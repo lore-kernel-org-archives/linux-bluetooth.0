@@ -1,293 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1361394733.1583.76.camel@aeonflux>
-Subject: Re: [PATCH 01/16] Bluetooth: Add src and dst info to struct
- l2cap_chan
-From: Marcel Holtmann <marcel@holtmann.org>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Date: Wed, 20 Feb 2013 22:12:13 +0100
-In-Reply-To: <1361391103-30738-2-git-send-email-gustavo@padovan.org>
-References: <1361391103-30738-1-git-send-email-gustavo@padovan.org>
-	 <1361391103-30738-2-git-send-email-gustavo@padovan.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1361389393.5261.54.camel@dellpc>
+References: <1361356092.2871.13.camel@dellpc>
+	<CANq1E4Q+etVLVL6OxWdC=N+aodvS5sqjKY3ZqJwoGM5gCjdEFw@mail.gmail.com>
+	<1361380641.5261.11.camel@dellpc>
+	<CANq1E4QP3COYCbAK7vmR1ODjZ0t9cTPzOF9GarcpBT-RDQu=bw@mail.gmail.com>
+	<1361389393.5261.54.camel@dellpc>
+Date: Wed, 20 Feb 2013 21:15:09 +0100
+Message-ID: <CANq1E4QNuj_7phM_rkG4jdZxjpJ9hozwmaiZ9oP3TsACSxagNg@mail.gmail.com>
+Subject: Re: hidp_get_raw_report source of 5 second delay in device removal
+From: David Herrmann <dh.herrmann@gmail.com>
+To: Karl Relton <karllinuxtest.relton@ntlworld.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Karl
 
-> Adding these two info to l2cap_chan makes the l2cap_core.c a little more
-> independent of the struct sock.
+On Wed, Feb 20, 2013 at 8:43 PM, Karl Relton
+<karllinuxtest.relton@ntlworld.com> wrote:
+[...]
+> Right!
+>
+> The point is
+> hci_unregister_dev calls
+>   hci_dev_do_close calls
+>     hci_conn_hash_flush calls
+>       hci_proto_disconn_cfm which triggers (via a 'wakeup' on a sock
+> waitlist)
+>         hidp_session running in another thread (a kthread) - which
+>                      removes the sub-protocols
+>
+> ... and then hci_unregister_dev, after the above calls, will go on to
+> call  hci_del_sysfs to remove the 'hci' device
+>
+> So the existing code does indeed trigger the removal of the
+> sub-protocols 'theoretically' before the HCI device removal as you
+> suggest it should.
 
-why are we doing this? What is the goal here? Explain it in the commit
-message.
+The way to fix that is to add "hidp_remove" or something similar,
+which locks the HIDP device, then removes the input-device/hid-device,
+unlocks the HIDP device and returns. This then needs to be called
+during hci_conn_del().
 
-> 
-> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> ---
->  include/net/bluetooth/l2cap.h |  3 +++
->  net/bluetooth/l2cap_core.c    | 46 ++++++++++++++++++-------------------------
->  net/bluetooth/l2cap_sock.c    |  6 +++---
->  net/bluetooth/rfcomm/core.c   | 15 +++++++-------
->  4 files changed, 33 insertions(+), 37 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index cdd3302..6040743 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -435,6 +435,9 @@ struct l2cap_seq_list {
->  struct l2cap_chan {
->  	struct sock *sk;
->  
-> +	bdaddr_t	src;
-> +	bdaddr_t	dst;
-> +
->  	struct l2cap_conn	*conn;
->  	struct hci_conn		*hs_hcon;
->  	struct hci_chan		*hs_hchan;
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 7c7e932..4a88fa1 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -148,7 +148,7 @@ static struct l2cap_chan *__l2cap_global_chan_by_addr(__le16 psm, bdaddr_t *src)
->  	struct l2cap_chan *c;
->  
->  	list_for_each_entry(c, &chan_list, global_l) {
-> -		if (c->sport == psm && !bacmp(&bt_sk(c->sk)->src, src))
-> +		if (c->sport == psm && !bacmp(&c->src, src))
->  			return c;
->  	}
->  	return NULL;
-> @@ -1305,7 +1305,6 @@ static struct l2cap_chan *l2cap_global_chan_by_scid(int state, u16 cid,
->  	read_lock(&chan_list_lock);
->  
->  	list_for_each_entry(c, &chan_list, global_l) {
-> -		struct sock *sk = c->sk;
->  
->  		if (state && c->state != state)
->  			continue;
-> @@ -1315,16 +1314,16 @@ static struct l2cap_chan *l2cap_global_chan_by_scid(int state, u16 cid,
->  			int src_any, dst_any;
->  
->  			/* Exact match. */
-> -			src_match = !bacmp(&bt_sk(sk)->src, src);
-> -			dst_match = !bacmp(&bt_sk(sk)->dst, dst);
-> +			src_match = !bacmp(&c->src, src);
-> +			dst_match = !bacmp(&c->dst, dst);
->  			if (src_match && dst_match) {
->  				read_unlock(&chan_list_lock);
->  				return c;
->  			}
->  
->  			/* Closest match */
-> -			src_any = !bacmp(&bt_sk(sk)->src, BDADDR_ANY);
-> -			dst_any = !bacmp(&bt_sk(sk)->dst, BDADDR_ANY);
-> +			src_any = !bacmp(&c->src, BDADDR_ANY);
-> +			dst_any = !bacmp(&c->dst, BDADDR_ANY);
->  			if ((src_match && dst_any) || (src_any && dst_match) ||
->  			    (src_any && dst_any))
->  				c1 = c;
-> @@ -1338,7 +1337,7 @@ static struct l2cap_chan *l2cap_global_chan_by_scid(int state, u16 cid,
->  
->  static void l2cap_le_conn_ready(struct l2cap_conn *conn)
->  {
-> -	struct sock *parent, *sk;
-> +	struct sock *parent;
->  	struct l2cap_chan *chan, *pchan;
->  
->  	BT_DBG("");
-> @@ -1357,13 +1356,11 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
->  	if (!chan)
->  		goto clean;
->  
-> -	sk = chan->sk;
-> -
->  	hci_conn_hold(conn->hcon);
->  	conn->hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
->  
-> -	bacpy(&bt_sk(sk)->src, conn->src);
-> -	bacpy(&bt_sk(sk)->dst, conn->dst);
-> +	bacpy(&chan->src, conn->src);
-> +	bacpy(&chan->dst, conn->dst);
->  
->  	l2cap_chan_add(conn, chan);
->  
-> @@ -1572,7 +1569,6 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
->  	read_lock(&chan_list_lock);
->  
->  	list_for_each_entry(c, &chan_list, global_l) {
-> -		struct sock *sk = c->sk;
->  
+We currently remove input-devices/hid-devices in the HIDP session
+itself. We can keep that if we make "hidp_remove" signal "terminate++"
+and then wait for the thread to stop. But I think the other way is
+better as it allows runtime-removal even though the sockets are still
+alive. For instance, we could make hidp_delconn() synchronous with
+this.
 
-You leave an empty line here?
+>
+> BUT because hidp_session is running in another thread there will ALWAYS
+> be a race. The whole 5 second hidp_get_raw_report thing shows up the
+> race big time, but even without that there is still a race ... and so
+> sometimes hidp_session will lose, leading to 'bad' udev events (and thus
+> potential problems for userspace programs that were depending on them).
 
->  		if (state && c->state != state)
->  			continue;
-> @@ -1582,16 +1578,16 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
->  			int src_any, dst_any;
->  
->  			/* Exact match. */
-> -			src_match = !bacmp(&bt_sk(sk)->src, src);
-> -			dst_match = !bacmp(&bt_sk(sk)->dst, dst);
-> +			src_match = !bacmp(&c->src, src);
-> +			dst_match = !bacmp(&c->dst, dst);
->  			if (src_match && dst_match) {
->  				read_unlock(&chan_list_lock);
->  				return c;
->  			}
->  
->  			/* Closest match */
-> -			src_any = !bacmp(&bt_sk(sk)->src, BDADDR_ANY);
-> -			dst_any = !bacmp(&bt_sk(sk)->dst, BDADDR_ANY);
-> +			src_any = !bacmp(&c->src, BDADDR_ANY);
-> +			dst_any = !bacmp(&c->dst, BDADDR_ANY);
->  			if ((src_match && dst_any) || (src_any && dst_match) ||
->  			    (src_any && dst_any))
->  				c1 = c;
-> @@ -1607,7 +1603,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
->  		       bdaddr_t *dst, u8 dst_type)
->  {
->  	struct sock *sk = chan->sk;
-> -	bdaddr_t *src = &bt_sk(sk)->src;
-> +	bdaddr_t *src = &chan->src;
->  	struct l2cap_conn *conn;
->  	struct hci_conn *hcon;
->  	struct hci_dev *hdev;
-> @@ -1674,9 +1670,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
->  	}
->  
->  	/* Set destination address and psm */
-> -	lock_sock(sk);
-> -	bacpy(&bt_sk(sk)->dst, dst);
-> -	release_sock(sk);
-> +	bacpy(&chan->dst, dst);
->  
->  	chan->psm = psm;
->  	chan->dcid = cid;
-> @@ -3637,8 +3631,8 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
->  
->  	hci_conn_hold(conn->hcon);
->  
-> -	bacpy(&bt_sk(sk)->src, conn->src);
-> -	bacpy(&bt_sk(sk)->dst, conn->dst);
-> +	bacpy(&chan->src, conn->src);
-> +	bacpy(&chan->dst, conn->dst);
->  	chan->psm  = psm;
->  	chan->dcid = scid;
->  	chan->local_amp_id = amp_id;
-> @@ -6285,17 +6279,16 @@ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
->  	/* Find listening sockets and check their link_mode */
->  	read_lock(&chan_list_lock);
->  	list_for_each_entry(c, &chan_list, global_l) {
-> -		struct sock *sk = c->sk;
->  
+My bad. The 5s gap does indeed increase the possibility of that race
+so it's definitely the more important fix.
 
-Same here.
+>
+> So ... if the HCI dev must be removed at its current point in the flow
+> of hci code, then a method of delaying the hci code flow until
+> sub-protocols (in this case hidp) are truly done is required (compared
+> to the current 'trigger and forget' scenario). It is not obvious to me
+> how to do that.
+>
+>> But more importantly, never ever call "device_del()" from within the
+>> _release_ callback of the device itself! If you do that, you didn't
+>> understand the idea behind the _get, _add, _del, _put functions.
+>> Besides, you are _required_ to hold a reference to a device when
+>> calling "device_del()". If you do that in the "release" callback, you
+>> violate this rule.
+>>
+>
+> I wasn't planning on doing that - which is why I re-introduced the hci
+> local refcnt. Never mind.
 
->  		if (c->state != BT_LISTEN)
->  			continue;
->  
-> -		if (!bacmp(&bt_sk(sk)->src, &hdev->bdaddr)) {
-> +		if (!bacmp(&c->src, &hdev->bdaddr)) {
->  			lm1 |= HCI_LM_ACCEPT;
->  			if (test_bit(FLAG_ROLE_SWITCH, &c->flags))
->  				lm1 |= HCI_LM_MASTER;
->  			exact++;
-> -		} else if (!bacmp(&bt_sk(sk)->src, BDADDR_ANY)) {
-> +		} else if (!bacmp(&c->src, BDADDR_ANY)) {
->  			lm2 |= HCI_LM_ACCEPT;
->  			if (test_bit(FLAG_ROLE_SWITCH, &c->flags))
->  				lm2 |= HCI_LM_MASTER;
-> @@ -6579,10 +6572,9 @@ static int l2cap_debugfs_show(struct seq_file *f, void *p)
->  	read_lock(&chan_list_lock);
->  
->  	list_for_each_entry(c, &chan_list, global_l) {
-> -		struct sock *sk = c->sk;
->  
+hci_dev_hold() and hci_dev_put() are the _only_ place where we call
+get_device() and put_device(), so if you introduce a refcnt in these
+functions, you simply extend the device-refcnt.
+This isn't obvious from the name of the functions so I'm sorry if that
+was rude. It wasn't supposed to be rude, sorry.
 
-And here.
+>
+>> I hope this cleared things up a bit. It's not your code, so you are
+>> not to blame. And honestly, I don't know who to blame. But IMO this
+>> needs to be fixed asap.
+>>
+>> Btw., the _ref, _add, _del, _unref cycle is something that is used in
+>> many other places. Unfortunately, many people get it wrong..
+>>
+>> I will try to fix the mess this week.
+>
+>
+> Great - sounds like the proper fix is beyond my ability and probably
+> requires more radical surgery. There are lots of user reports against
+> distributions that I think stem from this issue. For example Google
+> Chrome OS hacked their Xorg input driver to try and cope with the
+> truncated sysfs events that result - when the real issue is the hci/hidp
+> driver interaction. I'm glad therefore you are on the case.
 
->  		seq_printf(f, "%pMR %pMR %d %d 0x%4.4x 0x%4.4x %d %d %d %d\n",
-> -			   &bt_sk(sk)->src, &bt_sk(sk)->dst,
-> +			   &c->src, &c->dst,
->  			   c->state, __le16_to_cpu(c->psm),
->  			   c->scid, c->dcid, c->imtu, c->omtu,
->  			   c->sec_level, c->mode);
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index 1bcfb84..0977966 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -97,7 +97,7 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
->  	    __le16_to_cpu(la.l2_psm) == L2CAP_PSM_RFCOMM)
->  		chan->sec_level = BT_SECURITY_SDP;
->  
-> -	bacpy(&bt_sk(sk)->src, &la.l2_bdaddr);
-> +	bacpy(&chan->src, &la.l2_bdaddr);
->  
->  	chan->state = BT_BOUND;
->  	sk->sk_state = BT_BOUND;
-> @@ -259,11 +259,11 @@ static int l2cap_sock_getname(struct socket *sock, struct sockaddr *addr,
->  
->  	if (peer) {
->  		la->l2_psm = chan->psm;
-> -		bacpy(&la->l2_bdaddr, &bt_sk(sk)->dst);
-> +		bacpy(&la->l2_bdaddr, &chan->dst);
->  		la->l2_cid = cpu_to_le16(chan->dcid);
->  	} else {
->  		la->l2_psm = chan->sport;
-> -		bacpy(&la->l2_bdaddr, &bt_sk(sk)->src);
-> +		bacpy(&la->l2_bdaddr, &chan->src);
->  		la->l2_cid = cpu_to_le16(chan->scid);
->  	}
->  
-> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-> index 201fdf7..15dc078 100644
-> --- a/net/bluetooth/rfcomm/core.c
-> +++ b/net/bluetooth/rfcomm/core.c
-> @@ -632,13 +632,13 @@ static struct rfcomm_session *rfcomm_session_get(bdaddr_t *src, bdaddr_t *dst)
->  {
->  	struct rfcomm_session *s;
->  	struct list_head *p, *n;
-> -	struct bt_sock *sk;
-> +	struct l2cap_chan *chan;
->  	list_for_each_safe(p, n, &session_list) {
->  		s = list_entry(p, struct rfcomm_session, list);
-> -		sk = bt_sk(s->sock->sk);
-> +		chan = l2cap_pi(s->sock->sk)->chan;
->  
-> -		if ((!bacmp(src, BDADDR_ANY) || !bacmp(&sk->src, src)) &&
-> -				!bacmp(&sk->dst, dst))
-> +		if ((!bacmp(src, BDADDR_ANY) || !bacmp(&chan->src, src)) &&
-> +				!bacmp(&chan->dst, dst))
->  			return s;
->  	}
->  	return NULL;
-> @@ -727,9 +727,9 @@ void rfcomm_session_getaddr(struct rfcomm_session *s, bdaddr_t *src, bdaddr_t *d
->  {
->  	struct sock *sk = s->sock->sk;
->  	if (src)
-> -		bacpy(src, &bt_sk(sk)->src);
-> +		bacpy(src, &l2cap_pi(sk)->chan->src);
->  	if (dst)
-> -		bacpy(dst, &bt_sk(sk)->dst);
-> +		bacpy(dst, &l2cap_pi(sk)->chan->dst);
->  }
->  
->  /* ---- RFCOMM frame sending ---- */
-> @@ -2126,7 +2126,8 @@ static int rfcomm_dlc_debugfs_show(struct seq_file *f, void *x)
->  			struct sock *sk = s->sock->sk;
->  
->  			seq_printf(f, "%pMR %pMR %ld %d %d %d %d\n",
-> -				   &bt_sk(sk)->src, &bt_sk(sk)->dst,
-> +				   &l2cap_pi(sk)->chan->src,
-> +				   &l2cap_pi(sk)->chan->dst,
->  				   d->state, d->dlci, d->mtu,
->  				   d->rx_credits, d->tx_credits);
->  		}
+I know. This problem gets reported since at least 4 years here and
+no-one fixed it properly. I'm not working on the Bluetooth layer,
+either, but the bug bothers me as my HID drivers don't work over
+Bluetooth.
 
 Regards
-
-Marcel
-
-
+David
