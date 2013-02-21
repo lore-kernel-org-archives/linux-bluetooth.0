@@ -1,50 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1360764149-26447-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1360764149-26447-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Date: Fri, 22 Feb 2013 10:45:47 +0200
-Message-ID: <CABBYNZKYPancy0ncHxuAiKt9ib55MoyoZypCsurbQe=2UEc0BQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] obexd: Remove obc_session_setpath limit
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1361436132.2792.4.camel@dellpc>
+Subject: Re: [PATCH v2] hidp: Make hidp_get_raw_report abort if the session
+ is terminating.
+From: Karl Relton <karllinuxtest.relton@ntlworld.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: dh.herrmann@gmail.com, Marcel Holtmann <marcel@holtmann.org>, Gustavo
+	Padovan <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>
+Date: Thu, 21 Feb 2013 08:42:12 +0000
+In-Reply-To: <1361384179.5261.15.camel@dellpc>
+References: <1361384179.5261.15.camel@dellpc>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
-
-On Wed, Feb 13, 2013 at 4:02 PM, Christian Fetzer
-<christian.fetzer@oss.bmw-carit.de> wrote:
-> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
->
-> obc_session_setpath is able to handle multiple folder changes at once.
-> This removes the limit, that was introduced because of PBAP's limitation
-> to 3 levels (75d32c6b3a3bddaad19b7880950f9a503afe652b).
->
-> Other profiles like MAP might have deeper folder hierarchies.
+On Wed, 2013-02-20 at 18:16 +0000, Karl Relton wrote:
+> From: Karl Relton <karllinuxtest.relton@ntlworld.com>
+> 
+>  After linux 3.2 the hid_destroy_device call in hidp_session
+>  cleaning up invokes a hook to the power_supply code which
+>  in turn tries to read the battery capacity. This read will
+>  trigger a call to hidp_get_raw_report which is bound to fail
+>  because the device is being taken away - so rather than
+>  wait for the 5 second timeout failure this changes enables
+>  it to fail straight away.
+> 
+> Signed-off-by: Karl Relton <karllinuxtest.relton@ntlworld.com>
+> Reviewed-by: David Herrmann <dh.herrmann@gmail.com>
 > ---
->  obexd/client/session.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/obexd/client/session.c b/obexd/client/session.c
-> index db37a86..f8aae5d 100644
-> --- a/obexd/client/session.c
-> +++ b/obexd/client/session.c
-> @@ -929,7 +929,7 @@ guint obc_session_setpath(struct obc_session *session, const char *path,
->         data = g_new0(struct setpath_data, 1);
->         data->func = func;
->         data->user_data = user_data;
-> -       data->remaining = g_strsplit(path, "/", 3);
-> +       data->remaining = g_strsplit(path, "/", 0);
->
->         p = pending_request_new(session, NULL, setpath_complete, data);
->
-> --
-> 1.8.1.3
+>  net/bluetooth/hidp/core.c |    4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+> index b2bcbe2..4b26ea7 100644
+> --- a/net/bluetooth/hidp/core.c
+> +++ b/net/bluetooth/hidp/core.c
+> @@ -311,6 +311,9 @@ static int hidp_get_raw_report(struct hid_device *hid,
+>  	int numbered_reports = hid->report_enum[report_type].numbered;
+>  	int ret;
+>  
+> +	if (atomic_read(&session->terminate))
+> +		return -EIO;
+> +
+>  	switch (report_type) {
 
-This set is now upstream, thanks.
+Actually I've just realised that hidp_get_raw_report calls
+__hidp_send_ctrl_message which already has the session->terminate test,
+also returning -EIO on failure. So adding it again here is redundant.
 
+> @@ -722,6 +725,7 @@ static int hidp_session(void *arg)
+>  		set_current_state(TASK_INTERRUPTIBLE);
+>  	}
+>  	set_current_state(TASK_RUNNING);
+> +	atomic_inc(&session->terminate);
+>  	remove_wait_queue(sk_sleep(intr_sk), &intr_wait);
+>  	remove_wait_queue(sk_sleep(ctrl_sk), &ctrl_wait);
+>  
 
--- 
-Luiz Augusto von Dentz
+So its just this one single line we need - to ensure session->terminate
+is non-zero, which will ensure calls to other things (like
+hidp_get_raw_report) abort swiftly.
+
+I'll change the patch and send v3 this evening (need to get back to the
+day job!).
+
+Karl
