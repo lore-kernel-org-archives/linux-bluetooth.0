@@ -1,46 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 22 Feb 2013 16:31:15 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 01/15] Bluetooth: Fix __hci_request() handling of empty requests
-Date: Fri, 22 Feb 2013 16:48:18 +0200
-Message-Id: <1361544512-4056-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1361544512-4056-1-git-send-email-johan.hedberg@gmail.com>
-References: <1361544512-4056-1-git-send-email-johan.hedberg@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 07/14] Bluetooth: Add transaction cmd_complete and
+ cmd_status functions
+Message-ID: <20130222143115.GA2718@x220>
+References: <1361538759-13558-1-git-send-email-johan.hedberg@gmail.com>
+ <1361538759-13558-8-git-send-email-johan.hedberg@gmail.com>
+ <20130222141740.GA6830@echo>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130222141740.GA6830@echo>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Vinicius,
 
-If a request callback doesn't send any commands __hci_request() should
-fail imediately instead of waiting for the inevitable timeout to occur.
-This is particularly important once we start creating requests with
-conditional command sending which can potentially result in no commands
-being sent at all.
+On Fri, Feb 22, 2013, Vinicius Costa Gomes wrote:
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -53,6 +53,7 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
+> >  	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+> >  	hci_dev_unlock(hdev);
+> >  
+> > +	hci_transaction_cmd_complete(hdev, HCI_OP_INQUIRY, status);
+> >  	hci_req_complete(hdev, HCI_OP_INQUIRY_CANCEL, status);
+> >  
+> >  	hci_conn_check_pending(hdev);
+> > @@ -1692,6 +1693,7 @@ static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> >  
+> >  	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+> >  
+> > +	hci_transaction_cmd_complete(hdev, HCI_OP_INQUIRY, status);
+> 
+> There are quite a few other commands that do not cause a Command Complete
+> event, for example, LE Start Encryption, causes either a Encrypt Change or a
+> Key Refresh; LE Create Connection, causes a Connection Complete.
+> 
+> So if I want to add support for these commands to be part of a transaction I
+> would need to add the appropriate handler to the associated "complete" events,
+> right?  I feel that I already know the answer ;-) This question is more about
+> others developers losing time thinking: "Why transactions doesn't work for
+> these particular commands?".
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_core.c |    8 ++++++++
- 1 file changed, 8 insertions(+)
+Right. Any multi-command transactions, or transactions with a complete
+callback that contain HCI commands that do not result in command
+complete will need to have these extra calls to
+hci_transaction_cmd_complete added. Probably some comment might be worth
+adding to the code about this.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index aeb2b26..fd6921f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -122,6 +122,14 @@ static int __hci_request(struct hci_dev *hdev,
- 	set_current_state(TASK_INTERRUPTIBLE);
- 
- 	req(hdev, opt);
-+
-+	/* If the request didn't send any commands return immediately */
-+	if (skb_queue_empty(&hdev->cmd_q) && atomic_read(&hdev->cmd_cnt)) {
-+		hdev->req_status = 0;
-+		remove_wait_queue(&hdev->req_wait_q, &wait);
-+		return err;
-+	}
-+
- 	schedule_timeout(timeout);
- 
- 	remove_wait_queue(&hdev->req_wait_q, &wait);
--- 
-1.7.10.4
-
+Johan
