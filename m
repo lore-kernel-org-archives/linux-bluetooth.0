@@ -1,67 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 22 Feb 2013 11:17:40 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 07/14] Bluetooth: Add transaction cmd_complete and
- cmd_status functions
-Message-ID: <20130222141740.GA6830@echo>
-References: <1361538759-13558-1-git-send-email-johan.hedberg@gmail.com>
- <1361538759-13558-8-git-send-email-johan.hedberg@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1361538759-13558-8-git-send-email-johan.hedberg@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 03/14 v2] Bluetooth: Add initial skeleton for HCI transaction framework
+Date: Fri, 22 Feb 2013 15:34:00 +0200
+Message-Id: <1361540040-14488-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1361538759-13558-4-git-send-email-johan.hedberg@gmail.com>
+References: <1361538759-13558-4-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 15:12 Fri 22 Feb, Johan Hedberg wrote:
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> This patch introduces functions to process the transaction state when
-> receiving HCI Command Status or Command Complete events. Some HCI
-> commands, like Inquiry do not result in a Command complete event so
-> special handling is needed for them. Inquiry is a particularly important
-> one since it is the only forseeable "non-cmd_complete" command that will
-> make good use of the transaction framework, and its completion is either
-> indicated by an Inquiry Complete event of a successful Command Complete
-> for HCI_Inquiry_Cancel.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Looking pretty good.
+This patch adds the initial definitions and functions for HCI
+transactions. HCI transactions are essentially a group of HCI commands
+together with an optional completion callback. The transaction is
+tracked through the already existing command queue by having the
+necessary context information as part of the control buffer of each skb.
 
-[snip]
+The only information needed in the skb control buffer is a flag for
+indicating that the skb is the start of a transaction as well as the
+optional complete callback that should be used for the transaction (this
+will only be set for skbs that also have the start flag set).
 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 14e872a..6dd5fd4 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -53,6 +53,7 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
->  	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
->  	hci_dev_unlock(hdev);
->  
-> +	hci_transaction_cmd_complete(hdev, HCI_OP_INQUIRY, status);
->  	hci_req_complete(hdev, HCI_OP_INQUIRY_CANCEL, status);
->  
->  	hci_conn_check_pending(hdev);
-> @@ -1692,6 +1693,7 @@ static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
->  
->  	BT_DBG("%s status 0x%2.2x", hdev->name, status);
->  
-> +	hci_transaction_cmd_complete(hdev, HCI_OP_INQUIRY, status);
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+v2: Use splice_tail() instead of splice() so that new transactions don't
+    get precedence over ones already part of hdev->cmd_q
 
-There are quite a few other commands that do not cause a Command Complete
-event, for example, LE Start Encryption, causes either a Encrypt Change or a
-Key Refresh; LE Create Connection, causes a Connection Complete.
+ include/net/bluetooth/bluetooth.h |   11 +++++++++++
+ include/net/bluetooth/hci_core.h  |   13 +++++++++++++
+ net/bluetooth/hci_core.c          |   35 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 59 insertions(+)
 
-So if I want to add support for these commands to be part of a transaction I
-would need to add the appropriate handler to the associated "complete" events,
-right?  I feel that I already know the answer ;-) This question is more about
-others developers losing time thinking: "Why transactions doesn't work for
-these particular commands?".
-
-
-Cheers,
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 9531bee..9e1d197 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -260,12 +260,23 @@ struct l2cap_ctrl {
+ 	__u8		retries;
+ };
+ 
++struct hci_dev;
++
++typedef void (*transaction_complete_t)(struct hci_dev *hdev, u16 last_cmd,
++				       int status);
++
++struct transaction_ctrl {
++	__u8			start;
++	transaction_complete_t	complete;
++};
++
+ struct bt_skb_cb {
+ 	__u8 pkt_type;
+ 	__u8 incoming;
+ 	__u16 expect;
+ 	__u8 force_active;
+ 	struct l2cap_ctrl control;
++	struct transaction_ctrl transaction;
+ };
+ #define bt_cb(skb) ((struct bt_skb_cb *)((skb)->cb))
+ 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 787d3b9..e97d8e5 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -248,6 +248,8 @@ struct hci_dev {
+ 	__u32			req_status;
+ 	__u32			req_result;
+ 
++	transaction_complete_t	transaction_complete;
++
+ 	__u16			init_last_cmd;
+ 
+ 	struct list_head	mgmt_pending;
+@@ -1041,6 +1043,17 @@ static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type, u8 *data,
+ int hci_register_cb(struct hci_cb *hcb);
+ int hci_unregister_cb(struct hci_cb *hcb);
+ 
++struct hci_transaction {
++	struct hci_dev		*hdev;
++	struct sk_buff_head	cmd_q;
++	transaction_complete_t	complete;
++};
++
++void hci_transaction_init(struct hci_transaction *transaction,
++			  struct hci_dev *hdev,
++			  transaction_complete_t complete);
++int hci_transaction_run(struct hci_transaction *transaction);
++
+ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param);
+ void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags);
+ void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 9730424..51bf551 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2435,6 +2435,36 @@ static int hci_send_frame(struct sk_buff *skb)
+ 	return hdev->send(skb);
+ }
+ 
++void hci_transaction_init(struct hci_transaction *transaction,
++			  struct hci_dev *hdev,
++			  transaction_complete_t complete)
++{
++	memset(transaction, 0, sizeof(*transaction));
++	skb_queue_head_init(&transaction->cmd_q);
++	transaction->hdev = hdev;
++	transaction->complete = complete;
++}
++
++int hci_transaction_run(struct hci_transaction *transaction)
++{
++	struct hci_dev *hdev = transaction->hdev;
++	unsigned long flags;
++
++	BT_DBG("length %u", skb_queue_len(&transaction->cmd_q));
++
++	/* Do not allow empty transactions */
++	if (skb_queue_empty(&transaction->cmd_q))
++		return -EINVAL;
++
++	spin_lock_irqsave(&hdev->cmd_q.lock, flags);
++	skb_queue_splice_tail(&transaction->cmd_q, &hdev->cmd_q);
++	spin_unlock_irqrestore(&hdev->cmd_q.lock, flags);
++
++	queue_work(hdev->workqueue, &hdev->cmd_work);
++
++	return 0;
++}
++
+ /* Send HCI command */
+ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
+ {
+@@ -3209,6 +3239,11 @@ static void hci_cmd_work(struct work_struct *work)
+ 		hdev->sent_cmd = skb_clone(skb, GFP_ATOMIC);
+ 		if (hdev->sent_cmd) {
+ 			atomic_dec(&hdev->cmd_cnt);
++
++			if (bt_cb(skb)->transaction.start)
++				hdev->transaction_complete =
++					bt_cb(skb)->transaction.complete;
++
+ 			hci_send_frame(skb);
+ 			if (test_bit(HCI_RESET, &hdev->flags))
+ 				del_timer(&hdev->cmd_timer);
 -- 
-Vinicius
+1.7.10.4
+
