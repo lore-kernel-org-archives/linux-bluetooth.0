@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 12/15] Bluetooth: Fix busy condition testing for EIR and class updates
-Date: Fri, 22 Feb 2013 16:48:29 +0200
-Message-Id: <1361544512-4056-13-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 09/15] Bluetooth: Move power on HCI command updates to their own function
+Date: Fri, 22 Feb 2013 16:48:26 +0200
+Message-Id: <1361544512-4056-10-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1361544512-4056-1-git-send-email-johan.hedberg@gmail.com>
 References: <1361544512-4056-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,92 +11,114 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The add/remove_uuid and set_dev_class mgmt commands can trigger both EIR
-and class HCI commands, so testing just for a pending class command is
-enough. The simplest way to monitor conflicts that should trigger "busy"
-error returns is to check for any pending mgmt command that can trigger
-these HCI commands. This patch adds a helper function for this
-(pending_eir_or_class) and uses it instead of the old HCI_PENDING_CLASS
-flag to test for busy conditions.
+These commands will in a subsequent patch be performed in their own
+transaction, so it's more readable (not just from a resulting code
+perspective but also the way the patches look like) to have them
+performed in their own function.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c |   39 ++++++++++++++++++++++++++++++---------
- 1 file changed, 30 insertions(+), 9 deletions(-)
+ net/bluetooth/mgmt.c |   76 ++++++++++++++++++++++++++------------------------
+ 1 file changed, 40 insertions(+), 36 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index b2a9697..41a3265 100644
+index 39395c7..025f6f0 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1341,6 +1341,23 @@ unlock:
- 	return err;
+@@ -3058,53 +3058,57 @@ static int set_bredr_scan(struct hci_dev *hdev)
+ 	return hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
  }
  
-+static bool pending_eir_or_class(struct hci_dev *hdev)
-+{
-+	struct pending_cmd *cmd;
-+
-+	list_for_each_entry(cmd, &hdev->mgmt_pending, list) {
-+		switch (cmd->opcode) {
-+		case MGMT_OP_ADD_UUID:
-+		case MGMT_OP_REMOVE_UUID:
-+		case MGMT_OP_SET_DEV_CLASS:
-+		case MGMT_OP_SET_POWERED:
-+			return true;
-+		}
+-int mgmt_powered(struct hci_dev *hdev, u8 powered)
++static int powered_update_hci(struct hci_dev *hdev)
+ {
+-	struct cmd_lookup match = { NULL, hdev };
+-	int err;
++	u8 link_sec;
+ 
+-	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
+-		return 0;
++	if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
++	    !lmp_host_ssp_capable(hdev)) {
++		u8 ssp = 1;
+ 
+-	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
++		hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE, 1, &ssp);
 +	}
-+
-+	return false;
+ 
+-	if (powered) {
+-		u8 link_sec;
++	if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
++		struct hci_cp_write_le_host_supported cp;
+ 
+-		if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
+-		    !lmp_host_ssp_capable(hdev)) {
+-			u8 ssp = 1;
++		cp.le = 1;
++		cp.simul = lmp_le_br_capable(hdev);
+ 
+-			hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE, 1, &ssp);
+-		}
++		/* Check first if we already have the right
++		 * host state (host features set)
++		 */
++		if (cp.le != lmp_host_le_capable(hdev) ||
++		    cp.simul != lmp_host_le_br_capable(hdev))
++			hci_send_cmd(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED,
++				     sizeof(cp), &cp);
++	}
+ 
+-		if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
+-			struct hci_cp_write_le_host_supported cp;
++	link_sec = test_bit(HCI_LINK_SECURITY, &hdev->dev_flags);
++	if (link_sec != test_bit(HCI_AUTH, &hdev->flags))
++		hci_send_cmd(hdev, HCI_OP_WRITE_AUTH_ENABLE,
++			     sizeof(link_sec), &link_sec);
+ 
+-			cp.le = 1;
+-			cp.simul = lmp_le_br_capable(hdev);
++	if (lmp_bredr_capable(hdev)) {
++		set_bredr_scan(hdev);
++		update_class(hdev);
++		update_name(hdev, hdev->dev_name);
++		update_eir(hdev);
++	}
 +}
+ 
+-			/* Check first if we already have the right
+-			 * host state (host features set)
+-			 */
+-			if (cp.le != lmp_host_le_capable(hdev) ||
+-			    cp.simul != lmp_host_le_br_capable(hdev))
+-				hci_send_cmd(hdev,
+-					     HCI_OP_WRITE_LE_HOST_SUPPORTED,
+-					     sizeof(cp), &cp);
+-		}
++int mgmt_powered(struct hci_dev *hdev, u8 powered)
++{
++	struct cmd_lookup match = { NULL, hdev };
++	int err;
+ 
+-		link_sec = test_bit(HCI_LINK_SECURITY, &hdev->dev_flags);
+-		if (link_sec != test_bit(HCI_AUTH, &hdev->flags))
+-			hci_send_cmd(hdev, HCI_OP_WRITE_AUTH_ENABLE,
+-				     sizeof(link_sec), &link_sec);
++	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
++		return 0;
+ 
+-		if (lmp_bredr_capable(hdev)) {
+-			set_bredr_scan(hdev);
+-			update_class(hdev);
+-			update_name(hdev, hdev->dev_name);
+-			update_eir(hdev);
+-		}
++	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
 +
- static const u8 bluetooth_base_uuid[] = {
- 			0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
- 			0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-@@ -1372,7 +1389,7 @@ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
- 
- 	hci_dev_lock(hdev);
- 
--	if (test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
-+	if (pending_eir_or_class(hdev)) {
- 		err = cmd_status(sk, hdev->id, MGMT_OP_ADD_UUID,
- 				 MGMT_STATUS_BUSY);
- 		goto failed;
-@@ -1444,7 +1461,7 @@ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	hci_dev_lock(hdev);
- 
--	if (test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
-+	if (pending_eir_or_class(hdev)) {
- 		err = cmd_status(sk, hdev->id, MGMT_OP_REMOVE_UUID,
- 				 MGMT_STATUS_BUSY);
- 		goto unlock;
-@@ -1520,15 +1537,19 @@ static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
- 		return cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
- 				  MGMT_STATUS_NOT_SUPPORTED);
- 
--	if (test_bit(HCI_PENDING_CLASS, &hdev->dev_flags))
--		return cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
--				  MGMT_STATUS_BUSY);
-+	hci_dev_lock(hdev);
- 
--	if ((cp->minor & 0x03) != 0 || (cp->major & 0xe0) != 0)
--		return cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
--				  MGMT_STATUS_INVALID_PARAMS);
-+	if (pending_eir_or_class(hdev)) {
-+		err = cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
-+				 MGMT_STATUS_BUSY);
-+		goto unlock;
-+	}
- 
--	hci_dev_lock(hdev);
-+	if ((cp->minor & 0x03) != 0 || (cp->major & 0xe0) != 0) {
-+		err = cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
-+				 MGMT_STATUS_INVALID_PARAMS);
-+		goto unlock;
-+	}
- 
- 	hdev->major_class = cp->major;
- 	hdev->minor_class = cp->minor;
++	if (powered) {
++		powered_update_hci(hdev);
+ 	} else {
+ 		u8 status = MGMT_STATUS_NOT_POWERED;
+ 		u8 zero_cod[] = { 0, 0, 0 };
 -- 
 1.7.10.4
 
