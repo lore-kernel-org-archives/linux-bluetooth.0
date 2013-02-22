@@ -1,166 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CANT-zCVPDBd2EETq-q4Zok+XO--ZyRY-kdWoynYYszwB7vKBLw@mail.gmail.com>
-References: <1361284436-4584-1-git-send-email-luiz.dentz@gmail.com>
-	<CANT-zCUNV3cdEd6FR0psubCYn25nUO8on0bTmV=+ZVgCSiSMAA@mail.gmail.com>
-	<CABBYNZ+-dMtZ+EnzFQZcPBBTh91nMA7WUdTTmfeRKDxcagwgww@mail.gmail.com>
-	<CANT-zCVPDBd2EETq-q4Zok+XO--ZyRY-kdWoynYYszwB7vKBLw@mail.gmail.com>
-Date: Fri, 22 Feb 2013 14:00:59 +0200
-Message-ID: <CABBYNZKmH7k53tcUggcKstn09MS01yX5KcbCbJfaMtJc0WRTtg@mail.gmail.com>
-Subject: Re: [RFC BlueZ 1/2] A2DP: Mark start flag if resume happen while in
- configured state
+In-Reply-To: <1360764149-26447-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1360764149-26447-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Date: Fri, 22 Feb 2013 10:45:47 +0200
+Message-ID: <CABBYNZKYPancy0ncHxuAiKt9ib55MoyoZypCsurbQe=2UEc0BQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] obexd: Remove obc_session_setpath limit
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Christian,
 
-On Wed, Feb 20, 2013 at 3:37 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> Hi Luiz,
+On Wed, Feb 13, 2013 at 4:02 PM, Christian Fetzer
+<christian.fetzer@oss.bmw-carit.de> wrote:
+> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 >
-> On Tue, Feb 19, 2013 at 4:30 PM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi Mikel,
->>
->> On Tue, Feb 19, 2013 at 5:06 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
->>> Hi Luiz,
->>>
->>> On Tue, Feb 19, 2013 at 3:33 PM, Luiz Augusto von Dentz
->>> <luiz.dentz@gmail.com> wrote:
->>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>>
->>>> If SEP is in configured state that means OPEN is about to happen so just
->>>> mark start flag and send START once OPEN completes.
->>>> ---
->>>>  profiles/audio/a2dp.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++
->>>>  1 file changed, 54 insertions(+)
->>>>
->>>> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
->>>> index f1646ee..d9680a7 100644
->>>> --- a/profiles/audio/a2dp.c
->>>> +++ b/profiles/audio/a2dp.c
->>>> @@ -336,6 +336,20 @@ static struct a2dp_setup *find_setup_by_dev(struct audio_device *dev)
->>>>         return NULL;
->>>>  }
->>>>
->>>> +static struct a2dp_setup *find_setup_by_stream(struct avdtp_stream *stream)
->>>> +{
->>>> +       GSList *l;
->>>> +
->>>> +       for (l = setups; l != NULL; l = l->next) {
->>>> +               struct a2dp_setup *setup = l->data;
->>>> +
->>>> +               if (setup->stream == stream)
->>>> +                       return setup;
->>>> +       }
->>>> +
->>>> +       return NULL;
->>>> +}
->>>> +
->>>>  static void stream_state_changed(struct avdtp_stream *stream,
->>>>                                         avdtp_state_t old_state,
->>>>                                         avdtp_state_t new_state,
->>>> @@ -344,6 +358,29 @@ static void stream_state_changed(struct avdtp_stream *stream,
->>>>  {
->>>>         struct a2dp_sep *sep = user_data;
->>>>
->>>> +       if (new_state == AVDTP_STATE_OPEN) {
->>>> +               struct a2dp_setup *setup;
->>>> +               int err;
->>>> +
->>>> +               setup = find_setup_by_stream(stream);
->>>> +               if (!setup || !setup->start)
->>>> +                       return;
->>>> +
->>>> +               setup->start = FALSE;
->>>> +
->>>> +               err = avdtp_start(setup->session, stream);
->>>> +               if (err < 0 && err != -EINPROGRESS) {
->>>> +                       error("avdtp_start: %s (%d)", strerror(-err), -err);
->>>> +                       finalize_setup_errno(setup, err, finalize_resume,
->>>> +                                                                       NULL);
->>>> +                       return;
->>>> +               }
->>>> +
->>>> +               sep->starting = TRUE;
->>>> +
->>>> +               return;
->>>> +       }
->>>> +
->>>
->>> Shouldn't you handle the error case here? Any other transition from
->>> AVDTP_STATE_CONFIGURED should probably be considered a failure.
->>
->> The failure case is where OPEN fails, which is handled by open_ind and
->> open_cfm, or if stream connection timeout which will generate an ABORT
->> that takes care of terminating the setup.
->>
->>>>         if (new_state != AVDTP_STATE_IDLE)
->>>>                 return;
->>>>
->>>> @@ -661,6 +698,12 @@ static gboolean open_ind(struct avdtp *session, struct avdtp_local_sep *sep,
->>>>
->>>>         finalize_config(setup);
->>>>
->>>> +       if (!setup->start || !err)
->>>> +               return TRUE;
->>>> +
->>>> +       setup->start = FALSE;
->>>> +       finalize_resume(setup);
->>>> +
->>>>         return TRUE;
->>>>  }
->>>>
->>>> @@ -689,6 +732,14 @@ static void open_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
->>>>         }
->>>>
->>>>         finalize_config(setup);
->>>> +
->>>> +       if (!setup->start || !err)
->>>> +               return;
->>>> +
->>>> +       setup->start = FALSE;
->>>> +       finalize_resume(setup);
->>>> +
->>>> +       return;
->>>>  }
->>>>
->>>>  static gboolean suspend_timeout(struct a2dp_sep *sep)
->>>> @@ -1718,6 +1769,9 @@ unsigned int a2dp_resume(struct avdtp *session, struct a2dp_sep *sep,
->>>>         case AVDTP_STATE_IDLE:
->>>>                 goto failed;
->>>>                 break;
->>>> +       case AVDTP_STATE_CONFIGURED:
->>>> +               setup->start = TRUE;
->>>> +               break;
->>>>         case AVDTP_STATE_OPEN:
->>>>                 if (avdtp_start(session, sep->stream) < 0) {
->>>>                         error("avdtp_start failed");
->>>> --
->>>
->>> This alternative has the obvious advantage of not introducing an
->>> additional state to the transport and simpler APIs are generally good.
->>>
->>> However, I see little benefit in the client's side and the
->>> implementation gets a bit tricky in the server's side (BlueZ and
->>> oFono).
->>>
->>> I'd personally prefer to go simple and make this state explicit,
->>> instead of trying to internally defer the operation.
->>
->> I don't see this as being so complicated, in fact it is probably less
->> code than having to deal with another state because nothing has to be
->> changed in the clients, start flag is actually already there in case
->> the client resume while we are waiting for suspend to complete and for
->> HFP there is probably no  mapping to configuring state since the SCO
->> configuration is managed by the kernel.
+> obc_session_setpath is able to handle multiple folder changes at once.
+> This removes the limit, that was introduced because of PBAP's limitation
+> to 3 levels (75d32c6b3a3bddaad19b7880950f9a503afe652b).
 >
-> Ack from my side.
+> Other profiles like MAP might have deeper folder hierarchies.
+> ---
+>  obexd/client/session.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/obexd/client/session.c b/obexd/client/session.c
+> index db37a86..f8aae5d 100644
+> --- a/obexd/client/session.c
+> +++ b/obexd/client/session.c
+> @@ -929,7 +929,7 @@ guint obc_session_setpath(struct obc_session *session, const char *path,
+>         data = g_new0(struct setpath_data, 1);
+>         data->func = func;
+>         data->user_data = user_data;
+> -       data->remaining = g_strsplit(path, "/", 3);
+> +       data->remaining = g_strsplit(path, "/", 0);
+>
+>         p = pending_request_new(session, NULL, setpath_complete, data);
+>
+> --
+> 1.8.1.3
 
-Applied
+This set is now upstream, thanks.
 
 
 -- 
