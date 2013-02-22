@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 02/15] Bluetooth: Split HCI init sequence into three stages
-Date: Fri, 22 Feb 2013 17:04:57 +0200
-Message-Id: <1361545497-4949-1-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1361544512-4056-3-git-send-email-johan.hedberg@gmail.com>
-References: <1361544512-4056-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 02/15] Bluetooth: Split HCI init sequence into three stages
+Date: Fri, 22 Feb 2013 16:48:19 +0200
+Message-Id: <1361544512-4056-3-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1361544512-4056-1-git-send-email-johan.hedberg@gmail.com>
+References: <1361544512-4056-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -22,14 +22,12 @@ cater for transactions that change on the fly.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
-v3: Fix incorrect (err < 1) check for init2_req failure
-
  net/bluetooth/hci_core.c  |  271 ++++++++++++++++++++++++++++++++++++++++++++-
  net/bluetooth/hci_event.c |  255 +-----------------------------------------
  2 files changed, 271 insertions(+), 255 deletions(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index fd6921f..f71ad76 100644
+index fd6921f..9730424 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
 @@ -193,6 +193,9 @@ static void bredr_init(struct hci_dev *hdev)
@@ -313,7 +311,7 @@ index fd6921f..f71ad76 100644
 +		return 0;
 +
 +	err = __hci_request(hdev, hci_init2_req, 0, HCI_INIT_TIMEOUT);
-+	if (err < 0)
++	if (err < 1)
 +		return err;
 +
 +	return __hci_request(hdev, hci_init3_req, 0, HCI_INIT_TIMEOUT);
