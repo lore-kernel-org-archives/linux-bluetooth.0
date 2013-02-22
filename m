@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 09/15] Bluetooth: Move power on HCI command updates to their own function
-Date: Fri, 22 Feb 2013 16:48:26 +0200
-Message-Id: <1361544512-4056-10-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 07/15] Bluetooth: Add transaction cmd_complete and cmd_status functions
+Date: Fri, 22 Feb 2013 16:48:24 +0200
+Message-Id: <1361544512-4056-8-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1361544512-4056-1-git-send-email-johan.hedberg@gmail.com>
 References: <1361544512-4056-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,114 +11,161 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-These commands will in a subsequent patch be performed in their own
-transaction, so it's more readable (not just from a resulting code
-perspective but also the way the patches look like) to have them
-performed in their own function.
+This patch introduces functions to process the transaction state when
+receiving HCI Command Status or Command Complete events. Some HCI
+commands, like Inquiry do not result in a Command complete event so
+special handling is needed for them. Inquiry is a particularly important
+one since it is the only forseeable "non-cmd_complete" command that will
+make good use of the transaction framework, and its completion is either
+indicated by an Inquiry Complete event of a successful Command Complete
+for HCI_Inquiry_Cancel.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c |   76 ++++++++++++++++++++++++++------------------------
- 1 file changed, 40 insertions(+), 36 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 ++
+ net/bluetooth/hci_core.c         |   69 ++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |    7 ++++
+ 3 files changed, 78 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 39395c7..025f6f0 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3058,53 +3058,57 @@ static int set_bredr_scan(struct hci_dev *hdev)
- 	return hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 8c2553f..038f8c7a 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1056,6 +1056,8 @@ int hci_transaction_run(struct hci_transaction *transaction);
+ int hci_transaction_cmd(struct hci_transaction *transaction, u16 opcode,
+ 			u32 plen, void *param);
+ void hci_transaction_from_skb(struct hci_dev *hdev, struct sk_buff *skb);
++void hci_transaction_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status);
++void hci_transaction_cmd_status(struct hci_dev *hdev, u16 opcode, u8 status);
+ 
+ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param);
+ void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 64da4a3..35a0184 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3217,6 +3217,75 @@ static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 	kfree_skb(skb);
  }
  
--int mgmt_powered(struct hci_dev *hdev, u8 powered)
-+static int powered_update_hci(struct hci_dev *hdev)
- {
--	struct cmd_lookup match = { NULL, hdev };
--	int err;
-+	u8 link_sec;
- 
--	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
--		return 0;
-+	if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
-+	    !lmp_host_ssp_capable(hdev)) {
-+		u8 ssp = 1;
- 
--	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
-+		hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE, 1, &ssp);
++static bool transaction_is_complete(struct hci_dev *hdev)
++{
++	struct sk_buff *skb;
++
++	skb = skb_peek(&hdev->cmd_q);
++	if (!skb)
++		return true;
++
++	return bt_cb(skb)->transaction.start;
++}
++
++void hci_transaction_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status)
++{
++	unsigned long flags;
++	struct sk_buff *skb;
++
++	BT_DBG("opcode 0x%04x status 0x%02x", opcode, status);
++
++	/* Check that the completed command really matches the last one
++	 * that was sent.
++	 */
++	if (!hci_sent_cmd_data(hdev, opcode))
++		return;
++
++	/* If the command succeeded and there's still more commands in
++	 * this transaction the transaction is not yet complete.
++	 */
++	if (!status && !transaction_is_complete(hdev))
++		return;
++
++	/* Remove all pending commands belonging to this transaction */
++	spin_lock_irqsave(&hdev->cmd_q.lock, flags);
++	while ((skb = __skb_dequeue(&hdev->cmd_q))) {
++		if (bt_cb(skb)->transaction.start) {
++			__skb_queue_head(&hdev->cmd_q, skb);
++			break;
++		}
++
++		kfree_skb(skb);
 +	}
- 
--	if (powered) {
--		u8 link_sec;
-+	if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
-+		struct hci_cp_write_le_host_supported cp;
- 
--		if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
--		    !lmp_host_ssp_capable(hdev)) {
--			u8 ssp = 1;
-+		cp.le = 1;
-+		cp.simul = lmp_le_br_capable(hdev);
- 
--			hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE, 1, &ssp);
--		}
-+		/* Check first if we already have the right
-+		 * host state (host features set)
-+		 */
-+		if (cp.le != lmp_host_le_capable(hdev) ||
-+		    cp.simul != lmp_host_le_br_capable(hdev))
-+			hci_send_cmd(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED,
-+				     sizeof(cp), &cp);
-+	}
- 
--		if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
--			struct hci_cp_write_le_host_supported cp;
-+	link_sec = test_bit(HCI_LINK_SECURITY, &hdev->dev_flags);
-+	if (link_sec != test_bit(HCI_AUTH, &hdev->flags))
-+		hci_send_cmd(hdev, HCI_OP_WRITE_AUTH_ENABLE,
-+			     sizeof(link_sec), &link_sec);
- 
--			cp.le = 1;
--			cp.simul = lmp_le_br_capable(hdev);
-+	if (lmp_bredr_capable(hdev)) {
-+		set_bredr_scan(hdev);
-+		update_class(hdev);
-+		update_name(hdev, hdev->dev_name);
-+		update_eir(hdev);
++	spin_unlock_irqrestore(&hdev->cmd_q.lock, flags);
++
++	if (hdev->transaction_complete) {
++		hdev->transaction_complete(hdev, opcode, status);
++		hdev->transaction_complete = NULL;
 +	}
 +}
- 
--			/* Check first if we already have the right
--			 * host state (host features set)
--			 */
--			if (cp.le != lmp_host_le_capable(hdev) ||
--			    cp.simul != lmp_host_le_br_capable(hdev))
--				hci_send_cmd(hdev,
--					     HCI_OP_WRITE_LE_HOST_SUPPORTED,
--					     sizeof(cp), &cp);
--		}
-+int mgmt_powered(struct hci_dev *hdev, u8 powered)
-+{
-+	struct cmd_lookup match = { NULL, hdev };
-+	int err;
- 
--		link_sec = test_bit(HCI_LINK_SECURITY, &hdev->dev_flags);
--		if (link_sec != test_bit(HCI_AUTH, &hdev->flags))
--			hci_send_cmd(hdev, HCI_OP_WRITE_AUTH_ENABLE,
--				     sizeof(link_sec), &link_sec);
-+	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
-+		return 0;
- 
--		if (lmp_bredr_capable(hdev)) {
--			set_bredr_scan(hdev);
--			update_class(hdev);
--			update_name(hdev, hdev->dev_name);
--			update_eir(hdev);
--		}
-+	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
 +
-+	if (powered) {
-+		powered_update_hci(hdev);
- 	} else {
- 		u8 status = MGMT_STATUS_NOT_POWERED;
- 		u8 zero_cod[] = { 0, 0, 0 };
++void hci_transaction_cmd_status(struct hci_dev *hdev, u16 opcode, u8 status)
++{
++	BT_DBG("opcode 0x%04x status 0x%02x", opcode, status);
++
++	if (status) {
++		hci_transaction_cmd_complete(hdev, opcode, status);
++		return;
++	}
++
++	/* No need to handle success status if there are more commands */
++	if (!transaction_is_complete(hdev))
++		return;
++
++	/* If the transaction doesn't have a complete callback or there
++	 * are other commands/transactions in the hdev queue we consider
++	 * this transaction as completed.
++	 */
++	if (!hdev->transaction_complete || !skb_queue_empty(&hdev->cmd_q))
++		hci_transaction_cmd_complete(hdev, opcode, status);
++}
++
+ static void hci_rx_work(struct work_struct *work)
+ {
+ 	struct hci_dev *hdev = container_of(work, struct hci_dev, rx_work);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 14e872a..6dd5fd4 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -53,6 +53,7 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+ 	hci_dev_unlock(hdev);
+ 
++	hci_transaction_cmd_complete(hdev, HCI_OP_INQUIRY, status);
+ 	hci_req_complete(hdev, HCI_OP_INQUIRY_CANCEL, status);
+ 
+ 	hci_conn_check_pending(hdev);
+@@ -1692,6 +1693,7 @@ static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+ 
++	hci_transaction_cmd_complete(hdev, HCI_OP_INQUIRY, status);
+ 	hci_req_complete(hdev, HCI_OP_INQUIRY, status);
+ 
+ 	hci_conn_check_pending(hdev);
+@@ -2254,6 +2256,7 @@ static void hci_qos_setup_complete_evt(struct hci_dev *hdev,
+ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_ev_cmd_complete *ev = (void *) skb->data;
++	u8 status = skb->data[sizeof(*ev)];
+ 	__u16 opcode;
+ 
+ 	skb_pull(skb, sizeof(*ev));
+@@ -2497,6 +2500,8 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (ev->opcode != HCI_OP_NOP)
+ 		del_timer(&hdev->cmd_timer);
+ 
++	hci_transaction_cmd_complete(hdev, ev->opcode, status);
++
+ 	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags)) {
+ 		atomic_set(&hdev->cmd_cnt, 1);
+ 		if (!skb_queue_empty(&hdev->cmd_q))
+@@ -2590,6 +2595,8 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (ev->opcode != HCI_OP_NOP)
+ 		del_timer(&hdev->cmd_timer);
+ 
++	hci_transaction_cmd_status(hdev, ev->opcode, ev->status);
++
+ 	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags)) {
+ 		atomic_set(&hdev->cmd_cnt, 1);
+ 		if (!skb_queue_empty(&hdev->cmd_q))
 -- 
 1.7.10.4
 
