@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 11/14] Bluetooth: Fix busy condition testing for EIR and class updates
-Date: Fri, 22 Feb 2013 15:12:36 +0200
-Message-Id: <1361538759-13558-12-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 09/14] Bluetooth: Update mgmt powered HCI commands to use transactions
+Date: Fri, 22 Feb 2013 15:12:34 +0200
+Message-Id: <1361538759-13558-10-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1361538759-13558-1-git-send-email-johan.hedberg@gmail.com>
 References: <1361538759-13558-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,92 +11,454 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The add/remove_uuid and set_dev_class mgmt commands can trigger both EIR
-and class HCI commands, so testing just for a pending class command is
-enough. The simplest way to monitor conflicts that should trigger "busy"
-error returns is to check for any pending mgmt command that can trigger
-these HCI commands. This patch adds a helper function for this
-(pending_eir_or_class) and uses it instead of the old HCI_PENDING_CLASS
-flag to test for busy conditions.
+This patch updates sending of HCI commands related to mgmt_set_powered
+(e.g. class, name and EIR data) to be sent using transactions. This is
+necessary since it's the only (well, at least the cleanest) way to keep
+the power on procedure synchronized and let user space know it has
+completed only when all HCI commands are completed (this actual fix is
+coming in a subsequent patch).
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c |   39 ++++++++++++++++++++++++++++++---------
- 1 file changed, 30 insertions(+), 9 deletions(-)
+ net/bluetooth/mgmt.c |  207 +++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 128 insertions(+), 79 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index b2a9697..41a3265 100644
+index 39395c7..091b5c4 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1341,6 +1341,23 @@ unlock:
+@@ -591,8 +591,9 @@ static void create_eir(struct hci_dev *hdev, u8 *data)
+ 	ptr = create_uuid128_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
+ }
+ 
+-static int update_eir(struct hci_dev *hdev)
++static int update_eir(struct hci_transaction *transaction)
+ {
++	struct hci_dev *hdev = transaction->hdev;
+ 	struct hci_cp_write_eir cp;
+ 
+ 	if (!hdev_is_powered(hdev))
+@@ -616,7 +617,8 @@ static int update_eir(struct hci_dev *hdev)
+ 
+ 	memcpy(hdev->eir, cp.data, sizeof(cp.data));
+ 
+-	return hci_send_cmd(hdev, HCI_OP_WRITE_EIR, sizeof(cp), &cp);
++	return hci_transaction_cmd(transaction, HCI_OP_WRITE_EIR,
++				   sizeof(cp), &cp);
+ }
+ 
+ static u8 get_service_classes(struct hci_dev *hdev)
+@@ -630,8 +632,9 @@ static u8 get_service_classes(struct hci_dev *hdev)
+ 	return val;
+ }
+ 
+-static int update_class(struct hci_dev *hdev)
++static int update_class(struct hci_transaction *transaction)
+ {
++	struct hci_dev *hdev = transaction->hdev;
+ 	u8 cod[3];
+ 	int err;
+ 
+@@ -650,7 +653,8 @@ static int update_class(struct hci_dev *hdev)
+ 	if (memcmp(cod, hdev->dev_class, 3) == 0)
+ 		return 0;
+ 
+-	err = hci_send_cmd(hdev, HCI_OP_WRITE_CLASS_OF_DEV, sizeof(cod), cod);
++	err = hci_transaction_cmd(transaction, HCI_OP_WRITE_CLASS_OF_DEV,
++				  sizeof(cod), cod);
+ 	if (err == 0)
+ 		set_bit(HCI_PENDING_CLASS, &hdev->dev_flags);
+ 
+@@ -661,16 +665,21 @@ static void service_cache_off(struct work_struct *work)
+ {
+ 	struct hci_dev *hdev = container_of(work, struct hci_dev,
+ 					    service_cache.work);
++	struct hci_transaction transaction;
+ 
+ 	if (!test_and_clear_bit(HCI_SERVICE_CACHE, &hdev->dev_flags))
+ 		return;
+ 
++	hci_transaction_init(&transaction, hdev, NULL);
++
+ 	hci_dev_lock(hdev);
+ 
+-	update_eir(hdev);
+-	update_class(hdev);
++	update_eir(&transaction);
++	update_class(&transaction);
+ 
+ 	hci_dev_unlock(hdev);
++
++	hci_transaction_run(&transaction);
+ }
+ 
+ static void mgmt_init_hdev(struct sock *sk, struct hci_dev *hdev)
+@@ -1354,6 +1363,7 @@ static u8 get_uuid_size(const u8 *uuid)
+ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ {
+ 	struct mgmt_cp_add_uuid *cp = data;
++	struct hci_transaction transaction;
+ 	struct pending_cmd *cmd;
+ 	struct bt_uuid *uuid;
+ 	int err;
+@@ -1380,13 +1390,12 @@ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ 
+ 	list_add_tail(&uuid->list, &hdev->uuids);
+ 
+-	err = update_class(hdev);
+-	if (err < 0)
+-		goto failed;
++	hci_transaction_init(&transaction, hdev, NULL);
+ 
+-	err = update_eir(hdev);
+-	if (err < 0)
+-		goto failed;
++	update_class(&transaction);
++	update_eir(&transaction);
++
++	hci_transaction_run(&transaction);
+ 
+ 	if (!test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
+ 		err = cmd_complete(sk, hdev->id, MGMT_OP_ADD_UUID, 0,
+@@ -1395,8 +1404,12 @@ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ 	}
+ 
+ 	cmd = mgmt_pending_add(sk, MGMT_OP_ADD_UUID, hdev, data, len);
+-	if (!cmd)
++	if (!cmd) {
+ 		err = -ENOMEM;
++		goto failed;
++	}
++
++	err = 0;
+ 
+ failed:
+ 	hci_dev_unlock(hdev);
+@@ -1421,6 +1434,7 @@ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		       u16 len)
+ {
+ 	struct mgmt_cp_remove_uuid *cp = data;
++	struct hci_transaction transaction;
+ 	struct pending_cmd *cmd;
+ 	struct bt_uuid *match, *tmp;
+ 	u8 bt_uuid_any[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+@@ -1466,13 +1480,12 @@ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	}
+ 
+ update_class:
+-	err = update_class(hdev);
+-	if (err < 0)
+-		goto unlock;
++	hci_transaction_init(&transaction, hdev, NULL);
+ 
+-	err = update_eir(hdev);
+-	if (err < 0)
+-		goto unlock;
++	update_class(&transaction);
++	update_eir(&transaction);
++
++	hci_transaction_run(&transaction);
+ 
+ 	if (!test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
+ 		err = cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_UUID, 0,
+@@ -1481,8 +1494,12 @@ update_class:
+ 	}
+ 
+ 	cmd = mgmt_pending_add(sk, MGMT_OP_REMOVE_UUID, hdev, data, len);
+-	if (!cmd)
++	if (!cmd) {
+ 		err = -ENOMEM;
++		goto unlock;
++	}
++
++	err = 0;
+ 
+ unlock:
+ 	hci_dev_unlock(hdev);
+@@ -1493,6 +1510,7 @@ static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			 u16 len)
+ {
+ 	struct mgmt_cp_set_dev_class *cp = data;
++	struct hci_transaction transaction;
+ 	struct pending_cmd *cmd;
+ 	int err;
+ 
+@@ -1521,16 +1539,18 @@ static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto unlock;
+ 	}
+ 
++	hci_transaction_init(&transaction, hdev, NULL);
++
+ 	if (test_and_clear_bit(HCI_SERVICE_CACHE, &hdev->dev_flags)) {
+ 		hci_dev_unlock(hdev);
+ 		cancel_delayed_work_sync(&hdev->service_cache);
+ 		hci_dev_lock(hdev);
+-		update_eir(hdev);
++		update_eir(&transaction);
+ 	}
+ 
+-	err = update_class(hdev);
+-	if (err < 0)
+-		goto unlock;
++	update_class(&transaction);
++
++	hci_transaction_run(&transaction);
+ 
+ 	if (!test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
+ 		err = cmd_complete(sk, hdev->id, MGMT_OP_SET_DEV_CLASS, 0,
+@@ -1539,8 +1559,12 @@ static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	}
+ 
+ 	cmd = mgmt_pending_add(sk, MGMT_OP_SET_DEV_CLASS, hdev, data, len);
+-	if (!cmd)
++	if (!cmd) {
+ 		err = -ENOMEM;
++		goto unlock;
++	}
++
++	err = 0;
+ 
+ unlock:
+ 	hci_dev_unlock(hdev);
+@@ -2268,19 +2292,21 @@ static int user_passkey_neg_reply(struct sock *sk, struct hci_dev *hdev,
+ 				 HCI_OP_USER_PASSKEY_NEG_REPLY, 0);
+ }
+ 
+-static int update_name(struct hci_dev *hdev, const char *name)
++static void update_name(struct hci_transaction *transaction, const char *name)
+ {
+ 	struct hci_cp_write_local_name cp;
+ 
+ 	memcpy(cp.name, name, sizeof(cp.name));
+ 
+-	return hci_send_cmd(hdev, HCI_OP_WRITE_LOCAL_NAME, sizeof(cp), &cp);
++	hci_transaction_cmd(transaction, HCI_OP_WRITE_LOCAL_NAME,
++			    sizeof(cp), &cp);
+ }
+ 
+ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			  u16 len)
+ {
+ 	struct mgmt_cp_set_local_name *cp = data;
++	struct hci_transaction transaction;
+ 	struct pending_cmd *cmd;
+ 	int err;
+ 
+@@ -2310,7 +2336,9 @@ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto failed;
+ 	}
+ 
+-	err = update_name(hdev, cp->name);
++	hci_transaction_init(&transaction, hdev, NULL);
++	update_name(&transaction, cp->name);
++	err = hci_transaction_run(&transaction);
+ 	if (err < 0)
+ 		mgmt_pending_remove(cmd);
+ 
+@@ -2698,6 +2726,7 @@ static int set_device_id(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			 u16 len)
+ {
+ 	struct mgmt_cp_set_device_id *cp = data;
++	struct hci_transaction transaction;
+ 	int err;
+ 	__u16 source;
+ 
+@@ -2718,7 +2747,9 @@ static int set_device_id(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	err = cmd_complete(sk, hdev->id, MGMT_OP_SET_DEVICE_ID, 0, NULL, 0);
+ 
+-	update_eir(hdev);
++	hci_transaction_init(&transaction, hdev, NULL);
++	update_eir(&transaction);
++	hci_transaction_run(&transaction);
+ 
+ 	hci_dev_unlock(hdev);
+ 
+@@ -3043,8 +3074,9 @@ static void settings_rsp(struct pending_cmd *cmd, void *data)
+ 	mgmt_pending_free(cmd);
+ }
+ 
+-static int set_bredr_scan(struct hci_dev *hdev)
++static int set_bredr_scan(struct hci_transaction *transaction)
+ {
++	struct hci_dev *hdev = transaction->hdev;
+ 	u8 scan = 0;
+ 
+ 	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
+@@ -3055,65 +3087,71 @@ static int set_bredr_scan(struct hci_dev *hdev)
+ 	if (!scan)
+ 		return 0;
+ 
+-	return hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
++	return hci_transaction_cmd(transaction, HCI_OP_WRITE_SCAN_ENABLE,
++				   1, &scan);
+ }
+ 
+-int mgmt_powered(struct hci_dev *hdev, u8 powered)
++static int powered_update_hci(struct hci_dev *hdev)
+ {
+-	struct cmd_lookup match = { NULL, hdev };
+-	int err;
++	struct hci_transaction transaction;
++	u8 link_sec;
+ 
+-	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
+-		return 0;
++	hci_transaction_init(&transaction, hdev, NULL);
+ 
+-	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
++	if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
++			!lmp_host_ssp_capable(hdev)) {
++		u8 ssp = 1;
+ 
+-	if (powered) {
+-		u8 link_sec;
++		hci_transaction_cmd(&transaction, HCI_OP_WRITE_SSP_MODE,
++				    1, &ssp);
++	}
+ 
+-		if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
+-		    !lmp_host_ssp_capable(hdev)) {
+-			u8 ssp = 1;
++	if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
++		struct hci_cp_write_le_host_supported cp;
+ 
+-			hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE, 1, &ssp);
+-		}
++		cp.le = 1;
++		cp.simul = lmp_le_br_capable(hdev);
+ 
+-		if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
+-			struct hci_cp_write_le_host_supported cp;
++		/* Check first if we already have the right
++		 * host state (host features set)
++		 */
++		if (cp.le != lmp_host_le_capable(hdev) ||
++				cp.simul != lmp_host_le_br_capable(hdev))
++			hci_transaction_cmd(&transaction,
++					    HCI_OP_WRITE_LE_HOST_SUPPORTED,
++					    sizeof(cp), &cp);
++	}
+ 
+-			cp.le = 1;
+-			cp.simul = lmp_le_br_capable(hdev);
++	link_sec = test_bit(HCI_LINK_SECURITY, &hdev->dev_flags);
++	if (link_sec != test_bit(HCI_AUTH, &hdev->flags))
++		hci_transaction_cmd(&transaction, HCI_OP_WRITE_AUTH_ENABLE,
++				    sizeof(link_sec), &link_sec);
+ 
+-			/* Check first if we already have the right
+-			 * host state (host features set)
+-			 */
+-			if (cp.le != lmp_host_le_capable(hdev) ||
+-			    cp.simul != lmp_host_le_br_capable(hdev))
+-				hci_send_cmd(hdev,
+-					     HCI_OP_WRITE_LE_HOST_SUPPORTED,
+-					     sizeof(cp), &cp);
+-		}
++	if (lmp_bredr_capable(hdev)) {
++		set_bredr_scan(&transaction);
++		update_class(&transaction);
++		update_name(&transaction, hdev->dev_name);
++		update_eir(&transaction);
++	}
+ 
+-		link_sec = test_bit(HCI_LINK_SECURITY, &hdev->dev_flags);
+-		if (link_sec != test_bit(HCI_AUTH, &hdev->flags))
+-			hci_send_cmd(hdev, HCI_OP_WRITE_AUTH_ENABLE,
+-				     sizeof(link_sec), &link_sec);
++	return hci_transaction_run(&transaction);
++}
+ 
+-		if (lmp_bredr_capable(hdev)) {
+-			set_bredr_scan(hdev);
+-			update_class(hdev);
+-			update_name(hdev, hdev->dev_name);
+-			update_eir(hdev);
+-		}
++int mgmt_powered(struct hci_dev *hdev, u8 powered)
++{
++	struct cmd_lookup match = { NULL, hdev };
++	int err;
++
++	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
++		return 0;
++
++	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
++
++	if (powered) {
++		powered_update_hci(hdev);
+ 	} else {
+ 		u8 status = MGMT_STATUS_NOT_POWERED;
+-		u8 zero_cod[] = { 0, 0, 0 };
+-
+ 		mgmt_pending_foreach(0, hdev, cmd_status_rsp, &status);
+-
+-		if (memcmp(hdev->dev_class, zero_cod, sizeof(zero_cod)) != 0)
+-			mgmt_event(MGMT_EV_CLASS_OF_DEV_CHANGED, hdev,
+-				   zero_cod, sizeof(zero_cod), NULL);
+ 	}
+ 
+ 	err = new_settings(hdev, match.sk);
+@@ -3555,8 +3593,9 @@ int mgmt_auth_enable_complete(struct hci_dev *hdev, u8 status)
  	return err;
  }
  
-+static bool pending_eir_or_class(struct hci_dev *hdev)
-+{
-+	struct pending_cmd *cmd;
+-static int clear_eir(struct hci_dev *hdev)
++static int clear_eir(struct hci_transaction *transaction)
+ {
++	struct hci_dev *hdev = transaction->hdev;
+ 	struct hci_cp_write_eir cp;
+ 
+ 	if (!lmp_ext_inq_capable(hdev))
+@@ -3566,12 +3605,14 @@ static int clear_eir(struct hci_dev *hdev)
+ 
+ 	memset(&cp, 0, sizeof(cp));
+ 
+-	return hci_send_cmd(hdev, HCI_OP_WRITE_EIR, sizeof(cp), &cp);
++	return hci_transaction_cmd(transaction, HCI_OP_WRITE_EIR,
++				   sizeof(cp), &cp);
+ }
+ 
+ int mgmt_ssp_enable_complete(struct hci_dev *hdev, u8 enable, u8 status)
+ {
+ 	struct cmd_lookup match = { NULL, hdev };
++	struct hci_transaction transaction;
+ 	bool changed = false;
+ 	int err = 0;
+ 
+@@ -3604,10 +3645,14 @@ int mgmt_ssp_enable_complete(struct hci_dev *hdev, u8 enable, u8 status)
+ 	if (match.sk)
+ 		sock_put(match.sk);
+ 
++	hci_transaction_init(&transaction, hdev, NULL);
 +
-+	list_for_each_entry(cmd, &hdev->mgmt_pending, list) {
-+		switch (cmd->opcode) {
-+		case MGMT_OP_ADD_UUID:
-+		case MGMT_OP_REMOVE_UUID:
-+		case MGMT_OP_SET_DEV_CLASS:
-+		case MGMT_OP_SET_POWERED:
-+			return true;
-+		}
-+	}
+ 	if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags))
+-		update_eir(hdev);
++		update_eir(&transaction);
+ 	else
+-		clear_eir(hdev);
++		clear_eir(&transaction);
 +
-+	return false;
-+}
-+
- static const u8 bluetooth_base_uuid[] = {
- 			0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
- 			0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-@@ -1372,7 +1389,7 @@ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
++	hci_transaction_run(&transaction);
  
- 	hci_dev_lock(hdev);
- 
--	if (test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
-+	if (pending_eir_or_class(hdev)) {
- 		err = cmd_status(sk, hdev->id, MGMT_OP_ADD_UUID,
- 				 MGMT_STATUS_BUSY);
- 		goto failed;
-@@ -1444,7 +1461,7 @@ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	hci_dev_lock(hdev);
- 
--	if (test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
-+	if (pending_eir_or_class(hdev)) {
- 		err = cmd_status(sk, hdev->id, MGMT_OP_REMOVE_UUID,
- 				 MGMT_STATUS_BUSY);
- 		goto unlock;
-@@ -1520,15 +1537,19 @@ static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
- 		return cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
- 				  MGMT_STATUS_NOT_SUPPORTED);
- 
--	if (test_bit(HCI_PENDING_CLASS, &hdev->dev_flags))
--		return cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
--				  MGMT_STATUS_BUSY);
-+	hci_dev_lock(hdev);
- 
--	if ((cp->minor & 0x03) != 0 || (cp->major & 0xe0) != 0)
--		return cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
--				  MGMT_STATUS_INVALID_PARAMS);
-+	if (pending_eir_or_class(hdev)) {
-+		err = cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
-+				 MGMT_STATUS_BUSY);
-+		goto unlock;
+ 	return err;
+ }
+@@ -3695,8 +3740,12 @@ send_event:
+ 	 * adapter so only update them here if this is a name change
+ 	 * unrelated to power on.
+ 	 */
+-	if (!test_bit(HCI_INIT, &hdev->flags))
+-		update_eir(hdev);
++	if (!test_bit(HCI_INIT, &hdev->flags)) {
++		struct hci_transaction transaction;
++		hci_transaction_init(&transaction, hdev, NULL);
++		update_eir(&transaction);
++		hci_transaction_run(&transaction);
 +	}
  
--	hci_dev_lock(hdev);
-+	if ((cp->minor & 0x03) != 0 || (cp->major & 0xe0) != 0) {
-+		err = cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
-+				 MGMT_STATUS_INVALID_PARAMS);
-+		goto unlock;
-+	}
- 
- 	hdev->major_class = cp->major;
- 	hdev->minor_class = cp->minor;
+ failed:
+ 	if (cmd)
 -- 
 1.7.10.4
 
