@@ -1,46 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1361555483.13060.2.camel@dellpc>
-Subject: [PATCH] hidp: Ensure the session is marked as terminating to enable
- other functions to abort early.
-From: Karl Relton <karllinuxtest.relton@ntlworld.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: dh.herrmann@gmail.com, Marcel Holtmann <marcel@holtmann.org>, Gustavo
-	Padovan <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>
-Date: Fri, 22 Feb 2013 17:51:23 +0000
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: [PATCH] Bluetooth: Remove unused hdev->init_last_cmd
+Date: Fri, 22 Feb 2013 18:39:01 +0200
+Message-Id: <1361551141-7240-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Karl Relton <karllinuxtest.relton@ntlworld.com>
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Ensure the session is marked as terminating no matter how hidp_session
-drops out of its main loop.
+This variable is no longer needed (due to the transaction framweork and
+the conversion of hci_request to use it), so it can be safely removed.
 
-This enables other functions (such as hidp_get_raw_report) to
-abort early once a session is in its closing
-stages - important since the cleanup of a session will remove
-input/hid devices which (via the power_supply code) will typically
-trigger a call to hidp_get_raw_report for an ill-fated attempt to
-get the battery status. Without this change hidp_get_raw_report
-can end up stalling the cleanup process for its 5 second timeout.
-
-Signed-off-by: Karl Relton <karllinuxtest.relton@ntlworld.com>
-Reviewed-by: David Herrmann <dh.herrmann@gmail.com>
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hidp/core.c |    1 +
- 1 file changed, 1 insertion(+)
+I forgot this one from my patch set while redoing it. It should be
+applied after the other commands in the set (well, at least after
+"Convert hci_request to use HCI transaction framework").
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index b2bcbe2..ba9badc 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -722,6 +722,7 @@ static int hidp_session(void *arg)
- 		set_current_state(TASK_INTERRUPTIBLE);
- 	}
- 	set_current_state(TASK_RUNNING);
-+	atomic_inc(&session->terminate);
- 	remove_wait_queue(sk_sleep(intr_sk), &intr_wait);
- 	remove_wait_queue(sk_sleep(ctrl_sk), &ctrl_wait);
+ include/net/bluetooth/hci_core.h |    2 --
+ net/bluetooth/hci_core.c         |    6 ------
+ 2 files changed, 8 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 805551b..c9827f9 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -250,8 +250,6 @@ struct hci_dev {
  
+ 	transaction_complete_t	transaction_complete;
+ 
+-	__u16			init_last_cmd;
+-
+ 	struct list_head	mgmt_pending;
+ 
+ 	struct discovery_state	discovery;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index d8598d4..ff8f088 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1042,10 +1042,7 @@ int hci_dev_open(__u16 dev)
+ 	if (!test_bit(HCI_RAW, &hdev->flags)) {
+ 		atomic_set(&hdev->cmd_cnt, 1);
+ 		set_bit(HCI_INIT, &hdev->flags);
+-		hdev->init_last_cmd = 0;
+-
+ 		ret = __hci_init(hdev);
+-
+ 		clear_bit(HCI_INIT, &hdev->flags);
+ 	}
+ 
+@@ -2548,9 +2545,6 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
+ 		return -ENOMEM;
+ 	}
+ 
+-	if (test_bit(HCI_INIT, &hdev->flags))
+-		hdev->init_last_cmd = opcode;
+-
+ 	hci_transaction_from_skb(hdev, skb);
+ 
+ 	return 0;
 -- 
-1.7.9.5
+1.7.10.4
+
