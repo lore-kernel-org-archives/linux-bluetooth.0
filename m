@@ -1,40 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Sat, 23 Feb 2013 12:53:04 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Antonio Ospite <ospite@studenti.unina.it>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+Subject: Re: [PATCHv2 BlueZ 0/2] configure.ac fixes
+Message-ID: <20130223105304.GA12612@x220.P-661HNU-F1>
+References: <1359906411-12624-1-git-send-email-ospite@studenti.unina.it>
+ <1360531251-18371-1-git-send-email-ospite@studenti.unina.it>
 MIME-Version: 1.0
-In-Reply-To: <1361616485.1583.111.camel@aeonflux>
-References: <87ehgkxcsi.fsf@intel.com>
-	<1361616485.1583.111.camel@aeonflux>
-Date: Sat, 23 Feb 2013 10:06:03 -0800
-Message-ID: <CABhPDt9cnp=CiE0_U4kBL17WNrktsSrCrOq_Ly-x3+k0e4CKEw@mail.gmail.com>
-Subject: Re: [PATCH] Correct the dbus service file's systemd unit name for bluez.
-From: "Douglas, William" <william.douglas@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1360531251-18371-1-git-send-email-ospite@studenti.unina.it>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Antonio,
 
-On Sat, Feb 23, 2013 at 2:48 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi William,
->
->> Even though dbus-org.bluez.service is set as an alias for the
->> bluetooth.service systemd unit file, systemd will not be able to load
->> the bluetooth daemon without the daemon being enabled (and the
->> dbus-org.bluez.service file linked to bluetooth.service). This patch
->> allows the daemon to be loaded by other services on demand.
->
-> as you have noticed we have this in bluetooth.service:
->
-> [Install]
-> WantedBy=bluetooth.target
-> Alias=dbus-org.bluez.service
->
-> Isn't this exactly what we want anyway. The service must be enabled
-> first before it will ever auto-started. Otherwise it just auto-starts
-> and the user can never get rid of it.
->
+On Sun, Feb 10, 2013, Antonio Ospite wrote:
+> Patch 1 fixes --with-* options, it should be OK as Marcel
+> acknowledged.
+> 
+> Patch 2 is more for the sake of regularity with USB_CFLAGS and
+> USB_LIBS, it's not strictly necessary.
+> 
+> Thanks,
+>    Antonio
+> 
+> Antonio Ospite (2):
+>   configure.ac: call AC_SUBST unconditionally with --with-* options
+>   Call AC_SUBST(*_CFLAGS) and AC_SUBST(*_LIBS) only when needed
+> 
+>  configure.ac |   20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
 
-Oh I didn't realize that was the intent. Is that because if it is auto
-enabled there is no way for the service to be masked to avoid it from
-auto starting? I was hoping to have the daemon start once it was
-requested by default. Probably more of a distro choice though.
+Both patches have been applied. Thanks.
+
+Johan
