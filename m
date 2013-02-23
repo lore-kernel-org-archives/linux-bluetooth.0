@@ -1,38 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1361616485.1583.111.camel@aeonflux>
-Subject: Re: [PATCH] Correct the dbus service file's systemd unit name for
- bluez.
-From: Marcel Holtmann <marcel@holtmann.org>
-To: William Douglas <william.douglas@intel.com>
+Date: Sat, 23 Feb 2013 10:09:15 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Sat, 23 Feb 2013 11:48:05 +0100
-In-Reply-To: <87ehgkxcsi.fsf@intel.com>
-References: <87ehgkxcsi.fsf@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: Re: [PATCH BlueZ] profile: Fix crash when registering an invalid
+ profile
+Message-ID: <20130223080915.GA29928@x220.P-661HNU-F1>
+References: <1361573456-11528-1-git-send-email-vinicius.gomes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1361573456-11528-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi William,
+Hi Vinicius,
 
-> Even though dbus-org.bluez.service is set as an alias for the
-> bluetooth.service systemd unit file, systemd will not be able to load
-> the bluetooth daemon without the daemon being enabled (and the
-> dbus-org.bluez.service file linked to bluetooth.service). This patch
-> allows the daemon to be loaded by other services on demand.
+On Fri, Feb 22, 2013, Vinicius Costa Gomes wrote:
+> When a uuid string is sent and it doesn't indentify a profile
+> (bt_name2string() returns NULL), bluetoothd crash later when trying
+> to access the external profile uuid field.
+> 
+> Valgrind log:
+> 
+> bluetoothd[3986]: src/profile.c:register_profile() sender :1.492
+> ==3986== Invalid read of size 1
+> ==3986==    at 0x4C2ACA4: strcasecmp (mc_replace_strmem.c:583)
+> ==3986==    by 0x4656F0: register_profile (profile.c:1920)
+> ==3986==    by 0x40CFF0: process_message.isra.4 (object.c:258)
+> ==3986==    by 0x517C9E5: _dbus_object_tree_dispatch_and_unlock (in /usr/lib64/libdbus-1.so.3.7.2)
+> ==3986==    by 0x5167349: dbus_connection_dispatch (in /usr/lib64/libdbus-1.so.3.7.2)
+> ==3986==    by 0x40AB77: message_dispatch (mainloop.c:76)
+> ==3986==    by 0x4E77BCA: g_timeout_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
+> ==3986==    by 0x4E77044: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
+> ==3986==    by 0x4E77377: g_main_context_iterate.isra.24 (in /usr/lib64/libglib-2.0.so.0.3400.2)
+> ==3986==    by 0x4E77771: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3400.2)
+> ==3986==    by 0x40A3AE: main (main.c:583)
+> ==3986==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
+> ==3986==
+> ==3986==
+> ==3986== Process terminating with default action of signal 11 (SIGSEGV)
+> ==3986==  Access not within mapped region at address 0x0
+> ==3986==    at 0x4C2ACA4: strcasecmp (mc_replace_strmem.c:583)
+> ==3986==    by 0x4656F0: register_profile (profile.c:1920)
+> ==3986==    by 0x40CFF0: process_message.isra.4 (object.c:258)
+> ==3986==    by 0x517C9E5: _dbus_object_tree_dispatch_and_unlock (in /usr/lib64/libdbus-1.so.3.7.2)
+> ==3986==    by 0x5167349: dbus_connection_dispatch (in /usr/lib64/libdbus-1.so.3.7.2)
+> ==3986==    by 0x40AB77: message_dispatch (mainloop.c:76)
+> ==3986==    by 0x4E77BCA: g_timeout_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
+> ==3986==    by 0x4E77044: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
+> ==3986==    by 0x4E77377: g_main_context_iterate.isra.24 (in /usr/lib64/libglib-2.0.so.0.3400.2)
+> ==3986==    by 0x4E77771: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3400.2)
+> ==3986==    by 0x40A3AE: main (main.c:583)
+> ==3986==  If you believe this happened as a result of a stack
+> ==3986==  overflow in your program's main thread (unlikely but
+> ==3986==  possible), you can try to increase the size of the
+> ==3986==  main thread stack using the --main-stacksize= flag.
+> ==3986==  The main thread stack size used in this run was 8388608.
+> ==3986==
+> ---
+>  src/profile.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 
-as you have noticed we have this in bluetooth.service:
+Applied. Thanks.
 
-[Install]
-WantedBy=bluetooth.target
-Alias=dbus-org.bluez.service
-
-Isn't this exactly what we want anyway. The service must be enabled
-first before it will ever auto-started. Otherwise it just auto-starts
-and the user can never get rid of it.
-
-Regards
-
-Marcel
-
-
+Johan
