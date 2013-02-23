@@ -1,36 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 23 Feb 2013 12:53:04 +0200
+Date: Sat, 23 Feb 2013 12:48:54 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Antonio Ospite <ospite@studenti.unina.it>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCHv2 BlueZ 0/2] configure.ac fixes
-Message-ID: <20130223105304.GA12612@x220.P-661HNU-F1>
-References: <1359906411-12624-1-git-send-email-ospite@studenti.unina.it>
- <1360531251-18371-1-git-send-email-ospite@studenti.unina.it>
+To: Tomasz Bursztyka <tomasz.bursztyka@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: Re: [PATCH] gdbus: Always unreference the message in
+ g_dbus_send_message()
+Message-ID: <20130223104854.GA2663@x220.P-661HNU-F1>
+References: <1360331890-21983-1-git-send-email-tomasz.bursztyka@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1360531251-18371-1-git-send-email-ospite@studenti.unina.it>
+In-Reply-To: <1360331890-21983-1-git-send-email-tomasz.bursztyka@linux.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Antonio,
+Hi Tomasz,
 
-On Sun, Feb 10, 2013, Antonio Ospite wrote:
-> Patch 1 fixes --with-* options, it should be OK as Marcel
-> acknowledged.
+On Fri, Feb 08, 2013, Tomasz Bursztyka wrote:
+> ---
 > 
-> Patch 2 is more for the sake of regularity with USB_CFLAGS and
-> USB_LIBS, it's not strictly necessary.
+> Hi,
 > 
-> Thanks,
->    Antonio
+> A quick fix on g_dbus_send_message(), if check_signal() fails it returns FALSE without unreferencing
+> the message as it should. This patch fixes it.
 > 
-> Antonio Ospite (2):
->   configure.ac: call AC_SUBST unconditionally with --with-* options
->   Call AC_SUBST(*_CFLAGS) and AC_SUBST(*_LIBS) only when needed
-> 
->  configure.ac |   20 ++++++++++----------
->  1 file changed, 10 insertions(+), 10 deletions(-)
+>  gdbus/object.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 
-Both patches have been applied. Thanks.
+Thanks. Applied, though I had to move the comment part into the actual
+commit message.
 
 Johan
