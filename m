@@ -1,62 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <512996D9.8040705@kamens.us>
-Date: Sat, 23 Feb 2013 23:28:09 -0500
-From: Jonathan Kamens <jik@kamens.us>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: HFP/HSP Telephony profile doesn't work with Bluetooth USB dongle
-References: <51100E6E.8070804@kamens.us>
-In-Reply-To: <51100E6E.8070804@kamens.us>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Message-ID: <1361655279.3902.2.camel@aeonflux>
+Subject: Re: [PATCH] Correct the dbus service file's systemd unit name for
+ bluez.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Douglas, William" <william.douglas@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Sat, 23 Feb 2013 22:34:39 +0100
+In-Reply-To: <CABhPDt9cnp=CiE0_U4kBL17WNrktsSrCrOq_Ly-x3+k0e4CKEw@mail.gmail.com>
+References: <87ehgkxcsi.fsf@intel.com> <1361616485.1583.111.camel@aeonflux>
+	 <CABhPDt9cnp=CiE0_U4kBL17WNrktsSrCrOq_Ly-x3+k0e4CKEw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi William,
 
-I sent the below message almost three weeks ago and there have not been 
-any responses that I've seen.
+> >> Even though dbus-org.bluez.service is set as an alias for the
+> >> bluetooth.service systemd unit file, systemd will not be able to load
+> >> the bluetooth daemon without the daemon being enabled (and the
+> >> dbus-org.bluez.service file linked to bluetooth.service). This patch
+> >> allows the daemon to be loaded by other services on demand.
+> >
+> > as you have noticed we have this in bluetooth.service:
+> >
+> > [Install]
+> > WantedBy=bluetooth.target
+> > Alias=dbus-org.bluez.service
+> >
+> > Isn't this exactly what we want anyway. The service must be enabled
+> > first before it will ever auto-started. Otherwise it just auto-starts
+> > and the user can never get rid of it.
+> >
+> 
+> Oh I didn't realize that was the intent. Is that because if it is auto
+> enabled there is no way for the service to be masked to avoid it from
+> auto starting? I was hoping to have the daemon start once it was
+> requested by default. Probably more of a distro choice though.
 
-Was this the wrong place for me to report this problem? If so, where 
-should I report it?
+I am actually curious on what is the best way here. My current thinking
+is that the daemon should be started when hardware is present. Starting
+it only because of a UI applet seems silly if there is no hardware
+present, but I am not sure what's the appropriate default is here.
 
-You can get a USB Bluetooth dongle for $2.88 on Amazon, so I don't 
-really think cost is an issue, but if it is, then if there is a 
-contributor to the code base who is willing to commit to working on 
-this, I'm happy to mail him/her a dongle.
+Regards
 
-   Jonathan Kamens
+Marcel
 
-On 02/04/2013 02:39 PM, Jonathan Kamens wrote:
-> Greetings,
->
-> Using Fedora 18 x86_64, I've tested two different USB Bluetooth 
-> dongles (cheap generic Cambridge Silicon and more expensive BlueRigger 
-> BTD-400) and two different headsets (Motorola SF600, BrainyTrade 
-> BH-M20), in all combinations, the A2DP High-Fidelity profile for audio 
-> output works, but the HFP/HSP Telephony profile does not.
->
-> I contacted BlueRigger about this and they tested for themselves on 
-> different hardware and got the same result. BlueRigger says the 
-> HFP/HSP Telephony profile works fine with Ubuntu, which they say 
-> doesn't use Bluez.
->
-> I don't know if this problem is new in Fedora 18, because I didn't get 
-> the dongles until after I upgraded from Fedora 17.
->
-> I've reported this in Red Hat bugzilla 
-> <https://bugzilla.redhat.com/show_bug.cgi?id=905283> and emailed the 
-> Fedora test list 
-> <http://lists.fedoraproject.org/pipermail/test/2013-February/113598.html> 
-> about it; there has been no response to either.
->
-> Any suggestions or insights into how to resolve this issue would be 
-> appreciated.
->
-> Regards,
->
-> Jonathan Kamens
->
->
->
->
 
