@@ -1,32 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 23 Feb 2013 12:48:54 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Tomasz Bursztyka <tomasz.bursztyka@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: Re: [PATCH] gdbus: Always unreference the message in
- g_dbus_send_message()
-Message-ID: <20130223104854.GA2663@x220.P-661HNU-F1>
-References: <1360331890-21983-1-git-send-email-tomasz.bursztyka@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1360331890-21983-1-git-send-email-tomasz.bursztyka@linux.intel.com>
+Message-ID: <1361616485.1583.111.camel@aeonflux>
+Subject: Re: [PATCH] Correct the dbus service file's systemd unit name for
+ bluez.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: William Douglas <william.douglas@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Sat, 23 Feb 2013 11:48:05 +0100
+In-Reply-To: <87ehgkxcsi.fsf@intel.com>
+References: <87ehgkxcsi.fsf@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tomasz,
+Hi William,
 
-On Fri, Feb 08, 2013, Tomasz Bursztyka wrote:
-> ---
-> 
-> Hi,
-> 
-> A quick fix on g_dbus_send_message(), if check_signal() fails it returns FALSE without unreferencing
-> the message as it should. This patch fixes it.
-> 
->  gdbus/object.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+> Even though dbus-org.bluez.service is set as an alias for the
+> bluetooth.service systemd unit file, systemd will not be able to load
+> the bluetooth daemon without the daemon being enabled (and the
+> dbus-org.bluez.service file linked to bluetooth.service). This patch
+> allows the daemon to be loaded by other services on demand.
 
-Thanks. Applied, though I had to move the comment part into the actual
-commit message.
+as you have noticed we have this in bluetooth.service:
 
-Johan
+[Install]
+WantedBy=bluetooth.target
+Alias=dbus-org.bluez.service
+
+Isn't this exactly what we want anyway. The service must be enabled
+first before it will ever auto-started. Otherwise it just auto-starts
+and the user can never get rid of it.
+
+Regards
+
+Marcel
+
+
