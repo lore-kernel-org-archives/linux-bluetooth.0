@@ -3,72 +3,64 @@ From: Antonio Ospite <ospite@studenti.unina.it>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>,
 	Antonio Ospite <ospite@studenti.unina.it>
-Subject: [PATCH BlueZ 1/2] adapter: add a btd_adapter_get_default_address() call
-Date: Sun, 24 Feb 2013 10:54:44 +0100
-Message-Id: <1361699686-12341-2-git-send-email-ospite@studenti.unina.it>
-In-Reply-To: <1361699686-12341-1-git-send-email-ospite@studenti.unina.it>
-References: <1361699686-12341-1-git-send-email-ospite@studenti.unina.it>
+Subject: [PATCH BlueZ 0/2] Some more prerequisites for the playstation-peripheral plugin
+Date: Sun, 24 Feb 2013 10:54:43 +0100
+Message-Id: <1361699686-12341-1-git-send-email-ospite@studenti.unina.it>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add a new btd_* call to get the default adapter address as a string.
+Hi,
 
-This is meant to be used, for instance, by _external_ plugins which want
-to know the default adapter address for some reason (e.g. to send it to
-a device for some custom pairing scheme like in the case of Playstation
-peripherals).
+if you recall some older discussions we decided to have the
+playstation-peripheral plugin as an _external_ plugin, because it will be
+used by only a few people and allowing to make its installation optional
+makes a lot of sense.
 
-External plugins can only use symbols marked as "global" in
-src/bluetooth.ver, this patch avoids making global these symbols:
+But external plugins can only use a subset of the BlueZ API, the one
+marked as "global" in src/bluetooth.ver
 
-  adapter_get_address
-  bt_malloc
-  ba2str
----
- src/adapter.h |    1 +
- src/adapter.c |   17 +++++++++++++++++
- 2 files changed, 18 insertions(+)
+Hence some more btd_* APIs are needed for the playstation-peripheral
+plugin.
 
-diff --git a/src/adapter.h b/src/adapter.h
-index 8d23a64..cb6d0d6 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -38,6 +38,7 @@
- struct btd_adapter;
- 
- struct btd_adapter *btd_adapter_get_default(void);
-+char *btd_adapter_get_default_address(void);
- bool btd_adapter_is_default(struct btd_adapter *adapter);
- uint16_t btd_adapter_get_index(struct btd_adapter *adapter);
- 
-diff --git a/src/adapter.c b/src/adapter.c
-index e553626..5eac84f 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -217,6 +217,23 @@ struct btd_adapter *btd_adapter_get_default(void)
- 	return NULL;
- }
- 
-+char *btd_adapter_get_default_address(void)
-+{
-+	struct btd_adapter *adapter;
-+	char *str;
-+
-+	adapter = btd_adapter_get_default();
-+	if (adapter == NULL)
-+		return NULL;
-+
-+	str = bt_malloc(18);
-+	if (str == NULL)
-+		return NULL;
-+
-+	ba2str(adapter_get_address(adapter), str);
-+	return str;
-+}
-+
- bool btd_adapter_is_default(struct btd_adapter *adapter)
- {
- 	if (!adapter)
+Here I propose the last missing pieces of the jigsaw before I can submit
+the actual plugin.
+
+Please comment, in the hope that at most one more review round will be
+enough to have these functionalities merged.
+
+Patch 1 is needed because the playstation-peripheral plugin will send
+the adapter bdaddr to the peripheral via USB, to have it set as the
+"master bdaddr". I can very well avoid a new API in this case but then
+I'd need to make some symbols global, let me know if that's what you
+prefer instead.
+
+Patch 2 is to create the device in the BlueZ database, any comment on
+this one is appreciated: the name can be improved, the implementation
+can be changed, but the point is that in one way or another we need some
+mechanism to add new devices programmatically before they show up via
+Bluetooth. An alternative proposal by someone else would also be very
+welcome :)
+
+Patches are against BlueZ 5.3.
+
+I can submit the plugin as well, if you really want to see the code using
+these APIs, I didn't just yet in order to keep the discussion more focused.
+
+Thanks,
+   Antonio
+
+Antonio Ospite (2):
+  adapter: add a btd_adapter_get_default_address() call
+  adapter: add a btd_create_stored_device() call
+
+ src/adapter.c |   69 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/adapter.h |   12 ++++++++++
+ 2 files changed, 81 insertions(+)
+
 -- 
-1.7.10.4
+Antonio Ospite
+http://ao2.it
 
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
