@@ -1,71 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <51100E6E.8070804@kamens.us>
-References: <51100E6E.8070804@kamens.us>
-Date: Sun, 24 Feb 2013 10:59:29 -0400
-Message-ID: <CAJdJm_MsOBOGTBoG+Nua49DbwuXx5Pu5KRm9zMp2ma3_nhF2CQ@mail.gmail.com>
-Subject: Re: HFP/HSP Telephony profile doesn't work with Bluetooth USB dongle
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Jonathan Kamens <jik@kamens.us>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Antonio Ospite <ospite@studenti.unina.it>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bastien Nocera <hadess@hadess.net>,
+	Antonio Ospite <ospite@studenti.unina.it>
+Subject: [PATCH BlueZ 1/2] adapter: add a btd_adapter_get_default_address() call
+Date: Sun, 24 Feb 2013 10:54:44 +0100
+Message-Id: <1361699686-12341-2-git-send-email-ospite@studenti.unina.it>
+In-Reply-To: <1361699686-12341-1-git-send-email-ospite@studenti.unina.it>
+References: <1361699686-12341-1-git-send-email-ospite@studenti.unina.it>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jonathan,
+Add a new btd_* call to get the default adapter address as a string.
 
-On Mon, Feb 4, 2013 at 3:39 PM, Jonathan Kamens <jik@kamens.us> wrote:
-> Greetings,
->
-> Using Fedora 18 x86_64, I've tested two different USB Bluetooth dongles
-> (cheap generic Cambridge Silicon and more expensive BlueRigger BTD-400) and
-> two different headsets (Motorola SF600, BrainyTrade BH-M20), in all
-> combinations, the A2DP High-Fidelity profile for audio output works, but the
-> HFP/HSP Telephony profile does not.
+This is meant to be used, for instance, by _external_ plugins which want
+to know the default adapter address for some reason (e.g. to send it to
+a device for some custom pairing scheme like in the case of Playstation
+peripherals).
 
-More details on which steps you take to reproduce the problem should
-help identifying the issue.
+External plugins can only use symbols marked as "global" in
+src/bluetooth.ver, this patch avoids making global these symbols:
 
-Also run "sudo hcidump -w hcidump.dump"  while you do these steps and
-attach the generated hcidump.dump to your email so we can see what's
-going on.
+  adapter_get_address
+  bt_malloc
+  ba2str
+---
+ src/adapter.h |    1 +
+ src/adapter.c |   17 +++++++++++++++++
+ 2 files changed, 18 insertions(+)
 
-> I contacted BlueRigger about this and they tested for themselves on
-> different hardware and got the same result. BlueRigger says the HFP/HSP
-> Telephony profile works fine with Ubuntu, which they say doesn't use Bluez.
-
-Ubuntu (as pretty much every Desktop Linux distro, as far as I know)
-uses BlueZ. The only difference is that distros may use different
-BlueZ and/or kernel versions and this may cause different levels of
-hardware support.
-
-> I don't know if this problem is new in Fedora 18, because I didn't get the
-> dongles until after I upgraded from Fedora 17.
-
-My suggestion is for you to download a Live CD/USB for Ubuntu (ideally
-for the version BlueRigger tested) and confirm yourself it works.
-
-> I've reported this in Red Hat bugzilla
-> <https://bugzilla.redhat.com/show_bug.cgi?id=905283> and emailed the Fedora
-> test list
-> <http://lists.fedoraproject.org/pipermail/test/2013-February/113598.html>
-> about it; there has been no response to either.
->
-> Any suggestions or insights into how to resolve this issue would be
-> appreciated.
-
-Again, you need to provide more information:
-
-* hcidump log (as explained above)
-
-The information below is also important because not everyone here uses
-Fedora 18:
-* kernel version ("uname -r")
-* bluez version ("bluetoothd --version", or at least the package
-version from the distro).
-
-Best Regards,
+diff --git a/src/adapter.h b/src/adapter.h
+index 8d23a64..cb6d0d6 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -38,6 +38,7 @@
+ struct btd_adapter;
+ 
+ struct btd_adapter *btd_adapter_get_default(void);
++char *btd_adapter_get_default_address(void);
+ bool btd_adapter_is_default(struct btd_adapter *adapter);
+ uint16_t btd_adapter_get_index(struct btd_adapter *adapter);
+ 
+diff --git a/src/adapter.c b/src/adapter.c
+index e553626..5eac84f 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -217,6 +217,23 @@ struct btd_adapter *btd_adapter_get_default(void)
+ 	return NULL;
+ }
+ 
++char *btd_adapter_get_default_address(void)
++{
++	struct btd_adapter *adapter;
++	char *str;
++
++	adapter = btd_adapter_get_default();
++	if (adapter == NULL)
++		return NULL;
++
++	str = bt_malloc(18);
++	if (str == NULL)
++		return NULL;
++
++	ba2str(adapter_get_address(adapter), str);
++	return str;
++}
++
+ bool btd_adapter_is_default(struct btd_adapter *adapter)
+ {
+ 	if (!adapter)
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.10.4
+
