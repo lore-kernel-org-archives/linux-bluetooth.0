@@ -4,38 +4,60 @@ To: linux-bluetooth@vger.kernel.org
 Cc: Marcel Holtmann <marcel@holtmann.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
 	David Herrmann <dh.herrmann@gmail.com>
-Subject: [PATCH 10/16] Bluetooth: allow constant arguments for bacmp()/bacpy()
-Date: Sun, 24 Feb 2013 19:37:00 +0100
-Message-Id: <1361731026-7428-11-git-send-email-dh.herrmann@gmail.com>
+Subject: [PATCH 09/16] Bluetooth: hidp: test "terminate" before sleeping
+Date: Sun, 24 Feb 2013 19:36:59 +0100
+Message-Id: <1361731026-7428-10-git-send-email-dh.herrmann@gmail.com>
 In-Reply-To: <1361731026-7428-1-git-send-email-dh.herrmann@gmail.com>
 References: <1361731026-7428-1-git-send-email-dh.herrmann@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is no reason to require the source arguments to be writeable so fix
-this to allow constant source addresses.
+The "terminate" flag is guaranteed to be set before the session terminates
+and the handlers are woken up. Hence, we need to add it to the
+sleep-condition.
+
+Note that testing the flags is not enough as nothing prevents us from
+setting the flags again after the session-handler terminated.
 
 Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
 ---
- include/net/bluetooth/bluetooth.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/bluetooth/hidp/core.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index d3222d1..9928cef 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -170,11 +170,11 @@ typedef struct {
- #define BDADDR_LOCAL (&(bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff} })
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index c2979a7..162f22d 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -327,11 +327,13 @@ static int hidp_get_raw_report(struct hid_device *hid,
  
- /* Copy, swap, convert BD Address */
--static inline int bacmp(bdaddr_t *ba1, bdaddr_t *ba2)
-+static inline int bacmp(const bdaddr_t *ba1, const bdaddr_t *ba2)
- {
- 	return memcmp(ba1, ba2, sizeof(bdaddr_t));
- }
--static inline void bacpy(bdaddr_t *dst, bdaddr_t *src)
-+static inline void bacpy(bdaddr_t *dst, const bdaddr_t *src)
- {
- 	memcpy(dst, src, sizeof(bdaddr_t));
- }
+ 	/* Wait for the return of the report. The returned report
+ 	   gets put in session->report_return.  */
+-	while (test_bit(HIDP_WAITING_FOR_RETURN, &session->flags)) {
++	while (test_bit(HIDP_WAITING_FOR_RETURN, &session->flags) &&
++	       !atomic_read(&session->terminate)) {
+ 		int res;
+ 
+ 		res = wait_event_interruptible_timeout(session->report_queue,
+-			!test_bit(HIDP_WAITING_FOR_RETURN, &session->flags),
++			!test_bit(HIDP_WAITING_FOR_RETURN, &session->flags)
++				|| atomic_read(&session->terminate),
+ 			5*HZ);
+ 		if (res == 0) {
+ 			/* timeout */
+@@ -396,11 +398,13 @@ static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, s
+ 		goto err;
+ 
+ 	/* Wait for the ACK from the device. */
+-	while (test_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags)) {
++	while (test_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags) &&
++	       !atomic_read(&session->terminate)) {
+ 		int res;
+ 
+ 		res = wait_event_interruptible_timeout(session->report_queue,
+-			!test_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags),
++			!test_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags)
++				|| atomic_read(&session->terminate),
+ 			10*HZ);
+ 		if (res == 0) {
+ 			/* timeout */
 -- 
 1.8.1.4
