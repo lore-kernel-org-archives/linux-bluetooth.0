@@ -1,133 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Herrmann <dh.herrmann@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	David Herrmann <dh.herrmann@gmail.com>
-Subject: [PATCH 01/16] Bluetooth: discard bt_sock_unregister() errors
-Date: Sun, 24 Feb 2013 19:36:51 +0100
-Message-Id: <1361731026-7428-2-git-send-email-dh.herrmann@gmail.com>
-In-Reply-To: <1361731026-7428-1-git-send-email-dh.herrmann@gmail.com>
-References: <1361731026-7428-1-git-send-email-dh.herrmann@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <51100E6E.8070804@kamens.us>
+References: <51100E6E.8070804@kamens.us>
+Date: Sun, 24 Feb 2013 10:59:29 -0400
+Message-ID: <CAJdJm_MsOBOGTBoG+Nua49DbwuXx5Pu5KRm9zMp2ma3_nhF2CQ@mail.gmail.com>
+Subject: Re: HFP/HSP Telephony profile doesn't work with Bluetooth USB dongle
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Jonathan Kamens <jik@kamens.us>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-After we successfully registered a socket via bt_sock_register() there is
-no reason to ever check the return code of bt_sock_unregister(). If
-bt_sock_unregister() fails, it means the socket _is_ already unregistered
-so we have what we want, don't we?
+Hi Jonathan,
 
-Also, to get bt_sock_unregister() to fail, another part of the kernel has
-to unregister _our_ socket. This is sooo _wrong_ that it will break way
-earlier than when we unregister our socket.
+On Mon, Feb 4, 2013 at 3:39 PM, Jonathan Kamens <jik@kamens.us> wrote:
+> Greetings,
+>
+> Using Fedora 18 x86_64, I've tested two different USB Bluetooth dongles
+> (cheap generic Cambridge Silicon and more expensive BlueRigger BTD-400) and
+> two different headsets (Motorola SF600, BrainyTrade BH-M20), in all
+> combinations, the A2DP High-Fidelity profile for audio output works, but the
+> HFP/HSP Telephony profile does not.
 
-Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
----
- net/bluetooth/bnep/sock.c   | 4 +---
- net/bluetooth/cmtp/sock.c   | 4 +---
- net/bluetooth/hci_sock.c    | 4 +---
- net/bluetooth/hidp/sock.c   | 4 +---
- net/bluetooth/l2cap_sock.c  | 4 +---
- net/bluetooth/rfcomm/sock.c | 3 +--
- net/bluetooth/sco.c         | 3 +--
- 7 files changed, 7 insertions(+), 19 deletions(-)
+More details on which steps you take to reproduce the problem should
+help identifying the issue.
 
-diff --git a/net/bluetooth/bnep/sock.c b/net/bluetooth/bnep/sock.c
-index e7154a5..5b1c04e 100644
---- a/net/bluetooth/bnep/sock.c
-+++ b/net/bluetooth/bnep/sock.c
-@@ -253,8 +253,6 @@ error:
- void __exit bnep_sock_cleanup(void)
- {
- 	bt_procfs_cleanup(&init_net, "bnep");
--	if (bt_sock_unregister(BTPROTO_BNEP) < 0)
--		BT_ERR("Can't unregister BNEP socket");
--
-+	bt_sock_unregister(BTPROTO_BNEP);
- 	proto_unregister(&bnep_proto);
- }
-diff --git a/net/bluetooth/cmtp/sock.c b/net/bluetooth/cmtp/sock.c
-index 1c57482..58d9ede 100644
---- a/net/bluetooth/cmtp/sock.c
-+++ b/net/bluetooth/cmtp/sock.c
-@@ -264,8 +264,6 @@ error:
- void cmtp_cleanup_sockets(void)
- {
- 	bt_procfs_cleanup(&init_net, "cmtp");
--	if (bt_sock_unregister(BTPROTO_CMTP) < 0)
--		BT_ERR("Can't unregister CMTP socket");
--
-+	bt_sock_unregister(BTPROTO_CMTP);
- 	proto_unregister(&cmtp_proto);
- }
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 07f0739..20c92de 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -1126,8 +1126,6 @@ error:
- void hci_sock_cleanup(void)
- {
- 	bt_procfs_cleanup(&init_net, "hci");
--	if (bt_sock_unregister(BTPROTO_HCI) < 0)
--		BT_ERR("HCI socket unregistration failed");
--
-+	bt_sock_unregister(BTPROTO_HCI);
- 	proto_unregister(&hci_sk_proto);
- }
-diff --git a/net/bluetooth/hidp/sock.c b/net/bluetooth/hidp/sock.c
-index 82a829d..5d0f1ca 100644
---- a/net/bluetooth/hidp/sock.c
-+++ b/net/bluetooth/hidp/sock.c
-@@ -304,8 +304,6 @@ error:
- void __exit hidp_cleanup_sockets(void)
- {
- 	bt_procfs_cleanup(&init_net, "hidp");
--	if (bt_sock_unregister(BTPROTO_HIDP) < 0)
--		BT_ERR("Can't unregister HIDP socket");
--
-+	bt_sock_unregister(BTPROTO_HIDP);
- 	proto_unregister(&hidp_proto);
- }
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 1bcfb84..7f97049 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1312,8 +1312,6 @@ error:
- void l2cap_cleanup_sockets(void)
- {
- 	bt_procfs_cleanup(&init_net, "l2cap");
--	if (bt_sock_unregister(BTPROTO_L2CAP) < 0)
--		BT_ERR("L2CAP socket unregistration failed");
--
-+	bt_sock_unregister(BTPROTO_L2CAP);
- 	proto_unregister(&l2cap_proto);
- }
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index ce3f665..851ecc9 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -1068,8 +1068,7 @@ void __exit rfcomm_cleanup_sockets(void)
- 
- 	debugfs_remove(rfcomm_sock_debugfs);
- 
--	if (bt_sock_unregister(BTPROTO_RFCOMM) < 0)
--		BT_ERR("RFCOMM socket layer unregistration failed");
-+	bt_sock_unregister(BTPROTO_RFCOMM);
- 
- 	proto_unregister(&rfcomm_proto);
- }
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 57f250c..da479cd 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -1113,8 +1113,7 @@ void __exit sco_exit(void)
- 
- 	debugfs_remove(sco_debugfs);
- 
--	if (bt_sock_unregister(BTPROTO_SCO) < 0)
--		BT_ERR("SCO socket unregistration failed");
-+	bt_sock_unregister(BTPROTO_SCO);
- 
- 	proto_unregister(&sco_proto);
- }
+Also run "sudo hcidump -w hcidump.dump"  while you do these steps and
+attach the generated hcidump.dump to your email so we can see what's
+going on.
+
+> I contacted BlueRigger about this and they tested for themselves on
+> different hardware and got the same result. BlueRigger says the HFP/HSP
+> Telephony profile works fine with Ubuntu, which they say doesn't use Bluez.
+
+Ubuntu (as pretty much every Desktop Linux distro, as far as I know)
+uses BlueZ. The only difference is that distros may use different
+BlueZ and/or kernel versions and this may cause different levels of
+hardware support.
+
+> I don't know if this problem is new in Fedora 18, because I didn't get the
+> dongles until after I upgraded from Fedora 17.
+
+My suggestion is for you to download a Live CD/USB for Ubuntu (ideally
+for the version BlueRigger tested) and confirm yourself it works.
+
+> I've reported this in Red Hat bugzilla
+> <https://bugzilla.redhat.com/show_bug.cgi?id=905283> and emailed the Fedora
+> test list
+> <http://lists.fedoraproject.org/pipermail/test/2013-February/113598.html>
+> about it; there has been no response to either.
+>
+> Any suggestions or insights into how to resolve this issue would be
+> appreciated.
+
+Again, you need to provide more information:
+
+* hcidump log (as explained above)
+
+The information below is also important because not everyone here uses
+Fedora 18:
+* kernel version ("uname -r")
+* bluez version ("bluetoothd --version", or at least the package
+version from the distro).
+
+Best Regards,
 -- 
-1.8.1.4
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
