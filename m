@@ -1,119 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Antonio Ospite <ospite@studenti.unina.it>
+Message-ID: <512996D9.8040705@kamens.us>
+Date: Sat, 23 Feb 2013 23:28:09 -0500
+From: Jonathan Kamens <jik@kamens.us>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>,
-	Antonio Ospite <ospite@studenti.unina.it>
-Subject: [PATCH BlueZ 2/2] adapter: add a btd_create_stored_device() call
-Date: Sun, 24 Feb 2013 10:54:45 +0100
-Message-Id: <1361699686-12341-3-git-send-email-ospite@studenti.unina.it>
-In-Reply-To: <1361699686-12341-1-git-send-email-ospite@studenti.unina.it>
-References: <1361699686-12341-1-git-send-email-ospite@studenti.unina.it>
+Subject: Re: HFP/HSP Telephony profile doesn't work with Bluetooth USB dongle
+References: <51100E6E.8070804@kamens.us>
+In-Reply-To: <51100E6E.8070804@kamens.us>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add a new btd_* call to add a new device to the database of known
-devices.
+Hi,
 
-This is particularly useful to register Bluetooth devices using
-a non-Bluetooth mechanism (e.g. USB-pairing in the case of Playstation
-peripherals).
+I sent the below message almost three weeks ago and there have not been 
+any responses that I've seen.
 
-The interface uses a btd_ prefix and relies only on native C types in
-order to be more easily used by _external_ plugins.
+Was this the wrong place for me to report this problem? If so, where 
+should I report it?
 
-External plugins can only use symbols marked as "global" in
-src/bluetooth.ver, this patch avoids making global these symbols:
+You can get a USB Bluetooth dongle for $2.88 on Amazon, so I don't 
+really think cost is an issue, but if it is, then if there is a 
+contributor to the code base who is willing to commit to working on 
+this, I'm happy to mail him/her a dongle.
 
-  store_sdp_record
-  str2ba
-  adapter_get_device
-  device_set_name
-  device_set_temporary
-  device_set_trusted
----
- src/adapter.h |   11 +++++++++++
- src/adapter.c |   52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 63 insertions(+)
+   Jonathan Kamens
 
-diff --git a/src/adapter.h b/src/adapter.h
-index cb6d0d6..13aadb5 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -207,3 +207,14 @@ void adapter_store_cached_name(const bdaddr_t *local, const bdaddr_t *peer,
- void btd_adapter_for_each_device(struct btd_adapter *adapter,
- 			void (*cb)(struct btd_device *device, void *data),
- 			void *data);
-+
-+int btd_create_stored_device(char *adapter_address,
-+			     char *device_address,
-+			     char *name,
-+			     uint16_t vendor_id_source,
-+			     uint16_t vendor_id,
-+			     uint16_t product_id,
-+			     uint16_t version_id,
-+			     const char *uuid,
-+			     char *sdp_record,
-+			     bool trusted);
-diff --git a/src/adapter.c b/src/adapter.c
-index 5eac84f..7aee8f3 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -6196,3 +6196,55 @@ void adapter_shutdown(void)
- 	if (!adapter_remaining)
- 		btd_exit();
- }
-+
-+int btd_create_stored_device(char *adapter_address,
-+			     char *device_address,
-+			     char *name,
-+			     uint16_t vendor_id_source,
-+			     uint16_t vendor_id,
-+			     uint16_t product_id,
-+			     uint16_t version_id,
-+			     const char *uuid,
-+			     char *sdp_record,
-+			     bool trusted)
-+{
-+	struct btd_adapter *adapter;
-+	struct btd_device *device;
-+	bdaddr_t dst;
-+	int ret = 0;
-+
-+	store_sdp_record(adapter_address, device_address, 0x10000, sdp_record);
-+
-+	str2ba(device_address, &dst);
-+
-+	adapter = btd_adapter_get_default();
-+	if (adapter == NULL) {
-+		DBG("Failed to get the adapter");
-+		ret = -EPERM;
-+		goto out;
-+	}
-+
-+	/* This will create the device if necessary */
-+	device = adapter_get_device(adapter, &dst, BDADDR_BREDR);
-+	if (device == NULL) {
-+		DBG("Failed to get the device");
-+		ret = -ENODEV;
-+		goto out;
-+	}
-+
-+	if (name)
-+		device_set_name(device, name);
-+
-+	btd_device_set_pnpid(device, vendor_id_source,
-+			vendor_id, product_id, version_id);
-+
-+	if (uuid)
-+		btd_device_add_uuid(device, uuid);
-+
-+	device_set_temporary(device, FALSE);
-+
-+	if (trusted)
-+		device_set_trusted(device, TRUE);
-+out:
-+	return ret;
-+}
--- 
-1.7.10.4
+On 02/04/2013 02:39 PM, Jonathan Kamens wrote:
+> Greetings,
+>
+> Using Fedora 18 x86_64, I've tested two different USB Bluetooth 
+> dongles (cheap generic Cambridge Silicon and more expensive BlueRigger 
+> BTD-400) and two different headsets (Motorola SF600, BrainyTrade 
+> BH-M20), in all combinations, the A2DP High-Fidelity profile for audio 
+> output works, but the HFP/HSP Telephony profile does not.
+>
+> I contacted BlueRigger about this and they tested for themselves on 
+> different hardware and got the same result. BlueRigger says the 
+> HFP/HSP Telephony profile works fine with Ubuntu, which they say 
+> doesn't use Bluez.
+>
+> I don't know if this problem is new in Fedora 18, because I didn't get 
+> the dongles until after I upgraded from Fedora 17.
+>
+> I've reported this in Red Hat bugzilla 
+> <https://bugzilla.redhat.com/show_bug.cgi?id=905283> and emailed the 
+> Fedora test list 
+> <http://lists.fedoraproject.org/pipermail/test/2013-February/113598.html> 
+> about it; there has been no response to either.
+>
+> Any suggestions or insights into how to resolve this issue would be 
+> appreciated.
+>
+> Regards,
+>
+> Jonathan Kamens
+>
+>
+>
+>
 
