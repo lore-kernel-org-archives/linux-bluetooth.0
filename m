@@ -4,228 +4,350 @@ To: linux-bluetooth@vger.kernel.org
 Cc: Marcel Holtmann <marcel@holtmann.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
 	David Herrmann <dh.herrmann@gmail.com>
-Subject: [PATCH 06/16] Bluetooth: remove unneeded hci_conn_hold/put_device()
-Date: Sun, 24 Feb 2013 19:36:56 +0100
-Message-Id: <1361731026-7428-7-git-send-email-dh.herrmann@gmail.com>
+Subject: [PATCH 05/16] Bluetooth: rename hci_conn_put to hci_conn_drop
+Date: Sun, 24 Feb 2013 19:36:55 +0100
+Message-Id: <1361731026-7428-6-git-send-email-dh.herrmann@gmail.com>
 In-Reply-To: <1361731026-7428-1-git-send-email-dh.herrmann@gmail.com>
 References: <1361731026-7428-1-git-send-email-dh.herrmann@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hci_conn_hold/put_device() is used to control when hci_conn->dev is no
-longer needed and can be deleted from the system. Lets first look how they
-are currently used throughout the code (excluding HIDP!).
+We use _get() and _put() for device ref-counting in the kernel. However,
+hci_conn_put() is _not_ used for ref-counting, hence, rename it to
+hci_conn_drop() so we can later fix ref-counting and introduce
+hci_conn_put().
 
-All code that uses hci_conn_hold_device() looks like this:
-    ...
-    hci_conn_hold_device();
-    hci_conn_add_sysfs();
-    ...
-On the other side, hci_conn_put_device() is exclusively used in
-hci_conn_del().
+hci_conn_hold() and hci_conn_put() are currently used to manage how long a
+connection should be held alive. When the last user drops the connection,
+we spawn a delayed work that performs the disconnect. Obviously, this has
+nothing to do with ref-counting for the _object_ but rather for the
+keep-alive of the connection.
 
-So, considering that hci_conn_del() must not be called twice (which would
-fail horribly), we know that hci_conn_put_device() is only called _once_
-(which is in hci_conn_del()).
-On the other hand, hci_conn_add_sysfs() must not be called twice, either
-(it would call device_add twice, which breaks the device, see
-drivers/base/core.c). So we know that hci_conn_hold_device() is also
-called only once (it's only called directly before hci_conn_add_sysfs()).
-
-So hold and put are known to be called only once. That means we can safely
-remove them and directly call hci_conn_del_sysfs() in hci_conn_del().
-
-But there is one issue left: HIDP also uses hci_conn_hold/put_device().
-However, this case can be ignored and simply removed as it is totally
-broken. The issue is, the only thing HIDP delays with
-hci_conn_hold_device() is the removal of the hci_conn->dev from sysfs.
-But, the hci_conn device has no mechanism to get notified when its own
-parent (hci_dev) gets removed from sysfs. hci_dev_hold/put() does _not_
-control when it is removed but only when the device object is created
-and destroyed.
-And hci_dev calls hci_conn_flush_*() when it removes itself from sysfs,
-which itself causes hci_conn_del() to be called, but it does _not_ cause
-hci_conn_del_sysfs() to be called, which is wrong.
-
-Hence, we fix it to call hci_conn_del_sysfs() in hci_conn_del(). This
-guarantees that a hci_conn object is removed from sysfs _before_ its
-parent hci_dev is removed.
-
-The changes to HIDP look scary, wrong and broken. However, if you look at
-the HIDP session management, you will notice they're already broken in the
-exact _same_ way (ever tried "unplugging" HIDP devices? Breaks _all_ the
-time).
-So this patch only makes HIDP look _scary_ and _obviously broken_. It does
-not break HIDP itself, it already is!
-
-See later patches in this series which fix HIDP to use proper
-session-management.
+But we really _need_ proper ref-counting for the _object_ to allow
+connection-users like rfcomm-tty, HIDP or others.
 
 Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
 ---
- include/net/bluetooth/hci_core.h |  4 ----
- net/bluetooth/hci_conn.c         | 17 +----------------
- net/bluetooth/hci_event.c        |  4 ----
- net/bluetooth/hidp/core.c        | 20 +++-----------------
- 4 files changed, 4 insertions(+), 41 deletions(-)
+ include/net/bluetooth/hci_core.h |  2 +-
+ net/bluetooth/hci_conn.c         |  6 +++---
+ net/bluetooth/hci_event.c        | 36 ++++++++++++++++++------------------
+ net/bluetooth/l2cap_core.c       |  6 +++---
+ net/bluetooth/mgmt.c             |  6 +++---
+ net/bluetooth/sco.c              |  6 +++---
+ net/bluetooth/smp.c              |  2 +-
+ 7 files changed, 32 insertions(+), 32 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 2fde836..cd5b126 100644
+index 014a2ea..2fde836 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -338,7 +338,6 @@ struct hci_conn {
- 	struct timer_list auto_accept_timer;
+@@ -605,7 +605,7 @@ static inline void hci_conn_hold(struct hci_conn *conn)
+ 	cancel_delayed_work(&conn->disc_work);
+ }
  
- 	struct device	dev;
--	atomic_t	devref;
- 
- 	struct hci_dev	*hdev;
- 	void		*l2cap_data;
-@@ -594,9 +593,6 @@ int hci_conn_switch_role(struct hci_conn *conn, __u8 role);
- 
- void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active);
- 
--void hci_conn_hold_device(struct hci_conn *conn);
--void hci_conn_put_device(struct hci_conn *conn);
--
- static inline void hci_conn_hold(struct hci_conn *conn)
+-static inline void hci_conn_put(struct hci_conn *conn)
++static inline void hci_conn_drop(struct hci_conn *conn)
  {
  	BT_DBG("hcon %p orig refcnt %d", conn, atomic_read(&conn->refcnt));
+ 
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 319e7a4..134ab9f 100644
+index 4925a02..319e7a4 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -398,8 +398,6 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
- 	if (hdev->notify)
- 		hdev->notify(hdev, HCI_NOTIFY_CONN_ADD);
+@@ -433,7 +433,7 @@ int hci_conn_del(struct hci_conn *conn)
+ 		struct hci_conn *acl = conn->link;
+ 		if (acl) {
+ 			acl->link = NULL;
+-			hci_conn_put(acl);
++			hci_conn_drop(acl);
+ 		}
+ 	}
  
--	atomic_set(&conn->devref, 0);
--
- 	hci_conn_init_sysfs(conn);
+@@ -565,7 +565,7 @@ static struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type,
+ 	if (!sco) {
+ 		sco = hci_conn_add(hdev, type, dst);
+ 		if (!sco) {
+-			hci_conn_put(acl);
++			hci_conn_drop(acl);
+ 			return ERR_PTR(-ENOMEM);
+ 		}
+ 	}
+@@ -980,7 +980,7 @@ void hci_chan_del(struct hci_chan *chan)
  
- 	return conn;
-@@ -448,7 +446,7 @@ int hci_conn_del(struct hci_conn *conn)
+ 	synchronize_rcu();
  
- 	skb_queue_purge(&conn->data_q);
+-	hci_conn_put(conn);
++	hci_conn_drop(conn);
  
--	hci_conn_put_device(conn);
-+	hci_conn_del_sysfs(conn);
- 
- 	hci_dev_put(hdev);
- 
-@@ -835,19 +833,6 @@ void hci_conn_check_pending(struct hci_dev *hdev)
- 	hci_dev_unlock(hdev);
- }
- 
--void hci_conn_hold_device(struct hci_conn *conn)
--{
--	atomic_inc(&conn->devref);
--}
--EXPORT_SYMBOL(hci_conn_hold_device);
--
--void hci_conn_put_device(struct hci_conn *conn)
--{
--	if (atomic_dec_and_test(&conn->devref))
--		hci_conn_del_sysfs(conn);
--}
--EXPORT_SYMBOL(hci_conn_put_device);
--
- int hci_get_conn_list(void __user *arg)
- {
- 	struct hci_conn *c;
+ 	skb_queue_purge(&chan->data_q);
+ 	kfree(chan);
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 11df1c4..d089f5e 100644
+index 81b4448..11df1c4 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -2000,7 +2000,6 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -1475,7 +1475,7 @@ static void hci_cs_auth_requested(struct hci_dev *hdev, __u8 status)
+ 	if (conn) {
+ 		if (conn->state == BT_CONFIG) {
+ 			hci_proto_connect_cfm(conn, status);
+-			hci_conn_put(conn);
++			hci_conn_drop(conn);
+ 		}
+ 	}
+ 
+@@ -1502,7 +1502,7 @@ static void hci_cs_set_conn_encrypt(struct hci_dev *hdev, __u8 status)
+ 	if (conn) {
+ 		if (conn->state == BT_CONFIG) {
+ 			hci_proto_connect_cfm(conn, status);
+-			hci_conn_put(conn);
++			hci_conn_drop(conn);
+ 		}
+ 	}
+ 
+@@ -1664,7 +1664,7 @@ static void hci_cs_read_remote_features(struct hci_dev *hdev, __u8 status)
+ 	if (conn) {
+ 		if (conn->state == BT_CONFIG) {
+ 			hci_proto_connect_cfm(conn, status);
+-			hci_conn_put(conn);
++			hci_conn_drop(conn);
+ 		}
+ 	}
+ 
+@@ -1691,7 +1691,7 @@ static void hci_cs_read_remote_ext_features(struct hci_dev *hdev, __u8 status)
+ 	if (conn) {
+ 		if (conn->state == BT_CONFIG) {
+ 			hci_proto_connect_cfm(conn, status);
+-			hci_conn_put(conn);
++			hci_conn_drop(conn);
+ 		}
+ 	}
+ 
+@@ -2154,7 +2154,7 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		} else {
+ 			conn->state = BT_CONNECT2;
+ 			hci_proto_connect_cfm(conn, 0);
+-			hci_conn_put(conn);
++			hci_conn_drop(conn);
+ 		}
+ 	} else {
+ 		/* Connection rejected */
+@@ -2261,14 +2261,14 @@ static void hci_auth_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		} else {
+ 			conn->state = BT_CONNECTED;
+ 			hci_proto_connect_cfm(conn, ev->status);
+-			hci_conn_put(conn);
++			hci_conn_drop(conn);
+ 		}
+ 	} else {
+ 		hci_auth_cfm(conn, ev->status);
+ 
+ 		hci_conn_hold(conn);
+ 		conn->disc_timeout = HCI_DISCONN_TIMEOUT;
+-		hci_conn_put(conn);
++		hci_conn_drop(conn);
+ 	}
+ 
+ 	if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags)) {
+@@ -2352,7 +2352,7 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 		if (ev->status && conn->state == BT_CONNECTED) {
+ 			hci_acl_disconn(conn, HCI_ERROR_AUTH_FAILURE);
+-			hci_conn_put(conn);
++			hci_conn_drop(conn);
+ 			goto unlock;
+ 		}
+ 
+@@ -2361,7 +2361,7 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 				conn->state = BT_CONNECTED;
+ 
+ 			hci_proto_connect_cfm(conn, ev->status);
+-			hci_conn_put(conn);
++			hci_conn_drop(conn);
  		} else
+ 			hci_encrypt_cfm(conn, ev->status, ev->encrypt);
+ 	}
+@@ -2436,7 +2436,7 @@ static void hci_remote_features_evt(struct hci_dev *hdev,
+ 	if (!hci_outgoing_auth_needed(hdev, conn)) {
+ 		conn->state = BT_CONNECTED;
+ 		hci_proto_connect_cfm(conn, ev->status);
+-		hci_conn_put(conn);
++		hci_conn_drop(conn);
+ 	}
+ 
+ unlock:
+@@ -2996,7 +2996,7 @@ static void hci_pin_code_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (conn->state == BT_CONNECTED) {
+ 		hci_conn_hold(conn);
+ 		conn->disc_timeout = HCI_PAIRING_TIMEOUT;
+-		hci_conn_put(conn);
++		hci_conn_drop(conn);
+ 	}
+ 
+ 	if (!test_bit(HCI_PAIRABLE, &hdev->dev_flags))
+@@ -3099,7 +3099,7 @@ static void hci_link_key_notify_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		if (ev->key_type != HCI_LK_CHANGED_COMBINATION)
+ 			conn->key_type = ev->key_type;
+ 
+-		hci_conn_put(conn);
++		hci_conn_drop(conn);
+ 	}
+ 
+ 	if (test_bit(HCI_LINK_KEYS, &hdev->dev_flags))
+@@ -3268,7 +3268,7 @@ static void hci_remote_ext_features_evt(struct hci_dev *hdev,
+ 	if (!hci_outgoing_auth_needed(hdev, conn)) {
+ 		conn->state = BT_CONNECTED;
+ 		hci_proto_connect_cfm(conn, ev->status);
+-		hci_conn_put(conn);
++		hci_conn_drop(conn);
+ 	}
+ 
+ unlock:
+@@ -3413,7 +3413,7 @@ static void hci_key_refresh_complete_evt(struct hci_dev *hdev,
+ 
+ 	if (ev->status && conn->state == BT_CONNECTED) {
+ 		hci_acl_disconn(conn, HCI_ERROR_AUTH_FAILURE);
+-		hci_conn_put(conn);
++		hci_conn_drop(conn);
+ 		goto unlock;
+ 	}
+ 
+@@ -3422,13 +3422,13 @@ static void hci_key_refresh_complete_evt(struct hci_dev *hdev,
  			conn->state = BT_CONNECTED;
  
--		hci_conn_hold_device(conn);
- 		hci_conn_add_sysfs(conn);
+ 		hci_proto_connect_cfm(conn, ev->status);
+-		hci_conn_put(conn);
++		hci_conn_drop(conn);
+ 	} else {
+ 		hci_auth_cfm(conn, ev->status);
  
- 		if (test_bit(HCI_AUTH, &hdev->flags))
-@@ -3302,7 +3301,6 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
- 		conn->handle = __le16_to_cpu(ev->handle);
- 		conn->state  = BT_CONNECTED;
+ 		hci_conn_hold(conn);
+ 		conn->disc_timeout = HCI_DISCONN_TIMEOUT;
+-		hci_conn_put(conn);
++		hci_conn_drop(conn);
+ 	}
  
--		hci_conn_hold_device(conn);
- 		hci_conn_add_sysfs(conn);
- 		break;
+ unlock:
+@@ -3689,7 +3689,7 @@ static void hci_simple_pair_complete_evt(struct hci_dev *hdev,
+ 		mgmt_auth_failed(hdev, &conn->dst, conn->type, conn->dst_type,
+ 				 ev->status);
  
-@@ -3779,7 +3777,6 @@ static void hci_phy_link_complete_evt(struct hci_dev *hdev,
+-	hci_conn_put(conn);
++	hci_conn_drop(conn);
+ 
+ unlock:
+ 	hci_dev_unlock(hdev);
+@@ -3777,7 +3777,7 @@ static void hci_phy_link_complete_evt(struct hci_dev *hdev,
+ 
+ 	hci_conn_hold(hcon);
  	hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
- 	hci_conn_drop(hcon);
+-	hci_conn_put(hcon);
++	hci_conn_drop(hcon);
  
--	hci_conn_hold_device(hcon);
+ 	hci_conn_hold_device(hcon);
  	hci_conn_add_sysfs(hcon);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 22e6583..175dd32 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -571,7 +571,7 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 		chan->conn = NULL;
  
- 	amp_physical_cfm(bredr_hcon, hcon);
-@@ -3913,7 +3910,6 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	conn->handle = __le16_to_cpu(ev->handle);
- 	conn->state = BT_CONNECTED;
+ 		if (chan->chan_type != L2CAP_CHAN_CONN_FIX_A2MP)
+-			hci_conn_put(conn->hcon);
++			hci_conn_drop(conn->hcon);
  
--	hci_conn_hold_device(conn);
- 	hci_conn_add_sysfs(conn);
+ 		if (mgr && mgr->bredr_chan == chan)
+ 			mgr->bredr_chan = NULL;
+@@ -1702,7 +1702,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
  
- 	hci_proto_connect_cfm(conn, ev->status);
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index 61b50a6..143feb2 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -73,18 +73,6 @@ static struct hidp_session *__hidp_get_session(bdaddr_t *bdaddr)
- 	return NULL;
+ 	conn = l2cap_conn_add(hcon, 0);
+ 	if (!conn) {
+-		hci_conn_put(hcon);
++		hci_conn_drop(hcon);
+ 		err = -ENOMEM;
+ 		goto done;
+ 	}
+@@ -1712,7 +1712,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 
+ 		if (!list_empty(&conn->chan_l)) {
+ 			err = -EBUSY;
+-			hci_conn_put(hcon);
++			hci_conn_drop(hcon);
+ 		}
+ 
+ 		if (err)
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index f559b96..cca9187 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1857,7 +1857,7 @@ static void pairing_complete(struct pending_cmd *cmd, u8 status)
+ 	conn->security_cfm_cb = NULL;
+ 	conn->disconn_cfm_cb = NULL;
+ 
+-	hci_conn_put(conn);
++	hci_conn_drop(conn);
+ 
+ 	mgmt_pending_remove(cmd);
+ }
+@@ -1943,7 +1943,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	}
+ 
+ 	if (conn->connect_cfm_cb) {
+-		hci_conn_put(conn);
++		hci_conn_drop(conn);
+ 		err = cmd_complete(sk, hdev->id, MGMT_OP_PAIR_DEVICE,
+ 				   MGMT_STATUS_BUSY, &rp, sizeof(rp));
+ 		goto unlock;
+@@ -1952,7 +1952,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	cmd = mgmt_pending_add(sk, MGMT_OP_PAIR_DEVICE, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+-		hci_conn_put(conn);
++		hci_conn_drop(conn);
+ 		goto unlock;
+ 	}
+ 
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index da479cd..cde5aa3 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -185,7 +185,7 @@ static int sco_connect(struct sock *sk)
+ 
+ 	conn = sco_conn_add(hcon);
+ 	if (!conn) {
+-		hci_conn_put(hcon);
++		hci_conn_drop(hcon);
+ 		err = -ENOMEM;
+ 		goto done;
+ 	}
+@@ -355,7 +355,7 @@ static void __sco_sock_close(struct sock *sk)
+ 		if (sco_pi(sk)->conn->hcon) {
+ 			sk->sk_state = BT_DISCONN;
+ 			sco_sock_set_timer(sk, SCO_DISCONN_TIMEOUT);
+-			hci_conn_put(sco_pi(sk)->conn->hcon);
++			hci_conn_drop(sco_pi(sk)->conn->hcon);
+ 			sco_pi(sk)->conn->hcon = NULL;
+ 		} else
+ 			sco_chan_del(sk, ECONNRESET);
+@@ -883,7 +883,7 @@ static void sco_chan_del(struct sock *sk, int err)
+ 		sco_conn_unlock(conn);
+ 
+ 		if (conn->hcon)
+-			hci_conn_put(conn->hcon);
++			hci_conn_drop(conn->hcon);
+ 	}
+ 
+ 	sk->sk_state = BT_CLOSED;
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 5abefb1..b2296d3 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -522,7 +522,7 @@ void smp_chan_destroy(struct l2cap_conn *conn)
+ 	kfree(smp);
+ 	conn->smp_chan = NULL;
+ 	conn->hcon->smp_conn = NULL;
+-	hci_conn_put(conn->hcon);
++	hci_conn_drop(conn->hcon);
  }
  
--static void __hidp_link_session(struct hidp_session *session)
--{
--	list_add(&session->list, &hidp_session_list);
--}
--
--static void __hidp_unlink_session(struct hidp_session *session)
--{
--	hci_conn_put_device(session->conn);
--
--	list_del(&session->list);
--}
--
- static void __hidp_copy_session(struct hidp_session *session, struct hidp_conninfo *ci)
- {
- 	memset(ci, 0, sizeof(*ci));
-@@ -756,7 +744,7 @@ static int hidp_session(void *arg)
- 
- 	fput(session->ctrl_sock->file);
- 
--	__hidp_unlink_session(session);
-+	list_del(&session->list);
- 
- 	up_write(&hidp_session_sem);
- 
-@@ -779,8 +767,6 @@ static struct hci_conn *hidp_get_connection(struct hidp_session *session)
- 
- 	hci_dev_lock(hdev);
- 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, dst);
--	if (conn)
--		hci_conn_hold_device(conn);
- 	hci_dev_unlock(hdev);
- 
- 	hci_dev_put(hdev);
-@@ -1022,7 +1008,7 @@ int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock,
- 	session->flags   = req->flags & (1 << HIDP_BLUETOOTH_VENDOR_ID);
- 	session->idle_to = req->idle_to;
- 
--	__hidp_link_session(session);
-+	list_add(&session->list, &hidp_session_list);
- 
- 	if (req->rd_size > 0) {
- 		err = hidp_setup_hid(session, req);
-@@ -1102,7 +1088,7 @@ unlink:
- 	session->rd_data = NULL;
- 
- purge:
--	__hidp_unlink_session(session);
-+	list_del(&session->list);
- 
- 	skb_queue_purge(&session->ctrl_transmit);
- 	skb_queue_purge(&session->intr_transmit);
+ int smp_user_confirm_reply(struct hci_conn *hcon, u16 mgmt_op, __le32 passkey)
 -- 
 1.8.1.4
