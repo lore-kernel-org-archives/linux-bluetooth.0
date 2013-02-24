@@ -3,64 +3,117 @@ From: Antonio Ospite <ospite@studenti.unina.it>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>,
 	Antonio Ospite <ospite@studenti.unina.it>
-Subject: [PATCH BlueZ 0/2] Some more prerequisites for the playstation-peripheral plugin
-Date: Sun, 24 Feb 2013 10:54:43 +0100
-Message-Id: <1361699686-12341-1-git-send-email-ospite@studenti.unina.it>
+Subject: [PATCH BlueZ 2/2] adapter: add a btd_create_stored_device() call
+Date: Sun, 24 Feb 2013 10:54:45 +0100
+Message-Id: <1361699686-12341-3-git-send-email-ospite@studenti.unina.it>
+In-Reply-To: <1361699686-12341-1-git-send-email-ospite@studenti.unina.it>
+References: <1361699686-12341-1-git-send-email-ospite@studenti.unina.it>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Add a new btd_* call to add a new device to the database of known
+devices.
 
-if you recall some older discussions we decided to have the
-playstation-peripheral plugin as an _external_ plugin, because it will be
-used by only a few people and allowing to make its installation optional
-makes a lot of sense.
+This is particularly useful to register Bluetooth devices using
+a non-Bluetooth mechanism (e.g. USB-pairing in the case of Playstation
+peripherals).
 
-But external plugins can only use a subset of the BlueZ API, the one
-marked as "global" in src/bluetooth.ver
+The interface uses a btd_ prefix and relies only on native C types in
+order to be more easily used by _external_ plugins.
 
-Hence some more btd_* APIs are needed for the playstation-peripheral
-plugin.
+External plugins can only use symbols marked as "global" in
+src/bluetooth.ver, this patch avoids making global these symbols:
 
-Here I propose the last missing pieces of the jigsaw before I can submit
-the actual plugin.
+  store_sdp_record
+  str2ba
+  adapter_get_device
+  device_set_name
+  device_set_temporary
+  device_set_trusted
+---
+ src/adapter.h |   11 +++++++++++
+ src/adapter.c |   52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 63 insertions(+)
 
-Please comment, in the hope that at most one more review round will be
-enough to have these functionalities merged.
-
-Patch 1 is needed because the playstation-peripheral plugin will send
-the adapter bdaddr to the peripheral via USB, to have it set as the
-"master bdaddr". I can very well avoid a new API in this case but then
-I'd need to make some symbols global, let me know if that's what you
-prefer instead.
-
-Patch 2 is to create the device in the BlueZ database, any comment on
-this one is appreciated: the name can be improved, the implementation
-can be changed, but the point is that in one way or another we need some
-mechanism to add new devices programmatically before they show up via
-Bluetooth. An alternative proposal by someone else would also be very
-welcome :)
-
-Patches are against BlueZ 5.3.
-
-I can submit the plugin as well, if you really want to see the code using
-these APIs, I didn't just yet in order to keep the discussion more focused.
-
-Thanks,
-   Antonio
-
-Antonio Ospite (2):
-  adapter: add a btd_adapter_get_default_address() call
-  adapter: add a btd_create_stored_device() call
-
- src/adapter.c |   69 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/adapter.h |   12 ++++++++++
- 2 files changed, 81 insertions(+)
-
+diff --git a/src/adapter.h b/src/adapter.h
+index cb6d0d6..13aadb5 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -207,3 +207,14 @@ void adapter_store_cached_name(const bdaddr_t *local, const bdaddr_t *peer,
+ void btd_adapter_for_each_device(struct btd_adapter *adapter,
+ 			void (*cb)(struct btd_device *device, void *data),
+ 			void *data);
++
++int btd_create_stored_device(char *adapter_address,
++			     char *device_address,
++			     char *name,
++			     uint16_t vendor_id_source,
++			     uint16_t vendor_id,
++			     uint16_t product_id,
++			     uint16_t version_id,
++			     const char *uuid,
++			     char *sdp_record,
++			     bool trusted);
+diff --git a/src/adapter.c b/src/adapter.c
+index 5eac84f..7aee8f3 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -6196,3 +6196,55 @@ void adapter_shutdown(void)
+ 	if (!adapter_remaining)
+ 		btd_exit();
+ }
++
++int btd_create_stored_device(char *adapter_address,
++			     char *device_address,
++			     char *name,
++			     uint16_t vendor_id_source,
++			     uint16_t vendor_id,
++			     uint16_t product_id,
++			     uint16_t version_id,
++			     const char *uuid,
++			     char *sdp_record,
++			     bool trusted)
++{
++	struct btd_adapter *adapter;
++	struct btd_device *device;
++	bdaddr_t dst;
++	int ret = 0;
++
++	store_sdp_record(adapter_address, device_address, 0x10000, sdp_record);
++
++	str2ba(device_address, &dst);
++
++	adapter = btd_adapter_get_default();
++	if (adapter == NULL) {
++		DBG("Failed to get the adapter");
++		ret = -EPERM;
++		goto out;
++	}
++
++	/* This will create the device if necessary */
++	device = adapter_get_device(adapter, &dst, BDADDR_BREDR);
++	if (device == NULL) {
++		DBG("Failed to get the device");
++		ret = -ENODEV;
++		goto out;
++	}
++
++	if (name)
++		device_set_name(device, name);
++
++	btd_device_set_pnpid(device, vendor_id_source,
++			vendor_id, product_id, version_id);
++
++	if (uuid)
++		btd_device_add_uuid(device, uuid);
++
++	device_set_temporary(device, FALSE);
++
++	if (trusted)
++		device_set_trusted(device, TRUE);
++out:
++	return ret;
++}
 -- 
-Antonio Ospite
-http://ao2.it
+1.7.10.4
 
-A: Because it messes up the order in which people normally read text.
-   See http://en.wikipedia.org/wiki/Posting_style
-Q: Why is top-posting such a bad thing?
