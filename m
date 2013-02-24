@@ -4,65 +4,54 @@ To: linux-bluetooth@vger.kernel.org
 Cc: Marcel Holtmann <marcel@holtmann.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
 	David Herrmann <dh.herrmann@gmail.com>
-Subject: [PATCH 04/16] Bluetooth: hidp: verify l2cap sockets
-Date: Sun, 24 Feb 2013 19:36:54 +0100
-Message-Id: <1361731026-7428-5-git-send-email-dh.herrmann@gmail.com>
+Subject: [PATCH 03/16] Bluetooth: hidp: simplify error path in sock-init
+Date: Sun, 24 Feb 2013 19:36:53 +0100
+Message-Id: <1361731026-7428-4-git-send-email-dh.herrmann@gmail.com>
 In-Reply-To: <1361731026-7428-1-git-send-email-dh.herrmann@gmail.com>
 References: <1361731026-7428-1-git-send-email-dh.herrmann@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We need to verify that the given sockets are actually l2cap sockets. If
-they aren't, we are not supposed to access bt_sk(sock) and we shouldn't
-start the session if the offsets turn out to be valid local BT addresses.
+We currently print errors twice when doing a "goto error;". Avoid this and
+also use labels for each error-condition. We shouldn't mix
+"inline-cleanup" and "goto-cleanup" in a single function. It makes
+extending the function later just more work.
 
 Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
 ---
- include/net/bluetooth/l2cap.h | 1 +
- net/bluetooth/hidp/core.c     | 2 ++
- net/bluetooth/l2cap_sock.c    | 6 ++++++
- 3 files changed, 9 insertions(+)
+ net/bluetooth/hidp/sock.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 7588ef4..ae6210e 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -787,6 +787,7 @@ extern bool disable_ertm;
+diff --git a/net/bluetooth/hidp/sock.c b/net/bluetooth/hidp/sock.c
+index 5d0f1ca..ca86436 100644
+--- a/net/bluetooth/hidp/sock.c
++++ b/net/bluetooth/hidp/sock.c
+@@ -281,22 +281,22 @@ int __init hidp_init_sockets(void)
+ 	err = bt_sock_register(BTPROTO_HIDP, &hidp_sock_family_ops);
+ 	if (err < 0) {
+ 		BT_ERR("Can't register HIDP socket");
+-		goto error;
++		goto err_proto;
+ 	}
  
- int l2cap_init_sockets(void);
- void l2cap_cleanup_sockets(void);
-+bool is_l2cap_socket(struct socket *s);
+ 	err = bt_procfs_init(THIS_MODULE, &init_net, "hidp", &hidp_sk_list, NULL);
+ 	if (err < 0) {
+ 		BT_ERR("Failed to create HIDP proc file");
+-		bt_sock_unregister(BTPROTO_HIDP);
+-		goto error;
++		goto err_sock;
+ 	}
  
- void __l2cap_connect_rsp_defer(struct l2cap_chan *chan);
- int __l2cap_wait_ack(struct sock *sk);
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index a7352ff..61b50a6 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -969,6 +969,8 @@ int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock,
+ 	BT_INFO("HIDP socket layer initialized");
  
- 	BT_DBG("");
+ 	return 0;
  
-+	if (!is_l2cap_socket(ctrl_sock) || !is_l2cap_socket(intr_sock))
-+		return -EINVAL;
- 	if (bacmp(&bt_sk(ctrl_sock->sk)->src, &bt_sk(intr_sock->sk)->src) ||
- 			bacmp(&bt_sk(ctrl_sock->sk)->dst, &bt_sk(intr_sock->sk)->dst))
- 		return -ENOTUNIQ;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 7f97049..598b167 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -43,6 +43,12 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent);
- static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
- 				     int proto, gfp_t prio);
- 
-+bool is_l2cap_socket(struct socket *s)
-+{
-+	return s && s->ops == &l2cap_sock_ops;
-+}
-+EXPORT_SYMBOL(is_l2cap_socket);
-+
- static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- {
- 	struct sock *sk = sock->sk;
+-error:
+-	BT_ERR("Can't register HIDP socket");
++err_sock:
++	bt_sock_unregister(BTPROTO_HIDP);
++err_proto:
+ 	proto_unregister(&hidp_proto);
+ 	return err;
+ }
 -- 
 1.8.1.4
