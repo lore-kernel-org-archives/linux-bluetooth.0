@@ -4,174 +4,130 @@ To: linux-bluetooth@vger.kernel.org
 Cc: Marcel Holtmann <marcel@holtmann.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
 	David Herrmann <dh.herrmann@gmail.com>
-Subject: [PATCH 00/16] Rewrite HIDP Session Management
-Date: Sun, 24 Feb 2013 19:36:50 +0100
-Message-Id: <1361731026-7428-1-git-send-email-dh.herrmann@gmail.com>
+Subject: [PATCH 01/16] Bluetooth: discard bt_sock_unregister() errors
+Date: Sun, 24 Feb 2013 19:36:51 +0100
+Message-Id: <1361731026-7428-2-git-send-email-dh.herrmann@gmail.com>
+In-Reply-To: <1361731026-7428-1-git-send-email-dh.herrmann@gmail.com>
+References: <1361731026-7428-1-git-send-email-dh.herrmann@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+After we successfully registered a socket via bt_sock_register() there is
+no reason to ever check the return code of bt_sock_unregister(). If
+bt_sock_unregister() fails, it means the socket _is_ already unregistered
+so we have what we want, don't we?
 
-If anyone tested "hotplugging" with HIDP in the last years, there's a 50% chance
-you get an oops when "unplugging" devices. I never got around fixing it until
-now. I took the time to thoroughly review HIDP, hci_dev and hci_conn
-interaction and it turned out to be totally broken. The thing is that HIDP
-highly depends on the underlying hci_conn object. However, there is no way to
-notify HIDP when the connection is shut down. So this is where I started fixing
-things.
+Also, to get bt_sock_unregister() to fail, another part of the kernel has
+to unregister _our_ socket. This is sooo _wrong_ that it will break way
+earlier than when we unregister our socket.
 
-First, a list of bugs that all played together and are mostly fixed in this
-series:
+Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
+---
+ net/bluetooth/bnep/sock.c   | 4 +---
+ net/bluetooth/cmtp/sock.c   | 4 +---
+ net/bluetooth/hci_sock.c    | 4 +---
+ net/bluetooth/hidp/sock.c   | 4 +---
+ net/bluetooth/l2cap_sock.c  | 4 +---
+ net/bluetooth/rfcomm/sock.c | 3 +--
+ net/bluetooth/sco.c         | 3 +--
+ 7 files changed, 7 insertions(+), 19 deletions(-)
 
-* hci_conn use after free:
-  hci_conn_del() calls hci_conn_put_device() which might call
-  hci_conn_del_sysfs(), which itself calls put_device() which might call
-  bt_link_release() which calls kfree(hci_conn).
-  That is, the "conn->handle" check in hci_conn_del() dereferences "conn" after
-  it has been freed.
-  Note that the "might"-case is the usual case. So this is a real bug.
-
-* kfree() after device_initialize()
-  During hci_conn_add() we call hci_conn_init_sysfs() which calls
-  device_initialize() on hci_conn. However, if we never call
-  hci_conn_add_sysfs(), then hci_conn_del() will not use "put_device()" to drop
-  the reference but instead call kfree(hci_conn).
-  This is not allowed (see documentation for device_initialize()).
-
-* ref-count for device_del()
-  We use a "devcnt" reference-count in every hci_conn structure which controls
-  when we call device_del(hci_conn). This isn't a but itself, but discouraged
-  behavior. device_del() is supposed to be called when the (virtual) hardware
-  of the device goes away. So when the hci-connection is closed, we are supposed
-  to call device_del() immediately. If the direct call to device_del()
-  introduces bugs, we _must_ fix the bugs instead of delaying
-  device_del(). The correct fix is to notify all childs that the
-  device goes away (they can now call device_del(child)) and then call
-  device_del() afterwards. But this needs to be done synchronously.
-
-* device_find_child() + device_move()
-  This is really wrong. When an hci_conn object goes away, we move all it's
-  childs to the root node. The code doesn't have a comment to say _why_ we do
-  this bug digging in commit-messages it said that client RFCOMM-TTY devices
-  might have a reason to stay alive even though the hci_conn is gone.
-  Could anyone please tell me _one_ reason, why an RFCOMM-TTY object should stay
-  even though the hci_conn is gone?
-
-* hci_conn use after free
-  If an hci_conn is grabbed via hci_conn_hold_device(), but the connection
-  hasn't been added to user-space, yet, then hci_conn_del() might call kfree()
-  on the device, even though a later call to hci_conn_put_device() will still
-  access it.
-  This is a theoretical bug as we have other means to avoid it. But it's still
-  ugly.
-
-* hci_conn_put() called more often than hci_conn_hold()
-  I added a debug-print to hci_conn_put() and the ref-count dropped below 0
-  everytime I disconnected a device. It doesn't break anything, but we really
-  should avoid this!
-
-* hci_conn_put_device() doesn't take the parent hci_dev into account.
-  So the bug we tried to fix with _hold/put_device(), comes up again if we
-  unplug the adapter instead of disconnecting the remote device.
-
-* HIDP doesn't consider "terminate" in wait-conditions
-  No wait-condition in HIDP watches for "terminate" to become non-zero, even
-  though it is a _very_ likely condition to terminate HIDP.
-
-* HIDP removes the HID/input devices asynchronously from within the session
-  instead of synchronously when the connection goes down. This causes the
-  session-thread to use the connection even though it's gone.
-
-That's all I can remember for now, but there's some more small bugs that I fixed
-together with the session-rewrite.
-
-This series includes some small fixes/cleanups that can be applied right away
-(which would simplify this series a lot). The other patches depend on each other
-so they cannot be cherry-picked.
-
-I tested this series and it works perfectly well. 10 connect/disconnect
-cycles worked without a bug. I can shut down the device, unplug the adapter or
-do an explicit disconnect without an oops.
-I haven't tested suspend/resume, yet, though.
-
-Please review!
-Thanks
-David
-
-
-Overview:
-
-Patch 1-3: They remove a bogus return-code in bt_sock_unregister() which doesn't
-           make sense to me.
-
-Patch 4: Add is_l2cap_socket() which allows HIDP to verify that the passed
-         sockets are real l2cap sockets.
-
-Patch 5-7: Introduce ref-counting for hci_conn objects so we can have a
-           reference to them in the HIDP session. Note that we cannot reuse the
-           current "refcnt" as this is used for something totally differen: It
-           counts the number of active users on the underlying connection. It
-           doesn't ref-count the hci_conn object itself!
-
-Patch 8-10: Some small HIDP and HCI-core fixes
-
-Patch 11: Add l2cap_sock_get_hci_conn() helper to allow HIDP to use l2cap
-          sockets and retrieve the underlying hci_conn object instead of using
-          an unnecessary hash-table lookup.
-
-Patch 12: Add hci_conn_user objects. This allows external protocols to bind to
-          an hci_conn object and get notified whenever the connection is closed
-          and unlinked from sysfs.
-
-Patch 13: Small HIDP cleanup patch
-
-Patch 14-15: Rewrite the HIDP session-management based on hci_conn_user objects.
-             I haven't found an easy way to do this in many small patches as the
-             new session-management is totally different than the previous one.
-             Hence, I first add the new helpers and then remove the old helpers
-             and do the switch in a follow-up patch. This makes reviewing
-             easier.
-
-Patch 16: Again a small fix for HIDP that uses the new session-management
-          helpers.
-
-David Herrmann (16):
-  Bluetooth: discard bt_sock_unregister() errors
-  Bluetooth: change bt_sock_unregister() to return void
-  Bluetooth: hidp: simplify error path in sock-init
-  Bluetooth: hidp: verify l2cap sockets
-  Bluetooth: rename hci_conn_put to hci_conn_drop
-  Bluetooth: remove unneeded hci_conn_hold/put_device()
-  Bluetooth: introduce hci_conn ref-counting
-  Bluetooth: hidp: remove unused session->state field
-  Bluetooth: hidp: test "terminate" before sleeping
-  Bluetooth: allow constant arguments for bacmp()/bacpy()
-  Bluetooth: l2cap: add l2cap_sock_get_hci_conn() helper
-  Bluetooth: add hci_conn_user sub-modules
-  Bluetooth: hidp: move hidp_schedule() to core.c
-  Bluetooth: hidp: add new session-management helpers
-  Bluetooth: hidp: remove old session-management
-  Bluetooth: hidp: handle kernel_sendmsg() errors correctly
-
- include/net/bluetooth/bluetooth.h |   6 +-
- include/net/bluetooth/hci_core.h  |  46 ++-
- include/net/bluetooth/l2cap.h     |   2 +
- net/bluetooth/af_bluetooth.c      |  15 +-
- net/bluetooth/bnep/sock.c         |   4 +-
- net/bluetooth/cmtp/sock.c         |   4 +-
- net/bluetooth/hci_conn.c          |  92 ++++-
- net/bluetooth/hci_event.c         |  40 +-
- net/bluetooth/hci_sock.c          |   4 +-
- net/bluetooth/hci_sysfs.c         |   1 -
- net/bluetooth/hidp/core.c         | 787 +++++++++++++++++++++++++-------------
- net/bluetooth/hidp/hidp.h         |  67 ++--
- net/bluetooth/hidp/sock.c         |  35 +-
- net/bluetooth/l2cap_core.c        |   6 +-
- net/bluetooth/l2cap_sock.c        |  31 +-
- net/bluetooth/mgmt.c              |   6 +-
- net/bluetooth/rfcomm/sock.c       |   3 +-
- net/bluetooth/sco.c               |   9 +-
- net/bluetooth/smp.c               |   2 +-
- 19 files changed, 737 insertions(+), 423 deletions(-)
-
+diff --git a/net/bluetooth/bnep/sock.c b/net/bluetooth/bnep/sock.c
+index e7154a5..5b1c04e 100644
+--- a/net/bluetooth/bnep/sock.c
++++ b/net/bluetooth/bnep/sock.c
+@@ -253,8 +253,6 @@ error:
+ void __exit bnep_sock_cleanup(void)
+ {
+ 	bt_procfs_cleanup(&init_net, "bnep");
+-	if (bt_sock_unregister(BTPROTO_BNEP) < 0)
+-		BT_ERR("Can't unregister BNEP socket");
+-
++	bt_sock_unregister(BTPROTO_BNEP);
+ 	proto_unregister(&bnep_proto);
+ }
+diff --git a/net/bluetooth/cmtp/sock.c b/net/bluetooth/cmtp/sock.c
+index 1c57482..58d9ede 100644
+--- a/net/bluetooth/cmtp/sock.c
++++ b/net/bluetooth/cmtp/sock.c
+@@ -264,8 +264,6 @@ error:
+ void cmtp_cleanup_sockets(void)
+ {
+ 	bt_procfs_cleanup(&init_net, "cmtp");
+-	if (bt_sock_unregister(BTPROTO_CMTP) < 0)
+-		BT_ERR("Can't unregister CMTP socket");
+-
++	bt_sock_unregister(BTPROTO_CMTP);
+ 	proto_unregister(&cmtp_proto);
+ }
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 07f0739..20c92de 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -1126,8 +1126,6 @@ error:
+ void hci_sock_cleanup(void)
+ {
+ 	bt_procfs_cleanup(&init_net, "hci");
+-	if (bt_sock_unregister(BTPROTO_HCI) < 0)
+-		BT_ERR("HCI socket unregistration failed");
+-
++	bt_sock_unregister(BTPROTO_HCI);
+ 	proto_unregister(&hci_sk_proto);
+ }
+diff --git a/net/bluetooth/hidp/sock.c b/net/bluetooth/hidp/sock.c
+index 82a829d..5d0f1ca 100644
+--- a/net/bluetooth/hidp/sock.c
++++ b/net/bluetooth/hidp/sock.c
+@@ -304,8 +304,6 @@ error:
+ void __exit hidp_cleanup_sockets(void)
+ {
+ 	bt_procfs_cleanup(&init_net, "hidp");
+-	if (bt_sock_unregister(BTPROTO_HIDP) < 0)
+-		BT_ERR("Can't unregister HIDP socket");
+-
++	bt_sock_unregister(BTPROTO_HIDP);
+ 	proto_unregister(&hidp_proto);
+ }
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 1bcfb84..7f97049 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1312,8 +1312,6 @@ error:
+ void l2cap_cleanup_sockets(void)
+ {
+ 	bt_procfs_cleanup(&init_net, "l2cap");
+-	if (bt_sock_unregister(BTPROTO_L2CAP) < 0)
+-		BT_ERR("L2CAP socket unregistration failed");
+-
++	bt_sock_unregister(BTPROTO_L2CAP);
+ 	proto_unregister(&l2cap_proto);
+ }
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index ce3f665..851ecc9 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -1068,8 +1068,7 @@ void __exit rfcomm_cleanup_sockets(void)
+ 
+ 	debugfs_remove(rfcomm_sock_debugfs);
+ 
+-	if (bt_sock_unregister(BTPROTO_RFCOMM) < 0)
+-		BT_ERR("RFCOMM socket layer unregistration failed");
++	bt_sock_unregister(BTPROTO_RFCOMM);
+ 
+ 	proto_unregister(&rfcomm_proto);
+ }
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 57f250c..da479cd 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -1113,8 +1113,7 @@ void __exit sco_exit(void)
+ 
+ 	debugfs_remove(sco_debugfs);
+ 
+-	if (bt_sock_unregister(BTPROTO_SCO) < 0)
+-		BT_ERR("SCO socket unregistration failed");
++	bt_sock_unregister(BTPROTO_SCO);
+ 
+ 	proto_unregister(&sco_proto);
+ }
 -- 
 1.8.1.4
