@@ -3,228 +3,82 @@ From: dean_jenkins@mentor.com
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	gustavo@padovan.org
-Subject: [PATCH 4/6] Bluetooth: Remove RFCOMM session refcnt
-Date: Mon, 25 Feb 2013 16:38:35 +0000
-Message-Id: <1361810317-4005-5-git-send-email-dean_jenkins@mentor.com>
+Subject: [PATCH 2/6] Bluetooth: Check rfcomm session and DLC exists on socket close
+Date: Mon, 25 Feb 2013 16:38:33 +0000
+Message-Id: <1361810317-4005-3-git-send-email-dean_jenkins@mentor.com>
 In-Reply-To: <1361810317-4005-1-git-send-email-dean_jenkins@mentor.com>
 References: <1361810317-4005-1-git-send-email-dean_jenkins@mentor.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Dean Jenkins <Dean_Jenkins@mentor.com>
 
-Previous commits have improved the handling of the RFCOMM session
-timer and the RFCOMM session pointers such that freed RFCOMM
-session structures should no longer be erroneously accessed. The
-RFCOMM session refcnt now has no purpose and will be deleted by
-this commit.
+A race condition exists between near simultaneous asynchronous
+DLC data channel disconnection requests from the host and remote device.
+This causes the socket layer to request a socket shutdown at the same
+time the rfcomm core is processing the disconnect request from the remote
+device.
 
-Note that the RFCOMM session is now deleted as soon as the
-RFCOMM control channel link is no longer required. This makes the
-lifetime of the RFCOMM session deterministic and absolute.
-Previously with the refcnt, there was uncertainty about when
-the session structure would be deleted because the relative
-refcnt prevented the session structure from being deleted at will.
+The socket layer retains a copy of a struct rfcomm_dlc d pointer.
+The d pointer refers to a copy of a struct rfcomm_session.
+When the socket layer thread performs a socket shutdown, the thread
+may wait on a rfcomm lock in rfcomm_dlc_close(). This means that
+whilst the thread waits, the rfcomm_session and/or rfcomm_dlc structures
+pointed to by d maybe freed due to rfcomm core handling. Consequently,
+when the rfcomm lock becomes available and the thread runs, a
+malfunction could occur as a freed rfcomm_session structure and/or a
+freed rfcomm_dlc structure will be erroneously accessed.
 
-It was noted that the refcnt could malfunction under very heavy
-real-time processor loading in embedded SMP environments. This
-could cause premature RFCOMM session deletion or double session
-deletion that could result in kernel crashes. Removal of the
-refcnt prevents this issue.
-
-There are 4 connection / disconnection RFCOMM session scenarios:
-host initiated control link ---> host disconnected control link
-host initiated ctrl link ---> remote device disconnected ctrl link
-remote device initiated ctrl link ---> host disconnected ctrl link
-remote device initiated ctrl link ---> remote device disc'ed ctrl link
-
-The control channel connection procedures are independent of the
-disconnection procedures. Strangely, the RFCOMM session refcnt was
-applying special treatment so erroneously combining connection and
-disconnection events. This commit fixes this issue by removing
-some session code that used the "initiator" member of the session
-structure that was intended for use with the data channels.
+Therefore, after the rfcomm lock is acquired, check that the struct
+rfcomm_session is still valid by searching the rfcomm session list.
+If the session is valid then validate the d pointer by searching the
+rfcomm session list of active DLCs for the rfcomm_dlc structure
+pointed by d.
 
 Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
 ---
- include/net/bluetooth/rfcomm.h |    7 -------
- net/bluetooth/rfcomm/core.c    |   43 +++++-----------------------------------
- 2 files changed, 5 insertions(+), 45 deletions(-)
+ net/bluetooth/rfcomm/core.c |   26 ++++++++++++++++++++++++--
+ 1 file changed, 24 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
-index a4e38ea..7afd419 100644
---- a/include/net/bluetooth/rfcomm.h
-+++ b/include/net/bluetooth/rfcomm.h
-@@ -158,7 +158,6 @@ struct rfcomm_session {
- 	struct timer_list timer;
- 	unsigned long    state;
- 	unsigned long    flags;
--	atomic_t         refcnt;
- 	int              initiator;
- 
- 	/* Default DLC parameters */
-@@ -276,12 +275,6 @@ static inline void rfcomm_dlc_unthrottle(struct rfcomm_dlc *d)
- void   rfcomm_session_getaddr(struct rfcomm_session *s, bdaddr_t *src,
- 								bdaddr_t *dst);
- 
--static inline void rfcomm_session_hold(struct rfcomm_session *s)
--{
--	if (s)
--		atomic_inc(&s->refcnt);
--}
--
- /* ---- RFCOMM sockets ---- */
- struct sockaddr_rc {
- 	sa_family_t	rc_family;
 diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 60d2f1a..ecef9bc 100644
+index 8780e67..af0c26d 100644
 --- a/net/bluetooth/rfcomm/core.c
 +++ b/net/bluetooth/rfcomm/core.c
-@@ -108,14 +108,6 @@ static void rfcomm_schedule(void)
- 	wake_up_process(rfcomm_thread);
- }
+@@ -493,12 +493,34 @@ static int __rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
  
--static struct rfcomm_session *rfcomm_session_put(struct rfcomm_session *s)
--{
--	if (s && atomic_dec_and_test(&s->refcnt))
--		s = rfcomm_session_del(s);
--
--	return s;
--}
--
- /* ---- RFCOMM FCS computation ---- */
- 
- /* reversed, 8-bit, poly=0x07 */
-@@ -251,16 +243,14 @@ static void rfcomm_session_set_timer(struct rfcomm_session *s, long timeout)
+ int rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
  {
- 	BT_DBG("session %p state %ld timeout %ld", s, s->state, timeout);
+-	int r;
++	int r = 0;
++	struct rfcomm_dlc *d_list;
++	struct rfcomm_session *s, *s_list;
++
++	BT_DBG("dlc %p state %ld dlci %d err %d", d, d->state, d->dlci, err);
  
--	if (!mod_timer(&s->timer, jiffies + timeout))
--		rfcomm_session_hold(s);
-+	mod_timer(&s->timer, jiffies + timeout);
- }
+ 	rfcomm_lock();
  
- static void rfcomm_session_clear_timer(struct rfcomm_session *s)
- {
- 	BT_DBG("session %p state %ld", s, s->state);
+-	r = __rfcomm_dlc_close(d, err);
++	s = d->session;
++	if (!s)
++		goto no_session;
++
++	/* after waiting on the mutex check the session still exists */
++	list_for_each_entry(s_list, &session_list, list) {
++		if (s_list == s) {
++			/* after waiting on the mutex, */
++			/* check the dlc still exists */
++			list_for_each_entry(d_list, &s->dlcs, list) {
++				if (d_list == d) {
++					r = __rfcomm_dlc_close(d, err);
++					break;
++				}
++			}
++			break;
++		}
++	}
  
--	if (del_timer_sync(&s->timer))
--		rfcomm_session_put(s);
-+	del_timer_sync(&s->timer);
- }
- 
- /* ---- RFCOMM DLCs ---- */
-@@ -338,8 +328,6 @@ static void rfcomm_dlc_link(struct rfcomm_session *s, struct rfcomm_dlc *d)
- {
- 	BT_DBG("dlc %p session %p", d, s);
- 
--	rfcomm_session_hold(s);
--
- 	rfcomm_session_clear_timer(s);
- 	rfcomm_dlc_hold(d);
- 	list_add(&d->list, &s->dlcs);
-@@ -358,8 +346,6 @@ static void rfcomm_dlc_unlink(struct rfcomm_dlc *d)
- 
- 	if (list_empty(&s->dlcs))
- 		rfcomm_session_set_timer(s, RFCOMM_IDLE_TIMEOUT);
--
--	rfcomm_session_put(s);
- }
- 
- static struct rfcomm_dlc *rfcomm_dlc_get(struct rfcomm_session *s, u8 dlci)
-@@ -678,8 +664,6 @@ static struct rfcomm_session *rfcomm_session_close(struct rfcomm_session *s,
- 
- 	BT_DBG("session %p state %ld err %d", s, s->state, err);
- 
--	rfcomm_session_hold(s);
--
- 	s->state = BT_CLOSED;
- 
- 	/* Close all dlcs */
-@@ -690,7 +674,7 @@ static struct rfcomm_session *rfcomm_session_close(struct rfcomm_session *s,
- 	}
- 
- 	rfcomm_session_clear_timer(s);
--	return rfcomm_session_put(s);
-+	return rfcomm_session_del(s);
- }
- 
- static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
-@@ -1884,13 +1868,8 @@ static struct rfcomm_session *rfcomm_process_rx(struct rfcomm_session *s)
- 			kfree_skb(skb);
- 	}
- 
--	if (s && (sk->sk_state == BT_CLOSED)) {
--		if (!s->initiator)
--			s = rfcomm_session_put(s);
--
--		if (s)
--			s = rfcomm_session_close(s, sk->sk_err);
--	}
-+	if (s && (sk->sk_state == BT_CLOSED))
-+		s = rfcomm_session_close(s, sk->sk_err);
- 
- 	return s;
- }
-@@ -1917,8 +1896,6 @@ static void rfcomm_accept_connection(struct rfcomm_session *s)
- 
- 	s = rfcomm_session_add(nsock, BT_OPEN);
- 	if (s) {
--		rfcomm_session_hold(s);
--
- 		/* We should adjust MTU on incoming sessions.
- 		 * L2CAP MTU minus UIH header and FCS. */
- 		s->mtu = min(l2cap_pi(nsock->sk)->chan->omtu,
-@@ -1967,7 +1944,6 @@ static void rfcomm_process_sessions(void)
- 		if (test_and_clear_bit(RFCOMM_TIMED_OUT, &s->flags)) {
- 			s->state = BT_DISCONN;
- 			rfcomm_send_disc(s, 0);
--			rfcomm_session_put(s);
- 			continue;
- 		}
- 
-@@ -1976,8 +1952,6 @@ static void rfcomm_process_sessions(void)
- 			continue;
- 		}
- 
--		rfcomm_session_hold(s);
--
- 		switch (s->state) {
- 		case BT_BOUND:
- 			s = rfcomm_check_connection(s);
-@@ -1990,8 +1964,6 @@ static void rfcomm_process_sessions(void)
- 
- 		if (s)
- 			rfcomm_process_dlcs(s);
--
--		rfcomm_session_put(s);
- 	}
- 
++no_session:
  	rfcomm_unlock();
-@@ -2041,7 +2013,6 @@ static int rfcomm_add_listener(bdaddr_t *ba)
- 	if (!s)
- 		goto failed;
- 
--	rfcomm_session_hold(s);
- 	return 0;
- failed:
- 	sock_release(sock);
-@@ -2099,8 +2070,6 @@ static void rfcomm_security_cfm(struct hci_conn *conn, u8 status, u8 encrypt)
- 	if (!s)
- 		return;
- 
--	rfcomm_session_hold(s);
--
- 	list_for_each_safe(p, n, &s->dlcs) {
- 		d = list_entry(p, struct rfcomm_dlc, list);
- 
-@@ -2132,8 +2101,6 @@ static void rfcomm_security_cfm(struct hci_conn *conn, u8 status, u8 encrypt)
- 			set_bit(RFCOMM_AUTH_REJECT, &d->flags);
- 	}
- 
--	rfcomm_session_put(s);
--
- 	rfcomm_schedule();
+ 	return r;
  }
- 
 -- 
 1.7.10.1
