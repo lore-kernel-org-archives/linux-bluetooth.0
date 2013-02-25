@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/8] obexd: Provide sdp record in get_service_record
-Date: Mon, 25 Feb 2013 09:36:04 +0100
-Message-Id: <1361781370-19061-3-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH v2 5/8] obexd: Add RegisterNotifications function
+Date: Mon, 25 Feb 2013 09:36:07 +0100
+Message-Id: <1361781370-19061-6-git-send-email-christian.fetzer@oss.bmw-carit.de>
 In-Reply-To: <1361781370-19061-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 References: <1361781370-19061-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,184 +11,144 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-This caches the sdp record of the active session in the bluetooth transport
-and makes the data available for clients in get_service_record.
-The cached SDP record can be retreived using obc_session_get_service_record.
+This allows applications to register for all different types
+of MAP event reports.
 
-To have the SDP record also available when directly connecting by port,
-the profile implementation has to specify force_service_lookup in its
-obc_driver struct.
-
-Profiles like MAP specify additional SDP attributes that are of interest
-for the profile implementation.
+In response to this call, the MSE should connect to the local MNS
+instance.
 ---
- obexd/client/bluetooth.c | 51 +++++++++++++++++++++++++++++++++++++++++-------
- obexd/client/driver.h    |  1 +
- obexd/client/session.c   |  5 +++--
- obexd/client/transport.h |  1 +
- 4 files changed, 49 insertions(+), 9 deletions(-)
+ doc/obex-api.txt   |  6 ++++
+ obexd/client/map.c | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 92 insertions(+)
 
-diff --git a/obexd/client/bluetooth.c b/obexd/client/bluetooth.c
-index a832a3f..07c2228 100644
---- a/obexd/client/bluetooth.c
-+++ b/obexd/client/bluetooth.c
-@@ -51,7 +51,9 @@ struct bluetooth_session {
- 	bdaddr_t src;
- 	bdaddr_t dst;
- 	uint16_t port;
-+	gboolean force_service_lookup;
- 	sdp_session_t *sdp;
-+	sdp_record_t *sdp_record;
- 	GIOChannel *io;
- 	char *service;
- 	obc_transport_func func;
-@@ -82,6 +84,9 @@ static void session_destroy(struct bluetooth_session *session)
- 	if (session->sdp)
- 		sdp_close(session->sdp);
+diff --git a/doc/obex-api.txt b/doc/obex-api.txt
+index 759c4d8..ef5d85e 100644
+--- a/doc/obex-api.txt
++++ b/doc/obex-api.txt
+@@ -651,6 +651,12 @@ Methods		void SetFolder(string name)
+ 			Possible errors: org.bluez.obex.Error.InvalidArguments
+ 					 org.bluez.obex.Error.Failed
  
-+	if (session->sdp_record)
-+		sdp_record_free(session->sdp_record);
++		void RegisterNotifications(boolean)
 +
- 	g_free(session->service);
- 	g_free(session);
- }
-@@ -160,7 +165,7 @@ static void search_callback(uint8_t type, uint16_t status,
- 		sdp_record_t *rec;
- 		sdp_list_t *protos;
- 		sdp_data_t *data;
--		int recsize, ch = -1;
-+		int recsize, ch = -1, psm = -1;
- 
- 		recsize = 0;
- 		rec = sdp_extract_pdu(rsp, bytesleft, &recsize);
-@@ -183,15 +188,31 @@ static void search_callback(uint8_t type, uint16_t status,
- 		data = sdp_data_get(rec, 0x0200);
- 		/* PSM must be odd and lsb of upper byte must be 0 */
- 		if (data != NULL && (data->val.uint16 & 0x0101) == 0x0001)
--			ch = data->val.uint16;
--
--		sdp_record_free(rec);
-+			psm = data->val.uint16;
++			Register / unregister reception of notifications.
 +
-+		/* Preferably connect using L2CAP directly instead of RFCOMM.
-+		 * If the session has already a port specified, use that to
-+		 * connect. */
-+		if (session->port == 0) {
-+			if (psm > 0)
-+				port = psm;
-+			else if (ch > 0)
-+				port = ch;
-+		} else if (session->port > 0 &&
-+				(session->port == ch || session->port == psm)) {
-+			port = session->port;
-+		}
++			Possible errors: org.bluez.obex.Error.InvalidArguments
++					 org.bluez.obex.Error.Failed
  
--		if (ch > 0) {
--			port = ch;
-+		/* Cache the sdp record associated with the service that we
-+		 * attempt to connect. This allows reading it's application
-+		 * specific parameters with get_service_record. */
-+		if (port > 0) {
-+			session->sdp_record = rec;
- 			break;
- 		}
+ Filter:		uint16 Offset:
  
-+		sdp_record_free(rec);
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index 669ba9b..5b69978 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -1512,6 +1512,7 @@ static DBusMessage *push_message(struct map_data *map,
+ 
+ 	transfer = obc_transfer_put("x-bt/message", folder, filename,
+ 								NULL, 0, &err);
 +
- 		scanned += recsize;
- 		rsp += recsize;
- 		bytesleft -= recsize;
-@@ -362,7 +383,7 @@ static int session_connect(struct bluetooth_session *session)
- 
- 	DBG("session %p", session);
- 
--	if (session->port > 0) {
-+	if (session->port > 0 && !session->force_service_lookup) {
- 		session->io = transport_connect(&session->src, &session->dst,
- 							session->port,
- 							transport_callback,
-@@ -379,6 +400,7 @@ static int session_connect(struct bluetooth_session *session)
- 
- static guint bluetooth_connect(const char *source, const char *destination,
- 				const char *service, uint16_t port,
-+				gboolean force_service_lookup,
- 				obc_transport_func func, void *user_data)
- {
- 	struct bluetooth_session *session;
-@@ -398,6 +420,7 @@ static guint bluetooth_connect(const char *source, const char *destination,
- 	session->func = func;
- 	session->port = port;
- 	session->user_data = user_data;
-+	session->force_service_lookup = force_service_lookup;
- 
- 	session->service = g_strdup(service);
- 	str2ba(destination, &session->dst);
-@@ -459,11 +482,25 @@ static int bluetooth_getpacketopt(GIOChannel *io, int *tx_mtu, int *rx_mtu)
- 	return 0;
+ 	if (transfer == NULL) {
+ 		g_obex_apparam_free(apparam);
+ 		goto fail;
+@@ -1654,6 +1655,87 @@ static DBusMessage *map_push_message(DBusConnection *connection,
+ 	return push_message(map, message, filename, folder, apparam);
  }
  
-+static const void *get_bluetooth_service_record(guint id)
++static void notification_registration_cb(struct obc_session *session,
++				struct obc_transfer *transfer,
++				GError *err, void *user_data)
 +{
-+	GSList *l;
++	struct map_data *map = user_data;
++	DBusMessage *reply;
 +
-+	for (l = sessions; l; l = l->next) {
-+		struct bluetooth_session *session = l->data;
-+
-+		if (session->id == id)
-+			return session->sdp_record;
++	if (err != NULL) {
++		reply = g_dbus_create_error(map->msg,
++						ERROR_INTERFACE ".Failed",
++						"%s", err->message);
++		goto done;
 +	}
-+	return NULL;
++
++	reply = dbus_message_new_method_return(map->msg);
++
++done:
++	g_dbus_send_message(conn, reply);
++	dbus_message_unref(map->msg);
 +}
 +
- static struct obc_transport bluetooth = {
- 	.name = "Bluetooth",
- 	.connect = bluetooth_connect,
- 	.getpacketopt = bluetooth_getpacketopt,
- 	.disconnect = bluetooth_disconnect,
-+	.get_service_record = get_bluetooth_service_record,
++static DBusMessage *set_notification_registration(struct map_data *map,
++							DBusMessage *message,
++							GObexApparam *apparam)
++{
++	struct obc_transfer *transfer;
++	GError *err = NULL;
++	DBusMessage *reply;
++	char contents[2];
++
++	contents[0] = FILLER_BYTE;
++	contents[1] = '\0';
++
++	transfer = obc_transfer_put("x-bt/MAP-NotificationRegistration", NULL,
++					NULL, contents, sizeof(contents), &err);
++
++	if (transfer == NULL) {
++		g_obex_apparam_free(apparam);
++		goto fail;
++	}
++
++	obc_transfer_set_apparam(transfer, apparam);
++
++	if (obc_session_queue(map->session, transfer,
++				notification_registration_cb, map, &err)) {
++		map->msg = dbus_message_ref(message);
++		return NULL;
++	}
++
++fail:
++	reply = g_dbus_create_error(message, ERROR_INTERFACE ".Failed", "%s",
++								err->message);
++	g_error_free(err);
++	return reply;
++}
++
++
++static DBusMessage *map_register_notifications(DBusConnection *connection,
++					DBusMessage *message, void *user_data)
++{
++	struct map_data *map = user_data;
++	GObexApparam *apparam;
++	gboolean status;
++
++	if (map->mas_instance_id < 0)
++		return g_dbus_create_error(message,
++					ERROR_INTERFACE ".Failed",
++					"Unknown MAS instance id");
++
++	if (dbus_message_get_args(message, NULL, DBUS_TYPE_BOOLEAN, &status,
++					DBUS_TYPE_INVALID) == FALSE)
++		return g_dbus_create_error(message,
++					ERROR_INTERFACE ".InvalidArguments",
++					NULL);
++
++	apparam = g_obex_apparam_set_uint8(NULL, MAP_AP_NOTIFICATIONSTATUS,
++							status ? 0x01 : 0x00);
++
++	return set_notification_registration(map, message, apparam);
++}
++
+ static const GDBusMethodTable map_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("SetFolder",
+ 				GDBUS_ARGS({ "name", "s" }), NULL,
+@@ -1680,6 +1762,10 @@ static const GDBusMethodTable map_methods[] = {
+ 			GDBUS_ARGS({ "transfer", "o" },
+ 						{ "properties", "a{sv}" }),
+ 			map_push_message) },
++	{ GDBUS_ASYNC_METHOD("RegisterNotifications",
++			GDBUS_ARGS({ "status", "b" }),
++			NULL,
++			map_register_notifications) },
+ 	{ }
  };
  
- int bluetooth_init(void)
-diff --git a/obexd/client/driver.h b/obexd/client/driver.h
-index f1c0646..08ea09b 100644
---- a/obexd/client/driver.h
-+++ b/obexd/client/driver.h
-@@ -26,6 +26,7 @@ struct obc_driver {
- 	const char *uuid;
- 	void *target;
- 	gsize target_len;
-+	gboolean force_service_lookup;
- 	int (*probe) (struct obc_session *session);
- 	void (*remove) (struct obc_session *session);
- };
-diff --git a/obexd/client/session.c b/obexd/client/session.c
-index 809279a..514b95d 100644
---- a/obexd/client/session.c
-+++ b/obexd/client/session.c
-@@ -407,8 +407,9 @@ static int session_connect(struct obc_session *session,
- 	}
- 
- 	session->id = transport->connect(session->source, session->destination,
--					driver->uuid, session->channel,
--					transport_func, callback);
-+						driver->uuid, session->channel,
-+						driver->force_service_lookup,
-+						transport_func, callback);
- 	if (session->id == 0) {
- 		obc_session_unref(callback->session);
- 		g_free(callback);
-diff --git a/obexd/client/transport.h b/obexd/client/transport.h
-index eb29bf3..b131c50 100644
---- a/obexd/client/transport.h
-+++ b/obexd/client/transport.h
-@@ -28,6 +28,7 @@ struct obc_transport {
- 	const char *name;
- 	guint (*connect) (const char *source, const char *destination,
- 				const char *service, uint16_t port,
-+				gboolean force_service_lookup,
- 				obc_transport_func func, void *user_data);
- 	int (*getpacketopt) (GIOChannel *io, int *tx_mtu, int *rx_mtu);
- 	void (*disconnect) (guint id);
 -- 
 1.8.1.4
 
