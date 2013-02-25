@@ -1,76 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 0/8] MAP client: notification support
-Date: Mon, 25 Feb 2013 09:36:02 +0100
-Message-Id: <1361781370-19061-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH v2 3/8] obexd: Read MAP client SDP attributes
+Date: Mon, 25 Feb 2013 09:36:05 +0100
+Message-Id: <1361781370-19061-4-git-send-email-christian.fetzer@oss.bmw-carit.de>
+In-Reply-To: <1361781370-19061-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1361781370-19061-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-Rebased since the first patchset didn't apply cleanly anymore.
+Parse SDP attributes mas_instance_id and supported_message_types from
+the transport's service attributes as soon as a connection is
+established.
 ---
+ lib/sdp.h          |  2 ++
+ obexd/client/map.c | 35 +++++++++++++++++++++++++++++++++--
+ 2 files changed, 35 insertions(+), 2 deletions(-)
 
-This patchset adds the necessary blocks for receiving notifications in the MAP client.
-So far this covers only bluetooth protocol related additions, leaving out end user D-Bus API changes.
-
-The patchset consists of the following parts:
-- Message Notification Server (MNS)
-  Once connected, the MNS will receive XML based event reports from the MSE and parse them into a struct
-  for further processing.
-
-- RegisterNotification function
-  The function sends the SetNotificationRegistration command to the MSE which will then try to connect
-  to the MNS.
-
-- Notification dispatcher (that dispatches event reports by their MAS instance id to the correct client instance)
-  The message access part of every client instance registers a notification handler function.
-  The MNS will call the associated handler for all received event report.
-
-Since the dispatching needs to be done on the mas instance id, the message access part of the client
-needs to be aware of the instance id of the server it connects to. Unfortunately this information is only
-available as SDP attribute.
-
-Due to the current transport layer abstraction in obexd, the MAP client has no direct access to SDP.
-Therefore I have extended obc_transport to allow concrete transports (like Bluetooth) to specify
-a get_service_record function and made it available through obc_session_get_service_record.
-This way, transports can provide additional service information to the client implementations.
-The bluetooth transport will now always do a sdp lookup (if the driver's obc_driver->force_service_lookup is set).
-In addition it will cache sdp record associated with the connection and make it accessible in get_service_record.
-
-Christian Fetzer (8):
-  obexd: Add get_service_record to obc_transport
-  obexd: Provide sdp record in get_service_record
-  obexd: Read MAP client SDP attributes
-  obexd: Add Message Notification Server (MNS)
-  obexd: Add RegisterNotifications function
-  obexd: Add MAP notification dispatcher
-  obexd: Register MAP notification handler
-  obexd: Notify registered notification handlers
-
- Makefile.obexd                |   4 +
- doc/obex-api.txt              |   6 +
- lib/sdp.h                     |   2 +
- obexd/client/bluetooth.c      |  51 ++++++-
- obexd/client/driver.h         |   1 +
- obexd/client/map-dispatcher.c |  86 +++++++++++
- obexd/client/map-dispatcher.h |  45 ++++++
- obexd/client/map-event.h      |  42 +++++
- obexd/client/map.c            | 145 +++++++++++++++++-
- obexd/client/mns.c            | 346 ++++++++++++++++++++++++++++++++++++++++++
- obexd/client/session.c        |  11 +-
- obexd/client/session.h        |   2 +
- obexd/client/transport.h      |   2 +
- obexd/plugins/bluetooth.c     |   2 +
- obexd/src/obexd.h             |   1 +
- src/profile.c                 |  55 +++++++
- 16 files changed, 790 insertions(+), 11 deletions(-)
- create mode 100644 obexd/client/map-dispatcher.c
- create mode 100644 obexd/client/map-dispatcher.h
- create mode 100644 obexd/client/map-event.h
- create mode 100644 obexd/client/mns.c
-
+diff --git a/lib/sdp.h b/lib/sdp.h
+index baae15f..4ef2176 100644
+--- a/lib/sdp.h
++++ b/lib/sdp.h
+@@ -294,6 +294,8 @@ extern "C" {
+ #define SDP_ATTR_SUPPORTED_FUNCTIONS		0x0312
+ #define SDP_ATTR_TOTAL_IMAGING_DATA_CAPACITY	0x0313
+ #define SDP_ATTR_SUPPORTED_REPOSITORIES		0x0314
++#define SDP_ATTR_MAS_INSTANCE_ID		0x0315
++#define SDP_ATTR_SUPPORTED_MESSAGE_TYPES	0x0316
+ 
+ #define SDP_ATTR_SPECIFICATION_ID		0x0200
+ #define SDP_ATTR_VENDOR_ID			0x0201
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index 2b665ec..669ba9b 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -39,6 +39,8 @@
+ #include "transfer.h"
+ #include "session.h"
+ #include "driver.h"
++#include "sdp.h"
++#include "sdp_lib.h"
+ 
+ #define OBEX_MAS_UUID \
+ 	"\xBB\x58\x2B\x40\x42\x0C\x11\xDB\xB0\xDE\x08\x00\x20\x0C\x9A\x66"
+@@ -94,6 +96,8 @@ struct map_data {
+ 	struct obc_session *session;
+ 	DBusMessage *msg;
+ 	GHashTable *messages;
++	int16_t mas_instance_id;
++	uint8_t supported_message_types;
+ };
+ 
+ #define MAP_MSG_FLAG_PRIORITY	0x01
+@@ -1699,6 +1703,30 @@ static void map_free(void *data)
+ 	g_free(map);
+ }
+ 
++static void parse_service_record(struct map_data *map)
++{
++	sdp_data_t *data;
++	const sdp_record_t *rec = obc_session_get_service_record(map->session);
++
++	if (!rec)
++		return;
++
++	/* MAS instance id */
++	map->mas_instance_id = -1;
++	data = sdp_data_get(rec, SDP_ATTR_MAS_INSTANCE_ID);
++	if (data != NULL)
++		map->mas_instance_id = data->val.uint8;
++	else
++		DBG("Failed to read MAS instance id");
++
++	/* Supported Message Types */
++	data = sdp_data_get(rec, SDP_ATTR_SUPPORTED_MESSAGE_TYPES);
++	if (data != NULL)
++		map->supported_message_types = data->val.uint8;
++	else
++		DBG("Failed to read supported message types");
++}
++
+ static int map_probe(struct obc_session *session)
+ {
+ 	struct map_data *map;
+@@ -1706,8 +1734,6 @@ static int map_probe(struct obc_session *session)
+ 
+ 	path = obc_session_get_path(session);
+ 
+-	DBG("%s", path);
+-
+ 	map = g_try_new0(struct map_data, 1);
+ 	if (!map)
+ 		return -ENOMEM;
+@@ -1716,6 +1742,10 @@ static int map_probe(struct obc_session *session)
+ 	map->messages = g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
+ 								map_msg_remove);
+ 
++	parse_service_record(map);
++
++	DBG("%s, instance id %d", path, map->mas_instance_id);
++
+ 	if (!g_dbus_register_interface(conn, path, MAP_INTERFACE, map_methods,
+ 					NULL, NULL, map, map_free)) {
+ 		map_free(map);
+@@ -1740,6 +1770,7 @@ static struct obc_driver map = {
+ 	.uuid = MAS_UUID,
+ 	.target = OBEX_MAS_UUID,
+ 	.target_len = OBEX_MAS_UUID_LEN,
++	.force_service_lookup = TRUE,
+ 	.probe = map_probe,
+ 	.remove = map_remove
+ };
 -- 
 1.8.1.4
 
