@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 7/8] obexd: Register MAP notification handler
-Date: Mon, 25 Feb 2013 09:36:09 +0100
-Message-Id: <1361781370-19061-8-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH v2 1/8] obexd: Add get_service_record to obc_transport
+Date: Mon, 25 Feb 2013 09:36:03 +0100
+Message-Id: <1361781370-19061-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
 In-Reply-To: <1361781370-19061-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 References: <1361781370-19061-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,76 +11,57 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
+This adds a get_service_record function pointer to obc_transport,
+which allows transports to provide the session specific service record.
+This record can be queried using obc_session_get_service_record.
 ---
- obexd/client/map.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ obexd/client/session.c   | 6 ++++++
+ obexd/client/session.h   | 2 ++
+ obexd/client/transport.h | 1 +
+ 3 files changed, 9 insertions(+)
 
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index 5b69978..f6596e2 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -41,6 +41,7 @@
- #include "driver.h"
- #include "sdp.h"
- #include "sdp_lib.h"
-+#include "map-dispatcher.h"
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index f677bcb..809279a 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -827,6 +827,12 @@ fail:
+ 	return NULL;
+ }
  
- #define OBEX_MAS_UUID \
- 	"\xBB\x58\x2B\x40\x42\x0C\x11\xDB\xB0\xDE\x08\x00\x20\x0C\x9A\x66"
-@@ -98,6 +99,7 @@ struct map_data {
- 	GHashTable *messages;
- 	int16_t mas_instance_id;
- 	uint8_t supported_message_types;
-+	gboolean mns_acquired;
++const void *obc_session_get_service_record(struct obc_session *session)
++{
++	if (session->id > 0 && session->transport != NULL)
++		return session->transport->get_service_record(session->id);
++}
++
+ const char *obc_session_get_owner(struct obc_session *session)
+ {
+ 	if (session == NULL)
+diff --git a/obexd/client/session.h b/obexd/client/session.h
+index 402c042..8a3d629 100644
+--- a/obexd/client/session.h
++++ b/obexd/client/session.h
+@@ -54,6 +54,8 @@ const char *obc_session_get_target(struct obc_session *session);
+ const char *obc_session_register(struct obc_session *session,
+ 						GDBusDestroyFunction destroy);
+ 
++const void *obc_session_get_service_record(struct obc_session *session);
++
+ guint obc_session_queue(struct obc_session *session,
+ 				struct obc_transfer *transfer,
+ 				session_callback_t func, void *user_data,
+diff --git a/obexd/client/transport.h b/obexd/client/transport.h
+index 5140840..eb29bf3 100644
+--- a/obexd/client/transport.h
++++ b/obexd/client/transport.h
+@@ -31,6 +31,7 @@ struct obc_transport {
+ 				obc_transport_func func, void *user_data);
+ 	int (*getpacketopt) (GIOChannel *io, int *tx_mtu, int *rx_mtu);
+ 	void (*disconnect) (guint id);
++	const void *(*get_service_record)(guint id);
  };
  
- #define MAP_MSG_FLAG_PRIORITY	0x01
-@@ -1711,6 +1713,12 @@ fail:
- 	return reply;
- }
- 
-+static void map_handle_notification(struct map_event *event)
-+{
-+	DBG("event: type=%x, handle=%s, folder=%s, old_folder=%s, msg_type=%s",
-+				event->type, event->handle, event->folder,
-+					event->old_folder, event->msg_type);
-+}
- 
- static DBusMessage *map_register_notifications(DBusConnection *connection,
- 					DBusMessage *message, void *user_data)
-@@ -1730,9 +1738,22 @@ static DBusMessage *map_register_notifications(DBusConnection *connection,
- 					ERROR_INTERFACE ".InvalidArguments",
- 					NULL);
- 
-+	if (map->mns_acquired == status)
-+		return g_dbus_create_error(message,
-+					ERROR_INTERFACE ".InvalidArguments",
-+					NULL);
-+
- 	apparam = g_obex_apparam_set_uint8(NULL, MAP_AP_NOTIFICATIONSTATUS,
- 							status ? 0x01 : 0x00);
- 
-+	if (status) {
-+		map->mns_acquired = TRUE;
-+		map_acquire_mns(map->mas_instance_id, &map_handle_notification);
-+	} else {
-+		map->mns_acquired = FALSE;
-+		map_release_mns(map->mas_instance_id);
-+	}
-+
- 	return set_notification_registration(map, message, apparam);
- }
- 
-@@ -1784,6 +1805,9 @@ static void map_free(void *data)
- {
- 	struct map_data *map = data;
- 
-+	if (map->mns_acquired)
-+		map_release_mns(map->mas_instance_id);
-+
- 	obc_session_unref(map->session);
- 	g_hash_table_unref(map->messages);
- 	g_free(map);
+ int obc_transport_register(struct obc_transport *transport);
 -- 
 1.8.1.4
 
