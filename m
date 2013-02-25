@@ -1,118 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/8] obexd: Read MAP client SDP attributes
-Date: Mon, 25 Feb 2013 09:36:05 +0100
-Message-Id: <1361781370-19061-4-git-send-email-christian.fetzer@oss.bmw-carit.de>
-In-Reply-To: <1361781370-19061-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1361781370-19061-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Message-ID: <1361778859.3902.4.camel@aeonflux>
+Subject: Re: [PATCH] Correct the dbus service file's systemd unit name for
+ bluez.
+From: Marcel Holtmann <marcel@holtmann.org>
+To: "Douglas, William" <william.douglas@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Mon, 25 Feb 2013 08:54:19 +0100
+In-Reply-To: <CABhPDt-baxtSbCgBN2jRh_zGVhYFPP_78E==oqCJaVhQX7dOnQ@mail.gmail.com>
+References: <87ehgkxcsi.fsf@intel.com> <1361616485.1583.111.camel@aeonflux>
+	 <CABhPDt9cnp=CiE0_U4kBL17WNrktsSrCrOq_Ly-x3+k0e4CKEw@mail.gmail.com>
+	 <1361655279.3902.2.camel@aeonflux>
+	 <CABhPDt-baxtSbCgBN2jRh_zGVhYFPP_78E==oqCJaVhQX7dOnQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+Hi William,
 
-Parse SDP attributes mas_instance_id and supported_message_types from
-the transport's service attributes as soon as a connection is
-established.
----
- lib/sdp.h          |  2 ++
- obexd/client/map.c | 35 +++++++++++++++++++++++++++++++++--
- 2 files changed, 35 insertions(+), 2 deletions(-)
+> >> >> Even though dbus-org.bluez.service is set as an alias for the
+> >> >> bluetooth.service systemd unit file, systemd will not be able to load
+> >> >> the bluetooth daemon without the daemon being enabled (and the
+> >> >> dbus-org.bluez.service file linked to bluetooth.service). This patch
+> >> >> allows the daemon to be loaded by other services on demand.
+> >> >
+> >> > as you have noticed we have this in bluetooth.service:
+> >> >
+> >> > [Install]
+> >> > WantedBy=bluetooth.target
+> >> > Alias=dbus-org.bluez.service
+> >> >
+> >> > Isn't this exactly what we want anyway. The service must be enabled
+> >> > first before it will ever auto-started. Otherwise it just auto-starts
+> >> > and the user can never get rid of it.
+> >> >
+> >>
+> >> Oh I didn't realize that was the intent. Is that because if it is auto
+> >> enabled there is no way for the service to be masked to avoid it from
+> >> auto starting? I was hoping to have the daemon start once it was
+> >> requested by default. Probably more of a distro choice though.
+> >
+> > I am actually curious on what is the best way here. My current thinking
+> > is that the daemon should be started when hardware is present. Starting
+> > it only because of a UI applet seems silly if there is no hardware
+> > present, but I am not sure what's the appropriate default is here.
+> 
+> That is an interesting point. I was looking at it like I do for
+> connman, where it will start even if there isn't any network
+> interfaces currently available and that is expected behavior to me.
+> Bluez could be waiting on a usb bluetooth adapter to be added just
+> like connman is waiting on a usb ethernet adapter (and it isn't
+> obvious to my that this is taking up a much in the way of resources or
+> adding a lot of wakeups but I don't know). Either way I expect an easy
+> to turn on and off UI component making either default simple to
+> correct. Right now, the connman UI I am using just presents a
+> bluetooth option for enable/disable but it doesn't work as is without
+> the service being able to autostart without being enabled manually (or
+> by the distro default).
 
-diff --git a/lib/sdp.h b/lib/sdp.h
-index baae15f..4ef2176 100644
---- a/lib/sdp.h
-+++ b/lib/sdp.h
-@@ -294,6 +294,8 @@ extern "C" {
- #define SDP_ATTR_SUPPORTED_FUNCTIONS		0x0312
- #define SDP_ATTR_TOTAL_IMAGING_DATA_CAPACITY	0x0313
- #define SDP_ATTR_SUPPORTED_REPOSITORIES		0x0314
-+#define SDP_ATTR_MAS_INSTANCE_ID		0x0315
-+#define SDP_ATTR_SUPPORTED_MESSAGE_TYPES	0x0316
- 
- #define SDP_ATTR_SPECIFICATION_ID		0x0200
- #define SDP_ATTR_VENDOR_ID			0x0201
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index 2b665ec..669ba9b 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -39,6 +39,8 @@
- #include "transfer.h"
- #include "session.h"
- #include "driver.h"
-+#include "sdp.h"
-+#include "sdp_lib.h"
- 
- #define OBEX_MAS_UUID \
- 	"\xBB\x58\x2B\x40\x42\x0C\x11\xDB\xB0\xDE\x08\x00\x20\x0C\x9A\x66"
-@@ -94,6 +96,8 @@ struct map_data {
- 	struct obc_session *session;
- 	DBusMessage *msg;
- 	GHashTable *messages;
-+	int16_t mas_instance_id;
-+	uint8_t supported_message_types;
- };
- 
- #define MAP_MSG_FLAG_PRIORITY	0x01
-@@ -1699,6 +1703,30 @@ static void map_free(void *data)
- 	g_free(map);
- }
- 
-+static void parse_service_record(struct map_data *map)
-+{
-+	sdp_data_t *data;
-+	const sdp_record_t *rec = obc_session_get_service_record(map->session);
-+
-+	if (!rec)
-+		return;
-+
-+	/* MAS instance id */
-+	map->mas_instance_id = -1;
-+	data = sdp_data_get(rec, SDP_ATTR_MAS_INSTANCE_ID);
-+	if (data != NULL)
-+		map->mas_instance_id = data->val.uint8;
-+	else
-+		DBG("Failed to read MAS instance id");
-+
-+	/* Supported Message Types */
-+	data = sdp_data_get(rec, SDP_ATTR_SUPPORTED_MESSAGE_TYPES);
-+	if (data != NULL)
-+		map->supported_message_types = data->val.uint8;
-+	else
-+		DBG("Failed to read supported message types");
-+}
-+
- static int map_probe(struct obc_session *session)
- {
- 	struct map_data *map;
-@@ -1706,8 +1734,6 @@ static int map_probe(struct obc_session *session)
- 
- 	path = obc_session_get_path(session);
- 
--	DBG("%s", path);
--
- 	map = g_try_new0(struct map_data, 1);
- 	if (!map)
- 		return -ENOMEM;
-@@ -1716,6 +1742,10 @@ static int map_probe(struct obc_session *session)
- 	map->messages = g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
- 								map_msg_remove);
- 
-+	parse_service_record(map);
-+
-+	DBG("%s, instance id %d", path, map->mas_instance_id);
-+
- 	if (!g_dbus_register_interface(conn, path, MAP_INTERFACE, map_methods,
- 					NULL, NULL, map, map_free)) {
- 		map_free(map);
-@@ -1740,6 +1770,7 @@ static struct obc_driver map = {
- 	.uuid = MAS_UUID,
- 	.target = OBEX_MAS_UUID,
- 	.target_len = OBEX_MAS_UUID_LEN,
-+	.force_service_lookup = TRUE,
- 	.probe = map_probe,
- 	.remove = map_remove
- };
--- 
-1.8.1.4
+in general the Bluetooth option should only be present if you have
+bluetoothd running and at least one controller attached.
+
+So my thinking is that attaching a controller will start bluetoothd and
+then connmand will pick up up and present Bluetooth as technology. So
+that should all work.
+
+ConnMan actually detects at runtime the start/restart of bluetoothd.
+
+Regards
+
+Marcel
+
 
