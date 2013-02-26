@@ -1,41 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 26 Feb 2013 16:52:51 -0300
+Date: Tue, 26 Feb 2013 16:52:16 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
 To: David Herrmann <dh.herrmann@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
 	Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH 02/16] Bluetooth: change bt_sock_unregister() to return
- void
-Message-ID: <20130226195251.GB10898@joana>
+Subject: Re: [PATCH 01/16] Bluetooth: discard bt_sock_unregister() errors
+Message-ID: <20130226195216.GA10898@joana>
 References: <1361731026-7428-1-git-send-email-dh.herrmann@gmail.com>
- <1361731026-7428-3-git-send-email-dh.herrmann@gmail.com>
+ <1361731026-7428-2-git-send-email-dh.herrmann@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1361731026-7428-3-git-send-email-dh.herrmann@gmail.com>
+In-Reply-To: <1361731026-7428-2-git-send-email-dh.herrmann@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi David,
 
-* David Herrmann <dh.herrmann@gmail.com> [2013-02-24 19:36:52 +0100]:
+* David Herrmann <dh.herrmann@gmail.com> [2013-02-24 19:36:51 +0100]:
 
-> There is no reason a caller ever wants to check the return type of this
-> call. _Iff_ a user successfully called bt_sock_register(), they're allowed
-> to call bt_sock_unregister().
-> All other calls in the kernel (device_del, device_unregister, kfree(), ..)
-> that are logically equivalent return void. Lets not make callers think
-> they have to check the return type of this call and instead simply return
-> void.
+> After we successfully registered a socket via bt_sock_register() there is
+> no reason to ever check the return code of bt_sock_unregister(). If
+> bt_sock_unregister() fails, it means the socket _is_ already unregistered
+> so we have what we want, don't we?
 > 
-> We guarantee that after bt_sock_unregister() is called, the socket type
-> _is_ unregistered. If that is not what the caller wants, they're using the
-> wrong function, anyway.
+> Also, to get bt_sock_unregister() to fail, another part of the kernel has
+> to unregister _our_ socket. This is sooo _wrong_ that it will break way
+> earlier than when we unregister our socket.
 > 
 > Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
 > ---
->  include/net/bluetooth/bluetooth.h |  2 +-
->  net/bluetooth/af_bluetooth.c      | 15 +++------------
->  2 files changed, 4 insertions(+), 13 deletions(-)
+>  net/bluetooth/bnep/sock.c   | 4 +---
+>  net/bluetooth/cmtp/sock.c   | 4 +---
+>  net/bluetooth/hci_sock.c    | 4 +---
+>  net/bluetooth/hidp/sock.c   | 4 +---
+>  net/bluetooth/l2cap_sock.c  | 4 +---
+>  net/bluetooth/rfcomm/sock.c | 3 +--
+>  net/bluetooth/sco.c         | 3 +--
+>  7 files changed, 7 insertions(+), 19 deletions(-)
 
 Patch has been applied to bluetooth-next. Thanks.
 
