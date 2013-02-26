@@ -1,88 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 26 Feb 2013 16:12:35 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: dean_jenkins@mentor.com
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Subject: Re: [PATCH 2/6] Bluetooth: Check rfcomm session and DLC exists on
- socket close
-Message-ID: <20130226191235.GA4176@joana>
-References: <1361810317-4005-1-git-send-email-dean_jenkins@mentor.com>
- <1361810317-4005-3-git-send-email-dean_jenkins@mentor.com>
+Message-ID: <512CFB38.8070701@mentor.com>
+Date: Tue, 26 Feb 2013 18:13:12 +0000
+From: Dean Jenkins <Dean_Jenkins@mentor.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1361810317-4005-3-git-send-email-dean_jenkins@mentor.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org, gustavo@padovan.org
+Subject: Re: [PATCH 0/6] Bluetooth: Rework the RFCOMM session refcnt
+References: <1361810317-4005-1-git-send-email-dean_jenkins@mentor.com> <1361817164.3902.25.camel@aeonflux>
+In-Reply-To: <1361817164.3902.25.camel@aeonflux>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dean,
+Hi Marcel,
 
-* dean_jenkins@mentor.com <dean_jenkins@mentor.com> [2013-02-25 16:38:33 +0000]:
+On 25/02/13 18:32, Marcel Holtmann wrote:
+> Hi Dean,
+>
+>> This patchset consists of the following 6 patches that reworks the RFCOMM
+>> session refcnt by adding handling for a NULL RFCOMM session pointer when the
+>> session has been deleted followed by removing the now redundant refcnt
+>> mechanism:
+>>
+>> ----------------------------------------------------------------
+>> Dean Jenkins (6):
+>>        Bluetooth: Avoid rfcomm_session_timeout using freed session
+>>        Bluetooth: Check rfcomm session and DLC exists on socket close
+>>        Bluetooth: Return RFCOMM session ptrs to avoid freed session
+>>        Bluetooth: Remove RFCOMM session refcnt
+>>        Bluetooth: Remove redundant call to rfcomm_send_disc
+>>        Bluetooth: Remove redundant RFCOMM BT_CLOSED settings
+>>
+>>   include/net/bluetooth/rfcomm.h |    6 ----
+>>   net/bluetooth/rfcomm/core.c    |  163 ++++++++++++++++++++++++++++++++++++++++++++++++++----------------------------------------------------------
+>>   2 files changed, 76 insertions(+), 93 deletions(-)
+>>
+>> The motivation for the change was RFCOMM kernel crashes in a 2.6.34 based ARM
+>> SMP kernel. It is noted that RFCOMM in kernel 3.7 still contains the RFCOMM
+>> session refcnt so the patches have been forward ported. Crashes were due to
+>> malfunctions of the RFCOMM session refcnt such as premature deletion of the
+>> session and double deletion of the session. Some crashes were caused by
+>> the interaction of 2 kernel threads under very high processor loading.
+>>
+>> Note that the refcnt is incorrectly initialised, it should be set to 1 before
+>> allowing the session structure to be used, the old code used a value of 0 and
+>> this contributes to a weak implementation of the refcnt.
+>>
+>> In kernels later than 2.6.34, the threading model for RFCOMM was modified to
+>> use work queues and this reduced the probability of a RFCOMM crash. This
+>> helps to explain why the reports of RFCOMM crashes went away. However, the
+>> implementation of the RFCOMM session refcnt is weak and is in fact logically
+>> incorrect by using the RFCOMM data channel "initiator" flag. The control
+>> channel disconnection procedures do not care about how the control channel
+>> was established eg. by host or remote device request.
+>>
+>> The patches also make it clear when the RFCOMM session has been deleted by
+>> using a NULL pointer. The old code has a possibility to access freed RFCOMM
+>> session structures because there are multiple local copies of the pointer. The
+>> patches ensure that local copies of the pointer are set to NULL when the
+>> session has been deleted so avoiding any possibility of accessing freed memory.
+>>
+>> Therefore, the patchset cleans up the disconnection of the RFCOMM session
+>> control channel and now the code is deterministic and is understandable by
+>> code review.
+>>
+>> These patches were lightly tested against kernel 3.7.3 on a x86 PC. The design
+>> of the patches were proven on a commercial project using a modified embedded ARM
+>> SMP kernel 2.6.34.13. All previously observed RFCOMM control channel
+>> disconnection kernel crashes on ARM 2.6.34.13 went away with the patches
+>> applied.
+> I looked through the patch set and could not spot anything obvious
+> wrong. Thanks for looking into this. The RFCOMM reference counting has
+> been always giving me a headache.
+>
+> Great job on the cover page and the commit messages. It was a pleasure
+> to read them and then go through the code. Makes review a lot easier.
+>
+> On my account, lets get these patches in and see how they are doing.
+> Once they are in bluetooth-next they get a bit wider expose on upstream
+> kernels.
+>
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+>
+> Regards
+>
+> Marcel
+>
+>
+Many thanks for the encouraging feedback.
 
-> From: Dean Jenkins <Dean_Jenkins@mentor.com>
-> 
-> A race condition exists between near simultaneous asynchronous
-> DLC data channel disconnection requests from the host and remote device.
-> This causes the socket layer to request a socket shutdown at the same
-> time the rfcomm core is processing the disconnect request from the remote
-> device.
-> 
-> The socket layer retains a copy of a struct rfcomm_dlc d pointer.
-> The d pointer refers to a copy of a struct rfcomm_session.
-> When the socket layer thread performs a socket shutdown, the thread
-> may wait on a rfcomm lock in rfcomm_dlc_close(). This means that
-> whilst the thread waits, the rfcomm_session and/or rfcomm_dlc structures
-> pointed to by d maybe freed due to rfcomm core handling. Consequently,
-> when the rfcomm lock becomes available and the thread runs, a
-> malfunction could occur as a freed rfcomm_session structure and/or a
-> freed rfcomm_dlc structure will be erroneously accessed.
-> 
-> Therefore, after the rfcomm lock is acquired, check that the struct
-> rfcomm_session is still valid by searching the rfcomm session list.
-> If the session is valid then validate the d pointer by searching the
-> rfcomm session list of active DLCs for the rfcomm_dlc structure
-> pointed by d.
-> 
-> Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
-> ---
->  net/bluetooth/rfcomm/core.c |   26 ++++++++++++++++++++++++--
->  1 file changed, 24 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-> index 8780e67..af0c26d 100644
-> --- a/net/bluetooth/rfcomm/core.c
-> +++ b/net/bluetooth/rfcomm/core.c
-> @@ -493,12 +493,34 @@ static int __rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
->  
->  int rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
->  {
-> -	int r;
-> +	int r = 0;
-> +	struct rfcomm_dlc *d_list;
-> +	struct rfcomm_session *s, *s_list;
-> +
-> +	BT_DBG("dlc %p state %ld dlci %d err %d", d, d->state, d->dlci, err);
->  
->  	rfcomm_lock();
->  
-> -	r = __rfcomm_dlc_close(d, err);
-> +	s = d->session;
-> +	if (!s)
-> +		goto no_session;
-> +
-> +	/* after waiting on the mutex check the session still exists */
-> +	list_for_each_entry(s_list, &session_list, list) {
-> +		if (s_list == s) {
-> +			/* after waiting on the mutex, */
-> +			/* check the dlc still exists */
+I wait with eager anticipation to see my patches in kernel.org and to 
+see what feedback comes from upstream.
 
-Just a very small issue, this comment here is not following our coding style.
-If you want a multiple line comment do something like this:
+Thanks,
 
-			/* after waiting on the mutex,
-			 * check the dlc still exists
-			 */
-
-But I will just recommend you merge this comment with the one before the first
-list_for_each_entry. please send an updated version of this patch so I can go
-ahead and apply it.
-
-	Gustavo
+Regards,
+Dean
