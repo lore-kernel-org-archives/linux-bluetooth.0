@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 10/16] Bluetooth: Move power on HCI command updates to their own function
-Date: Wed, 27 Feb 2013 09:57:18 +0200
-Message-Id: <1361951844-13719-11-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v3 09/16] Bluetooth: Remove unused hdev->init_last_cmd
+Date: Wed, 27 Feb 2013 09:57:17 +0200
+Message-Id: <1361951844-13719-10-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1361951844-13719-1-git-send-email-johan.hedberg@gmail.com>
 References: <1361951844-13719-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,114 +11,53 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-These commands will in a subsequent patch be performed in their own
-transaction, so it's more readable (not just from a resulting code
-perspective but also the way the patches look like) to have them
-performed in their own function.
+This variable is no longer needed (due to the transaction framweork and
+the conversion of hci_request to use it), so it can be safely removed.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c |   76 ++++++++++++++++++++++++++------------------------
- 1 file changed, 40 insertions(+), 36 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 --
+ net/bluetooth/hci_core.c         |    6 ------
+ 2 files changed, 8 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 39395c7..025f6f0 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3058,53 +3058,57 @@ static int set_bredr_scan(struct hci_dev *hdev)
- 	return hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
- }
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 805551b..c9827f9 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -250,8 +250,6 @@ struct hci_dev {
  
--int mgmt_powered(struct hci_dev *hdev, u8 powered)
-+static int powered_update_hci(struct hci_dev *hdev)
- {
--	struct cmd_lookup match = { NULL, hdev };
--	int err;
-+	u8 link_sec;
+ 	transaction_complete_t	transaction_complete;
  
--	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
--		return 0;
-+	if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
-+	    !lmp_host_ssp_capable(hdev)) {
-+		u8 ssp = 1;
+-	__u16			init_last_cmd;
+-
+ 	struct list_head	mgmt_pending;
  
--	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
-+		hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE, 1, &ssp);
-+	}
+ 	struct discovery_state	discovery;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 2657a9e..92b6444 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1042,10 +1042,7 @@ int hci_dev_open(__u16 dev)
+ 	if (!test_bit(HCI_RAW, &hdev->flags)) {
+ 		atomic_set(&hdev->cmd_cnt, 1);
+ 		set_bit(HCI_INIT, &hdev->flags);
+-		hdev->init_last_cmd = 0;
+-
+ 		ret = __hci_init(hdev);
+-
+ 		clear_bit(HCI_INIT, &hdev->flags);
+ 	}
  
--	if (powered) {
--		u8 link_sec;
-+	if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
-+		struct hci_cp_write_le_host_supported cp;
+@@ -2547,9 +2544,6 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
+ 		return -ENOMEM;
+ 	}
  
--		if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
--		    !lmp_host_ssp_capable(hdev)) {
--			u8 ssp = 1;
-+		cp.le = 1;
-+		cp.simul = lmp_le_br_capable(hdev);
+-	if (test_bit(HCI_INIT, &hdev->flags))
+-		hdev->init_last_cmd = opcode;
+-
+ 	hci_transaction_from_skb(hdev, skb);
  
--			hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE, 1, &ssp);
--		}
-+		/* Check first if we already have the right
-+		 * host state (host features set)
-+		 */
-+		if (cp.le != lmp_host_le_capable(hdev) ||
-+		    cp.simul != lmp_host_le_br_capable(hdev))
-+			hci_send_cmd(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED,
-+				     sizeof(cp), &cp);
-+	}
- 
--		if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
--			struct hci_cp_write_le_host_supported cp;
-+	link_sec = test_bit(HCI_LINK_SECURITY, &hdev->dev_flags);
-+	if (link_sec != test_bit(HCI_AUTH, &hdev->flags))
-+		hci_send_cmd(hdev, HCI_OP_WRITE_AUTH_ENABLE,
-+			     sizeof(link_sec), &link_sec);
- 
--			cp.le = 1;
--			cp.simul = lmp_le_br_capable(hdev);
-+	if (lmp_bredr_capable(hdev)) {
-+		set_bredr_scan(hdev);
-+		update_class(hdev);
-+		update_name(hdev, hdev->dev_name);
-+		update_eir(hdev);
-+	}
-+}
- 
--			/* Check first if we already have the right
--			 * host state (host features set)
--			 */
--			if (cp.le != lmp_host_le_capable(hdev) ||
--			    cp.simul != lmp_host_le_br_capable(hdev))
--				hci_send_cmd(hdev,
--					     HCI_OP_WRITE_LE_HOST_SUPPORTED,
--					     sizeof(cp), &cp);
--		}
-+int mgmt_powered(struct hci_dev *hdev, u8 powered)
-+{
-+	struct cmd_lookup match = { NULL, hdev };
-+	int err;
- 
--		link_sec = test_bit(HCI_LINK_SECURITY, &hdev->dev_flags);
--		if (link_sec != test_bit(HCI_AUTH, &hdev->flags))
--			hci_send_cmd(hdev, HCI_OP_WRITE_AUTH_ENABLE,
--				     sizeof(link_sec), &link_sec);
-+	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
-+		return 0;
- 
--		if (lmp_bredr_capable(hdev)) {
--			set_bredr_scan(hdev);
--			update_class(hdev);
--			update_name(hdev, hdev->dev_name);
--			update_eir(hdev);
--		}
-+	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
-+
-+	if (powered) {
-+		powered_update_hci(hdev);
- 	} else {
- 		u8 status = MGMT_STATUS_NOT_POWERED;
- 		u8 zero_cod[] = { 0, 0, 0 };
+ 	return 0;
 -- 
 1.7.10.4
 
