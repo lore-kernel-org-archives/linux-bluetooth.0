@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 7/9] player: Only expose Track property if there is metadata
-Date: Wed, 27 Feb 2013 15:15:59 +0200
-Message-Id: <1361970961-14300-8-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/9] player: Add media_player_create_item
+Date: Wed, 27 Feb 2013 15:15:54 +0200
+Message-Id: <1361970961-14300-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1361970961-14300-1-git-send-email-luiz.dentz@gmail.com>
 References: <1361970961-14300-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,38 +11,56 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If no metadata is set there is no point in exposing it.
+Items are not only folders so this split the item creation from
+media_player_create_folder.
 ---
- profiles/audio/player.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ profiles/audio/player.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
 diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index b7ecae9..6a316ae 100644
+index b222643..8401e19 100644
 --- a/profiles/audio/player.c
 +++ b/profiles/audio/player.c
-@@ -266,6 +266,13 @@ static void set_setting(const GDBusPropertyTable *property,
- 	player_set_setting(mp, id, property->name, value);
- }
+@@ -1092,11 +1092,15 @@ static const GDBusPropertyTable media_item_properties[] = {
+ 	{ }
+ };
  
-+static gboolean track_exists(const GDBusPropertyTable *property, void *data)
-+{
-+	struct media_player *mp = data;
-+
-+	return g_hash_table_size(mp->track) != 0;
+-int media_player_create_folder(struct media_player *mp, const char *name)
++static struct media_item *media_player_create_item(struct media_player *mp,
++							const char *name,
++							bool folder,
++							bool playable)
+ {
+ 	struct media_item *item;
+ 
+-	DBG("%s", name);
++	DBG("%s folder %s playable %s", name, folder ? "true" : "false",
++						playable ? "true" : "false");
+ 
+ 	item = g_new0(struct media_item, 1);
+ 	item->player = mp;
+@@ -1113,9 +1117,20 @@ int media_player_create_folder(struct media_player *mp, const char *name)
+ 		error("D-Bus failed to register %s on %s path",
+ 					MEDIA_ITEM_INTERFACE, item->path);
+ 		media_item_destroy(item);
+-		return -EINVAL;
++		return NULL;
+ 	}
+ 
++	return item;
 +}
 +
- static gboolean get_track(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *data)
- {
-@@ -593,7 +600,7 @@ static const GDBusPropertyTable media_player_properties[] = {
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- 	{ "Scan", "s", get_setting, set_setting, setting_exists,
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
--	{ "Track", "a{sv}", get_track, NULL, NULL,
-+	{ "Track", "a{sv}", get_track, NULL, track_exists,
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- 	{ "Device", "o", get_device, NULL, NULL,
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++int media_player_create_folder(struct media_player *mp, const char *name)
++{
++	struct media_item *item;
++
++	item = media_player_create_item(mp, name, true, false);
++	if (item == NULL)
++		return -EINVAL;
++
+ 	if (mp->folder == NULL)
+ 		media_player_set_folder_item(mp, item, 0);
+ 
 -- 
 1.8.1.2
 
