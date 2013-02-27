@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 12/16] Bluetooth: Wait for HCI command completion with mgmt_set_powered
-Date: Wed, 27 Feb 2013 09:57:20 +0200
-Message-Id: <1361951844-13719-13-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v3 10/16] Bluetooth: Move power on HCI command updates to their own function
+Date: Wed, 27 Feb 2013 09:57:18 +0200
+Message-Id: <1361951844-13719-11-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1361951844-13719-1-git-send-email-johan.hedberg@gmail.com>
 References: <1361951844-13719-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,90 +11,114 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-We should only notify user space that the adapter has been powered on
-after all HCI commands related to the action have completed. This patch
-fixes the issue by instating a transaction complete callback for these
-HCI commands and only notifies user space in the callback.
+These commands will in a subsequent patch be performed in their own
+transaction, so it's more readable (not just from a resulting code
+perspective but also the way the patches look like) to have them
+performed in their own function.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c |   42 ++++++++++++++++++++++++++++++------------
- 1 file changed, 30 insertions(+), 12 deletions(-)
+ net/bluetooth/mgmt.c |   76 ++++++++++++++++++++++++++------------------------
+ 1 file changed, 40 insertions(+), 36 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index e76581d..b2a9697 100644
+index 39395c7..025f6f0 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -3091,12 +3091,26 @@ static int set_bredr_scan(struct hci_transaction *transaction)
- 				   1, &scan);
+@@ -3058,53 +3058,57 @@ static int set_bredr_scan(struct hci_dev *hdev)
+ 	return hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
  }
  
-+static void powered_complete(struct hci_dev *hdev, u16 opcode, int status)
-+{
-+	struct cmd_lookup match = { NULL, hdev };
-+
-+	BT_DBG("opcode 0x%04x status %d", opcode, status);
-+
-+	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
-+
-+	new_settings(hdev, match.sk);
-+
-+	if (match.sk)
-+		sock_put(match.sk);
-+}
-+
- static int powered_update_hci(struct hci_dev *hdev)
+-int mgmt_powered(struct hci_dev *hdev, u8 powered)
++static int powered_update_hci(struct hci_dev *hdev)
  {
- 	struct hci_transaction transaction;
- 	u8 link_sec;
+-	struct cmd_lookup match = { NULL, hdev };
+-	int err;
++	u8 link_sec;
  
--	hci_transaction_init(&transaction, hdev, NULL);
-+	hci_transaction_init(&transaction, hdev, powered_complete);
- 
- 	if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
- 			!lmp_host_ssp_capable(hdev)) {
-@@ -3140,26 +3154,30 @@ static int powered_update_hci(struct hci_dev *hdev)
- int mgmt_powered(struct hci_dev *hdev, u8 powered)
- {
- 	struct cmd_lookup match = { NULL, hdev };
-+	u8 status_not_powered = MGMT_STATUS_NOT_POWERED;
-+	u8 zero_cod[] = { 0, 0, 0 };
- 	int err;
- 
- 	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
- 		return 0;
+-	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
+-		return 0;
++	if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
++	    !lmp_host_ssp_capable(hdev)) {
++		u8 ssp = 1;
  
 -	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
--
- 	if (powered) {
--		powered_update_hci(hdev);
--	} else {
--		u8 status = MGMT_STATUS_NOT_POWERED;
--		u8 zero_cod[] = { 0, 0, 0 };
-+		if (powered_update_hci(hdev) == 0)
-+			return 0;
++		hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE, 1, &ssp);
++	}
  
--		mgmt_pending_foreach(0, hdev, cmd_status_rsp, &status);
--
--		if (memcmp(hdev->dev_class, zero_cod, sizeof(zero_cod)) != 0)
--			mgmt_event(MGMT_EV_CLASS_OF_DEV_CHANGED, hdev,
--				   zero_cod, sizeof(zero_cod), NULL);
-+		mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp,
-+				     &match);
-+		goto new_settings;
- 	}
+-	if (powered) {
+-		u8 link_sec;
++	if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
++		struct hci_cp_write_le_host_supported cp;
  
+-		if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) &&
+-		    !lmp_host_ssp_capable(hdev)) {
+-			u8 ssp = 1;
++		cp.le = 1;
++		cp.simul = lmp_le_br_capable(hdev);
+ 
+-			hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE, 1, &ssp);
+-		}
++		/* Check first if we already have the right
++		 * host state (host features set)
++		 */
++		if (cp.le != lmp_host_le_capable(hdev) ||
++		    cp.simul != lmp_host_le_br_capable(hdev))
++			hci_send_cmd(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED,
++				     sizeof(cp), &cp);
++	}
+ 
+-		if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
+-			struct hci_cp_write_le_host_supported cp;
++	link_sec = test_bit(HCI_LINK_SECURITY, &hdev->dev_flags);
++	if (link_sec != test_bit(HCI_AUTH, &hdev->flags))
++		hci_send_cmd(hdev, HCI_OP_WRITE_AUTH_ENABLE,
++			     sizeof(link_sec), &link_sec);
+ 
+-			cp.le = 1;
+-			cp.simul = lmp_le_br_capable(hdev);
++	if (lmp_bredr_capable(hdev)) {
++		set_bredr_scan(hdev);
++		update_class(hdev);
++		update_name(hdev, hdev->dev_name);
++		update_eir(hdev);
++	}
++}
+ 
+-			/* Check first if we already have the right
+-			 * host state (host features set)
+-			 */
+-			if (cp.le != lmp_host_le_capable(hdev) ||
+-			    cp.simul != lmp_host_le_br_capable(hdev))
+-				hci_send_cmd(hdev,
+-					     HCI_OP_WRITE_LE_HOST_SUPPORTED,
+-					     sizeof(cp), &cp);
+-		}
++int mgmt_powered(struct hci_dev *hdev, u8 powered)
++{
++	struct cmd_lookup match = { NULL, hdev };
++	int err;
+ 
+-		link_sec = test_bit(HCI_LINK_SECURITY, &hdev->dev_flags);
+-		if (link_sec != test_bit(HCI_AUTH, &hdev->flags))
+-			hci_send_cmd(hdev, HCI_OP_WRITE_AUTH_ENABLE,
+-				     sizeof(link_sec), &link_sec);
++	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
++		return 0;
+ 
+-		if (lmp_bredr_capable(hdev)) {
+-			set_bredr_scan(hdev);
+-			update_class(hdev);
+-			update_name(hdev, hdev->dev_name);
+-			update_eir(hdev);
+-		}
 +	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
-+	mgmt_pending_foreach(0, hdev, cmd_status_rsp, &status_not_powered);
 +
-+	if (memcmp(hdev->dev_class, zero_cod, sizeof(zero_cod)) != 0)
-+		mgmt_event(MGMT_EV_CLASS_OF_DEV_CHANGED, hdev,
-+			   zero_cod, sizeof(zero_cod), NULL);
-+
-+new_settings:
- 	err = new_settings(hdev, match.sk);
- 
- 	if (match.sk)
++	if (powered) {
++		powered_update_hci(hdev);
+ 	} else {
+ 		u8 status = MGMT_STATUS_NOT_POWERED;
+ 		u8 zero_cod[] = { 0, 0, 0 };
 -- 
 1.7.10.4
 
