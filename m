@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 16/16] Bluetooth: Remove empty HCI event handlers
-Date: Wed, 27 Feb 2013 09:57:24 +0200
-Message-Id: <1361951844-13719-17-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v3 13/16] Bluetooth: Fix busy condition testing for EIR and class updates
+Date: Wed, 27 Feb 2013 09:57:21 +0200
+Message-Id: <1361951844-13719-14-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1361951844-13719-1-git-send-email-johan.hedberg@gmail.com>
 References: <1361951844-13719-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,322 +11,92 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-With the removal of hci_req_complete() several HCI event handles have
-essentially become empty and can be removed. The only potential benefit
-of these could have been logging, but the hci_event, hci_cmd_complete
-and hci_cmd_status already provide a log for events which they do not
-have an explicit handler for.
+The add/remove_uuid and set_dev_class mgmt commands can trigger both EIR
+and class HCI commands, so testing just for a pending class command is
+enough. The simplest way to monitor conflicts that should trigger "busy"
+error returns is to check for any pending mgmt command that can trigger
+these HCI commands. This patch adds a helper function for this
+(pending_eir_or_class) and uses it instead of the old HCI_PENDING_CLASS
+flag to test for busy conditions.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_event.c |  164 ---------------------------------------------
- 1 file changed, 164 deletions(-)
+ net/bluetooth/mgmt.c |   39 ++++++++++++++++++++++++++++++---------
+ 1 file changed, 30 insertions(+), 9 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 8ab12fb..d766cf0 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -423,13 +423,6 @@ static void hci_cc_write_voice_setting(struct hci_dev *hdev,
- 		hdev->notify(hdev, HCI_NOTIFY_VOICE_SETTING);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index b2a9697..41a3265 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1341,6 +1341,23 @@ unlock:
+ 	return err;
  }
  
--static void hci_cc_host_buffer_size(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	__u8 status = *((__u8 *) skb->data);
--
--	BT_DBG("%s status 0x%2.2x", hdev->name, status);
--}
--
- static void hci_cc_write_ssp_mode(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	__u8 status = *((__u8 *) skb->data);
-@@ -631,13 +624,6 @@ static void hci_cc_read_data_block_size(struct hci_dev *hdev,
- 	       hdev->block_cnt, hdev->block_len);
- }
++static bool pending_eir_or_class(struct hci_dev *hdev)
++{
++	struct pending_cmd *cmd;
++
++	list_for_each_entry(cmd, &hdev->mgmt_pending, list) {
++		switch (cmd->opcode) {
++		case MGMT_OP_ADD_UUID:
++		case MGMT_OP_REMOVE_UUID:
++		case MGMT_OP_SET_DEV_CLASS:
++		case MGMT_OP_SET_POWERED:
++			return true;
++		}
++	}
++
++	return false;
++}
++
+ static const u8 bluetooth_base_uuid[] = {
+ 			0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
+ 			0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+@@ -1372,7 +1389,7 @@ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
  
--static void hci_cc_write_ca_timeout(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	__u8 status = *((__u8 *) skb->data);
--
--	BT_DBG("%s status 0x%2.2x", hdev->name, status);
--}
--
- static void hci_cc_read_local_amp_info(struct hci_dev *hdev,
- 				       struct sk_buff *skb)
- {
-@@ -700,29 +686,6 @@ a2mp_rsp:
- 	a2mp_send_create_phy_link_req(hdev, rp->status);
- }
+ 	hci_dev_lock(hdev);
  
--static void hci_cc_delete_stored_link_key(struct hci_dev *hdev,
--					  struct sk_buff *skb)
--{
--	__u8 status = *((__u8 *) skb->data);
--
--	BT_DBG("%s status 0x%2.2x", hdev->name, status);
--}
--
--static void hci_cc_set_event_mask(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	__u8 status = *((__u8 *) skb->data);
--
--	BT_DBG("%s status 0x%2.2x", hdev->name, status);
--}
--
--static void hci_cc_write_inquiry_mode(struct hci_dev *hdev,
--				      struct sk_buff *skb)
--{
--	__u8 status = *((__u8 *) skb->data);
--
--	BT_DBG("%s status 0x%2.2x", hdev->name, status);
--}
--
- static void hci_cc_read_inq_rsp_tx_power(struct hci_dev *hdev,
- 					 struct sk_buff *skb)
- {
-@@ -734,13 +697,6 @@ static void hci_cc_read_inq_rsp_tx_power(struct hci_dev *hdev,
- 		hdev->inq_tx_power = rp->tx_power;
- }
+-	if (test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
++	if (pending_eir_or_class(hdev)) {
+ 		err = cmd_status(sk, hdev->id, MGMT_OP_ADD_UUID,
+ 				 MGMT_STATUS_BUSY);
+ 		goto failed;
+@@ -1444,7 +1461,7 @@ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
  
--static void hci_cc_set_event_flt(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	__u8 status = *((__u8 *) skb->data);
--
--	BT_DBG("%s status 0x%2.2x", hdev->name, status);
--}
--
- static void hci_cc_pin_code_reply(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_rp_pin_code_reply *rp = (void *) skb->data;
-@@ -827,13 +783,6 @@ static void hci_cc_le_read_adv_tx_power(struct hci_dev *hdev,
- 	}
- }
+ 	hci_dev_lock(hdev);
  
--static void hci_cc_le_set_event_mask(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	__u8 status = *((__u8 *) skb->data);
--
--	BT_DBG("%s status 0x%2.2x", hdev->name, status);
--}
--
- static void hci_cc_user_confirm_reply(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_rp_user_confirm_reply *rp = (void *) skb->data;
-@@ -1014,26 +963,6 @@ static void hci_cc_le_read_white_list_size(struct hci_dev *hdev,
- 		hdev->le_white_list_size = rp->size;
- }
+-	if (test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
++	if (pending_eir_or_class(hdev)) {
+ 		err = cmd_status(sk, hdev->id, MGMT_OP_REMOVE_UUID,
+ 				 MGMT_STATUS_BUSY);
+ 		goto unlock;
+@@ -1520,15 +1537,19 @@ static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		return cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
+ 				  MGMT_STATUS_NOT_SUPPORTED);
  
--static void hci_cc_le_ltk_reply(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	struct hci_rp_le_ltk_reply *rp = (void *) skb->data;
--
--	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
--
--	if (rp->status)
--		return;
--}
--
--static void hci_cc_le_ltk_neg_reply(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	struct hci_rp_le_ltk_neg_reply *rp = (void *) skb->data;
--
--	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
--
--	if (rp->status)
--		return;
--}
--
- static void hci_cc_le_read_supported_states(struct hci_dev *hdev,
- 					    struct sk_buff *skb)
- {
-@@ -1564,11 +1493,6 @@ static void hci_cs_le_create_conn(struct hci_dev *hdev, __u8 status)
- 	}
- }
+-	if (test_bit(HCI_PENDING_CLASS, &hdev->dev_flags))
+-		return cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
+-				  MGMT_STATUS_BUSY);
++	hci_dev_lock(hdev);
  
--static void hci_cs_le_start_enc(struct hci_dev *hdev, u8 status)
--{
--	BT_DBG("%s status 0x%2.2x", hdev->name, status);
--}
--
- static void hci_cs_create_phylink(struct hci_dev *hdev, u8 status)
- {
- 	struct hci_cp_create_phy_link *cp;
-@@ -1610,11 +1534,6 @@ static void hci_cs_accept_phylink(struct hci_dev *hdev, u8 status)
- 	amp_write_remote_assoc(hdev, cp->phy_handle);
- }
+-	if ((cp->minor & 0x03) != 0 || (cp->major & 0xe0) != 0)
+-		return cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
+-				  MGMT_STATUS_INVALID_PARAMS);
++	if (pending_eir_or_class(hdev)) {
++		err = cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
++				 MGMT_STATUS_BUSY);
++		goto unlock;
++	}
  
--static void hci_cs_create_logical_link(struct hci_dev *hdev, u8 status)
--{
--	BT_DBG("%s status 0x%2.2x", hdev->name, status);
--}
--
- static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	__u8 status = *((__u8 *) skb->data);
-@@ -2171,17 +2090,6 @@ unlock:
- 	hci_dev_unlock(hdev);
- }
+-	hci_dev_lock(hdev);
++	if ((cp->minor & 0x03) != 0 || (cp->major & 0xe0) != 0) {
++		err = cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
++				 MGMT_STATUS_INVALID_PARAMS);
++		goto unlock;
++	}
  
--static void hci_remote_version_evt(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	BT_DBG("%s", hdev->name);
--}
--
--static void hci_qos_setup_complete_evt(struct hci_dev *hdev,
--				       struct sk_buff *skb)
--{
--	BT_DBG("%s", hdev->name);
--}
--
- static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_cmd_complete *ev = (void *) skb->data;
-@@ -2269,10 +2177,6 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cc_write_voice_setting(hdev, skb);
- 		break;
- 
--	case HCI_OP_HOST_BUFFER_SIZE:
--		hci_cc_host_buffer_size(hdev, skb);
--		break;
--
- 	case HCI_OP_WRITE_SSP_MODE:
- 		hci_cc_write_ssp_mode(hdev, skb);
- 		break;
-@@ -2305,10 +2209,6 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cc_read_data_block_size(hdev, skb);
- 		break;
- 
--	case HCI_OP_WRITE_CA_TIMEOUT:
--		hci_cc_write_ca_timeout(hdev, skb);
--		break;
--
- 	case HCI_OP_READ_FLOW_CONTROL_MODE:
- 		hci_cc_read_flow_control_mode(hdev, skb);
- 		break;
-@@ -2321,26 +2221,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cc_read_local_amp_assoc(hdev, skb);
- 		break;
- 
--	case HCI_OP_DELETE_STORED_LINK_KEY:
--		hci_cc_delete_stored_link_key(hdev, skb);
--		break;
--
--	case HCI_OP_SET_EVENT_MASK:
--		hci_cc_set_event_mask(hdev, skb);
--		break;
--
--	case HCI_OP_WRITE_INQUIRY_MODE:
--		hci_cc_write_inquiry_mode(hdev, skb);
--		break;
--
- 	case HCI_OP_READ_INQ_RSP_TX_POWER:
- 		hci_cc_read_inq_rsp_tx_power(hdev, skb);
- 		break;
- 
--	case HCI_OP_SET_EVENT_FLT:
--		hci_cc_set_event_flt(hdev, skb);
--		break;
--
- 	case HCI_OP_PIN_CODE_REPLY:
- 		hci_cc_pin_code_reply(hdev, skb);
- 		break;
-@@ -2365,10 +2249,6 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cc_le_read_adv_tx_power(hdev, skb);
- 		break;
- 
--	case HCI_OP_LE_SET_EVENT_MASK:
--		hci_cc_le_set_event_mask(hdev, skb);
--		break;
--
- 	case HCI_OP_USER_CONFIRM_REPLY:
- 		hci_cc_user_confirm_reply(hdev, skb);
- 		break;
-@@ -2401,14 +2281,6 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cc_le_read_white_list_size(hdev, skb);
- 		break;
- 
--	case HCI_OP_LE_LTK_REPLY:
--		hci_cc_le_ltk_reply(hdev, skb);
--		break;
--
--	case HCI_OP_LE_LTK_NEG_REPLY:
--		hci_cc_le_ltk_neg_reply(hdev, skb);
--		break;
--
- 	case HCI_OP_LE_READ_SUPPORTED_STATES:
- 		hci_cc_le_read_supported_states(hdev, skb);
- 		break;
-@@ -2500,10 +2372,6 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cs_le_create_conn(hdev, ev->status);
- 		break;
- 
--	case HCI_OP_LE_START_ENC:
--		hci_cs_le_start_enc(hdev, ev->status);
--		break;
--
- 	case HCI_OP_CREATE_PHY_LINK:
- 		hci_cs_create_phylink(hdev, ev->status);
- 		break;
-@@ -2512,10 +2380,6 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cs_accept_phylink(hdev, ev->status);
- 		break;
- 
--	case HCI_OP_CREATE_LOGICAL_LINK:
--		hci_cs_create_logical_link(hdev, ev->status);
--		break;
--
- 	default:
- 		BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
- 		break;
-@@ -3076,18 +2940,6 @@ unlock:
- 	hci_dev_unlock(hdev);
- }
- 
--static void hci_sync_conn_changed_evt(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	BT_DBG("%s", hdev->name);
--}
--
--static void hci_sniff_subrate_evt(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	struct hci_ev_sniff_subrate *ev = (void *) skb->data;
--
--	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
--}
--
- static void hci_extended_inquiry_result_evt(struct hci_dev *hdev,
- 					    struct sk_buff *skb)
- {
-@@ -3815,14 +3667,6 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_remote_features_evt(hdev, skb);
- 		break;
- 
--	case HCI_EV_REMOTE_VERSION:
--		hci_remote_version_evt(hdev, skb);
--		break;
--
--	case HCI_EV_QOS_SETUP_COMPLETE:
--		hci_qos_setup_complete_evt(hdev, skb);
--		break;
--
- 	case HCI_EV_CMD_COMPLETE:
- 		hci_cmd_complete_evt(hdev, skb);
- 		break;
-@@ -3879,14 +3723,6 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_sync_conn_complete_evt(hdev, skb);
- 		break;
- 
--	case HCI_EV_SYNC_CONN_CHANGED:
--		hci_sync_conn_changed_evt(hdev, skb);
--		break;
--
--	case HCI_EV_SNIFF_SUBRATE:
--		hci_sniff_subrate_evt(hdev, skb);
--		break;
--
- 	case HCI_EV_EXTENDED_INQUIRY_RESULT:
- 		hci_extended_inquiry_result_evt(hdev, skb);
- 		break;
+ 	hdev->major_class = cp->major;
+ 	hdev->minor_class = cp->minor;
 -- 
 1.7.10.4
 
