@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 02/16] Bluetooth: Split HCI init sequence into three stages
-Date: Wed, 27 Feb 2013 09:57:10 +0200
-Message-Id: <1361951844-13719-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v3 07/16] Bluetooth: Add transaction cmd_complete and cmd_status functions
+Date: Wed, 27 Feb 2013 09:57:15 +0200
+Message-Id: <1361951844-13719-8-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1361951844-13719-1-git-send-email-johan.hedberg@gmail.com>
 References: <1361951844-13719-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,623 +11,160 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Having contitional command sending during a request has always been
-problematic and caused hacks like the hdev->init_last_cmd variable. This
-patch removes these conditionals and instead splits the init sequence
-into three stages, each with its own __hci_request() call.
-
-This also paves the way to the upcoming transaction framework which will
-also benefit by having a simpler implementation if it doesn't need to
-cater for transactions that change on the fly.
+This patch introduces functions to process the transaction state when
+receiving HCI Command Status or Command Complete events. Some HCI
+commands, like Inquiry do not result in a Command complete event so
+special handling is needed for them. Inquiry is a particularly important
+one since it is the only forseeable "non-cmd_complete" command that will
+make good use of the transaction framework, and its completion is either
+indicated by an Inquiry Complete event of a successful Command Complete
+for HCI_Inquiry_Cancel.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_core.c  |  271 ++++++++++++++++++++++++++++++++++++++++++++-
- net/bluetooth/hci_event.c |  255 +-----------------------------------------
- 2 files changed, 271 insertions(+), 255 deletions(-)
+ include/net/bluetooth/hci_core.h |    2 ++
+ net/bluetooth/hci_core.c         |   68 ++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |    7 ++++
+ 3 files changed, 77 insertions(+)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 8c2553f..038f8c7a 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1056,6 +1056,8 @@ int hci_transaction_run(struct hci_transaction *transaction);
+ int hci_transaction_cmd(struct hci_transaction *transaction, u16 opcode,
+ 			u32 plen, void *param);
+ void hci_transaction_from_skb(struct hci_dev *hdev, struct sk_buff *skb);
++void hci_transaction_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status);
++void hci_transaction_cmd_status(struct hci_dev *hdev, u16 opcode, u8 status);
+ 
+ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param);
+ void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags);
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index fd6921f..f71ad76 100644
+index 315728c..15ec531 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -193,6 +193,9 @@ static void bredr_init(struct hci_dev *hdev)
- 
- 	/* Read Local Version */
- 	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL);
-+
-+	/* Read BD Address */
-+	hci_send_cmd(hdev, HCI_OP_READ_BD_ADDR, 0, NULL);
+@@ -3216,6 +3216,74 @@ static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 	kfree_skb(skb);
  }
  
- static void amp_init(struct hci_dev *hdev)
-@@ -209,7 +212,7 @@ static void amp_init(struct hci_dev *hdev)
- 	hci_send_cmd(hdev, HCI_OP_READ_DATA_BLOCK_SIZE, 0, NULL);
- }
- 
--static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
-+static void hci_init1_req(struct hci_dev *hdev, unsigned long opt)
- {
- 	struct sk_buff *skb;
- 
-@@ -246,6 +249,270 @@ static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
- 	}
- }
- 
-+static void bredr_setup(struct hci_dev *hdev)
++static bool hci_transaction_is_complete(struct hci_dev *hdev)
 +{
-+	struct hci_cp_delete_stored_link_key cp;
-+	__le16 param;
-+	__u8 flt_type;
++	struct sk_buff *skb;
 +
-+	/* Read Buffer Size (ACL mtu, max pkt, etc.) */
-+	hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
++	skb = skb_peek(&hdev->cmd_q);
++	if (!skb)
++		return true;
 +
-+	/* Read Class of Device */
-+	hci_send_cmd(hdev, HCI_OP_READ_CLASS_OF_DEV, 0, NULL);
-+
-+	/* Read Local Name */
-+	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_NAME, 0, NULL);
-+
-+	/* Read Voice Setting */
-+	hci_send_cmd(hdev, HCI_OP_READ_VOICE_SETTING, 0, NULL);
-+
-+	/* Clear Event Filters */
-+	flt_type = HCI_FLT_CLEAR_ALL;
-+	hci_send_cmd(hdev, HCI_OP_SET_EVENT_FLT, 1, &flt_type);
-+
-+	/* Connection accept timeout ~20 secs */
-+	param = __constant_cpu_to_le16(0x7d00);
-+	hci_send_cmd(hdev, HCI_OP_WRITE_CA_TIMEOUT, 2, &param);
-+
-+	bacpy(&cp.bdaddr, BDADDR_ANY);
-+	cp.delete_all = 1;
-+	hci_send_cmd(hdev, HCI_OP_DELETE_STORED_LINK_KEY, sizeof(cp), &cp);
++	return bt_cb(skb)->transaction.start;
 +}
 +
-+static void le_setup(struct hci_dev *hdev)
++void hci_transaction_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status)
 +{
-+	/* Read LE Buffer Size */
-+	hci_send_cmd(hdev, HCI_OP_LE_READ_BUFFER_SIZE, 0, NULL);
++	struct sk_buff *skb;
 +
-+	/* Read LE Local Supported Features */
-+	hci_send_cmd(hdev, HCI_OP_LE_READ_LOCAL_FEATURES, 0, NULL);
++	BT_DBG("opcode 0x%04x status 0x%02x", opcode, status);
 +
-+	/* Read LE Advertising Channel TX Power */
-+	hci_send_cmd(hdev, HCI_OP_LE_READ_ADV_TX_POWER, 0, NULL);
-+
-+	/* Read LE White List Size */
-+	hci_send_cmd(hdev, HCI_OP_LE_READ_WHITE_LIST_SIZE, 0, NULL);
-+
-+	/* Read LE Supported States */
-+	hci_send_cmd(hdev, HCI_OP_LE_READ_SUPPORTED_STATES, 0, NULL);
-+}
-+
-+static u8 hci_get_inquiry_mode(struct hci_dev *hdev)
-+{
-+	if (lmp_ext_inq_capable(hdev))
-+		return 2;
-+
-+	if (lmp_inq_rssi_capable(hdev))
-+		return 1;
-+
-+	if (hdev->manufacturer == 11 && hdev->hci_rev == 0x00 &&
-+	    hdev->lmp_subver == 0x0757)
-+		return 1;
-+
-+	if (hdev->manufacturer == 15) {
-+		if (hdev->hci_rev == 0x03 && hdev->lmp_subver == 0x6963)
-+			return 1;
-+		if (hdev->hci_rev == 0x09 && hdev->lmp_subver == 0x6963)
-+			return 1;
-+		if (hdev->hci_rev == 0x00 && hdev->lmp_subver == 0x6965)
-+			return 1;
-+	}
-+
-+	if (hdev->manufacturer == 31 && hdev->hci_rev == 0x2005 &&
-+	    hdev->lmp_subver == 0x1805)
-+		return 1;
-+
-+	return 0;
-+}
-+
-+static void hci_setup_inquiry_mode(struct hci_dev *hdev)
-+{
-+	u8 mode;
-+
-+	mode = hci_get_inquiry_mode(hdev);
-+
-+	hci_send_cmd(hdev, HCI_OP_WRITE_INQUIRY_MODE, 1, &mode);
-+}
-+
-+static void hci_setup_event_mask(struct hci_dev *hdev)
-+{
-+	/* The second byte is 0xff instead of 0x9f (two reserved bits
-+	 * disabled) since a Broadcom 1.2 dongle doesn't respond to the
-+	 * command otherwise.
++	/* Check that the completed command really matches the last one
++	 * that was sent.
 +	 */
-+	u8 events[8] = { 0xff, 0xff, 0xfb, 0xff, 0x00, 0x00, 0x00, 0x00 };
-+
-+	/* CSR 1.1 dongles does not accept any bitfield so don't try to set
-+	 * any event mask for pre 1.2 devices.
-+	 */
-+	if (hdev->hci_ver < BLUETOOTH_VER_1_2)
++	if (!hci_sent_cmd_data(hdev, opcode))
 +		return;
 +
-+	if (lmp_bredr_capable(hdev)) {
-+		events[4] |= 0x01; /* Flow Specification Complete */
-+		events[4] |= 0x02; /* Inquiry Result with RSSI */
-+		events[4] |= 0x04; /* Read Remote Extended Features Complete */
-+		events[5] |= 0x08; /* Synchronous Connection Complete */
-+		events[5] |= 0x10; /* Synchronous Connection Changed */
-+	}
++	/* If the command succeeded and there's still more commands in
++	 * this transaction the transaction is not yet complete.
++	 */
++	if (!status && !hci_transaction_is_complete(hdev))
++		return;
 +
-+	if (lmp_inq_rssi_capable(hdev))
-+		events[4] |= 0x02; /* Inquiry Result with RSSI */
-+
-+	if (lmp_sniffsubr_capable(hdev))
-+		events[5] |= 0x20; /* Sniff Subrating */
-+
-+	if (lmp_pause_enc_capable(hdev))
-+		events[5] |= 0x80; /* Encryption Key Refresh Complete */
-+
-+	if (lmp_ext_inq_capable(hdev))
-+		events[5] |= 0x40; /* Extended Inquiry Result */
-+
-+	if (lmp_no_flush_capable(hdev))
-+		events[7] |= 0x01; /* Enhanced Flush Complete */
-+
-+	if (lmp_lsto_capable(hdev))
-+		events[6] |= 0x80; /* Link Supervision Timeout Changed */
-+
-+	if (lmp_ssp_capable(hdev)) {
-+		events[6] |= 0x01;	/* IO Capability Request */
-+		events[6] |= 0x02;	/* IO Capability Response */
-+		events[6] |= 0x04;	/* User Confirmation Request */
-+		events[6] |= 0x08;	/* User Passkey Request */
-+		events[6] |= 0x10;	/* Remote OOB Data Request */
-+		events[6] |= 0x20;	/* Simple Pairing Complete */
-+		events[7] |= 0x04;	/* User Passkey Notification */
-+		events[7] |= 0x08;	/* Keypress Notification */
-+		events[7] |= 0x10;	/* Remote Host Supported
-+					 * Features Notification
-+					 */
-+	}
-+
-+	if (lmp_le_capable(hdev))
-+		events[7] |= 0x20;	/* LE Meta-Event */
-+
-+	hci_send_cmd(hdev, HCI_OP_SET_EVENT_MASK, sizeof(events), events);
-+
-+	if (lmp_le_capable(hdev)) {
-+		memset(events, 0, sizeof(events));
-+		events[0] = 0x1f;
-+		hci_send_cmd(hdev, HCI_OP_LE_SET_EVENT_MASK,
-+			     sizeof(events), events);
-+	}
-+}
-+
-+static void hci_init2_req(struct hci_dev *hdev, unsigned long opt)
-+{
-+	if (lmp_bredr_capable(hdev))
-+		bredr_setup(hdev);
-+
-+	if (lmp_le_capable(hdev))
-+		le_setup(hdev);
-+
-+	hci_setup_event_mask(hdev);
-+
-+	if (hdev->hci_ver > BLUETOOTH_VER_1_1)
-+		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_COMMANDS, 0, NULL);
-+
-+	if (lmp_ssp_capable(hdev)) {
-+		if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags)) {
-+			u8 mode = 0x01;
-+			hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE,
-+				     sizeof(mode), &mode);
-+		} else {
-+			struct hci_cp_write_eir cp;
-+
-+			memset(hdev->eir, 0, sizeof(hdev->eir));
-+			memset(&cp, 0, sizeof(cp));
-+
-+			hci_send_cmd(hdev, HCI_OP_WRITE_EIR, sizeof(cp), &cp);
++	/* Remove all pending commands belonging to this transaction */
++	spin_lock(&hdev->cmd_q.lock);
++	while ((skb = __skb_dequeue(&hdev->cmd_q))) {
++		if (bt_cb(skb)->transaction.start) {
++			__skb_queue_head(&hdev->cmd_q, skb);
++			break;
 +		}
++
++		kfree_skb(skb);
 +	}
++	spin_unlock(&hdev->cmd_q.lock);
 +
-+	if (lmp_inq_rssi_capable(hdev))
-+		hci_setup_inquiry_mode(hdev);
-+
-+	if (lmp_inq_tx_pwr_capable(hdev))
-+		hci_send_cmd(hdev, HCI_OP_READ_INQ_RSP_TX_POWER, 0, NULL);
-+
-+	if (lmp_ext_feat_capable(hdev)) {
-+		struct hci_cp_read_local_ext_features cp;
-+
-+		cp.page = 0x01;
-+		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_EXT_FEATURES, sizeof(cp),
-+			     &cp);
-+	}
-+
-+	if (test_bit(HCI_LINK_SECURITY, &hdev->dev_flags)) {
-+		u8 enable = 1;
-+		hci_send_cmd(hdev, HCI_OP_WRITE_AUTH_ENABLE, sizeof(enable),
-+			     &enable);
++	if (hdev->transaction_complete) {
++		hdev->transaction_complete(hdev, opcode, status);
++		hdev->transaction_complete = NULL;
 +	}
 +}
 +
-+static void hci_setup_link_policy(struct hci_dev *hdev)
++void hci_transaction_cmd_status(struct hci_dev *hdev, u16 opcode, u8 status)
 +{
-+	struct hci_cp_write_def_link_policy cp;
-+	u16 link_policy = 0;
++	BT_DBG("opcode 0x%04x status 0x%02x", opcode, status);
 +
-+	if (lmp_rswitch_capable(hdev))
-+		link_policy |= HCI_LP_RSWITCH;
-+	if (lmp_hold_capable(hdev))
-+		link_policy |= HCI_LP_HOLD;
-+	if (lmp_sniff_capable(hdev))
-+		link_policy |= HCI_LP_SNIFF;
-+	if (lmp_park_capable(hdev))
-+		link_policy |= HCI_LP_PARK;
-+
-+	cp.policy = cpu_to_le16(link_policy);
-+	hci_send_cmd(hdev, HCI_OP_WRITE_DEF_LINK_POLICY, sizeof(cp), &cp);
-+}
-+
-+static void hci_set_le_support(struct hci_dev *hdev)
-+{
-+	struct hci_cp_write_le_host_supported cp;
-+
-+	memset(&cp, 0, sizeof(cp));
-+
-+	if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
-+		cp.le = 1;
-+		cp.simul = lmp_le_br_capable(hdev);
++	if (status) {
++		hci_transaction_cmd_complete(hdev, opcode, status);
++		return;
 +	}
 +
-+	if (cp.le != lmp_host_le_capable(hdev))
-+		hci_send_cmd(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED, sizeof(cp),
-+			     &cp);
++	/* No need to handle success status if there are more commands */
++	if (!hci_transaction_is_complete(hdev))
++		return;
++
++	/* If the transaction doesn't have a complete callback or there
++	 * are other commands/transactions in the hdev queue we consider
++	 * this transaction as completed.
++	 */
++	if (!hdev->transaction_complete || !skb_queue_empty(&hdev->cmd_q))
++		hci_transaction_cmd_complete(hdev, opcode, status);
 +}
 +
-+static void hci_init3_req(struct hci_dev *hdev, unsigned long opt)
-+{
-+	if (hdev->commands[5] & 0x10)
-+		hci_setup_link_policy(hdev);
-+
-+	if (lmp_le_capable(hdev))
-+		hci_set_le_support(hdev);
-+}
-+
-+static int __hci_init(struct hci_dev *hdev)
-+{
-+	int err;
-+
-+	err = __hci_request(hdev, hci_init1_req, 0, HCI_INIT_TIMEOUT);
-+	if (err < 0)
-+		return err;
-+
-+	/* AMP controllers do not need stage 2/3 init */
-+	if (hdev->dev_type != HCI_BREDR)
-+		return 0;
-+
-+	err = __hci_request(hdev, hci_init2_req, 0, HCI_INIT_TIMEOUT);
-+	if (err < 0)
-+		return err;
-+
-+	return __hci_request(hdev, hci_init3_req, 0, HCI_INIT_TIMEOUT);
-+}
-+
- static void hci_scan_req(struct hci_dev *hdev, unsigned long opt)
+ static void hci_rx_work(struct work_struct *work)
  {
- 	__u8 scan = opt;
-@@ -745,7 +1012,7 @@ int hci_dev_open(__u16 dev)
- 		set_bit(HCI_INIT, &hdev->flags);
- 		hdev->init_last_cmd = 0;
- 
--		ret = __hci_request(hdev, hci_init_req, 0, HCI_INIT_TIMEOUT);
-+		ret = __hci_init(hdev);
- 
- 		clear_bit(HCI_INIT, &hdev->flags);
- 	}
+ 	struct hci_dev *hdev = container_of(work, struct hci_dev, rx_work);
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 5892e54..14e872a 100644
+index 14e872a..6dd5fd4 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -472,211 +472,6 @@ static void hci_cc_write_ssp_mode(struct hci_dev *hdev, struct sk_buff *skb)
- 	}
- }
+@@ -53,6 +53,7 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+ 	hci_dev_unlock(hdev);
  
--static u8 hci_get_inquiry_mode(struct hci_dev *hdev)
--{
--	if (lmp_ext_inq_capable(hdev))
--		return 2;
--
--	if (lmp_inq_rssi_capable(hdev))
--		return 1;
--
--	if (hdev->manufacturer == 11 && hdev->hci_rev == 0x00 &&
--	    hdev->lmp_subver == 0x0757)
--		return 1;
--
--	if (hdev->manufacturer == 15) {
--		if (hdev->hci_rev == 0x03 && hdev->lmp_subver == 0x6963)
--			return 1;
--		if (hdev->hci_rev == 0x09 && hdev->lmp_subver == 0x6963)
--			return 1;
--		if (hdev->hci_rev == 0x00 && hdev->lmp_subver == 0x6965)
--			return 1;
--	}
--
--	if (hdev->manufacturer == 31 && hdev->hci_rev == 0x2005 &&
--	    hdev->lmp_subver == 0x1805)
--		return 1;
--
--	return 0;
--}
--
--static void hci_setup_inquiry_mode(struct hci_dev *hdev)
--{
--	u8 mode;
--
--	mode = hci_get_inquiry_mode(hdev);
--
--	hci_send_cmd(hdev, HCI_OP_WRITE_INQUIRY_MODE, 1, &mode);
--}
--
--static void hci_setup_event_mask(struct hci_dev *hdev)
--{
--	/* The second byte is 0xff instead of 0x9f (two reserved bits
--	 * disabled) since a Broadcom 1.2 dongle doesn't respond to the
--	 * command otherwise */
--	u8 events[8] = { 0xff, 0xff, 0xfb, 0xff, 0x00, 0x00, 0x00, 0x00 };
--
--	/* CSR 1.1 dongles does not accept any bitfield so don't try to set
--	 * any event mask for pre 1.2 devices */
--	if (hdev->hci_ver < BLUETOOTH_VER_1_2)
--		return;
--
--	if (lmp_bredr_capable(hdev)) {
--		events[4] |= 0x01; /* Flow Specification Complete */
--		events[4] |= 0x02; /* Inquiry Result with RSSI */
--		events[4] |= 0x04; /* Read Remote Extended Features Complete */
--		events[5] |= 0x08; /* Synchronous Connection Complete */
--		events[5] |= 0x10; /* Synchronous Connection Changed */
--	}
--
--	if (lmp_inq_rssi_capable(hdev))
--		events[4] |= 0x02; /* Inquiry Result with RSSI */
--
--	if (lmp_sniffsubr_capable(hdev))
--		events[5] |= 0x20; /* Sniff Subrating */
--
--	if (lmp_pause_enc_capable(hdev))
--		events[5] |= 0x80; /* Encryption Key Refresh Complete */
--
--	if (lmp_ext_inq_capable(hdev))
--		events[5] |= 0x40; /* Extended Inquiry Result */
--
--	if (lmp_no_flush_capable(hdev))
--		events[7] |= 0x01; /* Enhanced Flush Complete */
--
--	if (lmp_lsto_capable(hdev))
--		events[6] |= 0x80; /* Link Supervision Timeout Changed */
--
--	if (lmp_ssp_capable(hdev)) {
--		events[6] |= 0x01;	/* IO Capability Request */
--		events[6] |= 0x02;	/* IO Capability Response */
--		events[6] |= 0x04;	/* User Confirmation Request */
--		events[6] |= 0x08;	/* User Passkey Request */
--		events[6] |= 0x10;	/* Remote OOB Data Request */
--		events[6] |= 0x20;	/* Simple Pairing Complete */
--		events[7] |= 0x04;	/* User Passkey Notification */
--		events[7] |= 0x08;	/* Keypress Notification */
--		events[7] |= 0x10;	/* Remote Host Supported
--					 * Features Notification */
--	}
--
--	if (lmp_le_capable(hdev))
--		events[7] |= 0x20;	/* LE Meta-Event */
--
--	hci_send_cmd(hdev, HCI_OP_SET_EVENT_MASK, sizeof(events), events);
--
--	if (lmp_le_capable(hdev)) {
--		memset(events, 0, sizeof(events));
--		events[0] = 0x1f;
--		hci_send_cmd(hdev, HCI_OP_LE_SET_EVENT_MASK,
--			     sizeof(events), events);
--	}
--}
--
--static void bredr_setup(struct hci_dev *hdev)
--{
--	struct hci_cp_delete_stored_link_key cp;
--	__le16 param;
--	__u8 flt_type;
--
--	/* Read Buffer Size (ACL mtu, max pkt, etc.) */
--	hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
--
--	/* Read Class of Device */
--	hci_send_cmd(hdev, HCI_OP_READ_CLASS_OF_DEV, 0, NULL);
--
--	/* Read Local Name */
--	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_NAME, 0, NULL);
--
--	/* Read Voice Setting */
--	hci_send_cmd(hdev, HCI_OP_READ_VOICE_SETTING, 0, NULL);
--
--	/* Clear Event Filters */
--	flt_type = HCI_FLT_CLEAR_ALL;
--	hci_send_cmd(hdev, HCI_OP_SET_EVENT_FLT, 1, &flt_type);
--
--	/* Connection accept timeout ~20 secs */
--	param = __constant_cpu_to_le16(0x7d00);
--	hci_send_cmd(hdev, HCI_OP_WRITE_CA_TIMEOUT, 2, &param);
--
--	bacpy(&cp.bdaddr, BDADDR_ANY);
--	cp.delete_all = 1;
--	hci_send_cmd(hdev, HCI_OP_DELETE_STORED_LINK_KEY, sizeof(cp), &cp);
--}
--
--static void le_setup(struct hci_dev *hdev)
--{
--	/* Read LE Buffer Size */
--	hci_send_cmd(hdev, HCI_OP_LE_READ_BUFFER_SIZE, 0, NULL);
--
--	/* Read LE Local Supported Features */
--	hci_send_cmd(hdev, HCI_OP_LE_READ_LOCAL_FEATURES, 0, NULL);
--
--	/* Read LE Advertising Channel TX Power */
--	hci_send_cmd(hdev, HCI_OP_LE_READ_ADV_TX_POWER, 0, NULL);
--
--	/* Read LE White List Size */
--	hci_send_cmd(hdev, HCI_OP_LE_READ_WHITE_LIST_SIZE, 0, NULL);
--
--	/* Read LE Supported States */
--	hci_send_cmd(hdev, HCI_OP_LE_READ_SUPPORTED_STATES, 0, NULL);
--}
--
--static void hci_setup(struct hci_dev *hdev)
--{
--	if (hdev->dev_type != HCI_BREDR)
--		return;
--
--	/* Read BD Address */
--	hci_send_cmd(hdev, HCI_OP_READ_BD_ADDR, 0, NULL);
--
--	if (lmp_bredr_capable(hdev))
--		bredr_setup(hdev);
--
--	if (lmp_le_capable(hdev))
--		le_setup(hdev);
--
--	hci_setup_event_mask(hdev);
--
--	if (hdev->hci_ver > BLUETOOTH_VER_1_1)
--		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_COMMANDS, 0, NULL);
--
--	if (lmp_ssp_capable(hdev)) {
--		if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags)) {
--			u8 mode = 0x01;
--			hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE,
--				     sizeof(mode), &mode);
--		} else {
--			struct hci_cp_write_eir cp;
--
--			memset(hdev->eir, 0, sizeof(hdev->eir));
--			memset(&cp, 0, sizeof(cp));
--
--			hci_send_cmd(hdev, HCI_OP_WRITE_EIR, sizeof(cp), &cp);
--		}
--	}
--
--	if (lmp_inq_rssi_capable(hdev))
--		hci_setup_inquiry_mode(hdev);
--
--	if (lmp_inq_tx_pwr_capable(hdev))
--		hci_send_cmd(hdev, HCI_OP_READ_INQ_RSP_TX_POWER, 0, NULL);
--
--	if (lmp_ext_feat_capable(hdev)) {
--		struct hci_cp_read_local_ext_features cp;
--
--		cp.page = 0x01;
--		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_EXT_FEATURES, sizeof(cp),
--			     &cp);
--	}
--
--	if (test_bit(HCI_LINK_SECURITY, &hdev->dev_flags)) {
--		u8 enable = 1;
--		hci_send_cmd(hdev, HCI_OP_WRITE_AUTH_ENABLE, sizeof(enable),
--			     &enable);
--	}
--}
--
- static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
++	hci_transaction_cmd_complete(hdev, HCI_OP_INQUIRY, status);
+ 	hci_req_complete(hdev, HCI_OP_INQUIRY_CANCEL, status);
+ 
+ 	hci_conn_check_pending(hdev);
+@@ -1692,6 +1693,7 @@ static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+ 
++	hci_transaction_cmd_complete(hdev, HCI_OP_INQUIRY, status);
+ 	hci_req_complete(hdev, HCI_OP_INQUIRY, status);
+ 
+ 	hci_conn_check_pending(hdev);
+@@ -2254,6 +2256,7 @@ static void hci_qos_setup_complete_evt(struct hci_dev *hdev,
+ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
  {
- 	struct hci_rp_read_local_version *rp = (void *) skb->data;
-@@ -695,31 +490,10 @@ static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
- 	BT_DBG("%s manufacturer 0x%4.4x hci ver %d:%d", hdev->name,
- 	       hdev->manufacturer, hdev->hci_ver, hdev->hci_rev);
+ 	struct hci_ev_cmd_complete *ev = (void *) skb->data;
++	u8 status = skb->data[sizeof(*ev)];
+ 	__u16 opcode;
  
--	if (test_bit(HCI_INIT, &hdev->flags))
--		hci_setup(hdev);
--
- done:
- 	hci_req_complete(hdev, HCI_OP_READ_LOCAL_VERSION, rp->status);
- }
+ 	skb_pull(skb, sizeof(*ev));
+@@ -2497,6 +2500,8 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (ev->opcode != HCI_OP_NOP)
+ 		del_timer(&hdev->cmd_timer);
  
--static void hci_setup_link_policy(struct hci_dev *hdev)
--{
--	struct hci_cp_write_def_link_policy cp;
--	u16 link_policy = 0;
--
--	if (lmp_rswitch_capable(hdev))
--		link_policy |= HCI_LP_RSWITCH;
--	if (lmp_hold_capable(hdev))
--		link_policy |= HCI_LP_HOLD;
--	if (lmp_sniff_capable(hdev))
--		link_policy |= HCI_LP_SNIFF;
--	if (lmp_park_capable(hdev))
--		link_policy |= HCI_LP_PARK;
--
--	cp.policy = cpu_to_le16(link_policy);
--	hci_send_cmd(hdev, HCI_OP_WRITE_DEF_LINK_POLICY, sizeof(cp), &cp);
--}
--
- static void hci_cc_read_local_commands(struct hci_dev *hdev,
- 				       struct sk_buff *skb)
- {
-@@ -727,15 +501,9 @@ static void hci_cc_read_local_commands(struct hci_dev *hdev,
++	hci_transaction_cmd_complete(hdev, ev->opcode, status);
++
+ 	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags)) {
+ 		atomic_set(&hdev->cmd_cnt, 1);
+ 		if (!skb_queue_empty(&hdev->cmd_q))
+@@ -2590,6 +2595,8 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (ev->opcode != HCI_OP_NOP)
+ 		del_timer(&hdev->cmd_timer);
  
- 	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
- 
--	if (rp->status)
--		goto done;
--
--	memcpy(hdev->commands, rp->commands, sizeof(hdev->commands));
--
--	if (test_bit(HCI_INIT, &hdev->flags) && (hdev->commands[5] & 0x10))
--		hci_setup_link_policy(hdev);
-+	if (!rp->status)
-+		memcpy(hdev->commands, rp->commands, sizeof(hdev->commands));
- 
--done:
- 	hci_req_complete(hdev, HCI_OP_READ_LOCAL_COMMANDS, rp->status);
- }
- 
-@@ -795,22 +563,6 @@ static void hci_cc_read_local_features(struct hci_dev *hdev,
- 	       hdev->features[6], hdev->features[7]);
- }
- 
--static void hci_set_le_support(struct hci_dev *hdev)
--{
--	struct hci_cp_write_le_host_supported cp;
--
--	memset(&cp, 0, sizeof(cp));
--
--	if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
--		cp.le = 1;
--		cp.simul = lmp_le_br_capable(hdev);
--	}
--
--	if (cp.le != lmp_host_le_capable(hdev))
--		hci_send_cmd(hdev, HCI_OP_WRITE_LE_HOST_SUPPORTED, sizeof(cp),
--			     &cp);
--}
--
- static void hci_cc_read_local_ext_features(struct hci_dev *hdev,
- 					   struct sk_buff *skb)
- {
-@@ -830,9 +582,6 @@ static void hci_cc_read_local_ext_features(struct hci_dev *hdev,
- 		break;
- 	}
- 
--	if (test_bit(HCI_INIT, &hdev->flags) && lmp_le_capable(hdev))
--		hci_set_le_support(hdev);
--
- done:
- 	hci_req_complete(hdev, HCI_OP_READ_LOCAL_EXT_FEATURES, rp->status);
- }
++	hci_transaction_cmd_status(hdev, ev->opcode, ev->status);
++
+ 	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags)) {
+ 		atomic_set(&hdev->cmd_cnt, 1);
+ 		if (!skb_queue_empty(&hdev->cmd_q))
 -- 
 1.7.10.4
 
