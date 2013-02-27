@@ -1,44 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/9] player: Fix property Device type
-Date: Wed, 27 Feb 2013 15:15:53 +0200
-Message-Id: <1361970961-14300-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1361970961-14300-1-git-send-email-luiz.dentz@gmail.com>
-References: <1361970961-14300-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 0/9] AVRCP Fixes
+Date: Wed, 27 Feb 2013 15:15:52 +0200
+Message-Id: <1361970961-14300-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Device property should be an objecy path not a string.
----
- profiles/audio/player.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+This set fixes some bugs with iOS and WP8 stacks, excessive changes on the
+metadata causing duplicate signals and some missing signals when properties
+changes.
 
-diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index 466b44a..b222643 100644
---- a/profiles/audio/player.c
-+++ b/profiles/audio/player.c
-@@ -290,7 +290,8 @@ static gboolean get_device(const GDBusPropertyTable *property,
- {
- 	struct media_player *mp = data;
- 
--	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &mp->device);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH,
-+								&mp->device);
- 
- 	return TRUE;
- }
-@@ -570,7 +571,7 @@ static const GDBusPropertyTable media_player_properties[] = {
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- 	{ "Track", "a{sv}", get_track, NULL, NULL,
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
--	{ "Device", "s", get_device, NULL, NULL,
-+	{ "Device", "o", get_device, NULL, NULL,
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- 	{ "Browsable", "b", get_browsable, NULL, browsable_exists,
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+Luiz Augusto von Dentz (9):
+  player: Fix property Device type
+  player: Add media_player_create_item
+  player: Add Playlist property
+  player: Fix not emitting PropertiesChanged for Browsable and
+    Searchable
+  AVRCP: Fix changing track metadata too many times
+  player: Only emit PropertiesChanged for Position if track exists
+  player: Only expose Track property if there is metadata
+  AVRCP: Add support to UIDs changed event for CT role
+  AVRCP: Fix storing wrong UID counter
+
+ doc/media-api.txt       |   4 ++
+ profiles/audio/avrcp.c  |  23 +++++++++--
+ profiles/audio/avrcp.h  |   1 +
+ profiles/audio/player.c | 104 +++++++++++++++++++++++++++++++++++++++++++-----
+ profiles/audio/player.h |   1 +
+ 5 files changed, 118 insertions(+), 15 deletions(-)
+
 -- 
 1.8.1.2
 
