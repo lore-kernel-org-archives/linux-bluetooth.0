@@ -1,46 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 01/16] Bluetooth: Fix __hci_request() handling of empty requests
-Date: Wed, 27 Feb 2013 09:57:09 +0200
-Message-Id: <1361951844-13719-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1361951844-13719-1-git-send-email-johan.hedberg@gmail.com>
-References: <1361951844-13719-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v3 00/16] Bluetooth: Add HCI transaction framework
+Date: Wed, 27 Feb 2013 09:57:08 +0200
+Message-Id: <1361951844-13719-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-If a request callback doesn't send any commands __hci_request() should
-fail imediately instead of waiting for the inevitable timeout to occur.
-This is particularly important once we start creating requests with
-conditional command sending which can potentially result in no commands
-being sent at all.
+Here's a revised set with the left-over init_last_cmd patch inserted
+where it belongs in the set.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_core.c |    8 ++++++++
- 1 file changed, 8 insertions(+)
+The other changes are based on an (off-list) review from Gustavo
+Padovan, resulting in removing unnecessary _irqsave versions of spinlock
+functions (for the skb queue), adding a hci_ prefix to some static
+hci_core.c functions as well as really removing the HCI_PENDING_CLASS
+flag (and not just its users).
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index aeb2b26..fd6921f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -122,6 +122,14 @@ static int __hci_request(struct hci_dev *hdev,
- 	set_current_state(TASK_INTERRUPTIBLE);
- 
- 	req(hdev, opt);
-+
-+	/* If the request didn't send any commands return immediately */
-+	if (skb_queue_empty(&hdev->cmd_q) && atomic_read(&hdev->cmd_cnt)) {
-+		hdev->req_status = 0;
-+		remove_wait_queue(&hdev->req_wait_q, &wait);
-+		return err;
-+	}
-+
- 	schedule_timeout(timeout);
- 
- 	remove_wait_queue(&hdev->req_wait_q, &wait);
--- 
-1.7.10.4
+Johan
+
+----------------------------------------------------------------
+Johan Hedberg (16):
+      Bluetooth: Fix __hci_request() handling of empty requests
+      Bluetooth: Split HCI init sequence into three stages
+      Bluetooth: Add initial skeleton for HCI transaction framework
+      Bluetooth: Refactor HCI command skb creation
+      Bluetooth: Introduce new hci_transaction_cmd function
+      Bluetooth: Introduce a hci_transaction_from_skb function
+      Bluetooth: Add transaction cmd_complete and cmd_status functions
+      Bluetooth: Convert hci_request to use HCI transaction framework
+      Bluetooth: Remove unused hdev->init_last_cmd
+      Bluetooth: Move power on HCI command updates to their own function
+      Bluetooth: Update mgmt powered HCI commands to use transactions
+      Bluetooth: Wait for HCI command completion with mgmt_set_powered
+      Bluetooth: Fix busy condition testing for EIR and class updates
+      Bluetooth: Fix UUID/class mgmt command response synchronization
+      Bluetooth: Remove useless HCI_PENDING_CLASS flag
+      Bluetooth: Remove empty HCI event handlers
+
+ include/net/bluetooth/bluetooth.h |   11 +
+ include/net/bluetooth/hci.h       |    1 -
+ include/net/bluetooth/hci_core.h  |   20 +-
+ net/bluetooth/hci_core.c          |  649 ++++++++++++++++++++++++++++++++-----
+ net/bluetooth/hci_event.c         |  507 +----------------------------
+ net/bluetooth/hci_sock.c          |    3 +-
+ net/bluetooth/mgmt.c              |  326 +++++++++++++------
+ 7 files changed, 826 insertions(+), 691 deletions(-)
 
