@@ -1,26 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 27 Feb 2013 12:55:54 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH sbc] build: Do not use deprecated AM_CONFIG_HEADER
-Message-ID: <20130227105554.GA24198@x220.ger.corp.intel.com>
-References: <1360852021-2693-1-git-send-email-lucas.demarchi@profusion.mobi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1360852021-2693-1-git-send-email-lucas.demarchi@profusion.mobi>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 3/3 v2] gdbus: Fix not calling property_changed callback
+Date: Wed, 27 Feb 2013 11:06:25 +0200
+Message-Id: <1361955985-27485-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1361955985-27485-1-git-send-email-luiz.dentz@gmail.com>
+References: <1361955985-27485-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Feb 14, 2013, Lucas De Marchi wrote:
-> The long-obsoleted AM_CONFIG_HEADER macro was removed in automake 1.13.
-> Use AC_CONFIG_HEADERS instead.
-> ---
->  configure.ac | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+In case a property did not appear by the time proxy_added was called
+property_changed has to be called if it appear latter otherwise the
+application will be unaware of it.
+---
+ gdbus/client.c | 23 ++++++++++-------------
+ 1 file changed, 10 insertions(+), 13 deletions(-)
 
-Applied. Thanks.
+diff --git a/gdbus/client.c b/gdbus/client.c
+index 369e3ac..2a7d2e1 100644
+--- a/gdbus/client.c
++++ b/gdbus/client.c
+@@ -205,6 +205,7 @@ static void prop_entry_free(gpointer data)
+ static void add_property(GDBusProxy *proxy, const char *name,
+ 				DBusMessageIter *iter, gboolean send_changed)
+ {
++	GDBusClient *client = proxy->client;
+ 	DBusMessageIter value;
+ 	struct prop_entry *prop;
+ 
+@@ -215,20 +216,8 @@ static void add_property(GDBusProxy *proxy, const char *name,
+ 
+ 	prop = g_hash_table_lookup(proxy->prop_list, name);
+ 	if (prop != NULL) {
+-		GDBusClient *client = proxy->client;
+-
+ 		prop_entry_update(prop, &value);
+-
+-		if (proxy->prop_func)
+-			proxy->prop_func(proxy, name, &value, proxy->prop_data);
+-
+-		if (client == NULL || send_changed == FALSE)
+-			return;
+-
+-		if (client->property_changed)
+-			client->property_changed(proxy, name, &value,
+-							client->user_data);
+-		return;
++		goto done;
+ 	}
+ 
+ 	prop = prop_entry_new(name, &value);
+@@ -237,8 +226,16 @@ static void add_property(GDBusProxy *proxy, const char *name,
+ 
+ 	g_hash_table_replace(proxy->prop_list, prop->name, prop);
+ 
++done:
+ 	if (proxy->prop_func)
+ 		proxy->prop_func(proxy, name, &value, proxy->prop_data);
++
++	if (client == NULL || send_changed == FALSE)
++		return;
++
++	if (client->property_changed)
++		client->property_changed(proxy, name, &value,
++							client->user_data);
+ }
+ 
+ static void update_properties(GDBusProxy *proxy, DBusMessageIter *iter,
+-- 
+1.8.1.2
 
-Johan
