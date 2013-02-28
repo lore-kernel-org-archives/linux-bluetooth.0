@@ -1,35 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 07/10 v3] player: Only emit PropertiesChanged for Position if track exists
-Date: Thu, 28 Feb 2013 16:47:08 +0200
-Message-Id: <1362062830-24549-8-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1362062830-24549-1-git-send-email-luiz.dentz@gmail.com>
-References: <1362062830-24549-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 0/2] obexd: Add support for retrieving messages in fractions
+Date: Thu, 28 Feb 2013 16:08:42 +0100
+Message-Id: <1362064124-29787-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
----
- profiles/audio/player.c | 4 ++++
- 1 file changed, 4 insertions(+)
+The MAP specification allows the client to retrieve messages in fractions,
+if the complete message is not yet available on the server.
 
-diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index 566fc73..faf497a 100644
---- a/profiles/audio/player.c
-+++ b/profiles/audio/player.c
-@@ -814,6 +814,10 @@ void media_player_set_position(struct media_player *mp, uint32_t position)
- {
- 	DBG("%u", position);
- 
-+	/* Only update duration if track exists */
-+	if (g_hash_table_size(mp->track) == 0)
-+		return;
-+
- 	mp->position = position;
- 	g_timer_start(mp->progress);
- 
+In case of some push-email services, the first fraction is available
+on the phone and can be downloaded immediately. Further fractions or
+attachments might not be available and have to be downloaded from the
+network first.
+
+In order to extend org.bluez.obex.Message1.Get with a FractionRequest
+parameter, I have moved the currently existing parameter Attachment
+into an args dict and made it optional (defaulting to true).
+How are such interface changes handled in BlueZ 5? Should I increment
+the interface version number as well? Or is that done with the next
+release?
+
+Christian Fetzer (2):
+  obexd: Move Message.Get parameter attachment into dictionary
+  obexd: Add support for retrieving messages in fractions
+
+ doc/obex-api.txt   |  22 +++++++-
+ obexd/client/map.c | 161 +++++++++++++++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 170 insertions(+), 13 deletions(-)
+
 -- 
-1.8.1.2
+1.8.1.4
 
