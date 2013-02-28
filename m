@@ -1,44 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHZ1yC=FkUt=ESbZ+OnfSXKrN0+XHVgcMxqOjQq-EaJU+TPf-w@mail.gmail.com>
-References: <CAHZ1yC=FkUt=ESbZ+OnfSXKrN0+XHVgcMxqOjQq-EaJU+TPf-w@mail.gmail.com>
-Date: Thu, 28 Feb 2013 22:23:57 +0200
-Message-ID: <CACumGOK+rmNt8xb6Ee-vkWRMoCDR0q-LQ-rPNsRwteKOpadJTQ@mail.gmail.com>
-Subject: Re: Bluez 5.2 A2DP: "Unable to select SEP"
-From: "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
-To: Scott James Remnant <keybuk@google.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.2 \(1499\))
+Subject: Re: [PATCH v3 13/16] Bluetooth: Fix busy condition testing for EIR and class updates
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1361951844-13719-14-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 28 Feb 2013 12:01:05 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <DCADC53A-261F-4CF0-A1CB-34DD7A49CA77@holtmann.org>
+References: <1361951844-13719-1-git-send-email-johan.hedberg@gmail.com> <1361951844-13719-14-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Scott,
+Hi Johan,
 
-On Thu, Feb 28, 2013 at 9:51 PM, Scott James Remnant <keybuk@google.com> wrote:
-> Hey,
->
-> I'm having some difficulties connecting up A2DP in BlueZ 5.2, and I'm
-> sure I'm just missing something obvious so would appreciate a second
-> set of eyes.
->
-> I had thought that to send to an A2DP Sink on a device, I needed an
-> A2DP Source endpoint at my end, but when I try and register that
-> endpoint I just get org.bluez.Error.NotSupported
 
-Check your /etc/bluetooth/audio.conf, you must have disabled it for some reason.
+> The add/remove_uuid and set_dev_class mgmt commands can trigger both EIR
+> and class HCI commands, so testing just for a pending class command is
+> enough. The simplest way to monitor conflicts that should trigger "busy"
+> error returns is to check for any pending mgmt command that can trigger
+> these HCI commands. This patch adds a helper function for this
+> (pending_eir_or_class) and uses it instead of the old HCI_PENDING_CLASS
+> flag to test for busy conditions.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/mgmt.c |   39 ++++++++++++++++++++++++++++++---------
+> 1 file changed, 30 insertions(+), 9 deletions(-)
+> 
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index b2a9697..41a3265 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -1341,6 +1341,23 @@ unlock:
+> 	return err;
+> }
+> 
+> +static bool pending_eir_or_class(struct hci_dev *hdev)
+> +{
+> +	struct pending_cmd *cmd;
+> +
+> +	list_for_each_entry(cmd, &hdev->mgmt_pending, list) {
+> +		switch (cmd->opcode) {
+> +		case MGMT_OP_ADD_UUID:
+> +		case MGMT_OP_REMOVE_UUID:
+> +		case MGMT_OP_SET_DEV_CLASS:
+> +		case MGMT_OP_SET_POWERED:
+> +			return true;
+> +		}
+> +	}
+> +
+> +	return false;
+> +}
+> +
 
-> I can register an A2DP Sink endpoint no problem, but then when I call
-> org.bluez.Device1.Connect the connection fails with "Unable to select
-> SEP" in the logs.
+I do not like this at all. Why would we do it like this?
 
-You need to register a A2DP Source endpoint in case you want to send
-to a Sink, maybe what happened is that we change the roles in the
-audio.conf, it used to be the remote role/interface but I think commit
-3a45f6e39fb89da3e518c43aa1bde5f41209c07d has changed that probably by
-mistake since it doesn't mention anything in the description of the
-patch.
+The transaction framework should allow us to just process these one at a time. So even if userspace send 20 add_uuid commands at the same time, we would deal with them one after the other.
 
-Now the question is, shall we bring the old behavior back? In the long
-term I think we will move away of plugin specific config file such as
-audio.conf and have something in main.conf to disable the
-plugins/profiles.
+What I am trying to understand what is the benefit of returning busy here.
+
+Regards
+
+Marcel
+
