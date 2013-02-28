@@ -1,168 +1,250 @@
 Return-Path: <cyrus@holtmann.org>
-From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] obexd: Move Message.Get parameter attachment into dictionary
-Date: Thu, 28 Feb 2013 16:08:43 +0100
-Message-Id: <1362064124-29787-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
-In-Reply-To: <1362064124-29787-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1362064124-29787-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH BlueZ 03/10 v3] player: Add defines for item types and folder types
+Date: Thu, 28 Feb 2013 16:47:04 +0200
+Message-Id: <1362062830-24549-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1362062830-24549-1-git-send-email-luiz.dentz@gmail.com>
+References: <1362062830-24549-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is a preparation for adding additional parameters to Message.Get.
-The parsing of the args dictionary is done in parse_get_options.
-
-The Attachment parameter has been moved into the args dictionary.
-The parameter is now optional defaulting to true.
+This avoid having to allocate memory just to store string representation
+of these types.
 ---
- doc/obex-api.txt   |  9 ++++++-
- obexd/client/map.c | 79 ++++++++++++++++++++++++++++++++++++++++++++++--------
- 2 files changed, 76 insertions(+), 12 deletions(-)
+ profiles/audio/avrcp.c  |  6 ++--
+ profiles/audio/player.c | 81 ++++++++++++++++++++++++++++++++++++++-----------
+ profiles/audio/player.h | 16 +++++++++-
+ 3 files changed, 82 insertions(+), 21 deletions(-)
 
-diff --git a/doc/obex-api.txt b/doc/obex-api.txt
-index 759c4d8..0dd1261 100644
---- a/doc/obex-api.txt
-+++ b/doc/obex-api.txt
-@@ -717,7 +717,7 @@ Service		org.bluez.obex
- Interface	org.bluez.obex.Message1
- Object path	[variable prefix]/{session0,session1,...}/{message0,...}
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 5f0f0a4..110910d 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -2035,14 +2035,16 @@ static void avrcp_player_parse_features(struct avrcp_player *player,
  
--Methods		object, dict Get(string targetfile, boolean attachment)
-+Methods		object, dict Get(string targetfile, dict args)
+ 	if (features[7] & 0x08) {
+ 		media_player_set_browsable(mp, true);
+-		media_player_create_folder(mp, "/Filesystem", "mixed");
++		media_player_create_folder(mp, "/Filesystem",
++						PLAYER_FOLDER_TYPE_MIXED);
+ 	}
  
- 			Download message and store it in the target file.
+ 	if (features[7] & 0x10)
+ 		media_player_set_searchable(mp, true);
  
-@@ -731,6 +731,13 @@ Methods		object, dict Get(string targetfile, boolean attachment)
- 			The properties of this transfer are also returned along
- 			with the object path, to avoid a call to GetProperties.
- 
-+			Possible args:
-+
-+				boolean Attachment
-+
-+					Request message attachment,
-+					defaults to True
-+
- 			Possible errors: org.bluez.obex.Error.InvalidArguments
- 					 org.bluez.obex.Error.Failed
- 
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index 2b665ec..b7e6428 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -385,34 +385,91 @@ static void map_msg_free(void *data)
- 	g_free(msg);
+ 	if (features[8] & 0x02)
+-		media_player_create_folder(mp, "/NowPlaying", "mixed");
++		media_player_create_folder(mp, "/NowPlaying",
++						PLAYER_FOLDER_TYPE_MIXED);
  }
  
-+static GObexApparam *parse_attachment(GObexApparam *apparam,
-+							DBusMessageIter *iter)
+ static void avrcp_parse_media_player_item(struct avrcp *session,
+diff --git a/profiles/audio/player.c b/profiles/audio/player.c
+index c4dd588..fa6b436 100644
+--- a/profiles/audio/player.c
++++ b/profiles/audio/player.c
+@@ -62,8 +62,8 @@ struct media_item {
+ 	struct media_player	*player;
+ 	char			*path;		/* Item object path */
+ 	char			*name;		/* Item name */
+-	char			*type;		/* Item type */
+-	char			*folder_type;	/* Folder type */
++	uint8_t			type;		/* Item type */
++	uint8_t			folder_type;	/* Folder type */
+ 	bool			playable;	/* Item playable flag */
+ };
+ 
+@@ -687,8 +687,6 @@ static void media_item_destroy(void *data)
+ 
+ 	g_free(item->path);
+ 	g_free(item->name);
+-	g_free(item->type);
+-	g_free(item->folder_type);
+ 	g_free(item);
+ }
+ 
+@@ -986,7 +984,7 @@ static struct media_item *media_player_find_folder(struct media_player *mp,
+ 	for (l = mp->folders; l; l = l->next) {
+ 		struct media_item *item = l->data;
+ 
+-		if (g_strcmp0(item->type, "folder") != 0)
++		if (item->type != PLAYER_ITEM_TYPE_FOLDER)
+ 			continue;
+ 
+ 		if (g_str_equal(item->name, name))
+@@ -1047,14 +1045,31 @@ static gboolean get_item_name(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
++static const char *type_to_string(uint8_t type)
 +{
-+	dbus_bool_t attachment;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
-+		return NULL;
-+
-+	dbus_message_iter_get_basic(iter, &attachment);
-+
-+	return g_obex_apparam_set_uint8(apparam, MAP_AP_ATTACHMENT,
-+						attachment ? TRUE : FALSE);
-+}
-+
-+static GObexApparam *parse_get_options(GObexApparam *apparam,
-+							DBusMessageIter *iter)
-+{
-+	DBusMessageIter array;
-+
-+	DBG("");
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
-+		return NULL;
-+
-+	dbus_message_iter_recurse(iter, &array);
-+
-+	while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_DICT_ENTRY) {
-+		const char *key;
-+		DBusMessageIter value, entry;
-+
-+		dbus_message_iter_recurse(&array, &entry);
-+		dbus_message_iter_get_basic(&entry, &key);
-+
-+		dbus_message_iter_next(&entry);
-+		dbus_message_iter_recurse(&entry, &value);
-+
-+		if (strcasecmp(key, "Attachment") == 0) {
-+			if (parse_attachment(apparam, &value) == NULL)
-+				return NULL;
-+		}
-+
-+		dbus_message_iter_next(&array);
++	switch (type) {
++	case PLAYER_ITEM_TYPE_AUDIO:
++		return "audio";
++	case PLAYER_ITEM_TYPE_VIDEO:
++		return "video";
++	case PLAYER_ITEM_TYPE_FOLDER:
++		return "folder";
 +	}
 +
-+	return apparam;
++	return NULL;
 +}
 +
- static DBusMessage *map_msg_get(DBusConnection *connection,
- 					DBusMessage *message, void *user_data)
+ static gboolean get_item_type(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
  {
- 	struct map_msg *msg = user_data;
- 	struct obc_transfer *transfer;
- 	const char *target_file;
--	gboolean attachment;
- 	GError *err = NULL;
- 	DBusMessage *reply;
- 	GObexApparam *apparam;
-+	DBusMessageIter args;
+ 	struct media_item *item = data;
++	const char *string;
+ 
+-	DBG("%s", item->type);
++	string = type_to_string(item->type);
+ 
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &item->type);
++	DBG("%s", string);
 +
-+	dbus_message_iter_init(message, &args);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &string);
  
--	if (dbus_message_get_args(message, NULL,
--				DBUS_TYPE_STRING, &target_file,
--				DBUS_TYPE_BOOLEAN, &attachment,
--				DBUS_TYPE_INVALID) == FALSE)
-+	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_STRING)
- 		return g_dbus_create_error(message,
- 				ERROR_INTERFACE ".InvalidArguments", NULL);
+ 	return TRUE;
+ }
+@@ -1074,26 +1089,49 @@ static gboolean get_playable(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
  
--	transfer = obc_transfer_get("x-bt/message", msg->handle, target_file,
--									&err);
--	if (transfer == NULL)
--		goto fail;
-+	dbus_message_iter_get_basic(&args, &target_file);
-+
-+	dbus_message_iter_next(&args);
- 
- 	apparam = g_obex_apparam_set_uint8(NULL, MAP_AP_ATTACHMENT,
--								attachment);
-+								TRUE);
-+
- 	apparam = g_obex_apparam_set_uint8(apparam, MAP_AP_CHARSET,
- 								CHARSET_UTF8);
- 
-+	if (parse_get_options(apparam, &args) == NULL) {
-+		g_obex_apparam_free(apparam);
-+		return g_dbus_create_error(message,
-+				ERROR_INTERFACE ".InvalidArguments", NULL);
++static const char *folder_type_to_string(uint8_t type)
++{
++	switch (type) {
++	case PLAYER_FOLDER_TYPE_MIXED:
++		return "mixed";
++	case PLAYER_FOLDER_TYPE_TITLES:
++		return "titles";
++	case PLAYER_FOLDER_TYPE_ALBUMS:
++		return "albums";
++	case PLAYER_FOLDER_TYPE_ARTISTS:
++		return "artists";
++	case PLAYER_FOLDER_TYPE_GENRES:
++		return "genres";
++	case PLAYER_FOLDER_TYPE_PLAYLISTS:
++		return "playlists";
++	case PLAYER_FOLDER_TYPE_YEARS:
++		return "years";
 +	}
 +
-+	transfer = obc_transfer_get("x-bt/message", msg->handle, target_file,
-+									&err);
-+	if (transfer == NULL)
-+		goto fail;
++	return NULL;
++}
 +
- 	obc_transfer_set_apparam(transfer, apparam);
+ static gboolean folder_type_exists(const GDBusPropertyTable *property,
+ 								void *data)
+ {
+ 	struct media_item *item = data;
  
- 	if (!obc_session_queue(msg->data->session, transfer, NULL, NULL, &err))
-@@ -731,7 +788,7 @@ static void set_deleted(const GDBusPropertyTable *property,
- static const GDBusMethodTable map_msg_methods[] = {
- 	{ GDBUS_METHOD("Get",
- 			GDBUS_ARGS({ "targetfile", "s" },
--						{ "attachment", "b" }),
-+						{ "args", "a{sv}" }),
- 			GDBUS_ARGS({ "transfer", "o" },
- 						{ "properties", "a{sv}" }),
- 			map_msg_get) },
+-	return item->folder_type != NULL;
++	return folder_type_to_string(item->folder_type) != NULL;
+ }
+ 
+ static gboolean get_folder_type(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
+ {
+ 	struct media_item *item = data;
++	const char *string;
+ 
+-	if (item->folder_type == NULL)
++	string = folder_type_to_string(item->folder_type);
++	if (string == NULL)
+ 		return FALSE;
+ 
+-	DBG("%s", item->folder_type);
++	DBG("%s", string);
+ 
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
+-							&item->folder_type);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &string);
+ 
+ 	return TRUE;
+ }
+@@ -1120,17 +1158,23 @@ static const GDBusPropertyTable media_item_properties[] = {
+ 
+ static struct media_item *media_player_create_item(struct media_player *mp,
+ 							const char *name,
+-							const char *type)
++							uint8_t type)
+ {
+ 	struct media_item *item;
++	const char *strtype;
++
++	strtype = type_to_string(type);
++	if (strtype == NULL)
++		return NULL;
+ 
+-	DBG("%s type %s", name, type);
++	DBG("%s type %s", name, strtype);
+ 
+ 	item = g_new0(struct media_item, 1);
+ 	item->player = mp;
+ 	item->path = g_strdup_printf("%s%s", mp->path, name);
+ 	item->name = g_strdup(name);
+-	item->type = g_strdup(type);
++	item->type = type;
++	item->folder_type = PLAYER_FOLDER_TYPE_INVALID;
+ 
+ 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+ 					item->path, MEDIA_ITEM_INTERFACE,
+@@ -1147,15 +1191,16 @@ static struct media_item *media_player_create_item(struct media_player *mp,
+ }
+ 
+ int media_player_create_folder(struct media_player *mp, const char *name,
+-							const char *type)
++							uint8_t type)
+ {
+ 	struct media_item *item;
+ 
+-	item = media_player_create_item(mp, name, "folder");
++	item = media_player_create_item(mp, name,
++					PLAYER_ITEM_TYPE_FOLDER);
+ 	if (item == NULL)
+ 		return -EINVAL;
+ 
+-	item->folder_type = g_strdup(type);
++	item->folder_type = type;
+ 
+ 	if (mp->folder == NULL)
+ 		media_player_set_folder_item(mp, item, 0);
+diff --git a/profiles/audio/player.h b/profiles/audio/player.h
+index 28689c5..9888f56 100644
+--- a/profiles/audio/player.h
++++ b/profiles/audio/player.h
+@@ -23,6 +23,20 @@
+  *
+  */
+ 
++#define PLAYER_ITEM_TYPE_AUDIO		0x00
++#define PLAYER_ITEM_TYPE_VIDEO		0x01
++#define PLAYER_ITEM_TYPE_FOLDER		0x02
++#define PLAYER_ITEM_TYPE_INVALID	0xff
++
++#define PLAYER_FOLDER_TYPE_MIXED	0x00
++#define PLAYER_FOLDER_TYPE_TITLES	0x01
++#define PLAYER_FOLDER_TYPE_ALBUMS	0x02
++#define PLAYER_FOLDER_TYPE_ARTISTS	0x03
++#define PLAYER_FOLDER_TYPE_GENRES	0x04
++#define PLAYER_FOLDER_TYPE_PLAYLISTS	0x05
++#define PLAYER_FOLDER_TYPE_YEARS	0x06
++#define PLAYER_FOLDER_TYPE_INVALID	0xff
++
+ struct media_player;
+ 
+ struct media_player_callback {
+@@ -56,7 +70,7 @@ void media_player_set_folder(struct media_player *mp, const char *path,
+ 								uint32_t items);
+ 
+ int media_player_create_folder(struct media_player *mp, const char *name,
+-							const char *type);
++								uint8_t type);
+ 
+ void media_player_set_callbacks(struct media_player *mp,
+ 				const struct media_player_callback *cbs,
 -- 
-1.8.1.4
+1.8.1.2
 
