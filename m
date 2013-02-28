@@ -1,39 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Message-ID: <512EB3C4.1040606@wp.pl>
+Date: Thu, 28 Feb 2013 02:32:52 +0100
+From: "W.P." <laurentp@wp.pl>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 0/9 v2] AVRCP Fixes
-Date: Thu, 28 Feb 2013 14:21:59 +0200
-Message-Id: <1362054128-20569-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Can I make USB sound card be available over BT? How?
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi there,
+I have following setup:
+router with USB - TP-LINK MR-3220,
+USB 2.0 hub,
+CSR BT USB dongle plugged to hub,
+"USB audio card" plugged to the same hub.
 
-This set fixes some bugs with iOS and WP8 stacks, excessive changes on the
-metadata causing duplicate signals and some missing signals when properties
-changes.
+I use (successfully) this "card" to play internet radio (wget | madplay).
 
-v2: Rework MediaItem Type to be clear about folder items
+Now I want to enable this router to act as HF (stereo, A2DP?) device 
+over Bluetooth.
 
-Luiz Augusto von Dentz (9):
-  player: Fix property Device type
-  media: Rework MediaItem Type property
-  player: Add Playlist property
-  player: Fix not emitting PropertiesChanged for Browsable and
-    Searchable
-  AVRCP: Fix changing track metadata too many times
-  player: Only emit PropertiesChanged for Position if track exists
-  player: Only expose Track property if there is metadata
-  AVRCP: Add support to UIDs changed event for CT role
-  AVRCP: Fix storing wrong UID counter
+Client would be Android 2.1 phone and/or another Linux (laptop, Fedora 16)
 
- doc/media-api.txt       |  51 +++++++++++-----
- profiles/audio/avrcp.c  |  27 +++++++--
- profiles/audio/avrcp.h  |   1 +
- profiles/audio/player.c | 152 +++++++++++++++++++++++++++++++++++++++++-------
- profiles/audio/player.h |   4 +-
- 5 files changed, 191 insertions(+), 44 deletions(-)
+What modules (programs) I need (router has 4MB flash, so I need to 
+"hand-craft" firmware),
+and most important:how to configure it?
 
--- 
-1.8.1.2
+(do I need "nohands"? there is HF server, but it is 2 years old, and no 
+contact with author).
 
+Current software is OpenWRT trunk 33310, compiled at home. (kernel 3.2, 
+uClibc).
+
+For tests, I'll run on Fedora 16 (kernel 3.6.11).
+
+[same question on OpenWRT forum (and Buildroot list) is still w/o 
+response... :( ]
+
+W.P.
