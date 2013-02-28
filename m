@@ -1,166 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.2 \(1499\))
-Subject: Re: [PATCH v3 03/16] Bluetooth: Add initial skeleton for HCI transaction framework
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1361951844-13719-4-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 28 Feb 2013 11:52:02 -0800
+MIME-Version: 1.0
+Date: Thu, 28 Feb 2013 11:51:58 -0800
+Message-ID: <CAHZ1yC=FkUt=ESbZ+OnfSXKrN0+XHVgcMxqOjQq-EaJU+TPf-w@mail.gmail.com>
+Subject: Bluez 5.2 A2DP: "Unable to select SEP"
+From: Scott James Remnant <keybuk@google.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <4FF31B76-4E16-4481-9158-4874B3D67349@holtmann.org>
-References: <1361951844-13719-1-git-send-email-johan.hedberg@gmail.com> <1361951844-13719-4-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hey,
 
+I'm having some difficulties connecting up A2DP in BlueZ 5.2, and I'm
+sure I'm just missing something obvious so would appreciate a second
+set of eyes.
 
-> This patch adds the initial definitions and functions for HCI
-> transactions. HCI transactions are essentially a group of HCI commands
-> together with an optional completion callback. The transaction is
-> tracked through the already existing command queue by having the
-> necessary context information as part of the control buffer of each skb.
-> 
-> The only information needed in the skb control buffer is a flag for
-> indicating that the skb is the start of a transaction as well as the
-> optional complete callback that should be used for the transaction (this
-> will only be set for skbs that also have the start flag set).
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> include/net/bluetooth/bluetooth.h |   11 +++++++++++
-> include/net/bluetooth/hci_core.h  |   13 +++++++++++++
-> net/bluetooth/hci_core.c          |   34 ++++++++++++++++++++++++++++++++++
-> 3 files changed, 58 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index 5f51bef..bfcdb56 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -260,12 +260,23 @@ struct l2cap_ctrl {
-> 	__u8		retries;
-> };
-> 
-> +struct hci_dev;
-> +
-> +typedef void (*transaction_complete_t)(struct hci_dev *hdev, u16 last_cmd,
-> +				       int status);
+I had thought that to send to an A2DP Sink on a device, I needed an
+A2DP Source endpoint at my end, but when I try and register that
+endpoint I just get org.bluez.Error.NotSupported
 
-why is status an int and not __u8?
+I can register an A2DP Sink endpoint no problem, but then when I call
+org.bluez.Device1.Connect the connection fails with "Unable to select
+SEP" in the logs.
 
-We might want to prefix this with hci_ here. Just in case someone includes this header.
+Any ideas?
 
-> +
-> +struct transaction_ctrl {
-
-Same here. hci_ prefix seems like a good idea.
-
-> +	__u8			start;
-
-Why is not a bool and we are using true/false. Magic numbers like 1 in the code seem like a bad idea.
-
-> +	transaction_complete_t	complete;
-> +};
-> +
-> struct bt_skb_cb {
-> 	__u8 pkt_type;
-> 	__u8 incoming;
-> 	__u16 expect;
-> 	__u8 force_active;
-> 	struct l2cap_ctrl control;
-> +	struct transaction_ctrl transaction;
-> };
-> #define bt_cb(skb) ((struct bt_skb_cb *)((skb)->cb))
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 787d3b9..e97d8e5 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -248,6 +248,8 @@ struct hci_dev {
-> 	__u32			req_status;
-> 	__u32			req_result;
-> 
-> +	transaction_complete_t	transaction_complete;
-> +
-> 	__u16			init_last_cmd;
-> 
-> 	struct list_head	mgmt_pending;
-> @@ -1041,6 +1043,17 @@ static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type, u8 *data,
-> int hci_register_cb(struct hci_cb *hcb);
-> int hci_unregister_cb(struct hci_cb *hcb);
-> 
-> +struct hci_transaction {
-> +	struct hci_dev		*hdev;
-> +	struct sk_buff_head	cmd_q;
-> +	transaction_complete_t	complete;
-> +};
-> +
-> +void hci_transaction_init(struct hci_transaction *transaction,
-> +			  struct hci_dev *hdev,
-> +			  transaction_complete_t complete);
-> +int hci_transaction_run(struct hci_transaction *transaction);
-> +
-> int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param);
-> void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags);
-> void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb);
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index f71ad76..ef051b7 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -2435,6 +2435,35 @@ static int hci_send_frame(struct sk_buff *skb)
-> 	return hdev->send(skb);
-> }
-> 
-> +void hci_transaction_init(struct hci_transaction *transaction,
-> +			  struct hci_dev *hdev,
-> +			  transaction_complete_t complete)
-> +{
-> +	memset(transaction, 0, sizeof(*transaction));
-> +	skb_queue_head_init(&transaction->cmd_q);
-> +	transaction->hdev = hdev;
-> +	transaction->complete = complete;
-> +}
-> +
-> +int hci_transaction_run(struct hci_transaction *transaction)
-> +{
-> +	struct hci_dev *hdev = transaction->hdev;
-> +
-> +	BT_DBG("length %u", skb_queue_len(&transaction->cmd_q));
-> +
-> +	/* Do not allow empty transactions */
-> +	if (skb_queue_empty(&transaction->cmd_q))
-> +		return -EINVAL;
-> +
-> +	spin_lock(&hdev->cmd_q.lock);
-> +	skb_queue_splice_tail(&transaction->cmd_q, &hdev->cmd_q);
-> +	spin_unlock(&hdev->cmd_q.lock);
-> +
-> +	queue_work(hdev->workqueue, &hdev->cmd_work);
-> +
-> +	return 0;
-> +}
-
-I am wondering why we are not giving the complete handler when finishing the transaction. Having a copy of the handler in hci_dev structure seems a bit pointless. What is the reason here?
-
-> +
-> /* Send HCI command */
-> int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
-> {
-> @@ -3209,6 +3238,11 @@ static void hci_cmd_work(struct work_struct *work)
-> 		hdev->sent_cmd = skb_clone(skb, GFP_ATOMIC);
-> 		if (hdev->sent_cmd) {
-> 			atomic_dec(&hdev->cmd_cnt);
-> +
-> +			if (bt_cb(skb)->transaction.start)
-> +				hdev->transaction_complete =
-> +					bt_cb(skb)->transaction.complete;
-> +
-> 			hci_send_frame(skb);
-> 			if (test_bit(HCI_RESET, &hdev->flags))
-> 				del_timer(&hdev->cmd_timer);
-
-Regards
-
-Marcel
-
-
+Scott
+--
+Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
