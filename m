@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/9 v2] player: Fix not emitting PropertiesChanged for Browsable and Searchable
-Date: Thu, 28 Feb 2013 14:22:03 +0200
-Message-Id: <1362054128-20569-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/9 v2] player: Add Playlist property
+Date: Thu, 28 Feb 2013 14:22:02 +0200
+Message-Id: <1362054128-20569-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1362054128-20569-1-git-send-email-luiz.dentz@gmail.com>
 References: <1362054128-20569-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,38 +11,136 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Browsable and Searchable should emit PropertiesChanged when their values
-changes.
+Playlist property refer to the folder where the list of items being
+played can be found.
 ---
- profiles/audio/player.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ doc/media-api.txt       |  4 ++++
+ profiles/audio/avrcp.c  |  4 +++-
+ profiles/audio/player.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+ profiles/audio/player.h |  1 +
+ 4 files changed, 53 insertions(+), 2 deletions(-)
 
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index 699affa..6bafd47 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -259,6 +259,10 @@ Properties	string Equalizer [readwrite]
+ 			by using MediaLibrary interface but it might interfere
+ 			in the playback of other players.
+ 
++		object Playlist
++
++			Playlist object path.
++
+ MediaFolder1 hierarchy
+ ======================
+ 
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 5f0f0a4..a122fec 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -2041,8 +2041,10 @@ static void avrcp_player_parse_features(struct avrcp_player *player,
+ 	if (features[7] & 0x10)
+ 		media_player_set_searchable(mp, true);
+ 
+-	if (features[8] & 0x02)
++	if (features[8] & 0x02) {
+ 		media_player_create_folder(mp, "/NowPlaying", "mixed");
++		media_player_set_playlist(mp, "/NowPlaying");
++	}
+ }
+ 
+ static void avrcp_parse_media_player_item(struct avrcp *session,
 diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index a8d18c1..c446cca 100644
+index 2593cd5..a8d18c1 100644
 --- a/profiles/audio/player.c
 +++ b/profiles/audio/player.c
-@@ -961,6 +961,10 @@ void media_player_set_browsable(struct media_player *mp, bool enabled)
- 	DBG("%s", enabled ? "true" : "false");
- 
- 	mp->browsable = enabled;
-+
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+					mp->path, MEDIA_PLAYER_INTERFACE,
-+					"Browsable");
+@@ -79,7 +79,8 @@ struct media_player {
+ 	char			*subtype;	/* Player subtype */
+ 	bool			browsable;	/* Player browsing feature */
+ 	bool			searchable;	/* Player searching feature */
+-	struct media_folder	*folder;	/* Player currenct folder */
++	struct media_folder	*folder;	/* Player current folder */
++	struct media_item	*playlist;	/* Player current playlist */
+ 	char			*path;		/* Player object path */
+ 	GHashTable		*settings;	/* Player settings */
+ 	GHashTable		*track;		/* Player current track */
+@@ -414,6 +415,29 @@ static gboolean get_searchable(const GDBusPropertyTable *property,
+ 	return TRUE;
  }
  
- void media_player_set_searchable(struct media_player *mp, bool enabled)
-@@ -968,6 +972,10 @@ void media_player_set_searchable(struct media_player *mp, bool enabled)
- 	DBG("%s", enabled ? "true" : "false");
- 
- 	mp->searchable = enabled;
++static gboolean playlist_exists(const GDBusPropertyTable *property,
++								void *data)
++{
++	struct media_player *mp = data;
 +
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+					mp->path, MEDIA_PLAYER_INTERFACE,
-+					"Searchable");
++	return mp->playlist != NULL;
++}
++
++static gboolean get_playlist(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct media_player *mp = data;
++	struct media_item *playlist = mp->playlist;
++
++	if (playlist == NULL)
++		return FALSE;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH,
++							&playlist->path);
++
++	return TRUE;
++}
++
+ static DBusMessage *media_player_play(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
+ {
+@@ -578,6 +602,8 @@ static const GDBusPropertyTable media_player_properties[] = {
+ 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+ 	{ "Searchable", "b", get_searchable, NULL, searchable_exists,
+ 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++	{ "Playlist", "o", get_playlist, NULL, playlist_exists,
++					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+ 	{ }
+ };
+ 
+@@ -1012,6 +1038,24 @@ void media_player_set_folder(struct media_player *mp, const char *name,
+ 	media_player_set_folder_item(mp, item, number_of_items);
  }
  
- static void media_player_set_folder_item(struct media_player *mp,
++void media_player_set_playlist(struct media_player *mp, const char *name)
++{
++	struct media_item *item;
++
++	DBG("%s", name);
++
++	item = media_player_find_folder(mp, name);
++	if (item == NULL) {
++		error("Unknown folder: %s", name);
++		return;
++	}
++
++	mp->playlist = item;
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(), mp->path,
++					MEDIA_PLAYER_INTERFACE, "Playlist");
++}
++
+ static DBusMessage *media_item_play(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
+ {
+diff --git a/profiles/audio/player.h b/profiles/audio/player.h
+index 28689c5..c8c1f1b 100644
+--- a/profiles/audio/player.h
++++ b/profiles/audio/player.h
+@@ -54,6 +54,7 @@ void media_player_set_browsable(struct media_player *mp, bool enabled);
+ void media_player_set_searchable(struct media_player *mp, bool enabled);
+ void media_player_set_folder(struct media_player *mp, const char *path,
+ 								uint32_t items);
++void media_player_set_playlist(struct media_player *mp, const char *name);
+ 
+ int media_player_create_folder(struct media_player *mp, const char *name,
+ 							const char *type);
 -- 
 1.8.1.2
 
