@@ -1,75 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHZ1yC=FkUt=ESbZ+OnfSXKrN0+XHVgcMxqOjQq-EaJU+TPf-w@mail.gmail.com>
+In-Reply-To: <CACumGOKG-bzZ-KM6a9Ay+HivvtS3bQN=gFM_P9wNtrrr=inv1w@mail.gmail.com>
 References: <CAHZ1yC=FkUt=ESbZ+OnfSXKrN0+XHVgcMxqOjQq-EaJU+TPf-w@mail.gmail.com>
-Date: Thu, 28 Feb 2013 13:25:10 -0800
-Message-ID: <CAHZ1yCmmPvo-XCrNB5N3KpefQC67CSNZkc_DZNSP0-HRhG1Tfw@mail.gmail.com>
+	<CACumGOK+rmNt8xb6Ee-vkWRMoCDR0q-LQ-rPNsRwteKOpadJTQ@mail.gmail.com>
+	<CAHZ1yCnWf0mamOLk9n9q4CfbXqhGhxG7H2tXmxLus3-keFM51g@mail.gmail.com>
+	<CD0EF9D5-67A4-4D64-9F81-9E494E879B7B@holtmann.org>
+	<CACumGOKG-bzZ-KM6a9Ay+HivvtS3bQN=gFM_P9wNtrrr=inv1w@mail.gmail.com>
+Date: Thu, 28 Feb 2013 13:15:39 -0800
+Message-ID: <CAHZ1yCkpsoaL4jhH=STqt3BVMtiNajPAN83Cm_cufqSeUKjWUQ@mail.gmail.com>
 Subject: Re: Bluez 5.2 A2DP: "Unable to select SEP"
 From: Scott James Remnant <keybuk@google.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
+To: "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I guess I spoke too soon, I can get the endpoint connected with this
-config change, but it just fails a little later now with
-"avdtp_set_configuration: Transport endpoint is not connected"
-
-Here's the log of the connect call; note that I see the
-SelectConfiguration and reply to it on the endpoint side - but never
-receive a SetConfiguration call:
-
-bluetoothd[24139]: src/device.c:connect_profiles()
-/org/bluez/hci0/dev_10_B7_F6_01_31_ED (all), client :1.389
-bluetoothd[24139]: profiles/audio/manager.c:a2dp_sink_connect() path
-/org/bluez/hci0/dev_10_B7_F6_01_31_ED
-bluetoothd[24139]: profiles/audio/avdtp.c:avdtp_ref() 0x7f68d07c8790: ref=2
-bluetoothd[24139]: profiles/audio/sink.c:sink_connect() stream
-creation in progress
-bluetoothd[24139]: profiles/audio/sink.c:discovery_complete() Discovery complete
-bluetoothd[24139]: profiles/audio/a2dp.c:setup_ref() 0x7f68d079aff0: ref=2
-bluetoothd[24139]: profiles/audio/media.c:media_endpoint_async_call()
-Calling SelectConfiguration: name = :1.398 path
- = /org/chromium/Cras/Bluetooth/A2DPSource
-bluetoothd[24139]: profiles/audio/a2dp.c:a2dp_config() a2dp_config:
-selected SEP 0x7f68d07d9640
-bluetoothd[24139]: profiles/audio/a2dp.c:setup_ref() 0x7f68d079aff0: ref=3
-bluetoothd[24139]: avdtp_set_configuration: Transport endpoint is not connected
-bluetoothd[24139]: profiles/audio/a2dp.c:setup_unref() 0x7f68d079aff0: ref=2
-bluetoothd[24139]: src/device.c:device_profile_connected() audio-sink
-Input/output error (5)
-bluetoothd[24139]: profiles/audio/manager.c:avrcp_control_connect()
-path /org/bluez/hci0/dev_10_B7_F6_01_31_ED
-bluetoothd[24139]: Failed to connect audio-avrcp: Operation not supported
-bluetoothd[24139]: src/device.c:device_profile_connected() returning
-response to :1.389
-bluetoothd[24139]: profiles/audio/avdtp.c:avdtp_unref() 0x7f68d07c8790: ref=1
-bluetoothd[24139]: profiles/audio/a2dp.c:setup_unref() 0x7f68d079aff0: ref=1
+Enabling both works for me; and leave it up to the audio manager to
+actually provide the Endpoints it wants to support.
 
 Scott
 
-On Thu, Feb 28, 2013 at 11:51 AM, Scott James Remnant <keybuk@google.com> wrote:
-> Hey,
+On Thu, Feb 28, 2013 at 1:14 PM, Von Dentz, Luiz
+<luiz.von.dentz@intel.com> wrote:
+
+> Hi Marcel, Scott,
 >
-> I'm having some difficulties connecting up A2DP in BlueZ 5.2, and I'm
-> sure I'm just missing something obvious so would appreciate a second
-> set of eyes.
+> On Thu, Feb 28, 2013 at 10:49 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> Hi Scott,
+>>
+>>
+>>>> On Thu, Feb 28, 2013 at 9:51 PM, Scott James Remnant <keybuk@google.com> wrote:
+>>>>> I'm having some difficulties connecting up A2DP in BlueZ 5.2, and I'm
+>>>>> sure I'm just missing something obvious so would appreciate a second
+>>>>> set of eyes.
+>>>>>
+>>>>> I had thought that to send to an A2DP Sink on a device, I needed an
+>>>>> A2DP Source endpoint at my end, but when I try and register that
+>>>>> endpoint I just get org.bluez.Error.NotSupported
+>>>>
+>>>> Check your /etc/bluetooth/audio.conf, you must have disabled it for some reason.
+>>>>
+>>>
+>>> There isn't an audio.conf shipped with BlueZ 5.2; checking
+>>> profiles/audio/manager.c it has:
+>>>
+>>> static struct enabled_interfaces enabled = {
+>>>        .sink           = TRUE,
+>>>        .source         = FALSE,
+>>>        .control        = TRUE,
+>>> };
+>>>
+>>> This seems bizarre that registering audio sinks (which I read as
+>>> sending A2DP from the device to the host) is enabled by default, but
+>>> not the more usual registering of an audio source (to send to an A2DP
+>>> sink on the device).
 >
-> I had thought that to send to an A2DP Sink on a device, I needed an
-> A2DP Source endpoint at my end, but when I try and register that
-> endpoint I just get org.bluez.Error.NotSupported
+> Yep, it was the result of changing the roles, I guess we should enable
+> them both by default and if the distro don't want one of them just
+> disable in the config file.
 >
-> I can register an A2DP Sink endpoint no problem, but then when I call
-> org.bluez.Device1.Connect the connection fails with "Unable to select
-> SEP" in the logs.
+>> we want to move to a state where BlueZ works out-of-the-box with no extra config files needed. So I think we should just fix this and always have at least one sink and one source present.
+>>
+>> Or if that causes issues, then at least have this depend on PA (or some other audio manager) making that call for us. The default behaviour needs to just work.
 >
-> Any ideas?
+> By default I would enable them both as nowadays both should work, well
+> I guess this is valid for every profile that is not market as
+> experimental it should be enabled by default, so how about the
+> following patch:
 >
-> Scott
-> --
-> Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
+> diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
+> index 934227e..163fcba 100644
+> --- a/profiles/audio/manager.c
+> +++ b/profiles/audio/manager.c
+> @@ -72,7 +72,7 @@ static GSList *devices = NULL;
+>
+>  static struct enabled_interfaces enabled = {
+>         .sink           = TRUE,
+> -       .source         = FALSE,
+> +       .source         = TRUE,
+>         .control        = TRUE,
+>  };
+>
+> Or maybe I just remove the whole enabled thing and have the core to handle this.
 
 
 
---
+-- 
 Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
