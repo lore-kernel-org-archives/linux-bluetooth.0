@@ -1,106 +1,182 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CANT-zCV2L3ju8LPakxrxvygoaOST38T8SPMWqid9guH1+vLj_g@mail.gmail.com>
-References: <CAHZ1yC=FkUt=ESbZ+OnfSXKrN0+XHVgcMxqOjQq-EaJU+TPf-w@mail.gmail.com>
-	<CACumGOK+rmNt8xb6Ee-vkWRMoCDR0q-LQ-rPNsRwteKOpadJTQ@mail.gmail.com>
-	<CAHZ1yCnWf0mamOLk9n9q4CfbXqhGhxG7H2tXmxLus3-keFM51g@mail.gmail.com>
-	<CD0EF9D5-67A4-4D64-9F81-9E494E879B7B@holtmann.org>
-	<CACumGOKG-bzZ-KM6a9Ay+HivvtS3bQN=gFM_P9wNtrrr=inv1w@mail.gmail.com>
-	<CAHZ1yCkpsoaL4jhH=STqt3BVMtiNajPAN83Cm_cufqSeUKjWUQ@mail.gmail.com>
-	<CANT-zCV2L3ju8LPakxrxvygoaOST38T8SPMWqid9guH1+vLj_g@mail.gmail.com>
-Date: Fri, 1 Mar 2013 15:20:39 +0200
-Message-ID: <CABBYNZJC4V9=+NDhsJ4hDNS2AHvJ6tehiE7OAbSHHUpznVQsFw@mail.gmail.com>
-Subject: Re: Bluez 5.2 A2DP: "Unable to select SEP"
+In-Reply-To: <1362064124-29787-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1362064124-29787-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+	<1362064124-29787-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Date: Fri, 1 Mar 2013 15:17:41 +0200
+Message-ID: <CABBYNZJQCKST+4AA9vemQTeUN9M7W_4tWZ+QfsAWMaz6wtLWcQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] obexd: Move Message.Get parameter attachment into dictionary
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: Scott James Remnant <keybuk@google.com>, "Von Dentz, Luiz" <luiz.von.dentz@intel.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HI Mikel,
+Hi Christian,
 
-On Fri, Mar 1, 2013 at 12:47 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> Hi,
+On Thu, Feb 28, 2013 at 5:08 PM, Christian Fetzer
+<christian.fetzer@oss.bmw-carit.de> wrote:
+> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 >
-> On Thu, Feb 28, 2013 at 10:15 PM, Scott James Remnant <keybuk@google.com> wrote:
->> Enabling both works for me; and leave it up to the audio manager to
->> actually provide the Endpoints it wants to support.
->>
->> Scott
->>
->> On Thu, Feb 28, 2013 at 1:14 PM, Von Dentz, Luiz
->> <luiz.von.dentz@intel.com> wrote:
->>
->>> Hi Marcel, Scott,
->>>
->>> On Thu, Feb 28, 2013 at 10:49 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
->>>> Hi Scott,
->>>>
->>>>
->>>>>> On Thu, Feb 28, 2013 at 9:51 PM, Scott James Remnant <keybuk@google.com> wrote:
->>>>>>> I'm having some difficulties connecting up A2DP in BlueZ 5.2, and I'm
->>>>>>> sure I'm just missing something obvious so would appreciate a second
->>>>>>> set of eyes.
->>>>>>>
->>>>>>> I had thought that to send to an A2DP Sink on a device, I needed an
->>>>>>> A2DP Source endpoint at my end, but when I try and register that
->>>>>>> endpoint I just get org.bluez.Error.NotSupported
->>>>>>
->>>>>> Check your /etc/bluetooth/audio.conf, you must have disabled it for some reason.
->>>>>>
->>>>>
->>>>> There isn't an audio.conf shipped with BlueZ 5.2; checking
->>>>> profiles/audio/manager.c it has:
->>>>>
->>>>> static struct enabled_interfaces enabled = {
->>>>>        .sink           = TRUE,
->>>>>        .source         = FALSE,
->>>>>        .control        = TRUE,
->>>>> };
->>>>>
->>>>> This seems bizarre that registering audio sinks (which I read as
->>>>> sending A2DP from the device to the host) is enabled by default, but
->>>>> not the more usual registering of an audio source (to send to an A2DP
->>>>> sink on the device).
->>>
->>> Yep, it was the result of changing the roles, I guess we should enable
->>> them both by default and if the distro don't want one of them just
->>> disable in the config file.
->>>
->>>> we want to move to a state where BlueZ works out-of-the-box with no extra config files needed. So I think we should just fix this and always have at least one sink and one source present.
->>>>
->>>> Or if that causes issues, then at least have this depend on PA (or some other audio manager) making that call for us. The default behaviour needs to just work.
->>>
->>> By default I would enable them both as nowadays both should work, well
->>> I guess this is valid for every profile that is not market as
->>> experimental it should be enabled by default, so how about the
->>> following patch:
->>>
->>> diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
->>> index 934227e..163fcba 100644
->>> --- a/profiles/audio/manager.c
->>> +++ b/profiles/audio/manager.c
->>> @@ -72,7 +72,7 @@ static GSList *devices = NULL;
->>>
->>>  static struct enabled_interfaces enabled = {
->>>         .sink           = TRUE,
->>> -       .source         = FALSE,
->>> +       .source         = TRUE,
->>>         .control        = TRUE,
->>>  };
->>>
->>> Or maybe I just remove the whole enabled thing and have the core to handle this.
+> This is a preparation for adding additional parameters to Message.Get.
+> The parsing of the args dictionary is done in parse_get_options.
 >
-> I agree enabling all is the best choice.
+> The Attachment parameter has been moved into the args dictionary.
+> The parameter is now optional defaulting to true.
+> ---
+>  doc/obex-api.txt   |  9 ++++++-
+>  obexd/client/map.c | 79 ++++++++++++++++++++++++++++++++++++++++++++++--------
+>  2 files changed, 76 insertions(+), 12 deletions(-)
 >
-> In fact, I've seen that distros like Ubuntu have patched BlueZ (4.101)
-> to enable them by default (in the source code), and nobody seemed to
-> complain about this so far.
+> diff --git a/doc/obex-api.txt b/doc/obex-api.txt
+> index 759c4d8..0dd1261 100644
+> --- a/doc/obex-api.txt
+> +++ b/doc/obex-api.txt
+> @@ -717,7 +717,7 @@ Service             org.bluez.obex
+>  Interface      org.bluez.obex.Message1
+>  Object path    [variable prefix]/{session0,session1,...}/{message0,...}
+>
+> -Methods                object, dict Get(string targetfile, boolean attachment)
+> +Methods                object, dict Get(string targetfile, dict args)
+>
+>                         Download message and store it in the target file.
+>
+> @@ -731,6 +731,13 @@ Methods            object, dict Get(string targetfile, boolean attachment)
+>                         The properties of this transfer are also returned along
+>                         with the object path, to avoid a call to GetProperties.
+>
+> +                       Possible args:
+> +
+> +                               boolean Attachment
+> +
+> +                                       Request message attachment,
+> +                                       defaults to True
+> +
+>                         Possible errors: org.bluez.obex.Error.InvalidArguments
+>                                          org.bluez.obex.Error.Failed
+>
+> diff --git a/obexd/client/map.c b/obexd/client/map.c
+> index 2b665ec..b7e6428 100644
+> --- a/obexd/client/map.c
+> +++ b/obexd/client/map.c
+> @@ -385,34 +385,91 @@ static void map_msg_free(void *data)
+>         g_free(msg);
+>  }
+>
+> +static GObexApparam *parse_attachment(GObexApparam *apparam,
+> +                                                       DBusMessageIter *iter)
+> +{
+> +       dbus_bool_t attachment;
+> +
+> +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
+> +               return NULL;
+> +
+> +       dbus_message_iter_get_basic(iter, &attachment);
+> +
+> +       return g_obex_apparam_set_uint8(apparam, MAP_AP_ATTACHMENT,
+> +                                               attachment ? TRUE : FALSE);
+> +}
+> +
+> +static GObexApparam *parse_get_options(GObexApparam *apparam,
+> +                                                       DBusMessageIter *iter)
+> +{
+> +       DBusMessageIter array;
+> +
+> +       DBG("");
+> +
+> +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
+> +               return NULL;
+> +
+> +       dbus_message_iter_recurse(iter, &array);
+> +
+> +       while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_DICT_ENTRY) {
+> +               const char *key;
+> +               DBusMessageIter value, entry;
+> +
+> +               dbus_message_iter_recurse(&array, &entry);
+> +               dbus_message_iter_get_basic(&entry, &key);
+> +
+> +               dbus_message_iter_next(&entry);
+> +               dbus_message_iter_recurse(&entry, &value);
+> +
+> +               if (strcasecmp(key, "Attachment") == 0) {
+> +                       if (parse_attachment(apparam, &value) == NULL)
+> +                               return NULL;
+> +               }
+> +
+> +               dbus_message_iter_next(&array);
+> +       }
+> +
+> +       return apparam;
+> +}
+> +
+>  static DBusMessage *map_msg_get(DBusConnection *connection,
+>                                         DBusMessage *message, void *user_data)
+>  {
+>         struct map_msg *msg = user_data;
+>         struct obc_transfer *transfer;
+>         const char *target_file;
+> -       gboolean attachment;
+>         GError *err = NULL;
+>         DBusMessage *reply;
+>         GObexApparam *apparam;
+> +       DBusMessageIter args;
+> +
+> +       dbus_message_iter_init(message, &args);
+>
+> -       if (dbus_message_get_args(message, NULL,
+> -                               DBUS_TYPE_STRING, &target_file,
+> -                               DBUS_TYPE_BOOLEAN, &attachment,
+> -                               DBUS_TYPE_INVALID) == FALSE)
+> +       if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_STRING)
+>                 return g_dbus_create_error(message,
+>                                 ERROR_INTERFACE ".InvalidArguments", NULL);
+>
+> -       transfer = obc_transfer_get("x-bt/message", msg->handle, target_file,
+> -                                                                       &err);
+> -       if (transfer == NULL)
+> -               goto fail;
+> +       dbus_message_iter_get_basic(&args, &target_file);
+> +
+> +       dbus_message_iter_next(&args);
+>
+>         apparam = g_obex_apparam_set_uint8(NULL, MAP_AP_ATTACHMENT,
+> -                                                               attachment);
+> +                                                               TRUE);
+> +
+>         apparam = g_obex_apparam_set_uint8(apparam, MAP_AP_CHARSET,
+>                                                                 CHARSET_UTF8);
+>
+> +       if (parse_get_options(apparam, &args) == NULL) {
+> +               g_obex_apparam_free(apparam);
+> +               return g_dbus_create_error(message,
+> +                               ERROR_INTERFACE ".InvalidArguments", NULL);
+> +       }
+> +
+> +       transfer = obc_transfer_get("x-bt/message", msg->handle, target_file,
+> +                                                                       &err);
+> +       if (transfer == NULL)
+> +               goto fail;
+> +
+>         obc_transfer_set_apparam(transfer, apparam);
+>
+>         if (!obc_session_queue(msg->data->session, transfer, NULL, NULL, &err))
+> @@ -731,7 +788,7 @@ static void set_deleted(const GDBusPropertyTable *property,
+>  static const GDBusMethodTable map_msg_methods[] = {
+>         { GDBUS_METHOD("Get",
+>                         GDBUS_ARGS({ "targetfile", "s" },
+> -                                               { "attachment", "b" }),
+> +                                               { "args", "a{sv}" }),
+>                         GDBUS_ARGS({ "transfer", "o" },
+>                                                 { "properties", "a{sv}" }),
+>                         map_msg_get) },
+> --
+> 1.8.1.4
 
-Ive send a set removing this from audio plugin, let me know if you
-have some comments.
+Im not against it, but we need to update the version number of the
+interface if we break the API which these changes does.
+
 
 -- 
 Luiz Augusto von Dentz
