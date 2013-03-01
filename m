@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.2 \(1499\))
-Subject: Re: [PATCH BlueZ 2/3] core: Add DisableProfiles entry to main.conf
+Subject: Re: [PATCH BlueZ 3/3] core: Rename hcid.h to main.h
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1362140773-13672-2-git-send-email-luiz.dentz@gmail.com>
-Date: Fri, 1 Mar 2013 08:17:12 -0800
+In-Reply-To: <1362140773-13672-3-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 1 Mar 2013 08:15:16 -0800
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <DA672AA1-BB12-44A4-9BDC-A7A25660DF2C@holtmann.org>
-References: <1362140773-13672-1-git-send-email-luiz.dentz@gmail.com> <1362140773-13672-2-git-send-email-luiz.dentz@gmail.com>
+Message-Id: <68C3A27C-6218-4DCA-BC3A-D6813E3F9EFC@holtmann.org>
+References: <1362140773-13672-1-git-send-email-luiz.dentz@gmail.com> <1362140773-13672-3-git-send-email-luiz.dentz@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -15,56 +15,28 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Hi Luiz,
 
 
-> This entry can be used to globally disable profiles, this is specially
-> useful for qualification purposes where some platforms may decide to
-> only qualify a subset of the supported profiles.
+> main seems more logical than hcid which use to be the binary name of
+> bluetoothd really long time ago.
 > ---
-> src/hcid.h    |  1 +
-> src/main.c    | 10 ++++++++++
-> src/main.conf |  4 ++++
-> src/profile.c | 24 ++++++++++++++++++++++++
-> 4 files changed, 39 insertions(+)
-> 
-> diff --git a/src/hcid.h b/src/hcid.h
-> index ea67cc2..f465a2b 100644
-> --- a/src/hcid.h
-> +++ b/src/hcid.h
-> @@ -32,6 +32,7 @@ struct main_opts {
-> 	gboolean	reverse_sdp;
-> 	gboolean	name_resolv;
-> 	gboolean	debug_keys;
-> +	char		**disabled_profiles;
-> 
-> 	uint16_t	did_source;
-> 	uint16_t	did_vendor;
-> diff --git a/src/main.c b/src/main.c
-> index 1e40ebc..933c20f 100644
-> --- a/src/main.c
-> +++ b/src/main.c
-> @@ -76,6 +76,7 @@ static const char * const supported_options[] = {
-> 	"ReverseServiceDiscovery",
-> 	"NameResolving",
-> 	"DebugKeys",
-> +	"DisableProfiles"
-> };
-> 
-> static GKeyFile *load_config(const char *file)
-> @@ -263,6 +264,15 @@ static void parse_config(GKeyFile *config)
-> 		g_clear_error(&err);
-> 	else
-> 		main_opts.debug_keys = boolean;
-> +
-> +	str = g_key_file_get_string(config, "General", "DisableProfiles", &err);
-> +	if (err) {
-> +		DBG("%s", err->message);
-> +		g_clear_error(&err);
-> +	} else {
-> +		main_opts.disabled_profiles = g_strsplit(str, " ", -1);
-> +		g_free(str);
-> +	}
-> }
+> Makefile.am                   | 2 +-
+> plugins/gatt-example.c        | 2 +-
+> plugins/neard.c               | 2 +-
+> profiles/proximity/main.c     | 2 +-
+> profiles/proximity/reporter.c | 2 +-
+> src/adapter.c                 | 2 +-
+> src/attrib-server.c           | 2 +-
+> src/device.c                  | 2 +-
+> src/main.c                    | 2 +-
+> src/{hcid.h => main.h}        | 0
+> src/plugin.c                  | 2 +-
+> src/profile.c                 | 2 +-
+> src/rfkill.c                  | 2 +-
+> src/sdpd-server.c             | 2 +-
+> src/sdpd-service.c            | 2 +-
+> 15 files changed, 14 insertions(+), 14 deletions(-)
+> rename src/{hcid.h => main.h} (100%)
 
-I am not a huge fan of adding this one back. Do we really need it?
+NAK. main.h is one single header we are not going to have. I do not want main.c to share anything actually. I want main.c to consume everything else.
 
 Regards
 
