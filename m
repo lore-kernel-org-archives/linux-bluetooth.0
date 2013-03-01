@@ -1,42 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.2 \(1499\))
-Subject: Re: [PATCH BlueZ 3/3] core: Rename hcid.h to main.h
+Subject: Re: [PATCH v3 03/16] Bluetooth: Add initial skeleton for HCI transaction framework
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1362140773-13672-3-git-send-email-luiz.dentz@gmail.com>
-Date: Fri, 1 Mar 2013 08:15:16 -0800
+In-Reply-To: <20130301100320.GA20590@x220.P-661HNU-F1>
+Date: Fri, 1 Mar 2013 08:13:28 -0800
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <68C3A27C-6218-4DCA-BC3A-D6813E3F9EFC@holtmann.org>
-References: <1362140773-13672-1-git-send-email-luiz.dentz@gmail.com> <1362140773-13672-3-git-send-email-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Message-Id: <F5D82C85-1BC7-4E49-B76C-38ADE5CA6FAE@holtmann.org>
+References: <1361951844-13719-1-git-send-email-johan.hedberg@gmail.com> <1361951844-13719-4-git-send-email-johan.hedberg@gmail.com> <4FF31B76-4E16-4481-9158-4874B3D67349@holtmann.org> <20130301070425.GB14811@x220.P-661HNU-F1> <01E8737B-3E6B-4FF5-B281-C262E85442B7@holtmann.org> <20130301100320.GA20590@x220.P-661HNU-F1>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Johan,
 
 
-> main seems more logical than hcid which use to be the binary name of
-> bluetoothd really long time ago.
-> ---
-> Makefile.am                   | 2 +-
-> plugins/gatt-example.c        | 2 +-
-> plugins/neard.c               | 2 +-
-> profiles/proximity/main.c     | 2 +-
-> profiles/proximity/reporter.c | 2 +-
-> src/adapter.c                 | 2 +-
-> src/attrib-server.c           | 2 +-
-> src/device.c                  | 2 +-
-> src/main.c                    | 2 +-
-> src/{hcid.h => main.h}        | 0
-> src/plugin.c                  | 2 +-
-> src/profile.c                 | 2 +-
-> src/rfkill.c                  | 2 +-
-> src/sdpd-server.c             | 2 +-
-> src/sdpd-service.c            | 2 +-
-> 15 files changed, 14 insertions(+), 14 deletions(-)
-> rename src/{hcid.h => main.h} (100%)
+>>>>> +int hci_transaction_run(struct hci_transaction *transaction)
+>>>>> +{
+>>>>> +	struct hci_dev *hdev = transaction->hdev;
+>>>>> +
+>>>>> +	BT_DBG("length %u", skb_queue_len(&transaction->cmd_q));
+>>>>> +
+>>>>> +	/* Do not allow empty transactions */
+>>>>> +	if (skb_queue_empty(&transaction->cmd_q))
+>>>>> +		return -EINVAL;
+>>>>> +
+>>>>> +	spin_lock(&hdev->cmd_q.lock);
+>>>>> +	skb_queue_splice_tail(&transaction->cmd_q, &hdev->cmd_q);
+>>>>> +	spin_unlock(&hdev->cmd_q.lock);
+>>>>> +
+>>>>> +	queue_work(hdev->workqueue, &hdev->cmd_work);
+>>>>> +
+>>>>> +	return 0;
+>>>>> +}
+>>>> 
+>>>> I am wondering why we are not giving the complete handler when
+>>>> finishing the transaction. Having a copy of the handler in hci_dev
+>>>> structure seems a bit pointless. What is the reason here?
+>>> 
+>>> The hdev->transaction_complete is not related to building transactions
+>>> but for running them. I can move giving the callback to the
+>>> transaction_run function and thereby remove the need to store it in
+>>> struct hci_transaction, but the fact remains that it still needs to be
+>>> copied to the first skb of the transaction (since the moment we start
+>>> processing the transaction the callback needs to be copied to
+>>> hdev->transaction_complete). Storing the callback in struct
+>>> hci_transaction made it easy to copy it to the first skb when
+>>> hci_transaction_cmd() gets called for the first time on the transaction.
+>>> 
+>>> So let me repeat, we need the hdev->complete_transaction since the
+>>> callback could be needed for any individual HCI command that's part of
+>>> the transaction in case that command fails (since then we stop
+>>> processing the transaction and call the callback). Because of this the
+>>> callback needs to be part of the first skb of the transaction.
+>> 
+>> The way I see this is that if one command of the transaction fails, we
+>> need to not continue and just discard the rest of the transaction. Why
+>> not just go through the queue and find the complete callback attached
+>> with the last skb of transaction. Either that is the last successful
+>> command, or we had to go and remove the rest of the queue.
+> 
+> A command that completes it not part of hdev->cmd_q anymore but can be
+> found in hdev->sent_cmd instead. This means that to find the complete
+> callback we first need to check for
+> bt_cb(hdev->sent_cmd)->transaction.complete and if it's NULL start going
+> through hdev->cmd_q. This is more complicated than just checking for
+> hdev->transaction_complete, but if you think it's worth not having to
+> add another hdev member then I'll go with it.
+> 
+> Another problem is that the control buffer gets lost when doing
+> skb_clone. This means we have to add a memcpy of the skb->cb after doing
+> the hdev->sent_cmd = skb_clone(skb) in hci_cmd_work.
 
-NAK. main.h is one single header we are not going to have. I do not want main.c to share anything actually. I want main.c to consume everything else.
+maybe we are trying to hard to make this fit with our existing model and we just need to redo it. The feeling that I am getting is that a complete callback function "temporary" storage inside hci_dev is a pretty bad idea. It should be part of the context of transaction itself and this mean the skb.
+
+Not that we have been really great with this in the past, we clearly were not. But since we are touching tis code now, I might make sense to have a look on how HCI command handling can be done better.
+
+Same goes for the sent_cmd data. As I said, in userspace we either keep the current packet at the head of the queue until it gets a response or we create a separate pending queue for the packets in fly. Since we only allow one HCI command at a time anyway, maybe just hanging on to cmd skb would be a good idea and in conjunction with your other comment, give a clone to the driver.
+
+>> This reminds me. Have you tested this with random commands in the
+>> transaction failing?
+> 
+> I *think* I tested it, but I'll make sure to do it at least before
+> sending the next patch set iteration.
+
+Please test this. Since if any comment of the transaction fails, we need to remove all pending commands of that said transaction.
 
 Regards
 
