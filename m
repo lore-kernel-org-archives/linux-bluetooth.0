@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.2 \(1499\))
-Subject: Re: [PATCH v3 03/16] Bluetooth: Add initial skeleton for HCI transaction framework
+Subject: Re: [PATCH v3 13/16] Bluetooth: Fix busy condition testing for EIR and class updates
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20130301101056.GA21030@x220.P-661HNU-F1>
-Date: Fri, 1 Mar 2013 08:07:02 -0800
+In-Reply-To: <20130301083902.GA17957@x220.P-661HNU-F1>
+Date: Fri, 1 Mar 2013 08:02:00 -0800
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <2F733681-C8E4-4338-8BF3-DAD16A5802DA@holtmann.org>
-References: <1361951844-13719-1-git-send-email-johan.hedberg@gmail.com> <1361951844-13719-4-git-send-email-johan.hedberg@gmail.com> <4FF31B76-4E16-4481-9158-4874B3D67349@holtmann.org> <20130301070425.GB14811@x220.P-661HNU-F1> <01E8737B-3E6B-4FF5-B281-C262E85442B7@holtmann.org> <20130301100320.GA20590@x220.P-661HNU-F1> <20130301101056.GA21030@x220.P-661HNU-F1>
+Message-Id: <42168620-5890-4C6F-8BAD-E7EEC3EE4407@holtmann.org>
+References: <1361951844-13719-1-git-send-email-johan.hedberg@gmail.com> <1361951844-13719-14-git-send-email-johan.hedberg@gmail.com> <DCADC53A-261F-4CF0-A1CB-34DD7A49CA77@holtmann.org> <20130301073232.GC14811@x220.P-661HNU-F1> <022948B2-E98F-4815-85BF-5227D65B2E71@holtmann.org> <20130301083902.GA17957@x220.P-661HNU-F1>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -15,53 +15,26 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Hi Johan,
 
 
->>>> The hdev->transaction_complete is not related to building transactions
->>>> but for running them. I can move giving the callback to the
->>>> transaction_run function and thereby remove the need to store it in
->>>> struct hci_transaction, but the fact remains that it still needs to be
->>>> copied to the first skb of the transaction (since the moment we start
->>>> processing the transaction the callback needs to be copied to
->>>> hdev->transaction_complete). Storing the callback in struct
->>>> hci_transaction made it easy to copy it to the first skb when
->>>> hci_transaction_cmd() gets called for the first time on the transaction.
->>>> 
->>>> So let me repeat, we need the hdev->complete_transaction since the
->>>> callback could be needed for any individual HCI command that's part of
->>>> the transaction in case that command fails (since then we stop
->>>> processing the transaction and call the callback). Because of this the
->>>> callback needs to be part of the first skb of the transaction.
->>> 
->>> The way I see this is that if one command of the transaction fails, we
->>> need to not continue and just discard the rest of the transaction. Why
->>> not just go through the queue and find the complete callback attached
->>> with the last skb of transaction. Either that is the last successful
->>> command, or we had to go and remove the rest of the queue.
+>>> One possible solution I can think of is that we update the CoD or EIR
+>>> value in hdev as soon as we create a HCI command to update the value, as
+>>> opposed to updating the hdev value when the HCI command completes. This
+>>> would allow us to have sensible checks on whether new HCI commands need
+>>> to be queued or not. We'd then have to have some flag to indicate that
+>>> there are pending EIR or CoD commands so that any of these mgmt commands
+>>> don't return a direct cmd_complete just because it looks like everything
+>>> is fine based on the CoD/EIR values in hdev.
 >> 
->> A command that completes it not part of hdev->cmd_q anymore but can be
->> found in hdev->sent_cmd instead. This means that to find the complete
->> callback we first need to check for
->> bt_cb(hdev->sent_cmd)->transaction.complete and if it's NULL start going
->> through hdev->cmd_q. This is more complicated than just checking for
->> hdev->transaction_complete, but if you think it's worth not having to
->> add another hdev member then I'll go with it.
->> 
->> Another problem is that the control buffer gets lost when doing
->> skb_clone. This means we have to add a memcpy of the skb->cb after doing
->> the hdev->sent_cmd = skb_clone(skb) in hci_cmd_work.
+>> I see the dilemma now. Still not liking it that much. I wonder if we
+>> should just force one command of each opcode present at all time. No
+>> special handling for any of them. If you send the same opcode twice
+>> before it returned, you get busy error.
 > 
-> Thinking a bit more about this we should probably be passing the clone
-> to the HCI driver and not the original skb. The skb API documentation
-> talks about doing skb_clone() to retain ownership of the control buffer
-> between different layers and it's quite natural to consider the HCI
-> driver one layer and the HCI core another. I.e. the original skb
-> "belongs" to the HCI core and only the clone should be passed to the HCI
-> driver. This however means that we'll need to pass at least the pkt_type
-> as a separate parameter to hci_send_frame().
+> That still doesn't completely solve the issue since what we have is not
+> just the same command conflicting against another pending instance of
+> itself but several different commands conflicting against each other
+> (since they all can cause changes to the CoD or EIR).
 
-
-or we just set the pkt_type in the cb of the cloned skb. Do we also have to set the dev value for hci_dev with it?
-
-Sounds like a good idea, but I think the reason why we were never doing it is that it has an impact on ACL and SCO packets where we would be doing a clone for no reason.
+that is indeed a problem. As much as I do not like it, maybe doing it like you did is the only way to handle this. Can you add a comment on why we are doing this and send an updated patch series.
 
 Regards
 
