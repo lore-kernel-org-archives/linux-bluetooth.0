@@ -1,91 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Mar 2013 09:04:25 +0200
+Date: Fri, 1 Mar 2013 08:55:02 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 03/16] Bluetooth: Add initial skeleton for HCI
- transaction framework
-Message-ID: <20130301070425.GB14811@x220.P-661HNU-F1>
+Subject: Re: [PATCH v3 02/16] Bluetooth: Split HCI init sequence into three
+ stages
+Message-ID: <20130301065502.GA14811@x220.P-661HNU-F1>
 References: <1361951844-13719-1-git-send-email-johan.hedberg@gmail.com>
- <1361951844-13719-4-git-send-email-johan.hedberg@gmail.com>
- <4FF31B76-4E16-4481-9158-4874B3D67349@holtmann.org>
+ <1361951844-13719-3-git-send-email-johan.hedberg@gmail.com>
+ <06B5DEA7-BB85-48EB-80F5-F876C9C8F049@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4FF31B76-4E16-4481-9158-4874B3D67349@holtmann.org>
+In-Reply-To: <06B5DEA7-BB85-48EB-80F5-F876C9C8F049@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
 On Thu, Feb 28, 2013, Marcel Holtmann wrote:
-> > +typedef void (*transaction_complete_t)(struct hci_dev *hdev, u16 last_cmd,
-> > +				       int status);
-> 
-> why is status an int and not __u8?
-> 
-> We might want to prefix this with hci_ here. Just in case someone
-> includes this header.
-
-The int came from the old hci_req_complete() API, but you're right it
-doesn't really make sense to have anything else than u8. I'll fix both
-issues for the next iteration of the set.
-
-> > +struct transaction_ctrl {
-> 
-> Same here. hci_ prefix seems like a good idea.
-
-Sure.
-
-> > +	__u8			start;
-> 
-> Why is not a bool and we are using true/false. Magic numbers like 1 in
-> the code seem like a bad idea.
-
-The main reason is that I wanted to control the amount of data we
-consume from the control buffer (which is limited to 40 bytes) and the
-size of bool is architecture dependent (could be 1 byte or 4 or
-something else). E.g. all other existing variables part of the buffer
-are either u8 or u16. We still have plenty of space left though and the
-complete callback pointer is anyway not a fixed size, so if you're not
-too worried that we'll continue extending the buffer in the future I'll
-just change this to bool.
-
-> > +int hci_transaction_run(struct hci_transaction *transaction)
+> > +static void hci_set_le_support(struct hci_dev *hdev)
 > > +{
-> > +	struct hci_dev *hdev = transaction->hdev;
+> > +	struct hci_cp_write_le_host_supported cp;
 > > +
-> > +	BT_DBG("length %u", skb_queue_len(&transaction->cmd_q));
+> > +	memset(&cp, 0, sizeof(cp));
 > > +
-> > +	/* Do not allow empty transactions */
-> > +	if (skb_queue_empty(&transaction->cmd_q))
-> > +		return -EINVAL;
-> > +
-> > +	spin_lock(&hdev->cmd_q.lock);
-> > +	skb_queue_splice_tail(&transaction->cmd_q, &hdev->cmd_q);
-> > +	spin_unlock(&hdev->cmd_q.lock);
-> > +
-> > +	queue_work(hdev->workqueue, &hdev->cmd_work);
-> > +
-> > +	return 0;
-> > +}
+> > +	if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
+> > +		cp.le = 1;
+> > +		cp.simul = lmp_le_br_capable(hdev);
+> > +	}
 > 
-> I am wondering why we are not giving the complete handler when
-> finishing the transaction. Having a copy of the handler in hci_dev
-> structure seems a bit pointless. What is the reason here?
+> I fully realise that you just copied this code, but use 0x01 here
+> instead of just 1 for variables inside HCI command structs.
 
-The hdev->transaction_complete is not related to building transactions
-but for running them. I can move giving the callback to the
-transaction_run function and thereby remove the need to store it in
-struct hci_transaction, but the fact remains that it still needs to be
-copied to the first skb of the transaction (since the moment we start
-processing the transaction the callback needs to be copied to
-hdev->transaction_complete). Storing the callback in struct
-hci_transaction made it easy to copy it to the first skb when
-hci_transaction_cmd() gets called for the first time on the transaction.
-
-So let me repeat, we need the hdev->complete_transaction since the
-callback could be needed for any individual HCI command that's part of
-the transaction in case that command fails (since then we stop
-processing the transaction and call the callback). Because of this the
-callback needs to be part of the first skb of the transaction.
+Sure, I'll fix it for the next iteration of this set.
 
 Johan
