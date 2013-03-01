@@ -1,96 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Mar 2013 15:39:22 +0200
+Date: Fri, 1 Mar 2013 15:37:33 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ 03/10 v3] player: Add defines for item types and
- folder types
-Message-ID: <20130301133922.GB28091@x220.P-661HNU-F1>
-References: <1362062830-24549-1-git-send-email-luiz.dentz@gmail.com>
- <1362062830-24549-4-git-send-email-luiz.dentz@gmail.com>
- <20130301112042.GA23500@x220.P-661HNU-F1>
- <CABBYNZKV4-xUw1i2dENK0hppu_rWNP5swJVE_0Wb2OR8-MZuNQ@mail.gmail.com>
+To: Rymarkiewicz Waldemar <waldemar.rymarkiewicz@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] bloodpressure: Add Blood Pressure API
+Message-ID: <20130301133733.GA28091@x220.P-661HNU-F1>
+References: <1360668097-28906-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <20130220075725.GA14731@x220>
+ <512F62E0.1030706@tieto.com>
+ <20130228141847.GA24103@x220>
+ <51309AE3.7070909@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CABBYNZKV4-xUw1i2dENK0hppu_rWNP5swJVE_0Wb2OR8-MZuNQ@mail.gmail.com>
+In-Reply-To: <51309AE3.7070909@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Waldek,
 
-On Fri, Mar 01, 2013, Luiz Augusto von Dentz wrote:
-> On Fri, Mar 1, 2013 at 1:20 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> > Hi Luiz,
-> >
-> > On Thu, Feb 28, 2013, Luiz Augusto von Dentz wrote:
-> >> +static const char *type_to_string(uint8_t type)
-> >> +{
-> >> +     switch (type) {
-> >> +     case PLAYER_ITEM_TYPE_AUDIO:
-> >> +             return "audio";
-> >> +     case PLAYER_ITEM_TYPE_VIDEO:
-> >> +             return "video";
-> >> +     case PLAYER_ITEM_TYPE_FOLDER:
-> >> +             return "folder";
-> >> +     }
-> >> +
-> >> +     return NULL;
-> >> +}
-> >> +
+On Fri, Mar 01, 2013, Rymarkiewicz Waldemar wrote:
+> >>>>+Blood Pressure Profile hierarchy
+> >>>>+================================
+> >>>>+
+> >>>>+Service		org.bluez
+> >>>>+Interface	org.bluez.BloodPressure1
+> >>>>+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+> >>>>+
+> >>>>+Properties	boolean Intermediate [readonly]
+> >>>>+
+> >>>>+			True if the device supports intermediate
+> >>>>+			measurement notifications.
 > >>
-> >> +static const char *folder_type_to_string(uint8_t type)
-> >> +{
-> >> +     switch (type) {
-> >> +     case PLAYER_FOLDER_TYPE_MIXED:
-> >> +             return "mixed";
-> >> +     case PLAYER_FOLDER_TYPE_TITLES:
-> >> +             return "titles";
-> >> +     case PLAYER_FOLDER_TYPE_ALBUMS:
-> >> +             return "albums";
-> >> +     case PLAYER_FOLDER_TYPE_ARTISTS:
-> >> +             return "artists";
-> >> +     case PLAYER_FOLDER_TYPE_GENRES:
-> >> +             return "genres";
-> >> +     case PLAYER_FOLDER_TYPE_PLAYLISTS:
-> >> +             return "playlists";
-> >> +     case PLAYER_FOLDER_TYPE_YEARS:
-> >> +             return "years";
-> >> +     }
-> >> +
-> >> +     return NULL;
-> >> +}
-> >> diff --git a/profiles/audio/player.h b/profiles/audio/player.h
-> >> index 28689c5..9888f56 100644
-> >> --- a/profiles/audio/player.h
-> >> +++ b/profiles/audio/player.h
-> >> @@ -23,6 +23,20 @@
-> >>   *
-> >>   */
-> >>
-> >> +#define PLAYER_ITEM_TYPE_AUDIO               0x00
-> >> +#define PLAYER_ITEM_TYPE_VIDEO               0x01
-> >> +#define PLAYER_ITEM_TYPE_FOLDER              0x02
-> >> +#define PLAYER_ITEM_TYPE_INVALID     0xff
-> >> +
-> >> +#define PLAYER_FOLDER_TYPE_MIXED     0x00
-> >> +#define PLAYER_FOLDER_TYPE_TITLES    0x01
-> >> +#define PLAYER_FOLDER_TYPE_ALBUMS    0x02
-> >> +#define PLAYER_FOLDER_TYPE_ARTISTS   0x03
-> >> +#define PLAYER_FOLDER_TYPE_GENRES    0x04
-> >> +#define PLAYER_FOLDER_TYPE_PLAYLISTS 0x05
-> >> +#define PLAYER_FOLDER_TYPE_YEARS     0x06
-> >> +#define PLAYER_FOLDER_TYPE_INVALID   0xff
-> >
-> > Why not enums? That'd let the compiler verify that all values are
-> > covered in switch statements and since this is an internal API and not a
-> > protocol detail there really isn't a need to use a fixed size integer
-> > (uint8_t).
+> >Couldn't you just return a "NotSupported" error to
+> >EnableIntermediateMeasurement?
 > 
-> Well I was expecting it should follow the AVRCP spec, otherwise we are
-> always going to have to do 2 conversions: AVRCP <-> enum <-> string.
+> 
+> I've just confronted this with the code and this make no sens
+> because the watcher passed to EnableIntermediateMeasurement is
+> registered on the adapter not for a device. So, it's not possible to
+> check if the device supports this feature.
+> 
+> Thus, I will keep Intermediate property for that reason.
 
-There is no AVRCP correspondence at least for the item type where you've
-molded two protocol concepts together into one value. Also, using an
-enum doesn't mean that you can't use protocol values.
+Now it makes even less sense. If the EnableIntermediateMeasurement is
+per adapter then what use is it to know about whether individual devices
+support it or not? The method call will always succeed and the UI will
+anyway need to be able to receive intermediate measurements from
+arbitrary devices if it has called this method.
+
+So what I'm lacking is a proper explanation of how a UI is supposed to
+use this API (in a way that's actually meaningful) as well as why there
+is this adapter/device split to begin with (i.e. why the registration
+isn't per device or even bluetoothd global).
 
 Johan
