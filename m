@@ -1,138 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1362140773-13672-1-git-send-email-luiz.dentz@gmail.com>
-References: <1362140773-13672-1-git-send-email-luiz.dentz@gmail.com>
-Date: Fri, 1 Mar 2013 14:48:22 +0100
-Message-ID: <CANT-zCVEffBVaGGuHZf6+A7cmVmbDaR23YMV2ais120NrYAB7A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] audio: Remove profile enabling/disabling logic
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Date: Fri, 1 Mar 2013 15:39:22 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ 03/10 v3] player: Add defines for item types and
+ folder types
+Message-ID: <20130301133922.GB28091@x220.P-661HNU-F1>
+References: <1362062830-24549-1-git-send-email-luiz.dentz@gmail.com>
+ <1362062830-24549-4-git-send-email-luiz.dentz@gmail.com>
+ <20130301112042.GA23500@x220.P-661HNU-F1>
+ <CABBYNZKV4-xUw1i2dENK0hppu_rWNP5swJVE_0Wb2OR8-MZuNQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CABBYNZKV4-xUw1i2dENK0hppu_rWNP5swJVE_0Wb2OR8-MZuNQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luis,
+Hi Luiz,
 
-On Fri, Mar 1, 2013 at 1:26 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This should be handle by the core for all profiles
-> ---
->  profiles/audio/audio.conf |  4 ---
->  profiles/audio/manager.c  | 62 ++++++-----------------------------------------
->  2 files changed, 8 insertions(+), 58 deletions(-)
->
-> diff --git a/profiles/audio/audio.conf b/profiles/audio/audio.conf
-> index f556610..067b3fc 100644
-> --- a/profiles/audio/audio.conf
-> +++ b/profiles/audio/audio.conf
-> @@ -6,7 +6,3 @@
->
->  # Switch to master role for incoming connections (defaults to true)
->  #Master=true
-> -
-> -# If we want to disable support for specific services
-> -# Defaults to supporting the services: Sink, Control
-> -#Disable=Source
-> diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
-> index 934227e..42a2b58 100644
-> --- a/profiles/audio/manager.c
-> +++ b/profiles/audio/manager.c
-> @@ -70,12 +70,6 @@
->  static GKeyFile *config = NULL;
->  static GSList *devices = NULL;
->
-> -static struct enabled_interfaces enabled = {
-> -       .sink           = TRUE,
-> -       .source         = FALSE,
-> -       .control        = TRUE,
-> -};
-> -
->  static struct audio_device *get_audio_dev(struct btd_device *device)
->  {
->         return manager_get_audio_device(device, TRUE);
-> @@ -410,47 +404,12 @@ void audio_control_disconnected(struct btd_device *dev, int err)
->
->  int audio_manager_init(GKeyFile *conf)
->  {
-> -       char **list;
-> -       int i;
-> -
-> -       if (!conf)
-> -               goto proceed;
-> -
-> -       config = conf;
-> -
-> -       list = g_key_file_get_string_list(config, "General", "Enable",
-> -                                               NULL, NULL);
-> -       for (i = 0; list && list[i] != NULL; i++) {
-> -               if (g_str_equal(list[i], "Sink"))
-> -                       enabled.sink = TRUE;
-> -               else if (g_str_equal(list[i], "Source"))
-> -                       enabled.source = TRUE;
-> -               else if (g_str_equal(list[i], "Control"))
-> -                       enabled.control = TRUE;
-> -       }
-> -       g_strfreev(list);
-> -
-> -       list = g_key_file_get_string_list(config, "General", "Disable",
-> -                                               NULL, NULL);
-> -       for (i = 0; list && list[i] != NULL; i++) {
-> -               if (g_str_equal(list[i], "Sink"))
-> -                       enabled.sink = FALSE;
-> -               else if (g_str_equal(list[i], "Source"))
-> -                       enabled.source = FALSE;
-> -               else if (g_str_equal(list[i], "Control"))
-> -                       enabled.control = FALSE;
-> -       }
-> -       g_strfreev(list);
-> +       if (conf)
-> +               config = conf;
->
-> -proceed:
-> -       if (enabled.source)
-> -               btd_profile_register(&a2dp_source_profile);
-> -
-> -       if (enabled.sink)
-> -               btd_profile_register(&a2dp_sink_profile);
-> -
-> -       if (enabled.control)
-> -               btd_profile_register(&avrcp_profile);
-> +       btd_profile_register(&a2dp_source_profile);
-> +       btd_profile_register(&a2dp_sink_profile);
-> +       btd_profile_register(&avrcp_profile);
->
->         btd_register_adapter_driver(&media_driver);
->
-> @@ -464,14 +423,9 @@ void audio_manager_exit(void)
->                 config = NULL;
->         }
->
-> -       if (enabled.source)
-> -               btd_profile_unregister(&a2dp_source_profile);
-> -
-> -       if (enabled.sink)
-> -               btd_profile_unregister(&a2dp_sink_profile);
-> -
-> -       if (enabled.control)
-> -               btd_profile_unregister(&avrcp_profile);
-> +       btd_profile_unregister(&a2dp_source_profile);
-> +       btd_profile_unregister(&a2dp_sink_profile);
-> +       btd_profile_unregister(&avrcp_profile);
->
->         btd_unregister_adapter_driver(&media_driver);
->  }
-> --
+On Fri, Mar 01, 2013, Luiz Augusto von Dentz wrote:
+> On Fri, Mar 1, 2013 at 1:20 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> > Hi Luiz,
+> >
+> > On Thu, Feb 28, 2013, Luiz Augusto von Dentz wrote:
+> >> +static const char *type_to_string(uint8_t type)
+> >> +{
+> >> +     switch (type) {
+> >> +     case PLAYER_ITEM_TYPE_AUDIO:
+> >> +             return "audio";
+> >> +     case PLAYER_ITEM_TYPE_VIDEO:
+> >> +             return "video";
+> >> +     case PLAYER_ITEM_TYPE_FOLDER:
+> >> +             return "folder";
+> >> +     }
+> >> +
+> >> +     return NULL;
+> >> +}
+> >> +
+> >>
+> >> +static const char *folder_type_to_string(uint8_t type)
+> >> +{
+> >> +     switch (type) {
+> >> +     case PLAYER_FOLDER_TYPE_MIXED:
+> >> +             return "mixed";
+> >> +     case PLAYER_FOLDER_TYPE_TITLES:
+> >> +             return "titles";
+> >> +     case PLAYER_FOLDER_TYPE_ALBUMS:
+> >> +             return "albums";
+> >> +     case PLAYER_FOLDER_TYPE_ARTISTS:
+> >> +             return "artists";
+> >> +     case PLAYER_FOLDER_TYPE_GENRES:
+> >> +             return "genres";
+> >> +     case PLAYER_FOLDER_TYPE_PLAYLISTS:
+> >> +             return "playlists";
+> >> +     case PLAYER_FOLDER_TYPE_YEARS:
+> >> +             return "years";
+> >> +     }
+> >> +
+> >> +     return NULL;
+> >> +}
+> >> diff --git a/profiles/audio/player.h b/profiles/audio/player.h
+> >> index 28689c5..9888f56 100644
+> >> --- a/profiles/audio/player.h
+> >> +++ b/profiles/audio/player.h
+> >> @@ -23,6 +23,20 @@
+> >>   *
+> >>   */
+> >>
+> >> +#define PLAYER_ITEM_TYPE_AUDIO               0x00
+> >> +#define PLAYER_ITEM_TYPE_VIDEO               0x01
+> >> +#define PLAYER_ITEM_TYPE_FOLDER              0x02
+> >> +#define PLAYER_ITEM_TYPE_INVALID     0xff
+> >> +
+> >> +#define PLAYER_FOLDER_TYPE_MIXED     0x00
+> >> +#define PLAYER_FOLDER_TYPE_TITLES    0x01
+> >> +#define PLAYER_FOLDER_TYPE_ALBUMS    0x02
+> >> +#define PLAYER_FOLDER_TYPE_ARTISTS   0x03
+> >> +#define PLAYER_FOLDER_TYPE_GENRES    0x04
+> >> +#define PLAYER_FOLDER_TYPE_PLAYLISTS 0x05
+> >> +#define PLAYER_FOLDER_TYPE_YEARS     0x06
+> >> +#define PLAYER_FOLDER_TYPE_INVALID   0xff
+> >
+> > Why not enums? That'd let the compiler verify that all values are
+> > covered in switch statements and since this is an internal API and not a
+> > protocol detail there really isn't a need to use a fixed size integer
+> > (uint8_t).
+> 
+> Well I was expecting it should follow the AVRCP spec, otherwise we are
+> always going to have to do 2 conversions: AVRCP <-> enum <-> string.
 
-Enabling all profiles by default is one thing but dropping the enable
-flags is IMO too much. Beyond the desktop setups, e.g. in automotive
-(or probably even for phones), some roles would be disabled.
+There is no AVRCP correspondence at least for the item type where you've
+molded two protocol concepts together into one value. Also, using an
+enum doesn't mean that you can't use protocol values.
 
-What I'm missing is how external profiles would fit for this purpose.
-Would BlueZ care at all or would for example oFono require similar
-flags?
-
-Cheers,
-Mikel
+Johan
