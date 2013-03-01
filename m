@@ -1,61 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1362140773-13672-1-git-send-email-luiz.dentz@gmail.com>
+References: <1362140773-13672-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 1 Mar 2013 14:48:22 +0100
+Message-ID: <CANT-zCVEffBVaGGuHZf6+A7cmVmbDaR23YMV2ais120NrYAB7A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/3] audio: Remove profile enabling/disabling logic
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v2 0/7] One remote UUID per btd_profile
-Date: Fri,  1 Mar 2013 14:59:06 +0100
-Message-Id: <1362146353-23799-1-git-send-email-mikel.astiz.oss@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Luis,
 
-Still not a lot of excitement after v1 but the patchset is required (or very convenient) for a later discussion which several people have shown interest in: the introduction of btd_service (or similar concept, to be discussed).
+On Fri, Mar 1, 2013 at 1:26 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This should be handle by the core for all profiles
+> ---
+>  profiles/audio/audio.conf |  4 ---
+>  profiles/audio/manager.c  | 62 ++++++-----------------------------------------
+>  2 files changed, 8 insertions(+), 58 deletions(-)
+>
+> diff --git a/profiles/audio/audio.conf b/profiles/audio/audio.conf
+> index f556610..067b3fc 100644
+> --- a/profiles/audio/audio.conf
+> +++ b/profiles/audio/audio.conf
+> @@ -6,7 +6,3 @@
+>
+>  # Switch to master role for incoming connections (defaults to true)
+>  #Master=true
+> -
+> -# If we want to disable support for specific services
+> -# Defaults to supporting the services: Sink, Control
+> -#Disable=Source
+> diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
+> index 934227e..42a2b58 100644
+> --- a/profiles/audio/manager.c
+> +++ b/profiles/audio/manager.c
+> @@ -70,12 +70,6 @@
+>  static GKeyFile *config = NULL;
+>  static GSList *devices = NULL;
+>
+> -static struct enabled_interfaces enabled = {
+> -       .sink           = TRUE,
+> -       .source         = FALSE,
+> -       .control        = TRUE,
+> -};
+> -
+>  static struct audio_device *get_audio_dev(struct btd_device *device)
+>  {
+>         return manager_get_audio_device(device, TRUE);
+> @@ -410,47 +404,12 @@ void audio_control_disconnected(struct btd_device *dev, int err)
+>
+>  int audio_manager_init(GKeyFile *conf)
+>  {
+> -       char **list;
+> -       int i;
+> -
+> -       if (!conf)
+> -               goto proceed;
+> -
+> -       config = conf;
+> -
+> -       list = g_key_file_get_string_list(config, "General", "Enable",
+> -                                               NULL, NULL);
+> -       for (i = 0; list && list[i] != NULL; i++) {
+> -               if (g_str_equal(list[i], "Sink"))
+> -                       enabled.sink = TRUE;
+> -               else if (g_str_equal(list[i], "Source"))
+> -                       enabled.source = TRUE;
+> -               else if (g_str_equal(list[i], "Control"))
+> -                       enabled.control = TRUE;
+> -       }
+> -       g_strfreev(list);
+> -
+> -       list = g_key_file_get_string_list(config, "General", "Disable",
+> -                                               NULL, NULL);
+> -       for (i = 0; list && list[i] != NULL; i++) {
+> -               if (g_str_equal(list[i], "Sink"))
+> -                       enabled.sink = FALSE;
+> -               else if (g_str_equal(list[i], "Source"))
+> -                       enabled.source = FALSE;
+> -               else if (g_str_equal(list[i], "Control"))
+> -                       enabled.control = FALSE;
+> -       }
+> -       g_strfreev(list);
+> +       if (conf)
+> +               config = conf;
+>
+> -proceed:
+> -       if (enabled.source)
+> -               btd_profile_register(&a2dp_source_profile);
+> -
+> -       if (enabled.sink)
+> -               btd_profile_register(&a2dp_sink_profile);
+> -
+> -       if (enabled.control)
+> -               btd_profile_register(&avrcp_profile);
+> +       btd_profile_register(&a2dp_source_profile);
+> +       btd_profile_register(&a2dp_sink_profile);
+> +       btd_profile_register(&avrcp_profile);
+>
+>         btd_register_adapter_driver(&media_driver);
+>
+> @@ -464,14 +423,9 @@ void audio_manager_exit(void)
+>                 config = NULL;
+>         }
+>
+> -       if (enabled.source)
+> -               btd_profile_unregister(&a2dp_source_profile);
+> -
+> -       if (enabled.sink)
+> -               btd_profile_unregister(&a2dp_sink_profile);
+> -
+> -       if (enabled.control)
+> -               btd_profile_unregister(&avrcp_profile);
+> +       btd_profile_unregister(&a2dp_source_profile);
+> +       btd_profile_unregister(&a2dp_sink_profile);
+> +       btd_profile_unregister(&avrcp_profile);
+>
+>         btd_unregister_adapter_driver(&media_driver);
+>  }
+> --
 
-Claudio pointed out several issues affecting patch v1 3/7, which have been improved in this v2, including:
-- Fix premature release of resources in cleanup_monitor().
-- Fix boolean literal in monitor_unregister_linkloss (which should be FALSE).
+Enabling all profiles by default is one thing but dropping the enable
+flags is IMO too much. Beyond the desktop setups, e.g. in automotive
+(or probably even for phones), some roles would be disabled.
 
-Luiz also triggered an interesting point affecting patch v1 2/7 but I considered it unrelated to this patchset, stricly speaking, and has been therefore left aside.
+What I'm missing is how external profiles would fit for this purpose.
+Would BlueZ care at all or would for example oFono require similar
+flags?
 
-Looking forward to your feedback.
-
->From original cover-letter:
-
-Disclaimer: this RFC is WIP and hasn't been tested, specially because I don't have the necessary hardware for it.
-
-The goal is to have one remote_uuid per btd_profile. There are only a few exceptions to this rule, and this patchset tries to fix three of them. This basically means splitting one btd_profile per role.
-
-Mikel Astiz (7):
-  avrcp: Refactor server registration
-  audio: Split AVRCP into two btd_profile
-  proximity: Split internal monitor registration API
-  proximity: Split monitor into three btd_profile
-  gatt: List only GATT_UUID as remote UUID
-  health: Split health into two btd_profile
-  profile: Limit to one remote UUID per profile
-
- profiles/audio/avrcp.c               | 114 +++++++++++++-----
- profiles/audio/avrcp.h               |   6 +-
- profiles/audio/manager.c             |  75 ++++++++----
- profiles/cyclingspeed/cyclingspeed.c |   2 +-
- profiles/deviceinfo/deviceinfo.c     |   2 +-
- profiles/gatt/gas.c                  |   2 +-
- profiles/health/hdp_manager.c        |  20 +++-
- profiles/heartrate/heartrate.c       |   2 +-
- profiles/input/hog.c                 |   2 +-
- profiles/input/manager.c             |   2 +-
- profiles/network/manager.c           |   6 +-
- profiles/proximity/manager.c         | 100 ++++++++++++----
- profiles/proximity/monitor.c         | 220 ++++++++++++++++++++++++++++-------
- profiles/proximity/monitor.h         |  17 ++-
- profiles/scanparam/scan.c            |   2 +-
- profiles/thermometer/thermometer.c   |   2 +-
- src/device.c                         |  49 +++-----
- src/profile.c                        |  25 ++--
- src/profile.h                        |   4 +-
- 19 files changed, 466 insertions(+), 186 deletions(-)
-
--- 
-1.8.1
-
+Cheers,
+Mikel
