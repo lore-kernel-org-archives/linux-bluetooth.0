@@ -1,93 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Mar 2013 09:32:32 +0200
+Date: Fri, 1 Mar 2013 09:04:25 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 13/16] Bluetooth: Fix busy condition testing for EIR
- and class updates
-Message-ID: <20130301073232.GC14811@x220.P-661HNU-F1>
+Subject: Re: [PATCH v3 03/16] Bluetooth: Add initial skeleton for HCI
+ transaction framework
+Message-ID: <20130301070425.GB14811@x220.P-661HNU-F1>
 References: <1361951844-13719-1-git-send-email-johan.hedberg@gmail.com>
- <1361951844-13719-14-git-send-email-johan.hedberg@gmail.com>
- <DCADC53A-261F-4CF0-A1CB-34DD7A49CA77@holtmann.org>
+ <1361951844-13719-4-git-send-email-johan.hedberg@gmail.com>
+ <4FF31B76-4E16-4481-9158-4874B3D67349@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <DCADC53A-261F-4CF0-A1CB-34DD7A49CA77@holtmann.org>
+In-Reply-To: <4FF31B76-4E16-4481-9158-4874B3D67349@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
 On Thu, Feb 28, 2013, Marcel Holtmann wrote:
-> > +static bool pending_eir_or_class(struct hci_dev *hdev)
+> > +typedef void (*transaction_complete_t)(struct hci_dev *hdev, u16 last_cmd,
+> > +				       int status);
+> 
+> why is status an int and not __u8?
+> 
+> We might want to prefix this with hci_ here. Just in case someone
+> includes this header.
+
+The int came from the old hci_req_complete() API, but you're right it
+doesn't really make sense to have anything else than u8. I'll fix both
+issues for the next iteration of the set.
+
+> > +struct transaction_ctrl {
+> 
+> Same here. hci_ prefix seems like a good idea.
+
+Sure.
+
+> > +	__u8			start;
+> 
+> Why is not a bool and we are using true/false. Magic numbers like 1 in
+> the code seem like a bad idea.
+
+The main reason is that I wanted to control the amount of data we
+consume from the control buffer (which is limited to 40 bytes) and the
+size of bool is architecture dependent (could be 1 byte or 4 or
+something else). E.g. all other existing variables part of the buffer
+are either u8 or u16. We still have plenty of space left though and the
+complete callback pointer is anyway not a fixed size, so if you're not
+too worried that we'll continue extending the buffer in the future I'll
+just change this to bool.
+
+> > +int hci_transaction_run(struct hci_transaction *transaction)
 > > +{
-> > +	struct pending_cmd *cmd;
+> > +	struct hci_dev *hdev = transaction->hdev;
 > > +
-> > +	list_for_each_entry(cmd, &hdev->mgmt_pending, list) {
-> > +		switch (cmd->opcode) {
-> > +		case MGMT_OP_ADD_UUID:
-> > +		case MGMT_OP_REMOVE_UUID:
-> > +		case MGMT_OP_SET_DEV_CLASS:
-> > +		case MGMT_OP_SET_POWERED:
-> > +			return true;
-> > +		}
-> > +	}
+> > +	BT_DBG("length %u", skb_queue_len(&transaction->cmd_q));
 > > +
-> > +	return false;
+> > +	/* Do not allow empty transactions */
+> > +	if (skb_queue_empty(&transaction->cmd_q))
+> > +		return -EINVAL;
+> > +
+> > +	spin_lock(&hdev->cmd_q.lock);
+> > +	skb_queue_splice_tail(&transaction->cmd_q, &hdev->cmd_q);
+> > +	spin_unlock(&hdev->cmd_q.lock);
+> > +
+> > +	queue_work(hdev->workqueue, &hdev->cmd_work);
+> > +
+> > +	return 0;
 > > +}
-> > +
 > 
-> I do not like this at all. Why would we do it like this?
-> 
-> The transaction framework should allow us to just process these one at
-> a time. So even if userspace send 20 add_uuid commands at the same
-> time, we would deal with them one after the other.
-> 
-> What I am trying to understand what is the benefit of returning busy
-> here.
+> I am wondering why we are not giving the complete handler when
+> finishing the transaction. Having a copy of the handler in hci_dev
+> structure seems a bit pointless. What is the reason here?
 
-If we have multiple commands/transactions in the queue wanting to send
-the same HCI commands the problem is that the content of each HCI
-command (the CoD or EIR data) should depend on the content of the
-preceding HCI commands. The current EIR data or CoD (as stored in hdev
-variables) depends on the last completed write HCI command for the data.
-When we decide whether another command needs to be sent we compare what
-we want to send based on what the current value is and not what it will
-be (based on what's already in the queue).
+The hdev->transaction_complete is not related to building transactions
+but for running them. I can move giving the callback to the
+transaction_run function and thereby remove the need to store it in
+struct hci_transaction, but the fact remains that it still needs to be
+copied to the first skb of the transaction (since the moment we start
+processing the transaction the callback needs to be copied to
+hdev->transaction_complete). Storing the callback in struct
+hci_transaction made it easy to copy it to the first skb when
+hci_transaction_cmd() gets called for the first time on the transaction.
 
-Another problem is the handling of HCI command complete events for the
-same HCI commands. We don't know which pending mgmt command should be
-indicated as completed since there's no tight coupling of HCI commands
-and the mgmt commands that triggered them.
-
-Since we strictly speaking don't need to send all those write_eir or
-write_cod commands in the queue but just the very last one (since that's
-what ultimately takes effect once everything is complete) we could in
-principle go digging into the queue and remove any earlier duplicates of
-the same HCI command and reply mgmt_cmd_complete for all pending
-commands when this one single HCI command completes. This is a bit messy
-for several reasons. One is that we still need to ensure that the
-complete callbacks for the transactions/commands we removed still get
-called. Another is that this will result in some quite interesting
-behavior:
-
-	1. Call add_uuid
-	2. Call remove_uuid with the same uuid as in 1.
-	3. The HCI command from 2. completes (the one from 1. was
-	replaced).
-	4. Success is returned for both mgmt commands when in fact the
-	UUID added in 1 never got added in reality.
-
-Considering the fact that we queue up all commands anyway I don't really
-have such a strong opinion on whether we allow potentially messed up
-behavior when such queuing doesn't happen, but the above is at least an
-attempt at explaining why I added this busy check.
-
-One possible solution I can think of is that we update the CoD or EIR
-value in hdev as soon as we create a HCI command to update the value, as
-opposed to updating the hdev value when the HCI command completes. This
-would allow us to have sensible checks on whether new HCI commands need
-to be queued or not. We'd then have to have some flag to indicate that
-there are pending EIR or CoD commands so that any of these mgmt commands
-don't return a direct cmd_complete just because it looks like everything
-is fine based on the CoD/EIR values in hdev.
+So let me repeat, we need the hdev->complete_transaction since the
+callback could be needed for any individual HCI command that's part of
+the transaction in case that command fails (since then we stop
+processing the transaction and call the callback). Because of this the
+callback needs to be part of the first skb of the transaction.
 
 Johan
