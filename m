@@ -1,39 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1362180153-11133-5-git-send-email-vinicius.gomes@openbossa.org>
-References: <1362180153-11133-1-git-send-email-vinicius.gomes@openbossa.org>
-	<1362180153-11133-5-git-send-email-vinicius.gomes@openbossa.org>
-Date: Fri, 1 Mar 2013 21:50:19 -0400
-Message-ID: <CAJdJm_NkO+96ptksOGnK8jO5qE8J-MgChW7cq+6cZPEeEZ-zBw@mail.gmail.com>
-Subject: Re: [RFC BlueZ v0 04/10] device: Remove misleading function
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.2 \(1499\))
+Subject: Re: [PATCH] Add GetCachedServices to device API.
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1362187350-23421-1-git-send-email-deymo@chromium.org>
+Date: Fri, 1 Mar 2013 17:29:30 -0800
+Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org,
+	johan.hedberg@intel.com
+Message-Id: <1756C3D5-55FB-4037-BEC4-4095E49B43D3@holtmann.org>
+References: <1362187350-23421-1-git-send-email-deymo@chromium.org>
+To: Alex Deymo <deymo@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Alex,
 
-On Fri, Mar 1, 2013 at 7:22 PM, Vinicius Costa Gomes
-<vinicius.gomes@openbossa.org> wrote:
-> @@ -3049,7 +3044,9 @@ static void register_all_services(struct btd_device *device, GSList *services)
->         g_slist_free_full(device->primaries, g_free);
->         device->primaries = NULL;
 
-I think you can remove the NULL assignment above, as device->primaries
-is updated just below.
+> This fix implements a new GetCachedServices() function with similar
+> functionality as DiscoverServices(), except it only retrieves information
+> from an internal cache.
+> 
+> Signed-off-by: Alex Deymo <deymo@chromium.org>
+> 
+> ---
+> 
+> Some background:
+> Currently, only the device properties are always available while the device
+> is off or out of range, but the service records are not. The
+> org.bluez.Device.ServiceRecords() call fails if the device is off, but some
+> important information relevant to the connection is present only there. For
+> example, for mice and keyboard, the HIDNormallyConnectable and
+> HIDReconnectInitiate tells if we are supposed to initiate a connection to
+> the device while it is off. When bluetoothd restarts and has such a divice
+> paired in its records, there is no way from the DBus interface to tell if
+> this device is "normally connectable" or not. This GetCachedServices() aims
+> to solve this problem.
 
->
-> -       device_register_primaries(device, g_slist_copy(services), -1);
-> +       /* And keep the new one */
-> +       device->primaries = g_slist_copy(services);
-> +
->         if (removed)
->                 device_remove_profiles(device, removed);
+why would we expose this in this format and not make the HID support work according to these SDP attributes? Just make it work without having any application interact with it.
 
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Or on a different questions, why are these not exported as properties for the input interface. Why this big hammer one fits all approach?
+
+Regards
+
+Marcel
+
