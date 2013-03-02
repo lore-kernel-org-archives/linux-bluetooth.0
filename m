@@ -1,48 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=US-ASCII
 Mime-Version: 1.0 (Mac OS X Mail 6.2 \(1499\))
-Subject: Re: [PATCH BlueZ 3/3] core: Rename hcid.h to main.h
+Subject: Re: [PATCH BlueZ 2/3] core: Add DisableProfiles entry to main.conf
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CABBYNZL+s4ieP4ToSvqML3PkybRnggPOMg5W+_RFdNb27_7=DA@mail.gmail.com>
-Date: Fri, 1 Mar 2013 18:42:48 -0800
+In-Reply-To: <CABBYNZ+u6JF8XtU8qiUy7ERrQg5o2Q-N2b2_4PxUn=Mg96Q=Vw@mail.gmail.com>
+Date: Fri, 1 Mar 2013 18:40:19 -0800
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <7BF3CFC9-D74E-49CA-B4B8-009DC511E772@holtmann.org>
-References: <1362140773-13672-1-git-send-email-luiz.dentz@gmail.com> <1362140773-13672-3-git-send-email-luiz.dentz@gmail.com> <68C3A27C-6218-4DCA-BC3A-D6813E3F9EFC@holtmann.org> <CABBYNZL+s4ieP4ToSvqML3PkybRnggPOMg5W+_RFdNb27_7=DA@mail.gmail.com>
+Message-Id: <EC5BBF4F-2309-4F89-8F75-A3478832A28C@holtmann.org>
+References: <1362140773-13672-1-git-send-email-luiz.dentz@gmail.com> <1362140773-13672-2-git-send-email-luiz.dentz@gmail.com> <DA672AA1-BB12-44A4-9BDC-A7A25660DF2C@holtmann.org> <CABBYNZ+u6JF8XtU8qiUy7ERrQg5o2Q-N2b2_4PxUn=Mg96Q=Vw@mail.gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
->>> main seems more logical than hcid which use to be the binary name of
->>> bluetoothd really long time ago.
+>>> This entry can be used to globally disable profiles, this is specially
+>>> useful for qualification purposes where some platforms may decide to
+>>> only qualify a subset of the supported profiles.
 >>> ---
->>> Makefile.am                   | 2 +-
->>> plugins/gatt-example.c        | 2 +-
->>> plugins/neard.c               | 2 +-
->>> profiles/proximity/main.c     | 2 +-
->>> profiles/proximity/reporter.c | 2 +-
->>> src/adapter.c                 | 2 +-
->>> src/attrib-server.c           | 2 +-
->>> src/device.c                  | 2 +-
->>> src/main.c                    | 2 +-
->>> src/{hcid.h => main.h}        | 0
->>> src/plugin.c                  | 2 +-
->>> src/profile.c                 | 2 +-
->>> src/rfkill.c                  | 2 +-
->>> src/sdpd-server.c             | 2 +-
->>> src/sdpd-service.c            | 2 +-
->>> 15 files changed, 14 insertions(+), 14 deletions(-)
->>> rename src/{hcid.h => main.h} (100%)
+>>> src/hcid.h    |  1 +
+>>> src/main.c    | 10 ++++++++++
+>>> src/main.conf |  4 ++++
+>>> src/profile.c | 24 ++++++++++++++++++++++++
+>>> 4 files changed, 39 insertions(+)
+>>> 
+>>> diff --git a/src/hcid.h b/src/hcid.h
+>>> index ea67cc2..f465a2b 100644
+>>> --- a/src/hcid.h
+>>> +++ b/src/hcid.h
+>>> @@ -32,6 +32,7 @@ struct main_opts {
+>>>      gboolean        reverse_sdp;
+>>>      gboolean        name_resolv;
+>>>      gboolean        debug_keys;
+>>> +     char            **disabled_profiles;
+>>> 
+>>>      uint16_t        did_source;
+>>>      uint16_t        did_vendor;
+>>> diff --git a/src/main.c b/src/main.c
+>>> index 1e40ebc..933c20f 100644
+>>> --- a/src/main.c
+>>> +++ b/src/main.c
+>>> @@ -76,6 +76,7 @@ static const char * const supported_options[] = {
+>>>      "ReverseServiceDiscovery",
+>>>      "NameResolving",
+>>>      "DebugKeys",
+>>> +     "DisableProfiles"
+>>> };
+>>> 
+>>> static GKeyFile *load_config(const char *file)
+>>> @@ -263,6 +264,15 @@ static void parse_config(GKeyFile *config)
+>>>              g_clear_error(&err);
+>>>      else
+>>>              main_opts.debug_keys = boolean;
+>>> +
+>>> +     str = g_key_file_get_string(config, "General", "DisableProfiles", &err);
+>>> +     if (err) {
+>>> +             DBG("%s", err->message);
+>>> +             g_clear_error(&err);
+>>> +     } else {
+>>> +             main_opts.disabled_profiles = g_strsplit(str, " ", -1);
+>>> +             g_free(str);
+>>> +     }
+>>> }
 >> 
->> NAK. main.h is one single header we are not going to have. I do not want main.c to share anything actually. I want main.c to consume everything else.
+>> I am not a huge fan of adding this one back. Do we really need it?
 > 
-> Well what is left, bluetoothd.h? Since this is mainly for config
-> options I guess this would be fine or you have a better idea?
+> This is for profiles we used to have for plugins but they are not 1:1
+> to profiles so -p/-P may not be enough, we could instead take as
+> command line option but 128 bit UUID sounds a little too messy to pass
+> in the command line. Mikel also comment about having this to block
+> external process to register profiles, maybe it is a good idea since
+> we don't have to create a similar mechanism to other components such
+> as obexd, oFono and PulseAudio just to disable certain roles.
 
-within ConnMan and oFono we are using connman.h and ofono.h. Since I am short of coming up with a better name than hcid.h that fits, lets leave it like this.
-
-However one thing that needs clearly to be done is to minimise the usage of this header. For example why is it leaking into profiles and plugins in the first place. So please start cleaning that one up first.
+can we at least then make it part of src/profile.c directly and not try to hack it in this way. I mean like after reading the config file, let it tell src/profile.c which profiles are blacklisted.
 
 Regards
 
