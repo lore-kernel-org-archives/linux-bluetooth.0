@@ -1,47 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
 Mime-Version: 1.0 (Mac OS X Mail 6.2 \(1499\))
-Subject: Re: [RFC] bloodpressure: Add Blood Pressure API
+Subject: Re: [PATCH BlueZ 3/3] core: Rename hcid.h to main.h
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1360668097-28906-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-Date: Fri, 1 Mar 2013 19:09:20 -0800
-Cc: <linux-bluetooth@vger.kernel.org>
-Message-Id: <C4340FC6-1121-468E-B15D-68E2770AA07E@holtmann.org>
-References: <1360668097-28906-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
-To: Waldemar Rymarkiewicz <Waldemar.Rymarkiewicz@tieto.com>
+In-Reply-To: <CABBYNZL+s4ieP4ToSvqML3PkybRnggPOMg5W+_RFdNb27_7=DA@mail.gmail.com>
+Date: Fri, 1 Mar 2013 18:42:48 -0800
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <7BF3CFC9-D74E-49CA-B4B8-009DC511E772@holtmann.org>
+References: <1362140773-13672-1-git-send-email-luiz.dentz@gmail.com> <1362140773-13672-3-git-send-email-luiz.dentz@gmail.com> <68C3A27C-6218-4DCA-BC3A-D6813E3F9EFC@holtmann.org> <CABBYNZL+s4ieP4ToSvqML3PkybRnggPOMg5W+_RFdNb27_7=DA@mail.gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldemar,
+Hi Luiz,
 
-> Change-Id: I7165ecee0186dfdb51cd01838f28768d94ff12b9
-> ---
-> doc/bloodpressure-api.txt | 138 ++++++++++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 138 insertions(+)
-> create mode 100644 doc/bloodpressure-api.txt
+>>> main seems more logical than hcid which use to be the binary name of
+>>> bluetoothd really long time ago.
+>>> ---
+>>> Makefile.am                   | 2 +-
+>>> plugins/gatt-example.c        | 2 +-
+>>> plugins/neard.c               | 2 +-
+>>> profiles/proximity/main.c     | 2 +-
+>>> profiles/proximity/reporter.c | 2 +-
+>>> src/adapter.c                 | 2 +-
+>>> src/attrib-server.c           | 2 +-
+>>> src/device.c                  | 2 +-
+>>> src/main.c                    | 2 +-
+>>> src/{hcid.h => main.h}        | 0
+>>> src/plugin.c                  | 2 +-
+>>> src/profile.c                 | 2 +-
+>>> src/rfkill.c                  | 2 +-
+>>> src/sdpd-server.c             | 2 +-
+>>> src/sdpd-service.c            | 2 +-
+>>> 15 files changed, 14 insertions(+), 14 deletions(-)
+>>> rename src/{hcid.h => main.h} (100%)
+>> 
+>> NAK. main.h is one single header we are not going to have. I do not want main.c to share anything actually. I want main.c to consume everything else.
 > 
-> diff --git a/doc/bloodpressure-api.txt b/doc/bloodpressure-api.txt
-> new file mode 100644
-> index 0000000..2acc660
-> --- /dev/null
-> +++ b/doc/bloodpressure-api.txt
-> @@ -0,0 +1,138 @@
-> +Blood Pressure API description
-> +******************************
-> +
-> +
-> +Blood Pressure Manager hierarchy
-> +================================
-> +
-> +Serviceorg.bluez
-> +Interface	org.bluez.BloodPressureManager1
-> +Object path	[variable prefix]/{hci0,hci1,...}
-> +
-> +Methods		RegisterWatcher(object agent)
+> Well what is left, bluetoothd.h? Since this is mainly for config
+> options I guess this would be fine or you have a better idea?
 
-I do not really this manager business anymore. Splitting the interface over adapter and device object seems pointless. What I like to see is that we make one interface on the device object. We should have no proper lifetime rules for these.
+within ConnMan and oFono we are using connman.h and ofono.h. Since I am short of coming up with a better name than hcid.h that fits, lets leave it like this.
 
-Basically a client using a specialised interface should have to deal with one entry point and not with multiple. Low Energy clients need to pick a device they want to operate with. So this should focus on device objects and nothing else.
+However one thing that needs clearly to be done is to minimise the usage of this header. For example why is it leaking into profiles and plugins in the first place. So please start cleaning that one up first.
 
 Regards
 
