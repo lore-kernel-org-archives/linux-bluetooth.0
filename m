@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 08/11] Bluetooth: Add request cmd_complete and cmd_status functions
-Date: Mon,  4 Mar 2013 12:09:05 +0200
-Message-Id: <1362391748-21653-9-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 04/11] Bluetooth: Add initial skeleton for asynchronous HCI requests
+Date: Mon,  4 Mar 2013 12:09:01 +0200
+Message-Id: <1362391748-21653-5-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1362391748-21653-1-git-send-email-johan.hedberg@gmail.com>
 References: <1362391748-21653-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,177 +11,113 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch introduces functions to process the HCI request state when
-receiving HCI Command Status or Command Complete events. Some HCI
-commands, like Inquiry do not result in a Command complete event so
-special handling is needed for them. Inquiry is a particularly important
-one since it is the only forseeable "non-cmd_complete" command that will
-make good use of the request functionality, and its completion is either
-indicated by an Inquiry Complete event of a successful Command Complete
-for HCI_Inquiry_Cancel.
+This patch adds the initial definitions and functions for asynchronous
+HCI requests. Asynchronous requests are essentially a group of HCI
+commands together with an optional completion callback. The request is
+tracked through the already existing command queue by having the
+necessary context information as part of the control buffer of each skb.
+
+The only information needed in the skb control buffer is a flag for
+indicating that the skb is the start of a request as well as the
+optional complete callback that should be used when the request is
+complete (this will be found in the last skb of the request).
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    2 +
- net/bluetooth/hci_core.c         |   85 ++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c        |    7 ++++
- 3 files changed, 94 insertions(+)
+ include/net/bluetooth/bluetooth.h |   11 +++++++++++
+ include/net/bluetooth/hci_core.h  |    8 ++++++++
+ net/bluetooth/hci_core.c          |   31 +++++++++++++++++++++++++++++++
+ 3 files changed, 50 insertions(+)
 
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 5f51bef..e646bd3 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -260,12 +260,23 @@ struct l2cap_ctrl {
+ 	__u8		retries;
+ };
+ 
++struct hci_dev;
++
++typedef void (*hci_req_complete_t)(struct hci_dev *hdev, u16 last_cmd,
++				   u8 status);
++
++struct hci_req_ctrl {
++	bool			start;
++	hci_req_complete_t	complete;
++};
++
+ struct bt_skb_cb {
+ 	__u8 pkt_type;
+ 	__u8 incoming;
+ 	__u16 expect;
+ 	__u8 force_active;
+ 	struct l2cap_ctrl control;
++	struct hci_req_ctrl req;
+ };
+ #define bt_cb(skb) ((struct bt_skb_cb *)((skb)->cb))
+ 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 7a0fb68..92495de 100644
+index 787d3b9..7191217 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1050,6 +1050,8 @@ void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
- int hci_req_run(struct hci_request *req, hci_req_complete_t complete);
- int hci_req_cmd(struct hci_request *req, u16 opcode, u32 plen, void *param);
- void hci_req_from_skb(struct hci_dev *hdev, struct sk_buff *skb);
-+void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status);
-+void hci_req_cmd_status(struct hci_dev *hdev, u16 opcode, u8 status);
+@@ -1041,6 +1041,14 @@ static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type, u8 *data,
+ int hci_register_cb(struct hci_cb *hcb);
+ int hci_unregister_cb(struct hci_cb *hcb);
  
++struct hci_request {
++	struct hci_dev		*hdev;
++	struct sk_buff_head	cmd_q;
++};
++
++void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
++int hci_req_run(struct hci_request *req, hci_req_complete_t complete);
++
  int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param);
  void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags);
+ void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb);
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 4269b3c..646a252 100644
+index f9210d3..3ce08b6 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -3207,6 +3207,91 @@ static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 	kfree_skb(skb);
+@@ -2436,6 +2436,37 @@ static int hci_send_frame(struct sk_buff *skb)
+ 	return hdev->send(skb);
  }
  
-+static bool hci_req_is_complete(struct hci_dev *hdev)
++void hci_req_init(struct hci_request *req, struct hci_dev *hdev)
 +{
-+	struct sk_buff *skb;
-+
-+	skb = skb_peek(&hdev->cmd_q);
-+	if (!skb)
-+		return true;
-+
-+	return bt_cb(skb)->req.start;
++	memset(req, 0, sizeof(*req));
++	skb_queue_head_init(&req->cmd_q);
++	req->hdev = hdev;
 +}
 +
-+void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status)
++int hci_req_run(struct hci_request *req, hci_req_complete_t complete)
 +{
-+	hci_req_complete_t req_complete = NULL;
++	struct hci_dev *hdev = req->hdev;
 +	struct sk_buff *skb;
 +	unsigned long flags;
 +
-+	BT_DBG("opcode 0x%04x status 0x%02x", opcode, status);
++	BT_DBG("length %u", skb_queue_len(&req->cmd_q));
 +
-+	/* Check that the completed command really matches the last one
-+	 * that was sent.
-+	 */
-+	if (!hci_sent_cmd_data(hdev, opcode))
-+		return;
++	/* Do not allow empty requests */
++	if (skb_queue_empty(&req->cmd_q))
++		return -EINVAL;
 +
-+	/* If the command succeeded and there's still more commands in
-+	 * this request the request is not yet complete.
-+	 */
-+	if (!status && !hci_req_is_complete(hdev))
-+		return;
++	skb = skb_peek_tail(&req->cmd_q);
++	bt_cb(skb)->req.complete = complete;
 +
-+	/* If this was the last command in a request the complete
-+	 * callback would be found in hdev->sent_cmd instead of the
-+	 * command queue (hdev->cmd_q).
-+	 */
-+	if (hdev->sent_cmd) {
-+		req_complete = bt_cb(hdev->sent_cmd)->req.complete;
-+		if (req_complete)
-+			goto call_complete;
-+	}
-+
-+	/* Remove all pending commands belonging to this request */
 +	spin_lock_irqsave(&hdev->cmd_q.lock, flags);
-+	while ((skb = __skb_dequeue(&hdev->cmd_q))) {
-+		if (bt_cb(skb)->req.start) {
-+			__skb_queue_head(&hdev->cmd_q, skb);
-+			break;
-+		}
-+
-+		req_complete = bt_cb(skb)->req.complete;
-+		kfree_skb(skb);
-+	}
++	skb_queue_splice_tail(&req->cmd_q, &hdev->cmd_q);
 +	spin_unlock_irqrestore(&hdev->cmd_q.lock, flags);
 +
-+call_complete:
-+	if (req_complete)
-+		req_complete(hdev, opcode, status);
++	queue_work(hdev->workqueue, &hdev->cmd_work);
++
++	return 0;
 +}
 +
-+void hci_req_cmd_status(struct hci_dev *hdev, u16 opcode, u8 status)
-+{
-+	hci_req_complete_t req_complete = NULL;
-+
-+	BT_DBG("opcode 0x%04x status 0x%02x", opcode, status);
-+
-+	if (status) {
-+		hci_req_cmd_complete(hdev, opcode, status);
-+		return;
-+	}
-+
-+	/* No need to handle success status if there are more commands */
-+	if (!hci_req_is_complete(hdev))
-+		return;
-+
-+	if (hdev->sent_cmd)
-+		req_complete = bt_cb(hdev->sent_cmd)->req.complete;
-+
-+	/* If the request doesn't have a complete callback or there
-+	 * are other commands/requests in the hdev queue we consider
-+	 * this request as completed.
-+	 */
-+	if (!req_complete || !skb_queue_empty(&hdev->cmd_q))
-+		hci_req_cmd_complete(hdev, opcode, status);
-+}
-+
- static void hci_rx_work(struct work_struct *work)
+ /* Send HCI command */
+ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
  {
- 	struct hci_dev *hdev = container_of(work, struct hci_dev, rx_work);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 14e872a..8b878a3 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -53,6 +53,7 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
- 	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
- 	hci_dev_unlock(hdev);
- 
-+	hci_req_cmd_complete(hdev, HCI_OP_INQUIRY, status);
- 	hci_req_complete(hdev, HCI_OP_INQUIRY_CANCEL, status);
- 
- 	hci_conn_check_pending(hdev);
-@@ -1692,6 +1693,7 @@ static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
- 
-+	hci_req_cmd_complete(hdev, HCI_OP_INQUIRY, status);
- 	hci_req_complete(hdev, HCI_OP_INQUIRY, status);
- 
- 	hci_conn_check_pending(hdev);
-@@ -2254,6 +2256,7 @@ static void hci_qos_setup_complete_evt(struct hci_dev *hdev,
- static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_cmd_complete *ev = (void *) skb->data;
-+	u8 status = skb->data[sizeof(*ev)];
- 	__u16 opcode;
- 
- 	skb_pull(skb, sizeof(*ev));
-@@ -2497,6 +2500,8 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (ev->opcode != HCI_OP_NOP)
- 		del_timer(&hdev->cmd_timer);
- 
-+	hci_req_cmd_complete(hdev, ev->opcode, status);
-+
- 	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags)) {
- 		atomic_set(&hdev->cmd_cnt, 1);
- 		if (!skb_queue_empty(&hdev->cmd_q))
-@@ -2590,6 +2595,8 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (ev->opcode != HCI_OP_NOP)
- 		del_timer(&hdev->cmd_timer);
- 
-+	hci_req_cmd_status(hdev, ev->opcode, ev->status);
-+
- 	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags)) {
- 		atomic_set(&hdev->cmd_cnt, 1);
- 		if (!skb_queue_empty(&hdev->cmd_q))
 -- 
 1.7.10.4
 
