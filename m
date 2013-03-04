@@ -1,49 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 Mar 2013 23:07:00 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 03/11] Bluetooth: Split HCI init sequence into three
- stages
-Message-ID: <20130304210700.GA6078@x220.P-661HNU-F1>
-References: <1362391748-21653-1-git-send-email-johan.hedberg@gmail.com>
- <1362391748-21653-4-git-send-email-johan.hedberg@gmail.com>
- <CAJdJm_Pj4_O8N1uYVSg6qsJm+L7PyGyPGNo-_y-FC+dWybotqQ@mail.gmail.com>
- <20130304113511.GA24442@x220>
- <CAJdJm_Pn6fx1RNu9DH2GmEHRPRdhU_FR4RoDx15cMUmynS-s9Q@mail.gmail.com>
- <F1DBC779-E43C-4171-A473-9DFEE05FBD70@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <F1DBC779-E43C-4171-A473-9DFEE05FBD70@holtmann.org>
+In-Reply-To: <5134D134.6020101@oss.bmw-carit.de>
+References: <1362064124-29787-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+	<1362064124-29787-3-git-send-email-christian.fetzer@oss.bmw-carit.de>
+	<CABBYNZKQV8jJFeCPB_t+_Lv1FgPQYu72zj-nmXoatAZkA-A_tg@mail.gmail.com>
+	<CABBYNZLvDKP18EjgVqa9r4Dt7rTBcDEEz0jv8e6fs9LUSOnwaw@mail.gmail.com>
+	<5134D134.6020101@oss.bmw-carit.de>
+Date: Mon, 4 Mar 2013 23:05:09 +0200
+Message-ID: <CABBYNZ+28dtWeppPuiN9AQ7k5MUsn9kUHvSgQ80VyKEAwGO1pg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] obexd: Add support for retrieving messages in fractions
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Christian,
 
-On Mon, Mar 04, 2013, Marcel Holtmann wrote:
-> >> This logic is a direct copy-paste from the beginning of the existing
-> >> hci_setup() function in net/bluetooth/hci_event.c. I could change it to
-> >> test specifically for AMP, but then what happens if we add more dev_type
-> >> values that also shouldn't have more than the stage 1 init? In that case
-> >> a stricter != HCI_BREDR test is safer than a looser == HCI_AMP test.
-> > 
-> > My concern is that the "HCI_BREDR" name is a bit misleading, specially
-> > if it matches a single mode LE device (is that the case?)
-> > 
-> > If changing the macro name is not an option, can it be clarified on
-> > the comment?
-> 
-> the HCI_BREDR and HCI_AMP define the difference between a BR/EDR
-> and/or LE controller and the AMP controller. It does not define the
-> difference between BR/EDR and LE.
-> 
-> While the name is not super perfect, it makes sense from a historic
-> point of view how Bluetooth as a technology evolved. If you figure out
-> a better naming, let me know.
+On Mon, Mar 4, 2013 at 6:52 PM, Christian Fetzer
+<christian.fetzer@oss.bmw-carit.de> wrote:
+> Hi Luiz,
+>
+> On 03/01/2013 02:13 PM, Luiz Augusto von Dentz wrote:
+>>
+>> So from the discussion the IRC yesterday I think we can have this
+>> transparently handled by the transfer, we can perhaps add Suspend/Resume and
+>> suspended state API to Transfer interface which probably in this case should
+>> auto suspend if FractionDelivery is set so the application has to resume to
+>> get the parts but they all belong to the same transfer and are saved in the
+>> same file. -- Luiz Augusto von Dentz -- To unsubscribe from this list: send
+>> the line "unsubscribe linux-bluetooth" in the body of a message to
+>> majordomo@vger.kernel.org More majordomo info at
+>> http://vger.kernel.org/majordomo-info.html
+>
+>
+> The first fraction is already a valid bMessage object, further fractions
+> contain enclosed bBody objects.
+> Since the application has to deal with the bMessage format already, there is
+> no need to hide the fractions in the transfer objects.
 
-The only idea I have is HCI_BREDRLE (since the core spec uses
-"BR/EDR/LE" for dual mode references). I'll anyway try to clarify the
-code comment that was partly responsible here.
+If they are all bmsg then you are right, they should be in their own transfer.
 
-Johan
+> The proposed way of simply adding a FractionDeliver parameter to the message
+> meta data, allows the application to easily
+> deal with the fractions without adding too much complexity to itself or
+> BlueZ.
+
+Im still not sure why the spec haven't done this in some other way,
+but Im fine wit the parameter provide we can actually tell when it is
+supported.
+
+-- 
+Luiz Augusto von Dentz
