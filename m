@@ -2,47 +2,35 @@ Return-Path: <cyrus@holtmann.org>
 From: Jaganath Kanakkassery <jaganath.k@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH 2/3] attrib: Fix use after free of attrib
-Date: Mon, 04 Mar 2013 18:44:31 +0530
-Message-id: <1362402872-13080-2-git-send-email-jaganath.k@samsung.com>
-In-reply-to: <1362402872-13080-1-git-send-email-jaganath.k@samsung.com>
-References: <1362402872-13080-1-git-send-email-jaganath.k@samsung.com>
+Subject: [PATCH 1/3] attrib: Remove redundant NULL check
+Date: Mon, 04 Mar 2013 18:44:30 +0530
+Message-id: <1362402872-13080-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If attrib is freed in cmd->func(), then it will be used if either
-request or response queue has some data to send.
-
-This patch moves calling wake_up_sender() which increases the ref
-count of attrib so that it wont get freed in cmd->func().
+g_queue_is_empty() internally checks for NULL and return TRUE
+in that case.
 ---
- attrib/gattrib.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ attrib/gattrib.c |    6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index d648b82..0090027 100644
+index 01c19f9..d648b82 100644
 --- a/attrib/gattrib.c
 +++ b/attrib/gattrib.c
-@@ -450,6 +450,9 @@ done:
- 	norequests = g_queue_is_empty(attrib->requests);
- 	noresponses = g_queue_is_empty(attrib->responses);
+@@ -447,10 +447,8 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
+ 	status = 0;
  
-+	if (!norequests || !noresponses)
-+		wake_up_sender(attrib);
-+
+ done:
+-	norequests = attrib->requests == NULL ||
+-			g_queue_is_empty(attrib->requests);
+-	noresponses = attrib->responses == NULL ||
+-			g_queue_is_empty(attrib->responses);
++	norequests = g_queue_is_empty(attrib->requests);
++	noresponses = g_queue_is_empty(attrib->responses);
+ 
  	if (cmd) {
  		if (cmd->func)
- 			cmd->func(status, buf, len, cmd->user_data);
-@@ -457,9 +460,6 @@ done:
- 		command_destroy(cmd);
- 	}
- 
--	if (!norequests || !noresponses)
--		wake_up_sender(attrib);
--
- 	return TRUE;
- }
- 
 -- 
 1.7.9.5
 
