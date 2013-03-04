@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 04/11] Bluetooth: Add initial skeleton for asynchronous HCI requests
-Date: Mon,  4 Mar 2013 12:09:01 +0200
-Message-Id: <1362391748-21653-5-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 07/11] Bluetooth: Introduce a hci_req_from_skb function
+Date: Mon,  4 Mar 2013 12:09:04 +0200
+Message-Id: <1362391748-21653-8-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1362391748-21653-1-git-send-email-johan.hedberg@gmail.com>
 References: <1362391748-21653-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,113 +11,73 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch adds the initial definitions and functions for asynchronous
-HCI requests. Asynchronous requests are essentially a group of HCI
-commands together with an optional completion callback. The request is
-tracked through the already existing command queue by having the
-necessary context information as part of the control buffer of each skb.
-
-The only information needed in the skb control buffer is a flag for
-indicating that the skb is the start of a request as well as the
-optional complete callback that should be used when the request is
-complete (this will be found in the last skb of the request).
+To have a consistent content for hdev->cmd_q all entries need to follow
+the semantics of asynchronous HCI requests. This means that even single
+commands need to be dressed as requests. This patch introduces a new
+function to create a single-command request and converts the two places
+needing this (hci_send_cmd and hci_sock_sendmsg) to use it.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/bluetooth.h |   11 +++++++++++
- include/net/bluetooth/hci_core.h  |    8 ++++++++
- net/bluetooth/hci_core.c          |   31 +++++++++++++++++++++++++++++++
- 3 files changed, 50 insertions(+)
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_core.c         |   10 ++++++++--
+ net/bluetooth/hci_sock.c         |    3 +--
+ 3 files changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 5f51bef..e646bd3 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -260,12 +260,23 @@ struct l2cap_ctrl {
- 	__u8		retries;
- };
- 
-+struct hci_dev;
-+
-+typedef void (*hci_req_complete_t)(struct hci_dev *hdev, u16 last_cmd,
-+				   u8 status);
-+
-+struct hci_req_ctrl {
-+	bool			start;
-+	hci_req_complete_t	complete;
-+};
-+
- struct bt_skb_cb {
- 	__u8 pkt_type;
- 	__u8 incoming;
- 	__u16 expect;
- 	__u8 force_active;
- 	struct l2cap_ctrl control;
-+	struct hci_req_ctrl req;
- };
- #define bt_cb(skb) ((struct bt_skb_cb *)((skb)->cb))
- 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 787d3b9..7191217 100644
+index 1a75d2a..7a0fb68 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1041,6 +1041,14 @@ static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type, u8 *data,
- int hci_register_cb(struct hci_cb *hcb);
- int hci_unregister_cb(struct hci_cb *hcb);
+@@ -1049,6 +1049,7 @@ struct hci_request {
+ void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
+ int hci_req_run(struct hci_request *req, hci_req_complete_t complete);
+ int hci_req_cmd(struct hci_request *req, u16 opcode, u32 plen, void *param);
++void hci_req_from_skb(struct hci_dev *hdev, struct sk_buff *skb);
  
-+struct hci_request {
-+	struct hci_dev		*hdev;
-+	struct sk_buff_head	cmd_q;
-+};
-+
-+void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
-+int hci_req_run(struct hci_request *req, hci_req_complete_t complete);
-+
  int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param);
  void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags);
- void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb);
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index f9210d3..3ce08b6 100644
+index f99d29c..4269b3c 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -2436,6 +2436,37 @@ static int hci_send_frame(struct sk_buff *skb)
- 	return hdev->send(skb);
+@@ -2467,6 +2467,13 @@ int hci_req_run(struct hci_request *req, hci_req_complete_t complete)
+ 	return 0;
  }
  
-+void hci_req_init(struct hci_request *req, struct hci_dev *hdev)
++void hci_req_from_skb(struct hci_dev *hdev, struct sk_buff *skb)
 +{
-+	memset(req, 0, sizeof(*req));
-+	skb_queue_head_init(&req->cmd_q);
-+	req->hdev = hdev;
-+}
-+
-+int hci_req_run(struct hci_request *req, hci_req_complete_t complete)
-+{
-+	struct hci_dev *hdev = req->hdev;
-+	struct sk_buff *skb;
-+	unsigned long flags;
-+
-+	BT_DBG("length %u", skb_queue_len(&req->cmd_q));
-+
-+	/* Do not allow empty requests */
-+	if (skb_queue_empty(&req->cmd_q))
-+		return -EINVAL;
-+
-+	skb = skb_peek_tail(&req->cmd_q);
-+	bt_cb(skb)->req.complete = complete;
-+
-+	spin_lock_irqsave(&hdev->cmd_q.lock, flags);
-+	skb_queue_splice_tail(&req->cmd_q, &hdev->cmd_q);
-+	spin_unlock_irqrestore(&hdev->cmd_q.lock, flags);
-+
++	bt_cb(skb)->req.start = true;
++	skb_queue_tail(&hdev->cmd_q, skb);
 +	queue_work(hdev->workqueue, &hdev->cmd_work);
-+
-+	return 0;
 +}
 +
- /* Send HCI command */
- int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
+ static struct sk_buff *hci_prepare_cmd(struct hci_dev *hdev, u16 opcode,
+ 				       u32 plen, void *param)
  {
+@@ -2509,8 +2516,7 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
+ 	if (test_bit(HCI_INIT, &hdev->flags))
+ 		hdev->init_last_cmd = opcode;
+ 
+-	skb_queue_tail(&hdev->cmd_q, skb);
+-	queue_work(hdev->workqueue, &hdev->cmd_work);
++	hci_req_from_skb(hdev, skb);
+ 
+ 	return 0;
+ }
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 20c92de..18cb4f3 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -859,8 +859,7 @@ static int hci_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
+ 			skb_queue_tail(&hdev->raw_q, skb);
+ 			queue_work(hdev->workqueue, &hdev->tx_work);
+ 		} else {
+-			skb_queue_tail(&hdev->cmd_q, skb);
+-			queue_work(hdev->workqueue, &hdev->cmd_work);
++			hci_req_from_skb(hdev, skb);
+ 		}
+ 	} else {
+ 		if (!capable(CAP_NET_RAW)) {
 -- 
 1.7.10.4
 
