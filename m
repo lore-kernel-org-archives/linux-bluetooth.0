@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 06/11] Bluetooth: Introduce new hci_req_cmd function
-Date: Mon,  4 Mar 2013 12:09:03 +0200
-Message-Id: <1362391748-21653-7-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 05/11] Bluetooth: Refactor HCI command skb creation
+Date: Mon,  4 Mar 2013 12:09:02 +0200
+Message-Id: <1362391748-21653-6-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1362391748-21653-1-git-send-email-johan.hedberg@gmail.com>
 References: <1362391748-21653-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,40 +11,55 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This function is analogous to hci_send_cmd() but instead of directly
-queuing the command to hdev->cmd_q it adds it to the local queue of the
-asynchronous HCI request being build (inside struct hci_request).
+This patch moves out the skb creation from hci_send_cmd() into its own
+prepare_cmd() function. This is essential so the same prepare_cmd()
+function can be easily reused for skb creation for asynchronous HCI
+requests.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_core.c         |   22 ++++++++++++++++++++++
- 2 files changed, 23 insertions(+)
+ net/bluetooth/hci_core.c |   28 ++++++++++++++++++++--------
+ 1 file changed, 20 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 7191217..1a75d2a 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1048,6 +1048,7 @@ struct hci_request {
- 
- void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
- int hci_req_run(struct hci_request *req, hci_req_complete_t complete);
-+int hci_req_cmd(struct hci_request *req, u16 opcode, u32 plen, void *param);
- 
- int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param);
- void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags);
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 1a441a3..f99d29c 100644
+index 3ce08b6..1a441a3 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -2515,6 +2515,28 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
+@@ -2467,20 +2467,16 @@ int hci_req_run(struct hci_request *req, hci_req_complete_t complete)
  	return 0;
  }
  
-+/* Queue a command to an asynchronous HCI request */
-+int hci_req_cmd(struct hci_request *req, u16 opcode, u32 plen, void *param)
+-/* Send HCI command */
+-int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
++static struct sk_buff *hci_prepare_cmd(struct hci_dev *hdev, u16 opcode,
++				       u32 plen, void *param)
+ {
+ 	int len = HCI_COMMAND_HDR_SIZE + plen;
+ 	struct hci_command_hdr *hdr;
+ 	struct sk_buff *skb;
+ 
+-	BT_DBG("%s opcode 0x%4.4x plen %d", hdev->name, opcode, plen);
+-
+ 	skb = bt_skb_alloc(len, GFP_ATOMIC);
+-	if (!skb) {
+-		BT_ERR("%s no memory for command", hdev->name);
+-		return -ENOMEM;
+-	}
++	if (!skb)
++		return NULL;
+ 
+ 	hdr = (struct hci_command_hdr *) skb_put(skb, HCI_COMMAND_HDR_SIZE);
+ 	hdr->opcode = cpu_to_le16(opcode);
+@@ -2494,6 +2490,22 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
+ 	bt_cb(skb)->pkt_type = HCI_COMMAND_PKT;
+ 	skb->dev = (void *) hdev;
+ 
++	return skb;
++}
++
++/* Send HCI command */
++int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
 +{
-+	struct hci_dev *hdev = req->hdev;
 +	struct sk_buff *skb;
 +
 +	BT_DBG("%s opcode 0x%4.4x plen %d", hdev->name, opcode, plen);
@@ -55,17 +70,9 @@ index 1a441a3..f99d29c 100644
 +		return -ENOMEM;
 +	}
 +
-+	if (skb_queue_empty(&req->cmd_q))
-+		bt_cb(skb)->req.start = true;
-+
-+	skb_queue_tail(&req->cmd_q, skb);
-+
-+	return 0;
-+}
-+
- /* Get data from the previously sent command */
- void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
- {
+ 	if (test_bit(HCI_INIT, &hdev->flags))
+ 		hdev->init_last_cmd = opcode;
+ 
 -- 
 1.7.10.4
 
