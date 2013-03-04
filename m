@@ -1,104 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-Message-id: <A94F3F1039284ED7AB00B9BC928893CD@sisodomain.com>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-References: <1362402872-13080-1-git-send-email-jaganath.k@samsung.com>
- <1362402872-13080-2-git-send-email-jaganath.k@samsung.com>
- <CAJdJm_P8unpbmR6Y1dzmkmXErrP6cLwaX8wza_6f+EPB5rr=CA@mail.gmail.com>
-In-reply-to: <CAJdJm_P8unpbmR6Y1dzmkmXErrP6cLwaX8wza_6f+EPB5rr=CA@mail.gmail.com>
-Subject: Re: [PATCH 2/3] attrib: Fix use after free of attrib
-Date: Mon, 04 Mar 2013 19:50:24 +0530
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 4/4] core: Move rfkill_init and rfkill_cleanup to rfkill.h
+Date: Mon,  4 Mar 2013 15:58:30 +0200
+Message-Id: <1362405510-8685-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1362405510-8685-1-git-send-email-luiz.dentz@gmail.com>
+References: <1362405510-8685-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
---------------------------------------------------
-From: "Anderson Lizardo" <anderson.lizardo@openbossa.org>
-Sent: Monday, March 04, 2013 7:14 PM
-To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
-Cc: <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 2/3] attrib: Fix use after free of attrib
+---
+ Makefile.am  |  3 ++-
+ src/hcid.h   |  3 ---
+ src/main.c   |  1 +
+ src/rfkill.c |  2 +-
+ src/rfkill.h | 24 ++++++++++++++++++++++++
+ 5 files changed, 28 insertions(+), 5 deletions(-)
+ create mode 100644 src/rfkill.h
 
-> Hi Jaganath,
->
-> On Mon, Mar 4, 2013 at 9:14 AM, Jaganath Kanakkassery
-> <jaganath.k@samsung.com> wrote:
->> If attrib is freed in cmd->func(), then it will be used if either
->> request or response queue has some data to send.
->
-> As far as I know, attrib was not supposed to be freed on the
-> cmd->func() callback. Do you have an example/testcase where this is
-> happening? To me, looks like a refcount issue (i.e. g_attrib_unref()
-> is deleting the attrib because a reference was not properly kept where
-> necessary).
->
-
-I got this issue in BlueZ 4.101 when I called "DiscoverCharacteristics".
-"GetProperty" and "SetProperty" of characteristics. Please see the logs
-
-daemon.debug bluetoothd[4567]: src/adapter.c:adapter_get_device() 
-E8:E8:66:E0:C0:01
-daemon.debug bluetoothd[4567]: attrib/gattrib.c:g_attrib_ref() 0xb6f47808: 
-ref=1
-daemon.debug bluetoothd[4567]: attrib/gattrib.c:g_attrib_ref() 0xb6f47808: 
-ref=2
-daemon.debug bluetoothd[4567]: src/device.c:btd_device_ref() 0xb6f47268: 
-ref=9
-daemon.debug bluetoothd[4567]: attrib/gattrib.c:g_attrib_ref() 0xb6f47808: 
-ref=3
-daemon.debug bluetoothd[4567]: attrib/gattrib.c:g_attrib_ref() 0xb6f47808: 
-ref=4
-daemon.debug bluetoothd[4567]: attrib/gattrib.c:g_attrib_ref() 0xb6f47808: 
-ref=5
-daemon.debug bluetoothd[4567]: attrib/gattrib.c:g_attrib_unref() 0xb6f47808: 
-ref=4
-daemon.debug bluetoothd[4567]: attrib/client.c:register_characteristic() 
-Registered: 
-/org/bluez/4567/hci0/dev_E8_E8_66_E0_C0_01/service0012/characteristic0014
-daemon.debug bluetoothd[4567]: attrib/gattrib.c:g_attrib_ref() 0xb6f47808: 
-ref=5
-daemon.debug bluetoothd[4567]: attrib/gattrib.c:g_attrib_unref() 0xb6f47808: 
-ref=4
-daemon.debug bluetoothd[4567]: attrib/gattrib.c:g_attrib_unref() 0xb6f47808: 
-ref=3
-daemon.debug bluetoothd[4567]: gdbus/object.c:generic_message() /: 
-org.bluez.Manager.DefaultAdapter()
-daemon.debug bluetoothd[4567]: gdbus/object.c:generic_message() 
-/org/bluez/4567/hci0/dev_E8_E8_66_E0_C0_01/service0012/characteristic0014: 
-org.bluez.Characteristic.GetProperties()
-daemon.debug bluetoothd[4567]: gdbus/object.c:generic_message() /: 
-org.bluez.Manager.DefaultAdapter()
-daemon.debug bluetoothd[4567]: gdbus/object.c:generic_message() 
-/org/bluez/4567/hci0/dev_E8_E8_66_E0_C0_01/service0012/characteristic0014: 
-org.bluez.Characteristic.SetProperty()
-daemon.debug bluetoothd[4567]: attrib/gattrib.c:g_attrib_ref() 0xb6f47808: 
-ref=4
-daemon.debug bluetoothd[4567]: attrib/gattrib.c:g_attrib_unref() 0xb6f47808: 
-ref=3
-daemon.debug bluetoothd[4567]: src/device.c:btd_device_unref() 0xb6f47268: 
-ref=8
-daemon.debug bluetoothd[4567]: attrib/gattrib.c:g_attrib_unref() 0xb6f47808: 
-ref=2
-daemon.debug bluetoothd[4567]: attrib/gattrib.c:g_attrib_unref() 0xb6f47808: 
-ref=1
-daemon.debug bluetoothd[4567]: attrib/gattrib.c:g_attrib_unref() 0xb6f47808: 
-ref=0
-daemon.debug bluetoothd[4567]: attrib/gattrib.c:g_attrib_ref() 0xb6f47808: 
-ref=1
-daemon.err bluetoothd[4567]: crashed [1357010043] processname=bluetoothd, 
-pid=4567, tid=4567, signal=11
-
-I did not give this log in commit since it is based on 4.101
-
-What I understood is cmd->func() is doing g_attrib_unref() which frees the 
-attrib
-during last unref. Then since data is there in queue it tries to ref in 
-wake_up_sender().
-
-Thanks,
-Jaganath 
+diff --git a/Makefile.am b/Makefile.am
+index f75b8d6..0451ff8 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -127,7 +127,8 @@ src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
+ 			src/bluetooth.ver \
+ 			src/main.c src/log.h src/log.c \
+ 			src/systemd.h src/systemd.c \
+-			src/rfkill.c src/hcid.h src/sdpd.h \
++			src/rfkill.c src/rfkill.h \
++			src/hcid.h src/sdpd.h \
+ 			src/sdpd-server.c src/sdpd-request.c \
+ 			src/sdpd-service.c src/sdpd-database.c \
+ 			src/attrib-server.h src/attrib-server.c \
+diff --git a/src/hcid.h b/src/hcid.h
+index 294e844..ae478e7 100644
+--- a/src/hcid.h
++++ b/src/hcid.h
+@@ -41,7 +41,4 @@ struct main_opts {
+ 
+ extern struct main_opts main_opts;
+ 
+-void rfkill_init(void);
+-void rfkill_exit(void);
+-
+ void btd_exit(void);
+diff --git a/src/main.c b/src/main.c
+index 23d598f..f2d0983 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -57,6 +57,7 @@
+ #include "profile.h"
+ #include "systemd.h"
+ #include "plugin.h"
++#include "rfkill.h"
+ 
+ #define BLUEZ_NAME "org.bluez"
+ 
+diff --git a/src/rfkill.c b/src/rfkill.c
+index 70588c0..583400b 100644
+--- a/src/rfkill.c
++++ b/src/rfkill.c
+@@ -37,7 +37,7 @@
+ 
+ #include "log.h"
+ #include "adapter.h"
+-#include "hcid.h"
++#include "rfkill.h"
+ 
+ enum rfkill_type {
+ 	RFKILL_TYPE_ALL = 0,
+diff --git a/src/rfkill.h b/src/rfkill.h
+new file mode 100644
+index 0000000..b1d50a7
+--- /dev/null
++++ b/src/rfkill.h
+@@ -0,0 +1,24 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013 Intel Corporation
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++void rfkill_init(void);
++void rfkill_exit(void);
+-- 
+1.8.1.2
 
