@@ -1,44 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.2 \(1499\))
-Subject: Re: [PATCH 03/11] Bluetooth: Split HCI init sequence into three stages
+Subject: Re: [PATCH BlueZ 3/4] core: Move plugin_init and plugin_cleanup to plugin.h
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAJdJm_Pn6fx1RNu9DH2GmEHRPRdhU_FR4RoDx15cMUmynS-s9Q@mail.gmail.com>
-Date: Mon, 4 Mar 2013 10:54:38 -0800
+In-Reply-To: <1362405510-8685-3-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 4 Mar 2013 10:50:36 -0800
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <F1DBC779-E43C-4171-A473-9DFEE05FBD70@holtmann.org>
-References: <1362391748-21653-1-git-send-email-johan.hedberg@gmail.com> <1362391748-21653-4-git-send-email-johan.hedberg@gmail.com> <CAJdJm_Pj4_O8N1uYVSg6qsJm+L7PyGyPGNo-_y-FC+dWybotqQ@mail.gmail.com> <20130304113511.GA24442@x220> <CAJdJm_Pn6fx1RNu9DH2GmEHRPRdhU_FR4RoDx15cMUmynS-s9Q@mail.gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Message-Id: <BB160896-8882-459E-9698-D194ED36E2C2@holtmann.org>
+References: <1362405510-8685-1-git-send-email-luiz.dentz@gmail.com> <1362405510-8685-3-git-send-email-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hi Luiz,
 
->>>> +       /* AMP controllers do not need stage 2/3 init */
->>>> +       if (hdev->dev_type != HCI_BREDR)
->>>> +               return 0;
->>> 
->>> What about checking for "dev_type == HCI_AMP" instead? I had to check
->>> net/bluetooth/hci.h because for a moment I thought Dual mode and
->>> single mode LE devices were being left out as well. I then realized
->>> you can only have BREDR vs. AMP controller types.
->> 
->> This logic is a direct copy-paste from the beginning of the existing
->> hci_setup() function in net/bluetooth/hci_event.c. I could change it to
->> test specifically for AMP, but then what happens if we add more dev_type
->> values that also shouldn't have more than the stage 1 init? In that case
->> a stricter != HCI_BREDR test is safer than a looser == HCI_AMP test.
+> profiles/input/manager.c  | 2 ++
+> profiles/scanparam/scan.c | 2 ++
+> src/hcid.h                | 3 ---
+> src/main.c                | 1 +
+> src/plugin.h              | 2 ++
+> 5 files changed, 7 insertions(+), 3 deletions(-)
 > 
-> My concern is that the "HCI_BREDR" name is a bit misleading, specially
-> if it matches a single mode LE device (is that the case?)
+> diff --git a/profiles/input/manager.c b/profiles/input/manager.c
+> index 6ed12ee..e1e1057 100644
+> --- a/profiles/input/manager.c
+> +++ b/profiles/input/manager.c
+> @@ -32,6 +32,8 @@
+> #include <bluetooth/sdp.h>
+> #include <bluetooth/sdp_lib.h>
 > 
-> If changing the macro name is not an option, can it be clarified on the comment?
+> +#include <glib.h>
+> +
+> #include "log.h"
+> #include "plugin.h"
+> 
+> diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
+> index 268bdc8..8428816 100644
+> --- a/profiles/scanparam/scan.c
+> +++ b/profiles/scanparam/scan.c
+> @@ -31,6 +31,8 @@
+> 
+> #include <bluetooth/bluetooth.h>
+> 
+> +#include <glib.h>
+> +
+> #include "lib/uuid.h"
+> #include "log.h"
+> #include "plugin.h"
+> diff --git a/src/hcid.h b/src/hcid.h
+> index ea67cc2..294e844 100644
+> --- a/src/hcid.h
+> +++ b/src/hcid.h
+> @@ -41,9 +41,6 @@ struct main_opts {
+> 
+> extern struct main_opts main_opts;
+> 
+> -gboolean plugin_init(const char *enable, const char *disable);
+> -void plugin_cleanup(void);
+> -
+> void rfkill_init(void);
+> void rfkill_exit(void);
+> 
+> diff --git a/src/main.c b/src/main.c
+> index 62a88cd..23d598f 100644
+> --- a/src/main.c
+> +++ b/src/main.c
+> @@ -56,6 +56,7 @@
+> #include "agent.h"
+> #include "profile.h"
+> #include "systemd.h"
+> +#include "plugin.h"
+> 
+> #define BLUEZ_NAME "org.bluez"
+> 
+> diff --git a/src/plugin.h b/src/plugin.h
+> index 89c7b85..f281cd9 100644
+> --- a/src/plugin.h
+> +++ b/src/plugin.h
+> @@ -39,6 +39,8 @@ struct bluetooth_plugin_desc {
+> 		struct bluetooth_plugin_desc __bluetooth_builtin_ ## name = { \
+> 			#name, version, priority, init, exit \
+> 		};
+> +gboolean plugin_init(const char *enable, const char *disable);
+> +void plugin_cleanup(void);
+> #else
+> #define BLUETOOTH_PLUGIN_DEFINE(name, version, priority, init, exit) \
+> 		extern struct btd_debug_desc __start___debug[] \\
 
-the HCI_BREDR and HCI_AMP define the difference between a BR/EDR and/or LE controller and the AMP controller. It does not define the difference between BR/EDR and LE.
-
-While the name is not super perfect, it makes sense from a historic point of view how Bluetooth as a technology evolved. If you figure out a better naming, let me know.
-
-Or start complaining to the Bluetooth SIG, that we can not tell AMP controllers apart from BR/EDR controllers on the HCI level. Unless we start checking for some magic supported HCI commands/events, but there is clearly no standard. And the init procedure of the two controller types to differ.
+why are we doing this?
 
 Regards
 
