@@ -1,45 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20130304113511.GA24442@x220>
-References: <1362391748-21653-1-git-send-email-johan.hedberg@gmail.com>
-	<1362391748-21653-4-git-send-email-johan.hedberg@gmail.com>
-	<CAJdJm_Pj4_O8N1uYVSg6qsJm+L7PyGyPGNo-_y-FC+dWybotqQ@mail.gmail.com>
-	<20130304113511.GA24442@x220>
-Date: Mon, 4 Mar 2013 09:36:30 -0400
-Message-ID: <CAJdJm_Pn6fx1RNu9DH2GmEHRPRdhU_FR4RoDx15cMUmynS-s9Q@mail.gmail.com>
-Subject: Re: [PATCH 03/11] Bluetooth: Split HCI init sequence into three stages
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Subject: [PATCH 3/3] attrib: Remove norequests and noresponses variables
+Date: Mon, 04 Mar 2013 18:44:32 +0530
+Message-id: <1362402872-13080-3-git-send-email-jaganath.k@samsung.com>
+In-reply-to: <1362402872-13080-1-git-send-email-jaganath.k@samsung.com>
+References: <1362402872-13080-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Using g_queue_is_empty() directly in if condition looks more
+readable.
+---
+ attrib/gattrib.c |    7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-On Mon, Mar 4, 2013 at 7:35 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
->> > +       /* AMP controllers do not need stage 2/3 init */
->> > +       if (hdev->dev_type != HCI_BREDR)
->> > +               return 0;
->>
->> What about checking for "dev_type == HCI_AMP" instead? I had to check
->> net/bluetooth/hci.h because for a moment I thought Dual mode and
->> single mode LE devices were being left out as well. I then realized
->> you can only have BREDR vs. AMP controller types.
->
-> This logic is a direct copy-paste from the beginning of the existing
-> hci_setup() function in net/bluetooth/hci_event.c. I could change it to
-> test specifically for AMP, but then what happens if we add more dev_type
-> values that also shouldn't have more than the stage 1 init? In that case
-> a stricter != HCI_BREDR test is safer than a looser == HCI_AMP test.
-
-My concern is that the "HCI_BREDR" name is a bit misleading, specially
-if it matches a single mode LE device (is that the case?)
-
-If changing the macro name is not an option, can it be clarified on the comment?
-
-Best Regards,
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+index 0090027..37581a3 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -394,7 +394,6 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
+ 	uint8_t buf[512], status;
+ 	gsize len;
+ 	GIOStatus iostat;
+-	gboolean norequests, noresponses;
+ 
+ 	if (attrib->stale)
+ 		return FALSE;
+@@ -447,10 +446,8 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
+ 	status = 0;
+ 
+ done:
+-	norequests = g_queue_is_empty(attrib->requests);
+-	noresponses = g_queue_is_empty(attrib->responses);
+-
+-	if (!norequests || !noresponses)
++	if (!g_queue_is_empty(attrib->requests) ||
++					!g_queue_is_empty(attrib->responses))
+ 		wake_up_sender(attrib);
+ 
+ 	if (cmd) {
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.9.5
+
