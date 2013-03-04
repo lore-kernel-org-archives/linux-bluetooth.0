@@ -1,44 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 01/10 v4] player: Fix property Device type
-Date: Mon,  4 Mar 2013 10:06:01 +0200
-Message-Id: <1362384369-20709-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1362384369-20709-1-git-send-email-luiz.dentz@gmail.com>
-References: <1362384369-20709-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 00/10 v4] AVRCP Fixes
+Date: Mon,  4 Mar 2013 10:06:00 +0200
+Message-Id: <1362384369-20709-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Device property should be an objecy path not a string.
----
- profiles/audio/player.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+This set fixes some bugs with iOS and WP8 stacks, excessive changes on the
+metadata causing duplicate signals and some missing signals when properties
+changes.
 
-diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index 466b44a..b222643 100644
---- a/profiles/audio/player.c
-+++ b/profiles/audio/player.c
-@@ -290,7 +290,8 @@ static gboolean get_device(const GDBusPropertyTable *property,
- {
- 	struct media_player *mp = data;
- 
--	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &mp->device);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH,
-+								&mp->device);
- 
- 	return TRUE;
- }
-@@ -570,7 +571,7 @@ static const GDBusPropertyTable media_player_properties[] = {
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- 	{ "Track", "a{sv}", get_track, NULL, NULL,
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
--	{ "Device", "s", get_device, NULL, NULL,
-+	{ "Device", "o", get_device, NULL, NULL,
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- 	{ "Browsable", "b", get_browsable, NULL, browsable_exists,
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+v2: Rework MediaItem Type to be clear about folder items
+v3: Add defines for item types an folder types
+v4: Change defines to enums
+
+Luiz Augusto von Dentz (10):
+  player: Fix property Device type
+  media: Rework MediaItem Type property
+  player: Add enums for item types and folder types
+  player: Add Playlist property
+  player: Fix not emitting PropertiesChanged for Browsable and
+    Searchable
+  AVRCP: Fix changing track metadata too many times
+  player: Only emit PropertiesChanged for Position if track exists
+  player: Only expose Track property if there is metadata
+  AVRCP: Add support to UIDs changed event for CT role
+  AVRCP: Fix storing wrong UID counter
+
+ doc/media-api.txt       |  51 +++++++++----
+ profiles/audio/avrcp.c  |  29 +++++--
+ profiles/audio/avrcp.h  |   1 +
+ profiles/audio/player.c | 195 ++++++++++++++++++++++++++++++++++++++++++------
+ profiles/audio/player.h |  22 +++++-
+ 5 files changed, 255 insertions(+), 43 deletions(-)
+
 -- 
 1.8.1.2
 
