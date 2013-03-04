@@ -1,158 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/4 v2] core: Add DisableProfiles entry to main.conf
-Date: Mon,  4 Mar 2013 15:58:28 +0200
-Message-Id: <1362405510-8685-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1362405510-8685-1-git-send-email-luiz.dentz@gmail.com>
-References: <1362405510-8685-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/4 v2] audio: Remove profile enabling/disabling logic
+Date: Mon,  4 Mar 2013 15:58:27 +0200
+Message-Id: <1362405510-8685-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This entry can be used to globally disable profiles, this is specially
-useful for qualification purposes where some platforms may decide to
-only qualify a subset of the supported profiles.
+This should be handle by the core for all profiles
 ---
- src/main.c    | 17 +++++++++++++++--
- src/main.conf |  4 ++++
- src/profile.c | 26 +++++++++++++++++++++++++-
- src/profile.h |  2 +-
- 4 files changed, 45 insertions(+), 4 deletions(-)
+v2: Don't use main_opts for storing disabled profiles list and cleanup hcid.h
 
-diff --git a/src/main.c b/src/main.c
-index 1e40ebc..62a88cd 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -65,6 +65,7 @@
- #define SHUTDOWN_GRACE_SECONDS 10
+ profiles/audio/audio.conf |  4 ---
+ profiles/audio/manager.c  | 62 ++++++-----------------------------------------
+ 2 files changed, 8 insertions(+), 58 deletions(-)
+
+diff --git a/profiles/audio/audio.conf b/profiles/audio/audio.conf
+index f556610..067b3fc 100644
+--- a/profiles/audio/audio.conf
++++ b/profiles/audio/audio.conf
+@@ -6,7 +6,3 @@
  
- struct main_opts main_opts;
-+static char **disabled_profiles = NULL;
+ # Switch to master role for incoming connections (defaults to true)
+ #Master=true
+-
+-# If we want to disable support for specific services
+-# Defaults to supporting the services: Sink, Control
+-#Disable=Source
+diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
+index 934227e..42a2b58 100644
+--- a/profiles/audio/manager.c
++++ b/profiles/audio/manager.c
+@@ -70,12 +70,6 @@
+ static GKeyFile *config = NULL;
+ static GSList *devices = NULL;
  
- static const char * const supported_options[] = {
- 	"Name",
-@@ -76,6 +77,7 @@ static const char * const supported_options[] = {
- 	"ReverseServiceDiscovery",
- 	"NameResolving",
- 	"DebugKeys",
-+	"DisableProfiles"
- };
- 
- static GKeyFile *load_config(const char *file)
-@@ -263,6 +265,15 @@ static void parse_config(GKeyFile *config)
- 		g_clear_error(&err);
- 	else
- 		main_opts.debug_keys = boolean;
-+
-+	str = g_key_file_get_string(config, "General", "DisableProfiles", &err);
-+	if (err) {
-+		DBG("%s", err->message);
-+		g_clear_error(&err);
-+	} else {
-+		disabled_profiles = g_strsplit(str, " ", -1);
-+		g_free(str);
-+	}
- }
- 
- static void init_defaults(void)
-@@ -538,7 +549,7 @@ int main(int argc, char *argv[])
- 
- 	btd_device_init();
- 	btd_agent_init();
--	btd_profile_init();
-+	btd_profile_init(disabled_profiles);
- 
- 	if (option_experimental)
- 		gdbus_flags = G_DBUS_FLAG_ENABLE_EXPERIMENTAL;
-@@ -600,8 +611,10 @@ int main(int argc, char *argv[])
- 
- 	g_main_loop_unref(event_loop);
- 
--	if (config)
-+	if (config) {
- 		g_key_file_free(config);
-+		g_strfreev(disabled_profiles);
-+	}
- 
- 	disconnect_dbus();
- 
-diff --git a/src/main.conf b/src/main.conf
-index a94274a..5c648bf 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -46,3 +46,7 @@
- # makes debug link keys valid only for the duration of the connection
- # that they were created for.
- #DebugKeys = false
-+
-+# Disable Profile, both driver name and 128 bits UUIDs can be used.
-+# By default all profiles are enabled.
-+#DisableProfiles = <profile1> <profile2> ...
-diff --git a/src/profile.c b/src/profile.c
-index 656506a..6d39a41 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -585,6 +585,7 @@ static GSList *custom_props = NULL;
- 
- static GSList *profiles = NULL;
- static GSList *ext_profiles = NULL;
-+static char **blacklist = NULL;
- 
- void btd_profile_foreach(void (*func)(struct btd_profile *p, void *data),
- 								void *data)
-@@ -610,6 +611,27 @@ void btd_profile_foreach(void (*func)(struct btd_profile *p, void *data),
- 
- int btd_profile_register(struct btd_profile *profile)
+-static struct enabled_interfaces enabled = {
+-	.sink		= TRUE,
+-	.source		= FALSE,
+-	.control	= TRUE,
+-};
+-
+ static struct audio_device *get_audio_dev(struct btd_device *device)
  {
-+	int i;
-+
-+	if (blacklist == NULL)
-+		goto done;
-+
-+	for (i = 0; blacklist[i]; i++) {
-+		if (g_pattern_match_simple(blacklist[i], profile->name) == 0)
-+			return -EPROTONOSUPPORT;
-+
-+		if (profile->local_uuid != NULL && strcasecmp(blacklist[i],
-+						profile->local_uuid) == 0)
-+			return -EPROTONOSUPPORT;
-+
-+		if (profile->remote_uuids == NULL)
-+			continue;
-+
-+		if (strcasecmp(blacklist[i], profile->remote_uuids[0]) == 0)
-+			return -EPROTONOSUPPORT;
-+	}
-+
-+done:
- 	profiles = g_slist_append(profiles, profile);
- 	return 0;
- }
-@@ -2335,8 +2357,10 @@ bool btd_profile_remove_custom_prop(const char *uuid, const char *name)
- 	return false;
- }
+ 	return manager_get_audio_device(device, TRUE);
+@@ -410,47 +404,12 @@ void audio_control_disconnected(struct btd_device *dev, int err)
  
--void btd_profile_init(void)
-+void btd_profile_init(char **disabled_profiles)
+ int audio_manager_init(GKeyFile *conf)
  {
-+	blacklist = disabled_profiles;
-+
- 	g_dbus_register_interface(btd_get_dbus_connection(),
- 				"/org/bluez", "org.bluez.ProfileManager1",
- 				methods, NULL, NULL, NULL, NULL);
-diff --git a/src/profile.h b/src/profile.h
-index d858925..75b40fb 100644
---- a/src/profile.h
-+++ b/src/profile.h
-@@ -74,5 +74,5 @@ bool btd_profile_add_custom_prop(const char *uuid, const char *type,
- 					void *user_data);
- bool btd_profile_remove_custom_prop(const char *uuid, const char *name);
+-	char **list;
+-	int i;
+-
+-	if (!conf)
+-		goto proceed;
+-
+-	config = conf;
+-
+-	list = g_key_file_get_string_list(config, "General", "Enable",
+-						NULL, NULL);
+-	for (i = 0; list && list[i] != NULL; i++) {
+-		if (g_str_equal(list[i], "Sink"))
+-			enabled.sink = TRUE;
+-		else if (g_str_equal(list[i], "Source"))
+-			enabled.source = TRUE;
+-		else if (g_str_equal(list[i], "Control"))
+-			enabled.control = TRUE;
+-	}
+-	g_strfreev(list);
+-
+-	list = g_key_file_get_string_list(config, "General", "Disable",
+-						NULL, NULL);
+-	for (i = 0; list && list[i] != NULL; i++) {
+-		if (g_str_equal(list[i], "Sink"))
+-			enabled.sink = FALSE;
+-		else if (g_str_equal(list[i], "Source"))
+-			enabled.source = FALSE;
+-		else if (g_str_equal(list[i], "Control"))
+-			enabled.control = FALSE;
+-	}
+-	g_strfreev(list);
++	if (conf)
++		config = conf;
  
--void btd_profile_init(void);
-+void btd_profile_init(char **disabled_profiles);
- void btd_profile_cleanup(void);
+-proceed:
+-	if (enabled.source)
+-		btd_profile_register(&a2dp_source_profile);
+-
+-	if (enabled.sink)
+-		btd_profile_register(&a2dp_sink_profile);
+-
+-	if (enabled.control)
+-		btd_profile_register(&avrcp_profile);
++	btd_profile_register(&a2dp_source_profile);
++	btd_profile_register(&a2dp_sink_profile);
++	btd_profile_register(&avrcp_profile);
+ 
+ 	btd_register_adapter_driver(&media_driver);
+ 
+@@ -464,14 +423,9 @@ void audio_manager_exit(void)
+ 		config = NULL;
+ 	}
+ 
+-	if (enabled.source)
+-		btd_profile_unregister(&a2dp_source_profile);
+-
+-	if (enabled.sink)
+-		btd_profile_unregister(&a2dp_sink_profile);
+-
+-	if (enabled.control)
+-		btd_profile_unregister(&avrcp_profile);
++	btd_profile_unregister(&a2dp_source_profile);
++	btd_profile_unregister(&a2dp_sink_profile);
++	btd_profile_unregister(&avrcp_profile);
+ 
+ 	btd_unregister_adapter_driver(&media_driver);
+ }
 -- 
 1.8.1.2
 
