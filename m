@@ -1,36 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH 1/3] attrib: Remove redundant NULL check
-Date: Mon, 04 Mar 2013 18:44:30 +0530
-Message-id: <1362402872-13080-1-git-send-email-jaganath.k@samsung.com>
+Date: Mon, 4 Mar 2013 13:35:11 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 03/11] Bluetooth: Split HCI init sequence into three
+ stages
+Message-ID: <20130304113511.GA24442@x220>
+References: <1362391748-21653-1-git-send-email-johan.hedberg@gmail.com>
+ <1362391748-21653-4-git-send-email-johan.hedberg@gmail.com>
+ <CAJdJm_Pj4_O8N1uYVSg6qsJm+L7PyGyPGNo-_y-FC+dWybotqQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAJdJm_Pj4_O8N1uYVSg6qsJm+L7PyGyPGNo-_y-FC+dWybotqQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-g_queue_is_empty() internally checks for NULL and return TRUE
-in that case.
----
- attrib/gattrib.c |    6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+Hi Lizardo,
 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 01c19f9..d648b82 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -447,10 +447,8 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
- 	status = 0;
- 
- done:
--	norequests = attrib->requests == NULL ||
--			g_queue_is_empty(attrib->requests);
--	noresponses = attrib->responses == NULL ||
--			g_queue_is_empty(attrib->responses);
-+	norequests = g_queue_is_empty(attrib->requests);
-+	noresponses = g_queue_is_empty(attrib->responses);
- 
- 	if (cmd) {
- 		if (cmd->func)
--- 
-1.7.9.5
+On Mon, Mar 04, 2013, Anderson Lizardo wrote:
+> On Mon, Mar 4, 2013 at 6:09 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> > From: Johan Hedberg <johan.hedberg@intel.com>
+> >
+> > Having contitional command sending during a request has always been
+> > problematic and caused hacks like the hdev->init_last_cmd variable. This
+> > patch removes these conditionals and instead splits the init sequence
+> > into three stages, each with its own __hci_request() call.
+> 
+> Typos:
+> 
+> contitional -> conditional
+> __hci_request() -> __hci_req_sync()
 
+Thanks. Will fix.
+
+> > +static int __hci_init(struct hci_dev *hdev)
+> > +{
+> > +       int err;
+> > +
+> > +       err = __hci_req_sync(hdev, hci_init1_req, 0, HCI_INIT_TIMEOUT);
+> > +       if (err < 0)
+> > +               return err;
+> > +
+> > +       /* AMP controllers do not need stage 2/3 init */
+> > +       if (hdev->dev_type != HCI_BREDR)
+> > +               return 0;
+> 
+> What about checking for "dev_type == HCI_AMP" instead? I had to check
+> net/bluetooth/hci.h because for a moment I thought Dual mode and
+> single mode LE devices were being left out as well. I then realized
+> you can only have BREDR vs. AMP controller types.
+
+This logic is a direct copy-paste from the beginning of the existing
+hci_setup() function in net/bluetooth/hci_event.c. I could change it to
+test specifically for AMP, but then what happens if we add more dev_type
+values that also shouldn't have more than the stage 1 init? In that case
+a stricter != HCI_BREDR test is safer than a looser == HCI_AMP test.
+
+Johan
