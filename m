@@ -1,33 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/5] Bluetooth: HCI command synchronisation fixes
-Date: Wed,  6 Mar 2013 09:16:26 +0200
-Message-Id: <1362554191-21753-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 5 Mar 2013 20:15:24 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 00/11] Bluetooth: Add asynchronous request support
+Message-ID: <20130305231524.GA9738@joana>
+References: <1362508671-6460-1-git-send-email-johan.hedberg@gmail.com>
+ <C36CBB88-DD0E-41AC-96C6-2A5A63D68F18@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <C36CBB88-DD0E-41AC-96C6-2A5A63D68F18@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan, 
 
-This set of patches fixes HCI command synchronization for powered, UUID
-and Class of Device related mgmt commands. It fixes these issues by
-using asynchronous transactions to wait for the completion of the
-associated HCI commands and only then responds to user space with a mgmt
-command complete event.
+* Marcel Holtmann <marcel@holtmann.org> [2013-03-05 11:31:38 -0800]:
 
-Johan
+> Hi Johan,
+> 
+> > Here's a v3 of the patch set with Marcel's feedback taken into account.
+> > 
+> > Johan
+> > 
+> > ----------------------------------------------------------------
+> > Johan Hedberg (11):
+> >      Bluetooth: Rename hci_request to hci_req_sync
+> >      Bluetooth: Fix __hci_request() handling of empty requests
+> >      Bluetooth: Split HCI init sequence into three stages
+> >      Bluetooth: Add initial skeleton for asynchronous HCI requests
+> >      Bluetooth: Refactor HCI command skb creation
+> >      Bluetooth: Introduce new hci_req_add function
+> >      Bluetooth: Fix stand-alone HCI command handling
+> >      Bluetooth: Add request cmd_complete and cmd_status functions
+> >      Bluetooth: Use async requests internally in hci_req_sync
+> >      Bluetooth: Remove unused hdev->init_last_cmd
+> >      Bluetooth: Remove empty HCI event handlers
+> > 
+> > include/net/bluetooth/bluetooth.h |   10 +
+> > include/net/bluetooth/hci_core.h  |   15 +-
+> > net/bluetooth/hci_core.c          |  668 +++++++++++++++++++++++++++++++------
+> > net/bluetooth/hci_event.c         |  504 +---------------------------
+> > net/bluetooth/hci_sock.c          |    5 +
+> > 5 files changed, 603 insertions(+), 599 deletions(-)
+> 
+> I am fine with this patch set now.
+> 
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> 
+> It would be still good if someone else does a sanity read through and extra testing with this patch set before we push it into bluetooth-next.
 
-----------------------------------------------------------------
-Johan Hedberg (5):
-      Bluetooth: Move power on HCI command updates to their own function
-      Bluetooth: Update mgmt powered HCI commands to use async requests
-      Bluetooth: Wait for HCI command completion with mgmt_set_powered
-      Bluetooth: Fix UUID/class mgmt command response synchronization
-      Bluetooth: Remove useless HCI_PENDING_CLASS flag
+It looked pretty good to me and since we got positive testing feedback from
+Andre I've gone ahead and pushed all patches to bluetooth-next. Thanks.
 
- include/net/bluetooth/hci.h |    1 -
- net/bluetooth/hci_event.c   |    3 +-
- net/bluetooth/mgmt.c        |  288 ++++++++++++++++++++++++++++---------------
- 3 files changed, 190 insertions(+), 102 deletions(-)
-
-
+	Gustavo
