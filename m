@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 06/11] Bluetooth: Introduce new hci_req_add function
-Date: Tue,  5 Mar 2013 20:37:46 +0200
-Message-Id: <1362508671-6460-7-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v3 07/11] Bluetooth: Fix stand-alone HCI command handling
+Date: Tue,  5 Mar 2013 20:37:47 +0200
+Message-Id: <1362508671-6460-8-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1362508671-6460-1-git-send-email-johan.hedberg@gmail.com>
 References: <1362508671-6460-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,65 +11,50 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This function is analogous to hci_send_cmd() but instead of directly
-queuing the command to hdev->cmd_q it adds it to the local queue of the
-asynchronous HCI request being build (inside struct hci_request).
-
-This is the main function used for building asynchronous requests and
-there should be one or more calls to it between calls to hci_req_init
-and hci_req_run.
+To have a consistent content for hdev->cmd_q all entries need to follow
+the semantics of asynchronous HCI requests. This means that even single
+commands need to be dressed as requests by having a request start
+indicator. This patch adds these indicators to the two places needing
+it (hci_send_cmd and hci_sock_sendmsg).
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_core.c         |   22 ++++++++++++++++++++++
- 2 files changed, 23 insertions(+)
+ net/bluetooth/hci_core.c |    5 +++++
+ net/bluetooth/hci_sock.c |    5 +++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 7191217..67fe661 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1048,6 +1048,7 @@ struct hci_request {
- 
- void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
- int hci_req_run(struct hci_request *req, hci_req_complete_t complete);
-+int hci_req_add(struct hci_request *req, u16 opcode, u32 plen, void *param);
- 
- int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param);
- void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags);
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 0daea68..a46d1f8 100644
+index a46d1f8..08a21c0 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -2517,6 +2517,28 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
- 	return 0;
- }
+@@ -2511,6 +2511,11 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
+ 	if (test_bit(HCI_INIT, &hdev->flags))
+ 		hdev->init_last_cmd = opcode;
  
-+/* Queue a command to an asynchronous HCI request */
-+int hci_req_add(struct hci_request *req, u16 opcode, u32 plen, void *param)
-+{
-+	struct hci_dev *hdev = req->hdev;
-+	struct sk_buff *skb;
++	/* Stand-alone HCI commands must be flaged as
++	 * single-command requests.
++	 */
++	bt_cb(skb)->req.start = true;
 +
-+	BT_DBG("%s opcode 0x%4.4x plen %d", hdev->name, opcode, plen);
+ 	skb_queue_tail(&hdev->cmd_q, skb);
+ 	queue_work(hdev->workqueue, &hdev->cmd_work);
+ 
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 20c92de..4c41265 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -859,6 +859,11 @@ static int hci_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
+ 			skb_queue_tail(&hdev->raw_q, skb);
+ 			queue_work(hdev->workqueue, &hdev->tx_work);
+ 		} else {
++			/* Stand-alone HCI commands must be flaged as
++			 * single-command requests.
++			 */
++			bt_cb(skb)->req.start = true;
 +
-+	skb = hci_prepare_cmd(hdev, opcode, plen, param);
-+	if (!skb) {
-+		BT_ERR("%s no memory for command", hdev->name);
-+		return -ENOMEM;
-+	}
-+
-+	if (skb_queue_empty(&req->cmd_q))
-+		bt_cb(skb)->req.start = true;
-+
-+	skb_queue_tail(&req->cmd_q, skb);
-+
-+	return 0;
-+}
-+
- /* Get data from the previously sent command */
- void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
- {
+ 			skb_queue_tail(&hdev->cmd_q, skb);
+ 			queue_work(hdev->workqueue, &hdev->cmd_work);
+ 		}
 -- 
 1.7.10.4
 
