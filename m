@@ -1,58 +1,181 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5135D425.5010809@oss.bmw-carit.de>
-Date: Tue, 05 Mar 2013 12:16:53 +0100
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 2/2] obexd: Add support for retrieving messages in fractions
-References: <1362064124-29787-1-git-send-email-christian.fetzer@oss.bmw-carit.de> <1362064124-29787-3-git-send-email-christian.fetzer@oss.bmw-carit.de> <CABBYNZKQV8jJFeCPB_t+_Lv1FgPQYu72zj-nmXoatAZkA-A_tg@mail.gmail.com> <CABBYNZLvDKP18EjgVqa9r4Dt7rTBcDEEz0jv8e6fs9LUSOnwaw@mail.gmail.com> <5134D134.6020101@oss.bmw-carit.de> <CABBYNZ+28dtWeppPuiN9AQ7k5MUsn9kUHvSgQ80VyKEAwGO1pg@mail.gmail.com>
-In-Reply-To: <CABBYNZ+28dtWeppPuiN9AQ7k5MUsn9kUHvSgQ80VyKEAwGO1pg@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 1/3] obexd: Move Message.Get parameter attachment into dictionary
+Date: Tue,  5 Mar 2013 12:12:59 +0100
+Message-Id: <1362481981-7813-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
+In-Reply-To: <1362481981-7813-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1362481981-7813-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-On 03/04/2013 10:05 PM, Luiz Augusto von Dentz wrote:
-> Hi Christian,
->
-> On Mon, Mar 4, 2013 at 6:52 PM, Christian Fetzer
-> <christian.fetzer@oss.bmw-carit.de> wrote:
->> Hi Luiz,
->>
->> On 03/01/2013 02:13 PM, Luiz Augusto von Dentz wrote:
->>> So from the discussion the IRC yesterday I think we can have this
->>> transparently handled by the transfer, we can perhaps add Suspend/Resume and
->>> suspended state API to Transfer interface which probably in this case should
->>> auto suspend if FractionDelivery is set so the application has to resume to
->>> get the parts but they all belong to the same transfer and are saved in the
->>> same file. -- Luiz Augusto von Dentz -- To unsubscribe from this list: send
->>> the line "unsubscribe linux-bluetooth" in the body of a message to
->>> majordomo@vger.kernel.org More majordomo info at
->>> http://vger.kernel.org/majordomo-info.html
->>
->> The first fraction is already a valid bMessage object, further fractions
->> contain enclosed bBody objects.
->> Since the application has to deal with the bMessage format already, there is
->> no need to hide the fractions in the transfer objects.
-> If they are all bmsg then you are right, they should be in their own transfer.
->
->> The proposed way of simply adding a FractionDeliver parameter to the message
->> meta data, allows the application to easily
->> deal with the fractions without adding too much complexity to itself or
->> BlueZ.
-> Im still not sure why the spec haven't done this in some other way,
-> but Im fine wit the parameter provide we can actually tell when it is
-> supported.
+This is a preparation for adding additional parameters to Message.Get.
+The parsing of the args dictionary is done in parse_get_options.
 
-I've sent an update tying to make sure that the documentation explains 
-the "FractionDeliver"
-parameter well enough, telling also when it is present.
-I also changed the interface version as requested.
+The Attachment parameter has been moved into the args dictionary.
+The parameter is now optional defaulting to true.
+---
+ doc/obex-api.txt   | 11 ++++++--
+ obexd/client/map.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++--------
+ 2 files changed, 78 insertions(+), 14 deletions(-)
 
-Let me know if you're fine with it then.
-
-Thanks and Br,
-Christian
+diff --git a/doc/obex-api.txt b/doc/obex-api.txt
+index 759c4d8..9a78284 100644
+--- a/doc/obex-api.txt
++++ b/doc/obex-api.txt
+@@ -714,10 +714,10 @@ Message hierarchy
+ =================
+ 
+ Service		org.bluez.obex
+-Interface	org.bluez.obex.Message1
++Interface	org.bluez.obex.Message2
+ Object path	[variable prefix]/{session0,session1,...}/{message0,...}
+ 
+-Methods		object, dict Get(string targetfile, boolean attachment)
++Methods		object, dict Get(string targetfile, dict args)
+ 
+ 			Download message and store it in the target file.
+ 
+@@ -731,6 +731,13 @@ Methods		object, dict Get(string targetfile, boolean attachment)
+ 			The properties of this transfer are also returned along
+ 			with the object path, to avoid a call to GetProperties.
+ 
++			Possible args:
++
++				boolean Attachment
++
++					Request message attachment,
++					defaults to True
++
+ 			Possible errors: org.bluez.obex.Error.InvalidArguments
+ 					 org.bluez.obex.Error.Failed
+ 
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index 2b665ec..cd4a361 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -45,7 +45,7 @@
+ #define OBEX_MAS_UUID_LEN 16
+ 
+ #define MAP_INTERFACE "org.bluez.obex.MessageAccess1"
+-#define MAP_MSG_INTERFACE "org.bluez.obex.Message1"
++#define MAP_MSG_INTERFACE "org.bluez.obex.Message2"
+ #define ERROR_INTERFACE "org.bluez.obex.Error"
+ #define MAS_UUID "00001132-0000-1000-8000-00805f9b34fb"
+ 
+@@ -385,34 +385,91 @@ static void map_msg_free(void *data)
+ 	g_free(msg);
+ }
+ 
++static GObexApparam *parse_attachment(GObexApparam *apparam,
++							DBusMessageIter *iter)
++{
++	dbus_bool_t attachment;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
++		return NULL;
++
++	dbus_message_iter_get_basic(iter, &attachment);
++
++	return g_obex_apparam_set_uint8(apparam, MAP_AP_ATTACHMENT,
++						attachment ? TRUE : FALSE);
++}
++
++static GObexApparam *parse_get_options(GObexApparam *apparam,
++							DBusMessageIter *iter)
++{
++	DBusMessageIter array;
++
++	DBG("");
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
++		return NULL;
++
++	dbus_message_iter_recurse(iter, &array);
++
++	while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_DICT_ENTRY) {
++		const char *key;
++		DBusMessageIter value, entry;
++
++		dbus_message_iter_recurse(&array, &entry);
++		dbus_message_iter_get_basic(&entry, &key);
++
++		dbus_message_iter_next(&entry);
++		dbus_message_iter_recurse(&entry, &value);
++
++		if (strcasecmp(key, "Attachment") == 0) {
++			if (parse_attachment(apparam, &value) == NULL)
++				return NULL;
++		}
++
++		dbus_message_iter_next(&array);
++	}
++
++	return apparam;
++}
++
+ static DBusMessage *map_msg_get(DBusConnection *connection,
+ 					DBusMessage *message, void *user_data)
+ {
+ 	struct map_msg *msg = user_data;
+ 	struct obc_transfer *transfer;
+ 	const char *target_file;
+-	gboolean attachment;
+ 	GError *err = NULL;
+ 	DBusMessage *reply;
+ 	GObexApparam *apparam;
++	DBusMessageIter args;
++
++	dbus_message_iter_init(message, &args);
+ 
+-	if (dbus_message_get_args(message, NULL,
+-				DBUS_TYPE_STRING, &target_file,
+-				DBUS_TYPE_BOOLEAN, &attachment,
+-				DBUS_TYPE_INVALID) == FALSE)
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_STRING)
+ 		return g_dbus_create_error(message,
+ 				ERROR_INTERFACE ".InvalidArguments", NULL);
+ 
+-	transfer = obc_transfer_get("x-bt/message", msg->handle, target_file,
+-									&err);
+-	if (transfer == NULL)
+-		goto fail;
++	dbus_message_iter_get_basic(&args, &target_file);
++
++	dbus_message_iter_next(&args);
+ 
+ 	apparam = g_obex_apparam_set_uint8(NULL, MAP_AP_ATTACHMENT,
+-								attachment);
++								TRUE);
++
+ 	apparam = g_obex_apparam_set_uint8(apparam, MAP_AP_CHARSET,
+ 								CHARSET_UTF8);
+ 
++	if (parse_get_options(apparam, &args) == NULL) {
++		g_obex_apparam_free(apparam);
++		return g_dbus_create_error(message,
++				ERROR_INTERFACE ".InvalidArguments", NULL);
++	}
++
++	transfer = obc_transfer_get("x-bt/message", msg->handle, target_file,
++									&err);
++	if (transfer == NULL)
++		goto fail;
++
+ 	obc_transfer_set_apparam(transfer, apparam);
+ 
+ 	if (!obc_session_queue(msg->data->session, transfer, NULL, NULL, &err))
+@@ -731,7 +788,7 @@ static void set_deleted(const GDBusPropertyTable *property,
+ static const GDBusMethodTable map_msg_methods[] = {
+ 	{ GDBUS_METHOD("Get",
+ 			GDBUS_ARGS({ "targetfile", "s" },
+-						{ "attachment", "b" }),
++						{ "args", "a{sv}" }),
+ 			GDBUS_ARGS({ "transfer", "o" },
+ 						{ "properties", "a{sv}" }),
+ 			map_msg_get) },
+-- 
+1.8.1.4
 
