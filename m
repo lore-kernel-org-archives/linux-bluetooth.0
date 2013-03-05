@@ -1,93 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
 Mime-Version: 1.0 (Mac OS X Mail 6.2 \(1499\))
-Subject: Re: [PATCH v2 03/11] Bluetooth: Split HCI init sequence into three stages
+Subject: Re: [RFC] bloodpressure: Add Blood Pressure API
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1362472150-30965-4-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 5 Mar 2013 09:01:55 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <BCAA5170-33A1-48D7-A8FD-F670A12E8252@holtmann.org>
-References: <1362472150-30965-1-git-send-email-johan.hedberg@gmail.com> <1362472150-30965-4-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+In-Reply-To: <5135D965.8020604@tieto.com>
+Date: Tue, 5 Mar 2013 08:15:58 -0800
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <F00262C4-3552-438E-AF44-1D088CAB11A8@holtmann.org>
+References: <1360668097-28906-1-git-send-email-waldemar.rymarkiewicz@tieto.com> <C4340FC6-1121-468E-B15D-68E2770AA07E@holtmann.org> <5135D965.8020604@tieto.com>
+To: Rymarkiewicz Waldemar <waldemar.rymarkiewicz@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Waldemar,
 
-> Having conditional command sending during a request has always been
-> problematic and caused hacks like the hdev->init_last_cmd variable. This
-> patch removes these conditionals and instead splits the init sequence
-> into three stages, each with its own __hci_req_sync() call.
+>>> +Blood Pressure Manager hierarchy
+>>> +================================
+>>> +
+>>> +Serviceorg.bluez
+>>> +Interface	org.bluez.BloodPressureManager1
+>>> +Object path	[variable prefix]/{hci0,hci1,...}
+>>> +
+>>> +Methods		RegisterWatcher(object agent)
+>> 
+>> I do not really this manager business anymore. Splitting the interface over adapter and device object seems pointless. What I like to see is that we make one interface on the device object. We should have no proper lifetime rules for these.
+>> 
+>> Basically a client using a specialised interface should have to deal with one entry point and not with multiple. Low Energy clients need to pick a device they want to operate with. So this should focus on device objects and nothing else.
+>> 
 > 
-> This also paves the way to the upcoming asynchronous request support
-> swhich will also benefit by having a simpler implementation if it
-> doesn't need to cater for requests that change on the fly.
+> Is this what you mean?
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/hci_core.c  |  274 ++++++++++++++++++++++++++++++++++++++++++++-
-> net/bluetooth/hci_event.c |  255 +----------------------------------------
-> 2 files changed, 274 insertions(+), 255 deletions(-)
 > 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index cd4e5cd..e5ee219 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -193,6 +193,9 @@ static void bredr_init(struct hci_dev *hdev)
-> 
-> 	/* Read Local Version */
-> 	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL);
+> diff --git a/doc/bloodpressure-api.txt b/doc/bloodpressure-api.txt
+> new file mode 100644
+> index 0000000..be18208
+> --- /dev/null
+> +++ b/doc/bloodpressure-api.txt
+> @@ -0,0 +1,127 @@
+> +Blood Pressure API description
+> +******************************
 > +
-> +	/* Read BD Address */
-> +	hci_send_cmd(hdev, HCI_OP_READ_BD_ADDR, 0, NULL);
-> }
-> 
-> static void amp_init(struct hci_dev *hdev)
-> @@ -209,7 +212,7 @@ static void amp_init(struct hci_dev *hdev)
-> 	hci_send_cmd(hdev, HCI_OP_READ_DATA_BLOCK_SIZE, 0, NULL);
-> }
-> 
-> -static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
-> +static void hci_init1_req(struct hci_dev *hdev, unsigned long opt)
-> {
-> 	struct sk_buff *skb;
-> 
-> @@ -246,6 +249,273 @@ static void hci_init_req(struct hci_dev *hdev, unsigned long opt)
-> 	}
-> }
-> 
-> +static void bredr_setup(struct hci_dev *hdev)
-> +{
-> +	struct hci_cp_delete_stored_link_key cp;
-> +	__le16 param;
-> +	__u8 flt_type;
+> +Blood Pressure Profile hierarchy
+> +================================
 > +
-> +	/* Read Buffer Size (ACL mtu, max pkt, etc.) */
-> +	hci_send_cmd(hdev, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
+> +Service		org.bluez
+> +Interface	org.bluez.BloodPressure1
+> +Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
 > +
-> +	/* Read Class of Device */
-> +	hci_send_cmd(hdev, HCI_OP_READ_CLASS_OF_DEV, 0, NULL);
+> +Methods		RegisterWatcher(object watcher)
 > +
-> +	/* Read Local Name */
-> +	hci_send_cmd(hdev, HCI_OP_READ_LOCAL_NAME, 0, NULL);
+> +			Registers a watcher to monitor blood pressure
+> +			measurements. This watcher will be notified about
+> +			final pressure measurements.
 > +
-> +	/* Read Voice Setting */
-> +	hci_send_cmd(hdev, HCI_OP_READ_VOICE_SETTING, 0, NULL);
+> +			Possible Errors: org.bluez.Error.InvalidArguments
 > +
-> +	/* Clear Event Filters */
-> +	flt_type = HCI_FLT_CLEAR_ALL;
-> +	hci_send_cmd(hdev, HCI_OP_SET_EVENT_FLT, 1, &flt_type);
+> +		UnregisterWatcher(object watcher)
 > +
-> +	/* Connection accept timeout ~20 secs */
-> +	param = __constant_cpu_to_le16(0x7d00);
-> +	hci_send_cmd(hdev, HCI_OP_WRITE_CA_TIMEOUT, 2, &param);
+> +			Unregisters a watcher.
 > +
-> +	bacpy(&cp.bdaddr, BDADDR_ANY);
-> +	cp.delete_all = 1;
-> +	hci_send_cmd(hdev, HCI_OP_DELETE_STORED_LINK_KEY, sizeof(cp), &cp);
-> +}
+> +		EnableIntermediateMeasurement(object watcher)
+> +
+> +			Enables intermediate measurement notifications
+> +			for this watcher. Intermediate measurements will
+> +			be enabled only for devices which support it.
+> +
+> +			Possible Errors: org.bluez.Error.InvalidArguments
+> +					org.bluez.Error.NotSupported
+> +
+> +		DisableIntermediateMeasurement(object watcher)
+> +
+> +			Disables intermediate measurement notifications
+> +			for this watcher. It will disable notifications in
+> +			devices when the last watcher is removed for
+> +			intermediate measurements.
+> +
+> +			Possible Errors: org.bluez.Error.InvalidArguments
+> +					org.bluez.Error.NotFound
 
-I know this is not your fault, but please while at it, use 0x01 for all of the values that go directly onto the wire.
+why don't we make these two methods parts of a dict for RegisterWatcher. Enabling them manually seems rather pointless.
 
 Regards
 
