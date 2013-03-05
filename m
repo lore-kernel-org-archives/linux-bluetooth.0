@@ -1,36 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 00/11] Bluetooth: Add asynchronous request support
-Date: Tue,  5 Mar 2013 20:37:40 +0200
-Message-Id: <1362508671-6460-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.2 \(1499\))
+Subject: Re: [PATCH v2 11/11] Bluetooth: Remove empty HCI event handlers
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1362472150-30965-12-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 5 Mar 2013 09:10:15 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <247B6A3D-34AD-4B62-851C-12736BCB6F98@holtmann.org>
+References: <1362472150-30965-1-git-send-email-johan.hedberg@gmail.com> <1362472150-30965-12-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan,
 
-Here's a v3 of the patch set with Marcel's feedback taken into account.
+> With the removal of hci_req_complete() several HCI event handles have
 
-Johan
+nitpick here, it is handlers.
 
-----------------------------------------------------------------
-Johan Hedberg (11):
-      Bluetooth: Rename hci_request to hci_req_sync
-      Bluetooth: Fix __hci_request() handling of empty requests
-      Bluetooth: Split HCI init sequence into three stages
-      Bluetooth: Add initial skeleton for asynchronous HCI requests
-      Bluetooth: Refactor HCI command skb creation
-      Bluetooth: Introduce new hci_req_add function
-      Bluetooth: Fix stand-alone HCI command handling
-      Bluetooth: Add request cmd_complete and cmd_status functions
-      Bluetooth: Use async requests internally in hci_req_sync
-      Bluetooth: Remove unused hdev->init_last_cmd
-      Bluetooth: Remove empty HCI event handlers
+> essentially become empty and can be removed. The only potential benefit
+> of these could have been logging, but the hci_event, hci_cmd_complete
+> and hci_cmd_status already provide a log for events which they do not
+> have an explicit handler for.
 
- include/net/bluetooth/bluetooth.h |   10 +
- include/net/bluetooth/hci_core.h  |   15 +-
- net/bluetooth/hci_core.c          |  668 +++++++++++++++++++++++++++++++------
- net/bluetooth/hci_event.c         |  504 +---------------------------
- net/bluetooth/hci_sock.c          |    5 +
- 5 files changed, 603 insertions(+), 599 deletions(-)
+Regards
+
+Marcel
 
