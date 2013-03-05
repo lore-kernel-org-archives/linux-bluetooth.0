@@ -1,46 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 00/11] Bluetooth: Add asynchronous request support
-Date: Tue,  5 Mar 2013 10:28:59 +0200
-Message-Id: <1362472150-30965-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1362405510-8685-2-git-send-email-luiz.dentz@gmail.com>
+References: <1362405510-8685-1-git-send-email-luiz.dentz@gmail.com>
+	<1362405510-8685-2-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 4 Mar 2013 21:12:31 -0400
+Message-ID: <CAJdJm_O=bbq4NW3VXLzPQ_g4Ps+8SZ_wBFJwOGdtkuPsUis88A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/4 v2] core: Add DisableProfiles entry to main.conf
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-Here's a v2 of the patch set with previous feedback taken into account.
+On Mon, Mar 4, 2013 at 9:58 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> +               if (g_pattern_match_simple(blacklist[i], profile->name) == 0)
+> +                       return -EPROTONOSUPPORT;
 
-One notable thing is with the request complete callback where I decided
-after all to ommit the last_opcode parameter. The reason for this is
-that it is indeed only used for logging in subsequent patches which is a
-bit redundant with the logs already existing in the other functions
-leading to the complete callback, and the same info is also available
-with tools like btmon. Furthermore, if some future piece of code really
-does end up needing this info it can always be dug out from
-hdev->sent_cmd.
+g_pattern_match_simple() returns gboolean so IMHO it is more readable
+if you use "== FALSE" or simply "if (!g_pattern_match_simple(...))"
+above.
 
-Johan
+> +
+> +               if (profile->local_uuid != NULL && strcasecmp(blacklist[i],
+> +                                               profile->local_uuid) == 0)
+> +                       return -EPROTONOSUPPORT;
+> +
+> +               if (profile->remote_uuids == NULL)
+> +                       continue;
+> +
+> +               if (strcasecmp(blacklist[i], profile->remote_uuids[0]) == 0)
+> +                       return -EPROTONOSUPPORT;
+> +       }
+> +
+> +done:
+>         profiles = g_slist_append(profiles, profile);
+>         return 0;
+>  }
 
-----------------------------------------------------------------
-Johan Hedberg (11):
-      Bluetooth: Rename hci_request to hci_req_sync
-      Bluetooth: Fix __hci_request() handling of empty requests
-      Bluetooth: Split HCI init sequence into three stages
-      Bluetooth: Add initial skeleton for asynchronous HCI requests
-      Bluetooth: Refactor HCI command skb creation
-      Bluetooth: Introduce new hci_req_add function
-      Bluetooth: Introduce a hci_req_from_skb function
-      Bluetooth: Add request cmd_complete and cmd_status functions
-      Bluetooth: Use async requests internally in hci_req_sync
-      Bluetooth: Remove unused hdev->init_last_cmd
-      Bluetooth: Remove empty HCI event handlers
-
- include/net/bluetooth/bluetooth.h |   10 +
- include/net/bluetooth/hci_core.h  |   16 +-
- net/bluetooth/hci_core.c          |  673 +++++++++++++++++++++++++++++++------
- net/bluetooth/hci_event.c         |  504 +--------------------------
- net/bluetooth/hci_sock.c          |    3 +-
- 5 files changed, 603 insertions(+), 603 deletions(-)
-
-
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
