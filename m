@@ -1,47 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.2 \(1499\))
-Subject: Re: [PATCH v2 1/3] obexd: Move Message.Get parameter attachment into dictionary
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1362481981-7813-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Date: Tue, 5 Mar 2013 08:12:49 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <A9F65BD5-95F0-4DA8-B6DE-A8D4C8756269@holtmann.org>
-References: <1362481981-7813-1-git-send-email-christian.fetzer@oss.bmw-carit.de> <1362481981-7813-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
-To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2 0/6] Fix state callbacks register/unregister in audio code
+Date: Tue, 5 Mar 2013 15:59:49 +0100
+Message-ID: <1362495595-17492-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+V2 fixes issues pointed by Luiz:
+ - callback registartion functions now takes device as first argument
+ - fixed typo in commit message
+ - fixed bogus return instead of continue in source_set_state
 
-> This is a preparation for adding additional parameters to Message.Get.
-> The parsing of the args dictionary is done in parse_get_options.
-> 
-> The Attachment parameter has been moved into the args dictionary.
-> The parameter is now optional defaulting to true.
-> ---
-> doc/obex-api.txt   | 11 ++++++--
-> obexd/client/map.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++--------
-> 2 files changed, 78 insertions(+), 14 deletions(-)
-> 
-> diff --git a/doc/obex-api.txt b/doc/obex-api.txt
-> index 759c4d8..9a78284 100644
-> --- a/doc/obex-api.txt
-> +++ b/doc/obex-api.txt
-> @@ -714,10 +714,10 @@ Message hierarchy
-> =================
-> 
-> Service		org.bluez.obex
-> -Interface	org.bluez.obex.Message1
-> +Interface	org.bluez.obex.Message2
-> Object path	[variable prefix]/{session0,session1,...}/{message0,...}
-> 
-> -Methods		object, dict Get(string targetfile, boolean attachment)
-> +Methods		object, dict Get(string targetfile, dict args)
+Szymon Janc (6):
+  avdtp: Register state callback for specified audio device
+  avdtp: Remove user data from avdtp_session_state_cb
+  avctp: Allow to register state callback for specified audio device
+  avctp: Remove user data from avctp_session_state_cb
+  sink: Register state callback for specified audio device
+  source: Register state callback for specified audio device
 
-you can not do this. We need to support both APIs in this case. ALso where is the discussion on this API change and especially why do we need it.
+ profiles/audio/avctp.c     | 12 ++++++++----
+ profiles/audio/avctp.h     |  5 ++---
+ profiles/audio/avdtp.c     | 13 +++++++++----
+ profiles/audio/avdtp.h     |  6 +++---
+ profiles/audio/avrcp.c     |  4 ++--
+ profiles/audio/control.c   | 10 +++++-----
+ profiles/audio/device.c    | 33 ++++++++++++++++-----------------
+ profiles/audio/sink.c      | 26 ++++++++++++++------------
+ profiles/audio/sink.h      |  3 ++-
+ profiles/audio/source.c    | 27 +++++++++++++++------------
+ profiles/audio/source.h    |  3 ++-
+ profiles/audio/transport.c | 10 ++--------
+ 12 files changed, 80 insertions(+), 72 deletions(-)
 
-Regards
-
-Marcel
+-- 
+1.8.1.5
 
