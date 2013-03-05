@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 6/6] source: Register state callback for specified audio device
-Date: Tue, 5 Mar 2013 12:06:59 +0100
-Message-ID: <1362481619-25815-7-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 2/6] avdtp: Remove user data from avdtp_session_state_cb
+Date: Tue, 5 Mar 2013 12:06:55 +0100
+Message-ID: <1362481619-25815-3-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1362481619-25815-1-git-send-email-szymon.janc@tieto.com>
 References: <1362481619-25815-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,92 +12,147 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-State callback will now be registered and called for specified device
-only. This will allow for more cleaner callback register/unregister
-in roles code.
+All users pass NULL as user data so there is no need to keep that.
 ---
- profiles/audio/source.c    | 9 ++++++++-
- profiles/audio/source.h    | 3 ++-
- profiles/audio/transport.c | 5 +----
- 3 files changed, 11 insertions(+), 6 deletions(-)
+ profiles/audio/avdtp.c  | 6 ++----
+ profiles/audio/avdtp.h  | 5 ++---
+ profiles/audio/device.c | 6 ++----
+ profiles/audio/sink.c   | 6 ++----
+ profiles/audio/source.c | 5 ++---
+ 5 files changed, 10 insertions(+), 18 deletions(-)
 
-diff --git a/profiles/audio/source.c b/profiles/audio/source.c
-index 4ebe598..5c5568a 100644
---- a/profiles/audio/source.c
-+++ b/profiles/audio/source.c
-@@ -70,6 +70,7 @@ struct source {
- 
- struct source_state_callback {
- 	source_state_cb cb;
-+	struct audio_device *dev;
- 	void *user_data;
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index 36273ad..23934a6 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -357,7 +357,6 @@ struct stream_callback {
+ struct avdtp_state_callback {
+ 	avdtp_session_state_cb cb;
+ 	struct audio_device *dev;
+-	void *user_data;
  	unsigned int id;
  };
-@@ -96,6 +97,10 @@ static void source_set_state(struct audio_device *dev, source_state_t new_state)
  
- 	for (l = source_callbacks; l != NULL; l = l->next) {
- 		struct source_state_callback *cb = l->data;
-+
-+		if (cb->dev != dev)
-+			return;
-+
- 		cb->cb(dev, old_state, new_state, cb->user_data);
+@@ -732,7 +731,7 @@ static void avdtp_set_state(struct avdtp *session,
+ 		if (dev != cb->dev)
+ 			continue;
+ 
+-		cb->cb(dev, session, old_state, new_state, cb->user_data);
++		cb->cb(dev, session, old_state, new_state);
  	}
- 
-@@ -439,13 +444,15 @@ int source_disconnect(struct audio_device *dev, gboolean shutdown)
- 	return avdtp_close(source->session, source->stream, FALSE);
  }
  
--unsigned int source_add_state_cb(source_state_cb cb, void *user_data)
-+unsigned int source_add_state_cb(source_state_cb cb, struct audio_device *dev,
-+								void *user_data)
- {
- 	struct source_state_callback *state_cb;
- 	static unsigned int id = 0;
+@@ -3924,7 +3923,7 @@ void avdtp_set_device_disconnect(struct avdtp *session, gboolean dev_dc)
+ }
  
- 	state_cb = g_new(struct source_state_callback, 1);
+ unsigned int avdtp_add_state_cb(avdtp_session_state_cb cb,
+-				struct audio_device *dev, void *user_data)
++						struct audio_device *dev)
+ {
+ 	struct avdtp_state_callback *state_cb;
+ 	static unsigned int id = 0;
+@@ -3932,7 +3931,6 @@ unsigned int avdtp_add_state_cb(avdtp_session_state_cb cb,
+ 	state_cb = g_new(struct avdtp_state_callback, 1);
  	state_cb->cb = cb;
-+	state_cb->dev = dev;
- 	state_cb->user_data = user_data;
+ 	state_cb->dev = dev;
+-	state_cb->user_data = user_data;
  	state_cb->id = ++id;
  
-diff --git a/profiles/audio/source.h b/profiles/audio/source.h
-index 4c01d27..d39abac 100644
---- a/profiles/audio/source.h
-+++ b/profiles/audio/source.h
-@@ -37,7 +37,8 @@ typedef void (*source_state_cb) (struct audio_device *dev,
- 				source_state_t new_state,
- 				void *user_data);
+ 	avdtp_callbacks = g_slist_append(avdtp_callbacks, state_cb);
+diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
+index 48b6748..270354a 100644
+--- a/profiles/audio/avdtp.h
++++ b/profiles/audio/avdtp.h
+@@ -119,8 +119,7 @@ struct avdtp_media_codec_capability {
+ typedef void (*avdtp_session_state_cb) (struct audio_device *dev,
+ 					struct avdtp *session,
+ 					avdtp_session_state_t old_state,
+-					avdtp_session_state_t new_state,
+-					void *user_data);
++					avdtp_session_state_t new_state);
  
--unsigned int source_add_state_cb(source_state_cb cb, void *user_data);
-+unsigned int source_add_state_cb(source_state_cb cb, struct audio_device *dev,
-+							void *user_data);
- gboolean source_remove_state_cb(unsigned int id);
+ typedef void (*avdtp_stream_state_cb) (struct avdtp_stream *stream,
+ 					avdtp_state_t old_state,
+@@ -261,7 +260,7 @@ struct avdtp_remote_sep *avdtp_stream_get_remote_sep(
+ 						struct avdtp_stream *stream);
  
- struct source *source_init(struct audio_device *dev);
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 1e54323..0b39ed0 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -764,9 +764,6 @@ static void source_state_changed(struct audio_device *dev,
+ unsigned int avdtp_add_state_cb(avdtp_session_state_cb cb,
+-				struct audio_device *dev, void *user_data);
++						struct audio_device *dev);
+ 
+ gboolean avdtp_remove_state_cb(unsigned int id);
+ 
+diff --git a/profiles/audio/device.c b/profiles/audio/device.c
+index 0c77468..663a341 100644
+--- a/profiles/audio/device.c
++++ b/profiles/audio/device.c
+@@ -226,8 +226,7 @@ static void device_set_state(struct audio_device *dev, audio_state_t new_state)
+ 
+ static void device_avdtp_cb(struct audio_device *dev, struct avdtp *session,
+ 				avdtp_session_state_t old_state,
+-				avdtp_session_state_t new_state,
+-				void *user_data)
++				avdtp_session_state_t new_state)
  {
- 	struct media_transport *transport = user_data;
+ 	if (!dev->control)
+ 		return;
+@@ -315,8 +314,7 @@ struct audio_device *audio_device_register(struct btd_device *device)
+ 	if (sink_callback_id == 0)
+ 		sink_callback_id = sink_add_state_cb(device_sink_cb, NULL);
  
--	if (dev != transport->device)
--		return;
--
- 	if (new_state == SOURCE_STATE_PLAYING)
- 		transport_update_playing(transport, TRUE);
- 	else
-@@ -815,7 +812,7 @@ struct media_transport *media_transport_create(struct audio_device *device,
- 			avrcp_set_volume(device, a2dp->volume);
- 			transport->source_watch = source_add_state_cb(
- 							source_state_changed,
--							transport);
-+							device, transport);
- 		}
- 	} else
- 		goto fail;
+-	dev->priv->avdtp_callback_id = avdtp_add_state_cb(device_avdtp_cb, dev,
+-									NULL);
++	dev->priv->avdtp_callback_id = avdtp_add_state_cb(device_avdtp_cb, dev);
+ 
+ 	if (avctp_callback_id == 0)
+ 		avctp_callback_id = avctp_add_state_cb(device_avctp_cb, NULL);
+diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
+index 9dbff9d..2c0ec4b 100644
+--- a/profiles/audio/sink.c
++++ b/profiles/audio/sink.c
+@@ -110,8 +110,7 @@ static void sink_set_state(struct audio_device *dev, sink_state_t new_state)
+ static void avdtp_state_callback(struct audio_device *dev,
+ 					struct avdtp *session,
+ 					avdtp_session_state_t old_state,
+-					avdtp_session_state_t new_state,
+-					void *user_data)
++					avdtp_session_state_t new_state)
+ {
+ 	struct sink *sink = dev->sink;
+ 
+@@ -378,8 +377,7 @@ struct sink *sink_init(struct audio_device *dev)
+ 
+ 	sink->dev = dev;
+ 
+-	sink->avdtp_callback_id = avdtp_add_state_cb(avdtp_state_callback, dev,
+-									NULL);
++	sink->avdtp_callback_id = avdtp_add_state_cb(avdtp_state_callback, dev);
+ 
+ 	return sink;
+ }
+diff --git a/profiles/audio/source.c b/profiles/audio/source.c
+index 2cbd08d..4ebe598 100644
+--- a/profiles/audio/source.c
++++ b/profiles/audio/source.c
+@@ -111,8 +111,7 @@ static void source_set_state(struct audio_device *dev, source_state_t new_state)
+ static void avdtp_state_callback(struct audio_device *dev,
+ 					struct avdtp *session,
+ 					avdtp_session_state_t old_state,
+-					avdtp_session_state_t new_state,
+-					void *user_data)
++					avdtp_session_state_t new_state)
+ {
+ 	struct source *source = dev->source;
+ 
+@@ -384,7 +383,7 @@ struct source *source_init(struct audio_device *dev)
+ 	source->dev = dev;
+ 
+ 	source->avdtp_callback_id = avdtp_add_state_cb(avdtp_state_callback,
+-								dev, NULL);
++									dev);
+ 
+ 	return source;
+ }
 -- 
 1.8.1.5
 
