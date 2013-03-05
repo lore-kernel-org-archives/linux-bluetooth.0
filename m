@@ -1,84 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.2 \(1499\))
-Subject: Re: [RFC] bloodpressure: Add Blood Pressure API
+Subject: Re: [PATCH v2 1/3] obexd: Move Message.Get parameter attachment into dictionary
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <5135D965.8020604@tieto.com>
-Date: Tue, 5 Mar 2013 08:15:58 -0800
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <F00262C4-3552-438E-AF44-1D088CAB11A8@holtmann.org>
-References: <1360668097-28906-1-git-send-email-waldemar.rymarkiewicz@tieto.com> <C4340FC6-1121-468E-B15D-68E2770AA07E@holtmann.org> <5135D965.8020604@tieto.com>
-To: Rymarkiewicz Waldemar <waldemar.rymarkiewicz@tieto.com>
+In-Reply-To: <1362481981-7813-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Date: Tue, 5 Mar 2013 08:12:49 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <A9F65BD5-95F0-4DA8-B6DE-A8D4C8756269@holtmann.org>
+References: <1362481981-7813-1-git-send-email-christian.fetzer@oss.bmw-carit.de> <1362481981-7813-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
+To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldemar,
+Hi Christian,
 
->>> +Blood Pressure Manager hierarchy
->>> +================================
->>> +
->>> +Serviceorg.bluez
->>> +Interface	org.bluez.BloodPressureManager1
->>> +Object path	[variable prefix]/{hci0,hci1,...}
->>> +
->>> +Methods		RegisterWatcher(object agent)
->> 
->> I do not really this manager business anymore. Splitting the interface over adapter and device object seems pointless. What I like to see is that we make one interface on the device object. We should have no proper lifetime rules for these.
->> 
->> Basically a client using a specialised interface should have to deal with one entry point and not with multiple. Low Energy clients need to pick a device they want to operate with. So this should focus on device objects and nothing else.
->> 
+> This is a preparation for adding additional parameters to Message.Get.
+> The parsing of the args dictionary is done in parse_get_options.
 > 
-> Is this what you mean?
+> The Attachment parameter has been moved into the args dictionary.
+> The parameter is now optional defaulting to true.
+> ---
+> doc/obex-api.txt   | 11 ++++++--
+> obexd/client/map.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++--------
+> 2 files changed, 78 insertions(+), 14 deletions(-)
 > 
+> diff --git a/doc/obex-api.txt b/doc/obex-api.txt
+> index 759c4d8..9a78284 100644
+> --- a/doc/obex-api.txt
+> +++ b/doc/obex-api.txt
+> @@ -714,10 +714,10 @@ Message hierarchy
+> =================
 > 
-> diff --git a/doc/bloodpressure-api.txt b/doc/bloodpressure-api.txt
-> new file mode 100644
-> index 0000000..be18208
-> --- /dev/null
-> +++ b/doc/bloodpressure-api.txt
-> @@ -0,0 +1,127 @@
-> +Blood Pressure API description
-> +******************************
-> +
-> +Blood Pressure Profile hierarchy
-> +================================
-> +
-> +Service		org.bluez
-> +Interface	org.bluez.BloodPressure1
-> +Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
-> +
-> +Methods		RegisterWatcher(object watcher)
-> +
-> +			Registers a watcher to monitor blood pressure
-> +			measurements. This watcher will be notified about
-> +			final pressure measurements.
-> +
-> +			Possible Errors: org.bluez.Error.InvalidArguments
-> +
-> +		UnregisterWatcher(object watcher)
-> +
-> +			Unregisters a watcher.
-> +
-> +		EnableIntermediateMeasurement(object watcher)
-> +
-> +			Enables intermediate measurement notifications
-> +			for this watcher. Intermediate measurements will
-> +			be enabled only for devices which support it.
-> +
-> +			Possible Errors: org.bluez.Error.InvalidArguments
-> +					org.bluez.Error.NotSupported
-> +
-> +		DisableIntermediateMeasurement(object watcher)
-> +
-> +			Disables intermediate measurement notifications
-> +			for this watcher. It will disable notifications in
-> +			devices when the last watcher is removed for
-> +			intermediate measurements.
-> +
-> +			Possible Errors: org.bluez.Error.InvalidArguments
-> +					org.bluez.Error.NotFound
+> Service		org.bluez.obex
+> -Interface	org.bluez.obex.Message1
+> +Interface	org.bluez.obex.Message2
+> Object path	[variable prefix]/{session0,session1,...}/{message0,...}
+> 
+> -Methods		object, dict Get(string targetfile, boolean attachment)
+> +Methods		object, dict Get(string targetfile, dict args)
 
-why don't we make these two methods parts of a dict for RegisterWatcher. Enabling them manually seems rather pointless.
+you can not do this. We need to support both APIs in this case. ALso where is the discussion on this API change and especially why do we need it.
 
 Regards
 
