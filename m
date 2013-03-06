@@ -1,48 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v6 04/17] sbc: add odd member variable to sbc_encoder_state
-Date: Wed,  6 Mar 2013 11:19:10 +0100
-Message-Id: <1362565163-3567-5-git-send-email-frederic.dalleau@linux.intel.com>
-In-Reply-To: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+In-Reply-To: <1362495595-17492-1-git-send-email-szymon.janc@tieto.com>
+References: <1362495595-17492-1-git-send-email-szymon.janc@tieto.com>
+Date: Wed, 6 Mar 2013 12:04:18 +0200
+Message-ID: <CABBYNZ+gmZ79A0Kij4pnHB9ZandaMNAN+bVgGcQ7L7kuxxAVQA@mail.gmail.com>
+Subject: Re: [PATCH v2 0/6] Fix state callbacks register/unregister in audio code
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- sbc/sbc_primitives.c |    2 ++
- sbc/sbc_primitives.h |    1 +
- 2 files changed, 3 insertions(+)
+Hi Szymon,
 
-diff --git a/sbc/sbc_primitives.c b/sbc/sbc_primitives.c
-index dce0ed2..0b48ddb 100644
---- a/sbc/sbc_primitives.c
-+++ b/sbc/sbc_primitives.c
-@@ -521,6 +521,8 @@ static int sbc_calc_scalefactors_j(
-  */
- void sbc_init_primitives(struct sbc_encoder_state *state)
- {
-+	state->odd = 1;
-+
- 	/* Default implementation for analyze functions */
- 	state->sbc_analyze_4s = sbc_analyze_4b_4s_simd;
- 	state->sbc_analyze_8s = sbc_analyze_4b_8s_simd;
-diff --git a/sbc/sbc_primitives.h b/sbc/sbc_primitives.h
-index 267c277..ffee339 100644
---- a/sbc/sbc_primitives.h
-+++ b/sbc/sbc_primitives.h
-@@ -40,6 +40,7 @@ struct sbc_encoder_state {
- 	int position;
- 	/* Number of consecutive blocks handled by the encoder */
- 	int increment;
-+	int odd;
- 	int16_t SBC_ALIGNED X[2][SBC_X_BUFFER_SIZE];
- 	/* Polyphase analysis filter for 4 subbands configuration,
- 	 * it handles "increment" blocks at once */
+On Tue, Mar 5, 2013 at 4:59 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> V2 fixes issues pointed by Luiz:
+>  - callback registartion functions now takes device as first argument
+>  - fixed typo in commit message
+>  - fixed bogus return instead of continue in source_set_state
+>
+> Szymon Janc (6):
+>   avdtp: Register state callback for specified audio device
+>   avdtp: Remove user data from avdtp_session_state_cb
+>   avctp: Allow to register state callback for specified audio device
+>   avctp: Remove user data from avctp_session_state_cb
+>   sink: Register state callback for specified audio device
+>   source: Register state callback for specified audio device
+>
+>  profiles/audio/avctp.c     | 12 ++++++++----
+>  profiles/audio/avctp.h     |  5 ++---
+>  profiles/audio/avdtp.c     | 13 +++++++++----
+>  profiles/audio/avdtp.h     |  6 +++---
+>  profiles/audio/avrcp.c     |  4 ++--
+>  profiles/audio/control.c   | 10 +++++-----
+>  profiles/audio/device.c    | 33 ++++++++++++++++-----------------
+>  profiles/audio/sink.c      | 26 ++++++++++++++------------
+>  profiles/audio/sink.h      |  3 ++-
+>  profiles/audio/source.c    | 27 +++++++++++++++------------
+>  profiles/audio/source.h    |  3 ++-
+>  profiles/audio/transport.c | 10 ++--------
+>  12 files changed, 80 insertions(+), 72 deletions(-)
+>
+> --
+> 1.8.1.5
+
+Applied, thanks.
+
+
 -- 
-1.7.9.5
-
+Luiz Augusto von Dentz
