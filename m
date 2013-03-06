@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v6 16/17] sbc: Update sbcinfo for msbc
-Date: Wed,  6 Mar 2013 11:19:22 +0100
-Message-Id: <1362565163-3567-17-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v6 15/17] sbc: Update sbcenc for msbc
+Date: Wed,  6 Mar 2013 11:19:21 +0100
+Message-Id: <1362565163-3567-16-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -14,13 +14,13 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/sbcinfo.c |   52 +++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 37 insertions(+), 15 deletions(-)
+ src/sbcenc.c |  107 ++++++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 63 insertions(+), 44 deletions(-)
 
-diff --git a/src/sbcinfo.c b/src/sbcinfo.c
-index 8cfb54a..676b949 100644
---- a/src/sbcinfo.c
-+++ b/src/sbcinfo.c
+diff --git a/src/sbcenc.c b/src/sbcenc.c
+index a723b03..629bdad 100644
+--- a/src/sbcenc.c
++++ b/src/sbcenc.c
 @@ -4,6 +4,7 @@
   *
   *  Copyright (C) 2008-2010  Nokia Corporation
@@ -29,137 +29,173 @@ index 8cfb54a..676b949 100644
   *
   *
   *  This program is free software; you can redistribute it and/or modify
-@@ -61,12 +62,11 @@ struct sbc_frame_hdr {
- #error "Unknown byte order"
- #endif
+@@ -45,7 +46,7 @@ static int verbose = 0;
+ static unsigned char input[BUF_SIZE], output[BUF_SIZE + BUF_SIZE / 4];
  
--static int calc_frame_len(struct sbc_frame_hdr *hdr)
-+static int calc_frame_len(struct sbc_frame_hdr *hdr, int nrof_blocks)
+ static void encode(char *filename, int subbands, int bitpool, int joint,
+-					int dualchannel, int snr, int blocks)
++				int dualchannel, int snr, int blocks, int msbc)
  {
--	int tmp, nrof_subbands, nrof_blocks;
-+	int tmp, nrof_subbands;
- 
- 	nrof_subbands = (hdr->subbands + 1) * 4;
--	nrof_blocks = (hdr->blocks + 1) * 4;
- 
- 	switch (hdr->channel_mode) {
- 	case 0x00:
-@@ -89,13 +89,12 @@ static int calc_frame_len(struct sbc_frame_hdr *hdr)
- 	return (nrof_subbands + ((tmp + 7) / 8));
- }
- 
--static double calc_bit_rate(struct sbc_frame_hdr *hdr)
-+static double calc_bit_rate(struct sbc_frame_hdr *hdr, int nrof_blocks)
- {
--	int nrof_subbands, nrof_blocks;
-+	int nrof_subbands;
- 	double f;
- 
- 	nrof_subbands = (hdr->subbands + 1) * 4;
--	nrof_blocks = (hdr->blocks + 1) * 4;
- 
- 	switch (hdr->sampling_frequency) {
- 	case 0:
-@@ -114,7 +113,7 @@ static double calc_bit_rate(struct sbc_frame_hdr *hdr)
- 		return 0;
+ 	struct au_header au_hdr;
+ 	sbc_t sbc;
+@@ -87,57 +88,69 @@ static void encode(char *filename, int subbands, int bitpool, int joint,
+ 		goto done;
  	}
  
--	return ((8 * (calc_frame_len(hdr) + 4) * f) /
-+	return ((8 * (calc_frame_len(hdr, nrof_blocks) + 4) * f) /
- 			(nrof_subbands * nrof_blocks));
- }
- 
-@@ -175,7 +174,7 @@ static int analyze_file(char *filename)
- 	double rate;
- 	int bitpool[SIZE], frame_len[SIZE];
- 	int subbands, blocks, freq, method;
--	int n, p1, p2, fd, size, num;
-+	int n, p1, p2, fd, size, num, msbc;
- 	ssize_t len;
- 	unsigned int count;
- 
-@@ -191,17 +190,30 @@ static int analyze_file(char *filename)
- 		fd = fileno(stdin);
- 
- 	len = __read(fd, &hdr, sizeof(hdr));
--	if (len != sizeof(hdr) || hdr.syncword != 0x9c) {
-+	if (len != sizeof(hdr) || !(hdr.syncword == 0x9c ||
-+			hdr.syncword == 0xad)) {
- 		fprintf(stderr, "Not a SBC audio file\n");
- 		return -1;
- 	}
-+	msbc = (hdr.syncword == 0xad) ? 1 : 0;
+-	sbc_init(&sbc, 0L);
+-
+-	switch (BE_INT(au_hdr.sample_rate)) {
+-	case 16000:
+-		sbc.frequency = SBC_FREQ_16000;
+-		break;
+-	case 32000:
+-		sbc.frequency = SBC_FREQ_32000;
+-		break;
+-	case 44100:
+-		sbc.frequency = SBC_FREQ_44100;
+-		break;
+-	case 48000:
+-		sbc.frequency = SBC_FREQ_48000;
+-		break;
+-	}
++	if (!msbc) {
++		sbc_init(&sbc, 0L);
 +
-+	if (msbc) {
-+		hdr.subbands = 1; /* 8 */
-+		hdr.sampling_frequency = 0x00; /* 16000 */
-+		hdr.allocation_method = 0; /* Loudness */
-+		hdr.bitpool = 26;
-+		hdr.channel_mode = 0x00; /* Mono */
-+
-+		blocks = 15;
-+	} else {
-+		blocks = (hdr.blocks + 1) * 4;
-+	}
- 
- 	subbands = (hdr.subbands + 1) * 4;
--	blocks = (hdr.blocks + 1) * 4;
- 	freq = hdr.sampling_frequency;
- 	method = hdr.allocation_method;
- 
--	count = calc_frame_len(&hdr);
-+	count = calc_frame_len(&hdr, blocks);
- 
- 	bitpool[0] = hdr.bitpool;
- 	frame_len[0] = count + 4;
-@@ -213,7 +225,7 @@ static int analyze_file(char *filename)
- 
- 	if (lseek(fd, 0, SEEK_SET) < 0) {
- 		num = 1;
--		rate = calc_bit_rate(&hdr);
-+		rate = calc_bit_rate(&hdr, blocks);
- 		while (count) {
- 			size = count > sizeof(buf) ? sizeof(buf) : count;
- 			len = __read(fd, buf, size);
-@@ -237,14 +249,23 @@ static int analyze_file(char *filename)
- 		if (len == 0)
- 			break;
- 
--		if ((size_t) len < sizeof(hdr) || hdr.syncword != 0x9c) {
-+		if ((size_t) len < sizeof(hdr) || !(hdr.syncword == 0x9c ||
-+				hdr.syncword == 0xad)) {
- 			fprintf(stderr, "Corrupted SBC stream "
- 					"(len %zd syncword 0x%02x)\n",
- 					len, hdr.syncword);
- 			break;
- 		}
- 
--		count = calc_frame_len(&hdr);
-+		if (msbc) {
-+			hdr.subbands = 1; /* 8 */
-+			hdr.sampling_frequency = 0x00; /* 16000 */
-+			hdr.allocation_method = 0; /* Loudness */
-+			hdr.bitpool = 26;
-+			hdr.channel_mode = 0x00; /* Mono */
++		switch (BE_INT(au_hdr.sample_rate)) {
++		case 16000:
++			sbc.frequency = SBC_FREQ_16000;
++			break;
++		case 32000:
++			sbc.frequency = SBC_FREQ_32000;
++			break;
++		case 44100:
++			sbc.frequency = SBC_FREQ_44100;
++			break;
++		case 48000:
++			sbc.frequency = SBC_FREQ_48000;
++			break;
 +		}
 +
-+		count = calc_frame_len(&hdr, blocks);
- 		len = count + 4;
++		srate = BE_INT(au_hdr.sample_rate);
  
- 		p1 = -1;
-@@ -273,10 +294,11 @@ static int analyze_file(char *filename)
- 			count -= len;
+-	srate = BE_INT(au_hdr.sample_rate);
++		sbc.subbands = subbands == 4 ? SBC_SB_4 : SBC_SB_8;
+ 
+-	sbc.subbands = subbands == 4 ? SBC_SB_4 : SBC_SB_8;
++		if (BE_INT(au_hdr.channels) == 1) {
++			sbc.mode = SBC_MODE_MONO;
++			if (joint || dualchannel) {
++				fprintf(stderr, "Audio is mono but joint or "
++					"dualchannel mode has been specified\n");
++				goto done;
++			}
++		} else if (joint && !dualchannel)
++			sbc.mode = SBC_MODE_JOINT_STEREO;
++		else if (!joint && dualchannel)
++			sbc.mode = SBC_MODE_DUAL_CHANNEL;
++		else if (!joint && !dualchannel)
++			sbc.mode = SBC_MODE_STEREO;
++		else {
++			fprintf(stderr, "Both joint and dualchannel mode have been "
++									"specified\n");
++			goto done;
++		}
+ 
+-	if (BE_INT(au_hdr.channels) == 1) {
+-		sbc.mode = SBC_MODE_MONO;
+-		if (joint || dualchannel) {
+-			fprintf(stderr, "Audio is mono but joint or "
+-				"dualchannel mode has been specified\n");
++		sbc.endian = SBC_BE;
++		sbc.bitpool = bitpool;
++		sbc.allocation = snr ? SBC_AM_SNR : SBC_AM_LOUDNESS;
++		sbc.blocks = blocks == 4 ? SBC_BLK_4 :
++				blocks == 8 ? SBC_BLK_8 :
++					blocks == 12 ? SBC_BLK_12 : SBC_BLK_16;
++	} else {
++		if (BE_INT(au_hdr.sample_rate) != 16000 ||
++				BE_INT(au_hdr.channels) != 1 ||
++				BE_INT(au_hdr.channels) != 1) {
++			fprintf(stderr, "mSBC requires 16 bits, 16kHz, mono input\n");
+ 			goto done;
  		}
- 
--		rate += calc_bit_rate(&hdr);
-+		rate += calc_bit_rate(&hdr, blocks);
- 		num++;
+-	} else if (joint && !dualchannel)
+-		sbc.mode = SBC_MODE_JOINT_STEREO;
+-	else if (!joint && dualchannel)
+-		sbc.mode = SBC_MODE_DUAL_CHANNEL;
+-	else if (!joint && !dualchannel)
+-		sbc.mode = SBC_MODE_STEREO;
+-	else {
+-		fprintf(stderr, "Both joint and dualchannel mode have been "
+-								"specified\n");
+-		goto done;
++
++		sbc_init_msbc(&sbc, 0);
++		sbc.endian = SBC_BE;
  	}
  
-+	printf("mSBC\t\t\t%d\n", msbc);
- 	printf("Subbands\t\t%d\n", subbands);
- 	printf("Block length\t\t%d\n", blocks);
- 	printf("Sampling frequency\t%s\n", freq2str(freq));
+-	sbc.endian = SBC_BE;
+ 	/* Skip extra bytes of the header if any */
+ 	if (read(fd, input, BE_INT(au_hdr.hdr_size) - len) < 0)
+ 		goto done;
+ 
+-	sbc.bitpool = bitpool;
+-	sbc.allocation = snr ? SBC_AM_SNR : SBC_AM_LOUDNESS;
+-	sbc.blocks = blocks == 4 ? SBC_BLK_4 :
+-			blocks == 8 ? SBC_BLK_8 :
+-				blocks == 12 ? SBC_BLK_12 : SBC_BLK_16;
+-
+ 	if (verbose) {
+ 		fprintf(stderr, "encoding %s with rate %d, %d blocks, "
+ 			"%d subbands, %d bits, allocation method %s, "
+@@ -215,6 +228,7 @@ static void usage(void)
+ 	printf("Options:\n"
+ 		"\t-h, --help           Display help\n"
+ 		"\t-v, --verbose        Verbose mode\n"
++		"\t-m, --msbc           mSBC codec\n"
+ 		"\t-s, --subbands       Number of subbands to use (4 or 8)\n"
+ 		"\t-b, --bitpool        Bitpool value (default is 32)\n"
+ 		"\t-j, --joint          Joint stereo\n"
+@@ -227,6 +241,7 @@ static void usage(void)
+ static struct option main_options[] = {
+ 	{ "help",	0, 0, 'h' },
+ 	{ "verbose",	0, 0, 'v' },
++	{ "msbc",	0, 0, 'm' },
+ 	{ "subbands",	1, 0, 's' },
+ 	{ "bitpool",	1, 0, 'b' },
+ 	{ "joint",	0, 0, 'j' },
+@@ -239,9 +254,9 @@ static struct option main_options[] = {
+ int main(int argc, char *argv[])
+ {
+ 	int i, opt, subbands = 8, bitpool = 32, joint = 0, dualchannel = 0;
+-	int snr = 0, blocks = 16;
++	int snr = 0, blocks = 16, msbc = 0;
+ 
+-	while ((opt = getopt_long(argc, argv, "+hvs:b:jdSB:",
++	while ((opt = getopt_long(argc, argv, "+hmvs:b:jdSB:",
+ 						main_options, NULL)) != -1) {
+ 		switch(opt) {
+ 		case 'h':
+@@ -252,6 +267,10 @@ int main(int argc, char *argv[])
+ 			verbose = 1;
+ 			break;
+ 
++		case 'm':
++			msbc = 1;
++			break;
++
+ 		case 's':
+ 			subbands = atoi(optarg);
+ 			if (subbands != 8 && subbands != 4) {
+@@ -302,7 +321,7 @@ int main(int argc, char *argv[])
+ 
+ 	for (i = 0; i < argc; i++)
+ 		encode(argv[i], subbands, bitpool, joint, dualchannel,
+-								snr, blocks);
++							snr, blocks, msbc);
+ 
+ 	return 0;
+ }
 -- 
 1.7.9.5
 
