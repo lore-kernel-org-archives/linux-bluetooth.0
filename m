@@ -1,120 +1,165 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] audio: Remove profile enabling/disabling logic
-Date: Wed,  6 Mar 2013 12:44:26 +0200
-Message-Id: <1362566668-5098-1-git-send-email-luiz.dentz@gmail.com>
+Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+Subject: [PATCH v6 16/17] sbc: Update sbcinfo for msbc
+Date: Wed,  6 Mar 2013 11:19:22 +0100
+Message-Id: <1362565163-3567-17-git-send-email-frederic.dalleau@linux.intel.com>
+In-Reply-To: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
+References: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This should be handle by the core for all profiles
 ---
- profiles/audio/audio.conf |  4 ---
- profiles/audio/manager.c  | 62 ++++++-----------------------------------------
- 2 files changed, 8 insertions(+), 58 deletions(-)
+ src/sbcinfo.c |   52 +++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 37 insertions(+), 15 deletions(-)
 
-diff --git a/profiles/audio/audio.conf b/profiles/audio/audio.conf
-index f556610..067b3fc 100644
---- a/profiles/audio/audio.conf
-+++ b/profiles/audio/audio.conf
-@@ -6,7 +6,3 @@
+diff --git a/src/sbcinfo.c b/src/sbcinfo.c
+index 8cfb54a..676b949 100644
+--- a/src/sbcinfo.c
++++ b/src/sbcinfo.c
+@@ -4,6 +4,7 @@
+  *
+  *  Copyright (C) 2008-2010  Nokia Corporation
+  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
++ *  Copyright (C) 2012       Intel Corporation
+  *
+  *
+  *  This program is free software; you can redistribute it and/or modify
+@@ -61,12 +62,11 @@ struct sbc_frame_hdr {
+ #error "Unknown byte order"
+ #endif
  
- # Switch to master role for incoming connections (defaults to true)
- #Master=true
--
--# If we want to disable support for specific services
--# Defaults to supporting the services: Sink, Control
--#Disable=Source
-diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
-index 934227e..42a2b58 100644
---- a/profiles/audio/manager.c
-+++ b/profiles/audio/manager.c
-@@ -70,12 +70,6 @@
- static GKeyFile *config = NULL;
- static GSList *devices = NULL;
- 
--static struct enabled_interfaces enabled = {
--	.sink		= TRUE,
--	.source		= FALSE,
--	.control	= TRUE,
--};
--
- static struct audio_device *get_audio_dev(struct btd_device *device)
+-static int calc_frame_len(struct sbc_frame_hdr *hdr)
++static int calc_frame_len(struct sbc_frame_hdr *hdr, int nrof_blocks)
  {
- 	return manager_get_audio_device(device, TRUE);
-@@ -410,47 +404,12 @@ void audio_control_disconnected(struct btd_device *dev, int err)
+-	int tmp, nrof_subbands, nrof_blocks;
++	int tmp, nrof_subbands;
  
- int audio_manager_init(GKeyFile *conf)
+ 	nrof_subbands = (hdr->subbands + 1) * 4;
+-	nrof_blocks = (hdr->blocks + 1) * 4;
+ 
+ 	switch (hdr->channel_mode) {
+ 	case 0x00:
+@@ -89,13 +89,12 @@ static int calc_frame_len(struct sbc_frame_hdr *hdr)
+ 	return (nrof_subbands + ((tmp + 7) / 8));
+ }
+ 
+-static double calc_bit_rate(struct sbc_frame_hdr *hdr)
++static double calc_bit_rate(struct sbc_frame_hdr *hdr, int nrof_blocks)
  {
--	char **list;
--	int i;
--
--	if (!conf)
--		goto proceed;
--
--	config = conf;
--
--	list = g_key_file_get_string_list(config, "General", "Enable",
--						NULL, NULL);
--	for (i = 0; list && list[i] != NULL; i++) {
--		if (g_str_equal(list[i], "Sink"))
--			enabled.sink = TRUE;
--		else if (g_str_equal(list[i], "Source"))
--			enabled.source = TRUE;
--		else if (g_str_equal(list[i], "Control"))
--			enabled.control = TRUE;
--	}
--	g_strfreev(list);
--
--	list = g_key_file_get_string_list(config, "General", "Disable",
--						NULL, NULL);
--	for (i = 0; list && list[i] != NULL; i++) {
--		if (g_str_equal(list[i], "Sink"))
--			enabled.sink = FALSE;
--		else if (g_str_equal(list[i], "Source"))
--			enabled.source = FALSE;
--		else if (g_str_equal(list[i], "Control"))
--			enabled.control = FALSE;
--	}
--	g_strfreev(list);
-+	if (conf)
-+		config = conf;
+-	int nrof_subbands, nrof_blocks;
++	int nrof_subbands;
+ 	double f;
  
--proceed:
--	if (enabled.source)
--		btd_profile_register(&a2dp_source_profile);
--
--	if (enabled.sink)
--		btd_profile_register(&a2dp_sink_profile);
--
--	if (enabled.control)
--		btd_profile_register(&avrcp_profile);
-+	btd_profile_register(&a2dp_source_profile);
-+	btd_profile_register(&a2dp_sink_profile);
-+	btd_profile_register(&avrcp_profile);
+ 	nrof_subbands = (hdr->subbands + 1) * 4;
+-	nrof_blocks = (hdr->blocks + 1) * 4;
  
- 	btd_register_adapter_driver(&media_driver);
- 
-@@ -464,14 +423,9 @@ void audio_manager_exit(void)
- 		config = NULL;
+ 	switch (hdr->sampling_frequency) {
+ 	case 0:
+@@ -114,7 +113,7 @@ static double calc_bit_rate(struct sbc_frame_hdr *hdr)
+ 		return 0;
  	}
  
--	if (enabled.source)
--		btd_profile_unregister(&a2dp_source_profile);
--
--	if (enabled.sink)
--		btd_profile_unregister(&a2dp_sink_profile);
--
--	if (enabled.control)
--		btd_profile_unregister(&avrcp_profile);
-+	btd_profile_unregister(&a2dp_source_profile);
-+	btd_profile_unregister(&a2dp_sink_profile);
-+	btd_profile_unregister(&avrcp_profile);
- 
- 	btd_unregister_adapter_driver(&media_driver);
+-	return ((8 * (calc_frame_len(hdr) + 4) * f) /
++	return ((8 * (calc_frame_len(hdr, nrof_blocks) + 4) * f) /
+ 			(nrof_subbands * nrof_blocks));
  }
+ 
+@@ -175,7 +174,7 @@ static int analyze_file(char *filename)
+ 	double rate;
+ 	int bitpool[SIZE], frame_len[SIZE];
+ 	int subbands, blocks, freq, method;
+-	int n, p1, p2, fd, size, num;
++	int n, p1, p2, fd, size, num, msbc;
+ 	ssize_t len;
+ 	unsigned int count;
+ 
+@@ -191,17 +190,30 @@ static int analyze_file(char *filename)
+ 		fd = fileno(stdin);
+ 
+ 	len = __read(fd, &hdr, sizeof(hdr));
+-	if (len != sizeof(hdr) || hdr.syncword != 0x9c) {
++	if (len != sizeof(hdr) || !(hdr.syncword == 0x9c ||
++			hdr.syncword == 0xad)) {
+ 		fprintf(stderr, "Not a SBC audio file\n");
+ 		return -1;
+ 	}
++	msbc = (hdr.syncword == 0xad) ? 1 : 0;
++
++	if (msbc) {
++		hdr.subbands = 1; /* 8 */
++		hdr.sampling_frequency = 0x00; /* 16000 */
++		hdr.allocation_method = 0; /* Loudness */
++		hdr.bitpool = 26;
++		hdr.channel_mode = 0x00; /* Mono */
++
++		blocks = 15;
++	} else {
++		blocks = (hdr.blocks + 1) * 4;
++	}
+ 
+ 	subbands = (hdr.subbands + 1) * 4;
+-	blocks = (hdr.blocks + 1) * 4;
+ 	freq = hdr.sampling_frequency;
+ 	method = hdr.allocation_method;
+ 
+-	count = calc_frame_len(&hdr);
++	count = calc_frame_len(&hdr, blocks);
+ 
+ 	bitpool[0] = hdr.bitpool;
+ 	frame_len[0] = count + 4;
+@@ -213,7 +225,7 @@ static int analyze_file(char *filename)
+ 
+ 	if (lseek(fd, 0, SEEK_SET) < 0) {
+ 		num = 1;
+-		rate = calc_bit_rate(&hdr);
++		rate = calc_bit_rate(&hdr, blocks);
+ 		while (count) {
+ 			size = count > sizeof(buf) ? sizeof(buf) : count;
+ 			len = __read(fd, buf, size);
+@@ -237,14 +249,23 @@ static int analyze_file(char *filename)
+ 		if (len == 0)
+ 			break;
+ 
+-		if ((size_t) len < sizeof(hdr) || hdr.syncword != 0x9c) {
++		if ((size_t) len < sizeof(hdr) || !(hdr.syncword == 0x9c ||
++				hdr.syncword == 0xad)) {
+ 			fprintf(stderr, "Corrupted SBC stream "
+ 					"(len %zd syncword 0x%02x)\n",
+ 					len, hdr.syncword);
+ 			break;
+ 		}
+ 
+-		count = calc_frame_len(&hdr);
++		if (msbc) {
++			hdr.subbands = 1; /* 8 */
++			hdr.sampling_frequency = 0x00; /* 16000 */
++			hdr.allocation_method = 0; /* Loudness */
++			hdr.bitpool = 26;
++			hdr.channel_mode = 0x00; /* Mono */
++		}
++
++		count = calc_frame_len(&hdr, blocks);
+ 		len = count + 4;
+ 
+ 		p1 = -1;
+@@ -273,10 +294,11 @@ static int analyze_file(char *filename)
+ 			count -= len;
+ 		}
+ 
+-		rate += calc_bit_rate(&hdr);
++		rate += calc_bit_rate(&hdr, blocks);
+ 		num++;
+ 	}
+ 
++	printf("mSBC\t\t\t%d\n", msbc);
+ 	printf("Subbands\t\t%d\n", subbands);
+ 	printf("Block length\t\t%d\n", blocks);
+ 	printf("Sampling frequency\t%s\n", freq2str(freq));
 -- 
-1.8.1.4
+1.7.9.5
 
