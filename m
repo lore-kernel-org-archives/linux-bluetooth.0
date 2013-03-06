@@ -4,65 +4,51 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v6 00/17] mSBC investigations
-Date: Wed,  6 Mar 2013 11:19:06 +0100
-Message-Id: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH v6 06/17] sbc: Add armv6 primitive for 1b 8s analysis
+Date: Wed,  6 Mar 2013 11:19:12 +0100
+Message-Id: <1362565163-3567-7-git-send-email-frederic.dalleau@linux.intel.com>
+In-Reply-To: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
+References: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ sbc/sbc_primitives_armv6.c |   18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-v6 implements sbc_init_msbc(). The SBC_MSBC flag is removed from sbc.h and
-replace by an internal flag in sbc_priv structure.
-The decoder has been validated to mSBC packets sent by an iPhone.
-The encoder couldn't be validated against a third party, but at least we know
-that libsbc encoded packets can be decoded by libsbc.
-I bumped version number to 1.1 to help compile time detection.
-
-v5 shoudl fix the few remaining issues.  I could test neon and armv6
-and raised verbosity of commit messages.
-
-Regards,
-Frederic
-
-
-Frédéric Dalleau (17):
-  sbc: Add encoder_state to analysis functions
-  sbc: Break 4 blocks processing to variable steps
-  sbc: Rename sbc_analyze_4b_xx to sbc_analyze_xx
-  sbc: add odd member variable to sbc_encoder_state
-  sbc: Add mmx primitive for 1b 8s analysis
-  sbc: Add armv6 primitive for 1b 8s analysis
-  sbc: Add iwmmxt primitive for 1b 8s encoding
-  sbc: Add plain C primitive for 1b 8s analysis
-  sbc: Use plain C primitive if doing msbc on neon
-  sbc: Fix input reordering for 15 blocks case
-  sbc: Add SBC_MSBC flag to enable 15 block encoding
-  sbc: Declare and implement sbc_init_msbc
-  sbc: Add support for mSBC frame header
-  sbc: Update sbcdec for msbc
-  sbc: Update sbcenc for msbc
-  sbc: Update sbcinfo for msbc
-  sbc: bump version number
-
- configure.ac                |    2 +-
- sbc/sbc.c                   |  322 ++++++++++++++++++++++++++++---------------
- sbc/sbc.h                   |    1 +
- sbc/sbc.sym                 |    1 +
- sbc/sbc_primitives.c        |   97 ++++++++++++-
- sbc/sbc_primitives.h        |   13 +-
- sbc/sbc_primitives_armv6.c  |   26 +++-
- sbc/sbc_primitives_iwmmxt.c |   28 +++-
- sbc/sbc_primitives_mmx.c    |   28 +++-
- sbc/sbc_primitives_neon.c   |   12 +-
- src/sbcdec.c                |   22 ++-
- src/sbcenc.c                |  107 ++++++++------
- src/sbcinfo.c               |   52 +++++--
- 13 files changed, 504 insertions(+), 207 deletions(-)
-
+diff --git a/sbc/sbc_primitives_armv6.c b/sbc/sbc_primitives_armv6.c
+index 068648a..a2cb2a8 100644
+--- a/sbc/sbc_primitives_armv6.c
++++ b/sbc/sbc_primitives_armv6.c
+@@ -291,10 +291,26 @@ static void sbc_analyze_4b_8s_armv6(struct sbc_encoder_state *state,
+ 	sbc_analyze_eight(x + 0, out, analysis_consts_fixed8_simd_even);
+ }
+ 
++static void sbc_analyze_1b_8s_armv6(struct sbc_encoder_state *state,
++		int16_t *x, int32_t *out, int out_stride)
++{
++	if (state->odd)
++		sbc_analyze_eight_armv6(x, out,
++					analysis_consts_fixed8_simd_odd);
++	else
++		sbc_analyze_eight_armv6(x, out,
++					analysis_consts_fixed8_simd_even);
++
++	state->odd = !state->odd;
++}
++
+ void sbc_init_primitives_armv6(struct sbc_encoder_state *state)
+ {
+ 	state->sbc_analyze_4s = sbc_analyze_4b_4s_armv6;
+-	state->sbc_analyze_8s = sbc_analyze_4b_8s_armv6;
++	if (state->increment == 1)
++		state->sbc_analyze_8s = sbc_analyze_1b_8s_armv6;
++	else
++		state->sbc_analyze_8s = sbc_analyze_4b_8s_armv6;
+ 	state->implementation_info = "ARMv6 SIMD";
+ }
+ 
 -- 
 1.7.9.5
 
