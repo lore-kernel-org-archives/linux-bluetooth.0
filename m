@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 5/6] Bluetooth: Fix UUID/class mgmt command response synchronization
-Date: Wed,  6 Mar 2013 09:29:27 +0200
-Message-Id: <1362554968-22174-6-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 6/6] Bluetooth: Remove useless HCI_PENDING_CLASS flag
+Date: Wed,  6 Mar 2013 09:29:28 +0200
+Message-Id: <1362554968-22174-7-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1362554968-22174-1-git-send-email-johan.hedberg@gmail.com>
 References: <1362554968-22174-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,150 +11,76 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-We should only return a mgmt command complete once all HCI commands to a
-mgmt_set_dev_class or mgmt_add/remove_uuid command have completed. This
-patch fixes the issue by having a proper async request complete callback
-for these actions and responding to user space in the callback.
+Now that class related operations are tracked through asynchronous HCI
+requests this flag is no longer needed.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c |   67 +++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 47 insertions(+), 20 deletions(-)
+ include/net/bluetooth/hci.h |    1 -
+ net/bluetooth/hci_event.c   |    3 +--
+ net/bluetooth/mgmt.c        |    9 +--------
+ 3 files changed, 2 insertions(+), 11 deletions(-)
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 7f12c25f..1e723c7 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -119,7 +119,6 @@ enum {
+ 	HCI_CONNECTABLE,
+ 	HCI_DISCOVERABLE,
+ 	HCI_LINK_SECURITY,
+-	HCI_PENDING_CLASS,
+ 	HCI_PERIODIC_INQ,
+ };
+ 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index e89707f..6135d68 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -194,8 +194,7 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
+ 	clear_bit(HCI_RESET, &hdev->flags);
+ 
+ 	/* Reset all non-persistent flags */
+-	hdev->dev_flags &= ~(BIT(HCI_LE_SCAN) | BIT(HCI_PENDING_CLASS) |
+-			     BIT(HCI_PERIODIC_INQ));
++	hdev->dev_flags &= ~(BIT(HCI_LE_SCAN) | BIT(HCI_PERIODIC_INQ));
+ 
+ 	hdev->discovery.state = DISCOVERY_STOPPED;
+ 	hdev->inq_tx_power = HCI_TX_POWER_INVALID;
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index aa54bde..55fd7b5 100644
+index 55fd7b5..7264fc9 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1381,6 +1381,32 @@ static u8 get_uuid_size(const u8 *uuid)
- 	return 16;
- }
- 
-+static void mgmt_class_complete(struct hci_dev *hdev, u16 mgmt_op, u8 status)
-+{
-+	struct pending_cmd *cmd;
-+
-+	hci_dev_lock(hdev);
-+
-+	cmd = mgmt_pending_find(mgmt_op, hdev);
-+	if (!cmd)
-+		goto unlock;
-+
-+	cmd_complete(cmd->sk, cmd->index, cmd->opcode, mgmt_status(status),
-+		     hdev->dev_class, 3);
-+
-+	mgmt_pending_remove(cmd);
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+}
-+
-+static void add_uuid_complete(struct hci_dev *hdev, u8 status)
-+{
-+	BT_DBG("status 0x%02x", status);
-+
-+	mgmt_class_complete(hdev, MGMT_OP_ADD_UUID, status);
-+}
-+
- static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+@@ -635,7 +635,6 @@ static int update_class(struct hci_request *req)
  {
- 	struct mgmt_cp_add_uuid *cp = data;
-@@ -1416,9 +1442,7 @@ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
- 	update_class(&req);
- 	update_eir(&req);
+ 	struct hci_dev *hdev = req->hdev;
+ 	u8 cod[3];
+-	int err;
  
--	hci_req_run(&req, NULL);
+ 	BT_DBG("%s", hdev->name);
+ 
+@@ -652,11 +651,7 @@ static int update_class(struct hci_request *req)
+ 	if (memcmp(cod, hdev->dev_class, 3) == 0)
+ 		return 0;
+ 
+-	err = hci_req_add(req, HCI_OP_WRITE_CLASS_OF_DEV, sizeof(cod), cod);
+-	if (err == 0)
+-		set_bit(HCI_PENDING_CLASS, &hdev->dev_flags);
 -
--	if (!test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
-+	if (hci_req_run(&req, add_uuid_complete) < 0) {
- 		err = cmd_complete(sk, hdev->id, MGMT_OP_ADD_UUID, 0,
- 				   hdev->dev_class, 3);
- 		goto failed;
-@@ -1451,6 +1475,13 @@ static bool enable_service_cache(struct hci_dev *hdev)
- 	return false;
+-	return err;
++	return hci_req_add(req, HCI_OP_WRITE_CLASS_OF_DEV, sizeof(cod), cod);
  }
  
-+static void remove_uuid_complete(struct hci_dev *hdev, u8 status)
-+{
-+	BT_DBG("status 0x%02x", status);
-+
-+	mgmt_class_complete(hdev, MGMT_OP_REMOVE_UUID, status);
-+}
-+
- static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
- 		       u16 len)
- {
-@@ -1506,9 +1537,7 @@ update_class:
- 	update_class(&req);
- 	update_eir(&req);
+ static void service_cache_off(struct work_struct *work)
+@@ -3755,8 +3750,6 @@ int mgmt_set_class_of_dev_complete(struct hci_dev *hdev, u8 *dev_class,
+ 	struct cmd_lookup match = { NULL, hdev, mgmt_status(status) };
+ 	int err = 0;
  
--	hci_req_run(&req, NULL);
+-	clear_bit(HCI_PENDING_CLASS, &hdev->dev_flags);
 -
--	if (!test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
-+	if (hci_req_run(&req, remove_uuid_complete) < 0) {
- 		err = cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_UUID, 0,
- 				   hdev->dev_class, 3);
- 		goto unlock;
-@@ -1527,6 +1556,13 @@ unlock:
- 	return err;
- }
- 
-+static void set_class_complete(struct hci_dev *hdev, u8 status)
-+{
-+	BT_DBG("status 0x%02x", status);
-+
-+	mgmt_class_complete(hdev, MGMT_OP_SET_DEV_CLASS, status);
-+}
-+
- static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
- 			 u16 len)
- {
-@@ -1575,9 +1611,7 @@ static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	update_class(&req);
- 
--	hci_req_run(&req, NULL);
--
--	if (!test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
-+	if (hci_req_run(&req, set_class_complete) < 0) {
- 		err = cmd_complete(sk, hdev->id, MGMT_OP_SET_DEV_CLASS, 0,
- 				   hdev->dev_class, 3);
- 		goto unlock;
-@@ -3705,21 +3739,14 @@ int mgmt_ssp_enable_complete(struct hci_dev *hdev, u8 enable, u8 status)
- 	return err;
- }
- 
--static void class_rsp(struct pending_cmd *cmd, void *data)
-+static void sk_lookup(struct pending_cmd *cmd, void *data)
- {
- 	struct cmd_lookup *match = data;
- 
--	cmd_complete(cmd->sk, cmd->index, cmd->opcode, match->mgmt_status,
--		     match->hdev->dev_class, 3);
--
--	list_del(&cmd->list);
--
- 	if (match->sk == NULL) {
- 		match->sk = cmd->sk;
- 		sock_hold(match->sk);
- 	}
--
--	mgmt_pending_free(cmd);
- }
- 
- int mgmt_set_class_of_dev_complete(struct hci_dev *hdev, u8 *dev_class,
-@@ -3730,9 +3757,9 @@ int mgmt_set_class_of_dev_complete(struct hci_dev *hdev, u8 *dev_class,
- 
- 	clear_bit(HCI_PENDING_CLASS, &hdev->dev_flags);
- 
--	mgmt_pending_foreach(MGMT_OP_SET_DEV_CLASS, hdev, class_rsp, &match);
--	mgmt_pending_foreach(MGMT_OP_ADD_UUID, hdev, class_rsp, &match);
--	mgmt_pending_foreach(MGMT_OP_REMOVE_UUID, hdev, class_rsp, &match);
-+	mgmt_pending_foreach(MGMT_OP_SET_DEV_CLASS, hdev, sk_lookup, &match);
-+	mgmt_pending_foreach(MGMT_OP_ADD_UUID, hdev, sk_lookup, &match);
-+	mgmt_pending_foreach(MGMT_OP_REMOVE_UUID, hdev, sk_lookup, &match);
- 
- 	if (!status)
- 		err = mgmt_event(MGMT_EV_CLASS_OF_DEV_CHANGED, hdev, dev_class,
+ 	mgmt_pending_foreach(MGMT_OP_SET_DEV_CLASS, hdev, sk_lookup, &match);
+ 	mgmt_pending_foreach(MGMT_OP_ADD_UUID, hdev, sk_lookup, &match);
+ 	mgmt_pending_foreach(MGMT_OP_REMOVE_UUID, hdev, sk_lookup, &match);
 -- 
 1.7.10.4
 
