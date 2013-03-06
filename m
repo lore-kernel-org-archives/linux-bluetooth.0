@@ -1,95 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <513703AA.2090206@tieto.com>
+Date: Wed, 6 Mar 2013 09:51:54 +0100
+From: Rymarkiewicz Waldemar <waldemar.rymarkiewicz@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <A9F65BD5-95F0-4DA8-B6DE-A8D4C8756269@holtmann.org>
-References: <1362481981-7813-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-	<1362481981-7813-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
-	<A9F65BD5-95F0-4DA8-B6DE-A8D4C8756269@holtmann.org>
-Date: Wed, 6 Mar 2013 11:43:16 +0200
-Message-ID: <CABBYNZJ_3jMMkNOUm_e1bwT=3Uq1t8u5D1xKj+eUuivnEZGyfA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] obexd: Move Message.Get parameter attachment into dictionary
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC] bloodpressure: Add Blood Pressure API
+References: <1360668097-28906-1-git-send-email-waldemar.rymarkiewicz@tieto.com> <C4340FC6-1121-468E-B15D-68E2770AA07E@holtmann.org> <5135D965.8020604@tieto.com> <F00262C4-3552-438E-AF44-1D088CAB11A8@holtmann.org>
+In-Reply-To: <F00262C4-3552-438E-AF44-1D088CAB11A8@holtmann.org>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Marcel,
 
-On Tue, Mar 5, 2013 at 6:12 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Christian,
+>> +Interface	org.bluez.BloodPressure1
+>> +Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+>> +
+>> +Methods		RegisterWatcher(object watcher)
+>> +
+>> +			Registers a watcher to monitor blood pressure
+>> +			measurements. This watcher will be notified about
+>> +			final pressure measurements.
+>> +
+>> +			Possible Errors: org.bluez.Error.InvalidArguments
+>> +
+>> +		UnregisterWatcher(object watcher)
+>> +
+>> +			Unregisters a watcher.
+>> +
+>> +		EnableIntermediateMeasurement(object watcher)
+>> +
+>> +			Enables intermediate measurement notifications
+>> +			for this watcher. Intermediate measurements will
+>> +			be enabled only for devices which support it.
+>> +
+>> +			Possible Errors: org.bluez.Error.InvalidArguments
+>> +					org.bluez.Error.NotSupported
+>> +
+>> +		DisableIntermediateMeasurement(object watcher)
+>> +
+>> +			Disables intermediate measurement notifications
+>> +			for this watcher. It will disable notifications in
+>> +			devices when the last watcher is removed for
+>> +			intermediate measurements.
+>> +
+>> +			Possible Errors: org.bluez.Error.InvalidArguments
+>> +					org.bluez.Error.NotFound
 >
->> This is a preparation for adding additional parameters to Message.Get.
->> The parsing of the args dictionary is done in parse_get_options.
->>
->> The Attachment parameter has been moved into the args dictionary.
->> The parameter is now optional defaulting to true.
->> ---
->> doc/obex-api.txt   | 11 ++++++--
->> obexd/client/map.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++--------
->> 2 files changed, 78 insertions(+), 14 deletions(-)
->>
->> diff --git a/doc/obex-api.txt b/doc/obex-api.txt
->> index 759c4d8..9a78284 100644
->> --- a/doc/obex-api.txt
->> +++ b/doc/obex-api.txt
->> @@ -714,10 +714,10 @@ Message hierarchy
->> =================
->>
->> Service               org.bluez.obex
->> -Interface    org.bluez.obex.Message1
->> +Interface    org.bluez.obex.Message2
->> Object path   [variable prefix]/{session0,session1,...}/{message0,...}
->>
->> -Methods              object, dict Get(string targetfile, boolean attachment)
->> +Methods              object, dict Get(string targetfile, dict args)
->
-> you can not do this. We need to support both APIs in this case. Also where is the discussion on this API change and especially why do we need it.
+> why don't we make these two methods parts of a dict for RegisterWatcher. Enabling them manually seems rather pointless.
 
-The discussion is in another thread but let me quote the important part here:
+It's been done intentionally to be able to return "not supported" error 
+when intermediate measurement is not available.
 
-Use case
-----------
+Having RegisterWatcher(object watcher, boolean intermediate) and 
+additionally Intermediate property [read only] is an another option.
 
-Fractioned messages are used by some email push-services. Only the
-first small part of the message is available on the phone.
-The rest of the message has to be downloaded from the internet /
-network. Which is slow, has high latency and causes additional costs.
+In this case app will check intermediate property and set intermediate 
+param to RegisterWatcher appropriately.
 
-For most of the messages, it might be enough for the user to have only
-the first part of the fraction.
-For other messages, the user might want to read the complete text.
-
-
-Details from the spec
----------------------
-
-The required attribute "reception_status" in the MAP-msg-listing is
-set to "fractioned" for the specific message.
-For normal messages it's set to "complete".
-
-Two possibilities to download fractioned messages:
-(1) Retreive complete message at once:
-    One OBEX Get request (GetMessage omitting parameter FractionRequest)
-    One OBEX Get response (bMessage)
-    The MSE has to download the complete message from the internet and
-deliver it transparently to the client
-
-(2) Retreive message in fractions:
-    Several OBEX Get requests (GetMessage, set parameter
-FractionRequest to "first" or "more")
-    Several OBEX Get responses (first: bMessage, further: bBody,
-parameter FractionDeliver is set to "more" or "last")
-    The fractions of one message must be downloaded sequentially and
-it is not supported to interrupt by calling GetMessage for
-    a different message
-
-
-Blackberry seems to be doing this for emails, they keep it stored in
-some server and only fractions of the message are in the device, so
-with the current API it will force to download the remaining content
-from the server.
-
-
---
-Luiz Augusto von Dentz
+/Waldek
