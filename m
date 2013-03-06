@@ -1,55 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/7] Bluetooth: Add hci_req_cleanup function
-Date: Wed,  6 Mar 2013 16:10:53 -0300
-Message-Id: <1362597059-4102-2-git-send-email-andre.guedes@openbossa.org>
-In-Reply-To: <1362597059-4102-1-git-send-email-andre.guedes@openbossa.org>
-References: <1362597059-4102-1-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 0/7] Use HCI request framework to enable LE scanning
+Date: Wed,  6 Mar 2013 16:10:52 -0300
+Message-Id: <1362597059-4102-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the hci_req_cleanup function which basically frees
-all HCI commands queued on a given request.
+Hi all,
 
-This function must be called in case something goes wrong during HCI
-request creation. Otherwise, HCI commands already queued on req->cmd_q
-will cause memory leaks.
+The main goal of this patch set is to update hci_le_scan helper to use the new
+HCI Request framework. Additionally, it also moves the LE scanning timeout
+handling from LE scanning helpers to discovery code, as Marcel requested
+during some discussion about LE connection improvements.
 
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
----
- include/net/bluetooth/hci_core.h | 1 +
- net/bluetooth/hci_core.c         | 5 +++++
- 2 files changed, 6 insertions(+)
+Below follows additional information about some patches of this patch set:
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 3a9cbf2..494f8f5 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1045,6 +1045,7 @@ struct hci_request {
- };
- 
- void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
-+void hci_req_cleanup(struct hci_request *req);
- int hci_req_run(struct hci_request *req, hci_req_complete_t complete);
- int hci_req_add(struct hci_request *req, u16 opcode, u32 plen, void *param);
- void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index b6d44a2..7635c2e 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2443,6 +2443,11 @@ void hci_req_init(struct hci_request *req, struct hci_dev *hdev)
- 	req->hdev = hdev;
- }
- 
-+void hci_req_cleanup(struct hci_request *req)
-+{
-+	skb_queue_purge(&req->cmd_q);
-+}
-+
- int hci_req_run(struct hci_request *req, hci_req_complete_t complete)
- {
- 	struct hci_dev *hdev = req->hdev;
+Patch 1 adds the hci_req_cleanup function so we are able to free HCI command
+already queued on a given HCI request. This function must be used in case
+something goes wrong during the HCI request creation. Otherwise, we will
+face some memory leak issues. hci_req_cleanup is used in this patch set in
+case something goes wrong with LE scanning HCI request creation.
+
+Patches 6 and 7 do a very trivial changes in order to organize discovery
+macros.
+
+Regards,
+
+Andre Guedes
+
+
+Andre Guedes (7):
+  Bluetooth: Add hci_req_cleanup function
+  Bluetooth: Update hci_le_scan to use HCI request
+  Bluetooth: Merge LE-only and interleaved cases
+  Bluetooth: Remove timeout handling from hci_cancel_le_scan
+  Bluetooth: Remove LE scan work
+  Bluetooth: Change LE scanning timeout macros
+  Bluetooth: Add LE scan type macros
+
+ include/net/bluetooth/hci_core.h |  18 ++----
+ net/bluetooth/hci_core.c         | 124 ++++++++++++---------------------------
+ net/bluetooth/mgmt.c             |  65 +++++++++++++++-----
+ 3 files changed, 94 insertions(+), 113 deletions(-)
+
 -- 
 1.8.1.2
 
