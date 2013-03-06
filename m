@@ -1,83 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/7] Bluetooth: Remove timeout handling from hci_cancel_le_scan
-Date: Wed,  6 Mar 2013 16:10:56 -0300
-Message-Id: <1362597059-4102-5-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 3/7] Bluetooth: Merge LE-only and interleaved cases
+Date: Wed,  6 Mar 2013 16:10:55 -0300
+Message-Id: <1362597059-4102-4-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1362597059-4102-1-git-send-email-andre.guedes@openbossa.org>
 References: <1362597059-4102-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch moves the LE scanning timeout handling from hci_cancel_
-le_scan helper to stop_discovery.
-
-Since we want discovery code handling LE scanning timeout, we should
-handle it in stop_discovery instead of hci_cancel_le_scan.
+This patch merges the LE-only and interleaved discovery type cases.
+Since hci_le_scan helper uses the HCI request framework, those cases
+are pretty much the same now.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_core.c | 14 +++++---------
- net/bluetooth/mgmt.c     | 15 ++++++++++++---
- 2 files changed, 17 insertions(+), 12 deletions(-)
+ net/bluetooth/mgmt.c | 18 +++---------------
+ 1 file changed, 3 insertions(+), 15 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 160bfe3..73487f0 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1903,20 +1903,16 @@ static int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval,
- 
- int hci_cancel_le_scan(struct hci_dev *hdev)
- {
-+	struct hci_cp_le_set_scan_enable cp;
-+
- 	BT_DBG("%s", hdev->name);
- 
- 	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
- 		return -EALREADY;
- 
--	if (cancel_delayed_work(&hdev->le_scan_disable)) {
--		struct hci_cp_le_set_scan_enable cp;
--
--		/* Send HCI command to disable LE Scan */
--		memset(&cp, 0, sizeof(cp));
--		hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
--	}
--
--	return 0;
-+	/* Send HCI command to disable LE Scan */
-+	memset(&cp, 0, sizeof(cp));
-+	return hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
- }
- 
- static void le_scan_disable_work(struct work_struct *work)
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 7a4f8dd..de1d2f4 100644
+index b444b19..7a4f8dd 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -2582,10 +2582,19 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	switch (hdev->discovery.state) {
- 	case DISCOVERY_FINDING:
--		if (test_bit(HCI_INQUIRY, &hdev->flags))
-+		if (test_bit(HCI_INQUIRY, &hdev->flags)) {
- 			err = hci_cancel_inquiry(hdev);
--		else
--			err = hci_cancel_le_scan(hdev);
-+		} else {
-+			/*
-+			 * If delayed work could not be canceled, it means the
-+			 * work is running. Therefore, there is no need to send
-+			 * another HCI command to disable LE scanning.
-+			 */
-+			if (!cancel_delayed_work(&hdev->le_scan_disable))
-+				err = 0;
-+			else
-+				err = hci_cancel_le_scan(hdev);
-+		}
- 
+@@ -2501,6 +2501,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
  		break;
  
+ 	case DISCOV_TYPE_LE:
++	case DISCOV_TYPE_INTERLEAVED:
+ 		if (!lmp_host_le_capable(hdev)) {
+ 			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
+ 					 MGMT_STATUS_NOT_SUPPORTED);
+@@ -2508,21 +2509,8 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 			goto failed;
+ 		}
+ 
+-		hci_req_init(&req, hdev);
+-
+-		err = hci_le_scan(&req, LE_SCAN_TYPE, LE_SCAN_INT,
+-				  LE_SCAN_WIN);
+-		if (err < 0) {
+-			mgmt_pending_remove(cmd);
+-			hci_req_cleanup(&req);
+-			goto failed;
+-		}
+-
+-		err = hci_req_run(&req, enable_le_scan_complete);
+-		break;
+-
+-	case DISCOV_TYPE_INTERLEAVED:
+-		if (!lmp_host_le_capable(hdev) || !lmp_bredr_capable(hdev)) {
++		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
++		    !lmp_bredr_capable(hdev)) {
+ 			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
+ 					 MGMT_STATUS_NOT_SUPPORTED);
+ 			mgmt_pending_remove(cmd);
 -- 
 1.8.1.2
 
