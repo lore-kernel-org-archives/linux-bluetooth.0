@@ -4,55 +4,98 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v6 08/17] sbc: Add plain C primitive for 1b 8s analysis
-Date: Wed,  6 Mar 2013 11:19:14 +0100
-Message-Id: <1362565163-3567-9-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v6 02/17] sbc: Break 4 blocks processing to variable steps
+Date: Wed,  6 Mar 2013 11:19:08 +0100
+Message-Id: <1362565163-3567-3-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Until now SBC processed 4 blocks at a time. If we want to process 15 blocks,
+then we need to break this processing in one block steps. 4 blocks is still
+default increment.
 ---
- sbc/sbc_primitives.c |   18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ sbc/sbc.c            |   19 +++++++++++--------
+ sbc/sbc_primitives.h |    6 ++++--
+ 2 files changed, 15 insertions(+), 10 deletions(-)
 
-diff --git a/sbc/sbc_primitives.c b/sbc/sbc_primitives.c
-index 0b48ddb..a4767ef 100644
---- a/sbc/sbc_primitives.c
-+++ b/sbc/sbc_primitives.c
-@@ -209,6 +209,19 @@ static inline void sbc_analyze_4b_8s_simd(struct sbc_encoder_state *state,
- 	sbc_analyze_eight_simd(x + 0, out, analysis_consts_fixed8_simd_even);
- }
+diff --git a/sbc/sbc.c b/sbc/sbc.c
+index e51ed57..4a7dd2e 100644
+--- a/sbc/sbc.c
++++ b/sbc/sbc.c
+@@ -688,30 +688,32 @@ static int sbc_analyze_audio(struct sbc_encoder_state *state,
+ 	switch (frame->subbands) {
+ 	case 4:
+ 		for (ch = 0; ch < frame->channels; ch++) {
+-			x = &state->X[ch][state->position - 16 +
+-							frame->blocks * 4];
+-			for (blk = 0; blk < frame->blocks; blk += 4) {
++			x = &state->X[ch][state->position - 4 *
++					state->increment + frame->blocks * 4];
++			for (blk = 0; blk < frame->blocks;
++						blk += state->increment) {
+ 				state->sbc_analyze_4b_4s(
+ 					state, x,
+ 					frame->sb_sample_f[blk][ch],
+ 					frame->sb_sample_f[blk + 1][ch] -
+ 					frame->sb_sample_f[blk][ch]);
+-				x -= 16;
++				x -= 4 * state->increment;
+ 			}
+ 		}
+ 		return frame->blocks * 4;
  
-+static inline void sbc_analyze_1b_8s_simd(struct sbc_encoder_state *state,
-+		int16_t *x, int32_t *out, int out_stride)
-+{
-+	if (state->odd)
-+		sbc_analyze_eight_simd(x, out,
-+					analysis_consts_fixed8_simd_odd);
-+	else
-+		sbc_analyze_eight_simd(x, out,
-+					analysis_consts_fixed8_simd_even);
-+
-+	state->odd = !state->odd;
-+}
-+
- static inline int16_t unaligned16_be(const uint8_t *ptr)
+ 	case 8:
+ 		for (ch = 0; ch < frame->channels; ch++) {
+-			x = &state->X[ch][state->position - 32 +
+-							frame->blocks * 8];
+-			for (blk = 0; blk < frame->blocks; blk += 4) {
++			x = &state->X[ch][state->position - 8 *
++					state->increment + frame->blocks * 8];
++			for (blk = 0; blk < frame->blocks;
++						blk += state->increment) {
+ 				state->sbc_analyze_4b_8s(
+ 					state, x,
+ 					frame->sb_sample_f[blk][ch],
+ 					frame->sb_sample_f[blk + 1][ch] -
+ 					frame->sb_sample_f[blk][ch]);
+-				x -= 32;
++				x -= 8 * state->increment;
+ 			}
+ 		}
+ 		return frame->blocks * 8;
+@@ -906,6 +908,7 @@ static void sbc_encoder_init(struct sbc_encoder_state *state,
  {
- 	return (int16_t) ((ptr[0] << 8) | ptr[1]);
-@@ -525,7 +538,10 @@ void sbc_init_primitives(struct sbc_encoder_state *state)
+ 	memset(&state->X, 0, sizeof(state->X));
+ 	state->position = (SBC_X_BUFFER_SIZE - frame->subbands * 9) & ~7;
++	state->increment = 4;
  
- 	/* Default implementation for analyze functions */
- 	state->sbc_analyze_4s = sbc_analyze_4b_4s_simd;
--	state->sbc_analyze_8s = sbc_analyze_4b_8s_simd;
-+	if (state->increment == 1)
-+		state->sbc_analyze_8s = sbc_analyze_1b_8s_simd;
-+	else
-+		state->sbc_analyze_8s = sbc_analyze_4b_8s_simd;
+ 	sbc_init_primitives(state);
+ }
+diff --git a/sbc/sbc_primitives.h b/sbc/sbc_primitives.h
+index a7bbef1..2a7d4a1 100644
+--- a/sbc/sbc_primitives.h
++++ b/sbc/sbc_primitives.h
+@@ -38,13 +38,15 @@
  
- 	/* Default implementation for input reordering / deinterleaving */
- 	state->sbc_enc_process_input_4s_le = sbc_enc_process_input_4s_le;
+ struct sbc_encoder_state {
+ 	int position;
++	/* Number of consecutive blocks handled by the encoder */
++	int increment;
+ 	int16_t SBC_ALIGNED X[2][SBC_X_BUFFER_SIZE];
+ 	/* Polyphase analysis filter for 4 subbands configuration,
+-	 * it handles 4 blocks at once */
++	 * it handles "increment" blocks at once */
+ 	void (*sbc_analyze_4b_4s)(struct sbc_encoder_state *state,
+ 			int16_t *x, int32_t *out, int out_stride);
+ 	/* Polyphase analysis filter for 8 subbands configuration,
+-	 * it handles 4 blocks at once */
++	 * it handles "increment" blocks at once */
+ 	void (*sbc_analyze_4b_8s)(struct sbc_encoder_state *state,
+ 			int16_t *x, int32_t *out, int out_stride);
+ 	/* Process input data (deinterleave, endian conversion, reordering),
 -- 
 1.7.9.5
 
