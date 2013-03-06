@@ -4,93 +4,133 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v6 12/17] sbc: Declare and implement sbc_init_msbc
-Date: Wed,  6 Mar 2013 11:19:18 +0100
-Message-Id: <1362565163-3567-13-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v6 10/17] sbc: Fix input reordering for 15 blocks case
+Date: Wed,  6 Mar 2013 11:19:16 +0100
+Message-Id: <1362565163-3567-11-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- sbc/sbc.c   |   31 +++++++++++++++++++++++++++++++
- sbc/sbc.h   |    1 +
- sbc/sbc.sym |    1 +
- 3 files changed, 33 insertions(+)
+SBC analysis handles 8 samples at a time. The optimisation requires 8 samples
+forming an "odd" block, followed by 8 samples, forming an "even" block. Until
+now SBC was used for encoding 4, 8, 12, or 16 blocks in a frame. Reordering
+took a frame and for each 16 samples (ie 2 blocks) it produced one "odd" block
+and one "even" block.
+A mSBC frame encodes 15 blocks of 8 samples. 14 blocks are processed as before,
+two at a time. If 8 samples are remaining, it will form the first half of two
+blocks (a bit of an "odd" block, and a bit of an "even" block). When processing
+the next frame, we detect eight samples were missing at previous iteration and
+the two block can be finished.
 
-diff --git a/sbc/sbc.c b/sbc/sbc.c
-index 631072e..570ee9f 100644
---- a/sbc/sbc.c
-+++ b/sbc/sbc.c
+This reordering is possible because only one sample is moved (x[-7]) AND the
+first coefficient in the coef table is 0. Thus x[0] doesn't need to be set and
+0 can be used in calculation instead. Note that x[-7] is not used in
+analysis for this block.
+see: analysis_consts_fixed8_simd_odd.
+
+To detect that two blocks are not completed, the number of processed samples
+can be used. This value is stored in position. position starts at
+SBC_X_BUFFER_SIZE-72 and is decremented by 16 as long as two blocks can be
+formed. If only 8 samples are remaining in input, then position is decremented
+by 8 *arbitrarly*, thus indicating that some samples are pending. During next
+frame reordering, position will be decremented by 8 again, back to a 16
+multiple.
+
+This logic works for SBC_X_BUFFER_SIZE-72 multiple of 16 and bigger than
+8*2*15+72=312 and less than 8*3*15+72=432. The current value of 328 matches this
+constraint and X buffer is shifted every two frames (30 blocks) in mSBC. This
+way, we don't need to care about x[-7] when shifting, we also know that it
+won't be before X.
+---
+ sbc/sbc_primitives.c |   59 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 58 insertions(+), 1 deletion(-)
+
+diff --git a/sbc/sbc_primitives.c b/sbc/sbc_primitives.c
+index 319e625..9c6e56a 100644
+--- a/sbc/sbc_primitives.c
++++ b/sbc/sbc_primitives.c
 @@ -6,6 +6,7 @@
   *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
   *  Copyright (C) 2004-2005  Henryk Ploetz <henryk@ploetzli.ch>
-  *  Copyright (C) 2005-2008  Brad Midgley <bmidgley@xmission.com>
+  *  Copyright (C) 2005-2006  Brad Midgley <bmidgley@xmission.com>
 + *  Copyright (C) 2012       Intel Corporation
   *
   *
   *  This library is free software; you can redistribute it and/or
-@@ -966,6 +967,36 @@ SBC_EXPORT int sbc_init(sbc_t *sbc, unsigned long flags)
- 	return 0;
- }
+@@ -309,8 +310,37 @@ static SBC_ALWAYS_INLINE int sbc_encoder_process_input_s8_internal(
+ 	#define PCM(i) (big_endian ? \
+ 		unaligned16_be(pcm + (i) * 2) : unaligned16_le(pcm + (i) * 2))
  
-+SBC_EXPORT int sbc_init_msbc(sbc_t *sbc, unsigned long flags)
-+{
-+	if (!sbc)
-+		return -EIO;
++	if (position % 16 == 8) {
++		position -= 8;
++		nsamples -= 8;
++		if (nchannels > 0) {
++			int16_t *x = &X[0][position];
++			x[0]  = PCM(0 + (15-8) * nchannels);
++			x[2]  = PCM(0 + (14-8) * nchannels);
++			x[3]  = PCM(0 + (8-8) * nchannels);
++			x[4]  = PCM(0 + (13-8) * nchannels);
++			x[5]  = PCM(0 + (9-8) * nchannels);
++			x[6]  = PCM(0 + (12-8) * nchannels);
++			x[7]  = PCM(0 + (10-8) * nchannels);
++			x[8]  = PCM(0 + (11-8) * nchannels);
++		}
++		if (nchannels > 1) {
++			int16_t *x = &X[1][position];
++			x[0]  = PCM(1 + (15-8) * nchannels);
++			x[2]  = PCM(1 + (14-8) * nchannels);
++			x[3]  = PCM(1 + (8-8) * nchannels);
++			x[4]  = PCM(1 + (13-8) * nchannels);
++			x[5]  = PCM(1 + (9-8) * nchannels);
++			x[6]  = PCM(1 + (12-8) * nchannels);
++			x[7]  = PCM(1 + (10-8) * nchannels);
++			x[8]  = PCM(1 + (11-8) * nchannels);
++		}
 +
-+	memset(sbc, 0, sizeof(sbc_t));
++		pcm += 16 * nchannels;
++	}
 +
-+	sbc->priv_alloc_base = malloc(sizeof(struct sbc_priv) + SBC_ALIGN_MASK);
-+	if (!sbc->priv_alloc_base)
-+		return -ENOMEM;
+ 	/* copy/permutate audio samples */
+-	while ((nsamples -= 16) >= 0) {
++	while (nsamples >= 16) {
+ 		position -= 16;
+ 		if (nchannels > 0) {
+ 			int16_t *x = &X[0][position];
+@@ -351,6 +381,33 @@ static SBC_ALWAYS_INLINE int sbc_encoder_process_input_s8_internal(
+ 			x[15] = PCM(1 + 2 * nchannels);
+ 		}
+ 		pcm += 32 * nchannels;
++		nsamples -= 16;
++	}
 +
-+	sbc->priv = (void *) (((uintptr_t) sbc->priv_alloc_base +
-+			SBC_ALIGN_MASK) & ~((uintptr_t) SBC_ALIGN_MASK));
-+
-+	memset(sbc->priv, 0, sizeof(struct sbc_priv));
-+
-+	((struct sbc_priv *)sbc->priv)->flags = SBC_MSBC;
-+
-+	sbc_set_defaults(sbc, flags);
-+
-+	sbc->frequency = SBC_FREQ_16000;
-+	sbc->blocks = MSBC_BLOCKS;
-+	sbc->subbands = SBC_SB_8;
-+	sbc->mode = SBC_MODE_MONO;
-+	sbc->allocation = SBC_AM_LOUDNESS;
-+	sbc->bitpool = 26;
-+
-+	return 0;
-+}
-+
- SBC_EXPORT ssize_t sbc_parse(sbc_t *sbc, const void *input, size_t input_len)
- {
- 	return sbc_decode(sbc, input, input_len, NULL, 0, NULL);
-diff --git a/sbc/sbc.h b/sbc/sbc.h
-index bbd45da..5f8a1fc 100644
---- a/sbc/sbc.h
-+++ b/sbc/sbc.h
-@@ -83,6 +83,7 @@ typedef struct sbc_struct sbc_t;
- 
- int sbc_init(sbc_t *sbc, unsigned long flags);
- int sbc_reinit(sbc_t *sbc, unsigned long flags);
-+int sbc_init_msbc(sbc_t *sbc, unsigned long flags);
- 
- ssize_t sbc_parse(sbc_t *sbc, const void *input, size_t input_len);
- 
-diff --git a/sbc/sbc.sym b/sbc/sbc.sym
-index 2cabcdd..3a47c12 100644
---- a/sbc/sbc.sym
-+++ b/sbc/sbc.sym
-@@ -1,6 +1,7 @@
- SBC_1.0 {
- global:
- 	sbc_init;
-+	sbc_init_msbc;
- 	sbc_reinit;
- 	sbc_finish;
++	if (nsamples == 8) {
++		position -= 8;
++		if (nchannels > 0) {
++			int16_t *x = &X[0][position];
++			x[-7] = PCM(0 + 7 * nchannels);
++			x[1]  = PCM(0 + 3 * nchannels);
++			x[2]  = PCM(0 + 6 * nchannels);
++			x[3]  = PCM(0 + 0 * nchannels);
++			x[4]  = PCM(0 + 5 * nchannels);
++			x[5]  = PCM(0 + 1 * nchannels);
++			x[6]  = PCM(0 + 4 * nchannels);
++			x[7]  = PCM(0 + 2 * nchannels);
++		}
++		if (nchannels > 1) {
++			int16_t *x = &X[1][position];
++			x[-7] = PCM(1 + 7 * nchannels);
++			x[1]  = PCM(1 + 3 * nchannels);
++			x[2]  = PCM(1 + 6 * nchannels);
++			x[3]  = PCM(1 + 0 * nchannels);
++			x[4]  = PCM(1 + 5 * nchannels);
++			x[5]  = PCM(1 + 1 * nchannels);
++			x[6]  = PCM(1 + 4 * nchannels);
++			x[7]  = PCM(1 + 2 * nchannels);
++		}
+ 	}
+ 	#undef PCM
  
 -- 
 1.7.9.5
