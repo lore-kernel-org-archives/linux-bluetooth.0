@@ -4,140 +4,65 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v6 03/17] sbc: Rename sbc_analyze_4b_xx to sbc_analyze_xx
-Date: Wed,  6 Mar 2013 11:19:09 +0100
-Message-Id: <1362565163-3567-4-git-send-email-frederic.dalleau@linux.intel.com>
-In-Reply-To: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v6 00/17] mSBC investigations
+Date: Wed,  6 Mar 2013 11:19:06 +0100
+Message-Id: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- sbc/sbc.c                   |    4 ++--
- sbc/sbc_primitives.c        |    4 ++--
- sbc/sbc_primitives.h        |    4 ++--
- sbc/sbc_primitives_armv6.c  |    4 ++--
- sbc/sbc_primitives_iwmmxt.c |    4 ++--
- sbc/sbc_primitives_mmx.c    |    4 ++--
- sbc/sbc_primitives_neon.c   |    4 ++--
- 7 files changed, 14 insertions(+), 14 deletions(-)
+Hi,
 
-diff --git a/sbc/sbc.c b/sbc/sbc.c
-index 4a7dd2e..ffdf05d 100644
---- a/sbc/sbc.c
-+++ b/sbc/sbc.c
-@@ -692,7 +692,7 @@ static int sbc_analyze_audio(struct sbc_encoder_state *state,
- 					state->increment + frame->blocks * 4];
- 			for (blk = 0; blk < frame->blocks;
- 						blk += state->increment) {
--				state->sbc_analyze_4b_4s(
-+				state->sbc_analyze_4s(
- 					state, x,
- 					frame->sb_sample_f[blk][ch],
- 					frame->sb_sample_f[blk + 1][ch] -
-@@ -708,7 +708,7 @@ static int sbc_analyze_audio(struct sbc_encoder_state *state,
- 					state->increment + frame->blocks * 8];
- 			for (blk = 0; blk < frame->blocks;
- 						blk += state->increment) {
--				state->sbc_analyze_4b_8s(
-+				state->sbc_analyze_8s(
- 					state, x,
- 					frame->sb_sample_f[blk][ch],
- 					frame->sb_sample_f[blk + 1][ch] -
-diff --git a/sbc/sbc_primitives.c b/sbc/sbc_primitives.c
-index f8cc4b6..dce0ed2 100644
---- a/sbc/sbc_primitives.c
-+++ b/sbc/sbc_primitives.c
-@@ -522,8 +522,8 @@ static int sbc_calc_scalefactors_j(
- void sbc_init_primitives(struct sbc_encoder_state *state)
- {
- 	/* Default implementation for analyze functions */
--	state->sbc_analyze_4b_4s = sbc_analyze_4b_4s_simd;
--	state->sbc_analyze_4b_8s = sbc_analyze_4b_8s_simd;
-+	state->sbc_analyze_4s = sbc_analyze_4b_4s_simd;
-+	state->sbc_analyze_8s = sbc_analyze_4b_8s_simd;
- 
- 	/* Default implementation for input reordering / deinterleaving */
- 	state->sbc_enc_process_input_4s_le = sbc_enc_process_input_4s_le;
-diff --git a/sbc/sbc_primitives.h b/sbc/sbc_primitives.h
-index 2a7d4a1..267c277 100644
---- a/sbc/sbc_primitives.h
-+++ b/sbc/sbc_primitives.h
-@@ -43,11 +43,11 @@ struct sbc_encoder_state {
- 	int16_t SBC_ALIGNED X[2][SBC_X_BUFFER_SIZE];
- 	/* Polyphase analysis filter for 4 subbands configuration,
- 	 * it handles "increment" blocks at once */
--	void (*sbc_analyze_4b_4s)(struct sbc_encoder_state *state,
-+	void (*sbc_analyze_4s)(struct sbc_encoder_state *state,
- 			int16_t *x, int32_t *out, int out_stride);
- 	/* Polyphase analysis filter for 8 subbands configuration,
- 	 * it handles "increment" blocks at once */
--	void (*sbc_analyze_4b_8s)(struct sbc_encoder_state *state,
-+	void (*sbc_analyze_8s)(struct sbc_encoder_state *state,
- 			int16_t *x, int32_t *out, int out_stride);
- 	/* Process input data (deinterleave, endian conversion, reordering),
- 	 * depending on the number of subbands and input data byte order */
-diff --git a/sbc/sbc_primitives_armv6.c b/sbc/sbc_primitives_armv6.c
-index 6ad94c6..068648a 100644
---- a/sbc/sbc_primitives_armv6.c
-+++ b/sbc/sbc_primitives_armv6.c
-@@ -293,8 +293,8 @@ static void sbc_analyze_4b_8s_armv6(struct sbc_encoder_state *state,
- 
- void sbc_init_primitives_armv6(struct sbc_encoder_state *state)
- {
--	state->sbc_analyze_4b_4s = sbc_analyze_4b_4s_armv6;
--	state->sbc_analyze_4b_8s = sbc_analyze_4b_8s_armv6;
-+	state->sbc_analyze_4s = sbc_analyze_4b_4s_armv6;
-+	state->sbc_analyze_8s = sbc_analyze_4b_8s_armv6;
- 	state->implementation_info = "ARMv6 SIMD";
- }
- 
-diff --git a/sbc/sbc_primitives_iwmmxt.c b/sbc/sbc_primitives_iwmmxt.c
-index 39cc390..0c8f329 100644
---- a/sbc/sbc_primitives_iwmmxt.c
-+++ b/sbc/sbc_primitives_iwmmxt.c
-@@ -296,8 +296,8 @@ static inline void sbc_analyze_4b_8s_iwmmxt(struct sbc_encoder_state *state,
- 
- void sbc_init_primitives_iwmmxt(struct sbc_encoder_state *state)
- {
--	state->sbc_analyze_4b_4s = sbc_analyze_4b_4s_iwmmxt;
--	state->sbc_analyze_4b_8s = sbc_analyze_4b_8s_iwmmxt;
-+	state->sbc_analyze_4s = sbc_analyze_4b_4s_iwmmxt;
-+	state->sbc_analyze_8s = sbc_analyze_4b_8s_iwmmxt;
- 	state->implementation_info = "IWMMXT";
- }
- 
-diff --git a/sbc/sbc_primitives_mmx.c b/sbc/sbc_primitives_mmx.c
-index cbacb4e..03070f5 100644
---- a/sbc/sbc_primitives_mmx.c
-+++ b/sbc/sbc_primitives_mmx.c
-@@ -365,8 +365,8 @@ static int check_mmx_support(void)
- void sbc_init_primitives_mmx(struct sbc_encoder_state *state)
- {
- 	if (check_mmx_support()) {
--		state->sbc_analyze_4b_4s = sbc_analyze_4b_4s_mmx;
--		state->sbc_analyze_4b_8s = sbc_analyze_4b_8s_mmx;
-+		state->sbc_analyze_4s = sbc_analyze_4b_4s_mmx;
-+		state->sbc_analyze_8s = sbc_analyze_4b_8s_mmx;
- 		state->sbc_calc_scalefactors = sbc_calc_scalefactors_mmx;
- 		state->implementation_info = "MMX";
- 	}
-diff --git a/sbc/sbc_primitives_neon.c b/sbc/sbc_primitives_neon.c
-index aeca8df..eda4ed3 100644
---- a/sbc/sbc_primitives_neon.c
-+++ b/sbc/sbc_primitives_neon.c
-@@ -879,8 +879,8 @@ static int sbc_enc_process_input_8s_le_neon(int position, const uint8_t *pcm,
- 
- void sbc_init_primitives_neon(struct sbc_encoder_state *state)
- {
--	state->sbc_analyze_4b_4s = sbc_analyze_4b_4s_neon;
--	state->sbc_analyze_4b_8s = sbc_analyze_4b_8s_neon;
-+	state->sbc_analyze_4s = sbc_analyze_4b_4s_neon;
-+	state->sbc_analyze_8s = sbc_analyze_4b_8s_neon;
- 	state->sbc_calc_scalefactors = sbc_calc_scalefactors_neon;
- 	state->sbc_calc_scalefactors_j = sbc_calc_scalefactors_j_neon;
- 	state->sbc_enc_process_input_4s_le = sbc_enc_process_input_4s_le_neon;
+v6 implements sbc_init_msbc(). The SBC_MSBC flag is removed from sbc.h and
+replace by an internal flag in sbc_priv structure.
+The decoder has been validated to mSBC packets sent by an iPhone.
+The encoder couldn't be validated against a third party, but at least we know
+that libsbc encoded packets can be decoded by libsbc.
+I bumped version number to 1.1 to help compile time detection.
+
+v5 shoudl fix the few remaining issues.  I could test neon and armv6
+and raised verbosity of commit messages.
+
+Regards,
+Frederic
+
+
+Frédéric Dalleau (17):
+  sbc: Add encoder_state to analysis functions
+  sbc: Break 4 blocks processing to variable steps
+  sbc: Rename sbc_analyze_4b_xx to sbc_analyze_xx
+  sbc: add odd member variable to sbc_encoder_state
+  sbc: Add mmx primitive for 1b 8s analysis
+  sbc: Add armv6 primitive for 1b 8s analysis
+  sbc: Add iwmmxt primitive for 1b 8s encoding
+  sbc: Add plain C primitive for 1b 8s analysis
+  sbc: Use plain C primitive if doing msbc on neon
+  sbc: Fix input reordering for 15 blocks case
+  sbc: Add SBC_MSBC flag to enable 15 block encoding
+  sbc: Declare and implement sbc_init_msbc
+  sbc: Add support for mSBC frame header
+  sbc: Update sbcdec for msbc
+  sbc: Update sbcenc for msbc
+  sbc: Update sbcinfo for msbc
+  sbc: bump version number
+
+ configure.ac                |    2 +-
+ sbc/sbc.c                   |  322 ++++++++++++++++++++++++++++---------------
+ sbc/sbc.h                   |    1 +
+ sbc/sbc.sym                 |    1 +
+ sbc/sbc_primitives.c        |   97 ++++++++++++-
+ sbc/sbc_primitives.h        |   13 +-
+ sbc/sbc_primitives_armv6.c  |   26 +++-
+ sbc/sbc_primitives_iwmmxt.c |   28 +++-
+ sbc/sbc_primitives_mmx.c    |   28 +++-
+ sbc/sbc_primitives_neon.c   |   12 +-
+ src/sbcdec.c                |   22 ++-
+ src/sbcenc.c                |  107 ++++++++------
+ src/sbcinfo.c               |   52 +++++--
+ 13 files changed, 504 insertions(+), 207 deletions(-)
+
 -- 
 1.7.9.5
 
