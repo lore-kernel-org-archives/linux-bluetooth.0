@@ -1,44 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/4] Error handling in HCI request framework
-Date: Wed,  6 Mar 2013 20:45:13 -0300
-Message-Id: <1362613517-1761-1-git-send-email-andre.guedes@openbossa.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.2 \(1499\))
+Subject: Re: [PATCH 1/7] Bluetooth: Add hci_req_cleanup function
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1362597059-4102-2-git-send-email-andre.guedes@openbossa.org>
+Date: Wed, 6 Mar 2013 12:12:42 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <CB305AD9-31B5-41EB-8DCF-6F5877BAAA0F@holtmann.org>
+References: <1362597059-4102-1-git-send-email-andre.guedes@openbossa.org> <1362597059-4102-2-git-send-email-andre.guedes@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Andre,
 
-This small patch set aims to add a better support for error handling in HCI
-request framework.
+> This patch adds the hci_req_cleanup function which basically frees
+> all HCI commands queued on a given request.
+> 
+> This function must be called in case something goes wrong during HCI
+> request creation. Otherwise, HCI commands already queued on req->cmd_q
+> will cause memory leaks.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+> include/net/bluetooth/hci_core.h | 1 +
+> net/bluetooth/hci_core.c         | 5 +++++
+> 2 files changed, 6 insertions(+)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 3a9cbf2..494f8f5 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1045,6 +1045,7 @@ struct hci_request {
+> };
+> 
+> void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
+> +void hci_req_cleanup(struct hci_request *req);
+> int hci_req_run(struct hci_request *req, hci_req_complete_t complete);
+> int hci_req_add(struct hci_request *req, u16 opcode, u32 plen, void *param);
+> void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status);
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index b6d44a2..7635c2e 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -2443,6 +2443,11 @@ void hci_req_init(struct hci_request *req, struct hci_dev *hdev)
+> 	req->hdev = hdev;
+> }
+> 
+> +void hci_req_cleanup(struct hci_request *req)
+> +{
+> +	skb_queue_purge(&req->cmd_q);
+> +}
+> +
+> int hci_req_run(struct hci_request *req, hci_req_complete_t complete)
+> {
+> 	struct hci_dev *hdev = req->hdev;
 
-When we are building a HCI request with more the one HCI command and one of
-the hci_req_add calls fail, we should have some cleanup routine. This way the
-HCI commands already queued on HCI request can be deleted. Otherwise we will
-face some memory leaks issues. Discussing about this issue on IRC, we came up
-with the approach implemented in this patch set.
+since the other one is called hci_req_run, then this should be named hci_req_abort or hci_req_cancel.
 
-The approach is the following: If a hci_req_add fails, we set a flag in struct
-hci_request to indicate the failure. Subsequent hci_req_add calls will simply
-add no HCI commands to the HCI request queue. Once hci_req_run is called, we
-verify the error flag. If it is set, we delete all HCI commands already queued
-and return a error code.
+Regards
 
-Regards,
-
-Andre
-
-
-Andre Guedes (4):
-  Bluetooth: Check hci_req_run error code in __hci_req_sync
-  Bluetooth: HCI request error handling
-  Bluetooth: Make hci_req_add return void
-  Bluetooth: Check req->error flag in hci_req_add
-
- include/net/bluetooth/hci_core.h |  5 ++++-
- net/bluetooth/hci_core.c         | 33 +++++++++++++++++++++++++++------
- 2 files changed, 31 insertions(+), 7 deletions(-)
-
--- 
-1.8.1.2
+Marcel
 
