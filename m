@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v6 05/17] sbc: Add mmx primitive for 1b 8s analysis
-Date: Wed,  6 Mar 2013 11:19:11 +0100
-Message-Id: <1362565163-3567-6-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v6 08/17] sbc: Add plain C primitive for 1b 8s analysis
+Date: Wed,  6 Mar 2013 11:19:14 +0100
+Message-Id: <1362565163-3567-9-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -14,45 +14,45 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- sbc/sbc_primitives_mmx.c |   18 +++++++++++++++++-
+ sbc/sbc_primitives.c |   18 +++++++++++++++++-
  1 file changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/sbc/sbc_primitives_mmx.c b/sbc/sbc_primitives_mmx.c
-index 03070f5..21d7b74 100644
---- a/sbc/sbc_primitives_mmx.c
-+++ b/sbc/sbc_primitives_mmx.c
-@@ -276,6 +276,19 @@ static inline void sbc_analyze_4b_8s_mmx(struct sbc_encoder_state *state,
- 	__asm__ volatile ("emms\n");
+diff --git a/sbc/sbc_primitives.c b/sbc/sbc_primitives.c
+index 0b48ddb..a4767ef 100644
+--- a/sbc/sbc_primitives.c
++++ b/sbc/sbc_primitives.c
+@@ -209,6 +209,19 @@ static inline void sbc_analyze_4b_8s_simd(struct sbc_encoder_state *state,
+ 	sbc_analyze_eight_simd(x + 0, out, analysis_consts_fixed8_simd_even);
  }
  
-+static inline void sbc_analyze_1b_8s_mmx(struct sbc_encoder_state *state,
++static inline void sbc_analyze_1b_8s_simd(struct sbc_encoder_state *state,
 +		int16_t *x, int32_t *out, int out_stride)
 +{
 +	if (state->odd)
-+		sbc_analyze_eight_mmx(x, out, analysis_consts_fixed8_simd_odd);
++		sbc_analyze_eight_simd(x, out,
++					analysis_consts_fixed8_simd_odd);
 +	else
-+		sbc_analyze_eight_mmx(x, out, analysis_consts_fixed8_simd_even);
++		sbc_analyze_eight_simd(x, out,
++					analysis_consts_fixed8_simd_even);
 +
 +	state->odd = !state->odd;
-+
-+	__asm__ volatile ("emms\n");
 +}
 +
- static void sbc_calc_scalefactors_mmx(
- 	int32_t sb_sample_f[16][2][8],
- 	uint32_t scale_factor[2][8],
-@@ -366,7 +379,10 @@ void sbc_init_primitives_mmx(struct sbc_encoder_state *state)
+ static inline int16_t unaligned16_be(const uint8_t *ptr)
  {
- 	if (check_mmx_support()) {
- 		state->sbc_analyze_4s = sbc_analyze_4b_4s_mmx;
--		state->sbc_analyze_8s = sbc_analyze_4b_8s_mmx;
-+		if (state->increment == 1)
-+			state->sbc_analyze_8s = sbc_analyze_1b_8s_mmx;
-+		else
-+			state->sbc_analyze_8s = sbc_analyze_4b_8s_mmx;
- 		state->sbc_calc_scalefactors = sbc_calc_scalefactors_mmx;
- 		state->implementation_info = "MMX";
- 	}
+ 	return (int16_t) ((ptr[0] << 8) | ptr[1]);
+@@ -525,7 +538,10 @@ void sbc_init_primitives(struct sbc_encoder_state *state)
+ 
+ 	/* Default implementation for analyze functions */
+ 	state->sbc_analyze_4s = sbc_analyze_4b_4s_simd;
+-	state->sbc_analyze_8s = sbc_analyze_4b_8s_simd;
++	if (state->increment == 1)
++		state->sbc_analyze_8s = sbc_analyze_1b_8s_simd;
++	else
++		state->sbc_analyze_8s = sbc_analyze_4b_8s_simd;
+ 
+ 	/* Default implementation for input reordering / deinterleaving */
+ 	state->sbc_enc_process_input_4s_le = sbc_enc_process_input_4s_le;
 -- 
 1.7.9.5
 
