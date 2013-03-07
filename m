@@ -1,36 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/6] Bluetooth: Return ENODATA in hci_req_run
-Date: Thu,  7 Mar 2013 18:48:08 -0300
-Message-Id: <1362692892-28716-3-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v2 3/6] Bluetooth: Check hci_req_run returning value in __hci_req_sync
+Date: Thu,  7 Mar 2013 18:48:09 -0300
+Message-Id: <1362692892-28716-4-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1362692892-28716-1-git-send-email-andre.guedes@openbossa.org>
 References: <1362692892-28716-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In case the HCI request queue is empty, hci_req_run should return
-ENODATA instead of EINVAL. This way, hci_req_run returns a more
-meaningful error value.
+Since hci_req_run will be returning more than one error code, we
+should check its returning value in __hci_req_sync.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/hci_core.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a3e3c96..5f625e0 100644
+index 5f625e0..dc76dcf 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -2452,7 +2452,7 @@ int hci_req_run(struct hci_request *req, hci_req_complete_t complete)
+@@ -100,13 +100,16 @@ static int __hci_req_sync(struct hci_dev *hdev,
+ 	err = hci_req_run(&req, hci_req_sync_complete);
+ 	if (err < 0) {
+ 		hdev->req_status = 0;
+-		/* req_run will fail if the request did not add any
+-		 * commands to the queue, something that can happen when
+-		 * a request with conditionals doesn't trigger any
+-		 * commands to be sent. This is normal behavior and
+-		 * should not trigger an error return.
++
++		/* ENODATA means the HCI request command queue is empty.
++		 * This can happen when a request with conditionals doesn't
++		 * trigger any commands to be sent. This is normal behavior
++		 * and should not trigger an error return.
+ 		 */
+-		return 0;
++		if (err == -ENODATA)
++			return 0;
++
++		return err;
+ 	}
  
- 	/* Do not allow empty requests */
- 	if (skb_queue_empty(&req->cmd_q))
--		return -EINVAL;
-+		return -ENODATA;
- 
- 	skb = skb_peek_tail(&req->cmd_q);
- 	bt_cb(skb)->req.complete = complete;
+ 	add_wait_queue(&hdev->req_wait_q, &wait);
 -- 
 1.8.1.2
 
