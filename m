@@ -1,123 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3 v2] audio: Remove profile enabling/disabling logic
-Date: Thu,  7 Mar 2013 11:41:22 +0200
-Message-Id: <1362649284-24335-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 7 Mar 2013 09:23:12 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 3/3] core: Add DisableProfiles entry to main.conf
+Message-ID: <20130307072312.GA28996@x220>
+References: <1362566668-5098-1-git-send-email-luiz.dentz@gmail.com>
+ <1362566668-5098-3-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1362566668-5098-3-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Luiz,
 
-This should be handle by the core for all profiles
----
-v2: Match only local_uuid to avoid end up disabling both roles whenever one
-role is disabled.
+On Wed, Mar 06, 2013, Luiz Augusto von Dentz wrote:
+>  int btd_profile_register(struct btd_profile *profile)
+>  {
+> +	int i;
+> +
+> +	if (blacklist == NULL)
+> +		goto done;
+> +
+> +	for (i = 0; blacklist[i]; i++) {
+> +		if (g_pattern_match_simple(blacklist[i], profile->name))
+> +			return -EPROTONOSUPPORT;
+> +
+> +		if (profile->local_uuid != NULL && strcasecmp(blacklist[i],
+> +						profile->local_uuid) == 0)
+> +			return -EPROTONOSUPPORT;
+> +
+> +		if (profile->remote_uuids == NULL)
+> +			continue;
+> +
+> +		if (strcasecmp(blacklist[i], profile->remote_uuids[0]) == 0)
+> +			return -EPROTONOSUPPORT;
+> +	}
 
- profiles/audio/audio.conf |  4 ---
- profiles/audio/manager.c  | 62 ++++++-----------------------------------------
- 2 files changed, 8 insertions(+), 58 deletions(-)
+Since this is matching both local and remote UUID it seems like it
+wouldn't be possible to just disable one role of an asymmetric profile
+(like HFP) since no matter which role's UUID you give it'd always match
+both roles.
 
-diff --git a/profiles/audio/audio.conf b/profiles/audio/audio.conf
-index f556610..067b3fc 100644
---- a/profiles/audio/audio.conf
-+++ b/profiles/audio/audio.conf
-@@ -6,7 +6,3 @@
- 
- # Switch to master role for incoming connections (defaults to true)
- #Master=true
--
--# If we want to disable support for specific services
--# Defaults to supporting the services: Sink, Control
--#Disable=Source
-diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
-index 934227e..42a2b58 100644
---- a/profiles/audio/manager.c
-+++ b/profiles/audio/manager.c
-@@ -70,12 +70,6 @@
- static GKeyFile *config = NULL;
- static GSList *devices = NULL;
- 
--static struct enabled_interfaces enabled = {
--	.sink		= TRUE,
--	.source		= FALSE,
--	.control	= TRUE,
--};
--
- static struct audio_device *get_audio_dev(struct btd_device *device)
- {
- 	return manager_get_audio_device(device, TRUE);
-@@ -410,47 +404,12 @@ void audio_control_disconnected(struct btd_device *dev, int err)
- 
- int audio_manager_init(GKeyFile *conf)
- {
--	char **list;
--	int i;
--
--	if (!conf)
--		goto proceed;
--
--	config = conf;
--
--	list = g_key_file_get_string_list(config, "General", "Enable",
--						NULL, NULL);
--	for (i = 0; list && list[i] != NULL; i++) {
--		if (g_str_equal(list[i], "Sink"))
--			enabled.sink = TRUE;
--		else if (g_str_equal(list[i], "Source"))
--			enabled.source = TRUE;
--		else if (g_str_equal(list[i], "Control"))
--			enabled.control = TRUE;
--	}
--	g_strfreev(list);
--
--	list = g_key_file_get_string_list(config, "General", "Disable",
--						NULL, NULL);
--	for (i = 0; list && list[i] != NULL; i++) {
--		if (g_str_equal(list[i], "Sink"))
--			enabled.sink = FALSE;
--		else if (g_str_equal(list[i], "Source"))
--			enabled.source = FALSE;
--		else if (g_str_equal(list[i], "Control"))
--			enabled.control = FALSE;
--	}
--	g_strfreev(list);
-+	if (conf)
-+		config = conf;
- 
--proceed:
--	if (enabled.source)
--		btd_profile_register(&a2dp_source_profile);
--
--	if (enabled.sink)
--		btd_profile_register(&a2dp_sink_profile);
--
--	if (enabled.control)
--		btd_profile_register(&avrcp_profile);
-+	btd_profile_register(&a2dp_source_profile);
-+	btd_profile_register(&a2dp_sink_profile);
-+	btd_profile_register(&avrcp_profile);
- 
- 	btd_register_adapter_driver(&media_driver);
- 
-@@ -464,14 +423,9 @@ void audio_manager_exit(void)
- 		config = NULL;
- 	}
- 
--	if (enabled.source)
--		btd_profile_unregister(&a2dp_source_profile);
--
--	if (enabled.sink)
--		btd_profile_unregister(&a2dp_sink_profile);
--
--	if (enabled.control)
--		btd_profile_unregister(&avrcp_profile);
-+	btd_profile_unregister(&a2dp_source_profile);
-+	btd_profile_unregister(&a2dp_sink_profile);
-+	btd_profile_unregister(&avrcp_profile);
- 
- 	btd_unregister_adapter_driver(&media_driver);
- }
--- 
-1.8.1.4
-
+Johan
