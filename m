@@ -1,37 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 8 Mar 2013 09:49:33 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 4/6] Bluetooth: HCI request error handling
-Message-ID: <20130308074933.GA817@x220>
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 6/6] Bluetooth: Check req->err in hci_req_add
+Date: Thu,  7 Mar 2013 18:48:12 -0300
+Message-Id: <1362692892-28716-7-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1362692892-28716-1-git-send-email-andre.guedes@openbossa.org>
 References: <1362692892-28716-1-git-send-email-andre.guedes@openbossa.org>
- <1362692892-28716-5-git-send-email-andre.guedes@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1362692892-28716-5-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+If req->err is set, there is no point in queueing the HCI command
+in HCI request command queue since it won't be sent anyway.
 
-On Thu, Mar 07, 2013, Andre Guedes wrote:
-> +	if (req->err) {
-> +		skb_queue_purge(&req->cmd_q);
-> +		return req->err;
-> +	}
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ net/bluetooth/hci_core.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Don't we usually use if (err < 0) instead of if (err) for error checks?
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 1103d9f..2f07d88 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2536,6 +2536,12 @@ void hci_req_add(struct hci_request *req, u16 opcode, u32 plen, void *param)
+ 
+ 	BT_DBG("%s opcode 0x%4.4x plen %d", hdev->name, opcode, plen);
+ 
++	/* If an error occured during request building, there is no point in
++	 * queueing the HCI command. We can simply return.
++	 */
++	if (req->err)
++		return;
++
+ 	skb = hci_prepare_cmd(hdev, opcode, plen, param);
+ 	if (!skb) {
+ 		BT_ERR("%s no memory for command", hdev->name);
+-- 
+1.8.1.2
 
->  	skb = hci_prepare_cmd(hdev, opcode, plen, param);
->  	if (!skb) {
->  		BT_ERR("%s no memory for command", hdev->name);
-> +		req->err = -ENOMEM;
->  		return -ENOMEM;
->  	}
-
-I think it'd be good to add at least the opcode to the BT_ERR log above
-since otherwise the information of exactly which command in the request
-caused an error is lost.
-
-Johan
