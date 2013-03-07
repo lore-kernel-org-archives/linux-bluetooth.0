@@ -1,40 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1362146353-23799-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1362146353-23799-1-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Thu, 7 Mar 2013 18:28:14 +0100
+Message-ID: <CANT-zCXP8_8phAqjNYCJsakjXjRb3F9sVzk0z+u0ruOG2++r+A@mail.gmail.com>
+Subject: Re: [RFC v2 0/7] One remote UUID per btd_profile
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 0/6] Error handling in HCI request framework
-Date: Thu,  7 Mar 2013 18:48:06 -0300
-Message-Id: <1362692892-28716-1-git-send-email-andre.guedes@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi,
 
-This v2 is based on Johan's suggestions about the previous patch set.
-The main comments were:
-- Replace EINVAL by ENODATA in a separated patch.
-- Save the exact error code in struct hci_request instead of having just a
-  flag to indicate an error has occurred.
-- Check req->err before before empty queue check.
+On Fri, Mar 1, 2013 at 2:59 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>
+> Still not a lot of excitement after v1 but the patchset is required (or very convenient) for a later discussion which several people have shown interest in: the introduction of btd_service (or similar concept, to be discussed).
+>
+> Claudio pointed out several issues affecting patch v1 3/7, which have been improved in this v2, including:
+> - Fix premature release of resources in cleanup_monitor().
+> - Fix boolean literal in monitor_unregister_linkloss (which should be FALSE).
+>
+> Luiz also triggered an interesting point affecting patch v1 2/7 but I considered it unrelated to this patchset, stricly speaking, and has been therefore left aside.
+>
+> Looking forward to your feedback.
+>
+> From original cover-letter:
+>
+> Disclaimer: this RFC is WIP and hasn't been tested, specially because I don't have the necessary hardware for it.
+>
+> The goal is to have one remote_uuid per btd_profile. There are only a few exceptions to this rule, and this patchset tries to fix three of them. This basically means splitting one btd_profile per role.
+>
+> Mikel Astiz (7):
+>   avrcp: Refactor server registration
+>   audio: Split AVRCP into two btd_profile
+>   proximity: Split internal monitor registration API
+>   proximity: Split monitor into three btd_profile
+>   gatt: List only GATT_UUID as remote UUID
+>   health: Split health into two btd_profile
+>   profile: Limit to one remote UUID per profile
+>
+>  profiles/audio/avrcp.c               | 114 +++++++++++++-----
+>  profiles/audio/avrcp.h               |   6 +-
+>  profiles/audio/manager.c             |  75 ++++++++----
+>  profiles/cyclingspeed/cyclingspeed.c |   2 +-
+>  profiles/deviceinfo/deviceinfo.c     |   2 +-
+>  profiles/gatt/gas.c                  |   2 +-
+>  profiles/health/hdp_manager.c        |  20 +++-
+>  profiles/heartrate/heartrate.c       |   2 +-
+>  profiles/input/hog.c                 |   2 +-
+>  profiles/input/manager.c             |   2 +-
+>  profiles/network/manager.c           |   6 +-
+>  profiles/proximity/manager.c         | 100 ++++++++++++----
+>  profiles/proximity/monitor.c         | 220 ++++++++++++++++++++++++++++-------
+>  profiles/proximity/monitor.h         |  17 ++-
+>  profiles/scanparam/scan.c            |   2 +-
+>  profiles/thermometer/thermometer.c   |   2 +-
+>  src/device.c                         |  49 +++-----
+>  src/profile.c                        |  25 ++--
+>  src/profile.h                        |   4 +-
+>  19 files changed, 466 insertions(+), 186 deletions(-)
+>
+> --
+> 1.8.1
+>
 
-I also added a new patch (Patch 1) to fix a problem found in __hci_req_sync
-while I was working on this patch set.
+Ping.
 
-Regards,
-
-Andre
-
-Andre Guedes (6):
-  Bluetooth: Fix __hci_req_sync
-  Bluetooth: Return ENODATA in hci_req_run
-  Bluetooth: Check hci_req_run returning value in __hci_req_sync
-  Bluetooth: HCI request error handling
-  Bluetooth: Make hci_req_add returning void
-  Bluetooth: Check req->err in hci_req_add
-
- include/net/bluetooth/hci_core.h |  7 +++++-
- net/bluetooth/hci_core.c         | 46 +++++++++++++++++++++++++++-------------
- 2 files changed, 37 insertions(+), 16 deletions(-)
-
--- 
-1.8.1.2
-
+Cheers,
+Mikel
