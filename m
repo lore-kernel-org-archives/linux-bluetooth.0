@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 5/5 v2] AVRCP: Fix not checking for invalid player items
-Date: Thu,  7 Mar 2013 17:11:59 +0200
-Message-Id: <1362669119-10890-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/5 v2] AVRCP: Fix not checking for invalid folder length
+Date: Thu,  7 Mar 2013 17:11:57 +0200
+Message-Id: <1362669119-10890-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1362669119-10890-1-git-send-email-luiz.dentz@gmail.com>
 References: <1362669119-10890-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,52 +11,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds checks for invalid size in the media player list returned by
-GetFolderItems that could cause crashes.
+This adds checks for invalid folder length in SetBrowsedPlayer that
+could cause crashes while reading invalid memory.
 ---
- profiles/audio/avrcp.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ profiles/audio/avrcp.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
 diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 192a466..e3dbb6b 100644
+index d5e6574..afb8c09 100644
 --- a/profiles/audio/avrcp.c
 +++ b/profiles/audio/avrcp.c
-@@ -2108,16 +2108,17 @@ static gboolean avrcp_get_media_player_list_rsp(struct avctp *conn,
- 						size_t operand_count,
- 						void *user_data)
- {
-+	struct avrcp_browsing_header *pdu = (void *) operands;
- 	struct avrcp *session = user_data;
- 	uint16_t count;
+@@ -1934,7 +1934,7 @@ static gboolean avrcp_set_browsed_player_rsp(struct avctp *conn,
+ 	uint32_t items;
+ 	char **folders, *path;
+ 	uint8_t depth, count;
 -	int i;
 +	size_t i;
  
--	if (operands[3] != AVRCP_STATUS_SUCCESS || operand_count < 5)
-+	if (pdu->params[0] != AVRCP_STATUS_SUCCESS || operand_count < 5)
+ 	if (pdu->params[0] != AVRCP_STATUS_SUCCESS || operand_count < 13)
  		return FALSE;
+@@ -1948,14 +1948,19 @@ static gboolean avrcp_set_browsed_player_rsp(struct avctp *conn,
+ 	folders = g_new0(char *, depth + 2);
+ 	folders[0] = g_strdup("/Filesystem");
  
- 	count = bt_get_be16(&operands[6]);
+-	for (i = 10, count = 1; count - 1 < depth; count++) {
+-		char *part;
++	for (i = 10, count = 1; count - 1 < depth && i < operand_count;
++								count++) {
+ 		uint8_t len;
  
--	for (i = 8; count; count--) {
-+	for (i = 8; count && i < operand_count; count--) {
- 		uint8_t type;
- 		uint16_t len;
- 
-@@ -2130,7 +2131,14 @@ static gboolean avrcp_get_media_player_list_rsp(struct avctp *conn,
- 			continue;
- 		}
- 
-+		if (i + len > operand_count) {
-+			error("Invalid player item length");
-+			return FALSE;
+ 		len = pdu->params[i++];
+-		part = g_memdup(&pdu->params[i], len);
++
++		if (i + len > operand_count || len == 0) {
++			error("Invalid folder length");
++			break;
 +		}
 +
- 		avrcp_parse_media_player_item(session, &operands[i], len);
-+
-+		i += len;
++		folders[count] = g_memdup(&pdu->params[i], len);
+ 		i += len;
+-		folders[count] = part;
  	}
  
- 	return FALSE;
+ 	path = g_build_pathv("/", folders);
 -- 
 1.8.1.4
 
