@@ -1,29 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 7 Mar 2013 17:21:11 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/5 v2] AVRCP: Fix reading wrong field as folder
- depth
-Message-ID: <20130307152111.GA2409@x220>
-References: <1362669119-10890-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 4/5 v2] AVRCP: Fix not checking for invalid player name length
+Date: Thu,  7 Mar 2013 17:11:58 +0200
+Message-Id: <1362669119-10890-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1362669119-10890-1-git-send-email-luiz.dentz@gmail.com>
+References: <1362669119-10890-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Mar 07, 2013, Luiz Augusto von Dentz wrote:
-> Folder depth is bit 10 of the parameters not the PDU operands
-> ---
-> v2: Make use of MIN macro to check player name length and fix zero length
-> check for folder.
-> 
->  profiles/audio/avrcp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+This adds checks for invalid player name length that could cause crashes
+while reading invalid memory.
+---
+ profiles/audio/avrcp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This patch set has been applied. Thanks.
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index afb8c09..192a466 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -2093,7 +2093,7 @@ static void avrcp_parse_media_player_item(struct avrcp *session,
+ 	avrcp_player_parse_features(player, &operands[8]);
+ 
+ 	namelen = bt_get_be16(&operands[26]);
+-	if (namelen != 0) {
++	if (namelen != 0 && namelen + 28 == len) {
+ 		namelen = MIN(namelen, sizeof(name) - 1);
+ 		memcpy(name, &operands[28], namelen);
+ 		name[namelen] = '\0';
+-- 
+1.8.1.4
 
-Johan
