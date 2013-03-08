@@ -1,53 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20130220173130.GA30757@joana>
-References: <20130219165415.GE362@hansolo.jdub.homelinux.org>
-	<20130220173130.GA30757@joana>
-Date: Fri, 8 Mar 2013 10:14:12 -0700
-Message-ID: <CAKocOOON6HCtz8v8HEb3+HjL6ouMNLPEJ3YjqfHW_i3NwJ=A7w@mail.gmail.com>
-Subject: Re: [PATCH] bluetooth: Add support for atheros 04ca:3004 device to ath3k
-From: Shuah Khan <shuahkhan@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>, Josh Boyer <jwboyer@redhat.com>,
-	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, niktr@mail.ru
-Cc: Greg KH <gregkh@linuxfoundation.org>, "\"stable" <stable@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 6/6] Bluetooth: Check req->err in hci_req_add
+Date: Fri,  8 Mar 2013 11:20:18 -0300
+Message-Id: <1362752418-8688-6-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1362752418-8688-1-git-send-email-andre.guedes@openbossa.org>
+References: <1362752418-8688-1-git-send-email-andre.guedes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Feb 20, 2013 at 10:31 AM, Gustavo Padovan <gustavo@padovan.org> wrote:
-> Hi Josh,
->
-> * Josh Boyer <jwboyer@redhat.com> [2013-02-19 11:54:16 -0500]:
->
->> Yet another version of the atheros bluetooth chipset
->>
->> T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
->> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
->> P:  Vendor=04ca ProdID=3004 Rev=00.01
->> S:  Manufacturer=Atheros Communications
->> S:  Product=Bluetooth USB Host Controller
->> S:  SerialNumber=Alaska Day 2006
->> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
->> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
->>
->> This resolves https://bugzilla.redhat.com/show_bug.cgi?id=844750
->>
->> Reported-by: niktr@mail.ru
->> Signed-off-by: Josh Boyer <jwboyer@redhat.com>
->> ---
->>  drivers/bluetooth/ath3k.c | 2 ++
->>  drivers/bluetooth/btusb.c | 1 +
->>  2 files changed, 3 insertions(+)
->
-> Patch has been applied to bluetooth.git. Thanks.
->
->         Gustavo
+If req->err is set, there is no point in queueing the HCI command
+in HCI request command queue since it won't be sent anyway.
 
-Gustavo,
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_core.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-I don't see this in Linus's git? Do you plan to get this into 3.9? Do
-you consider this a candidate for stable releases?
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index f14c41f..a49c445 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2536,6 +2536,12 @@ void hci_req_add(struct hci_request *req, u16 opcode, u32 plen, void *param)
+ 
+ 	BT_DBG("%s opcode 0x%4.4x plen %d", hdev->name, opcode, plen);
+ 
++	/* If an error occured during request building, there is no point in
++	 * queueing the HCI command. We can simply return.
++	 */
++	if (req->err)
++		return;
++
+ 	skb = hci_prepare_cmd(hdev, opcode, plen, param);
+ 	if (!skb) {
+ 		BT_ERR("%s no memory for command (opcode 0x%4.4x)",
+-- 
+1.8.1.2
 
-thanks,
--- Shuah
