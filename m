@@ -1,156 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 4/6] Bluetooth: Remove LE scan work
-Date: Fri,  8 Mar 2013 20:06:17 -0300
-Message-Id: <1362783979-10142-5-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v2 3/6] Bluetooth: Remove timeout handling from hci_cancel_le_scan
+Date: Fri,  8 Mar 2013 20:06:16 -0300
+Message-Id: <1362783979-10142-4-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1362783979-10142-1-git-send-email-andre.guedes@openbossa.org>
 References: <1362783979-10142-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes the LE scan work and all code related to it. We
-now use the HCI request framework to enable LE scanning so the LE
-scan work is no longer needed.
+This patch moves the LE scanning timeout handling from hci_cancel_
+le_scan helper to stop_discovery.
+
+Since we want discovery code handling LE scanning timeout, we should
+handle it in stop_discovery instead of hci_cancel_le_scan.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h | 10 ------
- net/bluetooth/hci_core.c         | 72 ----------------------------------------
- 2 files changed, 82 deletions(-)
+ net/bluetooth/hci_core.c | 14 +++++---------
+ net/bluetooth/mgmt.c     | 15 ++++++++++++---
+ 2 files changed, 17 insertions(+), 12 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 964b270..0e4d893 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -117,13 +117,6 @@ struct oob_data {
- 	u8 randomizer[16];
- };
- 
--struct le_scan_params {
--	u8 type;
--	u16 interval;
--	u16 window;
--	int timeout;
--};
--
- #define HCI_MAX_SHORT_NAME_LENGTH	10
- 
- struct amp_assoc {
-@@ -278,9 +271,6 @@ struct hci_dev {
- 
- 	struct delayed_work	le_scan_disable;
- 
--	struct work_struct	le_scan;
--	struct le_scan_params	le_scan_params;
--
- 	__s8			adv_tx_power;
- 	__u8			adv_data[HCI_MAX_AD_LENGTH];
- 	__u8			adv_data_len;
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 200ec5a..45fe8f3 100644
+index 59f583b..200ec5a 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -1063,8 +1063,6 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- {
- 	BT_DBG("%s %p", hdev->name, hdev);
+@@ -1905,20 +1905,16 @@ static int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval,
  
--	cancel_work_sync(&hdev->le_scan);
--
- 	cancel_delayed_work(&hdev->power_off);
- 
- 	hci_req_cancel(hdev, ENODEV);
-@@ -1845,64 +1843,6 @@ int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type)
- 	return mgmt_device_unblocked(hdev, bdaddr, type);
- }
- 
--static void le_scan_param_req(struct hci_request *req, unsigned long opt)
--{
--	struct le_scan_params *param =  (struct le_scan_params *) opt;
--	struct hci_cp_le_set_scan_param cp;
--
--	memset(&cp, 0, sizeof(cp));
--	cp.type = param->type;
--	cp.interval = cpu_to_le16(param->interval);
--	cp.window = cpu_to_le16(param->window);
--
--	hci_req_add(req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(cp), &cp);
--}
--
--static void le_scan_enable_req(struct hci_request *req, unsigned long opt)
--{
--	struct hci_cp_le_set_scan_enable cp;
--
--	memset(&cp, 0, sizeof(cp));
--	cp.enable = 1;
--	cp.filter_dup = 1;
--
--	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
--}
--
--static int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval,
--			  u16 window, int timeout)
--{
--	long timeo = msecs_to_jiffies(3000);
--	struct le_scan_params param;
--	int err;
--
--	BT_DBG("%s", hdev->name);
--
--	if (test_bit(HCI_LE_SCAN, &hdev->dev_flags))
--		return -EINPROGRESS;
--
--	param.type = type;
--	param.interval = interval;
--	param.window = window;
--
--	hci_req_lock(hdev);
--
--	err = __hci_req_sync(hdev, le_scan_param_req, (unsigned long) &param,
--			     timeo);
--	if (!err)
--		err = __hci_req_sync(hdev, le_scan_enable_req, 0, timeo);
--
--	hci_req_unlock(hdev);
--
--	if (err < 0)
--		return err;
--
--	queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
--			   msecs_to_jiffies(timeout));
--
--	return 0;
--}
--
  int hci_cancel_le_scan(struct hci_dev *hdev)
  {
- 	struct hci_cp_le_set_scan_enable cp;
-@@ -1930,17 +1870,6 @@ static void le_scan_disable_work(struct work_struct *work)
- 	hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
++	struct hci_cp_le_set_scan_enable cp;
++
+ 	BT_DBG("%s", hdev->name);
+ 
+ 	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
+ 		return -EALREADY;
+ 
+-	if (cancel_delayed_work(&hdev->le_scan_disable)) {
+-		struct hci_cp_le_set_scan_enable cp;
+-
+-		/* Send HCI command to disable LE Scan */
+-		memset(&cp, 0, sizeof(cp));
+-		hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
+-	}
+-
+-	return 0;
++	/* Send HCI command to disable LE Scan */
++	memset(&cp, 0, sizeof(cp));
++	return hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
  }
  
--static void le_scan_work(struct work_struct *work)
--{
--	struct hci_dev *hdev = container_of(work, struct hci_dev, le_scan);
--	struct le_scan_params *param = &hdev->le_scan_params;
--
--	BT_DBG("%s", hdev->name);
--
--	hci_do_le_scan(hdev, param->type, param->interval, param->window,
--		       param->timeout);
--}
--
- int hci_le_scan(struct hci_request *req, u8 type, u16 interval, u16 window)
- {
- 	struct hci_dev *hdev = req->hdev;
-@@ -2007,7 +1936,6 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
- 	INIT_WORK(&hdev->tx_work, hci_tx_work);
- 	INIT_WORK(&hdev->power_on, hci_power_on);
--	INIT_WORK(&hdev->le_scan, le_scan_work);
+ static void le_scan_disable_work(struct work_struct *work)
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 0fe7a87..3fec412 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2579,10 +2579,19 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
  
- 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
- 	INIT_DELAYED_WORK(&hdev->discov_off, hci_discov_off);
+ 	switch (hdev->discovery.state) {
+ 	case DISCOVERY_FINDING:
+-		if (test_bit(HCI_INQUIRY, &hdev->flags))
++		if (test_bit(HCI_INQUIRY, &hdev->flags)) {
+ 			err = hci_cancel_inquiry(hdev);
+-		else
+-			err = hci_cancel_le_scan(hdev);
++		} else {
++			/*
++			 * If delayed work could not be canceled, it means the
++			 * work is running. Therefore, there is no need to send
++			 * another HCI command to disable LE scanning.
++			 */
++			if (!cancel_delayed_work(&hdev->le_scan_disable))
++				err = 0;
++			else
++				err = hci_cancel_le_scan(hdev);
++		}
+ 
+ 		break;
+ 
 -- 
 1.8.1.2
 
