@@ -1,68 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 5/6] Bluetooth: Make hci_req_add returning void
-Date: Fri,  8 Mar 2013 11:20:17 -0300
-Message-Id: <1362752418-8688-5-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v3 3/6] Bluetooth: Check hci_req_run returning value in __hci_req_sync
+Date: Fri,  8 Mar 2013 11:20:15 -0300
+Message-Id: <1362752418-8688-3-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1362752418-8688-1-git-send-email-andre.guedes@openbossa.org>
 References: <1362752418-8688-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since no one checks the returning value of hci_req_add and HCI
-request errors are now handled in hci_req_run, we can make hci_
-req_add returning void.
+Since hci_req_run will be returning more than one error code, we
+should check its returning value in __hci_req_sync.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 Acked-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h | 2 +-
- net/bluetooth/hci_core.c         | 6 ++----
- 2 files changed, 3 insertions(+), 5 deletions(-)
+ net/bluetooth/hci_core.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 332ee50..d6c3256 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1051,7 +1051,7 @@ struct hci_request {
- 
- void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
- int hci_req_run(struct hci_request *req, hci_req_complete_t complete);
--int hci_req_add(struct hci_request *req, u16 opcode, u32 plen, void *param);
-+void hci_req_add(struct hci_request *req, u16 opcode, u32 plen, void *param);
- void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status);
- void hci_req_cmd_status(struct hci_dev *hdev, u16 opcode, u8 status);
- 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index fa72aff..f14c41f 100644
+index 5f625e0..dc76dcf 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -2529,7 +2529,7 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
- }
- 
- /* Queue a command to an asynchronous HCI request */
--int hci_req_add(struct hci_request *req, u16 opcode, u32 plen, void *param)
-+void hci_req_add(struct hci_request *req, u16 opcode, u32 plen, void *param)
- {
- 	struct hci_dev *hdev = req->hdev;
- 	struct sk_buff *skb;
-@@ -2541,15 +2541,13 @@ int hci_req_add(struct hci_request *req, u16 opcode, u32 plen, void *param)
- 		BT_ERR("%s no memory for command (opcode 0x%4.4x)",
- 		       hdev->name, opcode);
- 		req->err = -ENOMEM;
--		return -ENOMEM;
-+		return;
+@@ -100,13 +100,16 @@ static int __hci_req_sync(struct hci_dev *hdev,
+ 	err = hci_req_run(&req, hci_req_sync_complete);
+ 	if (err < 0) {
+ 		hdev->req_status = 0;
+-		/* req_run will fail if the request did not add any
+-		 * commands to the queue, something that can happen when
+-		 * a request with conditionals doesn't trigger any
+-		 * commands to be sent. This is normal behavior and
+-		 * should not trigger an error return.
++
++		/* ENODATA means the HCI request command queue is empty.
++		 * This can happen when a request with conditionals doesn't
++		 * trigger any commands to be sent. This is normal behavior
++		 * and should not trigger an error return.
+ 		 */
+-		return 0;
++		if (err == -ENODATA)
++			return 0;
++
++		return err;
  	}
  
- 	if (skb_queue_empty(&req->cmd_q))
- 		bt_cb(skb)->req.start = true;
- 
- 	skb_queue_tail(&req->cmd_q, skb);
--
--	return 0;
- }
- 
- /* Get data from the previously sent command */
+ 	add_wait_queue(&hdev->req_wait_q, &wait);
 -- 
 1.8.1.2
 
