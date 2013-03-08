@@ -1,48 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Fri, 8 Mar 2013 18:24:41 +0530
-Message-ID: <CALG=YKPN1nc4XGkDUjzKCdgA4XyrBTUAGa2FDKZLzqddd8StFw@mail.gmail.com>
-Subject: Requesting BlueZ Device Interoperability list.
-From: Ajay kumar <ajayembedded@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Message-id: <09E9BAE585E641F49AB5BF6C218841C9@sisodomain.com>
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Vinicius Gomes <vinicius.gomes@openbossa.org>
+References: <1362402872-13080-1-git-send-email-jaganath.k@samsung.com>
+ <1362402872-13080-2-git-send-email-jaganath.k@samsung.com>
+ <CAJdJm_P8unpbmR6Y1dzmkmXErrP6cLwaX8wza_6f+EPB5rr=CA@mail.gmail.com>
+ <A94F3F1039284ED7AB00B9BC928893CD@sisodomain.com>
+ <8BF3576D9B1446A3AF8908F58AF314CE@sisodomain.com>
+ <CAJdJm_Om0Rpv__KaKTdiqUxHrKj9GWKi6S971zp1-pBJkjMA2Q@mail.gmail.com>
+In-reply-to: <CAJdJm_Om0Rpv__KaKTdiqUxHrKj9GWKi6S971zp1-pBJkjMA2Q@mail.gmail.com>
+Subject: Re: [PATCH 2/3] attrib: Fix use after free of attrib
+Date: Fri, 08 Mar 2013 18:19:43 +0530
+MIME-version: 1.0
+Content-type: text/plain; format=flowed; charset=iso-8859-1; reply-type=original
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Anderson,
 
-I understand this is Developer's mailing list.
+--------------------------------------------------
+From: "Anderson Lizardo" <anderson.lizardo@openbossa.org>
+Sent: Friday, March 08, 2013 5:55 PM
+To: "Jaganath Kanakkassery" <jaganath.k@samsung.com>
+Cc: <linux-bluetooth@vger.kernel.org>; "Vinicius Gomes" 
+<vinicius.gomes@openbossa.org>
+Subject: Re: [PATCH 2/3] attrib: Fix use after free of attrib
 
-I Request constructive direction (this is the only choice left...).
+> Hi Jaganath,
+>
+> On Fri, Mar 8, 2013 at 8:03 AM, Jaganath Kanakkassery
+> <jaganath.k@samsung.com> wrote:
+>>> I got this issue in BlueZ 4.101 when I called "DiscoverCharacteristics".
+>>> "GetProperty" and "SetProperty" of characteristics. Please see the logs
+>> [...]
+>
+> Sorry for the delay. I talked with Vinicius Gomes (who recently worked
+> on the GAttrib code), and he agrees this fix is valid.
+>
+> Were you able to test this change on BlueZ 5, e.g. using gatttool or
+> some supported LE profile?
+>
+I could not test this on BlueZ 5 since we are still using BlueZ 4.101 which 
+I tested
+and is working fine.
 
-Following trials to get 'BlueZ Device Interoperability list' did not yield.
-1. Search here: http://marc.info/?l=linux-bluetooth
-2. Search on google.
-3. Search here: http://freenode.net/
-4. Search here: http://www.bluez.org/
- I found this:
-  Jack SP320 Service Point
-  Jack SP640 Service Point
-  Tom Tom GO300
-  Tom Tom GO500
-  Tom Tom GO700
-  Tom Tom RIDER
-  Tom Tom ONE
-  Tom Tom ONE (EDR version)
-  Nokia 770
-  Nokia N800
-  Nokia N810
-  Nokia N900
-  Nokia N9
-  Nokia N900
-  Nokia N9
-5. Here: https://www.bluetooth.org/tpg/listings.cfm
- I did not understand.
+Thanks,
+Jaganath 
 
-I want something like this:
-http://www.mecel.se/products/bluetooth/mecel-betula-sdk/list-of-compatible-mobile-phones-with-mecel-betula-sdk
-
-I request to educate / guide me to get BlueZ interoperability details.
-
-with gratitude,
-AjayKumar
