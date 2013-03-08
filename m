@@ -1,57 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <20130308113450.GA10655@x220.ger.corp.intel.com>
+References: <1362692892-28716-1-git-send-email-andre.guedes@openbossa.org>
+	<1362692892-28716-7-git-send-email-andre.guedes@openbossa.org>
+	<20130308075009.GB817@x220>
+	<20130308110845.GA31311@aemeltch-MOBL1>
+	<20130308112540.GA10170@x220.ger.corp.intel.com>
+	<20130308113450.GA10655@x220.ger.corp.intel.com>
+Date: Fri, 8 Mar 2013 11:07:01 -0300
+Message-ID: <CACJA=fUpWxNM_o6ZA0YSPZ=UDBfKXCBq8YjZRKmKyC+y3Xq0kw@mail.gmail.com>
+Subject: Re: [PATCH v2 6/6] Bluetooth: Check req->err in hci_req_add
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 1/6] Bluetooth: Fix __hci_req_sync
-Date: Fri,  8 Mar 2013 11:20:13 -0300
-Message-Id: <1362752418-8688-1-git-send-email-andre.guedes@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If hci_req_run returns error, we erroneously leave the current
-process in TASK_INTERRUPTABLE state. If we leave the process in
-TASK_INTERRUPTABLE and it is preempted, this process will never
-be scheduled again.
+Hi Johan,
 
-This patch fixes this issue by moving the preparation for scheduling
-(add to waitqueue and set process state) to just after the hci_req_run
-call.
+On Fri, Mar 8, 2013 at 8:34 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi,
+>
+> On Fri, Mar 08, 2013, Johan Hedberg wrote:
+>> On Fri, Mar 08, 2013, Andrei Emeltchenko wrote:
+>> > On Fri, Mar 08, 2013 at 09:50:09AM +0200, Johan Hedberg wrote:
+>> > > Hi Andre,
+>> > >
+>> > > On Thu, Mar 07, 2013, Andre Guedes wrote:
+>> > > > +       if (req->err)
+>> > > > +               return;
+>> > >
+>> > > Same thing here with the error check, I think if (err < 0) is more
+>> > > consistent.
+>> >
+>> > Using "if (err)" seems to be OK for kernel and looks shorter.
+>>
+>> It certainly seems to be more common than in user space, but I wouldn't say
+>> it's the most common form:
+>>
+>> jh@x220:linux{master}$ git grep 'if (err)' net/bluetooth/|wc -l
+>> 34
+>> jh@x220:linux{master}$ git grep 'if (err < 0)' net/bluetooth/|wc -l
+>> 89
+>> jh@x220:linux{master}$
+>
+> Looking elsewhere than net/bluetooth/ in the kernel tree the balance
+> seems to be the other way around though, so I wont insist on this.
+>
+> Andre, if you do the fix to BT_ERR() you can also add my acks to all
+> patches in your v3 of this set.
+>
+> Acked-by: Johan Hedberg <johan.hedberg@intel.com>
 
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-Acked-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_core.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+Ok, then I'll add the opcode to BT_ERR(), add yours acks and send the v3.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index b6d44a2..a3e3c96 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -95,15 +95,11 @@ static int __hci_req_sync(struct hci_dev *hdev,
- 
- 	hdev->req_status = HCI_REQ_PEND;
- 
--	add_wait_queue(&hdev->req_wait_q, &wait);
--	set_current_state(TASK_INTERRUPTIBLE);
--
- 	func(&req, opt);
- 
- 	err = hci_req_run(&req, hci_req_sync_complete);
- 	if (err < 0) {
- 		hdev->req_status = 0;
--		remove_wait_queue(&hdev->req_wait_q, &wait);
- 		/* req_run will fail if the request did not add any
- 		 * commands to the queue, something that can happen when
- 		 * a request with conditionals doesn't trigger any
-@@ -113,6 +109,9 @@ static int __hci_req_sync(struct hci_dev *hdev,
- 		return 0;
- 	}
- 
-+	add_wait_queue(&hdev->req_wait_q, &wait);
-+	set_current_state(TASK_INTERRUPTIBLE);
-+
- 	schedule_timeout(timeout);
- 
- 	remove_wait_queue(&hdev->req_wait_q, &wait);
--- 
-1.8.1.2
+Regards,
 
+Andre
