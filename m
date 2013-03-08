@@ -1,42 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 0/6] Use HCI request framework to enable LE scanning
-Date: Fri,  8 Mar 2013 20:06:13 -0300
-Message-Id: <1362783979-10142-1-git-send-email-andre.guedes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <20130220173130.GA30757@joana>
+References: <20130219165415.GE362@hansolo.jdub.homelinux.org>
+	<20130220173130.GA30757@joana>
+Date: Fri, 8 Mar 2013 10:14:12 -0700
+Message-ID: <CAKocOOON6HCtz8v8HEb3+HjL6ouMNLPEJ3YjqfHW_i3NwJ=A7w@mail.gmail.com>
+Subject: Re: [PATCH] bluetooth: Add support for atheros 04ca:3004 device to ath3k
+From: Shuah Khan <shuahkhan@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>, Josh Boyer <jwboyer@redhat.com>,
+	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, niktr@mail.ru
+Cc: Greg KH <gregkh@linuxfoundation.org>, "\"stable" <stable@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+On Wed, Feb 20, 2013 at 10:31 AM, Gustavo Padovan <gustavo@padovan.org> wrote:
+> Hi Josh,
+>
+> * Josh Boyer <jwboyer@redhat.com> [2013-02-19 11:54:16 -0500]:
+>
+>> Yet another version of the atheros bluetooth chipset
+>>
+>> T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
+>> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+>> P:  Vendor=04ca ProdID=3004 Rev=00.01
+>> S:  Manufacturer=Atheros Communications
+>> S:  Product=Bluetooth USB Host Controller
+>> S:  SerialNumber=Alaska Day 2006
+>> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+>> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>>
+>> This resolves https://bugzilla.redhat.com/show_bug.cgi?id=844750
+>>
+>> Reported-by: niktr@mail.ru
+>> Signed-off-by: Josh Boyer <jwboyer@redhat.com>
+>> ---
+>>  drivers/bluetooth/ath3k.c | 2 ++
+>>  drivers/bluetooth/btusb.c | 1 +
+>>  2 files changed, 3 insertions(+)
+>
+> Patch has been applied to bluetooth.git. Thanks.
+>
+>         Gustavo
 
-This v2 implements Marcel's comments about the previous patch set.
+Gustavo,
 
-The changes are:
-- set_le_scan_param and set_le_scan_enable helpers were removed and their
-  code put into hci_le_scan function.
-- Decimal values were replaced by hexadecimal in HCI parameters.
+I don't see this in Linus's git? Do you plan to get this into 3.9? Do
+you consider this a candidate for stable releases?
 
-I also removed Patch "Bluetooth: Add hci_req_cleanup function" from this
-patch set since all request errors are now handled by the HCI request
-framework.
-
-Regards,
-
-Andre
-
-Andre Guedes (6):
-  Bluetooth: Update hci_le_scan to use HCI request
-  Bluetooth: Merge LE-only and interleaved cases
-  Bluetooth: Remove timeout handling from hci_cancel_le_scan
-  Bluetooth: Remove LE scan work
-  Bluetooth: Change LE scanning timeout macros
-  Bluetooth: Add LE scan type macros
-
- include/net/bluetooth/hci_core.h |  17 ++----
- net/bluetooth/hci_core.c         | 113 ++++++++-------------------------------
- net/bluetooth/mgmt.c             |  62 ++++++++++++++++-----
- 3 files changed, 76 insertions(+), 116 deletions(-)
-
--- 
-1.8.1.2
-
+thanks,
+-- Shuah
