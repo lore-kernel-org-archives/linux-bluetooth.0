@@ -1,59 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20130308113450.GA10655@x220.ger.corp.intel.com>
-References: <1362692892-28716-1-git-send-email-andre.guedes@openbossa.org>
-	<1362692892-28716-7-git-send-email-andre.guedes@openbossa.org>
-	<20130308075009.GB817@x220>
-	<20130308110845.GA31311@aemeltch-MOBL1>
-	<20130308112540.GA10170@x220.ger.corp.intel.com>
-	<20130308113450.GA10655@x220.ger.corp.intel.com>
-Date: Fri, 8 Mar 2013 11:07:01 -0300
-Message-ID: <CACJA=fUpWxNM_o6ZA0YSPZ=UDBfKXCBq8YjZRKmKyC+y3Xq0kw@mail.gmail.com>
-Subject: Re: [PATCH v2 6/6] Bluetooth: Check req->err in hci_req_add
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <A286798B34C0C9419EDBB5F44D457E14137231@SHSMSX101.ccr.corp.intel.com>
+References: <A286798B34C0C9419EDBB5F44D457E14137231@SHSMSX101.ccr.corp.intel.com>
+Date: Fri, 8 Mar 2013 09:59:45 -0400
+Message-ID: <CAJdJm_OO4SXo6sSCnuoCWYB2nvhHjWp=gPwY9bAjPRYij2UAmA@mail.gmail.com>
+Subject: Re: one question on BLE device authentication error
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: "Huang, Christina" <christina.huang@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Christina,
 
-On Fri, Mar 8, 2013 at 8:34 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi,
->
-> On Fri, Mar 08, 2013, Johan Hedberg wrote:
->> On Fri, Mar 08, 2013, Andrei Emeltchenko wrote:
->> > On Fri, Mar 08, 2013 at 09:50:09AM +0200, Johan Hedberg wrote:
->> > > Hi Andre,
->> > >
->> > > On Thu, Mar 07, 2013, Andre Guedes wrote:
->> > > > +       if (req->err)
->> > > > +               return;
->> > >
->> > > Same thing here with the error check, I think if (err < 0) is more
->> > > consistent.
->> >
->> > Using "if (err)" seems to be OK for kernel and looks shorter.
->>
->> It certainly seems to be more common than in user space, but I wouldn't say
->> it's the most common form:
->>
->> jh@x220:linux{master}$ git grep 'if (err)' net/bluetooth/|wc -l
->> 34
->> jh@x220:linux{master}$ git grep 'if (err < 0)' net/bluetooth/|wc -l
->> 89
->> jh@x220:linux{master}$
->
-> Looking elsewhere than net/bluetooth/ in the kernel tree the balance
-> seems to be the other way around though, so I wont insist on this.
->
-> Andre, if you do the fix to BT_ERR() you can also add my acks to all
-> patches in your v3 of this set.
->
-> Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+On Fri, Mar 8, 2013 at 3:54 AM, Huang, Christina
+<christina.huang@intel.com> wrote:
+> < HCI Command: LE Start Encryption (0x08|0x0019) plen 28        [hci0] 5.724000
+>         Handle: 71
+>         Random number: 8c126b665d2de279
+>         Encryption diversifier: 0x3f55
+>         Long term key: dcd74a1a07f653c0e27f65888debcbe5
+> @ Device Connected: 00:17:EA:91:8C:78 (1) flags 0x0000
+>> HCI Event: Command Status (0x0f) plen 4                       [hci0] 5.733922
+>       LE Start Encryption (0x08|0x0019) ncmd 1
+>         Status: Success (0x00)
+>> ACL Data RX: Handle 71 flags 0x02 dlen 6                      [hci0] 5.835521
+>       SMP: Security Request (0x0b) len 1
+>         Authentication requirement: Bonding - MITM (0x05)
+>> HCI Event: Encryption Change (0x08) plen 4                    [hci0] 6.115911
+>         Status: PIN or Key Missing (0x06)
+>         Handle: 71
+>         Encryption: Disabled (0x00)
 
-Ok, then I'll add the opcode to BT_ERR(), add yours acks and send the v3.
+It looks like your LE device lost the bonding information (e.g. LTK)
+and thus is not able to just encrypt the connection with the LTK BlueZ
+is trying to use. You can try removing the bonding on BlueZ side (e.g.
+"test-device remove <bdaddr>" or "remove <bdaddr>" on bluetoothctl)
+and try again a complete pairing.
 
-Regards,
-
-Andre
+Best regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
