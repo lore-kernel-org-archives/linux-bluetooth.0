@@ -1,35 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 9 Mar 2013 17:20:19 -0300
+Date: Sat, 9 Mar 2013 17:13:40 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix endianness handling of
- cmd_status/complete opcodes
-Message-ID: <20130309202019.GB9938@joana>
-References: <1362815630-6800-1-git-send-email-johan.hedberg@gmail.com>
+Subject: Re: [PATCH v3 6/6] Bluetooth: Check req->err in hci_req_add
+Message-ID: <20130309201340.GA9938@joana>
+References: <1362752418-8688-1-git-send-email-andre.guedes@openbossa.org>
+ <1362752418-8688-6-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1362815630-6800-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1362752418-8688-6-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Andre,
 
-* Johan Hedberg <johan.hedberg@gmail.com> [2013-03-09 09:53:50 +0200]:
+* Andre Guedes <andre.guedes@openbossa.org> [2013-03-08 11:20:18 -0300]:
 
-> From: Johan Hedberg <johan.hedberg@intel.com>
+> If req->err is set, there is no point in queueing the HCI command
+> in HCI request command queue since it won't be sent anyway.
 > 
-> The opcode in cmd_complete and cmd_status events is 16 bits, so we
-> should only be comparing it after having converted it to the host
-> endianness. There's already an opcode variable in both functions which
-> is in host endiannes so the right fix is to just start using it instead
-> of ev->opcode.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> Acked-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  net/bluetooth/hci_event.c |    8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  net/bluetooth/hci_core.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 
-Patch has been applied to bluetooth-next. Thanks.
+All patches have been applied to bluetooth-next. Thanks.
 
 	Gustavo
