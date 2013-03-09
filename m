@@ -1,55 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix endianness handling of cmd_status/complete opcodes
-Date: Sat,  9 Mar 2013 09:53:50 +0200
-Message-Id: <1362815630-6800-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.2 \(1499\))
+Subject: Re: [PATCH v2 5/6] Bluetooth: Change LE scanning timeout macros
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1362783979-10142-6-git-send-email-andre.guedes@openbossa.org>
+Date: Fri, 8 Mar 2013 17:29:53 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <667E9201-E2EB-45B7-9629-F3A1C62F285B@holtmann.org>
+References: <1362783979-10142-1-git-send-email-andre.guedes@openbossa.org> <1362783979-10142-6-git-send-email-andre.guedes@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Andre,
 
-The opcode in cmd_complete and cmd_status events is 16 bits, so we
-should only be comparing it after having converted it to the host
-endianness. There's already an opcode variable in both functions which
-is in host endiannes so the right fix is to just start using it instead
-of ev->opcode.
+> Define LE scanning timeout macros in jiffies just like we do for
+> others timeout macros.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+> net/bluetooth/mgmt.c | 8 ++++----
+> 1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 3fec412..8567bec 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -109,8 +109,8 @@ static const u16 mgmt_events[] = {
+> #define LE_SCAN_TYPE			0x01
+> #define LE_SCAN_WIN			0x12
+> #define LE_SCAN_INT			0x12
+> -#define LE_SCAN_TIMEOUT_LE_ONLY		10240	/* TGAP(gen_disc_scan_min) */
+> -#define LE_SCAN_TIMEOUT_BREDR_LE	5120	/* TGAP(100)/2 */
+> +#define LE_SCAN_TIMEOUT_LE_ONLY		msecs_to_jiffies(10240)
+> +#define LE_SCAN_TIMEOUT_BREDR_LE	msecs_to_jiffies(5120)
+> 
+> #define INQUIRY_LEN_BREDR		0x08	/* TGAP(100) */
+> #define INQUIRY_LEN_BREDR_LE		0x04	/* TGAP(100)/2 */
+> @@ -2438,12 +2438,12 @@ static void enable_le_scan_complete(struct hci_dev *hdev, u8 status)
+> 	switch (hdev->discovery.type) {
+> 	case DISCOV_TYPE_LE:
+> 		queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
+> -				   msecs_to_jiffies(LE_SCAN_TIMEOUT_LE_ONLY));
+> +				   LE_SCAN_TIMEOUT_LE_ONLY);
+> 		break;
+> 
+> 	case DISCOV_TYPE_INTERLEAVED:
+> 		queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
+> -				   msecs_to_jiffies(LE_SCAN_TIMEOUT_BREDR_LE));
+> +				   LE_SCAN_TIMEOUT_BREDR_LE);
+> 		break;
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_event.c |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+why is this not done before any other patch. These things can go in as cleanups pretty quickly.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index e89707f..d11b87b 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2299,10 +2299,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		break;
- 	}
- 
--	if (ev->opcode != HCI_OP_NOP)
-+	if (opcode != HCI_OP_NOP)
- 		del_timer(&hdev->cmd_timer);
- 
--	hci_req_cmd_complete(hdev, ev->opcode, status);
-+	hci_req_cmd_complete(hdev, opcode, status);
- 
- 	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags)) {
- 		atomic_set(&hdev->cmd_cnt, 1);
-@@ -2386,10 +2386,10 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		break;
- 	}
- 
--	if (ev->opcode != HCI_OP_NOP)
-+	if (opcode != HCI_OP_NOP)
- 		del_timer(&hdev->cmd_timer);
- 
--	hci_req_cmd_status(hdev, ev->opcode, ev->status);
-+	hci_req_cmd_status(hdev, opcode, ev->status);
- 
- 	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags)) {
- 		atomic_set(&hdev->cmd_cnt, 1);
--- 
-1.7.10.4
+I am fine if you want to keep rebasing and me complaining about these, your choice ;)
+
+Regards
+
+Marcel
 
