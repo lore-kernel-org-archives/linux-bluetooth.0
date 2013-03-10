@@ -1,83 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sunguk Lee <d3m3vilurr@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Sunguk Lee <d3m3vilurr@gmail.com>
-Subject: [PATCH] Bluetooth device 0cf3:3008 should map AR 3012
-Date: Mon, 11 Mar 2013 00:05:03 +0900
-Message-Id: <1362927903-7975-1-git-send-email-d3m3vilurr@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 4/6] Bluetooth: Fix busy condition testing for EIR and class updates
+Date: Sun, 10 Mar 2013 07:18:41 +0200
+Message-Id: <1362892723-14967-5-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1362892723-14967-1-git-send-email-johan.hedberg@gmail.com>
+References: <1362892723-14967-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-T:  Bus=01 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0cf3 ProdID=3008 Rev= 0.01
-S:  Manufacturer=Atheros Communications
-S:  Product=Bluetooth USB Host Controller
-S:  SerialNumber=Alaska Day 2006
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Signed-off-by: Sunguk Lee <d3m3vilurr@gmail.com>
+The add/remove_uuid and set_dev_class mgmt commands can trigger both EIR
+and class HCI commands, so testing just for a pending class command is
+enough. The simplest way to monitor conflicts that should trigger "busy"
+error returns is to check for any pending mgmt command that can trigger
+these HCI commands. This patch adds a helper function for this
+(pending_eir_or_class) and uses it instead of the old HCI_PENDING_CLASS
+flag to test for busy conditions.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- drivers/bluetooth/ath3k.c |    2 ++
- drivers/bluetooth/btusb.c |    1 +
- 2 files changed, 3 insertions(+)
+ net/bluetooth/mgmt.c |   45 ++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 36 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index a8a41e07..f9aba52 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -74,6 +74,7 @@ static struct usb_device_id ath3k_table[] = {
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index bf17a62..367837d 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1336,6 +1336,29 @@ unlock:
+ 	return err;
+ }
  
- 	/* Atheros AR3012 with sflash firmware*/
- 	{ USB_DEVICE(0x0CF3, 0x3004) },
-+	{ USB_DEVICE(0x0CF3, 0x3008) },
- 	{ USB_DEVICE(0x0CF3, 0x311D) },
- 	{ USB_DEVICE(0x13d3, 0x3375) },
- 	{ USB_DEVICE(0x04CA, 0x3005) },
-@@ -106,6 +107,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
++/* This is a helper function to test for pending mgmt commands that can
++ * cause CoD or EIR HCI commands. We can only allow one such pending
++ * mgmt command at a time since otherwise we cannot easily track what
++ * the current values are, will be, and based on that calculate if a new
++ * HCI command needs to be sent and if yes with what value.
++ */
++static bool pending_eir_or_class(struct hci_dev *hdev)
++{
++	struct pending_cmd *cmd;
++
++	list_for_each_entry(cmd, &hdev->mgmt_pending, list) {
++		switch (cmd->opcode) {
++		case MGMT_OP_ADD_UUID:
++		case MGMT_OP_REMOVE_UUID:
++		case MGMT_OP_SET_DEV_CLASS:
++		case MGMT_OP_SET_POWERED:
++			return true;
++		}
++	}
++
++	return false;
++}
++
+ static const u8 bluetooth_base_uuid[] = {
+ 			0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
+ 			0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+@@ -1367,7 +1390,7 @@ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
  
- 	/* Atheros AR3012 with sflash firmware*/
- 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0cf3, 0x3008), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0x311D), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 7e351e3..baaed9c 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -132,6 +132,7 @@ static struct usb_device_id blacklist_table[] = {
+ 	hci_dev_lock(hdev);
  
- 	/* Atheros 3012 with sflash firmware */
- 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0cf3, 0x3008), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0x311d), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+-	if (test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
++	if (pending_eir_or_class(hdev)) {
+ 		err = cmd_status(sk, hdev->id, MGMT_OP_ADD_UUID,
+ 				 MGMT_STATUS_BUSY);
+ 		goto failed;
+@@ -1439,7 +1462,7 @@ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	if (test_bit(HCI_PENDING_CLASS, &hdev->dev_flags)) {
++	if (pending_eir_or_class(hdev)) {
+ 		err = cmd_status(sk, hdev->id, MGMT_OP_REMOVE_UUID,
+ 				 MGMT_STATUS_BUSY);
+ 		goto unlock;
+@@ -1515,15 +1538,19 @@ static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		return cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
+ 				  MGMT_STATUS_NOT_SUPPORTED);
+ 
+-	if (test_bit(HCI_PENDING_CLASS, &hdev->dev_flags))
+-		return cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
+-				  MGMT_STATUS_BUSY);
++	hci_dev_lock(hdev);
+ 
+-	if ((cp->minor & 0x03) != 0 || (cp->major & 0xe0) != 0)
+-		return cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
+-				  MGMT_STATUS_INVALID_PARAMS);
++	if (pending_eir_or_class(hdev)) {
++		err = cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
++				 MGMT_STATUS_BUSY);
++		goto unlock;
++	}
+ 
+-	hci_dev_lock(hdev);
++	if ((cp->minor & 0x03) != 0 || (cp->major & 0xe0) != 0) {
++		err = cmd_status(sk, hdev->id, MGMT_OP_SET_DEV_CLASS,
++				 MGMT_STATUS_INVALID_PARAMS);
++		goto unlock;
++	}
+ 
+ 	hdev->major_class = cp->major;
+ 	hdev->minor_class = cp->minor;
 -- 
 1.7.10.4
+
