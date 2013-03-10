@@ -1,88 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Huang, Christina" <christina.huang@intel.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: one question on BLE device authentication error
-Date: Mon, 11 Mar 2013 01:33:04 +0000
-Message-ID: <A286798B34C0C9419EDBB5F44D457E1413756B@SHSMSX101.ccr.corp.intel.com>
-References: <A286798B34C0C9419EDBB5F44D457E14137231@SHSMSX101.ccr.corp.intel.com>
- <CAJdJm_OO4SXo6sSCnuoCWYB2nvhHjWp=gPwY9bAjPRYij2UAmA@mail.gmail.com>
-In-Reply-To: <CAJdJm_OO4SXo6sSCnuoCWYB2nvhHjWp=gPwY9bAjPRYij2UAmA@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Sunguk Lee <d3m3vilurr@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Sunguk Lee <d3m3vilurr@gmail.com>
+Subject: [PATCH] Bluetooth device 0cf3:3008 should map AR 3012
+Date: Mon, 11 Mar 2013 00:05:03 +0900
+Message-Id: <1362927903-7975-1-git-send-email-d3m3vilurr@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Anderson
+T:  Bus=01 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0cf3 ProdID=3008 Rev= 0.01
+S:  Manufacturer=Atheros Communications
+S:  Product=Bluetooth USB Host Controller
+S:  SerialNumber=Alaska Day 2006
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
-Thanks for your quick reply, but it looks all same after I did "bluetoothctl remove", please see below log, I'm not sure if I did correct or not. 
-It's so strange that this LE device works well with my iphone4S, it connects well, and alert when the device is far away from my iphone.
+Signed-off-by: Sunguk Lee <d3m3vilurr@gmail.com>
+---
+ drivers/bluetooth/ath3k.c |    2 ++
+ drivers/bluetooth/btusb.c |    1 +
+ 2 files changed, 3 insertions(+)
 
-~/bluez/client$ sudo ./bluetoothctl remove 00:17:EA:91:8C:78
-[NEW] Controller 00:1A:7D:DA:71:05 christina-HP-Compaq-8200-Elite-SFF-PC-0 [default]
-[NEW] Device 00:17:EA:91:8C:78 UJuicer Alert
-[DEL] Device 00:17:EA:91:8C:78 UJuicer Alert
-[CHG] Controller 00:1A:7D:DA:71:05 Powered: no
-[CHG] Controller 00:1A:7D:DA:71:05 Discovering: no
-[CHG] Controller 00:1A:7D:DA:71:05 Class: 0x000000
-[DEL] Controller 00:1A:7D:DA:71:05 christina-HP-Compaq-8200-Elite-SFF-PC-0 [default]
-[NEW] Controller 00:1A:7D:DA:71:05 christina-HP-Compaq-8200-Elite-SFF-PC-0 [default]
-[NEW] Device 00:17:EA:91:8C:78 UJuicer Alert
-[DEL] Device 00:17:EA:91:8C:78 UJuicer Alert
-[DEL] Controller 00:1A:7D:DA:71:05 christina-HP-Compaq-8200-Elite-SFF-PC-0 [default]
-[bluetooth]# remove 00:17:EA:91:8C:78
-No default controller available
-[bluetooth]# exit
-
-~/bluez$ sudo bluetoothd
-
-@ Device Connected: 00:17:EA:91:8C:78 (1) flags 0x0000
-> HCI Event: Command Status (0x0f) plen 4                     [hci0] 208.799845
-      LE Start Encryption (0x08|0x0019) ncmd 1
-        Status: Success (0x00)
-> ACL Data RX: Handle 70 flags 0x02 dlen 6                    [hci0] 208.801325
-      SMP: Security Request (0x0b) len 1
-        Authentication requirement: Bonding - MITM (0x05)
-> HCI Event: Encryption Change (0x08) plen 4                  [hci0] 209.081845
-        Status: PIN or Key Missing (0x06)
-        Handle: 70
-        Encryption: Disabled (0x00)
-< HCI Command: Disconnect (0x01|0x0006) plen 3                [hci0] 209.081876
-        Handle: 70
-        Reason: Authentication Failure (0x05)
-
------Original Message-----
-From: Anderson Lizardo [mailto:anderson.lizardo@openbossa.org] 
-Sent: Friday, March 08, 2013 10:00 PM
-To: Huang, Christina
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: one question on BLE device authentication error
-
-Hi Christina,
-
-On Fri, Mar 8, 2013 at 3:54 AM, Huang, Christina <christina.huang@intel.com> wrote:
-> < HCI Command: LE Start Encryption (0x08|0x0019) plen 28        [hci0] 5.724000
->         Handle: 71
->         Random number: 8c126b665d2de279
->         Encryption diversifier: 0x3f55
->         Long term key: dcd74a1a07f653c0e27f65888debcbe5 @ Device 
-> Connected: 00:17:EA:91:8C:78 (1) flags 0x0000
->> HCI Event: Command Status (0x0f) plen 4                       [hci0] 5.733922
->       LE Start Encryption (0x08|0x0019) ncmd 1
->         Status: Success (0x00)
->> ACL Data RX: Handle 71 flags 0x02 dlen 6                      [hci0] 5.835521
->       SMP: Security Request (0x0b) len 1
->         Authentication requirement: Bonding - MITM (0x05)
->> HCI Event: Encryption Change (0x08) plen 4                    [hci0] 6.115911
->         Status: PIN or Key Missing (0x06)
->         Handle: 71
->         Encryption: Disabled (0x00)
-
-It looks like your LE device lost the bonding information (e.g. LTK) and thus is not able to just encrypt the connection with the LTK BlueZ is trying to use. You can try removing the bonding on BlueZ side (e.g.
-"test-device remove <bdaddr>" or "remove <bdaddr>" on bluetoothctl) and try again a complete pairing.
-
-Best regards,
---
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index a8a41e07..f9aba52 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -74,6 +74,7 @@ static struct usb_device_id ath3k_table[] = {
+ 
+ 	/* Atheros AR3012 with sflash firmware*/
+ 	{ USB_DEVICE(0x0CF3, 0x3004) },
++	{ USB_DEVICE(0x0CF3, 0x3008) },
+ 	{ USB_DEVICE(0x0CF3, 0x311D) },
+ 	{ USB_DEVICE(0x13d3, 0x3375) },
+ 	{ USB_DEVICE(0x04CA, 0x3005) },
+@@ -106,6 +107,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+ 
+ 	/* Atheros AR3012 with sflash firmware*/
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0x3008), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x311D), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 7e351e3..baaed9c 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -132,6 +132,7 @@ static struct usb_device_id blacklist_table[] = {
+ 
+ 	/* Atheros 3012 with sflash firmware */
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0x3008), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x311d), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3375), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+-- 
+1.7.10.4
