@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 6/8] obexd: Add MAP notification dispatcher
-Date: Mon, 11 Mar 2013 16:05:48 +0100
-Message-Id: <1363014350-16114-7-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH v3 3/8] obexd: Read MAP client SDP attributes
+Date: Mon, 11 Mar 2013 16:05:45 +0100
+Message-Id: <1363014350-16114-4-git-send-email-christian.fetzer@oss.bmw-carit.de>
 In-Reply-To: <1363014350-16114-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 References: <1363014350-16114-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,181 +11,108 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-The MAP specification allows to reuse one MNS instance for all local
-MAS client instances. This dispatching of event reports to the
-correct MAS client instance is done by the instance id.
-
-The dispatcher component allows MAP client instances to
-register a notification handler (map_aquire_mns).
-Events reports are then forwarded by the notification server
-using (mns_dispatch_notification).
+Parse SDP attributes mas_instance_id and supported_message_types from
+the transport's service attributes as soon as a connection is
+established.
 ---
- Makefile.obexd                |  1 +
- obexd/client/map-dispatcher.c | 88 +++++++++++++++++++++++++++++++++++++++++++
- obexd/client/map-dispatcher.h | 47 +++++++++++++++++++++++
- 3 files changed, 136 insertions(+)
- create mode 100644 obexd/client/map-dispatcher.c
- create mode 100644 obexd/client/map-dispatcher.h
+ lib/sdp.h          |  2 ++
+ obexd/client/map.c | 35 +++++++++++++++++++++++++++++++++--
+ 2 files changed, 35 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile.obexd b/Makefile.obexd
-index 5824e0a..02901a3 100644
---- a/Makefile.obexd
-+++ b/Makefile.obexd
-@@ -73,6 +73,7 @@ obexd_src_obexd_SOURCES = $(gdbus_sources) $(btio_sources) $(gobex_sources) \
- 			obexd/client/ftp.h obexd/client/ftp.c \
- 			obexd/client/opp.h obexd/client/opp.c \
- 			obexd/client/map.h obexd/client/map.c \
-+			obexd/client/map-dispatcher.h obexd/client/map-dispatcher.c \
- 			obexd/client/transfer.h obexd/client/transfer.c \
- 			obexd/client/transport.h obexd/client/transport.c \
- 			obexd/client/dbus.h obexd/client/dbus.c \
-diff --git a/obexd/client/map-dispatcher.c b/obexd/client/map-dispatcher.c
-new file mode 100644
-index 0000000..911e062
---- /dev/null
-+++ b/obexd/client/map-dispatcher.c
-@@ -0,0 +1,88 @@
-+/*
-+ *
-+ *  OBEX
-+ *
-+ *  Copyright (C) 2013  BMW Car IT GmbH. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <glib.h>
-+
-+#include "log.h"
-+#include "map-dispatcher.h"
-+
-+static GSList *mappings = NULL;
-+
-+struct mns_mapping {
-+	int mas_instance_id;
-+	map_handle_notification_func handler;
-+	void *user_data;
-+};
-+
-+gboolean map_acquire_mns(int mas_instance_id,
-+			map_handle_notification_func handler, void *user_data)
+diff --git a/lib/sdp.h b/lib/sdp.h
+index baae15f..4ef2176 100644
+--- a/lib/sdp.h
++++ b/lib/sdp.h
+@@ -294,6 +294,8 @@ extern "C" {
+ #define SDP_ATTR_SUPPORTED_FUNCTIONS		0x0312
+ #define SDP_ATTR_TOTAL_IMAGING_DATA_CAPACITY	0x0313
+ #define SDP_ATTR_SUPPORTED_REPOSITORIES		0x0314
++#define SDP_ATTR_MAS_INSTANCE_ID		0x0315
++#define SDP_ATTR_SUPPORTED_MESSAGE_TYPES	0x0316
+ 
+ #define SDP_ATTR_SPECIFICATION_ID		0x0200
+ #define SDP_ATTR_VENDOR_ID			0x0201
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index 2b665ec..669ba9b 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -39,6 +39,8 @@
+ #include "transfer.h"
+ #include "session.h"
+ #include "driver.h"
++#include "sdp.h"
++#include "sdp_lib.h"
+ 
+ #define OBEX_MAS_UUID \
+ 	"\xBB\x58\x2B\x40\x42\x0C\x11\xDB\xB0\xDE\x08\x00\x20\x0C\x9A\x66"
+@@ -94,6 +96,8 @@ struct map_data {
+ 	struct obc_session *session;
+ 	DBusMessage *msg;
+ 	GHashTable *messages;
++	int16_t mas_instance_id;
++	uint8_t supported_message_types;
+ };
+ 
+ #define MAP_MSG_FLAG_PRIORITY	0x01
+@@ -1699,6 +1703,30 @@ static void map_free(void *data)
+ 	g_free(map);
+ }
+ 
++static void parse_service_record(struct map_data *map)
 +{
-+	struct mns_mapping *mapping;
++	sdp_data_t *data;
++	const sdp_record_t *rec = obc_session_get_service_record(map->session);
 +
-+	mapping = g_try_new0(struct mns_mapping, 1);
-+	if (mapping == NULL)
-+		return FALSE;
++	if (!rec)
++		return;
 +
-+	mapping->mas_instance_id = mas_instance_id;
-+	mapping->handler = handler;
-+	mapping->user_data = user_data;
++	/* MAS instance id */
++	map->mas_instance_id = -1;
++	data = sdp_data_get(rec, SDP_ATTR_MAS_INSTANCE_ID);
++	if (data != NULL)
++		map->mas_instance_id = data->val.uint8;
++	else
++		DBG("Failed to read MAS instance id");
 +
-+	mappings = g_slist_append(mappings, mapping);
-+	DBG("Added MAP MNS mapping for instance %d", mas_instance_id);
-+
-+	return TRUE;
++	/* Supported Message Types */
++	data = sdp_data_get(rec, SDP_ATTR_SUPPORTED_MESSAGE_TYPES);
++	if (data != NULL)
++		map->supported_message_types = data->val.uint8;
++	else
++		DBG("Failed to read supported message types");
 +}
 +
-+static struct mns_mapping *find_mapping(int mas_instance_id)
-+{
-+	GSList *list;
+ static int map_probe(struct obc_session *session)
+ {
+ 	struct map_data *map;
+@@ -1706,8 +1734,6 @@ static int map_probe(struct obc_session *session)
+ 
+ 	path = obc_session_get_path(session);
+ 
+-	DBG("%s", path);
+-
+ 	map = g_try_new0(struct map_data, 1);
+ 	if (!map)
+ 		return -ENOMEM;
+@@ -1716,6 +1742,10 @@ static int map_probe(struct obc_session *session)
+ 	map->messages = g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
+ 								map_msg_remove);
+ 
++	parse_service_record(map);
 +
-+	for (list = mappings; list; list = list->next) {
-+		struct mns_mapping *mapping = list->data;
-+		if (mapping->mas_instance_id == mas_instance_id)
-+			return mapping;
-+	}
++	DBG("%s, instance id %d", path, map->mas_instance_id);
 +
-+	DBG("Cannot find MAP MNS mapping for instance %d", mas_instance_id);
-+	return NULL;
-+}
-+
-+void map_release_mns(int mas_instance_id)
-+{
-+	struct mns_mapping *mapping = find_mapping(mas_instance_id);
-+	if (mapping) {
-+		mappings = g_slist_remove(mappings, mapping);
-+		DBG("Removed MAP MNS mapping for instance %d", mas_instance_id);
-+	}
-+}
-+
-+void mns_dispatch_notification(int mas_instance_id, struct map_event *event)
-+{
-+	struct mns_mapping *mapping = find_mapping(mas_instance_id);
-+	if (mapping)
-+		mapping->handler(event, mapping->user_data);
-+}
-diff --git a/obexd/client/map-dispatcher.h b/obexd/client/map-dispatcher.h
-new file mode 100644
-index 0000000..3664e01
---- /dev/null
-+++ b/obexd/client/map-dispatcher.h
-@@ -0,0 +1,47 @@
-+/*
-+ *
-+ *  OBEX
-+ *
-+ *  Copyright (C) 2013  BMW Car IT GmbH. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include "map-event.h"
-+
-+/* Handle notification in map client.
-+ *
-+ * event: Event report.
-+ *
-+ * Callback shall be called for every received event.
-+ */
-+typedef void (*map_handle_notification_func)(struct map_event *event,
-+							void *user_data);
-+
-+/* Registers client notification handler callback for events that are
-+ * addressed to the given mas instance id.
-+ */
-+gboolean map_acquire_mns(int mas_instance_id, map_handle_notification_func,
-+							void *user_data);
-+
-+/* Unregisters client notification handler callback.
-+ */
-+void map_release_mns(int mas_instance_id);
-+
-+/* Dispatch notification to a registered notification handler callback.
-+ */
-+void mns_dispatch_notification(int mas_instance_id, struct map_event *event);
+ 	if (!g_dbus_register_interface(conn, path, MAP_INTERFACE, map_methods,
+ 					NULL, NULL, map, map_free)) {
+ 		map_free(map);
+@@ -1740,6 +1770,7 @@ static struct obc_driver map = {
+ 	.uuid = MAS_UUID,
+ 	.target = OBEX_MAS_UUID,
+ 	.target_len = OBEX_MAS_UUID_LEN,
++	.force_service_lookup = TRUE,
+ 	.probe = map_probe,
+ 	.remove = map_remove
+ };
 -- 
 1.8.1.5
 
