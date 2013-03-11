@@ -1,26 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com>
-Date: Mon, 11 Mar 2013 19:11:57 +0100
-Message-ID: <CA+QXtDsXnEmA1XVEJExe4-5KHgxBuXRCbKNYuSmiy6+DMxP4Vw@mail.gmail.com>
-Subject: Re: [PATCH v6 00/17] mSBC investigations
-From: "Dalleau, Frederic" <frederic.dalleau@intel.com>
-To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
-	<frederic.dalleau@linux.intel.com>
+In-Reply-To: <667E9201-E2EB-45B7-9629-F3A1C62F285B@holtmann.org>
+References: <1362783979-10142-1-git-send-email-andre.guedes@openbossa.org>
+	<1362783979-10142-6-git-send-email-andre.guedes@openbossa.org>
+	<667E9201-E2EB-45B7-9629-F3A1C62F285B@holtmann.org>
+Date: Mon, 11 Mar 2013 14:25:34 -0300
+Message-ID: <CACJA=fWFCXd9wyywTu-11RkjDQiLxK_1g5ME_FZW6Fd_+z1nUQ@mail.gmail.com>
+Subject: Re: [PATCH v2 5/6] Bluetooth: Change LE scanning timeout macros
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel,
 
-On Wed, Mar 6, 2013 at 11:19 AM, Frédéric Dalleau
-<frederic.dalleau@linux.intel.com> wrote:
-> The encoder couldn't be validated against a third party, but at least we know
-> that libsbc encoded packets can be decoded by libsbc.
+On Fri, Mar 8, 2013 at 10:29 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Andre,
+>
+>> Define LE scanning timeout macros in jiffies just like we do for
+>> others timeout macros.
+>>
+>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>> ---
+>> net/bluetooth/mgmt.c | 8 ++++----
+>> 1 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+>> index 3fec412..8567bec 100644
+>> --- a/net/bluetooth/mgmt.c
+>> +++ b/net/bluetooth/mgmt.c
+>> @@ -109,8 +109,8 @@ static const u16 mgmt_events[] = {
+>> #define LE_SCAN_TYPE                  0x01
+>> #define LE_SCAN_WIN                   0x12
+>> #define LE_SCAN_INT                   0x12
+>> -#define LE_SCAN_TIMEOUT_LE_ONLY              10240   /* TGAP(gen_disc_scan_min) */
+>> -#define LE_SCAN_TIMEOUT_BREDR_LE     5120    /* TGAP(100)/2 */
+>> +#define LE_SCAN_TIMEOUT_LE_ONLY              msecs_to_jiffies(10240)
+>> +#define LE_SCAN_TIMEOUT_BREDR_LE     msecs_to_jiffies(5120)
+>>
+>> #define INQUIRY_LEN_BREDR             0x08    /* TGAP(100) */
+>> #define INQUIRY_LEN_BREDR_LE          0x04    /* TGAP(100)/2 */
+>> @@ -2438,12 +2438,12 @@ static void enable_le_scan_complete(struct hci_dev *hdev, u8 status)
+>>       switch (hdev->discovery.type) {
+>>       case DISCOV_TYPE_LE:
+>>               queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
+>> -                                msecs_to_jiffies(LE_SCAN_TIMEOUT_LE_ONLY));
+>> +                                LE_SCAN_TIMEOUT_LE_ONLY);
+>>               break;
+>>
+>>       case DISCOV_TYPE_INTERLEAVED:
+>>               queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
+>> -                                msecs_to_jiffies(LE_SCAN_TIMEOUT_BREDR_LE));
+>> +                                LE_SCAN_TIMEOUT_BREDR_LE);
+>>               break;
+>
+> why is this not done before any other patch. These things can go in as cleanups pretty quickly.
 
-This has taken quite some time but I've just managed to validate the encoder!
+I'll put this at the beginning of v3 patch set.
 
 Regards,
-Frédéric
+
+Andre
