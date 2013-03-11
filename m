@@ -1,80 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 0/8] MAP client: notification support
-Date: Mon, 11 Mar 2013 16:05:42 +0100
-Message-Id: <1363014350-16114-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Date: Sun, 10 Mar 2013 17:16:31 -0700
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC v2 0/7] One remote UUID per btd_profile
+Message-ID: <20130311001631.GA9533@x220.amr.corp.intel.com>
+References: <1362146353-23799-1-git-send-email-mikel.astiz.oss@gmail.com>
+ <CANT-zCXP8_8phAqjNYCJsakjXjRb3F9sVzk0z+u0ruOG2++r+A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CANT-zCXP8_8phAqjNYCJsakjXjRb3F9sVzk0z+u0ruOG2++r+A@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+Hi Mikel,
 
-Changelog:
-v3: Added user_data parameter to dispatcher. This is needed for accessing struct map_data
-    in the notification handler.
-v2: Rebased since the first patchset didn't apply cleanly anymore.
+On Thu, Mar 07, 2013, Mikel Astiz wrote:
+> On Fri, Mar 1, 2013 at 2:59 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> > From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+> >
+> > Still not a lot of excitement after v1 but the patchset is required (or very convenient) for a later discussion which several people have shown interest in: the introduction of btd_service (or similar concept, to be discussed).
+> >
+> > Claudio pointed out several issues affecting patch v1 3/7, which have been improved in this v2, including:
+> > - Fix premature release of resources in cleanup_monitor().
+> > - Fix boolean literal in monitor_unregister_linkloss (which should be FALSE).
+> >
+> > Luiz also triggered an interesting point affecting patch v1 2/7 but I considered it unrelated to this patchset, stricly speaking, and has been therefore left aside.
+> >
+> > Looking forward to your feedback.
+> >
+> > From original cover-letter:
+> >
+> > Disclaimer: this RFC is WIP and hasn't been tested, specially because I don't have the necessary hardware for it.
+> >
+> > The goal is to have one remote_uuid per btd_profile. There are only a few exceptions to this rule, and this patchset tries to fix three of them. This basically means splitting one btd_profile per role.
+> >
+> > Mikel Astiz (7):
+> >   avrcp: Refactor server registration
+> >   audio: Split AVRCP into two btd_profile
+> >   proximity: Split internal monitor registration API
+> >   proximity: Split monitor into three btd_profile
+> >   gatt: List only GATT_UUID as remote UUID
+> >   health: Split health into two btd_profile
+> >   profile: Limit to one remote UUID per profile
+> >
+> >  profiles/audio/avrcp.c               | 114 +++++++++++++-----
+> >  profiles/audio/avrcp.h               |   6 +-
+> >  profiles/audio/manager.c             |  75 ++++++++----
+> >  profiles/cyclingspeed/cyclingspeed.c |   2 +-
+> >  profiles/deviceinfo/deviceinfo.c     |   2 +-
+> >  profiles/gatt/gas.c                  |   2 +-
+> >  profiles/health/hdp_manager.c        |  20 +++-
+> >  profiles/heartrate/heartrate.c       |   2 +-
+> >  profiles/input/hog.c                 |   2 +-
+> >  profiles/input/manager.c             |   2 +-
+> >  profiles/network/manager.c           |   6 +-
+> >  profiles/proximity/manager.c         | 100 ++++++++++++----
+> >  profiles/proximity/monitor.c         | 220 ++++++++++++++++++++++++++++-------
+> >  profiles/proximity/monitor.h         |  17 ++-
+> >  profiles/scanparam/scan.c            |   2 +-
+> >  profiles/thermometer/thermometer.c   |   2 +-
+> >  src/device.c                         |  49 +++-----
+> >  src/profile.c                        |  25 ++--
+> >  src/profile.h                        |   4 +-
+> >  19 files changed, 466 insertions(+), 186 deletions(-)
+> >
+> > --
+> > 1.8.1
+> >
+> 
+> Ping.
 
----
+This patch set has been hanging around the list long enough. After a
+basic review which didn't show any obvious issues I went a head and did
+a rebase against latest git and pushed it upstream. Let's hope any
+issues caused by it get caught before we do the next release.
 
-This patchset adds the necessary blocks for receiving notifications in the MAP client.
-So far this covers only bluetooth protocol related additions, leaving out end user D-Bus API changes.
-
-The patchset consists of the following parts:
-- Message Notification Server (MNS)
-  Once connected, the MNS will receive XML based event reports from the MSE and parse them into a struct
-  for further processing.
-
-- RegisterNotification function
-  The function sends the SetNotificationRegistration command to the MSE which will then try to connect
-  to the MNS.
-
-- Notification dispatcher (that dispatches event reports by their MAS instance id to the correct client instance)
-  The message access part of every client instance registers a notification handler function.
-  The MNS will call the associated handler for all received event report.
-
-Since the dispatching needs to be done on the mas instance id, the message access part of the client
-needs to be aware of the instance id of the server it connects to. Unfortunately this information is only
-available as SDP attribute.
-
-Due to the current transport layer abstraction in obexd, the MAP client has no direct access to SDP.
-Therefore I have extended obc_transport to allow concrete transports (like Bluetooth) to specify
-a get_service_record function and made it available through obc_session_get_service_record.
-This way, transports can provide additional service information to the client implementations.
-The bluetooth transport will now always do a sdp lookup (if the driver's obc_driver->force_service_lookup is set).
-In addition it will cache sdp record associated with the connection and make it accessible in get_service_record.
-
-Christian Fetzer (8):
-  obexd: Add get_service_record to obc_transport
-  obexd: Provide SDP record in get_service_record
-  obexd: Read MAP client SDP attributes
-  obexd: Add Message Notification Server (MNS)
-  obexd: Add RegisterNotifications function
-  obexd: Add MAP notification dispatcher
-  obexd: Register MAP notification handler
-  obexd: Notify registered notification handlers
-
- Makefile.obexd                |   4 +
- doc/obex-api.txt              |   6 +
- lib/sdp.h                     |   2 +
- obexd/client/bluetooth.c      |  51 ++++++-
- obexd/client/driver.h         |   1 +
- obexd/client/map-dispatcher.c |  88 +++++++++++
- obexd/client/map-dispatcher.h |  47 ++++++
- obexd/client/map-event.h      |  42 +++++
- obexd/client/map.c            | 146 +++++++++++++++++-
- obexd/client/mns.c            | 346 ++++++++++++++++++++++++++++++++++++++++++
- obexd/client/session.c        |  11 +-
- obexd/client/session.h        |   2 +
- obexd/client/transport.h      |   2 +
- obexd/plugins/bluetooth.c     |   2 +
- obexd/src/obexd.h             |   1 +
- src/profile.c                 |  55 +++++++
- 16 files changed, 795 insertions(+), 11 deletions(-)
- create mode 100644 obexd/client/map-dispatcher.c
- create mode 100644 obexd/client/map-dispatcher.h
- create mode 100644 obexd/client/map-event.h
- create mode 100644 obexd/client/mns.c
-
--- 
-1.8.1.5
-
+Johan
