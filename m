@@ -1,75 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 11 Mar 2013 18:20:33 -0300
+Date: Mon, 11 Mar 2013 16:55:50 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth 2013-03-11
-Message-ID: <20130311212033.GA17372@joana>
+To: Sunguk Lee <d3m3vilurr@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth device 0cf3:3008 should map AR 3012
+Message-ID: <20130311195550.GB22451@joana>
+References: <1363030918-8186-1-git-send-email-d3m3vilurr@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="WIyZ46R2i8wDzkSu"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1363030918-8186-1-git-send-email-d3m3vilurr@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Sunguk,
 
---WIyZ46R2i8wDzkSu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+* Sunguk Lee <d3m3vilurr@gmail.com> [2013-03-12 04:41:58 +0900]:
 
-Hi John,
+> T:  Bus=01 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
+> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0cf3 ProdID=3008 Rev= 0.01
+> S:  Manufacturer=Atheros Communications
+> S:  Product=Bluetooth USB Host Controller
+> S:  SerialNumber=Alaska Day 2006
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> 
+> Signed-off-by: Sunguk Lee <d3m3vilurr@gmail.com>
+> ---
+>  drivers/bluetooth/ath3k.c |    2 ++
+>  drivers/bluetooth/btusb.c |    1 +
+>  2 files changed, 3 insertions(+)
 
-I have these two patches for 3.9, these add support for two more devices to
-the bluetooth drivers. Please pull. Thanks.
+Patch has been applied to bluetooth.git. Thanks.
 
 	Gustavo
---
-The following changes since commit d786f67e5c587a4de8245336cb64cf4dd06871a7:
-
-  mwl8k: fix band for supported channels (2013-02-11 14:31:36 -0500)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth for-ups=
-tream=20
-
-for you to fetch changes up to 94a32d10f47b637ae24b78b1ddc7ef0e8396fda4:
-
-  Bluetooth: Device 0cf3:3008 should map AR 3012 (2013-03-11 18:04:54 -0300)
-
-----------------------------------------------------------------
-Josh Boyer (1):
-      Bluetooth: Add support for atheros 04ca:3004 device to ath3k
-
-Sunguk Lee (1):
-      Bluetooth: Device 0cf3:3008 should map AR 3012
-
- drivers/bluetooth/ath3k.c | 4 ++++
- drivers/bluetooth/btusb.c | 2 ++
- 2 files changed, 6 insertions(+)
-
-
-
---WIyZ46R2i8wDzkSu
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.13 (GNU/Linux)
-
-iQIcBAEBAgAGBQJRPkqhAAoJEPs3PUX4s20o/A8QAIwMIxVhU2qXsZoaW8yy2VaQ
-LY/yDit54L6sRxG20F8bcDxXfkkq0PojiVhqTQVjr/pSFU+q6vpNFMRzxnAY0eGV
-Ci2j8/iisy6zwEvcinsBDkqCgBXxcHzEQJ+nYTfIlXcPXa5T0C8TrDs/dqp9bVV6
-4fewRewT0vEKmvOrF8NHFDeJuj/THzeMOnYNPiGyjSN/l0z/If2vqR8GPPib/+cu
-axBq6dAYRm66nYMX85eoNHih+mcOqMEoZKz6SPfD7lelaAFklZBdS2q/Ad3Qp/4m
-kzy4boIoOxOLRtkGNy4OWkmqNepo+bvgg3uZ5cLuXPY05f7cWy6mfi2RzXZlJNHg
-OvH/z+u6KSfwHEduNszcH791fU8r8izbHe+otFr8E5/DDv3kttEyWI+gHgWaDS7k
-d0i6iHqi2tdmk60ndaVzJ0xX3WEjT8HalkTc2m+AJ3b3RUrug7/8PRk9OQtY2rmR
-TSHBnYV25I/mRNT43y2wCufluq7LbPLX6/eD4FbGQvNHKOF5j0rvNhXVC1K1hinh
-/ldc5X0TDDidCw6WY7zZ6HkMWYHNxcIZN3Obyek0GosqhHQD8uSVrTO7IV0q0o8i
-n8Xkupsui2FMhdnASsZJ/hK7hp2GHmoq766ng6vQYxIqwZ6iSTT7v6TEsLj1WWfu
-h0U+gMoDZSNZete4oRwv
-=Tz/L
------END PGP SIGNATURE-----
-
---WIyZ46R2i8wDzkSu--
