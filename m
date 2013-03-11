@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <667E9201-E2EB-45B7-9629-F3A1C62F285B@holtmann.org>
+In-Reply-To: <112A7600-CE46-4467-B45E-38FC61B90920@holtmann.org>
 References: <1362783979-10142-1-git-send-email-andre.guedes@openbossa.org>
-	<1362783979-10142-6-git-send-email-andre.guedes@openbossa.org>
-	<667E9201-E2EB-45B7-9629-F3A1C62F285B@holtmann.org>
-Date: Mon, 11 Mar 2013 14:25:34 -0300
-Message-ID: <CACJA=fWFCXd9wyywTu-11RkjDQiLxK_1g5ME_FZW6Fd_+z1nUQ@mail.gmail.com>
-Subject: Re: [PATCH v2 5/6] Bluetooth: Change LE scanning timeout macros
+	<1362783979-10142-4-git-send-email-andre.guedes@openbossa.org>
+	<112A7600-CE46-4467-B45E-38FC61B90920@holtmann.org>
+Date: Mon, 11 Mar 2013 14:25:12 -0300
+Message-ID: <CACJA=fUvNoUcB-2zDaba9tT2Cd7fQHZerE67HTejOX1Gi8_=QA@mail.gmail.com>
+Subject: Re: [PATCH v2 3/6] Bluetooth: Remove timeout handling from hci_cancel_le_scan
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
@@ -15,49 +15,55 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Fri, Mar 8, 2013 at 10:29 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+On Fri, Mar 8, 2013 at 10:28 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
 > Hi Andre,
 >
->> Define LE scanning timeout macros in jiffies just like we do for
->> others timeout macros.
+>> This patch moves the LE scanning timeout handling from hci_cancel_
+>> le_scan helper to stop_discovery.
+>>
+>> Since we want discovery code handling LE scanning timeout, we should
+>> handle it in stop_discovery instead of hci_cancel_le_scan.
 >>
 >> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 >> ---
->> net/bluetooth/mgmt.c | 8 ++++----
->> 1 file changed, 4 insertions(+), 4 deletions(-)
+>> net/bluetooth/hci_core.c | 14 +++++---------
+>> net/bluetooth/mgmt.c     | 15 ++++++++++++---
+>> 2 files changed, 17 insertions(+), 12 deletions(-)
 >>
->> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->> index 3fec412..8567bec 100644
->> --- a/net/bluetooth/mgmt.c
->> +++ b/net/bluetooth/mgmt.c
->> @@ -109,8 +109,8 @@ static const u16 mgmt_events[] = {
->> #define LE_SCAN_TYPE                  0x01
->> #define LE_SCAN_WIN                   0x12
->> #define LE_SCAN_INT                   0x12
->> -#define LE_SCAN_TIMEOUT_LE_ONLY              10240   /* TGAP(gen_disc_scan_min) */
->> -#define LE_SCAN_TIMEOUT_BREDR_LE     5120    /* TGAP(100)/2 */
->> +#define LE_SCAN_TIMEOUT_LE_ONLY              msecs_to_jiffies(10240)
->> +#define LE_SCAN_TIMEOUT_BREDR_LE     msecs_to_jiffies(5120)
+>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>> index 59f583b..200ec5a 100644
+>> --- a/net/bluetooth/hci_core.c
+>> +++ b/net/bluetooth/hci_core.c
+>> @@ -1905,20 +1905,16 @@ static int hci_do_le_scan(struct hci_dev *hdev, u8 type, u16 interval,
 >>
->> #define INQUIRY_LEN_BREDR             0x08    /* TGAP(100) */
->> #define INQUIRY_LEN_BREDR_LE          0x04    /* TGAP(100)/2 */
->> @@ -2438,12 +2438,12 @@ static void enable_le_scan_complete(struct hci_dev *hdev, u8 status)
->>       switch (hdev->discovery.type) {
->>       case DISCOV_TYPE_LE:
->>               queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
->> -                                msecs_to_jiffies(LE_SCAN_TIMEOUT_LE_ONLY));
->> +                                LE_SCAN_TIMEOUT_LE_ONLY);
->>               break;
+>> int hci_cancel_le_scan(struct hci_dev *hdev)
+>> {
+>> +     struct hci_cp_le_set_scan_enable cp;
+>> +
+>>       BT_DBG("%s", hdev->name);
 >>
->>       case DISCOV_TYPE_INTERLEAVED:
->>               queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
->> -                                msecs_to_jiffies(LE_SCAN_TIMEOUT_BREDR_LE));
->> +                                LE_SCAN_TIMEOUT_BREDR_LE);
->>               break;
+>>       if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
+>>               return -EALREADY;
+>>
+>> -     if (cancel_delayed_work(&hdev->le_scan_disable)) {
+>> -             struct hci_cp_le_set_scan_enable cp;
+>> -
+>> -             /* Send HCI command to disable LE Scan */
+>> -             memset(&cp, 0, sizeof(cp));
+>> -             hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
+>> -     }
+>> -
+>> -     return 0;
+>> +     /* Send HCI command to disable LE Scan */
+>> +     memset(&cp, 0, sizeof(cp));
+>> +     return hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
+>> }
 >
-> why is this not done before any other patch. These things can go in as cleanups pretty quickly.
+> so we have HCI request framework now and we keep using hci_send_cmd without checking if it fails or succeeds. I don't really think so. This needs to be done as a HCI request as well.
+>
+> If you want a convenience helper for a single command with a complete callback, then please add that one, but sending commands where the error is not handling from hci_event.c is not acceptable.
 
-I'll put this at the beginning of v3 patch set.
+I'll fix this and use hci request here instead.
 
 Regards,
 
