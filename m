@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 8/8] obexd: Notify registered notification handlers
-Date: Mon, 11 Mar 2013 16:05:50 +0100
-Message-Id: <1363014350-16114-9-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH v3 1/8] obexd: Add get_service_record to obc_transport
+Date: Mon, 11 Mar 2013 16:05:43 +0100
+Message-Id: <1363014350-16114-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
 In-Reply-To: <1363014350-16114-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 References: <1363014350-16114-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,45 +11,57 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
+This adds a get_service_record function pointer to obc_transport,
+which allows transports to provide the session specific service record.
+This record can be queried using obc_session_get_service_record.
 ---
- obexd/client/mns.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ obexd/client/session.c   | 6 ++++++
+ obexd/client/session.h   | 2 ++
+ obexd/client/transport.h | 1 +
+ 3 files changed, 9 insertions(+)
 
-diff --git a/obexd/client/mns.c b/obexd/client/mns.c
-index 81550ef..f16d235 100644
---- a/obexd/client/mns.c
-+++ b/obexd/client/mns.c
-@@ -41,7 +41,7 @@
- #include "service.h"
- #include "mimetype.h"
- #include "map_ap.h"
--#include "map-event.h"
-+#include "map-dispatcher.h"
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index f677bcb..809279a 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -827,6 +827,12 @@ fail:
+ 	return NULL;
+ }
  
- struct mns_session {
- 	GString *buffer;
-@@ -266,6 +266,8 @@ static int event_report_close(void *obj)
- 	GMarkupParseContext *ctxt;
- 	struct map_event *event;
- 
-+	DBG("");
++const void *obc_session_get_service_record(struct obc_session *session)
++{
++	if (session->id > 0 && session->transport != NULL)
++		return session->transport->get_service_record(session->id);
++}
 +
- 	event = g_new0(struct map_event, 1);
- 	ctxt = g_markup_parse_context_new(&event_report_parser, 0, event,
- 									NULL);
-@@ -273,11 +275,7 @@ static int event_report_close(void *obj)
- 									NULL);
- 	g_markup_parse_context_free(ctxt);
+ const char *obc_session_get_owner(struct obc_session *session)
+ {
+ 	if (session == NULL)
+diff --git a/obexd/client/session.h b/obexd/client/session.h
+index 402c042..8a3d629 100644
+--- a/obexd/client/session.h
++++ b/obexd/client/session.h
+@@ -54,6 +54,8 @@ const char *obc_session_get_target(struct obc_session *session);
+ const char *obc_session_register(struct obc_session *session,
+ 						GDBusDestroyFunction destroy);
  
--	DBG("Received event report for instance %d", mns->mas_instance_id);
--	DBG("type=%x, handle=%s, folder=%s, old_folder=%s, msg_type=%s",
--				event->type, event->handle, event->folder,
--					event->old_folder, event->msg_type);
--
-+	mns_dispatch_notification(mns->mas_instance_id, event);
- 	map_event_free(event);
++const void *obc_session_get_service_record(struct obc_session *session);
++
+ guint obc_session_queue(struct obc_session *session,
+ 				struct obc_transfer *transfer,
+ 				session_callback_t func, void *user_data,
+diff --git a/obexd/client/transport.h b/obexd/client/transport.h
+index 5140840..eb29bf3 100644
+--- a/obexd/client/transport.h
++++ b/obexd/client/transport.h
+@@ -31,6 +31,7 @@ struct obc_transport {
+ 				obc_transport_func func, void *user_data);
+ 	int (*getpacketopt) (GIOChannel *io, int *tx_mtu, int *rx_mtu);
+ 	void (*disconnect) (guint id);
++	const void *(*get_service_record)(guint id);
+ };
  
- 	reset_request(mns);
+ int obc_transport_register(struct obc_transport *transport);
 -- 
 1.8.1.5
 
