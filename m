@@ -1,64 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <514021F5.1040005@tieto.com>
-Date: Wed, 13 Mar 2013 07:51:33 +0100
-From: Rymarkiewicz Waldemar <waldemar.rymarkiewicz@tieto.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC] bloodpressure: Add Blood Pressure API
-References: <1360668097-28906-1-git-send-email-waldemar.rymarkiewicz@tieto.com> <C4340FC6-1121-468E-B15D-68E2770AA07E@holtmann.org> <5135D965.8020604@tieto.com> <F00262C4-3552-438E-AF44-1D088CAB11A8@holtmann.org> <513703AA.2090206@tieto.com>
-In-Reply-To: <513703AA.2090206@tieto.com>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+From: Silviu-Mihai Popescu <silviupopescu1990@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Silviu-Mihai Popescu <silviupopescu1990@gmail.com>
+Subject: [PATCH] bluetooth: use PTR_RET instead of IS_ERR + PTR_ERR
+Date: Tue, 12 Mar 2013 20:13:15 +0200
+Message-Id: <1363111995-26866-1-git-send-email-silviupopescu1990@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This uses PTR_RET instead of IS_ERR and PTR_ERR in order to increase
+readability.
 
->>> +Interface	org.bluez.BloodPressure1
->>> +Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
->>> +
->>> +Methods		RegisterWatcher(object watcher)
->>> +
->>> +			Registers a watcher to monitor blood pressure
->>> +			measurements. This watcher will be notified about
->>> +			final pressure measurements.
->>> +
->>> +			Possible Errors: org.bluez.Error.InvalidArguments
->>> +
->>> +		UnregisterWatcher(object watcher)
->>> +
->>> +			Unregisters a watcher.
->>> +
->>> +		EnableIntermediateMeasurement(object watcher)
->>> +
->>> +			Enables intermediate measurement notifications
->>> +			for this watcher. Intermediate measurements will
->>> +			be enabled only for devices which support it.
->>> +
->>> +			Possible Errors: org.bluez.Error.InvalidArguments
->>> +					org.bluez.Error.NotSupported
->>> +
->>> +		DisableIntermediateMeasurement(object watcher)
->>> +
->>> +			Disables intermediate measurement notifications
->>> +			for this watcher. It will disable notifications in
->>> +			devices when the last watcher is removed for
->>> +			intermediate measurements.
->>> +
->>> +			Possible Errors: org.bluez.Error.InvalidArguments
->>> +					org.bluez.Error.NotFound
->>
->> why don't we make these two methods parts of a dict for RegisterWatcher. Enabling them manually seems rather pointless.
->
-> It's been done intentionally to be able to return "not supported" error
-> when intermediate measurement is not available.
->
-> Having RegisterWatcher(object watcher, boolean intermediate) and
-> additionally Intermediate property [read only] is an another option.
->
-> In this case app will check intermediate property and set intermediate
-> param to RegisterWatcher appropriately.
->
+Signed-off-by: Silviu-Mihai Popescu <silviupopescu1990@gmail.com>
+---
+ net/bluetooth/hci_sysfs.c |    5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-Any comments on this.
-
-/Waldek
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 23b4e24..6fb5065 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -590,10 +590,7 @@ int __init bt_sysfs_init(void)
+ 	bt_debugfs = debugfs_create_dir("bluetooth", NULL);
+ 
+ 	bt_class = class_create(THIS_MODULE, "bluetooth");
+-	if (IS_ERR(bt_class))
+-		return PTR_ERR(bt_class);
+-
+-	return 0;
++	return PTR_RET(bt_class)
+ }
+ 
+ void bt_sysfs_cleanup(void)
+-- 
+1.7.9.5
