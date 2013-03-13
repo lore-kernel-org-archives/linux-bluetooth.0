@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 06/26] Bluetooth: Remove useless HCI_PENDING_CLASS flag
-Date: Wed, 13 Mar 2013 11:11:57 -0700
-Message-Id: <1363198337-3896-7-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v4 26/26] Bluetooth: Fix PIN/Confirm/Passkey response parameters
+Date: Wed, 13 Mar 2013 11:12:17 -0700
+Message-Id: <1363198337-3896-27-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1363198337-3896-1-git-send-email-johan.hedberg@gmail.com>
 References: <1363198337-3896-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,64 +11,61 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Now that class related operations are tracked through asynchronous HCI
-requests this flag is no longer needed.
+The only valid mgmt response to these pairing related commands is a
+mgmt_cmd_complete and the returned parameters should contain the address
+and address type of the remote device.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci.h |    1 -
- net/bluetooth/hci_event.c   |    3 +--
- net/bluetooth/mgmt.c        |    4 ----
- 3 files changed, 1 insertion(+), 7 deletions(-)
+ net/bluetooth/mgmt.c |   20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 7f12c25f..1e723c7 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -119,7 +119,6 @@ enum {
- 	HCI_CONNECTABLE,
- 	HCI_DISCOVERABLE,
- 	HCI_LINK_SECURITY,
--	HCI_PENDING_CLASS,
- 	HCI_PERIODIC_INQ,
- };
- 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index d11b87b..5f2d008 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -194,8 +194,7 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
- 	clear_bit(HCI_RESET, &hdev->flags);
- 
- 	/* Reset all non-persistent flags */
--	hdev->dev_flags &= ~(BIT(HCI_LE_SCAN) | BIT(HCI_PENDING_CLASS) |
--			     BIT(HCI_PERIODIC_INQ));
-+	hdev->dev_flags &= ~(BIT(HCI_LE_SCAN) | BIT(HCI_PERIODIC_INQ));
- 
- 	hdev->discovery.state = DISCOVERY_STOPPED;
- 	hdev->inq_tx_power = HCI_TX_POWER_INVALID;
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 8a0bbb9..3e3cb01 100644
+index 8587229..03e7e73 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -652,8 +652,6 @@ static void update_class(struct hci_request *req)
- 		return;
+@@ -2310,8 +2310,9 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
+ 	hci_dev_lock(hdev);
  
- 	hci_req_add(req, HCI_OP_WRITE_CLASS_OF_DEV, sizeof(cod), cod);
--
--	set_bit(HCI_PENDING_CLASS, &hdev->dev_flags);
- }
+ 	if (!hdev_is_powered(hdev)) {
+-		err = cmd_status(sk, hdev->id, mgmt_op,
+-				 MGMT_STATUS_NOT_POWERED);
++		err = cmd_complete(sk, hdev->id, mgmt_op,
++				   MGMT_STATUS_NOT_POWERED, addr,
++				   sizeof(*addr));
+ 		goto done;
+ 	}
  
- static void service_cache_off(struct work_struct *work)
-@@ -3762,8 +3760,6 @@ int mgmt_set_class_of_dev_complete(struct hci_dev *hdev, u8 *dev_class,
- 	struct cmd_lookup match = { NULL, hdev, mgmt_status(status) };
- 	int err = 0;
+@@ -2321,8 +2322,9 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
+ 		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &addr->bdaddr);
  
--	clear_bit(HCI_PENDING_CLASS, &hdev->dev_flags);
--
- 	mgmt_pending_foreach(MGMT_OP_SET_DEV_CLASS, hdev, sk_lookup, &match);
- 	mgmt_pending_foreach(MGMT_OP_ADD_UUID, hdev, sk_lookup, &match);
- 	mgmt_pending_foreach(MGMT_OP_REMOVE_UUID, hdev, sk_lookup, &match);
+ 	if (!conn) {
+-		err = cmd_status(sk, hdev->id, mgmt_op,
+-				 MGMT_STATUS_NOT_CONNECTED);
++		err = cmd_complete(sk, hdev->id, mgmt_op,
++				   MGMT_STATUS_NOT_CONNECTED, addr,
++				   sizeof(*addr));
+ 		goto done;
+ 	}
+ 
+@@ -2331,11 +2333,13 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
+ 		err = smp_user_confirm_reply(conn, mgmt_op, passkey);
+ 
+ 		if (!err)
+-			err = cmd_status(sk, hdev->id, mgmt_op,
+-					 MGMT_STATUS_SUCCESS);
++			err = cmd_complete(sk, hdev->id, mgmt_op,
++					   MGMT_STATUS_SUCCESS, addr,
++					   sizeof(*addr));
+ 		else
+-			err = cmd_status(sk, hdev->id, mgmt_op,
+-					 MGMT_STATUS_FAILED);
++			err = cmd_complete(sk, hdev->id, mgmt_op,
++					   MGMT_STATUS_FAILED, addr,
++					   sizeof(*addr));
+ 
+ 		goto done;
+ 	}
 -- 
 1.7.10.4
 
