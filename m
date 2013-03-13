@@ -1,74 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <51407D38.2080600@oss.bmw-carit.de>
-Date: Wed, 13 Mar 2013 14:20:56 +0100
-From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 5/8] obexd: Add RegisterNotifications function
-References: <1363014350-16114-1-git-send-email-christian.fetzer@oss.bmw-carit.de> <1363014350-16114-6-git-send-email-christian.fetzer@oss.bmw-carit.de> <72B23061-16D8-4949-AAB4-9537F6726FCB@holtmann.org>
-In-Reply-To: <72B23061-16D8-4949-AAB4-9537F6726FCB@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+From: Lubomir Rintel <lkundrak@v3.sk>
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Lubomir Rintel <lkundrak@v3.sk>
+Subject: [PATCH RESEND] bluetooth: btmrvl_sdio: look for sd8688 firmware in proper location
+Date: Wed, 13 Mar 2013 12:04:30 +0100
+Message-Id: <1363172670-14596-1-git-send-email-lkundrak@v3.sk>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+The firmware images are shared with libertas_sdio WiFi chip and used to be in
+libertas/ subtree in linux-firmware. As btmrvl_sdio used to look into the
+linux-firmware root, it ended up being unsuccessful. Since the firmware files
+are not specific to the libertas hardware, they're being moved into mrvl/ now.
 
-On 03/11/2013 05:19 PM, Marcel Holtmann wrote:
-> Hi Christian,
->
->> This allows applications to register for all different types
->> of MAP event reports.
->>
->> In response to this call, the MSE should connect to the local MNS
->> instance.
->> ---
->> doc/obex-api.txt   |  6 ++++
->> obexd/client/map.c | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->> 2 files changed, 92 insertions(+)
-> never ever intermix doc/ changes with actual code. You really need to learn on how to split patches properly. There is no reason at all that this are not two patches.
->
->
->> diff --git a/doc/obex-api.txt b/doc/obex-api.txt
->> index 759c4d8..ef5d85e 100644
->> --- a/doc/obex-api.txt
->> +++ b/doc/obex-api.txt
->> @@ -651,6 +651,12 @@ Methods		void SetFolder(string name)
->> 			Possible errors: org.bluez.obex.Error.InvalidArguments
->> 					 org.bluez.obex.Error.Failed
->>
->> +		void RegisterNotifications(boolean)
->> +
->> +			Register / unregister reception of notifications.
->> +
->> +			Possible errors: org.bluez.obex.Error.InvalidArguments
->> +					 org.bluez.obex.Error.Failed
-> Why don't you describe the boolean variable and what it does. If this is an on/off switch, then we are not doing this stupid thing here.
->
-> Simple things like EnableNotifications and DisableNotifications would be better. Also this needs a bit detailed explanations why you thing this is the right API for handling this. I am not even convinced we should be doing it like this.
->
-> Regards
->
-> Marcel
-Thanks for your comments. I'll split the patches and send an updated 
-patch set.
+Signed-off-by: Lubomir Rintel <lkundrak@v3.sk>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
 
-Yes, RegisterNotification simply enables / disabled receiving event 
-reports. I can change it as suggested.
-The reason for having an API function instead of enabling it implicitly 
-is that the application can control
-for which device it wants to receive event reports.
+Now that the relevant changes are in linux-firmware it makes sense to merge 
+this to make the driver look for correct firmware files.
 
-Event reports can be received for multiple MAP sessions on the same device.
-This is used for example when the phone exposes different E-Mail 
-accounts as different MAP instances.
-But according to the specification, we need to have one MNS (obex 
-server) instance for each remote device.
+ drivers/bluetooth/btmrvl_sdio.c |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
 
-The current code is limited to exactly one static MNS instance, and you 
-can receive notifications only for one device.
-In the future we could eventually work around that limitation by 
-dynamically instantiating MNS instances when
-needed.
-
-Br,
-Christian
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index 9959d4c..1cb5183 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -83,8 +83,8 @@ static const struct btmrvl_sdio_card_reg btmrvl_reg_87xx = {
+ };
+ 
+ static const struct btmrvl_sdio_device btmrvl_sdio_sd8688 = {
+-	.helper		= "sd8688_helper.bin",
+-	.firmware	= "sd8688.bin",
++	.helper		= "mrvl/sd8688_helper.bin",
++	.firmware	= "mrvl/sd8688.bin",
+ 	.reg		= &btmrvl_reg_8688,
+ 	.sd_blksz_fw_dl	= 64,
+ };
+@@ -1185,7 +1185,7 @@ MODULE_AUTHOR("Marvell International Ltd.");
+ MODULE_DESCRIPTION("Marvell BT-over-SDIO driver ver " VERSION);
+ MODULE_VERSION(VERSION);
+ MODULE_LICENSE("GPL v2");
+-MODULE_FIRMWARE("sd8688_helper.bin");
+-MODULE_FIRMWARE("sd8688.bin");
++MODULE_FIRMWARE("mrvl/sd8688_helper.bin");
++MODULE_FIRMWARE("mrvl/sd8688.bin");
+ MODULE_FIRMWARE("mrvl/sd8787_uapsta.bin");
+ MODULE_FIRMWARE("mrvl/sd8797_uapsta.bin");
+-- 
+1.7.1
