@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 24/26] Bluetooth: Fix fast connectable state when enabling page scan
-Date: Wed, 13 Mar 2013 11:12:15 -0700
-Message-Id: <1363198337-3896-25-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v4 23/26] Bluetooth: Fix updating page scan parameters when not necessary
+Date: Wed, 13 Mar 2013 11:12:14 -0700
+Message-Id: <1363198337-3896-24-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1363198337-3896-1-git-send-email-johan.hedberg@gmail.com>
 References: <1363198337-3896-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,60 +11,43 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-When powering on or enabling page scan we need to ensure that the page
-scan parameters are as they should be. This is because some controllers
-do not properly reset these values upon HCI_Reset. Since the
-write_scan_parameters function is now called from several new places it
-also checks for the >= 1.2 HCI version requirement before sending the
-commands.
+Now that the current page scan parameters are stored in struct hci_dev
+we should check against those values before sending new HCI commands to
+change them.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c |   17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ net/bluetooth/mgmt.c |   10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 7783b8d..75c9d92 100644
+index 98f6295..7783b8d 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1006,6 +1006,9 @@ static void write_fast_connectable(struct hci_request *req, bool enable)
+@@ -1002,6 +1002,7 @@ failed:
+ 
+ static void write_fast_connectable(struct hci_request *req, bool enable)
+ {
++	struct hci_dev *hdev = req->hdev;
  	struct hci_cp_write_page_scan_activity acp;
  	u8 type;
  
-+	if (hdev->hci_ver < BLUETOOTH_VER_1_2)
-+		return;
+@@ -1019,8 +1020,13 @@ static void write_fast_connectable(struct hci_request *req, bool enable)
+ 
+ 	acp.window = __constant_cpu_to_le16(0x0012);
+ 
+-	hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_ACTIVITY, sizeof(acp), &acp);
+-	hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
++	if (__cpu_to_le16(hdev->page_scan_interval) != acp.interval ||
++	    __cpu_to_le16(hdev->page_scan_window) != acp.window)
++		hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_ACTIVITY,
++			    sizeof(acp), &acp);
 +
- 	if (enable) {
- 		type = PAGE_SCAN_TYPE_INTERLACED;
++	if (hdev->page_scan_type != type)
++		hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
+ }
  
-@@ -1125,7 +1128,13 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
- 
--	if (!cp->val && test_bit(HCI_FAST_CONNECTABLE, &hdev->dev_flags))
-+	/* If we're going from non-connectable to connectable or
-+	 * vice-versa when fast connectable is enabled ensure that fast
-+	 * connectable gets disabled. write_fast_connectable won't do
-+	 * anything if the page scan parameters are already what they
-+	 * should be.
-+	 */
-+	if (cp->val || test_bit(HCI_FAST_CONNECTABLE, &hdev->dev_flags))
- 		write_fast_connectable(&req, false);
- 
- 	err = hci_req_run(&req, set_connectable_complete);
-@@ -3287,6 +3296,12 @@ static void set_bredr_scan(struct hci_request *req)
- 	struct hci_dev *hdev = req->hdev;
- 	u8 scan = 0;
- 
-+	/* Ensure that fast connectable is disabled. This function will
-+	 * not do anything if the page scan parameters are already what
-+	 * they should be.
-+	 */
-+	write_fast_connectable(req, false);
-+
- 	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
- 		scan |= SCAN_PAGE;
- 	if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
+ static void set_connectable_complete(struct hci_dev *hdev, u8 status)
 -- 
 1.7.10.4
 
