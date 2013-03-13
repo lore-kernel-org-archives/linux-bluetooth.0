@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 23/26] Bluetooth: Fix updating page scan parameters when not necessary
-Date: Wed, 13 Mar 2013 11:12:14 -0700
-Message-Id: <1363198337-3896-24-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v4 22/26] Bluetooth: Update page scan parameters after successful write commands
+Date: Wed, 13 Mar 2013 11:12:13 -0700
+Message-Id: <1363198337-3896-23-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1363198337-3896-1-git-send-email-johan.hedberg@gmail.com>
 References: <1363198337-3896-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,43 +11,88 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Now that the current page scan parameters are stored in struct hci_dev
-we should check against those values before sending new HCI commands to
-change them.
+The page scan parameters (interval, window and type) stored in struct
+hci_dev should not only be updated after successful reads but also after
+successful writes. This patch adds the necessary handlers for the write
+command complete events and updates the stored values through them.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c |   10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_event.c |   43 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 98f6295..7783b8d 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1002,6 +1002,7 @@ failed:
- 
- static void write_fast_connectable(struct hci_request *req, bool enable)
- {
-+	struct hci_dev *hdev = req->hdev;
- 	struct hci_cp_write_page_scan_activity acp;
- 	u8 type;
- 
-@@ -1019,8 +1020,13 @@ static void write_fast_connectable(struct hci_request *req, bool enable)
- 
- 	acp.window = __constant_cpu_to_le16(0x0012);
- 
--	hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_ACTIVITY, sizeof(acp), &acp);
--	hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
-+	if (__cpu_to_le16(hdev->page_scan_interval) != acp.interval ||
-+	    __cpu_to_le16(hdev->page_scan_window) != acp.window)
-+		hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_ACTIVITY,
-+			    sizeof(acp), &acp);
-+
-+	if (hdev->page_scan_type != type)
-+		hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 4a57913..7cbe35f 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -614,6 +614,25 @@ static void hci_cc_read_page_scan_activity(struct hci_dev *hdev,
+ 	}
  }
  
- static void set_connectable_complete(struct hci_dev *hdev, u8 status)
++static void hci_cc_write_page_scan_activity(struct hci_dev *hdev,
++					    struct sk_buff *skb)
++{
++	u8 status = *((u8 *) skb->data);
++	struct hci_cp_write_page_scan_activity *sent;
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	if (status)
++		return;
++
++	sent = hci_sent_cmd_data(hdev, HCI_OP_WRITE_PAGE_SCAN_ACTIVITY);
++	if (!sent)
++		return;
++
++	hdev->page_scan_interval = __le16_to_cpu(sent->interval);
++	hdev->page_scan_window = __le16_to_cpu(sent->window);
++}
++
+ static void hci_cc_read_page_scan_type(struct hci_dev *hdev,
+ 					   struct sk_buff *skb)
+ {
+@@ -625,6 +644,22 @@ static void hci_cc_read_page_scan_type(struct hci_dev *hdev,
+ 		hdev->page_scan_type = __le16_to_cpu(rp->type);
+ }
+ 
++static void hci_cc_write_page_scan_type(struct hci_dev *hdev,
++					struct sk_buff *skb)
++{
++	u8 status = *((u8 *) skb->data);
++	u8 *type;
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	if (status)
++		return;
++
++	type = hci_sent_cmd_data(hdev, HCI_OP_WRITE_PAGE_SCAN_TYPE);
++	if (type)
++		hdev->page_scan_type = *type;
++}
++
+ static void hci_cc_read_data_block_size(struct hci_dev *hdev,
+ 					struct sk_buff *skb)
+ {
+@@ -2232,10 +2267,18 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cc_read_page_scan_activity(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_WRITE_PAGE_SCAN_ACTIVITY:
++		hci_cc_write_page_scan_activity(hdev, skb);
++		break;
++
+ 	case HCI_OP_READ_PAGE_SCAN_TYPE:
+ 		hci_cc_read_page_scan_type(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_WRITE_PAGE_SCAN_TYPE:
++		hci_cc_write_page_scan_type(hdev, skb);
++		break;
++
+ 	case HCI_OP_READ_DATA_BLOCK_SIZE:
+ 		hci_cc_read_data_block_size(hdev, skb);
+ 		break;
 -- 
 1.7.10.4
 
