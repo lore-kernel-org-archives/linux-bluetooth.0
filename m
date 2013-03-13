@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 15/26] Bluetooth: Fix fast connectable response sending
-Date: Wed, 13 Mar 2013 11:12:06 -0700
-Message-Id: <1363198337-3896-16-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v4 14/26] Bluetooth: Use an async request for mgmt_set_connectable
+Date: Wed, 13 Mar 2013 11:12:05 -0700
+Message-Id: <1363198337-3896-15-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1363198337-3896-1-git-send-email-johan.hedberg@gmail.com>
 References: <1363198337-3896-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,27 +11,25 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The mgmt_set_fast_connectable response should be sent only when all
-related HCI commands have completed. This patch fixes the issue by using
-an async request and sending the response to user space throught the
-complete callback of the request. The patch also fixes in the same go
-the return parameters of the command which should be the current
-settings.
+This patch changes the mgmt_set_connectable handler to use an async
+request for sending the required HCI command. This is necessary
+preparation for handling the fast connectable change that needs to be
+associated with disabling the connectable setting.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c |   53 +++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 42 insertions(+), 11 deletions(-)
+ net/bluetooth/mgmt.c |   37 +++++++++++++++++++++++++++++--------
+ 1 file changed, 29 insertions(+), 8 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a4f928d..bd61318 100644
+index 15305fa..a4f928d 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -2896,11 +2896,39 @@ static int set_device_id(struct sock *sk, struct hci_dev *hdev, void *data,
+@@ -996,11 +996,32 @@ failed:
  	return err;
  }
  
-+static void fast_connectable_complete(struct hci_dev *hdev, u8 status)
++static void set_connectable_complete(struct hci_dev *hdev, u8 status)
 +{
 +	struct pending_cmd *cmd;
 +
@@ -39,17 +37,11 @@ index a4f928d..bd61318 100644
 +
 +	hci_dev_lock(hdev);
 +
-+	cmd = mgmt_pending_find(MGMT_OP_SET_FAST_CONNECTABLE, hdev);
++	cmd = mgmt_pending_find(MGMT_OP_SET_CONNECTABLE, hdev);
 +	if (!cmd)
 +		goto unlock;
 +
-+	if (status) {
-+		cmd_status(cmd->sk, hdev->id, MGMT_OP_SET_FAST_CONNECTABLE,
-+			   mgmt_status(status));
-+	} else {
-+		send_settings_rsp(cmd->sk, MGMT_OP_SET_FAST_CONNECTABLE, hdev);
-+		new_settings(hdev, cmd->sk);
-+	}
++	send_settings_rsp(cmd->sk, MGMT_OP_SET_CONNECTABLE, hdev);
 +
 +	mgmt_pending_remove(cmd);
 +
@@ -57,56 +49,54 @@ index a4f928d..bd61318 100644
 +	hci_dev_unlock(hdev);
 +}
 +
- static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
- 				void *data, u16 len)
+ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			   u16 len)
  {
  	struct mgmt_mode *cp = data;
- 	struct hci_cp_write_page_scan_activity acp;
-+	struct pending_cmd *cmd;
+ 	struct pending_cmd *cmd;
 +	struct hci_request req;
- 	u8 type;
+ 	u8 scan;
  	int err;
  
-@@ -2939,25 +2967,28 @@ static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
- 	/* default 11.25 msec page scan window */
- 	acp.window = __constant_cpu_to_le16(0x0012);
- 
--	err = hci_send_cmd(hdev, HCI_OP_WRITE_PAGE_SCAN_ACTIVITY, sizeof(acp),
--			   &acp);
--	if (err < 0) {
--		err = cmd_status(sk, hdev->id, MGMT_OP_SET_FAST_CONNECTABLE,
--				 MGMT_STATUS_FAILED);
--		goto done;
-+	cmd = mgmt_pending_add(sk, MGMT_OP_SET_FAST_CONNECTABLE, hdev,
-+			       data, len);
-+	if (!cmd) {
-+		err = -ENOMEM;
-+		goto unlock;
+@@ -1067,7 +1088,11 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			cancel_delayed_work(&hdev->discov_off);
  	}
  
--	err = hci_send_cmd(hdev, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
+-	err = hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
 +	hci_req_init(&req, hdev);
 +
-+	hci_req_add(&req, HCI_OP_WRITE_PAGE_SCAN_ACTIVITY, sizeof(acp), &acp);
-+	hci_req_add(&req, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
++	hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
 +
-+	err = hci_req_run(&req, fast_connectable_complete);
- 	if (err < 0) {
- 		err = cmd_status(sk, hdev->id, MGMT_OP_SET_FAST_CONNECTABLE,
- 				 MGMT_STATUS_FAILED);
--		goto done;
-+		mgmt_pending_remove(cmd);
++	err = hci_req_run(&req, set_connectable_complete);
+ 	if (err < 0)
+ 		mgmt_pending_remove(cmd);
+ 
+@@ -3328,7 +3353,7 @@ int mgmt_discoverable(struct hci_dev *hdev, u8 discoverable)
+ 
+ int mgmt_connectable(struct hci_dev *hdev, u8 connectable)
+ {
+-	struct cmd_lookup match = { NULL, hdev };
++	struct pending_cmd *cmd;
+ 	bool changed = false;
+ 	int err = 0;
+ 
+@@ -3340,14 +3365,10 @@ int mgmt_connectable(struct hci_dev *hdev, u8 connectable)
+ 			changed = true;
  	}
  
--	err = cmd_complete(sk, hdev->id, MGMT_OP_SET_FAST_CONNECTABLE, 0,
--			   NULL, 0);
--done:
-+unlock:
- 	hci_dev_unlock(hdev);
-+
+-	mgmt_pending_foreach(MGMT_OP_SET_CONNECTABLE, hdev, settings_rsp,
+-			     &match);
++	cmd = mgmt_pending_find(MGMT_OP_SET_CONNECTABLE, hdev);
+ 
+ 	if (changed)
+-		err = new_settings(hdev, match.sk);
+-
+-	if (match.sk)
+-		sock_put(match.sk);
++		err = new_settings(hdev, cmd ? cmd->sk : NULL);
+ 
  	return err;
  }
- 
 -- 
 1.7.10.4
 
