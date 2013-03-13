@@ -1,67 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=US-ASCII
 Mime-Version: 1.0 (Mac OS X Mail 6.2 \(1499\))
-Subject: Re: [PATCH v3 5/8] obexd: Add RegisterNotifications function
+Subject: Re: [PATCH v3 2/5] Bluetooth: Add option for SCO socket mode
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <51407D38.2080600@oss.bmw-carit.de>
-Date: Wed, 13 Mar 2013 09:27:49 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <440C26C3-24C4-4A9B-8527-C94C75F850E5@holtmann.org>
-References: <1363014350-16114-1-git-send-email-christian.fetzer@oss.bmw-carit.de> <1363014350-16114-6-git-send-email-christian.fetzer@oss.bmw-carit.de> <72B23061-16D8-4949-AAB4-9537F6726FCB@holtmann.org> <51407D38.2080600@oss.bmw-carit.de>
-To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+In-Reply-To: <CA+QXtDtu-fCY9JXueApOEzfyB8NZF87Xbnh5T_RYBPrNSNRavw@mail.gmail.com>
+Date: Wed, 13 Mar 2013 09:26:36 -0700
+Cc: =?iso-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
+	<frederic.dalleau@linux.intel.com>, linux-bluetooth@vger.kernel.org
+Message-Id: <FA4A6ABA-3968-4787-8572-EEBAA64F2F0B@holtmann.org>
+References: <1359986188-24432-1-git-send-email-frederic.dalleau@linux.intel.com> <1359986188-24432-2-git-send-email-frederic.dalleau@linux.intel.com> <1361229298.1583.48.camel@aeonflux> <CA+QXtDtu-fCY9JXueApOEzfyB8NZF87Xbnh5T_RYBPrNSNRavw@mail.gmail.com>
+To: "Dalleau, Frederic" <frederic.dalleau@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+Hi Fred,
 
->>> This allows applications to register for all different types
->>> of MAP event reports.
->>> 
->>> In response to this call, the MSE should connect to the local MNS
->>> instance.
->>> ---
->>> doc/obex-api.txt   |  6 ++++
->>> obexd/client/map.c | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>> 2 files changed, 92 insertions(+)
->> never ever intermix doc/ changes with actual code. You really need to learn on how to split patches properly. There is no reason at all that this are not two patches.
->> 
->> 
->>> diff --git a/doc/obex-api.txt b/doc/obex-api.txt
->>> index 759c4d8..ef5d85e 100644
->>> --- a/doc/obex-api.txt
->>> +++ b/doc/obex-api.txt
->>> @@ -651,6 +651,12 @@ Methods		void SetFolder(string name)
->>> 			Possible errors: org.bluez.obex.Error.InvalidArguments
->>> 					 org.bluez.obex.Error.Failed
->>> 
->>> +		void RegisterNotifications(boolean)
->>> +
->>> +			Register / unregister reception of notifications.
->>> +
->>> +			Possible errors: org.bluez.obex.Error.InvalidArguments
->>> +					 org.bluez.obex.Error.Failed
->> Why don't you describe the boolean variable and what it does. If this is an on/off switch, then we are not doing this stupid thing here.
->> 
->> Simple things like EnableNotifications and DisableNotifications would be better. Also this needs a bit detailed explanations why you thing this is the right API for handling this. I am not even convinced we should be doing it like this.
->> 
->> Regards
->> 
->> Marcel
-> Thanks for your comments. I'll split the patches and send an updated patch set.
+>> So I would actually propose to add a voice settings uint16 value as SCO
+>> socket field. Using the full voice settings make sense since then we can
+>> also retrieve the fact if we are doing 8-bit or 16-bit PCM. One detail
+>> we kinda ignored since we always defaulted to 16-bit, but would be worth
+>> while fixing while at it.
 > 
-> Yes, RegisterNotification simply enables / disabled receiving event reports. I can change it as suggested.
-> The reason for having an API function instead of enabling it implicitly is that the application can control
-> for which device it wants to receive event reports.
-> 
-> Event reports can be received for multiple MAP sessions on the same device.
-> This is used for example when the phone exposes different E-Mail accounts as different MAP instances.
-> But according to the specification, we need to have one MNS (obex server) instance for each remote device.
-> 
-> The current code is limited to exactly one static MNS instance, and you can receive notifications only for one device.
-> In the future we could eventually work around that limitation by dynamically instantiating MNS instances when
-> needed.
+> I'm unconvinced about this. This mean the application wil be able to mess into
+> what voice settings will be supported. And if csa2 has to be supported
+> in the future,
+> a new socket option will be required.
+> Is 8-bit sco support really worth it ?
 
-maybe it would a good idea to write this up in an email that just proposes the API changes and additions and we can discuss based on that. However you have to explain on how this API is supposed to be used.
+maybe it is not worth supporting 8-bit SCO, but it is a feature that we should not ignore. And in case you want to do multiple SCO connections (some people want to actually), one way of getting less bandwidth usage is to switch to 8-bit PCM. So my current thinking is that we should support it.
+
+Right now I am for working in the context of what we actually have. The CSA2 is not deployed at this moment and it is rather complex. So my thinking is to do voice setting right now and sort out CSA2 at some point later. Unless someone can come up with a good way of integrating CSA2 right now and allow a smooth backward compatibility to non CSA2 devices.
+
+That all said, we can always have a socket option later on that enables CSA2 features.
 
 Regards
 
