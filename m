@@ -1,53 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 00/26] Bluetooth: Management interface fixes
-Date: Wed, 13 Mar 2013 11:11:51 -0700
-Message-Id: <1363198337-3896-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 13 Mar 2013 13:30:36 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth 2013-03-11
+Message-ID: <20130313173035.GA19917@tuxdriver.com>
+References: <20130311212033.GA17372@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130311212033.GA17372@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Mon, Mar 11, 2013 at 06:20:33PM -0300, Gustavo Padovan wrote:
+> Hi John,
+> 
+> I have these two patches for 3.9, these add support for two more devices to
+> the bluetooth drivers. Please pull. Thanks.
+> 
+> 	Gustavo
+> --
+> The following changes since commit d786f67e5c587a4de8245336cb64cf4dd06871a7:
+> 
+>   mwl8k: fix band for supported channels (2013-02-11 14:31:36 -0500)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth for-upstream 
+> 
+> for you to fetch changes up to 94a32d10f47b637ae24b78b1ddc7ef0e8396fda4:
+> 
+>   Bluetooth: Device 0cf3:3008 should map AR 3012 (2013-03-11 18:04:54 -0300)
 
-I'm sending all 26 patches I had pending in my local tree, as requested
-by Marcel. The first six in this set are identical to my patch set
-titled "[PATCH v3 0/6] Bluetooth: HCI command synchronisation fixes".
+Pulling now...
 
-Johan
-
-----------------------------------------------------------------
-Johan Hedberg (26):
-      Bluetooth: Move power on HCI command updates to their own function
-      Bluetooth: Update mgmt powered HCI commands to use async requests
-      Bluetooth: Wait for HCI command completion with mgmt_set_powered
-      Bluetooth: Fix busy condition testing for EIR and class updates
-      Bluetooth: Fix UUID/class mgmt command response synchronization
-      Bluetooth: Remove useless HCI_PENDING_CLASS flag
-      Bluetooth: Add a define for the HCI persistent flags mask
-      Bluetooth: Clear non-persistent flags when closing HCI device
-      Bluetooth: Fix clearing flags on power off before notifying mgmt
-      Bluetooth: Fix waiting for EIR update when setting local name
-      Bluetooth: Handle AD updating through an async request
-      Bluetooth: Fix local name setting for LE-only controllers
-      Bluetooth: Fix setting local name to the existing value
-      Bluetooth: Use an async request for mgmt_set_connectable
-      Bluetooth: Fix fast connectable response sending
-      Bluetooth: Limit fast connectable support to >= 1.2 controllers
-      Bluetooth: Fix error response for simultaneous fast connectable commands
-      Bluetooth: Add proper flag for fast connectable mode
-      Bluetooth: Refactor fast connectable HCI commands
-      Bluetooth: Disable fast connectable when disabling connectable
-      Bluetooth: Add reading of page scan parameters
-      Bluetooth: Update page scan parameters after successful write commands
-      Bluetooth: Fix updating page scan parameters when not necessary
-      Bluetooth: Fix fast connectable state when enabling page scan
-      Bluetooth: Simplify address parameters of user_pairing_resp()
-      Bluetooth: Fix PIN/Confirm/Passkey response parameters
-
- include/net/bluetooth/hci.h      |   21 +-
- include/net/bluetooth/hci_core.h |    8 +-
- net/bluetooth/hci_core.c         |   42 ++-
- net/bluetooth/hci_event.c        |   97 +++++-
- net/bluetooth/mgmt.c             |  680 ++++++++++++++++++++++++++------------
- 5 files changed, 599 insertions(+), 249 deletions(-)
-
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
