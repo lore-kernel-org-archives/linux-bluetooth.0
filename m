@@ -1,54 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lubomir Rintel <lkundrak@v3.sk>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Lubomir Rintel <lkundrak@v3.sk>
-Subject: [PATCH RESEND] bluetooth: btmrvl_sdio: look for sd8688 firmware in proper location
-Date: Wed, 13 Mar 2013 12:04:30 +0100
-Message-Id: <1363172670-14596-1-git-send-email-lkundrak@v3.sk>
+Date: Wed, 13 Mar 2013 05:31:45 -0400 (EDT)
+Message-Id: <20130313.053145.2200448840921851390.davem@davemloft.net>
+To: silviupopescu1990@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	gustavo@padovan.org, johan.hedberg@gmail.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] bluetooth: use PTR_RET instead of IS_ERR + PTR_ERR
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <1363111995-26866-1-git-send-email-silviupopescu1990@gmail.com>
+References: <1363111995-26866-1-git-send-email-silviupopescu1990@gmail.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The firmware images are shared with libertas_sdio WiFi chip and used to be in
-libertas/ subtree in linux-firmware. As btmrvl_sdio used to look into the
-linux-firmware root, it ended up being unsuccessful. Since the firmware files
-are not specific to the libertas hardware, they're being moved into mrvl/ now.
+From: Silviu-Mihai Popescu <silviupopescu1990@gmail.com>
+Date: Tue, 12 Mar 2013 20:13:15 +0200
 
-Signed-off-by: Lubomir Rintel <lkundrak@v3.sk>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
----
+> @@ -590,10 +590,7 @@ int __init bt_sysfs_init(void)
+>  	bt_debugfs = debugfs_create_dir("bluetooth", NULL);
+>  
+>  	bt_class = class_create(THIS_MODULE, "bluetooth");
+> -	if (IS_ERR(bt_class))
+> -		return PTR_ERR(bt_class);
+> -
+> -	return 0;
+> +	return PTR_RET(bt_class)
 
-Now that the relevant changes are in linux-firmware it makes sense to merge 
-this to make the driver look for correct firmware files.
+Don't bother submitting patches you aren't even going to try
+to compile.
 
- drivers/bluetooth/btmrvl_sdio.c |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+I'm rejecting all of your current submissions.  Resubmit them
+when you feel like typing 'make' from time to time.
 
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index 9959d4c..1cb5183 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -83,8 +83,8 @@ static const struct btmrvl_sdio_card_reg btmrvl_reg_87xx = {
- };
- 
- static const struct btmrvl_sdio_device btmrvl_sdio_sd8688 = {
--	.helper		= "sd8688_helper.bin",
--	.firmware	= "sd8688.bin",
-+	.helper		= "mrvl/sd8688_helper.bin",
-+	.firmware	= "mrvl/sd8688.bin",
- 	.reg		= &btmrvl_reg_8688,
- 	.sd_blksz_fw_dl	= 64,
- };
-@@ -1185,7 +1185,7 @@ MODULE_AUTHOR("Marvell International Ltd.");
- MODULE_DESCRIPTION("Marvell BT-over-SDIO driver ver " VERSION);
- MODULE_VERSION(VERSION);
- MODULE_LICENSE("GPL v2");
--MODULE_FIRMWARE("sd8688_helper.bin");
--MODULE_FIRMWARE("sd8688.bin");
-+MODULE_FIRMWARE("mrvl/sd8688_helper.bin");
-+MODULE_FIRMWARE("mrvl/sd8688.bin");
- MODULE_FIRMWARE("mrvl/sd8787_uapsta.bin");
- MODULE_FIRMWARE("mrvl/sd8797_uapsta.bin");
--- 
-1.7.1
+
