@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 26/26] Bluetooth: Fix PIN/Confirm/Passkey response parameters
-Date: Wed, 13 Mar 2013 11:12:17 -0700
-Message-Id: <1363198337-3896-27-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v4 25/26] Bluetooth: Simplify address parameters of user_pairing_resp()
+Date: Wed, 13 Mar 2013 11:12:16 -0700
+Message-Id: <1363198337-3896-26-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1363198337-3896-1-git-send-email-johan.hedberg@gmail.com>
 References: <1363198337-3896-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,61 +11,120 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The only valid mgmt response to these pairing related commands is a
-mgmt_cmd_complete and the returned parameters should contain the address
-and address type of the remote device.
+Instead of passing the bdaddr and bdaddr_type as separate parameters to
+user_pairing_resp it's simpler to just pass the original mgmt_addr_info
+struct which contains both values.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c |   20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
+ net/bluetooth/mgmt.c |   27 ++++++++++++++-------------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 8587229..03e7e73 100644
+index 75c9d92..8587229 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -2310,8 +2310,9 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
- 	hci_dev_lock(hdev);
+@@ -2300,7 +2300,7 @@ unlock:
+ }
  
- 	if (!hdev_is_powered(hdev)) {
--		err = cmd_status(sk, hdev->id, mgmt_op,
--				 MGMT_STATUS_NOT_POWERED);
-+		err = cmd_complete(sk, hdev->id, mgmt_op,
-+				   MGMT_STATUS_NOT_POWERED, addr,
-+				   sizeof(*addr));
+ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
+-			     bdaddr_t *bdaddr, u8 type, u16 mgmt_op,
++			     struct mgmt_addr_info *addr, u16 mgmt_op,
+ 			     u16 hci_op, __le32 passkey)
+ {
+ 	struct pending_cmd *cmd;
+@@ -2315,10 +2315,10 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
  		goto done;
  	}
  
-@@ -2321,8 +2322,9 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
- 		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &addr->bdaddr);
+-	if (type == BDADDR_BREDR)
+-		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, bdaddr);
++	if (addr->type == BDADDR_BREDR)
++		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &addr->bdaddr);
+ 	else
+-		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, bdaddr);
++		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &addr->bdaddr);
  
  	if (!conn) {
--		err = cmd_status(sk, hdev->id, mgmt_op,
--				 MGMT_STATUS_NOT_CONNECTED);
-+		err = cmd_complete(sk, hdev->id, mgmt_op,
-+				   MGMT_STATUS_NOT_CONNECTED, addr,
-+				   sizeof(*addr));
+ 		err = cmd_status(sk, hdev->id, mgmt_op,
+@@ -2326,7 +2326,7 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
  		goto done;
  	}
  
-@@ -2331,11 +2333,13 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
+-	if (type == BDADDR_LE_PUBLIC || type == BDADDR_LE_RANDOM) {
++	if (addr->type == BDADDR_LE_PUBLIC || addr->type == BDADDR_LE_RANDOM) {
+ 		/* Continue with pairing via SMP */
  		err = smp_user_confirm_reply(conn, mgmt_op, passkey);
  
- 		if (!err)
--			err = cmd_status(sk, hdev->id, mgmt_op,
--					 MGMT_STATUS_SUCCESS);
-+			err = cmd_complete(sk, hdev->id, mgmt_op,
-+					   MGMT_STATUS_SUCCESS, addr,
-+					   sizeof(*addr));
- 		else
--			err = cmd_status(sk, hdev->id, mgmt_op,
--					 MGMT_STATUS_FAILED);
-+			err = cmd_complete(sk, hdev->id, mgmt_op,
-+					   MGMT_STATUS_FAILED, addr,
-+					   sizeof(*addr));
- 
+@@ -2340,7 +2340,7 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
  		goto done;
  	}
+ 
+-	cmd = mgmt_pending_add(sk, mgmt_op, hdev, bdaddr, sizeof(*bdaddr));
++	cmd = mgmt_pending_add(sk, mgmt_op, hdev, addr, sizeof(*addr));
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto done;
+@@ -2350,11 +2350,12 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
+ 	if (hci_op == HCI_OP_USER_PASSKEY_REPLY) {
+ 		struct hci_cp_user_passkey_reply cp;
+ 
+-		bacpy(&cp.bdaddr, bdaddr);
++		bacpy(&cp.bdaddr, &addr->bdaddr);
+ 		cp.passkey = passkey;
+ 		err = hci_send_cmd(hdev, hci_op, sizeof(cp), &cp);
+ 	} else
+-		err = hci_send_cmd(hdev, hci_op, sizeof(*bdaddr), bdaddr);
++		err = hci_send_cmd(hdev, hci_op, sizeof(addr->bdaddr),
++				   &addr->bdaddr);
+ 
+ 	if (err < 0)
+ 		mgmt_pending_remove(cmd);
+@@ -2371,7 +2372,7 @@ static int pin_code_neg_reply(struct sock *sk, struct hci_dev *hdev,
+ 
+ 	BT_DBG("");
+ 
+-	return user_pairing_resp(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
++	return user_pairing_resp(sk, hdev, &cp->addr,
+ 				MGMT_OP_PIN_CODE_NEG_REPLY,
+ 				HCI_OP_PIN_CODE_NEG_REPLY, 0);
+ }
+@@ -2387,7 +2388,7 @@ static int user_confirm_reply(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		return cmd_status(sk, hdev->id, MGMT_OP_USER_CONFIRM_REPLY,
+ 				  MGMT_STATUS_INVALID_PARAMS);
+ 
+-	return user_pairing_resp(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
++	return user_pairing_resp(sk, hdev, &cp->addr,
+ 				 MGMT_OP_USER_CONFIRM_REPLY,
+ 				 HCI_OP_USER_CONFIRM_REPLY, 0);
+ }
+@@ -2399,7 +2400,7 @@ static int user_confirm_neg_reply(struct sock *sk, struct hci_dev *hdev,
+ 
+ 	BT_DBG("");
+ 
+-	return user_pairing_resp(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
++	return user_pairing_resp(sk, hdev, &cp->addr,
+ 				 MGMT_OP_USER_CONFIRM_NEG_REPLY,
+ 				 HCI_OP_USER_CONFIRM_NEG_REPLY, 0);
+ }
+@@ -2411,7 +2412,7 @@ static int user_passkey_reply(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	BT_DBG("");
+ 
+-	return user_pairing_resp(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
++	return user_pairing_resp(sk, hdev, &cp->addr,
+ 				 MGMT_OP_USER_PASSKEY_REPLY,
+ 				 HCI_OP_USER_PASSKEY_REPLY, cp->passkey);
+ }
+@@ -2423,7 +2424,7 @@ static int user_passkey_neg_reply(struct sock *sk, struct hci_dev *hdev,
+ 
+ 	BT_DBG("");
+ 
+-	return user_pairing_resp(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
++	return user_pairing_resp(sk, hdev, &cp->addr,
+ 				 MGMT_OP_USER_PASSKEY_NEG_REPLY,
+ 				 HCI_OP_USER_PASSKEY_NEG_REPLY, 0);
+ }
 -- 
 1.7.10.4
 
