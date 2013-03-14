@@ -1,54 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1363285326-20089-6-git-send-email-deymo@chromium.org>
-References: <1363285326-20089-1-git-send-email-deymo@chromium.org>
-	<1363285326-20089-6-git-send-email-deymo@chromium.org>
-Date: Thu, 14 Mar 2013 16:45:22 -0400
-Message-ID: <CAJdJm_NpgRFV7qkoN_OAKYgS0Ff8kk8qJCH86sPvw5+qx4UHSQ@mail.gmail.com>
-Subject: Re: [PATCH 5/6] Agent's DisplayPasskey implementation
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Date: Thu, 14 Mar 2013 17:41:49 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: Alex Deymo <deymo@chromium.org>
-Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org, marcel@holtmann.org
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org,
+	marcel@holtmann.org
+Subject: Re: [PATCH 3/6] "agent" command capability argument and
+ autocompletion
+Message-ID: <20130314204149.GF2649@samus>
+References: <1363285326-20089-1-git-send-email-deymo@chromium.org>
+ <1363285326-20089-4-git-send-email-deymo@chromium.org>
+ <20130314200055.GE2649@samus>
+ <CAGd9gwjK_9pJ2ooRT2NLDRxwk4mToZ3cPxEjPj1mz8n0P_52Aw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAGd9gwjK_9pJ2ooRT2NLDRxwk4mToZ3cPxEjPj1mz8n0P_52Aw@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Alex,
 
-On Thu, Mar 14, 2013 at 2:22 PM, Alex Deymo <deymo@chromium.org> wrote:
-> +       dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
-> +                       DBUS_TYPE_UINT32, &passkey, DBUS_TYPE_UINT16, &entered,
-> +                                                       DBUS_TYPE_INVALID);
-> +
-> +       snprintf(passkey_entered, 7, "%.6u", passkey);
-> +       passkey_entered[6] = '\0';
-> +       strncpy(passkey_remaining, passkey_entered, 7);
-> +       if (entered > strlen(passkey_entered))
-> +               entered = strlen(passkey_entered);
-> +       passkey_entered[entered] = '\0';
-> +
-> +       rl_printf(AGENT_PROMPT "Passkey: " COLOR_BOLDGRAY "%s" COLOR_BOLDWHITE
-> +               "%s\n" COLOR_OFF, passkey_entered, passkey_remaining+entered);
-> +
-> +       return dbus_message_new_method_return(msg);
-> +}
-> +
+On 13:32 Thu 14 Mar, Alex Deymo wrote:
+> Thanks for the comments.
+> agent_capability_options[] was intended to be use in
+> parse_argument_agent(), but I finally reused agent_arguments[] since
+> the two extra cases (on, off) are handled before. I'll fix this (and
+> the indentation thing).
+> 
+> > > +     if (!arg || !strlen(arg)) {
+> > Even if it's not strictly enforced, in userspace code there's a tendency to
+> > use explicit checks for NULL and 0.
+> >
+> > This also applies for the strcmp()'s that are done just bellow.
+> 
+> I'm not sure if I properly understand this comment. If arg is NULL it
+> will fall in the first return FALSE, not calling any strcmp() because
+> of the lazy or operator, right?
 
-What about using the "%.*s" printf format specifier to simplify
-things? Something like (not tested):
+I was referring to the fact that in BlueZ (userspace code) the idiom
+"strcmp(x, y) == 0" is more common than "!strcmp(x, y)". But I agree that
+I wasn't clear enough.
 
-
-    snprintf(passkey_full, sizeof(passkey_full), "%.6u", passkey);
-    passkey_full[6] = '\0';
-
-    if (entered > strlen(passkey_full))
-        entered = strlen(passkey_full);
-
-    rl_printf(AGENT_PROMPT "Passkey: " COLOR_BOLDGRAY "%.*s" COLOR_BOLDWHITE
-            "%s\n" COLOR_OFF, entered, passkey_full, passkey_full + entered);
+> 
+> Alex.
 
 
-Best Regards,
+Cheers,
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Vinicius
