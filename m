@@ -1,256 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 14 Mar 2013 16:32:59 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Alex Deymo <deymo@chromium.org>
-Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org,
-	marcel@holtmann.org
-Subject: Re: [PATCH 2/6] Right prompt management on agent input
-Message-ID: <20130314193258.GB2649@samus>
-References: <1363285326-20089-1-git-send-email-deymo@chromium.org>
- <1363285326-20089-3-git-send-email-deymo@chromium.org>
+Date: Thu, 14 Mar 2013 15:53:20 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Ming Lei <ming.lei@canonical.com>
+Cc: linux-bluetooth@vger.kernel.org, stable@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [PATCH] Bluetooth: Add support for Dell[QCA 0cf3:0036]
+Message-ID: <20130314185320.GB11466@joana>
+References: <1363159863-10325-1-git-send-email-ming.lei@canonical.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1363285326-20089-3-git-send-email-deymo@chromium.org>
+In-Reply-To: <1363159863-10325-1-git-send-email-ming.lei@canonical.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Ming,
 
-On 11:22 Thu 14 Mar, Alex Deymo wrote:
-> Registering an agent shares the user input interface with the normal console
-> command interface. The way it is implemented (using rl_message, rl_save_prompt
-> and rl_restore_prompt) conflicts with the rl_printf calls that may appear
-> while waiting for user input, loosing the [bluetooth]# prompt.
-> This patch fixes this and makes clear if the expected input is a command or an
-> agent reply changing the color and text of the prompt.
+* Ming Lei <ming.lei@canonical.com> [2013-03-13 15:31:02 +0800]:
+
+> Add support for the AR9462 chip
+> 
+> T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
+> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0cf3 ProdID=0036 Rev= 0.02
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> 
+> Cc: <stable@vger.kernel.org>
+> Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> Signed-off-by: Ming Lei <ming.lei@canonical.com>
 > ---
->  client/agent.c   | 59 +++++++++++++++++++++++++++++++++++++++++++++-----------
->  client/display.h |  2 +-
->  client/main.c    | 13 ++++++++-----
->  3 files changed, 57 insertions(+), 17 deletions(-)
-> 
-> diff --git a/client/agent.c b/client/agent.c
-> index b0ac2f8..fa8b1b2 100644
-> --- a/client/agent.c
-> +++ b/client/agent.c
-> @@ -26,6 +26,7 @@
->  #endif
->  
->  #include <stdio.h>
-> +#include <stdlib.h>
->  #include <readline/readline.h>
->  #include <gdbus.h>
->  
-> @@ -35,9 +36,47 @@
->  #define AGENT_PATH "/org/bluez/agent"
->  #define AGENT_INTERFACE "org.bluez.Agent1"
->  
-> +#define AGENT_PROMPT	COLOR_RED "[agent]" COLOR_OFF " "
-> +
->  static gboolean agent_registered = FALSE;
->  static const char *agent_capability = NULL;
->  static DBusMessage *pending_message = NULL;
-> +static char *agent_saved_prompt = NULL;
-> +static int agent_saved_point = 0;
-> +
-> +static void rl_agent_prompt(const char* msg)
+>  drivers/bluetooth/ath3k.c |    2 ++
+>  drivers/bluetooth/btusb.c |    1 +
+>  2 files changed, 3 insertions(+)
 
-I don't like much using the "rl" prefix for local functions, it may confuse
-more than help.
+This patch need to be rebased against the bluetooth.git tree[1], I recently
+applied a similar patch there and your patch now breaks when I try to apply
+it.
 
-> +{
-> +	char *prompt;
-> +
-> +	/* Normal use should not prompt for user input to the agent a second
-> +	 * time before it releases the prompt, but we take a safe action. */
-> +	if (agent_saved_prompt)
-> +		return;
-> +
-> +	agent_saved_point = rl_point;
-> +	agent_saved_prompt = g_strdup(rl_prompt);
-> +
-> +	prompt = g_strdup_printf(AGENT_PROMPT "%s", msg);
-> +	rl_set_prompt(prompt);
-> +	g_free(prompt);
+[1] http://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth.git
 
-I would add an empty line here, don't know if it makes sense in the context of
-readline, but at least the code reads better.
-
-> +	rl_replace_line("", 0);
-> +	rl_redisplay();
-> +}
-> +
-> +static void rl_agent_release_prompt(void)
-
-Same argument about the "rl" prefix.
-
-> +{
-> +	if (!agent_saved_prompt)
-> +		return;
-> +
-> +	/* This will cause rl_expand_prompt to re-run over the last prompt, but
-> +	 * our prompt doesn't expand anyway. */
-> +	rl_set_prompt(agent_saved_prompt);
-> +	rl_replace_line("", 0);
-> +	rl_point = agent_saved_point;
-> +	rl_redisplay();
-> +	g_free(agent_saved_prompt);
-> +	agent_saved_prompt = NULL;
-
-Again, if it makes sense, some empty lines may help readability.
-
-> +}
->  
->  dbus_bool_t agent_completion(void)
->  {
-> @@ -69,11 +108,11 @@ dbus_bool_t agent_input(DBusConnection *conn, const char *input)
->  {
->  	const char *member;
->  
-> -	rl_clear_message();
-> -
->  	if (!pending_message)
->  		return FALSE;
->  
-> +	rl_agent_release_prompt();
-> +
->  	member = dbus_message_get_member(pending_message);
->  
->  	if (!strcmp(member, "RequestPinCode"))
-> @@ -97,9 +136,6 @@ dbus_bool_t agent_input(DBusConnection *conn, const char *input)
->  static DBusMessage *release_agent(DBusConnection *conn,
->  					DBusMessage *msg, void *user_data)
->  {
-> -	if (pending_message)
-> -		rl_clear_message();
-> -
->  	agent_registered = FALSE;
->  	agent_capability = NULL;
->  
-> @@ -110,6 +146,8 @@ static DBusMessage *release_agent(DBusConnection *conn,
->  		pending_message = NULL;
->  	}
->  
-> +	rl_agent_release_prompt();
-> +
->  	g_dbus_unregister_interface(conn, AGENT_PATH, AGENT_INTERFACE);
->  
->  	return dbus_message_new_method_return(msg);
-> @@ -125,7 +163,7 @@ static DBusMessage *request_pincode(DBusConnection *conn,
->  	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
->  							DBUS_TYPE_INVALID);
->  
-> -	rl_message("Enter PIN code: ");
-> +	rl_agent_prompt("Enter PIN code: ");
->  
->  	pending_message = dbus_message_ref(msg);
->  
-> @@ -145,7 +183,7 @@ static DBusMessage *request_confirmation(DBusConnection *conn,
->  				DBUS_TYPE_UINT32, &passkey, DBUS_TYPE_INVALID);
->  
->  	str = g_strdup_printf("Confirm passkey %06u (yes/no): ", passkey);
-> -	rl_message(str);
-> +	rl_agent_prompt(str);
->  	g_free(str);
->  
->  	pending_message = dbus_message_ref(msg);
-> @@ -163,7 +201,7 @@ static DBusMessage *request_authorization(DBusConnection *conn,
->  	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
->  							DBUS_TYPE_INVALID);
->  
-> -	rl_message("Accept pairing (yes/no): ");
-> +	rl_agent_prompt("Accept pairing (yes/no): ");
->  
->  	pending_message = dbus_message_ref(msg);
->  
-> @@ -182,7 +220,7 @@ static DBusMessage *authorize_service(DBusConnection *conn,
->  				DBUS_TYPE_STRING, &uuid, DBUS_TYPE_INVALID);
->  
->  	str = g_strdup_printf("Authorize service %s (yes/no): ", uuid);
-> -	rl_message(str);
-> +	rl_agent_prompt(str);
->  	g_free(str);
->  
->  	pending_message = dbus_message_ref(msg);
-> @@ -193,10 +231,9 @@ static DBusMessage *authorize_service(DBusConnection *conn,
->  static DBusMessage *cancel_request(DBusConnection *conn,
->  					DBusMessage *msg, void *user_data)
->  {
-> -	rl_clear_message();
-> -
->  	rl_printf("Request canceled\n");
->  
-> +	rl_agent_release_prompt();
->  	dbus_message_unref(pending_message);
->  	pending_message = NULL;
->  
-> diff --git a/client/display.h b/client/display.h
-> index 9cb891a..957bdc6 100644
-> --- a/client/display.h
-> +++ b/client/display.h
-> @@ -25,6 +25,6 @@
->  #define COLOR_RED	"\x1B[0;91m"
->  #define COLOR_GREEN	"\x1B[0;92m"
->  #define COLOR_YELLOW	"\x1B[0;93m"
-> -#define COLOR_BLUE	"\x1B[0;34m"
-> +#define COLOR_BLUE	"\x1B[0;94m"
->  
->  void rl_printf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
-> diff --git a/client/main.c b/client/main.c
-> index d8547c0..704cf46 100644
-> --- a/client/main.c
-> +++ b/client/main.c
-> @@ -46,6 +46,9 @@
->  #define COLORED_CHG	COLOR_YELLOW "CHG" COLOR_OFF
->  #define COLORED_DEL	COLOR_RED "DEL" COLOR_OFF
->  
-> +#define PROMPT_ON	COLOR_BLUE "[bluetooth]" COLOR_OFF "# "
-> +#define PROMPT_OFF	"[bluetooth]# "
-> +
->  static GMainLoop *main_loop;
->  static DBusConnection *dbus_conn;
->  
-> @@ -63,7 +66,7 @@ static void proxy_leak(gpointer data)
->  
->  static void connect_handler(DBusConnection *connection, void *user_data)
->  {
-> -	rl_set_prompt(COLOR_BLUE "[bluetooth]" COLOR_OFF "# ");
-> +	rl_set_prompt(PROMPT_ON);
->  	printf("\r");
->  	rl_on_new_line();
->  	rl_redisplay();
-> @@ -71,7 +74,7 @@ static void connect_handler(DBusConnection *connection, void *user_data)
->  
->  static void disconnect_handler(DBusConnection *connection, void *user_data)
->  {
-> -	rl_set_prompt("[bluetooth]# ");
-> +	rl_set_prompt(PROMPT_OFF);
->  	printf("\r");
->  	rl_on_new_line();
->  	rl_redisplay();
-> @@ -1283,11 +1286,11 @@ int main(int argc, char *argv[])
->  	rl_erase_empty_line = 1;
->  	rl_callback_handler_install(NULL, rl_handler);
->  
-> -	rl_set_prompt("[bluetooth]# ");
-> +	rl_set_prompt(PROMPT_OFF);
->  	rl_redisplay();
->  
-> -        input = setup_standard_input();
-> -        signal = setup_signalfd();
-> +	input = setup_standard_input();
-> +	signal = setup_signalfd();
->  	client = g_dbus_client_new(dbus_conn, "org.bluez", "/org/bluez");
->  
->  	g_dbus_client_set_connect_watch(client, connect_handler, NULL);
-> -- 
-> 1.8.1.3
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Cheers,
--- 
-Vinicius
+	Gustavo
