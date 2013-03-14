@@ -1,31 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20130314200055.GE2649@samus>
+Date: Thu, 14 Mar 2013 17:00:55 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Alex Deymo <deymo@chromium.org>
+Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org,
+	marcel@holtmann.org
+Subject: Re: [PATCH 3/6] "agent" command capability argument and
+ autocompletion
+Message-ID: <20130314200055.GE2649@samus>
 References: <1363285326-20089-1-git-send-email-deymo@chromium.org>
- <1363285326-20089-4-git-send-email-deymo@chromium.org> <20130314200055.GE2649@samus>
-From: Alex Deymo <deymo@chromium.org>
-Date: Thu, 14 Mar 2013 13:32:27 -0700
-Message-ID: <CAGd9gwjK_9pJ2ooRT2NLDRxwk4mToZ3cPxEjPj1mz8n0P_52Aw@mail.gmail.com>
-Subject: Re: [PATCH 3/6] "agent" command capability argument and autocompletion
-To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org, marcel@holtmann.org
-Content-Type: text/plain; charset=ISO-8859-1
+ <1363285326-20089-4-git-send-email-deymo@chromium.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1363285326-20089-4-git-send-email-deymo@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks for the comments.
-agent_capability_options[] was intended to be use in
-parse_argument_agent(), but I finally reused agent_arguments[] since
-the two extra cases (on, off) are handled before. I'll fix this (and
-the indentation thing).
+Hi Alex,
 
-> > +     if (!arg || !strlen(arg)) {
-> Even if it's not strictly enforced, in userspace code there's a tendency to
-> use explicit checks for NULL and 0.
->
-> This also applies for the strcmp()'s that are done just bellow.
+Sorry for the double post.
 
-I'm not sure if I properly understand this comment. If arg is NULL it
-will fall in the first return FALSE, not calling any strcmp() because
-of the lazy or operator, right?
+On 11:22 Thu 14 Mar, Alex Deymo wrote:
+> This patch enables argument autocompletion for the agent command with the
+> list of capabilities an agent can have, adding also "on" (for the default "")
+> and "off". The command passes the argument (parsing and verifying it) to the
+> dbus method call.
+> ---
+>  client/main.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 79 insertions(+), 3 deletions(-)
+> 
+> diff --git a/client/main.c b/client/main.c
+> index 704cf46..12b08b5 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -59,6 +59,27 @@ static GDBusProxy *default_ctrl;
+>  static GList *ctrl_list;
+>  static GList *dev_list;
+>  
+> +static const char* agent_arguments[] = {
+> +	"on",
+> +	"off",
+> +	"DisplayOnly",
+> +	"DisplayYesNo",
+> +	"KeyboardDisplay",
+> +	"KeyboardOnly",
+> +	"NoInputNoOutput",
+> +	NULL
+> +};
+> +
+> +static const char* agent_capability_options[] = {
 
-Alex.
+Neither I (nor my compiler) could find any usages of this ;-)
+
+> +	"", /* default */
+> +	"DisplayOnly",
+> +	"DisplayYesNo",
+> +	"KeyboardDisplay",
+> +	"KeyboardOnly",
+> +	"NoInputNoOutput",
+> +	NULL
+> +};
+> +
+
+[snip]
+
+
+Cheers,
+-- 
+Vinicius
