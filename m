@@ -1,64 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.2 \(1499\))
-Subject: Re: [PATCH v4 00/26] Bluetooth: Management interface fixes
+Subject: Re: [PATCH v4 07/26] Bluetooth: Add a define for the HCI persistent flags mask
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1363198337-3896-1-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 15 Mar 2013 13:29:24 -0700
+In-Reply-To: <1363198337-3896-8-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 15 Mar 2013 13:23:46 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <434BC258-2159-417A-80B5-077E8D0979F3@holtmann.org>
-References: <1363198337-3896-1-git-send-email-johan.hedberg@gmail.com>
+Message-Id: <035D9C11-5F66-4584-AB2C-86DA558E2A2E@holtmann.org>
+References: <1363198337-3896-1-git-send-email-johan.hedberg@gmail.com> <1363198337-3896-8-git-send-email-johan.hedberg@gmail.com>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> I'm sending all 26 patches I had pending in my local tree, as requested
-> by Marcel. The first six in this set are identical to my patch set
-> titled "[PATCH v3 0/6] Bluetooth: HCI command synchronisation fixes".
+> We'll need to use this mask also when powering off the HCI device
+> so it's better to have this in a single and visible place.
 > 
-> Johan
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> include/net/bluetooth/hci.h |    5 +++++
+> net/bluetooth/hci_event.c   |    2 +-
+> 2 files changed, 6 insertions(+), 1 deletion(-)
 > 
-> ----------------------------------------------------------------
-> Johan Hedberg (26):
->      Bluetooth: Move power on HCI command updates to their own function
->      Bluetooth: Update mgmt powered HCI commands to use async requests
->      Bluetooth: Wait for HCI command completion with mgmt_set_powered
->      Bluetooth: Fix busy condition testing for EIR and class updates
->      Bluetooth: Fix UUID/class mgmt command response synchronization
->      Bluetooth: Remove useless HCI_PENDING_CLASS flag
->      Bluetooth: Add a define for the HCI persistent flags mask
->      Bluetooth: Clear non-persistent flags when closing HCI device
->      Bluetooth: Fix clearing flags on power off before notifying mgmt
->      Bluetooth: Fix waiting for EIR update when setting local name
->      Bluetooth: Handle AD updating through an async request
->      Bluetooth: Fix local name setting for LE-only controllers
->      Bluetooth: Fix setting local name to the existing value
->      Bluetooth: Use an async request for mgmt_set_connectable
->      Bluetooth: Fix fast connectable response sending
->      Bluetooth: Limit fast connectable support to >= 1.2 controllers
->      Bluetooth: Fix error response for simultaneous fast connectable commands
->      Bluetooth: Add proper flag for fast connectable mode
->      Bluetooth: Refactor fast connectable HCI commands
->      Bluetooth: Disable fast connectable when disabling connectable
->      Bluetooth: Add reading of page scan parameters
->      Bluetooth: Update page scan parameters after successful write commands
->      Bluetooth: Fix updating page scan parameters when not necessary
->      Bluetooth: Fix fast connectable state when enabling page scan
->      Bluetooth: Simplify address parameters of user_pairing_resp()
->      Bluetooth: Fix PIN/Confirm/Passkey response parameters
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 1e723c7..a09d5e9 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -122,6 +122,11 @@ enum {
+> 	HCI_PERIODIC_INQ,
+> };
 > 
-> include/net/bluetooth/hci.h      |   21 +-
-> include/net/bluetooth/hci_core.h |    8 +-
-> net/bluetooth/hci_core.c         |   42 ++-
-> net/bluetooth/hci_event.c        |   97 +++++-
-> net/bluetooth/mgmt.c             |  680 ++++++++++++++++++++++++++------------
-> 5 files changed, 599 insertions(+), 249 deletions(-)
+> +/* A mask for the flags that are supposed to remain when a reset happens
+> + * or the HCI device is closed.
+> + */
+> +#define HCI_PERSISTENT_MASK ~(BIT(HCI_LE_SCAN) | BIT(HCI_PERIODIC_INQ))
+> +
 
-besides my one comment about the mask clearing, I did not see anything obvious. So this patch set is fine with me.
+didn't we agree and getting this fixed and moving the ~ to the actual call.
 
-However as we discussed there are cleanups to be done in some areas after this gets merged.
+> /* HCI ioctl defines */
+> #define HCIDEVUP	_IOW('H', 201, int)
+> #define HCIDEVDOWN	_IOW('H', 202, int)
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 5f2d008..ec24d9a 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -194,7 +194,7 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
+> 	clear_bit(HCI_RESET, &hdev->flags);
+> 
+> 	/* Reset all non-persistent flags */
+> -	hdev->dev_flags &= ~(BIT(HCI_LE_SCAN) | BIT(HCI_PERIODIC_INQ));
+> +	hdev->dev_flags &= HCI_PERSISTENT_MASK;
+
+So this should be &= ~HCI_PERSISTENT_MASK
 
 Regards
 
