@@ -1,28 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1363198337-3896-1-git-send-email-johan.hedberg@gmail.com>
-References: <1363198337-3896-1-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 15 Mar 2013 16:09:02 -0700
-Message-ID: <CAHZ1yCkPqiDoJCJ8_5-aReT2UDLYm6-yS=8P7Nwt3UM8WeifHA@mail.gmail.com>
-Subject: Re: [PATCH v4 00/26] Bluetooth: Management interface fixes
-From: Scott James Remnant <keybuk@google.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v5 23/26] Bluetooth: Fix updating page scan parameters when not necessary
+Date: Fri, 15 Mar 2013 17:07:13 -0500
+Message-Id: <1363385236-25704-24-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1363385236-25704-1-git-send-email-johan.hedberg@gmail.com>
+References: <1363385236-25704-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Mar 13, 2013 at 11:11 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> I'm sending all 26 patches I had pending in my local tree, as requested
-> by Marcel. The first six in this set are identical to my patch set
-> titled "[PATCH v3 0/6] Bluetooth: HCI command synchronisation fixes".
->
+Now that the current page scan parameters are stored in struct hci_dev
+we should check against those values before sending new HCI commands to
+change them.
 
-Which version of BlueZ are these intended to be used with?
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/mgmt.c |   10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-Thanks,
-
-Scott
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 98f6295..7783b8d 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1002,6 +1002,7 @@ failed:
+ 
+ static void write_fast_connectable(struct hci_request *req, bool enable)
+ {
++	struct hci_dev *hdev = req->hdev;
+ 	struct hci_cp_write_page_scan_activity acp;
+ 	u8 type;
+ 
+@@ -1019,8 +1020,13 @@ static void write_fast_connectable(struct hci_request *req, bool enable)
+ 
+ 	acp.window = __constant_cpu_to_le16(0x0012);
+ 
+-	hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_ACTIVITY, sizeof(acp), &acp);
+-	hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
++	if (__cpu_to_le16(hdev->page_scan_interval) != acp.interval ||
++	    __cpu_to_le16(hdev->page_scan_window) != acp.window)
++		hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_ACTIVITY,
++			    sizeof(acp), &acp);
++
++	if (hdev->page_scan_type != type)
++		hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
+ }
+ 
+ static void set_connectable_complete(struct hci_dev *hdev, u8 status)
 -- 
-Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
+1.7.10.4
+
