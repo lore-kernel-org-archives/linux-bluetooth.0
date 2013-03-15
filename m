@@ -1,30 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20130314185320.GB11466@joana>
-References: <1363159863-10325-1-git-send-email-ming.lei@canonical.com>
-	<20130314185320.GB11466@joana>
-Date: Fri, 15 Mar 2013 11:02:49 +0800
-Message-ID: <CACVXFVMJ+C6OynA69OwOXQAP9y5Cy07RcDzb6t92bNP=TCQv3Q@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Add support for Dell[QCA 0cf3:0036]
 From: Ming Lei <ming.lei@canonical.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	Ming Lei <ming.lei@canonical.com>,
-	linux-bluetooth@vger.kernel.org, stable@vger.kernel.org,
+To: linux-bluetooth@vger.kernel.org
+Cc: Ming Lei <ming.lei@canonical.com>, <stable@vger.kernel.org>,
 	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: [PATCH v1] Bluetooth: Add support for Dell[QCA 0cf3:0036]
+Date: Fri, 15 Mar 2013 11:00:39 +0800
+Message-Id: <1363316439-21927-1-git-send-email-ming.lei@canonical.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Add support for the AR9462 chip
 
-On Fri, Mar 15, 2013 at 2:53 AM, Gustavo Padovan <gustavo@padovan.org> wrote:
->
-> This patch need to be rebased against the bluetooth.git tree[1], I recently
-> applied a similar patch there and your patch now breaks when I try to apply
-> it.
+T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0cf3 ProdID=0036 Rev= 0.02
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
-V1 has been rebased against the bluetooth git tree and sent out.
+Cc: <stable@vger.kernel.org>
+Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Signed-off-by: Ming Lei <ming.lei@canonical.com>
+---
+v1:
+	- rebase on latest bluetooth tree 
 
-Thanks,
---
-Ming Lei
+ drivers/bluetooth/ath3k.c |    2 ++
+ drivers/bluetooth/btusb.c |    1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index b282af1..2f918fc 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -73,6 +73,7 @@ static struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x03F0, 0x311D) },
+ 
+ 	/* Atheros AR3012 with sflash firmware*/
++	{ USB_DEVICE(0x0CF3, 0x0036) },
+ 	{ USB_DEVICE(0x0CF3, 0x3004) },
+ 	{ USB_DEVICE(0x0CF3, 0x3008) },
+ 	{ USB_DEVICE(0x0CF3, 0x311D) },
+@@ -107,6 +108,7 @@ MODULE_DEVICE_TABLE(usb, ath3k_table);
+ static struct usb_device_id ath3k_blist_tbl[] = {
+ 
+ 	/* Atheros AR3012 with sflash firmware*/
++	{ USB_DEVICE(0x0CF3, 0x0036), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x3008), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x311D), .driver_info = BTUSB_ATH3012 },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index e547851..11ac303 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -131,6 +131,7 @@ static struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
+ 
+ 	/* Atheros 3012 with sflash firmware */
++	{ USB_DEVICE(0x0cf3, 0x0036), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x3008), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x311d), .driver_info = BTUSB_ATH3012 },
+-- 
+1.7.9.5
+
