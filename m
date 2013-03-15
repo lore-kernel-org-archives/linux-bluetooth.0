@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 19/26] Bluetooth: Refactor fast connectable HCI commands
-Date: Fri, 15 Mar 2013 17:07:09 -0500
-Message-Id: <1363385236-25704-20-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v5 18/26] Bluetooth: Add proper flag for fast connectable mode
+Date: Fri, 15 Mar 2013 17:07:08 -0500
+Message-Id: <1363385236-25704-19-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1363385236-25704-1-git-send-email-johan.hedberg@gmail.com>
 References: <1363385236-25704-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,94 +11,79 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch refactors the fast connectable HCI commands into their own
-HCI function. This is necessary so that the same function can be reused
-fo the fast connectable change required by disabling the connectable
-setting.
+In order to be able to represent fast connectable mode in the mgmt
+settings we need to have a HCI dev flag for it. This patch adds the flag
+and makes sure its value is changed whenever a mgmt_set_fast_connectable
+command completes.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c |   43 ++++++++++++++++++++++++-------------------
- 1 file changed, 24 insertions(+), 19 deletions(-)
+ include/net/bluetooth/hci.h |    4 +++-
+ net/bluetooth/mgmt.c        |   16 ++++++++++++++++
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 1e40222..b854506 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -120,12 +120,14 @@ enum {
+ 	HCI_DISCOVERABLE,
+ 	HCI_LINK_SECURITY,
+ 	HCI_PERIODIC_INQ,
++	HCI_FAST_CONNECTABLE,
+ };
+ 
+ /* A mask for the flags that are supposed to remain when a reset happens
+  * or the HCI device is closed.
+  */
+-#define HCI_PERSISTENT_MASK (BIT(HCI_LE_SCAN) | BIT(HCI_PERIODIC_INQ))
++#define HCI_PERSISTENT_MASK (BIT(HCI_LE_SCAN) | BIT(HCI_PERIODIC_INQ) | \
++			      BIT(HCI_FAST_CONNECTABLE))
+ 
+ /* HCI ioctl defines */
+ #define HCIDEVUP	_IOW('H', 201, int)
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index b6a33c5..f03b10c 100644
+index e89938e0..b6a33c5 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1000,6 +1000,29 @@ failed:
- 	return err;
- }
+@@ -410,6 +410,9 @@ static u32 get_current_settings(struct hci_dev *hdev)
+ 	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
+ 		settings |= MGMT_SETTING_CONNECTABLE;
  
-+static void write_fast_connectable(struct hci_request *req, bool enable)
-+{
-+	struct hci_cp_write_page_scan_activity acp;
-+	u8 type;
++	if (test_bit(HCI_FAST_CONNECTABLE, &hdev->dev_flags))
++		settings |= MGMT_SETTING_FAST_CONNECTABLE;
 +
-+	if (enable) {
-+		type = PAGE_SCAN_TYPE_INTERLACED;
-+
-+		/* 160 msec page scan interval */
-+		acp.interval = __constant_cpu_to_le16(0x0100);
-+	} else {
-+		type = PAGE_SCAN_TYPE_STANDARD;	/* default */
-+
-+		/* default 1.28 sec page scan */
-+		acp.interval = __constant_cpu_to_le16(0x0800);
-+	}
-+
-+	acp.window = __constant_cpu_to_le16(0x0012);
-+
-+	hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_ACTIVITY, sizeof(acp), &acp);
-+	hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
-+}
-+
- static void set_connectable_complete(struct hci_dev *hdev, u8 status)
- {
- 	struct pending_cmd *cmd;
-@@ -2937,10 +2960,8 @@ static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
- 				void *data, u16 len)
- {
- 	struct mgmt_mode *cp = data;
--	struct hci_cp_write_page_scan_activity acp;
- 	struct pending_cmd *cmd;
- 	struct hci_request req;
--	u8 type;
- 	int err;
+ 	if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
+ 		settings |= MGMT_SETTING_DISCOVERABLE;
  
- 	BT_DBG("%s", hdev->name);
-@@ -2975,21 +2996,6 @@ static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
+@@ -2913,6 +2916,13 @@ static void fast_connectable_complete(struct hci_dev *hdev, u8 status)
+ 		cmd_status(cmd->sk, hdev->id, MGMT_OP_SET_FAST_CONNECTABLE,
+ 			   mgmt_status(status));
+ 	} else {
++		struct mgmt_mode *cp = cmd->param;
++
++		if (cp->val)
++			set_bit(HCI_FAST_CONNECTABLE, &hdev->dev_flags);
++		else
++			clear_bit(HCI_FAST_CONNECTABLE, &hdev->dev_flags);
++
+ 		send_settings_rsp(cmd->sk, MGMT_OP_SET_FAST_CONNECTABLE, hdev);
+ 		new_settings(hdev, cmd->sk);
+ 	}
+@@ -2959,6 +2969,12 @@ static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
  		goto unlock;
  	}
  
--	if (cp->val) {
--		type = PAGE_SCAN_TYPE_INTERLACED;
--
--		/* 160 msec page scan interval */
--		acp.interval = __constant_cpu_to_le16(0x0100);
--	} else {
--		type = PAGE_SCAN_TYPE_STANDARD;	/* default */
--
--		/* default 1.28 sec page scan */
--		acp.interval = __constant_cpu_to_le16(0x0800);
--	}
--
--	/* default 11.25 msec page scan window */
--	acp.window = __constant_cpu_to_le16(0x0012);
--
- 	cmd = mgmt_pending_add(sk, MGMT_OP_SET_FAST_CONNECTABLE, hdev,
- 			       data, len);
- 	if (!cmd) {
-@@ -2999,8 +3005,7 @@ static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
++	if (!!cp->val == test_bit(HCI_FAST_CONNECTABLE, &hdev->dev_flags)) {
++		err = send_settings_rsp(sk, MGMT_OP_SET_FAST_CONNECTABLE,
++					hdev);
++		goto unlock;
++	}
++
+ 	if (cp->val) {
+ 		type = PAGE_SCAN_TYPE_INTERLACED;
  
- 	hci_req_init(&req, hdev);
- 
--	hci_req_add(&req, HCI_OP_WRITE_PAGE_SCAN_ACTIVITY, sizeof(acp), &acp);
--	hci_req_add(&req, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
-+	write_fast_connectable(&req, cp->val);
- 
- 	err = hci_req_run(&req, fast_connectable_complete);
- 	if (err < 0) {
 -- 
 1.7.10.4
 
