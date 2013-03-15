@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 25/26] Bluetooth: Simplify address parameters of user_pairing_resp()
-Date: Fri, 15 Mar 2013 17:07:15 -0500
-Message-Id: <1363385236-25704-26-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v5 24/26] Bluetooth: Fix fast connectable state when enabling page scan
+Date: Fri, 15 Mar 2013 17:07:14 -0500
+Message-Id: <1363385236-25704-25-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1363385236-25704-1-git-send-email-johan.hedberg@gmail.com>
 References: <1363385236-25704-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,121 +11,61 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Instead of passing the bdaddr and bdaddr_type as separate parameters to
-user_pairing_resp it's simpler to just pass the original mgmt_addr_info
-struct which contains both values.
+When powering on or enabling page scan we need to ensure that the page
+scan parameters are as they should be. This is because some controllers
+do not properly reset these values upon HCI_Reset. Since the
+write_scan_parameters function is now called from several new places it
+also checks for the >= 1.2 HCI version requirement before sending the
+commands.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c |   27 ++++++++++++++-------------
- 1 file changed, 14 insertions(+), 13 deletions(-)
+ net/bluetooth/mgmt.c |   17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 75c9d92..8587229 100644
+index 7783b8d..75c9d92 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -2300,7 +2300,7 @@ unlock:
- }
+@@ -1006,6 +1006,9 @@ static void write_fast_connectable(struct hci_request *req, bool enable)
+ 	struct hci_cp_write_page_scan_activity acp;
+ 	u8 type;
  
- static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
--			     bdaddr_t *bdaddr, u8 type, u16 mgmt_op,
-+			     struct mgmt_addr_info *addr, u16 mgmt_op,
- 			     u16 hci_op, __le32 passkey)
- {
- 	struct pending_cmd *cmd;
-@@ -2315,10 +2315,10 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
- 		goto done;
- 	}
++	if (hdev->hci_ver < BLUETOOTH_VER_1_2)
++		return;
++
+ 	if (enable) {
+ 		type = PAGE_SCAN_TYPE_INTERLACED;
  
--	if (type == BDADDR_BREDR)
--		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, bdaddr);
-+	if (addr->type == BDADDR_BREDR)
-+		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &addr->bdaddr);
- 	else
--		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, bdaddr);
-+		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &addr->bdaddr);
+@@ -1125,7 +1128,13 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
  
- 	if (!conn) {
- 		err = cmd_status(sk, hdev->id, mgmt_op,
-@@ -2326,7 +2326,7 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
- 		goto done;
- 	}
+ 	hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
  
--	if (type == BDADDR_LE_PUBLIC || type == BDADDR_LE_RANDOM) {
-+	if (addr->type == BDADDR_LE_PUBLIC || addr->type == BDADDR_LE_RANDOM) {
- 		/* Continue with pairing via SMP */
- 		err = smp_user_confirm_reply(conn, mgmt_op, passkey);
+-	if (!cp->val && test_bit(HCI_FAST_CONNECTABLE, &hdev->dev_flags))
++	/* If we're going from non-connectable to connectable or
++	 * vice-versa when fast connectable is enabled ensure that fast
++	 * connectable gets disabled. write_fast_connectable won't do
++	 * anything if the page scan parameters are already what they
++	 * should be.
++	 */
++	if (cp->val || test_bit(HCI_FAST_CONNECTABLE, &hdev->dev_flags))
+ 		write_fast_connectable(&req, false);
  
-@@ -2340,7 +2340,7 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
- 		goto done;
- 	}
+ 	err = hci_req_run(&req, set_connectable_complete);
+@@ -3287,6 +3296,12 @@ static void set_bredr_scan(struct hci_request *req)
+ 	struct hci_dev *hdev = req->hdev;
+ 	u8 scan = 0;
  
--	cmd = mgmt_pending_add(sk, mgmt_op, hdev, bdaddr, sizeof(*bdaddr));
-+	cmd = mgmt_pending_add(sk, mgmt_op, hdev, addr, sizeof(*addr));
- 	if (!cmd) {
- 		err = -ENOMEM;
- 		goto done;
-@@ -2350,11 +2350,12 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
- 	if (hci_op == HCI_OP_USER_PASSKEY_REPLY) {
- 		struct hci_cp_user_passkey_reply cp;
- 
--		bacpy(&cp.bdaddr, bdaddr);
-+		bacpy(&cp.bdaddr, &addr->bdaddr);
- 		cp.passkey = passkey;
- 		err = hci_send_cmd(hdev, hci_op, sizeof(cp), &cp);
- 	} else
--		err = hci_send_cmd(hdev, hci_op, sizeof(*bdaddr), bdaddr);
-+		err = hci_send_cmd(hdev, hci_op, sizeof(addr->bdaddr),
-+				   &addr->bdaddr);
- 
- 	if (err < 0)
- 		mgmt_pending_remove(cmd);
-@@ -2371,7 +2372,7 @@ static int pin_code_neg_reply(struct sock *sk, struct hci_dev *hdev,
- 
- 	BT_DBG("");
- 
--	return user_pairing_resp(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
-+	return user_pairing_resp(sk, hdev, &cp->addr,
- 				MGMT_OP_PIN_CODE_NEG_REPLY,
- 				HCI_OP_PIN_CODE_NEG_REPLY, 0);
- }
-@@ -2387,7 +2388,7 @@ static int user_confirm_reply(struct sock *sk, struct hci_dev *hdev, void *data,
- 		return cmd_status(sk, hdev->id, MGMT_OP_USER_CONFIRM_REPLY,
- 				  MGMT_STATUS_INVALID_PARAMS);
- 
--	return user_pairing_resp(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
-+	return user_pairing_resp(sk, hdev, &cp->addr,
- 				 MGMT_OP_USER_CONFIRM_REPLY,
- 				 HCI_OP_USER_CONFIRM_REPLY, 0);
- }
-@@ -2399,7 +2400,7 @@ static int user_confirm_neg_reply(struct sock *sk, struct hci_dev *hdev,
- 
- 	BT_DBG("");
- 
--	return user_pairing_resp(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
-+	return user_pairing_resp(sk, hdev, &cp->addr,
- 				 MGMT_OP_USER_CONFIRM_NEG_REPLY,
- 				 HCI_OP_USER_CONFIRM_NEG_REPLY, 0);
- }
-@@ -2411,7 +2412,7 @@ static int user_passkey_reply(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	BT_DBG("");
- 
--	return user_pairing_resp(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
-+	return user_pairing_resp(sk, hdev, &cp->addr,
- 				 MGMT_OP_USER_PASSKEY_REPLY,
- 				 HCI_OP_USER_PASSKEY_REPLY, cp->passkey);
- }
-@@ -2423,7 +2424,7 @@ static int user_passkey_neg_reply(struct sock *sk, struct hci_dev *hdev,
- 
- 	BT_DBG("");
- 
--	return user_pairing_resp(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
-+	return user_pairing_resp(sk, hdev, &cp->addr,
- 				 MGMT_OP_USER_PASSKEY_NEG_REPLY,
- 				 HCI_OP_USER_PASSKEY_NEG_REPLY, 0);
- }
++	/* Ensure that fast connectable is disabled. This function will
++	 * not do anything if the page scan parameters are already what
++	 * they should be.
++	 */
++	write_fast_connectable(req, false);
++
+ 	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
+ 		scan |= SCAN_PAGE;
+ 	if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
 -- 
 1.7.10.4
 
