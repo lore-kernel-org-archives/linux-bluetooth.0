@@ -1,40 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5143228B.1000405@kamens.us>
-Date: Fri, 15 Mar 2013 09:30:51 -0400
-From: Jonathan Kamens <jik@kamens.us>
-MIME-Version: 1.0
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: HFP/HSP Telephony profile doesn't work with Bluetooth USB dongle
-References: <51100E6E.8070804@kamens.us> <CAJdJm_MsOBOGTBoG+Nua49DbwuXx5Pu5KRm9zMp2ma3_nhF2CQ@mail.gmail.com> <512A82B3.405@kamens.us> <CABBYNZLRZkosRo95TDGMOwfD4-QB5NgP7erT1CoWzGbdq=o-ig@mail.gmail.com> <512E15F5.4010909@kamens.us>
-In-Reply-To: <512E15F5.4010909@kamens.us>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Alex Deymo <deymo@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: keybuk@chromium.org,
+	marcel@holtmann.org,
+	Alex Deymo <deymo@chromium.org>
+Subject: [PATCH 6/6] Agent's RequestPasskey implementation
+Date: Thu, 14 Mar 2013 20:54:38 -0700
+Message-Id: <1363319678-31568-1-git-send-email-deymo@chromium.org>
+In-Reply-To: <1363285326-20089-7-git-send-email-deymo@chromium.org>
+References: <1363285326-20089-7-git-send-email-deymo@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-FYI, the folks at BlueRigger sent me BTD-300 ("Product=Broadcom Bluetooh 
-3.0 Device" in usb-devices output, as opposed to "Product=BCM20702A0" 
-for the BTD-400 that wasn't working with HSP/HFP), and it works with 
-HSP/HFP just fine.
+Implements the uint32 RequestPasskey(object device) method.
+---
+ client/agent.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-This means I've got one USB Bluetooth dongle (the BTD-300) that works 
-with the HSP/HFP profile, and two that don't (the BTD-400 and a cheap 
-Cambridge Research dongle).
-
-In the spirit of supporting open source software, I am willing to mail 
-either or both of the dongles that don't work with HSP/HFP at my expense 
-to anyone on this list who is willing to commit to (a) checking whether 
-this problem still exists with the most recent kernel and bluez code) 
-and (b) debugging and fixing it if it does. You can keep the dongles.
-
-If you are willing to commit to doing these things, send me your mailing 
-address in private email and let me know whether you want just one of 
-the dongles or both of them.
-
-Bonus points if you're willing to specifically make sure it works with 
-Fedora 19, which just went into early testing, but I won't make that a 
-hard requirement for the free dongles. :-)
-
-Thanks,
-
-Jonathan Kamens
-
+diff --git a/client/agent.c b/client/agent.c
+index 00754df..29769fd 100644
+--- a/client/agent.c
++++ b/client/agent.c
+@@ -94,6 +94,20 @@ static void pincode_response(DBusConnection *conn, const char *input)
+ 							DBUS_TYPE_INVALID);
+ }
+ 
++static void passkey_response(DBusConnection *conn, const char *input)
++{
++	dbus_uint32_t passkey;
++	if (sscanf(input, "%u", &passkey) == 1)
++		g_dbus_send_reply(conn, pending_message, DBUS_TYPE_UINT32,
++						&passkey, DBUS_TYPE_INVALID);
++	else if (!strcmp(input, "no"))
++		g_dbus_send_error(conn, pending_message,
++					"org.bluez.Error.Rejected", NULL);
++	else
++		g_dbus_send_error(conn, pending_message,
++					"org.bluez.Error.Canceled", NULL);
++}
++
+ static void confirm_response(DBusConnection *conn, const char *input)
+ {
+ 	if (!strcmp(input, "yes"))
+@@ -119,6 +133,8 @@ dbus_bool_t agent_input(DBusConnection *conn, const char *input)
+ 
+ 	if (!strcmp(member, "RequestPinCode"))
+ 		pincode_response(conn, input);
++	else if (!strcmp(member, "RequestPasskey"))
++		passkey_response(conn, input);
+ 	else if (!strcmp(member, "RequestConfirmation"))
+ 		confirm_response(conn, input);
+ 	else if (!strcmp(member, "RequestAuthorization"))
+@@ -186,6 +202,23 @@ static DBusMessage *display_pincode(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
++static DBusMessage *request_passkey(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
++{
++	const char *device;
++
++	rl_printf("Request passkey\n");
++
++	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
++							DBUS_TYPE_INVALID);
++
++	agent_prompt("Enter passkey (number in 0-999999): ");
++
++	pending_message = dbus_message_ref(msg);
++
++	return NULL;
++}
++
+ static DBusMessage *display_passkey(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
+ {
+@@ -289,6 +322,9 @@ static const GDBusMethodTable methods[] = {
+ 	{ GDBUS_METHOD("DisplayPinCode",
+ 			GDBUS_ARGS({ "device", "o" }, { "pincode", "s" }),
+ 			NULL, display_pincode) },
++	{ GDBUS_ASYNC_METHOD("RequestPasskey",
++			GDBUS_ARGS({ "device", "o" }),
++			GDBUS_ARGS({ "passkey", "u" }), request_passkey) },
+ 	{ GDBUS_METHOD("DisplayPasskey",
+ 			GDBUS_ARGS({ "device", "o" }, { "passkey", "u" },
+ 							{ "entered", "q" }),
+-- 
+1.8.1.3
