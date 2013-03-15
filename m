@@ -1,144 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] audio: Track connections to AVRCP roles separately
-Date: Fri, 15 Mar 2013 13:46:30 -0300
-Message-Id: <1363365990-1901-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <5143419C.1060504@oss.bmw-carit.de>
+Date: Fri, 15 Mar 2013 16:43:24 +0100
+From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+MIME-Version: 1.0
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+ "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v3 5/8] obexd: Add RegisterNotifications function
+References: <1363014350-16114-1-git-send-email-christian.fetzer@oss.bmw-carit.de> <1363014350-16114-6-git-send-email-christian.fetzer@oss.bmw-carit.de> <72B23061-16D8-4949-AAB4-9537F6726FCB@holtmann.org> <51407D38.2080600@oss.bmw-carit.de> <440C26C3-24C4-4A9B-8527-C94C75F850E5@holtmann.org> <CABBYNZKcYCHg0oy2fr=uf0UwN8Mivi8jhfLfd4=jYjgzrwLWYQ@mail.gmail.com>
+In-Reply-To: <CABBYNZKcYCHg0oy2fr=uf0UwN8Mivi8jhfLfd4=jYjgzrwLWYQ@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Luiz,
 
-Currently the code assumes when one role connects the other must be
-connected as well which is bogus and can create problems.
----
- profiles/audio/avrcp.c   | 14 ++++++++++++++
- profiles/audio/control.c |  9 ---------
- profiles/audio/manager.c | 14 +++++++++++---
- profiles/audio/manager.h |  6 ++++--
- 4 files changed, 29 insertions(+), 14 deletions(-)
+On 03/13/2013 08:57 PM, Luiz Augusto von Dentz wrote:
+> Hi Christian,
+>
+>
+> On Wed, Mar 13, 2013 at 1:27 PM, Marcel Holtmann <marcel@holtmann.org 
+> <mailto:marcel@holtmann.org>> wrote:
+>
+>     Hi Christian,
+>
+>     >>> This allows applications to register for all different types
+>     >>> of MAP event reports.
+>     >>>
+>     >>> In response to this call, the MSE should connect to the local MNS
+>     >>> instance.
+>     >>> ---
+>     >>> doc/obex-api.txt   |  6 ++++
+>     >>> obexd/client/map.c | 86
+>     ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>     >>> 2 files changed, 92 insertions(+)
+>     >> never ever intermix doc/ changes with actual code. You really
+>     need to learn on how to split patches properly. There is no reason
+>     at all that this are not two patches.
+>     >>
+>     >>
+>     >>> diff --git a/doc/obex-api.txt b/doc/obex-api.txt
+>     >>> index 759c4d8..ef5d85e 100644
+>     >>> --- a/doc/obex-api.txt
+>     >>> +++ b/doc/obex-api.txt
+>     >>> @@ -651,6 +651,12 @@ Methods    void SetFolder(string name)
+>     >>>                     Possible errors:
+>     org.bluez.obex.Error.InvalidArguments
+>     >>>  org.bluez.obex.Error.Failed
+>     >>>
+>     >>> +           void RegisterNotifications(boolean)
+>     >>> +
+>     >>> +                   Register / unregister reception of
+>     notifications.
+>     >>> +
+>     >>> +                   Possible errors:
+>     org.bluez.obex.Error.InvalidArguments
+>     >>> +  org.bluez.obex.Error.Failed
+>
+>
+> Why we are not doing this automatically? The application can opt out 
+> by not connecting to signals, but I see no reason why not to be 
+> connected to register the notification channel automatically when 
+> connecting the MAP session if the remote support it.
+>
+> -- 
+> Luiz Augusto von Dentz
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 409cf5b..94616c0 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -2667,6 +2667,8 @@ static void session_tg_init_control(struct avrcp *session)
- 	if (session->version >= 0x0104)
- 		avrcp_register_notification(session,
- 						AVRCP_EVENT_VOLUME_CHANGED);
-+
-+	audio_remote_connected(session->dev->btd_dev, 0);
- }
- 
- static void session_ct_init_browsing(struct avrcp *session)
-@@ -2692,6 +2694,8 @@ static void session_ct_init_control(struct avrcp *session)
- 	if (session->version >= 0x0104)
- 		session->supported_events = (1 << AVRCP_EVENT_VOLUME_CHANGED);
- 
-+	audio_target_connected(session->dev->btd_dev, 0);
-+
- 	player = create_ct_player(session, 0);
- 	if (player == NULL)
- 		return;
-@@ -2726,6 +2730,11 @@ static void session_tg_destroy(struct avrcp *session)
- 	if (player != NULL)
- 		player->sessions = g_slist_remove(player->sessions, session);
- 
-+	if (session->control_id == 0)
-+		audio_remote_connected(session->dev->btd_dev, -EIO);
-+
-+	audio_remote_disconnected(session->dev->btd_dev, 0);
-+
- 	session_destroy(session);
- }
- 
-@@ -2735,6 +2744,11 @@ static void session_ct_destroy(struct avrcp *session)
- 
- 	g_slist_free_full(session->players, player_destroy);
- 
-+	if (session->control_id == 0)
-+		audio_target_connected(session->dev->btd_dev, -EIO);
-+
-+	audio_target_disconnected(session->dev->btd_dev, 0);
-+
- 	session_destroy(session);
- }
- 
-diff --git a/profiles/audio/control.c b/profiles/audio/control.c
-index 7e4ed42..6086bde 100644
---- a/profiles/audio/control.c
-+++ b/profiles/audio/control.c
-@@ -76,13 +76,6 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
- 	case AVCTP_STATE_DISCONNECTED:
- 		control->session = NULL;
- 
--		if (old_state != AVCTP_STATE_CONNECTED) {
--			audio_control_connected(dev->btd_dev, -EIO);
--			break;
--		}
--
--		audio_control_disconnected(dev->btd_dev, 0);
--
- 		g_dbus_emit_property_changed(conn, path,
- 					AUDIO_CONTROL_INTERFACE, "Connected");
- 
-@@ -95,8 +88,6 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
- 
- 		break;
- 	case AVCTP_STATE_CONNECTED:
--		audio_control_connected(dev->btd_dev, 0);
--
- 		g_dbus_emit_property_changed(conn, path,
- 					AUDIO_CONTROL_INTERFACE, "Connected");
- 		break;
-diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
-index 64665d7..b8b51d3 100644
---- a/profiles/audio/manager.c
-+++ b/profiles/audio/manager.c
-@@ -419,15 +419,23 @@ void audio_source_disconnected(struct btd_device *dev, int err)
- 	device_profile_disconnected(dev, &a2dp_source_profile, err);
- }
- 
--void audio_control_connected(struct btd_device *dev, int err)
-+void audio_target_connected(struct btd_device *dev, int err)
- {
- 	device_profile_connected(dev, &avrcp_target_profile, err);
--	device_profile_connected(dev, &avrcp_remote_profile, err);
- }
- 
--void audio_control_disconnected(struct btd_device *dev, int err)
-+void audio_target_disconnected(struct btd_device *dev, int err)
- {
- 	device_profile_disconnected(dev, &avrcp_target_profile, err);
-+}
-+
-+void audio_remote_connected(struct btd_device *dev, int err)
-+{
-+	device_profile_connected(dev, &avrcp_remote_profile, err);
-+}
-+
-+void audio_remote_disconnected(struct btd_device *dev, int err)
-+{
- 	device_profile_disconnected(dev, &avrcp_remote_profile, err);
- }
- 
-diff --git a/profiles/audio/manager.h b/profiles/audio/manager.h
-index 9e5ac94..a42b7da 100644
---- a/profiles/audio/manager.h
-+++ b/profiles/audio/manager.h
-@@ -33,8 +33,10 @@ void audio_sink_connected(struct btd_device *dev, int err);
- void audio_sink_disconnected(struct btd_device *dev, int err);
- void audio_source_connected(struct btd_device *dev, int err);
- void audio_source_disconnected(struct btd_device *dev, int err);
--void audio_control_connected(struct btd_device *dev, int err);
--void audio_control_disconnected(struct btd_device *dev, int err);
-+void audio_target_connected(struct btd_device *dev, int err);
-+void audio_target_disconnected(struct btd_device *dev, int err);
-+void audio_remote_connected(struct btd_device *dev, int err);
-+void audio_remote_disconnected(struct btd_device *dev, int err);
- 
- int audio_manager_init(GKeyFile *config);
- void audio_manager_exit(void);
--- 
-1.8.1.4
+as I tried to explain, the purpose of the function in the current patch 
+is to select the one device for that you will receive notifications.
+I agree, it would be better to hide the notification connection setup 
+and rather do it implicitly.
+That needs to go hand in hand with notification support for multiple 
+devices; with removing the function, you loose the possibility to select 
+a device.
 
+I'll send a suggestion for multiple device notification support in a 
+separate email and try to explain the relevant spec details.
+Then we can continue the discussion there.
+
+Br,
+Christian
