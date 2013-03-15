@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 14/26] Bluetooth: Use an async request for mgmt_set_connectable
-Date: Fri, 15 Mar 2013 17:07:04 -0500
-Message-Id: <1363385236-25704-15-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v5 13/26] Bluetooth: Fix setting local name to the existing value
+Date: Fri, 15 Mar 2013 17:07:03 -0500
+Message-Id: <1363385236-25704-14-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1363385236-25704-1-git-send-email-johan.hedberg@gmail.com>
 References: <1363385236-25704-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,93 +11,38 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch changes the mgmt_set_connectable handler to use an async
-request for sending the required HCI command. This is necessary
-preparation for handling the fast connectable change that needs to be
-associated with disabling the connectable setting.
+If user space attempts to set the local name to the same value that's
+already set we should simply return a direct command complete for this
+mgmt command.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c |   37 +++++++++++++++++++++++++++++--------
- 1 file changed, 29 insertions(+), 8 deletions(-)
+ net/bluetooth/mgmt.c |   11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 15305fa..a4f928d 100644
+index 28e5975..15305fa 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -996,11 +996,32 @@ failed:
- 	return err;
- }
+@@ -2408,6 +2408,17 @@ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
  
-+static void set_connectable_complete(struct hci_dev *hdev, u8 status)
-+{
-+	struct pending_cmd *cmd;
-+
-+	BT_DBG("status 0x%02x", status);
-+
-+	hci_dev_lock(hdev);
-+
-+	cmd = mgmt_pending_find(MGMT_OP_SET_CONNECTABLE, hdev);
-+	if (!cmd)
-+		goto unlock;
-+
-+	send_settings_rsp(cmd->sk, MGMT_OP_SET_CONNECTABLE, hdev);
-+
-+	mgmt_pending_remove(cmd);
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+}
-+
- static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
- 			   u16 len)
- {
- 	struct mgmt_mode *cp = data;
- 	struct pending_cmd *cmd;
-+	struct hci_request req;
- 	u8 scan;
- 	int err;
+ 	hci_dev_lock(hdev);
  
-@@ -1067,7 +1088,11 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
- 			cancel_delayed_work(&hdev->discov_off);
- 	}
- 
--	err = hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
-+	hci_req_init(&req, hdev);
++	/* If the old values are the same as the new ones just return a
++	 * direct command complete event.
++	 */
++	if (!memcmp(hdev->dev_name, cp->name, sizeof(hdev->dev_name)) &&
++	    !memcmp(hdev->short_name, cp->short_name,
++		    sizeof(hdev->short_name))) {
++		err = cmd_complete(sk, hdev->id, MGMT_OP_SET_LOCAL_NAME, 0,
++				   data, len);
++		goto failed;
++	}
 +
-+	hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
-+
-+	err = hci_req_run(&req, set_connectable_complete);
- 	if (err < 0)
- 		mgmt_pending_remove(cmd);
+ 	memcpy(hdev->short_name, cp->short_name, sizeof(hdev->short_name));
  
-@@ -3328,7 +3353,7 @@ int mgmt_discoverable(struct hci_dev *hdev, u8 discoverable)
- 
- int mgmt_connectable(struct hci_dev *hdev, u8 connectable)
- {
--	struct cmd_lookup match = { NULL, hdev };
-+	struct pending_cmd *cmd;
- 	bool changed = false;
- 	int err = 0;
- 
-@@ -3340,14 +3365,10 @@ int mgmt_connectable(struct hci_dev *hdev, u8 connectable)
- 			changed = true;
- 	}
- 
--	mgmt_pending_foreach(MGMT_OP_SET_CONNECTABLE, hdev, settings_rsp,
--			     &match);
-+	cmd = mgmt_pending_find(MGMT_OP_SET_CONNECTABLE, hdev);
- 
- 	if (changed)
--		err = new_settings(hdev, match.sk);
--
--	if (match.sk)
--		sock_put(match.sk);
-+		err = new_settings(hdev, cmd ? cmd->sk : NULL);
- 
- 	return err;
- }
+ 	if (!hdev_is_powered(hdev)) {
 -- 
 1.7.10.4
 
