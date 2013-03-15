@@ -1,83 +1,141 @@
 Return-Path: <cyrus@holtmann.org>
 From: Alex Deymo <deymo@chromium.org>
-To: vinicius.gomes@openbossa.org,
-	anderson.lizardo@openbossa.org
+To: vinicius.gomes@openbossa.org
 Cc: linux-bluetooth@vger.kernel.org,
 	keybuk@chromium.org,
 	marcel@holtmann.org,
 	Alex Deymo <deymo@chromium.org>
-Subject: [PATCH 5/6] Agent's DisplayPasskey implementation
-Date: Thu, 14 Mar 2013 20:52:07 -0700
-Message-Id: <1363319527-31454-1-git-send-email-deymo@chromium.org>
-In-Reply-To: <1363285326-20089-1-git-send-email-deymo@chromium.org>
-References: <1363285326-20089-1-git-send-email-deymo@chromium.org>
+Subject: [PATCH 3/6] "agent" command capability argument and autocompletion
+Date: Thu, 14 Mar 2013 20:47:54 -0700
+Message-Id: <1363319274-31206-1-git-send-email-deymo@chromium.org>
+In-Reply-To: <CAGd9gwico28=29MmSLbj2+JRvreH-=TYOxQWtjydiw0-bs_mOQ@mail.gmail.com>
+References: <CAGd9gwico28=29MmSLbj2+JRvreH-=TYOxQWtjydiw0-bs_mOQ@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implements the DisplayPasskey(object device, uint32 passkey, uint16 entered)
-method.
+This patch enables argument autocompletion for the agent command with the
+list of capabilities an agent can have, adding also "on" (for the default "")
+and "off". The command passes the argument (parsing and verifying it) to the
+dbus method call.
 ---
- client/agent.c   | 29 +++++++++++++++++++++++++++++
- client/display.h |  2 ++
- 2 files changed, 31 insertions(+)
+ client/main.c | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 70 insertions(+), 3 deletions(-)
 
-diff --git a/client/agent.c b/client/agent.c
-index 1414eba..00754df 100644
---- a/client/agent.c
-+++ b/client/agent.c
-@@ -186,6 +186,31 @@ static DBusMessage *display_pincode(DBusConnection *conn,
- 	return dbus_message_new_method_return(msg);
+diff --git a/client/main.c b/client/main.c
+index 704cf46..30d7aa2 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -59,6 +59,17 @@ static GDBusProxy *default_ctrl;
+ static GList *ctrl_list;
+ static GList *dev_list;
+ 
++static const char* agent_arguments[] = {
++	"on",
++	"off",
++	"DisplayOnly",
++	"DisplayYesNo",
++	"KeyboardDisplay",
++	"KeyboardOnly",
++	"NoInputNoOutput",
++	NULL
++};
++
+ static void proxy_leak(gpointer data)
+ {
+ 	printf("Leaking proxy %p\n", data);
+@@ -413,6 +424,39 @@ static gboolean parse_argument_on_off(const char *arg, dbus_bool_t *value)
+ 	return FALSE;
  }
  
-+static DBusMessage *display_passkey(DBusConnection *conn,
-+					DBusMessage *msg, void *user_data)
++static gboolean parse_argument_agent(const char *arg, dbus_bool_t *value,
++							const char **capability)
 +{
-+	const char *device;
-+	dbus_uint32_t passkey;
-+	dbus_uint16_t entered;
-+	char passkey_full[7];
++	const char **opt;
 +
-+	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
-+			DBUS_TYPE_UINT32, &passkey, DBUS_TYPE_UINT16, &entered,
-+							DBUS_TYPE_INVALID);
++	if (arg == NULL || strlen(arg) == 0) {
++		rl_printf("Missing on/off/capability argument\n");
++		return FALSE;
++	}
 +
-+	snprintf(passkey_full, sizeof(passkey_full), "%.6u", passkey);
-+	passkey_full[6] = '\0';
++	if (strcmp(arg, "on") == 0 || strcmp(arg, "yes") == 0) {
++		*value = TRUE;
++		*capability = "";
++		return TRUE;
++	}
 +
-+	if (entered > strlen(passkey_full))
-+		entered = strlen(passkey_full);
++	if (strcmp(arg, "off") == 0 || strcmp(arg, "no") == 0) {
++		*value = FALSE;
++		return TRUE;
++	}
 +
-+	rl_printf(AGENT_PROMPT "Passkey: "
-+			COLOR_BOLDGRAY "%.*s" COLOR_BOLDWHITE "%s\n" COLOR_OFF,
-+				entered, passkey_full, passkey_full + entered);
++	for (opt = agent_arguments; *opt; opt++) {
++		if (strcmp(arg, *opt) == 0) {
++			*value = TRUE;
++			*capability = *opt;
++			return TRUE;
++		}
++	}
 +
-+	return dbus_message_new_method_return(msg);
++	rl_printf("Invalid argument %s\n", arg);
++	return FALSE;
 +}
 +
- static DBusMessage *request_confirmation(DBusConnection *conn,
- 					DBusMessage *msg, void *user_data)
+ static void cmd_list(const char *arg)
  {
-@@ -264,6 +289,10 @@ static const GDBusMethodTable methods[] = {
- 	{ GDBUS_METHOD("DisplayPinCode",
- 			GDBUS_ARGS({ "device", "o" }, { "pincode", "s" }),
- 			NULL, display_pincode) },
-+	{ GDBUS_METHOD("DisplayPasskey",
-+			GDBUS_ARGS({ "device", "o" }, { "passkey", "u" },
-+							{ "entered", "q" }),
-+			NULL, display_passkey) },
- 	{ GDBUS_ASYNC_METHOD("RequestConfirmation",
- 			GDBUS_ARGS({ "device", "o" }, { "passkey", "u" }),
- 			NULL, request_confirmation) },
-diff --git a/client/display.h b/client/display.h
-index 957bdc6..91a0be9 100644
---- a/client/display.h
-+++ b/client/display.h
-@@ -26,5 +26,7 @@
- #define COLOR_GREEN	"\x1B[0;92m"
- #define COLOR_YELLOW	"\x1B[0;93m"
- #define COLOR_BLUE	"\x1B[0;94m"
-+#define COLOR_BOLDGRAY	"\x1B[1;30m"
-+#define COLOR_BOLDWHITE	"\x1B[1;37m"
+ 	GList *list;
+@@ -610,13 +654,14 @@ static void cmd_discoverable(const char *arg)
+ static void cmd_agent(const char *arg)
+ {
+ 	dbus_bool_t enable;
++	const char* capability;
  
- void rl_printf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
+-	if (parse_argument_on_off(arg, &enable) == FALSE)
++	if (parse_argument_agent(arg, &enable, &capability) == FALSE)
+ 		return;
+ 
+ 	if (enable == TRUE) {
+ 		g_free(auto_register_agent);
+-		auto_register_agent = g_strdup("");
++		auto_register_agent = g_strdup(capability);
+ 
+ 		if (agent_manager)
+ 			agent_register(dbus_conn, agent_manager,
+@@ -968,6 +1013,26 @@ static char *dev_generator(const char *text, int state)
+ 	return generic_generator(text, state, dev_list, "Address");
+ }
+ 
++static char *capability_generator(const char *text, int state)
++{
++	static int index, len;
++	const char *arg;
++
++	if (!state) {
++		index = 0;
++		len = strlen(text);
++	}
++
++	while ((arg = agent_arguments[index])) {
++		index++;
++
++		if (!strncmp(arg, text, len))
++			return strdup(arg);
++	}
++
++	return NULL;
++}
++
+ static const struct {
+ 	const char *cmd;
+ 	const char *arg;
+@@ -989,7 +1054,9 @@ static const struct {
+ 					"Set controller pairable mode" },
+ 	{ "discoverable", "<on/off>", cmd_discoverable,
+ 					"Set controller discoverable mode" },
+-	{ "agent",        "<on/off>", cmd_agent, "Enable/disable agent" },
++	{ "agent",        "<on/off/capability>", cmd_agent,
++				"Enable/disable agent with given capability",
++							capability_generator},
+ 	{ "default-agent",NULL,       cmd_default_agent },
+ 	{ "scan",         "<on/off>", cmd_scan, "Scan for devices" },
+ 	{ "info",         "<dev>",    cmd_info, "Device information",
 -- 
 1.8.1.3
