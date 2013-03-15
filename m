@@ -1,63 +1,144 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 15 Mar 2013 14:12:51 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Ming Lei <ming.lei@canonical.com>
-Cc: linux-bluetooth@vger.kernel.org, stable@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [PATCH v1] Bluetooth: Add support for Dell[QCA 0cf3:0036]
-Message-ID: <20130315171251.GA20196@joana>
-References: <1363316439-21927-1-git-send-email-ming.lei@canonical.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1363316439-21927-1-git-send-email-ming.lei@canonical.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] audio: Track connections to AVRCP roles separately
+Date: Fri, 15 Mar 2013 13:46:30 -0300
+Message-Id: <1363365990-1901-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ming,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-* Ming Lei <ming.lei@canonical.com> [2013-03-15 11:00:39 +0800]:
+Currently the code assumes when one role connects the other must be
+connected as well which is bogus and can create problems.
+---
+ profiles/audio/avrcp.c   | 14 ++++++++++++++
+ profiles/audio/control.c |  9 ---------
+ profiles/audio/manager.c | 14 +++++++++++---
+ profiles/audio/manager.h |  6 ++++--
+ 4 files changed, 29 insertions(+), 14 deletions(-)
 
-> Add support for the AR9462 chip
-> 
-> T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0cf3 ProdID=0036 Rev= 0.02
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> 
-> Cc: <stable@vger.kernel.org>
-> Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> Signed-off-by: Ming Lei <ming.lei@canonical.com>
-> ---
-> v1:
-> 	- rebase on latest bluetooth tree 
-> 
->  drivers/bluetooth/ath3k.c |    2 ++
->  drivers/bluetooth/btusb.c |    1 +
->  2 files changed, 3 insertions(+)
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 409cf5b..94616c0 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -2667,6 +2667,8 @@ static void session_tg_init_control(struct avrcp *session)
+ 	if (session->version >= 0x0104)
+ 		avrcp_register_notification(session,
+ 						AVRCP_EVENT_VOLUME_CHANGED);
++
++	audio_remote_connected(session->dev->btd_dev, 0);
+ }
+ 
+ static void session_ct_init_browsing(struct avrcp *session)
+@@ -2692,6 +2694,8 @@ static void session_ct_init_control(struct avrcp *session)
+ 	if (session->version >= 0x0104)
+ 		session->supported_events = (1 << AVRCP_EVENT_VOLUME_CHANGED);
+ 
++	audio_target_connected(session->dev->btd_dev, 0);
++
+ 	player = create_ct_player(session, 0);
+ 	if (player == NULL)
+ 		return;
+@@ -2726,6 +2730,11 @@ static void session_tg_destroy(struct avrcp *session)
+ 	if (player != NULL)
+ 		player->sessions = g_slist_remove(player->sessions, session);
+ 
++	if (session->control_id == 0)
++		audio_remote_connected(session->dev->btd_dev, -EIO);
++
++	audio_remote_disconnected(session->dev->btd_dev, 0);
++
+ 	session_destroy(session);
+ }
+ 
+@@ -2735,6 +2744,11 @@ static void session_ct_destroy(struct avrcp *session)
+ 
+ 	g_slist_free_full(session->players, player_destroy);
+ 
++	if (session->control_id == 0)
++		audio_target_connected(session->dev->btd_dev, -EIO);
++
++	audio_target_disconnected(session->dev->btd_dev, 0);
++
+ 	session_destroy(session);
+ }
+ 
+diff --git a/profiles/audio/control.c b/profiles/audio/control.c
+index 7e4ed42..6086bde 100644
+--- a/profiles/audio/control.c
++++ b/profiles/audio/control.c
+@@ -76,13 +76,6 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
+ 	case AVCTP_STATE_DISCONNECTED:
+ 		control->session = NULL;
+ 
+-		if (old_state != AVCTP_STATE_CONNECTED) {
+-			audio_control_connected(dev->btd_dev, -EIO);
+-			break;
+-		}
+-
+-		audio_control_disconnected(dev->btd_dev, 0);
+-
+ 		g_dbus_emit_property_changed(conn, path,
+ 					AUDIO_CONTROL_INTERFACE, "Connected");
+ 
+@@ -95,8 +88,6 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
+ 
+ 		break;
+ 	case AVCTP_STATE_CONNECTED:
+-		audio_control_connected(dev->btd_dev, 0);
+-
+ 		g_dbus_emit_property_changed(conn, path,
+ 					AUDIO_CONTROL_INTERFACE, "Connected");
+ 		break;
+diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
+index 64665d7..b8b51d3 100644
+--- a/profiles/audio/manager.c
++++ b/profiles/audio/manager.c
+@@ -419,15 +419,23 @@ void audio_source_disconnected(struct btd_device *dev, int err)
+ 	device_profile_disconnected(dev, &a2dp_source_profile, err);
+ }
+ 
+-void audio_control_connected(struct btd_device *dev, int err)
++void audio_target_connected(struct btd_device *dev, int err)
+ {
+ 	device_profile_connected(dev, &avrcp_target_profile, err);
+-	device_profile_connected(dev, &avrcp_remote_profile, err);
+ }
+ 
+-void audio_control_disconnected(struct btd_device *dev, int err)
++void audio_target_disconnected(struct btd_device *dev, int err)
+ {
+ 	device_profile_disconnected(dev, &avrcp_target_profile, err);
++}
++
++void audio_remote_connected(struct btd_device *dev, int err)
++{
++	device_profile_connected(dev, &avrcp_remote_profile, err);
++}
++
++void audio_remote_disconnected(struct btd_device *dev, int err)
++{
+ 	device_profile_disconnected(dev, &avrcp_remote_profile, err);
+ }
+ 
+diff --git a/profiles/audio/manager.h b/profiles/audio/manager.h
+index 9e5ac94..a42b7da 100644
+--- a/profiles/audio/manager.h
++++ b/profiles/audio/manager.h
+@@ -33,8 +33,10 @@ void audio_sink_connected(struct btd_device *dev, int err);
+ void audio_sink_disconnected(struct btd_device *dev, int err);
+ void audio_source_connected(struct btd_device *dev, int err);
+ void audio_source_disconnected(struct btd_device *dev, int err);
+-void audio_control_connected(struct btd_device *dev, int err);
+-void audio_control_disconnected(struct btd_device *dev, int err);
++void audio_target_connected(struct btd_device *dev, int err);
++void audio_target_disconnected(struct btd_device *dev, int err);
++void audio_remote_connected(struct btd_device *dev, int err);
++void audio_remote_disconnected(struct btd_device *dev, int err);
+ 
+ int audio_manager_init(GKeyFile *config);
+ void audio_manager_exit(void);
+-- 
+1.8.1.4
 
-Patch has been applied to bluetooth.git. Thanks.
-
-	Gustavo
