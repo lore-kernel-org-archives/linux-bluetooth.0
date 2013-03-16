@@ -1,26 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Sun, 17 Mar 2013 21:16:22 -0400
-Message-ID: <CA+uArHVQ9KdFpooFZA1sQYWybAbPcx7suF_U36t-mMP4T70GQA@mail.gmail.com>
-Subject: Do you have available project for google summer of code 2013
-From: Guanpeng Gao <ggpaue@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Alexandru Gheorghiu <gheorghiuandru@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Alexandru Gheorghiu <gheorghiuandru@gmail.com>
+Subject: [PATCH] net: bluetooth: Use PTR_RET function
+Date: Sat, 16 Mar 2013 16:10:03 +0200
+Message-Id: <1363443003-13839-1-git-send-email-gheorghiuandru@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-My name is Guanpeng Gao, I am a CS student in New York University
-I am interested in your Bluetooth traffic visualization project in
-google summer of code 2012 and I want to enroll with your project in
-this year, do you have some relate project for this year?
-If you have some other projects in some other fields for this year,
-could you please introduce them to me? thanks a lot
-Best regards
-Guanpeng Gao
+Used PTR_RET function instead of IS_ERR and PTR_ERR.
+Patch found using coccinelle.
 
+Signed-off-by: Alexandru Gheorghiu <gheorghiuandru@gmail.com>
+---
+ net/bluetooth/hci_sysfs.c |    4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 23b4e24..ff38561 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -590,10 +590,8 @@ int __init bt_sysfs_init(void)
+ 	bt_debugfs = debugfs_create_dir("bluetooth", NULL);
+ 
+ 	bt_class = class_create(THIS_MODULE, "bluetooth");
+-	if (IS_ERR(bt_class))
+-		return PTR_ERR(bt_class);
+ 
+-	return 0;
++	return PTR_RET(bt_class);
+ }
+ 
+ void bt_sysfs_cleanup(void)
 -- 
-Mr. Guanpeng Gao
-School of Computer Science & Engineering
-Polytechnic Institute
-New York University
+1.7.9.5
