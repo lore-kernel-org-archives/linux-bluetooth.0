@@ -6,34 +6,52 @@ Cc: Gustavo Padovan <gustavo@padovan.org>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Alexandru Gheorghiu <gheorghiuandru@gmail.com>
-Subject: [PATCH] net: bluetooth: Use PTR_RET function
-Date: Sat, 16 Mar 2013 16:10:03 +0200
-Message-Id: <1363443003-13839-1-git-send-email-gheorghiuandru@gmail.com>
+Subject: [PATCH] net: bluetooth: Replaced kzalloc and memcpy with kmemdup
+Date: Sat, 16 Mar 2013 16:07:10 +0200
+Message-Id: <1363442830-13754-1-git-send-email-gheorghiuandru@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Used PTR_RET function instead of IS_ERR and PTR_ERR.
+Replaced calls to kzalloc followed by memcpy with a single call to kmemdup.
 Patch found using coccinelle.
 
 Signed-off-by: Alexandru Gheorghiu <gheorghiuandru@gmail.com>
 ---
- net/bluetooth/hci_sysfs.c |    4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ net/bluetooth/a2mp.c |    6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 23b4e24..ff38561 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -590,10 +590,8 @@ int __init bt_sysfs_init(void)
- 	bt_debugfs = debugfs_create_dir("bluetooth", NULL);
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index eb0f4b1..140e81c 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -397,13 +397,12 @@ static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	if (ctrl) {
+ 		u8 *assoc;
  
- 	bt_class = class_create(THIS_MODULE, "bluetooth");
--	if (IS_ERR(bt_class))
--		return PTR_ERR(bt_class);
+-		assoc = kzalloc(assoc_len, GFP_KERNEL);
++		assoc = kmemdup(rsp->amp_assoc, assoc_len, GFP_KERNEL);
+ 		if (!assoc) {
+ 			amp_ctrl_put(ctrl);
+ 			return -ENOMEM;
+ 		}
  
--	return 0;
-+	return PTR_RET(bt_class);
- }
+-		memcpy(assoc, rsp->amp_assoc, assoc_len);
+ 		ctrl->assoc = assoc;
+ 		ctrl->assoc_len = assoc_len;
+ 		ctrl->assoc_rem_len = assoc_len;
+@@ -472,13 +471,12 @@ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 		size_t assoc_len = le16_to_cpu(hdr->len) - sizeof(*req);
+ 		u8 *assoc;
  
- void bt_sysfs_cleanup(void)
+-		assoc = kzalloc(assoc_len, GFP_KERNEL);
++		assoc = kmemdup(rep->amp_assoc, assoc_len, GFP_KERNEL);
+ 		if (!assoc) {
+ 			amp_ctrl_put(ctrl);
+ 			return -ENOMEM;
+ 		}
+ 
+-		memcpy(assoc, req->amp_assoc, assoc_len);
+ 		ctrl->assoc = assoc;
+ 		ctrl->assoc_len = assoc_len;
+ 		ctrl->assoc_rem_len = assoc_len;
 -- 
 1.7.9.5
