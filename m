@@ -1,37 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Herrmann <dh.herrmann@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Johan Hedberg <johan.hedberg@intel.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	David Herrmann <dh.herrmann@gmail.com>
-Subject: [PATCH bluez] sdptool: fix recursive search
-Date: Mon, 18 Mar 2013 18:41:02 +0100
-Message-Id: <1363628462-3421-1-git-send-email-dh.herrmann@gmail.com>
+Date: Mon, 18 Mar 2013 14:08:10 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v5 26/26] Bluetooth: Fix PIN/Confirm/Passkey response
+ parameters
+Message-ID: <20130318170810.GA3072@joana>
+References: <1363385236-25704-1-git-send-email-johan.hedberg@gmail.com>
+ <1363385236-25704-27-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1363385236-25704-27-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When doing recursive SDP searches, we must not overwrite our own values
-after we retrieved them from SDP. Otherwise, the UUID test will always we
-false.
----
- tools/sdptool.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Hi Johan,
 
-diff --git a/tools/sdptool.c b/tools/sdptool.c
-index 458d005..0a949f2 100644
---- a/tools/sdptool.c
-+++ b/tools/sdptool.c
-@@ -3812,9 +3812,10 @@ static int do_search(bdaddr_t *bdaddr, struct search_context *context)
- 			break;
- 		}
- 
-+		/* Set the subcontext for browsing the sub tree */
-+		memcpy(&sub_context, context, sizeof(struct search_context));
-+
- 		if (sdp_get_group_id(rec, &sub_context.group) != -1) {
--			/* Set the subcontext for browsing the sub tree */
--			memcpy(&sub_context, context, sizeof(struct search_context));
- 			/* Browse the next level down if not done */
- 			if (sub_context.group.value.uuid16 != context->group.value.uuid16)
- 				do_search(bdaddr, &sub_context);
--- 
-1.8.2
+* Johan Hedberg <johan.hedberg@gmail.com> [2013-03-15 17:07:16 -0500]:
+
+> From: Johan Hedberg <johan.hedberg@intel.com>
+> 
+> The only valid mgmt response to these pairing related commands is a
+> mgmt_cmd_complete and the returned parameters should contain the address
+> and address type of the remote device.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/mgmt.c |   20 ++++++++++++--------
+>  1 file changed, 12 insertions(+), 8 deletions(-)
+
+All patches have been applied to bluetooth-next. Thanks.
+
+	Gustavo
