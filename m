@@ -1,42 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
-Subject: Re: [PATCH] Bluetooth: remove __le16_to_cpu() from u8 var
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1363629135-6720-1-git-send-email-gustavo@padovan.org>
-Date: Mon, 18 Mar 2013 11:26:59 -0700
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Message-Id: <040583C3-DDAC-42A8-BAEC-43E5791147B6@holtmann.org>
-References: <1363629135-6720-1-git-send-email-gustavo@padovan.org>
-To: Gustavo Padovan <gustavo@padovan.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 18 Mar 2013 15:19:14 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Silviu Popescu <silviupopescu1990@gmail.com>
+Cc: David Miller <davem@davemloft.net>, linux-bluetooth@vger.kernel.org,
+	marcel@holtmann.org, johan.hedberg@gmail.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] bluetooth: use PTR_RET instead of IS_ERR + PTR_ERR
+Message-ID: <20130318181914.GC3072@joana>
+References: <1363111995-26866-1-git-send-email-silviupopescu1990@gmail.com>
+ <20130313.053145.2200448840921851390.davem@davemloft.net>
+ <CAPWTe+JzznuWYKksAfxkD=u9kv8DuAF4v2AWVxd2OUeDtCYKBA@mail.gmail.com>
+ <CAPWTe+Kfr=zD6oJsfX3W8Ze1iH+CoEHx5FXo4YaVtQuMHD5k_g@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="i0/AhcQY5QxfSsSZ"
+In-Reply-To: <CAPWTe+Kfr=zD6oJsfX3W8Ze1iH+CoEHx5FXo4YaVtQuMHD5k_g@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
 
-> We don't any endianness conversion in a single byte variable.
-> 
-> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> ---
-> net/bluetooth/hci_event.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 8a1f511..1385807 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -641,7 +641,7 @@ static void hci_cc_read_page_scan_type(struct hci_dev *hdev,
-> 	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
-> 
-> 	if (test_bit(HCI_INIT, &hdev->flags) && !rp->status)
-> -		hdev->page_scan_type = __le16_to_cpu(rp->type);
-> +		hdev->page_scan_type = rp->type;
-> }
+--i0/AhcQY5QxfSsSZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-we could also just fix up the patch with this mistake. Since it has not gotten into wireless-next yet.
+Hi Silviu,
 
-Regards
+* Silviu Popescu <silviupopescu1990@gmail.com> [2013-03-18 20:13:50 +0200]:
 
-Marcel
+> On Mon, Mar 18, 2013 at 8:05 PM, Silviu Popescu
+> <silviupopescu1990@gmail.com> wrote:
+> > On Wed, Mar 13, 2013 at 11:31 AM, David Miller <davem@davemloft.net> wr=
+ote:
+> >> From: Silviu-Mihai Popescu <silviupopescu1990@gmail.com>
+> >> Date: Tue, 12 Mar 2013 20:13:15 +0200
+> >>
+> >>> @@ -590,10 +590,7 @@ int __init bt_sysfs_init(void)
+> >>>       bt_debugfs =3D debugfs_create_dir("bluetooth", NULL);
+> >>>
+> >>>       bt_class =3D class_create(THIS_MODULE, "bluetooth");
+> >>> -     if (IS_ERR(bt_class))
+> >>> -             return PTR_ERR(bt_class);
+> >>> -
+> >>> -     return 0;
+> >>> +     return PTR_RET(bt_class)
+> >>
+> >> Don't bother submitting patches you aren't even going to try
+> >> to compile.
+> >>
+> >> I'm rejecting all of your current submissions.  Resubmit them
+> >> when you feel like typing 'make' from time to time.
+> >>
+> >>
+> >
+> > Sorry for the trouble caused and sorry for the late reply.
+> > That being said, I'd like to understand a bit better what exactly I mes=
+sed up.
+> > I've just pulled the latest revision of the mainline kernel and made
+> > the changes in this patch.
+> > I've tried with make defconfig (which would be x86_64_defconfig in my
+> > case), followed by
+> > make menuconfig to select the bluetooth options and make allyesconfig.
+> > Both defconfig and allyesconfig compile successfully on my system.
+> > Would you be so kind as to tell me what error you have encountered?
+> > Or perhaps enlighten me as to what I'm still doing wrong. I'd like to
+> > learn from my mistakes.
+>=20
+> Please ignore this gratuitous stupidity.
+> The right patch was applied locally, the wrong one sent to the list.
+> I'll resubmit the proper one.
 
+Someone already sent me a similar patch, so this is already fixed in
+bluetooth-next. No need to resubmit this one.
+
+	Gustavo
+
+--i0/AhcQY5QxfSsSZ
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.13 (GNU/Linux)
+
+iQIcBAEBAgAGBQJRR1qhAAoJEPs3PUX4s20oa8QQAJZa2lrQZNMpw2j8bkmBOcnX
+CtHlczrgcaeZ1dhoNBeRf107pFNxO103OFynP5zPpVBOW7OifzFdpH82ch1CuBnM
+QICCjnUE4PfNfEclIA/hRgROhMbvKqtoxt0I7+qeENU1twCuz79HU1yju48tkgZu
+sqPI7XistdSf5/eEceW7j8mmOuIB6PuYORp4UCckft0N1hUJ/3sArEwipJiouM2k
+gi5FITpXMhLKdi09bDl5L6u3e3YrON2dYBT0p9lIxu2bMWBNR1gMB8JzEqJmiZJ8
+6jd/7vWMTo0wyzKY6tAAmIpUvxBw2ZzZakpd244sWjiZzEgOng2FqpQuvkhxYhEx
+wqIDv94YUBUzaHdRRySBNEHknCtWFkxmnVwaswPS6z84TlciXRyJ9jOaTqpJoe/e
+elUR4sVNpfRSN2IwPcxGDQjbSSzeATn1ur1x2j2rpqFGUCQ5AZf3uV1dVp6gZmtI
+RhNjSJMLIh/NDf3a4caiXd4iDcrehP2dBeUYQqM10i32blzN6hM8A3ZXD/RggcW4
+85KFKbgSnFFOfbfJt/FjJ+ucMIWZMjY1kOSRJ1QPA5Ak+9MDcyyE8tu+iR3nMb+1
+L9JOxkN5A6M2sKDJX4UGCVuegBVSZx5k8l0YT4rx6FjIbp94mrye/qQrQO0Wa7Hc
+uib9DTyMVARX4FoRUVlq
+=yGa3
+-----END PGP SIGNATURE-----
+
+--i0/AhcQY5QxfSsSZ--
