@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/4] player: Check if values really changed before emitting signals
-Date: Mon, 18 Mar 2013 10:14:38 -0300
-Message-Id: <1363612480-8330-2-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 4/4 v2] AVRCP: Fallback to GetElementAttributes if GetItemAttributes fails
+Date: Mon, 18 Mar 2013 10:14:40 -0300
+Message-Id: <1363612480-8330-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1363612480-8330-1-git-send-email-luiz.dentz@gmail.com>
 References: <1363612480-8330-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,75 +11,37 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+If GetItemAttributes fails with error set to player not browsable
+fallback to GetElementAttributes.
 ---
- profiles/audio/player.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ profiles/audio/avrcp.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index ece33cc..e08e373 100644
---- a/profiles/audio/player.c
-+++ b/profiles/audio/player.c
-@@ -938,6 +938,9 @@ void media_player_set_metadata(struct media_player *mp, const char *key,
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 5b5f491..409cf5b 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -74,6 +74,7 @@
+ #define AVRCP_STATUS_INTERNAL_ERROR		0x03
+ #define AVRCP_STATUS_SUCCESS			0x04
+ #define AVRCP_STATUS_INVALID_PLAYER_ID		0x11
++#define AVRCP_STATUS_PLAYER_NOT_BROWSABLE	0x12
+ #define AVRCP_STATUS_NO_AVAILABLE_PLAYERS	0x15
+ #define AVRCP_STATUS_ADDRESSED_PLAYER_CHANGED	0x16
  
- void media_player_set_type(struct media_player *mp, const char *type)
- {
-+	if (g_strcmp0(mp->type, type) == 0)
-+		return;
-+
- 	DBG("%s", type);
+@@ -2002,8 +2003,11 @@ static gboolean avrcp_get_item_attributes_rsp(struct avctp *conn,
+ 	struct avrcp_browsing_header *pdu = (void *) operands;
+ 	uint8_t count;
  
- 	mp->type = g_strdup(type);
-@@ -949,6 +952,9 @@ void media_player_set_type(struct media_player *mp, const char *type)
+-	if (pdu->params[0] != AVRCP_STATUS_SUCCESS || operand_count < 4)
++	if (pdu->params[0] != AVRCP_STATUS_SUCCESS || operand_count < 4) {
++		if (pdu->params[0] == AVRCP_STATUS_PLAYER_NOT_BROWSABLE)
++			avrcp_get_element_attributes(session);
+ 		return FALSE;
++	}
  
- void media_player_set_subtype(struct media_player *mp, const char *subtype)
- {
-+	if (g_strcmp0(mp->subtype, subtype) == 0)
-+		return;
-+
- 	DBG("%s", subtype);
+ 	count = pdu->params[1];
  
- 	mp->subtype = g_strdup(subtype);
-@@ -960,6 +966,9 @@ void media_player_set_subtype(struct media_player *mp, const char *subtype)
- 
- void media_player_set_name(struct media_player *mp, const char *name)
- {
-+	if (g_strcmp0(mp->name, name) == 0)
-+		return;
-+
- 	DBG("%s", name);
- 
- 	mp->name = g_strdup(name);
-@@ -971,6 +980,9 @@ void media_player_set_name(struct media_player *mp, const char *name)
- 
- void media_player_set_browsable(struct media_player *mp, bool enabled)
- {
-+	if (mp->browsable == enabled)
-+		return;
-+
- 	DBG("%s", enabled ? "true" : "false");
- 
- 	mp->browsable = enabled;
-@@ -982,6 +994,9 @@ void media_player_set_browsable(struct media_player *mp, bool enabled)
- 
- void media_player_set_searchable(struct media_player *mp, bool enabled)
- {
-+	if (mp->browsable == enabled)
-+		return;
-+
- 	DBG("%s", enabled ? "true" : "false");
- 
- 	mp->searchable = enabled;
-@@ -1262,6 +1277,10 @@ int media_player_create_folder(struct media_player *mp, const char *name,
- {
- 	struct media_item *item;
- 
-+	item = media_player_find_folder(mp, name);
-+	if (item != NULL)
-+		return 0;
-+
- 	item = media_player_create_item(mp, name,
- 					PLAYER_ITEM_TYPE_FOLDER);
- 	if (item == NULL)
 -- 
 1.8.1.4
 
