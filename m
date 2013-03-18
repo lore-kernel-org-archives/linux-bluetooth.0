@@ -1,39 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 18 Mar 2013 12:13:35 -0700
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Christopher Waid <chris@thinkpenguin.com>
-Cc: linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode) causing
- crashes
-Message-ID: <20130318191335.GA11242@kroah.com>
-References: <514763A7.4020800@thinkpenguin.com>
+Date: Mon, 18 Mar 2013 15:41:02 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: Re: [PATCH] Bluetooth: remove __le16_to_cpu() from u8 var
+Message-ID: <20130318184102.GD3072@joana>
+References: <1363629135-6720-1-git-send-email-gustavo@padovan.org>
+ <040583C3-DDAC-42A8-BAEC-43E5791147B6@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <514763A7.4020800@thinkpenguin.com>
-Sender: linux-usb-owner@vger.kernel.org
+In-Reply-To: <040583C3-DDAC-42A8-BAEC-43E5791147B6@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Mar 18, 2013 at 02:57:43PM -0400, Christopher Waid wrote:
+Hi Marcel,
+
+* Marcel Holtmann <marcel@holtmann.org> [2013-03-18 11:26:59 -0700]:
+
+> Hi Gustavo,
 > 
-> Bus 001 Device 007: ID 0a12:0001 Cambridge Silicon Radio, Ltd
-> Bluetooth Dongle (HCI mode)
+> > We don't any endianness conversion in a single byte variable.
+> > 
+> > Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> > ---
+> > net/bluetooth/hci_event.c | 2 +-
+> > 1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > index 8a1f511..1385807 100644
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -641,7 +641,7 @@ static void hci_cc_read_page_scan_type(struct hci_dev *hdev,
+> > 	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
+> > 
+> > 	if (test_bit(HCI_INIT, &hdev->flags) && !rp->status)
+> > -		hdev->page_scan_type = __le16_to_cpu(rp->type);
+> > +		hdev->page_scan_type = rp->type;
+> > }
 > 
-> Code for a CSR bluetooth chipset appears broken in recent kernel
-> releases. After a device is paired the kernel panics. This has been
-> tested with a dozen USB dongles / systems and is consistently a
-> problem. On the rare occasion it might not cause a kernel panic
-> although it will definitely still crash after a few minutes. This
-> does not happen with older kernel releases.
+> we could also just fix up the patch with this mistake. Since it has not gotten into wireless-next yet.
 
-What kernel version is crashing, and what is the exact text of the
-kernel panic?
+Yes, the broken patch is now fixed in bluetooth-next.
 
-> Please let me know how I can help solve this issue. We have lots of
-> dongles and can try and get any information needed to fix it.
-
-You might want to ask the Linux bluetooth developers (now added to the
-cc of this response.)
-
-thanks,
-
-greg k-h
+	Gustavo
