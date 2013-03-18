@@ -1,43 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 18 Mar 2013 15:18:46 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth 2013-03-18
-Message-ID: <20130318191846.GB28919@tuxdriver.com>
-References: <20130318181601.GB3072@joana>
+Date: Mon, 18 Mar 2013 12:13:35 -0700
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Christopher Waid <chris@thinkpenguin.com>
+Cc: linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode) causing
+ crashes
+Message-ID: <20130318191335.GA11242@kroah.com>
+References: <514763A7.4020800@thinkpenguin.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130318181601.GB3072@joana>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <514763A7.4020800@thinkpenguin.com>
+Sender: linux-usb-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Mar 18, 2013 at 03:16:01PM -0300, Gustavo Padovan wrote:
-> Hi John,
+On Mon, Mar 18, 2013 at 02:57:43PM -0400, Christopher Waid wrote:
 > 
-> I put together 3 fixes intended for 3.9, there are support for two new devices
-> and a NULL dereference fix in the SCO code.
+> Bus 001 Device 007: ID 0a12:0001 Cambridge Silicon Radio, Ltd
+> Bluetooth Dongle (HCI mode)
 > 
-> Please pull or let me know of any problem. Thanks!
-> 
->         Gustavo
-> 
-> ---
-> The following changes since commit 94a32d10f47b637ae24b78b1ddc7ef0e8396fda4:
-> 
->   Bluetooth: Device 0cf3:3008 should map AR 3012 (2013-03-11 18:04:54 -0300)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
-> 
-> for you to fetch changes up to ebaf5795ef57a70a042ea259448a465024e2821d:
-> 
->   Bluetooth: Add support for Dell[QCA 0cf3:817a] (2013-03-18 14:14:37 -0300)
+> Code for a CSR bluetooth chipset appears broken in recent kernel
+> releases. After a device is paired the kernel panics. This has been
+> tested with a dozen USB dongles / systems and is consistently a
+> problem. On the rare occasion it might not cause a kernel panic
+> although it will definitely still crash after a few minutes. This
+> does not happen with older kernel releases.
 
-Pulling now...
+What kernel version is crashing, and what is the exact text of the
+kernel panic?
 
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+> Please let me know how I can help solve this issue. We have lots of
+> dongles and can try and get any information needed to fix it.
+
+You might want to ask the Linux bluetooth developers (now added to the
+cc of this response.)
+
+thanks,
+
+greg k-h
