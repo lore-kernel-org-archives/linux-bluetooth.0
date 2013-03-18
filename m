@@ -1,35 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gustavo Padovan <gustavo@padovan.org>
+From: David Herrmann <dh.herrmann@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH] Bluetooth: remove __le16_to_cpu() from u8 var
-Date: Mon, 18 Mar 2013 14:52:15 -0300
-Message-Id: <1363629135-6720-1-git-send-email-gustavo@padovan.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: Johan Hedberg <johan.hedberg@intel.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	David Herrmann <dh.herrmann@gmail.com>
+Subject: [PATCH bluez] sdptool: fix recursive search
+Date: Mon, 18 Mar 2013 18:41:02 +0100
+Message-Id: <1363628462-3421-1-git-send-email-dh.herrmann@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-
-We don't any endianness conversion in a single byte variable.
-
-Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+When doing recursive SDP searches, we must not overwrite our own values
+after we retrieved them from SDP. Otherwise, the UUID test will always we
+false.
 ---
- net/bluetooth/hci_event.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/sdptool.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 8a1f511..1385807 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -641,7 +641,7 @@ static void hci_cc_read_page_scan_type(struct hci_dev *hdev,
- 	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
+diff --git a/tools/sdptool.c b/tools/sdptool.c
+index 458d005..0a949f2 100644
+--- a/tools/sdptool.c
++++ b/tools/sdptool.c
+@@ -3812,9 +3812,10 @@ static int do_search(bdaddr_t *bdaddr, struct search_context *context)
+ 			break;
+ 		}
  
- 	if (test_bit(HCI_INIT, &hdev->flags) && !rp->status)
--		hdev->page_scan_type = __le16_to_cpu(rp->type);
-+		hdev->page_scan_type = rp->type;
- }
- 
- static void hci_cc_write_page_scan_type(struct hci_dev *hdev,
++		/* Set the subcontext for browsing the sub tree */
++		memcpy(&sub_context, context, sizeof(struct search_context));
++
+ 		if (sdp_get_group_id(rec, &sub_context.group) != -1) {
+-			/* Set the subcontext for browsing the sub tree */
+-			memcpy(&sub_context, context, sizeof(struct search_context));
+ 			/* Browse the next level down if not done */
+ 			if (sub_context.group.value.uuid16 != context->group.value.uuid16)
+ 				do_search(bdaddr, &sub_context);
 -- 
-1.8.1.4
-
+1.8.2
