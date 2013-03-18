@@ -1,55 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alexandru Gheorghiu <gheorghiuandru@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Alexandru Gheorghiu <gheorghiuandru@gmail.com>
-Subject: [PATCH] net: bluetooth: Replaced kzalloc and memcpy with kmemdup
-Date: Sun, 17 Mar 2013 07:16:50 +0200
-Message-Id: <1363497410-24983-1-git-send-email-gheorghiuandru@gmail.com>
+Message-ID: <51472E9E.50807@oss.bmw-carit.de>
+Date: Mon, 18 Mar 2013 16:11:26 +0100
+From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+MIME-Version: 1.0
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: MAP client: Add support for receiving notifications
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Replaced calls to kzalloc followed by memcpy with a single call to kmemdup.
+Hi,
 
-Signed-off-by: Alexandru Gheorghiu <gheorghiuandru@gmail.com>
----
- net/bluetooth/a2mp.c |    6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+This is a follow-up on the discussion started in my patch set
+"MAP client: notification support". The patches were implementing
+notification support only for one remote device and needed an additional
+API function for choosing that device.
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index eb0f4b1..17f33a6 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -397,13 +397,12 @@ static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 	if (ctrl) {
- 		u8 *assoc;
- 
--		assoc = kzalloc(assoc_len, GFP_KERNEL);
-+		assoc = kmemdup(rsp->amp_assoc, assoc_len, GFP_KERNEL);
- 		if (!assoc) {
- 			amp_ctrl_put(ctrl);
- 			return -ENOMEM;
- 		}
- 
--		memcpy(assoc, rsp->amp_assoc, assoc_len);
- 		ctrl->assoc = assoc;
- 		ctrl->assoc_len = assoc_len;
- 		ctrl->assoc_rem_len = assoc_len;
-@@ -472,13 +471,12 @@ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 		size_t assoc_len = le16_to_cpu(hdr->len) - sizeof(*req);
- 		u8 *assoc;
- 
--		assoc = kzalloc(assoc_len, GFP_KERNEL);
-+		assoc = kmemdup(req->amp_assoc, assoc_len, GFP_KERNEL);
- 		if (!assoc) {
- 			amp_ctrl_put(ctrl);
- 			return -ENOMEM;
- 		}
- 
--		memcpy(assoc, req->amp_assoc, assoc_len);
- 		ctrl->assoc = assoc;
- 		ctrl->assoc_len = assoc_len;
- 		ctrl->assoc_rem_len = assoc_len;
--- 
-1.7.9.5
+It's better to implement this implicitly and support multiple devices
+from the beginning.
+
+In this E-Mail I'd like to suggest how we could implement the
+notification connection setup in BlueZ. I'll try to explain the relevant
+part of the spec to have a base for discussion.
+
+MAP consists of two different OBEX applications, Message Access Service
+(MAS) for browsing messages and Message Notification Service (MNS) for
+receiving event reports about changes on the server (like new messages,
+moved messages, delivery reports, ...).
+
+The spec describes the single phone use case where the MAP client (MCE)
+consists of several MAS client instances for the different accounts and
+one common MNS server instance:
+
+  MCE (Car Kit)       MSE (Phone)
++---------------+   +-------------------------+
+| MAS client 1  |<->| MAS server 1 (SMS)      |
+| MAS client 2  |<->| MAS server 2 (E-Mail A) |
+|     ...       |   |     ...                 |
+| MNS server    |<->| MNS client              |
++---------------+   +-------------------------+
+
+Every MAS client instance, that wants to use notifications, needs to
+use the SetNotificationRegistration function to enable it.
+If the MNS connection isn't established already, the server (MSE) will
+start the SDP lookup for the MNS instance on the client and connect to
+it. The event reports that are sent on the MNS channel contain the MAS
+instance ID, that can be used to map the event to the MAS client.
+
+Since an OBEX instance, like the MNS server, cannot be connected to
+different remote devices at the same time, it will not work to have one
+static MNS server instance. Instead we need one MNS server instance for
+every connected remote device (that we want to use with MAP). Since the
+MNS connection establishment is based on SDP, we have to make sure that
+there's only one MNS server SDP record visible. Otherwise, the MSE
+cannot know which one to connect to.
+
+If we want to hide this all from the application level, we could do the
+connection establishment for two devices (MSE 1 and MSE 2) as described
+here.
+
+  MCE (Car Kit)       MSE 1 (Business phone)
++---------------+   +-------------------------+
+| MAS client 1  |<->| MAS server 1 (SMS)      |
+| MAS client 2  |<->| MAS server 2 (E-Mail A) |
+|     ...       |   |     ...                 |
+| MNS server 1  |<->| MNS client              |
+|               |   +-------------------------+
+|               |
+|               |     MSE 2 (private phone)
+|               |   +-------------------------+
+| MAS client 3  |<->| MAS server 1 (SMS)      |
+|     ...       |   |     ...                 |
+| MNS server 2  |<->| MNS client              |
++---------------+   +-------------------------+
+
+- MCE connects MAS client 1 to MSE 1
+- MCE dynamically instantiates MNS server 1 and registers its SDP record
+- MAS client 1 sends SetNotificationRegistration(on)
+- MSE does SDP lookup and connects to the found MNS server 1
+- MCE removes SDP record for MNS server 1
+- MCE connects MAS client 2 to MSE 1
+- MAS client 2 sends SetNotificationRegistration(on)
+     (MNS channel is already up, MSE just responds OK)
+- MCE connects MAS client 3 to MSE 2
+- MCE dynamically instantiates MNS server 2 and registers its SDP record
+- MAS client 3 sends SetNotificationRegistration(on)
+- MSE does SDP lookup and connects to the found MNS server 2
+- MCE removes SDP record for MNS server 2
+...
+
+Does that sound reasonable for you?
+
+Currently it's not possible to dynamically add OBEX servers, as they are
+all instantiated at startup on predefined RFCOMM channels.
+Could you comment on how this should be implemented best?
+
+Thanks and Br,
+Christian
