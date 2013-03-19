@@ -1,48 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 19 Mar 2013 09:59:21 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix bogus __le16_to_cpu call
+Message-ID: <20130319075921.GA16093@x220>
+References: <1363678634-15338-1-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <B75AA63D-0629-4B45-BBB2-C09CD7EEFB48@hadess.net>
-References: <CANq1E4TMGGwiz-kGGCqGOn+A-D-msiTAb8L4Yf6kkMwrzOnn_g@mail.gmail.com>
-	<B75AA63D-0629-4B45-BBB2-C09CD7EEFB48@hadess.net>
-Date: Tue, 19 Mar 2013 09:04:22 +0100
-Message-ID: <CANq1E4QSW0y1SC=-E6wFw6arQEUwPOdeWgaSzE2iZnXOeqD1tw@mail.gmail.com>
-Subject: Re: Device selection during inquiry
-From: David Herrmann <dh.herrmann@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1363678634-15338-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien
+Hi,
 
-On Tue, Mar 19, 2013 at 1:15 AM, Bastien Nocera <hadess@hadess.net> wrote:
-> On 19 Mar 2013, at 01:07, David Herrmann <dh.herrmann@gmail.com> wrote:
->> I tried setting the following to the same values as on a sample target device:
->>  - BT Address
->>  - device-class
->>  - inquiry-mode
->>  - device-name
->> However, that didn't change anything.
->>
->> Are there any other values that I should play with which might be used
->> by the host to identify possible target devices?
->
-> Adapter MAC address. In fact, I thought that was necessary with some Wiimotes to make the bonding permanent.
+On Tue, Mar 19, 2013, Johan Hedberg wrote:
+> The type member of struct hci_rp_read_page_scan_type is u8 so no
+> byte order conversion is necessary for it. This patch removes a bogus
+> call to __le16_to_cpu on it.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  net/bluetooth/hci_event.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 8a1f511..1385807 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -641,7 +641,7 @@ static void hci_cc_read_page_scan_type(struct hci_dev *hdev,
+>  	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
+>  
+>  	if (test_bit(HCI_INIT, &hdev->flags) && !rp->status)
+> -		hdev->page_scan_type = __le16_to_cpu(rp->type);
+> +		hdev->page_scan_type = rp->type;
+>  }
+>  
+>  static void hci_cc_write_page_scan_type(struct hci_dev *hdev,
 
-As I said, I already tried changing the BD-Address to one of a target
-device and it didn't change anything.
+Just ignore this one. I should have checked for new emails on
+linux-bluetooth before creating it since this was already taken care of.
 
-In fact, I can reliably bond with any Wii Remote without changing my
-BD-Address and this already works perfectly well. But this time I want
-to emulate the Wii Remote and make the Wii-Console connect to me.
-I don't think that it filters Address based as I have working remotes
-with the following addresses:
-  00:1E:35:3B:7E:6D
-  78:A2:A0:DD:F6:8A
-  D8:6B:F7:0D:3C:78
-  2C:10:C1:B8:84:40
-  34:AF:2C:18:AC:99
-I cannot see any common attribute here.
-
-Thanks anyway!
-David
+Johan
