@@ -2,228 +2,31 @@ Return-Path: <cyrus@holtmann.org>
 From: Alex Deymo <deymo@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: keybuk@chromium.org, Alex Deymo <deymo@chromium.org>
-Subject: [PATCH v3 2/6] client: Right prompt management on agent input
-Date: Tue, 19 Mar 2013 13:55:01 -0700
-Message-Id: <1363726505-15171-3-git-send-email-deymo@chromium.org>
-In-Reply-To: <1363726505-15171-1-git-send-email-deymo@chromium.org>
-References: <1363726505-15171-1-git-send-email-deymo@chromium.org>
+Subject: [PATCH v3 0/6] client: agent implementation on bluetoothctl
+Date: Tue, 19 Mar 2013 13:54:59 -0700
+Message-Id: <1363726505-15171-1-git-send-email-deymo@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Registering an agent shares the user input interface with the normal console
-command interface. The way it is implemented (using rl_message, rl_save_prompt
-and rl_restore_prompt) conflicts with the rl_printf calls that may appear
-while waiting for user input, loosing the [bluetooth]# prompt.
-This patch fixes this and makes clear if the expected input is a command or an
-agent reply changing the color and text of the prompt.
----
- client/agent.c   | 61 ++++++++++++++++++++++++++++++++++++++++++++++----------
- client/display.h |  2 +-
- client/main.c    | 13 +++++++-----
- 3 files changed, 59 insertions(+), 17 deletions(-)
+Hi,
+This is the same patch set I sent last week, but with the changes based on the
+comments you made here. I think I addressed them all. Let me know if you have
+other comments.
+Thanks!
 
-diff --git a/client/agent.c b/client/agent.c
-index b0ac2f8..dc27079 100644
---- a/client/agent.c
-+++ b/client/agent.c
-@@ -26,6 +26,7 @@
- #endif
- 
- #include <stdio.h>
-+#include <stdlib.h>
- #include <readline/readline.h>
- #include <gdbus.h>
- 
-@@ -35,9 +36,49 @@
- #define AGENT_PATH "/org/bluez/agent"
- #define AGENT_INTERFACE "org.bluez.Agent1"
- 
-+#define AGENT_PROMPT	COLOR_RED "[agent]" COLOR_OFF " "
-+
- static gboolean agent_registered = FALSE;
- static const char *agent_capability = NULL;
- static DBusMessage *pending_message = NULL;
-+static char *agent_saved_prompt = NULL;
-+static int agent_saved_point = 0;
-+
-+static void agent_prompt(const char* msg)
-+{
-+	char *prompt;
-+
-+	/* Normal use should not prompt for user input to the agent a second
-+	 * time before it releases the prompt, but we take a safe action. */
-+	if (agent_saved_prompt)
-+		return;
-+
-+	agent_saved_point = rl_point;
-+	agent_saved_prompt = g_strdup(rl_prompt);
-+
-+	prompt = g_strdup_printf(AGENT_PROMPT "%s", msg);
-+	rl_set_prompt(prompt);
-+	g_free(prompt);
-+
-+	rl_replace_line("", 0);
-+	rl_redisplay();
-+}
-+
-+static void agent_release_prompt(void)
-+{
-+	if (!agent_saved_prompt)
-+		return;
-+
-+	/* This will cause rl_expand_prompt to re-run over the last prompt, but
-+	 * our prompt doesn't expand anyway. */
-+	rl_set_prompt(agent_saved_prompt);
-+	rl_replace_line("", 0);
-+	rl_point = agent_saved_point;
-+	rl_redisplay();
-+
-+	g_free(agent_saved_prompt);
-+	agent_saved_prompt = NULL;
-+}
- 
- dbus_bool_t agent_completion(void)
- {
-@@ -69,11 +110,11 @@ dbus_bool_t agent_input(DBusConnection *conn, const char *input)
- {
- 	const char *member;
- 
--	rl_clear_message();
--
- 	if (!pending_message)
- 		return FALSE;
- 
-+	agent_release_prompt();
-+
- 	member = dbus_message_get_member(pending_message);
- 
- 	if (!strcmp(member, "RequestPinCode"))
-@@ -97,9 +138,6 @@ dbus_bool_t agent_input(DBusConnection *conn, const char *input)
- static DBusMessage *release_agent(DBusConnection *conn,
- 					DBusMessage *msg, void *user_data)
- {
--	if (pending_message)
--		rl_clear_message();
--
- 	agent_registered = FALSE;
- 	agent_capability = NULL;
- 
-@@ -110,6 +148,8 @@ static DBusMessage *release_agent(DBusConnection *conn,
- 		pending_message = NULL;
- 	}
- 
-+	agent_release_prompt();
-+
- 	g_dbus_unregister_interface(conn, AGENT_PATH, AGENT_INTERFACE);
- 
- 	return dbus_message_new_method_return(msg);
-@@ -125,7 +165,7 @@ static DBusMessage *request_pincode(DBusConnection *conn,
- 	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
- 							DBUS_TYPE_INVALID);
- 
--	rl_message("Enter PIN code: ");
-+	agent_prompt("Enter PIN code: ");
- 
- 	pending_message = dbus_message_ref(msg);
- 
-@@ -145,7 +185,7 @@ static DBusMessage *request_confirmation(DBusConnection *conn,
- 				DBUS_TYPE_UINT32, &passkey, DBUS_TYPE_INVALID);
- 
- 	str = g_strdup_printf("Confirm passkey %06u (yes/no): ", passkey);
--	rl_message(str);
-+	agent_prompt(str);
- 	g_free(str);
- 
- 	pending_message = dbus_message_ref(msg);
-@@ -163,7 +203,7 @@ static DBusMessage *request_authorization(DBusConnection *conn,
- 	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
- 							DBUS_TYPE_INVALID);
- 
--	rl_message("Accept pairing (yes/no): ");
-+	agent_prompt("Accept pairing (yes/no): ");
- 
- 	pending_message = dbus_message_ref(msg);
- 
-@@ -182,7 +222,7 @@ static DBusMessage *authorize_service(DBusConnection *conn,
- 				DBUS_TYPE_STRING, &uuid, DBUS_TYPE_INVALID);
- 
- 	str = g_strdup_printf("Authorize service %s (yes/no): ", uuid);
--	rl_message(str);
-+	agent_prompt(str);
- 	g_free(str);
- 
- 	pending_message = dbus_message_ref(msg);
-@@ -193,10 +233,9 @@ static DBusMessage *authorize_service(DBusConnection *conn,
- static DBusMessage *cancel_request(DBusConnection *conn,
- 					DBusMessage *msg, void *user_data)
- {
--	rl_clear_message();
--
- 	rl_printf("Request canceled\n");
- 
-+	agent_release_prompt();
- 	dbus_message_unref(pending_message);
- 	pending_message = NULL;
- 
-diff --git a/client/display.h b/client/display.h
-index 9cb891a..957bdc6 100644
---- a/client/display.h
-+++ b/client/display.h
-@@ -25,6 +25,6 @@
- #define COLOR_RED	"\x1B[0;91m"
- #define COLOR_GREEN	"\x1B[0;92m"
- #define COLOR_YELLOW	"\x1B[0;93m"
--#define COLOR_BLUE	"\x1B[0;34m"
-+#define COLOR_BLUE	"\x1B[0;94m"
- 
- void rl_printf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
-diff --git a/client/main.c b/client/main.c
-index d8547c0..704cf46 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -46,6 +46,9 @@
- #define COLORED_CHG	COLOR_YELLOW "CHG" COLOR_OFF
- #define COLORED_DEL	COLOR_RED "DEL" COLOR_OFF
- 
-+#define PROMPT_ON	COLOR_BLUE "[bluetooth]" COLOR_OFF "# "
-+#define PROMPT_OFF	"[bluetooth]# "
-+
- static GMainLoop *main_loop;
- static DBusConnection *dbus_conn;
- 
-@@ -63,7 +66,7 @@ static void proxy_leak(gpointer data)
- 
- static void connect_handler(DBusConnection *connection, void *user_data)
- {
--	rl_set_prompt(COLOR_BLUE "[bluetooth]" COLOR_OFF "# ");
-+	rl_set_prompt(PROMPT_ON);
- 	printf("\r");
- 	rl_on_new_line();
- 	rl_redisplay();
-@@ -71,7 +74,7 @@ static void connect_handler(DBusConnection *connection, void *user_data)
- 
- static void disconnect_handler(DBusConnection *connection, void *user_data)
- {
--	rl_set_prompt("[bluetooth]# ");
-+	rl_set_prompt(PROMPT_OFF);
- 	printf("\r");
- 	rl_on_new_line();
- 	rl_redisplay();
-@@ -1283,11 +1286,11 @@ int main(int argc, char *argv[])
- 	rl_erase_empty_line = 1;
- 	rl_callback_handler_install(NULL, rl_handler);
- 
--	rl_set_prompt("[bluetooth]# ");
-+	rl_set_prompt(PROMPT_OFF);
- 	rl_redisplay();
- 
--        input = setup_standard_input();
--        signal = setup_signalfd();
-+	input = setup_standard_input();
-+	signal = setup_signalfd();
- 	client = g_dbus_client_new(dbus_conn, "org.bluez", "/org/bluez");
- 
- 	g_dbus_client_set_connect_watch(client, connect_handler, NULL);
+Alex Deymo (6):
+  client: Add color modifiers to NEW, CHG and DEL events.
+  client: Right prompt management on agent input
+  client: "agent" command capability argument and autocompletion
+  client: Agent's DisplayPincode implementation
+  client: Agent's DisplayPasskey implementation
+  client: Agent's RequestPasskey implementation
+
+ client/agent.c   | 143 ++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ client/display.h |   7 ++-
+ client/main.c    | 106 +++++++++++++++++++++++++++++++++++------
+ 3 files changed, 229 insertions(+), 27 deletions(-)
+
 -- 
 1.8.1.3
 
