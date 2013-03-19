@@ -1,84 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v0 00/11] struct btd_service in core
-Date: Tue, 19 Mar 2013 08:40:44 +0100
-Message-Id: <1363678855-12765-1-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH] Bluetooth: Fix bogus __le16_to_cpu call
+Date: Tue, 19 Mar 2013 09:37:14 +0200
+Message-Id: <1363678634-15338-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-This RFC proposes a somewhat intrusive change in the core with the adoption of struct btd_service, with the following main goals:
+The type member of struct hci_rp_read_page_scan_type is u8 so no
+byte order conversion is necessary for it. This patch removes a bogus
+call to __le16_to_cpu on it.
 
-1. Support for multiple instances of the same UUID.
-2. Better support for connection-handling plugins/components (e.g. automotive).
-3. Exposure of remote services in D-Bus (not implemented here).
-4. Improve code readability and reduce profile-implementation code size.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_event.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-There's a lot of changes and many points open for discussion, so before working further (splitting, testing) I'd like to have some upstream feedback.
-
-As a suggestion for a first review, I'd say the most relevant patches are 01/11, 06/11 and 11/11.
-
-Cheers,
-Mikel
-
-Mikel Astiz (11):
-  core: Add btd_service to represent device services
-  device: Use btd_service to represent profiles
-  device: Replace connected_profiles with btd_service
-  device: Find services instead of profiles
-  device: Replace pending profile list with services
-  profile: Use btd_service for probing profiles
-  audio: Hold a reference to btd_service
-  network: Hold a reference to btd_service
-  input: Hold a reference to btd_service
-  service: Add callbacks to track state changes
-  profile: Use btd_service for connect/disconnect
-
- Makefile.am                          |   1 +
- Makefile.plugins                     |   4 +-
- profiles/audio/control.c             |  52 ++++++--
- profiles/audio/control.h             |   7 +-
- profiles/audio/manager.c             |  80 ++++-------
- profiles/audio/manager.h             |   7 -
- profiles/audio/sink.c                |  24 ++--
- profiles/audio/sink.h                |   4 +-
- profiles/audio/source.c              |  25 ++--
- profiles/audio/source.h              |   5 +-
- profiles/cyclingspeed/cyclingspeed.c |   9 +-
- profiles/deviceinfo/deviceinfo.c     |  11 +-
- profiles/gatt/gas.c                  |  10 +-
- profiles/health/hdp_manager.c        |  10 +-
- profiles/heartrate/heartrate.c       |  10 +-
- profiles/input/device.c              |  95 +++++++------
- profiles/input/device.h              |  13 +-
- profiles/input/hog.c                 |   8 +-
- profiles/input/manager.c             |  51 +------
- profiles/input/manager.h             |  25 ----
- profiles/network/connection.c        |  77 +++++------
- profiles/network/connection.h        |   8 +-
- profiles/network/manager.c           | 123 ++---------------
- profiles/network/manager.h           |  25 ----
- profiles/proximity/manager.c         |  28 ++--
- profiles/proximity/reporter.c        |   8 +-
- profiles/proximity/reporter.h        |   5 +-
- profiles/sap/manager.c               |   1 +
- profiles/scanparam/scan.c            |   9 +-
- profiles/thermometer/thermometer.c   |  11 +-
- src/device.c                         | 230 +++++++++++++++++++++-----------
- src/device.h                         |   5 -
- src/profile.c                        |  40 +++---
- src/profile.h                        |  14 +-
- src/service.c                        | 250 +++++++++++++++++++++++++++++++++++
- src/service.h                        |  61 +++++++++
- 36 files changed, 793 insertions(+), 553 deletions(-)
- delete mode 100644 profiles/input/manager.h
- delete mode 100644 profiles/network/manager.h
- create mode 100644 src/service.c
- create mode 100644 src/service.h
-
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 8a1f511..1385807 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -641,7 +641,7 @@ static void hci_cc_read_page_scan_type(struct hci_dev *hdev,
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
+ 
+ 	if (test_bit(HCI_INIT, &hdev->flags) && !rp->status)
+-		hdev->page_scan_type = __le16_to_cpu(rp->type);
++		hdev->page_scan_type = rp->type;
+ }
+ 
+ static void hci_cc_write_page_scan_type(struct hci_dev *hdev,
 -- 
-1.8.1.4
+1.7.10.4
 
