@@ -1,36 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5148EB5B.6030104@somethingshocking.com>
-Date: Tue, 19 Mar 2013 22:48:59 +0000
-From: Graham Burnside <graham@somethingshocking.com>
-MIME-Version: 1.0
+From: Alex Deymo <deymo@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: ralink rt3290/3298 pcie
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: keybuk@chromium.org, Alex Deymo <deymo@chromium.org>
+Subject: [PATCH v3 6/6] client: Agent's RequestPasskey implementation
+Date: Tue, 19 Mar 2013 13:55:05 -0700
+Message-Id: <1363726505-15171-7-git-send-email-deymo@chromium.org>
+In-Reply-To: <1363726505-15171-1-git-send-email-deymo@chromium.org>
+References: <1363726505-15171-1-git-send-email-deymo@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Implements the uint32 RequestPasskey(object device) method.
+---
+ client/agent.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-I was wondering if anyone had had a look into or discussed this wifi /
-bluetooth combo card with ralink? It came present in my new HP laptop,
-so I'm guessing its quite common.
-
-I have the wifi working perfectly from the rt2x00 backports, but can't
-find any mention of the bluetooth device. I have also emailed ralink, so
-will post anything useful back here.
-
-Details as follows:
-
-           +-1c.0-[01]--+-00.0  Ralink corp. Device 3290
-           |                        \-00.1  Ralink corp. Device 3298
-
-
-Thanks,
-
-Graham
-
+diff --git a/client/agent.c b/client/agent.c
+index 00754df..29769fd 100644
+--- a/client/agent.c
++++ b/client/agent.c
+@@ -94,6 +94,20 @@ static void pincode_response(DBusConnection *conn, const char *input)
+ 							DBUS_TYPE_INVALID);
+ }
+ 
++static void passkey_response(DBusConnection *conn, const char *input)
++{
++	dbus_uint32_t passkey;
++	if (sscanf(input, "%u", &passkey) == 1)
++		g_dbus_send_reply(conn, pending_message, DBUS_TYPE_UINT32,
++						&passkey, DBUS_TYPE_INVALID);
++	else if (!strcmp(input, "no"))
++		g_dbus_send_error(conn, pending_message,
++					"org.bluez.Error.Rejected", NULL);
++	else
++		g_dbus_send_error(conn, pending_message,
++					"org.bluez.Error.Canceled", NULL);
++}
++
+ static void confirm_response(DBusConnection *conn, const char *input)
+ {
+ 	if (!strcmp(input, "yes"))
+@@ -119,6 +133,8 @@ dbus_bool_t agent_input(DBusConnection *conn, const char *input)
+ 
+ 	if (!strcmp(member, "RequestPinCode"))
+ 		pincode_response(conn, input);
++	else if (!strcmp(member, "RequestPasskey"))
++		passkey_response(conn, input);
+ 	else if (!strcmp(member, "RequestConfirmation"))
+ 		confirm_response(conn, input);
+ 	else if (!strcmp(member, "RequestAuthorization"))
+@@ -186,6 +202,23 @@ static DBusMessage *display_pincode(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
++static DBusMessage *request_passkey(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
++{
++	const char *device;
++
++	rl_printf("Request passkey\n");
++
++	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
++							DBUS_TYPE_INVALID);
++
++	agent_prompt("Enter passkey (number in 0-999999): ");
++
++	pending_message = dbus_message_ref(msg);
++
++	return NULL;
++}
++
+ static DBusMessage *display_passkey(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
+ {
+@@ -289,6 +322,9 @@ static const GDBusMethodTable methods[] = {
+ 	{ GDBUS_METHOD("DisplayPinCode",
+ 			GDBUS_ARGS({ "device", "o" }, { "pincode", "s" }),
+ 			NULL, display_pincode) },
++	{ GDBUS_ASYNC_METHOD("RequestPasskey",
++			GDBUS_ARGS({ "device", "o" }),
++			GDBUS_ARGS({ "passkey", "u" }), request_passkey) },
+ 	{ GDBUS_METHOD("DisplayPasskey",
+ 			GDBUS_ARGS({ "device", "o" }, { "passkey", "u" },
+ 							{ "entered", "q" }),
 -- 
-
-Get my public signing / encryption OpenPGP key at:
-https://www.somethingshocking.com/grahamPublicPGP.key
+1.8.1.3
 
