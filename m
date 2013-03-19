@@ -1,54 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CANq1E4TMGGwiz-kGGCqGOn+A-D-msiTAb8L4Yf6kkMwrzOnn_g@mail.gmail.com>
+In-Reply-To: <B75AA63D-0629-4B45-BBB2-C09CD7EEFB48@hadess.net>
 References: <CANq1E4TMGGwiz-kGGCqGOn+A-D-msiTAb8L4Yf6kkMwrzOnn_g@mail.gmail.com>
-Date: Tue, 19 Mar 2013 07:02:17 -0400
-Message-ID: <CAJdJm_MtG=Ar8N836PK11LeiSqs8K7foCfbm=qeCF39rmj=whg@mail.gmail.com>
+	<B75AA63D-0629-4B45-BBB2-C09CD7EEFB48@hadess.net>
+Date: Tue, 19 Mar 2013 09:04:22 +0100
+Message-ID: <CANq1E4QSW0y1SC=-E6wFw6arQEUwPOdeWgaSzE2iZnXOeqD1tw@mail.gmail.com>
 Subject: Re: Device selection during inquiry
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: David Herrmann <dh.herrmann@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+From: David Herrmann <dh.herrmann@gmail.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Bastien
 
-On Mon, Mar 18, 2013 at 8:07 PM, David Herrmann <dh.herrmann@gmail.com> wrote:
-> A Bluetooth Host searches for target devices via standard inquiry (at
-> least I think so). The devices can be placed into discoverable mode
-> for 20s via a "sync" button. Once they are found, a baseband
-> connection is created by the host and the devices are paired via a
-> simple BT-address related PIN.
+On Tue, Mar 19, 2013 at 1:15 AM, Bastien Nocera <hadess@hadess.net> wrote:
+> On 19 Mar 2013, at 01:07, David Herrmann <dh.herrmann@gmail.com> wrote:
+>> I tried setting the following to the same values as on a sample target device:
+>>  - BT Address
+>>  - device-class
+>>  - inquiry-mode
+>>  - device-name
+>> However, that didn't change anything.
+>>
+>> Are there any other values that I should play with which might be used
+>> by the host to identify possible target devices?
 >
-> I can easily replace the host with a BlueZ host and connect to the
-> devices via a normal inquiry and then open the baseband connection.
-> However, I haven't succeeded in replacing the target devices with a
-> BlueZ host. I simply cannot trick the proprietary host into connecting
-> to my device. In fact, "hcidump" doesn't give me anything while the
-> host is performing the inquiry. I couldn't even figure out the
-> BT-address of the host.
+> Adapter MAC address. In fact, I thought that was necessary with some Wiimotes to make the bonding permanent.
 
-I remembered that I used to change BlueZ's default LAP (0x9e8b33,
-which is the GIAC) and use that same value on the "host" side in order
-to filter out unwanted devices during inquiry. This allowed me to get
-"cleaner" hcidumps because I could only "see" the devices which are
-using IACs generated from that same LAP. See page 315 of the Core V4.0
-spec for some intro to these concepts.
+As I said, I already tried changing the BD-Address to one of a target
+device and it didn't change anything.
 
-It's possible that the Wii Remote uses a different LAP than of that of
-BlueZ's, and that the Wii host runs inquiry using that LAP in order to
-reduce the list of found devices and improve discovery latency. BlueZ
-sees all devices because it uses the GIAC.
+In fact, I can reliably bond with any Wii Remote without changing my
+BD-Address and this already works perfectly well. But this time I want
+to emulate the Wii Remote and make the Wii-Console connect to me.
+I don't think that it filters Address based as I have working remotes
+with the following addresses:
+  00:1E:35:3B:7E:6D
+  78:A2:A0:DD:F6:8A
+  D8:6B:F7:0D:3C:78
+  2C:10:C1:B8:84:40
+  34:AF:2C:18:AC:99
+I cannot see any common attribute here.
 
-If that's the case, you need to find out this LAP and use the same
-value. But It might be just that simple because other controller
-parameters are also used to calculate the IAC. Unfortunately, I know
-very little about this part of the spec (I only play with it for
-testing). But I hope it helps you looking for further info.
-
-Best Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Thanks anyway!
+David
