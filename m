@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v0 02/11] device: Use btd_service to represent profiles
-Date: Tue, 19 Mar 2013 08:40:46 +0100
-Message-Id: <1363678855-12765-3-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v0 01/11] core: Add btd_service to represent device services
+Date: Tue, 19 Mar 2013 08:40:45 +0100
+Message-Id: <1363678855-12765-2-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1363678855-12765-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1363678855-12765-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,227 +12,295 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Maintain a list of btd_service pointers instead of btd_profile pointers,
-for services that have been probed for this device.
-
-This list will reference count the btd_service instances.
+Add object to centralize all data corresponding to a service provided by
+a remote device as well as the possible states for such a service.
 ---
- src/device.c | 76 ++++++++++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 53 insertions(+), 23 deletions(-)
+ Makefile.am   |   1 +
+ src/service.c | 202 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/service.h |  53 +++++++++++++++
+ 3 files changed, 256 insertions(+)
+ create mode 100644 src/service.c
+ create mode 100644 src/service.h
 
-diff --git a/src/device.c b/src/device.c
-index 3cd7f10..c84a042 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -56,6 +56,7 @@
- #include "attio.h"
- #include "device.h"
- #include "profile.h"
-+#include "service.h"
- #include "dbus-common.h"
- #include "error.h"
- #include "glib-helper.h"
-@@ -167,7 +168,7 @@ struct btd_device {
- 	struct btd_adapter	*adapter;
- 	GSList		*uuids;
- 	GSList		*primaries;		/* List of primary services */
--	GSList		*profiles;		/* Probed profiles */
-+	GSList		*services;		/* List of btd_service */
- 	GSList		*pending;		/* Pending profiles */
- 	GSList		*watches;		/* List of disconnect_data */
- 	gboolean	temporary;
-@@ -217,6 +218,17 @@ static int device_browse_primary(struct btd_device *device, DBusMessage *msg,
- static int device_browse_sdp(struct btd_device *device, DBusMessage *msg,
- 							gboolean reverse);
- 
-+static gint service_profile_cmp(gconstpointer a, gconstpointer b)
-+{
-+	struct btd_service *service = (gpointer) a;
-+	struct btd_profile *profile = (gpointer) b;
+diff --git a/Makefile.am b/Makefile.am
+index f75b8d6..c30ab69 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -142,6 +142,7 @@ src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
+ 			src/error.h src/error.c \
+ 			src/adapter.h src/adapter.c \
+ 			src/profile.h src/profile.c \
++			src/service.h src/service.c \
+ 			src/device.h src/device.c src/attio.h \
+ 			src/dbus-common.c src/dbus-common.h \
+ 			src/eir.h src/eir.c \
+diff --git a/src/service.c b/src/service.c
+new file mode 100644
+index 0000000..ee56a0a
+--- /dev/null
++++ b/src/service.c
+@@ -0,0 +1,202 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012-2013  BMW Car IT GmbH. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+	if (service_get_profile(service) == profile)
-+		return 0;
-+	else
-+		return 1;
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <assert.h>
++#include <unistd.h>
++#include <fcntl.h>
++#include <stdbool.h>
++#include <sys/stat.h>
++#include <sys/ioctl.h>
++#include <errno.h>
++
++#include <bluetooth/bluetooth.h>
++
++#include <glib.h>
++
++#include "log.h"
++
++#include "adapter.h"
++#include "device.h"
++#include "profile.h"
++#include "service.h"
++
++struct btd_service {
++	gint			ref;
++	struct btd_device	*device;
++	struct btd_profile	*profile;
++	void			*user_data;
++	service_state_t		state;
++	int			err;
++};
++
++static char *str_state[] = {
++	"SERVICE_STATE_UNAVAILABLE",
++	"SERVICE_STATE_DISCONNECTED",
++	"SERVICE_STATE_CONNECTING",
++	"SERVICE_STATE_CONNECTED",
++	"SERVICE_STATE_DISCONNECTING",
++};
++
++struct btd_device *service_get_device(struct btd_service *service)
++{
++	return service->device;
 +}
 +
- static gboolean store_device_info_cb(gpointer user_data)
- {
- 	struct btd_device *device = user_data;
-@@ -870,12 +882,14 @@ static gboolean dev_property_get_adapter(const GDBusPropertyTable *property,
- 	return TRUE;
- }
- 
--static void profile_remove(gpointer data, gpointer user_data)
-+static void service_remove(struct btd_service *service)
- {
--	struct btd_profile *profile = data;
--	struct btd_device *device = user_data;
-+	struct btd_profile *profile = service_get_profile(service);
-+	struct btd_device *device = service_get_device(service);
- 
-+	service_unavailable(service);
- 	profile->device_remove(profile, device);
-+	btd_service_unref(service);
- }
- 
- static gboolean do_disconnect(gpointer user_data)
-@@ -900,9 +914,8 @@ int device_block(struct btd_device *device, gboolean update_only)
- 	if (device->connected)
- 		do_disconnect(device);
- 
--	g_slist_foreach(device->profiles, profile_remove, device);
--	g_slist_free(device->profiles);
--	device->profiles = NULL;
-+	g_slist_free_full(device->services, (GDestroyNotify) service_remove);
-+	device->services = NULL;
- 
- 	if (!update_only)
- 		err = btd_adapter_block_address(device->adapter,
-@@ -1156,8 +1169,9 @@ static struct btd_profile *find_connectable_profile(struct btd_device *dev,
- {
- 	GSList *l;
- 
--	for (l = dev->profiles; l != NULL; l = g_slist_next(l)) {
--		struct btd_profile *p = l->data;
-+	for (l = dev->services; l != NULL; l = g_slist_next(l)) {
-+		struct btd_service *service = l->data;
-+		struct btd_profile *p = service_get_profile(service);
- 
- 		if (!p->connect || !p->remote_uuid)
- 			continue;
-@@ -1179,6 +1193,7 @@ static gint profile_prio_cmp(gconstpointer a, gconstpointer b)
- static DBusMessage *connect_profiles(struct btd_device *dev, DBusMessage *msg,
- 							const char *uuid)
- {
-+	struct btd_service *service;
- 	struct btd_profile *p;
- 	GSList *l;
- 	int err;
-@@ -1208,8 +1223,9 @@ static DBusMessage *connect_profiles(struct btd_device *dev, DBusMessage *msg,
- 		goto start_connect;
- 	}
- 
--	for (l = dev->profiles; l != NULL; l = g_slist_next(l)) {
--		p = l->data;
-+	for (l = dev->services; l != NULL; l = g_slist_next(l)) {
-+		service = l->data;
-+		p = service_get_profile(service);
- 
- 		if (!p->auto_connect)
- 			continue;
-@@ -2245,9 +2261,8 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
- 	if (remove_stored)
- 		device_remove_stored(device);
- 
--	g_slist_foreach(device->profiles, profile_remove, device);
--	g_slist_free(device->profiles);
--	device->profiles = NULL;
-+	g_slist_free_full(device->services, (GDestroyNotify) service_remove);
-+	device->services = NULL;
- 
- 	btd_device_unref(device);
- }
-@@ -2323,6 +2338,7 @@ static void dev_probe(struct btd_profile *p, void *user_data)
- {
- 	struct probe_data *d = user_data;
- 	GSList *probe_uuids;
-+	struct btd_service *service;
- 	int err;
- 
- 	if (p->device_probe == NULL)
-@@ -2333,14 +2349,18 @@ static void dev_probe(struct btd_profile *p, void *user_data)
- 
- 	probe_uuids = g_slist_append(NULL, (char *) p->remote_uuid);
- 
-+	service = service_create(d->dev, p);
++struct btd_profile *service_get_profile(struct btd_service *service)
++{
++	return service->profile;
++}
 +
- 	err = p->device_probe(p, d->dev, probe_uuids);
- 	if (err < 0) {
- 		error("%s profile probe failed for %s", p->name, d->addr);
-+		btd_service_unref(service);
- 		g_slist_free(probe_uuids);
- 		return;
- 	}
- 
--	d->dev->profiles = g_slist_append(d->dev->profiles, p);
-+	service_probed(service);
-+	d->dev->services = g_slist_append(d->dev->services, service);
- 	g_slist_free(probe_uuids);
- }
- 
-@@ -2348,6 +2368,7 @@ void device_probe_profile(gpointer a, gpointer b)
- {
- 	struct btd_device *device = a;
- 	struct btd_profile *profile = b;
-+	struct btd_service *service;
- 	GSList *probe_uuids;
- 	char addr[18];
- 	int err;
-@@ -2362,14 +2383,18 @@ void device_probe_profile(gpointer a, gpointer b)
- 
- 	ba2str(&device->bdaddr, addr);
- 
-+	service = service_create(device, profile);
++void service_set_user_data(struct btd_service *service, void *user_data)
++{
++	assert(service->state == SERVICE_STATE_UNAVAILABLE);
++	service->user_data = user_data;
++}
 +
- 	err = profile->device_probe(profile, device, probe_uuids);
- 	if (err < 0) {
- 		error("%s profile probe failed for %s", profile->name, addr);
-+		btd_service_unref(service);
- 		g_slist_free(probe_uuids);
- 		return;
- 	}
- 
--	device->profiles = g_slist_append(device->profiles, profile);
-+	service_probed(service);
-+	device->services = g_slist_append(device->services, service);
- 	g_slist_free(probe_uuids);
- 
- 	if (!profile->auto_connect || !device->general_connect)
-@@ -2385,15 +2410,19 @@ void device_remove_profile(gpointer a, gpointer b)
- {
- 	struct btd_device *device = a;
- 	struct btd_profile *profile = b;
++void *service_get_user_data(struct btd_service *service)
++{
++	return service->user_data;
++}
++
++int service_get_error(struct btd_service *service)
++{
++	return service->err;
++}
++
++service_state_t service_get_state(struct btd_service *service)
++{
++	return service->state;
++}
++
++static void service_set_state(struct btd_service *service,
++							service_state_t state)
++{
++	service_state_t old = service->state;
++
++	if (state == old)
++		return;
++
++	service->state = state;
++
++	DBG("State changed %p: %s -> %s", service, str_state[old],
++							str_state[state]);
++}
++
++struct btd_service *service_create(struct btd_device *device,
++						struct btd_profile *profile)
++{
 +	struct btd_service *service;
-+	GSList *l;
- 
--	if (!g_slist_find(device->profiles, profile))
-+	l = g_slist_find_custom(device->services, profile, service_profile_cmp);
-+	if (l == NULL)
- 		return;
- 
- 	device->connected_profiles = g_slist_remove(device->connected_profiles,
- 								profile);
--	device->profiles = g_slist_remove(device->profiles, profile);
- 
--	profile->device_remove(profile, device);
-+	service = l->data;
-+	device->services = g_slist_delete_link(device->services, l);
-+	service_remove(service);
- }
- 
- void device_probe_profiles(struct btd_device *device, GSList *uuids)
-@@ -2442,15 +2471,16 @@ static void device_remove_profiles(struct btd_device *device, GSList *uuids)
- 	device->uuids = NULL;
- 	store_device_info(device);
- 
--	for (l = device->profiles; l != NULL; l = next) {
--		struct btd_profile *profile = l->data;
-+	for (l = device->services; l != NULL; l = next) {
-+		struct btd_service *service = l->data;
-+		struct btd_profile *profile = service_get_profile(service);
- 
- 		next = l->next;
- 		if (device_match_profile(device, profile, device->uuids))
- 			continue;
- 
--		profile->device_remove(profile, device);
--		device->profiles = g_slist_remove(device->profiles, profile);
-+		device->services = g_slist_delete_link(device->services, l);
-+		service_remove(service);
- 	}
- }
- 
++
++	service = g_try_new0(struct btd_service, 1);
++	if (!service) {
++		error("service_create: failed to alloc memory");
++		return NULL;
++	}
++
++	service->ref = 1;
++	service->device = btd_device_ref(device);
++	service->profile = profile;
++	service->state = SERVICE_STATE_UNAVAILABLE;
++
++	return service;
++}
++
++struct btd_service *btd_service_ref(struct btd_service *service)
++{
++	service->ref++;
++
++	DBG("%p: ref=%d", service, service->ref);
++
++	return service;
++}
++
++void btd_service_unref(struct btd_service *service)
++{
++	service->ref--;
++
++	DBG("%p: ref=%d", service, service->ref);
++
++	if (service->ref > 0)
++		return;
++
++	btd_device_unref(service->device);
++	g_free(service);
++}
++
++void service_probed(struct btd_service *service)
++{
++	assert(service->state == SERVICE_STATE_UNAVAILABLE);
++	service_set_state(service, SERVICE_STATE_DISCONNECTED);
++}
++
++void service_connecting(struct btd_service *service)
++{
++	assert(service->state == SERVICE_STATE_DISCONNECTED);
++	service->err = 0;
++	service_set_state(service, SERVICE_STATE_CONNECTING);
++}
++
++void service_connecting_complete(struct btd_service *service, int err)
++{
++	if (service->state != SERVICE_STATE_DISCONNECTED &&
++				service->state != SERVICE_STATE_CONNECTING)
++		return;
++
++	service->err = err;
++
++	if (err == 0)
++		service_set_state(service, SERVICE_STATE_CONNECTED);
++	else
++		service_set_state(service, SERVICE_STATE_DISCONNECTED);
++}
++
++void service_disconnecting(struct btd_service *service)
++{
++	assert(service->state == SERVICE_STATE_CONNECTING ||
++				service->state == SERVICE_STATE_CONNECTED);
++	service->err = 0;
++	service_set_state(service, SERVICE_STATE_DISCONNECTING);
++}
++
++void service_disconnecting_complete(struct btd_service *service, int err)
++{
++	if (service->state != SERVICE_STATE_CONNECTED &&
++				service->state != SERVICE_STATE_DISCONNECTING)
++		return;
++
++	service->err = err;
++	service_set_state(service, SERVICE_STATE_DISCONNECTED);
++}
++
++void service_unavailable(struct btd_service *service)
++{
++	service->profile = NULL;
++	service->err = 0;
++	service_set_state(service, SERVICE_STATE_UNAVAILABLE);
++}
+diff --git a/src/service.h b/src/service.h
+new file mode 100644
+index 0000000..72282bd
+--- /dev/null
++++ b/src/service.h
+@@ -0,0 +1,53 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012-2013  BMW Car IT GmbH. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++typedef enum {
++	SERVICE_STATE_UNAVAILABLE, /* Not probed */
++	SERVICE_STATE_DISCONNECTED,
++	SERVICE_STATE_CONNECTING,
++	SERVICE_STATE_CONNECTED,
++	SERVICE_STATE_DISCONNECTING,
++} service_state_t;
++
++struct btd_service;
++
++struct btd_service *service_create(struct btd_device *device,
++						struct btd_profile *profile);
++
++struct btd_service *btd_service_ref(struct btd_service *service);
++void btd_service_unref(struct btd_service *service);
++
++struct btd_device *service_get_device(struct btd_service *service);
++struct btd_profile *service_get_profile(struct btd_service *service);
++service_state_t service_get_state(struct btd_service *service);
++
++void service_set_user_data(struct btd_service *service, void *user_data);
++void *service_get_user_data(struct btd_service *service);
++int service_get_error(struct btd_service *service);
++
++void service_probed(struct btd_service *service);
++void service_connecting(struct btd_service *service);
++void service_connecting_complete(struct btd_service *service, int err);
++void service_disconnecting(struct btd_service *service);
++void service_disconnecting_complete(struct btd_service *service, int err);
++void service_unavailable(struct btd_service *service);
 -- 
 1.8.1.4
 
