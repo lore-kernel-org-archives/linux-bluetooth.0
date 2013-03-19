@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v0 09/11] input: Hold a reference to btd_service
-Date: Tue, 19 Mar 2013 08:40:53 +0100
-Message-Id: <1363678855-12765-10-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v0 06/11] profile: Use btd_service for probing profiles
+Date: Tue, 19 Mar 2013 08:40:50 +0100
+Message-Id: <1363678855-12765-7-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1363678855-12765-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1363678855-12765-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,285 +12,814 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Profile implementations are expected to hold a reference to probed
-services, so update the input profiles accordingly.
----
- profiles/input/device.c  | 74 +++++++++++++++++++++++++-----------------------
- profiles/input/device.h  |  8 +++---
- profiles/input/manager.c | 41 ++++-----------------------
- 3 files changed, 48 insertions(+), 75 deletions(-)
+Change the profile probe mechanism in order to pass the btd_service
+instance representing the remote service. This object is bound to a
+btd_profile and a btd_device, thus replacing the previous parameters.
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index 1da9d99..6fa87bc 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -44,6 +44,7 @@
+The probe callback is allowed to hold a reference to the btd_service
+by means of btd_service_ref(), which should be unreferenced during
+removal. In addition, the probe callback is allowed to set the
+user_data pointer associated to the btd_service by using
+service_set_user_data().
+
+Keeping such a reference of the btd_service allows supporting multiple
+instances of the same UUID, since the reference can serve as a handle
+during the interactions between the profile implementation and the core.
+---
+ profiles/audio/control.c             |  8 ++++----
+ profiles/audio/control.h             |  4 ++--
+ profiles/audio/manager.c             | 21 ++++++++++++---------
+ profiles/cyclingspeed/cyclingspeed.c |  9 +++++----
+ profiles/deviceinfo/deviceinfo.c     | 11 ++++++-----
+ profiles/gatt/gas.c                  | 10 ++++++----
+ profiles/health/hdp_manager.c        | 10 +++++++---
+ profiles/heartrate/heartrate.c       | 10 ++++++----
+ profiles/input/hog.c                 |  8 +++++---
+ profiles/input/manager.c             | 11 +++++++----
+ profiles/network/manager.c           | 20 +++++++++++++-------
+ profiles/proximity/manager.c         | 28 ++++++++++++++++------------
+ profiles/proximity/reporter.c        |  8 +++++---
+ profiles/proximity/reporter.h        |  5 ++---
+ profiles/sap/manager.c               |  1 +
+ profiles/scanparam/scan.c            |  9 ++++++---
+ profiles/thermometer/thermometer.c   | 11 ++++++-----
+ src/device.c                         | 11 +++--------
+ src/profile.c                        | 11 +++++++----
+ src/profile.h                        |  8 ++++----
+ 20 files changed, 123 insertions(+), 91 deletions(-)
+
+diff --git a/profiles/audio/control.c b/profiles/audio/control.c
+index 7e4ed42..ebaf319 100644
+--- a/profiles/audio/control.c
++++ b/profiles/audio/control.c
+@@ -262,13 +262,13 @@ void control_unregister(struct audio_device *dev)
+ 						AUDIO_CONTROL_INTERFACE);
+ }
+ 
+-void control_update(struct control *control, GSList *uuids)
++void control_update(struct control *control, const char *uuid)
+ {
+-	if (g_slist_find_custom(uuids, AVRCP_TARGET_UUID, bt_uuid_strcmp))
++	if (bt_uuid_strcmp(uuid, AVRCP_TARGET_UUID) == 0)
+ 		control->target = TRUE;
+ }
+ 
+-struct control *control_init(struct audio_device *dev, GSList *uuids)
++struct control *control_init(struct audio_device *dev, const char *uuid)
+ {
+ 	struct control *control;
+ 
+@@ -285,7 +285,7 @@ struct control *control_init(struct audio_device *dev, GSList *uuids)
+ 
+ 	control = g_new0(struct control, 1);
+ 
+-	control_update(control, uuids);
++	control_update(control, uuid);
+ 
+ 	control->avctp_id = avctp_add_state_cb(dev, state_changed);
+ 
+diff --git a/profiles/audio/control.h b/profiles/audio/control.h
+index de0259e..82ad0d2 100644
+--- a/profiles/audio/control.h
++++ b/profiles/audio/control.h
+@@ -24,8 +24,8 @@
+ 
+ #define AUDIO_CONTROL_INTERFACE "org.bluez.MediaControl1"
+ 
+-struct control *control_init(struct audio_device *dev, GSList *uuids);
+-void control_update(struct control *control, GSList *uuids);
++struct control *control_init(struct audio_device *dev, const char *uuid);
++void control_update(struct control *control, const char *uuid);
+ void control_unregister(struct audio_device *dev);
+ gboolean control_is_active(struct audio_device *dev);
+ 
+diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
+index 64665d7..0163d0e 100644
+--- a/profiles/audio/manager.c
++++ b/profiles/audio/manager.c
+@@ -53,6 +53,7 @@
  #include "../src/adapter.h"
  #include "../src/device.h"
  #include "../src/profile.h"
 +#include "../src/service.h"
- #include "../src/storage.h"
- #include "../src/dbus-common.h"
  
-@@ -55,9 +56,9 @@
- #include "sdp-client.h"
- 
- struct input_device {
-+	struct btd_service	*service;
- 	struct btd_device	*device;
- 	char			*path;
--	char			*uuid;
- 	bdaddr_t		src;
- 	bdaddr_t		dst;
- 	uint32_t		handle;
-@@ -66,7 +67,6 @@ struct input_device {
- 	guint			ctrl_watch;
- 	guint			intr_watch;
- 	guint			sec_watch;
--	int			timeout;
- 	struct hidp_connadd_req *req;
- 	guint			dc_id;
- 	gboolean		disable_sdp;
-@@ -74,6 +74,12 @@ struct input_device {
- };
- 
- static GSList *devices = NULL;
-+static int idle_timeout = 0;
-+
-+void input_set_idle_timeout(int timeout)
-+{
-+	idle_timeout = timeout;
-+}
- 
- static struct input_device *find_device_by_path(GSList *list, const char *path)
- {
-@@ -92,6 +98,7 @@ static void input_device_free(struct input_device *idev)
- 	if (idev->dc_id)
- 		device_remove_disconnect_watch(idev->device, idev->dc_id);
- 
-+	btd_service_unref(idev->service);
- 	btd_device_unref(idev->device);
- 	g_free(idev->name);
- 	g_free(idev->path);
-@@ -111,8 +118,6 @@ static void input_device_free(struct input_device *idev)
- 	if (idev->ctrl_io)
- 		g_io_channel_unref(idev->ctrl_io);
- 
--	g_free(idev->uuid);
--
- 	g_free(idev);
- }
- 
-@@ -366,7 +371,7 @@ static int hidp_add_connection(struct input_device *idev)
- 	req->ctrl_sock = g_io_channel_unix_get_fd(idev->ctrl_io);
- 	req->intr_sock = g_io_channel_unix_get_fd(idev->intr_io);
- 	req->flags     = 0;
--	req->idle_to   = idev->timeout;
-+	req->idle_to   = idle_timeout;
- 
- 	ba2str(&idev->src, src_addr);
- 	ba2str(&idev->dst, dst_addr);
-@@ -674,10 +679,21 @@ int input_device_disconnect(struct btd_device *dev, struct btd_profile *profile)
- 	return 0;
- }
- 
--static struct input_device *input_device_new(struct btd_device *device,
--				const char *path, const uint32_t handle,
--				gboolean disable_sdp)
-+static gboolean is_device_sdp_disable(const sdp_record_t *rec)
- {
-+	sdp_data_t *data;
-+
-+	data = sdp_data_get(rec, SDP_ATTR_HID_SDP_DISABLE);
-+
-+	return data && data->val.uint8;
-+}
-+
-+static struct input_device *input_device_new(struct btd_service *service)
-+{
-+	struct btd_device *device = service_get_device(service);
-+	const char *path = device_get_path(device);
-+	struct btd_profile *p = service_get_profile(service);
-+	const sdp_record_t *rec = btd_device_get_record(device, p->remote_uuid);
- 	struct btd_adapter *adapter = device_get_adapter(device);
- 	struct input_device *idev;
- 	char name[HCI_MAX_NAME_LENGTH + 1];
-@@ -685,10 +701,11 @@ static struct input_device *input_device_new(struct btd_device *device,
- 	idev = g_new0(struct input_device, 1);
- 	bacpy(&idev->src, adapter_get_address(adapter));
- 	bacpy(&idev->dst, device_get_address(device));
-+	idev->service = btd_service_ref(service);
- 	idev->device = btd_device_ref(device);
- 	idev->path = g_strdup(path);
--	idev->handle = handle;
--	idev->disable_sdp = disable_sdp;
-+	idev->handle = rec->handle;
-+	idev->disable_sdp = is_device_sdp_disable(rec);
- 
- 	device_get_name(device, name, HCI_MAX_NAME_LENGTH);
- 	if (strlen(name) > 0)
-@@ -697,19 +714,10 @@ static struct input_device *input_device_new(struct btd_device *device,
- 	return idev;
- }
- 
--static gboolean is_device_sdp_disable(const sdp_record_t *rec)
--{
--	sdp_data_t *data;
--
--	data = sdp_data_get(rec, SDP_ATTR_HID_SDP_DISABLE);
--
--	return data && data->val.uint8;
--}
--
--int input_device_register(struct btd_device *device,
--					const char *path, const char *uuid,
--					const sdp_record_t *rec, int timeout)
-+int input_device_register(struct btd_service *service)
- {
-+	struct btd_device *device = service_get_device(service);
-+	const char *path = device_get_path(device);
- 	struct input_device *idev;
- 
- 	DBG("%s", path);
-@@ -718,13 +726,11 @@ int input_device_register(struct btd_device *device,
- 	if (idev)
- 		return -EEXIST;
- 
--	idev = input_device_new(device, path, rec->handle,
--			is_device_sdp_disable(rec));
-+	idev = input_device_new(service);
- 	if (!idev)
- 		return -EINVAL;
- 
--	idev->timeout = timeout;
--	idev->uuid = g_strdup(uuid);
-+	service_set_user_data(service, idev);
- 
- 	devices = g_slist_append(devices, idev);
- 
-@@ -746,25 +752,21 @@ static struct input_device *find_device(const bdaddr_t *src,
+ #include "log.h"
+ #include "device.h"
+@@ -89,8 +90,9 @@ static struct audio_device *manager_find_device(struct btd_device *device)
  	return NULL;
  }
  
--int input_device_unregister(const char *path, const char *uuid)
-+void input_device_unregister(struct btd_service *service)
+-static void audio_remove(struct btd_profile *p, struct btd_device *device)
++static void audio_remove(struct btd_service *service)
  {
--	struct input_device *idev;
 +	struct btd_device *device = service_get_device(service);
-+	const char *path = device_get_path(device);
-+	struct input_device *idev = service_get_user_data(service);
+ 	struct audio_device *dev;
  
- 	DBG("%s", path);
- 
--	idev = find_device_by_path(devices, path);
--	if (idev == NULL)
--		return -EINVAL;
--
- 	if (idev->ctrl_io) {
--		/* Pending connection running */
--		return -EBUSY;
-+		/* FIXME: pending connection running */
-+		return;
- 	}
- 
- 	devices = g_slist_remove(devices, idev);
- 	input_device_free(idev);
--
--	return 0;
+ 	dev = manager_find_device(device);
+@@ -101,9 +103,9 @@ static void audio_remove(struct btd_profile *p, struct btd_device *device)
+ 	audio_device_unregister(dev);
  }
  
- static int input_device_connadd(struct input_device *idev)
-diff --git a/profiles/input/device.h b/profiles/input/device.h
-index aabc79c..fd7f847 100644
---- a/profiles/input/device.h
-+++ b/profiles/input/device.h
-@@ -27,10 +27,10 @@
- struct input_device;
- struct input_conn;
- 
--int input_device_register(struct btd_device *device, const char *path,
--				const char *uuid, const sdp_record_t *rec,
--				int timeout);
--int input_device_unregister(const char *path, const char *uuid);
-+void input_set_idle_timeout(int timeout);
-+
-+int input_device_register(struct btd_service *service);
-+void input_device_unregister(struct btd_service *service);
- 
- int input_device_set_channel(const bdaddr_t *src, const bdaddr_t *dst, int psm,
- 							GIOChannel *io);
-diff --git a/profiles/input/manager.c b/profiles/input/manager.c
-index 165938f..dc771a6 100644
---- a/profiles/input/manager.c
-+++ b/profiles/input/manager.c
-@@ -45,39 +45,6 @@
- #include "server.h"
- #include "manager.h"
- 
--static int idle_timeout = 0;
--
--static void input_remove(struct btd_device *device, const char *uuid)
--{
--	const char *path = device_get_path(device);
--
--	DBG("path %s", path);
--
--	input_device_unregister(path, uuid);
--}
--
--static int hid_device_probe(struct btd_service *service)
--{
--	struct btd_device *device = service_get_device(service);
--	const char *path = device_get_path(device);
--	const sdp_record_t *rec = btd_device_get_record(device, HID_UUID);
--
--	DBG("path %s", path);
--
--	if (!rec)
--		return -1;
--
--	return input_device_register(device, path, HID_UUID, rec,
--							idle_timeout * 60);
--}
--
--static void hid_device_remove(struct btd_service *service)
--{
--	struct btd_device *device = service_get_device(service);
--
--	input_remove(device, HID_UUID);
--}
--
- static int hid_server_probe(struct btd_profile *p, struct btd_adapter *adapter)
+-static int a2dp_source_probe(struct btd_profile *p, struct btd_device *device,
+-								GSList *uuids)
++static int a2dp_source_probe(struct btd_service *service)
  {
- 	return server_start(adapter_get_address(adapter));
-@@ -98,8 +65,8 @@ static struct btd_profile input_profile = {
- 	.connect	= input_device_connect,
- 	.disconnect	= input_device_disconnect,
++	struct btd_device *device = service_get_device(service);
+ 	struct audio_device *audio_dev;
  
--	.device_probe	= hid_device_probe,
--	.device_remove	= hid_device_remove,
-+	.device_probe	= input_device_register,
-+	.device_remove	= input_device_unregister,
+ 	audio_dev = get_audio_dev(device);
+@@ -117,9 +119,9 @@ static int a2dp_source_probe(struct btd_profile *p, struct btd_device *device,
+ 	return 0;
+ }
  
- 	.adapter_probe	= hid_server_probe,
- 	.adapter_remove = hid_server_remove,
-@@ -140,12 +107,16 @@ static int input_init(void)
+-static int a2dp_sink_probe(struct btd_profile *p, struct btd_device *device,
+-								GSList *uuids)
++static int a2dp_sink_probe(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
+ 	struct audio_device *audio_dev;
  
- 	config = load_config_file(CONFIGDIR "/input.conf");
- 	if (config) {
-+		int idle_timeout;
-+
- 		idle_timeout = g_key_file_get_integer(config, "General",
- 						"IdleTimeout", &err);
- 		if (err) {
- 			DBG("input.conf: %s", err->message);
- 			g_error_free(err);
- 		}
-+
-+		input_set_idle_timeout(idle_timeout * 60);
+ 	audio_dev = get_audio_dev(device);
+@@ -133,9 +135,10 @@ static int a2dp_sink_probe(struct btd_profile *p, struct btd_device *device,
+ 	return 0;
+ }
+ 
+-static int avrcp_probe(struct btd_profile *p, struct btd_device *device,
+-								GSList *uuids)
++static int avrcp_probe(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
++	struct btd_profile *p = service_get_profile(service);
+ 	struct audio_device *audio_dev;
+ 
+ 	audio_dev = get_audio_dev(device);
+@@ -145,9 +148,9 @@ static int avrcp_probe(struct btd_profile *p, struct btd_device *device,
  	}
  
- 	btd_profile_register(&input_profile);
+ 	if (audio_dev->control)
+-		control_update(audio_dev->control, uuids);
++		control_update(audio_dev->control, p->remote_uuid);
+ 	else
+-		audio_dev->control = control_init(audio_dev, uuids);
++		audio_dev->control = control_init(audio_dev, p->remote_uuid);
+ 
+ 	if (audio_dev->sink && sink_is_active(audio_dev))
+ 		avrcp_connect(audio_dev);
+diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
+index 125007e..1a2fdf6 100644
+--- a/profiles/cyclingspeed/cyclingspeed.c
++++ b/profiles/cyclingspeed/cyclingspeed.c
+@@ -34,6 +34,7 @@
+ #include "adapter.h"
+ #include "device.h"
+ #include "profile.h"
++#include "service.h"
+ #include "dbus-common.h"
+ #include "error.h"
+ #include "attrib/gattrib.h"
+@@ -1180,9 +1181,9 @@ static const GDBusMethodTable cyclingspeed_device_methods[] = {
+ 	{ }
+ };
+ 
+-static int csc_device_probe(struct btd_profile *p,
+-				struct btd_device *device, GSList *uuids)
++static int csc_device_probe(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
+ 	struct btd_adapter *adapter;
+ 	struct csc_adapter *cadapter;
+ 	struct csc *csc;
+@@ -1227,9 +1228,9 @@ static int csc_device_probe(struct btd_profile *p,
+ 	return 0;
+ }
+ 
+-static void csc_device_remove(struct btd_profile *p,
+-						struct btd_device *device)
++static void csc_device_remove(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
+ 	struct btd_adapter *adapter;
+ 	struct csc_adapter *cadapter;
+ 	struct csc *csc;
+diff --git a/profiles/deviceinfo/deviceinfo.c b/profiles/deviceinfo/deviceinfo.c
+index 471241b..a264fdf 100644
+--- a/profiles/deviceinfo/deviceinfo.c
++++ b/profiles/deviceinfo/deviceinfo.c
+@@ -34,6 +34,7 @@
+ #include "adapter.h"
+ #include "device.h"
+ #include "profile.h"
++#include "service.h"
+ #include "attrib/gattrib.h"
+ #include "attio.h"
+ #include "attrib/att.h"
+@@ -198,10 +199,9 @@ static void deviceinfo_unregister(struct btd_device *device)
+ 	deviceinfo_free(d);
+ }
+ 
+-static int deviceinfo_driver_probe(struct btd_profile *p,
+-					struct btd_device *device,
+-					GSList *uuids)
++static int deviceinfo_driver_probe(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
+ 	struct gatt_primary *prim;
+ 
+ 	prim = btd_device_get_primary(device, DEVICE_INFORMATION_UUID);
+@@ -211,9 +211,10 @@ static int deviceinfo_driver_probe(struct btd_profile *p,
+ 	return deviceinfo_register(device, prim);
+ }
+ 
+-static void deviceinfo_driver_remove(struct btd_profile *p,
+-						struct btd_device *device)
++static void deviceinfo_driver_remove(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
++
+ 	deviceinfo_unregister(device);
+ }
+ 
+diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
+index bc8dbb5..219f157 100644
+--- a/profiles/gatt/gas.c
++++ b/profiles/gatt/gas.c
+@@ -39,6 +39,7 @@
+ #include "adapter.h"
+ #include "device.h"
+ #include "profile.h"
++#include "service.h"
+ #include "attrib/att.h"
+ #include "attrib/gattrib.h"
+ #include "attio.h"
+@@ -407,9 +408,9 @@ static void gas_unregister(struct btd_device *device)
+ 	gas_free(gas);
+ }
+ 
+-static int gatt_driver_probe(struct btd_profile *p, struct btd_device *device,
+-								GSList *uuids)
++static int gatt_driver_probe(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
+ 	struct gatt_primary *gap, *gatt;
+ 
+ 	gap = btd_device_get_primary(device, GAP_UUID);
+@@ -423,9 +424,10 @@ static int gatt_driver_probe(struct btd_profile *p, struct btd_device *device,
+ 	return gas_register(device, &gap->range, &gatt->range);
+ }
+ 
+-static void gatt_driver_remove(struct btd_profile *p,
+-						struct btd_device *device)
++static void gatt_driver_remove(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
++
+ 	gas_unregister(device);
+ }
+ 
+diff --git a/profiles/health/hdp_manager.c b/profiles/health/hdp_manager.c
+index 5428724..7d50b17 100644
+--- a/profiles/health/hdp_manager.c
++++ b/profiles/health/hdp_manager.c
+@@ -34,6 +34,7 @@
+ #include <adapter.h>
+ #include <device.h>
+ #include <profile.h>
++#include <service.h>
+ #include <glib-helper.h>
+ #include <log.h>
+ 
+@@ -54,14 +55,17 @@ static void hdp_adapter_remove(struct btd_profile *p,
+ 	hdp_adapter_unregister(adapter);
+ }
+ 
+-static int hdp_driver_probe(struct btd_profile *p, struct btd_device *device,
+-								GSList *uuids)
++static int hdp_driver_probe(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
++
+ 	return hdp_device_register(device);
+ }
+ 
+-static void hdp_driver_remove(struct btd_profile *p, struct btd_device *device)
++static void hdp_driver_remove(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
++
+ 	hdp_device_unregister(device);
+ }
+ 
+diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
+index 0520f5c..3bcf859 100644
+--- a/profiles/heartrate/heartrate.c
++++ b/profiles/heartrate/heartrate.c
+@@ -35,6 +35,7 @@
+ #include "dbus-common.h"
+ #include "device.h"
+ #include "profile.h"
++#include "service.h"
+ #include "error.h"
+ #include "attrib/gattrib.h"
+ #include "attrib/att.h"
+@@ -841,9 +842,9 @@ static void heartrate_adapter_remove(struct btd_profile *p,
+ 	heartrate_adapter_unregister(adapter);
+ }
+ 
+-static int heartrate_device_probe(struct btd_profile *p,
+-				struct btd_device *device, GSList *uuids)
++static int heartrate_device_probe(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
+ 	struct gatt_primary *prim;
+ 
+ 	prim = btd_device_get_primary(device, HEART_RATE_UUID);
+@@ -853,9 +854,10 @@ static int heartrate_device_probe(struct btd_profile *p,
+ 	return heartrate_device_register(device, prim);
+ }
+ 
+-static void heartrate_device_remove(struct btd_profile *p,
+-						struct btd_device *device)
++static void heartrate_device_remove(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
++
+ 	heartrate_device_unregister(device);
+ }
+ 
+diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+index eadc860..beca6d8 100644
+--- a/profiles/input/hog.c
++++ b/profiles/input/hog.c
+@@ -46,6 +46,7 @@
+ #include "src/adapter.h"
+ #include "src/device.h"
+ #include "src/profile.h"
++#include "src/service.h"
+ 
+ #include "plugin.h"
+ #include "suspend.h"
+@@ -820,9 +821,9 @@ static void resume_callback(void)
+ 	g_slist_foreach(devices, set_suspend, GINT_TO_POINTER(suspend));
+ }
+ 
+-static int hog_probe(struct btd_profile *p, struct btd_device *device,
+-								GSList *uuids)
++static int hog_probe(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
+ 	const char *path = device_get_path(device);
+ 	GSList *primaries, *l;
+ 
+@@ -861,8 +862,9 @@ static void remove_device(gpointer a, gpointer b)
+ 	hog_unregister_device(hogdev);
+ }
+ 
+-static void hog_remove(struct btd_profile *p, struct btd_device *device)
++static void hog_remove(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
+ 	const char *path = device_get_path(device);
+ 
+ 	DBG("path %s", path);
+diff --git a/profiles/input/manager.c b/profiles/input/manager.c
+index d30ba67..165938f 100644
+--- a/profiles/input/manager.c
++++ b/profiles/input/manager.c
+@@ -39,6 +39,7 @@
+ #include "../src/adapter.h"
+ #include "../src/device.h"
+ #include "../src/profile.h"
++#include "../src/service.h"
+ 
+ #include "device.h"
+ #include "server.h"
+@@ -55,11 +56,11 @@ static void input_remove(struct btd_device *device, const char *uuid)
+ 	input_device_unregister(path, uuid);
+ }
+ 
+-static int hid_device_probe(struct btd_profile *p, struct btd_device *device,
+-								GSList *uuids)
++static int hid_device_probe(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
+ 	const char *path = device_get_path(device);
+-	const sdp_record_t *rec = btd_device_get_record(device, uuids->data);
++	const sdp_record_t *rec = btd_device_get_record(device, HID_UUID);
+ 
+ 	DBG("path %s", path);
+ 
+@@ -70,8 +71,10 @@ static int hid_device_probe(struct btd_profile *p, struct btd_device *device,
+ 							idle_timeout * 60);
+ }
+ 
+-static void hid_device_remove(struct btd_profile *p, struct btd_device *device)
++static void hid_device_remove(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
++
+ 	input_remove(device, HID_UUID);
+ }
+ 
+diff --git a/profiles/network/manager.c b/profiles/network/manager.c
+index 53bb652..ffaed9b 100644
+--- a/profiles/network/manager.c
++++ b/profiles/network/manager.c
+@@ -41,6 +41,7 @@
+ #include "adapter.h"
+ #include "device.h"
+ #include "profile.h"
++#include "service.h"
+ #include "manager.h"
+ #include "common.h"
+ #include "connection.h"
+@@ -74,16 +75,19 @@ done:
+ 				conf_security ? "true" : "false");
+ }
+ 
+-static int panu_probe(struct btd_profile *p, struct btd_device *device,
+-								GSList *uuids)
++static int panu_probe(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
++
+ 	DBG("path %s", device_get_path(device));
+ 
+ 	return connection_register(device, BNEP_SVC_PANU);
+ }
+ 
+-static void network_remove(struct btd_profile *p, struct btd_device *device)
++static void network_remove(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
++
+ 	DBG("path %s", device_get_path(device));
+ 
+ 	connection_unregister(device);
+@@ -118,9 +122,10 @@ static void panu_server_remove(struct btd_profile *p,
+ 	server_unregister(adapter, BNEP_SVC_PANU);
+ }
+ 
+-static int gn_probe(struct btd_profile *p, struct btd_device *device,
+-								GSList *uuids)
++static int gn_probe(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
++
+ 	DBG("path %s", device_get_path(device));
+ 
+ 	return connection_register(device, BNEP_SVC_GN);
+@@ -155,9 +160,10 @@ static void gn_server_remove(struct btd_profile *p,
+ 	server_unregister(adapter, BNEP_SVC_GN);
+ }
+ 
+-static int nap_probe(struct btd_profile *p, struct btd_device *device,
+-								GSList *uuids)
++static int nap_probe(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
++
+ 	DBG("path %s", device_get_path(device));
+ 
+ 	return connection_register(device, BNEP_SVC_NAP);
+diff --git a/profiles/proximity/manager.c b/profiles/proximity/manager.c
+index 81bfc3b..7b45f62 100644
+--- a/profiles/proximity/manager.c
++++ b/profiles/proximity/manager.c
+@@ -35,6 +35,7 @@
+ #include "adapter.h"
+ #include "device.h"
+ #include "profile.h"
++#include "service.h"
+ #include "attrib/att.h"
+ #include "attrib/gattrib.h"
+ #include "attrib/gatt.h"
+@@ -48,9 +49,9 @@ static struct enabled enabled  = {
+ 	.findme = TRUE,
+ };
+ 
+-static int monitor_linkloss_probe(struct btd_profile *p,
+-				struct btd_device *device, GSList *uuids)
++static int monitor_linkloss_probe(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
+ 	struct gatt_primary *linkloss;
+ 
+ 	linkloss = btd_device_get_primary(device, LINK_LOSS_UUID);
+@@ -60,9 +61,9 @@ static int monitor_linkloss_probe(struct btd_profile *p,
+ 	return monitor_register_linkloss(device, &enabled, linkloss);
+ }
+ 
+-static int monitor_immediate_probe(struct btd_profile *p,
+-				struct btd_device *device, GSList *uuids)
++static int monitor_immediate_probe(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
+ 	struct gatt_primary *immediate;
+ 
+ 	immediate = btd_device_get_primary(device, IMMEDIATE_ALERT_UUID);
+@@ -72,9 +73,9 @@ static int monitor_immediate_probe(struct btd_profile *p,
+ 	return monitor_register_immediate(device, &enabled, immediate);
+ }
+ 
+-static int monitor_txpower_probe(struct btd_profile *p,
+-				struct btd_device *device, GSList *uuids)
++static int monitor_txpower_probe(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
+ 	struct gatt_primary *txpower;
+ 
+ 	txpower = btd_device_get_primary(device, TX_POWER_UUID);
+@@ -84,21 +85,24 @@ static int monitor_txpower_probe(struct btd_profile *p,
+ 	return monitor_register_txpower(device, &enabled, txpower);
+ }
+ 
+-static void monitor_linkloss_remove(struct btd_profile *p,
+-						struct btd_device *device)
++static void monitor_linkloss_remove(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
++
+ 	monitor_unregister_linkloss(device);
+ }
+ 
+-static void monitor_immediate_remove(struct btd_profile *p,
+-						struct btd_device *device)
++static void monitor_immediate_remove(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
++
+ 	monitor_unregister_immediate(device);
+ }
+ 
+-static void monitor_txpower_remove(struct btd_profile *p,
+-						struct btd_device *device)
++static void monitor_txpower_remove(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
++
+ 	monitor_unregister_txpower(device);
+ }
+ 
+diff --git a/profiles/proximity/reporter.c b/profiles/proximity/reporter.c
+index 31c33ef..8f19b92 100644
+--- a/profiles/proximity/reporter.c
++++ b/profiles/proximity/reporter.c
+@@ -42,6 +42,7 @@
+ #include "error.h"
+ #include "device.h"
+ #include "profile.h"
++#include "service.h"
+ #include "hcid.h"
+ #include "attrib/gattrib.h"
+ #include "attrib/att.h"
+@@ -203,9 +204,9 @@ static void register_reporter_device(struct btd_device *device,
+ 	radapter->devices = g_slist_prepend(radapter->devices, device);
+ }
+ 
+-int reporter_device_probe(struct btd_profile *p, struct btd_device *device,
+-								GSList *uuids)
++int reporter_device_probe(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
+ 	struct reporter_adapter *radapter;
+ 	struct btd_adapter *adapter = device_get_adapter(device);
+ 
+@@ -218,8 +219,9 @@ int reporter_device_probe(struct btd_profile *p, struct btd_device *device,
+ 	return 0;
+ }
+ 
+-void reporter_device_remove(struct btd_profile *p, struct btd_device *device)
++void reporter_device_remove(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
+ 	struct reporter_adapter *radapter;
+ 	struct btd_adapter *adapter = device_get_adapter(device);
+ 
+diff --git a/profiles/proximity/reporter.h b/profiles/proximity/reporter.h
+index 6a7066d..a8e1aac 100644
+--- a/profiles/proximity/reporter.h
++++ b/profiles/proximity/reporter.h
+@@ -36,9 +36,8 @@ enum {
+ 	HIGH_ALERT = 0x02,
+ };
+ 
+-void reporter_device_remove(struct btd_profile *p, struct btd_device *device);
+-int reporter_device_probe(struct btd_profile *p, struct btd_device *device,
+-								GSList *uuids);
++void reporter_device_remove(struct btd_service *service);
++int reporter_device_probe(struct btd_service *service);
+ 
+ int reporter_adapter_probe(struct btd_profile *p, struct btd_adapter *adapter);
+ void reporter_adapter_remove(struct btd_profile *p,
+diff --git a/profiles/sap/manager.c b/profiles/sap/manager.c
+index fddd7aa..24b73e7 100644
+--- a/profiles/sap/manager.c
++++ b/profiles/sap/manager.c
+@@ -28,6 +28,7 @@
+ #include "adapter.h"
+ #include "device.h"
+ #include "profile.h"
++#include "service.h"
+ 
+ #include "manager.h"
+ #include "server.h"
+diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
+index abbd129..9b17b9b 100644
+--- a/profiles/scanparam/scan.c
++++ b/profiles/scanparam/scan.c
+@@ -37,6 +37,7 @@
+ #include "adapter.h"
+ #include "device.h"
+ #include "profile.h"
++#include "service.h"
+ #include "attrib/att.h"
+ #include "attrib/gattrib.h"
+ #include "attrib/gatt.h"
+@@ -266,9 +267,9 @@ static void scan_unregister(struct btd_device *device)
+ 	g_free(scan);
+ }
+ 
+-static int scan_param_probe(struct btd_profile *p, struct btd_device *device,
+-								GSList *uuids)
++static int scan_param_probe(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
+ 	struct gatt_primary *prim;
+ 
+ 	DBG("Probing Scan Parameters");
+@@ -280,8 +281,10 @@ static int scan_param_probe(struct btd_profile *p, struct btd_device *device,
+ 	return scan_register(device, prim);
+ }
+ 
+-static void scan_param_remove(struct btd_profile *p, struct btd_device *device)
++static void scan_param_remove(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
++
+ 	scan_unregister(device);
+ }
+ 
+diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
+index 8550500..ff93806 100644
+--- a/profiles/thermometer/thermometer.c
++++ b/profiles/thermometer/thermometer.c
+@@ -35,6 +35,7 @@
+ #include "adapter.h"
+ #include "device.h"
+ #include "profile.h"
++#include "service.h"
+ #include "error.h"
+ #include "log.h"
+ #include "attrib/gattrib.h"
+@@ -1280,10 +1281,9 @@ static void thermometer_adapter_unregister(struct btd_adapter *adapter)
+ 					THERMOMETER_MANAGER_INTERFACE);
+ }
+ 
+-static int thermometer_device_probe(struct btd_profile *p,
+-					struct btd_device *device,
+-					GSList *uuids)
++static int thermometer_device_probe(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
+ 	struct gatt_primary *tattr;
+ 
+ 	tattr = btd_device_get_primary(device, HEALTH_THERMOMETER_UUID);
+@@ -1293,9 +1293,10 @@ static int thermometer_device_probe(struct btd_profile *p,
+ 	return thermometer_register(device, tattr);
+ }
+ 
+-static void thermometer_device_remove(struct btd_profile *p,
+-						struct btd_device *device)
++static void thermometer_device_remove(struct btd_service *service)
+ {
++	struct btd_device *device = service_get_device(service);
++
+ 	thermometer_unregister(device);
+ }
+ 
+diff --git a/src/device.c b/src/device.c
+index 98f37a2..31399d5 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -898,7 +898,7 @@ static void service_remove(struct btd_service *service)
+ 	struct btd_device *device = service_get_device(service);
+ 
+ 	service_unavailable(service);
+-	profile->device_remove(profile, device);
++	profile->device_remove(service);
+ 	device->pending = g_slist_remove(device->pending, service);
+ 	btd_service_unref(service);
+ }
+@@ -2379,7 +2379,6 @@ struct probe_data {
+ static void dev_probe(struct btd_profile *p, void *user_data)
+ {
+ 	struct probe_data *d = user_data;
+-	GSList *probe_uuids;
+ 	struct btd_service *service;
+ 	int err;
+ 
+@@ -2389,21 +2388,17 @@ static void dev_probe(struct btd_profile *p, void *user_data)
+ 	if (!device_match_profile(d->dev, p, d->uuids))
+ 		return;
+ 
+-	probe_uuids = g_slist_append(NULL, (char *) p->remote_uuid);
+-
+ 	service = service_create(d->dev, p);
+ 
+-	err = p->device_probe(p, d->dev, probe_uuids);
++	err = p->device_probe(service);
+ 	if (err < 0) {
+ 		error("%s profile probe failed for %s", p->name, d->addr);
+ 		btd_service_unref(service);
+-		g_slist_free(probe_uuids);
+ 		return;
+ 	}
+ 
+ 	service_probed(service);
+ 	d->dev->services = g_slist_append(d->dev->services, service);
+-	g_slist_free(probe_uuids);
+ }
+ 
+ void device_probe_profile(gpointer a, gpointer b)
+@@ -2427,7 +2422,7 @@ void device_probe_profile(gpointer a, gpointer b)
+ 
+ 	service = service_create(device, profile);
+ 
+-	err = profile->device_probe(profile, device, probe_uuids);
++	err = profile->device_probe(service);
+ 	if (err < 0) {
+ 		error("%s profile probe failed for %s", profile->name, addr);
+ 		btd_service_unref(service);
+diff --git a/src/profile.c b/src/profile.c
+index 29f9ee6..185897a 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -50,6 +50,7 @@
+ #include "adapter.h"
+ #include "device.h"
+ #include "profile.h"
++#include "service.h"
+ 
+ #define DUN_DEFAULT_CHANNEL	1
+ #define SPP_DEFAULT_CHANNEL	3
+@@ -1359,16 +1360,16 @@ static void ext_adapter_remove(struct btd_profile *p,
+ 	}
+ }
+ 
+-static int ext_device_probe(struct btd_profile *p, struct btd_device *dev,
+-								GSList *uuids)
++static int ext_device_probe(struct btd_service *service)
+ {
++	struct btd_profile *p = service_get_profile(service);
+ 	struct ext_profile *ext;
+ 
+ 	ext = find_ext(p);
+ 	if (!ext)
+ 		return -ENOENT;
+ 
+-	DBG("%s probed with %u UUIDs", ext->name, g_slist_length(uuids));
++	DBG("%s probed with UUID %s", ext->name, p->remote_uuid);
+ 
+ 	return 0;
+ }
+@@ -1388,8 +1389,10 @@ static struct ext_io *find_connection(struct ext_profile *ext,
+ 	return NULL;
+ }
+ 
+-static void ext_device_remove(struct btd_profile *p, struct btd_device *dev)
++static void ext_device_remove(struct btd_service *service)
+ {
++	struct btd_profile *p = service_get_profile(service);
++	struct btd_device *dev = service_get_device(service);
+ 	struct ext_profile *ext;
+ 	struct ext_io *conn;
+ 
+diff --git a/src/profile.h b/src/profile.h
+index 5d78b37..8daa358 100644
+--- a/src/profile.h
++++ b/src/profile.h
+@@ -25,6 +25,8 @@
+ #define BTD_PROFILE_PRIORITY_MEDIUM	1
+ #define BTD_PROFILE_PRIORITY_HIGH	2
+ 
++struct btd_service;
++
+ struct btd_profile {
+ 	const char *name;
+ 	int priority;
+@@ -34,10 +36,8 @@ struct btd_profile {
+ 
+ 	bool auto_connect;
+ 
+-	int (*device_probe) (struct btd_profile *p, struct btd_device *device,
+-								GSList *uuids);
+-	void (*device_remove) (struct btd_profile *p,
+-						struct btd_device *device);
++	int (*device_probe) (struct btd_service *service);
++	void (*device_remove) (struct btd_service *service);
+ 
+ 	int (*connect) (struct btd_device *device,
+ 						struct btd_profile *profile);
 -- 
 1.8.1.4
 
