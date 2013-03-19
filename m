@@ -1,44 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 19 Mar 2013 15:48:00 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bruna Moreira <bruna.moreira@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 0/4] Basic mgmt API tests for discovery procedure
-Message-ID: <20130319134800.GA28886@x220.ger.corp.intel.com>
-References: <1363639986-16231-1-git-send-email-bruna.moreira@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1363639986-16231-1-git-send-email-bruna.moreira@openbossa.org>
+In-Reply-To: <CAJdJm_MtG=Ar8N836PK11LeiSqs8K7foCfbm=qeCF39rmj=whg@mail.gmail.com>
+References: <CANq1E4TMGGwiz-kGGCqGOn+A-D-msiTAb8L4Yf6kkMwrzOnn_g@mail.gmail.com>
+	<CAJdJm_MtG=Ar8N836PK11LeiSqs8K7foCfbm=qeCF39rmj=whg@mail.gmail.com>
+Date: Tue, 19 Mar 2013 14:06:35 +0100
+Message-ID: <CANq1E4SZR+uzMhuFOYB+XbzbONPhv_jeiH53GByq+_nF+pCZKg@mail.gmail.com>
+Subject: Re: Device selection during inquiry
+From: David Herrmann <dh.herrmann@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bruna,
+Hi
 
-On Mon, Mar 18, 2013, Bruna Moreira wrote:
-> This series implements initial basic tests for discovery procedure. The
-> following tests were added in mgmt-tester utility:
-> - Start Discovery: success testcase.
-> - Stop discovery: success, rejected and invalid parameters testcases.
-> 
-> More complex tests (including stop discovery at specific discovery stages) will
-> be sent in next weeks.
-> 
-> BR,
-> Bruna Moreira.
-> 
-> Bruna Moreira (4):
->   tools: Add basic success test for start discovery
->   tools: Add basic success test for stop discovery
->   tools: Add basic rejected test for stop discovery
->   tools: Add basic invalid parameters test for stop discovery
-> 
->  tools/mgmt-tester.c |  116 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 116 insertions(+)
+On Tue, Mar 19, 2013 at 12:02 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi David,
+>
+> On Mon, Mar 18, 2013 at 8:07 PM, David Herrmann <dh.herrmann@gmail.com> wrote:
+>> A Bluetooth Host searches for target devices via standard inquiry (at
+>> least I think so). The devices can be placed into discoverable mode
+>> for 20s via a "sync" button. Once they are found, a baseband
+>> connection is created by the host and the devices are paired via a
+>> simple BT-address related PIN.
+>>
+>> I can easily replace the host with a BlueZ host and connect to the
+>> devices via a normal inquiry and then open the baseband connection.
+>> However, I haven't succeeded in replacing the target devices with a
+>> BlueZ host. I simply cannot trick the proprietary host into connecting
+>> to my device. In fact, "hcidump" doesn't give me anything while the
+>> host is performing the inquiry. I couldn't even figure out the
+>> BT-address of the host.
+>
+> I remembered that I used to change BlueZ's default LAP (0x9e8b33,
+> which is the GIAC) and use that same value on the "host" side in order
+> to filter out unwanted devices during inquiry. This allowed me to get
+> "cleaner" hcidumps because I could only "see" the devices which are
+> using IACs generated from that same LAP. See page 315 of the Core V4.0
+> spec for some intro to these concepts.
+>
+> It's possible that the Wii Remote uses a different LAP than of that of
+> BlueZ's, and that the Wii host runs inquiry using that LAP in order to
+> reduce the list of found devices and improve discovery latency. BlueZ
+> sees all devices because it uses the GIAC.
+>
+> If that's the case, you need to find out this LAP and use the same
+> value. But It might be just that simple because other controller
+> parameters are also used to calculate the IAC. Unfortunately, I know
+> very little about this part of the spec (I only play with it for
+> testing). But I hope it helps you looking for further info.
 
-All patches in this set have been applied. Thanks.
+Yeah, that was it. The remotes are set to LIAC mode and it turns out
+that the host performs an LIAC inquiry exclusively.
 
-While you're working on new test cases as well as improving the existing
-ones please remember that you also can (and should) test for specific
-HCI commands caused by the tests.
+And for the archive:
+I changed my local adapter mode via "hciconfig hci0 iac liac" to liac mode.
 
-Johan
+Thanks for the hint!
+David
