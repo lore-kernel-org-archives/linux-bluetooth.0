@@ -1,109 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alex Deymo <deymo@chromium.org>
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: keybuk@chromium.org, Alex Deymo <deymo@chromium.org>
-Subject: [PATCH v3 1/6] client: Add color modifiers to NEW, CHG and DEL events.
-Date: Tue, 19 Mar 2013 13:55:00 -0700
-Message-Id: <1363726505-15171-2-git-send-email-deymo@chromium.org>
-In-Reply-To: <1363726505-15171-1-git-send-email-deymo@chromium.org>
-References: <1363726505-15171-1-git-send-email-deymo@chromium.org>
+Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+Subject: [PATCH v4 6/6] Bluetooth: Fallback transparent SCO from T2 to T1
+Date: Tue, 19 Mar 2013 19:04:15 +0100
+Message-Id: <1363716255-21332-7-git-send-email-frederic.dalleau@linux.intel.com>
+In-Reply-To: <1363716255-21332-1-git-send-email-frederic.dalleau@linux.intel.com>
+References: <1363716255-21332-1-git-send-email-frederic.dalleau@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Events like [NEW], [CHG] and [DEL] can appear in the command console at
-any time, even when the user is typing a command. The last line is kept
-making the event line appear just before it, something that can be
-unnoticed. This patch add meaningful colors for those three event to make
-it easier to see them.
+When initiating a transparent eSCO connection, make use of T2 settings at
+first try. T2 is the recommended settings from HFP 1.6 WideBand Speech. Upon
+connection failure, try T1 settings.
+T2 failure is detected if Synchronous Connection Complete event fails with
+error 0x0d. This error code has been found experimentally by sending a T2
+request to a T1 only SCO listener. It means "Connection Rejected due to
+Limited resource".
+To know which of T2 or T1 should be used, conn->fallback is used.  Bluez only
+attempt to reconnect twice, but still test conn->fallback as a preventive
+measure.
 ---
- client/display.h |  3 +++
- client/main.c    | 20 +++++++++++++-------
- 2 files changed, 16 insertions(+), 7 deletions(-)
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_conn.c         |   12 ++++++++++--
+ net/bluetooth/hci_event.c        |    3 ++-
+ 3 files changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/client/display.h b/client/display.h
-index 393a3c8..9cb891a 100644
---- a/client/display.h
-+++ b/client/display.h
-@@ -22,6 +22,9 @@
-  */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 70e0364..ba3fd72 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -329,6 +329,7 @@ struct hci_conn {
+ 	__u8		passkey_entered;
+ 	__u16		disc_timeout;
+ 	__u16		voice_setting;
++	__u8		fallback;
+ 	unsigned long	flags;
  
- #define COLOR_OFF	"\x1B[0m"
-+#define COLOR_RED	"\x1B[0;91m"
-+#define COLOR_GREEN	"\x1B[0;92m"
-+#define COLOR_YELLOW	"\x1B[0;93m"
- #define COLOR_BLUE	"\x1B[0;34m"
+ 	__u8		remote_cap;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 95c69a6..83b38e3 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -179,13 +179,21 @@ void hci_setup_sync(struct hci_conn *conn, __u16 handle)
+ 	cp.tx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
+ 	cp.rx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
  
- void rl_printf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
-diff --git a/client/main.c b/client/main.c
-index 9a927a8..d8547c0 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -41,6 +41,11 @@
- #include "agent.h"
- #include "display.h"
+-	if (conn->voice_setting == 0x0003) {
++	if (conn->fallback == 0 && conn->voice_setting == 0x0003) {
+ 		cp.pkt_type       = __constant_cpu_to_le16(EDR_ESCO_MASK &
+ 							   ~ESCO_2EV3);
+ 		cp.max_latency    = __constant_cpu_to_le16(0x000d);
+ 		cp.voice_setting  = __constant_cpu_to_le16(0x0003);
+ 		cp.retrans_effort = 0x02;
+-	} else {
++		conn->fallback = 1;
++	} else if (conn->fallback == 1 && conn->voice_setting == 0x0003) {
++		cp.pkt_type       = __constant_cpu_to_le16(EDR_ESCO_MASK |
++							   ESCO_EV3);
++		cp.max_latency    = __constant_cpu_to_le16(0x0007);
++		cp.voice_setting  = __constant_cpu_to_le16(0x0003);
++		cp.retrans_effort = 0x02;
++		conn->fallback = 2;
++	} else if (conn->voice_setting == 0x0000) {
+ 		cp.pkt_type       = cpu_to_le16(conn->pkt_type);
+ 		cp.max_latency    = __constant_cpu_to_le16(0xffff);
+ 		cp.voice_setting  = cpu_to_le16(hdev->voice_setting);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 2fe3ccd..f3b070e 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2953,11 +2953,12 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
+ 		hci_conn_add_sysfs(conn);
+ 		break;
  
-+/* String display constants */
-+#define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
-+#define COLORED_CHG	COLOR_YELLOW "CHG" COLOR_OFF
-+#define COLORED_DEL	COLOR_RED "DEL" COLOR_OFF
-+
- static GMainLoop *main_loop;
- static DBusConnection *dbus_conn;
- 
-@@ -252,7 +257,7 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
- 		if (device_is_child(proxy, default_ctrl) == TRUE) {
- 			dev_list = g_list_append(dev_list, proxy);
- 
--			print_device(proxy, "NEW");
-+			print_device(proxy, COLORED_NEW);
- 		}
- 	} else if (!strcmp(interface, "org.bluez.Adapter1")) {
- 		ctrl_list = g_list_append(ctrl_list, proxy);
-@@ -260,7 +265,7 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
- 		if (!default_ctrl)
- 			default_ctrl = proxy;
- 
--		print_adapter(proxy, "NEW");
-+		print_adapter(proxy, COLORED_NEW);
- 	} else if (!strcmp(interface, "org.bluez.AgentManager1")) {
- 		if (!agent_manager) {
- 			agent_manager = proxy;
-@@ -282,12 +287,12 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
- 		if (device_is_child(proxy, default_ctrl) == TRUE) {
- 			dev_list = g_list_remove(dev_list, proxy);
- 
--			print_device(proxy, "DEL");
-+			print_device(proxy, COLORED_DEL);
- 		}
- 	} else if (!strcmp(interface, "org.bluez.Adapter1")) {
- 		ctrl_list = g_list_remove(ctrl_list, proxy);
- 
--		print_adapter(proxy, "DEL");
-+		print_adapter(proxy, COLORED_DEL);
- 
- 		if (default_ctrl == proxy) {
- 			default_ctrl = NULL;
-@@ -319,8 +324,8 @@ static void property_changed(GDBusProxy *proxy, const char *name,
- 
- 				dbus_message_iter_get_basic(&addr_iter,
- 								&address);
--				str = g_strdup_printf("[CHG] Device %s ",
--								address);
-+				str = g_strdup_printf("[" COLORED_CHG
-+						"] Device %s ", address);
- 			} else
- 				str = g_strdup("");
- 
-@@ -336,7 +341,8 @@ static void property_changed(GDBusProxy *proxy, const char *name,
- 			const char *address;
- 
- 			dbus_message_iter_get_basic(&addr_iter, &address);
--			str = g_strdup_printf("[CHG] Controller %s ", address);
-+			str = g_strdup_printf("[" COLORED_CHG
-+						"] Controller %s ", address);
- 		} else
- 			str = g_strdup("");
- 
++	case 0x0d:	/* No resource available */
+ 	case 0x11:	/* Unsupported Feature or Parameter Value */
+ 	case 0x1c:	/* SCO interval rejected */
+ 	case 0x1a:	/* Unsupported Remote Feature */
+ 	case 0x1f:	/* Unspecified error */
+-		if (conn->out && conn->attempt < 2) {
++		if (conn->out && conn->attempt < 2 && conn->fallback != 2) {
+ 			conn->pkt_type = (hdev->esco_type & SCO_ESCO_MASK) |
+ 					(hdev->esco_type & EDR_ESCO_MASK);
+ 			hci_setup_sync(conn, conn->link->handle);
 -- 
-1.8.1.3
+1.7.9.5
 
