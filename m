@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v0 08/11] network: Hold a reference to btd_service
-Date: Tue, 19 Mar 2013 08:40:52 +0100
-Message-Id: <1363678855-12765-9-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v0 07/11] audio: Hold a reference to btd_service
+Date: Tue, 19 Mar 2013 08:40:51 +0100
+Message-Id: <1363678855-12765-8-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1363678855-12765-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1363678855-12765-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,226 +13,277 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
 Profile implementations are expected to hold a reference to probed
-services, so update the network profiles accordingly.
+services, so update the audio profiles accordingly.
 ---
- profiles/network/connection.c | 38 ++++++++++++++++++++++++++--------
- profiles/network/connection.h |  4 ++--
- profiles/network/manager.c    | 48 ++++++-------------------------------------
- 3 files changed, 37 insertions(+), 53 deletions(-)
+ profiles/audio/control.c | 28 ++++++++++++++++++++++------
+ profiles/audio/control.h |  7 +++++--
+ profiles/audio/manager.c |  9 ++++-----
+ profiles/audio/sink.c    |  6 +++++-
+ profiles/audio/sink.h    |  4 +++-
+ profiles/audio/source.c  |  7 ++++++-
+ profiles/audio/source.h  |  5 ++++-
+ 7 files changed, 49 insertions(+), 17 deletions(-)
 
-diff --git a/profiles/network/connection.c b/profiles/network/connection.c
-index 3a913cf..b09ef0c 100644
---- a/profiles/network/connection.c
-+++ b/profiles/network/connection.c
-@@ -43,6 +43,8 @@
- #include "dbus-common.h"
- #include "adapter.h"
- #include "device.h"
-+#include "profile.h"
-+#include "service.h"
+diff --git a/profiles/audio/control.c b/profiles/audio/control.c
+index ebaf319..1c1fbd6 100644
+--- a/profiles/audio/control.c
++++ b/profiles/audio/control.c
+@@ -48,6 +48,8 @@
+ #include "lib/uuid.h"
+ #include "../src/adapter.h"
+ #include "../src/device.h"
++#include "../src/profile.h"
++#include "../src/service.h"
  
+ #include "log.h"
  #include "error.h"
- #include "common.h"
-@@ -65,6 +67,7 @@ struct network_peer {
+@@ -61,7 +63,8 @@
+ 
+ struct control {
+ 	struct avctp *session;
+-	gboolean target;
++	struct btd_service *target;
++	struct btd_service *remote;
+ 	unsigned int avctp_id;
  };
  
- struct network_conn {
-+	struct btd_service *service;
- 	char		dev[16];	/* Interface name */
- 	uint16_t	id;		/* Role: Service Class Identifier */
- 	conn_state	state;
-@@ -83,6 +86,13 @@ struct __service_16 {
+@@ -251,6 +254,12 @@ static void path_unregister(void *data)
  
- static GSList *peers = NULL;
+ 	avctp_remove_state_cb(control->avctp_id);
  
-+static uint16_t get_service_id(struct btd_service *service)
-+{
++	if (control->target)
++		btd_service_unref(control->target);
++
++	if (control->remote)
++		btd_service_unref(control->remote);
++
+ 	g_free(control);
+ 	dev->control = NULL;
+ }
+@@ -262,13 +271,20 @@ void control_unregister(struct audio_device *dev)
+ 						AUDIO_CONTROL_INTERFACE);
+ }
+ 
+-void control_update(struct control *control, const char *uuid)
++void control_update(struct control *control, struct btd_service *service)
+ {
+-	if (bt_uuid_strcmp(uuid, AVRCP_TARGET_UUID) == 0)
+-		control->target = TRUE;
 +	struct btd_profile *p = service_get_profile(service);
++	const char *uuid = p->remote_uuid;
 +
-+	return bnep_service_id(p->remote_uuid);
-+}
-+
- static struct network_peer *find_peer(GSList *list, struct btd_device *device)
- {
- 	for (; list; list = list->next) {
-@@ -599,6 +609,7 @@ static void connection_free(void *data)
- 	if (nc->connect)
- 		dbus_message_unref(nc->connect);
- 
-+	btd_service_unref(nc->service);
- 	g_free(nc);
++	if (!control->target && bt_uuid_strcmp(uuid, AVRCP_TARGET_UUID) == 0)
++		control->target = btd_service_ref(service);
++	else if (!control->remote &&
++				bt_uuid_strcmp(uuid, AVRCP_REMOTE_UUID) == 0)
++		control->remote = btd_service_ref(service);
  }
  
-@@ -639,13 +650,14 @@ static const GDBusPropertyTable connection_properties[] = {
- 	{ }
- };
- 
--void connection_unregister(struct btd_device *device)
-+void connection_unregister(struct btd_service *service)
+-struct control *control_init(struct audio_device *dev, const char *uuid)
++struct control *control_init(struct audio_device *dev,
++						struct btd_service *service)
  {
--	struct network_peer *peer;
-+	struct btd_device *device = service_get_device(service);
-+	struct network_conn *conn = service_get_user_data(service);
-+	struct network_peer *peer = conn->peer;
-+	uint16_t id = get_service_id(service);
+ 	struct control *control;
  
--	peer = find_peer(peers, device);
--	if (!peer)
--		return;
-+	DBG("%s id %u", device_get_path(device), id);
+@@ -285,7 +301,7 @@ struct control *control_init(struct audio_device *dev, const char *uuid)
  
- 	g_slist_free_full(peer->connections, connection_free);
- 	peer->connections = NULL;
-@@ -682,12 +694,14 @@ static struct network_peer *create_peer(struct btd_device *device)
- 	return peer;
- }
+ 	control = g_new0(struct control, 1);
  
--int connection_register(struct btd_device *device, uint16_t id)
-+int connection_register(struct btd_service *service)
- {
-+	struct btd_device *device = service_get_device(service);
- 	struct network_peer *peer;
- 	struct network_conn *nc;
-+	uint16_t id = get_service_id(service);
+-	control_update(control, uuid);
++	control_update(control, service);
  
--	DBG("id %u", id);
-+	DBG("%s id %u", device_get_path(device), id);
+ 	control->avctp_id = avctp_add_state_cb(dev, state_changed);
  
- 	peer = find_peer(peers, device);
- 	if (!peer) {
-@@ -698,16 +712,22 @@ int connection_register(struct btd_device *device, uint16_t id)
+diff --git a/profiles/audio/control.h b/profiles/audio/control.h
+index 82ad0d2..0176b54 100644
+--- a/profiles/audio/control.h
++++ b/profiles/audio/control.h
+@@ -24,8 +24,11 @@
+ 
+ #define AUDIO_CONTROL_INTERFACE "org.bluez.MediaControl1"
+ 
+-struct control *control_init(struct audio_device *dev, const char *uuid);
+-void control_update(struct control *control, const char *uuid);
++struct btd_service;
++
++struct control *control_init(struct audio_device *dev,
++						struct btd_service *service);
++void control_update(struct control *control, struct btd_service *service);
+ void control_unregister(struct audio_device *dev);
+ gboolean control_is_active(struct audio_device *dev);
+ 
+diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
+index 0163d0e..54c0b92 100644
+--- a/profiles/audio/manager.c
++++ b/profiles/audio/manager.c
+@@ -114,7 +114,7 @@ static int a2dp_source_probe(struct btd_service *service)
+ 		return -1;
  	}
  
- 	nc = find_connection(peer->connections, id);
--	if (nc)
--		return 0;
-+	if (nc) {
-+		error("Device %s has multiple connection instances of %d",
-+						device_get_path(device), id);
-+		return -1;
-+	}
+-	audio_dev->source = source_init(audio_dev);
++	audio_dev->source = source_init(audio_dev, service);
  
- 	nc = g_new0(struct network_conn, 1);
- 	nc->id = id;
- 	memset(nc->dev, 0, sizeof(nc->dev));
- 	strcpy(nc->dev, "bnep%d");
-+	nc->service = btd_service_ref(service);
- 	nc->state = DISCONNECTED;
- 	nc->peer = peer;
+ 	return 0;
+ }
+@@ -130,7 +130,7 @@ static int a2dp_sink_probe(struct btd_service *service)
+ 		return -1;
+ 	}
  
-+	service_set_user_data(service, nc);
+-	audio_dev->sink = sink_init(audio_dev);
++	audio_dev->sink = sink_init(audio_dev, service);
+ 
+ 	return 0;
+ }
+@@ -138,7 +138,6 @@ static int a2dp_sink_probe(struct btd_service *service)
+ static int avrcp_probe(struct btd_service *service)
+ {
+ 	struct btd_device *device = service_get_device(service);
+-	struct btd_profile *p = service_get_profile(service);
+ 	struct audio_device *audio_dev;
+ 
+ 	audio_dev = get_audio_dev(device);
+@@ -148,9 +147,9 @@ static int avrcp_probe(struct btd_service *service)
+ 	}
+ 
+ 	if (audio_dev->control)
+-		control_update(audio_dev->control, p->remote_uuid);
++		control_update(audio_dev->control, service);
+ 	else
+-		audio_dev->control = control_init(audio_dev, p->remote_uuid);
++		audio_dev->control = control_init(audio_dev, service);
+ 
+ 	if (audio_dev->sink && sink_is_active(audio_dev))
+ 		avrcp_connect(audio_dev);
+diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
+index f023307..9f1a2d9 100644
+--- a/profiles/audio/sink.c
++++ b/profiles/audio/sink.c
+@@ -41,6 +41,7 @@
+ 
+ #include "../src/adapter.h"
+ #include "../src/device.h"
++#include "../src/service.h"
+ 
+ #include "device.h"
+ #include "avdtp.h"
+@@ -55,6 +56,7 @@
+ 
+ struct sink {
+ 	struct audio_device *dev;
++	struct btd_service *service;
+ 	struct avdtp *session;
+ 	struct avdtp_stream *stream;
+ 	unsigned int cb_id;
+@@ -361,6 +363,7 @@ static void sink_free(struct audio_device *dev)
+ 		g_source_remove(sink->retry_id);
+ 
+ 	avdtp_remove_state_cb(sink->avdtp_callback_id);
++	btd_service_unref(sink->service);
+ 
+ 	g_free(sink);
+ 	dev->sink = NULL;
+@@ -372,7 +375,7 @@ void sink_unregister(struct audio_device *dev)
+ 	sink_free(dev);
+ }
+ 
+-struct sink *sink_init(struct audio_device *dev)
++struct sink *sink_init(struct audio_device *dev, struct btd_service *service)
+ {
+ 	struct sink *sink;
+ 
+@@ -381,6 +384,7 @@ struct sink *sink_init(struct audio_device *dev)
+ 	sink = g_new0(struct sink, 1);
+ 
+ 	sink->dev = dev;
++	sink->service = btd_service_ref(service);
+ 
+ 	sink->avdtp_callback_id = avdtp_add_state_cb(dev, avdtp_state_callback);
+ 
+diff --git a/profiles/audio/sink.h b/profiles/audio/sink.h
+index ba0dde8..1f20545 100644
+--- a/profiles/audio/sink.h
++++ b/profiles/audio/sink.h
+@@ -36,11 +36,13 @@ typedef void (*sink_state_cb) (struct audio_device *dev,
+ 				sink_state_t new_state,
+ 				void *user_data);
+ 
++struct btd_service;
 +
- 	DBG("id %u registered", id);
+ unsigned int sink_add_state_cb(struct audio_device *dev, sink_state_cb cb,
+ 							void *user_data);
+ gboolean sink_remove_state_cb(unsigned int id);
  
- 	peer->connections = g_slist_append(peer->connections, nc);
-diff --git a/profiles/network/connection.h b/profiles/network/connection.h
-index 32356f9..1e7eedb 100644
---- a/profiles/network/connection.h
-+++ b/profiles/network/connection.h
-@@ -21,7 +21,7 @@
-  *
-  */
+-struct sink *sink_init(struct audio_device *dev);
++struct sink *sink_init(struct audio_device *dev, struct btd_service *service);
+ void sink_unregister(struct audio_device *dev);
+ gboolean sink_is_active(struct audio_device *dev);
+ int sink_connect(struct audio_device *dev);
+diff --git a/profiles/audio/source.c b/profiles/audio/source.c
+index 5d9e237..20fd412 100644
+--- a/profiles/audio/source.c
++++ b/profiles/audio/source.c
+@@ -42,6 +42,7 @@
  
--int connection_register(struct btd_device *device, uint16_t id);
--void connection_unregister(struct btd_device *device);
-+int connection_register(struct btd_service *service);
-+void connection_unregister(struct btd_service *service);
- int connection_connect(struct btd_device *device, uint16_t id);
- int connection_disconnect(struct btd_device *device, uint16_t id);
-diff --git a/profiles/network/manager.c b/profiles/network/manager.c
-index ffaed9b..f37954a 100644
---- a/profiles/network/manager.c
-+++ b/profiles/network/manager.c
-@@ -75,24 +75,6 @@ done:
- 				conf_security ? "true" : "false");
+ #include "../src/adapter.h"
+ #include "../src/device.h"
++#include "../src/service.h"
+ 
+ #include "device.h"
+ #include "avdtp.h"
+@@ -56,6 +57,7 @@
+ 
+ struct source {
+ 	struct audio_device *dev;
++	struct btd_service *service;
+ 	struct avdtp *session;
+ 	struct avdtp_stream *stream;
+ 	unsigned int cb_id;
+@@ -365,6 +367,7 @@ static void source_free(struct audio_device *dev)
+ 		g_source_remove(source->retry_id);
+ 
+ 	avdtp_remove_state_cb(source->avdtp_callback_id);
++	btd_service_unref(source->service);
+ 
+ 	g_free(source);
+ 	dev->source = NULL;
+@@ -377,7 +380,8 @@ void source_unregister(struct audio_device *dev)
+ 	source_free(dev);
  }
  
--static int panu_probe(struct btd_service *service)
--{
--	struct btd_device *device = service_get_device(service);
--
--	DBG("path %s", device_get_path(device));
--
--	return connection_register(device, BNEP_SVC_PANU);
--}
--
--static void network_remove(struct btd_service *service)
--{
--	struct btd_device *device = service_get_device(service);
--
--	DBG("path %s", device_get_path(device));
--
--	connection_unregister(device);
--}
--
- static int panu_connect(struct btd_device *dev, struct btd_profile *profile)
+-struct source *source_init(struct audio_device *dev)
++struct source *source_init(struct audio_device *dev,
++						struct btd_service *service)
  {
- 	return connection_connect(dev, BNEP_SVC_PANU);
-@@ -122,15 +104,6 @@ static void panu_server_remove(struct btd_profile *p,
- 	server_unregister(adapter, BNEP_SVC_PANU);
- }
+ 	struct source *source;
  
--static int gn_probe(struct btd_service *service)
--{
--	struct btd_device *device = service_get_device(service);
--
--	DBG("path %s", device_get_path(device));
--
--	return connection_register(device, BNEP_SVC_GN);
--}
--
- static int gn_connect(struct btd_device *dev, struct btd_profile *profile)
- {
- 	return connection_connect(dev, BNEP_SVC_GN);
-@@ -160,15 +133,6 @@ static void gn_server_remove(struct btd_profile *p,
- 	server_unregister(adapter, BNEP_SVC_GN);
- }
+@@ -386,6 +390,7 @@ struct source *source_init(struct audio_device *dev)
+ 	source = g_new0(struct source, 1);
  
--static int nap_probe(struct btd_service *service)
--{
--	struct btd_device *device = service_get_device(service);
--
--	DBG("path %s", device_get_path(device));
--
--	return connection_register(device, BNEP_SVC_NAP);
--}
--
- static int nap_connect(struct btd_device *dev, struct btd_profile *profile)
- {
- 	return connection_connect(dev, BNEP_SVC_NAP);
-@@ -202,8 +166,8 @@ static struct btd_profile panu_profile = {
- 	.name		= "network-panu",
- 	.local_uuid	= NAP_UUID,
- 	.remote_uuid	= PANU_UUID,
--	.device_probe	= panu_probe,
--	.device_remove	= network_remove,
-+	.device_probe	= connection_register,
-+	.device_remove	= connection_unregister,
- 	.connect	= panu_connect,
- 	.disconnect	= panu_disconnect,
- 	.adapter_probe	= panu_server_probe,
-@@ -214,8 +178,8 @@ static struct btd_profile gn_profile = {
- 	.name		= "network-gn",
- 	.local_uuid	= PANU_UUID,
- 	.remote_uuid	= GN_UUID,
--	.device_probe	= gn_probe,
--	.device_remove	= network_remove,
-+	.device_probe	= connection_register,
-+	.device_remove	= connection_unregister,
- 	.connect	= gn_connect,
- 	.disconnect	= gn_disconnect,
- 	.adapter_probe	= gn_server_probe,
-@@ -226,8 +190,8 @@ static struct btd_profile nap_profile = {
- 	.name		= "network-nap",
- 	.local_uuid	= PANU_UUID,
- 	.remote_uuid	= NAP_UUID,
--	.device_probe	= nap_probe,
--	.device_remove	= network_remove,
-+	.device_probe	= connection_register,
-+	.device_remove	= connection_unregister,
- 	.connect	= nap_connect,
- 	.disconnect	= nap_disconnect,
- 	.adapter_probe	= nap_server_probe,
+ 	source->dev = dev;
++	source->service = btd_service_ref(service);
+ 
+ 	source->avdtp_callback_id = avdtp_add_state_cb(dev,
+ 							avdtp_state_callback);
+diff --git a/profiles/audio/source.h b/profiles/audio/source.h
+index 61afd94..0156423 100644
+--- a/profiles/audio/source.h
++++ b/profiles/audio/source.h
+@@ -37,11 +37,14 @@ typedef void (*source_state_cb) (struct audio_device *dev,
+ 				source_state_t new_state,
+ 				void *user_data);
+ 
++struct btd_service;
++
+ unsigned int source_add_state_cb(struct audio_device *dev, source_state_cb cb,
+ 							void *user_data);
+ gboolean source_remove_state_cb(unsigned int id);
+ 
+-struct source *source_init(struct audio_device *dev);
++struct source *source_init(struct audio_device *dev,
++				struct btd_service *service);
+ void source_unregister(struct audio_device *dev);
+ int source_connect(struct audio_device *dev);
+ gboolean source_new_stream(struct audio_device *dev, struct avdtp *session,
 -- 
 1.8.1.4
 
