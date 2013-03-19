@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v0 11/11] profile: Use btd_service for connect/disconnect
-Date: Tue, 19 Mar 2013 08:40:55 +0100
-Message-Id: <1363678855-12765-12-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v0 10/11] service: Add callbacks to track state changes
+Date: Tue, 19 Mar 2013 08:40:54 +0100
+Message-Id: <1363678855-12765-11-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1363678855-12765-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1363678855-12765-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,1125 +12,118 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Change the btd_profile connect/disconnect callbacks to receive a
-btd_service pointer. This should make it possible to handle multiple
-instances of the same profile in a specific device.
-
-The patch strongly influences how the profiles should interact with the
-core. The state transitions, previously reported using the device.h API
-(device_profile_connected() and device_profile__disconnected()), have
-now been replaced by the btd_service API.
-
-The transitions will then be propagated to device.c by means of the
-conventional state-changed callback mechanism.
+Extend the btd_service API to support state observers.
 ---
- Makefile.plugins              |  4 +--
- profiles/audio/control.c      | 24 +++++++++++--
- profiles/audio/manager.c      | 56 +++++++-----------------------
- profiles/audio/manager.h      |  7 ----
- profiles/audio/sink.c         | 18 +++++-----
- profiles/audio/source.c       | 18 +++++-----
- profiles/input/device.c       | 21 +++++-------
- profiles/input/device.h       |  5 ++-
- profiles/input/manager.c      | 11 ------
- profiles/input/manager.h      | 25 --------------
- profiles/network/connection.c | 39 ++++++---------------
- profiles/network/connection.h |  4 +--
- profiles/network/manager.c    | 79 ++++---------------------------------------
- profiles/network/manager.h    | 25 --------------
- src/device.c                  | 42 ++++++++++++++---------
- src/device.h                  |  5 ---
- src/profile.c                 | 29 ++++++++++------
- src/profile.h                 |  6 ++--
- 18 files changed, 128 insertions(+), 290 deletions(-)
- delete mode 100644 profiles/input/manager.h
- delete mode 100644 profiles/network/manager.h
+ src/service.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ src/service.h |  8 ++++++++
+ 2 files changed, 56 insertions(+)
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index f497782..44e6eca 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -41,14 +41,14 @@ builtin_sources += profiles/audio/main.c \
- 			profiles/audio/a2dp-codecs.h
- 
- builtin_modules += network
--builtin_sources += profiles/network/manager.h profiles/network/manager.c \
-+builtin_sources += profiles/network/manager.c \
- 			profiles/network/common.h profiles/network/common.c \
- 			profiles/network/server.h profiles/network/server.c \
- 			profiles/network/connection.h \
- 			profiles/network/connection.c
- 
- builtin_modules += input
--builtin_sources += profiles/input/manager.h profiles/input/manager.c \
-+builtin_sources += profiles/input/manager.c \
- 			profiles/input/server.h profiles/input/server.c \
- 			profiles/input/device.h profiles/input/device.c
- 
-diff --git a/profiles/audio/control.c b/profiles/audio/control.c
-index 1c1fbd6..faf5743 100644
---- a/profiles/audio/control.c
-+++ b/profiles/audio/control.c
-@@ -68,6 +68,24 @@ struct control {
- 	unsigned int avctp_id;
+diff --git a/src/service.c b/src/service.c
+index ee56a0a..2f0974c 100644
+--- a/src/service.c
++++ b/src/service.c
+@@ -55,6 +55,12 @@ struct btd_service {
+ 	int			err;
  };
  
-+static void control_connected(struct control *control, int err)
-+{
-+	if (control->target)
-+		service_connecting_complete(control->target, err);
++struct service_state_callback {
++	service_state_cb	cb;
++	void			*user_data;
++	guint			id;
++};
 +
-+	if (control->remote)
-+		service_connecting_complete(control->remote, err);
+ static char *str_state[] = {
+ 	"SERVICE_STATE_UNAVAILABLE",
+ 	"SERVICE_STATE_DISCONNECTED",
+@@ -63,6 +69,8 @@ static char *str_state[] = {
+ 	"SERVICE_STATE_DISCONNECTING",
+ };
+ 
++static GSList *state_callbacks;
++
+ struct btd_device *service_get_device(struct btd_service *service)
+ {
+ 	return service->device;
+@@ -98,6 +106,7 @@ static void service_set_state(struct btd_service *service,
+ 							service_state_t state)
+ {
+ 	service_state_t old = service->state;
++	GSList *l;
+ 
+ 	if (state == old)
+ 		return;
+@@ -106,6 +115,45 @@ static void service_set_state(struct btd_service *service,
+ 
+ 	DBG("State changed %p: %s -> %s", service, str_state[old],
+ 							str_state[state]);
++
++	for (l = state_callbacks; l != NULL; l = g_slist_next(l)) {
++		struct service_state_callback *cb = l->data;
++
++		cb->cb(service, old, state, cb->user_data);
++	}
 +}
 +
-+static void control_disconnected(struct control *control, int err)
++guint service_add_state_cb(service_state_cb cb, void *user_data)
 +{
-+	if (control->target)
-+		service_disconnecting_complete(control->target, err);
++	struct service_state_callback *state_cb;
++	static guint id = 0;
 +
-+	if (control->remote)
-+		service_disconnecting_complete(control->remote, err);
++	state_cb = g_new(struct service_state_callback, 1);
++	state_cb->cb = cb;
++	state_cb->user_data = user_data;
++	state_cb->id = ++id;
++
++	state_callbacks = g_slist_append(state_callbacks, state_cb);
++
++	return state_cb->id;
 +}
 +
- static void state_changed(struct audio_device *dev, avctp_state_t old_state,
- 							avctp_state_t new_state)
- {
-@@ -80,11 +98,11 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
- 		control->session = NULL;
- 
- 		if (old_state != AVCTP_STATE_CONNECTED) {
--			audio_control_connected(dev->btd_dev, -EIO);
-+			control_connected(control, -EIO);
- 			break;
- 		}
- 
--		audio_control_disconnected(dev->btd_dev, 0);
-+		control_disconnected(control, 0);
- 
- 		g_dbus_emit_property_changed(conn, path,
- 					AUDIO_CONTROL_INTERFACE, "Connected");
-@@ -98,7 +116,7 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
- 
- 		break;
- 	case AVCTP_STATE_CONNECTED:
--		audio_control_connected(dev->btd_dev, 0);
-+		control_connected(control, 0);
- 
- 		g_dbus_emit_property_changed(conn, path,
- 					AUDIO_CONTROL_INTERFACE, "Connected");
-diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
-index 54c0b92..3330013 100644
---- a/profiles/audio/manager.c
-+++ b/profiles/audio/manager.c
-@@ -157,9 +157,9 @@ static int avrcp_probe(struct btd_service *service)
- 	return 0;
- }
- 
--static int a2dp_source_connect(struct btd_device *dev,
--						struct btd_profile *profile)
-+static int a2dp_source_connect(struct btd_service *service)
- {
-+	struct btd_device *dev = service_get_device(service);
- 	const char *path = device_get_path(dev);
- 	struct audio_device *audio_dev;
- 
-@@ -174,9 +174,9 @@ static int a2dp_source_connect(struct btd_device *dev,
- 	return source_connect(audio_dev);
- }
- 
--static int a2dp_source_disconnect(struct btd_device *dev,
--						struct btd_profile *profile)
-+static int a2dp_source_disconnect(struct btd_service *service)
- {
-+	struct btd_device *dev = service_get_device(service);
- 	const char *path = device_get_path(dev);
- 	struct audio_device *audio_dev;
- 
-@@ -191,9 +191,9 @@ static int a2dp_source_disconnect(struct btd_device *dev,
- 	return source_disconnect(audio_dev, FALSE);
- }
- 
--static int a2dp_sink_connect(struct btd_device *dev,
--						struct btd_profile *profile)
-+static int a2dp_sink_connect(struct btd_service *service)
- {
-+	struct btd_device *dev = service_get_device(service);
- 	const char *path = device_get_path(dev);
- 	struct audio_device *audio_dev;
- 
-@@ -208,9 +208,9 @@ static int a2dp_sink_connect(struct btd_device *dev,
- 	return sink_connect(audio_dev);
- }
- 
--static int a2dp_sink_disconnect(struct btd_device *dev,
--						struct btd_profile *profile)
-+static int a2dp_sink_disconnect(struct btd_service *service)
- {
-+	struct btd_device *dev = service_get_device(service);
- 	const char *path = device_get_path(dev);
- 	struct audio_device *audio_dev;
- 
-@@ -225,9 +225,9 @@ static int a2dp_sink_disconnect(struct btd_device *dev,
- 	return sink_disconnect(audio_dev, FALSE);
- }
- 
--static int avrcp_target_connect(struct btd_device *dev,
--						struct btd_profile *profile)
-+static int avrcp_target_connect(struct btd_service *service)
- {
-+	struct btd_device *dev = service_get_device(service);
- 	const char *path = device_get_path(dev);
- 	struct audio_device *audio_dev;
- 
-@@ -242,9 +242,9 @@ static int avrcp_target_connect(struct btd_device *dev,
- 	return control_connect(audio_dev);
- }
- 
--static int avrcp_target_disconnect(struct btd_device *dev,
--						struct btd_profile *profile)
-+static int avrcp_target_disconnect(struct btd_service *service)
- {
-+	struct btd_device *dev = service_get_device(service);
- 	const char *path = device_get_path(dev);
- 	struct audio_device *audio_dev;
- 
-@@ -401,38 +401,6 @@ static struct btd_adapter_driver media_driver = {
- 	.remove	= media_server_remove,
- };
- 
--void audio_sink_connected(struct btd_device *dev, int err)
--{
--	device_profile_connected(dev, &a2dp_sink_profile, err);
--}
--
--void audio_sink_disconnected(struct btd_device *dev, int err)
--{
--	device_profile_disconnected(dev, &a2dp_sink_profile, err);
--}
--
--void audio_source_connected(struct btd_device *dev, int err)
--{
--	device_profile_connected(dev, &a2dp_source_profile, err);
--}
--
--void audio_source_disconnected(struct btd_device *dev, int err)
--{
--	device_profile_disconnected(dev, &a2dp_source_profile, err);
--}
--
--void audio_control_connected(struct btd_device *dev, int err)
--{
--	device_profile_connected(dev, &avrcp_target_profile, err);
--	device_profile_connected(dev, &avrcp_remote_profile, err);
--}
--
--void audio_control_disconnected(struct btd_device *dev, int err)
--{
--	device_profile_disconnected(dev, &avrcp_target_profile, err);
--	device_profile_disconnected(dev, &avrcp_remote_profile, err);
--}
--
- int audio_manager_init(GKeyFile *conf)
- {
- 	if (conf)
-diff --git a/profiles/audio/manager.h b/profiles/audio/manager.h
-index 9e5ac94..b8d8ef7 100644
---- a/profiles/audio/manager.h
-+++ b/profiles/audio/manager.h
-@@ -29,13 +29,6 @@ struct enabled_interfaces {
- 	gboolean media_player;
- };
- 
--void audio_sink_connected(struct btd_device *dev, int err);
--void audio_sink_disconnected(struct btd_device *dev, int err);
--void audio_source_connected(struct btd_device *dev, int err);
--void audio_source_disconnected(struct btd_device *dev, int err);
--void audio_control_connected(struct btd_device *dev, int err);
--void audio_control_disconnected(struct btd_device *dev, int err);
--
- int audio_manager_init(GKeyFile *config);
- void audio_manager_exit(void);
- 
-diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
-index 9f1a2d9..b654500 100644
---- a/profiles/audio/sink.c
-+++ b/profiles/audio/sink.c
-@@ -149,7 +149,7 @@ static void stream_state_changed(struct avdtp_stream *stream,
- 
- 	switch (new_state) {
- 	case AVDTP_STATE_IDLE:
--		audio_sink_disconnected(dev->btd_dev, 0);
-+		service_disconnecting_complete(sink->service, 0);
- 
- 		if (sink->disconnect_id > 0) {
- 			a2dp_cancel(dev, sink->disconnect_id);
-@@ -194,7 +194,7 @@ static gboolean stream_setup_retry(gpointer user_data)
- 		err = -EIO;
- 	}
- 
--	audio_sink_connected(sink->dev->btd_dev, err);
-+	service_connecting_complete(sink->service, err);
- 
- 	if (sink->connect_id > 0) {
- 		a2dp_cancel(sink->dev, sink->connect_id);
-@@ -214,7 +214,7 @@ static void stream_setup_complete(struct avdtp *session, struct a2dp_sep *sep,
- 
- 	if (stream) {
- 		DBG("Stream successfully created");
--		audio_sink_connected(sink->dev->btd_dev, 0);
-+		service_connecting_complete(sink->service, 0);
- 		return;
- 	}
- 
-@@ -228,7 +228,7 @@ static void stream_setup_complete(struct avdtp *session, struct a2dp_sep *sep,
- 							sink);
- 	} else {
- 		DBG("Stream setup failed : %s", avdtp_strerror(err));
--		audio_sink_connected(sink->dev->btd_dev, -EIO);
-+		service_connecting_complete(sink->service, -EIO);
- 	}
- }
- 
-@@ -248,7 +248,7 @@ static void select_complete(struct avdtp *session, struct a2dp_sep *sep,
- 	return;
- 
- failed:
--	audio_sink_connected(sink->dev->btd_dev, -EIO);
-+	service_connecting_complete(sink->service, -EIO);
- 
- 	avdtp_unref(sink->session);
- 	sink->session = NULL;
-@@ -286,7 +286,7 @@ static void discovery_complete(struct avdtp *session, GSList *seps, struct avdtp
- 	return;
- 
- failed:
--	audio_sink_connected(sink->dev->btd_dev, -EIO);
-+	service_connecting_complete(sink->service, -EIO);
- 	avdtp_unref(sink->session);
- 	sink->session = NULL;
- }
-@@ -348,13 +348,13 @@ static void sink_free(struct audio_device *dev)
- 		avdtp_unref(sink->session);
- 
- 	if (sink->connect_id > 0) {
--		audio_sink_connected(dev->btd_dev, -ECANCELED);
-+		service_connecting_complete(sink->service, -ECANCELED);
- 		a2dp_cancel(dev, sink->connect_id);
- 		sink->connect_id = 0;
- 	}
- 
- 	if (sink->disconnect_id > 0) {
--		audio_sink_disconnected(dev->btd_dev, -ECANCELED);
-+		service_disconnecting_complete(sink->service, -ECANCELED);
- 		a2dp_cancel(dev, sink->disconnect_id);
- 		sink->disconnect_id = 0;
- 	}
-@@ -434,7 +434,7 @@ int sink_disconnect(struct audio_device *dev, gboolean shutdown)
- 	if (sink->connect_id > 0) {
- 		a2dp_cancel(dev, sink->connect_id);
- 		sink->connect_id = 0;
--		audio_sink_connected(dev->btd_dev, -ECANCELED);
-+		service_connecting_complete(sink->service, -ECANCELED);
- 
- 		avdtp_unref(sink->session);
- 		sink->session = NULL;
-diff --git a/profiles/audio/source.c b/profiles/audio/source.c
-index 20fd412..278e815 100644
---- a/profiles/audio/source.c
-+++ b/profiles/audio/source.c
-@@ -150,7 +150,7 @@ static void stream_state_changed(struct avdtp_stream *stream,
- 
- 	switch (new_state) {
- 	case AVDTP_STATE_IDLE:
--		audio_source_disconnected(dev->btd_dev, 0);
-+		service_disconnecting_complete(source->service, 0);
- 
- 		if (source->disconnect_id > 0) {
- 			a2dp_cancel(dev, source->disconnect_id);
-@@ -195,7 +195,7 @@ static gboolean stream_setup_retry(gpointer user_data)
- 		err = -EIO;
- 	}
- 
--	audio_source_connected(source->dev->btd_dev, err);
-+	service_connecting_complete(source->service, err);
- 
- 	if (source->connect_id > 0) {
- 		a2dp_cancel(source->dev, source->connect_id);
-@@ -215,7 +215,7 @@ static void stream_setup_complete(struct avdtp *session, struct a2dp_sep *sep,
- 
- 	if (stream) {
- 		DBG("Stream successfully created");
--		audio_source_connected(source->dev->btd_dev, 0);
-+		service_connecting_complete(source->service, 0);
- 		return;
- 	}
- 
-@@ -229,7 +229,7 @@ static void stream_setup_complete(struct avdtp *session, struct a2dp_sep *sep,
- 							source);
- 	} else {
- 		DBG("Stream setup failed : %s", avdtp_strerror(err));
--		audio_source_connected(source->dev->btd_dev, -EIO);
-+		service_connecting_complete(source->service, -EIO);
- 	}
- }
- 
-@@ -252,7 +252,7 @@ static void select_complete(struct avdtp *session, struct a2dp_sep *sep,
- 	return;
- 
- failed:
--	audio_source_connected(source->dev->btd_dev, -EIO);
-+	service_connecting_complete(source->service, -EIO);
- 
- 	avdtp_unref(source->session);
- 	source->session = NULL;
-@@ -290,7 +290,7 @@ static void discovery_complete(struct avdtp *session, GSList *seps, struct avdtp
- 	return;
- 
- failed:
--	audio_source_connected(source->dev->btd_dev, -EIO);
-+	service_connecting_complete(source->service, -EIO);
- 	avdtp_unref(source->session);
- 	source->session = NULL;
- }
-@@ -352,13 +352,13 @@ static void source_free(struct audio_device *dev)
- 		avdtp_unref(source->session);
- 
- 	if (source->connect_id > 0) {
--		audio_source_connected(dev->btd_dev, -ECANCELED);
-+		service_connecting_complete(source->service, -ECANCELED);
- 		a2dp_cancel(dev, source->connect_id);
- 		source->connect_id = 0;
- 	}
- 
- 	if (source->disconnect_id > 0) {
--		audio_source_disconnected(dev->btd_dev, -ECANCELED);
-+		service_disconnecting_complete(source->service, -ECANCELED);
- 		a2dp_cancel(dev, source->disconnect_id);
- 		source->disconnect_id = 0;
- 	}
-@@ -431,7 +431,7 @@ int source_disconnect(struct audio_device *dev, gboolean shutdown)
- 	if (source->connect_id > 0) {
- 		a2dp_cancel(dev, source->connect_id);
- 		source->connect_id = 0;
--		audio_source_connected(dev->btd_dev, -ECANCELED);
-+		service_connecting_complete(source->service, -ECANCELED);
- 
- 		avdtp_unref(source->session);
- 		source->session = NULL;
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index 6fa87bc..9028d96 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -48,7 +48,6 @@
- #include "../src/storage.h"
- #include "../src/dbus-common.h"
- 
--#include "manager.h"
- #include "device.h"
- #include "error.h"
- #include <btio/btio.h>
-@@ -534,7 +533,7 @@ static int input_device_connected(struct input_device *idev)
- 	idev->dc_id = device_add_disconnect_watch(idev->device, disconnect_cb,
- 							idev, NULL);
- 
--	input_manager_device_connected(idev->device, 0);
-+	service_connecting_complete(idev->service, 0);
- 
- 	return 0;
- }
-@@ -561,7 +560,7 @@ static void interrupt_connect_cb(GIOChannel *chan, GError *conn_err,
- 	return;
- 
- failed:
--	input_manager_device_connected(idev->device, err);
-+	service_connecting_complete(idev->service, err);
- 
- 	/* So we guarantee the interrupt channel is closed before the
- 	 * control channel (if we only do unref GLib will close it only
-@@ -613,7 +612,7 @@ static void control_connect_cb(GIOChannel *chan, GError *conn_err,
- 	return;
- 
- failed:
--	input_manager_device_connected(idev->device, -EIO);
-+	service_connecting_complete(idev->service, -EIO);
- 	g_io_channel_unref(idev->ctrl_io);
- 	idev->ctrl_io = NULL;
- }
-@@ -644,13 +643,11 @@ static int dev_connect(struct input_device *idev)
- 	return -EIO;
- }
- 
--int input_device_connect(struct btd_device *dev, struct btd_profile *profile)
-+int input_device_connect(struct btd_service *service)
- {
- 	struct input_device *idev;
- 
--	idev = find_device_by_path(devices, device_get_path(dev));
--	if (!idev)
--		return -ENOENT;
-+	idev = service_get_user_data(service);
- 
- 	if (idev->ctrl_io)
- 		return -EBUSY;
-@@ -661,20 +658,18 @@ int input_device_connect(struct btd_device *dev, struct btd_profile *profile)
- 	return dev_connect(idev);
- }
- 
--int input_device_disconnect(struct btd_device *dev, struct btd_profile *profile)
-+int input_device_disconnect(struct btd_service *service)
- {
- 	struct input_device *idev;
- 	int err;
- 
--	idev = find_device_by_path(devices, device_get_path(dev));
--	if (!idev)
--		return -ENOENT;
-+	idev = service_get_user_data(service);
- 
- 	err = connection_disconnect(idev, 0);
- 	if (err < 0)
- 		return err;
- 
--	device_profile_disconnected(dev, profile, 0);
-+	service_disconnecting_complete(service, 0);
- 
- 	return 0;
- }
-diff --git a/profiles/input/device.h b/profiles/input/device.h
-index fd7f847..39c642d 100644
---- a/profiles/input/device.h
-+++ b/profiles/input/device.h
-@@ -36,6 +36,5 @@ int input_device_set_channel(const bdaddr_t *src, const bdaddr_t *dst, int psm,
- 							GIOChannel *io);
- int input_device_close_channels(const bdaddr_t *src, const bdaddr_t *dst);
- 
--int input_device_connect(struct btd_device *dev, struct btd_profile *profile);
--int input_device_disconnect(struct btd_device *dev,
--						struct btd_profile *profile);
-+int input_device_connect(struct btd_service *service);
-+int input_device_disconnect(struct btd_service *service);
-diff --git a/profiles/input/manager.c b/profiles/input/manager.c
-index dc771a6..689ccdd 100644
---- a/profiles/input/manager.c
-+++ b/profiles/input/manager.c
-@@ -43,7 +43,6 @@
- 
- #include "device.h"
- #include "server.h"
--#include "manager.h"
- 
- static int hid_server_probe(struct btd_profile *p, struct btd_adapter *adapter)
- {
-@@ -72,16 +71,6 @@ static struct btd_profile input_profile = {
- 	.adapter_remove = hid_server_remove,
- };
- 
--void input_manager_device_connected(struct btd_device *dev, int err)
--{
--	device_profile_connected(dev, &input_profile, err);
--}
--
--void input_manager_device_disconnected(struct btd_device *dev, int err)
--{
--	device_profile_disconnected(dev, &input_profile, err);
--}
--
- static GKeyFile *load_config_file(const char *file)
- {
- 	GKeyFile *keyfile;
-diff --git a/profiles/input/manager.h b/profiles/input/manager.h
-deleted file mode 100644
-index 3a05094..0000000
---- a/profiles/input/manager.h
-+++ /dev/null
-@@ -1,25 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--void input_manager_device_connected(struct btd_device *dev, int err);
--void input_manager_device_disconnected(struct btd_device *dev, int err);
-diff --git a/profiles/network/connection.c b/profiles/network/connection.c
-index b09ef0c..832d929 100644
---- a/profiles/network/connection.c
-+++ b/profiles/network/connection.c
-@@ -48,7 +48,6 @@
- 
- #include "error.h"
- #include "common.h"
--#include "manager.h"
- #include "connection.h"
- 
- #define NETWORK_PEER_INTERFACE "org.bluez.Network1"
-@@ -146,7 +145,7 @@ static gboolean bnep_watchdog_cb(GIOChannel *chan, GIOCondition cond,
- 	device_remove_disconnect_watch(nc->peer->device, nc->dc_id);
- 	nc->dc_id = 0;
- 
--	network_disconnected(nc->peer->device, nc->id, 0);
-+	service_disconnecting_complete(nc->service, 0);
- 
- 	info("%s disconnected", nc->dev);
- 
-@@ -183,7 +182,7 @@ static void cancel_connection(struct network_conn *nc, int err)
- 		nc->timeout_source = 0;
- 	}
- 
--	network_connected(nc->peer->device, nc->id, err);
-+	service_connecting_complete(nc->service, err);
- 	if (nc->connect)
- 		local_connect_cb(nc, err);
- 
-@@ -291,7 +290,7 @@ static gboolean bnep_setup_cb(GIOChannel *chan, GIOCondition cond,
- 
- 	bnep_if_up(nc->dev);
- 
--	network_connected(nc->peer->device, nc->id, 0);
-+	service_connecting_complete(nc->service, 0);
- 	if (nc->connect)
- 		local_connect_cb(nc, 0);
- 
-@@ -432,7 +431,7 @@ static DBusMessage *local_connect(DBusConnection *conn,
- 	if (nc && nc->connect)
- 		return btd_error_busy(msg);
- 
--	err = connection_connect(peer->device, id);
-+	err = connection_connect(nc->service);
- 	if (err < 0)
- 		return btd_error_failed(msg, strerror(-err));
- 
-@@ -446,24 +445,17 @@ static DBusMessage *local_connect(DBusConnection *conn,
- }
- 
- /* Connect and initiate BNEP session */
--int connection_connect(struct btd_device *device, uint16_t id)
-+int connection_connect(struct btd_service *service)
- {
--	struct network_peer *peer;
--	struct network_conn *nc;
-+	struct network_conn *nc = service_get_user_data(service);
-+	struct network_peer *peer = nc->peer;
-+	uint16_t id = get_service_id(service);
- 	GError *err = NULL;
- 	const bdaddr_t *src;
- 	const bdaddr_t *dst;
- 
- 	DBG("id %u", id);
- 
--	peer = find_peer(peers, device);
--	if (!peer)
--		return -ENOENT;
--
--	nc = find_connection(peer->connections, id);
--	if (!nc)
--		return -ENOTSUP;
--
- 	if (nc->state != DISCONNECTED)
- 		return -EALREADY;
- 
-@@ -487,18 +479,9 @@ int connection_connect(struct btd_device *device, uint16_t id)
- 	return 0;
- }
- 
--int connection_disconnect(struct btd_device *device, uint16_t id)
-+int connection_disconnect(struct btd_service *service)
- {
--	struct network_peer *peer;
--	struct network_conn *nc;
--
--	peer = find_peer(peers, device);
--	if (!peer)
--		return -ENOENT;
--
--	nc = find_connection(peer->connections, id);
--	if (!nc)
--		return -ENOTSUP;
-+	struct network_conn *nc = service_get_user_data(service);
- 
- 	if (nc->state == DISCONNECTED)
- 		return 0;
-@@ -521,7 +504,7 @@ static DBusMessage *local_disconnect(DBusConnection *conn,
- 		if (nc->state == DISCONNECTED)
- 			continue;
- 
--		err = connection_disconnect(peer->device, nc->id);
-+		err = connection_disconnect(nc->service);
- 		if (err < 0)
- 			return btd_error_failed(msg, strerror(-err));
- 
-diff --git a/profiles/network/connection.h b/profiles/network/connection.h
-index 1e7eedb..4a8b43b 100644
---- a/profiles/network/connection.h
-+++ b/profiles/network/connection.h
-@@ -23,5 +23,5 @@
- 
- int connection_register(struct btd_service *service);
- void connection_unregister(struct btd_service *service);
--int connection_connect(struct btd_device *device, uint16_t id);
--int connection_disconnect(struct btd_device *device, uint16_t id);
-+int connection_connect(struct btd_service *service);
-+int connection_disconnect(struct btd_service *service);
-diff --git a/profiles/network/manager.c b/profiles/network/manager.c
-index f37954a..03b1b3d 100644
---- a/profiles/network/manager.c
-+++ b/profiles/network/manager.c
-@@ -42,7 +42,6 @@
- #include "device.h"
- #include "profile.h"
- #include "service.h"
--#include "manager.h"
- #include "common.h"
- #include "connection.h"
- #include "server.h"
-@@ -75,16 +74,6 @@ done:
- 				conf_security ? "true" : "false");
- }
- 
--static int panu_connect(struct btd_device *dev, struct btd_profile *profile)
--{
--	return connection_connect(dev, BNEP_SVC_PANU);
--}
--
--static int panu_disconnect(struct btd_device *dev, struct btd_profile *profile)
--{
--	return connection_disconnect(dev, BNEP_SVC_PANU);
--}
--
- static int panu_server_probe(struct btd_profile *p, struct btd_adapter *adapter)
- {
- 	const char *path = adapter_get_path(adapter);
-@@ -104,16 +93,6 @@ static void panu_server_remove(struct btd_profile *p,
- 	server_unregister(adapter, BNEP_SVC_PANU);
- }
- 
--static int gn_connect(struct btd_device *dev, struct btd_profile *profile)
--{
--	return connection_connect(dev, BNEP_SVC_GN);
--}
--
--static int gn_disconnect(struct btd_device *dev, struct btd_profile *profile)
--{
--	return connection_disconnect(dev, BNEP_SVC_GN);
--}
--
- static int gn_server_probe(struct btd_profile *p, struct btd_adapter *adapter)
- {
- 	const char *path = adapter_get_path(adapter);
-@@ -133,16 +112,6 @@ static void gn_server_remove(struct btd_profile *p,
- 	server_unregister(adapter, BNEP_SVC_GN);
- }
- 
--static int nap_connect(struct btd_device *dev, struct btd_profile *profile)
--{
--	return connection_connect(dev, BNEP_SVC_NAP);
--}
--
--static int nap_disconnect(struct btd_device *dev, struct btd_profile *profile)
--{
--	return connection_disconnect(dev, BNEP_SVC_NAP);
--}
--
- static int nap_server_probe(struct btd_profile *p, struct btd_adapter *adapter)
- {
- 	const char *path = adapter_get_path(adapter);
-@@ -168,8 +137,8 @@ static struct btd_profile panu_profile = {
- 	.remote_uuid	= PANU_UUID,
- 	.device_probe	= connection_register,
- 	.device_remove	= connection_unregister,
--	.connect	= panu_connect,
--	.disconnect	= panu_disconnect,
-+	.connect	= connection_connect,
-+	.disconnect	= connection_disconnect,
- 	.adapter_probe	= panu_server_probe,
- 	.adapter_remove	= panu_server_remove,
- };
-@@ -180,8 +149,8 @@ static struct btd_profile gn_profile = {
- 	.remote_uuid	= GN_UUID,
- 	.device_probe	= connection_register,
- 	.device_remove	= connection_unregister,
--	.connect	= gn_connect,
--	.disconnect	= gn_disconnect,
-+	.connect	= connection_connect,
-+	.disconnect	= connection_disconnect,
- 	.adapter_probe	= gn_server_probe,
- 	.adapter_remove	= gn_server_remove,
- };
-@@ -192,48 +161,12 @@ static struct btd_profile nap_profile = {
- 	.remote_uuid	= NAP_UUID,
- 	.device_probe	= connection_register,
- 	.device_remove	= connection_unregister,
--	.connect	= nap_connect,
--	.disconnect	= nap_disconnect,
-+	.connect	= connection_connect,
-+	.disconnect	= connection_disconnect,
- 	.adapter_probe	= nap_server_probe,
- 	.adapter_remove	= nap_server_remove,
- };
- 
--void network_connected(struct btd_device *dev, int id, int err)
--{
--	switch (id) {
--	case BNEP_SVC_PANU:
--		device_profile_connected(dev, &panu_profile, err);
--		break;
--	case BNEP_SVC_GN:
--		device_profile_connected(dev, &gn_profile, err);
--		break;
--	case BNEP_SVC_NAP:
--		device_profile_connected(dev, &nap_profile, err);
--		break;
--	default:
--		error("Invalid id %d passed to network_connected", id);
--		break;
--	}
--}
--
--void network_disconnected(struct btd_device *dev, int id, int err)
--{
--	switch (id) {
--	case BNEP_SVC_PANU:
--		device_profile_disconnected(dev, &panu_profile, err);
--		break;
--	case BNEP_SVC_GN:
--		device_profile_disconnected(dev, &gn_profile, err);
--		break;
--	case BNEP_SVC_NAP:
--		device_profile_disconnected(dev, &gn_profile, err);
--		break;
--	default:
--		error("Invalid id %d passed to network_disconnected", id);
--		break;
--	}
--}
--
- static int network_init(void)
- {
- 	read_config(CONFIGDIR "/network.conf");
-diff --git a/profiles/network/manager.h b/profiles/network/manager.h
-deleted file mode 100644
-index 8a8c065..0000000
---- a/profiles/network/manager.h
-+++ /dev/null
-@@ -1,25 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--void network_connected(struct btd_device *dev, int id, int err);
--void network_disconnected(struct btd_device *dev, int id, int err);
-diff --git a/src/device.c b/src/device.c
-index 31399d5..6b5f9f7 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -184,6 +184,7 @@ struct btd_device {
- 	GSList		*attios;
- 	GSList		*attios_offline;
- 	guint		attachid;		/* Attrib server attach */
-+	guint		service_state_cb_id;
- 
- 	gboolean	connected;
- 
-@@ -434,6 +435,8 @@ static void device_free(gpointer user_data)
- {
- 	struct btd_device *device = user_data;
- 
-+	service_remove_state_cb(device->service_state_cb_id);
++gboolean service_remove_state_cb(guint id)
++{
++	GSList *l;
 +
- 	g_slist_free_full(device->uuids, g_free);
- 	g_slist_free_full(device->primaries, g_free);
- 	g_slist_free_full(device->attios, g_free);
-@@ -996,7 +999,6 @@ static void dev_disconn_service(gpointer a, gpointer b)
- {
- 	struct btd_service *service = a;
- 	struct btd_profile *profile = service_get_profile(service);
--	struct btd_device *dev = service_get_device(service);
- 	service_state_t state = service_get_state(service);
- 
- 	if (!profile->disconnect)
-@@ -1006,7 +1008,7 @@ static void dev_disconn_service(gpointer a, gpointer b)
- 					state != SERVICE_STATE_CONNECTED)
- 		return;
- 
--	if (profile->disconnect(dev, profile) != 0)
-+	if (profile->disconnect(service) != 0)
- 		return;
- 
- 	service_disconnecting(service);
-@@ -1098,7 +1100,7 @@ static int connect_next(struct btd_device *dev)
- 			continue;
- 		}
- 
--		err = profile->connect(dev, profile);
-+		err = profile->connect(service);
- 		if (err == 0) {
- 			service_connecting(service);
- 			return 0;
-@@ -1113,7 +1115,7 @@ static int connect_next(struct btd_device *dev)
- 	return err;
++	for (l = state_callbacks; l != NULL; l = g_slist_next(l)) {
++		struct service_state_callback *cb = l->data;
++
++		if (cb && cb->id == id) {
++			state_callbacks = g_slist_remove_link(state_callbacks,
++									l);
++			g_free(cb);
++			return TRUE;
++		}
++	}
++
++	return FALSE;
  }
  
--void device_profile_connected(struct btd_device *dev,
-+static void device_profile_connected(struct btd_device *dev,
- 					struct btd_profile *profile, int err)
- {
- 	struct btd_profile *pending;
-@@ -1129,10 +1131,6 @@ void device_profile_connected(struct btd_device *dev,
- 	if (l != NULL)
- 		dev->pending = g_slist_delete_link(dev->pending, l);
+ struct btd_service *service_create(struct btd_device *device,
+diff --git a/src/service.h b/src/service.h
+index 72282bd..5e6c2b8 100644
+--- a/src/service.h
++++ b/src/service.h
+@@ -31,6 +31,11 @@ typedef enum {
  
--	l = g_slist_find_custom(dev->services, profile, service_profile_cmp);
--	if (l != NULL)
--		service_connecting_complete(l->data, err);
--
- 	/* Only continue connecting the next profile if it matches the first
- 	 * pending, otherwise it will trigger another connect to the same
- 	 * profile
-@@ -1336,15 +1334,9 @@ static DBusMessage *connect_profile(DBusConnection *conn, DBusMessage *msg,
- 	return reply;
- }
+ struct btd_service;
  
--void device_profile_disconnected(struct btd_device *dev,
-+static void device_profile_disconnected(struct btd_device *dev,
- 					struct btd_profile *profile, int err)
- {
--	GSList *l;
--
--	l = g_slist_find_custom(dev->services, profile, service_profile_cmp);
--	if (l != NULL)
--		service_disconnecting_complete(l->data, err);
--
- 	if (!dev->disconnect)
- 		return;
- 
-@@ -1389,7 +1381,7 @@ static DBusMessage *disconnect_profile(DBusConnection *conn, DBusMessage *msg,
- 	if (!p->disconnect)
- 		return btd_error_not_supported(msg);
- 
--	err = p->disconnect(dev, p);
-+	err = p->disconnect(service);
- 	if (err < 0)
- 		return btd_error_failed(msg, strerror(-err));
- 
-@@ -2081,6 +2073,21 @@ struct btd_device *device_create_from_storage(struct btd_adapter *adapter,
- 	return device;
- }
- 
-+static void service_state_changed(struct btd_service *service,
++typedef void (*service_state_cb) (struct btd_service *service,
 +						service_state_t old_state,
 +						service_state_t new_state,
-+						void *user_data)
-+{
-+	struct btd_profile *profile = service_get_profile(service);
-+	struct btd_device *device = service_get_device(service);
-+	int err = service_get_error(service);
++						void *user_data);
 +
-+	if (old_state == SERVICE_STATE_CONNECTING)
-+		device_profile_connected(device, profile, err);
-+	else if (old_state == SERVICE_STATE_DISCONNECTING)
-+		device_profile_disconnected(device, profile, err);
-+}
+ struct btd_service *service_create(struct btd_device *device,
+ 						struct btd_profile *profile);
+ 
+@@ -41,6 +46,9 @@ struct btd_device *service_get_device(struct btd_service *service);
+ struct btd_profile *service_get_profile(struct btd_service *service);
+ service_state_t service_get_state(struct btd_service *service);
+ 
++guint service_add_state_cb(service_state_cb cb, void *user_data);
++gboolean service_remove_state_cb(guint id);
 +
- struct btd_device *device_create(struct btd_adapter *adapter,
- 				const bdaddr_t *bdaddr, uint8_t bdaddr_type)
- {
-@@ -2106,6 +2113,9 @@ struct btd_device *device_create(struct btd_adapter *adapter,
- 		g_free(str);
- 	}
- 
-+	device->service_state_cb_id = service_add_state_cb(
-+						service_state_changed, NULL);
-+
- 	return device;
- }
- 
-diff --git a/src/device.h b/src/device.h
-index d072015..df6cbd8 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -122,10 +122,5 @@ bool device_remove_svc_complete_callback(struct btd_device *dev,
- 
- struct btd_profile;
- 
--void device_profile_connected(struct btd_device *dev,
--					struct btd_profile *profile, int err);
--void device_profile_disconnected(struct btd_device *dev,
--					struct btd_profile *profile, int err);
--
- void btd_device_init(void);
- void btd_device_cleanup(void);
-diff --git a/src/profile.c b/src/profile.c
-index 185897a..f33718a 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -553,6 +553,7 @@ struct ext_io {
- 	guint io_id;
- 	struct btd_adapter *adapter;
- 	struct btd_device *device;
-+	struct btd_service *service;
- 
- 	bool resolving;
- 	bool connected;
-@@ -684,6 +685,9 @@ static void ext_io_destroy(gpointer p)
- 	if (ext_io->device)
- 		btd_device_unref(ext_io->device);
- 
-+	if (ext_io->service)
-+		btd_service_unref(ext_io->service);
-+
- 	g_free(ext_io);
- }
- 
-@@ -708,7 +712,7 @@ static gboolean ext_io_disconnected(GIOChannel *io, GIOCondition cond,
- 
- 	DBG("%s disconnected from %s", ext->name, addr);
- drop:
--	device_profile_disconnected(conn->device, &ext->p, 0);
-+	service_disconnecting_complete(conn->service, 0);
- 	ext->conns = g_slist_remove(ext->conns, conn);
- 	ext_io_destroy(conn);
- 	return FALSE;
-@@ -730,7 +734,7 @@ static void new_conn_reply(DBusPendingCall *call, void *user_data)
- 	conn->pending = NULL;
- 
- 	if (!dbus_error_is_set(&err)) {
--		device_profile_connected(conn->device, &ext->p, 0);
-+		service_connecting_complete(conn->service, 0);
- 		conn->connected = true;
- 		return;
- 	}
-@@ -738,7 +742,7 @@ static void new_conn_reply(DBusPendingCall *call, void *user_data)
- 	error("%s replied with an error: %s, %s", ext->name,
- 						err.name, err.message);
- 
--	device_profile_connected(conn->device, &ext->p, -ECONNREFUSED);
-+	service_connecting_complete(conn->service, -ECONNREFUSED);
- 
- 	if (dbus_error_has_name(&err, DBUS_ERROR_NO_REPLY))
- 		ext_cancel(ext);
-@@ -765,14 +769,14 @@ static void disconn_reply(DBusPendingCall *call, void *user_data)
- 	conn->pending = NULL;
- 
- 	if (!dbus_error_is_set(&err)) {
--		device_profile_disconnected(conn->device, &ext->p, 0);
-+		service_disconnecting_complete(conn->service, 0);
- 		goto disconnect;
- 	}
- 
- 	error("%s replied with an error: %s, %s", ext->name,
- 						err.name, err.message);
- 
--	device_profile_disconnected(conn->device, &ext->p, -ECONNREFUSED);
-+	service_disconnecting_complete(conn->service, -ECONNREFUSED);
- 
- 	if (dbus_error_has_name(&err, DBUS_ERROR_NO_REPLY))
- 		ext_cancel(ext);
-@@ -948,8 +952,7 @@ static void ext_connect(GIOChannel *io, GError *err, gpointer user_data)
- 		return;
- 
- drop:
--	device_profile_connected(conn->device, &ext->p,
--						err ? -err->code : -EIO);
-+	service_connecting_complete(conn->service, err ? -err->code : -EIO);
- 	if (io_err)
- 		g_error_free(io_err);
- 	ext->conns = g_slist_remove(ext->conns, conn);
-@@ -1531,7 +1534,7 @@ static void record_cb(sdp_list_t *recs, int err, gpointer user_data)
- 	return;
- 
- failed:
--	device_profile_connected(conn->device, &ext->p, err);
-+	service_connecting_complete(conn->service, err);
- 	ext->conns = g_slist_remove(ext->conns, conn);
- 	ext_io_destroy(conn);
- }
-@@ -1553,8 +1556,10 @@ static int resolve_service(struct ext_io *conn, const bdaddr_t *src,
- 	return err;
- }
- 
--static int ext_connect_dev(struct btd_device *dev, struct btd_profile *profile)
-+static int ext_connect_dev(struct btd_service *service)
- {
-+	struct btd_device *dev = service_get_device(service);
-+	struct btd_profile *profile = service_get_profile(service);
- 	struct btd_adapter *adapter;
- 	struct ext_io *conn;
- 	struct ext_profile *ext;
-@@ -1588,6 +1593,7 @@ static int ext_connect_dev(struct btd_device *dev, struct btd_profile *profile)
- 
- 	conn->adapter = btd_adapter_ref(adapter);
- 	conn->device = btd_device_ref(dev);
-+	conn->service = btd_service_ref(service);
- 
- 	ext->conns = g_slist_append(ext->conns, conn);
- 
-@@ -1630,9 +1636,10 @@ static int send_disconn_req(struct ext_profile *ext, struct ext_io *conn)
- 	return 0;
- }
- 
--static int ext_disconnect_dev(struct btd_device *dev,
--						struct btd_profile *profile)
-+static int ext_disconnect_dev(struct btd_service *service)
- {
-+	struct btd_device *dev = service_get_device(service);
-+	struct btd_profile *profile = service_get_profile(service);
- 	struct ext_profile *ext;
- 	struct ext_io *conn;
- 	int err;
-diff --git a/src/profile.h b/src/profile.h
-index 8daa358..9aec27e 100644
---- a/src/profile.h
-+++ b/src/profile.h
-@@ -39,10 +39,8 @@ struct btd_profile {
- 	int (*device_probe) (struct btd_service *service);
- 	void (*device_remove) (struct btd_service *service);
- 
--	int (*connect) (struct btd_device *device,
--						struct btd_profile *profile);
--	int (*disconnect) (struct btd_device *device,
--						struct btd_profile *profile);
-+	int (*connect) (struct btd_service *service);
-+	int (*disconnect) (struct btd_service *service);
- 
- 	int (*adapter_probe) (struct btd_profile *p,
- 						struct btd_adapter *adapter);
+ void service_set_user_data(struct btd_service *service, void *user_data);
+ void *service_get_user_data(struct btd_service *service);
+ int service_get_error(struct btd_service *service);
 -- 
 1.8.1.4
 
