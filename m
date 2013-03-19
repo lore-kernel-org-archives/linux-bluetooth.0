@@ -1,151 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 19 Mar 2013 15:48:00 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bruna Moreira <bruna.moreira@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 0/4] Basic mgmt API tests for discovery procedure
+Message-ID: <20130319134800.GA28886@x220.ger.corp.intel.com>
+References: <1363639986-16231-1-git-send-email-bruna.moreira@openbossa.org>
 MIME-Version: 1.0
-In-Reply-To: <51472E9E.50807@oss.bmw-carit.de>
-References: <51472E9E.50807@oss.bmw-carit.de>
-Date: Tue, 19 Mar 2013 12:39:47 -0300
-Message-ID: <CABBYNZKB7LkBWNkk-pP069H_iOhJuWCYHsSFBkRL9+gw3Cfccg@mail.gmail.com>
-Subject: Re: MAP client: Add support for receiving notifications
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1363639986-16231-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+Hi Bruna,
 
-On Mon, Mar 18, 2013 at 12:11 PM, Christian Fetzer
-<christian.fetzer@oss.bmw-carit.de> wrote:
-> Hi,
->
-> This is a follow-up on the discussion started in my patch set
-> "MAP client: notification support". The patches were implementing
-> notification support only for one remote device and needed an additional
-> API function for choosing that device.
->
-> It's better to implement this implicitly and support multiple devices
-> from the beginning.
->
-> In this E-Mail I'd like to suggest how we could implement the
-> notification connection setup in BlueZ. I'll try to explain the relevant
-> part of the spec to have a base for discussion.
->
-> MAP consists of two different OBEX applications, Message Access Service
-> (MAS) for browsing messages and Message Notification Service (MNS) for
-> receiving event reports about changes on the server (like new messages,
-> moved messages, delivery reports, ...).
->
-> The spec describes the single phone use case where the MAP client (MCE)
-> consists of several MAS client instances for the different accounts and
-> one common MNS server instance:
->
->   MCE (Car Kit)       MSE (Phone)
-> +---------------+   +-------------------------+
-> | MAS client 1  |<->| MAS server 1 (SMS)      |
-> | MAS client 2  |<->| MAS server 2 (E-Mail A) |
-> |     ...       |   |     ...                 |
-> | MNS server    |<->| MNS client              |
-> +---------------+   +-------------------------+
->
-> Every MAS client instance, that wants to use notifications, needs to
-> use the SetNotificationRegistration function to enable it.
-> If the MNS connection isn't established already, the server (MSE) will
-> start the SDP lookup for the MNS instance on the client and connect to
-> it. The event reports that are sent on the MNS channel contain the MAS
-> instance ID, that can be used to map the event to the MAS client.
->
-> Since an OBEX instance, like the MNS server, cannot be connected to
-> different remote devices at the same time, it will not work to have one
-> static MNS server instance. Instead we need one MNS server instance for
-> every connected remote device (that we want to use with MAP). Since the
-> MNS connection establishment is based on SDP, we have to make sure that
-> there's only one MNS server SDP record visible. Otherwise, the MSE
-> cannot know which one to connect to.
+On Mon, Mar 18, 2013, Bruna Moreira wrote:
+> This series implements initial basic tests for discovery procedure. The
+> following tests were added in mgmt-tester utility:
+> - Start Discovery: success testcase.
+> - Stop discovery: success, rejected and invalid parameters testcases.
+> 
+> More complex tests (including stop discovery at specific discovery stages) will
+> be sent in next weeks.
+> 
+> BR,
+> Bruna Moreira.
+> 
+> Bruna Moreira (4):
+>   tools: Add basic success test for start discovery
+>   tools: Add basic success test for stop discovery
+>   tools: Add basic rejected test for stop discovery
+>   tools: Add basic invalid parameters test for stop discovery
+> 
+>  tools/mgmt-tester.c |  116 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 116 insertions(+)
 
-But it should not the same instance, for every connection it will be a
-different OBEX instance just like any OPP instance. RFCOMM limitation
-is to the same device we can only have one connection, actually 2 one
-in each direction, but for different devices we can connect just fine.
+All patches in this set have been applied. Thanks.
 
-> If we want to hide this all from the application level, we could do the
-> connection establishment for two devices (MSE 1 and MSE 2) as described
-> here.
->
->   MCE (Car Kit)       MSE 1 (Business phone)
-> +---------------+   +-------------------------+
-> | MAS client 1  |<->| MAS server 1 (SMS)      |
-> | MAS client 2  |<->| MAS server 2 (E-Mail A) |
-> |     ...       |   |     ...                 |
-> | MNS server 1  |<->| MNS client              |
-> |               |   +-------------------------+
-> |               |
-> |               |     MSE 2 (private phone)
-> |               |   +-------------------------+
-> | MAS client 3  |<->| MAS server 1 (SMS)      |
-> |     ...       |   |     ...                 |
-> | MNS server 2  |<->| MNS client              |
-> +---------------+   +-------------------------+
->
-> - MCE connects MAS client 1 to MSE 1
-> - MCE dynamically instantiates MNS server 1 and registers its SDP record
-> - MAS client 1 sends SetNotificationRegistration(on)
-> - MSE does SDP lookup and connects to the found MNS server 1
-> - MCE removes SDP record for MNS server 1
-> - MCE connects MAS client 2 to MSE 1
-> - MAS client 2 sends SetNotificationRegistration(on)
->      (MNS channel is already up, MSE just responds OK)
-> - MCE connects MAS client 3 to MSE 2
-> - MCE dynamically instantiates MNS server 2 and registers its SDP record
-> - MAS client 3 sends SetNotificationRegistration(on)
-> - MSE does SDP lookup and connects to the found MNS server 2
-> - MCE removes SDP record for MNS server 2
-> ...
->
-> Does that sound reasonable for you?
->
-> Currently it's not possible to dynamically add OBEX servers, as they are
-> all instantiated at startup on predefined RFCOMM channels.
-> Could you comment on how this should be implemented best?
+While you're working on new test cases as well as improving the existing
+ones please remember that you also can (and should) test for specific
+HCI commands caused by the tests.
 
-We should be able to differentiate each connection already, in fact
-bluetoothd and obexd are already able to handle multiple
-instances/connections to e.g. OPP:
-
-bluetoothd[18792]: src/profile.c:ext_confirm() incoming connect from
-6C:83:36:BA:55:B4
-bluetoothd[18792]: src/profile.c:ext_confirm() Object Push authorizing
-connection from 6C:83:36:BA:55:B4
-bluetoothd[18792]: src/profile.c:ext_auth() Connection from
-6C:83:36:BA:55:B4 authorized but still waiting for SDP
-bluetoothd[18792]: src/profile.c:ext_svc_complete() Services resolved
-for 6C:83:36:BA:55:B4
-bluetoothd[18792]: src/profile.c:ext_svc_complete() 6C:83:36:BA:55:B4
-authorized to connect to Object Push
-bluetoothd[18792]: src/profile.c:ext_connect() Object Push connected
-to 6C:83:36:BA:55:B4
-bluetoothd[18792]: src/device.c:device_profile_connected() Object Push
-Success (0)
-bluetoothd[18792]: src/adapter.c:connected_callback() hci0 device
-B4:EE:D4:93:34:8F connected eir_len 5
-bluetoothd[18792]: src/profile.c:ext_confirm() incoming connect from
-B4:EE:D4:93:34:8F
-bluetoothd[18792]: src/profile.c:ext_confirm() Object Push authorizing
-connection from B4:EE:D4:93:34:8F
-bluetoothd[18792]: src/profile.c:ext_auth() Connection from
-B4:EE:D4:93:34:8F authorized but still waiting for SDP
-bluetoothd[18792]: src/profile.c:ext_svc_complete() Services resolved
-for B4:EE:D4:93:34:8F
-bluetoothd[18792]: src/profile.c:ext_svc_complete() B4:EE:D4:93:34:8F
-authorized to connect to Object Push
-bluetoothd[18792]: src/profile.c:ext_connect() Object Push connected
-to B4:EE:D4:93:34:8F
-bluetoothd[18792]: src/device.c:device_profile_connected() Object Push
-Success (0)
-
-Every connection is represented by a GObex instance, since there is
-only one MSN independent of how many MAS instances there is no need to
-have multiple records because each device will connection only once
-and each will have a dedicated GObex instance.
-
---
-Luiz Augusto von Dentz
+Johan
