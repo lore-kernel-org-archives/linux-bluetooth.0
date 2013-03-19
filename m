@@ -1,141 +1,151 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v4 1/6] Bluetooth: Move and rename hci_conn_accept
-Date: Tue, 19 Mar 2013 19:04:10 +0100
-Message-Id: <1363716255-21332-2-git-send-email-frederic.dalleau@linux.intel.com>
-In-Reply-To: <1363716255-21332-1-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1363716255-21332-1-git-send-email-frederic.dalleau@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+In-Reply-To: <51472E9E.50807@oss.bmw-carit.de>
+References: <51472E9E.50807@oss.bmw-carit.de>
+Date: Tue, 19 Mar 2013 12:39:47 -0300
+Message-ID: <CABBYNZKB7LkBWNkk-pP069H_iOhJuWCYHsSFBkRL9+gw3Cfccg@mail.gmail.com>
+Subject: Re: MAP client: Add support for receiving notifications
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since this function is only used by sco, move it from hci_event.c to
-sco.c and rename to sco_conn_defer_accept.
----
- include/net/bluetooth/hci_core.h |    1 -
- net/bluetooth/hci_event.c        |   36 ------------------------------------
- net/bluetooth/sco.c              |   38 +++++++++++++++++++++++++++++++++++++-
- 3 files changed, 37 insertions(+), 38 deletions(-)
+Hi Christian,
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 358a698..e6aa0f1 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -584,7 +584,6 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst);
- int hci_conn_del(struct hci_conn *conn);
- void hci_conn_hash_flush(struct hci_dev *hdev);
- void hci_conn_check_pending(struct hci_dev *hdev);
--void hci_conn_accept(struct hci_conn *conn, int mask);
- 
- struct hci_chan *hci_chan_create(struct hci_conn *conn);
- void hci_chan_del(struct hci_chan *chan);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 1385807..2fe3ccd 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1752,42 +1752,6 @@ unlock:
- 	hci_conn_check_pending(hdev);
- }
- 
--void hci_conn_accept(struct hci_conn *conn, int mask)
--{
--	struct hci_dev *hdev = conn->hdev;
--
--	BT_DBG("conn %p", conn);
--
--	conn->state = BT_CONFIG;
--
--	if (!lmp_esco_capable(hdev)) {
--		struct hci_cp_accept_conn_req cp;
--
--		bacpy(&cp.bdaddr, &conn->dst);
--
--		if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
--			cp.role = 0x00; /* Become master */
--		else
--			cp.role = 0x01; /* Remain slave */
--
--		hci_send_cmd(hdev, HCI_OP_ACCEPT_CONN_REQ, sizeof(cp), &cp);
--	} else /* lmp_esco_capable(hdev)) */ {
--		struct hci_cp_accept_sync_conn_req cp;
--
--		bacpy(&cp.bdaddr, &conn->dst);
--		cp.pkt_type = cpu_to_le16(conn->pkt_type);
--
--		cp.tx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
--		cp.rx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
--		cp.max_latency    = __constant_cpu_to_le16(0xffff);
--		cp.content_format = cpu_to_le16(hdev->voice_setting);
--		cp.retrans_effort = 0xff;
--
--		hci_send_cmd(hdev, HCI_OP_ACCEPT_SYNC_CONN_REQ,
--			     sizeof(cp), &cp);
--	}
--}
--
- static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_conn_request *ev = (void *) skb->data;
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 183b852..2738014 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -653,6 +653,42 @@ static int sco_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
- 	return err;
- }
- 
-+static void sco_conn_defer_accept(struct hci_conn *conn, int mask)
-+{
-+	struct hci_dev *hdev = conn->hdev;
-+
-+	BT_DBG("conn %p", conn);
-+
-+	conn->state = BT_CONFIG;
-+
-+	if (!lmp_esco_capable(hdev)) {
-+		struct hci_cp_accept_conn_req cp;
-+
-+		bacpy(&cp.bdaddr, &conn->dst);
-+
-+		if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
-+			cp.role = 0x00; /* Become master */
-+		else
-+			cp.role = 0x01; /* Remain slave */
-+
-+		hci_send_cmd(hdev, HCI_OP_ACCEPT_CONN_REQ, sizeof(cp), &cp);
-+	} else {
-+		struct hci_cp_accept_sync_conn_req cp;
-+
-+		bacpy(&cp.bdaddr, &conn->dst);
-+		cp.pkt_type = cpu_to_le16(conn->pkt_type);
-+
-+		cp.tx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
-+		cp.rx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
-+		cp.max_latency    = __constant_cpu_to_le16(0xffff);
-+		cp.content_format = cpu_to_le16(hdev->voice_setting);
-+		cp.retrans_effort = 0xff;
-+
-+		hci_send_cmd(hdev, HCI_OP_ACCEPT_SYNC_CONN_REQ,
-+			     sizeof(cp), &cp);
-+	}
-+}
-+
- static int sco_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
- 			    struct msghdr *msg, size_t len, int flags)
- {
-@@ -663,7 +699,7 @@ static int sco_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
- 
- 	if (sk->sk_state == BT_CONNECT2 &&
- 	    test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
--		hci_conn_accept(pi->conn->hcon, 0);
-+		sco_conn_defer_accept(pi->conn->hcon, 0);
- 		sk->sk_state = BT_CONFIG;
- 
- 		release_sock(sk);
--- 
-1.7.9.5
+On Mon, Mar 18, 2013 at 12:11 PM, Christian Fetzer
+<christian.fetzer@oss.bmw-carit.de> wrote:
+> Hi,
+>
+> This is a follow-up on the discussion started in my patch set
+> "MAP client: notification support". The patches were implementing
+> notification support only for one remote device and needed an additional
+> API function for choosing that device.
+>
+> It's better to implement this implicitly and support multiple devices
+> from the beginning.
+>
+> In this E-Mail I'd like to suggest how we could implement the
+> notification connection setup in BlueZ. I'll try to explain the relevant
+> part of the spec to have a base for discussion.
+>
+> MAP consists of two different OBEX applications, Message Access Service
+> (MAS) for browsing messages and Message Notification Service (MNS) for
+> receiving event reports about changes on the server (like new messages,
+> moved messages, delivery reports, ...).
+>
+> The spec describes the single phone use case where the MAP client (MCE)
+> consists of several MAS client instances for the different accounts and
+> one common MNS server instance:
+>
+>   MCE (Car Kit)       MSE (Phone)
+> +---------------+   +-------------------------+
+> | MAS client 1  |<->| MAS server 1 (SMS)      |
+> | MAS client 2  |<->| MAS server 2 (E-Mail A) |
+> |     ...       |   |     ...                 |
+> | MNS server    |<->| MNS client              |
+> +---------------+   +-------------------------+
+>
+> Every MAS client instance, that wants to use notifications, needs to
+> use the SetNotificationRegistration function to enable it.
+> If the MNS connection isn't established already, the server (MSE) will
+> start the SDP lookup for the MNS instance on the client and connect to
+> it. The event reports that are sent on the MNS channel contain the MAS
+> instance ID, that can be used to map the event to the MAS client.
+>
+> Since an OBEX instance, like the MNS server, cannot be connected to
+> different remote devices at the same time, it will not work to have one
+> static MNS server instance. Instead we need one MNS server instance for
+> every connected remote device (that we want to use with MAP). Since the
+> MNS connection establishment is based on SDP, we have to make sure that
+> there's only one MNS server SDP record visible. Otherwise, the MSE
+> cannot know which one to connect to.
 
+But it should not the same instance, for every connection it will be a
+different OBEX instance just like any OPP instance. RFCOMM limitation
+is to the same device we can only have one connection, actually 2 one
+in each direction, but for different devices we can connect just fine.
+
+> If we want to hide this all from the application level, we could do the
+> connection establishment for two devices (MSE 1 and MSE 2) as described
+> here.
+>
+>   MCE (Car Kit)       MSE 1 (Business phone)
+> +---------------+   +-------------------------+
+> | MAS client 1  |<->| MAS server 1 (SMS)      |
+> | MAS client 2  |<->| MAS server 2 (E-Mail A) |
+> |     ...       |   |     ...                 |
+> | MNS server 1  |<->| MNS client              |
+> |               |   +-------------------------+
+> |               |
+> |               |     MSE 2 (private phone)
+> |               |   +-------------------------+
+> | MAS client 3  |<->| MAS server 1 (SMS)      |
+> |     ...       |   |     ...                 |
+> | MNS server 2  |<->| MNS client              |
+> +---------------+   +-------------------------+
+>
+> - MCE connects MAS client 1 to MSE 1
+> - MCE dynamically instantiates MNS server 1 and registers its SDP record
+> - MAS client 1 sends SetNotificationRegistration(on)
+> - MSE does SDP lookup and connects to the found MNS server 1
+> - MCE removes SDP record for MNS server 1
+> - MCE connects MAS client 2 to MSE 1
+> - MAS client 2 sends SetNotificationRegistration(on)
+>      (MNS channel is already up, MSE just responds OK)
+> - MCE connects MAS client 3 to MSE 2
+> - MCE dynamically instantiates MNS server 2 and registers its SDP record
+> - MAS client 3 sends SetNotificationRegistration(on)
+> - MSE does SDP lookup and connects to the found MNS server 2
+> - MCE removes SDP record for MNS server 2
+> ...
+>
+> Does that sound reasonable for you?
+>
+> Currently it's not possible to dynamically add OBEX servers, as they are
+> all instantiated at startup on predefined RFCOMM channels.
+> Could you comment on how this should be implemented best?
+
+We should be able to differentiate each connection already, in fact
+bluetoothd and obexd are already able to handle multiple
+instances/connections to e.g. OPP:
+
+bluetoothd[18792]: src/profile.c:ext_confirm() incoming connect from
+6C:83:36:BA:55:B4
+bluetoothd[18792]: src/profile.c:ext_confirm() Object Push authorizing
+connection from 6C:83:36:BA:55:B4
+bluetoothd[18792]: src/profile.c:ext_auth() Connection from
+6C:83:36:BA:55:B4 authorized but still waiting for SDP
+bluetoothd[18792]: src/profile.c:ext_svc_complete() Services resolved
+for 6C:83:36:BA:55:B4
+bluetoothd[18792]: src/profile.c:ext_svc_complete() 6C:83:36:BA:55:B4
+authorized to connect to Object Push
+bluetoothd[18792]: src/profile.c:ext_connect() Object Push connected
+to 6C:83:36:BA:55:B4
+bluetoothd[18792]: src/device.c:device_profile_connected() Object Push
+Success (0)
+bluetoothd[18792]: src/adapter.c:connected_callback() hci0 device
+B4:EE:D4:93:34:8F connected eir_len 5
+bluetoothd[18792]: src/profile.c:ext_confirm() incoming connect from
+B4:EE:D4:93:34:8F
+bluetoothd[18792]: src/profile.c:ext_confirm() Object Push authorizing
+connection from B4:EE:D4:93:34:8F
+bluetoothd[18792]: src/profile.c:ext_auth() Connection from
+B4:EE:D4:93:34:8F authorized but still waiting for SDP
+bluetoothd[18792]: src/profile.c:ext_svc_complete() Services resolved
+for B4:EE:D4:93:34:8F
+bluetoothd[18792]: src/profile.c:ext_svc_complete() B4:EE:D4:93:34:8F
+authorized to connect to Object Push
+bluetoothd[18792]: src/profile.c:ext_connect() Object Push connected
+to B4:EE:D4:93:34:8F
+bluetoothd[18792]: src/device.c:device_profile_connected() Object Push
+Success (0)
+
+Every connection is represented by a GObex instance, since there is
+only one MSN independent of how many MAS instances there is no need to
+have multiple records because each device will connection only once
+and each will have a dedicated GObex instance.
+
+--
+Luiz Augusto von Dentz
