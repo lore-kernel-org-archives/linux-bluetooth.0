@@ -1,46 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 20 Mar 2013 15:57:19 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Christopher Waid <chris@thinkpenguin.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode) causing
- crashes
-Message-ID: <20130320185719.GC7522@joana>
-References: <514763A7.4020800@thinkpenguin.com>
- <20130318191335.GA11242@kroah.com>
- <5149FC3A.4070208@thinkpenguin.com>
+Date: Wed, 20 Mar 2013 15:22:59 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Alex Deymo <deymo@chromium.org>
+Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org
+Subject: Re: [PATCH v3 2/6] client: Right prompt management on agent input
+Message-ID: <20130320182259.GC6190@samus>
+References: <1363726505-15171-1-git-send-email-deymo@chromium.org>
+ <1363726505-15171-3-git-send-email-deymo@chromium.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <5149FC3A.4070208@thinkpenguin.com>
-Sender: linux-usb-owner@vger.kernel.org
+In-Reply-To: <1363726505-15171-3-git-send-email-deymo@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Christopher Waid <chris@thinkpenguin.com> [2013-03-20 14:13:14 -0400]:
+Hi Alex,
 
-> On 03/18/2013 03:13 PM, Greg KH wrote:
-> >On Mon, Mar 18, 2013 at 02:57:43PM -0400, Christopher Waid wrote:
-> >>Bus 001 Device 007: ID 0a12:0001 Cambridge Silicon Radio, Ltd
-> >>Bluetooth Dongle (HCI mode)
-> >>
-> >>Code for a CSR bluetooth chipset appears broken in recent kernel
-> >>releases. After a device is paired the kernel panics. This has been
-> >>tested with a dozen USB dongles / systems and is consistently a
-> >>problem. On the rare occasion it might not cause a kernel panic
-> >>although it will definitely still crash after a few minutes. This
-> >>does not happen with older kernel releases.
-> >What kernel version is crashing, and what is the exact text of the
-> >kernel panic?
-> 
-> It goes black and disappears off the screen with a lot of other text
-> so I'm unsure.
+On 13:55 Tue 19 Mar, Alex Deymo wrote:
+> Registering an agent shares the user input interface with the normal console
+> command interface. The way it is implemented (using rl_message, rl_save_prompt
+> and rl_restore_prompt) conflicts with the rl_printf calls that may appear
+> while waiting for user input, loosing the [bluetooth]# prompt.
+> This patch fixes this and makes clear if the expected input is a command or an
+> agent reply changing the color and text of the prompt.
 
-This text you are seeing in probably the crash dump of the failure, could you
-try to take a picture of the screen so we can check if there is some useful
-information there.
+Seems that there are some minor issues with formatting:
 
-Also if the kernel doesn't panic instantly you could check if there is some
-issue in the kernel log after pairing and save it somewhere so we can take a
-look. Use the 3.8 kernel. 
+[bluetooth]# pair 40:98:4E:XX:XX:XX
+Attempting to pair with 40:98:4E:XX:XX:XX
+[CHG] Device 40:98:4E:XX:XX:XX Connected: yes
+Request confirmation
+[blue1m[agent] Confirm passkey 368383 (yes/no): yes
 
-	Gustavo
+
+And I would suggest adding a patch to make bluetoothctl register itself as a
+default agent by default. I needed to enable it manually before it could
+handle incomming pairing requests.
+
+
+Cheers,
+-- 
+Vinicius
