@@ -1,39 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 20 Mar 2013 13:58:13 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Graham Burnside <graham@somethingshocking.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: ralink rt3290/3298 pcie
-Message-ID: <20130320165813.GA7522@joana>
-References: <5148EB5B.6030104@somethingshocking.com>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <5148EB5B.6030104@somethingshocking.com>
+Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
+Subject: Re: [PATCH] Expose HIDNormallyConnectable and HIDReconnectInitiate properties
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1363655144-9705-1-git-send-email-deymo@chromium.org>
+Date: Wed, 20 Mar 2013 08:47:16 -0700
+Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@intel.com,
+	keybuk@chromium.org
+Message-Id: <619604FF-BBA6-4FE5-8F48-A7B637272084@holtmann.org>
+References: <1363655144-9705-1-git-send-email-deymo@chromium.org>
+To: Alex Deymo <deymo@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Graham,
+Hi Alex,
 
-* Graham Burnside <graham@somethingshocking.com> [2013-03-19 22:48:59 +0000]:
-
-> Hi,
+> The "Connectability" of a HID device, as defined by the HID spec,
+> governs the way the host may and should connect to a HID device or
+> expect a connection from it. In the comon case of mice and keyboards
+> the HIDNormallyConnectable is FALSE and HIDReconnectInitiate is TRUE,
+> since those devices only attempt a connection to the host when they
+> have some data to transfer. A connection attempt initiated from the
+> host after the device drops the connection (while still paired) will
+> result in a Page timeout.
 > 
-> I was wondering if anyone had had a look into or discussed this wifi /
-> bluetooth combo card with ralink? It came present in my new HP laptop,
-> so I'm guessing its quite common.
+> This patch exposes these two HID properties as Device properties, updates
+> them every time new SDP records are available and persists them in the
+> device's info file. This patch also shows this information in the
+> bluetoothctl "info <dev>" command.
+> For non-HID devices and when no information is available (i.e. a cached
+> device after upgrade from a version without this patch) both properties
+> are set to the comon case: HIDNormallyConnectable is FALSE and
+> HIDReconnectInitiate is TRUE.
+> ---
 > 
-> I have the wifi working perfectly from the rt2x00 backports, but can't
-> find any mention of the bluetooth device. I have also emailed ralink, so
-> will post anything useful back here.
-> 
-> Details as follows:
-> 
->            +-1c.0-[01]--+-00.0  Ralink corp. Device 3290
->            |                        \-00.1  Ralink corp. Device 3298
+> This patch is a rework of a previous patch named "Add GetCachedServices
+> to device API". This new attempt exposes only these two properties 
+> related to the "Connectability" of the device. 
 
-You are saying that you don't even see the device with 'hciconfig', right?
+I am not a huge fan of making these part of the Device1 interface. They should be part of an Input1 interface on the same object path. And it should be only present for HID devices. Making this available for everybody is a bit against the idea of keeping it simple.
 
-So please post the output of /sys/kernel/debug/usb/devices for the bluetooth
-device here so we can more information about this device.
+We do not have an Input1 interface right now, but that does not stop the input plugin from creating this.
 
-	Gustavo
+Regards
+
+Marcel
+
