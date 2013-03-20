@@ -1,42 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 20 Mar 2013 15:22:59 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Alex Deymo <deymo@chromium.org>
-Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org
-Subject: Re: [PATCH v3 2/6] client: Right prompt management on agent input
-Message-ID: <20130320182259.GC6190@samus>
-References: <1363726505-15171-1-git-send-email-deymo@chromium.org>
- <1363726505-15171-3-git-send-email-deymo@chromium.org>
+Message-ID: <5149FC3A.4070208@thinkpenguin.com>
+Date: Wed, 20 Mar 2013 14:13:14 -0400
+From: Christopher Waid <chris@thinkpenguin.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1363726505-15171-3-git-send-email-deymo@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Greg KH <gregkh@linuxfoundation.org>
+CC: linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode) causing
+ crashes
+References: <514763A7.4020800@thinkpenguin.com> <20130318191335.GA11242@kroah.com>
+In-Reply-To: <20130318191335.GA11242@kroah.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-usb-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+On 03/18/2013 03:13 PM, Greg KH wrote:
+> On Mon, Mar 18, 2013 at 02:57:43PM -0400, Christopher Waid wrote:
+>> Bus 001 Device 007: ID 0a12:0001 Cambridge Silicon Radio, Ltd
+>> Bluetooth Dongle (HCI mode)
+>>
+>> Code for a CSR bluetooth chipset appears broken in recent kernel
+>> releases. After a device is paired the kernel panics. This has been
+>> tested with a dozen USB dongles / systems and is consistently a
+>> problem. On the rare occasion it might not cause a kernel panic
+>> although it will definitely still crash after a few minutes. This
+>> does not happen with older kernel releases.
+> What kernel version is crashing, and what is the exact text of the
+> kernel panic?
 
-On 13:55 Tue 19 Mar, Alex Deymo wrote:
-> Registering an agent shares the user input interface with the normal console
-> command interface. The way it is implemented (using rl_message, rl_save_prompt
-> and rl_restore_prompt) conflicts with the rl_printf calls that may appear
-> while waiting for user input, loosing the [bluetooth]# prompt.
-> This patch fixes this and makes clear if the expected input is a command or an
-> agent reply changing the color and text of the prompt.
+It goes black and disappears off the screen with a lot of other text so 
+I'm unsure.
 
-Seems that there are some minor issues with formatting:
+It has done it with various kernel versions including 3.2 and 3.8. I 
+tested it with the mainline kernel 3.8:
 
-[bluetooth]# pair 40:98:4E:XX:XX:XX
-Attempting to pair with 40:98:4E:XX:XX:XX
-[CHG] Device 40:98:4E:XX:XX:XX Connected: yes
-Request confirmation
-[blue1m[agent] Confirm passkey 368383 (yes/no): yes
+Linux penguin 3.8.0-030800-generic #201302181935 SMP Tue Feb 19 00:36:19
+UTC 2013 x86_64 x86_64 x86_64 GNU/Linux
 
 
-And I would suggest adding a patch to make bluetoothctl register itself as a
-default agent by default. I needed to enable it manually before it could
-handle incomming pairing requests.
 
 
-Cheers,
--- 
-Vinicius
+>
+>> Please let me know how I can help solve this issue. We have lots of
+>> dongles and can try and get any information needed to fix it.
+> You might want to ask the Linux bluetooth developers (now added to the
+> cc of this response.)
+>
+> thanks,
+>
+> greg k-h
+
