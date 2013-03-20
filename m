@@ -1,42 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-Subject: [PATCH BlueZ] test: Fix list-devices when there is more than one adapter
-Date: Wed, 20 Mar 2013 17:18:24 -0300
-Message-Id: <1363810704-21450-1-git-send-email-jprvita@openbossa.org>
+From: Oliver Neukum <oliver@neukum.org>
+To: Graham Burnside <graham@somethingshocking.com>,
+	Al Cho <acho@suse.com>
+Subject: Re: ralink rt3290/3298 pcie
+Date: Wed, 20 Mar 2013 22:53:21 +0100
+Cc: linux-bluetooth@vger.kernel.org
+References: <514A09AD.20809@somethingshocking.com> <514A108C.9000102@somethingshocking.com>
+In-Reply-To: <514A108C.9000102@somethingshocking.com>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201303202253.21510.oliver@neukum.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- test/list-devices | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Am Mittwoch, 20. März 2013, 20:39:56 schrieb Graham Burnside:
 
-diff --git a/test/list-devices b/test/list-devices
-index 0aac217..790b358 100755
---- a/test/list-devices
-+++ b/test/list-devices
-@@ -31,9 +31,6 @@ def extract_uuids(uuid_list):
- 
- objects = manager.GetManagedObjects()
- 
--all_devices = (str(path) for path, interfaces in objects.iteritems() if
--					"org.bluez.Device1" in interfaces.keys())
--
- for path, interfaces in objects.iteritems():
- 	if "org.bluez.Adapter1" not in interfaces.keys():
- 		continue
-@@ -49,6 +46,8 @@ for path, interfaces in objects.iteritems():
- 		else:
- 			print("    %s = %s" % (key, value))
- 
-+	all_devices = (str(path) for path, interfaces in objects.iteritems() if
-+					"org.bluez.Device1" in interfaces.keys())
- 	device_list = [d for d in all_devices if d.startswith(path + "/")]
- 
- 	for dev_path in device_list:
--- 
-1.7.11.7
+> hciconfig gives no ouput.
+> 
+> The directory /sys/kernel/debug/usb/devices does not exist. I'm not sure
+> what else might be useful?
+> 
+> 
+> Here is the relevant output from lspci -v (note there is no kernel
+> driver being loaded for the bluetooth device).
+> 
+> 01:00.0 Network controller: Ralink corp. Device 3290
+>     Subsystem: Hewlett-Packard Company Device 18ec
+>     Flags: bus master, fast devsel, latency 0, IRQ 16
+>     Memory at c2510000 (32-bit, non-prefetchable) [size=64K]
+>     Capabilities: [40] Power Management version 3
+>     Capabilities: [50] MSI: Enable- Count=1/32 Maskable- 64bit+
+>     Capabilities: [70] Express Endpoint, MSI 00
+>     Capabilities: [100] Advanced Error Reporting
+>     Capabilities: [140] Device Serial Number 00-00-4d-fa-a8-23-94-68
+>     Kernel driver in use: rt2800pci
+> 
+> 01:00.1 Bluetooth: Ralink corp. Device 3298
+>     Subsystem: Hewlett-Packard Company Device 18ec
+>     Flags: bus master, fast devsel, latency 0, IRQ 11
+>     Memory at c2500000 (32-bit, non-prefetchable) [size=64K]
+>     Capabilities: [40] Power Management version 3
+>     Capabilities: [50] MSI: Enable- Count=1/32 Maskable- 64bit+
+>     Capabilities: [70] Express Endpoint, MSI 00
+>     Capabilities: [100] Advanced Error Reporting
+>     Capabilities: [140] Device Serial Number 00-00-4e-fa-a8-23-94-68
 
+The device is indeed PCI and different to anything else in the world.
+It doesn't use the normal HC commands. The registers are not documented.
+I am afraid you are out of luck with this device.
+
+	Regards
+		Oliver
