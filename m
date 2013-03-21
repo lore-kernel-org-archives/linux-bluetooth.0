@@ -4,183 +4,68 @@ To: linux-bluetooth@vger.kernel.org
 Cc: keybuk@chromium.org,
 	marcel@holtmann.org,
 	Alex Deymo <deymo@chromium.org>
-Subject: [PATCH 1/6] core: Convert the pincode callback to an interable list.
-Date: Wed, 20 Mar 2013 21:10:03 -0700
-Message-Id: <1363839008-8405-2-git-send-email-deymo@chromium.org>
-In-Reply-To: <1363839008-8405-1-git-send-email-deymo@chromium.org>
-References: <1363839008-8405-1-git-send-email-deymo@chromium.org>
+Subject: [PATCH 0/6] The Autopair strikes back
+Date: Wed, 20 Mar 2013 21:10:02 -0700
+Message-Id: <1363839008-8405-1-git-send-email-deymo@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/adapter.c | 51 +++++++++++++++++++++++++++++++++++++++++++--------
- src/adapter.h |  4 ++++
- src/device.c  | 13 +++++++++++++
- src/device.h  |  1 +
- 4 files changed, 61 insertions(+), 8 deletions(-)
+Hello!
+This is a rework of the autopair.c plugin we had at some point in BlueZ 4.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index e553626..b5e49b4 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -121,6 +121,12 @@ struct service_auth {
- 	struct agent *agent;		/* NULL for queued auths */
- };
- 
-+struct pincb_iter {
-+	GSList* it;			/* current callback function */
-+	int count;			/* numer of times it() was called */
-+	/* When the iterator reachs the end, it is NULL and count is -1 */
-+};
-+
- struct btd_adapter {
- 	int ref_count;
- 
-@@ -4771,22 +4777,43 @@ static void user_passkey_notify_callback(uint16_t index, uint16_t length,
- 		error("device_notify_passkey: %s", strerror(-err));
- }
- 
--static ssize_t adapter_get_pin(struct btd_adapter *adapter,
--					struct btd_device *dev, char *pin_buf,
-+struct pincb_iter *pincb_iter_new(struct btd_adapter *adapter) {
-+	struct pincb_iter *iter = g_new0(struct pincb_iter, 1);
-+
-+	iter->it = adapter->pin_callbacks;
-+
-+	return iter;
-+}
-+
-+void pincb_iter_free(struct pincb_iter *iter) {
-+	g_free(iter);
-+}
-+
-+gboolean pincb_iter_end(struct pincb_iter *iter) {
-+	return iter->it == NULL && iter->count == -1;
-+}
-+
-+static ssize_t pincb_iter_next(struct pincb_iter* iter,
-+					struct btd_adapter *adapter,
-+					struct btd_device *device,
-+					char *pin_buf,
- 					gboolean *display)
- {
- 	btd_adapter_pin_cb_t cb;
- 	ssize_t ret;
--	GSList *l;
- 
--	for (l = adapter->pin_callbacks; l != NULL; l = g_slist_next(l)) {
--		cb = l->data;
--		ret = cb(adapter, dev, pin_buf, display);
-+	while (iter->it != NULL) {
-+		cb = iter->it->data;
-+		ret = cb(adapter, device, pin_buf, display);
-+		iter->count++;
- 		if (ret > 0)
- 			return ret;
-+		iter->count = 0;
-+		iter->it = g_slist_next(iter->it);
- 	}
-+	iter->count = -1;
- 
--	return -1;
-+	return 0;
- }
- 
- static void pin_code_request_callback(uint16_t index, uint16_t length,
-@@ -4800,6 +4827,7 @@ static void pin_code_request_callback(uint16_t index, uint16_t length,
- 	ssize_t pinlen;
- 	char addr[18];
- 	int err;
-+	struct pincb_iter* iter;
- 
- 	if (length < sizeof(*ev)) {
- 		error("Too small PIN code request event");
-@@ -4817,7 +4845,14 @@ static void pin_code_request_callback(uint16_t index, uint16_t length,
- 	}
- 
- 	memset(pin, 0, sizeof(pin));
--	pinlen = adapter_get_pin(adapter, device, pin, &display);
-+
-+	iter = device_bonding_iter(device);
-+
-+	if (iter == NULL)
-+		pinlen = 0;
-+	else
-+		pinlen = pincb_iter_next(iter, adapter, device, pin, &display);
-+
- 	if (pinlen > 0 && (!ev->secure || pinlen == 16)) {
- 		if (display && device_is_bonding(device, NULL)) {
- 			err = device_notify_pincode(device, ev->secure, pin);
-diff --git a/src/adapter.h b/src/adapter.h
-index 8d23a64..d158334 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -138,6 +138,10 @@ void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
- void btd_adapter_unregister_pin_cb(struct btd_adapter *adapter,
- 						btd_adapter_pin_cb_t cb);
- 
-+struct pincb_iter *pincb_iter_new(struct btd_adapter *adapter);
-+void pincb_iter_free(struct pincb_iter *iter);
-+gboolean pincb_iter_end(struct pincb_iter *iter);
-+
- /* If TRUE, enables fast connectabe, i.e. reduces page scan interval and changes
-  * type. If FALSE, disables fast connectable, i.e. sets page scan interval and
-  * type to default values. Valid for both connectable and discoverable modes. */
-diff --git a/src/device.c b/src/device.c
-index 3cd7f10..abedb38 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -85,6 +85,7 @@ struct bonding_req {
- 	guint listener_id;
- 	struct btd_device *device;
- 	struct agent *agent;
-+	struct pincb_iter *cb_iter;
- };
- 
- typedef enum {
-@@ -1408,6 +1409,8 @@ static struct bonding_req *bonding_request_new(DBusMessage *msg,
- 
- 	bonding->msg = dbus_message_ref(msg);
- 
-+	bonding->cb_iter = pincb_iter_new(device->adapter);
-+
- 	if (agent)
- 		bonding->agent = agent_ref(agent);
- 
-@@ -1533,6 +1536,9 @@ static void bonding_request_free(struct bonding_req *bonding)
- 	if (bonding->msg)
- 		dbus_message_unref(bonding->msg);
- 
-+	if (bonding->cb_iter)
-+		g_free(bonding->cb_iter);
-+
- 	if (bonding->agent) {
- 		agent_cancel(bonding->agent);
- 		agent_unref(bonding->agent);
-@@ -3737,6 +3743,13 @@ void device_bonding_failed(struct btd_device *device, uint8_t status)
- 	bonding_request_free(bonding);
- }
- 
-+struct pincb_iter *device_bonding_iter(struct btd_device *device) {
-+	if (device->bonding == NULL)
-+		return NULL;
-+
-+	return device->bonding->cb_iter;
-+}
-+
- static void pincode_cb(struct agent *agent, DBusError *err, const char *pin,
- 								void *data)
- {
-diff --git a/src/device.h b/src/device.h
-index d072015..725bd7a 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -76,6 +76,7 @@ gboolean device_is_connected(struct btd_device *device);
- void device_bonding_complete(struct btd_device *device, uint8_t status);
- gboolean device_is_bonding(struct btd_device *device, const char *sender);
- void device_bonding_failed(struct btd_device *device, uint8_t status);
-+struct pincb_iter *device_bonding_iter(struct btd_device *device);
- int device_request_pincode(struct btd_device *device, gboolean secure);
- int device_request_passkey(struct btd_device *device);
- int device_confirm_passkey(struct btd_device *device, uint32_t passkey,
+The goal of this patch set is to make the pairing process easier for 
+devices that have a fixed and dumb pincode (like 0000 or 1234) or that
+accept any pincode as long as the same pincode is entered on the device
+(keyboards/combos). The goal is:
+ * Don't ask the user (i.e. the agent) a question if we know the right answer.
+This makes the user happier. =)
+
+The covered constraints and scenarios are:
+1. If the device has a well known pincode we should pair to it without
+   asking the agent for a pin code (no RequestPincode call). Comon case are 
+   mice and other devices with very limited input.
+2. If the device accepts any pincode (as long as it is also entered in the
+   device), we should provide the agent a random pincode (calling
+   DisplayPincode) avoiding the unnecessary step of asking the agent for a
+   [random] pincode (with RequestPincode). Comon case are keyboards/combos.
+3. Don't return a failed error because we failed to guess the pincode. Retry
+   instead until is not our fault (i.e., the device is out of range, the
+   agent provided a wrong code, etc)
+4. If the device accepts only a fixed pincode (and we don't know it) we
+   should ask the agent for the pincode and be able to pair with the device.
+   Read this as: don't break any compatibility.
+
+The implemented logic is:
+For each new org.bluez.Device1.Pair call that ends in a pin request (not SSP)
+we *iterate* the list of pincode callbacks from plugins trying every callback
+until it returns 0 (no pincode). For each pincode in this iteration, we try
+to use it for the pin request. If it fails with an auth_failed, then we try
+again with the next one until we reach the end of the list.
+When we reach the end of the list, we try again but this time asking the
+agent, thus following the current normal course (i.e. failing if there isn't
+an agent registered, etc).
+
+I'm open to hear your comments and look forward to have this patch set in.
+If you find a problem or a device that doesn't work with this patch, please
+let me know.
+Thanks!
+
+Alex Deymo (6):
+  core: Convert the pincode callback to an interable list.
+  plugins: Extend the pin code callback with the call number
+  core: Add support for retrying a bonding
+  core: retry bonding attempt until the iterator reachs the end.
+  core: Add device_get_class to the public interface.
+  autopair: Add the autopair plugin.
+
+ Makefile.plugins   |   3 ++
+ plugins/autopair.c | 145 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ plugins/wiimote.c  |   7 ++-
+ src/adapter.c      | 125 +++++++++++++++++++++++++++++++++++++--------
+ src/adapter.h      |  10 +++-
+ src/device.c       |  82 ++++++++++++++++++++++++++++--
+ src/device.h       |   5 ++
+ 7 files changed, 350 insertions(+), 27 deletions(-)
+ create mode 100644 plugins/autopair.c
+
 -- 
 1.8.1.3
