@@ -1,37 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1363852154.2681.3.camel@novo>
-Subject: Re: [PATCH 0/6] The Autopair strikes back
-From: Bastien Nocera <hadess@hadess.net>
-To: Alex Deymo <deymo@chromium.org>
-Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org, marcel@holtmann.org
-Date: Thu, 21 Mar 2013 08:49:14 +0100
-In-Reply-To: <1363839008-8405-1-git-send-email-deymo@chromium.org>
-References: <1363839008-8405-1-git-send-email-deymo@chromium.org>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
+From: Alex Deymo <deymo@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: deymo@chromium.org,
+	keybuk@chromium.org,
+	marcel@holtmann.org
+Subject: [PATCH] core: Fix wrong argument on agent *_cb functions.
+Date: Thu, 21 Mar 2013 00:04:41 -0700
+Message-Id: <1363849481-7862-1-git-send-email-deymo@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey Alex,
+The last argument for the functions pincode_cb, passkey_cb and confirm_cb is
+a user data pointer with the "void *". Those functions expect a
+"struct authentication_req *", but insted a "struct btd_device*" without
+any complaint from the compiler due the void* cast. This fix passes the
+right argument to those functions.
 
-On Wed, 2013-03-20 at 21:10 -0700, Alex Deymo wrote:
-> Hello!
-> This is a rework of the autopair.c plugin we had at some point in BlueZ 4.
+Other uses of those functions as callbacks (agent_request_passkey,
+agent_request_pincode, agent_request_authorization and agent_request_confirmation)
+pass the right struct authentication_req *.
+---
 
-Happy to see it come back!
+I was having some bluetoothd SEGFAULTs because of this. If you want more details
+and an easy repro case, check http://crbug.com/222665 .
 
-> The goal of this patch set is to make the pairing process easier for 
-> devices that have a fixed and dumb pincode (like 0000 or 1234) or that
-> accept any pincode as long as the same pincode is entered on the device
-> (keyboards/combos). The goal is:
->  * Don't ask the user (i.e. the agent) a question if we know the right answer.
-> This makes the user happier. =)
+ src/device.c |   10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-Is there any chance you could use:
-https://git.gnome.org/browse/gnome-bluetooth/tree/wizard/pin-code-database.xml
-even it means converting it to a different format?
-
-This would mean more supported devices out-of-the-box? I'd be happy
-maintaining the list outside of the bluez tree if the bluez developers
-don't want to take on the burden of maintaining it.
-
-Cheers
+diff --git a/src/device.c b/src/device.c
+index 3cd7f10..1630082 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -3952,14 +3952,12 @@ int device_notify_pincode(struct btd_device *device, gboolean secure,
+ 
+ static void cancel_authentication(struct authentication_req *auth)
+ {
+-	struct btd_device *device;
+ 	struct agent *agent;
+ 	DBusError err;
+ 
+ 	if (!auth || !auth->agent)
+ 		return;
+ 
+-	device = auth->device;
+ 	agent = auth->agent;
+ 	auth->agent = NULL;
+ 
+@@ -3968,19 +3966,19 @@ static void cancel_authentication(struct authentication_req *auth)
+ 
+ 	switch (auth->type) {
+ 	case AUTH_TYPE_PINCODE:
+-		pincode_cb(agent, &err, NULL, device);
++		pincode_cb(agent, &err, NULL, auth);
+ 		break;
+ 	case AUTH_TYPE_CONFIRM:
+-		confirm_cb(agent, &err, device);
++		confirm_cb(agent, &err, auth);
+ 		break;
+ 	case AUTH_TYPE_PASSKEY:
+-		passkey_cb(agent, &err, 0, device);
++		passkey_cb(agent, &err, 0, auth);
+ 		break;
+ 	case AUTH_TYPE_NOTIFY_PASSKEY:
+ 		/* User Notify doesn't require any reply */
+ 		break;
+ 	case AUTH_TYPE_NOTIFY_PINCODE:
+-		pincode_cb(agent, &err, NULL, device);
++		pincode_cb(agent, &err, NULL, auth);
+ 		break;
+ 	}
+ 
+-- 
+1.7.10.4
