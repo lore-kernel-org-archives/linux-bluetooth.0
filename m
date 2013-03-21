@@ -1,40 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alvaro Silva <alvaro.silva@openbossa.org>
+From: Alex Deymo <deymo@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
-Subject: [PATCH 03/13] gatttool: Remote address is mandatory for non-interactive gatttool
-Date: Thu, 21 Mar 2013 18:31:39 -0400
-Message-Id: <1363905109-30839-4-git-send-email-alvaro.silva@openbossa.org>
-In-Reply-To: <1363905109-30839-1-git-send-email-alvaro.silva@openbossa.org>
-References: <1363905109-30839-1-git-send-email-alvaro.silva@openbossa.org>
+Cc: marcel@holtmann.org, keybuk@chromium.org,
+	Alex Deymo <deymo@chromium.org>
+Subject: [PATCH v4 6/6] client: Agent's RequestPasskey implementation
+Date: Thu, 21 Mar 2013 15:04:56 -0700
+Message-Id: <1363903497-4517-7-git-send-email-deymo@chromium.org>
+In-Reply-To: <1363903497-4517-1-git-send-email-deymo@chromium.org>
+References: <1363903497-4517-1-git-send-email-deymo@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
-
-For gatttool non-interactive mode, command line parameter with
-bluetooth remote address is mandatory.
+Implements the uint32 RequestPasskey(object device) method.
 ---
- attrib/gatttool.c |    6 ++++++
- 1 file changed, 6 insertions(+)
+ client/agent.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-diff --git a/attrib/gatttool.c b/attrib/gatttool.c
-index 29e3261..1dd0c35 100644
---- a/attrib/gatttool.c
-+++ b/attrib/gatttool.c
-@@ -603,6 +603,12 @@ int main(int argc, char *argv[])
- 		goto done;
- 	}
+diff --git a/client/agent.c b/client/agent.c
+index e2ef96e..ed8db11 100644
+--- a/client/agent.c
++++ b/client/agent.c
+@@ -97,6 +97,20 @@ static void pincode_response(DBusConnection *conn, const char *input)
+ 							DBUS_TYPE_INVALID);
+ }
  
-+	if (opt_dst == NULL) {
-+		g_print("Remote Bluetooth address required\n");
-+		got_error = TRUE;
-+		goto done;
-+	}
++static void passkey_response(DBusConnection *conn, const char *input)
++{
++	dbus_uint32_t passkey;
++	if (sscanf(input, "%u", &passkey) == 1)
++		g_dbus_send_reply(conn, pending_message, DBUS_TYPE_UINT32,
++						&passkey, DBUS_TYPE_INVALID);
++	else if (!strcmp(input, "no"))
++		g_dbus_send_error(conn, pending_message,
++					"org.bluez.Error.Rejected", NULL);
++	else
++		g_dbus_send_error(conn, pending_message,
++					"org.bluez.Error.Canceled", NULL);
++}
 +
- 	chan = gatt_connect(opt_src, opt_dst, opt_dst_type, opt_sec_level,
- 					opt_psm, opt_mtu, connect_cb);
- 	if (chan == NULL) {
+ static void confirm_response(DBusConnection *conn, const char *input)
+ {
+ 	if (!strcmp(input, "yes"))
+@@ -122,6 +136,8 @@ dbus_bool_t agent_input(DBusConnection *conn, const char *input)
+ 
+ 	if (!strcmp(member, "RequestPinCode"))
+ 		pincode_response(conn, input);
++	else if (!strcmp(member, "RequestPasskey"))
++		passkey_response(conn, input);
+ 	else if (!strcmp(member, "RequestConfirmation"))
+ 		confirm_response(conn, input);
+ 	else if (!strcmp(member, "RequestAuthorization"))
+@@ -189,6 +205,23 @@ static DBusMessage *display_pincode(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
++static DBusMessage *request_passkey(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
++{
++	const char *device;
++
++	rl_printf("Request passkey\n");
++
++	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
++							DBUS_TYPE_INVALID);
++
++	agent_prompt("Enter passkey (number in 0-999999): ");
++
++	pending_message = dbus_message_ref(msg);
++
++	return NULL;
++}
++
+ static DBusMessage *display_passkey(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
+ {
+@@ -292,6 +325,9 @@ static const GDBusMethodTable methods[] = {
+ 	{ GDBUS_METHOD("DisplayPinCode",
+ 			GDBUS_ARGS({ "device", "o" }, { "pincode", "s" }),
+ 			NULL, display_pincode) },
++	{ GDBUS_ASYNC_METHOD("RequestPasskey",
++			GDBUS_ARGS({ "device", "o" }),
++			GDBUS_ARGS({ "passkey", "u" }), request_passkey) },
+ 	{ GDBUS_METHOD("DisplayPasskey",
+ 			GDBUS_ARGS({ "device", "o" }, { "passkey", "u" },
+ 							{ "entered", "q" }),
 -- 
-1.7.9.5
+1.8.1.3
 
