@@ -3,87 +3,80 @@ From: Alex Deymo <deymo@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org, keybuk@chromium.org,
 	Alex Deymo <deymo@chromium.org>
-Subject: [PATCH v4 6/6] client: Agent's RequestPasskey implementation
-Date: Thu, 21 Mar 2013 15:04:56 -0700
-Message-Id: <1363903497-4517-7-git-send-email-deymo@chromium.org>
+Subject: [PATCH v4 5/6] client: Agent's DisplayPasskey implementation
+Date: Thu, 21 Mar 2013 15:04:55 -0700
+Message-Id: <1363903497-4517-6-git-send-email-deymo@chromium.org>
 In-Reply-To: <1363903497-4517-1-git-send-email-deymo@chromium.org>
 References: <1363903497-4517-1-git-send-email-deymo@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implements the uint32 RequestPasskey(object device) method.
+Implements the DisplayPasskey(object device, uint32 passkey, uint16 entered)
+method.
 ---
- client/agent.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ client/agent.c   | 29 +++++++++++++++++++++++++++++
+ client/display.h |  2 ++
+ 2 files changed, 31 insertions(+)
 
 diff --git a/client/agent.c b/client/agent.c
-index e2ef96e..ed8db11 100644
+index 3ac240a..e2ef96e 100644
 --- a/client/agent.c
 +++ b/client/agent.c
-@@ -97,6 +97,20 @@ static void pincode_response(DBusConnection *conn, const char *input)
- 							DBUS_TYPE_INVALID);
- }
- 
-+static void passkey_response(DBusConnection *conn, const char *input)
-+{
-+	dbus_uint32_t passkey;
-+	if (sscanf(input, "%u", &passkey) == 1)
-+		g_dbus_send_reply(conn, pending_message, DBUS_TYPE_UINT32,
-+						&passkey, DBUS_TYPE_INVALID);
-+	else if (!strcmp(input, "no"))
-+		g_dbus_send_error(conn, pending_message,
-+					"org.bluez.Error.Rejected", NULL);
-+	else
-+		g_dbus_send_error(conn, pending_message,
-+					"org.bluez.Error.Canceled", NULL);
-+}
-+
- static void confirm_response(DBusConnection *conn, const char *input)
- {
- 	if (!strcmp(input, "yes"))
-@@ -122,6 +136,8 @@ dbus_bool_t agent_input(DBusConnection *conn, const char *input)
- 
- 	if (!strcmp(member, "RequestPinCode"))
- 		pincode_response(conn, input);
-+	else if (!strcmp(member, "RequestPasskey"))
-+		passkey_response(conn, input);
- 	else if (!strcmp(member, "RequestConfirmation"))
- 		confirm_response(conn, input);
- 	else if (!strcmp(member, "RequestAuthorization"))
-@@ -189,6 +205,23 @@ static DBusMessage *display_pincode(DBusConnection *conn,
+@@ -189,6 +189,31 @@ static DBusMessage *display_pincode(DBusConnection *conn,
  	return dbus_message_new_method_return(msg);
  }
  
-+static DBusMessage *request_passkey(DBusConnection *conn,
++static DBusMessage *display_passkey(DBusConnection *conn,
 +					DBusMessage *msg, void *user_data)
 +{
 +	const char *device;
-+
-+	rl_printf("Request passkey\n");
++	dbus_uint32_t passkey;
++	dbus_uint16_t entered;
++	char passkey_full[7];
 +
 +	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
++			DBUS_TYPE_UINT32, &passkey, DBUS_TYPE_UINT16, &entered,
 +							DBUS_TYPE_INVALID);
 +
-+	agent_prompt("Enter passkey (number in 0-999999): ");
++	snprintf(passkey_full, sizeof(passkey_full), "%.6u", passkey);
++	passkey_full[6] = '\0';
 +
-+	pending_message = dbus_message_ref(msg);
++	if (entered > strlen(passkey_full))
++		entered = strlen(passkey_full);
 +
-+	return NULL;
++	rl_printf(AGENT_PROMPT "Passkey: "
++			COLOR_BOLDGRAY "%.*s" COLOR_BOLDWHITE "%s\n" COLOR_OFF,
++				entered, passkey_full, passkey_full + entered);
++
++	return dbus_message_new_method_return(msg);
 +}
 +
- static DBusMessage *display_passkey(DBusConnection *conn,
+ static DBusMessage *request_confirmation(DBusConnection *conn,
  					DBusMessage *msg, void *user_data)
  {
-@@ -292,6 +325,9 @@ static const GDBusMethodTable methods[] = {
+@@ -267,6 +292,10 @@ static const GDBusMethodTable methods[] = {
  	{ GDBUS_METHOD("DisplayPinCode",
  			GDBUS_ARGS({ "device", "o" }, { "pincode", "s" }),
  			NULL, display_pincode) },
-+	{ GDBUS_ASYNC_METHOD("RequestPasskey",
-+			GDBUS_ARGS({ "device", "o" }),
-+			GDBUS_ARGS({ "passkey", "u" }), request_passkey) },
- 	{ GDBUS_METHOD("DisplayPasskey",
- 			GDBUS_ARGS({ "device", "o" }, { "passkey", "u" },
- 							{ "entered", "q" }),
++	{ GDBUS_METHOD("DisplayPasskey",
++			GDBUS_ARGS({ "device", "o" }, { "passkey", "u" },
++							{ "entered", "q" }),
++			NULL, display_passkey) },
+ 	{ GDBUS_ASYNC_METHOD("RequestConfirmation",
+ 			GDBUS_ARGS({ "device", "o" }, { "passkey", "u" }),
+ 			NULL, request_confirmation) },
+diff --git a/client/display.h b/client/display.h
+index 957bdc6..91a0be9 100644
+--- a/client/display.h
++++ b/client/display.h
+@@ -26,5 +26,7 @@
+ #define COLOR_GREEN	"\x1B[0;92m"
+ #define COLOR_YELLOW	"\x1B[0;93m"
+ #define COLOR_BLUE	"\x1B[0;94m"
++#define COLOR_BOLDGRAY	"\x1B[1;30m"
++#define COLOR_BOLDWHITE	"\x1B[1;37m"
+ 
+ void rl_printf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 -- 
 1.8.1.3
 
