@@ -1,77 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
 From: Alvaro Silva <alvaro.silva@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
-Subject: [PATCH 10/13] gatttool: Use bluetoothctl strategy to handle standard input
-Date: Thu, 21 Mar 2013 18:31:46 -0400
-Message-Id: <1363905109-30839-11-git-send-email-alvaro.silva@openbossa.org>
-In-Reply-To: <1363905109-30839-1-git-send-email-alvaro.silva@openbossa.org>
-References: <1363905109-30839-1-git-send-email-alvaro.silva@openbossa.org>
+Cc: Alvaro Silva <alvaro.silva@openbossa.org>
+Subject: [PATCH 00/13] Improvements on gatttool interactive interface
+Date: Thu, 21 Mar 2013 18:31:36 -0400
+Message-Id: <1363905109-30839-1-git-send-email-alvaro.silva@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
+Hi,
 
-Use GSource id returned by g_io_add_watch() instead of raw GIOChannel to
-handle stdin and glib main loop.
----
- attrib/interactive.c |   26 +++++++++++++++++++-------
- 1 file changed, 19 insertions(+), 7 deletions(-)
+This series implements some changes on gatttool in order to keep it
+consistent with bluetoothctl approach, like colored prompt and not
+breaking empty line upon pressing enter. In addition, some fixes were
+made when displaying messages.
 
-diff --git a/attrib/interactive.c b/attrib/interactive.c
-index 7520324..fa3f82a 100644
---- a/attrib/interactive.c
-+++ b/attrib/interactive.c
-@@ -906,11 +906,26 @@ static char **commands_completion(const char *text, int start, int end)
- 		return NULL;
- }
- 
-+static guint setup_standard_input(void)
-+{
-+	GIOChannel *channel;
-+	guint source;
-+
-+	channel = g_io_channel_unix_new(fileno(stdin));
-+
-+	source = g_io_add_watch(channel,
-+				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+				prompt_read, NULL);
-+
-+	g_io_channel_unref(channel);
-+
-+	return source;
-+}
-+
- int interactive(const gchar *src, const gchar *dst,
- 		const gchar *dst_type, int psm)
- {
--	GIOChannel *pchan;
--	gint events;
-+	guint input;
- 
- 	opt_sec_level = g_strdup("low");
- 
-@@ -923,10 +938,7 @@ int interactive(const gchar *src, const gchar *dst,
- 
- 	event_loop = g_main_loop_new(NULL, FALSE);
- 
--	pchan = g_io_channel_unix_new(fileno(stdin));
--	g_io_channel_set_close_on_unref(pchan, TRUE);
--	events = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
--	g_io_add_watch(pchan, events, prompt_read, NULL);
-+	input = setup_standard_input();
- 
- 	rl_attempted_completion_function = commands_completion;
- 	rl_erase_empty_line = 1;
-@@ -936,7 +948,7 @@ int interactive(const gchar *src, const gchar *dst,
- 
- 	rl_callback_handler_remove();
- 	cmd_disconnect(0, NULL);
--	g_io_channel_unref(pchan);
-+	g_source_remove(input);
- 	g_main_loop_unref(event_loop);
- 	g_string_free(prompt, TRUE);
- 
+BR,
+Alvaro Silva
+
+Alvaro Silva (3):
+  gatttool: Show connection state using color
+  gatttool: Remove connecting message from prompt
+  gatttool: Use error message prefixes consistently
+
+Eder Ruiz Maria (9):
+  gatttool: Remove programming error check
+  gatttool: Remote address is mandatory for non-interactive gatttool
+  gatttool: Use GError to propage error messages to caller
+  gatttool: Fix issues with printf() and readline prompt
+  gatttool: Replace more usages of printf() with rl_printf()
+  gatttool: Use bluetoothctl behavior when pressing Enter on empty
+    prompt
+  gatttool: Use bluetoothctl strategy to handle standard input
+  gatttool: Use bluetoothctl strategy for unix signal handling
+  gatttool: Show info message when no primary service is found
+
+Jefferson Delfes (1):
+  gatttool: Fix memory leak after parsing input line
+
+ Makefile.tools       |    3 +-
+ attrib/gatttool.c    |   12 +-
+ attrib/gatttool.h    |    3 +-
+ attrib/interactive.c |  345 +++++++++++++++++++++++++++++++++-----------------
+ attrib/utils.c       |   19 +--
+ client/display.h     |    1 +
+ 6 files changed, 250 insertions(+), 133 deletions(-)
+
 -- 
 1.7.9.5
 
