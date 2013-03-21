@@ -1,77 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Sender: keybuk@google.com
-In-Reply-To: <1363852154.2681.3.camel@novo>
-References: <1363839008-8405-1-git-send-email-deymo@chromium.org>
-	<1363852154.2681.3.camel@novo>
-Date: Thu, 21 Mar 2013 16:07:46 -0700
-Message-ID: <CAHZ1yCkx89ppxAKeP8O4Oe2tf9KxVYVfeJ4RRxsi2eaW94UgUA@mail.gmail.com>
-Subject: Re: [PATCH 0/6] The Autopair strikes back
-From: Scott James Remnant <keybuk@chromium.org>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Alex Deymo <deymo@chromium.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Alvaro Silva <alvaro.silva@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
+Subject: [PATCH 12/13] gatttool: Show info message when no primary service is found
+Date: Thu, 21 Mar 2013 18:31:48 -0400
+Message-Id: <1363905109-30839-13-git-send-email-alvaro.silva@openbossa.org>
+In-Reply-To: <1363905109-30839-1-git-send-email-alvaro.silva@openbossa.org>
+References: <1363905109-30839-1-git-send-email-alvaro.silva@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Mar 21, 2013 at 12:49 AM, Bastien Nocera <hadess@hadess.net> wrote:
+From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
 
-> On Wed, 2013-03-20 at 21:10 -0700, Alex Deymo wrote:
->> The goal of this patch set is to make the pairing process easier for
->> devices that have a fixed and dumb pincode (like 0000 or 1234) or that
->> accept any pincode as long as the same pincode is entered on the device
->> (keyboards/combos). The goal is:
->>  * Don't ask the user (i.e. the agent) a question if we know the right answer.
->> This makes the user happier. =)
->
-> Is there any chance you could use:
-> https://git.gnome.org/browse/gnome-bluetooth/tree/wizard/pin-code-database.xml
-> even it means converting it to a different format?
->
+---
+ attrib/interactive.c |   10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-One weird issue with this database is that it includes entries for
-devices with which pairing is not possible:
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index 9b16ddf..1d31889 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -190,6 +190,11 @@ static void primary_all_cb(GSList *services, guint8 status, gpointer user_data)
+ 		return;
+ 	}
+ 
++	if (services == NULL) {
++		rl_printf("No primary service found\n");
++		return;
++	}
++
+ 	for (l = services; l; l = l->next) {
+ 		struct gatt_primary *prim = l->data;
+ 		rl_printf("attr handle: 0x%04x, end grp handle: 0x%04x uuid: %s\n",
+@@ -208,6 +213,11 @@ static void primary_by_uuid_cb(GSList *ranges, guint8 status,
+ 		return;
+ 	}
+ 
++	if (ranges == NULL) {
++		rl_printf("No service UUID found\n");
++		return;
++	}
++
+ 	for (l = ranges; l; l = l->next) {
+ 		struct att_range *range = l->data;
+ 		rl_printf("Starting handle: 0x%04x Ending handle: 0x%04x\n",
+-- 
+1.7.9.5
 
-<device oui="00:19:C1:" name="BD Remote Control" pin="NULL"/>
-<device oui="00:1E:3D:" name="BD Remote Control" pin="NULL"/>
-<device oui="00:06:F5:" name="BD Remote Control" pin="NULL"/>
-
-These could be handled by BlueZ refusing to pair with them
-automatically, but it could be argued that BlueZ should somehow reveal
-to the user that pairing is not possible so it is not offered to begin
-with.
-
-It also includes entries for devices (with no distinguishing from the
-above) for devices that should not ordinarily be paired:
-
-<device type="mouse" pin="NULL"/>
-
-Again these should be handled similarly to above - informing the user
-that pairing is not required, but that connection is possible without
-pairing.
-
-It seems to confuse the types of devices that use fixed-length random PINs:
-
-<device type="audio" oui="00:1A:80:" name="CMT-DH5BT" pin="max:4"/>
-
-With keyboards, which should be just max:6. Note that BlueZ already
-has the DisplayPinCode agent method precisely to deal with showing a
-PIN - so the issue of help text is strictly an application one.
-
-<device type="keyboard" pin="KEYBOARD"/>
-
-> This would mean more supported devices out-of-the-box? I'd be happy
-> maintaining the list outside of the bluez tree if the bluez developers
-> don't want to take on the burden of maintaining it.
->
-
-If the list isn't maintained in the BlueZ tree, then how will more
-devices be supported out-of-the-box?
-
-This, to me, has always seemed like something that should just work
-without requiring any special behavior out of the agent. bluetoothctl
-should be just as capable as a GNOME Wizard.
-
-Scott
---
-Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
