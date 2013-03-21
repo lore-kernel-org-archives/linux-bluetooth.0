@@ -1,73 +1,190 @@
 Return-Path: <cyrus@holtmann.org>
 From: Alex Deymo <deymo@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: deymo@chromium.org,
-	keybuk@chromium.org,
-	marcel@holtmann.org
-Subject: [PATCH] core: Fix wrong argument on agent *_cb functions.
-Date: Thu, 21 Mar 2013 00:04:41 -0700
-Message-Id: <1363849481-7862-1-git-send-email-deymo@chromium.org>
+Cc: keybuk@chromium.org,
+	marcel@holtmann.org,
+	Alex Deymo <deymo@chromium.org>
+Subject: [PATCH 6/6] autopair: Add the autopair plugin.
+Date: Wed, 20 Mar 2013 21:10:08 -0700
+Message-Id: <1363839008-8405-7-git-send-email-deymo@chromium.org>
+In-Reply-To: <1363839008-8405-1-git-send-email-deymo@chromium.org>
+References: <1363839008-8405-1-git-send-email-deymo@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The last argument for the functions pincode_cb, passkey_cb and confirm_cb is
-a user data pointer with the "void *". Those functions expect a
-"struct authentication_req *", but insted a "struct btd_device*" without
-any complaint from the compiler due the void* cast. This fix passes the
-right argument to those functions.
-
-Other uses of those functions as callbacks (agent_request_passkey,
-agent_request_pincode, agent_request_authorization and agent_request_confirmation)
-pass the right struct authentication_req *.
+The autopair plugin tries standard pincodes for different devices with dumb
+pincodes. It also generates a random 6 digit pincode for keyboards that
+support any pincode but fallbacks to the agent call in case the random
+generated pincode didn't work.
 ---
+ Makefile.plugins   |   3 ++
+ plugins/autopair.c | 145 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 148 insertions(+)
+ create mode 100644 plugins/autopair.c
 
-I was having some bluetoothd SEGFAULTs because of this. If you want more details
-and an easy repro case, check http://crbug.com/222665 .
-
- src/device.c |   10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
-
-diff --git a/src/device.c b/src/device.c
-index 3cd7f10..1630082 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -3952,14 +3952,12 @@ int device_notify_pincode(struct btd_device *device, gboolean secure,
+diff --git a/Makefile.plugins b/Makefile.plugins
+index f497782..651a970 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -5,6 +5,9 @@ builtin_sources += plugins/hostname.c
+ builtin_modules += wiimote
+ builtin_sources += plugins/wiimote.c
  
- static void cancel_authentication(struct authentication_req *auth)
- {
--	struct btd_device *device;
- 	struct agent *agent;
- 	DBusError err;
- 
- 	if (!auth || !auth->agent)
- 		return;
- 
--	device = auth->device;
- 	agent = auth->agent;
- 	auth->agent = NULL;
- 
-@@ -3968,19 +3966,19 @@ static void cancel_authentication(struct authentication_req *auth)
- 
- 	switch (auth->type) {
- 	case AUTH_TYPE_PINCODE:
--		pincode_cb(agent, &err, NULL, device);
-+		pincode_cb(agent, &err, NULL, auth);
- 		break;
- 	case AUTH_TYPE_CONFIRM:
--		confirm_cb(agent, &err, device);
-+		confirm_cb(agent, &err, auth);
- 		break;
- 	case AUTH_TYPE_PASSKEY:
--		passkey_cb(agent, &err, 0, device);
-+		passkey_cb(agent, &err, 0, auth);
- 		break;
- 	case AUTH_TYPE_NOTIFY_PASSKEY:
- 		/* User Notify doesn't require any reply */
- 		break;
- 	case AUTH_TYPE_NOTIFY_PINCODE:
--		pincode_cb(agent, &err, NULL, device);
-+		pincode_cb(agent, &err, NULL, auth);
- 		break;
- 	}
- 
++builtin_modules += autopair
++builtin_sources += plugins/autopair.c
++
+ if MAINTAINER_MODE
+ builtin_modules += gatt_example
+ builtin_sources += plugins/gatt-example.c
+diff --git a/plugins/autopair.c b/plugins/autopair.c
+new file mode 100644
+index 0000000..1feb04d
+--- /dev/null
++++ b/plugins/autopair.c
+@@ -0,0 +1,145 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012-2013 Google Inc.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdbool.h>
++#include <stdlib.h>
++
++#include <bluetooth/bluetooth.h>
++#include <glib.h>
++
++#include "plugin.h"
++#include "adapter.h"
++#include "device.h"
++#include "log.h"
++#include "storage.h"
++
++/*
++ * Plugin to handle automatic pairing of devices with reduced user
++ * interaction, including implementing the recommendation of the HID spec
++ * for keyboard devices.
++ *
++ * The plugin works by intercepting the PIN request for devices; if the
++ * device is a keyboard a random six-digit numeric PIN is generated and
++ * returned, flagged for displaying using DisplayPinCode.
++ *
++ */
++
++static ssize_t autopair_pincb(struct btd_adapter *adapter,
++					struct btd_device *device,
++					char *pinbuf, gboolean *display,
++					uint32_t count)
++{
++	char addr[18];
++	char pinstr[7];
++	uint32_t class;
++
++	ba2str(device_get_address(device), addr);
++
++	class = btd_device_get_class(device);
++
++	DBG("device %s 0x%x", addr, class);
++
++	/* This is a class-based pincode guesser. Ignore devices with an unknown
++	 * class. */
++	if (class == 0)
++		return 0;
++
++	switch ((class & 0x1f00) >> 8) {
++	case 0x04:		/* Audio/Video */
++		switch ((class & 0xfc) >> 2) {
++		case 0x01:		/* Wearable Headset Device */
++		case 0x02:		/* Hands-free Device */
++		case 0x06:		/* Headphones */
++		case 0x07:		/* Portable Audio */
++		case 0x0a:		/* HiFi Audio Device */
++			if (count == 0)
++				memcpy(pinbuf, "0000", 4);
++			else if (count == 1)
++				memcpy(pinbuf, "1234", 4);
++			else
++				return 0;
++			return 4;
++			break;
++		}
++		break;
++	case 0x05:		/* Peripheral */
++		switch ((class & 0xc0) >> 6) {
++		case 0x01:		/* Keyboard */
++		case 0x03:		/* Combo keyboard/pointing device */
++			if (count > 0)
++				return 0;
++			srand(time(NULL));
++			snprintf(pinstr, sizeof pinstr, "%06d",
++						rand() % 1000000);
++			*display = TRUE;
++			memcpy(pinbuf, pinstr, 6);
++			return 6;
++			break;
++		case 0x02: /* Pointing device */
++			if (count > 0)
++				return 0;
++			memcpy(pinbuf, "0000", 4);
++			return 4;
++			break;
++		}
++		break;
++	}
++
++	return 0;
++}
++
++
++static int autopair_probe(struct btd_adapter *adapter)
++{
++	btd_adapter_register_pin_cb(adapter, autopair_pincb);
++
++	return 0;
++}
++
++static void autopair_remove(struct btd_adapter *adapter)
++{
++	btd_adapter_unregister_pin_cb(adapter, autopair_pincb);
++}
++
++static struct btd_adapter_driver autopair_driver = {
++	.name = "autopair",
++	.probe = autopair_probe,
++	.remove = autopair_remove,
++};
++
++static int autopair_init(void)
++{
++	return btd_register_adapter_driver(&autopair_driver);
++}
++
++static void autopair_exit(void)
++{
++	btd_unregister_adapter_driver(&autopair_driver);
++}
++
++BLUETOOTH_PLUGIN_DEFINE(autopair, VERSION,
++		BLUETOOTH_PLUGIN_PRIORITY_DEFAULT, autopair_init, autopair_exit)
 -- 
-1.7.10.4
+1.8.1.3
