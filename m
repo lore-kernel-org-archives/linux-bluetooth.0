@@ -1,43 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 From: Alvaro Silva <alvaro.silva@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Alvaro Silva <alvaro.silva@openbossa.org>
-Subject: [PATCH 08/13] gatttool: Show connection state using color
-Date: Thu, 21 Mar 2013 18:31:44 -0400
-Message-Id: <1363905109-30839-9-git-send-email-alvaro.silva@openbossa.org>
+Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
+Subject: [PATCH 03/13] gatttool: Remote address is mandatory for non-interactive gatttool
+Date: Thu, 21 Mar 2013 18:31:39 -0400
+Message-Id: <1363905109-30839-4-git-send-email-alvaro.silva@openbossa.org>
 In-Reply-To: <1363905109-30839-1-git-send-email-alvaro.silva@openbossa.org>
 References: <1363905109-30839-1-git-send-email-alvaro.silva@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When device is connected, the Bluetooth address is shown in blue color.
----
- attrib/interactive.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
 
-diff --git a/attrib/interactive.c b/attrib/interactive.c
-index ecb8b7d..5ffe2fb 100644
---- a/attrib/interactive.c
-+++ b/attrib/interactive.c
-@@ -79,15 +79,15 @@ static char *get_prompt(void)
+For gatttool non-interactive mode, command line parameter with
+bluetooth remote address is mandatory.
+---
+ attrib/gatttool.c |    6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index 29e3261..1dd0c35 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -603,6 +603,12 @@ int main(int argc, char *argv[])
+ 		goto done;
  	}
  
- 	if (conn_state == STATE_CONNECTED)
--		g_string_assign(prompt, "[CON]");
--	else
--		g_string_assign(prompt, "[   ]");
-+		g_string_append(prompt, COLOR_BLUE);
- 
- 	if (opt_dst)
- 		g_string_append_printf(prompt, "[%17s]", opt_dst);
- 	else
- 		g_string_append_printf(prompt, "[%17s]", "");
- 
-+	g_string_append(prompt, COLOR_OFF);
++	if (opt_dst == NULL) {
++		g_print("Remote Bluetooth address required\n");
++		got_error = TRUE;
++		goto done;
++	}
 +
- 	if (opt_psm)
- 		g_string_append(prompt, "[BR]");
- 	else
+ 	chan = gatt_connect(opt_src, opt_dst, opt_dst_type, opt_sec_level,
+ 					opt_psm, opt_mtu, connect_cb);
+ 	if (chan == NULL) {
 -- 
 1.7.9.5
 
