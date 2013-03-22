@@ -1,50 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20130322105754.GC10769@x220.ger.corp.intel.com>
-References: <1363678855-12765-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1363678855-12765-4-git-send-email-mikel.astiz.oss@gmail.com>
-	<20130322105754.GC10769@x220.ger.corp.intel.com>
-Date: Fri, 22 Mar 2013 13:17:30 -0400
-Message-ID: <CAJdJm_N57Q+d4ObHyUEuD3CyYAXo26yU2gn8WUtb-GtURqeF7Q@mail.gmail.com>
-Subject: Re: [RFC v0 03/11] device: Replace connected_profiles with btd_service
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Chan-yeol Park <chanyeol.park@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix crash with incoming uart packet
+Date: Fri, 22 Mar 2013 22:44:13 +0900
+Message-id: <1363959853-21666-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+This patch adds check HCI_UART_REGISTERED before reading uart packet because
+BT uart data could be read before hci_uart is registered.
 
-On Fri, Mar 22, 2013 at 6:57 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Mikel,
->
-> On Tue, Mar 19, 2013, Mikel Astiz wrote:
->> +static gint service_state_cmp(gconstpointer a, gconstpointer b)
->> +{
->> +     struct btd_service *service = (gpointer) a;
->
-> Couldn't you just declare the local variable const to avoid the ugly
-> cast?
->
->> +     service_state_t state = (service_state_t) GPOINTER_TO_INT(b);
->
-> I think it'd be cleaner to just have:
->
->         const service_state_t *state = b;
->
->> +     if (service_get_state(service) == state)
->
-> And this would then become:
->
->         if (service_get_state(service) == *state)
+Backtrace:
+[<c05f27ec>] (hci_recv_stream_fragment+0x0/0x74) from [<c04126f4>] (h4_recv+0x18/0x40)
+ r7:eb1d4d1c r6:eb7683b0 r5:eae8e800 r4:0000000c
+[<c04126dc>] (h4_recv+0x0/0x40) from [<c0411870>] (hci_uart_tty_receive+0x6c/0x94)
+ r5:eae8e800 r4:eb768380
+[<c0411804>] (hci_uart_tty_receive+0x0/0x94) from [<c027be88>] (flush_to_ldisc+0x16c/0x17c)
+ r6:eae8e8d8 r5:eae8e800 r4:eae8e8c8
+[<c027bd1c>] (flush_to_ldisc+0x0/0x17c) from [<c0050ae8>] (process_one_work+0x144/0x4d4)
+[<c00509a4>] (process_one_work+0x0/0x4d4) from [<c0051208>] (worker_thread+0x180/0x370)
+[<c0051088>] (worker_thread+0x0/0x370) from [<c005617c>] (kthread+0x90/0x9c)
+[<c00560ec>] (kthread+0x0/0x9c) from [<c003a3a0>] (do_exit+0x0/0x7ec)
 
-I don't think these are equivalent, unless the caller is also changed
-to use "&state" instead of "GINT_TO_POINTER(state)".
+Signed-off-by: Chan-yeol Park <chanyeol.park@samsung.com>
+---
+ drivers/bluetooth/hci_ldisc.c |    3 +++
+ 1 file changed, 3 insertions(+)
 
-Regards,
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index ed0fade..476a307 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -386,6 +386,9 @@ static void hci_uart_tty_receive(struct tty_struct *tty, const u8 *data, char *f
+ 	if (!test_bit(HCI_UART_PROTO_SET, &hu->flags))
+ 		return;
+ 
++	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
++		return;
++
+ 	spin_lock(&hu->rx_lock);
+ 	hu->proto->recv(hu, (void *) data, count);
+ 	hu->hdev->stat.byte_rx += count;
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.10.4
+
