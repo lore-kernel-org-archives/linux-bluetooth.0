@@ -1,118 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1363940639.29764.35.camel@novo>
-Subject: Re: [PATCH 0/6] The Autopair strikes back
-From: Bastien Nocera <hadess@hadess.net>
-To: Scott James Remnant <keybuk@chromium.org>
-Cc: Alex Deymo <deymo@chromium.org>, "linux-bluetooth@vger.kernel.org"
-	 <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
-Date: Fri, 22 Mar 2013 09:23:59 +0100
-In-Reply-To: <CAHZ1yCkx89ppxAKeP8O4Oe2tf9KxVYVfeJ4RRxsi2eaW94UgUA@mail.gmail.com>
-References: <1363839008-8405-1-git-send-email-deymo@chromium.org>
-	 <1363852154.2681.3.camel@novo>
-	 <CAHZ1yCkx89ppxAKeP8O4Oe2tf9KxVYVfeJ4RRxsi2eaW94UgUA@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
+MIME-Version: 1.0
+Date: Fri, 22 Mar 2013 16:00:01 +0900
+Message-ID: <CAHLX0ue__CbJ2hYGe7V6mYVJPiqUktkKH=tvAYRBw=E+g1jZCg@mail.gmail.com>
+Subject: The way of using several usb bluetooth dongles to support more
+ bluetooth devices
+From: Chang Chao <charleschung.cn@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2013-03-21 at 16:07 -0700, Scott James Remnant wrote:
-> On Thu, Mar 21, 2013 at 12:49 AM, Bastien Nocera <hadess@hadess.net> wrote:
-> 
-> > On Wed, 2013-03-20 at 21:10 -0700, Alex Deymo wrote:
-> >> The goal of this patch set is to make the pairing process easier for
-> >> devices that have a fixed and dumb pincode (like 0000 or 1234) or that
-> >> accept any pincode as long as the same pincode is entered on the device
-> >> (keyboards/combos). The goal is:
-> >>  * Don't ask the user (i.e. the agent) a question if we know the right answer.
-> >> This makes the user happier. =)
-> >
-> > Is there any chance you could use:
-> > https://git.gnome.org/browse/gnome-bluetooth/tree/wizard/pin-code-database.xml
-> > even it means converting it to a different format?
-> >
-> 
-> One weird issue with this database is that it includes entries for
-> devices with which pairing is not possible:
+Hi,bluez developers.
 
-It's a device database for gnome-bluetooth's wizard, not something
-solely for pairing.
+I use usb bluetooth dongle to connect to other bluetooth device using
+rfcomm(with bluez-4.66).
+as one usb dongle can support 7 devices at most,to support 8 devices 2
+usb dongles(hci0 and hci1) is used.
 
-> <device oui="00:19:C1:" name="BD Remote Control" pin="NULL"/>
-> <device oui="00:1E:3D:" name="BD Remote Control" pin="NULL"/>
-> <device oui="00:06:F5:" name="BD Remote Control" pin="NULL"/>
-> 
-> These could be handled by BlueZ refusing to pair with them
-> automatically, but it could be argued that BlueZ should somehow reveal
-> to the user that pairing is not possible so it is not offered to begin
-> with.
+hci0:rfcomm0,rfcomm1,...,rfcomm6
+hci1:rfcomm7
 
-Completely agreed.
+#more contents of /etc/bluetooth/rfcomm_hci0.conf
+     rfcomm0 {
+         bind yes;
+         device BD ADDRESS;
+     }
 
-> It also includes entries for devices (with no distinguishing from the
-> above)
+     rfcomm1 {
+         bind yes;
+         device BD ADDRESS;
+     }
+     ...
+     rfcomm6 {
+         bind yes;
+         device BD ADDRESS;
+     }
 
-from the above what?
+#more /etc/bluetooth/rfcomm_hci1.conf
+     rfcomm7 {
+         bind yes;
+         device BD ADDRESS;
+     }
 
->  for devices that should not ordinarily be paired:
-> 
-> <device type="mouse" pin="NULL"/>
+I'v tried to acheive this with 2 methods.
 
-Yes. I didn't want those device classes hard-coded in the wizard code
-itself.
+Method1(the simple one,which I wonder why it failed):
+#rfcomm -i hci0 -f /etc/bluetooth/rfcomm_hci0.conf  bind all
+#rfcomm -i hci1 -f /etc/bluetooth/rfcomm_hci1.conf  bind all
+when I connect to the serial ports using minicom,only six of them can
+connect simultaneously.
+the seventh connecting attemp always gives a "Too many links" error and failed.
 
-> Again these should be handled similarly to above - informing the user
-> that pairing is not required, but that connection is possible without
-> pairing.
+Method2
+#rfcomm -i hci0 -f /etc/bluetooth/rfcomm_hci0.conf connect rfcomm0 &
+#rfcomm -i hci0 -f /etc/bluetooth/rfcomm_hci0.conf connect rfcomm1 &
+#...
+#rfcomm -i hci0 -f /etc/bluetooth/rfcomm_hci0.conf connect rfcomm6 &
 
-They actually 
+#rfcomm -i hci1 -f /etc/bluetooth/rfcomm_hci1.conf connect rfcomm7 &
+This method works well(minicom can connect to 7 serial ports simultaneously)
 
-> It seems to confuse the types of devices that use fixed-length random PINs:
-> 
-> <device type="audio" oui="00:1A:80:" name="CMT-DH5BT" pin="max:4"/>
-> 
-> With keyboards, which should be just max:6. Note that BlueZ already
-> has the DisplayPinCode agent method precisely to deal with showing a
-> PIN - so the issue of help text is strictly an application one.
-
-It's absolutely not a confusion. This device is a speaker box, with
-input devices. The device supports a maximum of 4 digits for the PIN but
-can enter any digits. So we truncate the maximum number of digits
-requested from the device so that pairing is possible.
-
-> <device type="keyboard" pin="KEYBOARD"/>
-> 
-> > This would mean more supported devices out-of-the-box? I'd be happy
-> > maintaining the list outside of the bluez tree if the bluez developers
-> > don't want to take on the burden of maintaining it.
-> >
-> 
-> If the list isn't maintained in the BlueZ tree, then how will more
-> devices be supported out-of-the-box?
-
-It can be a separate project that BlueZ (optionally) depends on.
-
-> This, to me, has always seemed like something that should just work
-> without requiring any special behavior out of the agent. bluetoothctl
-> should be just as capable as a GNOME Wizard.
-
-I completely agree.
-
-The database solves a number of problems, not all of them relevant to
-the autopair plugin:
-1) separates devices that can be paired, and those that will just be
-connected to and marked as trusted (apple mouse vs. normal mouse)
-2) gives out the PIN code for particular devices (see the list of GPS
-devices in the database)
-3) explains how to generate random PINs for particular devices (such as
-the CMT-DH5BT above)
-4) hints the UI as to how to present the pairing. For non-SSP keyboards,
-pressing return is necessary, for the iCade, we want to use joystick
-directions instead of digits.
-
-So there's definitely a subset of that database which is useful.
-
-I don't particularly care if you use the same format or not, but using
-it would mean that the autopair plugin would work better out-of-the-box
-(would you have guessed the non-numeric "NAVMAN" password for the navman
-GPS one?).
-
-Cheers
+Method1 is simple,but it failed,Would anyone please explain why did it fail?
+And what is the recommended method to acheive what I want to do
+(several usb dongles to support more bluetooth devices).
