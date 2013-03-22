@@ -1,45 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAHZ1yCmkO_-edONxyNGzXohyTc+5JoUr4aCCK0+_XXX7vXbJ0A@mail.gmail.com>
-References: <1363839008-8405-1-git-send-email-deymo@chromium.org>
-	<1363839008-8405-3-git-send-email-deymo@chromium.org>
-	<CAHZ1yCmkO_-edONxyNGzXohyTc+5JoUr4aCCK0+_XXX7vXbJ0A@mail.gmail.com>
-Date: Fri, 22 Mar 2013 11:06:56 +0100
-Message-ID: <CANq1E4R96J_sMzrnczbGYnzLGWQfLoH9K+mU0WpLppkm+u1jVA@mail.gmail.com>
-Subject: Re: [PATCH 2/6] plugins: Extend the pin code callback with the call number
-From: David Herrmann <dh.herrmann@gmail.com>
+Message-ID: <1363942369.29764.36.camel@novo>
+Subject: Re: [PATCH 0/6] The Autopair strikes back
+From: Bastien Nocera <hadess@hadess.net>
 To: Scott James Remnant <keybuk@chromium.org>
-Cc: Alex Deymo <deymo@chromium.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Fri, 22 Mar 2013 09:52:49 +0100
+In-Reply-To: <1363940639.29764.35.camel@novo>
+References: <1363839008-8405-1-git-send-email-deymo@chromium.org>
+	 <1363852154.2681.3.camel@novo>
+	 <CAHZ1yCkx89ppxAKeP8O4Oe2tf9KxVYVfeJ4RRxsi2eaW94UgUA@mail.gmail.com>
+	 <1363940639.29764.35.camel@novo>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Scott
+On Fri, 2013-03-22 at 09:23 +0100, Bastien Nocera wrote:
+> > Again these should be handled similarly to above - informing the
+> user
+> > that pairing is not required, but that connection is possible
+> without
+> > pairing.
+> 
+> They actually 
 
-On Fri, Mar 22, 2013 at 12:12 AM, Scott James Remnant
-<keybuk@chromium.org> wrote:
-> On Wed, Mar 20, 2013 at 9:10 PM, Alex Deymo <deymo@chromium.org> wrote:
->
->> +       /* Only try the pin code once per device. If it's not correct then it's
->> +        * an unknown device. */
->> +       if (count > 0)
->> +               return 0;
->> +
->
-> Semi-interesting fact:
->
-> There are actually two possible PINs for a wiimote, depending which
-> pairing mode is used. This plugin could be used to iterate between
-> them.
+Unfinished thought, and I don't remember what I wanted to say. In any
+case, the list at the end of the email should clarify all this.
 
-No, you cannot. The Wii Remote closes the connection after a failed
-attempt (at least some revisions do). And after a reconnect, you
-cannot be sure that the old PIN is still wrong.
-
-Hence, the only recommended way to pair Wii Remotes is via the "red
-sync" button on the back.
-I'm currently trying to find a way to distinguish both connection
-methods before pairing, but I haven't succeeded, yet.
-
-Regards
-David
