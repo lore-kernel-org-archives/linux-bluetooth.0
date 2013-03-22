@@ -1,64 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: =?UTF-8?B?6I2S5be744K144O844OQ44O8?= <mofmof@scaltinof.net>
-From: Noguchi Kazutosi <linux@scaltinof.net>
-To: marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Noguchi Kazutosi <linux@scaltinof.net>
-Subject: [PATCH] Bluetooth: Add support for Foxconn / Hon Hai [0489:e04d] Add support for the AR3012 chip in SONY SVS13129.
-Date: Sun, 24 Mar 2013 23:41:10 +0900
-Message-Id: <1364136070-4426-1-git-send-email-linux@scaltinof.net>
+Date: Fri, 22 Mar 2013 21:18:58 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Mikel Astiz <mikel.astiz.oss@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: Re: [RFC v0 03/11] device: Replace connected_profiles with
+ btd_service
+Message-ID: <20130322191858.GA2906@x220.P-661HNU-F1>
+References: <1363678855-12765-1-git-send-email-mikel.astiz.oss@gmail.com>
+ <1363678855-12765-4-git-send-email-mikel.astiz.oss@gmail.com>
+ <20130322105754.GC10769@x220.ger.corp.intel.com>
+ <CAJdJm_N57Q+d4ObHyUEuD3CyYAXo26yU2gn8WUtb-GtURqeF7Q@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAJdJm_N57Q+d4ObHyUEuD3CyYAXo26yU2gn8WUtb-GtURqeF7Q@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-T:  Bus=01 Lev=02 Prnt=02 Port=05 Cnt=03 Dev#= 21 Spd=12  MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e04d Rev=00.02
-S:  Manufacturer=Atheros Communications
-S:  Product=Bluetooth USB Host Controller
-S:  SerialNumber=Alaska Day 2006
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+Hi Lizardo,
 
-Signed-off-by: Noguchi Kazutosi <linux@scaltinof.net>
----
- drivers/bluetooth/ath3k.c |    2 ++
- drivers/bluetooth/btusb.c |    1 +
- 2 files changed, 3 insertions(+)
+On Fri, Mar 22, 2013, Anderson Lizardo wrote:
+> > On Tue, Mar 19, 2013, Mikel Astiz wrote:
+> >> +static gint service_state_cmp(gconstpointer a, gconstpointer b)
+> >> +{
+> >> +     struct btd_service *service = (gpointer) a;
+> >
+> > Couldn't you just declare the local variable const to avoid the ugly
+> > cast?
+> >
+> >> +     service_state_t state = (service_state_t) GPOINTER_TO_INT(b);
+> >
+> > I think it'd be cleaner to just have:
+> >
+> >         const service_state_t *state = b;
+> >
+> >> +     if (service_get_state(service) == state)
+> >
+> > And this would then become:
+> >
+> >         if (service_get_state(service) == *state)
+> 
+> I don't think these are equivalent, unless the caller is also changed
+> to use "&state" instead of "GINT_TO_POINTER(state)".
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 6aab00e..11f467c 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -90,6 +90,7 @@ static struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3393) },
- 	{ USB_DEVICE(0x0489, 0xe04e) },
- 	{ USB_DEVICE(0x0489, 0xe056) },
-+	{ USB_DEVICE(0x0489, 0xe04d) },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE02C) },
-@@ -126,6 +127,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
- 	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0489, 0xe04e), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0489, 0xe056), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0489, 0xe04d), .driver_info = BTUSB_ATH3012 },
- 
- 	/* Atheros AR5BBU22 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE03C), .driver_info = BTUSB_ATH3012 },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 2cc5f77..b82c0964 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -148,6 +148,7 @@ static struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0489, 0xe04e), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0489, 0xe056), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0489, 0xe04d), .driver_info = BTUSB_ATH3012 },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
--- 
-1.7.10.4
+You're right, and that's what I (incorrectly) thought the original code
+was doing.
+
+Johan
