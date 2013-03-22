@@ -1,123 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <514C5241.5090509@oss.bmw-carit.de>
-Date: Fri, 22 Mar 2013 13:44:49 +0100
-From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: MAP client: Add support for receiving notifications
-References: <51472E9E.50807@oss.bmw-carit.de> <F648EBCB-EE39-47D1-8040-07AC2AE0C249@holtmann.org>
-In-Reply-To: <F648EBCB-EE39-47D1-8040-07AC2AE0C249@holtmann.org>
+In-Reply-To: <20130322105516.GB10769@x220.ger.corp.intel.com>
+References: <1363678855-12765-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1363678855-12765-3-git-send-email-mikel.astiz.oss@gmail.com>
+	<20130322105516.GB10769@x220.ger.corp.intel.com>
+Date: Fri, 22 Mar 2013 13:33:40 +0100
+Message-ID: <CANT-zCX6qx5=oCsscMr=tqrHxTCqKsvWuWO7fmjt_YPkUUAY1A@mail.gmail.com>
+Subject: Re: [RFC v0 02/11] device: Use btd_service to represent profiles
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On 03/20/2013 06:10 PM, Marcel Holtmann wrote:
-> Hi Christian,
-> 
->> This is a follow-up on the discussion started in my patch set
->> "MAP client: notification support". The patches were implementing
->> notification support only for one remote device and needed an additional
->> API function for choosing that device.
->>
->> It's better to implement this implicitly and support multiple devices
->> from the beginning.
->>
->> In this E-Mail I'd like to suggest how we could implement the
->> notification connection setup in BlueZ. I'll try to explain the relevant
->> part of the spec to have a base for discussion.
->>
->> MAP consists of two different OBEX applications, Message Access Service
->> (MAS) for browsing messages and Message Notification Service (MNS) for
->> receiving event reports about changes on the server (like new messages,
->> moved messages, delivery reports, ...).
->>
->> The spec describes the single phone use case where the MAP client (MCE)
->> consists of several MAS client instances for the different accounts and
->> one common MNS server instance:
->>
->>  MCE (Car Kit)       MSE (Phone)
->> +---------------+   +-------------------------+
->> | MAS client 1  |<->| MAS server 1 (SMS)      |
->> | MAS client 2  |<->| MAS server 2 (E-Mail A) |
->> |     ...       |   |     ...                 |
->> | MNS server    |<->| MNS client              |
->> +---------------+   +-------------------------+
->>
->> Every MAS client instance, that wants to use notifications, needs to
->> use the SetNotificationRegistration function to enable it.
->> If the MNS connection isn't established already, the server (MSE) will
->> start the SDP lookup for the MNS instance on the client and connect to
->> it. The event reports that are sent on the MNS channel contain the MAS
->> instance ID, that can be used to map the event to the MAS client.
->>
->> Since an OBEX instance, like the MNS server, cannot be connected to
->> different remote devices at the same time, it will not work to have one
->> static MNS server instance. Instead we need one MNS server instance for
->> every connected remote device (that we want to use with MAP). Since the
->> MNS connection establishment is based on SDP, we have to make sure that
->> there's only one MNS server SDP record visible. Otherwise, the MSE
->> cannot know which one to connect to.
-> 
-> are you sure about this? In theory you could just use another OBEX connection id for the second connection. Has this actually been tested?
-> 
->> If we want to hide this all from the application level, we could do the
->> connection establishment for two devices (MSE 1 and MSE 2) as described
->> here.
->>
->>  MCE (Car Kit)       MSE 1 (Business phone)
->> +---------------+   +-------------------------+
->> | MAS client 1  |<->| MAS server 1 (SMS)      |
->> | MAS client 2  |<->| MAS server 2 (E-Mail A) |
->> |     ...       |   |     ...                 |
->> | MNS server 1  |<->| MNS client              |
->> |               |   +-------------------------+
->> |               |
->> |               |     MSE 2 (private phone)
->> |               |   +-------------------------+
->> | MAS client 3  |<->| MAS server 1 (SMS)      |
->> |     ...       |   |     ...                 |
->> | MNS server 2  |<->| MNS client              |
->> +---------------+   +-------------------------+
->>
->> - MCE connects MAS client 1 to MSE 1
->> - MCE dynamically instantiates MNS server 1 and registers its SDP record
->> - MAS client 1 sends SetNotificationRegistration(on)
->> - MSE does SDP lookup and connects to the found MNS server 1
->> - MCE removes SDP record for MNS server 1
->> - MCE connects MAS client 2 to MSE 1
->> - MAS client 2 sends SetNotificationRegistration(on)
->>     (MNS channel is already up, MSE just responds OK)
->> - MCE connects MAS client 3 to MSE 2
->> - MCE dynamically instantiates MNS server 2 and registers its SDP record
->> - MAS client 3 sends SetNotificationRegistration(on)
->> - MSE does SDP lookup and connects to the found MNS server 2
->> - MCE removes SDP record for MNS server 2
->> ...
->>
->> Does that sound reasonable for you?
-> 
-> This proposal is inherintly racy. I also do not understand it. When you have a different ACL link, then you can have the same RFCOMM channel established twice. So why are we bothering with this.
-> 
-> If you are expecting one client connection from each MSE, then there is no need to play any of these tricks. And if a MSE wants to establish more than one client connection, then it is better able to use different connection ids.
-> 
-> Regards
-> 
-> Marcel
+On Fri, Mar 22, 2013 at 11:55 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Mikel,
+>
+> On Tue, Mar 19, 2013, Mikel Astiz wrote:
+>> +static gint service_profile_cmp(gconstpointer a, gconstpointer b)
+>> +{
+>> +     struct btd_service *service = (gpointer) a;
+>> +     struct btd_profile *profile = (gpointer) b;
+>
+> Instead of this explicit casting why not declare the local variables
+> const too?
 
-I agree. As written in response to Luiz's Mail I have tested connecting
-two devices to one MNS instance a couple of weeks ago and I couldn't
-get it to work. Because of some misleading old mails, saying that it is
-possible only with L2CAP, I didn't pursue the simple approach.
+In order to do this (at least in the case of b) I'd have to add a
+const version of service_get_profile(). However, profile.h doesn't
+define any semantics for a const profile (and neither does device.h),
+so I would discourage adding a function such as:
 
-However, after your helpful hints, I have retested it and confirm that
-dual connections to the same MNS server instance works fine. This makes
-both, the proposal and a dedicated API call for setting up the
-notification connection obsolete.
+struct btd_profile *service_get_profile(const struct btd_service *service);
 
-I will split up my patch set as requested into smaller parts and send
-it as different sets to simplify the review.
+I therefore though it wasn't worth making the API more complex in
+order to have such a comparison function. If you still want this, a
+possible alternative would be to extend the API with:
 
-Br,
-Christian
+const struct btd_profile *service_get_profile_const(const struct
+btd_service *service);
+const struct btd_device *service_get_device_const(const struct
+btd_service *service);
+
+Cheers,
+Mikel
