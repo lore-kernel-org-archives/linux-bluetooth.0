@@ -1,58 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAC8Q6ZTMRLkkYfzRVJFyLMap216UuF7W_VrqWoeZaZ8adfh4+g@mail.gmail.com>
-References: <CAC8Q6ZTMRLkkYfzRVJFyLMap216UuF7W_VrqWoeZaZ8adfh4+g@mail.gmail.com>
-Date: Mon, 25 Mar 2013 11:06:20 +0530
-Message-ID: <CAC8Q6ZRoNZ6cZpF-X-=FSctqKKAz9Yqt7D6xm7Zw05DJ_GFc5A@mail.gmail.com>
-Subject: Fwd: CSR chipset sco voice routing
-From: prasanna <prasannakarthik123@gmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Noguchi Kazutosi <linux@scaltinof.net>, marcel@holtmann.org, gustavo@padovan.org,
+Sender: =?UTF-8?B?6I2S5be744K144O844OQ44O8?= <mofmof@scaltinof.net>
+From: Noguchi Kazutosi <linux@scaltinof.net>
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
 	johan.hedberg@gmail.com
-Content-Type: multipart/alternative; boundary=14dae93408ff4642b204d8b92f33
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Noguchi Kazutosi <linux@scaltinof.net>
+Subject: [PATCH] Bluetooth: Add support for Foxconn / Hon Hai [0489:e04d] Add support for the AR3012 chip in SONY SVS13129.
+Date: Sun, 24 Mar 2013 23:41:10 +0900
+Message-Id: <1364136070-4426-1-git-send-email-linux@scaltinof.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---14dae93408ff4642b204d8b92f33
-Content-Type: text/plain; charset=ISO-8859-1
+T:  Bus=01 Lev=02 Prnt=02 Port=05 Cnt=03 Dev#= 21 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0489 ProdID=e04d Rev=00.02
+S:  Manufacturer=Atheros Communications
+S:  Product=Bluetooth USB Host Controller
+S:  SerialNumber=Alaska Day 2006
+C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-Hi
+Signed-off-by: Noguchi Kazutosi <linux@scaltinof.net>
+---
+ drivers/bluetooth/ath3k.c |    2 ++
+ drivers/bluetooth/btusb.c |    1 +
+ 2 files changed, 3 insertions(+)
 
-This is regarding routing sco audio/voice from CSR USB chipset to ALSA.
-I established HFP service connection establishment and made AT Commands
-over the established connection. For routing the audio Does the CSR require
-USB ISO audio driver for bluetooh?
-SCO voice data is sniffed over hcidump.
-
-Some chipsets like TIWILINK has pcm audio pins for direct connection to
-audio codec. But USB chipset like CSR USB dongle to accept and route
-audio/voice to the audio port/ALSA.
-Does it require special audio driver?
-
-Let me know what you think
-
-Regards
-Prasanna
-
---14dae93408ff4642b204d8b92f33
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-
-<br><div class=3D"gmail_quote"><span style=3D"font-family:verdana,sans-seri=
-f"><font>Hi<br><br>This is regarding routing sco audio/voice from CSR USB c=
-hipset to ALSA.<br>I established HFP service connection establishment and m=
-ade AT Commands over the established connection. For routing the audio Does=
- the CSR require USB ISO audio driver for bluetooh?<br>
-
-
-SCO voice data is sniffed over hcidump.<br><br>Some chipsets like TIWILINK =
-has pcm audio pins for direct connection to audio codec. But USB chipset li=
-ke CSR USB dongle to accept and route audio/voice to the audio port/ALSA.<b=
-r>
-
-
-Does it require special audio driver?<br><br>Let me know what you think<br>=
-<br>Regards<span><font color=3D"#888888"><br>Prasanna</font></span></font><=
-/span><br>
-</div><br>
-
---14dae93408ff4642b204d8b92f33--
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 6aab00e..11f467c 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -90,6 +90,7 @@ static struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3393) },
+ 	{ USB_DEVICE(0x0489, 0xe04e) },
+ 	{ USB_DEVICE(0x0489, 0xe056) },
++	{ USB_DEVICE(0x0489, 0xe04d) },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE02C) },
+@@ -126,6 +127,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe04e), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe056), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0489, 0xe04d), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU22 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE03C), .driver_info = BTUSB_ATH3012 },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 2cc5f77..b82c0964 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -148,6 +148,7 @@ static struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe04e), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe056), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0489, 0xe04d), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+-- 
+1.7.10.4
