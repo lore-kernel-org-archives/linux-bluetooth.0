@@ -1,54 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 25 Mar 2013 16:40:25 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2013-03-21
-Message-ID: <20130325204025.GF17454@tuxdriver.com>
-References: <20130321222408.GA8890@joana>
+Date: Mon, 25 Mar 2013 16:55:04 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Noguchi Kazutosi <linux@scaltinof.net>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Add support for Foxconn / Hon Hai [0489:e04d]
+ Add support for the AR3012 chip in SONY SVS13129.
+Message-ID: <20130325195504.GA15335@joana>
+References: <1364136070-4426-1-git-send-email-linux@scaltinof.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130321222408.GA8890@joana>
-Sender: linux-wireless-owner@vger.kernel.org
+In-Reply-To: <1364136070-4426-1-git-send-email-linux@scaltinof.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Mar 21, 2013 at 07:24:08PM -0300, Gustavo Padovan wrote:
-> Hi John,
+Hi Noguchi,
+
+* Noguchi Kazutosi <linux@scaltinof.net> [2013-03-24 23:41:10 +0900]:
+
+> T:  Bus=01 Lev=02 Prnt=02 Port=05 Cnt=03 Dev#= 21 Spd=12  MxCh= 0
+> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0489 ProdID=e04d Rev=00.02
+> S:  Manufacturer=Atheros Communications
+> S:  Product=Bluetooth USB Host Controller
+> S:  SerialNumber=Alaska Day 2006
+> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 > 
-> This is our first batch of patches for 3.10. The biggest changes of this pull
-> request are from Johan Hedberg, he implemented a HCI request framework to make
-> life easier when we have to send many HCI commands and a block and wait for
-> all of the to finish, we were able to fix a few issues in stack with the
-> introduction of this framework.
-> 
-> Other than that Dean Jenkins did a good work cleaning the RFCOMM code, the
-> refcnt infrastructure was removed and now we use NULL pointer checks to know
-> when a object was freed or not. That code was buggy and now it looks a way
-> better.
-> 
-> The rest of changes are clean ups, fixes and small improvements all over the
-> Bluetooth subsystem. 
-> 
-> Please pull, or let me know of any issues! Thanks.
-> 
-> 	Gustavo
-> 
+> Signed-off-by: Noguchi Kazutosi <linux@scaltinof.net>
 > ---
-> The following changes since commit 7da060c1c01b103d181dba39bce9bd141a945f99:
-> 
->   mwifiex: add WOWLAN support (2013-03-06 16:29:17 -0500)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next for-upstream
-> 
-> for you to fetch changes up to 0227c7b56959cd8f5edd20b6a47db86fa553e91a:
-> 
->   Bluetooth: fix error return code in rfcomm_add_listener() (2013-03-20 14:17:52 -0300)
+>  drivers/bluetooth/ath3k.c |    2 ++
+>  drivers/bluetooth/btusb.c |    1 +
+>  2 files changed, 3 insertions(+)
 
-Pulling now...
+Patch has been applied to bluetooth-next. Thanks.
 
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+	Gustavo
