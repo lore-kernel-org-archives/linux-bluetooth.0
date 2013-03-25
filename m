@@ -1,38 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 25 Mar 2013 16:55:04 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Noguchi Kazutosi <linux@scaltinof.net>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Add support for Foxconn / Hon Hai [0489:e04d]
- Add support for the AR3012 chip in SONY SVS13129.
-Message-ID: <20130325195504.GA15335@joana>
-References: <1364136070-4426-1-git-send-email-linux@scaltinof.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1364136070-4426-1-git-send-email-linux@scaltinof.net>
+In-Reply-To: <20130325162309.GA25769@x220.P-661HNU-F1>
+References: <CAB8sVA-XJeACK9YHEB0V3vLHbskPaVe6A+C9_oM6t2jP-UV+pQ@mail.gmail.com>
+	<20130325162309.GA25769@x220.P-661HNU-F1>
+Date: Mon, 25 Mar 2013 12:36:18 -0400
+Message-ID: <CAB8sVA-r2EnKTKWT+tp-eQo0r-nFS58cwpF_gNQ9Hi_v7xtZsA@mail.gmail.com>
+Subject: Re: Problem Running Bluez Tests
+From: Brendan West <extremeskateboarding@gmail.com>
+To: Brendan West <extremeskateboarding@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Noguchi,
+Johan,
 
-* Noguchi Kazutosi <linux@scaltinof.net> [2013-03-24 23:41:10 +0900]:
+On Mon, Mar 25, 2013 at 12:23 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Brendan,
+>
+> On Mon, Mar 25, 2013, Brendan West wrote:
+>  ./test-heartrate -i hci1 -b FC:4E:09:DC:68:44
+>> Traceback (most recent call last):
+>> File "./test-heartrate", line 62, in <module>
+>> managed_objects = bluezutils.get_managed_objects()
+>> File "/home/user/Downloads/bluez-5.2/test/bluezutils.py", line 11, in
+>> get_managed_objects
+>> return manager.GetManagedObjects()
+>> File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 70, in __call__
+>> return self._proxy_method(*args, **keywords)
+>> File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 145, in __call__
+>> **keywords)
+>> File "/usr/lib/python2.7/dist-packages/dbus/connection.py", line 651,
+>> in call_blocking
+>> message, timeout)
+>> dbus.exceptions.DBusException:
+>> org.freedesktop.DBus.Error.UnknownMethod: Method "GetManagedObjects"
+>> with signature "" on interface "org.freedesktop.DBus.ObjectManager"
+>> doesn't exist
+>
+> This sounds like you still have an old (4.x) bluetoothd running. You'll
+> need to stop it and start the one you compiled from the 5.x tree. Also
+> be sure to install a new D-Bus policy (src/bluetooth.conf to
+> /etc/dbus-1.system.d/) since a lot of interface names have changed since
+> 4.x.
+>
+> Johan
 
-> T:  Bus=01 Lev=02 Prnt=02 Port=05 Cnt=03 Dev#= 21 Spd=12  MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0489 ProdID=e04d Rev=00.02
-> S:  Manufacturer=Atheros Communications
-> S:  Product=Bluetooth USB Host Controller
-> S:  SerialNumber=Alaska Day 2006
-> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> 
-> Signed-off-by: Noguchi Kazutosi <linux@scaltinof.net>
-> ---
->  drivers/bluetooth/ath3k.c |    2 ++
->  drivers/bluetooth/btusb.c |    1 +
->  2 files changed, 3 insertions(+)
+That sounds like it could be the problem.  However, shouldn't the old
+bluetoothd stop and the new one start when I reboot the Raspberry Pi?
+Or do I actually have to do it manually?  If the latter, can you
+explain how to do so (I am not sure how two different versions can be
+installed at the same time..I was under the impression that a normal
+install of the new would overwrite the old).
 
-Patch has been applied to bluetooth-next. Thanks.
+As for the D-Bus policy, I'm afraid that I am still not sure how to do
+that one either..  I have updated D-Bus using apt-get, but you seem to
+be referring to something else..  Would you mind explaining further?
 
-	Gustavo
+Thanks for your help, and I apologize for being  completely clueless
+to what you are talking about..I've only been using Linux for a short
+time haha.  Thanks again.
+
+Brendan West
