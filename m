@@ -1,27 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 25 Mar 2013 16:40:25 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2013-03-21
+Message-ID: <20130325204025.GF17454@tuxdriver.com>
+References: <20130321222408.GA8890@joana>
 MIME-Version: 1.0
-Date: Mon, 25 Mar 2013 21:02:28 -0400
-Message-ID: <CAB8sVA9vLu1CbfUmNrGqShePg+s0s3M-vhkPvo_FjOgHLcm6DQ@mail.gmail.com>
-Subject: Installing & Compiling Bluez From Git
-From: Brendan West <extremeskateboarding@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130321222408.GA8890@joana>
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I've been trying to compile and install Bluez both from the Git
-repository (located at
-git://git.kernel.org/pub/scm/bluetooth/bluez.git) and the standard
-"bluez-5.3.tar.gz" package, but I don't think it's working..  I am
-following the instructions in the README file, but the Bluetooth on my
-Debian Wheezy doesn't update to the Bluez 5.x version (at least I'm
-assuming so, since the file in /etc/init.d/bluetooth says it's still
-for Bluez 4.x; and none of the tests included with the packages work).
- I have been told by another guy on the mailing list that perhaps the
-bluetoothd file didn't update properly, but I haven't been able to
-figure out how to do that (I assumed that it would have updated
-properly with the "make install" command).  I am new to
-compiling/installing packages from source, so any tips would be
-appreciated.  Thanks.
+On Thu, Mar 21, 2013 at 07:24:08PM -0300, Gustavo Padovan wrote:
+> Hi John,
+> 
+> This is our first batch of patches for 3.10. The biggest changes of this pull
+> request are from Johan Hedberg, he implemented a HCI request framework to make
+> life easier when we have to send many HCI commands and a block and wait for
+> all of the to finish, we were able to fix a few issues in stack with the
+> introduction of this framework.
+> 
+> Other than that Dean Jenkins did a good work cleaning the RFCOMM code, the
+> refcnt infrastructure was removed and now we use NULL pointer checks to know
+> when a object was freed or not. That code was buggy and now it looks a way
+> better.
+> 
+> The rest of changes are clean ups, fixes and small improvements all over the
+> Bluetooth subsystem. 
+> 
+> Please pull, or let me know of any issues! Thanks.
+> 
+> 	Gustavo
+> 
+> ---
+> The following changes since commit 7da060c1c01b103d181dba39bce9bd141a945f99:
+> 
+>   mwifiex: add WOWLAN support (2013-03-06 16:29:17 -0500)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next for-upstream
+> 
+> for you to fetch changes up to 0227c7b56959cd8f5edd20b6a47db86fa553e91a:
+> 
+>   Bluetooth: fix error return code in rfcomm_add_listener() (2013-03-20 14:17:52 -0300)
 
-Brendan West
+Pulling now...
+
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
