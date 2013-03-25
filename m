@@ -1,21 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20130325122952.GB21794@x220.ger.corp.intel.com>
-References: <1362430730-19580-1-git-send-email-jefferson.delfes@openbossa.org> <20130325122952.GB21794@x220.ger.corp.intel.com>
-From: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Date: Mon, 25 Mar 2013 10:50:12 -0400
-Message-ID: <CA+_d9qc1O8OB1JyYSb_ih_Qc=SzE_Ki-hBmBYnMeL4jjYngbjA@mail.gmail.com>
+Date: Mon, 25 Mar 2013 14:29:52 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: [PATCH BlueZ 0/6] attrib: Remove glib basic data types usage
-To: Jefferson Delfes <jefferson.delfes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <20130325122952.GB21794@x220.ger.corp.intel.com>
+References: <1362430730-19580-1-git-send-email-jefferson.delfes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1362430730-19580-1-git-send-email-jefferson.delfes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan.
+Hi Jefferson,
 
-Maybe there are too many changes here hehehe.
-I will split it better trying to change only vars that aren't passed
-to GLib, so I'll send to maillist again.
+On Mon, Mar 04, 2013, Jefferson Delfes wrote:
+> This patch series do a cleanup of glib basic data types usage. Types as
+> gpointer, guint, gint, gchar and gsize were replaced by standard types without
+> any extra effort. The only exception was gboolean which needs stdbool.h.
+> Some variables were mainted as gboolean, because are passed as parameter to
+> glib functions.
 
-Thanks.
+For code directly interacting with GLib APIs I thought the convention is
+to use the same data types as in the APIs (meaning the GLib ones). Have
+you seen major differences to this principle somewhere in the source
+tree?
+
+Johan
