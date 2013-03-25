@@ -1,27 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 25 Mar 2013 14:27:15 +0200
+Date: Mon, 25 Mar 2013 13:00:05 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] gatttool: fix parameter type/name from le to psm
-Message-ID: <20130325122715.GA21794@x220.ger.corp.intel.com>
-References: <1362429775-19101-1-git-send-email-jefferson.delfes@openbossa.org>
+To: Alex Deymo <deymo@chromium.org>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	keybuk@chromium.org
+Subject: Re: [PATCH v4 0/6] client: agent implementation on bluetoothctl
+Message-ID: <20130325110005.GA17227@x220.ger.corp.intel.com>
+References: <1363903497-4517-1-git-send-email-deymo@chromium.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1362429775-19101-1-git-send-email-jefferson.delfes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1363903497-4517-1-git-send-email-deymo@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jefferson,
+Hi Alex,
 
-On Mon, Mar 04, 2013, Jefferson Delfes wrote:
-> The parameter le was changed to psm and its type was modified from
-> boolean to int, but header was unmodified. That change occurred in commit
-> 0cc24599637ed6666469c68d55f4e42ff722e447.
-> ---
->  attrib/gatttool.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, Mar 21, 2013, Alex Deymo wrote:
+> Fixed Vinicius comments for agent prompt. I kind of hate readline =)
+> Thanks for reporting.
+> I'll leave the agent disabled at startup since you can choose the
+> capability you want to support for your agent, and also you may want
+> to test your environment without an agent.
+> 
+> Alex Deymo (6):
+>   client: Add color modifiers to NEW, CHG and DEL events.
+>   client: Right prompt management on agent input
+>   client: "agent" command capability argument and autocompletion
+>   client: Agent's DisplayPincode implementation
+>   client: Agent's DisplayPasskey implementation
+>   client: Agent's RequestPasskey implementation
+> 
+>  client/agent.c   | 146 ++++++++++++++++++++++++++++++++++++++++++++++++++-----
+>  client/display.h |   7 ++-
+>  client/main.c    | 106 ++++++++++++++++++++++++++++++++++------
+>  3 files changed, 232 insertions(+), 27 deletions(-)
 
-Applied. Thanks.
+Thanks. All patches in this set have been applied.
+
+I did have to do some manual fixing with coding style issues such as
+"char* foo" vs "char *foo", so please pay attention to that in the
+future.
 
 Johan
