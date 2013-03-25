@@ -1,54 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 25 Mar 2013 11:36:36 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] test: Fix list-devices when there is more than one
- adapter
-Message-ID: <20130325093636.GA10556@x220.ger.corp.intel.com>
-References: <1363810704-21450-1-git-send-email-jprvita@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1363810704-21450-1-git-send-email-jprvita@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <CAC8Q6ZTMRLkkYfzRVJFyLMap216UuF7W_VrqWoeZaZ8adfh4+g@mail.gmail.com>
+References: <CAC8Q6ZTMRLkkYfzRVJFyLMap216UuF7W_VrqWoeZaZ8adfh4+g@mail.gmail.com>
+Date: Mon, 25 Mar 2013 11:06:20 +0530
+Message-ID: <CAC8Q6ZRoNZ6cZpF-X-=FSctqKKAz9Yqt7D6xm7Zw05DJ_GFc5A@mail.gmail.com>
+Subject: Fwd: CSR chipset sco voice routing
+From: prasanna <prasannakarthik123@gmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Noguchi Kazutosi <linux@scaltinof.net>, marcel@holtmann.org, gustavo@padovan.org,
+	johan.hedberg@gmail.com
+Content-Type: multipart/alternative; boundary=14dae93408ff4642b204d8b92f33
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi João Paulo,
+--14dae93408ff4642b204d8b92f33
+Content-Type: text/plain; charset=ISO-8859-1
 
-On Wed, Mar 20, 2013, João Paulo Rechi Vita wrote:
-> ---
->  test/list-devices | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/test/list-devices b/test/list-devices
-> index 0aac217..790b358 100755
-> --- a/test/list-devices
-> +++ b/test/list-devices
-> @@ -31,9 +31,6 @@ def extract_uuids(uuid_list):
->  
->  objects = manager.GetManagedObjects()
->  
-> -all_devices = (str(path) for path, interfaces in objects.iteritems() if
-> -					"org.bluez.Device1" in interfaces.keys())
-> -
->  for path, interfaces in objects.iteritems():
->  	if "org.bluez.Adapter1" not in interfaces.keys():
->  		continue
-> @@ -49,6 +46,8 @@ for path, interfaces in objects.iteritems():
->  		else:
->  			print("    %s = %s" % (key, value))
->  
-> +	all_devices = (str(path) for path, interfaces in objects.iteritems() if
-> +					"org.bluez.Device1" in interfaces.keys())
->  	device_list = [d for d in all_devices if d.startswith(path + "/")]
->  
->  	for dev_path in device_list:
+Hi
 
-Your commit message should explain why the old code is wrong and how/why
-your patch makes it right. In general the code above looks suspicious
-since it's relying on a certain format for the object path (the adapter
-path being a prefix to the device path) instead of properly looking for
-devices whose "Adapter" property on the Device1 interface matches the
-path of the adapter that's currently being processed.
+This is regarding routing sco audio/voice from CSR USB chipset to ALSA.
+I established HFP service connection establishment and made AT Commands
+over the established connection. For routing the audio Does the CSR require
+USB ISO audio driver for bluetooh?
+SCO voice data is sniffed over hcidump.
 
-Johan
+Some chipsets like TIWILINK has pcm audio pins for direct connection to
+audio codec. But USB chipset like CSR USB dongle to accept and route
+audio/voice to the audio port/ALSA.
+Does it require special audio driver?
+
+Let me know what you think
+
+Regards
+Prasanna
+
+--14dae93408ff4642b204d8b92f33
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+<br><div class=3D"gmail_quote"><span style=3D"font-family:verdana,sans-seri=
+f"><font>Hi<br><br>This is regarding routing sco audio/voice from CSR USB c=
+hipset to ALSA.<br>I established HFP service connection establishment and m=
+ade AT Commands over the established connection. For routing the audio Does=
+ the CSR require USB ISO audio driver for bluetooh?<br>
+
+
+SCO voice data is sniffed over hcidump.<br><br>Some chipsets like TIWILINK =
+has pcm audio pins for direct connection to audio codec. But USB chipset li=
+ke CSR USB dongle to accept and route audio/voice to the audio port/ALSA.<b=
+r>
+
+
+Does it require special audio driver?<br><br>Let me know what you think<br>=
+<br>Regards<span><font color=3D"#888888"><br>Prasanna</font></span></font><=
+/span><br>
+</div><br>
+
+--14dae93408ff4642b204d8b92f33--
