@@ -1,60 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAB8sVA_Sth76eEpbvy-nsLEAzki7Py9StRBL=4PwH3xJ=U582g@mail.gmail.com>
+In-Reply-To: <20130326072529.GA30560@x220>
 References: <CAB8sVA-XJeACK9YHEB0V3vLHbskPaVe6A+C9_oM6t2jP-UV+pQ@mail.gmail.com>
 	<20130325162309.GA25769@x220.P-661HNU-F1>
 	<CAB8sVA-r2EnKTKWT+tp-eQo0r-nFS58cwpF_gNQ9Hi_v7xtZsA@mail.gmail.com>
 	<20130326072529.GA30560@x220>
-	<CAB8sVA_Sth76eEpbvy-nsLEAzki7Py9StRBL=4PwH3xJ=U582g@mail.gmail.com>
-Date: Tue, 26 Mar 2013 10:22:57 -0400
-Message-ID: <CAJdJm_NF3UQ+toEcqf02qs4azEH9meFArh_bw2Wht+xRsxMBuQ@mail.gmail.com>
+Date: Tue, 26 Mar 2013 09:54:56 -0400
+Message-ID: <CAB8sVA_Sth76eEpbvy-nsLEAzki7Py9StRBL=4PwH3xJ=U582g@mail.gmail.com>
 Subject: Re: Problem Running Bluez Tests
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Brendan West <extremeskateboarding@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+From: Brendan West <extremeskateboarding@gmail.com>
+To: Brendan West <extremeskateboarding@gmail.com>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brendan,
+Johan,
 
-On Tue, Mar 26, 2013 at 9:54 AM, Brendan West
-<extremeskateboarding@gmail.com> wrote:
-> Johan,
->
-> On Tue, Mar 26, 2013 at 3:25 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
->> BlueZ 5.x installs bluetoothd by default into /usr/libexec/bluetooth/
->> whereas 4.x installs it to /usr/sbin/, so it wouldn't get overwritten.
->
-> Ah, that makes sense.  I hate to keep asking questions that I probably
-> should already know the answer to, but how do I start the 5.x
-> bluetoothd?  I have tried editing the "bluetooth" file in the
-> "/etc/init.d/" directory and pointing the "daemon" path to the
-> "/usr/libexec/bluetooth/" directory (the one specified in the first
-> few lines of the file; the file does say that it is for Bluez 4.x, but
-> I couldn't find one for 5.x), but when I use the
-> "/etc/init.d/bluetooth start" command, it just hangs and doesn't do
-> anything.  Is there a different command/location that I need to
-> utilize for 5.x?
+On Tue, Mar 26, 2013 at 3:25 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> BlueZ 5.x installs bluetoothd by default into /usr/libexec/bluetooth/
+> whereas 4.x installs it to /usr/sbin/, so it wouldn't get overwritten.
 
-If you are just hacking around, you can try these steps (first restore
-your /etc/init.d/bluetooth to the original content):
+Ah, that makes sense.  I hate to keep asking questions that I probably
+should already know the answer to, but how do I start the 5.x
+bluetoothd?  I have tried editing the "bluetooth" file in the
+"/etc/init.d/" directory and pointing the "daemon" path to the
+"/usr/libexec/bluetooth/" directory (the one specified in the first
+few lines of the file; the file does say that it is for Bluez 4.x, but
+I couldn't find one for 5.x), but when I use the
+"/etc/init.d/bluetooth start" command, it just hangs and doesn't do
+anything.  Is there a different command/location that I need to
+utilize for 5.x?
 
-/etc/init.d/bluetooth stop
-# do a backup of the original executable
-mv /usr/sbin/bluetoothd  /usr/sbin/bluetoothd.orig
-ln -s /usr/libexec/bluetooth/bluetoothd /usr/sbin/bluetoothd
-/etc/init.d/bluetooth start
+> D-Bus policy files are provided by each service that needs them. You
+> won't get the new BlueZ policy with some centralized D-Bus package. I
+> tried to tell you that you'll find the policy file in the BlueZ source
+> tree and you just need to copy it to the right place (also explained in
+> my email).
 
-Note though that this is just a quick&dirty hack. The correct approach
-is for you to do the proper packaging for the distro you are running
-(e.g. .deb packaging for Debian based distros).
+Sorry about that; I had misunderstood what you said in your email.  I
+did figure out what you meant a while after I responded, so thank you
+for pointing that out.  I did replace the file, but I'm still having
+the problem that I mentioned above.
 
-Unfortunately, I did not find any Debian based distro already
-packaging BlueZ 5.x, so you will need to do your own packaging.
+Thanks for all of your help.
 
-Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Brendan West
