@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
-Subject: Re: [PATCH v6 04/17] sbc: add odd member variable to sbc_encoder_state
+Subject: Re: [PATCH v4 2/6] Bluetooth: Add SCO socket voice_setting option
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1362565163-3567-5-git-send-email-frederic.dalleau@linux.intel.com>
-Date: Tue, 26 Mar 2013 19:17:35 -0700
+In-Reply-To: <1363716255-21332-3-git-send-email-frederic.dalleau@linux.intel.com>
+Date: Tue, 26 Mar 2013 13:22:50 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <52E3E55C-7E50-4702-9F37-94399097B485@holtmann.org>
-References: <1362565163-3567-1-git-send-email-frederic.dalleau@linux.intel.com> <1362565163-3567-5-git-send-email-frederic.dalleau@linux.intel.com>
+Message-Id: <DE6F5576-C7C9-4EA9-B242-3489F0651FBC@holtmann.org>
+References: <1363716255-21332-1-git-send-email-frederic.dalleau@linux.intel.com> <1363716255-21332-3-git-send-email-frederic.dalleau@linux.intel.com>
 To: =?iso-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
 	<frederic.dalleau@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -15,36 +15,39 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Fred,
 
-> sbc/sbc_primitives.c |    2 ++
-> sbc/sbc_primitives.h |    1 +
-> 2 files changed, 3 insertions(+)
+> This patch extends the current SCO socket option to add a 'voice_setting'
+> member. This member is intended to choose data type at runtime.
+> Incoming connections will be setup during defered setup. Outgoing connections
+> have to be setup before connect(). The desired setting is stored in the sco
+> socket info.
+> This patch declares needed members, modifies getsockopt() and implements
+> setsockopt(). Setting the mtu is not supported.
+
+Signed-off-by line.
+
+> ---
+> include/net/bluetooth/sco.h |    2 ++
+> net/bluetooth/sco.c         |   54 +++++++++++++++++++++++++++++++++++++++++++
+> 2 files changed, 56 insertions(+)
 > 
-> diff --git a/sbc/sbc_primitives.c b/sbc/sbc_primitives.c
-> index dce0ed2..0b48ddb 100644
-> --- a/sbc/sbc_primitives.c
-> +++ b/sbc/sbc_primitives.c
-> @@ -521,6 +521,8 @@ static int sbc_calc_scalefactors_j(
->  */
-> void sbc_init_primitives(struct sbc_encoder_state *state)
-> {
-> +	state->odd = 1;
-> +
-> 	/* Default implementation for analyze functions */
-> 	state->sbc_analyze_4s = sbc_analyze_4b_4s_simd;
-> 	state->sbc_analyze_8s = sbc_analyze_4b_8s_simd;
-> diff --git a/sbc/sbc_primitives.h b/sbc/sbc_primitives.h
-> index 267c277..ffee339 100644
-> --- a/sbc/sbc_primitives.h
-> +++ b/sbc/sbc_primitives.h
-> @@ -40,6 +40,7 @@ struct sbc_encoder_state {
-> 	int position;
-> 	/* Number of consecutive blocks handled by the encoder */
-> 	int increment;
-> +	int odd;
+> diff --git a/include/net/bluetooth/sco.h b/include/net/bluetooth/sco.h
+> index 1e35c43..41dbdfa 100644
+> --- a/include/net/bluetooth/sco.h
+> +++ b/include/net/bluetooth/sco.h
+> @@ -43,6 +43,7 @@ struct sockaddr_sco {
+> #define SCO_OPTIONS	0x01
+> struct sco_options {
+> 	__u16 mtu;
+> +	__u16 voice_setting;
+> };
 
-lets start using bool here. We should keep the memory footprint as small as possible.
+I find this parameter name a bit long. What about just "setting" or "settings" or "voice". I am open for suggestions.
 
-We could also discuss using uint8_t instead of int in some cases. Or go with unsigned int in some cases.
+Also should this be part of options or the socket address structure.
+
+Another option would be to introduce a SCO_SETTINGS or SCO_VOICE socket option. With just this one parameter.
+
+Since the default value of voice setting is not 0x0000, it might make actually more sense to introduce a new socket option. Playing the memset handling would only work nicely if the default would be 0x0000, but it isn't.
 
 Regards
 
