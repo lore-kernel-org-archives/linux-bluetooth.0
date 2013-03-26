@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v1 09/11] input: Hold a reference to btd_service
-Date: Tue, 26 Mar 2013 17:13:52 +0100
-Message-Id: <1364314434-9796-10-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v1 07/11] audio: Hold a reference to btd_service
+Date: Tue, 26 Mar 2013 17:13:50 +0100
+Message-Id: <1364314434-9796-8-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1364314434-9796-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1364314434-9796-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,284 +13,277 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
 Profile implementations are expected to hold a reference to probed
-services, so update the input profiles accordingly.
+services, so update the audio profiles accordingly.
 ---
- profiles/input/device.c  | 74 +++++++++++++++++++++++++-----------------------
- profiles/input/device.h  |  8 +++---
- profiles/input/manager.c | 41 ++++-----------------------
- 3 files changed, 48 insertions(+), 75 deletions(-)
+ profiles/audio/control.c | 28 ++++++++++++++++++++++------
+ profiles/audio/control.h |  7 +++++--
+ profiles/audio/manager.c |  9 ++++-----
+ profiles/audio/sink.c    |  6 +++++-
+ profiles/audio/sink.h    |  4 +++-
+ profiles/audio/source.c  |  7 ++++++-
+ profiles/audio/source.h  |  5 ++++-
+ 7 files changed, 49 insertions(+), 17 deletions(-)
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index 1da9d99..2115111 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -44,6 +44,7 @@
+diff --git a/profiles/audio/control.c b/profiles/audio/control.c
+index ebaf319..407e589 100644
+--- a/profiles/audio/control.c
++++ b/profiles/audio/control.c
+@@ -48,6 +48,8 @@
+ #include "lib/uuid.h"
  #include "../src/adapter.h"
  #include "../src/device.h"
- #include "../src/profile.h"
++#include "../src/profile.h"
 +#include "../src/service.h"
- #include "../src/storage.h"
- #include "../src/dbus-common.h"
  
-@@ -55,9 +56,9 @@
- #include "sdp-client.h"
+ #include "log.h"
+ #include "error.h"
+@@ -61,7 +63,8 @@
  
- struct input_device {
-+	struct btd_service	*service;
- 	struct btd_device	*device;
- 	char			*path;
--	char			*uuid;
- 	bdaddr_t		src;
- 	bdaddr_t		dst;
- 	uint32_t		handle;
-@@ -66,7 +67,6 @@ struct input_device {
- 	guint			ctrl_watch;
- 	guint			intr_watch;
- 	guint			sec_watch;
--	int			timeout;
- 	struct hidp_connadd_req *req;
- 	guint			dc_id;
- 	gboolean		disable_sdp;
-@@ -74,6 +74,12 @@ struct input_device {
+ struct control {
+ 	struct avctp *session;
+-	gboolean target;
++	struct btd_service *target;
++	struct btd_service *remote;
+ 	unsigned int avctp_id;
  };
  
- static GSList *devices = NULL;
-+static int idle_timeout = 0;
+@@ -251,6 +254,12 @@ static void path_unregister(void *data)
+ 
+ 	avctp_remove_state_cb(control->avctp_id);
+ 
++	if (control->target)
++		btd_service_unref(control->target);
 +
-+void input_set_idle_timeout(int timeout)
-+{
-+	idle_timeout = timeout;
-+}
- 
- static struct input_device *find_device_by_path(GSList *list, const char *path)
- {
-@@ -92,6 +98,7 @@ static void input_device_free(struct input_device *idev)
- 	if (idev->dc_id)
- 		device_remove_disconnect_watch(idev->device, idev->dc_id);
- 
-+	btd_service_unref(idev->service);
- 	btd_device_unref(idev->device);
- 	g_free(idev->name);
- 	g_free(idev->path);
-@@ -111,8 +118,6 @@ static void input_device_free(struct input_device *idev)
- 	if (idev->ctrl_io)
- 		g_io_channel_unref(idev->ctrl_io);
- 
--	g_free(idev->uuid);
--
- 	g_free(idev);
++	if (control->remote)
++		btd_service_unref(control->remote);
++
+ 	g_free(control);
+ 	dev->control = NULL;
+ }
+@@ -262,13 +271,20 @@ void control_unregister(struct audio_device *dev)
+ 						AUDIO_CONTROL_INTERFACE);
  }
  
-@@ -366,7 +371,7 @@ static int hidp_add_connection(struct input_device *idev)
- 	req->ctrl_sock = g_io_channel_unix_get_fd(idev->ctrl_io);
- 	req->intr_sock = g_io_channel_unix_get_fd(idev->intr_io);
- 	req->flags     = 0;
--	req->idle_to   = idev->timeout;
-+	req->idle_to   = idle_timeout;
+-void control_update(struct control *control, const char *uuid)
++void control_update(struct control *control, struct btd_service *service)
+ {
+-	if (bt_uuid_strcmp(uuid, AVRCP_TARGET_UUID) == 0)
+-		control->target = TRUE;
++	struct btd_profile *p = btd_service_get_profile(service);
++	const char *uuid = p->remote_uuid;
++
++	if (!control->target && bt_uuid_strcmp(uuid, AVRCP_TARGET_UUID) == 0)
++		control->target = btd_service_ref(service);
++	else if (!control->remote &&
++				bt_uuid_strcmp(uuid, AVRCP_REMOTE_UUID) == 0)
++		control->remote = btd_service_ref(service);
+ }
  
- 	ba2str(&idev->src, src_addr);
- 	ba2str(&idev->dst, dst_addr);
-@@ -674,10 +679,21 @@ int input_device_disconnect(struct btd_device *dev, struct btd_profile *profile)
+-struct control *control_init(struct audio_device *dev, const char *uuid)
++struct control *control_init(struct audio_device *dev,
++						struct btd_service *service)
+ {
+ 	struct control *control;
+ 
+@@ -285,7 +301,7 @@ struct control *control_init(struct audio_device *dev, const char *uuid)
+ 
+ 	control = g_new0(struct control, 1);
+ 
+-	control_update(control, uuid);
++	control_update(control, service);
+ 
+ 	control->avctp_id = avctp_add_state_cb(dev, state_changed);
+ 
+diff --git a/profiles/audio/control.h b/profiles/audio/control.h
+index 82ad0d2..0176b54 100644
+--- a/profiles/audio/control.h
++++ b/profiles/audio/control.h
+@@ -24,8 +24,11 @@
+ 
+ #define AUDIO_CONTROL_INTERFACE "org.bluez.MediaControl1"
+ 
+-struct control *control_init(struct audio_device *dev, const char *uuid);
+-void control_update(struct control *control, const char *uuid);
++struct btd_service;
++
++struct control *control_init(struct audio_device *dev,
++						struct btd_service *service);
++void control_update(struct control *control, struct btd_service *service);
+ void control_unregister(struct audio_device *dev);
+ gboolean control_is_active(struct audio_device *dev);
+ 
+diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
+index c55ef1f..0fa2ec3 100644
+--- a/profiles/audio/manager.c
++++ b/profiles/audio/manager.c
+@@ -114,7 +114,7 @@ static int a2dp_source_probe(struct btd_service *service)
+ 		return -1;
+ 	}
+ 
+-	audio_dev->source = source_init(audio_dev);
++	audio_dev->source = source_init(audio_dev, service);
+ 
  	return 0;
  }
- 
--static struct input_device *input_device_new(struct btd_device *device,
--				const char *path, const uint32_t handle,
--				gboolean disable_sdp)
-+static gboolean is_device_sdp_disable(const sdp_record_t *rec)
- {
-+	sdp_data_t *data;
-+
-+	data = sdp_data_get(rec, SDP_ATTR_HID_SDP_DISABLE);
-+
-+	return data && data->val.uint8;
-+}
-+
-+static struct input_device *input_device_new(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	const char *path = device_get_path(device);
-+	struct btd_profile *p = btd_service_get_profile(service);
-+	const sdp_record_t *rec = btd_device_get_record(device, p->remote_uuid);
- 	struct btd_adapter *adapter = device_get_adapter(device);
- 	struct input_device *idev;
- 	char name[HCI_MAX_NAME_LENGTH + 1];
-@@ -685,10 +701,11 @@ static struct input_device *input_device_new(struct btd_device *device,
- 	idev = g_new0(struct input_device, 1);
- 	bacpy(&idev->src, adapter_get_address(adapter));
- 	bacpy(&idev->dst, device_get_address(device));
-+	idev->service = btd_service_ref(service);
- 	idev->device = btd_device_ref(device);
- 	idev->path = g_strdup(path);
--	idev->handle = handle;
--	idev->disable_sdp = disable_sdp;
-+	idev->handle = rec->handle;
-+	idev->disable_sdp = is_device_sdp_disable(rec);
- 
- 	device_get_name(device, name, HCI_MAX_NAME_LENGTH);
- 	if (strlen(name) > 0)
-@@ -697,19 +714,10 @@ static struct input_device *input_device_new(struct btd_device *device,
- 	return idev;
- }
- 
--static gboolean is_device_sdp_disable(const sdp_record_t *rec)
--{
--	sdp_data_t *data;
--
--	data = sdp_data_get(rec, SDP_ATTR_HID_SDP_DISABLE);
--
--	return data && data->val.uint8;
--}
--
--int input_device_register(struct btd_device *device,
--					const char *path, const char *uuid,
--					const sdp_record_t *rec, int timeout)
-+int input_device_register(struct btd_service *service)
- {
-+	struct btd_device *device = btd_service_get_device(service);
-+	const char *path = device_get_path(device);
- 	struct input_device *idev;
- 
- 	DBG("%s", path);
-@@ -718,13 +726,11 @@ int input_device_register(struct btd_device *device,
- 	if (idev)
- 		return -EEXIST;
- 
--	idev = input_device_new(device, path, rec->handle,
--			is_device_sdp_disable(rec));
-+	idev = input_device_new(service);
- 	if (!idev)
- 		return -EINVAL;
- 
--	idev->timeout = timeout;
--	idev->uuid = g_strdup(uuid);
-+	btd_service_set_user_data(service, idev);
- 
- 	devices = g_slist_append(devices, idev);
- 
-@@ -746,25 +752,21 @@ static struct input_device *find_device(const bdaddr_t *src,
- 	return NULL;
- }
- 
--int input_device_unregister(const char *path, const char *uuid)
-+void input_device_unregister(struct btd_service *service)
- {
--	struct input_device *idev;
-+	struct btd_device *device = btd_service_get_device(service);
-+	const char *path = device_get_path(device);
-+	struct input_device *idev = btd_service_get_user_data(service);
- 
- 	DBG("%s", path);
- 
--	idev = find_device_by_path(devices, path);
--	if (idev == NULL)
--		return -EINVAL;
--
- 	if (idev->ctrl_io) {
--		/* Pending connection running */
--		return -EBUSY;
-+		/* FIXME: pending connection running */
-+		return;
+@@ -130,7 +130,7 @@ static int a2dp_sink_probe(struct btd_service *service)
+ 		return -1;
  	}
  
- 	devices = g_slist_remove(devices, idev);
- 	input_device_free(idev);
--
--	return 0;
+-	audio_dev->sink = sink_init(audio_dev);
++	audio_dev->sink = sink_init(audio_dev, service);
+ 
+ 	return 0;
  }
- 
- static int input_device_connadd(struct input_device *idev)
-diff --git a/profiles/input/device.h b/profiles/input/device.h
-index aabc79c..fd7f847 100644
---- a/profiles/input/device.h
-+++ b/profiles/input/device.h
-@@ -27,10 +27,10 @@
- struct input_device;
- struct input_conn;
- 
--int input_device_register(struct btd_device *device, const char *path,
--				const char *uuid, const sdp_record_t *rec,
--				int timeout);
--int input_device_unregister(const char *path, const char *uuid);
-+void input_set_idle_timeout(int timeout);
-+
-+int input_device_register(struct btd_service *service);
-+void input_device_unregister(struct btd_service *service);
- 
- int input_device_set_channel(const bdaddr_t *src, const bdaddr_t *dst, int psm,
- 							GIOChannel *io);
-diff --git a/profiles/input/manager.c b/profiles/input/manager.c
-index 72a4e3b..dc771a6 100644
---- a/profiles/input/manager.c
-+++ b/profiles/input/manager.c
-@@ -45,39 +45,6 @@
- #include "server.h"
- #include "manager.h"
- 
--static int idle_timeout = 0;
--
--static void input_remove(struct btd_device *device, const char *uuid)
--{
--	const char *path = device_get_path(device);
--
--	DBG("path %s", path);
--
--	input_device_unregister(path, uuid);
--}
--
--static int hid_device_probe(struct btd_service *service)
--{
--	struct btd_device *device = btd_service_get_device(service);
--	const char *path = device_get_path(device);
--	const sdp_record_t *rec = btd_device_get_record(device, HID_UUID);
--
--	DBG("path %s", path);
--
--	if (!rec)
--		return -1;
--
--	return input_device_register(device, path, HID_UUID, rec,
--							idle_timeout * 60);
--}
--
--static void hid_device_remove(struct btd_service *service)
--{
--	struct btd_device *device = btd_service_get_device(service);
--
--	input_remove(device, HID_UUID);
--}
--
- static int hid_server_probe(struct btd_profile *p, struct btd_adapter *adapter)
+@@ -138,7 +138,6 @@ static int a2dp_sink_probe(struct btd_service *service)
+ static int avrcp_probe(struct btd_service *service)
  {
- 	return server_start(adapter_get_address(adapter));
-@@ -98,8 +65,8 @@ static struct btd_profile input_profile = {
- 	.connect	= input_device_connect,
- 	.disconnect	= input_device_disconnect,
+ 	struct btd_device *device = btd_service_get_device(service);
+-	struct btd_profile *p = btd_service_get_profile(service);
+ 	struct audio_device *audio_dev;
  
--	.device_probe	= hid_device_probe,
--	.device_remove	= hid_device_remove,
-+	.device_probe	= input_device_register,
-+	.device_remove	= input_device_unregister,
- 
- 	.adapter_probe	= hid_server_probe,
- 	.adapter_remove = hid_server_remove,
-@@ -140,12 +107,16 @@ static int input_init(void)
- 
- 	config = load_config_file(CONFIGDIR "/input.conf");
- 	if (config) {
-+		int idle_timeout;
-+
- 		idle_timeout = g_key_file_get_integer(config, "General",
- 						"IdleTimeout", &err);
- 		if (err) {
- 			DBG("input.conf: %s", err->message);
- 			g_error_free(err);
- 		}
-+
-+		input_set_idle_timeout(idle_timeout * 60);
+ 	audio_dev = get_audio_dev(device);
+@@ -148,9 +147,9 @@ static int avrcp_probe(struct btd_service *service)
  	}
  
- 	btd_profile_register(&input_profile);
+ 	if (audio_dev->control)
+-		control_update(audio_dev->control, p->remote_uuid);
++		control_update(audio_dev->control, service);
+ 	else
+-		audio_dev->control = control_init(audio_dev, p->remote_uuid);
++		audio_dev->control = control_init(audio_dev, service);
+ 
+ 	if (audio_dev->sink && sink_is_active(audio_dev))
+ 		avrcp_connect(audio_dev);
+diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
+index f023307..9f1a2d9 100644
+--- a/profiles/audio/sink.c
++++ b/profiles/audio/sink.c
+@@ -41,6 +41,7 @@
+ 
+ #include "../src/adapter.h"
+ #include "../src/device.h"
++#include "../src/service.h"
+ 
+ #include "device.h"
+ #include "avdtp.h"
+@@ -55,6 +56,7 @@
+ 
+ struct sink {
+ 	struct audio_device *dev;
++	struct btd_service *service;
+ 	struct avdtp *session;
+ 	struct avdtp_stream *stream;
+ 	unsigned int cb_id;
+@@ -361,6 +363,7 @@ static void sink_free(struct audio_device *dev)
+ 		g_source_remove(sink->retry_id);
+ 
+ 	avdtp_remove_state_cb(sink->avdtp_callback_id);
++	btd_service_unref(sink->service);
+ 
+ 	g_free(sink);
+ 	dev->sink = NULL;
+@@ -372,7 +375,7 @@ void sink_unregister(struct audio_device *dev)
+ 	sink_free(dev);
+ }
+ 
+-struct sink *sink_init(struct audio_device *dev)
++struct sink *sink_init(struct audio_device *dev, struct btd_service *service)
+ {
+ 	struct sink *sink;
+ 
+@@ -381,6 +384,7 @@ struct sink *sink_init(struct audio_device *dev)
+ 	sink = g_new0(struct sink, 1);
+ 
+ 	sink->dev = dev;
++	sink->service = btd_service_ref(service);
+ 
+ 	sink->avdtp_callback_id = avdtp_add_state_cb(dev, avdtp_state_callback);
+ 
+diff --git a/profiles/audio/sink.h b/profiles/audio/sink.h
+index ba0dde8..1f20545 100644
+--- a/profiles/audio/sink.h
++++ b/profiles/audio/sink.h
+@@ -36,11 +36,13 @@ typedef void (*sink_state_cb) (struct audio_device *dev,
+ 				sink_state_t new_state,
+ 				void *user_data);
+ 
++struct btd_service;
++
+ unsigned int sink_add_state_cb(struct audio_device *dev, sink_state_cb cb,
+ 							void *user_data);
+ gboolean sink_remove_state_cb(unsigned int id);
+ 
+-struct sink *sink_init(struct audio_device *dev);
++struct sink *sink_init(struct audio_device *dev, struct btd_service *service);
+ void sink_unregister(struct audio_device *dev);
+ gboolean sink_is_active(struct audio_device *dev);
+ int sink_connect(struct audio_device *dev);
+diff --git a/profiles/audio/source.c b/profiles/audio/source.c
+index 5d9e237..20fd412 100644
+--- a/profiles/audio/source.c
++++ b/profiles/audio/source.c
+@@ -42,6 +42,7 @@
+ 
+ #include "../src/adapter.h"
+ #include "../src/device.h"
++#include "../src/service.h"
+ 
+ #include "device.h"
+ #include "avdtp.h"
+@@ -56,6 +57,7 @@
+ 
+ struct source {
+ 	struct audio_device *dev;
++	struct btd_service *service;
+ 	struct avdtp *session;
+ 	struct avdtp_stream *stream;
+ 	unsigned int cb_id;
+@@ -365,6 +367,7 @@ static void source_free(struct audio_device *dev)
+ 		g_source_remove(source->retry_id);
+ 
+ 	avdtp_remove_state_cb(source->avdtp_callback_id);
++	btd_service_unref(source->service);
+ 
+ 	g_free(source);
+ 	dev->source = NULL;
+@@ -377,7 +380,8 @@ void source_unregister(struct audio_device *dev)
+ 	source_free(dev);
+ }
+ 
+-struct source *source_init(struct audio_device *dev)
++struct source *source_init(struct audio_device *dev,
++						struct btd_service *service)
+ {
+ 	struct source *source;
+ 
+@@ -386,6 +390,7 @@ struct source *source_init(struct audio_device *dev)
+ 	source = g_new0(struct source, 1);
+ 
+ 	source->dev = dev;
++	source->service = btd_service_ref(service);
+ 
+ 	source->avdtp_callback_id = avdtp_add_state_cb(dev,
+ 							avdtp_state_callback);
+diff --git a/profiles/audio/source.h b/profiles/audio/source.h
+index 61afd94..0156423 100644
+--- a/profiles/audio/source.h
++++ b/profiles/audio/source.h
+@@ -37,11 +37,14 @@ typedef void (*source_state_cb) (struct audio_device *dev,
+ 				source_state_t new_state,
+ 				void *user_data);
+ 
++struct btd_service;
++
+ unsigned int source_add_state_cb(struct audio_device *dev, source_state_cb cb,
+ 							void *user_data);
+ gboolean source_remove_state_cb(unsigned int id);
+ 
+-struct source *source_init(struct audio_device *dev);
++struct source *source_init(struct audio_device *dev,
++				struct btd_service *service);
+ void source_unregister(struct audio_device *dev);
+ int source_connect(struct audio_device *dev);
+ gboolean source_new_stream(struct audio_device *dev, struct avdtp *session,
 -- 
 1.8.1.4
 
