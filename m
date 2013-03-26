@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v1 08/11] network: Hold a reference to btd_service
-Date: Tue, 26 Mar 2013 17:13:51 +0100
-Message-Id: <1364314434-9796-9-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v1 10/11] service: Add callbacks to track state changes
+Date: Tue, 26 Mar 2013 17:13:53 +0100
+Message-Id: <1364314434-9796-11-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1364314434-9796-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1364314434-9796-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,227 +12,111 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Profile implementations are expected to hold a reference to probed
-services, so update the network profiles accordingly.
+Extend the btd_service API to support state observers.
 ---
- profiles/network/connection.c | 38 ++++++++++++++++++++++++++--------
- profiles/network/connection.h |  4 ++--
- profiles/network/manager.c    | 48 ++++++-------------------------------------
- 3 files changed, 37 insertions(+), 53 deletions(-)
+ src/service.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ src/service.h |  8 ++++++++
+ 2 files changed, 56 insertions(+)
 
-diff --git a/profiles/network/connection.c b/profiles/network/connection.c
-index 3a913cf..1ecff4d 100644
---- a/profiles/network/connection.c
-+++ b/profiles/network/connection.c
-@@ -43,6 +43,8 @@
- #include "dbus-common.h"
- #include "adapter.h"
- #include "device.h"
-+#include "profile.h"
-+#include "service.h"
- 
- #include "error.h"
- #include "common.h"
-@@ -65,6 +67,7 @@ struct network_peer {
+diff --git a/src/service.c b/src/service.c
+index 090dd06..e3239ee 100644
+--- a/src/service.c
++++ b/src/service.c
+@@ -55,6 +55,14 @@ struct btd_service {
+ 	int			err;
  };
  
- struct network_conn {
-+	struct btd_service *service;
- 	char		dev[16];	/* Interface name */
- 	uint16_t	id;		/* Role: Service Class Identifier */
- 	conn_state	state;
-@@ -83,6 +86,13 @@ struct __service_16 {
- 
- static GSList *peers = NULL;
- 
-+static uint16_t get_service_id(struct btd_service *service)
-+{
-+	struct btd_profile *p = btd_service_get_profile(service);
++struct service_state_callback {
++	btd_service_state_cb	cb;
++	void			*user_data;
++	guint			id;
++};
 +
-+	return bnep_service_id(p->remote_uuid);
++static GSList *state_callbacks;
++
+ static const char *state2str(btd_service_state_t state)
+ {
+ 	switch(state) {
+@@ -108,6 +116,7 @@ static void service_set_state(struct btd_service *service,
+ 						btd_service_state_t state)
+ {
+ 	btd_service_state_t old = service->state;
++	GSList *l;
+ 
+ 	if (state == old)
+ 		return;
+@@ -116,6 +125,45 @@ static void service_set_state(struct btd_service *service,
+ 
+ 	DBG("State changed %p: %s -> %s", service, state2str(old),
+ 							state2str(state));
++
++	for (l = state_callbacks; l != NULL; l = g_slist_next(l)) {
++		struct service_state_callback *cb = l->data;
++
++		cb->cb(service, old, state, cb->user_data);
++	}
 +}
 +
- static struct network_peer *find_peer(GSList *list, struct btd_device *device)
- {
- 	for (; list; list = list->next) {
-@@ -599,6 +609,7 @@ static void connection_free(void *data)
- 	if (nc->connect)
- 		dbus_message_unref(nc->connect);
- 
-+	btd_service_unref(nc->service);
- 	g_free(nc);
- }
- 
-@@ -639,13 +650,14 @@ static const GDBusPropertyTable connection_properties[] = {
- 	{ }
- };
- 
--void connection_unregister(struct btd_device *device)
-+void connection_unregister(struct btd_service *service)
- {
--	struct network_peer *peer;
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct network_conn *conn = btd_service_get_user_data(service);
-+	struct network_peer *peer = conn->peer;
-+	uint16_t id = get_service_id(service);
- 
--	peer = find_peer(peers, device);
--	if (!peer)
--		return;
-+	DBG("%s id %u", device_get_path(device), id);
- 
- 	g_slist_free_full(peer->connections, connection_free);
- 	peer->connections = NULL;
-@@ -682,12 +694,14 @@ static struct network_peer *create_peer(struct btd_device *device)
- 	return peer;
- }
- 
--int connection_register(struct btd_device *device, uint16_t id)
-+int connection_register(struct btd_service *service)
- {
-+	struct btd_device *device = btd_service_get_device(service);
- 	struct network_peer *peer;
- 	struct network_conn *nc;
-+	uint16_t id = get_service_id(service);
- 
--	DBG("id %u", id);
-+	DBG("%s id %u", device_get_path(device), id);
- 
- 	peer = find_peer(peers, device);
- 	if (!peer) {
-@@ -698,16 +712,22 @@ int connection_register(struct btd_device *device, uint16_t id)
- 	}
- 
- 	nc = find_connection(peer->connections, id);
--	if (nc)
--		return 0;
-+	if (nc) {
-+		error("Device %s has multiple connection instances of %d",
-+						device_get_path(device), id);
-+		return -1;
-+	}
- 
- 	nc = g_new0(struct network_conn, 1);
- 	nc->id = id;
- 	memset(nc->dev, 0, sizeof(nc->dev));
- 	strcpy(nc->dev, "bnep%d");
-+	nc->service = btd_service_ref(service);
- 	nc->state = DISCONNECTED;
- 	nc->peer = peer;
- 
-+	btd_service_set_user_data(service, nc);
++guint btd_service_add_state_cb(btd_service_state_cb cb, void *user_data)
++{
++	struct service_state_callback *state_cb;
++	static guint id = 0;
 +
- 	DBG("id %u registered", id);
- 
- 	peer->connections = g_slist_append(peer->connections, nc);
-diff --git a/profiles/network/connection.h b/profiles/network/connection.h
-index 32356f9..1e7eedb 100644
---- a/profiles/network/connection.h
-+++ b/profiles/network/connection.h
-@@ -21,7 +21,7 @@
-  *
-  */
- 
--int connection_register(struct btd_device *device, uint16_t id);
--void connection_unregister(struct btd_device *device);
-+int connection_register(struct btd_service *service);
-+void connection_unregister(struct btd_service *service);
- int connection_connect(struct btd_device *device, uint16_t id);
- int connection_disconnect(struct btd_device *device, uint16_t id);
-diff --git a/profiles/network/manager.c b/profiles/network/manager.c
-index d860cc0..f37954a 100644
---- a/profiles/network/manager.c
-+++ b/profiles/network/manager.c
-@@ -75,24 +75,6 @@ done:
- 				conf_security ? "true" : "false");
++	state_cb = g_new0(struct service_state_callback, 1);
++	state_cb->cb = cb;
++	state_cb->user_data = user_data;
++	state_cb->id = ++id;
++
++	state_callbacks = g_slist_append(state_callbacks, state_cb);
++
++	return state_cb->id;
++}
++
++gboolean btd_service_remove_state_cb(guint id)
++{
++	GSList *l;
++
++	for (l = state_callbacks; l != NULL; l = g_slist_next(l)) {
++		struct service_state_callback *cb = l->data;
++
++		if (cb && cb->id == id) {
++			state_callbacks = g_slist_remove_link(state_callbacks,
++									l);
++			g_free(cb);
++			return TRUE;
++		}
++	}
++
++	return FALSE;
  }
  
--static int panu_probe(struct btd_service *service)
--{
--	struct btd_device *device = btd_service_get_device(service);
--
--	DBG("path %s", device_get_path(device));
--
--	return connection_register(device, BNEP_SVC_PANU);
--}
--
--static void network_remove(struct btd_service *service)
--{
--	struct btd_device *device = btd_service_get_device(service);
--
--	DBG("path %s", device_get_path(device));
--
--	connection_unregister(device);
--}
--
- static int panu_connect(struct btd_device *dev, struct btd_profile *profile)
- {
- 	return connection_connect(dev, BNEP_SVC_PANU);
-@@ -122,15 +104,6 @@ static void panu_server_remove(struct btd_profile *p,
- 	server_unregister(adapter, BNEP_SVC_PANU);
- }
+ struct btd_service *service_create(struct btd_device *device,
+diff --git a/src/service.h b/src/service.h
+index 596898b..63537d7 100644
+--- a/src/service.h
++++ b/src/service.h
+@@ -31,6 +31,11 @@ typedef enum {
  
--static int gn_probe(struct btd_service *service)
--{
--	struct btd_device *device = btd_service_get_device(service);
--
--	DBG("path %s", device_get_path(device));
--
--	return connection_register(device, BNEP_SVC_GN);
--}
--
- static int gn_connect(struct btd_device *dev, struct btd_profile *profile)
- {
- 	return connection_connect(dev, BNEP_SVC_GN);
-@@ -160,15 +133,6 @@ static void gn_server_remove(struct btd_profile *p,
- 	server_unregister(adapter, BNEP_SVC_GN);
- }
+ struct btd_service;
  
--static int nap_probe(struct btd_service *service)
--{
--	struct btd_device *device = btd_service_get_device(service);
--
--	DBG("path %s", device_get_path(device));
--
--	return connection_register(device, BNEP_SVC_NAP);
--}
--
- static int nap_connect(struct btd_device *dev, struct btd_profile *profile)
- {
- 	return connection_connect(dev, BNEP_SVC_NAP);
-@@ -202,8 +166,8 @@ static struct btd_profile panu_profile = {
- 	.name		= "network-panu",
- 	.local_uuid	= NAP_UUID,
- 	.remote_uuid	= PANU_UUID,
--	.device_probe	= panu_probe,
--	.device_remove	= network_remove,
-+	.device_probe	= connection_register,
-+	.device_remove	= connection_unregister,
- 	.connect	= panu_connect,
- 	.disconnect	= panu_disconnect,
- 	.adapter_probe	= panu_server_probe,
-@@ -214,8 +178,8 @@ static struct btd_profile gn_profile = {
- 	.name		= "network-gn",
- 	.local_uuid	= PANU_UUID,
- 	.remote_uuid	= GN_UUID,
--	.device_probe	= gn_probe,
--	.device_remove	= network_remove,
-+	.device_probe	= connection_register,
-+	.device_remove	= connection_unregister,
- 	.connect	= gn_connect,
- 	.disconnect	= gn_disconnect,
- 	.adapter_probe	= gn_server_probe,
-@@ -226,8 +190,8 @@ static struct btd_profile nap_profile = {
- 	.name		= "network-nap",
- 	.local_uuid	= PANU_UUID,
- 	.remote_uuid	= NAP_UUID,
--	.device_probe	= nap_probe,
--	.device_remove	= network_remove,
-+	.device_probe	= connection_register,
-+	.device_remove	= connection_unregister,
- 	.connect	= nap_connect,
- 	.disconnect	= nap_disconnect,
- 	.adapter_probe	= nap_server_probe,
++typedef void (*btd_service_state_cb) (struct btd_service *service,
++						btd_service_state_t old_state,
++						btd_service_state_t new_state,
++						void *user_data);
++
+ struct btd_service *service_create(struct btd_device *device,
+ 						struct btd_profile *profile);
+ 
+@@ -41,6 +46,9 @@ struct btd_device *btd_service_get_device(const struct btd_service *service);
+ struct btd_profile *btd_service_get_profile(const struct btd_service *service);
+ btd_service_state_t btd_service_get_state(const struct btd_service *service);
+ 
++guint btd_service_add_state_cb(btd_service_state_cb cb, void *user_data);
++gboolean btd_service_remove_state_cb(guint id);
++
+ void btd_service_set_user_data(struct btd_service *service, void *user_data);
+ void *btd_service_get_user_data(const struct btd_service *service);
+ int btd_service_get_error(const struct btd_service *service);
 -- 
 1.8.1.4
 
