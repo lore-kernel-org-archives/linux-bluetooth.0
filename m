@@ -1,37 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
+From: Chan-yeol Park <chanyeol.park@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 0/3] Fix Inquiry command support in HCI request framework
-Date: Wed, 27 Mar 2013 20:04:54 -0300
-Message-Id: <1364425497-30944-1-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v4 3/3] Bluetooth: Remove trivial white space
+Date: Thu, 28 Mar 2013 02:09:09 +0900
+Message-id: <1364404149-12853-3-git-send-email-chanyeol.park@samsung.com>
+In-reply-to: <1364404149-12853-1-git-send-email-chanyeol.park@samsung.com>
+References: <1364404149-12853-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Signed-off-by: Chan-yeol Park <chanyeol.park@samsung.com>
+---
+ drivers/bluetooth/hci_ldisc.c |   10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-This v2 implements the following comments about the previous patch set:
- - Consider commands (which don't send Command Complete Event) as completed
-   based on Command Status Event.
- - Remove hci_req_cmd_status function.
-
-Thus, for those HCI commands which don't send Command Complete Event, the HCI
-request framework considers they have completed when the Command Status Event
-is received. 
-
-Regards,
-
-Andre
-
-Andre Guedes (3):
-  Bluetooth: Fix HCI request framework
-  Bluetooth: Fix hci_inquiry
-  Bluetooth: Remove hci_req_cmd_status
-
- include/net/bluetooth/hci_core.h |  1 -
- net/bluetooth/hci_core.c         | 39 +++++++++++++--------------------------
- net/bluetooth/hci_event.c        | 11 ++++++-----
- 3 files changed, 19 insertions(+), 32 deletions(-)
-
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index d710d8b..bc68a44 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -260,12 +260,12 @@ static int hci_uart_send_frame(struct sk_buff *skb)
+ 
+ /* ------ LDISC part ------ */
+ /* hci_uart_tty_open
+- * 
++ *
+  *     Called when line discipline changed to HCI_UART.
+  *
+  * Arguments:
+  *     tty    pointer to tty info structure
+- * Return Value:    
++ * Return Value:
+  *     0 if success, otherwise error code
+  */
+ static int hci_uart_tty_open(struct tty_struct *tty)
+@@ -365,15 +365,15 @@ static void hci_uart_tty_wakeup(struct tty_struct *tty)
+ }
+ 
+ /* hci_uart_tty_receive()
+- * 
++ *
+  *     Called by tty low level driver when receive data is
+  *     available.
+- *     
++ *
+  * Arguments:  tty          pointer to tty isntance data
+  *             data         pointer to received data
+  *             flags        pointer to flags for data
+  *             count        count of received data in bytes
+- *     
++ *
+  * Return Value:    None
+  */
+ static void hci_uart_tty_receive(struct tty_struct *tty, const u8 *data, char *flags, int count)
 -- 
-1.8.1.2
+1.7.10.4
 
