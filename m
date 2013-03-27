@@ -1,74 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/3] Bluetooth: Remove hci_req_cmd_status
-Date: Wed, 27 Mar 2013 20:04:57 -0300
-Message-Id: <1364425497-30944-4-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v2 2/3] Bluetooth: Fix hci_inquiry
+Date: Wed, 27 Mar 2013 20:04:56 -0300
+Message-Id: <1364425497-30944-3-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1364425497-30944-1-git-send-email-andre.guedes@openbossa.org>
 References: <1364425497-30944-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes the hci_req_cmd_status function since it is not
-used anymore. The HCI request framework now considers the HCI command
-has complete once the Command Status or Command Complete Event is
-received.
+Since the HCI request framework was properly fixed, the hci_req_sync
+call, in hci_inquiry, will return as soon as the HCI command completes
+(not the Inquiry procedure). However, in inquiry ioctl implementation,
+we want to sleep the user process until the inquiry procedure finishes.
+
+This patch changes hci_inquiry so, in case the HCI Inquiry command
+was executed successfully, it waits the HCI_INQUIRY flag to be cleared.
+This way, the user process will sleep until the inquiry procedure
+finishes.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |  1 -
- net/bluetooth/hci_core.c         | 26 --------------------------
- 2 files changed, 27 deletions(-)
+ net/bluetooth/hci_core.c  | 13 +++++++++++++
+ net/bluetooth/hci_event.c |  5 +++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 358a698..0e7ee89 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1055,7 +1055,6 @@ void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
- int hci_req_run(struct hci_request *req, hci_req_complete_t complete);
- void hci_req_add(struct hci_request *req, u16 opcode, u32 plen, void *param);
- void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status);
--void hci_req_cmd_status(struct hci_dev *hdev, u16 opcode, u8 status);
- 
- int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param);
- void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags);
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 1239929..a199d63 100644
+index cfcad54..1239929 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -3322,32 +3322,6 @@ call_complete:
- 		req_complete(hdev, status);
+@@ -818,6 +818,12 @@ static void hci_inq_req(struct hci_request *req, unsigned long opt)
+ 	hci_req_add(req, HCI_OP_INQUIRY, sizeof(cp), &cp);
  }
  
--void hci_req_cmd_status(struct hci_dev *hdev, u16 opcode, u8 status)
--{
--	hci_req_complete_t req_complete = NULL;
--
--	BT_DBG("opcode 0x%04x status 0x%02x", opcode, status);
--
--	if (status) {
--		hci_req_cmd_complete(hdev, opcode, status);
--		return;
--	}
--
--	/* No need to handle success status if there are more commands */
--	if (!hci_req_is_complete(hdev))
--		return;
--
--	if (hdev->sent_cmd)
--		req_complete = bt_cb(hdev->sent_cmd)->req.complete;
--
--	/* If the request doesn't have a complete callback or there
--	 * are other commands/requests in the hdev queue we consider
--	 * this request as completed.
--	 */
--	if (!req_complete || !skb_queue_empty(&hdev->cmd_q))
--		hci_req_cmd_complete(hdev, opcode, status);
--}
--
- static void hci_rx_work(struct work_struct *work)
++static int wait_inquiry(void *word)
++{
++	schedule();
++	return signal_pending(current);
++}
++
+ int hci_inquiry(void __user *arg)
  {
- 	struct hci_dev *hdev = container_of(work, struct hci_dev, rx_work);
+ 	__u8 __user *ptr = arg;
+@@ -849,6 +855,13 @@ int hci_inquiry(void __user *arg)
+ 				   timeo);
+ 		if (err < 0)
+ 			goto done;
++
++		/* Wait until Inquiry procedure finishes (HCI_INQUIRY flag is
++		 * cleared). If it is interrupted by a signal, return -EINTR.
++		 */
++		if (wait_on_bit(&hdev->flags, HCI_INQUIRY, wait_inquiry,
++				TASK_INTERRUPTIBLE))
++			return -EINTR;
+ 	}
+ 
+ 	/* for unlimited number of responses we will use buffer with
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 8efb9c0..7e7fbca 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -48,6 +48,8 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
+ 	}
+ 
+ 	clear_bit(HCI_INQUIRY, &hdev->flags);
++	smp_mb__after_clear_bit(); /* wake_up_bit advises about this barrier */
++	wake_up_bit(&hdev->flags, HCI_INQUIRY);
+ 
+ 	hci_dev_lock(hdev);
+ 	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+@@ -1603,6 +1605,9 @@ static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!test_and_clear_bit(HCI_INQUIRY, &hdev->flags))
+ 		return;
+ 
++	smp_mb__after_clear_bit(); /* wake_up_bit advises about this barrier */
++	wake_up_bit(&hdev->flags, HCI_INQUIRY);
++
+ 	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
+ 		return;
+ 
 -- 
 1.8.1.2
 
