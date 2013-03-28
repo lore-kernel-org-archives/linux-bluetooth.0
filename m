@@ -2,53 +2,57 @@ Return-Path: <cyrus@holtmann.org>
 From: Jefferson Delfes <jefferson.delfes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [PATCH BlueZ 09/16] attrib: Change g_attrib_set_debug return type from gboolean
-Date: Thu, 28 Mar 2013 11:39:13 -0400
-Message-Id: <1364485160-22720-10-git-send-email-jefferson.delfes@openbossa.org>
+Subject: [PATCH BlueZ 10/16] attrib: Change g_attrib_set_mtu return type from gboolean
+Date: Thu, 28 Mar 2013 11:39:14 -0400
+Message-Id: <1364485160-22720-11-git-send-email-jefferson.delfes@openbossa.org>
 In-Reply-To: <1364485160-22720-1-git-send-email-jefferson.delfes@openbossa.org>
 References: <1364485160-22720-1-git-send-email-jefferson.delfes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is no reason to use gboolean in return type of g_attrib_set_debug.
+There is no reason to use gboolean in return type of g_attrib_set_mtu.
 ---
  attrib/gattrib.c | 6 +++---
- attrib/gattrib.h | 4 ++--
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ attrib/gattrib.h | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 1424ef0..bd24a16 100644
+index bd24a16..365a58e 100644
 --- a/attrib/gattrib.c
 +++ b/attrib/gattrib.c
-@@ -644,10 +644,10 @@ bool g_attrib_cancel_all(GAttrib *attrib)
- 	return ret;
+@@ -660,16 +660,16 @@ uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len)
+ 	return attrib->buf;
  }
  
--gboolean g_attrib_set_debug(GAttrib *attrib,
--		GAttribDebugFunc func, gpointer user_data)
-+bool g_attrib_set_debug(GAttrib *attrib, GAttribDebugFunc func,
-+							gpointer user_data)
+-gboolean g_attrib_set_mtu(GAttrib *attrib, int mtu)
++bool g_attrib_set_mtu(GAttrib *attrib, int mtu)
  {
+ 	if (mtu < ATT_DEFAULT_LE_MTU)
+-		return FALSE;
++		return false;
+ 
+ 	attrib->buf = g_realloc(attrib->buf, mtu);
+ 
+ 	attrib->buflen = mtu;
+ 
 -	return TRUE;
 +	return true;
  }
  
- uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len)
+ guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
 diff --git a/attrib/gattrib.h b/attrib/gattrib.h
-index 6e5d183..d3d6d0d 100644
+index d3d6d0d..70c730f 100644
 --- a/attrib/gattrib.h
 +++ b/attrib/gattrib.h
-@@ -58,8 +58,8 @@ guint g_attrib_send(GAttrib *attrib, guint id, const guint8 *pdu, guint16 len,
- bool g_attrib_cancel(GAttrib *attrib, guint id);
- bool g_attrib_cancel_all(GAttrib *attrib);
+@@ -68,7 +68,7 @@ guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
+ gboolean g_attrib_is_encrypted(GAttrib *attrib);
  
--gboolean g_attrib_set_debug(GAttrib *attrib,
--		GAttribDebugFunc func, gpointer user_data);
-+bool g_attrib_set_debug(GAttrib *attrib, GAttribDebugFunc func,
-+							gpointer user_data);
+ uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len);
+-gboolean g_attrib_set_mtu(GAttrib *attrib, int mtu);
++bool g_attrib_set_mtu(GAttrib *attrib, int mtu);
  
- guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
- 				GAttribNotifyFunc func, gpointer user_data,
+ bool g_attrib_unregister(GAttrib *attrib, guint id);
+ bool g_attrib_unregister_all(GAttrib *attrib);
 -- 
 1.8.2
 
