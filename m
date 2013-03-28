@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v7 07/16] sbc: Add iwmmxt primitive for 1b 8s encoding
-Date: Thu, 28 Mar 2013 11:18:54 +0100
-Message-Id: <1364465943-959-8-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v7 05/16] sbc: Add mmx primitive for 1b 8s analysis
+Date: Thu, 28 Mar 2013 11:18:52 +0100
+Message-Id: <1364465943-959-6-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1364465943-959-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1364465943-959-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -14,41 +14,45 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- sbc/sbc_primitives_iwmmxt.c |   18 +++++++++++++++++-
+ sbc/sbc_primitives_mmx.c |   18 +++++++++++++++++-
  1 file changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/sbc/sbc_primitives_iwmmxt.c b/sbc/sbc_primitives_iwmmxt.c
-index 247bb69..43f77e6 100644
---- a/sbc/sbc_primitives_iwmmxt.c
-+++ b/sbc/sbc_primitives_iwmmxt.c
-@@ -295,10 +295,26 @@ static inline void sbc_analyze_4b_8s_iwmmxt(struct sbc_encoder_state *state,
- 	sbc_analyze_eight_iwmmxt(x + 0, out, analysis_consts_fixed8_simd_even);
+diff --git a/sbc/sbc_primitives_mmx.c b/sbc/sbc_primitives_mmx.c
+index d723b0c..4c88c24 100644
+--- a/sbc/sbc_primitives_mmx.c
++++ b/sbc/sbc_primitives_mmx.c
+@@ -277,6 +277,19 @@ static inline void sbc_analyze_4b_8s_mmx(struct sbc_encoder_state *state,
+ 	__asm__ volatile ("emms\n");
  }
  
-+static inline void sbc_analyze_1b_8s_iwmmxt(struct sbc_encoder_state *state,
++static inline void sbc_analyze_1b_8s_mmx(struct sbc_encoder_state *state,
 +		int16_t *x, int32_t *out, int out_stride)
 +{
 +	if (state->odd)
-+		sbc_analyze_eight_iwmmxt(x, out,
-+					analysis_consts_fixed8_simd_odd);
++		sbc_analyze_eight_mmx(x, out, analysis_consts_fixed8_simd_odd);
 +	else
-+		sbc_analyze_eight_iwmmxt(x, out,
-+					analysis_consts_fixed8_simd_even);
++		sbc_analyze_eight_mmx(x, out, analysis_consts_fixed8_simd_even);
 +
 +	state->odd = !state->odd;
++
++	__asm__ volatile ("emms\n");
 +}
 +
- void sbc_init_primitives_iwmmxt(struct sbc_encoder_state *state)
+ static void sbc_calc_scalefactors_mmx(
+ 	int32_t sb_sample_f[16][2][8],
+ 	uint32_t scale_factor[2][8],
+@@ -367,7 +380,10 @@ void sbc_init_primitives_mmx(struct sbc_encoder_state *state)
  {
- 	state->sbc_analyze_4s = sbc_analyze_4b_4s_iwmmxt;
--	state->sbc_analyze_8s = sbc_analyze_4b_8s_iwmmxt;
-+	if (state->increment == 1)
-+		state->sbc_analyze_8s = sbc_analyze_1b_8s_iwmmxt;
-+	else
-+		state->sbc_analyze_8s = sbc_analyze_4b_8s_iwmmxt;
- 	state->implementation_info = "IWMMXT";
- }
- 
+ 	if (check_mmx_support()) {
+ 		state->sbc_analyze_4s = sbc_analyze_4b_4s_mmx;
+-		state->sbc_analyze_8s = sbc_analyze_4b_8s_mmx;
++		if (state->increment == 1)
++			state->sbc_analyze_8s = sbc_analyze_1b_8s_mmx;
++		else
++			state->sbc_analyze_8s = sbc_analyze_4b_8s_mmx;
+ 		state->sbc_calc_scalefactors = sbc_calc_scalefactors_mmx;
+ 		state->implementation_info = "MMX";
+ 	}
 -- 
 1.7.9.5
 
