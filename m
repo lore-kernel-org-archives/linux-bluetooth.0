@@ -1,72 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v8 00/16] mSBC investigations
-Date: Fri, 29 Mar 2013 16:58:04 +0100
-Message-Id: <1364572700-31701-1-git-send-email-frederic.dalleau@linux.intel.com>
+Message-ID: <BAY175-W240DF9C80BE34DD37FB78DE5D20@phx.gbl>
+From: yousif saeed <yufi_saeed@hotmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Listening for notifications/indications
+Date: Thu, 28 Mar 2013 16:47:57 +0000
+Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Dear All
+I'm trying to communicate with a BLE module through a Linux machine (the module is running a heart rate profile). So far, I've been able to do everything I need except listening for Notifications and indications. I've searched through the web, forums, and even tried walking through the source code and still could not find the answer. 
 
-v8 fixes cosmetic issues in sbc_init_msbc, sbcenc and sbcdec.
+I'm using kernel version 3.5 and bluez-5.3.
 
-v7 features bool instead of int for odd state. uint8_t instead of int for
-increment. Little refactoring of sbcinfo and copyrights update for 2013. No
-longer bumps version number.
+Any help is greatly appreciated as this is part of my final year project.
 
-v6 implements sbc_init_msbc(). The SBC_MSBC flag is removed from sbc.h and
-replace by an internal flag in sbc_priv structure.
-The decoder has been validated to mSBC packets sent by an iPhone.
-The encoder couldn't be validated, but at least we know that libsbc encoded
-packets can be decoded by libsbc.
-I bumped version number to 1.1 to help compile time detection.
-
-v5 shoudl fix the few remaining issues.  I could test neon and armv6
-and raised verbosity of commit messages.
-
-Regards,
-Frederic
+Thanks
+Youssif
 
 
-Frédéric Dalleau (16):
-  sbc: Add encoder_state to analysis functions
-  sbc: Break 4 blocks processing to variable steps
-  sbc: Rename sbc_analyze_4b_xx to sbc_analyze_xx
-  sbc: add odd member variable to sbc_encoder_state
-  sbc: Add mmx primitive for 1b 8s analysis
-  sbc: Add armv6 primitive for 1b 8s analysis
-  sbc: Add iwmmxt primitive for 1b 8s encoding
-  sbc: Add plain C primitive for 1b 8s analysis
-  sbc: Use plain C primitive if doing msbc on neon
-  sbc: Fix input reordering for 15 blocks case
-  sbc: Add a private boolean flag to enable 15 block encoding
-  sbc: Declare and implement sbc_init_msbc
-  sbc: Add support for mSBC frame header
-  sbc: Update sbcdec for msbc
-  sbc: Update sbcenc for msbc
-  sbc: Update sbcinfo for msbc
+P.S.
 
- sbc/sbc.c                   |  324 ++++++++++++++++++++++++++++---------------
- sbc/sbc.h                   |    1 +
- sbc/sbc.sym                 |    1 +
- sbc/sbc_primitives.c        |   98 ++++++++++++-
- sbc/sbc_primitives.h        |   13 +-
- sbc/sbc_primitives_armv6.c  |   27 +++-
- sbc/sbc_primitives_iwmmxt.c |   29 +++-
- sbc/sbc_primitives_mmx.c    |   29 +++-
- sbc/sbc_primitives_neon.c   |   13 +-
- src/sbcdec.c                |   23 ++-
- src/sbcenc.c                |  107 ++++++++------
- src/sbcinfo.c               |   54 ++++++--
- 12 files changed, 515 insertions(+), 204 deletions(-)
+Succcessful commands used so far:
+hcitool lescan
+hcitool lecc
+gatttool -b <Mac Address> --primary
+gatttool -b <MAC Address> --characteristics
+gatttool -b <MAC Address> --char-read
+gatttool -b <MAC Address> --char-des
+gatttool -b <MAC Address> --interactive
 
--- 
-1.7.9.5
-
+Failed commands:
+gatttool -b <MAC Address> --listen 		 	   		  
