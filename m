@@ -4,205 +4,335 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v8 15/16] sbc: Update sbcenc for msbc
-Date: Fri, 29 Mar 2013 16:58:19 +0100
-Message-Id: <1364572700-31701-16-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v8 13/16] sbc: Add support for mSBC frame header
+Date: Fri, 29 Mar 2013 16:58:17 +0100
+Message-Id: <1364572700-31701-14-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1364572700-31701-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1364572700-31701-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Traditionnal SBC frame header describe encoding parameters for each frame: nr
+of blocks, subbands, allocation method, and bitpool. In mSBC, only one
+combination of parameter is defined. That combination cannot be expressed using
+a traditionnal SBC header. Because of this, a specific header is defined with
+0xAD followed by two reserved zero bytes.
 ---
- src/sbcenc.c |  107 +++++++++++++++++++++++++++++++++++-----------------------
- 1 file changed, 64 insertions(+), 43 deletions(-)
+ sbc/sbc.c |  228 +++++++++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 138 insertions(+), 90 deletions(-)
 
-diff --git a/src/sbcenc.c b/src/sbcenc.c
-index a723b03..c766767 100644
---- a/src/sbcenc.c
-+++ b/src/sbcenc.c
-@@ -4,6 +4,7 @@
-  *
-  *  Copyright (C) 2008-2010  Nokia Corporation
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2012-2013  Intel Corporation
-  *
-  *
-  *  This program is free software; you can redistribute it and/or modify
-@@ -31,6 +32,7 @@
- #include <fcntl.h>
- #include <unistd.h>
- #include <stdlib.h>
-+#include <stdbool.h>
- #include <stdint.h>
- #include <string.h>
- #include <getopt.h>
-@@ -45,7 +47,7 @@ static int verbose = 0;
- static unsigned char input[BUF_SIZE], output[BUF_SIZE + BUF_SIZE / 4];
- 
- static void encode(char *filename, int subbands, int bitpool, int joint,
--					int dualchannel, int snr, int blocks)
-+				int dualchannel, int snr, int blocks, bool msbc)
+diff --git a/sbc/sbc.c b/sbc/sbc.c
+index d8282ec..70f3251 100644
+--- a/sbc/sbc.c
++++ b/sbc/sbc.c
+@@ -379,8 +379,8 @@ static void sbc_calculate_bits(const struct sbc_frame *frame, int (*bits)[8])
+  *  -3   CRC8 incorrect
+  *  -4   Bitpool value out of bounds
+  */
+-static int sbc_unpack_frame(const uint8_t *data, struct sbc_frame *frame,
+-								size_t len)
++static int sbc_unpack_frame_internal(const uint8_t *data,
++		struct sbc_frame *frame, size_t len)
  {
- 	struct au_header au_hdr;
- 	sbc_t sbc;
-@@ -87,57 +89,69 @@ static void encode(char *filename, int subbands, int bitpool, int joint,
- 		goto done;
- 	}
+ 	unsigned int consumed;
+ 	/* Will copy the parts of the header that are relevant to crc
+@@ -395,59 +395,6 @@ static int sbc_unpack_frame(const uint8_t *data, struct sbc_frame *frame,
+ 	int bits[2][8];		/* bits distribution */
+ 	uint32_t levels[2][8];	/* levels derived from that */
  
--	sbc_init(&sbc, 0L);
+-	if (len < 4)
+-		return -1;
 -
--	switch (BE_INT(au_hdr.sample_rate)) {
--	case 16000:
--		sbc.frequency = SBC_FREQ_16000;
+-	if (data[0] != SBC_SYNCWORD)
+-		return -2;
+-
+-	frame->frequency = (data[1] >> 6) & 0x03;
+-
+-	frame->block_mode = (data[1] >> 4) & 0x03;
+-	switch (frame->block_mode) {
+-	case SBC_BLK_4:
+-		frame->blocks = 4;
 -		break;
--	case 32000:
--		sbc.frequency = SBC_FREQ_32000;
+-	case SBC_BLK_8:
+-		frame->blocks = 8;
 -		break;
--	case 44100:
--		sbc.frequency = SBC_FREQ_44100;
+-	case SBC_BLK_12:
+-		frame->blocks = 12;
 -		break;
--	case 48000:
--		sbc.frequency = SBC_FREQ_48000;
+-	case SBC_BLK_16:
+-		frame->blocks = 16;
 -		break;
 -	}
-+	if (!msbc) {
-+		sbc_init(&sbc, 0L);
+-
+-	frame->mode = (data[1] >> 2) & 0x03;
+-	switch (frame->mode) {
+-	case MONO:
+-		frame->channels = 1;
+-		break;
+-	case DUAL_CHANNEL:	/* fall-through */
+-	case STEREO:
+-	case JOINT_STEREO:
+-		frame->channels = 2;
+-		break;
+-	}
+-
+-	frame->allocation = (data[1] >> 1) & 0x01;
+-
+-	frame->subband_mode = (data[1] & 0x01);
+-	frame->subbands = frame->subband_mode ? 8 : 4;
+-
+-	frame->bitpool = data[2];
+-
+-	if ((frame->mode == MONO || frame->mode == DUAL_CHANNEL) &&
+-			frame->bitpool > 16 * frame->subbands)
+-		return -4;
+-
+-	if ((frame->mode == STEREO || frame->mode == JOINT_STEREO) &&
+-			frame->bitpool > 32 * frame->subbands)
+-		return -4;
+-
+-	/* data[3] is crc, we're checking it later */
+-
+ 	consumed = 32;
+ 
+ 	crc_header[0] = data[1];
+@@ -548,6 +495,90 @@ static int sbc_unpack_frame(const uint8_t *data, struct sbc_frame *frame,
+ 	return consumed >> 3;
+ }
+ 
++static int sbc_unpack_frame(const uint8_t *data,
++		struct sbc_frame *frame, size_t len)
++{
++	if (len < 4)
++		return -1;
 +
-+		switch (BE_INT(au_hdr.sample_rate)) {
-+		case 16000:
-+			sbc.frequency = SBC_FREQ_16000;
-+			break;
-+		case 32000:
-+			sbc.frequency = SBC_FREQ_32000;
-+			break;
-+		case 44100:
-+			sbc.frequency = SBC_FREQ_44100;
-+			break;
-+		case 48000:
-+			sbc.frequency = SBC_FREQ_48000;
-+			break;
-+		}
++	if (data[0] != SBC_SYNCWORD)
++		return -2;
 +
-+		srate = BE_INT(au_hdr.sample_rate);
++	frame->frequency = (data[1] >> 6) & 0x03;
++	frame->block_mode = (data[1] >> 4) & 0x03;
++
++	switch (frame->block_mode) {
++	case SBC_BLK_4:
++		frame->blocks = 4;
++		break;
++	case SBC_BLK_8:
++		frame->blocks = 8;
++		break;
++	case SBC_BLK_12:
++		frame->blocks = 12;
++		break;
++	case SBC_BLK_16:
++		frame->blocks = 16;
++		break;
++	}
++
++	frame->mode = (data[1] >> 2) & 0x03;
++
++	switch (frame->mode) {
++	case MONO:
++		frame->channels = 1;
++		break;
++	case DUAL_CHANNEL:	/* fall-through */
++	case STEREO:
++	case JOINT_STEREO:
++		frame->channels = 2;
++		break;
++	}
++
++	frame->allocation = (data[1] >> 1) & 0x01;
++
++	frame->subband_mode = (data[1] & 0x01);
++	frame->subbands = frame->subband_mode ? 8 : 4;
++
++	frame->bitpool = data[2];
++
++	if ((frame->mode == MONO || frame->mode == DUAL_CHANNEL) &&
++			frame->bitpool > 16 * frame->subbands)
++		return -4;
++
++	if ((frame->mode == STEREO || frame->mode == JOINT_STEREO) &&
++			frame->bitpool > 32 * frame->subbands)
++		return -4;
++
++	return sbc_unpack_frame_internal(data, frame, len);
++}
++
++static int msbc_unpack_frame(const uint8_t *data,
++		struct sbc_frame *frame, size_t len)
++{
++	if (len < 4)
++		return -1;
++
++	if (data[0] != MSBC_SYNCWORD)
++		return -2;
++	if (data[1] != 0)
++		return -2;
++	if (data[2] != 0)
++		return -2;
++
++	frame->frequency = SBC_FREQ_16000;
++	frame->block_mode = SBC_BLK_4;
++	frame->blocks = MSBC_BLOCKS;
++	frame->allocation = LOUDNESS;
++	frame->mode = MONO;
++	frame->channels = 1;
++	frame->subband_mode = 1;
++	frame->subbands = 8;
++	frame->bitpool = 26;
++
++	return sbc_unpack_frame_internal(data, frame, len);
++}
++
+ static void sbc_decoder_init(struct sbc_decoder_state *state,
+ 					const struct sbc_frame *frame)
+ {
+@@ -792,38 +823,6 @@ static SBC_ALWAYS_INLINE ssize_t sbc_pack_frame_internal(uint8_t *data,
+ 	uint32_t levels[2][8];	/* levels are derived from that */
+ 	uint32_t sb_sample_delta[2][8];
  
--	srate = BE_INT(au_hdr.sample_rate);
-+		sbc.subbands = subbands == 4 ? SBC_SB_4 : SBC_SB_8;
+-	data[0] = SBC_SYNCWORD;
+-
+-	data[1] = (frame->frequency & 0x03) << 6;
+-
+-	data[1] |= (frame->block_mode & 0x03) << 4;
+-
+-	data[1] |= (frame->mode & 0x03) << 2;
+-
+-	data[1] |= (frame->allocation & 0x01) << 1;
+-
+-	switch (frame_subbands) {
+-	case 4:
+-		/* Nothing to do */
+-		break;
+-	case 8:
+-		data[1] |= 0x01;
+-		break;
+-	default:
+-		return -4;
+-		break;
+-	}
+-
+-	data[2] = frame->bitpool;
+-
+-	if ((frame->mode == MONO || frame->mode == DUAL_CHANNEL) &&
+-			frame->bitpool > frame_subbands << 4)
+-		return -5;
+-
+-	if ((frame->mode == STEREO || frame->mode == JOINT_STEREO) &&
+-			frame->bitpool > frame_subbands << 5)
+-		return -5;
+-
+ 	/* Can't fill in crc yet */
  
--	sbc.subbands = subbands == 4 ? SBC_SB_4 : SBC_SB_8;
-+		if (BE_INT(au_hdr.channels) == 1) {
-+			sbc.mode = SBC_MODE_MONO;
-+			if (joint || dualchannel) {
-+				fprintf(stderr, "Audio is mono but joint or "
-+					"dualchannel mode has been specified\n");
-+				goto done;
-+			}
-+		} else if (joint && !dualchannel)
-+			sbc.mode = SBC_MODE_JOINT_STEREO;
-+		else if (!joint && dualchannel)
-+			sbc.mode = SBC_MODE_DUAL_CHANNEL;
-+		else if (!joint && !dualchannel)
-+			sbc.mode = SBC_MODE_STEREO;
-+		else {
-+			fprintf(stderr, "Both joint and dualchannel mode have been "
-+									"specified\n");
-+			goto done;
-+		}
+ 	crc_header[0] = data[1];
+@@ -891,6 +890,28 @@ static SBC_ALWAYS_INLINE ssize_t sbc_pack_frame_internal(uint8_t *data,
+ static ssize_t sbc_pack_frame(uint8_t *data, struct sbc_frame *frame, size_t len,
+ 								int joint)
+ {
++	int frame_subbands = 4;
++
++	data[0] = SBC_SYNCWORD;
++
++	data[1] = (frame->frequency & 0x03) << 6;
++	data[1] |= (frame->block_mode & 0x03) << 4;
++	data[1] |= (frame->mode & 0x03) << 2;
++	data[1] |= (frame->allocation & 0x01) << 1;
++
++	data[2] = frame->bitpool;
++
++	if (frame->subbands != 4)
++		frame_subbands = 8;
++
++	if ((frame->mode == MONO || frame->mode == DUAL_CHANNEL) &&
++			frame->bitpool > frame_subbands << 4)
++		return -5;
++
++	if ((frame->mode == STEREO || frame->mode == JOINT_STEREO) &&
++			frame->bitpool > frame_subbands << 5)
++		return -5;
++
+ 	if (frame->subbands == 4) {
+ 		if (frame->channels == 1)
+ 			return sbc_pack_frame_internal(
+@@ -899,6 +920,7 @@ static ssize_t sbc_pack_frame(uint8_t *data, struct sbc_frame *frame, size_t len
+ 			return sbc_pack_frame_internal(
+ 				data, frame, len, 4, 2, joint);
+ 	} else {
++		data[1] |= 0x01;
+ 		if (frame->channels == 1)
+ 			return sbc_pack_frame_internal(
+ 				data, frame, len, 8, 1, joint);
+@@ -908,6 +930,16 @@ static ssize_t sbc_pack_frame(uint8_t *data, struct sbc_frame *frame, size_t len
+ 	}
+ }
  
--	if (BE_INT(au_hdr.channels) == 1) {
--		sbc.mode = SBC_MODE_MONO;
--		if (joint || dualchannel) {
--			fprintf(stderr, "Audio is mono but joint or "
--				"dualchannel mode has been specified\n");
-+		sbc.endian = SBC_BE;
-+		sbc.bitpool = bitpool;
-+		sbc.allocation = snr ? SBC_AM_SNR : SBC_AM_LOUDNESS;
-+		sbc.blocks = blocks == 4 ? SBC_BLK_4 :
-+				blocks == 8 ? SBC_BLK_8 :
-+					blocks == 12 ? SBC_BLK_12 : SBC_BLK_16;
++static ssize_t msbc_pack_frame(uint8_t *data, struct sbc_frame *frame,
++						size_t len, int joint)
++{
++	data[0] = MSBC_SYNCWORD;
++	data[1] = 0;
++	data[2] = 0;
++
++	return sbc_pack_frame_internal(data, frame, len, 8, 1, joint);
++}
++
+ static void sbc_encoder_init(bool msbc, struct sbc_encoder_state *state,
+ 						const struct sbc_frame *frame)
+ {
+@@ -927,10 +959,24 @@ struct sbc_priv {
+ 	struct SBC_ALIGNED sbc_frame frame;
+ 	struct SBC_ALIGNED sbc_decoder_state dec_state;
+ 	struct SBC_ALIGNED sbc_encoder_state enc_state;
++	int (*unpack_frame)(const uint8_t *data, struct sbc_frame *frame,
++			size_t len);
++	ssize_t (*pack_frame)(uint8_t *data, struct sbc_frame *frame,
++			size_t len, int joint);
+ };
+ 
+ static void sbc_set_defaults(sbc_t *sbc, unsigned long flags)
+ {
++	struct sbc_priv *priv = sbc->priv;
++
++	if (priv->msbc) {
++		priv->pack_frame = msbc_pack_frame;
++		priv->unpack_frame = msbc_unpack_frame;
 +	} else {
-+		if (BE_INT(au_hdr.sample_rate) != 16000 ||
-+				BE_INT(au_hdr.channels) != 1 ||
-+				BE_INT(au_hdr.channels) != 1) {
-+			fprintf(stderr, "mSBC requires 16 bits, 16kHz, mono input\n");
- 			goto done;
- 		}
--	} else if (joint && !dualchannel)
--		sbc.mode = SBC_MODE_JOINT_STEREO;
--	else if (!joint && dualchannel)
--		sbc.mode = SBC_MODE_DUAL_CHANNEL;
--	else if (!joint && !dualchannel)
--		sbc.mode = SBC_MODE_STEREO;
--	else {
--		fprintf(stderr, "Both joint and dualchannel mode have been "
--								"specified\n");
--		goto done;
++		priv->pack_frame = sbc_pack_frame;
++		priv->unpack_frame = sbc_unpack_frame;
++	}
 +
-+		sbc_init_msbc(&sbc, 0);
-+		sbc.endian = SBC_BE;
+ 	sbc->flags = flags;
+ 	sbc->frequency = SBC_FREQ_44100;
+ 	sbc->mode = SBC_MODE_STEREO;
+@@ -1017,7 +1063,7 @@ SBC_EXPORT ssize_t sbc_decode(sbc_t *sbc, const void *input, size_t input_len,
+ 
+ 	priv = sbc->priv;
+ 
+-	framelen = sbc_unpack_frame(input, &priv->frame, input_len);
++	framelen = priv->unpack_frame(input, &priv->frame, input_len);
+ 
+ 	if (!priv->init) {
+ 		sbc_decoder_init(&priv->dec_state, &priv->frame);
+@@ -1151,13 +1197,15 @@ SBC_EXPORT ssize_t sbc_encode(sbc_t *sbc, const void *input, size_t input_len,
+ 		int j = priv->enc_state.sbc_calc_scalefactors_j(
+ 			priv->frame.sb_sample_f, priv->frame.scale_factor,
+ 			priv->frame.blocks, priv->frame.subbands);
+-		framelen = sbc_pack_frame(output, &priv->frame, output_len, j);
++		framelen = priv->pack_frame(output,
++				&priv->frame, output_len, j);
+ 	} else {
+ 		priv->enc_state.sbc_calc_scalefactors(
+ 			priv->frame.sb_sample_f, priv->frame.scale_factor,
+ 			priv->frame.blocks, priv->frame.channels,
+ 			priv->frame.subbands);
+-		framelen = sbc_pack_frame(output, &priv->frame, output_len, 0);
++		framelen = priv->pack_frame(output,
++				&priv->frame, output_len, 0);
  	}
  
--	sbc.endian = SBC_BE;
- 	/* Skip extra bytes of the header if any */
- 	if (read(fd, input, BE_INT(au_hdr.hdr_size) - len) < 0)
- 		goto done;
- 
--	sbc.bitpool = bitpool;
--	sbc.allocation = snr ? SBC_AM_SNR : SBC_AM_LOUDNESS;
--	sbc.blocks = blocks == 4 ? SBC_BLK_4 :
--			blocks == 8 ? SBC_BLK_8 :
--				blocks == 12 ? SBC_BLK_12 : SBC_BLK_16;
--
- 	if (verbose) {
- 		fprintf(stderr, "encoding %s with rate %d, %d blocks, "
- 			"%d subbands, %d bits, allocation method %s, "
-@@ -215,6 +229,7 @@ static void usage(void)
- 	printf("Options:\n"
- 		"\t-h, --help           Display help\n"
- 		"\t-v, --verbose        Verbose mode\n"
-+		"\t-m, --msbc           mSBC codec\n"
- 		"\t-s, --subbands       Number of subbands to use (4 or 8)\n"
- 		"\t-b, --bitpool        Bitpool value (default is 32)\n"
- 		"\t-j, --joint          Joint stereo\n"
-@@ -227,6 +242,7 @@ static void usage(void)
- static struct option main_options[] = {
- 	{ "help",	0, 0, 'h' },
- 	{ "verbose",	0, 0, 'v' },
-+	{ "msbc",	0, 0, 'm' },
- 	{ "subbands",	1, 0, 's' },
- 	{ "bitpool",	1, 0, 'b' },
- 	{ "joint",	0, 0, 'j' },
-@@ -240,8 +256,9 @@ int main(int argc, char *argv[])
- {
- 	int i, opt, subbands = 8, bitpool = 32, joint = 0, dualchannel = 0;
- 	int snr = 0, blocks = 16;
-+	bool msbc = false;
- 
--	while ((opt = getopt_long(argc, argv, "+hvs:b:jdSB:",
-+	while ((opt = getopt_long(argc, argv, "+hmvs:b:jdSB:",
- 						main_options, NULL)) != -1) {
- 		switch(opt) {
- 		case 'h':
-@@ -252,6 +269,10 @@ int main(int argc, char *argv[])
- 			verbose = 1;
- 			break;
- 
-+		case 'm':
-+			msbc = true;
-+			break;
-+
- 		case 's':
- 			subbands = atoi(optarg);
- 			if (subbands != 8 && subbands != 4) {
-@@ -302,7 +323,7 @@ int main(int argc, char *argv[])
- 
- 	for (i = 0; i < argc; i++)
- 		encode(argv[i], subbands, bitpool, joint, dualchannel,
--								snr, blocks);
-+							snr, blocks, msbc);
- 
- 	return 0;
- }
+ 	if (written)
 -- 
 1.7.9.5
 
