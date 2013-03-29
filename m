@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v8 14/16] sbc: Update sbcdec for msbc
-Date: Fri, 29 Mar 2013 16:58:18 +0100
-Message-Id: <1364572700-31701-15-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v8 12/16] sbc: Declare and implement sbc_init_msbc
+Date: Fri, 29 Mar 2013 16:58:16 +0100
+Message-Id: <1364572700-31701-13-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1364572700-31701-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1364572700-31701-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -14,99 +14,86 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/sbcdec.c |   23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+ sbc/sbc.c   |   34 ++++++++++++++++++++++++++++++++++
+ sbc/sbc.h   |    1 +
+ sbc/sbc.sym |    1 +
+ 3 files changed, 36 insertions(+)
 
-diff --git a/src/sbcdec.c b/src/sbcdec.c
-index 0077a82..f937ef3 100644
---- a/src/sbcdec.c
-+++ b/src/sbcdec.c
-@@ -4,6 +4,7 @@
-  *
-  *  Copyright (C) 2008-2010  Nokia Corporation
+diff --git a/sbc/sbc.c b/sbc/sbc.c
+index 137757b..d8282ec 100644
+--- a/sbc/sbc.c
++++ b/sbc/sbc.c
+@@ -6,6 +6,7 @@
   *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+  *  Copyright (C) 2004-2005  Henryk Ploetz <henryk@ploetzli.ch>
+  *  Copyright (C) 2005-2008  Brad Midgley <bmidgley@xmission.com>
 + *  Copyright (C) 2012-2013  Intel Corporation
   *
   *
-  *  This program is free software; you can redistribute it and/or modify
-@@ -31,6 +32,7 @@
- #include <fcntl.h>
- #include <unistd.h>
- #include <stdlib.h>
-+#include <stdbool.h>
- #include <string.h>
- #include <getopt.h>
- #include <sys/stat.h>
-@@ -44,7 +46,7 @@
- 
- static int verbose = 0;
- 
--static void decode(char *filename, char *output, int tofile)
-+static void decode(char *filename, char *output, int tofile, bool msbc)
- {
- 	unsigned char buf[BUF_SIZE], *stream;
- 	struct stat st;
-@@ -98,7 +100,11 @@ static void decode(char *filename, char *output, int tofile)
- 		goto free;
- 	}
- 
--	sbc_init(&sbc, 0L);
-+	if (msbc) {
-+		sbc_init_msbc(&sbc, 0L);
-+	} else {
-+		sbc_init(&sbc, 0L);
-+	}
- 	sbc.endian = SBC_BE;
- 
- 	framelen = sbc_decode(&sbc, stream, streamlen, buf, sizeof(buf), &len);
-@@ -228,14 +234,16 @@ static void usage(void)
- 
- 	printf("Options:\n"
- 		"\t-h, --help           Display help\n"
--		"\t-v, --verbose        Verbose mode\n"
- 		"\t-d, --device <dsp>   Sound device\n"
-+		"\t-v, --verbose        Verbose mode\n"
-+		"\t-m, --msbc           mSBC codec\n"
- 		"\t-f, --file <file>    Decode to a file\n"
- 		"\n");
+  *  This library is free software; you can redistribute it and/or
+@@ -966,6 +967,39 @@ SBC_EXPORT int sbc_init(sbc_t *sbc, unsigned long flags)
+ 	return 0;
  }
  
- static struct option main_options[] = {
- 	{ "help",	0, 0, 'h' },
-+	{ "msbc",	0, 0, 'm' },
- 	{ "device",	1, 0, 'd' },
- 	{ "verbose",	0, 0, 'v' },
- 	{ "file",	1, 0, 'f' },
-@@ -246,8 +254,9 @@ int main(int argc, char *argv[])
- {
- 	char *output = NULL;
- 	int i, opt, tofile = 0;
-+	bool msbc = false;
- 
--	while ((opt = getopt_long(argc, argv, "+hvd:f:",
-+	while ((opt = getopt_long(argc, argv, "+hmvd:f:",
- 						main_options, NULL)) != -1) {
- 		switch(opt) {
- 		case 'h':
-@@ -258,6 +267,10 @@ int main(int argc, char *argv[])
- 			verbose = 1;
- 			break;
- 
-+		case 'm':
-+			msbc = true;
-+			break;
++SBC_EXPORT int sbc_init_msbc(sbc_t *sbc, unsigned long flags)
++{
++	struct sbc_priv *priv;
 +
- 		case 'd':
- 			free(output);
- 			output = strdup(optarg);
-@@ -285,7 +298,7 @@ int main(int argc, char *argv[])
- 	}
++	if (!sbc)
++		return -EIO;
++
++	memset(sbc, 0, sizeof(sbc_t));
++
++	sbc->priv_alloc_base = malloc(sizeof(struct sbc_priv) + SBC_ALIGN_MASK);
++	if (!sbc->priv_alloc_base)
++		return -ENOMEM;
++
++	sbc->priv = (void *) (((uintptr_t) sbc->priv_alloc_base +
++			SBC_ALIGN_MASK) & ~((uintptr_t) SBC_ALIGN_MASK));
++
++	memset(sbc->priv, 0, sizeof(struct sbc_priv));
++
++	priv = sbc->priv;
++	priv->msbc = true;
++
++	sbc_set_defaults(sbc, flags);
++
++	sbc->frequency = SBC_FREQ_16000;
++	sbc->blocks = MSBC_BLOCKS;
++	sbc->subbands = SBC_SB_8;
++	sbc->mode = SBC_MODE_MONO;
++	sbc->allocation = SBC_AM_LOUDNESS;
++	sbc->bitpool = 26;
++
++	return 0;
++}
++
+ SBC_EXPORT ssize_t sbc_parse(sbc_t *sbc, const void *input, size_t input_len)
+ {
+ 	return sbc_decode(sbc, input, input_len, NULL, 0, NULL);
+diff --git a/sbc/sbc.h b/sbc/sbc.h
+index bbd45da..5f8a1fc 100644
+--- a/sbc/sbc.h
++++ b/sbc/sbc.h
+@@ -83,6 +83,7 @@ typedef struct sbc_struct sbc_t;
  
- 	for (i = 0; i < argc; i++)
--		decode(argv[i], output ? output : "/dev/dsp", tofile);
-+		decode(argv[i], output ? output : "/dev/dsp", tofile, msbc);
+ int sbc_init(sbc_t *sbc, unsigned long flags);
+ int sbc_reinit(sbc_t *sbc, unsigned long flags);
++int sbc_init_msbc(sbc_t *sbc, unsigned long flags);
  
- 	free(output);
+ ssize_t sbc_parse(sbc_t *sbc, const void *input, size_t input_len);
+ 
+diff --git a/sbc/sbc.sym b/sbc/sbc.sym
+index 2cabcdd..3a47c12 100644
+--- a/sbc/sbc.sym
++++ b/sbc/sbc.sym
+@@ -1,6 +1,7 @@
+ SBC_1.0 {
+ global:
+ 	sbc_init;
++	sbc_init_msbc;
+ 	sbc_reinit;
+ 	sbc_finish;
  
 -- 
 1.7.9.5
