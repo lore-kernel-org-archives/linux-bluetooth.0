@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v8 07/16] sbc: Add iwmmxt primitive for 1b 8s encoding
-Date: Fri, 29 Mar 2013 16:58:11 +0100
-Message-Id: <1364572700-31701-8-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v8 06/16] sbc: Add armv6 primitive for 1b 8s analysis
+Date: Fri, 29 Mar 2013 16:58:10 +0100
+Message-Id: <1364572700-31701-7-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1364572700-31701-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1364572700-31701-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -14,39 +14,39 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- sbc/sbc_primitives_iwmmxt.c |   18 +++++++++++++++++-
+ sbc/sbc_primitives_armv6.c |   18 +++++++++++++++++-
  1 file changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/sbc/sbc_primitives_iwmmxt.c b/sbc/sbc_primitives_iwmmxt.c
-index 247bb69..43f77e6 100644
---- a/sbc/sbc_primitives_iwmmxt.c
-+++ b/sbc/sbc_primitives_iwmmxt.c
-@@ -295,10 +295,26 @@ static inline void sbc_analyze_4b_8s_iwmmxt(struct sbc_encoder_state *state,
- 	sbc_analyze_eight_iwmmxt(x + 0, out, analysis_consts_fixed8_simd_even);
+diff --git a/sbc/sbc_primitives_armv6.c b/sbc/sbc_primitives_armv6.c
+index dcc3ef4..6651d2e 100644
+--- a/sbc/sbc_primitives_armv6.c
++++ b/sbc/sbc_primitives_armv6.c
+@@ -292,10 +292,26 @@ static void sbc_analyze_4b_8s_armv6(struct sbc_encoder_state *state,
+ 	sbc_analyze_eight(x + 0, out, analysis_consts_fixed8_simd_even);
  }
  
-+static inline void sbc_analyze_1b_8s_iwmmxt(struct sbc_encoder_state *state,
++static void sbc_analyze_1b_8s_armv6(struct sbc_encoder_state *state,
 +		int16_t *x, int32_t *out, int out_stride)
 +{
 +	if (state->odd)
-+		sbc_analyze_eight_iwmmxt(x, out,
++		sbc_analyze_eight_armv6(x, out,
 +					analysis_consts_fixed8_simd_odd);
 +	else
-+		sbc_analyze_eight_iwmmxt(x, out,
++		sbc_analyze_eight_armv6(x, out,
 +					analysis_consts_fixed8_simd_even);
 +
 +	state->odd = !state->odd;
 +}
 +
- void sbc_init_primitives_iwmmxt(struct sbc_encoder_state *state)
+ void sbc_init_primitives_armv6(struct sbc_encoder_state *state)
  {
- 	state->sbc_analyze_4s = sbc_analyze_4b_4s_iwmmxt;
--	state->sbc_analyze_8s = sbc_analyze_4b_8s_iwmmxt;
+ 	state->sbc_analyze_4s = sbc_analyze_4b_4s_armv6;
+-	state->sbc_analyze_8s = sbc_analyze_4b_8s_armv6;
 +	if (state->increment == 1)
-+		state->sbc_analyze_8s = sbc_analyze_1b_8s_iwmmxt;
++		state->sbc_analyze_8s = sbc_analyze_1b_8s_armv6;
 +	else
-+		state->sbc_analyze_8s = sbc_analyze_4b_8s_iwmmxt;
- 	state->implementation_info = "IWMMXT";
++		state->sbc_analyze_8s = sbc_analyze_4b_8s_armv6;
+ 	state->implementation_info = "ARMv6 SIMD";
  }
  
 -- 
