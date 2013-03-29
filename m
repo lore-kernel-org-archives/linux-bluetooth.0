@@ -4,124 +4,134 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v8 11/16] sbc: Add a private boolean flag to enable 15 block encoding
-Date: Fri, 29 Mar 2013 16:58:15 +0100
-Message-Id: <1364572700-31701-12-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v8 10/16] sbc: Fix input reordering for 15 blocks case
+Date: Fri, 29 Mar 2013 16:58:14 +0100
+Message-Id: <1364572700-31701-11-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1364572700-31701-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1364572700-31701-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch introduce a new private member which purpose is to encode 15
-blocks. It is private to the library and can't be set from standard API.
-sbc_init_msbc() function will be defined to set this flag.
----
- sbc/sbc.c |   36 ++++++++++++++++++++++++++++--------
- 1 file changed, 28 insertions(+), 8 deletions(-)
+SBC analysis handles 8 samples at a time. The optimisation requires 8 samples
+forming an "odd" block, followed by 8 samples, forming an "even" block. Until
+now SBC was used for encoding 4, 8, 12, or 16 blocks in a frame. Reordering
+took a frame and for each 16 samples (ie 2 blocks) it produced one "odd" block
+and one "even" block.
+A mSBC frame encodes 15 blocks of 8 samples. 14 blocks are processed as before,
+two at a time. If 8 samples are remaining, it will form the first half of two
+blocks (a bit of an "odd" block, and a bit of an "even" block). When processing
+the next frame, we detect eight samples were missing at previous iteration and
+the two block can be finished.
 
-diff --git a/sbc/sbc.c b/sbc/sbc.c
-index 75b30a3..137757b 100644
---- a/sbc/sbc.c
-+++ b/sbc/sbc.c
-@@ -53,6 +53,9 @@
+This reordering is possible because only one sample is moved (x[-7]) AND the
+first coefficient in the coef table is 0. Thus x[0] doesn't need to be set and
+0 can be used in calculation instead. Note that x[-7] is not used in
+analysis for this block.
+see: analysis_consts_fixed8_simd_odd.
+
+To detect that two blocks are not completed, the number of processed samples
+can be used. This value is stored in position. position starts at
+SBC_X_BUFFER_SIZE-72 and is decremented by 16 as long as two blocks can be
+formed. If only 8 samples are remaining in input, then position is decremented
+by 8 *arbitrarly*, thus indicating that some samples are pending. During next
+frame reordering, position will be decremented by 8 again, back to a 16
+multiple.
+
+This logic works for SBC_X_BUFFER_SIZE-72 multiple of 16 and bigger than
+8*2*15+72=312 and less than 8*3*15+72=432. The current value of 328 matches this
+constraint and X buffer is shifted every two frames (30 blocks) in mSBC. This
+way, we don't need to care about x[-7] when shifting, we also know that it
+won't be before X.
+---
+ sbc/sbc_primitives.c |   59 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 58 insertions(+), 1 deletion(-)
+
+diff --git a/sbc/sbc_primitives.c b/sbc/sbc_primitives.c
+index 2f144b4..f24bd7c 100644
+--- a/sbc/sbc_primitives.c
++++ b/sbc/sbc_primitives.c
+@@ -6,6 +6,7 @@
+  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+  *  Copyright (C) 2004-2005  Henryk Ploetz <henryk@ploetzli.ch>
+  *  Copyright (C) 2005-2006  Brad Midgley <bmidgley@xmission.com>
++ *  Copyright (C) 2012-2013  Intel Corporation
+  *
+  *
+  *  This library is free software; you can redistribute it and/or
+@@ -310,8 +311,37 @@ static SBC_ALWAYS_INLINE int sbc_encoder_process_input_s8_internal(
+ 	#define PCM(i) (big_endian ? \
+ 		unaligned16_be(pcm + (i) * 2) : unaligned16_le(pcm + (i) * 2))
  
- #define SBC_SYNCWORD	0x9C
- 
-+#define MSBC_SYNCWORD	0xAD
-+#define MSBC_BLOCKS	15
++	if (position % 16 == 8) {
++		position -= 8;
++		nsamples -= 8;
++		if (nchannels > 0) {
++			int16_t *x = &X[0][position];
++			x[0]  = PCM(0 + (15-8) * nchannels);
++			x[2]  = PCM(0 + (14-8) * nchannels);
++			x[3]  = PCM(0 + (8-8) * nchannels);
++			x[4]  = PCM(0 + (13-8) * nchannels);
++			x[5]  = PCM(0 + (9-8) * nchannels);
++			x[6]  = PCM(0 + (12-8) * nchannels);
++			x[7]  = PCM(0 + (10-8) * nchannels);
++			x[8]  = PCM(0 + (11-8) * nchannels);
++		}
++		if (nchannels > 1) {
++			int16_t *x = &X[1][position];
++			x[0]  = PCM(1 + (15-8) * nchannels);
++			x[2]  = PCM(1 + (14-8) * nchannels);
++			x[3]  = PCM(1 + (8-8) * nchannels);
++			x[4]  = PCM(1 + (13-8) * nchannels);
++			x[5]  = PCM(1 + (9-8) * nchannels);
++			x[6]  = PCM(1 + (12-8) * nchannels);
++			x[7]  = PCM(1 + (10-8) * nchannels);
++			x[8]  = PCM(1 + (11-8) * nchannels);
++		}
 +
- /* This structure contains an unpacked SBC frame.
-    Yes, there is probably quite some unused space herein */
- struct sbc_frame {
-@@ -904,18 +907,22 @@ static ssize_t sbc_pack_frame(uint8_t *data, struct sbc_frame *frame, size_t len
++		pcm += 16 * nchannels;
++	}
++
+ 	/* copy/permutate audio samples */
+-	while ((nsamples -= 16) >= 0) {
++	while (nsamples >= 16) {
+ 		position -= 16;
+ 		if (nchannels > 0) {
+ 			int16_t *x = &X[0][position];
+@@ -352,6 +382,33 @@ static SBC_ALWAYS_INLINE int sbc_encoder_process_input_s8_internal(
+ 			x[15] = PCM(1 + 2 * nchannels);
+ 		}
+ 		pcm += 32 * nchannels;
++		nsamples -= 16;
++	}
++
++	if (nsamples == 8) {
++		position -= 8;
++		if (nchannels > 0) {
++			int16_t *x = &X[0][position];
++			x[-7] = PCM(0 + 7 * nchannels);
++			x[1]  = PCM(0 + 3 * nchannels);
++			x[2]  = PCM(0 + 6 * nchannels);
++			x[3]  = PCM(0 + 0 * nchannels);
++			x[4]  = PCM(0 + 5 * nchannels);
++			x[5]  = PCM(0 + 1 * nchannels);
++			x[6]  = PCM(0 + 4 * nchannels);
++			x[7]  = PCM(0 + 2 * nchannels);
++		}
++		if (nchannels > 1) {
++			int16_t *x = &X[1][position];
++			x[-7] = PCM(1 + 7 * nchannels);
++			x[1]  = PCM(1 + 3 * nchannels);
++			x[2]  = PCM(1 + 6 * nchannels);
++			x[3]  = PCM(1 + 0 * nchannels);
++			x[4]  = PCM(1 + 5 * nchannels);
++			x[5]  = PCM(1 + 1 * nchannels);
++			x[6]  = PCM(1 + 4 * nchannels);
++			x[7]  = PCM(1 + 2 * nchannels);
++		}
  	}
- }
+ 	#undef PCM
  
--static void sbc_encoder_init(struct sbc_encoder_state *state,
--					const struct sbc_frame *frame)
-+static void sbc_encoder_init(bool msbc, struct sbc_encoder_state *state,
-+						const struct sbc_frame *frame)
- {
- 	memset(&state->X, 0, sizeof(state->X));
- 	state->position = (SBC_X_BUFFER_SIZE - frame->subbands * 9) & ~7;
--	state->increment = 4;
-+	if (msbc)
-+		state->increment = 1;
-+	else
-+		state->increment = 4;
- 
- 	sbc_init_primitives(state);
- }
- 
- struct sbc_priv {
- 	int init;
-+	bool msbc;
- 	struct SBC_ALIGNED sbc_frame frame;
- 	struct SBC_ALIGNED sbc_decoder_state dec_state;
- 	struct SBC_ALIGNED sbc_encoder_state enc_state;
-@@ -923,6 +930,7 @@ struct sbc_priv {
- 
- static void sbc_set_defaults(sbc_t *sbc, unsigned long flags)
- {
-+	sbc->flags = flags;
- 	sbc->frequency = SBC_FREQ_44100;
- 	sbc->mode = SBC_MODE_STEREO;
- 	sbc->subbands = SBC_SB_8;
-@@ -1058,12 +1066,15 @@ SBC_EXPORT ssize_t sbc_encode(sbc_t *sbc, const void *input, size_t input_len,
- 		priv->frame.subband_mode = sbc->subbands;
- 		priv->frame.subbands = sbc->subbands ? 8 : 4;
- 		priv->frame.block_mode = sbc->blocks;
--		priv->frame.blocks = 4 + (sbc->blocks * 4);
-+		if (priv->msbc)
-+			priv->frame.blocks = MSBC_BLOCKS;
-+		else
-+			priv->frame.blocks = 4 + (sbc->blocks * 4);
- 		priv->frame.bitpool = sbc->bitpool;
- 		priv->frame.codesize = sbc_get_codesize(sbc);
- 		priv->frame.length = sbc_get_frame_length(sbc);
- 
--		sbc_encoder_init(&priv->enc_state, &priv->frame);
-+		sbc_encoder_init(priv->msbc, &priv->enc_state, &priv->frame);
- 		priv->init = 1;
- 	} else if (priv->frame.bitpool != sbc->bitpool) {
- 		priv->frame.length = sbc_get_frame_length(sbc);
-@@ -1142,7 +1153,10 @@ SBC_EXPORT size_t sbc_get_frame_length(sbc_t *sbc)
- 		return priv->frame.length;
- 
- 	subbands = sbc->subbands ? 8 : 4;
--	blocks = 4 + (sbc->blocks * 4);
-+	if (priv->msbc)
-+		blocks = MSBC_BLOCKS;
-+	else
-+		blocks = 4 + (sbc->blocks * 4);
- 	channels = sbc->mode == SBC_MODE_MONO ? 1 : 2;
- 	joint = sbc->mode == SBC_MODE_JOINT_STEREO ? 1 : 0;
- 	bitpool = sbc->bitpool;
-@@ -1166,7 +1180,10 @@ SBC_EXPORT unsigned sbc_get_frame_duration(sbc_t *sbc)
- 	priv = sbc->priv;
- 	if (!priv->init) {
- 		subbands = sbc->subbands ? 8 : 4;
--		blocks = 4 + (sbc->blocks * 4);
-+		if (priv->msbc)
-+			blocks = MSBC_BLOCKS;
-+		else
-+			blocks = 4 + (sbc->blocks * 4);
- 	} else {
- 		subbands = priv->frame.subbands;
- 		blocks = priv->frame.blocks;
-@@ -1203,7 +1220,10 @@ SBC_EXPORT size_t sbc_get_codesize(sbc_t *sbc)
- 	priv = sbc->priv;
- 	if (!priv->init) {
- 		subbands = sbc->subbands ? 8 : 4;
--		blocks = 4 + (sbc->blocks * 4);
-+		if (priv->msbc)
-+			blocks = MSBC_BLOCKS;
-+		else
-+			blocks = 4 + (sbc->blocks * 4);
- 		channels = sbc->mode == SBC_MODE_MONO ? 1 : 2;
- 	} else {
- 		subbands = priv->frame.subbands;
 -- 
 1.7.9.5
 
