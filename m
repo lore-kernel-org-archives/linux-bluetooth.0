@@ -1,78 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <510B88F5.7010404@wastelink.com.au>
-Date: Fri, 01 Feb 2013 20:20:53 +1100
-From: Tim Connolly <tconnolly@wastelink.com.au>
+Date: Sat, 30 Mar 2013 19:09:06 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
+	<frederic.dalleau@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v8 04/16] sbc: add odd member variable to
+ sbc_encoder_state
+Message-ID: <20130330170906.GA29534@x220.P-661HNU-F1>
+References: <1364572700-31701-1-git-send-email-frederic.dalleau@linux.intel.com>
+ <1364572700-31701-5-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Accepting RFCOMM connections without pairing?
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1364572700-31701-5-git-send-email-frederic.dalleau@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Can anybody point me to sample code for an RFCOMM server that can accept 
-connections without the need for pairing?
+Hi Frédéric,
 
-I am trying to get this working under Debian Squeeze, which has Bluez 
-4.66. Both ends of the connection are using Bluetooth v2.0 hardware.
+On Fri, Mar 29, 2013, Frédéric Dalleau wrote:
+> --- a/sbc/sbc_primitives.h
+> +++ b/sbc/sbc_primitives.h
+> @@ -40,6 +40,7 @@ struct sbc_encoder_state {
+>  	int position;
+>  	/* Number of consecutive blocks handled by the encoder */
+>  	uint8_t increment;
+> +	bool odd;
 
-I found this discussion:
-   http://permalink.gmane.org/gmane.linux.bluez.kernel/13828
-indicating that with my hardware, adjusting the security level on the 
-server socket will disable pairing. However, I have not been able to 
-make this work - bluetoothd triggers a link_key_request and 
-pin_code_request on every connection attempt.
+Since most of the code related on this variable uses function pointers
+would it make sense to simply play with those pointers and have the odd
+function set the pointer to the even function and vice versa? If this is
+a performance critical part of the code it'd remove one if-statement.
 
-Any advice you can offer would be greatly appreciated.
-
---
-Current test server:
-
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/rfcomm.h>
-
-int main(int argc, char **argv)
-{
-     struct sockaddr_rc loc_addr = { 0 }, rem_addr = { 0 };
-     char buf[1024] = { 0 };
-     int s, client, bytes_read;
-     unsigned int opt = sizeof(rem_addr);
-
-     // allocate socket
-     s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-
-     struct bt_security sec = { BT_SECURITY_LOW };
-     if (setsockopt(s, SOL_BLUETOOTH, BT_SECURITY, &sec, sizeof(sec)) < 0) {
-         fprintf(stderr, "failed to set security level");
-         return 2;
-     }
-
-     // bind socket to port 1 of the first available bluetooth adapter
-     loc_addr.rc_family = AF_BLUETOOTH;
-     loc_addr.rc_bdaddr = *BDADDR_ANY;
-     loc_addr.rc_channel = 1;
-     bind(s, (struct sockaddr *)&loc_addr, sizeof(loc_addr));
-
-     // put socket into listening mode
-     listen(s, 1);
-
-     // accept one connection
-     client = accept(s, (struct sockaddr *)&rem_addr, &opt);
-
-     ba2str( &rem_addr.rc_bdaddr, buf );
-     fprintf(stderr, "accepted connection from %s\n", buf);
-     memset(buf, 0, sizeof(buf));
-
-     // read data from the client
-     bytes_read = recv(client, buf, sizeof(buf), 0);
-     if( bytes_read > 0 ) {
-         printf("received [%s]\n", buf);
-     }
-
-     // close connection
-     close(client);
-     close(s);
-     return 0;
-}
+Johan
