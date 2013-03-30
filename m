@@ -1,34 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 30 Mar 2013 19:09:06 +0200
+Date: Sat, 30 Mar 2013 18:56:04 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
-	<frederic.dalleau@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v8 04/16] sbc: add odd member variable to
- sbc_encoder_state
-Message-ID: <20130330170906.GA29534@x220.P-661HNU-F1>
-References: <1364572700-31701-1-git-send-email-frederic.dalleau@linux.intel.com>
- <1364572700-31701-5-git-send-email-frederic.dalleau@linux.intel.com>
+To: Alex Deymo <deymo@chromium.org>
+Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org
+Subject: Re: [PATCH] core: Memory leak on device_free for eir_uuids field.
+Message-ID: <20130330165604.GB27129@x220.P-661HNU-F1>
+References: <1364591983-30077-1-git-send-email-deymo@chromium.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1364572700-31701-5-git-send-email-frederic.dalleau@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1364591983-30077-1-git-send-email-deymo@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
+Hi Alex,
 
-On Fri, Mar 29, 2013, Frédéric Dalleau wrote:
-> --- a/sbc/sbc_primitives.h
-> +++ b/sbc/sbc_primitives.h
-> @@ -40,6 +40,7 @@ struct sbc_encoder_state {
->  	int position;
->  	/* Number of consecutive blocks handled by the encoder */
->  	uint8_t increment;
-> +	bool odd;
+On Fri, Mar 29, 2013, Alex Deymo wrote:
+> The eir_uuids list is usually freed by device_svc_resolved, but that
+> doesn't happen if the device is removed before a SDP browse ends.
+> This fix deletes the eir_uuids list on device_free.
+> 
+> ---
+> 
+> ==5593== 1,431 (48 direct, 1,383 indirect) bytes in 3 blocks are definitely lost in loss record 214 of 224
+> ==5593==    at 0x4C2B6CD: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==5593==    by 0x4E7FA78: g_malloc (gmem.c:159)
+> ==5593==    by 0x4E92CA2: g_slice_alloc (gslice.c:1003)
+> ==5593==    by 0x4E93FC2: g_slist_append (gslist.c:222)
+> ==5593==    by 0x46D039: device_add_eir_uuids (device.c:1138)
+> ==5593==    by 0x462049: update_found_devices (adapter.c:4148)
+> ==5593==    by 0x462328: device_found_callback (adapter.c:4232)
+> ==5593==    by 0x47614A: process_notify (mgmt.c:252)
+> ==5593==    by 0x476479: received_data (mgmt.c:336)
+> ==5593==    by 0x4E79D52: g_main_context_dispatch (gmain.c:2539)
+> ==5593==    by 0x4E7A09F: g_main_context_iterate.isra.23 (gmain.c:3146)
+> ==5593==    by 0x4E7A499: g_main_loop_run (gmain.c:3340)
+> ==5593==
+> 
+>  src/device.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-Since most of the code related on this variable uses function pointers
-would it make sense to simply play with those pointers and have the odd
-function set the pointer to the even function and vice versa? If this is
-a performance critical part of the code it'd remove one if-statement.
+Applied. Thanks. Btw, don't be afraid to include such valgrind reports
+in the actual commit message. They're useful in demonstrating the
+validity of the patch.
 
 Johan
