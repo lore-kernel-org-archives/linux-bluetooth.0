@@ -1,31 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alex Deymo <deymo@chromium.org>
-To: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Cc: keybuk@chromium.org, Alex Deymo <deymo@chromium.org>
-Subject: [PATCH v3 0/2] HID Connetabillity
-Date: Mon,  1 Apr 2013 17:40:24 -0700
-Message-Id: <1364863226-10566-1-git-send-email-deymo@chromium.org>
-In-Reply-To: <1363655144-9705-1-git-send-email-deymo@chromium.org>
+MIME-Version: 1.0
+In-Reply-To: <3E108FF4-C533-46A1-9119-5C87229E73A0@holtmann.org>
 References: <1363655144-9705-1-git-send-email-deymo@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+ <1364852391-15929-1-git-send-email-deymo@chromium.org> <3E108FF4-C533-46A1-9119-5C87229E73A0@holtmann.org>
+From: Alex Deymo <deymo@chromium.org>
+Date: Mon, 1 Apr 2013 15:54:11 -0700
+Message-ID: <CAGd9gwjWy2SFCHAQKcGhHF=La8s2UQ1PrTYM7ybXmrB2YwxQ8w@mail.gmail.com>
+Subject: Re: [PATCH v2] core: Expose HIDNormallyConnectable and
+ HIDReconnectInitiate properties
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>, keybuk <keybuk@chromium.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Addressed Marcel comments on PATCH v2.
-* The two properties are always exposed.
-* Persistence file is <adapter>/<device>/input. No global helper is used.
-* Doc in a separate commit.
-* Logs updated.
+Hi,
 
-Alex Deymo (2):
-  input: Documentation for new Input1 interface
-  core: Expose HIDNormallyConnectable and HIDReconnectInitiate
-    properties
+On Mon, Apr 1, 2013 at 2:48 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> lets split doc patches from code patches please.
+ok
 
- doc/input-api.txt       |  21 ++++++
- profiles/input/device.c | 170 +++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 189 insertions(+), 2 deletions(-)
- create mode 100644 doc/input-api.txt
+> Do we want to keep the terms used in the HID spec or come up with a bit more generic property names here?
 
--- 
-1.8.1.3
+I think these two properties have a very particular behavior defined
+by the HID spec. Using a simpler name (like simply "connectable") will
+add more noise.
 
+
+> We slowly want to move over to using bool instead of gboolean. So I would prefer that any new code starts with this. And for extra points, patches that fix up the old usages are more than welcome.
+ok
+
+> Don't we have a general helper for this? We might should. Or should the input plugin store its specific values in its own file?
+
+The %s/%s/info filename is created in 6 different places in the code.
+I could add a new helper for this logic instead of having the filename
+scheme spread in the code. I don't mind having a separate file for the
+input plugin
+
+
+> I think you need callbacks for the case when the values are not available. Otherwise the GDBus core behaves funny when attempting to get all properties.
+Yes, you are right. But, in any case, I'll remove the
+hid_props_present since the input interface is created passing a
+sdp_record_t, so the properties will be always present. One of the
+properties is mandatory (so it should be present in the SDP record)
+and the other is optional and assumed as false if not present. Doesn't
+make sense to move the HID spec logic to the user/client when the
+properties are not present.
+Even in the case of an upgrade from bluez 4 the sdp records are
+correctly parsed from the old format.
+
+Thanks for the comments!
+Alex
