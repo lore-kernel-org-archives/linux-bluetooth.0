@@ -1,52 +1,319 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <3E108FF4-C533-46A1-9119-5C87229E73A0@holtmann.org>
-References: <1363655144-9705-1-git-send-email-deymo@chromium.org>
- <1364852391-15929-1-git-send-email-deymo@chromium.org> <3E108FF4-C533-46A1-9119-5C87229E73A0@holtmann.org>
-From: Alex Deymo <deymo@chromium.org>
-Date: Mon, 1 Apr 2013 15:54:11 -0700
-Message-ID: <CAGd9gwjWy2SFCHAQKcGhHF=La8s2UQ1PrTYM7ybXmrB2YwxQ8w@mail.gmail.com>
-Subject: Re: [PATCH v2] core: Expose HIDNormallyConnectable and
- HIDReconnectInitiate properties
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>, keybuk <keybuk@chromium.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
+Subject: Re: [PATCH v2] core: Expose HIDNormallyConnectable and HIDReconnectInitiate properties
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1364852391-15929-1-git-send-email-deymo@chromium.org>
+Date: Mon, 1 Apr 2013 14:48:30 -0700
+Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org
+Message-Id: <3E108FF4-C533-46A1-9119-5C87229E73A0@holtmann.org>
+References: <1363655144-9705-1-git-send-email-deymo@chromium.org> <1364852391-15929-1-git-send-email-deymo@chromium.org>
+To: Alex Deymo <deymo@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Alex,
 
-On Mon, Apr 1, 2013 at 2:48 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> lets split doc patches from code patches please.
-ok
+> The "Connectability" of a HID device, as defined by the HID spec,
+> governs the way the host may and should connect to a HID device or
+> expect a connection from it. In the comon case of mice and keyboards
+> the HIDNormallyConnectable is FALSE and HIDReconnectInitiate is TRUE,
+> since those devices only attempt a connection to the host when they
+> have some data to transfer. A connection attempt initiated from the
+> host after the device drops the connection (while still paired) will
+> result in a Page timeout.
+> 
+> This patch exposes these two HID properties as Device properties, updates
+> them every time new SDP records are available and persists them in the
+> device's info file. This patch also shows this information in the
+> bluetoothctl "info <dev>" command.
+> For non-HID devices and when no information is available (i.e. a cached
+> device after upgrade from a version without this patch) both properties
+> are set to the comon case: HIDNormallyConnectable is FALSE and
+> HIDReconnectInitiate is TRUE.
+> ---
+> doc/input-api.txt       |  29 ++++++++
+> profiles/input/device.c | 175 ++++++++++++++++++++++++++++++++++++++++++++++++
+> 2 files changed, 204 insertions(+)
+> create mode 100644 doc/input-api.txt
 
-> Do we want to keep the terms used in the HID spec or come up with a bit more generic property names here?
+lets split doc patches from code patches please.
 
-I think these two properties have a very particular behavior defined
-by the HID spec. Using a simpler name (like simply "connectable") will
-add more noise.
+> diff --git a/doc/input-api.txt b/doc/input-api.txt
+> new file mode 100644
+> index 0000000..dffd9fb
+> --- /dev/null
+> +++ b/doc/input-api.txt
+> @@ -0,0 +1,29 @@
+> +BlueZ D-Bus Input API description
+> +*********************************
+> +
+> +Input hierarchy
+> +===============
+> +
+> +Service		org.bluez
+> +Interface	org.bluez.Input1
+> +Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+> +
+> +Properties	boolean NormallyConnectable [readonly, optional]
+> +
+> +			Exposes the value of HIDNormallyConnectable as defined
+> +			by the HID profile specification. If this optional value
+> +			is not specified by the HID device, the value is asumend
+> +			as FALSE.
+> +
+> +			If the value of the property is unknown, for example
+> +			upgrading from a previous version of BlueZ, the property
+> +			is missing.
+> +
+> +		boolean ConnectInitiate [readonly, optional]
+> +
+> +			Exposes the value of ConnectInitiate as defined by the
+> +			HID profile specification.
+> +
+> +			If the value of the property is unknown, for example
+> +			upgrading from a previous version of BlueZ, the property
+> +			is missing.
 
+Do we want to keep the terms used in the HID spec or come up with a bit more generic property names here?
 
-> We slowly want to move over to using bool instead of gboolean. So I would prefer that any new code starts with this. And for extra points, patches that fix up the old usages are more than welcome.
-ok
+> diff --git a/profiles/input/device.c b/profiles/input/device.c
+> index 1da9d99..dd2a3ab 100644
+> --- a/profiles/input/device.c
+> +++ b/profiles/input/device.c
+> @@ -54,6 +54,8 @@
+> 
+> #include "sdp-client.h"
+> 
+> +#define INPUT_INTERFACE "org.bluez.Input1"
+> +
+> struct input_device {
+> 	struct btd_device	*device;
+> 	char			*path;
+> @@ -71,6 +73,9 @@ struct input_device {
+> 	guint			dc_id;
+> 	gboolean		disable_sdp;
+> 	char			*name;
+> +	gboolean		hid_props_present;
+> +	gboolean		normally_connectable;
+> +	gboolean		reconnect_initiate;
+> };
 
-> Don't we have a general helper for this? We might should. Or should the input plugin store its specific values in its own file?
+We slowly want to move over to using bool instead of gboolean. So I would prefer that any new code starts with this. And for extra points, patches that fix up the old usages are more than welcome.
 
-The %s/%s/info filename is created in 6 different places in the code.
-I could add a new helper for this logic instead of having the filename
-scheme spread in the code. I don't mind having a separate file for the
-input plugin
+> static GSList *devices = NULL;
+> @@ -116,6 +121,83 @@ static void input_device_free(struct input_device *idev)
+> 	g_free(idev);
+> }
+> 
+> +static void input_device_config_filename(struct input_device *idev,
+> +						char *filename, size_t maxlen)
+> +{
+> +	char adapter_addr[18];
+> +	char device_addr[18];
+> +
+> +	ba2str(device_get_address(idev->device), device_addr);
+> +	ba2str(adapter_get_address(device_get_adapter(idev->device)),
+> +								adapter_addr);
+> +	snprintf(filename, maxlen, STORAGEDIR "/%s/%s/info", adapter_addr,
+> +								device_addr);
+> +	filename[maxlen-1] = '\0';
+> +}
 
+Don't we have a general helper for this? We might should. Or should the input plugin store its specific values in its own file?
 
-> I think you need callbacks for the case when the values are not available. Otherwise the GDBus core behaves funny when attempting to get all properties.
-Yes, you are right. But, in any case, I'll remove the
-hid_props_present since the input interface is created passing a
-sdp_record_t, so the properties will be always present. One of the
-properties is mandatory (so it should be present in the SDP record)
-and the other is optional and assumed as false if not present. Doesn't
-make sense to move the HID spec logic to the user/client when the
-properties are not present.
-Even in the case of an upgrade from bluez 4 the sdp records are
-correctly parsed from the old format.
+> +
+> +static void input_device_load_props(struct input_device *idev)
+> +{
+> +	char filename[PATH_MAX + 1];
+> +	GKeyFile *key_file;
+> +	GError *err = NULL;
+> +
+> +	input_device_config_filename(idev, filename, PATH_MAX + 1);
+> +
+> +	key_file = g_key_file_new();
+> +	if (!key_file)
+> +		return;
+> +	g_key_file_load_from_file(key_file, filename, 0, NULL);
+> +
+> +	/* Load HID connectivity properties */
+> +	idev->normally_connectable = g_key_file_get_boolean(key_file,
+> +				"Input", "NormallyConnectable", &err);
+> +	if (err) {
+> +		idev->normally_connectable = FALSE;
+> +		g_error_free(err);
+> +		err = NULL;
+> +	} else
+> +		idev->hid_props_present = TRUE;
+> +
+> +	idev->reconnect_initiate = g_key_file_get_boolean(key_file,
+> +				"Input", "ReconnectInitiate", &err);
+> +	if (err) {
+> +		idev->reconnect_initiate = TRUE;
+> +		g_error_free(err);
+> +		err = NULL;
+> +	} else
+> +		idev->hid_props_present = TRUE;
+> +
+> +	g_key_file_free(key_file);
+> +}
+> +
+> +static void input_device_store_props(struct input_device *idev)
+> +{
+> +	char filename[PATH_MAX + 1];
+> +	GKeyFile *key_file;
+> +	char *str;
+> +	gsize length = 0;
+> +
+> +	input_device_config_filename(idev, filename, PATH_MAX + 1);
+> +
+> +	key_file = g_key_file_new();
+> +	if (!key_file)
+> +		return;
+> +	g_key_file_load_from_file(key_file, filename, 0, NULL);
+> +
+> +	g_key_file_set_boolean(key_file, "Input",
+> +		"NormallyConnectable", idev->normally_connectable);
+> +	g_key_file_set_boolean(key_file, "Input",
+> +		"ReconnectInitiate", idev->reconnect_initiate);
+> +
+> +	create_file(filename, S_IRUSR | S_IWUSR);
+> +
+> +	str = g_key_file_to_data(key_file, &length, NULL);
+> +	g_file_set_contents(filename, str, length, NULL);
+> +	g_free(str);
+> +
+> +	g_key_file_free(key_file);
+> +}
+> +
+> static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
+> {
+> 	struct input_device *idev = data;
+> @@ -694,6 +776,9 @@ static struct input_device *input_device_new(struct btd_device *device,
+> 	if (strlen(name) > 0)
+> 		idev->name = g_strdup(name);
+> 
+> +	idev->hid_props_present = FALSE;
+> +	input_device_load_props(idev);
+> +
+> 	return idev;
+> }
+> 
+> @@ -706,6 +791,81 @@ static gboolean is_device_sdp_disable(const sdp_record_t *rec)
+> 	return data && data->val.uint8;
+> }
+> 
+> +static void update_hid_props(struct input_device *idev,
+> +		gboolean normally_connectable, gboolean reconnect_initiate)
+> +{
+> +	gboolean update_nc, update_ri;
+> +	DBusConnection *dbus_conn = btd_get_dbus_connection();
+> +
+> +	update_nc = !idev->hid_props_present ||
+> +			idev->normally_connectable != normally_connectable;
+> +	idev->normally_connectable = normally_connectable;
+> +	if (update_nc)
+> +		g_dbus_emit_property_changed(dbus_conn, idev->path,
+> +				DEVICE_INTERFACE, "HIDNormallyConnectable");
+> +
+> +	update_ri = !idev->hid_props_present ||
+> +				idev->reconnect_initiate != reconnect_initiate;
+> +	idev->reconnect_initiate = reconnect_initiate;
+> +	if (update_ri)
+> +		g_dbus_emit_property_changed(dbus_conn, idev->path,
+> +				DEVICE_INTERFACE, "HIDReconnectInitiate");
+> +
+> +	idev->hid_props_present = TRUE;
+> +	if (update_nc || update_ri)
+> +		input_device_store_props(idev);
+> +}
+> +
+> +static void extract_hid_props(struct input_device *idev,
+> +							const sdp_record_t *rec)
+> +{
+> +	/* Extract HID connectability */
+> +	bool hid_nc, hid_ri;
+> +	sdp_data_t *pdlist;
+> +
+> +	/* HIDNormallyConnectable is optional and assumed FALSE
+> +	* if not present. */
+> +	pdlist = sdp_data_get(rec, SDP_ATTR_HID_NORMALLY_CONNECTABLE);
+> +	hid_nc = pdlist ? pdlist->val.uint8 : FALSE;
+> +
+> +	pdlist = sdp_data_get(rec, SDP_ATTR_HID_RECONNECT_INITIATE);
+> +	hid_ri = pdlist ? pdlist->val.uint8 : TRUE;
+> +
+> +	update_hid_props(idev, hid_nc, hid_ri);
+> +}
+> +
+> +static gboolean property_get_normally_connectable(
+> +					const GDBusPropertyTable *property,
+> +					DBusMessageIter *iter, void *data)
+> +{
+> +	struct input_device *idev = data;
+> +
+> +	if (idev->hid_props_present)
+> +		dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN,
+> +						&idev->normally_connectable);
+> +
+> +	return TRUE;
+> +}
+> +
+> +static gboolean property_get_reconnect_initiate(
+> +					const GDBusPropertyTable *property,
+> +					DBusMessageIter *iter, void *data)
+> +{
+> +	struct input_device *idev = data;
+> +
+> +	if (idev->hid_props_present)
+> +		dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN,
+> +						&idev->reconnect_initiate);
+> +
+> +	return TRUE;
+> +}
+> +
+> +static const GDBusPropertyTable input_properties[] = {
+> +	{ "NormallyConnectable", "b", property_get_normally_connectable },
+> +	{ "ReconnectInitiate", "b", property_get_reconnect_initiate },
+> +	{ }
+> +};
+> +
 
-Thanks for the comments!
-Alex
+I think you need callbacks for the case when the values are not available. Otherwise the GDBus core behaves funny when attempting to get all properties.
+
+> int input_device_register(struct btd_device *device,
+> 					const char *path, const char *uuid,
+> 					const sdp_record_t *rec, int timeout)
+> @@ -723,6 +883,18 @@ int input_device_register(struct btd_device *device,
+> 	if (!idev)
+> 		return -EINVAL;
+> 
+> +	if (g_dbus_register_interface(btd_get_dbus_connection(),
+> +					idev->path, INPUT_INTERFACE,
+> +					NULL, NULL,
+> +					input_properties, idev,
+> +					NULL) == FALSE) {
+> +		error("Unable to register %s interface", INPUT_INTERFACE);
+> +		input_device_free(idev);
+> +		return -EINVAL;
+> +	}
+> +
+> +	extract_hid_props(idev, rec);
+> +
+> 	idev->timeout = timeout;
+> 	idev->uuid = g_strdup(uuid);
+> 
+> @@ -761,6 +933,9 @@ int input_device_unregister(const char *path, const char *uuid)
+> 		return -EBUSY;
+> 	}
+> 
+> +	g_dbus_unregister_interface(btd_get_dbus_connection(),
+> +						idev->path, INPUT_INTERFACE);
+> +
+> 	devices = g_slist_remove(devices, idev);
+> 	input_device_free(idev);
+
+Regards
+
+Marcel
+
