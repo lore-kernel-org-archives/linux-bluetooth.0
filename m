@@ -2,185 +2,286 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [RFC BlueZ 03/18] attrib: Rename gatt_find_info() to gatt_discover_char_desc()
-Date: Tue,  2 Apr 2013 12:50:50 -0400
-Message-Id: <1364921465-31182-4-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [RFC BlueZ 02/18] unit: Add test for gatt_exchange_mtu()
+Date: Tue,  2 Apr 2013 12:50:49 -0400
+Message-Id: <1364921465-31182-3-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1364921465-31182-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1364921465-31182-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The old name referred to the underlying ATT PDU (Find Information
-Request and Find Information Response) and not to the actual GATT
-procedure (Discover All Characteristic Descriptors).
+The new unit/test-gatt.c file will contain tests for GATT API
+implemented in attrib/gatt.{c,h}.
 ---
- attrib/gatt.c                        |    2 +-
- attrib/gatt.h                        |    2 +-
- attrib/gatttool.c                    |    2 +-
- attrib/interactive.c                 |    5 +++--
- profiles/cyclingspeed/cyclingspeed.c |    2 +-
- profiles/gatt/gas.c                  |    3 ++-
- profiles/heartrate/heartrate.c       |    2 +-
- profiles/input/hog.c                 |    7 ++++---
- profiles/scanparam/scan.c            |    4 ++--
- profiles/thermometer/thermometer.c   |    2 +-
- 10 files changed, 17 insertions(+), 14 deletions(-)
+ Makefile.am      |    9 +++
+ unit/test-gatt.c |  238 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 247 insertions(+)
+ create mode 100644 unit/test-gatt.c
 
-diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 024d148..7a96c67 100644
---- a/attrib/gatt.c
-+++ b/attrib/gatt.c
-@@ -863,7 +863,7 @@ guint gatt_exchange_mtu(GAttrib *attrib, uint16_t mtu,
- 									g_free);
- }
+diff --git a/Makefile.am b/Makefile.am
+index f75b8d6..6c3f1fe 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -275,6 +275,15 @@ unit_tests += unit/test-lib
+ unit_test_lib_SOURCES = unit/test-lib.c
+ unit_test_lib_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@
  
--guint gatt_find_info(GAttrib *attrib, uint16_t start, uint16_t end,
-+guint gatt_discover_char_desc(GAttrib *attrib, uint16_t start, uint16_t end,
- 				GAttribResultFunc func, gpointer user_data)
- {
- 	uint8_t *buf;
-diff --git a/attrib/gatt.h b/attrib/gatt.h
-index 691be80..c0bdcc6 100644
---- a/attrib/gatt.h
-+++ b/attrib/gatt.h
-@@ -93,7 +93,7 @@ guint gatt_write_char(GAttrib *attrib, uint16_t handle, uint8_t *value,
- 					size_t vlen, GAttribResultFunc func,
- 					gpointer user_data);
++unit_tests += unit/test-gatt
++
++unit_test_gatt_SOURCES = unit/test-gatt.c \
++				attrib/gatt.h attrib/gatt.c \
++				attrib/gattrib.h attrib/gattrib.c \
++				attrib/att.h attrib/att.c \
++				src/shared/util.c
++unit_test_gatt_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@
++
+ noinst_PROGRAMS += $(unit_tests)
  
--guint gatt_find_info(GAttrib *attrib, uint16_t start, uint16_t end,
-+guint gatt_discover_char_desc(GAttrib *attrib, uint16_t start, uint16_t end,
- 				GAttribResultFunc func, gpointer user_data);
- 
- guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, uint8_t *value, int vlen,
-diff --git a/attrib/gatttool.c b/attrib/gatttool.c
-index 44c9ccf..c7539e7 100644
---- a/attrib/gatttool.c
-+++ b/attrib/gatttool.c
-@@ -461,7 +461,7 @@ static gboolean characteristics_desc(gpointer user_data)
- {
- 	GAttrib *attrib = user_data;
- 
--	gatt_find_info(attrib, opt_start, opt_end, char_desc_cb, NULL);
-+	gatt_discover_char_desc(attrib, opt_start, opt_end, char_desc_cb, NULL);
- 
- 	return FALSE;
- }
-diff --git a/attrib/interactive.c b/attrib/interactive.c
-index e1af871..6bc3b4e 100644
---- a/attrib/interactive.c
-+++ b/attrib/interactive.c
-@@ -306,7 +306,8 @@ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 	att_data_list_free(list);
- 
- 	if (handle != 0xffff && handle < end)
--		gatt_find_info(attrib, handle + 1, end, char_desc_cb, NULL);
-+		gatt_discover_char_desc(attrib, handle + 1, end, char_desc_cb,
-+									NULL);
- 	else
- 		rl_forced_update_display();
- }
-@@ -560,7 +561,7 @@ static void cmd_char_desc(int argcp, char **argvp)
- 	} else
- 		end = 0xffff;
- 
--	gatt_find_info(attrib, start, end, char_desc_cb, NULL);
-+	gatt_discover_char_desc(attrib, start, end, char_desc_cb, NULL);
- }
- 
- static void cmd_read_hnd(int argcp, char **argvp)
-diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
-index 125007e..7bec0fa 100644
---- a/profiles/cyclingspeed/cyclingspeed.c
-+++ b/profiles/cyclingspeed/cyclingspeed.c
-@@ -505,7 +505,7 @@ static void discover_desc(struct csc *csc, struct gatt_char *c,
- 	ch->csc = csc;
- 	memcpy(ch->uuid, c->uuid, sizeof(c->uuid));
- 
--	gatt_find_info(csc->attrib, start, end, discover_desc_cb, ch);
-+	gatt_discover_char_desc(csc->attrib, start, end, discover_desc_cb, ch);
- }
- 
- static void update_watcher(gpointer data, gpointer user_data)
-diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
-index 9ff89b0..48d5a2d 100644
---- a/profiles/gatt/gas.c
-+++ b/profiles/gatt/gas.c
-@@ -285,7 +285,8 @@ static void gatt_characteristic_cb(GSList *characteristics, guint8 status,
- 	}
- 
- 	gas->changed_handle = chr->value_handle;
--	gatt_find_info(gas->attrib, start, end, gatt_descriptors_cb, gas);
-+	gatt_discover_char_desc(gas->attrib, start, end, gatt_descriptors_cb,
-+									gas);
- }
- 
- static void exchange_mtu_cb(uint8_t status, uint16_t mtu, void *user_data)
-diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index 0520f5c..6522a90 100644
---- a/profiles/heartrate/heartrate.c
-+++ b/profiles/heartrate/heartrate.c
-@@ -460,7 +460,7 @@ static void discover_measurement_ccc(struct heartrate *hr,
- 		return;
- 	}
- 
--	gatt_find_info(hr->attrib, start, end, discover_ccc_cb, hr);
-+	gatt_discover_char_desc(hr->attrib, start, end, discover_ccc_cb, hr);
- }
- 
- static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index eadc860..5c90a92 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -260,8 +260,8 @@ done:
- 	att_data_list_free(list);
- 
- 	if (handle != 0xffff && handle < end)
--		gatt_find_info(attrib, handle + 1, end, discover_descriptor_cb,
--								ddcb_data);
-+		gatt_discover_char_desc(attrib, handle + 1, end,
-+					discover_descriptor_cb, ddcb_data);
- 	else
- 		g_free(ddcb_data);
- }
-@@ -278,7 +278,8 @@ static void discover_descriptor(GAttrib *attrib, uint16_t start, uint16_t end,
- 	ddcb_data->end = end;
- 	ddcb_data->data = user_data;
- 
--	gatt_find_info(attrib, start, end, discover_descriptor_cb, ddcb_data);
-+	gatt_discover_char_desc(attrib, start, end, discover_descriptor_cb,
-+								ddcb_data);
- }
- 
- static void external_service_char_cb(GSList *chars, guint8 status,
-diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
-index abbd129..374ae65 100644
---- a/profiles/scanparam/scan.c
-+++ b/profiles/scanparam/scan.c
-@@ -172,8 +172,8 @@ static void refresh_discovered_cb(GSList *chars, guint8 status,
- 
- 	scan->refresh_handle = chr->value_handle;
- 
--	gatt_find_info(scan->attrib, start, end,
--				discover_descriptor_cb, user_data);
-+	gatt_discover_char_desc(scan->attrib, start, end,
-+					discover_descriptor_cb, user_data);
- }
- 
- static void iwin_discovered_cb(GSList *chars, guint8 status,
-diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
-index 8550500..7795792 100644
---- a/profiles/thermometer/thermometer.c
-+++ b/profiles/thermometer/thermometer.c
-@@ -632,7 +632,7 @@ static void discover_desc(struct thermometer *t, struct gatt_char *c,
- 	ch->t = t;
- 	memcpy(ch->uuid, c->uuid, sizeof(c->uuid));
- 
--	gatt_find_info(t->attrib, start, end, discover_desc_cb, ch);
-+	gatt_discover_char_desc(t->attrib, start, end, discover_desc_cb, ch);
- }
- 
- static void read_temp_type_cb(guint8 status, const guint8 *pdu, guint16 len,
+ TESTS = $(unit_tests)
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+new file mode 100644
+index 0000000..babc30a
+--- /dev/null
++++ b/unit/test-gatt.c
+@@ -0,0 +1,238 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *  Copyright (C) 2013  Instituto Nokia de Tecnologia - INdT
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
++
++#include <glib.h>
++#include <unistd.h>
++#include <stdbool.h>
++
++#include "lib/uuid.h"
++#include "attrib/att.h"
++#include "attrib/gattrib.h"
++#include "attrib/gatt.h"
++#include "btio/btio.h"
++#include "log.h"
++#include "src/shared/util.h"
++
++struct context {
++	GMainLoop *main_loop;
++	guint server_source;
++	GAttrib *attrib;
++};
++
++void btd_debug(const char *format, ...)
++{
++}
++
++gboolean bt_io_get(GIOChannel *io, GError **err, BtIOOption opt1, ...)
++{
++	va_list args;
++	BtIOOption opt = opt1;
++
++	va_start(args, opt1);
++	while (opt != BT_IO_OPT_INVALID) {
++		switch (opt) {
++		case BT_IO_OPT_SEC_LEVEL:
++			*(va_arg(args, int *)) = BT_SECURITY_HIGH;
++			break;
++		case BT_IO_OPT_IMTU:
++			*(va_arg(args, uint16_t *)) = 512;
++			break;
++		case BT_IO_OPT_CID:
++			*(va_arg(args, uint16_t *)) = ATT_CID;
++			break;
++		default:
++			if (g_test_verbose() == TRUE)
++				printf("Unknown option %d\n", opt);
++
++			return FALSE;
++		}
++
++		opt = va_arg(args, int);
++	}
++	va_end(args);
++
++	return TRUE;
++}
++
++static gboolean handle_mtu_exchange(int fd)
++{
++	uint8_t pdu[3];
++	uint16_t mtu, pdu_len;
++	ssize_t len;
++
++	len = recv(fd, pdu, sizeof(pdu), 0);
++	g_assert(len == sizeof(pdu));
++
++	pdu_len = dec_mtu_req(pdu, len, &mtu);
++	g_assert(pdu_len == sizeof(pdu));
++
++	if (g_test_verbose() == TRUE)
++		printf("Received Exchange MTU Request: Client Rx MTU 0x%04x\n",
++									mtu);
++
++	/* Just reply with same MTU as client */
++	pdu_len = enc_mtu_resp(mtu, pdu, len);
++	g_assert(pdu_len == sizeof(pdu));
++
++	len = write(fd, pdu, pdu_len);
++	g_assert(len == pdu_len);
++
++	return TRUE;
++}
++
++static void att_debug(const char *str, void *user_data)
++{
++	g_print("ATT: %s\n", str);
++}
++
++static gboolean handle_not_supported(int fd)
++{
++	uint8_t pdu[5], ipdu[ATT_DEFAULT_LE_MTU];
++	ssize_t len;
++	uint16_t pdu_len;
++
++	len = recv(fd, ipdu, sizeof(ipdu), 0);
++	g_assert(len > 0);
++
++	if (g_test_verbose() == TRUE) {
++		printf("Unsupported/invalid ATT request (opcode 0x%02x)\n",
++								ipdu[0]);
++		util_hexdump('>', ipdu, len, att_debug, NULL);
++	}
++
++	pdu_len = enc_error_resp(ipdu[0], 0x0000, ATT_ECODE_REQ_NOT_SUPP, pdu,
++								sizeof(pdu));
++	g_assert(pdu_len == sizeof(pdu));
++
++	len = write(fd, pdu, pdu_len);
++	g_assert(len == pdu_len);
++
++	return TRUE;
++}
++
++static gboolean server_handler(GIOChannel *channel, GIOCondition cond,
++							gpointer user_data)
++{
++	uint8_t opcode;
++	ssize_t len;
++	int fd;
++
++	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP))
++		return FALSE;
++
++	fd = g_io_channel_unix_get_fd(channel);
++	len = recv(fd, &opcode, sizeof(opcode), MSG_PEEK);
++	g_assert(len == sizeof(opcode));
++
++	if (g_test_verbose() == TRUE)
++		printf("ATT request received (opcode 0x%02x)\n", opcode);
++
++	switch (opcode) {
++	case ATT_OP_MTU_REQ:
++		return handle_mtu_exchange(fd);
++	}
++
++	return handle_not_supported(fd);
++}
++
++static struct context *create_context(void)
++{
++	struct context *context = g_new0(struct context, 1);
++	GIOChannel *channel;
++	int err, sv[2];
++
++	context->main_loop = g_main_loop_new(NULL, FALSE);
++	g_assert(context->main_loop);
++
++	err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
++	g_assert(err == 0);
++
++	channel = g_io_channel_unix_new(sv[0]);
++
++	g_io_channel_set_close_on_unref(channel, TRUE);
++	g_io_channel_set_encoding(channel, NULL, NULL);
++	g_io_channel_set_buffered(channel, FALSE);
++
++	context->server_source = g_io_add_watch(channel,
++				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++				server_handler, context);
++	g_assert(context->server_source > 0);
++
++	g_io_channel_unref(channel);
++
++	channel = g_io_channel_unix_new(sv[1]);
++	context->attrib = g_attrib_new(channel);
++	g_io_channel_unref(channel);
++
++	return context;
++}
++
++static void execute_context(struct context *context)
++{
++	g_main_loop_run(context->main_loop);
++
++	g_source_remove(context->server_source);
++	g_main_loop_unref(context->main_loop);
++	g_attrib_unref(context->attrib);
++
++	g_free(context);
++}
++
++static void exchange_mtu_cb(uint8_t status, uint16_t mtu, void *user_data)
++{
++	struct context *context = user_data;
++
++	g_assert(status == 0);
++
++	if (g_test_verbose() == TRUE)
++		printf("Received Exchange MTU Response: Server Rx MTU 0x%04x\n",
++									mtu);
++
++	g_assert(mtu == ATT_DEFAULT_LE_MTU);
++
++	g_main_loop_quit(context->main_loop);
++}
++
++static void test_gatt_exchange_mtu(void)
++{
++	struct context *context = create_context();
++
++	gatt_exchange_mtu(context->attrib, ATT_DEFAULT_LE_MTU, exchange_mtu_cb,
++								context);
++
++	execute_context(context);
++}
++
++int main(int argc, char *argv[])
++{
++	g_test_init(&argc, &argv, NULL);
++
++	g_test_add_func("/gatt/gatt_exchange_mtu", test_gatt_exchange_mtu);
++
++	return g_test_run();
++}
 -- 
 1.7.9.5
 
