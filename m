@@ -2,138 +2,611 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [RFC BlueZ 05/18] unit: Add test for gatt_discover_primary()
-Date: Tue,  2 Apr 2013 12:50:52 -0400
-Message-Id: <1364921465-31182-6-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [RFC BlueZ 04/18] attrib: Modify gatt_cb_t to return bool
+Date: Tue,  2 Apr 2013 12:50:51 -0400
+Message-Id: <1364921465-31182-5-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1364921465-31182-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1364921465-31182-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- unit/test-gatt.c |   90 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 90 insertions(+)
+The boolean return value will have the same semantics as GLib watches:
+returning "true" will keep the GATT procedure going; returning "false"
+will interrupt it (either due to an error or because the desired
+information was found.)
 
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index babc30a..02afc69 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -135,6 +135,58 @@ static gboolean handle_not_supported(int fd)
- 	return TRUE;
+This "early interruption" of GATT procedures is allowed by the spec and
+avoids unnecessary data transfers, specially on large attribute
+databases and when using small MTU values.
+---
+ attrib/gatt.h                        |    2 +-
+ attrib/gatttool.c                    |   12 +++++++++---
+ attrib/interactive.c                 |   22 +++++++++++++++-------
+ profiles/cyclingspeed/cyclingspeed.c |    6 ++++--
+ profiles/deviceinfo/deviceinfo.c     |    6 ++++--
+ profiles/gatt/gas.c                  |    8 +++++---
+ profiles/heartrate/heartrate.c       |    6 ++++--
+ profiles/input/hog.c                 |   12 ++++++++----
+ profiles/proximity/monitor.c         |   18 ++++++++++++------
+ profiles/scanparam/scan.c            |   16 ++++++++++------
+ profiles/thermometer/thermometer.c   |    6 ++++--
+ src/device.c                         |   12 ++++++++----
+ 12 files changed, 84 insertions(+), 42 deletions(-)
+
+diff --git a/attrib/gatt.h b/attrib/gatt.h
+index c0bdcc6..e09970f 100644
+--- a/attrib/gatt.h
++++ b/attrib/gatt.h
+@@ -53,7 +53,7 @@
+ #define GATT_CLIENT_CHARAC_CFG_NOTIF_BIT	0x0001
+ #define GATT_CLIENT_CHARAC_CFG_IND_BIT		0x0002
+ 
+-typedef void (*gatt_cb_t) (GSList *l, guint8 status, gpointer user_data);
++typedef bool (*gatt_cb_t) (GSList *l, guint8 status, gpointer user_data);
+ typedef void (*gatt_exchange_mtu_cb_t) (uint8_t status, uint16_t mtu,
+ 							void *user_data);
+ 
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index c7539e7..11269c7 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -138,7 +138,7 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+ 	operation(attrib);
  }
  
-+static gboolean handle_read_by_group(int fd)
-+{
-+	uint8_t pdu[sizeof(uint16_t) * 3 + 2], ipdu[ATT_DEFAULT_LE_MTU];
-+	uint16_t pdu_len, start, end;
-+	struct att_data_list *adl;
-+	bt_uuid_t uuid, prim;
-+	uint8_t *value;
-+	ssize_t len;
+-static void primary_all_cb(GSList *services, guint8 status, gpointer user_data)
++static bool primary_all_cb(GSList *services, guint8 status, gpointer user_data)
+ {
+ 	GSList *l;
+ 
+@@ -156,9 +156,11 @@ static void primary_all_cb(GSList *services, guint8 status, gpointer user_data)
+ 
+ done:
+ 	g_main_loop_quit(event_loop);
 +
-+	len = recv(fd, ipdu, sizeof(ipdu), 0);
-+	g_assert(len > 0);
-+
-+	pdu_len = dec_read_by_grp_req(ipdu, len, &start, &end, &uuid);
-+	g_assert(pdu_len == len);
-+
-+	bt_uuid16_create(&prim, GATT_PRIM_SVC_UUID);
-+	g_assert(bt_uuid_cmp(&uuid, &prim) == 0);
-+
-+	adl = att_data_list_alloc(1, sizeof(uint16_t) * 3);
-+	g_assert(adl != NULL);
-+
-+	value = adl->data[0];
-+
-+	if (start == 0x0001 && end == 0xffff) {
-+		att_put_u16(0x0001, &value[0]);
-+		att_put_u16(0x000f, &value[2]);
-+		att_put_u16(0xaaaa, &value[4]);
-+	} else if (start == 0x0010 && end == 0xffff) {
-+		att_put_u16(0x0010, &value[0]);
-+		att_put_u16(0x001f, &value[2]);
-+		att_put_u16(0xbbbb, &value[4]);
-+	} else {
-+		/* Signal end of attribute group (primary service) */
-+		pdu_len = enc_error_resp(ipdu[0], start,
-+						ATT_ECODE_ATTR_NOT_FOUND,
-+						pdu, sizeof(pdu));
-+		g_assert(pdu_len == 5);
-+		goto done;
-+	}
-+
-+	pdu_len = enc_read_by_grp_resp(adl, pdu, sizeof(pdu));
-+	g_assert(pdu_len == sizeof(pdu));
-+
-+done:
-+	att_data_list_free(adl);
-+
-+	len = write(fd, pdu, pdu_len);
-+	g_assert(len == pdu_len);
-+
-+	return TRUE;
-+}
-+
- static gboolean server_handler(GIOChannel *channel, GIOCondition cond,
++	return true;
+ }
+ 
+-static void primary_by_uuid_cb(GSList *ranges, guint8 status,
++static bool primary_by_uuid_cb(GSList *ranges, guint8 status,
  							gpointer user_data)
  {
-@@ -155,6 +207,8 @@ static gboolean server_handler(GIOChannel *channel, GIOCondition cond,
- 	switch (opcode) {
- 	case ATT_OP_MTU_REQ:
- 		return handle_mtu_exchange(fd);
-+	case ATT_OP_READ_BY_GROUP_REQ:
-+		return handle_read_by_group(fd);
+ 	GSList *l;
+@@ -177,6 +179,8 @@ static void primary_by_uuid_cb(GSList *ranges, guint8 status,
+ 
+ done:
+ 	g_main_loop_quit(event_loop);
++
++	return true;
+ }
+ 
+ static gboolean primary(gpointer user_data)
+@@ -192,7 +196,7 @@ static gboolean primary(gpointer user_data)
+ 	return FALSE;
+ }
+ 
+-static void char_discovered_cb(GSList *characteristics, guint8 status,
++static bool char_discovered_cb(GSList *characteristics, guint8 status,
+ 							gpointer user_data)
+ {
+ 	GSList *l;
+@@ -213,6 +217,8 @@ static void char_discovered_cb(GSList *characteristics, guint8 status,
+ 
+ done:
+ 	g_main_loop_quit(event_loop);
++
++	return true;
+ }
+ 
+ static gboolean characteristics(gpointer user_data)
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index 6bc3b4e..f8f4fff 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -175,14 +175,14 @@ static void disconnect_io()
+ 	set_state(STATE_DISCONNECTED);
+ }
+ 
+-static void primary_all_cb(GSList *services, guint8 status, gpointer user_data)
++static bool primary_all_cb(GSList *services, guint8 status, gpointer user_data)
+ {
+ 	GSList *l;
+ 
+ 	if (status) {
+ 		printf("Discover all primary services failed: %s\n",
+ 							att_ecode2str(status));
+-		return;
++		return false;
  	}
  
- 	return handle_not_supported(fd);
-@@ -228,11 +282,47 @@ static void test_gatt_exchange_mtu(void)
- 	execute_context(context);
+ 	printf("\n");
+@@ -193,9 +193,11 @@ static void primary_all_cb(GSList *services, guint8 status, gpointer user_data)
+ 	}
+ 
+ 	rl_forced_update_display();
++
++	return true;
  }
  
-+static bool discover_primary_cb(GSList *services, uint8_t status,
-+								void *user_data)
-+{
-+	struct context *context = user_data;
-+	struct gatt_primary *prim;
-+
-+	g_assert_cmpuint(status, ==, 0);
-+	g_assert_cmpuint(g_slist_length(services), ==, 2);
-+
-+	prim = g_slist_nth_data(services, 0);
-+	g_assert(prim->range.start == 0x0001 && prim->range.end == 0x000f);
-+	g_assert(bt_uuid_strcmp(&prim->uuid,
-+				"0000aaaa-0000-1000-8000-00805f9b34fb") == 0);
-+
-+	prim = g_slist_nth_data(services, 1);
-+	g_assert(prim->range.start == 0x0010 && prim->range.end == 0x001f);
-+	g_assert(bt_uuid_strcmp(&prim->uuid,
-+				"0000bbbb-0000-1000-8000-00805f9b34fb") == 0);
-+
-+	g_main_loop_quit(context->main_loop);
-+
-+	return false;
-+}
-+
-+static void test_gatt_discover_primary(void)
-+{
-+	struct context *context = create_context();
-+
-+	gatt_discover_primary(context->attrib, NULL, discover_primary_cb,
-+								context);
-+
-+	execute_context(context);
-+}
-+
- int main(int argc, char *argv[])
+-static void primary_by_uuid_cb(GSList *ranges, guint8 status,
++static bool primary_by_uuid_cb(GSList *ranges, guint8 status,
+ 							gpointer user_data)
  {
- 	g_test_init(&argc, &argv, NULL);
+ 	GSList *l;
+@@ -203,7 +205,7 @@ static void primary_by_uuid_cb(GSList *ranges, guint8 status,
+ 	if (status) {
+ 		printf("Discover primary services by UUID failed: %s\n",
+ 							att_ecode2str(status));
+-		return;
++		return false;
+ 	}
  
- 	g_test_add_func("/gatt/gatt_exchange_mtu", test_gatt_exchange_mtu);
-+	g_test_add_func("/gatt/gatt_discover_primary",
-+						test_gatt_discover_primary);
+ 	printf("\n");
+@@ -214,9 +216,11 @@ static void primary_by_uuid_cb(GSList *ranges, guint8 status,
+ 	}
  
- 	return g_test_run();
+ 	rl_forced_update_display();
++
++	return true;
  }
+ 
+-static void included_cb(GSList *includes, guint8 status, gpointer user_data)
++static bool included_cb(GSList *includes, guint8 status, gpointer user_data)
+ {
+ 	GSList *l;
+ 
+@@ -242,16 +246,18 @@ static void included_cb(GSList *includes, guint8 status, gpointer user_data)
+ 
+ done:
+ 	rl_forced_update_display();
++
++	return true;
+ }
+ 
+-static void char_cb(GSList *characteristics, guint8 status, gpointer user_data)
++static bool char_cb(GSList *characteristics, guint8 status, gpointer user_data)
+ {
+ 	GSList *l;
+ 
+ 	if (status) {
+ 		printf("Discover all characteristics failed: %s\n",
+ 							att_ecode2str(status));
+-		return;
++		return false;
+ 	}
+ 
+ 	printf("\n");
+@@ -265,6 +271,8 @@ static void char_cb(GSList *characteristics, guint8 status, gpointer user_data)
+ 	}
+ 
+ 	rl_forced_update_display();
++
++	return true;
+ }
+ 
+ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
+diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
+index 7bec0fa..605bb6c 100644
+--- a/profiles/cyclingspeed/cyclingspeed.c
++++ b/profiles/cyclingspeed/cyclingspeed.c
+@@ -758,7 +758,7 @@ done:
+ 		g_attrib_send(csc->attrib, 0, opdu, olen, NULL, NULL, NULL);
+ }
+ 
+-static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
++static bool discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
+ {
+ 	struct csc *csc = user_data;
+ 	uint16_t feature_val_handle = 0;
+@@ -766,7 +766,7 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
+ 	if (status) {
+ 		error("Discover CSCS characteristics: %s",
+ 							att_ecode2str(status));
+-		return;
++		return false;
+ 	}
+ 
+ 	for (; chars; chars = chars->next) {
+@@ -803,6 +803,8 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
+ 	if (feature_val_handle > 0)
+ 		gatt_read_char(csc->attrib, feature_val_handle,
+ 							read_feature_cb, csc);
++
++	return true;
+ }
+ 
+ static void enable_measurement(gpointer data, gpointer user_data)
+diff --git a/profiles/deviceinfo/deviceinfo.c b/profiles/deviceinfo/deviceinfo.c
+index 471241b..d926367 100644
+--- a/profiles/deviceinfo/deviceinfo.c
++++ b/profiles/deviceinfo/deviceinfo.c
+@@ -119,7 +119,7 @@ static void process_deviceinfo_char(struct characteristic *ch)
+ 							read_pnpid_cb, ch);
+ }
+ 
+-static void configure_deviceinfo_cb(GSList *characteristics, guint8 status,
++static bool configure_deviceinfo_cb(GSList *characteristics, guint8 status,
+ 							gpointer user_data)
+ {
+ 	struct deviceinfo *d = user_data;
+@@ -128,7 +128,7 @@ static void configure_deviceinfo_cb(GSList *characteristics, guint8 status,
+ 	if (status != 0) {
+ 		error("Discover deviceinfo characteristics: %s",
+ 							att_ecode2str(status));
+-		return;
++		return false;
+ 	}
+ 
+ 	for (l = characteristics; l; l = l->next) {
+@@ -146,6 +146,8 @@ static void configure_deviceinfo_cb(GSList *characteristics, guint8 status,
+ 
+ 		process_deviceinfo_char(ch);
+ 	}
++
++	return true;
+ }
+ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ {
+diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
+index 48d5a2d..8390f4a 100644
+--- a/profiles/gatt/gas.c
++++ b/profiles/gatt/gas.c
+@@ -262,7 +262,7 @@ done:
+ 	att_data_list_free(list);
+ }
+ 
+-static void gatt_characteristic_cb(GSList *characteristics, guint8 status,
++static bool gatt_characteristic_cb(GSList *characteristics, guint8 status,
+ 							gpointer user_data)
+ {
+ 	struct gas *gas = user_data;
+@@ -271,7 +271,7 @@ static void gatt_characteristic_cb(GSList *characteristics, guint8 status,
+ 
+ 	if (status) {
+ 		error("Discover Service Changed handle: %s", att_ecode2str(status));
+-		return;
++		return false;
+ 	}
+ 
+ 	chr = characteristics->data;
+@@ -281,12 +281,14 @@ static void gatt_characteristic_cb(GSList *characteristics, guint8 status,
+ 
+ 	if (start > end) {
+ 		error("Inconsistent database: Service Changed CCC missing");
+-		return;
++		return false;
+ 	}
+ 
+ 	gas->changed_handle = chr->value_handle;
+ 	gatt_discover_char_desc(gas->attrib, start, end, gatt_descriptors_cb,
+ 									gas);
++
++	return true;
+ }
+ 
+ static void exchange_mtu_cb(uint8_t status, uint16_t mtu, void *user_data)
+diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
+index 6522a90..2fe8b0f 100644
+--- a/profiles/heartrate/heartrate.c
++++ b/profiles/heartrate/heartrate.c
+@@ -463,14 +463,14 @@ static void discover_measurement_ccc(struct heartrate *hr,
+ 	gatt_discover_char_desc(hr->attrib, start, end, discover_ccc_cb, hr);
+ }
+ 
+-static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
++static bool discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
+ {
+ 	struct heartrate *hr = user_data;
+ 
+ 	if (status) {
+ 		error("Discover HRS characteristics failed: %s",
+ 							att_ecode2str(status));
+-		return;
++		return false;
+ 	}
+ 
+ 	for (; chars; chars = chars->next) {
+@@ -497,6 +497,8 @@ static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
+ 			hr->hrcp_val_handle = c->value_handle;
+ 		}
+ 	}
++
++	return true;
+ }
+ 
+ static void enable_measurement(gpointer data, gpointer user_data)
+diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+index 5c90a92..feee24d 100644
+--- a/profiles/input/hog.c
++++ b/profiles/input/hog.c
+@@ -282,7 +282,7 @@ static void discover_descriptor(GAttrib *attrib, uint16_t start, uint16_t end,
+ 								ddcb_data);
+ }
+ 
+-static void external_service_char_cb(GSList *chars, guint8 status,
++static bool external_service_char_cb(GSList *chars, guint8 status,
+ 							gpointer user_data)
+ {
+ 	struct hog_device *hogdev = user_data;
+@@ -293,7 +293,7 @@ static void external_service_char_cb(GSList *chars, guint8 status,
+ 	if (status != 0) {
+ 		const char *str = att_ecode2str(status);
+ 		DBG("Discover external service characteristic failed: %s", str);
+-		return;
++		return false;
+ 	}
+ 
+ 	for (l = chars; l; l = g_slist_next(l)) {
+@@ -314,6 +314,8 @@ static void external_service_char_cb(GSList *chars, guint8 status,
+ 		end = (next ? next->handle - 1 : prim->range.end);
+ 		discover_descriptor(hogdev->attrib, start, end, report);
+ 	}
++
++	return true;
+ }
+ 
+ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
+@@ -462,7 +464,7 @@ static void proto_mode_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 								hogdev->id);
+ }
+ 
+-static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
++static bool char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+ {
+ 	struct hog_device *hogdev = user_data;
+ 	struct gatt_primary *prim = hogdev->hog_primary;
+@@ -475,7 +477,7 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+ 	if (status != 0) {
+ 		const char *str = att_ecode2str(status);
+ 		DBG("Discover all characteristics failed: %s", str);
+-		return;
++		return false;
+ 	}
+ 
+ 	bt_uuid16_create(&report_uuid, HOG_REPORT_UUID);
+@@ -528,6 +530,8 @@ static void char_discovered_cb(GSList *chars, guint8 status, gpointer user_data)
+ 	if (info_handle)
+ 		gatt_read_char(hogdev->attrib, info_handle, info_read_cb,
+ 									hogdev);
++
++	return true;
+ }
+ 
+ static void output_written_cb(guint8 status, const guint8 *pdu,
+diff --git a/profiles/proximity/monitor.c b/profiles/proximity/monitor.c
+index 48f877d..91e0c69 100644
+--- a/profiles/proximity/monitor.c
++++ b/profiles/proximity/monitor.c
+@@ -182,7 +182,7 @@ static void linkloss_written(guint8 status, const guint8 *pdu, guint16 plen,
+ 				PROXIMITY_INTERFACE, "LinkLossAlertLevel");
+ }
+ 
+-static void char_discovered_cb(GSList *characteristics, guint8 status,
++static bool char_discovered_cb(GSList *characteristics, guint8 status,
+ 							gpointer user_data)
+ {
+ 	struct monitor *monitor = user_data;
+@@ -191,7 +191,7 @@ static void char_discovered_cb(GSList *characteristics, guint8 status,
+ 
+ 	if (status) {
+ 		error("Discover Link Loss handle: %s", att_ecode2str(status));
+-		return;
++		return false;
+ 	}
+ 
+ 	DBG("Setting alert level \"%s\" on Reporter", monitor->linklosslevel);
+@@ -202,6 +202,8 @@ static void char_discovered_cb(GSList *characteristics, guint8 status,
+ 
+ 	gatt_write_char(monitor->attrib, monitor->linklosshandle, &value, 1,
+ 						linkloss_written, monitor);
++
++	return true;
+ }
+ 
+ static int write_alert_level(struct monitor *monitor)
+@@ -251,7 +253,7 @@ static void tx_power_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	DBG("Tx Power Level: %02x", (int8_t) value[0]);
+ }
+ 
+-static void tx_power_handle_cb(GSList *characteristics, guint8 status,
++static bool tx_power_handle_cb(GSList *characteristics, guint8 status,
+ 							gpointer user_data)
+ {
+ 	struct monitor *monitor = user_data;
+@@ -259,7 +261,7 @@ static void tx_power_handle_cb(GSList *characteristics, guint8 status,
+ 
+ 	if (status) {
+ 		error("Discover Tx Power handle: %s", att_ecode2str(status));
+-		return;
++		return false;
+ 	}
+ 
+ 	chr = characteristics->data;
+@@ -269,6 +271,8 @@ static void tx_power_handle_cb(GSList *characteristics, guint8 status,
+ 
+ 	gatt_read_char(monitor->attrib, monitor->txpowerhandle,
+ 							tx_power_read_cb, monitor);
++
++	return true;
+ }
+ 
+ static void read_tx_power(struct monitor *monitor)
+@@ -338,7 +342,7 @@ static void write_immediate_alert(struct monitor *monitor)
+ 						immediate_written, monitor);
+ }
+ 
+-static void immediate_handle_cb(GSList *characteristics, guint8 status,
++static bool immediate_handle_cb(GSList *characteristics, guint8 status,
+ 							gpointer user_data)
+ {
+ 	struct monitor *monitor = user_data;
+@@ -347,7 +351,7 @@ static void immediate_handle_cb(GSList *characteristics, guint8 status,
+ 	if (status) {
+ 		error("Discover Immediate Alert handle: %s",
+ 						att_ecode2str(status));
+-		return;
++		return false;
+ 	}
+ 
+ 	chr = characteristics->data;
+@@ -357,6 +361,8 @@ static void immediate_handle_cb(GSList *characteristics, guint8 status,
+ 
+ 	if (monitor->fallbacklevel)
+ 		write_immediate_alert(monitor);
++
++	return true;
+ }
+ 
+ static void discover_immediate_handle(struct monitor *monitor)
+diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
+index 374ae65..1c7be37 100644
+--- a/profiles/scanparam/scan.c
++++ b/profiles/scanparam/scan.c
+@@ -143,7 +143,7 @@ done:
+ 	att_data_list_free(list);
+ }
+ 
+-static void refresh_discovered_cb(GSList *chars, guint8 status,
++static bool refresh_discovered_cb(GSList *chars, guint8 status,
+ 						gpointer user_data)
+ {
+ 	struct scan *scan = user_data;
+@@ -152,12 +152,12 @@ static void refresh_discovered_cb(GSList *chars, guint8 status,
+ 
+ 	if (status) {
+ 		error("Scan Refresh %s", att_ecode2str(status));
+-		return;
++		return false;
+ 	}
+ 
+ 	if (!chars) {
+ 		DBG("Scan Refresh not supported");
+-		return;
++		return false;
+ 	}
+ 
+ 	chr = chars->data;
+@@ -168,15 +168,17 @@ static void refresh_discovered_cb(GSList *chars, guint8 status,
+ 	end = scan->range.end;
+ 
+ 	if (start >= end)
+-		return;
++		return false;
+ 
+ 	scan->refresh_handle = chr->value_handle;
+ 
+ 	gatt_discover_char_desc(scan->attrib, start, end,
+ 					discover_descriptor_cb, user_data);
++
++	return true;
+ }
+ 
+-static void iwin_discovered_cb(GSList *chars, guint8 status,
++static bool iwin_discovered_cb(GSList *chars, guint8 status,
+ 						gpointer user_data)
+ {
+ 	struct scan *scan = user_data;
+@@ -185,7 +187,7 @@ static void iwin_discovered_cb(GSList *chars, guint8 status,
+ 	if (status) {
+ 		error("Discover Scan Interval Window: %s",
+ 						att_ecode2str(status));
+-		return;
++		return false;
+ 	}
+ 
+ 	chr = chars->data;
+@@ -194,6 +196,8 @@ static void iwin_discovered_cb(GSList *chars, guint8 status,
+ 	DBG("Scan Interval Window handle: 0x%04x", scan->iwhandle);
+ 
+ 	write_scan_params(scan->attrib, scan->iwhandle);
++
++	return true;
+ }
+ 
+ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
+index 7795792..6580867 100644
+--- a/profiles/thermometer/thermometer.c
++++ b/profiles/thermometer/thermometer.c
+@@ -736,7 +736,7 @@ static void process_thermometer_char(struct thermometer *t,
+ 	}
+ }
+ 
+-static void configure_thermometer_cb(GSList *characteristics, guint8 status,
++static bool configure_thermometer_cb(GSList *characteristics, guint8 status,
+ 							gpointer user_data)
+ {
+ 	struct thermometer *t = user_data;
+@@ -745,7 +745,7 @@ static void configure_thermometer_cb(GSList *characteristics, guint8 status,
+ 	if (status != 0) {
+ 		error("Discover thermometer characteristics: %s",
+ 							att_ecode2str(status));
+-		return;
++		return false;
+ 	}
+ 
+ 	for (l = characteristics; l; l = l->next) {
+@@ -754,6 +754,8 @@ static void configure_thermometer_cb(GSList *characteristics, guint8 status,
+ 
+ 		process_thermometer_char(t, c, c_next);
+ 	}
++
++	return true;
+ }
+ 
+ static void write_interval_cb(guint8 status, const guint8 *pdu, guint16 len,
+diff --git a/src/device.c b/src/device.c
+index ee17514..b2a7ade 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -3026,7 +3026,7 @@ static int service_by_range_cmp(gconstpointer a, gconstpointer b)
+ 	return memcmp(&prim->range, range, sizeof(*range));
+ }
+ 
+-static void find_included_cb(GSList *includes, uint8_t status,
++static bool find_included_cb(GSList *includes, uint8_t status,
+ 						gpointer user_data)
+ {
+ 	struct included_search *search = user_data;
+@@ -3063,12 +3063,14 @@ done:
+ 		register_all_services(search->req, search->services);
+ 		g_slist_free(search->services);
+ 		g_free(search);
+-		return;
++		return true;
+ 	}
+ 
+ 	prim = search->current->data;
+ 	gatt_find_included(device->attrib, prim->range.start, prim->range.end,
+ 					find_included_cb, search);
++
++	return true;
+ }
+ 
+ static void find_included_services(struct browse_req *req, GSList *services)
+@@ -3091,7 +3093,7 @@ static void find_included_services(struct browse_req *req, GSList *services)
+ 
+ }
+ 
+-static void primary_cb(GSList *services, guint8 status, gpointer user_data)
++static bool primary_cb(GSList *services, guint8 status, gpointer user_data)
+ {
+ 	struct browse_req *req = user_data;
+ 
+@@ -3107,10 +3109,12 @@ static void primary_cb(GSList *services, guint8 status, gpointer user_data)
+ 
+ 		device->browse = NULL;
+ 		browse_request_free(req);
+-		return;
++		return false;
+ 	}
+ 
+ 	find_included_services(req, services);
++
++	return true;
+ }
+ 
+ static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
 -- 
 1.7.9.5
 
