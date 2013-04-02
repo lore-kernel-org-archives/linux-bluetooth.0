@@ -1,54 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <14D61081-B665-4A03-840C-52CB64ECB1C4@holtmann.org>
-References: <1364918918-2336-1-git-send-email-dh.herrmann@gmail.com>
-	<14D61081-B665-4A03-840C-52CB64ECB1C4@holtmann.org>
-Date: Tue, 2 Apr 2013 18:48:53 +0200
-Message-ID: <CANq1E4QJ3F_tseko9+4tRLFaF7MiMZVPgjQQ7eiWQn_Y3vYTQg@mail.gmail.com>
-Subject: Re: [PATCH v2 00/18] Rework HIDP Module
-From: David Herrmann <dh.herrmann@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Gustavo Padovan <gustavo@padovan.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [RFC BlueZ 07/18] core: Do not pass around memory allocated internally by GATT API
+Date: Tue,  2 Apr 2013 12:50:54 -0400
+Message-Id: <1364921465-31182-8-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1364921465-31182-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1364921465-31182-1-git-send-email-anderson.lizardo@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel
+Instead, do a "deep copy" of the list of GATT services. While this
+generates extra heap allocations, it also allows proper cleanup in case
+of ATT or link errors. In other words, memory allocated by GATT API will
+be freed by GATT API after callback returns.
+---
+ src/device.c |    8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-On Tue, Apr 2, 2013 at 6:38 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi David,
->
->> This is my second attempt to get these patches merged. I added 4 more fixes at
->> the end and removed the patches that were already merged by Gustavo.
->>
->> This fixes a lot of issues with the HIDP layer. It is currently nearly
->> impossible to use HIDP devices. Every attempt (except the first) to connect a
->> device results in an oops or panic for me.
->>
->> I haven't found a way to fix this easily, so I decided to rewrite the session
->> handling of HIDP.
->
-> I am generally fine with these patches after a quick read-through. However I am not 100% sure that hci_conn_user is the right approach.
->
-> So my question is if we really want to base this of the ACL link itself and not base this around L2CAP directly. Every L2CAP connection implies a hci_conn in the end. Would it be hard to have something like l2cap_user instead of hci_conn_user?
+diff --git a/src/device.c b/src/device.c
+index 6fd255a..3b4d66b 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -3078,11 +3078,16 @@ static void find_included_services(struct included_search *search,
+ {
+ 	struct btd_device *device = search->req->device;
+ 	struct gatt_primary *prim;
++	GSList *l;
+ 
+ 	if (services == NULL)
+ 		return;
+ 
+-	search->services = g_slist_copy(services);
++	for (l = services; l != NULL; l = l->next) {
++		prim = l->data;
++		search->services = g_slist_append(search->services,
++						g_memdup(prim, sizeof(*prim)));
++	}
+ 	search->current = search->services;
+ 
+ 	prim = search->current->data;
+@@ -3108,6 +3113,7 @@ static bool primary_cb(GSList *services, guint8 status, gpointer user_data)
+ 
+ 		device->browse = NULL;
+ 		browse_request_free(req);
++		g_slist_free_full(search->services, g_free);
+ 		g_free(search);
+ 
+ 		return false;
+-- 
+1.7.9.5
 
-The thing is that HID uses two L2CAP channels. We would probably use
-the CTRL channel as parent device, but this makes the synchronization
-with the INTR channel quite hard to implement.
-Also note that l2cap channels do not have "struct device" embedded,
-which would disallow showing the HID device in the right location in
-sysfs.
-If you have some other idea, I can try to implement this. But I
-couldn't come up with anything better than hid_conn_user.
-
-All in all I think using the HCI-conn object is the best approach as
-it is the "logical" parent device of an HIDP device. Also note that
-this is only used as sysfs connection. We still detect L2CAP channel
-events in the HIDP core.
-
-Thanks for the review! I have a ton more HID fixes which generalize
-HID-boot devices and output reports across HID ll-drivers. But I
-really want this to get in first. Everything else can be taken through
-Jiri's HID tree.
-
-Regards
-David
