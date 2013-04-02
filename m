@@ -1,35 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
-Subject: Re: [PATCH v2 00/18] Rework HIDP Module
-From: Marcel Holtmann <marcel@holtmann.org>
+From: David Herrmann <dh.herrmann@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	David Herrmann <dh.herrmann@gmail.com>
+Subject: [PATCH v2 18/18] Bluetooth: hidp: fix sending output reports on intr channel
+Date: Tue,  2 Apr 2013 18:08:38 +0200
+Message-Id: <1364918918-2336-19-git-send-email-dh.herrmann@gmail.com>
 In-Reply-To: <1364918918-2336-1-git-send-email-dh.herrmann@gmail.com>
-Date: Tue, 2 Apr 2013 09:38:36 -0700
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo@padovan.org>
-Message-Id: <14D61081-B665-4A03-840C-52CB64ECB1C4@holtmann.org>
 References: <1364918918-2336-1-git-send-email-dh.herrmann@gmail.com>
-To: David Herrmann <dh.herrmann@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+According to the specifications, data output reports must be sent on the
+interrupt channel. See also usbhid implementation.
+Sending these reports on the control channel breaks newer Wii Remotes.
 
-> This is my second attempt to get these patches merged. I added 4 more fixes at
-> the end and removed the patches that were already merged by Gustavo.
-> 
-> This fixes a lot of issues with the HIDP layer. It is currently nearly
-> impossible to use HIDP devices. Every attempt (except the first) to connect a
-> device results in an oops or panic for me.
-> 
-> I haven't found a way to fix this easily, so I decided to rewrite the session
-> handling of HIDP.
+Note that this will make output reports asynchronous. However, that's how
+hid_output_raw_report() is supposed to work with HID_OUTPUT_REPORT as
+report type. There are no responses to output reports.
 
-I am generally fine with these patches after a quick read-through. However I am not 100% sure that hci_conn_user is the right approach.
+Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
+---
+ net/bluetooth/hidp/core.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-So my question is if we really want to base this of the ACL link itself and not base this around L2CAP directly. Every L2CAP connection implies a hci_conn in the end. Would it be hard to have something like l2cap_user instead of hci_conn_user?
-
-Regards
-
-Marcel
-
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index 041a82c..0910944 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -332,14 +332,11 @@ static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, s
+ 	struct hidp_session *session = hid->driver_data;
+ 	int ret;
+ 
+-	switch (report_type) {
+-	case HID_FEATURE_REPORT:
+-		report_type = HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE;
+-		break;
+-	case HID_OUTPUT_REPORT:
++	if (report_type == HID_OUTPUT_REPORT) {
+ 		report_type = HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT;
+-		break;
+-	default:
++		return hidp_send_intr_message(session, report_type,
++					      data, count);
++	} else if (report_type != HID_FEATURE_REPORT) {
+ 		return -EINVAL;
+ 	}
+ 
+@@ -348,6 +345,7 @@ static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, s
+ 
+ 	/* Set up our wait, and send the report request to the device. */
+ 	set_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags);
++	report_type = HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE;
+ 	ret = hidp_send_ctrl_message(session, report_type, data, count);
+ 	if (ret)
+ 		goto err;
+-- 
+1.8.2
