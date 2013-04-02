@@ -1,44 +1,143 @@
 Return-Path: <cyrus@holtmann.org>
 From: Alvaro Silva <alvaro.silva@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Alvaro Silva <alvaro.silva@openbossa.org>
-Subject: [PATCH 1/2] tools: Add tests for start discovery
-Date: Tue,  2 Apr 2013 19:34:59 -0400
-Message-Id: <1364945700-17156-1-git-send-email-alvaro.silva@openbossa.org>
+Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
+Subject: [PATCH BlueZ v2 04/13] gatttool: Use GError to propage error messages to caller
+Date: Tue,  2 Apr 2013 19:31:21 -0400
+Message-Id: <1364945490-17059-5-git-send-email-alvaro.silva@openbossa.org>
+In-Reply-To: <1364945490-17059-1-git-send-email-alvaro.silva@openbossa.org>
+References: <1363905109-30839-1-git-send-email-alvaro.silva@openbossa.org>
+ <1364945490-17059-1-git-send-email-alvaro.silva@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add HCI command test and discovering event test for start discovery.
----
- tools/mgmt-tester.c |    8 ++++++++
- 1 file changed, 8 insertions(+)
+From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index ac7c01a..3def64e 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -1066,6 +1066,8 @@ static const char start_discovery_invalid_param[] = { 0x00 };
- static const char start_discovery_bredr_param[] = { 0x01 };
- static const char start_discovery_le_param[] = { 0x06 };
- static const char start_discovery_bredrle_param[] = { 0x07 };
-+static const char start_discovery_valid_hci[] = { 0x01, 0x01 };
-+static const char start_discovery_evt[] = { 0x07, 0x01 };
+Handle runtime errors outside gatt_connect(), using GError to propagate
+error messages to caller.
+---
+ attrib/gatttool.c    |    6 +++++-
+ attrib/gatttool.h    |    3 ++-
+ attrib/interactive.c |   10 +++++++---
+ attrib/utils.c       |   14 +++++++-------
+ 4 files changed, 21 insertions(+), 12 deletions(-)
+
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index 1dd0c35..8dbebbb 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -576,6 +576,7 @@ int main(int argc, char *argv[])
+ 	if (g_option_context_parse(context, &argc, &argv, &gerr) == FALSE) {
+ 		g_printerr("%s\n", gerr->message);
+ 		g_error_free(gerr);
++		gerr = NULL;
+ 	}
  
- static const struct generic_data start_discovery_not_powered_test_1 = {
- 	.send_opcode = MGMT_OP_START_DISCOVERY,
-@@ -1095,6 +1097,12 @@ static const struct generic_data start_discovery_valid_param_test_1 = {
- 	.expect_status = MGMT_STATUS_SUCCESS,
- 	.expect_param = start_discovery_bredrle_param,
- 	.expect_len = sizeof(start_discovery_bredr_param),
-+	.expect_hci_command = BT_HCI_CMD_LE_SET_SCAN_ENABLE,
-+	.expect_hci_param = start_discovery_valid_hci,
-+	.expect_hci_len = sizeof(start_discovery_valid_hci),
-+	.expect_alt_ev = MGMT_EV_DISCOVERING,
-+	.expect_alt_ev_param = start_discovery_evt,
-+	.expect_alt_ev_len = sizeof(start_discovery_evt),
- };
+ 	if (opt_interactive) {
+@@ -610,8 +611,11 @@ int main(int argc, char *argv[])
+ 	}
  
- static const char stop_discovery_bredrle_param[] = { 0x07 };
+ 	chan = gatt_connect(opt_src, opt_dst, opt_dst_type, opt_sec_level,
+-					opt_psm, opt_mtu, connect_cb);
++					opt_psm, opt_mtu, connect_cb, &gerr);
+ 	if (chan == NULL) {
++		g_printerr("%s\n", gerr->message);
++		g_error_free(gerr);
++		gerr = NULL;
+ 		got_error = TRUE;
+ 		goto done;
+ 	}
+diff --git a/attrib/gatttool.h b/attrib/gatttool.h
+index 260480d..184a7f8 100644
+--- a/attrib/gatttool.h
++++ b/attrib/gatttool.h
+@@ -25,5 +25,6 @@ int interactive(const gchar *src, const gchar *dst, const gchar *dst_type,
+ 								int psm);
+ GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
+ 			const gchar *dst_type, const gchar *sec_level,
+-			int psm, int mtu, BtIOConnect connect_cb);
++			int psm, int mtu, BtIOConnect connect_cb,
++			GError **gerr);
+ size_t gatt_attr_data_from_string(const char *str, uint8_t **data);
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index 9f72453..ce35218 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -395,6 +395,8 @@ static gboolean channel_watcher(GIOChannel *chan, GIOCondition cond,
+ 
+ static void cmd_connect(int argcp, char **argvp)
+ {
++	GError *gerr = NULL;
++
+ 	if (conn_state != STATE_DISCONNECTED)
+ 		return;
+ 
+@@ -416,10 +418,12 @@ static void cmd_connect(int argcp, char **argvp)
+ 
+ 	set_state(STATE_CONNECTING);
+ 	iochannel = gatt_connect(opt_src, opt_dst, opt_dst_type, opt_sec_level,
+-						opt_psm, opt_mtu, connect_cb);
+-	if (iochannel == NULL)
++					opt_psm, opt_mtu, connect_cb, &gerr);
++	if (iochannel == NULL) {
++		printf("%s\n", gerr->message);
+ 		set_state(STATE_DISCONNECTED);
+-	else
++		g_error_free(gerr);
++	} else
+ 		g_io_add_watch(iochannel, G_IO_HUP, channel_watcher, NULL);
+ }
+ 
+diff --git a/attrib/utils.c b/attrib/utils.c
+index c8c8651..e263bcb 100644
+--- a/attrib/utils.c
++++ b/attrib/utils.c
+@@ -42,12 +42,13 @@
+ 
+ GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
+ 				const gchar *dst_type, const gchar *sec_level,
+-				int psm, int mtu, BtIOConnect connect_cb)
++				int psm, int mtu, BtIOConnect connect_cb,
++				GError **gerr)
+ {
+ 	GIOChannel *chan;
+ 	bdaddr_t sba, dba;
+ 	uint8_t dest_type;
+-	GError *err = NULL;
++	GError *tmp_err = NULL;
+ 	BtIOSecLevel sec;
+ 
+ 	str2ba(dst, &dba);
+@@ -75,7 +76,7 @@ GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
+ 		sec = BT_IO_SEC_LOW;
+ 
+ 	if (psm == 0)
+-		chan = bt_io_connect(connect_cb, NULL, NULL, &err,
++		chan = bt_io_connect(connect_cb, NULL, NULL, &tmp_err,
+ 				BT_IO_OPT_SOURCE_BDADDR, &sba,
+ 				BT_IO_OPT_DEST_BDADDR, &dba,
+ 				BT_IO_OPT_DEST_TYPE, dest_type,
+@@ -83,7 +84,7 @@ GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
+ 				BT_IO_OPT_SEC_LEVEL, sec,
+ 				BT_IO_OPT_INVALID);
+ 	else
+-		chan = bt_io_connect(connect_cb, NULL, NULL, &err,
++		chan = bt_io_connect(connect_cb, NULL, NULL, &tmp_err,
+ 				BT_IO_OPT_SOURCE_BDADDR, &sba,
+ 				BT_IO_OPT_DEST_BDADDR, &dba,
+ 				BT_IO_OPT_PSM, psm,
+@@ -91,9 +92,8 @@ GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
+ 				BT_IO_OPT_SEC_LEVEL, sec,
+ 				BT_IO_OPT_INVALID);
+ 
+-	if (err) {
+-		g_printerr("%s\n", err->message);
+-		g_error_free(err);
++	if (tmp_err) {
++		g_propagate_error(gerr, tmp_err);
+ 		return NULL;
+ 	}
+ 
 -- 
 1.7.9.5
 
