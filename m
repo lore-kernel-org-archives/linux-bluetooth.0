@@ -2,30 +2,36 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 1/3] attrib: Fix memory leak on low memory condition
-Date: Tue,  2 Apr 2013 11:07:43 -0400
-Message-Id: <1364915265-4191-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 3/3] attrib: Fix status on memory allocation failure
+Date: Tue,  2 Apr 2013 11:07:45 -0400
+Message-Id: <1364915265-4191-3-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1364915265-4191-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1364915265-4191-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If g_try_new0() fails due to low memory condition, "list" should be
-freed before returning from primary_all_cb().
+If memory allocation fails, ATT_ECODE_INSUFF_RESOURCES should be
+reported to the callback.
 ---
- attrib/gatt.c |    1 +
- 1 file changed, 1 insertion(+)
+ attrib/gatt.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 44d3eb6..e4c5385 100644
+index c1aa070..38d455a 100644
 --- a/attrib/gatt.c
 +++ b/attrib/gatt.c
-@@ -226,6 +226,7 @@ static void primary_all_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
+@@ -651,8 +651,10 @@ static void read_char_helper(guint8 status, const guint8 *rpdu,
+ 		goto done;
  
- 		primary = g_try_new0(struct gatt_primary, 1);
- 		if (!primary) {
-+			att_data_list_free(list);
- 			err = ATT_ECODE_INSUFF_RESOURCES;
- 			goto done;
- 		}
+ 	long_read->buffer = g_malloc(rlen);
+-	if (long_read->buffer == NULL)
++	if (long_read->buffer == NULL) {
++		status = ATT_ECODE_INSUFF_RESOURCES;
+ 		goto done;
++	}
+ 
+ 	memcpy(long_read->buffer, rpdu, rlen);
+ 	long_read->size = rlen;
 -- 
 1.7.9.5
 
