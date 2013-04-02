@@ -2,55 +2,43 @@ Return-Path: <cyrus@holtmann.org>
 From: Alvaro Silva <alvaro.silva@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Alvaro Silva <alvaro.silva@openbossa.org>
-Subject: [PATCH BlueZ v2 00/13] Improvements on gatttool interactive interface
-Date: Tue,  2 Apr 2013 19:31:17 -0400
-Message-Id: <1364945490-17059-1-git-send-email-alvaro.silva@openbossa.org>
-In-Reply-To: <1363905109-30839-1-git-send-email-alvaro.silva@openbossa.org>
+Subject: [PATCH BlueZ v2 08/13] gatttool: Show connection state using color
+Date: Tue,  2 Apr 2013 19:31:25 -0400
+Message-Id: <1364945490-17059-9-git-send-email-alvaro.silva@openbossa.org>
+In-Reply-To: <1364945490-17059-1-git-send-email-alvaro.silva@openbossa.org>
 References: <1363905109-30839-1-git-send-email-alvaro.silva@openbossa.org>
+ <1364945490-17059-1-git-send-email-alvaro.silva@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+When device is connected, the Bluetooth address is shown in blue color.
+---
+ attrib/interactive.c |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-This is the second version of the patches with improvements to
-gatttool interactive interface.
-
-As suggested, we rewrote the commit message for patch #03. We also
-reordered the patches #02 and #03, so the check for destination
-address is removed only after the appropriate check is added to
-gatttool.c.
-
-BR,
-Alvaro Silva
-
-Alvaro Silva (3):
-  gatttool: Show connection state using color
-  gatttool: Remove connecting message from prompt
-  gatttool: Use error message prefixes consistently
-
-Eder Ruiz Maria (9):
-  gatttool: Remote address is mandatory for non-interactive gatttool
-  gatttool: Remove check for bluetooth address parameter on
-    gatt_connect()
-  gatttool: Use GError to propage error messages to caller
-  gatttool: Fix issues with printf() and readline prompt
-  gatttool: Replace more usages of printf() with rl_printf()
-  gatttool: Use bluetoothctl behavior when pressing Enter on empty
-    prompt
-  gatttool: Use bluetoothctl strategy to handle standard input
-  gatttool: Use bluetoothctl strategy for unix signal handling
-  gatttool: Show info message when no primary service is found
-
-Jefferson Delfes (1):
-  gatttool: Fix memory leak after parsing input line
-
- Makefile.tools       |    3 +-
- attrib/gatttool.c    |   12 +-
- attrib/gatttool.h    |    3 +-
- attrib/interactive.c |  345 +++++++++++++++++++++++++++++++++-----------------
- attrib/utils.c       |   19 +--
- 5 files changed, 249 insertions(+), 133 deletions(-)
-
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index ecb8b7d..5ffe2fb 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -79,15 +79,15 @@ static char *get_prompt(void)
+ 	}
+ 
+ 	if (conn_state == STATE_CONNECTED)
+-		g_string_assign(prompt, "[CON]");
+-	else
+-		g_string_assign(prompt, "[   ]");
++		g_string_append(prompt, COLOR_BLUE);
+ 
+ 	if (opt_dst)
+ 		g_string_append_printf(prompt, "[%17s]", opt_dst);
+ 	else
+ 		g_string_append_printf(prompt, "[%17s]", "");
+ 
++	g_string_append(prompt, COLOR_OFF);
++
+ 	if (opt_psm)
+ 		g_string_append(prompt, "[BR]");
+ 	else
 -- 
 1.7.9.5
 
