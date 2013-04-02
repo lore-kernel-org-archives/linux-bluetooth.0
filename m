@@ -1,50 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 2 Apr 2013 12:21:15 +0300
+Date: Tue, 2 Apr 2013 10:07:46 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: yousif saeed <yufi_saeed@hotmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Listening for notifications/indications
-Message-ID: <20130402092115.GA9284@x220>
-References: <BAY175-W240DF9C80BE34DD37FB78DE5D20@phx.gbl>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] Fix Inquiry command support in HCI request
+ framework
+Message-ID: <20130402070746.GA5376@x220>
+References: <1364425497-30944-1-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <BAY175-W240DF9C80BE34DD37FB78DE5D20@phx.gbl>
+In-Reply-To: <1364425497-30944-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Youssif,
+Hi Andre,
 
-On Thu, Mar 28, 2013, yousif saeed wrote:
-> I'm trying to communicate with a BLE module through a Linux machine
-> (the module is running a heart rate profile). So far, I've been able
-> to do everything I need except listening for Notifications and
-> indications. I've searched through the web, forums, and even tried
-> walking through the source code and still could not find the answer. 
+On Wed, Mar 27, 2013, Andre Guedes wrote:
+> This v2 implements the following comments about the previous patch set:
+>  - Consider commands (which don't send Command Complete Event) as completed
+>    based on Command Status Event.
+>  - Remove hci_req_cmd_status function.
 > 
-> I'm using kernel version 3.5 and bluez-5.3.
+> Thus, for those HCI commands which don't send Command Complete Event, the HCI
+> request framework considers they have completed when the Command Status Event
+> is received. 
 > 
-> Any help is greatly appreciated as this is part of my final year project.
+> Regards,
 > 
-> Thanks
-> Youssif
+> Andre
 > 
-> Succcessful commands used so far:
-> hcitool lescan
-> hcitool lecc
-> gatttool -b <Mac Address> --primary
-> gatttool -b <MAC Address> --characteristics
-> gatttool -b <MAC Address> --char-read
-> gatttool -b <MAC Address> --char-des
-> gatttool -b <MAC Address> --interactive
+> Andre Guedes (3):
+>   Bluetooth: Fix HCI request framework
+>   Bluetooth: Fix hci_inquiry
+>   Bluetooth: Remove hci_req_cmd_status
 > 
-> Failed commands:
-> gatttool -b <MAC Address> --listen
+>  include/net/bluetooth/hci_core.h |  1 -
+>  net/bluetooth/hci_core.c         | 39 +++++++++++++--------------------------
+>  net/bluetooth/hci_event.c        | 11 ++++++-----
+>  3 files changed, 19 insertions(+), 32 deletions(-)
 
-You shouldn't need to use hcitool nor gatttool for the heartrate
-profile. Instead, it should be enough to register a Heartrate Watcher
-through the HeartrateManager D-Bus interface (see doc/heartrate-api.txt).
-There's also a python script that will do all this for you in
-test/test-heartrate. I've been able to use the script successfully with
-my own LE heartrate device.
+I did a bit of testing and these patches seem to work fine. I'm not
+really familiar with the smp_mb__after_clear_bit() usage, but I'll
+assume you did your homework to ensure it's correct. Other than that the
+patches seem fine to me.
+
+Acked-by: Johan Hedberg <johan.hedberg@intel.com>
 
 Johan
