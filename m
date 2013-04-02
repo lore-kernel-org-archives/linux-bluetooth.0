@@ -4,70 +4,77 @@ To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo@padovan.org>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	David Herrmann <dh.herrmann@gmail.com>
-Subject: [PATCH v2 02/18] Bluetooth: hidp: verify l2cap sockets
-Date: Tue,  2 Apr 2013 18:08:22 +0200
-Message-Id: <1364918918-2336-3-git-send-email-dh.herrmann@gmail.com>
-In-Reply-To: <1364918918-2336-1-git-send-email-dh.herrmann@gmail.com>
-References: <1364918918-2336-1-git-send-email-dh.herrmann@gmail.com>
+Subject: [PATCH v2 00/18] Rework HIDP Module
+Date: Tue,  2 Apr 2013 18:08:20 +0200
+Message-Id: <1364918918-2336-1-git-send-email-dh.herrmann@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We need to verify that the given sockets actually are l2cap sockets. If
-they aren't, we are not supposed to access bt_sk(sock) and we shouldn't
-start the session if the offsets turn out to be valid local BT addresses.
+Hi
 
-That is, if someone passes a TCP socket to HIDCONNADD, then we access some
-random offset in the TCP socket (which isn't even guaranteed to be valid).
+This is my second attempt to get these patches merged. I added 4 more fixes at
+the end and removed the patches that were already merged by Gustavo.
 
-Fix this by checking that the socket is an l2cap socket.
+This fixes a lot of issues with the HIDP layer. It is currently nearly
+impossible to use HIDP devices. Every attempt (except the first) to connect a
+device results in an oops or panic for me.
 
-Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
----
- include/net/bluetooth/l2cap.h | 1 +
- net/bluetooth/hidp/core.c     | 2 ++
- net/bluetooth/l2cap_sock.c    | 6 ++++++
- 3 files changed, 9 insertions(+)
+I haven't found a way to fix this easily, so I decided to rewrite the session
+handling of HIDP.
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 7588ef4..db6694f 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -787,6 +787,7 @@ extern bool disable_ertm;
- 
- int l2cap_init_sockets(void);
- void l2cap_cleanup_sockets(void);
-+bool l2cap_is_socket(struct socket *sock);
- 
- void __l2cap_connect_rsp_defer(struct l2cap_chan *chan);
- int __l2cap_wait_ack(struct sock *sk);
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index a7352ff..c547b55 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -969,6 +969,8 @@ int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock,
- 
- 	BT_DBG("");
- 
-+	if (!l2cap_is_socket(ctrl_sock) || !l2cap_is_socket(intr_sock))
-+		return -EINVAL;
- 	if (bacmp(&bt_sk(ctrl_sock->sk)->src, &bt_sk(intr_sock->sk)->src) ||
- 			bacmp(&bt_sk(ctrl_sock->sk)->dst, &bt_sk(intr_sock->sk)->dst))
- 		return -ENOTUNIQ;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 1bcfb84..461e8bc 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -43,6 +43,12 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent);
- static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
- 				     int proto, gfp_t prio);
- 
-+bool l2cap_is_socket(struct socket *sock)
-+{
-+	return sock && sock->ops == &l2cap_sock_ops;
-+}
-+EXPORT_SYMBOL(l2cap_is_socket);
-+
- static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- {
- 	struct sock *sk = sock->sk;
+The following patches can be cherry-picked if you decide to give the others
+some more time for reviews: (you have to replace hidp_session_terminate()
+with atomic_inc(&session->terminate))
+  Bluetooth: hidp: remove redundant error message
+  Bluetooth: hidp: verify l2cap sockets
+  Bluetooth: hidp: remove unused session->state field
+  Bluetooth: hidp: test "terminate" before sleeping
+  Bluetooth: allow constant arguments for bacmp()/bacpy()
+  Bluetooth: hidp: move hidp_schedule() to core.c
+  Bluetooth: hidp: handle kernel_sendmsg() errors correctly
+  Bluetooth: hidp: merge hidp_process_{ctrl,intr}_transmit()
+  Bluetooth: hidp: merge 'send' functions into hidp_send_message()
+  Bluetooth: hidp: don't send boot-protocol messages as HID-reports
+  Bluetooth: hidp: fix sending output reports on intr channel
+
+Thanks
+David
+
+
+David Herrmann (18):
+  Bluetooth: hidp: remove redundant error message
+  Bluetooth: hidp: verify l2cap sockets
+  Bluetooth: rename hci_conn_put to hci_conn_drop
+  Bluetooth: remove unneeded hci_conn_hold/put_device()
+  Bluetooth: introduce hci_conn ref-counting
+  Bluetooth: hidp: remove unused session->state field
+  Bluetooth: hidp: test "terminate" before sleeping
+  Bluetooth: allow constant arguments for bacmp()/bacpy()
+  Bluetooth: l2cap: add l2cap_sock_get_hci_conn() helper
+  Bluetooth: add hci_conn_user sub-modules
+  Bluetooth: hidp: move hidp_schedule() to core.c
+  Bluetooth: hidp: add new session-management helpers
+  Bluetooth: hidp: remove old session-management
+  Bluetooth: hidp: handle kernel_sendmsg() errors correctly
+  Bluetooth: hidp: merge hidp_process_{ctrl,intr}_transmit()
+  Bluetooth: hidp: merge 'send' functions into hidp_send_message()
+  Bluetooth: hidp: don't send boot-protocol messages as HID-reports
+  Bluetooth: hidp: fix sending output reports on intr channel
+
+ include/net/bluetooth/bluetooth.h |   4 +-
+ include/net/bluetooth/hci_core.h  |  46 +-
+ include/net/bluetooth/l2cap.h     |   2 +
+ net/bluetooth/hci_conn.c          |  92 +++-
+ net/bluetooth/hci_event.c         |  40 +-
+ net/bluetooth/hci_sysfs.c         |   1 -
+ net/bluetooth/hidp/core.c         | 981 ++++++++++++++++++++++----------------
+ net/bluetooth/hidp/hidp.h         |  67 ++-
+ net/bluetooth/hidp/sock.c         |  22 +-
+ net/bluetooth/l2cap_core.c        |   6 +-
+ net/bluetooth/l2cap_sock.c        |  27 ++
+ net/bluetooth/mgmt.c              |   6 +-
+ net/bluetooth/sco.c               |   6 +-
+ net/bluetooth/smp.c               |   2 +-
+ 14 files changed, 783 insertions(+), 519 deletions(-)
+
 -- 
 1.8.2
