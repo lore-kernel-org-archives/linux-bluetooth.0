@@ -1,157 +1,286 @@
 Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [RFC BlueZ 01/18] attrib: Avoid passing raw PDU to Exchange MTU callback
-Date: Tue,  2 Apr 2013 12:50:48 -0400
-Message-Id: <1364921465-31182-2-git-send-email-anderson.lizardo@openbossa.org>
+Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
+Subject: [RFC BlueZ 18/18] gatt: Avoid passing raw PDU to read characteristic by UUID
+Date: Tue,  2 Apr 2013 12:51:05 -0400
+Message-Id: <1364921465-31182-19-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1364921465-31182-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1364921465-31182-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
+
 By centralizing the PDU parsing and validation internally to GATT API,
 the callbacks become simpler.
 ---
- attrib/gatt.c        |   32 ++++++++++++++++++++++++++++++--
- attrib/gatt.h        |    6 ++++--
- attrib/interactive.c |   10 +---------
- profiles/gatt/gas.c  |   11 ++---------
- 4 files changed, 37 insertions(+), 22 deletions(-)
+ attrib/gatt.c        |   57 +++++++++++++++++++++++++++++++++++++++++++++++---
+ attrib/gatt.h        |   10 +++++++--
+ attrib/gatttool.c    |   27 +++++++++---------------
+ attrib/interactive.c |   29 ++++++++++---------------
+ profiles/gatt/gas.c  |   22 +++++++------------
+ 5 files changed, 90 insertions(+), 55 deletions(-)
 
 diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 8b15569..024d148 100644
+index aeea2ca..8ff54d8 100644
 --- a/attrib/gatt.c
 +++ b/attrib/gatt.c
-@@ -823,16 +823,44 @@ guint gatt_write_char(GAttrib *attrib, uint16_t handle, uint8_t *value,
- 							func, long_write);
+@@ -587,10 +587,56 @@ guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
+ 								dc, NULL);
  }
  
--guint gatt_exchange_mtu(GAttrib *attrib, uint16_t mtu, GAttribResultFunc func,
-+struct gatt_exchange_mtu_data {
-+	gatt_exchange_mtu_cb_t func;
++struct read_char_by_uuid {
++	gatt_cb_t func;
 +	void *user_data;
 +};
 +
-+static void gatt_exchange_mtu_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 							gpointer user_data)
- {
-+	struct gatt_exchange_mtu_data *data = user_data;
-+	uint16_t rmtu = 0;
++static void gatt_att_free(gpointer data)
++{
++	struct gatt_att *gatt_att = data;
++
++	g_free(gatt_att->value);
++	g_free(gatt_att);
++}
++
++static void read_char_by_uuid_cb(uint8_t status, const uint8_t *pdu,
++						uint16_t plen, void *user_data)
++{
++	struct read_char_by_uuid *rd = user_data;
++	struct att_data_list *att_list = NULL;
++	GSList *gatt_list = NULL;
++	int i;
 +
 +	if (status != 0)
 +		goto done;
 +
-+	if (dec_mtu_resp(pdu, plen, &rmtu) == 0)
++	att_list = dec_read_by_type_resp(pdu, plen);
++	if (att_list == NULL) {
 +		status = ATT_ECODE_IO;
++		goto done;
++	}
++
++	for (i = 0; i < att_list->num; i++) {
++		uint8_t *data = att_list->data[i];
++		struct gatt_att *gatt_att = g_new0(struct gatt_att, 1);
++		gatt_att->handle = att_get_u16(&data[0]);
++		gatt_att->size = att_list->len - 2;
++		gatt_att->value = g_memdup(&data[2], gatt_att->size);
++		gatt_list = g_slist_prepend(gatt_list, gatt_att);
++	}
 +
 +done:
-+	data->func(status, rmtu, data->user_data);
++	att_data_list_free(att_list);
++	rd->func(gatt_list, status, rd->user_data);
++	g_slist_free_full(gatt_list, gatt_att_free);
 +}
 +
-+guint gatt_exchange_mtu(GAttrib *attrib, uint16_t mtu,
-+				gatt_exchange_mtu_cb_t func, void *user_data)
-+{
-+	struct gatt_exchange_mtu_data *data;
- 	uint8_t *buf;
+ guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
+-					bt_uuid_t *uuid, GAttribResultFunc func,
+-					gpointer user_data)
++						bt_uuid_t *uuid, gatt_cb_t func,
++						gpointer user_data)
+ {
++	struct read_char_by_uuid *data;
  	size_t buflen;
+ 	uint8_t *buf = g_attrib_get_buffer(attrib, &buflen);
  	guint16 plen;
+@@ -599,7 +645,12 @@ guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
+ 	if (plen == 0)
+ 		return 0;
  
-+	data = g_new0(struct gatt_exchange_mtu_data, 1);
+-	return g_attrib_send(attrib, 0, buf, plen, func, user_data, NULL);
++	data = g_new0(struct read_char_by_uuid, 1);
 +	data->func = func;
 +	data->user_data = user_data;
 +
- 	buf = g_attrib_get_buffer(attrib, &buflen);
- 	plen = enc_mtu_req(mtu, buf, buflen);
--	return g_attrib_send(attrib, 0, buf, plen, func, user_data, NULL);
-+
-+	return g_attrib_send(attrib, 0, buf, plen, gatt_exchange_mtu_cb, data,
++	return g_attrib_send(attrib, 0, buf, plen, read_char_by_uuid_cb, data,
 +									g_free);
  }
  
- guint gatt_find_info(GAttrib *attrib, uint16_t start, uint16_t end,
+ struct read_long_data {
 diff --git a/attrib/gatt.h b/attrib/gatt.h
-index 305b4c6..691be80 100644
+index 97b38c6..d7f6880 100644
 --- a/attrib/gatt.h
 +++ b/attrib/gatt.h
-@@ -54,6 +54,8 @@
- #define GATT_CLIENT_CHARAC_CFG_IND_BIT		0x0002
+@@ -84,6 +84,12 @@ struct gatt_char_desc {
+ 	bt_uuid_t uuid;
+ };
  
- typedef void (*gatt_cb_t) (GSList *l, guint8 status, gpointer user_data);
-+typedef void (*gatt_exchange_mtu_cb_t) (uint8_t status, uint16_t mtu,
-+							void *user_data);
++struct gatt_att {
++	uint16_t handle;
++	uint8_t *value;
++	size_t size;
++};
++
+ guint gatt_discover_primary(GAttrib *attrib, bt_uuid_t *uuid, gatt_cb_t func,
+ 							gpointer user_data);
  
- struct gatt_primary {
- 	char uuid[MAX_LEN_UUID_STR + 1];
-@@ -101,8 +103,8 @@ guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
- 				bt_uuid_t *uuid, GAttribResultFunc func,
- 				gpointer user_data);
+@@ -108,8 +114,8 @@ guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, uint8_t *value, int vlen,
+ 				GDestroyNotify notify, gpointer user_data);
  
--guint gatt_exchange_mtu(GAttrib *attrib, uint16_t mtu, GAttribResultFunc func,
--							gpointer user_data);
-+guint gatt_exchange_mtu(GAttrib *attrib, uint16_t mtu,
-+				gatt_exchange_mtu_cb_t func, void *user_data);
+ guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
+-				bt_uuid_t *uuid, GAttribResultFunc func,
+-				gpointer user_data);
++						bt_uuid_t *uuid, gatt_cb_t func,
++						gpointer user_data);
  
- gboolean gatt_parse_record(const sdp_record_t *rec,
- 					uuid_t *prim_uuid, uint16_t *psm,
+ guint gatt_exchange_mtu(GAttrib *attrib, uint16_t mtu,
+ 				gatt_exchange_mtu_cb_t func, void *user_data);
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index 2013a15..860a98c 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -252,11 +252,10 @@ done:
+ 		g_main_loop_quit(event_loop);
+ }
+ 
+-static void char_read_by_uuid_cb(guint8 status, const guint8 *pdu,
+-					guint16 plen, gpointer user_data)
++static bool char_read_by_uuid_cb(GSList *values, uint8_t status,
++								void *user_data)
+ {
+-	struct att_data_list *list;
+-	int i;
++	GSList *l;
+ 
+ 	if (status != 0) {
+ 		g_printerr("Read characteristics by UUID failed: %s\n",
+@@ -264,25 +263,19 @@ static void char_read_by_uuid_cb(guint8 status, const guint8 *pdu,
+ 		goto done;
+ 	}
+ 
+-	list = dec_read_by_type_resp(pdu, plen);
+-	if (list == NULL)
+-		goto done;
+-
+-	for (i = 0; i < list->num; i++) {
+-		uint8_t *value = list->data[i];
+-		int j;
++	for (l = values; l; l = g_slist_next(l)) {
++		size_t i;
++		struct gatt_att *att_data = l->data;
+ 
+-		g_print("handle: 0x%04x \t value: ", att_get_u16(value));
+-		value += 2;
+-		for (j = 0; j < list->len - 2; j++, value++)
+-			g_print("%02x ", *value);
++		printf("\nhandle: 0x%04x \t value: ", att_data->handle);
++		for (i = 0; i < att_data->size; i++)
++			g_print("%02x ", att_data->value[i]);
+ 		g_print("\n");
+ 	}
+ 
+-	att_data_list_free(list);
+-
+ done:
+ 	g_main_loop_quit(event_loop);
++	return true;
+ }
+ 
+ static gboolean characteristics_read(gpointer user_data)
 diff --git a/attrib/interactive.c b/attrib/interactive.c
-index d6fc89c..e1af871 100644
+index e297bd7..f030b5d 100644
 --- a/attrib/interactive.c
 +++ b/attrib/interactive.c
-@@ -729,22 +729,14 @@ static void cmd_sec_level(int argcp, char **argvp)
- 	}
+@@ -314,36 +314,29 @@ static void char_read_cb(uint8_t status, const uint8_t *value, size_t vlen,
+ 	rl_forced_update_display();
  }
  
--static void exchange_mtu_cb(guint8 status, const guint8 *pdu, guint16 plen,
--							gpointer user_data)
-+static void exchange_mtu_cb(uint8_t status, uint16_t mtu, void *user_data)
+-static void char_read_by_uuid_cb(guint8 status, const guint8 *pdu,
+-					guint16 plen, gpointer user_data)
++static bool char_read_by_uuid_cb(GSList *values, uint8_t status,
++								void *user_data)
  {
--	uint16_t mtu;
--
+-	struct att_data_list *list;
+-	int i;
++	GSList *l;
+ 
  	if (status != 0) {
- 		printf("Exchange MTU Request failed: %s\n",
+ 		printf("Read characteristics by UUID failed: %s\n",
  							att_ecode2str(status));
- 		return;
+-		return;
++		return true;
  	}
  
--	if (!dec_mtu_resp(pdu, plen, &mtu)) {
--		printf("Protocol error\n");
+-	list = dec_read_by_type_resp(pdu, plen);
+-	if (list == NULL)
 -		return;
--	}
 -
- 	mtu = MIN(mtu, opt_mtu);
- 	/* Set new value for MTU in client */
- 	if (g_attrib_set_mtu(attrib, mtu))
+-	for (i = 0; i < list->num; i++) {
+-		uint8_t *value = list->data[i];
+-		int j;
++	for (l = values; l; l = g_slist_next(l)) {
++		size_t i;
++		struct gatt_att *att_data = l->data;
+ 
+-		printf("\nhandle: 0x%04x \t value: ", att_get_u16(value));
+-		value += 2;
+-		for (j = 0; j < list->len - 2; j++, value++)
+-			printf("%02x ", *value);
++		printf("\nhandle: 0x%04x \t value: ", att_data->handle);
++		for (i = 0; i < att_data->size; i++)
++			printf("%02x ", att_data->value[i]);
+ 		printf("\n");
+ 	}
+ 
+-	att_data_list_free(list);
+-
+ 	rl_forced_update_display();
++	return true;
+ }
+ 
+ static void cmd_exit(int argcp, char **argvp)
 diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
-index bc8dbb5..9ff89b0 100644
+index 6313ea3..e89c745 100644
 --- a/profiles/gatt/gas.c
 +++ b/profiles/gatt/gas.c
-@@ -288,23 +288,16 @@ static void gatt_characteristic_cb(GSList *characteristics, guint8 status,
- 	gatt_find_info(gas->attrib, start, end, gatt_descriptors_cb, gas);
+@@ -132,38 +132,30 @@ static int read_ctp_handle(struct btd_device *device, uint16_t uuid,
+ 	return err;
  }
  
--static void exchange_mtu_cb(guint8 status, const guint8 *pdu, guint16 plen,
+-static void gap_appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
 -							gpointer user_data)
-+static void exchange_mtu_cb(uint8_t status, uint16_t mtu, void *user_data)
++static bool gap_appearance_cb(GSList *values, uint8_t status, void *user_data)
  {
  	struct gas *gas = user_data;
--	uint16_t rmtu;
+-	struct att_data_list *list =  NULL;
++	struct gatt_att *gatt_att = values->data;
+ 	uint16_t app;
+-	uint8_t *atval;
  
- 	if (status) {
- 		error("MTU exchange: %s", att_ecode2str(status));
- 		return;
+ 	if (status != 0) {
+ 		error("Read characteristics by UUID failed: %s",
+ 				att_ecode2str(status));
+-		return;
++		return false;
  	}
  
--	if (!dec_mtu_resp(pdu, plen, &rmtu)) {
--		error("MTU exchange: protocol error");
+-	list = dec_read_by_type_resp(pdu, plen);
+-	if (list == NULL)
 -		return;
--	}
 -
--	gas->mtu = MIN(rmtu, gas->mtu);
-+	gas->mtu = MIN(mtu, gas->mtu);
- 	if (g_attrib_set_mtu(gas->attrib, gas->mtu))
- 		DBG("MTU exchange succeeded: %d", gas->mtu);
- 	else
+-	if (list->len != 4) {
++	if (gatt_att->size != 2) {
+ 		error("GAP Appearance value: invalid data");
+-		goto done;
++		return false;
+ 	}
+ 
+-	atval = list->data[0] + 2; /* skip handle value */
+-	app = att_get_u16(atval);
++	app = att_get_u16(gatt_att->value);
+ 
+ 	DBG("GAP Appearance: 0x%04x", app);
+ 
+ 	device_set_appearance(gas->device, app);
+ 
+-done:
+-	att_data_list_free(list);
++	return false;
+ }
+ 
+ static void indication_cb(const uint8_t *pdu, uint16_t len, gpointer user_data)
 -- 
 1.7.9.5
 
