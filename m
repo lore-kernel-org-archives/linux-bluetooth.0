@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Alvaro Silva <alvaro.silva@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
-Subject: [PATCH BlueZ v2 03/13] gatttool: Remove check for bluetooth address parameter on gatt_connect()
-Date: Tue,  2 Apr 2013 19:31:20 -0400
-Message-Id: <1364945490-17059-4-git-send-email-alvaro.silva@openbossa.org>
+Subject: [PATCH BlueZ v2 02/13] gatttool: Remote address is mandatory for non-interactive gatttool
+Date: Tue,  2 Apr 2013 19:31:19 -0400
+Message-Id: <1364945490-17059-3-git-send-email-alvaro.silva@openbossa.org>
 In-Reply-To: <1364945490-17059-1-git-send-email-alvaro.silva@openbossa.org>
 References: <1363905109-30839-1-git-send-email-alvaro.silva@openbossa.org>
  <1364945490-17059-1-git-send-email-alvaro.silva@openbossa.org>
@@ -13,29 +13,29 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
 
-This check is more appropriate to be done by callers of gatt_connect().
-This is already done on interactive mode in attrib/interactive.c and is
-now also done in non-interactive mode.
+For gatttool non-interactive mode, command line parameter with
+bluetooth remote address is mandatory.
 ---
- attrib/utils.c |    5 -----
- 1 file changed, 5 deletions(-)
+ attrib/gatttool.c |    6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/attrib/utils.c b/attrib/utils.c
-index f9813d1..c8c8651 100644
---- a/attrib/utils.c
-+++ b/attrib/utils.c
-@@ -50,11 +50,6 @@ GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
- 	GError *err = NULL;
- 	BtIOSecLevel sec;
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index 29e3261..1dd0c35 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -603,6 +603,12 @@ int main(int argc, char *argv[])
+ 		goto done;
+ 	}
  
--	/* Remote device */
--	if (dst == NULL) {
--		g_printerr("Remote Bluetooth address required\n");
--		return NULL;
--	}
- 	str2ba(dst, &dba);
- 
- 	/* Local adapter */
++	if (opt_dst == NULL) {
++		g_print("Remote Bluetooth address required\n");
++		got_error = TRUE;
++		goto done;
++	}
++
+ 	chan = gatt_connect(opt_src, opt_dst, opt_dst_type, opt_sec_level,
+ 					opt_psm, opt_mtu, connect_cb);
+ 	if (chan == NULL) {
 -- 
 1.7.9.5
 
