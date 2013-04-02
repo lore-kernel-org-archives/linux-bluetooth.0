@@ -1,43 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+From: Chan-yeol Park <chanyeol.park@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 2/3] attrib: Fix coding style in read_char_helper()
-Date: Tue,  2 Apr 2013 11:07:44 -0400
-Message-Id: <1364915265-4191-2-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1364915265-4191-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1364915265-4191-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH v4 3/3] Bluetooth: Remove trivial white space
+Date: Tue, 02 Apr 2013 21:24:23 +0900
+Message-id: <1364905463-1752-3-git-send-email-chanyeol.park@samsung.com>
+In-reply-to: <1364905463-1752-1-git-send-email-chanyeol.park@samsung.com>
+References: <1364905463-1752-1-git-send-email-chanyeol.park@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Signed-off-by: Chan-yeol Park <chanyeol.park@samsung.com>
 ---
- attrib/gatt.c |    5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/bluetooth/hci_ldisc.c |   10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/attrib/gatt.c b/attrib/gatt.c
-index e4c5385..c1aa070 100644
---- a/attrib/gatt.c
-+++ b/attrib/gatt.c
-@@ -651,7 +651,6 @@ static void read_char_helper(guint8 status, const guint8 *rpdu,
- 		goto done;
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index d710d8b..bc68a44 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -260,12 +260,12 @@ static int hci_uart_send_frame(struct sk_buff *skb)
  
- 	long_read->buffer = g_malloc(rlen);
--
- 	if (long_read->buffer == NULL)
- 		goto done;
+ /* ------ LDISC part ------ */
+ /* hci_uart_tty_open
+- * 
++ *
+  *     Called when line discipline changed to HCI_UART.
+  *
+  * Arguments:
+  *     tty    pointer to tty info structure
+- * Return Value:    
++ * Return Value:
+  *     0 if success, otherwise error code
+  */
+ static int hci_uart_tty_open(struct tty_struct *tty)
+@@ -365,15 +365,15 @@ static void hci_uart_tty_wakeup(struct tty_struct *tty)
+ }
  
-@@ -659,9 +658,9 @@ static void read_char_helper(guint8 status, const guint8 *rpdu,
- 	long_read->size = rlen;
- 
- 	plen = enc_read_blob_req(long_read->handle, rlen - 1, buf, buflen);
--	id = g_attrib_send(long_read->attrib, long_read->id, buf, plen,
--			read_blob_helper, long_read, read_long_destroy);
- 
-+	id = g_attrib_send(long_read->attrib, long_read->id, buf, plen,
-+				read_blob_helper, long_read, read_long_destroy);
- 	if (id != 0) {
- 		g_atomic_int_inc(&long_read->ref);
- 		return;
+ /* hci_uart_tty_receive()
+- * 
++ *
+  *     Called by tty low level driver when receive data is
+  *     available.
+- *     
++ *
+  * Arguments:  tty          pointer to tty isntance data
+  *             data         pointer to received data
+  *             flags        pointer to flags for data
+  *             count        count of received data in bytes
+- *     
++ *
+  * Return Value:    None
+  */
+ static void hci_uart_tty_receive(struct tty_struct *tty, const u8 *data, char *flags, int count)
 -- 
-1.7.9.5
+1.7.10.4
 
