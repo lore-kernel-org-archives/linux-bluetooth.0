@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Alvaro Silva <alvaro.silva@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
-Subject: [PATCH BlueZ v2 04/13] gatttool: Use GError to propage error messages to caller
-Date: Tue,  2 Apr 2013 19:31:21 -0400
-Message-Id: <1364945490-17059-5-git-send-email-alvaro.silva@openbossa.org>
+Subject: [PATCH BlueZ v2 05/13] gatttool: Fix issues with printf() and readline prompt
+Date: Tue,  2 Apr 2013 19:31:22 -0400
+Message-Id: <1364945490-17059-6-git-send-email-alvaro.silva@openbossa.org>
 In-Reply-To: <1364945490-17059-1-git-send-email-alvaro.silva@openbossa.org>
 References: <1363905109-30839-1-git-send-email-alvaro.silva@openbossa.org>
  <1364945490-17059-1-git-send-email-alvaro.silva@openbossa.org>
@@ -13,131 +13,85 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
 
-Handle runtime errors outside gatt_connect(), using GError to propagate
-error messages to caller.
+Use rl_printf() from bluetoothctl to consistently display messages. This
+is specially important for asynchronous callbacks, where using printf()
+may mess up the prompt created by readline.
 ---
- attrib/gatttool.c    |    6 +++++-
- attrib/gatttool.h    |    3 ++-
- attrib/interactive.c |   10 +++++++---
- attrib/utils.c       |   14 +++++++-------
- 4 files changed, 21 insertions(+), 12 deletions(-)
+ Makefile.tools       |    3 ++-
+ attrib/interactive.c |    9 +++++----
+ 2 files changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/attrib/gatttool.c b/attrib/gatttool.c
-index 1dd0c35..8dbebbb 100644
---- a/attrib/gatttool.c
-+++ b/attrib/gatttool.c
-@@ -576,6 +576,7 @@ int main(int argc, char *argv[])
- 	if (g_option_context_parse(context, &argc, &argv, &gerr) == FALSE) {
- 		g_printerr("%s\n", gerr->message);
- 		g_error_free(gerr);
-+		gerr = NULL;
- 	}
+diff --git a/Makefile.tools b/Makefile.tools
+index 4d45682..0de0a0d 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -189,7 +189,8 @@ noinst_PROGRAMS += attrib/gatttool \
+ attrib_gatttool_SOURCES = attrib/gatttool.c attrib/att.c attrib/gatt.c \
+ 				attrib/gattrib.c btio/btio.c \
+ 				attrib/gatttool.h attrib/interactive.c \
+-				attrib/utils.c src/log.c
++				attrib/utils.c src/log.c client/display.c \
++				client/display.h
+ attrib_gatttool_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@ -lreadline
  
- 	if (opt_interactive) {
-@@ -610,8 +611,11 @@ int main(int argc, char *argv[])
- 	}
- 
- 	chan = gatt_connect(opt_src, opt_dst, opt_dst_type, opt_sec_level,
--					opt_psm, opt_mtu, connect_cb);
-+					opt_psm, opt_mtu, connect_cb, &gerr);
- 	if (chan == NULL) {
-+		g_printerr("%s\n", gerr->message);
-+		g_error_free(gerr);
-+		gerr = NULL;
- 		got_error = TRUE;
- 		goto done;
- 	}
-diff --git a/attrib/gatttool.h b/attrib/gatttool.h
-index 260480d..184a7f8 100644
---- a/attrib/gatttool.h
-+++ b/attrib/gatttool.h
-@@ -25,5 +25,6 @@ int interactive(const gchar *src, const gchar *dst, const gchar *dst_type,
- 								int psm);
- GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
- 			const gchar *dst_type, const gchar *sec_level,
--			int psm, int mtu, BtIOConnect connect_cb);
-+			int psm, int mtu, BtIOConnect connect_cb,
-+			GError **gerr);
- size_t gatt_attr_data_from_string(const char *str, uint8_t **data);
+ tools_obex_client_tool_SOURCES = $(gobex_sources) $(btio_sources) \
 diff --git a/attrib/interactive.c b/attrib/interactive.c
-index 9f72453..ce35218 100644
+index ce35218..d5da9ad 100644
 --- a/attrib/interactive.c
 +++ b/attrib/interactive.c
-@@ -395,6 +395,8 @@ static gboolean channel_watcher(GIOChannel *chan, GIOCondition cond,
+@@ -40,6 +40,7 @@
+ #include "gattrib.h"
+ #include "gatt.h"
+ #include "gatttool.h"
++#include "client/display.h"
  
- static void cmd_connect(int argcp, char **argvp)
+ static GIOChannel *iochannel = NULL;
+ static GAttrib *attrib = NULL;
+@@ -102,7 +103,6 @@ static void set_state(enum state st)
  {
-+	GError *gerr = NULL;
-+
- 	if (conn_state != STATE_DISCONNECTED)
- 		return;
- 
-@@ -416,10 +418,12 @@ static void cmd_connect(int argcp, char **argvp)
- 
- 	set_state(STATE_CONNECTING);
- 	iochannel = gatt_connect(opt_src, opt_dst, opt_dst_type, opt_sec_level,
--						opt_psm, opt_mtu, connect_cb);
--	if (iochannel == NULL)
-+					opt_psm, opt_mtu, connect_cb, &gerr);
-+	if (iochannel == NULL) {
-+		printf("%s\n", gerr->message);
- 		set_state(STATE_DISCONNECTED);
--	else
-+		g_error_free(gerr);
-+	} else
- 		g_io_add_watch(iochannel, G_IO_HUP, channel_watcher, NULL);
+ 	conn_state = st;
+ 	rl_set_prompt(get_prompt());
+-	rl_redisplay();
  }
  
-diff --git a/attrib/utils.c b/attrib/utils.c
-index c8c8651..e263bcb 100644
---- a/attrib/utils.c
-+++ b/attrib/utils.c
-@@ -42,12 +42,13 @@
- 
- GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
- 				const gchar *dst_type, const gchar *sec_level,
--				int psm, int mtu, BtIOConnect connect_cb)
-+				int psm, int mtu, BtIOConnect connect_cb,
-+				GError **gerr)
+ static void events_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
+@@ -145,8 +145,8 @@ static void events_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
+ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
  {
- 	GIOChannel *chan;
- 	bdaddr_t sba, dba;
- 	uint8_t dest_type;
--	GError *err = NULL;
-+	GError *tmp_err = NULL;
- 	BtIOSecLevel sec;
- 
- 	str2ba(dst, &dba);
-@@ -75,7 +76,7 @@ GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
- 		sec = BT_IO_SEC_LOW;
- 
- 	if (psm == 0)
--		chan = bt_io_connect(connect_cb, NULL, NULL, &err,
-+		chan = bt_io_connect(connect_cb, NULL, NULL, &tmp_err,
- 				BT_IO_OPT_SOURCE_BDADDR, &sba,
- 				BT_IO_OPT_DEST_BDADDR, &dba,
- 				BT_IO_OPT_DEST_TYPE, dest_type,
-@@ -83,7 +84,7 @@ GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
- 				BT_IO_OPT_SEC_LEVEL, sec,
- 				BT_IO_OPT_INVALID);
- 	else
--		chan = bt_io_connect(connect_cb, NULL, NULL, &err,
-+		chan = bt_io_connect(connect_cb, NULL, NULL, &tmp_err,
- 				BT_IO_OPT_SOURCE_BDADDR, &sba,
- 				BT_IO_OPT_DEST_BDADDR, &dba,
- 				BT_IO_OPT_PSM, psm,
-@@ -91,9 +92,8 @@ GIOChannel *gatt_connect(const gchar *src, const gchar *dst,
- 				BT_IO_OPT_SEC_LEVEL, sec,
- 				BT_IO_OPT_INVALID);
- 
--	if (err) {
--		g_printerr("%s\n", err->message);
--		g_error_free(err);
-+	if (tmp_err) {
-+		g_propagate_error(gerr, tmp_err);
- 		return NULL;
+ 	if (err) {
+-		printf("connect error: %s\n", err->message);
+ 		set_state(STATE_DISCONNECTED);
++		rl_printf("%s\n", err->message);
+ 		return;
  	}
  
+@@ -156,6 +156,7 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+ 	g_attrib_register(attrib, ATT_OP_HANDLE_IND, GATTRIB_ALL_HANDLES,
+ 						events_handler, attrib, NULL);
+ 	set_state(STATE_CONNECTED);
++	rl_redisplay();
+ }
+ 
+ static void disconnect_io()
+@@ -412,7 +413,7 @@ static void cmd_connect(int argcp, char **argvp)
+ 	}
+ 
+ 	if (opt_dst == NULL) {
+-		printf("Remote Bluetooth address required\n");
++		rl_printf("Remote Bluetooth address required\n");
+ 		return;
+ 	}
+ 
+@@ -420,8 +421,8 @@ static void cmd_connect(int argcp, char **argvp)
+ 	iochannel = gatt_connect(opt_src, opt_dst, opt_dst_type, opt_sec_level,
+ 					opt_psm, opt_mtu, connect_cb, &gerr);
+ 	if (iochannel == NULL) {
+-		printf("%s\n", gerr->message);
+ 		set_state(STATE_DISCONNECTED);
++		rl_printf("%s\n", gerr->message);
+ 		g_error_free(gerr);
+ 	} else
+ 		g_io_add_watch(iochannel, G_IO_HUP, channel_watcher, NULL);
 -- 
 1.7.9.5
 
