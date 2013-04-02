@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [RFC 3/6] attrib: Use gcc builtin instead of g_atomic
-Date: Tue,  2 Apr 2013 19:54:41 -0300
-Message-Id: <1364943285-12463-4-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [RFC 4/6] gobex: Use gcc builtin instead of g_atomic
+Date: Tue,  2 Apr 2013 19:54:42 -0300
+Message-Id: <1364943285-12463-5-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1364943285-12463-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1364943285-12463-1-git-send-email-lucas.demarchi@profusion.mobi>
 MIME-Version: 1.0
@@ -23,109 +23,47 @@ well. If we are using atomic operations, reading the variable again
 later for logging is not an option, we should use the return of the
 atomic function used to fetch the variable.
 ---
- attrib/gatt.c    | 12 ++++++------
- attrib/gattrib.c | 14 ++++++++------
- 2 files changed, 14 insertions(+), 12 deletions(-)
+ gobex/gobex.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 44d3eb6..fa61c9e 100644
---- a/attrib/gatt.c
-+++ b/attrib/gatt.c
-@@ -79,14 +79,14 @@ static void discover_primary_free(struct discover_primary *dp)
+diff --git a/gobex/gobex.c b/gobex/gobex.c
+index a9bcee9..790aec5 100644
+--- a/gobex/gobex.c
++++ b/gobex/gobex.c
+@@ -1315,25 +1315,27 @@ GObex *g_obex_new(GIOChannel *io, GObexTransportType transport_type,
  
- static struct included_discovery *isd_ref(struct included_discovery *isd)
- {
--	g_atomic_int_inc(&isd->refs);
-+	__sync_fetch_and_add(&isd->refs, 1);
- 
- 	return isd;
- }
- 
- static void isd_unref(struct included_discovery *isd)
- {
--	if (g_atomic_int_dec_and_test(&isd->refs) == FALSE)
-+	if (__sync_sub_and_fetch(&isd->refs, 1) > 0)
- 		return;
- 
- 	if (isd->err)
-@@ -581,7 +581,7 @@ static void read_long_destroy(gpointer user_data)
- {
- 	struct read_long_data *long_read = user_data;
- 
--	if (g_atomic_int_dec_and_test(&long_read->ref) == FALSE)
-+	if (__sync_sub_and_fetch(&long_read->ref, 1) > 0)
- 		return;
- 
- 	if (long_read->buffer != NULL)
-@@ -626,7 +626,7 @@ static void read_blob_helper(guint8 status, const guint8 *rpdu, guint16 rlen,
- 				read_blob_helper, long_read, read_long_destroy);
- 
- 	if (id != 0) {
--		g_atomic_int_inc(&long_read->ref);
-+		__sync_fetch_and_add(&long_read->ref, 1);
- 		return;
- 	}
- 
-@@ -662,7 +662,7 @@ static void read_char_helper(guint8 status, const guint8 *rpdu,
- 			read_blob_helper, long_read, read_long_destroy);
- 
- 	if (id != 0) {
--		g_atomic_int_inc(&long_read->ref);
-+		__sync_fetch_and_add(&long_read->ref, 1);
- 		return;
- 	}
- 
-@@ -698,7 +698,7 @@ guint gatt_read_char(GAttrib *attrib, uint16_t handle, GAttribResultFunc func,
- 	if (id == 0)
- 		g_free(long_read);
- 	else {
--		g_atomic_int_inc(&long_read->ref);
-+		__sync_fetch_and_add(&long_read->ref, 1);
- 		long_read->id = id;
- 	}
- 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 37581a3..b323617 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -147,12 +147,14 @@ static gboolean is_response(guint8 opcode)
- 
- GAttrib *g_attrib_ref(GAttrib *attrib)
+ GObex *g_obex_ref(GObex *obex)
  {
 +	int refs;
 +
- 	if (!attrib)
+ 	if (obex == NULL)
  		return NULL;
  
--	g_atomic_int_inc(&attrib->refs);
-+	refs = __sync_fetch_and_add(&attrib->refs, 1);
+-	g_atomic_int_inc(&obex->ref_count);
++	refs = __sync_fetch_and_add(&obex->ref_count, 1);
  
--	DBG("%p: ref=%d", attrib, attrib->refs);
-+	DBG("%p: ref=%d", attrib, refs + 1);
+-	g_obex_debug(G_OBEX_DEBUG_COMMAND, "ref %u", obex->ref_count);
++	g_obex_debug(G_OBEX_DEBUG_COMMAND, "ref %u", refs + 1);
  
- 	return attrib;
+ 	return obex;
  }
-@@ -219,16 +221,16 @@ static void attrib_destroy(GAttrib *attrib)
  
- void g_attrib_unref(GAttrib *attrib)
+ void g_obex_unref(GObex *obex)
  {
--	gboolean ret;
+-	gboolean last_ref;
 +	int refs;
  
- 	if (!attrib)
- 		return;
+-	last_ref = g_atomic_int_dec_and_test(&obex->ref_count);
++	refs = __sync_sub_and_fetch(&obex->ref_count, 1);
  
--	ret = g_atomic_int_dec_and_test(&attrib->refs);
-+	refs = __sync_sub_and_fetch(&attrib->refs, 1);
+-	g_obex_debug(G_OBEX_DEBUG_COMMAND, "ref %u", obex->ref_count);
++	g_obex_debug(G_OBEX_DEBUG_COMMAND, "ref %u", refs);
  
--	DBG("%p: ref=%d", attrib, attrib->refs);
-+	DBG("%p: ref=%d", attrib, refs);
- 
--	if (ret == FALSE)
+-	if (!last_ref)
 +	if (refs > 0)
  		return;
  
- 	attrib_destroy(attrib);
+ 	g_slist_free_full(obex->req_handlers, g_free);
 -- 
 1.8.2
 
