@@ -1,32 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1364943285-12463-7-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1364943285-12463-1-git-send-email-lucas.demarchi@profusion.mobi> <1364943285-12463-7-git-send-email-lucas.demarchi@profusion.mobi>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Tue, 2 Apr 2013 20:39:02 -0300
-Message-ID: <CAMOw1v6OF5a7FVG8wgEcZa+0OMqERNfoqRAZxusbKm=-49U_pg@mail.gmail.com>
-Subject: Re: [RFC 6/6] obexd: Use gcc builtin instead of g_atomic
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Content-Type: text/plain; charset=windows-1252
+From: Alvaro Silva <alvaro.silva@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Alvaro Silva <alvaro.silva@openbossa.org>
+Subject: [PATCH BlueZ v2 00/13] Improvements on gatttool interactive interface
+Date: Tue,  2 Apr 2013 19:31:17 -0400
+Message-Id: <1364945490-17059-1-git-send-email-alvaro.silva@openbossa.org>
+In-Reply-To: <1363905109-30839-1-git-send-email-alvaro.silva@openbossa.org>
+References: <1363905109-30839-1-git-send-email-alvaro.silva@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Tue, Apr 2, 2013 at 7:54 PM, Lucas De Marchi
-<lucas.demarchi@profusion.mobi> wrote:
-> g_atomic_* end up using G_STATIC_ASSERT, causing gcc 4.8 to yell due to
-> -Wunused-local-typedefs.
->
-> /usr/include/glib-2.0/glib/gmacros.h:162:53: error: typedef ‘_GStaticAssertCompileTimeAssertion_2’ locally defined but not used [-Werror=unused-local-typedefs]
->  #define G_STATIC_ASSERT(expr) typedef char G_PASTE (_GStaticAssertCompileTimeAssertion_, __COUNTER__)[(expr) ? 1 : -1]
-> ---
+This is the second version of the patches with improvements to
+gatttool interactive interface.
 
-This patch was laying in my /tmp when I sent the patches. Please
-ignore this one and use the other with subject "[RFC 5/6] obexd: Use
-gcc builtin instead of g_atomic"
+As suggested, we rewrote the commit message for patch #03. We also
+reordered the patches #02 and #03, so the check for destination
+address is removed only after the appropriate check is added to
+gatttool.c.
 
-Sorry for the noise.
+BR,
+Alvaro Silva
 
-Lucas De Marchi
+Alvaro Silva (3):
+  gatttool: Show connection state using color
+  gatttool: Remove connecting message from prompt
+  gatttool: Use error message prefixes consistently
+
+Eder Ruiz Maria (9):
+  gatttool: Remote address is mandatory for non-interactive gatttool
+  gatttool: Remove check for bluetooth address parameter on
+    gatt_connect()
+  gatttool: Use GError to propage error messages to caller
+  gatttool: Fix issues with printf() and readline prompt
+  gatttool: Replace more usages of printf() with rl_printf()
+  gatttool: Use bluetoothctl behavior when pressing Enter on empty
+    prompt
+  gatttool: Use bluetoothctl strategy to handle standard input
+  gatttool: Use bluetoothctl strategy for unix signal handling
+  gatttool: Show info message when no primary service is found
+
+Jefferson Delfes (1):
+  gatttool: Fix memory leak after parsing input line
+
+ Makefile.tools       |    3 +-
+ attrib/gatttool.c    |   12 +-
+ attrib/gatttool.h    |    3 +-
+ attrib/interactive.c |  345 +++++++++++++++++++++++++++++++++-----------------
+ attrib/utils.c       |   19 +--
+ 5 files changed, 249 insertions(+), 133 deletions(-)
+
+-- 
+1.7.9.5
+
