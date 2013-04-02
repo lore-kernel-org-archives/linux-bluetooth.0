@@ -4,73 +4,112 @@ To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo@padovan.org>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	David Herrmann <dh.herrmann@gmail.com>
-Subject: [PATCH v2 06/18] Bluetooth: hidp: remove unused session->state field
-Date: Tue,  2 Apr 2013 18:08:26 +0200
-Message-Id: <1364918918-2336-7-git-send-email-dh.herrmann@gmail.com>
+Subject: [PATCH v2 05/18] Bluetooth: introduce hci_conn ref-counting
+Date: Tue,  2 Apr 2013 18:08:25 +0200
+Message-Id: <1364918918-2336-6-git-send-email-dh.herrmann@gmail.com>
 In-Reply-To: <1364918918-2336-1-git-send-email-dh.herrmann@gmail.com>
 References: <1364918918-2336-1-git-send-email-dh.herrmann@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This field is always BT_CONNECTED. Remove it and set it to BT_CONNECTED in
-hidp_copy_session() unconditionally.
+We currently do not allow using hci_conn from outside of HCI-core.
+However, several other users could make great use of it. This includes
+HIDP, rfcomm and all other sub-protocols that rely on an active
+connection.
 
-Also note that this field is totally bogus. Userspace can query an
-hidp-session for its state. However, whenever user-space queries us, this
-field should be BT_CONNECTED. If it wasn't BT_CONNECTED, then we would be
-currently cleaning up the session and the session itself would exit in the
-next few milliseconds. Hence, there is no reason to let user-space know
-that the session will exit now if they cannot make _any_ use of that.
+Hence, we now introduce hci_conn ref-counting. We currently never call
+get_device(). put_device() is exclusively used in hci_conn_del_sysfs().
+Hence, we currently never have a greater device-refcnt than 1.
+Therefore, it is safe to remove the put_device() call from
+hci_conn_del_sysfs() to hci_conn_del() (it's the only caller). In fact,
+this even fixes a "use-after-free" bug as we access hci_conn after calling
+hci_conn_del_sysfs() in hci_conn_del().
 
-Thus, remove the field and let user-space think that a session is always
-BT_CONNECTED as long as they can query it.
+>From now on we can add references to hci_conn objects in other layers
+(like l2cap_sock, HIDP, rfcomm, ...) and grab a reference via
+hci_conn_get(). This does _not_ guarantee, that the connection is still
+alive. However, this isn't what we want. We can simply lock the hci_conn
+device and use "device_is_registered(hci_conn->dev)" to test that.
+However, this is hardly necessary as outside users should never rely on
+the HCI connection to be alive, anyway. Instead, they should solely rely
+on the device-object to be available.
+But if sub-devices want the hci_conn object as sysfs parent, they need to
+be notified when the connection drops. This will be introduced in later
+patches with hci_conn-users.
 
 Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
 ---
- net/bluetooth/hidp/core.c | 5 ++---
- net/bluetooth/hidp/hidp.h | 1 -
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ include/net/bluetooth/hci_core.h | 31 +++++++++++++++++++++++++++++++
+ net/bluetooth/hci_conn.c         |  3 +--
+ net/bluetooth/hci_sysfs.c        |  1 -
+ 3 files changed, 32 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index f8144fe..413b900 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -79,7 +79,7 @@ static void __hidp_copy_session(struct hidp_session *session, struct hidp_connin
- 	bacpy(&ci->bdaddr, &session->bdaddr);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index cd5b126..fa8fe72 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -593,6 +593,37 @@ int hci_conn_switch_role(struct hci_conn *conn, __u8 role);
  
- 	ci->flags = session->flags;
--	ci->state = session->state;
-+	ci->state = BT_CONNECTED;
+ void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active);
  
- 	ci->vendor  = 0x0000;
- 	ci->product = 0x0000;
-@@ -966,7 +966,7 @@ int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock,
- 	down_write(&hidp_session_sem);
++/*
++ * hci_conn_get() and hci_conn_put() are used to control the life-time of an
++ * "hci_conn" object. They do not guarantee that the hci_conn object is running,
++ * working or anything else. They just guarantee that the object is available
++ * and can be dereferenced. So you can use its locks, local variables and any
++ * other constant data.
++ * Before accessing runtime data, you _must_ lock the object and then check that
++ * it is still running. As soon as you release the locks, the connection might
++ * get dropped, though.
++ *
++ * On the other hand, hci_conn_hold() and hci_conn_drop() are used to control
++ * how long the underlying connection is held. So every channel that runs on the
++ * hci_conn object calls this to prevent the connection from disappearing. As
++ * long as you hold a device, you must also guarantee that you have a valid
++ * reference to the device via hci_conn_get() (or the initial reference from
++ * hci_conn_add()).
++ * The hold()/drop() ref-count is known to drop below 0 sometimes, which doesn't
++ * break because nobody cares for that. But this means, we cannot use
++ * _get()/_drop() in it, but require the caller to have a valid ref (FIXME).
++ */
++
++static inline void hci_conn_get(struct hci_conn *conn)
++{
++	get_device(&conn->dev);
++}
++
++static inline void hci_conn_put(struct hci_conn *conn)
++{
++	put_device(&conn->dev);
++}
++
+ static inline void hci_conn_hold(struct hci_conn *conn)
+ {
+ 	BT_DBG("hcon %p orig refcnt %d", conn, atomic_read(&conn->refcnt));
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 134ab9f..75b75a8 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -450,8 +450,7 @@ int hci_conn_del(struct hci_conn *conn)
  
- 	s = __hidp_get_session(&bt_sk(ctrl_sock->sk)->dst);
--	if (s && s->state == BT_CONNECTED) {
-+	if (s) {
- 		up_write(&hidp_session_sem);
- 		return -EEXIST;
+ 	hci_dev_put(hdev);
+ 
+-	if (conn->handle == 0)
+-		kfree(conn);
++	hci_conn_put(conn);
+ 
+ 	return 0;
+ }
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 55cceee..0384b76 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -145,7 +145,6 @@ void hci_conn_del_sysfs(struct hci_conn *conn)
  	}
-@@ -988,7 +988,6 @@ int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock,
  
- 	session->ctrl_sock = ctrl_sock;
- 	session->intr_sock = intr_sock;
--	session->state     = BT_CONNECTED;
+ 	device_del(&conn->dev);
+-	put_device(&conn->dev);
  
- 	session->conn = hidp_get_connection(session);
- 	if (!session->conn) {
-diff --git a/net/bluetooth/hidp/hidp.h b/net/bluetooth/hidp/hidp.h
-index af1bcc8..57a6191 100644
---- a/net/bluetooth/hidp/hidp.h
-+++ b/net/bluetooth/hidp/hidp.h
-@@ -135,7 +135,6 @@ struct hidp_session {
- 
- 	bdaddr_t bdaddr;
- 
--	unsigned long state;
- 	unsigned long flags;
- 	unsigned long idle_to;
- 
+ 	hci_dev_put(hdev);
+ }
 -- 
 1.8.2
