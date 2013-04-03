@@ -1,29 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 3 Apr 2013 10:56:01 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/2] Bluetooth: Add __hci_cmd_sync() helper
-Date: Wed,  3 Apr 2013 16:52:44 +0300
-Message-Id: <1364997166-24236-1-git-send-email-johan.hedberg@gmail.com>
+To: Alvaro Silva <alvaro.silva@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] tools: Add tests for start discovery
+Message-ID: <20130403075601.GA3651@x220>
+References: <1364945700-17156-1-git-send-email-alvaro.silva@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1364945700-17156-1-git-send-email-alvaro.silva@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Alvaro,
 
-This function is mainly intended as a helper for the hdev->setup()
-routine which needs to be able to wait for completion of its commands
-before returning (i.e. a pre-requisite is Marcel's patch set I sent
-yesterday).
+On Tue, Apr 02, 2013, Alvaro Silva wrote:
+> Add HCI command test and discovering event test for start discovery.
+> ---
+>  tools/mgmt-tester.c |    8 ++++++++
+>  1 file changed, 8 insertions(+)
+
+Both patches in this set have been applied, however I tweaked the commit
+messages to be less misleading since you're not really adding new test
+cases but just refining existing ones.
 
 Johan
-
-----------------------------------------------------------------
-Johan Hedberg (2):
-      Bluetooth: Track received events in hdev
-      Bluetooth: Add __hci_cmd_sync() helper function
-
- include/net/bluetooth/hci_core.h |    5 ++
- net/bluetooth/hci_core.c         |   98 ++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c        |    8 ++++
- 3 files changed, 111 insertions(+)
-
-
