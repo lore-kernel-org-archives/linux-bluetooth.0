@@ -1,46 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1364997166-24236-3-git-send-email-johan.hedberg@gmail.com>
-References: <1364997166-24236-1-git-send-email-johan.hedberg@gmail.com>
-	<1364997166-24236-3-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 3 Apr 2013 13:12:40 -0400
-Message-ID: <CAJdJm_PLDq1jh=0iUoUZfTZV_QXOuSCj3pSZWDZvon4tcEzUow@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Bluetooth: Add __hci_cmd_sync() helper function
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Wed, 3 Apr 2013 11:20:18 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [RFC 0/6] Use __sync_* instead of g_atomic_*
+Message-ID: <20130403142018.GE2715@samus>
+References: <1364943285-12463-1-git-send-email-lucas.demarchi@profusion.mobi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1364943285-12463-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi,
 
-On Wed, Apr 3, 2013 at 9:52 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> +       switch (hdev->req_status) {
-> +       case HCI_REQ_DONE:
-> +               err = -bt_to_errno(hdev->req_result);
-> +               break;
-> +
-> +       case HCI_REQ_CANCELED:
-> +               err = -hdev->req_result;
-> +               break;
-> +
-> +       default:
-> +               err = -ETIMEDOUT;
-> +               break;
-> +       }
-> +
-> +       hdev->req_status = hdev->req_result = 0;
-> +
-> +       BT_DBG("%s end: err %d", hdev->name, err);
-> +
-> +       if (err < 0)
-> +               return ERR_PTR(err);
+On 19:54 Tue 02 Apr, Lucas De Marchi wrote:
+> These patches fix build with gcc >= 4.8. I'd prefer to use plain ++/-- for
+> these refcounts since we are not running multiple threads, but I'm preserving
+> the previous behavior.
+> 
+> Note in some of the commits that the use of atomic operations was wrong, and it
+> was not noticed only because there aren't multiple threads.
+> 
+> It's an RFC because it's only compile-tested (and 'make check' was executed as
+> well). Please take a look in the patches and tell me if we want
+> to continue with atomic operations. Then I can run some tests tomorrow.
 
-Isn't this always true (due to the switch() avove) ?
+Just to (publicly) clarify a doubt that I had, in case it matters to anyone
+else, clang also has these built-ins.
 
-Regards,
+
+Cheers,
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Vinicius
