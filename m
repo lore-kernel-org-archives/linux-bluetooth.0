@@ -1,32 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
-Subject: Re: [PATCH v2 1/4] Bluetooth: Track received events in hdev
+Subject: Re: [PATCH v2 0/3] Bluetooth: Add HCI init setup stage
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1365062347-860-2-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 4 Apr 2013 08:24:20 -0700
+In-Reply-To: <20130404094608.GA4710@x220>
+Date: Thu, 4 Apr 2013 08:22:43 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <AA9A658E-8C32-415B-AEA9-6E343AD66476@holtmann.org>
-References: <1365062347-860-1-git-send-email-johan.hedberg@gmail.com> <1365062347-860-2-git-send-email-johan.hedberg@gmail.com>
+Message-Id: <1A69F091-319A-4BBE-8608-295AA304EB64@holtmann.org>
+References: <1364923287-25935-1-git-send-email-johan.hedberg@gmail.com> <20130404082436.GA2340@x220> <20130404094608.GA4710@x220>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> This patch adds tracking of received HCI events to the hci_dev struct.
-> This is necessary so that a subsequent patch can implement a function
-> for sending a single command synchronously and returning the resulting
-> command complete parameters in the function return value.
+>>> This is a resend of Marcel's patches that were sent in November, rebased
+>>> and fixed-up for bluetooth-next. They are a pre-requsite of some
+>>> follow-up work I'm doing to have a simple way of doing synchronous
+>>> single-command requests that will be needed by some HCI driver setup
+>>> routines.
+>>> 
+>>> Johan
+>>> 
+>>> ----------------------------------------------------------------
+>>> Marcel Holtmann (3):
+>>>      Bluetooth: Add driver setup stage for early init
+>>>      Bluetooth: Convert BCM92035 support to driver setup callback
+>>>      Bluetooth: Remove driver init queue from core
+>>> 
+>>> drivers/bluetooth/btusb.c        |   28 +++++++++++--------
+>>> include/net/bluetooth/hci_core.h |    3 +-
+>>> net/bluetooth/hci_core.c         |   56 ++++++++++++++------------------------
+>>> 3 files changed, 38 insertions(+), 49 deletions(-)
+>> 
+>> There patches have now been pushed to the bluetooth-next tree.
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> include/net/bluetooth/hci_core.h |    1 +
-> net/bluetooth/hci_core.c         |    3 +++
-> net/bluetooth/hci_event.c        |   12 ++++++++++++
-> 3 files changed, 16 insertions(+)
+> I had to temporarily remove these since they cause build breakage when
+> building as modules:
+> 
+>>> ERROR: "hci_send_cmd" [drivers/bluetooth/btusb.ko] undefined!
+> 
+> It seems the reason is a missing EXPORT_SYMBOL declaration for
+> hci_send_cmd which the attached patch should fix. I'll also send a
+> revised patch set of my own function additions since those too will need
+> this declaration.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+can we just switch over to use __hci_cmd_sync() for this as well. I really like to keep hci_send_cmd() internal.
 
 Regards
 
