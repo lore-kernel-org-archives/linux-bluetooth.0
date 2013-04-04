@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/4] Bluetooth: Add support for custom event terminated commands
-Date: Thu,  4 Apr 2013 10:59:06 +0300
-Message-Id: <1365062347-860-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 2/4] Bluetooth: Add __hci_cmd_sync() helper function
+Date: Thu,  4 Apr 2013 10:59:05 +0300
+Message-Id: <1365062347-860-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1365062347-860-1-git-send-email-johan.hedberg@gmail.com>
 References: <1365062347-860-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,109 +11,143 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch adds support for having commands within HCI requests that do
-not result in a command complete but some other event. This is at least
-needed for some vendor specific commands to be issued in the
-hdev->setup() procecure, but might also be useful for other commands.
+This patch adds a helper function for sending a single HCI command
+waiting for its completion and then returning back the parameters in the
+resulting command complete event (if there was one).
 
-The way that the support is implemented is by extending the skb control
-buffer to have a field to indicate that the command is expected to
-terminate with a special event. After sending the command each received
-event can then be compared against this field through hdev->sent_cmd.
+The implementation is very similar to that of hci_req_sync() except that
+instead of invocing a callback for sending HCI commands the function
+constructs and sends one itself and after being woken up picks the last
+received event from hdev->recv_evt (if it matches the right criteria)
+and returns it.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/bluetooth.h |    1 +
- include/net/bluetooth/hci_core.h  |    2 ++
- net/bluetooth/hci_core.c          |   10 +++++++++-
- net/bluetooth/hci_event.c         |   11 ++++++++++-
- 4 files changed, 22 insertions(+), 2 deletions(-)
+ include/net/bluetooth/hci_core.h |    3 ++
+ net/bluetooth/hci_core.c         |   96 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 99 insertions(+)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index ed6e955..591fee7 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -266,6 +266,7 @@ typedef void (*hci_req_complete_t)(struct hci_dev *hdev, u8 status);
- 
- struct hci_req_ctrl {
- 	bool			start;
-+	u8			event;
- 	hci_req_complete_t	complete;
- };
- 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 38b653d..b2be51c 100644
+index beae2e8..38b653d 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1054,6 +1054,8 @@ struct hci_request {
- void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
- int hci_req_run(struct hci_request *req, hci_req_complete_t complete);
+@@ -1056,6 +1056,9 @@ int hci_req_run(struct hci_request *req, hci_req_complete_t complete);
  void hci_req_add(struct hci_request *req, u16 opcode, u32 plen, void *param);
-+void hci_req_add_ev(struct hci_request *req, u16 opcode, u32 plen, void *param,
-+		    u8 event);
  void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status);
  
- struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
++struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
++			       void *param, u32 timeout);
++
+ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param);
+ void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags);
+ void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb);
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index d0c12c0..91ef2cc 100644
+index 6739cce..d0c12c0 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -2623,7 +2623,8 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
+@@ -79,6 +79,102 @@ static void hci_req_cancel(struct hci_dev *hdev, int err)
+ 	}
  }
  
- /* Queue a command to an asynchronous HCI request */
--void hci_req_add(struct hci_request *req, u16 opcode, u32 plen, void *param)
-+void hci_req_add_ev(struct hci_request *req, u16 opcode, u32 plen, void *param,
-+		    u8 event)
- {
- 	struct hci_dev *hdev = req->hdev;
- 	struct sk_buff *skb;
-@@ -2647,9 +2648,16 @@ void hci_req_add(struct hci_request *req, u16 opcode, u32 plen, void *param)
- 	if (skb_queue_empty(&req->cmd_q))
- 		bt_cb(skb)->req.start = true;
- 
-+	bt_cb(skb)->req.event = event;
-+
- 	skb_queue_tail(&req->cmd_q, skb);
- }
- 
-+void hci_req_add(struct hci_request *req, u16 opcode, u32 plen, void *param)
++struct sk_buff *hci_get_cmd_complete(struct hci_dev *hdev, u16 opcode)
 +{
-+	hci_req_add_ev(req, opcode, plen, param, 0);
-+}
++	struct hci_ev_cmd_complete *ev;
++	struct hci_event_hdr *hdr;
++	struct sk_buff *skb;
 +
- /* Get data from the previously sent command */
- void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
- {
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index ed0efb7..0a2b128 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2463,7 +2463,9 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (opcode != HCI_OP_NOP)
- 		del_timer(&hdev->cmd_timer);
- 
--	hci_req_cmd_complete(hdev, opcode, ev->status);
-+	if (ev->status ||
-+	    (hdev->sent_cmd && !bt_cb(hdev->sent_cmd)->req.event))
-+		hci_req_cmd_complete(hdev, opcode, ev->status);
- 
- 	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags)) {
- 		atomic_set(&hdev->cmd_cnt, 1);
-@@ -3713,6 +3715,13 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	skb_pull(skb, HCI_EVENT_HDR_SIZE);
- 
-+	if (hdev->sent_cmd && bt_cb(hdev->sent_cmd)->req.event == event) {
-+		struct hci_command_hdr *hdr = (void *) hdev->sent_cmd->data;
-+		u16 opcode = __le16_to_cpu(hdr->opcode);
++	hci_dev_lock(hdev);
 +
-+		hci_req_cmd_complete(hdev, opcode, 0);
++	skb = hdev->recv_evt;
++	hdev->recv_evt = NULL;
++
++	hci_dev_unlock(hdev);
++
++	if (!skb)
++		return ERR_PTR(-ENODATA);
++
++	hdr = (void *) skb->data;
++	skb_pull(skb, HCI_EVENT_HDR_SIZE);
++
++	if (hdr->evt != HCI_EV_CMD_COMPLETE) {
++		BT_DBG("Last event is not cmd complete (0x%2.2x)", hdr->evt);
++		goto failed;
 +	}
 +
- 	switch (event) {
- 	case HCI_EV_INQUIRY_COMPLETE:
- 		hci_inquiry_complete_evt(hdev, skb);
++	if (skb->len < sizeof(*ev)) {
++		BT_ERR("Too short cmd_complete event");
++		goto failed;
++	}
++
++	ev = (void *) skb->data;
++	skb_pull(skb, sizeof(*ev));
++
++	if (opcode == __le16_to_cpu(ev->opcode))
++		return skb;
++
++	BT_DBG("opcode doesn't match (0x%2.2x != 0x%2.2x)", opcode,
++	       __le16_to_cpu(ev->opcode));
++
++failed:
++	kfree_skb(skb);
++	return ERR_PTR(-ENODATA);
++}
++
++struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
++			       void *param, u32 timeout)
++{
++	DECLARE_WAITQUEUE(wait, current);
++	struct hci_request req;
++	int err = 0;
++
++	BT_DBG("%s", hdev->name);
++
++	hci_req_init(&req, hdev);
++
++	hci_req_add(&req, opcode, plen, param);
++
++	hdev->req_status = HCI_REQ_PEND;
++
++	err = hci_req_run(&req, hci_req_sync_complete);
++	if (err < 0)
++		return ERR_PTR(err);
++
++	add_wait_queue(&hdev->req_wait_q, &wait);
++	set_current_state(TASK_INTERRUPTIBLE);
++
++	schedule_timeout(timeout);
++
++	remove_wait_queue(&hdev->req_wait_q, &wait);
++
++	if (signal_pending(current))
++		return ERR_PTR(-EINTR);
++
++	switch (hdev->req_status) {
++	case HCI_REQ_DONE:
++		err = -bt_to_errno(hdev->req_result);
++		break;
++
++	case HCI_REQ_CANCELED:
++		err = -hdev->req_result;
++		break;
++
++	default:
++		err = -ETIMEDOUT;
++		break;
++	}
++
++	hdev->req_status = hdev->req_result = 0;
++
++	BT_DBG("%s end: err %d", hdev->name, err);
++
++	if (err < 0)
++		return ERR_PTR(err);
++
++	return hci_get_cmd_complete(hdev, opcode);
++}
++
+ /* Execute request and wait for completion. */
+ static int __hci_req_sync(struct hci_dev *hdev,
+ 			  void (*func)(struct hci_request *req,
 -- 
 1.7.10.4
 
