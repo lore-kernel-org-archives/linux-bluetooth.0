@@ -1,77 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/4] Bluetooth: Track received events in hdev
-Date: Thu,  4 Apr 2013 10:59:04 +0300
-Message-Id: <1365062347-860-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1365062347-860-1-git-send-email-johan.hedberg@gmail.com>
-References: <1365062347-860-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 0/4] Bluetooth: Add synchronous HCI command helpers
+Date: Thu,  4 Apr 2013 10:59:03 +0300
+Message-Id: <1365062347-860-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-This patch adds tracking of received HCI events to the hci_dev struct.
-This is necessary so that a subsequent patch can implement a function
-for sending a single command synchronously and returning the resulting
-command complete parameters in the function return value.
+Here's my two previous patch sets combined into one with the comments
+received so far taken into account.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_core.c         |    3 +++
- net/bluetooth/hci_event.c        |   12 ++++++++++++
- 3 files changed, 16 insertions(+)
+Johan
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 88dd46e..beae2e8 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -244,6 +244,7 @@ struct hci_dev {
- 	struct sk_buff_head	raw_q;
- 	struct sk_buff_head	cmd_q;
- 
-+	struct sk_buff		*recv_evt;
- 	struct sk_buff		*sent_cmd;
- 	struct sk_buff		*reassembly[NUM_REASSEMBLY];
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 2b488ed..6739cce 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1123,6 +1123,9 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 		hdev->sent_cmd = NULL;
- 	}
- 
-+	kfree_skb(hdev->recv_evt);
-+	hdev->recv_evt = NULL;
-+
- 	/* After this point our queues are empty
- 	 * and no tasks are scheduled. */
- 	hdev->close(hdev);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 7e7fbca..ed0efb7 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3699,6 +3699,18 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 	struct hci_event_hdr *hdr = (void *) skb->data;
- 	__u8 event = hdr->evt;
- 
-+	hci_dev_lock(hdev);
-+
-+	/* Received events are (currently) only needed when a request is
-+	 * ongoing so avoid unnecessary memory allocation.
-+	 */
-+	if (hdev->req_status == HCI_REQ_PEND) {
-+		kfree_skb(hdev->recv_evt);
-+		hdev->recv_evt = skb_clone(skb, GFP_KERNEL);
-+	}
-+
-+	hci_dev_unlock(hdev);
-+
- 	skb_pull(skb, HCI_EVENT_HDR_SIZE);
- 
- 	switch (event) {
--- 
-1.7.10.4
+----------------------------------------------------------------
+Johan Hedberg (4):
+      Bluetooth: Track received events in hdev
+      Bluetooth: Add __hci_cmd_sync() helper function
+      Bluetooth: Add support for custom event terminated commands
+      Bluetooth: Add __hci_cmd_sync_ev function
+
+ include/net/bluetooth/bluetooth.h |    1 +
+ include/net/bluetooth/hci_core.h  |    8 +++
+ net/bluetooth/hci_core.c          |  121 ++++++++++++++++++++++++++++++++++++-
+ net/bluetooth/hci_event.c         |   23 ++++++-
+ 4 files changed, 151 insertions(+), 2 deletions(-)
 
