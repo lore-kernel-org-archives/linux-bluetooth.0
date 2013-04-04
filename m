@@ -1,91 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 4 Apr 2013 12:46:08 +0300
+Date: Thu, 4 Apr 2013 11:34:02 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 0/3] Bluetooth: Add HCI init setup stage
-Message-ID: <20130404094608.GA4710@x220>
-References: <1364923287-25935-1-git-send-email-johan.hedberg@gmail.com>
- <20130404082436.GA2340@x220>
+To: Christopher Waid <chris@thinkpenguin.com>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	Greg KH <gregkh@linuxfoundation.org>,
+	linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode) causing
+ crashes
+Message-ID: <20130404083402.GA2594@x220>
+References: <514763A7.4020800@thinkpenguin.com>
+ <20130318191335.GA11242@kroah.com>
+ <5149FC3A.4070208@thinkpenguin.com>
+ <20130320185719.GC7522@joana>
+ <514A2DDE.8060801@thinkpenguin.com>
+ <515C7BD4.9000906@thinkpenguin.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="3V7upXqbjpZ4EhLz"
-In-Reply-To: <20130404082436.GA2340@x220>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <515C7BD4.9000906@thinkpenguin.com>
+Sender: linux-usb-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Christopher,
 
---3V7upXqbjpZ4EhLz
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-Hi Marcel,
-
-On Thu, Apr 04, 2013, Johan Hedberg wrote:
-> On Tue, Apr 02, 2013, Johan Hedberg wrote:
-> > This is a resend of Marcel's patches that were sent in November, rebased
-> > and fixed-up for bluetooth-next. They are a pre-requsite of some
-> > follow-up work I'm doing to have a simple way of doing synchronous
-> > single-command requests that will be needed by some HCI driver setup
-> > routines.
-> > 
-> > Johan
-> > 
-> > ----------------------------------------------------------------
-> > Marcel Holtmann (3):
-> >       Bluetooth: Add driver setup stage for early init
-> >       Bluetooth: Convert BCM92035 support to driver setup callback
-> >       Bluetooth: Remove driver init queue from core
-> > 
-> >  drivers/bluetooth/btusb.c        |   28 +++++++++++--------
-> >  include/net/bluetooth/hci_core.h |    3 +-
-> >  net/bluetooth/hci_core.c         |   56 ++++++++++++++------------------------
-> >  3 files changed, 38 insertions(+), 49 deletions(-)
+On Wed, Apr 03, 2013, Christopher Waid wrote:
+> On 03/20/2013 05:45 PM, Christopher Waid wrote:
+> >On 03/20/2013 02:57 PM, Gustavo Padovan wrote:
+> >>* Christopher Waid <chris@thinkpenguin.com> [2013-03-20 14:13:14 -0400]:
+> >>
+> >>>On 03/18/2013 03:13 PM, Greg KH wrote:
+> >>>>On Mon, Mar 18, 2013 at 02:57:43PM -0400, Christopher Waid wrote:
+> >>>>>Bus 001 Device 007: ID 0a12:0001 Cambridge Silicon Radio, Ltd
+> >>>>>Bluetooth Dongle (HCI mode)
+> >>>>>
+> >>>>>Code for a CSR bluetooth chipset appears broken in recent kernel
+> >>>>>releases. After a device is paired the kernel panics. This has been
+> >>>>>tested with a dozen USB dongles / systems and is consistently a
+> >>>>>problem. On the rare occasion it might not cause a kernel panic
+> >>>>>although it will definitely still crash after a few minutes. This
+> >>>>>does not happen with older kernel releases.
+> >>>>What kernel version is crashing, and what is the exact text of the
+> >>>>kernel panic?
+> >>>It goes black and disappears off the screen with a lot of other text
+> >>>so I'm unsure.
+> >>This text you are seeing in probably the crash dump of the
+> >>failure, could you
+> >>try to take a picture of the screen so we can check if there is
+> >>some useful
+> >>information there.
+> >>
+> >>Also if the kernel doesn't panic instantly you could check if
+> >>there is some
+> >>issue in the kernel log after pairing and save it somewhere so
+> >>we can take a
+> >>look. Use the 3.8 kernel.
+> >>
+> >
+> >I'm attaching kern.log and a picture of the screen when it crashes
+> >/ dumps.
+> >
 > 
-> There patches have now been pushed to the bluetooth-next tree.
+> I was wondering if anybody had a chance to look into this. I don't
+> seem to be on the mailing list even though I attempted to subscribe.
 
-I had to temporarily remove these since they cause build breakage when
-building as modules:
-
->> ERROR: "hci_send_cmd" [drivers/bluetooth/btusb.ko] undefined!
-
-It seems the reason is a missing EXPORT_SYMBOL declaration for
-hci_send_cmd which the attached patch should fix. I'll also send a
-revised patch set of my own function additions since those too will need
-this declaration.
+I never saw the mail with the attachments from you. It was probably
+blocked from the linux-bluetooth list (probably linux-usb too) due to a
+too big size. You might want to put the picture on some website and just
+send the link to it in your email.
 
 Johan
-
---3V7upXqbjpZ4EhLz
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="0001-Bluetooth-Export-hci_send_cmd-outside-of-the-HCI-cor.patch"
-
->From 74b40041d3caeae96d9cbdd2f0ac8a478b79c7c1 Mon Sep 17 00:00:00 2001
-From: Johan Hedberg <johan.hedberg@intel.com>
-Date: Thu, 4 Apr 2013 12:39:53 +0300
-Subject: [PATCH] Bluetooth: Export hci_send_cmd outside of the HCI core
-
-This function will be needed by HCI drivers when we enable the driver
-setup sequence to use the HCI core functionality. Hence, export the
-symbol using EXPORT_SYMBOL.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_core.c |    1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a199d63..6dfb2f3 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2538,6 +2538,7 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
- 
- 	return 0;
- }
-+EXPORT_SYMBOL(hci_send_cmd);
- 
- /* Queue a command to an asynchronous HCI request */
- void hci_req_add(struct hci_request *req, u16 opcode, u32 plen, void *param)
--- 
-1.7.10.4
-
-
---3V7upXqbjpZ4EhLz--
