@@ -1,85 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 4 Apr 2013 01:43:32 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Alex Deymo <deymo@chromium.org>, linux-bluetooth@vger.kernel.org,
+	keybuk@chromium.org
+Subject: Re: [PATCH v3 1/2] input: Documentation for new Input1 interface
+Message-ID: <20130404044332.GA30908@echo>
+References: <1363655144-9705-1-git-send-email-deymo@chromium.org>
+ <1364863226-10566-1-git-send-email-deymo@chromium.org>
+ <1364863226-10566-2-git-send-email-deymo@chromium.org>
+ <51314AAB-DED8-49D6-ACF9-C5658B5948F1@holtmann.org>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
-Subject: Re: [PATCH 1/2] Bluetooth: Track received events in hdev
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1364997166-24236-2-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 4 Apr 2013 00:11:03 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <95E2D219-B8DF-4B91-BEEE-00CF8A42495A@holtmann.org>
-References: <1364997166-24236-1-git-send-email-johan.hedberg@gmail.com> <1364997166-24236-2-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <51314AAB-DED8-49D6-ACF9-C5658B5948F1@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi,
 
-> This patch adds tracking of received HCI events to the hci_dev struct.
-> This is necessary so that a subsequent patch can implement a function
-> for sending a single command synchronously and returning the resulting
-> command complete parameters in the function return value.
+
+On 20:48 Wed 03 Apr, Marcel Holtmann wrote:
+> Hi Alex,
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> include/net/bluetooth/hci_core.h |    2 ++
-> net/bluetooth/hci_core.c         |    5 +++++
-> net/bluetooth/hci_event.c        |    8 ++++++++
-> 3 files changed, 15 insertions(+)
+> > Adds new documentation for a new Input1 interface exposing two properties.
+> > ---
+> > doc/input-api.txt | 21 +++++++++++++++++++++
+> > 1 file changed, 21 insertions(+)
+> > create mode 100644 doc/input-api.txt
+> > 
+> > diff --git a/doc/input-api.txt b/doc/input-api.txt
+> > new file mode 100644
+> > index 0000000..44bbde6
+> > --- /dev/null
+> > +++ b/doc/input-api.txt
+> > @@ -0,0 +1,21 @@
+> > +BlueZ D-Bus Input API description
+> > +*********************************
+> > +
+> > +Input hierarchy
+> > +===============
+> > +
+> > +Service		org.bluez
+> > +Interface	org.bluez.Input1
+> > +Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+> > +
+> > +Properties	boolean NormallyConnectable [readonly]
+> > +
+> > +			Exposes the value of HIDNormallyConnectable as defined
+> > +			by the HID profile specification. If this optional value
+> > +			is not specified by the HID device, the value is asumend
+> > +			as FALSE.
+> > +
+> > +		boolean ConnectInitiate [readonly]
+> > +
+> > +			Exposes the value of ConnectInitiate as defined by the
+> > +			HID profile specification.
 > 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 88dd46e..0a1cb19 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -244,6 +244,8 @@ struct hci_dev {
-> 	struct sk_buff_head	raw_q;
-> 	struct sk_buff_head	cmd_q;
+> I am not 100% comfortable with the property names yet. Especially the ConnectInitiate sounds badly to me. Does anybody have any ideas?
+
+Just for fun, the only idea that I could come up with is: "ReconnectionMode"
+or "Mode" with two values: "active" (the remote is not normally connectable,
+but is able to initiate connections), "passive" (the remote is not able to
+initiate connections but is normally connectable) and "dual".
+
+Alex, does something like this cover the use cases that you have in mind?
+
 > 
-> +	struct sk_buff		*recv_evt;
-> +
-
-loose the empty line here.
-
-> 	struct sk_buff		*sent_cmd;
-> 	struct sk_buff		*reassembly[NUM_REASSEMBLY];
+> Regards
 > 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 2b488ed..7008b4d 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1123,6 +1123,11 @@ static int hci_dev_do_close(struct hci_dev *hdev)
-> 		hdev->sent_cmd = NULL;
-> 	}
+> Marcel
 > 
-> +	if (hdev->recv_evt) {
-> +		kfree_skb(hdev->recv_evt);
-> +		hdev->recv_evt = NULL;
-> +	}
-> +
-
-Actually kfree_skb does the NULL pointer check. So you do not need that one.
-
-> 	/* After this point our queues are empty
-> 	 * and no tasks are scheduled. */
-> 	hdev->close(hdev);
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 7e7fbca..24906fb 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -3699,6 +3699,14 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
-> 	struct hci_event_hdr *hdr = (void *) skb->data;
-> 	__u8 event = hdr->evt;
 > 
-> +	hci_dev_lock(hdev);
-> +
-> +	if (hdev->recv_evt)
-> +		kfree_skb(hdev->recv_evt);
-> +	hdev->recv_evt = skb_clone(skb, GFP_KERNEL);
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Same here.
 
-However since this actually means memory allocation for every single event we receive, can we just optimize this to be only done when we actually have a HCI request ongoing.
-
-Regards
-
-Marcel
-
+Cheers,
+-- 
+Vinicius
