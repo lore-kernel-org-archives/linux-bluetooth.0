@@ -1,108 +1,195 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 00/17] Update Discovery to use HCI request framework
-Date: Thu,  4 Apr 2013 20:20:58 -0300
-Message-Id: <1365117675-2202-1-git-send-email-andre.guedes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 4 Apr 2013 18:49:13 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Alex Deymo <deymo@chromium.org>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	keybuk@chromium.org
+Subject: Re: [PATCH v4 2/2] input: Implement the new ReconnectMode Input1
+ property.
+Message-ID: <20130404214913.GB7065@echo>
+References: <1365111113-13741-1-git-send-email-deymo@chromium.org>
+ <1365111113-13741-3-git-send-email-deymo@chromium.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1365111113-13741-3-git-send-email-deymo@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Alex,
 
-This patch set updates discovery code in order to make use of the HCI request
-framework. This way, we can move all Start/Stop Discovery command complete
-handling, spread in hci_event.c, to a single place in mgmt.c, reducing the
-spaghetti factor from discovery code.
+On 14:31 Thu 04 Apr, Alex Deymo wrote:
+> The "Connectability" of a HID device, as defined by the HID spec,
+> governs the way the host may and should connect to a HID device or
+> expect a connection from it. In the comon case of mice and keyboards
+> the HIDNormallyConnectable is FALSE and HIDReconnectInitiate is TRUE,
+> since those devices only attempt a connection to the host when they
+> have some data to transfer. A connection attempt initiated from the
+> host after the device drops the connection (while still paired) will
+> result in a Page timeout.
+> 
+> This patch exposes a new property called "ReconnectMode" combining the
+> those two SDP attributes as shown in the Connectability section of the
+> HID spec (see section 5.4.2). The property can have one of the following
+> four values: "None", "Device", "Host", "Any", and is derived from the
+> SDP cached value on device creation even if the device is off.
+> ---
+>  profiles/input/device.c | 89 +++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 86 insertions(+), 3 deletions(-)
+> 
+> diff --git a/profiles/input/device.c b/profiles/input/device.c
+> index 1da9d99..33a6f65 100644
+> --- a/profiles/input/device.c
+> +++ b/profiles/input/device.c
+> @@ -54,6 +54,22 @@
+>  
+>  #include "sdp-client.h"
+>  
+> +#define INPUT_INTERFACE "org.bluez.Input1"
+> +
+> +enum reconnect_mode_t {
+> +	RECONNECT_NONE = 0,
+> +	RECONNECT_DEVICE,
+> +	RECONNECT_HOST,
+> +	RECONNECT_ANY
+> +};
+> +
+> +static const char * const reconnect_value[] = {
+> +	"None",
+> +	"Device",
+> +	"Host",
+> +	"Any"
+> +};
 
-Since this patch set follows a different approach from the previous one, I
-reset the version counter on the subject. However, some comments from Marcel
-about the previous patch set are still applicable and all of them were covered
-in this patch set. The main comments were:
-* Move cleanup and trivial refactoring patches to the beginning of the patch
-set.
-* When build a HCI request, put hci_req_init, hci_req_add and hci_req_run in
-the same function;
+I would suggest changing this to a explicit function to make the conversion,
+something like 'mode_to_string()'.
 
-Since this is a long patch set, below follows a summary of the patches in
-order to make the review process a bit easier:
+> +
+>  struct input_device {
+>  	struct btd_device	*device;
+>  	char			*path;
+> @@ -69,8 +85,9 @@ struct input_device {
+>  	int			timeout;
+>  	struct hidp_connadd_req *req;
+>  	guint			dc_id;
+> -	gboolean		disable_sdp;
+> +	bool			disable_sdp;
 
-* Patches 1 to 4 are a very trivial patches which add or rename some macros in
-order to improve code's readability and remove some magic numbers. These macros
-are related to LE scanning parameters such as scanning type, filter duplicates
-and scanning timeout.
+And I would put this change in another commit.
 
-* Patch 5 makes inquiry_cache_flush function non-static since it will be used
-in mgmt.c by the upcoming patch (patch 6).
+>  	char			*name;
+> +	enum reconnect_mode_t	reconnect_mode;
+>  };
+>  
+>  static GSList *devices = NULL;
+> @@ -676,7 +693,7 @@ int input_device_disconnect(struct btd_device *dev, struct btd_profile *profile)
+>  
+>  static struct input_device *input_device_new(struct btd_device *device,
+>  				const char *path, const uint32_t handle,
+> -				gboolean disable_sdp)
+> +				bool disable_sdp)
+>  {
+>  	struct btd_adapter *adapter = device_get_adapter(device);
+>  	struct input_device *idev;
+> @@ -697,7 +714,7 @@ static struct input_device *input_device_new(struct btd_device *device,
+>  	return idev;
+>  }
+>  
+> -static gboolean is_device_sdp_disable(const sdp_record_t *rec)
+> +static bool is_device_sdp_disable(const sdp_record_t *rec)
+>  {
+>  	sdp_data_t *data;
+>  
+> @@ -706,6 +723,56 @@ static gboolean is_device_sdp_disable(const sdp_record_t *rec)
+>  	return data && data->val.uint8;
+>  }
+>  
+> +static enum reconnect_mode_t hid_reconnection_mode(bool reconnect_initiate,
+> +						bool normally_connectable)
+> +{
+> +	if (!reconnect_initiate && !normally_connectable)
+> +		return RECONNECT_NONE;
+> +	else if (!reconnect_initiate && normally_connectable)
+> +		return RECONNECT_HOST;
+> +	else if (reconnect_initiate && !normally_connectable)
+> +		return RECONNECT_DEVICE;
+> +	else /* (reconnect_initiate && normally_connectable) */
+> +		return RECONNECT_ANY;
+> +}
+> +
+> +static void extract_hid_props(struct input_device *idev,
+> +					const sdp_record_t *rec)
+> +{
+> +	/* Extract HID connectability */
+> +	bool reconnect_initiate, normally_connectable;
+> +	sdp_data_t *pdlist;
+> +
+> +	/* HIDNormallyConnectable is optional and assumed FALSE
+> +	* if not present. */
+> +	pdlist = sdp_data_get(rec, SDP_ATTR_HID_RECONNECT_INITIATE);
+> +	reconnect_initiate = pdlist ? pdlist->val.uint8 : TRUE;
+> +
+> +	pdlist = sdp_data_get(rec, SDP_ATTR_HID_NORMALLY_CONNECTABLE);
+> +	normally_connectable = pdlist ? pdlist->val.uint8 : FALSE;
+> +
+> +	/* Update local values */
+> +	idev->reconnect_mode =
+> +		hid_reconnection_mode(reconnect_initiate, normally_connectable);
+> +}
+> +
+> +static gboolean property_get_reconnect_mode(
+> +					const GDBusPropertyTable *property,
+> +					DBusMessageIter *iter, void *data)
+> +{
+> +	struct input_device *idev = data;
+> +
+> +	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
+> +					reconnect_value + idev->reconnect_mode);
+> +
+> +	return TRUE;
+> +}
+> +
+> +static const GDBusPropertyTable input_properties[] = {
+> +	{ "ReconnectMode", "s", property_get_reconnect_mode },
+> +	{ }
+> +};
+> +
+>  int input_device_register(struct btd_device *device,
+>  					const char *path, const char *uuid,
+>  					const sdp_record_t *rec, int timeout)
+> @@ -723,6 +790,19 @@ int input_device_register(struct btd_device *device,
+>  	if (!idev)
+>  		return -EINVAL;
+>  
+> +	/* Initialize device properties */
+> +	extract_hid_props(idev, rec);
+> +
+> +	if (g_dbus_register_interface(btd_get_dbus_connection(),
+> +					idev->path, INPUT_INTERFACE,
+> +					NULL, NULL,
+> +					input_properties, idev,
+> +					NULL) == FALSE) {
+> +		error("Unable to register %s interface", INPUT_INTERFACE);
+> +		input_device_free(idev);
+> +		return -EINVAL;
+> +	}
+> +
+>  	idev->timeout = timeout;
+>  	idev->uuid = g_strdup(uuid);
+>  
+> @@ -761,6 +841,9 @@ int input_device_unregister(const char *path, const char *uuid)
+>  		return -EBUSY;
+>  	}
+>  
+> +	g_dbus_unregister_interface(btd_get_dbus_connection(),
+> +						idev->path, INPUT_INTERFACE);
+> +
+>  	devices = g_slist_remove(devices, idev);
+>  	input_device_free(idev);
+>  
+> -- 
+> 1.8.1.3
+> 
 
-* Patch 6 updates start_discovery function to use HCI request to send HCI
-inquiry/LE scanning commands to the controller. It also defines the start_
-discovery_complete function where all command complete events are handled.
 
-* Patch 7 simply removes Start Discovery command complete handling from hci_
-event.c since it is now handled by start_discovery_complete function in mgmt.c.
-
-* Patch 8 moves discovery macros from mgmt.c to a common place (hci_core.h)
-because some of these macros will be used in hci_core.c in the upcoming patch
-(patch 9).
-
-* Patch 9 updates le_scan_disable_work function to use HCI request.
-
-* Patch 10 updates stop_discovery function to use HCI request. This patch does
-a similar job as Patch 6, but for Stop Discovery command instead.
-
-* Patch 11 simply removes Stop Discovery command complete handling from hci_
-event.c. This patch does a similar job as Patch 7, but for Stop Discovery
-command instead.
-
-* Patch 12 does a very trivial refactoring in hci_cc_le_set_scan_enable
-function.
-
-* Patches 13 and 14 removes LE scanning helpers and inquiry helpers since they
-are no longer used.
-
-* Patch 15 removes the hci_cc_le_set_scan_param function since it became an
-empty event handler.
-
-* Patch 16 renames le_scan_disable work to a more suitable name.
-
-* Patch 17 is not really related to this patch set, but it is related to the
-whole Device Discovery functionality. As discussed on IRC with Marcel, we
-don't want the kernel sending Mgmt Device Found events to user-space when we
-are not running the Device Discovery. Therefore, Inquiry or LE scanning
-triggered by HCI raw interface (e.g. hcitool) won't generate Mgmt Device Found
-events anymore.
-
-Regards,
-
-Andre
-
-
-Andre Guedes (17):
-  Bluetooth: Change LE scanning timeout macros
-  Bluetooth: Add LE scan type macros
-  Bluetooth: Add macros for filter duplicates values
-  Bluetooth: Rename LE_SCANNING_* macros
-  Bluetooth: Make inquiry_cache_flush non-static
-  Bluetooth: Update start_discovery to use HCI request
-  Bluetooth: Remove start discovery handling from hci_event.c
-  Bluetooth: Move discovery macros to hci_core.h
-  Bluetooth: Update le_scan_disable_work to use HCI request
-  Bluetooth: Update stop_discovery to use HCI request
-  Bluetooth: Remove stop discovery handling from hci_event.c
-  Bluetooth: Refactor hci_cc_le_set_scan_enable
-  Bluetooth: Remove LE scan helpers
-  Bluetooth: Remove inquiry helpers
-  Bluetooth: Remove empty event handler
-  Bluetooth: Rename le_scan_disable delayed work
-  Bluetooth: Mgmt Device Found Event
-
- include/net/bluetooth/hci.h      |   9 +-
- include/net/bluetooth/hci_core.h |  29 +++---
- net/bluetooth/hci_core.c         | 192 ++++++++++++---------------------------
- net/bluetooth/hci_event.c        |  71 ++-------------
- net/bluetooth/mgmt.c             | 156 +++++++++++++++++++++++--------
- 5 files changed, 201 insertions(+), 256 deletions(-)
-
+Cheers,
 -- 
-1.8.1.2
-
+Vinicius
