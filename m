@@ -1,70 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 4 Apr 2013 11:34:02 +0300
+Date: Thu, 4 Apr 2013 11:26:13 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Christopher Waid <chris@thinkpenguin.com>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-	Greg KH <gregkh@linuxfoundation.org>,
-	linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode) causing
- crashes
-Message-ID: <20130404083402.GA2594@x220>
-References: <514763A7.4020800@thinkpenguin.com>
- <20130318191335.GA11242@kroah.com>
- <5149FC3A.4070208@thinkpenguin.com>
- <20130320185719.GC7522@joana>
- <514A2DDE.8060801@thinkpenguin.com>
- <515C7BD4.9000906@thinkpenguin.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] Fix Inquiry command support in HCI request
+ framework
+Message-ID: <20130404082613.GC2340@x220>
+References: <1364425497-30944-1-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <515C7BD4.9000906@thinkpenguin.com>
-Sender: linux-usb-owner@vger.kernel.org
+In-Reply-To: <1364425497-30944-1-git-send-email-andre.guedes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christopher,
+Hi Andre,
 
-On Wed, Apr 03, 2013, Christopher Waid wrote:
-> On 03/20/2013 05:45 PM, Christopher Waid wrote:
-> >On 03/20/2013 02:57 PM, Gustavo Padovan wrote:
-> >>* Christopher Waid <chris@thinkpenguin.com> [2013-03-20 14:13:14 -0400]:
-> >>
-> >>>On 03/18/2013 03:13 PM, Greg KH wrote:
-> >>>>On Mon, Mar 18, 2013 at 02:57:43PM -0400, Christopher Waid wrote:
-> >>>>>Bus 001 Device 007: ID 0a12:0001 Cambridge Silicon Radio, Ltd
-> >>>>>Bluetooth Dongle (HCI mode)
-> >>>>>
-> >>>>>Code for a CSR bluetooth chipset appears broken in recent kernel
-> >>>>>releases. After a device is paired the kernel panics. This has been
-> >>>>>tested with a dozen USB dongles / systems and is consistently a
-> >>>>>problem. On the rare occasion it might not cause a kernel panic
-> >>>>>although it will definitely still crash after a few minutes. This
-> >>>>>does not happen with older kernel releases.
-> >>>>What kernel version is crashing, and what is the exact text of the
-> >>>>kernel panic?
-> >>>It goes black and disappears off the screen with a lot of other text
-> >>>so I'm unsure.
-> >>This text you are seeing in probably the crash dump of the
-> >>failure, could you
-> >>try to take a picture of the screen so we can check if there is
-> >>some useful
-> >>information there.
-> >>
-> >>Also if the kernel doesn't panic instantly you could check if
-> >>there is some
-> >>issue in the kernel log after pairing and save it somewhere so
-> >>we can take a
-> >>look. Use the 3.8 kernel.
-> >>
-> >
-> >I'm attaching kern.log and a picture of the screen when it crashes
-> >/ dumps.
-> >
+On Wed, Mar 27, 2013, Andre Guedes wrote:
+> This v2 implements the following comments about the previous patch set:
+>  - Consider commands (which don't send Command Complete Event) as completed
+>    based on Command Status Event.
+>  - Remove hci_req_cmd_status function.
 > 
-> I was wondering if anybody had a chance to look into this. I don't
-> seem to be on the mailing list even though I attempted to subscribe.
+> Thus, for those HCI commands which don't send Command Complete Event, the HCI
+> request framework considers they have completed when the Command Status Event
+> is received. 
+> 
+> Regards,
+> 
+> Andre
+> 
+> Andre Guedes (3):
+>   Bluetooth: Fix HCI request framework
+>   Bluetooth: Fix hci_inquiry
+>   Bluetooth: Remove hci_req_cmd_status
+> 
+>  include/net/bluetooth/hci_core.h |  1 -
+>  net/bluetooth/hci_core.c         | 39 +++++++++++++--------------------------
+>  net/bluetooth/hci_event.c        | 11 ++++++-----
+>  3 files changed, 19 insertions(+), 32 deletions(-)
 
-I never saw the mail with the attachments from you. It was probably
-blocked from the linux-bluetooth list (probably linux-usb too) due to a
-too big size. You might want to put the picture on some website and just
-send the link to it in your email.
+All patches in this set have now been pushed to the bluetooth-next
+tree. Thanks.
 
 Johan
