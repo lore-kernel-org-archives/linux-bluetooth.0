@@ -1,72 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Christian Lamparter <chunkeey@googlemail.com>
-To: Eugene Krasnikov <k.eugene.e@gmail.com>
-Subject: Re: Version number policy!
-Date: Fri, 5 Apr 2013 20:08:14 +0200
-Cc: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
-	"linux-bluetooth" <linux-bluetooth@vger.kernel.org>,
-	Adrian Chadd <adrian@freebsd.org>,
-	"linux-wireless" <linux-wireless@vger.kernel.org>,
-	"ath9k_htc_fw" <ath9k_htc_fw@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <CAJ-Vmo=LVSzdEo6DhfOVT_0JHCTMmdPU1zGfMuBmhmr8QuDmJQ@mail.gmail.com> <201304051903.11215.chunkeey@googlemail.com> <CAFSJ42bqquh+xekt8+V3wbG3MOUVFELTxR3mNPfS0Jn9J7OURQ@mail.gmail.com>
-In-Reply-To: <CAFSJ42bqquh+xekt8+V3wbG3MOUVFELTxR3mNPfS0Jn9J7OURQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Message-Id: <201304052008.15412.chunkeey@googlemail.com>
+In-Reply-To: <201304051903.11215.chunkeey@googlemail.com>
+References: <CAJ-Vmo=LVSzdEo6DhfOVT_0JHCTMmdPU1zGfMuBmhmr8QuDmJQ@mail.gmail.com>
+	<CAB=NE6V3sApMSGWkKbaFaJC4+VpLxgYF-xyNRKxiA-YDCwhGkQ@mail.gmail.com>
+	<201304051903.11215.chunkeey@googlemail.com>
+Date: Fri, 5 Apr 2013 19:23:54 +0200
+Message-ID: <CAFSJ42bqquh+xekt8+V3wbG3MOUVFELTxR3mNPfS0Jn9J7OURQ@mail.gmail.com>
+Subject: Re: Version number policy!
+From: Eugene Krasnikov <k.eugene.e@gmail.com>
+To: Christian Lamparter <chunkeey@googlemail.com>
+Cc: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	Adrian Chadd <adrian@freebsd.org>,
+	linux-wireless <linux-wireless@vger.kernel.org>,
+	ath9k_htc_fw <ath9k_htc_fw@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Friday 05 April 2013 19:23:54 Eugene Krasnikov wrote:
-> When it comes to feature bitmap do you have an example of such a
-> bitmap from carl9170? 
-That's a weird way of asking. No, I don't have an example?!
-But carl9170fw_feature_list is used in "production".
+Good point regarding timestamp.
 
-Anyway, there is one defined in:
-<https://github.com/chunkeey/carl9170fw/blob/master/include/shared/fwdesc.h#L26>
+When it comes to feature bitmap do you have an example of such a
+bitmap from carl9170? Why not to rely always on major version?
 
-It's packed into the OTUS firmware descriptor:
-<https://github.com/chunkeey/carl9170fw/blob/master/include/shared/fwdesc.h#L118>
+2013/4/5 Christian Lamparter <chunkeey@googlemail.com>:
+> On Friday 05 April 2013 10:19:00 Luis R. Rodriguez wrote:
+>> On Thu, Apr 4, 2013 at 11:27 AM, Adrian Chadd <adrian@freebsd.org> wrote:
+>> > Here's my first take on the version number policy:
+>> >
+>> > https://github.com/qca/open-ath9k-htc-firmware/wiki/VersionPolicy
+>> > The summary:
+>> >
+>> > * major version number changes are for firmware API / behaviour
+>> > changes that aren't backwards compatible;
+>> > * minor version number changes are for firmware API / behaviour
+>> > changes that are incremental and default to the old behaviour (eg, new
+>> > optional commands);
+>> > * the driver should check the minor version number before using any
+>> > optional features with that version.
+>> >
+>> > What's TODO:
+>> >
+>> > * Add a new WMI command to get the build number, git string, etc.
+>> > * add it as our first optional minor version command :-)
+>>
+>> This is better than anything we had drafted before for 802.11 open
+>> firmware design rules. Cc'ing a few lists for wider review given that
+>> what we had written before for rules was for 802.11 and Bluetooth [0]
+>> and it was very Linux specific. We are striving for open firmware here
+>> for the community, for BSD / Linux. Christian would have dealt with
+>> more of the support on open firmware design so far due to carl9170.fw
+>> [1] so curious if he has any input.
+> Based on my experience with carl9170, I can tell you that
+> new stuff (new wmi commands, or advanced offload caps, features
+> and bugfixes) should be advised via feature flags in bitmaps
+> and not firmware versions. [Just make it long enough...]
+>
+> Otherwise you'll have to write endless checks like:
+> if ((fw_minor == 1 && fw_patch > 30) ||
+>     (fw_minor == 2 && fw_patch > 7) ||
+>     (fw_minor == 3 && fw_patch > 3) ||
+>     (fw_minor > 4))
+>                 feature_supported = true;
+>
+> everytime you backport features and bugfixes to older firmwares.
+>
+> Also, firmware dates are more important than you think.
+> They allow some way of syncing the firmware->driver and
+> your inbox.
+>
+> Regards,
+>         Christian
+>
+> _______________________________________________
+> Ath9k_htc_fw mailing list
+> Ath9k_htc_fw@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/ath9k_htc_fw
 
-And the descriptor is filled in:
-<https://github.com/chunkeey/carl9170fw/blob/master/carlfw/src/fw.c>
 
-[Basically, a bit for every feature in kconfig.]
 
-Of course, the nice thing is, if you have something like
-kconfig (carl9170fw.git uses a pretty much the vanilla kernel
-kconfig. Everything apart from the cmake scripts for gperf
-(which is in extra/) is packed into the conf/ directory.
-
-And it has the necessary cmake files. So it should integrate 
-well into the "new" ath9k_htc cmake build system Felix made.
-
-> Why not to rely always on major version?
-Ok, let's do the same with major version...
-
-if  ((fw_major == 1 && fw_minor > 30) ||
-     (fw_major == 2 && fw_minor > 7) ||
-     (fw_major == 3 && fw_minor > 3) ||
-     (fw_major > 4))
-      feature_supported = true;
-
-Nope, I think it looks just as bad.
-[Please, explain what you meant to say...
-Because the new versioning draft stats that very
-major release is incompatible with the old one and
-clearly, having to support a ton of different firmware
-trees is no joy.... and not necessary]
-
-BTW: Instead of a GET_BUILD command, why not make a add a
-firmware header or pack the information into the tail... 
-
-This way, it can be read and parsed by tools, without having
-to upload it to the device first.
-
-carl9170fw already such a tool, it's called: fwinfo and it is located in: 
-<https://github.com/chunkeey/carl9170fw/blob/master/tools/src/fwinfo.c>
-
-Regards,
-	Christian
+-- 
+Best regards,
+Eugene
