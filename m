@@ -1,84 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v2 00/11] struct btd_service in core
-Date: Fri,  5 Apr 2013 13:45:37 +0200
-Message-Id: <1365162348-25541-1-git-send-email-mikel.astiz.oss@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <CAB=NE6V3sApMSGWkKbaFaJC4+VpLxgYF-xyNRKxiA-YDCwhGkQ@mail.gmail.com>
+References: <CAJ-Vmo=LVSzdEo6DhfOVT_0JHCTMmdPU1zGfMuBmhmr8QuDmJQ@mail.gmail.com>
+	<CAB=NE6V3sApMSGWkKbaFaJC4+VpLxgYF-xyNRKxiA-YDCwhGkQ@mail.gmail.com>
+Date: Fri, 5 Apr 2013 01:21:06 -0700
+Message-ID: <CAJ-Vmom7gNBhyuBgg9YkCLRohR6eE-JfBYYtxfFeTkSiGhgHyw@mail.gmail.com>
+Subject: Re: Version number policy!
+From: Adrian Chadd <adrian@freebsd.org>
+To: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>
+Cc: ath9k_htc_fw <ath9k_htc_fw@lists.infradead.org>,
+	linux-wireless <linux-wireless@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	Christian Lamparter <chunkeey@googlemail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+On 5 April 2013 01:19, Luis R. Rodriguez <mcgrof@do-not-panic.com> wrote:
 
-v1 does not apply anymore so I'm sending an updated version of the patchset.
+> This is better than anything we had drafted before for 802.11 open
+> firmware design rules. Cc'ing a few lists for wider review given that
+> what we had written before for rules was for 802.11 and Bluetooth [0]
+> and it was very Linux specific. We are striving for open firmware here
+> for the community, for BSD / Linux. Christian would have dealt with
+> more of the support on open firmware design so far due to carl9170.fw
+> [1] so curious if he has any input.
+>
 
-v2 is similar to the pervious version but with minor changes in patch 1 as pointed out by Johan and Anderson. Besides, patch 11 has been updated to the latest changes in profiles/audio.
+I'm treating it like shared libraries should be treated - minor
+versions shouldn't break existing stuff, just add new calls. Major
+versions are incompatible.
 
->From original cover-letter:
+We'll see how well this scales after people hack at it for a while.
 
-This RFC proposes a somewhat intrusive change in the core with the adoption of struct btd_service, with the following main goals:
 
-1. Support for multiple instances of the same UUID.
-2. Better support for connection-handling plugins/components (e.g. automotive).
-3. Exposure of remote services in D-Bus (not implemented here).
-4. Improve code readability and reduce profile-implementation code size.
 
-Mikel Astiz (11):
-  core: Add btd_service to represent device services
-  device: Use btd_service to represent profiles
-  device: Replace connected_profiles with btd_service
-  device: Find services instead of profiles
-  device: Replace pending profile list with services
-  profile: Use btd_service for probing profiles
-  audio: Hold a reference to btd_service
-  network: Hold a reference to btd_service
-  input: Hold a reference to btd_service
-  service: Add callbacks to track state changes
-  profile: Use btd_service for connect/disconnect
-
- Makefile.am                          |   1 +
- Makefile.plugins                     |   4 +-
- profiles/audio/avrcp.c               |  16 +--
- profiles/audio/control.c             |  48 ++++++-
- profiles/audio/control.h             |  12 +-
- profiles/audio/manager.c             |  88 ++++--------
- profiles/audio/manager.h             |   9 --
- profiles/audio/sink.c                |  24 ++--
- profiles/audio/sink.h                |   4 +-
- profiles/audio/source.c              |  25 ++--
- profiles/audio/source.h              |   5 +-
- profiles/cyclingspeed/cyclingspeed.c |   9 +-
- profiles/deviceinfo/deviceinfo.c     |  11 +-
- profiles/gatt/gas.c                  |  10 +-
- profiles/health/hdp_manager.c        |  10 +-
- profiles/heartrate/heartrate.c       |  10 +-
- profiles/input/device.c              |  95 +++++++------
- profiles/input/device.h              |  13 +-
- profiles/input/hog.c                 |   8 +-
- profiles/input/manager.c             |  51 +------
- profiles/input/manager.h             |  25 ----
- profiles/network/connection.c        |  77 ++++++-----
- profiles/network/connection.h        |   8 +-
- profiles/network/manager.c           | 123 ++---------------
- profiles/network/manager.h           |  25 ----
- profiles/proximity/manager.c         |  28 ++--
- profiles/proximity/reporter.c        |   8 +-
- profiles/proximity/reporter.h        |   5 +-
- profiles/sap/manager.c               |   1 +
- profiles/scanparam/scan.c            |   9 +-
- profiles/thermometer/thermometer.c   |  11 +-
- src/device.c                         | 242 +++++++++++++++++++++-----------
- src/device.h                         |   5 -
- src/profile.c                        |  40 ++++--
- src/profile.h                        |  14 +-
- src/service.c                        | 260 +++++++++++++++++++++++++++++++++++
- src/service.h                        |  61 ++++++++
- 37 files changed, 825 insertions(+), 570 deletions(-)
- delete mode 100644 profiles/input/manager.h
- delete mode 100644 profiles/network/manager.h
- create mode 100644 src/service.c
- create mode 100644 src/service.h
-
--- 
-1.8.1.4
-
+Adrian
