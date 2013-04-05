@@ -1,40 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
-Subject: Re: [PATCH v3 00/18] Rework HIDP Session Management
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1365166670-3271-1-git-send-email-dh.herrmann@gmail.com>
-Date: Fri, 5 Apr 2013 12:01:54 -0700
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo@padovan.org>
-Message-Id: <CD91E66B-2A36-476C-BCDD-D1536A8983B4@holtmann.org>
-References: <1365166670-3271-1-git-send-email-dh.herrmann@gmail.com>
-To: David Herrmann <dh.herrmann@gmail.com>
+From: Christian Lamparter <chunkeey@googlemail.com>
+To: Eugene Krasnikov <k.eugene.e@gmail.com>
+Subject: Re: Version number policy!
+Date: Fri, 5 Apr 2013 20:08:14 +0200
+Cc: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
+	"linux-bluetooth" <linux-bluetooth@vger.kernel.org>,
+	Adrian Chadd <adrian@freebsd.org>,
+	"linux-wireless" <linux-wireless@vger.kernel.org>,
+	"ath9k_htc_fw" <ath9k_htc_fw@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <CAJ-Vmo=LVSzdEo6DhfOVT_0JHCTMmdPU1zGfMuBmhmr8QuDmJQ@mail.gmail.com> <201304051903.11215.chunkeey@googlemail.com> <CAFSJ42bqquh+xekt8+V3wbG3MOUVFELTxR3mNPfS0Jn9J7OURQ@mail.gmail.com>
+In-Reply-To: <CAFSJ42bqquh+xekt8+V3wbG3MOUVFELTxR3mNPfS0Jn9J7OURQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Message-Id: <201304052008.15412.chunkeey@googlemail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+On Friday 05 April 2013 19:23:54 Eugene Krasnikov wrote:
+> When it comes to feature bitmap do you have an example of such a
+> bitmap from carl9170? 
+That's a weird way of asking. No, I don't have an example?!
+But carl9170fw_feature_list is used in "production".
 
-> This is v3 of the HIDP session management rework. Only thing that changed is
-> that I moved hci_conn_user to l2cap_user as requested. The l2cap_user object is
-> now bound to l2cap_conn objects instead of hci_conn. This avoids any direct HCI
-> dependency in external modules.
-> 
-> Note that this requires l2cap_conn ref-counting. However, this is pretty easy to
-> implement and does not affect existing code at all as we use direct
-> synchronization.
-> 
-> Also note that I designed it in a way that it is independent of l2cap_sock. So
-> if we succeed it making l2cap_core independent of l2cap_sock, we can move HIDP
-> or other l2cap_user users over and make them independent of l2cap_sock, too.
+Anyway, there is one defined in:
+<https://github.com/chunkeey/carl9170fw/blob/master/include/shared/fwdesc.h#L26>
 
-this looks good. And using L2CAP as entry point makes this cleaner.
+It's packed into the OTUS firmware descriptor:
+<https://github.com/chunkeey/carl9170fw/blob/master/include/shared/fwdesc.h#L118>
 
-And triple thanks for the really great commit messages. That made it a lot easier for me to review these patches.
+And the descriptor is filled in:
+<https://github.com/chunkeey/carl9170fw/blob/master/carlfw/src/fw.c>
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+[Basically, a bit for every feature in kconfig.]
 
-Regards
+Of course, the nice thing is, if you have something like
+kconfig (carl9170fw.git uses a pretty much the vanilla kernel
+kconfig. Everything apart from the cmake scripts for gperf
+(which is in extra/) is packed into the conf/ directory.
 
-Marcel
+And it has the necessary cmake files. So it should integrate 
+well into the "new" ath9k_htc cmake build system Felix made.
 
+> Why not to rely always on major version?
+Ok, let's do the same with major version...
+
+if  ((fw_major == 1 && fw_minor > 30) ||
+     (fw_major == 2 && fw_minor > 7) ||
+     (fw_major == 3 && fw_minor > 3) ||
+     (fw_major > 4))
+      feature_supported = true;
+
+Nope, I think it looks just as bad.
+[Please, explain what you meant to say...
+Because the new versioning draft stats that very
+major release is incompatible with the old one and
+clearly, having to support a ton of different firmware
+trees is no joy.... and not necessary]
+
+BTW: Instead of a GET_BUILD command, why not make a add a
+firmware header or pack the information into the tail... 
+
+This way, it can be read and parsed by tools, without having
+to upload it to the device first.
+
+carl9170fw already such a tool, it's called: fwinfo and it is located in: 
+<https://github.com/chunkeey/carl9170fw/blob/master/tools/src/fwinfo.c>
+
+Regards,
+	Christian
