@@ -4,192 +4,102 @@ To: linux-bluetooth@vger.kernel.org
 Cc: Marcel Holtmann <marcel@holtmann.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
 	David Herrmann <dh.herrmann@gmail.com>
-Subject: [PATCH v3 11/18] Bluetooth: l2cap: add l2cap_user sub-modules
-Date: Fri,  5 Apr 2013 14:57:43 +0200
-Message-Id: <1365166670-3271-12-git-send-email-dh.herrmann@gmail.com>
+Subject: [PATCH v3 10/18] Bluetooth: l2cap: introduce l2cap_conn ref-counting
+Date: Fri,  5 Apr 2013 14:57:42 +0200
+Message-Id: <1365166670-3271-11-git-send-email-dh.herrmann@gmail.com>
 In-Reply-To: <1365166670-3271-1-git-send-email-dh.herrmann@gmail.com>
 References: <1365166670-3271-1-git-send-email-dh.herrmann@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Several sub-modules like HIDP, rfcomm, ... need to track l2cap
-connections. The l2cap_conn->hcon->dev object is used as parent for sysfs
-devices so the sub-modules need to be notified when the hci_conn object is
-removed from sysfs.
+If we want to use l2cap_conn outside of l2cap_core.c, we need refcounting
+for these objects. Otherwise, we cannot synchronize l2cap locks with
+outside locks and end up with deadlocks.
 
-As submodules normally use the l2cap layer, the l2cap_user objects are
-registered there instead of on the underlying hci_conn object. This avoids
-any direct dependency on the HCI layer and lets the l2cap core handle any
-specifics.
-
-This patch introduces l2cap_user objects which contain a "probe" and
-"remove" callback. You can register them on any l2cap_conn object and if
-it is active, the "probe" callback will get called. Otherwise, an error is
-returned.
-
-The l2cap_conn object will call your "remove" callback directly before it
-is removed from user-space. This allows you to remove your submodules
-_before_ the parent l2cap_conn and hci_conn object is removed.
-
-At any time you can asynchronously unregister your l2cap_user object if
-your submodule vanishes before the l2cap_conn object does.
-
-There is no way around l2cap_user. If we want wire-protocols in the
-kernel, we always want the hci_conn object as parent in the sysfs tree. We
-cannot use a channel here since we might need multiple channels for a
-single protocol.
-But the problem is, we _must_ get notified when an l2cap_conn object is
-removed. We cannot use reference-counting for object-removal! This is not
-how it works. If a hardware is removed, we should immediately remove the
-object from sysfs. Any other behavior would be inconsistent with the rest
-of the system. Also note that device_del() might sleep, but it doesn't
-wait for user-space or block very long. It only _unlinks_ the object from
-sysfs and the whole device-tree. Everything else is handled by ref-counts!
-This is exactly what the other sub-modules must do: unlink their devices
-when the "remove" l2cap_user callback is called. They should not do any
-cleanup or synchronous shutdowns.
+Hence, introduce ref-counting for l2cap_conn objects. This doesn't affect
+l2cap internals at all, as they use a direct synchronization.
+We also keep a reference to the parent hci_conn for locking purposes as
+l2cap_conn depends on this. This doesn't affect the connection itself but
+only the lifetime of the (dead) object.
 
 Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
 ---
- include/net/bluetooth/l2cap.h | 10 +++++
- net/bluetooth/l2cap_core.c    | 86 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 96 insertions(+)
+ include/net/bluetooth/l2cap.h |  4 ++++
+ net/bluetooth/l2cap_core.c    | 25 ++++++++++++++++++++++++-
+ 2 files changed, 28 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 73ac062..1beba19 100644
+index db6694f..73ac062 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -585,6 +585,13 @@ struct l2cap_conn {
+@@ -584,6 +584,7 @@ struct l2cap_conn {
+ 
  	struct list_head	chan_l;
  	struct mutex		chan_lock;
- 	struct kref		ref;
-+	struct list_head	users;
-+};
-+
-+struct l2cap_user {
-+	struct list_head list;
-+	int (*probe) (struct l2cap_conn *conn, struct l2cap_user *user);
-+	void (*remove) (struct l2cap_conn *conn, struct l2cap_user *user);
++	struct kref		ref;
  };
  
  #define L2CAP_INFO_CL_MTU_REQ_SENT	0x01
-@@ -818,4 +825,7 @@ void __l2cap_physical_cfm(struct l2cap_chan *chan, int result);
- void l2cap_conn_get(struct l2cap_conn *conn);
- void l2cap_conn_put(struct l2cap_conn *conn);
+@@ -814,4 +815,7 @@ void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
+ 		       u8 status);
+ void __l2cap_physical_cfm(struct l2cap_chan *chan, int result);
  
-+int l2cap_register_user(struct l2cap_conn *conn, struct l2cap_user *user);
-+void l2cap_unregister_user(struct l2cap_conn *conn, struct l2cap_user *user);
++void l2cap_conn_get(struct l2cap_conn *conn);
++void l2cap_conn_put(struct l2cap_conn *conn);
 +
  #endif /* __L2CAP_H */
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 58af8d6..f8f7d25 100644
+index 175dd32..58af8d6 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1446,6 +1446,89 @@ static void l2cap_info_timeout(struct work_struct *work)
- 	l2cap_conn_start(conn);
+@@ -1486,7 +1486,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ 	}
+ 
+ 	hcon->l2cap_data = NULL;
+-	kfree(conn);
++	conn->hchan = NULL;
++	l2cap_conn_put(conn);
  }
  
-+/*
-+ * l2cap_user
-+ * External modules can register l2cap_user objects on l2cap_conn. The ->probe
-+ * callback is called during registration. The ->remove callback is called
-+ * during unregistration.
-+ * An l2cap_user object can either be explicitly unregistered or when the
-+ * underlying l2cap_conn object is deleted. This guarantees that l2cap->hcon,
-+ * l2cap->hchan, .. are valid as long as the remove callback hasn't been called.
-+ * External modules must own a reference to the l2cap_conn object if they intend
-+ * to call l2cap_unregister_user(). The l2cap_conn object might get destroyed at
-+ * any time if they don't.
-+ */
-+
-+int l2cap_register_user(struct l2cap_conn *conn, struct l2cap_user *user)
+ static void security_timeout(struct work_struct *work)
+@@ -1520,8 +1521,10 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+ 		return NULL;
+ 	}
+ 
++	kref_init(&conn->ref);
+ 	hcon->l2cap_data = conn;
+ 	conn->hcon = hcon;
++	hci_conn_get(conn->hcon);
+ 	conn->hchan = hchan;
+ 
+ 	BT_DBG("hcon %p conn %p hchan %p", hcon, conn, hchan);
+@@ -1563,6 +1566,26 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
+ 	return conn;
+ }
+ 
++static void l2cap_conn_free(struct kref *ref)
 +{
-+	struct hci_dev *hdev = conn->hcon->hdev;
-+	int ret;
++	struct l2cap_conn *conn = container_of(ref, struct l2cap_conn, ref);
 +
-+	/* We need to check whether l2cap_conn is registered. If it is not, we
-+	 * must not register the l2cap_user. l2cap_conn_del() is unregisters
-+	 * l2cap_conn objects, but doesn't provide its own locking. Instead, it
-+	 * relies on the parent hci_conn object to be locked. This itself relies
-+	 * on the hci_dev object to be locked. So we must lock the hci device
-+	 * here, too. */
-+
-+	hci_dev_lock(hdev);
-+
-+	if (user->list.next || user->list.prev) {
-+		ret = -EINVAL;
-+		goto out_unlock;
-+	}
-+
-+	/* conn->hchan is NULL after l2cap_conn_del() was called */
-+	if (!conn->hchan) {
-+		ret = -ENODEV;
-+		goto out_unlock;
-+	}
-+
-+	ret = user->probe(conn, user);
-+	if (ret)
-+		goto out_unlock;
-+
-+	list_add(&user->list, &conn->users);
-+	ret = 0;
-+
-+out_unlock:
-+	hci_dev_unlock(hdev);
-+	return ret;
-+}
-+EXPORT_SYMBOL(l2cap_register_user);
-+
-+void l2cap_unregister_user(struct l2cap_conn *conn, struct l2cap_user *user)
-+{
-+	struct hci_dev *hdev = conn->hcon->hdev;
-+
-+	hci_dev_lock(hdev);
-+
-+	if (!user->list.next || !user->list.prev)
-+		goto out_unlock;
-+
-+	list_del(&user->list);
-+	user->list.next = NULL;
-+	user->list.prev = NULL;
-+	user->remove(conn, user);
-+
-+out_unlock:
-+	hci_dev_unlock(hdev);
-+}
-+EXPORT_SYMBOL(l2cap_unregister_user);
-+
-+static void l2cap_unregister_all_users(struct l2cap_conn *conn)
-+{
-+	struct l2cap_user *user;
-+
-+	while (!list_empty(&conn->users)) {
-+		user = list_first_entry(&conn->users, struct l2cap_user, list);
-+		list_del(&user->list);
-+		user->list.next = NULL;
-+		user->list.prev = NULL;
-+		user->remove(conn, user);
-+	}
++	hci_conn_put(conn->hcon);
++	kfree(conn);
 +}
 +
- static void l2cap_conn_del(struct hci_conn *hcon, int err)
- {
- 	struct l2cap_conn *conn = hcon->l2cap_data;
-@@ -1458,6 +1541,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- 
- 	kfree_skb(conn->rx_skb);
- 
-+	l2cap_unregister_all_users(conn);
++void l2cap_conn_get(struct l2cap_conn *conn)
++{
++	kref_get(&conn->ref);
++}
++EXPORT_SYMBOL(l2cap_conn_get);
 +
- 	mutex_lock(&conn->chan_lock);
++void l2cap_conn_put(struct l2cap_conn *conn)
++{
++	kref_put(&conn->ref, l2cap_conn_free);
++}
++EXPORT_SYMBOL(l2cap_conn_put);
++
+ /* ---- Socket interface ---- */
  
- 	/* Kill channels */
-@@ -1555,6 +1640,7 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
- 	mutex_init(&conn->chan_lock);
- 
- 	INIT_LIST_HEAD(&conn->chan_l);
-+	INIT_LIST_HEAD(&conn->users);
- 
- 	if (hcon->type == LE_LINK)
- 		INIT_DELAYED_WORK(&conn->security_timer, security_timeout);
+ /* Find socket with psm and source / destination bdaddr.
 -- 
 1.8.2
+
