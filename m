@@ -4,60 +4,73 @@ To: linux-bluetooth@vger.kernel.org
 Cc: Marcel Holtmann <marcel@holtmann.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
 	David Herrmann <dh.herrmann@gmail.com>
-Subject: [PATCH v3 07/18] Bluetooth: hidp: test "terminate" before sleeping
-Date: Fri,  5 Apr 2013 14:57:39 +0200
-Message-Id: <1365166670-3271-8-git-send-email-dh.herrmann@gmail.com>
+Subject: [PATCH v3 06/18] Bluetooth: hidp: remove unused session->state field
+Date: Fri,  5 Apr 2013 14:57:38 +0200
+Message-Id: <1365166670-3271-7-git-send-email-dh.herrmann@gmail.com>
 In-Reply-To: <1365166670-3271-1-git-send-email-dh.herrmann@gmail.com>
 References: <1365166670-3271-1-git-send-email-dh.herrmann@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The "terminate" flag is guaranteed to be set before the session terminates
-and the handlers are woken up. Hence, we need to add it to the
-sleep-condition.
+This field is always BT_CONNECTED. Remove it and set it to BT_CONNECTED in
+hidp_copy_session() unconditionally.
 
-Note that testing the flags is not enough as nothing prevents us from
-setting the flags again after the session-handler terminated.
+Also note that this field is totally bogus. Userspace can query an
+hidp-session for its state. However, whenever user-space queries us, this
+field should be BT_CONNECTED. If it wasn't BT_CONNECTED, then we would be
+currently cleaning up the session and the session itself would exit in the
+next few milliseconds. Hence, there is no reason to let user-space know
+that the session will exit now if they cannot make _any_ use of that.
+
+Thus, remove the field and let user-space think that a session is always
+BT_CONNECTED as long as they can query it.
 
 Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
 ---
- net/bluetooth/hidp/core.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ net/bluetooth/hidp/core.c | 5 ++---
+ net/bluetooth/hidp/hidp.h | 1 -
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index 413b900..2a179ad 100644
+index f8144fe..413b900 100644
 --- a/net/bluetooth/hidp/core.c
 +++ b/net/bluetooth/hidp/core.c
-@@ -327,11 +327,13 @@ static int hidp_get_raw_report(struct hid_device *hid,
+@@ -79,7 +79,7 @@ static void __hidp_copy_session(struct hidp_session *session, struct hidp_connin
+ 	bacpy(&ci->bdaddr, &session->bdaddr);
  
- 	/* Wait for the return of the report. The returned report
- 	   gets put in session->report_return.  */
--	while (test_bit(HIDP_WAITING_FOR_RETURN, &session->flags)) {
-+	while (test_bit(HIDP_WAITING_FOR_RETURN, &session->flags) &&
-+	       !atomic_read(&session->terminate)) {
- 		int res;
+ 	ci->flags = session->flags;
+-	ci->state = session->state;
++	ci->state = BT_CONNECTED;
  
- 		res = wait_event_interruptible_timeout(session->report_queue,
--			!test_bit(HIDP_WAITING_FOR_RETURN, &session->flags),
-+			!test_bit(HIDP_WAITING_FOR_RETURN, &session->flags)
-+				|| atomic_read(&session->terminate),
- 			5*HZ);
- 		if (res == 0) {
- 			/* timeout */
-@@ -396,11 +398,13 @@ static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, s
- 		goto err;
+ 	ci->vendor  = 0x0000;
+ 	ci->product = 0x0000;
+@@ -966,7 +966,7 @@ int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock,
+ 	down_write(&hidp_session_sem);
  
- 	/* Wait for the ACK from the device. */
--	while (test_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags)) {
-+	while (test_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags) &&
-+	       !atomic_read(&session->terminate)) {
- 		int res;
+ 	s = __hidp_get_session(&bt_sk(ctrl_sock->sk)->dst);
+-	if (s && s->state == BT_CONNECTED) {
++	if (s) {
+ 		up_write(&hidp_session_sem);
+ 		return -EEXIST;
+ 	}
+@@ -988,7 +988,6 @@ int hidp_add_connection(struct hidp_connadd_req *req, struct socket *ctrl_sock,
  
- 		res = wait_event_interruptible_timeout(session->report_queue,
--			!test_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags),
-+			!test_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags)
-+				|| atomic_read(&session->terminate),
- 			10*HZ);
- 		if (res == 0) {
- 			/* timeout */
+ 	session->ctrl_sock = ctrl_sock;
+ 	session->intr_sock = intr_sock;
+-	session->state     = BT_CONNECTED;
+ 
+ 	session->conn = hidp_get_connection(session);
+ 	if (!session->conn) {
+diff --git a/net/bluetooth/hidp/hidp.h b/net/bluetooth/hidp/hidp.h
+index af1bcc8..57a6191 100644
+--- a/net/bluetooth/hidp/hidp.h
++++ b/net/bluetooth/hidp/hidp.h
+@@ -135,7 +135,6 @@ struct hidp_session {
+ 
+ 	bdaddr_t bdaddr;
+ 
+-	unsigned long state;
+ 	unsigned long flags;
+ 	unsigned long idle_to;
+ 
 -- 
 1.8.2
