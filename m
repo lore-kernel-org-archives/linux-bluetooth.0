@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v2 08/11] network: Hold a reference to btd_service
-Date: Fri,  5 Apr 2013 13:45:45 +0200
-Message-Id: <1365162348-25541-9-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC v2 09/11] input: Hold a reference to btd_service
+Date: Fri,  5 Apr 2013 13:45:46 +0200
+Message-Id: <1365162348-25541-10-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1365162348-25541-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1365162348-25541-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,226 +13,284 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
 Profile implementations are expected to hold a reference to probed
-services, so update the network profiles accordingly.
+services, so update the input profiles accordingly.
 ---
- profiles/network/connection.c | 38 ++++++++++++++++++++++++++--------
- profiles/network/connection.h |  4 ++--
- profiles/network/manager.c    | 48 ++++++-------------------------------------
- 3 files changed, 37 insertions(+), 53 deletions(-)
+ profiles/input/device.c  | 74 +++++++++++++++++++++++++-----------------------
+ profiles/input/device.h  |  8 +++---
+ profiles/input/manager.c | 41 ++++-----------------------
+ 3 files changed, 48 insertions(+), 75 deletions(-)
 
-diff --git a/profiles/network/connection.c b/profiles/network/connection.c
-index 3a913cf..1ecff4d 100644
---- a/profiles/network/connection.c
-+++ b/profiles/network/connection.c
-@@ -43,6 +43,8 @@
- #include "dbus-common.h"
- #include "adapter.h"
- #include "device.h"
-+#include "profile.h"
-+#include "service.h"
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index 1da9d99..2115111 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -44,6 +44,7 @@
+ #include "../src/adapter.h"
+ #include "../src/device.h"
+ #include "../src/profile.h"
++#include "../src/service.h"
+ #include "../src/storage.h"
+ #include "../src/dbus-common.h"
  
- #include "error.h"
- #include "common.h"
-@@ -65,6 +67,7 @@ struct network_peer {
+@@ -55,9 +56,9 @@
+ #include "sdp-client.h"
+ 
+ struct input_device {
++	struct btd_service	*service;
+ 	struct btd_device	*device;
+ 	char			*path;
+-	char			*uuid;
+ 	bdaddr_t		src;
+ 	bdaddr_t		dst;
+ 	uint32_t		handle;
+@@ -66,7 +67,6 @@ struct input_device {
+ 	guint			ctrl_watch;
+ 	guint			intr_watch;
+ 	guint			sec_watch;
+-	int			timeout;
+ 	struct hidp_connadd_req *req;
+ 	guint			dc_id;
+ 	gboolean		disable_sdp;
+@@ -74,6 +74,12 @@ struct input_device {
  };
  
- struct network_conn {
-+	struct btd_service *service;
- 	char		dev[16];	/* Interface name */
- 	uint16_t	id;		/* Role: Service Class Identifier */
- 	conn_state	state;
-@@ -83,6 +86,13 @@ struct __service_16 {
- 
- static GSList *peers = NULL;
- 
-+static uint16_t get_service_id(struct btd_service *service)
-+{
-+	struct btd_profile *p = btd_service_get_profile(service);
+ static GSList *devices = NULL;
++static int idle_timeout = 0;
 +
-+	return bnep_service_id(p->remote_uuid);
++void input_set_idle_timeout(int timeout)
++{
++	idle_timeout = timeout;
++}
+ 
+ static struct input_device *find_device_by_path(GSList *list, const char *path)
+ {
+@@ -92,6 +98,7 @@ static void input_device_free(struct input_device *idev)
+ 	if (idev->dc_id)
+ 		device_remove_disconnect_watch(idev->device, idev->dc_id);
+ 
++	btd_service_unref(idev->service);
+ 	btd_device_unref(idev->device);
+ 	g_free(idev->name);
+ 	g_free(idev->path);
+@@ -111,8 +118,6 @@ static void input_device_free(struct input_device *idev)
+ 	if (idev->ctrl_io)
+ 		g_io_channel_unref(idev->ctrl_io);
+ 
+-	g_free(idev->uuid);
+-
+ 	g_free(idev);
+ }
+ 
+@@ -366,7 +371,7 @@ static int hidp_add_connection(struct input_device *idev)
+ 	req->ctrl_sock = g_io_channel_unix_get_fd(idev->ctrl_io);
+ 	req->intr_sock = g_io_channel_unix_get_fd(idev->intr_io);
+ 	req->flags     = 0;
+-	req->idle_to   = idev->timeout;
++	req->idle_to   = idle_timeout;
+ 
+ 	ba2str(&idev->src, src_addr);
+ 	ba2str(&idev->dst, dst_addr);
+@@ -674,10 +679,21 @@ int input_device_disconnect(struct btd_device *dev, struct btd_profile *profile)
+ 	return 0;
+ }
+ 
+-static struct input_device *input_device_new(struct btd_device *device,
+-				const char *path, const uint32_t handle,
+-				gboolean disable_sdp)
++static gboolean is_device_sdp_disable(const sdp_record_t *rec)
+ {
++	sdp_data_t *data;
++
++	data = sdp_data_get(rec, SDP_ATTR_HID_SDP_DISABLE);
++
++	return data && data->val.uint8;
 +}
 +
- static struct network_peer *find_peer(GSList *list, struct btd_device *device)
- {
- 	for (; list; list = list->next) {
-@@ -599,6 +609,7 @@ static void connection_free(void *data)
- 	if (nc->connect)
- 		dbus_message_unref(nc->connect);
++static struct input_device *input_device_new(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	const char *path = device_get_path(device);
++	struct btd_profile *p = btd_service_get_profile(service);
++	const sdp_record_t *rec = btd_device_get_record(device, p->remote_uuid);
+ 	struct btd_adapter *adapter = device_get_adapter(device);
+ 	struct input_device *idev;
+ 	char name[HCI_MAX_NAME_LENGTH + 1];
+@@ -685,10 +701,11 @@ static struct input_device *input_device_new(struct btd_device *device,
+ 	idev = g_new0(struct input_device, 1);
+ 	bacpy(&idev->src, adapter_get_address(adapter));
+ 	bacpy(&idev->dst, device_get_address(device));
++	idev->service = btd_service_ref(service);
+ 	idev->device = btd_device_ref(device);
+ 	idev->path = g_strdup(path);
+-	idev->handle = handle;
+-	idev->disable_sdp = disable_sdp;
++	idev->handle = rec->handle;
++	idev->disable_sdp = is_device_sdp_disable(rec);
  
-+	btd_service_unref(nc->service);
- 	g_free(nc);
+ 	device_get_name(device, name, HCI_MAX_NAME_LENGTH);
+ 	if (strlen(name) > 0)
+@@ -697,19 +714,10 @@ static struct input_device *input_device_new(struct btd_device *device,
+ 	return idev;
  }
  
-@@ -639,13 +650,14 @@ static const GDBusPropertyTable connection_properties[] = {
- 	{ }
- };
- 
--void connection_unregister(struct btd_device *device)
-+void connection_unregister(struct btd_service *service)
+-static gboolean is_device_sdp_disable(const sdp_record_t *rec)
+-{
+-	sdp_data_t *data;
+-
+-	data = sdp_data_get(rec, SDP_ATTR_HID_SDP_DISABLE);
+-
+-	return data && data->val.uint8;
+-}
+-
+-int input_device_register(struct btd_device *device,
+-					const char *path, const char *uuid,
+-					const sdp_record_t *rec, int timeout)
++int input_device_register(struct btd_service *service)
  {
--	struct network_peer *peer;
 +	struct btd_device *device = btd_service_get_device(service);
-+	struct network_conn *conn = btd_service_get_user_data(service);
-+	struct network_peer *peer = conn->peer;
-+	uint16_t id = get_service_id(service);
++	const char *path = device_get_path(device);
+ 	struct input_device *idev;
  
--	peer = find_peer(peers, device);
--	if (!peer)
--		return;
-+	DBG("%s id %u", device_get_path(device), id);
+ 	DBG("%s", path);
+@@ -718,13 +726,11 @@ int input_device_register(struct btd_device *device,
+ 	if (idev)
+ 		return -EEXIST;
  
- 	g_slist_free_full(peer->connections, connection_free);
- 	peer->connections = NULL;
-@@ -682,12 +694,14 @@ static struct network_peer *create_peer(struct btd_device *device)
- 	return peer;
+-	idev = input_device_new(device, path, rec->handle,
+-			is_device_sdp_disable(rec));
++	idev = input_device_new(service);
+ 	if (!idev)
+ 		return -EINVAL;
+ 
+-	idev->timeout = timeout;
+-	idev->uuid = g_strdup(uuid);
++	btd_service_set_user_data(service, idev);
+ 
+ 	devices = g_slist_append(devices, idev);
+ 
+@@ -746,25 +752,21 @@ static struct input_device *find_device(const bdaddr_t *src,
+ 	return NULL;
  }
  
--int connection_register(struct btd_device *device, uint16_t id)
-+int connection_register(struct btd_service *service)
+-int input_device_unregister(const char *path, const char *uuid)
++void input_device_unregister(struct btd_service *service)
  {
+-	struct input_device *idev;
 +	struct btd_device *device = btd_service_get_device(service);
- 	struct network_peer *peer;
- 	struct network_conn *nc;
-+	uint16_t id = get_service_id(service);
++	const char *path = device_get_path(device);
++	struct input_device *idev = btd_service_get_user_data(service);
  
--	DBG("id %u", id);
-+	DBG("%s id %u", device_get_path(device), id);
+ 	DBG("%s", path);
  
- 	peer = find_peer(peers, device);
- 	if (!peer) {
-@@ -698,16 +712,22 @@ int connection_register(struct btd_device *device, uint16_t id)
+-	idev = find_device_by_path(devices, path);
+-	if (idev == NULL)
+-		return -EINVAL;
+-
+ 	if (idev->ctrl_io) {
+-		/* Pending connection running */
+-		return -EBUSY;
++		/* FIXME: pending connection running */
++		return;
  	}
  
- 	nc = find_connection(peer->connections, id);
--	if (nc)
--		return 0;
-+	if (nc) {
-+		error("Device %s has multiple connection instances of %d",
-+						device_get_path(device), id);
-+		return -1;
-+	}
+ 	devices = g_slist_remove(devices, idev);
+ 	input_device_free(idev);
+-
+-	return 0;
+ }
  
- 	nc = g_new0(struct network_conn, 1);
- 	nc->id = id;
- 	memset(nc->dev, 0, sizeof(nc->dev));
- 	strcpy(nc->dev, "bnep%d");
-+	nc->service = btd_service_ref(service);
- 	nc->state = DISCONNECTED;
- 	nc->peer = peer;
+ static int input_device_connadd(struct input_device *idev)
+diff --git a/profiles/input/device.h b/profiles/input/device.h
+index aabc79c..fd7f847 100644
+--- a/profiles/input/device.h
++++ b/profiles/input/device.h
+@@ -27,10 +27,10 @@
+ struct input_device;
+ struct input_conn;
  
-+	btd_service_set_user_data(service, nc);
+-int input_device_register(struct btd_device *device, const char *path,
+-				const char *uuid, const sdp_record_t *rec,
+-				int timeout);
+-int input_device_unregister(const char *path, const char *uuid);
++void input_set_idle_timeout(int timeout);
 +
- 	DBG("id %u registered", id);
++int input_device_register(struct btd_service *service);
++void input_device_unregister(struct btd_service *service);
  
- 	peer->connections = g_slist_append(peer->connections, nc);
-diff --git a/profiles/network/connection.h b/profiles/network/connection.h
-index 32356f9..1e7eedb 100644
---- a/profiles/network/connection.h
-+++ b/profiles/network/connection.h
-@@ -21,7 +21,7 @@
-  *
-  */
+ int input_device_set_channel(const bdaddr_t *src, const bdaddr_t *dst, int psm,
+ 							GIOChannel *io);
+diff --git a/profiles/input/manager.c b/profiles/input/manager.c
+index 72a4e3b..dc771a6 100644
+--- a/profiles/input/manager.c
++++ b/profiles/input/manager.c
+@@ -45,39 +45,6 @@
+ #include "server.h"
+ #include "manager.h"
  
--int connection_register(struct btd_device *device, uint16_t id);
--void connection_unregister(struct btd_device *device);
-+int connection_register(struct btd_service *service);
-+void connection_unregister(struct btd_service *service);
- int connection_connect(struct btd_device *device, uint16_t id);
- int connection_disconnect(struct btd_device *device, uint16_t id);
-diff --git a/profiles/network/manager.c b/profiles/network/manager.c
-index d860cc0..f37954a 100644
---- a/profiles/network/manager.c
-+++ b/profiles/network/manager.c
-@@ -75,24 +75,6 @@ done:
- 				conf_security ? "true" : "false");
- }
- 
--static int panu_probe(struct btd_service *service)
+-static int idle_timeout = 0;
+-
+-static void input_remove(struct btd_device *device, const char *uuid)
+-{
+-	const char *path = device_get_path(device);
+-
+-	DBG("path %s", path);
+-
+-	input_device_unregister(path, uuid);
+-}
+-
+-static int hid_device_probe(struct btd_service *service)
+-{
+-	struct btd_device *device = btd_service_get_device(service);
+-	const char *path = device_get_path(device);
+-	const sdp_record_t *rec = btd_device_get_record(device, HID_UUID);
+-
+-	DBG("path %s", path);
+-
+-	if (!rec)
+-		return -1;
+-
+-	return input_device_register(device, path, HID_UUID, rec,
+-							idle_timeout * 60);
+-}
+-
+-static void hid_device_remove(struct btd_service *service)
 -{
 -	struct btd_device *device = btd_service_get_device(service);
 -
--	DBG("path %s", device_get_path(device));
--
--	return connection_register(device, BNEP_SVC_PANU);
+-	input_remove(device, HID_UUID);
 -}
 -
--static void network_remove(struct btd_service *service)
--{
--	struct btd_device *device = btd_service_get_device(service);
--
--	DBG("path %s", device_get_path(device));
--
--	connection_unregister(device);
--}
--
- static int panu_connect(struct btd_device *dev, struct btd_profile *profile)
+ static int hid_server_probe(struct btd_profile *p, struct btd_adapter *adapter)
  {
- 	return connection_connect(dev, BNEP_SVC_PANU);
-@@ -122,15 +104,6 @@ static void panu_server_remove(struct btd_profile *p,
- 	server_unregister(adapter, BNEP_SVC_PANU);
- }
+ 	return server_start(adapter_get_address(adapter));
+@@ -98,8 +65,8 @@ static struct btd_profile input_profile = {
+ 	.connect	= input_device_connect,
+ 	.disconnect	= input_device_disconnect,
  
--static int gn_probe(struct btd_service *service)
--{
--	struct btd_device *device = btd_service_get_device(service);
--
--	DBG("path %s", device_get_path(device));
--
--	return connection_register(device, BNEP_SVC_GN);
--}
--
- static int gn_connect(struct btd_device *dev, struct btd_profile *profile)
- {
- 	return connection_connect(dev, BNEP_SVC_GN);
-@@ -160,15 +133,6 @@ static void gn_server_remove(struct btd_profile *p,
- 	server_unregister(adapter, BNEP_SVC_GN);
- }
+-	.device_probe	= hid_device_probe,
+-	.device_remove	= hid_device_remove,
++	.device_probe	= input_device_register,
++	.device_remove	= input_device_unregister,
  
--static int nap_probe(struct btd_service *service)
--{
--	struct btd_device *device = btd_service_get_device(service);
--
--	DBG("path %s", device_get_path(device));
--
--	return connection_register(device, BNEP_SVC_NAP);
--}
--
- static int nap_connect(struct btd_device *dev, struct btd_profile *profile)
- {
- 	return connection_connect(dev, BNEP_SVC_NAP);
-@@ -202,8 +166,8 @@ static struct btd_profile panu_profile = {
- 	.name		= "network-panu",
- 	.local_uuid	= NAP_UUID,
- 	.remote_uuid	= PANU_UUID,
--	.device_probe	= panu_probe,
--	.device_remove	= network_remove,
-+	.device_probe	= connection_register,
-+	.device_remove	= connection_unregister,
- 	.connect	= panu_connect,
- 	.disconnect	= panu_disconnect,
- 	.adapter_probe	= panu_server_probe,
-@@ -214,8 +178,8 @@ static struct btd_profile gn_profile = {
- 	.name		= "network-gn",
- 	.local_uuid	= PANU_UUID,
- 	.remote_uuid	= GN_UUID,
--	.device_probe	= gn_probe,
--	.device_remove	= network_remove,
-+	.device_probe	= connection_register,
-+	.device_remove	= connection_unregister,
- 	.connect	= gn_connect,
- 	.disconnect	= gn_disconnect,
- 	.adapter_probe	= gn_server_probe,
-@@ -226,8 +190,8 @@ static struct btd_profile nap_profile = {
- 	.name		= "network-nap",
- 	.local_uuid	= PANU_UUID,
- 	.remote_uuid	= NAP_UUID,
--	.device_probe	= nap_probe,
--	.device_remove	= network_remove,
-+	.device_probe	= connection_register,
-+	.device_remove	= connection_unregister,
- 	.connect	= nap_connect,
- 	.disconnect	= nap_disconnect,
- 	.adapter_probe	= nap_server_probe,
+ 	.adapter_probe	= hid_server_probe,
+ 	.adapter_remove = hid_server_remove,
+@@ -140,12 +107,16 @@ static int input_init(void)
+ 
+ 	config = load_config_file(CONFIGDIR "/input.conf");
+ 	if (config) {
++		int idle_timeout;
++
+ 		idle_timeout = g_key_file_get_integer(config, "General",
+ 						"IdleTimeout", &err);
+ 		if (err) {
+ 			DBG("input.conf: %s", err->message);
+ 			g_error_free(err);
+ 		}
++
++		input_set_idle_timeout(idle_timeout * 60);
+ 	}
+ 
+ 	btd_profile_register(&input_profile);
 -- 
 1.8.1.4
 
