@@ -1,29 +1,170 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 5 Apr 2013 23:41:20 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: David Herrmann <dh.herrmann@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH v3 01/18] Bluetooth: hidp: remove redundant error message
-Message-ID: <20130406024120.GA10666@joana>
-References: <1365166670-3271-1-git-send-email-dh.herrmann@gmail.com>
- <1365166670-3271-2-git-send-email-dh.herrmann@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1365166670-3271-2-git-send-email-dh.herrmann@gmail.com>
+From: Alex Deymo <deymo@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org, keybuk@chromium.org,
+	vinicius.gomes@openbossa.org, Alex Deymo <deymo@chromium.org>
+Subject: [PATCH v5 2/3] input: Implement the new ReconnectMode Input1 property.
+Date: Fri,  5 Apr 2013 16:20:32 -0700
+Message-Id: <1365204033-30540-2-git-send-email-deymo@chromium.org>
+In-Reply-To: <1365204033-30540-1-git-send-email-deymo@chromium.org>
+References: <1365204033-30540-1-git-send-email-deymo@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+The "Connectability" of a HID device, as defined by the HID spec,
+governs the way the host may and should connect to a HID device or
+expect a connection from it. In the comon case of mice and keyboards
+the HIDNormallyConnectable is FALSE and HIDReconnectInitiate is TRUE,
+since those devices only attempt a connection to the host when they
+have some data to transfer. A connection attempt initiated from the
+host after the device drops the connection (while still paired) will
+result in a Page timeout.
 
-* David Herrmann <dh.herrmann@gmail.com> [2013-04-05 14:57:33 +0200]:
+This patch exposes a new property called "ReconnectMode" combining the
+those two SDP attributes as shown in the Connectability section of the
+HID spec (see section 5.4.2). The property can have one of the following
+four values: "None", "Device", "Host", "Any", and is derived from the
+SDP cached value on device creation even if the device is off.
+---
+ profiles/input/device.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 89 insertions(+), 1 deletion(-)
 
-> We print this error twice in the first error-path so remove it. One error
-> message is enough.
-> 
-> Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
-> ---
->  net/bluetooth/hidp/sock.c | 1 -
->  1 file changed, 1 deletion(-)
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index 1da9d99..f78163b 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -54,6 +54,15 @@
+ 
+ #include "sdp-client.h"
+ 
++#define INPUT_INTERFACE "org.bluez.Input1"
++
++enum reconnect_mode_t {
++	RECONNECT_NONE = 0,
++	RECONNECT_DEVICE,
++	RECONNECT_HOST,
++	RECONNECT_ANY
++};
++
+ struct input_device {
+ 	struct btd_device	*device;
+ 	char			*path;
+@@ -71,6 +80,7 @@ struct input_device {
+ 	guint			dc_id;
+ 	gboolean		disable_sdp;
+ 	char			*name;
++	enum reconnect_mode_t	reconnect_mode;
+ };
+ 
+ static GSList *devices = NULL;
+@@ -676,7 +686,7 @@ int input_device_disconnect(struct btd_device *dev, struct btd_profile *profile)
+ 
+ static struct input_device *input_device_new(struct btd_device *device,
+ 				const char *path, const uint32_t handle,
+-				gboolean disable_sdp)
++				bool disable_sdp)
+ {
+ 	struct btd_adapter *adapter = device_get_adapter(device);
+ 	struct input_device *idev;
+@@ -706,6 +716,68 @@ static gboolean is_device_sdp_disable(const sdp_record_t *rec)
+ 	return data && data->val.uint8;
+ }
+ 
++static enum reconnect_mode_t hid_reconnection_mode(bool reconnect_initiate,
++						bool normally_connectable)
++{
++	if (!reconnect_initiate && !normally_connectable)
++		return RECONNECT_NONE;
++	else if (!reconnect_initiate && normally_connectable)
++		return RECONNECT_HOST;
++	else if (reconnect_initiate && !normally_connectable)
++		return RECONNECT_DEVICE;
++	else /* (reconnect_initiate && normally_connectable) */
++		return RECONNECT_ANY;
++}
++
++static void extract_hid_props(struct input_device *idev,
++					const sdp_record_t *rec)
++{
++	/* Extract HID connectability */
++	bool reconnect_initiate, normally_connectable;
++	sdp_data_t *pdlist;
++
++	/* HIDNormallyConnectable is optional and assumed FALSE
++	* if not present. */
++	pdlist = sdp_data_get(rec, SDP_ATTR_HID_RECONNECT_INITIATE);
++	reconnect_initiate = pdlist ? pdlist->val.uint8 : TRUE;
++
++	pdlist = sdp_data_get(rec, SDP_ATTR_HID_NORMALLY_CONNECTABLE);
++	normally_connectable = pdlist ? pdlist->val.uint8 : FALSE;
++
++	/* Update local values */
++	idev->reconnect_mode =
++		hid_reconnection_mode(reconnect_initiate, normally_connectable);
++}
++
++static const char * const _reconnect_mode_str[] = {
++	"none",
++	"device",
++	"host",
++	"any"
++};
++
++static const char *reconnect_mode_to_string(const enum reconnect_mode_t mode)
++{
++	return _reconnect_mode_str[mode];
++}
++
++static gboolean property_get_reconnect_mode(
++					const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct input_device *idev = data;
++	const char *str_mode = reconnect_mode_to_string(idev->reconnect_mode);
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &str_mode);
++
++	return TRUE;
++}
++
++static const GDBusPropertyTable input_properties[] = {
++	{ "ReconnectMode", "s", property_get_reconnect_mode },
++	{ }
++};
++
+ int input_device_register(struct btd_device *device,
+ 					const char *path, const char *uuid,
+ 					const sdp_record_t *rec, int timeout)
+@@ -723,6 +795,19 @@ int input_device_register(struct btd_device *device,
+ 	if (!idev)
+ 		return -EINVAL;
+ 
++	/* Initialize device properties */
++	extract_hid_props(idev, rec);
++
++	if (g_dbus_register_interface(btd_get_dbus_connection(),
++					idev->path, INPUT_INTERFACE,
++					NULL, NULL,
++					input_properties, idev,
++					NULL) == FALSE) {
++		error("Unable to register %s interface", INPUT_INTERFACE);
++		input_device_free(idev);
++		return -EINVAL;
++	}
++
+ 	idev->timeout = timeout;
+ 	idev->uuid = g_strdup(uuid);
+ 
+@@ -761,6 +846,9 @@ int input_device_unregister(const char *path, const char *uuid)
+ 		return -EBUSY;
+ 	}
+ 
++	g_dbus_unregister_interface(btd_get_dbus_connection(),
++						idev->path, INPUT_INTERFACE);
++
+ 	devices = g_slist_remove(devices, idev);
+ 	input_device_free(idev);
+ 
+-- 
+1.8.1.3
 
-Patch has been applied. Thanks.
-
-	Gustavo
