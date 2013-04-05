@@ -4,102 +4,61 @@ To: linux-bluetooth@vger.kernel.org
 Cc: Marcel Holtmann <marcel@holtmann.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
 	David Herrmann <dh.herrmann@gmail.com>
-Subject: [PATCH v3 10/18] Bluetooth: l2cap: introduce l2cap_conn ref-counting
-Date: Fri,  5 Apr 2013 14:57:42 +0200
-Message-Id: <1365166670-3271-11-git-send-email-dh.herrmann@gmail.com>
+Subject: [PATCH v3 09/18] Bluetooth: hidp: move hidp_schedule() to core.c
+Date: Fri,  5 Apr 2013 14:57:41 +0200
+Message-Id: <1365166670-3271-10-git-send-email-dh.herrmann@gmail.com>
 In-Reply-To: <1365166670-3271-1-git-send-email-dh.herrmann@gmail.com>
 References: <1365166670-3271-1-git-send-email-dh.herrmann@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If we want to use l2cap_conn outside of l2cap_core.c, we need refcounting
-for these objects. Otherwise, we cannot synchronize l2cap locks with
-outside locks and end up with deadlocks.
-
-Hence, introduce ref-counting for l2cap_conn objects. This doesn't affect
-l2cap internals at all, as they use a direct synchronization.
-We also keep a reference to the parent hci_conn for locking purposes as
-l2cap_conn depends on this. This doesn't affect the connection itself but
-only the lifetime of the (dead) object.
+There is no reason to keep this helper in the header file. No other file
+depends on it so move it into hidp/core.c where it belongs.
 
 Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
 ---
- include/net/bluetooth/l2cap.h |  4 ++++
- net/bluetooth/l2cap_core.c    | 25 ++++++++++++++++++++++++-
- 2 files changed, 28 insertions(+), 1 deletion(-)
+ net/bluetooth/hidp/core.c | 9 +++++++++
+ net/bluetooth/hidp/hidp.h | 9 ---------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index db6694f..73ac062 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -584,6 +584,7 @@ struct l2cap_conn {
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index 2a179ad..a16474a 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -59,6 +59,15 @@ static unsigned char hidp_keycode[256] = {
  
- 	struct list_head	chan_l;
- 	struct mutex		chan_lock;
-+	struct kref		ref;
+ static unsigned char hidp_mkeyspat[] = { 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 };
+ 
++static inline void hidp_schedule(struct hidp_session *session)
++{
++	struct sock *ctrl_sk = session->ctrl_sock->sk;
++	struct sock *intr_sk = session->intr_sock->sk;
++
++	wake_up_interruptible(sk_sleep(ctrl_sk));
++	wake_up_interruptible(sk_sleep(intr_sk));
++}
++
+ static struct hidp_session *__hidp_get_session(bdaddr_t *bdaddr)
+ {
+ 	struct hidp_session *session;
+diff --git a/net/bluetooth/hidp/hidp.h b/net/bluetooth/hidp/hidp.h
+index 57a6191..c844420 100644
+--- a/net/bluetooth/hidp/hidp.h
++++ b/net/bluetooth/hidp/hidp.h
+@@ -174,15 +174,6 @@ struct hidp_session {
+ 	int waiting_for_startup;
  };
  
- #define L2CAP_INFO_CL_MTU_REQ_SENT	0x01
-@@ -814,4 +815,7 @@ void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
- 		       u8 status);
- void __l2cap_physical_cfm(struct l2cap_chan *chan, int result);
- 
-+void l2cap_conn_get(struct l2cap_conn *conn);
-+void l2cap_conn_put(struct l2cap_conn *conn);
-+
- #endif /* __L2CAP_H */
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 175dd32..58af8d6 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1486,7 +1486,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- 	}
- 
- 	hcon->l2cap_data = NULL;
--	kfree(conn);
-+	conn->hchan = NULL;
-+	l2cap_conn_put(conn);
- }
- 
- static void security_timeout(struct work_struct *work)
-@@ -1520,8 +1521,10 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
- 		return NULL;
- 	}
- 
-+	kref_init(&conn->ref);
- 	hcon->l2cap_data = conn;
- 	conn->hcon = hcon;
-+	hci_conn_get(conn->hcon);
- 	conn->hchan = hchan;
- 
- 	BT_DBG("hcon %p conn %p hchan %p", hcon, conn, hchan);
-@@ -1563,6 +1566,26 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
- 	return conn;
- }
- 
-+static void l2cap_conn_free(struct kref *ref)
-+{
-+	struct l2cap_conn *conn = container_of(ref, struct l2cap_conn, ref);
-+
-+	hci_conn_put(conn->hcon);
-+	kfree(conn);
-+}
-+
-+void l2cap_conn_get(struct l2cap_conn *conn)
-+{
-+	kref_get(&conn->ref);
-+}
-+EXPORT_SYMBOL(l2cap_conn_get);
-+
-+void l2cap_conn_put(struct l2cap_conn *conn)
-+{
-+	kref_put(&conn->ref, l2cap_conn_free);
-+}
-+EXPORT_SYMBOL(l2cap_conn_put);
-+
- /* ---- Socket interface ---- */
- 
- /* Find socket with psm and source / destination bdaddr.
+-static inline void hidp_schedule(struct hidp_session *session)
+-{
+-	struct sock *ctrl_sk = session->ctrl_sock->sk;
+-	struct sock *intr_sk = session->intr_sock->sk;
+-
+-	wake_up_interruptible(sk_sleep(ctrl_sk));
+-	wake_up_interruptible(sk_sleep(intr_sk));
+-}
+-
+ /* HIDP init defines */
+ extern int __init hidp_init_sockets(void);
+ extern void __exit hidp_cleanup_sockets(void);
 -- 
 1.8.2
-
