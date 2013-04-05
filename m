@@ -1,31 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 4 Apr 2013 21:16:16 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: yegorslists@googlemail.com
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Subject: Re: [PATCH] hciattach: fix firmware path
-Message-ID: <20130404181616.GA10386@x220.ger.corp.intel.com>
-References: <1364395749-20156-1-git-send-email-yegorslists@googlemail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1364395749-20156-1-git-send-email-yegorslists@googlemail.com>
+In-Reply-To: <20130404214444.GA7065@echo>
+References: <1365111113-13741-1-git-send-email-deymo@chromium.org> <20130404214444.GA7065@echo>
+From: Alex Deymo <deymo@chromium.org>
+Date: Thu, 4 Apr 2013 19:47:17 -0700
+Message-ID: <CAGd9gwgGiFzZBDRNAgb9Xcf5vxeYW-Xz_0CjOgW=50ei8bRFxg@mail.gmail.com>
+Subject: Re: [PATCH v4 0/2] Input1 Connectability revisited
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+	keybuk <keybuk@chromium.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Yegor,
+On Thu, Apr 4, 2013 at 2:44 PM, Vinicius Costa Gomes
+<vinicius.gomes@openbossa.org> wrote:
+> Sounds good to me. Just please change to lower case names to maintain
+> consistency with the rest of the API, see media-api.txt, for example.
 
-On Wed, Mar 27, 2013, yegorslists@googlemail.com wrote:
-> Change firmware path to /lib/firmware/ti-connectivity/ to be
-> conform with linux-firmware folder structure. All wl1xxx firmware
-> resides in ti-connectivity. See linux-firmware repository
-> https://git.kernel.org/cgit/linux/kernel/git/firmware/linux-firmware.git/
-> for reference.
-> 
-> Signed-off-by: Yegor Yefremov <yegorslists@googlemail.com>
-> ---
->  tools/hciattach_ti.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-
-Applied (after removing the signed-off-by line which we don't use).
-Thanks.
-
-Johan
+Ok. I changed this and the reconnect_mode_to_string() thing. Also
+split the part about the gboolean in another commit. For some reason I
+though the upper case was the consistent with rest of the API, but now
+I see that is not the case for property values.
+I'll wait until tomorrow to see if someone else has another comment
+over this approach and send all the changes together.
+Thanks!
+Alex.
