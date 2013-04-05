@@ -4,61 +4,38 @@ To: linux-bluetooth@vger.kernel.org
 Cc: Marcel Holtmann <marcel@holtmann.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
 	David Herrmann <dh.herrmann@gmail.com>
-Subject: [PATCH v3 09/18] Bluetooth: hidp: move hidp_schedule() to core.c
-Date: Fri,  5 Apr 2013 14:57:41 +0200
-Message-Id: <1365166670-3271-10-git-send-email-dh.herrmann@gmail.com>
+Subject: [PATCH v3 08/18] Bluetooth: allow constant arguments for bacmp()/bacpy()
+Date: Fri,  5 Apr 2013 14:57:40 +0200
+Message-Id: <1365166670-3271-9-git-send-email-dh.herrmann@gmail.com>
 In-Reply-To: <1365166670-3271-1-git-send-email-dh.herrmann@gmail.com>
 References: <1365166670-3271-1-git-send-email-dh.herrmann@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is no reason to keep this helper in the header file. No other file
-depends on it so move it into hidp/core.c where it belongs.
+There is no reason to require the source arguments to be writeable so fix
+this to allow constant source addresses.
 
 Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
 ---
- net/bluetooth/hidp/core.c | 9 +++++++++
- net/bluetooth/hidp/hidp.h | 9 ---------
- 2 files changed, 9 insertions(+), 9 deletions(-)
+ include/net/bluetooth/bluetooth.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index 2a179ad..a16474a 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -59,6 +59,15 @@ static unsigned char hidp_keycode[256] = {
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 2554b3f..2dbee97 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -170,11 +170,11 @@ typedef struct {
+ #define BDADDR_LOCAL (&(bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff} })
  
- static unsigned char hidp_mkeyspat[] = { 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 };
- 
-+static inline void hidp_schedule(struct hidp_session *session)
-+{
-+	struct sock *ctrl_sk = session->ctrl_sock->sk;
-+	struct sock *intr_sk = session->intr_sock->sk;
-+
-+	wake_up_interruptible(sk_sleep(ctrl_sk));
-+	wake_up_interruptible(sk_sleep(intr_sk));
-+}
-+
- static struct hidp_session *__hidp_get_session(bdaddr_t *bdaddr)
+ /* Copy, swap, convert BD Address */
+-static inline int bacmp(bdaddr_t *ba1, bdaddr_t *ba2)
++static inline int bacmp(const bdaddr_t *ba1, const bdaddr_t *ba2)
  {
- 	struct hidp_session *session;
-diff --git a/net/bluetooth/hidp/hidp.h b/net/bluetooth/hidp/hidp.h
-index 57a6191..c844420 100644
---- a/net/bluetooth/hidp/hidp.h
-+++ b/net/bluetooth/hidp/hidp.h
-@@ -174,15 +174,6 @@ struct hidp_session {
- 	int waiting_for_startup;
- };
- 
--static inline void hidp_schedule(struct hidp_session *session)
--{
--	struct sock *ctrl_sk = session->ctrl_sock->sk;
--	struct sock *intr_sk = session->intr_sock->sk;
--
--	wake_up_interruptible(sk_sleep(ctrl_sk));
--	wake_up_interruptible(sk_sleep(intr_sk));
--}
--
- /* HIDP init defines */
- extern int __init hidp_init_sockets(void);
- extern void __exit hidp_cleanup_sockets(void);
+ 	return memcmp(ba1, ba2, sizeof(bdaddr_t));
+ }
+-static inline void bacpy(bdaddr_t *dst, bdaddr_t *src)
++static inline void bacpy(bdaddr_t *dst, const bdaddr_t *src)
+ {
+ 	memcpy(dst, src, sizeof(bdaddr_t));
+ }
 -- 
 1.8.2
