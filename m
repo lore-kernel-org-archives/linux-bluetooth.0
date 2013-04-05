@@ -1,85 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <201304052008.15412.chunkeey@googlemail.com>
-References: <CAJ-Vmo=LVSzdEo6DhfOVT_0JHCTMmdPU1zGfMuBmhmr8QuDmJQ@mail.gmail.com>
-	<201304051903.11215.chunkeey@googlemail.com>
-	<CAFSJ42bqquh+xekt8+V3wbG3MOUVFELTxR3mNPfS0Jn9J7OURQ@mail.gmail.com>
-	<201304052008.15412.chunkeey@googlemail.com>
-Date: Fri, 5 Apr 2013 12:16:46 -0700
-Message-ID: <CAJ-VmomdD9nOrAb0_cY7vYw1DiP7ENnGALW=24newMj-XZ4cTA@mail.gmail.com>
-Subject: Re: Version number policy!
-From: Adrian Chadd <adrian@freebsd.org>
-To: Christian Lamparter <chunkeey@googlemail.com>
-Cc: Eugene Krasnikov <k.eugene.e@gmail.com>,
-	"Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	linux-wireless <linux-wireless@vger.kernel.org>,
-	ath9k_htc_fw <ath9k_htc_fw@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
+Subject: Re: [PATCH v3 00/18] Rework HIDP Session Management
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1365166670-3271-1-git-send-email-dh.herrmann@gmail.com>
+Date: Fri, 5 Apr 2013 12:01:54 -0700
+Cc: linux-bluetooth@vger.kernel.org,
+	Gustavo Padovan <gustavo@padovan.org>
+Message-Id: <CD91E66B-2A36-476C-BCDD-D1536A8983B4@holtmann.org>
+References: <1365166670-3271-1-git-send-email-dh.herrmann@gmail.com>
+To: David Herrmann <dh.herrmann@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The point here is that once we hit a new major version, all the
-previous version checks can go away.
+Hi David,
 
-So, if we decide to change some WMI message formats, it'll be in 2.x
-rather than 1.x.
+> This is v3 of the HIDP session management rework. Only thing that changed is
+> that I moved hci_conn_user to l2cap_user as requested. The l2cap_user object is
+> now bound to l2cap_conn objects instead of hci_conn. This avoids any direct HCI
+> dependency in external modules.
+> 
+> Note that this requires l2cap_conn ref-counting. However, this is pretty easy to
+> implement and does not affect existing code at all as we use direct
+> synchronization.
+> 
+> Also note that I designed it in a way that it is independent of l2cap_sock. So
+> if we succeed it making l2cap_core independent of l2cap_sock, we can move HIDP
+> or other l2cap_user users over and make them independent of l2cap_sock, too.
 
-For example, has talked about killing off rate control in the NIC and
-doing it on the host. I'm happy with that (since it's easy enough to
-move back into the NIC if people want it for whatever reason) so:
+this looks good. And using L2CAP as entry point makes this cleaner.
 
-* Do we make it configurable?
-* Do we make it backwards compatible?
-* Do we just say "oh screw this" and treat it as part of the next
-major revision?
+And triple thanks for the really great commit messages. That made it a lot easier for me to review these patches.
 
-If I were doing this for work and there was a long lifetime
-requirement for this stuff, then sure, we may have pressure from
-various groups to maintain backwards compatibility. And as we do so,
-we end up slowly bloating out the firmware and adding more driver
-capabilities.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-But since we're doing this in an open community, we can just create
-branches and let people who wish to maintain things do so, whilst not
-tying ourselves down too much. We have very specific pressures here
-(ie, how much RAM and CPU these little USB SoCs have), so we can't
-just infinitely grow the API.
+Regards
 
-If there are bugfixes that someone like Google, Redhat or Canonical
-need for the 1.3 firmware in say, 2015 (when we've moved onto a much
-later evolution of this firmware) because they have a compat-wireless
-download that _only gets bugfixes_ and doesn't get new features (ie
-,doesn't just sync against the latest compat-wireless to get bugfixes
-_and_ features), then they're quite welcome to cherry-pick fixes from
-mainline, merge them into the 1.3 branch and send a diff or pull
-request. But I personally don't want to maintain config options and
-backwards compatibility outside of what goes on in a minor branch.
+Marcel
 
-So, to address Christian's concern in more specific detail:
-
-* I intend that major revisions are break points, and that when we
-push out a new major revision, ath9k_htc (or whatever it becomes) will
-eventually update to use that;
-* .. then we can do things that break backwards compatibility, which
-means we can kill all those capability checks if we need to;
-* For things that occur during a given major release branch, we can
-either use a capability bitmap OR we can do it via versioning -
-because I don't want to see ath9k_htc try to support >1 major version;
-* How we do that check isn't really that big a deal - as long as the
-checks look like:
-
-if (feature_xxx(sc)) {
-}
-
-.. we can easily just change feature_xxx() to be a bitmap check or a
-version check.
-
-* And then once we push out a new major release, we can reap features
-that are either on by default in the new major release.
-
-How's that sound?
-
-
-Adrian
