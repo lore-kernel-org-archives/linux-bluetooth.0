@@ -1,59 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20130406024803.GC10666@joana>
-References: <1365166670-3271-1-git-send-email-dh.herrmann@gmail.com>
-	<1365166670-3271-4-git-send-email-dh.herrmann@gmail.com>
-	<20130406024803.GC10666@joana>
-Date: Sat, 6 Apr 2013 20:31:16 +0200
-Message-ID: <CANq1E4QM8-ArGgZh6PUPXs0o-VpNvF8B-hJ7ks89-Nz5sE+apQ@mail.gmail.com>
-Subject: Re: [PATCH v3 03/18] Bluetooth: rename hci_conn_put to hci_conn_drop
 From: David Herrmann <dh.herrmann@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	David Herrmann <dh.herrmann@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	David Herrmann <dh.herrmann@gmail.com>
+Subject: [PATCH v4 16/16] Bluetooth: hidp: fix sending output reports on intr channel
+Date: Sat,  6 Apr 2013 20:28:52 +0200
+Message-Id: <1365272932-571-17-git-send-email-dh.herrmann@gmail.com>
+In-Reply-To: <1365272932-571-1-git-send-email-dh.herrmann@gmail.com>
+References: <1365166670-3271-1-git-send-email-dh.herrmann@gmail.com>
+ <1365272932-571-1-git-send-email-dh.herrmann@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo
+According to the specifications, data output reports must be sent on the
+interrupt channel. See also usbhid implementation.
+Sending these reports on the control channel breaks newer Wii Remotes.
 
-On Sat, Apr 6, 2013 at 4:48 AM, Gustavo Padovan <gustavo@padovan.org> wrote:
-> Hi David,
->
-> * David Herrmann <dh.herrmann@gmail.com> [2013-04-05 14:57:35 +0200]:
->
->> We use _get() and _put() for device ref-counting in the kernel. However,
->> hci_conn_put() is _not_ used for ref-counting, hence, rename it to
->> hci_conn_drop() so we can later fix ref-counting and introduce
->> hci_conn_put().
->>
->> hci_conn_hold() and hci_conn_put() are currently used to manage how long a
->> connection should be held alive. When the last user drops the connection,
->> we spawn a delayed work that performs the disconnect. Obviously, this has
->> nothing to do with ref-counting for the _object_ but rather for the
->> keep-alive of the connection.
->>
->> But we really _need_ proper ref-counting for the _object_ to allow
->> connection-users like rfcomm-tty, HIDP or others.
->>
->> Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
->> ---
->>  include/net/bluetooth/hci_core.h |  2 +-
->>  net/bluetooth/hci_conn.c         |  6 +++---
->>  net/bluetooth/hci_event.c        | 36 ++++++++++++++++++------------------
->>  net/bluetooth/l2cap_core.c       |  6 +++---
->>  net/bluetooth/mgmt.c             |  6 +++---
->>  net/bluetooth/sco.c              |  6 +++---
->>  net/bluetooth/smp.c              |  2 +-
->>  7 files changed, 32 insertions(+), 32 deletions(-)
->
-> This patch doesn't apply anymore. Maybe you didn't rebase it on the latest
-> bluetooth-next before send it. Please do this and resend. You can already add
-> Marcel's acks to your patches when you resend it.
+Note that this will make output reports asynchronous. However, that's how
+hid_output_raw_report() is supposed to work with HID_OUTPUT_REPORT as
+report type. There are no responses to output reports.
 
-Sorry, I rebased in v1, but it seems there were some changes in
-between. I rebased again and added Marcel's Acked-By.
+Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hidp/core.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-Thanks!
-David
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index 13a0a05..940f5ac 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -335,14 +335,11 @@ static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, s
+ 	struct hidp_session *session = hid->driver_data;
+ 	int ret;
+ 
+-	switch (report_type) {
+-	case HID_FEATURE_REPORT:
+-		report_type = HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE;
+-		break;
+-	case HID_OUTPUT_REPORT:
++	if (report_type == HID_OUTPUT_REPORT) {
+ 		report_type = HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT;
+-		break;
+-	default:
++		return hidp_send_intr_message(session, report_type,
++					      data, count);
++	} else if (report_type != HID_FEATURE_REPORT) {
+ 		return -EINVAL;
+ 	}
+ 
+@@ -351,6 +348,7 @@ static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, s
+ 
+ 	/* Set up our wait, and send the report request to the device. */
+ 	set_bit(HIDP_WAITING_FOR_SEND_ACK, &session->flags);
++	report_type = HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_FEATURE;
+ 	ret = hidp_send_ctrl_message(session, report_type, data, count);
+ 	if (ret)
+ 		goto err;
+-- 
+1.8.2
+
