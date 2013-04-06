@@ -1,80 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Huang, Christina" <christina.huang@intel.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: one question on BLE device authentication error
-Date: Sun, 7 Apr 2013 06:23:25 +0000
-Message-ID: <A286798B34C0C9419EDBB5F44D457E1413D2D6@SHSMSX101.ccr.corp.intel.com>
-References: <A286798B34C0C9419EDBB5F44D457E14137231@SHSMSX101.ccr.corp.intel.com>
- <CAJdJm_OO4SXo6sSCnuoCWYB2nvhHjWp=gPwY9bAjPRYij2UAmA@mail.gmail.com>
-In-Reply-To: <CAJdJm_OO4SXo6sSCnuoCWYB2nvhHjWp=gPwY9bAjPRYij2UAmA@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <20130406024803.GC10666@joana>
+References: <1365166670-3271-1-git-send-email-dh.herrmann@gmail.com>
+	<1365166670-3271-4-git-send-email-dh.herrmann@gmail.com>
+	<20130406024803.GC10666@joana>
+Date: Sat, 6 Apr 2013 20:31:16 +0200
+Message-ID: <CANq1E4QM8-ArGgZh6PUPXs0o-VpNvF8B-hJ7ks89-Nz5sE+apQ@mail.gmail.com>
+Subject: Re: [PATCH v3 03/18] Bluetooth: rename hci_conn_put to hci_conn_drop
+From: David Herrmann <dh.herrmann@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	David Herrmann <dh.herrmann@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Gustavo
 
-Hi, Anderson
+On Sat, Apr 6, 2013 at 4:48 AM, Gustavo Padovan <gustavo@padovan.org> wrote:
+> Hi David,
+>
+> * David Herrmann <dh.herrmann@gmail.com> [2013-04-05 14:57:35 +0200]:
+>
+>> We use _get() and _put() for device ref-counting in the kernel. However,
+>> hci_conn_put() is _not_ used for ref-counting, hence, rename it to
+>> hci_conn_drop() so we can later fix ref-counting and introduce
+>> hci_conn_put().
+>>
+>> hci_conn_hold() and hci_conn_put() are currently used to manage how long a
+>> connection should be held alive. When the last user drops the connection,
+>> we spawn a delayed work that performs the disconnect. Obviously, this has
+>> nothing to do with ref-counting for the _object_ but rather for the
+>> keep-alive of the connection.
+>>
+>> But we really _need_ proper ref-counting for the _object_ to allow
+>> connection-users like rfcomm-tty, HIDP or others.
+>>
+>> Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
+>> ---
+>>  include/net/bluetooth/hci_core.h |  2 +-
+>>  net/bluetooth/hci_conn.c         |  6 +++---
+>>  net/bluetooth/hci_event.c        | 36 ++++++++++++++++++------------------
+>>  net/bluetooth/l2cap_core.c       |  6 +++---
+>>  net/bluetooth/mgmt.c             |  6 +++---
+>>  net/bluetooth/sco.c              |  6 +++---
+>>  net/bluetooth/smp.c              |  2 +-
+>>  7 files changed, 32 insertions(+), 32 deletions(-)
+>
+> This patch doesn't apply anymore. Maybe you didn't rebase it on the latest
+> bluetooth-next before send it. Please do this and resend. You can already add
+> Marcel's acks to your patches when you resend it.
 
-I met one more issue on connecting with Wahoo BlueSC BLE speed / cadence sensor device, it could be discovered successfully, while fails in connection and reports error " Command Disallowed ". Could you suggest what I could do to allow the "connect" command? 
-I found this same issue reported before but no available answer.
-http://www.spinics.net/lists/linux-bluetooth/msg30681.html
+Sorry, I rebased in v1, but it seems there were some changes in
+between. I rebased again and added Marcel's Acked-By.
 
-Thank you very much.
-Christina
-
-@ Device Found: EF:CE:46:33:62:F6 (2) rssi -55 flags 0x0000
-        02 01 06 03 02 16 18 12 09 57 61 68 6f 6f 20 42  .........Wahoo B
-        6c 75 65 53 43 20 76 31 2e 34                    lueSC v1.4
-< HCI Command: LE Create Connection (0x08|0x000d) plen 25                                         [hci0] 6.358536
-        Scan interval: 60.000 msec (0x0060)
-        Scan window: 30.000 msec (0x0030)
-        Filter policy: White list is not used (0x00)
-        Peer address type: Random (0x01)
-        Address: EF:CE:46:33:62:F6 (Static)
-        Own address type: Public (0x00)
-        Min connection interval: 50.00 msec (0x0028)
-        Max connection interval: 70.00 msec (0x0038)
-        Connection latency: 0x0000
-        Supervision timeout: 420 msec (0x002a)
-        Min connection length: 0.000 msec (0x0000)
-        Max connection length: 0.000 msec (0x0000)
-> HCI Event: Command Status (0x0f) plen 4                                                         [hci0] 6.360646
-      LE Create Connection (0x08|0x000d) ncmd 1
-        Status: Command Disallowed (0x0c)
-
------Original Message-----
-From: Anderson Lizardo [mailto:anderson.lizardo@openbossa.org] 
-Sent: Friday, March 08, 2013 10:00 PM
-To: Huang, Christina
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: one question on BLE device authentication error
-
-Hi Christina,
-
-On Fri, Mar 8, 2013 at 3:54 AM, Huang, Christina <christina.huang@intel.com> wrote:
-> < HCI Command: LE Start Encryption (0x08|0x0019) plen 28        [hci0] 5.724000
->         Handle: 71
->         Random number: 8c126b665d2de279
->         Encryption diversifier: 0x3f55
->         Long term key: dcd74a1a07f653c0e27f65888debcbe5 @ Device 
-> Connected: 00:17:EA:91:8C:78 (1) flags 0x0000
->> HCI Event: Command Status (0x0f) plen 4                       [hci0] 5.733922
->       LE Start Encryption (0x08|0x0019) ncmd 1
->         Status: Success (0x00)
->> ACL Data RX: Handle 71 flags 0x02 dlen 6                      [hci0] 5.835521
->       SMP: Security Request (0x0b) len 1
->         Authentication requirement: Bonding - MITM (0x05)
->> HCI Event: Encryption Change (0x08) plen 4                    [hci0] 6.115911
->         Status: PIN or Key Missing (0x06)
->         Handle: 71
->         Encryption: Disabled (0x00)
-
-It looks like your LE device lost the bonding information (e.g. LTK) and thus is not able to just encrypt the connection with the LTK BlueZ is trying to use. You can try removing the bonding on BlueZ side (e.g.
-"test-device remove <bdaddr>" or "remove <bdaddr>" on bluetoothctl) and try again a complete pairing.
-
-Best regards,
---
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Thanks!
+David
