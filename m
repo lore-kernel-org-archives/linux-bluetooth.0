@@ -1,39 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5161F474.5030405@gmail.com>
-Date: Mon, 08 Apr 2013 00:34:28 +0200
-From: Sergio Callegari <sergio.callegari@gmail.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Kernel panic on kernel 3.8.x when closing bluetooth dun connection
-References: <51498CFE.9060804@gmail.com> <20130320161712.GA27840@kroah.com>
-In-Reply-To: <20130320161712.GA27840@kroah.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <A286798B34C0C9419EDBB5F44D457E1413D2D6@SHSMSX101.ccr.corp.intel.com>
+References: <A286798B34C0C9419EDBB5F44D457E14137231@SHSMSX101.ccr.corp.intel.com>
+	<CAJdJm_OO4SXo6sSCnuoCWYB2nvhHjWp=gPwY9bAjPRYij2UAmA@mail.gmail.com>
+	<A286798B34C0C9419EDBB5F44D457E1413D2D6@SHSMSX101.ccr.corp.intel.com>
+Date: Sun, 7 Apr 2013 11:01:19 -0400
+Message-ID: <CAJdJm_MHao8QLnHMq_UXPPmiUBbxzDZy9vALuFPM=e+r+66umw@mail.gmail.com>
+Subject: Re: one question on BLE device authentication error
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: "Huang, Christina" <christina.huang@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Christina,
 
-I'm following up with a previous email where I was reporting a 
-systematic kernel panic when closing a bluetooth DUN connection.
+On Sun, Apr 7, 2013 at 2:23 AM, Huang, Christina
+<christina.huang@intel.com> wrote:
+>
+> Hi, Anderson
+>
+> I met one more issue on connecting with Wahoo BlueSC BLE speed / cadence sensor device, it could be discovered successfully, while fails in connection and reports error " Command Disallowed ". Could you suggest what I could do to allow the "connect" command?
+> I found this same issue reported before but no available answer.
+> http://www.spinics.net/lists/linux-bluetooth/msg30681.html
 
-I have made a few more tests:
+How are you doing the device discovery? You should use the BlueZ D-Bus
+API instead of "hcitool lescan", because some (most?) BLE controllers
+do not allow connection creation while in LE scanning state. If I
+remember correctly, If the D-Bus API is always used the LE scan is
+always disabled prior to LE Create Connection.
 
-- Bug happens with all the 3.8.x kernel series, up to the latest 3.8.6
-- Bug is not present up to 3.7.x, including the latest 3.7.10
-- Bug happens on the DELL E6500 laptop that has a Dell Computer Corp. 
-Wireless 370 Bluetooth Mini-card
-- Bug also happens on a desktop that has a Cambridge Silicon Radio, Ltd 
-Bluetooth Dongle (HCI mode)
+Also make sure you are not in advertising state (i.e. you did not run
+"hciconfig hci0 leadv").
 
-Let me recall that the bug is triggered by connecting to the internet 
-via a mobile phone, using bluetooth DUN and then disconnecting. Kernel 
-panics on disconnection (the phone I am using is a Samsung Galaxy S Plus)
-
-- Bug does not happen on the same machines when connecting to the 
-internet via ppp using a usb-umts dongle
-
-Hope this can helps haunting the regression.
-
-Thanks for the attention,
-
-Sergio
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
