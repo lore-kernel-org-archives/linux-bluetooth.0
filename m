@@ -4,132 +4,140 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v9 10/16] sbc: Add a private boolean flag to enable 15 block encoding
-Date: Mon,  8 Apr 2013 15:24:12 +0200
-Message-Id: <1365427458-26911-11-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v9 03/16] sbc: Rename sbc_analyze_4b_xx to sbc_analyze_xx
+Date: Mon,  8 Apr 2013 15:24:05 +0200
+Message-Id: <1365427458-26911-4-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1365427458-26911-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1365427458-26911-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch introduce a new private member which purpose is to encode 15
-blocks. It is private to the library and can't be set from standard API.
-sbc_init_msbc() function will be defined to set this flag.
 ---
- sbc/sbc.c |   37 +++++++++++++++++++++++++++++--------
- 1 file changed, 29 insertions(+), 8 deletions(-)
+ sbc/sbc.c                   |    4 ++--
+ sbc/sbc_primitives.c        |    4 ++--
+ sbc/sbc_primitives.h        |    4 ++--
+ sbc/sbc_primitives_armv6.c  |    4 ++--
+ sbc/sbc_primitives_iwmmxt.c |    4 ++--
+ sbc/sbc_primitives_mmx.c    |    4 ++--
+ sbc/sbc_primitives_neon.c   |    4 ++--
+ 7 files changed, 14 insertions(+), 14 deletions(-)
 
 diff --git a/sbc/sbc.c b/sbc/sbc.c
-index ffdf05d..5ba5eb3 100644
+index 4a7dd2e..ffdf05d 100644
 --- a/sbc/sbc.c
 +++ b/sbc/sbc.c
-@@ -40,6 +40,7 @@
- #include <errno.h>
- #include <string.h>
- #include <stdlib.h>
-+#include <stdbool.h>
- #include <sys/types.h>
- #include <limits.h>
+@@ -692,7 +692,7 @@ static int sbc_analyze_audio(struct sbc_encoder_state *state,
+ 					state->increment + frame->blocks * 4];
+ 			for (blk = 0; blk < frame->blocks;
+ 						blk += state->increment) {
+-				state->sbc_analyze_4b_4s(
++				state->sbc_analyze_4s(
+ 					state, x,
+ 					frame->sb_sample_f[blk][ch],
+ 					frame->sb_sample_f[blk + 1][ch] -
+@@ -708,7 +708,7 @@ static int sbc_analyze_audio(struct sbc_encoder_state *state,
+ 					state->increment + frame->blocks * 8];
+ 			for (blk = 0; blk < frame->blocks;
+ 						blk += state->increment) {
+-				state->sbc_analyze_4b_8s(
++				state->sbc_analyze_8s(
+ 					state, x,
+ 					frame->sb_sample_f[blk][ch],
+ 					frame->sb_sample_f[blk + 1][ch] -
+diff --git a/sbc/sbc_primitives.c b/sbc/sbc_primitives.c
+index f8cc4b6..dce0ed2 100644
+--- a/sbc/sbc_primitives.c
++++ b/sbc/sbc_primitives.c
+@@ -522,8 +522,8 @@ static int sbc_calc_scalefactors_j(
+ void sbc_init_primitives(struct sbc_encoder_state *state)
+ {
+ 	/* Default implementation for analyze functions */
+-	state->sbc_analyze_4b_4s = sbc_analyze_4b_4s_simd;
+-	state->sbc_analyze_4b_8s = sbc_analyze_4b_8s_simd;
++	state->sbc_analyze_4s = sbc_analyze_4b_4s_simd;
++	state->sbc_analyze_8s = sbc_analyze_4b_8s_simd;
  
-@@ -52,6 +53,9 @@
+ 	/* Default implementation for input reordering / deinterleaving */
+ 	state->sbc_enc_process_input_4s_le = sbc_enc_process_input_4s_le;
+diff --git a/sbc/sbc_primitives.h b/sbc/sbc_primitives.h
+index 8606298..e01c957 100644
+--- a/sbc/sbc_primitives.h
++++ b/sbc/sbc_primitives.h
+@@ -43,11 +43,11 @@ struct sbc_encoder_state {
+ 	int16_t SBC_ALIGNED X[2][SBC_X_BUFFER_SIZE];
+ 	/* Polyphase analysis filter for 4 subbands configuration,
+ 	 * it handles "increment" blocks at once */
+-	void (*sbc_analyze_4b_4s)(struct sbc_encoder_state *state,
++	void (*sbc_analyze_4s)(struct sbc_encoder_state *state,
+ 			int16_t *x, int32_t *out, int out_stride);
+ 	/* Polyphase analysis filter for 8 subbands configuration,
+ 	 * it handles "increment" blocks at once */
+-	void (*sbc_analyze_4b_8s)(struct sbc_encoder_state *state,
++	void (*sbc_analyze_8s)(struct sbc_encoder_state *state,
+ 			int16_t *x, int32_t *out, int out_stride);
+ 	/* Process input data (deinterleave, endian conversion, reordering),
+ 	 * depending on the number of subbands and input data byte order */
+diff --git a/sbc/sbc_primitives_armv6.c b/sbc/sbc_primitives_armv6.c
+index 6ad94c6..068648a 100644
+--- a/sbc/sbc_primitives_armv6.c
++++ b/sbc/sbc_primitives_armv6.c
+@@ -293,8 +293,8 @@ static void sbc_analyze_4b_8s_armv6(struct sbc_encoder_state *state,
  
- #define SBC_SYNCWORD	0x9C
+ void sbc_init_primitives_armv6(struct sbc_encoder_state *state)
+ {
+-	state->sbc_analyze_4b_4s = sbc_analyze_4b_4s_armv6;
+-	state->sbc_analyze_4b_8s = sbc_analyze_4b_8s_armv6;
++	state->sbc_analyze_4s = sbc_analyze_4b_4s_armv6;
++	state->sbc_analyze_8s = sbc_analyze_4b_8s_armv6;
+ 	state->implementation_info = "ARMv6 SIMD";
+ }
  
-+#define MSBC_SYNCWORD	0xAD
-+#define MSBC_BLOCKS	15
-+
- /* This structure contains an unpacked SBC frame.
-    Yes, there is probably quite some unused space herein */
- struct sbc_frame {
-@@ -903,18 +907,22 @@ static ssize_t sbc_pack_frame(uint8_t *data, struct sbc_frame *frame, size_t len
+diff --git a/sbc/sbc_primitives_iwmmxt.c b/sbc/sbc_primitives_iwmmxt.c
+index 39cc390..0c8f329 100644
+--- a/sbc/sbc_primitives_iwmmxt.c
++++ b/sbc/sbc_primitives_iwmmxt.c
+@@ -296,8 +296,8 @@ static inline void sbc_analyze_4b_8s_iwmmxt(struct sbc_encoder_state *state,
+ 
+ void sbc_init_primitives_iwmmxt(struct sbc_encoder_state *state)
+ {
+-	state->sbc_analyze_4b_4s = sbc_analyze_4b_4s_iwmmxt;
+-	state->sbc_analyze_4b_8s = sbc_analyze_4b_8s_iwmmxt;
++	state->sbc_analyze_4s = sbc_analyze_4b_4s_iwmmxt;
++	state->sbc_analyze_8s = sbc_analyze_4b_8s_iwmmxt;
+ 	state->implementation_info = "IWMMXT";
+ }
+ 
+diff --git a/sbc/sbc_primitives_mmx.c b/sbc/sbc_primitives_mmx.c
+index cbacb4e..03070f5 100644
+--- a/sbc/sbc_primitives_mmx.c
++++ b/sbc/sbc_primitives_mmx.c
+@@ -365,8 +365,8 @@ static int check_mmx_support(void)
+ void sbc_init_primitives_mmx(struct sbc_encoder_state *state)
+ {
+ 	if (check_mmx_support()) {
+-		state->sbc_analyze_4b_4s = sbc_analyze_4b_4s_mmx;
+-		state->sbc_analyze_4b_8s = sbc_analyze_4b_8s_mmx;
++		state->sbc_analyze_4s = sbc_analyze_4b_4s_mmx;
++		state->sbc_analyze_8s = sbc_analyze_4b_8s_mmx;
+ 		state->sbc_calc_scalefactors = sbc_calc_scalefactors_mmx;
+ 		state->implementation_info = "MMX";
  	}
- }
+diff --git a/sbc/sbc_primitives_neon.c b/sbc/sbc_primitives_neon.c
+index aeca8df..eda4ed3 100644
+--- a/sbc/sbc_primitives_neon.c
++++ b/sbc/sbc_primitives_neon.c
+@@ -879,8 +879,8 @@ static int sbc_enc_process_input_8s_le_neon(int position, const uint8_t *pcm,
  
--static void sbc_encoder_init(struct sbc_encoder_state *state,
--					const struct sbc_frame *frame)
-+static void sbc_encoder_init(bool msbc, struct sbc_encoder_state *state,
-+						const struct sbc_frame *frame)
+ void sbc_init_primitives_neon(struct sbc_encoder_state *state)
  {
- 	memset(&state->X, 0, sizeof(state->X));
- 	state->position = (SBC_X_BUFFER_SIZE - frame->subbands * 9) & ~7;
--	state->increment = 4;
-+	if (msbc)
-+		state->increment = 1;
-+	else
-+		state->increment = 4;
- 
- 	sbc_init_primitives(state);
- }
- 
- struct sbc_priv {
- 	int init;
-+	bool msbc;
- 	struct SBC_ALIGNED sbc_frame frame;
- 	struct SBC_ALIGNED sbc_decoder_state dec_state;
- 	struct SBC_ALIGNED sbc_encoder_state enc_state;
-@@ -922,6 +930,7 @@ struct sbc_priv {
- 
- static void sbc_set_defaults(sbc_t *sbc, unsigned long flags)
- {
-+	sbc->flags = flags;
- 	sbc->frequency = SBC_FREQ_44100;
- 	sbc->mode = SBC_MODE_STEREO;
- 	sbc->subbands = SBC_SB_8;
-@@ -1057,12 +1066,15 @@ SBC_EXPORT ssize_t sbc_encode(sbc_t *sbc, const void *input, size_t input_len,
- 		priv->frame.subband_mode = sbc->subbands;
- 		priv->frame.subbands = sbc->subbands ? 8 : 4;
- 		priv->frame.block_mode = sbc->blocks;
--		priv->frame.blocks = 4 + (sbc->blocks * 4);
-+		if (priv->msbc)
-+			priv->frame.blocks = MSBC_BLOCKS;
-+		else
-+			priv->frame.blocks = 4 + (sbc->blocks * 4);
- 		priv->frame.bitpool = sbc->bitpool;
- 		priv->frame.codesize = sbc_get_codesize(sbc);
- 		priv->frame.length = sbc_get_frame_length(sbc);
- 
--		sbc_encoder_init(&priv->enc_state, &priv->frame);
-+		sbc_encoder_init(priv->msbc, &priv->enc_state, &priv->frame);
- 		priv->init = 1;
- 	} else if (priv->frame.bitpool != sbc->bitpool) {
- 		priv->frame.length = sbc_get_frame_length(sbc);
-@@ -1141,7 +1153,10 @@ SBC_EXPORT size_t sbc_get_frame_length(sbc_t *sbc)
- 		return priv->frame.length;
- 
- 	subbands = sbc->subbands ? 8 : 4;
--	blocks = 4 + (sbc->blocks * 4);
-+	if (priv->msbc)
-+		blocks = MSBC_BLOCKS;
-+	else
-+		blocks = 4 + (sbc->blocks * 4);
- 	channels = sbc->mode == SBC_MODE_MONO ? 1 : 2;
- 	joint = sbc->mode == SBC_MODE_JOINT_STEREO ? 1 : 0;
- 	bitpool = sbc->bitpool;
-@@ -1165,7 +1180,10 @@ SBC_EXPORT unsigned sbc_get_frame_duration(sbc_t *sbc)
- 	priv = sbc->priv;
- 	if (!priv->init) {
- 		subbands = sbc->subbands ? 8 : 4;
--		blocks = 4 + (sbc->blocks * 4);
-+		if (priv->msbc)
-+			blocks = MSBC_BLOCKS;
-+		else
-+			blocks = 4 + (sbc->blocks * 4);
- 	} else {
- 		subbands = priv->frame.subbands;
- 		blocks = priv->frame.blocks;
-@@ -1202,7 +1220,10 @@ SBC_EXPORT size_t sbc_get_codesize(sbc_t *sbc)
- 	priv = sbc->priv;
- 	if (!priv->init) {
- 		subbands = sbc->subbands ? 8 : 4;
--		blocks = 4 + (sbc->blocks * 4);
-+		if (priv->msbc)
-+			blocks = MSBC_BLOCKS;
-+		else
-+			blocks = 4 + (sbc->blocks * 4);
- 		channels = sbc->mode == SBC_MODE_MONO ? 1 : 2;
- 	} else {
- 		subbands = priv->frame.subbands;
+-	state->sbc_analyze_4b_4s = sbc_analyze_4b_4s_neon;
+-	state->sbc_analyze_4b_8s = sbc_analyze_4b_8s_neon;
++	state->sbc_analyze_4s = sbc_analyze_4b_4s_neon;
++	state->sbc_analyze_8s = sbc_analyze_4b_8s_neon;
+ 	state->sbc_calc_scalefactors = sbc_calc_scalefactors_neon;
+ 	state->sbc_calc_scalefactors_j = sbc_calc_scalefactors_j_neon;
+ 	state->sbc_enc_process_input_4s_le = sbc_enc_process_input_4s_le_neon;
 -- 
 1.7.9.5
 
