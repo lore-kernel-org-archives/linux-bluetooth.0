@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH v2 5/6] obexd: Use gcc builtin instead of g_atomic
-Date: Mon,  8 Apr 2013 17:56:21 -0300
-Message-Id: <1365454582-12781-5-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH v2 4/6] gobex: Use gcc builtin instead of g_atomic
+Date: Mon,  8 Apr 2013 17:56:20 -0300
+Message-Id: <1365454582-12781-4-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1365454582-12781-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1365454582-12781-1-git-send-email-lucas.demarchi@profusion.mobi>
 MIME-Version: 1.0
@@ -23,43 +23,47 @@ well. If we are using atomic operations, reading the variable again
 later for logging is not an option, we should use the return of the
 atomic function used to fetch the variable.
 ---
- obexd/client/session.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ gobex/gobex.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/obexd/client/session.c b/obexd/client/session.c
-index f677bcb..2e8b113 100644
---- a/obexd/client/session.c
-+++ b/obexd/client/session.c
-@@ -115,9 +115,9 @@ static GQuark obex_io_error_quark(void)
+diff --git a/gobex/gobex.c b/gobex/gobex.c
+index a9bcee9..ce4f284 100644
+--- a/gobex/gobex.c
++++ b/gobex/gobex.c
+@@ -1315,25 +1315,27 @@ GObex *g_obex_new(GIOChannel *io, GObexTransportType transport_type,
  
- struct obc_session *obc_session_ref(struct obc_session *session)
+ GObex *g_obex_ref(GObex *obex)
  {
--	g_atomic_int_inc(&session->refcount);
-+	int refs = __sync_add_and_fetch(&session->refcount, 1);
++	int refs;
++
+ 	if (obex == NULL)
+ 		return NULL;
  
--	DBG("%p: ref=%d", session, session->refcount);
-+	DBG("%p: ref=%d", session, refs);
+-	g_atomic_int_inc(&obex->ref_count);
++	refs = __sync_add_and_fetch(&obex->ref_count, 1);
  
- 	return session;
+-	g_obex_debug(G_OBEX_DEBUG_COMMAND, "ref %u", obex->ref_count);
++	g_obex_debug(G_OBEX_DEBUG_COMMAND, "ref %u", refs);
+ 
+ 	return obex;
  }
-@@ -210,13 +210,13 @@ static void session_free(struct obc_session *session)
  
- void obc_session_unref(struct obc_session *session)
+ void g_obex_unref(GObex *obex)
  {
--	gboolean ret;
+-	gboolean last_ref;
 +	int refs;
  
--	ret = g_atomic_int_dec_and_test(&session->refcount);
-+	refs = __sync_sub_and_fetch(&session->refcount, 1);
+-	last_ref = g_atomic_int_dec_and_test(&obex->ref_count);
++	refs = __sync_sub_and_fetch(&obex->ref_count, 1);
  
--	DBG("%p: ref=%d", session, session->refcount);
-+	DBG("%p: ref=%d", session, refs);
+-	g_obex_debug(G_OBEX_DEBUG_COMMAND, "ref %u", obex->ref_count);
++	g_obex_debug(G_OBEX_DEBUG_COMMAND, "ref %u", refs);
  
--	if (ret == FALSE)
+-	if (!last_ref)
 +	if (refs > 0)
  		return;
  
- 	session_free(session);
+ 	g_slist_free_full(obex->req_handlers, g_free);
 -- 
 1.8.2.1
 
