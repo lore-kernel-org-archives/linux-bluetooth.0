@@ -1,42 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 8 Apr 2013 20:37:20 -0400
-From: Theodore Ts'o <tytso@mit.edu>
-To: Adrian Chadd <adrian@freebsd.org>
-Cc: Christian Lamparter <chunkeey@googlemail.com>,
-	Eugene Krasnikov <k.eugene.e@gmail.com>,
+MIME-Version: 1.0
+In-Reply-To: <201304090003.47056.chunkeey@googlemail.com>
+References: <CAJ-Vmo=LVSzdEo6DhfOVT_0JHCTMmdPU1zGfMuBmhmr8QuDmJQ@mail.gmail.com>
+	<CAJ-VmomS_=1=QLZrfdD4vhu9Qy0w2JNQxEFrkt_OKjWetrWY4w@mail.gmail.com>
+	<CAFSJ42b7DD9UVtzT7YWhaEchzwpde0yW=pS3nJVeMCHoVQGBqQ@mail.gmail.com>
+	<201304090003.47056.chunkeey@googlemail.com>
+Date: Mon, 8 Apr 2013 16:12:07 -0700
+Message-ID: <CAJ-VmomksDSNvTpKQpNRRQx+QboSVHpby7V4qq4rngqVkTvf+A@mail.gmail.com>
+Subject: Re: Version number policy!
+From: Adrian Chadd <adrian@freebsd.org>
+To: Christian Lamparter <chunkeey@googlemail.com>
+Cc: Eugene Krasnikov <k.eugene.e@gmail.com>,
 	Kalle Valo <kvalo@adurom.com>,
 	"Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
 	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
 	linux-wireless <linux-wireless@vger.kernel.org>,
 	ath9k_htc_fw <ath9k_htc_fw@lists.infradead.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: Version number policy!
-Message-ID: <20130409003720.GA5145@thunk.org>
-References: <CAJ-Vmo=LVSzdEo6DhfOVT_0JHCTMmdPU1zGfMuBmhmr8QuDmJQ@mail.gmail.com>
- <CAJ-VmomS_=1=QLZrfdD4vhu9Qy0w2JNQxEFrkt_OKjWetrWY4w@mail.gmail.com>
- <CAFSJ42b7DD9UVtzT7YWhaEchzwpde0yW=pS3nJVeMCHoVQGBqQ@mail.gmail.com>
- <201304090003.47056.chunkeey@googlemail.com>
- <CAJ-VmomksDSNvTpKQpNRRQx+QboSVHpby7V4qq4rngqVkTvf+A@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAJ-VmomksDSNvTpKQpNRRQx+QboSVHpby7V4qq4rngqVkTvf+A@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Apr 08, 2013 at 04:12:07PM -0700, Adrian Chadd wrote:
-> I'm a FreeBSD user. I know what it's like to have an alternate, out of
-> linux implementation of ext2/3 that doesn't implement all of the
-> features.
-> 
-> I also know what kinds of crap happens when you try mounting a more
-> recent extX filesystem on an earlier kernel. Ie, it doesn't
-> necessarily end well. :-)
+I'm a FreeBSD user. I know what it's like to have an alternate, out of
+linux implementation of ext2/3 that doesn't implement all of the
+features.
 
-There shouldn't be any crap; just a an error message indicating that
-"the file system has features which this implementation doesn't
-understand".  At least, if the implementation was competently
-coded.... (ext2/3/4 has feature bitmasks that make it very clear what
-features are required so that an implementation can mount the file
-system read/write or read/only).
+I also know what kinds of crap happens when you try mounting a more
+recent extX filesystem on an earlier kernel. Ie, it doesn't
+necessarily end well. :-)
 
-							- Ted
+Anyway, there's been a lot of good points in this discussion. Let's
+keep it in mind as we slowly march forward.
+
+There's only like, 60k of generated binary code on these things. Let's
+not overthink things too much for now. :)
+
+
+
+Adrian
