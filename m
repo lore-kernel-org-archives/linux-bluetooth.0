@@ -1,65 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
-Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
-Subject: Re: [PATCH v4 2/6] Bluetooth: Add SCO socket voice_setting option
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <5162BADF.7010608@linux.intel.com>
-Date: Mon, 8 Apr 2013 10:50:34 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <562DEF75-6DB8-4AA8-ACD5-40929964BC45@holtmann.org>
-References: <1363716255-21332-1-git-send-email-frederic.dalleau@linux.intel.com> <1363716255-21332-3-git-send-email-frederic.dalleau@linux.intel.com> <DE6F5576-C7C9-4EA9-B242-3489F0651FBC@holtmann.org> <5162BADF.7010608@linux.intel.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric_DALLEAU?=
-	<frederic.dalleau@linux.intel.com>
+Message-ID: <5162FC45.1080009@start.ca>
+Date: Mon, 08 Apr 2013 13:20:05 -0400
+From: Colin Beckingham <colbec@start.ca>
+MIME-Version: 1.0
+To: Tanu Kaskinen <tanuk@iki.fi>
+CC: Mikel Astiz <mikel.astiz.oss@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	General PulseAudio Discussion
+	<pulseaudio-discuss@lists.freedesktop.org>
+Subject: Re: [pulseaudio-discuss] Bluetooth pulseaudio multiple device entries
+References: <515EBB91.1020006@start.ca>  <CANT-zCVRwyR9de4gHp5+ur3_oDcMnL4RttQFayBmUKYUrgJODA@mail.gmail.com>  <515EC86C.1020809@start.ca>  <CANT-zCW7+n0Jh84T1RSUnP47bf_t5rMQXBByKtegV0E+eM-w9g@mail.gmail.com>  <515FE45C.10908@start.ca>  <CANT-zCW3fMvHN_Ga0n6N8Kg7Qq2bQyxT_fidkCT201UeCXaD5g@mail.gmail.com> <1365439197.3683.52.camel@laptop>
+In-Reply-To: <1365439197.3683.52.camel@laptop>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fred,
 
-> I find this parameter name a bit long. What about just "setting" or "settings" or "voice". I am open for suggestions.
->> 
->> Also should this be part of options or the socket address structure.
->> 
->> Another option would be to introduce a SCO_SETTINGS or SCO_VOICE socket option. With just this one parameter.
->> 
->> Since the default value of voice setting is not 0x0000, it might make actually more sense to introduce a new socket option. Playing the memset handling would only work nicely if the default would be 0x0000, but it isn't.
->> 
->> Regards
->> 
->> Marcel
->> 
-> 
-> I agree that having a separate socket option is better. IMHO, having it in the
-> sockaddr is not enough because you don't know in advance what stream is
-> flowing for incoming connections. It could improve the API for outgoing
-> connections.
 
-fair enough. Being able to set a socket option before calling accept() allows us to pick and choose the SCO air mode we require.
+On 04/08/2013 12:39 PM, Tanu Kaskinen wrote:
+>> On Sat, Apr 6, 2013 at 11:01 AM, Colin Beckingham <colbec@start.ca> wrote:
+>>> My testing to this point has been that the device was connected
+>>> automatically having been pre-registered and paired.
+>>>
+>>> So I deleted the pre-registered entry and re-paired the device. The device
+>>> entry behaved correctly when first paired, however when I left the
+>>> registration in place, unconnected the device and then reconnected it, the
+>>> duplicates reappeared.
+>>>
+>>> In fact each time I selected an entry at random and clicked "test speakers"
+>>> it created a new entry. At one point I had 6 entries all working and all the
+>>> same device.
+>>>
+>>> It certainly looks like a UI issue. I will contact the PA folks.
+>>> Thanks for helping me remove the BT side from the query list.
+>
+> You can check if the bug is in the UI or in PulseAudio by running "pactl
+> list cards short" and "pactl list sinks short". I that shows multiple
+> entries for the same device, it's not a UI bug.
+>
+> Is the UI that you're using pavucontrol or something else?
+>
 
-> My concern is how do we handle user values.
-> If the user do not set this option, hci_conn->settings contains 0x0000.
-> In this case, it is possible to start the sco connection as we have it today.
-> If the user set 0x0060 (cvsd 16 bits) or 0x0003 (transparent data), then it is
-> possible to start S3, S2, S1 or T2, T1 sequences.
-> 
-> For other values, IMHO, returning an error would be the way to go.
+Tanu, I am using gnome-control-center in the Sound section.
 
-The default value for voice settings comes from hci_dev and is normally 0x0060. So that would be the value that we have initially. Which means CVSD air encoding.
+pavucontrol and pactl list modules show only one entry, so it is 
+increasingly looking like an issue in gnome control center. I have 
+registered an issue on bugzilla.
 
-If you create a SCO socket with socket() and call getsockopt on it, then it should return the default voice setting from the controller. Actually our global default and only once you bound it with bind() it will tell you the controller specific value. And with Synchronous setup, it also does not matter much since there it is part of the HCI command anyway. It does get a bit tricky for legacy controllers that do not support eSCO. Here we would need to write default voice setting first before calling add SCO.
-
-And yes, we can limit the possible valid values. It is more important to also return the value we are getting back from the kernel. So that systems like PA know exactly what kind of link is configured.
-
-> If the above is fine for you, we can discuss the naming. What about the
-> following ?
-> 
-> #define SCO_SETTINGS  0x03
-> struct sco_settings {
->        __u16           settings;
-> };
-
-That is my current thinking. However we might start using SOL_BLUETOOTH and start using BT_VOICE or similar as a socket option. I do want to be able to retire SOL_SCO and SOL_L2CAP at some point.
-
-Regards
-
-Marcel
-
+Thanks for your feedback.
+-- 
+---
+Colin Beckingham
+http://www.it4gh.com
