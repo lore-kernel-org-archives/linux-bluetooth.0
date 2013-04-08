@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v9 13/16] sbc: Update sbcdec for msbc
-Date: Mon,  8 Apr 2013 15:24:15 +0200
-Message-Id: <1365427458-26911-14-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v9 06/16] sbc: Add iwmmxt primitive for 1b 8s encoding
+Date: Mon,  8 Apr 2013 15:24:08 +0200
+Message-Id: <1365427458-26911-7-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1365427458-26911-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1365427458-26911-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -14,98 +14,44 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/sbcdec.c |   22 +++++++++++++++++-----
- 1 file changed, 17 insertions(+), 5 deletions(-)
+ sbc/sbc_primitives_iwmmxt.c |   22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
 
-diff --git a/src/sbcdec.c b/src/sbcdec.c
-index 0077a82..ba17f7a 100644
---- a/src/sbcdec.c
-+++ b/src/sbcdec.c
-@@ -4,6 +4,7 @@
-  *
-  *  Copyright (C) 2008-2010  Nokia Corporation
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2012-2013  Intel Corporation
-  *
-  *
-  *  This program is free software; you can redistribute it and/or modify
-@@ -31,6 +32,7 @@
- #include <fcntl.h>
- #include <unistd.h>
- #include <stdlib.h>
-+#include <stdbool.h>
- #include <string.h>
- #include <getopt.h>
- #include <sys/stat.h>
-@@ -44,7 +46,7 @@
- 
- static int verbose = 0;
- 
--static void decode(char *filename, char *output, int tofile)
-+static void decode(char *filename, char *output, int tofile, bool msbc)
- {
- 	unsigned char buf[BUF_SIZE], *stream;
- 	struct stat st;
-@@ -98,7 +100,10 @@ static void decode(char *filename, char *output, int tofile)
- 		goto free;
- 	}
- 
--	sbc_init(&sbc, 0L);
-+	if (msbc)
-+		sbc_init_msbc(&sbc, 0L);
-+	else
-+		sbc_init(&sbc, 0L);
- 	sbc.endian = SBC_BE;
- 
- 	framelen = sbc_decode(&sbc, stream, streamlen, buf, sizeof(buf), &len);
-@@ -228,14 +233,16 @@ static void usage(void)
- 
- 	printf("Options:\n"
- 		"\t-h, --help           Display help\n"
--		"\t-v, --verbose        Verbose mode\n"
- 		"\t-d, --device <dsp>   Sound device\n"
-+		"\t-v, --verbose        Verbose mode\n"
-+		"\t-m, --msbc           mSBC codec\n"
- 		"\t-f, --file <file>    Decode to a file\n"
- 		"\n");
+diff --git a/sbc/sbc_primitives_iwmmxt.c b/sbc/sbc_primitives_iwmmxt.c
+index 0c8f329..5be8933 100644
+--- a/sbc/sbc_primitives_iwmmxt.c
++++ b/sbc/sbc_primitives_iwmmxt.c
+@@ -294,10 +294,30 @@ static inline void sbc_analyze_4b_8s_iwmmxt(struct sbc_encoder_state *state,
+ 	sbc_analyze_eight_iwmmxt(x + 0, out, analysis_consts_fixed8_simd_even);
  }
  
- static struct option main_options[] = {
- 	{ "help",	0, 0, 'h' },
-+	{ "msbc",	0, 0, 'm' },
- 	{ "device",	1, 0, 'd' },
- 	{ "verbose",	0, 0, 'v' },
- 	{ "file",	1, 0, 'f' },
-@@ -246,8 +253,9 @@ int main(int argc, char *argv[])
- {
- 	char *output = NULL;
- 	int i, opt, tofile = 0;
-+	bool msbc = false;
- 
--	while ((opt = getopt_long(argc, argv, "+hvd:f:",
-+	while ((opt = getopt_long(argc, argv, "+hmvd:f:",
- 						main_options, NULL)) != -1) {
- 		switch(opt) {
- 		case 'h':
-@@ -258,6 +266,10 @@ int main(int argc, char *argv[])
- 			verbose = 1;
- 			break;
- 
-+		case 'm':
-+			msbc = true;
-+			break;
++static inline void sbc_analyze_1b_8s_iwmmxt_even(struct sbc_encoder_state *state,
++		int16_t *x, int32_t *out, int out_stride);
 +
- 		case 'd':
- 			free(output);
- 			output = strdup(optarg);
-@@ -285,7 +297,7 @@ int main(int argc, char *argv[])
- 	}
- 
- 	for (i = 0; i < argc; i++)
--		decode(argv[i], output ? output : "/dev/dsp", tofile);
-+		decode(argv[i], output ? output : "/dev/dsp", tofile, msbc);
- 
- 	free(output);
++static inline void sbc_analyze_1b_8s_iwmmxt_odd(struct sbc_encoder_state *state,
++		int16_t *x, int32_t *out, int out_stride)
++{
++	sbc_analyze_eight_iwmmxt(x, out, analysis_consts_fixed8_simd_odd);
++	state->sbc_analyze_8s = sbc_analyze_1b_8s_iwmmxt_even;
++}
++
++static inline void sbc_analyze_1b_8s_iwmmxt_even(struct sbc_encoder_state *state,
++		int16_t *x, int32_t *out, int out_stride)
++{
++	sbc_analyze_eight_iwmmxt(x, out, analysis_consts_fixed8_simd_even);
++	state->sbc_analyze_8s = sbc_analyze_1b_8s_iwmmxt_odd;
++}
++
+ void sbc_init_primitives_iwmmxt(struct sbc_encoder_state *state)
+ {
+ 	state->sbc_analyze_4s = sbc_analyze_4b_4s_iwmmxt;
+-	state->sbc_analyze_8s = sbc_analyze_4b_8s_iwmmxt;
++	if (state->increment == 1)
++		state->sbc_analyze_8s = sbc_analyze_1b_8s_iwmmxt_odd;
++	else
++		state->sbc_analyze_8s = sbc_analyze_4b_8s_iwmmxt;
+ 	state->implementation_info = "IWMMXT";
+ }
  
 -- 
 1.7.9.5
