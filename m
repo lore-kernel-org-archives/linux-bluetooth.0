@@ -1,69 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH v2 4/6] gobex: Use gcc builtin instead of g_atomic
-Date: Mon,  8 Apr 2013 17:56:20 -0300
-Message-Id: <1365454582-12781-4-git-send-email-lucas.demarchi@profusion.mobi>
-In-Reply-To: <1365454582-12781-1-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1365454582-12781-1-git-send-email-lucas.demarchi@profusion.mobi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <CAJ-VmomS_=1=QLZrfdD4vhu9Qy0w2JNQxEFrkt_OKjWetrWY4w@mail.gmail.com>
+References: <CAJ-Vmo=LVSzdEo6DhfOVT_0JHCTMmdPU1zGfMuBmhmr8QuDmJQ@mail.gmail.com>
+	<CAJ-VmomQaYFMR0G1DM+dno6qB+AdXUom8=kWPzJoOjuzQj81bw@mail.gmail.com>
+	<CAFSJ42Zd3s8xKwt4X3LNcupCTntDULxNntMuD-_Xh6_csiGA4A@mail.gmail.com>
+	<201304081733.15727.chunkeey@googlemail.com>
+	<CAJ-VmomS_=1=QLZrfdD4vhu9Qy0w2JNQxEFrkt_OKjWetrWY4w@mail.gmail.com>
+Date: Mon, 8 Apr 2013 22:37:08 +0200
+Message-ID: <CAFSJ42b7DD9UVtzT7YWhaEchzwpde0yW=pS3nJVeMCHoVQGBqQ@mail.gmail.com>
+Subject: Re: Version number policy!
+From: Eugene Krasnikov <k.eugene.e@gmail.com>
+To: Adrian Chadd <adrian@freebsd.org>
+Cc: Christian Lamparter <chunkeey@googlemail.com>,
+	Kalle Valo <kvalo@adurom.com>,
+	"Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-wireless <linux-wireless@vger.kernel.org>,
+	ath9k_htc_fw <ath9k_htc_fw@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-g_atomic_* end up using G_STATIC_ASSERT, causing gcc 4.8 to yell due to
--Wunused-local-typedefs.
+Christian,
 
-/usr/include/glib-2.0/glib/gmacros.h:162:53: error: typedef â€˜_GStaticAssertCompileTimeAssertion_2â€™ locally defined but not used [-Werror=unused-local-typedefs]
- #define G_STATIC_ASSERT(expr) typedef char G_PASTE (_GStaticAssertCompileTimeAssertion_, __COUNTER__)[(expr) ? 1 : -1]
+Did you have such a situation when e.g. one feature has 2 incompatible
+implementations? Let’s say initial implementation of “offloaded TX
+rate control” feature was immature and community decides to change
+implementation drastically so final realization of this feature is
+incompatible with initial. How did carl9170 track such a situation in
+feature bitmap?
 
-Most of the uses of atomic operations were wrong. They were fixed as
-well. If we are using atomic operations, reading the variable again
-later for logging is not an option, we should use the return of the
-atomic function used to fetch the variable.
----
- gobex/gobex.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+2013/4/8 Adrian Chadd <adrian@freebsd.org>:
+> On 8 April 2013 08:33, Christian Lamparter <chunkeey@googlemail.com> wrote:
+>> On Monday, April 08, 2013 11:10:30 AM Eugene Krasnikov wrote:
+>>> It’s a good idea to pack bitmap into the tail/header of the firmware
+>>> binary to get capabilities even before fw loading. The plan is to add
+>>> 8 bytes for caps and also add time stamp. Let me play around with that
+>>> and provide fw and driver patch for review.
+>>
+>> Hm, come to think of it. Kalle, do you think ath9k_htc could use
+>> some bits of the fw header format, parser or the complete infrastructure
+>> from ath6kl? This could be great for Adrian, because he could
+>> just point people to it and they could moved it into the code
+>> into /drivers/net/wireless/ath/fw.c.
+>
+> Just remember that we (ath9k_htc and carl9170) aren't constrained by
+> the same kinds of issues that closed firmware is. So version checks
+> aren't that bad, because that way over time we don't end up needing to
+> maintain lots of special cases for firmware options.
+>
+> I still like the idea of firmware options for build time options that
+> people may wish to use - eg, say we want to support a version of
+> ath9k-htc firmware that does offloaded TX rate control, versus not.
+> But, maintaining multiple builds of the same firmware is IMHO going to
+> be a path towards madness to maintain.
+>
+> The maintainability is why I'm hoping (!) to keep the number of
+> options low and just do "clean slate" moves whenever we shift to the
+> next major firmware version.
+>
+>
+> Adrian
 
-diff --git a/gobex/gobex.c b/gobex/gobex.c
-index a9bcee9..ce4f284 100644
---- a/gobex/gobex.c
-+++ b/gobex/gobex.c
-@@ -1315,25 +1315,27 @@ GObex *g_obex_new(GIOChannel *io, GObexTransportType transport_type,
- 
- GObex *g_obex_ref(GObex *obex)
- {
-+	int refs;
-+
- 	if (obex == NULL)
- 		return NULL;
- 
--	g_atomic_int_inc(&obex->ref_count);
-+	refs = __sync_add_and_fetch(&obex->ref_count, 1);
- 
--	g_obex_debug(G_OBEX_DEBUG_COMMAND, "ref %u", obex->ref_count);
-+	g_obex_debug(G_OBEX_DEBUG_COMMAND, "ref %u", refs);
- 
- 	return obex;
- }
- 
- void g_obex_unref(GObex *obex)
- {
--	gboolean last_ref;
-+	int refs;
- 
--	last_ref = g_atomic_int_dec_and_test(&obex->ref_count);
-+	refs = __sync_sub_and_fetch(&obex->ref_count, 1);
- 
--	g_obex_debug(G_OBEX_DEBUG_COMMAND, "ref %u", obex->ref_count);
-+	g_obex_debug(G_OBEX_DEBUG_COMMAND, "ref %u", refs);
- 
--	if (!last_ref)
-+	if (refs > 0)
- 		return;
- 
- 	g_slist_free_full(obex->req_handlers, g_free);
+
+
 -- 
-1.8.2.1
-
+Best regards,
+Eugene
