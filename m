@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH v2 6/6] shared: Use gcc builtin instead of g_atomic
-Date: Mon,  8 Apr 2013 17:56:22 -0300
-Message-Id: <1365454582-12781-6-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH v2 3/6] attrib: Use gcc builtin instead of g_atomic
+Date: Mon,  8 Apr 2013 17:56:19 -0300
+Message-Id: <1365454582-12781-3-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1365454582-12781-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1365454582-12781-1-git-send-email-lucas.demarchi@profusion.mobi>
 MIME-Version: 1.0
@@ -17,32 +17,115 @@ g_atomic_* end up using G_STATIC_ASSERT, causing gcc 4.8 to yell due to
 
 /usr/include/glib-2.0/glib/gmacros.h:162:53: error: typedef ‘_GStaticAssertCompileTimeAssertion_2’ locally defined but not used [-Werror=unused-local-typedefs]
  #define G_STATIC_ASSERT(expr) typedef char G_PASTE (_GStaticAssertCompileTimeAssertion_, __COUNTER__)[(expr) ? 1 : -1]
----
- src/shared/hciemu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/shared/hciemu.c b/src/shared/hciemu.c
-index 97ea84e..60a4f47 100644
---- a/src/shared/hciemu.c
-+++ b/src/shared/hciemu.c
-@@ -308,7 +308,7 @@ struct hciemu *hciemu_ref(struct hciemu *hciemu)
- 	if (!hciemu)
+Most of the uses of atomic operations were wrong. They were fixed as
+well. If we are using atomic operations, reading the variable again
+later for logging is not an option, we should use the return of the
+atomic function used to fetch the variable.
+---
+ attrib/gatt.c    | 12 ++++++------
+ attrib/gattrib.c | 14 ++++++++------
+ 2 files changed, 14 insertions(+), 12 deletions(-)
+
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index 38d455a..749e820 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -79,14 +79,14 @@ static void discover_primary_free(struct discover_primary *dp)
+ 
+ static struct included_discovery *isd_ref(struct included_discovery *isd)
+ {
+-	g_atomic_int_inc(&isd->refs);
++	__sync_fetch_and_add(&isd->refs, 1);
+ 
+ 	return isd;
+ }
+ 
+ static void isd_unref(struct included_discovery *isd)
+ {
+-	if (g_atomic_int_dec_and_test(&isd->refs) == FALSE)
++	if (__sync_sub_and_fetch(&isd->refs, 1) > 0)
+ 		return;
+ 
+ 	if (isd->err)
+@@ -582,7 +582,7 @@ static void read_long_destroy(gpointer user_data)
+ {
+ 	struct read_long_data *long_read = user_data;
+ 
+-	if (g_atomic_int_dec_and_test(&long_read->ref) == FALSE)
++	if (__sync_sub_and_fetch(&long_read->ref, 1) > 0)
+ 		return;
+ 
+ 	if (long_read->buffer != NULL)
+@@ -627,7 +627,7 @@ static void read_blob_helper(guint8 status, const guint8 *rpdu, guint16 rlen,
+ 				read_blob_helper, long_read, read_long_destroy);
+ 
+ 	if (id != 0) {
+-		g_atomic_int_inc(&long_read->ref);
++		__sync_fetch_and_add(&long_read->ref, 1);
+ 		return;
+ 	}
+ 
+@@ -664,7 +664,7 @@ static void read_char_helper(guint8 status, const guint8 *rpdu,
+ 	id = g_attrib_send(long_read->attrib, long_read->id, buf, plen,
+ 				read_blob_helper, long_read, read_long_destroy);
+ 	if (id != 0) {
+-		g_atomic_int_inc(&long_read->ref);
++		__sync_fetch_and_add(&long_read->ref, 1);
+ 		return;
+ 	}
+ 
+@@ -700,7 +700,7 @@ guint gatt_read_char(GAttrib *attrib, uint16_t handle, GAttribResultFunc func,
+ 	if (id == 0)
+ 		g_free(long_read);
+ 	else {
+-		g_atomic_int_inc(&long_read->ref);
++		__sync_fetch_and_add(&long_read->ref, 1);
+ 		long_read->id = id;
+ 	}
+ 
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+index 37581a3..e6d6022 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -147,12 +147,14 @@ static gboolean is_response(guint8 opcode)
+ 
+ GAttrib *g_attrib_ref(GAttrib *attrib)
+ {
++	int refs;
++
+ 	if (!attrib)
  		return NULL;
  
--	g_atomic_int_inc(&hciemu->ref_count);
-+	__sync_fetch_and_add(&hciemu->ref_count, 1);
+-	g_atomic_int_inc(&attrib->refs);
++	refs = __sync_add_and_fetch(&attrib->refs, 1);
  
- 	return hciemu;
+-	DBG("%p: ref=%d", attrib, attrib->refs);
++	DBG("%p: ref=%d", attrib, refs);
+ 
+ 	return attrib;
  }
-@@ -318,7 +318,7 @@ void hciemu_unref(struct hciemu *hciemu)
- 	if (!hciemu)
+@@ -219,16 +221,16 @@ static void attrib_destroy(GAttrib *attrib)
+ 
+ void g_attrib_unref(GAttrib *attrib)
+ {
+-	gboolean ret;
++	int refs;
+ 
+ 	if (!attrib)
  		return;
  
--	if (g_atomic_int_dec_and_test(&hciemu->ref_count) == FALSE)
-+	if (__sync_sub_and_fetch(&hciemu->ref_count, 1) > 0)
+-	ret = g_atomic_int_dec_and_test(&attrib->refs);
++	refs = __sync_sub_and_fetch(&attrib->refs, 1);
+ 
+-	DBG("%p: ref=%d", attrib, attrib->refs);
++	DBG("%p: ref=%d", attrib, refs);
+ 
+-	if (ret == FALSE)
++	if (refs > 0)
  		return;
  
- 	g_list_foreach(hciemu->post_command_hooks, destroy_command_hook, NULL);
+ 	attrib_destroy(attrib);
 -- 
 1.8.2.1
 
