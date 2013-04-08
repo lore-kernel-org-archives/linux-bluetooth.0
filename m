@@ -1,34 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: Christian Lamparter <chunkeey@googlemail.com>
-To: Eugene Krasnikov <k.eugene.e@gmail.com>
-Subject: Re: Version number policy!
-Date: Mon, 8 Apr 2013 17:33:15 +0200
-Cc: Adrian Chadd <adrian@freebsd.org>, Kalle Valo <kvalo@adurom.com>,
-	"Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
-	"linux-bluetooth" <linux-bluetooth@vger.kernel.org>,
-	"linux-wireless" <linux-wireless@vger.kernel.org>,
-	"ath9k_htc_fw" <ath9k_htc_fw@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <CAJ-Vmo=LVSzdEo6DhfOVT_0JHCTMmdPU1zGfMuBmhmr8QuDmJQ@mail.gmail.com> <CAJ-VmomQaYFMR0G1DM+dno6qB+AdXUom8=kWPzJoOjuzQj81bw@mail.gmail.com> <CAFSJ42Zd3s8xKwt4X3LNcupCTntDULxNntMuD-_Xh6_csiGA4A@mail.gmail.com>
-In-Reply-To: <CAFSJ42Zd3s8xKwt4X3LNcupCTntDULxNntMuD-_Xh6_csiGA4A@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="windows-1252"
-Message-Id: <201304081733.15727.chunkeey@googlemail.com>
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+Subject: [PATCH v9 16/16] TODO: Add TODO list
+Date: Mon,  8 Apr 2013 15:24:18 +0200
+Message-Id: <1365427458-26911-17-git-send-email-frederic.dalleau@linux.intel.com>
+In-Reply-To: <1365427458-26911-1-git-send-email-frederic.dalleau@linux.intel.com>
+References: <1365427458-26911-1-git-send-email-frederic.dalleau@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday, April 08, 2013 11:10:30 AM Eugene Krasnikov wrote:
-> It’s a good idea to pack bitmap into the tail/header of the firmware
-> binary to get capabilities even before fw loading. The plan is to add
-> 8 bytes for caps and also add time stamp. Let me play around with that
-> and provide fw and driver patch for review.
+---
+ TODO |   51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
+ create mode 100644 TODO
 
-Hm, come to think of it. Kalle, do you think ath9k_htc could use
-some bits of the fw header format, parser or the complete infrastructure
-from ath6kl? This could be great for Adrian, because he could
-just point people to it and they could moved it into the code
-into /drivers/net/wireless/ath/fw.c.
+diff --git a/TODO b/TODO
+new file mode 100644
+index 0000000..6305f19
+--- /dev/null
++++ b/TODO
+@@ -0,0 +1,51 @@
++Background
++==========
++
++- Priority scale: High, Medium and Low
++
++- Complexity scale: C1, C2, C4 and C8.  The complexity scale is exponential,
++  with complexity 1 being the lowest complexity.  Complexity is a function
++  of both task 'complexity' and task 'scope'.
++
++  The general rule of thumb is that a complexity 1 task should take 1-2 weeks
++  for a person very familiar with oFono codebase.  Higher complexity tasks
++  require more time and have higher uncertainty.
++
++  Higher complexity tasks should be refined into several lower complexity tasks
++  once the task is better understood.
++
++
++NEON instruction set
++====================
++
++- The neon optimization code is split in two parts. Sample reordering and blocks
++encoding. There is a neon optimization for encoding SBC. But mSBC is not
++supported by this optimizer because the reordering has been specifically for
++mSBC.
++
++  Priority: Low
++  Complexity: C2
++
++SSE instruction set
++===================
++
++- The decoder is optimized to take advantage of advanced processor instruction
++sets. Currently implemented are MMX, arm neon, arm v6 and iwmmxt. SSE3 is
++is available since almost 10 years now, on a large range of Intel processors.
++It should be interesting to implement it and to compare with MMX implementation
++on Intel processors.
++
++  Priority: Medium
++  Complexity: C4
++
++Decoder improvements
++====================
++
++- Currently, only the decoder is optimized to take advantage of advanced
++processor instruction sets. In use cases like HFP 1.6, optimizing the encoder
++will bring a significant latency, power and performance advantage. For exemple,
++the MMX encoder is 3 to 6 time faster than the SIMD encoder.
++
++  Priority: High
++  Complexity: C8
++
+-- 
+1.7.9.5
 
-Regards,
-	Christian
