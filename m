@@ -1,44 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: Larry Finger <larry.finger@gmail.com>
-From: Larry Finger <Larry.Finger@lwfinger.net>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org,
-	Larry Finger <Larry.Finger@lwfinger.net>,
-	netdev@vger.kernel.org,
-	marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	champion_chen@realsil.com.cn
-Subject: [RFC/RFT PATCH 0/2 V2] Adding a new bluetooth driver to the kernel
-Date: Mon,  8 Apr 2013 19:57:46 -0500
-Message-Id: <1365469068-4548-1-git-send-email-Larry.Finger@lwfinger.net>
+Date: Mon, 8 Apr 2013 20:37:20 -0400
+From: Theodore Ts'o <tytso@mit.edu>
+To: Adrian Chadd <adrian@freebsd.org>
+Cc: Christian Lamparter <chunkeey@googlemail.com>,
+	Eugene Krasnikov <k.eugene.e@gmail.com>,
+	Kalle Valo <kvalo@adurom.com>,
+	"Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-wireless <linux-wireless@vger.kernel.org>,
+	ath9k_htc_fw <ath9k_htc_fw@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: Version number policy!
+Message-ID: <20130409003720.GA5145@thunk.org>
+References: <CAJ-Vmo=LVSzdEo6DhfOVT_0JHCTMmdPU1zGfMuBmhmr8QuDmJQ@mail.gmail.com>
+ <CAJ-VmomS_=1=QLZrfdD4vhu9Qy0w2JNQxEFrkt_OKjWetrWY4w@mail.gmail.com>
+ <CAFSJ42b7DD9UVtzT7YWhaEchzwpde0yW=pS3nJVeMCHoVQGBqQ@mail.gmail.com>
+ <201304090003.47056.chunkeey@googlemail.com>
+ <CAJ-VmomksDSNvTpKQpNRRQx+QboSVHpby7V4qq4rngqVkTvf+A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAJ-VmomksDSNvTpKQpNRRQx+QboSVHpby7V4qq4rngqVkTvf+A@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These patches supply the code needed to operate the bluetooth portion of
-the Realtek RTL8723AE chip. Much of the necessary code is already present
-in btusb, thus that driver is changed to export the necessary routines.
-The second patch implements the routines that differ from the standard
-driver.
+On Mon, Apr 08, 2013 at 04:12:07PM -0700, Adrian Chadd wrote:
+> I'm a FreeBSD user. I know what it's like to have an alternate, out of
+> linux implementation of ext2/3 that doesn't implement all of the
+> features.
+> 
+> I also know what kinds of crap happens when you try mounting a more
+> recent extX filesystem on an earlier kernel. Ie, it doesn't
+> necessarily end well. :-)
 
-Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+There shouldn't be any crap; just a an error message indicating that
+"the file system has features which this implementation doesn't
+understand".  At least, if the implementation was competently
+coded.... (ext2/3/4 has feature bitmasks that make it very clear what
+features are required so that an implementation can mount the file
+system read/write or read/only).
 
-
-Larry Finger (2):
-  btusb: Modify code for use with a similar driver
-  rtk_btusb: A new driver for the Bluetooth portion of the Realtek
-    RTL8723AE chip
-
- drivers/bluetooth/Kconfig     |  10 +
- drivers/bluetooth/Makefile    |   1 +
- drivers/bluetooth/btusb.c     |  79 +---
- drivers/bluetooth/btusb.h     |  88 ++++
- drivers/bluetooth/rtk_btusb.c | 974 ++++++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/rtk_btusb.h | 102 +++++
- 6 files changed, 1194 insertions(+), 60 deletions(-)
- create mode 100644 drivers/bluetooth/btusb.h
- create mode 100644 drivers/bluetooth/rtk_btusb.c
- create mode 100644 drivers/bluetooth/rtk_btusb.h
-
--- 
-1.8.1.4
+							- Ted
