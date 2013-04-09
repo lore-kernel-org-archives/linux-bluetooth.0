@@ -1,69 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/5] obexd: Register notification handler in the MAP client
-Date: Tue,  9 Apr 2013 13:55:24 +0200
-Message-Id: <1365508525-13251-5-git-send-email-christian.fetzer@oss.bmw-carit.de>
-In-Reply-To: <1365508525-13251-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1365508525-13251-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH 4/8] obexd: Add obc_session_get_service_record to session
+Date: Tue,  9 Apr 2013 13:54:04 +0200
+Message-Id: <1365508448-13171-5-git-send-email-christian.fetzer@oss.bmw-carit.de>
+In-Reply-To: <1365508448-13171-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1365508448-13171-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
+This adds a obc_session_get_service_record function to the client session.
+The function allows querying the session specific service record.
 ---
- obexd/client/map.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ obexd/client/session.c | 9 +++++++++
+ obexd/client/session.h | 2 ++
+ 2 files changed, 11 insertions(+)
 
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index 7a02583..aaf581b 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -41,6 +41,7 @@
- #include "driver.h"
- #include "sdp.h"
- #include "sdp_lib.h"
-+#include "map-dispatcher.h"
- 
- #define OBEX_MAS_UUID \
- 	"\xBB\x58\x2B\x40\x42\x0C\x11\xDB\xB0\xDE\x08\x00\x20\x0C\x9A\x66"
-@@ -1694,6 +1695,17 @@ static void map_msg_remove(void *data)
- 	g_free(path);
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index 2e8b113..7f4a192 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -827,6 +827,15 @@ fail:
+ 	return NULL;
  }
  
-+static void map_handle_notification(struct map_event *event, void *user_data)
++const void *obc_session_get_service_record(struct obc_session *session)
 +{
-+	struct map_data *map = user_data;
++	if (session && session->id > 0 && session->transport &&
++			session->transport->get_service_record)
++		return session->transport->get_service_record(session->id);
 +
-+	DBG("Event report for %s:%d", obc_session_get_destination(map->session),
-+							map->mas_instance_id);
-+	DBG("type=%x, handle=%s, folder=%s, old_folder=%s, msg_type=%s",
-+				event->type, event->handle, event->folder,
-+					event->old_folder, event->msg_type);
++	return NULL;
 +}
 +
- static gboolean set_notification_registration(struct map_data *map,
- 								gboolean status)
+ const char *obc_session_get_owner(struct obc_session *session)
  {
-@@ -1701,6 +1713,18 @@ static gboolean set_notification_registration(struct map_data *map,
- 	GError *err = NULL;
- 	GObexApparam *apparam;
- 	char contents[2];
-+	const char *address;
-+
-+	address = obc_session_get_destination(map->session);
-+	if (!address || map->mas_instance_id < 0)
-+		return FALSE;
-+
-+	if (status) {
-+		map_acquire_mns(map->mas_instance_id, address,
-+						&map_handle_notification, map);
-+	} else {
-+		map_release_mns(map->mas_instance_id, address);
-+	}
+ 	if (session == NULL)
+diff --git a/obexd/client/session.h b/obexd/client/session.h
+index 402c042..8a3d629 100644
+--- a/obexd/client/session.h
++++ b/obexd/client/session.h
+@@ -54,6 +54,8 @@ const char *obc_session_get_target(struct obc_session *session);
+ const char *obc_session_register(struct obc_session *session,
+ 						GDBusDestroyFunction destroy);
  
- 	contents[0] = FILLER_BYTE;
- 	contents[1] = '\0';
++const void *obc_session_get_service_record(struct obc_session *session);
++
+ guint obc_session_queue(struct obc_session *session,
+ 				struct obc_transfer *transfer,
+ 				session_callback_t func, void *user_data,
 -- 
 1.8.2.1
 
