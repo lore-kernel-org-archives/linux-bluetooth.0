@@ -1,114 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
-From: Feng Hong <hongfeng@marvell.com>
-To: <marcel@holtmann.org>, <gustavo@padovan.org>, <johan.hedberg@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>, Feng Hong <hongfeng@marvell.com>
-Subject: [PATCH] Bluetooth: Avoid dumplicate conn dev register
-Date: Tue, 9 Apr 2013 14:43:46 +0800
-Message-ID: <1365489826-30652-1-git-send-email-hongfeng@marvell.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Subject: [PATCH v2] Bluetooth: Fix incorrect ssp mode bit for non ssp devices
+Date: Tue, 09 Apr 2013 11:41:42 +0530
+Message-id: <1365487902-3553-1-git-send-email-jaganath.k@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Once hit dumplicate connection device register:
+Some faulty non ssp devices send extended inquiry response
+during device discovery which is a violation of 2.1 specification.
+So for these devices we set ssp bit during acl connection
+initiation thinking that it is an ssp device. But for these
+devices, in remote extended features event ssp supported bit
+will be off. But we are not clearing the ssp bit in that case
+and eventually ssp bit in conn flag will be incorrectly set for
+these devices.
 
-[  651.865509] WARNING: at lib/kobject.c:198
-kobject_add_internal+0x1f4/0x264()
-[  651.872894] kobject_add_internal failed for hci0:1 with -EEXIST,
-don't try to register things with the same name in the same directory.
-[  651.885650] Modules linked in: runcase_sysfs(O) sd8xxx(O) mlan(O)
-bt8xxx(O) cidatattydev(O) gs_diag(O) diag(O) gs_modem(O) ccinetdev(O)
-cci_datastub(O) citty(O) msocketk(O) smsmdtv seh(O) cploaddev(O) blcr(O)
-blcr_imports(O) geu(O) galcore(O)
-[  651.910125] [<c011991c>] (unwind_backtrace+0x0/0x11c) from
-[<c0134d3c>] (warn_slowpath_common+0x4c/0x64)
-[  651.920013] [<c0134d3c>] (warn_slowpath_common+0x4c/0x64) from
-[<c0134dd4>] (warn_slowpath_fmt+0x2c/0x3c)
-[  651.930053] [<c0134dd4>] (warn_slowpath_fmt+0x2c/0x3c) from
-[<c02d91e0>] (kobject_add_internal+0x1f4/0x264)
-[  651.940246] [<c02d91e0>] (kobject_add_internal+0x1f4/0x264) from
-[<c02d95f0>] (kobject_add+0x68/0x8c)
-[  651.949890] [<c02d95f0>] (kobject_add+0x68/0x8c) from [<c03323c8>]
-(device_add+0x104/0x5b8)
-[  651.958831] [<c03323c8>] (device_add+0x104/0x5b8) from [<c0547484>]
-(hci_conn_add_sysfs+0x4c/0x80)
-[  651.968109] [<c0547484>] (hci_conn_add_sysfs+0x4c/0x80) from
-[<c053996c>] (hci_event_packet+0x530/0x6428)
-[  651.978149] [<c053996c>] (hci_event_packet+0x530/0x6428) from
-[<c05342a8>] (hci_rx_work+0xd0/0x390)
-[  651.987640] [<c05342a8>] (hci_rx_work+0xd0/0x390) from [<c014ce24>]
-(process_one_work+0x280/0x488)
-[  651.996978] [<c014ce24>] (process_one_work+0x280/0x488) from
-[<c014d240>] (worker_thread+0x214/0x3b4)
-[  652.006652] [<c014d240>] (worker_thread+0x214/0x3b4) from
-[<c01511b4>] (kthread+0x80/0x8c)
-[  652.015228] [<c01511b4>] (kthread+0x80/0x8c) from [<c0113ed8>]
-(kernel_thread_exit+0x0/0x8)
-[  652.023925] ---[ end trace 7d6ac73956376f0a ]---
-[  652.035034] Bluetooth: Failed to register connection device
+The software which has caused this issue is MecApp
+http://www.mecel.se/products/bluetooth/downloads/MecApp_download
 
- dev->device_private struct will be freed in device_add, later on anyone
-go through father/child list will meet panic like this:
+This patch does a workaround by clearing the ssp bit if it is
+not supported in remote extended features event
 
-[  668.902984] Unable to handle kernel NULL pointer dereference at
-virtual address 00000004
-[  668.903015] pgd = c0104000
-[  668.903015] [00000004] *pgd=00000000
-[  668.903045] Internal error: Oops: 805 [#1] PREEMPT SMP ARM
-[  668.903106] Modules linked in: runcase_sysfs(O) sd8xxx(O) mlan(O)
-bt8xxx(O) cidatattydev(O) gs_diag(O) diag(O) gs_modem(O) ccinetdev(O)
-cci_datastub(O) citty(O) msocketk(O) smsmdtv seh(O
-) cploaddev(O) blcr(O) blcr_imports(O) geu(O) galcore(O)
-[  668.903228] CPU: 1    Tainted: G        W  O  (3.4.5+ #1)
-[  668.903259] PC is at klist_release+0x30/0xe0
-[  668.903289] LR is at warn_slowpath_null+0x18/0x1c
-[  668.908081] [<c059d028>] (klist_release+0x30/0xe0) from [<c059d10c>]
-(klist_dec_and_del+0x34/0x44)
-[  668.908142] [<c059d10c>] (klist_dec_and_del+0x34/0x44) from
-[<c059d148>] (klist_next+0x2c/0xd8)
-[  668.908172] [<c059d148>] (klist_next+0x2c/0xd8) from [<c03317f4>]
-(device_for_each_child+0x44/0x70)
-[  668.908233] [<c03317f4>] (device_for_each_child+0x44/0x70) from
-[<c033a5ec>] (__device_suspend+0x20/0x340)
-[  668.908294] [<c033a5ec>] (__device_suspend+0x20/0x340) from
-[<c033b1e8>] (dpm_suspend+0xa8/0x210)
-[  668.908325] [<c033b1e8>] (dpm_suspend+0xa8/0x210) from [<c0168770>]
-(suspend_devices_and_enter+0xd4/0x390)
-[  668.908386] [<c0168770>] (suspend_devices_and_enter+0xd4/0x390) from
-[<c0168b7c>] (pm_suspend+0x150/0x234)
-[  668.908416] [<c0168b7c>] (pm_suspend+0x150/0x234) from [<c0168cf4>]
-(try_to_suspend+0x64/0xa8)
-[  668.908477] [<c0168cf4>] (try_to_suspend+0x64/0xa8) from [<c014ce24>]
-(process_one_work+0x280/0x488)
-[  668.908508] [<c014ce24>] (process_one_work+0x280/0x488) from
-[<c014d240>] (worker_thread+0x214/0x3b4)
-[  668.908569] [<c014d240>] (worker_thread+0x214/0x3b4) from
-[<c01511b4>] (kthread+0x80/0x8c)
-[  668.908630] [<c01511b4>] (kthread+0x80/0x8c) from [<c0113ed8>]
-(kernel_thread_exit+0x0/0x8)
+hcidump log
+----------
 
-This patch is trying to add protection in this case.
+< HCI Command: Inquiry (0x01|0x0001) plen 5
+    lap 0x9e8b33 len 4 num 0
+> HCI Event: Command Status (0x0f) plen 4
+    Inquiry (0x01|0x0001) status 0x00 ncmd 1
+> HCI Event: Extended Inquiry Result (0x2f) plen 255
+    bdaddr 00:1B:DC:05:B5:25 mode 1 clkoffset 0x3263 class 0x3c0000 rssi -77
+    Unknown type 0x42 with 8 bytes data
+    Unknown type 0x1e with 2 bytes data
+> HCI Event: Inquiry Complete (0x01) plen 1
+    status 0x00
 
-Change-Id: I028d9bda88139bdaba475a5cebbf27acbcaf3a05
-Signed-off-by: Feng Hong <hongfeng@marvell.com>
+< HCI Command: Create Connection (0x01|0x0005) plen 13
+    bdaddr 00:1B:DC:05:B5:25 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> HCI Event: Command Status (0x0f) plen 4
+    Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> HCI Event: Connect Complete (0x03) plen 11
+    status 0x00 handle 12 bdaddr 00:1B:DC:05:B5:25 type ACL encrypt 0x00
+< HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+    handle 12
+> HCI Event: Command Status (0x0f) plen 4
+    Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
+> HCI Event: Read Remote Supported Features (0x0b) plen 11
+    status 0x00 handle 12
+    Features: 0xff 0xff 0x8f 0x7e 0xd8 0x1f 0x5b 0x87
+< HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
+    handle 12 page 1
+> HCI Event: Command Status (0x0f) plen 4
+    Read Remote Extended Features (0x01|0x001c) status 0x00 ncmd 1
+> HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
+    bdaddr 00:1B:DC:05:B5:25 mode 1
+> HCI Event: Max Slots Change (0x1b) plen 3
+    handle 12 slots 5
+> HCI Event: Read Remote Extended Features (0x23) plen 13
+    status 0x00 handle 12 page 1 max 0
+    Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+< HCI Command: Remote Name Request (0x01|0x0019) plen 10
+    bdaddr 00:1B:DC:05:B5:25 mode 2 clkoffset 0x0000
+> HCI Event: Command Status (0x0f) plen 4
+    Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> HCI Event: Remote Name Req Complete (0x07) plen 255
+    status 0x00 bdaddr 00:1B:DC:05:B5:25 name 'Bluetooth PTS Radio v4'
+< HCI Command: Authentication Requested (0x01|0x0011) plen 2
+    handle 12
+> HCI Event: Command Status (0x0f) plen 4
+    Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
+> HCI Event: Link Key Request (0x17) plen 6
+    bdaddr 00:1B:DC:05:B5:25
+< HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
+    bdaddr 00:1B:DC:05:B5:25
+> HCI Event: Command Complete (0x0e) plen 10
+    Link Key Request Negative Reply (0x01|0x000c) ncmd 1
+    status 0x00 bdaddr 00:1B:DC:05:B5:25
+> HCI Event: PIN Code Request (0x16) plen 6
+    bdaddr 00:1B:DC:05:B5:25
+
+Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
 ---
- net/bluetooth/hci_sysfs.c |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+ net/bluetooth/hci_event.c |    4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 23b4e24..5c23d13 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -116,6 +116,11 @@ void hci_conn_add_sysfs(struct hci_conn *conn)
- {
- 	struct hci_dev *hdev = conn->hdev;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 0a2b128..c1af186 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2935,6 +2935,10 @@ static void hci_remote_ext_features_evt(struct hci_dev *hdev,
  
-+	if (device_is_registered(&conn->dev)) {
-+		BT_ERR("Duplicate register connection device");
-+		return;
-+	}
-+
- 	BT_DBG("conn %p", conn);
+ 		if (ev->features[0] & LMP_HOST_SSP)
+ 			set_bit(HCI_CONN_SSP_ENABLED, &conn->flags);
++		else
++			/* This is a workaround for some devices which send eir
++			 * which actually does not support ssp */
++			clear_bit(HCI_CONN_SSP_ENABLED, &conn->flags);
+ 	}
  
- 	dev_set_name(&conn->dev, "%s:%d", hdev->name, conn->handle);
+ 	if (conn->state != BT_CONFIG)
 -- 
-1.7.0.4
+1.7.9.5
+
