@@ -1,54 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 9 Apr 2013 23:26:54 +0900
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Alvaro Silva <alvaro.silva@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Eder Ruiz Maria <eder.ruiz@openbossa.org>
-Subject: Re: [PATCH BlueZ v2 04/13] gatttool: Use GError to propage error
- messages to caller
-Message-ID: <20130409142654.GA8294@x220>
-References: <1364945490-17059-1-git-send-email-alvaro.silva@openbossa.org>
- <1364945490-17059-5-git-send-email-alvaro.silva@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1364945490-17059-5-git-send-email-alvaro.silva@openbossa.org>
+In-Reply-To: <CANK1S=MG_kJ3DJmjV9nSbEW0E51ru_ukFsbHjx4fTMoYAMHv5A@mail.gmail.com>
+References: <CANK1S=MG_kJ3DJmjV9nSbEW0E51ru_ukFsbHjx4fTMoYAMHv5A@mail.gmail.com>
+Date: Tue, 9 Apr 2013 15:26:26 +0300
+Message-ID: <CABBYNZKCM1u+aY39o3Qha1cOFM1ugq4VFg9OpBLghhWB_KYj1A@mail.gmail.com>
+Subject: Re: Bluez 5.3: Failed to connect to speaker (Unable to select SEP)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Om Huang <dendrobium0093@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Tue, Apr 02, 2013, Alvaro Silva wrote:
-> Handle runtime errors outside gatt_connect(), using GError to propagate
-> error messages to caller.
-> ---
->  attrib/gatttool.c    |    6 +++++-
->  attrib/gatttool.h    |    3 ++-
->  attrib/interactive.c |   10 +++++++---
->  attrib/utils.c       |   14 +++++++-------
->  4 files changed, 21 insertions(+), 12 deletions(-)
+On Tue, Apr 9, 2013 at 3:02 PM, Om Huang <dendrobium0093@gmail.com> wrote:
+> Hi,
+>
+> I'm trying to use bluez-5.3 to connect to a Bluetooth speaker. My
+> computer is ubuntu-12.10 x86_64 with Linux 3.5.0. The bluez source was
+> downloaded from http://www.bluez.org/release-of-bluez-5-3/
 
-The first three patches have been applied, but there are a few issues
-with this one:
+Then you need BlueZ 5 patches to PulseAudio to make it work, there is
+a experimental tree here (if you are brave enough to try):
 
-> --- a/attrib/gatttool.c
-> +++ b/attrib/gatttool.c
-> @@ -576,6 +576,7 @@ int main(int argc, char *argv[])
->  	if (g_option_context_parse(context, &argc, &argv, &gerr) == FALSE) {
->  		g_printerr("%s\n", gerr->message);
->  		g_error_free(gerr);
-> +		gerr = NULL;
+github.com/mastiz/pulseaudio-bluez5.git
 
-g_error_free + gerr = NULL is the same as g_clear_error(&gerr). Please
-use that instead.
+> I have read the previous thread "Bluez 5.2 A2DP: Unable to select SEP"
+> and thus enable source, sink and control in profiles/audio/manager.c.
+> I also enable gateway, socket and source in /etc/bluetooth/audio.conf.
+> I disable systemd in configure. And then make and make install.
+> Unfortunately, I still got an error "Unable to select SEP" when I try
+> to connect to my speaker. Any suggestion or idea? Thanks for any help.
 
->  	chan = gatt_connect(opt_src, opt_dst, opt_dst_type, opt_sec_level,
-> -					opt_psm, opt_mtu, connect_cb);
-> +					opt_psm, opt_mtu, connect_cb, &gerr);
->  	if (chan == NULL) {
-> +		g_printerr("%s\n", gerr->message);
-> +		g_error_free(gerr);
-> +		gerr = NULL;
+Socket is no longer supported and gateway support is now done via
+external profile (e.g. telephony stacks such as oFono).
 
-Same here.
-
-Johan
+--
+Luiz Augusto von Dentz
