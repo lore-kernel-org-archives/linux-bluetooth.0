@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/8] lib: Add attributes MASInstanceID and SupportedMessageTypes
-Date: Tue,  9 Apr 2013 13:54:05 +0200
-Message-Id: <1365508448-13171-6-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH 8/8] obexd: Force service lookup when instantiating MAP session
+Date: Tue,  9 Apr 2013 13:54:08 +0200
+Message-Id: <1365508448-13171-9-git-send-email-christian.fetzer@oss.bmw-carit.de>
 In-Reply-To: <1365508448-13171-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 References: <1365508448-13171-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,23 +11,28 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
----
- lib/sdp.h | 2 ++
- 1 file changed, 2 insertions(+)
+In order to correctly receive event reports, the MAP driver needs to read
+the MASinstanceID of the MAS server it is connected to. Since that
+information is only available in the SDP record, a MAP session needs to
+force the service lookup when connecting.
 
-diff --git a/lib/sdp.h b/lib/sdp.h
-index baae15f..4ef2176 100644
---- a/lib/sdp.h
-+++ b/lib/sdp.h
-@@ -294,6 +294,8 @@ extern "C" {
- #define SDP_ATTR_SUPPORTED_FUNCTIONS		0x0312
- #define SDP_ATTR_TOTAL_IMAGING_DATA_CAPACITY	0x0313
- #define SDP_ATTR_SUPPORTED_REPOSITORIES		0x0314
-+#define SDP_ATTR_MAS_INSTANCE_ID		0x0315
-+#define SDP_ATTR_SUPPORTED_MESSAGE_TYPES	0x0316
- 
- #define SDP_ATTR_SPECIFICATION_ID		0x0200
- #define SDP_ATTR_VENDOR_ID			0x0201
+The MASinstanceID is needed to correctly retrieve event reports.
+---
+ obexd/client/map.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index b39eaa5..7a02583 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -1804,6 +1804,7 @@ static struct obc_driver map = {
+ 	.uuid = MAS_UUID,
+ 	.target = OBEX_MAS_UUID,
+ 	.target_len = OBEX_MAS_UUID_LEN,
++	.force_service_lookup = TRUE,
+ 	.probe = map_probe,
+ 	.remove = map_remove
+ };
 -- 
 1.8.2.1
 
