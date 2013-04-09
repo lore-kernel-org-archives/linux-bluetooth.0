@@ -1,55 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 9 Apr 2013 07:28:24 -0400
-From: Theodore Ts'o <tytso@mit.edu>
-To: Adrian Chadd <adrian@freebsd.org>
-Cc: Christian Lamparter <chunkeey@googlemail.com>,
-	Eugene Krasnikov <k.eugene.e@gmail.com>,
-	Kalle Valo <kvalo@adurom.com>,
-	"Luis R. Rodriguez" <mcgrof@do-not-panic.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	linux-wireless <linux-wireless@vger.kernel.org>,
-	ath9k_htc_fw <ath9k_htc_fw@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: Version number policy!
-Message-ID: <20130409112824.GA12050@thunk.org>
-References: <CAJ-Vmo=LVSzdEo6DhfOVT_0JHCTMmdPU1zGfMuBmhmr8QuDmJQ@mail.gmail.com>
- <CAJ-VmomS_=1=QLZrfdD4vhu9Qy0w2JNQxEFrkt_OKjWetrWY4w@mail.gmail.com>
- <CAFSJ42b7DD9UVtzT7YWhaEchzwpde0yW=pS3nJVeMCHoVQGBqQ@mail.gmail.com>
- <201304090003.47056.chunkeey@googlemail.com>
- <CAJ-VmomksDSNvTpKQpNRRQx+QboSVHpby7V4qq4rngqVkTvf+A@mail.gmail.com>
- <20130409003720.GA5145@thunk.org>
- <CAJ-VmokQ=1FLnn-0Ew1JTY_WhYuSYmZq2=DuNTV0TR3kF4wo7g@mail.gmail.com>
+Message-ID: <5163D206.9070000@linux.intel.com>
+Date: Tue, 09 Apr 2013 10:32:06 +0200
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?=
+	<frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAJ-VmokQ=1FLnn-0Ew1JTY_WhYuSYmZq2=DuNTV0TR3kF4wo7g@mail.gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v4 2/6] Bluetooth: Add SCO socket voice_setting option
+References: <1363716255-21332-1-git-send-email-frederic.dalleau@linux.intel.com> <1363716255-21332-3-git-send-email-frederic.dalleau@linux.intel.com> <DE6F5576-C7C9-4EA9-B242-3489F0651FBC@holtmann.org> <5162BADF.7010608@linux.intel.com> <562DEF75-6DB8-4AA8-ACD5-40929964BC45@holtmann.org>
+In-Reply-To: <562DEF75-6DB8-4AA8-ACD5-40929964BC45@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Apr 08, 2013 at 06:51:10PM -0700, Adrian Chadd wrote:
-> 
-> But then you end up with people making filesystems which aren't
-> necessarily backwards compatible (and aren't aware of this), then try
-> to share with other extX implementations; or boot an older Linux
-> kernel (eg plugging an ext3 device on a newer box to an older box.)
-> Now, ext3 is a bit more mature nowdays so people aren't _always_
-> hitting this corner case.
+Hi Marcel,
 
-You have a long memory --- going back to about seven years ago, to
-2006....
+ >> #define SCO_SETTINGS  0x03
+>> struct sco_settings {
+>>         __u16           settings;
+>> };
+>
+> That is my current thinking. However we might start using SOL_BLUETOOTH and start using BT_VOICE or similar as a socket option. I do want to be able to retire SOL_SCO and SOL_L2CAP at some point.
 
-> I'm not knocking extX here; I'm just pointing out that exposing things
-> as a set of capability flags doesn't magically fix interoperability.
-> It just stops you from scribbling crap where it shouldn't be.
+I just forgot about this because I don't use it and this API satisfy my 
+needs, but it does not allow to distinguish between host side and 
+adapter side mSBC.
+Do you still care about this?
 
-Sure, the only question is how long do you support ancient file
-systems out there.  I consider that primarily a distribution question,
-not an upstream development question.  People who pay $$$ for ancient
-crud, expect that the people to whom they have paid $$$ will take care
-of that problem for them.  From an upstream development perspective,
-some people might argue that two years is plenty of time to wait for
-the vast majority of the people running community distributions to
-have upgraded (and if they want more than that, they can pay $$$ to
-the aforementioned enterprise distro's, or take care of that situation
-on their own).
+Thanks,
+Fred
 
-						- Ted
