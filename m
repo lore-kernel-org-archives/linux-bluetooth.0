@@ -1,45 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alex Deymo <deymo@chromium.org>
+From: Jefferson Delfes <jefferson.delfes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, Alex Deymo <deymo@chromium.org>
-Subject: [PATCH 0/6] Autopair plugin revisited
-Date: Wed, 10 Apr 2013 14:19:07 -0700
-Message-Id: <1365628753-16774-1-git-send-email-deymo@chromium.org>
+Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Subject: [PATCH BlueZ v2 11/16] attrib: Change g_attrib_is_encrypted return type from gboolean
+Date: Wed, 10 Apr 2013 15:16:56 -0400
+Message-Id: <1365621421-1422-12-git-send-email-jefferson.delfes@openbossa.org>
+In-Reply-To: <1365621421-1422-1-git-send-email-jefferson.delfes@openbossa.org>
+References: <1364485160-22720-1-git-send-email-jefferson.delfes@openbossa.org>
+ <1365621421-1422-1-git-send-email-jefferson.delfes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
-I went through this patch set again to fix some details. I may work in
-some improvements for it in the future but think this is already a good
-start.
+The function g_attrib_is_encrypted don't need to use gboolean as return
+type, it can be standard bool type.
+This change implies that gatt_channel->encrypted from
+src/attrib-server.c can be standard bool type too.
+---
+ attrib/gattrib.c    | 4 ++--
+ attrib/gattrib.h    | 2 +-
+ src/attrib-server.c | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-As I tested, remote initiated bondings don't have a bonding_req and don't
-go through these plugins anyway... but correct me if I'm missing something.
-
-Repeated attempts errors are handled failing the pairing with an
-AuthenticationCanceled error.
-
-Please take a look, thanks!
-Alex.
-
-Alex Deymo (6):
-  core: Convert the pincode callback to an interable list.
-  plugins: Extend the pin code callback with the call number
-  core: Add support for retrying a bonding
-  core: retry bonding attempt until the iterator reachs the end.
-  core: Add device_get_class to the public interface.
-  autopair: Add the autopair plugin.
-
- Makefile.plugins   |   3 ++
- plugins/autopair.c | 145 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- plugins/wiimote.c  |   7 ++-
- src/adapter.c      | 143 ++++++++++++++++++++++++++++++++++++++++++++--------
- src/adapter.h      |  10 +++-
- src/device.c       |  79 ++++++++++++++++++++++++++++-
- src/device.h       |   5 ++
- 7 files changed, 366 insertions(+), 26 deletions(-)
- create mode 100644 plugins/autopair.c
-
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+index 1689c72..521a714 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -700,14 +700,14 @@ static gint event_cmp_by_id(gconstpointer a, gconstpointer b)
+ 	return evt->id - id;
+ }
+ 
+-gboolean g_attrib_is_encrypted(GAttrib *attrib)
++bool g_attrib_is_encrypted(GAttrib *attrib)
+ {
+ 	BtIOSecLevel sec_level;
+ 
+ 	if (!bt_io_get(attrib->io, NULL,
+ 			BT_IO_OPT_SEC_LEVEL, &sec_level,
+ 			BT_IO_OPT_INVALID))
+-		return FALSE;
++		return false;
+ 
+ 	return sec_level > BT_IO_SEC_LOW;
+ }
+diff --git a/attrib/gattrib.h b/attrib/gattrib.h
+index 70c730f..03f4911 100644
+--- a/attrib/gattrib.h
++++ b/attrib/gattrib.h
+@@ -65,7 +65,7 @@ guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
+ 				GAttribNotifyFunc func, gpointer user_data,
+ 				GDestroyNotify notify);
+ 
+-gboolean g_attrib_is_encrypted(GAttrib *attrib);
++bool g_attrib_is_encrypted(GAttrib *attrib);
+ 
+ uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len);
+ bool g_attrib_set_mtu(GAttrib *attrib, int mtu);
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 99656e3..7976610 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -75,7 +75,7 @@ struct gatt_channel {
+ 	guint mtu;
+ 	gboolean le;
+ 	guint id;
+-	gboolean encrypted;
++	bool encrypted;
+ 	struct gatt_server *server;
+ 	guint cleanup_id;
+ 	struct btd_device *device;
 -- 
-1.8.1.3
+1.8.2
 
