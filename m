@@ -1,74 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Apr 2013 08:57:56 +0900
-From: Johan Hedberg <johan.hedberg@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
+Subject: Re: [RFC] Bluetooth: Add support for Intel Bluetooth device [8087:07dc]
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20130410220419.GA17338@x220>
+Date: Wed, 10 Apr 2013 15:09:55 -0700
 Cc: Tedd Ho-Jeong An <tedd.an@intel.com>,
 	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
 	don.fry@intel.com
-Subject: Re: [RFC] Bluetooth: Add support for Intel Bluetooth device
- [8087:07dc]
-Message-ID: <20130410235756.GA20270@x220>
-References: <1640417.GJq4DRhhap@tedd-ubuntu>
- <6C02E13F-AA1A-43B9-891F-8B42F9111DD8@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <6C02E13F-AA1A-43B9-891F-8B42F9111DD8@holtmann.org>
+Message-Id: <5C338FDA-422A-4600-8DCF-43065D3EB6EA@holtmann.org>
+References: <1640417.GJq4DRhhap@tedd-ubuntu> <6C02E13F-AA1A-43B9-891F-8B42F9111DD8@holtmann.org> <20130410220419.GA17338@x220>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On Wed, Apr 10, 2013, Marcel Holtmann wrote:
-> > +		/* Send command based on the evt */
-> > +		if (evt->evt == HCI_EV_CMD_COMPLETE) {
-> > +			/* Command Complete Event */
-> > +			skb = __hci_cmd_sync(hdev, cmd->opcode, cmd->plen,
-> > +					(void *)param,
-> > +					HCI_INIT_TIMEOUT);
-> > +			if (IS_ERR(skb)) {
-> > +				BT_ERR("__hci_cmd_sync(patch): %ld",
-> > +						PTR_ERR(skb));
-> > +				m_off_code = m_off_1;
-> > +				goto exit_mfg;
-> > +			}
-> > +
-> > +			/* Check the event status */
-> > +			if (skb->data[0]) {
-> > +				BT_ERR("%s patch failed(%02x)", hdev->name,
-> > +						skb->data[0]);
-> > +				m_off_code = m_off_1;
-> > +				kfree_skb(skb);
-> > +				goto exit_mfg;
-> > +			}
-> > +		} else {
-> > +			/* Non Command Complete Event */
-> > +			skb = __hci_cmd_sync_ev(hdev, cmd->opcode, cmd->plen,
-> > +					(void *)param, evt->evt,
-> > +					HCI_INIT_TIMEOUT);
-> > +			if (IS_ERR(skb)) {
-> > +				BT_ERR("__hci_cmd_sync_ev(patch): %ld",
-> > +						PTR_ERR(skb));
-> > +				m_off_code = m_off_1;
-> > +				goto exit_mfg;
-> > +			}
-> > +
-> > +			/* Checking the returned event */
-> > +			if (memcmp(skb->data, evt_param, evt->plen)) {
-> > +				BT_ERR("%s patch event doesn't match!!",
-> > +						hdev->name);
-> > +				m_off_code = m_off_1;
-> > +				kfree_skb(skb);
-> > +				goto exit_mfg;
-> > +			}
-> > +		}
+>>> +	const u8		*patch_curr;
+>>> +	char			pfile[32];
+>>> +	u8			*m_off_code;
+>>> +
+>>> +	u8 m_on[] = { 0x01, 0x00 };
+>>> +	u8 m_off_1[] = { 0x00, 0x01 };
+>>> +	u8 m_off_2[] = { 0x00, 0x02 };
+>> 
+>> Shouldn't this be __u8. Johan, any preference. I know that I used __u8
+>> for the bcm92035 vendor command.
 > 
-> Check if the __hci_cmd_sync_ev can just take HCI_EV_CMD_COMPLETE as
-> event and it would work the same.
+> To my understanding __u8 (and __u16 and __u32 too) are intended for code
+> that's to be shared with user space (e.g. our upcoming uapi header
+> file(s)). Anything else should just use u8. At least this is what I
+> discovered after some research when I get more heavily involved with
+> kernel development a few years ago.
 
-It should work but it does change the semantics of the function a bit.
-When a non-zero "special" event is given __hci_cmd_sync_ev() assumes no
-special knowledge of the contents of the event. This means that it
-does not strip off the cmd_complete header, where as a value 0 (or using
-__hci_cmd_sync) will strip off the cmd_complete header in the returned
-skb so that it can be directly cast to the structs we have in hci.h.
+then you might have to tweak my other patch a little to fix this for BCM92035 setup routine.
 
-Johan
+Regards
+
+Marcel
+
