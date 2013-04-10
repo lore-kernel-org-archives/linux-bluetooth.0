@@ -1,132 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Fry, Don" <don.fry@intel.com>
-To: "An, Tedd" <tedd.an@intel.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-CC: marcel <marcel@holtmann.org>,
-	"Hedberg, Johan" <johan.hedberg@intel.com>
-Subject: Re: [RFC] Bluetooth: Add support for Intel Bluetooth device
- [8087:07dc]
-Date: Wed, 10 Apr 2013 15:40:13 +0000
-Message-ID: <CD8AD196.1D35%don.fry@intel.com>
-In-Reply-To: <1640417.GJq4DRhhap@tedd-ubuntu>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Use separate function for BCM92035 vendor setup
+Date: Wed, 10 Apr 2013 08:11:35 -0700
+Message-Id: <1365606695-43841-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Just a couple comments inline.  I know outlook munges whitespaces, so I
-don't comment on those.
-Don
+Trying to squeeze every single vendor setup routine into the same function
+and have it assigned all the time is actually a bad idea. Especially since
+the core can handle the absence of a setup routine perfectly fine.
 
-On 4/9/13 7:44 PM, "An, Tedd" <tedd.an@intel.com> wrote:
+To make this a lot simpler for future additions of vendor setup code,
+split the BCM92035 setup into its own function and only assign it when
+this specific device has been detected.
 
->From: Tedd Ho-Jeong An <tedd.an@intel.com>
->
->This patch adds support for Intel Bluetooth device by adding
->btusb_setup_intel() routine that updates the device with ROM patch
->during HCI_SETUP.
+Doing it like this has the nice side benefit that we do not have to keep
+a copy of the driver_info around.
 
-<DF> snip
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/btusb.c | 52 ++++++++++++++++++++++-------------------------
+ 1 file changed, 24 insertions(+), 28 deletions(-)
 
->
->+	/* Get bseq file name */
->+	snprintf(pfile, 32, "intel/%02x%02x%02x%02x%02x%02x%02x%02x%02x.bseq",
->+				skb->data[1], skb->data[2], skb->data[3],
->+				skb->data[4], skb->data[5], skb->data[6],
->+				skb->data[7], skb->data[8], skb->data[9]);
-
-<DF> Is the length of the data always 9 bytes?  If less data is returned
-garbage will be used.
-
->+	kfree_skb(skb);
->+	BT_DBG("%s patch file: %s", hdev->name, pfile);
->+
->
-<DF> snip
->
->+		/* Send command based on the evt */
->+		if (evt->evt == HCI_EV_CMD_COMPLETE) {
->+			/* Command Complete Event */
->+			skb = __hci_cmd_sync(hdev, cmd->opcode, cmd->plen,
-
-<DF> use le16_to_cpu(cmd->opcode) for big endian systems
-
->+					(void *)param,
->+					HCI_INIT_TIMEOUT);
->+			if (IS_ERR(skb)) {
->+				BT_ERR("__hci_cmd_sync(patch): %ld",
->+						PTR_ERR(skb));
->+				m_off_code = m_off_1;
->+				goto exit_mfg;
->+			}
->+
->+			/* Check the event status */
->+			if (skb->data[0]) {
->+				BT_ERR("%s patch failed(%02x)", hdev->name,
->+						skb->data[0]);
->+				m_off_code = m_off_1;
->+				kfree_skb(skb);
->+				goto exit_mfg;
->+			}
->+		} else {
->+			/* Non Command Complete Event */
->+			skb = __hci_cmd_sync_ev(hdev, cmd->opcode, cmd->plen,
-
-<DF> same as above le16_to_cpu()
-
->+					(void *)param, evt->evt,
->+					HCI_INIT_TIMEOUT);
->+			if (IS_ERR(skb)) {
->+				BT_ERR("__hci_cmd_sync_ev(patch): %ld",
->+						PTR_ERR(skb));
->+				m_off_code = m_off_1;
->+				goto exit_mfg;
->+			}
->+
-
-<DF> the length (skb->len) is not checked before this memcmp
-
->+			/* Checking the returned event */
->+			if (memcmp(skb->data, evt_param, evt->plen)) {
->+				BT_ERR("%s patch event doesn't match!!",
->+						hdev->name);
->+				m_off_code = m_off_1;
->+				kfree_skb(skb);
->+				goto exit_mfg;
->+			}
->+		}
-
-<DF> The two cases above can be combined and treated identically.
-Just call __hci_cmd_sync_ev with evt->evt and then both can verify the
-returned
-data is what was expected.
-
->+		BT_DBG("%s patch cmd succeeded %d of %d",
->+				hdev->name, patch_curr - fw->data, fw->size);
->+		kfree_skb(skb);
->
-<DF> snip
->
->+
-> static int btusb_setup(struct hci_dev *hdev)
-> {
-> 	struct btusb_data *data = hci_get_drvdata(hdev);
-> 
-> 	BT_DBG("%s", hdev->name);
-> 
->+	if (data->driver_info & BTUSB_INTEL) {
->+		return btusb_setup_intel(hdev);
-
-<DF> with Marcel's latest patch, setting hdev->setup in the probe routine
-removes this test
-
->+	}
->+
-> 	if (data->driver_info & BTUSB_BCM92035) {
-> 		struct sk_buff *skb;
-> 		__u8 val = 0x00;
->-- 
->1.7.9.5
->
->
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 35c967f..6c45dc5 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -246,7 +246,6 @@ struct btusb_data {
+ 	struct usb_endpoint_descriptor *isoc_rx_ep;
+ 
+ 	__u8 cmdreq_type;
+-	unsigned long driver_info;
+ 
+ 	unsigned int sco_num;
+ 	int isoc_altsetting;
+@@ -700,26 +699,6 @@ static int btusb_flush(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
+-static int btusb_setup(struct hci_dev *hdev)
+-{
+-	struct btusb_data *data = hci_get_drvdata(hdev);
+-
+-	BT_DBG("%s", hdev->name);
+-
+-	if (data->driver_info & BTUSB_BCM92035) {
+-		struct sk_buff *skb;
+-		__u8 val = 0x00;
+-
+-		skb = __hci_cmd_sync(hdev, 0xfc3b, 1, &val, HCI_INIT_TIMEOUT);
+-		if (IS_ERR(skb))
+-			BT_ERR("BCM92035 command failed (%ld)", -PTR_ERR(skb));
+-		else
+-			kfree_skb(skb);
+-	}
+-
+-	return 0;
+-}
+-
+ static int btusb_send_frame(struct sk_buff *skb)
+ {
+ 	struct hci_dev *hdev = (struct hci_dev *) skb->dev;
+@@ -948,6 +927,22 @@ static void btusb_waker(struct work_struct *work)
+ 	usb_autopm_put_interface(data->intf);
+ }
+ 
++static int btusb_setup_bcm92035(struct hci_dev *hdev)
++{
++	struct sk_buff *skb;
++	__u8 val = 0x00;
++
++	BT_DBG("%s", hdev->name);
++
++	skb = __hci_cmd_sync(hdev, 0xfc3b, 1, &val, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb))
++		BT_ERR("BCM92035 command failed (%ld)", -PTR_ERR(skb));
++	else
++		kfree_skb(skb);
++
++	return 0;
++}
++
+ static int btusb_probe(struct usb_interface *intf,
+ 				const struct usb_device_id *id)
+ {
+@@ -1017,7 +1012,6 @@ static int btusb_probe(struct usb_interface *intf,
+ 		return -ENODEV;
+ 
+ 	data->cmdreq_type = USB_TYPE_CLASS;
+-	data->driver_info = id->driver_info;
+ 
+ 	data->udev = interface_to_usbdev(intf);
+ 	data->intf = intf;
+@@ -1045,12 +1039,14 @@ static int btusb_probe(struct usb_interface *intf,
+ 
+ 	SET_HCIDEV_DEV(hdev, &intf->dev);
+ 
+-	hdev->open     = btusb_open;
+-	hdev->close    = btusb_close;
+-	hdev->flush    = btusb_flush;
+-	hdev->setup    = btusb_setup;
+-	hdev->send     = btusb_send_frame;
+-	hdev->notify   = btusb_notify;
++	hdev->open   = btusb_open;
++	hdev->close  = btusb_close;
++	hdev->flush  = btusb_flush;
++	hdev->send   = btusb_send_frame;
++	hdev->notify = btusb_notify;
++
++	if (id->driver_info & BTUSB_BCM92035)
++		hdev->setup = btusb_setup_bcm92035;
+ 
+ 	/* Interface numbers are hardcoded in the specification */
+ 	data->isoc = usb_ifnum_to_if(data->udev, 1);
+-- 
+1.8.1.4
 
