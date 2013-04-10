@@ -2,60 +2,50 @@ Return-Path: <cyrus@holtmann.org>
 From: Jefferson Delfes <jefferson.delfes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [PATCH BlueZ v2 05/16] attrib: Change match_event return type from gboolean
-Date: Wed, 10 Apr 2013 15:16:50 -0400
-Message-Id: <1365621421-1422-6-git-send-email-jefferson.delfes@openbossa.org>
+Subject: [PATCH BlueZ v2 02/16] attrib: Change GAttrib->stale type from gboolean
+Date: Wed, 10 Apr 2013 15:16:47 -0400
+Message-Id: <1365621421-1422-3-git-send-email-jefferson.delfes@openbossa.org>
 In-Reply-To: <1365621421-1422-1-git-send-email-jefferson.delfes@openbossa.org>
 References: <1364485160-22720-1-git-send-email-jefferson.delfes@openbossa.org>
  <1365621421-1422-1-git-send-email-jefferson.delfes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is no reason to use gboolean as return type of match_event.
+There is no reason to GAttrib->stale be gboolean.
 ---
- attrib/gattrib.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ attrib/gattrib.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 9fda74f..636e09d 100644
+index 416d17b..f6881af 100644
 --- a/attrib/gattrib.c
 +++ b/attrib/gattrib.c
-@@ -365,28 +365,28 @@ static void wake_up_sender(struct _GAttrib *attrib)
- 				can_write_data, attrib, destroy_sender);
- }
+@@ -27,6 +27,7 @@
+ #endif
  
--static gboolean match_event(struct event *evt, const uint8_t *pdu, gsize len)
-+static bool match_event(struct event *evt, const uint8_t *pdu, gsize len)
- {
- 	guint16 handle;
+ #include <stdint.h>
++#include <stdbool.h>
+ #include <string.h>
+ #include <glib.h>
  
- 	if (evt->expected == GATTRIB_ALL_EVENTS)
--		return TRUE;
-+		return true;
+@@ -56,7 +57,7 @@ struct _GAttrib {
+ 	guint next_cmd_id;
+ 	GDestroyNotify destroy;
+ 	gpointer destroy_user_data;
+-	gboolean stale;
++	bool stale;
+ };
  
- 	if (!is_response(pdu[0]) && evt->expected == GATTRIB_ALL_REQS)
--		return TRUE;
-+		return true;
+ struct command {
+@@ -279,7 +280,7 @@ static gboolean disconnect_timeout(gpointer data)
+ 	}
  
- 	if (evt->expected == pdu[0] && evt->handle == GATTRIB_ALL_HANDLES)
--		return TRUE;
-+		return true;
+ done:
+-	attrib->stale = TRUE;
++	attrib->stale = true;
  
- 	if (len < 3)
--		return FALSE;
-+		return false;
+ 	g_attrib_unref(attrib);
  
- 	handle = att_get_u16(&pdu[1]);
- 
- 	if (evt->expected == pdu[0] && evt->handle == handle)
--		return TRUE;
-+		return true;
- 
--	return FALSE;
-+	return false;
- }
- 
- static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
 -- 
 1.8.2
 
