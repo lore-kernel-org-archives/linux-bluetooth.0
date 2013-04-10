@@ -1,119 +1,155 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Use separate function for BCM92035 vendor setup
-Date: Wed, 10 Apr 2013 08:11:35 -0700
-Message-Id: <1365606695-43841-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH BlueZ 2/2] obexd: Fix using the same prefix for client and server sessions
+Date: Wed, 10 Apr 2013 17:17:10 +0300
+Message-Id: <1365603430-29030-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1365603430-29030-1-git-send-email-luiz.dentz@gmail.com>
+References: <1365603430-29030-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Trying to squeeze every single vendor setup routine into the same function
-and have it assigned all the time is actually a bad idea. Especially since
-the core can handle the absence of a setup routine perfectly fine.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-To make this a lot simpler for future additions of vendor setup code,
-split the BCM92035 setup into its own function and only assign it when
-this specific device has been detected.
-
-Doing it like this has the nice side benefit that we do not have to keep
-a copy of the driver_info around.
-
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+This avoids using the same path for different sessions which fail since
+it cannot register a second time causing an unexpected error.
 ---
- drivers/bluetooth/btusb.c | 52 ++++++++++++++++++++++-------------------------
- 1 file changed, 24 insertions(+), 28 deletions(-)
+ doc/obex-api.txt       | 17 +++++++++--------
+ obexd/client/session.c |  2 +-
+ obexd/src/manager.c    |  9 ++++++---
+ 3 files changed, 16 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 35c967f..6c45dc5 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -246,7 +246,6 @@ struct btusb_data {
- 	struct usb_endpoint_descriptor *isoc_rx_ep;
+diff --git a/doc/obex-api.txt b/doc/obex-api.txt
+index 759c4d8..22449c4 100644
+--- a/doc/obex-api.txt
++++ b/doc/obex-api.txt
+@@ -44,7 +44,8 @@ Session hierarchy
  
- 	__u8 cmdreq_type;
--	unsigned long driver_info;
+ Service		org.bluez.obex
+ Interface	org.bluez.obex.Session1
+-Object path	/org/bluez/obex/session{0, 1, 2, ...}
++Object path	/org/bluez/obex/server/session{0, 1, 2, ...} or
++		/org/bluez/obex/client/session{0, 1, 2, ...}
  
- 	unsigned int sco_num;
- 	int isoc_altsetting;
-@@ -700,26 +699,6 @@ static int btusb_flush(struct hci_dev *hdev)
- 	return 0;
- }
+ Methods		string GetCapabilities()
  
--static int btusb_setup(struct hci_dev *hdev)
--{
--	struct btusb_data *data = hci_get_drvdata(hdev);
--
--	BT_DBG("%s", hdev->name);
--
--	if (data->driver_info & BTUSB_BCM92035) {
--		struct sk_buff *skb;
--		__u8 val = 0x00;
--
--		skb = __hci_cmd_sync(hdev, 0xfc3b, 1, &val, HCI_INIT_TIMEOUT);
--		if (IS_ERR(skb))
--			BT_ERR("BCM92035 command failed (%ld)", -PTR_ERR(skb));
--		else
--			kfree_skb(skb);
--	}
--
--	return 0;
--}
--
- static int btusb_send_frame(struct sk_buff *skb)
+@@ -79,7 +80,7 @@ Transfer hierarchy
+ 
+ Service		org.bluez.obex
+ Interface	org.bluez.obex.Transfer1
+-Object path	/org/bluez/obex/session{0, 1, 2, ...}/transfer{0, 1, 2, ...}
++Object path	[Session object path]/transfer{0, 1, 2, ...}
+ 
+ Methods		void Cancel()
+ 
+@@ -141,7 +142,7 @@ Object Push hierarchy
+ 
+ Service		org.bluez.obex
+ Interface	org.bluez.obex.ObjectPush1
+-Object path	/org/bluez/obex/session{0, 1, 2, ...}
++Object path	[Session object path]
+ 
+ Methods		object, dict SendFile(string sourcefile)
+ 
+@@ -201,7 +202,7 @@ File Transfer hierarchy
+ 
+ Service		org.bluez.obex
+ Interface	org.bluez.obex.FileTransfer
+-Object path	/org/bluez/obex/session{0, 1, 2, ...}
++Object path	[Session object path]
+ 
+ Methods		void ChangeFolder(string folder)
+ 
+@@ -298,7 +299,7 @@ Phonebook Access hierarchy
+ 
+ Service		org.bluez.obex
+ Interface	org.bluez.obex.PhonebookAccess1
+-Object path	/org/bluez/obex/session{0, 1, 2, ...}
++Object path	[Session object path]
+ 
+ Methods		void Select(string location, string phonebook)
+ 
+@@ -448,7 +449,7 @@ Synchronization hierarchy
+ 
+ Service		org.bluez.obex
+ Interface	org.bluez.obex.Synchronization1
+-Object path	/org/bluez/obex/session{0, 1, 2, ...}
++Object path	[Session object path]
+ 
+ Methods		void SetLocation(string location)
+ 
+@@ -503,7 +504,7 @@ Message Access hierarchy
+ 
+ Service		org.bluez.obex
+ Interface	org.bluez.obex.MessageAccess1
+-Object path	[variable prefix]/{session0,session1,...}
++Object path	[Session object path]
+ 
+ Methods		void SetFolder(string name)
+ 
+@@ -715,7 +716,7 @@ Message hierarchy
+ 
+ Service		org.bluez.obex
+ Interface	org.bluez.obex.Message1
+-Object path	[variable prefix]/{session0,session1,...}/{message0,...}
++Object path	[Session object path]/{message0,...}
+ 
+ Methods		object, dict Get(string targetfile, boolean attachment)
+ 
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index 2e8b113..7d16c26 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -47,7 +47,7 @@
+ 
+ #define SESSION_INTERFACE "org.bluez.obex.Session1"
+ #define ERROR_INTERFACE "org.bluez.obex.Error"
+-#define SESSION_BASEPATH "/org/bluez/obex"
++#define SESSION_BASEPATH "/org/bluez/obex/client"
+ 
+ #define OBEX_IO_ERROR obex_io_error_quark()
+ #define OBEX_IO_ERROR_FIRST (0xff + 1)
+diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+index c0887ca..b67567b 100644
+--- a/obexd/src/manager.c
++++ b/obexd/src/manager.c
+@@ -45,6 +45,7 @@
+ #include "service.h"
+ 
+ #define OBEX_BASE_PATH "/org/bluez/obex"
++#define SESSION_BASE_PATH OBEX_BASE_PATH "/server"
+ #define OBEX_MANAGER_INTERFACE OBEXD_SERVICE ".AgentManager1"
+ #define ERROR_INTERFACE OBEXD_SERVICE ".Error"
+ #define TRANSFER_INTERFACE OBEXD_SERVICE ".Transfer1"
+@@ -354,7 +355,7 @@ static gboolean transfer_get_session(const GDBusPropertyTable *property,
+ 	if (session == NULL)
+ 		return FALSE;
+ 
+-	path = g_strdup_printf("%s/session%u", OBEX_BASE_PATH, session->id);
++	path = g_strdup_printf("%s/session%u", SESSION_BASE_PATH, session->id);
+ 
+ 	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
+ 
+@@ -614,7 +615,7 @@ struct obex_transfer *manager_register_transfer(struct obex_session *os)
+ 
+ 	transfer = g_new0(struct obex_transfer, 1);
+ 	transfer->path = g_strdup_printf("%s/session%u/transfer%u",
+-					OBEX_BASE_PATH, os->id, id++);
++					SESSION_BASE_PATH, os->id, id++);
+ 	transfer->session = os;
+ 
+ 	if (!g_dbus_register_interface(connection, transfer->path,
+@@ -800,7 +801,9 @@ static const GDBusMethodTable session_methods[] = {
+ 
+ void manager_register_session(struct obex_session *os)
  {
- 	struct hci_dev *hdev = (struct hci_dev *) skb->dev;
-@@ -948,6 +927,22 @@ static void btusb_waker(struct work_struct *work)
- 	usb_autopm_put_interface(data->intf);
- }
- 
-+static int btusb_setup_bcm92035(struct hci_dev *hdev)
-+{
-+	struct sk_buff *skb;
-+	__u8 val = 0x00;
+-	char *path = g_strdup_printf("%s/session%u", OBEX_BASE_PATH, os->id);
++	char *path;
 +
-+	BT_DBG("%s", hdev->name);
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc3b, 1, &val, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb))
-+		BT_ERR("BCM92035 command failed (%ld)", -PTR_ERR(skb));
-+	else
-+		kfree_skb(skb);
-+
-+	return 0;
-+}
-+
- static int btusb_probe(struct usb_interface *intf,
- 				const struct usb_device_id *id)
- {
-@@ -1017,7 +1012,6 @@ static int btusb_probe(struct usb_interface *intf,
- 		return -ENODEV;
++	path = g_strdup_printf("%s/session%u", SESSION_BASE_PATH, os->id);
  
- 	data->cmdreq_type = USB_TYPE_CLASS;
--	data->driver_info = id->driver_info;
- 
- 	data->udev = interface_to_usbdev(intf);
- 	data->intf = intf;
-@@ -1045,12 +1039,14 @@ static int btusb_probe(struct usb_interface *intf,
- 
- 	SET_HCIDEV_DEV(hdev, &intf->dev);
- 
--	hdev->open     = btusb_open;
--	hdev->close    = btusb_close;
--	hdev->flush    = btusb_flush;
--	hdev->setup    = btusb_setup;
--	hdev->send     = btusb_send_frame;
--	hdev->notify   = btusb_notify;
-+	hdev->open   = btusb_open;
-+	hdev->close  = btusb_close;
-+	hdev->flush  = btusb_flush;
-+	hdev->send   = btusb_send_frame;
-+	hdev->notify = btusb_notify;
-+
-+	if (id->driver_info & BTUSB_BCM92035)
-+		hdev->setup = btusb_setup_bcm92035;
- 
- 	/* Interface numbers are hardcoded in the specification */
- 	data->isoc = usb_ifnum_to_if(data->udev, 1);
+ 	if (!g_dbus_register_interface(connection, path,
+ 				SESSION_INTERFACE,
 -- 
 1.8.1.4
 
