@@ -1,38 +1,189 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Apr 2013 07:04:19 +0900
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Tedd Ho-Jeong An <tedd.an@intel.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	don.fry@intel.com
-Subject: Re: [RFC] Bluetooth: Add support for Intel Bluetooth device
- [8087:07dc]
-Message-ID: <20130410220419.GA17338@x220>
-References: <1640417.GJq4DRhhap@tedd-ubuntu>
- <6C02E13F-AA1A-43B9-891F-8B42F9111DD8@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <6C02E13F-AA1A-43B9-891F-8B42F9111DD8@holtmann.org>
+From: Alex Deymo <deymo@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	Alex Deymo <deymo@chromium.org>
+Subject: [PATCH 6/6] autopair: Add the autopair plugin.
+Date: Wed, 10 Apr 2013 14:19:13 -0700
+Message-Id: <1365628753-16774-7-git-send-email-deymo@chromium.org>
+In-Reply-To: <1365628753-16774-1-git-send-email-deymo@chromium.org>
+References: <1365628753-16774-1-git-send-email-deymo@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+The autopair plugin tries standard pincodes for different devices with dumb
+pincodes. It also generates a random 6 digit pincode for keyboards that
+support any pincode but fallbacks to the agent call in case the random
+generated pincode didn't work.
+---
+ Makefile.plugins   |   3 ++
+ plugins/autopair.c | 145 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 148 insertions(+)
+ create mode 100644 plugins/autopair.c
 
-On Wed, Apr 10, 2013, Marcel Holtmann wrote:
-> > +	const u8		*patch_curr;
-> > +	char			pfile[32];
-> > +	u8			*m_off_code;
-> > +
-> > +	u8 m_on[] = { 0x01, 0x00 };
-> > +	u8 m_off_1[] = { 0x00, 0x01 };
-> > +	u8 m_off_2[] = { 0x00, 0x02 };
-> 
-> Shouldn't this be __u8. Johan, any preference. I know that I used __u8
-> for the bcm92035 vendor command.
-
-To my understanding __u8 (and __u16 and __u32 too) are intended for code
-that's to be shared with user space (e.g. our upcoming uapi header
-file(s)). Anything else should just use u8. At least this is what I
-discovered after some research when I get more heavily involved with
-kernel development a few years ago.
-
-Johan
+diff --git a/Makefile.plugins b/Makefile.plugins
+index f497782..651a970 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -5,6 +5,9 @@ builtin_sources += plugins/hostname.c
+ builtin_modules += wiimote
+ builtin_sources += plugins/wiimote.c
+ 
++builtin_modules += autopair
++builtin_sources += plugins/autopair.c
++
+ if MAINTAINER_MODE
+ builtin_modules += gatt_example
+ builtin_sources += plugins/gatt-example.c
+diff --git a/plugins/autopair.c b/plugins/autopair.c
+new file mode 100644
+index 0000000..40b8f8b
+--- /dev/null
++++ b/plugins/autopair.c
+@@ -0,0 +1,145 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012-2013 Google Inc.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdbool.h>
++#include <stdlib.h>
++
++#include <bluetooth/bluetooth.h>
++#include <glib.h>
++
++#include "plugin.h"
++#include "adapter.h"
++#include "device.h"
++#include "log.h"
++#include "storage.h"
++
++/*
++ * Plugin to handle automatic pairing of devices with reduced user
++ * interaction, including implementing the recommendation of the HID spec
++ * for keyboard devices.
++ *
++ * The plugin works by intercepting the PIN request for devices; if the
++ * device is a keyboard a random six-digit numeric PIN is generated and
++ * returned, flagged for displaying using DisplayPinCode.
++ *
++ */
++
++static ssize_t autopair_pincb(struct btd_adapter *adapter,
++					struct btd_device *device,
++					char *pinbuf, gboolean *display,
++					int count)
++{
++	char addr[18];
++	char pinstr[7];
++	uint32_t class;
++
++	ba2str(device_get_address(device), addr);
++
++	class = btd_device_get_class(device);
++
++	DBG("device %s 0x%x", addr, class);
++
++	/* This is a class-based pincode guesser. Ignore devices with an unknown
++	 * class. */
++	if (class == 0)
++		return 0;
++
++	switch ((class & 0x1f00) >> 8) {
++	case 0x04:		/* Audio/Video */
++		switch ((class & 0xfc) >> 2) {
++		case 0x01:		/* Wearable Headset Device */
++		case 0x02:		/* Hands-free Device */
++		case 0x06:		/* Headphones */
++		case 0x07:		/* Portable Audio */
++		case 0x0a:		/* HiFi Audio Device */
++			if (count == 0)
++				memcpy(pinbuf, "0000", 4);
++			else if (count == 1)
++				memcpy(pinbuf, "1234", 4);
++			else
++				return 0;
++			return 4;
++			break;
++		}
++		break;
++	case 0x05:		/* Peripheral */
++		switch ((class & 0xc0) >> 6) {
++		case 0x01:		/* Keyboard */
++		case 0x03:		/* Combo keyboard/pointing device */
++			if (count > 0)
++				return 0;
++			srand(time(NULL));
++			snprintf(pinstr, sizeof pinstr, "%06d",
++						rand() % 1000000);
++			*display = TRUE;
++			memcpy(pinbuf, pinstr, 6);
++			return 6;
++			break;
++		case 0x02: /* Pointing device */
++			if (count > 0)
++				return 0;
++			memcpy(pinbuf, "0000", 4);
++			return 4;
++			break;
++		}
++		break;
++	}
++
++	return 0;
++}
++
++
++static int autopair_probe(struct btd_adapter *adapter)
++{
++	btd_adapter_register_pin_cb(adapter, autopair_pincb);
++
++	return 0;
++}
++
++static void autopair_remove(struct btd_adapter *adapter)
++{
++	btd_adapter_unregister_pin_cb(adapter, autopair_pincb);
++}
++
++static struct btd_adapter_driver autopair_driver = {
++	.name = "autopair",
++	.probe = autopair_probe,
++	.remove = autopair_remove,
++};
++
++static int autopair_init(void)
++{
++	return btd_register_adapter_driver(&autopair_driver);
++}
++
++static void autopair_exit(void)
++{
++	btd_unregister_adapter_driver(&autopair_driver);
++}
++
++BLUETOOTH_PLUGIN_DEFINE(autopair, VERSION,
++		BLUETOOTH_PLUGIN_PRIORITY_DEFAULT, autopair_init, autopair_exit)
+-- 
+1.8.1.3
