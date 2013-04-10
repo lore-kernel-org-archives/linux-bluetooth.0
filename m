@@ -1,56 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 11 Apr 2013 08:57:56 +0900
+From: Johan Hedberg <johan.hedberg@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Tedd Ho-Jeong An <tedd.an@intel.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	don.fry@intel.com
+Subject: Re: [RFC] Bluetooth: Add support for Intel Bluetooth device
+ [8087:07dc]
+Message-ID: <20130410235756.GA20270@x220>
+References: <1640417.GJq4DRhhap@tedd-ubuntu>
+ <6C02E13F-AA1A-43B9-891F-8B42F9111DD8@holtmann.org>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
-Subject: Re: [PATCH 1/6] core: Convert the pincode callback to an interable list.
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1365628753-16774-2-git-send-email-deymo@chromium.org>
-Date: Wed, 10 Apr 2013 22:05:01 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <DFCDACC7-ECDB-45E1-BDD0-68794E29D51D@holtmann.org>
-References: <1365628753-16774-1-git-send-email-deymo@chromium.org> <1365628753-16774-2-git-send-email-deymo@chromium.org>
-To: Alex Deymo <deymo@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <6C02E13F-AA1A-43B9-891F-8B42F9111DD8@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Marcel,
 
-> The current pincode callback list on the adapter keeps track of all the
-> pincode callbacks registered by a plugin for that adapter and calls each
-> one until one provides a pincode for the current bonding. This mechanism
-> forgets about what happened with previous bonding attempts and pushes the
-> status track to the plugin side.
+On Wed, Apr 10, 2013, Marcel Holtmann wrote:
+> > +		/* Send command based on the evt */
+> > +		if (evt->evt == HCI_EV_CMD_COMPLETE) {
+> > +			/* Command Complete Event */
+> > +			skb = __hci_cmd_sync(hdev, cmd->opcode, cmd->plen,
+> > +					(void *)param,
+> > +					HCI_INIT_TIMEOUT);
+> > +			if (IS_ERR(skb)) {
+> > +				BT_ERR("__hci_cmd_sync(patch): %ld",
+> > +						PTR_ERR(skb));
+> > +				m_off_code = m_off_1;
+> > +				goto exit_mfg;
+> > +			}
+> > +
+> > +			/* Check the event status */
+> > +			if (skb->data[0]) {
+> > +				BT_ERR("%s patch failed(%02x)", hdev->name,
+> > +						skb->data[0]);
+> > +				m_off_code = m_off_1;
+> > +				kfree_skb(skb);
+> > +				goto exit_mfg;
+> > +			}
+> > +		} else {
+> > +			/* Non Command Complete Event */
+> > +			skb = __hci_cmd_sync_ev(hdev, cmd->opcode, cmd->plen,
+> > +					(void *)param, evt->evt,
+> > +					HCI_INIT_TIMEOUT);
+> > +			if (IS_ERR(skb)) {
+> > +				BT_ERR("__hci_cmd_sync_ev(patch): %ld",
+> > +						PTR_ERR(skb));
+> > +				m_off_code = m_off_1;
+> > +				goto exit_mfg;
+> > +			}
+> > +
+> > +			/* Checking the returned event */
+> > +			if (memcmp(skb->data, evt_param, evt->plen)) {
+> > +				BT_ERR("%s patch event doesn't match!!",
+> > +						hdev->name);
+> > +				m_off_code = m_off_1;
+> > +				kfree_skb(skb);
+> > +				goto exit_mfg;
+> > +			}
+> > +		}
 > 
-> This patch creates an iterator struct (struct pincb_iter) that keeps track
-> of the last function called and the number of times called. This will
-> allow to provide more information about the bonding status to the pincode
-> callback.
-> ---
-> src/adapter.c | 51 +++++++++++++++++++++++++++++++++++++++++++--------
-> src/adapter.h |  4 ++++
-> src/device.c  | 13 +++++++++++++
-> src/device.h  |  1 +
-> 4 files changed, 61 insertions(+), 8 deletions(-)
-> 
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 6255da6..957f829 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -121,6 +121,12 @@ struct service_auth {
-> 	struct agent *agent;		/* NULL for queued auths */
-> };
-> 
-> +struct pincb_iter {
-> +	GSList *it;			/* current callback function */
-> +	int count;			/* numer of times it() was called */
-> +	/* When the iterator reaches the end, it is NULL and count is -1 */
-> +};
-> +
+> Check if the __hci_cmd_sync_ev can just take HCI_EV_CMD_COMPLETE as
+> event and it would work the same.
 
-explain to me why this iter struct is needed. I am a little bit lost on the nested GSList in it.
+It should work but it does change the semantics of the function a bit.
+When a non-zero "special" event is given __hci_cmd_sync_ev() assumes no
+special knowledge of the contents of the event. This means that it
+does not strip off the cmd_complete header, where as a value 0 (or using
+__hci_cmd_sync) will strip off the cmd_complete header in the returned
+skb so that it can be directly cast to the structs we have in hci.h.
 
-I get the basic idea what this patch tries to achieve, but it looks a bit too complicated to me.
-
-Regards
-
-Marcel
-
+Johan
