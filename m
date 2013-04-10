@@ -2,65 +2,47 @@ Return-Path: <cyrus@holtmann.org>
 From: Jefferson Delfes <jefferson.delfes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [PATCH BlueZ v2 13/16] attrib: Change event->handle type from guint16
-Date: Wed, 10 Apr 2013 15:16:58 -0400
-Message-Id: <1365621421-1422-14-git-send-email-jefferson.delfes@openbossa.org>
-In-Reply-To: <1365621421-1422-1-git-send-email-jefferson.delfes@openbossa.org>
+Subject: [PATCH BlueZ v2 00/16] attrib: Replace GLib basic data types usage
+Date: Wed, 10 Apr 2013 15:16:45 -0400
+Message-Id: <1365621421-1422-1-git-send-email-jefferson.delfes@openbossa.org>
+In-Reply-To: <1364485160-22720-1-git-send-email-jefferson.delfes@openbossa.org>
 References: <1364485160-22720-1-git-send-email-jefferson.delfes@openbossa.org>
- <1365621421-1422-1-git-send-email-jefferson.delfes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Change type of event->handle for a standard type.
----
- attrib/gattrib.c | 6 +++---
- attrib/gattrib.h | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+There are some places that we don't need to use GLib date types. For instance
+local variables, fields that dont't go through GLib or return vars.
+That patch series do some atomic changes over attrib/gattrib for this purpose
 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 57acb09..0dd4a87 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -75,7 +75,7 @@ struct command {
- struct event {
- 	guint id;
- 	uint8_t expected;
--	guint16 handle;
-+	uint16_t handle;
- 	GAttribNotifyFunc func;
- 	gpointer user_data;
- 	GDestroyNotify notify;
-@@ -367,7 +367,7 @@ static void wake_up_sender(struct _GAttrib *attrib)
- 
- static bool match_event(struct event *evt, const uint8_t *pdu, gsize len)
- {
--	guint16 handle;
-+	uint16_t handle;
- 
- 	if (evt->expected == GATTRIB_ALL_EVENTS)
- 		return true;
-@@ -669,7 +669,7 @@ bool g_attrib_set_mtu(GAttrib *attrib, int mtu)
- 	return true;
- }
- 
--guint g_attrib_register(GAttrib *attrib, uint8_t opcode, guint16 handle,
-+guint g_attrib_register(GAttrib *attrib, uint8_t opcode, uint16_t handle,
- 				GAttribNotifyFunc func, gpointer user_data,
- 				GDestroyNotify notify)
- {
-diff --git a/attrib/gattrib.h b/attrib/gattrib.h
-index 2cf5b4d..9d98bfe 100644
---- a/attrib/gattrib.h
-+++ b/attrib/gattrib.h
-@@ -61,7 +61,7 @@ bool g_attrib_cancel_all(GAttrib *attrib);
- bool g_attrib_set_debug(GAttrib *attrib, GAttribDebugFunc func,
- 							gpointer user_data);
- 
--guint g_attrib_register(GAttrib *attrib, uint8_t opcode, guint16 handle,
-+guint g_attrib_register(GAttrib *attrib, uint8_t opcode, uint16_t handle,
- 				GAttribNotifyFunc func, gpointer user_data,
- 				GDestroyNotify notify);
- 
+v2: Updated with upstream.
+
+Jefferson Delfes (16):
+  attrib: Simplify boolean tests
+  attrib: Change GAttrib->stale type from gboolean
+  attrib: Change command->sent type from gboolean
+  attrib: Change is_response return type from gboolean
+  attrib: Change match_event return type from gboolean
+  attrib: Change g_attrib_set_destroy_function return type
+  attrib: Change g_attrib_cancel/_all return type
+  attrib: Change g_attrib_unregister/_all return type
+  attrib: Change g_attrib_set_debug return type from gboolean
+  attrib: Change g_attrib_set_mtu return type from gboolean
+  attrib: Change g_attrib_is_encrypted return type from gboolean
+  attrib: Change command->opcode type from guint8
+  attrib: Change event->handle type from guint16
+  attrib: Change command->id type from guint
+  attrib: Change event->id type from guint
+  attrib: Change command->pdu pointer type from guint8
+
+ attrib/gatt.c        |   1 +
+ attrib/gattrib.c     | 127 ++++++++++++++++++++++++++-------------------------
+ attrib/gattrib.h     |  28 ++++++------
+ attrib/gatttool.c    |   9 ++--
+ attrib/interactive.c |   1 +
+ attrib/utils.c       |   1 +
+ src/attrib-server.c  |   2 +-
+ 7 files changed, 87 insertions(+), 82 deletions(-)
+
 -- 
 1.8.2
 
