@@ -1,54 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+From: Jefferson Delfes <jefferson.delfes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH v1] Bluetooth: Fix SCO connection reference
-Date: Thu, 11 Apr 2013 13:53:34 -0300
-Message-Id: <1365699214-22201-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1365690946-28050-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1365690946-28050-1-git-send-email-claudio.takahasi@openbossa.org>
+Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Subject: [PATCH BlueZ 3/3] shared: Return real address of master dev in hciemu
+Date: Thu, 11 Apr 2013 11:24:44 -0400
+Message-Id: <1365693884-15423-4-git-send-email-jefferson.delfes@openbossa.org>
+In-Reply-To: <1365693884-15423-1-git-send-email-jefferson.delfes@openbossa.org>
+References: <1365693884-15423-1-git-send-email-jefferson.delfes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes decrementing SCO connection reference right after
-stablishing the SCO connection with defer setup enabled. The dump below
-shows a disconnection command with handle 0, the connection is still in
-BT_CONNECT2 state and there isn't a handle associated with it.
-
-< HCI Command: Accept Synchronous Connection (0x01|0x0029) plen 21
-  bdaddr 78:47:1D:B3:72:6C
-> HCI Event: Command Status (0x0f) plen 4
-  Accept Synchronous Connection (0x01|0x0029) status 0x00 ncmd 1
-< HCI Command: Disconnect (0x01|0x0006) plen 3
-  handle 0 reason 0x13
-  Reason: Remote User Terminated Connection
-> HCI Event: Command Status (0x0f) plen 4
-  Disconnect (0x01|0x0006) status 0x00 ncmd 1
-> HCI Event: Synchronous Connect Complete (0x2c) plen 17
-  status 0x00 handle 46 bdaddr 78:47:1D:B3:72:6C
-  type eSCO
-  Air mode: CVSD
-< SCO data: handle 46 flags 0x00 dlen 48
-
-Signed-off-by: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Exports master btdev address in hciemu.
 ---
- net/bluetooth/hci_event.c | 1 -
- 1 file changed, 1 deletion(-)
+ src/shared/hciemu.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 2cf28b1..f6ea3c7 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1860,7 +1860,6 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		} else {
- 			conn->state = BT_CONNECT2;
- 			hci_proto_connect_cfm(conn, 0);
--			hci_conn_drop(conn);
- 		}
- 	} else {
- 		/* Connection rejected */
+diff --git a/src/shared/hciemu.c b/src/shared/hciemu.c
+index 8cd6548..133f16f 100644
+--- a/src/shared/hciemu.c
++++ b/src/shared/hciemu.c
+@@ -25,6 +25,7 @@
+ #include <config.h>
+ #endif
+ 
++#include <stdio.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+ #include <stdlib.h>
+@@ -49,6 +50,7 @@ struct hciemu {
+ 	guint master_source;
+ 	guint client_source;
+ 	GList *post_command_hooks;
++	char bdaddr_str[18];
+ };
+ 
+ struct hciemu_command_hook {
+@@ -331,10 +333,15 @@ void hciemu_unref(struct hciemu *hciemu)
+ 
+ const char *hciemu_get_address(struct hciemu *hciemu)
+ {
+-	if (!hciemu)
++	const uint8_t *addr;
++
++	if (!hciemu || !hciemu->master_dev)
+ 		return NULL;
+ 
+-	return "00:FA:CE:1E:55:00";
++	addr = btdev_get_bdaddr(hciemu->master_dev);
++	sprintf(hciemu->bdaddr_str, "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
++			addr[5], addr[4], addr[3], addr[2], addr[1], addr[0]);
++	return hciemu->bdaddr_str;
+ }
+ 
+ bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
 -- 
-1.7.11.7
+1.8.2
 
