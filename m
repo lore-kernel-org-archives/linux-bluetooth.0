@@ -1,137 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
-Subject: Re: [PATCH 6/6] autopair: Add the autopair plugin.
+Subject: Re: [PATCH 2/6] plugins: Extend the pin code callback with the call number
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1365628753-16774-7-git-send-email-deymo@chromium.org>
-Date: Wed, 10 Apr 2013 22:11:27 -0700
+In-Reply-To: <1365628753-16774-3-git-send-email-deymo@chromium.org>
+Date: Wed, 10 Apr 2013 22:06:59 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <92759276-C5D5-437D-8FB0-4089DA14E749@holtmann.org>
-References: <1365628753-16774-1-git-send-email-deymo@chromium.org> <1365628753-16774-7-git-send-email-deymo@chromium.org>
+Message-Id: <D1661A8A-7A16-4B53-98B3-03D256B76766@holtmann.org>
+References: <1365628753-16774-1-git-send-email-deymo@chromium.org> <1365628753-16774-3-git-send-email-deymo@chromium.org>
 To: Alex Deymo <deymo@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Alex,
 
-> The autopair plugin tries standard pincodes for different devices with dumb
-> pincodes. It also generates a random 6 digit pincode for keyboards that
-> support any pincode but fallbacks to the agent call in case the random
-> generated pincode didn't work.
+> The plugin's pin code callback doesn't know about the pairing process. It
+> just provides a pin code based on the information provided to this function.
+> Although limited state could be added through other new callbacks, this fix
+> achieves this by providing more information to the callback itself. The
+> new argument "count" states the pin callback attempt of the particular
+> plugin for the current pairing of the device. This allows a plugin to try
+> different pincodes for the same device in the same pairing process.
+> 
+> To signal that the plugin doesn't provide any pin code for the provided device
+> the current implementation returns 0 (an empty pin code). Analogously, with
+> this fix, a plugin should return 0 when it doesn't have any other pin code to
+> provide for the given device.
 > ---
-> Makefile.plugins   |   3 ++
-> plugins/autopair.c | 145 +++++++++++++++++++++++++++++++++++++++++++++++++++++
-> 2 files changed, 148 insertions(+)
-> create mode 100644 plugins/autopair.c
+> plugins/wiimote.c | 7 ++++++-
+> src/adapter.c     | 2 +-
+> src/adapter.h     | 3 ++-
+> 3 files changed, 9 insertions(+), 3 deletions(-)
 > 
-> diff --git a/Makefile.plugins b/Makefile.plugins
-> index f497782..651a970 100644
-> --- a/Makefile.plugins
-> +++ b/Makefile.plugins
-> @@ -5,6 +5,9 @@ builtin_sources += plugins/hostname.c
-> builtin_modules += wiimote
-> builtin_sources += plugins/wiimote.c
+> diff --git a/plugins/wiimote.c b/plugins/wiimote.c
+> index 90d6d7b..c8d024f 100644
+> --- a/plugins/wiimote.c
+> +++ b/plugins/wiimote.c
+> @@ -70,12 +70,17 @@ static const char *wii_names[] = {
+> };
 > 
-> +builtin_modules += autopair
-> +builtin_sources += plugins/autopair.c
-> +
-> if MAINTAINER_MODE
-> builtin_modules += gatt_example
-> builtin_sources += plugins/gatt-example.c
-> diff --git a/plugins/autopair.c b/plugins/autopair.c
-> new file mode 100644
-> index 0000000..40b8f8b
-> --- /dev/null
-> +++ b/plugins/autopair.c
-> @@ -0,0 +1,145 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2012-2013 Google Inc.
-> + *
-> + *
-> + *  This program is free software; you can redistribute it and/or modify
-> + *  it under the terms of the GNU General Public License as published by
-> + *  the Free Software Foundation; either version 2 of the License, or
-> + *  (at your option) any later version.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU General Public License
-> + *  along with this program; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> + *
-> + */
-> +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
-> +
-> +#include <stdbool.h>
-> +#include <stdlib.h>
-> +
-> +#include <bluetooth/bluetooth.h>
-> +#include <glib.h>
-> +
-> +#include "plugin.h"
-> +#include "adapter.h"
-> +#include "device.h"
-> +#include "log.h"
-> +#include "storage.h"
-> +
-> +/*
-> + * Plugin to handle automatic pairing of devices with reduced user
-> + * interaction, including implementing the recommendation of the HID spec
-> + * for keyboard devices.
-> + *
-> + * The plugin works by intercepting the PIN request for devices; if the
-> + * device is a keyboard a random six-digit numeric PIN is generated and
-> + * returned, flagged for displaying using DisplayPinCode.
-> + *
-> + */
-> +
-> +static ssize_t autopair_pincb(struct btd_adapter *adapter,
-> +					struct btd_device *device,
-> +					char *pinbuf, gboolean *display,
-> +					int count)
-> +{
-> +	char addr[18];
-> +	char pinstr[7];
-> +	uint32_t class;
-> +
-> +	ba2str(device_get_address(device), addr);
-> +
-> +	class = btd_device_get_class(device);
-> +
-> +	DBG("device %s 0x%x", addr, class);
-> +
-> +	/* This is a class-based pincode guesser. Ignore devices with an unknown
-> +	 * class. */
-> +	if (class == 0)
+> static ssize_t wii_pincb(struct btd_adapter *adapter, struct btd_device *device,
+> -						char *pinbuf, gboolean *display)
+> +				char *pinbuf, gboolean *display, int count)
+> {
+> 	uint16_t vendor, product;
+> 	char addr[18], name[25];
+> 	unsigned int i;
+> 
+> +	/* Only try the pin code once per device. If it's not correct then it's
+> +	 * an unknown device. */
+> +	if (count > 0)
 > +		return 0;
 > +
-> +	switch ((class & 0x1f00) >> 8) {
-> +	case 0x04:		/* Audio/Video */
-> +		switch ((class & 0xfc) >> 2) {
-> +		case 0x01:		/* Wearable Headset Device */
-> +		case 0x02:		/* Hands-free Device */
-> +		case 0x06:		/* Headphones */
-> +		case 0x07:		/* Portable Audio */
-> +		case 0x0a:		/* HiFi Audio Device */
-> +			if (count == 0)
-> +				memcpy(pinbuf, "0000", 4);
-> +			else if (count == 1)
-> +				memcpy(pinbuf, "1234", 4);
-> +			else
-> +				return 0;
+> 	ba2str(device_get_address(device), addr);
+> 
+> 	vendor = btd_device_get_vendor(device);
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 957f829..f2193cf 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -4802,7 +4802,7 @@ static ssize_t pincb_iter_next(struct pincb_iter *iter,
+> 
+> 	while (iter->it != NULL) {
+> 		cb = iter->it->data;
+> -		ret = cb(adapter, device, pin_buf, display);
+> +		ret = cb(adapter, device, pin_buf, display, iter->count);
+> 		iter->count++;
+> 		if (ret > 0)
+> 			return ret;
+> diff --git a/src/adapter.h b/src/adapter.h
+> index d158334..692963f 100644
+> --- a/src/adapter.h
+> +++ b/src/adapter.h
+> @@ -132,7 +132,8 @@ int btd_cancel_authorization(guint id);
+> int btd_adapter_restore_powered(struct btd_adapter *adapter);
+> 
+> typedef ssize_t (*btd_adapter_pin_cb_t) (struct btd_adapter *adapter,
+> -			struct btd_device *dev, char *out, gboolean *display);
+> +			struct btd_device *dev, char *out, gboolean *display,
+> +								int count);
 
-as mentioned earlier, I do not like the count naming. Here it makes it even worse.
+so I do not think that "count" is a really good name here. Wouldn't it be better to call it "attempt" or something like that?
 
-And what I would be doing is creating a string array { "0000", "1234" } that just can be walked and not this hardcoded if statement.
+And I prefer to make these things unsigned if we are not planning to have -1 handed to it.
 
 Regards
 
