@@ -1,49 +1,157 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 11 Apr 2013 16:35:52 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	Tedd Ho-Jeong An <tedd.an@intel.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	don.fry@intel.com
-Subject: Re: [RFC] Bluetooth: Add support for Intel Bluetooth device
- [8087:07dc]
-Message-ID: <20130411193552.GA28775@joana>
-References: <1640417.GJq4DRhhap@tedd-ubuntu>
- <6C02E13F-AA1A-43B9-891F-8B42F9111DD8@holtmann.org>
- <20130410220419.GA17338@x220>
- <5C338FDA-422A-4600-8DCF-43065D3EB6EA@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <5C338FDA-422A-4600-8DCF-43065D3EB6EA@holtmann.org>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 2/2] lib: Fix list of company identifiers
+Date: Thu, 11 Apr 2013 14:59:12 -0400
+Message-Id: <1365706752-4442-2-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1365706752-4442-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1365706752-4442-1-git-send-email-anderson.lizardo@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Fix minor typos on company names.
+---
+ lib/bluetooth.c |   34 +++++++++++++++++-----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
 
-* Marcel Holtmann <marcel@holtmann.org> [2013-04-10 15:09:55 -0700]:
+diff --git a/lib/bluetooth.c b/lib/bluetooth.c
+index cc40ac5..80849b9 100644
+--- a/lib/bluetooth.c
++++ b/lib/bluetooth.c
+@@ -290,13 +290,13 @@ const char *bt_compidtostr(int compid)
+ 	case 13:
+ 		return "Texas Instruments Inc.";
+ 	case 14:
+-		return "Ceva, Inc. (formerly Parthus Technologies Inc.)";
++		return "Ceva, Inc. (formerly Parthus Technologies, Inc.)";
+ 	case 15:
+ 		return "Broadcom Corporation";
+ 	case 16:
+ 		return "Mitel Semiconductor";
+ 	case 17:
+-		return "Widcomm, Inc.";
++		return "Widcomm, Inc";
+ 	case 18:
+ 		return "Zeevo, Inc.";
+ 	case 19:
+@@ -308,11 +308,11 @@ const char *bt_compidtostr(int compid)
+ 	case 22:
+ 		return "KC Technology Inc.";
+ 	case 23:
+-		return "Newlogic";
++		return "NewLogic";
+ 	case 24:
+ 		return "Transilica, Inc.";
+ 	case 25:
+-		return "Rohde & Schwartz GmbH & Co. KG";
++		return "Rohde & Schwarz GmbH & Co. KG";
+ 	case 26:
+ 		return "TTPCom Limited";
+ 	case 27:
+@@ -360,7 +360,7 @@ const char *bt_compidtostr(int compid)
+ 	case 48:
+ 		return "ST Microelectronics";
+ 	case 49:
+-		return "Synopsys";
++		return "Synopsis";
+ 	case 50:
+ 		return "Red-M (Communications) Ltd";
+ 	case 51:
+@@ -386,13 +386,13 @@ const char *bt_compidtostr(int compid)
+ 	case 61:
+ 		return "IPextreme, Inc.";
+ 	case 62:
+-		return "Systems and Chips, Inc";
++		return "Systems and Chips, Inc.";
+ 	case 63:
+-		return "Bluetooth SIG, Inc";
++		return "Bluetooth SIG, Inc.";
+ 	case 64:
+ 		return "Seiko Epson Corporation";
+ 	case 65:
+-		return "Integrated Silicon Solution Taiwain, Inc.";
++		return "Integrated Silicon Solution Taiwan, Inc.";
+ 	case 66:
+ 		return "CONWISE Technology Corporation Ltd";
+ 	case 67:
+@@ -422,7 +422,7 @@ const char *bt_compidtostr(int compid)
+ 	case 79:
+ 		return "APT Licensing Ltd.";
+ 	case 80:
+-		return "SiRF Technology, Inc.";
++		return "SiRF Technology";
+ 	case 81:
+ 		return "Tzero Technologies, Inc.";
+ 	case 82:
+@@ -512,7 +512,7 @@ const char *bt_compidtostr(int compid)
+ 	case 124:
+ 		return "A & R Cambridge";
+ 	case 125:
+-		return "Seers Technology Co. Ltd.";
++		return "Seers Technology Co. Ltd";
+ 	case 126:
+ 		return "Sports Tracking Technologies Ltd.";
+ 	case 127:
+@@ -530,7 +530,7 @@ const char *bt_compidtostr(int compid)
+ 	case 133:
+ 		return "BlueRadios, Inc.";
+ 	case 134:
+-		return "equinux AG";
++		return "equinox AG";
+ 	case 135:
+ 		return "Garmin International, Inc.";
+ 	case 136:
+@@ -540,7 +540,7 @@ const char *bt_compidtostr(int compid)
+ 	case 138:
+ 		return "Jawbone";
+ 	case 139:
+-		return "Topcon Positioning Systems, LLC";
++		return "Topcorn Positioning Systems, LLC";
+ 	case 140:
+ 		return "Qualcomm Labs, Inc.";
+ 	case 141:
+@@ -548,11 +548,11 @@ const char *bt_compidtostr(int compid)
+ 	case 142:
+ 		return "Quintic Corp.";
+ 	case 143:
+-		return "Stollmann E+V GmbH";
++		return "Stollman E+V GmbH";
+ 	case 144:
+ 		return "Funai Electric Co., Ltd.";
+ 	case 145:
+-		return "Advanced PANMOBIL systems GmbH & Co. KG";
++		return "Advanced PANMOBIL Systems GmbH & Co. KG";
+ 	case 146:
+ 		return "ThinkOptics, Inc.";
+ 	case 147:
+@@ -566,7 +566,7 @@ const char *bt_compidtostr(int compid)
+ 	case 151:
+ 		return "Bluetrek Technologies Limited";
+ 	case 152:
+-		return "zero1.tv GmbH";
++		return "zer01.tv GmbH";
+ 	case 153:
+ 		return "i.Tech Dynamic Global Distribution Ltd.";
+ 	case 154:
+@@ -600,7 +600,7 @@ const char *bt_compidtostr(int compid)
+ 	case 168:
+ 		return "ARP Devices Limited";
+ 	case 169:
+-		return "Magneti Marelli S.p.A.";
++		return "Magneti Marelli S.p.A";
+ 	case 170:
+ 		return "CAEN RFID srl";
+ 	case 171:
+@@ -638,7 +638,7 @@ const char *bt_compidtostr(int compid)
+ 	case 187:
+ 		return "S-Power Electronics Limited";
+ 	case 188:
+-		return "Ace Sensor Inc.";
++		return "Ace Sensor Inc";
+ 	case 189:
+ 		return "Aplix Corporation";
+ 	case 190:
+-- 
+1.7.9.5
 
-> Hi Johan,
-> 
-> >>> +	const u8		*patch_curr;
-> >>> +	char			pfile[32];
-> >>> +	u8			*m_off_code;
-> >>> +
-> >>> +	u8 m_on[] = { 0x01, 0x00 };
-> >>> +	u8 m_off_1[] = { 0x00, 0x01 };
-> >>> +	u8 m_off_2[] = { 0x00, 0x02 };
-> >> 
-> >> Shouldn't this be __u8. Johan, any preference. I know that I used __u8
-> >> for the bcm92035 vendor command.
-> > 
-> > To my understanding __u8 (and __u16 and __u32 too) are intended for code
-> > that's to be shared with user space (e.g. our upcoming uapi header
-> > file(s)). Anything else should just use u8. At least this is what I
-> > discovered after some research when I get more heavily involved with
-> > kernel development a few years ago.
-> 
-> then you might have to tweak my other patch a little to fix this for BCM92035 setup routine.
-
-I fixed up your patch on bluetooth-next. I didn't see this comment here before
-applying the patch.
-
-	Gustavo
