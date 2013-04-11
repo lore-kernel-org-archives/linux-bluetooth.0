@@ -1,24 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <D1661A8A-7A16-4B53-98B3-03D256B76766@holtmann.org>
-References: <1365628753-16774-1-git-send-email-deymo@chromium.org>
- <1365628753-16774-3-git-send-email-deymo@chromium.org> <D1661A8A-7A16-4B53-98B3-03D256B76766@holtmann.org>
-From: Alex Deymo <deymo@chromium.org>
-Date: Thu, 11 Apr 2013 10:00:53 -0700
-Message-ID: <CAGd9gwhXi0iiwOiN09FdEftk9rgOaMM9UP6g-fx8K0QNTVYjwQ@mail.gmail.com>
-Subject: Re: [PATCH 2/6] plugins: Extend the pin code callback with the call number
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH v1] Bluetooth: Remove unneeded parameter
+Date: Thu, 11 Apr 2013 13:55:50 -0300
+Message-Id: <1365699350-22314-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1365690946-28050-3-git-send-email-claudio.takahasi@openbossa.org>
+References: <1365690946-28050-3-git-send-email-claudio.takahasi@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Apr 10, 2013 at 10:06 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> so I do not think that "count" is a really good name here. Wouldn't it be better to call it "attempt" or something like that?
+This patch removes the status parameter of the l2cap_conn_add function.
+The parameter 'status' is always 0.
 
-No strong preference. "attempt" looks good.
+Signed-off-by: Claudio Takahasi <claudio.takahasi@openbossa.org>
+---
+ net/bluetooth/l2cap_core.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-> And I prefer to make these things unsigned if we are not planning to have -1 handed to it.
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 7cdb93c..e09b89b 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1502,12 +1502,12 @@ static void security_timeout(struct work_struct *work)
+ 	}
+ }
+ 
+-static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
++static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
+ {
+ 	struct l2cap_conn *conn = hcon->l2cap_data;
+ 	struct hci_chan *hchan;
+ 
+-	if (conn || status)
++	if (conn)
+ 		return conn;
+ 
+ 	hchan = hci_chan_create(hcon);
+@@ -1695,7 +1695,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 		goto done;
+ 	}
+ 
+-	conn = l2cap_conn_add(hcon, 0);
++	conn = l2cap_conn_add(hcon);
+ 	if (!conn) {
+ 		hci_conn_drop(hcon);
+ 		err = -ENOMEM;
+@@ -6313,7 +6313,7 @@ void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 	BT_DBG("hcon %p bdaddr %pMR status %d", hcon, &hcon->dst, status);
+ 
+ 	if (!status) {
+-		conn = l2cap_conn_add(hcon, status);
++		conn = l2cap_conn_add(hcon);
+ 		if (conn)
+ 			l2cap_conn_ready(conn);
+ 	} else {
+@@ -6482,7 +6482,7 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 		goto drop;
+ 
+ 	if (!conn)
+-		conn = l2cap_conn_add(hcon, 0);
++		conn = l2cap_conn_add(hcon);
+ 
+ 	if (!conn)
+ 		goto drop;
+-- 
+1.7.11.7
 
-Actually, I'm using a -1 internally in the struct pincb_iter to mark
-that the iterator reached the end (see pincb_iter_end()), but it is
-never passed to the plugin.
