@@ -1,69 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH v1] Bluetooth: Remove unneeded parameter
-Date: Thu, 11 Apr 2013 13:55:50 -0300
-Message-Id: <1365699350-22314-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1365690946-28050-3-git-send-email-claudio.takahasi@openbossa.org>
-References: <1365690946-28050-3-git-send-email-claudio.takahasi@openbossa.org>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Subject: [PATCH v1] Bluetooth: Add rejecting SCO
+Date: Thu, 11 Apr 2013 13:54:56 -0300
+Message-Id: <1365699296-22260-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1365690946-28050-2-git-send-email-claudio.takahasi@openbossa.org>
+References: <1365690946-28050-2-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes the status parameter of the l2cap_conn_add function.
-The parameter 'status' is always 0.
+This patch sends Reject Synchronous Connection Request Command when
+hci_conn_timeout is triggered, and the SCO connection is in BT_CONNECT2
+state. It prevents inconsistency if the remote host doesn't implement
+properly the timeout for the connection request, and it removes the
+connection reference left when the socket is closed for incoming SCO
+connections.
+
+[ 2650.129080] sco_sock_release: sock ffff8801ca417400, sk ffff88020c408800
+[ 2650.129092] sco_sock_clear_timer: sock ffff88020c408800 state 6
+[ 2650.129101] __sco_sock_close: sk ffff88020c408800 state 6 socket
+	ffff8801ca417400
+[ 2650.129108] sco_chan_del: sk ffff88020c408800, conn ffff8801c650ea20,
+	err 104
+[ 2650.129114] hci_conn_put: hcon ffff88020c40a800 orig refcnt 1
+[ 2650.129128] sco_sock_kill: sk ffff88020c408800 state 9
+[ 2650.129135] sco_sock_destruct: sk ffff88020c408800
+[ 2650.138468] hci_conn_timeout: hcon ffff88020c40a800 state BT_CONNECT2
 
 Signed-off-by: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 ---
- net/bluetooth/l2cap_core.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ net/bluetooth/hci_conn.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 7cdb93c..e09b89b 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1502,12 +1502,12 @@ static void security_timeout(struct work_struct *work)
- 	}
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 30d7dfc..b1a02ce 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -117,6 +117,16 @@ static void hci_acl_create_connection_cancel(struct hci_conn *conn)
+ 	hci_send_cmd(conn->hdev, HCI_OP_CREATE_CONN_CANCEL, sizeof(cp), &cp);
  }
  
--static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon, u8 status)
-+static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
++static void hci_reject_sco(struct hci_conn *conn)
++{
++	struct hci_cp_reject_sync_conn_req cp;
++
++	cp.reason = HCI_ERROR_REMOTE_USER_TERM;
++	bacpy(&cp.bdaddr, &conn->dst);
++
++	hci_send_cmd(conn->hdev, HCI_OP_REJECT_SYNC_CONN_REQ, sizeof(cp), &cp);
++}
++
+ void hci_disconnect(struct hci_conn *conn, __u8 reason)
  {
- 	struct l2cap_conn *conn = hcon->l2cap_data;
- 	struct hci_chan *hchan;
- 
--	if (conn || status)
-+	if (conn)
- 		return conn;
- 
- 	hchan = hci_chan_create(hcon);
-@@ -1695,7 +1695,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 		goto done;
- 	}
- 
--	conn = l2cap_conn_add(hcon, 0);
-+	conn = l2cap_conn_add(hcon);
- 	if (!conn) {
- 		hci_conn_drop(hcon);
- 		err = -ENOMEM;
-@@ -6313,7 +6313,7 @@ void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
- 	BT_DBG("hcon %p bdaddr %pMR status %d", hcon, &hcon->dst, status);
- 
- 	if (!status) {
--		conn = l2cap_conn_add(hcon, status);
-+		conn = l2cap_conn_add(hcon);
- 		if (conn)
- 			l2cap_conn_ready(conn);
- 	} else {
-@@ -6482,7 +6482,7 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 		goto drop;
- 
- 	if (!conn)
--		conn = l2cap_conn_add(hcon, 0);
-+		conn = l2cap_conn_add(hcon);
- 
- 	if (!conn)
- 		goto drop;
+ 	struct hci_cp_disconnect cp;
+@@ -276,6 +286,8 @@ static void hci_conn_timeout(struct work_struct *work)
+ 				hci_acl_create_connection_cancel(conn);
+ 			else if (conn->type == LE_LINK)
+ 				hci_le_create_connection_cancel(conn);
++		} else if (conn->type == SCO_LINK || conn->type == ESCO_LINK) {
++			hci_reject_sco(conn);
+ 		}
+ 		break;
+ 	case BT_CONFIG:
 -- 
 1.7.11.7
 
