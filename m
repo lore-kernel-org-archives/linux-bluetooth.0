@@ -1,71 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [PATCH] Bluetooth: Add rejecting SCO
-Date: Thu, 11 Apr 2013 11:35:43 -0300
-Message-Id: <1365690946-28050-2-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1365690946-28050-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1365690946-28050-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1365508448-13171-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1365508448-13171-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Date: Thu, 11 Apr 2013 12:23:00 +0300
+Message-ID: <CABBYNZLdgaL_vWX4h-bWE5nxU474WS4_KgOWyqeNCXBhCYOwog@mail.gmail.com>
+Subject: Re: [PATCH 0/8] MAP client: Read MASInstanceID for the current connection
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch sends Reject Synchronous Connection Request Command when
-hci_conn_timeout is triggered, and the SCO connection is in BT_CONNECT2
-state. It prevents inconsistency if the remote host doesn't implement
-properly the timeout for the connection request, and it removes the
-connection reference left when the socket is closed for incoming SCO
-connections.
+Hi Christian,
 
-[ 2650.129080] sco_sock_release: sock ffff8801ca417400, sk ffff88020c408800
-[ 2650.129092] sco_sock_clear_timer: sock ffff88020c408800 state 6
-[ 2650.129101] __sco_sock_close: sk ffff88020c408800 state 6 socket
-	ffff8801ca417400
-[ 2650.129108] sco_chan_del: sk ffff88020c408800, conn ffff8801c650ea20,
-	err 104
-[ 2650.129114] hci_conn_put: hcon ffff88020c40a800 orig refcnt 1
-[ 2650.129128] sco_sock_kill: sk ffff88020c408800 state 9
-[ 2650.129135] sco_sock_destruct: sk ffff88020c408800
-[ 2650.138468] hci_conn_timeout: hcon ffff88020c40a800 state BT_CONNECT2
+On Tue, Apr 9, 2013 at 2:54 PM, Christian Fetzer
+<christian.fetzer@oss.bmw-carit.de> wrote:
+> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+>
+> This patch set allows the MAP client profile implementation to read the
+> instance id of the MAS server it is connected to.
+>
+> This is a prerequisite for receiving event reports and distributing them to the
+> correct MAS client instance. The instance id is only available as SDP
+> attribute.
+>
+> Due to the current transport layer abstraction in obexd, the MAP client has no
+> direct access to SDP. Therefore I have extended obc_transport to allow concrete
+> transports (like Bluetooth) to specify a get_service_record function and made
+> it available through obc_session_get_service_record. This way, transports can
+> provide additional service information to the client implementations.
+>
+> The Bluetooth transport will now always do a SDP lookup (if the driver's
+> obc_driver->force_service_lookup is set) and cache the connection specific
+> service record to be accessed via get_service_record.
+>
+> I will send the dispatching of notifications itself in a third set.
+>
+> Christian Fetzer (8):
+>   obexd: Cache SDP record in bluetooth transport
+>   obexd: Add get_service_record to obc_transport
+>   obexd: Add get_bluetooth_service_record to Bluetooth transport
+>   obexd: Add obc_session_get_service_record to session
+>   lib: Add attributes MASInstanceID and SupportedMessageTypes
+>   obexd: Read SDP attributes when instantiating MAP session
+>   obexd: Add the possibility for drivers to force a service lookup
+>   obexd: Force service lookup when instantiating MAP session
+>
+>  lib/sdp.h                |  2 ++
+>  obexd/client/bluetooth.c | 51 +++++++++++++++++++++++++++++++++++++++++-------
+>  obexd/client/driver.h    |  1 +
+>  obexd/client/map.c       | 35 +++++++++++++++++++++++++++++++--
+>  obexd/client/session.c   | 14 +++++++++++--
+>  obexd/client/session.h   |  2 ++
+>  obexd/client/transport.h |  2 ++
+>  7 files changed, 96 insertions(+), 11 deletions(-)
+>
+> --
+> 1.8.2.1
 
-Signed-off-by: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
----
- net/bluetooth/hci_conn.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+Lets drop force_lookup for now, if the application is using the
+channel directly it should know which instance it is connected and
+should not attempt to connect another instance.
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b9f9016..aed48fe 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -117,6 +117,16 @@ static void hci_acl_create_connection_cancel(struct hci_conn *conn)
- 	hci_send_cmd(conn->hdev, HCI_OP_CREATE_CONN_CANCEL, sizeof(cp), &cp);
- }
- 
-+static void hci_reject_sco(struct hci_conn *conn)
-+{
-+	struct hci_cp_reject_sync_conn_req cp;
-+
-+	cp.reason = HCI_ERROR_REMOTE_USER_TERM;
-+	bacpy(&cp.bdaddr, &conn->dst);
-+
-+	hci_send_cmd(conn->hdev, HCI_OP_REJECT_SYNC_CONN_REQ, sizeof(cp), &cp);
-+}
-+
- void hci_disconnect(struct hci_conn *conn, __u8 reason)
- {
- 	struct hci_cp_disconnect cp;
-@@ -276,7 +286,8 @@ static void hci_conn_timeout(struct work_struct *work)
- 				hci_acl_create_connection_cancel(conn);
- 			else if (conn->type == LE_LINK)
- 				hci_le_create_connection_cancel(conn);
--		}
-+		} else if (conn->type == SCO_LINK || conn->type == ESCO_LINK)
-+			hci_reject_sco(conn);
- 		break;
- 	case BT_CONFIG:
- 	case BT_CONNECTED:
--- 
-1.7.11.7
+For get_service_record I was thinking that it would be better not to
+expose the raw record as it is being done, perhaps get_instance_id or
+a generic get_attribute which should take the sdp attribute.
 
+
+--
+Luiz Augusto von Dentz
