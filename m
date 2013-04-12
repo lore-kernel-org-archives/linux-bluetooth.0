@@ -4,192 +4,46 @@ To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	keybuk@chromium.org,
 	Alex Deymo <deymo@chromium.org>
-Subject: [PATCH v2 6/8] autopair: Add the autopair plugin.
-Date: Fri, 12 Apr 2013 16:28:36 -0700
-Message-Id: <1365809318-17775-7-git-send-email-deymo@chromium.org>
+Subject: [PATCH v2 5/8] core: Add device_get_class to the public interface.
+Date: Fri, 12 Apr 2013 16:28:35 -0700
+Message-Id: <1365809318-17775-6-git-send-email-deymo@chromium.org>
 In-Reply-To: <1365809318-17775-1-git-send-email-deymo@chromium.org>
 References: <1365809318-17775-1-git-send-email-deymo@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The autopair plugin tries standard pincodes for different devices with dumb
-pincodes. It also generates a random 6 digit pincode for keyboards that
-support any pincode but fallbacks to the agent call in case the random
-generated pincode didn't work.
+Exports the device class to plugins.
 ---
- Makefile.plugins   |   3 ++
- plugins/autopair.c | 150 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 153 insertions(+)
- create mode 100644 plugins/autopair.c
+ src/device.c | 5 +++++
+ src/device.h | 1 +
+ 2 files changed, 6 insertions(+)
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index f497782..651a970 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -5,6 +5,9 @@ builtin_sources += plugins/hostname.c
- builtin_modules += wiimote
- builtin_sources += plugins/wiimote.c
+diff --git a/src/device.c b/src/device.c
+index 032fc68..4ce7b8c 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2127,6 +2127,11 @@ void device_set_class(struct btd_device *device, uint32_t class)
+ 						DEVICE_INTERFACE, "Class");
+ }
  
-+builtin_modules += autopair
-+builtin_sources += plugins/autopair.c
-+
- if MAINTAINER_MODE
- builtin_modules += gatt_example
- builtin_sources += plugins/gatt-example.c
-diff --git a/plugins/autopair.c b/plugins/autopair.c
-new file mode 100644
-index 0000000..0f0d123
---- /dev/null
-+++ b/plugins/autopair.c
-@@ -0,0 +1,150 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012 Google Inc.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdbool.h>
-+#include <stdlib.h>
-+
-+#include <bluetooth/bluetooth.h>
-+#include <glib.h>
-+
-+#include "plugin.h"
-+#include "adapter.h"
-+#include "device.h"
-+#include "log.h"
-+#include "storage.h"
-+
-+/*
-+ * Plugin to handle automatic pairing of devices with reduced user
-+ * interaction, including implementing the recommendation of the HID spec
-+ * for keyboard devices.
-+ *
-+ * The plugin works by intercepting the PIN request for devices; if the
-+ * device is a keyboard a random six-digit numeric PIN is generated and
-+ * returned, flagged for displaying using DisplayPinCode.
-+ *
-+ */
-+
-+static ssize_t autopair_pincb(struct btd_adapter *adapter,
-+					struct btd_device *device,
-+					char *pinbuf, gboolean *display,
-+					uint32_t attempt)
++uint32_t btd_device_get_class(struct btd_device *device)
 +{
-+	char addr[18];
-+	char pinstr[7];
-+	uint32_t class;
-+
-+	ba2str(device_get_address(device), addr);
-+
-+	class = btd_device_get_class(device);
-+
-+	DBG("device %s 0x%x", addr, class);
-+
-+	/* This is a class-based pincode guesser. Ignore devices with an unknown
-+	 * class. */
-+	if (class == 0)
-+		return 0;
-+
-+	switch ((class & 0x1f00) >> 8) {
-+	case 0x04:		/* Audio/Video */
-+		switch ((class & 0xfc) >> 2) {
-+		case 0x01:		/* Wearable Headset Device */
-+		case 0x02:		/* Hands-free Device */
-+		case 0x06:		/* Headphones */
-+		case 0x07:		/* Portable Audio */
-+		case 0x0a:		/* HiFi Audio Device */
-+			if (attempt > 1)
-+				return 0;
-+			memcpy(pinbuf, "0000", 4);
-+			return 4;
-+			break;
-+		}
-+		break;
-+	case 0x05:		/* Peripheral */
-+		switch ((class & 0xc0) >> 6) {
-+		case 0x01:		/* Keyboard */
-+		case 0x03:		/* Combo keyboard/pointing device */
-+			if (attempt > 1)
-+				return 0;
-+			snprintf(pinstr, sizeof pinstr, "%06d",
-+						rand() % 1000000);
-+			*display = TRUE;
-+			memcpy(pinbuf, pinstr, 6);
-+			return 6;
-+			break;
-+		case 0x02: /* Pointing device */
-+			if (attempt > 1)
-+				return 0;
-+			memcpy(pinbuf, "0000", 4);
-+			return 4;
-+			break;
-+		}
-+		break;
-+	}
-+
-+	return 0;
++	return device->class;
 +}
 +
-+
-+static int autopair_probe(struct btd_adapter *adapter)
-+{
-+	btd_adapter_register_pin_cb(adapter, autopair_pincb);
-+
-+	return 0;
-+}
-+
-+static void autopair_remove(struct btd_adapter *adapter)
-+{
-+	btd_adapter_unregister_pin_cb(adapter, autopair_pincb);
-+}
-+
-+static struct btd_adapter_driver autopair_driver = {
-+	.name = "autopair",
-+	.probe = autopair_probe,
-+	.remove = autopair_remove,
-+};
-+
-+static int autopair_init(void)
-+{
-+	/* Initialize the random seed from /dev/urandom */
-+	unsigned int seed = time(NULL);
-+	FILE *f = fopen("/dev/urandom", "rb");
-+	if (f != NULL) {
-+		fread(&seed, sizeof(seed), 1, f);
-+		fclose(f);
-+	}
-+	srand(seed);
-+
-+	return btd_register_adapter_driver(&autopair_driver);
-+}
-+
-+static void autopair_exit(void)
-+{
-+	btd_unregister_adapter_driver(&autopair_driver);
-+}
-+
-+BLUETOOTH_PLUGIN_DEFINE(autopair, VERSION,
-+		BLUETOOTH_PLUGIN_PRIORITY_DEFAULT, autopair_init, autopair_exit)
+ uint16_t btd_device_get_vendor(struct btd_device *device)
+ {
+ 	return device->vendor;
+diff --git a/src/device.h b/src/device.h
+index f81721a..ab243f9 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -37,6 +37,7 @@ void device_set_name(struct btd_device *device, const char *name);
+ void device_get_name(struct btd_device *device, char *name, size_t len);
+ bool device_name_known(struct btd_device *device);
+ void device_set_class(struct btd_device *device, uint32_t class);
++uint32_t btd_device_get_class(struct btd_device *device);
+ uint16_t btd_device_get_vendor(struct btd_device *device);
+ uint16_t btd_device_get_vendor_src(struct btd_device *device);
+ uint16_t btd_device_get_product(struct btd_device *device);
 -- 
 1.8.1.3
