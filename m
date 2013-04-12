@@ -2,37 +2,49 @@ Return-Path: <cyrus@holtmann.org>
 From: Alex Deymo <deymo@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
-	keybuk@chromium.org,
 	Alex Deymo <deymo@chromium.org>
-Subject: [PATCH] Powered status stored in BlueZ
-Date: Fri, 12 Apr 2013 14:51:32 -0700
-Message-Id: <1365803493-6716-1-git-send-email-deymo@chromium.org>
+Subject: [PATCH v6 3/3] input: Convert gboolean to bool
+Date: Fri, 12 Apr 2013 13:20:25 -0700
+Message-Id: <1365798025-12798-4-git-send-email-deymo@chromium.org>
+In-Reply-To: <1365798025-12798-1-git-send-email-deymo@chromium.org>
+References: <1365798025-12798-1-git-send-email-deymo@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
-As far as I understand, moving from BlueZ 4 to BlueZ 5 intentionally
-dropped the Powered status management to another system like the
-network-manager. It turns out that our NM does not support that right
-now, and since we want to make a smooth transition to BlueZ 5 we 
-created a patch adding back this functionality. The following patch
-also migrates this option from the BlueZ 4 config file and persists
-the value across reboots to make the user happy.
+Remove some usage of gboolean in favor of bool.
+---
+ profiles/input/device.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-I'm sending this patch (already open-sourced in our tree) to share it
-with other projects that are also in the same situation and help them
-make the BlueZ 5 transition easier. You are also free to consider it
-back in BlueZ, but I don't know the details about why was this
-dropped.
-
-This is the only patch I had in the chromium tree that wasn't shared
-here. Thank you all for the work!
-Alex.
-
-Alex Deymo (1):
-  Make "Powered" property persistent across reboots.
-
- src/adapter.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
-
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index 2701c93..13c74cb 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -78,7 +78,7 @@ struct input_device {
+ 	int			timeout;
+ 	struct hidp_connadd_req *req;
+ 	guint			dc_id;
+-	gboolean		disable_sdp;
++	bool			disable_sdp;
+ 	char			*name;
+ 	enum reconnect_mode_t	reconnect_mode;
+ };
+@@ -686,7 +686,7 @@ int input_device_disconnect(struct btd_device *dev, struct btd_profile *profile)
+ 
+ static struct input_device *input_device_new(struct btd_device *device,
+ 				const char *path, const uint32_t handle,
+-				gboolean disable_sdp)
++				bool disable_sdp)
+ {
+ 	struct btd_adapter *adapter = device_get_adapter(device);
+ 	struct input_device *idev;
+@@ -707,7 +707,7 @@ static struct input_device *input_device_new(struct btd_device *device,
+ 	return idev;
+ }
+ 
+-static gboolean is_device_sdp_disable(const sdp_record_t *rec)
++static bool is_device_sdp_disable(const sdp_record_t *rec)
+ {
+ 	sdp_data_t *data;
+ 
 -- 
 1.8.1.3
