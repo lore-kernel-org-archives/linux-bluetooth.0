@@ -1,34 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <3298128.mJ3qNWl1BF@tedd-ubuntu>
-References: <3298128.mJ3qNWl1BF@tedd-ubuntu>
-Date: Fri, 12 Apr 2013 06:44:19 -0400
-Message-ID: <CAJdJm_NmHWTGcBCDt+wFtR-ARPqxi5bWR1fSQSdJHvEs2Vo61w@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Add support for Intel Bluetooth device [8087:07dc]
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Tedd Ho-Jeong An <tedd.an@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	johan.hedberg@intel.com, don.fry@intel.com
-Content-Type: text/plain; charset=ISO-8859-1
+From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 3/6] obexd: Add bluetooth_getattribute to Bluetooth transport
+Date: Fri, 12 Apr 2013 11:29:03 +0200
+Message-Id: <1365758946-8682-4-git-send-email-christian.fetzer@oss.bmw-carit.de>
+In-Reply-To: <1365758946-8682-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1365758946-8682-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tedd,
+From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-On Thu, Apr 11, 2013 at 7:31 PM, Tedd Ho-Jeong An <tedd.an@intel.com> wrote:
-> From: Tedd Ho-Jeong An <tedd.an@intel.com>
->
-> This patch adds support for Intel Bluetooth device by adding
-> btusb_setup_intel() routine that update the device with ROM patch.
+This function makes the cached SDP attributes available for the profile
+implementations.
+---
+ obexd/client/bluetooth.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-You might want to run "./scripts/checkpatch.pl --strict" on your
-patch, which will report various alignment issues. These issues were
-very criticized on the past, therefore you may want to fix them.
-
-There is a line exceeding the 80-column limit as well, which should be
-easy to fix.
-
-Best Regards,
+diff --git a/obexd/client/bluetooth.c b/obexd/client/bluetooth.c
+index a14b75b..63c8a25 100644
+--- a/obexd/client/bluetooth.c
++++ b/obexd/client/bluetooth.c
+@@ -467,11 +467,35 @@ static int bluetooth_getpacketopt(GIOChannel *io, int *tx_mtu, int *rx_mtu)
+ 	return 0;
+ }
+ 
++static const void *bluetooth_getattribute(guint id, int attribute_id)
++{
++	GSList *l;
++	sdp_data_t *data;
++
++	for (l = sessions; l; l = l->next) {
++		struct bluetooth_session *session = l->data;
++
++		if (session->id != id)
++			continue;
++
++		if (!session->sdp_record)
++			break;
++
++		data = sdp_data_get(session->sdp_record, attribute_id);
++		if (!data)
++			break;
++
++		return &data->val;
++	}
++	return NULL;
++}
++
+ static struct obc_transport bluetooth = {
+ 	.name = "Bluetooth",
+ 	.connect = bluetooth_connect,
+ 	.getpacketopt = bluetooth_getpacketopt,
+ 	.disconnect = bluetooth_disconnect,
++	.getattribute = bluetooth_getattribute,
+ };
+ 
+ int bluetooth_init(void)
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.8.2.1
+
