@@ -1,56 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZKCM1u+aY39o3Qha1cOFM1ugq4VFg9OpBLghhWB_KYj1A@mail.gmail.com>
-References: <CANK1S=MG_kJ3DJmjV9nSbEW0E51ru_ukFsbHjx4fTMoYAMHv5A@mail.gmail.com>
-	<CABBYNZKCM1u+aY39o3Qha1cOFM1ugq4VFg9OpBLghhWB_KYj1A@mail.gmail.com>
-Date: Fri, 12 Apr 2013 10:16:10 +0800
-Message-ID: <CANK1S=OFfmhR2-URNmSkMxeCf1tby5Uc4c1=FZrvcJ0TT=_gCg@mail.gmail.com>
-Subject: Re: Bluez 5.3: Failed to connect to speaker (Unable to select SEP)
-From: Om Huang <dendrobium0093@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
+Subject: Re: [PATCH 5/6] core: Add device_get_class to the public interface.
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAHZ1yCnU+n0A5t2eBfdg+js-j2ZPnozBma4bvWjv7KLMZa7Xsg@mail.gmail.com>
+Date: Thu, 11 Apr 2013 19:05:18 -0700
+Cc: Alex Deymo <deymo@chromium.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Message-Id: <48D16AA8-EEE5-49E5-9E52-50C076F6A4BF@holtmann.org>
+References: <1365628753-16774-1-git-send-email-deymo@chromium.org> <1365628753-16774-6-git-send-email-deymo@chromium.org> <362A54BE-466C-4B1E-A968-6DD7F758CBA5@holtmann.org> <CAGd9gwj4YDzuYUpwph+CtLgefD1+L+209sP6qp67R6hpBNQebQ@mail.gmail.com> <C93C109F-6ACA-46B4-9C50-BE1E93A314E5@holtmann.org> <CAHZ1yCnU+n0A5t2eBfdg+js-j2ZPnozBma4bvWjv7KLMZa7Xsg@mail.gmail.com>
+To: Scott James Remnant <keybuk@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Scott,
 
-2013/4/9 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
-> Hi,
->
-> On Tue, Apr 9, 2013 at 3:02 PM, Om Huang <dendrobium0093@gmail.com> wrote:
->> Hi,
->>
->> I'm trying to use bluez-5.3 to connect to a Bluetooth speaker. My
->> computer is ubuntu-12.10 x86_64 with Linux 3.5.0. The bluez source was
->> downloaded from http://www.bluez.org/release-of-bluez-5-3/
->
-> Then you need BlueZ 5 patches to PulseAudio to make it work, there is
-> a experimental tree here (if you are brave enough to try):
->
-> github.com/mastiz/pulseaudio-bluez5.git
->
-Thanks for your help. But I still have a question. When I was using
-bluez 4, I can connect to my speaker by using org.bluez.Device.Connect
-without installing pulseaudio. Pulseaudio can be installed after bluez
-4 connects to my speaker. However, when I use
-org.bluez.Device1.Connect or org.bluez.Device1.ConnectProfile in bluez
-5 without pulseaudio, "unable to select SEP" appears and connection
-losts. Is it necessary to install pulseaudio-bluez5 for bluez 5 to
-connect to a speaker?
-Thank you.
+>>>>> +uint32_t btd_device_get_class(struct btd_device *device)
+>>>>> +{
+>>>>> +     return device->class;
+>>>>> +}
+>>> 
+>>>> why not export functions for getting the major and minor class. That seems to better then making a plugin decode that by themselves. Especially since we know they will get it work.
+>>> 
+>>> Basically we had the device class exported like that in the previous
+>>> plugin. I don't see a huge advantage on splitting the class in this
+>>> file instead of in the plugin... and a plugin could also compare with
+>>> both the major and minor class at the same time. Anyway, is an easy
+>>> change and I don't have a strong preference.
+>> 
+>> the reason why I prefer major and minor class is that then the core does the "math" ones and does it right. We had enough issues with it being done wrong. Including a kernel bug that we have to live with now.
+>> 
+>> In addition you actually did not consider the 2 bits that define a format type of major/minor class. Only when they are 0, then the mapping is what you are checking against. These 3 bytes are the worst combination of smashing bits into each other. Check print_dev_class() of btmon to see what I mean.
+>> 
+> 
+> We have do this parsing in applications as well, since BlueZ just
+> exports the class as a uint32 via D-Bus properties; so if BlueZ is
+> going to have a single place to parse this, we should also offer the
+> parsed values to applications as D-Bus properties.
+> 
+> Even the parsing of the Minor Device Class is pretty hairy, since it
+> depends on the Major Class; so to make sure that's done properly, it
+> also seems that BlueZ should do that and provide a complete parsed
+> description of the device.
 
->> I have read the previous thread "Bluez 5.2 A2DP: Unable to select SEP"
->> and thus enable source, sink and control in profiles/audio/manager.c.
->> I also enable gateway, socket and source in /etc/bluetooth/audio.conf.
->> I disable systemd in configure. And then make and make install.
->> Unfortunately, I still got an error "Unable to select SEP" when I try
->> to connect to my speaker. Any suggestion or idea? Thanks for any help.
->
-> Socket is no longer supported and gateway support is now done via
-> external profile (e.g. telephony stacks such as oFono).
->
-> --
-> Luiz Augusto von Dentz
---
-Om Huang
+we are giving you the Icon property or with LE the Appearance property. That we in addition hand out the raw class of device value is just for the crazy people that pretend to know better.
+
+The Icon property follows the Freedesktop Icon specification and Appearance property follows the Bluetooth GAP service specification.
+
+Regards
+
+Marcel
+
