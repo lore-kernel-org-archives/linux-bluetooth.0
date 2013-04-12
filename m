@@ -1,25 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
+From: jprvita@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@gmail.com>
+Subject: [PATCH BlueZ 3/3] audio: Remove unused constants
+Date: Fri, 12 Apr 2013 19:34:24 -0300
+Message-Id: <1365806064-12052-3-git-send-email-jprvita@gmail.com>
+In-Reply-To: <1365806064-12052-1-git-send-email-jprvita@gmail.com>
+References: <1365806064-12052-1-git-send-email-jprvita@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <92759276-C5D5-437D-8FB0-4089DA14E749@holtmann.org>
-References: <1365628753-16774-1-git-send-email-deymo@chromium.org>
- <1365628753-16774-7-git-send-email-deymo@chromium.org> <92759276-C5D5-437D-8FB0-4089DA14E749@holtmann.org>
-From: Alex Deymo <deymo@chromium.org>
-Date: Fri, 12 Apr 2013 15:58:18 -0700
-Message-ID: <CAGd9gwgdQ+kX0XCj7_tsqKnQFE_y2EXWKXSE_NVWY21Vx4Qd4Q@mail.gmail.com>
-Subject: Re: [PATCH 6/6] autopair: Add the autopair plugin.
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Apr 10, 2013 at 10:11 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> as mentioned earlier, I do not like the count naming. Here it makes it even worse.
-Ok. Got it ;)
+From: João Paulo Rechi Vita <jprvita@gmail.com>
 
-> And what I would be doing is creating a string array { "0000", "1234" } that just can be walked and not this hardcoded if statement.
-As I mentioned before I like more the idea of the plugin having its
-logic because it allows the plugin to do more than just a database.
-When I said that I had in mind some ideas that you will find in my
-next patch set. I'll change this dumb code to just "0000" at the
-beginning and see what devices are out there requiring a dumb pincode
-other than "0000".
+Removes the never used constants AUDIO_SINK_INTERFACE and
+AUDIO_SOURCE_INTERFACE which are defined to "org.bluez.AudioSink" and
+"org.bluez.AudioSource", respectively.
+---
+ profiles/audio/sink.h   | 2 --
+ profiles/audio/source.h | 2 --
+ 2 files changed, 4 deletions(-)
+
+diff --git a/profiles/audio/sink.h b/profiles/audio/sink.h
+index ba0dde8..7ec7610 100644
+--- a/profiles/audio/sink.h
++++ b/profiles/audio/sink.h
+@@ -22,8 +22,6 @@
+  *
+  */
+ 
+-#define AUDIO_SINK_INTERFACE "org.bluez.AudioSink"
+-
+ typedef enum {
+ 	SINK_STATE_DISCONNECTED,
+ 	SINK_STATE_CONNECTING,
+diff --git a/profiles/audio/source.h b/profiles/audio/source.h
+index 61afd94..317db9a 100644
+--- a/profiles/audio/source.h
++++ b/profiles/audio/source.h
+@@ -23,8 +23,6 @@
+  *
+  */
+ 
+-#define AUDIO_SOURCE_INTERFACE "org.bluez.AudioSource"
+-
+ typedef enum {
+ 	SOURCE_STATE_DISCONNECTED,
+ 	SOURCE_STATE_CONNECTING,
+-- 
+1.7.11.7
+
