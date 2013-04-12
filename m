@@ -4,179 +4,192 @@ To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	keybuk@chromium.org,
 	Alex Deymo <deymo@chromium.org>
-Subject: [PATCH v2 7/8] core: Expose the last bonding attempt duration on retry
-Date: Fri, 12 Apr 2013 16:28:37 -0700
-Message-Id: <1365809318-17775-8-git-send-email-deymo@chromium.org>
+Subject: [PATCH v2 6/8] autopair: Add the autopair plugin.
+Date: Fri, 12 Apr 2013 16:28:36 -0700
+Message-Id: <1365809318-17775-7-git-send-email-deymo@chromium.org>
 In-Reply-To: <1365809318-17775-1-git-send-email-deymo@chromium.org>
 References: <1365809318-17775-1-git-send-email-deymo@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-One of the interesting values for pincode plugins is the timeout of a
-bonding attempt. For keyboards supporting any random pincode as long as
-it is also typed in the keyboard, the timeout until it fails is in the
-order of the seconds to allow the user type the pincode on the bluetooth
-keyboard. In the case of a dumb keyboard accepting only a fixed pincode
-the timeout before the keyboard fails is in the order of a fraction of
-a second.
-
-This patch computes the elapsed time between the pairing started or the
-pin code was sent to the device and the device returns with an error.
-This measured duration is exposed in milliseconds to the plugins when
-retrying the bonding attempt.
+The autopair plugin tries standard pincodes for different devices with dumb
+pincodes. It also generates a random 6 digit pincode for keyboards that
+support any pincode but fallbacks to the agent call in case the random
+generated pincode didn't work.
 ---
- src/adapter.c | 19 ++++++++++++++++++-
- src/device.c  | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/device.h  |  2 ++
- 3 files changed, 75 insertions(+), 1 deletion(-)
+ Makefile.plugins   |   3 ++
+ plugins/autopair.c | 150 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 153 insertions(+)
+ create mode 100644 plugins/autopair.c
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 93cea81..fefb7e5 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -4570,10 +4570,22 @@ int btd_adapter_remove_bonding(struct btd_adapter *adapter,
- 	return -EIO;
- }
+diff --git a/Makefile.plugins b/Makefile.plugins
+index f497782..651a970 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -5,6 +5,9 @@ builtin_sources += plugins/hostname.c
+ builtin_modules += wiimote
+ builtin_sources += plugins/wiimote.c
  
-+static void pincode_reply_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct btd_device *device = user_data;
++builtin_modules += autopair
++builtin_sources += plugins/autopair.c
 +
-+	/* If the MGMT_OP_PIN_CODE_REPLY command is acknowledged, move the
-+	 * starting time to that point. This give a better sense of time
-+	 * evaluating the pincode. */
-+	device_bonding_restart_timer(device);
-+}
-+
- int btd_adapter_pincode_reply(struct btd_adapter *adapter,
- 					const bdaddr_t *bdaddr,
- 					const char *pin, size_t pin_len)
- {
-+	struct btd_device *device;
- 	unsigned int id;
- 	char addr[18];
- 
-@@ -4602,9 +4614,14 @@ int btd_adapter_pincode_reply(struct btd_adapter *adapter,
- 		cp.pin_len = pin_len;
- 		memcpy(cp.pin_code, pin, pin_len);
- 
-+		/* Since a pincode was requested, update the starting time to
-+		 * the point where the pincode is provided. */
-+		device = adapter_find_device(adapter, bdaddr);
-+		device_bonding_restart_timer(device);
-+
- 		id = mgmt_reply(adapter->mgmt, MGMT_OP_PIN_CODE_REPLY,
- 					adapter->dev_id, sizeof(cp), &cp,
--					NULL, NULL, NULL);
-+					pincode_reply_complete, device, NULL);
- 	}
- 
- 	if (id == 0)
-diff --git a/src/device.c b/src/device.c
-index 4ce7b8c..cfd1027 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -89,6 +89,8 @@ struct bonding_req {
- 	uint8_t capability;
- 	uint8_t status;
- 	guint retry_timer;
-+	gint64 attempt_start_time_us;
-+	gint64 last_attempt_duration_us;
- };
- 
- typedef enum {
-@@ -1420,12 +1422,55 @@ static struct bonding_req *bonding_request_new(DBusMessage *msg,
- 
- 	bonding->capability = io_cap;
- 
-+	/* Marks the bonding start time for the first attempt on request
-+	 * construction. The following attempts will be updated on
-+	 * device_bonding_retry. */
-+	bonding->attempt_start_time_us = g_get_monotonic_time();
-+
- 	if (agent)
- 		bonding->agent = agent_ref(agent);
- 
- 	return bonding;
- }
- 
-+void device_bonding_restart_timer(struct btd_device *device)
-+{
-+	if (!device || !device->bonding)
-+		return;
-+
-+	device->bonding->attempt_start_time_us = g_get_monotonic_time();
-+}
-+
-+static void bonding_request_stop_timer(struct bonding_req *bonding)
-+{
-+	gint64 current = g_get_monotonic_time();
-+
-+	/* Compute the time difference in ms. */
-+	if (current > bonding->attempt_start_time_us)
-+		bonding->last_attempt_duration_us =
-+				current - bonding->attempt_start_time_us;
-+	else
-+		bonding->last_attempt_duration_us = 0;
-+}
-+
-+/* Returns the duration of the last bonding attempt in milliseconds. The
-+ * duration is measured starting from the latest of the following three
-+ * events and finishing when the Command complete event is received for the
-+ * authentication request:
-+ *  - MGMT_OP_PAIR_DEVICE is sent,
-+ *  - MGMT_OP_PIN_CODE_REPLY is sent and
-+ *  - Command complete event is received for the sent MGMT_OP_PIN_CODE_REPLY.
+ if MAINTAINER_MODE
+ builtin_modules += gatt_example
+ builtin_sources += plugins/gatt-example.c
+diff --git a/plugins/autopair.c b/plugins/autopair.c
+new file mode 100644
+index 0000000..0f0d123
+--- /dev/null
++++ b/plugins/autopair.c
+@@ -0,0 +1,150 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012 Google Inc.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
 + */
-+gint64 device_bonding_last_duration(struct btd_device *device)
-+{
-+	struct bonding_req *bonding = device->bonding;
 +
-+	if (!bonding)
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdbool.h>
++#include <stdlib.h>
++
++#include <bluetooth/bluetooth.h>
++#include <glib.h>
++
++#include "plugin.h"
++#include "adapter.h"
++#include "device.h"
++#include "log.h"
++#include "storage.h"
++
++/*
++ * Plugin to handle automatic pairing of devices with reduced user
++ * interaction, including implementing the recommendation of the HID spec
++ * for keyboard devices.
++ *
++ * The plugin works by intercepting the PIN request for devices; if the
++ * device is a keyboard a random six-digit numeric PIN is generated and
++ * returned, flagged for displaying using DisplayPinCode.
++ *
++ */
++
++static ssize_t autopair_pincb(struct btd_adapter *adapter,
++					struct btd_device *device,
++					char *pinbuf, gboolean *display,
++					uint32_t attempt)
++{
++	char addr[18];
++	char pinstr[7];
++	uint32_t class;
++
++	ba2str(device_get_address(device), addr);
++
++	class = btd_device_get_class(device);
++
++	DBG("device %s 0x%x", addr, class);
++
++	/* This is a class-based pincode guesser. Ignore devices with an unknown
++	 * class. */
++	if (class == 0)
 +		return 0;
 +
-+	return bonding->last_attempt_duration_us / 1000;
++	switch ((class & 0x1f00) >> 8) {
++	case 0x04:		/* Audio/Video */
++		switch ((class & 0xfc) >> 2) {
++		case 0x01:		/* Wearable Headset Device */
++		case 0x02:		/* Hands-free Device */
++		case 0x06:		/* Headphones */
++		case 0x07:		/* Portable Audio */
++		case 0x0a:		/* HiFi Audio Device */
++			if (attempt > 1)
++				return 0;
++			memcpy(pinbuf, "0000", 4);
++			return 4;
++			break;
++		}
++		break;
++	case 0x05:		/* Peripheral */
++		switch ((class & 0xc0) >> 6) {
++		case 0x01:		/* Keyboard */
++		case 0x03:		/* Combo keyboard/pointing device */
++			if (attempt > 1)
++				return 0;
++			snprintf(pinstr, sizeof pinstr, "%06d",
++						rand() % 1000000);
++			*display = TRUE;
++			memcpy(pinbuf, pinstr, 6);
++			return 6;
++			break;
++		case 0x02: /* Pointing device */
++			if (attempt > 1)
++				return 0;
++			memcpy(pinbuf, "0000", 4);
++			return 4;
++			break;
++		}
++		break;
++	}
++
++	return 0;
 +}
 +
- static void create_bond_req_exit(DBusConnection *conn, void *user_data)
- {
- 	struct btd_device *device = user_data;
-@@ -3761,6 +3806,12 @@ static gboolean device_bonding_retry(gpointer data)
- 	DBG("retrying bonding");
- 	bonding->retry_timer = 0;
- 
-+	/* Restart the bonding timer to the begining of the pairing. If not
-+	 * pincode request/reply occurs during this retry,
-+	 * device_bonding_last_duration() will return a consistent value from
-+	 * this point. */
-+	device_bonding_restart_timer(device);
 +
- 	err = adapter_bonding_attempt(adapter, &device->bdaddr,
- 				device->bdaddr_type, bonding->capability);
- 	if (err < 0)
-@@ -3779,6 +3830,10 @@ int device_bonding_attempt_retry(struct btd_device *device) {
- 	if (!bonding)
- 		return -EINVAL;
- 
-+	/* Mark the end of a bonding attempt to compute the delta for the
-+	 * retry. */
-+	bonding_request_stop_timer(bonding);
++static int autopair_probe(struct btd_adapter *adapter)
++{
++	btd_adapter_register_pin_cb(adapter, autopair_pincb);
 +
- 	if (pincb_iter_end(bonding->cb_iter))
- 		return -EINVAL;
- 
-diff --git a/src/device.h b/src/device.h
-index ab243f9..26aab5f 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -81,6 +81,8 @@ void device_bonding_attempt_failed(struct btd_device *device, uint8_t status);
- void device_bonding_failed(struct btd_device *device, uint8_t status);
- struct pincb_iter *device_bonding_iter(struct btd_device *device);
- int device_bonding_attempt_retry(struct btd_device *device);
-+gint64 device_bonding_last_duration(struct btd_device *device);
-+void device_bonding_restart_timer(struct btd_device *device);
- int device_request_pincode(struct btd_device *device, gboolean secure);
- int device_request_passkey(struct btd_device *device);
- int device_confirm_passkey(struct btd_device *device, uint32_t passkey,
++	return 0;
++}
++
++static void autopair_remove(struct btd_adapter *adapter)
++{
++	btd_adapter_unregister_pin_cb(adapter, autopair_pincb);
++}
++
++static struct btd_adapter_driver autopair_driver = {
++	.name = "autopair",
++	.probe = autopair_probe,
++	.remove = autopair_remove,
++};
++
++static int autopair_init(void)
++{
++	/* Initialize the random seed from /dev/urandom */
++	unsigned int seed = time(NULL);
++	FILE *f = fopen("/dev/urandom", "rb");
++	if (f != NULL) {
++		fread(&seed, sizeof(seed), 1, f);
++		fclose(f);
++	}
++	srand(seed);
++
++	return btd_register_adapter_driver(&autopair_driver);
++}
++
++static void autopair_exit(void)
++{
++	btd_unregister_adapter_driver(&autopair_driver);
++}
++
++BLUETOOTH_PLUGIN_DEFINE(autopair, VERSION,
++		BLUETOOTH_PLUGIN_PRIORITY_DEFAULT, autopair_init, autopair_exit)
 -- 
 1.8.1.3
