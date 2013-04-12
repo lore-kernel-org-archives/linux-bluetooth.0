@@ -1,49 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 0/6] MAP client: Read MASInstanceID for the current connection
-Date: Fri, 12 Apr 2013 11:29:00 +0200
-Message-Id: <1365758946-8682-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH v2 4/6] obexd: Add obc_session_get_attribute to session
+Date: Fri, 12 Apr 2013 11:29:04 +0200
+Message-Id: <1365758946-8682-5-git-send-email-christian.fetzer@oss.bmw-carit.de>
+In-Reply-To: <1365758946-8682-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1365758946-8682-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-Changelog v2:
-- Replaced get_service_record by get_attribute
-- Removed force sdp lookup
+This adds a obc_session_get_attribute function to the client session.
+The function allows querying the session specific service attributes.
+---
+ obexd/client/session.c | 11 +++++++++++
+ obexd/client/session.h |  3 +++
+ 2 files changed, 14 insertions(+)
 
---
-
-This patch set allows the MAP client profile implementation to read the
-instance id of the MAS server it is connected to.
-
-This is a prerequisite for receiving event reports and distributing them to the
-correct MAS client instance. The instance id is only available as SDP
-attribute.
-
-Due to the current transport layer abstraction in obexd, the MAP client has no
-direct access to SDP. Therefore I have extended obc_transport to allow concrete
-transports (like Bluetooth) to specify a getattribute function and made
-it available through obc_session_get_attribute. This way, transports can
-provide additional service information to the client implementations.
-
-Christian Fetzer (6):
-  obexd: Cache SDP record in bluetooth transport
-  obexd: Add getattribute to obc_transport
-  obexd: Add bluetooth_getattribute to Bluetooth transport
-  obexd: Add obc_session_get_attribute to session
-  lib: Add attributes MASInstanceID and SupportedMessageTypes
-  obexd: Read service attributes when instantiating MAP session
-
- lib/sdp.h                |  2 ++
- obexd/client/bluetooth.c | 36 ++++++++++++++++++++++++++++++++++--
- obexd/client/map.c       | 31 +++++++++++++++++++++++++++++--
- obexd/client/session.c   | 11 +++++++++++
- obexd/client/session.h   |  3 +++
- obexd/client/transport.h |  1 +
- 6 files changed, 80 insertions(+), 4 deletions(-)
-
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index 2e8b113..63707f1 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -827,6 +827,17 @@ fail:
+ 	return NULL;
+ }
+ 
++const void *obc_session_get_attribute(struct obc_session *session,
++							int attribute_id)
++{
++	if (session && session->id > 0 && session->transport &&
++			session->transport->getattribute)
++		return session->transport->getattribute(session->id,
++								attribute_id);
++
++	return NULL;
++}
++
+ const char *obc_session_get_owner(struct obc_session *session)
+ {
+ 	if (session == NULL)
+diff --git a/obexd/client/session.h b/obexd/client/session.h
+index 402c042..b0b3655 100644
+--- a/obexd/client/session.h
++++ b/obexd/client/session.h
+@@ -54,6 +54,9 @@ const char *obc_session_get_target(struct obc_session *session);
+ const char *obc_session_register(struct obc_session *session,
+ 						GDBusDestroyFunction destroy);
+ 
++const void *obc_session_get_attribute(struct obc_session *session,
++							int attribute_id);
++
+ guint obc_session_queue(struct obc_session *session,
+ 				struct obc_transfer *transfer,
+ 				session_callback_t func, void *user_data,
 -- 
 1.8.2.1
 
