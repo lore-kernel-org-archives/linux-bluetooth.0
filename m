@@ -4,274 +4,114 @@ To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	keybuk@chromium.org,
 	Alex Deymo <deymo@chromium.org>
-Subject: [PATCH v2 4/8] core: retry bonding attempt until the iterator reachs the end.
-Date: Fri, 12 Apr 2013 16:28:34 -0700
-Message-Id: <1365809318-17775-5-git-send-email-deymo@chromium.org>
+Subject: [PATCH v2 3/8] core: Add support for retrying a bonding
+Date: Fri, 12 Apr 2013 16:28:33 -0700
+Message-Id: <1365809318-17775-4-git-send-email-deymo@chromium.org>
 In-Reply-To: <1365809318-17775-1-git-send-email-deymo@chromium.org>
 References: <1365809318-17775-1-git-send-email-deymo@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch splits the bonding process in an interative process consisting
-of one or more "bonding attempts". The user/agent starts a new "bonding"
-that may involve several rounds of "bonding attempts" with the device
-before it gets back to the user/agent.
-
-Some functions were split in two parts to reflect this change. When a
-bonding attempt fails with an authentication error, a new bonding attempt
-is initiated (after a short delay) to retry with the next function (or
-next call to the same function) in the pincode callback list. This
-effectively allows a plugin try different pincodes for the same device
-during the same bonding.
+In order to retry a bonding we need a timer that will perform the
+retry, we need to stash the status and capability of the bonding
+request so it can use them again. In the case of a retrying
+bonding attempt we need to not tear down the temporary D-Bus device
+object on the adapter.
 ---
- src/adapter.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++++++---------
- src/adapter.h |  3 ++
- src/device.c  | 45 ++++++++++++++++++++++++++++--
- src/device.h  |  2 ++
- 4 files changed, 125 insertions(+), 15 deletions(-)
+ src/adapter.c |  2 +-
+ src/device.c  | 20 ++++++++++++++++++--
+ src/device.h  |  1 +
+ 3 files changed, 20 insertions(+), 3 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 498bb49..93cea81 100644
+index 8c00dc6..498bb49 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -4931,6 +4931,44 @@ static void bonding_complete(struct btd_adapter *adapter,
- 	check_oob_bonding_complete(adapter, bdaddr, status);
- }
+@@ -4253,7 +4253,7 @@ static void adapter_remove_connection(struct btd_adapter *adapter,
+ 	if (device_is_authenticating(device))
+ 		device_cancel_authentication(device, TRUE);
  
-+/* bonding_attempt_complete() handles the end of a "bonding attempt" checking if
-+ * it should begin a new attempt or complete the bonding.
-+ */
-+static void bonding_attempt_complete(struct btd_adapter *adapter,
-+					const bdaddr_t *bdaddr,
-+					uint8_t addr_type, uint8_t status)
-+{
-+	int err = 0;
-+	struct btd_device *device;
-+	char addr[18];
-+
-+	ba2str(bdaddr, addr);
-+	DBG("hci%u bdaddr %s type %u status 0x%x", adapter->dev_id, addr,
-+							addr_type, status);
-+
-+	if (status == 0)
-+		device = adapter_get_device(adapter, bdaddr, addr_type);
-+	else
-+		device = adapter_find_device(adapter, bdaddr);
-+
-+	if (status == MGMT_STATUS_AUTH_FAILED) {
-+
-+		/* On faliure, issue a bonding_retry if possible. */
-+		if (device != NULL) {
-+			err = device_bonding_attempt_retry(device);
-+			if (err == 0)
-+				return;
-+		}
-+	}
-+
-+	/* Ignore disconnects during retry. */
-+	if (status == MGMT_STATUS_DISCONNECTED && device_is_retrying(device))
-+		return;
-+
-+	/* In any other case, finish the bonding. */
-+	bonding_complete(adapter, bdaddr, addr_type, status);
-+}
-+
- struct pair_device_data {
- 	struct btd_adapter *adapter;
- 	bdaddr_t bdaddr;
-@@ -4984,7 +5022,7 @@ static void pair_device_complete(uint8_t status, uint16_t length,
- 		error("Pair device failed: %s (0x%02x)",
- 						mgmt_errstr(status), status);
+-	if (device_is_temporary(device)) {
++	if (device_is_temporary(device) && !device_is_retrying(device)) {
+ 		const char *path = device_get_path(device);
  
--		bonding_complete(adapter, &data->bdaddr,
-+		bonding_attempt_complete(adapter, &data->bdaddr,
- 						data->addr_type, status);
- 		return;
- 	}
-@@ -4994,17 +5032,13 @@ static void pair_device_complete(uint8_t status, uint16_t length,
- 		return;
- 	}
- 
--	bonding_complete(adapter, &rp->addr.bdaddr, rp->addr.type, status);
-+	bonding_attempt_complete(adapter, &rp->addr.bdaddr, rp->addr.type,
-+									status);
- }
- 
- int adapter_create_bonding(struct btd_adapter *adapter, const bdaddr_t *bdaddr,
- 					uint8_t addr_type, uint8_t io_cap)
- {
--	struct mgmt_cp_pair_device cp;
--	char addr[18];
--	struct pair_device_data *data;
--	unsigned int id;
--
- 	if (adapter->pair_device_id > 0) {
- 		error("Unable pair since another pairing is in progress");
- 		return -EBUSY;
-@@ -5012,6 +5046,18 @@ int adapter_create_bonding(struct btd_adapter *adapter, const bdaddr_t *bdaddr,
- 
- 	suspend_discovery(adapter);
- 
-+	return adapter_bonding_attempt(adapter, bdaddr, addr_type, io_cap);
-+}
-+
-+/* Starts a new bonding attempt in a fresh new bonding_req or a retried one. */
-+int adapter_bonding_attempt(struct btd_adapter *adapter, const bdaddr_t *bdaddr,
-+					uint8_t addr_type, uint8_t io_cap)
-+{
-+	struct mgmt_cp_pair_device cp;
-+	char addr[18];
-+	struct pair_device_data *data;
-+	unsigned int id;
-+
- 	ba2str(bdaddr, addr);
- 	DBG("hci%u bdaddr %s type %d io_cap 0x%02x",
- 				adapter->dev_id, addr, addr_type, io_cap);
-@@ -5064,7 +5110,7 @@ static void dev_disconnected(struct btd_adapter *adapter,
- 	if (device)
- 		adapter_remove_connection(adapter, device);
- 
--	bonding_complete(adapter, &addr->bdaddr, addr->type,
-+	bonding_attempt_complete(adapter, &addr->bdaddr, addr->type,
- 						MGMT_STATUS_DISCONNECTED);
- }
- 
-@@ -5118,7 +5164,8 @@ static void auth_failed_callback(uint16_t index, uint16_t length,
- 		return;
- 	}
- 
--	bonding_complete(adapter, &ev->addr.bdaddr, ev->addr.type, ev->status);
-+	bonding_attempt_complete(adapter, &ev->addr.bdaddr, ev->addr.type,
-+								ev->status);
- }
- 
- static void store_link_key(struct btd_adapter *adapter,
-@@ -5718,14 +5765,31 @@ static void connect_failed_callback(uint16_t index, uint16_t length,
- 
- 	device = adapter_find_device(adapter, &ev->addr.bdaddr);
- 	if (device) {
-+		/* If the device is in a bonding process cancel any auth request
-+		 * sent to the agent before proceeding, but keep the bonding
-+		 * request structure. */
- 		if (device_is_bonding(device, NULL))
--			device_bonding_failed(device, ev->status);
--		if (device_is_temporary(device))
--			adapter_remove_device(adapter, device, TRUE);
-+			device_cancel_authentication(device, FALSE);
- 	}
- 
- 	/* In the case of security mode 3 devices */
--	bonding_complete(adapter, &ev->addr.bdaddr, ev->addr.type, ev->status);
-+	bonding_attempt_complete(adapter, &ev->addr.bdaddr, ev->addr.type,
-+								ev->status);
-+
-+	/* If the device is scheduled to retry the bonding wait until the retry
-+	 * happens. In other case, proceed with cancel the bondig.
-+	 */
-+	if (device && device_is_bonding(device, NULL)
-+					&& !device_is_retrying(device)) {
-+		device_cancel_authentication(device, TRUE);
-+		device_bonding_failed(device, ev->status);
-+	}
-+
-+	/* In the case the bonding was canceled or did exists, remove the device
-+	 * when it is temporary. */
-+	if (device && !device_is_bonding(device, NULL)
-+						&& device_is_temporary(device))
-+		adapter_remove_device(adapter, device, TRUE);
- }
- 
- static void unpaired_callback(uint16_t index, uint16_t length,
-diff --git a/src/adapter.h b/src/adapter.h
-index 7392187..2f4bc5a 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -178,6 +178,9 @@ int btd_adapter_passkey_reply(struct btd_adapter *adapter,
- int adapter_create_bonding(struct btd_adapter *adapter, const bdaddr_t *bdaddr,
- 					uint8_t addr_type, uint8_t io_cap);
- 
-+int adapter_bonding_attempt(struct btd_adapter *adapter, const bdaddr_t *bdaddr,
-+					uint8_t addr_type, uint8_t io_cap);
-+
- int adapter_cancel_bonding(struct btd_adapter *adapter, const bdaddr_t *bdaddr,
- 							uint8_t addr_type);
- 
+ 		DBG("Removing temporary device %s", path);
 diff --git a/src/device.c b/src/device.c
-index 0a39add..032fc68 100644
+index 8c4b98a..0a39add 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -3743,6 +3743,46 @@ gboolean device_is_bonding(struct btd_device *device, const char *sender)
- 	return g_str_equal(sender, dbus_message_get_sender(bonding->msg));
+@@ -86,6 +86,9 @@ struct bonding_req {
+ 	struct btd_device *device;
+ 	struct agent *agent;
+ 	struct pincb_iter *cb_iter;
++	uint8_t capability;
++	uint8_t status;
++	guint retry_timer;
+ };
+ 
+ typedef enum {
+@@ -1400,7 +1403,8 @@ static void device_svc_resolved(struct btd_device *dev, int err)
+ 
+ static struct bonding_req *bonding_request_new(DBusMessage *msg,
+ 						struct btd_device *device,
+-						struct agent *agent)
++						struct agent *agent,
++						uint8_t io_cap)
+ {
+ 	struct bonding_req *bonding;
+ 	char addr[18];
+@@ -1414,6 +1418,8 @@ static struct bonding_req *bonding_request_new(DBusMessage *msg,
+ 
+ 	bonding->cb_iter = pincb_iter_new(device->adapter);
+ 
++	bonding->capability = io_cap;
++
+ 	if (agent)
+ 		bonding->agent = agent_ref(agent);
+ 
+@@ -1467,7 +1473,7 @@ static DBusMessage *pair_device(DBusConnection *conn, DBusMessage *msg,
+ 	else
+ 		io_cap = IO_CAPABILITY_NOINPUTNOOUTPUT;
+ 
+-	bonding = bonding_request_new(msg, device, agent);
++	bonding = bonding_request_new(msg, device, agent, io_cap);
+ 
+ 	if (agent)
+ 		agent_unref(agent);
+@@ -1548,6 +1554,9 @@ static void bonding_request_free(struct bonding_req *bonding)
+ 		bonding->agent = NULL;
+ 	}
+ 
++	if (bonding->retry_timer)
++		g_source_remove(bonding->retry_timer);
++
+ 	if (bonding->device)
+ 		bonding->device->bonding = NULL;
+ 
+@@ -3594,6 +3603,13 @@ static void device_auth_req_free(struct btd_device *device)
+ 	device->authr = NULL;
  }
  
-+static gboolean device_bonding_retry(gpointer data)
++gboolean device_is_retrying(struct btd_device *device)
 +{
-+	struct btd_device *device = data;
-+	struct btd_adapter *adapter = device_get_adapter(device);
-+	struct bonding_req *bonding = device->bonding;
-+	int err;
-+
-+	if (!bonding)
-+		return FALSE;
-+
-+	DBG("retrying bonding");
-+	bonding->retry_timer = 0;
-+
-+	err = adapter_bonding_attempt(adapter, &device->bdaddr,
-+				device->bdaddr_type, bonding->capability);
-+	if (err < 0)
-+		device_bonding_complete(device, bonding->status);
-+
-+	return FALSE;
-+}
-+
-+int device_bonding_attempt_retry(struct btd_device *device) {
 +	struct bonding_req *bonding = device->bonding;
 +
-+	/* Ignore other failure events while retrying */
-+	if (device_is_retrying(device))
-+		return 0;
-+
-+	if (!bonding)
-+		return -EINVAL;
-+
-+	if (pincb_iter_end(bonding->cb_iter))
-+		return -EINVAL;
-+
-+	DBG("scheduling retry with io_cap %u", bonding->capability);
-+	bonding->retry_timer = g_timeout_add(3000,
-+						device_bonding_retry, device);
-+	return 0;
++	return bonding && bonding->retry_timer != 0;
 +}
 +
- void device_bonding_failed(struct btd_device *device, uint8_t status)
+ void device_bonding_complete(struct btd_device *device, uint8_t status)
  {
  	struct bonding_req *bonding = device->bonding;
-@@ -3762,8 +3802,9 @@ void device_bonding_failed(struct btd_device *device, uint8_t status)
- 	bonding_request_free(bonding);
- }
- 
--struct pincb_iter *device_bonding_iter(struct btd_device *device) {
--	if (device->bonding == NULL)
-+struct pincb_iter *device_bonding_iter(struct btd_device *device)
-+{
-+	if (!device->bonding)
- 		return NULL;
- 
- 	return device->bonding->cb_iter;
 diff --git a/src/device.h b/src/device.h
-index 61a294b..f81721a 100644
+index 725bd7a..61a294b 100644
 --- a/src/device.h
 +++ b/src/device.h
-@@ -76,8 +76,10 @@ gboolean device_is_connected(struct btd_device *device);
- gboolean device_is_retrying(struct btd_device *device);
+@@ -73,6 +73,7 @@ void device_set_bonded(struct btd_device *device, gboolean bonded);
+ void device_set_legacy(struct btd_device *device, bool legacy);
+ void device_set_rssi(struct btd_device *device, int8_t rssi);
+ gboolean device_is_connected(struct btd_device *device);
++gboolean device_is_retrying(struct btd_device *device);
  void device_bonding_complete(struct btd_device *device, uint8_t status);
  gboolean device_is_bonding(struct btd_device *device, const char *sender);
-+void device_bonding_attempt_failed(struct btd_device *device, uint8_t status);
  void device_bonding_failed(struct btd_device *device, uint8_t status);
- struct pincb_iter *device_bonding_iter(struct btd_device *device);
-+int device_bonding_attempt_retry(struct btd_device *device);
- int device_request_pincode(struct btd_device *device, gboolean secure);
- int device_request_passkey(struct btd_device *device);
- int device_confirm_passkey(struct btd_device *device, uint32_t passkey,
 -- 
 1.8.1.3
