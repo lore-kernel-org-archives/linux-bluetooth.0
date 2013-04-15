@@ -1,46 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1365806064-12052-1-git-send-email-jprvita@gmail.com>
-References: <1365806064-12052-1-git-send-email-jprvita@gmail.com>
-Date: Mon, 15 Apr 2013 17:20:49 +0300
-Message-ID: <CABBYNZKpCGDmAfkPZ7Cm0SThL4arCZWfvH_KL_fCHmPjm=y7cw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] audio: Remove unused constant
+In-Reply-To: <CANK1S=PZqcKOupE9mbg3=hGpHQKz_s7W0wt4zvo0b=H5mVDwzA@mail.gmail.com>
+References: <CANK1S=MG_kJ3DJmjV9nSbEW0E51ru_ukFsbHjx4fTMoYAMHv5A@mail.gmail.com>
+	<CABBYNZKCM1u+aY39o3Qha1cOFM1ugq4VFg9OpBLghhWB_KYj1A@mail.gmail.com>
+	<CANK1S=OFfmhR2-URNmSkMxeCf1tby5Uc4c1=FZrvcJ0TT=_gCg@mail.gmail.com>
+	<CANK1S=Mn0esGHy7q5g8rCtA0paFw_EVAc=5XA83D+Ev=6cGhdw@mail.gmail.com>
+	<CANK1S=PZqcKOupE9mbg3=hGpHQKz_s7W0wt4zvo0b=H5mVDwzA@mail.gmail.com>
+Date: Mon, 15 Apr 2013 17:07:48 +0300
+Message-ID: <CABBYNZ+6K5Q3YbD43_JZUfH=OLGkixkL__RL4F9z8s-F8sDXhQ@mail.gmail.com>
+Subject: Re: Bluez 5.3: Failed to connect to speaker (Unable to select SEP)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: =?ISO-8859-1?Q?Jo=E3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
+To: Om Huang <dendrobium0093@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joao,
+Hi Om Huang,
 
-On Sat, Apr 13, 2013 at 1:34 AM,  <jprvita@gmail.com> wrote:
-> From: João Paulo Rechi Vita <jprvita@gmail.com>
+On Mon, Apr 15, 2013 at 4:31 PM, Om Huang <dendrobium0093@gmail.com> wrote:
+> Hi Luiz,
 >
-> Removes the never used constant AUDIO_INTERFACE which is defined to
-> "org.bluez.Audio".
-> ---
->  profiles/audio/device.c | 2 --
->  1 file changed, 2 deletions(-)
->
-> diff --git a/profiles/audio/device.c b/profiles/audio/device.c
-> index 907221d..b9d1dde 100644
-> --- a/profiles/audio/device.c
-> +++ b/profiles/audio/device.c
-> @@ -56,8 +56,6 @@
->  #include "sink.h"
->  #include "source.h"
->
-> -#define AUDIO_INTERFACE "org.bluez.Audio"
-> -
->  #define CONTROL_CONNECT_TIMEOUT 2
->  #define AVDTP_CONNECT_TIMEOUT 1
->  #define AVDTP_CONNECT_TIMEOUT_BOOST 1
-> --
-> 1.7.11.7
+> I'm sorry to bother you. The order of building projects is bluez-5,
+> sbc-1.0 and then pulseaudio-bluez5. The configure result of
+> pulseaudio-bluez5 shows that D-Bus and BlueZ are enabled. I install
+> these three projects to my development board. But I still encounter
+> the same problem (i.e. unable to find sep). By code tracing, I find
+> that server->sources is null in a2dp_select_sep(). That's maybe the
+> reason that bluez can't select SEP. Could anyone provides some idea?
 
-All 3 patches pushed upstream, thanks.
+Do you happen to have the bluetoothd logs? Btw, make sure the correct
+PulseAudio is running.
 
-
---
 Luiz Augusto von Dentz
