@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v5 3/6] Bluetooth: Use hci_connect_sco directly
-Date: Tue, 16 Apr 2013 17:08:37 +0200
-Message-Id: <1366124920-10185-4-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v5 2/6] Bluetooth: Add bluetooth socket voice option
+Date: Tue, 16 Apr 2013 17:08:36 +0200
+Message-Id: <1366124920-10185-3-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1366124920-10185-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1366124920-10185-1-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
@@ -15,75 +15,129 @@ Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hci_connect is a super function for connecting hci protocols. But the
-voice_setting parameter is only needed by SCO and security requirements are not
-needed for SCO channels. Thus, it makes sense to have a separate function.
+This patch extends the current bluetooth socket option to add BT_VOICE.
+This is intended to choose voice data type at runtime. It only applies to SCO
+sockets.
+Incoming connections shall be setup during defered setup. Outgoing connections
+shall be setup before connect(). The desired setting is stored in the sco
+socket info.
+This patch declares needed members, modifies getsockopt() and setsockopt().
 
 Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
 ---
- include/net/bluetooth/hci_core.h |    2 ++
- net/bluetooth/hci_conn.c         |    9 +++------
- net/bluetooth/sco.c              |    3 +--
- 3 files changed, 6 insertions(+), 8 deletions(-)
+ include/net/bluetooth/bluetooth.h |    8 ++++++++
+ include/net/bluetooth/sco.h       |    1 +
+ net/bluetooth/sco.c               |   38 ++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 46 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 33f570c..5c6c5b0 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -592,6 +592,8 @@ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle);
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 591fee7..c6b4a38 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -107,6 +107,14 @@ struct bt_power {
+  */
+ #define BT_CHANNEL_POLICY_AMP_PREFERRED		2
  
- struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 			     __u8 dst_type, __u8 sec_level, __u8 auth_type);
-+struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
-+				 __u16 setting);
- int hci_conn_check_link_mode(struct hci_conn *conn);
- int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
- int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type);
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b1a02ce..61f686b 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -563,13 +563,13 @@ static struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
- 	return acl;
- }
++#define BT_VOICE		11
++struct bt_voice {
++       __u16 setting;
++};
++
++#define BT_VOICE_TRANSPARENT			0x0003
++#define BT_VOICE_CVSD				0x0060
++
+ __printf(1, 2)
+ int bt_info(const char *fmt, ...);
+ __printf(1, 2)
+diff --git a/include/net/bluetooth/sco.h b/include/net/bluetooth/sco.h
+index 1e35c43..e252a31 100644
+--- a/include/net/bluetooth/sco.h
++++ b/include/net/bluetooth/sco.h
+@@ -73,6 +73,7 @@ struct sco_conn {
+ struct sco_pinfo {
+ 	struct bt_sock	bt;
+ 	__u32		flags;
++	__u16		setting;
+ 	struct sco_conn	*conn;
+ };
  
--static struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type,
--				bdaddr_t *dst, u8 sec_level, u8 auth_type)
-+struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
-+				 __u16 setting)
- {
- 	struct hci_conn *acl;
- 	struct hci_conn *sco;
- 
--	acl = hci_connect_acl(hdev, dst, sec_level, auth_type);
-+	acl = hci_connect_acl(hdev, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING);
- 	if (IS_ERR(acl))
- 		return acl;
- 
-@@ -615,9 +615,6 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 		return hci_connect_le(hdev, dst, dst_type, sec_level, auth_type);
- 	case ACL_LINK:
- 		return hci_connect_acl(hdev, dst, sec_level, auth_type);
--	case SCO_LINK:
--	case ESCO_LINK:
--		return hci_connect_sco(hdev, type, dst, sec_level, auth_type);
- 	}
- 
- 	return ERR_PTR(-EINVAL);
 diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 454ab64..4e69923 100644
+index 9e62102..454ab64 100644
 --- a/net/bluetooth/sco.c
 +++ b/net/bluetooth/sco.c
-@@ -176,8 +176,7 @@ static int sco_connect(struct sock *sk)
- 	else
- 		type = SCO_LINK;
+@@ -417,6 +417,8 @@ static struct sock *sco_sock_alloc(struct net *net, struct socket *sock, int pro
+ 	sk->sk_protocol = proto;
+ 	sk->sk_state    = BT_OPEN;
  
--	hcon = hci_connect(hdev, type, dst, BDADDR_BREDR, BT_SECURITY_LOW,
--			   HCI_AT_NO_BONDING);
-+	hcon = hci_connect_sco(hdev, type, dst, sco_pi(sk)->setting);
- 	if (IS_ERR(hcon)) {
- 		err = PTR_ERR(hcon);
- 		goto done;
++	sco_pi(sk)->setting = 0;
++
+ 	setup_timer(&sk->sk_timer, sco_sock_timeout, (unsigned long)sk);
+ 
+ 	bt_sock_link(&sco_sk_list, sk);
+@@ -713,7 +715,8 @@ static int sco_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
+ static int sco_sock_setsockopt(struct socket *sock, int level, int optname, char __user *optval, unsigned int optlen)
+ {
+ 	struct sock *sk = sock->sk;
+-	int err = 0;
++	int len, err = 0;
++	struct bt_voice voice;
+ 	u32 opt;
+ 
+ 	BT_DBG("sk %p", sk);
+@@ -739,6 +742,29 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname, char
+ 			clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
+ 		break;
+ 
++	case BT_VOICE:
++		if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND &&
++		    sk->sk_state != BT_CONNECT2) {
++			err = -EINVAL;
++			break;
++		}
++
++		len = min_t(unsigned int, sizeof(voice), optlen);
++		if (copy_from_user((char *) &voice, optval, len)) {
++			err = -EFAULT;
++			break;
++		}
++
++
++		if (voice.setting != BT_VOICE_TRANSPARENT &&
++		    voice.setting != BT_VOICE_CVSD) {
++			err = -EINVAL;
++			break;
++		}
++
++		sco_pi(sk)->setting = voice.setting;
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
+@@ -808,6 +834,7 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname, char
+ {
+ 	struct sock *sk = sock->sk;
+ 	int len, err = 0;
++	struct bt_voice voice;
+ 
+ 	BT_DBG("sk %p", sk);
+ 
+@@ -833,6 +860,15 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname, char
+ 
+ 		break;
+ 
++	case BT_VOICE:
++		voice.setting = sco_pi(sk)->setting;
++
++		len = min_t(unsigned int, len, sizeof(voice));
++		if (copy_to_user(optval, (char *)&voice, len))
++			err = -EFAULT;
++
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
 -- 
 1.7.9.5
 
