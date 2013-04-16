@@ -4,127 +4,47 @@ To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	keybuk@chromium.org,
 	Alex Deymo <deymo@chromium.org>
-Subject: [PATCH v7 5/5] input: Automatically attempt a reconnect when required.
-Date: Tue, 16 Apr 2013 14:58:41 -0700
-Message-Id: <1366149521-26908-6-git-send-email-deymo@chromium.org>
+Subject: [PATCH v7 4/5] input: Fix memory leak for hidp_connadd_req.
+Date: Tue, 16 Apr 2013 14:58:40 -0700
+Message-Id: <1366149521-26908-5-git-send-email-deymo@chromium.org>
 In-Reply-To: <1366149521-26908-1-git-send-email-deymo@chromium.org>
 References: <1366149521-26908-1-git-send-email-deymo@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The HID 1.1 spec requires a host to attempt a reconnection when a
-HID device goes out of range and comes back. There is test (see
-TP/HCE/BV-04-I [Host Initiated Re-connection]) to ensure that the
-host initiates the connection when that happens.
+If the struct input_device is destroyed while a hidp_connad_req
+is pending, the input_device will be destroyed leaking the associated
+memory.
 
-This patch adds a reconnection timer for HID devices trying to
-reconnect every 30s for a maximum of 3 minutes after the connection
-to a HID device with a ReconnectMode of "host" or "any" is closed.
+==30790== 492 (168 direct, 324 indirect) bytes in 1 blocks are definitely lost in loss record 199 of 216
+==30790==    at 0x4C29DB4: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==30790==    by 0x4E7FAE0: g_malloc0 (gmem.c:189)
+==30790==    by 0x4378E4: hidp_add_connection (device.c:365)
+==30790==    by 0x438055: input_device_connected (device.c:525)
+==30790==    by 0x4380DA: interrupt_connect_cb (device.c:548)
+==30790==    by 0x443508: connect_cb (btio.c:230)
+==30790==    by 0x4E79D52: g_main_context_dispatch (gmain.c:2539)
+==30790==    by 0x4E7A09F: g_main_context_iterate.isra.23 (gmain.c:3146)
+==30790==    by 0x4E7A499: g_main_loop_run (gmain.c:3340)
+==30790==    by 0x448CCC: main (main.c:583)
 ---
- profiles/input/device.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 67 insertions(+)
+ profiles/input/device.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/profiles/input/device.c b/profiles/input/device.c
-index 6ffc199..4af95d8 100644
+index 13c74cb..6ffc199 100644
 --- a/profiles/input/device.c
 +++ b/profiles/input/device.c
-@@ -81,10 +81,15 @@ struct input_device {
- 	bool			disable_sdp;
- 	char			*name;
- 	enum reconnect_mode_t	reconnect_mode;
-+	guint			reconnect_timer;
-+	uint32_t		reconnect_attempt;
- };
+@@ -121,6 +121,11 @@ static void input_device_free(struct input_device *idev)
+ 	if (idev->ctrl_io)
+ 		g_io_channel_unref(idev->ctrl_io);
  
- static GSList *devices = NULL;
- 
-+static void input_device_enter_reconnect_mode(struct input_device *idev);
-+static const char *reconnect_mode_to_string(const enum reconnect_mode_t mode);
-+
- static struct input_device *find_device_by_path(GSList *list, const char *path)
- {
- 	for (; list; list = list->next) {
-@@ -126,6 +131,9 @@ static void input_device_free(struct input_device *idev)
- 		g_free(idev->req);
- 	}
- 
-+	if (idev->reconnect_timer > 0)
-+		g_source_remove(idev->reconnect_timer);
++	if (idev->req) {
++		g_free(idev->req->rd_data);
++		g_free(idev->req);
++	}
 +
  	g_free(idev->uuid);
  
  	g_free(idev);
-@@ -160,6 +168,9 @@ static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data
- 	if (idev->ctrl_io && !(cond & G_IO_NVAL))
- 		g_io_channel_shutdown(idev->ctrl_io, TRUE, NULL);
- 
-+	/* Enter the auto-reconnect mode if needed */
-+	input_device_enter_reconnect_mode(idev);
-+
- 	return FALSE;
- }
- 
-@@ -654,6 +665,62 @@ static int dev_connect(struct input_device *idev)
- 	return -EIO;
- }
- 
-+static gboolean input_device_auto_reconnect(gpointer user_data)
-+{
-+	struct input_device *idev = user_data;
-+
-+	DBG("path=%s, attempt=%d", idev->path, idev->reconnect_attempt);
-+
-+	/* Stop the recurrent reconnection attempts if the device is reconnected
-+	 * or is marked for removal. */
-+	if (device_is_temporary(idev->device) ||
-+					device_is_connected(idev->device))
-+		return FALSE;
-+
-+	/* Only attempt an auto-reconnect for at most 3 minutes (6 * 30s). */
-+	if (idev->reconnect_attempt >= 6)
-+		return FALSE;
-+
-+	/* Check if the profile is already connected. */
-+	if (idev->ctrl_io)
-+		return FALSE;
-+
-+	if (is_connected(idev))
-+		return FALSE;
-+
-+	idev->reconnect_attempt++;
-+	dev_connect(idev);
-+
-+	return TRUE;
-+}
-+
-+static void input_device_enter_reconnect_mode(struct input_device *idev)
-+{
-+	DBG("path=%s reconnect_mode=%s", idev->path,
-+				reconnect_mode_to_string(idev->reconnect_mode));
-+
-+	/* Only attempt an auto-reconnect when the device is required to accept
-+	 * reconnections from the host. */
-+	if (idev->reconnect_mode != RECONNECT_ANY &&
-+				idev->reconnect_mode != RECONNECT_HOST)
-+		return;
-+
-+	/* If the device is temporary we are not required to reconnect with the
-+	 * device. This is likely the case of a removing device. */
-+	if (device_is_temporary(idev->device) ||
-+					device_is_connected(idev->device))
-+		return;
-+
-+	if (idev->reconnect_timer > 0)
-+		g_source_remove(idev->reconnect_timer);
-+
-+	DBG("registering auto-reconnect");
-+	idev->reconnect_attempt = 0;
-+	idev->reconnect_timer = g_timeout_add_seconds(30,
-+					input_device_auto_reconnect, idev);
-+
-+}
-+
- int input_device_connect(struct btd_device *dev, struct btd_profile *profile)
- {
- 	struct input_device *idev;
 -- 
 1.8.1.3
