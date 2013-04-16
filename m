@@ -1,82 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 17 Apr 2013 02:39:29 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: David Herrmann <dh.herrmann@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 02/16] Bluetooth: remove unneeded
- hci_conn_hold/put_device()
-Message-ID: <20130417053929.GA3480@joana>
-References: <1365166670-3271-1-git-send-email-dh.herrmann@gmail.com>
- <1365272932-571-1-git-send-email-dh.herrmann@gmail.com>
- <1365272932-571-3-git-send-email-dh.herrmann@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1365272932-571-3-git-send-email-dh.herrmann@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Alex Deymo <deymo@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	keybuk@chromium.org,
+	Alex Deymo <deymo@chromium.org>
+Subject: [PATCH v7 5/5] input: Automatically attempt a reconnect when required.
+Date: Tue, 16 Apr 2013 14:58:41 -0700
+Message-Id: <1366149521-26908-6-git-send-email-deymo@chromium.org>
+In-Reply-To: <1366149521-26908-1-git-send-email-deymo@chromium.org>
+References: <1366149521-26908-1-git-send-email-deymo@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+The HID 1.1 spec requires a host to attempt a reconnection when a
+HID device goes out of range and comes back. There is test (see
+TP/HCE/BV-04-I [Host Initiated Re-connection]) to ensure that the
+host initiates the connection when that happens.
 
-* David Herrmann <dh.herrmann@gmail.com> [2013-04-06 20:28:38 +0200]:
+This patch adds a reconnection timer for HID devices trying to
+reconnect every 30s for a maximum of 3 minutes after the connection
+to a HID device with a ReconnectMode of "host" or "any" is closed.
+---
+ profiles/input/device.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 67 insertions(+)
 
-> hci_conn_hold/put_device() is used to control when hci_conn->dev is no
-> longer needed and can be deleted from the system. Lets first look how they
-> are currently used throughout the code (excluding HIDP!).
-> 
-> All code that uses hci_conn_hold_device() looks like this:
->     ...
->     hci_conn_hold_device();
->     hci_conn_add_sysfs();
->     ...
-> On the other side, hci_conn_put_device() is exclusively used in
-> hci_conn_del().
-> 
-> So, considering that hci_conn_del() must not be called twice (which would
-> fail horribly), we know that hci_conn_put_device() is only called _once_
-> (which is in hci_conn_del()).
-> On the other hand, hci_conn_add_sysfs() must not be called twice, either
-> (it would call device_add twice, which breaks the device, see
-> drivers/base/core.c). So we know that hci_conn_hold_device() is also
-> called only once (it's only called directly before hci_conn_add_sysfs()).
-> 
-> So hold and put are known to be called only once. That means we can safely
-> remove them and directly call hci_conn_del_sysfs() in hci_conn_del().
-> 
-> But there is one issue left: HIDP also uses hci_conn_hold/put_device().
-> However, this case can be ignored and simply removed as it is totally
-> broken. The issue is, the only thing HIDP delays with
-> hci_conn_hold_device() is the removal of the hci_conn->dev from sysfs.
-> But, the hci_conn device has no mechanism to get notified when its own
-> parent (hci_dev) gets removed from sysfs. hci_dev_hold/put() does _not_
-> control when it is removed but only when the device object is created
-> and destroyed.
-> And hci_dev calls hci_conn_flush_*() when it removes itself from sysfs,
-> which itself causes hci_conn_del() to be called, but it does _not_ cause
-> hci_conn_del_sysfs() to be called, which is wrong.
-> 
-> Hence, we fix it to call hci_conn_del_sysfs() in hci_conn_del(). This
-> guarantees that a hci_conn object is removed from sysfs _before_ its
-> parent hci_dev is removed.
-> 
-> The changes to HIDP look scary, wrong and broken. However, if you look at
-> the HIDP session management, you will notice they're already broken in the
-> exact _same_ way (ever tried "unplugging" HIDP devices? Breaks _all_ the
-> time).
-> So this patch only makes HIDP look _scary_ and _obviously broken_. It does
-> not break HIDP itself, it already is!
-> 
-> See later patches in this series which fix HIDP to use proper
-> session-management.
-> 
-> Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/hci_core.h |  4 ----
->  net/bluetooth/hci_conn.c         | 17 +----------------
->  net/bluetooth/hci_event.c        |  4 ----
->  net/bluetooth/hidp/core.c        | 20 +++-----------------
->  4 files changed, 4 insertions(+), 41 deletions(-)
-
-Patch has been applied to bluetooth-next. Thanks.
-
-	Gustavo
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index 6ffc199..4af95d8 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -81,10 +81,15 @@ struct input_device {
+ 	bool			disable_sdp;
+ 	char			*name;
+ 	enum reconnect_mode_t	reconnect_mode;
++	guint			reconnect_timer;
++	uint32_t		reconnect_attempt;
+ };
+ 
+ static GSList *devices = NULL;
+ 
++static void input_device_enter_reconnect_mode(struct input_device *idev);
++static const char *reconnect_mode_to_string(const enum reconnect_mode_t mode);
++
+ static struct input_device *find_device_by_path(GSList *list, const char *path)
+ {
+ 	for (; list; list = list->next) {
+@@ -126,6 +131,9 @@ static void input_device_free(struct input_device *idev)
+ 		g_free(idev->req);
+ 	}
+ 
++	if (idev->reconnect_timer > 0)
++		g_source_remove(idev->reconnect_timer);
++
+ 	g_free(idev->uuid);
+ 
+ 	g_free(idev);
+@@ -160,6 +168,9 @@ static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data
+ 	if (idev->ctrl_io && !(cond & G_IO_NVAL))
+ 		g_io_channel_shutdown(idev->ctrl_io, TRUE, NULL);
+ 
++	/* Enter the auto-reconnect mode if needed */
++	input_device_enter_reconnect_mode(idev);
++
+ 	return FALSE;
+ }
+ 
+@@ -654,6 +665,62 @@ static int dev_connect(struct input_device *idev)
+ 	return -EIO;
+ }
+ 
++static gboolean input_device_auto_reconnect(gpointer user_data)
++{
++	struct input_device *idev = user_data;
++
++	DBG("path=%s, attempt=%d", idev->path, idev->reconnect_attempt);
++
++	/* Stop the recurrent reconnection attempts if the device is reconnected
++	 * or is marked for removal. */
++	if (device_is_temporary(idev->device) ||
++					device_is_connected(idev->device))
++		return FALSE;
++
++	/* Only attempt an auto-reconnect for at most 3 minutes (6 * 30s). */
++	if (idev->reconnect_attempt >= 6)
++		return FALSE;
++
++	/* Check if the profile is already connected. */
++	if (idev->ctrl_io)
++		return FALSE;
++
++	if (is_connected(idev))
++		return FALSE;
++
++	idev->reconnect_attempt++;
++	dev_connect(idev);
++
++	return TRUE;
++}
++
++static void input_device_enter_reconnect_mode(struct input_device *idev)
++{
++	DBG("path=%s reconnect_mode=%s", idev->path,
++				reconnect_mode_to_string(idev->reconnect_mode));
++
++	/* Only attempt an auto-reconnect when the device is required to accept
++	 * reconnections from the host. */
++	if (idev->reconnect_mode != RECONNECT_ANY &&
++				idev->reconnect_mode != RECONNECT_HOST)
++		return;
++
++	/* If the device is temporary we are not required to reconnect with the
++	 * device. This is likely the case of a removing device. */
++	if (device_is_temporary(idev->device) ||
++					device_is_connected(idev->device))
++		return;
++
++	if (idev->reconnect_timer > 0)
++		g_source_remove(idev->reconnect_timer);
++
++	DBG("registering auto-reconnect");
++	idev->reconnect_attempt = 0;
++	idev->reconnect_timer = g_timeout_add_seconds(30,
++					input_device_auto_reconnect, idev);
++
++}
++
+ int input_device_connect(struct btd_device *dev, struct btd_profile *profile)
+ {
+ 	struct input_device *idev;
+-- 
+1.8.1.3
