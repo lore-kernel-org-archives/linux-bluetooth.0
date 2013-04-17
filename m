@@ -1,68 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 17 Apr 2013 12:44:57 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: Re: [RFC v2 01/11] core: Add btd_service to represent device services
+Message-ID: <20130417094457.GA8155@x220>
+References: <1365162348-25541-1-git-send-email-mikel.astiz.oss@gmail.com>
+ <1365162348-25541-2-git-send-email-mikel.astiz.oss@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1365758946-8682-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1365758946-8682-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Date: Wed, 17 Apr 2013 14:01:21 +0300
-Message-ID: <CABBYNZKMi-EXtDowasnESvkpYH4LY2swEuA7BBE8Sx0P9Xg3ig@mail.gmail.com>
-Subject: Re: [PATCH v2 0/6] MAP client: Read MASInstanceID for the current connection
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1365162348-25541-2-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+Hi Mikel,
 
-On Fri, Apr 12, 2013 at 12:29 PM, Christian Fetzer
-<christian.fetzer@oss.bmw-carit.de> wrote:
-> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
->
-> Changelog v2:
-> - Replaced get_service_record by get_attribute
-> - Removed force sdp lookup
->
-> --
->
-> This patch set allows the MAP client profile implementation to read the
-> instance id of the MAS server it is connected to.
->
-> This is a prerequisite for receiving event reports and distributing them to the
-> correct MAS client instance. The instance id is only available as SDP
-> attribute.
->
-> Due to the current transport layer abstraction in obexd, the MAP client has no
-> direct access to SDP. Therefore I have extended obc_transport to allow concrete
-> transports (like Bluetooth) to specify a getattribute function and made
-> it available through obc_session_get_attribute. This way, transports can
-> provide additional service information to the client implementations.
->
-> Christian Fetzer (6):
->   obexd: Cache SDP record in bluetooth transport
->   obexd: Add getattribute to obc_transport
->   obexd: Add bluetooth_getattribute to Bluetooth transport
->   obexd: Add obc_session_get_attribute to session
->   lib: Add attributes MASInstanceID and SupportedMessageTypes
->   obexd: Read service attributes when instantiating MAP session
->
->  lib/sdp.h                |  2 ++
->  obexd/client/bluetooth.c | 36 ++++++++++++++++++++++++++++++++++--
->  obexd/client/map.c       | 31 +++++++++++++++++++++++++++++--
->  obexd/client/session.c   | 11 +++++++++++
->  obexd/client/session.h   |  3 +++
->  obexd/client/transport.h |  1 +
->  6 files changed, 80 insertions(+), 4 deletions(-)
->
-> --
-> 1.8.2.1
+I did a quick read through of the patches and in general they seem quite
+good. A couple of issues though:
 
-Applied, thanks.
+> +struct btd_service *service_create(struct btd_device *device,
+> +						struct btd_profile *profile)
+> +{
+> +	struct btd_service *service;
+> +
+> +	service = g_try_new0(struct btd_service, 1);
+> +	if (!service) {
+> +		error("service_create: failed to alloc memory");
+> +		return NULL;
+> +	}
+> +
+> +	service->ref = 1;
+> +	service->device = btd_device_ref(device);
 
-Note that I did some modification to bluetooth_getattribute to check
-sdp_record pointer against NULL to be consistent with the rest of the
-code and obc_session_get_attribute I simplified it a little bit to be
-more readable. Together with this set I pushed some changes to sdptool
-so it can now parse MASInstanceID and SupportedMessageTypes.
+I don't think we want to have this pointer impacting reference count of
+the device. The device "owns" the service and maintains a list of them
+so when device.c calls service_create it shouldn't cause a new
+reference for the device. We follow the same principle with adapters and
+devices too: when an adapter creates a new device object the device
+objects adapter pointer doesn't use ref().
 
---
-Luiz Augusto von Dentz
+One thing that you may need to pay attention to though is if for
+whatever reason (buggy plugins) all service references aren't released
+when a device gets removed, the device pointer should at least get set
+to NULL (or maybe just have a big assert if this should only happen in
+the case of a bug).
+
+> +struct btd_service *service_create(struct btd_device *device,
+> +						struct btd_profile *profile);
+> +
+> +struct btd_service *btd_service_ref(struct btd_service *service);
+> +void btd_service_unref(struct btd_service *service);
+> +
+> +struct btd_device *btd_service_get_device(const struct btd_service *service);
+> +struct btd_profile *btd_service_get_profile(const struct btd_service *service);
+> +btd_service_state_t btd_service_get_state(const struct btd_service *service);
+> +
+> +void btd_service_set_user_data(struct btd_service *service, void *user_data);
+> +void *btd_service_get_user_data(const struct btd_service *service);
+> +int btd_service_get_error(const struct btd_service *service);
+> +
+> +void btd_service_probed(struct btd_service *service);
+> +void btd_service_connecting(struct btd_service *service);
+> +void btd_service_connecting_complete(struct btd_service *service, int err);
+> +void btd_service_disconnecting(struct btd_service *service);
+> +void btd_service_disconnecting_complete(struct btd_service *service, int err);
+> +void btd_service_unavailable(struct btd_service *service);
+
+Since you're adding all these APIs without any actual users in this
+patch I'd appreciate a short description of the expected uses of them.
+You could e.g. put it to the cover letter or even the commit message.
+
+Johan
