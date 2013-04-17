@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20130417091835.GF6637@x220>
+In-Reply-To: <20130417083005.GE6637@x220>
 References: <1365117675-2202-1-git-send-email-andre.guedes@openbossa.org>
-	<1365117675-2202-10-git-send-email-andre.guedes@openbossa.org>
-	<20130417091835.GF6637@x220>
-Date: Wed, 17 Apr 2013 19:18:05 -0300
-Message-ID: <CACJA=fWu_qOxKc8cTD2-QKyeF+LgFKf9oAX7pLy=wQ_54361nQ@mail.gmail.com>
-Subject: Re: [PATCH 09/17] Bluetooth: Update le_scan_disable_work to use HCI request
+	<1365117675-2202-6-git-send-email-andre.guedes@openbossa.org>
+	<20130417083005.GE6637@x220>
+Date: Wed, 17 Apr 2013 19:17:52 -0300
+Message-ID: <CACJA=fV5LM7BMD25OL==7rkQ=ConQMJYfK8_Zk39tYw4vPp2FQ@mail.gmail.com>
+Subject: Re: [PATCH 05/17] Bluetooth: Make inquiry_cache_flush non-static
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: Andre Guedes <andre.guedes@openbossa.org>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -16,113 +16,50 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-On Wed, Apr 17, 2013 at 6:18 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
->
+On Wed, Apr 17, 2013 at 5:30 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
 > Hi Andre,
 >
 > On Thu, Apr 04, 2013, Andre Guedes wrote:
-> > +static void le_scan_disable_work_complete(struct hci_dev *hdev, u8 status)
-> > +{
-> > +     struct hci_command_hdr *last_cmd;
-> > +     u16 opcode;
-> > +
-> > +     BT_DBG("status %d", status);
-> > +
-> > +     /* Get opcode from the last command sent */
-> > +     last_cmd = (void *) hdev->sent_cmd->data;
-> > +     opcode = __le16_to_cpu(last_cmd->opcode);
-> > +
-> > +     switch (opcode) {
-> > +     case HCI_OP_LE_SET_SCAN_ENABLE:
-> > +             if (status) {
-> > +                     BT_ERR("Failed to disable LE scanning: status %d",
-> > +                            status);
-> > +                     return;
-> > +             }
-> > +
-> > +             hci_dev_lock(hdev);
-> > +             hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-> > +             hci_dev_unlock(hdev);
-> > +             break;
-> > +
-> > +     case HCI_OP_INQUIRY:
-> > +             if (status) {
-> > +                     hci_dev_lock(hdev);
-> > +                     hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-> > +                     hci_dev_unlock(hdev);
-> > +                     return;
-> > +             }
-> > +
-> > +             break;
-> > +     }
-> > +}
-> > +
-> >  static void le_scan_disable_work(struct work_struct *work)
-> >  {
-> >       struct hci_dev *hdev = container_of(work, struct hci_dev,
-> >                                           le_scan_disable.work);
-> >       struct hci_cp_le_set_scan_enable cp;
-> > +     struct hci_request req;
-> > +     int err;
-> >
-> >       BT_DBG("%s", hdev->name);
-> >
-> > +     if (hdev->discovery.state != DISCOVERY_FINDING)
-> > +             return;
-> > +
-> > +     hci_req_init(&req, hdev);
-> > +
-> >       memset(&cp, 0, sizeof(cp));
-> > +     cp.enable = LE_SCAN_DISABLE;
-> > +     hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-> > +
-> > +     /* If we are running the interleaved discovery, also add the inquiry
-> > +      * HCI command to the HCI request.
-> > +      */
-> > +     if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED) {
-> > +             struct hci_cp_inquiry inq_cp;
-> > +             /* General inquiry access code (GIAC) */
-> > +             u8 lap[3] = { 0x33, 0x8b, 0x9e };
-> > +
-> > +             hci_dev_lock(hdev);
-> > +             inquiry_cache_flush(hdev);
-> > +             hci_dev_unlock(hdev);
-> > +
-> > +             memset(&inq_cp, 0, sizeof(inq_cp));
-> > +             memcpy(&inq_cp.lap, lap, sizeof(inq_cp.lap));
-> > +             inq_cp.length = DISCOV_INTERLEAVED_INQUIRY_LEN;
-> > +             hci_req_add(&req, HCI_OP_INQUIRY, sizeof(inq_cp), &inq_cp);
-> > +     }
-> >
-> > -     hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-> > +     err = hci_req_run(&req, le_scan_disable_work_complete);
-> > +     if (err)
-> > +             BT_ERR("Failed to disable LE scanning: err %d", err);
-> >  }
+>> In order to use HCI request framework in start_discovery, we'll need
+>> to call inquiry_cache_flush in mgmt.c. Therefore, this patch makes
+>> inquiry_cache_flush non-static
+>>
+>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>> ---
+>>  include/net/bluetooth/hci_core.h | 1 +
+>>  net/bluetooth/hci_core.c         | 2 +-
+>>  2 files changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+>> index 0e7ee89..4713514 100644
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -431,6 +431,7 @@ void hci_inquiry_cache_update_resolve(struct hci_dev *hdev,
+>>                                     struct inquiry_entry *ie);
+>>  bool hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data,
+>>                             bool name_known, bool *ssp);
+>> +void inquiry_cache_flush(struct hci_dev *hdev);
+>>
+>>  /* ----- HCI Connections ----- */
+>>  enum {
+>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>> index 43ea7e3..eecab8e 100644
+>> --- a/net/bluetooth/hci_core.c
+>> +++ b/net/bluetooth/hci_core.c
+>> @@ -630,7 +630,7 @@ void hci_discovery_set_state(struct hci_dev *hdev, int state)
+>>       hdev->discovery.state = state;
+>>  }
+>>
+>> -static void inquiry_cache_flush(struct hci_dev *hdev)
+>> +void inquiry_cache_flush(struct hci_dev *hdev)
+>>  {
+>>       struct discovery_state *cache = &hdev->discovery;
+>>       struct inquiry_entry *p, *n;
 >
-> I don't really like the complexity of the logic here with having to peek
-> at hdev->sent_cmd to figure out what's going on in the callback. Maybe
-> instead do this in two separate steps, i.e. send the HCI_OP_INQUIRY only
-> in the callback for the HCI_OP_LE_SET_SCAN_ENABLE. Alternatively look
-> into the possibility of using our recently introduced _sync API, though
-> you'll first need to have a patch to add a hci_cmd_sync() which
-> internally acquires the request lock.
+> Making this public means that you also have to prefix it with hci_.
 
-I took a look at the possibility of using __hci_cmd_sync here, but
-this approach isn't going to work. le_scan_disable_work and cmd_work
-are both queued on hdev->workqueue. This means, if we call
-__hci_cmd_sync here, the worker thread goes to sleep and the HCI
-command is not sent until le_scan_disable_work finishes.
+Sure, I'll fix this.
 
-About the idea of doing this in two steps, as you suggested, I can
-implement it. However, IMO, things can get more complex. IIRC, one of
-the motivations of the HCI Request API is we be able to send several
-command and handle them all in a single place (the request complete
-callback) instead of spreading the handling in hci_event.c. If we
-follow this chaining approach, we'll spread interleaved discovery
-logic and command complete handling in several functions in
-hci_core.c, making this code even more "spaghetty".
-
-Regards,
+Thanks,
 
 Andre
