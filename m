@@ -1,74 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 17 Apr 2013 12:44:57 +0300
+Date: Wed, 17 Apr 2013 12:18:35 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [RFC v2 01/11] core: Add btd_service to represent device services
-Message-ID: <20130417094457.GA8155@x220>
-References: <1365162348-25541-1-git-send-email-mikel.astiz.oss@gmail.com>
- <1365162348-25541-2-git-send-email-mikel.astiz.oss@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 09/17] Bluetooth: Update le_scan_disable_work to use HCI
+ request
+Message-ID: <20130417091835.GF6637@x220>
+References: <1365117675-2202-1-git-send-email-andre.guedes@openbossa.org>
+ <1365117675-2202-10-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1365162348-25541-2-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1365117675-2202-10-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Andre, 
 
-I did a quick read through of the patches and in general they seem quite
-good. A couple of issues though:
-
-> +struct btd_service *service_create(struct btd_device *device,
-> +						struct btd_profile *profile)
+On Thu, Apr 04, 2013, Andre Guedes wrote:
+> +static void le_scan_disable_work_complete(struct hci_dev *hdev, u8 status)
 > +{
-> +	struct btd_service *service;
+> +	struct hci_command_hdr *last_cmd;
+> +	u16 opcode;
 > +
-> +	service = g_try_new0(struct btd_service, 1);
-> +	if (!service) {
-> +		error("service_create: failed to alloc memory");
-> +		return NULL;
+> +	BT_DBG("status %d", status);
+> +
+> +	/* Get opcode from the last command sent */
+> +	last_cmd = (void *) hdev->sent_cmd->data;
+> +	opcode = __le16_to_cpu(last_cmd->opcode);
+> +
+> +	switch (opcode) {
+> +	case HCI_OP_LE_SET_SCAN_ENABLE:
+> +		if (status) {
+> +			BT_ERR("Failed to disable LE scanning: status %d",
+> +			       status);
+> +			return;
+> +		}
+> +
+> +		hci_dev_lock(hdev);
+> +		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+> +		hci_dev_unlock(hdev);
+> +		break;
+> +
+> +	case HCI_OP_INQUIRY:
+> +		if (status) {
+> +			hci_dev_lock(hdev);
+> +			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+> +			hci_dev_unlock(hdev);
+> +			return;
+> +		}
+> +
+> +		break;
 > +	}
+> +}
 > +
-> +	service->ref = 1;
-> +	service->device = btd_device_ref(device);
+>  static void le_scan_disable_work(struct work_struct *work)
+>  {
+>  	struct hci_dev *hdev = container_of(work, struct hci_dev,
+>  					    le_scan_disable.work);
+>  	struct hci_cp_le_set_scan_enable cp;
+> +	struct hci_request req;
+> +	int err;
+>  
+>  	BT_DBG("%s", hdev->name);
+>  
+> +	if (hdev->discovery.state != DISCOVERY_FINDING)
+> +		return;
+> +
+> +	hci_req_init(&req, hdev);
+> +
+>  	memset(&cp, 0, sizeof(cp));
+> +	cp.enable = LE_SCAN_DISABLE;
+> +	hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
+> +
+> +	/* If we are running the interleaved discovery, also add the inquiry
+> +	 * HCI command to the HCI request.
+> +	 */
+> +	if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED) {
+> +		struct hci_cp_inquiry inq_cp;
+> +		/* General inquiry access code (GIAC) */
+> +		u8 lap[3] = { 0x33, 0x8b, 0x9e };
+> +
+> +		hci_dev_lock(hdev);
+> +		inquiry_cache_flush(hdev);
+> +		hci_dev_unlock(hdev);
+> +
+> +		memset(&inq_cp, 0, sizeof(inq_cp));
+> +		memcpy(&inq_cp.lap, lap, sizeof(inq_cp.lap));
+> +		inq_cp.length = DISCOV_INTERLEAVED_INQUIRY_LEN;
+> +		hci_req_add(&req, HCI_OP_INQUIRY, sizeof(inq_cp), &inq_cp);
+> +	}
+>  
+> -	hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
+> +	err = hci_req_run(&req, le_scan_disable_work_complete);
+> +	if (err)
+> +		BT_ERR("Failed to disable LE scanning: err %d", err);
+>  }
 
-I don't think we want to have this pointer impacting reference count of
-the device. The device "owns" the service and maintains a list of them
-so when device.c calls service_create it shouldn't cause a new
-reference for the device. We follow the same principle with adapters and
-devices too: when an adapter creates a new device object the device
-objects adapter pointer doesn't use ref().
-
-One thing that you may need to pay attention to though is if for
-whatever reason (buggy plugins) all service references aren't released
-when a device gets removed, the device pointer should at least get set
-to NULL (or maybe just have a big assert if this should only happen in
-the case of a bug).
-
-> +struct btd_service *service_create(struct btd_device *device,
-> +						struct btd_profile *profile);
-> +
-> +struct btd_service *btd_service_ref(struct btd_service *service);
-> +void btd_service_unref(struct btd_service *service);
-> +
-> +struct btd_device *btd_service_get_device(const struct btd_service *service);
-> +struct btd_profile *btd_service_get_profile(const struct btd_service *service);
-> +btd_service_state_t btd_service_get_state(const struct btd_service *service);
-> +
-> +void btd_service_set_user_data(struct btd_service *service, void *user_data);
-> +void *btd_service_get_user_data(const struct btd_service *service);
-> +int btd_service_get_error(const struct btd_service *service);
-> +
-> +void btd_service_probed(struct btd_service *service);
-> +void btd_service_connecting(struct btd_service *service);
-> +void btd_service_connecting_complete(struct btd_service *service, int err);
-> +void btd_service_disconnecting(struct btd_service *service);
-> +void btd_service_disconnecting_complete(struct btd_service *service, int err);
-> +void btd_service_unavailable(struct btd_service *service);
-
-Since you're adding all these APIs without any actual users in this
-patch I'd appreciate a short description of the expected uses of them.
-You could e.g. put it to the cover letter or even the commit message.
+I don't really like the complexity of the logic here with having to peek
+at hdev->sent_cmd to figure out what's going on in the callback. Maybe
+instead do this in two separate steps, i.e. send the HCI_OP_INQUIRY only
+in the callback for the HCI_OP_LE_SET_SCAN_ENABLE. Alternatively look
+into the possibility of using our recently introduced _sync API, though
+you'll first need to have a patch to add a hci_cmd_sync() which
+internally acquires the request lock.
 
 Johan
