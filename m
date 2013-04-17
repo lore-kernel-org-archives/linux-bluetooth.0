@@ -1,65 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20130417083005.GE6637@x220>
-References: <1365117675-2202-1-git-send-email-andre.guedes@openbossa.org>
-	<1365117675-2202-6-git-send-email-andre.guedes@openbossa.org>
-	<20130417083005.GE6637@x220>
-Date: Wed, 17 Apr 2013 19:17:52 -0300
-Message-ID: <CACJA=fV5LM7BMD25OL==7rkQ=ConQMJYfK8_Zk39tYw4vPp2FQ@mail.gmail.com>
-Subject: Re: [PATCH 05/17] Bluetooth: Make inquiry_cache_flush non-static
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Andre Guedes <andre.guedes@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <553F95A2-59E2-4D2E-BDB6-4AEF5E45B3FD@holtmann.org>
+References: <1366149521-26908-1-git-send-email-deymo@chromium.org> <553F95A2-59E2-4D2E-BDB6-4AEF5E45B3FD@holtmann.org>
+From: Alex Deymo <deymo@chromium.org>
+Date: Wed, 17 Apr 2013 13:37:59 -0700
+Message-ID: <CAGd9gwiE4=fNX7Mb1911Za-aMm2Wa3WuTnapDWKuGXY45a8xbw@mail.gmail.com>
+Subject: Re: [PATCH v7 0/5] input: Connectability
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>, keybuk <keybuk@chromium.org>
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+On Wed, Apr 17, 2013 at 1:20 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> However I do have a general question, do we need the new D-Bus API if we do an auto-reconnect handling? If so, do we need to indicate that the we are currently in auto-reconnect mode and/or cancel it when connecting attempts via other means happen.
 
-On Wed, Apr 17, 2013 at 5:30 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Andre,
->
-> On Thu, Apr 04, 2013, Andre Guedes wrote:
->> In order to use HCI request framework in start_discovery, we'll need
->> to call inquiry_cache_flush in mgmt.c. Therefore, this patch makes
->> inquiry_cache_flush non-static
->>
->> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->> ---
->>  include/net/bluetooth/hci_core.h | 1 +
->>  net/bluetooth/hci_core.c         | 2 +-
->>  2 files changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
->> index 0e7ee89..4713514 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -431,6 +431,7 @@ void hci_inquiry_cache_update_resolve(struct hci_dev *hdev,
->>                                     struct inquiry_entry *ie);
->>  bool hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data,
->>                             bool name_known, bool *ssp);
->> +void inquiry_cache_flush(struct hci_dev *hdev);
->>
->>  /* ----- HCI Connections ----- */
->>  enum {
->> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> index 43ea7e3..eecab8e 100644
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -630,7 +630,7 @@ void hci_discovery_set_state(struct hci_dev *hdev, int state)
->>       hdev->discovery.state = state;
->>  }
->>
->> -static void inquiry_cache_flush(struct hci_dev *hdev)
->> +void inquiry_cache_flush(struct hci_dev *hdev)
->>  {
->>       struct discovery_state *cache = &hdev->discovery;
->>       struct inquiry_entry *p, *n;
->
-> Making this public means that you also have to prefix it with hci_.
+We still need the new D-Bus API to let the UI know that it can't
+reconnect to the device because the device is not supposed to normally
+accept connections (ReconnectMode is "device" (or "none" if such a
+device exists)). This allows the UI to instruct the user to go and
+move the mouse to reconnect or press that hidden "connect" button in
+his device to reconnect it if the device had lost the pairing. If the
+ReconnectMode is "device", the meaning of Device1.Connected property
+changes a bit, since the fact that my mouse is disconnected right now
+doesn't mean that it is not working as intended or that it should be
+connected.
 
-Sure, I'll fix this.
+The auto-reconnect is implied and required by the Bluetooth HID spec
+for example in cases where ReconnectMode is "host". I don't think we
+should indicate that we are currently following the spec. The
+auto-reconnect attempts are canceled when the device is reconnected
+for some reason (because of this auto-reconnect or not) or when the
+device is marked for deletion, even if the removal is during the
+auto-reconnect process.
 
-Thanks,
-
-Andre
+Regards,
+Alex.
