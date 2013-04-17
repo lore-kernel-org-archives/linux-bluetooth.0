@@ -2,60 +2,46 @@ Return-Path: <cyrus@holtmann.org>
 From: Jefferson Delfes <jefferson.delfes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [PATCH BlueZ v3 05/16] attrib: Change match_event return type from gboolean
-Date: Wed, 17 Apr 2013 10:03:08 -0400
-Message-Id: <1366207399-29536-6-git-send-email-jefferson.delfes@openbossa.org>
+Subject: [PATCH BlueZ v3 04/16] attrib: Change is_response return type from gboolean
+Date: Wed, 17 Apr 2013 10:03:07 -0400
+Message-Id: <1366207399-29536-5-git-send-email-jefferson.delfes@openbossa.org>
 In-Reply-To: <1366207399-29536-1-git-send-email-jefferson.delfes@openbossa.org>
 References: <1365621421-1422-1-git-send-email-jefferson.delfes@openbossa.org>
  <1366207399-29536-1-git-send-email-jefferson.delfes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is no reason to use gboolean as return type of match_event.
+There is no reason to use gboolean as return type of is_response.
 ---
- attrib/gattrib.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ attrib/gattrib.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 9fda74f..636e09d 100644
+index 41e1ce4..9fda74f 100644
 --- a/attrib/gattrib.c
 +++ b/attrib/gattrib.c
-@@ -365,28 +365,28 @@ static void wake_up_sender(struct _GAttrib *attrib)
- 				can_write_data, attrib, destroy_sender);
+@@ -124,7 +124,7 @@ static guint8 opcode2expected(guint8 opcode)
+ 	return 0;
  }
  
--static gboolean match_event(struct event *evt, const uint8_t *pdu, gsize len)
-+static bool match_event(struct event *evt, const uint8_t *pdu, gsize len)
+-static gboolean is_response(guint8 opcode)
++static bool is_response(guint8 opcode)
  {
- 	guint16 handle;
- 
- 	if (evt->expected == GATTRIB_ALL_EVENTS)
+ 	switch (opcode) {
+ 	case ATT_OP_ERROR:
+@@ -140,10 +140,10 @@ static gboolean is_response(guint8 opcode)
+ 	case ATT_OP_PREP_WRITE_RESP:
+ 	case ATT_OP_EXEC_WRITE_RESP:
+ 	case ATT_OP_HANDLE_CNF:
 -		return TRUE;
 +		return true;
- 
- 	if (!is_response(pdu[0]) && evt->expected == GATTRIB_ALL_REQS)
--		return TRUE;
-+		return true;
- 
- 	if (evt->expected == pdu[0] && evt->handle == GATTRIB_ALL_HANDLES)
--		return TRUE;
-+		return true;
- 
- 	if (len < 3)
--		return FALSE;
-+		return false;
- 
- 	handle = att_get_u16(&pdu[1]);
- 
- 	if (evt->expected == pdu[0] && evt->handle == handle)
--		return TRUE;
-+		return true;
+ 	}
  
 -	return FALSE;
 +	return false;
  }
  
- static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
+ GAttrib *g_attrib_ref(GAttrib *attrib)
 -- 
 1.8.2
 
