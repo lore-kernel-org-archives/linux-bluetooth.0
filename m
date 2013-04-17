@@ -2,55 +2,60 @@ Return-Path: <cyrus@holtmann.org>
 From: Jefferson Delfes <jefferson.delfes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [PATCH BlueZ v3 16/16] attrib: Change command->pdu pointer type from guint8
-Date: Wed, 17 Apr 2013 10:03:19 -0400
-Message-Id: <1366207399-29536-17-git-send-email-jefferson.delfes@openbossa.org>
+Subject: [PATCH BlueZ v3 15/16] attrib: Change event->id type from guint
+Date: Wed, 17 Apr 2013 10:03:18 -0400
+Message-Id: <1366207399-29536-16-git-send-email-jefferson.delfes@openbossa.org>
 In-Reply-To: <1366207399-29536-1-git-send-email-jefferson.delfes@openbossa.org>
 References: <1365621421-1422-1-git-send-email-jefferson.delfes@openbossa.org>
  <1366207399-29536-1-git-send-email-jefferson.delfes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Change pointer type of command->pdu for a standard type.
+Change type of event->id for a standard type.
 ---
- attrib/gattrib.c | 4 ++--
+ attrib/gattrib.c | 6 +++---
  attrib/gattrib.h | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index e9b5a15..b00a8d2 100644
+index ea85eaa..e9b5a15 100644
 --- a/attrib/gattrib.c
 +++ b/attrib/gattrib.c
-@@ -63,7 +63,7 @@ struct _GAttrib {
- struct command {
- 	unsigned int id;
- 	uint8_t opcode;
--	guint8 *pdu;
-+	uint8_t *pdu;
- 	guint16 len;
+@@ -73,7 +73,7 @@ struct command {
+ };
+ 
+ struct event {
+-	guint id;
++	unsigned int id;
  	uint8_t expected;
- 	bool sent;
-@@ -502,7 +502,7 @@ GAttrib *g_attrib_new(GIOChannel *io)
- 	return g_attrib_ref(attrib);
+ 	uint16_t handle;
+ 	GAttribNotifyFunc func;
+@@ -669,11 +669,11 @@ bool g_attrib_set_mtu(GAttrib *attrib, int mtu)
+ 	return true;
  }
  
--unsigned int g_attrib_send(GAttrib *attrib, unsigned int id, const guint8 *pdu,
-+unsigned int g_attrib_send(GAttrib *attrib, unsigned int id, const uint8_t *pdu,
- 				guint16 len, GAttribResultFunc func,
- 				gpointer user_data, GDestroyNotify notify)
+-guint g_attrib_register(GAttrib *attrib, uint8_t opcode, uint16_t handle,
++unsigned int g_attrib_register(GAttrib *attrib, uint8_t opcode, uint16_t handle,
+ 				GAttribNotifyFunc func, gpointer user_data,
+ 				GDestroyNotify notify)
  {
+-	static guint next_evt_id = 0;
++	static unsigned int next_evt_id = 0;
+ 	struct event *event;
+ 
+ 	event = g_try_new0(struct event, 1);
 diff --git a/attrib/gattrib.h b/attrib/gattrib.h
-index 4404428..5f4477d 100644
+index 06ed450..4404428 100644
 --- a/attrib/gattrib.h
 +++ b/attrib/gattrib.h
-@@ -51,7 +51,7 @@ GIOChannel *g_attrib_get_channel(GAttrib *attrib);
- bool g_attrib_set_destroy_function(GAttrib *attrib, GDestroyNotify destroy,
+@@ -61,7 +61,7 @@ bool g_attrib_cancel_all(GAttrib *attrib);
+ bool g_attrib_set_debug(GAttrib *attrib, GAttribDebugFunc func,
  							gpointer user_data);
  
--unsigned int g_attrib_send(GAttrib *attrib, unsigned int id, const guint8 *pdu,
-+unsigned int g_attrib_send(GAttrib *attrib, unsigned int id, const uint8_t *pdu,
- 				guint16 len, GAttribResultFunc func,
- 				gpointer user_data, GDestroyNotify notify);
+-guint g_attrib_register(GAttrib *attrib, uint8_t opcode, uint16_t handle,
++unsigned int g_attrib_register(GAttrib *attrib, uint8_t opcode, uint16_t handle,
+ 				GAttribNotifyFunc func, gpointer user_data,
+ 				GDestroyNotify notify);
  
 -- 
 1.8.2
