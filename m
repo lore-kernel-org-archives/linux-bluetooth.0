@@ -1,493 +1,158 @@
 Return-Path: <cyrus@holtmann.org>
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, johan.hedberg@intel.com, don.fry@intel.com
-Subject: Re: [PATCH v4] Bluetooth: Add support for Intel Bluetooth device [8087:07dc]
-Date: Thu, 18 Apr 2013 09:10:54 -0700
-Message-ID: <1466472.WPu0Nr1Sby@tedd-ubuntu>
-In-Reply-To: <20130418041217.GA28913@joana>
-References: <3638763.erUlVvs0at@tedd-ubuntu> <20130418041217.GA28913@joana>
+Date: Thu, 18 Apr 2013 01:48:36 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth-next 2013-04-18
+Message-ID: <20130418044836.GB29635@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="sdtB3X0nJg68CQEu"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo
 
-On Thursday, April 18, 2013 01:12:17 AM Gustavo Padovan wrote:
-> Hi Tedd,
-> 
-> * Tedd Ho-Jeong An <tedd.an@intel.com> [2013-04-17 11:47:17 -0700]:
-> 
-> > From: Tedd Ho-Jeong An <tedd.an@intel.com>
-> > 
-> > This patch adds support for Intel Bluetooth device by adding
-> > btusb_setup_intel() routine that update the device with ROM patch.
-> > 
-> > T:  Bus=02 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  4 Spd=12   MxCh= 0
-> > D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> > P:  Vendor=8087 ProdID=07dc Rev= 0.01
-> > C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> > I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> > E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
-> > E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> > E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> > I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> > E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> > E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> > I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> > E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> > E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> > I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> > E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> > E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> > I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> > E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> > E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> > I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> > E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> > E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> > I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> > E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> > E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> > 
-> > Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
-> > ---
-> > v4 changes
-> >  - refactored patching routin to separate function
-> >  - changed varaible type for status to u8
-> >  - corrected minor format issues
-> > 
-> >  drivers/bluetooth/btusb.c |  366 +++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 366 insertions(+)
-> > 
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 3d684d2..52c0ec0 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -23,6 +23,7 @@
-> >  
-> >  #include <linux/module.h>
-> >  #include <linux/usb.h>
-> > +#include <linux/firmware.h>
-> >  
-> >  #include <net/bluetooth/bluetooth.h>
-> >  #include <net/bluetooth/hci_core.h>
-> > @@ -47,6 +48,7 @@ static struct usb_driver btusb_driver;
-> >  #define BTUSB_BROKEN_ISOC	0x20
-> >  #define BTUSB_WRONG_SCO_MTU	0x40
-> >  #define BTUSB_ATH3012		0x80
-> > +#define BTUSB_INTEL		0x100
-> >  
-> >  static struct usb_device_id btusb_table[] = {
-> >  	/* Generic Bluetooth USB device */
-> > @@ -207,6 +209,9 @@ static struct usb_device_id blacklist_table[] = {
-> >  	/* Frontline ComProbe Bluetooth Sniffer */
-> >  	{ USB_DEVICE(0x16d3, 0x0002), .driver_info = BTUSB_SNIFFER },
-> >  
-> > +	/* Intel Bluetooth device */
-> > +	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL },
-> > +
-> >  	{ }	/* Terminating entry */
-> >  };
-> >  
-> > @@ -943,6 +948,364 @@ static int btusb_setup_bcm92035(struct hci_dev *hdev)
-> >  	return 0;
-> >  }
-> >  
-> > +struct intel_version {
-> > +	u8	status;
-> > +	u8	hw_platform;
-> > +	u8	hw_variant;
-> > +	u8	hw_revision;
-> > +	u8	fw_variant;
-> > +	u8	fw_revision;
-> > +	u8	fw_build_num;
-> > +	u8	fw_build_ww;
-> > +	u8	fw_build_yy;
-> > +	u8	fw_patch_num;
-> > +} __packed;
-> > +
-> > +static const struct firmware *btusb_setup_intel_get_fw(struct hci_dev *hdev,
-> > +						struct intel_version *ver)
-> > +{
-> > +	const struct firmware *fw;
-> > +	char fwname[64];
-> > +	int ret;
-> > +
-> > +	snprintf(fwname, sizeof(fwname),
-> > +		 "intel/ibt-hw-%x.%x.%x-fw-%x.%x.%x.%x.%x.bseq",
-> > +		 ver->hw_platform, ver->hw_variant, ver->hw_revision,
-> > +		 ver->fw_variant,  ver->fw_revision, ver->fw_build_num,
-> > +		 ver->fw_build_ww, ver->fw_build_yy);
-> > +
-> > +	ret = request_firmware(&fw, fwname, &hdev->dev);
-> > +	if (ret < 0) {
-> > +		if (ret == -EINVAL) {
-> > +			BT_ERR("%s Intel firmware file request failed (%d)",
-> > +			       hdev->name, ret);
-> > +			return NULL;
-> > +		}
-> > +
-> > +		BT_ERR("%s failed to open Intel firmware file: %s(%d)",
-> > +		       hdev->name, fwname, ret);
-> > +
-> > +		snprintf(fwname, sizeof(fwname), "intel/ibt-default-%x.%x.bseq",
-> > +			 ver->hw_platform, ver->hw_variant);
-> > +		if (request_firmware(&fw, fwname, &hdev->dev) < 0) {
-> > +			BT_ERR("%s failed to open default Intel fw file: %s",
-> > +			       hdev->name, fwname);
-> > +			return NULL;
-> > +		}
-> > +	}
-> > +
-> > +	BT_INFO("%s Intel Bluetooth firmware file: %s", hdev->name, fwname);
-> > +
-> > +	return fw;
-> > +}
-> > +
-> > +static int btusb_setup_intel_patching(struct hci_dev *hdev,
-> > +				      const struct firmware *fw,
-> > +				      const u8 **curr_fw_ptr,
-> > +				      int *disable_patch)
-> > +{
-> > +	struct sk_buff *skb;
-> > +	struct hci_command_hdr *cmd;
-> > +	const u8 *cmd_param;
-> > +	struct hci_event_hdr *evt = NULL;
-> > +	const u8 *evt_param = NULL;
-> > +	const u8 *fw_ptr = *curr_fw_ptr;
-> 
-> Why do you need an extra var to keep fw_ptr? can't you just use curr_fw_ptr
-> directly?
+--sdtB3X0nJg68CQEu
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Yes. I can.  I will make a change.
+Hi John,
 
-> 
-> > +	int remain = fw->size - (fw_ptr - fw->data);
-> > +
-> > +	/* Read command */
-> > +	if (remain > HCI_COMMAND_HDR_SIZE &&
-> > +	    fw_ptr[0] != 0x01) {
-> 
-> Apparently you don't need to break line on the if.
+A set of changes intended for 3.10. The biggest changes here are from David
+Herrmann, he rewrote most of the HIDP layer making it more reliable. Marcel
+added a driver setup stage for device that need special handling on their
+early initialization. Other than that we have the usual clean ups, bugfixes
+and small improvements.
 
-ACK.
+Please pull or let me know of any problems! Thanks!
 
-> 
-> > +		BT_ERR("%s Intel fw corrupted: invalid cmd read", hdev->name);
-> > +		return -1;
-> 
-> Please return a proper error code.
+	Gustavo
 
-ACK.
+---
+The following changes since commit 84bcc0c3c4b8ca4c0abed2d2dd63b7ce04f8be0e:
 
-> 
-> > +	}
-> > +	fw_ptr++;
-> > +	remain--;
-> > +
-> > +	cmd = (struct hci_command_hdr *)fw_ptr;
-> > +	fw_ptr += sizeof(*cmd);
-> > +	remain -= sizeof(*cmd);
-> > +
-> > +	/* checking the length */
-> > +	if (remain < cmd->plen) {
-> > +		BT_ERR("%s Intel fw corrupted: invalid cmd len", hdev->name);
-> > +		return -1;
-> 
-> Same here and all other places you return -1
+  brcmfmac: enable sk_buff queueing when credits deplete (2013-04-03 15:07:=
+09 -0400)
 
-ACK.
+are available in the git repository at:
 
-> 
-> > +	}
-> > +
-> > +	/* If there is a command that loads a patch in the firmware
-> > +	 * file, then enable the patch upon success, otherwise just
-> > +	 * disable the manufacturer mode, for example patch activation
-> > +	 * is not required when the default firmware patch file is used
-> > +	 * because there are no patch data to load.
-> > +	 */
-> > +	if (*disable_patch && cmd->opcode == 0xfc8e)
-> > +		*disable_patch = 0;
-> > +
-> > +	cmd_param = fw_ptr;
-> > +	fw_ptr += cmd->plen;
-> > +	remain -= cmd->plen;
-> > +
-> > +	/* Read event */
-> > +	while (remain > HCI_EVENT_HDR_SIZE && fw_ptr[0] == 0x02) {
-> > +		fw_ptr++;
-> > +		remain--;
-> > +
-> > +		evt = (struct hci_event_hdr *)fw_ptr;
-> > +		fw_ptr += sizeof(*evt);
-> > +		remain -= sizeof(*evt);
-> > +
-> > +		if (remain < evt->plen) {
-> > +			BT_ERR("%s Intel fw corrupted: invalid evt len",
-> > +			       hdev->name);
-> > +			return -1;
-> > +		}
-> > +
-> > +		evt_param = fw_ptr;
-> > +		fw_ptr += evt->plen;
-> > +		remain -= evt->plen;
-> > +	}
-> > +
-> > +	if (!evt || !evt_param || remain < 0) {
-> > +		BT_ERR("%s Intel fw corrupted: invalid evt read", hdev->name);
-> > +		return -1;
-> > +	}
-> > +
-> > +	skb = __hci_cmd_sync_ev(hdev, le16_to_cpu(cmd->opcode),
-> > +				cmd->plen, (void *)cmd_param, evt->evt,
-> > +				HCI_INIT_TIMEOUT);
-> > +	if (IS_ERR(skb)) {
-> > +		BT_ERR("%s sending Intel patch command failed (%ld)",
-> > +		       hdev->name, PTR_ERR(skb));
-> > +		return -1;
-> > +	}
-> > +
-> > +	/* Checking the returned event */
-> > +	if (skb->len != evt->plen) {
-> > +		BT_ERR("%s mismatch event length", hdev->name);
-> > +		kfree_skb(skb);
-> > +		return -1;
-> > +	}
-> > +
-> > +	if (memcmp(skb->data, evt_param, evt->plen)) {
-> > +		BT_ERR("%s mismatch event parameter", hdev->name);
-> > +		kfree_skb(skb);
-> > +		return -1;
-> > +	}
-> > +	kfree_skb(skb);
-> > +
-> > +	*curr_fw_ptr = fw_ptr;
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int btusb_setup_intel(struct hci_dev *hdev)
-> > +{
-> > +	struct sk_buff *skb;
-> > +	const struct firmware *fw;
-> > +	const u8 *fw_ptr;
-> > +	int disable_patch;
-> > +	struct intel_version *ver;
-> > +
-> > +	u8 mfg_enable[] = { 0x01, 0x00 };
-> > +	u8 mfg_disable[] = { 0x00, 0x00 };
-> > +	u8 mfg_reset_deactivate[] = { 0x00, 0x01 };
-> > +	u8 mfg_reset_activate[] = { 0x00, 0x02 };
-> > +
-> > +	BT_DBG("%s", hdev->name);
-> > +
-> > +	/* The controller has a bug with the first HCI command send to it
-> 
-> s/send/sent/
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next fo=
+r-upstream
 
-ACK.
+for you to fetch changes up to 76a388beaf92cc75b829d4a0b7d69afaaeaa4b0a:
 
-> 
-> > +	 * returning number of completed commands as zero. This would stall the
-> > +	 * command processing in the Bluetooth core
-> > +	 *
-> > +	 * As a workaround, send HCI Reset command first which will reset the
-> > +	 * number of completed commands and allow normal command processing
-> > +	 * from now on
-> > +	 */
-> > +	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
-> > +	if (IS_ERR(skb)) {
-> > +		BT_ERR("%s sending initial HCI reset command failed (%ld)",
-> > +		       hdev->name, PTR_ERR(skb));
-> > +		return -PTR_ERR(skb);
-> > +	}
-> > +	kfree_skb(skb);
-> > +
-> > +	/* Read Intel specific controller version first to allow selection of
-> > +	 * which firmware file to load.
-> > +	 *
-> > +	 * The returned information are hardware variant and revision plus
-> > +	 * firmware variant, revision and build number.
-> > +	 */
-> > +	skb = __hci_cmd_sync(hdev, 0xfc05, 0, NULL, HCI_INIT_TIMEOUT);
-> 
-> Could you turn 0xfc05 into a macro that we can actually understand
+  Bluetooth: Rename LE_SCANNING_* macros (2013-04-18 01:17:27 -0300)
 
-My older version of patch used macro but I changed it later due to a comments from others.
-I will make a change back to use macro. I think that will make the code cleaner.
+----------------------------------------------------------------
+Andre Guedes (7):
+      Bluetooth: Fix HCI request framework
+      Bluetooth: Fix hci_inquiry ioctl usage
+      Bluetooth: Remove unneeded hci_req_cmd_status function
+      Bluetooth: Change LE scanning timeout macros
+      Bluetooth: Add LE scan type macros
+      Bluetooth: Add macros for filter duplicates values
+      Bluetooth: Rename LE_SCANNING_* macros
 
-> 
-> > +	if (IS_ERR(skb)) {
-> > +		BT_ERR("%s reading Intel fw version command failed (%ld)",
-> > +		       hdev->name, PTR_ERR(skb));
-> > +		return -PTR_ERR(skb);
-> > +	}
-> > +
-> > +	if (skb->len != sizeof(*ver)) {
-> > +		BT_ERR("%s Intel version event length mismatch", hdev->name);
-> > +		kfree_skb(skb);
-> > +		return 0;
-> 
-> So why you return 0 here?
+Chan-yeol Park (3):
+      Bluetooth: Fix H4 crash from incoming UART packets
+      Bluetooth: Fix possible NULL dereference in hci_uart_tty_receive
+      Bluetooth: Remove trivial white space
 
-Orignially, I thought it would be ok to continue the initialization (BT init) even if it received invalid length or status.
-Actually, if it receives these errors, there must be something wrong in the device and should return with error.
+Claudio Takahasi (5):
+      Bluetooth: Fix SCO connection reference
+      Bluetooth: Use GFP_KERNEL in sco_conn_add
+      Bluetooth: Minor coding style fix
+      Bluetooth: Remove unneeded parameter
+      Bluetooth: Reject SCO when hci connection timeouts
 
-I will make a change to return with proper error code.
+David Herrmann (18):
+      Bluetooth: hidp: remove redundant error message
+      Bluetooth: hidp: verify l2cap sockets
+      Bluetooth: rename hci_conn_put to hci_conn_drop
+      Bluetooth: remove unneeded hci_conn_hold/put_device()
+      Bluetooth: introduce hci_conn ref-counting
+      Bluetooth: hidp: remove unused session->state field
+      Bluetooth: hidp: test "terminate" before sleeping
+      Bluetooth: allow constant arguments for bacmp()/bacpy()
+      Bluetooth: hidp: move hidp_schedule() to core.c
+      Bluetooth: l2cap: introduce l2cap_conn ref-counting
+      Bluetooth: l2cap: add l2cap_user sub-modules
+      Bluetooth: hidp: add new session-management helpers
+      Bluetooth: hidp: remove old session-management
+      Bluetooth: hidp: handle kernel_sendmsg() errors correctly
+      Bluetooth: hidp: merge hidp_process_{ctrl,intr}_transmit()
+      Bluetooth: hidp: merge 'send' functions into hidp_send_message()
+      Bluetooth: hidp: don't send boot-protocol messages as HID-reports
+      Bluetooth: hidp: fix sending output reports on intr channel
 
-However, please understand that there are a certain cases that I need to return 0 even if the fw patching is not completed.
+Fr=E9d=E9ric Dalleau (1):
+      Bluetooth: Move and rename hci_conn_accept
 
-I will carefully review those return case.
+Jaganath Kanakkassery (1):
+      Bluetooth: Fix incorrect SSP mode bit for non SSP devices
 
-> 
-> > +	}
-> > +
-> > +	ver = (struct intel_version *)skb->data;
-> 
-> Is the cast really necessary?
-> 
-> > +	/* was command successful */
-> 
-> I would just drop this comment. The 'if' below already tell you that.
+Johan Hedberg (6):
+      Bluetooth: Track received events in hdev
+      Bluetooth: Add __hci_cmd_sync() helper function
+      Bluetooth: Add support for custom event terminated commands
+      Bluetooth: Add __hci_cmd_sync_ev function
+      Bluetooth: Track feature pages in a single table
+      Bluetooth: Add reading of all local feature pages
 
-ACK
+Marcel Holtmann (4):
+      Bluetooth: Add driver setup stage for early init
+      Bluetooth: Convert BCM92035 support to driver setup callback
+      Bluetooth: Remove driver init queue from core
+      Bluetooth: Use separate function for BCM92035 vendor setup
 
-> 
-> > +	if (ver->status) {
-> > +		BT_ERR("%s Intel fw version event failed (%02x)", hdev->name,
-> > +		       ver->status);
-> > +		kfree_skb(skb);
-> > +		return 0;
-> 
-> Here again. Why return 0? Check other places in the function.
+Noguchi Kazutosi (1):
+      Bluetooth: Add support for Foxconn/Hon Hai [0489:e04d]
 
-Same as above. 
+ drivers/bluetooth/ath3k.c         |   2 +
+ drivers/bluetooth/btusb.c         |  41 +-
+ drivers/bluetooth/hci_h4.c        |   3 +
+ drivers/bluetooth/hci_ldisc.c     |  15 +-
+ include/net/bluetooth/bluetooth.h |   5 +-
+ include/net/bluetooth/hci.h       |   9 +-
+ include/net/bluetooth/hci_core.h  |  98 ++--
+ include/net/bluetooth/l2cap.h     |  15 +
+ net/bluetooth/hci_conn.c          |  38 +-
+ net/bluetooth/hci_core.c          | 239 +++++++---
+ net/bluetooth/hci_event.c         | 184 ++++----
+ net/bluetooth/hci_sysfs.c         |  17 +-
+ net/bluetooth/hidp/core.c         | 992 +++++++++++++++++++++++-----------=
+------
+ net/bluetooth/hidp/hidp.h         |  67 ++-
+ net/bluetooth/hidp/sock.c         |  22 +-
+ net/bluetooth/l2cap_core.c        | 127 ++++-
+ net/bluetooth/l2cap_sock.c        |   6 +
+ net/bluetooth/mgmt.c              |  17 +-
+ net/bluetooth/sco.c               |  49 +-
+ net/bluetooth/smp.c               |   2 +-
+ 20 files changed, 1213 insertions(+), 735 deletions(-)
 
-> 
-> > +	}
-> > +
-> > +	BT_INFO("%s read Intel version: %02x%02x%02x%02x%02x%02x%02x%02x%02x",
-> 
-> Add a ":" after the %s for hdev->name
 
-ACK
+--sdtB3X0nJg68CQEu
+Content-Type: application/pgp-signature
 
-> 
-> > +		hdev->name, ver->hw_platform, ver->hw_variant,
-> > +		ver->hw_revision, ver->fw_variant,  ver->fw_revision,
-> > +		ver->fw_build_num, ver->fw_build_ww, ver->fw_build_yy,
-> > +		ver->fw_patch_num);
-> > +
-> > +	/* is the device already patched */
-> > +	if (ver->fw_patch_num) {
-> > +		BT_INFO("%s Intel device is already patched. patch num: %02x",
-> > +			hdev->name, ver->fw_patch_num);
-> > +		kfree_skb(skb);
-> > +		return 0;
-> > +	}
-> > +
-> > +	/* Opens the firmware patch file based on the firmware version read
-> > +	 * from the controller. If it failed to open the matching firmware
-> > +	 * patch file, it tries to open the default firmware patch file.
-> > +	 * If no patch file, allow the device to operate without a patch.
-> > +	 */
-> > +	fw = btusb_setup_intel_get_fw(hdev, ver);
-> > +	if (!fw) {
-> > +		kfree_skb(skb);
-> > +		return 0;
-> > +	}
-> > +	fw_ptr = fw->data;
-> > +
-> > +	/* This Intel specific command enables the manufacturer mode of the
-> > +	 * controller.
-> > +	 *
-> > +	 * Only while this mode is enabled, the driver can download the
-> > +	 * firmware patch data and configuration parameters.
-> > +	 */
-> > +	skb = __hci_cmd_sync(hdev, 0xfc11, 2, mfg_enable, HCI_INIT_TIMEOUT);
-> > +	if (IS_ERR(skb)) {
-> > +		BT_ERR("%s entering Intel manufacturer mode failed (%ld)",
-> > +		       hdev->name, PTR_ERR(skb));
-> 
-> Same here ":" after %s.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.13 (GNU/Linux)
 
-ACK
+iQIcBAEBAgAGBQJRb3sjAAoJEPs3PUX4s20oKmwP+wdaZB14rFmnua4d0VtFmEJx
+1PQvdvkwlqEflXLP9D5IVuEofGbhbhUkS5R2tQsGtcNtBngO5SlVxnN5J0F4+JVe
+fKUovVugtGL+Dp1i2sWbPntzZ1I47JuWE53UwngHgxEIqq0xi+0w2bxu16rNWELO
+fsPYX/3u9mQadB6GF+VvOfbeoUQtt+mdgfFhb+65vI90m/r184jYOrV+Y+/drw6y
+90KtKRghQDmlxi6y9Jv5uQw29l9cTMMGrGzhilyxIniMc80j0vJ4ZdA0Axs2iIm2
+mQoHb9PbTbKb6rOh73eo8AGbB6WKWcENZLxj+JL7NVxl0SDQL1Coz29M45u/lAvL
+RI769b52PsES2ckE0FX5MfaM1xJMboO3/zP9PzZZS2kW74HL7fuq97gx9Yurakpp
+MZ5Rvfd8rcKVdr8noEOjVDQFlVwHAau98vYJpHkHVaBP0BGP6TyJwF2qb/ikS0y4
+/iMWpcAAX+HTdbRWPrtrv+iOxHu0EyfUPLFINLtqVkOTSlidxGOrMYt2E106mSPD
+eLibVzUm3MrwJvdTUr+cCTWBqr3dP34LV+npdP2xzdSuGcaAY5nCbgQNd5dnghaU
+7qMpMTDKpDygiG5QU222/XwzyjcHkRvHdZwJ6+MvIZG0wPes1NMqQJbV7I6/lz9h
+3EOmtJ0uaX7AslqXPIfU
+=8KLa
+-----END PGP SIGNATURE-----
 
-> 
-> > +		release_firmware(fw);
-> > +		return -PTR_ERR(skb);
-> > +	}
-> > +
-> > +	if (skb->data[0]) {
-> > +		u8 evt_status = skb->data[0];
-> > +		BT_ERR("%s enable Intel manufacturer mode event failed (%02x)",
-> > +		       hdev->name, evt_status);
-> > +		kfree_skb(skb);
-> > +		release_firmware(fw);
-> > +		return -bt_to_errno(evt_status);
-> > +	}
-> > +	kfree_skb(skb);
-> > +
-> > +	disable_patch = 1;
-> > +
-> > +	/* The firmware data file consists of list of Intel specific HCI
-> > +	 * commands and its expected events. The first byte indicates the
-> > +	 * type of the message, either HCI command or HCI event.
-> > +	 *
-> > +	 * It reads the command and its expected event from the firmware file,
-> > +	 * and send to the controller. Once __hci_cmd_sync_ev() returns,
-> > +	 * the returned event is compared with the event read from the firmware
-> > +	 * file and it will continue until all the messages are downloaded to
-> > +	 * the controller.
-> > +	 *
-> > +	 * Once the firmware patching is completed successfully,
-> > +	 * the manufacturer mode is disabled with reset and activating the
-> > +	 * downloaded patch.
-> > +	 *
-> > +	 * If the firmware patching is failed, the manufacturer mode is
-> 
-> s/is failed/fails/
-
-ACK
-
-> 
-> > +	 * disabled with reset and deactivating the patch.
-> > +	 *
-> > +	 * If the default patch file is used, no reset is done when disabling
-> > +	 * the manufacturer.
-> > +	 */
-> > +	while (1) {
-> > +		int ret;
-> > +
-> > +		ret = btusb_setup_intel_patching(hdev, fw, &fw_ptr,
-> > +						 &disable_patch);
-> > +		if (ret < 0)
-> > +			goto exit_mfg_deactivate;
-> > +
-> > +		/* Checking if EOF */
-> > +		if (fw->size == fw_ptr - fw->data) {
-> > +			if (disable_patch)
-> > +				goto exit_mfg_disable;
-> > +			else
-> > +				goto exit_mfg_activate;
-> > +		} else if (fw->size < fw_ptr - fw->data) {
-> > +			BT_ERR("%s inconsistent patch read size", hdev->name);
-> > +			goto exit_mfg_deactivate;
-> 
-> It seems that to make this if true 'remain' has to be < 0 in the other
-> function and if remain is < 0 the we actually never see this if since the
-> return of btusb_setup_intel_patching() is < 0 and we goto exit_mfg_deactivate
-> above.
-> 
-
-I was a little coufused at first but I got your point. Yes, you are right. this 'else if' will never be hit.
-Good point and I will remove it.
-
-> 	Gustavo
-
--- 
-Regards
-Tedd Ho-Jeong An
-Intel Corporation
+--sdtB3X0nJg68CQEu--
