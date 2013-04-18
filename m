@@ -1,33 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 18 Apr 2013 00:16:08 -0300
+Date: Thu, 18 Apr 2013 00:10:47 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
-	<frederic.dalleau@linux.intel.com>
+To: Jaganath Kanakkassery <jaganath.k@samsung.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v6 1/6] Bluetooth: Move and rename hci_conn_accept
-Message-ID: <20130418031608.GA22245@joana>
-References: <1366126143-28545-1-git-send-email-frederic.dalleau@linux.intel.com>
- <1366126143-28545-2-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: Re: [PATCH v4] Bluetooth: Fix incorrect SSP mode bit for non SSP
+ devices
+Message-ID: <20130418031047.GA21885@joana>
+References: <1366123590-28567-1-git-send-email-jaganath.k@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1366126143-28545-2-git-send-email-frederic.dalleau@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1366123590-28567-1-git-send-email-jaganath.k@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frédéric,
+Hi Jaganath,
 
-* Frédéric Dalleau <frederic.dalleau@linux.intel.com> [2013-04-16 17:28:58 +0200]:
+* Jaganath Kanakkassery <jaganath.k@samsung.com> [2013-04-16 20:16:30 +0530]:
 
-> Since this function is only used by sco, move it from hci_event.c to
-> sco.c and rename to sco_conn_defer_accept. Make it static.
+> Some faulty non SSP devices send extended inquiry response
+> during device discovery which is a violation of 2.1 specification.
+> So for these devices we set SSP bit during acl connection
+> initiation thinking that it is an SSP device. But for these
+> devices, in remote host features event SSP supported bit
+> will be off. But we are not clearing the SSP bit in that case
+> and eventually SSP bit in conn flag will be incorrectly set for
+> these devices.
 > 
-> Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
+> The software which has caused this issue is MecApp
+> http://www.mecel.se/products/bluetooth/downloads/MecApp_download
+> 
+> This patch does a workaround by clearing the SSP bit if it is
+> not supported in remote host features event
+> 
+> hcidump log
+> ----------
+> 
+> < HCI Command: Inquiry (0x01|0x0001) plen 5
+>     lap 0x9e8b33 len 4 num 0
+> > HCI Event: Command Status (0x0f) plen 4
+>     Inquiry (0x01|0x0001) status 0x00 ncmd 1
+> > HCI Event: Extended Inquiry Result (0x2f) plen 255
+>     bdaddr 00:1B:DC:05:B5:25 mode 1 clkoffset 0x3263 class 0x3c0000 rssi -77
+>     Unknown type 0x42 with 8 bytes data
+>     Unknown type 0x1e with 2 bytes data
+> > HCI Event: Inquiry Complete (0x01) plen 1
+>     status 0x00
+> 
+> < HCI Command: Create Connection (0x01|0x0005) plen 13
+>     bdaddr 00:1B:DC:05:B5:25 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
+>     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
+> > HCI Event: Command Status (0x0f) plen 4
+>     Create Connection (0x01|0x0005) status 0x00 ncmd 1
+> > HCI Event: Connect Complete (0x03) plen 11
+>     status 0x00 handle 12 bdaddr 00:1B:DC:05:B5:25 type ACL encrypt 0x00
+> < HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
+>     handle 12
+> > HCI Event: Command Status (0x0f) plen 4
+>     Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
+> > HCI Event: Read Remote Supported Features (0x0b) plen 11
+>     status 0x00 handle 12
+>     Features: 0xff 0xff 0x8f 0x7e 0xd8 0x1f 0x5b 0x87
+> < HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
+>     handle 12 page 1
+> > HCI Event: Command Status (0x0f) plen 4
+>     Read Remote Extended Features (0x01|0x001c) status 0x00 ncmd 1
+> > HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
+>     bdaddr 00:1B:DC:05:B5:25 mode 1
+> > HCI Event: Max Slots Change (0x1b) plen 3
+>     handle 12 slots 5
+> > HCI Event: Read Remote Extended Features (0x23) plen 13
+>     status 0x00 handle 12 page 1 max 0
+>     Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
+>     bdaddr 00:1B:DC:05:B5:25 mode 2 clkoffset 0x0000
+> > HCI Event: Command Status (0x0f) plen 4
+>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> > HCI Event: Remote Name Req Complete (0x07) plen 255
+>     status 0x00 bdaddr 00:1B:DC:05:B5:25 name 'Bluetooth PTS Radio v4'
+> < HCI Command: Authentication Requested (0x01|0x0011) plen 2
+>     handle 12
+> > HCI Event: Command Status (0x0f) plen 4
+>     Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
+> > HCI Event: Link Key Request (0x17) plen 6
+>     bdaddr 00:1B:DC:05:B5:25
+> < HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
+>     bdaddr 00:1B:DC:05:B5:25
+> > HCI Event: Command Complete (0x0e) plen 10
+>     Link Key Request Negative Reply (0x01|0x000c) ncmd 1
+>     status 0x00 bdaddr 00:1B:DC:05:B5:25
+> > HCI Event: PIN Code Request (0x16) plen 6
+>     bdaddr 00:1B:DC:05:B5:25
+> 
+> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
 > ---
->  include/net/bluetooth/hci_core.h |    1 -
->  net/bluetooth/hci_event.c        |   36 ------------------------------------
->  net/bluetooth/sco.c              |   38 +++++++++++++++++++++++++++++++++++++-
->  3 files changed, 37 insertions(+), 38 deletions(-)
+>  net/bluetooth/hci_event.c |   13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
 
-Patch has been applied to bluetooth-next. Thanks.
+It seems you took care of all comments already. Patch has been applied to
+bluetooth-next. Thanks.
 
 	Gustavo
