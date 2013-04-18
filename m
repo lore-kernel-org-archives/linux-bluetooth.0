@@ -1,102 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 18 Apr 2013 00:10:47 -0300
+Date: Wed, 17 Apr 2013 23:55:03 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4] Bluetooth: Fix incorrect SSP mode bit for non SSP
- devices
-Message-ID: <20130418031047.GA21885@joana>
-References: <1366123590-28567-1-git-send-email-jaganath.k@samsung.com>
+To: Feng Hong <hongfeng@marvell.com>
+Cc: "marcel@holtmann.org" <marcel@holtmann.org>,
+	"johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: Avoid duplicate conn dev register
+Message-ID: <20130418025503.GB17064@joana>
+References: <1365489826-30652-1-git-send-email-hongfeng@marvell.com>
+ <E62404B31D39064FBDD0B843ADF05A7D2DEBE7E9EB@SC-VEXCH4.marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1366123590-28567-1-git-send-email-jaganath.k@samsung.com>
+In-Reply-To: <E62404B31D39064FBDD0B843ADF05A7D2DEBE7E9EB@SC-VEXCH4.marvell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+Hi Feng,
 
-* Jaganath Kanakkassery <jaganath.k@samsung.com> [2013-04-16 20:16:30 +0530]:
+* Feng Hong <hongfeng@marvell.com> [2013-04-11 19:43:48 -0700]:
 
-> Some faulty non SSP devices send extended inquiry response
-> during device discovery which is a violation of 2.1 specification.
-> So for these devices we set SSP bit during acl connection
-> initiation thinking that it is an SSP device. But for these
-> devices, in remote host features event SSP supported bit
-> will be off. But we are not clearing the SSP bit in that case
-> and eventually SSP bit in conn flag will be incorrectly set for
-> these devices.
+> Hello, Marcel Holtmann, Gustavo Padovan, Johan Hedberg,
 > 
-> The software which has caused this issue is MecApp
-> http://www.mecel.se/products/bluetooth/downloads/MecApp_download
+> What's your idea why below warning will happen ?
+> [  651.865509] WARNING: at lib/kobject.c:198 kobject_add_internal+0x1f4/0x264()
+> [  651.872894] kobject_add_internal failed for hci0:1 with -EEXIST, don't try to register things with the same name in the same directory.
+> [  651.910125] [<c011991c>] (unwind_backtrace+0x0/0x11c) from [<c0134d3c>] (warn_slowpath_common+0x4c/0x64)
+> [  651.920013] [<c0134d3c>] (warn_slowpath_common+0x4c/0x64) from [<c0134dd4>] (warn_slowpath_fmt+0x2c/0x3c)
+> [  651.930053] [<c0134dd4>] (warn_slowpath_fmt+0x2c/0x3c) from [<c02d91e0>] (kobject_add_internal+0x1f4/0x264)
+> [  651.940246] [<c02d91e0>] (kobject_add_internal+0x1f4/0x264) from [<c02d95f0>] (kobject_add+0x68/0x8c)
+> [  651.949890] [<c02d95f0>] (kobject_add+0x68/0x8c) from [<c03323c8>] (device_add+0x104/0x5b8)
+> [  651.958831] [<c03323c8>] (device_add+0x104/0x5b8) from [<c0547484>] (hci_conn_add_sysfs+0x4c/0x80)
+> [  651.968109] [<c0547484>] (hci_conn_add_sysfs+0x4c/0x80) from [<c053996c>] (hci_event_packet+0x530/0x6428)
+> [  651.978149] [<c053996c>] (hci_event_packet+0x530/0x6428) from [<c05342a8>] (hci_rx_work+0xd0/0x390)
+> [  651.987640] [<c05342a8>] (hci_rx_work+0xd0/0x390) from [<c014ce24>] (process_one_work+0x280/0x488)
+> [  651.996978] [<c014ce24>] (process_one_work+0x280/0x488) from [<c014d240>] (worker_thread+0x214/0x3b4)
+> [  652.006652] [<c014d240>] (worker_thread+0x214/0x3b4) from [<c01511b4>] (kthread+0x80/0x8c)
+> [  652.015228] [<c01511b4>] (kthread+0x80/0x8c) from [<c0113ed8>] (kernel_thread_exit+0x0/0x8)
+> [  652.023925] ---[ end trace 7d6ac73956376f0a ]---
+> [  652.035034] Bluetooth: Failed to register connection device
 > 
-> This patch does a workaround by clearing the SSP bit if it is
-> not supported in remote host features event
-> 
-> hcidump log
-> ----------
-> 
-> < HCI Command: Inquiry (0x01|0x0001) plen 5
->     lap 0x9e8b33 len 4 num 0
-> > HCI Event: Command Status (0x0f) plen 4
->     Inquiry (0x01|0x0001) status 0x00 ncmd 1
-> > HCI Event: Extended Inquiry Result (0x2f) plen 255
->     bdaddr 00:1B:DC:05:B5:25 mode 1 clkoffset 0x3263 class 0x3c0000 rssi -77
->     Unknown type 0x42 with 8 bytes data
->     Unknown type 0x1e with 2 bytes data
-> > HCI Event: Inquiry Complete (0x01) plen 1
->     status 0x00
-> 
-> < HCI Command: Create Connection (0x01|0x0005) plen 13
->     bdaddr 00:1B:DC:05:B5:25 ptype 0xcc18 rswitch 0x01 clkoffset 0x0000
->     Packet type: DM1 DM3 DM5 DH1 DH3 DH5
-> > HCI Event: Command Status (0x0f) plen 4
->     Create Connection (0x01|0x0005) status 0x00 ncmd 1
-> > HCI Event: Connect Complete (0x03) plen 11
->     status 0x00 handle 12 bdaddr 00:1B:DC:05:B5:25 type ACL encrypt 0x00
-> < HCI Command: Read Remote Supported Features (0x01|0x001b) plen 2
->     handle 12
-> > HCI Event: Command Status (0x0f) plen 4
->     Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
-> > HCI Event: Read Remote Supported Features (0x0b) plen 11
->     status 0x00 handle 12
->     Features: 0xff 0xff 0x8f 0x7e 0xd8 0x1f 0x5b 0x87
-> < HCI Command: Read Remote Extended Features (0x01|0x001c) plen 3
->     handle 12 page 1
-> > HCI Event: Command Status (0x0f) plen 4
->     Read Remote Extended Features (0x01|0x001c) status 0x00 ncmd 1
-> > HCI Event: Page Scan Repetition Mode Change (0x20) plen 7
->     bdaddr 00:1B:DC:05:B5:25 mode 1
-> > HCI Event: Max Slots Change (0x1b) plen 3
->     handle 12 slots 5
-> > HCI Event: Read Remote Extended Features (0x23) plen 13
->     status 0x00 handle 12 page 1 max 0
->     Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> < HCI Command: Remote Name Request (0x01|0x0019) plen 10
->     bdaddr 00:1B:DC:05:B5:25 mode 2 clkoffset 0x0000
-> > HCI Event: Command Status (0x0f) plen 4
->     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
-> > HCI Event: Remote Name Req Complete (0x07) plen 255
->     status 0x00 bdaddr 00:1B:DC:05:B5:25 name 'Bluetooth PTS Radio v4'
-> < HCI Command: Authentication Requested (0x01|0x0011) plen 2
->     handle 12
-> > HCI Event: Command Status (0x0f) plen 4
->     Authentication Requested (0x01|0x0011) status 0x00 ncmd 1
-> > HCI Event: Link Key Request (0x17) plen 6
->     bdaddr 00:1B:DC:05:B5:25
-> < HCI Command: Link Key Request Negative Reply (0x01|0x000c) plen 6
->     bdaddr 00:1B:DC:05:B5:25
-> > HCI Event: Command Complete (0x0e) plen 10
->     Link Key Request Negative Reply (0x01|0x000c) ncmd 1
->     status 0x00 bdaddr 00:1B:DC:05:B5:25
-> > HCI Event: PIN Code Request (0x16) plen 6
->     bdaddr 00:1B:DC:05:B5:25
-> 
-> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
-> ---
->  net/bluetooth/hci_event.c |   13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
+> And if above really happen, the patch below can avoid system from panic, what's your comments on this protection ? 
 
-It seems you took care of all comments already. Patch has been applied to
-bluetooth-next. Thanks.
+I think that fc225c3f5 and other commits we recently added to bluetooth-next
+may help you with this. Could give bluetooth-next a try please and see if this
+is gone?
 
 	Gustavo
