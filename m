@@ -2,38 +2,62 @@ Return-Path: <cyrus@holtmann.org>
 From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-Subject: [RFC 2/2] device: Fix the wrong order of UUIDs PropertyChanged
-Date: Thu, 18 Apr 2013 14:50:24 -0300
-Message-Id: <1366307424-19825-2-git-send-email-vinicius.gomes@openbossa.org>
-In-Reply-To: <1366307424-19825-1-git-send-email-vinicius.gomes@openbossa.org>
-References: <1366307424-19825-1-git-send-email-vinicius.gomes@openbossa.org>
+Subject: [RFC 1/2] gdbus: Add g_dbus_flush_properties()
+Date: Thu, 18 Apr 2013 14:50:23 -0300
+Message-Id: <1366307424-19825-1-git-send-email-vinicius.gomes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The code goes to great length to make sure that the Service Discovery
-is finished before sending the NewConnection() message to external
-profiles.  In some situations this effort is wasted because the UUIDs
-signal is emitted after NewConnection() is sent.
-
-This patch fixes it by making sure that all the properties for that
-object are updated before sending the NewConnection() call.
+In some situations, it may be useful to be sure that all the
+properties updates for a object are sent.
 ---
- src/device.c | 2 ++
- 1 file changed, 2 insertions(+)
+ gdbus/gdbus.h  |  2 ++
+ gdbus/object.c | 19 +++++++++++++++++++
+ 2 files changed, 21 insertions(+)
 
-diff --git a/src/device.c b/src/device.c
-index ee17514..9f9dba3 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2806,6 +2806,8 @@ static void search_cb(sdp_list_t *recs, int err, gpointer user_data)
- send_reply:
- 	device_svc_resolved(device, err);
+diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
+index 8b13393..ed280e4 100644
+--- a/gdbus/gdbus.h
++++ b/gdbus/gdbus.h
+@@ -299,6 +299,8 @@ void g_dbus_emit_property_changed(DBusConnection *connection,
+ gboolean g_dbus_get_properties(DBusConnection *connection, const char *path,
+ 				const char *interface, DBusMessageIter *iter);
  
-+	g_dbus_flush_properties(dbus_conn, req->device->path);
++gboolean g_dbus_flush_properties(DBusConnection *connection, const char *path);
 +
- 	if (!device->temporary)
- 		store_device_info(device);
+ gboolean g_dbus_attach_object_manager(DBusConnection *connection);
+ gboolean g_dbus_detach_object_manager(DBusConnection *connection);
  
+diff --git a/gdbus/object.c b/gdbus/object.c
+index 2f8ef45..14b6803 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -1751,6 +1751,25 @@ gboolean g_dbus_get_properties(DBusConnection *connection, const char *path,
+ 	return TRUE;
+ }
+ 
++gboolean g_dbus_flush_properties(DBusConnection *connection, const char *path)
++{
++	struct generic_data *data;
++
++	if (path == NULL)
++		return FALSE;
++
++	if (!dbus_connection_get_object_path_data(connection, path,
++					(void **) &data) || data == NULL)
++		return FALSE;
++
++	if (data->process_id)
++		g_source_remove(data->process_id);
++
++	process_changes(data);
++
++	return TRUE;
++}
++
+ gboolean g_dbus_attach_object_manager(DBusConnection *connection)
+ {
+ 	struct generic_data *data;
 -- 
 1.8.2.1
 
