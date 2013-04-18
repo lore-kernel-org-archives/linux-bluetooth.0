@@ -1,36 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 18 Apr 2013 00:27:22 -0300
+Date: Thu, 18 Apr 2013 00:16:08 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
+	<frederic.dalleau@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: Add reading of all local feature pages
-Message-ID: <20130418032722.GB22245@joana>
-References: <1366200052-13196-1-git-send-email-johan.hedberg@gmail.com>
- <1366200052-13196-3-git-send-email-johan.hedberg@gmail.com>
+Subject: Re: [PATCH v6 1/6] Bluetooth: Move and rename hci_conn_accept
+Message-ID: <20130418031608.GA22245@joana>
+References: <1366126143-28545-1-git-send-email-frederic.dalleau@linux.intel.com>
+ <1366126143-28545-2-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1366200052-13196-3-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1366126143-28545-2-git-send-email-frederic.dalleau@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Frédéric,
 
-* Johan Hedberg <johan.hedberg@gmail.com> [2013-04-17 15:00:52 +0300]:
+* Frédéric Dalleau <frederic.dalleau@linux.intel.com> [2013-04-16 17:28:58 +0200]:
 
-> From: Johan Hedberg <johan.hedberg@intel.com>
+> Since this function is only used by sco, move it from hci_event.c to
+> sco.c and rename to sco_conn_defer_accept. Make it static.
 > 
-> With the introduction of CSA4 there is now also a features page number 2
-> available. This patch increments the maximum supported page number to 2
-> and adds code for reading all available pages (as long as we have
-> support for them - indicated by HCI_MAX_PAGES).
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
 > ---
->  include/net/bluetooth/hci_core.h |    3 ++-
->  net/bluetooth/hci_core.c         |   10 ++++++++++
->  net/bluetooth/hci_event.c        |    2 ++
->  3 files changed, 14 insertions(+), 1 deletion(-)
+>  include/net/bluetooth/hci_core.h |    1 -
+>  net/bluetooth/hci_event.c        |   36 ------------------------------------
+>  net/bluetooth/sco.c              |   38 +++++++++++++++++++++++++++++++++++++-
+>  3 files changed, 37 insertions(+), 38 deletions(-)
 
-Both patches have been applied to bluetooth-next. Thanks.
+Patch has been applied to bluetooth-next. Thanks.
 
 	Gustavo
