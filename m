@@ -9,77 +9,76 @@ Cc: gustavo@padovan.org,
 	bzhao@marvell.com,
 	zonque@gmail.com,
 	Andreas Fenkart <andreas.fenkart@streamunlimited.com>
-Subject: [PATCH v2 2/2] Bluetooth: btmrvl: report error if verify_fw_download times out.
-Date: Fri, 19 Apr 2013 10:07:08 +0200
-Message-Id: <1366358828-1241-4-git-send-email-andreas.fenkart@streamunlimited.com>
+Subject: [PATCH v2 1/2] Bluetooth: btmrv: release lock while waiting for fw download complete.
+Date: Fri, 19 Apr 2013 10:07:07 +0200
+Message-Id: <1366358828-1241-3-git-send-email-andreas.fenkart@streamunlimited.com>
 In-Reply-To: <1366358828-1241-1-git-send-email-andreas.fenkart@streamunlimited.com>
 References: <1366301890-14100-1-git-send-email-andreas.fenkart@streamunlimited.com>
  <1366358828-1241-1-git-send-email-andreas.fenkart@streamunlimited.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-FW does the synchronization of the different modules during init.
-It will report different modules, that it is ready at different times.
-The fw download 'winner' will be reported fw ready first. Without this
-patch, btmrvl was already continuing before the FW told it too. Probably
-on behalf of the 'winner' which then never sees FW ready and times out.
+If not winner, driver must release the sdio host lock, so the fw
+download can progress. While holding the lock fw download is stalled
+and the following error is produced:
+
+[  235.746015] Bluetooth: FW failed to be active in time!
+[  235.752799] Bluetooth: Downloading firmware failed!
 
 Signed-off-by: Andreas Fenkart <andreas.fenkart@streamunlimited.com>
 
 diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index c7ec727..3d8305c 100644
+index 9959d4c..c7ec727 100644
 --- a/drivers/bluetooth/btmrvl_sdio.c
 +++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -228,9 +228,8 @@ failed:
- static int btmrvl_sdio_verify_fw_download(struct btmrvl_sdio_card *card,
- 								int pollnum)
- {
--	int ret = -ETIMEDOUT;
- 	u16 firmwarestat;
--	unsigned int tries;
-+	int tries, ret;
+@@ -234,7 +234,10 @@ static int btmrvl_sdio_verify_fw_download(struct btmrvl_sdio_card *card,
  
  	 /* Wait for firmware to become ready */
  	for (tries = 0; tries < pollnum; tries++) {
-@@ -240,15 +239,13 @@ static int btmrvl_sdio_verify_fw_download(struct btmrvl_sdio_card *card,
- 		if (ret < 0)
+-		if (btmrvl_sdio_read_fw_status(card, &firmwarestat) < 0)
++		sdio_claim_host(card->func);
++		ret = btmrvl_sdio_read_fw_status(card, &firmwarestat);
++		sdio_release_host(card->func);
++		if (ret < 0)
  			continue;
  
--		if (firmwarestat == FIRMWARE_READY) {
--			ret = 0;
--			break;
--		} else {
--			msleep(10);
--		}
-+		if (firmwarestat == FIRMWARE_READY)
-+			return 0;
-+
-+		msleep(10);
+ 		if (firmwarestat == FIRMWARE_READY) {
+@@ -882,13 +885,14 @@ static int btmrvl_sdio_download_fw(struct btmrvl_sdio_card *card)
+ 		BT_ERR("card or function is NULL!");
+ 		return -EINVAL;
+ 	}
+-	sdio_claim_host(card->func);
+ 
+ 	if (!btmrvl_sdio_verify_fw_download(card, 1)) {
+ 		BT_DBG("Firmware already downloaded!");
+-		goto done;
++		return 0;
  	}
  
--	return ret;
-+	return -ETIMEDOUT;
- }
++	sdio_claim_host(card->func);
++
+ 	/* Check if other function driver is downloading the firmware */
+ 	fws0 = sdio_readb(card->func, card->reg->card_fw_status0, &ret);
+ 	if (ret) {
+@@ -918,15 +922,17 @@ static int btmrvl_sdio_download_fw(struct btmrvl_sdio_card *card)
+ 		}
+ 	}
  
- static int btmrvl_sdio_download_helper(struct btmrvl_sdio_card *card)
-@@ -924,6 +921,10 @@ static int btmrvl_sdio_download_fw(struct btmrvl_sdio_card *card)
- 
- 	sdio_release_host(card->func);
- 
-+	/*
-+	 * winner or not, with this test the FW synchronizes when the
-+	 * module can continue its initialization
-+	 */
++	sdio_release_host(card->func);
++
  	if (btmrvl_sdio_verify_fw_download(card, pollnum)) {
  		BT_ERR("FW failed to be active in time!");
- 		return -ETIMEDOUT;
-@@ -995,8 +996,6 @@ static int btmrvl_sdio_probe(struct sdio_func *func,
- 		goto unreg_dev;
+-		ret = -ETIMEDOUT;
+-		goto done;
++		return -ETIMEDOUT;
  	}
  
--	msleep(100);
++	return 0;
++
+ done:
+ 	sdio_release_host(card->func);
 -
- 	btmrvl_sdio_enable_host_int(card);
+ 	return ret;
+ }
  
- 	priv = btmrvl_add_card(card);
 -- 
 1.7.10.4
