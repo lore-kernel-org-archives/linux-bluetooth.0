@@ -1,176 +1,162 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/6] AVRCP: Register pass-through handler for CT
-Date: Fri, 19 Apr 2013 15:31:09 +0300
-Message-Id: <1366374673-24937-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1366374673-24937-1-git-send-email-luiz.dentz@gmail.com>
-References: <1366374673-24937-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/6] AVCTP: Add support to register pass-through handler
+Date: Fri, 19 Apr 2013 15:31:08 +0300
+Message-Id: <1366374673-24937-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Register pass-through handler for CT role if version >= 1.3 and creates
-callbacks to direct this commands to the active player.
+Pass-through handler can be used to capture AV/C Panel commands before
+they are sent to uinput.
 ---
- profiles/audio/avrcp.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++++++
- profiles/audio/avrcp.h |  5 +++
- 2 files changed, 101 insertions(+)
+ profiles/audio/avctp.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ profiles/audio/avctp.h |  8 ++++++
+ 2 files changed, 80 insertions(+)
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 512b018..71a691d 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -203,8 +203,10 @@ struct avrcp {
- 	void (*init_browsing) (struct avrcp *session);
- 	void (*destroy) (struct avrcp *sesion);
+diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+index 21aeb6f..705bf71 100644
+--- a/profiles/audio/avctp.c
++++ b/profiles/audio/avctp.c
+@@ -192,10 +192,18 @@ struct avctp {
+ 	struct avctp_channel *control;
+ 	struct avctp_channel *browsing;
  
-+	const struct passthrough_handler *passthrough_handlers;
- 	const struct control_pdu_handler *control_handlers;
- 
-+	unsigned int passthrough_id;
- 	unsigned int control_id;
- 	unsigned int browsing_id;
- 	uint16_t supported_events;
-@@ -214,6 +216,11 @@ struct avrcp {
- 	struct pending_pdu *pending_pdu;
++	struct avctp_passthrough_handler *handler;
++
+ 	uint8_t key_quirks[256];
+ 	struct key_pressed *key;
  };
  
-+struct passthrough_handler {
-+	uint8_t op;
-+	bool (*func) (struct avrcp *session);
++struct avctp_passthrough_handler {
++	avctp_passthrough_cb cb;
++	void *user_data;
++	unsigned int id;
 +};
 +
- struct control_pdu_handler {
- 	uint8_t pdu_id;
- 	uint8_t code;
-@@ -1252,6 +1259,87 @@ static GList *player_list_settings(struct avrcp_player *player)
- 	return player->cb->list_settings(player->user_data);
- }
+ struct avctp_pdu_handler {
+ 	uint8_t opcode;
+ 	avctp_control_pdu_cb cb;
+@@ -280,6 +288,8 @@ static size_t handle_panel_passthrough(struct avctp *session,
+ 					uint8_t *subunit, uint8_t *operands,
+ 					size_t operand_count, void *user_data)
+ {
++	struct key_pressed *key = session->key;
++	struct avctp_passthrough_handler *handler = session->handler;
+ 	const char *status;
+ 	int pressed, i;
  
-+static bool avrcp_handle_play(struct avrcp *session)
-+{
-+	struct avrcp_player *player = session->player;
-+
-+	if (session->player == NULL)
-+		return false;
-+
-+	return player->cb->play(player->user_data);
-+}
-+
-+static bool avrcp_handle_stop(struct avrcp *session)
-+{
-+	struct avrcp_player *player = session->player;
-+
-+	if (session->player == NULL)
-+		return false;
-+
-+	return player->cb->stop(player->user_data);
-+}
-+
-+static bool avrcp_handle_pause(struct avrcp *session)
-+{
-+	struct avrcp_player *player = session->player;
-+
-+	if (session->player == NULL)
-+		return false;
-+
-+	return player->cb->pause(player->user_data);
-+}
-+
-+static bool avrcp_handle_next(struct avrcp *session)
-+{
-+	struct avrcp_player *player = session->player;
-+
-+	if (session->player == NULL)
-+		return false;
-+
-+	return player->cb->next(player->user_data);
-+}
-+
-+static bool avrcp_handle_previous(struct avrcp *session)
-+{
-+	struct avrcp_player *player = session->player;
-+
-+	if (session->player == NULL)
-+		return false;
-+
-+	return player->cb->previous(player->user_data);
-+}
-+
-+static const struct passthrough_handler tg_passthrough_handlers[] = {
-+		{ AVC_PLAY, avrcp_handle_play },
-+		{ AVC_STOP, avrcp_handle_stop },
-+		{ AVC_PAUSE, avrcp_handle_pause },
-+		{ AVC_FORWARD, avrcp_handle_next },
-+		{ AVC_BACKWARD, avrcp_handle_previous },
-+		{ },
-+};
-+
-+static bool handle_passthrough(struct avctp *conn, uint8_t op, bool pressed,
-+							void *user_data)
-+{
-+	struct avrcp *session = user_data;
-+	const struct passthrough_handler *handler;
-+
-+	for (handler = session->passthrough_handlers; handler->func;
-+								handler++) {
-+		if (handler->op == op)
-+			break;
-+	}
-+
-+	if (handler->func == NULL)
-+		return false;
-+
-+	/* Do not trigger handler on release */
-+	if (!pressed)
-+		return true;
-+
-+	return handler->func(session);
-+}
-+
- static uint8_t avrcp_handle_register_notification(struct avrcp *session,
- 						struct avrcp_header *pdu,
- 						uint8_t transaction)
-@@ -2653,6 +2741,11 @@ static void session_tg_init_control(struct avrcp *session)
- 		player->sessions = g_slist_prepend(player->sessions, session);
+@@ -299,6 +309,12 @@ static size_t handle_panel_passthrough(struct avctp *session,
+ 		pressed = 1;
  	}
  
-+	session->passthrough_id = avctp_register_passthrough_handler(
-+							session->conn,
-+							handle_passthrough,
-+							session);
-+	session->passthrough_handlers = tg_passthrough_handlers;
- 	session->control_id = avctp_register_pdu_handler(session->conn,
- 							AVC_OP_VENDORDEP,
- 							handle_vendordep_pdu,
-@@ -2712,6 +2805,9 @@ static void session_destroy(struct avrcp *session)
- 
- 	server->sessions = g_slist_remove(server->sessions, session);
- 
-+	if (session->passthrough_id > 0)
-+		avctp_unregister_passthrough_handler(session->passthrough_id);
++	if (key == NULL && handler != NULL) {
++		if (handler->cb(session, operands[0] & 0x7F,
++						pressed, handler->user_data))
++			goto done;
++	}
 +
- 	if (session->control_id > 0)
- 		avctp_unregister_pdu_handler(session->control_id);
+ 	for (i = 0; key_map[i].name != NULL; i++) {
+ 		uint8_t key_quirks;
  
-diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
-index 7b6fe92..3b1963f 100644
---- a/profiles/audio/avrcp.h
-+++ b/profiles/audio/avrcp.h
-@@ -93,6 +93,11 @@ struct avrcp_player_cb {
- 	uint32_t (*get_duration) (void *user_data);
- 	void (*set_volume) (uint8_t volume, struct audio_device *dev,
- 							void *user_data);
-+	bool (*play) (void *user_data);
-+	bool (*stop) (void *user_data);
-+	bool (*pause) (void *user_data);
-+	bool (*next) (void *user_data);
-+	bool (*previous) (void *user_data);
- };
+@@ -321,6 +337,16 @@ static size_t handle_panel_passthrough(struct avctp *session,
+ 			break;
+ 		}
  
- int avrcp_target_register(struct btd_adapter *adapter, GKeyFile *config);
++		if (pressed) {
++			if (key == NULL)
++				key = g_new0(struct key_pressed, 1);
++			key->op = key_map[i].avc;
++			session->key = key;
++		} else if (key && key->op == key_map[i].avc) {
++			g_free(key);
++			session->key = NULL;
++		}
++
+ 		send_key(session->uinput, key_map[i].uinput, pressed);
+ 		break;
+ 	}
+@@ -1692,6 +1718,52 @@ gboolean avctp_remove_state_cb(unsigned int id)
+ 	return FALSE;
+ }
+ 
++unsigned int avctp_register_passthrough_handler(struct avctp *session,
++						avctp_passthrough_cb cb,
++						void *user_data)
++{
++	struct avctp_channel *control = session->control;
++	struct avctp_passthrough_handler *handler;
++	static unsigned int id = 0;
++
++	if (control == NULL || session->handler != NULL)
++		return 0;
++
++	handler = g_new(struct avctp_passthrough_handler, 1);
++	handler->cb = cb;
++	handler->user_data = user_data;
++	handler->id = ++id;
++
++	session->handler = handler;
++
++	return handler->id;
++}
++
++bool avctp_unregister_passthrough_handler(unsigned int id)
++{
++	GSList *l;
++
++	for (l = servers; l; l = l->next) {
++		struct avctp_server *server = l->data;
++		GSList *s;
++
++		for (s = server->sessions; s; s = s->next) {
++			struct avctp *session = s->data;
++
++			if (session->handler == NULL)
++				continue;
++
++			if (session->handler->id == id) {
++				g_free(session->handler);
++				session->handler = NULL;
++				return true;
++			}
++		}
++	}
++
++	return false;
++}
++
+ unsigned int avctp_register_pdu_handler(struct avctp *session, uint8_t opcode,
+ 						avctp_control_pdu_cb cb,
+ 						void *user_data)
+diff --git a/profiles/audio/avctp.h b/profiles/audio/avctp.h
+index 648e982..0a414af 100644
+--- a/profiles/audio/avctp.h
++++ b/profiles/audio/avctp.h
+@@ -94,6 +94,9 @@ typedef void (*avctp_state_cb) (struct audio_device *dev,
+ 				avctp_state_t old_state,
+ 				avctp_state_t new_state);
+ 
++typedef bool (*avctp_passthrough_cb) (struct avctp *session,
++					uint8_t op, bool pressed,
++					void *user_data);
+ typedef size_t (*avctp_control_pdu_cb) (struct avctp *session,
+ 					uint8_t transaction, uint8_t *code,
+ 					uint8_t *subunit, uint8_t *operands,
+@@ -120,6 +123,11 @@ struct avctp *avctp_get(struct audio_device *device);
+ int avctp_connect_browsing(struct avctp *session);
+ void avctp_disconnect(struct avctp *session);
+ 
++unsigned int avctp_register_passthrough_handler(struct avctp *session,
++						avctp_passthrough_cb cb,
++						void *user_data);
++bool avctp_unregister_passthrough_handler(unsigned int id);
++
+ unsigned int avctp_register_pdu_handler(struct avctp *session, uint8_t opcode,
+ 						avctp_control_pdu_cb cb,
+ 						void *user_data);
 -- 
 1.8.1.4
 
