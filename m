@@ -1,55 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix sending write_le_host_supporte for LE-only controllers
-Date: Fri, 19 Apr 2013 17:07:12 +0300
-Message-Id: <1366380432-16237-1-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 19 Apr 2013 10:35:34 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix HCI command send functions to use const
+ specifier
+Message-ID: <20130419133534.GA2194@joana>
+References: <1366355691-3173-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1366355691-3173-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Johan,
 
-The Bluetooth Core Specification (4.0) defines the Write LE Host
-Supported HCI command as only available for controllers supporting
-BR/EDR. This is further reflected in the Read Local Extended Features
-HCI command also not being available for LE-only controllers. In other
-words, host-side LE support is implicit for single-mode LE controllers
-and doesn't have explicit HCI-level enablement.
+* Johan Hedberg <johan.hedberg@gmail.com> [2013-04-19 10:14:51 +0300]:
 
-We do however still want user space to explicitly enable LE support in
-order to use it (all user space versions already do this) so all the
-mgmt_set_le command should affect is the HCI_LE_ENABLED flag without
-causing any HCI commands to be sent.
+> From: Johan Hedberg <johan.hedberg@intel.com>
+> 
+> All HCI command send functions that take a pointer to the command
+> parameters do not need to modify the content in any way (they merely
+> copy the data to an skb). Therefore, the parameter type should be
+> declared const. This also allows passing already const parameters to
+> these APIs which previously would have generated a compiler warning.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  include/net/bluetooth/hci_core.h |   14 ++++++++------
+>  net/bluetooth/hci_core.c         |   16 +++++++++-------
+>  2 files changed, 17 insertions(+), 13 deletions(-)
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c |    6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Patch has been applied to bluetooth-next. Thanks.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 4c830c6..8a4b4da 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1356,7 +1356,8 @@ static int set_le(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
- 	val = !!cp->val;
- 	enabled = lmp_host_le_capable(hdev);
- 
--	if (!hdev_is_powered(hdev) || val == enabled) {
-+	if (!hdev_is_powered(hdev) || val == enabled ||
-+	    !lmp_bredr_capable(hdev)) {
- 		bool changed = false;
- 
- 		if (val != test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
-@@ -3347,7 +3348,8 @@ static int powered_update_hci(struct hci_dev *hdev)
- 		hci_req_add(&req, HCI_OP_WRITE_SSP_MODE, 1, &ssp);
- 	}
- 
--	if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
-+	if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags) &&
-+	    lmp_bredr_capable(hdev)) {
- 		struct hci_cp_write_le_host_supported cp;
- 
- 		cp.le = 1;
--- 
-1.7.10.4
-
+	Gustavo
