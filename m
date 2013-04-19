@@ -1,49 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 19 Apr 2013 10:23:09 +0300
+Date: Fri, 19 Apr 2013 10:16:09 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Larry Finger <Larry.Finger@lwfinger.net>
-Cc: Gustavo Padovan <gustavo@padovan.org>, linville@tuxdriver.com,
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
-	champion_chen@realsil.com.cn
-Subject: Re: [RFC/RFT PATCH 2/2] rtk_btusb: A new driver for the Bluetooth
- portion of the Realtek RTL8723AE chip
-Message-ID: <20130419072309.GB3214@x220>
-References: <1365469068-4548-1-git-send-email-Larry.Finger@lwfinger.net>
- <1365469068-4548-3-git-send-email-Larry.Finger@lwfinger.net>
- <20130418222221.GA15279@joana>
- <51709E57.7020402@lwfinger.net>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Tedd Ho-Jeong An <tedd.an@intel.com>, linux-bluetooth@vger.kernel.org,
+	don.fry@intel.com, gustavo@padovan.org
+Subject: Re: [PATCH v5] Bluetooth: Add support for Intel Bluetooth device
+ [8087:07dc]
+Message-ID: <20130419071609.GA3214@x220>
+References: <1657315.CFhxFClec5@tedd-ubuntu>
+ <7AA63F25-1E5A-4449-96F9-07E307C9F9C6@holtmann.org>
+ <1683721.rPzt6KZh0J@tedd-ubuntu>
+ <1FD1A5F4-36D2-44E0-BBA8-BA5147C7322D@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <51709E57.7020402@lwfinger.net>
+In-Reply-To: <1FD1A5F4-36D2-44E0-BBA8-BA5147C7322D@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Larry,
+Hi Marcel,
 
-On Thu, Apr 18, 2013, Larry Finger wrote:
-> On 04/18/2013 05:22 PM, Gustavo Padovan wrote:
-> >We recently added a setup callback to btusb to run device specific
-> >initialization, take a look in bluetooth-next to check how that can help you
-> >avoid duplicate a lot of code.
+On Thu, Apr 18, 2013, Marcel Holtmann wrote:
+> >>> +	u8 mfg_enable[] = { 0x01, 0x00 };
+> >>> +	u8 mfg_disable[] = { 0x00, 0x00 };
+> >>> +	u8 mfg_reset_deactivate[] = { 0x00, 0x01 };
+> >>> +	u8 mfg_reset_activate[] = { 0x00, 0x02 };
+> >> 
+> >> Check if you can make these const.
+> > 
+> > If these becomes const, the compiler throws a warning at __hci_cmd_sync() below.
 > 
-> Thanks for the tip. I knew something was in the planning stage.
+> That is what I almost figured.
 > 
-> Is there any documentation on using the new facility?
+> Johan, can you check if we can fix __hci_cmd_sync to take a const array.
 
-Not really, but you can take a look at the "Bluetooth: Add support for
-Intel Bluetooth device [[8087:07dc]" patch that's currently going
-through some feedback rounds on linux-bluetooth. It's one of the first
-users of this new API.
-
-Basically what you have is the new setup() callback for HCI drivers and
-then a new __hci_cmd_sync() function that can be used from within the
-setup() callback to synchronously send whatever HCI commands you need to
-send before proceeding with the normal HCI init sequence within the HCI
-core.
-
-To my understanding Marcel has planned to move the vendor specific btusb
-routines into their own files in the long run (I believe he's used a
-term "mini driver" for this) but for now the changes are expected to go
-to the main btusb.c file.
+Done. The patch for this is now on the list.
 
 Johan
