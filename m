@@ -1,37 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 19 Apr 2013 10:16:09 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Tedd Ho-Jeong An <tedd.an@intel.com>, linux-bluetooth@vger.kernel.org,
-	don.fry@intel.com, gustavo@padovan.org
-Subject: Re: [PATCH v5] Bluetooth: Add support for Intel Bluetooth device
- [8087:07dc]
-Message-ID: <20130419071609.GA3214@x220>
-References: <1657315.CFhxFClec5@tedd-ubuntu>
- <7AA63F25-1E5A-4449-96F9-07E307C9F9C6@holtmann.org>
- <1683721.rPzt6KZh0J@tedd-ubuntu>
- <1FD1A5F4-36D2-44E0-BBA8-BA5147C7322D@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1FD1A5F4-36D2-44E0-BBA8-BA5147C7322D@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix HCI command send functions to use const specifier
+Date: Fri, 19 Apr 2013 10:14:51 +0300
+Message-Id: <1366355691-3173-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Thu, Apr 18, 2013, Marcel Holtmann wrote:
-> >>> +	u8 mfg_enable[] = { 0x01, 0x00 };
-> >>> +	u8 mfg_disable[] = { 0x00, 0x00 };
-> >>> +	u8 mfg_reset_deactivate[] = { 0x00, 0x01 };
-> >>> +	u8 mfg_reset_activate[] = { 0x00, 0x02 };
-> >> 
-> >> Check if you can make these const.
-> > 
-> > If these becomes const, the compiler throws a warning at __hci_cmd_sync() below.
-> 
-> That is what I almost figured.
-> 
-> Johan, can you check if we can fix __hci_cmd_sync to take a const array.
+All HCI command send functions that take a pointer to the command
+parameters do not need to modify the content in any way (they merely
+copy the data to an skb). Therefore, the parameter type should be
+declared const. This also allows passing already const parameters to
+these APIs which previously would have generated a compiler warning.
 
-Done. The patch for this is now on the list.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci_core.h |   14 ++++++++------
+ net/bluetooth/hci_core.c         |   16 +++++++++-------
+ 2 files changed, 17 insertions(+), 13 deletions(-)
 
-Johan
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 80d718a..35a57cd 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1081,17 +1081,19 @@ struct hci_request {
+ 
+ void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
+ int hci_req_run(struct hci_request *req, hci_req_complete_t complete);
+-void hci_req_add(struct hci_request *req, u16 opcode, u32 plen, void *param);
+-void hci_req_add_ev(struct hci_request *req, u16 opcode, u32 plen, void *param,
+-		    u8 event);
++void hci_req_add(struct hci_request *req, u16 opcode, u32 plen,
++		 const void *param);
++void hci_req_add_ev(struct hci_request *req, u16 opcode, u32 plen,
++		    const void *param, u8 event);
+ void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status);
+ 
+ struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
+-			       void *param, u32 timeout);
++			       const void *param, u32 timeout);
+ struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
+-				  void *param, u8 event, u32 timeout);
++				  const void *param, u8 event, u32 timeout);
+ 
+-int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param);
++int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen,
++		 const void *param);
+ void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags);
+ void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb);
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index ce82265..215db08 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -134,7 +134,7 @@ failed:
+ }
+ 
+ struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
+-				  void *param, u8 event, u32 timeout)
++				  const void *param, u8 event, u32 timeout)
+ {
+ 	DECLARE_WAITQUEUE(wait, current);
+ 	struct hci_request req;
+@@ -188,7 +188,7 @@ struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
+ EXPORT_SYMBOL(__hci_cmd_sync_ev);
+ 
+ struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
+-			       void *param, u32 timeout)
++			       const void *param, u32 timeout)
+ {
+ 	return __hci_cmd_sync_ev(hdev, opcode, plen, param, 0, timeout);
+ }
+@@ -2602,7 +2602,7 @@ int hci_req_run(struct hci_request *req, hci_req_complete_t complete)
+ }
+ 
+ static struct sk_buff *hci_prepare_cmd(struct hci_dev *hdev, u16 opcode,
+-				       u32 plen, void *param)
++				       u32 plen, const void *param)
+ {
+ 	int len = HCI_COMMAND_HDR_SIZE + plen;
+ 	struct hci_command_hdr *hdr;
+@@ -2628,7 +2628,8 @@ static struct sk_buff *hci_prepare_cmd(struct hci_dev *hdev, u16 opcode,
+ }
+ 
+ /* Send HCI command */
+-int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
++int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen,
++		 const void *param)
+ {
+ 	struct sk_buff *skb;
+ 
+@@ -2652,8 +2653,8 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen, void *param)
+ }
+ 
+ /* Queue a command to an asynchronous HCI request */
+-void hci_req_add_ev(struct hci_request *req, u16 opcode, u32 plen, void *param,
+-		    u8 event)
++void hci_req_add_ev(struct hci_request *req, u16 opcode, u32 plen,
++		    const void *param, u8 event)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+ 	struct sk_buff *skb;
+@@ -2682,7 +2683,8 @@ void hci_req_add_ev(struct hci_request *req, u16 opcode, u32 plen, void *param,
+ 	skb_queue_tail(&req->cmd_q, skb);
+ }
+ 
+-void hci_req_add(struct hci_request *req, u16 opcode, u32 plen, void *param)
++void hci_req_add(struct hci_request *req, u16 opcode, u32 plen,
++		 const void *param)
+ {
+ 	hci_req_add_ev(req, opcode, plen, param, 0);
+ }
+-- 
+1.7.10.4
+
