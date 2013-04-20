@@ -1,21 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 20 Apr 2013 09:48:55 +0300
-From: Johan Hedberg <johan.hedberg@intel.com>
-To: Tedd Ho-Jeong An <tedd.an@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, don.fry@intel.com,
-	gustavo@padovan.org
-Subject: Re: [PATCH v7] Bluetooth: Add support for Intel Bluetooth device
- [8087:07dc]
-Message-ID: <20130420064855.GA23692@x220.P-661HNU-F1>
-References: <7512829.DBWZ3dSBuK@tedd-ubuntu>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
+Subject: Re: [PATCH v7] Bluetooth: Add support for Intel Bluetooth device [8087:07dc]
+From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <7512829.DBWZ3dSBuK@tedd-ubuntu>
+Date: Fri, 19 Apr 2013 21:48:25 -0700
+Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@intel.com,
+	don.fry@intel.com, gustavo@padovan.org
+Message-Id: <D4B9167A-DED5-4929-8870-A1FB9D4E8B5F@holtmann.org>
+References: <7512829.DBWZ3dSBuK@tedd-ubuntu>
+To: Tedd Ho-Jeong An <tedd.an@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Tedd,
 
-On Fri, Apr 19, 2013, Tedd Ho-Jeong An wrote:
 > This patch adds support for Intel Bluetooth device by adding
 > btusb_setup_intel() routine that update the device with ROM patch.
 > 
@@ -49,15 +48,20 @@ On Fri, Apr 19, 2013, Tedd Ho-Jeong An wrote:
 > Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 > ---
 > v7 changes:
->  - fixed endian swapping for opcode
->  - removed type casting for cmd_param in in __hci_cmd_sync_ev()
->  - made command param arrays to const
->  - minor format change
->  - required Johan's new patch: [PATCH] Bluetooth: Fix HCI command send functions to use const specifier
+> - fixed endian swapping for opcode
+> - removed type casting for cmd_param in in __hci_cmd_sync_ev()
+> - made command param arrays to const
+> - minor format change
+> - required Johan's new patch: [PATCH] Bluetooth: Fix HCI command send functions to use const specifier
 > 
->  drivers/bluetooth/btusb.c |  378 +++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 378 insertions(+)
+> drivers/bluetooth/btusb.c |  378 +++++++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 378 insertions(+)
 
-Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+this looks good enough to me.
 
-Johan
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
+Regards
+
+Marcel
+
