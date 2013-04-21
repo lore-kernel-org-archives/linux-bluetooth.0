@@ -1,28 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andreas Fenkart <andreas.fenkart@streamunlimited.com>
-To: marcel@holtmann.org
-Cc: gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	andrei.emeltchenko@intel.com,
-	akarwar@marvell.com,
-	bzhao@marvell.com,
-	zonque@gmail.com,
-	Andreas Fenkart <andreas.fenkart@streamunlimited.com>
-Subject: [PATCH v3 0/2] Bluetooth: btmrvl: Fix concurrent FW download
-Date: Mon, 22 Apr 2013 11:10:21 +0200
-Message-Id: <1366621823-10411-1-git-send-email-andreas.fenkart@streamunlimited.com>
+MIME-Version: 1.0
+In-Reply-To: <CAJdJm_NatozmvH5SKEZvZ4GDeyb0vbxbtf61=4vPh1V7r=r7vA@mail.gmail.com>
+References: <CALSoeMdtP4AxTK1-+gs+Xzo67U7KF11U0y2ihj3KKm5kwp8_og@mail.gmail.com>
+	<CAJdJm_NatozmvH5SKEZvZ4GDeyb0vbxbtf61=4vPh1V7r=r7vA@mail.gmail.com>
+Date: Sun, 21 Apr 2013 15:26:14 -0400
+Message-ID: <CALSoeMeghHjqdzrEOdNnZY1-gA=SsBfGCdyr1LgcJeE2ixEDaQ@mail.gmail.com>
+Subject: Re: Access GATT characteristics with DBus in BlueZ 5.4
+From: Sandeep Mistry <sandeep.mistry@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a resend.
+On Sun, Apr 21, 2013 at 2:25 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi,
+>
+> On Sat, Apr 20, 2013 at 5:11 PM, Sandeep Mistry
+> <sandeep.mistry@gmail.com> wrote:
+>> Hi, Is there a way to access GATT characteristics via DBus in BlueZ 5.4?
+>>
+>> In Bluez 4.101, I was abled to access them using the
+>> "org.bluez.Characteristic" interface.
+>
+> So far, there is no GATT D-Bus API in BlueZ 5.x. The only way to
+> access GATT profiles in BlueZ 5.x is using existing profile specific
+> D-Bus APIs (thermometer, heart rate, proximity, cycling speed, HID
+> over GATT) or using C API (like gatttool does).
+>
+> Regards,
+> --
+> Anderson Lizardo
+> Instituto Nokia de Tecnologia - INdT
+> Manaus - Brazil
 
-Andreas Fenkart (2):
-  Bluetooth: btmrvl: release lock while waiting for fw download
-    complete.
-  Bluetooth: btmrvl: report error if verify_fw_download times out.
+Thanks! Are there plans to add a D-Bus API for generic GATT
+services/characteristics in later versions of BlueZ?
 
- drivers/bluetooth/btmrvl_sdio.c |   39 ++++++++++++++++++++++-----------------
- 1 file changed, 22 insertions(+), 17 deletions(-)
-
--- 
-1.7.10.4
+Regards,
+ Sandeep
