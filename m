@@ -1,48 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
-Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
-Subject: Re: [PATCH v7 0/5] input: Connectability
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAGd9gwiE4=fNX7Mb1911Za-aMm2Wa3WuTnapDWKuGXY45a8xbw@mail.gmail.com>
-Date: Mon, 22 Apr 2013 12:27:55 -0700
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	keybuk <keybuk@chromium.org>
-Message-Id: <51409ECB-5F03-473F-A257-72EE1540B571@holtmann.org>
-References: <1366149521-26908-1-git-send-email-deymo@chromium.org> <553F95A2-59E2-4D2E-BDB6-4AEF5E45B3FD@holtmann.org> <CAGd9gwiE4=fNX7Mb1911Za-aMm2Wa3WuTnapDWKuGXY45a8xbw@mail.gmail.com>
-To: Alex Deymo <deymo@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 22 Apr 2013 14:57:14 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2013-04-18
+Message-ID: <20130422185713.GE2055@tuxdriver.com>
+References: <20130418044836.GB29635@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130418044836.GB29635@joana>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
-
->> However I do have a general question, do we need the new D-Bus API if we do an auto-reconnect handling? If so, do we need to indicate that the we are currently in auto-reconnect mode and/or cancel it when connecting attempts via other means happen.
+On Thu, Apr 18, 2013 at 01:48:36AM -0300, Gustavo Padovan wrote:
+> Hi John,
 > 
-> We still need the new D-Bus API to let the UI know that it can't
-> reconnect to the device because the device is not supposed to normally
-> accept connections (ReconnectMode is "device" (or "none" if such a
-> device exists)). This allows the UI to instruct the user to go and
-> move the mouse to reconnect or press that hidden "connect" button in
-> his device to reconnect it if the device had lost the pairing. If the
-> ReconnectMode is "device", the meaning of Device1.Connected property
-> changes a bit, since the fact that my mouse is disconnected right now
-> doesn't mean that it is not working as intended or that it should be
-> connected.
+> A set of changes intended for 3.10. The biggest changes here are from David
+> Herrmann, he rewrote most of the HIDP layer making it more reliable. Marcel
+> added a driver setup stage for device that need special handling on their
+> early initialization. Other than that we have the usual clean ups, bugfixes
+> and small improvements.
+> 
+> Please pull or let me know of any problems! Thanks!
+> 
+> 	Gustavo
+> 
+> ---
+> The following changes since commit 84bcc0c3c4b8ca4c0abed2d2dd63b7ce04f8be0e:
+> 
+>   brcmfmac: enable sk_buff queueing when credits deplete (2013-04-03 15:07:09 -0400)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next for-upstream
+> 
+> for you to fetch changes up to 76a388beaf92cc75b829d4a0b7d69afaaeaa4b0a:
+> 
+>   Bluetooth: Rename LE_SCANNING_* macros (2013-04-18 01:17:27 -0300)
 
-I might have should answered this email with an acknowledged and understood comment. Sorry about that.
+Pulling now...
 
-My original comment still stands. I am fine with this patch set, but leave it up to Johan to make the final to apply it.
-
-> The auto-reconnect is implied and required by the Bluetooth HID spec
-> for example in cases where ReconnectMode is "host". I don't think we
-> should indicate that we are currently following the spec. The
-> auto-reconnect attempts are canceled when the device is reconnected
-> for some reason (because of this auto-reconnect or not) or when the
-> device is marked for deletion, even if the removal is during the
-> auto-reconnect process.
-
-Sounds good.
-
-Regards
-
-Marcel
-
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
