@@ -1,46 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 22 Apr 2013 14:57:14 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2013-04-18
-Message-ID: <20130422185713.GE2055@tuxdriver.com>
-References: <20130418044836.GB29635@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130418044836.GB29635@joana>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1365809318-17775-1-git-send-email-deymo@chromium.org>
+References: <1365809318-17775-1-git-send-email-deymo@chromium.org>
+From: Alex Deymo <deymo@chromium.org>
+Date: Mon, 22 Apr 2013 10:51:22 -0700
+Message-ID: <CAGd9gwh8uhkjRsAqCRfCwbssRfCuEiONtwKe6AuP6jHyyVXPvw@mail.gmail.com>
+Subject: Re: [PATCH v2 0/8] Autopair plugin, with some extensions.
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, keybuk <keybuk@chromium.org>,
+	Alex Deymo <deymo@chromium.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Apr 18, 2013 at 01:48:36AM -0300, Gustavo Padovan wrote:
-> Hi John,
-> 
-> A set of changes intended for 3.10. The biggest changes here are from David
-> Herrmann, he rewrote most of the HIDP layer making it more reliable. Marcel
-> added a driver setup stage for device that need special handling on their
-> early initialization. Other than that we have the usual clean ups, bugfixes
-> and small improvements.
-> 
-> Please pull or let me know of any problems! Thanks!
-> 
-> 	Gustavo
-> 
-> ---
-> The following changes since commit 84bcc0c3c4b8ca4c0abed2d2dd63b7ce04f8be0e:
-> 
->   brcmfmac: enable sk_buff queueing when credits deplete (2013-04-03 15:07:09 -0400)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next for-upstream
-> 
-> for you to fetch changes up to 76a388beaf92cc75b829d4a0b7d69afaaeaa4b0a:
-> 
->   Bluetooth: Rename LE_SCANNING_* macros (2013-04-18 01:17:27 -0300)
+On Fri, Apr 12, 2013 at 4:28 PM, Alex Deymo <deymo@chromium.org> wrote:
+> Hi,
+>
+> This patch set includes a few changes mentioned in the mailing list
+> and a new functionality for dumb keyboards (last 2 commits).
+>
+> "count" changed to "attempt". I agree that "attempt" is a better name.
+> With this change, attempt is now started at 1, so the first attempt of
+> a given plugin will be called with attempt==1. This also changes the
+> variable type to an unsinged version since it is not supposed to store
+> a negative number.
+>
+> Added a timer to measure the pairing duration of the last attempt. This
+> is a great information to the autopair plugin to identify the cause of a
+> pairing failure. If a keyboard rejects the provided pincode in very short
+> time (less than 500ms) it means that the provided random pincode wasn't
+> the right code and is likelly that any random pincode will be rejected.
+> It turns out that those keyboards have a fixed pincode of "0000".
+>
+> Please take another look.
 
-Pulling now...
-
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Ping?
