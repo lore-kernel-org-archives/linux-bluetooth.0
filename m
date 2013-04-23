@@ -4,114 +4,80 @@ To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	keybuk@chromium.org,
 	Alex Deymo <deymo@chromium.org>
-Subject: [PATCH v3 3/8] core: Add support for retrying a bonding
-Date: Tue, 23 Apr 2013 11:04:02 -0700
-Message-Id: <1366740247-368-4-git-send-email-deymo@chromium.org>
+Subject: [PATCH v3 2/8] plugins: Extend the pin code callback with the call number
+Date: Tue, 23 Apr 2013 11:04:01 -0700
+Message-Id: <1366740247-368-3-git-send-email-deymo@chromium.org>
 In-Reply-To: <1366740247-368-1-git-send-email-deymo@chromium.org>
 References: <1366740247-368-1-git-send-email-deymo@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In order to retry a bonding we need a timer that will perform the
-retry, we need to stash the status and capability of the bonding
-request so it can use them again. In the case of a retrying
-bonding attempt we need to not tear down the temporary D-Bus device
-object on the adapter.
----
- src/adapter.c |  2 +-
- src/device.c  | 20 ++++++++++++++++++--
- src/device.h  |  1 +
- 3 files changed, 20 insertions(+), 3 deletions(-)
+The plugin's pin code callback doesn't know about the pairing process. It
+just provides a pin code based on the information provided to this function.
+Although limited state could be added through other new callbacks, this fix
+achieves this by providing more information to the callback itself. The
+new argument "attempt" states the pin callback attempt of the particular
+plugin for the current pairing of the device. This allows a plugin to try
+different pincodes for the same device in the same pairing process.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 3163d2e..b2231d7 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -4253,7 +4253,7 @@ static void adapter_remove_connection(struct btd_adapter *adapter,
- 	if (device_is_authenticating(device))
- 		device_cancel_authentication(device, TRUE);
- 
--	if (device_is_temporary(device)) {
-+	if (device_is_temporary(device) && !device_is_retrying(device)) {
- 		const char *path = device_get_path(device);
- 
- 		DBG("Removing temporary device %s", path);
-diff --git a/src/device.c b/src/device.c
-index 5686443..291ae5f 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -86,6 +86,9 @@ struct bonding_req {
- 	struct btd_device *device;
- 	struct agent *agent;
- 	struct pincb_iter *cb_iter;
-+	uint8_t capability;
-+	uint8_t status;
-+	guint retry_timer;
+To signal that the plugin doesn't provide any pin code for the provided device
+the current implementation returns 0 (an empty pin code). Analogously, with
+this fix, a plugin should return 0 when it doesn't have any other pin code to
+provide for the given device.
+---
+ plugins/wiimote.c | 7 ++++++-
+ src/adapter.c     | 2 +-
+ src/adapter.h     | 3 ++-
+ 3 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/plugins/wiimote.c b/plugins/wiimote.c
+index 90d6d7b..a1e7974 100644
+--- a/plugins/wiimote.c
++++ b/plugins/wiimote.c
+@@ -70,12 +70,17 @@ static const char *wii_names[] = {
  };
  
- typedef enum {
-@@ -1400,7 +1403,8 @@ static void device_svc_resolved(struct btd_device *dev, int err)
- 
- static struct bonding_req *bonding_request_new(DBusMessage *msg,
- 						struct btd_device *device,
--						struct agent *agent)
-+						struct agent *agent,
-+						uint8_t io_cap)
+ static ssize_t wii_pincb(struct btd_adapter *adapter, struct btd_device *device,
+-						char *pinbuf, gboolean *display)
++			char *pinbuf, gboolean *display, uint32_t attempt)
  {
- 	struct bonding_req *bonding;
- 	char addr[18];
-@@ -1414,6 +1418,8 @@ static struct bonding_req *bonding_request_new(DBusMessage *msg,
+ 	uint16_t vendor, product;
+ 	char addr[18], name[25];
+ 	unsigned int i;
  
- 	bonding->cb_iter = pincb_iter_new(device->adapter);
- 
-+	bonding->capability = io_cap;
++	/* Only try the pin code once per device. If it's not correct then it's
++	 * an unknown device. */
++	if (attempt > 1)
++		return 0;
 +
- 	if (agent)
- 		bonding->agent = agent_ref(agent);
+ 	ba2str(device_get_address(device), addr);
  
-@@ -1467,7 +1473,7 @@ static DBusMessage *pair_device(DBusConnection *conn, DBusMessage *msg,
- 	else
- 		io_cap = IO_CAPABILITY_NOINPUTNOOUTPUT;
+ 	vendor = btd_device_get_vendor(device);
+diff --git a/src/adapter.c b/src/adapter.c
+index 4a6b882..3163d2e 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -4806,7 +4806,7 @@ static ssize_t pincb_iter_next(struct pincb_iter *iter,
  
--	bonding = bonding_request_new(msg, device, agent);
-+	bonding = bonding_request_new(msg, device, agent, io_cap);
+ 	while (iter->it != NULL) {
+ 		cb = iter->it->data;
+-		ret = cb(adapter, device, pin_buf, display);
++		ret = cb(adapter, device, pin_buf, display, iter->attempt);
+ 		iter->attempt++;
+ 		if (ret > 0)
+ 			return ret;
+diff --git a/src/adapter.h b/src/adapter.h
+index d158334..7392187 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -132,7 +132,8 @@ int btd_cancel_authorization(guint id);
+ int btd_adapter_restore_powered(struct btd_adapter *adapter);
  
- 	if (agent)
- 		agent_unref(agent);
-@@ -1548,6 +1554,9 @@ static void bonding_request_free(struct bonding_req *bonding)
- 		bonding->agent = NULL;
- 	}
- 
-+	if (bonding->retry_timer)
-+		g_source_remove(bonding->retry_timer);
-+
- 	if (bonding->device)
- 		bonding->device->bonding = NULL;
- 
-@@ -3594,6 +3603,13 @@ static void device_auth_req_free(struct btd_device *device)
- 	device->authr = NULL;
- }
- 
-+gboolean device_is_retrying(struct btd_device *device)
-+{
-+	struct bonding_req *bonding = device->bonding;
-+
-+	return bonding && bonding->retry_timer != 0;
-+}
-+
- void device_bonding_complete(struct btd_device *device, uint8_t status)
- {
- 	struct bonding_req *bonding = device->bonding;
-diff --git a/src/device.h b/src/device.h
-index 725bd7a..61a294b 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -73,6 +73,7 @@ void device_set_bonded(struct btd_device *device, gboolean bonded);
- void device_set_legacy(struct btd_device *device, bool legacy);
- void device_set_rssi(struct btd_device *device, int8_t rssi);
- gboolean device_is_connected(struct btd_device *device);
-+gboolean device_is_retrying(struct btd_device *device);
- void device_bonding_complete(struct btd_device *device, uint8_t status);
- gboolean device_is_bonding(struct btd_device *device, const char *sender);
- void device_bonding_failed(struct btd_device *device, uint8_t status);
+ typedef ssize_t (*btd_adapter_pin_cb_t) (struct btd_adapter *adapter,
+-			struct btd_device *dev, char *out, gboolean *display);
++			struct btd_device *dev, char *out, gboolean *display,
++							uint32_t attempt);
+ void btd_adapter_register_pin_cb(struct btd_adapter *adapter,
+ 						btd_adapter_pin_cb_t cb);
+ void btd_adapter_unregister_pin_cb(struct btd_adapter *adapter,
 -- 
 1.8.2.1
