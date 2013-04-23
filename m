@@ -1,28 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 23 Apr 2013 20:33:28 -0300
+Date: Tue, 23 Apr 2013 20:31:38 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Marcel Holtmann <marcel@holtmann.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Remove unneeded parameter from L2CAP ATT
- channel handling
-Message-ID: <20130423233328.GD1697@joana>
-References: <1366703940-27816-1-git-send-email-marcel@holtmann.org>
+Subject: Re: [PATCH] Bluetooth: hci_get_cmd_complete() can be static
+Message-ID: <20130423233138.GC1697@joana>
+References: <1366464271-3067-1-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1366703940-27816-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1366464271-3067-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-* Marcel Holtmann <marcel@holtmann.org> [2013-04-23 00:59:00 -0700]:
+* Johan Hedberg <johan.hedberg@gmail.com> [2013-04-20 16:24:31 +0300]:
 
-> The CID is fixed to L2CAP ATT channel and so there is no need to hand it
-> down to the handling function. Just use a constant instead.
+> From: Fengguang Wu <fengguang.wu@intel.com>
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> There are new sparse warnings show up in
+> 
+> tree:   git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next master
+> head:   a0b644b0385fa58ca578f6dce4473e8a8e6f6c38
+> commit: 75e84b7c522c6e07964cd1f5bf28535768a1e9fa Bluetooth: Add __hci_cmd_sync() helper function
+> date:   13 days ago
+> 
+> >> net/bluetooth/hci_core.c:82:16: sparse: symbol 'hci_get_cmd_complete' was not declared. Should it be static?
+> 
+> Signed-off-by: Fengguang Wu <fengguang.wu@intel.com>
+> Acked-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  net/bluetooth/l2cap_core.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  net/bluetooth/hci_core.c |    3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
 Patch has been applied to bluetooth-next. Thanks.
 
