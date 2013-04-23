@@ -1,47 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 23 Apr 2013 20:22:33 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Fix sending write_le_host_supporte for
- LE-only controllers
-Message-ID: <20130423232233.GA1697@joana>
-References: <1366385721-4558-1-git-send-email-johan.hedberg@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1366385721-4558-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Alex Deymo <deymo@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	keybuk@chromium.org,
+	Alex Deymo <deymo@chromium.org>
+Subject: [PATCH v3 8/8] autopair: Try a fixed pincode for keyboards rejecting random codes
+Date: Tue, 23 Apr 2013 11:04:07 -0700
+Message-Id: <1366740247-368-9-git-send-email-deymo@chromium.org>
+In-Reply-To: <1366740247-368-1-git-send-email-deymo@chromium.org>
+References: <1366740247-368-1-git-send-email-deymo@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+This patch makes the autopair plugin try a fixed "0000" pincode for
+keyboards that reject the pincode too fast (less than 500ms). This
+too short delay rejecting the pincode means that the user didn't
+have time to type the random pincode in the bluetooth keyboard and
+was the keyboard who actually rejected it.
+---
+ plugins/autopair.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-* Johan Hedberg <johan.hedberg@gmail.com> [2013-04-19 18:35:21 +0300]:
-
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> The Bluetooth Core Specification (4.0) defines the Write LE Host
-> Supported HCI command as only available for controllers supporting
-> BR/EDR. This is further reflected in the Read Local Extended Features
-> HCI command also not being available for LE-only controllers. In other
-> words, host-side LE support is implicit for single-mode LE controllers
-> and doesn't have explicit HCI-level enablement.
-> 
-> This patch ensures that the LE setting is always exposed as enabled
-> through mgmt and returns a "rejected" response if user space tries to
-> toggle the setting. The patch also ensures that Write LE Host Supported
-> is never sent for LE-only controllers.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> v2: Instead of requiring user space to explicitly enable the setting it
-> is now always enabled and trying to toggle it through mgmt will cause a
-> rejected error. One missing check for bredr_supported in the HCI init
-> sequence was also added.
-> 
->  net/bluetooth/hci_core.c |   10 ++++++++++
->  net/bluetooth/mgmt.c     |    8 +++++++-
->  2 files changed, 17 insertions(+), 1 deletion(-)
-
-Patch has been applied to bluetooth-next. Thanks.
-
-	Gustavo
+diff --git a/plugins/autopair.c b/plugins/autopair.c
+index 2b7a5ee..c669fcb 100644
+--- a/plugins/autopair.c
++++ b/plugins/autopair.c
+@@ -87,8 +87,23 @@ static ssize_t autopair_pincb(struct btd_adapter *adapter,
+ 		switch ((class & 0xc0) >> 6) {
+ 		case 0x01:		/* Keyboard */
+ 		case 0x03:		/* Combo keyboard/pointing device */
+-			if (attempt > 1)
++			/* For keyboards rejecting the first random code in less
++			 * than 500ms, try a fixed code. */
++			if (attempt > 1 &&
++				device_bonding_last_duration(device) < 500) {
++				/* Don't try more than one dumb code */
++				if (attempt > 2)
++					return 0;
++				/* Try "0000" as the code for the second
++				 * attempt. */
++				memcpy(pinbuf, "0000", 4);
++				return 4;
++			}
++
++			/* Never try more than 3 random pincodes. */
++			if (attempt >= 4)
+ 				return 0;
++
+ 			snprintf(pinstr, sizeof(pinstr), "%06d",
+ 						rand() % 1000000);
+ 			*display = TRUE;
+-- 
+1.8.2.1
