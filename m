@@ -1,102 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 23 Apr 2013 20:58:25 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth-next 2013-04-23
-Message-ID: <20130423235825.GG1697@joana>
+Date: Tue, 23 Apr 2013 20:51:04 -0300
+From: Gutavo Padovan <gustavo@padovan.org>
+To: Andreas Fenkart <andreas.fenkart@streamunlimited.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org, andrei.emeltchenko@intel.com,
+	akarwar@marvell.com, bzhao@marvell.com, zonque@gmail.com
+Subject: Re: [PATCH v3 2/2] Bluetooth: btmrvl: report error if
+ verify_fw_download times out.
+Message-ID: <20130423235104.GF1697@joana>
+References: <1366621823-10411-1-git-send-email-andreas.fenkart@streamunlimited.com>
+ <1366621823-10411-3-git-send-email-andreas.fenkart@streamunlimited.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ew6BAiZeqk4r7MaW"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1366621823-10411-3-git-send-email-andreas.fenkart@streamunlimited.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Andreas,
 
---ew6BAiZeqk4r7MaW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+* Andreas Fenkart <andreas.fenkart@streamunlimited.com> [2013-04-22 11:10:23 +0200]:
 
-Hi John,
+> FW does the synchronization of the different modules during init.
+> It will report different modules, that it is ready at different times.
+> The fw download 'winner' will be reported fw ready first. Without this
+> patch, btmrvl was already continuing before the FW told it too. Probably
+> on behalf of the 'winner' which then never sees FW ready and times out.
+> 
+> Signed-off-by: Andreas Fenkart <andreas.fenkart@streamunlimited.com>
+> ---
+>  drivers/bluetooth/btmrvl_sdio.c |   21 ++++++++++-----------
+>  1 file changed, 10 insertions(+), 11 deletions(-)
 
-A few more patches intended for 3.10, the most important one is the support=
- in
-btusb for fw loading for the Intel Bluetooth device. Other than that we have
-only fixes and clean ups.
-
-Please pull or let me know of any problems! Thanks.
+Patch has been applied to bluetooth-next. Thanks.
 
 	Gustavo
----
-The following changes since commit 76a388beaf92cc75b829d4a0b7d69afaaeaa4b0a:
-
-  Bluetooth: Rename LE_SCANNING_* macros (2013-04-18 01:17:27 -0300)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next fo=
-r-upstream=20
-
-for you to fetch changes up to 69676b1c2af451bfe5cd36ff4973a484b5d5a86c:
-
-  Bluetooth: btmrvl: report error if verify_fw_download times out (2013-04-=
-23 20:55:55 -0300)
-
-----------------------------------------------------------------
-Andreas Fenkart (2):
-      Bluetooth: btmrvl: release lock while waiting for fw download complete
-      Bluetooth: btmrvl: report error if verify_fw_download times out
-
-Andy Shevchenko (1):
-      Bluetooth: btmrvl: use native helpers for debugfs
-
-Fengguang Wu (1):
-      Bluetooth: hci_get_cmd_complete() can be static
-
-Gustavo Padovan (1):
-      Bluetooth: remove unneeded var initialization in btmrvl
-
-Johan Hedberg (2):
-      Bluetooth: Fix HCI command send functions to use const specifier
-      Bluetooth: Fix sending write_le_host_supporte for LE-only controllers
-
-Marcel Holtmann (1):
-      Bluetooth: Remove unneeded parameter from L2CAP ATT channel handling
-
-Tedd Ho-Jeong An (1):
-      Bluetooth: Add support for Intel Bluetooth device [8087:07dc]
-
- drivers/bluetooth/btmrvl_debugfs.c | 266 +++------------------------
- drivers/bluetooth/btmrvl_sdio.c    |  41 +++--
- drivers/bluetooth/btusb.c          | 377 +++++++++++++++++++++++++++++++++=
-++++++
- include/net/bluetooth/hci_core.h   |  14 +-
- net/bluetooth/hci_core.c           |  29 ++-
- net/bluetooth/l2cap_core.c         |   7 +-
- net/bluetooth/mgmt.c               |   8 +-
- 7 files changed, 462 insertions(+), 280 deletions(-)
-
-
---ew6BAiZeqk4r7MaW
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.13 (GNU/Linux)
-
-iQIcBAEBAgAGBQJRdyAhAAoJEPs3PUX4s20ob18P/2gfa73Qcfts+Wq47sfRe4Ui
-CaKMe6iQLsQCgRfGkKE5ut5VCcxHlJFrVZ1sw8c6ucKZqM8xMjaXhyHngZ+lt+RT
-RLy7RCyWSP2yAZEFPdehaEuPPO7UVjjc7Ae/uHkdj7mW61h6j/vRmXHA+w4t/C1d
-RJQi8Ta+18Rwk87/xebMmRGUO08/k1OBXPELbbGZOjnjujnRklOSoDx360RaqM+m
-6XHx/lsHNJKKTe2/EbiubsbxzH6RfIFQ2ohCGv5FiidXxyfb01KfsHdWroP+S0ia
-BGHRsjnT15HtwT10JA0E0WLCKJbC5euv4+6JGnafAKN4nTbiCpSIe1EodniHrPGt
-q3PKY8QxJOKa4+QnHzpa5wQcc+Qp9zdSE6ZSoLLkMeZQdp4I7P9RoXHooXR+2Wjk
-KAknZL7ezGeZnbDQrgyIXwKO9T3JShZTOQuPj3Am0ZPvucvYTCK+x266AKLP2c7K
-gRykaXeVth5tPrNA/uxX7xDgCqFjBlIhiJdn4UN2H6jZYiZ8CIc34xUySXsOxX6E
-MtsvLMcKL/gw2Wn1qjIkdRsfBy51BiRGSuIvL8RZY2zmoQDvv0gsyIS4BB/rtwuN
-lRpfpy61CosKiTa9HislzZAeq2Tw7zAuh7R21Mc9bzNaUTyuSFyBVYJCPK2Liv3a
-l/btT+0fHBfNz1He/S8s
-=JPJI
------END PGP SIGNATURE-----
-
---ew6BAiZeqk4r7MaW--
