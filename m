@@ -1,32 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 23 Apr 2013 20:46:12 -0300
+Date: Tue, 23 Apr 2013 20:33:28 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Marcel Holtmann <marcel@linux.intel.com>,
-	Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Subject: Re: [PATCH] bluetooth: btmrvl: use native helpers
-Message-ID: <20130423234612.GE1697@joana>
-References: <1366710826-9779-1-git-send-email-andriy.shevchenko@linux.intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Remove unneeded parameter from L2CAP ATT
+ channel handling
+Message-ID: <20130423233328.GD1697@joana>
+References: <1366703940-27816-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1366710826-9779-1-git-send-email-andriy.shevchenko@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1366703940-27816-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andy,
+Hi Marcel,
 
-* Andy Shevchenko <andriy.shevchenko@linux.intel.com> [2013-04-23 12:53:46 +0300]:
+* Marcel Holtmann <marcel@holtmann.org> [2013-04-23 00:59:00 -0700]:
 
-> Clean up the code by using native debugfs helpers:
-> 	debugfs_create_u8()
-> 	debugfs_create_x16()
-> 	debugfs_remove_recursive()
+> The CID is fixed to L2CAP ATT channel and so there is no need to hand it
+> down to the handling function. Just use a constant instead.
 > 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  drivers/bluetooth/btmrvl_debugfs.c | 266 +++----------------------------------
->  1 file changed, 22 insertions(+), 244 deletions(-)
+>  net/bluetooth/l2cap_core.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 
 Patch has been applied to bluetooth-next. Thanks.
 
