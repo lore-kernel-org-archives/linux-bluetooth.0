@@ -1,37 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Apr 2013 14:24:44 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Alex Deymo <deymo@chromium.org>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	keybuk@chromium.org
-Subject: Re: [PATCH v3 1/8] core: Convert the pincode callback to an
- interable list.
-Message-ID: <20130424112444.GA15231@x220.ger.corp.intel.com>
-References: <1366740247-368-1-git-send-email-deymo@chromium.org>
- <1366740247-368-2-git-send-email-deymo@chromium.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1366740247-368-2-git-send-email-deymo@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix checks for LE support on LE-only controllers
+Date: Wed, 24 Apr 2013 13:05:32 +0300
+Message-Id: <1366797932-11507-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Tue, Apr 23, 2013, Alex Deymo wrote:
-> +struct pincb_iter {
-> +	GSList *it;			/* current callback function */
-> +	uint32_t attempt;		/* numer of times it() was called */
+LE-only controllers do not support extended features so any kind of host
+feature bit checks do not make sense for them. This patch fixes code
+used for both single-mode (LE-only) and dual-mode (BR/EDR/LE) to use the
+HCI_LE_ENABLED flag instead of the "Host LE supported" feature bit for
+LE support tests.
 
-Why specifically uint32_t? We usually reserve fixed size integer types
-for stuff that directly maps to a protocol that really requires it,
-whereas for simple iterators "int" should be enough.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+This one slipped by with my earlier single-mode fixes. I've added a
+mgmt-tester case for it to prevent it from returning in the future.
+Since this is probably too late for a bluetooth-next pull for 3.10 I
+suppose it'll need to wait for the first bluetooth.git pull request
+instead.
 
-> +	iter = device_bonding_iter(device);
-> +
-> +	if (iter == NULL)
+ net/bluetooth/mgmt.c |    2 +-
+ net/bluetooth/smp.c  |    4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-Remove the empty line above. When doing an assignment to a variable and
-then testing the variable's value we don't have any empty lines in
-between.
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 35fef22..5e93b24 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2700,7 +2700,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 		break;
+ 
+ 	case DISCOV_TYPE_LE:
+-		if (!lmp_host_le_capable(hdev)) {
++		if (!test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
+ 			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
+ 					 MGMT_STATUS_NOT_SUPPORTED);
+ 			mgmt_pending_remove(cmd);
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index b2296d3..b5562ab 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -770,7 +770,7 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+ 
+ 	BT_DBG("conn %p hcon %p level 0x%2.2x", conn, hcon, sec_level);
+ 
+-	if (!lmp_host_le_capable(hcon->hdev))
++	if (!test_bit(HCI_LE_ENABLED, &hcon->hdev->dev_flags))
+ 		return 1;
+ 
+ 	if (sec_level == BT_SECURITY_LOW)
+@@ -851,7 +851,7 @@ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	__u8 reason;
+ 	int err = 0;
+ 
+-	if (!lmp_host_le_capable(conn->hcon->hdev)) {
++	if (!test_bit(HCI_LE_ENABLED, &conn->hcon->hdev->dev_flags)) {
+ 		err = -ENOTSUPP;
+ 		reason = SMP_PAIRING_NOTSUPP;
+ 		goto done;
+-- 
+1.7.10.4
 
-Johan
