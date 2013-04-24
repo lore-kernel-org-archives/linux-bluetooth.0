@@ -1,39 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Amro Mouslli" <amro@clarus-llc.com>
-To: "'Lucas De Marchi'" <lucas.demarchi@profusion.mobi>,
-	"'Vinicius Costa Gomes'" <vinicius.gomes@openbossa.org>,
-	"'Luiz Augusto von Dentz'" <luiz.dentz@gmail.com>,
-	<linux-bluetooth@vger.kernel.org>
-References: <1366307424-19825-1-git-send-email-vinicius.gomes@openbossa.org> <CABBYNZJFT18e172brOH1QR2WCrZWEkxUsw3vwp8YDKCsYvRPQw@mail.gmail.com> <20130419133459.GA7044@echo> <20130424135855.GA18679@x220> <CAMOw1v5ef6Uwx5t32pMhzzb4gurLuf+K9-iXJmgfdyCAGH+Wjg@mail.gmail.com> <20130424183600.GA29925@x220> <CAMOw1v5PS46KSTEb-7mEySpucEQqB19=iDwvGKSJ3CHKEdJ0Ow@mail.gmail.com>
-In-Reply-To: <CAMOw1v5PS46KSTEb-7mEySpucEQqB19=iDwvGKSJ3CHKEdJ0Ow@mail.gmail.com>
-Subject: RE: [RFC 1/2] gdbus: Add g_dbus_flush_properties()
-Date: Wed, 24 Apr 2013 13:14:24 -0700
-Message-ID: <00a801ce4128$5121f400$f365dc00$@com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+In-Reply-To: <20130424183600.GA29925@x220>
+References: <1366307424-19825-1-git-send-email-vinicius.gomes@openbossa.org>
+ <CABBYNZJFT18e172brOH1QR2WCrZWEkxUsw3vwp8YDKCsYvRPQw@mail.gmail.com>
+ <20130419133459.GA7044@echo> <20130424135855.GA18679@x220>
+ <CAMOw1v5ef6Uwx5t32pMhzzb4gurLuf+K9-iXJmgfdyCAGH+Wjg@mail.gmail.com> <20130424183600.GA29925@x220>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Wed, 24 Apr 2013 16:01:43 -0300
+Message-ID: <CAMOw1v5PS46KSTEb-7mEySpucEQqB19=iDwvGKSJ3CHKEdJ0Ow@mail.gmail.com>
+Subject: Re: [RFC 1/2] gdbus: Add g_dbus_flush_properties()
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>,
+	Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All , 
-
-Any straight forward instructions on how to setup Bluetooth PAN on Ubuntu
-server 11.04 ? it looks like there is no clear instruction for the new bluez
-versions. 
-Thank you 
-
-Amro
-
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org
-[mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Lucas De Marchi
-Sent: Wednesday, April 24, 2013 12:02 PM
-To: Lucas De Marchi; Vinicius Costa Gomes; Luiz Augusto von Dentz;
-linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 1/2] gdbus: Add g_dbus_flush_properties()
-
-On Wed, Apr 24, 2013 at 3:36 PM, Johan Hedberg <johan.hedberg@gmail.com>
-wrote:
+On Wed, Apr 24, 2013 at 3:36 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
 > Hi Lucas,
 >
 > On Wed, Apr 24, 2013, Lucas De Marchi wrote:
@@ -49,8 +33,7 @@ wrote:
 >> >> requires, we use some kind of barrier to keep the ordering in check.
 >> >>
 >> >> And having a function to call we make it easier to detect when this
->> >> is abused, i.e. we know there's something very wrong if there's a
-flush
+>> >> is abused, i.e. we know there's something very wrong if there's a flush
 >> >> after each emit.
 >> >
 >> > Is this where the discussion got stuck? Since this feature is really
@@ -59,8 +42,7 @@ flush
 >> >
 >> > Another option is to make *all* D-Bus messages that gdbus sends to use
 >> > an idle callback, including method calls and returns. In the idle
->> > callback the messages would be sent in the same order as they were
-added
+>> > callback the messages would be sent in the same order as they were added
 >> > to the send queue. This would not require any changes to the gdbus API.
 >>
 >> ugh.. no. This doesn't play well with sending the message directly
@@ -111,9 +93,3 @@ best one neither.
 
 
 Lucas De Marchi
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
