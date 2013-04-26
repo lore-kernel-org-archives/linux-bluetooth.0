@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH BlueZ v3 26/27] service: Add callbacks to track state changes
-Date: Fri, 26 Apr 2013 08:17:22 +0200
-Message-Id: <1366957043-2383-27-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH BlueZ v3 25/27] input: Hold a reference to btd_service
+Date: Fri, 26 Apr 2013 08:17:21 +0200
+Message-Id: <1366957043-2383-26-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1366957043-2383-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1366957043-2383-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,118 +12,66 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Extend the btd_service API to support state observers.
+Profile implementations are allowed to hold a reference to probed
+services and make use of the service's userdata pointer, so update the
+input profiles accordingly.
 ---
- src/service.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- src/service.h |  8 ++++++++
- 2 files changed, 56 insertions(+)
+ profiles/input/device.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/src/service.c b/src/service.c
-index e03a412..d74fc98 100644
---- a/src/service.c
-+++ b/src/service.c
-@@ -54,6 +54,14 @@ struct btd_service {
- 	btd_service_state_t	state;
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index c9a3612..adbd114 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -65,6 +65,7 @@ enum reconnect_mode_t {
  };
  
-+struct service_state_callback {
-+	btd_service_state_cb	cb;
-+	void			*user_data;
-+	guint			id;
-+};
+ struct input_device {
++	struct btd_service	*service;
+ 	struct btd_device	*device;
+ 	char			*path;
+ 	bdaddr_t		src;
+@@ -115,6 +116,7 @@ static void input_device_free(struct input_device *idev)
+ 	if (idev->dc_id)
+ 		device_remove_disconnect_watch(idev->device, idev->dc_id);
+ 
++	btd_service_unref(idev->service);
+ 	btd_device_unref(idev->device);
+ 	g_free(idev->name);
+ 	g_free(idev->path);
+@@ -775,6 +777,7 @@ static struct input_device *input_device_new(struct btd_service *service)
+ 	idev = g_new0(struct input_device, 1);
+ 	bacpy(&idev->src, adapter_get_address(adapter));
+ 	bacpy(&idev->dst, device_get_address(device));
++	idev->service = btd_service_ref(service);
+ 	idev->device = btd_device_ref(device);
+ 	idev->path = g_strdup(path);
+ 	idev->handle = rec->handle;
+@@ -887,6 +890,8 @@ int input_device_register(struct btd_service *service)
+ 		return -EINVAL;
+ 	}
+ 
++	btd_service_set_user_data(service, idev);
 +
-+static GSList *state_callbacks;
-+
- static const char *state2str(btd_service_state_t state)
+ 	devices = g_slist_append(devices, idev);
+ 
+ 	return 0;
+@@ -911,14 +916,10 @@ void input_device_unregister(struct btd_service *service)
  {
- 	switch (state) {
-@@ -77,6 +85,7 @@ static void change_state(struct btd_service *service, btd_service_state_t state,
- {
- 	btd_service_state_t old = service->state;
- 	char addr[18];
-+	GSList *l;
+ 	struct btd_device *device = btd_service_get_device(service);
+ 	const char *path = device_get_path(device);
+-	struct input_device *idev;
++	struct input_device *idev = btd_service_get_user_data(service);
  
- 	if (state == old)
- 		return;
-@@ -90,6 +99,12 @@ static void change_state(struct btd_service *service, btd_service_state_t state,
- 	DBG("%p: device %s profile %s state changed: %s -> %s (%d)", service,
- 					addr, service->profile->name,
- 					state2str(old), state2str(state), err);
-+
-+	for (l = state_callbacks; l != NULL; l = g_slist_next(l)) {
-+		struct service_state_callback *cb = l->data;
-+
-+		cb->cb(service, old, state, err, cb->user_data);
-+	}
- }
+ 	DBG("%s", path);
  
- struct btd_service *btd_service_ref(struct btd_service *service)
-@@ -256,6 +271,39 @@ btd_service_state_t btd_service_get_state(const struct btd_service *service)
- 	return service->state;
- }
+-	idev = find_device_by_path(devices, path);
+-	if (idev == NULL)
+-		return;
+-
+ 	g_dbus_unregister_interface(btd_get_dbus_connection(),
+ 						idev->path, INPUT_INTERFACE);
  
-+guint btd_service_add_state_cb(btd_service_state_cb cb, void *user_data)
-+{
-+	struct service_state_callback *state_cb;
-+	static guint id = 0;
-+
-+	state_cb = g_new0(struct service_state_callback, 1);
-+	state_cb->cb = cb;
-+	state_cb->user_data = user_data;
-+	state_cb->id = ++id;
-+
-+	state_callbacks = g_slist_append(state_callbacks, state_cb);
-+
-+	return state_cb->id;
-+}
-+
-+gboolean btd_service_remove_state_cb(guint id)
-+{
-+	GSList *l;
-+
-+	for (l = state_callbacks; l != NULL; l = g_slist_next(l)) {
-+		struct service_state_callback *cb = l->data;
-+
-+		if (cb && cb->id == id) {
-+			state_callbacks = g_slist_remove_link(state_callbacks,
-+									l);
-+			g_free(cb);
-+			return TRUE;
-+		}
-+	}
-+
-+	return FALSE;
-+}
-+
- void btd_service_connecting_complete(struct btd_service *service, int err)
- {
- 	if (service->state != BTD_SERVICE_STATE_DISCONNECTED &&
-diff --git a/src/service.h b/src/service.h
-index a89b524..718a465 100644
---- a/src/service.h
-+++ b/src/service.h
-@@ -33,6 +33,11 @@ struct btd_service;
- struct btd_device;
- struct btd_profile;
- 
-+typedef void (*btd_service_state_cb) (struct btd_service *service,
-+						btd_service_state_t old_state,
-+						btd_service_state_t new_state,
-+						int err, void *user_data);
-+
- struct btd_service *btd_service_ref(struct btd_service *service);
- void btd_service_unref(struct btd_service *service);
- 
-@@ -52,6 +57,9 @@ struct btd_device *btd_service_get_device(const struct btd_service *service);
- struct btd_profile *btd_service_get_profile(const struct btd_service *service);
- btd_service_state_t btd_service_get_state(const struct btd_service *service);
- 
-+guint btd_service_add_state_cb(btd_service_state_cb cb, void *user_data);
-+gboolean btd_service_remove_state_cb(guint id);
-+
- /* Functions used by profile implementation */
- void btd_service_connecting_complete(struct btd_service *service, int err);
- void btd_service_disconnecting_complete(struct btd_service *service, int err);
 -- 
 1.8.1.4
 
