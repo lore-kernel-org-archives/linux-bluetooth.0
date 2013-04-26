@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH BlueZ v3 25/27] input: Hold a reference to btd_service
-Date: Fri, 26 Apr 2013 08:17:21 +0200
-Message-Id: <1366957043-2383-26-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH BlueZ v3 24/27] control: Bypass manager for connect state changes
+Date: Fri, 26 Apr 2013 08:17:20 +0200
+Message-Id: <1366957043-2383-25-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1366957043-2383-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1366957043-2383-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,66 +12,166 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Profile implementations are allowed to hold a reference to probed
-services and make use of the service's userdata pointer, so update the
-input profiles accordingly.
+Move the code to propagate the AVRCP->core state changes from manager.c
+to control.c.
 ---
- profiles/input/device.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ profiles/audio/avrcp.c   | 16 ++++++++--------
+ profiles/audio/control.c | 32 ++++++++++++++++++++++++++++++++
+ profiles/audio/control.h |  5 +++++
+ profiles/audio/manager.c | 20 --------------------
+ profiles/audio/manager.h |  4 ----
+ 5 files changed, 45 insertions(+), 32 deletions(-)
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index c9a3612..adbd114 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -65,6 +65,7 @@ enum reconnect_mode_t {
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 512b018..b7de051 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -2668,7 +2668,7 @@ static void session_tg_init_control(struct avrcp *session)
+ 		avrcp_register_notification(session,
+ 						AVRCP_EVENT_VOLUME_CHANGED);
+ 
+-	audio_controller_connected(session->dev->btd_dev, 0);
++	control_remote_connected(session->dev->control, 0);
+ }
+ 
+ static void session_ct_init_browsing(struct avrcp *session)
+@@ -2694,7 +2694,7 @@ static void session_ct_init_control(struct avrcp *session)
+ 	if (session->version >= 0x0104)
+ 		session->supported_events = (1 << AVRCP_EVENT_VOLUME_CHANGED);
+ 
+-	audio_target_connected(session->dev->btd_dev, 0);
++	control_target_connected(session->dev->control, 0);
+ 
+ 	player = create_ct_player(session, 0);
+ 	if (player == NULL)
+@@ -2731,9 +2731,9 @@ static void session_tg_destroy(struct avrcp *session)
+ 		player->sessions = g_slist_remove(player->sessions, session);
+ 
+ 	if (session->control_id == 0)
+-		audio_controller_connected(session->dev->btd_dev, -EIO);
+-
+-	audio_controller_disconnected(session->dev->btd_dev, 0);
++		control_remote_connected(session->dev->control, -EIO);
++	else
++		control_remote_disconnected(session->dev->control, 0);
+ 
+ 	session_destroy(session);
+ }
+@@ -2745,9 +2745,9 @@ static void session_ct_destroy(struct avrcp *session)
+ 	g_slist_free_full(session->players, player_destroy);
+ 
+ 	if (session->control_id == 0)
+-		audio_target_connected(session->dev->btd_dev, -EIO);
+-
+-	audio_target_disconnected(session->dev->btd_dev, 0);
++		control_target_connected(session->dev->control, -EIO);
++	else
++		control_target_disconnected(session->dev->control, 0);
+ 
+ 	session_destroy(session);
+ }
+diff --git a/profiles/audio/control.c b/profiles/audio/control.c
+index 10cd1de..bb3f812 100644
+--- a/profiles/audio/control.c
++++ b/profiles/audio/control.c
+@@ -68,6 +68,38 @@ struct control {
+ 	unsigned int avctp_id;
  };
  
- struct input_device {
-+	struct btd_service	*service;
- 	struct btd_device	*device;
- 	char			*path;
- 	bdaddr_t		src;
-@@ -115,6 +116,7 @@ static void input_device_free(struct input_device *idev)
- 	if (idev->dc_id)
- 		device_remove_disconnect_watch(idev->device, idev->dc_id);
- 
-+	btd_service_unref(idev->service);
- 	btd_device_unref(idev->device);
- 	g_free(idev->name);
- 	g_free(idev->path);
-@@ -775,6 +777,7 @@ static struct input_device *input_device_new(struct btd_service *service)
- 	idev = g_new0(struct input_device, 1);
- 	bacpy(&idev->src, adapter_get_address(adapter));
- 	bacpy(&idev->dst, device_get_address(device));
-+	idev->service = btd_service_ref(service);
- 	idev->device = btd_device_ref(device);
- 	idev->path = g_strdup(path);
- 	idev->handle = rec->handle;
-@@ -887,6 +890,8 @@ int input_device_register(struct btd_service *service)
- 		return -EINVAL;
- 	}
- 
-+	btd_service_set_user_data(service, idev);
++void control_target_connected(struct control *control, int err)
++{
++	struct btd_device *device = btd_service_get_device(control->target);
++	struct btd_profile *profile = btd_service_get_profile(control->target);
 +
- 	devices = g_slist_append(devices, idev);
- 
- 	return 0;
-@@ -911,14 +916,10 @@ void input_device_unregister(struct btd_service *service)
++	device_profile_connected(device, profile, err);
++}
++
++void control_target_disconnected(struct control *control, int err)
++{
++	struct btd_device *device = btd_service_get_device(control->target);
++	struct btd_profile *profile = btd_service_get_profile(control->target);
++
++	device_profile_disconnected(device, profile, err);
++}
++
++void control_remote_connected(struct control *control, int err)
++{
++	struct btd_device *device = btd_service_get_device(control->remote);
++	struct btd_profile *profile = btd_service_get_profile(control->remote);
++
++	device_profile_connected(device, profile, err);
++}
++
++void control_remote_disconnected(struct control *control, int err)
++{
++	struct btd_device *device = btd_service_get_device(control->remote);
++	struct btd_profile *profile = btd_service_get_profile(control->remote);
++
++	device_profile_disconnected(device, profile, err);
++}
++
+ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
+ 							avctp_state_t new_state)
  {
- 	struct btd_device *device = btd_service_get_device(service);
- 	const char *path = device_get_path(device);
--	struct input_device *idev;
-+	struct input_device *idev = btd_service_get_user_data(service);
+diff --git a/profiles/audio/control.h b/profiles/audio/control.h
+index 0176b54..0a0f208 100644
+--- a/profiles/audio/control.h
++++ b/profiles/audio/control.h
+@@ -34,3 +34,8 @@ gboolean control_is_active(struct audio_device *dev);
  
- 	DBG("%s", path);
+ int control_connect(struct audio_device *dev);
+ int control_disconnect(struct audio_device *dev);
++
++void control_target_connected(struct control *control, int err);
++void control_target_disconnected(struct control *control, int err);
++void control_remote_connected(struct control *control, int err);
++void control_remote_disconnected(struct control *control, int err);
+diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
+index e886e12..901f94f 100644
+--- a/profiles/audio/manager.c
++++ b/profiles/audio/manager.c
+@@ -421,26 +421,6 @@ void audio_source_disconnected(struct btd_device *dev, int err)
+ 	device_profile_disconnected(dev, &a2dp_source_profile, err);
+ }
  
--	idev = find_device_by_path(devices, path);
--	if (idev == NULL)
--		return;
+-void audio_target_connected(struct btd_device *dev, int err)
+-{
+-	device_profile_connected(dev, &avrcp_target_profile, err);
+-}
 -
- 	g_dbus_unregister_interface(btd_get_dbus_connection(),
- 						idev->path, INPUT_INTERFACE);
+-void audio_target_disconnected(struct btd_device *dev, int err)
+-{
+-	device_profile_disconnected(dev, &avrcp_target_profile, err);
+-}
+-
+-void audio_controller_connected(struct btd_device *dev, int err)
+-{
+-	device_profile_connected(dev, &avrcp_remote_profile, err);
+-}
+-
+-void audio_controller_disconnected(struct btd_device *dev, int err)
+-{
+-	device_profile_disconnected(dev, &avrcp_remote_profile, err);
+-}
+-
+ int audio_manager_init(GKeyFile *conf)
+ {
+ 	if (conf)
+diff --git a/profiles/audio/manager.h b/profiles/audio/manager.h
+index 9b5af5f..2567e46 100644
+--- a/profiles/audio/manager.h
++++ b/profiles/audio/manager.h
+@@ -33,10 +33,6 @@ void audio_sink_connected(struct btd_device *dev, int err);
+ void audio_sink_disconnected(struct btd_device *dev, int err);
+ void audio_source_connected(struct btd_device *dev, int err);
+ void audio_source_disconnected(struct btd_device *dev, int err);
+-void audio_target_connected(struct btd_device *dev, int err);
+-void audio_target_disconnected(struct btd_device *dev, int err);
+-void audio_controller_connected(struct btd_device *dev, int err);
+-void audio_controller_disconnected(struct btd_device *dev, int err);
  
+ int audio_manager_init(GKeyFile *config);
+ void audio_manager_exit(void);
 -- 
 1.8.1.4
 
