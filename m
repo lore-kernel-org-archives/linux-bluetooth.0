@@ -2,67 +2,48 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH BlueZ v5 1/3] service: Add error-code btd_service
-Date: Fri, 26 Apr 2013 11:46:23 +0200
-Message-Id: <1366969585-28654-2-git-send-email-mikel.astiz.oss@gmail.com>
-In-Reply-To: <1366969585-28654-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1366969585-28654-1-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH BlueZ v5 0/3] struct btd_service in core
+Date: Fri, 26 Apr 2013 11:46:22 +0200
+Message-Id: <1366969585-28654-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-The error-code represents the result of a connection/disconnection
-procedure and can be useful when a state transition is detected.
----
- src/service.c | 7 +++++++
- src/service.h | 1 +
- 2 files changed, 8 insertions(+)
+v5 updated as suggested by Johan:
+- Fixed memory leak in v4 2/3.
+- Static variables initialized.
+- Avoid dependencies to GLib types.
 
-diff --git a/src/service.c b/src/service.c
-index e03a412..6228de1 100644
---- a/src/service.c
-+++ b/src/service.c
-@@ -52,6 +52,7 @@ struct btd_service {
- 	struct btd_profile	*profile;
- 	void			*user_data;
- 	btd_service_state_t	state;
-+	int			err;
- };
- 
- static const char *state2str(btd_service_state_t state)
-@@ -85,6 +86,7 @@ static void change_state(struct btd_service *service, btd_service_state_t state,
- 	assert(service->profile != NULL);
- 
- 	service->state = state;
-+	service->err = err;
- 
- 	ba2str(device_get_address(service->device), addr);
- 	DBG("%p: device %s profile %s state changed: %s -> %s (%d)", service,
-@@ -256,6 +258,11 @@ btd_service_state_t btd_service_get_state(const struct btd_service *service)
- 	return service->state;
- }
- 
-+int btd_service_get_error(const struct btd_service *service)
-+{
-+	return service->err;
-+}
-+
- void btd_service_connecting_complete(struct btd_service *service, int err)
- {
- 	if (service->state != BTD_SERVICE_STATE_DISCONNECTED &&
-diff --git a/src/service.h b/src/service.h
-index a89b524..e3bc6e5 100644
---- a/src/service.h
-+++ b/src/service.h
-@@ -51,6 +51,7 @@ int btd_service_disconnect(struct btd_service *service);
- struct btd_device *btd_service_get_device(const struct btd_service *service);
- struct btd_profile *btd_service_get_profile(const struct btd_service *service);
- btd_service_state_t btd_service_get_state(const struct btd_service *service);
-+int btd_service_get_error(const struct btd_service *service);
- 
- /* Functions used by profile implementation */
- void btd_service_connecting_complete(struct btd_service *service, int err);
+Mikel Astiz (3):
+  service: Add error-code btd_service
+  service: Add callbacks to track state changes
+  profile: Use btd_service for connect/disconnect
+
+ Makefile.plugins              |  4 +--
+ profiles/audio/control.c      | 20 +++--------
+ profiles/audio/manager.c      | 44 +++++++-----------------
+ profiles/audio/manager.h      |  5 ---
+ profiles/audio/sink.c         | 18 +++++-----
+ profiles/audio/source.c       | 18 +++++-----
+ profiles/input/device.c       | 21 +++++-------
+ profiles/input/device.h       |  5 ++-
+ profiles/input/manager.c      | 11 ------
+ profiles/input/manager.h      | 25 --------------
+ profiles/network/connection.c | 39 ++++++---------------
+ profiles/network/connection.h |  4 +--
+ profiles/network/manager.c    | 79 ++++---------------------------------------
+ profiles/network/manager.h    | 25 --------------
+ src/device.c                  | 33 +++++++++++-------
+ src/device.h                  |  7 ----
+ src/profile.c                 | 29 ++++++++++------
+ src/profile.h                 |  6 ++--
+ src/service.c                 | 58 +++++++++++++++++++++++++++++--
+ src/service.h                 |  9 +++++
+ 20 files changed, 171 insertions(+), 289 deletions(-)
+ delete mode 100644 profiles/input/manager.h
+ delete mode 100644 profiles/network/manager.h
+
 -- 
 1.8.1.4
 
