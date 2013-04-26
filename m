@@ -1,72 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-Date: Fri, 26 Apr 2013 19:30:46 +0200
-Message-ID: <CA+icZUVCmFeh3Xna37VJDDzvZ34sYJ_Dser7i5rRzGLhMTi5-Q@mail.gmail.com>
-Subject: Re: linux-next: Tree for Apr 26 [ bluetooth on suspend/resume ]
-From: Sedat Dilek <sedat.dilek@gmail.com>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Linux PM List <linux-pm@lists.linux-foundation.org>,
-	"Rafael J. Wysocki" <rjw@sisk.pl>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CAJdJm_OqM0w78sFzVtS5aOcvRDS0jZp9G2TqWVw3OHX=jGjETw@mail.gmail.com>
+References: <1366957043-2383-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1366957043-2383-13-git-send-email-mikel.astiz.oss@gmail.com>
+	<CAJdJm_OqM0w78sFzVtS5aOcvRDS0jZp9G2TqWVw3OHX=jGjETw@mail.gmail.com>
+Date: Fri, 26 Apr 2013 13:58:59 +0200
+Message-ID: <CANT-zCXQ3mH2rZk12nQH_Z93VUnF94qwN5qoxq3egzzFvB4FUA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3 12/27] device: Use btd_service to represent profiles
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Apr 26, 2013 at 10:03 AM, Stephen Rothwell <sfr@canb.auug.org.au> wrote:
-> Hi all,
->
-> Changes since 20130424:
->
-> Removed tree: ppc-temp (remerged into powerpc)
->
-> The net-next tree gained conflicts against the net and pci trees and a
-> build failure for which I applied a merge fix patch.
->
-> The omap_dss2 tree gained a build failure so I used the version from
-> next-20130424.
->
-> The trivial tree gained a conflict against the arm tree.
->
-> The staging tree still had its build failure for which I applied a
-> supplied patch.
->
-> The arm-soc tree gained a conflict against the spi-mb tree.
->
-> The renesas tree gained a conflict against the input tree.
->
+Hi Anderson,
 
-[ CC linux-bluetooth + linux-pm folks ]
+On Fri, Apr 26, 2013 at 1:48 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Mikel,
+>
+> On Fri, Apr 26, 2013 at 2:17 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>> +static GSList *find_service_with_profile(GSList *list, struct btd_profile *p)
+>> +{
+>> +       GSList *l;
+>> +
+>> +       for (l = list; l != NULL; l = g_slist_next(l)) {
+>> +               struct btd_service *service = l->data;
+>> +
+>> +               if (btd_service_get_profile(service) == p)
+>> +                       return l;
+>
+> Why you don't return service directly here? It should avoid the caller
+> having to do "service = l->data;".
 
-I see the following:
+The patch has already been applied, but please go ahead with the
+review since there's been a lot of code being changed, and testing was
+fairly limited due to lack of hardware.
 
-[  176.667799] PM: Syncing filesystems ... done.
-[  176.670014] PM: Preparing system for mem sleep
-[  176.670422] Freezing user space processes ...
-[  196.656719] Freezing of tasks failed after 20.00 seconds (1 tasks
-refusing to freeze, wq_busy=0):
-[  196.656728] bluetoothd      D ffffffff8180d8c0     0  1012    863 0x00000004
-[  196.656731]  ffff88008fdb3cc8 0000000000000046 ffff8800926530d0
-0000020000000000
-[  196.656735]  ffff88008feca200 ffff88008fdb3fd8 ffff88008fdb3fd8
-ffff88008fdb3fd8
-[  196.656738]  ffff880119f78300 ffff88008feca200 ffff88008fdb3cf8
-ffff880095281950
-[  196.656741] Call Trace:
-[  196.656749]  [<ffffffff816cfc99>] schedule+0x29/0x70
-[  196.656752]  [<ffffffff816cff9e>] schedule_preempt_disabled+0xe/0x10
-[  196.656754]  [<ffffffff816ce075>] __mutex_lock_slowpath+0x125/0x2f0
-[  196.656757]  [<ffffffff816ce25e>] mutex_lock+0x1e/0x40
-[  196.656773]  [<ffffffffa016f8b1>] hci_dev_open+0x51/0x2e0 [bluetooth]
-[  196.656780]  [<ffffffffa0182752>] hci_sock_ioctl+0x1f2/0x3f0 [bluetooth]
-[  196.656783]  [<ffffffff815c6050>] sock_do_ioctl+0x30/0x70
-[  196.656786]  [<ffffffff815c75f9>] sock_ioctl+0x79/0x2f0
-[  196.656790]  [<ffffffff811a8046>] do_vfs_ioctl+0x96/0x560
-[  196.656794]  [<ffffffff811a85a1>] SyS_ioctl+0x91/0xb0
-[  196.656797]  [<ffffffff816d989d>] system_call_fastpath+0x1a/0x1f
-[  196.656811]
-[  196.656812] Restarting tasks ... done.
+The purpose of this was to be able to delete the node more efficiently
+in case that's the intention of the caller, but it's certainly of
+little use considering that it's a singly-linked list.
+
+Feel free to submit a patch to simplify this, or otherwise I'll
+consider this for a later cleanup patchset.
+
+>
+> Another option: you could try using g_slist_find_custom() on the
+> callers and turn this into a comparison callback for it.
+
+Johan preferred this approach over find_custom() in a very similar
+scenario, so I changed this one as well for consistency.
+
+Cheers,
+Mikel
