@@ -2,128 +2,45 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH BlueZ v4 2/3] service: Add callbacks to track state changes
-Date: Fri, 26 Apr 2013 10:39:11 +0200
-Message-Id: <1366965552-14146-3-git-send-email-mikel.astiz.oss@gmail.com>
-In-Reply-To: <1366965552-14146-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1366965552-14146-1-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH BlueZ v4 0/3] struct btd_service in core
+Date: Fri, 26 Apr 2013 10:39:09 +0200
+Message-Id: <1366965552-14146-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Extend the btd_service API to support state observers.
----
- src/service.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- src/service.h |  8 ++++++++
- 2 files changed, 56 insertions(+)
+Sending the remaning patches after updating as suggested by Johan: the error-code after a connection/disconnection procedure is accessible using btd_service_get_error(), introduced in patch v4 1/3, instead of being part of the conventional state transition propagation mechanism (btd_service_state_cb).
 
-diff --git a/src/service.c b/src/service.c
-index 6228de1..87e0fb5 100644
---- a/src/service.c
-+++ b/src/service.c
-@@ -55,6 +55,14 @@ struct btd_service {
- 	int			err;
- };
- 
-+struct service_state_callback {
-+	btd_service_state_cb	cb;
-+	void			*user_data;
-+	guint			id;
-+};
-+
-+static GSList *state_callbacks;
-+
- static const char *state2str(btd_service_state_t state)
- {
- 	switch (state) {
-@@ -78,6 +86,7 @@ static void change_state(struct btd_service *service, btd_service_state_t state,
- {
- 	btd_service_state_t old = service->state;
- 	char addr[18];
-+	GSList *l;
- 
- 	if (state == old)
- 		return;
-@@ -92,6 +101,12 @@ static void change_state(struct btd_service *service, btd_service_state_t state,
- 	DBG("%p: device %s profile %s state changed: %s -> %s (%d)", service,
- 					addr, service->profile->name,
- 					state2str(old), state2str(state), err);
-+
-+	for (l = state_callbacks; l != NULL; l = g_slist_next(l)) {
-+		struct service_state_callback *cb = l->data;
-+
-+		cb->cb(service, old, state, cb->user_data);
-+	}
- }
- 
- struct btd_service *btd_service_ref(struct btd_service *service)
-@@ -263,6 +278,39 @@ int btd_service_get_error(const struct btd_service *service)
- 	return service->err;
- }
- 
-+guint btd_service_add_state_cb(btd_service_state_cb cb, void *user_data)
-+{
-+	struct service_state_callback *state_cb;
-+	static guint id = 0;
-+
-+	state_cb = g_new0(struct service_state_callback, 1);
-+	state_cb->cb = cb;
-+	state_cb->user_data = user_data;
-+	state_cb->id = ++id;
-+
-+	state_callbacks = g_slist_append(state_callbacks, state_cb);
-+
-+	return state_cb->id;
-+}
-+
-+gboolean btd_service_remove_state_cb(guint id)
-+{
-+	GSList *l;
-+
-+	for (l = state_callbacks; l != NULL; l = g_slist_next(l)) {
-+		struct service_state_callback *cb = l->data;
-+
-+		if (cb && cb->id == id) {
-+			state_callbacks = g_slist_remove_link(state_callbacks,
-+									l);
-+			g_free(cb);
-+			return TRUE;
-+		}
-+	}
-+
-+	return FALSE;
-+}
-+
- void btd_service_connecting_complete(struct btd_service *service, int err)
- {
- 	if (service->state != BTD_SERVICE_STATE_DISCONNECTED &&
-diff --git a/src/service.h b/src/service.h
-index e3bc6e5..a67e7fb 100644
---- a/src/service.h
-+++ b/src/service.h
-@@ -33,6 +33,11 @@ struct btd_service;
- struct btd_device;
- struct btd_profile;
- 
-+typedef void (*btd_service_state_cb) (struct btd_service *service,
-+						btd_service_state_t old_state,
-+						btd_service_state_t new_state,
-+						void *user_data);
-+
- struct btd_service *btd_service_ref(struct btd_service *service);
- void btd_service_unref(struct btd_service *service);
- 
-@@ -53,6 +58,9 @@ struct btd_profile *btd_service_get_profile(const struct btd_service *service);
- btd_service_state_t btd_service_get_state(const struct btd_service *service);
- int btd_service_get_error(const struct btd_service *service);
- 
-+guint btd_service_add_state_cb(btd_service_state_cb cb, void *user_data);
-+gboolean btd_service_remove_state_cb(guint id);
-+
- /* Functions used by profile implementation */
- void btd_service_connecting_complete(struct btd_service *service, int err);
- void btd_service_disconnecting_complete(struct btd_service *service, int err);
+Mikel Astiz (3):
+  service: Add error-code btd_service
+  service: Add callbacks to track state changes
+  profile: Use btd_service for connect/disconnect
+
+ Makefile.plugins              |  4 +--
+ profiles/audio/control.c      | 20 +++--------
+ profiles/audio/manager.c      | 44 +++++++-----------------
+ profiles/audio/manager.h      |  5 ---
+ profiles/audio/sink.c         | 18 +++++-----
+ profiles/audio/source.c       | 18 +++++-----
+ profiles/input/device.c       | 21 +++++-------
+ profiles/input/device.h       |  5 ++-
+ profiles/input/manager.c      | 11 ------
+ profiles/input/manager.h      | 25 --------------
+ profiles/network/connection.c | 39 ++++++---------------
+ profiles/network/connection.h |  4 +--
+ profiles/network/manager.c    | 79 ++++---------------------------------------
+ profiles/network/manager.h    | 25 --------------
+ src/device.c                  | 33 +++++++++++-------
+ src/device.h                  |  7 ----
+ src/profile.c                 | 29 ++++++++++------
+ src/profile.h                 |  6 ++--
+ src/service.c                 | 59 ++++++++++++++++++++++++++++++--
+ src/service.h                 |  9 +++++
+ 20 files changed, 172 insertions(+), 289 deletions(-)
+ delete mode 100644 profiles/input/manager.h
+ delete mode 100644 profiles/network/manager.h
+
 -- 
 1.8.1.4
 
