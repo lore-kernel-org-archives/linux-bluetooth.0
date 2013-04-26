@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH BlueZ v3 10/27] network: Bypass manager during probe/remove
-Date: Fri, 26 Apr 2013 08:17:06 +0200
-Message-Id: <1366957043-2383-11-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH BlueZ v3 09/27] input: Bypass manager during probe/remove
+Date: Fri, 26 Apr 2013 08:17:05 +0200
+Message-Id: <1366957043-2383-10-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1366957043-2383-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1366957043-2383-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -15,153 +15,162 @@ From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 Use the internal device API to provide the btd_profile callback
 functions, without boilerplate code in manager.c.
 ---
- profiles/network/connection.c | 11 ++++++++---
- profiles/network/connection.h |  4 ++--
- profiles/network/manager.c    | 40 ++++++----------------------------------
- 3 files changed, 16 insertions(+), 39 deletions(-)
+ profiles/input/device.c  | 29 ++++++++++++++++-------------
+ profiles/input/device.h  |  5 ++---
+ profiles/input/manager.c | 31 ++-----------------------------
+ 3 files changed, 20 insertions(+), 45 deletions(-)
 
-diff --git a/profiles/network/connection.c b/profiles/network/connection.c
-index 3ccd211..84359c0 100644
---- a/profiles/network/connection.c
-+++ b/profiles/network/connection.c
-@@ -43,6 +43,7 @@
- #include "dbus-common.h"
- #include "adapter.h"
- #include "device.h"
-+#include "profile.h"
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index 0688a02..b6f9028 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -92,6 +92,9 @@ void input_set_idle_timeout(int timeout)
+ }
  
- #include "error.h"
- #include "common.h"
-@@ -639,9 +640,12 @@ static const GDBusPropertyTable connection_properties[] = {
+ static void input_device_enter_reconnect_mode(struct input_device *idev);
++static bool is_device_sdp_disable(const sdp_record_t *rec);
++static void extract_hid_props(struct input_device *idev,
++						const sdp_record_t *rec);
+ static const char *reconnect_mode_to_string(const enum reconnect_mode_t mode);
+ 
+ static struct input_device *find_device_by_path(GSList *list, const char *path)
+@@ -759,9 +762,10 @@ int input_device_disconnect(struct btd_device *dev, struct btd_profile *profile)
+ }
+ 
+ static struct input_device *input_device_new(struct btd_device *device,
+-				const char *path, const uint32_t handle,
+-				bool disable_sdp)
++							struct btd_profile *p)
+ {
++	const char *path = device_get_path(device);
++	const sdp_record_t *rec = btd_device_get_record(device, p->remote_uuid);
+ 	struct btd_adapter *adapter = device_get_adapter(device);
+ 	struct input_device *idev;
+ 	char name[HCI_MAX_NAME_LENGTH + 1];
+@@ -771,13 +775,16 @@ static struct input_device *input_device_new(struct btd_device *device,
+ 	bacpy(&idev->dst, device_get_address(device));
+ 	idev->device = btd_device_ref(device);
+ 	idev->path = g_strdup(path);
+-	idev->handle = handle;
+-	idev->disable_sdp = disable_sdp;
++	idev->handle = rec->handle;
++	idev->disable_sdp = is_device_sdp_disable(rec);
+ 
+ 	device_get_name(device, name, HCI_MAX_NAME_LENGTH);
+ 	if (strlen(name) > 0)
+ 		idev->name = g_strdup(name);
+ 
++	/* Initialize device properties */
++	extract_hid_props(idev, rec);
++
+ 	return idev;
+ }
+ 
+@@ -852,10 +859,9 @@ static const GDBusPropertyTable input_properties[] = {
  	{ }
  };
  
--void connection_unregister(struct btd_device *device)
-+void connection_unregister(struct btd_profile *p, struct btd_device *device)
+-int input_device_register(struct btd_device *device,
+-					const char *path, const char *uuid,
+-					const sdp_record_t *rec)
++int input_device_register(struct btd_profile *p, struct btd_device *device)
  {
- 	struct network_peer *peer;
-+	uint16_t id = bnep_service_id(p->remote_uuid);
-+
-+	DBG("%s id %u", device_get_path(device), id);
++	const char *path = device_get_path(device);
+ 	struct input_device *idev;
  
- 	peer = find_peer(peers, device);
- 	if (!peer)
-@@ -682,12 +686,13 @@ static struct network_peer *create_peer(struct btd_device *device)
- 	return peer;
+ 	DBG("%s", path);
+@@ -864,14 +870,10 @@ int input_device_register(struct btd_device *device,
+ 	if (idev)
+ 		return -EEXIST;
+ 
+-	idev = input_device_new(device, path, rec->handle,
+-			is_device_sdp_disable(rec));
++	idev = input_device_new(device, p);
+ 	if (!idev)
+ 		return -EINVAL;
+ 
+-	/* Initialize device properties */
+-	extract_hid_props(idev, rec);
+-
+ 	if (g_dbus_register_interface(btd_get_dbus_connection(),
+ 					idev->path, INPUT_INTERFACE,
+ 					NULL, NULL,
+@@ -902,8 +904,9 @@ static struct input_device *find_device(const bdaddr_t *src,
+ 	return NULL;
  }
  
--int connection_register(struct btd_device *device, uint16_t id)
-+int connection_register(struct btd_profile *p, struct btd_device *device)
+-void input_device_unregister(const char *path, const char *uuid)
++void input_device_unregister(struct btd_profile *p, struct btd_device *device)
  {
- 	struct network_peer *peer;
- 	struct network_conn *nc;
-+	uint16_t id = bnep_service_id(p->remote_uuid);
++	const char *path = device_get_path(device);
+ 	struct input_device *idev;
  
--	DBG("id %u", id);
-+	DBG("%s id %u", device_get_path(device), id);
+ 	DBG("%s", path);
+diff --git a/profiles/input/device.h b/profiles/input/device.h
+index 798b4b0..1c237fc 100644
+--- a/profiles/input/device.h
++++ b/profiles/input/device.h
+@@ -29,9 +29,8 @@ struct input_conn;
  
- 	peer = find_peer(peers, device);
- 	if (!peer) {
-diff --git a/profiles/network/connection.h b/profiles/network/connection.h
-index 32356f9..5daead0 100644
---- a/profiles/network/connection.h
-+++ b/profiles/network/connection.h
-@@ -21,7 +21,7 @@
-  *
-  */
+ void input_set_idle_timeout(int timeout);
  
--int connection_register(struct btd_device *device, uint16_t id);
--void connection_unregister(struct btd_device *device);
-+int connection_register(struct btd_profile *p, struct btd_device *device);
-+void connection_unregister(struct btd_profile *p, struct btd_device *device);
- int connection_connect(struct btd_device *device, uint16_t id);
- int connection_disconnect(struct btd_device *device, uint16_t id);
-diff --git a/profiles/network/manager.c b/profiles/network/manager.c
-index 4aa6a2b..df79351 100644
---- a/profiles/network/manager.c
-+++ b/profiles/network/manager.c
-@@ -74,20 +74,6 @@ done:
- 				conf_security ? "true" : "false");
- }
+-int input_device_register(struct btd_device *device, const char *path,
+-				const char *uuid, const sdp_record_t *rec);
+-void input_device_unregister(const char *path, const char *uuid);
++int input_device_register(struct btd_profile *p, struct btd_device *device);
++void input_device_unregister(struct btd_profile *p, struct btd_device *device);
  
--static int panu_probe(struct btd_profile *p, struct btd_device *device)
+ int input_device_set_channel(const bdaddr_t *src, const bdaddr_t *dst, int psm,
+ 							GIOChannel *io);
+diff --git a/profiles/input/manager.c b/profiles/input/manager.c
+index cdcabfe..51cd4cf 100644
+--- a/profiles/input/manager.c
++++ b/profiles/input/manager.c
+@@ -44,33 +44,6 @@
+ #include "server.h"
+ #include "manager.h"
+ 
+-static void input_remove(struct btd_device *device, const char *uuid)
 -{
--	DBG("path %s", device_get_path(device));
+-	const char *path = device_get_path(device);
 -
--	return connection_register(device, BNEP_SVC_PANU);
+-	DBG("path %s", path);
+-
+-	input_device_unregister(path, uuid);
 -}
 -
--static void network_remove(struct btd_profile *p, struct btd_device *device)
+-static int hid_device_probe(struct btd_profile *p, struct btd_device *device)
 -{
--	DBG("path %s", device_get_path(device));
+-	const char *path = device_get_path(device);
+-	const sdp_record_t *rec = btd_device_get_record(device, HID_UUID);
 -
--	connection_unregister(device);
+-	DBG("path %s", path);
+-
+-	if (!rec)
+-		return -1;
+-
+-	return input_device_register(device, path, HID_UUID, rec);
 -}
 -
- static int panu_connect(struct btd_device *dev, struct btd_profile *profile)
+-static void hid_device_remove(struct btd_profile *p, struct btd_device *device)
+-{
+-	input_remove(device, HID_UUID);
+-}
+-
+ static int hid_server_probe(struct btd_profile *p, struct btd_adapter *adapter)
  {
- 	return connection_connect(dev, BNEP_SVC_PANU);
-@@ -117,13 +103,6 @@ static void panu_server_remove(struct btd_profile *p,
- 	server_unregister(adapter, BNEP_SVC_PANU);
- }
+ 	return server_start(adapter_get_address(adapter));
+@@ -91,8 +64,8 @@ static struct btd_profile input_profile = {
+ 	.connect	= input_device_connect,
+ 	.disconnect	= input_device_disconnect,
  
--static int gn_probe(struct btd_profile *p, struct btd_device *device)
--{
--	DBG("path %s", device_get_path(device));
--
--	return connection_register(device, BNEP_SVC_GN);
--}
--
- static int gn_connect(struct btd_device *dev, struct btd_profile *profile)
- {
- 	return connection_connect(dev, BNEP_SVC_GN);
-@@ -153,13 +132,6 @@ static void gn_server_remove(struct btd_profile *p,
- 	server_unregister(adapter, BNEP_SVC_GN);
- }
+-	.device_probe	= hid_device_probe,
+-	.device_remove	= hid_device_remove,
++	.device_probe	= input_device_register,
++	.device_remove	= input_device_unregister,
  
--static int nap_probe(struct btd_profile *p, struct btd_device *device)
--{
--	DBG("path %s", device_get_path(device));
--
--	return connection_register(device, BNEP_SVC_NAP);
--}
--
- static int nap_connect(struct btd_device *dev, struct btd_profile *profile)
- {
- 	return connection_connect(dev, BNEP_SVC_NAP);
-@@ -193,8 +165,8 @@ static struct btd_profile panu_profile = {
- 	.name		= "network-panu",
- 	.local_uuid	= NAP_UUID,
- 	.remote_uuid	= PANU_UUID,
--	.device_probe	= panu_probe,
--	.device_remove	= network_remove,
-+	.device_probe	= connection_register,
-+	.device_remove	= connection_unregister,
- 	.connect	= panu_connect,
- 	.disconnect	= panu_disconnect,
- 	.adapter_probe	= panu_server_probe,
-@@ -205,8 +177,8 @@ static struct btd_profile gn_profile = {
- 	.name		= "network-gn",
- 	.local_uuid	= PANU_UUID,
- 	.remote_uuid	= GN_UUID,
--	.device_probe	= gn_probe,
--	.device_remove	= network_remove,
-+	.device_probe	= connection_register,
-+	.device_remove	= connection_unregister,
- 	.connect	= gn_connect,
- 	.disconnect	= gn_disconnect,
- 	.adapter_probe	= gn_server_probe,
-@@ -217,8 +189,8 @@ static struct btd_profile nap_profile = {
- 	.name		= "network-nap",
- 	.local_uuid	= PANU_UUID,
- 	.remote_uuid	= NAP_UUID,
--	.device_probe	= nap_probe,
--	.device_remove	= network_remove,
-+	.device_probe	= connection_register,
-+	.device_remove	= connection_unregister,
- 	.connect	= nap_connect,
- 	.disconnect	= nap_disconnect,
- 	.adapter_probe	= nap_server_probe,
+ 	.adapter_probe	= hid_server_probe,
+ 	.adapter_remove = hid_server_remove,
 -- 
 1.8.1.4
 
