@@ -1,57 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAJdJm_OqM0w78sFzVtS5aOcvRDS0jZp9G2TqWVw3OHX=jGjETw@mail.gmail.com>
-References: <1366957043-2383-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1366957043-2383-13-git-send-email-mikel.astiz.oss@gmail.com>
-	<CAJdJm_OqM0w78sFzVtS5aOcvRDS0jZp9G2TqWVw3OHX=jGjETw@mail.gmail.com>
-Date: Fri, 26 Apr 2013 13:58:59 +0200
-Message-ID: <CANT-zCXQ3mH2rZk12nQH_Z93VUnF94qwN5qoxq3egzzFvB4FUA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 12/27] device: Use btd_service to represent profiles
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Date: Fri, 26 Apr 2013 14:50:07 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org,
 	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH BlueZ v5 0/3] struct btd_service in core
+Message-ID: <20130426115007.GA22715@x220.ger.corp.intel.com>
+References: <1366969585-28654-1-git-send-email-mikel.astiz.oss@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1366969585-28654-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hi Mikel,
 
-On Fri, Apr 26, 2013 at 1:48 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Mikel,
->
-> On Fri, Apr 26, 2013 at 2:17 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
->> +static GSList *find_service_with_profile(GSList *list, struct btd_profile *p)
->> +{
->> +       GSList *l;
->> +
->> +       for (l = list; l != NULL; l = g_slist_next(l)) {
->> +               struct btd_service *service = l->data;
->> +
->> +               if (btd_service_get_profile(service) == p)
->> +                       return l;
->
-> Why you don't return service directly here? It should avoid the caller
-> having to do "service = l->data;".
+On Fri, Apr 26, 2013, Mikel Astiz wrote:
+> v5 updated as suggested by Johan:
+> - Fixed memory leak in v4 2/3.
+> - Static variables initialized.
+> - Avoid dependencies to GLib types.
+> 
+> Mikel Astiz (3):
+>   service: Add error-code btd_service
+>   service: Add callbacks to track state changes
+>   profile: Use btd_service for connect/disconnect
+> 
+>  Makefile.plugins              |  4 +--
+>  profiles/audio/control.c      | 20 +++--------
+>  profiles/audio/manager.c      | 44 +++++++-----------------
+>  profiles/audio/manager.h      |  5 ---
+>  profiles/audio/sink.c         | 18 +++++-----
+>  profiles/audio/source.c       | 18 +++++-----
+>  profiles/input/device.c       | 21 +++++-------
+>  profiles/input/device.h       |  5 ++-
+>  profiles/input/manager.c      | 11 ------
+>  profiles/input/manager.h      | 25 --------------
+>  profiles/network/connection.c | 39 ++++++---------------
+>  profiles/network/connection.h |  4 +--
+>  profiles/network/manager.c    | 79 ++++---------------------------------------
+>  profiles/network/manager.h    | 25 --------------
+>  src/device.c                  | 33 +++++++++++-------
+>  src/device.h                  |  7 ----
+>  src/profile.c                 | 29 ++++++++++------
+>  src/profile.h                 |  6 ++--
+>  src/service.c                 | 58 +++++++++++++++++++++++++++++--
+>  src/service.h                 |  9 +++++
+>  20 files changed, 171 insertions(+), 289 deletions(-)
+>  delete mode 100644 profiles/input/manager.h
+>  delete mode 100644 profiles/network/manager.h
 
-The patch has already been applied, but please go ahead with the
-review since there's been a lot of code being changed, and testing was
-fairly limited due to lack of hardware.
+All patches have been applied (after a quick s/unsigned/unsigned int/
+change on patch 2/3). Thanks.
 
-The purpose of this was to be able to delete the node more efficiently
-in case that's the intention of the caller, but it's certainly of
-little use considering that it's a singly-linked list.
-
-Feel free to submit a patch to simplify this, or otherwise I'll
-consider this for a later cleanup patchset.
-
->
-> Another option: you could try using g_slist_find_custom() on the
-> callers and turn this into a comparison callback for it.
-
-Johan preferred this approach over find_custom() in a very similar
-scenario, so I changed this one as well for consistency.
-
-Cheers,
-Mikel
+Johan
