@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH BlueZ v3 15/27] core: Add a state enum to btd_service
-Date: Fri, 26 Apr 2013 08:17:11 +0200
-Message-Id: <1366957043-2383-16-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH BlueZ v3 14/27] core: Add connect/disconnect API to btd_service
+Date: Fri, 26 Apr 2013 08:17:10 +0200
+Message-Id: <1366957043-2383-15-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1366957043-2383-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1366957043-2383-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,216 +12,162 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Add a state to btd_service in order to distinguish which operations are
-allowed in a certain point in time.
+Make use of the btd_profile connect/disconnect callbacks directly within
+service.c instead of doing it inside device.c.
 ---
- src/service.c | 107 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- src/service.h |  13 +++++++
- 2 files changed, 119 insertions(+), 1 deletion(-)
+ src/device.c  | 39 ++++++++++++++++++++++++---------------
+ src/service.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ src/service.h |  4 ++++
+ 3 files changed, 68 insertions(+), 15 deletions(-)
 
+diff --git a/src/device.c b/src/device.c
+index 0ae921e..abdd3af 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -990,11 +990,12 @@ static void dev_disconn_profile(gpointer a, gpointer b)
+ {
+ 	struct btd_profile *profile = a;
+ 	struct btd_device *dev = b;
++	struct btd_service *service;
++	GSList *l;
+ 
+-	if (!profile->disconnect)
+-		return;
+-
+-	profile->disconnect(dev, profile);
++	l = find_service_with_profile(dev->services, profile);
++	service = l->data;
++	btd_service_disconnect(service);
+ }
+ 
+ void device_request_disconnect(struct btd_device *device, DBusMessage *msg)
+@@ -1071,17 +1072,20 @@ static DBusMessage *disconnect(DBusConnection *conn, DBusMessage *msg,
+ static int connect_next(struct btd_device *dev)
+ {
+ 	struct btd_profile *profile;
++	struct btd_service *service;
+ 	int err = -ENOENT;
+ 
+ 	while (dev->pending) {
++		GSList *l;
++
+ 		profile = dev->pending->data;
+ 
+-		err = profile->connect(dev, profile);
+-		if (err == 0)
++		l = find_service_with_profile(dev->services, profile);
++		service = l->data;
++
++		if (btd_service_connect(service) == 0)
+ 			return 0;
+ 
+-		error("Failed to connect %s: %s", profile->name,
+-							strerror(-err));
+ 		dev->pending = g_slist_remove(dev->pending, profile);
+ 	}
+ 
+@@ -1328,6 +1332,8 @@ static DBusMessage *disconnect_profile(DBusConnection *conn, DBusMessage *msg,
+ {
+ 	struct btd_device *dev = user_data;
+ 	struct btd_profile *p;
++	struct btd_service *service;
++	GSList *l;
+ 	const char *pattern;
+ 	char *uuid;
+ 	int err;
+@@ -1346,16 +1352,19 @@ static DBusMessage *disconnect_profile(DBusConnection *conn, DBusMessage *msg,
+ 	if (!p)
+ 		return btd_error_invalid_args(msg);
+ 
+-	if (!p->disconnect)
+-		return btd_error_not_supported(msg);
++	l = find_service_with_profile(dev->services, p);
++	service = l->data;
+ 
+-	err = p->disconnect(dev, p);
+-	if (err < 0)
+-		return btd_error_failed(msg, strerror(-err));
++	err = btd_service_disconnect(service);
++	if (err == 0) {
++		dev->disconnect = dbus_message_ref(msg);
++		return NULL;
++	}
+ 
+-	dev->disconnect = dbus_message_ref(msg);
++	if (err == -ENOTSUP)
++		return btd_error_not_supported(msg);
+ 
+-	return NULL;
++	return btd_error_failed(msg, strerror(-err));
+ }
+ 
+ static void device_svc_resolved(struct btd_device *dev, int err)
 diff --git a/src/service.c b/src/service.c
-index 378dd2d..298d600 100644
+index 39a58d9..378dd2d 100644
 --- a/src/service.c
 +++ b/src/service.c
-@@ -50,8 +50,47 @@ struct btd_service {
- 	gint			ref;
- 	struct btd_device	*device;
- 	struct btd_profile	*profile;
-+	btd_service_state_t	state;
- };
+@@ -113,6 +113,46 @@ void service_shutdown(struct btd_service *service)
+ 	service->profile = NULL;
+ }
  
-+static const char *state2str(btd_service_state_t state)
++int btd_service_connect(struct btd_service *service)
 +{
-+	switch (state) {
-+	case BTD_SERVICE_STATE_UNAVAILABLE:
-+		return "unavailable";
-+	case BTD_SERVICE_STATE_DISCONNECTED:
-+		return "disconnected";
-+	case BTD_SERVICE_STATE_CONNECTING:
-+		return "connecting";
-+	case BTD_SERVICE_STATE_CONNECTED:
-+		return "connected";
-+	case BTD_SERVICE_STATE_DISCONNECTING:
-+		return "disconnecting";
-+	}
-+
-+	return NULL;
-+}
-+
-+static void change_state(struct btd_service *service, btd_service_state_t state,
-+									int err)
-+{
-+	btd_service_state_t old = service->state;
++	struct btd_profile *profile = service->profile;
 +	char addr[18];
++	int err;
 +
-+	if (state == old)
-+		return;
++	if (!profile->connect)
++		return -ENOTSUP;
 +
-+	assert(service->device != NULL);
-+	assert(service->profile != NULL);
-+
-+	service->state = state;
++	err = profile->connect(service->device, service->profile);
++	if (err == 0)
++		return 0;
 +
 +	ba2str(device_get_address(service->device), addr);
-+	DBG("%p: device %s profile %s state changed: %s -> %s (%d)", service,
-+					addr, service->profile->name,
-+					state2str(old), state2str(state), err);
++	error("%s profile connect failed for %s: %s", profile->name, addr,
++								strerror(-err));
++
++	return err;
 +}
 +
- struct btd_service *btd_service_ref(struct btd_service *service)
- {
- 	service->ref++;
-@@ -87,6 +126,7 @@ struct btd_service *service_create(struct btd_device *device,
- 	service->ref = 1;
- 	service->device = device; /* Weak ref */
- 	service->profile = profile;
-+	service->state = BTD_SERVICE_STATE_UNAVAILABLE;
- 
- 	return service;
- }
-@@ -96,9 +136,13 @@ int service_probe(struct btd_service *service)
- 	char addr[18];
- 	int err;
- 
-+	assert(service->state == BTD_SERVICE_STATE_UNAVAILABLE);
-+
- 	err = service->profile->device_probe(service->profile, service->device);
--	if (err == 0)
-+	if (err == 0) {
-+		change_state(service, BTD_SERVICE_STATE_DISCONNECTED, 0);
- 		return 0;
-+	}
- 
- 	ba2str(device_get_address(service->device), addr);
- 	error("%s profile probe failed for %s", service->profile->name, addr);
-@@ -108,6 +152,7 @@ int service_probe(struct btd_service *service)
- 
- void service_shutdown(struct btd_service *service)
- {
-+	change_state(service, BTD_SERVICE_STATE_UNAVAILABLE, 0);
- 	service->profile->device_remove(service->profile, service->device);
- 	service->device = NULL;
- 	service->profile = NULL;
-@@ -122,6 +167,20 @@ int btd_service_connect(struct btd_service *service)
- 	if (!profile->connect)
- 		return -ENOTSUP;
- 
-+	switch (service->state) {
-+	case BTD_SERVICE_STATE_UNAVAILABLE:
-+		return -EINVAL;
-+	case BTD_SERVICE_STATE_DISCONNECTED:
-+		break;
-+	case BTD_SERVICE_STATE_CONNECTING:
-+	case BTD_SERVICE_STATE_CONNECTED:
-+		return -EALREADY;
-+	case BTD_SERVICE_STATE_DISCONNECTING:
-+		return -EBUSY;
-+	}
-+
-+	change_state(service, BTD_SERVICE_STATE_CONNECTING, 0);
-+
- 	err = profile->connect(service->device, service->profile);
- 	if (err == 0)
- 		return 0;
-@@ -130,6 +189,8 @@ int btd_service_connect(struct btd_service *service)
- 	error("%s profile connect failed for %s: %s", profile->name, addr,
- 								strerror(-err));
- 
-+	btd_service_connecting_complete(service, err);
-+
- 	return err;
- }
- 
-@@ -142,6 +203,19 @@ int btd_service_disconnect(struct btd_service *service)
- 	if (!profile->disconnect)
- 		return -ENOTSUP;
- 
-+	switch (service->state) {
-+	case BTD_SERVICE_STATE_UNAVAILABLE:
-+		return -EINVAL;
-+	case BTD_SERVICE_STATE_DISCONNECTED:
-+	case BTD_SERVICE_STATE_DISCONNECTING:
-+		return -EALREADY;
-+	case BTD_SERVICE_STATE_CONNECTING:
-+	case BTD_SERVICE_STATE_CONNECTED:
-+		break;
-+	}
-+
-+	change_state(service, BTD_SERVICE_STATE_DISCONNECTING, 0);
-+
- 	err = profile->disconnect(service->device, service->profile);
- 	if (err == 0)
- 		return 0;
-@@ -150,6 +224,8 @@ int btd_service_disconnect(struct btd_service *service)
- 	error("%s profile disconnect failed for %s: %s", profile->name, addr,
- 								strerror(-err));
- 
-+	btd_service_disconnecting_complete(service, err);
-+
- 	return err;
- }
- 
-@@ -162,3 +238,32 @@ struct btd_profile *btd_service_get_profile(const struct btd_service *service)
- {
- 	return service->profile;
- }
-+
-+btd_service_state_t btd_service_get_state(const struct btd_service *service)
++int btd_service_disconnect(struct btd_service *service)
 +{
-+	return service->state;
-+}
++	struct btd_profile *profile = service->profile;
++	char addr[18];
++	int err;
 +
-+void btd_service_connecting_complete(struct btd_service *service, int err)
-+{
-+	if (service->state != BTD_SERVICE_STATE_DISCONNECTED &&
-+				service->state != BTD_SERVICE_STATE_CONNECTING)
-+		return;
++	if (!profile->disconnect)
++		return -ENOTSUP;
 +
++	err = profile->disconnect(service->device, service->profile);
 +	if (err == 0)
-+		change_state(service, BTD_SERVICE_STATE_CONNECTED, 0);
-+	else
-+		change_state(service, BTD_SERVICE_STATE_DISCONNECTED, err);
++		return 0;
++
++	ba2str(device_get_address(service->device), addr);
++	error("%s profile disconnect failed for %s: %s", profile->name, addr,
++								strerror(-err));
++
++	return err;
 +}
 +
-+void btd_service_disconnecting_complete(struct btd_service *service, int err)
-+{
-+	if (service->state != BTD_SERVICE_STATE_CONNECTED &&
-+			service->state != BTD_SERVICE_STATE_DISCONNECTING)
-+		return;
-+
-+	if (err == 0)
-+		change_state(service, BTD_SERVICE_STATE_DISCONNECTED, 0);
-+	else /* If disconnect fails, we assume it remains connected */
-+		change_state(service, BTD_SERVICE_STATE_CONNECTED, err);
-+}
+ struct btd_device *btd_service_get_device(const struct btd_service *service)
+ {
+ 	return service->device;
 diff --git a/src/service.h b/src/service.h
-index f242f2f..8fb1ed5 100644
+index 4a69571..f242f2f 100644
 --- a/src/service.h
 +++ b/src/service.h
-@@ -21,6 +21,14 @@
-  *
-  */
+@@ -35,6 +35,10 @@ struct btd_service *service_create(struct btd_device *device,
+ int service_probe(struct btd_service *service);
+ void service_shutdown(struct btd_service *service);
  
-+typedef enum {
-+	BTD_SERVICE_STATE_UNAVAILABLE, /* Not probed */
-+	BTD_SERVICE_STATE_DISCONNECTED,
-+	BTD_SERVICE_STATE_CONNECTING,
-+	BTD_SERVICE_STATE_CONNECTED,
-+	BTD_SERVICE_STATE_DISCONNECTING,
-+} btd_service_state_t;
++/* Connection control API */
++int btd_service_connect(struct btd_service *service);
++int btd_service_disconnect(struct btd_service *service);
 +
- struct btd_service;
- struct btd_device;
- struct btd_profile;
-@@ -42,3 +50,8 @@ int btd_service_disconnect(struct btd_service *service);
  /* Public member access */
  struct btd_device *btd_service_get_device(const struct btd_service *service);
  struct btd_profile *btd_service_get_profile(const struct btd_service *service);
-+btd_service_state_t btd_service_get_state(const struct btd_service *service);
-+
-+/* Functions used by profile implementation */
-+void btd_service_connecting_complete(struct btd_service *service, int err);
-+void btd_service_disconnecting_complete(struct btd_service *service, int err);
 -- 
 1.8.1.4
 
