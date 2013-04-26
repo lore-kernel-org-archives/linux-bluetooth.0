@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH BlueZ v3 11/27] core: Add btd_service to represent device services
-Date: Fri, 26 Apr 2013 08:17:07 +0200
-Message-Id: <1366957043-2383-12-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH BlueZ v3 10/27] network: Bypass manager during probe/remove
+Date: Fri, 26 Apr 2013 08:17:06 +0200
+Message-Id: <1366957043-2383-11-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1366957043-2383-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1366957043-2383-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,180 +12,156 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Add a new object to centralize all data corresponding to a service
-provided by a remote device, coupling a pair of btd_profile and
-btd_device pointers.
+Use the internal device API to provide the btd_profile callback
+functions, without boilerplate code in manager.c.
 ---
- Makefile.am   |   1 +
- src/service.c | 102 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/service.h |  37 +++++++++++++++++++++
- 3 files changed, 140 insertions(+)
- create mode 100644 src/service.c
- create mode 100644 src/service.h
+ profiles/network/connection.c | 11 ++++++++---
+ profiles/network/connection.h |  4 ++--
+ profiles/network/manager.c    | 40 ++++++----------------------------------
+ 3 files changed, 16 insertions(+), 39 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 1d0dd13..da87a21 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -142,6 +142,7 @@ src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
- 			src/error.h src/error.c \
- 			src/adapter.h src/adapter.c \
- 			src/profile.h src/profile.c \
-+			src/service.h src/service.c \
- 			src/device.h src/device.c src/attio.h \
- 			src/dbus-common.c src/dbus-common.h \
- 			src/eir.h src/eir.c \
-diff --git a/src/service.c b/src/service.c
-new file mode 100644
-index 0000000..4b69cba
---- /dev/null
-+++ b/src/service.c
-@@ -0,0 +1,102 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012-2013  BMW Car IT GmbH. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <assert.h>
-+#include <unistd.h>
-+#include <fcntl.h>
-+#include <stdbool.h>
-+#include <sys/stat.h>
-+#include <sys/ioctl.h>
-+#include <errno.h>
-+
-+#include <bluetooth/bluetooth.h>
-+
-+#include <glib.h>
-+
-+#include "log.h"
-+
-+#include "adapter.h"
-+#include "device.h"
+diff --git a/profiles/network/connection.c b/profiles/network/connection.c
+index 3ccd211..84359c0 100644
+--- a/profiles/network/connection.c
++++ b/profiles/network/connection.c
+@@ -43,6 +43,7 @@
+ #include "dbus-common.h"
+ #include "adapter.h"
+ #include "device.h"
 +#include "profile.h"
-+#include "service.h"
+ 
+ #include "error.h"
+ #include "common.h"
+@@ -639,9 +640,12 @@ static const GDBusPropertyTable connection_properties[] = {
+ 	{ }
+ };
+ 
+-void connection_unregister(struct btd_device *device)
++void connection_unregister(struct btd_profile *p, struct btd_device *device)
+ {
+ 	struct network_peer *peer;
++	uint16_t id = bnep_service_id(p->remote_uuid);
 +
-+struct btd_service {
-+	gint			ref;
-+	struct btd_device	*device;
-+	struct btd_profile	*profile;
-+};
-+
-+struct btd_service *btd_service_ref(struct btd_service *service)
-+{
-+	service->ref++;
-+
-+	DBG("%p: ref=%d", service, service->ref);
-+
-+	return service;
-+}
-+
-+void btd_service_unref(struct btd_service *service)
-+{
-+	service->ref--;
-+
-+	DBG("%p: ref=%d", service, service->ref);
-+
-+	if (service->ref > 0)
-+		return;
-+
-+	g_free(service);
-+}
-+
-+struct btd_service *service_create(struct btd_device *device,
-+						struct btd_profile *profile)
-+{
-+	struct btd_service *service;
-+
-+	service = g_try_new0(struct btd_service, 1);
-+	if (!service) {
-+		error("service_create: failed to alloc memory");
-+		return NULL;
-+	}
-+
-+	service->ref = 1;
-+	service->device = device; /* Weak ref */
-+	service->profile = profile;
-+
-+	return service;
-+}
-+
-+struct btd_device *btd_service_get_device(const struct btd_service *service)
-+{
-+	return service->device;
-+}
-+
-+struct btd_profile *btd_service_get_profile(const struct btd_service *service)
-+{
-+	return service->profile;
-+}
-diff --git a/src/service.h b/src/service.h
-new file mode 100644
-index 0000000..4f83387
---- /dev/null
-+++ b/src/service.h
-@@ -0,0 +1,37 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012-2013  BMW Car IT GmbH. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+struct btd_service;
-+struct btd_device;
-+struct btd_profile;
-+
-+struct btd_service *btd_service_ref(struct btd_service *service);
-+void btd_service_unref(struct btd_service *service);
-+
-+/* Service management functions used by the core */
-+struct btd_service *service_create(struct btd_device *device,
-+						struct btd_profile *profile);
-+
-+/* Public member access */
-+struct btd_device *btd_service_get_device(const struct btd_service *service);
-+struct btd_profile *btd_service_get_profile(const struct btd_service *service);
++	DBG("%s id %u", device_get_path(device), id);
+ 
+ 	peer = find_peer(peers, device);
+ 	if (!peer)
+@@ -682,12 +686,13 @@ static struct network_peer *create_peer(struct btd_device *device)
+ 	return peer;
+ }
+ 
+-int connection_register(struct btd_device *device, uint16_t id)
++int connection_register(struct btd_profile *p, struct btd_device *device)
+ {
+ 	struct network_peer *peer;
+ 	struct network_conn *nc;
++	uint16_t id = bnep_service_id(p->remote_uuid);
+ 
+-	DBG("id %u", id);
++	DBG("%s id %u", device_get_path(device), id);
+ 
+ 	peer = find_peer(peers, device);
+ 	if (!peer) {
+diff --git a/profiles/network/connection.h b/profiles/network/connection.h
+index 32356f9..5daead0 100644
+--- a/profiles/network/connection.h
++++ b/profiles/network/connection.h
+@@ -21,7 +21,7 @@
+  *
+  */
+ 
+-int connection_register(struct btd_device *device, uint16_t id);
+-void connection_unregister(struct btd_device *device);
++int connection_register(struct btd_profile *p, struct btd_device *device);
++void connection_unregister(struct btd_profile *p, struct btd_device *device);
+ int connection_connect(struct btd_device *device, uint16_t id);
+ int connection_disconnect(struct btd_device *device, uint16_t id);
+diff --git a/profiles/network/manager.c b/profiles/network/manager.c
+index 4aa6a2b..df79351 100644
+--- a/profiles/network/manager.c
++++ b/profiles/network/manager.c
+@@ -74,20 +74,6 @@ done:
+ 				conf_security ? "true" : "false");
+ }
+ 
+-static int panu_probe(struct btd_profile *p, struct btd_device *device)
+-{
+-	DBG("path %s", device_get_path(device));
+-
+-	return connection_register(device, BNEP_SVC_PANU);
+-}
+-
+-static void network_remove(struct btd_profile *p, struct btd_device *device)
+-{
+-	DBG("path %s", device_get_path(device));
+-
+-	connection_unregister(device);
+-}
+-
+ static int panu_connect(struct btd_device *dev, struct btd_profile *profile)
+ {
+ 	return connection_connect(dev, BNEP_SVC_PANU);
+@@ -117,13 +103,6 @@ static void panu_server_remove(struct btd_profile *p,
+ 	server_unregister(adapter, BNEP_SVC_PANU);
+ }
+ 
+-static int gn_probe(struct btd_profile *p, struct btd_device *device)
+-{
+-	DBG("path %s", device_get_path(device));
+-
+-	return connection_register(device, BNEP_SVC_GN);
+-}
+-
+ static int gn_connect(struct btd_device *dev, struct btd_profile *profile)
+ {
+ 	return connection_connect(dev, BNEP_SVC_GN);
+@@ -153,13 +132,6 @@ static void gn_server_remove(struct btd_profile *p,
+ 	server_unregister(adapter, BNEP_SVC_GN);
+ }
+ 
+-static int nap_probe(struct btd_profile *p, struct btd_device *device)
+-{
+-	DBG("path %s", device_get_path(device));
+-
+-	return connection_register(device, BNEP_SVC_NAP);
+-}
+-
+ static int nap_connect(struct btd_device *dev, struct btd_profile *profile)
+ {
+ 	return connection_connect(dev, BNEP_SVC_NAP);
+@@ -193,8 +165,8 @@ static struct btd_profile panu_profile = {
+ 	.name		= "network-panu",
+ 	.local_uuid	= NAP_UUID,
+ 	.remote_uuid	= PANU_UUID,
+-	.device_probe	= panu_probe,
+-	.device_remove	= network_remove,
++	.device_probe	= connection_register,
++	.device_remove	= connection_unregister,
+ 	.connect	= panu_connect,
+ 	.disconnect	= panu_disconnect,
+ 	.adapter_probe	= panu_server_probe,
+@@ -205,8 +177,8 @@ static struct btd_profile gn_profile = {
+ 	.name		= "network-gn",
+ 	.local_uuid	= PANU_UUID,
+ 	.remote_uuid	= GN_UUID,
+-	.device_probe	= gn_probe,
+-	.device_remove	= network_remove,
++	.device_probe	= connection_register,
++	.device_remove	= connection_unregister,
+ 	.connect	= gn_connect,
+ 	.disconnect	= gn_disconnect,
+ 	.adapter_probe	= gn_server_probe,
+@@ -217,8 +189,8 @@ static struct btd_profile nap_profile = {
+ 	.name		= "network-nap",
+ 	.local_uuid	= PANU_UUID,
+ 	.remote_uuid	= NAP_UUID,
+-	.device_probe	= nap_probe,
+-	.device_remove	= network_remove,
++	.device_probe	= connection_register,
++	.device_remove	= connection_unregister,
+ 	.connect	= nap_connect,
+ 	.disconnect	= nap_disconnect,
+ 	.adapter_probe	= nap_server_probe,
 -- 
 1.8.1.4
 
