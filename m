@@ -1,213 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1367006741-28907-7-git-send-email-deymo@chromium.org>
-References: <1367006741-28907-1-git-send-email-deymo@chromium.org>
-	<1367006741-28907-7-git-send-email-deymo@chromium.org>
-Date: Sat, 27 Apr 2013 11:31:08 +0200
-Message-ID: <CANq1E4RQzgSL8j_9dQpR+N7rVQ3S2mo9Z5_2tgeePYKm7-jDhQ@mail.gmail.com>
-Subject: Re: [PATCH v4 6/8] autopair: Add the autopair plugin.
-From: David Herrmann <dh.herrmann@gmail.com>
-To: Alex Deymo <deymo@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
-	Scott James Remnant <keybuk@chromium.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Reply-To: sedat.dilek@gmail.com
+In-Reply-To: <20130426220427.GE1433@mtj.dyndns.org>
+References: <CA+icZUVCmFeh3Xna37VJDDzvZ34sYJ_Dser7i5rRzGLhMTi5-Q@mail.gmail.com>
+	<CA+icZUXeDT8x60iUtjJV2GO5KkDnm8CJsz8mntz5hREoOD+YJw@mail.gmail.com>
+	<CA+icZUWkyP9TE0eeqstyvVNP++MtN8rYfGcPBT6NuMOHEHm7dw@mail.gmail.com>
+	<20130426182239.GA25767@mtj.dyndns.org>
+	<CA+icZUVWRkP_fxTH22ywx9Ntnnp1xW_2dVRjwTvBfs0eJBcEVg@mail.gmail.com>
+	<20130426220427.GE1433@mtj.dyndns.org>
+Date: Sat, 27 Apr 2013 01:24:48 +0200
+Message-ID: <CA+icZUWJ=LoMTMMGfU9pJc7fVOFEdoZjxfMba2TaLgPWruiH4g@mail.gmail.com>
+Subject: Re: linux-next: Tree for Apr 26 [ bluetooth on suspend/resume ]
+From: Sedat Dilek <sedat.dilek@gmail.com>
+To: Tejun Heo <tj@kernel.org>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Linux PM List <linux-pm@lists.linux-foundation.org>, "Rafael J. Wysocki" <rjw@sisk.pl>,
+	Frederic Weisbecker <fweisbec@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex
-
-On Fri, Apr 26, 2013 at 10:05 PM, Alex Deymo <deymo@chromium.org> wrote:
-> The autopair plugin tries standard pincodes for different devices with dumb
-> pincodes. It also generates a random 6 digit pincode for keyboards that
-> support any pincode but fallbacks to the agent call in case the random
-> generated pincode didn't work.
-> ---
->  Makefile.plugins   |   3 ++
->  plugins/autopair.c | 150 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 153 insertions(+)
->  create mode 100644 plugins/autopair.c
+On Sat, Apr 27, 2013 at 12:04 AM, Tejun Heo <tj@kernel.org> wrote:
+> On Fri, Apr 26, 2013 at 11:07:44PM +0200, Sedat Dilek wrote:
+>> > The second argument %rsi is zero, which got transferred to %r13 and
+>> > then offset deref on it trapped.
+>> >
+>> > The second argument is @wq and the oopsing code is the wq->flags deref
+>> > in the following if condition.
+>> >
+>> >         /* if dying, only works from the same workqueue are allowed */
+>> >         if (unlikely(wq->flags & __WQ_DRAINING) &&
+>> >                 WARN_ON_ONCE(!is_chained_work(wq)))
+>> >                 return;
+>> >
+>> > So, umm, don't pass in NULL as @wq. :)
+>> >
+>>
+>> Do you have a patch for this?
 >
-> diff --git a/Makefile.plugins b/Makefile.plugins
-> index 44e6eca..3efe849 100644
-> --- a/Makefile.plugins
-> +++ b/Makefile.plugins
-> @@ -5,6 +5,9 @@ builtin_sources += plugins/hostname.c
->  builtin_modules += wiimote
->  builtin_sources += plugins/wiimote.c
+> Heh, I haven't even looked at the caller.  It's a bug on the workqueue
+> user side.
 >
-> +builtin_modules += autopair
-> +builtin_sources += plugins/autopair.c
-> +
->  if MAINTAINER_MODE
->  builtin_modules += gatt_example
->  builtin_sources += plugins/gatt-example.c
-> diff --git a/plugins/autopair.c b/plugins/autopair.c
-> new file mode 100644
-> index 0000000..2b7a5ee
-> --- /dev/null
-> +++ b/plugins/autopair.c
-> @@ -0,0 +1,150 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2012 Google Inc.
-> + *
-> + *
-> + *  This program is free software; you can redistribute it and/or modify
-> + *  it under the terms of the GNU General Public License as published by
-> + *  the Free Software Foundation; either version 2 of the License, or
-> + *  (at your option) any later version.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU General Public License
-> + *  along with this program; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> + *
-> + */
-> +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
-> +
-> +#include <stdbool.h>
-> +#include <stdlib.h>
-> +
-> +#include <bluetooth/bluetooth.h>
-> +#include <glib.h>
-> +
-> +#include "plugin.h"
-> +#include "adapter.h"
-> +#include "device.h"
-> +#include "log.h"
-> +#include "storage.h"
-> +
-> +/*
-> + * Plugin to handle automatic pairing of devices with reduced user
-> + * interaction, including implementing the recommendation of the HID spec
-> + * for keyboard devices.
-> + *
-> + * The plugin works by intercepting the PIN request for devices; if the
-> + * device is a keyboard a random six-digit numeric PIN is generated and
-> + * returned, flagged for displaying using DisplayPinCode.
-> + *
-> + */
-> +
-> +static ssize_t autopair_pincb(struct btd_adapter *adapter,
-> +                                       struct btd_device *device,
-> +                                       char *pinbuf, gboolean *display,
-> +                                       uint32_t attempt)
-> +{
-> +       char addr[18];
-> +       char pinstr[7];
-> +       uint32_t class;
-> +
-> +       ba2str(device_get_address(device), addr);
-> +
-> +       class = btd_device_get_class(device);
-> +
-> +       DBG("device %s 0x%x", addr, class);
-> +
-> +       /* This is a class-based pincode guesser. Ignore devices with an unknown
-> +        * class. */
-> +       if (class == 0)
-> +               return 0;
-> +
-> +       switch ((class & 0x1f00) >> 8) {
-> +       case 0x04:              /* Audio/Video */
-> +               switch ((class & 0xfc) >> 2) {
-> +               case 0x01:              /* Wearable Headset Device */
-> +               case 0x02:              /* Hands-free Device */
-> +               case 0x06:              /* Headphones */
-> +               case 0x07:              /* Portable Audio */
-> +               case 0x0a:              /* HiFi Audio Device */
-> +                       if (attempt > 1)
-> +                               return 0;
-> +                       memcpy(pinbuf, "0000", 4);
-> +                       return 4;
-> +                       break;
-> +               }
-> +               break;
-> +       case 0x05:              /* Peripheral */
-> +               switch ((class & 0xc0) >> 6) {
-> +               case 0x01:              /* Keyboard */
-> +               case 0x03:              /* Combo keyboard/pointing device */
-> +                       if (attempt > 1)
-> +                               return 0;
-> +                       snprintf(pinstr, sizeof(pinstr), "%06d",
-> +                                               rand() % 1000000);
-> +                       *display = TRUE;
-> +                       memcpy(pinbuf, pinstr, 6);
-> +                       return 6;
-> +                       break;
-> +               case 0x02: /* Pointing device */
-> +                       if (attempt > 1)
-> +                               return 0;
-> +                       memcpy(pinbuf, "0000", 4);
-> +                       return 4;
-> +                       break;
-> +               }
-> +               break;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +
-> +static int autopair_probe(struct btd_adapter *adapter)
-> +{
-> +       btd_adapter_register_pin_cb(adapter, autopair_pincb);
-> +
-> +       return 0;
-> +}
-> +
-> +static void autopair_remove(struct btd_adapter *adapter)
-> +{
-> +       btd_adapter_unregister_pin_cb(adapter, autopair_pincb);
-> +}
-> +
-> +static struct btd_adapter_driver autopair_driver = {
-> +       .name = "autopair",
-> +       .probe = autopair_probe,
-> +       .remove = autopair_remove,
-> +};
-> +
-> +static int autopair_init(void)
-> +{
-> +       /* Initialize the random seed from /dev/urandom */
-> +       unsigned int seed = time(NULL);
-> +       FILE *f = fopen("/dev/urandom", "rb");
-> +       if (f != NULL) {
-> +               fread(&seed, sizeof(seed), 1, f);
-> +               fclose(f);
-> +       }
-> +       srand(seed);
-> +
-> +       return btd_register_adapter_driver(&autopair_driver);
-> +}
-> +
-> +static void autopair_exit(void)
-> +{
-> +       btd_unregister_adapter_driver(&autopair_driver);
-> +}
-> +
-> +BLUETOOTH_PLUGIN_DEFINE(autopair, VERSION,
-> +               BLUETOOTH_PLUGIN_PRIORITY_DEFAULT, autopair_init, autopair_exit)
 
-Would you mind choosing a lower priority than default? Or how do you
-intend other plugins like plugins/wiimote.c to work in combination
-with this? I have seen a lot of 3rd party Wii-Remote based devices
-which report nearly random "class" entries. So if the autopair
-callback is called _before_ the wiimote callback, pairing will fail.
+[ CC Frederic ]
 
-I have two solutions for this: Integrate wiimote pairing into this
-plugin or changing the plugin priorities so the autopair callback is
-registered _after_ other pin-callbacks (or reversed, I forgot the
-order in which pincbs are called).
+You should explain that a bit.
 
-I'm ok with both.
-Regards
-David
+I have tested with my "problematic -3" kernel and did not see the warning again.
+So, I assume it's independent of linux-dynticks kconfig-settings.
+
+- Sedat -
+
+> Thanks.
+>
+> --
+> tejun
