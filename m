@@ -1,42 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-From: Alex Deymo <deymo@chromium.org>
-Date: Mon, 29 Apr 2013 14:51:25 -0700
-Message-ID: <CAGd9gwjbOFpaYrZt=4Pn4VLUNX-uq-Ap=pPaWt9snV_Gmiwmtg@mail.gmail.com>
-Subject: Paired devices in discovery mode
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	keybuk <keybuk@chromium.org>
+In-Reply-To: <CABBYNZL-z46TVEADJRH7taXBe8S3VKu3HoRC-JNvbjrw1-TjCw@mail.gmail.com>
+References: <1366318045-22261-1-git-send-email-luiz.dentz@gmail.com>
+ <CABBYNZKYwVpz6kAzJQ5D52ndVhb8M9P9YgECh69mQ7FPXhD0JA@mail.gmail.com>
+ <CAMOw1v4U+cFv=+J4CxuAOKFvBcfEUSTzJ2PV+mn4CCEjxDE99g@mail.gmail.com> <CABBYNZL-z46TVEADJRH7taXBe8S3VKu3HoRC-JNvbjrw1-TjCw@mail.gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Mon, 29 Apr 2013 15:00:38 -0300
+Message-ID: <CAMOw1v6pL2bEAGdu1f92DbJ+ig+71mk5L2McBJtj_6CRONAEjw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gdbus: Fix calling GetManagedObjects twice in a row
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
-I'm wonder to solve the following situation:
-1. You pair your BT device with your computer and use it.
-2. Then go somewhere else and pair it with another computer to use it there.
-3. Finally you go back to the first computer and want to use the
-device again with the first computer.
+On Mon, Apr 29, 2013 at 2:34 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Lucas,
+>
+> On Mon, Apr 29, 2013 at 7:39 PM, Lucas De Marchi
+> <lucas.demarchi@profusion.mobi> wrote:
+>> On Mon, Apr 29, 2013 at 11:45 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi,
+>>>
+>>> On Thu, Apr 18, 2013 at 11:47 PM, Luiz Augusto von Dentz
+>>> <luiz.dentz@gmail.com> wrote:
+>>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>>
+>>>> Calling g_dbus_client_new followed by g_dbus_client_set_proxy_handlers
+>>>> cause two calls to GetManagedObjects in a row as GetNameOwner reply is
+>>>> asyncronously it triggers the second call because the handlers have
+>>>> been set by g_dbus_client_set_proxy_handlers.
+>>>> ---
+>>>>  gdbus/client.c | 25 ++++++++++++++++++-------
+>>>>  1 file changed, 18 insertions(+), 7 deletions(-)
+>>>>
+>>>> diff --git a/gdbus/client.c b/gdbus/client.c
+>>>> index c2d2346..55f1d89 100644
+>>>> --- a/gdbus/client.c
+>>>> +++ b/gdbus/client.c
+>>>> @@ -40,6 +40,7 @@ struct GDBusClient {
+>>>>         char *base_path;
+>>>>         GPtrArray *match_rules;
+>>>>         DBusPendingCall *pending_call;
+>>>> +       DBusPendingCall *get_objects_call;
+>>>>         GDBusWatchFunction connect_func;
+>>>>         void *connect_data;
+>>>>         GDBusWatchFunction disconn_func;
+>>>> @@ -992,6 +993,8 @@ static void get_managed_objects_reply(DBusPendingCall *call, void *user_data)
+>>>>         DBusMessage *reply = dbus_pending_call_steal_reply(call);
+>>>>         DBusError error;
+>>>>
+>>>> +       g_dbus_client_ref(client);
+>>>> +
+>>>>         dbus_error_init(&error);
+>>>>
+>>>>         if (dbus_set_error_from_message(&error, reply) == TRUE) {
+>>>> @@ -1004,19 +1007,24 @@ static void get_managed_objects_reply(DBusPendingCall *call, void *user_data)
+>>>>  done:
+>>>>         dbus_message_unref(reply);
+>>>>
+>>>> +       dbus_pending_call_unref(client->get_objects_call);
+>>>> +       client->get_objects_call = NULL;
+>>>> +
+>>>>         g_dbus_client_unref(client);
+>>>>  }
+>>>>
+>>>>  static void get_managed_objects(GDBusClient *client)
+>>>>  {
+>>>>         DBusMessage *msg;
+>>>> -       DBusPendingCall *call;
+>>>>
+>>>>         if (!client->proxy_added && !client->proxy_removed) {
+>>>>                 refresh_properties(client);
+>>>>                 return;
+>>>>         }
+>>>>
+>>>> +       if (client->get_objects_call != NULL)
+>>>> +               return;
+>>>> +
+>>>>         msg = dbus_message_new_method_call(client->service_name, "/",
+>>>>                                         DBUS_INTERFACE_DBUS ".ObjectManager",
+>>>>                                                         "GetManagedObjects");
+>>>> @@ -1026,16 +1034,14 @@ static void get_managed_objects(GDBusClient *client)
+>>>>         dbus_message_append_args(msg, DBUS_TYPE_INVALID);
+>>>>
+>>>>         if (dbus_connection_send_with_reply(client->dbus_conn, msg,
+>>>> -                                                       &call, -1) == FALSE) {
+>>>> +                               &client->get_objects_call, -1) == FALSE) {
+>>>>                 dbus_message_unref(msg);
+>>>>                 return;
+>>>>         }
+>>>>
+>>>> -       g_dbus_client_ref(client);
+>>>> -
+>>>> -       dbus_pending_call_set_notify(call, get_managed_objects_reply,
+>>>> -                                                       client, NULL);
+>>>> -       dbus_pending_call_unref(call);
+>>>> +       dbus_pending_call_set_notify(client->get_objects_call,
+>>>> +                                               get_managed_objects_reply,
+>>>> +                                               client, NULL);
+>>
+>> Why don't you let the unref here, so you don't need to do it in
+>> g_dbus_client_unref() and get_managed_objects_reply(). This way the
+>> only ref is owned by libdbus which will free it when it's done.
+>
+> But that means we have no control over any reference and from libdbus
+> perspective it can free whenever it likes which I think could break in
+> case where the callback is not called so I find it safer not to abuse
+> it here. Note that in get_name_owner we do the same, although some
+> other parts of the code it seems to not get this right and would
+> probably break in case the user data is freed before the pending call
+> completes.
 
-In this situation, depending on the device, the first pairing could be
-lost if the device supports only one pairing. Some mice/keyboards
-support only one pairing, but there are also other devices supporting
-more than one pairing at each time.
+Well... in the cases it does this user data is freed only when the
+pending call completes. It's not "not getting this right".
 
-If the device lost the pairing, the connect attempt with the device
-will likely reject our link key. With the current BlueZ, this is
-"Paired: yes" for us, but we can't initiate the secure connection. To
-solve this we would need to, in order:
-1. Remove the device.
-2. Wait for the device to appear in the discovery session.
-3. Pair again with the device (re-trust is if needed, etc).
+Anyway, for this part it seems ok, it's just 1 or 2 lines more.
 
-Can we solve this or make it easier?
-I'm thinking about adding a "Discovering" boolean property to the
-Device1 interface that tells you if a device (paired or not, connected
-or not) is in discovery mode. We know that because we see an inquiry
-response while discovering. I would also modify the "Pair" method to
-allow to re-pair a device that is Paired and Discovering instead of
-returning an error for that case.
-What do you think?
+Ack
 
-Alex.
+Lucas De Marchi
