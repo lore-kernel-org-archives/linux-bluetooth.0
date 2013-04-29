@@ -1,80 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 11/13] Bluetooth: Simplify hci_conn_hold/drop logic for L2CAP
-Date: Mon, 29 Apr 2013 19:35:43 +0300
-Message-Id: <1367253345-12482-12-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1367253345-12482-1-git-send-email-johan.hedberg@gmail.com>
-References: <1367253345-12482-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZKYwVpz6kAzJQ5D52ndVhb8M9P9YgECh69mQ7FPXhD0JA@mail.gmail.com>
+References: <1366318045-22261-1-git-send-email-luiz.dentz@gmail.com> <CABBYNZKYwVpz6kAzJQ5D52ndVhb8M9P9YgECh69mQ7FPXhD0JA@mail.gmail.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Mon, 29 Apr 2013 13:39:55 -0300
+Message-ID: <CAMOw1v4U+cFv=+J4CxuAOKFvBcfEUSTzJ2PV+mn4CCEjxDE99g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gdbus: Fix calling GetManagedObjects twice in a row
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+On Mon, Apr 29, 2013 at 11:45 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi,
+>
+> On Thu, Apr 18, 2013 at 11:47 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> Calling g_dbus_client_new followed by g_dbus_client_set_proxy_handlers
+>> cause two calls to GetManagedObjects in a row as GetNameOwner reply is
+>> asyncronously it triggers the second call because the handlers have
+>> been set by g_dbus_client_set_proxy_handlers.
+>> ---
+>>  gdbus/client.c | 25 ++++++++++++++++++-------
+>>  1 file changed, 18 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/gdbus/client.c b/gdbus/client.c
+>> index c2d2346..55f1d89 100644
+>> --- a/gdbus/client.c
+>> +++ b/gdbus/client.c
+>> @@ -40,6 +40,7 @@ struct GDBusClient {
+>>         char *base_path;
+>>         GPtrArray *match_rules;
+>>         DBusPendingCall *pending_call;
+>> +       DBusPendingCall *get_objects_call;
+>>         GDBusWatchFunction connect_func;
+>>         void *connect_data;
+>>         GDBusWatchFunction disconn_func;
+>> @@ -992,6 +993,8 @@ static void get_managed_objects_reply(DBusPendingCall *call, void *user_data)
+>>         DBusMessage *reply = dbus_pending_call_steal_reply(call);
+>>         DBusError error;
+>>
+>> +       g_dbus_client_ref(client);
+>> +
+>>         dbus_error_init(&error);
+>>
+>>         if (dbus_set_error_from_message(&error, reply) == TRUE) {
+>> @@ -1004,19 +1007,24 @@ static void get_managed_objects_reply(DBusPendingCall *call, void *user_data)
+>>  done:
+>>         dbus_message_unref(reply);
+>>
+>> +       dbus_pending_call_unref(client->get_objects_call);
+>> +       client->get_objects_call = NULL;
+>> +
+>>         g_dbus_client_unref(client);
+>>  }
+>>
+>>  static void get_managed_objects(GDBusClient *client)
+>>  {
+>>         DBusMessage *msg;
+>> -       DBusPendingCall *call;
+>>
+>>         if (!client->proxy_added && !client->proxy_removed) {
+>>                 refresh_properties(client);
+>>                 return;
+>>         }
+>>
+>> +       if (client->get_objects_call != NULL)
+>> +               return;
+>> +
+>>         msg = dbus_message_new_method_call(client->service_name, "/",
+>>                                         DBUS_INTERFACE_DBUS ".ObjectManager",
+>>                                                         "GetManagedObjects");
+>> @@ -1026,16 +1034,14 @@ static void get_managed_objects(GDBusClient *client)
+>>         dbus_message_append_args(msg, DBUS_TYPE_INVALID);
+>>
+>>         if (dbus_connection_send_with_reply(client->dbus_conn, msg,
+>> -                                                       &call, -1) == FALSE) {
+>> +                               &client->get_objects_call, -1) == FALSE) {
+>>                 dbus_message_unref(msg);
+>>                 return;
+>>         }
+>>
+>> -       g_dbus_client_ref(client);
+>> -
+>> -       dbus_pending_call_set_notify(call, get_managed_objects_reply,
+>> -                                                       client, NULL);
+>> -       dbus_pending_call_unref(call);
+>> +       dbus_pending_call_set_notify(client->get_objects_call,
+>> +                                               get_managed_objects_reply,
+>> +                                               client, NULL);
 
-The L2CAP code has been incrementing the hci_conn reference for each
-l2cap_chan instance in the l2cap_conn list. Likewise, the reference is
-dropped each time an l2cap_chan is removed from the list. The reference
-counting policy with respect to removal has been clear and explicit in
-the l2cap_chan_drop function, however for addition the function
-calling 2cap_chan_add has always had to do a separate hci_conn_hold
-call.
+Why don't you let the unref here, so you don't need to do it in
+g_dbus_client_unref() and get_managed_objects_reply(). This way the
+only ref is owned by libdbus which will free it when it's done.
 
-What made the counting even more hard to follow is that the
-hci_connect() procedure increments the reference and the L2CAP layer
-making this call took advantage of it to use it as its own reference.
-
-This patch aims to clarify things by having the call to hci_conn_hold
-inside __l2cap_chan_add, thereby removing the need to do it in the
-functions calling __l2cap_chan_add. The reference count for hci_connect
-is still kept as it's necessary for users such as mgmt_pair_device,
-however for the L2CAP layer it means that an extra call to hci_conn_drop
-must be performed once l2cap_chan_add has been done.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/l2cap_core.c |    8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index e373b9d..c78a510 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -545,6 +545,8 @@ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- 
- 	l2cap_chan_hold(chan);
- 
-+	hci_conn_hold(conn->hcon);
-+
- 	list_add(&chan->list, &conn->chan_l);
- }
- 
-@@ -1361,7 +1363,6 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
- 
- 	chan->dcid = L2CAP_CID_ATT;
- 
--	hci_conn_hold(conn->hcon);
- 	conn->hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
- 
- 	bacpy(&bt_sk(chan->sk)->src, conn->src);
-@@ -1827,6 +1828,9 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 	l2cap_chan_add(conn, chan);
- 	l2cap_chan_lock(chan);
- 
-+	/* l2cap_chan_add takes its own ref so we can drop this one */
-+	hci_conn_drop(hcon);
-+
- 	l2cap_state_change(chan, BT_CONNECT);
- 	__set_chan_timer(chan, sk->sk_sndtimeo);
- 
-@@ -3741,8 +3745,6 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
- 
- 	sk = chan->sk;
- 
--	hci_conn_hold(conn->hcon);
--
- 	bacpy(&bt_sk(sk)->src, conn->src);
- 	bacpy(&bt_sk(sk)->dst, conn->dst);
- 	chan->psm  = psm;
--- 
-1.7.10.4
-
+Lucas De Marchi
