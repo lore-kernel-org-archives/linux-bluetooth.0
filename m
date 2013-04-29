@@ -1,101 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZKYwVpz6kAzJQ5D52ndVhb8M9P9YgECh69mQ7FPXhD0JA@mail.gmail.com>
-References: <1366318045-22261-1-git-send-email-luiz.dentz@gmail.com> <CABBYNZKYwVpz6kAzJQ5D52ndVhb8M9P9YgECh69mQ7FPXhD0JA@mail.gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Mon, 29 Apr 2013 13:39:55 -0300
-Message-ID: <CAMOw1v4U+cFv=+J4CxuAOKFvBcfEUSTzJ2PV+mn4CCEjxDE99g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] gdbus: Fix calling GetManagedObjects twice in a row
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 09/13] Bluetooth: Remove useless sk variable in l2cap_le_conn_ready
+Date: Mon, 29 Apr 2013 19:35:41 +0300
+Message-Id: <1367253345-12482-10-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1367253345-12482-1-git-send-email-johan.hedberg@gmail.com>
+References: <1367253345-12482-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Apr 29, 2013 at 11:45 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi,
->
-> On Thu, Apr 18, 2013 at 11:47 PM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> Calling g_dbus_client_new followed by g_dbus_client_set_proxy_handlers
->> cause two calls to GetManagedObjects in a row as GetNameOwner reply is
->> asyncronously it triggers the second call because the handlers have
->> been set by g_dbus_client_set_proxy_handlers.
->> ---
->>  gdbus/client.c | 25 ++++++++++++++++++-------
->>  1 file changed, 18 insertions(+), 7 deletions(-)
->>
->> diff --git a/gdbus/client.c b/gdbus/client.c
->> index c2d2346..55f1d89 100644
->> --- a/gdbus/client.c
->> +++ b/gdbus/client.c
->> @@ -40,6 +40,7 @@ struct GDBusClient {
->>         char *base_path;
->>         GPtrArray *match_rules;
->>         DBusPendingCall *pending_call;
->> +       DBusPendingCall *get_objects_call;
->>         GDBusWatchFunction connect_func;
->>         void *connect_data;
->>         GDBusWatchFunction disconn_func;
->> @@ -992,6 +993,8 @@ static void get_managed_objects_reply(DBusPendingCall *call, void *user_data)
->>         DBusMessage *reply = dbus_pending_call_steal_reply(call);
->>         DBusError error;
->>
->> +       g_dbus_client_ref(client);
->> +
->>         dbus_error_init(&error);
->>
->>         if (dbus_set_error_from_message(&error, reply) == TRUE) {
->> @@ -1004,19 +1007,24 @@ static void get_managed_objects_reply(DBusPendingCall *call, void *user_data)
->>  done:
->>         dbus_message_unref(reply);
->>
->> +       dbus_pending_call_unref(client->get_objects_call);
->> +       client->get_objects_call = NULL;
->> +
->>         g_dbus_client_unref(client);
->>  }
->>
->>  static void get_managed_objects(GDBusClient *client)
->>  {
->>         DBusMessage *msg;
->> -       DBusPendingCall *call;
->>
->>         if (!client->proxy_added && !client->proxy_removed) {
->>                 refresh_properties(client);
->>                 return;
->>         }
->>
->> +       if (client->get_objects_call != NULL)
->> +               return;
->> +
->>         msg = dbus_message_new_method_call(client->service_name, "/",
->>                                         DBUS_INTERFACE_DBUS ".ObjectManager",
->>                                                         "GetManagedObjects");
->> @@ -1026,16 +1034,14 @@ static void get_managed_objects(GDBusClient *client)
->>         dbus_message_append_args(msg, DBUS_TYPE_INVALID);
->>
->>         if (dbus_connection_send_with_reply(client->dbus_conn, msg,
->> -                                                       &call, -1) == FALSE) {
->> +                               &client->get_objects_call, -1) == FALSE) {
->>                 dbus_message_unref(msg);
->>                 return;
->>         }
->>
->> -       g_dbus_client_ref(client);
->> -
->> -       dbus_pending_call_set_notify(call, get_managed_objects_reply,
->> -                                                       client, NULL);
->> -       dbus_pending_call_unref(call);
->> +       dbus_pending_call_set_notify(client->get_objects_call,
->> +                                               get_managed_objects_reply,
->> +                                               client, NULL);
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Why don't you let the unref here, so you don't need to do it in
-g_dbus_client_unref() and get_managed_objects_reply(). This way the
-only ref is owned by libdbus which will free it when it's done.
+The sk variable is of quite little use since it's only used to simplify
+access in the two bt_sk() calls.
 
-Lucas De Marchi
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/l2cap_core.c |    8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 881be61..aa4bc70 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1340,7 +1340,7 @@ static struct l2cap_chan *l2cap_global_chan_by_scid(int state, u16 cid,
+ 
+ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ {
+-	struct sock *parent, *sk;
++	struct sock *parent;
+ 	struct l2cap_chan *chan, *pchan;
+ 
+ 	BT_DBG("");
+@@ -1361,13 +1361,11 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 
+ 	chan->dcid = L2CAP_CID_ATT;
+ 
+-	sk = chan->sk;
+-
+ 	hci_conn_hold(conn->hcon);
+ 	conn->hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
+ 
+-	bacpy(&bt_sk(sk)->src, conn->src);
+-	bacpy(&bt_sk(sk)->dst, conn->dst);
++	bacpy(&bt_sk(chan->sk)->src, conn->src);
++	bacpy(&bt_sk(chan->sk)->dst, conn->dst);
+ 
+ 	l2cap_chan_add(conn, chan);
+ 
+-- 
+1.7.10.4
+
