@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 06/13] Bluetooth: Fix hardcoding ATT CID in __l2cap_chan_add()
-Date: Mon, 29 Apr 2013 19:35:38 +0300
-Message-Id: <1367253345-12482-7-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 05/13] Bluetooth: Fix EBUSY condition test in l2cap_chan_connect
+Date: Mon, 29 Apr 2013 19:35:37 +0300
+Message-Id: <1367253345-12482-6-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1367253345-12482-1-git-send-email-johan.hedberg@gmail.com>
 References: <1367253345-12482-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,48 +11,43 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Since in the future more than the ATT CID may be permissible we should
-not be hardcoding it for all LE connections in __l2cap_chan_add().
-Instead, the source ATT CID should only be set if the destination is
-also ATT, and in other cases we should just use the existing dynamic CID
-allocation function.
-
-Assigning scid based on dcid means that whenever __l2cap_chan_add() is
-called that chan->dcid is properly initialized. l2cap_le_conn_ready()
-wasn't initializing is properly so this is also taken care of in this
-patch.
+The current test in l2cap_chan_connect is intended to protect against
+multiple conflicting connect attempts. However, it assumes that there
+will ever only be a single CID that is connected to, which is not true.
+We do need to check for conflicts with connect attempts to the same
+destination CID but this check is not in anyway specific to LE but can
+be applied to BR/EDR as well.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c |    8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ net/bluetooth/l2cap_core.c |   14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index fd8d3059..dd7f9b3 100644
+index 95d46cd..fd8d3059 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -504,8 +504,10 @@ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- 		if (conn->hcon->type == LE_LINK) {
- 			/* LE connection */
- 			chan->omtu = L2CAP_DEFAULT_MTU;
--			chan->scid = L2CAP_CID_ATT;
--			chan->dcid = L2CAP_CID_ATT;
-+			if (chan->dcid == L2CAP_CID_ATT)
-+				chan->scid = L2CAP_CID_ATT;
-+			else
-+				chan->scid = l2cap_alloc_cid(conn);
- 		} else {
- 			/* Alloc CID for connection-oriented socket */
- 			chan->scid = l2cap_alloc_cid(conn);
-@@ -1357,6 +1359,8 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
- 	if (!chan)
- 		goto clean;
+@@ -1811,16 +1811,10 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 		goto done;
+ 	}
  
-+	chan->dcid = L2CAP_CID_ATT;
-+
- 	sk = chan->sk;
+-	if (hcon->type == LE_LINK) {
+-		err = 0;
+-
+-		if (!list_empty(&conn->chan_l)) {
+-			err = -EBUSY;
+-			hci_conn_drop(hcon);
+-		}
+-
+-		if (err)
+-			goto done;
++	if (cid && __l2cap_get_chan_by_dcid(conn, cid)) {
++		hci_conn_drop(hcon);
++		err = -EBUSY;
++		goto done;
+ 	}
  
- 	hci_conn_hold(conn->hcon);
+ 	/* Update source addr of the socket */
 -- 
 1.7.10.4
 
