@@ -1,104 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 01/13] Bluetooth: Handle LE L2CAP signalling in its own function
-Date: Mon, 29 Apr 2013 19:35:33 +0300
-Message-Id: <1367253345-12482-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1367253345-12482-1-git-send-email-johan.hedberg@gmail.com>
-References: <1367253345-12482-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 00/13] Bluetooth: L2CAP cleanups and fixes
+Date: Mon, 29 Apr 2013 19:35:32 +0300
+Message-Id: <1367253345-12482-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-The LE L2CAP signalling channel follows its own rules and will continue
-to evolve independently from the BR/EDR signalling channel. Therefore,
-it makes sense to have a clear split from BR/EDR by having a dedicated
-function for handling LE signalling commands.
+This set of patches contains some cleanups and fixes for future L2CAP
+work. The L2CAP usage in coming core spec versions will no longer be as
+constrined as it has so far with extensions to the LE signalling
+channel etc. This means that we really do need separate code paths for
+LE signalling instead of sharing BR/EDR related signalling code. The
+patches to split this up keep the same functionality as before (for now)
+but ensure that we have dedicated functions and structs for LE.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/l2cap_core.c |   53 +++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 48 insertions(+), 5 deletions(-)
+Johan
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index a76d1ac..1adda11 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5255,6 +5255,51 @@ static inline int l2cap_le_sig_cmd(struct l2cap_conn *conn,
- 	}
- }
- 
-+static inline void l2cap_le_sig_channel(struct l2cap_conn *conn,
-+					struct sk_buff *skb)
-+{
-+	u8 *data = skb->data;
-+	int len = skb->len;
-+	struct l2cap_cmd_hdr cmd;
-+	int err;
-+
-+	l2cap_raw_recv(conn, skb);
-+
-+	while (len >= L2CAP_CMD_HDR_SIZE) {
-+		u16 cmd_len;
-+		memcpy(&cmd, data, L2CAP_CMD_HDR_SIZE);
-+		data += L2CAP_CMD_HDR_SIZE;
-+		len  -= L2CAP_CMD_HDR_SIZE;
-+
-+		cmd_len = le16_to_cpu(cmd.len);
-+
-+		BT_DBG("code 0x%2.2x len %d id 0x%2.2x", cmd.code, cmd_len,
-+		       cmd.ident);
-+
-+		if (cmd_len > len || !cmd.ident) {
-+			BT_DBG("corrupted command");
-+			break;
-+		}
-+
-+		err = l2cap_le_sig_cmd(conn, &cmd, data);
-+		if (err) {
-+			struct l2cap_cmd_rej_unk rej;
-+
-+			BT_ERR("Wrong link type (%d)", err);
-+
-+			/* FIXME: Map err to a valid reason */
-+			rej.reason = __constant_cpu_to_le16(L2CAP_REJ_NOT_UNDERSTOOD);
-+			l2cap_send_cmd(conn, cmd.ident, L2CAP_COMMAND_REJ,
-+				       sizeof(rej), &rej);
-+		}
-+
-+		data += cmd_len;
-+		len  -= cmd_len;
-+	}
-+
-+	kfree_skb(skb);
-+}
-+
- static inline void l2cap_sig_channel(struct l2cap_conn *conn,
- 				     struct sk_buff *skb)
- {
-@@ -5281,11 +5326,7 @@ static inline void l2cap_sig_channel(struct l2cap_conn *conn,
- 			break;
- 		}
- 
--		if (conn->hcon->type == LE_LINK)
--			err = l2cap_le_sig_cmd(conn, &cmd, data);
--		else
--			err = l2cap_bredr_sig_cmd(conn, &cmd, cmd_len, data);
--
-+		err = l2cap_bredr_sig_cmd(conn, &cmd, cmd_len, data);
- 		if (err) {
- 			struct l2cap_cmd_rej_unk rej;
- 
-@@ -6358,6 +6399,8 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
- 
- 	switch (cid) {
- 	case L2CAP_CID_LE_SIGNALING:
-+		l2cap_le_sig_channel(conn, skb);
-+		break;
- 	case L2CAP_CID_SIGNALING:
- 		l2cap_sig_channel(conn, skb);
- 		break;
--- 
-1.7.10.4
+----------------------------------------------------------------
+Johan Hedberg (13):
+      Bluetooth: Handle LE L2CAP signalling in its own function
+      Bluetooth: Create independent LE signalling defines and structs
+      Bluetooth: Rename L2CAP_CID_LE_DATA to L2CAP_CID_ATT
+      Bluetooth: Fix LE vs BR/EDR selection when connecting
+      Bluetooth: Fix EBUSY condition test in l2cap_chan_connect
+      Bluetooth: Fix hardcoding ATT CID in __l2cap_chan_add()
+      Bluetooth: Add clarifying comment to l2cap_conn_ready()
+      Bluetooth: Fix duplicate call to l2cap_chan_ready()
+      Bluetooth: Remove useless sk variable in l2cap_le_conn_ready
+      Bluetooth: Remove unnecessary L2CAP channel state check
+      Bluetooth: Simplify hci_conn_hold/drop logic for L2CAP
+      Bluetooth: Remove useless hci_conn disc_timeout setting
+      Bluetooth: Fix multiple LE socket handling
+
+ include/net/bluetooth/l2cap.h |   36 ++++++++--
+ net/bluetooth/l2cap_core.c    |  145 ++++++++++++++++++++++++++---------------
+ net/bluetooth/l2cap_sock.c    |    4 +-
+ 3 files changed, 126 insertions(+), 59 deletions(-)
 
