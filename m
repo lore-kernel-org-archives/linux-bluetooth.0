@@ -1,116 +1,183 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 07/13] Bluetooth: Update stop_discovery to use HCI request
-Date: Tue, 30 Apr 2013 02:44:58 -0300
-Message-Id: <1367300704-703-8-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v2 06/13] Bluetooth: Use HCI request in interleaved discovery
+Date: Tue, 30 Apr 2013 02:44:57 -0300
+Message-Id: <1367300704-703-7-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1367300704-703-1-git-send-email-andre.guedes@openbossa.org>
 References: <1367300704-703-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch modifies the stop_discovery function so it uses the HCI
-request framework.
+In order to have a better HCI error handling in interleaved discovery
+functionality, we should use the HCI request framework.
 
-The HCI request is built according to the current discovery state
-(inquiry, LE scanning or name resolving) and a complete callback is
-register to handle the command complete event for the stop discovery
-command. This way, we move all stop_discovery mgmt handling code
-spread in hci_event.c to a single place in mgmt.c.
+This patch updates le_scan_disable_work function so it uses the
+HCI request framework instead of the hci_send_cmd helper. A complete
+callback is registered (le_scan_disable_work_complete function) so we
+are able to trigger the inquiry procedure (if we are running the
+interleaved discovery) or to stop the discovery procedure (if we are
+running LE-only discovery).
+
+This patch also removes the extra logic in hci_cc_le_set_scan_enable
+to trigger the inquiry procedure and the mgmt_interleaved_discovery
+function since they become useless.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/mgmt.c | 47 ++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 40 insertions(+), 7 deletions(-)
+ include/net/bluetooth/hci_core.h |  1 -
+ net/bluetooth/hci_core.c         | 65 +++++++++++++++++++++++++++++++++++++++-
+ net/bluetooth/hci_event.c        | 10 -------
+ net/bluetooth/mgmt.c             | 17 -----------
+ 4 files changed, 64 insertions(+), 29 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 7201c05..d2c9881 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2787,6 +2787,23 @@ failed:
- 	return err;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index fbfa5cd..99dded9 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1182,7 +1182,6 @@ int mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status);
+ int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status);
+ int mgmt_discovering(struct hci_dev *hdev, u8 discovering);
+-int mgmt_interleaved_discovery(struct hci_dev *hdev);
+ int mgmt_device_blocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
+ int mgmt_device_unblocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
+ bool mgmt_valid_hdev(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 8aefd17..d2b96bd 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2058,17 +2058,80 @@ int hci_cancel_le_scan(struct hci_dev *hdev)
+ 	return 0;
  }
  
-+static void stop_discovery_complete(struct hci_dev *hdev, u8 status)
++static void inquiry_complete(struct hci_dev *hdev, u8 status)
 +{
-+	BT_DBG("status %d", status);
-+
-+	hci_dev_lock(hdev);
-+
 +	if (status) {
-+		mgmt_stop_discovery_failed(hdev, status);
-+		goto unlock;
++		BT_ERR("Failed to start inquiry: status %d", status);
++
++		hci_dev_lock(hdev);
++		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
++		hci_dev_unlock(hdev);
++		return;
 +	}
-+
-+	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+
-+unlock:
-+	hci_dev_unlock(hdev);
 +}
 +
- static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
- 			  u16 len)
- {
-@@ -2794,6 +2811,8 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
- 	struct pending_cmd *cmd;
- 	struct hci_cp_remote_name_req_cancel cp;
- 	struct inquiry_entry *e;
++static void le_scan_disable_work_complete(struct hci_dev *hdev, u8 status)
++{
++	/* General inquiry access code (GIAC) */
++	u8 lap[3] = { 0x33, 0x8b, 0x9e };
 +	struct hci_request req;
-+	struct hci_cp_le_set_scan_enable enable_cp;
- 	int err;
++	struct hci_cp_inquiry cp;
++	int err;
++
++	if (status) {
++		BT_ERR("Failed to disable LE scanning: status %d", status);
++		return;
++	}
++
++	switch (hdev->discovery.type) {
++	case DISCOV_TYPE_LE:
++		hci_dev_lock(hdev);
++		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
++		hci_dev_unlock(hdev);
++		break;
++
++	case DISCOV_TYPE_INTERLEAVED:
++		hci_dev_lock(hdev);
++		hci_inquiry_cache_flush(hdev);
++		hci_dev_unlock(hdev);
++
++		hci_req_init(&req, hdev);
++
++		memset(&cp, 0, sizeof(cp));
++		memcpy(&cp.lap, lap, sizeof(cp.lap));
++		cp.length = DISCOV_INTERLEAVED_INQUIRY_LEN;
++		hci_req_add(&req, HCI_OP_INQUIRY, sizeof(cp), &cp);
++
++		err = hci_req_run(&req, inquiry_complete);
++		if (err) {
++			BT_ERR("Inquiry request failed: err %d", err);
++			hci_dev_lock(hdev);
++			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
++			hci_dev_unlock(hdev);
++		}
++		break;
++	}
++}
++
+ static void le_scan_disable_work(struct work_struct *work)
+ {
+ 	struct hci_dev *hdev = container_of(work, struct hci_dev,
+ 					    le_scan_disable.work);
+ 	struct hci_cp_le_set_scan_enable cp;
++	struct hci_request req;
++	int err;
  
  	BT_DBG("%s", hdev->name);
-@@ -2820,12 +2839,20 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
- 		goto unlock;
- 	}
  
 +	hci_req_init(&req, hdev);
 +
- 	switch (hdev->discovery.state) {
- 	case DISCOVERY_FINDING:
--		if (test_bit(HCI_INQUIRY, &hdev->flags))
--			err = hci_cancel_inquiry(hdev);
--		else
--			err = hci_cancel_le_scan(hdev);
-+		if (test_bit(HCI_INQUIRY, &hdev->flags)) {
-+			hci_req_add(&req, HCI_OP_INQUIRY_CANCEL, 0, NULL);
-+		} else {
-+			cancel_delayed_work(&hdev->le_scan_disable);
-+
-+			memset(&enable_cp, 0, sizeof(enable_cp));
-+			enable_cp.enable = LE_SCAN_DISABLE;
-+			hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE,
-+				    sizeof(enable_cp), &enable_cp);
-+		}
+ 	memset(&cp, 0, sizeof(cp));
++	cp.enable = LE_SCAN_DISABLE;
++	hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
  
- 		break;
+-	hci_send_cmd(hdev, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
++	err = hci_req_run(&req, le_scan_disable_work_complete);
++	if (err)
++		BT_ERR("Disable LE scanning request failed: err %d", err);
+ }
  
-@@ -2843,16 +2870,22 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+ static void le_scan_work(struct work_struct *work)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 0e71e6c..faaf1f3 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -974,16 +974,6 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
  		}
  
- 		bacpy(&cp.bdaddr, &e->data.bdaddr);
--		err = hci_send_cmd(hdev, HCI_OP_REMOTE_NAME_REQ_CANCEL,
--				   sizeof(cp), &cp);
-+		hci_req_add(&req, HCI_OP_REMOTE_NAME_REQ_CANCEL, sizeof(cp),
-+			    &cp);
- 
+ 		clear_bit(HCI_LE_SCAN, &hdev->dev_flags);
+-
+-		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
+-		    hdev->discovery.state == DISCOVERY_FINDING) {
+-			mgmt_interleaved_discovery(hdev);
+-		} else {
+-			hci_dev_lock(hdev);
+-			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+-			hci_dev_unlock(hdev);
+-		}
+-
  		break;
  
  	default:
- 		BT_DBG("unknown discovery state %u", hdev->discovery.state);
--		err = -EFAULT;
-+
-+		mgmt_pending_remove(cmd);
-+		err = cmd_complete(sk, hdev->id, MGMT_OP_STOP_DISCOVERY,
-+				   MGMT_STATUS_FAILED, &mgmt_cp->type,
-+				   sizeof(mgmt_cp->type));
-+		goto unlock;
- 	}
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 7673398..7201c05 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2621,23 +2621,6 @@ static int remove_remote_oob_data(struct sock *sk, struct hci_dev *hdev,
+ 	return err;
+ }
  
-+	err = hci_req_run(&req, stop_discovery_complete);
- 	if (err < 0)
- 		mgmt_pending_remove(cmd);
- 	else
+-int mgmt_interleaved_discovery(struct hci_dev *hdev)
+-{
+-	int err;
+-
+-	BT_DBG("%s", hdev->name);
+-
+-	hci_dev_lock(hdev);
+-
+-	err = hci_do_inquiry(hdev, DISCOV_INTERLEAVED_INQUIRY_LEN);
+-	if (err < 0)
+-		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+-
+-	hci_dev_unlock(hdev);
+-
+-	return err;
+-}
+-
+ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+ {
+ 	BT_DBG("status %d", status);
 -- 
 1.8.2.1
 
