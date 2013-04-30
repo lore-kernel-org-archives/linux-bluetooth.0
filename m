@@ -1,180 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 02/14] Bluetooth: Update start_discovery to use HCI request
-Date: Tue, 30 Apr 2013 15:29:28 -0300
-Message-Id: <1367346580-6647-3-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v3 01/14] Bluetooth: Make inquiry_cache_flush non-static
+Date: Tue, 30 Apr 2013 15:29:27 -0300
+Message-Id: <1367346580-6647-2-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1367346580-6647-1-git-send-email-andre.guedes@openbossa.org>
 References: <1367346580-6647-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch modifies the start_discovery function so it uses the HCI
-request framework.
-
-We build the HCI request according to the discovery type (add inquiry
-or LE scan HCI commands) and run the HCI request. We also register
-the start_discovery_complete callback which handles mgmt command
-complete events for this command. This way, we move all start_
-discovery mgmt handling code spread in hci_event.c to a single place
-in mgmt.c.
-
-This patch also merges the LE-only and interleaved discovery type
-cases since these cases are pretty much the same now.
+In order to use HCI request framework in start_discovery, we'll need
+to call inquiry_cache_flush in mgmt.c. Therefore, this patch adds the
+hci_ prefix to inquiry_cache_flush and makes it non-static.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 Acked-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 85 insertions(+), 9 deletions(-)
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_core.c         | 10 +++++-----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 5e93b24..c701eac 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2650,11 +2650,51 @@ int mgmt_interleaved_discovery(struct hci_dev *hdev)
- 	return err;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 35a57cd..1ff7f67 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -432,6 +432,7 @@ void hci_inquiry_cache_update_resolve(struct hci_dev *hdev,
+ 				      struct inquiry_entry *ie);
+ bool hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data,
+ 			      bool name_known, bool *ssp);
++void hci_inquiry_cache_flush(struct hci_dev *hdev);
+ 
+ /* ----- HCI Connections ----- */
+ enum {
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 33843c5..8aefd17 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -746,7 +746,7 @@ void hci_discovery_set_state(struct hci_dev *hdev, int state)
+ 	hdev->discovery.state = state;
  }
  
-+static void start_discovery_complete(struct hci_dev *hdev, u8 status)
-+{
-+	BT_DBG("status %d", status);
-+
-+	if (status) {
-+		hci_dev_lock(hdev);
-+		mgmt_start_discovery_failed(hdev, status);
-+		hci_dev_unlock(hdev);
-+		return;
-+	}
-+
-+	hci_dev_lock(hdev);
-+	hci_discovery_set_state(hdev, DISCOVERY_FINDING);
-+	hci_dev_unlock(hdev);
-+
-+	switch (hdev->discovery.type) {
-+	case DISCOV_TYPE_LE:
-+		queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
-+				   LE_SCAN_TIMEOUT_LE_ONLY);
-+		break;
-+
-+	case DISCOV_TYPE_INTERLEAVED:
-+		queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
-+				   LE_SCAN_TIMEOUT_BREDR_LE);
-+		break;
-+
-+	case DISCOV_TYPE_BREDR:
-+		break;
-+
-+	default:
-+		BT_ERR("Invalid discovery type %d", hdev->discovery.type);
-+	}
-+}
-+
- static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 			   void *data, u16 len)
+-static void inquiry_cache_flush(struct hci_dev *hdev)
++void hci_inquiry_cache_flush(struct hci_dev *hdev)
  {
- 	struct mgmt_cp_start_discovery *cp = data;
- 	struct pending_cmd *cmd;
-+	struct hci_cp_le_set_scan_param param_cp;
-+	struct hci_cp_le_set_scan_enable enable_cp;
-+	struct hci_cp_inquiry inq_cp;
-+	struct hci_request req;
-+	/* General inquiry access code (GIAC) */
-+	u8 lap[3] = { 0x33, 0x8b, 0x9e };
- 	int err;
- 
- 	BT_DBG("%s", hdev->name);
-@@ -2687,6 +2727,8 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 
- 	hdev->discovery.type = cp->type;
- 
-+	hci_req_init(&req, hdev);
-+
- 	switch (hdev->discovery.type) {
- 	case DISCOV_TYPE_BREDR:
- 		if (!lmp_bredr_capable(hdev)) {
-@@ -2696,10 +2738,23 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 			goto failed;
- 		}
- 
--		err = hci_do_inquiry(hdev, INQUIRY_LEN_BREDR);
-+		if (test_bit(HCI_INQUIRY, &hdev->flags)) {
-+			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+					 MGMT_STATUS_BUSY);
-+			mgmt_pending_remove(cmd);
-+			goto failed;
-+		}
-+
+ 	struct discovery_state *cache = &hdev->discovery;
+ 	struct inquiry_entry *p, *n;
+@@ -959,7 +959,7 @@ int hci_inquiry(void __user *arg)
+ 	hci_dev_lock(hdev);
+ 	if (inquiry_cache_age(hdev) > INQUIRY_CACHE_AGE_MAX ||
+ 	    inquiry_cache_empty(hdev) || ir.flags & IREQ_CACHE_FLUSH) {
+-		inquiry_cache_flush(hdev);
 +		hci_inquiry_cache_flush(hdev);
-+
-+		memset(&inq_cp, 0, sizeof(inq_cp));
-+		memcpy(&inq_cp.lap, lap, sizeof(inq_cp.lap));
-+		inq_cp.length = INQUIRY_LEN_BREDR;
-+		hci_req_add(&req, HCI_OP_INQUIRY, sizeof(inq_cp), &inq_cp);
- 		break;
- 
- 	case DISCOV_TYPE_LE:
-+	case DISCOV_TYPE_INTERLEAVED:
- 		if (!test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
- 			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
- 					 MGMT_STATUS_NOT_SUPPORTED);
-@@ -2707,20 +2762,40 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 			goto failed;
- 		}
- 
--		err = hci_le_scan(hdev, LE_SCAN_ACTIVE, LE_SCAN_INT,
--				  LE_SCAN_WIN, LE_SCAN_TIMEOUT_LE_ONLY);
--		break;
--
--	case DISCOV_TYPE_INTERLEAVED:
--		if (!lmp_host_le_capable(hdev) || !lmp_bredr_capable(hdev)) {
-+		if (hdev->discovery.type == DISCOV_TYPE_INTERLEAVED &&
-+		    !lmp_bredr_capable(hdev)) {
- 			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
- 					 MGMT_STATUS_NOT_SUPPORTED);
- 			mgmt_pending_remove(cmd);
- 			goto failed;
- 		}
- 
--		err = hci_le_scan(hdev, LE_SCAN_ACTIVE, LE_SCAN_INT,
--				  LE_SCAN_WIN, LE_SCAN_TIMEOUT_BREDR_LE);
-+		if (test_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags)) {
-+			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+					 MGMT_STATUS_REJECTED);
-+			mgmt_pending_remove(cmd);
-+			goto failed;
-+		}
-+
-+		if (test_bit(HCI_LE_SCAN, &hdev->dev_flags)) {
-+			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-+					 MGMT_STATUS_BUSY);
-+			mgmt_pending_remove(cmd);
-+			goto failed;
-+		}
-+
-+		memset(&param_cp, 0, sizeof(param_cp));
-+		param_cp.type = LE_SCAN_ACTIVE;
-+		param_cp.interval = cpu_to_le16(LE_SCAN_INT);
-+		param_cp.window = cpu_to_le16(LE_SCAN_WIN);
-+		hci_req_add(&req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
-+			    &param_cp);
-+
-+		memset(&enable_cp, 0, sizeof(enable_cp));
-+		enable_cp.enable = LE_SCAN_ENABLE;
-+		enable_cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
-+		hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
-+			    &enable_cp);
- 		break;
- 
- 	default:
-@@ -2730,6 +2805,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 		goto failed;
+ 		do_inquiry = 1;
  	}
+ 	hci_dev_unlock(hdev);
+@@ -1225,7 +1225,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 	cancel_delayed_work_sync(&hdev->le_scan_disable);
  
-+	err = hci_req_run(&req, start_discovery_complete);
- 	if (err < 0)
- 		mgmt_pending_remove(cmd);
- 	else
+ 	hci_dev_lock(hdev);
+-	inquiry_cache_flush(hdev);
++	hci_inquiry_cache_flush(hdev);
+ 	hci_conn_hash_flush(hdev);
+ 	hci_dev_unlock(hdev);
+ 
+@@ -1326,7 +1326,7 @@ int hci_dev_reset(__u16 dev)
+ 	skb_queue_purge(&hdev->cmd_q);
+ 
+ 	hci_dev_lock(hdev);
+-	inquiry_cache_flush(hdev);
++	hci_inquiry_cache_flush(hdev);
+ 	hci_conn_hash_flush(hdev);
+ 	hci_dev_unlock(hdev);
+ 
+@@ -3553,7 +3553,7 @@ int hci_do_inquiry(struct hci_dev *hdev, u8 length)
+ 	if (test_bit(HCI_INQUIRY, &hdev->flags))
+ 		return -EINPROGRESS;
+ 
+-	inquiry_cache_flush(hdev);
++	hci_inquiry_cache_flush(hdev);
+ 
+ 	memset(&cp, 0, sizeof(cp));
+ 	memcpy(&cp.lap, lap, sizeof(cp.lap));
 -- 
 1.8.2.1
 
