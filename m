@@ -1,63 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 30 Apr 2013 15:33:18 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 04/13] Bluetooth: Fix LE vs BR/EDR selection when
- connecting
-Message-ID: <20130430183318.GA16351@samus>
-References: <1367253345-12482-1-git-send-email-johan.hedberg@gmail.com>
- <1367253345-12482-5-git-send-email-johan.hedberg@gmail.com>
- <20130430173619.GA19710@samus>
- <B2B99ED5-AE78-480F-B8C5-871D1E1F3CD6@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <B2B99ED5-AE78-480F-B8C5-871D1E1F3CD6@holtmann.org>
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 14/14] Bluetooth: Mgmt Device Found Event
+Date: Tue, 30 Apr 2013 15:29:40 -0300
+Message-Id: <1367346580-6647-15-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1367346580-6647-1-git-send-email-andre.guedes@openbossa.org>
+References: <1367346580-6647-1-git-send-email-andre.guedes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+We only want to send Mgmt Device Found Events if we are running the
+Device Discovery procedure (started by the MGMT Start Discovery
+Command). Inquiry or LE scanning triggered by HCI raw interface (e.g.
+hcitool) or kernel internals should not send Mgmt Device Found Events.
 
-On 10:51 Tue 30 Apr, Marcel Holtmann wrote:
-> Hi Vinicius,
-> 
-> >> The choice between LE and BR/EDR should be made on the destination
-> >> address type instead of the destination CID. This is particularly
-> >> important when in the future more than one CID will be allowed for LE.
-> >> 
-> >> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> >> ---
-> >> net/bluetooth/l2cap_core.c |    2 +-
-> >> 1 file changed, 1 insertion(+), 1 deletion(-)
-> >> 
-> >> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> >> index d5e4404..95d46cd 100644
-> >> --- a/net/bluetooth/l2cap_core.c
-> >> +++ b/net/bluetooth/l2cap_core.c
-> >> @@ -1792,7 +1792,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
-> >> 
-> >> 	auth_type = l2cap_get_auth_type(chan);
-> >> 
-> >> -	if (chan->dcid == L2CAP_CID_ATT)
-> >> +	if (bdaddr_type_is_le(dst_type))
-> > 
-> > Wouldn't this break applications that rely on the CID for making a LE 
-> > connection?
-> 
-> which application are these. They are all from the time where enable_le=0 was the default. We introduced the BD_ADDR address type before we enabled LE by default.
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-I was thinking "old" BlueZ releases, 4.99 would have this issue, 4.101 is
-fine.
-
-Fair enough. That argument about the address type being added before LE being
-enabled by default convinced me.
-
-> 
-> Regards
-> 
-> Marcel
-> 
-
-Cheers,
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 83db6e8..8567764 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4159,6 +4159,9 @@ int mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	struct mgmt_ev_device_found *ev = (void *) buf;
+ 	size_t ev_size;
+ 
++	if (!hci_discovery_active(hdev))
++		return -EPERM;
++
+ 	/* Leave 5 bytes for a potential CoD field */
+ 	if (sizeof(*ev) + eir_len + 5 > sizeof(buf))
+ 		return -EINVAL;
 -- 
-Vinicius
+1.8.2.1
+
