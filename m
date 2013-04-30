@@ -1,47 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <20130430083621.GJ777@x220.ger.corp.intel.com>
+References: <1367300704-703-1-git-send-email-andre.guedes@openbossa.org>
+	<1367300704-703-9-git-send-email-andre.guedes@openbossa.org>
+	<20130430083621.GJ777@x220.ger.corp.intel.com>
+Date: Tue, 30 Apr 2013 15:06:48 -0300
+Message-ID: <CACJA=fXqr-YiqT4S8yA6h-c1XgXi=LKOqXd8Vqf8jm6D93Df3g@mail.gmail.com>
+Subject: Re: [PATCH v2 08/13] Bluetooth: Remove stop discovery handling from hci_event.c
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 00/14] Update Discovery to use HCI request framework
-Date: Tue, 30 Apr 2013 15:29:26 -0300
-Message-Id: <1367346580-6647-1-git-send-email-andre.guedes@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Johan,
 
-This v3 is very similar to the previous patch set, except it has some minor
-changes Johan suggested.
+On Tue, Apr 30, 2013 at 5:36 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Andre,
+>
+> On Tue, Apr 30, 2013, Andre Guedes wrote:
+>> Since all mgmt stop discovery command complete events are now handled
+>> in stop_discovery_complete callback in mgmt.c, we can remove this
+>> handling from hci_event.c.
+>>
+>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>> ---
+>>  net/bluetooth/hci_event.c | 16 ++--------------
+>>  1 file changed, 2 insertions(+), 14 deletions(-)
+>
+> Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+>
+> However, looks like you're missing a patch to remove
+> mgmt_stop_discovery_failed() from hci_core.h (since it seems it's now
+> only needed inside mgmt.c).
 
-This patch set requires the patch "Bluetooth: Fix checks for LE support on
-LE-only controllers" in order to apply (this patch is already acked).
+Yes, you're right. I'll make mgmt_stop_disovery_failed static and
+remove it from hci_core.h.
 
-Regards,
+I'm going to do all these fixes and send a v3 patch set.
+
+Thanks,
 
 Andre
-
-
-Andre Guedes (14):
-  Bluetooth: Make inquiry_cache_flush non-static
-  Bluetooth: Update start_discovery to use HCI request
-  Bluetooth: Remove start discovery handling from hci_event.c
-  Bluetooth: Make mgmt_start_discovery_failed static
-  Bluetooth: Move discovery macros to hci_core.h
-  Bluetooth: Use HCI request in interleaved discovery
-  Bluetooth: Update stop_discovery to use HCI request
-  Bluetooth: Remove stop discovery handling from hci_event.c
-  Bluetooth: Make mgmt_stop_discovery_failed static
-  Bluetooth: Refactor hci_cc_le_set_scan_enable
-  Bluetooth: Remove LE scan helpers
-  Bluetooth: Remove inquiry helpers
-  Bluetooth: Remove empty event handler
-  Bluetooth: Mgmt Device Found Event
-
- include/net/bluetooth/hci_core.h |  29 ++---
- net/bluetooth/hci_core.c         | 182 +++++++++----------------------
- net/bluetooth/hci_event.c        |  67 +-----------
- net/bluetooth/mgmt.c             | 227 ++++++++++++++++++++++++++-------------
- 4 files changed, 221 insertions(+), 284 deletions(-)
-
--- 
-1.8.2.1
-
