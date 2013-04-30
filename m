@@ -1,46 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 30 Apr 2013 20:53:53 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 04/13] Bluetooth: Fix LE vs BR/EDR selection when
+ connecting
+Message-ID: <20130430175353.GA29666@x220.P-661HNU-F1>
+References: <1367253345-12482-1-git-send-email-johan.hedberg@gmail.com>
+ <1367253345-12482-5-git-send-email-johan.hedberg@gmail.com>
+ <20130430173619.GA19710@samus>
 MIME-Version: 1.0
-In-Reply-To: <20130430064304.GA29654@x220>
-References: <1367300704-703-1-git-send-email-andre.guedes@openbossa.org>
-	<1367300704-703-2-git-send-email-andre.guedes@openbossa.org>
-	<20130430064304.GA29654@x220>
-Date: Tue, 30 Apr 2013 15:06:04 -0300
-Message-ID: <CACJA=fVf-6K9bb+3-5PKeY_NZy24p1E5fMgYbSnsRqcyhLcSMw@mail.gmail.com>
-Subject: Re: [PATCH v2 01/13] Bluetooth: Fix start_discovery for LE-only controllers
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130430173619.GA19710@samus>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Vinicius,
 
-On Tue, Apr 30, 2013 at 3:43 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Andre,
->
-> On Tue, Apr 30, 2013, Andre Guedes wrote:
->> LE-only controllers don't have local extended features (see commit
->> c73eee9172bf061202c75ad4d16506a7efd04d1c). Thus, lmp_host_le_capable
->> helper is not applicable and we should use test_bit(HCI_LE_ENABLED)
->> to check if the host supports LE. Otherwise, start_discovery will
->> always fail for LE-only controllers.
->>
->> This misbehavior can be easily checked by running mgmt-tester tool
->> (test "Start Discovery - Success 2" will fail).
->>
->> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->> ---
->>  net/bluetooth/mgmt.c | 5 +++--
->>  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> I already sent a patch for this last Wednesday:
->
->   Bluetooth: Fix checks for LE support on LE-only controllers
->
-> So this patch can be ignored.
+On Tue, Apr 30, 2013, Vinicius Costa Gomes wrote:
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -1792,7 +1792,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+> >  
+> >  	auth_type = l2cap_get_auth_type(chan);
+> >  
+> > -	if (chan->dcid == L2CAP_CID_ATT)
+> > +	if (bdaddr_type_is_le(dst_type))
+> 
+> Wouldn't this break applications that rely on the CID for making a LE 
+> connection?
 
-Great, I'll remove it from the v3 patch set.
+An application that wants to make an LE connection but doesn't provide
+an LE address type in the l2_bdaddr_type member of sockaddr_l2 is
+broken.
 
-Thanks,
-
-Andre
+Johan
