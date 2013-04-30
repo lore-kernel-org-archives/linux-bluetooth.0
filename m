@@ -1,45 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 30 Apr 2013 19:10:40 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 13/13] Bluetooth: Fix multiple LE socket handling
-Message-ID: <20130430221040.GA4456@joana>
+Date: Tue, 30 Apr 2013 15:33:18 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 04/13] Bluetooth: Fix LE vs BR/EDR selection when
+ connecting
+Message-ID: <20130430183318.GA16351@samus>
 References: <1367253345-12482-1-git-send-email-johan.hedberg@gmail.com>
- <1367253345-12482-14-git-send-email-johan.hedberg@gmail.com>
+ <1367253345-12482-5-git-send-email-johan.hedberg@gmail.com>
+ <20130430173619.GA19710@samus>
+ <B2B99ED5-AE78-480F-B8C5-871D1E1F3CD6@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1367253345-12482-14-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <B2B99ED5-AE78-480F-B8C5-871D1E1F3CD6@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi,
 
-* Johan Hedberg <johan.hedberg@gmail.com> [2013-04-29 19:35:45 +0300]:
-
-> From: Johan Hedberg <johan.hedberg@intel.com>
+On 10:51 Tue 30 Apr, Marcel Holtmann wrote:
+> Hi Vinicius,
 > 
-> The LE ATT server socket needs to be superseded by any ATT client
-> sockets. Previously this was done by looking at the hcon->out variable
-> (indicating whether the connection is outgoing or incoming) which is a
-> too crude way of determining whether the server socket needs to be
-> picked or not (an outgoing connection doesn't necessarily mean that an
-> ATT client socket has triggered it).
+> >> The choice between LE and BR/EDR should be made on the destination
+> >> address type instead of the destination CID. This is particularly
+> >> important when in the future more than one CID will be allowed for LE.
+> >> 
+> >> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> >> ---
+> >> net/bluetooth/l2cap_core.c |    2 +-
+> >> 1 file changed, 1 insertion(+), 1 deletion(-)
+> >> 
+> >> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> >> index d5e4404..95d46cd 100644
+> >> --- a/net/bluetooth/l2cap_core.c
+> >> +++ b/net/bluetooth/l2cap_core.c
+> >> @@ -1792,7 +1792,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+> >> 
+> >> 	auth_type = l2cap_get_auth_type(chan);
+> >> 
+> >> -	if (chan->dcid == L2CAP_CID_ATT)
+> >> +	if (bdaddr_type_is_le(dst_type))
+> > 
+> > Wouldn't this break applications that rely on the CID for making a LE 
+> > connection?
 > 
-> This patch extends the ATT server socket lookup function
-> (l2cap_le_conn_ready) to be used for all LE connections (regardless of
-> the hcon->out value) and adds an internal check into the function for
-> the existence of any ATT client sockets (in which case the server socket
-> should be skipped). For this to work reliably all lookups must be done
-> while the l2cap_conn->chan_lock is held, meaning also that the call to
-> l2cap_chan_add needs to be changed to its lockless __l2cap_chan_add
-> counterpart.
+> which application are these. They are all from the time where enable_le=0 was the default. We introduced the BD_ADDR address type before we enabled LE by default.
+
+I was thinking "old" BlueZ releases, 4.99 would have this issue, 4.101 is
+fine.
+
+Fair enough. That argument about the address type being added before LE being
+enabled by default convinced me.
+
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  net/bluetooth/l2cap_core.c |   12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
+> Regards
+> 
+> Marcel
+> 
 
-All 13 patches have been applied to bluetooth-next. Thanks.
-
-	Gustavo
+Cheers,
+-- 
+Vinicius
