@@ -1,38 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 30 Apr 2013 13:02:13 +0300
+Date: Tue, 30 Apr 2013 11:38:03 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jefferson Delfes <jefferson.delfes@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 0/3] shared: Different address for hciemu devices
-Message-ID: <20130430100213.GA5745@x220.ger.corp.intel.com>
-References: <1365693884-15423-1-git-send-email-jefferson.delfes@openbossa.org>
+Subject: Re: [PATCH v2 13/13] Bluetooth: Mgmt Device Found Event
+Message-ID: <20130430083803.GO777@x220.ger.corp.intel.com>
+References: <1367300704-703-1-git-send-email-andre.guedes@openbossa.org>
+ <1367300704-703-14-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1365693884-15423-1-git-send-email-jefferson.delfes@openbossa.org>
+In-Reply-To: <1367300704-703-14-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HI Jefferson,
+Hi Andre,
 
-On Thu, Apr 11, 2013, Jefferson Delfes wrote:
-> For testing multiple devices, it's nice to use a hciemu for each virtual
-> device. The problem is that their addresses are always the same.
+On Tue, Apr 30, 2013, Andre Guedes wrote:
+> We only want to send Mgmt Device Found Events if we are running the
+> Device Discovery procedure (started by the MGMT Start Discovery
+> Command). Inquiry or LE scanning triggered by HCI raw interface (e.g.
+> hcitool) or kernel internals should not send Mgmt Device Found Events.
 > 
-> This patch series removes the static address assignment made in
-> hciemu_new/create_vhci.
-> Inside btdev_create, it already generated a specific address, so we can
-> just reuse it.
-> 
-> Jefferson Delfes (3):
->   emulator: Add getter function for device address in btdev
->   shared: Remove static address assignment in hciemu
->   shared: Return real address of master dev in hciemu
-> 
->  emulator/btdev.c    |  5 +++++
->  emulator/btdev.h    |  1 +
->  src/shared/hciemu.c | 21 ++++++++++-----------
->  3 files changed, 16 insertions(+), 11 deletions(-)
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+>  net/bluetooth/mgmt.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-All three patches have been applied. Thanks.
+Acked-by: Johan Hedberg <johan.hedberg@intel.com>
 
 Johan
