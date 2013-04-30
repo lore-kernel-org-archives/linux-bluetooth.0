@@ -1,80 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 03/14] Bluetooth: Remove start discovery handling from hci_event.c
-Date: Tue, 30 Apr 2013 15:29:29 -0300
-Message-Id: <1367346580-6647-4-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v3 04/14] Bluetooth: Make mgmt_start_discovery_failed static
+Date: Tue, 30 Apr 2013 15:29:30 -0300
+Message-Id: <1367346580-6647-5-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1367346580-6647-1-git-send-email-andre.guedes@openbossa.org>
 References: <1367346580-6647-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since all mgmt start discovery command complete events are now handled
-in start_discovery_complete callback in mgmt.c, we can remove this
-handling from hci_event.c.
+mgmt_start_discovery_failed is now only used in mgmt.c so we can
+make it a local function. This patch also moves the mgmt_start_
+discovery_failed definition up in mgmt.c to avoid forward
+declaration.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-Acked-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_event.c | 24 +-----------------------
- 1 file changed, 1 insertion(+), 23 deletions(-)
+ include/net/bluetooth/hci_core.h |  1 -
+ net/bluetooth/mgmt.c             | 42 ++++++++++++++++++++--------------------
+ 2 files changed, 21 insertions(+), 22 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index b93cd2e..0e71e6c 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -943,12 +943,6 @@ static void hci_cc_le_set_scan_param(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
- 
--	if (status) {
--		hci_dev_lock(hdev);
--		mgmt_start_discovery_failed(hdev, status);
--		hci_dev_unlock(hdev);
--		return;
--	}
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 1ff7f67..aa7eed7 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1169,7 +1169,6 @@ int mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		      u8 ssp, u8 *eir, u16 eir_len);
+ int mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		     u8 addr_type, s8 rssi, u8 *name, u8 name_len);
+-int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status);
+ int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status);
+ int mgmt_discovering(struct hci_dev *hdev, u8 discovering);
+ int mgmt_interleaved_discovery(struct hci_dev *hdev);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index c701eac..0572cb1 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2650,6 +2650,27 @@ int mgmt_interleaved_discovery(struct hci_dev *hdev)
+ 	return err;
  }
  
- static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
-@@ -965,18 +959,10 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 
- 	switch (cp->enable) {
- 	case LE_SCAN_ENABLE:
--		if (status) {
--			hci_dev_lock(hdev);
--			mgmt_start_discovery_failed(hdev, status);
--			hci_dev_unlock(hdev);
-+		if (status)
- 			return;
--		}
- 
- 		set_bit(HCI_LE_SCAN, &hdev->dev_flags);
--
--		hci_dev_lock(hdev);
--		hci_discovery_set_state(hdev, DISCOVERY_FINDING);
--		hci_dev_unlock(hdev);
- 		break;
- 
- 	case LE_SCAN_DISABLE:
-@@ -1077,18 +1063,10 @@ static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
- 
- 	if (status) {
- 		hci_conn_check_pending(hdev);
--		hci_dev_lock(hdev);
--		if (test_bit(HCI_MGMT, &hdev->dev_flags))
--			mgmt_start_discovery_failed(hdev, status);
--		hci_dev_unlock(hdev);
- 		return;
- 	}
- 
- 	set_bit(HCI_INQUIRY, &hdev->flags);
--
--	hci_dev_lock(hdev);
--	hci_discovery_set_state(hdev, DISCOVERY_FINDING);
--	hci_dev_unlock(hdev);
++static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
++{
++	struct pending_cmd *cmd;
++	u8 type;
++	int err;
++
++	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
++
++	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev);
++	if (!cmd)
++		return -ENOENT;
++
++	type = hdev->discovery.type;
++
++	err = cmd_complete(cmd->sk, hdev->id, cmd->opcode, mgmt_status(status),
++			   &type, sizeof(type));
++	mgmt_pending_remove(cmd);
++
++	return err;
++}
++
+ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+ {
+ 	BT_DBG("status %d", status);
+@@ -4169,27 +4190,6 @@ int mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 			  sizeof(*ev) + eir_len, NULL);
  }
  
- static void hci_cs_create_conn(struct hci_dev *hdev, __u8 status)
+-int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
+-{
+-	struct pending_cmd *cmd;
+-	u8 type;
+-	int err;
+-
+-	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+-
+-	cmd = mgmt_pending_find(MGMT_OP_START_DISCOVERY, hdev);
+-	if (!cmd)
+-		return -ENOENT;
+-
+-	type = hdev->discovery.type;
+-
+-	err = cmd_complete(cmd->sk, hdev->id, cmd->opcode, mgmt_status(status),
+-			   &type, sizeof(type));
+-	mgmt_pending_remove(cmd);
+-
+-	return err;
+-}
+-
+ int mgmt_stop_discovery_failed(struct hci_dev *hdev, u8 status)
+ {
+ 	struct pending_cmd *cmd;
 -- 
 1.8.2.1
 
