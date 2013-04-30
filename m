@@ -1,31 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 30 Apr 2013 11:21:13 +0300
+Date: Tue, 30 Apr 2013 11:18:26 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 02/13] Bluetooth: Make inquiry_cache_flush non-static
-Message-ID: <20130430082113.GD777@x220.ger.corp.intel.com>
-References: <1367300704-703-1-git-send-email-andre.guedes@openbossa.org>
- <1367300704-703-3-git-send-email-andre.guedes@openbossa.org>
+To: Alex Deymo <deymo@chromium.org>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	keybuk@chromium.org
+Subject: Re: [PATCH v4 6/8] autopair: Add the autopair plugin.
+Message-ID: <20130430081826.GC777@x220.ger.corp.intel.com>
+References: <1367006741-28907-1-git-send-email-deymo@chromium.org>
+ <1367006741-28907-7-git-send-email-deymo@chromium.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1367300704-703-3-git-send-email-andre.guedes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1367006741-28907-7-git-send-email-deymo@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Alex,
 
-On Tue, Apr 30, 2013, Andre Guedes wrote:
-> In order to use HCI request framework in start_discovery, we'll need
-> to call inquiry_cache_flush in mgmt.c. Therefore, this patch adds the
-> hci_ prefix to inquiry_cache_flush and makes it non-static.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  include/net/bluetooth/hci_core.h |  1 +
->  net/bluetooth/hci_core.c         | 10 +++++-----
->  2 files changed, 6 insertions(+), 5 deletions(-)
+On Fri, Apr 26, 2013, Alex Deymo wrote:
+> +static ssize_t autopair_pincb(struct btd_adapter *adapter,
+> +					struct btd_device *device,
+> +					char *pinbuf, gboolean *display,
+> +					uint32_t attempt)
 
-Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+Another forgotten uint32_t here as well.
 
 Johan
