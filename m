@@ -1,36 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Mar 2013 08:55:02 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Date: Tue, 30 Apr 2013 20:30:53 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 02/16] Bluetooth: Split HCI init sequence into three
- stages
-Message-ID: <20130301065502.GA14811@x220.P-661HNU-F1>
-References: <1361951844-13719-1-git-send-email-johan.hedberg@gmail.com>
- <1361951844-13719-3-git-send-email-johan.hedberg@gmail.com>
- <06B5DEA7-BB85-48EB-80F5-F876C9C8F049@holtmann.org>
+Subject: Re: [PATCH] Bluetooth: Fix checks for LE support on LE-only
+ controllers
+Message-ID: <20130430233053.GB4456@joana>
+References: <1366797932-11507-1-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <06B5DEA7-BB85-48EB-80F5-F876C9C8F049@holtmann.org>
+In-Reply-To: <1366797932-11507-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On Thu, Feb 28, 2013, Marcel Holtmann wrote:
-> > +static void hci_set_le_support(struct hci_dev *hdev)
-> > +{
-> > +	struct hci_cp_write_le_host_supported cp;
-> > +
-> > +	memset(&cp, 0, sizeof(cp));
-> > +
-> > +	if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
-> > +		cp.le = 1;
-> > +		cp.simul = lmp_le_br_capable(hdev);
-> > +	}
+* Johan Hedberg <johan.hedberg@gmail.com> [2013-04-24 13:05:32 +0300]:
+
+> From: Johan Hedberg <johan.hedberg@intel.com>
 > 
-> I fully realise that you just copied this code, but use 0x01 here
-> instead of just 1 for variables inside HCI command structs.
+> LE-only controllers do not support extended features so any kind of host
+> feature bit checks do not make sense for them. This patch fixes code
+> used for both single-mode (LE-only) and dual-mode (BR/EDR/LE) to use the
+> HCI_LE_ENABLED flag instead of the "Host LE supported" feature bit for
+> LE support tests.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> This one slipped by with my earlier single-mode fixes. I've added a
+> mgmt-tester case for it to prevent it from returning in the future.
+> Since this is probably too late for a bluetooth-next pull for 3.10 I
+> suppose it'll need to wait for the first bluetooth.git pull request
+> instead.
+> 
+>  net/bluetooth/mgmt.c |    2 +-
+>  net/bluetooth/smp.c  |    4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 
-Sure, I'll fix it for the next iteration of this set.
+Patch has been applied to bluetooth.git. Thanks.
 
-Johan
+	Gustavo
