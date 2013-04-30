@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20130430083621.GJ777@x220.ger.corp.intel.com>
+In-Reply-To: <20130430083408.GH777@x220.ger.corp.intel.com>
 References: <1367300704-703-1-git-send-email-andre.guedes@openbossa.org>
-	<1367300704-703-9-git-send-email-andre.guedes@openbossa.org>
-	<20130430083621.GJ777@x220.ger.corp.intel.com>
-Date: Tue, 30 Apr 2013 15:06:48 -0300
-Message-ID: <CACJA=fXqr-YiqT4S8yA6h-c1XgXi=LKOqXd8Vqf8jm6D93Df3g@mail.gmail.com>
-Subject: Re: [PATCH v2 08/13] Bluetooth: Remove stop discovery handling from hci_event.c
+	<1367300704-703-7-git-send-email-andre.guedes@openbossa.org>
+	<20130430083408.GH777@x220.ger.corp.intel.com>
+Date: Tue, 30 Apr 2013 15:06:32 -0300
+Message-ID: <CACJA=fVJS+OM3e_LimeNBrpgNUMt66K2a_nQ7++ogZvkcigrhg@mail.gmail.com>
+Subject: Re: [PATCH v2 06/13] Bluetooth: Use HCI request in interleaved discovery
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
@@ -15,30 +15,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-On Tue, Apr 30, 2013 at 5:36 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+On Tue, Apr 30, 2013 at 5:34 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
 > Hi Andre,
 >
 > On Tue, Apr 30, 2013, Andre Guedes wrote:
->> Since all mgmt stop discovery command complete events are now handled
->> in stop_discovery_complete callback in mgmt.c, we can remove this
->> handling from hci_event.c.
->>
->> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->> ---
->>  net/bluetooth/hci_event.c | 16 ++--------------
->>  1 file changed, 2 insertions(+), 14 deletions(-)
+>> +     case DISCOV_TYPE_INTERLEAVED:
+>> +             hci_dev_lock(hdev);
+>> +             hci_inquiry_cache_flush(hdev);
+>> +             hci_dev_unlock(hdev);
+>> +
+>> +             hci_req_init(&req, hdev);
+>> +
+>> +             memset(&cp, 0, sizeof(cp));
+>> +             memcpy(&cp.lap, lap, sizeof(cp.lap));
+>> +             cp.length = DISCOV_INTERLEAVED_INQUIRY_LEN;
+>> +             hci_req_add(&req, HCI_OP_INQUIRY, sizeof(cp), &cp);
+>> +
+>> +             err = hci_req_run(&req, inquiry_complete);
+>> +             if (err) {
+>> +                     BT_ERR("Inquiry request failed: err %d", err);
+>> +                     hci_dev_lock(hdev);
+>> +                     hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+>> +                     hci_dev_unlock(hdev);
+>> +             }
+>> +             break;
 >
-> Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+> The locking here seems a bit needlessly fine grained. I know hci_req_run
+> doesn't strictly speaking need the hdev lock but you could simplify this
+> a bit by moving the inquiry cache flush right before hci_req_run and
+> doing
 >
-> However, looks like you're missing a patch to remove
-> mgmt_stop_discovery_failed() from hci_core.h (since it seems it's now
-> only needed inside mgmt.c).
+>         hci_dev_lock(hdev);
+>
+>         hci_inquiry_cache_flush(hdev);
+>
+>         err = hci_req_run(..);
+>         if (err) {
+>                 ...
+>         }
+>
+>         hci_dev_unlock(hdev);
 
-Yes, you're right. I'll make mgmt_stop_disovery_failed static and
-remove it from hci_core.h.
+Ok, I'll change this.
 
-I'm going to do all these fixes and send a v3 patch set.
-
-Thanks,
+Regards,
 
 Andre
