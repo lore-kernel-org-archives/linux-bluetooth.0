@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20130430082531.GF777@x220.ger.corp.intel.com>
+In-Reply-To: <20130430064304.GA29654@x220>
 References: <1367300704-703-1-git-send-email-andre.guedes@openbossa.org>
-	<1367300704-703-5-git-send-email-andre.guedes@openbossa.org>
-	<20130430082531.GF777@x220.ger.corp.intel.com>
-Date: Tue, 30 Apr 2013 15:06:19 -0300
-Message-ID: <CACJA=fUG9iGOLFBd2bEbQBpkY1s+0iKnhs-k1R2Qd=-xd6Estw@mail.gmail.com>
-Subject: Re: [PATCH v2 04/13] Bluetooth: Remove start discovery handling from hci_event.c
+	<1367300704-703-2-git-send-email-andre.guedes@openbossa.org>
+	<20130430064304.GA29654@x220>
+Date: Tue, 30 Apr 2013 15:06:04 -0300
+Message-ID: <CACJA=fVf-6K9bb+3-5PKeY_NZy24p1E5fMgYbSnsRqcyhLcSMw@mail.gmail.com>
+Subject: Re: [PATCH v2 01/13] Bluetooth: Fix start_discovery for LE-only controllers
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
@@ -15,27 +15,31 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-On Tue, Apr 30, 2013 at 5:25 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+On Tue, Apr 30, 2013 at 3:43 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
 > Hi Andre,
 >
 > On Tue, Apr 30, 2013, Andre Guedes wrote:
->> Since all mgmt start discovery command complete events are now handled
->> in start_discovery_complete callback in mgmt.c, we can remove this
->> handling from hci_event.c.
+>> LE-only controllers don't have local extended features (see commit
+>> c73eee9172bf061202c75ad4d16506a7efd04d1c). Thus, lmp_host_le_capable
+>> helper is not applicable and we should use test_bit(HCI_LE_ENABLED)
+>> to check if the host supports LE. Otherwise, start_discovery will
+>> always fail for LE-only controllers.
+>>
+>> This misbehavior can be easily checked by running mgmt-tester tool
+>> (test "Start Discovery - Success 2" will fail).
 >>
 >> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 >> ---
->>  net/bluetooth/hci_event.c | 24 +-----------------------
->>  1 file changed, 1 insertion(+), 23 deletions(-)
+>>  net/bluetooth/mgmt.c | 5 +++--
+>>  1 file changed, 3 insertions(+), 2 deletions(-)
 >
-> Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+> I already sent a patch for this last Wednesday:
 >
-> However, it looks like after this patch you could have another one to
-> remove mgmt_start_discovery_failed from hci_core.h since it's only
-> needed inside mgmt.c. Or did I miss something?
+>   Bluetooth: Fix checks for LE support on LE-only controllers
+>
+> So this patch can be ignored.
 
-Yes, you're right. I'll make mgmt_start_disovery_failed static and
-remove it from hci_core.h.
+Great, I'll remove it from the v3 patch set.
 
 Thanks,
 
