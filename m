@@ -1,44 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 30 Apr 2013 09:23:44 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-nfc@vger.kernel.org
-Subject: [davem@davemloft.net: Bug fixes only now please.]
-Message-ID: <20130430132343.GA17618@tuxdriver.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAJdJm_N8kZEo5ek=6VGDhcdkQhM72O-aKE=fgX=i9UTL18=5iA@mail.gmail.com>
+References: <1365706752-4442-1-git-send-email-anderson.lizardo@openbossa.org>
+	<20130430100655.GB5745@x220.ger.corp.intel.com>
+	<CAJdJm_N8kZEo5ek=6VGDhcdkQhM72O-aKE=fgX=i9UTL18=5iA@mail.gmail.com>
+Date: Tue, 30 Apr 2013 08:36:33 -0400
+Message-ID: <CAJdJm_OXMeRQfc7sAdnhUs9qtWO1SaEEezHVJrbu8vTP-s8n8g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] tools: Add script for updating bt_compidtostr() implementation
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Be advised...
+On Tue, Apr 30, 2013 at 8:32 AM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Johan,
+>
+>> I tried this script but after downloading the page it fails with "Input
+>> recoding failed due to invalid input sequence." and then proceeds with
+>> generating a diff to remove all entries from the switch statement.
 
------ Forwarded message from David Miller <davem@davemloft.net> -----
+I think I found the culprit, it's some problem related to Unicode handling:
 
-> Date: Tue, 30 Apr 2013 04:13:51 -0400 (EDT)
-> From: David Miller <davem@davemloft.net>
-> To: netdev@vger.kernel.org
-> CC: linux-wireless@vger.kernel.org, netfilter-devel@vger.kernel.org
-> Subject: Bug fixes only now please.
-> X-Mailer: Mew version 6.5 on Emacs 24.1 / Mule 6.0 (HANACHIRUSATO)
-> 
-> 
-> With the merge window open, I funneled the remaining bug fixes into
-> 'net', then merged 'net' into 'net-next' in preparation for submission
-> into Linus's tree.
-> 
-> Do not send anything other than bug fixes.
-> 
-> No cleanups and no new features at this time.
-> 
-> Thanks!
-> --
-> To unsubscribe from this list: send the line "unsubscribe netdev" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=545695
 
------ End forwarded message -----
+There are a few unicode characters on the HTML, I'll remove them
+before passing the HTML file to html2test.
 
+Best Regards,
 -- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
