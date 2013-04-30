@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20130430083408.GH777@x220.ger.corp.intel.com>
+In-Reply-To: <20130430082531.GF777@x220.ger.corp.intel.com>
 References: <1367300704-703-1-git-send-email-andre.guedes@openbossa.org>
-	<1367300704-703-7-git-send-email-andre.guedes@openbossa.org>
-	<20130430083408.GH777@x220.ger.corp.intel.com>
-Date: Tue, 30 Apr 2013 15:06:32 -0300
-Message-ID: <CACJA=fVJS+OM3e_LimeNBrpgNUMt66K2a_nQ7++ogZvkcigrhg@mail.gmail.com>
-Subject: Re: [PATCH v2 06/13] Bluetooth: Use HCI request in interleaved discovery
+	<1367300704-703-5-git-send-email-andre.guedes@openbossa.org>
+	<20130430082531.GF777@x220.ger.corp.intel.com>
+Date: Tue, 30 Apr 2013 15:06:19 -0300
+Message-ID: <CACJA=fUG9iGOLFBd2bEbQBpkY1s+0iKnhs-k1R2Qd=-xd6Estw@mail.gmail.com>
+Subject: Re: [PATCH v2 04/13] Bluetooth: Remove start discovery handling from hci_event.c
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
@@ -15,49 +15,28 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-On Tue, Apr 30, 2013 at 5:34 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+On Tue, Apr 30, 2013 at 5:25 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
 > Hi Andre,
 >
 > On Tue, Apr 30, 2013, Andre Guedes wrote:
->> +     case DISCOV_TYPE_INTERLEAVED:
->> +             hci_dev_lock(hdev);
->> +             hci_inquiry_cache_flush(hdev);
->> +             hci_dev_unlock(hdev);
->> +
->> +             hci_req_init(&req, hdev);
->> +
->> +             memset(&cp, 0, sizeof(cp));
->> +             memcpy(&cp.lap, lap, sizeof(cp.lap));
->> +             cp.length = DISCOV_INTERLEAVED_INQUIRY_LEN;
->> +             hci_req_add(&req, HCI_OP_INQUIRY, sizeof(cp), &cp);
->> +
->> +             err = hci_req_run(&req, inquiry_complete);
->> +             if (err) {
->> +                     BT_ERR("Inquiry request failed: err %d", err);
->> +                     hci_dev_lock(hdev);
->> +                     hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
->> +                     hci_dev_unlock(hdev);
->> +             }
->> +             break;
+>> Since all mgmt start discovery command complete events are now handled
+>> in start_discovery_complete callback in mgmt.c, we can remove this
+>> handling from hci_event.c.
+>>
+>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>> ---
+>>  net/bluetooth/hci_event.c | 24 +-----------------------
+>>  1 file changed, 1 insertion(+), 23 deletions(-)
 >
-> The locking here seems a bit needlessly fine grained. I know hci_req_run
-> doesn't strictly speaking need the hdev lock but you could simplify this
-> a bit by moving the inquiry cache flush right before hci_req_run and
-> doing
+> Acked-by: Johan Hedberg <johan.hedberg@intel.com>
 >
->         hci_dev_lock(hdev);
->
->         hci_inquiry_cache_flush(hdev);
->
->         err = hci_req_run(..);
->         if (err) {
->                 ...
->         }
->
->         hci_dev_unlock(hdev);
+> However, it looks like after this patch you could have another one to
+> remove mgmt_start_discovery_failed from hci_core.h since it's only
+> needed inside mgmt.c. Or did I miss something?
 
-Ok, I'll change this.
+Yes, you're right. I'll make mgmt_start_disovery_failed static and
+remove it from hci_core.h.
 
-Regards,
+Thanks,
 
 Andre
