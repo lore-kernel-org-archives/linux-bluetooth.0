@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Subject: [PATCH BlueZ v2 15/16] tools: Get rid of gint
-Date: Wed,  1 May 2013 02:28:09 -0300
-Message-Id: <1367386090-24633-15-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ v2 14/16] core: Get rid of gint
+Date: Wed,  1 May 2013 02:28:08 -0300
+Message-Id: <1367386090-24633-14-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1367386090-24633-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1367386090-24633-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -15,143 +15,217 @@ From: Lucas De Marchi <lucas.de.marchi@gmail.com>
 Use plain int instead of gint. In glib gint is always a typedef to int,
 so it's safe to use it even for callbacks with glib.
 ---
- tools/btiotest.c | 52 ++++++++++++++++++++++++++--------------------------
- 1 file changed, 26 insertions(+), 26 deletions(-)
+ src/adapter.c       |  6 +++---
+ src/attrib-server.c |  6 +++---
+ src/device.c        | 10 +++++-----
+ src/device.h        |  4 ++--
+ src/plugin.c        |  2 +-
+ src/sdp-client.c    |  2 +-
+ src/service.c       |  2 +-
+ src/shared/hciemu.c |  2 +-
+ src/shared/mgmt.c   |  4 ++--
+ 9 files changed, 19 insertions(+), 19 deletions(-)
 
-diff --git a/tools/btiotest.c b/tools/btiotest.c
-index 7a77bb7..5359ace 100644
---- a/tools/btiotest.c
-+++ b/tools/btiotest.c
-@@ -38,14 +38,14 @@
- #include <btio/btio.h>
+diff --git a/src/adapter.c b/src/adapter.c
+index 0c0831c..1252e74 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1472,7 +1472,7 @@ static void stop_discovery_complete(uint8_t status, uint16_t length,
+ 	}
+ }
  
- #define DEFAULT_ACCEPT_TIMEOUT 2
--static gint opt_update_sec = 0;
-+static int opt_update_sec = 0;
+-static gint compare_discovery_sender(gconstpointer a, gconstpointer b)
++static int compare_discovery_sender(gconstpointer a, gconstpointer b)
+ {
+ 	const struct discovery_client *client = a;
+ 	const char *sender = b;
+@@ -2098,7 +2098,7 @@ static gboolean property_get_modalias(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
  
- struct io_data {
- 	guint ref;
- 	GIOChannel *io;
--	gint reject;
--	gint disconn;
--	gint accept;
-+	int reject;
-+	int disconn;
-+	int accept;
+-static gint device_path_cmp(gconstpointer a, gconstpointer b)
++static int device_path_cmp(gconstpointer a, gconstpointer b)
+ {
+ 	const struct btd_device *device = a;
+ 	const char *path = b;
+@@ -3099,7 +3099,7 @@ static void convert_did_entry(GKeyFile *key_file, void *value)
+ static void convert_linkkey_entry(GKeyFile *key_file, void *value)
+ {
+ 	char *type_str, *length_str, *str;
+-	gint val;
++	int val;
+ 
+ 	type_str = strchr(value, ' ');
+ 	if (!type_str)
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 61bc01d..3610e60 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -150,7 +150,7 @@ static void gatt_server_free(struct gatt_server *server)
+ 	g_free(server);
+ }
+ 
+-static gint adapter_cmp_addr(gconstpointer a, gconstpointer b)
++static int adapter_cmp_addr(gconstpointer a, gconstpointer b)
+ {
+ 	const struct gatt_server *server = a;
+ 	const bdaddr_t *bdaddr = b;
+@@ -158,7 +158,7 @@ static gint adapter_cmp_addr(gconstpointer a, gconstpointer b)
+ 	return bacmp(adapter_get_address(server->adapter), bdaddr);
+ }
+ 
+-static gint adapter_cmp(gconstpointer a, gconstpointer b)
++static int adapter_cmp(gconstpointer a, gconstpointer b)
+ {
+ 	const struct gatt_server *server = a;
+ 	const struct btd_adapter *adapter = b;
+@@ -1176,7 +1176,7 @@ guint attrib_channel_attach(GAttrib *attrib)
+ 	return channel->id;
+ }
+ 
+-static gint channel_id_cmp(gconstpointer data, gconstpointer user_data)
++static int channel_id_cmp(gconstpointer data, gconstpointer user_data)
+ {
+ 	const struct gatt_channel *channel = data;
+ 	guint id = GPOINTER_TO_UINT(user_data);
+diff --git a/src/device.c b/src/device.c
+index 85610c4..ff4c553 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1242,7 +1242,7 @@ static struct btd_service *find_connectable_service(struct btd_device *dev,
+ 	return NULL;
+ }
+ 
+-static gint service_prio_cmp(gconstpointer a, gconstpointer b)
++static int service_prio_cmp(gconstpointer a, gconstpointer b)
+ {
+ 	struct btd_profile *p1 = btd_service_get_profile(a);
+ 	struct btd_profile *p2 = btd_service_get_profile(b);
+@@ -1978,7 +1978,7 @@ static void load_att_info(struct btd_device *device, const char *local,
+ 
+ 	for (handle = groups; *handle; handle++) {
+ 		gboolean uuid_ok;
+-		gint end;
++		int end;
+ 
+ 		str = g_key_file_get_string(key_file, *handle, "UUID", NULL);
+ 		if (!str)
+@@ -2334,7 +2334,7 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
+ 	btd_device_unref(device);
+ }
+ 
+-gint device_address_cmp(gconstpointer a, gconstpointer b)
++int device_address_cmp(gconstpointer a, gconstpointer b)
+ {
+ 	const struct btd_device *device = a;
+ 	const char *address = b;
+@@ -2344,7 +2344,7 @@ gint device_address_cmp(gconstpointer a, gconstpointer b)
+ 	return strcasecmp(addr, address);
+ }
+ 
+-gint device_bdaddr_cmp(gconstpointer a, gconstpointer b)
++int device_bdaddr_cmp(gconstpointer a, gconstpointer b)
+ {
+ 	const struct btd_device *device = a;
+ 	const bdaddr_t *bdaddr = b;
+@@ -2740,7 +2740,7 @@ static void update_bredr_services(struct browse_req *req, sdp_list_t *recs)
+ 	}
+ }
+ 
+-static gint primary_cmp(gconstpointer a, gconstpointer b)
++static int primary_cmp(gconstpointer a, gconstpointer b)
+ {
+ 	return memcmp(a, b, sizeof(struct gatt_primary));
+ }
+diff --git a/src/device.h b/src/device.h
+index f4db3b9..7cd11af 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -43,8 +43,8 @@ uint16_t btd_device_get_vendor_src(struct btd_device *device);
+ uint16_t btd_device_get_product(struct btd_device *device);
+ uint16_t btd_device_get_version(struct btd_device *device);
+ void device_remove(struct btd_device *device, gboolean remove_stored);
+-gint device_address_cmp(gconstpointer a, gconstpointer b);
+-gint device_bdaddr_cmp(gconstpointer a, gconstpointer b);
++int device_address_cmp(gconstpointer a, gconstpointer b);
++int device_bdaddr_cmp(gconstpointer a, gconstpointer b);
+ GSList *device_get_uuids(struct btd_device *device);
+ void device_probe_profiles(struct btd_device *device, GSList *profiles);
+ const sdp_record_t *btd_device_get_record(struct btd_device *device,
+diff --git a/src/plugin.c b/src/plugin.c
+index a23e533..51c98bc 100644
+--- a/src/plugin.c
++++ b/src/plugin.c
+@@ -47,7 +47,7 @@ struct bluetooth_plugin {
+ 	struct bluetooth_plugin_desc *desc;
  };
  
- static void io_data_unref(struct io_data *data)
-@@ -67,8 +67,8 @@ static struct io_data *io_data_ref(struct io_data *data)
- 	return data;
- }
- 
--static struct io_data *io_data_new(GIOChannel *io, int reject, gint disconn,
--								gint accept)
-+static struct io_data *io_data_new(GIOChannel *io, int reject, int disconn,
-+								int accept)
+-static gint compare_priority(gconstpointer a, gconstpointer b)
++static int compare_priority(gconstpointer a, gconstpointer b)
  {
- 	struct io_data *data;
- 
-@@ -251,7 +251,7 @@ static void confirm_cb(GIOChannel *io, gpointer user_data)
- 			return;
- 		}
- 	} else {
--		gint seconds = (data->reject > 0) ?
-+		int seconds = (data->reject > 0) ?
- 						data->reject : data->accept;
- 		g_timeout_add_seconds_full(G_PRIORITY_DEFAULT, seconds,
- 					confirm_timeout, data,
-@@ -260,8 +260,8 @@ static void confirm_cb(GIOChannel *io, gpointer user_data)
+ 	const struct bluetooth_plugin *plugin1 = a;
+ 	const struct bluetooth_plugin *plugin2 = b;
+diff --git a/src/sdp-client.c b/src/sdp-client.c
+index 106344a..fdf2b01 100644
+--- a/src/sdp-client.c
++++ b/src/sdp-client.c
+@@ -336,7 +336,7 @@ int bt_search_service(const bdaddr_t *src, const bdaddr_t *dst,
+ 	return 0;
  }
  
- static void l2cap_connect(const char *src, const char *dst, uint8_t addr_type,
--				uint16_t psm, uint16_t cid, gint disconn,
--				gint sec, gint prio)
-+				uint16_t psm, uint16_t cid, int disconn,
-+				int sec, int prio)
+-static gint find_by_bdaddr(gconstpointer data, gconstpointer user_data)
++static int find_by_bdaddr(gconstpointer data, gconstpointer user_data)
  {
- 	struct io_data *data;
- 	GError *err = NULL;
-@@ -301,9 +301,9 @@ static void l2cap_connect(const char *src, const char *dst, uint8_t addr_type,
- 	}
+ 	const struct search_context *ctxt = data, *search = user_data;
+ 	int ret;
+diff --git a/src/service.c b/src/service.c
+index 98fcbfe..aef9502 100644
+--- a/src/service.c
++++ b/src/service.c
+@@ -47,7 +47,7 @@
+ #include "service.h"
+ 
+ struct btd_service {
+-	gint			ref;
++	int			ref;
+ 	struct btd_device	*device;
+ 	struct btd_profile	*profile;
+ 	void			*user_data;
+diff --git a/src/shared/hciemu.c b/src/shared/hciemu.c
+index 133f16f..463ef52 100644
+--- a/src/shared/hciemu.c
++++ b/src/shared/hciemu.c
+@@ -41,7 +41,7 @@
+ #include "hciemu.h"
+ 
+ struct hciemu {
+-	gint ref_count;
++	int ref_count;
+ 	enum btdev_type btdev_type;
+ 	struct bthost *host_stack;
+ 	struct btdev *master_dev;
+diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
+index ca4b05f..2c79886 100644
+--- a/src/shared/mgmt.c
++++ b/src/shared/mgmt.c
+@@ -94,7 +94,7 @@ static void destroy_request(gpointer data, gpointer user_data)
+ 	g_free(request);
  }
  
--static void l2cap_listen(const char *src, uint16_t psm, gint defer,
--				gint reject, gint disconn, gint accept,
--				gint sec, gboolean master)
-+static void l2cap_listen(const char *src, uint16_t psm, int defer,
-+				int reject, int disconn, int accept,
-+				int sec, gboolean master)
+-static gint compare_request_id(gconstpointer a, gconstpointer b)
++static int compare_request_id(gconstpointer a, gconstpointer b)
  {
- 	struct io_data *data;
- 	BtIOConnect conn;
-@@ -351,7 +351,7 @@ static void l2cap_listen(const char *src, uint16_t psm, gint defer,
+ 	const struct mgmt_request *request = a;
+ 	unsigned int id = GPOINTER_TO_UINT(b);
+@@ -112,7 +112,7 @@ static void destroy_notify(gpointer data, gpointer user_data)
+ 	g_free(notify);
  }
  
- static void rfcomm_connect(const char *src, const char *dst, uint8_t ch,
--						gint disconn, gint sec)
-+						int disconn, int sec)
+-static gint compare_notify_id(gconstpointer a, gconstpointer b)
++static int compare_notify_id(gconstpointer a, gconstpointer b)
  {
- 	struct io_data *data;
- 	GError *err = NULL;
-@@ -386,8 +386,8 @@ static void rfcomm_connect(const char *src, const char *dst, uint8_t ch,
- }
- 
- static void rfcomm_listen(const char *src, uint8_t ch, gboolean defer,
--				gint reject, gint disconn, gint accept,
--				gint sec, gboolean master)
-+				int reject, int disconn, int accept,
-+				int sec, gboolean master)
- {
- 	struct io_data *data;
- 	BtIOConnect conn;
-@@ -436,7 +436,7 @@ static void rfcomm_listen(const char *src, uint8_t ch, gboolean defer,
- 	g_io_channel_unref(rc_srv);
- }
- 
--static void sco_connect(const char *src, const char *dst, gint disconn)
-+static void sco_connect(const char *src, const char *dst, int disconn)
- {
- 	struct io_data *data;
- 	GError *err = NULL;
-@@ -466,8 +466,8 @@ static void sco_connect(const char *src, const char *dst, gint disconn)
- 	}
- }
- 
--static void sco_listen(const char *src, gboolean defer, gint reject,
--				gint disconn, gint accept)
-+static void sco_listen(const char *src, gboolean defer, int reject,
-+				int disconn, int accept)
- {
- 	struct io_data *data;
- 	BtIOConnect conn;
-@@ -507,18 +507,18 @@ static void sco_listen(const char *src, gboolean defer, gint reject,
- 	g_io_channel_unref(sco_srv);
- }
- 
--static gint opt_channel = -1;
--static gint opt_psm = 0;
-+static int opt_channel = -1;
-+static int opt_psm = 0;
- static gboolean opt_sco = FALSE;
- static gboolean opt_defer = FALSE;
- static char *opt_dev = NULL;
--static gint opt_reject = -1;
--static gint opt_disconn = -1;
--static gint opt_accept = DEFAULT_ACCEPT_TIMEOUT;
--static gint opt_sec = 0;
-+static int opt_reject = -1;
-+static int opt_disconn = -1;
-+static int opt_accept = DEFAULT_ACCEPT_TIMEOUT;
-+static int opt_sec = 0;
- static gboolean opt_master = FALSE;
--static gint opt_priority = 0;
--static gint opt_cid = 0;
-+static int opt_priority = 0;
-+static int opt_cid = 0;
- static guint8 opt_addr_type = 0;
- 
- static GMainLoop *main_loop;
+ 	const struct mgmt_notify *notify = a;
+ 	unsigned int id = GPOINTER_TO_UINT(b);
 -- 
 1.8.2.2
 
