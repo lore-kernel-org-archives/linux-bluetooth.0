@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Subject: [PATCH BlueZ 12/16] scanparam: Get rid of gint
-Date: Wed,  1 May 2013 02:12:07 -0300
-Message-Id: <1367385131-24034-12-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ 11/16] input: Get rid of gint
+Date: Wed,  1 May 2013 02:12:06 -0300
+Message-Id: <1367385131-24034-11-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1367385131-24034-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1367385131-24034-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,22 +14,36 @@ From: Lucas De Marchi <lucas.de.marchi@gmail.com>
 
 Use plain int instead of gint. In glib gint is always a typedef to int, so it's safe to use it even for callbacks with glib.
 ---
- profiles/scanparam/scan.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ profiles/input/hog.c    | 2 +-
+ profiles/input/server.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
-index dbbb4ea..a9baec8 100644
---- a/profiles/scanparam/scan.c
-+++ b/profiles/scanparam/scan.c
-@@ -66,7 +66,7 @@ struct scan {
+diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+index c092875..3ce9480 100644
+--- a/profiles/input/hog.c
++++ b/profiles/input/hog.c
+@@ -539,7 +539,7 @@ static void output_written_cb(guint8 status, const guint8 *pdu,
+ 	}
+ }
  
- static GSList *servers = NULL;
- 
--static gint scan_device_cmp(gconstpointer a, gconstpointer b)
-+static int scan_device_cmp(gconstpointer a, gconstpointer b)
+-static gint report_type_cmp(gconstpointer a, gconstpointer b)
++static int report_type_cmp(gconstpointer a, gconstpointer b)
  {
- 	const struct scan *scan = a;
- 	const struct btd_device *device = b;
+ 	const struct report *report = a;
+ 	uint8_t type = GPOINTER_TO_UINT(b);
+diff --git a/profiles/input/server.c b/profiles/input/server.c
+index e15ae88..5c98573 100644
+--- a/profiles/input/server.c
++++ b/profiles/input/server.c
+@@ -55,7 +55,7 @@ struct input_server {
+ 	GIOChannel *confirm;
+ };
+ 
+-static gint server_cmp(gconstpointer s, gconstpointer user_data)
++static int server_cmp(gconstpointer s, gconstpointer user_data)
+ {
+ 	const struct input_server *server = s;
+ 	const bdaddr_t *src = user_data;
 -- 
 1.8.2.2
 
