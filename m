@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Subject: [PATCH BlueZ 3/6] gobex: Get rid of gchar
-Date: Wed,  1 May 2013 01:51:58 -0300
-Message-Id: <1367383921-19129-3-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ 6/6] unit: Get rid of gchar
+Date: Wed,  1 May 2013 01:52:01 -0300
+Message-Id: <1367383921-19129-6-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1367383921-19129-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1367383921-19129-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,72 +14,40 @@ From: Lucas De Marchi <lucas.de.marchi@gmail.com>
 
 Use plain char instead of gchar.
 ---
- gobex/gobex.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ unit/test-gobex.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/gobex/gobex.c b/gobex/gobex.c
-index ce4f284..6badfeb 100644
---- a/gobex/gobex.c
-+++ b/gobex/gobex.c
-@@ -260,9 +260,9 @@ static gboolean write_stream(GObex *obex, GError **err)
- {
- 	GIOStatus status;
- 	gsize bytes_written;
--	gchar *buf;
-+	char *buf;
- 
--	buf = (gchar *) &obex->tx_buf[obex->tx_sent];
-+	buf = (char *) &obex->tx_buf[obex->tx_sent];
- 	status = g_io_channel_write_chars(obex->io, buf, obex->tx_data,
- 							&bytes_written, err);
- 	if (status != G_IO_STATUS_NORMAL)
-@@ -280,9 +280,9 @@ static gboolean write_packet(GObex *obex, GError **err)
- {
- 	GIOStatus status;
- 	gsize bytes_written;
--	gchar *buf;
-+	char *buf;
- 
--	buf = (gchar *) &obex->tx_buf[obex->tx_sent];
-+	buf = (char *) &obex->tx_buf[obex->tx_sent];
- 	status = g_io_channel_write_chars(obex->io, buf, obex->tx_data,
- 							&bytes_written, err);
- 	if (status != G_IO_STATUS_NORMAL)
-@@ -1036,14 +1036,14 @@ static gboolean read_stream(GObex *obex, GError **err)
- 	GIOStatus status;
- 	gsize rbytes, toread;
- 	guint16 u16;
--	gchar *buf;
-+	char *buf;
- 
- 	if (obex->rx_data >= 3)
- 		goto read_body;
- 
- 	rbytes = 0;
- 	toread = 3 - obex->rx_data;
--	buf = (gchar *) &obex->rx_buf[obex->rx_data];
-+	buf = (char *) &obex->rx_buf[obex->rx_data];
- 
- 	status = g_io_channel_read_chars(io, buf, toread, &rbytes, NULL);
- 	if (status != G_IO_STATUS_NORMAL)
-@@ -1069,7 +1069,7 @@ read_body:
- 
- 	do {
- 		toread = obex->rx_pkt_len - obex->rx_data;
--		buf = (gchar *) &obex->rx_buf[obex->rx_data];
-+		buf = (char *) &obex->rx_buf[obex->rx_data];
- 
- 		status = g_io_channel_read_chars(io, buf, toread, &rbytes, NULL);
- 		if (status != G_IO_STATUS_NORMAL)
-@@ -1098,7 +1098,7 @@ static gboolean read_packet(GObex *obex, GError **err)
- 		goto fail;
+diff --git a/unit/test-gobex.c b/unit/test-gobex.c
+index 74e7759..e7af4d8 100644
+--- a/unit/test-gobex.c
++++ b/unit/test-gobex.c
+@@ -402,7 +402,7 @@ static gboolean cancel_server(GIOChannel *io, GIOCondition cond,
+ 		goto failed;
  	}
  
--	status = g_io_channel_read_chars(io, (gchar *) obex->rx_buf,
-+	status = g_io_channel_read_chars(io, (char *) obex->rx_buf,
- 					obex->rx_mtu, &rbytes, &read_err);
- 	if (status != G_IO_STATUS_NORMAL) {
- 		g_set_error(err, G_OBEX_ERROR, G_OBEX_ERROR_PARSE_ERROR,
+-	g_io_channel_write_chars(io, (gchar *) pkt_abort_rsp,
++	g_io_channel_write_chars(io, (char *) pkt_abort_rsp,
+ 				sizeof(pkt_abort_rsp), &bytes_written, NULL);
+ 	if (bytes_written != sizeof(pkt_abort_rsp)) {
+ 		g_set_error(&r->err, TEST_ERROR, TEST_ERROR_UNEXPECTED,
+@@ -592,7 +592,7 @@ static void test_recv_unexpected(void)
+ 	g_obex_packet_free(req);
+ 	g_assert_cmpint(len, >=, 0);
+ 
+-	g_io_channel_write_chars(io, (gchar *) buf, len, NULL, &err);
++	g_io_channel_write_chars(io, (char *) buf, len, NULL, &err);
+ 	g_assert_no_error(err);
+ 
+ 	mainloop = g_main_loop_new(NULL, FALSE);
+@@ -727,7 +727,7 @@ static void recv_connect(int transport_type)
+ 						handle_connect_req, &gerr);
+ 	g_obex_set_disconnect_function(obex, handle_connect_err, &gerr);
+ 
+-	status = g_io_channel_write_chars(io, (gchar *) pkt_connect_req,
++	status = g_io_channel_write_chars(io, (char *) pkt_connect_req,
+ 						sizeof(pkt_connect_req),
+ 						&bytes_written, NULL);
+ 	g_assert_cmpint(status, ==, G_IO_STATUS_NORMAL);
 -- 
 1.8.2.2
 
