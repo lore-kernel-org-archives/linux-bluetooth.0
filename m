@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Subject: [PATCH BlueZ v2 11/16] input: Get rid of gint
-Date: Wed,  1 May 2013 02:28:05 -0300
-Message-Id: <1367386090-24633-11-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ v2 10/16] heartrate: Get rid of gint
+Date: Wed,  1 May 2013 02:28:04 -0300
+Message-Id: <1367386090-24633-10-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1367386090-24633-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1367386090-24633-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -15,36 +15,40 @@ From: Lucas De Marchi <lucas.de.marchi@gmail.com>
 Use plain int instead of gint. In glib gint is always a typedef to int,
 so it's safe to use it even for callbacks with glib.
 ---
- profiles/input/hog.c    | 2 +-
- profiles/input/server.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ profiles/heartrate/heartrate.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index c092875..3ce9480 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -539,7 +539,7 @@ static void output_written_cb(guint8 status, const guint8 *pdu,
- 	}
+diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
+index 3a2d419..8de81bb 100644
+--- a/profiles/heartrate/heartrate.c
++++ b/profiles/heartrate/heartrate.c
+@@ -115,7 +115,7 @@ static const char *location2str(uint8_t value)
+ 	return NULL;
  }
  
--static gint report_type_cmp(gconstpointer a, gconstpointer b)
-+static int report_type_cmp(gconstpointer a, gconstpointer b)
+-static gint cmp_adapter(gconstpointer a, gconstpointer b)
++static int cmp_adapter(gconstpointer a, gconstpointer b)
  {
- 	const struct report *report = a;
- 	uint8_t type = GPOINTER_TO_UINT(b);
-diff --git a/profiles/input/server.c b/profiles/input/server.c
-index e15ae88..5c98573 100644
---- a/profiles/input/server.c
-+++ b/profiles/input/server.c
-@@ -55,7 +55,7 @@ struct input_server {
- 	GIOChannel *confirm;
- };
+ 	const struct heartrate_adapter *hradapter = a;
+ 	const struct btd_adapter *adapter = b;
+@@ -126,7 +126,7 @@ static gint cmp_adapter(gconstpointer a, gconstpointer b)
+ 	return -1;
+ }
  
--static gint server_cmp(gconstpointer s, gconstpointer user_data)
-+static int server_cmp(gconstpointer s, gconstpointer user_data)
+-static gint cmp_device(gconstpointer a, gconstpointer b)
++static int cmp_device(gconstpointer a, gconstpointer b)
  {
- 	const struct input_server *server = s;
- 	const bdaddr_t *src = user_data;
+ 	const struct heartrate *hr = a;
+ 	const struct btd_device *dev = b;
+@@ -137,7 +137,7 @@ static gint cmp_device(gconstpointer a, gconstpointer b)
+ 	return -1;
+ }
+ 
+-static gint cmp_watcher(gconstpointer a, gconstpointer b)
++static int cmp_watcher(gconstpointer a, gconstpointer b)
+ {
+ 	const struct watcher *watcher = a;
+ 	const struct watcher *match = b;
 -- 
 1.8.2.2
 
