@@ -2,78 +2,75 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Subject: [PATCH BlueZ 01/16] attrib: Get rid of gint
-Date: Wed,  1 May 2013 02:11:56 -0300
-Message-Id: <1367385131-24034-1-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ 5/6] core: Get rid of gchar
+Date: Wed,  1 May 2013 01:52:00 -0300
+Message-Id: <1367383921-19129-5-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1367383921-19129-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1367383921-19129-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Lucas De Marchi <lucas.de.marchi@gmail.com>
 
-Use plain int instead of gint. In glib gint is always a typedef to int, so it's safe to use it even for callbacks with glib.
+Use plain char instead of gchar.
 ---
- attrib/gatt-service.c | 2 +-
- attrib/gatt.c         | 2 +-
- attrib/gattrib.c      | 6 +++---
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ src/log.c    | 2 +-
+ src/main.c   | 6 +++---
+ src/plugin.c | 4 ++--
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/attrib/gatt-service.c b/attrib/gatt-service.c
-index bdb12cd..4b02d39 100644
---- a/attrib/gatt-service.c
-+++ b/attrib/gatt-service.c
-@@ -168,7 +168,7 @@ static int att_write_req(int authorization, int authentication, uint8_t props)
- 	return ATT_NONE;
+diff --git a/src/log.c b/src/log.c
+index 75a98a9..ca783f3 100644
+--- a/src/log.c
++++ b/src/log.c
+@@ -80,7 +80,7 @@ void btd_debug(const char *format, ...)
+ extern struct btd_debug_desc __start___debug[];
+ extern struct btd_debug_desc __stop___debug[];
+ 
+-static gchar **enabled = NULL;
++static char **enabled = NULL;
+ 
+ static gboolean is_enabled(struct btd_debug_desc *desc)
+ {
+diff --git a/src/main.c b/src/main.c
+index 1e40ebc..dc0478e 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -378,9 +378,9 @@ static guint setup_signalfd(void)
+ 	return source;
  }
  
--static gint find_callback(gconstpointer a, gconstpointer b)
-+static int find_callback(gconstpointer a, gconstpointer b)
+-static gchar *option_debug = NULL;
+-static gchar *option_plugin = NULL;
+-static gchar *option_noplugin = NULL;
++static char *option_debug = NULL;
++static char *option_plugin = NULL;
++static char *option_noplugin = NULL;
+ static gboolean option_compat = FALSE;
+ static gboolean option_detach = TRUE;
+ static gboolean option_version = FALSE;
+diff --git a/src/plugin.c b/src/plugin.c
+index f231f34..a23e533 100644
+--- a/src/plugin.c
++++ b/src/plugin.c
+@@ -116,7 +116,7 @@ gboolean plugin_init(const char *enable, const char *disable)
  {
- 	const struct attrib_cb *cb = a;
- 	unsigned int event = GPOINTER_TO_UINT(b);
-diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 749e820..0f116e8 100644
---- a/attrib/gatt.c
-+++ b/attrib/gatt.c
-@@ -575,7 +575,7 @@ struct read_long_data {
- 	guint16 size;
- 	guint16 handle;
- 	guint id;
--	gint ref;
-+	int ref;
- };
+ 	GSList *list;
+ 	GDir *dir;
+-	const gchar *file;
++	const char *file;
+ 	char **cli_disabled, **cli_enabled;
+ 	unsigned int i;
  
- static void read_long_destroy(gpointer user_data)
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 7fb460f..c662ace 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -45,7 +45,7 @@
+@@ -156,7 +156,7 @@ gboolean plugin_init(const char *enable, const char *disable)
+ 	while ((file = g_dir_read_name(dir)) != NULL) {
+ 		struct bluetooth_plugin_desc *desc;
+ 		void *handle;
+-		gchar *filename;
++		char *filename;
  
- struct _GAttrib {
- 	GIOChannel *io;
--	gint refs;
-+	int refs;
- 	uint8_t *buf;
- 	size_t buflen;
- 	guint read_watch;
-@@ -556,7 +556,7 @@ guint g_attrib_send(GAttrib *attrib, guint id, const guint8 *pdu, guint16 len,
- 	return c->id;
- }
- 
--static gint command_cmp_by_id(gconstpointer a, gconstpointer b)
-+static int command_cmp_by_id(gconstpointer a, gconstpointer b)
- {
- 	const struct command *cmd = a;
- 	guint id = GPOINTER_TO_UINT(b);
-@@ -692,7 +692,7 @@ guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
- 	return event->id;
- }
- 
--static gint event_cmp_by_id(gconstpointer a, gconstpointer b)
-+static int event_cmp_by_id(gconstpointer a, gconstpointer b)
- {
- 	const struct event *evt = a;
- 	guint id = GPOINTER_TO_UINT(b);
+ 		if (g_str_has_prefix(file, "lib") == TRUE ||
+ 				g_str_has_suffix(file, ".so") == FALSE)
 -- 
 1.8.2.2
 
