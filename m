@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Subject: [PATCH BlueZ v2 02/16] gobex: Get rid of gint
-Date: Wed,  1 May 2013 02:27:56 -0300
-Message-Id: <1367386090-24633-2-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ v2 03/16] obexd: Get rid of gint
+Date: Wed,  1 May 2013 02:27:57 -0300
+Message-Id: <1367386090-24633-3-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1367386090-24633-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1367386090-24633-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -15,79 +15,159 @@ From: Lucas De Marchi <lucas.de.marchi@gmail.com>
 Use plain int instead of gint. In glib gint is always a typedef to int,
 so it's safe to use it even for callbacks with glib.
 ---
- gobex/gobex.c | 14 +++++++-------
- gobex/gobex.h |  2 +-
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ obexd/client/ftp.c             |  2 +-
+ obexd/client/map.c             | 10 +++++-----
+ obexd/client/mns.c             |  2 +-
+ obexd/client/pbap.c            |  6 +++---
+ obexd/client/session.c         |  4 ++--
+ obexd/client/transfer.c        |  2 +-
+ obexd/plugins/messages-dummy.c |  2 +-
+ 7 files changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/gobex/gobex.c b/gobex/gobex.c
-index 6badfeb..deeab40 100644
---- a/gobex/gobex.c
-+++ b/gobex/gobex.c
-@@ -55,7 +55,7 @@ struct srm_config {
- };
- 
- struct _GObex {
--	gint ref_count;
-+	int ref_count;
- 	GIOChannel *io;
- 	guint io_source;
- 
-@@ -623,7 +623,7 @@ static void prepare_srm_req(GObex *obex, GObexPacket *pkt)
- 	g_obex_packet_prepend_header(pkt, hdr);
- }
- 
--guint g_obex_send_req(GObex *obex, GObexPacket *req, gint timeout,
-+guint g_obex_send_req(GObex *obex, GObexPacket *req, int timeout,
- 			GObexResponseFunc func, gpointer user_data,
- 			GError **err)
+diff --git a/obexd/client/ftp.c b/obexd/client/ftp.c
+index a4cf3fc..fa85708 100644
+--- a/obexd/client/ftp.c
++++ b/obexd/client/ftp.c
+@@ -106,7 +106,7 @@ static void xml_element(GMarkupParseContext *ctxt,
  {
-@@ -677,7 +677,7 @@ create_pending:
- 	return p->id;
- }
+ 	DBusMessageIter dict, *iter = user_data;
+ 	char *key;
+-	gint i;
++	int i;
  
--static gint pending_pkt_cmp(gconstpointer a, gconstpointer b)
-+static int pending_pkt_cmp(gconstpointer a, gconstpointer b)
+ 	if (strcasecmp("folder", element) != 0 && strcasecmp("file", element) != 0)
+ 		return;
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index 2e09030..0285286 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -184,7 +184,7 @@ static void folder_element(GMarkupParseContext *ctxt, const char *element,
  {
- 	const struct pending_pkt *p = a;
- 	guint id = GPOINTER_TO_UINT(b);
-@@ -782,20 +782,20 @@ void g_obex_set_disconnect_function(GObex *obex, GObexFunc func,
- 	obex->disconn_func_data = user_data;
+ 	DBusMessageIter dict, *iter = user_data;
+ 	const char *key;
+-	gint i;
++	int i;
+ 
+ 	if (strcasecmp("folder", element) != 0)
+ 		return;
+@@ -976,7 +976,7 @@ static void msg_element(GMarkupParseContext *ctxt, const char *element,
+ 	DBusMessageIter entry, dict, *iter = parser->iter;
+ 	struct map_msg *msg;
+ 	const char *key;
+-	gint i;
++	int i;
+ 
+ 	if (strcasecmp("msg", element) != 0)
+ 		return;
+@@ -1411,10 +1411,10 @@ static DBusMessage *map_list_messages(DBusConnection *connection,
+ 	return get_message_listing(map, message, folder, apparam);
  }
  
--static gint req_handler_cmpop(gconstpointer a, gconstpointer b)
-+static int req_handler_cmpop(gconstpointer a, gconstpointer b)
+-static char **get_filter_strs(uint64_t filter, gint *size)
++static char **get_filter_strs(uint64_t filter, int *size)
  {
- 	const struct req_handler *handler = a;
- 	guint opcode = GPOINTER_TO_UINT(b);
+ 	char **list, **item;
+-	gint i;
++	int i;
  
--	return (gint) handler->opcode - (gint) opcode;
-+	return (int) handler->opcode - (int) opcode;
- }
+ 	list = g_malloc0(sizeof(char **) * (FILTER_BIT_MAX + 2));
  
--static gint req_handler_cmpid(gconstpointer a, gconstpointer b)
-+static int req_handler_cmpid(gconstpointer a, gconstpointer b)
+@@ -1433,7 +1433,7 @@ static DBusMessage *map_list_filter_fields(DBusConnection *connection,
+ 					DBusMessage *message, void *user_data)
  {
- 	const struct req_handler *handler = a;
- 	guint id = GPOINTER_TO_UINT(b);
+ 	char **filters = NULL;
+-	gint size;
++	int size;
+ 	DBusMessage *reply;
  
--	return (gint) handler->id - (gint) id;
-+	return (int) handler->id - (int) id;
+ 	filters = get_filter_strs(FILTER_ALL, &size);
+diff --git a/obexd/client/mns.c b/obexd/client/mns.c
+index 9a86462..8095b9e 100644
+--- a/obexd/client/mns.c
++++ b/obexd/client/mns.c
+@@ -220,7 +220,7 @@ static void event_report_element(GMarkupParseContext *ctxt,
+ {
+ 	struct map_event *event = user_data;
+ 	const char *key;
+-	gint i;
++	int i;
+ 
+ 	if (strcasecmp("event", element) != 0)
+ 		return;
+diff --git a/obexd/client/pbap.c b/obexd/client/pbap.c
+index 25cc17c..2089860 100644
+--- a/obexd/client/pbap.c
++++ b/obexd/client/pbap.c
+@@ -876,10 +876,10 @@ static DBusMessage *pbap_get_size(DBusConnection *connection,
+ 	return pull_phonebook(pbap, message, GETPHONEBOOKSIZE, NULL, apparam);
  }
  
- guint g_obex_add_request_function(GObex *obex, guint8 opcode,
-diff --git a/gobex/gobex.h b/gobex/gobex.h
-index c42c42c..3ac7b13 100644
---- a/gobex/gobex.h
-+++ b/gobex/gobex.h
-@@ -44,7 +44,7 @@ typedef void (*GObexResponseFunc) (GObex *obex, GError *err, GObexPacket *rsp,
+-static char **get_filter_strs(uint64_t filter, gint *size)
++static char **get_filter_strs(uint64_t filter, int *size)
+ {
+ 	char **list, **item;
+-	gint i;
++	int i;
  
- gboolean g_obex_send(GObex *obex, GObexPacket *pkt, GError **err);
+ 	list = g_malloc0(sizeof(char **) * (FILTER_BIT_MAX + 2));
  
--guint g_obex_send_req(GObex *obex, GObexPacket *req, gint timeout,
-+guint g_obex_send_req(GObex *obex, GObexPacket *req, int timeout,
- 			GObexResponseFunc func, gpointer user_data,
- 			GError **err);
- gboolean g_obex_cancel_req(GObex *obex, guint req_id,
+@@ -902,7 +902,7 @@ static DBusMessage *pbap_list_filter_fields(DBusConnection *connection,
+ 					DBusMessage *message, void *user_data)
+ {
+ 	char **filters = NULL;
+-	gint size;
++	int size;
+ 	DBusMessage *reply;
+ 
+ 	filters = get_filter_strs(FILTER_ALL, &size);
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index 32c847c..0fbfe41 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -83,7 +83,7 @@ struct setpath_data {
+ 
+ struct obc_session {
+ 	guint id;
+-	gint refcount;
++	int refcount;
+ 	char *source;
+ 	char *destination;
+ 	uint8_t channel;
+@@ -721,7 +721,7 @@ static void session_process_queue(struct obc_session *session)
+ 	obc_session_unref(session);
+ }
+ 
+-static gint pending_transfer_cmptransfer(gconstpointer a, gconstpointer b)
++static int pending_transfer_cmptransfer(gconstpointer a, gconstpointer b)
+ {
+ 	const struct pending_request *p = a;
+ 	const struct obc_transfer *transfer = b;
+diff --git a/obexd/client/transfer.c b/obexd/client/transfer.c
+index 427eab7..4b1def3 100644
+--- a/obexd/client/transfer.c
++++ b/obexd/client/transfer.c
+@@ -536,7 +536,7 @@ static gboolean get_xfer_progress(const void *buf, gsize len,
+ 	struct obc_transfer *transfer = user_data;
+ 
+ 	if (transfer->fd > 0) {
+-		gint w;
++		int w;
+ 
+ 		w = write(transfer->fd, buf, len);
+ 		if (w < 0)
+diff --git a/obexd/plugins/messages-dummy.c b/obexd/plugins/messages-dummy.c
+index 4c66f51..bb0627f 100644
+--- a/obexd/plugins/messages-dummy.c
++++ b/obexd/plugins/messages-dummy.c
+@@ -57,7 +57,7 @@ struct folder_listing_data {
+  * seem to follow the fig. 3-2 from MAP specification v1.0, and I've seen a
+  * test suite requiring folder listing to be in that order.
+  */
+-static gint folder_names_cmp(gconstpointer a, gconstpointer b,
++static int folder_names_cmp(gconstpointer a, gconstpointer b,
+ 						gpointer user_data)
+ {
+ 	static const char *order[] = {
 -- 
 1.8.2.2
 
