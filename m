@@ -1,35 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
-Subject: Re: [PATCH BlueZ v3 06/16] attrib: Change g_attrib_set_destroy_function return type
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20130424140245.GB18679@x220>
-Date: Thu, 2 May 2013 09:05:39 -0700
-Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <0D7D5332-E081-4F02-8117-91ED46BEF0C9@holtmann.org>
-References: <1366207399-29536-1-git-send-email-jefferson.delfes@openbossa.org> <1366207399-29536-7-git-send-email-jefferson.delfes@openbossa.org> <20130424140245.GB18679@x220>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Alistair Buxton <a.j.buxton@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: gustavo@padovan.org, Alistair Buxton <a.j.buxton@gmail.com>
+Subject: [PATCH] Bluetooth: Add Lite-On Technology Corp [04ca:3002] as AR3011.
+Date: Thu,  2 May 2013 16:15:55 +0100
+Message-Id: <1367507755-25021-1-git-send-email-a.j.buxton@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+A user reported this device not working. After looking at the related IDs
+I took a shot in the dark, and the user reports it works with this patch.
 
->> -gboolean g_attrib_set_destroy_function(GAttrib *attrib,
->> -		GDestroyNotify destroy, gpointer user_data)
->> +bool g_attrib_set_destroy_function(GAttrib *attrib, GDestroyNotify destroy,
->> +							gpointer user_data)
-> 
-> I've applied patches 1-5 but stopped there since I'm still not sure that
-> we want to change this for an API which tries to follow GLib conventions
-> (after all that's why the GAttrib API has G and g_ prefixes). Marcel, do
-> you have any opinion about this one way or another?
+The device is in an Asus K53U with internal bluetooth and ath9k wireless.
 
-the long term plan is to use standard types like bool, char, uint8_t and also void * here. However we might want to also see how to get rid of g_ prefix as well. Especially g_attrib seems to be a good candidate to get rid of.
+Signed-off-by: Alistair Buxton <a.j.buxton@gmail.com>
+---
+ drivers/bluetooth/ath3k.c | 1 +
+ drivers/bluetooth/btusb.c | 1 +
+ 2 files changed, 2 insertions(+)
 
-I also like to see ATT and GATT being implemented as src/shared/ under LGPL so we can be easily share it in the future. I already have some (unpublished) code for src/shared/att.[ch] and src/shared/gatt.[ch] already, but I think what we first need to do is to figure out how we handle clients and servers from the kernel side. Especially with the background of the kernel auto-connecting LE channels in the future.
-
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 6aab00e..817586f 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -65,6 +65,7 @@ static struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x0CF3, 0x3002) },
+ 	{ USB_DEVICE(0x0CF3, 0xE019) },
+ 	{ USB_DEVICE(0x13d3, 0x3304) },
++	{ USB_DEVICE(0x04ca, 0x3002) },
+ 	{ USB_DEVICE(0x0930, 0x0215) },
+ 	{ USB_DEVICE(0x0489, 0xE03D) },
+ 	{ USB_DEVICE(0x0489, 0xE027) },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 2cc5f77..2adb4d1 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -123,6 +123,7 @@ static struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0cf3, 0x3002), .driver_info = BTUSB_IGNORE },
+ 	{ USB_DEVICE(0x0cf3, 0xe019), .driver_info = BTUSB_IGNORE },
+ 	{ USB_DEVICE(0x13d3, 0x3304), .driver_info = BTUSB_IGNORE },
++	{ USB_DEVICE(0x04ca, 0x3002), .driver_info = BTUSB_IGNORE },
+ 	{ USB_DEVICE(0x0930, 0x0215), .driver_info = BTUSB_IGNORE },
+ 	{ USB_DEVICE(0x0489, 0xe03d), .driver_info = BTUSB_IGNORE },
+ 	{ USB_DEVICE(0x0489, 0xe027), .driver_info = BTUSB_IGNORE },
+-- 
+1.8.1.2
 
