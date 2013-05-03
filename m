@@ -1,78 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH v2 BlueZ] tools: Add script for updating bt_compidtostr() implementation
-Date: Fri,  3 May 2013 16:19:31 -0400
-Message-Id: <1367612371-20930-1-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1365706752-4442-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1365706752-4442-1-git-send-email-anderson.lizardo@openbossa.org>
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
+Subject: Re: ATT/GATT shared code (Re: [PATCH BlueZ v3 06/16] attrib: Change g_attrib_set_destroy_function return type)
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAJdJm_PXxz2idnQvSzc7NCL3Y=hzoAPRmf_2tpz70qjUeDqZ6Q@mail.gmail.com>
+Date: Fri, 3 May 2013 11:52:43 -0700
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	Jefferson Delfes <jefferson.delfes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <87E60651-8C57-4431-9129-0BACF5CF714F@holtmann.org>
+References: <CAJdJm_MNgzqquKHCtrDPjU3OaaLba6zb=kwCjUnUm-qNccevpw@mail.gmail.com> <AE3F5471-8387-4451-A851-47E5FAAB4521@holtmann.org> <CAJdJm_PXxz2idnQvSzc7NCL3Y=hzoAPRmf_2tpz70qjUeDqZ6Q@mail.gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This script uses curl and html2text to fetch company IDs from
-bluetooth.org's "Assigned Numbers" section.
----
+Hi Anderson,
 
-v2:
+>>> We have been working recently on cleaning up GATT/ATT code and
+>>> implementing unit tests for it (as you can see from our latest patches
+>>> in BlueZ). Is this unpublished code based on existing code, or
+>>> something written from scratch? If the latter, I think we should not
+>>> spend time on cleaning up existing GATT code.
+>> 
+>> it is from scratch code and also possible throw away code. It does nothing useful so far. However one think became pretty clear, the current gattrib needs massive cleanups. Not just a little bit. Especially when it comes to where GATT server is located and where GATT client.
+> 
+> Do you mean the location on bluez tree (i.e. server code in
+> src/attrib-server.c vs. client code in attrib/*)?
 
-* Use iconv to strip unrelated UTF-8 text from the HTML prior to passing it to
-  html2text.
-* Add simple sanity check for when HTML parsing fails.
+I am talking about both. It should not really be separated.
 
+> What do you think of moving the attribute server to src/shared/* as
+> well (after a bit of refactoring to become more pluggable)? At least
+> gatttool can reuse it, as so far it has no ability to handle GATT
+> requests, and therefore is not usable when connecting to clients that
+> issue GATT requests.
 
- tools/update_compids.sh |   42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
- create mode 100755 tools/update_compids.sh
+Everything under src/shared/ I want to be LGPL licensed. Keep that in mind.
 
-diff --git a/tools/update_compids.sh b/tools/update_compids.sh
-new file mode 100755
-index 0000000..296e32f
---- /dev/null
-+++ b/tools/update_compids.sh
-@@ -0,0 +1,42 @@
-+#!/bin/bash
-+# Download the list of company IDs from bluetooth.org and generate a diff which
-+# can be applied to source tree to update bt_compidtostr(). Usage:
-+#
-+# 1) ./tools/update_compids.sh | git apply -p0
-+# 2) Inspect changes to make sure they are sane
-+# 3) git commit -m "lib: Update list of company identifiers" lib/bluetooth.c
-+#
-+# Requires html2text: http://www.mbayer.de/html2text/
-+#
-+set -e -u
-+
-+tmpdir=$(mktemp -d)
-+trap "rm -rf $tmpdir" EXIT
-+
-+mkdir $tmpdir/lib
-+cp lib/bluetooth.c $tmpdir/lib/bluetooth.c.orig
-+cp lib/bluetooth.c $tmpdir/lib/bluetooth.c
-+
-+cd $tmpdir
-+
-+path=en-us/specification/assigned-numbers-overview/company-identifiers
-+# Use "iconv -c" to strip unwanted unicode characters
-+curl https://www.bluetooth.org/$path | iconv -c -f UTF-8 -t ISO-8859-1 | \
-+    html2text -ascii -o identifiers.txt
-+
-+sed -n '/^const char \*bt_compidtostr(int compid)/,/^}/p' \
-+    lib/bluetooth.c > old.c
-+
-+echo -e 'const char *bt_compidtostr(int compid)\n{\n\tswitch (compid) {' > new.c
-+cat identifiers.txt |
-+    perl -ne 'm/^(\d+)\s+0x[0-9a-f]+\s+(.*)/i &&
-+        print "\tcase $1:\n\t\treturn \"$2\";\n"' >> new.c
-+if ! grep -q "return \"" new.c; then
-+    echo "ERROR: could not parse company IDs from bluetooth.org" >&2
-+    exit 1
-+fi
-+echo -e '\tcase 65535:\n\t\treturn "internal use";' >> new.c
-+echo -e '\tdefault:\n\t\treturn "not assigned";\n\t}\n}' >> new.c
-+
-+diff -Naur old.c new.c | patch -sp0 lib/bluetooth.c
-+diff -Naur lib/bluetooth.c.orig lib/bluetooth.c
--- 
-1.7.9.5
+>> I want to be able to create unit tests that simulate PTS and also extra unit tests that test the raw ATT protocol and GATT procedures. That is the basic goal here.
+> 
+> I agree that exercising the ATT protocol separately is a good idea.
+> Specially corner cases on encoding/decoding.
+> 
+> IMHO the PTS GATT tests are not exhaustive. We could add tests that
+> imitate them, but they tend to exercise only well behaved PDUs. Except
+> for standard ATT errors, error paths are poorly tested with PTS. But
+> it is a start.
+
+Of course PTS is too focused on positive testing, but that is the testing we need to be able to quickly reproduced. The important negative testing we have to add on top of it.
+
+> We will flush our latest development on GATT (including unit tests) to
+> the mailing list and later we (or someone else interested) can improve
+> on top of it to add more tests.
+
+Send the patches around.
+
+Regards
+
+Marcel
 
