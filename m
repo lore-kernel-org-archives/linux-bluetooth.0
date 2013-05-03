@@ -1,54 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 3 May 2013 19:25:16 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 14/14] Bluetooth: Mgmt Device Found Event
+Message-ID: <20130503222516.GB2311@joana>
+References: <1367346580-6647-1-git-send-email-andre.guedes@openbossa.org>
+ <1367346580-6647-15-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
-In-Reply-To: <CAGd9gwjaECWWRE+Ux4XenbUO9L-QSsjnP6wLHEvH5q3sasWWkg@mail.gmail.com>
-References: <CAGd9gwjaECWWRE+Ux4XenbUO9L-QSsjnP6wLHEvH5q3sasWWkg@mail.gmail.com>
-From: Alex Deymo <deymo@chromium.org>
-Date: Fri, 3 May 2013 18:14:53 -0700
-Message-ID: <CAGd9gwj=79xKJ0Mdb1eb+a5MDGtG1a3BcC8utfDad1ZLzhfd5A@mail.gmail.com>
-Subject: Fwd: Short names on Extended Inquiry Result
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	keybuk <keybuk@chromium.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1367346580-6647-15-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi again!
+Hi Andre,
 
-I'm having a problem while comparing the BlueZ 5 and BlueZ 4 behavior
-regarding the name/alias of a device during scanning.
+* Andre Guedes <andre.guedes@openbossa.org> [2013-04-30 15:29:40 -0300]:
 
-On BlueZ 4 (at least on 4.99), there was a two steps discovery
-process. During the first 10 seconds, the adapter will look for new
-devices, and during the second 30 seconds, it will ask each device for
-further information.
+> We only want to send Mgmt Device Found Events if we are running the
+> Device Discovery procedure (started by the MGMT Start Discovery
+> Command). Inquiry or LE scanning triggered by HCI raw interface (e.g.
+> hcitool) or kernel internals should not send Mgmt Device Found Events.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  net/bluetooth/mgmt.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-I have here devices like the Monster ClarityHD speakers, or the
-Creative WP-350 headsets. Those devices announce a short name with the
-Inquiry Result. btmon reveals a "HCI Event: Extended Inquiry Result"
-for each one with a short name of 9 chars, respectively "Monster C"
-and "Creative " (with a space at the end).
+All patches have been applied to bluetooth-next. Thanks.
 
-BlueZ 4 will show this name during the first 10 seconds as the name of
-the device, but when the adapter goes to the second step, it will
-issue a "HCI Command: Remote Name Request" and get the full name, like
-"Creative WP-350 Headset" and update the property on the device, still
-during discovery.
-
-In the other hand, BlueZ 5 will not issue a "Remote Name Request"
-until you attempt a pairing. This is not the best user experience
-since no matter how long you leave your scan session on, you will
-never get the right name of the device, until you attempt a connection
-or a pairing with it.
-
-Even worse, if you had connected to the device before (and you have
-the long name in the bluez cache for example), if you scan for new
-devices and this device shows up in that scan, bluez will change the
-name to the short version.
-
-I'm thinking about sending a Remote Name Request to the new devices
-between the "> HCI Event: Inquiry Complete" and the "< HCI Command:
-Inquiry". What do you think about this approach? Do you have a better
-idea to solve this?
-
-Thanks,
-Alex.
+	Gustavo
