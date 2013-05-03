@@ -4,19 +4,19 @@ In-Reply-To: <A060FC80-17F1-4666-B3CE-DA0B576D3A0D@holtmann.org>
 References: <CAE6HaM=ogwUXRFM1+Pv-O9Cg0W3ueOpATMtU8kW2=D4Ghb93JA@mail.gmail.com>
 	<20130503044355.GB3742@x220>
 	<A060FC80-17F1-4666-B3CE-DA0B576D3A0D@holtmann.org>
-Date: Fri, 3 May 2013 12:11:57 -0300
-Message-ID: <CAE6HaM=tvfFn2d9WXqXVPX2y7HFkcvKL7xZES8qWSO2CyZS4-Q@mail.gmail.com>
+Date: Fri, 3 May 2013 12:06:04 -0300
+Message-ID: <CACJA=fV1ctv-D8FUccuYNN7obA_T7BQQMp-MyS+9ueYRUukxew@mail.gmail.com>
 Subject: Re: GATT Clients and Servers in the kernel (was Re:[PATCH BlueZ v3
  06/16] attrib...)
-From: Vinicius Gomes <vinicius.gomes@openbossa.org>
+From: Andre Guedes <andre.guedes@openbossa.org>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+Cc: Johan Hedberg <johan.hedberg@gmail.com>, Vinicius Gomes <vinicius.gomes@openbossa.org>,
 	Jefferson Delfes <jefferson.delfes@openbossa.org>,
 	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Marcel, Johan and Vinicius,
 
 On Fri, May 3, 2013 at 3:17 AM, Marcel Holtmann <marcel@holtmann.org> wrote=
 :
@@ -71,12 +71,21 @@ t the right scanning parameters. No call to connect() will be able to provi=
 de the right amount of parameters here anyway. And doing a connect() with a=
 n infinite timeout seems the wrong approach.
 
-I agree that we need a way to feed the kernel the connection
-parameters and that a new mgmt command seems the best way. This
-infinite timeout argument still doesn't convince me that it is the
-wrong approach.
+Still in the connect() approach for the initiating side, what about if
+we had a socket option to set up the connection parameters? The user
+would call setsockopt() to provide the right connection parameters
+(for this connection) and then call connect(). If there is more than
+one LE connection attempt going on, the kernel chooses the set of
+parameters (provided by each setsockopt()) which is more restrictive.
 
->
+This way, we wouldn't require a extra mgmt command and the whole LE
+connection functionality would be confined in the socket interface
+instead of a mix of socket and management interfaces.
+
+Regarding the connect() with no timeout, yes, I think it is a bit
+weird too. However, it seems this is the way connection is handled by
+the LE spec.
+
 > So I think it is better for bluetoothd to just sit and only consume 1 fil=
 e descriptor for the listen socket instead of 10 or more for keeping one fo=
 r every connect() we are holding. Especially with cases where devices are r=
@@ -84,27 +93,15 @@ unning for month and only ever now and then they want to actually connect. =
 This is especially important if the connection interval is actually handled=
  by the peripheral and we have no control.
 
-This one is better, with multiple connect()s we would have a very low
-"used coefficient" (rate of the number of active connection over the
-number of waiting connections).
+Following the server socket approach, let's say we have a BlueZ vs
+BlueZ scenario (one the GATT server the other the GATT client). Both
+(server and client) would call accept() to establish a connection.
+This seems a weird usage of socket interface.
 
-There's still the point that we will have to keep the connect() side
-of things playing nicely with the rest. Having a half baked connect()
-is wrong.
+Besides, what happens with connect()? We will have to support it
+anyway, right? At the end, we will have two ways to initiate a LE
+connection?
 
- So we would have two alternatives for establishing connections, the
-"listen way" that would be used by applications that exptect a low
-"used coefficient" (bluetoothd) and the "connect way" that would be
-used by applications that expect to have a high "used coefficient"
-(gatttool-like applications).
+BR,
 
->
-> Regards
->
-> Marcel
->
-
-
-
---
-Vinicius
+Andre
