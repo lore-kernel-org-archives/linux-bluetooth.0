@@ -1,33 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 3 May 2013 19:25:16 -0300
+Date: Fri, 3 May 2013 19:08:23 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
+To: Alistair Buxton <a.j.buxton@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 14/14] Bluetooth: Mgmt Device Found Event
-Message-ID: <20130503222516.GB2311@joana>
-References: <1367346580-6647-1-git-send-email-andre.guedes@openbossa.org>
- <1367346580-6647-15-git-send-email-andre.guedes@openbossa.org>
+Subject: Re: [PATCH] Bluetooth: Add Lite-On Technology Corp [04ca:3002] as
+ AR3011.
+Message-ID: <20130503220823.GA2311@joana>
+References: <1367507755-25021-1-git-send-email-a.j.buxton@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1367346580-6647-15-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1367507755-25021-1-git-send-email-a.j.buxton@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Alistair,
 
-* Andre Guedes <andre.guedes@openbossa.org> [2013-04-30 15:29:40 -0300]:
+* Alistair Buxton <a.j.buxton@gmail.com> [2013-05-02 16:15:55 +0100]:
 
-> We only want to send Mgmt Device Found Events if we are running the
-> Device Discovery procedure (started by the MGMT Start Discovery
-> Command). Inquiry or LE scanning triggered by HCI raw interface (e.g.
-> hcitool) or kernel internals should not send Mgmt Device Found Events.
+> A user reported this device not working. After looking at the related IDs
+> I took a shot in the dark, and the user reports it works with this patch.
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> Acked-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  net/bluetooth/mgmt.c | 3 +++
->  1 file changed, 3 insertions(+)
+> The device is in an Asus K53U with internal bluetooth and ath9k wireless.
 
-All patches have been applied to bluetooth-next. Thanks.
+Please add the output of /sys/kernel/debug/usb/devices of this specific device
+to the commit message. We need to log this properly. Also, a Tested-by tag by
+the user would be helpful too. Thanks.
 
 	Gustavo
