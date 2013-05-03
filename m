@@ -1,29 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 3 May 2013 19:08:23 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Alistair Buxton <a.j.buxton@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Add Lite-On Technology Corp [04ca:3002] as
- AR3011.
-Message-ID: <20130503220823.GA2311@joana>
-References: <1367507755-25021-1-git-send-email-a.j.buxton@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1367507755-25021-1-git-send-email-a.j.buxton@gmail.com>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH v2 BlueZ] tools: Add script for updating bt_compidtostr() implementation
+Date: Fri,  3 May 2013 16:19:31 -0400
+Message-Id: <1367612371-20930-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1365706752-4442-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1365706752-4442-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alistair,
+This script uses curl and html2text to fetch company IDs from
+bluetooth.org's "Assigned Numbers" section.
+---
 
-* Alistair Buxton <a.j.buxton@gmail.com> [2013-05-02 16:15:55 +0100]:
+v2:
 
-> A user reported this device not working. After looking at the related IDs
-> I took a shot in the dark, and the user reports it works with this patch.
-> 
-> The device is in an Asus K53U with internal bluetooth and ath9k wireless.
+* Use iconv to strip unrelated UTF-8 text from the HTML prior to passing it to
+  html2text.
+* Add simple sanity check for when HTML parsing fails.
 
-Please add the output of /sys/kernel/debug/usb/devices of this specific device
-to the commit message. We need to log this properly. Also, a Tested-by tag by
-the user would be helpful too. Thanks.
 
-	Gustavo
+ tools/update_compids.sh |   42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
+ create mode 100755 tools/update_compids.sh
+
+diff --git a/tools/update_compids.sh b/tools/update_compids.sh
+new file mode 100755
+index 0000000..296e32f
+--- /dev/null
++++ b/tools/update_compids.sh
+@@ -0,0 +1,42 @@
++#!/bin/bash
++# Download the list of company IDs from bluetooth.org and generate a diff which
++# can be applied to source tree to update bt_compidtostr(). Usage:
++#
++# 1) ./tools/update_compids.sh | git apply -p0
++# 2) Inspect changes to make sure they are sane
++# 3) git commit -m "lib: Update list of company identifiers" lib/bluetooth.c
++#
++# Requires html2text: http://www.mbayer.de/html2text/
++#
++set -e -u
++
++tmpdir=$(mktemp -d)
++trap "rm -rf $tmpdir" EXIT
++
++mkdir $tmpdir/lib
++cp lib/bluetooth.c $tmpdir/lib/bluetooth.c.orig
++cp lib/bluetooth.c $tmpdir/lib/bluetooth.c
++
++cd $tmpdir
++
++path=en-us/specification/assigned-numbers-overview/company-identifiers
++# Use "iconv -c" to strip unwanted unicode characters
++curl https://www.bluetooth.org/$path | iconv -c -f UTF-8 -t ISO-8859-1 | \
++    html2text -ascii -o identifiers.txt
++
++sed -n '/^const char \*bt_compidtostr(int compid)/,/^}/p' \
++    lib/bluetooth.c > old.c
++
++echo -e 'const char *bt_compidtostr(int compid)\n{\n\tswitch (compid) {' > new.c
++cat identifiers.txt |
++    perl -ne 'm/^(\d+)\s+0x[0-9a-f]+\s+(.*)/i &&
++        print "\tcase $1:\n\t\treturn \"$2\";\n"' >> new.c
++if ! grep -q "return \"" new.c; then
++    echo "ERROR: could not parse company IDs from bluetooth.org" >&2
++    exit 1
++fi
++echo -e '\tcase 65535:\n\t\treturn "internal use";' >> new.c
++echo -e '\tdefault:\n\t\treturn "not assigned";\n\t}\n}' >> new.c
++
++diff -Naur old.c new.c | patch -sp0 lib/bluetooth.c
++diff -Naur lib/bluetooth.c.orig lib/bluetooth.c
+-- 
+1.7.9.5
+
