@@ -1,47 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAGd9gwj_TFTHVmibtSto8Fd3hVFPkkW8ZLhuL_5NopRbopBD=A@mail.gmail.com>
-References: <1367532265-26766-1-git-send-email-deymo@chromium.org>
-	<CABBYNZJ5=gLRTdD=Ggi3VN62tM4E77BTw3G6FszcLqXjtV-Jqg@mail.gmail.com>
-	<CAGd9gwj_TFTHVmibtSto8Fd3hVFPkkW8ZLhuL_5NopRbopBD=A@mail.gmail.com>
-Date: Sun, 5 May 2013 12:06:09 +0300
-Message-ID: <CABBYNZ+iyquChaiKHK92+G7KM0MF3fned16Y4DAZvq21drNREw@mail.gmail.com>
-Subject: Re: [PATCH] audio: Don't create an avctp session on avrcp disconnect
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Alex Deymo <deymo@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"keybuk@chromium.org" <keybuk@chromium.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 2/2] gdbus: Fix using NULL DBusPendingCall when disconnected from D-Bus
+Date: Sat,  4 May 2013 15:39:43 -0400
+Message-Id: <1367696383-14831-2-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1367696383-14831-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1367696383-14831-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+>From D-Bus documentation for dbus_connection_send_with_reply():
 
-On Fri, May 3, 2013 at 9:39 PM, Alex Deymo <deymo@chromium.org> wrote:
-> Hi!
-> I'm far from an expert in the audio profile code (that's why I had to
-> include such amount of debug traces =] ).
-> Both patches are ok with me, I just find my approach a bit more robust since
-> the next inclusion an avrcp_disconnect() will also need to check if the
-> avctp is disconnected or not.
-> Anyway, I just tried yours on my system and it works for me.
-> Thanks for the patch!
+"Warning: if the connection is disconnected or you try to send Unix file
+descriptors on a connection that does not support them, the
+DBusPendingCall will be set to NULL, so be careful with this."
 
-Patch is now upstream including some cleanups and other fixes to
-problems I discovered while testing, let us know if you find anything
-else has been broken.
+Fix these errors when killing D-Bus daemon with the client still
+running:
 
-We will probably do some changes to profiles/audio/device.c, right now
-the only thing that it should be doing is auto connecting AVRCP if
-A2DP connects, so Im cleaning up it quite a bit. In future we might be
-able to completely remove it and perhaps have the core or a dedicated
-plugin handling profile dependencies such as AVRCP/A2DP using the
-service infrastructure, but service is not very stable right now so we
-first need to fix it first before converting the rest to use the
-service states.
+process 5712: arguments to dbus_pending_call_set_notify() were
+incorrect, assertion "pending != NULL" failed in file
+../../dbus/dbus-pending-call.c line 596.
+This is normally a bug in some application using the D-Bus library.
+process 5712: arguments to dbus_pending_call_unref() were incorrect,
+assertion "pending != NULL" failed in file
+../../dbus/dbus-pending-call.c line 572.
+This is normally a bug in some application using the D-Bus library.
+---
+ gdbus/client.c |    5 +++++
+ 1 file changed, 5 insertions(+)
 
-Btw, please respond inline, top posting is not recommended as stated
-http://www.bluez.org/development/lists/
+diff --git a/gdbus/client.c b/gdbus/client.c
+index a21b66a..f700b7e 100644
+--- a/gdbus/client.c
++++ b/gdbus/client.c
+@@ -105,6 +105,11 @@ static gboolean modify_match(DBusConnection *conn, const char *member,
+ 		return FALSE;
+ 	}
+ 
++	if (call == NULL) {
++		dbus_message_unref(msg);
++		return FALSE;
++	}
++
+ 	dbus_pending_call_set_notify(call, modify_match_reply, NULL, NULL);
+ 	dbus_pending_call_unref(call);
+ 
+-- 
+1.7.9.5
 
---
-Luiz Augusto von Dentz
