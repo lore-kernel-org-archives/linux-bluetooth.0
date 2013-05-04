@@ -1,70 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] gdbus: Fix segfault when D-Bus daemon exits
-Date: Sat,  4 May 2013 14:36:41 -0400
-Message-Id: <1367692601-3578-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <CAGd9gwj=79xKJ0Mdb1eb+a5MDGtG1a3BcC8utfDad1ZLzhfd5A@mail.gmail.com>
+References: <CAGd9gwjaECWWRE+Ux4XenbUO9L-QSsjnP6wLHEvH5q3sasWWkg@mail.gmail.com>
+	<CAGd9gwj=79xKJ0Mdb1eb+a5MDGtG1a3BcC8utfDad1ZLzhfd5A@mail.gmail.com>
+Date: Fri, 3 May 2013 22:55:53 -0300
+Message-ID: <CAE6HaM=cTHJkVKLCdUUD3oHgOFnGYGuVPwD=LSj4iL4U17vE6g@mail.gmail.com>
+Subject: Re: Short names on Extended Inquiry Result
+From: Vinicius Gomes <vinicius.gomes@openbossa.org>
+To: Alex Deymo <deymo@chromium.org>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	keybuk <keybuk@chromium.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix this crash if D-Bus exits while the client is still connected to it:
+Hi Alex,
 
-==5570== Invalid read of size 1
-==5570==    at 0x402D28E: strcmp (in
-/usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
-==5570==    by 0x4070E22: g_str_equal (ghash.c:1704)
-==5570==    by 0x8055F61: message_filter (client.c:1123)
-==5570==    by 0x4141500: dbus_connection_dispatch (in
-/lib/i386-linux-gnu/libdbus-1.so.3.5.8)
-==5570==    by 0x80506F7: message_dispatch (mainloop.c:76)
-==5570==    by 0x4081A7E: g_timeout_dispatch (gmain.c:3882)
-==5570==    by 0x4080D85: g_main_context_dispatch (gmain.c:2539)
-==5570==    by 0x4081124: g_main_context_iterate.isra.21 (gmain.c:3146)
-==5570==    by 0x408156A: g_main_loop_run (gmain.c:3340)
-==5570==    by 0x41BF4D2: (below main) (libc-start.c:226)
-==5570==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
-==5570==
-==5570==
+On Fri, May 3, 2013 at 10:14 PM, Alex Deymo <deymo@chromium.org> wrote:
+> Hi again!
+>
+> I'm having a problem while comparing the BlueZ 5 and BlueZ 4 behavior
+> regarding the name/alias of a device during scanning.
+>
+> On BlueZ 4 (at least on 4.99), there was a two steps discovery
+> process. During the first 10 seconds, the adapter will look for new
+> devices, and during the second 30 seconds, it will ask each device for
+> further information.
+>
+> I have here devices like the Monster ClarityHD speakers, or the
+> Creative WP-350 headsets. Those devices announce a short name with the
+> Inquiry Result. btmon reveals a "HCI Event: Extended Inquiry Result"
+> for each one with a short name of 9 chars, respectively "Monster C"
+> and "Creative " (with a space at the end).
+>
+> BlueZ 4 will show this name during the first 10 seconds as the name of
+> the device, but when the adapter goes to the second step, it will
+> issue a "HCI Command: Remote Name Request" and get the full name, like
+> "Creative WP-350 Headset" and update the property on the device, still
+> during discovery.
+>
+> In the other hand, BlueZ 5 will not issue a "Remote Name Request"
+> until you attempt a pairing. This is not the best user experience
+> since no matter how long you leave your scan session on, you will
+> never get the right name of the device, until you attempt a connection
+> or a pairing with it.
+>
+> Even worse, if you had connected to the device before (and you have
+> the long name in the bluez cache for example), if you scan for new
+> devices and this device shows up in that scan, bluez will change the
+> name to the short version.
+>
+> I'm thinking about sending a Remote Name Request to the new devices
+> between the "> HCI Event: Inquiry Complete" and the "< HCI Command:
+> Inquiry". What do you think about this approach? Do you have a better
+> idea to solve this?
 
-Also make sure that dbus_pending_call_set_notify() and
-dbus_pending_call_unref() are not called on a NULL DBusPendingCall. From
-D-Bus documentation for dbus_connection_send_with_reply():
+I don't know if this is what you already had in mind, but I would
+start on the userspace side, src/adapter.c:4052
+(update_found_devices()), and make it send the confirm name command in
+the cases that we only have the short name. It should cause the remote
+name to be requested.
 
-"Warning: if the connection is disconnected or you try to send Unix file
-descriptors on a connection that does not support them, the
-DBusPendingCall will be set to NULL, so be careful with this."
----
- gdbus/client.c |    9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+>
+> Thanks,
+> Alex.
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-diff --git a/gdbus/client.c b/gdbus/client.c
-index 55f1d89..b5e2ebc 100644
---- a/gdbus/client.c
-+++ b/gdbus/client.c
-@@ -105,8 +105,11 @@ static gboolean modify_match(DBusConnection *conn, const char *member,
- 		return FALSE;
- 	}
- 
--	dbus_pending_call_set_notify(call, modify_match_reply, NULL, NULL);
--	dbus_pending_call_unref(call);
-+	if (call != NULL) {
-+		dbus_pending_call_set_notify(call, modify_match_reply, NULL,
-+									NULL);
-+		dbus_pending_call_unref(call);
-+	}
- 
- 	dbus_message_unref(msg);
- 
-@@ -1119,6 +1122,8 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
- 		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- 
- 	sender = dbus_message_get_sender(message);
-+	if (sender == NULL)
-+		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- 
- 	if (g_str_equal(sender, DBUS_SERVICE_DBUS) == TRUE) {
- 		const char *interface, *member;
--- 
-1.7.9.5
 
+Cheers,
+--
+Vinicius
