@@ -1,55 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC BlueZ v0 00/13] Add experimental org.bluez.Service1
-Date: Mon,  6 May 2013 10:43:17 +0200
-Message-Id: <1367829810-8262-1-git-send-email-mikel.astiz.oss@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAGd9gwj_TFTHVmibtSto8Fd3hVFPkkW8ZLhuL_5NopRbopBD=A@mail.gmail.com>
+References: <1367532265-26766-1-git-send-email-deymo@chromium.org>
+	<CABBYNZJ5=gLRTdD=Ggi3VN62tM4E77BTw3G6FszcLqXjtV-Jqg@mail.gmail.com>
+	<CAGd9gwj_TFTHVmibtSto8Fd3hVFPkkW8ZLhuL_5NopRbopBD=A@mail.gmail.com>
+Date: Sun, 5 May 2013 12:06:09 +0300
+Message-ID: <CABBYNZ+iyquChaiKHK92+G7KM0MF3fned16Y4DAZvq21drNREw@mail.gmail.com>
+Subject: Re: [PATCH] audio: Don't create an avctp session on avrcp disconnect
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Alex Deymo <deymo@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"keybuk@chromium.org" <keybuk@chromium.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Alex,
 
-Beyond the desktop use-cases, some users (e.g. GENIVI) are interested in having profile-specific information and control interfaces exposed in D-Bus. Such APIs did exist in BlueZ 4 but were dropped for BlueZ 5 in favor of simpler API simplicity. This service-specific interfaces had a fairly low priority for BlueZ 5 and therefore the discussion was postponed.
+On Fri, May 3, 2013 at 9:39 PM, Alex Deymo <deymo@chromium.org> wrote:
+> Hi!
+> I'm far from an expert in the audio profile code (that's why I had to
+> include such amount of debug traces =] ).
+> Both patches are ok with me, I just find my approach a bit more robust since
+> the next inclusion an avrcp_disconnect() will also need to check if the
+> avctp is disconnected or not.
+> Anyway, I just tried yours on my system and it works for me.
+> Thanks for the patch!
 
-This patchset proposes org.bluez.Service1 as an attempt to cover these needs. As compared to the former Device.ConnectProfile()/DisconnectProfile(), the approach has the following advantages:
-- Multiple instances of the same UUID can be exposed.
-- The state of each service can be exposed, without hackish lists like Device.ConnectedProfiles.
-- It's ObjectManager-centric.
-- The design should scale better if new properties are required in the future (supported features, service handle, etc.)
+Patch is now upstream including some cleanups and other fixes to
+problems I discovered while testing, let us know if you find anything
+else has been broken.
 
-Mikel Astiz (13):
-  test: Remove obsolete test script
-  test: Add UUID alias table to bluezutils.py
-  test: Support human-friendly UUIDs in test-device
-  test: Show human-friendly UUIDs in list-devices
-  dbus: Add new org.bluez.Service1
-  dbus: Add Device property to org.bluez.Service1
-  dbus: Add UUID property to org.bluez.Service1
-  dbus: Add state property to org.bluez.Service1
-  dbus: Add Connect/Disconnect to org.bluez.Service1
-  doc: Add API documentation for org.bluez.Service1
-  dbus: Deprecate old profile-connecting API
-  test: Add test-service script
-  test: Add --uuid to test-service
+We will probably do some changes to profiles/audio/device.c, right now
+the only thing that it should be doing is auto connecting AVRCP if
+A2DP connects, so Im cleaning up it quite a bit. In future we might be
+able to completely remove it and perhaps have the core or a dedicated
+plugin handling profile dependencies such as AVRCP/A2DP using the
+service infrastructure, but service is not very stable right now so we
+first need to fix it first before converting the rest to use the
+service states.
 
- Makefile.am         |   2 +-
- Makefile.tools      |   2 +-
- doc/device-api.txt  |   4 +-
- doc/service-api.txt |  54 ++++++++++++++
- src/device.c        |  14 ++--
- src/service.c       | 197 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- src/service.h       |   2 +-
- test/bluezutils.py  |  84 ++++++++++++++++++++++
- test/list-devices   |   6 +-
- test/simple-service | 128 ----------------------------------
- test/test-device    |   4 +-
- test/test-service   | 174 ++++++++++++++++++++++++++++++++++++++++++++++
- 12 files changed, 530 insertions(+), 141 deletions(-)
- create mode 100644 doc/service-api.txt
- delete mode 100755 test/simple-service
- create mode 100755 test/test-service
+Btw, please respond inline, top posting is not recommended as stated
+http://www.bluez.org/development/lists/
 
--- 
-1.8.1.4
-
+--
+Luiz Augusto von Dentz
