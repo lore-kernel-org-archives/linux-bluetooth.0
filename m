@@ -1,69 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [RFC BlueZ v0 13/13] test: Add --uuid to test-service
+Date: Mon,  6 May 2013 10:43:30 +0200
+Message-Id: <1367829810-8262-14-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1367829810-8262-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1367829810-8262-1-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Mon, 6 May 2013 12:19:37 +0300
-Message-ID: <CABBYNZLQTOsdeJ52WF3pn_+bYqSeXjeK_6-TK3RhcXrS567_Ag@mail.gmail.com>
-Subject: Re: [RFC BlueZ v0 00/13] Add experimental org.bluez.Service1
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-On Mon, May 6, 2013 at 11:43 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> Beyond the desktop use-cases, some users (e.g. GENIVI) are interested in having profile-specific information and control interfaces exposed in D-Bus. Such APIs did exist in BlueZ 4 but were dropped for BlueZ 5 in favor of simpler API simplicity. This service-specific interfaces had a fairly low priority for BlueZ 5 and therefore the discussion was postponed.
->
-> This patchset proposes org.bluez.Service1 as an attempt to cover these needs. As compared to the former Device.ConnectProfile()/DisconnectProfile(), the approach has the following advantages:
-> - Multiple instances of the same UUID can be exposed.
-> - The state of each service can be exposed, without hackish lists like Device.ConnectedProfiles.
-> - It's ObjectManager-centric.
-> - The design should scale better if new properties are required in the future (supported features, service handle, etc.)
->
-> Mikel Astiz (13):
->   test: Remove obsolete test script
->   test: Add UUID alias table to bluezutils.py
->   test: Support human-friendly UUIDs in test-device
->   test: Show human-friendly UUIDs in list-devices
->   dbus: Add new org.bluez.Service1
->   dbus: Add Device property to org.bluez.Service1
->   dbus: Add UUID property to org.bluez.Service1
->   dbus: Add state property to org.bluez.Service1
->   dbus: Add Connect/Disconnect to org.bluez.Service1
->   doc: Add API documentation for org.bluez.Service1
->   dbus: Deprecate old profile-connecting API
->   test: Add test-service script
->   test: Add --uuid to test-service
->
->  Makefile.am         |   2 +-
->  Makefile.tools      |   2 +-
->  doc/device-api.txt  |   4 +-
->  doc/service-api.txt |  54 ++++++++++++++
->  src/device.c        |  14 ++--
->  src/service.c       | 197 +++++++++++++++++++++++++++++++++++++++++++++++++++-
->  src/service.h       |   2 +-
->  test/bluezutils.py  |  84 ++++++++++++++++++++++
->  test/list-devices   |   6 +-
->  test/simple-service | 128 ----------------------------------
->  test/test-device    |   4 +-
->  test/test-service   | 174 ++++++++++++++++++++++++++++++++++++++++++++++
->  12 files changed, 530 insertions(+), 141 deletions(-)
->  create mode 100644 doc/service-api.txt
->  delete mode 100755 test/simple-service
->  create mode 100755 test/test-service
->
-> --
-> 1.8.1.4
+Extend the test script with an optional filter to let the user operate
+on services matching a given UUID.
+---
+ test/test-service | 34 ++++++++++++++++++++++++++--------
+ 1 file changed, 26 insertions(+), 8 deletions(-)
 
-This is probably the way forward, but currently there have been some
-instability after service was introduced, so before we move on to this
-set I would like that we make sure those crashes are fixed.
+diff --git a/test/test-service b/test/test-service
+index 7143891..2342d50 100755
+--- a/test/test-service
++++ b/test/test-service
+@@ -22,6 +22,8 @@ mainloop = GObject.MainLoop()
+ option_list = [
+ 		make_option("-i", "--adapter", action="store",
+ 				type="string", dest="adap_id"),
++		make_option("-u", "--uuid", action="store",
++				type="string", dest="uuid"),
+ 		]
+ 
+ description="Test script to operate on org.bluez.Service1 interfaces"
+@@ -29,8 +31,8 @@ usage = "usage: %prog [options] <command> [<args>]"
+ epilog="""
+ Commands:
+ 	list [<address>]
+-	connect <address> <service-path-suffix>
+-	disconnect <address> <service-path-suffix>
++	connect [<address> [<service-path-suffix>]]
++	disconnect [<address> [<service-path-suffix>]]
+ 
+ """
+ 
+@@ -47,6 +49,10 @@ if len(args) < 1:
+ 	parser.print_help()
+ 	sys.exit(1)
+ 
++uuid = None
++if options.uuid:
++	uuid = bluezutils.parse_uuid(options.uuid)
++
+ if args[0] == "list":
+ 	if len(args) > 2:
+ 		parser.print_help()
+@@ -83,6 +89,10 @@ if args[0] == "list":
+ 
+ 			if properties["Device"] != path:
+ 				continue
++			elif uuid:
++				if properties["UUID"] != uuid:
++					continue
++				del(properties["UUID"])
+ 
+ 			print("    [ " + service_path + " ]")
+ 
+@@ -102,23 +112,31 @@ if args[0] == "list":
+ 	sys.exit(0)
+ 
+ def service_do(func):
+-	if len(args) < 3:
+-		parser.print_help()
++	if len(args) < 3 and not(uuid):
++		print("ERROR: Either service suffix or UUID must be specified")
+ 		sys.exit(1)
+ 
+ 	objects = bluezutils.get_managed_objects()
+ 	adapter = bluezutils.find_adapter_in_objects(objects, options.adap_id)
+-	device = bluezutils.find_device_in_objects(objects, args[1],
++
++	device = None
++	if len(args) >= 2:
++		device = bluezutils.find_device_in_objects(objects, args[1],
+ 								options.adap_id)
+-	path_suffix = args[2]
++	path_suffix = None
++	if len(args) >= 3:
++		path_suffix = args[2]
++
+ 	found = False
+ 	for path, ifaces in objects.iteritems():
+ 		service = ifaces.get(SERVICE_INTERFACE)
+ 		if service is None:
+ 			continue
+-		if device.object_path != service["Device"]:
++		if device and device.object_path != service["Device"]:
++			continue
++		if uuid and uuid != service["UUID"]:
+ 			continue
+-		if not(path.endswith(path_suffix)):
++		if path_suffix and not(path.endswith(path_suffix)):
+ 			continue
+ 		try:
+ 			found = True
+-- 
+1.8.1.4
 
---
-Luiz Augusto von Dentz
