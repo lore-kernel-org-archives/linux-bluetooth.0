@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC BlueZ v0 10/13] doc: Add API documentation for org.bluez.Service1
-Date: Mon,  6 May 2013 10:43:27 +0200
-Message-Id: <1367829810-8262-11-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC BlueZ v0 09/13] dbus: Add Connect/Disconnect to org.bluez.Service1
+Date: Mon,  6 May 2013 10:43:26 +0200
+Message-Id: <1367829810-8262-10-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1367829810-8262-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1367829810-8262-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,86 +12,133 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Update the documentation to reflect the newly adopted D-Bus API.
+Add the control methods to connect or disconnect a specific remote
+service, in a similar way that org.bluez.Device1.ConnectProfile()/
+.DisconnectProfile() do.
 ---
- Makefile.am         |  2 +-
- doc/service-api.txt | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 55 insertions(+), 1 deletion(-)
- create mode 100644 doc/service-api.txt
+ src/service.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 80 insertions(+), 1 deletion(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index da87a21..9cd10b9 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -199,7 +199,7 @@ EXTRA_DIST += doc/assigned-numbers.txt doc/supported-features.txt
+diff --git a/src/service.c b/src/service.c
+index fed8460..0aa8cc4 100644
+--- a/src/service.c
++++ b/src/service.c
+@@ -108,6 +108,26 @@ static const char *state2dbus(btd_service_state_t state)
+ 	return NULL;
+ }
  
- EXTRA_DIST += doc/mgmt-api.txt \
- 		doc/adapter-api.txt doc/device-api.txt \
--		doc/agent-api.txt doc/profile-api.txt \
-+		doc/agent-api.txt doc/profile-api.txt doc/service-api.txt \
- 		doc/network-api.txt doc/media-api.txt \
- 		doc/health-api.txt doc/sap-api.txt
++static void send_dbus_reply(DBusMessage **p, bool state_ok, int err)
++{
++	DBusMessage *msg = *p;
++	DBusMessage *reply;
++
++	if (msg == NULL)
++		return;
++
++	if (state_ok)
++		reply = dbus_message_new_method_return(msg);
++	else if (err < 0)
++		reply = btd_error_failed(msg, strerror(-err));
++	else /* For some reason, the error was not set */
++		reply = btd_error_failed(msg, strerror(EIO));
++
++	g_dbus_send_message(btd_get_dbus_connection(), reply);
++	dbus_message_unref(msg);
++	*p = NULL;
++}
++
+ static void change_state(struct btd_service *service, btd_service_state_t state,
+ 									int err)
+ {
+@@ -140,6 +160,12 @@ static void change_state(struct btd_service *service, btd_service_state_t state,
  
-diff --git a/doc/service-api.txt b/doc/service-api.txt
-new file mode 100644
-index 0000000..ef611d6
---- /dev/null
-+++ b/doc/service-api.txt
-@@ -0,0 +1,54 @@
-+BlueZ D-Bus Service API description
-+***********************************
+ 		cb->cb(service, old, state, cb->user_data);
+ 	}
 +
-+Copyright (C) 2012-2013  BMW Car IT GmbH. All rights reserved.
++	send_dbus_reply(&service->connect_msg,
++				state == BTD_SERVICE_STATE_CONNECTED, err);
 +
++	send_dbus_reply(&service->disconnect_msg,
++				state == BTD_SERVICE_STATE_DISCONNECTED, err);
+ }
+ 
+ struct btd_service *btd_service_ref(struct btd_service *service)
+@@ -392,6 +418,52 @@ static gboolean service_get_uuid(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
++static DBusMessage *service_connect(DBusConnection *conn, DBusMessage *msg,
++								void *user_data)
++{
++	struct btd_service *service = user_data;
++	int err;
 +
-+Service hierarchy
-+=================
++	if (service->state != BTD_SERVICE_STATE_DISCONNECTED)
++		return btd_error_already_connected(msg);
 +
-+Service		unique name
-+Interface	org.bluez.Service1 [Experimental]
-+Object path	freely definable
++	if (service->connect_msg != NULL || service->disconnect_msg)
++		return btd_error_busy(msg);
 +
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/
-+								serviceZZZ
++	err = btd_service_connect(service);
++	if (err == -ENOTSUP)
++		return btd_error_not_supported(msg);
++	else if (err < 0)
++		return btd_error_failed(msg, strerror(-err));
 +
-+Methods		void Connect()
++	service->connect_msg = dbus_message_ref(msg);
 +
-+			This method connects a specific service of this
-+			device.
++	return NULL;
++}
 +
-+			Possible errors: org.bluez.Error.AgentNotAvailable
-+					 org.bluez.Error.AlreadyConnected
-+					 org.bluez.Error.Canceled
-+					 org.bluez.Error.Failed
-+					 org.bluez.Error.InProgress
++static DBusMessage *service_disconnect(DBusConnection *conn, DBusMessage *msg,
++								void *user_data)
++{
++	struct btd_service *service = user_data;
++	int err;
 +
-+		void Disconnect()
++	if (service->state == BTD_SERVICE_STATE_DISCONNECTED)
++		return btd_error_not_connected(msg);
 +
-+			This method disconnects a specific service of this
-+			device.
++	if (service->disconnect_msg != NULL)
++		return btd_error_busy(msg);
 +
-+			There is no connection tracking for a service, so
-+			as long as the service is registered this will always
-+			succeed.
++	err = btd_service_disconnect(service);
++	if (err == -ENOTSUP)
++		return btd_error_not_supported(msg);
++	else if (err < 0)
++		return btd_error_failed(msg, strerror(-err));
 +
-+			Possible errors: org.bluez.Error.Failed
-+					 org.bluez.Error.InProgress
-+					 org.bluez.Error.NotConnected
++	service->disconnect_msg = dbus_message_ref(msg);
 +
-+Properties	object Device [readonly]
++	return NULL;
++}
 +
-+			The object path of the device the service belongs to.
+ static gboolean service_get_state(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
+ {
+@@ -405,6 +477,12 @@ static gboolean service_get_state(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
++static const GDBusMethodTable service_methods[] = {
++	{ GDBUS_ASYNC_METHOD("Connect", NULL, NULL, service_connect) },
++	{ GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL, service_disconnect) },
++	{ }
++};
 +
-+		string State [readonly]
-+
-+			Indicates the state of the connection.  Possible
-+			values are:
-+				"disconnected"
-+				"connected"
-+
-+		string UUID [readonly]
-+
-+			128-bit UUID that representing the remote service.
+ static const GDBusPropertyTable service_properties[] = {
+ 	{ "Device", "o", service_get_device },
+ 	{ "UUID", "s", service_get_uuid },
+@@ -423,7 +501,8 @@ static int service_register(struct btd_service *service, unsigned int id)
+ 
+ 	if (g_dbus_register_interface(dbus_conn,
+ 					path, SERVICE_INTERFACE,
+-					NULL, NULL, service_properties, service,
++					service_methods, NULL,
++					service_properties, service,
+ 					NULL) == FALSE) {
+ 		g_free(path);
+ 		error("Unable to register service interface for %s",
 -- 
 1.8.1.4
 
