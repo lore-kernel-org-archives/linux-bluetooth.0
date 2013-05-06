@@ -1,43 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Bluetooth: Fix not sending link key negative reply
-Date: Mon,  6 May 2013 16:50:35 +0300
-Message-Id: <1367848235-19452-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Samuel Ortiz <sameo@linux.intel.com>,
+	Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 2/2] neard: Fix reading local OOB data when adapter is not powered
+Date: Mon, 6 May 2013 15:20:52 +0200
+Message-ID: <1367846452-23303-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1367846452-23303-1-git-send-email-szymon.janc@tieto.com>
+References: <1367846452-23303-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-If Link Keys are not loaded then HCI_LINK_KEYS is not set
-and for HCI Event "Link Key Request" reply is not sent.
---
-send as RFC since I did not get why we need this flag really.
-
-Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Read Local OOB data only if adapter is powered. This fix replying with
+error instead of CPS set to inactive when adapter is not powered.
 ---
- net/bluetooth/hci_event.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ plugins/neard.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index db58e72..e7de1df 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2611,11 +2611,11 @@ static void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+diff --git a/plugins/neard.c b/plugins/neard.c
+index dfe4f23..e4a4d71 100644
+--- a/plugins/neard.c
++++ b/plugins/neard.c
+@@ -790,7 +790,7 @@ static DBusMessage *request_oob(DBusConnection *conn, DBusMessage *msg,
  
- 	BT_DBG("%s", hdev->name);
+ 	store_params(adapter, device, &remote);
  
--	if (!test_bit(HCI_LINK_KEYS, &hdev->dev_flags))
--		return;
--
- 	hci_dev_lock(hdev);
+-	if (!remote.hash) {
++	if (!remote.hash || !btd_adapter_get_powered(adapter)) {
+ 		free_oob_params(&remote);
+ 		return create_request_oob_reply(adapter, NULL, NULL, msg);
+ 	}
+@@ -798,6 +798,9 @@ static DBusMessage *request_oob(DBusConnection *conn, DBusMessage *msg,
+ read_local:
+ 	free_oob_params(&remote);
  
-+	if (!test_bit(HCI_LINK_KEYS, &hdev->dev_flags))
-+		goto not_found;
++	if (!btd_adapter_get_powered(adapter))
++		return create_request_oob_reply(adapter, NULL, NULL, msg);
 +
- 	key = hci_find_link_key(hdev, &ev->bdaddr);
- 	if (!key) {
- 		BT_DBG("%s link key not found for %pMR", hdev->name,
+ 	err = btd_adapter_read_local_oob_data(adapter);
+ 	if (err < 0)
+ 		return error_reply(msg, -err);
 -- 
-1.8.1.2
+1.8.2.2
 
