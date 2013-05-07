@@ -1,33 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CAE6HaMmDgfHuAEandfET7OXRMcdyEG-J2E-x=iaCEeH1DVob=g@mail.gmail.com>
+References: <1367533776-3987-1-git-send-email-vinicius.gomes@openbossa.org>
+	<20130503043602.GA3742@x220>
+	<CAE6HaMmDgfHuAEandfET7OXRMcdyEG-J2E-x=iaCEeH1DVob=g@mail.gmail.com>
+Date: Tue, 7 May 2013 09:34:50 +0200
+Message-ID: <CANT-zCU==msZyJ1JSXH=0OyPNCP9GVZNtHmK0JeG_fUz7=v3kw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] profile: Create a service for incomming connections
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH BlueZ v1 0/3] Issue with incoming connections
-Date: Tue,  7 May 2013 09:44:01 +0200
-Message-Id: <1367912644-17401-1-git-send-email-mikel.astiz.oss@gmail.com>
+To: Vinicius Gomes <vinicius.gomes@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Vinicius,
 
-Vinicius reported this issue and tried to fix it in his patch "profile: Create a service for incomming connections".
+On Mon, May 6, 2013 at 7:23 PM, Vinicius Gomes
+<vinicius.gomes@openbossa.org> wrote:
+> Hi Johan,
+>
+> On Fri, May 3, 2013 at 1:36 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>> Hi Vinicius,
+>>
+>> On Thu, May 02, 2013, Vinicius Costa Gomes wrote:
+>>> diff --git a/src/profile.c b/src/profile.c
+>>> index 0500983..2c35dc7 100644
+>>> --- a/src/profile.c
+>>> +++ b/src/profile.c
+>>> @@ -1045,6 +1045,7 @@ static struct ext_io *create_conn(struct ext_io *server, GIOChannel *io,
+>>>  {
+>>>       struct btd_device *device;
+>>>       struct ext_io *conn;
+>>> +     struct btd_profile *profile;
+>>>       GIOCondition cond;
+>>>
+>>>       conn = g_new0(struct ext_io, 1);
+>>> @@ -1052,11 +1053,14 @@ static struct ext_io *create_conn(struct ext_io *server, GIOChannel *io,
+>>>       conn->proto = server->proto;
+>>>       conn->ext = server->ext;
+>>>       conn->adapter = btd_adapter_ref(server->adapter);
+>>> +     profile = &server->ext->p;
+>>>
+>>>       device = adapter_find_device(server->adapter, dst);
+>>>
+>>> -     if (device)
+>>> +     if (device) {
+>>>               conn->device = btd_device_ref(device);
+>>> +             conn->service = service_create(device, profile);
+>>> +     }
+>>>
+>>>       cond = G_IO_HUP | G_IO_ERR | G_IO_NVAL;
+>>>       conn->io_id = g_io_add_watch(io, cond, ext_io_disconnected, conn);
+>>
+>> How would the service show up in the list of services for the device
+>> object in question? To me it seems like src/device.c is the only place
+>> that should be calling service_create because of this. What does seem to
+>> be missing in profile.c is a call to btd_device_add_uuid for unexpected
+>> connections from a device which we did not yet know to support a certain
+>> UUID. The btd_device_add_uuid function should cause a new service to be
+>> created, but it may not yet be enough to get the service to be assigned
+>> to conn in profile.c.
+>
+> The problem in question seems that the service is already created, but
+> it doesn't get associated with
+> the conn in my particular case of incomming connections (testing the
+> AG side of HFP, for the record).
 
-As compared to his original patch, this patchset avoid creating an additional service instance (which should already be created) and instead performs a search within the list of existing services for the given device.
+The issue seems to be caused by a missing service search and
+association in create_conn(), leaving conn->service unassigned and
+leading to the issue you describe, affecting incoming connections for
+external profiles.
 
-Patch 2/3 is the actual fix which makes use of patch 1/1.
+I'll send a patchset to fix it.
 
-Patch 3/3 is an attempt to make the code more robust, but I'm not 100% sure if there are cases where the device can be set to NULL as handled in the upstream create_conn() body as first introduced in 86842030039583d092a1d3ce5004e7bc5b7d2b01.
-
-Mikel Astiz (3):
-  device: Add function to find a given service
-  profile: Fix remotely initiated connections without service
-  profile: Error-cases for incoming connections
-
- src/device.c  | 16 ++++++++++++++++
- src/device.h  |  3 +++
- src/profile.c | 26 +++++++++++++++++++++-----
- 3 files changed, 40 insertions(+), 5 deletions(-)
-
--- 
-1.8.1.4
-
+Cheers,
+Mikel
