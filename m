@@ -1,107 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <51890AC9.7010501@asianux.com>
+Date: Tue, 07 May 2013 22:08:09 +0800
+From: Chen Gang <gang.chen@asianux.com>
 MIME-Version: 1.0
-In-Reply-To: <1367912644-17401-4-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1367912644-17401-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1367912644-17401-4-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Tue, 7 May 2013 11:43:36 -0300
-Message-ID: <CAE6HaM=f8ZuWPLP524=a0z=j=O-LaARo=DvLwjwj6fCH1Ax_uA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 3/3] profile: Error-cases for incoming connections
-From: Vinicius Gomes <vinicius.gomes@openbossa.org>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>, gustavo@padovan.org,
+ johan.hedberg@gmail.com
+CC: David Miller <davem@davemloft.net>, dh.herrmann@gmail.com,
+ Jiri Kosina <jkosina@suse.cz>,
+ andrei.emeltchenko@intel.com, linux-bluetooth@vger.kernel.org,
+ netdev <netdev@vger.kernel.org>
+Subject: [Suggestion] Bluetooth: hidp: redundant initialization or issue for
+ function hidp_copy_session
+References: <518906A8.7060708@asianux.com>
+In-Reply-To: <518906A8.7060708@asianux.com>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hello Maintainers:
 
-On Tue, May 7, 2013 at 4:44 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> When an incoming connection attempt is received, if the corresponding
-> device or service is not found, handle the error-case.
-> ---
->  src/profile.c | 31 ++++++++++++++++++++-----------
->  1 file changed, 20 insertions(+), 11 deletions(-)
->
-> diff --git a/src/profile.c b/src/profile.c
-> index 6a71627..aab7e33 100644
-> --- a/src/profile.c
-> +++ b/src/profile.c
-> @@ -1048,22 +1048,26 @@ static struct ext_io *create_conn(struct ext_io *server, GIOChannel *io,
->         struct ext_io *conn;
->         GIOCondition cond;
->
-> +       device = adapter_find_device(server->adapter, dst);
-> +       if (device == NULL) {
-> +               error("%s device %s not found", server->ext->name, src);
+In net/bluetooth/hidp/core.c, for hidp_copy_session(), the
+'session->input' and 'session->hid' are conflict with each other.
 
-src is a bdaddr_t, so it would be better converted to a proper string.
+And excuse me, I do not quit know the details, but I think we have 2
+choices for fixing it:
 
-> +               return NULL;
-> +       }
-> +
-> +       service = btd_device_get_service(device, server->ext->remote_uuid);
-> +       if (service == NULL) {
-> +               error("%s service not found for device %s", server->ext->name,
-> +                                                                       src);
+  one is ''if (session->input) { } else if (session->hid) { };''
+  the other is ''if (seesion->hid) { } else if (session->input) { };''
 
-Same here.
+The first choice assumes the original code has a logical issue; the
+second choice assumes the original code has redundant initialization.
 
-> +               return NULL;
-> +       }
-> +
->         conn = g_new0(struct ext_io, 1);
->         conn->io = g_io_channel_ref(io);
->         conn->proto = server->proto;
->         conn->ext = server->ext;
->         conn->adapter = btd_adapter_ref(server->adapter);
-> -
-> -       device = adapter_find_device(server->adapter, dst);
-> -
-> -       if (device) {
-> -               conn->device = btd_device_ref(device);
-> -
-> -               service = btd_device_get_service(device,
-> -                                               server->ext->remote_uuid);
-> -               if (service)
-> -                       conn->service = btd_service_ref(service);
-> -       }
-> +       conn->device = btd_device_ref(device);
-> +       conn->service = btd_service_ref(service);
->
->         cond = G_IO_HUP | G_IO_ERR | G_IO_NVAL;
->         conn->io_id = g_io_add_watch(io, cond, ext_io_disconnected, conn);
-> @@ -1137,6 +1141,8 @@ static void ext_confirm(GIOChannel *io, gpointer user_data)
->         DBG("incoming connect from %s", addr);
->
->         conn = create_conn(server, io, &src, &dst);
-> +       if (conn == NULL)
-> +               return;
->
->         conn->auth_id = btd_request_authorization(&src, &dst, uuid, ext_auth,
->                                                                         conn);
-> @@ -1175,6 +1181,9 @@ static void ext_direct_connect(GIOChannel *io, GError *err, gpointer user_data)
->         }
->
->         conn = create_conn(server, io, &src, &dst);
-> +       if (conn == NULL)
-> +               return;
-> +
->         ext->conns = g_slist_append(ext->conns, conn);
->
->         ext_connect(io, err, conn);
-> --
-> 1.8.1.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Please help check.
 
+Thanks.
 
-
-Cheers,
---
-Vinicius
+  71 static void hidp_copy_session(struct hidp_session *session, struct hidp_conninfo *ci)
+  72 {
+  73         memset(ci, 0, sizeof(*ci));
+  74         bacpy(&ci->bdaddr, &session->bdaddr);
+  75 
+  76         ci->flags = session->flags;
+  77         ci->state = BT_CONNECTED;
+  78 
+  79         ci->vendor  = 0x0000;
+  80         ci->product = 0x0000;
+  81         ci->version = 0x0000;
+  82 
+  83         if (session->input) {
+  84                 ci->vendor  = session->input->id.vendor;
+  85                 ci->product = session->input->id.product;
+  86                 ci->version = session->input->id.version;
+  87                 if (session->input->name)
+  88                         strncpy(ci->name, session->input->name, 128);
+  89                 else
+  90                         strncpy(ci->name, "HID Boot Device", 128);
+  91         }
+  92 
+  93         if (session->hid) {
+  94                 ci->vendor  = session->hid->vendor;
+  95                 ci->product = session->hid->product;
+  96                 ci->version = session->hid->version;
+  97                 strncpy(ci->name, session->hid->name, 128);
+  98         }
+  99 }
