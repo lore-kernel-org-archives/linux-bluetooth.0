@@ -1,78 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 7 May 2013 09:06:30 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] Bluetooth: Fix not sending link key negative reply
+Message-ID: <20130507060630.GA3766@x220.ger.corp.intel.com>
+References: <1367848235-19452-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAE6HaMmDgfHuAEandfET7OXRMcdyEG-J2E-x=iaCEeH1DVob=g@mail.gmail.com>
-References: <1367533776-3987-1-git-send-email-vinicius.gomes@openbossa.org>
-	<20130503043602.GA3742@x220>
-	<CAE6HaMmDgfHuAEandfET7OXRMcdyEG-J2E-x=iaCEeH1DVob=g@mail.gmail.com>
-Date: Tue, 7 May 2013 09:34:50 +0200
-Message-ID: <CANT-zCU==msZyJ1JSXH=0OyPNCP9GVZNtHmK0JeG_fUz7=v3kw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] profile: Create a service for incomming connections
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: Vinicius Gomes <vinicius.gomes@openbossa.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1367848235-19452-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Hi Andrei,
 
-On Mon, May 6, 2013 at 7:23 PM, Vinicius Gomes
-<vinicius.gomes@openbossa.org> wrote:
-> Hi Johan,
->
-> On Fri, May 3, 2013 at 1:36 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
->> Hi Vinicius,
->>
->> On Thu, May 02, 2013, Vinicius Costa Gomes wrote:
->>> diff --git a/src/profile.c b/src/profile.c
->>> index 0500983..2c35dc7 100644
->>> --- a/src/profile.c
->>> +++ b/src/profile.c
->>> @@ -1045,6 +1045,7 @@ static struct ext_io *create_conn(struct ext_io *server, GIOChannel *io,
->>>  {
->>>       struct btd_device *device;
->>>       struct ext_io *conn;
->>> +     struct btd_profile *profile;
->>>       GIOCondition cond;
->>>
->>>       conn = g_new0(struct ext_io, 1);
->>> @@ -1052,11 +1053,14 @@ static struct ext_io *create_conn(struct ext_io *server, GIOChannel *io,
->>>       conn->proto = server->proto;
->>>       conn->ext = server->ext;
->>>       conn->adapter = btd_adapter_ref(server->adapter);
->>> +     profile = &server->ext->p;
->>>
->>>       device = adapter_find_device(server->adapter, dst);
->>>
->>> -     if (device)
->>> +     if (device) {
->>>               conn->device = btd_device_ref(device);
->>> +             conn->service = service_create(device, profile);
->>> +     }
->>>
->>>       cond = G_IO_HUP | G_IO_ERR | G_IO_NVAL;
->>>       conn->io_id = g_io_add_watch(io, cond, ext_io_disconnected, conn);
->>
->> How would the service show up in the list of services for the device
->> object in question? To me it seems like src/device.c is the only place
->> that should be calling service_create because of this. What does seem to
->> be missing in profile.c is a call to btd_device_add_uuid for unexpected
->> connections from a device which we did not yet know to support a certain
->> UUID. The btd_device_add_uuid function should cause a new service to be
->> created, but it may not yet be enough to get the service to be assigned
->> to conn in profile.c.
->
-> The problem in question seems that the service is already created, but
-> it doesn't get associated with
-> the conn in my particular case of incomming connections (testing the
-> AG side of HFP, for the record).
+On Mon, May 06, 2013, Andrei Emeltchenko wrote:
+> If Link Keys are not loaded then HCI_LINK_KEYS is not set
+> and for HCI Event "Link Key Request" reply is not sent.
+> --
+> send as RFC since I did not get why we need this flag really.
+> 
+> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> ---
+>  net/bluetooth/hci_event.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index db58e72..e7de1df 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -2611,11 +2611,11 @@ static void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>  
+>  	BT_DBG("%s", hdev->name);
+>  
+> -	if (!test_bit(HCI_LINK_KEYS, &hdev->dev_flags))
+> -		return;
+> -
+>  	hci_dev_lock(hdev);
+>  
+> +	if (!test_bit(HCI_LINK_KEYS, &hdev->dev_flags))
+> +		goto not_found;
+> +
+>  	key = hci_find_link_key(hdev, &ev->bdaddr);
+>  	if (!key) {
+>  		BT_DBG("%s link key not found for %pMR", hdev->name,
 
-The issue seems to be caused by a missing service search and
-association in create_conn(), leaving conn->service unassigned and
-leading to the issue you describe, affecting incoming connections for
-external profiles.
+Nack.
 
-I'll send a patchset to fix it.
+This check is there for backwards compatibility with older user space
+versions. Your patch would break all user space versions that do not use
+the management interface (and hence do not have the HCI_LINK_KEYS flag
+set).
 
-Cheers,
-Mikel
+That said, the flag is in a way redundant with the HCI_MGMT flag, so the
+check could be changed for that and the HCI_LINK_KEYS flag could then be
+completely removed.
+
+Johan
