@@ -1,58 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CAE6HaM=cTHJkVKLCdUUD3oHgOFnGYGuVPwD=LSj4iL4U17vE6g@mail.gmail.com>
+References: <CAGd9gwjaECWWRE+Ux4XenbUO9L-QSsjnP6wLHEvH5q3sasWWkg@mail.gmail.com>
+ <CAGd9gwj=79xKJ0Mdb1eb+a5MDGtG1a3BcC8utfDad1ZLzhfd5A@mail.gmail.com> <CAE6HaM=cTHJkVKLCdUUD3oHgOFnGYGuVPwD=LSj4iL4U17vE6g@mail.gmail.com>
 From: Alex Deymo <deymo@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: keybuk@chromium.org, vinicius.gomes@openbossa.org,
-	Alex Deymo <deymo@chromium.org>
-Subject: [PATCH] core: Don't update a known long name with a short name.
-Date: Mon,  6 May 2013 20:31:57 -0700
-Message-Id: <1367897517-12309-1-git-send-email-deymo@chromium.org>
+Date: Mon, 6 May 2013 20:30:56 -0700
+Message-ID: <CAGd9gwiyUaedR6EOMOhpw64iA=_jkM+v08QsNJUteg_d+2mvmg@mail.gmail.com>
+Subject: Re: Short names on Extended Inquiry Result
+To: Vinicius Gomes <vinicius.gomes@openbossa.org>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	keybuk <keybuk@chromium.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-update_found_devices() could attempt to update a device with new information
-containing only a short verstion of the name. If the struct eir_data passed
-has a short or NULL name, it will never update a previous name and will
-also trigger a "HCI Command: Remote Name Request" if the previous name was
-unknown.
----
- src/adapter.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+Hi Vinicius,
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 1252e74..b952ea1 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -4060,6 +4060,7 @@ static void update_found_devices(struct btd_adapter *adapter,
- 	char addr[18];
- 	int err;
- 	GSList *list;
-+	bool name_known;
- 
- 	memset(&eir_data, 0, sizeof(eir_data));
- 	err = eir_parse(&eir_data, data, data_len);
-@@ -4116,7 +4117,11 @@ static void update_found_devices(struct btd_adapter *adapter,
- 	if (eir_data.appearance != 0)
- 		device_set_appearance(dev, eir_data.appearance);
- 
--	if (eir_data.name)
-+	/* Report an unknown name to the kernel even if there is a short name
-+	 * known, but still update the name with the known short name. */
-+	name_known = device_name_known(dev);
-+
-+	if (eir_data.name && (eir_data.name_complete || !name_known))
- 		device_set_name(dev, eir_data.name);
- 
- 	if (eir_data.class != 0)
-@@ -4139,8 +4144,7 @@ static void update_found_devices(struct btd_adapter *adapter,
- 		return;
- 
- 	if (confirm)
--		confirm_name(adapter, bdaddr, bdaddr_type,
--						device_name_known(dev));
-+		confirm_name(adapter, bdaddr, bdaddr_type, name_known);
- 
- 	adapter->discovery_found = g_slist_prepend(adapter->discovery_found,
- 									dev);
--- 
-1.8.2.1
+On Fri, May 3, 2013 at 6:55 PM, Vinicius Gomes
+<vinicius.gomes@openbossa.org> wrote:
+> Hi Alex,
+>
+> I don't know if this is what you already had in mind, but I would
+> start on the userspace side, src/adapter.c:4052
+> (update_found_devices()), and make it send the confirm name command in
+> the cases that we only have the short name. It should cause the remote
+> name to be requested.
 
+Thanks for the pointer. I managed to solve the problem of updating the
+already known long name with the new short name in that function, and
+after some time debugging between the kernel module and the userland
+daemon I also found that the problem of the "Remote Name Request" not
+being sent is because confirm_name() is called with a known_name in
+TRUE since we already known "a name".
+
+I though about several options and finally choose tho consider the
+short name as an unknown name and thus calling the confirm_name() with
+known_name in FALSE, but also report the device with the short name,
+while we ask for the long name.
+
+This has the advantage of sending the device found signal earlier, but
+may have a problem in the following scenario:
+1. We have a first call to update_found_devices() with a short name
+and report it to the user.
+2. We request the full name.
+3. The device doesn't reply to this request (for any reason)
+4. We get a second call to update_found_devices() with a short name...
+but since we already know "a name" we don't request the long name.
+
+To avoid this I think the best should be to include the name_complete
+field in the struct btd_device together with the name. What do you
+think?
+
+I'm sending a proposed patch with this implementation.
+Thanks!
+Alex.
