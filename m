@@ -1,59 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 7 May 2013 09:06:30 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: Fix not sending link key negative reply
-Message-ID: <20130507060630.GA3766@x220.ger.corp.intel.com>
-References: <1367848235-19452-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1367848235-19452-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20130430081629.GA777@x220.ger.corp.intel.com>
+References: <1367006741-28907-1-git-send-email-deymo@chromium.org>
+ <1367006741-28907-2-git-send-email-deymo@chromium.org> <20130430081629.GA777@x220.ger.corp.intel.com>
+From: Alex Deymo <deymo@chromium.org>
+Date: Mon, 6 May 2013 21:20:11 -0700
+Message-ID: <CAGd9gwgGMyHPN9BBSS7bqbbaqsx5QVvFqf6+V5e-t4yveN_kig@mail.gmail.com>
+Subject: Re: [PATCH v4 1/8] core: Convert the pincode callback to an interable list.
+To: Alex Deymo <deymo@chromium.org>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>, keybuk <keybuk@chromium.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Johan,
 
-On Mon, May 06, 2013, Andrei Emeltchenko wrote:
-> If Link Keys are not loaded then HCI_LINK_KEYS is not set
-> and for HCI Event "Link Key Request" reply is not sent.
-> --
-> send as RFC since I did not get why we need this flag really.
-> 
-> Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> ---
->  net/bluetooth/hci_event.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index db58e72..e7de1df 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -2611,11 +2611,11 @@ static void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
->  
->  	BT_DBG("%s", hdev->name);
->  
-> -	if (!test_bit(HCI_LINK_KEYS, &hdev->dev_flags))
-> -		return;
-> -
->  	hci_dev_lock(hdev);
->  
-> +	if (!test_bit(HCI_LINK_KEYS, &hdev->dev_flags))
-> +		goto not_found;
-> +
->  	key = hci_find_link_key(hdev, &ev->bdaddr);
->  	if (!key) {
->  		BT_DBG("%s link key not found for %pMR", hdev->name,
+On Tue, Apr 30, 2013 at 1:16 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> On Fri, Apr 26, 2013, Alex Deymo wrote:
+>> +struct pincb_iter {
+>
+> What concerns me a bit about this is that you're now introducing the
+> first symbols exported by adapter.{c.h} that are not name spaced with
+> btd_adapter* or adapter*. Would it make sense to keep this name spacing
+> even for the iterator?
+Yes, I'll change the name of those functions to btd_adapter_pincb... .
+After all, those are for iterating the adapter's pincode callback list
+and not /any/ pincode callback list.
 
-Nack.
+>> +     unsigned int attempt;           /* numer of times it() was called */
+>
+> Just use int and not unsigned int. It's what we typically use for
+> iterator variables.
+This "attempt" member is not exactly an iterator variable, but a
+member of an iterator struct. The iterator variable will be of type
+struct pincb_iter *. Also, the attempt member will only take
+non-negative values, so the unsigned version looks more appropriate in
+that case.
 
-This check is there for backwards compatibility with older user space
-versions. Your patch would break all user space versions that do not use
-the management interface (and hence do not have the HCI_LINK_KEYS flag
-set).
-
-That said, the flag is in a way redundant with the HCI_MGMT flag, so the
-check could be changed for that and the HCI_LINK_KEYS flag could then be
-completely removed.
-
-Johan
+Excuse me for not iterate this patch before. I'll try to send an
+update tomorrow including a fix for the bonding retry with a Bluetooth
+2.1+ discoverable but not pairable device.
+Best regards,
+Alex.
