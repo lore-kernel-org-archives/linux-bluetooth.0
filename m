@@ -1,42 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 7 May 2013 15:51:49 +0300
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2] Bluetooth: Fix not sending link key negative reply
-Message-ID: <20130507125147.GB5800@aemeltch-MOBL1>
-References: <20130507060630.GA3766@x220.ger.corp.intel.com>
- <1367923915-6421-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20130507111436.GA11154@x220>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130507111436.GA11154@x220>
+Subject: [PATCH] Bluetooth: Use HCI_MGMT instead of HCI_LINK_KEYS flag
+Date: Tue,  7 May 2013 14:57:05 +0300
+Message-Id: <1367927825-8921-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <20130507114116.GA11873@x220>
+References: <20130507114116.GA11873@x220>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Tue, May 07, 2013 at 02:14:36PM +0300, Johan Hedberg wrote:
-> Hi Andrei,
-> 
-> On Tue, May 07, 2013, Andrei Emeltchenko wrote:
-> > If Link Keys are not loaded during initialization with
-> > MGMT_OP_LOAD_LINK_KEYS command then pairing always fails
-> > since HCI_LINK_KEYS is not set. Check instead for HCI_MGMT
-> > flag.
-> > 
-> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > ---
-> > *v2 modified patch following Johan's comments
-> 
-> The existing behavior is intentional with the implicit assumption that a
-> mgmt_load_link_keys will always be received, if only to set the debug
-> keys flag in case of no link keys. 
+Remove HCI_LINK_KEYS flag since standard HCI_MGMT can be used instead.
+There is also problem with HCI_LINK_KEYS flag since it is set only
+when link keys are loaded. Otherwise kernel assumes that old
+interface is used and pairing always fails.
 
-There is a valid case that there is no bonded devices and we leave default
-debug flags. In that case pairing always fails.
+Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+---
+ include/net/bluetooth/hci.h | 1 -
+ net/bluetooth/hci_event.c   | 4 ++--
+ net/bluetooth/mgmt.c        | 2 --
+ 3 files changed, 2 insertions(+), 5 deletions(-)
 
-For example I need to execute "dummy link keys loading" just to be able to pair.
-
-Best regards 
-Andrei Emeltchenko 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index e0512aa..3c592cf 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -107,7 +107,6 @@ enum {
+ 	HCI_MGMT,
+ 	HCI_PAIRABLE,
+ 	HCI_SERVICE_CACHE,
+-	HCI_LINK_KEYS,
+ 	HCI_DEBUG_KEYS,
+ 	HCI_UNREGISTER,
+ 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index db58e72..0437200 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2611,7 +2611,7 @@ static void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
+-	if (!test_bit(HCI_LINK_KEYS, &hdev->dev_flags))
++	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
+ 		return;
+ 
+ 	hci_dev_lock(hdev);
+@@ -2687,7 +2687,7 @@ static void hci_link_key_notify_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_conn_drop(conn);
+ 	}
+ 
+-	if (test_bit(HCI_LINK_KEYS, &hdev->dev_flags))
++	if (test_bit(HCI_MGMT, &hdev->dev_flags))
+ 		hci_add_link_key(hdev, conn, 1, &ev->bdaddr, ev->link_key,
+ 				 ev->key_type, pin_len);
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 8567764..5cd3aee 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1736,8 +1736,6 @@ static int load_link_keys(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	hci_link_keys_clear(hdev);
+ 
+-	set_bit(HCI_LINK_KEYS, &hdev->dev_flags);
+-
+ 	if (cp->debug_keys)
+ 		set_bit(HCI_DEBUG_KEYS, &hdev->dev_flags);
+ 	else
+-- 
+1.8.1.2
 
