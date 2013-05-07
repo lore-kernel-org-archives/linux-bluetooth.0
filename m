@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH BlueZ v2 2/3] profile: Fix remotely initiated connections without service
-Date: Tue,  7 May 2013 18:58:14 +0200
-Message-Id: <1367945895-18926-3-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH BlueZ v2 1/3] device: Add function to find a given service
+Date: Tue,  7 May 2013 18:58:13 +0200
+Message-Id: <1367945895-18926-2-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1367945895-18926-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1367945895-18926-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,55 +12,52 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Remotely initiated connections need to be associated to a service
-instance to avoid the following crash as reported by Vinicius Costa:
-
-bluetoothd[14366]: src/profile.c:ext_confirm() incoming connect from A0:4E:04:F6:F5:05
-bluetoothd[14366]: src/profile.c:ext_confirm() hfp_hf authorizing connection from A0:4E:04:F6:F5:05
-bluetoothd[14366]: src/agent.c:agent_ref() 0x6a85e0: ref=2
-bluetoothd[14366]: src/agent.c:agent_authorize_service() authorize service request was sent for /org/bluez/hci0/dev_A0_4E_04_F6_F5_05
-bluetoothd[14366]: src/profile.c:ext_svc_complete() Services resolved for A0:4E:04:F6:F5:05
-bluetoothd[14366]: src/profile.c:ext_svc_complete() Services resolved but still waiting for authorization
-bluetoothd[14366]: src/profile.c:ext_auth() A0:4E:04:F6:F5:05 authorized to connect to hfp_hf
-bluetoothd[14366]: src/agent.c:agent_unref() 0x6a85e0: ref=1
-bluetoothd[14366]: src/profile.c:ext_connect() hfp_hf connected to A0:4E:04:F6:F5:05
-
-Program received signal SIGSEGV, Segmentation fault.
-btd_service_connecting_complete (service=0x0, err=err@entry=0) at src/service.c:315
-315		if (service->state != BTD_SERVICE_STATE_DISCONNECTED &&
+Search within the list of services for a given remote UUID.
 ---
- src/profile.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ src/device.c | 16 ++++++++++++++++
+ src/device.h |  3 +++
+ 2 files changed, 19 insertions(+)
 
-diff --git a/src/profile.c b/src/profile.c
-index 0500983..6a71627 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -1044,6 +1044,7 @@ static struct ext_io *create_conn(struct ext_io *server, GIOChannel *io,
- 						bdaddr_t *src, bdaddr_t *dst)
- {
- 	struct btd_device *device;
-+	struct btd_service *service;
- 	struct ext_io *conn;
- 	GIOCondition cond;
+diff --git a/src/device.c b/src/device.c
+index ff4c553..14c3e81 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -4376,6 +4376,22 @@ static void service_state_changed(struct btd_service *service,
+ 		device_profile_disconnected(device, profile, err);
+ }
  
-@@ -1055,9 +1056,15 @@ static struct ext_io *create_conn(struct ext_io *server, GIOChannel *io,
- 
- 	device = adapter_find_device(server->adapter, dst);
- 
--	if (device)
-+	if (device) {
- 		conn->device = btd_device_ref(device);
- 
-+		service = btd_device_get_service(device,
-+						server->ext->remote_uuid);
-+		if (service)
-+			conn->service = btd_service_ref(service);
++struct btd_service *btd_device_get_service(struct btd_device *dev,
++						const char *remote_uuid)
++{
++	GSList *l;
++
++	for (l = dev->services; l != NULL; l = g_slist_next(l)) {
++		struct btd_service *service = l->data;
++		struct btd_profile *p = btd_service_get_profile(service);
++
++		if (g_str_equal(p->remote_uuid, remote_uuid))
++			return service;
 +	}
 +
- 	cond = G_IO_HUP | G_IO_ERR | G_IO_NVAL;
- 	conn->io_id = g_io_add_watch(io, cond, ext_io_disconnected, conn);
++	return NULL;
++}
++
+ void btd_device_init(void)
+ {
+ 	dbus_conn = btd_get_dbus_connection();
+diff --git a/src/device.h b/src/device.h
+index 7cd11af..70e1502 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -121,5 +121,8 @@ unsigned int device_wait_for_svc_complete(struct btd_device *dev,
+ bool device_remove_svc_complete_callback(struct btd_device *dev,
+ 							unsigned int id);
  
++struct btd_service *btd_device_get_service(struct btd_device *dev,
++						const char *remote_uuid);
++
+ void btd_device_init(void);
+ void btd_device_cleanup(void);
 -- 
 1.8.1.4
 
