@@ -1,43 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20130430081629.GA777@x220.ger.corp.intel.com>
-References: <1367006741-28907-1-git-send-email-deymo@chromium.org>
- <1367006741-28907-2-git-send-email-deymo@chromium.org> <20130430081629.GA777@x220.ger.corp.intel.com>
 From: Alex Deymo <deymo@chromium.org>
-Date: Mon, 6 May 2013 21:20:11 -0700
-Message-ID: <CAGd9gwgGMyHPN9BBSS7bqbbaqsx5QVvFqf6+V5e-t4yveN_kig@mail.gmail.com>
-Subject: Re: [PATCH v4 1/8] core: Convert the pincode callback to an interable list.
-To: Alex Deymo <deymo@chromium.org>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>, keybuk <keybuk@chromium.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Cc: keybuk@chromium.org, vinicius.gomes@openbossa.org,
+	Alex Deymo <deymo@chromium.org>
+Subject: [PATCH] core: Don't update a known long name with a short name.
+Date: Mon,  6 May 2013 20:31:57 -0700
+Message-Id: <1367897517-12309-1-git-send-email-deymo@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+update_found_devices() could attempt to update a device with new information
+containing only a short verstion of the name. If the struct eir_data passed
+has a short or NULL name, it will never update a previous name and will
+also trigger a "HCI Command: Remote Name Request" if the previous name was
+unknown.
+---
+ src/adapter.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-On Tue, Apr 30, 2013 at 1:16 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> On Fri, Apr 26, 2013, Alex Deymo wrote:
->> +struct pincb_iter {
->
-> What concerns me a bit about this is that you're now introducing the
-> first symbols exported by adapter.{c.h} that are not name spaced with
-> btd_adapter* or adapter*. Would it make sense to keep this name spacing
-> even for the iterator?
-Yes, I'll change the name of those functions to btd_adapter_pincb... .
-After all, those are for iterating the adapter's pincode callback list
-and not /any/ pincode callback list.
+diff --git a/src/adapter.c b/src/adapter.c
+index 1252e74..b952ea1 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -4060,6 +4060,7 @@ static void update_found_devices(struct btd_adapter *adapter,
+ 	char addr[18];
+ 	int err;
+ 	GSList *list;
++	bool name_known;
+ 
+ 	memset(&eir_data, 0, sizeof(eir_data));
+ 	err = eir_parse(&eir_data, data, data_len);
+@@ -4116,7 +4117,11 @@ static void update_found_devices(struct btd_adapter *adapter,
+ 	if (eir_data.appearance != 0)
+ 		device_set_appearance(dev, eir_data.appearance);
+ 
+-	if (eir_data.name)
++	/* Report an unknown name to the kernel even if there is a short name
++	 * known, but still update the name with the known short name. */
++	name_known = device_name_known(dev);
++
++	if (eir_data.name && (eir_data.name_complete || !name_known))
+ 		device_set_name(dev, eir_data.name);
+ 
+ 	if (eir_data.class != 0)
+@@ -4139,8 +4144,7 @@ static void update_found_devices(struct btd_adapter *adapter,
+ 		return;
+ 
+ 	if (confirm)
+-		confirm_name(adapter, bdaddr, bdaddr_type,
+-						device_name_known(dev));
++		confirm_name(adapter, bdaddr, bdaddr_type, name_known);
+ 
+ 	adapter->discovery_found = g_slist_prepend(adapter->discovery_found,
+ 									dev);
+-- 
+1.8.2.1
 
->> +     unsigned int attempt;           /* numer of times it() was called */
->
-> Just use int and not unsigned int. It's what we typically use for
-> iterator variables.
-This "attempt" member is not exactly an iterator variable, but a
-member of an iterator struct. The iterator variable will be of type
-struct pincb_iter *. Also, the attempt member will only take
-non-negative values, so the unsigned version looks more appropriate in
-that case.
-
-Excuse me for not iterate this patch before. I'll try to send an
-update tomorrow including a fix for the bonding retry with a Bluetooth
-2.1+ discoverable but not pairable device.
-Best regards,
-Alex.
