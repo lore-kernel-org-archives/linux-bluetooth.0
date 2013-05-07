@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH BlueZ v1 2/3] profile: Fix remotely initiated connections without service
-Date: Tue,  7 May 2013 09:44:03 +0200
-Message-Id: <1367912644-17401-3-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH BlueZ v1 3/3] profile: Error-cases for incoming connections
+Date: Tue,  7 May 2013 09:44:04 +0200
+Message-Id: <1367912644-17401-4-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1367912644-17401-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1367912644-17401-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,55 +12,73 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Remotely initiated connections need to be associated to a service
-instance to avoid the following crash as reported by Vinicius Costa:
-
-bluetoothd[14366]: src/profile.c:ext_confirm() incoming connect from A0:4E:04:F6:F5:05
-bluetoothd[14366]: src/profile.c:ext_confirm() hfp_hf authorizing connection from A0:4E:04:F6:F5:05
-bluetoothd[14366]: src/agent.c:agent_ref() 0x6a85e0: ref=2
-bluetoothd[14366]: src/agent.c:agent_authorize_service() authorize service request was sent for /org/bluez/hci0/dev_A0_4E_04_F6_F5_05
-bluetoothd[14366]: src/profile.c:ext_svc_complete() Services resolved for A0:4E:04:F6:F5:05
-bluetoothd[14366]: src/profile.c:ext_svc_complete() Services resolved but still waiting for authorization
-bluetoothd[14366]: src/profile.c:ext_auth() A0:4E:04:F6:F5:05 authorized to connect to hfp_hf
-bluetoothd[14366]: src/agent.c:agent_unref() 0x6a85e0: ref=1
-bluetoothd[14366]: src/profile.c:ext_connect() hfp_hf connected to A0:4E:04:F6:F5:05
-
-Program received signal SIGSEGV, Segmentation fault.
-btd_service_connecting_complete (service=0x0, err=err@entry=0) at src/service.c:315
-315		if (service->state != BTD_SERVICE_STATE_DISCONNECTED &&
+When an incoming connection attempt is received, if the corresponding
+device or service is not found, handle the error-case.
 ---
- src/profile.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ src/profile.c | 31 ++++++++++++++++++++-----------
+ 1 file changed, 20 insertions(+), 11 deletions(-)
 
 diff --git a/src/profile.c b/src/profile.c
-index 0500983..6a71627 100644
+index 6a71627..aab7e33 100644
 --- a/src/profile.c
 +++ b/src/profile.c
-@@ -1044,6 +1044,7 @@ static struct ext_io *create_conn(struct ext_io *server, GIOChannel *io,
- 						bdaddr_t *src, bdaddr_t *dst)
- {
- 	struct btd_device *device;
-+	struct btd_service *service;
+@@ -1048,22 +1048,26 @@ static struct ext_io *create_conn(struct ext_io *server, GIOChannel *io,
  	struct ext_io *conn;
  	GIOCondition cond;
  
-@@ -1055,9 +1056,15 @@ static struct ext_io *create_conn(struct ext_io *server, GIOChannel *io,
- 
- 	device = adapter_find_device(server->adapter, dst);
- 
--	if (device)
-+	if (device) {
- 		conn->device = btd_device_ref(device);
- 
-+		service = btd_device_get_service(device,
-+						server->ext->remote_uuid);
-+		if (service)
-+			conn->service = btd_service_ref(service);
++	device = adapter_find_device(server->adapter, dst);
++	if (device == NULL) {
++		error("%s device %s not found", server->ext->name, src);
++		return NULL;
 +	}
 +
++	service = btd_device_get_service(device, server->ext->remote_uuid);
++	if (service == NULL) {
++		error("%s service not found for device %s", server->ext->name,
++									src);
++		return NULL;
++	}
++
+ 	conn = g_new0(struct ext_io, 1);
+ 	conn->io = g_io_channel_ref(io);
+ 	conn->proto = server->proto;
+ 	conn->ext = server->ext;
+ 	conn->adapter = btd_adapter_ref(server->adapter);
+-
+-	device = adapter_find_device(server->adapter, dst);
+-
+-	if (device) {
+-		conn->device = btd_device_ref(device);
+-
+-		service = btd_device_get_service(device,
+-						server->ext->remote_uuid);
+-		if (service)
+-			conn->service = btd_service_ref(service);
+-	}
++	conn->device = btd_device_ref(device);
++	conn->service = btd_service_ref(service);
+ 
  	cond = G_IO_HUP | G_IO_ERR | G_IO_NVAL;
  	conn->io_id = g_io_add_watch(io, cond, ext_io_disconnected, conn);
+@@ -1137,6 +1141,8 @@ static void ext_confirm(GIOChannel *io, gpointer user_data)
+ 	DBG("incoming connect from %s", addr);
  
+ 	conn = create_conn(server, io, &src, &dst);
++	if (conn == NULL)
++		return;
+ 
+ 	conn->auth_id = btd_request_authorization(&src, &dst, uuid, ext_auth,
+ 									conn);
+@@ -1175,6 +1181,9 @@ static void ext_direct_connect(GIOChannel *io, GError *err, gpointer user_data)
+ 	}
+ 
+ 	conn = create_conn(server, io, &src, &dst);
++	if (conn == NULL)
++		return;
++
+ 	ext->conns = g_slist_append(ext->conns, conn);
+ 
+ 	ext_connect(io, err, conn);
 -- 
 1.8.1.4
 
