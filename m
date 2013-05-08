@@ -1,95 +1,174 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAGd9gwjqSiH3=JwR80VcuXf2Z7KA8zOsYFT9N5gAZgZnTfF2wQ@mail.gmail.com>
-References: <CAGd9gwjqSiH3=JwR80VcuXf2Z7KA8zOsYFT9N5gAZgZnTfF2wQ@mail.gmail.com>
-Date: Wed, 8 May 2013 17:25:59 +0300
-Message-ID: <CABBYNZ+dE7Pkt5-RpzQQ1YSgj9pa4cM+MMDwGKFmdidApDtUKQ@mail.gmail.com>
-Subject: Re: Audio sink stream remains suspended on reconnection
+In-Reply-To: <1366374673-24937-1-git-send-email-luiz.dentz@gmail.com>
+References: <1366374673-24937-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 8 May 2013 17:06:30 +0300
+Message-ID: <CABBYNZKZVmSZ4egGkZUOt6v0NxmNq8AorBO_CRX0rPh5ZyrgpQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/6] AVCTP: Add support to register pass-through handler
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Alex Deymo <deymo@chromium.org>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	keybuk <keybuk@chromium.org>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi,
 
-On Wed, May 8, 2013 at 2:47 AM, Alex Deymo <deymo@chromium.org> wrote:
-> bluetoothd[21017]: profiles/audio/avdtp.c:session_cb()
-> bluetoothd[21017]: profiles/audio/avdtp.c:avdtp_parse_cmd() Received SUSPEND_CMD
-> bluetoothd[21017]: profiles/audio/a2dp.c:suspend_ind() Source
-> 0x7f2acd437a00: Suspend_Ind
-> bluetoothd[21017]: profiles/audio/avdtp.c:avdtp_sep_set_state() stream
-> state changed: STREAMING -> OPEN
-> bluetoothd[21017]: profiles/audio/sink.c:sink_set_state() State
-> changed /org/bluez/hci0/dev_10_B7_F6_01_31_ED: SINK_STATE_PLAYING ->
-> SINK_STATE_CONNECTED
-> bluetoothd[21017]:
-> profiles/audio/transport.c:transport_update_playing()
-> /org/bluez/hci0/dev_10_B7_F6_01_31_ED/fd3 State=TRANSPORT_STATE_ACTIVE
-> Playing=0
-> bluetoothd[21017]:
-> profiles/audio/transport.c:media_transport_remove_owner() Transport
-> /org/bluez/hci0/dev_10_B7_F6_01_31_ED/fd3 Owner :1.1198
-> bluetoothd[21017]: profiles/audio/transport.c:media_owner_free() Owner :1.1198
-> bluetoothd[21017]: profiles/audio/transport.c:transport_set_state()
-> State changed /org/bluez/hci0/dev_10_B7_F6_01_31_ED/fd3:
-> TRANSPORT_STATE_ACTIVE -> TRANSPORT_STATE_IDLE
-> bluetoothd[21017]: profiles/audio/a2dp.c:a2dp_sep_unlock() SEP
-> 0x7f2acd437a00 unlocked
-
-There device request the stream to be suspended, which is what it
-happens and the transport is then set to idle state which should
-indicate to the endpoint what happened.
-
+On Fri, Apr 19, 2013 at 3:31 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> bluetoothd[21017]: profiles/audio/avdtp.c:session_cb()
-> bluetoothd[21017]: profiles/audio/avdtp.c:avdtp_parse_cmd() Received START_CMD
-> bluetoothd[21017]: profiles/audio/a2dp.c:start_ind() Source
-> 0x7f2acd437a00: Start_Ind
-> bluetoothd[21017]: profiles/audio/avdtp.c:avdtp_ref() 0x7f2acd43ce70: ref=3
-> bluetoothd[21017]: profiles/audio/avdtp.c:avdtp_sep_set_state() stream
-> state changed: OPEN -> STREAMING
-> bluetoothd[21017]: profiles/audio/sink.c:sink_set_state() State
-> changed /org/bluez/hci0/dev_10_B7_F6_01_31_ED: SINK_STATE_CONNECTED ->
-> SINK_STATE_PLAYING
-> bluetoothd[21017]:
-> profiles/audio/transport.c:transport_update_playing()
-> /org/bluez/hci0/dev_10_B7_F6_01_31_ED/fd3 State=TRANSPORT_STATE_IDLE
-> Playing=1
-> bluetoothd[21017]: profiles/audio/transport.c:transport_set_state()
-> State changed /org/bluez/hci0/dev_10_B7_F6_01_31_ED/fd3:
-> TRANSPORT_STATE_IDLE -> TRANSPORT_STATE_PENDING
-> bluetoothd[21017]: profiles/audio/avdtp.c:avdtp_unref() 0x7f2acd43ce70: ref=2
-
-Here it asks the stream to resume, transport state goes to pending
-which normally triggers the endpoint to Acquire the fd.
-
+> Pass-through handler can be used to capture AV/C Panel commands before
+> they are sent to uinput.
+> ---
+>  profiles/audio/avctp.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  profiles/audio/avctp.h |  8 ++++++
+>  2 files changed, 80 insertions(+)
 >
-> bluetoothd[21017]: profiles/audio/avdtp.c:session_cb()
-> bluetoothd[21017]: profiles/audio/avdtp.c:avdtp_parse_resp() SUSPEND
-> request succeeded
-> bluetoothd[21017]: profiles/audio/avdtp.c:avdtp_sep_set_state() stream
-> state changed: STREAMING -> OPEN
-> bluetoothd[21017]: profiles/audio/sink.c:sink_set_state() State
-> changed /org/bluez/hci0/dev_10_B7_F6_01_31_ED: SINK_STATE_PLAYING ->
-> SINK_STATE_CONNECTED
-> bluetoothd[21017]:
-> profiles/audio/transport.c:transport_update_playing()
-> /org/bluez/hci0/dev_10_B7_F6_01_31_ED/fd3
-> State=TRANSPORT_STATE_PENDING Playing=0
-> bluetoothd[21017]: profiles/audio/transport.c:transport_set_state()
-> State changed /org/bluez/hci0/dev_10_B7_F6_01_31_ED/fd3:
-> TRANSPORT_STATE_PENDING -> TRANSPORT_STATE_IDLE
-> bluetoothd[21017]: profiles/audio/a2dp.c:suspend_cfm() Source
-> 0x7f2acd437a00: Suspend_Cfm
+> diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+> index 21aeb6f..705bf71 100644
+> --- a/profiles/audio/avctp.c
+> +++ b/profiles/audio/avctp.c
+> @@ -192,10 +192,18 @@ struct avctp {
+>         struct avctp_channel *control;
+>         struct avctp_channel *browsing;
+>
+> +       struct avctp_passthrough_handler *handler;
+> +
+>         uint8_t key_quirks[256];
+>         struct key_pressed *key;
+>  };
+>
+> +struct avctp_passthrough_handler {
+> +       avctp_passthrough_cb cb;
+> +       void *user_data;
+> +       unsigned int id;
+> +};
+> +
+>  struct avctp_pdu_handler {
+>         uint8_t opcode;
+>         avctp_control_pdu_cb cb;
+> @@ -280,6 +288,8 @@ static size_t handle_panel_passthrough(struct avctp *session,
+>                                         uint8_t *subunit, uint8_t *operands,
+>                                         size_t operand_count, void *user_data)
+>  {
+> +       struct key_pressed *key = session->key;
+> +       struct avctp_passthrough_handler *handler = session->handler;
+>         const char *status;
+>         int pressed, i;
+>
+> @@ -299,6 +309,12 @@ static size_t handle_panel_passthrough(struct avctp *session,
+>                 pressed = 1;
+>         }
+>
+> +       if (key == NULL && handler != NULL) {
+> +               if (handler->cb(session, operands[0] & 0x7F,
+> +                                               pressed, handler->user_data))
+> +                       goto done;
+> +       }
+> +
+>         for (i = 0; key_map[i].name != NULL; i++) {
+>                 uint8_t key_quirks;
+>
+> @@ -321,6 +337,16 @@ static size_t handle_panel_passthrough(struct avctp *session,
+>                         break;
+>                 }
+>
+> +               if (pressed) {
+> +                       if (key == NULL)
+> +                               key = g_new0(struct key_pressed, 1);
+> +                       key->op = key_map[i].avc;
+> +                       session->key = key;
+> +               } else if (key && key->op == key_map[i].avc) {
+> +                       g_free(key);
+> +                       session->key = NULL;
+> +               }
+> +
+>                 send_key(session->uinput, key_map[i].uinput, pressed);
+>                 break;
+>         }
+> @@ -1692,6 +1718,52 @@ gboolean avctp_remove_state_cb(unsigned int id)
+>         return FALSE;
+>  }
+>
+> +unsigned int avctp_register_passthrough_handler(struct avctp *session,
+> +                                               avctp_passthrough_cb cb,
+> +                                               void *user_data)
+> +{
+> +       struct avctp_channel *control = session->control;
+> +       struct avctp_passthrough_handler *handler;
+> +       static unsigned int id = 0;
+> +
+> +       if (control == NULL || session->handler != NULL)
+> +               return 0;
+> +
+> +       handler = g_new(struct avctp_passthrough_handler, 1);
+> +       handler->cb = cb;
+> +       handler->user_data = user_data;
+> +       handler->id = ++id;
+> +
+> +       session->handler = handler;
+> +
+> +       return handler->id;
+> +}
+> +
+> +bool avctp_unregister_passthrough_handler(unsigned int id)
+> +{
+> +       GSList *l;
+> +
+> +       for (l = servers; l; l = l->next) {
+> +               struct avctp_server *server = l->data;
+> +               GSList *s;
+> +
+> +               for (s = server->sessions; s; s = s->next) {
+> +                       struct avctp *session = s->data;
+> +
+> +                       if (session->handler == NULL)
+> +                               continue;
+> +
+> +                       if (session->handler->id == id) {
+> +                               g_free(session->handler);
+> +                               session->handler = NULL;
+> +                               return true;
+> +                       }
+> +               }
+> +       }
+> +
+> +       return false;
+> +}
+> +
+>  unsigned int avctp_register_pdu_handler(struct avctp *session, uint8_t opcode,
+>                                                 avctp_control_pdu_cb cb,
+>                                                 void *user_data)
+> diff --git a/profiles/audio/avctp.h b/profiles/audio/avctp.h
+> index 648e982..0a414af 100644
+> --- a/profiles/audio/avctp.h
+> +++ b/profiles/audio/avctp.h
+> @@ -94,6 +94,9 @@ typedef void (*avctp_state_cb) (struct audio_device *dev,
+>                                 avctp_state_t old_state,
+>                                 avctp_state_t new_state);
+>
+> +typedef bool (*avctp_passthrough_cb) (struct avctp *session,
+> +                                       uint8_t op, bool pressed,
+> +                                       void *user_data);
+>  typedef size_t (*avctp_control_pdu_cb) (struct avctp *session,
+>                                         uint8_t transaction, uint8_t *code,
+>                                         uint8_t *subunit, uint8_t *operands,
+> @@ -120,6 +123,11 @@ struct avctp *avctp_get(struct audio_device *device);
+>  int avctp_connect_browsing(struct avctp *session);
+>  void avctp_disconnect(struct avctp *session);
+>
+> +unsigned int avctp_register_passthrough_handler(struct avctp *session,
+> +                                               avctp_passthrough_cb cb,
+> +                                               void *user_data);
+> +bool avctp_unregister_passthrough_handler(unsigned int id);
+> +
+>  unsigned int avctp_register_pdu_handler(struct avctp *session, uint8_t opcode,
+>                                                 avctp_control_pdu_cb cb,
+>                                                 void *user_data);
+> --
+> 1.8.1.4
 
-The endpoint probably didn't acquire the fd so we suspend the stream.
-Anyway the device is misbehaving if it is sending suspend and start
-commands like that (perhaps you are pressing play/pause buttons?) but
-if you don't wan't the stream to auto suspend you just need to Acquire
-when the transport is in pending state.
+It seems this did not get into upstream, can I go ahead and apply this set?
 
 
 --
