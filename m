@@ -1,175 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 8 May 2013 10:57:49 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/2] gdbus: Fix segfault when D-Bus daemon exits
+Message-ID: <20130508075749.GA12128@x220>
+References: <1367696383-14831-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
-In-Reply-To: <1366374673-24937-1-git-send-email-luiz.dentz@gmail.com>
-References: <1366374673-24937-1-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 8 May 2013 17:06:30 +0300
-Message-ID: <CABBYNZKZVmSZ4egGkZUOt6v0NxmNq8AorBO_CRX0rPh5ZyrgpQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/6] AVCTP: Add support to register pass-through handler
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1367696383-14831-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lizardo,
 
-On Fri, Apr 19, 2013 at 3:31 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> Pass-through handler can be used to capture AV/C Panel commands before
-> they are sent to uinput.
+On Sat, May 04, 2013, Anderson Lizardo wrote:
+> Fix this crash if D-Bus exits while the client is still connected to it:
+> 
+> ==5570== Invalid read of size 1
+> ==5570==    at 0x402D28E: strcmp (in
+> /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+> ==5570==    by 0x4070E22: g_str_equal (ghash.c:1704)
+> ==5570==    by 0x8055F61: message_filter (client.c:1123)
+> ==5570==    by 0x4141500: dbus_connection_dispatch (in
+> /lib/i386-linux-gnu/libdbus-1.so.3.5.8)
+> ==5570==    by 0x80506F7: message_dispatch (mainloop.c:76)
+> ==5570==    by 0x4081A7E: g_timeout_dispatch (gmain.c:3882)
+> ==5570==    by 0x4080D85: g_main_context_dispatch (gmain.c:2539)
+> ==5570==    by 0x4081124: g_main_context_iterate.isra.21 (gmain.c:3146)
+> ==5570==    by 0x408156A: g_main_loop_run (gmain.c:3340)
+> ==5570==    by 0x41BF4D2: (below main) (libc-start.c:226)
+> ==5570==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
+> ==5570==
+> ==5570==
 > ---
->  profiles/audio/avctp.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  profiles/audio/avctp.h |  8 ++++++
->  2 files changed, 80 insertions(+)
->
-> diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-> index 21aeb6f..705bf71 100644
-> --- a/profiles/audio/avctp.c
-> +++ b/profiles/audio/avctp.c
-> @@ -192,10 +192,18 @@ struct avctp {
->         struct avctp_channel *control;
->         struct avctp_channel *browsing;
->
-> +       struct avctp_passthrough_handler *handler;
-> +
->         uint8_t key_quirks[256];
->         struct key_pressed *key;
->  };
->
-> +struct avctp_passthrough_handler {
-> +       avctp_passthrough_cb cb;
-> +       void *user_data;
-> +       unsigned int id;
-> +};
-> +
->  struct avctp_pdu_handler {
->         uint8_t opcode;
->         avctp_control_pdu_cb cb;
-> @@ -280,6 +288,8 @@ static size_t handle_panel_passthrough(struct avctp *session,
->                                         uint8_t *subunit, uint8_t *operands,
->                                         size_t operand_count, void *user_data)
->  {
-> +       struct key_pressed *key = session->key;
-> +       struct avctp_passthrough_handler *handler = session->handler;
->         const char *status;
->         int pressed, i;
->
-> @@ -299,6 +309,12 @@ static size_t handle_panel_passthrough(struct avctp *session,
->                 pressed = 1;
->         }
->
-> +       if (key == NULL && handler != NULL) {
-> +               if (handler->cb(session, operands[0] & 0x7F,
-> +                                               pressed, handler->user_data))
-> +                       goto done;
-> +       }
-> +
->         for (i = 0; key_map[i].name != NULL; i++) {
->                 uint8_t key_quirks;
->
-> @@ -321,6 +337,16 @@ static size_t handle_panel_passthrough(struct avctp *session,
->                         break;
->                 }
->
-> +               if (pressed) {
-> +                       if (key == NULL)
-> +                               key = g_new0(struct key_pressed, 1);
-> +                       key->op = key_map[i].avc;
-> +                       session->key = key;
-> +               } else if (key && key->op == key_map[i].avc) {
-> +                       g_free(key);
-> +                       session->key = NULL;
-> +               }
-> +
->                 send_key(session->uinput, key_map[i].uinput, pressed);
->                 break;
->         }
-> @@ -1692,6 +1718,52 @@ gboolean avctp_remove_state_cb(unsigned int id)
->         return FALSE;
->  }
->
-> +unsigned int avctp_register_passthrough_handler(struct avctp *session,
-> +                                               avctp_passthrough_cb cb,
-> +                                               void *user_data)
-> +{
-> +       struct avctp_channel *control = session->control;
-> +       struct avctp_passthrough_handler *handler;
-> +       static unsigned int id = 0;
-> +
-> +       if (control == NULL || session->handler != NULL)
-> +               return 0;
-> +
-> +       handler = g_new(struct avctp_passthrough_handler, 1);
-> +       handler->cb = cb;
-> +       handler->user_data = user_data;
-> +       handler->id = ++id;
-> +
-> +       session->handler = handler;
-> +
-> +       return handler->id;
-> +}
-> +
-> +bool avctp_unregister_passthrough_handler(unsigned int id)
-> +{
-> +       GSList *l;
-> +
-> +       for (l = servers; l; l = l->next) {
-> +               struct avctp_server *server = l->data;
-> +               GSList *s;
-> +
-> +               for (s = server->sessions; s; s = s->next) {
-> +                       struct avctp *session = s->data;
-> +
-> +                       if (session->handler == NULL)
-> +                               continue;
-> +
-> +                       if (session->handler->id == id) {
-> +                               g_free(session->handler);
-> +                               session->handler = NULL;
-> +                               return true;
-> +                       }
-> +               }
-> +       }
-> +
-> +       return false;
-> +}
-> +
->  unsigned int avctp_register_pdu_handler(struct avctp *session, uint8_t opcode,
->                                                 avctp_control_pdu_cb cb,
->                                                 void *user_data)
-> diff --git a/profiles/audio/avctp.h b/profiles/audio/avctp.h
-> index 648e982..0a414af 100644
-> --- a/profiles/audio/avctp.h
-> +++ b/profiles/audio/avctp.h
-> @@ -94,6 +94,9 @@ typedef void (*avctp_state_cb) (struct audio_device *dev,
->                                 avctp_state_t old_state,
->                                 avctp_state_t new_state);
->
-> +typedef bool (*avctp_passthrough_cb) (struct avctp *session,
-> +                                       uint8_t op, bool pressed,
-> +                                       void *user_data);
->  typedef size_t (*avctp_control_pdu_cb) (struct avctp *session,
->                                         uint8_t transaction, uint8_t *code,
->                                         uint8_t *subunit, uint8_t *operands,
-> @@ -120,6 +123,11 @@ struct avctp *avctp_get(struct audio_device *device);
->  int avctp_connect_browsing(struct avctp *session);
->  void avctp_disconnect(struct avctp *session);
->
-> +unsigned int avctp_register_passthrough_handler(struct avctp *session,
-> +                                               avctp_passthrough_cb cb,
-> +                                               void *user_data);
-> +bool avctp_unregister_passthrough_handler(unsigned int id);
-> +
->  unsigned int avctp_register_pdu_handler(struct avctp *session, uint8_t opcode,
->                                                 avctp_control_pdu_cb cb,
->                                                 void *user_data);
-> --
-> 1.8.1.4
+>  gdbus/client.c |    2 ++
+>  1 file changed, 2 insertions(+)
 
-It seems this did not get into upstream, can I go ahead and apply this set?
+Both patches have been applied. Thanks.
 
-
---
-Luiz Augusto von Dentz
+Johan
