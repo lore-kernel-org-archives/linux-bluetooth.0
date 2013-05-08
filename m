@@ -1,30 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 8 May 2013 10:22:29 +0300
+Date: Wed, 8 May 2013 10:18:26 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Alex Deymo <deymo@chromium.org>
-Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org,
-	vinicius.gomes@openbossa.org
-Subject: Re: [PATCH] core: Don't update a known long name with a short name.
-Message-ID: <20130508072229.GC9401@x220>
-References: <1367897517-12309-1-git-send-email-deymo@chromium.org>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: Re: [PATCH BlueZ v2 0/3] Issue with incoming connections
+Message-ID: <20130508071826.GB9401@x220>
+References: <1367945895-18926-1-git-send-email-mikel.astiz.oss@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1367897517-12309-1-git-send-email-deymo@chromium.org>
+In-Reply-To: <1367945895-18926-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Mikel,
 
-On Mon, May 06, 2013, Alex Deymo wrote:
-> update_found_devices() could attempt to update a device with new information
-> containing only a short verstion of the name. If the struct eir_data passed
-> has a short or NULL name, it will never update a previous name and will
-> also trigger a "HCI Command: Remote Name Request" if the previous name was
-> unknown.
-> ---
->  src/adapter.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
+On Tue, May 07, 2013, Mikel Astiz wrote:
+> v2 fixes the error message in patch 3/3 as pointed out by Vinicius.
+> The rest remains unchanged.
+> 
+> From original cover-letter:
+> 
+> Vinicius reported this issue and tried to fix it in his patch
+> "profile: Create a service for incomming connections".
+> 
+> As compared to his original patch, this patchset avoid creating an
+> additional service instance (which should already be created) and
+> instead performs a search within the list of existing services for the
+> given device.
+> 
+> Mikel Astiz (3):
+>   device: Add function to find a given service
+>   profile: Fix remotely initiated connections without service
+>   profile: Error-cases for incoming connections
+> 
+>  src/device.c  | 16 ++++++++++++++++
+>  src/device.h  |  3 +++
+>  src/profile.c | 29 ++++++++++++++++++++++++-----
+>  3 files changed, 43 insertions(+), 5 deletions(-)
 
-Applied. Thanks.
+All three patches have been applied. Thanks.
 
 Johan
