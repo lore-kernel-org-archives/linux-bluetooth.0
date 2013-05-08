@@ -1,92 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 8 May 2013 10:41:38 +0300
+Date: Wed, 8 May 2013 10:26:12 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Rymarkiewicz Waldemar <waldemar.rymarkiewicz@tieto.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC] bloodpressure: Add Blood Pressure API
-Message-ID: <20130508074138.GA11502@x220>
-References: <1360668097-28906-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <C4340FC6-1121-468E-B15D-68E2770AA07E@holtmann.org>
- <5135D965.8020604@tieto.com>
- <F00262C4-3552-438E-AF44-1D088CAB11A8@holtmann.org>
- <513703AA.2090206@tieto.com>
- <514021F5.1040005@tieto.com>
+To: Alex Deymo <deymo@chromium.org>
+Cc: Vinicius Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	keybuk <keybuk@chromium.org>
+Subject: Re: Short names on Extended Inquiry Result
+Message-ID: <20130508072612.GD9401@x220>
+References: <CAGd9gwjaECWWRE+Ux4XenbUO9L-QSsjnP6wLHEvH5q3sasWWkg@mail.gmail.com>
+ <CAGd9gwj=79xKJ0Mdb1eb+a5MDGtG1a3BcC8utfDad1ZLzhfd5A@mail.gmail.com>
+ <CAE6HaM=cTHJkVKLCdUUD3oHgOFnGYGuVPwD=LSj4iL4U17vE6g@mail.gmail.com>
+ <CAGd9gwiyUaedR6EOMOhpw64iA=_jkM+v08QsNJUteg_d+2mvmg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <514021F5.1040005@tieto.com>
+In-Reply-To: <CAGd9gwiyUaedR6EOMOhpw64iA=_jkM+v08QsNJUteg_d+2mvmg@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Waldek,
+Hi Alex,
 
-On Wed, Mar 13, 2013, Rymarkiewicz Waldemar wrote:
->>>>+Interface	org.bluez.BloodPressure1
->>>>+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
->>>>+
->>>>+Methods		RegisterWatcher(object watcher)
->>>>+
->>>>+			Registers a watcher to monitor blood pressure
->>>>+			measurements. This watcher will be notified about
->>>>+			final pressure measurements.
->>>>+
->>>>+			Possible Errors: org.bluez.Error.InvalidArguments
->>>>+
->>>>+		UnregisterWatcher(object watcher)
->>>>+
->>>>+			Unregisters a watcher.
->>>>+
->>>>+		EnableIntermediateMeasurement(object watcher)
->>>>+
->>>>+			Enables intermediate measurement notifications
->>>>+			for this watcher. Intermediate measurements will
->>>>+			be enabled only for devices which support it.
->>>>+
->>>>+			Possible Errors: org.bluez.Error.InvalidArguments
->>>>+					org.bluez.Error.NotSupported
->>>>+
->>>>+		DisableIntermediateMeasurement(object watcher)
->>>>+
->>>>+			Disables intermediate measurement notifications
->>>>+			for this watcher. It will disable notifications in
->>>>+			devices when the last watcher is removed for
->>>>+			intermediate measurements.
->>>>+
->>>>+			Possible Errors: org.bluez.Error.InvalidArguments
->>>>+					org.bluez.Error.NotFound
->>>
->>> why don't we make these two methods parts of a dict for
->>> RegisterWatcher. Enabling them manually seems rather pointless.
->>
->> It's been done intentionally to be able to return "not supported" error
->> when intermediate measurement is not available.
->>
->> Having RegisterWatcher(object watcher, boolean intermediate) and
->> additionally Intermediate property [read only] is an another option.
->>
->> In this case app will check intermediate property and set intermediate
->> param to RegisterWatcher appropriately.
->
-> Any comments on this.
+On Mon, May 06, 2013, Alex Deymo wrote:
+> I though about several options and finally choose tho consider the
+> short name as an unknown name and thus calling the confirm_name() with
+> known_name in FALSE, but also report the device with the short name,
+> while we ask for the long name.
+> 
+> This has the advantage of sending the device found signal earlier, but
+> may have a problem in the following scenario:
+> 1. We have a first call to update_found_devices() with a short name
+> and report it to the user.
+> 2. We request the full name.
+> 3. The device doesn't reply to this request (for any reason)
+> 4. We get a second call to update_found_devices() with a short name...
+> but since we already know "a name" we don't request the long name.
+> 
+> To avoid this I think the best should be to include the name_complete
+> field in the struct btd_device together with the name. What do you
+> think?
 
-Are you still working on this? Seems this discussion was forgotten or
-just abandoned.
-
-Having the intermediate measurement enabling in the registration instead
-of a separate method and you being fine with it (assuming that an
-Intermediate property is added) raises some questions.
-
-Apparently it was never a requirement to be able to enable/disable this
-an arbitrary amount of times during the watcher life time, and instead
-just leave it disabled or enabled until the watcher gets unregistered?
-
-Also, do you think there will be UIs that will refuse to work if a
-device does not support intermediate measurement or that any UI that is
-interested in intermediate measurement will forgive devices that do not
-support it and simply get on with working without it being enabled? If
-the latter is true then why not make an API which allows requesting
-"register watcher and enable intermediate measurement if it's
-supported". In such a case you wouldn't need a separate property and the
-registration would succeed even if intermediate measurement isn't
-supported. Thoughts?
+I'm not completely sure about this. In theory you could have a (broken
+or malicious) device with page scan disabled but inquiry scan enabled
+and such a device would be causing us to block all other baseband
+activity while we wait for a page timeout to happen each time we request
+its name. Since we anyway re-request the name when connecting this might
+not be worth it.
 
 Johan
