@@ -1,80 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <5189C7C6.8090408@asianux.com>
-References: <518906A8.7060708@asianux.com>
-	<CANq1E4SmY+CD0uf53_b6GeFkQ-LYnpdxsDGSRMWdn2i1mnb6WQ@mail.gmail.com>
-	<5189A417.503@asianux.com>
-	<5189C7C6.8090408@asianux.com>
-Date: Wed, 8 May 2013 17:16:25 +0200
-Message-ID: <CANq1E4Q+duvLzwmwN=FHb2AaTQsnSgxRD7T+YsBZLSE-kchR_Q@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: hidp: using strlcpy instead of strncpy,
- also beautify code.
-From: David Herrmann <dh.herrmann@gmail.com>
-To: Chen Gang <gang.chen@asianux.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, David Miller <davem@davemloft.net>,
-	Jiri Kosina <jkosina@suse.cz>, andrei.emeltchenko@intel.com,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, netdev <netdev@vger.kernel.org>
+In-Reply-To: <CAGd9gwjqSiH3=JwR80VcuXf2Z7KA8zOsYFT9N5gAZgZnTfF2wQ@mail.gmail.com>
+References: <CAGd9gwjqSiH3=JwR80VcuXf2Z7KA8zOsYFT9N5gAZgZnTfF2wQ@mail.gmail.com>
+Date: Wed, 8 May 2013 17:25:59 +0300
+Message-ID: <CABBYNZ+dE7Pkt5-RpzQQ1YSgj9pa4cM+MMDwGKFmdidApDtUKQ@mail.gmail.com>
+Subject: Re: Audio sink stream remains suspended on reconnection
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Alex Deymo <deymo@chromium.org>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	keybuk <keybuk@chromium.org>
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen
+Hi Alex,
 
-On Wed, May 8, 2013 at 5:34 AM, Chen Gang <gang.chen@asianux.com> wrote:
->
-> For NUL terminated string, need always let it ended by zero.
->
-> Since have already called memcpy() to initialize 'ci', so need not
-> redundent initializations.
->
-> Better use ''if(session->hid) {} else if(session->input) {}'' instead
-> of ''if(session->hid) {}; if(session->input) {};''
+On Wed, May 8, 2013 at 2:47 AM, Alex Deymo <deymo@chromium.org> wrote:
+> bluetoothd[21017]: profiles/audio/avdtp.c:session_cb()
+> bluetoothd[21017]: profiles/audio/avdtp.c:avdtp_parse_cmd() Received SUSPEND_CMD
+> bluetoothd[21017]: profiles/audio/a2dp.c:suspend_ind() Source
+> 0x7f2acd437a00: Suspend_Ind
+> bluetoothd[21017]: profiles/audio/avdtp.c:avdtp_sep_set_state() stream
+> state changed: STREAMING -> OPEN
+> bluetoothd[21017]: profiles/audio/sink.c:sink_set_state() State
+> changed /org/bluez/hci0/dev_10_B7_F6_01_31_ED: SINK_STATE_PLAYING ->
+> SINK_STATE_CONNECTED
+> bluetoothd[21017]:
+> profiles/audio/transport.c:transport_update_playing()
+> /org/bluez/hci0/dev_10_B7_F6_01_31_ED/fd3 State=TRANSPORT_STATE_ACTIVE
+> Playing=0
+> bluetoothd[21017]:
+> profiles/audio/transport.c:media_transport_remove_owner() Transport
+> /org/bluez/hci0/dev_10_B7_F6_01_31_ED/fd3 Owner :1.1198
+> bluetoothd[21017]: profiles/audio/transport.c:media_owner_free() Owner :1.1198
+> bluetoothd[21017]: profiles/audio/transport.c:transport_set_state()
+> State changed /org/bluez/hci0/dev_10_B7_F6_01_31_ED/fd3:
+> TRANSPORT_STATE_ACTIVE -> TRANSPORT_STATE_IDLE
+> bluetoothd[21017]: profiles/audio/a2dp.c:a2dp_sep_unlock() SEP
+> 0x7f2acd437a00 unlocked
 
-Yep, looks good now.
+There device request the stream to be suspended, which is what it
+happens and the transport is then set to idle state which should
+indicate to the endpoint what happened.
 
-Reviewed-by: David Herrmann <dh.herrmann@gmail.com>
+>
+> bluetoothd[21017]: profiles/audio/avdtp.c:session_cb()
+> bluetoothd[21017]: profiles/audio/avdtp.c:avdtp_parse_cmd() Received START_CMD
+> bluetoothd[21017]: profiles/audio/a2dp.c:start_ind() Source
+> 0x7f2acd437a00: Start_Ind
+> bluetoothd[21017]: profiles/audio/avdtp.c:avdtp_ref() 0x7f2acd43ce70: ref=3
+> bluetoothd[21017]: profiles/audio/avdtp.c:avdtp_sep_set_state() stream
+> state changed: OPEN -> STREAMING
+> bluetoothd[21017]: profiles/audio/sink.c:sink_set_state() State
+> changed /org/bluez/hci0/dev_10_B7_F6_01_31_ED: SINK_STATE_CONNECTED ->
+> SINK_STATE_PLAYING
+> bluetoothd[21017]:
+> profiles/audio/transport.c:transport_update_playing()
+> /org/bluez/hci0/dev_10_B7_F6_01_31_ED/fd3 State=TRANSPORT_STATE_IDLE
+> Playing=1
+> bluetoothd[21017]: profiles/audio/transport.c:transport_set_state()
+> State changed /org/bluez/hci0/dev_10_B7_F6_01_31_ED/fd3:
+> TRANSPORT_STATE_IDLE -> TRANSPORT_STATE_PENDING
+> bluetoothd[21017]: profiles/audio/avdtp.c:avdtp_unref() 0x7f2acd43ce70: ref=2
 
-Thanks
-David
+Here it asks the stream to resume, transport state goes to pending
+which normally triggers the endpoint to Acquire the fd.
 
-> Signed-off-by: Chen Gang <gang.chen@asianux.com>
-> ---
->  net/bluetooth/hidp/core.c |   14 ++++----------
->  1 files changed, 4 insertions(+), 10 deletions(-)
 >
-> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-> index 940f5ac..f13a8da 100644
-> --- a/net/bluetooth/hidp/core.c
-> +++ b/net/bluetooth/hidp/core.c
-> @@ -76,25 +76,19 @@ static void hidp_copy_session(struct hidp_session *session, struct hidp_conninfo
->         ci->flags = session->flags;
->         ci->state = BT_CONNECTED;
->
-> -       ci->vendor  = 0x0000;
-> -       ci->product = 0x0000;
-> -       ci->version = 0x0000;
-> -
->         if (session->input) {
->                 ci->vendor  = session->input->id.vendor;
->                 ci->product = session->input->id.product;
->                 ci->version = session->input->id.version;
->                 if (session->input->name)
-> -                       strncpy(ci->name, session->input->name, 128);
-> +                       strlcpy(ci->name, session->input->name, 128);
->                 else
-> -                       strncpy(ci->name, "HID Boot Device", 128);
-> -       }
-> -
-> -       if (session->hid) {
-> +                       strlcpy(ci->name, "HID Boot Device", 128);
-> +       } else if (session->hid) {
->                 ci->vendor  = session->hid->vendor;
->                 ci->product = session->hid->product;
->                 ci->version = session->hid->version;
-> -               strncpy(ci->name, session->hid->name, 128);
-> +               strlcpy(ci->name, session->hid->name, 128);
->         }
->  }
->
-> --
-> 1.7.7.6
+> bluetoothd[21017]: profiles/audio/avdtp.c:session_cb()
+> bluetoothd[21017]: profiles/audio/avdtp.c:avdtp_parse_resp() SUSPEND
+> request succeeded
+> bluetoothd[21017]: profiles/audio/avdtp.c:avdtp_sep_set_state() stream
+> state changed: STREAMING -> OPEN
+> bluetoothd[21017]: profiles/audio/sink.c:sink_set_state() State
+> changed /org/bluez/hci0/dev_10_B7_F6_01_31_ED: SINK_STATE_PLAYING ->
+> SINK_STATE_CONNECTED
+> bluetoothd[21017]:
+> profiles/audio/transport.c:transport_update_playing()
+> /org/bluez/hci0/dev_10_B7_F6_01_31_ED/fd3
+> State=TRANSPORT_STATE_PENDING Playing=0
+> bluetoothd[21017]: profiles/audio/transport.c:transport_set_state()
+> State changed /org/bluez/hci0/dev_10_B7_F6_01_31_ED/fd3:
+> TRANSPORT_STATE_PENDING -> TRANSPORT_STATE_IDLE
+> bluetoothd[21017]: profiles/audio/a2dp.c:suspend_cfm() Source
+> 0x7f2acd437a00: Suspend_Cfm
+
+The endpoint probably didn't acquire the fd so we suspend the stream.
+Anyway the device is misbehaving if it is sending suspend and start
+commands like that (perhaps you are pressing play/pause buttons?) but
+if you don't wan't the stream to auto suspend you just need to Acquire
+when the transport is in pending state.
+
+
+--
+Luiz Augusto von Dentz
