@@ -1,42 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 8 May 2013 10:57:49 +0300
+Date: Wed, 8 May 2013 10:41:38 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/2] gdbus: Fix segfault when D-Bus daemon exits
-Message-ID: <20130508075749.GA12128@x220>
-References: <1367696383-14831-1-git-send-email-anderson.lizardo@openbossa.org>
+To: Rymarkiewicz Waldemar <waldemar.rymarkiewicz@tieto.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC] bloodpressure: Add Blood Pressure API
+Message-ID: <20130508074138.GA11502@x220>
+References: <1360668097-28906-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
+ <C4340FC6-1121-468E-B15D-68E2770AA07E@holtmann.org>
+ <5135D965.8020604@tieto.com>
+ <F00262C4-3552-438E-AF44-1D088CAB11A8@holtmann.org>
+ <513703AA.2090206@tieto.com>
+ <514021F5.1040005@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1367696383-14831-1-git-send-email-anderson.lizardo@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <514021F5.1040005@tieto.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi Waldek,
 
-On Sat, May 04, 2013, Anderson Lizardo wrote:
-> Fix this crash if D-Bus exits while the client is still connected to it:
-> 
-> ==5570== Invalid read of size 1
-> ==5570==    at 0x402D28E: strcmp (in
-> /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
-> ==5570==    by 0x4070E22: g_str_equal (ghash.c:1704)
-> ==5570==    by 0x8055F61: message_filter (client.c:1123)
-> ==5570==    by 0x4141500: dbus_connection_dispatch (in
-> /lib/i386-linux-gnu/libdbus-1.so.3.5.8)
-> ==5570==    by 0x80506F7: message_dispatch (mainloop.c:76)
-> ==5570==    by 0x4081A7E: g_timeout_dispatch (gmain.c:3882)
-> ==5570==    by 0x4080D85: g_main_context_dispatch (gmain.c:2539)
-> ==5570==    by 0x4081124: g_main_context_iterate.isra.21 (gmain.c:3146)
-> ==5570==    by 0x408156A: g_main_loop_run (gmain.c:3340)
-> ==5570==    by 0x41BF4D2: (below main) (libc-start.c:226)
-> ==5570==  Address 0x0 is not stack'd, malloc'd or (recently) free'd
-> ==5570==
-> ==5570==
-> ---
->  gdbus/client.c |    2 ++
->  1 file changed, 2 insertions(+)
+On Wed, Mar 13, 2013, Rymarkiewicz Waldemar wrote:
+>>>>+Interface	org.bluez.BloodPressure1
+>>>>+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX
+>>>>+
+>>>>+Methods		RegisterWatcher(object watcher)
+>>>>+
+>>>>+			Registers a watcher to monitor blood pressure
+>>>>+			measurements. This watcher will be notified about
+>>>>+			final pressure measurements.
+>>>>+
+>>>>+			Possible Errors: org.bluez.Error.InvalidArguments
+>>>>+
+>>>>+		UnregisterWatcher(object watcher)
+>>>>+
+>>>>+			Unregisters a watcher.
+>>>>+
+>>>>+		EnableIntermediateMeasurement(object watcher)
+>>>>+
+>>>>+			Enables intermediate measurement notifications
+>>>>+			for this watcher. Intermediate measurements will
+>>>>+			be enabled only for devices which support it.
+>>>>+
+>>>>+			Possible Errors: org.bluez.Error.InvalidArguments
+>>>>+					org.bluez.Error.NotSupported
+>>>>+
+>>>>+		DisableIntermediateMeasurement(object watcher)
+>>>>+
+>>>>+			Disables intermediate measurement notifications
+>>>>+			for this watcher. It will disable notifications in
+>>>>+			devices when the last watcher is removed for
+>>>>+			intermediate measurements.
+>>>>+
+>>>>+			Possible Errors: org.bluez.Error.InvalidArguments
+>>>>+					org.bluez.Error.NotFound
+>>>
+>>> why don't we make these two methods parts of a dict for
+>>> RegisterWatcher. Enabling them manually seems rather pointless.
+>>
+>> It's been done intentionally to be able to return "not supported" error
+>> when intermediate measurement is not available.
+>>
+>> Having RegisterWatcher(object watcher, boolean intermediate) and
+>> additionally Intermediate property [read only] is an another option.
+>>
+>> In this case app will check intermediate property and set intermediate
+>> param to RegisterWatcher appropriately.
+>
+> Any comments on this.
 
-Both patches have been applied. Thanks.
+Are you still working on this? Seems this discussion was forgotten or
+just abandoned.
+
+Having the intermediate measurement enabling in the registration instead
+of a separate method and you being fine with it (assuming that an
+Intermediate property is added) raises some questions.
+
+Apparently it was never a requirement to be able to enable/disable this
+an arbitrary amount of times during the watcher life time, and instead
+just leave it disabled or enabled until the watcher gets unregistered?
+
+Also, do you think there will be UIs that will refuse to work if a
+device does not support intermediate measurement or that any UI that is
+interested in intermediate measurement will forgive devices that do not
+support it and simply get on with working without it being enabled? If
+the latter is true then why not make an API which allows requesting
+"register watcher and enable intermediate measurement if it's
+supported". In such a case you wouldn't need a separate property and the
+registration would succeed even if intermediate measurement isn't
+supported. Thoughts?
 
 Johan
