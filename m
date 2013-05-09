@@ -1,61 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAJdJm_MzO3rQ6q2Rv_hQzokHiG5KE_GHdyKAoKDVc+=EG9QhGg@mail.gmail.com>
+In-Reply-To: <1368073016-28434-5-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1368073016-28434-1-git-send-email-lucas.demarchi@profusion.mobi>
- <1368073016-28434-5-git-send-email-lucas.demarchi@profusion.mobi> <CAJdJm_MzO3rQ6q2Rv_hQzokHiG5KE_GHdyKAoKDVc+=EG9QhGg@mail.gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Thu, 9 May 2013 09:12:05 -0300
-Message-ID: <CAMOw1v6oirPxsB6gHu4ZqmbMzwiCtoEHfVAbCJOahjnbUfJibA@mail.gmail.com>
+	<1368073016-28434-5-git-send-email-lucas.demarchi@profusion.mobi>
+Date: Thu, 9 May 2013 06:55:05 -0400
+Message-ID: <CAJdJm_MaTBC+bT-aTbKPPDQrziq4WJArow_ERbzRiq54pp+ZJg@mail.gmail.com>
 Subject: Re: [PATCH BlueZ 05/26] attrib: Get rid of guint* types
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hi Lucas,
 
-On Thu, May 9, 2013 at 7:45 AM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Lucas,
+On Thu, May 9, 2013 at 12:16 AM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> diff --git a/attrib/gatt.h b/attrib/gatt.h
+> index 305b4c6..d5758b7 100644
+> --- a/attrib/gatt.h
+> +++ b/attrib/gatt.h
+> @@ -22,6 +22,7 @@
+>   *
+>   */
 >
-> On Thu, May 9, 2013 at 12:16 AM, Lucas De Marchi
-> <lucas.demarchi@profusion.mobi> wrote:
->> guint -> unsigned int
->> guint8 -> uint8_t
->> guint16 -> uint16_t
->> guint32 -> uint32_t
->> guint64 -> uint64_t
->>
->> Add "#include <inttypes.h>" where appropriate and prefer this one over
->> stdint.h.
->> ---
->>  attrib/att.c         |   2 +-
->>  attrib/gatt.c        | 124 ++++++++++++++++++++++++++-------------------------
->>  attrib/gatt.h        |  33 +++++++-------
->>  attrib/gattrib.c     |  51 ++++++++++-----------
->>  attrib/gattrib.h     |  21 +++++----
->>  attrib/gatttool.c    |  19 ++++----
->>  attrib/interactive.c |  35 ++++++++-------
->>  7 files changed, 148 insertions(+), 137 deletions(-)
->>
->> diff --git a/attrib/att.c b/attrib/att.c
->> index d2b78bd..e196fa3 100644
->> --- a/attrib/att.c
->> +++ b/attrib/att.c
->> @@ -27,7 +27,7 @@
->>  #endif
->>
->>  #include <errno.h>
->> -#include <stdint.h>
->> +#include <inttypes.h>
->>  #include <stdlib.h>
+> +#include <inttypes.h>
+>  #include <bluetooth/sdp.h>
+
+We used to avoid adding includes into headers, and instead add them on
+the .c files only. (The existing include above is a unfortunate
+exception). Not sure if this convention has changed since.
+
+> diff --git a/attrib/gattrib.h b/attrib/gattrib.h
+> index 3fe92c7..a1f2dd8 100644
+> --- a/attrib/gattrib.h
+> +++ b/attrib/gattrib.h
+> @@ -28,6 +28,8 @@
+>  extern "C" {
+>  #endif
 >
-> Any reason to include inttypes.h instead of just stdint.h? Are we
-> using any of the PRI* format conversion macros?
+> +#include <inttypes.h>
+> +
+>  #define GATTRIB_ALL_EVENTS 0xFF
+>  #define GATTRIB_ALL_REQS 0xFE
+>  #define GATTRIB_ALL_HANDLES 0x0000
 
-The reason is to be able to use PRI formats without having to change
-the include later.
+Same thing here.
 
-
-Lucas De Marchi
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
