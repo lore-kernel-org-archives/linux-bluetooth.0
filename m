@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ 16/26] iap: Get rid of guint* types
-Date: Thu,  9 May 2013 01:16:46 -0300
-Message-Id: <1368073016-28434-16-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ 15/26] heartrate: Get rid of guint* types
+Date: Thu,  9 May 2013 01:16:45 -0300
+Message-Id: <1368073016-28434-15-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1368073016-28434-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1368073016-28434-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -18,65 +18,81 @@ guint64 -> uint64_t
 
 Add "#include <inttypes.h>" where appropriate.
 ---
- profiles/iap/main.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ profiles/heartrate/heartrate.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/profiles/iap/main.c b/profiles/iap/main.c
-index 0e8f43f..08dcce3 100644
---- a/profiles/iap/main.c
-+++ b/profiles/iap/main.c
-@@ -25,6 +25,7 @@
+diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
+index 8de81bb..25077ad 100644
+--- a/profiles/heartrate/heartrate.c
++++ b/profiles/heartrate/heartrate.c
+@@ -24,6 +24,7 @@
  #include <config.h>
  #endif
  
 +#include <inttypes.h>
- #include <stdio.h>
  #include <errno.h>
- #include <ctype.h>
-@@ -102,7 +103,7 @@
+ #include <stdbool.h>
+ #include <glib.h>
+@@ -63,8 +64,8 @@ struct heartrate {
+ 	struct btd_device		*dev;
+ 	struct heartrate_adapter	*hradapter;
+ 	GAttrib				*attrib;
+-	guint				attioid;
+-	guint				attionotid;
++	unsigned int				attioid;
++	unsigned int				attionotid;
  
- static GMainLoop *main_loop;
+ 	struct att_range		*svc_range;	/* primary svc range */
  
--static guint iap_source = 0;
-+static unsigned int iap_source = 0;
+@@ -77,7 +78,7 @@ struct heartrate {
  
- static gboolean iap_handler(GIOChannel *channel, GIOCondition condition,
+ struct watcher {
+ 	struct heartrate_adapter	*hradapter;
+-	guint				id;
++	unsigned int				id;
+ 	char				*srv;
+ 	char				*path;
+ };
+@@ -222,8 +223,8 @@ static void destroy_heartrate_adapter(gpointer user_data)
+ 	g_free(hradapter);
+ }
+ 
+-static void read_sensor_location_cb(guint8 status, const guint8 *pdu,
+-						guint16 len, gpointer user_data)
++static void read_sensor_location_cb(uint8_t status, const uint8_t *pdu,
++					uint16_t len, gpointer user_data)
+ {
+ 	struct heartrate *hr = user_data;
+ 	uint8_t value;
+@@ -250,7 +251,7 @@ static void read_sensor_location_cb(guint8 status, const guint8 *pdu,
+ 	hr->location = value;
+ }
+ 
+-static void char_write_cb(guint8 status, const guint8 *pdu, guint16 len,
++static void char_write_cb(uint8_t status, const uint8_t *pdu, uint16_t len,
  							gpointer user_data)
-@@ -127,10 +128,10 @@ static gboolean iap_handler(GIOChannel *channel, GIOCondition condition,
- 	return TRUE;
+ {
+ 	char *msg = user_data;
+@@ -390,8 +391,8 @@ static void notify_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
+ 	process_measurement(hr, pdu + 3, len - 3);
  }
  
--static guint create_source(int fd, GIOFunc func)
-+static unsigned int create_source(int fd, GIOFunc func)
+-static void discover_ccc_cb(guint8 status, const guint8 *pdu,
+-						guint16 len, gpointer user_data)
++static void discover_ccc_cb(uint8_t status, const uint8_t *pdu,
++					uint16_t len, gpointer user_data)
  {
- 	GIOChannel *channel;
--	guint source;
-+	unsigned int source;
- 
- 	channel = g_io_channel_unix_new(fd);
- 
-@@ -370,10 +371,10 @@ static gboolean signal_handler(GIOChannel *channel, GIOCondition condition,
- 	return TRUE;
+ 	struct heartrate *hr = user_data;
+ 	struct att_data_list *list;
+@@ -464,7 +465,7 @@ static void discover_measurement_ccc(struct heartrate *hr,
+ 	gatt_find_info(hr->attrib, start, end, discover_ccc_cb, hr);
  }
  
--static guint setup_signalfd(void)
-+static unsigned int setup_signalfd(void)
+-static void discover_char_cb(GSList *chars, guint8 status, gpointer user_data)
++static void discover_char_cb(GSList *chars, uint8_t status, gpointer user_data)
  {
- 	GIOChannel *channel;
--	guint source;
-+	unsigned int source;
- 	sigset_t mask;
- 	int fd;
+ 	struct heartrate *hr = user_data;
  
-@@ -421,7 +422,7 @@ int main(int argc, char *argv[])
- 	GError *error = NULL;
- 	DBusConnection *dbus_conn;
- 	GDBusClient *client;
--	guint signal;
-+	unsigned int signal;
- 
- 	context = g_option_context_new(NULL);
- 	g_option_context_add_main_entries(context, options, NULL);
 -- 
 1.8.2.2
 
