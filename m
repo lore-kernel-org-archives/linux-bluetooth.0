@@ -1,58 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+dE7Pkt5-RpzQQ1YSgj9pa4cM+MMDwGKFmdidApDtUKQ@mail.gmail.com>
-References: <CAGd9gwjqSiH3=JwR80VcuXf2Z7KA8zOsYFT9N5gAZgZnTfF2wQ@mail.gmail.com>
- <CABBYNZ+dE7Pkt5-RpzQQ1YSgj9pa4cM+MMDwGKFmdidApDtUKQ@mail.gmail.com>
-From: Alex Deymo <deymo@chromium.org>
-Date: Wed, 8 May 2013 21:40:29 -0700
-Message-ID: <CAGd9gwi=72xSK5=ne2+wPU-A=oEz2VXnpPqjxMW9Z6OnyHOUMA@mail.gmail.com>
-Subject: Re: Audio sink stream remains suspended on reconnection
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	keybuk <keybuk@chromium.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ 21/26] scanparam: Get rid of guint* types
+Date: Thu,  9 May 2013 01:16:51 -0300
+Message-Id: <1368073016-28434-21-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1368073016-28434-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1368073016-28434-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+guint -> unsigned int
+guint8 -> uint8_t
+guint16 -> uint16_t
+guint32 -> uint32_t
+guint64 -> uint64_t
 
-On Wed, May 8, 2013 at 7:25 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Alex,
->
-> On Wed, May 8, 2013 at 2:47 AM, Alex Deymo <deymo@chromium.org> wrote:
->> bluetoothd[21017]: profiles/audio/avdtp.c:session_cb()
->> bluetoothd[21017]: profiles/audio/avdtp.c:avdtp_parse_resp() SUSPEND
->> request succeeded
->> bluetoothd[21017]: profiles/audio/avdtp.c:avdtp_sep_set_state() stream
->> state changed: STREAMING -> OPEN
->> bluetoothd[21017]: profiles/audio/sink.c:sink_set_state() State
->> changed /org/bluez/hci0/dev_10_B7_F6_01_31_ED: SINK_STATE_PLAYING ->
->> SINK_STATE_CONNECTED
->> bluetoothd[21017]:
->> profiles/audio/transport.c:transport_update_playing()
->> /org/bluez/hci0/dev_10_B7_F6_01_31_ED/fd3
->> State=TRANSPORT_STATE_PENDING Playing=0
->> bluetoothd[21017]: profiles/audio/transport.c:transport_set_state()
->> State changed /org/bluez/hci0/dev_10_B7_F6_01_31_ED/fd3:
->> TRANSPORT_STATE_PENDING -> TRANSPORT_STATE_IDLE
->> bluetoothd[21017]: profiles/audio/a2dp.c:suspend_cfm() Source
->> 0x7f2acd437a00: Suspend_Cfm
->
-> The endpoint probably didn't acquire the fd so we suspend the stream.
-> Anyway the device is misbehaving if it is sending suspend and start
-> commands like that (perhaps you are pressing play/pause buttons?) but
-> if you don't wan't the stream to auto suspend you just need to Acquire
-> when the transport is in pending state.
+Add "#include <inttypes.h>" where appropriate.
+---
+ profiles/scanparam/scan.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-I did call org.bluez.MediaTransport1.Acquire before all this and the
-State went to active at that point and music was playing well. Then
-with the SUSPEND_CMD I see the State property going from active to
-idle and later from idle to pending (and later to suspend)  If I
-understand well from what you say... Should I call Acquire again on
-the same /fd3 when I see the State going to pending?? Should I also
-Release it before? (for example when I see the State going to idle?) I
-don't see a clear answer from the doc/.
+diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
+index a9baec8..2458a7b 100644
+--- a/profiles/scanparam/scan.c
++++ b/profiles/scanparam/scan.c
+@@ -26,6 +26,7 @@
+ #include <config.h>
+ #endif
+ 
++#include <inttypes.h>
+ #include <stdbool.h>
+ #include <errno.h>
+ 
+@@ -56,7 +57,7 @@ struct scan {
+ 	struct btd_device *device;
+ 	GAttrib *attrib;
+ 	struct att_range range;
+-	guint attioid;
++	unsigned int attioid;
+ 	uint16_t interval;
+ 	uint16_t window;
+ 	uint16_t iwhandle;
+@@ -95,8 +96,8 @@ static void refresh_value_cb(const uint8_t *pdu, uint16_t len,
+ 		write_scan_params(scan->attrib, scan->iwhandle);
+ }
+ 
+-static void ccc_written_cb(guint8 status, const guint8 *pdu,
+-					guint16 plen, gpointer user_data)
++static void ccc_written_cb(uint8_t status, const uint8_t *pdu,
++					uint16_t plen, gpointer user_data)
+ {
+ 	struct scan *scan = user_data;
+ 
+@@ -113,8 +114,8 @@ static void ccc_written_cb(guint8 status, const guint8 *pdu,
+ 				refresh_value_cb, scan, NULL);
+ }
+ 
+-static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
+-					guint16 len, gpointer user_data)
++static void discover_descriptor_cb(uint8_t status, const uint8_t *pdu,
++					uint16_t len, gpointer user_data)
+ {
+ 	struct scan *scan = user_data;
+ 	struct att_data_list *list;
+@@ -144,7 +145,7 @@ done:
+ 	att_data_list_free(list);
+ }
+ 
+-static void refresh_discovered_cb(GSList *chars, guint8 status,
++static void refresh_discovered_cb(GSList *chars, uint8_t status,
+ 						gpointer user_data)
+ {
+ 	struct scan *scan = user_data;
+@@ -177,7 +178,7 @@ static void refresh_discovered_cb(GSList *chars, guint8 status,
+ 				discover_descriptor_cb, user_data);
+ }
+ 
+-static void iwin_discovered_cb(GSList *chars, guint8 status,
++static void iwin_discovered_cb(GSList *chars, uint8_t status,
+ 						gpointer user_data)
+ {
+ 	struct scan *scan = user_data;
+-- 
+1.8.2.2
 
-Thanks for the help!
-Alex.
