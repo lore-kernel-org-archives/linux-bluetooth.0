@@ -1,40 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <518AF6BE.1@asianux.com>
-Date: Thu, 09 May 2013 09:07:10 +0800
-From: Chen Gang <gang.chen@asianux.com>
-MIME-Version: 1.0
-To: David Herrmann <dh.herrmann@gmail.com>
-CC: Marcel Holtmann <marcel@holtmann.org>,
- Gustavo Padovan <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- David Miller <davem@davemloft.net>,
- Jiri Kosina <jkosina@suse.cz>, andrei.emeltchenko@intel.com,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2] Bluetooth: hidp: using strlcpy instead of strncpy,
- also beautify code.
-References: <518906A8.7060708@asianux.com> <CANq1E4SmY+CD0uf53_b6GeFkQ-LYnpdxsDGSRMWdn2i1mnb6WQ@mail.gmail.com> <5189A417.503@asianux.com> <5189C7C6.8090408@asianux.com> <CANq1E4Q+duvLzwmwN=FHb2AaTQsnSgxRD7T+YsBZLSE-kchR_Q@mail.gmail.com>
-In-Reply-To: <CANq1E4Q+duvLzwmwN=FHb2AaTQsnSgxRD7T+YsBZLSE-kchR_Q@mail.gmail.com>
-Content-Type: text/plain; charset=GB2312
+From: Alex Deymo <deymo@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org, keybuk@chromium.org,
+	Alex Deymo <deymo@chromium.org>
+Subject: [PATCH v5 8/8] autopair: Try a fixed pincode for keyboards rejecting random codes
+Date: Wed,  8 May 2013 17:38:02 -0700
+Message-Id: <1368059882-9986-9-git-send-email-deymo@chromium.org>
+In-Reply-To: <1368059882-9986-1-git-send-email-deymo@chromium.org>
+References: <1368059882-9986-1-git-send-email-deymo@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 05/08/2013 11:16 PM, David Herrmann wrote:
-> On Wed, May 8, 2013 at 5:34 AM, Chen Gang <gang.chen@asianux.com> wrote:
->> >
->> > For NUL terminated string, need always let it ended by zero.
->> >
->> > Since have already called memcpy() to initialize 'ci', so need not
->> > redundent initializations.
->> >
->> > Better use ''if(session->hid) {} else if(session->input) {}'' instead
->> > of ''if(session->hid) {}; if(session->input) {};''
-> Yep, looks good now.
-> 
-> Reviewed-by: David Herrmann <dh.herrmann@gmail.com>
+This patch makes the autopair plugin try a fixed "0000" pincode for
+keyboards that reject the pincode too fast (less than 500ms). This
+too short delay rejecting the pincode means that the user didn't
+have time to type the random pincode in the bluetooth keyboard and
+was the keyboard who actually rejected it.
+---
+ plugins/autopair.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-Thanks.
-
+diff --git a/plugins/autopair.c b/plugins/autopair.c
+index 4d5e787..06cae8d 100644
+--- a/plugins/autopair.c
++++ b/plugins/autopair.c
+@@ -87,8 +87,23 @@ static ssize_t autopair_pincb(struct btd_adapter *adapter,
+ 		switch ((class & 0xc0) >> 6) {
+ 		case 0x01:		/* Keyboard */
+ 		case 0x03:		/* Combo keyboard/pointing device */
+-			if (attempt > 1)
++			/* For keyboards rejecting the first random code in less
++			 * than 500ms, try a fixed code. */
++			if (attempt > 1 &&
++				device_bonding_last_duration(device) < 500) {
++				/* Don't try more than one dumb code */
++				if (attempt > 2)
++					return 0;
++				/* Try "0000" as the code for the second
++				 * attempt. */
++				memcpy(pinbuf, "0000", 4);
++				return 4;
++			}
++
++			/* Never try more than 3 random pincodes. */
++			if (attempt >= 4)
+ 				return 0;
++
+ 			snprintf(pinstr, sizeof(pinstr), "%06d",
+ 						rand() % 1000000);
+ 			*display = TRUE;
 -- 
-Chen Gang
+1.8.2.1
 
-Asianux Corporation
