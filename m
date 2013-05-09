@@ -1,57 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <518B62E6.1040905@asianux.com>
+Date: Thu, 09 May 2013 16:48:38 +0800
+From: Chen Gang <gang.chen@asianux.com>
 MIME-Version: 1.0
-In-Reply-To: <1368073016-28434-5-git-send-email-lucas.demarchi@profusion.mobi>
-References: <1368073016-28434-1-git-send-email-lucas.demarchi@profusion.mobi>
-	<1368073016-28434-5-git-send-email-lucas.demarchi@profusion.mobi>
-Date: Thu, 9 May 2013 06:45:48 -0400
-Message-ID: <CAJdJm_MzO3rQ6q2Rv_hQzokHiG5KE_GHdyKAoKDVc+=EG9QhGg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 05/26] attrib: Get rid of guint* types
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Jiri Kosina <jkosina@suse.cz>
+CC: Gustavo Padovan <gustavo@padovan.org>,
+ David Herrmann <dh.herrmann@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ David Miller <davem@davemloft.net>, andrei.emeltchenko@intel.com,
+ "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+ netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2] Bluetooth: hidp: using strlcpy instead of strncpy,
+ also beautify code.
+References: <518906A8.7060708@asianux.com> <CANq1E4SmY+CD0uf53_b6GeFkQ-LYnpdxsDGSRMWdn2i1mnb6WQ@mail.gmail.com> <5189A417.503@asianux.com> <5189C7C6.8090408@asianux.com> <alpine.LNX.2.00.1305091041140.23038@pobox.suse.cz>
+In-Reply-To: <alpine.LNX.2.00.1305091041140.23038@pobox.suse.cz>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+On 05/09/2013 04:42 PM, Jiri Kosina wrote:
+> On Wed, 8 May 2013, Chen Gang wrote:
+> 
+>> > 
+>> > For NUL terminated string, need always let it ended by zero.
+>> > 
+>> > Since have already called memcpy() to initialize 'ci', so need not
+>> > redundent initializations.
+>> > 
+>> > Better use ''if(session->hid) {} else if(session->input) {}'' instead
+>> > of ''if(session->hid) {}; if(session->input) {};''
+>> > 
+>> > Signed-off-by: Chen Gang <gang.chen@asianux.com>
+> Makes sense.
+> 
+> Acked-by: Jiri Kosina <jkosina@suse.cz>
+> 
+> Gustavo, going to take this, please?
+> 
+> -- Jiri Kosina SUSE Labs
+> 
 
-On Thu, May 9, 2013 at 12:16 AM, Lucas De Marchi
-<lucas.demarchi@profusion.mobi> wrote:
-> guint -> unsigned int
-> guint8 -> uint8_t
-> guint16 -> uint16_t
-> guint32 -> uint32_t
-> guint64 -> uint64_t
->
-> Add "#include <inttypes.h>" where appropriate and prefer this one over
-> stdint.h.
-> ---
->  attrib/att.c         |   2 +-
->  attrib/gatt.c        | 124 ++++++++++++++++++++++++++-------------------------
->  attrib/gatt.h        |  33 +++++++-------
->  attrib/gattrib.c     |  51 ++++++++++-----------
->  attrib/gattrib.h     |  21 +++++----
->  attrib/gatttool.c    |  19 ++++----
->  attrib/interactive.c |  35 ++++++++-------
->  7 files changed, 148 insertions(+), 137 deletions(-)
->
-> diff --git a/attrib/att.c b/attrib/att.c
-> index d2b78bd..e196fa3 100644
-> --- a/attrib/att.c
-> +++ b/attrib/att.c
-> @@ -27,7 +27,7 @@
->  #endif
->
->  #include <errno.h>
-> -#include <stdint.h>
-> +#include <inttypes.h>
->  #include <stdlib.h>
+Thanks, and also help to fix the spelling: redundent -> redundant.
+(if need let me send patch v3, please reply to tell me, thanks)
 
-Any reason to include inttypes.h instead of just stdint.h? Are we
-using any of the PRI* format conversion macros?
 
-Best Regards,
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Chen Gang
+
+Asianux Corporation
