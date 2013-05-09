@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Subject: [PATCH BlueZ 06/26] obexd: Get rid of guint* types
-Date: Thu,  9 May 2013 01:16:36 -0300
-Message-Id: <1368073016-28434-6-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ 05/26] attrib: Get rid of guint* types
+Date: Thu,  9 May 2013 01:16:35 -0300
+Message-Id: <1368073016-28434-5-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1368073016-28434-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1368073016-28434-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,646 +16,865 @@ guint16 -> uint16_t
 guint32 -> uint32_t
 guint64 -> uint64_t
 
-Add "#include <inttypes.h>" where appropriate.
+Add "#include <inttypes.h>" where appropriate and prefer this one over
+stdint.h.
 ---
- obexd/client/bluetooth.c        | 15 ++++++++-------
- obexd/client/ftp.c              |  3 ++-
- obexd/client/map.c              | 21 +++++++++++----------
- obexd/client/pbap.c             | 25 +++++++++++++------------
- obexd/client/session.c          | 31 ++++++++++++++++---------------
- obexd/client/session.h          | 15 ++++++++-------
- obexd/client/transfer.c         | 16 ++++++++--------
- obexd/client/transfer.h         |  2 +-
- obexd/client/transport.h        |  8 +++++---
- obexd/plugins/irmc.c            |  2 +-
- obexd/plugins/phonebook-dummy.c |  7 ++++---
- obexd/src/main.c                |  7 ++++---
- obexd/src/obex-priv.h           |  4 +++-
- obexd/src/obex.c                | 18 +++++++++---------
- 14 files changed, 93 insertions(+), 81 deletions(-)
+ attrib/att.c         |   2 +-
+ attrib/gatt.c        | 124 ++++++++++++++++++++++++++-------------------------
+ attrib/gatt.h        |  33 +++++++-------
+ attrib/gattrib.c     |  51 ++++++++++-----------
+ attrib/gattrib.h     |  21 +++++----
+ attrib/gatttool.c    |  19 ++++----
+ attrib/interactive.c |  35 ++++++++-------
+ 7 files changed, 148 insertions(+), 137 deletions(-)
 
-diff --git a/obexd/client/bluetooth.c b/obexd/client/bluetooth.c
-index 1f407d1..6e6e3ec 100644
---- a/obexd/client/bluetooth.c
-+++ b/obexd/client/bluetooth.c
-@@ -47,7 +47,7 @@
- #define OBC_BT_ERROR obc_bt_error_quark()
- 
- struct bluetooth_session {
--	guint id;
-+	unsigned int id;
- 	bdaddr_t src;
- 	bdaddr_t dst;
- 	uint16_t port;
-@@ -385,12 +385,13 @@ static int session_connect(struct bluetooth_session *session)
- 	return err;
- }
- 
--static guint bluetooth_connect(const char *source, const char *destination,
--				const char *service, uint16_t port,
--				obc_transport_func func, void *user_data)
-+static unsigned int bluetooth_connect(const char *source,
-+				const char *destination, const char *service,
-+				uint16_t port, obc_transport_func func,
-+				void *user_data)
- {
- 	struct bluetooth_session *session;
--	static guint id = 0;
-+	static unsigned int id = 0;
- 
- 	DBG("src %s dest %s service %s port %u",
- 				source, destination, service, port);
-@@ -421,7 +422,7 @@ static guint bluetooth_connect(const char *source, const char *destination,
- 	return session->id;
- }
- 
--static void bluetooth_disconnect(guint id)
-+static void bluetooth_disconnect(unsigned int id)
- {
- 	GSList *l;
- 
-@@ -467,7 +468,7 @@ static int bluetooth_getpacketopt(GIOChannel *io, int *tx_mtu, int *rx_mtu)
- 	return 0;
- }
- 
--static const void *bluetooth_getattribute(guint id, int attribute_id)
-+static const void *bluetooth_getattribute(unsigned int id, int attribute_id)
- {
- 	GSList *l;
- 	sdp_data_t *data;
-diff --git a/obexd/client/ftp.c b/obexd/client/ftp.c
-index fa85708..af39653 100644
---- a/obexd/client/ftp.c
-+++ b/obexd/client/ftp.c
-@@ -25,6 +25,7 @@
- #include <config.h>
+diff --git a/attrib/att.c b/attrib/att.c
+index d2b78bd..e196fa3 100644
+--- a/attrib/att.c
++++ b/attrib/att.c
+@@ -27,7 +27,7 @@
  #endif
  
-+#include <inttypes.h>
  #include <errno.h>
- #include <string.h>
- 
-@@ -124,7 +125,7 @@ static void xml_element(GMarkupParseContext *ctxt,
- 	for (key = (char *) names[i]; key; key = (char *) names[++i]) {
- 		key[0] = g_ascii_toupper(key[0]);
- 		if (g_str_equal("Size", key) == TRUE) {
--			guint64 size;
-+			uint64_t size;
- 			size = g_ascii_strtoll(values[i], NULL, 10);
- 			obex_dbus_dict_append(&dict, key, DBUS_TYPE_UINT64,
- 								&size);
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index 0285286..ae65bb3 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -24,6 +24,7 @@
- #include <config.h>
- #endif
- 
-+#include <inttypes.h>
- #include <errno.h>
- #include <string.h>
- #include <stdio.h>
-@@ -291,7 +292,7 @@ fail:
- 
- static GObexApparam *parse_offset(GObexApparam *apparam, DBusMessageIter *iter)
- {
--	guint16 num;
-+	uint16_t num;
- 
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
- 		return NULL;
-@@ -304,7 +305,7 @@ static GObexApparam *parse_offset(GObexApparam *apparam, DBusMessageIter *iter)
- static GObexApparam *parse_max_count(GObexApparam *apparam,
- 							DBusMessageIter *iter)
- {
--	guint16 num;
-+	uint16_t num;
- 
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
- 		return NULL;
-@@ -1123,7 +1124,7 @@ fail:
- static GObexApparam *parse_subject_length(GObexApparam *apparam,
- 							DBusMessageIter *iter)
- {
--	guint8 num;
-+	uint8_t num;
- 
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BYTE)
- 		return NULL;
-@@ -1150,9 +1151,9 @@ static uint64_t get_filter_mask(const char *filterstr)
- 	return 0;
- }
- 
--static int set_field(guint32 *filter, const char *filterstr)
-+static int set_field(uint32_t *filter, const char *filterstr)
- {
--	guint64 mask;
-+	uint64_t mask;
- 
- 	mask = get_filter_mask(filterstr);
- 
-@@ -1166,7 +1167,7 @@ static int set_field(guint32 *filter, const char *filterstr)
- static GObexApparam *parse_fields(GObexApparam *apparam, DBusMessageIter *iter)
- {
- 	DBusMessageIter array;
--	guint32 filter = 0;
-+	uint32_t filter = 0;
- 
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
- 		return NULL;
-@@ -1192,7 +1193,7 @@ static GObexApparam *parse_filter_type(GObexApparam *apparam,
- 							DBusMessageIter *iter)
- {
- 	DBusMessageIter array;
--	guint8 types = 0;
-+	uint8_t types = 0;
- 
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
- 		return NULL;
-@@ -1251,7 +1252,7 @@ static GObexApparam *parse_period_end(GObexApparam *apparam,
- static GObexApparam *parse_filter_read(GObexApparam *apparam,
- 							DBusMessageIter *iter)
- {
--	guint8 status = FILTER_READ_STATUS_NONE;
-+	uint8_t status = FILTER_READ_STATUS_NONE;
- 	dbus_bool_t dbus_status = FALSE;
- 
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
-@@ -1299,7 +1300,7 @@ static GObexApparam *parse_filter_sender(GObexApparam *apparam,
- static GObexApparam *parse_filter_priority(GObexApparam *apparam,
- 							DBusMessageIter *iter)
- {
--	guint8 priority = FILTER_PRIORITY_NONE;
-+	uint8_t priority = FILTER_PRIORITY_NONE;
- 	dbus_bool_t dbus_priority = FALSE;
- 
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
-@@ -1560,7 +1561,7 @@ static GObexApparam *parse_retry(GObexApparam *apparam, DBusMessageIter *iter)
- 
- static GObexApparam *parse_charset(GObexApparam *apparam, DBusMessageIter *iter)
- {
--	guint8 charset = 0;
-+	uint8_t charset = 0;
- 	const char *string;
- 
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
-diff --git a/obexd/client/pbap.c b/obexd/client/pbap.c
-index 2089860..5aa8da9 100644
---- a/obexd/client/pbap.c
-+++ b/obexd/client/pbap.c
-@@ -26,6 +26,7 @@
- #include <config.h>
- #endif
- 
-+#include <inttypes.h>
- #include <errno.h>
- #include <string.h>
- #include <stdio.h>
-@@ -247,7 +248,7 @@ static void pbap_setpath_cb(struct obc_session *session,
- }
- 
- static void read_return_apparam(struct obc_transfer *transfer,
--				guint16 *phone_book_size, guint8 *new_missed_calls)
-+			uint16_t *phone_book_size, uint8_t *new_missed_calls)
- {
- 	GObexApparam *apparam;
- 
-@@ -270,8 +271,8 @@ static void phonebook_size_callback(struct obc_session *session,
- {
- 	struct pending_request *request = user_data;
- 	DBusMessage *reply;
--	guint16 phone_book_size;
--	guint8 new_missed_calls;
-+	uint16_t phone_book_size;
-+	uint8_t new_missed_calls;
- 
- 	if (err) {
- 		reply = g_dbus_create_error(request->msg,
-@@ -342,7 +343,7 @@ send:
- static GObexApparam *parse_format(GObexApparam *apparam, DBusMessageIter *iter)
- {
- 	const char *string;
--	guint8 format;
-+	uint8_t format;
- 
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
- 		return NULL;
-@@ -364,7 +365,7 @@ static GObexApparam *parse_format(GObexApparam *apparam, DBusMessageIter *iter)
- static GObexApparam *parse_order(GObexApparam *apparam, DBusMessageIter *iter)
- {
- 	const char *string;
--	guint8 order;
-+	uint8_t order;
- 
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
- 		return NULL;
-@@ -387,7 +388,7 @@ static GObexApparam *parse_order(GObexApparam *apparam, DBusMessageIter *iter)
- 
- static GObexApparam *parse_offset(GObexApparam *apparam, DBusMessageIter *iter)
- {
--	guint16 num;
-+	uint16_t num;
- 
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
- 		return NULL;
-@@ -400,7 +401,7 @@ static GObexApparam *parse_offset(GObexApparam *apparam, DBusMessageIter *iter)
- static GObexApparam *parse_max_count(GObexApparam *apparam,
- 							DBusMessageIter *iter)
- {
--	guint16 num;
-+	uint16_t num;
- 
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
- 		return NULL;
-@@ -435,9 +436,9 @@ static uint64_t get_filter_mask(const char *filterstr)
- 		return 0;
- }
- 
--static int set_field(guint64 *filter, const char *filterstr)
-+static int set_field(uint64_t *filter, const char *filterstr)
- {
--	guint64 mask;
-+	uint64_t mask;
- 
- 	mask = get_filter_mask(filterstr);
- 
-@@ -451,7 +452,7 @@ static int set_field(guint64 *filter, const char *filterstr)
- static GObexApparam *parse_fields(GObexApparam *apparam, DBusMessageIter *iter)
- {
- 	DBusMessageIter array;
--	guint64 filter = 0;
-+	uint64_t filter = 0;
- 
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
- 		return NULL;
-@@ -517,7 +518,7 @@ static GObexApparam *parse_filters(GObexApparam *apparam,
- 
- static DBusMessage *pull_phonebook(struct pbap_data *pbap,
- 						DBusMessage *message,
--						guint8 type,
-+						uint8_t type,
- 						const char *targetfile,
- 						GObexApparam *apparam)
- {
-@@ -790,7 +791,7 @@ static DBusMessage *pbap_list(DBusConnection *connection,
- 
- static GObexApparam *parse_attribute(GObexApparam *apparam, const char *field)
- {
--	guint8 attrib;
-+	uint8_t attrib;
- 
- 	if (!field || g_str_equal(field, ""))
- 		attrib = ATTRIB_NAME;
-diff --git a/obexd/client/session.c b/obexd/client/session.c
-index 0fbfe41..daa49db 100644
---- a/obexd/client/session.c
-+++ b/obexd/client/session.c
-@@ -26,6 +26,7 @@
- #include <config.h>
- #endif
- 
+-#include <stdint.h>
 +#include <inttypes.h>
  #include <stdlib.h>
- #include <stdio.h>
- #include <errno.h>
-@@ -57,7 +58,7 @@ enum {
- 	OBEX_IO_BUSY,
- };
  
--static guint64 counter = 0;
-+static uint64_t counter = 0;
+ #include <bluetooth/bluetooth.h>
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index 0f116e8..3dacf9e 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -26,7 +26,7 @@
+ #include <config.h>
+ #endif
  
- struct callback_data {
- 	struct obc_session *session;
-@@ -66,8 +67,8 @@ struct callback_data {
- };
+-#include <stdint.h>
++#include <inttypes.h>
+ #include <stdlib.h>
+ #include <glib.h>
+ #include <bluetooth/sdp.h>
+@@ -107,11 +107,11 @@ static void discover_char_free(struct discover_char *dc)
+ 	g_free(dc);
+ }
  
- struct pending_request {
+-static guint16 encode_discover_primary(uint16_t start, uint16_t end,
++static uint16_t encode_discover_primary(uint16_t start, uint16_t end,
+ 				bt_uuid_t *uuid, uint8_t *pdu, size_t len)
+ {
+ 	bt_uuid_t prim;
+-	guint16 plen;
++	uint16_t plen;
+ 
+ 	bt_uuid16_create(&prim, GATT_PRIM_SVC_UUID);
+ 
+@@ -143,15 +143,15 @@ static guint16 encode_discover_primary(uint16_t start, uint16_t end,
+ 	return plen;
+ }
+ 
+-static void primary_by_uuid_cb(guint8 status, const guint8 *ipdu,
+-					guint16 iplen, gpointer user_data)
++static void primary_by_uuid_cb(uint8_t status, const uint8_t *ipdu,
++					uint16_t iplen, gpointer user_data)
+ 
+ {
+ 	struct discover_primary *dp = user_data;
+ 	GSList *ranges, *last;
+ 	struct att_range *range;
+ 	uint8_t *buf;
+-	guint16 oplen;
++	uint16_t oplen;
+ 	int err = 0;
+ 	size_t buflen;
+ 
+@@ -187,7 +187,7 @@ done:
+ 	discover_primary_free(dp);
+ }
+ 
+-static void primary_all_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
++static void primary_all_cb(uint8_t status, const uint8_t *ipdu, uint16_t iplen,
+ 							gpointer user_data)
+ {
+ 	struct discover_primary *dp = user_data;
+@@ -242,7 +242,7 @@ static void primary_all_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
+ 	if (end != 0xffff) {
+ 		size_t buflen;
+ 		uint8_t *buf = g_attrib_get_buffer(dp->attrib, &buflen);
+-		guint16 oplen = encode_discover_primary(end + 1, 0xffff, NULL,
++		uint16_t oplen = encode_discover_primary(end + 1, 0xffff, NULL,
+ 								buf, buflen);
+ 
+ 		g_attrib_send(dp->attrib, 0, buf, oplen, primary_all_cb,
+@@ -256,14 +256,14 @@ done:
+ 	discover_primary_free(dp);
+ }
+ 
+-guint gatt_discover_primary(GAttrib *attrib, bt_uuid_t *uuid, gatt_cb_t func,
+-							gpointer user_data)
++unsigned int gatt_discover_primary(GAttrib *attrib, bt_uuid_t *uuid,
++					gatt_cb_t func, gpointer user_data)
+ {
+ 	struct discover_primary *dp;
+ 	size_t buflen;
+ 	uint8_t *buf = g_attrib_get_buffer(attrib, &buflen);
+ 	GAttribResultFunc cb;
+-	guint16 plen;
++	uint16_t plen;
+ 
+ 	plen = encode_discover_primary(0x0001, 0xffff, uuid, buf, buflen);
+ 	if (plen == 0)
+@@ -322,13 +322,13 @@ done:
+ 	g_free(query);
+ }
+ 
+-static guint resolve_included_uuid(struct included_discovery *isd,
++static unsigned int resolve_included_uuid(struct included_discovery *isd,
+ 					struct gatt_included *incl)
+ {
+ 	struct included_uuid_query *query;
+ 	size_t buflen;
+ 	uint8_t *buf = g_attrib_get_buffer(isd->attrib, &buflen);
+-	guint16 oplen = enc_read_req(incl->range.start, buf, buflen);
++	uint16_t oplen = enc_read_req(incl->range.start, buf, buflen);
+ 
+ 	query = g_new0(struct included_uuid_query, 1);
+ 	query->isd = isd_ref(isd);
+@@ -360,12 +360,13 @@ static struct gatt_included *included_from_buf(const uint8_t *buf, gsize len)
+ static void find_included_cb(uint8_t status, const uint8_t *pdu, uint16_t len,
+ 							gpointer user_data);
+ 
+-static guint find_included(struct included_discovery *isd, uint16_t start)
++static unsigned int find_included(struct included_discovery *isd,
++							uint16_t start)
+ {
+ 	bt_uuid_t uuid;
+ 	size_t buflen;
+ 	uint8_t *buf = g_attrib_get_buffer(isd->attrib, &buflen);
+-	guint16 oplen;
++	uint16_t oplen;
+ 
+ 	bt_uuid16_create(&uuid, GATT_INCLUDE_UUID);
+ 	oplen = enc_read_by_type_req(start, isd->end_handle, &uuid,
+@@ -443,15 +444,15 @@ unsigned int gatt_find_included(GAttrib *attrib, uint16_t start, uint16_t end,
+ 	return find_included(isd, start);
+ }
+ 
+-static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
+-							gpointer user_data)
++static void char_discovered_cb(uint8_t status, const uint8_t *ipdu,
++					uint16_t iplen, gpointer user_data)
+ {
+ 	struct discover_char *dc = user_data;
+ 	struct att_data_list *list;
+ 	unsigned int i, err = ATT_ECODE_ATTR_NOT_FOUND;
+ 	size_t buflen;
+ 	uint8_t *buf;
+-	guint16 oplen;
++	uint16_t oplen;
+ 	bt_uuid_t uuid;
+ 	uint16_t last = 0;
+ 
+@@ -522,7 +523,7 @@ done:
+ 	discover_char_free(dc);
+ }
+ 
+-guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
++unsigned int gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
+ 						bt_uuid_t *uuid, gatt_cb_t func,
+ 						gpointer user_data)
+ {
+@@ -530,7 +531,7 @@ guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
+ 	uint8_t *buf = g_attrib_get_buffer(attrib, &buflen);
+ 	struct discover_char *dc;
+ 	bt_uuid_t type_uuid;
+-	guint16 plen;
++	uint16_t plen;
+ 
+ 	bt_uuid16_create(&type_uuid, GATT_CHARAC_UUID);
+ 
+@@ -552,13 +553,14 @@ guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
+ 								dc, NULL);
+ }
+ 
+-guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
+-					bt_uuid_t *uuid, GAttribResultFunc func,
++unsigned int gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start,
++					uint16_t end, bt_uuid_t *uuid,
++					GAttribResultFunc func,
+ 					gpointer user_data)
+ {
+ 	size_t buflen;
+ 	uint8_t *buf = g_attrib_get_buffer(attrib, &buflen);
+-	guint16 plen;
++	uint16_t plen;
+ 
+ 	plen = enc_read_by_type_req(start, end, uuid, buf, buflen);
+ 	if (plen == 0)
+@@ -571,10 +573,10 @@ struct read_long_data {
+ 	GAttrib *attrib;
+ 	GAttribResultFunc func;
+ 	gpointer user_data;
+-	guint8 *buffer;
+-	guint16 size;
+-	guint16 handle;
 -	guint id;
--	guint req_id;
++	uint8_t *buffer;
++	uint16_t size;
++	uint16_t handle;
 +	unsigned int id;
-+	unsigned int req_id;
- 	struct obc_session *session;
- 	struct obc_transfer *transfer;
- 	session_callback_t func;
-@@ -82,7 +83,7 @@ struct setpath_data {
+ 	int ref;
  };
  
- struct obc_session {
+@@ -591,15 +593,15 @@ static void read_long_destroy(gpointer user_data)
+ 	g_free(long_read);
+ }
+ 
+-static void read_blob_helper(guint8 status, const guint8 *rpdu, guint16 rlen,
++static void read_blob_helper(uint8_t status, const uint8_t *rpdu, uint16_t rlen,
+ 							gpointer user_data)
+ {
+ 	struct read_long_data *long_read = user_data;
+ 	uint8_t *buf;
+ 	size_t buflen;
+-	guint8 *tmp;
+-	guint16 plen;
 -	guint id;
++	uint8_t *tmp;
++	uint16_t plen;
 +	unsigned int id;
- 	int refcount;
- 	char *source;
- 	char *destination;
-@@ -94,9 +95,9 @@ struct obc_session {
- 	GObex *obex;
- 	struct pending_request *p;
- 	char *owner;		/* Session owner */
--	guint watch;
-+	unsigned int watch;
- 	GQueue *queue;
--	guint queue_complete_id;
-+	unsigned int queue_complete_id;
+ 
+ 	if (status != 0 || rlen == 1) {
+ 		status = 0;
+@@ -638,14 +640,14 @@ done:
+ 							long_read->user_data);
+ }
+ 
+-static void read_char_helper(guint8 status, const guint8 *rpdu,
+-					guint16 rlen, gpointer user_data)
++static void read_char_helper(uint8_t status, const uint8_t *rpdu,
++					uint16_t rlen, gpointer user_data)
+ {
+ 	struct read_long_data *long_read = user_data;
+ 	size_t buflen;
+ 	uint8_t *buf = g_attrib_get_buffer(long_read->attrib, &buflen);
+-	guint16 plen;
+-	guint id;
++	uint16_t plen;
++	unsigned int id;
+ 
+ 	if (status != 0 || rlen < buflen)
+ 		goto done;
+@@ -674,13 +676,13 @@ done:
+ 	long_read->func(status, rpdu, rlen, long_read->user_data);
+ }
+ 
+-guint gatt_read_char(GAttrib *attrib, uint16_t handle, GAttribResultFunc func,
+-							gpointer user_data)
++unsigned int gatt_read_char(GAttrib *attrib, uint16_t handle,
++				GAttribResultFunc func, gpointer user_data)
+ {
+ 	uint8_t *buf;
+ 	size_t buflen;
+-	guint16 plen;
+-	guint id;
++	uint16_t plen;
++	unsigned int id;
+ 	struct read_long_data *long_read;
+ 
+ 	long_read = g_try_new0(struct read_long_data, 1);
+@@ -711,18 +713,18 @@ struct write_long_data {
+ 	GAttrib *attrib;
+ 	GAttribResultFunc func;
+ 	gpointer user_data;
+-	guint16 handle;
++	uint16_t handle;
+ 	uint16_t offset;
+ 	uint8_t *value;
+ 	size_t vlen;
  };
  
- static GSList *sessions = NULL;
-@@ -145,7 +146,7 @@ static struct pending_request *pending_request_new(struct obc_session *session,
- 						void *data)
+-static guint execute_write(GAttrib *attrib, uint8_t flags,
++static unsigned int execute_write(GAttrib *attrib, uint8_t flags,
+ 				GAttribResultFunc func, gpointer user_data)
  {
- 	struct pending_request *p;
--	static guint id = 0;
-+	static unsigned int id = 0;
+ 	uint8_t *buf;
+ 	size_t buflen;
+-	guint16 plen;
++	uint16_t plen;
  
- 	p = g_new0(struct pending_request, 1);
- 	p->id = ++id;
-@@ -656,7 +657,7 @@ static gboolean session_queue_complete(gpointer data)
- 	return FALSE;
+ 	buf = g_attrib_get_buffer(attrib, &buflen);
+ 	plen = enc_exec_write_req(flags, buf, buflen);
+@@ -732,12 +734,12 @@ static guint execute_write(GAttrib *attrib, uint8_t flags,
+ 	return g_attrib_send(attrib, 0, buf, plen, func, user_data, NULL);
  }
  
--guint obc_session_queue(struct obc_session *session,
-+unsigned int obc_session_queue(struct obc_session *session,
- 				struct obc_transfer *transfer,
- 				session_callback_t func, void *user_data,
- 				GError **err)
-@@ -881,7 +882,7 @@ static void setpath_cb(GObex *obex, GError *err, GObexPacket *rsp,
- 	struct pending_request *p = user_data;
- 	struct setpath_data *data = p->data;
- 	char *next;
--	guint8 code;
-+	uint8_t code;
+-static guint prepare_write(GAttrib *attrib, uint16_t handle, uint16_t offset,
+-			uint8_t *value, size_t vlen, GAttribResultFunc func,
+-			gpointer user_data);
++static unsigned int prepare_write(GAttrib *attrib, uint16_t handle,
++				uint16_t offset, uint8_t *value, size_t vlen,
++				GAttribResultFunc func, gpointer user_data);
  
- 	p->req_id = 0;
+-static void prepare_write_cb(guint8 status, const guint8 *rpdu,
+-					guint16 rlen, gpointer user_data)
++static void prepare_write_cb(uint8_t status, const uint8_t *rpdu,
++					uint16_t rlen, gpointer user_data)
+ {
+ 	struct write_long_data *long_write = user_data;
  
-@@ -918,7 +919,7 @@ static void setpath_cb(GObex *obex, GError *err, GObexPacket *rsp,
- 	}
+@@ -763,11 +765,11 @@ static void prepare_write_cb(guint8 status, const guint8 *rpdu,
+ 		long_write->func, long_write);
  }
  
--guint obc_session_setpath(struct obc_session *session, const char *path,
-+unsigned int obc_session_setpath(struct obc_session *session, const char *path,
- 				session_callback_t func, void *user_data,
- 				GError **err)
+-static guint prepare_write(GAttrib *attrib, uint16_t handle, uint16_t offset,
+-			uint8_t *value, size_t vlen, GAttribResultFunc func,
+-			gpointer user_data)
++static unsigned int prepare_write(GAttrib *attrib, uint16_t handle,
++				uint16_t offset, uint8_t *value, size_t vlen,
++				GAttribResultFunc func, gpointer user_data)
  {
-@@ -1000,7 +1001,7 @@ done:
- 	session_process_queue(session);
+-	guint16 plen;
++	uint16_t plen;
+ 	size_t buflen;
+ 	uint8_t *buf;
+ 
+@@ -782,12 +784,12 @@ static guint prepare_write(GAttrib *attrib, uint16_t handle, uint16_t offset,
+ 							user_data, NULL);
  }
  
--guint obc_session_mkdir(struct obc_session *session, const char *folder,
-+unsigned int obc_session_mkdir(struct obc_session *session, const char *folder,
- 				session_callback_t func, void *user_data,
- 				GError **err)
+-guint gatt_write_char(GAttrib *attrib, uint16_t handle, uint8_t *value,
++unsigned int gatt_write_char(GAttrib *attrib, uint16_t handle, uint8_t *value,
+ 			size_t vlen, GAttribResultFunc func, gpointer user_data)
  {
-@@ -1030,7 +1031,7 @@ guint obc_session_mkdir(struct obc_session *session, const char *folder,
- 	return p->id;
+ 	uint8_t *buf;
+ 	size_t buflen;
+-	guint16 plen;
++	uint16_t plen;
+ 	struct write_long_data *long_write;
+ 
+ 	buf = g_attrib_get_buffer(attrib, &buflen);
+@@ -822,24 +824,24 @@ guint gatt_write_char(GAttrib *attrib, uint16_t handle, uint8_t *value,
+ 							func, long_write);
  }
  
--guint obc_session_copy(struct obc_session *session, const char *srcname,
-+unsigned int obc_session_copy(struct obc_session *session, const char *srcname,
- 				const char *destname, session_callback_t func,
- 				void *user_data, GError **err)
+-guint gatt_exchange_mtu(GAttrib *attrib, uint16_t mtu, GAttribResultFunc func,
+-							gpointer user_data)
++unsigned int gatt_exchange_mtu(GAttrib *attrib, uint16_t mtu,
++				GAttribResultFunc func, gpointer user_data)
  {
-@@ -1060,7 +1061,7 @@ guint obc_session_copy(struct obc_session *session, const char *srcname,
- 	return p->id;
+ 	uint8_t *buf;
+ 	size_t buflen;
+-	guint16 plen;
++	uint16_t plen;
+ 
+ 	buf = g_attrib_get_buffer(attrib, &buflen);
+ 	plen = enc_mtu_req(mtu, buf, buflen);
+ 	return g_attrib_send(attrib, 0, buf, plen, func, user_data, NULL);
  }
  
--guint obc_session_move(struct obc_session *session, const char *srcname,
-+unsigned int obc_session_move(struct obc_session *session, const char *srcname,
- 				const char *destname, session_callback_t func,
- 				void *user_data, GError **err)
+-guint gatt_find_info(GAttrib *attrib, uint16_t start, uint16_t end,
++unsigned int gatt_find_info(GAttrib *attrib, uint16_t start, uint16_t end,
+ 				GAttribResultFunc func, gpointer user_data)
  {
-@@ -1090,7 +1091,7 @@ guint obc_session_move(struct obc_session *session, const char *srcname,
- 	return p->id;
+ 	uint8_t *buf;
+ 	size_t buflen;
+-	guint16 plen;
++	uint16_t plen;
+ 
+ 	buf = g_attrib_get_buffer(attrib, &buflen);
+ 	plen = enc_find_info_req(start, end, buf, buflen);
+@@ -849,12 +851,12 @@ guint gatt_find_info(GAttrib *attrib, uint16_t start, uint16_t end,
+ 	return g_attrib_send(attrib, 0, buf, plen, func, user_data, NULL);
  }
  
--guint obc_session_delete(struct obc_session *session, const char *file,
-+unsigned int obc_session_delete(struct obc_session *session, const char *file,
- 				session_callback_t func, void *user_data,
- 				GError **err)
+-guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, uint8_t *value, int vlen,
+-				GDestroyNotify notify, gpointer user_data)
++unsigned int gatt_write_cmd(GAttrib *attrib, uint16_t handle, uint8_t *value,
++			int vlen, GDestroyNotify notify, gpointer user_data)
  {
-@@ -1119,7 +1120,7 @@ guint obc_session_delete(struct obc_session *session, const char *file,
- 	return p->id;
- }
+ 	uint8_t *buf;
+ 	size_t buflen;
+-	guint16 plen;
++	uint16_t plen;
  
--void obc_session_cancel(struct obc_session *session, guint id,
-+void obc_session_cancel(struct obc_session *session, unsigned int id,
- 							gboolean remove)
- {
- 	struct pending_request *p = session->p;
-diff --git a/obexd/client/session.h b/obexd/client/session.h
-index b0b3655..22a4987 100644
---- a/obexd/client/session.h
-+++ b/obexd/client/session.h
+ 	buf = g_attrib_get_buffer(attrib, &buflen);
+ 	plen = enc_write_cmd(handle, value, vlen, buf, buflen);
+diff --git a/attrib/gatt.h b/attrib/gatt.h
+index 305b4c6..d5758b7 100644
+--- a/attrib/gatt.h
++++ b/attrib/gatt.h
 @@ -22,6 +22,7 @@
   *
   */
  
 +#include <inttypes.h>
- #include <stdint.h>
- #include <glib.h>
- #include <gdbus/gdbus.h>
-@@ -57,24 +58,24 @@ const char *obc_session_register(struct obc_session *session,
- const void *obc_session_get_attribute(struct obc_session *session,
- 							int attribute_id);
+ #include <bluetooth/sdp.h>
  
--guint obc_session_queue(struct obc_session *session,
-+unsigned int obc_session_queue(struct obc_session *session,
- 				struct obc_transfer *transfer,
- 				session_callback_t func, void *user_data,
- 				GError **err);
--guint obc_session_setpath(struct obc_session *session, const char *path,
-+unsigned int obc_session_setpath(struct obc_session *session, const char *path,
- 				session_callback_t func, void *user_data,
- 				GError **err);
--guint obc_session_mkdir(struct obc_session *session, const char *folder,
-+unsigned int obc_session_mkdir(struct obc_session *session, const char *folder,
- 				session_callback_t func, void *user_data,
- 				GError **err);
--guint obc_session_copy(struct obc_session *session, const char *srcname,
-+unsigned int obc_session_copy(struct obc_session *session, const char *srcname,
- 				const char *destname, session_callback_t func,
- 				void *user_data, GError **err);
--guint obc_session_move(struct obc_session *session, const char *srcname,
-+unsigned int obc_session_move(struct obc_session *session, const char *srcname,
- 				const char *destname, session_callback_t func,
- 				void *user_data, GError **err);
--guint obc_session_delete(struct obc_session *session, const char *file,
-+unsigned int obc_session_delete(struct obc_session *session, const char *file,
- 				session_callback_t func, void *user_data,
- 				GError **err);
--void obc_session_cancel(struct obc_session *session, guint id,
-+void obc_session_cancel(struct obc_session *session, unsigned int id,
- 							gboolean remove);
-diff --git a/obexd/client/transfer.c b/obexd/client/transfer.c
-index ac0909d..7ab3473 100644
---- a/obexd/client/transfer.c
-+++ b/obexd/client/transfer.c
-@@ -50,7 +50,7 @@
+ /* GATT Profile Attribute types */
+@@ -53,7 +54,7 @@
+ #define GATT_CLIENT_CHARAC_CFG_NOTIF_BIT	0x0001
+ #define GATT_CLIENT_CHARAC_CFG_IND_BIT		0x0002
  
- #define FIRST_PACKET_TIMEOUT 60
+-typedef void (*gatt_cb_t) (GSList *l, guint8 status, gpointer user_data);
++typedef void (*gatt_cb_t) (GSList *l, uint8_t status, gpointer user_data);
  
--static guint64 counter = 0;
-+static uint64_t counter = 0;
- 
- struct transfer_callback {
- 	transfer_callback_t func;
-@@ -68,7 +68,7 @@ struct obc_transfer {
- 	GObex *obex;
- 	uint8_t status;
- 	GObexApparam *apparam;
--	guint8 op;
-+	uint8_t op;
- 	struct transfer_callback *callback;
- 	DBusConnection *conn;
- 	DBusMessage *msg;
-@@ -79,11 +79,11 @@ struct obc_transfer {
- 	char *name;		/* Transfer object name */
- 	char *type;		/* Transfer object type */
- 	int fd;
--	guint xfer;
-+	unsigned int xfer;
- 	int64_t size;
- 	int64_t transferred;
- 	int64_t progress;
--	guint progress_id;
-+	unsigned int progress_id;
+ struct gatt_primary {
+ 	char uuid[MAX_LEN_UUID_STR + 1];
+@@ -74,35 +75,37 @@ struct gatt_char {
+ 	uint16_t value_handle;
  };
  
- static GQuark obc_transfer_error_quark(void)
-@@ -356,7 +356,7 @@ static void obc_transfer_free(struct obc_transfer *transfer)
- 	g_free(transfer);
- }
+-guint gatt_discover_primary(GAttrib *attrib, bt_uuid_t *uuid, gatt_cb_t func,
+-							gpointer user_data);
++unsigned int gatt_discover_primary(GAttrib *attrib, bt_uuid_t *uuid,
++					gatt_cb_t func, gpointer user_data);
  
--static struct obc_transfer *obc_transfer_create(guint8 op,
-+static struct obc_transfer *obc_transfer_create(uint8_t op,
- 						const char *filename,
- 						const char *name,
- 						const char *type)
-@@ -584,9 +584,9 @@ static void get_xfer_progress_first(GObex *obex, GError *err, GObexPacket *rsp,
- 	GObexPacket *req;
- 	GObexHeader *hdr;
- 	GObexApparam *apparam;
--	const guint8 *buf;
-+	const uint8_t *buf;
- 	gsize len;
--	guint8 rspcode;
-+	uint8_t rspcode;
- 	gboolean final;
+ unsigned int gatt_find_included(GAttrib *attrib, uint16_t start, uint16_t end,
+ 					gatt_cb_t func, gpointer user_data);
  
- 	if (err != NULL) {
-@@ -788,7 +788,7 @@ gboolean obc_transfer_start(struct obc_transfer *transfer, void *obex,
- 	return FALSE;
- }
+-guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
++unsigned int gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
+ 					bt_uuid_t *uuid, gatt_cb_t func,
+ 					gpointer user_data);
  
--guint8 obc_transfer_get_operation(struct obc_transfer *transfer)
-+uint8_t obc_transfer_get_operation(struct obc_transfer *transfer)
+-guint gatt_read_char(GAttrib *attrib, uint16_t handle, GAttribResultFunc func,
+-							gpointer user_data);
++unsigned int gatt_read_char(GAttrib *attrib, uint16_t handle,
++				GAttribResultFunc func, gpointer user_data);
+ 
+-guint gatt_write_char(GAttrib *attrib, uint16_t handle, uint8_t *value,
++unsigned int gatt_write_char(GAttrib *attrib, uint16_t handle, uint8_t *value,
+ 					size_t vlen, GAttribResultFunc func,
+ 					gpointer user_data);
+ 
+-guint gatt_find_info(GAttrib *attrib, uint16_t start, uint16_t end,
++unsigned int gatt_find_info(GAttrib *attrib, uint16_t start, uint16_t end,
+ 				GAttribResultFunc func, gpointer user_data);
+ 
+-guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, uint8_t *value, int vlen,
+-				GDestroyNotify notify, gpointer user_data);
++unsigned int gatt_write_cmd(GAttrib *attrib, uint16_t handle, uint8_t *value,
++					int vlen, GDestroyNotify notify,
++					gpointer user_data);
+ 
+-guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
+-				bt_uuid_t *uuid, GAttribResultFunc func,
+-				gpointer user_data);
++unsigned int gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start,
++					uint16_t end, bt_uuid_t *uuid,
++					GAttribResultFunc func,
++					gpointer user_data);
+ 
+-guint gatt_exchange_mtu(GAttrib *attrib, uint16_t mtu, GAttribResultFunc func,
+-							gpointer user_data);
++unsigned int gatt_exchange_mtu(GAttrib *attrib, uint16_t mtu,
++				GAttribResultFunc func, gpointer user_data);
+ 
+ gboolean gatt_parse_record(const sdp_record_t *rec,
+ 					uuid_t *prim_uuid, uint16_t *psm,
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+index c662ace..ad4efe1 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -26,7 +26,7 @@
+ #include "config.h"
+ #endif
+ 
+-#include <stdint.h>
++#include <inttypes.h>
+ #include <stdbool.h>
+ #include <string.h>
+ #include <glib.h>
+@@ -48,24 +48,24 @@ struct _GAttrib {
+ 	int refs;
+ 	uint8_t *buf;
+ 	size_t buflen;
+-	guint read_watch;
+-	guint write_watch;
+-	guint timeout_watch;
++	unsigned int read_watch;
++	unsigned int write_watch;
++	unsigned int timeout_watch;
+ 	GQueue *requests;
+ 	GQueue *responses;
+ 	GSList *events;
+-	guint next_cmd_id;
++	unsigned int next_cmd_id;
+ 	GDestroyNotify destroy;
+ 	gpointer destroy_user_data;
+ 	bool stale;
+ };
+ 
+ struct command {
+-	guint id;
+-	guint8 opcode;
+-	guint8 *pdu;
+-	guint16 len;
+-	guint8 expected;
++	unsigned int id;
++	uint8_t opcode;
++	uint8_t *pdu;
++	uint16_t len;
++	uint8_t expected;
+ 	bool sent;
+ 	GAttribResultFunc func;
+ 	gpointer user_data;
+@@ -73,15 +73,15 @@ struct command {
+ };
+ 
+ struct event {
+-	guint id;
+-	guint8 expected;
+-	guint16 handle;
++	unsigned int id;
++	uint8_t expected;
++	uint16_t handle;
+ 	GAttribNotifyFunc func;
+ 	gpointer user_data;
+ 	GDestroyNotify notify;
+ };
+ 
+-static guint8 opcode2expected(guint8 opcode)
++static uint8_t opcode2expected(uint8_t opcode)
  {
- 	return transfer->op;
+ 	switch (opcode) {
+ 	case ATT_OP_MTU_REQ:
+@@ -124,7 +124,7 @@ static guint8 opcode2expected(guint8 opcode)
+ 	return 0;
  }
-diff --git a/obexd/client/transfer.h b/obexd/client/transfer.h
-index 474900b..fb9e6dc 100644
---- a/obexd/client/transfer.h
-+++ b/obexd/client/transfer.h
-@@ -53,7 +53,7 @@ gboolean obc_transfer_set_callback(struct obc_transfer *transfer,
  
- gboolean obc_transfer_start(struct obc_transfer *transfer, void *obex,
- 								GError **err);
--guint8 obc_transfer_get_operation(struct obc_transfer *transfer);
-+uint8_t obc_transfer_get_operation(struct obc_transfer *transfer);
+-static bool is_response(guint8 opcode)
++static bool is_response(uint8_t opcode)
+ {
+ 	switch (opcode) {
+ 	case ATT_OP_ERROR:
+@@ -367,7 +367,7 @@ static void wake_up_sender(struct _GAttrib *attrib)
  
- void obc_transfer_set_apparam(struct obc_transfer *transfer, void *data);
- void *obc_transfer_get_apparam(struct obc_transfer *transfer);
-diff --git a/obexd/client/transport.h b/obexd/client/transport.h
-index b035cfc..becb0fe 100644
---- a/obexd/client/transport.h
-+++ b/obexd/client/transport.h
-@@ -21,17 +21,19 @@
-  *
-  */
+ static bool match_event(struct event *evt, const uint8_t *pdu, gsize len)
+ {
+-	guint16 handle;
++	uint16_t handle;
+ 
+ 	if (evt->expected == GATTRIB_ALL_EVENTS)
+ 		return true;
+@@ -502,9 +502,10 @@ GAttrib *g_attrib_new(GIOChannel *io)
+ 	return g_attrib_ref(attrib);
+ }
+ 
+-guint g_attrib_send(GAttrib *attrib, guint id, const guint8 *pdu, guint16 len,
+-			GAttribResultFunc func, gpointer user_data,
+-			GDestroyNotify notify)
++unsigned int g_attrib_send(GAttrib *attrib, unsigned int id,
++				const uint8_t *pdu, uint16_t len,
++				GAttribResultFunc func, gpointer user_data,
++				GDestroyNotify notify)
+ {
+ 	struct command *c;
+ 	GQueue *queue;
+@@ -559,12 +560,12 @@ guint g_attrib_send(GAttrib *attrib, guint id, const guint8 *pdu, guint16 len,
+ static int command_cmp_by_id(gconstpointer a, gconstpointer b)
+ {
+ 	const struct command *cmd = a;
+-	guint id = GPOINTER_TO_UINT(b);
++	unsigned int id = GPOINTER_TO_UINT(b);
+ 
+ 	return cmd->id - id;
+ }
+ 
+-gboolean g_attrib_cancel(GAttrib *attrib, guint id)
++gboolean g_attrib_cancel(GAttrib *attrib, unsigned int id)
+ {
+ 	GList *l = NULL;
+ 	struct command *cmd;
+@@ -669,11 +670,11 @@ gboolean g_attrib_set_mtu(GAttrib *attrib, int mtu)
+ 	return TRUE;
+ }
+ 
+-guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
++unsigned int g_attrib_register(GAttrib *attrib, uint8_t opcode, uint16_t handle,
+ 				GAttribNotifyFunc func, gpointer user_data,
+ 				GDestroyNotify notify)
+ {
+-	static guint next_evt_id = 0;
++	static unsigned int next_evt_id = 0;
+ 	struct event *event;
+ 
+ 	event = g_try_new0(struct event, 1);
+@@ -695,7 +696,7 @@ guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
+ static int event_cmp_by_id(gconstpointer a, gconstpointer b)
+ {
+ 	const struct event *evt = a;
+-	guint id = GPOINTER_TO_UINT(b);
++	unsigned int id = GPOINTER_TO_UINT(b);
+ 
+ 	return evt->id - id;
+ }
+@@ -712,7 +713,7 @@ gboolean g_attrib_is_encrypted(GAttrib *attrib)
+ 	return sec_level > BT_IO_SEC_LOW;
+ }
+ 
+-gboolean g_attrib_unregister(GAttrib *attrib, guint id)
++gboolean g_attrib_unregister(GAttrib *attrib, unsigned int id)
+ {
+ 	struct event *evt;
+ 	GSList *l;
+diff --git a/attrib/gattrib.h b/attrib/gattrib.h
+index 3fe92c7..a1f2dd8 100644
+--- a/attrib/gattrib.h
++++ b/attrib/gattrib.h
+@@ -28,6 +28,8 @@
+ extern "C" {
+ #endif
  
 +#include <inttypes.h>
 +
- typedef void (*obc_transport_func)(GIOChannel *io, GError *err,
+ #define GATTRIB_ALL_EVENTS 0xFF
+ #define GATTRIB_ALL_REQS 0xFE
+ #define GATTRIB_ALL_HANDLES 0x0000
+@@ -35,11 +37,11 @@ extern "C" {
+ struct _GAttrib;
+ typedef struct _GAttrib GAttrib;
+ 
+-typedef void (*GAttribResultFunc) (guint8 status, const guint8 *pdu,
+-					guint16 len, gpointer user_data);
++typedef void (*GAttribResultFunc) (uint8_t status, const uint8_t *pdu,
++					uint16_t len, gpointer user_data);
+ typedef void (*GAttribDisconnectFunc)(gpointer user_data);
+ typedef void (*GAttribDebugFunc)(const char *str, gpointer user_data);
+-typedef void (*GAttribNotifyFunc)(const guint8 *pdu, guint16 len,
++typedef void (*GAttribNotifyFunc)(const uint8_t *pdu, uint16_t len,
  							gpointer user_data);
  
- struct obc_transport {
- 	const char *name;
--	guint (*connect) (const char *source, const char *destination,
-+	unsigned int (*connect) (const char *source, const char *destination,
- 				const char *service, uint16_t port,
- 				obc_transport_func func, void *user_data);
- 	int (*getpacketopt) (GIOChannel *io, int *tx_mtu, int *rx_mtu);
--	void (*disconnect) (guint id);
--	const void *(*getattribute) (guint id, int attribute_id);
-+	void (*disconnect) (unsigned int id);
-+	const void *(*getattribute) (unsigned int id, int attribute_id);
- };
+ GAttrib *g_attrib_new(GIOChannel *io);
+@@ -51,17 +53,18 @@ GIOChannel *g_attrib_get_channel(GAttrib *attrib);
+ gboolean g_attrib_set_destroy_function(GAttrib *attrib,
+ 		GDestroyNotify destroy, gpointer user_data);
  
- int obc_transport_register(struct obc_transport *transport);
-diff --git a/obexd/plugins/irmc.c b/obexd/plugins/irmc.c
-index d343977..6407de2 100644
---- a/obexd/plugins/irmc.c
-+++ b/obexd/plugins/irmc.c
-@@ -68,7 +68,7 @@ struct irmc_session {
+-guint g_attrib_send(GAttrib *attrib, guint id, const guint8 *pdu, guint16 len,
+-			GAttribResultFunc func, gpointer user_data,
+-			GDestroyNotify notify);
++unsigned int g_attrib_send(GAttrib *attrib, unsigned int id,
++				const uint8_t *pdu, uint16_t len,
++				GAttribResultFunc func, gpointer user_data,
++				GDestroyNotify notify);
  
- #define IRMC_TARGET_SIZE 9
+-gboolean g_attrib_cancel(GAttrib *attrib, guint id);
++gboolean g_attrib_cancel(GAttrib *attrib, unsigned int id);
+ gboolean g_attrib_cancel_all(GAttrib *attrib);
  
--static const guint8 IRMC_TARGET[IRMC_TARGET_SIZE] = {
-+static const uint8_t IRMC_TARGET[IRMC_TARGET_SIZE] = {
- 			0x49, 0x52, 0x4d, 0x43,  0x2d, 0x53, 0x59, 0x4e, 0x43 };
+ gboolean g_attrib_set_debug(GAttrib *attrib,
+ 		GAttribDebugFunc func, gpointer user_data);
  
- /* FIXME:
-diff --git a/obexd/plugins/phonebook-dummy.c b/obexd/plugins/phonebook-dummy.c
-index 6b9d040..aa9ba18 100644
---- a/obexd/plugins/phonebook-dummy.c
-+++ b/obexd/plugins/phonebook-dummy.c
+-guint g_attrib_register(GAttrib *attrib, guint8 opcode, guint16 handle,
++unsigned int g_attrib_register(GAttrib *attrib, uint8_t opcode, uint16_t handle,
+ 				GAttribNotifyFunc func, gpointer user_data,
+ 				GDestroyNotify notify);
+ 
+@@ -70,7 +73,7 @@ gboolean g_attrib_is_encrypted(GAttrib *attrib);
+ uint8_t *g_attrib_get_buffer(GAttrib *attrib, size_t *len);
+ gboolean g_attrib_set_mtu(GAttrib *attrib, int mtu);
+ 
+-gboolean g_attrib_unregister(GAttrib *attrib, guint id);
++gboolean g_attrib_unregister(GAttrib *attrib, unsigned int id);
+ gboolean g_attrib_unregister_all(GAttrib *attrib);
+ 
+ #ifdef __cplusplus
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index 2c11562..9ecd628 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
 @@ -26,6 +26,7 @@
  #include <config.h>
  #endif
  
 +#include <inttypes.h>
- #include <dirent.h>
  #include <errno.h>
- #include <stdio.h>
-@@ -52,7 +53,7 @@ struct dummy_data {
- 	const struct apparam_field *apparams;
- 	char *folder;
- 	int fd;
--	guint id;
-+	unsigned int id;
- };
+ #include <glib.h>
+ #include <stdlib.h>
+@@ -137,7 +138,7 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+ 	operation(attrib);
+ }
  
- struct cache_query {
-@@ -520,7 +521,7 @@ void *phonebook_get_entry(const char *folder, const char *id,
- 	struct dummy_data *dummy;
- 	char *filename;
- 	int fd;
--	guint ret;
-+	unsigned int ret;
+-static void primary_all_cb(GSList *services, guint8 status, gpointer user_data)
++static void primary_all_cb(GSList *services, uint8_t status, gpointer user_data)
+ {
+ 	GSList *l;
  
- 	filename = g_build_filename(root_folder, folder, id, NULL);
+@@ -157,7 +158,7 @@ done:
+ 	g_main_loop_quit(event_loop);
+ }
  
-@@ -553,7 +554,7 @@ void *phonebook_create_cache(const char *name, phonebook_entry_cb entry_cb,
- 	struct cache_query *query;
- 	char *foldername;
- 	DIR *dp;
--	guint ret;
-+	unsigned int ret;
+-static void primary_by_uuid_cb(GSList *ranges, guint8 status,
++static void primary_by_uuid_cb(GSList *ranges, uint8_t status,
+ 							gpointer user_data)
+ {
+ 	GSList *l;
+@@ -191,7 +192,7 @@ static gboolean primary(gpointer user_data)
+ 	return FALSE;
+ }
  
- 	foldername = g_build_filename(root_folder, name, NULL);
- 	dp = opendir(foldername);
-diff --git a/obexd/src/main.c b/obexd/src/main.c
-index 61a06b2..ae7c73c 100644
---- a/obexd/src/main.c
-+++ b/obexd/src/main.c
+-static void char_discovered_cb(GSList *characteristics, guint8 status,
++static void char_discovered_cb(GSList *characteristics, uint8_t status,
+ 							gpointer user_data)
+ {
+ 	GSList *l;
+@@ -224,7 +225,7 @@ static gboolean characteristics(gpointer user_data)
+ 	return FALSE;
+ }
+ 
+-static void char_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
++static void char_read_cb(uint8_t status, const uint8_t *pdu, uint16_t plen,
+ 							gpointer user_data)
+ {
+ 	uint8_t value[plen];
+@@ -252,8 +253,8 @@ done:
+ 		g_main_loop_quit(event_loop);
+ }
+ 
+-static void char_read_by_uuid_cb(guint8 status, const guint8 *pdu,
+-					guint16 plen, gpointer user_data)
++static void char_read_by_uuid_cb(uint8_t status, const uint8_t *pdu,
++					uint16_t plen, gpointer user_data)
+ {
+ 	struct characteristic_data *char_data = user_data;
+ 	struct att_data_list *list;
+@@ -361,7 +362,7 @@ error:
+ 	return FALSE;
+ }
+ 
+-static void char_write_req_cb(guint8 status, const guint8 *pdu, guint16 plen,
++static void char_write_req_cb(uint8_t status, const uint8_t *pdu, uint16_t plen,
+ 							gpointer user_data)
+ {
+ 	if (status != 0) {
+@@ -414,11 +415,11 @@ error:
+ 	return FALSE;
+ }
+ 
+-static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
++static void char_desc_cb(uint8_t status, const uint8_t *pdu, uint16_t plen,
+ 							gpointer user_data)
+ {
+ 	struct att_data_list *list;
+-	guint8 format;
++	uint8_t format;
+ 	int i;
+ 
+ 	if (status != 0) {
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index f28dc22..12f1506 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
 @@ -25,6 +25,7 @@
- #include <config.h>
+ #include "config.h"
  #endif
  
 +#include <inttypes.h>
- #include <stdio.h>
- #include <errno.h>
- #include <unistd.h>
-@@ -91,10 +92,10 @@ static gboolean signal_handler(GIOChannel *channel, GIOCondition cond,
+ #include <string.h>
+ #include <stdlib.h>
+ #include <stdarg.h>
+@@ -187,7 +188,7 @@ static void disconnect_io()
+ 	set_state(STATE_DISCONNECTED);
+ }
+ 
+-static void primary_all_cb(GSList *services, guint8 status, gpointer user_data)
++static void primary_all_cb(GSList *services, uint8_t status, gpointer user_data)
+ {
+ 	GSList *l;
+ 
+@@ -209,7 +210,7 @@ static void primary_all_cb(GSList *services, guint8 status, gpointer user_data)
+ 	}
+ }
+ 
+-static void primary_by_uuid_cb(GSList *ranges, guint8 status,
++static void primary_by_uuid_cb(GSList *ranges, uint8_t status,
+ 							gpointer user_data)
+ {
+ 	GSList *l;
+@@ -232,7 +233,7 @@ static void primary_by_uuid_cb(GSList *ranges, guint8 status,
+ 	}
+ }
+ 
+-static void included_cb(GSList *includes, guint8 status, gpointer user_data)
++static void included_cb(GSList *includes, uint8_t status, gpointer user_data)
+ {
+ 	GSList *l;
+ 
+@@ -256,7 +257,7 @@ static void included_cb(GSList *includes, guint8 status, gpointer user_data)
+ 	}
+ }
+ 
+-static void char_cb(GSList *characteristics, guint8 status, gpointer user_data)
++static void char_cb(GSList *characteristics, uint8_t status, gpointer user_data)
+ {
+ 	GSList *l;
+ 
+@@ -276,11 +277,11 @@ static void char_cb(GSList *characteristics, guint8 status, gpointer user_data)
+ 	}
+ }
+ 
+-static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
++static void char_desc_cb(uint8_t status, const uint8_t *pdu, uint16_t plen,
+ 							gpointer user_data)
+ {
+ 	struct att_data_list *list;
+-	guint8 format;
++	uint8_t format;
+ 	uint16_t handle = 0xffff;
+ 	int i;
+ 
+@@ -317,7 +318,7 @@ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 		gatt_find_info(attrib, handle + 1, end, char_desc_cb, NULL);
+ }
+ 
+-static void char_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
++static void char_read_cb(uint8_t status, const uint8_t *pdu, uint16_t plen,
+ 							gpointer user_data)
+ {
+ 	uint8_t value[plen];
+@@ -345,8 +346,8 @@ static void char_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	g_string_free(s, TRUE);
+ }
+ 
+-static void char_read_by_uuid_cb(guint8 status, const guint8 *pdu,
+-					guint16 plen, gpointer user_data)
++static void char_read_by_uuid_cb(uint8_t status, const uint8_t *pdu,
++					uint16_t plen, gpointer user_data)
+ {
+ 	struct characteristic_data *char_data = user_data;
+ 	struct att_data_list *list;
+@@ -648,7 +649,7 @@ static void cmd_read_uuid(int argcp, char **argvp)
+ 					char_read_by_uuid_cb, char_data);
+ }
+ 
+-static void char_write_req_cb(guint8 status, const guint8 *pdu, guint16 plen,
++static void char_write_req_cb(uint8_t status, const uint8_t *pdu, uint16_t plen,
+ 							gpointer user_data)
+ {
+ 	if (status != 0) {
+@@ -743,7 +744,7 @@ static void cmd_sec_level(int argcp, char **argvp)
+ 	}
+ }
+ 
+-static void exchange_mtu_cb(guint8 status, const guint8 *pdu, guint16 plen,
++static void exchange_mtu_cb(uint8_t status, const uint8_t *pdu, uint16_t plen,
+ 							gpointer user_data)
+ {
+ 	uint16_t mtu;
+@@ -924,10 +925,10 @@ static char **commands_completion(const char *text, int start, int end)
+ 		return NULL;
+ }
+ 
+-static guint setup_standard_input(void)
++static unsigned int setup_standard_input(void)
+ {
+ 	GIOChannel *channel;
+-	guint source;
++	unsigned int source;
+ 
+ 	channel = g_io_channel_unix_new(fileno(stdin));
+ 
+@@ -980,10 +981,10 @@ static gboolean signal_handler(GIOChannel *channel, GIOCondition condition,
  	return TRUE;
  }
  
@@ -668,115 +887,17 @@ index 61a06b2..ae7c73c 100644
  	sigset_t mask;
  	int fd;
  
-@@ -244,7 +245,7 @@ int main(int argc, char *argv[])
+@@ -1020,8 +1021,8 @@ static guint setup_signalfd(void)
+ int interactive(const char *src, const char *dst,
+ 		const char *dst_type, int psm)
  {
- 	GOptionContext *context;
- 	GError *err = NULL;
+-	guint input;
 -	guint signal;
++	unsigned int input;
 +	unsigned int signal;
  
- #ifdef NEED_THREADS
- 	if (g_thread_supported() == FALSE)
-diff --git a/obexd/src/obex-priv.h b/obexd/src/obex-priv.h
-index 41854bc..aba3564 100644
---- a/obexd/src/obex-priv.h
-+++ b/obexd/src/obex-priv.h
-@@ -22,6 +22,8 @@
-  *
-  */
+ 	opt_sec_level = g_strdup("low");
  
-+#include <inttypes.h>
-+
- struct obex_session {
- 	GIOChannel *io;
- 	uint32_t id;
-@@ -36,7 +38,7 @@ struct obex_session {
- 	size_t apparam_len;
- 	const void *nonhdr;
- 	size_t nonhdr_len;
--	guint get_rsp;
-+	unsigned int get_rsp;
- 	uint8_t *buf;
- 	int64_t pending;
- 	int64_t offset;
-diff --git a/obexd/src/obex.c b/obexd/src/obex.c
-index a3e7b0e..ec91733 100644
---- a/obexd/src/obex.c
-+++ b/obexd/src/obex.c
-@@ -352,7 +352,7 @@ static uint8_t *challenge_response(const uint8_t *nonce)
- static void parse_service(struct obex_session *os, GObexPacket *req)
- {
- 	GObexHeader *hdr;
--	const guint8 *target = NULL, *who = NULL;
-+	const uint8_t *target = NULL, *who = NULL;
- 	gsize target_size = 0, who_size = 0;
- 
- 	hdr = g_obex_packet_get_header(req, G_OBEX_HDR_WHO);
-@@ -378,7 +378,7 @@ static void parse_authchal(struct obex_session *session, GObexPacket *req,
- 							GObexPacket *rsp)
- {
- 	GObexHeader *hdr;
--	const guint8 *data, *nonce = NULL;
-+	const uint8_t *data, *nonce = NULL;
- 	gsize len;
- 	uint8_t challenge[18];
- 	struct auth_header *auth = (struct auth_header *) challenge;
-@@ -561,8 +561,8 @@ static int driver_get_headers(struct obex_session *os)
- {
- 	GObexPacket *rsp;
- 	gssize len;
--	guint8 data[255];
--	guint8 id;
-+	uint8_t data[255];
-+	uint8_t id;
- 	GObexHeader *hdr;
- 
- 	DBG("name=%s type=%s object=%p", os->name, os->type, os->object);
-@@ -687,7 +687,7 @@ static gboolean recv_data(const void *buf, gsize size, gpointer user_data)
- static void parse_type(struct obex_session *os, GObexPacket *req)
- {
- 	GObexHeader *hdr;
--	const guint8 *type;
-+	const uint8_t *type;
- 	gsize len;
- 
- 	g_free(os->type);
-@@ -737,7 +737,7 @@ static void parse_name(struct obex_session *os, GObexPacket *req)
- static void parse_apparam(struct obex_session *os, GObexPacket *req)
- {
- 	GObexHeader *hdr;
--	const guint8 *apparam;
-+	const uint8_t *apparam;
- 	gsize len;
- 
- 	hdr = g_obex_packet_get_header(req, G_OBEX_HDR_APPARAM);
-@@ -876,7 +876,7 @@ int obex_put_stream_start(struct obex_session *os, const char *filename)
- static void parse_length(struct obex_session *os, GObexPacket *req)
- {
- 	GObexHeader *hdr;
--	guint32 size;
-+	uint32_t size;
- 
- 	hdr = g_obex_packet_get_header(req, G_OBEX_HDR_LENGTH);
- 	if (hdr == NULL)
-@@ -892,7 +892,7 @@ static void parse_length(struct obex_session *os, GObexPacket *req)
- static void parse_time(struct obex_session *os, GObexPacket *req)
- {
- 	GObexHeader *hdr;
--	const guint8 *time;
-+	const uint8_t *time;
- 	gsize len;
- 
- 	hdr = g_obex_packet_get_header(req, G_OBEX_HDR_TIME);
-@@ -1009,7 +1009,7 @@ static void parse_destname(struct obex_session *os, GObexPacket *req)
- static void parse_action(struct obex_session *os, GObexPacket *req)
- {
- 	GObexHeader *hdr;
--	guint8 id;
-+	uint8_t id;
- 
- 	hdr = g_obex_packet_get_header(req, G_OBEX_HDR_ACTION);
- 	if (hdr == NULL)
 -- 
 1.8.2.2
 
