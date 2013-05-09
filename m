@@ -1,58 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alex Deymo <deymo@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	keybuk@chromium.org,
-	Alex Deymo <deymo@chromium.org>
-Subject: [PATCH] doc: Document missing errors returned by the Device1 API.
-Date: Thu,  9 May 2013 12:09:48 -0700
-Message-Id: <1368126588-19304-1-git-send-email-deymo@chromium.org>
+MIME-Version: 1.0
+In-Reply-To: <CAMOw1v5GdFxwmNJX9U+9HTmSRi-FkOhLaSFSU0YQ9WKeosvvMw@mail.gmail.com>
+References: <1368073016-28434-1-git-send-email-lucas.demarchi@profusion.mobi>
+	<1368073016-28434-5-git-send-email-lucas.demarchi@profusion.mobi>
+	<CAJdJm_MaTBC+bT-aTbKPPDQrziq4WJArow_ERbzRiq54pp+ZJg@mail.gmail.com>
+	<CAMOw1v5GdFxwmNJX9U+9HTmSRi-FkOhLaSFSU0YQ9WKeosvvMw@mail.gmail.com>
+Date: Thu, 9 May 2013 08:31:02 -0400
+Message-ID: <CAJdJm_O3SnM67RbEHcpCZMnhyObmFcx5nCzLMhsY-rz2QaXWaQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 05/26] attrib: Get rid of guint* types
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There were two groups of missing error messages in the documentation:
-* For org.bluez.Device1.DisconnectProfile:
-  This method could certainly call btd_error_not_supported or
-  btd_error_failed returning those errors.
-* For org.bluez.Device1.Pair:
-  The pairing process could certainly call new_authentication_return
-  which can return (and actualy does) five other different errors.
----
+Hi Lucas,
 
-Hi,
-Those are just a few I found, but didn't check rigorously all the functions.
-This is at least a progress.
-Thanks!
-Alex.
+On Thu, May 9, 2013 at 8:15 AM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+>> We used to avoid adding includes into headers, and instead add them on
+>> the .c files only. (The existing include above is a unfortunate
+>> exception). Not sure if this convention has changed since.
+>
+> Sure, but when you use a certain type in header you need the header
+> (or if it's a pointer you have the option to do a forward declaration,
+> but it's not the case here). If you don't do this you depend on the
+> include order in each .c, risking to break the build, which is way
+> worse.
 
+My point is, I know of all these aspects of not having self-contained
+headers, and I am personally okay with it. But there was a tendency in
+BlueZ to explicitly add #include's to each .c where it was needed and
+keep headers free from #include's. Maybe I just misinterpreted this
+convention, but I wanted to have it noted (and maybe Johan/Marcel
+could clarify whether this is relevant).
 
- doc/device-api.txt | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/doc/device-api.txt b/doc/device-api.txt
-index 187f2bf..6201780 100644
---- a/doc/device-api.txt
-+++ b/doc/device-api.txt
-@@ -61,7 +61,9 @@ Methods		void Connect()
- 			succeed.
- 
- 			Possible errors: org.bluez.Error.DoesNotExist
-+					 org.bluez.Error.Failed
- 					 org.bluez.Error.NotConnected
-+					 org.bluez.Error.NotSupported
- 
- 		void Pair()
- 
-@@ -83,6 +85,11 @@ Methods		void Connect()
- 
- 			Possible errors: org.bluez.Error.InvalidArguments
- 					 org.bluez.Error.Failed
-+					 org.bluez.Error.AuthenticationCanceled
-+					 org.bluez.Error.AuthenticationFailed
-+					 org.bluez.Error.AuthenticationRejected
-+					 org.bluez.Error.AuthenticationTimeout
-+					 org.bluez.Error.ConnectionAttemptFailed
- 
- 		void CancelPairing()
- 
+Best Regards,
 -- 
-1.8.2.1
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
