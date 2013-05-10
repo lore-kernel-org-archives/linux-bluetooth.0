@@ -1,40 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH BlueZ v0] avctp: Fix missing UUID registration
-Date: Fri, 10 May 2013 13:41:04 +0200
-Message-Id: <1368186064-10960-1-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Fri, 10 May 2013 14:27:11 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/8] AVCTP: Add support to register pass-through
+ handler
+Message-ID: <20130510112711.GB16027@x220.P-661HNU-F1>
+References: <1368183727-24461-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1368183727-24461-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Luiz,
 
-When there is an incoming connection to AVCTP PSM, there is no way to
-know if the remote UUID corresponds to AVRCP_REMOTE_UUID or
-AVRCP_TARGET_UUID. Therefore both UUIDs should be reported to the core.
+On Fri, May 10, 2013, Luiz Augusto von Dentz wrote:
+> Pass-through handler can be used to capture AV/C Panel commands before
+> they are sent to uinput.
+> ---
+>  profiles/audio/avctp.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  profiles/audio/avctp.h |  8 ++++++
+>  2 files changed, 80 insertions(+)
 
-Without this patch, a crash has been observed with the iPhone 5
-immediately after pairing.
----
-I don't have the log traces right now but submitting the patch anyway due to the upcoming release.
+All patches in this set have been applied. Thanks.
 
- profiles/audio/avctp.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 21aeb6f..6f1fc17 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -1324,6 +1324,8 @@ static void avctp_confirm_cb(GIOChannel *chan, gpointer data)
- 
- 	if (dev->control == NULL) {
- 		btd_device_add_uuid(dev->btd_dev, AVRCP_REMOTE_UUID);
-+		btd_device_add_uuid(dev->btd_dev, AVRCP_TARGET_UUID);
-+
- 		if (dev->control == NULL)
- 			goto drop;
- 	}
--- 
-1.8.1.4
-
+Johan
