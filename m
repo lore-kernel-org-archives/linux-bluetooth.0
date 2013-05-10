@@ -1,28 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 10 May 2013 14:27:11 +0300
+Date: Fri, 10 May 2013 14:26:50 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/8] AVCTP: Add support to register pass-through
- handler
-Message-ID: <20130510112711.GB16027@x220.P-661HNU-F1>
-References: <1368183727-24461-1-git-send-email-luiz.dentz@gmail.com>
+To: Alex Deymo <deymo@chromium.org>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	keybuk@chromium.org
+Subject: Re: [PATCH] doc: Document missing errors returned by the Device1 API.
+Message-ID: <20130510112650.GA16027@x220.P-661HNU-F1>
+References: <1368126588-19304-1-git-send-email-deymo@chromium.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1368183727-24461-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1368126588-19304-1-git-send-email-deymo@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Alex,
 
-On Fri, May 10, 2013, Luiz Augusto von Dentz wrote:
-> Pass-through handler can be used to capture AV/C Panel commands before
-> they are sent to uinput.
+On Thu, May 09, 2013, Alex Deymo wrote:
+> There were two groups of missing error messages in the documentation:
+> * For org.bluez.Device1.DisconnectProfile:
+>   This method could certainly call btd_error_not_supported or
+>   btd_error_failed returning those errors.
+> * For org.bluez.Device1.Pair:
+>   The pairing process could certainly call new_authentication_return
+>   which can return (and actualy does) five other different errors.
 > ---
->  profiles/audio/avctp.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  profiles/audio/avctp.h |  8 ++++++
->  2 files changed, 80 insertions(+)
+> 
+> Hi,
+> Those are just a few I found, but didn't check rigorously all the functions.
+> This is at least a progress.
+> Thanks!
+> Alex.
+> 
+> 
+>  doc/device-api.txt | 7 +++++++
+>  1 file changed, 7 insertions(+)
 
-All patches in this set have been applied. Thanks.
+Applied. Thanks.
 
 Johan
