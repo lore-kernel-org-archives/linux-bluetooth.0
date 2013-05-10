@@ -1,65 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 10 May 2013 10:39:59 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Alex Deymo <deymo@chromium.org>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	keybuk@chromium.org
-Subject: Re: [PATCH v5 0/8] Autopair
-Message-ID: <20130510073959.GA32047@x220.ger.corp.intel.com>
-References: <1368059882-9986-1-git-send-email-deymo@chromium.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1368059882-9986-1-git-send-email-deymo@chromium.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 8/8] media: Check MPRIS Can* properties before calling the respective method
+Date: Fri, 10 May 2013 14:02:07 +0300
+Message-Id: <1368183727-24461-8-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1368183727-24461-1-git-send-email-luiz.dentz@gmail.com>
+References: <1368183727-24461-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, May 08, 2013, Alex Deymo wrote:
-> Changes from the v4 are:
-> * uint32_t --> unsigned int for the "attempt" argument. I think that
-> restrict that value to unsigned given that -1 is never used for
-> attempt is a good practice.
-> * "pincb_iter" --> "btd_adapter_pin_cb_iter". The "pin_cb" instead
-> of "pincb" is to match the btd_adapter_pin_cb_t callback type
-> already used in the code.
-> * Added a bool pincode_requested member to btd_adapter (see patch 4/8)
-> to signal if the device requested a pincode during the bonding attempt.
-> This is basically to fix the case were we keep retrying the bonding
-> and the device keeps sending an authentication error without consuming
-> a pin code from the pincode callback list. This ensures that either a
-> pincode was consumed from the list before retrying. Together with the
-> fact that the pin codes provided by the callback list is a finite list,
-> this ensures the retry mechanism will finish.
-> 
-> Please consider this version for bluez. We are actively testing this
-> patchset in our last chromiumos release and I don't have any bug reported
-> regarding this feature. Thanks!
-> Alex.
-> 
-> Alex Deymo (8):
->   core: Convert the pincode callback to an interable list.
->   plugins: Extend the pin code callback with the call number
->   core: Add support for retrying a bonding
->   core: retry bonding attempt until the iterator reaches the end.
->   core: Add device_get_class to the public interface.
->   autopair: Add the autopair plugin.
->   core: Expose the last bonding attempt timeout on retry
->   autopair: Try a fixed pincode for keyboards rejecting random codes
-> 
->  Makefile.plugins   |   3 +
->  plugins/autopair.c | 165 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  plugins/wiimote.c  |   7 ++-
->  src/adapter.c      | 175 ++++++++++++++++++++++++++++++++++++++++++++++-------
->  src/adapter.h      |  11 +++-
->  src/device.c       | 135 +++++++++++++++++++++++++++++++++++++++++
->  src/device.h       |   7 +++
->  7 files changed, 478 insertions(+), 25 deletions(-)
->  create mode 100644 plugins/autopair.c
+With MPRIS the player can disable support for certain control using
+properties such as CanPlay, CanPause..., in this case these methods
+should not be called and the code should fallback to uinput method.
+---
+ profiles/audio/media.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
 
-All patches in this set have been applied. Thanks!
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index ce674d0..eb5ea81 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -102,6 +102,11 @@ struct media_player {
+ 	uint32_t		duration;
+ 	uint8_t			volume;
+ 	GTimer			*timer;
++	bool			play;
++	bool			pause;
++	bool			next;
++	bool			previous;
++	bool			control;
+ };
+ 
+ static GSList *adapters = NULL;
+@@ -1151,6 +1156,9 @@ static bool play(void *user_data)
+ 
+ 	DBG("");
+ 
++	if (!mp->play || !mp->control)
++		return false;
++
+ 	return media_player_send(mp, "Play");
+ }
+ 
+@@ -1160,6 +1168,9 @@ static bool stop(void *user_data)
+ 
+ 	DBG("");
+ 
++	if (!mp->control)
++		return false;
++
+ 	return media_player_send(mp, "Stop");
+ }
+ 
+@@ -1169,6 +1180,9 @@ static bool pause(void *user_data)
+ 
+ 	DBG("");
+ 
++	if (!mp->pause || !mp->control)
++		return false;
++
+ 	return media_player_send(mp, "Pause");
+ }
+ 
+@@ -1178,6 +1192,9 @@ static bool next(void *user_data)
+ 
+ 	DBG("");
+ 
++	if (!mp->next || !mp->control)
++		return false;
++
+ 	return media_player_send(mp, "Next");
+ }
+ 
+@@ -1187,6 +1204,9 @@ static bool previous(void *user_data)
+ 
+ 	DBG("");
+ 
++	if (!mp->previous || !mp->control)
++		return false;
++
+ 	return media_player_send(mp, "Previous");
+ }
+ 
+@@ -1512,6 +1532,21 @@ static gboolean set_repeat(struct media_player *mp, DBusMessageIter *iter)
+ 	return set_property(mp, "Repeat", value);
+ }
+ 
++static gboolean set_flag(struct media_player *mp, DBusMessageIter *iter,
++								bool *var)
++{
++	dbus_bool_t value;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
++		return FALSE;
++
++	dbus_message_iter_get_basic(iter, &value);
++
++	*var = value;
++
++	return TRUE;
++}
++
+ static gboolean set_player_property(struct media_player *mp, const char *key,
+ 							DBusMessageIter *entry)
+ {
+@@ -1537,6 +1572,21 @@ static gboolean set_player_property(struct media_player *mp, const char *key,
+ 	if (strcasecmp(key, "LoopStatus") == 0)
+ 		return set_repeat(mp, &var);
+ 
++	if (strcasecmp(key, "CanPlay") == 0)
++		return set_flag(mp, &var, &mp->play);
++
++	if (strcasecmp(key, "CanPause") == 0)
++		return set_flag(mp, &var, &mp->pause);
++
++	if (strcasecmp(key, "CanGoNext") == 0)
++		return set_flag(mp, &var, &mp->next);
++
++	if (strcasecmp(key, "CanGoPrevious") == 0)
++		return set_flag(mp, &var, &mp->previous);
++
++	if (strcasecmp(key, "CanControl") == 0)
++		return set_flag(mp, &var, &mp->control);
++
+ 	DBG("%s not supported, ignoring", key);
+ 
+ 	return TRUE;
+-- 
+1.8.1.4
 
-I did fix one thing in patch 4: for type bool the expected assignments
-are true/false and not TRUE/FALSE (which are GLib defines). I also
-pushed one small coding style/readability patch on top of this set.
-
-Johan
