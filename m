@@ -1,93 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ] AVRCP: Fix crash when no A2DP role is detected
-Date: Sun, 12 May 2013 09:59:12 +0300
-Message-Id: <1368341952-5666-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZJDL478uFzA2qAdj1ubav4FXEVvHix5Z37mv7oLyL0=ZQ@mail.gmail.com>
+References: <1368232149-9974-1-git-send-email-vinicius.gomes@openbossa.org>
+	<1368232149-9974-2-git-send-email-vinicius.gomes@openbossa.org>
+	<CABBYNZJDL478uFzA2qAdj1ubav4FXEVvHix5Z37mv7oLyL0=ZQ@mail.gmail.com>
+Date: Sat, 11 May 2013 11:26:18 -0300
+Message-ID: <CAE6HaMnsJgsmL9nGVMm7x4ET5RYUj4rG0NPYrLK1yO2Oq0TmSw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] avrcp: Fix crash using the wrong AVRCP role
+From: Vinicius Gomes <vinicius.gomes@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Luiz,
 
-Invalid read of size 4
-   at 0x468370: btd_service_connecting_complete (service.c:315)
-   by 0x41B70F: session_ct_init_control (avrcp.c:2790)
-   by 0x41B1E0: state_changed (avrcp.c:2933)
-   by 0x418054: avctp_set_state (avctp.c:548)
-   by 0x41A2E4: avctp_connect_cb (avctp.c:1201)
-   by 0x44F989: accept_cb (btio.c:201)
-   by 0x4E77044: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
-   by 0x4E77377: g_main_context_iterate.isra.24 (in /usr/lib64/libglib-2.0.so.0.3400.2)
-   by 0x4E77771: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3400.2)
-   by 0x40A8EE: main (main.c:583)
- Address 0x20 is not stack'd, malloc'd or (recently) free'd
+On Sat, May 11, 2013 at 5:18 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 
- If no A2DP is found assume the controller is the initiator.
----
- profiles/audio/avctp.c | 7 +++++++
- profiles/audio/avctp.h | 1 +
- profiles/audio/avrcp.c | 7 ++++++-
- 3 files changed, 14 insertions(+), 1 deletion(-)
+[snip]
 
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index db03456..314dbfb 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -201,6 +201,7 @@ struct avctp {
- 
- 	uint8_t key_quirks[256];
- 	struct key_pressed key;
-+	bool initiator;
- };
- 
- struct avctp_passthrough_handler {
-@@ -1931,6 +1932,7 @@ struct avctp *avctp_connect(struct audio_device *device)
- 	}
- 
- 	session->control = avctp_channel_create(session, io, NULL);
-+	session->initiator = true;
- 	g_io_channel_unref(io);
- 
- 	return session;
-@@ -1983,3 +1985,8 @@ struct avctp *avctp_get(struct audio_device *device)
- {
- 	return avctp_get_internal(device->btd_dev);
- }
-+
-+bool avctp_is_initiator(struct avctp *session)
-+{
-+	return session->initiator;
-+}
-diff --git a/profiles/audio/avctp.h b/profiles/audio/avctp.h
-index 0a414af..cd575cc 100644
---- a/profiles/audio/avctp.h
-+++ b/profiles/audio/avctp.h
-@@ -120,6 +120,7 @@ void avctp_unregister(struct btd_adapter *adapter);
- 
- struct avctp *avctp_connect(struct audio_device *device);
- struct avctp *avctp_get(struct audio_device *device);
-+bool avctp_is_initiator(struct avctp *session);
- int avctp_connect_browsing(struct avctp *session);
- void avctp_disconnect(struct avctp *session);
- 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 4acf396..4558407 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -2863,7 +2863,12 @@ static struct avrcp *session_create(struct avrcp_server *server,
- 
- 	server->sessions = g_slist_append(server->sessions, session);
- 
--	if (dev->sink && !dev->source)
-+	/* If sink and source are not supported assume the controller must
-+	 * be the initiator
-+	 */
-+	if (dev->sink == NULL && dev->source == NULL)
-+		session->target = !avctp_is_initiator(session->conn);
-+	else if (dev->sink && !dev->source)
- 		session->target = TRUE;
- 	else if (dev->source && !dev->sink)
- 		session->target = FALSE;
--- 
-1.8.1.4
+>
+> Are you still seeing this problem after we have applied Mikel's patch?
+> Perhaps we should do a late detection if we cannot find any A2DP role,
+> we can figure out by looking at the get_capabilities response, but
+> this would only work for 1.3 and latter. But perhaps we should use the
+> initiator as under these conditions it should be the controller.
 
+Yes, this is with Mikel's patch applied.
+
+The second alternative sounds good to me, but just sounds, as I am not
+completely
+familiar with avrcp.
+
+
+Cheers,
+--
+Vinicius
