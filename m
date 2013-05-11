@@ -1,64 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20130430072335.GA31159@x220.ger.corp.intel.com>
-References: <CAGd9gwjbOFpaYrZt=4Pn4VLUNX-uq-Ap=pPaWt9snV_Gmiwmtg@mail.gmail.com>
- <20130430072335.GA31159@x220.ger.corp.intel.com>
+In-Reply-To: <CABBYNZJNxEnKk-E5TcSwwNwkeBDhbsBgyMUJ_MuL02-MeV_i1Q@mail.gmail.com>
+References: <CAGd9gwjqSiH3=JwR80VcuXf2Z7KA8zOsYFT9N5gAZgZnTfF2wQ@mail.gmail.com>
+ <CABBYNZ+dE7Pkt5-RpzQQ1YSgj9pa4cM+MMDwGKFmdidApDtUKQ@mail.gmail.com>
+ <CAGd9gwi=72xSK5=ne2+wPU-A=oEz2VXnpPqjxMW9Z6OnyHOUMA@mail.gmail.com> <CABBYNZJNxEnKk-E5TcSwwNwkeBDhbsBgyMUJ_MuL02-MeV_i1Q@mail.gmail.com>
 From: Alex Deymo <deymo@chromium.org>
-Date: Fri, 10 May 2013 19:36:29 -0700
-Message-ID: <CAGd9gwg5ucupbzz5DoQNO0XNB5t_QgTB+Z-R0ZrvRGtV9hRz6Q@mail.gmail.com>
-Subject: Re: Paired devices in discovery mode
-To: Alex Deymo <deymo@chromium.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+Date: Fri, 10 May 2013 18:51:20 -0700
+Message-ID: <CAGd9gwj7c=EL8bQ_qjEq7XR5LonH_c=sQyTrhvnxompiN687Vg@mail.gmail.com>
+Subject: Re: Audio sink stream remains suspended on reconnection
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
 	keybuk <keybuk@chromium.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Luiz,
 
-On Tue, Apr 30, 2013 at 12:23 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> This has been discussed many times in the past but nothing concrete has
-> been done about it so far. The core spec essentially gives us two
-> options: either to reject the link or to ask the user if it's ok to
-> repair (and loose the old key) and then proceed with repairing. We've so
-> far only implemented the first option.
+On Fri, May 10, 2013 at 1:09 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Yes, you should release the fd once the state change to idle, in the
+> future we might actually use frevoke (http://lwn.net/Articles/192632/)
+> to revoke the permissions but for now we have to assume the endpoint
+> will behave and close whenever the transport became idle. You are also
+> right, we should probably update the documentation to state the fd is
+> considered revoked in this case and the endpoint has to acquired
+> again. Btw PulseAudio does that already so Im curious why you are not
+> using PA, or is this for another Audio daemon?
 
-I think that in that the first option is ok if the connection is
-initiated by the device, since it could be a malicious device with a
-fake key trying to spam us. But if we reject and ignore the key
-provided by the device (or the devices doesn't know it), we still need
-to give the user a way to re-pair the device.
+Oh, thank you very much for that information. I would never guessed
+that was the problem!
+Having the documentation clear and updated is good not only because
+not everyone uses PA, but also because definitively we don't want to
+use PA for testing (we may want to fake and control the interaction
+with the audio server to run a test). Actually, as Scott mentioned we
+are not using PA on Chromium/ChromiumOS laptops, we are using CRAS
+(ChromeOS Audio Server) which is basically the minimum we need to have
+low latency dynamic audio routing with a low CPU impact... and that's
+basically the "why". If you are curious, you can find the original
+design doc here [1], the code is opensource and here [2] and actually
+also works on ubuntu [3], but need applications (like chrome) that
+know how to talk with cras.
 
-I don't like the idea of extending the Device1.Connect() method with
-pairing related stuff, since some devices (mostly mice) are not
-normally-connectable and we should not expect the Connect() to work
-for those devices. Also, if the device supports encryption but don't
-require it (like keyboards), the way I have to tell BlueZ that I want
-an encrypted connection is to Pair the device first, and make sure the
-device is Paired before Connect. We would have to make sure then that
-Connect() a device reported as Paired does ensure a encrypted even
-after repair, and also I will require the client to register an agent
-before calling Connect() just in case the connect requires it... and
-currently we don't need that.
-
-Mac OS have done a good job here, displaying already paired devices in
-the Bluetooth Setup Assistant when they are in discovery mode. If you
-attempt to pair to one of those devices it will ask you about
-un-pairing and re-pairing with that device, and loosing the previous
-linkkey there (see screenshot here http://goo.gl/fGJ2U ). Only the
-paired devices that are in discovery are shown there in the list.
-
-The problem is that I can't implement such a nice interface with the
-current BlueZ API, since I don't known when a paired device is
-replying to the inquiry request or not. BlueZ knows that, but I don't
-know that from the dbus API. That's why I want to introduce the
-"Discovering" property. It will be also handy if Device1.Pair() allows
-me to re-pair the device and only replaces the linkkey if the pairing
-works. Right now, if the user wants to re-pair a device it has to
-remove it, wait several seconds until it appears in a discovery
-session and then call Pair in that new device. This possible, but not
-as user-friendly as it could be, and the change I'm proposing is
-backward compatible with the existing users since the only changed
-behavior is when trying to Pair an already Paired device.
-
+Again, thanks for the help.
 Alex.
+
+[1] http://www.chromium.org/chromium-os/chromiumos-design-docs/cras-chromeos-audio-server
+[2] http://git.chromium.org/gitweb/?p=chromiumos/third_party/adhd.git;a=summary
+[3] http://www.chromium.org/chromium-os/how-tos-and-troubleshooting/chrome-with-libcras-on-gprecise
