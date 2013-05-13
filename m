@@ -1,41 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 13 May 2013 10:09:39 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC BlueZ] AVRCP: Fix crash when no A2DP role is detected
-Message-ID: <20130513130939.GA10517@samus.indt.org>
-References: <1368341952-5666-1-git-send-email-luiz.dentz@gmail.com>
+Message-ID: <51904ACF.6010904@asianux.com>
+Date: Mon, 13 May 2013 10:07:11 +0800
+From: Chen Gang <gang.chen@asianux.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1368341952-5666-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Jiri Kosina <jkosina@suse.cz>
+CC: Gustavo Padovan <gustavo@padovan.org>,
+ David Herrmann <dh.herrmann@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ David Miller <davem@davemloft.net>, andrei.emeltchenko@intel.com,
+ "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+ netdev <netdev@vger.kernel.org>
+Subject: [PATCH v3] Bluetooth: hidp: using strlcpy instead of strncpy, also
+ beautify code.
+References: <518906A8.7060708@asianux.com> <CANq1E4SmY+CD0uf53_b6GeFkQ-LYnpdxsDGSRMWdn2i1mnb6WQ@mail.gmail.com> <5189A417.503@asianux.com> <5189C7C6.8090408@asianux.com> <alpine.LNX.2.00.1305091041140.23038@pobox.suse.cz>
+In-Reply-To: <alpine.LNX.2.00.1305091041140.23038@pobox.suse.cz>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
 
-On 09:59 Sun 12 May, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> Invalid read of size 4
->    at 0x468370: btd_service_connecting_complete (service.c:315)
->    by 0x41B70F: session_ct_init_control (avrcp.c:2790)
->    by 0x41B1E0: state_changed (avrcp.c:2933)
->    by 0x418054: avctp_set_state (avctp.c:548)
->    by 0x41A2E4: avctp_connect_cb (avctp.c:1201)
->    by 0x44F989: accept_cb (btio.c:201)
->    by 0x4E77044: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
->    by 0x4E77377: g_main_context_iterate.isra.24 (in /usr/lib64/libglib-2.0.so.0.3400.2)
->    by 0x4E77771: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3400.2)
->    by 0x40A8EE: main (main.c:583)
->  Address 0x20 is not stack'd, malloc'd or (recently) free'd
-> 
->  If no A2DP is found assume the controller is the initiator.
+For NUL terminated string, need always let it ended by zero.
 
+Since have already called memcpy() to initialize 'ci', so need not
+redundant initialization.
 
-This patch indeed fixes the crash. Ack.
+Better use ''if(session->hid) {} else if(session->input) {}"" instead
+of ''if(session->hid) {}; if(session->input) {};''
 
+Signed-off-by: Chen Gang <gang.chen@asianux.com>
+---
+ net/bluetooth/hidp/core.c |   14 ++++----------
+ 1 files changed, 4 insertions(+), 10 deletions(-)
 
-Cheers,
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index 940f5ac..f13a8da 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -76,25 +76,19 @@ static void hidp_copy_session(struct hidp_session *session, struct hidp_conninfo
+ 	ci->flags = session->flags;
+ 	ci->state = BT_CONNECTED;
+ 
+-	ci->vendor  = 0x0000;
+-	ci->product = 0x0000;
+-	ci->version = 0x0000;
+-
+ 	if (session->input) {
+ 		ci->vendor  = session->input->id.vendor;
+ 		ci->product = session->input->id.product;
+ 		ci->version = session->input->id.version;
+ 		if (session->input->name)
+-			strncpy(ci->name, session->input->name, 128);
++			strlcpy(ci->name, session->input->name, 128);
+ 		else
+-			strncpy(ci->name, "HID Boot Device", 128);
+-	}
+-
+-	if (session->hid) {
++			strlcpy(ci->name, "HID Boot Device", 128);
++	} else if (session->hid) {
+ 		ci->vendor  = session->hid->vendor;
+ 		ci->product = session->hid->product;
+ 		ci->version = session->hid->version;
+-		strncpy(ci->name, session->hid->name, 128);
++		strlcpy(ci->name, session->hid->name, 128);
+ 	}
+ }
+ 
 -- 
-Vinicius
+1.7.7.6
