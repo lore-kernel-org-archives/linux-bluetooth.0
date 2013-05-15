@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 08/14] tools: Add implementation of Playlists.ActivatePlaylist to mpris-player
-Date: Wed, 15 May 2013 18:31:40 +0300
-Message-Id: <1368631906-15951-8-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 04/14] tools: Add support for MPRIS TrackList.TrackAdded signal to mpris-player
+Date: Wed, 15 May 2013 18:31:36 +0300
+Message-Id: <1368631906-15951-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1368631906-15951-1-git-send-email-luiz.dentz@gmail.com>
 References: <1368631906-15951-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,129 +12,93 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- tools/mpris-player.c | 99 +++++++++++++++++++++++++++++++---------------------
- 1 file changed, 59 insertions(+), 40 deletions(-)
+ tools/mpris-player.c | 47 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 46 insertions(+), 1 deletion(-)
 
 diff --git a/tools/mpris-player.c b/tools/mpris-player.c
-index 9ac59b3..47e98d7 100644
+index 3fa9cd6..d4e6d14 100644
 --- a/tools/mpris-player.c
 +++ b/tools/mpris-player.c
-@@ -1730,11 +1730,68 @@ static const GDBusPropertyTable tracklist_properties[] = {
- 	{ }
+@@ -1690,6 +1690,12 @@ static const GDBusMethodTable tracklist_methods[] = {
+ 	{ },
  };
  
-+static void list_items_setup(DBusMessageIter *iter, void *user_data)
-+{
-+	DBusMessageIter dict;
++static const GDBusSignalTable tracklist_signals[] = {
++	{ GDBUS_SIGNAL("TrackAdded", GDBUS_ARGS({"metadata", "a{sv}"},
++						{"after", "o"})) },
++	{ }
++};
 +
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+					DBUS_TYPE_STRING_AS_STRING
-+					DBUS_TYPE_VARIANT_AS_STRING
-+					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
-+					&dict);
-+	dbus_message_iter_close_container(iter, &dict);
-+}
+ static void append_path(gpointer data, gpointer user_data)
+ {
+ 	GDBusProxy *proxy = data;
+@@ -1813,7 +1819,7 @@ static void register_tracklist(struct player *player, const char *playlist)
+ 	if (!g_dbus_register_interface(player->conn, MPRIS_PLAYER_PATH,
+ 						MPRIS_TRACKLIST_INTERFACE,
+ 						tracklist_methods,
+-						NULL,
++						tracklist_signals,
+ 						tracklist_properties,
+ 						player, NULL)) {
+ 		fprintf(stderr, "Could not register interface %s",
+@@ -1973,6 +1979,10 @@ static void register_item(struct player *player, GDBusProxy *proxy)
+ {
+ 	struct tracklist *tracklist;
+ 	const char *path;
++	DBusMessage *signal;
++	DBusMessageIter iter, args, metadata;
++	GSList *l;
++	GDBusProxy *after;
+ 
+ 	tracklist = player->tracklist;
+ 	if (tracklist == NULL)
+@@ -1983,11 +1993,46 @@ static void register_item(struct player *player, GDBusProxy *proxy)
+ 				!g_str_has_prefix(path, tracklist->playlist))
+ 		return;
+ 
++	l = g_slist_last(tracklist->items);
+ 	tracklist->items = g_slist_append(tracklist->items, proxy);
+ 
+ 	g_dbus_emit_property_changed(player->conn, MPRIS_PLAYER_PATH,
+ 						MPRIS_TRACKLIST_INTERFACE,
+ 						"Tracks");
 +
-+static void change_folder_reply(DBusMessage *message, void *user_data)
-+{
-+	struct player *player = user_data;
-+	struct tracklist *tracklist = player->tracklist;
-+	DBusError err;
++	if (l == NULL)
++		return;
 +
-+	dbus_error_init(&err);
-+	if (dbus_set_error_from_message(&err, message)) {
-+		fprintf(stderr, "error: %s", err.name);
++	signal = dbus_message_new_signal(MPRIS_PLAYER_PATH,
++					MPRIS_TRACKLIST_INTERFACE,
++					"TrackAdded");
++	if (!signal) {
++		fprintf(stderr, "Unable to allocate new %s.TrackAdded signal",
++						MPRIS_TRACKLIST_INTERFACE);
 +		return;
 +	}
 +
-+	g_dbus_proxy_method_call(tracklist->proxy, "ListItems",
-+					list_items_setup, NULL, NULL, NULL);
-+}
++	dbus_message_iter_init_append(signal, &args);
 +
-+static void change_folder_setup(DBusMessageIter *iter, void *user_data)
-+{
-+	struct player *player = user_data;
-+	struct tracklist *tracklist = player->tracklist;
++	if (!g_dbus_proxy_get_property(proxy, "Metadata", &iter)) {
++		dbus_message_unref(signal);
++		return;
++	}
 +
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH,
-+							&tracklist->playlist);
-+}
++	dbus_message_iter_open_container(&args, DBUS_TYPE_ARRAY,
++			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
++			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &metadata);
 +
- static DBusMessage *playlist_activate(DBusConnection *conn,
- 						DBusMessage *msg, void *data)
- {
--	return g_dbus_create_error(msg, ERROR_INTERFACE ".NotImplemented",
--					"Not implemented");
-+	struct player *player = data;
-+	struct tracklist *tracklist = player->tracklist;
-+	const char *path;
++	parse_metadata(&iter, &metadata, parse_track_entry);
 +
-+	if (!dbus_message_get_args(msg, NULL,
-+					DBUS_TYPE_OBJECT_PATH, &path,
-+					DBUS_TYPE_INVALID))
-+		return g_dbus_create_error(msg,
-+					ERROR_INTERFACE ".InvalidArguments",
-+					"Invalid Arguments");
++	dbus_message_iter_close_container(&args, &metadata);
 +
-+	if (!g_str_equal(path, tracklist->playlist))
-+		return g_dbus_create_error(msg,
-+					ERROR_INTERFACE ".InvalidArguments",
-+					"Invalid Arguments");
++	after = l->data;
++	path = g_dbus_proxy_get_path(after);
++	dbus_message_iter_append_basic(&args, DBUS_TYPE_OBJECT_PATH, &path);
 +
-+	g_dbus_proxy_method_call(tracklist->proxy, "ChangeFolder",
-+				change_folder_setup, change_folder_reply,
-+				player, NULL);
-+
-+	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++	g_dbus_send_message(player->conn, signal);
  }
  
- static DBusMessage *playlist_get(DBusConnection *conn, DBusMessage *msg,
-@@ -1848,44 +1905,6 @@ static GDBusProxy *find_transport_by_path(const char *path)
- 	return NULL;
- }
- 
--static void list_items_setup(DBusMessageIter *iter, void *user_data)
--{
--	DBusMessageIter dict;
--
--	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
--					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
--					DBUS_TYPE_STRING_AS_STRING
--					DBUS_TYPE_VARIANT_AS_STRING
--					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
--					&dict);
--	dbus_message_iter_close_container(iter, &dict);
--}
--
--static void change_folder_reply(DBusMessage *message, void *user_data)
--{
--	struct player *player = user_data;
--	struct tracklist *tracklist = player->tracklist;
--	DBusError err;
--
--	dbus_error_init(&err);
--	if (dbus_set_error_from_message(&err, message)) {
--		fprintf(stderr, "error: %s", err.name);
--		return;
--	}
--
--	g_dbus_proxy_method_call(tracklist->proxy, "ListItems",
--					list_items_setup, NULL, NULL, NULL);
--}
--
--static void change_folder_setup(DBusMessageIter *iter, void *user_data)
--{
--	struct player *player = user_data;
--	struct tracklist *tracklist = player->tracklist;
--
--	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH,
--							&tracklist->playlist);
--}
--
- static void register_tracklist(struct player *player, const char *playlist)
- {
- 	struct tracklist *tracklist;
+ static void proxy_added(GDBusProxy *proxy, void *user_data)
 -- 
 1.8.1.4
 
