@@ -1,85 +1,305 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZLf7JANb+QxKWczvQNeG1DvqYkbbD9_nncdfznCajLOWg@mail.gmail.com>
-References: <CAGd9gwjqSiH3=JwR80VcuXf2Z7KA8zOsYFT9N5gAZgZnTfF2wQ@mail.gmail.com>
-	<CABBYNZ+dE7Pkt5-RpzQQ1YSgj9pa4cM+MMDwGKFmdidApDtUKQ@mail.gmail.com>
-	<CAGd9gwi=72xSK5=ne2+wPU-A=oEz2VXnpPqjxMW9Z6OnyHOUMA@mail.gmail.com>
-	<CABBYNZJNxEnKk-E5TcSwwNwkeBDhbsBgyMUJ_MuL02-MeV_i1Q@mail.gmail.com>
-	<CAGd9gwj7c=EL8bQ_qjEq7XR5LonH_c=sQyTrhvnxompiN687Vg@mail.gmail.com>
-	<CABBYNZLf7JANb+QxKWczvQNeG1DvqYkbbD9_nncdfznCajLOWg@mail.gmail.com>
-Date: Wed, 15 May 2013 08:33:45 -0700
-Message-ID: <CAHZ1yCmMOyYiBYO2Fg8SRc_9h-_3Jw=74mAuvucZJUrVm76ieA@mail.gmail.com>
-Subject: Re: Audio sink stream remains suspended on reconnection
-From: Scott James Remnant <keybuk@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Alex Deymo <deymo@chromium.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 13/14] tools: Use playlist proxy instead of object path in mpris-player
+Date: Wed, 15 May 2013 18:31:45 +0300
+Message-Id: <1368631906-15951-13-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1368631906-15951-1-git-send-email-luiz.dentz@gmail.com>
+References: <1368631906-15951-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It's still not fully clear to me how the state could be handled. For
-example, the following:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-We only acquire the transport stream when we have actual sound to be
-played, and once we've finished playback we release the transport
-stream again. In most circumstances this seems correct, and matches
-what we see on other platforms - with a suspend being sent to the
-device, and a start being sent when we have more sound to play.
+This is more convenient as it gives access to all properties including
+the Name of the playlist.
+---
+ tools/mpris-player.c | 130 +++++++++++++++++++++++++++------------------------
+ 1 file changed, 69 insertions(+), 61 deletions(-)
 
-What I can't figure out is what we're supposed to do in the case where
-the device sends the start (state goes to pending) when we _don't_
-have any sound to play.
+diff --git a/tools/mpris-player.c b/tools/mpris-player.c
+index cdff267..df0ac7c 100644
+--- a/tools/mpris-player.c
++++ b/tools/mpris-player.c
+@@ -77,7 +77,7 @@ struct player {
+ 	GDBusProxy *folder;
+ 	GDBusProxy *device;
+ 	GDBusProxy *transport;
+-	char *playlist;
++	GDBusProxy *playlist;
+ 	struct tracklist *tracklist;
+ };
+ 
+@@ -896,7 +896,9 @@ static void player_free(void *data)
+ 	if (player->transport)
+ 		g_dbus_proxy_unref(player->transport);
+ 
+-	g_free(player->playlist);
++	if (player->playlist)
++		g_dbus_proxy_unref(player->playlist);
++
+ 	g_free(player->bus_name);
+ 	g_free(player);
+ }
+@@ -1800,9 +1802,11 @@ static void change_folder_reply(DBusMessage *message, void *user_data)
+ static void change_folder_setup(DBusMessageIter *iter, void *user_data)
+ {
+ 	struct player *player = user_data;
++	const char *path;
++
++	path = g_dbus_proxy_get_path(player->playlist);
+ 
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH,
+-							&player->playlist);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
+ }
+ 
+ static DBusMessage *playlist_activate(DBusConnection *conn,
+@@ -1812,7 +1816,7 @@ static DBusMessage *playlist_activate(DBusConnection *conn,
+ 	struct tracklist *tracklist = player->tracklist;
+ 	const char *path;
+ 
+-	if (tracklist == NULL)
++	if (player->playlist == NULL || tracklist == NULL)
+ 		return g_dbus_create_error(msg,
+ 					ERROR_INTERFACE ".InvalidArguments",
+ 					"Invalid Arguments");
+@@ -1824,7 +1828,7 @@ static DBusMessage *playlist_activate(DBusConnection *conn,
+ 					ERROR_INTERFACE ".InvalidArguments",
+ 					"Invalid Arguments");
+ 
+-	if (!g_str_equal(path, player->playlist))
++	if (!g_str_equal(path, g_dbus_proxy_get_path(player->playlist)))
+ 		return g_dbus_create_error(msg,
+ 					ERROR_INTERFACE ".InvalidArguments",
+ 					"Invalid Arguments");
+@@ -1840,16 +1844,15 @@ static DBusMessage *playlist_get(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
+ {
+ 	struct player *player = data;
+-	struct tracklist *tracklist = player->tracklist;
+ 	uint32_t index, count;
+ 	const char *order;
+ 	dbus_bool_t reverse;
+ 	DBusMessage *reply;
+ 	DBusMessageIter iter, entry, value, name;
+-	const char *string;
++	const char *string, *path;
+ 	const char *empty = "";
+ 
+-	if (tracklist == NULL)
++	if (player->playlist == NULL)
+ 		return g_dbus_create_error(msg,
+ 					ERROR_INTERFACE ".InvalidArguments",
+ 					"Invalid Arguments");
+@@ -1864,6 +1867,8 @@ static DBusMessage *playlist_get(DBusConnection *conn, DBusMessage *msg,
+ 					ERROR_INTERFACE ".InvalidArguments",
+ 					"Invalid Arguments");
+ 
++	path = g_dbus_proxy_get_path(player->playlist);
++
+ 	reply = dbus_message_new_method_return(msg);
+ 
+ 	dbus_message_iter_init_append(reply, &iter);
+@@ -1872,15 +1877,14 @@ static DBusMessage *playlist_get(DBusConnection *conn, DBusMessage *msg,
+ 								&entry);
+ 	dbus_message_iter_open_container(&entry, DBUS_TYPE_STRUCT, NULL,
+ 								&value);
+-	dbus_message_iter_append_basic(&value, DBUS_TYPE_OBJECT_PATH,
+-						&player->playlist);
+-	if (g_dbus_proxy_get_property(tracklist->proxy, "Name", &name)) {
++	dbus_message_iter_append_basic(&value, DBUS_TYPE_OBJECT_PATH, &path);
++	if (g_dbus_proxy_get_property(player->playlist, "Name", &name)) {
+ 		dbus_message_iter_get_basic(&name, &string);
+ 		dbus_message_iter_append_basic(&value, DBUS_TYPE_STRING,
+ 								&string);
+ 	} else {
+ 		dbus_message_iter_append_basic(&value, DBUS_TYPE_STRING,
+-							&player->playlist);
++								&path);
+ 	}
+ 	dbus_message_iter_append_basic(&value, DBUS_TYPE_STRING, &empty);
+ 	dbus_message_iter_close_container(&entry, &value);
+@@ -1901,13 +1905,20 @@ static const GDBusMethodTable playlist_methods[] = {
+ 	{ },
+ };
+ 
++static gboolean playlist_exists(const GDBusPropertyTable *property, void *data)
++{
++	struct player *player = data;
++
++	return player->playlist != NULL;
++}
++
+ static gboolean get_playlist_count(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
+ {
+ 	struct player *player = data;
+ 	uint32_t count = 1;
+ 
+-	if (player->tracklist == NULL)
++	if (player->playlist == NULL)
+ 		return FALSE;
+ 
+ 	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT32, &count);
+@@ -1934,23 +1945,22 @@ static gboolean get_active_playlist(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
+ {
+ 	struct player *player = data;
+-	struct tracklist *tracklist = player->tracklist;
+ 	DBusMessageIter value, entry;
+ 	dbus_bool_t enabled = TRUE;
+-	const char *empty = "";
++	const char *path, *empty = "";
+ 
+-	if (tracklist == NULL)
++	if (player->playlist == NULL)
+ 		return FALSE;
+ 
++	path = g_dbus_proxy_get_path(player->playlist);
++
+ 	dbus_message_iter_open_container(iter, DBUS_TYPE_STRUCT,
+ 							NULL, &value);
+ 	dbus_message_iter_append_basic(&value, DBUS_TYPE_BOOLEAN, &enabled);
+ 	dbus_message_iter_open_container(&value, DBUS_TYPE_STRUCT, NULL,
+ 								&entry);
+-	dbus_message_iter_append_basic(&entry, DBUS_TYPE_OBJECT_PATH,
+-						&player->playlist);
+-	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
+-						&player->playlist);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_OBJECT_PATH, &path);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &path);
+ 	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &empty);
+ 	dbus_message_iter_close_container(&value, &entry);
+ 	dbus_message_iter_close_container(iter, &value);
+@@ -1959,10 +1969,10 @@ static gboolean get_active_playlist(const GDBusPropertyTable *property,
+ }
+ 
+ static const GDBusPropertyTable playlist_properties[] = {
+-	{ "PlaylistCount", "u", get_playlist_count, NULL, tracklist_exists },
++	{ "PlaylistCount", "u", get_playlist_count, NULL, playlist_exists },
+ 	{ "Orderings", "as", get_orderings, NULL, NULL },
+ 	{ "ActivePlaylist", "(b(oss))", get_active_playlist, NULL,
+-							tracklist_exists },
++							playlist_exists },
+ 	{ }
+ };
+ 
+@@ -2041,30 +2051,7 @@ static void register_tracklist(GDBusProxy *proxy)
+ 	if (player->playlist == NULL)
+ 		return;
+ 
+-	g_dbus_emit_property_changed(player->conn, MPRIS_PLAYER_PATH,
+-						MPRIS_PLAYLISTS_INTERFACE,
+-						"PlaylistCount");
+-
+-	g_dbus_proxy_method_call(tracklist->proxy, "ChangeFolder",
+-				change_folder_setup, change_folder_reply,
+-				player, NULL);
+-}
+-
+-static void player_set_playlist(struct player *player, const char *path)
+-{
+-	struct tracklist *tracklist = player->tracklist;
+-
+-	g_free(player->playlist);
+-	player->playlist = g_strdup(path);
+-
+-	if (player->tracklist == NULL)
+-		return;
+-
+-	g_dbus_emit_property_changed(player->conn, MPRIS_PLAYER_PATH,
+-						MPRIS_PLAYLISTS_INTERFACE,
+-						"PlaylistCount");
+-
+-	g_dbus_proxy_method_call(tracklist->proxy, "ChangeFolder",
++	g_dbus_proxy_method_call(player->tracklist->proxy, "ChangeFolder",
+ 				change_folder_setup, change_folder_reply,
+ 				player, NULL);
+ }
+@@ -2164,11 +2151,6 @@ static void register_player(GDBusProxy *proxy)
+ 	if (transport)
+ 		player->transport = g_dbus_proxy_ref(transport);
+ 
+-	if (g_dbus_proxy_get_property(proxy, "Playlist", &iter)) {
+-		dbus_message_iter_get_basic(&iter, &path);
+-		player_set_playlist(player, path);
+-	}
+-
+ 	return;
+ 
+ fail:
+@@ -2232,22 +2214,54 @@ static struct player *find_player_by_item(const char *item)
+ 	return NULL;
+ }
+ 
++static void register_playlist(struct player *player, GDBusProxy *proxy)
++{
++	const char *path;
++	DBusMessageIter iter;
++
++	if (!g_dbus_proxy_get_property(player->proxy, "Playlist", &iter))
++		return;
++
++	dbus_message_iter_get_basic(&iter, &path);
++
++	if (!g_str_equal(path, g_dbus_proxy_get_path(proxy)))
++		return;
++
++	player->playlist = g_dbus_proxy_ref(proxy);
++
++	g_dbus_emit_property_changed(player->conn, MPRIS_PLAYER_PATH,
++						MPRIS_PLAYLISTS_INTERFACE,
++						"PlaylistCount");
++
++	if (player->tracklist == NULL)
++		return;
++
++	g_dbus_proxy_method_call(player->tracklist->proxy, "ChangeFolder",
++				change_folder_setup, change_folder_reply,
++				player, NULL);
++}
++
+ static void register_item(struct player *player, GDBusProxy *proxy)
+ {
+ 	struct tracklist *tracklist;
+-	const char *path;
++	const char *path, *playlist;
+ 	DBusMessage *signal;
+ 	DBusMessageIter iter, args, metadata;
+ 	GSList *l;
+ 	GDBusProxy *after;
+ 
++	if (player->playlist == NULL) {
++		register_playlist(player, proxy);
++		return;
++	}
++
+ 	tracklist = player->tracklist;
+ 	if (tracklist == NULL)
+ 		return;
+ 
+ 	path = g_dbus_proxy_get_path(proxy);
+-	if (g_str_equal(path, player->playlist) ||
+-				!g_str_has_prefix(path, player->playlist))
++	playlist = g_dbus_proxy_get_path(player->playlist);
++	if (!g_str_has_prefix(path, playlist))
+ 		return;
+ 
+ 	l = g_slist_last(tracklist->items);
+@@ -2470,12 +2484,6 @@ static void player_property_changed(GDBusProxy *proxy, const char *name,
+ 	if (player == NULL)
+ 		return;
+ 
+-	if (strcasecmp(name, "Playlist") == 0) {
+-		const char *path;
+-		dbus_message_iter_get_basic(iter, &path);
+-		return player_set_playlist(player, path);
+-	}
+-
+ 	property = property_to_mpris(name);
+ 	if (property == NULL)
+ 		return;
+-- 
+1.8.1.4
 
-Are we still expected to acquire the transport stream? What happens if we don't?
-
-Scott
-
-On Mon, May 13, 2013 at 10:04 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Alex,
->
-> On Sat, May 11, 2013 at 4:51 AM, Alex Deymo <deymo@chromium.org> wrote:
->> Hi Luiz,
->>
->> On Fri, May 10, 2013 at 1:09 AM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> Yes, you should release the fd once the state change to idle, in the
->>> future we might actually use frevoke (http://lwn.net/Articles/192632/)
->>> to revoke the permissions but for now we have to assume the endpoint
->>> will behave and close whenever the transport became idle. You are also
->>> right, we should probably update the documentation to state the fd is
->>> considered revoked in this case and the endpoint has to acquired
->>> again. Btw PulseAudio does that already so Im curious why you are not
->>> using PA, or is this for another Audio daemon?
->>
->> Oh, thank you very much for that information. I would never guessed
->> that was the problem!
->> Having the documentation clear and updated is good not only because
->> not everyone uses PA, but also because definitively we don't want to
->> use PA for testing (we may want to fake and control the interaction
->> with the audio server to run a test). Actually, as Scott mentioned we
->> are not using PA on Chromium/ChromiumOS laptops, we are using CRAS
->> (ChromeOS Audio Server) which is basically the minimum we need to have
->> low latency dynamic audio routing with a low CPU impact... and that's
->> basically the "why". If you are curious, you can find the original
->> design doc here [1], the code is opensource and here [2] and actually
->> also works on ubuntu [3], but need applications (like chrome) that
->> know how to talk with cras.
->
-> If you fill that you can put some effort in improving the
-> documentation patches are welcome, I hope now it is clear how the
-> state should handled, you can still overwrite and request to resume by
-> doing Acquire but the remote stack may refuse to do so, it is actually
-> recommended that whoever suspend should resume.
->
-> Regarding PulseAudio, it is a bit frustrating to see very little
-> effort for adapting PA for whatever you guys need and btw Arun did
-> ported PA to Android and compared it with AudioFlinger:
->
-> http://arunraghavan.net/2012/01/pulseaudio-vs-audioflinger-fight/
->
-> It doesn't look like PA is power hog, it can get low latency as well,
-> anyway it is probably not a good idea to talk about this in
-> linux-bluetooth, there are very competent guys in PA mailing list to
-> discuss about this.
