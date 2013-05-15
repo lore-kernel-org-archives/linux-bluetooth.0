@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 10/14] tools: Map mpris:trackid to Item in mpris-player
-Date: Wed, 15 May 2013 18:31:42 +0300
-Message-Id: <1368631906-15951-10-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 09/14] tools: Add implementation of Playlists.GetPlaylists to mpris-player
+Date: Wed, 15 May 2013 18:31:41 +0300
+Message-Id: <1368631906-15951-9-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1368631906-15951-1-git-send-email-luiz.dentz@gmail.com>
 References: <1368631906-15951-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,64 +11,66 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-mpris:trackid is used as identifier of the current track.
 ---
- tools/mpris-player.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ tools/mpris-player.c | 45 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 43 insertions(+), 2 deletions(-)
 
 diff --git a/tools/mpris-player.c b/tools/mpris-player.c
-index a067fe5..cdda3ec 100644
+index 47e98d7..a067fe5 100644
 --- a/tools/mpris-player.c
 +++ b/tools/mpris-player.c
-@@ -1326,6 +1326,21 @@ static gboolean parse_int32_metadata(DBusMessageIter *iter, const char *key,
- 	return TRUE;
+@@ -1797,8 +1797,49 @@ static DBusMessage *playlist_activate(DBusConnection *conn,
+ static DBusMessage *playlist_get(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
+ {
+-	return g_dbus_create_error(msg, ERROR_INTERFACE ".NotImplemented",
+-					"Not implemented");
++	struct player *player = data;
++	struct tracklist *tracklist = player->tracklist;
++	uint32_t index, count;
++	const char *order;
++	dbus_bool_t reverse;
++	DBusMessage *reply;
++	DBusMessageIter iter, entry, value, name;
++	const char *string;
++	const char *empty = "";
++
++	if (!dbus_message_get_args(msg, NULL,
++					DBUS_TYPE_UINT32, &index,
++					DBUS_TYPE_UINT32, &count,
++					DBUS_TYPE_STRING, &order,
++					DBUS_TYPE_BOOLEAN, &reverse,
++					DBUS_TYPE_INVALID))
++		return g_dbus_create_error(msg,
++					ERROR_INTERFACE ".InvalidArguments",
++					"Invalid Arguments");
++
++	reply = dbus_message_new_method_return(msg);
++
++	dbus_message_iter_init_append(reply, &iter);
++
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "(oss)",
++								&entry);
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_STRUCT, NULL,
++								&value);
++	dbus_message_iter_append_basic(&value, DBUS_TYPE_OBJECT_PATH,
++						&tracklist->playlist);
++	if (g_dbus_proxy_get_property(tracklist->proxy, "Name", &name)) {
++		dbus_message_iter_get_basic(&name, &string);
++		dbus_message_iter_append_basic(&value, DBUS_TYPE_STRING,
++								&string);
++	} else {
++		dbus_message_iter_append_basic(&value, DBUS_TYPE_STRING,
++							&tracklist->playlist);
++	}
++	dbus_message_iter_append_basic(&value, DBUS_TYPE_STRING, &empty);
++	dbus_message_iter_close_container(&entry, &value);
++	dbus_message_iter_close_container(&iter, &entry);
++
++	return reply;
  }
  
-+static gboolean parse_path_metadata(DBusMessageIter *iter, const char *key,
-+						DBusMessageIter *metadata)
-+{
-+	const char *value;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_OBJECT_PATH)
-+		return FALSE;
-+
-+	dbus_message_iter_get_basic(iter, &value);
-+
-+	dict_append_entry(metadata, key, DBUS_TYPE_OBJECT_PATH, &value);
-+
-+	return TRUE;
-+}
-+
- static int parse_track_entry(DBusMessageIter *entry, const char *key,
- 						DBusMessageIter *metadata)
- {
-@@ -1354,6 +1369,9 @@ static int parse_track_entry(DBusMessageIter *entry, const char *key,
- 	} else if (strcasecmp(key, "TrackNumber") == 0) {
- 		if (!parse_int32_metadata(&var, "xesam:trackNumber", metadata))
- 			return -EINVAL;
-+	} else if (strcasecmp(key, "Item") == 0) {
-+		if (!parse_path_metadata(&var, "mpris:trackid", metadata))
-+			return -EINVAL;
- 	}
- 
- 	return 0;
-@@ -1533,12 +1551,16 @@ static void append_item_metadata(void *data, void *user_data)
- 	GDBusProxy *item = data;
- 	DBusMessageIter *iter = user_data;
- 	DBusMessageIter var, metadata;
-+	const char *path = g_dbus_proxy_get_path(item);
- 
- 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
- 			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
- 			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
- 			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &metadata);
- 
-+	dict_append_entry(&metadata, "mpris:trackid", DBUS_TYPE_OBJECT_PATH,
-+									&path);
-+
- 	if (g_dbus_proxy_get_property(item, "Metadata", &var))
- 		parse_metadata(&var, &metadata, parse_track_entry);
- 
+ static const GDBusMethodTable playlist_methods[] = {
 -- 
 1.8.1.4
 
