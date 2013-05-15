@@ -1,120 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 02/14] tools: Add implementation of TrackList.GetTracksMetadata to mpris-player
-Date: Wed, 15 May 2013 18:31:34 +0300
-Message-Id: <1368631906-15951-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1368631906-15951-1-git-send-email-luiz.dentz@gmail.com>
-References: <1368631906-15951-1-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
+Subject: Re: Paired devices in discovery mode
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20130514082618.GA11514@x220.ger.corp.intel.com>
+Date: Wed, 15 May 2013 14:22:30 +0200
+Cc: Alex Deymo <deymo@chromium.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	keybuk <keybuk@chromium.org>
+Message-Id: <4AADBC01-6149-4422-AA3B-6BF1B0E3D744@holtmann.org>
+References: <CAGd9gwjbOFpaYrZt=4Pn4VLUNX-uq-Ap=pPaWt9snV_Gmiwmtg@mail.gmail.com> <20130430072335.GA31159@x220.ger.corp.intel.com> <CAGd9gwg5ucupbzz5DoQNO0XNB5t_QgTB+Z-R0ZrvRGtV9hRz6Q@mail.gmail.com> <20130514082618.GA11514@x220.ger.corp.intel.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Johan,
 
----
- tools/mpris-player.c | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 84 insertions(+), 2 deletions(-)
+>> Mac OS have done a good job here, displaying already paired devices in
+>> the Bluetooth Setup Assistant when they are in discovery mode. If you
+>> attempt to pair to one of those devices it will ask you about
+>> un-pairing and re-pairing with that device, and loosing the previous
+>> linkkey there (see screenshot here http://goo.gl/fGJ2U ). Only the
+>> paired devices that are in discovery are shown there in the list.
+> 
+> I'm not completely convinced that this is the most user friendly
+> approach (requiring the user to go through a pairing wizard instead of
+> just selecting to connect to the device and having that trigger
+> pairing).
 
-diff --git a/tools/mpris-player.c b/tools/mpris-player.c
-index 3378227..2e27ee2 100644
---- a/tools/mpris-player.c
-+++ b/tools/mpris-player.c
-@@ -1511,11 +1511,93 @@ static const GDBusPropertyTable mpris_properties[] = {
- 	{ }
- };
- 
-+static GDBusProxy *find_item(struct player *player, const char *path)
-+{
-+	struct tracklist *tracklist = player->tracklist;
-+	GSList *l;
-+
-+	for (l = tracklist->items; l; l = l->next) {
-+		GDBusProxy *proxy = l->data;
-+		const char *p = g_dbus_proxy_get_path(proxy);
-+
-+		if (g_str_equal(path, p))
-+			return proxy;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void append_item_metadata(void *data, void *user_data)
-+{
-+	GDBusProxy *item = data;
-+	DBusMessageIter *iter = user_data;
-+	DBusMessageIter var, metadata;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+			DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
-+			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &metadata);
-+
-+	if (g_dbus_proxy_get_property(item, "Metadata", &var))
-+		parse_metadata(&var, &metadata, parse_track_entry);
-+
-+	dbus_message_iter_close_container(iter, &metadata);
-+
-+	return;
-+}
-+
- static DBusMessage *tracklist_get_metadata(DBusConnection *conn,
- 						DBusMessage *msg, void *data)
- {
--	return g_dbus_create_error(msg, ERROR_INTERFACE ".NotImplemented",
--					"Not implemented");
-+	struct player *player = data;
-+	DBusMessage *reply;
-+	DBusMessageIter args, array;
-+	GSList *l = NULL;
-+
-+	dbus_message_iter_init(msg, &args);
-+
-+	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY)
-+		return g_dbus_create_error(msg,
-+					ERROR_INTERFACE ".InvalidArguments",
-+					"Invalid Arguments");
-+
-+	dbus_message_iter_recurse(&args, &array);
-+
-+	while (dbus_message_iter_get_arg_type(&array) ==
-+						DBUS_TYPE_OBJECT_PATH) {
-+		const char *path;
-+		GDBusProxy *item;
-+
-+		dbus_message_iter_get_basic(&array, &path);
-+
-+		item = find_item(player, path);
-+		if (item == NULL)
-+			return g_dbus_create_error(msg,
-+					ERROR_INTERFACE ".InvalidArguments",
-+					"Invalid Arguments");
-+
-+		l = g_slist_append(l, item);
-+
-+		dbus_message_iter_next(&array);
-+	}
-+
-+	reply = dbus_message_new_method_return(msg);
-+
-+	dbus_message_iter_init_append(reply, &args);
-+
-+	dbus_message_iter_open_container(&args, DBUS_TYPE_ARRAY,
-+					DBUS_TYPE_ARRAY_AS_STRING
-+					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+					DBUS_TYPE_STRING_AS_STRING
-+					DBUS_TYPE_VARIANT_AS_STRING
-+					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
-+					&array);
-+
-+	g_slist_foreach(l, append_item_metadata, &array);
-+
-+	dbus_message_iter_close_container(&args, &array);
-+
-+	return reply;
- }
- 
- static DBusMessage *tracklist_goto(DBusConnection *conn,
--- 
-1.8.1.4
+yes, back in the days MacOS has done an awesome job to make Bluetooth more user accessible. However these days I would rather look towards iOS if you want to get inspiration.
+
+If I would have to write a desktop UI for Bluetooth right now, I would not go with a pairing wizard at all. I would go with a device menu/list like iOS does.
+
+>> The problem is that I can't implement such a nice interface with the
+>> current BlueZ API, since I don't known when a paired device is
+>> replying to the inquiry request or not. BlueZ knows that, but I don't
+>> know that from the dbus API. That's why I want to introduce the
+>> "Discovering" property.
+> 
+> If we're really going to introduce something like this I'd rather have a
+> "LastSeen" property with the time that the device was last seen. This
+> could potentially be useful for sorting the devices in the UI (something
+> that a simple "Discovering" boolean doesn't allow).
+
+What would a last seen improve here? Maybe I am missing a bit of context. How many devices are we expecting to have paired. In a normal day use you have around 3-4. And even power users don't get easily over 10. I do understand that with LE this potentially can change, but so far I have not seen that. Users just don't have that many devices.
+
+>> It will be also handy if Device1.Pair() allows me to re-pair the
+>> device and only replaces the linkkey if the pairing works. Right now,
+>> if the user wants to re-pair a device it has to remove it, wait
+>> several seconds until it appears in a discovery session and then call
+>> Pair in that new device. This possible, but not as user-friendly as it
+>> could be, and the change I'm proposing is backward compatible with the
+>> existing users since the only changed behavior is when trying to Pair
+>> an already Paired device.
+> 
+> I agree that we should consider allowing multiple calls to Pair(). If we
+> have an existing link key the procedure would just drop the old one as
+> soon as repairing has succeeded.
+
+I am fine with Device1.Pair() triggering a repairing. We could just ask via the agent the user to confirm that he/she wants to drop the previous link and be done with it. Simple, intuitive and exactly a user interaction we want do see. And more important a question that the user can answer at that point in time since he/she pressed the pairing button. And in addition, the user can abort the pairing attempt if it was an accident. If any UI system wants to outsmart us or the user, it can hook into the agent to do so.
+
+Regards
+
+Marcel
 
