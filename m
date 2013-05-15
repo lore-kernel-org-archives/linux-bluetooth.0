@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 07/14] tools: Add support for MPRIS Playlists interface to mpris-player
-Date: Wed, 15 May 2013 18:31:39 +0300
-Message-Id: <1368631906-15951-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 06/14] tools: Add support for MPRIS TrackList.TrackMetadataChanged signal to mpris-player
+Date: Wed, 15 May 2013 18:31:38 +0300
+Message-Id: <1368631906-15951-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1368631906-15951-1-git-send-email-luiz.dentz@gmail.com>
 References: <1368631906-15951-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,145 +11,75 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support for Playlists interface as defined in MPRIS:
-http://specifications.freedesktop.org/mpris-spec/latest/Playlists_Interface.html
 ---
- tools/mpris-player.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 99 insertions(+), 1 deletion(-)
+ tools/mpris-player.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
 diff --git a/tools/mpris-player.c b/tools/mpris-player.c
-index 681bb09..9ac59b3 100644
+index 79d815b..681bb09 100644
 --- a/tools/mpris-player.c
 +++ b/tools/mpris-player.c
-@@ -50,6 +50,7 @@
- #define MPRIS_INTERFACE "org.mpris.MediaPlayer2"
- #define MPRIS_PLAYER_INTERFACE "org.mpris.MediaPlayer2.Player"
- #define MPRIS_TRACKLIST_INTERFACE "org.mpris.MediaPlayer2.TrackList"
-+#define MPRIS_PLAYLISTS_INTERFACE "org.mpris.MediaPlayer2.Playlists"
- #define MPRIS_PLAYER_PATH "/org/mpris/MediaPlayer2"
- #define ERROR_INTERFACE "org.mpris.MediaPlayer2.Error"
- 
-@@ -1729,6 +1730,89 @@ static const GDBusPropertyTable tracklist_properties[] = {
+@@ -1694,6 +1694,8 @@ static const GDBusSignalTable tracklist_signals[] = {
+ 	{ GDBUS_SIGNAL("TrackAdded", GDBUS_ARGS({"metadata", "a{sv}"},
+ 						{"after", "o"})) },
+ 	{ GDBUS_SIGNAL("TrackRemoved", GDBUS_ARGS({"track", "o"})) },
++	{ GDBUS_SIGNAL("TrackMetadataChanged", GDBUS_ARGS({"track", "o"},
++						{"metadata", "a{sv}"})) },
  	{ }
  };
  
-+static DBusMessage *playlist_activate(DBusConnection *conn,
-+						DBusMessage *msg, void *data)
-+{
-+	return g_dbus_create_error(msg, ERROR_INTERFACE ".NotImplemented",
-+					"Not implemented");
-+}
-+
-+static DBusMessage *playlist_get(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	return g_dbus_create_error(msg, ERROR_INTERFACE ".NotImplemented",
-+					"Not implemented");
-+}
-+
-+static const GDBusMethodTable playlist_methods[] = {
-+	{ GDBUS_METHOD("ActivatePlaylist",
-+			GDBUS_ARGS({ "playlist", "o" }), NULL,
-+			playlist_activate) },
-+	{ GDBUS_METHOD("GetPlaylists",
-+			GDBUS_ARGS({ "index", "u" }, { "maxcount", "u"},
-+					{ "order", "s" }, { "reverse", "b" }),
-+			GDBUS_ARGS({ "playlists", "a(oss)"}),
-+			playlist_get) },
-+	{ },
-+};
-+
-+static gboolean get_playlist_count(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	uint32_t count = 1;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT32, &count);
-+
-+	return TRUE;
-+}
-+
-+static gboolean get_orderings(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	DBusMessageIter value;
-+	const char *order = "User";
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_TYPE_OBJECT_PATH_AS_STRING,
-+					&value);
-+	dbus_message_iter_append_basic(&value, DBUS_TYPE_STRING, &order);
-+	dbus_message_iter_close_container(iter, &value);
-+
-+	return TRUE;
-+}
-+
-+static gboolean get_active_playlist(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct player *player = data;
-+	struct tracklist *tracklist = player->tracklist;
-+	DBusMessageIter value, entry;
-+	dbus_bool_t enabled = TRUE;
-+	const char *empty = "";
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_STRUCT,
-+							NULL, &value);
-+	dbus_message_iter_append_basic(&value, DBUS_TYPE_BOOLEAN, &enabled);
-+	dbus_message_iter_open_container(&value, DBUS_TYPE_STRUCT, NULL,
-+								&entry);
-+	dbus_message_iter_append_basic(&entry, DBUS_TYPE_OBJECT_PATH,
-+						&tracklist->playlist);
-+	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
-+						&tracklist->playlist);
-+	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &empty);
-+	dbus_message_iter_close_container(&value, &entry);
-+	dbus_message_iter_close_container(iter, &value);
-+
-+	return TRUE;
-+}
-+
-+static const GDBusPropertyTable playlist_properties[] = {
-+	{ "PlaylistCount", "u", get_playlist_count, NULL, NULL },
-+	{ "Orderings", "as", get_orderings, NULL, NULL },
-+	{ "ActivePlaylist", "(b(oss))", get_active_playlist, NULL, NULL },
-+	{ }
-+};
-+
- #define a_z "abcdefghijklmnopqrstuvwxyz"
- #define A_Z "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
- #define _0_9 "_0123456789"
-@@ -1831,6 +1915,16 @@ static void register_tracklist(struct player *player, const char *playlist)
- 		return;
- 	}
+@@ -2281,6 +2283,41 @@ static void transport_property_changed(GDBusProxy *proxy, const char *name,
+ 						name);
+ }
  
-+	if (!g_dbus_register_interface(player->conn, MPRIS_PLAYER_PATH,
-+						MPRIS_PLAYLISTS_INTERFACE,
-+						playlist_methods,
-+						NULL,
-+						playlist_properties,
-+						player, NULL)) {
-+		fprintf(stderr, "Could not register interface %s",
-+						MPRIS_PLAYLISTS_INTERFACE);
++static void item_property_changed(GDBusProxy *proxy, const char *name,
++					DBusMessageIter *iter, void *user_data)
++{
++	struct player *player;
++	DBusMessage *signal;
++	DBusMessageIter args;
++	const char *path;
++
++	path = g_dbus_proxy_get_path(proxy);
++
++	player = find_player_by_item(path);
++	if (player == NULL)
++		return;
++
++	if (strcasecmp(name, "Metadata") != 0)
++		return;
++
++	signal = dbus_message_new_signal(MPRIS_PLAYER_PATH,
++					MPRIS_TRACKLIST_INTERFACE,
++					"TrackMetadataChanged");
++	if (!signal) {
++		fprintf(stderr, "Unable to allocate new %s.TrackAdded signal",
++						MPRIS_TRACKLIST_INTERFACE);
++		return;
 +	}
 +
- 	player->tracklist = tracklist;
- 
- 	g_dbus_proxy_method_call(proxy, "ChangeFolder", change_folder_setup,
-@@ -2075,8 +2169,12 @@ static void unregister_player(struct player *player)
++	dbus_message_iter_init_append(signal, &args);
++
++	dbus_message_iter_append_basic(&args, DBUS_TYPE_OBJECT_PATH, &path);
++
++	append_iter(&args, iter);
++
++	g_dbus_send_message(player->conn, signal);
++}
++
+ static void property_changed(GDBusProxy *proxy, const char *name,
+ 					DBusMessageIter *iter, void *user_data)
  {
- 	players = g_slist_remove(players, player);
+@@ -2294,6 +2331,9 @@ static void property_changed(GDBusProxy *proxy, const char *name,
+ 	if (strcmp(interface, BLUEZ_MEDIA_TRANSPORT_INTERFACE) == 0)
+ 		return transport_property_changed(proxy, name, iter,
+ 								user_data);
++
++	if (strcmp(interface, BLUEZ_MEDIA_ITEM_INTERFACE) == 0)
++		return item_property_changed(proxy, name, iter, user_data);
+ }
  
--	g_dbus_unregister_interface(player->conn, MPRIS_PLAYER_PATH,
-+	if (player->tracklist != NULL) {
-+		g_dbus_unregister_interface(player->conn, MPRIS_PLAYER_PATH,
-+						MPRIS_PLAYLISTS_INTERFACE);
-+		g_dbus_unregister_interface(player->conn, MPRIS_PLAYER_PATH,
- 						MPRIS_TRACKLIST_INTERFACE);
-+	}
- 
- 	g_dbus_unregister_interface(player->conn, MPRIS_PLAYER_PATH,
- 						MPRIS_INTERFACE);
+ int main(int argc, char *argv[])
 -- 
 1.8.1.4
 
