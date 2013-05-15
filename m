@@ -1,66 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
-Subject: Re: Paired devices in discovery mode
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20130514082618.GA11514@x220.ger.corp.intel.com>
-Date: Wed, 15 May 2013 14:22:30 +0200
-Cc: Alex Deymo <deymo@chromium.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	keybuk <keybuk@chromium.org>
-Message-Id: <4AADBC01-6149-4422-AA3B-6BF1B0E3D744@holtmann.org>
-References: <CAGd9gwjbOFpaYrZt=4Pn4VLUNX-uq-Ap=pPaWt9snV_Gmiwmtg@mail.gmail.com> <20130430072335.GA31159@x220.ger.corp.intel.com> <CAGd9gwg5ucupbzz5DoQNO0XNB5t_QgTB+Z-R0ZrvRGtV9hRz6Q@mail.gmail.com> <20130514082618.GA11514@x220.ger.corp.intel.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZLQTOsdeJ52WF3pn_+bYqSeXjeK_6-TK3RhcXrS567_Ag@mail.gmail.com>
+References: <1367829810-8262-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<CABBYNZLQTOsdeJ52WF3pn_+bYqSeXjeK_6-TK3RhcXrS567_Ag@mail.gmail.com>
+Date: Wed, 15 May 2013 10:56:06 +0200
+Message-ID: <CANT-zCXjM9w6AND-Md6WYp_95eyT7Gby1E4DARjm7=ztpzA6GQ@mail.gmail.com>
+Subject: Re: [RFC BlueZ v0 00/13] Add experimental org.bluez.Service1
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi,
 
->> Mac OS have done a good job here, displaying already paired devices in
->> the Bluetooth Setup Assistant when they are in discovery mode. If you
->> attempt to pair to one of those devices it will ask you about
->> un-pairing and re-pairing with that device, and loosing the previous
->> linkkey there (see screenshot here http://goo.gl/fGJ2U ). Only the
->> paired devices that are in discovery are shown there in the list.
-> 
-> I'm not completely convinced that this is the most user friendly
-> approach (requiring the user to go through a pairing wizard instead of
-> just selecting to connect to the device and having that trigger
-> pairing).
+On Mon, May 6, 2013 at 11:19 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Mikel,
+>
+> On Mon, May 6, 2013 at 11:43 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>>
+>> Beyond the desktop use-cases, some users (e.g. GENIVI) are interested in having profile-specific information and control interfaces exposed in D-Bus. Such APIs did exist in BlueZ 4 but were dropped for BlueZ 5 in favor of simpler API simplicity. This service-specific interfaces had a fairly low priority for BlueZ 5 and therefore the discussion was postponed.
+>>
+>> This patchset proposes org.bluez.Service1 as an attempt to cover these needs. As compared to the former Device.ConnectProfile()/DisconnectProfile(), the approach has the following advantages:
+>> - Multiple instances of the same UUID can be exposed.
+>> - The state of each service can be exposed, without hackish lists like Device.ConnectedProfiles.
+>> - It's ObjectManager-centric.
+>> - The design should scale better if new properties are required in the future (supported features, service handle, etc.)
+>>
+>> Mikel Astiz (13):
+>>   test: Remove obsolete test script
+>>   test: Add UUID alias table to bluezutils.py
+>>   test: Support human-friendly UUIDs in test-device
+>>   test: Show human-friendly UUIDs in list-devices
+>>   dbus: Add new org.bluez.Service1
+>>   dbus: Add Device property to org.bluez.Service1
+>>   dbus: Add UUID property to org.bluez.Service1
+>>   dbus: Add state property to org.bluez.Service1
+>>   dbus: Add Connect/Disconnect to org.bluez.Service1
+>>   doc: Add API documentation for org.bluez.Service1
+>>   dbus: Deprecate old profile-connecting API
+>>   test: Add test-service script
+>>   test: Add --uuid to test-service
+>>
+>>  Makefile.am         |   2 +-
+>>  Makefile.tools      |   2 +-
+>>  doc/device-api.txt  |   4 +-
+>>  doc/service-api.txt |  54 ++++++++++++++
+>>  src/device.c        |  14 ++--
+>>  src/service.c       | 197 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>  src/service.h       |   2 +-
+>>  test/bluezutils.py  |  84 ++++++++++++++++++++++
+>>  test/list-devices   |   6 +-
+>>  test/simple-service | 128 ----------------------------------
+>>  test/test-device    |   4 +-
+>>  test/test-service   | 174 ++++++++++++++++++++++++++++++++++++++++++++++
+>>  12 files changed, 530 insertions(+), 141 deletions(-)
+>>  create mode 100644 doc/service-api.txt
+>>  delete mode 100755 test/simple-service
+>>  create mode 100755 test/test-service
+>>
+>> --
+>> 1.8.1.4
+>
+> This is probably the way forward, but currently there have been some
+> instability after service was introduced, so before we move on to this
+> set I would like that we make sure those crashes are fixed.
+>
+> --
+> Luiz Augusto von Dentz
 
-yes, back in the days MacOS has done an awesome job to make Bluetooth more user accessible. However these days I would rather look towards iOS if you want to get inspiration.
+Now that the main issues seem to be fixed and 5.5 is out, ping.
 
-If I would have to write a desktop UI for Bluetooth right now, I would not go with a pairing wizard at all. I would go with a device menu/list like iOS does.
-
->> The problem is that I can't implement such a nice interface with the
->> current BlueZ API, since I don't known when a paired device is
->> replying to the inquiry request or not. BlueZ knows that, but I don't
->> know that from the dbus API. That's why I want to introduce the
->> "Discovering" property.
-> 
-> If we're really going to introduce something like this I'd rather have a
-> "LastSeen" property with the time that the device was last seen. This
-> could potentially be useful for sorting the devices in the UI (something
-> that a simple "Discovering" boolean doesn't allow).
-
-What would a last seen improve here? Maybe I am missing a bit of context. How many devices are we expecting to have paired. In a normal day use you have around 3-4. And even power users don't get easily over 10. I do understand that with LE this potentially can change, but so far I have not seen that. Users just don't have that many devices.
-
->> It will be also handy if Device1.Pair() allows me to re-pair the
->> device and only replaces the linkkey if the pairing works. Right now,
->> if the user wants to re-pair a device it has to remove it, wait
->> several seconds until it appears in a discovery session and then call
->> Pair in that new device. This possible, but not as user-friendly as it
->> could be, and the change I'm proposing is backward compatible with the
->> existing users since the only changed behavior is when trying to Pair
->> an already Paired device.
-> 
-> I agree that we should consider allowing multiple calls to Pair(). If we
-> have an existing link key the procedure would just drop the old one as
-> soon as repairing has succeeded.
-
-I am fine with Device1.Pair() triggering a repairing. We could just ask via the agent the user to confirm that he/she wants to drop the previous link and be done with it. Simple, intuitive and exactly a user interaction we want do see. And more important a question that the user can answer at that point in time since he/she pressed the pairing button. And in addition, the user can abort the pairing attempt if it was an accident. If any UI system wants to outsmart us or the user, it can hook into the agent to do so.
-
-Regards
-
-Marcel
-
+Cheers,
+Mikel
