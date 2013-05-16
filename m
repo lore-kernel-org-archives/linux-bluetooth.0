@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v7 4/8] Bluetooth: Constants and macro declaration for SCO airmode
-Date: Thu, 16 May 2013 19:34:01 +0200
-Message-Id: <1368725646-4593-5-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v7 7/8] Bluetooth: Fallback transparent SCO from T2 to T1
+Date: Thu, 16 May 2013 19:34:04 +0200
+Message-Id: <1368725646-4593-8-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1368725646-4593-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1368725646-4593-1-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
@@ -15,29 +15,103 @@ Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patchs define constants and macro for extracting SCO airmode from SCO
-voice setting. It refers to Bluetooth Core V4.0 specification, Part E, Chap
-6.12 which describe SCO voice setting format.
+When initiating a transparent eSCO connection, make use of T2 settings at
+first try. T2 is the recommended settings from HFP 1.6 WideBand Speech. Upon
+connection failure, try T1 settings.
+T2 failure is detected if Synchronous Connection Complete event fails with
+error 0x0d. This error code has been found experimentally by sending a T2
+request to a T1 only SCO listener. It means "Connection Rejected due to
+Limited resource".
+To know which of T2 or T1 should be used, conn->fallback is used.  Bluez only
+attempt to reconnect twice. In the future, we will need more than 2 fallback
+possibilities. Thus, test conn->fallback as an alternative measure. We want to
+fallback only if conn->fallback is positive. Calling hci_setup_sync with
+conn->fallback == 0 is an initial connection attempt.
 
 Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
 ---
- include/net/bluetooth/hci_core.h |    5 +++++
- 1 file changed, 5 insertions(+)
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_conn.c         |   20 +++++++++++++++++---
+ net/bluetooth/hci_event.c        |    3 ++-
+ 3 files changed, 20 insertions(+), 4 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index e9cf9fa..a6fd544 100644
+index b5996b3..c8b91d2 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1214,4 +1214,9 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
+@@ -321,6 +321,7 @@ struct hci_conn {
+ 	__u8		passkey_entered;
+ 	__u16		disc_timeout;
+ 	__u16		setting;
++	__u8		fallback;
+ 	unsigned long	flags;
  
- u8 bdaddr_to_le(u8 bdaddr_type);
+ 	__u8		remote_cap;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index cd7452e..8d71d73 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -31,6 +31,17 @@
+ #include <net/bluetooth/a2mp.h>
+ #include <net/bluetooth/smp.h>
  
-+#define SCO_AIRMODE_MASK       0x0003
-+#define SCO_AIRMODE_CVSD       0x0000
-+#define SCO_AIRMODE_TRANSP     0x0003
-+#define hci_sco_airmode(setting) ((setting) & SCO_AIRMODE_MASK)
++struct sco_param {
++	u16 pkt_type;
++	u16 max_latency;
++	u8 next;
++};
 +
- #endif /* __HCI_CORE_H */
++static const struct sco_param sco_param_wideband[] = {
++	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x000d, 1 },
++	{ EDR_ESCO_MASK | ESCO_EV3,   0x0008, 0 },
++};
++
+ static void hci_le_create_connection(struct hci_conn *conn)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+@@ -176,6 +187,7 @@ void hci_setup_sync(struct hci_conn *conn, __u16 handle)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+ 	struct hci_cp_setup_sync_conn cp;
++	const struct sco_param *param;
+ 
+ 	BT_DBG("hcon %p", conn);
+ 
+@@ -191,11 +203,13 @@ void hci_setup_sync(struct hci_conn *conn, __u16 handle)
+ 
+ 	switch (hci_sco_airmode(conn->setting)) {
+ 	case SCO_AIRMODE_TRANSP:
+-		cp.pkt_type       = __constant_cpu_to_le16(EDR_ESCO_MASK &
+-							   ~ESCO_2EV3);
+-		cp.max_latency    = __constant_cpu_to_le16(0x000d);
++		param = &sco_param_wideband[conn->fallback];
++		cp.pkt_type       = __constant_cpu_to_le16(param->pkt_type);
++		cp.max_latency    = __constant_cpu_to_le16(param->max_latency);
+ 		cp.voice_setting  = __constant_cpu_to_le16(SCO_AIRMODE_TRANSP);
+ 		cp.retrans_effort = 0x02;
++
++		conn->fallback    = param->next;
+ 		break;
+ 	case SCO_AIRMODE_CVSD:
+ 		cp.pkt_type       = cpu_to_le16(conn->pkt_type);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index db58e72..9be10be 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2904,11 +2904,12 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
+ 		hci_conn_add_sysfs(conn);
+ 		break;
+ 
++	case 0x0d:	/* No resource available */
+ 	case 0x11:	/* Unsupported Feature or Parameter Value */
+ 	case 0x1c:	/* SCO interval rejected */
+ 	case 0x1a:	/* Unsupported Remote Feature */
+ 	case 0x1f:	/* Unspecified error */
+-		if (conn->out && conn->attempt < 2) {
++		if (conn->out && (conn->attempt < 2 || conn->fallback > 0)) {
+ 			conn->pkt_type = (hdev->esco_type & SCO_ESCO_MASK) |
+ 					(hdev->esco_type & EDR_ESCO_MASK);
+ 			hci_setup_sync(conn, conn->link->handle);
 -- 
 1.7.9.5
 
