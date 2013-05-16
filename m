@@ -1,51 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHZ1yCnFaUoNyCF8BCXw9nz8ioki0jmdPh0n1Ah3CC4y9=sv=A@mail.gmail.com>
-References: <1367829810-8262-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1367829810-8262-11-git-send-email-mikel.astiz.oss@gmail.com>
-	<CAHZ1yCnFaUoNyCF8BCXw9nz8ioki0jmdPh0n1Ah3CC4y9=sv=A@mail.gmail.com>
-Date: Thu, 16 May 2013 08:22:26 +0200
-Message-ID: <CANT-zCUH97DBRPkrbEDrkHvJm2NukC2436fMwDe8Z-VxJdJveA@mail.gmail.com>
-Subject: Re: [RFC BlueZ v0 10/13] doc: Add API documentation for org.bluez.Service1
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: Scott James Remnant <keybuk@google.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
+From: Alex Deymo <deymo@chromium.org>
+Date: Wed, 15 May 2013 21:38:17 -0700
+Message-ID: <CAGd9gwgFnuqiYMkYgb=2Ssh8ScoR45H=PZWG-BOXb8kwjnMMNg@mail.gmail.com>
+Subject: audio: Connect doesn't return when audio device is off.
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	keybuk <keybuk@chromium.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Scott,
+Hello,
+I was debugging this issue when I found that may be related with this
+new concept of "service", anyway this issue is present in bluez 5.4
+and 5.5 (did not try with previous versions).
 
-On Wed, May 15, 2013 at 6:38 PM, Scott James Remnant <keybuk@google.com> wrote:
-> On Mon, May 6, 2013 at 1:43 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
->
->> diff --git a/doc/service-api.txt b/doc/service-api.txt
->> new file mode 100644
->> index 0000000..ef611d6
->> --- /dev/null
->> +++ b/doc/service-api.txt
->> @@ -0,0 +1,54 @@
->> +BlueZ D-Bus Service API description
->> +***********************************
->> +
->> +Copyright (C) 2012-2013  BMW Car IT GmbH. All rights reserved.
->> +
->> +
->> +Service hierarchy
->> +=================
->> +
->> +Service                unique name
->> +Interface      org.bluez.Service1 [Experimental]
->> +Object path    freely definable
->> +
->> +Object path    [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/
->> +                                                               serviceZZZ
->> +
->
-> This says the Object path is both freely definable and fixed, which is it? :)
+The problem is easy to reproduce. Again I'm using the Bose SoundLink
+model 404600 but it should work with any audio device. The steps are
+as follow:
+1. power on the adapter, scan and pair to the device.
+2. trust the device.
+3. turn off the device (short-press once the power button)
+4. attempt to connect to the device from the bluetoothctl.
+The D-Bus Connect call doesn't return. I think that in general the
+Connect call doesn't return on failure, it only returns when it
+succeeds.
+I can also run into this same issue attempting to connect from the
+device (short-press the bluetooth button on this device) and running
+the "connect" command from bluetoothctl immediately after. In this
+case the device successfully connects to the host, but the attempt to
+connect from the host fails and Connect doesn't return. The funny
+thing is that the device works and you can play music to it.
 
-The later is the correct one, thanks for pointing it out.
+I would appreciate if you can help me to debug this issue. I tracked
+down the connection failure to connect_lost() being called.... but I'm
+sure should the audio profile notify the device or the service about
+the profile connection failure.
 
-Cheers,
-Mikel
+Thanks!
+Alex.
