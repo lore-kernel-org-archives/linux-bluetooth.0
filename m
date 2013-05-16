@@ -1,92 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <519480A1.6030909@ahsoftware.de>
-Date: Thu, 16 May 2013 08:45:53 +0200
-From: Alexander Holler <holler@ahsoftware.de>
 MIME-Version: 1.0
-To: linux-kernel@vger.kernel.org
-CC: Jiri Slaby <jslaby@suse.cz>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Marcel Holtmann <marcel@holtmann.org>,
- Gustavo Padovan <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- linux-bluetooth@vger.kernel.org
-Subject: BUG: tty: memory corruption through tty_release/tty_ldisc_release
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+In-Reply-To: <CAHZ1yCnFaUoNyCF8BCXw9nz8ioki0jmdPh0n1Ah3CC4y9=sv=A@mail.gmail.com>
+References: <1367829810-8262-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1367829810-8262-11-git-send-email-mikel.astiz.oss@gmail.com>
+	<CAHZ1yCnFaUoNyCF8BCXw9nz8ioki0jmdPh0n1Ah3CC4y9=sv=A@mail.gmail.com>
+Date: Thu, 16 May 2013 08:22:26 +0200
+Message-ID: <CANT-zCUH97DBRPkrbEDrkHvJm2NukC2436fMwDe8Z-VxJdJveA@mail.gmail.com>
+Subject: Re: [RFC BlueZ v0 10/13] doc: Add API documentation for org.bluez.Service1
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Scott James Remnant <keybuk@google.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Scott,
 
-after some pain because the "big step" (ecbbfd4) happened while the 
-support for my AMD CPU was broken and thus git bisect hit a series of 
-kernels which didn't boot, I've finally found the cause for a memory 
-corruption: tty_ldisc_release().
+On Wed, May 15, 2013 at 6:38 PM, Scott James Remnant <keybuk@google.com> wrote:
+> On Mon, May 6, 2013 at 1:43 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>
+>> diff --git a/doc/service-api.txt b/doc/service-api.txt
+>> new file mode 100644
+>> index 0000000..ef611d6
+>> --- /dev/null
+>> +++ b/doc/service-api.txt
+>> @@ -0,0 +1,54 @@
+>> +BlueZ D-Bus Service API description
+>> +***********************************
+>> +
+>> +Copyright (C) 2012-2013  BMW Car IT GmbH. All rights reserved.
+>> +
+>> +
+>> +Service hierarchy
+>> +=================
+>> +
+>> +Service                unique name
+>> +Interface      org.bluez.Service1 [Experimental]
+>> +Object path    freely definable
+>> +
+>> +Object path    [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/
+>> +                                                               serviceZZZ
+>> +
+>
+> This says the Object path is both freely definable and fixed, which is it? :)
 
-What happens is the following:
+The later is the correct one, thanks for pointing it out.
 
-tty_port is self-destructing, that means it destroys itself in 
-tty_port.c:tty_port_destructor() when the last reference is gone. E.g. 
-in case of rfcomm this happens with the call to tty->ops->close() in 
-tty_io.c:tty_release().
-
-The problem here is that tty_io.c:tty_release() calls 
-tty_ldisc.c:tty_ldisc_release() which uses the tty_port to flush the 
-ldisc work queues.
-
-In the best case this hits a BUG() in cancel_work_sync() but often it 
-just causes a memory corruption without a BUG() got hit before.
-
-My quick fix (the diff below) is to remove the call to 
-tty_ldisc_release() but I'm very doubtful that this is the correct 
-approach, as I'm not very familiar with the tty subsystem and therefor 
-I'm not sure if it is necessary to flush the ldisc queues. Another 
-solution could be to move the call to tty_ldisc_release() to 
-tty_port.c:tty_port_destructor().
-
-If the patch finds friends, it could be enhanced to remove
-tty_ldisc.c:tty_ldisc_release() too, tty_release() is the only user of 
-that function.
-
-I've added the bluetooth people to cc, because rfcomm is one user of 
-tty_release() which gets hit by this bug whenever a connected (rfcomm) 
-remote device disappears.
-
-Regards,
-
-Alexander Holler
-
-
-(The format of the patch below is likely broken, but I don't care, as it 
-is just a RFC.)
-
- From 4a1d24e5334668f6cd82937d574cd75b5e372a75 Mon Sep 17 00:00:00 2001
-From: Alexander Holler <holler@ahsoftware.de>
-Date: Thu, 16 May 2013 08:21:22 +0200
-Subject: [PATCH] tty: don't call tty_ldisc_release() because tty_port likely
-  disappeared before
-
-tty_port destroys itself when the last reference is gone, therefor
-tty_ldisc_release() can't be called afterwards.
-
-Signed-off-by: Alexander Holler <holler@ahsoftware.de>
----
-  drivers/tty/tty_io.c | 4 ----
-  1 file changed, 4 deletions(-)
-
-diff --git a/drivers/tty/tty_io.c b/drivers/tty/tty_io.c
-index 6464029..9c9ad04 100644
---- a/drivers/tty/tty_io.c
-+++ b/drivers/tty/tty_io.c
-@@ -1850,10 +1850,6 @@ int tty_release(struct inode *inode, struct file 
-*filp)
-  #ifdef TTY_DEBUG_HANGUP
-  	printk(KERN_DEBUG "%s: %s: final close\n", __func__, tty_name(tty, buf));
-  #endif
--	/*
--	 * Ask the line discipline code to release its structures
--	 */
--	tty_ldisc_release(tty, o_tty);
-
-  	/* Wait for pending work before tty destruction commmences */
-  	tty_flush_works(tty);
--- 
-1.8.1.4
+Cheers,
+Mikel
