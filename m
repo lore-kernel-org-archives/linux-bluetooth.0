@@ -1,41 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5194E380.1030109@hurleysoftware.com>
-Date: Thu, 16 May 2013 09:47:44 -0400
-From: Peter Hurley <peter@hurleysoftware.com>
-MIME-Version: 1.0
-To: Alexander Holler <holler@ahsoftware.de>
-CC: linux-kernel@vger.kernel.org, Jiri Slaby <jslaby@suse.cz>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Marcel Holtmann <marcel@holtmann.org>,
- Gustavo Padovan <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- linux-bluetooth@vger.kernel.org
-Subject: Re: BUG: tty: memory corruption through tty_release/tty_ldisc_release
-References: <519480A1.6030909@ahsoftware.de>
-In-Reply-To: <519480A1.6030909@ahsoftware.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
+Subject: Re: [PATCH BlueZ 1/2] test: Remove commented out code from simple-agent
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1368710695-22623-1-git-send-email-anderson.lizardo@openbossa.org>
+Date: Thu, 16 May 2013 15:45:46 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <318C0863-4CB8-4DC6-B577-13F7D33ADBF6@holtmann.org>
+References: <1368710695-22623-1-git-send-email-anderson.lizardo@openbossa.org>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 05/16/2013 02:45 AM, Alexander Holler wrote:
-> Hello,
->
-> after some pain because the "big step" (ecbbfd4) happened while the support for my AMD CPU was broken and thus git bisect hit a series of kernels which didn't boot, I've finally found the cause for a memory corruption: tty_ldisc_release().
->
-> What happens is the following:
->
-> tty_port is self-destructing, that means it destroys itself in tty_port.c:tty_port_destructor() when the last reference is gone. E.g. in case of rfcomm this happens with the call to tty->ops->close() in tty_io.c:tty_release().
->
-> The problem here is that tty_io.c:tty_release() calls tty_ldisc.c:tty_ldisc_release() which uses the tty_port to flush the ldisc work queues.
->
-> In the best case this hits a BUG() in cancel_work_sync() but often it just causes a memory corruption without a BUG() got hit before.
+Hi Anderson,
 
-Hi Alexander,
+> ---
+> test/simple-agent |    3 ---
+> 1 file changed, 3 deletions(-)
+> 
+> diff --git a/test/simple-agent b/test/simple-agent
+> index 854e1af..64b2ca8 100755
+> --- a/test/simple-agent
+> +++ b/test/simple-agent
+> @@ -176,6 +176,3 @@ if __name__ == '__main__':
+> 		manager.RequestDefaultAgent(path)
+> 
+> 	mainloop.run()
+> -
+> -	#adapter.UnregisterAgent(path)
+> -	#print("Agent unregistered")
 
-Actually, the problem is that tty->ops->close() shouldn't be
-the last kref on the port.
+I would prefer if we remove the whole script. Does it provide anything that bluetoothctl is not providing?
 
-It doesn't look to me like device removal is being handled
-properly.
+Regards
 
-Regards,
-Peter Hurley
+Marcel
+
+
