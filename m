@@ -1,61 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CANT-zCUH97DBRPkrbEDrkHvJm2NukC2436fMwDe8Z-VxJdJveA@mail.gmail.com>
-References: <1367829810-8262-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<1367829810-8262-11-git-send-email-mikel.astiz.oss@gmail.com>
-	<CAHZ1yCnFaUoNyCF8BCXw9nz8ioki0jmdPh0n1Ah3CC4y9=sv=A@mail.gmail.com>
-	<CANT-zCUH97DBRPkrbEDrkHvJm2NukC2436fMwDe8Z-VxJdJveA@mail.gmail.com>
-Date: Thu, 16 May 2013 10:10:22 -0700
-Message-ID: <CAHZ1yCnPYU8eZxjO2YDrJSBkcs4BnGg53GL=fKLMsXKT=H94Rw@mail.gmail.com>
-Subject: Re: [RFC BlueZ v0 10/13] doc: Add API documentation for org.bluez.Service1
-From: Scott James Remnant <keybuk@google.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
+In-Reply-To: <318C0863-4CB8-4DC6-B577-13F7D33ADBF6@holtmann.org>
+References: <1368710695-22623-1-git-send-email-anderson.lizardo@openbossa.org>
+	<318C0863-4CB8-4DC6-B577-13F7D33ADBF6@holtmann.org>
+Date: Thu, 16 May 2013 12:23:31 -0400
+Message-ID: <CAJdJm_M564tPtm5FBBxE3kDs8q8izxpOdV=S3KKw7xJe+rPk1w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] test: Remove commented out code from simple-agent
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, May 15, 2013 at 11:22 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> Hi Scott,
->
-> On Wed, May 15, 2013 at 6:38 PM, Scott James Remnant <keybuk@google.com> wrote:
->> On Mon, May 6, 2013 at 1:43 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+Hi Marcel,
+
+On Thu, May 16, 2013 at 9:45 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> --- a/test/simple-agent
+>> +++ b/test/simple-agent
+>> @@ -176,6 +176,3 @@ if __name__ == '__main__':
+>>               manager.RequestDefaultAgent(path)
 >>
->>> diff --git a/doc/service-api.txt b/doc/service-api.txt
->>> new file mode 100644
->>> index 0000000..ef611d6
->>> --- /dev/null
->>> +++ b/doc/service-api.txt
->>> @@ -0,0 +1,54 @@
->>> +BlueZ D-Bus Service API description
->>> +***********************************
->>> +
->>> +Copyright (C) 2012-2013  BMW Car IT GmbH. All rights reserved.
->>> +
->>> +
->>> +Service hierarchy
->>> +=================
->>> +
->>> +Service                unique name
->>> +Interface      org.bluez.Service1 [Experimental]
->>> +Object path    freely definable
->>> +
->>> +Object path    [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/
->>> +                                                               serviceZZZ
->>> +
->>
->> This says the Object path is both freely definable and fixed, which is it? :)
+>>       mainloop.run()
+>> -
+>> -     #adapter.UnregisterAgent(path)
+>> -     #print("Agent unregistered")
 >
-> The later is the correct one, thanks for pointing it out.
->
+> I would prefer if we remove the whole script. Does it provide anything that bluetoothctl is not providing?
 
-What's the interaction between this and org.bluez.Profile1 ?
+I have nothing against it (and we can always improve bluetoothctl if
+something is missing there), but this is a legacy script that some
+distros seem to package and users have been relying on it as a simple
+console agent. Maybe we should (somehow) advertise bluetoothctl more.
 
-Do you need an exported org.bluez.Profile1 object with a matching UUID
-of serviceZZZ to be able to connect? I would assume so, since that's
-what would receive the file descriptor.
+BTW, It seems that --timeout/-t option on simple-agent is totally ignored.
 
-Scott
---
-Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
+Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
