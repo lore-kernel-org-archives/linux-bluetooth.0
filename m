@@ -1,53 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+Subject: [PATCH v7 1/8] Bluetooth: Use hci_connect_sco directly
+Date: Thu, 16 May 2013 19:33:58 +0200
+Message-Id: <1368725646-4593-2-git-send-email-frederic.dalleau@linux.intel.com>
+In-Reply-To: <1368725646-4593-1-git-send-email-frederic.dalleau@linux.intel.com>
+References: <1368725646-4593-1-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLz=nP5fouBQw0oUYe_L4SOX3jPoQtkATYGispvs8dh_w@mail.gmail.com>
-References: <CAGd9gwgKMt21TnGLJ09+gAkP-=Jn9mfoAThiBuqup_vTyCshuw@mail.gmail.com>
- <CAGd9gwgkWe+A5rbEnhgNxc5Va9TQt_-Pp04c5rP18nO2FF9f2A@mail.gmail.com> <CABBYNZLz=nP5fouBQw0oUYe_L4SOX3jPoQtkATYGispvs8dh_w@mail.gmail.com>
-From: Alex Deymo <deymo@chromium.org>
-Date: Thu, 16 May 2013 13:34:24 -0700
-Message-ID: <CAGd9gwhOurO91q1EwJwZbTVthaxr2AjcVeZ47xuAY_S1Ft_u3w@mail.gmail.com>
-Subject: Re: a2dp.c: finalize_config(setup) can destroy setup
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: keybuk <keybuk@chromium.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+hci_connect is a super function for connecting hci protocols. But the
+voice_setting parameter is only needed by SCO and security requirements are not
+needed for SCO channels. Thus, it makes sense to have a separate function.
 
-On Thu, May 16, 2013 at 4:02 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Looks like there are some new devices that should try to get a hold,
-> anyway this problem should be fixed ASAP so what about the following
-> patch:
->
-> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-> index 215f4db..c6973ae 100644
-> --- a/profiles/audio/a2dp.c
-> +++ b/profiles/audio/a2dp.c
-> @@ -723,16 +723,12 @@ static void open_cfm(struct avdtp *session,
-> struct avdtp_local_sep *sep,
->         if (err) {
->                 setup->stream = NULL;
->                 setup->err = err;
-> +               if (setup->start)
-> +                       finalize_resume(setup);
->         }
->
->         finalize_config(setup);
->
-> -       if (!setup->start || !err)
-> -               return;
-> -
-> -       setup->start = FALSE;
-> -       finalize_resume(setup);
-> -
->         return;
->  }
+Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci_core.h |    2 ++
+ net/bluetooth/hci_conn.c         |    9 +++------
+ net/bluetooth/sco.c              |    3 +--
+ 3 files changed, 6 insertions(+), 8 deletions(-)
 
-This patch looks good to me. I tried it in the same scenario and
-valgrind does not complain.
-Could you please push it to the repo?
-Thanks,
-Alex.
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 606615c..e9cf9fa 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -584,6 +584,8 @@ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle);
+ 
+ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 			     __u8 dst_type, __u8 sec_level, __u8 auth_type);
++struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
++				 __u16 setting);
+ int hci_conn_check_link_mode(struct hci_conn *conn);
+ int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
+ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type);
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 6c7f363..d1d9919 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -560,13 +560,13 @@ static struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
+ 	return acl;
+ }
+ 
+-static struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type,
+-				bdaddr_t *dst, u8 sec_level, u8 auth_type)
++struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
++				 __u16 setting)
+ {
+ 	struct hci_conn *acl;
+ 	struct hci_conn *sco;
+ 
+-	acl = hci_connect_acl(hdev, dst, sec_level, auth_type);
++	acl = hci_connect_acl(hdev, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING);
+ 	if (IS_ERR(acl))
+ 		return acl;
+ 
+@@ -612,9 +612,6 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 		return hci_connect_le(hdev, dst, dst_type, sec_level, auth_type);
+ 	case ACL_LINK:
+ 		return hci_connect_acl(hdev, dst, sec_level, auth_type);
+-	case SCO_LINK:
+-	case ESCO_LINK:
+-		return hci_connect_sco(hdev, type, dst, sec_level, auth_type);
+ 	}
+ 
+ 	return ERR_PTR(-EINVAL);
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 9e62102..a85182f 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -176,8 +176,7 @@ static int sco_connect(struct sock *sk)
+ 	else
+ 		type = SCO_LINK;
+ 
+-	hcon = hci_connect(hdev, type, dst, BDADDR_BREDR, BT_SECURITY_LOW,
+-			   HCI_AT_NO_BONDING);
++	hcon = hci_connect_sco(hdev, type, dst, sco_pi(sk)->setting);
+ 	if (IS_ERR(hcon)) {
+ 		err = PTR_ERR(hcon);
+ 		goto done;
+-- 
+1.7.9.5
+
