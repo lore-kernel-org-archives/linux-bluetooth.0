@@ -1,41 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <9C2AAC1D-11FF-42B4-8658-0FFBC50A2A46@holtmann.org>
-References: <1368712856-30692-1-git-send-email-anderson.lizardo@openbossa.org>
-	<9C2AAC1D-11FF-42B4-8658-0FFBC50A2A46@holtmann.org>
-Date: Thu, 16 May 2013 12:19:18 -0400
-Message-ID: <CAJdJm_NBJpoovNRkECuVGLB6pmdhNMGKQas4af9Y70BKKsPU3Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] plugins: Fix compilation error on autopair
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 1/2] plugins: Use open()/read() instead of fopen()/fread() on autopair
+Date: Thu, 16 May 2013 12:25:09 -0400
+Message-Id: <1368721510-14339-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+open()/read() is more common on BlueZ code. Incidentally, get rid of
+this compilation error (using gcc 4.6.3):
 
-On Thu, May 16, 2013 at 10:07 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
->>       f = fopen("/dev/urandom", "rb");
->>       if (f != NULL) {
->> -             fread(&seed, sizeof(seed), 1, f);
->> +             nread = fread(&seed, sizeof(seed), 1, f);
->>               fclose(f);
->>       }
->>
->> +     if (f == NULL || nread != 1)
->> +             seed = time(NULL);
->> +
->>       srand(seed);
->
-> lets redo this in actually readable code ;)
->
-> Checking f twice is not acceptable. And I still wonder why fopen() is here preferred over open().
+plugins/autopair.c: In function ‘autopair_init’:
+plugins/autopair.c:154:8: error: ignoring return value of ‘fread’,
+declared with attribute warn_unused_result [-Werror=unused-result]
+---
 
-I just sent another version that uses open()/read() instead.
-Compilation tested only.
+WARNING: compilation tested only.
 
-Regards,
+ plugins/autopair.c |   20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/plugins/autopair.c b/plugins/autopair.c
+index 5d90f9d..63f906d 100644
+--- a/plugins/autopair.c
++++ b/plugins/autopair.c
+@@ -27,6 +27,8 @@
+ 
+ #include <stdbool.h>
+ #include <stdlib.h>
++#include <fcntl.h>
++#include <unistd.h>
+ 
+ #include <bluetooth/bluetooth.h>
+ #include <glib.h>
+@@ -146,15 +148,19 @@ static struct btd_adapter_driver autopair_driver = {
+ static int autopair_init(void)
+ {
+ 	/* Initialize the random seed from /dev/urandom */
+-	unsigned int seed = time(NULL);
+-	FILE *f;
+-
+-	f = fopen("/dev/urandom", "rb");
+-	if (f != NULL) {
+-		fread(&seed, sizeof(seed), 1, f);
+-		fclose(f);
++	unsigned int seed;
++	ssize_t nread = 0;
++	int fd;
++
++	fd = open("/dev/urandom", O_RDONLY);
++	if (fd != -1) {
++		nread = read(fd, &seed, sizeof(seed));
++		close(fd);
+ 	}
+ 
++	if (nread < (ssize_t) sizeof(seed))
++		seed = time(NULL);
++
+ 	srand(seed);
+ 
+ 	return btd_register_adapter_driver(&autopair_driver);
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.9.5
+
