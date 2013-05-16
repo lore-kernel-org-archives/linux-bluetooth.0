@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <318C0863-4CB8-4DC6-B577-13F7D33ADBF6@holtmann.org>
-References: <1368710695-22623-1-git-send-email-anderson.lizardo@openbossa.org>
-	<318C0863-4CB8-4DC6-B577-13F7D33ADBF6@holtmann.org>
-Date: Thu, 16 May 2013 12:23:31 -0400
-Message-ID: <CAJdJm_M564tPtm5FBBxE3kDs8q8izxpOdV=S3KKw7xJe+rPk1w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] test: Remove commented out code from simple-agent
+In-Reply-To: <9C2AAC1D-11FF-42B4-8658-0FFBC50A2A46@holtmann.org>
+References: <1368712856-30692-1-git-send-email-anderson.lizardo@openbossa.org>
+	<9C2AAC1D-11FF-42B4-8658-0FFBC50A2A46@holtmann.org>
+Date: Thu, 16 May 2013 12:19:18 -0400
+Message-ID: <CAJdJm_NBJpoovNRkECuVGLB6pmdhNMGKQas4af9Y70BKKsPU3Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] plugins: Fix compilation error on autopair
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
@@ -14,25 +14,25 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Thu, May 16, 2013 at 9:45 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
->> --- a/test/simple-agent
->> +++ b/test/simple-agent
->> @@ -176,6 +176,3 @@ if __name__ == '__main__':
->>               manager.RequestDefaultAgent(path)
+On Thu, May 16, 2013 at 10:07 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>>       f = fopen("/dev/urandom", "rb");
+>>       if (f != NULL) {
+>> -             fread(&seed, sizeof(seed), 1, f);
+>> +             nread = fread(&seed, sizeof(seed), 1, f);
+>>               fclose(f);
+>>       }
 >>
->>       mainloop.run()
->> -
->> -     #adapter.UnregisterAgent(path)
->> -     #print("Agent unregistered")
+>> +     if (f == NULL || nread != 1)
+>> +             seed = time(NULL);
+>> +
+>>       srand(seed);
 >
-> I would prefer if we remove the whole script. Does it provide anything that bluetoothctl is not providing?
+> lets redo this in actually readable code ;)
+>
+> Checking f twice is not acceptable. And I still wonder why fopen() is here preferred over open().
 
-I have nothing against it (and we can always improve bluetoothctl if
-something is missing there), but this is a legacy script that some
-distros seem to package and users have been relying on it as a simple
-console agent. Maybe we should (somehow) advertise bluetoothctl more.
-
-BTW, It seems that --timeout/-t option on simple-agent is totally ignored.
+I just sent another version that uses open()/read() instead.
+Compilation tested only.
 
 Regards,
 -- 
