@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v7 1/8] Bluetooth: Use hci_connect_sco directly
-Date: Thu, 16 May 2013 19:33:58 +0200
-Message-Id: <1368725646-4593-2-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v7 4/8] Bluetooth: Constants and macro declaration for SCO airmode
+Date: Thu, 16 May 2013 19:34:01 +0200
+Message-Id: <1368725646-4593-5-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1368725646-4593-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1368725646-4593-1-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
@@ -15,76 +15,29 @@ Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hci_connect is a super function for connecting hci protocols. But the
-voice_setting parameter is only needed by SCO and security requirements are not
-needed for SCO channels. Thus, it makes sense to have a separate function.
+This patchs define constants and macro for extracting SCO airmode from SCO
+voice setting. It refers to Bluetooth Core V4.0 specification, Part E, Chap
+6.12 which describe SCO voice setting format.
 
 Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h |    2 ++
- net/bluetooth/hci_conn.c         |    9 +++------
- net/bluetooth/sco.c              |    3 +--
- 3 files changed, 6 insertions(+), 8 deletions(-)
+ include/net/bluetooth/hci_core.h |    5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 606615c..e9cf9fa 100644
+index e9cf9fa..a6fd544 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -584,6 +584,8 @@ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle);
+@@ -1214,4 +1214,9 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
  
- struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 			     __u8 dst_type, __u8 sec_level, __u8 auth_type);
-+struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
-+				 __u16 setting);
- int hci_conn_check_link_mode(struct hci_conn *conn);
- int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
- int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type);
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 6c7f363..d1d9919 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -560,13 +560,13 @@ static struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
- 	return acl;
- }
+ u8 bdaddr_to_le(u8 bdaddr_type);
  
--static struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type,
--				bdaddr_t *dst, u8 sec_level, u8 auth_type)
-+struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
-+				 __u16 setting)
- {
- 	struct hci_conn *acl;
- 	struct hci_conn *sco;
- 
--	acl = hci_connect_acl(hdev, dst, sec_level, auth_type);
-+	acl = hci_connect_acl(hdev, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING);
- 	if (IS_ERR(acl))
- 		return acl;
- 
-@@ -612,9 +612,6 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 		return hci_connect_le(hdev, dst, dst_type, sec_level, auth_type);
- 	case ACL_LINK:
- 		return hci_connect_acl(hdev, dst, sec_level, auth_type);
--	case SCO_LINK:
--	case ESCO_LINK:
--		return hci_connect_sco(hdev, type, dst, sec_level, auth_type);
- 	}
- 
- 	return ERR_PTR(-EINVAL);
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 9e62102..a85182f 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -176,8 +176,7 @@ static int sco_connect(struct sock *sk)
- 	else
- 		type = SCO_LINK;
- 
--	hcon = hci_connect(hdev, type, dst, BDADDR_BREDR, BT_SECURITY_LOW,
--			   HCI_AT_NO_BONDING);
-+	hcon = hci_connect_sco(hdev, type, dst, sco_pi(sk)->setting);
- 	if (IS_ERR(hcon)) {
- 		err = PTR_ERR(hcon);
- 		goto done;
++#define SCO_AIRMODE_MASK       0x0003
++#define SCO_AIRMODE_CVSD       0x0000
++#define SCO_AIRMODE_TRANSP     0x0003
++#define hci_sco_airmode(setting) ((setting) & SCO_AIRMODE_MASK)
++
+ #endif /* __HCI_CORE_H */
 -- 
 1.7.9.5
 
