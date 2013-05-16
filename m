@@ -4,140 +4,59 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v7 3/8] Bluetooth: Add bluetooth socket voice option
-Date: Thu, 16 May 2013 19:34:00 +0200
-Message-Id: <1368725646-4593-4-git-send-email-frederic.dalleau@linux.intel.com>
-In-Reply-To: <1368725646-4593-1-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1368725646-4593-1-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v7 0/8] sco: SCO socket option for voice_setting
+Date: Thu, 16 May 2013 19:33:57 +0200
+Message-Id: <1368725646-4593-1-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch extends the current bluetooth socket option to add BT_VOICE.
-This is intended to choose voice data type at runtime. It only applies to SCO
-sockets.
-Incoming connections shall be setup during defered setup. Outgoing connections
-shall be setup before connect(). The desired setting is stored in the sco
-socket info.
-This patch declares needed members, modifies getsockopt() and setsockopt().
+Hi,
 
-Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
----
- include/net/bluetooth/bluetooth.h |    8 ++++++++
+v7 changes defaults to BT_VOICE_CVSD
+Remove mask parameter to sco_conn_defer_accept, it was always 0
+check the bits for air codec instead of use constants.
+Add S3, S2, S1, D1, D0 settings.
+The controller default is now only used to initialize the controller or fill
+in the missing information in case of using the old Add_SCO command
+
+v6 fixes style issues
+
+v5 changes interface to SOL_BLUETOOTH, BT_VOICE.
+Rework fallback mechanism.
+
+This is the patch version 4 of the socket option for enabling transparent SCO.
+As requested by Marcel, this is now a 16-bit voice_setting.
+0x0000 is the value corresponding to current behavior.
+0x0003 is the value to use for enabling transparent data.
+It is easy to allow all possible values from Bluetooth core spec, but I guess
+results can be unexpected...
+Should we filter allowed values in setsockopt ?
+
+Let me know what you think.
+Regards,
+Fred
+
+Frédéric Dalleau (8):
+  Bluetooth: Use hci_connect_sco directly
+  Bluetooth: Remove unused mask parameter in sco_conn_defer_accept
+  Bluetooth: Add bluetooth socket voice option
+  Bluetooth: Constants and macro declaration for SCO airmode
+  Bluetooth: Use voice setting in incoming SCO connection
+  Bluetooth: Parameters for outgoing SCO connections
+  Bluetooth: Fallback transparent SCO from T2 to T1
+  Bluetooth: Add support for fallback between CVSD recommended settings
+
+ include/net/bluetooth/bluetooth.h |    8 +++++
+ include/net/bluetooth/hci_core.h  |    9 +++++
  include/net/bluetooth/sco.h       |    1 +
- net/bluetooth/sco.c               |   38 ++++++++++++++++++++++++++++++++++++-
- 3 files changed, 46 insertions(+), 1 deletion(-)
+ net/bluetooth/hci_conn.c          |   56 +++++++++++++++++++++++------
+ net/bluetooth/hci_event.c         |    3 +-
+ net/bluetooth/sco.c               |   70 ++++++++++++++++++++++++++++++-------
+ 6 files changed, 123 insertions(+), 24 deletions(-)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 6912ef9..0239a49 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -107,6 +107,14 @@ struct bt_power {
-  */
- #define BT_CHANNEL_POLICY_AMP_PREFERRED		2
- 
-+#define BT_VOICE		11
-+struct bt_voice {
-+	__u16 setting;
-+};
-+
-+#define BT_VOICE_TRANSPARENT			0x0003
-+#define BT_VOICE_CVSD				0x0060
-+
- __printf(1, 2)
- int bt_info(const char *fmt, ...);
- __printf(1, 2)
-diff --git a/include/net/bluetooth/sco.h b/include/net/bluetooth/sco.h
-index 1e35c43..e252a31 100644
---- a/include/net/bluetooth/sco.h
-+++ b/include/net/bluetooth/sco.h
-@@ -73,6 +73,7 @@ struct sco_conn {
- struct sco_pinfo {
- 	struct bt_sock	bt;
- 	__u32		flags;
-+	__u16		setting;
- 	struct sco_conn	*conn;
- };
- 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 26c9d51..7b4c3df 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -416,6 +416,8 @@ static struct sock *sco_sock_alloc(struct net *net, struct socket *sock, int pro
- 	sk->sk_protocol = proto;
- 	sk->sk_state    = BT_OPEN;
- 
-+	sco_pi(sk)->setting = BT_VOICE_CVSD;
-+
- 	setup_timer(&sk->sk_timer, sco_sock_timeout, (unsigned long)sk);
- 
- 	bt_sock_link(&sco_sk_list, sk);
-@@ -708,7 +710,8 @@ static int sco_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
- static int sco_sock_setsockopt(struct socket *sock, int level, int optname, char __user *optval, unsigned int optlen)
- {
- 	struct sock *sk = sock->sk;
--	int err = 0;
-+	int len, err = 0;
-+	struct bt_voice voice;
- 	u32 opt;
- 
- 	BT_DBG("sk %p", sk);
-@@ -734,6 +737,29 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname, char
- 			clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
- 		break;
- 
-+	case BT_VOICE:
-+		if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND &&
-+		    sk->sk_state != BT_CONNECT2) {
-+			err = -EINVAL;
-+			break;
-+		}
-+
-+		len = min_t(unsigned int, sizeof(voice), optlen);
-+		if (copy_from_user((char *) &voice, optval, len)) {
-+			err = -EFAULT;
-+			break;
-+		}
-+
-+
-+		if (voice.setting != BT_VOICE_TRANSPARENT &&
-+		    voice.setting != BT_VOICE_CVSD) {
-+			err = -EINVAL;
-+			break;
-+		}
-+
-+		sco_pi(sk)->setting = voice.setting;
-+		break;
-+
- 	default:
- 		err = -ENOPROTOOPT;
- 		break;
-@@ -803,6 +829,7 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname, char
- {
- 	struct sock *sk = sock->sk;
- 	int len, err = 0;
-+	struct bt_voice voice;
- 
- 	BT_DBG("sk %p", sk);
- 
-@@ -828,6 +855,15 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname, char
- 
- 		break;
- 
-+	case BT_VOICE:
-+		voice.setting = sco_pi(sk)->setting;
-+
-+		len = min_t(unsigned int, len, sizeof(voice));
-+		if (copy_to_user(optval, (char *)&voice, len))
-+			err = -EFAULT;
-+
-+		break;
-+
- 	default:
- 		err = -ENOPROTOOPT;
- 		break;
 -- 
 1.7.9.5
 
