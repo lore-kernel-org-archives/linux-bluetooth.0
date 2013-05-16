@@ -1,117 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20130508074138.GA11502@x220>
-References: <1360668097-28906-1-git-send-email-waldemar.rymarkiewicz@tieto.com>
- <C4340FC6-1121-468E-B15D-68E2770AA07E@holtmann.org> <5135D965.8020604@tieto.com>
- <F00262C4-3552-438E-AF44-1D088CAB11A8@holtmann.org> <513703AA.2090206@tieto.com>
- <514021F5.1040005@tieto.com> <20130508074138.GA11502@x220>
-From: Waldemar Rymarkiewicz <waldemar.rymarkiewicz@gmail.com>
-Date: Thu, 16 May 2013 14:17:25 +0200
-Message-ID: <CAHKzcENFNqJ3iyd1V7YBaE=7j5aUY8rkFUW8VdUz=oKiCfrUNg@mail.gmail.com>
-Subject: Re: [RFC] bloodpressure: Add Blood Pressure API
-To: Rymarkiewicz Waldemar <waldemar.rymarkiewicz@tieto.com>, Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/alternative; boundary=20cf301ee723cd3baf04dcd4dbe8
+In-Reply-To: <CAGd9gwgkWe+A5rbEnhgNxc5Va9TQt_-Pp04c5rP18nO2FF9f2A@mail.gmail.com>
+References: <CAGd9gwgKMt21TnGLJ09+gAkP-=Jn9mfoAThiBuqup_vTyCshuw@mail.gmail.com>
+	<CAGd9gwgkWe+A5rbEnhgNxc5Va9TQt_-Pp04c5rP18nO2FF9f2A@mail.gmail.com>
+Date: Thu, 16 May 2013 14:02:50 +0300
+Message-ID: <CABBYNZLz=nP5fouBQw0oUYe_L4SOX3jPoQtkATYGispvs8dh_w@mail.gmail.com>
+Subject: Re: a2dp.c: finalize_config(setup) can destroy setup
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Alex Deymo <deymo@chromium.org>
+Cc: keybuk <keybuk@chromium.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---20cf301ee723cd3baf04dcd4dbe8
-Content-Type: text/plain; charset=UTF-8
+Hi Alex,
 
-Hi Johan,
-
-On 8 May 2013 09:41, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-
-> Are you still working on this? Seems this discussion was forgotten or
-> just abandoned.
+On Thu, May 16, 2013 at 7:06 AM, Alex Deymo <deymo@chromium.org> wrote:
+> Hello,
 >
-
-I've been focused on something else, but nice to see you are still
-interested in.
-
-
-> Apparently it was never a requirement to be able to enable/disable this
-> an arbitrary amount of times during the watcher life time, and instead
-> just leave it disabled or enabled until the watcher gets unregistered?
+> I just found this invalid read where finalize_config(setup); is
+> actually destroying the setup pointer passed there. The log attached
+> below is running with valgrind on bluez 5.5 (with a tiny patch to
+> src/log.{c|h} to have the debug file:line:function on error() as you
+> may see on the logs)
 >
-> Also, do you think there will be UIs that will refuse to work if a
-> device does not support intermediate measurement or that any UI that is
-> interested in intermediate measurement will forgive devices that do not
-> support it and simply get on with working without it being enabled? If
-> the latter ilds true then why not make an API which allows requesting
-> "register watcher and enable intermediate measurement if it's
-> supported". In such a case you wouldn't need a separate property and the
-> registration would succeed even if intermediate measurement isn't
-> supported. Thoughts?
+> The code around the open_cfm (a2dp.c:730) is:
+> finalize_config(setup);
 >
+> if (!setup->start || !err)
+>         return;
 
-Well, I believe any app will always be interested in getting intermediate
-results if possible, but it would be nice to notify (property, signal) the
-app if it's not possible.
-Just to give a chance to handle user experience in nice way. It can take a
-while between start of measurements and the final results event.
+> and the invalid must be the "setup->start". The debug log shows that
+> setup_free was called just before and if I'm not missing something, it
+> must come from finalize_setup()... but not sure why.
 
->From the other hand, the app by default can assume there is no intermediate
-results ( (however API will not require that if there is no property)) and
-can handle this time properly. In case, when it starts receiving
-intermediate results it will start display it immediately.
+Yep, this is actually a regression introduced by:
+commit 99c6f5221800a48e8ce0b1e070e97d1c26a0f90b
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Tue Feb 19 12:54:55 2013 +0200
 
-Thanks,
-/Waldek
+    A2DP: Mark start flag if resume happen while in configured state
 
---20cf301ee723cd3baf04dcd4dbe8
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+    If SEP is in configured state that means OPEN is about to happen so just
+    mark start flag and send START once OPEN completes.
 
-<div dir=3D"ltr"><br><div class=3D"gmail_extra">Hi Johan,<br></div><div cla=
-ss=3D"gmail_extra"><br><div class=3D"gmail_quote">On 8 May 2013 09:41, Joha=
-n Hedberg <span dir=3D"ltr">&lt;<a href=3D"mailto:johan.hedberg@gmail.com" =
-target=3D"_blank">johan.hedberg@gmail.com</a>&gt;</span> wrote:<br>
+As we don't have a start flag, perhaps because the endpoint don't
+try/delay the Acquire, the setup is free by finalize_config because
+there is no other operation pending.
 
+> The steps to run into this (although there may be some timing
+> involved) are simply scan, pair, trust and connect the device with
+> bluetoothctl. Device is a Bose SoundLink model 404600.
 
-<blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-=
-left-width:1px;border-left-color:rgb(204,204,204);border-left-style:solid;p=
-adding-left:1ex">Are you still working on this? Seems this discussion was f=
-orgotten or<br>
+Looks like there are some new devices that should try to get a hold,
+anyway this problem should be fixed ASAP so what about the following
+patch:
 
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 215f4db..c6973ae 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -723,16 +723,12 @@ static void open_cfm(struct avdtp *session,
+struct avdtp_local_sep *sep,
+        if (err) {
+                setup->stream = NULL;
+                setup->err = err;
++               if (setup->start)
++                       finalize_resume(setup);
+        }
 
-just abandoned.<br></blockquote><div><br></div><div>I&#39;ve been focused o=
-n something else, but nice to see you are still interested in. <br></div><d=
-iv>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0p=
-x 0.8ex;border-left-width:1px;border-left-color:rgb(204,204,204);border-lef=
-t-style:solid;padding-left:1ex">
+        finalize_config(setup);
 
-Apparently it was never a requirement to be able to enable/disable this<br>
-an arbitrary amount of times during the watcher life time, and instead<br>
-just leave it disabled or enabled until the watcher gets unregistered?<br>
-<br></blockquote><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px =
-0px 0.8ex;border-left-width:1px;border-left-color:rgb(204,204,204);border-l=
-eft-style:solid;padding-left:1ex">Also, do you think there will be UIs that=
- will refuse to work if a<br>
-
-
-device does not support intermediate measurement or that any UI that is<br>
-interested in intermediate measurement will forgive devices that do not<br>
-support it and simply get on with working without it being enabled? If<br>
-the latter ilds true then why not make an API which allows requesting<br>
-&quot;register watcher and enable intermediate measurement if it&#39;s<br>
-supported&quot;. In such a case you wouldn&#39;t need a separate property a=
-nd the<br>
-registration would succeed even if intermediate measurement isn&#39;t<br>
-supported. Thoughts?<br></blockquote><div><br></div><div style>Well, I beli=
-eve any app will always be interested in getting intermediate results if po=
-ssible, but it would be nice to notify (property, signal) the app if it&#39=
-;s not possible.</div>
-
-<div style>Just to give a chance to handle user experience in nice way. It =
-can take a while between start of measurements and the final results event.=
-=C2=A0</div><div style><br></div><div style>From the other hand, the app by=
- default can assume there is no intermediate results (=C2=A0(however API wi=
-ll not require that if there is no property)) and can handle this time prop=
-erly. In case, when it starts receiving intermediate results it will start =
-display it immediately.</div>
-
-<div style><br></div><div style>Thanks,</div><div style>/Waldek=C2=A0<br></=
-div><div style><br></div><div style>=C2=A0<br></div><div style><br></div><d=
-iv style><br></div><div style><br></div><div>=C2=A0</div></div></div></div>
-
---20cf301ee723cd3baf04dcd4dbe8--
+-       if (!setup->start || !err)
+-               return;
+-
+-       setup->start = FALSE;
+-       finalize_resume(setup);
+-
+        return;
+ }
