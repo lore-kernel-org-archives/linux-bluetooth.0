@@ -1,42 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <AF55EC03-6D36-4150-B314-0F5DB2F46485@holtmann.org>
-References: <1368721510-14339-1-git-send-email-anderson.lizardo@openbossa.org>
-	<AF55EC03-6D36-4150-B314-0F5DB2F46485@holtmann.org>
-Date: Fri, 17 May 2013 07:05:25 -0400
-Message-ID: <CAJdJm_NefGTEAgXrU7uZVeG0t11QnNG7UvsYh589dNrdYDrYqg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] plugins: Use open()/read() instead of
- fopen()/fread() on autopair
+In-Reply-To: <20130517072830.GA24865@x220>
+References: <1365706752-4442-1-git-send-email-anderson.lizardo@openbossa.org>
+	<1367612371-20930-1-git-send-email-anderson.lizardo@openbossa.org>
+	<CAJdJm_O7dnpKZcTq_RJG5Hk2V_DR8jVdojSz6zuJAChyJbaZzQ@mail.gmail.com>
+	<20130517072830.GA24865@x220>
+Date: Fri, 17 May 2013 06:49:40 -0400
+Message-ID: <CAJdJm_P6Z_=2dub7AyMNngw3zy_OiwibFARHBStYmJDudj2bhQ@mail.gmail.com>
+Subject: Re: [PATCH v2 BlueZ] tools: Add script for updating bt_compidtostr() implementation
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On Fri, May 17, 2013 at 1:14 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Also I wonder why this is all so complicated.
->
->         if (fd < 0) {
->                 int n;
->
->                 n = read(fd, ...);
->                 if (n < sizeof(...))
->                         seed = time();
->
->                 close(fd);
->         } else
->                 seed = time();
+On Fri, May 17, 2013 at 3:28 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> The script still doesn't work for me. It spews out some java script and
+> finally ends with "ERROR: could not parse company IDs from bluetooth.org".
 
-I intentionally avoided nested if()'s and the duplicated "seed =
-time(...)" assignment because it seemed to actually make it more
-complex IMHO. I will change to the version above, but I don't see why
-it is more readable than my v2 (plus the changes you proposed above).
-My main concern for this specific code is still to get the build fixed
-:)
+It seems that FC18 source has some patches that make it behave
+different from Ubuntu and upstream sources. I built the upstream
+(without any patches) and it worked fine (just like the Ubuntu
+version). After applying FC18 patches, I got the problem you
+mentioned.
 
-Note that the cast is necessary because "sizeof()" is unsigned.
+I'll now change the script to make it work with both upstream and FC18 versions.
 
 Best Regards,
 -- 
