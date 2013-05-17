@@ -1,39 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=windows-1252
 Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
-Subject: Re: [PATCH BlueZ 1/2] test: Remove commented out code from simple-agent
+Subject: Re: [PATCH BlueZ 1/2] plugins: Use open()/read() instead of fopen()/fread() on autopair
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAJdJm_M564tPtm5FBBxE3kDs8q8izxpOdV=S3KKw7xJe+rPk1w@mail.gmail.com>
-Date: Fri, 17 May 2013 07:15:20 +0200
+In-Reply-To: <1368721510-14339-1-git-send-email-anderson.lizardo@openbossa.org>
+Date: Fri, 17 May 2013 07:14:17 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <BEF9B7BE-655D-4953-A514-9C7392E81C1B@holtmann.org>
-References: <1368710695-22623-1-git-send-email-anderson.lizardo@openbossa.org> <318C0863-4CB8-4DC6-B577-13F7D33ADBF6@holtmann.org> <CAJdJm_M564tPtm5FBBxE3kDs8q8izxpOdV=S3KKw7xJe+rPk1w@mail.gmail.com>
+Message-Id: <AF55EC03-6D36-4150-B314-0F5DB2F46485@holtmann.org>
+References: <1368721510-14339-1-git-send-email-anderson.lizardo@openbossa.org>
 To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Anderson,
 
->>> --- a/test/simple-agent
->>> +++ b/test/simple-agent
->>> @@ -176,6 +176,3 @@ if __name__ == '__main__':
->>>              manager.RequestDefaultAgent(path)
->>> 
->>>      mainloop.run()
->>> -
->>> -     #adapter.UnregisterAgent(path)
->>> -     #print("Agent unregistered")
->> 
->> I would prefer if we remove the whole script. Does it provide anything that bluetoothctl is not providing?
+> open()/read() is more common on BlueZ code. Incidentally, get rid of
+> this compilation error (using gcc 4.6.3):
 > 
-> I have nothing against it (and we can always improve bluetoothctl if
-> something is missing there), but this is a legacy script that some
-> distros seem to package and users have been relying on it as a simple
-> console agent. Maybe we should (somehow) advertise bluetoothctl more.
+> plugins/autopair.c: In function ‘autopair_init’:
+> plugins/autopair.c:154:8: error: ignoring return value of ‘fread’,
+> declared with attribute warn_unused_result [-Werror=unused-result]
+> ---
 > 
-> BTW, It seems that --timeout/-t option on simple-agent is totally ignored.
+> WARNING: compilation tested only.
+> 
+> plugins/autopair.c |   20 +++++++++++++-------
+> 1 file changed, 13 insertions(+), 7 deletions(-)
+> 
+> diff --git a/plugins/autopair.c b/plugins/autopair.c
+> index 5d90f9d..63f906d 100644
+> --- a/plugins/autopair.c
+> +++ b/plugins/autopair.c
+> @@ -27,6 +27,8 @@
+> 
+> #include <stdbool.h>
+> #include <stdlib.h>
+> +#include <fcntl.h>
+> +#include <unistd.h>
+> 
+> #include <bluetooth/bluetooth.h>
+> #include <glib.h>
+> @@ -146,15 +148,19 @@ static struct btd_adapter_driver autopair_driver = {
+> static int autopair_init(void)
+> {
+> 	/* Initialize the random seed from /dev/urandom */
+> -	unsigned int seed = time(NULL);
+> -	FILE *f;
+> -
+> -	f = fopen("/dev/urandom", "rb");
+> -	if (f != NULL) {
+> -		fread(&seed, sizeof(seed), 1, f);
+> -		fclose(f);
+> +	unsigned int seed;
+> +	ssize_t nread = 0;
+> +	int fd;
+> +
+> +	fd = open("/dev/urandom", O_RDONLY);
+> +	if (fd != -1) {
 
-then lets just delete it. Distros should be shipping bluetoothctl anyway these days.
+we are still checking this with fd < 0.
+
+> +		nread = read(fd, &seed, sizeof(seed));
+> +		close(fd);
+> 	}
+
+	else
+		nread = -1;
+
+I really dislike initialized variable if there is no reason for doing that.
+
+> 
+> +	if (nread < (ssize_t) sizeof(seed))
+> +		seed = time(NULL);
+> +
+> 	srand(seed);
+
+Also I wonder why this is all so complicated.
+
+	if (fd < 0) {
+		int n;
+
+		n = read(fd, ...);
+		if (n < sizeof(...))
+			seed = time();
+
+		close(fd);
+	} else
+		seed = time();
 
 Regards
 
