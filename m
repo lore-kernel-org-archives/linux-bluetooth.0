@@ -1,92 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=US-ASCII
 Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
-Subject: Re: [PATCH BlueZ 1/2] plugins: Use open()/read() instead of fopen()/fread() on autopair
+Subject: Re: Paired devices in discovery mode
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1368721510-14339-1-git-send-email-anderson.lizardo@openbossa.org>
-Date: Fri, 17 May 2013 07:14:17 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <AF55EC03-6D36-4150-B314-0F5DB2F46485@holtmann.org>
-References: <1368721510-14339-1-git-send-email-anderson.lizardo@openbossa.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+In-Reply-To: <CAHZ1yC=J8mNDH54HqNu1odCcJX7C1TRPfTxqWZi4ear84ubc9A@mail.gmail.com>
+Date: Fri, 17 May 2013 07:07:24 +0200
+Cc: Alex Deymo <deymo@chromium.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Message-Id: <32EFB8C4-6875-4B7B-8968-6088AD1A5FF5@holtmann.org>
+References: <CAGd9gwjbOFpaYrZt=4Pn4VLUNX-uq-Ap=pPaWt9snV_Gmiwmtg@mail.gmail.com> <20130430072335.GA31159@x220.ger.corp.intel.com> <CAGd9gwg5ucupbzz5DoQNO0XNB5t_QgTB+Z-R0ZrvRGtV9hRz6Q@mail.gmail.com> <20130514082618.GA11514@x220.ger.corp.intel.com> <CAHZ1yC=J8mNDH54HqNu1odCcJX7C1TRPfTxqWZi4ear84ubc9A@mail.gmail.com>
+To: Scott James Remnant <keybuk@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hi Scott,
 
-> open()/read() is more common on BlueZ code. Incidentally, get rid of
-> this compilation error (using gcc 4.6.3):
+>>> Mac OS have done a good job here, displaying already paired devices in
+>>> the Bluetooth Setup Assistant when they are in discovery mode. If you
+>>> attempt to pair to one of those devices it will ask you about
+>>> un-pairing and re-pairing with that device, and loosing the previous
+>>> linkkey there (see screenshot here http://goo.gl/fGJ2U ). Only the
+>>> paired devices that are in discovery are shown there in the list.
+>> 
+>> I'm not completely convinced that this is the most user friendly
+>> approach (requiring the user to go through a pairing wizard instead of
+>> just selecting to connect to the device and having that trigger
+>> pairing).
+>> 
 > 
-> plugins/autopair.c: In function ‘autopair_init’:
-> plugins/autopair.c:154:8: error: ignoring return value of ‘fread’,
-> declared with attribute warn_unused_result [-Werror=unused-result]
-> ---
+> Part of the problem we're seeing is that users instinctively go
+> through the pairing wizard each time, and expect to find the device
+> there.
 > 
-> WARNING: compilation tested only.
+> I think this is a side-effect of the documentation that comes with
+> devices, they tell the user to hold down the connect button when
+> turning it on, and then go to the pairing wizard each time.
 > 
-> plugins/autopair.c |   20 +++++++++++++-------
-> 1 file changed, 13 insertions(+), 7 deletions(-)
-> 
-> diff --git a/plugins/autopair.c b/plugins/autopair.c
-> index 5d90f9d..63f906d 100644
-> --- a/plugins/autopair.c
-> +++ b/plugins/autopair.c
-> @@ -27,6 +27,8 @@
-> 
-> #include <stdbool.h>
-> #include <stdlib.h>
-> +#include <fcntl.h>
-> +#include <unistd.h>
-> 
-> #include <bluetooth/bluetooth.h>
-> #include <glib.h>
-> @@ -146,15 +148,19 @@ static struct btd_adapter_driver autopair_driver = {
-> static int autopair_init(void)
-> {
-> 	/* Initialize the random seed from /dev/urandom */
-> -	unsigned int seed = time(NULL);
-> -	FILE *f;
-> -
-> -	f = fopen("/dev/urandom", "rb");
-> -	if (f != NULL) {
-> -		fread(&seed, sizeof(seed), 1, f);
-> -		fclose(f);
-> +	unsigned int seed;
-> +	ssize_t nread = 0;
-> +	int fd;
-> +
-> +	fd = open("/dev/urandom", O_RDONLY);
-> +	if (fd != -1) {
+> Because the device is paired, we don't show it in the pairing wizard,
+> and BlueZ doesn't give us a hint that it's responding to Inquiry Scans
+> so _should_ appear in the pairing wizard again.
 
-we are still checking this with fd < 0.
+that is why I like the iOS approach here. You just get one list about YOUR devices and then it just starts scanning to see if there are other around it might want you to see additionally.
 
-> +		nread = read(fd, &seed, sizeof(seed));
-> +		close(fd);
-> 	}
-
-	else
-		nread = -1;
-
-I really dislike initialized variable if there is no reason for doing that.
-
-> 
-> +	if (nread < (ssize_t) sizeof(seed))
-> +		seed = time(NULL);
-> +
-> 	srand(seed);
-
-Also I wonder why this is all so complicated.
-
-	if (fd < 0) {
-		int n;
-
-		n = read(fd, ...);
-		if (n < sizeof(...))
-			seed = time();
-
-		close(fd);
-	} else
-		seed = time();
+Adding a LastSeen property is mostly useless since device will not go that often visible anyway. So a lot of information for nothing. Maybe a boolean for Discovered could help us to differentiate here. I am though not 100% convinced.
 
 Regards
 
