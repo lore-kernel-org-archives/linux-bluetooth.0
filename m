@@ -1,36 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20130517072830.GA24865@x220>
-References: <1365706752-4442-1-git-send-email-anderson.lizardo@openbossa.org>
-	<1367612371-20930-1-git-send-email-anderson.lizardo@openbossa.org>
-	<CAJdJm_O7dnpKZcTq_RJG5Hk2V_DR8jVdojSz6zuJAChyJbaZzQ@mail.gmail.com>
-	<20130517072830.GA24865@x220>
-Date: Fri, 17 May 2013 06:49:40 -0400
-Message-ID: <CAJdJm_P6Z_=2dub7AyMNngw3zy_OiwibFARHBStYmJDudj2bhQ@mail.gmail.com>
-Subject: Re: [PATCH v2 BlueZ] tools: Add script for updating bt_compidtostr() implementation
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	linux-bluetooth@vger.kernel.org
+In-Reply-To: <CAHZ1yCnPYU8eZxjO2YDrJSBkcs4BnGg53GL=fKLMsXKT=H94Rw@mail.gmail.com>
+References: <1367829810-8262-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1367829810-8262-11-git-send-email-mikel.astiz.oss@gmail.com>
+	<CAHZ1yCnFaUoNyCF8BCXw9nz8ioki0jmdPh0n1Ah3CC4y9=sv=A@mail.gmail.com>
+	<CANT-zCUH97DBRPkrbEDrkHvJm2NukC2436fMwDe8Z-VxJdJveA@mail.gmail.com>
+	<CAHZ1yCnPYU8eZxjO2YDrJSBkcs4BnGg53GL=fKLMsXKT=H94Rw@mail.gmail.com>
+Date: Fri, 17 May 2013 11:20:27 +0200
+Message-ID: <CANT-zCVzqmhV-FBs+in+Z8gFUi0=U006qp0GkgvdbvtMbPYMfw@mail.gmail.com>
+Subject: Re: [RFC BlueZ v0 10/13] doc: Add API documentation for org.bluez.Service1
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Scott James Remnant <keybuk@google.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Scott,
 
-On Fri, May 17, 2013 at 3:28 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> The script still doesn't work for me. It spews out some java script and
-> finally ends with "ERROR: could not parse company IDs from bluetooth.org".
+On Thu, May 16, 2013 at 7:10 PM, Scott James Remnant <keybuk@google.com> wrote:
+> On Wed, May 15, 2013 at 11:22 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>> Hi Scott,
+>>
+>> On Wed, May 15, 2013 at 6:38 PM, Scott James Remnant <keybuk@google.com> wrote:
+>>> On Mon, May 6, 2013 at 1:43 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>>>
+>>>> diff --git a/doc/service-api.txt b/doc/service-api.txt
+>>>> new file mode 100644
+>>>> index 0000000..ef611d6
+>>>> --- /dev/null
+>>>> +++ b/doc/service-api.txt
+>>>> @@ -0,0 +1,54 @@
+>>>> +BlueZ D-Bus Service API description
+>>>> +***********************************
+>>>> +
+>>>> +Copyright (C) 2012-2013  BMW Car IT GmbH. All rights reserved.
+>>>> +
+>>>> +
+>>>> +Service hierarchy
+>>>> +=================
+>>>> +
+>>>> +Service                unique name
+>>>> +Interface      org.bluez.Service1 [Experimental]
+>>>> +Object path    freely definable
+>>>> +
+>>>> +Object path    [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/
+>>>> +                                                               serviceZZZ
+>>>> +
+>>>
+>>> This says the Object path is both freely definable and fixed, which is it? :)
+>>
+>> The later is the correct one, thanks for pointing it out.
+>>
+>
+> What's the interaction between this and org.bluez.Profile1 ?
 
-It seems that FC18 source has some patches that make it behave
-different from Ubuntu and upstream sources. I built the upstream
-(without any patches) and it worked fine (just like the Ubuntu
-version). After applying FC18 patches, I got the problem you
-mentioned.
+There'no direct relation between these two interfaces.
 
-I'll now change the script to make it work with both upstream and FC18 versions.
+org.bluez.Profile1 is some kind of agent which can be used by a
+external component (e.g. oFono) to implement a profile. I argued in
+the past that the name is misleading but without success.
 
-Best Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+>
+> Do you need an exported org.bluez.Profile1 object with a matching UUID
+> of serviceZZZ to be able to connect? I would assume so, since that's
+> what would receive the file descriptor.
+
+No, they are independent mechanisms. For example A2DP is implemented
+inside bluetoothd and has therefore no associated org.bluez.Profile1
+interface, but the service gets exposed nevertheless in a
+org.bluez.Service1 and can thus be connected.
+
+Cheers,
+Mikel
