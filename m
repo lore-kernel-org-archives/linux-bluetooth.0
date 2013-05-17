@@ -1,86 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH v3 BlueZ] tools: Add script for updating bt_compidtostr() implementation
-Date: Fri, 17 May 2013 10:21:59 -0400
-Message-Id: <1368800519-20187-1-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1367612371-20930-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1367612371-20930-1-git-send-email-anderson.lizardo@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <5910C04C-A52D-401A-A298-E7031A190B08@holtmann.org>
+References: <1368725646-4593-1-git-send-email-frederic.dalleau@linux.intel.com>
+	<1368725646-4593-7-git-send-email-frederic.dalleau@linux.intel.com>
+	<5910C04C-A52D-401A-A298-E7031A190B08@holtmann.org>
+Date: Fri, 17 May 2013 10:10:15 -0300
+Message-ID: <CAE6HaMkGF9-GuVY2za_7yTMK2zAZMRzygg7jx9CSF2SGiAsz=w@mail.gmail.com>
+Subject: Re: [PATCH v7 6/8] Bluetooth: Parameters for outgoing SCO connections
+From: Vinicius Gomes <vinicius.gomes@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: =?UTF-8?B?RnLDqWTDqXJpYyBEYWxsZWF1?= <frederic.dalleau@linux.intel.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This script uses curl and html2text to fetch company IDs from
-bluetooth.org's "Assigned Numbers" section.
----
+Hi,
 
-v3:
+On Fri, May 17, 2013 at 5:55 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Fred,
+>
+>> In order to establish a transparent SCO connection, the correct settings=
+ must
+>> be specified in the Setup Synchronous Connection request. For that,
+>> voice_setting is added to ACL connection flags to set up the desired
+>> parameters. If this value is zero, a legacy SCO connection will be reque=
+sted.
+>> This patch uses T2 settings.
+>>
+>> Signed-off-by: Fr=C3=A9d=C3=A9ric Dalleau <frederic.dalleau@linux.intel.=
+com>
+>> ---
+>> include/net/bluetooth/hci_core.h |    1 +
+>> net/bluetooth/hci_conn.c         |   22 ++++++++++++++++++----
+>> 2 files changed, 19 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hc=
+i_core.h
+>> index a6fd544..b5996b3 100644
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -320,6 +320,7 @@ struct hci_conn {
+>>       __u32           passkey_notify;
+>>       __u8            passkey_entered;
+>>       __u16           disc_timeout;
+>> +     __u16           setting;
+>>       unsigned long   flags;
+>>
+>>       __u8            remote_cap;
+>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+>> index d1d9919..cd7452e 100644
+>> --- a/net/bluetooth/hci_conn.c
+>> +++ b/net/bluetooth/hci_conn.c
+>> @@ -185,13 +185,25 @@ void hci_setup_sync(struct hci_conn *conn, __u16 h=
+andle)
+>>       conn->attempt++;
+>>
+>>       cp.handle   =3D cpu_to_le16(handle);
+>> -     cp.pkt_type =3D cpu_to_le16(conn->pkt_type);
+>>
+>>       cp.tx_bandwidth   =3D __constant_cpu_to_le32(0x00001f40);
+>>       cp.rx_bandwidth   =3D __constant_cpu_to_le32(0x00001f40);
+>> -     cp.max_latency    =3D __constant_cpu_to_le16(0xffff);
+>> -     cp.voice_setting  =3D cpu_to_le16(hdev->voice_setting);
+>> -     cp.retrans_effort =3D 0xff;
+>
+> same here. What are we doing with Add_SCO fallback on older controllers.
+>
+> We could just reject setting transparent air mode for controllers that do=
+ not support eSCO command procedures. And the only valid option there would=
+ be CVSD then. Which is default.
 
-* Make the script work better with modified html2text versions.
-(it is unfortunate that in this case the upstream unmodified version works
-better than the distro one).
+I have seem some controllers (IIRC CSR 2.0) that don't have eSCO but
+have support for transparent air mode, in these cases we want to use
+the Setup SCO/Accept SCO procedures.
 
-I should report a bug to Fedora as time permits...
+>
+> In case we use Add_SCO is is important that the voice setting programmed =
+into the controller is actually 16-bit CVSD at that time. That needs to be =
+taken care of as well.
+>
+> Regards
+>
+> Marcel
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
- tools/update_compids.sh |   48 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
- create mode 100755 tools/update_compids.sh
-
-diff --git a/tools/update_compids.sh b/tools/update_compids.sh
-new file mode 100755
-index 0000000..38d7032
---- /dev/null
-+++ b/tools/update_compids.sh
-@@ -0,0 +1,48 @@
-+#!/bin/bash
-+# Download the list of company IDs from bluetooth.org and generate a diff which
-+# can be applied to source tree to update bt_compidtostr(). Usage:
-+#
-+# 1) ./tools/update_compids.sh | git apply -p0
-+# 2) Inspect changes to make sure they are sane
-+# 3) git commit -m "lib: Update list of company identifiers" lib/bluetooth.c
-+#
-+# Requires html2text: http://www.mbayer.de/html2text/
-+#
-+set -e -u
-+
-+tmpdir=$(mktemp -d)
-+trap "rm -rf $tmpdir" EXIT
-+
-+mkdir $tmpdir/lib
-+cp lib/bluetooth.c $tmpdir/lib/bluetooth.c.orig
-+cp lib/bluetooth.c $tmpdir/lib/bluetooth.c
-+
-+cd $tmpdir
-+
-+path=en-us/specification/assigned-numbers-overview/company-identifiers
-+# Use "iconv -c" to strip unwanted unicode characters
-+# Also strip <input> tags of type checkbox because html2text generates UTF-8
-+# for them in some distros even when using -ascii (e.g. Fedora 18)
-+curl https://www.bluetooth.org/$path | iconv -c -f utf8 -t ascii | \
-+    sed '/<input.*type="checkbox"/d' | \
-+    html2text -ascii -o identifiers.txt >/dev/null
-+
-+# Some versions of html2text do not replace &amp; (e.g. Fedora 18)
-+sed -i 's/&amp;/\&/g' identifiers.txt
-+
-+sed -n '/^const char \*bt_compidtostr(int compid)/,/^}/p' \
-+    lib/bluetooth.c > old.c
-+
-+echo -e 'const char *bt_compidtostr(int compid)\n{\n\tswitch (compid) {' > new.c
-+cat identifiers.txt |
-+    perl -ne 'm/^(\d+)\s+0x[0-9a-f]+\s+(.*)/i &&
-+        print "\tcase $1:\n\t\treturn \"$2\";\n"' >> new.c
-+if ! grep -q "return \"" new.c; then
-+    echo "ERROR: could not parse company IDs from bluetooth.org" >&2
-+    exit 1
-+fi
-+echo -e '\tcase 65535:\n\t\treturn "internal use";' >> new.c
-+echo -e '\tdefault:\n\t\treturn "not assigned";\n\t}\n}' >> new.c
-+
-+diff -Naur old.c new.c | patch -sp0 lib/bluetooth.c
-+diff -Naur lib/bluetooth.c.orig lib/bluetooth.c
--- 
-1.7.9.5
-
+Cheers,
+--
+Vinicius
