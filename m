@@ -1,89 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5195D683.2000001@asianux.com>
-Date: Fri, 17 May 2013 15:04:35 +0800
-From: Chen Gang <gang.chen@asianux.com>
 MIME-Version: 1.0
-To: Jiri Kosina <jkosina@suse.cz>
-CC: Gustavo Padovan <gustavo@padovan.org>,
- David Herrmann <dh.herrmann@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- David Miller <davem@davemloft.net>, andrei.emeltchenko@intel.com,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH v3] Bluetooth: hidp: using strlcpy instead of strncpy,
- also beautify code.
-References: <518906A8.7060708@asianux.com> <CANq1E4SmY+CD0uf53_b6GeFkQ-LYnpdxsDGSRMWdn2i1mnb6WQ@mail.gmail.com> <5189A417.503@asianux.com> <5189C7C6.8090408@asianux.com> <alpine.LNX.2.00.1305091041140.23038@pobox.suse.cz> <51904ACF.6010904@asianux.com>
-In-Reply-To: <51904ACF.6010904@asianux.com>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CAGd9gwhOurO91q1EwJwZbTVthaxr2AjcVeZ47xuAY_S1Ft_u3w@mail.gmail.com>
+References: <CAGd9gwgKMt21TnGLJ09+gAkP-=Jn9mfoAThiBuqup_vTyCshuw@mail.gmail.com>
+	<CAGd9gwgkWe+A5rbEnhgNxc5Va9TQt_-Pp04c5rP18nO2FF9f2A@mail.gmail.com>
+	<CABBYNZLz=nP5fouBQw0oUYe_L4SOX3jPoQtkATYGispvs8dh_w@mail.gmail.com>
+	<CAGd9gwhOurO91q1EwJwZbTVthaxr2AjcVeZ47xuAY_S1Ft_u3w@mail.gmail.com>
+Date: Fri, 17 May 2013 09:47:44 +0300
+Message-ID: <CABBYNZKmuPbRywcZniFcGPmZBGn78ucKretDn12=9KukREy4jQ@mail.gmail.com>
+Subject: Re: a2dp.c: finalize_config(setup) can destroy setup
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Alex Deymo <deymo@chromium.org>
+Cc: keybuk <keybuk@chromium.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Maintainers:
+Hi Alex,
 
-Please help check this patch when you have time, thanks.
+On Thu, May 16, 2013 at 11:34 PM, Alex Deymo <deymo@chromium.org> wrote:
+> Hi Luiz,
+>
+> On Thu, May 16, 2013 at 4:02 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> Looks like there are some new devices that should try to get a hold,
+>> anyway this problem should be fixed ASAP so what about the following
+>> patch:
+>>
+>> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+>> index 215f4db..c6973ae 100644
+>> --- a/profiles/audio/a2dp.c
+>> +++ b/profiles/audio/a2dp.c
+>> @@ -723,16 +723,12 @@ static void open_cfm(struct avdtp *session,
+>> struct avdtp_local_sep *sep,
+>>         if (err) {
+>>                 setup->stream = NULL;
+>>                 setup->err = err;
+>> +               if (setup->start)
+>> +                       finalize_resume(setup);
+>>         }
+>>
+>>         finalize_config(setup);
+>>
+>> -       if (!setup->start || !err)
+>> -               return;
+>> -
+>> -       setup->start = FALSE;
+>> -       finalize_resume(setup);
+>> -
+>>         return;
+>>  }
+>
+> This patch looks good to me. I tried it in the same scenario and
+> valgrind does not complain.
+> Could you please push it to the repo?
 
-It is "Reviewed-by: David Herrmann <dh.herrmann@gmail.com>"
-
-And also is "Acked-by: Jiri Kosina <jkosina@suse.cz>"
-
-If need me do any additional things, please tell me.
-
-
-Thanks.
-
-On 05/13/2013 10:07 AM, Chen Gang wrote:
-> 
-> For NUL terminated string, need always let it ended by zero.
-> 
-> Since have already called memcpy() to initialize 'ci', so need not
-> redundant initialization.
-> 
-> Better use ''if(session->hid) {} else if(session->input) {}"" instead
-> of ''if(session->hid) {}; if(session->input) {};''
-> 
-> Signed-off-by: Chen Gang <gang.chen@asianux.com>
-> ---
->  net/bluetooth/hidp/core.c |   14 ++++----------
->  1 files changed, 4 insertions(+), 10 deletions(-)
-> 
-> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-> index 940f5ac..f13a8da 100644
-> --- a/net/bluetooth/hidp/core.c
-> +++ b/net/bluetooth/hidp/core.c
-> @@ -76,25 +76,19 @@ static void hidp_copy_session(struct hidp_session *session, struct hidp_conninfo
->  	ci->flags = session->flags;
->  	ci->state = BT_CONNECTED;
->  
-> -	ci->vendor  = 0x0000;
-> -	ci->product = 0x0000;
-> -	ci->version = 0x0000;
-> -
->  	if (session->input) {
->  		ci->vendor  = session->input->id.vendor;
->  		ci->product = session->input->id.product;
->  		ci->version = session->input->id.version;
->  		if (session->input->name)
-> -			strncpy(ci->name, session->input->name, 128);
-> +			strlcpy(ci->name, session->input->name, 128);
->  		else
-> -			strncpy(ci->name, "HID Boot Device", 128);
-> -	}
-> -
-> -	if (session->hid) {
-> +			strlcpy(ci->name, "HID Boot Device", 128);
-> +	} else if (session->hid) {
->  		ci->vendor  = session->hid->vendor;
->  		ci->product = session->hid->product;
->  		ci->version = session->hid->version;
-> -		strncpy(ci->name, session->hid->name, 128);
-> +		strlcpy(ci->name, session->hid->name, 128);
->  	}
->  }
->  
-> 
+Pushed, thanks for testing it.
 
 
--- 
-Chen Gang
-
-Asianux Corporation
+--
+Luiz Augusto von Dentz
