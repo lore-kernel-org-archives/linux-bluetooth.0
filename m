@@ -1,53 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=iso-8859-1
 Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
-Subject: Re: [PATCH v7 5/8] Bluetooth: Use voice setting in incoming SCO connection
+Subject: Re: [PATCH v7 4/8] Bluetooth: Constants and macro declaration for SCO airmode
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1368725646-4593-6-git-send-email-frederic.dalleau@linux.intel.com>
-Date: Fri, 17 May 2013 10:51:58 +0200
+In-Reply-To: <1368725646-4593-5-git-send-email-frederic.dalleau@linux.intel.com>
+Date: Fri, 17 May 2013 10:49:58 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <E5F5E079-A231-424B-BA4D-83D2DCBE3267@holtmann.org>
-References: <1368725646-4593-1-git-send-email-frederic.dalleau@linux.intel.com> <1368725646-4593-6-git-send-email-frederic.dalleau@linux.intel.com>
+Message-Id: <3FC9A611-FA7B-4C55-9D8F-23D492975DD5@holtmann.org>
+References: <1368725646-4593-1-git-send-email-frederic.dalleau@linux.intel.com> <1368725646-4593-5-git-send-email-frederic.dalleau@linux.intel.com>
 To: =?iso-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
 	<frederic.dalleau@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fred,
 
-> When an incoming SCO connection is requested, check the selected voice setting,
-> and reply appropriately. Voice setting should have been negotiated previously.
-> For example, in case of HFP, the codec is negotiated using AT commands on the
-> RFCOMM channel. This patch only changes replies for socket with defered setup
-> enabled.
+On May 16, 2013, at 7:34 PM, Frédéric Dalleau <frederic.dalleau@linux.intel.com> wrote:
+
+> This patchs define constants and macro for extracting SCO airmode from SCO
+> voice setting. It refers to Bluetooth Core V4.0 specification, Part E, Chap
+> 6.12 which describe SCO voice setting format.
 > 
 > Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
 > ---
-> net/bluetooth/sco.c |   23 ++++++++++++++++++-----
-> 1 file changed, 18 insertions(+), 5 deletions(-)
+> include/net/bluetooth/hci_core.h |    5 +++++
+> 1 file changed, 5 insertions(+)
 > 
-> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> index 7b4c3df..7881208 100644
-> --- a/net/bluetooth/sco.c
-> +++ b/net/bluetooth/sco.c
-> @@ -653,7 +653,7 @@ static int sco_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
-> 	return err;
-> }
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index e9cf9fa..a6fd544 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1214,4 +1214,9 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
 > 
-> -static void sco_conn_defer_accept(struct hci_conn *conn)
-> +static void sco_conn_defer_accept(struct hci_conn *conn, int setting)
-> {
-> 	struct hci_dev *hdev = conn->hdev;
+> u8 bdaddr_to_le(u8 bdaddr_type);
 > 
-> @@ -676,9 +676,22 @@ static void sco_conn_defer_accept(struct hci_conn *conn)
-> 
-> 		cp.tx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
-> 		cp.rx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
-> -		cp.max_latency    = __constant_cpu_to_le16(0xffff);
-> -		cp.content_format = cpu_to_le16(hdev->voice_setting);
-> -		cp.retrans_effort = 0xff;
+> +#define SCO_AIRMODE_MASK       0x0003
+> +#define SCO_AIRMODE_CVSD       0x0000
+> +#define SCO_AIRMODE_TRANSP     0x0003
+> +#define hci_sco_airmode(setting) ((setting) & SCO_AIRMODE_MASK)
 
-so we are now ignoring the hdev->voice_setting. This is fine for eSCO, but what are we doing in case we have a 1.1 controller that only supports the Add_SCO command?
+the constants are fine, but I would not bother with the macro. Just use SCO_AIRMODE_MASK directly.
 
 Regards
 
