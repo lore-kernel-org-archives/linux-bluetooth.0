@@ -1,51 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <BEF9B7BE-655D-4953-A514-9C7392E81C1B@holtmann.org>
-References: <1368710695-22623-1-git-send-email-anderson.lizardo@openbossa.org>
-	<318C0863-4CB8-4DC6-B577-13F7D33ADBF6@holtmann.org>
-	<CAJdJm_M564tPtm5FBBxE3kDs8q8izxpOdV=S3KKw7xJe+rPk1w@mail.gmail.com>
-	<BEF9B7BE-655D-4953-A514-9C7392E81C1B@holtmann.org>
-Date: Fri, 17 May 2013 15:33:09 +0300
-Message-ID: <CABBYNZ+CVJfwMRq-dmPxmzRBBovUX-o3FjSrkjLfWNfKMFH4oQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] test: Remove commented out code from simple-agent
+In-Reply-To: <CAJdJm_NefGTEAgXrU7uZVeG0t11QnNG7UvsYh589dNrdYDrYqg@mail.gmail.com>
+References: <1368721510-14339-1-git-send-email-anderson.lizardo@openbossa.org>
+	<AF55EC03-6D36-4150-B314-0F5DB2F46485@holtmann.org>
+	<CAJdJm_NefGTEAgXrU7uZVeG0t11QnNG7UvsYh589dNrdYDrYqg@mail.gmail.com>
+Date: Fri, 17 May 2013 15:07:30 +0300
+Message-ID: <CABBYNZKtMZJ9oN_CFnZXGx221zqmFZBPyMHMjF1z8tdoHHmmtQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] plugins: Use open()/read() instead of
+ fopen()/fread() on autopair
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Anderson,
 
-On Fri, May 17, 2013 at 8:15 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Anderson,
+On Fri, May 17, 2013 at 2:05 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Marcel,
 >
->>>> --- a/test/simple-agent
->>>> +++ b/test/simple-agent
->>>> @@ -176,6 +176,3 @@ if __name__ == '__main__':
->>>>              manager.RequestDefaultAgent(path)
->>>>
->>>>      mainloop.run()
->>>> -
->>>> -     #adapter.UnregisterAgent(path)
->>>> -     #print("Agent unregistered")
->>>
->>> I would prefer if we remove the whole script. Does it provide anything that bluetoothctl is not providing?
+> On Fri, May 17, 2013 at 1:14 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> Also I wonder why this is all so complicated.
 >>
->> I have nothing against it (and we can always improve bluetoothctl if
->> something is missing there), but this is a legacy script that some
->> distros seem to package and users have been relying on it as a simple
->> console agent. Maybe we should (somehow) advertise bluetoothctl more.
+>>         if (fd < 0) {
+>>                 int n;
 >>
->> BTW, It seems that --timeout/-t option on simple-agent is totally ignored.
+>>                 n = read(fd, ...);
+>>                 if (n < sizeof(...))
+>>                         seed = time();
+>>
+>>                 close(fd);
+>>         } else
+>>                 seed = time();
 >
-> then lets just delete it. Distros should be shipping bluetoothctl anyway these days.
+> I intentionally avoided nested if()'s and the duplicated "seed =
+> time(...)" assignment because it seemed to actually make it more
+> complex IMHO. I will change to the version above, but I don't see why
+> it is more readable than my v2 (plus the changes you proposed above).
+> My main concern for this specific code is still to get the build fixed
+> :)
 
-Ultimately it is better to use bluetoothctl but it doesn't hurt to
-have an example in python, but we should probably improve the
-documentation about agent capabilities and IMO it should default to
-"KeyboardDisplay" when no capability is given (agent on), right now I
-think it does "" which maps to IO_CAPABILITY_DISPLAYYESNO.
+You can always create a helper function if the code gets too complicated.
+
 
 --
 Luiz Augusto von Dentz
