@@ -1,96 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <5910C04C-A52D-401A-A298-E7031A190B08@holtmann.org>
-References: <1368725646-4593-1-git-send-email-frederic.dalleau@linux.intel.com>
-	<1368725646-4593-7-git-send-email-frederic.dalleau@linux.intel.com>
-	<5910C04C-A52D-401A-A298-E7031A190B08@holtmann.org>
-Date: Fri, 17 May 2013 10:10:15 -0300
-Message-ID: <CAE6HaMkGF9-GuVY2za_7yTMK2zAZMRzygg7jx9CSF2SGiAsz=w@mail.gmail.com>
-Subject: Re: [PATCH v7 6/8] Bluetooth: Parameters for outgoing SCO connections
-From: Vinicius Gomes <vinicius.gomes@openbossa.org>
+In-Reply-To: <BEF9B7BE-655D-4953-A514-9C7392E81C1B@holtmann.org>
+References: <1368710695-22623-1-git-send-email-anderson.lizardo@openbossa.org>
+	<318C0863-4CB8-4DC6-B577-13F7D33ADBF6@holtmann.org>
+	<CAJdJm_M564tPtm5FBBxE3kDs8q8izxpOdV=S3KKw7xJe+rPk1w@mail.gmail.com>
+	<BEF9B7BE-655D-4953-A514-9C7392E81C1B@holtmann.org>
+Date: Fri, 17 May 2013 15:33:09 +0300
+Message-ID: <CABBYNZ+CVJfwMRq-dmPxmzRBBovUX-o3FjSrkjLfWNfKMFH4oQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] test: Remove commented out code from simple-agent
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: =?UTF-8?B?RnLDqWTDqXJpYyBEYWxsZWF1?= <frederic.dalleau@linux.intel.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel,
 
-On Fri, May 17, 2013 at 5:55 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Fred,
+On Fri, May 17, 2013 at 8:15 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Anderson,
 >
->> In order to establish a transparent SCO connection, the correct settings=
- must
->> be specified in the Setup Synchronous Connection request. For that,
->> voice_setting is added to ACL connection flags to set up the desired
->> parameters. If this value is zero, a legacy SCO connection will be reque=
-sted.
->> This patch uses T2 settings.
+>>>> --- a/test/simple-agent
+>>>> +++ b/test/simple-agent
+>>>> @@ -176,6 +176,3 @@ if __name__ == '__main__':
+>>>>              manager.RequestDefaultAgent(path)
+>>>>
+>>>>      mainloop.run()
+>>>> -
+>>>> -     #adapter.UnregisterAgent(path)
+>>>> -     #print("Agent unregistered")
+>>>
+>>> I would prefer if we remove the whole script. Does it provide anything that bluetoothctl is not providing?
 >>
->> Signed-off-by: Fr=C3=A9d=C3=A9ric Dalleau <frederic.dalleau@linux.intel.=
-com>
->> ---
->> include/net/bluetooth/hci_core.h |    1 +
->> net/bluetooth/hci_conn.c         |   22 ++++++++++++++++++----
->> 2 files changed, 19 insertions(+), 4 deletions(-)
+>> I have nothing against it (and we can always improve bluetoothctl if
+>> something is missing there), but this is a legacy script that some
+>> distros seem to package and users have been relying on it as a simple
+>> console agent. Maybe we should (somehow) advertise bluetoothctl more.
 >>
->> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hc=
-i_core.h
->> index a6fd544..b5996b3 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -320,6 +320,7 @@ struct hci_conn {
->>       __u32           passkey_notify;
->>       __u8            passkey_entered;
->>       __u16           disc_timeout;
->> +     __u16           setting;
->>       unsigned long   flags;
->>
->>       __u8            remote_cap;
->> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
->> index d1d9919..cd7452e 100644
->> --- a/net/bluetooth/hci_conn.c
->> +++ b/net/bluetooth/hci_conn.c
->> @@ -185,13 +185,25 @@ void hci_setup_sync(struct hci_conn *conn, __u16 h=
-andle)
->>       conn->attempt++;
->>
->>       cp.handle   =3D cpu_to_le16(handle);
->> -     cp.pkt_type =3D cpu_to_le16(conn->pkt_type);
->>
->>       cp.tx_bandwidth   =3D __constant_cpu_to_le32(0x00001f40);
->>       cp.rx_bandwidth   =3D __constant_cpu_to_le32(0x00001f40);
->> -     cp.max_latency    =3D __constant_cpu_to_le16(0xffff);
->> -     cp.voice_setting  =3D cpu_to_le16(hdev->voice_setting);
->> -     cp.retrans_effort =3D 0xff;
+>> BTW, It seems that --timeout/-t option on simple-agent is totally ignored.
 >
-> same here. What are we doing with Add_SCO fallback on older controllers.
->
-> We could just reject setting transparent air mode for controllers that do=
- not support eSCO command procedures. And the only valid option there would=
- be CVSD then. Which is default.
+> then lets just delete it. Distros should be shipping bluetoothctl anyway these days.
 
-I have seem some controllers (IIRC CSR 2.0) that don't have eSCO but
-have support for transparent air mode, in these cases we want to use
-the Setup SCO/Accept SCO procedures.
+Ultimately it is better to use bluetoothctl but it doesn't hurt to
+have an example in python, but we should probably improve the
+documentation about agent capabilities and IMO it should default to
+"KeyboardDisplay" when no capability is given (agent on), right now I
+think it does "" which maps to IO_CAPABILITY_DISPLAYYESNO.
 
->
-> In case we use Add_SCO is is important that the voice setting programmed =
-into the controller is actually 16-bit CVSD at that time. That needs to be =
-taken care of as well.
->
-> Regards
->
-> Marcel
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Cheers,
 --
-Vinicius
+Luiz Augusto von Dentz
