@@ -1,25 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=iso-8859-1
-Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
-Subject: Re: [PATCH v7 2/8] Bluetooth: Remove unused mask parameter in sco_conn_defer_accept
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1368725646-4593-3-git-send-email-frederic.dalleau@linux.intel.com>
-Date: Fri, 17 May 2013 10:40:25 +0200
+Date: Fri, 17 May 2013 10:30:37 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Emilio Pozuelo Monfort <pochu27@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <EF5D5793-EA97-4365-AF4E-680EF8DD46F4@holtmann.org>
-References: <1368725646-4593-1-git-send-email-frederic.dalleau@linux.intel.com> <1368725646-4593-3-git-send-email-frederic.dalleau@linux.intel.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
-	<frederic.dalleau@linux.intel.com>
+Subject: Re: [PATCH] ftp-client: fix syntax error
+Message-ID: <20130517073037.GB24865@x220>
+References: <1368725243-21324-1-git-send-email-emilio.pozuelo@collabora.co.uk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1368725243-21324-1-git-send-email-emilio.pozuelo@collabora.co.uk>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fred,
+Hi Emilio,
 
-> Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
+On Thu, May 16, 2013, Emilio Pozuelo Monfort wrote:
+> ---
+>  test/ftp-client | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-please add a commit message on why it is unused and okay to remove.
+Applied. Thanks.
 
-Regards
-
-Marcel
-
+Johan
