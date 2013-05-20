@@ -1,46 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 20 May 2013 18:52:24 -0300
+Date: Mon, 20 May 2013 18:44:32 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Chen Gang <gang.chen@asianux.com>
-Cc: Jiri Kosina <jkosina@suse.cz>, David Herrmann <dh.herrmann@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	David Miller <davem@davemloft.net>, andrei.emeltchenko@intel.com,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH v3] Bluetooth: hidp: using strlcpy instead of strncpy,
- also beautify code.
-Message-ID: <20130520215224.GE17712@joana>
-References: <518906A8.7060708@asianux.com>
- <CANq1E4SmY+CD0uf53_b6GeFkQ-LYnpdxsDGSRMWdn2i1mnb6WQ@mail.gmail.com>
- <5189A417.503@asianux.com>
- <5189C7C6.8090408@asianux.com>
- <alpine.LNX.2.00.1305091041140.23038@pobox.suse.cz>
- <51904ACF.6010904@asianux.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 2/2] Bluetooth: Remove unneeded flag
+Message-ID: <20130520214432.GD17712@joana>
+References: <20130507114116.GA11873@x220>
+ <1368521057-20931-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1368521057-20931-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20130520205941.GC17712@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <51904ACF.6010904@asianux.com>
+In-Reply-To: <20130520205941.GC17712@joana>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chen,
+Hi Andrei,
 
-* Chen Gang <gang.chen@asianux.com> [2013-05-13 10:07:11 +0800]:
+* Gustavo Padovan <gustavo@padovan.org> [2013-05-20 17:59:41 -0300]:
 
+> Hi Andrei,
 > 
-> For NUL terminated string, need always let it ended by zero.
+> * Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com> [2013-05-14 11:44:17 +0300]:
 > 
-> Since have already called memcpy() to initialize 'ci', so need not
-> redundant initialization.
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > 
+> > Remove HCI_LINK_KEYS flag since using HCI_MGMT is enough for test that
+> > user space expects the kernel managing link keys.
+> > 
+> > Signed-off-by: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > ---
+> >  include/net/bluetooth/hci.h | 1 -
+> >  net/bluetooth/mgmt.c        | 2 --
+> >  2 files changed, 3 deletions(-)
 > 
-> Better use ''if(session->hid) {} else if(session->input) {}"" instead
-> of ''if(session->hid) {}; if(session->input) {};''
-> 
-> Signed-off-by: Chen Gang <gang.chen@asianux.com>
-> ---
->  net/bluetooth/hidp/core.c |   14 ++++----------
->  1 files changed, 4 insertions(+), 10 deletions(-)
+> Since patch one went to bluetooth.git, I'll have to wait for a merge of both
+> trees to apply this one. Once the bluetooth.git gets merged in
+> bluetooth-next.git I'll apply this patch.
 
-Sorry for the big delay on this, patches has now been applied to
-bluetooth-next. Thanks all.
+I was told by Johan that this only happens in your experimental code, so both
+patches are now applied to bluetooth-next nad not anymore to bluetooth.git.
+Thanks.
 
 	Gustavo
