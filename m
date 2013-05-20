@@ -1,37 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 20 May 2013 20:08:32 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Shuah Khan <shuah.kh@samsung.com>
-Cc: "marcel@holtmann.org" <marcel@holtmann.org>,
-	"johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"shuahkhan@gmail.com" <shuahkhan@gmail.com>
-Subject: Re: [PATCH] Bluetooth: Add missing reset_resume dev_pm_ops
-Message-ID: <20130520230832.GF17712@joana>
-References: <1367250333.4938.20.camel@lorien>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1367250333.4938.20.camel@lorien>
+In-Reply-To: <CALR+S1hNpVdRp=rhNEFvfegLOeLNJ5jqRTt7mZfOtTDj+0Fi7A@mail.gmail.com>
+References: <CALR+S1j8VcdNqgdhXKQshCHXUSAzdab1vv-1UWafPEhn-C2shQ@mail.gmail.com>
+	<CALR+S1hNpVdRp=rhNEFvfegLOeLNJ5jqRTt7mZfOtTDj+0Fi7A@mail.gmail.com>
+Date: Mon, 20 May 2013 15:07:32 -0700
+Message-ID: <CABBYNZLtUSSvC=CkonBjaVs=rYnw5_NzyY8KRYZvzq6xVLBhrg@mail.gmail.com>
+Subject: Re: BlueZ - First timer
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "Suresh Kumar N." <suri.injun@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Shuah,
+Hi,
 
-* Shuah Khan <shuah.kh@samsung.com> [2013-04-29 15:45:34 +0000]:
+On Mon, May 20, 2013 at 10:19 AM, Suresh Kumar N. <suri.injun@gmail.com> wrote:
+> Hi All,
+>
+> I am completely new to BlueZ, can someone please refer me some
+> documentation or information to get started with BlueZ.
 
-> Add missing reset_resume dev_pm_ops. Missing reset_resume results in the
-> following message after power management device test. This change sets
-> reset_resume to btusb_resume().
-> 
-> [ 2506.936134] btusb 1-1.5:1.0: no reset_resume for driver btusb?
-> [ 2506.936137] btusb 1-1.5:1.1: no reset_resume for driver btusb?
-> 
-> Signed-off-by: Shuah Khan <shuah.kh@samsung.com>
-> ---
->  drivers/bluetooth/btusb.c |    1 +
->  1 file changed, 1 insertion(+)
+To get start please visit www.bluez.org, there is some documentation
+about the D-Bus API under doc but you can read the source code which
+is the best documentation one can get.
 
-This patch needs rebase on latest bluetooth-next. It doesn't apply anymore.
-Please re-send it.
 
-	Gustavo
+--
+Luiz Augusto von Dentz
