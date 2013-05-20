@@ -1,30 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 20 May 2013 18:52:24 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Chen Gang <gang.chen@asianux.com>
+Cc: Jiri Kosina <jkosina@suse.cz>, David Herrmann <dh.herrmann@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	David Miller <davem@davemloft.net>, andrei.emeltchenko@intel.com,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH v3] Bluetooth: hidp: using strlcpy instead of strncpy,
+ also beautify code.
+Message-ID: <20130520215224.GE17712@joana>
+References: <518906A8.7060708@asianux.com>
+ <CANq1E4SmY+CD0uf53_b6GeFkQ-LYnpdxsDGSRMWdn2i1mnb6WQ@mail.gmail.com>
+ <5189A417.503@asianux.com>
+ <5189C7C6.8090408@asianux.com>
+ <alpine.LNX.2.00.1305091041140.23038@pobox.suse.cz>
+ <51904ACF.6010904@asianux.com>
 MIME-Version: 1.0
-In-Reply-To: <CALR+S1hNpVdRp=rhNEFvfegLOeLNJ5jqRTt7mZfOtTDj+0Fi7A@mail.gmail.com>
-References: <CALR+S1j8VcdNqgdhXKQshCHXUSAzdab1vv-1UWafPEhn-C2shQ@mail.gmail.com>
-	<CALR+S1hNpVdRp=rhNEFvfegLOeLNJ5jqRTt7mZfOtTDj+0Fi7A@mail.gmail.com>
-Date: Mon, 20 May 2013 15:07:32 -0700
-Message-ID: <CABBYNZLtUSSvC=CkonBjaVs=rYnw5_NzyY8KRYZvzq6xVLBhrg@mail.gmail.com>
-Subject: Re: BlueZ - First timer
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "Suresh Kumar N." <suri.injun@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <51904ACF.6010904@asianux.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Chen,
 
-On Mon, May 20, 2013 at 10:19 AM, Suresh Kumar N. <suri.injun@gmail.com> wrote:
-> Hi All,
->
-> I am completely new to BlueZ, can someone please refer me some
-> documentation or information to get started with BlueZ.
+* Chen Gang <gang.chen@asianux.com> [2013-05-13 10:07:11 +0800]:
 
-To get start please visit www.bluez.org, there is some documentation
-about the D-Bus API under doc but you can read the source code which
-is the best documentation one can get.
+> 
+> For NUL terminated string, need always let it ended by zero.
+> 
+> Since have already called memcpy() to initialize 'ci', so need not
+> redundant initialization.
+> 
+> Better use ''if(session->hid) {} else if(session->input) {}"" instead
+> of ''if(session->hid) {}; if(session->input) {};''
+> 
+> Signed-off-by: Chen Gang <gang.chen@asianux.com>
+> ---
+>  net/bluetooth/hidp/core.c |   14 ++++----------
+>  1 files changed, 4 insertions(+), 10 deletions(-)
 
+Sorry for the big delay on this, patches has now been applied to
+bluetooth-next. Thanks all.
 
---
-Luiz Augusto von Dentz
+	Gustavo
