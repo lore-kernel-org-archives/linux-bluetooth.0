@@ -1,33 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 20 May 2013 17:49:44 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Bing Zhao <bzhao@marvell.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Frank Huang <frankh@marvell.com>
-Subject: Re: [PATCH] Bluetooth: btmrvl: support Marvell Bluetooth device
- SD8897
-Message-ID: <20130520204944.GA17712@joana>
-References: <1368494132-23701-1-git-send-email-bzhao@marvell.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1368494132-23701-1-git-send-email-bzhao@marvell.com>
+In-Reply-To: <CAEhrai1s7Y0JHvd09k8y_xANE8EeLct-f_Z1FXWifRHF00kEew@mail.gmail.com>
+References: <CAEhrai1s7Y0JHvd09k8y_xANE8EeLct-f_Z1FXWifRHF00kEew@mail.gmail.com>
+Date: Mon, 20 May 2013 13:18:38 -0700
+Message-ID: <CABBYNZK2q_RHFSrhSn9npH_We877CGiztrVBx2HVMOrxC6Yfjg@mail.gmail.com>
+Subject: Re: Does sdp_seq_alloc_with_length() invoke undefined behavior?
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Michael Bradshaw <mjbshaw@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bing,
+Hi Michael,
 
-* Bing Zhao <bzhao@marvell.com> [2013-05-13 18:15:32 -0700]:
+On Mon, May 20, 2013 at 10:36 AM, Michael Bradshaw <mjbshaw@gmail.com> wrote:
+> After reading some sample HID client code[1] that brought up the
+> suspicious code in sdp_seq_alloc_with_length(), I'm wondering if it
+> possibly invokes undefined behavior.
+>
+> I'll annotate the function:
+> sdp_data_t *sdp_seq_alloc_with_length(void **dtds, void **values, int *length,
+>                                       int len)
+> {
+>     sdp_data_t *curr = NULL, *seq = NULL;
+>     int i;
+>
+>     for (i = 0; i < len; i++) {
+>         // ... removed to be concise ...
+>     }
+>
+>     return sdp_data_alloc_with_length(SDP_SEQ8, seq, length[i]);
+> }
+>
+> That last line looks like it is accessing one-past-the-end of the
+> length array when it says length[i]. Should the code execute that
+> line, i == len, and if len represents the number of elements in the
+> length array (which I think it does, but correct me if it does not),
+> then it does indeed invoke undefined behavior.
 
-> The register offsets have been changed in SD8897 and newer chips.
-> Define a new btmrvl_sdio_card_reg map for SD88xx.
-> 
-> Signed-off-by: Bing Zhao <bzhao@marvell.com>
-> Signed-off-by: Frank Huang <frankh@marvell.com>
-> ---
->  drivers/bluetooth/Kconfig       |  4 ++--
->  drivers/bluetooth/btmrvl_sdio.c | 28 ++++++++++++++++++++++++++++
->  2 files changed, 30 insertions(+), 2 deletions(-)
+This might actually be bug, the function is not that much that is
+probably why we haven't notice this problem before. Anyway it is
+leaking whenever it fails because we don't free the data allocated
+previously.
 
-Patch has been applied to bluetooth.git. Thanks.
+> I'm hoping I could get some input from bluez developers who can say
+> with confidence whether or not this is a bug (so I know whether or not
+> I should open a bug report).
 
-	Gustavo
+If you have the backtrace it is usually easier for us to tell but just
+by looking at the code it seems very problematic.
+
+--
+Luiz Augusto von Dentz
