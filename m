@@ -1,59 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 21 May 2013 00:28:06 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Shuah Khan <shuah.kh@samsung.com>
-Cc: "marcel@holtmann.org" <marcel@holtmann.org>,
-	"johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"shuahkhan@gmail.com" <shuahkhan@gmail.com>
-Subject: Re: [PATCH rebased] Bluetooth: Add missing reset_resume dev_pm_ops
-Message-ID: <20130521032806.GA12086@joana>
-References: <1367250333.4938.20.camel@lorien>
- <20130520230832.GF17712@joana>
- <1369092891.8079.5.camel@lorien>
- <1369098178.11557.3.camel@lorien>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1369098178.11557.3.camel@lorien>
+From: Alex Deymo <deymo@chromium.org>
+Date: Mon, 20 May 2013 19:07:23 -0700
+Message-ID: <CAGd9gwhNgRhgqzhxxZNyD-o=j4ksTXvFFhTQMawt4bv0b2VPcQ@mail.gmail.com>
+Subject: [BUG] Set Powered=true doesn't power up the adapter
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	keybuk <keybuk@chromium.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Shuan,
+Hello,
 
-* Shuah Khan <shuah.kh@samsung.com> [2013-05-21 01:02:58 +0000]:
+I'm seeing a problem while trying to power on the adapter once in a
+while just after reboot. What happens is that sending a dbus call to
+power on the adapter doesn't return. You can read a more detailed
+description of the bug here [1] but the resume is as follows:
 
-> Add missing reset_resume dev_pm_ops. Missing reset_resume results in the
-> following message after power management device test. This change sets
-> reset_resume to btusb_resume().
-> 
-> [ 2506.936134] btusb 1-1.5:1.0: no reset_resume for driver btusb?
-> [ 2506.936137] btusb 1-1.5:1.1: no reset_resume for driver btusb?
-> 
-> Signed-off-by: Shuah Khan <shuah.kh@samsung.com>
-> ---
->  drivers/bluetooth/btusb.c |    1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 7a7e5f8..1eb90c0 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -1616,6 +1616,7 @@ static struct usb_driver btusb_driver = {
->  #ifdef CONFIG_PM
->  	.suspend	= btusb_suspend,
->  	.resume		= btusb_resume,
-> +	.reset_resume	= btusb_resume,
->  #endif
->  	.id_table	= btusb_table,
->  	.supports_autosuspend = 1,
+Sending org.freedesktop.DBus.Properties.Set for power up the adapter
+doesn't return (dbus timeouts after a while) just after reboot. Is a
+very rare bug, but happens from time to time. Restarting bluetoothd
+with -n -d to get the logs made it start returning with the error
+org.bluez.Error.Failed to the same call. I don't see any HCI command
+with btmon while doing this, so I think it's not a firmware issue at
+that point (could be some other thing before). From this state, I can
+call Set several times to power up the adapter, but doesn't work.
+What is interesting is that if instead of sending MGMT_OP_SET_POWERED
+from bluetoothd, we try to power up the adapter with hciconfig
+(calling ioctl(ctl, HCIDEVUP, hdev) ) the adapter goes up and
+everything works fine from there. We are running kernel 3.8, I don't
+know if this was already reported in a newer version.
 
-Patch still doesn't apply, are you sending it with git-send-email?
+Hope it helps, I'll try to have more debugging information... but it
+would be useful it someone can tell me where to look at, since this is
+not very easy to reproduce.
+Best regards,
+Alex.
 
-Applying: Bluetooth: Add missing reset_resume dev_pm_ops
-/home/padovan/p/linux-trees/bluetooth-next/.git/rebase-apply/patch:13: trailing whitespace.
-        .reset_resume   = btusb_resume,
-error: patch failed: drivers/bluetooth/btusb.c:1616
-error: drivers/bluetooth/btusb.c: patch does not apply
-Patch failed at 0001 Bluetooth: Add missing reset_resume dev_pm_ops
-
-	Gustavo
+[1] https://code.google.com/p/chromium/issues/detail?id=239896#c11
