@@ -1,35 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 21 May 2013 00:28:06 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Shuah Khan <shuah.kh@samsung.com>
+Cc: "marcel@holtmann.org" <marcel@holtmann.org>,
+	"johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"shuahkhan@gmail.com" <shuahkhan@gmail.com>
+Subject: Re: [PATCH rebased] Bluetooth: Add missing reset_resume dev_pm_ops
+Message-ID: <20130521032806.GA12086@joana>
+References: <1367250333.4938.20.camel@lorien>
+ <20130520230832.GF17712@joana>
+ <1369092891.8079.5.camel@lorien>
+ <1369098178.11557.3.camel@lorien>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLtUSSvC=CkonBjaVs=rYnw5_NzyY8KRYZvzq6xVLBhrg@mail.gmail.com>
-References: <CALR+S1j8VcdNqgdhXKQshCHXUSAzdab1vv-1UWafPEhn-C2shQ@mail.gmail.com>
-	<CALR+S1hNpVdRp=rhNEFvfegLOeLNJ5jqRTt7mZfOtTDj+0Fi7A@mail.gmail.com>
-	<CABBYNZLtUSSvC=CkonBjaVs=rYnw5_NzyY8KRYZvzq6xVLBhrg@mail.gmail.com>
-Date: Tue, 21 May 2013 11:26:42 +0530
-Message-ID: <CALR+S1hPtT4M-Uso05oaVN_VPuEtAiMQv9Pg39mFgCLgsza4CQ@mail.gmail.com>
-Subject: Re: BlueZ - First timer
-From: "Suresh Kumar N." <suri.injun@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1369098178.11557.3.camel@lorien>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thank you Luiz
+Hi Shuan,
 
-On Tue, May 21, 2013 at 3:37 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi,
->
-> On Mon, May 20, 2013 at 10:19 AM, Suresh Kumar N. <suri.injun@gmail.com> wrote:
->> Hi All,
->>
->> I am completely new to BlueZ, can someone please refer me some
->> documentation or information to get started with BlueZ.
->
-> To get start please visit www.bluez.org, there is some documentation
-> about the D-Bus API under doc but you can read the source code which
-> is the best documentation one can get.
->
->
-> --
-> Luiz Augusto von Dentz
+* Shuah Khan <shuah.kh@samsung.com> [2013-05-21 01:02:58 +0000]:
+
+> Add missing reset_resume dev_pm_ops. Missing reset_resume results in the
+> following message after power management device test. This change sets
+> reset_resume to btusb_resume().
+> 
+> [ 2506.936134] btusb 1-1.5:1.0: no reset_resume for driver btusb?
+> [ 2506.936137] btusb 1-1.5:1.1: no reset_resume for driver btusb?
+> 
+> Signed-off-by: Shuah Khan <shuah.kh@samsung.com>
+> ---
+>  drivers/bluetooth/btusb.c |    1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 7a7e5f8..1eb90c0 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -1616,6 +1616,7 @@ static struct usb_driver btusb_driver = {
+>  #ifdef CONFIG_PM
+>  	.suspend	= btusb_suspend,
+>  	.resume		= btusb_resume,
+> +	.reset_resume	= btusb_resume,
+>  #endif
+>  	.id_table	= btusb_table,
+>  	.supports_autosuspend = 1,
+
+Patch still doesn't apply, are you sending it with git-send-email?
+
+Applying: Bluetooth: Add missing reset_resume dev_pm_ops
+/home/padovan/p/linux-trees/bluetooth-next/.git/rebase-apply/patch:13: trailing whitespace.
+        .reset_resume   = btusb_resume,
+error: patch failed: drivers/bluetooth/btusb.c:1616
+error: drivers/bluetooth/btusb.c: patch does not apply
+Patch failed at 0001 Bluetooth: Add missing reset_resume dev_pm_ops
+
+	Gustavo
