@@ -1,34 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 21 May 2013 12:36:09 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Shuah Khan <shuah.kh@samsung.com>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	shuahkhan@gmail.com
-Subject: Re: [PATCH rebased] Bluetooth: Add missing reset_resume dev_pm_ops
-Message-ID: <20130521153609.GC1829@joana>
-References: <1369150326-4476-1-git-send-email-shuah.kh@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1369150326-4476-1-git-send-email-shuah.kh@samsung.com>
+From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/1] profile: Fix incoming connections without SDP record
+Date: Tue, 21 May 2013 17:26:24 +0200
+Message-Id: <1369149984-1953-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Shuah,
+From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-* Shuah Khan <shuah.kh@samsung.com> [2013-05-21 09:32:06 -0600]:
+After commit 7bd3626b6715ac6a117d56b95b455960f7cf34de, incoming connections
+require the service being available from SDP. This is not always guaranteed
+because some services might not be listed in SDP (like MNS).
+---
+ src/profile.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> Add missing reset_resume dev_pm_ops. Missing reset_resume results in the
-> following message after power management device test. This change sets
-> reset_resume to btusb_resume().
-> 
-> [ 2506.936134] btusb 1-1.5:1.0: no reset_resume for driver btusb?
-> [ 2506.936137] btusb 1-1.5:1.1: no reset_resume for driver btusb?
-> 
-> Signed-off-by: Shuah Khan <shuah.kh@samsung.com>
-> ---
->  drivers/bluetooth/btusb.c |    1 +
->  1 file changed, 1 insertion(+)
+diff --git a/src/profile.c b/src/profile.c
+index 8fd0424..9f98d65 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -1056,6 +1056,7 @@ static struct ext_io *create_conn(struct ext_io *server, GIOChannel *io,
+ 		return NULL;
+ 	}
+ 
++	btd_device_add_uuid(device, server->ext->remote_uuid);
+ 	service = btd_device_get_service(device, server->ext->remote_uuid);
+ 	if (service == NULL) {
+ 		ba2str(dst, addr);
+-- 
+1.8.2.3
 
-Patch has been applied to bluetooth-next. Thanks.
-
-	Gustavo
