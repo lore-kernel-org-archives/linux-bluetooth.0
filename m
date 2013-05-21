@@ -1,49 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 21 May 2013 12:36:09 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Shuah Khan <shuah.kh@samsung.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	shuahkhan@gmail.com
+Subject: Re: [PATCH rebased] Bluetooth: Add missing reset_resume dev_pm_ops
+Message-ID: <20130521153609.GC1829@joana>
+References: <1369150326-4476-1-git-send-email-shuah.kh@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <1369149984-1953-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1369149984-1953-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Date: Tue, 21 May 2013 18:46:26 +0200
-Message-ID: <CANT-zCUPxKA3qx9nZ5wtVwvV8=OS9jHByHQqhkYSY1YF4t6wkA@mail.gmail.com>
-Subject: Re: [PATCH 1/1] profile: Fix incoming connections without SDP record
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1369150326-4476-1-git-send-email-shuah.kh@samsung.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+Hi Shuah,
 
-On Tue, May 21, 2013 at 5:26 PM, Christian Fetzer
-<christian.fetzer@oss.bmw-carit.de> wrote:
-> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
->
-> After commit 7bd3626b6715ac6a117d56b95b455960f7cf34de, incoming connections
-> require the service being available from SDP. This is not always guaranteed
-> because some services might not be listed in SDP (like MNS).
+* Shuah Khan <shuah.kh@samsung.com> [2013-05-21 09:32:06 -0600]:
+
+> Add missing reset_resume dev_pm_ops. Missing reset_resume results in the
+> following message after power management device test. This change sets
+> reset_resume to btusb_resume().
+> 
+> [ 2506.936134] btusb 1-1.5:1.0: no reset_resume for driver btusb?
+> [ 2506.936137] btusb 1-1.5:1.1: no reset_resume for driver btusb?
+> 
+> Signed-off-by: Shuah Khan <shuah.kh@samsung.com>
 > ---
->  src/profile.c | 1 +
+>  drivers/bluetooth/btusb.c |    1 +
 >  1 file changed, 1 insertion(+)
->
-> diff --git a/src/profile.c b/src/profile.c
-> index 8fd0424..9f98d65 100644
-> --- a/src/profile.c
-> +++ b/src/profile.c
-> @@ -1056,6 +1056,7 @@ static struct ext_io *create_conn(struct ext_io *server, GIOChannel *io,
->                 return NULL;
->         }
->
-> +       btd_device_add_uuid(device, server->ext->remote_uuid);
->         service = btd_device_get_service(device, server->ext->remote_uuid);
->         if (service == NULL) {
->                 ba2str(dst, addr);
-> --
 
-Ack from my side.
+Patch has been applied to bluetooth-next. Thanks.
 
-A comment might be helpful to clarify that the condition below (i.e.
-service == NULL) is now unlikely and only possible due to issues
-during profile probe.
-
-Cheers,
-Mikel
+	Gustavo
