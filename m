@@ -1,55 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 From: Shuah Khan <shuah.kh@samsung.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-CC: "marcel@holtmann.org" <marcel@holtmann.org>,
-	"johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"shuahkhan@gmail.com" <shuahkhan@gmail.com>
-Subject: Re: [PATCH rebased] Bluetooth: Add missing reset_resume dev_pm_ops
-Date: Tue, 21 May 2013 15:32:51 +0000
-Message-ID: <1369150371.18338.4.camel@lorien>
-References: <1367250333.4938.20.camel@lorien> <20130520230832.GF17712@joana>
-	 <1369092891.8079.5.camel@lorien> <1369098178.11557.3.camel@lorien>
-	 <20130521032806.GA12086@joana>
-In-Reply-To: <20130521032806.GA12086@joana>
-Reply-To: Shuah Khan <shuah.kh@samsung.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com
+Cc: Shuah Khan <shuah.kh@samsung.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	shuahkhan@gmail.com
+Subject: [PATCH rebased] Bluetooth: Add missing reset_resume dev_pm_ops
+Date: Tue, 21 May 2013 09:32:06 -0600
+Message-Id: <1369150326-4476-1-git-send-email-shuah.kh@samsung.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-T24gVHVlLCAyMDEzLTA1LTIxIGF0IDAwOjI4IC0wMzAwLCBHdXN0YXZvIFBhZG92YW4gd3JvdGU6
-DQo+IEhpIFNodWFuLA0KPiANCj4gKiBTaHVhaCBLaGFuIDxzaHVhaC5raEBzYW1zdW5nLmNvbT4g
-WzIwMTMtMDUtMjEgMDE6MDI6NTggKzAwMDBdOg0KPiANCj4gPiBBZGQgbWlzc2luZyByZXNldF9y
-ZXN1bWUgZGV2X3BtX29wcy4gTWlzc2luZyByZXNldF9yZXN1bWUgcmVzdWx0cyBpbiB0aGUNCj4g
-PiBmb2xsb3dpbmcgbWVzc2FnZSBhZnRlciBwb3dlciBtYW5hZ2VtZW50IGRldmljZSB0ZXN0LiBU
-aGlzIGNoYW5nZSBzZXRzDQo+ID4gcmVzZXRfcmVzdW1lIHRvIGJ0dXNiX3Jlc3VtZSgpLg0KPiA+
-IA0KPiA+IFsgMjUwNi45MzYxMzRdIGJ0dXNiIDEtMS41OjEuMDogbm8gcmVzZXRfcmVzdW1lIGZv
-ciBkcml2ZXIgYnR1c2I/DQo+ID4gWyAyNTA2LjkzNjEzN10gYnR1c2IgMS0xLjU6MS4xOiBubyBy
-ZXNldF9yZXN1bWUgZm9yIGRyaXZlciBidHVzYj8NCj4gPiANCj4gPiBTaWduZWQtb2ZmLWJ5OiBT
-aHVhaCBLaGFuIDxzaHVhaC5raEBzYW1zdW5nLmNvbT4NCj4gPiAtLS0NCj4gPiAgZHJpdmVycy9i
-bHVldG9vdGgvYnR1c2IuYyB8ICAgIDEgKw0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRp
-b24oKykNCj4gPiANCj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYyBi
-L2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMNCj4gPiBpbmRleCA3YTdlNWY4Li4xZWI5MGMwIDEw
-MDY0NA0KPiA+IC0tLSBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMNCj4gPiArKysgYi9kcml2
-ZXJzL2JsdWV0b290aC9idHVzYi5jDQo+ID4gQEAgLTE2MTYsNiArMTYxNiw3IEBAIHN0YXRpYyBz
-dHJ1Y3QgdXNiX2RyaXZlciBidHVzYl9kcml2ZXIgPSB7DQo+ID4gICNpZmRlZiBDT05GSUdfUE0N
-Cj4gPiAgCS5zdXNwZW5kCT0gYnR1c2Jfc3VzcGVuZCwNCj4gPiAgCS5yZXN1bWUJCT0gYnR1c2Jf
-cmVzdW1lLA0KPiA+ICsJLnJlc2V0X3Jlc3VtZQk9IGJ0dXNiX3Jlc3VtZSwNCj4gPiAgI2VuZGlm
-DQo+ID4gIAkuaWRfdGFibGUJPSBidHVzYl90YWJsZSwNCj4gPiAgCS5zdXBwb3J0c19hdXRvc3Vz
-cGVuZCA9IDEsDQo+IA0KPiBQYXRjaCBzdGlsbCBkb2Vzbid0IGFwcGx5LCBhcmUgeW91IHNlbmRp
-bmcgaXQgd2l0aCBnaXQtc2VuZC1lbWFpbD8NCj4gDQo+IEFwcGx5aW5nOiBCbHVldG9vdGg6IEFk
-ZCBtaXNzaW5nIHJlc2V0X3Jlc3VtZSBkZXZfcG1fb3BzDQo+IC9ob21lL3BhZG92YW4vcC9saW51
-eC10cmVlcy9ibHVldG9vdGgtbmV4dC8uZ2l0L3JlYmFzZS1hcHBseS9wYXRjaDoxMzogdHJhaWxp
-bmcgd2hpdGVzcGFjZS4NCj4gICAgICAgICAucmVzZXRfcmVzdW1lICAgPSBidHVzYl9yZXN1bWUs
-DQo+IGVycm9yOiBwYXRjaCBmYWlsZWQ6IGRyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmM6MTYxNg0K
-PiBlcnJvcjogZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYzogcGF0Y2ggZG9lcyBub3QgYXBwbHkN
-Cj4gUGF0Y2ggZmFpbGVkIGF0IDAwMDEgQmx1ZXRvb3RoOiBBZGQgbWlzc2luZyByZXNldF9yZXN1
-bWUgZGV2X3BtX29wcw0KPiANCj4gCUd1c3Rhdm8NCg0KSSBzYXZlZCB0aGUgcGF0Y2ggZnJvbSB0
-aGUgZW1haWwgSSBzZW50IGFuZCBhcHBsaWVkIHRvIHlvdXIgbGF0ZXN0IGdpdA0KYW5kIGl0IGFw
-cGxpZXMuIEkgYW0gbm90IHN1cmUgd2hhdCBoYXBwZW5lZC4gSW4gYW55IGNhc2UsIEkganVzdCBy
-ZXNlbnQNCml0IHVzaW5nIGdpdC1zZW5kLWVtYWlsLiBIb3BlIHRoYXQgd29ya3MuDQoNCi0tIFNo
-dWFoDQoNClNodWFoIEtoYW4sIExpbnV4IEtlcm5lbCBEZXZlbG9wZXIgLSBPcGVuIFNvdXJjZSBH
-cm91cCANClNhbXN1bmcgUmVzZWFyY2ggQW1lcmljYSAoU2lsaWNvbiBWYWxsZXkpDQpzaHVhaC5r
-aEBzYW1zdW5nLmNvbSB8ICg5NzApIDY3Mi0wNjU4DQoNCg==
+Add missing reset_resume dev_pm_ops. Missing reset_resume results in the
+following message after power management device test. This change sets
+reset_resume to btusb_resume().
+
+[ 2506.936134] btusb 1-1.5:1.0: no reset_resume for driver btusb?
+[ 2506.936137] btusb 1-1.5:1.1: no reset_resume for driver btusb?
+
+Signed-off-by: Shuah Khan <shuah.kh@samsung.com>
+---
+ drivers/bluetooth/btusb.c |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 7a7e5f8..1eb90c0 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -1616,6 +1616,7 @@ static struct usb_driver btusb_driver = {
+ #ifdef CONFIG_PM
+ 	.suspend	= btusb_suspend,
+ 	.resume		= btusb_resume,
++	.reset_resume	= btusb_resume,
+ #endif
+ 	.id_table	= btusb_table,
+ 	.supports_autosuspend = 1,
+-- 
+1.7.10.4
