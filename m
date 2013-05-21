@@ -1,40 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <519AD072.1090102@asianux.com>
+Date: Tue, 21 May 2013 09:40:02 +0800
+From: Chen Gang <gang.chen@asianux.com>
 MIME-Version: 1.0
-From: Alex Deymo <deymo@chromium.org>
-Date: Mon, 20 May 2013 19:07:23 -0700
-Message-ID: <CAGd9gwhNgRhgqzhxxZNyD-o=j4ksTXvFFhTQMawt4bv0b2VPcQ@mail.gmail.com>
-Subject: [BUG] Set Powered=true doesn't power up the adapter
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	keybuk <keybuk@chromium.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Gustavo Padovan <gustavo@padovan.org>, Jiri Kosina <jkosina@suse.cz>,
+ David Herrmann <dh.herrmann@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ David Miller <davem@davemloft.net>, andrei.emeltchenko@intel.com,
+ "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+ netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH v3] Bluetooth: hidp: using strlcpy instead of strncpy,
+ also beautify code.
+References: <518906A8.7060708@asianux.com> <CANq1E4SmY+CD0uf53_b6GeFkQ-LYnpdxsDGSRMWdn2i1mnb6WQ@mail.gmail.com> <5189A417.503@asianux.com> <5189C7C6.8090408@asianux.com> <alpine.LNX.2.00.1305091041140.23038@pobox.suse.cz> <51904ACF.6010904@asianux.com> <20130520215224.GE17712@joana>
+In-Reply-To: <20130520215224.GE17712@joana>
+Content-Type: text/plain; charset=GB2312
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+On 05/21/2013 05:52 AM, Gustavo Padovan wrote:
+> Hi Chen,
+> 
+> * Chen Gang <gang.chen@asianux.com> [2013-05-13 10:07:11 +0800]:
+> 
+>> > 
+>> > For NUL terminated string, need always let it ended by zero.
+>> > 
+>> > Since have already called memcpy() to initialize 'ci', so need not
+>> > redundant initialization.
+>> > 
+>> > Better use ''if(session->hid) {} else if(session->input) {}"" instead
+>> > of ''if(session->hid) {}; if(session->input) {};''
+>> > 
+>> > Signed-off-by: Chen Gang <gang.chen@asianux.com>
+>> > ---
+>> >  net/bluetooth/hidp/core.c |   14 ++++----------
+>> >  1 files changed, 4 insertions(+), 10 deletions(-)
+> Sorry for the big delay on this, patches has now been applied to
+> bluetooth-next. Thanks all.
 
-I'm seeing a problem while trying to power on the adapter once in a
-while just after reboot. What happens is that sending a dbus call to
-power on the adapter doesn't return. You can read a more detailed
-description of the bug here [1] but the resume is as follows:
+It doesn't matter, every member have their own work, especially, most of
+us are busy.
 
-Sending org.freedesktop.DBus.Properties.Set for power up the adapter
-doesn't return (dbus timeouts after a while) just after reboot. Is a
-very rare bug, but happens from time to time. Restarting bluetoothd
-with -n -d to get the logs made it start returning with the error
-org.bluez.Error.Failed to the same call. I don't see any HCI command
-with btmon while doing this, so I think it's not a firmware issue at
-that point (could be some other thing before). From this state, I can
-call Set several times to power up the adapter, but doesn't work.
-What is interesting is that if instead of sending MGMT_OP_SET_POWERED
-from bluetoothd, we try to power up the adapter with hciconfig
-(calling ioctl(ctl, HCIDEVUP, hdev) ) the adapter goes up and
-everything works fine from there. We are running kernel 3.8, I don't
-know if this was already reported in a newer version.
+Thank you for your work, too.
 
-Hope it helps, I'll try to have more debugging information... but it
-would be useful it someone can tell me where to look at, since this is
-not very easy to reproduce.
-Best regards,
-Alex.
 
-[1] https://code.google.com/p/chromium/issues/detail?id=239896#c11
+Thanks.
+-- 
+Chen Gang
+
+Asianux Corporation
