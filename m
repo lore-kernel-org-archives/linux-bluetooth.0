@@ -1,27 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1369259656-19683-1-git-send-email-hdante@profusion.mobi>
-References: <1369259656-19683-1-git-send-email-hdante@profusion.mobi>
-Date: Wed, 22 May 2013 18:35:29 -0400
-Message-ID: <CAJdJm_NqYT_3nVHCzenwd2UOvsxnMZGY1FKzxKWbYTZt-jxn6g@mail.gmail.com>
-Subject: Re: [PATCH RFC] gdbus: Remove proxies when client disconnects
+In-Reply-To: <1369255996-28230-1-git-send-email-luiz.dentz@gmail.com>
+References: <1369255996-28230-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 22 May 2013 18:31:31 -0400
+Message-ID: <CAJdJm_Mnk8+b6x4=vqdGT-G61u=vOFa_S4C=htn_LQ5iiLvGaw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] lib: Fix sdp_seq_alloc_with_length accessing
+ invalid index/memory
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Henrique Dante de Almeida <hdante@profusion.mobi>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Henrique,
+Hi Luiz,
 
-On Wed, May 22, 2013 at 5:54 PM, Henrique Dante de Almeida
-<hdante@profusion.mobi> wrote:
-> Remove proxies and generate proxy_removed callbacks even when there are
-> no corresponding InterfaceRemoved signals.
-> ---
+On Wed, May 22, 2013 at 4:53 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> The sequence itself is not an index of dtds, values, lenghts, thats why
+> SDP_SEQ8 is used directly as dtd, so accessing lenght[i] is always off
+> by one.
+>
+> Furthermore the lenght is not really used by sdp_data_alloc_with_length
+> when the dtd is SDP_SEQ8.
 
-I think that, for the records, it is a good idea to explain on the
-commit message at which circumstances the bug is triggered.
+small typo: lenght -> length (3 occurrences).
 
 Best Regards,
 -- 
