@@ -1,77 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 22 May 2013 14:22:13 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [BUG] Set Powered=true doesn't power up the adapter
-Message-ID: <20130522172213.GA12160@samus.indt.org>
-References: <CAGd9gwhNgRhgqzhxxZNyD-o=j4ksTXvFFhTQMawt4bv0b2VPcQ@mail.gmail.com>
- <CAE6HaMnFF7ym+FCWpVHCi=7=OJZeaS+uiF_qQDKHgpbzLUUu_w@mail.gmail.com>
- <CAE6HaMmUL2Dn6H0iBzh6Wrk+DzOzDUHa8fUNGDt6psAc6=JAUw@mail.gmail.com>
- <61DC8CEB-C49A-466F-B5E3-F5B60D398157@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <61DC8CEB-C49A-466F-B5E3-F5B60D398157@holtmann.org>
+In-Reply-To: <CAGd9gwgfGHo0EtXWE2eM=sYVCx58JG9Kc8LGO9NgPVbBL2hstA@mail.gmail.com>
+References: <CAGd9gwgFnuqiYMkYgb=2Ssh8ScoR45H=PZWG-BOXb8kwjnMMNg@mail.gmail.com>
+	<CAGd9gwgfGHo0EtXWE2eM=sYVCx58JG9Kc8LGO9NgPVbBL2hstA@mail.gmail.com>
+Date: Wed, 22 May 2013 11:19:13 +0200
+Message-ID: <CANT-zCXKK=O1zmUc8Oh71F_4wioFS+vgdDnYN3_Z5_9NT-EVwQ@mail.gmail.com>
+Subject: Re: audio: Connect doesn't return when audio device is off.
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Alex Deymo <deymo@chromium.org>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	keybuk <keybuk@chromium.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Alex,
 
-On 08:47 Wed 22 May, Marcel Holtmann wrote:
-> Hi Vinicius,
-> 
-> >> I'm seeing a problem while trying to power on the adapter once in a
-> >> while just after reboot. What happens is that sending a dbus call to
-> >> power on the adapter doesn't return. You can read a more detailed
-> >> description of the bug here [1] but the resume is as follows:
-> >> 
-> >> Sending org.freedesktop.DBus.Properties.Set for power up the adapter
-> >> doesn't return (dbus timeouts after a while) just after reboot. Is a
-> >> very rare bug, but happens from time to time. Restarting bluetoothd
-> >> with -n -d to get the logs made it start returning with the error
-> >> org.bluez.Error.Failed to the same call. I don't see any HCI command
-> >> with btmon while doing this, so I think it's not a firmware issue at
-> >> that point (could be some other thing before). From this state, I can
-> >> call Set several times to power up the adapter, but doesn't work.
-> >> What is interesting is that if instead of sending MGMT_OP_SET_POWERED
-> >> from bluetoothd, we try to power up the adapter with hciconfig
-> >> (calling ioctl(ctl, HCIDEVUP, hdev) ) the adapter goes up and
-> >> everything works fine from there. We are running kernel 3.8, I don't
-> >> know if this was already reported in a newer version.
-> >> 
-> > 
-> > I can consistently reproduce it:
-> > 
-> > 1. run bluetoothd
-> > 2. rfkill block all
-> > 3. test-adapter powered on
-> > 
-> > (current bluetooth-next)
-> > 
-> > I only got things to work again after a hciconfig up, which makes me
-> > think that the "rfkill block" confuses the kernel (probably) about the
-> > state of the controller.
-> 
-> what rfkill block does is to bring the controller down and actually refuse to bring it back up until rfkill unblock happens. If we can bring the controller up via mgmt, then we have a bug.
+On Wed, May 22, 2013 at 2:59 AM, Alex Deymo <deymo@chromium.org> wrote:
+> Hello ML,
+>
+> On Wed, May 15, 2013 at 9:38 PM, Alex Deymo <deymo@chromium.org> wrote:
+>> Hello,
+>> I was debugging this issue when I found that may be related with this
+>> new concept of "service", anyway this issue is present in bluez 5.4
+>> and 5.5 (did not try with previous versions).
 
-Seems that we have just one bug, when the controller is rfkill blocked, mgmt
-Set Powered (for example) doesn't return (no Command Complete, no Command
-Status).
+If you confirm the issue is present in 5.4, it's probably unrelated to
+btd_service.
 
-If I send any Set Powered command after the controller is unblocked, while
-there's still one pending command in the queue, this command will fail, and I
-won't be able to bring the controller up, unless I force a HCI_RESET command.
+>>
+>> The problem is easy to reproduce. Again I'm using the Bose SoundLink
+>> model 404600 but it should work with any audio device. The steps are
+>> as follow:
+>> 1. power on the adapter, scan and pair to the device.
+>> 2. trust the device.
 
-So it seems that we need a way to mark an hdev as rfkill blocked.
+Is trusting in any way relevant in this procedure?
 
-Does anyone else have any other ideas?
+>> 3. turn off the device (short-press once the power button)
+>> 4. attempt to connect to the device from the bluetoothctl.
+>> The D-Bus Connect call doesn't return. I think that in general the
+>> Connect call doesn't return on failure, it only returns when it
+>> succeeds.
 
-> 
-> Regards
-> 
-> Marcel
-> 
+I followed the steps above but I can't reproduce the issue. Can you
+retest with the latest master and send the full logs?
 
+Most likely there is an issue in some profile implementation so it'd
+be interesting to isolate the problem by for example disabling AVRCP
+(i.e. removing the btd_profile_register() calls for avrcp in
+audio_manager_init()).
+
+>> I can also run into this same issue attempting to connect from the
+>> device (short-press the bluetooth button on this device) and running
+>> the "connect" command from bluetoothctl immediately after. In this
+>> case the device successfully connects to the host, but the attempt to
+>> connect from the host fails and Connect doesn't return. The funny
+>> thing is that the device works and you can play music to it.
+
+This might be a different issue, but I couldn't reproduce it either.
+Which device are you using?
+
+>
+> While on that state of "connecting" (the Connect() call did not
+> return) and the device connected a remove command will produce an
+> extra unref (reaching a reference count of -1). I understand that
+> there ir some timing involved here because the extra unref is not
+> issued always, but it happens. Below is the debug output right after
+> the remove command is sent from bluetoothctl. I hope it helps to debug
+> this problem since I consistently run into the Connect() not returning
+> an error.
+> Thanks,
+> Alex.
+
+Let's start with fixing the state first and later we can focus on the
+reference counting.
 
 Cheers,
--- 
-Vinicius
+Mikel
