@@ -1,36 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Henrique Dante de Almeida <hdante@profusion.mobi>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Henrique Dante de Almeida <hdante@profusion.mobi>
-Subject: [PATCH RFC] gdbus: Remove proxies when client disconnects
-Date: Wed, 22 May 2013 18:51:14 -0300
-Message-Id: <1369259474-19536-1-git-send-email-hdante@profusion.mobi>
+Subject: [PATCH BlueZ] lib: Fix sdp_seq_alloc_with_length accessing invalid index/memory
+Date: Wed, 22 May 2013 13:53:16 -0700
+Message-Id: <1369255996-28230-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Remove proxies and generate proxy_removed callbacks even when there are
-no corresponding InterfaceRemoved signals.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Change-Id: I4fe534cd152f98db00d3462f4d7eaaa41b69bdf3
+The sequence itself is not an index of dtds, values, lenghts, thats why
+SDP_SEQ8 is used directly as dtd, so accessing lenght[i] is always off
+by one.
+
+Furthermore the lenght is not really used by sdp_data_alloc_with_length
+when the dtd is SDP_SEQ8.
 ---
- gdbus/client.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ lib/sdp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/gdbus/client.c b/gdbus/client.c
-index f700b7e..d80e252 100644
---- a/gdbus/client.c
-+++ b/gdbus/client.c
-@@ -1153,6 +1153,10 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
+diff --git a/lib/sdp.c b/lib/sdp.c
+index cc685b4..7f8f92b 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -535,7 +535,7 @@ sdp_data_t *sdp_seq_alloc_with_length(void **dtds, void **values, int *length,
+ 		curr = data;
+ 	}
  
- 		if (*new == '\0' && client->unique_name != NULL &&
- 				g_str_equal(old, client->unique_name) == TRUE) {
-+
-+			g_list_free_full(client->proxy_list, proxy_free);
-+			client->proxy_list = NULL;
-+
- 			if (client->disconn_func)
- 				client->disconn_func(client->dbus_conn,
- 							client->disconn_data);
+-	return sdp_data_alloc_with_length(SDP_SEQ8, seq, length[i]);
++	return sdp_data_alloc(SDP_SEQ8, seq);
+ }
+ 
+ sdp_data_t *sdp_seq_alloc(void **dtds, void **values, int len)
 -- 
-1.8.2.3
+1.8.1.4
 
