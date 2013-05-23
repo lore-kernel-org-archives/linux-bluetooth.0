@@ -1,49 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/1] obexd: Fix SetPath response
-Date: Thu, 23 May 2013 18:33:30 +0200
-Message-Id: <1369326810-6397-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+MIME-Version: 1.0
+In-Reply-To: <1369301309-25189-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1369301309-25189-1-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Thu, 23 May 2013 09:21:41 -0700
+Message-ID: <CABBYNZ+1baqBJRNgY9a_4soZ5o3oWK_jfSv=7RqMAkJtz=BP7w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v0 0/4] AVRCP connection-tracking issues
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Alex Deymo <deymo@chromium.org>,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+Hi Mikel,
 
-This fixes the issue, that failed attempts to the OBEX SetPath command
-are not propagated through the D-Bus API.
+On Thu, May 23, 2013 at 2:28 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>
+> This patchset addresses the issues reported by Alex Deymo in the thread "audio: Connect doesn't return when audio device is off". Extracted from his message:
+>
+> "There are two ways to hit this problem:
+> * One is to attempt a connection when the device is off,
+> * the other one is to attempt a connection from the host right after
+> you short press the button with the bluetooth logo on the speakers.
+> This button normally reconnects the speakers to the host, but if you
+> attempt a connection while the device is also doing that, you end up
+> in the same situation."
+>
+> I have been able to reproduce the first issue, which should be fixed with patch 1/4. The second issue is addressed in patch 3/4 but I couldn't actually test it.
+>
+> Patch 4/4 tries to improve the AVRCP role heuristic, which could alone fix Alex's issues, but I think the core cannot rely on this heuristic nevertheless.
+>
+> Mikel Astiz (4):
+>   avrcp: Fix missing reply to profile connect
+>   control: Remove unused parameter
+>   avrcp: Fix service connections not reported to core
+>   avrcp: Don't require active sink in role heuristic
+>
+>  profiles/audio/avrcp.c   | 17 ++++-------------
+>  profiles/audio/control.c | 37 +++++++++++++++++++++++++++----------
+>  profiles/audio/control.h |  7 +++----
+>  3 files changed, 34 insertions(+), 27 deletions(-)
+>
+> --
+> 1.8.1.4
 
-Trace:
+By looking at your patch 2/4 it seems we are not able to really tell
+if a connection attempt has failed anymore, so I think there is
+probably something wrong. The host down error should probably stop
+continuing connection whenever it fails the first time, the issue with
+the connection clash is probably different though and perhaps we
+should go ahead with the heuristic fix and see if that fixes all the
+problems.
 
-  method call sender=:1.942 -> dest=:1.934 serial=8
-  path=/org/bluez/obex/client/session3;
-  interface=org.bluez.obex.MessageAccess1; member=SetFolder
-     string "test"
-  method return sender=:1.934 -> dest=:1.942 reply_serial=8
+@Alex: Can you test the last patch from Mikel for the second issue
+with the remote device connecting to us while we are connecting to it?
+The host down I think Johan has been working on that and we should
+have a patch soon.
 
-  method call sender=:1.946 -> dest=:1.945 serial=8
-  path=/org/bluez/obex/client/session0;
-  interface=org.bluez.obex.MessageAccess1; member=SetFolder
-     string "test"
-  error sender=:1.945 -> dest=:1.946
-  error_name=org.bluez.obex.Error.Failed reply_serial=8
-     string "Not Found"
----
- obexd/client/session.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/obexd/client/session.c b/obexd/client/session.c
-index 17a3d3f..f1bdf18 100644
---- a/obexd/client/session.c
-+++ b/obexd/client/session.c
-@@ -895,7 +895,7 @@ static void setpath_cb(GObex *obex, GError *err, GObexPacket *rsp,
- 		GError *gerr = NULL;
- 		g_set_error(&gerr, OBEX_IO_ERROR, code, "%s",
- 							g_obex_strerror(code));
--		setpath_complete(p->session, NULL, err, user_data);
-+		setpath_complete(p->session, NULL, gerr, user_data);
- 		g_clear_error(&gerr);
- 		return;
- 	}
--- 
-1.8.2.3
-
+--
+Luiz Augusto von Dentz
