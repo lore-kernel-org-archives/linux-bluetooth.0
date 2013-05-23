@@ -1,49 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZJ0fi6LHBMyj1OZ=ZEtfXUkrPB5_7c_MBD-zRBvoa4MmQ@mail.gmail.com>
-References: <1369301309-25189-1-git-send-email-mikel.astiz.oss@gmail.com>
- <CABBYNZ+1baqBJRNgY9a_4soZ5o3oWK_jfSv=7RqMAkJtz=BP7w@mail.gmail.com>
- <CABBYNZJA0C2r-4Y=fd6V_g115ZHyDxmN=9vUCE=HYepMncWKVQ@mail.gmail.com>
- <CAGd9gwhAfcc_DVdJxZ7rqyKPji6xy51TGtPuCvEPET_JK4NJjg@mail.gmail.com>
- <CABBYNZKxTjvbL5Oww3Xni6WzUK3RqBzK7pcMLFSrF919FCBg=g@mail.gmail.com>
- <CAGd9gwgN8KkhCNFTKdE+=YUOAPgV35vGdiSc_GX312+MtbMcdA@mail.gmail.com> <CABBYNZJ0fi6LHBMyj1OZ=ZEtfXUkrPB5_7c_MBD-zRBvoa4MmQ@mail.gmail.com>
-From: Alex Deymo <deymo@chromium.org>
-Date: Thu, 23 May 2013 15:46:11 -0700
-Message-ID: <CAGd9gwjk=UMdS6g1EL=XrKrL2HYmJci--Z=VNzAM_qM2yztNSw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v0 0/4] AVRCP connection-tracking issues
+Date: Thu, 23 May 2013 14:57:58 -0700
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Mikel Astiz <mikel.astiz.oss@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v2] lib: Fix sdp_seq_alloc_with_length accessing
+ invalid index/memory
+Message-ID: <20130523215758.GA31190@x220.psav.com>
+References: <1369335672-9156-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1369335672-9156-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-On Thu, May 23, 2013 at 2:12 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->>> So with what patch-set have you tested, mine that Ive send a few hours
->>> ago or Mikel's?
->>
->> I tried Mikel's patchset. I can try your patchset now if you want.
->
-> Please do it, Ive done some testing with the devices I have with me
-> (Sony MW600 and a couple phones for the CT role) and it seems to fix
-> the problem. It is not that Mikel's patches wouldn't work, they
-> actually do fix it too but it fix the effect not the cause that is
-> connecting the wrong profile in first place.
+On Thu, May 23, 2013, Luiz Augusto von Dentz wrote:
+> The sequence itself is not an index of dtds, values, lengths, thats why
+> SDP_SEQ8 is used directly as dtd, so accessing length[i] is always off
+> by one.
+> 
+> Furthermore the length is not really used by sdp_data_alloc_with_length
+> when the dtd is SDP_SEQ8 which is probably why it doesn't crash.
+> ---
+> v2: Fix length typo and add more clear description why this is currently
+> not causing a crash.
+> 
+>  lib/sdp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Ok, I tried your patch in the same environment as before and the logs
-are here ( http://ix.io/5LR ).
-That one also works fine:
-* the device is idle and would accept a connection from the host.
-* pressing the bluetooth logo button makes it leave that mode and
-start a connection to the host... but it takes some time to do that
-(about 2sec).
-* a "connect" command in the bluetoothctl will fail and (now) return an error.
-* the "ongoing" connection from the device succeeds after that and
-everything works :)
+Applied. Thanks.
 
-Thank you!
-Alex.
+Johan
