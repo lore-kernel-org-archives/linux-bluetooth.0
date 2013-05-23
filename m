@@ -1,37 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] audio: Remove auto_connect flag from audio-avrcp-target
-Date: Thu, 23 May 2013 11:58:29 -0700
-Message-Id: <1369335511-8874-1-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
+Subject: Re: Support for Ralink RT3298 Bluetooth Module
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <519E0CC5.9010300@pdm.ac.in>
+Date: Thu, 23 May 2013 19:00:32 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <95E714D7-326A-4126-9B08-124EEAF4432A@holtmann.org>
+References: <519E0CC5.9010300@pdm.ac.in>
+To: Mohit <mt1037ag11@pdm.ac.in>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Mohit,
 
-By the time the profile is registered it is not really possible to
-tell which role of AVRCP should be connected, currently this cause
-a problem with headsets that normally are controllers/sink but since
-it normally also has target record for features related to things like
-volume control the target profile is also probed and as it currently
-has the auto_connect set it would lead to the wrong profile to start
-connecting.
----
- profiles/audio/manager.c | 1 -
- 1 file changed, 1 deletion(-)
+> There was a proprietary driver for Ralink RT3298 bluetooth module that compiled in kernel 3.2 but stopped compiling in kernel 3.3, 3.4 or 3.5 which is available here http://downloads.zotac.com/mediadrivers/mb/download/NB087_Ubuntu.zip. I get the following output when compiling in kernel 3.5 :
 
-diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
-index 15226e4..1518e5d 100644
---- a/profiles/audio/manager.c
-+++ b/profiles/audio/manager.c
-@@ -376,7 +376,6 @@ static struct btd_profile avrcp_target_profile = {
- 	.device_probe	= avrcp_probe,
- 	.device_remove	= audio_remove,
- 
--	.auto_connect	= true,
- 	.connect	= avrcp_target_connect,
- 	.disconnect	= avrcp_target_disconnect,
- 
--- 
-1.8.1.4
+if neither Ralink nor Ubuntu feels the need to get this upstream, why would we care if this compiles or not. This is not how Linux works. The community is not responsible for out-of-tree drivers.
+
+> mohit@linux-xmln:~/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3> make
+> make -C /lib/modules/3.7.10-1.4-desktop/build M=/home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3 modules
+> make[1]: Entering directory `/usr/src/linux-3.7.10-1.4-obj/x86_64/desktop'
+>  CC [M]  /home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_main.o
+>  CC [M]  /home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_init.o
+>  CC [M]  /home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.o
+> /home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.c: In function ‘rtbt_pci_suspend’:
+> /home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.c:60:43: error: ‘struct hci_dev’ has no member named ‘driver_data’
+
+
+This change was made over a year ago. So seems nobody really cares enough.
+
+commit 155961e8001719af6d87cbcc961111e8ce477843
+Author: David Herrmann <dh.herrmann@googlemail.com>
+Date:   Thu Feb 9 21:58:32 2012 +0100
+
+    Bluetooth: Remove hci_dev->driver_data
+    
+    The linux device model provides dev_set/get_drvdata so we can use this
+    to save private driver data.
+    This also removes several unnecessary casts.
+    
+    Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
+    Acked-by: Marcel Holtmann <marcel@holtmann.org>
+    Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+
+Regards
+
+Marcel
 
