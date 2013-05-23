@@ -1,40 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2] lib: Fix sdp_seq_alloc_with_length accessing invalid index/memory
-Date: Thu, 23 May 2013 12:01:12 -0700
-Message-Id: <1369335672-9156-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/3] audio/control: Remove control_update
+Date: Thu, 23 May 2013 11:58:31 -0700
+Message-Id: <1369335511-8874-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1369335511-8874-1-git-send-email-luiz.dentz@gmail.com>
+References: <1369335511-8874-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The sequence itself is not an index of dtds, values, lengths, thats why
-SDP_SEQ8 is used directly as dtd, so accessing length[i] is always off
-by one.
-
-Furthermore the length is not really used by sdp_data_alloc_with_length
-when the dtd is SDP_SEQ8 which is probably why it doesn't crash.
 ---
-v2: Fix length typo and add more clear description why this is currently
-not causing a crash.
+ profiles/audio/control.c | 12 ------------
+ profiles/audio/control.h |  1 -
+ 2 files changed, 13 deletions(-)
 
- lib/sdp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/lib/sdp.c b/lib/sdp.c
-index cc685b4..7f8f92b 100644
---- a/lib/sdp.c
-+++ b/lib/sdp.c
-@@ -535,7 +535,7 @@ sdp_data_t *sdp_seq_alloc_with_length(void **dtds, void **values, int *length,
- 		curr = data;
- 	}
- 
--	return sdp_data_alloc_with_length(SDP_SEQ8, seq, length[i]);
-+	return sdp_data_alloc(SDP_SEQ8, seq);
+diff --git a/profiles/audio/control.c b/profiles/audio/control.c
+index f520e49..c33dcad 100644
+--- a/profiles/audio/control.c
++++ b/profiles/audio/control.c
+@@ -282,18 +282,6 @@ void control_unregister(struct audio_device *dev)
+ 						AUDIO_CONTROL_INTERFACE);
  }
  
- sdp_data_t *sdp_seq_alloc(void **dtds, void **values, int len)
+-void control_update(struct control *control, struct btd_service *service)
+-{
+-	struct btd_profile *p = btd_service_get_profile(service);
+-	const char *uuid = p->remote_uuid;
+-
+-	if (!control->target && bt_uuid_strcmp(uuid, AVRCP_TARGET_UUID) == 0)
+-		control->target = btd_service_ref(service);
+-	else if (!control->remote &&
+-				bt_uuid_strcmp(uuid, AVRCP_REMOTE_UUID) == 0)
+-		control->remote = btd_service_ref(service);
+-}
+-
+ static struct control *control_init(struct audio_device *dev)
+ {
+ 	struct control *control;
+diff --git a/profiles/audio/control.h b/profiles/audio/control.h
+index 369cca6..af6893b 100644
+--- a/profiles/audio/control.h
++++ b/profiles/audio/control.h
+@@ -30,7 +30,6 @@ struct control *control_init_target(struct audio_device *dev,
+ 						struct btd_service *service);
+ struct control *control_init_remote(struct audio_device *dev,
+ 						struct btd_service *service);
+-void control_update(struct control *control, struct btd_service *service);
+ void control_unregister(struct audio_device *dev);
+ gboolean control_is_active(struct audio_device *dev);
+ 
 -- 
 1.8.1.4
 
