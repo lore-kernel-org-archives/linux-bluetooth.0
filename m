@@ -1,44 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <519E0CC5.9010300@pdm.ac.in>
+Date: Thu, 23 May 2013 18:04:13 +0530
+From: Mohit <mt1037ag11@pdm.ac.in>
 MIME-Version: 1.0
-In-Reply-To: <CAJdJm_NqYT_3nVHCzenwd2UOvsxnMZGY1FKzxKWbYTZt-jxn6g@mail.gmail.com>
-References: <1369259656-19683-1-git-send-email-hdante@profusion.mobi>
-	<CAJdJm_NqYT_3nVHCzenwd2UOvsxnMZGY1FKzxKWbYTZt-jxn6g@mail.gmail.com>
-Date: Thu, 23 May 2013 11:42:14 -0300
-Message-ID: <CAFAvTnOTEMDw7Pd+np6ZZq2TmsWWNm-z-AjKrcUABGsKusyf0Q@mail.gmail.com>
-Subject: Re: [PATCH RFC] gdbus: Remove proxies when client disconnects
-From: Henrique Dante <hdante@profusion.mobi>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Subject: Support for Ralink RT3298 Bluetooth Module
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, May 22, 2013 at 7:35 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Henrique,
->
-> On Wed, May 22, 2013 at 5:54 PM, Henrique Dante de Almeida
-> <hdante@profusion.mobi> wrote:
->> Remove proxies and generate proxy_removed callbacks even when there are
->> no corresponding InterfaceRemoved signals.
->> ---
->
-> I think that, for the records, it is a good idea to explain on the
-> commit message at which circumstances the bug is triggered.
+Hello,
+There was a proprietary driver for Ralink RT3298 bluetooth module that 
+compiled in kernel 3.2 but stopped compiling in kernel 3.3, 3.4 or 3.5 
+which is available here 
+http://downloads.zotac.com/mediadrivers/mb/download/NB087_Ubuntu.zip. I 
+get the following output when compiling in kernel 3.5 :
 
- "This patch fixes having zombie gdbus proxy objects when a server
-disconnects without sending InterfaceRemoved signals. These objects
-may interact with new server instances, for example, making
-InterfaceAdded signals of new objects with the same name be filtered
-out as duplicates, or staying allocated, but unused if the new server
-doesn't reuse the object paths. Note that as a side-effect, the
-lifetime of a gdbus proxy becomes stricter: it lives at most for the
-duration of a single connection to a single instance of a server
-process."
+mohit@linux-xmln:~/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3> make
+make -C /lib/modules/3.7.10-1.4-desktop/build M=/home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3 modules
+make[1]: Entering directory `/usr/src/linux-3.7.10-1.4-obj/x86_64/desktop'
+   CC [M]  /home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_main.o
+   CC [M]  /home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_init.o
+   CC [M]  /home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.o
+/home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.c: In function ‘rtbt_pci_suspend’:
+/home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.c:60:43: error: ‘struct hci_dev’ has no member named ‘driver_data’
+/home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.c: In function ‘rtbt_pci_resume’:
+/home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.c:87:46: error: ‘struct hci_dev’ has no member named ‘driver_data’
+/home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.c: In function ‘rtbt_pci_probe’:
+/home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.c:198:1: warning: label ‘err_hps_iface’ defined but not used [-Wunused-label]
+/home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.c: In function ‘rtbt_pci_remove’:
+/home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.c:240:43: error: ‘struct hci_dev’ has no member named ‘driver_data’
+/home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.c: In function ‘BthIsr’:
+/home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.c:346:40: error: ‘struct hci_dev’ has no member named ‘driver_data’
+make[4]: *** [/home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.o] Error 1
+make[3]: *** [_module_/home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3] Error 2
+make[2]: *** [sub-make] Error 2
+make[1]: *** [all] Error 2
+make[1]: Leaving directory `/usr/src/linux-3.7.10-1.4-obj/x86_64/desktop'
+make: *** [all] Error 2
 
->
-> Best Regards,
-> --
-> Anderson Lizardo
-> Instituto Nokia de Tecnologia - INdT
-> Manaus - Brazil
+
+
+-- 
+
+
+
+
+
+
+
+
+
+--
+******************************************************************************************************************************************************************
+"This e-Mail may contain proprietary and confidential information and is 
+sent for the intended  recipient(s) only. If, by an addressing or 
+transmission error, this mail has been misdirected to you, you are 
+requested to delete this mail immediately.You are also hereby notified that 
+any use, any form of reproduction, dissemination, copying, disclosure, 
+modification, distribution and/or publication of this e-mail 
+message,contents or its attachment(s) other than by its intended 
+recipient(s) is strictly prohibited.Any opinions expressed in this email 
+are those of the individual and not necessarily of the organization.Before 
+opening attachment(s), please scan for viruses."
+**********************************************************************************************************************************************************************
+
