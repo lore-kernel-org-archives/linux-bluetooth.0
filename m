@@ -1,34 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 23 May 2013 14:57:58 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v2] lib: Fix sdp_seq_alloc_with_length accessing
- invalid index/memory
-Message-ID: <20130523215758.GA31190@x220.psav.com>
-References: <1369335672-9156-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1369335672-9156-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1369326810-6397-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1369326810-6397-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Date: Thu, 23 May 2013 14:36:17 -0700
+Message-ID: <CABBYNZLhjQE6B98rBssJYnEfFT9zR-0qTjCoji14vUy9Q-28jA@mail.gmail.com>
+Subject: Re: [PATCH 1/1] obexd: Fix SetPath response
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Christian,
 
-On Thu, May 23, 2013, Luiz Augusto von Dentz wrote:
-> The sequence itself is not an index of dtds, values, lengths, thats why
-> SDP_SEQ8 is used directly as dtd, so accessing length[i] is always off
-> by one.
-> 
-> Furthermore the length is not really used by sdp_data_alloc_with_length
-> when the dtd is SDP_SEQ8 which is probably why it doesn't crash.
+On Thu, May 23, 2013 at 9:33 AM, Christian Fetzer
+<christian.fetzer@oss.bmw-carit.de> wrote:
+> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+>
+> This fixes the issue, that failed attempts to the OBEX SetPath command
+> are not propagated through the D-Bus API.
+>
+> Trace:
+>
+>   method call sender=:1.942 -> dest=:1.934 serial=8
+>   path=/org/bluez/obex/client/session3;
+>   interface=org.bluez.obex.MessageAccess1; member=SetFolder
+>      string "test"
+>   method return sender=:1.934 -> dest=:1.942 reply_serial=8
+>
+>   method call sender=:1.946 -> dest=:1.945 serial=8
+>   path=/org/bluez/obex/client/session0;
+>   interface=org.bluez.obex.MessageAccess1; member=SetFolder
+>      string "test"
+>   error sender=:1.945 -> dest=:1.946
+>   error_name=org.bluez.obex.Error.Failed reply_serial=8
+>      string "Not Found"
 > ---
-> v2: Fix length typo and add more clear description why this is currently
-> not causing a crash.
-> 
->  lib/sdp.c | 2 +-
+>  obexd/client/session.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/obexd/client/session.c b/obexd/client/session.c
+> index 17a3d3f..f1bdf18 100644
+> --- a/obexd/client/session.c
+> +++ b/obexd/client/session.c
+> @@ -895,7 +895,7 @@ static void setpath_cb(GObex *obex, GError *err, GObexPacket *rsp,
+>                 GError *gerr = NULL;
+>                 g_set_error(&gerr, OBEX_IO_ERROR, code, "%s",
+>                                                         g_obex_strerror(code));
+> -               setpath_complete(p->session, NULL, err, user_data);
+> +               setpath_complete(p->session, NULL, gerr, user_data);
+>                 g_clear_error(&gerr);
+>                 return;
+>         }
+> --
+> 1.8.2.3
 
-Applied. Thanks.
+Pushed, thanks.
 
-Johan
+
+--
+Luiz Augusto von Dentz
