@@ -1,50 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
-Subject: Re: Support for Ralink RT3298 Bluetooth Module
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <519E0CC5.9010300@pdm.ac.in>
-Date: Thu, 23 May 2013 19:00:32 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <95E714D7-326A-4126-9B08-124EEAF4432A@holtmann.org>
-References: <519E0CC5.9010300@pdm.ac.in>
-To: Mohit <mt1037ag11@pdm.ac.in>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZ+1baqBJRNgY9a_4soZ5o3oWK_jfSv=7RqMAkJtz=BP7w@mail.gmail.com>
+References: <1369301309-25189-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<CABBYNZ+1baqBJRNgY9a_4soZ5o3oWK_jfSv=7RqMAkJtz=BP7w@mail.gmail.com>
+Date: Thu, 23 May 2013 09:45:48 -0700
+Message-ID: <CABBYNZJA0C2r-4Y=fd6V_g115ZHyDxmN=9vUCE=HYepMncWKVQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v0 0/4] AVRCP connection-tracking issues
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Alex Deymo <deymo@chromium.org>,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mohit,
+Hi Mikel,
 
-> There was a proprietary driver for Ralink RT3298 bluetooth module that compiled in kernel 3.2 but stopped compiling in kernel 3.3, 3.4 or 3.5 which is available here http://downloads.zotac.com/mediadrivers/mb/download/NB087_Ubuntu.zip. I get the following output when compiling in kernel 3.5 :
+On Thu, May 23, 2013 at 9:21 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Mikel,
+>
+> On Thu, May 23, 2013 at 2:28 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>>
+>> This patchset addresses the issues reported by Alex Deymo in the thread "audio: Connect doesn't return when audio device is off". Extracted from his message:
+>>
+>> "There are two ways to hit this problem:
+>> * One is to attempt a connection when the device is off,
+>> * the other one is to attempt a connection from the host right after
+>> you short press the button with the bluetooth logo on the speakers.
+>> This button normally reconnects the speakers to the host, but if you
+>> attempt a connection while the device is also doing that, you end up
+>> in the same situation."
+>>
+>> I have been able to reproduce the first issue, which should be fixed with patch 1/4. The second issue is addressed in patch 3/4 but I couldn't actually test it.
+>>
+>> Patch 4/4 tries to improve the AVRCP role heuristic, which could alone fix Alex's issues, but I think the core cannot rely on this heuristic nevertheless.
+>>
+>> Mikel Astiz (4):
+>>   avrcp: Fix missing reply to profile connect
+>>   control: Remove unused parameter
+>>   avrcp: Fix service connections not reported to core
+>>   avrcp: Don't require active sink in role heuristic
+>>
+>>  profiles/audio/avrcp.c   | 17 ++++-------------
+>>  profiles/audio/control.c | 37 +++++++++++++++++++++++++++----------
+>>  profiles/audio/control.h |  7 +++----
+>>  3 files changed, 34 insertions(+), 27 deletions(-)
+>>
+>> --
+>> 1.8.1.4
+>
+> By looking at your patch 2/4 it seems we are not able to really tell
+> if a connection attempt has failed anymore, so I think there is
+> probably something wrong. The host down error should probably stop
+> continuing connection whenever it fails the first time, the issue with
+> the connection clash is probably different though and perhaps we
+> should go ahead with the heuristic fix and see if that fixes all the
+> problems.
+>
+> @Alex: Can you test the last patch from Mikel for the second issue
+> with the remote device connecting to us while we are connecting to it?
+> The host down I think Johan has been working on that and we should
+> have a patch soon.
 
-if neither Ralink nor Ubuntu feels the need to get this upstream, why would we care if this compiles or not. This is not how Linux works. The community is not responsible for out-of-tree drivers.
+Actually let me take it back, the heuristic fix actually doesn't do
+anything since we already have the same check four line above this
+should never happen. A potential fix is to remove auto_connect from
+avrcp_target_profile so if sink fails to connect it won't connect
+automatically, anyway when the sink connects device.c will make sure
+to connect avrcp as well.
 
-> mohit@linux-xmln:~/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3> make
-> make -C /lib/modules/3.7.10-1.4-desktop/build M=/home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3 modules
-> make[1]: Entering directory `/usr/src/linux-3.7.10-1.4-obj/x86_64/desktop'
->  CC [M]  /home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_main.o
->  CC [M]  /home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_init.o
->  CC [M]  /home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.o
-> /home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.c: In function ‘rtbt_pci_suspend’:
-> /home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.c:60:43: error: ‘struct hci_dev’ has no member named ‘driver_data’
-
-
-This change was made over a year ago. So seems nobody really cares enough.
-
-commit 155961e8001719af6d87cbcc961111e8ce477843
-Author: David Herrmann <dh.herrmann@googlemail.com>
-Date:   Thu Feb 9 21:58:32 2012 +0100
-
-    Bluetooth: Remove hci_dev->driver_data
-    
-    The linux device model provides dev_set/get_drvdata so we can use this
-    to save private driver data.
-    This also removes several unnecessary casts.
-    
-    Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
-    Acked-by: Marcel Holtmann <marcel@holtmann.org>
-    Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-
-Regards
-
-Marcel
-
+--
+Luiz Augusto von Dentz
