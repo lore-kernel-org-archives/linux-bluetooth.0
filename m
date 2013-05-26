@@ -1,41 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <51A3355D.2030107@gmail.com>
-Date: Mon, 27 May 2013 12:28:45 +0200
-From: Emilio Pozuelo Monfort <pochu27@gmail.com>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Powered state in BlueZ 5
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
+Subject: Re: Support for Ralink RT3298 Bluetooth Module
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <51A20F59.3060403@pdm.ac.in>
+Date: Mon, 27 May 2013 07:40:07 +0900
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <437141F8-2776-4146-9C1A-66A7D4E4AE41@holtmann.org>
+References: <519E0CC5.9010300@pdm.ac.in> <95E714D7-326A-4126-9B08-124EEAF4432A@holtmann.org> <51A20F59.3060403@pdm.ac.in>
+To: Mohit <mt1037ag11@pdm.ac.in>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Mohit,
 
-I'm porting the GNOME stack to BlueZ 5 and I'm hitting one issue. It looks like 
-the Powered state is not persistent anymore:
+replying to me in private and not CC the mailing from a previous thread is not acceptable behavior on this mailing list. Please learn to press Reply All button.
 
-commit 0f575386a54382b63a1aa8e90589917747ee1a79
-Author: Johan Hedberg <johan.hedberg@intel.com>
-Date:   Thu Dec 13 16:35:30 2012 +0200
+>>> There was a proprietary driver for Ralink RT3298 bluetooth module that compiled in kernel 3.2 but stopped compiling in kernel 3.3, 3.4 or 3.5 which is available here http://downloads.zotac.com/mediadrivers/mb/download/NB087_Ubuntu.zip. I get the following output when compiling in kernel 3.5 :
+>> if neither Ralink nor Ubuntu feels the need to get this upstream, why would we care if this compiles or not. This is not how Linux works. The community is not responsible for out-of-tree drivers.
+>> 
+>>> mohit@linux-xmln:~/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3> make
+>>> make -C /lib/modules/3.7.10-1.4-desktop/build M=/home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3 modules
+>>> make[1]: Entering directory `/usr/src/linux-3.7.10-1.4-obj/x86_64/desktop'
+>>>  CC [M]  /home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_main.o
+>>>  CC [M]  /home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_init.o
+>>>  CC [M]  /home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.o
+>>> /home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.c: In function ‘rtbt_pci_suspend’:
+>>> /home/mohit/Downloads/NB087_Ubuntu/NB087_BT_ubuntu_release/rtbth_v3.9.3/rtbth_v3.9.3/rtbth_core_pci.c:60:43: error: ‘struct hci_dev’ has no member named ‘driver_data’
+>> 
+>> This change was made over a year ago. So seems nobody really cares enough.
+>> 
+>> commit 155961e8001719af6d87cbcc961111e8ce477843
+>> Author: David Herrmann <dh.herrmann@googlemail.com>
+>> Date:   Thu Feb 9 21:58:32 2012 +0100
+>> 
+>>     Bluetooth: Remove hci_dev->driver_data
+>>          The linux device model provides dev_set/get_drvdata so we can use this
+>>     to save private driver data.
+>>     This also removes several unnecessary casts.
+>>          Signed-off-by: David Herrmann <dh.herrmann@googlemail.com>
+>>     Acked-by: Marcel Holtmann <marcel@holtmann.org>
+>>     Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+>> 
+> I removed hci_dev->driver_data, but there needs to be an expression in its place. Should i replace it with dev_set->driver_data or get_drvdata->driver_data??
 
-     core: Remove persistent storing of the powered state
+I have no intention on trying to make this driver work. Please contact Ralink to provide you an updated driver or even better have some submitted this one upstream.
 
-commit 0bd31205e667de7a809a683e5c42c58a8d547a6e
-Author: Marcel Holtmann <marcel@holtmann.org>
-Date:   Sat Dec 29 16:28:03 2012 -0800
+Regards
 
-     doc: Mention that the adapter powered property is not persistent
+Marcel
 
-The problem with this is that if the adapter is switched off with rfkill (that's 
-what the toggles to turn bluetooth on and off do), then when it's switched back 
-on it won't be powered. Should those toggle buttons also take care of powering 
-the adapter? What if the user uses a hardware switch to turn it off? Or is there 
-another way this should be done in BlueZ 5? I couldn't find any documentation 
-about this in [1], but [2] suggests this needs to be handled elsewhere, such as 
-in NM.
-
-Thanks,
-Emilio
-
-[1] http://www.bluez.org/bluez-5-api-introduction-and-porting-guide/
-[2] http://article.gmane.org/gmane.linux.bluez.kernel/35532
