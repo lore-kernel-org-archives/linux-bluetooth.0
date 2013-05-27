@@ -1,54 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Message-ID: <51A3355D.2030107@gmail.com>
+Date: Mon, 27 May 2013 12:28:45 +0200
+From: Emilio Pozuelo Monfort <pochu27@gmail.com>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 00/13] MediaFolder and MediaItem implementation
-Date: Mon, 27 May 2013 14:33:50 +0300
-Message-Id: <1369654443-11514-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Powered state in BlueZ 5
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi,
 
-This set of patches implements most of the functionality of MediaFolder and
-MediaItem interfaces.
+I'm porting the GNOME stack to BlueZ 5 and I'm hitting one issue. It looks like 
+the Powered state is not persistent anymore:
 
-Some remarks:
+commit 0f575386a54382b63a1aa8e90589917747ee1a79
+Author: Johan Hedberg <johan.hedberg@intel.com>
+Date:   Thu Dec 13 16:35:30 2012 +0200
 
-- ChangeFolder can only change one level at time, this perhaps gonna be
-  changed in the future but for now this matches the limitation of AVRCP
-  itself.
-- ListItems returns the items in the correct order but GetManagedObjects does
-  the reverse order due to use of g_slist_prepend.
-- PlayItem and AddToNowPlaying works fine with iPhone but with WP8 is not
-  working probably because the UIDCounter changes more frequently which needs
-  some new notifications that are currently not implemented.
+     core: Remove persistent storing of the powered state
 
-This can be tested using tools/mpris-player which will browse the NowPlaying
-list and show which item is currently being played, but the gnome extention
-itself needs patching which can be found here:
+commit 0bd31205e667de7a809a683e5c42c58a8d547a6e
+Author: Marcel Holtmann <marcel@holtmann.org>
+Date:   Sat Dec 29 16:28:03 2012 -0800
 
-https://github.com/Vudentz/gnome-shell-extensions-mediaplayer
+     doc: Mention that the adapter powered property is not persistent
 
-Luiz Augusto von Dentz (13):
-  player: Split item creation
-  AVRCP: Add browsed flag to player
-  AVRCP: Add support for GetFolderItems command
-  player: Add implementation of MediaFolder.ListItems
-  player: Add support for setting current Item object
-  player: Add function media_item_set_playable
-  player: Add support for MediaItem.Metadata property
-  AVRCP: Add support for ChangePath command
-  player: Add implementation of MediaFolder.ChangeFolder
-  AVRCP: Add support for PlayItem command
-  player: Add implementation of MediaItem.Play
-  AVRCP: Add support for AddToNowPlaying command
-  player: Add implementation of MediaItem.AddToNowPlaying
+The problem with this is that if the adapter is switched off with rfkill (that's 
+what the toggles to turn bluetooth on and off do), then when it's switched back 
+on it won't be powered. Should those toggle buttons also take care of powering 
+the adapter? What if the user uses a hardware switch to turn it off? Or is there 
+another way this should be done in BlueZ 5? I couldn't find any documentation 
+about this in [1], but [2] suggests this needs to be handled elsewhere, such as 
+in NM.
 
- profiles/audio/avrcp.c  | 390 ++++++++++++++++++++++++++++-
- profiles/audio/player.c | 650 ++++++++++++++++++++++++++++++++++++++++--------
- profiles/audio/player.h |  23 +-
- 3 files changed, 943 insertions(+), 120 deletions(-)
+Thanks,
+Emilio
 
--- 
-1.8.1.4
-
+[1] http://www.bluez.org/bluez-5-api-introduction-and-porting-guide/
+[2] http://article.gmane.org/gmane.linux.bluez.kernel/35532
