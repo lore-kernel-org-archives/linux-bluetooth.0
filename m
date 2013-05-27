@@ -1,500 +1,199 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1369399155-16028-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1369399155-16028-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Date: Mon, 27 May 2013 07:37:57 -0700
-Message-ID: <CABBYNZKa0pjdtM2nMy2MTpsRpE2evvxxFPyvZ-pk=b5iqX9Xxg@mail.gmail.com>
-Subject: Re: [PATCH 1/1] obexd: Queue session commands
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CABBYNZJjXedjx1Qjn_QDSO-szcCkj=QAVGC4eaKBbWv+Fw5Pcg@mail.gmail.com>
+References: <1369301309-25189-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<CABBYNZ+1baqBJRNgY9a_4soZ5o3oWK_jfSv=7RqMAkJtz=BP7w@mail.gmail.com>
+	<CABBYNZJA0C2r-4Y=fd6V_g115ZHyDxmN=9vUCE=HYepMncWKVQ@mail.gmail.com>
+	<CANT-zCV-3LYVWnsCz+wfaAKqQVj3Fx-Dq0i3zXMiojV2Cyzzrw@mail.gmail.com>
+	<CABBYNZLL4T-+=aX_47R-BnuC+gO5MYoUJUD4keYt+XrC1kG-WQ@mail.gmail.com>
+	<CANT-zCX-f8+cnhGLCPgVcRV3B5shLmaS=pQyRs8AJR0Y41dYBg@mail.gmail.com>
+	<CABBYNZJjXedjx1Qjn_QDSO-szcCkj=QAVGC4eaKBbWv+Fw5Pcg@mail.gmail.com>
+Date: Mon, 27 May 2013 16:06:49 +0200
+Message-ID: <CANT-zCXHGoUDDoMM8W-FeP0u5b-jyuUtW5bcqFRHm0GVJnA++w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v0 0/4] AVRCP connection-tracking issues
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Alex Deymo <deymo@chromium.org>,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+Hi Luiz,
 
-On Fri, May 24, 2013 at 5:39 AM, Christian Fetzer
-<christian.fetzer@oss.bmw-carit.de> wrote:
-> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+On Mon, May 27, 2013 at 3:07 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Mikel,
 >
-> So far only transfers are queued in OBEX sessions. Commands like SetPath
-> are not queued and the commands will simply fail when a different
-> operation or transfer is ongoing. This patch removes this limitation and
-> queues commands as well.
+> On Sun, May 26, 2013 at 2:30 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>> Hi Luiz,
+>>
+>> On Sat, May 25, 2013 at 2:56 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi Mikel,
+>>>
+>>> On Fri, May 24, 2013 at 12:05 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>>>> Hi Luis,
+>>>>
+>>>> On Thu, May 23, 2013 at 6:45 PM, Luiz Augusto von Dentz
+>>>> <luiz.dentz@gmail.com> wrote:
+>>>>> Hi Mikel,
+>>>>>
+>>>>> On Thu, May 23, 2013 at 9:21 AM, Luiz Augusto von Dentz
+>>>>> <luiz.dentz@gmail.com> wrote:
+>>>>>> Hi Mikel,
+>>>>>>
+>>>>>> On Thu, May 23, 2013 at 2:28 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>>>>>>> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>>>>>>>
+>>>>>>> This patchset addresses the issues reported by Alex Deymo in the thread "audio: Connect doesn't return when audio device is off". Extracted from his message:
+>>>>>>>
+>>>>>>> "There are two ways to hit this problem:
+>>>>>>> * One is to attempt a connection when the device is off,
+>>>>>>> * the other one is to attempt a connection from the host right after
+>>>>>>> you short press the button with the bluetooth logo on the speakers.
+>>>>>>> This button normally reconnects the speakers to the host, but if you
+>>>>>>> attempt a connection while the device is also doing that, you end up
+>>>>>>> in the same situation."
+>>>>>>>
+>>>>>>> I have been able to reproduce the first issue, which should be fixed with patch 1/4. The second issue is addressed in patch 3/4 but I couldn't actually test it.
+>>>>>>>
+>>>>>>> Patch 4/4 tries to improve the AVRCP role heuristic, which could alone fix Alex's issues, but I think the core cannot rely on this heuristic nevertheless.
+>>>>>>>
+>>>>>>> Mikel Astiz (4):
+>>>>>>>   avrcp: Fix missing reply to profile connect
+>>>>>>>   control: Remove unused parameter
+>>>>>>>   avrcp: Fix service connections not reported to core
+>>>>>>>   avrcp: Don't require active sink in role heuristic
+>>>>>>>
+>>>>>>>  profiles/audio/avrcp.c   | 17 ++++-------------
+>>>>>>>  profiles/audio/control.c | 37 +++++++++++++++++++++++++++----------
+>>>>>>>  profiles/audio/control.h |  7 +++----
+>>>>>>>  3 files changed, 34 insertions(+), 27 deletions(-)
+>>>>>>>
+>>>>>>> --
+>>>>>>> 1.8.1.4
+>>>>>>
+>>>>>> By looking at your patch 2/4 it seems we are not able to really tell
+>>>>>> if a connection attempt has failed anymore, so I think there is
+>>>>>> probably something wrong. The host down error should probably stop
+>>>>>> continuing connection whenever it fails the first time, the issue with
+>>>>>> the connection clash is probably different though and perhaps we
+>>>>>> should go ahead with the heuristic fix and see if that fixes all the
+>>>>>> problems.
+>>>>>>
+>>>>>> @Alex: Can you test the last patch from Mikel for the second issue
+>>>>>> with the remote device connecting to us while we are connecting to it?
+>>>>>> The host down I think Johan has been working on that and we should
+>>>>>> have a patch soon.
+>>>>>
+>>>>> Actually let me take it back, the heuristic fix actually doesn't do
+>>>>> anything since we already have the same check four line above this
+>>>>> should never happen. A potential fix is to remove auto_connect from
+>>>>> avrcp_target_profile so if sink fails to connect it won't connect
+>>>>> automatically, anyway when the sink connects device.c will make sure
+>>>>> to connect avrcp as well.
+>>>>>
+>>>>> --
+>>>>> Luiz Augusto von Dentz
+>>>>
+>>>> You're right, the last patch doesn't help at all. What about the first
+>>>> three? Even if the originally reported issue seems to be fixed now, I
+>>>> think the change still makes sense.
+>>>>
+>>>> The issue might now be hidden because Device.Connect() doesn't connect
+>>>> AVRCP, but I believe you could still hit the issue with
+>>>> Device.ConnectProfile() assuming that the role heuristic makes a wrong
+>>>> guess.
+>>>
+>>> In that case I would like to remove the heuristic for outgoing
+>>> connections using the service when it attempt to connect, so I would
+>>> like to wait you to complete the service code so I can remove a lot of
+>>> code in the audio including the audio_dev and perhaps deprecate
+>>> MediaControl interface in favor of Service, this would leave the
+>>> heuristic only for incoming connections where the heuristic is
+>>> necessary to figure out which role the remote device is expecting.
+>>
+>> I consider the core service infrastructure finished, with the
+>> exception of the D-Bus part which I already submitted as RFC. There
+>> might still be issues to fix (as recently reported by Vinicius and
+>> Christian) but this is more about profile-specific adoption of
+>> btd_service.
+>>
+>> Regarding the audio part, there's definitely room for simplification
+>> by exploiting new features of the core. Some ideas I have in mind are:
+>>
+>> 1. Register btd_profile (and therefore btd_service) instances for
+>> UUIDs like AVDTP and AVCTP. This would presumably simplify the
+>> connection logic a lot, but it might also require some additional core
+>> support in order to handle disconnections properly (i.e. disconnect
+>> AVDTP when all users have finished, in this case with a delay).
 >
-> Currently, the MAP client is directly affected by this limitation.
-> An immediate call to SetPath after the MAP connection has been established
-> reliably fails, because MNS is being connected in the background in parallel.
-> ---
->  obexd/client/session.c | 271 ++++++++++++++++++++++++++++++++++---------------
->  1 file changed, 190 insertions(+), 81 deletions(-)
->
-> diff --git a/obexd/client/session.c b/obexd/client/session.c
-> index f1bdf18..bffc015 100644
-> --- a/obexd/client/session.c
-> +++ b/obexd/client/session.c
-> @@ -65,10 +65,18 @@ struct callback_data {
->         void *data;
->  };
->
-> +struct pending_request;
-> +typedef int (*session_process_cb) (struct pending_request *pr, GError **err);
-> +
-> +typedef void (*process_free_cb)(void *process_data);
+> It could be a good idea, but Im not sure it would work because we are
+> only using the service classes, but perhaps internally we can add
+> those UUIDs but they should probably not be exposed to the
+> applications.
 
-Call it pending_destroy and there should be only one data here.
+I briefly discussed this with Johan and he is apparently not against
+this idea either. I'll send some proposal after we first clarify the
+adoption of something like btd_server, discussed below in the message.
 
->  struct pending_request {
->         guint id;
->         guint req_id;
->         struct obc_session *session;
-> +       session_process_cb process;
-> +       void *process_data;
+As you mention, there needs to be some filtering to avoid exposing too
+much external information. The first idea that comes to mind is to
+extend btd_profile with a member that specifies it's type, but I have
+to think this through.
 
-No need to create another data parameter if it is a void * you can
-always stuff a struct that carries another data if needed. You should
-probably stuff the func and the transfer in a specialized request
-which is the passed as data to pending_request_new., the process
-callback should know how to treat its data.
+>
+>> 2. Exploit btd_service's userdata to avoid maintaining internal lists
+>> and associations. This should be fairly easy and specially interesting
+>> after (1), making for example avdtp_get_internal() trivial.
+>
+> This should be fine provided with can do (1).
+>
+>> 3. Extend btd_service_state_t with BTD_SERVICE_STATE_ACTIVE (i.e.
+>> "Service is using a considerable bandwidth"), which would map to
+>> PLAYING for many audio profiles. I don't have a strong opinion on this
+>> one since the concept might not be generic enough to be adopted in the
+>> core. For example, it might make sense for networking profiles (i.e.
+>> an active connection exists) but on the contrary the HID profile would
+>> make little use of this state.
+>
+> I would't have this extra state in the service, it is too profile
+> specific, what we really want is that the core takes care of
+> connection logic but the underlining signalling/data stream is profile
+> specif so it is better to leave the plugins/external profiles to
+> handle.
 
-> +       process_free_cb process_free;
->         struct obc_transfer *transfer;
->         session_callback_t func;
->         void *data;
-> @@ -81,6 +89,11 @@ struct setpath_data {
->         void *user_data;
->  };
->
-> +struct file_data {
-> +       char *srcname;
-> +       char *destname;
-> +};
-> +
->  struct obc_session {
->         guint id;
->         int refcount;
-> @@ -140,6 +153,9 @@ static void session_unregistered(struct obc_session *session)
->  }
->
->  static struct pending_request *pending_request_new(struct obc_session *session,
-> +                                               session_process_cb process,
-> +                                               void *process_data,
-> +                                               process_free_cb process_free,
->                                                 struct obc_transfer *transfer,
->                                                 session_callback_t func,
->                                                 void *data)
-> @@ -150,6 +166,9 @@ static struct pending_request *pending_request_new(struct obc_session *session,
->         p = g_new0(struct pending_request, 1);
->         p->id = ++id;
->         p->session = obc_session_ref(session);
-> +       p->process = process;
-> +       p->process_data = process_data;
-> +       p->process_free = process_free;
->         p->transfer = transfer;
->         p->func = func;
->         p->data = data;
-> @@ -159,6 +178,9 @@ static struct pending_request *pending_request_new(struct obc_session *session,
->
->  static void pending_request_free(struct pending_request *p)
->  {
-> +       if (p->process_free && p->process_data)
-> +               p->process_free(p->process_data);
-> +
->         if (p->transfer)
->                 obc_transfer_unregister(p->transfer);
->
-> @@ -168,6 +190,23 @@ static void pending_request_free(struct pending_request *p)
->         g_free(p);
->  }
->
-> +static void setpath_data_free(void *process_data)
-> +{
-> +       struct setpath_data *data = process_data;
-> +
-> +       g_strfreev(data->remaining);
-> +       g_free(data);
-> +}
-> +
-> +static void file_data_free(void *process_data)
-> +{
-> +       struct file_data *data = process_data;
-> +
-> +       g_free(data->srcname);
-> +       g_free(data->destname);
-> +       g_free(data);
-> +}
-> +
->  static void session_free(struct obc_session *session)
->  {
->         DBG("%p", session);
-> @@ -656,6 +695,15 @@ static gboolean session_queue_complete(gpointer data)
->         return FALSE;
->  }
->
-> +static int session_process_transfer(struct pending_request *p, GError **err)
-> +{
-> +       if (obc_transfer_start(p->transfer, p->session->obex, err)) {
-> +               p->session->p = p;
-> +               return 0;
-> +       }
-> +       return -1;
-> +}
-> +
->  guint obc_session_queue(struct obc_session *session,
->                                 struct obc_transfer *transfer,
->                                 session_callback_t func, void *user_data,
-> @@ -678,7 +726,8 @@ guint obc_session_queue(struct obc_session *session,
->
->         obc_transfer_set_callback(transfer, transfer_complete, session);
->
-> -       p = pending_request_new(session, transfer, func, user_data);
-> +       p = pending_request_new(session, session_process_transfer, NULL, NULL,
-> +                                               transfer, func, user_data);
->         g_queue_push_tail(session->queue, p);
->
->         if (session->queue_complete_id == 0)
-> @@ -703,12 +752,8 @@ static void session_process_queue(struct obc_session *session)
->         while ((p = g_queue_pop_head(session->queue))) {
->                 GError *gerr = NULL;
->
-> -               DBG("Transfer(%p) started", p->transfer);
-> -
-> -               if (obc_transfer_start(p->transfer, session->obex, &gerr)) {
-> -                       session->p = p;
-> +               if (p->process(p, &gerr) == 0)
->                         break;
-> -               }
->
->                 if (p->func)
->                         p->func(session, p->transfer, gerr, p->data);
-> @@ -864,9 +909,6 @@ static void setpath_complete(struct obc_session *session,
->         if (data->func)
->                 data->func(session, NULL, err, data->user_data);
->
-> -       g_strfreev(data->remaining);
-> -       g_free(data);
-> -
->         if (session->p == p)
->                 session->p = NULL;
->
-> @@ -918,13 +960,35 @@ static void setpath_cb(GObex *obex, GError *err, GObexPacket *rsp,
->         }
->  }
->
-> +static int session_process_setpath(struct pending_request *p, GError **err)
-> +{
-> +       struct setpath_data *req = p->process_data;
-> +       const char *first = "";
-> +
-> +       /* Relative path */
-> +       if (req->remaining[0][0] != '/')
-> +               first = req->remaining[req->index];
-> +       req->index++;
-> +
-> +       p->req_id = g_obex_setpath(p->session->obex, first, setpath_cb, p, err);
-> +       if (*err != NULL)
-> +               goto fail;
-> +
-> +       p->session->p = p;
-> +
-> +       return 0;
-> +
-> +fail:
-> +       pending_request_free(p);
-> +       return (*err)->code;
-> +}
-> +
->  guint obc_session_setpath(struct obc_session *session, const char *path,
->                                 session_callback_t func, void *user_data,
->                                 GError **err)
->  {
->         struct setpath_data *data;
->         struct pending_request *p;
-> -       const char *first = "";
->
->         if (session->obex == NULL) {
->                 g_set_error(err, OBEX_IO_ERROR, OBEX_IO_DISCONNECTED,
-> @@ -932,38 +996,20 @@ guint obc_session_setpath(struct obc_session *session, const char *path,
->                 return 0;
->         }
->
-> -       if (session->p != NULL) {
-> -               g_set_error(err, OBEX_IO_ERROR, OBEX_IO_BUSY,
-> -                                                       "Session busy");
-> -               return 0;
-> -       }
-> -
->         data = g_new0(struct setpath_data, 1);
->         data->func = func;
->         data->user_data = user_data;
->         data->remaining = g_strsplit(strlen(path) ? path : "/", "/", 0);
->
-> -       p = pending_request_new(session, NULL, setpath_complete, data);
-> -
-> -       /* Relative path */
-> -       if (path[0] != '/')
-> -               first = data->remaining[data->index];
-> -
-> -       data->index++;
-> -
-> -       p->req_id = g_obex_setpath(session->obex, first, setpath_cb, p, err);
-> -       if (*err != NULL)
-> -               goto fail;
-> +       p = pending_request_new(session, session_process_setpath, data,
-> +                       setpath_data_free, NULL, setpath_complete, data);
+OK, let's proceed this way.
 
-It just reinforce the idea that just one data is required as you have
-data twice here.
+>
+>> 4. Assuming (1) and (3) are acceptable, remove all internal
+>> audio-specific states and their callbacks (e.g. source_state_t,
+>> sink_state_t, avdtp_session_state_t...) and replace them with the core
+>> btd_service states.
+>
+> Sink and Source state will probably remain due to A2DP design of
+> Suspend/Start, but the other can probably be removed in favor of
+> service states.
 
-> +       g_queue_push_tail(session->queue, p);
->
-> -       session->p = p;
-> +       if (session->queue_complete_id == 0)
-> +               session->queue_complete_id = g_idle_add(
-> +                                       session_queue_complete, session);
->
->         return p->id;
-> -
-> -fail:
-> -       g_strfreev(data->remaining);
-> -       g_free(data);
-> -       pending_request_free(p);
-> -       return 0;
->  }
->
->  static void async_cb(GObex *obex, GError *err, GObexPacket *rsp,
-> @@ -1000,10 +1046,29 @@ done:
->         session_process_queue(session);
->  }
->
-> +static int session_process_mkdir(struct pending_request *p, GError **err)
-> +{
-> +       struct file_data *req = p->process_data;
-> +
-> +       p->req_id = g_obex_mkdir(p->session->obex, req->srcname, async_cb, p,
-> +                                                                       err);
-> +       if (*err != NULL)
-> +               goto fail;
-> +
-> +       p->session->p = p;
-> +
-> +       return 0;
-> +
-> +fail:
-> +       pending_request_free(p);
-> +       return (*err)->code;
-> +}
-> +
->  guint obc_session_mkdir(struct obc_session *session, const char *folder,
->                                 session_callback_t func, void *user_data,
->                                 GError **err)
->  {
-> +       struct file_data *data;
->         struct pending_request *p;
->
->         if (session->obex == NULL) {
-> @@ -1012,28 +1077,43 @@ guint obc_session_mkdir(struct obc_session *session, const char *folder,
->                 return 0;
->         }
->
-> -       if (session->p != NULL) {
-> -               g_set_error(err, OBEX_IO_ERROR, OBEX_IO_BUSY, "Session busy");
-> -               return 0;
-> -       }
-> -
-> +       data = g_new0(struct file_data, 1);
-> +       data->srcname = g_strdup(folder);
->
-> -       p = pending_request_new(session, NULL, func, user_data);
-> +       p = pending_request_new(session, session_process_mkdir, data,
-> +                                       file_data_free, NULL, func, user_data);
-> +       g_queue_push_tail(session->queue, p);
->
-> -       p->req_id = g_obex_mkdir(session->obex, folder, async_cb, p, err);
-> -       if (*err != NULL) {
-> -               pending_request_free(p);
-> -               return 0;
-> -       }
-> +       if (session->queue_complete_id == 0)
-> +               session->queue_complete_id = g_idle_add(
-> +                                       session_queue_complete, session);
->
-> -       session->p = p;
->         return p->id;
->  }
->
-> +static int session_process_copy(struct pending_request *p, GError **err)
-> +{
-> +       struct file_data *req = p->process_data;
-> +
-> +       p->req_id = g_obex_copy(p->session->obex, req->srcname, req->destname,
-> +                                                       async_cb, p, err);
-> +       if (*err != NULL)
-> +               goto fail;
-> +
-> +       p->session->p = p;
-> +
-> +       return 0;
-> +
-> +fail:
-> +       pending_request_free(p);
-> +       return (*err)->code;
-> +}
-> +
->  guint obc_session_copy(struct obc_session *session, const char *srcname,
->                                 const char *destname, session_callback_t func,
->                                 void *user_data, GError **err)
->  {
-> +       struct file_data *data;
->         struct pending_request *p;
->
->         if (session->obex == NULL) {
-> @@ -1042,28 +1122,44 @@ guint obc_session_copy(struct obc_session *session, const char *srcname,
->                 return 0;
->         }
->
-> -       if (session->p != NULL) {
-> -               g_set_error(err, OBEX_IO_ERROR, OBEX_IO_BUSY, "Session busy");
-> -               return 0;
-> -       }
-> +       data = g_new0(struct file_data, 1);
-> +       data->srcname = g_strdup(srcname);
-> +       data->destname = g_strdup(destname);
->
-> -       p = pending_request_new(session, NULL, func, user_data);
-> +       p = pending_request_new(session, session_process_copy, data,
-> +                                       file_data_free, NULL, func, user_data);
-> +       g_queue_push_tail(session->queue, p);
->
-> -       p->req_id = g_obex_copy(session->obex, srcname, destname, async_cb, p,
-> -                                                                       err);
-> -       if (*err != NULL) {
-> -               pending_request_free(p);
-> -               return 0;
-> -       }
-> +       if (session->queue_complete_id == 0)
-> +               session->queue_complete_id = g_idle_add(
-> +                                       session_queue_complete, session);
->
-> -       session->p = p;
->         return p->id;
->  }
->
-> +static int session_process_move(struct pending_request *p, GError **err)
-> +{
-> +       struct file_data *req = p->process_data;
-> +
-> +       p->req_id = g_obex_move(p->session->obex, req->srcname, req->destname,
-> +                                                       async_cb, p, err);
-> +       if (*err != NULL)
-> +               goto fail;
-> +
-> +       p->session->p = p;
-> +
-> +       return 0;
-> +
-> +fail:
-> +       pending_request_free(p);
-> +       return (*err)->code;
-> +}
-> +
->  guint obc_session_move(struct obc_session *session, const char *srcname,
->                                 const char *destname, session_callback_t func,
->                                 void *user_data, GError **err)
->  {
-> +       struct file_data *data;
->         struct pending_request *p;
->
->         if (session->obex == NULL) {
-> @@ -1072,28 +1168,44 @@ guint obc_session_move(struct obc_session *session, const char *srcname,
->                 return 0;
->         }
->
-> -       if (session->p != NULL) {
-> -               g_set_error(err, OBEX_IO_ERROR, OBEX_IO_BUSY, "Session busy");
-> -               return 0;
-> -       }
-> +       data = g_new0(struct file_data, 1);
-> +       data->srcname = g_strdup(srcname);
-> +       data->destname = g_strdup(destname);
->
-> -       p = pending_request_new(session, NULL, func, user_data);
-> +       p = pending_request_new(session, session_process_move, data,
-> +                                       file_data_free, NULL, func, user_data);
-> +       g_queue_push_tail(session->queue, p);
->
-> -       p->req_id = g_obex_move(session->obex, srcname, destname, async_cb, p,
-> -                                                                       err);
-> -       if (*err != NULL) {
-> -               pending_request_free(p);
-> -               return 0;
-> -       }
-> +       if (session->queue_complete_id == 0)
-> +               session->queue_complete_id = g_idle_add(
-> +                                       session_queue_complete, session);
->
-> -       session->p = p;
->         return p->id;
->  }
->
-> +static int session_process_delete(struct pending_request *p, GError **err)
-> +{
-> +       struct file_data *req = p->process_data;
-> +
-> +       p->req_id = g_obex_delete(p->session->obex, req->srcname, async_cb, p,
-> +                                                                       err);
-> +       if (*err != NULL)
-> +               goto fail;
-> +
-> +       p->session->p = p;
-> +
-> +       return 0;
-> +
-> +fail:
-> +       pending_request_free(p);
-> +       return (*err)->code;
-> +}
-> +
->  guint obc_session_delete(struct obc_session *session, const char *file,
->                                 session_callback_t func, void *user_data,
->                                 GError **err)
->  {
-> +       struct file_data *data;
->         struct pending_request *p;
->
->         if (session->obex == NULL) {
-> @@ -1102,20 +1214,17 @@ guint obc_session_delete(struct obc_session *session, const char *file,
->                 return 0;
->         }
->
-> -       if (session->p != NULL) {
-> -               g_set_error(err, OBEX_IO_ERROR, OBEX_IO_BUSY, "Session busy");
-> -               return 0;
-> -       }
-> +       data = g_new0(struct file_data, 1);
-> +       data->srcname = g_strdup(file);
->
-> -       p = pending_request_new(session, NULL, func, user_data);
-> +       p = pending_request_new(session, session_process_delete, data,
-> +                                       file_data_free, NULL, func, user_data);
-> +       g_queue_push_tail(session->queue, p);
->
-> -       p->req_id = g_obex_delete(session->obex, file, async_cb, p, err);
-> -       if (*err != NULL) {
-> -               pending_request_free(p);
-> -               return 0;
-> -       }
-> +       if (session->queue_complete_id == 0)
-> +               session->queue_complete_id = g_idle_add(
-> +                                       session_queue_complete, session);
+OK.
 
-Those line above repeat for every you queue the operations so perhaps
-we need a helper functions or just make pending_request_new to do this
-automatically. Btw I think you can split this into multiple patches,
-you can probably pass NULL as process callback then you add
-specialized process callback one by one in the following patches.
+>
+>> 5. Extend the core with something like btd_server, which is analogous
+>> to btd_service but representing local profile implementations. This is
+>> an orthogonal discussion but I believe the audio profiles could
+>> benefit a lot from this infrastructure as well.
+>
+> Well ultimately I would like to have the core doing the connection
+> management for plugins as it does for external profiles, perhaps this
+> is your idea with btd_server as well, but for that to happen we would
+> need a bit more logic for handling records that have several PSMs to
+> be listen or those that can receive multiple connections such as A2DP.
 
+I think the idea is basically the same, and as you suggest we would
+require the support of multiple PSMs. I'll try to elaborate this idea
+and see if I can submit a RFC as a base for further discussions.
 
---
-Luiz Augusto von Dentz
+Cheers,
+Mikel
