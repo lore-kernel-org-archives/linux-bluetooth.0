@@ -3,42 +3,46 @@ From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: emilio.pozuelo@collabora.co.uk,
 	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 4/4] opp: Register Session interface for OPP transfers
-Date: Mon, 27 May 2013 20:07:04 -0300
-Message-Id: <1369696024-27434-4-git-send-email-gustavo@padovan.org>
-In-Reply-To: <1369696024-27434-1-git-send-email-gustavo@padovan.org>
-References: <1369696024-27434-1-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 1/4] session: only add Target if it exists
+Date: Mon, 27 May 2013 20:07:01 -0300
+Message-Id: <1369696024-27434-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-The Session interface wasn't registered when a new transfer arrives.
 ---
- obexd/plugins/opp.c | 3 +++
- 1 file changed, 3 insertions(+)
+ obexd/src/manager.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/obexd/plugins/opp.c b/obexd/plugins/opp.c
-index 97bf943..ee0204c 100644
---- a/obexd/plugins/opp.c
-+++ b/obexd/plugins/opp.c
-@@ -46,6 +46,8 @@
- 
- static void *opp_connect(struct obex_session *os, int *err)
- {
-+	manager_register_session(os);
-+
- 	if (err)
- 		*err = 0;
- 
-@@ -154,6 +156,7 @@ static int opp_get(struct obex_session *os, void *user_data)
- static void opp_disconnect(struct obex_session *os, void *user_data)
- {
- 	manager_unregister_transfer(user_data);
-+	manager_unregister_session(os);
+diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+index b67567b..b86565c 100644
+--- a/obexd/src/manager.c
++++ b/obexd/src/manager.c
+@@ -265,6 +265,14 @@ static DBusMessage *unregister_agent(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
  }
  
- static void opp_reset(struct obex_session *os, void *user_data)
++static gboolean session_target_exists(const GDBusPropertyTable *property,
++								void *data)
++{
++	struct obex_session *os = data;
++
++	return os->service->target ? TRUE : FALSE;
++}
++
+ static char *target2str(const uint8_t *t)
+ {
+ 	if (!t)
+@@ -521,7 +529,7 @@ static const GDBusPropertyTable transfer_properties[] = {
+ };
+ 
+ static const GDBusPropertyTable session_properties[] = {
+-	{ "Target", "s", get_target },
++	{ "Target", "s", get_target, NULL, session_target_exists },
+ 	{ "Root", "s", get_root },
+ 	{ }
+ };
 -- 
 1.8.1.4
 
