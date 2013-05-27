@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 03/13] AVRCP: Add support for GetFolderItems command
-Date: Mon, 27 May 2013 14:33:53 +0300
-Message-Id: <1369654443-11514-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 04/13] player: Add implementation of MediaFolder.ListItems
+Date: Mon, 27 May 2013 14:33:54 +0300
+Message-Id: <1369654443-11514-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1369654443-11514-1-git-send-email-luiz.dentz@gmail.com>
 References: <1369654443-11514-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,270 +11,222 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support for GetFolderItems command via player callback.
 ---
- profiles/audio/avrcp.c  | 197 +++++++++++++++++++++++++++++++++++++++++++++++-
+ profiles/audio/avrcp.c  |   2 +
+ profiles/audio/player.c | 135 +++++++++++++++++++++++++++++++++++++++++++++++-
  profiles/audio/player.h |   2 +
- 2 files changed, 195 insertions(+), 4 deletions(-)
+ 3 files changed, 137 insertions(+), 2 deletions(-)
 
 diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 5477016..9b54ae9 100644
+index 9b54ae9..f86dc9a 100644
 --- a/profiles/audio/avrcp.c
 +++ b/profiles/audio/avrcp.c
-@@ -177,14 +177,24 @@ struct pending_pdu {
- 	uint16_t offset;
+@@ -2135,6 +2135,8 @@ static gboolean avrcp_list_items_rsp(struct avctp *conn, uint8_t *operands,
+ 	}
+ 
+ done:
++	media_player_list_complete(player->user_data, p->items);
++
+ 	g_slist_free(p->items);
+ 	g_free(p);
+ 	player->p = NULL;
+diff --git a/profiles/audio/player.c b/profiles/audio/player.c
+index 3944807..fcaee5c 100644
+--- a/profiles/audio/player.c
++++ b/profiles/audio/player.c
+@@ -74,6 +74,7 @@ struct media_folder {
+ 	uint32_t		number_of_items;/* Number of items */
+ 	GSList			*subfolders;
+ 	GSList			*items;
++	DBusMessage		*msg;
  };
  
-+struct pending_list_items {
-+	GSList *items;
-+	uint32_t start;
-+	uint32_t end;
-+};
-+
- struct avrcp_player {
- 	struct avrcp_server *server;
- 	GSList *sessions;
- 	uint16_t id;
-+	uint8_t scope;
-+	uint64_t uid;
- 	uint16_t uid_counter;
- 	bool browsed;
- 	uint8_t *features;
- 
-+	struct pending_list_items *p;
-+
- 	struct avrcp_player_cb *cb;
- 	void *user_data;
- 	GDestroyNotify destroy;
-@@ -2013,6 +2023,158 @@ static const char *subtype_to_string(uint32_t subtype)
- 	return "None";
+ struct media_player {
+@@ -569,6 +570,57 @@ static DBusMessage *media_player_rewind(DBusConnection *conn, DBusMessage *msg,
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
  }
  
-+static struct media_item *parse_media_element(struct avrcp *session,
-+					uint8_t *operands, uint16_t len)
++static void parse_folder_list(gpointer data, gpointer user_data)
 +{
-+	struct avrcp_player *player;
-+	struct media_player *mp;
-+	uint16_t namelen;
-+	char name[255];
-+	uint64_t uid;
++	struct media_item *item = data;
++	DBusMessageIter *array = user_data;
++	DBusMessageIter entry;
 +
-+	if (len < 13)
-+		return NULL;
++	dbus_message_iter_open_container(array, DBUS_TYPE_DICT_ENTRY, NULL,
++								&entry);
 +
-+	uid = bt_get_be64(&operands[0]);
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_OBJECT_PATH,
++								&item->path);
 +
-+	namelen = MIN(bt_get_be16(&operands[11]), sizeof(name) - 1);
-+	if (namelen > 0) {
-+		memcpy(name, &operands[13], namelen);
-+		name[namelen] = '\0';
-+	}
++	g_dbus_get_properties(btd_get_dbus_connection(), item->path,
++						MEDIA_ITEM_INTERFACE, &entry);
 +
-+	player = session->player;
-+	mp = player->user_data;
-+
-+	return media_player_create_item(mp, name, PLAYER_ITEM_TYPE_AUDIO, uid);
++	dbus_message_iter_close_container(array, &entry);
 +}
 +
-+static struct media_item *parse_media_folder(struct avrcp *session,
-+					uint8_t *operands, uint16_t len)
++void media_player_list_complete(struct media_player *mp, GSList *items)
 +{
-+	struct avrcp_player *player = session->player;
-+	struct media_player *mp = player->user_data;
-+	uint16_t namelen;
-+	char name[255];
-+	uint64_t uid;
-+	uint8_t type;
++	struct media_folder *folder = mp->scope;
++	DBusMessage *reply;
++	DBusMessageIter iter, array;
 +
-+	if (len < 12)
-+		return NULL;
++	if (folder == NULL || folder->msg == NULL)
++		return;
 +
-+	uid = bt_get_be64(&operands[0]);
-+	type = operands[9];
++	reply = dbus_message_new_method_return(folder->msg);
 +
-+	namelen = MIN(bt_get_be16(&operands[12]), sizeof(name) - 1);
-+	if (namelen > 0) {
-+		memcpy(name, &operands[14], namelen);
-+		name[namelen] = '\0';
-+	}
++	dbus_message_iter_init_append(reply, &iter);
 +
-+	return media_player_create_folder(mp, name, type, uid);
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
++					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++					DBUS_TYPE_OBJECT_PATH_AS_STRING
++					DBUS_TYPE_ARRAY_AS_STRING
++					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++					DBUS_TYPE_STRING_AS_STRING
++					DBUS_TYPE_VARIANT_AS_STRING
++					DBUS_DICT_ENTRY_END_CHAR_AS_STRING
++					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
++					&array);
++
++	g_slist_foreach(items, parse_folder_list, &array);
++	dbus_message_iter_close_container(&iter, &array);
++
++	g_dbus_send_message(btd_get_dbus_connection(), reply);
++
++	dbus_message_unref(folder->msg);
++	folder->msg = NULL;
 +}
 +
-+static void avrcp_list_items(struct avrcp *session, uint32_t start,
-+								uint32_t end);
-+static gboolean avrcp_list_items_rsp(struct avctp *conn, uint8_t *operands,
-+					size_t operand_count, void *user_data)
+ static const GDBusMethodTable media_player_methods[] = {
+ 	{ GDBUS_EXPERIMENTAL_METHOD("Play", NULL, NULL, media_player_play) },
+ 	{ GDBUS_EXPERIMENTAL_METHOD("Pause", NULL, NULL, media_player_pause) },
+@@ -625,10 +677,83 @@ static DBusMessage *media_folder_search(DBusConnection *conn, DBusMessage *msg,
+ 	return btd_error_failed(msg, strerror(ENOTSUP));
+ }
+ 
++static int parse_filters(struct media_player *player, DBusMessageIter *iter,
++						uint32_t *start, uint32_t *end)
 +{
-+	struct avrcp_browsing_header *pdu = (void *) operands;
-+	struct avrcp *session = user_data;
-+	struct avrcp_player *player = session->player;
-+	struct pending_list_items *p = player->p;
-+	uint16_t count;
-+	uint32_t items, total;
-+	size_t i;
++	struct media_folder *folder = player->scope;
++	DBusMessageIter dict;
++	int ctype;
 +
-+	if (pdu->params[0] != AVRCP_STATUS_SUCCESS || operand_count < 5)
-+		goto done;
++	*start = 0;
++	*end = folder->number_of_items ? folder->number_of_items : UINT32_MAX;
 +
-+	count = bt_get_be16(&operands[6]);
-+	if (count == 0)
-+		goto done;
-+
-+	for (i = 8; count && i + 3 < operand_count; count--) {
-+		struct media_item *item;
-+		uint8_t type;
-+		uint16_t len;
-+
-+		type = operands[i++];
-+		len = bt_get_be16(&operands[i]);
-+		i += 2;
-+
-+		if (type != 0x03 && type != 0x02) {
-+			i += len;
-+			continue;
-+		}
-+
-+		if (i + len > operand_count) {
-+			error("Invalid item length");
-+			break;
-+		}
-+
-+		if (type == 0x03)
-+			item = parse_media_element(session, &operands[i], len);
-+		else if (type == 0x02)
-+			item = parse_media_folder(session, &operands[i], len);
-+
-+		if (item) {
-+			if (g_slist_find(p->items, item))
-+				goto done;
-+			p->items = g_slist_append(p->items, item);
-+		}
-+
-+		i += len;
-+	}
-+
-+	items = g_slist_length(p->items);
-+	total = p->end - p->start;
-+	if (items < total) {
-+		avrcp_list_items(session, p->start + items + 1, p->end);
++	ctype = dbus_message_iter_get_arg_type(iter);
++	if (ctype != DBUS_TYPE_ARRAY)
 +		return FALSE;
++
++	dbus_message_iter_recurse(iter, &dict);
++
++	while ((ctype = dbus_message_iter_get_arg_type(&dict)) !=
++							DBUS_TYPE_INVALID) {
++		DBusMessageIter entry;
++		const char *key;
++
++		if (ctype != DBUS_TYPE_DICT_ENTRY)
++			return -EINVAL;
++
++		dbus_message_iter_recurse(&dict, &entry);
++		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_STRING)
++			return -EINVAL;
++
++		dbus_message_iter_get_basic(&entry, &key);
++		dbus_message_iter_next(&entry);
++
++		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_UINT32)
++			return -EINVAL;
++
++		if (strcasecmp(key, "Start") == 0)
++			dbus_message_iter_get_basic(&entry, start);
++		else if (strcasecmp(key, "End") == 0)
++			dbus_message_iter_get_basic(&entry, end);
++
++		dbus_message_iter_next(&dict);
 +	}
 +
-+done:
-+	g_slist_free(p->items);
-+	g_free(p);
-+	player->p = NULL;
-+
-+	return FALSE;
-+}
-+
-+static void avrcp_list_items(struct avrcp *session, uint32_t start,
-+								uint32_t end)
-+{
-+	uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + 10 +
-+			AVRCP_MEDIA_ATTRIBUTE_LAST * sizeof(uint32_t)];
-+	struct avrcp_player *player = session->player;
-+	struct avrcp_browsing_header *pdu = (void *) buf;
-+	uint16_t length = AVRCP_BROWSING_HEADER_LENGTH + 10;
-+	uint32_t attribute;
-+
-+	memset(buf, 0, sizeof(buf));
-+
-+	pdu->pdu_id = AVRCP_GET_FOLDER_ITEMS;
-+	pdu->param_len = htons(10 + sizeof(uint32_t));
-+
-+	pdu->params[0] = player->scope;
-+
-+	bt_put_be32(start, &pdu->params[1]);
-+	bt_put_be32(end, &pdu->params[5]);
-+
-+	pdu->params[9] = 1;
-+
-+	/* Only the title (0x01) is mandatory. This can be extended to
-+	 * support AVRCP_MEDIA_ATTRIBUTE_* attributes */
-+	attribute = htonl(AVRCP_MEDIA_ATTRIBUTE_TITLE);
-+	memcpy(&pdu->params[10], &attribute, sizeof(uint32_t));
-+
-+	length += sizeof(uint32_t);
-+
-+	avctp_send_browsing_req(session->conn, buf, length,
-+					avrcp_list_items_rsp, session);
-+}
-+
- static gboolean avrcp_set_browsed_player_rsp(struct avctp *conn,
- 						uint8_t *operands,
- 						size_t operand_count,
-@@ -2270,6 +2432,33 @@ static int ct_rewind(struct media_player *mp, void *user_data)
- 	return ct_press(player, AVC_REWIND);
- }
- 
-+static int ct_list_items(struct media_player *mp, const char *name,
-+				uint32_t start, uint32_t end, void *user_data)
-+{
-+	struct avrcp_player *player = user_data;
-+	struct avrcp *session;
-+	struct pending_list_items *p;
-+
-+	if (player->p != NULL)
-+		return -EBUSY;
-+
-+	session = player->sessions->data;
-+
-+	if (g_str_has_prefix(name, "/NowPlaying"))
-+		player->scope = 0x03;
-+	else
-+		player->scope = 0x01;
-+
-+	avrcp_list_items(session, start, end);
-+
-+	p = g_new0(struct pending_list_items, 1);
-+	p->start = start;
-+	p->end = end;
-+	player->p = p;
++	if (folder->number_of_items > 0 && *end > folder->number_of_items)
++		*end = folder->number_of_items;
 +
 +	return 0;
 +}
 +
- static const struct media_player_callback ct_cbs = {
- 	.set_setting	= ct_set_setting,
- 	.play		= ct_play,
-@@ -2279,6 +2468,7 @@ static const struct media_player_callback ct_cbs = {
- 	.previous	= ct_previous,
- 	.fast_forward	= ct_fast_forward,
- 	.rewind		= ct_rewind,
-+	.list_items	= ct_list_items,
- };
- 
- static struct avrcp_player *create_ct_player(struct avrcp *session,
-@@ -2495,11 +2685,10 @@ static void avrcp_status_changed(struct avrcp *session,
- static void avrcp_track_changed(struct avrcp *session,
- 						struct avrcp_header *pdu)
+ static DBusMessage *media_folder_list_items(DBusConnection *conn,
+ 						DBusMessage *msg, void *data)
  {
--	uint64_t uid;
--
- 	if (session->browsing_id) {
--		uid = bt_get_be64(&pdu->params[1]);
--		avrcp_get_item_attributes(session, uid);
-+		struct avrcp_player *player = session->player;
-+		player->uid = bt_get_be64(&pdu->params[1]);
-+		avrcp_get_item_attributes(session, player->uid);
- 	} else
- 		avrcp_get_element_attributes(session);
+-	return btd_error_failed(msg, strerror(ENOTSUP));
++	struct media_player *mp = data;
++	struct media_folder *folder = mp->scope;
++	struct player_callback *cb = mp->cb;
++	DBusMessageIter iter;
++	uint32_t start, end;
++	int err;
++
++	dbus_message_iter_init(msg, &iter);
++
++	if (parse_filters(mp, &iter, &start, &end) < 0)
++		return btd_error_invalid_args(msg);
++
++	if (cb->cbs->list_items == NULL)
++		return btd_error_not_supported(msg);
++
++	if (folder->msg != NULL)
++		return btd_error_failed(msg, strerror(EBUSY));
++
++	err = cb->cbs->list_items(mp, folder->item->name, start, end,
++							cb->user_data);
++	if (err < 0)
++		return btd_error_failed(msg, strerror(-err));
++
++	folder->msg = dbus_message_ref(msg);
++
++	return NULL;
  }
+ 
+ static struct media_folder *
+@@ -696,6 +821,9 @@ static void media_folder_destroy(void *data)
+ 	g_slist_free_full(folder->subfolders, media_folder_destroy);
+ 	g_slist_free_full(folder->items, media_item_destroy);
+ 
++	if (folder->msg != NULL)
++		dbus_message_unref(folder->msg);
++
+ 	media_item_destroy(folder->item);
+ 	g_free(folder);
+ }
+@@ -795,7 +923,7 @@ static const GDBusMethodTable media_folder_methods[] = {
+ 			GDBUS_ARGS({ "string", "s" }, { "filter", "a{sv}" }),
+ 			GDBUS_ARGS({ "folder", "o" }),
+ 			media_folder_search) },
+-	{ GDBUS_EXPERIMENTAL_METHOD("ListItems",
++	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("ListItems",
+ 			GDBUS_ARGS({ "filter", "a{sv}" }),
+ 			GDBUS_ARGS({ "items", "a{oa{sv}}" }),
+ 			media_folder_list_items) },
+@@ -830,6 +958,9 @@ static void media_player_set_scope(struct media_player *mp,
+ 		return;
+ 	}
+ 
++	if (mp->scope->msg != NULL)
++		return;
++
+ 	return media_player_change_scope(mp, folder);
+ }
+ 
 diff --git a/profiles/audio/player.h b/profiles/audio/player.h
-index 6e44308..e7a885e 100644
+index e7a885e..0f75f4f 100644
 --- a/profiles/audio/player.h
 +++ b/profiles/audio/player.h
-@@ -54,6 +54,8 @@ struct media_player_callback {
- 	int (*previous) (struct media_player *mp, void *user_data);
- 	int (*fast_forward) (struct media_player *mp, void *user_data);
- 	int (*rewind) (struct media_player *mp, void *user_data);
-+	int (*list_items) (struct media_player *mp, const char *name,
-+				uint32_t start, uint32_t end, void *user_data);
- };
+@@ -87,6 +87,8 @@ struct media_item *media_player_create_item(struct media_player *mp,
+ 						player_item_type_t type,
+ 						uint64_t uid);
  
- struct media_player *media_player_controller_create(const char *path,
++void media_player_list_complete(struct media_player *mp, GSList *items);
++
+ void media_player_set_callbacks(struct media_player *mp,
+ 				const struct media_player_callback *cbs,
+ 				void *user_data);
 -- 
 1.8.1.4
 
