@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH BlueZ v0 5/6] scanparam: Use btd_service userdata pointer
-Date: Mon, 27 May 2013 14:04:08 +0200
-Message-Id: <1369656249-27980-6-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [PATCH BlueZ v0 6/6] input: Use btd_service userdata pointer
+Date: Mon, 27 May 2013 14:04:09 +0200
+Message-Id: <1369656249-27980-7-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1369656249-27980-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1369656249-27980-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,86 +12,104 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Avoid maintaining an internal list of probed struct scan instances by
+Avoid maintaining an internal list of probed input_device instances by
 making use of btd_service's userdata pointer.
 ---
- profiles/scanparam/scan.c | 36 ++++++------------------------------
- 1 file changed, 6 insertions(+), 30 deletions(-)
+ profiles/input/device.c | 37 ++++++++++---------------------------
+ 1 file changed, 10 insertions(+), 27 deletions(-)
 
-diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
-index a9baec8..fc4779f 100644
---- a/profiles/scanparam/scan.c
-+++ b/profiles/scanparam/scan.c
-@@ -64,16 +64,6 @@ struct scan {
- 	uint16_t refresh_cb_id;
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index 498c226..7c3130c 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -41,6 +41,7 @@
+ 
+ #include "log.h"
+ 
++#include "lib/uuid.h"
+ #include "../src/adapter.h"
+ #include "../src/device.h"
+ #include "../src/profile.h"
+@@ -84,7 +85,6 @@ struct input_device {
+ 	uint32_t		reconnect_attempt;
  };
  
--static GSList *servers = NULL;
--
--static int scan_device_cmp(gconstpointer a, gconstpointer b)
+-static GSList *devices = NULL;
+ static int idle_timeout = 0;
+ 
+ void input_set_idle_timeout(int timeout)
+@@ -94,18 +94,6 @@ void input_set_idle_timeout(int timeout)
+ 
+ static void input_device_enter_reconnect_mode(struct input_device *idev);
+ 
+-static struct input_device *find_device_by_path(GSList *list, const char *path)
 -{
--	const struct scan *scan = a;
--	const struct btd_device *device = b;
+-	for (; list; list = list->next) {
+-		struct input_device *idev = list->data;
 -
--	return (device == scan->device ? 0 : -1);
+-		if (!strcmp(idev->path, path))
+-			return idev;
+-	}
+-
+-	return NULL;
 -}
 -
- static void write_scan_params(GAttrib *attrib, uint16_t handle)
+ static void input_device_free(struct input_device *idev)
  {
- 	uint8_t value[4];
-@@ -227,8 +217,9 @@ static void attio_disconnected_cb(gpointer user_data)
- 	scan->attrib = NULL;
- }
+ 	if (idev->dc_id)
+@@ -863,10 +851,6 @@ int input_device_register(struct btd_service *service)
  
--static int scan_register(struct btd_device *device, struct gatt_primary *prim)
-+static int scan_register(struct btd_service *service, struct gatt_primary *prim)
- {
-+	struct btd_device *device = btd_service_get_device(service);
- 	struct scan *scan;
+ 	DBG("%s", path);
  
- 	scan = g_new0(struct scan, 1);
-@@ -239,22 +230,14 @@ static int scan_register(struct btd_device *device, struct gatt_primary *prim)
- 							attio_disconnected_cb,
- 							scan);
+-	idev = find_device_by_path(devices, path);
+-	if (idev)
+-		return -EEXIST;
+-
+ 	idev = input_device_new(service);
+ 	if (!idev)
+ 		return -EINVAL;
+@@ -883,24 +867,24 @@ int input_device_register(struct btd_service *service)
  
--	servers = g_slist_prepend(servers, scan);
-+	btd_service_set_user_data(service, scan);
+ 	btd_service_set_user_data(service, idev);
  
+-	devices = g_slist_append(devices, idev);
+-
  	return 0;
  }
  
--static void scan_unregister(struct btd_device *device)
-+static void scan_param_remove(struct btd_service *service)
+ static struct input_device *find_device(const bdaddr_t *src,
+ 					const bdaddr_t *dst)
  {
--	struct scan *scan;
--	GSList *l;
--
--	l = g_slist_find_custom(servers, device, scan_device_cmp);
--	if (l == NULL)
--		return;
--
--	scan = l->data;
--	servers = g_slist_remove(servers, scan);
-+	struct scan *scan = btd_service_get_user_data(service);
+-	GSList *list;
++	struct btd_device *device;
++	struct btd_service *service;
  
- 	if (scan->refresh_cb_id) {
- 		g_attrib_unregister(scan->attrib, scan->refresh_cb_id);
-@@ -278,14 +261,7 @@ static int scan_param_probe(struct btd_service *service)
- 	if (!prim)
- 		return -EINVAL;
+-	for (list = devices; list != NULL; list = list->next) {
+-		struct input_device *idev = list->data;
++	device = adapter_find_device(adapter_find(src), dst);
++	if (device == NULL)
++		return NULL;
  
--	return scan_register(device, prim);
--}
--
--static void scan_param_remove(struct btd_service *service)
--{
--	struct btd_device *device = btd_service_get_device(service);
--
--	scan_unregister(device);
-+	return scan_register(service, prim);
+-		if (!bacmp(&idev->src, src) && !bacmp(&idev->dst, dst))
+-			return idev;
+-	}
++	service = btd_device_get_service(device, HID_UUID);
++	if (service == NULL)
++		return NULL;
+ 
+-	return NULL;
++	return btd_service_get_user_data(service);
  }
  
- static struct btd_profile scan_profile = {
+ void input_device_unregister(struct btd_service *service)
+@@ -914,7 +898,6 @@ void input_device_unregister(struct btd_service *service)
+ 	g_dbus_unregister_interface(btd_get_dbus_connection(),
+ 						idev->path, INPUT_INTERFACE);
+ 
+-	devices = g_slist_remove(devices, idev);
+ 	input_device_free(idev);
+ }
+ 
 -- 
 1.8.1.4
 
