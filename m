@@ -3,9 +3,9 @@ From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: emilio.pozuelo@collabora.co.uk,
 	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 2/4] obex: extract src and dst address and store it
-Date: Mon, 27 May 2013 20:07:02 -0300
-Message-Id: <1369696024-27434-2-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 4/4] opp: Register Session interface for OPP transfers
+Date: Mon, 27 May 2013 20:07:04 -0300
+Message-Id: <1369696024-27434-4-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1369696024-27434-1-git-send-email-gustavo@padovan.org>
 References: <1369696024-27434-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,59 +13,32 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-This commit creates src and dst members in obex_session to later use them
-to export via Session D-Bus API.
+The Session interface wasn't registered when a new transfer arrives.
 ---
- obexd/src/obex-priv.h | 2 ++
- obexd/src/obex.c      | 8 ++++++++
- 2 files changed, 10 insertions(+)
+ obexd/plugins/opp.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/obexd/src/obex-priv.h b/obexd/src/obex-priv.h
-index 41854bc..90aa225 100644
---- a/obexd/src/obex-priv.h
-+++ b/obexd/src/obex-priv.h
-@@ -27,6 +27,8 @@ struct obex_session {
- 	uint32_t id;
- 	uint8_t cmd;
- 	uint8_t action_id;
-+	char src[18];
-+	char dst[18];
- 	char *name;
- 	char *destname;
- 	char *type;
-diff --git a/obexd/src/obex.c b/obexd/src/obex.c
-index a3e7b0e..b08a412 100644
---- a/obexd/src/obex.c
-+++ b/obexd/src/obex.c
-@@ -40,6 +40,7 @@
- #include <inttypes.h>
+diff --git a/obexd/plugins/opp.c b/obexd/plugins/opp.c
+index 97bf943..ee0204c 100644
+--- a/obexd/plugins/opp.c
++++ b/obexd/plugins/opp.c
+@@ -46,6 +46,8 @@
  
- #include <glib.h>
-+#include <bluetooth.h>
- #include <btio/btio.h>
- #include <gobex/gobex.h>
- 
-@@ -1102,6 +1103,7 @@ int obex_session_start(GIOChannel *io, uint16_t tx_mtu, uint16_t rx_mtu,
- 	GObex *obex;
- 	GObexTransportType type;
- 	static uint32_t id = 0;
-+	bdaddr_t src, dst;
- 
- 	DBG("");
- 
-@@ -1134,6 +1136,12 @@ int obex_session_start(GIOChannel *io, uint16_t tx_mtu, uint16_t rx_mtu,
- 	os->obex = obex;
- 	os->io = g_io_channel_ref(io);
- 
-+	bt_io_get(io, NULL, BT_IO_OPT_SOURCE_BDADDR, &src,
-+			BT_IO_OPT_DEST_BDADDR, &dst, BT_IO_OPT_INVALID);
+ static void *opp_connect(struct obex_session *os, int *err)
+ {
++	manager_register_session(os);
 +
-+	ba2str(&src, os->src);
-+	ba2str(&dst, os->dst);
-+
- 	sessions = g_slist_prepend(sessions, os);
+ 	if (err)
+ 		*err = 0;
  
- 	return 0;
+@@ -154,6 +156,7 @@ static int opp_get(struct obex_session *os, void *user_data)
+ static void opp_disconnect(struct obex_session *os, void *user_data)
+ {
+ 	manager_unregister_transfer(user_data);
++	manager_unregister_session(os);
+ }
+ 
+ static void opp_reset(struct obex_session *os, void *user_data)
 -- 
 1.8.1.4
 
