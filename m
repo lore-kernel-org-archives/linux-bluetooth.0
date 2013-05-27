@@ -1,48 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: emilio.pozuelo@collabora.co.uk,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 1/4] session: only add Target if it exists
-Date: Mon, 27 May 2013 20:07:01 -0300
-Message-Id: <1369696024-27434-1-git-send-email-gustavo@padovan.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
+Subject: Re: [RFC 1/2] doc: Add reauthentication commands and event to Management API
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <24461786.QnjOjE6FNW@athlon>
+Date: Tue, 28 May 2013 03:57:24 +0900
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <849D1D9E-D8A0-491B-9BCF-13878A536A54@holtmann.org>
+References: <1368566595-8836-1-git-send-email-szymon.janc@gmail.com> <1368566595-8836-2-git-send-email-szymon.janc@gmail.com> <20130514231538.GA395@samus.indt.org> <24461786.QnjOjE6FNW@athlon>
+To: Szymon Janc <szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Hi Szymon,
 
----
- obexd/src/manager.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+>>> Those will be used to allow/disallow of performing remote device
+>>> reauthentication.
+>> 
+>> I guess you could expand this explaining why you need this in the MGMT API,
+>> i.e. why this can't be implemented on userspace only.
+> 
+> This will allow to avoid ACL disconnect in case of auth failure and should
+> allow to reauth also for incoming connections e.g. this is what Android do.
+> I couldn't figure out how this could be achieved in userspace only but if it
+> is possible I'm totally after userspace-only implementation.
 
-diff --git a/obexd/src/manager.c b/obexd/src/manager.c
-index b67567b..b86565c 100644
---- a/obexd/src/manager.c
-+++ b/obexd/src/manager.c
-@@ -265,6 +265,14 @@ static DBusMessage *unregister_agent(DBusConnection *conn,
- 	return dbus_message_new_method_return(msg);
- }
- 
-+static gboolean session_target_exists(const GDBusPropertyTable *property,
-+								void *data)
-+{
-+	struct obex_session *os = data;
-+
-+	return os->service->target ? TRUE : FALSE;
-+}
-+
- static char *target2str(const uint8_t *t)
- {
- 	if (!t)
-@@ -521,7 +529,7 @@ static const GDBusPropertyTable transfer_properties[] = {
- };
- 
- static const GDBusPropertyTable session_properties[] = {
--	{ "Target", "s", get_target },
-+	{ "Target", "s", get_target, NULL, session_target_exists },
- 	{ "Root", "s", get_root },
- 	{ }
- };
--- 
-1.8.1.4
+can someone send around some btmon traces that would demonstrate this. I am not really following on what the issue here is and what we trying to solve.
+
+Regards
+
+Marcel
 
