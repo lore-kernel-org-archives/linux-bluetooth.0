@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 02/13] AVRCP: Add browsed flag to player
-Date: Mon, 27 May 2013 14:33:52 +0300
-Message-Id: <1369654443-11514-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 05/13] player: Add support for setting current Item object
+Date: Mon, 27 May 2013 14:33:55 +0300
+Message-Id: <1369654443-11514-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1369654443-11514-1-git-send-email-luiz.dentz@gmail.com>
 References: <1369654443-11514-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,41 +11,105 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This flag indicates if the player is browsed and are checked to avoid
-setting the same player as browsed multiple times.
+This introduces media_player_set_playlist_item which is used when the
+current item UID is known, with this the application can tell what
+is the current item in the playlist.
 ---
- profiles/audio/avrcp.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ profiles/audio/avrcp.c  |  3 +++
+ profiles/audio/player.c | 42 ++++++++++++++++++++++++++++++++++++------
+ profiles/audio/player.h |  1 +
+ 3 files changed, 40 insertions(+), 6 deletions(-)
 
 diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 39882e4..5477016 100644
+index f86dc9a..6ae0a68 100644
 --- a/profiles/audio/avrcp.c
 +++ b/profiles/audio/avrcp.c
-@@ -182,6 +182,7 @@ struct avrcp_player {
- 	GSList *sessions;
- 	uint16_t id;
- 	uint16_t uid_counter;
-+	bool browsed;
- 	uint8_t *features;
+@@ -1896,6 +1896,9 @@ static void avrcp_parse_attribute_list(struct avrcp_player *player,
+ 	struct media_player *mp = player->user_data;
+ 	int i;
  
- 	struct avrcp_player_cb *cb;
-@@ -2030,6 +2031,7 @@ static gboolean avrcp_set_browsed_player_rsp(struct avctp *conn,
- 		return FALSE;
++	if (player->uid > 0)
++		media_player_set_playlist_item(mp, player->uid);
++
+ 	for (i = 0; count > 0; count--) {
+ 		uint32_t id;
+ 		uint16_t charset, len;
+diff --git a/profiles/audio/player.c b/profiles/audio/player.c
+index fcaee5c..91a6e0a 100644
+--- a/profiles/audio/player.c
++++ b/profiles/audio/player.c
+@@ -102,16 +102,18 @@ struct media_player {
+ static void append_metadata(void *key, void *value, void *user_data)
+ {
+ 	DBusMessageIter *dict = user_data;
++	const char *strkey = key;
  
- 	player->uid_counter = bt_get_be16(&pdu->params[1]);
-+	player->browsed = true;
- 
- 	items = bt_get_be32(&pdu->params[3]);
- 
-@@ -2375,7 +2377,7 @@ avrcp_parse_media_player_item(struct avrcp *session, uint8_t *operands,
- 		media_player_set_name(mp, name);
+-	if (strcasecmp((char *) key, "Duration") == 0 ||
+-			strcasecmp((char *) key, "TrackNumber") == 0 ||
+-			strcasecmp((char *) key, "NumberOfTracks") == 0)  {
++	if (strcasecmp(strkey, "Duration") == 0 ||
++			strcasecmp(strkey, "TrackNumber") == 0 ||
++			strcasecmp(strkey, "NumberOfTracks") == 0)  {
+ 		uint32_t num = atoi(value);
+ 		dict_append_entry(dict, key, DBUS_TYPE_UINT32, &num);
+-		return;
++	} else if (strcasecmp(strkey, "Item") == 0) {
++		dict_append_entry(dict, key, DBUS_TYPE_OBJECT_PATH, &value);
++	} else {
++		dict_append_entry(dict, key, DBUS_TYPE_STRING, &value);
  	}
+-
+-	dict_append_entry(dict, key, DBUS_TYPE_STRING, &value);
+ }
  
--	if (session->player == player)
-+	if (session->player == player && !player->browsed)
- 		avrcp_set_browsed_player(session, player);
+ static struct pending_req *find_pending(struct media_player *mp,
+@@ -1309,6 +1311,34 @@ static struct media_item *media_folder_find_item(struct media_folder *folder,
+ 	return NULL;
+ }
  
- 	return player;
++void media_player_set_playlist_item(struct media_player *mp, uint64_t uid)
++{
++	struct media_folder *folder = mp->playlist;
++	struct media_item *item;
++
++	DBG("%" PRIu64 "", uid);
++
++	if (folder == NULL)
++		return;
++
++	item = media_folder_find_item(folder, uid);
++	if (item == NULL) {
++		warn("Item not found");
++		return;
++	}
++
++	if (item == g_hash_table_lookup(mp->track, "Item"))
++		return;
++
++	if (mp->process_id == 0) {
++		g_hash_table_remove_all(mp->track);
++		mp->process_id = g_idle_add(process_metadata_changed, mp);
++	}
++
++	g_hash_table_replace(mp->track, g_strdup("Item"),
++						g_strdup(item->path));
++}
++
+ static DBusMessage *media_item_play(DBusConnection *conn, DBusMessage *msg,
+ 								void *data)
+ {
+diff --git a/profiles/audio/player.h b/profiles/audio/player.h
+index 0f75f4f..843c71b 100644
+--- a/profiles/audio/player.h
++++ b/profiles/audio/player.h
+@@ -77,6 +77,7 @@ void media_player_set_searchable(struct media_player *mp, bool enabled);
+ void media_player_set_folder(struct media_player *mp, const char *path,
+ 								uint32_t items);
+ void media_player_set_playlist(struct media_player *mp, const char *name);
++void media_player_set_playlist_item(struct media_player *mp, uint64_t uid);
+ 
+ struct media_item *media_player_create_folder(struct media_player *mp,
+ 						const char *name,
 -- 
 1.8.1.4
 
