@@ -1,86 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix mgmt handling of power on failures
-Date: Tue, 28 May 2013 10:07:47 +0300
-Message-Id: <1369724867-31011-1-git-send-email-johan.hedberg@gmail.com>
+Cc: emilio.pozuelo@collabora.co.uk,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: [PATCH 3/4] session: add Source and Destination properties
+Date: Mon, 27 May 2013 20:07:03 -0300
+Message-Id: <1369696024-27434-3-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1369696024-27434-1-git-send-email-gustavo@padovan.org>
+References: <1369696024-27434-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-If hci_dev_open fails we need to ensure that the corresponding
-mgmt_set_powered command gets an appropriate response. This patch fixes
-the missing response by adding a new mgmt_set_powered_failed function
-that's used to indicate a power on failure to mgmt.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+This is useful when we want to know where a incoming OPP transfer, for
+example, is from.
 ---
- include/net/bluetooth/hci_core.h |    1 +
- net/bluetooth/hci_core.c         |    6 +++++-
- net/bluetooth/mgmt.c             |   16 ++++++++++++++++
- 3 files changed, 22 insertions(+), 1 deletion(-)
+ obexd/src/manager.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 606615c..f77885e 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1118,6 +1118,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
- int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
- int mgmt_index_added(struct hci_dev *hdev);
- int mgmt_index_removed(struct hci_dev *hdev);
-+int mgmt_set_powered_failed(struct hci_dev *hdev, int err);
- int mgmt_powered(struct hci_dev *hdev, u8 powered);
- int mgmt_discoverable(struct hci_dev *hdev, u8 discoverable);
- int mgmt_connectable(struct hci_dev *hdev, u8 connectable);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 21ad85d..d7c2dbd 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1598,11 +1598,15 @@ static const struct rfkill_ops hci_rfkill_ops = {
- static void hci_power_on(struct work_struct *work)
- {
- 	struct hci_dev *hdev = container_of(work, struct hci_dev, power_on);
-+	int err;
- 
- 	BT_DBG("%s", hdev->name);
- 
--	if (hci_dev_open(hdev->id) < 0)
-+	err = hci_dev_open(hdev->id);
-+	if (err < 0) {
-+		mgmt_set_powered_failed(hdev, err);
- 		return;
-+	}
- 
- 	if (test_bit(HCI_AUTO_OFF, &hdev->dev_flags))
- 		queue_delayed_work(hdev->req_workqueue, &hdev->power_off,
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 5cd3aee..00b006b 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3533,6 +3533,22 @@ new_settings:
- 	return err;
+diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+index b86565c..a116a3e 100644
+--- a/obexd/src/manager.c
++++ b/obexd/src/manager.c
+@@ -265,6 +265,30 @@ static DBusMessage *unregister_agent(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
  }
  
-+int mgmt_set_powered_failed(struct hci_dev *hdev, int err)
++static gboolean get_source(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
 +{
-+	struct pending_cmd *cmd;
++	struct obex_session *os = data;
++	char *s;
 +
-+	cmd = mgmt_pending_find(MGMT_OP_SET_POWERED, hdev);
-+	if (!cmd)
-+		return -ENOENT;
++	s = os->src;
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &s);
 +
-+	err = cmd_status(cmd->sk, hdev->id, MGMT_OP_SET_POWERED,
-+			 MGMT_STATUS_FAILED);
-+
-+	mgmt_pending_remove(cmd);
-+
-+	return err;
++	return TRUE;
 +}
 +
- int mgmt_discoverable(struct hci_dev *hdev, u8 discoverable)
++static gboolean get_destination(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct obex_session *os = data;
++	char *s;
++
++	s = os->dst;
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &s);
++
++	return TRUE;
++}
++
+ static gboolean session_target_exists(const GDBusPropertyTable *property,
+ 								void *data)
  {
- 	struct cmd_lookup match = { NULL, hdev };
+@@ -529,6 +553,8 @@ static const GDBusPropertyTable transfer_properties[] = {
+ };
+ 
+ static const GDBusPropertyTable session_properties[] = {
++	{ "Source", "s", get_source },
++	{ "Destination", "s", get_destination },
+ 	{ "Target", "s", get_target, NULL, session_target_exists },
+ 	{ "Root", "s", get_root },
+ 	{ }
 -- 
-1.7.10.4
+1.8.1.4
 
