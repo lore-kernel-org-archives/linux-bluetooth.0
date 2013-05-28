@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 5/9] obexd: Add file_data struct to session
-Date: Tue, 28 May 2013 14:37:09 +0200
-Message-Id: <1369744633-8980-6-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH v2 6/9] obexd: Queue mkdir command
+Date: Tue, 28 May 2013 14:37:10 +0200
+Message-Id: <1369744633-8980-7-git-send-email-christian.fetzer@oss.bmw-carit.de>
 In-Reply-To: <1369744633-8980-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 References: <1369744633-8980-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,65 +11,69 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-This adds a common file_data struct and related free and complete callbacks
-to the session. This will be used for queuing the file related commands
-mkdir, copy, move and delete.
----
- obexd/client/session.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
-
 diff --git a/obexd/client/session.c b/obexd/client/session.c
-index 36ed541..6036d33 100644
+index 6036d33..6b33f3e 100644
 --- a/obexd/client/session.c
 +++ b/obexd/client/session.c
-@@ -88,6 +88,13 @@ struct setpath_data {
- 	void *user_data;
- };
- 
-+struct file_data {
-+	char *srcname;
-+	char *destname;
-+	session_callback_t func;
-+	void *user_data;
-+};
-+
- struct obc_session {
- 	guint id;
- 	int refcount;
-@@ -190,6 +197,15 @@ static void setpath_data_free(void *process_data)
- 	g_free(data);
+@@ -1055,10 +1055,29 @@ static void file_op_complete(struct obc_session *session,
+ 		data->func(session, NULL, err, data->user_data);
  }
  
-+static void file_data_free(void *process_data)
++static int session_process_mkdir(struct pending_request *p, GError **err)
 +{
-+	struct file_data *data = process_data;
++	struct file_data *req = p->data;
 +
-+	g_free(data->srcname);
-+	g_free(data->destname);
-+	g_free(data);
-+}
++	p->req_id = g_obex_mkdir(p->session->obex, req->srcname, async_cb, p,
++									err);
++	if (*err != NULL)
++		goto fail;
 +
- static void session_free(struct obc_session *session)
- {
- 	DBG("%p", session);
-@@ -1028,6 +1044,17 @@ done:
- 	session_process_queue(session);
- }
- 
-+static void file_op_complete(struct obc_session *session,
-+						struct obc_transfer *transfer,
-+						GError *err, void *user_data)
-+{
-+	struct pending_request *p = user_data;
-+	struct file_data *data = p->data;
++	p->session->p = p;
 +
-+	if (data->func)
-+		data->func(session, NULL, err, data->user_data);
++	return 0;
++
++fail:
++	pending_request_free(p);
++	return (*err)->code;
 +}
 +
  guint obc_session_mkdir(struct obc_session *session, const char *folder,
  				session_callback_t func, void *user_data,
  				GError **err)
+ {
++	struct file_data *data;
+ 	struct pending_request *p;
+ 
+ 	if (session->obex == NULL) {
+@@ -1067,21 +1086,14 @@ guint obc_session_mkdir(struct obc_session *session, const char *folder,
+ 		return 0;
+ 	}
+ 
+-	if (session->p != NULL) {
+-		g_set_error(err, OBEX_IO_ERROR, OBEX_IO_BUSY, "Session busy");
+-		return 0;
+-	}
+-
+-
+-	p = pending_request_new(session, NULL, NULL, NULL, func, user_data);
+-
+-	p->req_id = g_obex_mkdir(session->obex, folder, async_cb, p, err);
+-	if (*err != NULL) {
+-		pending_request_free(p);
+-		return 0;
+-	}
++	data = g_new0(struct file_data, 1);
++	data->srcname = g_strdup(folder);
++	data->func = func;
++	data->user_data = user_data;
+ 
+-	session->p = p;
++	p = pending_request_new(session, session_process_mkdir,
++					file_data_free, NULL, func, data);
++	session_queue_add(p);
+ 	return p->id;
+ }
+ 
 -- 
 1.8.2.3
 
