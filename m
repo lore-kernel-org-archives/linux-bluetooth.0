@@ -3,9 +3,9 @@ From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: emilio.pozuelo@collabora.co.uk,
 	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 6/6] manager: remove unused call to obex_getpeername()
-Date: Tue, 28 May 2013 14:45:23 -0300
-Message-Id: <1369763123-17949-6-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 5/6] session: add Source and Destination properties
+Date: Tue, 28 May 2013 14:45:22 -0300
+Message-Id: <1369763123-17949-5-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1369763123-17949-1-git-send-email-gustavo@padovan.org>
 References: <1369763123-17949-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,45 +13,56 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
+This is useful when we want to know where a incoming OPP transfer, for
+example, is from.
 ---
- obexd/src/manager.c | 8 --------
- 1 file changed, 8 deletions(-)
+ obexd/src/manager.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
 diff --git a/obexd/src/manager.c b/obexd/src/manager.c
-index a116a3e..d0991e9 100644
+index b86565c..a116a3e 100644
 --- a/obexd/src/manager.c
 +++ b/obexd/src/manager.c
-@@ -751,10 +751,8 @@ int manager_request_authorization(struct obex_transfer *transfer, int32_t time,
- 	DBusPendingCall *call;
- 	const char *filename = os->name ? os->name : "";
- 	const char *type = os->type ? os->type : "";
--	char *address;
- 	unsigned int watch;
- 	gboolean got_reply;
--	int err;
+@@ -265,6 +265,30 @@ static DBusMessage *unregister_agent(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
+ }
  
- 	if (!agent)
- 		return -1;
-@@ -765,10 +763,6 @@ int manager_request_authorization(struct obex_transfer *transfer, int32_t time,
- 	if (!new_folder || !new_name)
- 		return -EINVAL;
++static gboolean get_source(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct obex_session *os = data;
++	char *s;
++
++	s = os->src;
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &s);
++
++	return TRUE;
++}
++
++static gboolean get_destination(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct obex_session *os = data;
++	char *s;
++
++	s = os->dst;
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &s);
++
++	return TRUE;
++}
++
+ static gboolean session_target_exists(const GDBusPropertyTable *property,
+ 								void *data)
+ {
+@@ -529,6 +553,8 @@ static const GDBusPropertyTable transfer_properties[] = {
+ };
  
--	err = obex_getpeername(os, &address);
--	if (err < 0)
--		return err;
--
- 	msg = dbus_message_new_method_call(agent->bus_name, agent->path,
- 							AGENT_INTERFACE,
- 							"AuthorizePush");
-@@ -776,8 +770,6 @@ int manager_request_authorization(struct obex_transfer *transfer, int32_t time,
- 	dbus_message_append_args(msg, DBUS_TYPE_OBJECT_PATH, &transfer->path,
- 							DBUS_TYPE_INVALID);
- 
--	g_free(address);
--
- 	if (!dbus_connection_send_with_reply(connection,
- 					msg, &call, TIMEOUT)) {
- 		dbus_message_unref(msg);
+ static const GDBusPropertyTable session_properties[] = {
++	{ "Source", "s", get_source },
++	{ "Destination", "s", get_destination },
+ 	{ "Target", "s", get_target, NULL, session_target_exists },
+ 	{ "Root", "s", get_root },
+ 	{ }
 -- 
 1.8.1.4
 
