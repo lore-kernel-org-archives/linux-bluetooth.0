@@ -1,52 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1369141604-1129-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1368721510-14339-1-git-send-email-anderson.lizardo@openbossa.org>
-	<1369141604-1129-1-git-send-email-anderson.lizardo@openbossa.org>
-Date: Tue, 28 May 2013 09:25:18 -0400
-Message-ID: <CAJdJm_NPgMvsOpRpzXbXcchy-aUBNqCKs894mnr_svbZNScQJw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 1/2] plugins: Use open()/read() instead of
- fopen()/fread() on autopair
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <1369674934-28204-1-git-send-email-hdante@profusion.mobi>
+References: <1369674934-28204-1-git-send-email-hdante@profusion.mobi>
+Date: Tue, 28 May 2013 06:23:53 -0700
+Message-ID: <CABBYNZ+dWxJ=-Z62E_GVe2YeZr+YPRhy0n4bnx+L1vP1tyDZHw@mail.gmail.com>
+Subject: Re: [PATCH] gdbus: Remove proxies when client disconnects
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Henrique Dante de Almeida <hdante@profusion.mobi>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Henrique,
 
-On Tue, May 21, 2013 at 9:06 AM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> open()/read() is more common on BlueZ code. Incidentally, get rid of
-> this compilation error (using gcc 4.6.3):
+On Mon, May 27, 2013 at 10:15 AM, Henrique Dante de Almeida
+<hdante@profusion.mobi> wrote:
+> Remove proxies and generate proxy_removed callbacks even when there are
+> no corresponding InterfaceRemoved signals.
 >
-> plugins/autopair.c: In function ‘autopair_init’:
-> plugins/autopair.c:154:8: error: ignoring return value of ‘fread’,
-> declared with attribute warn_unused_result [-Werror=unused-result]
+> This patch fixes having zombie gdbus proxy object when a server
+> disconnects without sending InterfaceRemoved signals. These objects
+> may interact with new server instances, for example, making
+> InterfaceAdded signals of new objects with the same name be filtered
+> out as duplicated, or staying allocated, but unused, if the new server
+> doesn't reuse the object paths. Note that as a side-effect, the
+> lifetime of a gdbus proxy becomes stricter: it lives at most for the
+> duration of a single connection to a single instance of a server
+> process.
 > ---
->  plugins/autopair.c |   22 +++++++++++++++-------
->  1 file changed, 15 insertions(+), 7 deletions(-)
+>  gdbus/client.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 >
-> v3:
+> diff --git a/gdbus/client.c b/gdbus/client.c
+> index f700b7e..d80e252 100644
+> --- a/gdbus/client.c
+> +++ b/gdbus/client.c
+> @@ -1153,6 +1153,10 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
 >
-> * Fix buggy logic
-> * The obvious code path is tested by just starting bluetoothd, which will call
->   autopair_init()
-> * Maybe overkill, but I used this mockup code to test other unreachable code
->   paths: http://ix.io/5JC
-> * I agree with Marcel that we should just fail if /dev/urandom is not readable.
->   Otherwise, we are introducing code that will 99% of the time not be run
->   (unless someone confirms that we have systems with unusable /dev/urandom).
+>                 if (*new == '\0' && client->unique_name != NULL &&
+>                                 g_str_equal(old, client->unique_name) == TRUE) {
+> +
+> +                       g_list_free_full(client->proxy_list, proxy_free);
+> +                       client->proxy_list = NULL;
+> +
+>                         if (client->disconn_func)
+>                                 client->disconn_func(client->dbus_conn,
+>                                                         client->disconn_data);
+> --
+> 1.8.2.3
 
-Ping. There were no further comments on the idea of removing the
-"time(NULL)" fallback suggested by Marcel.
+Pushed, thanks.
 
-Should I proceed with dropping the time(NULL) fallback or may this
-patch be applied as is?
 
-Best Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+--
+Luiz Augusto von Dentz
