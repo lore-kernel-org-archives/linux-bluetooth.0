@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/9] obexd: Add process callback to session's pending_request
-Date: Tue, 28 May 2013 14:37:05 +0200
-Message-Id: <1369744633-8980-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH v2 4/9] obexd: Queue setpath command
+Date: Tue, 28 May 2013 14:37:08 +0200
+Message-Id: <1369744633-8980-5-git-send-email-christian.fetzer@oss.bmw-carit.de>
 In-Reply-To: <1369744633-8980-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 References: <1369744633-8980-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,125 +11,115 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-This adds a process callback and a data destroy callback to the session's
-pending_request structure.
-
-This is needed as preparation of queuing all OBEX session commands.
----
- obexd/client/session.c | 33 ++++++++++++++++++++++++---------
- 1 file changed, 24 insertions(+), 9 deletions(-)
-
 diff --git a/obexd/client/session.c b/obexd/client/session.c
-index f1bdf18..1b02403 100644
+index 6c2ecb7..36ed541 100644
 --- a/obexd/client/session.c
 +++ b/obexd/client/session.c
-@@ -65,10 +65,17 @@ struct callback_data {
- 	void *data;
- };
- 
-+struct pending_request;
-+typedef int (*session_process_t) (struct pending_request *pr, GError **err);
-+
-+typedef void (*pending_destroy_t)(void *data);
-+
- struct pending_request {
- 	guint id;
- 	guint req_id;
- 	struct obc_session *session;
-+	session_process_t process;
-+	pending_destroy_t pending_destroy;
- 	struct obc_transfer *transfer;
- 	session_callback_t func;
- 	void *data;
-@@ -140,9 +147,11 @@ static void session_unregistered(struct obc_session *session)
+@@ -182,6 +182,14 @@ static void pending_request_free(struct pending_request *p)
+ 	g_free(p);
  }
  
- static struct pending_request *pending_request_new(struct obc_session *session,
--						struct obc_transfer *transfer,
--						session_callback_t func,
--						void *data)
-+					session_process_t process,
-+					pending_destroy_t pending_destroy,
-+					struct obc_transfer *transfer,
-+					session_callback_t func,
-+					void *data)
- {
- 	struct pending_request *p;
- 	static guint id = 0;
-@@ -150,6 +159,8 @@ static struct pending_request *pending_request_new(struct obc_session *session,
- 	p = g_new0(struct pending_request, 1);
- 	p->id = ++id;
- 	p->session = obc_session_ref(session);
-+	p->process = process;
-+	p->pending_destroy = pending_destroy;
- 	p->transfer = transfer;
- 	p->func = func;
- 	p->data = data;
-@@ -159,6 +170,9 @@ static struct pending_request *pending_request_new(struct obc_session *session,
- 
- static void pending_request_free(struct pending_request *p)
- {
-+	if (p->pending_destroy && p->data)
-+		p->pending_destroy(p->data);
++static void setpath_data_free(void *process_data)
++{
++	struct setpath_data *data = process_data;
 +
- 	if (p->transfer)
- 		obc_transfer_unregister(p->transfer);
++	g_strfreev(data->remaining);
++	g_free(data);
++}
++
+ static void session_free(struct obc_session *session)
+ {
+ 	DBG("%p", session);
+@@ -888,9 +896,6 @@ static void setpath_complete(struct obc_session *session,
+ 	if (data->func)
+ 		data->func(session, NULL, err, data->user_data);
  
-@@ -678,7 +692,7 @@ guint obc_session_queue(struct obc_session *session,
+-	g_strfreev(data->remaining);
+-	g_free(data);
+-
+ 	if (session->p == p)
+ 		session->p = NULL;
  
- 	obc_transfer_set_callback(transfer, transfer_complete, session);
+@@ -942,13 +947,35 @@ static void setpath_cb(GObex *obex, GError *err, GObexPacket *rsp,
+ 	}
+ }
  
--	p = pending_request_new(session, transfer, func, user_data);
-+	p = pending_request_new(session, NULL, NULL, transfer, func, user_data);
- 	g_queue_push_tail(session->queue, p);
++static int session_process_setpath(struct pending_request *p, GError **err)
++{
++	struct setpath_data *req = p->data;
++	const char *first = "";
++
++	/* Relative path */
++	if (req->remaining[0][0] != '/')
++		first = req->remaining[req->index];
++	req->index++;
++
++	p->req_id = g_obex_setpath(p->session->obex, first, setpath_cb, p, err);
++	if (*err != NULL)
++		goto fail;
++
++	p->session->p = p;
++
++	return 0;
++
++fail:
++	pending_request_free(p);
++	return (*err)->code;
++}
++
+ guint obc_session_setpath(struct obc_session *session, const char *path,
+ 				session_callback_t func, void *user_data,
+ 				GError **err)
+ {
+ 	struct setpath_data *data;
+ 	struct pending_request *p;
+-	const char *first = "";
  
- 	if (session->queue_complete_id == 0)
-@@ -943,7 +957,8 @@ guint obc_session_setpath(struct obc_session *session, const char *path,
+ 	if (session->obex == NULL) {
+ 		g_set_error(err, OBEX_IO_ERROR, OBEX_IO_DISCONNECTED,
+@@ -956,39 +983,15 @@ guint obc_session_setpath(struct obc_session *session, const char *path,
+ 		return 0;
+ 	}
+ 
+-	if (session->p != NULL) {
+-		g_set_error(err, OBEX_IO_ERROR, OBEX_IO_BUSY,
+-							"Session busy");
+-		return 0;
+-	}
+-
+ 	data = g_new0(struct setpath_data, 1);
+ 	data->func = func;
  	data->user_data = user_data;
  	data->remaining = g_strsplit(strlen(path) ? path : "/", "/", 0);
  
--	p = pending_request_new(session, NULL, setpath_complete, data);
-+	p = pending_request_new(session, NULL, NULL, NULL, setpath_complete,
-+									data);
+-	p = pending_request_new(session, NULL, NULL, NULL, setpath_complete,
+-									data);
+-
+-	/* Relative path */
+-	if (path[0] != '/')
+-		first = data->remaining[data->index];
+-
+-	data->index++;
+-
+-	p->req_id = g_obex_setpath(session->obex, first, setpath_cb, p, err);
+-	if (*err != NULL)
+-		goto fail;
+-
+-	session->p = p;
+-
++	p = pending_request_new(session, session_process_setpath,
++			setpath_data_free, NULL, setpath_complete, data);
++	session_queue_add(p);
+ 	return p->id;
+-
+-fail:
+-	g_strfreev(data->remaining);
+-	g_free(data);
+-	pending_request_free(p);
+-	return 0;
+ }
  
- 	/* Relative path */
- 	if (path[0] != '/')
-@@ -1018,7 +1033,7 @@ guint obc_session_mkdir(struct obc_session *session, const char *folder,
- 	}
- 
- 
--	p = pending_request_new(session, NULL, func, user_data);
-+	p = pending_request_new(session, NULL, NULL, NULL, func, user_data);
- 
- 	p->req_id = g_obex_mkdir(session->obex, folder, async_cb, p, err);
- 	if (*err != NULL) {
-@@ -1047,7 +1062,7 @@ guint obc_session_copy(struct obc_session *session, const char *srcname,
- 		return 0;
- 	}
- 
--	p = pending_request_new(session, NULL, func, user_data);
-+	p = pending_request_new(session, NULL, NULL, NULL, func, user_data);
- 
- 	p->req_id = g_obex_copy(session->obex, srcname, destname, async_cb, p,
- 									err);
-@@ -1077,7 +1092,7 @@ guint obc_session_move(struct obc_session *session, const char *srcname,
- 		return 0;
- 	}
- 
--	p = pending_request_new(session, NULL, func, user_data);
-+	p = pending_request_new(session, NULL, NULL, NULL, func, user_data);
- 
- 	p->req_id = g_obex_move(session->obex, srcname, destname, async_cb, p,
- 									err);
-@@ -1107,7 +1122,7 @@ guint obc_session_delete(struct obc_session *session, const char *file,
- 		return 0;
- 	}
- 
--	p = pending_request_new(session, NULL, func, user_data);
-+	p = pending_request_new(session, NULL, NULL, NULL, func, user_data);
- 
- 	p->req_id = g_obex_delete(session->obex, file, async_cb, p, err);
- 	if (*err != NULL) {
+ static void async_cb(GObex *obex, GError *err, GObexPacket *rsp,
 -- 
 1.8.2.3
 
