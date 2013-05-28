@@ -1,55 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <51A4688C.2030808@gmail.com>
-Date: Tue, 28 May 2013 10:19:24 +0200
-From: Sebastian Mahler <werbungsbunker@googlemail.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: [BUG] Using bluez 5.5 a bluetooth headset cannot be used as a recording
- device.
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+In-Reply-To: <1369696024-27434-2-git-send-email-gustavo@padovan.org>
+References: <1369696024-27434-1-git-send-email-gustavo@padovan.org>
+	<1369696024-27434-2-git-send-email-gustavo@padovan.org>
+Date: Tue, 28 May 2013 01:13:34 -0700
+Message-ID: <CABBYNZLfFW=tkcucf+CXpA9wUgnZ-hRgm2-N9SpMdwLGOSrb5g@mail.gmail.com>
+Subject: Re: [PATCH 2/4] obex: extract src and dst address and store it
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	emilio.pozuelo@collabora.co.uk,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Headset used Iqua BHS-611.
+Hi Gustavo,
 
-How to reproduce this error:
+On Mon, May 27, 2013 at 4:07 PM, Gustavo Padovan <gustavo@padovan.org> wrote:
+> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+>
+> This commit creates src and dst members in obex_session to later use them
+> to export via Session D-Bus API.
+> ---
+>  obexd/src/obex-priv.h | 2 ++
+>  obexd/src/obex.c      | 8 ++++++++
+>  2 files changed, 10 insertions(+)
+>
+> diff --git a/obexd/src/obex-priv.h b/obexd/src/obex-priv.h
+> index 41854bc..90aa225 100644
+> --- a/obexd/src/obex-priv.h
+> +++ b/obexd/src/obex-priv.h
+> @@ -27,6 +27,8 @@ struct obex_session {
+>         uint32_t id;
+>         uint8_t cmd;
+>         uint8_t action_id;
+> +       char src[18];
+> +       char dst[18];
+>         char *name;
+>         char *destname;
+>         char *type;
+> diff --git a/obexd/src/obex.c b/obexd/src/obex.c
+> index a3e7b0e..b08a412 100644
+> --- a/obexd/src/obex.c
+> +++ b/obexd/src/obex.c
+> @@ -40,6 +40,7 @@
+>  #include <inttypes.h>
+>
+>  #include <glib.h>
+> +#include <bluetooth.h>
+>  #include <btio/btio.h>
+>  #include <gobex/gobex.h>
+>
+> @@ -1102,6 +1103,7 @@ int obex_session_start(GIOChannel *io, uint16_t tx_mtu, uint16_t rx_mtu,
+>         GObex *obex;
+>         GObexTransportType type;
+>         static uint32_t id = 0;
+> +       bdaddr_t src, dst;
+>
+>         DBG("");
+>
+> @@ -1134,6 +1136,12 @@ int obex_session_start(GIOChannel *io, uint16_t tx_mtu, uint16_t rx_mtu,
+>         os->obex = obex;
+>         os->io = g_io_channel_ref(io);
+>
+> +       bt_io_get(io, NULL, BT_IO_OPT_SOURCE_BDADDR, &src,
+> +                       BT_IO_OPT_DEST_BDADDR, &dst, BT_IO_OPT_INVALID);
+> +
+> +       ba2str(&src, os->src);
+> +       ba2str(&dst, os->dst);
+> +
+>         sessions = g_slist_prepend(sessions, os);
+>
+>         return 0;
+> --
+> 1.8.1.4
 
-1.    sudo hciconfig device up
-2.    hcitool scan
-3.    sudo bluez-simple-agent hci0 <mac>
-4.    sudo bluez-test-device trusted <mac> yes
-5.    pulseaudio -k; sleep 4; pulseaudio -vv;
-6.    pactl load-module module-alsa-sink device="btheadset"
-7.    pactl load-module module-alsa-source device="btheadset"
-8.    aplay -D btheadset -f S16_LE wave.wav
-         Works
-9.    arecord -D btheadset -f S16_LE wave2.wav
-         Recording WAVE 'wave2.wav' : Signed 16 bit Little Endian, Rate 
-8000 Hz, Mono
-         Final wave2.wav is always 2.092 B in size and contains only a 
-wave header and zeroes.
-10.    parec
-         Shows no output.
+I would prefer having this in the transport driver we just need to
+extend with getsockname as getpeername is already supported, btw you
+can use BT_IO_OPT_SOURCE and BT_IO_OPT_DEST directly so there is no
+need to include bluetooth.h.
 
-
-Please use as a bug report or - better - show a solution.
-
-Sebastian Mahler
-
-PS:
-
-   .asoundrc:
-
-    pcm.bt {
-            type plug
-            slave {
-                    pcm "bt_hw"
-            }
-    }
-
-    pcm.bt_hw {
-            type bluetooth
-            device 00:1A:7D:11:C0:66
-            profile "auto"
-    }
-
+--
+Luiz Augusto von Dentz
