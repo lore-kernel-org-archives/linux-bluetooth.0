@@ -1,57 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1369674934-28204-1-git-send-email-hdante@profusion.mobi>
-References: <1369674934-28204-1-git-send-email-hdante@profusion.mobi>
-Date: Tue, 28 May 2013 06:23:53 -0700
-Message-ID: <CABBYNZ+dWxJ=-Z62E_GVe2YeZr+YPRhy0n4bnx+L1vP1tyDZHw@mail.gmail.com>
-Subject: Re: [PATCH] gdbus: Remove proxies when client disconnects
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Henrique Dante de Almeida <hdante@profusion.mobi>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 13/13] player: Add implementation of MediaItem.AddToNowPlaying
+Date: Tue, 28 May 2013 15:51:31 +0300
+Message-Id: <1369745491-23897-14-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1369745491-23897-1-git-send-email-luiz.dentz@gmail.com>
+References: <1369745491-23897-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Henrique,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, May 27, 2013 at 10:15 AM, Henrique Dante de Almeida
-<hdante@profusion.mobi> wrote:
-> Remove proxies and generate proxy_removed callbacks even when there are
-> no corresponding InterfaceRemoved signals.
->
-> This patch fixes having zombie gdbus proxy object when a server
-> disconnects without sending InterfaceRemoved signals. These objects
-> may interact with new server instances, for example, making
-> InterfaceAdded signals of new objects with the same name be filtered
-> out as duplicated, or staying allocated, but unused, if the new server
-> doesn't reuse the object paths. Note that as a side-effect, the
-> lifetime of a gdbus proxy becomes stricter: it lives at most for the
-> duration of a single connection to a single instance of a server
-> process.
-> ---
->  gdbus/client.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/gdbus/client.c b/gdbus/client.c
-> index f700b7e..d80e252 100644
-> --- a/gdbus/client.c
-> +++ b/gdbus/client.c
-> @@ -1153,6 +1153,10 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
->
->                 if (*new == '\0' && client->unique_name != NULL &&
->                                 g_str_equal(old, client->unique_name) == TRUE) {
-> +
-> +                       g_list_free_full(client->proxy_list, proxy_free);
-> +                       client->proxy_list = NULL;
-> +
->                         if (client->disconn_func)
->                                 client->disconn_func(client->dbus_conn,
->                                                         client->disconn_data);
-> --
-> 1.8.2.3
+---
+ profiles/audio/player.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-Pushed, thanks.
+diff --git a/profiles/audio/player.c b/profiles/audio/player.c
+index a34757a..57753b3 100644
+--- a/profiles/audio/player.c
++++ b/profiles/audio/player.c
+@@ -1375,7 +1375,23 @@ static DBusMessage *media_item_play(DBusConnection *conn, DBusMessage *msg,
+ static DBusMessage *media_item_add_to_nowplaying(DBusConnection *conn,
+ 						DBusMessage *msg, void *data)
+ {
+-	return btd_error_failed(msg, strerror(ENOTSUP));
++	struct media_item *item = data;
++	struct media_player *mp = item->player;
++	struct player_callback *cb = mp->cb;
++	int err;
++
++	if (!item->playable)
++		return btd_error_failed(msg, strerror(ENOTSUP));
++
++	if (cb->cbs->play_item == NULL)
++		return btd_error_failed(msg, strerror(ENOTSUP));
++
++	err = cb->cbs->add_to_nowplaying(mp, item->path, item->uid,
++							cb->user_data);
++	if (err < 0)
++		return btd_error_failed(msg, strerror(-err));
++
++	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ }
+ 
+ static gboolean item_name_exists(const GDBusPropertyTable *property,
+-- 
+1.8.1.4
 
-
---
-Luiz Augusto von Dentz
