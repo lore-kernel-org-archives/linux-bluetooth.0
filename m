@@ -1,56 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 00/13] MediaFolder and MediaItem implementation
-Date: Tue, 28 May 2013 15:51:18 +0300
-Message-Id: <1369745491-23897-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH v2 7/9] obexd: Queue copy command
+Date: Tue, 28 May 2013 14:37:11 +0200
+Message-Id: <1369744633-8980-8-git-send-email-christian.fetzer@oss.bmw-carit.de>
+In-Reply-To: <1369744633-8980-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1369744633-8980-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-v2: Fixes ChangeFolder not working for subfolders past /Filesystem
-
-This set of patches implements most of the functionality of MediaFolder and
-MediaItem interfaces.
-
-Some remarks:
-
-- ChangeFolder can only change one level at time, this perhaps gonna be
-  changed in the future but for now this matches the limitation of AVRCP
-  itself.
-- ListItems returns the items in the correct order but GetManagedObjects does
-  the reverse order due to use of g_slist_prepend.
-- PlayItem and AddToNowPlaying works fine with iPhone but with WP8 is not
-  working probably because the UIDCounter changes more frequently which needs
-  some new notifications that are currently not implemented.
-
-This can be tested using tools/mpris-player which will browse the NowPlaying
-list and show which item is currently being played, but the gnome extention
-itself needs patching which can be found here:
-
-https://github.com/Vudentz/gnome-shell-extensions-mediaplayer
-
-Luiz Augusto von Dentz (13):
-  player: Split item creation
-  AVRCP: Add browsed flag to player
-  AVRCP: Add support for GetFolderItems command
-  player: Add implementation of MediaFolder.ListItems
-  player: Add support for setting current Item object
-  player: Add function media_item_set_playable
-  player: Add support for MediaItem.Metadata property
-  AVRCP: Add support for ChangePath command
-  player: Add implementation of MediaFolder.ChangeFolder
-  AVRCP: Add support for PlayItem command
-  player: Add implementation of MediaItem.Play
-  AVRCP: Add support for AddToNowPlaying command
-  player: Add implementation of MediaItem.AddToNowPlaying
-
- profiles/audio/avrcp.c  | 390 +++++++++++++++++++++++++++++-
- profiles/audio/player.c | 623 ++++++++++++++++++++++++++++++++++++++++--------
- profiles/audio/player.h |  23 +-
- 3 files changed, 916 insertions(+), 120 deletions(-)
-
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index 6b33f3e..374b95a 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -1097,10 +1097,29 @@ guint obc_session_mkdir(struct obc_session *session, const char *folder,
+ 	return p->id;
+ }
+ 
++static int session_process_copy(struct pending_request *p, GError **err)
++{
++	struct file_data *req = p->data;
++
++	p->req_id = g_obex_copy(p->session->obex, req->srcname, req->destname,
++							async_cb, p, err);
++	if (*err != NULL)
++		goto fail;
++
++	p->session->p = p;
++
++	return 0;
++
++fail:
++	pending_request_free(p);
++	return (*err)->code;
++}
++
+ guint obc_session_copy(struct obc_session *session, const char *srcname,
+ 				const char *destname, session_callback_t func,
+ 				void *user_data, GError **err)
+ {
++	struct file_data *data;
+ 	struct pending_request *p;
+ 
+ 	if (session->obex == NULL) {
+@@ -1109,21 +1128,15 @@ guint obc_session_copy(struct obc_session *session, const char *srcname,
+ 		return 0;
+ 	}
+ 
+-	if (session->p != NULL) {
+-		g_set_error(err, OBEX_IO_ERROR, OBEX_IO_BUSY, "Session busy");
+-		return 0;
+-	}
+-
+-	p = pending_request_new(session, NULL, NULL, NULL, func, user_data);
+-
+-	p->req_id = g_obex_copy(session->obex, srcname, destname, async_cb, p,
+-									err);
+-	if (*err != NULL) {
+-		pending_request_free(p);
+-		return 0;
+-	}
++	data = g_new0(struct file_data, 1);
++	data->srcname = g_strdup(srcname);
++	data->destname = g_strdup(destname);
++	data->func = func;
++	data->user_data = user_data;
+ 
+-	session->p = p;
++	p = pending_request_new(session, session_process_copy, file_data_free,
++						NULL, file_op_complete, data);
++	session_queue_add(p);
+ 	return p->id;
+ }
+ 
 -- 
-1.8.1.4
+1.8.2.3
 
