@@ -1,78 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 28 May 2013 10:45:26 +0200 (CEST)
-From: Jiri Kosina <jkosina@suse.cz>
-To: David Herrmann <dh.herrmann@gmail.com>,
-	Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Daniel Nicoletti <dantti12@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>, linux-input@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hidp: register HID devices async
-In-Reply-To: <1369307425-5993-1-git-send-email-dh.herrmann@gmail.com>
-Message-ID: <alpine.LNX.2.00.1305281044210.3914@pobox.suse.cz>
-References: <1369307425-5993-1-git-send-email-dh.herrmann@gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <1369696024-27434-1-git-send-email-gustavo@padovan.org>
+References: <1369696024-27434-1-git-send-email-gustavo@padovan.org>
+Date: Tue, 28 May 2013 01:37:34 -0700
+Message-ID: <CABBYNZLc8=a6xZPzE+Xz9RUvFHpUpG5ouxSHeXvP3ZEoL7X5EA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] session: only add Target if it exists
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	emilio.pozuelo@collabora.co.uk,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 23 May 2013, David Herrmann wrote:
+Hi Gustavo,
 
-> While l2cap_user callbacks are running, the whole hci_dev is locked. Even
-> if we would add more fine-grained locking to HCI core, it would still be
-> called from the non-reentrant rx work-queue and thus block the event
-> processing.
-> 
-> However, if we want to perform synchronous I/O during HID device
-> registration (eg., to perform device-detection), we need the HCI core
-> to be able to dispatch incoming data.
-> 
-> Therefore, we now move device-registration to a separate worker. The HCI
-> core can continue running and we add devices asynchronously in another
-> kernel thread. Device removal is synchronized and waits for the worker
-> to exit before calling the usual device removal functions.
-> 
-> If l2cap_user->remove is called before the thread registered the devices,
-> we set "terminate" to true and the thread will skip it. If
-> l2cap_user->remove is called after it, we notice this as the device
-> is no longer in HIDP_SESSION_PREPARING state and simply unregister the
-> device as we did before.
-> There is no new deadlock as we now call hidp_session_add_dev() with
-> one lock less held (the HCI lock) and it cannot itself call back into
-> HCI as it was called with the HCI-lock held before.
-> 
-> One might wonder whether this can block during device unregistration.
-> But we set "terminate" to true and wake the HIDP thread up _before_
-> unregistering the HID/input devices. Therefore, all pending HID I/O
-> operations are canceled. All further I/O attempts will fail with ENODEV
-> or EIO. So all latency we can get are few context-switches, but no
-> timeouts or blocking I/O waits!
-> 
-> This change also prepares for a long standing HID bug. All HID devices
-> that register power_supply devices need to be able to handle callbacks
-> during registration (a power_supply oddity that cannot easily be fixed).
-> So with this patch available, we can allow HID I/O during registration
-> by calling the recently introduced hid_device_io_start/stop helpers,
-> which currently are a no-op for bluetooth due to this locking.
-> 
-> Note that we cannot do the same for input devices. input-core doesn't
-> allow us to call input_event() asynchronously to input_register_device(),
-> which HID-core kindly allows (for good reasons).
-> Fixing input-core to allow this isn't as easy as it sounds and is,
-> beside simplifying HIDP, not really an improvement. Hence, we still
-> register input devices synchronously as we did before. Only HID devices
-> are registered asynchronously.
-> 
-> Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
+On Mon, May 27, 2013 at 4:07 PM, Gustavo Padovan <gustavo@padovan.org> wrote:
+> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+>
+> ---
+>  obexd/src/manager.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+>
+> diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+> index b67567b..b86565c 100644
+> --- a/obexd/src/manager.c
+> +++ b/obexd/src/manager.c
+> @@ -265,6 +265,14 @@ static DBusMessage *unregister_agent(DBusConnection *conn,
+>         return dbus_message_new_method_return(msg);
+>  }
+>
+> +static gboolean session_target_exists(const GDBusPropertyTable *property,
+> +                                                               void *data)
+> +{
+> +       struct obex_session *os = data;
+> +
+> +       return os->service->target ? TRUE : FALSE;
+> +}
+> +
+>  static char *target2str(const uint8_t *t)
+>  {
+>         if (!t)
+> @@ -521,7 +529,7 @@ static const GDBusPropertyTable transfer_properties[] = {
+>  };
+>
+>  static const GDBusPropertyTable session_properties[] = {
+> -       { "Target", "s", get_target },
+> +       { "Target", "s", get_target, NULL, session_target_exists },
+>         { "Root", "s", get_root },
+>         { }
+>  };
+> --
+> 1.8.1.4
 
-Acked-by: Jiri Kosina <jkosina@suse.cz>
+Patches 1/4 and 4/4 are now upstream, thanks.
 
-Gustavo, I think I'd like to take this patch together with the ENODATA 
-change for hid-input, as they, in some sense, stick together.
 
-If you are OK with that, could you please provide me with your Acked-by, 
-and I'll take it through my tree?
-
-Thanks.
-
--- 
-Jiri Kosina
-SUSE Labs
+--
+Luiz Augusto von Dentz
