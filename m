@@ -1,60 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1369696024-27434-1-git-send-email-gustavo@padovan.org>
-References: <1369696024-27434-1-git-send-email-gustavo@padovan.org>
-Date: Tue, 28 May 2013 01:37:34 -0700
-Message-ID: <CABBYNZLc8=a6xZPzE+Xz9RUvFHpUpG5ouxSHeXvP3ZEoL7X5EA@mail.gmail.com>
-Subject: Re: [PATCH 1/4] session: only add Target if it exists
+In-Reply-To: <51A465AD.5030704@gmail.com>
+References: <51A465AD.5030704@gmail.com>
+Date: Tue, 28 May 2013 01:26:13 -0700
+Message-ID: <CABBYNZL0OSwiK4rhDy8h8k61K-HpZpdGu1-M0zD5jZvMox59Vg@mail.gmail.com>
+Subject: Re: linux-bluetooth@vger.kernel.org
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	emilio.pozuelo@collabora.co.uk,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+To: Sebastian Mahler <werbungsbunker@googlemail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi,
 
-On Mon, May 27, 2013 at 4:07 PM, Gustavo Padovan <gustavo@padovan.org> wrote:
-> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
->
-> ---
->  obexd/src/manager.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
->
-> diff --git a/obexd/src/manager.c b/obexd/src/manager.c
-> index b67567b..b86565c 100644
-> --- a/obexd/src/manager.c
-> +++ b/obexd/src/manager.c
-> @@ -265,6 +265,14 @@ static DBusMessage *unregister_agent(DBusConnection *conn,
->         return dbus_message_new_method_return(msg);
->  }
->
-> +static gboolean session_target_exists(const GDBusPropertyTable *property,
-> +                                                               void *data)
-> +{
-> +       struct obex_session *os = data;
-> +
-> +       return os->service->target ? TRUE : FALSE;
-> +}
-> +
->  static char *target2str(const uint8_t *t)
->  {
->         if (!t)
-> @@ -521,7 +529,7 @@ static const GDBusPropertyTable transfer_properties[] = {
->  };
->
->  static const GDBusPropertyTable session_properties[] = {
-> -       { "Target", "s", get_target },
-> +       { "Target", "s", get_target, NULL, session_target_exists },
->         { "Root", "s", get_root },
->         { }
->  };
-> --
-> 1.8.1.4
 
-Patches 1/4 and 4/4 are now upstream, thanks.
+
+On Tue, May 28, 2013 at 1:07 AM, Sebastian Mahler
+<werbungsbunker@googlemail.com> wrote:
+> Headset used Iqua BHS-611.
+>
+> How to reproduce this error:
+>
+> 1.    sudo hciconfig device up
+> 2.    hcitool scan
+> 3.    sudo bluez-simple-agent hci0 <mac>
+> 4.    sudo bluez-test-device trusted <mac> yes
+> 5.    pulseaudio -k; sleep 4; pulseaudio -vv;
+> 6.    pactl load-module module-alsa-sink device="btheadset"
+> 7.    pactl load-module module-alsa-source device="btheadset"
+
+There are dedicated modules for bluetooth such as
+module-bluetooth-discover which will do the device detection
+automatically for you, and if you need you can also load manually via
+module-bluetooth-device.
+
+> 8.    aplay -D btheadset -f S16_LE wave.wav
+>         Works
+> 9.    arecord -D btheadset -f S16_LE wave2.wav
+>         Recording WAVE 'wave2.wav' : Signed 16 bit Little Endian, Rate 8000
+> Hz, Mono
+>         Final wave2.wav is always 2.092 B in size and contains only a wave
+> header and zeroes.
+> 10.    parec
+>         Shows no output.
+
+
+> Please use as a bug report or - better - show a solution.
+>
+> Sebastian Mahler
+>
+> PS:
+>
+>   .asoundrc:
+>
+>    pcm.bt {
+>            type plug
+>            slave {
+>                    pcm "bt_hw"
+>            }
+>    }
+>
+>    pcm.bt_hw {
+>            type bluetooth
+>            device 00:1A:7D:11:C0:66
+>            profile "auto"
+>    }
+
+This probably doesn't work anymore, if ever worked, PA has native
+modules for Bluetooth for quite long time, please use those instead of
+using alsa.
 
 
 --
