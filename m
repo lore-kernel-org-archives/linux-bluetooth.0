@@ -1,85 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1369696024-27434-2-git-send-email-gustavo@padovan.org>
-References: <1369696024-27434-1-git-send-email-gustavo@padovan.org>
-	<1369696024-27434-2-git-send-email-gustavo@padovan.org>
-Date: Tue, 28 May 2013 01:13:34 -0700
-Message-ID: <CABBYNZLfFW=tkcucf+CXpA9wUgnZ-hRgm2-N9SpMdwLGOSrb5g@mail.gmail.com>
-Subject: Re: [PATCH 2/4] obex: extract src and dst address and store it
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	emilio.pozuelo@collabora.co.uk,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
+Subject: Re: [BUG] Set Powered=true doesn't power up the adapter
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20130528074906.GA32404@x220.ger.corp.intel.com>
+Date: Tue, 28 May 2013 17:09:56 +0900
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <9A028387-F030-4C5C-B1AE-5B50221E18B2@holtmann.org>
+References: <CAGd9gwhNgRhgqzhxxZNyD-o=j4ksTXvFFhTQMawt4bv0b2VPcQ@mail.gmail.com> <CAE6HaMnFF7ym+FCWpVHCi=7=OJZeaS+uiF_qQDKHgpbzLUUu_w@mail.gmail.com> <CAE6HaMmUL2Dn6H0iBzh6Wrk+DzOzDUHa8fUNGDt6psAc6=JAUw@mail.gmail.com> <61DC8CEB-C49A-466F-B5E3-F5B60D398157@holtmann.org> <20130522172213.GA12160@samus.indt.org> <1E509939-3804-43E0-A047-09CCD38A4713@holtmann.org> <20130528071306.GA31172@x220> <16EC52EF-CEB3-40B5-BDD3-6D6BE35FF177@holtmann.org> <20130528074906.GA32404@x220.ger.corp.intel.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Johan,
 
-On Mon, May 27, 2013 at 4:07 PM, Gustavo Padovan <gustavo@padovan.org> wrote:
-> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
->
-> This commit creates src and dst members in obex_session to later use them
-> to export via Session D-Bus API.
-> ---
->  obexd/src/obex-priv.h | 2 ++
->  obexd/src/obex.c      | 8 ++++++++
->  2 files changed, 10 insertions(+)
->
-> diff --git a/obexd/src/obex-priv.h b/obexd/src/obex-priv.h
-> index 41854bc..90aa225 100644
-> --- a/obexd/src/obex-priv.h
-> +++ b/obexd/src/obex-priv.h
-> @@ -27,6 +27,8 @@ struct obex_session {
->         uint32_t id;
->         uint8_t cmd;
->         uint8_t action_id;
-> +       char src[18];
-> +       char dst[18];
->         char *name;
->         char *destname;
->         char *type;
-> diff --git a/obexd/src/obex.c b/obexd/src/obex.c
-> index a3e7b0e..b08a412 100644
-> --- a/obexd/src/obex.c
-> +++ b/obexd/src/obex.c
-> @@ -40,6 +40,7 @@
->  #include <inttypes.h>
->
->  #include <glib.h>
-> +#include <bluetooth.h>
->  #include <btio/btio.h>
->  #include <gobex/gobex.h>
->
-> @@ -1102,6 +1103,7 @@ int obex_session_start(GIOChannel *io, uint16_t tx_mtu, uint16_t rx_mtu,
->         GObex *obex;
->         GObexTransportType type;
->         static uint32_t id = 0;
-> +       bdaddr_t src, dst;
->
->         DBG("");
->
-> @@ -1134,6 +1136,12 @@ int obex_session_start(GIOChannel *io, uint16_t tx_mtu, uint16_t rx_mtu,
->         os->obex = obex;
->         os->io = g_io_channel_ref(io);
->
-> +       bt_io_get(io, NULL, BT_IO_OPT_SOURCE_BDADDR, &src,
-> +                       BT_IO_OPT_DEST_BDADDR, &dst, BT_IO_OPT_INVALID);
-> +
-> +       ba2str(&src, os->src);
-> +       ba2str(&dst, os->dst);
-> +
->         sessions = g_slist_prepend(sessions, os);
->
->         return 0;
-> --
-> 1.8.1.4
+>>>>> If I send any Set Powered command after the controller is unblocked, while
+>>>>> there's still one pending command in the queue, this command will fail, and I
+>>>>> won't be able to bring the controller up, unless I force a HCI_RESET command.
+>>>>> 
+>>>>> So it seems that we need a way to mark an hdev as rfkill blocked.
+>>>>> 
+>>>>> Does anyone else have any other ideas?
+>>>> 
+>>>> my wild guess right now is that this is the problem:
+>>>> 
+>>>> 	static void hci_power_on(struct work_struct *work)
+>>>> 	{
+>>>> 	        struct hci_dev *hdev = container_of(work, struct hci_dev, power_on);
+>>>> 
+>>>> 	        BT_DBG("%s", hdev->name);
+>>>> 
+>>>> 	        if (hci_dev_open(hdev->id) < 0)
+>>>> 	                return;
+>>>> 
+>>>> 	        if (test_bit(HCI_AUTO_OFF, &hdev->dev_flags))
+>>>> 	                queue_delayed_work(hdev->req_workqueue, &hdev->power_off,
+>>>> 	                                   HCI_AUTO_OFF_TIMEOUT);
+>>>> 
+>>>> 	        if (test_and_clear_bit(HCI_SETUP, &hdev->dev_flags))
+>>>> 	                mgmt_index_added(hdev);
+>>>> 	}
+>>>> 
+>>>> In case hci_dev_open() fails and rfkill would be one example for that,
+>>>> we do not return an error back to the mgmt command that originates
+>>>> this power on.
+>>>> 
+>>>> Of course there is the initial adapter power on and there is the mgmt
+>>>> triggered power on. And my guess is that these two are racing against
+>>>> each other.
+>>> 
+>>> It seems you're right about the cause. I just sent a patch to fix it.
+>>> With the patch I get this behavior:
+>>> 
+>>> jh@qemu~/src/bluez{master}$ sudo rfkill list
+>>> 0: hci0: Bluetooth
+>>> 	Soft blocked: no
+>>> 	Hard blocked: no
+>>> jh@qemu~/src/bluez{master}$ sudo rfkill block 0
+>>> jh@qemu~/src/bluez{master}$ sudo tools/btmgmt power on
+>>> Set Powered for hci0 failed with status 0x03 (Failed)
+>> 
+>> we could be a bit smarter about the error code here. At least when
+>> ERFKILL we should return a more descriptive error via mgmt.
+> 
+> I'm fine with that, and I actually left room for it by passing the exact
+> error to the new mgmt_set_powered_failed function. Would you prefer a
+> completely new error only used for rfkill or reuse one of our existing
+> errors. We've e.g. got MGMT_STATUS_REJECTED which could be used for
+> rfkill and MGMT_STATUS_FAILED for anything else.
 
-I would prefer having this in the transport driver we just need to
-extend with getsockname as getpeername is already supported, btw you
-can use BT_IO_OPT_SOURCE and BT_IO_OPT_DEST directly so there is no
-need to include bluetooth.h.
+I think a brand new error might be a good idea. RFKILL has always been special.
 
---
-Luiz Augusto von Dentz
+Regards
+
+Marcel
+
