@@ -1,37 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
-Subject: Re: [PATCH] Bluetooth: Fix mgmt handling of power on failures
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20130528152337.GA3697@joana>
-Date: Wed, 29 May 2013 09:58:34 +0900
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <BB0C792C-39F4-4713-B017-AA66CEF209DE@holtmann.org>
-References: <1369724867-31011-1-git-send-email-johan.hedberg@gmail.com> <20130528152337.GA3697@joana>
-To: Gustavo Padovan <gustavo@padovan.org>
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: emilio.pozuelo@collabora.co.uk,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: [PATCH 6/6] manager: remove unused call to obex_getpeername()
+Date: Tue, 28 May 2013 14:45:23 -0300
+Message-Id: <1369763123-17949-6-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1369763123-17949-1-git-send-email-gustavo@padovan.org>
+References: <1369763123-17949-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
->> If hci_dev_open fails we need to ensure that the corresponding
->> mgmt_set_powered command gets an appropriate response. This patch fixes
->> the missing response by adding a new mgmt_set_powered_failed function
->> that's used to indicate a power on failure to mgmt.
->> 
->> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
->> ---
->> include/net/bluetooth/hci_core.h |    1 +
->> net/bluetooth/hci_core.c         |    6 +++++-
->> net/bluetooth/mgmt.c             |   16 ++++++++++++++++
->> 3 files changed, 22 insertions(+), 1 deletion(-)
-> 
-> Patch has been applied to bluetooth.git. Thanks.
+---
+ obexd/src/manager.c | 8 --------
+ 1 file changed, 8 deletions(-)
 
-I rather have this fixed properly with a new error for specifically ERFKILL. Having one stable kernel return rejected and another rfkill is a bad idea.
-
-Regards
-
-Marcel
+diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+index a116a3e..d0991e9 100644
+--- a/obexd/src/manager.c
++++ b/obexd/src/manager.c
+@@ -751,10 +751,8 @@ int manager_request_authorization(struct obex_transfer *transfer, int32_t time,
+ 	DBusPendingCall *call;
+ 	const char *filename = os->name ? os->name : "";
+ 	const char *type = os->type ? os->type : "";
+-	char *address;
+ 	unsigned int watch;
+ 	gboolean got_reply;
+-	int err;
+ 
+ 	if (!agent)
+ 		return -1;
+@@ -765,10 +763,6 @@ int manager_request_authorization(struct obex_transfer *transfer, int32_t time,
+ 	if (!new_folder || !new_name)
+ 		return -EINVAL;
+ 
+-	err = obex_getpeername(os, &address);
+-	if (err < 0)
+-		return err;
+-
+ 	msg = dbus_message_new_method_call(agent->bus_name, agent->path,
+ 							AGENT_INTERFACE,
+ 							"AuthorizePush");
+@@ -776,8 +770,6 @@ int manager_request_authorization(struct obex_transfer *transfer, int32_t time,
+ 	dbus_message_append_args(msg, DBUS_TYPE_OBJECT_PATH, &transfer->path,
+ 							DBUS_TYPE_INVALID);
+ 
+-	g_free(address);
+-
+ 	if (!dbus_connection_send_with_reply(connection,
+ 					msg, &call, TIMEOUT)) {
+ 		dbus_message_unref(msg);
+-- 
+1.8.1.4
 
