@@ -1,82 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 28 May 2013 12:52:41 -0300
+Date: Tue, 28 May 2013 12:23:37 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Jiri Kosina <jkosina@suse.cz>
-Cc: David Herrmann <dh.herrmann@gmail.com>, linux-bluetooth@vger.kernel.org,
-	Daniel Nicoletti <dantti12@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>, linux-input@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hidp: register HID devices async
-Message-ID: <20130528155241.GB3697@joana>
-References: <1369307425-5993-1-git-send-email-dh.herrmann@gmail.com>
- <alpine.LNX.2.00.1305281044210.3914@pobox.suse.cz>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix mgmt handling of power on failures
+Message-ID: <20130528152337.GA3697@joana>
+References: <1369724867-31011-1-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <alpine.LNX.2.00.1305281044210.3914@pobox.suse.cz>
+In-Reply-To: <1369724867-31011-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jiri,
+Hi Johan,
 
-* Jiri Kosina <jkosina@suse.cz> [2013-05-28 10:45:26 +0200]:
+* Johan Hedberg <johan.hedberg@gmail.com> [2013-05-28 10:07:47 +0300]:
 
-> On Thu, 23 May 2013, David Herrmann wrote:
+> From: Johan Hedberg <johan.hedberg@intel.com>
 > 
-> > While l2cap_user callbacks are running, the whole hci_dev is locked. Even
-> > if we would add more fine-grained locking to HCI core, it would still be
-> > called from the non-reentrant rx work-queue and thus block the event
-> > processing.
-> > 
-> > However, if we want to perform synchronous I/O during HID device
-> > registration (eg., to perform device-detection), we need the HCI core
-> > to be able to dispatch incoming data.
-> > 
-> > Therefore, we now move device-registration to a separate worker. The HCI
-> > core can continue running and we add devices asynchronously in another
-> > kernel thread. Device removal is synchronized and waits for the worker
-> > to exit before calling the usual device removal functions.
-> > 
-> > If l2cap_user->remove is called before the thread registered the devices,
-> > we set "terminate" to true and the thread will skip it. If
-> > l2cap_user->remove is called after it, we notice this as the device
-> > is no longer in HIDP_SESSION_PREPARING state and simply unregister the
-> > device as we did before.
-> > There is no new deadlock as we now call hidp_session_add_dev() with
-> > one lock less held (the HCI lock) and it cannot itself call back into
-> > HCI as it was called with the HCI-lock held before.
-> > 
-> > One might wonder whether this can block during device unregistration.
-> > But we set "terminate" to true and wake the HIDP thread up _before_
-> > unregistering the HID/input devices. Therefore, all pending HID I/O
-> > operations are canceled. All further I/O attempts will fail with ENODEV
-> > or EIO. So all latency we can get are few context-switches, but no
-> > timeouts or blocking I/O waits!
-> > 
-> > This change also prepares for a long standing HID bug. All HID devices
-> > that register power_supply devices need to be able to handle callbacks
-> > during registration (a power_supply oddity that cannot easily be fixed).
-> > So with this patch available, we can allow HID I/O during registration
-> > by calling the recently introduced hid_device_io_start/stop helpers,
-> > which currently are a no-op for bluetooth due to this locking.
-> > 
-> > Note that we cannot do the same for input devices. input-core doesn't
-> > allow us to call input_event() asynchronously to input_register_device(),
-> > which HID-core kindly allows (for good reasons).
-> > Fixing input-core to allow this isn't as easy as it sounds and is,
-> > beside simplifying HIDP, not really an improvement. Hence, we still
-> > register input devices synchronously as we did before. Only HID devices
-> > are registered asynchronously.
-> > 
-> > Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
+> If hci_dev_open fails we need to ensure that the corresponding
+> mgmt_set_powered command gets an appropriate response. This patch fixes
+> the missing response by adding a new mgmt_set_powered_failed function
+> that's used to indicate a power on failure to mgmt.
 > 
-> Acked-by: Jiri Kosina <jkosina@suse.cz>
-> 
-> Gustavo, I think I'd like to take this patch together with the ENODATA 
-> change for hid-input, as they, in some sense, stick together.
-> 
-> If you are OK with that, could you please provide me with your Acked-by, 
-> and I'll take it through my tree?
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  include/net/bluetooth/hci_core.h |    1 +
+>  net/bluetooth/hci_core.c         |    6 +++++-
+>  net/bluetooth/mgmt.c             |   16 ++++++++++++++++
+>  3 files changed, 22 insertions(+), 1 deletion(-)
 
-This looks good to me.
-
-Acked-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Patch has been applied to bluetooth.git. Thanks.
 
 	Gustavo
