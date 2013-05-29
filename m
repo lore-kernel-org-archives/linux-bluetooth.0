@@ -1,46 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1369763123-17949-1-git-send-email-gustavo@padovan.org>
-References: <1369763123-17949-1-git-send-email-gustavo@padovan.org>
-Date: Wed, 29 May 2013 04:41:59 -0700
-Message-ID: <CABBYNZKYyo1eGL33pbGVRFOHpQvYOejf0gT1EdKs=19KzdcAqw@mail.gmail.com>
-Subject: Re: [PATCH 1/6] transport: add getsockname to transport driver
+In-Reply-To: <1369744633-8980-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1369744633-8980-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Date: Wed, 29 May 2013 03:30:41 -0700
+Message-ID: <CABBYNZ+bfZkhD6FOdgw7oyCj6fZiMpJA6VCSuMe1UdJWMe0LqQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/9] obexd: Queue session commands
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	emilio.pozuelo@collabora.co.uk,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Christian,
 
-On Tue, May 28, 2013 at 10:45 AM, Gustavo Padovan <gustavo@padovan.org> wrote:
-> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+On Tue, May 28, 2013 at 5:37 AM, Christian Fetzer
+<christian.fetzer@oss.bmw-carit.de> wrote:
+> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 >
-> Enable other pieces of obex to get the source Bluetooth address.
+> - v2: Split patches, remove void *process_data from pending_request,
+>       adapt names as requested
 > ---
->  obexd/src/transport.h | 1 +
->  1 file changed, 1 insertion(+)
 >
-> diff --git a/obexd/src/transport.h b/obexd/src/transport.h
-> index b81615b..97e10d0 100644
-> --- a/obexd/src/transport.h
-> +++ b/obexd/src/transport.h
-> @@ -26,6 +26,7 @@ struct obex_transport_driver {
->         uint16_t service;
->         void *(*start) (struct obex_server *server, int *err);
->         int (*getpeername) (GIOChannel *io, char **name);
-> +       int (*getsockname) (GIOChannel *io, char **name);
->         void (*stop) (void *data);
->  };
+> So far only transfers are queued in OBEX sessions. Commands like setpath
+> are not queued and the commands will simply fail when a different
+> operation or transfer is ongoing. This patch set removes this limitation and
+> queues commands as well.
+>
+> Currently, the MAP client is directly affected by this limitation.
+> An immediate call to SetPath after the MAP connection has been established
+> reliably fails, because MNS is being connected in the background in parallel.
+>
+> Christian Fetzer (9):
+>   obexd: Add process callback to session's pending_request
+>   obexd: Add session_queue_add
+>   obexd: Use process callback to queue transfers
+>   obexd: Queue setpath command
+>   obexd: Add file_data struct to session
+>   obexd: Queue mkdir command
+>   obexd: Queue copy command
+>   obexd: Queue move command
+>   obexd: Queue delete command
+>
+>  obexd/client/session.c | 296 +++++++++++++++++++++++++++++++++----------------
+>  1 file changed, 201 insertions(+), 95 deletions(-)
 >
 > --
-> 1.8.1.4
+> 1.8.2.3
 
-Pushed, thanks.
+Pushed, note that I did some modifications so that the destroy is the
+last parameter of pending_request_new, this is usual practice for
+destroy callbacks.
 
+Thanks for your contribution.
 
 --
 Luiz Augusto von Dentz
