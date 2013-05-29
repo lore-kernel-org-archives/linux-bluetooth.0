@@ -1,37 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 29 May 2013 15:20:44 +0200 (CEST)
-From: Jiri Kosina <jkosina@suse.cz>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: David Herrmann <dh.herrmann@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Daniel Nicoletti <dantti12@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>, linux-input@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hidp: register HID devices async
-In-Reply-To: <20130528155241.GB3697@joana>
-Message-ID: <alpine.LNX.2.00.1305291519550.30576@pobox.suse.cz>
-References: <1369307425-5993-1-git-send-email-dh.herrmann@gmail.com> <alpine.LNX.2.00.1305281044210.3914@pobox.suse.cz> <20130528155241.GB3697@joana>
+Date: Wed, 29 May 2013 16:02:41 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: Re: [PATCH BlueZ v0 1/2] cyclingspeed: Fix D-Bus registration error
+ case
+Message-ID: <20130529130241.GA18206@x220.ger.corp.intel.com>
+References: <1369831104-23363-1-git-send-email-mikel.astiz.oss@gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1369831104-23363-1-git-send-email-mikel.astiz.oss@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 28 May 2013, Gustavo Padovan wrote:
+Hi Mikel,
 
-> > > Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
-> > 
-> > Acked-by: Jiri Kosina <jkosina@suse.cz>
-> > 
-> > Gustavo, I think I'd like to take this patch together with the ENODATA 
-> > change for hid-input, as they, in some sense, stick together.
-> > 
-> > If you are OK with that, could you please provide me with your Acked-by, 
-> > and I'll take it through my tree?
-> 
-> This looks good to me.
-> 
-> Acked-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+On Wed, May 29, 2013, Mikel Astiz wrote:
+> If g_dbus_register_interface() fails, the struct csc_adapter memory will
+> be freed and therefore the csc_adapters list cannot contain such an
+> invalid pointer.
+> ---
+>  profiles/cyclingspeed/cyclingspeed.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Perfect, I am taking it through my tree. Thanks,
+Both patches have been applied. Thanks.
 
--- 
-Jiri Kosina
-SUSE Labs
+Johan
