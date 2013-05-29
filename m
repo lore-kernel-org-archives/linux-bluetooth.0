@@ -1,111 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CALJeEo7qPkUj-Wfea4Vme38=g97uWLL9BXP6igyM1RvQfHJYfg@mail.gmail.com>
+References: <CALJeEo7qPkUj-Wfea4Vme38=g97uWLL9BXP6igyM1RvQfHJYfg@mail.gmail.com>
+Date: Tue, 28 May 2013 23:11:23 -0700
+Message-ID: <CALJeEo7DyFmX4SVjxXMssBP7Z=aNN5KTcnQAQvsfXOLW+rPLhg@mail.gmail.com>
+Subject: Re: Automatic pairing
+From: Jonathan Nichols <jnichols@alumni.princeton.edu>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Fix mgmt handling of power on failures
-Date: Wed, 29 May 2013 09:51:29 +0300
-Message-Id: <1369810289-5090-1-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1369724867-31011-1-git-send-email-johan.hedberg@gmail.com>
-References: <1369724867-31011-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Just to follow up ... I didn't quite mean that I wanted to pair with
+any device that initiates a pairing.  Ideally, I would like to hard
+code a non-trivial pin, so that the linux machine automatically pairs
+with any device that knows that pin.
 
-If hci_dev_open fails we need to ensure that the corresponding
-mgmt_set_powered command gets an appropriate response. This patch fixes
-the missing response by adding a new mgmt_set_powered_failed function
-that's used to indicate a power on failure to mgmt. Since a sutuation
-with the device being rfkilled may require special handling in user
-space the patch uses a new dedicated mgmt status code for this.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-Cc: stable@vger.kernel.org
----
-v2: Added dedicated mgmt error for the ERFKILL case
-
- include/net/bluetooth/hci_core.h |    1 +
- include/net/bluetooth/mgmt.h     |    1 +
- net/bluetooth/hci_core.c         |    6 +++++-
- net/bluetooth/mgmt.c             |   21 +++++++++++++++++++++
- 4 files changed, 28 insertions(+), 1 deletion(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 606615c..f77885e 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1118,6 +1118,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
- int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
- int mgmt_index_added(struct hci_dev *hdev);
- int mgmt_index_removed(struct hci_dev *hdev);
-+int mgmt_set_powered_failed(struct hci_dev *hdev, int err);
- int mgmt_powered(struct hci_dev *hdev, u8 powered);
- int mgmt_discoverable(struct hci_dev *hdev, u8 discoverable);
- int mgmt_connectable(struct hci_dev *hdev, u8 connectable);
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 22980a7..9944c3e 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -42,6 +42,7 @@
- #define MGMT_STATUS_NOT_POWERED		0x0f
- #define MGMT_STATUS_CANCELLED		0x10
- #define MGMT_STATUS_INVALID_INDEX	0x11
-+#define MGMT_STATUS_RFKILLED		0x12
- 
- struct mgmt_hdr {
- 	__le16	opcode;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 21ad85d..d7c2dbd 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1598,11 +1598,15 @@ static const struct rfkill_ops hci_rfkill_ops = {
- static void hci_power_on(struct work_struct *work)
- {
- 	struct hci_dev *hdev = container_of(work, struct hci_dev, power_on);
-+	int err;
- 
- 	BT_DBG("%s", hdev->name);
- 
--	if (hci_dev_open(hdev->id) < 0)
-+	err = hci_dev_open(hdev->id);
-+	if (err < 0) {
-+		mgmt_set_powered_failed(hdev, err);
- 		return;
-+	}
- 
- 	if (test_bit(HCI_AUTO_OFF, &hdev->dev_flags))
- 		queue_delayed_work(hdev->req_workqueue, &hdev->power_off,
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 5cd3aee..fedc539 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3533,6 +3533,27 @@ new_settings:
- 	return err;
- }
- 
-+int mgmt_set_powered_failed(struct hci_dev *hdev, int err)
-+{
-+	struct pending_cmd *cmd;
-+	u8 status;
-+
-+	cmd = mgmt_pending_find(MGMT_OP_SET_POWERED, hdev);
-+	if (!cmd)
-+		return -ENOENT;
-+
-+	if (err == -ERFKILL)
-+		status = MGMT_STATUS_RFKILLED;
-+	else
-+		status = MGMT_STATUS_FAILED;
-+
-+	err = cmd_status(cmd->sk, hdev->id, MGMT_OP_SET_POWERED, status);
-+
-+	mgmt_pending_remove(cmd);
-+
-+	return err;
-+}
-+
- int mgmt_discoverable(struct hci_dev *hdev, u8 discoverable)
- {
- 	struct cmd_lookup match = { NULL, hdev };
--- 
-1.7.10.4
-
+On Tue, May 28, 2013 at 10:57 PM, Jonathan Nichols
+<jnichols@alumni.princeton.edu> wrote:
+> Hello,
+>
+>     I want to use bluez to set up a linux machine to automatically
+> pair with devices that initiate pairings.  What is the recommended way
+> of doing this?  I noticed that there is an autopair.c in bluez 5.5,
+> but it isn't clear how to use it.  Is there any example code that
+> shows how to use this file?
+>
+>     Any other suggestions for setting up a linux machine to
+> automatically pair with any device that initiates a pairing?
+>
+> Thanks,
+>
+> jon
