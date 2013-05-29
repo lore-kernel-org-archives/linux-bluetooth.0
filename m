@@ -1,44 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [PATCH BlueZ v0 1/2] cyclingspeed: Fix D-Bus registration error case
-Date: Wed, 29 May 2013 14:38:23 +0200
-Message-Id: <1369831104-23363-1-git-send-email-mikel.astiz.oss@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1369763123-17949-1-git-send-email-gustavo@padovan.org>
+References: <1369763123-17949-1-git-send-email-gustavo@padovan.org>
+Date: Wed, 29 May 2013 04:41:59 -0700
+Message-ID: <CABBYNZKYyo1eGL33pbGVRFOHpQvYOejf0gT1EdKs=19KzdcAqw@mail.gmail.com>
+Subject: Re: [PATCH 1/6] transport: add getsockname to transport driver
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	emilio.pozuelo@collabora.co.uk,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Gustavo,
 
-If g_dbus_register_interface() fails, the struct csc_adapter memory will
-be freed and therefore the csc_adapters list cannot contain such an
-invalid pointer.
----
- profiles/cyclingspeed/cyclingspeed.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Tue, May 28, 2013 at 10:45 AM, Gustavo Padovan <gustavo@padovan.org> wrote:
+> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+>
+> Enable other pieces of obex to get the source Bluetooth address.
+> ---
+>  obexd/src/transport.h | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/obexd/src/transport.h b/obexd/src/transport.h
+> index b81615b..97e10d0 100644
+> --- a/obexd/src/transport.h
+> +++ b/obexd/src/transport.h
+> @@ -26,6 +26,7 @@ struct obex_transport_driver {
+>         uint16_t service;
+>         void *(*start) (struct obex_server *server, int *err);
+>         int (*getpeername) (GIOChannel *io, char **name);
+> +       int (*getsockname) (GIOChannel *io, char **name);
+>         void (*stop) (void *data);
+>  };
+>
+> --
+> 1.8.1.4
 
-diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
-index 76be234..ea6076c 100644
---- a/profiles/cyclingspeed/cyclingspeed.c
-+++ b/profiles/cyclingspeed/cyclingspeed.c
-@@ -964,8 +964,6 @@ static int csc_adapter_probe(struct btd_profile *p, struct btd_adapter *adapter)
- 	cadapter = g_new0(struct csc_adapter, 1);
- 	cadapter->adapter = adapter;
- 
--	csc_adapters = g_slist_prepend(csc_adapters, cadapter);
--
- 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
- 						adapter_get_path(adapter),
- 						CYCLINGSPEED_MANAGER_INTERFACE,
-@@ -978,6 +976,8 @@ static int csc_adapter_probe(struct btd_profile *p, struct btd_adapter *adapter)
- 		return -EIO;
- 	}
- 
-+	csc_adapters = g_slist_prepend(csc_adapters, cadapter);
-+
- 	return 0;
- }
- 
--- 
-1.8.1.4
+Pushed, thanks.
 
+
+--
+Luiz Augusto von Dentz
