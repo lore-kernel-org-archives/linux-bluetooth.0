@@ -1,58 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1369744633-8980-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1369744633-8980-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Date: Wed, 29 May 2013 03:30:41 -0700
-Message-ID: <CABBYNZ+bfZkhD6FOdgw7oyCj6fZiMpJA6VCSuMe1UdJWMe0LqQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/9] obexd: Queue session commands
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Fix mgmt handling of power on failures
+Date: Wed, 29 May 2013 09:51:29 +0300
+Message-Id: <1369810289-5090-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1369724867-31011-1-git-send-email-johan.hedberg@gmail.com>
+References: <1369724867-31011-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Tue, May 28, 2013 at 5:37 AM, Christian Fetzer
-<christian.fetzer@oss.bmw-carit.de> wrote:
-> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
->
-> - v2: Split patches, remove void *process_data from pending_request,
->       adapt names as requested
-> ---
->
-> So far only transfers are queued in OBEX sessions. Commands like setpath
-> are not queued and the commands will simply fail when a different
-> operation or transfer is ongoing. This patch set removes this limitation and
-> queues commands as well.
->
-> Currently, the MAP client is directly affected by this limitation.
-> An immediate call to SetPath after the MAP connection has been established
-> reliably fails, because MNS is being connected in the background in parallel.
->
-> Christian Fetzer (9):
->   obexd: Add process callback to session's pending_request
->   obexd: Add session_queue_add
->   obexd: Use process callback to queue transfers
->   obexd: Queue setpath command
->   obexd: Add file_data struct to session
->   obexd: Queue mkdir command
->   obexd: Queue copy command
->   obexd: Queue move command
->   obexd: Queue delete command
->
->  obexd/client/session.c | 296 +++++++++++++++++++++++++++++++++----------------
->  1 file changed, 201 insertions(+), 95 deletions(-)
->
-> --
-> 1.8.2.3
+If hci_dev_open fails we need to ensure that the corresponding
+mgmt_set_powered command gets an appropriate response. This patch fixes
+the missing response by adding a new mgmt_set_powered_failed function
+that's used to indicate a power on failure to mgmt. Since a sutuation
+with the device being rfkilled may require special handling in user
+space the patch uses a new dedicated mgmt status code for this.
 
-Pushed, note that I did some modifications so that the destroy is the
-last parameter of pending_request_new, this is usual practice for
-destroy callbacks.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Cc: stable@vger.kernel.org
+---
+v2: Added dedicated mgmt error for the ERFKILL case
 
-Thanks for your contribution.
+ include/net/bluetooth/hci_core.h |    1 +
+ include/net/bluetooth/mgmt.h     |    1 +
+ net/bluetooth/hci_core.c         |    6 +++++-
+ net/bluetooth/mgmt.c             |   21 +++++++++++++++++++++
+ 4 files changed, 28 insertions(+), 1 deletion(-)
 
---
-Luiz Augusto von Dentz
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 606615c..f77885e 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1118,6 +1118,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
+ int mgmt_index_added(struct hci_dev *hdev);
+ int mgmt_index_removed(struct hci_dev *hdev);
++int mgmt_set_powered_failed(struct hci_dev *hdev, int err);
+ int mgmt_powered(struct hci_dev *hdev, u8 powered);
+ int mgmt_discoverable(struct hci_dev *hdev, u8 discoverable);
+ int mgmt_connectable(struct hci_dev *hdev, u8 connectable);
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 22980a7..9944c3e 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -42,6 +42,7 @@
+ #define MGMT_STATUS_NOT_POWERED		0x0f
+ #define MGMT_STATUS_CANCELLED		0x10
+ #define MGMT_STATUS_INVALID_INDEX	0x11
++#define MGMT_STATUS_RFKILLED		0x12
+ 
+ struct mgmt_hdr {
+ 	__le16	opcode;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 21ad85d..d7c2dbd 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1598,11 +1598,15 @@ static const struct rfkill_ops hci_rfkill_ops = {
+ static void hci_power_on(struct work_struct *work)
+ {
+ 	struct hci_dev *hdev = container_of(work, struct hci_dev, power_on);
++	int err;
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
+-	if (hci_dev_open(hdev->id) < 0)
++	err = hci_dev_open(hdev->id);
++	if (err < 0) {
++		mgmt_set_powered_failed(hdev, err);
+ 		return;
++	}
+ 
+ 	if (test_bit(HCI_AUTO_OFF, &hdev->dev_flags))
+ 		queue_delayed_work(hdev->req_workqueue, &hdev->power_off,
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 5cd3aee..fedc539 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3533,6 +3533,27 @@ new_settings:
+ 	return err;
+ }
+ 
++int mgmt_set_powered_failed(struct hci_dev *hdev, int err)
++{
++	struct pending_cmd *cmd;
++	u8 status;
++
++	cmd = mgmt_pending_find(MGMT_OP_SET_POWERED, hdev);
++	if (!cmd)
++		return -ENOENT;
++
++	if (err == -ERFKILL)
++		status = MGMT_STATUS_RFKILLED;
++	else
++		status = MGMT_STATUS_FAILED;
++
++	err = cmd_status(cmd->sk, hdev->id, MGMT_OP_SET_POWERED, status);
++
++	mgmt_pending_remove(cmd);
++
++	return err;
++}
++
+ int mgmt_discoverable(struct hci_dev *hdev, u8 discoverable)
+ {
+ 	struct cmd_lookup match = { NULL, hdev };
+-- 
+1.7.10.4
+
