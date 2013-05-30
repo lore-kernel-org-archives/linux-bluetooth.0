@@ -1,62 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
-Subject: Re: [PATCH 1/5] core: Add option to list available plugins
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1369951317-16789-1-git-send-email-szymon.janc@gmail.com>
-Date: Fri, 31 May 2013 07:13:51 +0900
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <90A041DA-6E52-4FB3-8BFE-423FF3D8AC54@holtmann.org>
-References: <1369951317-16789-1-git-send-email-szymon.janc@gmail.com>
-To: Szymon Janc <szymon.janc@gmail.com>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 1/2] doc: Add reauthentication commands and event to Management API
+Date: Fri, 31 May 2013 00:10:50 +0200
+Message-ID: <15570803.bRbUDUQyn6@athlon>
+In-Reply-To: <849D1D9E-D8A0-491B-9BCF-13878A536A54@holtmann.org>
+References: <1368566595-8836-1-git-send-email-szymon.janc@gmail.com> <24461786.QnjOjE6FNW@athlon> <849D1D9E-D8A0-491B-9BCF-13878A536A54@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+On Tuesday 28 May 2013 03:57:24 Marcel Holtmann wrote:
+> Hi Szymon,
 
-> This allows to list plugins names that can be passed with -p/-P
-> options. This is usefull with binary provided by distribution to easily
-> determine what plugins are supported.
-> ---
-> src/hcid.h   |    1 +
-> src/main.c   |    8 ++++++++
-> src/plugin.c |   47 +++++++++++++++++++++++++++++++++++++++++++++++
-> 3 files changed, 56 insertions(+)
+Hi Marcel,
+
 > 
-> diff --git a/src/hcid.h b/src/hcid.h
-> index ea67cc2..ff4a3c5 100644
-> --- a/src/hcid.h
-> +++ b/src/hcid.h
-> @@ -43,6 +43,7 @@ extern struct main_opts main_opts;
+> >>> Those will be used to allow/disallow of performing remote device
+> >>> reauthentication.
+> >> 
+> >> I guess you could expand this explaining why you need this in the MGMT
+> >> API,
+> >> i.e. why this can't be implemented on userspace only.
+> > 
+> > This will allow to avoid ACL disconnect in case of auth failure and should
+> > allow to reauth also for incoming connections e.g. this is what Android
+> > do.
+> > I couldn't figure out how this could be achieved in userspace only but if
+> > it is possible I'm totally after userspace-only implementation.
 > 
-> gboolean plugin_init(const char *enable, const char *disable);
-> void plugin_cleanup(void);
-> +void plugin_list(void);
-> 
-> void rfkill_init(void);
-> void rfkill_exit(void);
-> diff --git a/src/main.c b/src/main.c
-> index dc0478e..aea3e3f 100644
-> --- a/src/main.c
-> +++ b/src/main.c
-> @@ -381,6 +381,7 @@ static guint setup_signalfd(void)
-> static char *option_debug = NULL;
-> static char *option_plugin = NULL;
-> static char *option_noplugin = NULL;
-> +static gboolean option_listplugins = FALSE;
-> static gboolean option_compat = FALSE;
-> static gboolean option_detach = TRUE;
-> static gboolean option_version = FALSE;
-> @@ -468,6 +469,8 @@ static GOptionEntry options[] = {
-> 				"Specify plugins to load", "NAME,..," },
-> 	{ "noplugin", 'P', 0, G_OPTION_ARG_STRING, &option_noplugin,
-> 				"Specify plugins not to load", "NAME,..." },
-> +	{ "list-plugins", 'l', 0, G_OPTION_ARG_NONE, &option_listplugins,
-> +				"List available plugins", },
+> can someone send around some btmon traces that would demonstrate this. I am
+> not really following on what the issue here is and what we trying to solve.
 
-I am not in favor of doing this. Distributions should build it with the plugins that are useful for that distro and they should be enabled all the time. The disabling of plugins for for developers only.
+Yeah... I was confused about how authentication works. After more reading and 
+testing I see that remote device with no linkkey will initiate pairing before 
+connecting so this patch was trying to address non-existing issue and can be
+ignored. Sorry for noise.
 
-Regards
+I'll follow with agent api extension only.
 
-Marcel
-
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
