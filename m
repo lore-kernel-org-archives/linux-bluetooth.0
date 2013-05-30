@@ -1,32 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC v2 0/2] SSP MITM protection for General Bonding
-Date: Thu, 30 May 2013 11:26:54 +0200
-Message-Id: <1369906016-17006-1-git-send-email-mikel.astiz.oss@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 30 May 2013 11:05:10 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org
+Subject: [patch] Bluetooth: check for (harmless) underflow
+Message-ID: <20130530080510.GD8148@debian>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+"len" can be negative here.  It's harmless but pretty subtle and
+scary looking so lets add a check for it.
 
-I'm reworking Timo's patch originally submitted as "[RFC] Bluetooth: Fix missing MITM protection when being responding LM".
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-The proposal is to use MITM protection for General Bonding exactly as for Dedicated Bonding (patch 2/2). I can't think of any reason why the current implementation has different policies, leading to not using MITM protection for General Bonding even if the I/O capabilities make it possible.
-
-The proposal is therefore to make both bonding types equal.
-
-Another alternative would be to toggle this behavior through a mgmt API setting.
-
-Mikel Astiz (1):
-  Bluetooth: Use defines instead of integer literals
-
-Timo Mueller (1):
-  Bluetooth: Use MITM protection when responding LM
-
- net/bluetooth/hci_event.c | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
-
--- 
-1.8.1.4
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index a1b7a02..438f39e 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4069,6 +4069,9 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
+ 	BT_DBG("scid 0x%4.4x flags 0x%2.2x result 0x%2.2x len %d", scid, flags,
+ 	       result, len);
+ 
++	if (len < 0)
++		return -EINVAL;
++
+ 	chan = l2cap_get_chan_by_scid(conn, scid);
+ 	if (!chan)
+ 		return 0;
