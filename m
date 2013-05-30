@@ -2,51 +2,91 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 4/5] tools: Update rfcomm help
-Date: Fri, 31 May 2013 00:01:56 +0200
-Message-Id: <1369951317-16789-4-git-send-email-szymon.janc@gmail.com>
+Subject: [PATCH 2/5] man: Update bluetoothd manual
+Date: Fri, 31 May 2013 00:01:54 +0200
+Message-Id: <1369951317-16789-2-git-send-email-szymon.janc@gmail.com>
 In-Reply-To: <1369951317-16789-1-git-send-email-szymon.janc@gmail.com>
 References: <1369951317-16789-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This includes:
-remove describtion of non-existing option '-f'
-add missing description of '-L' option
-add missing long version of '-i' option
+This puts manual up-to-date with bluetoothd options.
 ---
- tools/rfcomm.c |   18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ src/bluetoothd.8.in |   48 +++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 37 insertions(+), 11 deletions(-)
 
-diff --git a/tools/rfcomm.c b/tools/rfcomm.c
-index ff164c8..b5bea38 100644
---- a/tools/rfcomm.c
-+++ b/tools/rfcomm.c
-@@ -652,15 +652,15 @@ static void usage(void)
- 		"\n");
+diff --git a/src/bluetoothd.8.in b/src/bluetoothd.8.in
+index 09f7f47..1a64c1e 100644
+--- a/src/bluetoothd.8.in
++++ b/src/bluetoothd.8.in
+@@ -4,10 +4,9 @@
+ bluetoothd \- Bluetooth daemon
  
- 	printf("Options:\n"
--		"\t-i [hciX|bdaddr]      Local HCI device or BD Address\n"
--		"\t-h, --help            Display help\n"
--		"\t-r, --raw             Switch TTY into raw mode\n"
--		"\t-A, --auth            Enable authentication\n"
--		"\t-E, --encrypt         Enable encryption\n"
--		"\t-S, --secure          Secure connection\n"
--		"\t-M, --master          Become the master of a piconet\n"
--		"\t-f, --config [file]   Specify alternate config file\n"
--		"\t-a                    Show all devices (default)\n"
-+		"\t-i, --device [hciX|bdaddr]     Local HCI device or BD Address\n"
-+		"\t-h, --help                     Display help\n"
-+		"\t-r, --raw                      Switch TTY into raw mode\n"
-+		"\t-A, --auth                     Enable authentication\n"
-+		"\t-E, --encrypt                  Enable encryption\n"
-+		"\t-S, --secure                   Secure connection\n"
-+		"\t-M, --master                   Become the master of a piconet\n"
-+		"\t-L, --linger [seconds]         Set linger timeout\n"
-+		"\t-a                             Show all devices (default)\n"
- 		"\n");
+ .SH "SYNOPSIS"
+-.B bluetoothd
+-[
+-.B \-n
+-]
++.B bluetoothd [--version] | [--help] | [--list-plugins]
++
++.B bluetoothd [--nodetach] [--compat] [--experimental] [--debug=<files>] [--plugin=<plugins>] [--noplugin=<plugins>]
  
- 	printf("Commands:\n");
+ .SH "DESCRIPTION"
+ This manual page documents briefly the
+@@ -18,19 +17,46 @@ can also provide a number of services via the D-Bus message bus
+ system.
+ .SH "OPTIONS"
+ .TP
+-.BI \-n
+-Don't run as daemon in background.
++.B -v, --version
++Print bluetoothd version and exit.
++.TP
++.B -h, --help
++Print bluetoothd options and exit.
++.TP
++.B -l, --list-plugins
++Print available plugins and exit. 
+ .TP
+-.BI \-d
+-Enable debug information output.
++.B -n, --nodetach
++Enable logging in foreground. Directs log output to the controlling terminal \
++in addition to syslog.
+ .TP
+-.BI \-m\ mtu\-size
+-Use specific MTU size for SDP server.
++.B -d, --debug=<file1>:<file2>:...
++Sets how much information bluetoothd sends to the log destination (usually \
++syslog's "daemon" facility). If the file options are omitted, then debugging \
++information from all the source files are printed. If file options are \
++present, then only debug prints from that source file are printed. The option \
++can be a pattern containing "*" and "?" characters.
+ 
++Example: --debug=src/adapter.c:src/agent.c
++.TP
++.B -p, --plugin=<plugin1>,<plugin2>,..
++Load these plugins only. The option can be a pattern containing "*" and "?" \
++characters.
++.TP
++.B -P, --noplugin=<plugin1>,<plugin2>,..
++Never load these plugins. The option can be a pattern containing "*" and "?" \
++characters.
++.TP
++.B -C, --compat
++Provide deprecated command line interfaces.
++.TP
++.B -E, -experimental
++Enable experimental interfaces. Those interfaces are not guaranteed to be
++compatible or present in future releases.
+ .SH "FILES"
+ .TP
+ .I @CONFIGDIR@/main.conf
+-Default location of the global configuration file.
++Location of the global configuration file.
+ 
+ .SH "AUTHOR"
+ This manual page was written by Marcel Holtmann, Philipp Matthias Hahn and Fredrik Noring.
 -- 
 1.7.10.4
 
