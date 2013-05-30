@@ -1,89 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 30 May 2013 19:52:32 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth 2013-05-30
-Message-ID: <20130530225232.GB14083@joana>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ZPt4rx8FFjLCG7dd"
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
+Subject: Re: [PATCH 1/5] core: Add option to list available plugins
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1369951317-16789-1-git-send-email-szymon.janc@gmail.com>
+Date: Fri, 31 May 2013 07:13:51 +0900
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <90A041DA-6E52-4FB3-8BFE-423FF3D8AC54@holtmann.org>
+References: <1369951317-16789-1-git-send-email-szymon.janc@gmail.com>
+To: Szymon Janc <szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Szymon,
 
---ZPt4rx8FFjLCG7dd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> This allows to list plugins names that can be passed with -p/-P
+> options. This is usefull with binary provided by distribution to easily
+> determine what plugins are supported.
+> ---
+> src/hcid.h   |    1 +
+> src/main.c   |    8 ++++++++
+> src/plugin.c |   47 +++++++++++++++++++++++++++++++++++++++++++++++
+> 3 files changed, 56 insertions(+)
+> 
+> diff --git a/src/hcid.h b/src/hcid.h
+> index ea67cc2..ff4a3c5 100644
+> --- a/src/hcid.h
+> +++ b/src/hcid.h
+> @@ -43,6 +43,7 @@ extern struct main_opts main_opts;
+> 
+> gboolean plugin_init(const char *enable, const char *disable);
+> void plugin_cleanup(void);
+> +void plugin_list(void);
+> 
+> void rfkill_init(void);
+> void rfkill_exit(void);
+> diff --git a/src/main.c b/src/main.c
+> index dc0478e..aea3e3f 100644
+> --- a/src/main.c
+> +++ b/src/main.c
+> @@ -381,6 +381,7 @@ static guint setup_signalfd(void)
+> static char *option_debug = NULL;
+> static char *option_plugin = NULL;
+> static char *option_noplugin = NULL;
+> +static gboolean option_listplugins = FALSE;
+> static gboolean option_compat = FALSE;
+> static gboolean option_detach = TRUE;
+> static gboolean option_version = FALSE;
+> @@ -468,6 +469,8 @@ static GOptionEntry options[] = {
+> 				"Specify plugins to load", "NAME,..," },
+> 	{ "noplugin", 'P', 0, G_OPTION_ARG_STRING, &option_noplugin,
+> 				"Specify plugins not to load", "NAME,..." },
+> +	{ "list-plugins", 'l', 0, G_OPTION_ARG_NONE, &option_listplugins,
+> +				"List available plugins", },
 
-Hi John,
+I am not in favor of doing this. Distributions should build it with the plugins that are useful for that distro and they should be enabled all the time. The disabling of plugins for for developers only.
 
-The following patches are important bug fixes for 3.10, plus the support for a
-new device. We do have three fixes from Johan. The first one is a fix to avoid
-LE-only devices to rely on the (inexistent) extended features data. The second
-patch fixes length checks on incoming L2CAP signalling PDUs so we can discard
-PDU whose size doesn't match the one reported in the header.
-The last one fixes the handling of power on failures, we now report proper
-errors to mgmt when hci_dev_open().
+Regards
 
-Please pull or let me know of any issues! Thanks.
+Marcel
 
-	Gustavo
-
----
-
-The following changes since commit f942d116b80feb3ae618a0d8ce2df6e853526d3c:
-
-  brcmsmac: fix regression observed in 3.10-rc1 (2013-05-29 14:46:51 -0400)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
-
-for you to fetch changes up to 0f9e216b0e12971af8a1d39c98c353c76533283b:
-
-  Bluetooth: Fix mgmt handling of power on failures (2013-05-30 18:36:08 -0300)
-
-----------------------------------------------------------------
-Bing Zhao (1):
-      Bluetooth: btmrvl: support Marvell Bluetooth device SD8897
-
-Johan Hedberg (3):
-      Bluetooth: Fix checks for LE support on LE-only controllers
-      Bluetooth: Fix missing length checks for L2CAP signalling PDUs
-      Bluetooth: Fix mgmt handling of power on failures
-
- drivers/bluetooth/Kconfig        |  4 +--
- drivers/bluetooth/btmrvl_sdio.c  | 28 ++++++++++++++++++
- include/net/bluetooth/hci_core.h |  1 +
- include/net/bluetooth/mgmt.h     |  1 +
- net/bluetooth/hci_core.c         |  6 +++-
- net/bluetooth/l2cap_core.c       | 70 ++++++++++++++++++++++++++++++++------------
- net/bluetooth/mgmt.c             | 23 ++++++++++++++-
- net/bluetooth/smp.c              |  4 +--
- 8 files changed, 113 insertions(+), 24 deletions(-)
-
-
---ZPt4rx8FFjLCG7dd
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.13 (GNU/Linux)
-
-iQIcBAEBAgAGBQJRp9gwAAoJEPs3PUX4s20ozpEP/0rBewYThcZk/uSEA2lu1011
-eOaj7LXxiMKVKesNGrpbmDyPiVwy5MiQUthPt3DOGt9TSwHOO3zndlt9mCJtuqeg
-/yyhT2ApNyLN58sGfsg2mFYuq4TAlKjLOgjJxGdq0zLQo5Ip+T4dagFmdeYaMEgG
-agH+aIbmrBqU5/rz3YsTvDFbK4ww0roLuHtthVP7W4iFd5JwETSGn/u2xGbH3z7p
-X1p/3JvrGmen/fuTIhS1kfCeigKob9c/tXjTyjpS4pFzBZq4BIYxRYJmhnlri0Hv
-+8JKvfDA6cxyZ7Hsnr9W/ZkKPQmQw5xmqL7b+Ui2jnxf0HKnDYxd6aY62r1kELFZ
-cJfO6VicQXNcUbwuCnR/28DRJ2giKa7pZOzY9dq2r1OH0DJYn65+b4XetUBAD1Kk
-8gUFxks5/rYKNRt2tTEa6ZPFzcm0JqMEoZTpI1d2UDRvMKQoQiuytfLqGSW+5mAB
-wAArBED1kv6qxkpXUq1KPeWbQ3r4TpUZk38NhDqAn00BOWb4FMvNRwcqoPoq/iVS
-n2+CZw7tDqi192nWCrqSELkLRkP+03eh07XMzahDThk7lr32KFkJlJlJO1YbLa7z
-Zf/72A4BfKfUV4hJT2nppD42Ju6WVSkRvnI7ygGafinUIEVS8X079VOeuDUrAQSY
-xsSGZBcu3YAkwt/PHMso
-=hu5I
------END PGP SIGNATURE-----
-
---ZPt4rx8FFjLCG7dd--
