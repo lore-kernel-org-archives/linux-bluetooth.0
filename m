@@ -1,31 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 30 May 2013 14:03:46 +0100
-From: Ian Lynagh <igloo@earth.li>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: Problems with a Plantronics BT300
-Message-ID: <20130530130346.GA14111@matrix.chaos.earth.li>
-References: <20130527152151.GA465@matrix.chaos.earth.li>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130527152151.GA465@matrix.chaos.earth.li>
+Cc: Timo Mueller <timo.mueller@bmw-carit.de>,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [RFC v2 2/2] Bluetooth: Use MITM protection when responding LM
+Date: Thu, 30 May 2013 11:26:56 +0200
+Message-Id: <1369906016-17006-3-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1369906016-17006-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1369906016-17006-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, May 27, 2013 at 04:21:51PM +0100, Ian Lynagh wrote:
-> 
-> $ time sudo /lib/udev/hid2hci --devpath=devices/pci0000:00/0000:00:1d.0/usb2/2-1/2-1.6/2-1.6:1.4/input/input11 --method=csr
-> 
-> which takes 10 seconds and adds this line to dmesg:
-> 
-> [587720.123420] usb 2-1.6: usbfs: USBDEVFS_CONTROL failed cmd hid2hci rqt 64 rq 0 len 0 ret -110
-> 
-> Am I doing something wrong? Or is my dongle just not supported?
+From: Timo Mueller <timo.mueller@bmw-carit.de>
 
-If it's not supported, does anyone have any recommendations for a USB
-dongle that works well with Linux please? (ideally without needing
-non-free firmware).
+A MITM protected SSP associaton model can be used for pairing if both
+local and remote IO capabilities are set to something other than
+NoInputNoOutput, regardless of the bonding type (dedicated or general).
 
+With these IO capabilities a MITM protected SSP association model has
+been used by the Kernel if we are initiating the pairing process
+(initiating LM).
 
-Thanks
-Ian
+When responding to a pairing request (remote device is the initiating
+LM) the pairing should also be proteced against MITM attacks, as
+proposed in this patch.
+
+Signed-off-by: Timo Mueller <timo.mueller@bmw-carit.de>
+Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
+---
+ net/bluetooth/hci_event.c | 21 +++++++++------------
+ 1 file changed, 9 insertions(+), 12 deletions(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 777a040..ca59623 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3024,22 +3024,19 @@ unlock:
+ 
+ static u8 hci_get_auth_req(struct hci_conn *conn)
+ {
+-	/* If remote requests dedicated bonding follow that lead */
+-	if ((conn->remote_auth & ~0x01) == HCI_AT_DEDICATED_BONDING) {
+-		/* If both remote and local IO capabilities allow MITM
+-		 * protection then require it, otherwise don't */
+-		if (conn->remote_cap == SMP_IO_NO_INPUT_OUTPUT ||
+-		    conn->io_capability == SMP_IO_NO_INPUT_OUTPUT)
+-			return 0x02;
+-		else
+-			return 0x03;
+-	}
+-
+ 	/* If remote requests no-bonding follow that lead */
+ 	if ((conn->remote_auth & ~0x01) == HCI_AT_NO_BONDING)
+ 		return conn->remote_auth | (conn->auth_type & 0x01);
+ 
+-	return conn->auth_type;
++	/* If both remote and local IO capabilities allow MITM protection
++	 * then require it
++	 */
++	if (conn->remote_cap != SMP_IO_NO_INPUT_OUTPUT &&
++	    conn->io_capability != SMP_IO_NO_INPUT_OUTPUT)
++		return conn->remote_auth | 0x01;
++
++	/* No MITM protection possible due to lacking capabilities */
++	return conn->remote_auth & ~0x01;
+ }
+ 
+ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+-- 
+1.8.1.4
 
