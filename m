@@ -1,51 +1,125 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: Alex Deymo <deymo@chromium.org>
-Date: Wed, 29 May 2013 18:57:45 -0700
-Message-ID: <CAGd9gwhg507Me7JmrJF+it5U8JeXrCqx1gdXNHz8EopfsWFDhQ@mail.gmail.com>
-Subject: Temporary devices
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	keybuk <keybuk@chromium.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
+Subject: Re: [PATCH v2] Bluetooth: Fix mgmt handling of power on failures
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1369810289-5090-1-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 30 May 2013 10:55:56 +0900
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <6D7361BA-24A0-49D5-AA04-C04C7E1101A1@holtmann.org>
+References: <1369724867-31011-1-git-send-email-johan.hedberg@gmail.com> <1369810289-5090-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello ML,
+Hi Johan,
 
-I have a problem with the lifetime of a device object in the
-bluetoothd. When you scan for devices they first appear as temporary
-devices (device_is_temporary()==true), and attempting to pair to a
-given device will mark it as not temporary. The problem is that if the
-pair fails, for example because the device is no longer in range or is
-off, the device keeps its non-temporary status.
+> If hci_dev_open fails we need to ensure that the corresponding
+> mgmt_set_powered command gets an appropriate response. This patch fixes
+> the missing response by adding a new mgmt_set_powered_failed function
+> that's used to indicate a power on failure to mgmt. Since a situation
 
-When this happens, the device status is as follows:
-* Remove_temp_devices() will never remove it after the timeout, since
-it is not temporary.
-* The device's profiles are unknown because the device was never
-paired and thus, the device is not stored on disk (we just know the
-name on the ADAPTER_ADDR/cache/DEVICE_ADDR file)...
-* Because of this, a bluetoothd restart will discard that device in
-the new process, meaning that the device was in fact a temporary
-device... but the device will stay there in the device list forever
-(until we Remove it).
+might want to fix this typo.
 
-I tried to set the temporary property back to true when the pairing
-fails (and is not connected, nor trusted, etc ....) but I see a lot of
-other problems with that approach. In general... I don't get why we
-need the "temporary" field itself... temporary should be derived from
-properties like bonded, connected, trusted and some sort of
-"LastSeen".
+> with the device being rfkilled may require special handling in user
+> space the patch uses a new dedicated mgmt status code for this.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Cc: stable@vger.kernel.org
+> ---
+> v2: Added dedicated mgmt error for the ERFKILL case
+> 
+> include/net/bluetooth/hci_core.h |    1 +
+> include/net/bluetooth/mgmt.h     |    1 +
+> net/bluetooth/hci_core.c         |    6 +++++-
+> net/bluetooth/mgmt.c             |   21 +++++++++++++++++++++
+> 4 files changed, 28 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 606615c..f77885e 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1118,6 +1118,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
+> int mgmt_control(struct sock *sk, struct msghdr *msg, size_t len);
+> int mgmt_index_added(struct hci_dev *hdev);
+> int mgmt_index_removed(struct hci_dev *hdev);
+> +int mgmt_set_powered_failed(struct hci_dev *hdev, int err);
+> int mgmt_powered(struct hci_dev *hdev, u8 powered);
+> int mgmt_discoverable(struct hci_dev *hdev, u8 discoverable);
+> int mgmt_connectable(struct hci_dev *hdev, u8 connectable);
+> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+> index 22980a7..9944c3e 100644
+> --- a/include/net/bluetooth/mgmt.h
+> +++ b/include/net/bluetooth/mgmt.h
+> @@ -42,6 +42,7 @@
+> #define MGMT_STATUS_NOT_POWERED		0x0f
+> #define MGMT_STATUS_CANCELLED		0x10
+> #define MGMT_STATUS_INVALID_INDEX	0x11
+> +#define MGMT_STATUS_RFKILLED		0x12
+> 
+> struct mgmt_hdr {
+> 	__le16	opcode;
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 21ad85d..d7c2dbd 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1598,11 +1598,15 @@ static const struct rfkill_ops hci_rfkill_ops = {
+> static void hci_power_on(struct work_struct *work)
+> {
+> 	struct hci_dev *hdev = container_of(work, struct hci_dev, power_on);
+> +	int err;
+> 
+> 	BT_DBG("%s", hdev->name);
+> 
+> -	if (hci_dev_open(hdev->id) < 0)
+> +	err = hci_dev_open(hdev->id);
+> +	if (err < 0) {
+> +		mgmt_set_powered_failed(hdev, err);
+> 		return;
+> +	}
+> 
+> 	if (test_bit(HCI_AUTO_OFF, &hdev->dev_flags))
+> 		queue_delayed_work(hdev->req_workqueue, &hdev->power_off,
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 5cd3aee..fedc539 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -3533,6 +3533,27 @@ new_settings:
+> 	return err;
+> }
+> 
+> +int mgmt_set_powered_failed(struct hci_dev *hdev, int err)
+> +{
+> +	struct pending_cmd *cmd;
+> +	u8 status;
+> +
+> +	cmd = mgmt_pending_find(MGMT_OP_SET_POWERED, hdev);
+> +	if (!cmd)
+> +		return -ENOENT;
+> +
+> +	if (err == -ERFKILL)
+> +		status = MGMT_STATUS_RFKILLED;
+> +	else
+> +		status = MGMT_STATUS_FAILED;
+> +
+> +	err = cmd_status(cmd->sk, hdev->id, MGMT_OP_SET_POWERED, status);
+> +
+> +	mgmt_pending_remove(cmd);
+> +
+> +	return err;
+> +}
+> +
+> int mgmt_discoverable(struct hci_dev *hdev, u8 discoverable)
+> {
+> 	struct cmd_lookup match = { NULL, hdev };
 
-Thinking about this, I propose to add the already mentioned "LastSeen"
-property to the Device1 interface and let the client handle what's the
-right thing to show to the user in a meaningful order. The other thing
-we could do is to get rid of the explicit "temporary" property and
-make it just a function of the other mentioned properties. Basically,
-bluetoothd should get rid of a device when nobody cares about it (is
-not connected, not trusted nor paired, etc) and we didn't heard from
-it in the last N minutes.
-Any thoughts?
+We do not need to do this in this patch, but I think we need to get rid of all the return values for the status notification functions. Since we never use them, it is pointless to keep them around. Or are we doing anything useful with them.
 
-Thanks,
-Alex.
+Anyhow, this patch is fine with me.
+
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
+Regards
+
+Marcel
+
