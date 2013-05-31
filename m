@@ -1,92 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH v2 2/5] man: Update bluetoothd manual
-Date: Fri, 31 May 2013 22:40:45 +0200
-Message-Id: <1370032845-17123-1-git-send-email-szymon.janc@gmail.com>
-In-Reply-To: <1369951317-16789-2-git-send-email-szymon.janc@gmail.com>
-References: <1369951317-16789-2-git-send-email-szymon.janc@gmail.com>
+Subject: [PATCH BlueZ 12/14] client/bluetooth-player: Add list command
+Date: Fri, 31 May 2013 13:55:47 +0300
+Message-Id: <1369997749-8663-12-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1369997749-8663-1-git-send-email-luiz.dentz@gmail.com>
+References: <1369997749-8663-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This puts manual up-to-date with bluetoothd options.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+Add support for list command which can be used to list available players
 ---
+ client/bluetooth-player.c | 59 ++++++++++++++++++++++++++++-------------------
+ 1 file changed, 35 insertions(+), 24 deletions(-)
 
-V2: Removed list-plugins option description
-
- src/bluetoothd.8.in |   45 ++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 34 insertions(+), 11 deletions(-)
-
-diff --git a/src/bluetoothd.8.in b/src/bluetoothd.8.in
-index 09f7f47..0bf3914 100644
---- a/src/bluetoothd.8.in
-+++ b/src/bluetoothd.8.in
-@@ -4,10 +4,9 @@
- bluetoothd \- Bluetooth daemon
+diff --git a/client/bluetooth-player.c b/client/bluetooth-player.c
+index 373c49e..7cfaa17 100644
+--- a/client/bluetooth-player.c
++++ b/client/bluetooth-player.c
+@@ -289,12 +289,47 @@ static void cmd_rewind(int argc, char *argv[])
+ 	rl_printf("Rewind playback\n");
+ }
  
- .SH "SYNOPSIS"
--.B bluetoothd
--[
--.B \-n
--]
-+.B bluetoothd [--version] | [--help]
++static char *player_description(GDBusProxy *proxy, const char *description)
++{
++	const char *path;
 +
-+.B bluetoothd [--nodetach] [--compat] [--experimental] [--debug=<files>] [--plugin=<plugins>] [--noplugin=<plugins>]
++	path = g_dbus_proxy_get_path(proxy);
++
++	return g_strdup_printf("%s%s%sPlayer %s ",
++					description ? "[" : "",
++					description ? : "",
++					description ? "] " : "",
++					path);
++}
++
++static void print_player(GDBusProxy *proxy, const char *description)
++{
++	char *str;
++
++	str = player_description(proxy, description);
++
++	rl_printf("%s%s\n", str, default_player == proxy ? "[default]" : "");
++
++	g_free(str);
++}
++
++static void cmd_list(int argc, char *arg[])
++{
++	GSList *l;
++
++	for (l = players; l; l = g_slist_next(l)) {
++		GDBusProxy *proxy = l->data;
++		print_player(proxy, NULL);
++	}
++}
++
+ static const struct {
+ 	const char *cmd;
+ 	const char *arg;
+ 	void (*func) (int argc, char *argv[]);
+ 	const char *desc;
+ } cmd_table[] = {
++	{ "list",         NULL,       cmd_list, "List available players" },
+ 	{ "play",         NULL,       cmd_play, "Start playback" },
+ 	{ "pause",        NULL,       cmd_pause, "Pause playback" },
+ 	{ "stop",         NULL,       cmd_stop, "Stop playback" },
+@@ -515,30 +550,6 @@ static guint setup_standard_input(void)
+ 	return source;
+ }
  
- .SH "DESCRIPTION"
- This manual page documents briefly the
-@@ -18,19 +17,43 @@ can also provide a number of services via the D-Bus message bus
- system.
- .SH "OPTIONS"
- .TP
--.BI \-n
--Don't run as daemon in background.
-+.B -v, --version
-+Print bluetoothd version and exit.
- .TP
--.BI \-d
--Enable debug information output.
-+.B -h, --help
-+Print bluetoothd options and exit.
- .TP
--.BI \-m\ mtu\-size
--Use specific MTU size for SDP server.
-+.B -n, --nodetach
-+Enable logging in foreground. Directs log output to the controlling terminal \
-+in addition to syslog.
-+.TP
-+.B -d, --debug=<file1>:<file2>:...
-+Sets how much information bluetoothd sends to the log destination (usually \
-+syslog's "daemon" facility). If the file options are omitted, then debugging \
-+information from all the source files are printed. If file options are \
-+present, then only debug prints from that source file are printed. The option \
-+can be a pattern containing "*" and "?" characters.
- 
-+Example: --debug=src/adapter.c:src/agent.c
-+.TP
-+.B -p, --plugin=<plugin1>,<plugin2>,..
-+Load these plugins only. The option can be a pattern containing "*" and "?" \
-+characters.
-+.TP
-+.B -P, --noplugin=<plugin1>,<plugin2>,..
-+Never load these plugins. The option can be a pattern containing "*" and "?" \
-+characters.
-+.TP
-+.B -C, --compat
-+Provide deprecated command line interfaces.
-+.TP
-+.B -E, -experimental
-+Enable experimental interfaces. Those interfaces are not guaranteed to be
-+compatible or present in future releases.
- .SH "FILES"
- .TP
- .I @CONFIGDIR@/main.conf
--Default location of the global configuration file.
-+Location of the global configuration file.
- 
- .SH "AUTHOR"
- This manual page was written by Marcel Holtmann, Philipp Matthias Hahn and Fredrik Noring.
+-static char *player_description(GDBusProxy *proxy, const char *description)
+-{
+-	const char *path;
+-
+-	path = g_dbus_proxy_get_path(proxy);
+-
+-	return g_strdup_printf("%s%s%sPlayer %s ",
+-					description ? "[" : "",
+-					description ? : "",
+-					description ? "] " : "",
+-					path);
+-}
+-
+-static void print_player(GDBusProxy *proxy, const char *description)
+-{
+-	char *str;
+-
+-	str = player_description(proxy, description);
+-
+-	rl_printf("%s%s\n", str, default_player == proxy ? "[default]" : "");
+-
+-	g_free(str);
+-}
+-
+ static void player_added(GDBusProxy *proxy)
+ {
+ 	players = g_slist_append(players, proxy);
 -- 
-1.7.10.4
+1.8.1.4
 
