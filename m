@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 14/14] client/bluetooth-player: Add select command
-Date: Fri, 31 May 2013 13:55:49 +0300
-Message-Id: <1369997749-8663-14-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 10/14] client/bluetooth-player: Add fast_forward command
+Date: Fri, 31 May 2013 13:55:45 +0300
+Message-Id: <1369997749-8663-10-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1369997749-8663-1-git-send-email-luiz.dentz@gmail.com>
 References: <1369997749-8663-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,53 +11,61 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add support for select command which can be used to set the default
-player
+Add support for fast_forward command which can be used to fast forward
+the playback
 ---
- client/bluetooth-player.c | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ client/bluetooth-player.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
 diff --git a/client/bluetooth-player.c b/client/bluetooth-player.c
-index 3e25bba..3daf586 100644
+index 92d577a..dcbe301 100644
 --- a/client/bluetooth-player.c
 +++ b/client/bluetooth-player.c
-@@ -438,6 +438,28 @@ static void cmd_show(int argc, char *argv[])
- 	print_property(proxy, "Track");
+@@ -231,6 +231,35 @@ static void cmd_previous(int argc, char *argv[])
+ 	rl_printf("Attempting to jump to previous\n");
  }
  
-+static void cmd_select(int argc, char *argv[])
++static void fast_forward_reply(DBusMessage *message, void *user_data)
 +{
-+	GDBusProxy *proxy;
++	DBusError error;
 +
-+	if (argc < 2) {
-+		rl_printf("Missing player address argument\n");
++	dbus_error_init(&error);
++
++	if (dbus_set_error_from_message(&error, message) == TRUE) {
++		rl_printf("Failed to fast forward: %s\n", error.name);
++		dbus_error_free(&error);
 +		return;
 +	}
 +
-+	proxy = find_player(argv[1]);
-+	if (proxy == NULL) {
-+		rl_printf("Player %s not available\n", argv[1]);
++	rl_printf("FastForward successful\n");
++}
++
++static void cmd_fast_forward(int argc, char *argv[])
++{
++	if (!check_default_player())
++		return;
++
++	if (g_dbus_proxy_method_call(default_player, "FastForward", NULL,
++				fast_forward_reply, NULL, NULL) == FALSE) {
++		rl_printf("Failed to jump to previous\n");
 +		return;
 +	}
 +
-+	if (default_player == proxy)
-+		return;
-+
-+	default_player = proxy,
-+	print_player(proxy, NULL);
++	rl_printf("Fast forward playback\n");
 +}
 +
  static const struct {
  	const char *cmd;
  	const char *arg;
-@@ -446,6 +468,7 @@ static const struct {
- } cmd_table[] = {
- 	{ "list",         NULL,       cmd_list, "List available players" },
- 	{ "show",         "[player]", cmd_show, "Player information" },
-+	{ "select",       "<player>", cmd_select, "Select default player" },
- 	{ "play",         NULL,       cmd_play, "Start playback" },
- 	{ "pause",        NULL,       cmd_pause, "Pause playback" },
+@@ -242,6 +271,8 @@ static const struct {
  	{ "stop",         NULL,       cmd_stop, "Stop playback" },
+ 	{ "next",         NULL,       cmd_next, "Jump to next item" },
+ 	{ "previous",     NULL,       cmd_previous, "Jump to previous item" },
++	{ "fast_forward", NULL,       cmd_fast_forward,
++						"Fast forward playback" },
+ 	{ "quit",         NULL,       cmd_quit, "Quit program" },
+ 	{ "exit",         NULL,       cmd_quit },
+ 	{ "help" },
 -- 
 1.8.1.4
 
