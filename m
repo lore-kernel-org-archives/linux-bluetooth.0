@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 10/14] client/bluetooth-player: Add fast_forward command
-Date: Fri, 31 May 2013 13:55:45 +0300
-Message-Id: <1369997749-8663-10-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 09/14] client/bluetooth-player: Add previous command
+Date: Fri, 31 May 2013 13:55:44 +0300
+Message-Id: <1369997749-8663-9-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1369997749-8663-1-git-send-email-luiz.dentz@gmail.com>
 References: <1369997749-8663-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,58 +11,57 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add support for fast_forward command which can be used to fast forward
-the playback
+Add support for next command which can be used to jump to the previous
+item
 ---
- client/bluetooth-player.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ client/bluetooth-player.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
 diff --git a/client/bluetooth-player.c b/client/bluetooth-player.c
-index 92d577a..dcbe301 100644
+index a6eb932..92d577a 100644
 --- a/client/bluetooth-player.c
 +++ b/client/bluetooth-player.c
-@@ -231,6 +231,35 @@ static void cmd_previous(int argc, char *argv[])
- 	rl_printf("Attempting to jump to previous\n");
+@@ -202,6 +202,35 @@ static void cmd_next(int argc, char *argv[])
+ 	rl_printf("Attempting to jump to next\n");
  }
  
-+static void fast_forward_reply(DBusMessage *message, void *user_data)
++static void previous_reply(DBusMessage *message, void *user_data)
 +{
 +	DBusError error;
 +
 +	dbus_error_init(&error);
 +
 +	if (dbus_set_error_from_message(&error, message) == TRUE) {
-+		rl_printf("Failed to fast forward: %s\n", error.name);
++		rl_printf("Failed to jump to previous: %s\n", error.name);
 +		dbus_error_free(&error);
 +		return;
 +	}
 +
-+	rl_printf("FastForward successful\n");
++	rl_printf("Previous successful\n");
 +}
 +
-+static void cmd_fast_forward(int argc, char *argv[])
++static void cmd_previous(int argc, char *argv[])
 +{
 +	if (!check_default_player())
 +		return;
 +
-+	if (g_dbus_proxy_method_call(default_player, "FastForward", NULL,
-+				fast_forward_reply, NULL, NULL) == FALSE) {
++	if (g_dbus_proxy_method_call(default_player, "Previous", NULL,
++					previous_reply, NULL, NULL) == FALSE) {
 +		rl_printf("Failed to jump to previous\n");
 +		return;
 +	}
 +
-+	rl_printf("Fast forward playback\n");
++	rl_printf("Attempting to jump to previous\n");
 +}
 +
  static const struct {
  	const char *cmd;
  	const char *arg;
-@@ -242,6 +271,8 @@ static const struct {
+@@ -212,6 +241,7 @@ static const struct {
+ 	{ "pause",        NULL,       cmd_pause, "Pause playback" },
  	{ "stop",         NULL,       cmd_stop, "Stop playback" },
  	{ "next",         NULL,       cmd_next, "Jump to next item" },
- 	{ "previous",     NULL,       cmd_previous, "Jump to previous item" },
-+	{ "fast_forward", NULL,       cmd_fast_forward,
-+						"Fast forward playback" },
++	{ "previous",     NULL,       cmd_previous, "Jump to previous item" },
  	{ "quit",         NULL,       cmd_quit, "Quit program" },
  	{ "exit",         NULL,       cmd_quit },
  	{ "help" },
