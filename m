@@ -1,74 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 01/14] build: Add bluetooth-player command line client
-Date: Fri, 31 May 2013 13:55:36 +0300
-Message-Id: <1369997749-8663-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 30 May 2013 21:02:46 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [patch] Bluetooth: check for (harmless) underflow
+Message-ID: <20130531000246.GC14083@joana>
+References: <20130530080510.GD8148@debian>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="uQr8t48UFsdbeI+V"
+In-Reply-To: <20130530080510.GD8148@debian>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-bluetooth-player is intended to control players connect over bluetooth.
----
- Makefile.tools            |  5 +++++
- client/bluetooth-player.c | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 36 insertions(+)
- create mode 100644 client/bluetooth-player.c
+--uQr8t48UFsdbeI+V
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/Makefile.tools b/Makefile.tools
-index acd403e..d7920c2 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -7,6 +7,11 @@ client_bluetoothctl_SOURCES = $(gdbus_sources) client/main.c \
- 					client/agent.h client/agent.c \
- 					monitor/uuid.h monitor/uuid.c
- client_bluetoothctl_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ -lreadline
-+
-+bin_PROGRAMS += client/bluetooth-player
-+client_bluetooth_player_SOURCES = $(gdbus_sources) client/bluetooth-player.c \
-+					client/display.c
-+client_bluetooth_player_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ -lreadline
- endif
- 
- if MONITOR
-diff --git a/client/bluetooth-player.c b/client/bluetooth-player.c
-new file mode 100644
-index 0000000..b38861a
---- /dev/null
-+++ b/client/bluetooth-player.c
-@@ -0,0 +1,31 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+int main(int argc, char *argv[])
-+{
-+	return 0;
-+}
--- 
-1.8.1.4
+Hi Dan,
 
+* Dan Carpenter <dan.carpenter@oracle.com> [2013-05-30 11:05:10 +0300]:
+
+> "len" can be negative here.  It's harmless but pretty subtle and
+> scary looking so lets add a check for it.
+>=20
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+>=20
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index a1b7a02..438f39e 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -4069,6 +4069,9 @@ static inline int l2cap_config_rsp(struct l2cap_con=
+n *conn,
+>  	BT_DBG("scid 0x%4.4x flags 0x%2.2x result 0x%2.2x len %d", scid, flags,
+>  	       result, len);
+> =20
+> +	if (len < 0)
+> +		return -EINVAL;
+> +
+>  	chan =3D l2cap_get_chan_by_scid(conn, scid);
+>  	if (!chan)
+>  		return 0;
+
+We already pushed to bluetooth.git a more comprehensive patch to fix this
+issue and others over the code. Thanks anyway for sending this.
+
+	Gustavo
+
+--uQr8t48UFsdbeI+V
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.13 (GNU/Linux)
+
+iQIcBAEBAgAGBQJRp+imAAoJEPs3PUX4s20og0YQAIic5kSVIW92Pr5Lxy9131EZ
+UKSxd+gDhTD99VpRg4oDsteB/816BKr29A1XJtAXAHrfG3AKUHGm+YGGOimgWSkf
+m3OP+/L9Dw5QRw7VqSZt+85+SKE1QaC8PaJe9lgIlefwTFYqZ+faBsaSVhkVs2uc
+51KyExZIbzFtmcrdP4acST+4FV0Zl5Q+HAX+I/HLhIGkJiK63ArEfjbt978Xu5Xx
+WD4tcorzdvd79fgdZsDMrg4av/Px2XhJdCXtBFihTUSGh/jITaBNl5JbvRIp0DMe
+a3qeo3sv/KRXn0/RKdX3z/g/UYEVu+XGjqUj2eZlrlkM4zkmyg8B+z8LETPhawE9
+ugH0WckGv637racL16taLRiN1O9dFAI95sd6PasR4BFbSgO1HRT3JZPmhjWcoE+v
+oxA7m1Kvau9q9jNWo9HEu+OWW/YsC0KQ1XSRklvS/GBypZLTQPNnMAQrhNV6QmsZ
+0Qp3Xvc6tUeeus4HIGTzjmYFg7js+6A9ORE6fSKgMkQTp/n7c29TvxpW8DiVEDLH
+Qg9B9rJYZiqHAJsaVCpC0/9QKvSnfnrXycrQu0kPeP75eaq7+XYm4X7vjb5VtbGC
+9q3Ats1ItAx0KLUZyEZxacvlcj7GzkUl7Zdi6FPCyBuFEWxGe3BbmUUsCr41Wvqk
+5+xOPuCl7319BP/JE/u9
+=AqQw
+-----END PGP SIGNATURE-----
+
+--uQr8t48UFsdbeI+V--
