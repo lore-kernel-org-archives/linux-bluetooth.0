@@ -1,54 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH BlueZ v1 1/2] attrib: Remove norequests and noresponses
- variables
-Date: Mon, 01 Apr 2013 15:08:00 +0530
-Message-id: <1364809081-1796-1-git-send-email-jaganath.k@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 31 May 2013 12:58:28 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth 2013-05-30
+Message-ID: <20130531165827.GA2072@tuxdriver.com>
+References: <20130530225232.GB14083@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130530225232.GB14083@joana>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Passing NULL is fine to g_queue_is_empty(), so removing these
-variables makes the code more readable
----
- attrib/gattrib.c |    9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+On Thu, May 30, 2013 at 07:52:32PM -0300, Gustavo Padovan wrote:
+> Hi John,
+> 
+> The following patches are important bug fixes for 3.10, plus the support for a
+> new device. We do have three fixes from Johan. The first one is a fix to avoid
+> LE-only devices to rely on the (inexistent) extended features data. The second
+> patch fixes length checks on incoming L2CAP signalling PDUs so we can discard
+> PDU whose size doesn't match the one reported in the header.
+> The last one fixes the handling of power on failures, we now report proper
+> errors to mgmt when hci_dev_open().
+> 
+> Please pull or let me know of any issues! Thanks.
+> 
+> 	Gustavo
+> 
+> ---
+> 
+> The following changes since commit f942d116b80feb3ae618a0d8ce2df6e853526d3c:
+> 
+>   brcmsmac: fix regression observed in 3.10-rc1 (2013-05-29 14:46:51 -0400)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
+> 
+> for you to fetch changes up to 0f9e216b0e12971af8a1d39c98c353c76533283b:
+> 
+>   Bluetooth: Fix mgmt handling of power on failures (2013-05-30 18:36:08 -0300)
 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 01c19f9..f95f2fb 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -394,7 +394,6 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
- 	uint8_t buf[512], status;
- 	gsize len;
- 	GIOStatus iostat;
--	gboolean norequests, noresponses;
- 
- 	if (attrib->stale)
- 		return FALSE;
-@@ -447,11 +446,6 @@ static gboolean received_data(GIOChannel *io, GIOCondition cond, gpointer data)
- 	status = 0;
- 
- done:
--	norequests = attrib->requests == NULL ||
--			g_queue_is_empty(attrib->requests);
--	noresponses = attrib->responses == NULL ||
--			g_queue_is_empty(attrib->responses);
--
- 	if (cmd) {
- 		if (cmd->func)
- 			cmd->func(status, buf, len, cmd->user_data);
-@@ -459,7 +453,8 @@ done:
- 		command_destroy(cmd);
- 	}
- 
--	if (!norequests || !noresponses)
-+	if (!g_queue_is_empty(attrib->requests) ||
-+					!g_queue_is_empty(attrib->responses))
- 		wake_up_sender(attrib);
- 
- 	return TRUE;
+Pulling now...
+
 -- 
-1.7.9.5
-
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
