@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 11/14] client/bluetooth-player: Add rewind command
-Date: Fri, 31 May 2013 13:55:46 +0300
-Message-Id: <1369997749-8663-11-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 14/14] client/bluetooth-player: Add select command
+Date: Fri, 31 May 2013 13:55:49 +0300
+Message-Id: <1369997749-8663-14-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1369997749-8663-1-git-send-email-luiz.dentz@gmail.com>
 References: <1369997749-8663-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,59 +11,53 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add support for rewind command which can be used to rewind the playback
+Add support for select command which can be used to set the default
+player
 ---
- client/bluetooth-player.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ client/bluetooth-player.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
 diff --git a/client/bluetooth-player.c b/client/bluetooth-player.c
-index dcbe301..373c49e 100644
+index 3e25bba..3daf586 100644
 --- a/client/bluetooth-player.c
 +++ b/client/bluetooth-player.c
-@@ -260,6 +260,35 @@ static void cmd_fast_forward(int argc, char *argv[])
- 	rl_printf("Fast forward playback\n");
+@@ -438,6 +438,28 @@ static void cmd_show(int argc, char *argv[])
+ 	print_property(proxy, "Track");
  }
  
-+static void rewind_reply(DBusMessage *message, void *user_data)
++static void cmd_select(int argc, char *argv[])
 +{
-+	DBusError error;
++	GDBusProxy *proxy;
 +
-+	dbus_error_init(&error);
-+
-+	if (dbus_set_error_from_message(&error, message) == TRUE) {
-+		rl_printf("Failed to rewind: %s\n", error.name);
-+		dbus_error_free(&error);
++	if (argc < 2) {
++		rl_printf("Missing player address argument\n");
 +		return;
 +	}
 +
-+	rl_printf("Rewind successful\n");
-+}
-+
-+static void cmd_rewind(int argc, char *argv[])
-+{
-+	if (!check_default_player())
-+		return;
-+
-+	if (g_dbus_proxy_method_call(default_player, "Rewind", NULL,
-+					rewind_reply, NULL, NULL) == FALSE) {
-+		rl_printf("Failed to rewind\n");
++	proxy = find_player(argv[1]);
++	if (proxy == NULL) {
++		rl_printf("Player %s not available\n", argv[1]);
 +		return;
 +	}
 +
-+	rl_printf("Rewind playback\n");
++	if (default_player == proxy)
++		return;
++
++	default_player = proxy,
++	print_player(proxy, NULL);
 +}
 +
  static const struct {
  	const char *cmd;
  	const char *arg;
-@@ -273,6 +302,7 @@ static const struct {
- 	{ "previous",     NULL,       cmd_previous, "Jump to previous item" },
- 	{ "fast_forward", NULL,       cmd_fast_forward,
- 						"Fast forward playback" },
-+	{ "rewind",       NULL,       cmd_rewind, "Rewind playback" },
- 	{ "quit",         NULL,       cmd_quit, "Quit program" },
- 	{ "exit",         NULL,       cmd_quit },
- 	{ "help" },
+@@ -446,6 +468,7 @@ static const struct {
+ } cmd_table[] = {
+ 	{ "list",         NULL,       cmd_list, "List available players" },
+ 	{ "show",         "[player]", cmd_show, "Player information" },
++	{ "select",       "<player>", cmd_select, "Select default player" },
+ 	{ "play",         NULL,       cmd_play, "Start playback" },
+ 	{ "pause",        NULL,       cmd_pause, "Pause playback" },
+ 	{ "stop",         NULL,       cmd_stop, "Stop playback" },
 -- 
 1.8.1.4
 
