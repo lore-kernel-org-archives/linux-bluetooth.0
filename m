@@ -1,97 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <33F0ED7F-C1AA-4B03-A585-DCBAE5E667E5@holtmann.org>
+References: <1370056311-14199-1-git-send-email-anderson.lizardo@openbossa.org>
+	<33F0ED7F-C1AA-4B03-A585-DCBAE5E667E5@holtmann.org>
+Date: Sun, 2 Jun 2013 12:00:19 -0400
+Message-ID: <CAJdJm_NcSO36+z_ib9gP5QVpZ8-z1fikxuR2xbXP6nmyt5p-iA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Add parameter validation for ioctl(HCISETACLMTU)
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix crash in l2cap_build_cmd() with small MTU
-Date: Sun,  2 Jun 2013 16:30:40 -0400
-Message-Id: <1370205040-16680-1-git-send-email-anderson.lizardo@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If a too small MTU value is set with ioctl(HCISETACLMTU) or by a bogus
-controller, memory corruption happens due to a memcpy() call with
-negative length.
+Hi Marcel,
 
-Fix this crash on either incoming or outgoing connections with a MTU
-smaller than L2CAP_HDR_SIZE + L2CAP_CMD_HDR_SIZE:
+On Sat, Jun 1, 2013 at 6:17 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
+:
+> Hi Anderson,
+>
+>> Setting ACL MTU to a very low value (or even zero) causes access to
+>> invalid memory when creating L2CAP connections. The minimum value of 48
+>> was taken from the L2CAP minimum allowed MTU for BR/EDR (this ioctl() is
+>> not applicable for LE).
+>
+> and the value 48 is totally wrong here. Please check the definition of a =
+L2CAP C-frame and table 4.1 which defines the minimum payload as 23 octets =
+for LE-U. We could argue that this ioctl only sets ACL-U, but nevertheless =
+this seems kinda weird as well.
 
-[   46.885433] BUG: unable to handle kernel paging request at f56ad000
-[   46.888037] IP: [<c03d94cd>] memcpy+0x1d/0x40
-[   46.888037] *pdpt = 0000000000ac3001 *pde = 00000000373f8067 *pte = 80000000356ad060
-[   46.888037] Oops: 0002 [#1] SMP DEBUG_PAGEALLOC
-[   46.888037] Modules linked in: hci_vhci bluetooth virtio_balloon i2c_piix4 uhci_hcd usbcore usb_common
-[   46.888037] CPU: 0 PID: 1044 Comm: kworker/u3:0 Not tainted 3.10.0-rc1+ #12
-[   46.888037] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2007
-[   46.888037] Workqueue: hci0 hci_rx_work [bluetooth]
-[   46.888037] task: f59b15b0 ti: f55c4000 task.ti: f55c4000
-[   46.888037] EIP: 0060:[<c03d94cd>] EFLAGS: 00010212 CPU: 0
-[   46.888037] EIP is at memcpy+0x1d/0x40
-[   46.888037] EAX: f56ac1c0 EBX: fffffff8 ECX: 3ffffc6e EDX: f55c5cf2
-[   46.888037] ESI: f55c6b32 EDI: f56ad000 EBP: f55c5c68 ESP: f55c5c5c
-[   46.888037]  DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068
-[   46.888037] CR0: 8005003b CR2: f56ad000 CR3: 3557d000 CR4: 000006f0
-[   46.888037] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
-[   46.888037] DR6: ffff0ff0 DR7: 00000400
-[   46.888037] Stack:
-[   46.888037]  fffffff8 00000010 00000003 f55c5cac f8c6a54c ffffffff f8c69eb2 00000000
-[   46.888037]  f4783cdc f57f0070 f759c590 1001c580 00000003 0200000a 00000000 f5a88560
-[   46.888037]  f5ba2600 f5a88560 00000041 00000000 f55c5d90 f8c6f4c7 00000008 f55c5cf2
-[   46.888037] Call Trace:
-[   46.888037]  [<f8c6a54c>] l2cap_send_cmd+0x1cc/0x230 [bluetooth]
-[   46.888037]  [<f8c69eb2>] ? l2cap_global_chan_by_psm+0x152/0x1a0 [bluetooth]
-[   46.888037]  [<f8c6f4c7>] l2cap_connect+0x3f7/0x540 [bluetooth]
-[   46.888037]  [<c019b37b>] ? trace_hardirqs_off+0xb/0x10
-[   46.888037]  [<c01a0ff8>] ? mark_held_locks+0x68/0x110
-[   46.888037]  [<c064ad20>] ? mutex_lock_nested+0x280/0x360
-[   46.888037]  [<c064b9d9>] ? __mutex_unlock_slowpath+0xa9/0x150
-[   46.888037]  [<c01a118c>] ? trace_hardirqs_on_caller+0xec/0x1b0
-[   46.888037]  [<c064ad08>] ? mutex_lock_nested+0x268/0x360
-[   46.888037]  [<c01a125b>] ? trace_hardirqs_on+0xb/0x10
-[   46.888037]  [<f8c72f8d>] l2cap_recv_frame+0xb2d/0x1d30 [bluetooth]
-[   46.888037]  [<c01a0ff8>] ? mark_held_locks+0x68/0x110
-[   46.888037]  [<c064b9d9>] ? __mutex_unlock_slowpath+0xa9/0x150
-[   46.888037]  [<c01a118c>] ? trace_hardirqs_on_caller+0xec/0x1b0
-[   46.888037]  [<f8c754f1>] l2cap_recv_acldata+0x2a1/0x320 [bluetooth]
-[   46.888037]  [<f8c491d8>] hci_rx_work+0x518/0x810 [bluetooth]
-[   46.888037]  [<f8c48df2>] ? hci_rx_work+0x132/0x810 [bluetooth]
-[   46.888037]  [<c0158979>] process_one_work+0x1a9/0x600
-[   46.888037]  [<c01588fb>] ? process_one_work+0x12b/0x600
-[   46.888037]  [<c015922e>] ? worker_thread+0x19e/0x320
-[   46.888037]  [<c015922e>] ? worker_thread+0x19e/0x320
-[   46.888037]  [<c0159187>] worker_thread+0xf7/0x320
-[   46.888037]  [<c0159090>] ? rescuer_thread+0x290/0x290
-[   46.888037]  [<c01602f8>] kthread+0xa8/0xb0
-[   46.888037]  [<c0656777>] ret_from_kernel_thread+0x1b/0x28
-[   46.888037]  [<c0160250>] ? flush_kthread_worker+0x120/0x120
-[   46.888037] Code: c3 90 8d 74 26 00 e8 63 fc ff ff eb e8 90 55 89 e5 83 ec 0c 89 5d f4 89 75 f8 89 7d fc 3e 8d 74 26 00 89 cb 89 c7 c1 e9 02 89 d6 <f3> a5 89 d9 83 e1 03 74 02 f3 a4 8b 5d f4 8b 75 f8 8b 7d fc 89
-[   46.888037] EIP: [<c03d94cd>] memcpy+0x1d/0x40 SS:ESP 0068:f55c5c5c
-[   46.888037] CR2: 00000000f56ad000
-[   46.888037] ---[ end trace 0217c1f4d78714a9 ]---
+The reason 48 was used is because this ioctl only affects ACL link
+types. LE ones are not affected.
 
-Signed-off-by: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: stable@vger.kernel.org
----
- net/bluetooth/l2cap_core.c |    3 +++
- 1 file changed, 3 insertions(+)
+> Why are we forcing L2CAP restrictions on a lower-layer here. If someone w=
+ants to shoot themselves in the foot, they are allowed to do so. We need to=
+ make sure that L2CAP works with whatever value we have here. Since essenti=
+ally even a broken controller can give us wrong values.
 
-This patch replaces the one I previously sent: "Bluetooth: Add parameter
-validation for ioctl(HCISETACLMTU)"
+I was going to send another patch that fixes the same issue for broken
+"Read Buffer Size" HCI command implementations. But if you prefer, I
+can instead fix all places where some minimum MTU is expected.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index a1b7a02..b5d898f 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2855,6 +2855,9 @@ static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn, u8 code,
- 	BT_DBG("conn %p, code 0x%2.2x, ident 0x%2.2x, len %u",
- 	       conn, code, ident, dlen);
- 
-+	if (conn->mtu < L2CAP_HDR_SIZE + L2CAP_CMD_HDR_SIZE)
-+		return NULL;
-+
- 	len = L2CAP_HDR_SIZE + L2CAP_CMD_HDR_SIZE + dlen;
- 	count = min_t(unsigned int, conn->mtu, len);
- 
--- 
-1.7.9.5
+>> Also make sure the "maximum number of ACL packets" parameter is at least
+>> 1, otherwise no connections can be created.
+>
+> Again, I am fine if people want to shoot themselves in the foot here. We =
+need to just make sure L2CAP works properly.
 
+Setting to zero simply makes the connection attempt to hang (and
+eventually abort), but I didn't notice persistent issues. Will do more
+tests to make sure.
+
+> We might better fix l2cap_build_cmd here to fail if we are trying to buil=
+d a frame that is larger than our ACL MTU. As I said, if a misbehaving cont=
+roller gives us a too small value, we might be in trouble as well.
+
+IIRC there are other places where a minimum MTU is expected. Should I
+go ahead and fix all these locations?
+
+> We have seen controllers giving us 0 buffer sizes for SCO packets in the =
+past before. So this just need to be robust.
+
+I noticed this quirk on the kernel code. But the "fix" there is to
+assume a minimum buffer size in these cases instead of just refusing
+to use the controller.
+
+In summary, what's the best approach here?
+
+1) Fail loudly if the controller or the user wants to use too small
+buffer sizes; or
+2) Ignore the given value and use the minimum value allowed by the
+spec (23 for LE-U and 48 for ACL-U)
+
+Best Regards,
+--=20
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
