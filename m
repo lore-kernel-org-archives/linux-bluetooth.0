@@ -1,33 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 5 Jun 2013 10:16:55 +0800
-Message-ID: <CAPgLHd_+jJEOiO9x=gw1eW0LrrRj-rkKhb7mDqhg1ALaMzjKwQ@mail.gmail.com>
-Subject: [PATCH] Bluetooth: btmrvl: fix error return code in btmrvl_sdio_card_to_host()
-From: Wei Yongjun <weiyj.lk@gmail.com>
-To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com
-Cc: yongjun_wei@trendmicro.com.cn, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: "Cho, Yu-Chen" <acho@suse.com>
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: oneukum@suse.com,
+	acho@suse.com,
+	jlee@suse.com,
+	jay.hung@mediatek.com
+Subject: [PATCH] Bluetooth: Add support for Mediatek Bluetooth device [0e8d:763f]
+Date: Tue,  4 Jun 2013 21:40:26 +0800
+Message-Id: <1370353226-11058-1-git-send-email-acho@suse.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+From: "Cho, Yu-Chen" <acho@suse.com>
 
-Fix to return -ENOMEM in the skb alloc error handling case
-instead of 0, as done elsewhere in this function.
+This patch adds support for Mediatek Bluetooth device
 
-Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+T:  Bus=02 Lev=01 Prnt=01 Port=03 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
+D:  Ver= 2.01 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0e8d ProdID=763f Rev= 1.00
+S:  Manufacturer=MediaTek
+S:  Product=BT
+S:  SerialNumber=1.0
+C:* #Ifs= 2 Cfg#= 1 Atr=a0 MxPwr=450mA
+A:  FirstIf#= 0 IfCount= 2 Cls=ff(vend.) Sub=ff Prot=ff
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=125us
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+
+Signed-off-by: Cho, Yu-Chen <acho@suse.com>
 ---
- drivers/bluetooth/btmrvl_sdio.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index 13693b7..75c2626 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -554,6 +554,7 @@ static int btmrvl_sdio_card_to_host(struct btmrvl_private *priv)
- 	skb = bt_skb_alloc(num_blocks * blksz + BTSDIO_DMA_ALIGN, GFP_ATOMIC);
- 	if (skb == NULL) {
- 		BT_ERR("No free skb");
-+		ret = -ENOMEM;
- 		goto exit;
- 	}
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 7a7e5f8..81f1275 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -57,6 +57,9 @@ static struct usb_device_id btusb_table[] = {
+ 	/* Apple-specific (Broadcom) devices */
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x05ac, 0xff, 0x01, 0x01) },
  
++	/* MediaTek MT76x0E */
++	{ USB_DEVICE(0x0e8d, 0x763f) },
++
+ 	/* Broadcom SoftSailing reporting vendor specific */
+ 	{ USB_DEVICE(0x0a5c, 0x21e1) },
+ 
+-- 
+1.8.1.4
