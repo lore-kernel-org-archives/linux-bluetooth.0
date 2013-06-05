@@ -2,58 +2,70 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] emulator: Fix Remote Name Request Cancel command complete
-Date: Wed,  5 Jun 2013 17:04:53 -0400
-Message-Id: <1370466293-14471-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ] emulator: Fix uninitialised memory usage on inquiry
+Date: Wed,  5 Jun 2013 16:35:16 -0400
+Message-Id: <1370464516-5706-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Command Complete event for this HCI command contains two parameters,
-status and bd_addr.
+This happens when using "btvirt -l2" and running "discoverable on" on
+hci1 and "scan on" on hci0 using bluetoothctl:
+
+==1870== Syscall param write(buf) points to uninitialised byte(s)
+==1870==    at 0x4114443: __write_nocancel (syscall-template.S:82)
+==1870==    by 0x804B503: send_packet (btdev.c:478)
+==1870==    by 0x804B599: send_event (btdev.c:503)
+==1870==    by 0x804B8C0: inquiry_complete (btdev.c:589)
+==1870==    by 0x804C538: default_cmd (btdev.c:881)
+==1870==    by 0x804E5DE: process_cmd (btdev.c:1559)
+==1870==    by 0x804E646: btdev_receive_h4 (btdev.c:1577)
+==1870==    by 0x804A487: vhci_read_callback (vhci.c:82)
+==1870==    by 0x804923E: mainloop_run (mainloop.c:142)
+==1870==    by 0x8048FD4: main (main.c:145)
+==1870==  Address 0x41e4d0f is 15 bytes inside a block of size 258
+alloc'd
+==1870==    at 0x402B56C: malloc (vg_replace_malloc.c:270)
+==1870==    by 0x804B531: send_event (btdev.c:490)
+==1870==    by 0x804B8C0: inquiry_complete (btdev.c:589)
+==1870==    by 0x804C538: default_cmd (btdev.c:881)
+==1870==    by 0x804E5DE: process_cmd (btdev.c:1559)
+==1870==    by 0x804E646: btdev_receive_h4 (btdev.c:1577)
+==1870==    by 0x804A487: vhci_read_callback (vhci.c:82)
+==1870==    by 0x804923E: mainloop_run (mainloop.c:142)
+==1870==    by 0x8048FD4: main (main.c:145)
+==1870==
 ---
- emulator/btdev.c |    6 ++++--
- monitor/bt.h     |    4 ++++
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ emulator/btdev.c |    3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 6e00cc6..cc209db 100644
+index d88c853..6e00cc6 100644
 --- a/emulator/btdev.c
 +++ b/emulator/btdev.c
-@@ -874,6 +874,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 	struct bt_hci_rsp_le_read_adv_tx_power lratp;
- 	struct bt_hci_rsp_le_read_supported_states lrss;
- 	struct bt_hci_rsp_le_read_white_list_size lrwls;
-+	struct bt_hci_rsp_remote_name_request_cancel rnrc_rsp;
- 	uint8_t status, page;
+@@ -583,6 +583,7 @@ static void inquiry_complete(struct btdev *btdev, uint8_t status)
+ 			ir.pscan_rep_mode = 0x00;
+ 			ir.pscan_period_mode = 0x00;
+ 			memcpy(ir.dev_class, btdev_list[i]->dev_class, 3);
++			ir.clock_offset = 0x0000;
+ 			ir.rssi = -60;
+ 			memcpy(ir.data, btdev_list[i]->ext_inquiry_rsp, 240);
  
- 	switch (opcode) {
-@@ -941,8 +942,9 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 		if (btdev->type == BTDEV_TYPE_LE)
- 			goto unsupported;
- 		rnrc = data;
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		rnrc_rsp.status = BT_HCI_ERR_SUCCESS;
-+		memcpy(rnrc_rsp.bdaddr, rnrc->bdaddr, 6);
-+		cmd_complete(btdev, opcode, &rnrc_rsp, sizeof(rnrc_rsp));
- 		name_request_complete(btdev, rnrc->bdaddr,
- 						BT_HCI_ERR_UNKNOWN_CONN_ID);
- 		break;
-diff --git a/monitor/bt.h b/monitor/bt.h
-index 7bd439f..996668f 100644
---- a/monitor/bt.h
-+++ b/monitor/bt.h
-@@ -167,6 +167,10 @@ struct bt_hci_cmd_remote_name_request {
- struct bt_hci_cmd_remote_name_request_cancel {
- 	uint8_t  bdaddr[6];
- } __attribute__ ((packed));
-+struct bt_hci_rsp_remote_name_request_cancel {
-+	uint8_t  status;
-+	uint8_t  bdaddr[6];
-+} __attribute__ ((packed));
+@@ -599,6 +600,7 @@ static void inquiry_complete(struct btdev *btdev, uint8_t status)
+ 			ir.pscan_rep_mode = 0x00;
+ 			ir.pscan_period_mode = 0x00;
+ 			memcpy(ir.dev_class, btdev_list[i]->dev_class, 3);
++			ir.clock_offset = 0x0000;
+ 			ir.rssi = -60;
  
- #define BT_HCI_CMD_READ_REMOTE_FEATURES		0x041b
- struct bt_hci_cmd_read_remote_features {
+ 			send_event(btdev, BT_HCI_EVT_INQUIRY_RESULT_WITH_RSSI,
+@@ -612,6 +614,7 @@ static void inquiry_complete(struct btdev *btdev, uint8_t status)
+ 			ir.pscan_period_mode = 0x00;
+ 			ir.pscan_mode = 0x00;
+ 			memcpy(ir.dev_class, btdev_list[i]->dev_class, 3);
++			ir.clock_offset = 0x0000;
+ 
+ 			send_event(btdev, BT_HCI_EVT_INQUIRY_RESULT,
+ 							&ir, sizeof(ir));
 -- 
 1.7.9.5
 
