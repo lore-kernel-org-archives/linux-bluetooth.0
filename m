@@ -1,64 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 5 Jun 2013 15:36:48 +0100
+Date: Wed, 5 Jun 2013 15:28:48 +0100
 From: Gustavo Padovan <gustavo@padovan.org>
-To: "Cho, Yu-Chen" <acho@suse.com>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	oneukum@suse.com, jlee@suse.com, jay.hung@mediatek.com
-Subject: Re: [PATCH] Bluetooth: Add support for Mediatek Bluetooth device
- [0e8d:763f]
-Message-ID: <20130605143648.GB3043@joana>
-References: <1370353226-11058-1-git-send-email-acho@suse.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix crash in l2cap_build_cmd() with small MTU
+Message-ID: <20130605142848.GA3043@joana>
+References: <1370205040-16680-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1370353226-11058-1-git-send-email-acho@suse.com>
+In-Reply-To: <1370205040-16680-1-git-send-email-anderson.lizardo@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Cho,
+Hi Anderson,
 
-* Cho, Yu-Chen <acho@suse.com> [2013-06-04 21:40:26 +0800]:
+* Anderson Lizardo <anderson.lizardo@openbossa.org> [2013-06-02 16:30:40 -0400]:
 
-> From: "Cho, Yu-Chen" <acho@suse.com>
+> If a too small MTU value is set with ioctl(HCISETACLMTU) or by a bogus
+> controller, memory corruption happens due to a memcpy() call with
+> negative length.
 > 
-> This patch adds support for Mediatek Bluetooth device
+> Fix this crash on either incoming or outgoing connections with a MTU
+> smaller than L2CAP_HDR_SIZE + L2CAP_CMD_HDR_SIZE:
 > 
-> T:  Bus=02 Lev=01 Prnt=01 Port=03 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
-> D:  Ver= 2.01 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0e8d ProdID=763f Rev= 1.00
-> S:  Manufacturer=MediaTek
-> S:  Product=BT
-> S:  SerialNumber=1.0
-> C:* #Ifs= 2 Cfg#= 1 Atr=a0 MxPwr=450mA
-> A:  FirstIf#= 0 IfCount= 2 Cls=ff(vend.) Sub=ff Prot=ff
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=125us
-> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> [   46.885433] BUG: unable to handle kernel paging request at f56ad000
+> [   46.888037] IP: [<c03d94cd>] memcpy+0x1d/0x40
+> [   46.888037] *pdpt = 0000000000ac3001 *pde = 00000000373f8067 *pte = 80000000356ad060
+> [   46.888037] Oops: 0002 [#1] SMP DEBUG_PAGEALLOC
+> [   46.888037] Modules linked in: hci_vhci bluetooth virtio_balloon i2c_piix4 uhci_hcd usbcore usb_common
+> [   46.888037] CPU: 0 PID: 1044 Comm: kworker/u3:0 Not tainted 3.10.0-rc1+ #12
+> [   46.888037] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2007
+> [   46.888037] Workqueue: hci0 hci_rx_work [bluetooth]
+> [   46.888037] task: f59b15b0 ti: f55c4000 task.ti: f55c4000
+> [   46.888037] EIP: 0060:[<c03d94cd>] EFLAGS: 00010212 CPU: 0
+> [   46.888037] EIP is at memcpy+0x1d/0x40
+> [   46.888037] EAX: f56ac1c0 EBX: fffffff8 ECX: 3ffffc6e EDX: f55c5cf2
+> [   46.888037] ESI: f55c6b32 EDI: f56ad000 EBP: f55c5c68 ESP: f55c5c5c
+> [   46.888037]  DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068
+> [   46.888037] CR0: 8005003b CR2: f56ad000 CR3: 3557d000 CR4: 000006f0
+> [   46.888037] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
+> [   46.888037] DR6: ffff0ff0 DR7: 00000400
+> [   46.888037] Stack:
+> [   46.888037]  fffffff8 00000010 00000003 f55c5cac f8c6a54c ffffffff f8c69eb2 00000000
+> [   46.888037]  f4783cdc f57f0070 f759c590 1001c580 00000003 0200000a 00000000 f5a88560
+> [   46.888037]  f5ba2600 f5a88560 00000041 00000000 f55c5d90 f8c6f4c7 00000008 f55c5cf2
+> [   46.888037] Call Trace:
+> [   46.888037]  [<f8c6a54c>] l2cap_send_cmd+0x1cc/0x230 [bluetooth]
+> [   46.888037]  [<f8c69eb2>] ? l2cap_global_chan_by_psm+0x152/0x1a0 [bluetooth]
+> [   46.888037]  [<f8c6f4c7>] l2cap_connect+0x3f7/0x540 [bluetooth]
+> [   46.888037]  [<c019b37b>] ? trace_hardirqs_off+0xb/0x10
+> [   46.888037]  [<c01a0ff8>] ? mark_held_locks+0x68/0x110
+> [   46.888037]  [<c064ad20>] ? mutex_lock_nested+0x280/0x360
+> [   46.888037]  [<c064b9d9>] ? __mutex_unlock_slowpath+0xa9/0x150
+> [   46.888037]  [<c01a118c>] ? trace_hardirqs_on_caller+0xec/0x1b0
+> [   46.888037]  [<c064ad08>] ? mutex_lock_nested+0x268/0x360
+> [   46.888037]  [<c01a125b>] ? trace_hardirqs_on+0xb/0x10
+> [   46.888037]  [<f8c72f8d>] l2cap_recv_frame+0xb2d/0x1d30 [bluetooth]
+> [   46.888037]  [<c01a0ff8>] ? mark_held_locks+0x68/0x110
+> [   46.888037]  [<c064b9d9>] ? __mutex_unlock_slowpath+0xa9/0x150
+> [   46.888037]  [<c01a118c>] ? trace_hardirqs_on_caller+0xec/0x1b0
+> [   46.888037]  [<f8c754f1>] l2cap_recv_acldata+0x2a1/0x320 [bluetooth]
+> [   46.888037]  [<f8c491d8>] hci_rx_work+0x518/0x810 [bluetooth]
+> [   46.888037]  [<f8c48df2>] ? hci_rx_work+0x132/0x810 [bluetooth]
+> [   46.888037]  [<c0158979>] process_one_work+0x1a9/0x600
+> [   46.888037]  [<c01588fb>] ? process_one_work+0x12b/0x600
+> [   46.888037]  [<c015922e>] ? worker_thread+0x19e/0x320
+> [   46.888037]  [<c015922e>] ? worker_thread+0x19e/0x320
+> [   46.888037]  [<c0159187>] worker_thread+0xf7/0x320
+> [   46.888037]  [<c0159090>] ? rescuer_thread+0x290/0x290
+> [   46.888037]  [<c01602f8>] kthread+0xa8/0xb0
+> [   46.888037]  [<c0656777>] ret_from_kernel_thread+0x1b/0x28
+> [   46.888037]  [<c0160250>] ? flush_kthread_worker+0x120/0x120
+> [   46.888037] Code: c3 90 8d 74 26 00 e8 63 fc ff ff eb e8 90 55 89 e5 83 ec 0c 89 5d f4 89 75 f8 89 7d fc 3e 8d 74 26 00 89 cb 89 c7 c1 e9 02 89 d6 <f3> a5 89 d9 83 e1 03 74 02 f3 a4 8b 5d f4 8b 75 f8 8b 7d fc 89
+> [   46.888037] EIP: [<c03d94cd>] memcpy+0x1d/0x40 SS:ESP 0068:f55c5c5c
+> [   46.888037] CR2: 00000000f56ad000
+> [   46.888037] ---[ end trace 0217c1f4d78714a9 ]---
 > 
-> Signed-off-by: Cho, Yu-Chen <acho@suse.com>
+> Signed-off-by: Anderson Lizardo <anderson.lizardo@openbossa.org>
+> Cc: stable@vger.kernel.org
 > ---
->  drivers/bluetooth/btusb.c | 3 +++
+>  net/bluetooth/l2cap_core.c |    3 +++
 >  1 file changed, 3 insertions(+)
 
 Patch has been applied to bluetooth.git. Thanks.
