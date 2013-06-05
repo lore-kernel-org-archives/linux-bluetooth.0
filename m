@@ -1,61 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC BlueZ v1 00/13] Add experimental org.bluez.Service1
-Date: Thu,  6 Jun 2013 10:21:32 +0200
-Message-Id: <1370506905-19641-1-git-send-email-mikel.astiz.oss@gmail.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ] emulator: Fix Remote Name Request Cancel command complete
+Date: Wed,  5 Jun 2013 17:04:53 -0400
+Message-Id: <1370466293-14471-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+The Command Complete event for this HCI command contains two parameters,
+status and bd_addr.
+---
+ emulator/btdev.c |    6 ++++--
+ monitor/bt.h     |    4 ++++
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-Resending this patchset which is basically the same as v0 with the following minor changes:
-- Doc errata fixed as pointed out by Scott.
-- test-service script extended to print the device alias along with the BT address.
-
->From original cover-letter:
-
-Beyond the desktop use-cases, some users (e.g. GENIVI) are interested in having profile-specific information and control interfaces exposed in D-Bus. Such APIs did exist in BlueZ 4 but were dropped for BlueZ 5 in favor of simpler API simplicity. This service-specific interfaces had a fairly low priority for BlueZ 5 and therefore the discussion was postponed.
-
-This patchset proposes org.bluez.Service1 as an attempt to cover these needs. As compared to the former Device.ConnectProfile()/DisconnectProfile(), the approach has the following advantages:
-- Multiple instances of the same UUID can be exposed.
-- The state of each service can be exposed, without hackish lists like Device.ConnectedProfiles.
-- It's ObjectManager-centric.
-- The design should scale better if new properties are required in the future (supported features, service handle, etc.)
-
-Mikel Astiz (13):
-  test: Remove obsolete test script
-  test: Add UUID alias table to bluezutils.py
-  test: Support human-friendly UUIDs in test-device
-  test: Show human-friendly UUIDs in list-devices
-  dbus: Add new org.bluez.Service1
-  dbus: Add Device property to org.bluez.Service1
-  dbus: Add UUID property to org.bluez.Service1
-  dbus: Add state property to org.bluez.Service1
-  dbus: Add Connect/Disconnect to org.bluez.Service1
-  doc: Add API documentation for org.bluez.Service1
-  dbus: Deprecate old profile-connecting API
-  test: Add test-service script
-  test: Add --uuid to test-service
-
- Makefile.am         |   2 +-
- Makefile.tools      |   2 +-
- doc/device-api.txt  |   4 +-
- doc/service-api.txt |  52 ++++++++++++++
- src/device.c        |  14 ++--
- src/service.c       | 197 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- src/service.h       |   2 +-
- test/bluezutils.py  |  84 ++++++++++++++++++++++
- test/list-devices   |   6 +-
- test/simple-service | 128 ----------------------------------
- test/test-device    |   4 +-
- test/test-service   | 175 ++++++++++++++++++++++++++++++++++++++++++++++
- 12 files changed, 529 insertions(+), 141 deletions(-)
- create mode 100644 doc/service-api.txt
- delete mode 100755 test/simple-service
- create mode 100755 test/test-service
-
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 6e00cc6..cc209db 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -874,6 +874,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+ 	struct bt_hci_rsp_le_read_adv_tx_power lratp;
+ 	struct bt_hci_rsp_le_read_supported_states lrss;
+ 	struct bt_hci_rsp_le_read_white_list_size lrwls;
++	struct bt_hci_rsp_remote_name_request_cancel rnrc_rsp;
+ 	uint8_t status, page;
+ 
+ 	switch (opcode) {
+@@ -941,8 +942,9 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+ 		if (btdev->type == BTDEV_TYPE_LE)
+ 			goto unsupported;
+ 		rnrc = data;
+-		status = BT_HCI_ERR_SUCCESS;
+-		cmd_complete(btdev, opcode, &status, sizeof(status));
++		rnrc_rsp.status = BT_HCI_ERR_SUCCESS;
++		memcpy(rnrc_rsp.bdaddr, rnrc->bdaddr, 6);
++		cmd_complete(btdev, opcode, &rnrc_rsp, sizeof(rnrc_rsp));
+ 		name_request_complete(btdev, rnrc->bdaddr,
+ 						BT_HCI_ERR_UNKNOWN_CONN_ID);
+ 		break;
+diff --git a/monitor/bt.h b/monitor/bt.h
+index 7bd439f..996668f 100644
+--- a/monitor/bt.h
++++ b/monitor/bt.h
+@@ -167,6 +167,10 @@ struct bt_hci_cmd_remote_name_request {
+ struct bt_hci_cmd_remote_name_request_cancel {
+ 	uint8_t  bdaddr[6];
+ } __attribute__ ((packed));
++struct bt_hci_rsp_remote_name_request_cancel {
++	uint8_t  status;
++	uint8_t  bdaddr[6];
++} __attribute__ ((packed));
+ 
+ #define BT_HCI_CMD_READ_REMOTE_FEATURES		0x041b
+ struct bt_hci_cmd_read_remote_features {
 -- 
-1.8.1.4
+1.7.9.5
 
