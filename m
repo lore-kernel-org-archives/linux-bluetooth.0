@@ -1,31 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 5 Jun 2013 16:53:13 +0100
+Date: Wed, 5 Jun 2013 15:36:48 +0100
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Wei Yongjun <weiyj.lk@gmail.com>
+To: "Cho, Yu-Chen" <acho@suse.com>
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-	yongjun_wei@trendmicro.com.cn, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: btmrvl: fix error return code in
- btmrvl_sdio_card_to_host()
-Message-ID: <20130605155313.GC3043@joana>
-References: <CAPgLHd_+jJEOiO9x=gw1eW0LrrRj-rkKhb7mDqhg1ALaMzjKwQ@mail.gmail.com>
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	oneukum@suse.com, jlee@suse.com, jay.hung@mediatek.com
+Subject: Re: [PATCH] Bluetooth: Add support for Mediatek Bluetooth device
+ [0e8d:763f]
+Message-ID: <20130605143648.GB3043@joana>
+References: <1370353226-11058-1-git-send-email-acho@suse.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAPgLHd_+jJEOiO9x=gw1eW0LrrRj-rkKhb7mDqhg1ALaMzjKwQ@mail.gmail.com>
+In-Reply-To: <1370353226-11058-1-git-send-email-acho@suse.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Wei,
+Hi Cho,
 
-* Wei Yongjun <weiyj.lk@gmail.com> [2013-06-05 10:16:55 +0800]:
+* Cho, Yu-Chen <acho@suse.com> [2013-06-04 21:40:26 +0800]:
 
-> From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+> From: "Cho, Yu-Chen" <acho@suse.com>
 > 
-> Fix to return -ENOMEM in the skb alloc error handling case
-> instead of 0, as done elsewhere in this function.
+> This patch adds support for Mediatek Bluetooth device
 > 
-> Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+> T:  Bus=02 Lev=01 Prnt=01 Port=03 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
+> D:  Ver= 2.01 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0e8d ProdID=763f Rev= 1.00
+> S:  Manufacturer=MediaTek
+> S:  Product=BT
+> S:  SerialNumber=1.0
+> C:* #Ifs= 2 Cfg#= 1 Atr=a0 MxPwr=450mA
+> A:  FirstIf#= 0 IfCount= 2 Cls=ff(vend.) Sub=ff Prot=ff
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=125us
+> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:  If#= 1 Alt= 6 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> 
+> Signed-off-by: Cho, Yu-Chen <acho@suse.com>
 > ---
->  drivers/bluetooth/btmrvl_sdio.c | 1 +
->  1 file changed, 1 insertion(+)
+>  drivers/bluetooth/btusb.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
 Patch has been applied to bluetooth.git. Thanks.
 
