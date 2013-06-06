@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC BlueZ v1 03/13] test: Support human-friendly UUIDs in test-device
-Date: Thu,  6 Jun 2013 10:21:35 +0200
-Message-Id: <1370506905-19641-4-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC BlueZ v1 04/13] test: Show human-friendly UUIDs in list-devices
+Date: Thu,  6 Jun 2013 10:21:36 +0200
+Message-Id: <1370506905-19641-5-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1370506905-19641-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1370506905-19641-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,35 +12,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Make use of the newly introduced helper function in bluezutils.py to
-parse the command line UUID argument for "connect" and "disconnect"
-operations.
+Instead of showing the hexadecimal UUID, convert it to a human-friendly
+alias as defined in the internal translation table in bluezutils.py.
 ---
- test/test-device | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ test/list-devices | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/test/test-device b/test/test-device
-index 3d7b852..b5f8f96 100755
---- a/test/test-device
-+++ b/test/test-device
-@@ -99,7 +99,7 @@ if (args[0] == "connect"):
- 	else:
- 		device = bluezutils.find_device(args[1], options.dev_id)
- 		if (len(args) > 2):
--			device.ConnectProfile(args[2])
-+			device.ConnectProfile(bluezutils.parse_uuid(args[2]))
- 		else:
- 			device.Connect()
- 	sys.exit(0)
-@@ -110,7 +110,7 @@ if (args[0] == "disconnect"):
- 	else:
- 		device = bluezutils.find_device(args[1], options.dev_id)
- 		if (len(args) > 2):
--			device.DisconnectProfile(args[2])
-+			device.DisconnectProfile(bluezutils.parse_uuid(args[2]))
- 		else:
- 			device.Disconnect()
- 	sys.exit(0)
+diff --git a/test/list-devices b/test/list-devices
+index 0aac217..57f9ba1 100755
+--- a/test/list-devices
++++ b/test/list-devices
+@@ -3,6 +3,7 @@
+ from __future__ import absolute_import, print_function, unicode_literals
+ 
+ import dbus
++import bluezutils
+ 
+ bus = dbus.SystemBus()
+ 
+@@ -19,7 +20,10 @@ def extract_objects(object_list):
+ def extract_uuids(uuid_list):
+ 	list = ""
+ 	for uuid in uuid_list:
+-		if (uuid.endswith("-0000-1000-8000-00805f9b34fb")):
++		alias = bluezutils.get_uuid_alias(uuid)
++		if alias:
++			val = alias
++		elif (uuid.endswith("-0000-1000-8000-00805f9b34fb")):
+ 			if (uuid.startswith("0000")):
+ 				val = "0x" + uuid[4:8]
+ 			else:
 -- 
 1.8.1.4
 
