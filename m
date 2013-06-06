@@ -1,35 +1,160 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH] adapter: fix setting of discoverable timeout
-Date: Thu,  6 Jun 2013 13:11:15 +0100
-Message-Id: <1370520675-1929-1-git-send-email-gustavo@padovan.org>
+MIME-Version: 1.0
+In-Reply-To: <20130606082922.GA25636@joana>
+References: <1370506905-19641-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<1370506905-19641-6-git-send-email-mikel.astiz.oss@gmail.com>
+	<20130606082922.GA25636@joana>
+Date: Thu, 6 Jun 2013 11:26:44 +0200
+Message-ID: <CANT-zCU9mL3X8=nZzERM2YXTDmY5y0bJO2enRgnJrpeK9292Dg@mail.gmail.com>
+Subject: Re: [RFC BlueZ v1 05/13] dbus: Add new org.bluez.Service1
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Hi Gustavo,
 
-The mgmt_cp_set_discoverable struct was getting reset for no reason after
-we set up the discoverable timeout value.
----
- src/adapter.c | 3 ---
- 1 file changed, 3 deletions(-)
+On Thu, Jun 6, 2013 at 10:29 AM, Gustavo Padovan <gustavo@padovan.org> wrote:
+> Hi Mikel,
+>
+> * Mikel Astiz <mikel.astiz.oss@gmail.com> [2013-06-06 10:21:37 +0200]:
+>
+>> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>>
+>> Add a D-Bus interface to represent a service that is supported by a
+>> device.
+>> ---
+>>  src/device.c  |  8 ++++++--
+>>  src/service.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>  src/service.h |  2 +-
+>>  3 files changed, 60 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/src/device.c b/src/device.c
+>> index 57bfc86..c03db12 100644
+>> --- a/src/device.c
+>> +++ b/src/device.c
+>> @@ -177,6 +177,7 @@ struct btd_device {
+>>       GSList          *uuids;
+>>       GSList          *primaries;             /* List of primary services */
+>>       GSList          *services;              /* List of btd_service */
+>> +     unsigned int    service_id;
+>>       GSList          *pending;               /* Pending services */
+>>       GSList          *watches;               /* List of disconnect_data */
+>>       gboolean        temporary;
+>> @@ -2132,6 +2133,7 @@ static struct btd_device *device_new(struct btd_adapter *adapter,
+>>
+>>       str2ba(address, &device->bdaddr);
+>>       device->adapter = adapter;
+>> +     device->service_id = 1;
+>>
+>>       return btd_device_ref(device);
+>>  }
+>> @@ -2477,11 +2479,12 @@ static void dev_probe(struct btd_profile *p, void *user_data)
+>>
+>>       service = service_create(d->dev, p);
+>>
+>> -     if (service_probe(service) < 0) {
+>> +     if (service_probe(service, d->dev->service_id) < 0) {
+>>               btd_service_unref(service);
+>>               return;
+>>       }
+>>
+>> +     d->dev->service_id++;
+>>       d->dev->services = g_slist_append(d->dev->services, service);
+>>  }
+>>
+>> @@ -2499,11 +2502,12 @@ void device_probe_profile(gpointer a, gpointer b)
+>>
+>>       service = service_create(device, profile);
+>>
+>> -     if (service_probe(service) < 0) {
+>> +     if (service_probe(service, device->service_id) < 0) {
+>>               btd_service_unref(service);
+>>               return;
+>>       }
+>>
+>> +     device->service_id++;
+>>       device->services = g_slist_append(device->services, service);
+>>
+>>       if (!profile->auto_connect || !device->general_connect)
+>> diff --git a/src/service.c b/src/service.c
+>> index aef9502..7b9e271 100644
+>> --- a/src/service.c
+>> +++ b/src/service.c
+>> @@ -38,6 +38,7 @@
+>>  #include <bluetooth/bluetooth.h>
+>>
+>>  #include <glib.h>
+>> +#include <gdbus/gdbus.h>
+>>
+>>  #include "log.h"
+>>
+>> @@ -45,6 +46,10 @@
+>>  #include "device.h"
+>>  #include "profile.h"
+>>  #include "service.h"
+>> +#include "dbus-common.h"
+>> +#include "error.h"
+>> +
+>> +#define SERVICE_INTERFACE "org.bluez.Service1"
+>>
+>>  struct btd_service {
+>>       int                     ref;
+>> @@ -53,6 +58,9 @@ struct btd_service {
+>>       void                    *user_data;
+>>       btd_service_state_t     state;
+>>       int                     err;
+>> +     char                    *path;
+>> +     DBusMessage             *connect_msg;
+>> +     DBusMessage             *disconnect_msg;
+>>  };
+>>
+>>  struct service_state_callback {
+>> @@ -63,6 +71,9 @@ struct service_state_callback {
+>>
+>>  static GSList *state_callbacks = NULL;
+>>
+>> +static int service_register(struct btd_service *service, unsigned int id);
+>> +static void service_unregister(struct btd_service *service);
+>> +
+>>  static const char *state2str(btd_service_state_t state)
+>>  {
+>>       switch (state) {
+>> @@ -149,7 +160,7 @@ struct btd_service *service_create(struct btd_device *device,
+>>       return service;
+>>  }
+>>
+>> -int service_probe(struct btd_service *service)
+>> +int service_probe(struct btd_service *service, unsigned int id)
+>>  {
+>>       char addr[18];
+>>       int err;
+>> @@ -159,6 +170,7 @@ int service_probe(struct btd_service *service)
+>>       err = service->profile->device_probe(service);
+>>       if (err == 0) {
+>>               change_state(service, BTD_SERVICE_STATE_DISCONNECTED, 0);
+>> +             service_register(service, id); /* Ignore errors */
+>>               return 0;
+>>       }
+>>
+>> @@ -170,10 +182,12 @@ int service_probe(struct btd_service *service)
+>>
+>>  void service_shutdown(struct btd_service *service)
+>>  {
+>> +     service_unregister(service);
+>>       change_state(service, BTD_SERVICE_STATE_UNAVAILABLE, 0);
+>>       service->profile->device_remove(service);
+>>       service->device = NULL;
+>>       service->profile = NULL;
+>> +     service_unregister(service);
+>
+> Didn't get why you are calling service_unregister twice here.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 8246240..c2f0045 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1907,9 +1907,6 @@ static void property_set_mode(struct btd_adapter *adapter, uint32_t setting,
- 		goto failed;
- 	}
- 
--	memset(&cp, 0, sizeof(cp));
--	cp.val = (enable == TRUE) ? 0x01 : 0x00;
--
- 	DBG("sending %s command for index %u", mgmt_opstr(opcode),
- 							adapter->dev_id);
- 
--- 
-1.8.1.4
+My mistake, the second call is useless (it's actually being ignored)
+and should be removed from the patch.
 
+Cheers,
+Mikel
