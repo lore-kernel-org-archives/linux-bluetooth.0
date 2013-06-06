@@ -2,30 +2,34 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH] adapter: remove unused toggle_discoverable
-Date: Thu,  6 Jun 2013 14:54:18 +0100
-Message-Id: <1370526858-6879-1-git-send-email-gustavo@padovan.org>
+Subject: [PATCH] adapter: fix setting of discoverable timeout
+Date: Thu,  6 Jun 2013 13:11:15 +0100
+Message-Id: <1370520675-1929-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
+The mgmt_cp_set_discoverable struct was getting reset for no reason after
+we set up the discoverable timeout value.
 ---
- src/adapter.c | 1 -
- 1 file changed, 1 deletion(-)
+ src/adapter.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index c2f0045..bb5737e 100644
+index 8246240..c2f0045 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -172,7 +172,6 @@ struct btd_adapter {
- 	struct btd_device *connect_le;	/* LE device waiting to be connected */
- 	sdp_list_t *services;		/* Services associated to adapter */
+@@ -1907,9 +1907,6 @@ static void property_set_mode(struct btd_adapter *adapter, uint32_t setting,
+ 		goto failed;
+ 	}
  
--	bool toggle_discoverable;	/* discoverable needs to be changed */
- 	gboolean initialized;
+-	memset(&cp, 0, sizeof(cp));
+-	cp.val = (enable == TRUE) ? 0x01 : 0x00;
+-
+ 	DBG("sending %s command for index %u", mgmt_opstr(opcode),
+ 							adapter->dev_id);
  
- 	GSList *pin_callbacks;
 -- 
 1.8.1.4
 
