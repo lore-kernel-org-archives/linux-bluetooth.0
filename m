@@ -1,152 +1,186 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 6 Jun 2013 09:29:22 +0100
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: Re: [RFC BlueZ v1 05/13] dbus: Add new org.bluez.Service1
-Message-ID: <20130606082922.GA25636@joana>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [RFC BlueZ v1 12/13] test: Add test-service script
+Date: Thu,  6 Jun 2013 10:21:44 +0200
+Message-Id: <1370506905-19641-13-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1370506905-19641-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1370506905-19641-1-git-send-email-mikel.astiz.oss@gmail.com>
- <1370506905-19641-6-git-send-email-mikel.astiz.oss@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1370506905-19641-6-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-* Mikel Astiz <mikel.astiz.oss@gmail.com> [2013-06-06 10:21:37 +0200]:
+This simple script can be used to control the org.bluez.Service1 API.
+---
+ test/test-service | 157 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 157 insertions(+)
+ create mode 100755 test/test-service
 
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
-> 
-> Add a D-Bus interface to represent a service that is supported by a
-> device.
-> ---
->  src/device.c  |  8 ++++++--
->  src/service.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  src/service.h |  2 +-
->  3 files changed, 60 insertions(+), 4 deletions(-)
-> 
-> diff --git a/src/device.c b/src/device.c
-> index 57bfc86..c03db12 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -177,6 +177,7 @@ struct btd_device {
->  	GSList		*uuids;
->  	GSList		*primaries;		/* List of primary services */
->  	GSList		*services;		/* List of btd_service */
-> +	unsigned int	service_id;
->  	GSList		*pending;		/* Pending services */
->  	GSList		*watches;		/* List of disconnect_data */
->  	gboolean	temporary;
-> @@ -2132,6 +2133,7 @@ static struct btd_device *device_new(struct btd_adapter *adapter,
->  
->  	str2ba(address, &device->bdaddr);
->  	device->adapter = adapter;
-> +	device->service_id = 1;
->  
->  	return btd_device_ref(device);
->  }
-> @@ -2477,11 +2479,12 @@ static void dev_probe(struct btd_profile *p, void *user_data)
->  
->  	service = service_create(d->dev, p);
->  
-> -	if (service_probe(service) < 0) {
-> +	if (service_probe(service, d->dev->service_id) < 0) {
->  		btd_service_unref(service);
->  		return;
->  	}
->  
-> +	d->dev->service_id++;
->  	d->dev->services = g_slist_append(d->dev->services, service);
->  }
->  
-> @@ -2499,11 +2502,12 @@ void device_probe_profile(gpointer a, gpointer b)
->  
->  	service = service_create(device, profile);
->  
-> -	if (service_probe(service) < 0) {
-> +	if (service_probe(service, device->service_id) < 0) {
->  		btd_service_unref(service);
->  		return;
->  	}
->  
-> +	device->service_id++;
->  	device->services = g_slist_append(device->services, service);
->  
->  	if (!profile->auto_connect || !device->general_connect)
-> diff --git a/src/service.c b/src/service.c
-> index aef9502..7b9e271 100644
-> --- a/src/service.c
-> +++ b/src/service.c
-> @@ -38,6 +38,7 @@
->  #include <bluetooth/bluetooth.h>
->  
->  #include <glib.h>
-> +#include <gdbus/gdbus.h>
->  
->  #include "log.h"
->  
-> @@ -45,6 +46,10 @@
->  #include "device.h"
->  #include "profile.h"
->  #include "service.h"
-> +#include "dbus-common.h"
-> +#include "error.h"
-> +
-> +#define SERVICE_INTERFACE "org.bluez.Service1"
->  
->  struct btd_service {
->  	int			ref;
-> @@ -53,6 +58,9 @@ struct btd_service {
->  	void			*user_data;
->  	btd_service_state_t	state;
->  	int			err;
-> +	char			*path;
-> +	DBusMessage             *connect_msg;
-> +	DBusMessage             *disconnect_msg;
->  };
->  
->  struct service_state_callback {
-> @@ -63,6 +71,9 @@ struct service_state_callback {
->  
->  static GSList *state_callbacks = NULL;
->  
-> +static int service_register(struct btd_service *service, unsigned int id);
-> +static void service_unregister(struct btd_service *service);
-> +
->  static const char *state2str(btd_service_state_t state)
->  {
->  	switch (state) {
-> @@ -149,7 +160,7 @@ struct btd_service *service_create(struct btd_device *device,
->  	return service;
->  }
->  
-> -int service_probe(struct btd_service *service)
-> +int service_probe(struct btd_service *service, unsigned int id)
->  {
->  	char addr[18];
->  	int err;
-> @@ -159,6 +170,7 @@ int service_probe(struct btd_service *service)
->  	err = service->profile->device_probe(service);
->  	if (err == 0) {
->  		change_state(service, BTD_SERVICE_STATE_DISCONNECTED, 0);
-> +		service_register(service, id); /* Ignore errors */
->  		return 0;
->  	}
->  
-> @@ -170,10 +182,12 @@ int service_probe(struct btd_service *service)
->  
->  void service_shutdown(struct btd_service *service)
->  {
-> +	service_unregister(service);
->  	change_state(service, BTD_SERVICE_STATE_UNAVAILABLE, 0);
->  	service->profile->device_remove(service);
->  	service->device = NULL;
->  	service->profile = NULL;
-> +	service_unregister(service);
+diff --git a/test/test-service b/test/test-service
+new file mode 100755
+index 0000000..48426f9
+--- /dev/null
++++ b/test/test-service
+@@ -0,0 +1,157 @@
++#!/usr/bin/python
++
++# Copyright (C) 2012-2013  BMW Car IT GmbH.
++
++from __future__ import absolute_import, print_function, unicode_literals
++
++from gi.repository import GObject
++
++import sys
++import dbus
++import dbus.mainloop.glib
++from optparse import OptionParser, make_option
++import bluezutils
++
++BUS_NAME = 'org.bluez'
++SERVICE_INTERFACE = 'org.bluez.Service1'
++
++dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
++bus = dbus.SystemBus()
++mainloop = GObject.MainLoop()
++
++option_list = [
++		make_option("-i", "--adapter", action="store",
++				type="string", dest="adap_id"),
++		]
++
++description="Test script to operate on org.bluez.Service1 interfaces"
++usage = "usage: %prog [options] <command> [<args>]"
++epilog="""
++Commands:
++	list [<address>]
++	connect <address> <service-path-suffix>
++	disconnect <address> <service-path-suffix>
++
++"""
++
++OptionParser.format_epilog = lambda self, formatter: self.epilog
++parser = OptionParser(
++	usage=usage,
++	description = description,
++	epilog = epilog,
++	option_list=option_list)
++
++(options, args) = parser.parse_args()
++
++if len(args) < 1:
++	parser.print_help()
++	sys.exit(1)
++
++if args[0] == "list":
++	if len(args) > 2:
++		parser.print_help()
++		sys.exit(1)
++
++	adapter = bluezutils.find_adapter(options.adap_id)
++	adapter_path = adapter.object_path
++
++	om = dbus.Interface(bus.get_object("org.bluez", "/"),
++					"org.freedesktop.DBus.ObjectManager")
++	objects = om.GetManagedObjects()
++
++	all_services = (str(path) for path, interfaces in objects.iteritems()
++			if SERVICE_INTERFACE in interfaces.keys())
++	all_services = list(all_services)
++
++	for path, interfaces in objects.iteritems():
++		if "org.bluez.Device1" not in interfaces:
++			continue
++
++		properties = interfaces["org.bluez.Device1"]
++		if properties["Adapter"] != adapter_path:
++			continue
++
++		alias = properties["Alias"]
++		address = properties["Address"]
++		if len(args) >= 2 and args[1] != address:
++			continue
++
++		print("[ %s ('%s') ]" % (address, alias))
++
++		for service_path in all_services:
++			service = objects[service_path]
++			properties = service[SERVICE_INTERFACE]
++
++			if properties["Device"] != path:
++				continue
++
++			print("    [ " + service_path + " ]")
++
++			for key in properties.keys():
++				value = properties[key]
++				extra = ""
++				if key == "Device":
++					continue
++				elif key == "UUID":
++					alias = bluezutils.get_uuid_alias(value)
++					if alias:
++						extra = " (%s)" % alias
++				print("        %s = %s%s" % (key, value, extra))
++
++		print("")
++
++	sys.exit(0)
++
++def service_do(func):
++	if len(args) < 3:
++		parser.print_help()
++		sys.exit(1)
++
++	objects = bluezutils.get_managed_objects()
++	adapter = bluezutils.find_adapter_in_objects(objects, options.adap_id)
++	device = bluezutils.find_device_in_objects(objects, args[1],
++								options.adap_id)
++	path_suffix = args[2]
++	found = False
++	for path, ifaces in objects.iteritems():
++		service = ifaces.get(SERVICE_INTERFACE)
++		if service is None:
++			continue
++		if device.object_path != service["Device"]:
++			continue
++		if not(path.endswith(path_suffix)):
++			continue
++		try:
++			found = True
++			service = bus.get_object(BUS_NAME, path)
++			iface = dbus.Interface(service, SERVICE_INTERFACE)
++			func(path, iface)
++		except dbus.exceptions.DBusException as e:
++			print(e)
++			print()
++
++	if not(found):
++		raise Exception("Service not found")
++
++if args[0] == "connect":
++	def connect(path, iface):
++		print("Connecting service %s..." % path)
++		iface.Connect()
++		print("Done.")
++		print()
++
++	service_do(connect)
++	sys.exit(0)
++
++if args[0] == "disconnect":
++	def disconnect(path, iface):
++		print("Disconnecting service %s..." % path)
++		iface.Disconnect()
++		print("Done.")
++		print()
++
++	service_do(disconnect)
++	sys.exit(0)
++
++parser.print_help()
++sys.exit(1)
+-- 
+1.8.1.4
 
-Didn't get why you are calling service_unregister twice here.
-
-	Gustavo
