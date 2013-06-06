@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC BlueZ v1 04/13] test: Show human-friendly UUIDs in list-devices
-Date: Thu,  6 Jun 2013 10:21:36 +0200
-Message-Id: <1370506905-19641-5-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC BlueZ v1 01/13] test: Remove obsolete test script
+Date: Thu,  6 Jun 2013 10:21:33 +0200
+Message-Id: <1370506905-19641-2-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1370506905-19641-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1370506905-19641-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,36 +12,161 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Instead of showing the hexadecimal UUID, convert it to a human-friendly
-alias as defined in the internal translation table in bluezutils.py.
+The interface was removed some time ago making the test script useless,
+so just remove it from the codebase.
 ---
- test/list-devices | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ Makefile.tools      |   2 +-
+ test/simple-service | 128 ----------------------------------------------------
+ 2 files changed, 1 insertion(+), 129 deletions(-)
+ delete mode 100755 test/simple-service
 
-diff --git a/test/list-devices b/test/list-devices
-index 0aac217..57f9ba1 100755
---- a/test/list-devices
-+++ b/test/list-devices
-@@ -3,6 +3,7 @@
- from __future__ import absolute_import, print_function, unicode_literals
- 
- import dbus
-+import bluezutils
- 
- bus = dbus.SystemBus()
- 
-@@ -19,7 +20,10 @@ def extract_objects(object_list):
- def extract_uuids(uuid_list):
- 	list = ""
- 	for uuid in uuid_list:
--		if (uuid.endswith("-0000-1000-8000-00805f9b34fb")):
-+		alias = bluezutils.get_uuid_alias(uuid)
-+		if alias:
-+			val = alias
-+		elif (uuid.endswith("-0000-1000-8000-00805f9b34fb")):
- 			if (uuid.startswith("0000")):
- 				val = "0x" + uuid[4:8]
- 			else:
+diff --git a/Makefile.tools b/Makefile.tools
+index acd403e..b48b02f 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -240,7 +240,7 @@ test_scripts += test/sap_client.py test/bluezutils.py \
+ 		test/dbusdef.py test/monitor-bluetooth test/list-devices \
+ 		test/test-discovery test/test-manager test/test-adapter \
+ 		test/test-device test/simple-agent \
+-		test/simple-service test/simple-endpoint test/test-sap-server \
++		test/simple-endpoint test/test-sap-server \
+ 		test/test-proximity test/test-network \
+ 		test/test-thermometer test/test-profile test/test-health \
+ 		test/test-health-sink test/service-record.dtd \
+diff --git a/test/simple-service b/test/simple-service
+deleted file mode 100755
+index 02d7648..0000000
+--- a/test/simple-service
++++ /dev/null
+@@ -1,128 +0,0 @@
+-#!/usr/bin/python
+-
+-from __future__ import absolute_import, print_function, unicode_literals
+-
+-import sys
+-import time
+-import dbus
+-import bluezutils
+-
+-xml = ' \
+-<?xml version="1.0" encoding="UTF-8" ?> 	\
+-<record>					\
+-  <attribute id="0x0001">			\
+-    <sequence>					\
+-      <uuid value="0x1101"/>			\
+-    </sequence>					\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0002">			\
+-     <uint32 value="0"/>			\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0003">			\
+-    <uuid value="00001101-0000-1000-8000-00805f9b34fb"/> \
+-  </attribute>					\
+-						\
+-  <attribute id="0x0004">			\
+-    <sequence>					\
+-      <sequence>				\
+-        <uuid value="0x0100"/>			\
+-      </sequence>				\
+-      <sequence>				\
+-        <uuid value="0x0003"/>			\
+-        <uint8 value="23"/>			\
+-      </sequence>				\
+-    </sequence>					\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0005">			\
+-    <sequence>					\
+-      <uuid value="0x1002"/>			\
+-    </sequence>					\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0006">			\
+-    <sequence>					\
+-      <uint16 value="0x656e"/>			\
+-      <uint16 value="0x006a"/>			\
+-      <uint16 value="0x0100"/>			\
+-    </sequence>					\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0007">			\
+-     <uint32 value="0"/>			\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0008">			\
+-     <uint8 value="0xff"/>			\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0009">			\
+-    <sequence>					\
+-      <sequence>				\
+-        <uuid value="0x1101"/>			\
+-        <uint16 value="0x0100"/>		\
+-      </sequence>				\
+-    </sequence>					\
+-  </attribute>					\
+-						\
+-  <attribute id="0x000a">			\
+-    <url value="http://www.bluez.org/"/>	\
+-  </attribute>					\
+-						\
+-  <attribute id="0x000b">			\
+-    <url value="http://www.bluez.org/"/>	\
+-  </attribute>					\
+-						\
+-  <attribute id="0x000c">			\
+-    <url value="http://www.bluez.org/"/>	\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0100">			\
+-    <text value="Serial Port"/>			\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0101">			\
+-    <text value="Serial Port Service"/>		\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0102">			\
+-     <text value="BlueZ"/>			\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0200">			\
+-    <sequence>					\
+-      <uint16 value="0x0100"/>			\
+-    </sequence>					\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0201">			\
+-     <uint32 value="0"/>			\
+-  </attribute>					\
+-</record>					\
+-'
+-
+-bus = dbus.SystemBus()
+-
+-if len(sys.argv) > 1:
+-	path = bluezutils.find_adapter(sys.argv[1]).object_path
+-else:
+-	path = bluezutils.find_adapter().object_path
+-
+-service = dbus.Interface(bus.get_object("org.bluez", path),
+-						"org.bluez.Service")
+-
+-handle = service.AddRecord(xml)
+-
+-print("Service record with handle 0x%04x added" % (handle))
+-
+-print("Press CTRL-C to remove service record")
+-
+-try:
+-	time.sleep(1000)
+-	print("Terminating session")
+-except:
+-	pass
+-
+-service.RemoveRecord(dbus.UInt32(handle))
 -- 
 1.8.1.4
 
