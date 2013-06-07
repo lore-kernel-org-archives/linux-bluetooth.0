@@ -1,65 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 10 Jun 2013 11:29:07 +0200
-From: Pavel Machek <pavel@ucw.cz>
-To: "Rafael J. Wysocki" <rjw@sisk.pl>,
-	kernel list <linux-kernel@vger.kernel.org>, marcel@holtmann.org,
-	gustavo@padovan.org, johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org
-Subject: 3.10-rc: bluetooth disappeared on thinkpad x60 (regression)
-Message-ID: <20130610092907.GA5487@amd.pavel.ucw.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130606162030.GC9652@joana>
+References: <1370528339-7921-1-git-send-email-gustavo@padovan.org>
+	<1370528339-7921-4-git-send-email-gustavo@padovan.org>
+	<CABBYNZLxeRNBL4KBjs624pVSvDv76pbV4u+Y8K6VuNnHD8ApVg@mail.gmail.com>
+	<20130606155959.GA9652@joana>
+	<CABBYNZ+HZ1N4XD0X-3fNh0yiF5ALAkFpte+G9z_2YmiuSAhJ9w@mail.gmail.com>
+	<20130606162030.GC9652@joana>
+Date: Fri, 7 Jun 2013 09:58:46 +0200
+Message-ID: <CANT-zCUtkcu=8ZAPv7exorbBNdzvJhxFuPavpGUk4DAU8H3UHA@mail.gmail.com>
+Subject: Re: [RFC v0 4/5] adapter: add RequestDiscoverable() and ReleaseDiscoverable()
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+Hi,
 
->From start of 3.10-rc series, bluetooth seems to be gone on thinkpad
-x60.
+On Thu, Jun 6, 2013 at 6:20 PM, Gustavo Padovan <gustavo@padovan.org> wrote:
+> Hi Luiz,
+>
+> * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2013-06-06 23:06:36 +0700]:
+>
+>> Hi Gustavo,
+>>
+>> On Thu, Jun 6, 2013 at 10:59 PM, Gustavo Padovan <gustavo@padovan.org> wrote:
+>> > Hi Luiz,
+>> >
+>> > * Luiz Augusto von Dentz <luiz.dentz@gmail.com> [2013-06-06 22:50:32 +0700]:
+>> >
+>> >> Hi Gustavo,
+>> >>
+>> >> On Thu, Jun 6, 2013 at 9:18 PM, Gustavo Padovan <gustavo@padovan.org> wrote:
+>> >> > From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+>> >> >
+>> >> > With those two methods BlueZ is now aware of client lifetime and can set
+>> >> > Discoverable back to False if all clients exit or call
+>> >> > ReleaseDiscoverable()
+>> >> > ---
+>> >>
+>> >> This probably should be handled int the component controlling the
+>> >> powered state like we used to have with RequestSession or we can have
+>> >> an agent to the power/policy manager asking if it is ok to power on
+>> >> the adapter.
+>> >
+>> > Not sure if it makes sense to put this in the component that handles power
+>> > state (you mean ConnMan here, for example?). How an agent for this can help
+>> > us. The problem I'm trying to solve here is, do not let the Discoverable True
+>> > for infinite time if the who is using crashes.
+>>
+>> There is the exact same problem with Powered isn't it? If the
+>> application crashes will stay on, actually with an agent we can always
+>> request the component controlling it e.g. ConnMan to confirm the
+>> action.
+>
+> Yes, Powered has the same problem, but didn't ConnMan itself would need to
+> register "Powered session" on BlueZ as well. The I see it BlueZ is the session
+> manager, not ConnMan. In your mind ConnMan would also control things like
+> Discoverable or Pairable?
+>
 
-root@amd:~# uname -a
-Linux amd 3.10.0-rc5+ #261 SMP Mon Jun 10 02:59:55 CEST 2013 i686
-GNU/Linux
+The way I see this there is a difference between Powered and
+Pairable/Discoverable.
 
-pavel@amd:~$ lsusb 
-Bus 005 Device 003: ID 0483:2016 SGS Thomson Microelectronics
-Fingerprint Reader
-Bus 005 Device 002: ID 0a5c:2110 Broadcom Corp. Bluetooth Controller
-Bus 005 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
-Bus 004 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
-Bus 003 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
-Bus 002 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
-Bus 001 Device 007: ID 046d:c05a Logitech, Inc. Optical Mouse M90
-Bus 001 Device 006: ID 04f2:0111 Chicony Electronics Co., Ltd KU-9908
-Keyboard
-Bus 001 Device 003: ID 17ef:1000 Lenovo 
-Bus 001 Device 002: ID 0421:01c7 Nokia Mobile Phones N900 (Storage
-Mode)
-Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Powered can be controlled by Connman and that's it. If it crashes, it
+should restart and recover.
 
-root@amd:~# hciconfig hci0 up
-Can't init device hci0: Operation not supported (95)
-root@amd:~# hcitool inq
-Inquiring ...
-Inquiry failed.: No such device
-root@amd:~# 
+Pairable/Discoverable are IMO different, and what Gustavo proposes
+makes sense to me. A possible improvement would be to request both
+pairable and discoverable in a single call.
 
-(This is regression from 3.9.)
+In the longer term, however, I would be in favor of coupling this with
+the registration of the (pairing) agent. The UI would call
+RequestPairingMode(object agent) which would do everything together.
+The only exceptions here would be the Authorize() and
+ConfirmModeChange() methods, which are the only ones in
+org.bluez.Agent1 that are unrelated to pairing.
 
-dmesg does not show much:
-
-thinkpad_acpi: rfkill switch tpacpi_bluetooth_sw: radio is unblocked
-thinkpad_acpi: warning: userspace override of important firmware LEDs
-is enabled
-thinkpad_acpi: Standard ACPI backlight interface available, not
-loading native one
-thinkpad_acpi: volume: disabled as there is no ALSA support in this
-kernel
-
-Bluetooth LED is on (and wifi works), so it is not hardware kill
-switch.
-
-
-								Pavel
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+Cheers,
+Mikel
