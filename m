@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 12/15] AVRCP: Fix sending invalid attributes when responding to GetElementAttributes
-Date: Mon, 10 Jun 2013 13:37:07 +0300
-Message-Id: <1370860630-30359-12-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 11/15] core: Fix not been able to cancel Device.Connect with Device.Disconnect
+Date: Mon, 10 Jun 2013 13:37:06 +0300
+Message-Id: <1370860630-30359-11-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1370860630-30359-1-git-send-email-luiz.dentz@gmail.com>
 References: <1370860630-30359-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,104 +11,87 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The list returned by media.c contains the attributes in string format not
-the binary format which cause us to send wrong/reserved attributes as can
-be observed bellow:
-
-> ACL data: handle 12 flags 0x02 dlen 58
-    L2CAP(d): cid 0x0041 len 54 [psm 23]
-      AVCTP Control: Response : pt 0x00 transaction 14 pid 0x110e
-        AV/C: Stable: address 0x48 opcode 0x00
-          Subunit: Panel
-          Opcode: Vendor Dependent
-          Company ID: 0x001958
-          AVRCP: GetElementAttributes: pt Single len 0x0029
-            AttributeCount: 0x05
-            Attribute: 0x00df9490 (Reserved)
-            CharsetID: 0x006a (UTF-8)
-            AttributeValueLength: 0x0000
-            AttributeValue:
-            Attribute: 0x00e0e880 (Reserved)
-            CharsetID: 0x006a (UTF-8)
-            AttributeValueLength: 0x0000
-            AttributeValue:
-            Attribute: 0x00e07b00 (Reserved)
-            CharsetID: 0x006a (UTF-8)
-            AttributeValueLength: 0x0000
-            AttributeValue:
-            Attribute: 0x00e16bc0 (Reserved)
-            CharsetID: 0x006a (UTF-8)
-            AttributeValueLength: 0x0000
-            AttributeValue:
-            Attribute: 0x00e07bc0 (Reserved)
-            CharsetID: 0x006a (UTF-8)
-            AttributeValueLength: 0x0000
-            AttributeValue:
+Device.Disconnect should be able to interrupt the connection attempt
+started by Device.Connect.
 ---
- profiles/audio/avrcp.c | 39 ++++++++++++++++++++++++++++++++++-----
- 1 file changed, 34 insertions(+), 5 deletions(-)
+ src/device.c  | 18 ++++++++++++------
+ src/service.c |  5 +++++
+ 2 files changed, 17 insertions(+), 6 deletions(-)
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index f439ab3..7eaadf4 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -977,13 +977,43 @@ err:
- 	return AVC_CTYPE_REJECTED;
- }
+diff --git a/src/device.c b/src/device.c
+index d4c1e23..5cb5460 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1082,7 +1082,7 @@ void device_request_disconnect(struct btd_device *device, DBusMessage *msg)
+ 		device->connect = NULL;
+ 	}
  
-+static uint32_t str_to_metadata(const char *str)
-+{
-+	if (strcasecmp(str, "Title") == 0)
-+		return AVRCP_MEDIA_ATTRIBUTE_TITLE;
-+	else if (strcasecmp(str, "Artist") == 0)
-+		return AVRCP_MEDIA_ATTRIBUTE_ARTIST;
-+	else if (strcasecmp(str, "Album") == 0)
-+		return AVRCP_MEDIA_ATTRIBUTE_ALBUM;
-+	else if (strcasecmp(str, "Genre") == 0)
-+		return AVRCP_MEDIA_ATTRIBUTE_GENRE;
-+	else if (strcasecmp(str, "TrackNumber") == 0)
-+		return AVRCP_MEDIA_ATTRIBUTE_TRACK;
-+	else if (strcasecmp(str, "NumberOfTracks") == 0)
-+		return AVRCP_MEDIA_ATTRIBUTE_N_TRACKS;
-+	else if (strcasecmp(str, "Duration") == 0)
-+		return AVRCP_MEDIA_ATTRIBUTE_DURATION;
-+
-+	return 0;
-+}
-+
- static GList *player_list_metadata(struct avrcp_player *player)
- {
--	if (player != NULL)
--		return player->cb->list_metadata(player->user_data);
-+	GList *l, *attrs = NULL;
+-	if (msg)
++	if (device->connected && msg)
+ 		device->disconnects = g_slist_append(device->disconnects,
+ 						dbus_message_ref(msg));
  
--	return g_list_prepend(NULL,
-+	if (player == NULL)
-+		return g_list_prepend(NULL,
- 				GUINT_TO_POINTER(AVRCP_MEDIA_ATTRIBUTE_TITLE));
-+
-+	l = player->cb->list_metadata(player->user_data);
-+	for (; l; l = l->next) {
-+		const char *key = l->data;
-+
-+		attrs = g_list_append(attrs,
-+					GUINT_TO_POINTER(str_to_metadata(key)));
+@@ -1110,18 +1110,20 @@ void device_request_disconnect(struct btd_device *device, DBusMessage *msg)
+ 		g_free(data);
+ 	}
+ 
++	if (!device->connected) {
++		g_dbus_send_reply(dbus_conn, msg, DBUS_TYPE_INVALID);
++		return;
 +	}
 +
-+	return attrs;
+ 	device->disconn_timer = g_timeout_add_seconds(DISCONNECT_TIMER,
+ 						do_disconnect, device);
  }
  
- static uint8_t avrcp_handle_get_element_attributes(struct avrcp *session,
-@@ -2123,8 +2153,7 @@ static gboolean avrcp_get_item_attributes_rsp(struct avctp *conn,
- 	}
+-static DBusMessage *disconnect(DBusConnection *conn, DBusMessage *msg,
++static DBusMessage *dev_disconnect(DBusConnection *conn, DBusMessage *msg,
+ 							void *user_data)
+ {
+ 	struct btd_device *device = user_data;
  
- 	if (pdu->params[0] != AVRCP_STATUS_SUCCESS || operand_count < 4) {
--		if (pdu->params[0] == AVRCP_STATUS_PLAYER_NOT_BROWSABLE)
--			avrcp_get_element_attributes(session);
-+		avrcp_get_element_attributes(session);
- 		return FALSE;
- 	}
+-	if (!device->connected)
+-		return btd_error_not_connected(msg);
+-
+ 	/*
+ 	 * Disable connections through passive scanning until
+ 	 * Device1.Connect is called
+@@ -1723,7 +1725,7 @@ static DBusMessage *cancel_pairing(DBusConnection *conn, DBusMessage *msg,
+ }
  
+ static const GDBusMethodTable device_methods[] = {
+-	{ GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL, disconnect) },
++	{ GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL, dev_disconnect) },
+ 	{ GDBUS_ASYNC_METHOD("Connect", NULL, NULL, dev_connect) },
+ 	{ GDBUS_ASYNC_METHOD("ConnectProfile", GDBUS_ARGS({ "UUID", "s" }),
+ 						NULL, connect_profile) },
+@@ -4508,6 +4510,10 @@ static void service_state_changed(struct btd_service *service,
+ 	struct btd_device *device = btd_service_get_device(service);
+ 	int err = btd_service_get_error(service);
+ 
++	if (new_state == BTD_SERVICE_STATE_CONNECTING ||
++				new_state == BTD_SERVICE_STATE_DISCONNECTING)
++		return;
++
+ 	if (old_state == BTD_SERVICE_STATE_CONNECTING)
+ 		device_profile_connected(device, profile, err);
+ 	else if (old_state == BTD_SERVICE_STATE_DISCONNECTING)
+diff --git a/src/service.c b/src/service.c
+index aef9502..83e1c1a 100644
+--- a/src/service.c
++++ b/src/service.c
+@@ -238,6 +238,11 @@ int btd_service_disconnect(struct btd_service *service)
+ 	if (err == 0)
+ 		return 0;
+ 
++	if (err == -ENOTCONN) {
++		btd_service_disconnecting_complete(service, 0);
++		return 0;
++	}
++
+ 	ba2str(device_get_address(service->device), addr);
+ 	error("%s profile disconnect failed for %s: %s", profile->name, addr,
+ 								strerror(-err));
 -- 
 1.8.1.4
 
