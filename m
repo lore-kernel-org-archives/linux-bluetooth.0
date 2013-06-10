@@ -1,45 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 10 Jun 2013 13:05:19 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Pavel Machek <pavel@ucw.cz>
-Cc: "Rafael J. Wysocki" <rjw@sisk.pl>,
+Date: Mon, 10 Jun 2013 11:29:07 +0200
+From: Pavel Machek <pavel@ucw.cz>
+To: "Rafael J. Wysocki" <rjw@sisk.pl>,
 	kernel list <linux-kernel@vger.kernel.org>, marcel@holtmann.org,
-	gustavo@padovan.org, linux-bluetooth@vger.kernel.org
-Subject: Re: 3.10-rc: bluetooth disappeared on thinkpad x60 (regression)
-Message-ID: <20130610100519.GA9816@x220.ger.corp.intel.com>
-References: <20130610092907.GA5487@amd.pavel.ucw.cz>
+	gustavo@padovan.org, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org
+Subject: 3.10-rc: bluetooth disappeared on thinkpad x60 (regression)
+Message-ID: <20130610092907.GA5487@amd.pavel.ucw.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130610092907.GA5487@amd.pavel.ucw.cz>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pavel,
+Hi!
 
-On Mon, Jun 10, 2013, Pavel Machek wrote:
-> root@amd:~# hciconfig hci0 up
-> Can't init device hci0: Operation not supported (95)
-> root@amd:~# hcitool inq
-> Inquiring ...
-> Inquiry failed.: No such device
-> root@amd:~# 
+>From start of 3.10-rc series, bluetooth seems to be gone on thinkpad
+x60.
 
-Could you take logs of the HCI traffic that happens when you try this.
-You can use the btmon tool from BlueZ for it. Based on a quick look at
-the code it seems like this particular error could only come if one of
-the HCI commands used for device initialization fails.
+root@amd:~# uname -a
+Linux amd 3.10.0-rc5+ #261 SMP Mon Jun 10 02:59:55 CEST 2013 i686
+GNU/Linux
 
-The Bluetooth HCI init sequence is constructed using only commands that
-should be expected to work assuming the hardware follows the
-specification, but occasionally we do encounter Bluetooth hardware that
-is broken in one way or another and needs a work around to the sequence.
-E.g. recently we added a couple of extra commands to read some new
-parameters from the hardware, commands that are mandatory for hardware
-beyond a specific version (something we check for), but could be that
-the chip on the X60 doesn't support these.
+pavel@amd:~$ lsusb 
+Bus 005 Device 003: ID 0483:2016 SGS Thomson Microelectronics
+Fingerprint Reader
+Bus 005 Device 002: ID 0a5c:2110 Broadcom Corp. Bluetooth Controller
+Bus 005 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 004 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 003 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 002 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 001 Device 007: ID 046d:c05a Logitech, Inc. Optical Mouse M90
+Bus 001 Device 006: ID 04f2:0111 Chicony Electronics Co., Ltd KU-9908
+Keyboard
+Bus 001 Device 003: ID 17ef:1000 Lenovo 
+Bus 001 Device 002: ID 0421:01c7 Nokia Mobile Phones N900 (Storage
+Mode)
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
 
-Anyway, once we see what exactly is failing in the HCI logs we can make
-an adjustment to the conditions that the failing commands depend on,
-which in the worst case will be a device specific quirk based on the USB
-id of your hardware.
+root@amd:~# hciconfig hci0 up
+Can't init device hci0: Operation not supported (95)
+root@amd:~# hcitool inq
+Inquiring ...
+Inquiry failed.: No such device
+root@amd:~# 
 
-Johan
+(This is regression from 3.9.)
+
+dmesg does not show much:
+
+thinkpad_acpi: rfkill switch tpacpi_bluetooth_sw: radio is unblocked
+thinkpad_acpi: warning: userspace override of important firmware LEDs
+is enabled
+thinkpad_acpi: Standard ACPI backlight interface available, not
+loading native one
+thinkpad_acpi: volume: disabled as there is no ALSA support in this
+kernel
+
+Bluetooth LED is on (and wifi works), so it is not hardware kill
+switch.
+
+
+								Pavel
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
