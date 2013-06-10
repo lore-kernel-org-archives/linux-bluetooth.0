@@ -1,33 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 01/15] AVRCP: Fix crash when registering unsupported notification
-Date: Mon, 10 Jun 2013 13:36:56 +0300
-Message-Id: <1370860630-30359-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 15/15] obexd: Fix not checking for valid fd on NewConnection
+Date: Mon, 10 Jun 2013 13:37:10 +0300
+Message-Id: <1370860630-30359-15-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1370860630-30359-1-git-send-email-luiz.dentz@gmail.com>
+References: <1370860630-30359-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Reject command if notification is not supported otherwise this can
-cause crashes.
----
- profiles/audio/avrcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The fd needs to be checked as it may not be valid anymore which cause the
+following warnings:
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 4558407..5bddd08 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -1355,7 +1355,7 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
- 	 * one is applicable only for EVENT_PLAYBACK_POS_CHANGED. See AVRCP
- 	 * 1.3 spec, section 5.4.2.
- 	 */
--	if (len != 5)
-+	if (len != 5 || !(session->supported_events & (1 << pdu->params[0])))
- 		goto err;
+==8162== Warning: invalid file descriptor 1031 in syscall fcntl(DUPFD_CLOEXEC)()
+
+(obexd:8162): GLib-WARNING **: giounix.c:412Error while getting flags for FD: Bad file descriptor (9)
+---
+ obexd/plugins/bluetooth.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
+index 07baf90..4e65923 100644
+--- a/obexd/plugins/bluetooth.c
++++ b/obexd/plugins/bluetooth.c
+@@ -30,6 +30,7 @@
+ #include <string.h>
+ #include <unistd.h>
+ #include <inttypes.h>
++#include <fcntl.h>
+ #include <sys/socket.h>
  
- 	switch (pdu->params[0]) {
+ #include <glib.h>
+@@ -132,6 +133,9 @@ static DBusMessage *profile_new_connection(DBusConnection *conn,
+ 
+ 	dbus_message_iter_get_basic(&args, &fd);
+ 
++	if (fcntl(fd, F_GETFD) < 0)
++		return invalid_args(msg);
++
+ 	io = g_io_channel_unix_new(fd);
+ 	if (io == NULL)
+ 		return invalid_args(msg);
 -- 
 1.8.1.4
 
