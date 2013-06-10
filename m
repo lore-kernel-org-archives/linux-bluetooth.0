@@ -1,46 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/5] MAP client: Add notification dispatcher
-Date: Mon, 10 Jun 2013 13:01:34 +0200
-Message-Id: <1370862099-31046-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH 3/5] obexd: Add function to get the destination from the obc_session
+Date: Mon, 10 Jun 2013 13:01:37 +0200
+Message-Id: <1370862099-31046-4-git-send-email-christian.fetzer@oss.bmw-carit.de>
+In-Reply-To: <1370862099-31046-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1370862099-31046-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-This patch set completes the two patch sets "Add Message Notification Service
-(MNS) server" and "Read MASInstanceID for the current connection".
+---
+ obexd/client/session.c | 5 +++++
+ obexd/client/session.h | 1 +
+ 2 files changed, 6 insertions(+)
 
-The notification dispatcher component dispatches event reports that are
-received by the MNS server to the correct MAS client instance.
-
-The message access part of every client instance registers a notification
-handler function. The MNS will call the associated handler for all received
-event reports.
-
-For now, the handler will only print a log message for the received
-notifications. This is the starting point where we can add the necessary
-DBus API parts.
-
-Christian Fetzer (5):
-  obexd: Add MAP notification dispatcher
-  build: Add support for building MAP notification dispatcher
-  obexd: Add function to get the destination from the obc_session
-  obexd: Register notification handler in the MAP client
-  obexd: Notify registered notification handlers in MNS
-
- Makefile.obexd                |   1 +
- obexd/client/map-dispatcher.c | 101 ++++++++++++++++++++++++++++++++++++++++++
- obexd/client/map-dispatcher.h |  48 ++++++++++++++++++++
- obexd/client/map.c            |  24 ++++++++++
- obexd/client/mns.c            |  13 +++---
- obexd/client/session.c        |   5 +++
- obexd/client/session.h        |   1 +
- 7 files changed, 185 insertions(+), 8 deletions(-)
- create mode 100644 obexd/client/map-dispatcher.c
- create mode 100644 obexd/client/map-dispatcher.h
-
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index f1915db..288807a 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -892,6 +892,11 @@ const char *obc_session_get_owner(struct obc_session *session)
+ 	return session->owner;
+ }
+ 
++const char *obc_session_get_destination(struct obc_session *session)
++{
++	return session->destination;
++}
++
+ const char *obc_session_get_path(struct obc_session *session)
+ {
+ 	return session->path;
+diff --git a/obexd/client/session.h b/obexd/client/session.h
+index b0b3655..319d529 100644
+--- a/obexd/client/session.h
++++ b/obexd/client/session.h
+@@ -48,6 +48,7 @@ int obc_session_set_owner(struct obc_session *session, const char *name,
+ 			GDBusWatchFunction func);
+ const char *obc_session_get_owner(struct obc_session *session);
+ 
++const char *obc_session_get_destination(struct obc_session *session);
+ const char *obc_session_get_path(struct obc_session *session);
+ const char *obc_session_get_target(struct obc_session *session);
+ 
 -- 
 1.8.2.3
 
