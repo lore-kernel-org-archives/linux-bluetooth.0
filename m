@@ -1,49 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/5] obexd: Add function to get the destination from the obc_session
-Date: Mon, 10 Jun 2013 13:01:37 +0200
-Message-Id: <1370862099-31046-4-git-send-email-christian.fetzer@oss.bmw-carit.de>
-In-Reply-To: <1370862099-31046-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1370862099-31046-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH BlueZ 01/15] AVRCP: Fix crash when registering unsupported notification
+Date: Mon, 10 Jun 2013 13:36:56 +0300
+Message-Id: <1370860630-30359-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+Reject command if notification is not supported otherwise this can
+cause crashes.
 ---
- obexd/client/session.c | 5 +++++
- obexd/client/session.h | 1 +
- 2 files changed, 6 insertions(+)
+ profiles/audio/avrcp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/obexd/client/session.c b/obexd/client/session.c
-index f1915db..288807a 100644
---- a/obexd/client/session.c
-+++ b/obexd/client/session.c
-@@ -892,6 +892,11 @@ const char *obc_session_get_owner(struct obc_session *session)
- 	return session->owner;
- }
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 4558407..5bddd08 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -1355,7 +1355,7 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
+ 	 * one is applicable only for EVENT_PLAYBACK_POS_CHANGED. See AVRCP
+ 	 * 1.3 spec, section 5.4.2.
+ 	 */
+-	if (len != 5)
++	if (len != 5 || !(session->supported_events & (1 << pdu->params[0])))
+ 		goto err;
  
-+const char *obc_session_get_destination(struct obc_session *session)
-+{
-+	return session->destination;
-+}
-+
- const char *obc_session_get_path(struct obc_session *session)
- {
- 	return session->path;
-diff --git a/obexd/client/session.h b/obexd/client/session.h
-index b0b3655..319d529 100644
---- a/obexd/client/session.h
-+++ b/obexd/client/session.h
-@@ -48,6 +48,7 @@ int obc_session_set_owner(struct obc_session *session, const char *name,
- 			GDBusWatchFunction func);
- const char *obc_session_get_owner(struct obc_session *session);
- 
-+const char *obc_session_get_destination(struct obc_session *session);
- const char *obc_session_get_path(struct obc_session *session);
- const char *obc_session_get_target(struct obc_session *session);
- 
+ 	switch (pdu->params[0]) {
 -- 
-1.8.2.3
+1.8.1.4
 
