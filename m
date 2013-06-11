@@ -1,46 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1370860630-30359-1-git-send-email-luiz.dentz@gmail.com>
-References: <1370860630-30359-1-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 12 Jun 2013 00:16:09 +0300
-Message-ID: <CABBYNZLU6VgDMA139Rk5r=ym3kPNR-4xvHJr4jyEhWiEZqXg0g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 01/15] AVRCP: Fix crash when registering unsupported notification
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Daniel Drake <dsd@laptop.org>
+To: marcel@holtmann.org, bzhao@marvell.com, gustavo@padovan.org, johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: btmrvl: fix thread stopping race
+Message-Id: <20130611194020.9EFBEFAACD@dev.laptop.org>
+Date: Tue, 11 Jun 2013 15:40:20 -0400 (EDT)
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+There is currently a race condition in the btmrvl_remove_card() which
+is causing hangs on suspend for OLPC. When the race occurs,
+kthread_stop() never returns.
 
-On Mon, Jun 10, 2013 at 1:36 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> Reject command if notification is not supported otherwise this can
-> cause crashes.
-> ---
->  profiles/audio/avrcp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index 4558407..5bddd08 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -1355,7 +1355,7 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
->          * one is applicable only for EVENT_PLAYBACK_POS_CHANGED. See AVRCP
->          * 1.3 spec, section 5.4.2.
->          */
-> -       if (len != 5)
-> +       if (len != 5 || !(session->supported_events & (1 << pdu->params[0])))
->                 goto err;
->
->         switch (pdu->params[0]) {
-> --
-> 1.8.1.4
->
+The problem is that btmrvl_service_main_thread() calls kthread_should_stop()
+and then does a fair number of things before restarting the loop and
+sleeping.
 
-This patch-set is now upstream.
+If the thread gets stopped after kthread_should_stop() is checked, but
+before the sleep happens, the thread will go to sleep and won't necessarily
+be woken up.
 
---
-Luiz Augusto von Dentz
+Move the kthread_should_stop() check into a race-free place.
+
+Signed-off-by: Daniel Drake <dsd@laptop.org>
+---
+ drivers/bluetooth/btmrvl_main.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+index 3a4343b..9a9f518 100644
+--- a/drivers/bluetooth/btmrvl_main.c
++++ b/drivers/bluetooth/btmrvl_main.c
+@@ -498,6 +498,10 @@ static int btmrvl_service_main_thread(void *data)
+ 		add_wait_queue(&thread->wait_q, &wait);
+ 
+ 		set_current_state(TASK_INTERRUPTIBLE);
++		if (kthread_should_stop()) {
++			BT_DBG("main_thread: break from main thread");
++			break;
++		}
+ 
+ 		if (adapter->wakeup_tries ||
+ 				((!adapter->int_count) &&
+@@ -513,11 +517,6 @@ static int btmrvl_service_main_thread(void *data)
+ 
+ 		BT_DBG("main_thread woke up");
+ 
+-		if (kthread_should_stop()) {
+-			BT_DBG("main_thread: break from main thread");
+-			break;
+-		}
+-
+ 		spin_lock_irqsave(&priv->driver_lock, flags);
+ 		if (adapter->int_count) {
+ 			adapter->int_count = 0;
+-- 
+1.8.1.4
