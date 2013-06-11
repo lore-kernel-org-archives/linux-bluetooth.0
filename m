@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 7/9] adapter: add Pairing property to report ongoing Pairing Session
-Date: Tue, 11 Jun 2013 11:56:25 +0100
-Message-Id: <1370948187-3702-7-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 5/9] doc: add EnablePairing() and DisablePairing()
+Date: Tue, 11 Jun 2013 11:56:23 +0100
+Message-Id: <1370948187-3702-5-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1370948187-3702-1-git-send-email-gustavo@padovan.org>
 References: <1370948187-3702-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,90 +12,116 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-Pairing is a readonly property that will be true whenever on or more
-Pairing Sessions are running.
----
- src/adapter.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+Those methods improve the tracking of the Discoverable and Pairable
+properties for Pairing purposes. One could call EnablePairing() to get a
+Pairing session.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 06d1207..9e11f02 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -169,8 +169,11 @@ struct btd_adapter {
- 	GSList *connections;		/* Connected devices */
- 	GSList *devices;		/* Devices structure pointers */
- 	GSList *connect_list;		/* Devices to connect when found */
-+
-+	bool pairing;			/* pairing property state */
- 	uint32_t pairing_settings;	/* settings before pairing session*/
- 	GSList *pairing_list;		/* list of pairing sessions */
-+
- 	struct btd_device *connect_le;	/* LE device waiting to be connected */
- 	sdp_list_t *services;		/* Services associated to adapter */
+DisablePairing() releases a session. If the client exits without calling
+the DisablePairing() the session is also released.  When the last session
+is released both Discoverable and Pairable goes back the value they had
+before the first session started.
+
+The Pairing property tracks if the there is a ongoing Pairing session.
+---
+ doc/adapter-api.txt | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
+
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 74d235a..dba037f 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -35,6 +35,43 @@ Methods		void StartDiscovery()
+ 					 org.bluez.Error.Failed
+ 					 org.bluez.Error.NotAuthorized
  
-@@ -1734,6 +1737,11 @@ static void discoverable_disconnect(DBusConnection *conn, void *user_data)
++		void EnablePairing()
++
++			This method starts a Pairing session, in other words,
++			it enables both Discoverable and Pairable properties
++			and tracks the lifetime of the client that requested
++			it. The client can release the session by calling
++			ReleasePairingSession(). The session is also released
++			if the clients exits unexpectedly.
++
++			Many sessions can be created by different clients. When
++			last session is released Discoverable and Pairable are
++			set back to wherever value they had before the request
++			of the first session.
++
++			The Pairing property show if there is a ongoing session
++			or not.
++
++			When one or more pairing session is running the
++			following properties goes to the readonly mode:
++			Discoverable, DiscoverableTimeout, Pairable and
++			PairableTimeout. An error will be returned if a
++			client tries to set their value.
++
++			Possible errors: org.bluez.Error.NotReady
++					 org.bluez.Error.Failed
++
++		void DisablePairing()
++
++			This method removes a Pairing session. When called
++			it will remove the session and if it is the last session
++			Discoverable and Pairable will be set to the value they
++			had before the beginning of the first session.
++
++			Possible errors: org.bluez.Error.NotReady
++					 org.bluez.Error.Failed
++					 org.bluez.Error.NotAuthorized
++
+ 		void RemoveDevice(object device)
  
- 	if (!(adapter->pairing_settings & MGMT_SETTING_PAIRABLE))
- 		set_mode(adapter, MGMT_OP_SET_PAIRABLE, 0x00);
-+
-+	adapter->pairing = false;
-+
-+	g_dbus_emit_property_changed(dbus_conn, adapter->path,
-+					ADAPTER_INTERFACE, "Pairing");
- }
+ 			This removes the remote device object at the given
+@@ -111,6 +148,9 @@ Properties	string Address [readonly]
  
- static DBusMessage *enable_pairing(DBusConnection *conn, DBusMessage *msg,
-@@ -1781,6 +1789,11 @@ static DBusMessage *enable_pairing(DBusConnection *conn, DBusMessage *msg,
- 	if (!(adapter->pairing_settings & MGMT_SETTING_PAIRABLE))
- 		set_mode(adapter, MGMT_OP_SET_PAIRABLE, 0x01);
+ 			For any new adapter this settings defaults to false.
  
-+	adapter->pairing = true;
++			This property will become readonly if a Pairing session
++			is ongoing.
 +
-+	g_dbus_emit_property_changed(dbus_conn, adapter->path,
-+					ADAPTER_INTERFACE, "Pairing");
-+
- 	return dbus_message_new_method_return(msg);
- }
+ 		boolean Pairable [readwrite]
  
-@@ -1821,6 +1834,11 @@ static DBusMessage *disable_pairing(DBusConnection *conn, DBusMessage *msg,
- 	if (!(adapter->pairing_settings & MGMT_SETTING_PAIRABLE))
- 		set_mode(adapter, MGMT_OP_SET_PAIRABLE, 0x00);
+ 			Switch an adapter to pairable or non-pairable. This is
+@@ -122,6 +162,9 @@ Properties	string Address [readonly]
  
-+	adapter->pairing = false;
-+
-+	g_dbus_emit_property_changed(dbus_conn, adapter->path,
-+					ADAPTER_INTERFACE, "Pairing");
-+
- 	return dbus_message_new_method_return(msg);
- }
+ 			For any new adapter this settings defaults to true.
  
-@@ -2175,6 +2193,17 @@ static void property_set_pairable_timeout(const GDBusPropertyTable *property,
- 	trigger_pairable_timeout(adapter);
- }
++			This property will become readonly if a Pairing session
++			is ongoing.
++
+ 		uint32 PairableTimeout [readwrite]
  
-+static gboolean property_get_pairing(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
-+{
-+	struct btd_adapter *adapter = user_data;
-+	dbus_bool_t pairing = adapter->pairing;
+ 			The pairable timeout in seconds. A value of zero
+@@ -131,6 +174,9 @@ Properties	string Address [readonly]
+ 			The default value for pairable timeout should be
+ 			disabled (value 0).
+ 
++			This property will become readonly if a Pairing session
++			is ongoing.
 +
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &pairing);
+ 		uint32 DiscoverableTimeout [readwrite]
+ 
+ 			The discoverable timeout in seconds. A value of zero
+@@ -140,10 +186,17 @@ Properties	string Address [readonly]
+ 			The default value for the discoverable timeout should
+ 			be 180 seconds (3 minutes).
+ 
++			This property will become readonly if a Pairing session
++			is ongoing.
 +
-+	return TRUE;
-+}
+ 		boolean Discovering [readonly]
+ 
+ 			Indicates that a device discovery procedure is active.
+ 
++		boolean Pairing [readonly]
 +
- static gboolean property_get_discovering(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *user_data)
- {
-@@ -2300,6 +2329,7 @@ static const GDBusPropertyTable adapter_properties[] = {
- 	{ "Pairable", "b", property_get_pairable, property_set_pairable },
- 	{ "PairableTimeout", "u", property_get_pairable_timeout,
- 					property_set_pairable_timeout },
-+	{ "Pairing", "b", property_get_pairing },
- 	{ "Discovering", "b", property_get_discovering },
- 	{ "UUIDs", "as", property_get_uuids },
- 	{ "Modalias", "s", property_get_modalias, NULL,
++			Indicates that one or more pairing session is active.
++
+ 		array{string} UUIDs [readonly]
+ 
+ 			List of 128-bit UUIDs that represents the available
 -- 
 1.8.1.4
 
