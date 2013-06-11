@@ -1,52 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alex Deymo <deymo@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: keybuk@chromium.org, Alex Deymo <deymo@chromium.org>
-Subject: [PATCH] lib: Fix two size constants
-Date: Tue, 11 Jun 2013 14:16:42 -0700
-Message-Id: <1370985402-27535-1-git-send-email-deymo@chromium.org>
+MIME-Version: 1.0
+In-Reply-To: <1370860630-30359-1-git-send-email-luiz.dentz@gmail.com>
+References: <1370860630-30359-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 12 Jun 2013 00:16:09 +0300
+Message-ID: <CABBYNZLU6VgDMA139Rk5r=ym3kPNR-4xvHJr4jyEhWiEZqXg0g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 01/15] AVRCP: Fix crash when registering unsupported notification
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fixes the value of RESET_FAILED_CONTACT_COUNTER_RP_SIZE and
-RESET_FAILED_CONTACT_COUNTER_RP_SIZE macros to respect the
-associated struct.
----
+Hi,
 
-Hi! I was playing with the libbluetooth and found these two constants
-wrongly defined. I actually checked with the Core spec that the structs
-are fine... but I still have a very very naive question:
+On Mon, Jun 10, 2013 at 1:36 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> Reject command if notification is not supported otherwise this can
+> cause crashes.
+> ---
+>  profiles/audio/avrcp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> index 4558407..5bddd08 100644
+> --- a/profiles/audio/avrcp.c
+> +++ b/profiles/audio/avrcp.c
+> @@ -1355,7 +1355,7 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
+>          * one is applicable only for EVENT_PLAYBACK_POS_CHANGED. See AVRCP
+>          * 1.3 spec, section 5.4.2.
+>          */
+> -       if (len != 5)
+> +       if (len != 5 || !(session->supported_events & (1 << pdu->params[0])))
+>                 goto err;
+>
+>         switch (pdu->params[0]) {
+> --
+> 1.8.1.4
+>
 
-Why don't you use sizeof(some_struct) and be happy???
+This patch-set is now upstream.
 
-Thanks!
-Alex.
-
- lib/hci.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/lib/hci.h b/lib/hci.h
-index 56c9316..898cf52 100644
---- a/lib/hci.h
-+++ b/lib/hci.h
-@@ -1350,7 +1350,7 @@ typedef struct {
- 	uint8_t		status;
- 	uint16_t	handle;
- } __attribute__ ((packed)) reset_failed_contact_counter_rp;
--#define RESET_FAILED_CONTACT_COUNTER_RP_SIZE 4
-+#define RESET_FAILED_CONTACT_COUNTER_RP_SIZE 3
- 
- #define OCF_READ_LINK_QUALITY		0x0003
- typedef struct {
-@@ -1764,7 +1764,7 @@ typedef struct {
- 	uint16_t	handle;
- 	uint8_t		encrypt;
- } __attribute__ ((packed)) evt_encrypt_change;
--#define EVT_ENCRYPT_CHANGE_SIZE 5
-+#define EVT_ENCRYPT_CHANGE_SIZE 4
- 
- #define EVT_CHANGE_CONN_LINK_KEY_COMPLETE	0x09
- typedef struct {
--- 
-1.8.3
-
+--
+Luiz Augusto von Dentz
