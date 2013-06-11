@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 5/9] doc: add EnablePairing() and DisablePairing()
-Date: Tue, 11 Jun 2013 11:56:23 +0100
-Message-Id: <1370948187-3702-5-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 4/9] adapter: rename compare_discovery_sender
+Date: Tue, 11 Jun 2013 11:56:22 +0100
+Message-Id: <1370948187-3702-4-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1370948187-3702-1-git-send-email-gustavo@padovan.org>
 References: <1370948187-3702-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,116 +12,43 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-Those methods improve the tracking of the Discoverable and Pairable
-properties for Pairing purposes. One could call EnablePairing() to get a
-Pairing session.
-
-DisablePairing() releases a session. If the client exits without calling
-the DisablePairing() the session is also released.  When the last session
-is released both Discoverable and Pairable goes back the value they had
-before the first session started.
-
-The Pairing property tracks if the there is a ongoing Pairing session.
+The new name "compare_sender" is more generic and will be used for more
+than one purpose.
 ---
- doc/adapter-api.txt | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+ src/adapter.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index 74d235a..dba037f 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -35,6 +35,43 @@ Methods		void StartDiscovery()
- 					 org.bluez.Error.Failed
- 					 org.bluez.Error.NotAuthorized
+diff --git a/src/adapter.c b/src/adapter.c
+index 0277057..bb5737e 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1478,7 +1478,7 @@ static void stop_discovery_complete(uint8_t status, uint16_t length,
+ 	}
+ }
  
-+		void EnablePairing()
-+
-+			This method starts a Pairing session, in other words,
-+			it enables both Discoverable and Pairable properties
-+			and tracks the lifetime of the client that requested
-+			it. The client can release the session by calling
-+			ReleasePairingSession(). The session is also released
-+			if the clients exits unexpectedly.
-+
-+			Many sessions can be created by different clients. When
-+			last session is released Discoverable and Pairable are
-+			set back to wherever value they had before the request
-+			of the first session.
-+
-+			The Pairing property show if there is a ongoing session
-+			or not.
-+
-+			When one or more pairing session is running the
-+			following properties goes to the readonly mode:
-+			Discoverable, DiscoverableTimeout, Pairable and
-+			PairableTimeout. An error will be returned if a
-+			client tries to set their value.
-+
-+			Possible errors: org.bluez.Error.NotReady
-+					 org.bluez.Error.Failed
-+
-+		void DisablePairing()
-+
-+			This method removes a Pairing session. When called
-+			it will remove the session and if it is the last session
-+			Discoverable and Pairable will be set to the value they
-+			had before the beginning of the first session.
-+
-+			Possible errors: org.bluez.Error.NotReady
-+					 org.bluez.Error.Failed
-+					 org.bluez.Error.NotAuthorized
-+
- 		void RemoveDevice(object device)
+-static int compare_discovery_sender(gconstpointer a, gconstpointer b)
++static int compare_sender(gconstpointer a, gconstpointer b)
+ {
+ 	const struct watch_client *client = a;
+ 	const char *sender = b;
+@@ -1617,7 +1617,7 @@ static DBusMessage *start_discovery(DBusConnection *conn,
+ 	 * already started a discovery then return an error.
+ 	 */
+ 	list = g_slist_find_custom(adapter->discovery_list, sender,
+-						compare_discovery_sender);
++						compare_sender);
+ 	if (list)
+ 		return btd_error_busy(msg);
  
- 			This removes the remote device object at the given
-@@ -111,6 +148,9 @@ Properties	string Address [readonly]
+@@ -1657,7 +1657,7 @@ static DBusMessage *stop_discovery(DBusConnection *conn,
+ 		return btd_error_not_ready(msg);
  
- 			For any new adapter this settings defaults to false.
+ 	list = g_slist_find_custom(adapter->discovery_list, sender,
+-						compare_discovery_sender);
++						compare_sender);
+ 	if (!list)
+ 		return btd_error_failed(msg, "No discovery started");
  
-+			This property will become readonly if a Pairing session
-+			is ongoing.
-+
- 		boolean Pairable [readwrite]
- 
- 			Switch an adapter to pairable or non-pairable. This is
-@@ -122,6 +162,9 @@ Properties	string Address [readonly]
- 
- 			For any new adapter this settings defaults to true.
- 
-+			This property will become readonly if a Pairing session
-+			is ongoing.
-+
- 		uint32 PairableTimeout [readwrite]
- 
- 			The pairable timeout in seconds. A value of zero
-@@ -131,6 +174,9 @@ Properties	string Address [readonly]
- 			The default value for pairable timeout should be
- 			disabled (value 0).
- 
-+			This property will become readonly if a Pairing session
-+			is ongoing.
-+
- 		uint32 DiscoverableTimeout [readwrite]
- 
- 			The discoverable timeout in seconds. A value of zero
-@@ -140,10 +186,17 @@ Properties	string Address [readonly]
- 			The default value for the discoverable timeout should
- 			be 180 seconds (3 minutes).
- 
-+			This property will become readonly if a Pairing session
-+			is ongoing.
-+
- 		boolean Discovering [readonly]
- 
- 			Indicates that a device discovery procedure is active.
- 
-+		boolean Pairing [readonly]
-+
-+			Indicates that one or more pairing session is active.
-+
- 		array{string} UUIDs [readonly]
- 
- 			List of 128-bit UUIDs that represents the available
 -- 
 1.8.1.4
 
