@@ -2,166 +2,106 @@ Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [RFC BlueZ 21/35] tools/mgmt-tester: Add support for second controller
-Date: Wed, 12 Jun 2013 08:57:07 -0400
-Message-Id: <1371041841-21793-22-git-send-email-bruna.moreira@openbossa.org>
+Subject: [RFC BlueZ 19/35] emulator: Add new function for running all hooks
+Date: Wed, 12 Jun 2013 08:57:05 -0400
+Message-Id: <1371041841-21793-20-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1371041841-21793-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1371041841-21793-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add second controller to tester and let a testcase start discovery and
-receive Device Found events.
+It was defined four hook types and they are run before/after the first
+part of default command processing and send event. Note that hook return
+will define if the emulator will process/send next events (calling the
+default_cmd_completion() function or not).
 ---
- tools/mgmt-tester.c |   74 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 73 insertions(+), 1 deletion(-)
+ emulator/btdev.c |   34 +++++++++++++++++++++++++++++++---
+ 1 file changed, 31 insertions(+), 3 deletions(-)
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index cbff775..a27b2e2 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -56,6 +56,8 @@ struct test_data {
- 	uint16_t mgmt_index;
- 	struct hciemu *hciemu;
- 	enum hciemu_type hciemu_type;
-+	struct hciemu *hciemu_second;
-+	uint16_t mgmt_index_second;
- 	int unmet_conditions;
- };
- 
-@@ -165,6 +167,30 @@ static void read_info_callback(uint8_t status, uint16_t length,
- 	tester_pre_setup_complete();
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 69cfd12..e70ad19 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -140,6 +140,17 @@ static int get_hook_index(struct btdev *btdev, enum btdev_hook_type type,
+ 	return -1;
  }
  
-+static void setup_powered_callback(uint8_t status, uint16_t length,
-+					const void *param, void *user_data);
-+
-+static void second_powered_discoverable()
++static bool run_hooks(struct btdev *btdev, enum btdev_hook_type type,
++				uint16_t opcode, const void *data, uint16_t len)
 +{
-+	struct test_data *data = tester_get_data();
-+	unsigned char con_param[] = { 0x01 };
-+	unsigned char discov_param[] = { 0x01, 0x00, 0x00 };
++	int index = get_hook_index(btdev, type, opcode);
++	if (index < 0)
++		return true;
 +
-+	tester_print("Enabling connectable, discoverable and powered (second)");
-+
-+	mgmt_send(data->mgmt, MGMT_OP_SET_CONNECTABLE, data->mgmt_index_second,
-+					sizeof(con_param), con_param,
-+					NULL, NULL, NULL);
-+
-+	mgmt_send(data->mgmt, MGMT_OP_SET_DISCOVERABLE, data->mgmt_index_second,
-+					sizeof(discov_param), discov_param,
-+					NULL, NULL, NULL);
-+
-+	mgmt_send(data->mgmt, MGMT_OP_SET_POWERED, data->mgmt_index_second,
-+					sizeof(con_param), con_param,
-+					setup_powered_callback, NULL, NULL);
++	return btdev->hook_list[index]->handler(data, len,
++					btdev->hook_list[index]->user_data);
 +}
 +
- static void index_added_callback(uint16_t index, uint16_t length,
- 					const void *param, void *user_data)
+ static inline int add_btdev(struct btdev *btdev)
  {
-@@ -173,6 +199,12 @@ static void index_added_callback(uint16_t index, uint16_t length,
- 	tester_print("Index Added callback");
- 	tester_print("  Index: 0x%04x", index);
+ 	int i, index = -1;
+@@ -634,7 +645,8 @@ static void send_event(struct btdev *btdev, uint8_t event,
+ 	if (len > 0)
+ 		memcpy(pkt_data + 1 + sizeof(*hdr), data, len);
  
-+	if (data->hciemu_second) {
-+		data->mgmt_index_second = index;
-+		second_powered_discoverable();
-+		return;
-+	}
-+
- 	data->mgmt_index = index;
+-	send_packet(btdev, pkt_data, pkt_len);
++	if (run_hooks(btdev, BTDEV_HOOK_POST_EVT, event, pkt_data, pkt_len))
++		send_packet(btdev, pkt_data, pkt_len);
  
- 	mgmt_send(data->mgmt, MGMT_OP_READ_INFO, data->mgmt_index, 0, NULL,
-@@ -268,6 +300,12 @@ static void test_post_teardown(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
- 
-+	if (data->hciemu_second) {
-+		hciemu_unref(data->hciemu_second);
-+		data->mgmt_index_second = 0xffff;
-+		data->hciemu_second = NULL;
-+	}
-+
- 	hciemu_unref(data->hciemu);
- 	data->hciemu = NULL;
+ 	free(pkt_data);
  }
-@@ -299,6 +337,8 @@ static void test_condition_complete(struct test_data *data)
- 		if (!user) \
- 			break; \
- 		user->hciemu_type = HCIEMU_TYPE_BREDRLE; \
-+		user->hciemu_second = NULL; \
-+		user->mgmt_index_second = 0xffff; \
- 		user->test_data = data; \
- 		user->expected_version = 0x06; \
- 		user->expected_manufacturer = 0x003f; \
-@@ -317,6 +357,8 @@ static void test_condition_complete(struct test_data *data)
- 		if (!user) \
- 			break; \
- 		user->hciemu_type = HCIEMU_TYPE_BREDR; \
-+		user->hciemu_second = NULL; \
-+		user->mgmt_index_second = 0xffff; \
- 		user->test_data = data; \
- 		user->expected_version = 0x05; \
- 		user->expected_manufacturer = 0x003f; \
-@@ -335,6 +377,8 @@ static void test_condition_complete(struct test_data *data)
- 		if (!user) \
- 			break; \
- 		user->hciemu_type = HCIEMU_TYPE_LE; \
-+		user->hciemu_second = NULL; \
-+		user->mgmt_index_second = 0xffff; \
- 		user->test_data = data; \
- 		user->expected_version = 0x06; \
- 		user->expected_manufacturer = 0x003f; \
-@@ -1828,6 +1872,27 @@ static void setup_ssp_powered(const void *test_data)
- 					setup_powered_callback, NULL, NULL);
+@@ -666,7 +678,8 @@ static void cmd_complete(struct btdev *btdev, uint16_t opcode,
+ 	if (len > 0)
+ 		memcpy(pkt_data + 1 + sizeof(*hdr) + sizeof(*cc), data, len);
+ 
+-	send_packet(btdev, pkt_data, pkt_len);
++	if (run_hooks(btdev, BTDEV_HOOK_POST_CMD, opcode, pkt_data, pkt_len))
++		send_packet(btdev, pkt_data, pkt_len);
+ 
+ 	free(pkt_data);
  }
+@@ -695,7 +708,8 @@ static void cmd_status(struct btdev *btdev, uint8_t status, uint16_t opcode)
+ 	cs->ncmd = 0x01;
+ 	cs->opcode = cpu_to_le16(opcode);
  
-+static void setup_le_powered_callback(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	if (status != MGMT_STATUS_SUCCESS) {
-+		tester_setup_failed();
-+		return;
-+	}
-+
-+	tester_print("First Controller powered on");
-+
-+	if (!data->hciemu_second) {
-+		if (option_wait_powered)
-+			tester_wait(1, powered_delay, NULL);
-+		else
-+			tester_setup_complete();
-+		return;
-+	}
-+}
-+
- static void setup_le_powered(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
-@@ -1835,12 +1900,19 @@ static void setup_le_powered(const void *test_data)
+-	send_packet(btdev, pkt_data, pkt_len);
++	if (run_hooks(btdev, BTDEV_HOOK_POST_CMD, opcode, pkt_data, pkt_len))
++		send_packet(btdev, pkt_data, pkt_len);
  
- 	tester_print("Powering on controller (with LE enabled)");
- 
-+	data->hciemu_second = hciemu_new(data->hciemu_type);
-+	if (!data->hciemu_second) {
-+		tester_warn("Failed to setup second HCI emulation");
-+		tester_setup_failed();
-+		return;
-+	}
-+
- 	mgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,
- 				sizeof(param), param, NULL, NULL, NULL);
- 
- 	mgmt_send(data->mgmt, MGMT_OP_SET_POWERED, data->mgmt_index,
- 					sizeof(param), param,
--					setup_powered_callback, NULL, NULL);
-+					setup_le_powered_callback, NULL, NULL);
+ 	free(pkt_data);
  }
+@@ -1870,8 +1884,15 @@ static void handler_callback(btdev_callback callback, uint8_t response,
  
- static void setup_discovery_callback(uint8_t status, uint16_t length,
+ 	switch (response) {
+ 	case BTDEV_RESPONSE_DEFAULT:
++		if (!run_hooks(btdev, BTDEV_HOOK_PRE_CMD, callback->opcode,
++						callback->data, callback->len))
++			return;
+ 		default_cmd(btdev, callback->opcode,
+ 					callback->data, callback->len);
++
++		if (!run_hooks(btdev, BTDEV_HOOK_PRE_EVT, callback->opcode,
++						callback->data, callback->len))
++			return;
+ 		default_cmd_completion(btdev, callback->opcode,
+ 					callback->data, callback->len);
+ 		break;
+@@ -1907,8 +1928,15 @@ static void process_cmd(struct btdev *btdev, const void *data, uint16_t len)
+ 					callback.data, callback.len,
+ 					&callback, btdev->command_data);
+ 	else {
++		if (!run_hooks(btdev, BTDEV_HOOK_PRE_CMD, callback.opcode,
++						callback.data, callback.len))
++			return;
+ 		default_cmd(btdev, callback.opcode,
+ 					callback.data, callback.len);
++
++		if (!run_hooks(btdev, BTDEV_HOOK_PRE_EVT, callback.opcode,
++						callback.data, callback.len))
++			return;
+ 		default_cmd_completion(btdev, callback.opcode,
+ 					callback.data, callback.len);
+ 	}
 -- 
 1.7.9.5
 
