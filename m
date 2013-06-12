@@ -2,100 +2,122 @@ Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [RFC BlueZ 34/35] tools/mgmt-tester: Interleaved stop discovery (BR/EDR dev. found)
-Date: Wed, 12 Jun 2013 08:57:20 -0400
-Message-Id: <1371041841-21793-35-git-send-email-bruna.moreira@openbossa.org>
+Subject: [RFC BlueZ 12/35] emulator: Add remove operation in HCI hook callback
+Date: Wed, 12 Jun 2013 08:56:58 -0400
+Message-Id: <1371041841-21793-13-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1371041841-21793-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1371041841-21793-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This test will check the stop interleaved discovery during inquiry. For
-this, it verifies the following:
-- LE Set Scan Enable HCI command is received,
-- Device found event (with BR/EDR device) is received,
-- Inquiry cancel is received, and
-- Stop discovery is succeed.
+Now it is possible remove the HCI hook callback after running it at
+least once. It working similar to glib watchers, and it is removed when
+the function calback return false, otherwise it is kept.
 ---
- tools/mgmt-tester.c |   44 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+ src/shared/hciemu.c |   24 ++++++++++++++++++++----
+ src/shared/hciemu.h |    2 +-
+ tools/mgmt-tester.c |   10 ++++++----
+ 3 files changed, 27 insertions(+), 9 deletions(-)
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 92ae2ea..b995076 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -1441,6 +1441,24 @@ static const struct generic_data stop_discovery_bredrle_success_test_5 = {
- 	.expect_alt_ev_len = sizeof(start_le_device_found_evt),
- };
+diff --git a/src/shared/hciemu.c b/src/shared/hciemu.c
+index a0b347c..7ff651e 100644
+--- a/src/shared/hciemu.c
++++ b/src/shared/hciemu.c
+@@ -66,21 +66,37 @@ static void destroy_command_hook(gpointer data, gpointer user_data)
+ 	g_free(hook);
+ }
  
-+static const struct generic_data stop_discovery_bredrle_success_test_6 = {
-+	.hciemu_type_second = HCIEMU_TYPE_BREDR,
-+	.setup_expect_hci_command = BT_HCI_CMD_LE_SET_SCAN_ENABLE,
-+	.setup_expect_hci_param = start_discovery_valid_hci,
-+	.setup_expect_hci_len = sizeof(start_discovery_valid_hci),
-+	.block_hci_command = BT_HCI_EVT_INQUIRY_COMPLETE,
-+	.send_opcode = MGMT_OP_STOP_DISCOVERY,
-+	.send_param = stop_discovery_bredrle_param,
-+	.send_len = sizeof(stop_discovery_bredrle_param),
-+	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_param = stop_discovery_bredrle_param,
-+	.expect_len = sizeof(stop_discovery_bredrle_param),
-+	.expect_hci_command = BT_HCI_CMD_INQUIRY_CANCEL,
-+	.expect_alt_ev = MGMT_EV_DEVICE_FOUND,
-+	.expect_alt_ev_param = stop_device_found_bredr_evt,
-+	.expect_alt_ev_len = sizeof(stop_device_found_bredr_evt),
-+};
++static void remove_command_hook(GList **lhooks,
++					struct hciemu_command_hook *hook)
++{
++	*lhooks = g_list_remove(*lhooks, hook);
++	g_free(hook);
++}
 +
- static const struct generic_data stop_discovery_rejected_test_1 = {
- 	.send_opcode = MGMT_OP_STOP_DISCOVERY,
- 	.send_param = stop_discovery_bredrle_param,
-@@ -2740,6 +2758,21 @@ static void command_generic_event_alt(uint16_t index, uint16_t length,
- 	if (test->expect_hci_command == BT_HCI_CMD_REMOTE_NAME_REQUEST_CANCEL) {
- 		test_add_condition(data);
- 		send_confirm_name();
-+	} else if (test->setup_expect_hci_param) {
-+		const char bredrle_param[] = { 0x07 };
+ static void master_command_callback(uint16_t opcode,
+ 				const void *data, uint8_t len,
+ 				btdev_callback callback, void *user_data)
+ {
+ 	struct hciemu *hciemu = user_data;
+-	GList *list;
++	GList *list, *next;
+ 
+ 	btdev_command_default(callback);
+ 
+ 	for (list = g_list_first(hciemu->post_command_hooks); list;
+-						list = g_list_next(list)) {
++								list = next) {
+ 		struct hciemu_command_hook *hook = list->data;
+ 
+-		if (hook->function)
+-			hook->function(opcode, data, len, hook->user_data);
++		next = g_list_next(list);
 +
-+		/* Interleaved discovery */
-+		if (memcmp(test->send_param, bredrle_param,
-+							test->send_len) == 0) {
-+			tester_print("Sending command 0x%04x (interleaved)",
-+							test->send_opcode);
++		if (hook->function) {
++			int ret;
 +
-+			mgmt_send(data->mgmt, test->send_opcode,
-+					data->mgmt_index,
-+					test->send_len, test->send_param,
-+					command_generic_callback, NULL, NULL);
-+			test_add_condition(data);
++			ret = hook->function(opcode, data, len,
++							hook->user_data);
++			if (!ret)
++				remove_command_hook(&hciemu->post_command_hooks,
++									hook);
 +		}
  	}
+ }
  
- 	mgmt_unregister(data->mgmt_alt, data->mgmt_alt_ev_id);
-@@ -2864,6 +2897,14 @@ static void start_discovery_callback(uint8_t status, uint16_t length,
- 	tester_print("Discovery started");
+diff --git a/src/shared/hciemu.h b/src/shared/hciemu.h
+index a473c0e..dc7cc1f 100644
+--- a/src/shared/hciemu.h
++++ b/src/shared/hciemu.h
+@@ -44,7 +44,7 @@ const char *hciemu_get_address(struct hciemu *hciemu);
+ const uint8_t *hciemu_get_master_bdaddr(struct hciemu *hciemu);
+ const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu);
  
- 	if (test->expect_hci_command != BT_HCI_CMD_REMOTE_NAME_REQUEST_CANCEL) {
-+		const char bredrle_param[] = { 0x07 };
+-typedef void (*hciemu_command_func_t)(uint16_t opcode, const void *data,
++typedef bool (*hciemu_command_func_t)(uint16_t opcode, const void *data,
+ 						uint8_t len, void *user_data);
+ 
+ bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 844f7db..08b5ac8 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -2300,7 +2300,7 @@ static void command_generic_callback(uint8_t status, uint16_t length,
+ 	test_condition_complete(data);
+ }
+ 
+-static void command_hci_callback(uint16_t opcode, const void *param,
++static bool command_hci_callback(uint16_t opcode, const void *param,
+ 					uint8_t length, void *user_data)
+ {
+ 	struct test_data *data = user_data;
+@@ -2309,21 +2309,23 @@ static void command_hci_callback(uint16_t opcode, const void *param,
+ 	tester_print("HCI Command 0x%04x length %u", opcode, length);
+ 
+ 	if (opcode != test->expect_hci_command)
+-		return;
++		return true;
+ 
+ 	if (length != test->expect_hci_len) {
+ 		tester_warn("Invalid parameter size for HCI command");
+ 		tester_test_failed();
+-		return;
++		return false;
+ 	}
+ 
+ 	if (memcmp(param, test->expect_hci_param, length) != 0) {
+ 		tester_warn("Unexpected HCI command parameter value");
+ 		tester_test_failed();
+-		return;
++		return false;
+ 	}
+ 
+ 	test_condition_complete(data);
 +
-+		/* If interleaved discovery was started, only send opcode after
-+		 * device found event */
-+		if (test->setup_expect_hci_param && (memcmp(test->send_param,
-+					bredrle_param, test->send_len) == 0))
-+				return;
-+
- 		tester_print("Sending command 0x%04x", test->send_opcode);
++	return true;
+ }
  
- 		mgmt_send(data->mgmt, test->send_opcode, data->mgmt_index,
-@@ -3214,6 +3255,9 @@ int main(int argc, char *argv[])
- 	test_bredrle("Stop discovery (Device Found) - Success 5",
- 				&stop_discovery_bredrle_success_test_5,
- 				setup_le_powered, test_command_start_discovery);
-+	test_bredrle("Stop discovery (Device Found) - Success 6",
-+				&stop_discovery_bredrle_success_test_6,
-+				setup_le_powered, test_command_start_discovery);
- 	test_bredrle("Stop Discovery - Rejected 1",
- 				&stop_discovery_rejected_test_1,
- 				setup_le_powered, test_command_generic);
+ static void test_command_generic(const void *test_data)
 -- 
 1.7.9.5
 
