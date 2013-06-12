@@ -1,69 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 12 Jun 2013 10:34:40 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Alex Deymo <deymo@chromium.org>
-Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org
-Subject: Re: [PATCH] lib: Fix two size constants
-Message-ID: <20130612073401.GE19392@aemeltch-MOBL1>
-References: <1370985402-27535-1-git-send-email-deymo@chromium.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1370985402-27535-1-git-send-email-deymo@chromium.org>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [RFC BlueZ v2 07/13] dbus: Add UUID property to org.bluez.Service1
+Date: Wed, 12 Jun 2013 09:06:49 +0200
+Message-Id: <1371020815-22330-8-git-send-email-mikel.astiz.oss@gmail.com>
+In-Reply-To: <1371020815-22330-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1371020815-22330-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-On Tue, Jun 11, 2013 at 02:16:42PM -0700, Alex Deymo wrote:
-> Fixes the value of RESET_FAILED_CONTACT_COUNTER_RP_SIZE and
-> RESET_FAILED_CONTACT_COUNTER_RP_SIZE macros to respect the
-> associated struct.
-> ---
-> 
-> Hi! I was playing with the libbluetooth and found these two constants
-> wrongly defined. I actually checked with the Core spec that the structs
-> are fine... but I still have a very very naive question:
-> 
-> Why don't you use sizeof(some_struct) and be happy???
+Expose in D-Bus the remote UUID corresponding to each service instance.
+---
+ src/service.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-This sounds very reasonable! I could not understand this myself.
+diff --git a/src/service.c b/src/service.c
+index 3882b60..a04ff3f 100644
+--- a/src/service.c
++++ b/src/service.c
+@@ -363,8 +363,20 @@ static gboolean service_get_device(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
++static gboolean service_get_uuid(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_service *service = data;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
++						&service->profile->remote_uuid);
++
++	return TRUE;
++}
++
+ static const GDBusPropertyTable service_properties[] = {
+ 	{ "Device", "o", service_get_device },
++	{ "UUID", "s", service_get_uuid },
+ 	{ }
+ };
+ 
+-- 
+1.8.1.4
 
-Best regards 
-Andrei Emeltchenko 
-
-> 
-> Thanks!
-> Alex.
-> 
->  lib/hci.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/lib/hci.h b/lib/hci.h
-> index 56c9316..898cf52 100644
-> --- a/lib/hci.h
-> +++ b/lib/hci.h
-> @@ -1350,7 +1350,7 @@ typedef struct {
->  	uint8_t		status;
->  	uint16_t	handle;
->  } __attribute__ ((packed)) reset_failed_contact_counter_rp;
-> -#define RESET_FAILED_CONTACT_COUNTER_RP_SIZE 4
-> +#define RESET_FAILED_CONTACT_COUNTER_RP_SIZE 3
->  
->  #define OCF_READ_LINK_QUALITY		0x0003
->  typedef struct {
-> @@ -1764,7 +1764,7 @@ typedef struct {
->  	uint16_t	handle;
->  	uint8_t		encrypt;
->  } __attribute__ ((packed)) evt_encrypt_change;
-> -#define EVT_ENCRYPT_CHANGE_SIZE 5
-> +#define EVT_ENCRYPT_CHANGE_SIZE 4
->  
->  #define EVT_CHANGE_CONN_LINK_KEY_COMPLETE	0x09
->  typedef struct {
-> -- 
-> 1.8.3
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
