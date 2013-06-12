@@ -1,75 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [RFC BlueZ 03/35] emulator: Implement basic LE set adv enable command
-Date: Wed, 12 Jun 2013 08:56:49 -0400
-Message-Id: <1371041841-21793-4-git-send-email-bruna.moreira@openbossa.org>
+Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
+Subject: [RFC BlueZ 15/35] emulator: Export command and event hooks for hciemu user
+Date: Wed, 12 Jun 2013 08:57:01 -0400
+Message-Id: <1371041841-21793-16-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1371041841-21793-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1371041841-21793-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jefferson Delfes <jefferson.delfes@openbossa.org>
+From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
 
-Store advertising state of virtual controller in btdev struct.
 ---
- emulator/btdev.c |   15 +++++++++++++++
- monitor/bt.h     |    1 +
- 2 files changed, 16 insertions(+)
+ src/shared/hciemu.c |   30 ++++++++++++++++++++++++++++++
+ src/shared/hciemu.h |   15 ++++++++++++++-
+ 2 files changed, 44 insertions(+), 1 deletion(-)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 1555e2f..316d816 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -89,6 +89,7 @@ struct btdev {
- 	uint8_t  le_event_mask[8];
- 	uint8_t  le_adv_data[31];
- 	uint8_t  le_adv_data_len;
-+	uint8_t  le_adv_enable;
+diff --git a/src/shared/hciemu.c b/src/shared/hciemu.c
+index 7ff651e..4ebeff6 100644
+--- a/src/shared/hciemu.c
++++ b/src/shared/hciemu.c
+@@ -405,3 +405,33 @@ bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
  
- 	uint16_t sync_train_interval;
- 	uint32_t sync_train_timeout;
-@@ -906,6 +907,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 	const struct bt_hci_cmd_set_event_mask_page2 *semp2;
- 	const struct bt_hci_cmd_le_set_event_mask *lsem;
- 	const struct bt_hci_cmd_le_set_adv_data *lsad;
-+	const struct bt_hci_cmd_le_set_adv_enable *lsae;
- 	struct bt_hci_rsp_read_default_link_policy rdlp;
- 	struct bt_hci_rsp_read_stored_link_key rslk;
- 	struct bt_hci_rsp_write_stored_link_key wslk;
-@@ -1517,6 +1519,19 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 		cmd_complete(btdev, opcode, &lratp, sizeof(lratp));
- 		break;
- 
-+	case BT_HCI_CMD_LE_SET_ADV_ENABLE:
-+		if (btdev->type == BTDEV_TYPE_BREDR)
-+			goto unsupported;
-+		lsae = data;
-+		if (btdev->le_adv_enable == lsae->enable)
-+			status = BT_HCI_ERR_COMMAND_DISALLOWED;
-+		else {
-+			btdev->le_adv_enable = lsae->enable;
-+			status = BT_HCI_ERR_SUCCESS;
-+		}
-+		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		break;
+ 	return true;
+ }
 +
- 	case BT_HCI_CMD_LE_SET_SCAN_PARAMETERS:
- 		if (btdev->type == BTDEV_TYPE_BREDR)
- 			goto unsupported;
-diff --git a/monitor/bt.h b/monitor/bt.h
-index 220cb0c..9f237ee 100644
---- a/monitor/bt.h
-+++ b/monitor/bt.h
-@@ -1475,6 +1475,7 @@ struct bt_hci_evt_le_long_term_key_request {
- #define BT_HCI_ERR_UNKNOWN_CONN_ID		0x02
- #define BT_HCI_ERR_HARDWARE_FAILURE		0x03
- #define BT_HCI_ERR_PAGE_TIMEOUT			0x04
-+#define BT_HCI_ERR_COMMAND_DISALLOWED		0x0c
- #define BT_HCI_ERR_INVALID_PARAMETERS		0x12
++int hciemu_add_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
++				uint16_t opcode, hciemu_hook_func_t function,
++				void *user_data)
++{
++	enum btdev_hook_type hook_type;
++
++	if (!hciemu)
++		return -1;
++
++	switch (type) {
++	case HCIEMU_HOOK_PRE_CMD:
++		hook_type = BTDEV_HOOK_PRE_CMD;
++		break;
++	case HCIEMU_HOOK_POST_CMD:
++		hook_type = BTDEV_HOOK_POST_CMD;
++		break;
++	case HCIEMU_HOOK_PRE_EVT:
++		hook_type = BTDEV_HOOK_PRE_EVT;
++		break;
++	case HCIEMU_HOOK_POST_EVT:
++		hook_type = BTDEV_HOOK_POST_EVT;
++		break;
++	default:
++		return -1;
++	}
++
++	return btdev_add_hook(hciemu->master_dev, hook_type, opcode, function,
++								user_data);
++}
+diff --git a/src/shared/hciemu.h b/src/shared/hciemu.h
+index dc7cc1f..13575de 100644
+--- a/src/shared/hciemu.h
++++ b/src/shared/hciemu.h
+@@ -32,8 +32,14 @@ enum hciemu_type {
+ 	HCIEMU_TYPE_LE,
+ };
  
- struct bt_l2cap_hdr {
+-struct hciemu *hciemu_new(enum hciemu_type type);
++enum hciemu_hook_type {
++	HCIEMU_HOOK_PRE_CMD,
++	HCIEMU_HOOK_POST_CMD,
++	HCIEMU_HOOK_PRE_EVT,
++	HCIEMU_HOOK_POST_EVT,
++};
+ 
++struct hciemu *hciemu_new(enum hciemu_type type);
+ struct hciemu *hciemu_ref(struct hciemu *hciemu);
+ void hciemu_unref(struct hciemu *hciemu);
+ 
+@@ -47,5 +53,12 @@ const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu);
+ typedef bool (*hciemu_command_func_t)(uint16_t opcode, const void *data,
+ 						uint8_t len, void *user_data);
+ 
++typedef bool (*hciemu_hook_func_t)(const void *data, uint16_t len,
++							void *user_data);
++
+ bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
+ 			hciemu_command_func_t function, void *user_data);
++
++int hciemu_add_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
++				uint16_t opcode, hciemu_hook_func_t function,
++				void *user_data);
 -- 
 1.7.9.5
 
