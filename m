@@ -2,106 +2,144 @@ Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [RFC BlueZ 19/35] emulator: Add new function for running all hooks
-Date: Wed, 12 Jun 2013 08:57:05 -0400
-Message-Id: <1371041841-21793-20-git-send-email-bruna.moreira@openbossa.org>
+Subject: [RFC BlueZ 20/35] tools/mgmt-tester: Add stop discovery for BR/EDR only
+Date: Wed, 12 Jun 2013 08:57:06 -0400
+Message-Id: <1371041841-21793-21-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1371041841-21793-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1371041841-21793-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It was defined four hook types and they are run before/after the first
-part of default command processing and send event. Note that hook return
-will define if the emulator will process/send next events (calling the
-default_cmd_completion() function or not).
+Send stop command during inquiry. Check if inquiry cancel is sent and
+discovering event is disabled.
 ---
- emulator/btdev.c |   34 +++++++++++++++++++++++++++++++---
- 1 file changed, 31 insertions(+), 3 deletions(-)
+ tools/mgmt-tester.c |   72 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 70 insertions(+), 2 deletions(-)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 69cfd12..e70ad19 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -140,6 +140,17 @@ static int get_hook_index(struct btdev *btdev, enum btdev_hook_type type,
- 	return -1;
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 08b5ac8..cbff775 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -352,6 +352,9 @@ static void controller_setup(const void *test_data)
  }
  
-+static bool run_hooks(struct btdev *btdev, enum btdev_hook_type type,
-+				uint16_t opcode, const void *data, uint16_t len)
-+{
-+	int index = get_hook_index(btdev, type, opcode);
-+	if (index < 0)
-+		return true;
+ struct generic_data {
++	uint16_t setup_expect_hci_command;
++	const void *setup_expect_hci_param;
++	uint8_t setup_expect_hci_len;
+ 	bool send_index_none;
+ 	uint16_t send_opcode;
+ 	const void *send_param;
+@@ -1125,6 +1128,9 @@ static const char stop_discovery_bredrle_param[] = { 0x07 };
+ static const char stop_discovery_bredrle_invalid_param[] = { 0x06 };
+ static const char stop_discovery_valid_hci[] = { 0x00, 0x00 };
+ static const char stop_discovery_evt[] = { 0x07, 0x00 };
++static const char stop_discovery_bredr_param[] = { 0x01 };
++static const char stop_discovery_bredr_discovering[] = { 0x01, 0x00 };
++static const char stop_discovery_inq_param[] = { 0x33, 0x8b, 0x9e, 0x08, 0x00 };
+ 
+ static const struct generic_data stop_discovery_success_test_1 = {
+ 	.send_opcode = MGMT_OP_STOP_DISCOVERY,
+@@ -1141,6 +1147,22 @@ static const struct generic_data stop_discovery_success_test_1 = {
+ 	.expect_alt_ev_len = sizeof(stop_discovery_evt),
+ };
+ 
++static const struct generic_data stop_discovery_bredr_success_test_1 = {
++	.setup_expect_hci_command = BT_HCI_CMD_INQUIRY,
++	.setup_expect_hci_param = stop_discovery_inq_param,
++	.setup_expect_hci_len = sizeof(stop_discovery_inq_param),
++	.send_opcode = MGMT_OP_STOP_DISCOVERY,
++	.send_param = stop_discovery_bredr_param,
++	.send_len = sizeof(stop_discovery_bredr_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = stop_discovery_bredr_param,
++	.expect_len = sizeof(stop_discovery_bredr_param),
++	.expect_hci_command = BT_HCI_CMD_INQUIRY_CANCEL,
++	.expect_alt_ev = MGMT_EV_DISCOVERING,
++	.expect_alt_ev_param = stop_discovery_bredr_discovering,
++	.expect_alt_ev_len = sizeof(stop_discovery_bredr_discovering),
++};
 +
-+	return btdev->hook_list[index]->handler(data, len,
-+					btdev->hook_list[index]->user_data);
+ static const struct generic_data stop_discovery_rejected_test_1 = {
+ 	.send_opcode = MGMT_OP_STOP_DISCOVERY,
+ 	.send_param = stop_discovery_bredrle_param,
+@@ -1833,11 +1855,41 @@ static void setup_discovery_callback(uint8_t status, uint16_t length,
+ 	tester_setup_complete();
+ }
+ 
++static bool setup_command_hci_callback(const void *data, uint16_t len,
++								void *user_data)
++{
++	struct test_data *tdata = tester_get_data();
++	const struct generic_data *test = tdata->test_data;
++
++	tester_print("HCI Command 0x%04x length %u (setup)",
++					test->setup_expect_hci_command, len);
++
++	if (len != test->setup_expect_hci_len) {
++		tester_warn("Invalid parameter size for HCI command (setup)");
++		tester_setup_failed();
++		goto done;
++	}
++
++	if (memcmp(data, test->setup_expect_hci_param, len) != 0) {
++		tester_warn("Unexpected HCI command parameter value (setup)");
++		tester_setup_failed();
++		goto done;
++	}
++
++	tester_setup_complete();
++
++done:
++	hciemu_del_hook(tdata->hciemu, HCIEMU_HOOK_PRE_EVT,
++			test->setup_expect_hci_command);
++
++	return false;
 +}
 +
- static inline int add_btdev(struct btdev *btdev)
+ static void setup_start_discovery_callback(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
  {
- 	int i, index = -1;
-@@ -634,7 +645,8 @@ static void send_event(struct btdev *btdev, uint8_t event,
- 	if (len > 0)
- 		memcpy(pkt_data + 1 + sizeof(*hdr), data, len);
+ 	struct test_data *data = tester_get_data();
+-	unsigned char disc_param[] = { 0x07 };
++	const struct generic_data *test = data->test_data;
  
--	send_packet(btdev, pkt_data, pkt_len);
-+	if (run_hooks(btdev, BTDEV_HOOK_POST_EVT, event, pkt_data, pkt_len))
-+		send_packet(btdev, pkt_data, pkt_len);
+ 	if (status != MGMT_STATUS_SUCCESS) {
+ 		tester_setup_failed();
+@@ -1846,9 +1898,22 @@ static void setup_start_discovery_callback(uint8_t status, uint16_t length,
  
- 	free(pkt_data);
- }
-@@ -666,7 +678,8 @@ static void cmd_complete(struct btdev *btdev, uint16_t opcode,
- 	if (len > 0)
- 		memcpy(pkt_data + 1 + sizeof(*hdr) + sizeof(*cc), data, len);
+ 	tester_print("Controller powered on");
  
--	send_packet(btdev, pkt_data, pkt_len);
-+	if (run_hooks(btdev, BTDEV_HOOK_POST_CMD, opcode, pkt_data, pkt_len))
-+		send_packet(btdev, pkt_data, pkt_len);
- 
- 	free(pkt_data);
- }
-@@ -695,7 +708,8 @@ static void cmd_status(struct btdev *btdev, uint8_t status, uint16_t opcode)
- 	cs->ncmd = 0x01;
- 	cs->opcode = cpu_to_le16(opcode);
- 
--	send_packet(btdev, pkt_data, pkt_len);
-+	if (run_hooks(btdev, BTDEV_HOOK_POST_CMD, opcode, pkt_data, pkt_len))
-+		send_packet(btdev, pkt_data, pkt_len);
- 
- 	free(pkt_data);
- }
-@@ -1870,8 +1884,15 @@ static void handler_callback(btdev_callback callback, uint8_t response,
- 
- 	switch (response) {
- 	case BTDEV_RESPONSE_DEFAULT:
-+		if (!run_hooks(btdev, BTDEV_HOOK_PRE_CMD, callback->opcode,
-+						callback->data, callback->len))
-+			return;
- 		default_cmd(btdev, callback->opcode,
- 					callback->data, callback->len);
+-	mgmt_send(data->mgmt, MGMT_OP_START_DISCOVERY, data->mgmt_index,
++	if (test->setup_expect_hci_command) {
++		tester_print("Registering HCI command callback (setup)");
++		hciemu_add_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT,
++				test->setup_expect_hci_command,
++				setup_command_hci_callback,
++				NULL);
++		mgmt_send(data->mgmt, MGMT_OP_START_DISCOVERY, data->mgmt_index,
++				test->send_len, test->send_param,
++				NULL, NULL, NULL);
++	} else {
++		unsigned char disc_param[] = { 0x07 };
 +
-+		if (!run_hooks(btdev, BTDEV_HOOK_PRE_EVT, callback->opcode,
-+						callback->data, callback->len))
-+			return;
- 		default_cmd_completion(btdev, callback->opcode,
- 					callback->data, callback->len);
- 		break;
-@@ -1907,8 +1928,15 @@ static void process_cmd(struct btdev *btdev, const void *data, uint16_t len)
- 					callback.data, callback.len,
- 					&callback, btdev->command_data);
- 	else {
-+		if (!run_hooks(btdev, BTDEV_HOOK_PRE_CMD, callback.opcode,
-+						callback.data, callback.len))
-+			return;
- 		default_cmd(btdev, callback.opcode,
- 					callback.data, callback.len);
-+
-+		if (!run_hooks(btdev, BTDEV_HOOK_PRE_EVT, callback.opcode,
-+						callback.data, callback.len))
-+			return;
- 		default_cmd_completion(btdev, callback.opcode,
- 					callback.data, callback.len);
- 	}
++		mgmt_send(data->mgmt, MGMT_OP_START_DISCOVERY, data->mgmt_index,
+ 					sizeof(disc_param), disc_param,
+ 					setup_discovery_callback, NULL, NULL);
++	}
+ 
+ 	if (option_wait_powered)
+ 		tester_wait(1, NULL, NULL);
+@@ -2655,6 +2720,9 @@ int main(int argc, char *argv[])
+ 	test_bredrle("Stop Discovery - Success 1",
+ 				&stop_discovery_success_test_1,
+ 				setup_start_discovery, test_command_generic);
++	test_bredr("Stop Discovery - BR/EDR (Inquiry) Success 1",
++				&stop_discovery_bredr_success_test_1,
++				setup_start_discovery, test_command_generic);
+ 	test_bredrle("Stop Discovery - Rejected 1",
+ 				&stop_discovery_rejected_test_1,
+ 				setup_le_powered, test_command_generic);
 -- 
 1.7.9.5
 
