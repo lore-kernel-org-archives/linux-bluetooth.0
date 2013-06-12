@@ -1,72 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [RFC BlueZ 27/35] emulator: Fix Remote Name Request Cancel command complete
-Date: Wed, 12 Jun 2013 08:57:13 -0400
-Message-Id: <1371041841-21793-28-git-send-email-bruna.moreira@openbossa.org>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [RFC BlueZ 26/35] btdev: Add function to send an aborted packet
+Date: Wed, 12 Jun 2013 08:57:12 -0400
+Message-Id: <1371041841-21793-27-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1371041841-21793-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1371041841-21793-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-
-The Command Complete event for this HCI command contains two parameters,
-status and bd_addr.
+After running a hook, it is possible to ignore a packet in this moment
+for sending the same packet later.
 ---
- emulator/btdev.c |    8 ++++++--
- monitor/bt.h     |    4 ++++
- 2 files changed, 10 insertions(+), 2 deletions(-)
+ emulator/btdev.c    |   14 ++++++++++++++
+ emulator/btdev.h    |    2 ++
+ src/shared/hciemu.c |    5 +++++
+ src/shared/hciemu.h |    2 ++
+ 4 files changed, 23 insertions(+)
 
 diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 6d71ce2..2e099b9 100644
+index e70ad19..6d71ce2 100644
 --- a/emulator/btdev.c
 +++ b/emulator/btdev.c
-@@ -1093,6 +1093,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 	const struct bt_hci_cmd_le_set_adv_enable *lsae;
- 	const struct bt_hci_cmd_le_set_scan_enable *lsse;
- 	const struct bt_hci_cmd_le_create_conn *lcc;
-+	const struct bt_hci_cmd_remote_name_request_cancel *rnrc_cmd;
- 	struct bt_hci_rsp_read_default_link_policy rdlp;
- 	struct bt_hci_rsp_read_stored_link_key rslk;
- 	struct bt_hci_rsp_write_stored_link_key wslk;
-@@ -1127,6 +1128,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 	struct bt_hci_rsp_le_read_adv_tx_power lratp;
- 	struct bt_hci_rsp_le_read_supported_states lrss;
- 	struct bt_hci_rsp_le_read_white_list_size lrwls;
-+	struct bt_hci_rsp_remote_name_request_cancel rnrc;
- 	uint8_t status, page;
+@@ -107,6 +107,9 @@ struct btdev {
+ 	uint16_t sync_train_interval;
+ 	uint32_t sync_train_timeout;
+ 	uint8_t  sync_train_service_data;
++
++	uint8_t dropped_pkt_data[255];
++	uint16_t dropped_pkt_len;
+ };
  
- 	switch (opcode) {
-@@ -1180,8 +1182,10 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 	case BT_HCI_CMD_REMOTE_NAME_REQUEST_CANCEL:
- 		if (btdev->type == BTDEV_TYPE_LE)
- 			goto unsupported;
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		rnrc_cmd = data;
-+		rnrc.status = BT_HCI_ERR_SUCCESS;
-+		memcpy(rnrc.bdaddr, rnrc_cmd->bdaddr, 6);
-+		cmd_complete(btdev, opcode, &rnrc, sizeof(rnrc));
- 		break;
+ #define MAX_BTDEV_ENTRIES 16
+@@ -647,6 +650,10 @@ static void send_event(struct btdev *btdev, uint8_t event,
  
- 	case BT_HCI_CMD_READ_REMOTE_FEATURES:
-diff --git a/monitor/bt.h b/monitor/bt.h
-index e900525..0f1c1d8 100644
---- a/monitor/bt.h
-+++ b/monitor/bt.h
-@@ -167,6 +167,10 @@ struct bt_hci_cmd_remote_name_request {
- struct bt_hci_cmd_remote_name_request_cancel {
- 	uint8_t  bdaddr[6];
- } __attribute__ ((packed));
-+struct bt_hci_rsp_remote_name_request_cancel {
-+	uint8_t  status;
-+	uint8_t  bdaddr[6];
-+} __attribute__ ((packed));
+ 	if (run_hooks(btdev, BTDEV_HOOK_POST_EVT, event, pkt_data, pkt_len))
+ 		send_packet(btdev, pkt_data, pkt_len);
++	else {
++		memcpy(btdev->dropped_pkt_data, pkt_data, pkt_len);
++		btdev->dropped_pkt_len = pkt_len;
++	}
  
- #define BT_HCI_CMD_READ_REMOTE_FEATURES		0x041b
- struct bt_hci_cmd_read_remote_features {
+ 	free(pkt_data);
+ }
+@@ -2027,3 +2034,10 @@ bool btdev_del_hook(struct btdev *btdev, enum btdev_hook_type type,
+ 
+ 	return false;
+ }
++
++void btdev_send_packet(struct btdev *btdev)
++{
++	if (btdev->dropped_pkt_len)
++		send_packet(btdev, btdev->dropped_pkt_data,
++							btdev->dropped_pkt_len);
++}
+diff --git a/emulator/btdev.h b/emulator/btdev.h
+index 5118a4a..c1cf882 100644
+--- a/emulator/btdev.h
++++ b/emulator/btdev.h
+@@ -92,3 +92,5 @@ int btdev_add_hook(struct btdev *btdev, enum btdev_hook_type type,
+ 
+ bool btdev_del_hook(struct btdev *btdev, enum btdev_hook_type type,
+ 							uint16_t opcode);
++
++void btdev_send_packet(struct btdev *btdev);
+diff --git a/src/shared/hciemu.c b/src/shared/hciemu.c
+index 0bbaa09..d36639f 100644
+--- a/src/shared/hciemu.c
++++ b/src/shared/hciemu.c
+@@ -463,3 +463,8 @@ bool hciemu_del_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
+ 
+ 	return btdev_del_hook(hciemu->master_dev, hook_type, opcode);
+ }
++
++void hciemu_send_packet(struct hciemu *hciemu)
++{
++	btdev_send_packet(hciemu->master_dev);
++}
+diff --git a/src/shared/hciemu.h b/src/shared/hciemu.h
+index 2abf404..5b23a0b 100644
+--- a/src/shared/hciemu.h
++++ b/src/shared/hciemu.h
+@@ -65,3 +65,5 @@ int hciemu_add_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
+ 
+ bool hciemu_del_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
+ 							uint16_t opcode);
++
++void hciemu_send_packet(struct hciemu *hciemu);
 -- 
 1.7.9.5
 
