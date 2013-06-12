@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [RFC BlueZ 07/35] emulator: Implement LE advertising report
-Date: Wed, 12 Jun 2013 08:56:53 -0400
-Message-Id: <1371041841-21793-8-git-send-email-bruna.moreira@openbossa.org>
+Subject: [RFC BlueZ 09/35] emulator: Dummy LE set advertising parameters
+Date: Wed, 12 Jun 2013 08:56:55 -0400
+Message-Id: <1371041841-21793-10-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1371041841-21793-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1371041841-21793-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,65 +12,56 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Jefferson Delfes <jefferson.delfes@openbossa.org>
 
-This is a helper to report an advertising from a virtual device to other
-device in scan mode.
+Implement basic LE set adv parameters command.
 ---
- emulator/btdev.c |   28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ emulator/btdev.c |   10 ++++++++++
+ monitor/bt.h     |   12 ++++++++++++
+ 2 files changed, 22 insertions(+)
 
 diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 2725c76..171ca68 100644
+index 178971f..cbcf140 100644
 --- a/emulator/btdev.c
 +++ b/emulator/btdev.c
-@@ -876,6 +876,30 @@ static void remote_version_complete(struct btdev *btdev, uint16_t handle)
- 							&rvc, sizeof(rvc));
- }
+@@ -1606,6 +1606,16 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+ 		cmd_complete(btdev, opcode, &lrlf, sizeof(lrlf));
+ 		break;
  
-+static void le_send_adv_report(struct btdev *btdev, const struct btdev *remote)
-+{
-+	struct __packed {
-+		uint8_t subevent;
-+		union {
-+			struct bt_hci_evt_le_adv_report lar;
-+			uint8_t raw[10 + 31 + 1];
-+		};
-+	} meta_event;
++	case BT_HCI_CMD_LE_SET_ADV_PARAMETERS:
++		if (btdev->type == BTDEV_TYPE_BREDR)
++			goto unsupported;
++		if (btdev->le_adv_enable)
++			status = BT_HCI_ERR_COMMAND_DISALLOWED;
++		else
++			status = BT_HCI_ERR_SUCCESS;
++		cmd_complete(btdev, opcode, &status, sizeof(status));
++		break;
 +
-+	meta_event.subevent = BT_HCI_EVT_LE_ADV_REPORT;
-+
-+	memset(&meta_event.lar, 0, sizeof(meta_event.lar));
-+	meta_event.lar.num_reports = 1;
-+	memcpy(meta_event.lar.addr, remote->bdaddr, 6);
-+	meta_event.lar.data_len = remote->le_adv_data_len;
-+	memcpy(meta_event.lar.data, remote->le_adv_data,
-+						meta_event.lar.data_len);
-+	/* Not available */
-+	meta_event.raw[10 + meta_event.lar.data_len] = 127;
-+	send_event(btdev, BT_HCI_EVT_LE_META_EVENT, &meta_event,
-+					1 + 10 + meta_event.lar.data_len + 1);
-+}
-+
- static void le_set_adv_enable_complete(struct btdev *btdev)
- {
- 	int i;
-@@ -886,6 +910,8 @@ static void le_set_adv_enable_complete(struct btdev *btdev)
+ 	case BT_HCI_CMD_LE_READ_ADV_TX_POWER:
+ 		if (btdev->type == BTDEV_TYPE_BREDR)
+ 			goto unsupported;
+diff --git a/monitor/bt.h b/monitor/bt.h
+index 9f237ee..e900525 100644
+--- a/monitor/bt.h
++++ b/monitor/bt.h
+@@ -838,6 +838,18 @@ struct bt_hci_cmd_le_set_random_address {
+ 	uint8_t  addr[6];
+ } __attribute__ ((packed));
  
- 		if (!btdev_list[i]->le_scan_enable)
- 			continue;
++#define BT_HCI_CMD_LE_SET_ADV_PARAMETERS	0x2006
++struct bt_hci_cmd_le_set_adv_parameters {
++	uint16_t adv_interval_min;
++	uint16_t adv_interval_max;
++	uint8_t adv_type;
++	uint8_t own_address_type;
++	uint8_t direct_address_type;
++	uint8_t direct_address[6];
++	uint8_t adv_channel_map;
++	uint8_t adv_filter_policy;
++} __attribute__ ((packed));
 +
-+		le_send_adv_report(btdev_list[i], btdev);
- 	}
- }
- 
-@@ -899,6 +925,8 @@ static void le_set_scan_enable_complete(struct btdev *btdev)
- 
- 		if (!btdev_list[i]->le_adv_enable)
- 			continue;
-+
-+		le_send_adv_report(btdev, btdev_list[i]);
- 	}
- }
- 
+ #define BT_HCI_CMD_LE_READ_ADV_TX_POWER		0x2007
+ struct bt_hci_rsp_le_read_adv_tx_power {
+ 	uint8_t  status;
 -- 
 1.7.9.5
 
