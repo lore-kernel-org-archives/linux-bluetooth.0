@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC BlueZ v2 13/13] test: Add --uuid to test-service
-Date: Wed, 12 Jun 2013 09:06:55 +0200
-Message-Id: <1371020815-22330-14-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC BlueZ v2 11/13] dbus: Deprecate old profile-connecting API
+Date: Wed, 12 Jun 2013 09:06:53 +0200
+Message-Id: <1371020815-22330-12-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1371020815-22330-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1371020815-22330-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,96 +12,53 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Extend the test script with an optional filter to let the user operate
-on services matching a given UUID.
+The new org.bluez.Service1 interface deprecates the old UUID-specific
+connect/disconnect methods in org.bluez.Device1.
 ---
- test/test-service | 34 ++++++++++++++++++++++++++--------
- 1 file changed, 26 insertions(+), 8 deletions(-)
+ doc/device-api.txt | 4 ++--
+ src/device.c       | 6 ++++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/test/test-service b/test/test-service
-index 48426f9..f8dee66 100755
---- a/test/test-service
-+++ b/test/test-service
-@@ -22,6 +22,8 @@ mainloop = GObject.MainLoop()
- option_list = [
- 		make_option("-i", "--adapter", action="store",
- 				type="string", dest="adap_id"),
-+		make_option("-u", "--uuid", action="store",
-+				type="string", dest="uuid"),
- 		]
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index 6201780..5329054 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -40,7 +40,7 @@ Methods		void Connect()
  
- description="Test script to operate on org.bluez.Service1 interfaces"
-@@ -29,8 +31,8 @@ usage = "usage: %prog [options] <command> [<args>]"
- epilog="""
- Commands:
- 	list [<address>]
--	connect <address> <service-path-suffix>
--	disconnect <address> <service-path-suffix>
-+	connect [<address> [<service-path-suffix>]]
-+	disconnect [<address> [<service-path-suffix>]]
+ 			Possible errors: org.bluez.Error.NotConnected
  
- """
+-		void ConnectProfile(string uuid)
++		void ConnectProfile(string uuid) [Deprecated]
  
-@@ -47,6 +49,10 @@ if len(args) < 1:
- 	parser.print_help()
- 	sys.exit(1)
+ 			This method connects a specific profile of this
+ 			device. The UUID provided is the remote service
+@@ -50,7 +50,7 @@ Methods		void Connect()
+ 					 org.bluez.Error.AlreadyConnected
+ 					 org.bluez.Error.ConnectFailed
  
-+uuid = None
-+if options.uuid:
-+	uuid = bluezutils.parse_uuid(options.uuid)
-+
- if args[0] == "list":
- 	if len(args) > 2:
- 		parser.print_help()
-@@ -84,6 +90,10 @@ if args[0] == "list":
+-		void DisconnectProfile(string uuid)
++		void DisconnectProfile(string uuid) [Deprecated]
  
- 			if properties["Device"] != path:
- 				continue
-+			elif uuid:
-+				if properties["UUID"] != uuid:
-+					continue
-+				del(properties["UUID"])
- 
- 			print("    [ " + service_path + " ]")
- 
-@@ -103,23 +113,31 @@ if args[0] == "list":
- 	sys.exit(0)
- 
- def service_do(func):
--	if len(args) < 3:
--		parser.print_help()
-+	if len(args) < 3 and not(uuid):
-+		print("ERROR: Either service suffix or UUID must be specified")
- 		sys.exit(1)
- 
- 	objects = bluezutils.get_managed_objects()
- 	adapter = bluezutils.find_adapter_in_objects(objects, options.adap_id)
--	device = bluezutils.find_device_in_objects(objects, args[1],
-+
-+	device = None
-+	if len(args) >= 2:
-+		device = bluezutils.find_device_in_objects(objects, args[1],
- 								options.adap_id)
--	path_suffix = args[2]
-+	path_suffix = None
-+	if len(args) >= 3:
-+		path_suffix = args[2]
-+
- 	found = False
- 	for path, ifaces in objects.iteritems():
- 		service = ifaces.get(SERVICE_INTERFACE)
- 		if service is None:
- 			continue
--		if device.object_path != service["Device"]:
-+		if device and device.object_path != service["Device"]:
-+			continue
-+		if uuid and uuid != service["UUID"]:
- 			continue
--		if not(path.endswith(path_suffix)):
-+		if path_suffix and not(path.endswith(path_suffix)):
- 			continue
- 		try:
- 			found = True
+ 			This method disconnects a specific profile of
+ 			this device. The profile needs to be registered
+diff --git a/src/device.c b/src/device.c
+index d2be46b..7c6f2c8 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1728,9 +1728,11 @@ static DBusMessage *cancel_pairing(DBusConnection *conn, DBusMessage *msg,
+ static const GDBusMethodTable device_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL, dev_disconnect) },
+ 	{ GDBUS_ASYNC_METHOD("Connect", NULL, NULL, dev_connect) },
+-	{ GDBUS_ASYNC_METHOD("ConnectProfile", GDBUS_ARGS({ "UUID", "s" }),
++	{ GDBUS_DEPRECATED_ASYNC_METHOD("ConnectProfile",
++						GDBUS_ARGS({ "UUID", "s" }),
+ 						NULL, connect_profile) },
+-	{ GDBUS_ASYNC_METHOD("DisconnectProfile", GDBUS_ARGS({ "UUID", "s" }),
++	{ GDBUS_DEPRECATED_ASYNC_METHOD("DisconnectProfile",
++						GDBUS_ARGS({ "UUID", "s" }),
+ 						NULL, disconnect_profile) },
+ 	{ GDBUS_ASYNC_METHOD("Pair", NULL, NULL, pair_device) },
+ 	{ GDBUS_METHOD("CancelPairing", NULL, NULL, cancel_pairing) },
 -- 
 1.8.1.4
 
