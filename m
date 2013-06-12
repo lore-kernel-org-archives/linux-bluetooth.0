@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC BlueZ v2 06/13] dbus: Add Device property to org.bluez.Service1
-Date: Wed, 12 Jun 2013 09:06:48 +0200
-Message-Id: <1371020815-22330-7-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC BlueZ v2 13/13] test: Add --uuid to test-service
+Date: Wed, 12 Jun 2013 09:06:55 +0200
+Message-Id: <1371020815-22330-14-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1371020815-22330-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1371020815-22330-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,48 +12,96 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Expose in D-Bus the object path of the device which the service belongs
-to.
+Extend the test script with an optional filter to let the user operate
+on services matching a given UUID.
 ---
- src/service.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ test/test-service | 34 ++++++++++++++++++++++++++--------
+ 1 file changed, 26 insertions(+), 8 deletions(-)
 
-diff --git a/src/service.c b/src/service.c
-index 0c9477d..3882b60 100644
---- a/src/service.c
-+++ b/src/service.c
-@@ -352,6 +352,22 @@ void btd_service_disconnecting_complete(struct btd_service *service, int err)
- 		change_state(service, BTD_SERVICE_STATE_CONNECTED, err);
- }
+diff --git a/test/test-service b/test/test-service
+index 48426f9..f8dee66 100755
+--- a/test/test-service
++++ b/test/test-service
+@@ -22,6 +22,8 @@ mainloop = GObject.MainLoop()
+ option_list = [
+ 		make_option("-i", "--adapter", action="store",
+ 				type="string", dest="adap_id"),
++		make_option("-u", "--uuid", action="store",
++				type="string", dest="uuid"),
+ 		]
  
-+static gboolean service_get_device(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_service *service = data;
-+	const char *path = device_get_path(service->device);
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
-+
-+	return TRUE;
-+}
-+
-+static const GDBusPropertyTable service_properties[] = {
-+	{ "Device", "o", service_get_device },
-+	{ }
-+};
-+
- static int service_register(struct btd_service *service, unsigned int id)
- {
- 	DBusConnection *dbus_conn = btd_get_dbus_connection();
-@@ -363,7 +379,7 @@ static int service_register(struct btd_service *service, unsigned int id)
+ description="Test script to operate on org.bluez.Service1 interfaces"
+@@ -29,8 +31,8 @@ usage = "usage: %prog [options] <command> [<args>]"
+ epilog="""
+ Commands:
+ 	list [<address>]
+-	connect <address> <service-path-suffix>
+-	disconnect <address> <service-path-suffix>
++	connect [<address> [<service-path-suffix>]]
++	disconnect [<address> [<service-path-suffix>]]
  
- 	if (g_dbus_register_interface(dbus_conn,
- 					path, SERVICE_INTERFACE,
--					NULL, NULL, NULL, service,
-+					NULL, NULL, service_properties, service,
- 					NULL) == FALSE) {
- 		g_free(path);
- 		error("Unable to register service interface for %s",
+ """
+ 
+@@ -47,6 +49,10 @@ if len(args) < 1:
+ 	parser.print_help()
+ 	sys.exit(1)
+ 
++uuid = None
++if options.uuid:
++	uuid = bluezutils.parse_uuid(options.uuid)
++
+ if args[0] == "list":
+ 	if len(args) > 2:
+ 		parser.print_help()
+@@ -84,6 +90,10 @@ if args[0] == "list":
+ 
+ 			if properties["Device"] != path:
+ 				continue
++			elif uuid:
++				if properties["UUID"] != uuid:
++					continue
++				del(properties["UUID"])
+ 
+ 			print("    [ " + service_path + " ]")
+ 
+@@ -103,23 +113,31 @@ if args[0] == "list":
+ 	sys.exit(0)
+ 
+ def service_do(func):
+-	if len(args) < 3:
+-		parser.print_help()
++	if len(args) < 3 and not(uuid):
++		print("ERROR: Either service suffix or UUID must be specified")
+ 		sys.exit(1)
+ 
+ 	objects = bluezutils.get_managed_objects()
+ 	adapter = bluezutils.find_adapter_in_objects(objects, options.adap_id)
+-	device = bluezutils.find_device_in_objects(objects, args[1],
++
++	device = None
++	if len(args) >= 2:
++		device = bluezutils.find_device_in_objects(objects, args[1],
+ 								options.adap_id)
+-	path_suffix = args[2]
++	path_suffix = None
++	if len(args) >= 3:
++		path_suffix = args[2]
++
+ 	found = False
+ 	for path, ifaces in objects.iteritems():
+ 		service = ifaces.get(SERVICE_INTERFACE)
+ 		if service is None:
+ 			continue
+-		if device.object_path != service["Device"]:
++		if device and device.object_path != service["Device"]:
++			continue
++		if uuid and uuid != service["UUID"]:
+ 			continue
+-		if not(path.endswith(path_suffix)):
++		if path_suffix and not(path.endswith(path_suffix)):
+ 			continue
+ 		try:
+ 			found = True
 -- 
 1.8.1.4
 
