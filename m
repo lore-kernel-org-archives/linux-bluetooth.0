@@ -1,95 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bruna Moreira <bruna.moreira@openbossa.org>
-Subject: [RFC BlueZ 28/35] tools/mgmt-tester: Move command_generic_callback()
-Date: Wed, 12 Jun 2013 08:57:14 -0400
-Message-Id: <1371041841-21793-29-git-send-email-bruna.moreira@openbossa.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [RFC BlueZ 27/35] emulator: Fix Remote Name Request Cancel command complete
+Date: Wed, 12 Jun 2013 08:57:13 -0400
+Message-Id: <1371041841-21793-28-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1371041841-21793-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1371041841-21793-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Rearrange command_generic_callback() position to avoid fast forward
-declaration in next patch.
----
- tools/mgmt-tester.c |   56 +++++++++++++++++++++++++--------------------------
- 1 file changed, 28 insertions(+), 28 deletions(-)
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index d53f94e..64f18c1 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -2565,34 +2565,6 @@ done:
- 	test_condition_complete(data);
- }
+The Command Complete event for this HCI command contains two parameters,
+status and bd_addr.
+---
+ emulator/btdev.c |    8 ++++++--
+ monitor/bt.h     |    4 ++++
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 6d71ce2..2e099b9 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -1093,6 +1093,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+ 	const struct bt_hci_cmd_le_set_adv_enable *lsae;
+ 	const struct bt_hci_cmd_le_set_scan_enable *lsse;
+ 	const struct bt_hci_cmd_le_create_conn *lcc;
++	const struct bt_hci_cmd_remote_name_request_cancel *rnrc_cmd;
+ 	struct bt_hci_rsp_read_default_link_policy rdlp;
+ 	struct bt_hci_rsp_read_stored_link_key rslk;
+ 	struct bt_hci_rsp_write_stored_link_key wslk;
+@@ -1127,6 +1128,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+ 	struct bt_hci_rsp_le_read_adv_tx_power lratp;
+ 	struct bt_hci_rsp_le_read_supported_states lrss;
+ 	struct bt_hci_rsp_le_read_white_list_size lrwls;
++	struct bt_hci_rsp_remote_name_request_cancel rnrc;
+ 	uint8_t status, page;
  
--static void command_generic_event_alt(uint16_t index, uint16_t length,
--							const void *param,
--							void *user_data)
--{
--	struct test_data *data = tester_get_data();
--	const struct generic_data *test = data->test_data;
--
--	if (length != test->expect_alt_ev_len) {
--		tester_warn("Invalid length %s event",
--					mgmt_evstr(test->expect_alt_ev));
--		tester_test_failed();
--		return;
--	}
--
--	tester_print("New %s event received", mgmt_evstr(test->expect_alt_ev));
--
--	if (memcmp(param, test->expect_alt_ev_param,
--						test->expect_alt_ev_len) != 0)
--		return;
--
--	tester_print("Unregistering %s notification",
--					mgmt_evstr(test->expect_alt_ev));
--
--	mgmt_unregister(data->mgmt_alt, data->mgmt_alt_ev_id);
--
--	test_condition_complete(data);
--}
--
- static void command_generic_callback(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
-@@ -2621,6 +2593,34 @@ static void command_generic_callback(uint8_t status, uint16_t length,
- 	test_condition_complete(data);
- }
+ 	switch (opcode) {
+@@ -1180,8 +1182,10 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+ 	case BT_HCI_CMD_REMOTE_NAME_REQUEST_CANCEL:
+ 		if (btdev->type == BTDEV_TYPE_LE)
+ 			goto unsupported;
+-		status = BT_HCI_ERR_SUCCESS;
+-		cmd_complete(btdev, opcode, &status, sizeof(status));
++		rnrc_cmd = data;
++		rnrc.status = BT_HCI_ERR_SUCCESS;
++		memcpy(rnrc.bdaddr, rnrc_cmd->bdaddr, 6);
++		cmd_complete(btdev, opcode, &rnrc, sizeof(rnrc));
+ 		break;
  
-+static void command_generic_event_alt(uint16_t index, uint16_t length,
-+							const void *param,
-+							void *user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	const struct generic_data *test = data->test_data;
-+
-+	if (length != test->expect_alt_ev_len) {
-+		tester_warn("Invalid length %s event",
-+					mgmt_evstr(test->expect_alt_ev));
-+		tester_test_failed();
-+		return;
-+	}
-+
-+	tester_print("New %s event received", mgmt_evstr(test->expect_alt_ev));
-+
-+	if (memcmp(param, test->expect_alt_ev_param,
-+						test->expect_alt_ev_len) != 0)
-+		return;
-+
-+	tester_print("Unregistering %s notification",
-+					mgmt_evstr(test->expect_alt_ev));
-+
-+	mgmt_unregister(data->mgmt_alt, data->mgmt_alt_ev_id);
-+
-+	test_condition_complete(data);
-+}
-+
- static bool command_hci_callback(uint16_t opcode, const void *param,
- 					uint8_t length, void *user_data)
- {
+ 	case BT_HCI_CMD_READ_REMOTE_FEATURES:
+diff --git a/monitor/bt.h b/monitor/bt.h
+index e900525..0f1c1d8 100644
+--- a/monitor/bt.h
++++ b/monitor/bt.h
+@@ -167,6 +167,10 @@ struct bt_hci_cmd_remote_name_request {
+ struct bt_hci_cmd_remote_name_request_cancel {
+ 	uint8_t  bdaddr[6];
+ } __attribute__ ((packed));
++struct bt_hci_rsp_remote_name_request_cancel {
++	uint8_t  status;
++	uint8_t  bdaddr[6];
++} __attribute__ ((packed));
+ 
+ #define BT_HCI_CMD_READ_REMOTE_FEATURES		0x041b
+ struct bt_hci_cmd_read_remote_features {
 -- 
 1.7.9.5
 
