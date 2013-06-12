@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
-Subject: [RFC BlueZ 18/35] emulator: cmd_status() using send_packet() for run hooks easily
-Date: Wed, 12 Jun 2013 08:57:04 -0400
-Message-Id: <1371041841-21793-19-git-send-email-bruna.moreira@openbossa.org>
+Subject: [RFC BlueZ 14/35] emulator: Add hook only if there aren't other with same type and opcode
+Date: Wed, 12 Jun 2013 08:57:00 -0400
+Message-Id: <1371041841-21793-15-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1371041841-21793-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1371041841-21793-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,57 +12,48 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
 
-Now like cmd_command(), cmd_status() directly uses send_packet() instead
-of send_event(), consequently cmd_status() must build the hci packet
-without help of send_event(). With this change the events sent by
-default_cmd() no more use send_event(), who is a good place to run hooks
-for BTDEV_HOOK_POST_EVT. And the functions cmd_command() and
-cmd_status() can run hooks for BTDEV_HOOK_POST_CMD.
 ---
- emulator/btdev.c |   28 +++++++++++++++++++++++-----
- 1 file changed, 23 insertions(+), 5 deletions(-)
+ emulator/btdev.c |   20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
 diff --git a/emulator/btdev.c b/emulator/btdev.c
-index c12103d..69cfd12 100644
+index 1560936..1006e03 100644
 --- a/emulator/btdev.c
 +++ b/emulator/btdev.c
-@@ -673,13 +673,31 @@ static void cmd_complete(struct btdev *btdev, uint16_t opcode,
+@@ -123,6 +123,23 @@ struct connection {
  
- static void cmd_status(struct btdev *btdev, uint8_t status, uint16_t opcode)
+ static struct connection *connection_list[MAX_CONNECTION_ENTRIES] = { };
+ 
++static int get_hook_index(struct btdev *btdev, enum btdev_hook_type type,
++								uint16_t opcode)
++{
++	int i;
++
++	for (i = 0; i < MAX_HOOK_ENTRIES; i++) {
++		if (btdev->hook_list[i] == NULL)
++			continue;
++
++		if (btdev->hook_list[i]->type == type &&
++					btdev->hook_list[i]->opcode == opcode)
++			return i;
++	}
++
++	return -1;
++}
++
+ static inline int add_btdev(struct btdev *btdev)
  {
--	struct bt_hci_evt_cmd_status cs;
-+	struct bt_hci_evt_hdr *hdr;
-+	struct bt_hci_evt_cmd_status *cs;
-+	uint16_t pkt_len;
-+	void *pkt_data;
-+
-+	pkt_len = 1 + sizeof(*hdr) + sizeof(*cs);
+ 	int i, index = -1;
+@@ -1857,6 +1874,9 @@ int btdev_add_hook(struct btdev *btdev, enum btdev_hook_type type,
+ 	if (!btdev)
+ 		return -1;
  
--	cs.status = status;
--	cs.ncmd = 0x01;
--	cs.opcode = cpu_to_le16(opcode);
-+	pkt_data = malloc(pkt_len);
-+	if (!pkt_data)
-+		return;
- 
--	send_event(btdev, BT_HCI_EVT_CMD_STATUS, &cs, sizeof(cs));
-+	((uint8_t *) pkt_data)[0] = BT_H4_EVT_PKT;
++	if (get_hook_index(btdev, type, opcode) > 0)
++		return -1;
 +
-+	hdr = pkt_data + 1;
-+	hdr->evt = BT_HCI_EVT_CMD_STATUS;
-+	hdr->plen = sizeof(*cs);
-+
-+	cs = pkt_data + 1 + sizeof(*hdr);
-+	cs->status = status;
-+	cs->ncmd = 0x01;
-+	cs->opcode = cpu_to_le16(opcode);
-+
-+	send_packet(btdev, pkt_data, pkt_len);
-+
-+	free(pkt_data);
- }
- 
- static void num_completed_packets(struct btdev *btdev, uint16_t handle)
+ 	for (i = 0; i < MAX_HOOK_ENTRIES; i++) {
+ 		if (btdev->hook_list[i] == NULL) {
+ 			btdev->hook_list[i] = malloc(sizeof(struct hook));
 -- 
 1.7.9.5
 
