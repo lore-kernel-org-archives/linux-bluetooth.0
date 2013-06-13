@@ -1,95 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 13 Jun 2013 12:22:28 +0100
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth 2013-06-13
-Message-ID: <20130613112228.GB17870@joana>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ZGiS0Q5IWpPtfppv"
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
+Subject: Re: [PATCH] Bluetooth: Fix conditions for HCI_Delete_Stored_Link_Key
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20130613104216.GA17870@joana>
+Date: Thu, 13 Jun 2013 12:48:51 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org, pavel@ucw.cz
+Message-Id: <C40E0870-3699-41E2-8764-AD5DB1344927@holtmann.org>
+References: <1371110473-15072-1-git-send-email-johan.hedberg@gmail.com> <5B6FB8F0-A31D-4C86-B15A-3FA04CB237FF@holtmann.org> <20130613104216.GA17870@joana>
+To: Gustavo Padovan <gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Gustavo,
 
---ZGiS0Q5IWpPtfppv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+>>> Even though the HCI_Delete_Stored_Link_Key command is mandatory for 1.1
+>>> and later controllers some controllers do not seem to support it
+>>> properly as was witnessed by one Broadcom based controller:
+>>> 
+>>> < HCI Command: Delete Stored Link Key (0x03|0x0012) plen 7
+>>>   bdaddr 00:00:00:00:00:00 all 1
+>>>> HCI Event: Command Complete (0x0e) plen 4
+>>>   Delete Stored Link Key (0x03|0x0012) ncmd 1
+>>>   status 0x11 deleted 0
+>>>   Error: Unsupported Feature or Parameter Value
+>>> 
+>>> Luckily this same controller also doesn't list the command in its
+>>> supported commands bit mask (counting from 0 bit 7 of octet 6):
+>>> 
+>>> < HCI Command: Read Local Supported Commands (0x04|0x0002) plen 0
+>>>> HCI Event: Command Complete (0x0e) plen 68
+>>>   Read Local Supported Commands (0x04|0x0002) ncmd 1
+>>>   status 0x00
+>>>   Commands: ffffffffffff1ffffffffffff30fffff3f
+>>> 
+>>> Therefore, it makes sense to move sending of HCI_Delete_Stored_Link_Key
+>>> to after receiving the supported commands response and to only send it
+>>> if its respective bit in the mask is set. The downside of this is that
+>>> we no longer send the HCI_Delete_Stored_Link_Key command for Bluetooth
+>>> 1.1 controllers since HCI_Read_Local_Supported_Command was introduced in
+>>> version 1.2, but this is an acceptable penalty as the command in
+>>> question shouldn't affect critical behavior.
+>>> 
+>>> Reported-by: Pavel Machek <pavel@ucw.cz>
+>>> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+>>> ---
+>>> net/bluetooth/hci_core.c |   14 +++++++++-----
+>>> 1 file changed, 9 insertions(+), 5 deletions(-)
+>>> 
+>>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>>> index d817c93..d68425c 100644
+>>> --- a/net/bluetooth/hci_core.c
+>>> +++ b/net/bluetooth/hci_core.c
+>>> @@ -341,7 +341,6 @@ static void hci_init1_req(struct hci_request *req, unsigned long opt)
+>>> 
+>>> static void bredr_setup(struct hci_request *req)
+>>> {
+>>> -	struct hci_cp_delete_stored_link_key cp;
+>>> 	__le16 param;
+>>> 	__u8 flt_type;
+>>> 
+>>> @@ -365,10 +364,6 @@ static void bredr_setup(struct hci_request *req)
+>>> 	param = __constant_cpu_to_le16(0x7d00);
+>>> 	hci_req_add(req, HCI_OP_WRITE_CA_TIMEOUT, 2, &param);
+>>> 
+>>> -	bacpy(&cp.bdaddr, BDADDR_ANY);
+>>> -	cp.delete_all = 0x01;
+>>> -	hci_req_add(req, HCI_OP_DELETE_STORED_LINK_KEY, sizeof(cp), &cp);
+>>> -
+>>> 	/* Read page scan parameters */
+>>> 	if (req->hdev->hci_ver > BLUETOOTH_VER_1_1) {
+>>> 		hci_req_add(req, HCI_OP_READ_PAGE_SCAN_ACTIVITY, 0, NULL);
+>>> @@ -602,6 +597,15 @@ static void hci_init3_req(struct hci_request *req, unsigned long opt)
+>>> 	struct hci_dev *hdev = req->hdev;
+>>> 	u8 p;
+>> 
+>> I would have added here a comment to explain what bit we are checking for.
+> 
+> I just added:
+> 
+> /* Only send HCI_Delete_Stored_Link_Key if it is supported */
 
-Hi John,
+that is the super cheap way out. There is no harm in going into details.
 
-A few important fixes to 3.10. The first one is a crash fix and talks by itself.
-Then we have the support for a device id, it should be fine if you want to
-remove this. Next there are two btmrvl fixes, one for a potential race
-condition that could make its main thread never stop and the other to fix the
-return code when a memory allocation fails. It was returning 0 instead of
--ENOMEM. Last is a fix to an issue that affects at least some Thinkpad X60,
-Initialization on those laptops were failing due by unsupported cmd we were
-sending to the device. The patch fixes this by checking if the cmd is
-supported first.
+	/* Some Broadcom based Bluetooth controllers do not support the
+	 * Delete Stored Link Key command. They are clearly indicating its
+	 * absence in the bit mask of supported commands.
+	 *
+	 * Check the supported commands and only if the the command is marked as
+	 * supported send it. If not supported assume that the controller does not
+	 * have actual support for stored link keys which makes this command
+	 * redundant anyway.
+	 */
 
-Please pull or let me know of any concerns you may have.
+Regards
 
-	Gustavo
+Marcel
 
----
-The following changes since commit d90b9e29ec5fe7a08eb7965386ebb47615306584:
-
-  Merge branch 'for-john' of git://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-fixes (2013-06-12 14:28:21 -0400)
-
-are available in the git repository at:
-
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
-
-for you to fetch changes up to 0e1aba9361bf292fbdca781d419dca67d6b9911f:
-
-  Bluetooth: btmrvl: fix thread stopping race (2013-06-13 11:48:38 +0100)
-
-----------------------------------------------------------------
-Anderson Lizardo (1):
-      Bluetooth: Fix crash in l2cap_build_cmd() with small MTU
-
-Cho, Yu-Chen (1):
-      Bluetooth: Add support for Mediatek Bluetooth device [0e8d:763f]
-
-Daniel Drake (1):
-      Bluetooth: btmrvl: fix thread stopping race
-
-Johan Hedberg (1):
-      Bluetooth: Fix conditions for HCI_Delete_Stored_Link_Key
-
-Wei Yongjun (1):
-      Bluetooth: btmrvl: fix error return code in btmrvl_sdio_card_to_host()
-
- drivers/bluetooth/btmrvl_main.c |  9 ++++-----
- drivers/bluetooth/btmrvl_sdio.c |  1 +
- drivers/bluetooth/btusb.c       |  3 +++
- net/bluetooth/hci_core.c        | 15 ++++++++++-----
- net/bluetooth/l2cap_core.c      |  3 +++
- 5 files changed, 21 insertions(+), 10 deletions(-)
-
-
---ZGiS0Q5IWpPtfppv
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.13 (GNU/Linux)
-
-iQIcBAEBAgAGBQJRuat0AAoJEPs3PUX4s20omJwP/iqoxp1m7A3mtRWi5VdcclWM
-1G/Lyo/gHPK/0tW11ypI6ppogp25B6mxhyhFXHYRK6dVBo3t36ag0ABTcvNgzp1J
-TGBsKUn0+GzyBqcUmRuRj+3X4m9F6fbLcWcU22vmNfJ0s+lhsgi08D7tN01G7NdU
-Bj5ASouMplFj1GHdqThDtFD7YMTbxohOOVkrW7M2ZdSfYX0f0wLFAimReaA9a41U
-GBaTBi/xBAq50NeZGmDC57e6/kJHdX1CG3+/NYfwwFEHfI4uCmNwnQPkhnHkbVmO
-gZ0DNZ0/P5svbocNCi1Z4GUJtnL3WLrMiH17rvlUR0QPSa0P/C7AUoyKm6au4SSk
-Z/xaKsmgRbdAE9cX6C702IqkhWhwz3DXqUm7Bk4T/7x1J7Yep5jnYvTAxDZukKYN
-SYOeUVB2aGHzTEBLH2ZhK+qFJKiUVtsLo2w73xODi0rFcv7aTL1D/MognvqokzsM
-1qD5VXk+UEFMzSoBLpkvkaI+J4mxcBitzyHNY3Y55lqXSNd4nRCNrVyLWJpFhGHw
-SyCFQ4gDQ+b/9rI1Y732ZU32t+qA8UBtnnfu41sRi1itFPr+h1GYuK0qtbvPblom
-OBJXLxavVS5vIFlXcY8I19UHmENFLAfAhVdJePZo/UQvCXCVF8PS2jAIRU857rgs
-/KUyaA8rBYxeh/ZFl1Z/
-=dRCI
------END PGP SIGNATURE-----
-
---ZGiS0Q5IWpPtfppv--
