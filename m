@@ -1,52 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 13 Jun 2013 10:45:48 +0200
-From: Pavel Machek <pavel@ucw.cz>
-To: "Rafael J. Wysocki" <rjw@sisk.pl>,
-	kernel list <linux-kernel@vger.kernel.org>, marcel@holtmann.org,
-	gustavo@padovan.org, linux-bluetooth@vger.kernel.org
-Subject: Re: 3.10-rc: bluetooth disappeared on thinkpad x60 (regression)
-Message-ID: <20130613084548.GB3651@amd.pavel.ucw.cz>
-References: <20130610110423.GA8834@amd.pavel.ucw.cz>
- <20130610115938.GA12892@x220.ger.corp.intel.com>
- <20130610133834.GA4058@amd.pavel.ucw.cz>
- <20130610160723.GA18282@x220.P-661HNU-F1>
- <20130610193746.GA30801@amd.pavel.ucw.cz>
- <20130611072245.GA12463@x220>
- <20130611102025.GA5580@x220>
- <20130612112326.GA4237@amd.pavel.ucw.cz>
- <20130613072327.GA12951@x220>
- <20130613080442.GA14677@x220>
+Date: Thu, 13 Jun 2013 11:32:40 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Timo Mueller <timo.mueller@bmw-carit.de>,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: Re: [RFC v2 2/2] Bluetooth: Use MITM protection when responding LM
+Message-ID: <20130613083240.GB15607@x220>
+References: <1369906016-17006-1-git-send-email-mikel.astiz.oss@gmail.com>
+ <1369906016-17006-3-git-send-email-mikel.astiz.oss@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130613080442.GA14677@x220>
+In-Reply-To: <1369906016-17006-3-git-send-email-mikel.astiz.oss@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu 2013-06-13 11:04:42, Johan Hedberg wrote:
-> Hi Pavel,
-> 
-> On Thu, Jun 13, 2013, Johan Hedberg wrote:
-> > On Wed, Jun 12, 2013, Pavel Machek wrote:
-> > > < HCI Command: Read Local Supported Commands (0x04|0x0002) plen 0
-> > > > HCI Event: Command Complete (0x0e) plen 68
-> > >     Read Local Supported Commands (0x04|0x0002) ncmd 1
-> > >     status 0x00
-> > >     Commands: ffffffffffff1ffffffffffff30fffff3f
-> > 
-> > As I suspected, even though the Delete Stored Link Key command is
-> > mandatory from Bluetooth version 1.1 onwards (this controller supports
-> > 2.0) this controller doesn't have it mentioned in its supported commands
-> > response (counting from 0 it should be bit 7 of octet 6). Therefore, it
-> > might be possible to just move sending of this problematic command to
-> > after receiving the supported commands response and making it
-> > conditional to having its respective bit set in the mask. I'll be
-> > sending another patch proposal soon.
-> 
-> I just sent a patch to linux-bluetooth for this. It would be nice if you
-> could revert the previous patch, apply this one instead (also attached
-> to this email) and let us know if it works fine.
+Hi,
 
-Patch works for me, thanks!
+On Thu, May 30, 2013, Mikel Astiz wrote:
+> A MITM protected SSP associaton model can be used for pairing if both
+> local and remote IO capabilities are set to something other than
+> NoInputNoOutput, regardless of the bonding type (dedicated or general).
+> 
+> With these IO capabilities a MITM protected SSP association model has
+> been used by the Kernel if we are initiating the pairing process
+> (initiating LM).
+> 
+> When responding to a pairing request (remote device is the initiating
+> LM) the pairing should also be proteced against MITM attacks, as
+> proposed in this patch.
+> 
+> Signed-off-by: Timo Mueller <timo.mueller@bmw-carit.de>
+> Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
+> ---
+>  net/bluetooth/hci_event.c | 21 +++++++++------------
+>  1 file changed, 9 insertions(+), 12 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 777a040..ca59623 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -3024,22 +3024,19 @@ unlock:
+>  
+>  static u8 hci_get_auth_req(struct hci_conn *conn)
+>  {
+> -	/* If remote requests dedicated bonding follow that lead */
+> -	if ((conn->remote_auth & ~0x01) == HCI_AT_DEDICATED_BONDING) {
+> -		/* If both remote and local IO capabilities allow MITM
+> -		 * protection then require it, otherwise don't */
+> -		if (conn->remote_cap == SMP_IO_NO_INPUT_OUTPUT ||
+> -		    conn->io_capability == SMP_IO_NO_INPUT_OUTPUT)
+> -			return 0x02;
+> -		else
+> -			return 0x03;
+> -	}
+> -
+>  	/* If remote requests no-bonding follow that lead */
+>  	if ((conn->remote_auth & ~0x01) == HCI_AT_NO_BONDING)
+>  		return conn->remote_auth | (conn->auth_type & 0x01);
+>  
+> -	return conn->auth_type;
+> +	/* If both remote and local IO capabilities allow MITM protection
+> +	 * then require it
+> +	 */
+> +	if (conn->remote_cap != SMP_IO_NO_INPUT_OUTPUT &&
+> +	    conn->io_capability != SMP_IO_NO_INPUT_OUTPUT)
+> +		return conn->remote_auth | 0x01;
+> +
+> +	/* No MITM protection possible due to lacking capabilities */
+> +	return conn->remote_auth & ~0x01;
+>  }
+>  
+>  static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
 
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+Did you test this with acting as pairing initiator too? What worries me
+a bit is the partial removal of reliance on conn->auth_type. It'd also
+be important to verify that this doesn't cause issues with GAP test
+cases using the BITE.
+
+Johan
