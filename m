@@ -1,63 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 BlueZ 00/16] MediaFolder and MediaItem implementation
-Date: Fri, 14 Jun 2013 15:41:34 +0300
-Message-Id: <1371213710-16607-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 13 Jun 2013 18:48:25 +0100
+From: Gustavo Padovan <gustavo@padovan.org>
+To: "John W. Linville" <linville@tuxdriver.com>
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth 2013-06-13
+Message-ID: <20130613174825.GA28084@joana>
+References: <20130613112228.GB17870@joana>
+ <20130613171711.GB3246@tuxdriver.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130613171711.GB3246@tuxdriver.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi John,
 
-v2: Fixes ChangeFolder not working for subfolders past /Filesystem
-v3: Add Search implementation, fix not forwarding errors properly and add
-patch to create current item if it doesn't exist.
+* John W. Linville <linville@tuxdriver.com> [2013-06-13 13:17:12 -0400]:
 
-This set of patches implements most of the functionality of MediaFolder and
-MediaItem interfaces.
+> On Thu, Jun 13, 2013 at 12:22:28PM +0100, Gustavo Padovan wrote:
+> > Hi John,
+> > 
+> > A few important fixes to 3.10. The first one is a crash fix and talks by itself.
+> > Then we have the support for a device id, it should be fine if you want to
+> > remove this. Next there are two btmrvl fixes, one for a potential race
+> > condition that could make its main thread never stop and the other to fix the
+> > return code when a memory allocation fails. It was returning 0 instead of
+> > -ENOMEM. Last is a fix to an issue that affects at least some Thinkpad X60,
+> > Initialization on those laptops were failing due by unsupported cmd we were
+> > sending to the device. The patch fixes this by checking if the cmd is
+> > supported first.
+> > 
+> > Please pull or let me know of any concerns you may have.
+> > 
+> > 	Gustavo
+> > 
+> > ---
+> > The following changes since commit d90b9e29ec5fe7a08eb7965386ebb47615306584:
+> > 
+> >   Merge branch 'for-john' of git://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-fixes (2013-06-12 14:28:21 -0400)
+> > 
+> > are available in the git repository at:
+> > 
+> > 
+> >   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
+> > 
+> > for you to fetch changes up to 0e1aba9361bf292fbdca781d419dca67d6b9911f:
+> > 
+> >   Bluetooth: btmrvl: fix thread stopping race (2013-06-13 11:48:38 +0100)
+> > 
+> > ----------------------------------------------------------------
+> 
+> I applied these manually to the wireless tree:
+> 
+> > Anderson Lizardo (1):
+> >       Bluetooth: Fix crash in l2cap_build_cmd() with small MTU
+> > 
+> > Daniel Drake (1):
+> >       Bluetooth: btmrvl: fix thread stopping race
+> > 
+> > Johan Hedberg (1):
+> >       Bluetooth: Fix conditions for HCI_Delete_Stored_Link_Key
+> 
+> These I will manually apply to wireless-next:
+> 
+> > Cho, Yu-Chen (1):
+> >       Bluetooth: Add support for Mediatek Bluetooth device [0e8d:763f]
+> > 
+> > Wei Yongjun (1):
+> >       Bluetooth: btmrvl: fix error return code in btmrvl_sdio_card_to_host()
+> 
+> The device ID one might be OK, but it can wait for now.  The error
+> return code patch fixes the return code for a function whose return
+> code isn't actually checked, so it doesn't seem to need a quick fix.
 
-Some remarks:
+Oh, I missed that when applied this patch! Thanks a lot for pushing the
+patches, I'll update the bluetooth trees accordingly.
 
-- ChangeFolder can only change one level at time, this perhaps gonna be
-  changed in the future but for now this matches the limitation of AVRCP
-  itself.
-- ListItems returns the items in the correct order but GetManagedObjects
-  does the reverse order due to use of g_slist_prepend.
-- PlayItem and AddToNowPlaying works fine with iPhone but with WP8 is not
-  working probably because the UIDCounter changes more frequently
-  which needs some new notifications that are currently not implemented.
-
-This can be tested using tools/mpris-player which will browse the NowPlaying
-list and show which item is currently being played, but the gnome extention
-itself needs patching which can be found here:
-
-https://github.com/Vudentz/gnome-shell-extensions-mediaplayer
-
-Or use the command line tool: tools/bluetooth-player
-
-Luiz Augusto von Dentz (16):
-  audio/player: Split item creation
-  audio/AVRCP: Add browsed flag to player
-  audio/AVRCP: Add support for GetFolderItems command
-  audio/player: Add implementation of MediaFolder.ListItems
-  audio/player: Add support for setting current Item object
-  audio/player: Add function media_item_set_playable
-  audio/player: Add support for MediaItem.Metadata property
-  audio/AVRCP: Add support for ChangePath command
-  audio/player: Add implementation of MediaFolder.ChangeFolder
-  audio/AVRCP: Add support for PlayItem command
-  audio/player: Add implementation of MediaItem.Play
-  audio/AVRCP: Add support for AddToNowPlaying command
-  audio/player: Add implementation of MediaItem.AddToNowPlaying
-  audio/AVRCP: Add support for Search command
-  audio/player: Add implementation of MediaFolder.Search
-  audio/player: Create item on media_player_set_playlist_item
-
- profiles/audio/avrcp.c  | 488 ++++++++++++++++++++++++++++-
- profiles/audio/player.c | 804 ++++++++++++++++++++++++++++++++++++++++--------
- profiles/audio/player.h |  35 ++-
- 3 files changed, 1187 insertions(+), 140 deletions(-)
-
--- 
-1.8.1.4
-
+	Gustavo
