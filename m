@@ -1,53 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 13 Jun 2013 17:26:57 +0300
+Date: Thu, 13 Jun 2013 16:20:42 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Szymon Janc <szymon.janc@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v3 1/2] plugins: Use open()/read() instead of
- fopen()/fread() on autopair
-Message-ID: <20130613142657.GA27563@x220.P-661HNU-F1>
-References: <1368721510-14339-1-git-send-email-anderson.lizardo@openbossa.org>
- <1369141604-1129-1-git-send-email-anderson.lizardo@openbossa.org>
- <CAJdJm_NPgMvsOpRpzXbXcchy-aUBNqCKs894mnr_svbZNScQJw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/5] man: Update bluetoothd manual
+Message-ID: <20130613132042.GA25911@x220.ger.corp.intel.com>
+References: <1369951317-16789-2-git-send-email-szymon.janc@gmail.com>
+ <1370032845-17123-1-git-send-email-szymon.janc@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <CAJdJm_NPgMvsOpRpzXbXcchy-aUBNqCKs894mnr_svbZNScQJw@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1370032845-17123-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi Szymon,
 
-On Tue, May 28, 2013, Anderson Lizardo wrote:
-> On Tue, May 21, 2013 at 9:06 AM, Anderson Lizardo
-> <anderson.lizardo@openbossa.org> wrote:
-> > open()/read() is more common on BlueZ code. Incidentally, get rid of
-> > this compilation error (using gcc 4.6.3):
-> >
-> > plugins/autopair.c: In function ‘autopair_init’:
-> > plugins/autopair.c:154:8: error: ignoring return value of ‘fread’,
-> > declared with attribute warn_unused_result [-Werror=unused-result]
-> > ---
-> >  plugins/autopair.c |   22 +++++++++++++++-------
-> >  1 file changed, 15 insertions(+), 7 deletions(-)
-> >
-> > v3:
-> >
-> > * Fix buggy logic
-> > * The obvious code path is tested by just starting bluetoothd, which will call
-> >   autopair_init()
-> > * Maybe overkill, but I used this mockup code to test other unreachable code
-> >   paths: http://ix.io/5JC
-> > * I agree with Marcel that we should just fail if /dev/urandom is not readable.
-> >   Otherwise, we are introducing code that will 99% of the time not be run
-> >   (unless someone confirms that we have systems with unusable /dev/urandom).
+On Fri, May 31, 2013, Szymon Janc wrote:
+> This puts manual up-to-date with bluetoothd options.
+> ---
 > 
-> Ping. There were no further comments on the idea of removing the
-> "time(NULL)" fallback suggested by Marcel.
+> V2: Removed list-plugins option description
 > 
-> Should I proceed with dropping the time(NULL) fallback or may this
-> patch be applied as is?
+>  src/bluetoothd.8.in |   45 ++++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 34 insertions(+), 11 deletions(-)
 
-I pushed the current patches, however I wont object to a third one to
-get rid of the time(NULL) call.
+This v2 of patch 2/5 as well as patches 3/5 - 5/5 have been applied.
+Thanks.
 
 Johan
