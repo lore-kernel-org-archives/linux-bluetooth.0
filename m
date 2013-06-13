@@ -1,75 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 13 Jun 2013 13:17:12 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth 2013-06-13
-Message-ID: <20130613171711.GB3246@tuxdriver.com>
-References: <20130613112228.GB17870@joana>
+Date: Thu, 13 Jun 2013 17:26:57 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v3 1/2] plugins: Use open()/read() instead of
+ fopen()/fread() on autopair
+Message-ID: <20130613142657.GA27563@x220.P-661HNU-F1>
+References: <1368721510-14339-1-git-send-email-anderson.lizardo@openbossa.org>
+ <1369141604-1129-1-git-send-email-anderson.lizardo@openbossa.org>
+ <CAJdJm_NPgMvsOpRpzXbXcchy-aUBNqCKs894mnr_svbZNScQJw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130613112228.GB17870@joana>
-Sender: linux-wireless-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAJdJm_NPgMvsOpRpzXbXcchy-aUBNqCKs894mnr_svbZNScQJw@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Jun 13, 2013 at 12:22:28PM +0100, Gustavo Padovan wrote:
-> Hi John,
-> 
-> A few important fixes to 3.10. The first one is a crash fix and talks by itself.
-> Then we have the support for a device id, it should be fine if you want to
-> remove this. Next there are two btmrvl fixes, one for a potential race
-> condition that could make its main thread never stop and the other to fix the
-> return code when a memory allocation fails. It was returning 0 instead of
-> -ENOMEM. Last is a fix to an issue that affects at least some Thinkpad X60,
-> Initialization on those laptops were failing due by unsupported cmd we were
-> sending to the device. The patch fixes this by checking if the cmd is
-> supported first.
-> 
-> Please pull or let me know of any concerns you may have.
-> 
-> 	Gustavo
-> 
-> ---
-> The following changes since commit d90b9e29ec5fe7a08eb7965386ebb47615306584:
-> 
->   Merge branch 'for-john' of git://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-fixes (2013-06-12 14:28:21 -0400)
-> 
-> are available in the git repository at:
-> 
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
-> 
-> for you to fetch changes up to 0e1aba9361bf292fbdca781d419dca67d6b9911f:
-> 
->   Bluetooth: btmrvl: fix thread stopping race (2013-06-13 11:48:38 +0100)
-> 
-> ----------------------------------------------------------------
+Hi Lizardo,
 
-I applied these manually to the wireless tree:
-
-> Anderson Lizardo (1):
->       Bluetooth: Fix crash in l2cap_build_cmd() with small MTU
+On Tue, May 28, 2013, Anderson Lizardo wrote:
+> On Tue, May 21, 2013 at 9:06 AM, Anderson Lizardo
+> <anderson.lizardo@openbossa.org> wrote:
+> > open()/read() is more common on BlueZ code. Incidentally, get rid of
+> > this compilation error (using gcc 4.6.3):
+> >
+> > plugins/autopair.c: In function ‘autopair_init’:
+> > plugins/autopair.c:154:8: error: ignoring return value of ‘fread’,
+> > declared with attribute warn_unused_result [-Werror=unused-result]
+> > ---
+> >  plugins/autopair.c |   22 +++++++++++++++-------
+> >  1 file changed, 15 insertions(+), 7 deletions(-)
+> >
+> > v3:
+> >
+> > * Fix buggy logic
+> > * The obvious code path is tested by just starting bluetoothd, which will call
+> >   autopair_init()
+> > * Maybe overkill, but I used this mockup code to test other unreachable code
+> >   paths: http://ix.io/5JC
+> > * I agree with Marcel that we should just fail if /dev/urandom is not readable.
+> >   Otherwise, we are introducing code that will 99% of the time not be run
+> >   (unless someone confirms that we have systems with unusable /dev/urandom).
 > 
-> Daniel Drake (1):
->       Bluetooth: btmrvl: fix thread stopping race
+> Ping. There were no further comments on the idea of removing the
+> "time(NULL)" fallback suggested by Marcel.
 > 
-> Johan Hedberg (1):
->       Bluetooth: Fix conditions for HCI_Delete_Stored_Link_Key
+> Should I proceed with dropping the time(NULL) fallback or may this
+> patch be applied as is?
 
-These I will manually apply to wireless-next:
+I pushed the current patches, however I wont object to a third one to
+get rid of the time(NULL) call.
 
-> Cho, Yu-Chen (1):
->       Bluetooth: Add support for Mediatek Bluetooth device [0e8d:763f]
-> 
-> Wei Yongjun (1):
->       Bluetooth: btmrvl: fix error return code in btmrvl_sdio_card_to_host()
-
-The device ID one might be OK, but it can wait for now.  The error
-return code patch fixes the return code for a function whose return
-code isn't actually checked, so it doesn't seem to need a quick fix.
-
-John
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Johan
