@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 08/16] audio/AVRCP: Add support for ChangePath command
-Date: Fri, 14 Jun 2013 15:41:42 +0300
-Message-Id: <1371213710-16607-9-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 07/16] audio/player: Add support for MediaItem.Metadata property
+Date: Fri, 14 Jun 2013 15:41:41 +0300
+Message-Id: <1371213710-16607-8-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1371213710-16607-1-git-send-email-luiz.dentz@gmail.com>
 References: <1371213710-16607-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,167 +11,92 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support for ChangePath command via player callback.
 ---
- profiles/audio/avrcp.c  | 77 +++++++++++++++++++++++++++++++++++++++++++++----
- profiles/audio/player.h |  2 ++
- 2 files changed, 73 insertions(+), 6 deletions(-)
+ profiles/audio/player.c | 42 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 41 insertions(+), 1 deletion(-)
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index d46e598..6135d78 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -102,8 +102,9 @@
- #define AVRCP_ABORT_CONTINUING		0x41
- #define AVRCP_SET_ABSOLUTE_VOLUME	0x50
- #define AVRCP_SET_BROWSED_PLAYER	0x70
--#define AVRCP_GET_ITEM_ATTRIBUTES	0x73
- #define AVRCP_GET_FOLDER_ITEMS		0x71
-+#define AVRCP_CHANGE_PATH		0x72
-+#define AVRCP_GET_ITEM_ATTRIBUTES	0x73
- #define AVRCP_GENERAL_REJECT		0xA0
+diff --git a/profiles/audio/player.c b/profiles/audio/player.c
+index 69e8cd5..d56640f 100644
+--- a/profiles/audio/player.c
++++ b/profiles/audio/player.c
+@@ -66,6 +66,7 @@ struct media_item {
+ 	player_folder_type_t	folder_type;	/* Folder type */
+ 	bool			playable;	/* Item playable flag */
+ 	uint64_t		uid;		/* Item uid */
++	GHashTable		*metadata;	/* Item metadata */
+ };
  
- /* Capabilities for AVRCP_GET_CAPABILITIES pdu */
-@@ -193,8 +194,10 @@ struct avrcp_player {
- 	uint16_t uid_counter;
- 	bool browsed;
- 	uint8_t *features;
-+	char *path;
+ struct media_folder {
+@@ -771,6 +772,9 @@ static DBusMessage *media_folder_list_items(DBusConnection *conn,
  
- 	struct pending_list_items *p;
-+	char *change_path;
- 
- 	struct avrcp_player_cb *cb;
- 	void *user_data;
-@@ -2268,6 +2271,32 @@ static void avrcp_list_items(struct avrcp *session, uint32_t start,
- 					avrcp_list_items_rsp, session);
+ static void media_item_free(struct media_item *item)
+ {
++	if (item->metadata != NULL)
++		g_hash_table_unref(item->metadata);
++
+ 	g_free(item->path);
+ 	g_free(item->name);
+ 	g_free(item);
+@@ -1446,6 +1450,37 @@ static gboolean get_folder_type(const GDBusPropertyTable *property,
+ 	return TRUE;
  }
  
-+static gboolean avrcp_change_path_rsp(struct avctp *conn,
-+					uint8_t *operands, size_t operand_count,
-+					void *user_data)
++static gboolean metadata_exists(const GDBusPropertyTable *property, void *data)
 +{
-+	struct avrcp_browsing_header *pdu = (void *) operands;
-+	struct avrcp *session = user_data;
-+	struct avrcp_player *player = session->player;
-+	struct media_player *mp = player->user_data;
-+	uint8_t status;
-+	uint32_t num_of_items;
++	struct media_item *item = data;
 +
-+	status = pdu->params[0];
-+	if (status != AVRCP_STATUS_SUCCESS)
-+		return FALSE;
-+
-+	num_of_items = bt_get_be32(&pdu->params[1]);
-+
-+	g_free(player->path);
-+	player->path = player->change_path;
-+	player->change_path = NULL;
-+
-+	media_player_set_folder(mp, player->path, num_of_items);
-+
-+	return FALSE;
++	return item->metadata != NULL;
 +}
 +
- static gboolean avrcp_set_browsed_player_rsp(struct avctp *conn,
- 						uint8_t *operands,
- 						size_t operand_count,
-@@ -2278,7 +2307,7 @@ static gboolean avrcp_set_browsed_player_rsp(struct avctp *conn,
- 	struct media_player *mp = player->user_data;
- 	struct avrcp_browsing_header *pdu = (void *) operands;
- 	uint32_t items;
--	char **folders, *path;
-+	char **folders;
- 	uint8_t depth, count;
- 	size_t i;
++static gboolean get_metadata(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct media_item *item = data;
++	DBusMessageIter dict;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
++					DBUS_TYPE_STRING_AS_STRING
++					DBUS_TYPE_VARIANT_AS_STRING
++					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
++					&dict);
++
++	if (g_hash_table_size(item->metadata) > 0)
++		g_hash_table_foreach(item->metadata, append_metadata, &dict);
++	else if (item->name != NULL)
++		dict_append_entry(&dict, "Title", DBUS_TYPE_STRING,
++								&item->name);
++
++	dbus_message_iter_close_container(iter, &dict);
++
++	return TRUE;
++}
++
+ static const GDBusMethodTable media_item_methods[] = {
+ 	{ GDBUS_EXPERIMENTAL_METHOD("Play", NULL, NULL,
+ 					media_item_play) },
+@@ -1463,6 +1498,8 @@ static const GDBusPropertyTable media_item_properties[] = {
+ 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+ 	{ "Playable", "b", get_playable, NULL, NULL,
+ 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++	{ "Metadata", "a{sv}", get_metadata, NULL, metadata_exists,
++					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+ 	{ }
+ };
  
-@@ -2311,12 +2340,10 @@ static gboolean avrcp_set_browsed_player_rsp(struct avctp *conn,
- 		i += len;
+@@ -1521,8 +1558,11 @@ struct media_item *media_player_create_item(struct media_player *mp,
+ 		return NULL;
  	}
  
--	path = g_build_pathv("/", folders);
-+	player->path = g_build_pathv("/", folders);
- 	g_strfreev(folders);
+-	if (type != PLAYER_ITEM_TYPE_FOLDER)
++	if (type != PLAYER_ITEM_TYPE_FOLDER) {
+ 		folder->items = g_slist_prepend(folder->items, item);
++		item->metadata = g_hash_table_new_full(g_str_hash, g_str_equal,
++							g_free, g_free);
++	}
  
--	media_player_set_folder(mp, path, items);
--
--	g_free(path);
-+	media_player_set_folder(mp, player->path, items);
+ 	DBG("%s", item->path);
  
- 	return FALSE;
- }
-@@ -2557,6 +2584,41 @@ static int ct_list_items(struct media_player *mp, const char *name,
- 	return 0;
- }
- 
-+static void avrcp_change_path(struct avrcp *session, uint8_t direction,
-+								uint64_t uid)
-+{
-+	struct avrcp_player *player = session->player;
-+	uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + 11];
-+	struct avrcp_browsing_header *pdu = (void *) buf;
-+
-+	memset(buf, 0, sizeof(buf));
-+	bt_put_be16(player->uid_counter, &pdu->params[0]);
-+	pdu->params[2] = direction;
-+	bt_put_be64(uid, &pdu->params[3]);
-+	pdu->pdu_id = AVRCP_CHANGE_PATH;
-+	pdu->param_len = htons(11);
-+
-+	avctp_send_browsing_req(session->conn, buf, sizeof(buf),
-+					avrcp_change_path_rsp, session);
-+}
-+
-+static int ct_change_folder(struct media_player *mp, const char *path,
-+					uint64_t uid, void *user_data)
-+{
-+	struct avrcp_player *player = user_data;
-+	struct avrcp *session;
-+	uint8_t direction;
-+
-+	session = player->sessions->data;
-+	player->change_path = g_strdup(path);
-+
-+	direction = g_str_has_prefix(path, player->path) ? 0x01 : 0x00;
-+
-+	avrcp_change_path(session, direction, uid);
-+
-+	return 0;
-+}
-+
- static const struct media_player_callback ct_cbs = {
- 	.set_setting	= ct_set_setting,
- 	.play		= ct_play,
-@@ -2567,6 +2629,7 @@ static const struct media_player_callback ct_cbs = {
- 	.fast_forward	= ct_fast_forward,
- 	.rewind		= ct_rewind,
- 	.list_items	= ct_list_items,
-+	.change_folder	= ct_change_folder,
- };
- 
- static struct avrcp_player *create_ct_player(struct avrcp *session,
-@@ -2679,6 +2742,8 @@ static void player_destroy(gpointer data)
- 		player->destroy(player->user_data);
- 
- 	g_slist_free(player->sessions);
-+	g_free(player->path);
-+	g_free(player->change_path);
- 	g_free(player->features);
- 	g_free(player);
- }
-diff --git a/profiles/audio/player.h b/profiles/audio/player.h
-index 20de0b8..4103742 100644
---- a/profiles/audio/player.h
-+++ b/profiles/audio/player.h
-@@ -56,6 +56,8 @@ struct media_player_callback {
- 	int (*rewind) (struct media_player *mp, void *user_data);
- 	int (*list_items) (struct media_player *mp, const char *name,
- 				uint32_t start, uint32_t end, void *user_data);
-+	int (*change_folder) (struct media_player *mp, const char *path,
-+						uint64_t uid, void *user_data);
- };
- 
- struct media_player *media_player_controller_create(const char *path,
 -- 
 1.8.1.4
 
