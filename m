@@ -1,32 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] audio/media: Fix notifying settings changed incorrectly
-Date: Sun, 16 Jun 2013 20:01:23 +0300
-Message-Id: <1371402085-30762-1-git-send-email-luiz.dentz@gmail.com>
+Date: Sun, 16 Jun 2013 18:30:37 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Alex Deymo <deymo@chromium.org>
+Cc: linux-bluetooth@vger.kernel.org, keybuk@chromium.org
+Subject: Re: [PATCH] lib: Fix two size constants
+Message-ID: <20130616153037.GA6010@x220.P-661HNU-F1>
+References: <1370985402-27535-1-git-send-email-deymo@chromium.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1370985402-27535-1-git-send-email-deymo@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Alex,
 
-We should notify only the setting that has changed not all of them.
----
- profiles/audio/media.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Tue, Jun 11, 2013, Alex Deymo wrote:
+> Fixes the value of RESET_FAILED_CONTACT_COUNTER_RP_SIZE and
+> RESET_FAILED_CONTACT_COUNTER_RP_SIZE macros to respect the
+> associated struct.
+> ---
+>  lib/hci.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index eb5ea81..69139a7 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -1480,7 +1480,7 @@ static gboolean set_property(struct media_player *mp, const char *key,
- 
- 	g_hash_table_replace(mp->settings, g_strdup(key), g_strdup(value));
- 
--	settings = list_settings(mp);
-+	settings = g_list_prepend(NULL, (char *) key);
- 
- 	avrcp_player_event(mp->player, AVRCP_EVENT_SETTINGS_CHANGED, settings);
- 
--- 
-1.8.1.4
+Applied. Thanks.
 
+Johan
