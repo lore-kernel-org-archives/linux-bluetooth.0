@@ -1,90 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] obexd: Fix handling error cases in setpath
-Date: Mon, 17 Jun 2013 14:10:52 +0200
-Message-Id: <1371471055-25591-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+MIME-Version: 1.0
+In-Reply-To: <1370865307-7433-1-git-send-email-gustavo@padovan.org>
+References: <1370865307-7433-1-git-send-email-gustavo@padovan.org>
+Date: Mon, 17 Jun 2013 14:03:11 +0300
+Message-ID: <CABBYNZJqRvRz8VBU5rDckfzmxb-U1PLNrVwuFh3WwJ0N9E=scQ@mail.gmail.com>
+Subject: Re: [PATCH] device: fix reporting of Connected state for PAN
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Emilio Pozuelo Monfort <emilio.pozuelo@collabora.co.uk>,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+Hi Gustavo,
 
-This adds a setpath_op_complete callback, that unpacks the user data and
-finally calls the user callback. The callback is now used for success and error
-cases.
+On Mon, Jun 10, 2013 at 2:55 PM, Gustavo Padovan <gustavo@padovan.org> wrote:
+> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+>
+> The network interface handles the connected state as boolean so we never
+> get an intermediate state CONNECTING. The old code was preventing the
+> transition from DISCONNECTED to CONNECTED in network to be signaled in
+> the Device interface.
+> ---
+>  src/device.c | 16 +++++++++++++---
+>  1 file changed, 13 insertions(+), 3 deletions(-)
+>
+> diff --git a/src/device.c b/src/device.c
+> index 57bfc86..34511bd 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -4506,10 +4506,20 @@ static void service_state_changed(struct btd_service *service,
+>         struct btd_device *device = btd_service_get_device(service);
+>         int err = btd_service_get_error(service);
+>
+> -       if (old_state == BTD_SERVICE_STATE_CONNECTING)
+> -               device_profile_connected(device, profile, err);
+> -       else if (old_state == BTD_SERVICE_STATE_DISCONNECTING)
+> +       switch (new_state) {
+> +       case BTD_SERVICE_STATE_CONNECTED:
+> +               if (old_state == BTD_SERVICE_STATE_CONNECTING ||
+> +                               old_state == BTD_SERVICE_STATE_DISCONNECTED)
+> +                       device_profile_connected(device, profile, err);
+> +               break;
+> +
+> +       case BTD_SERVICE_STATE_DISCONNECTED:
+>                 device_profile_disconnected(device, profile, err);
+> +               break;
+> +
+> +       default:
+> +               break;
+> +       }
+>  }
+>
+>  struct btd_service *btd_device_get_service(struct btd_device *dev,
+> --
+> 1.8.1.4
 
-The previous implementation was using setpath_complete which did not
-work for error cases, because it was called with incorrect user data.
-This was leading to a crash, that can be reproduced by disconnecting PBAP
-after trying to select a non existing phone book.
+I believe I fixed a similar problem already thus the problem might be
+fixed, but perhaps you want to rebase it and resend as it seems a
+cleaner/more readable code.
 
-  0  setpath_complete (session=0x66bd90, transfer=0x0, err=0x69b370,
-     user_data=0x69a810) at obexd/client/session.c:912
-  1  0x000000000042d100 in obc_session_shutdown (session=0x66bd90)
-     at obexd/client/session.c:537
-  2  0x000000000040f227 in service_filter (connection=0x664b20,
-     message=<optimized out>, user_data=0x66bed0) at gdbus/watch.c:486
-  3  0x000000000040f49b in message_filter (connection=0x664b20,
-     message=0x66ba30, user_data=<optimized out>) at gdbus/watch.c:554
-  4  0x00007ffff72f40a6 in dbus_connection_dispatch ()
-     from /usr/lib/libdbus-1.so.3
-  5  0x000000000040e148 in message_dispatch (data=0x664b20)
-     at gdbus/mainloop.c:76
-  6  0x00007ffff702e9a3 in ?? () from /usr/lib/libglib-2.0.so.0
-  7  0x00007ffff702de46 in g_main_context_dispatch ()
-     from /usr/lib/libglib-2.0.so.0
-  8  0x00007ffff702e198 in ?? () from /usr/lib/libglib-2.0.so.0
-  9  0x00007ffff702e59a in g_main_loop_run () from
-     /usr/lib/libglib-2.0.so.0
-  10 0x000000000040dd72 in main (argc=1, argv=0x7fffffffddc8)
-     at obexd/src/main.c:319
----
- obexd/client/session.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/obexd/client/session.c b/obexd/client/session.c
-index f1915db..eda3412 100644
---- a/obexd/client/session.c
-+++ b/obexd/client/session.c
-@@ -907,10 +907,9 @@ static void setpath_complete(struct obc_session *session,
- 						GError *err, void *user_data)
- {
- 	struct pending_request *p = user_data;
--	struct setpath_data *data = p->data;
- 
--	if (data->func)
--		data->func(session, NULL, err, data->user_data);
-+	if (p->func)
-+		p->func(session, NULL, err, p->data);
- 
- 	if (session->p == p)
- 		session->p = NULL;
-@@ -920,6 +919,16 @@ static void setpath_complete(struct obc_session *session,
- 	session_process_queue(session);
- }
- 
-+static void setpath_op_complete(struct obc_session *session,
-+						struct obc_transfer *transfer,
-+						GError *err, void *user_data)
-+{
-+	struct setpath_data *data = user_data;
-+
-+	if (data->func)
-+		data->func(session, NULL, err, data->user_data);
-+}
-+
- static void setpath_cb(GObex *obex, GError *err, GObexPacket *rsp,
- 							gpointer user_data)
- {
-@@ -1005,7 +1014,7 @@ guint obc_session_setpath(struct obc_session *session, const char *path,
- 	data->remaining = g_strsplit(strlen(path) ? path : "/", "/", 0);
- 
- 	p = pending_request_new(session, session_process_setpath, NULL,
--				setpath_complete, data, setpath_data_free);
-+				setpath_op_complete, data, setpath_data_free);
- 	session_queue(p);
- 	return p->id;
- }
--- 
-1.8.2.3
-
+--
+Luiz Augusto von Dentz
