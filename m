@@ -1,76 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1371213710-16607-1-git-send-email-luiz.dentz@gmail.com>
-References: <1371213710-16607-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 17 Jun 2013 19:46:53 +0300
-Message-ID: <CABBYNZLskpTJt5biiwUUQzcq4Ss2y5WOTk7oDVML4A8KtRbu2g@mail.gmail.com>
-Subject: Re: [PATCH v3 BlueZ 00/16] MediaFolder and MediaItem implementation
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 4/4] obexd: Use correct callback in obc_session_mkdir
+Date: Mon, 17 Jun 2013 14:10:55 +0200
+Message-Id: <1371471055-25591-4-git-send-email-christian.fetzer@oss.bmw-carit.de>
+In-Reply-To: <1371471055-25591-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1371471055-25591-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-On Fri, Jun 14, 2013 at 3:41 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> v2: Fixes ChangeFolder not working for subfolders past /Filesystem
-> v3: Add Search implementation, fix not forwarding errors properly and add
-> patch to create current item if it doesn't exist.
->
-> This set of patches implements most of the functionality of MediaFolder and
-> MediaItem interfaces.
->
-> Some remarks:
->
-> - ChangeFolder can only change one level at time, this perhaps gonna be
->   changed in the future but for now this matches the limitation of AVRCP
->   itself.
-> - ListItems returns the items in the correct order but GetManagedObjects
->   does the reverse order due to use of g_slist_prepend.
-> - PlayItem and AddToNowPlaying works fine with iPhone but with WP8 is not
->   working probably because the UIDCounter changes more frequently
->   which needs some new notifications that are currently not implemented.
->
-> This can be tested using tools/mpris-player which will browse the NowPlaying
-> list and show which item is currently being played, but the gnome extention
-> itself needs patching which can be found here:
->
-> https://github.com/Vudentz/gnome-shell-extensions-mediaplayer
->
-> Or use the command line tool: tools/bluetooth-player
->
-> Luiz Augusto von Dentz (16):
->   audio/player: Split item creation
->   audio/AVRCP: Add browsed flag to player
->   audio/AVRCP: Add support for GetFolderItems command
->   audio/player: Add implementation of MediaFolder.ListItems
->   audio/player: Add support for setting current Item object
->   audio/player: Add function media_item_set_playable
->   audio/player: Add support for MediaItem.Metadata property
->   audio/AVRCP: Add support for ChangePath command
->   audio/player: Add implementation of MediaFolder.ChangeFolder
->   audio/AVRCP: Add support for PlayItem command
->   audio/player: Add implementation of MediaItem.Play
->   audio/AVRCP: Add support for AddToNowPlaying command
->   audio/player: Add implementation of MediaItem.AddToNowPlaying
->   audio/AVRCP: Add support for Search command
->   audio/player: Add implementation of MediaFolder.Search
->   audio/player: Create item on media_player_set_playlist_item
->
->  profiles/audio/avrcp.c  | 488 ++++++++++++++++++++++++++++-
->  profiles/audio/player.c | 804 ++++++++++++++++++++++++++++++++++++++++--------
->  profiles/audio/player.h |  35 ++-
->  3 files changed, 1187 insertions(+), 140 deletions(-)
->
-> --
-> 1.8.1.4
+The function obc_session_mkdir needs to use file_op_complete as
+callback.
 
-This patch-set has been applied.
+  0  0x00007ffff72f7553 in ?? () from /usr/lib/libdbus-1.so.3
+  1  0x00007ffff72f7dff in ?? () from /usr/lib/libdbus-1.so.3
+  2  0x00007ffff72fef9a in dbus_message_get_sender ()
+     from /usr/lib/libdbus-1.so.3
+  3  0x00007ffff72feff9 in dbus_message_new_method_return ()
+     from /usr/lib/libdbus-1.so.3
+  4  0x000000000043c93f in async_cb (session=0x6a9d30, transfer=0x0,
+       err=0x0,
+     user_data=0x675660) at obexd/client/ftp.c:65
+  5  0x0000000000438c7c in async_cb (obex=0x6aa980, err=0x0,
+       rsp=0x67a690,
+     user_data=0x67ced0) at obexd/client/session.c:1035
+  6  0x000000000041cbcc in handle_response (obex=0x6aa980, err=0x0,
+     rsp=0x67a690) at gobex/gobex.c:949
+  7  0x000000000041d49f in incoming_data (io=0x67d0f0, cond=G_IO_IN,
+     user_data=0x6aa980) at gobex/gobex.c:1192
+  8  0x00007ffff702de46 in g_main_context_dispatch ()
+     from /usr/lib/libglib-2.0.so.0
+  9  0x00007ffff702e198 in ?? () from /usr/lib/libglib-2.0.so.0
+  10 0x00007ffff702e59a in g_main_loop_run () from
+       /usr/lib/libglib-2.0.so.0
+  11 0x0000000000430a09 in main (argc=1, argv=0x7fffffffddc8)
+     at obexd/src/main.c:319
+---
+ obexd/client/session.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index 558b9f8..12a4997 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -1100,7 +1100,7 @@ guint obc_session_mkdir(struct obc_session *session, const char *folder,
+ 	data->user_data = user_data;
+ 
+ 	p = pending_request_new(session, session_process_mkdir, NULL,
+-						func, data, file_data_free);
++					file_op_complete, data, file_data_free);
+ 	session_queue(p);
+ 	return p->id;
+ }
+-- 
+1.8.2.3
 
---
-Luiz Augusto von Dentz
