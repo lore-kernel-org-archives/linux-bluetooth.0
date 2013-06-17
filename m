@@ -1,28 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 17 Jun 2013 11:49:30 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [PATCH 1/9] adapter: fix setting of discoverable timeout
-Message-ID: <20130617084930.GA15980@x220>
-References: <1370948187-3702-1-git-send-email-gustavo@padovan.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1370948187-3702-1-git-send-email-gustavo@padovan.org>
+From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 0/6] MAP client: Add notification dispatching
+Date: Mon, 17 Jun 2013 10:35:25 +0200
+Message-Id: <1371458131-2741-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-On Tue, Jun 11, 2013, Gustavo Padovan wrote:
-> The mgmt_cp_set_discoverable struct was getting reset for no reason after
-> we set up the discoverable timeout value.
-> ---
->  src/adapter.c | 3 ---
->  1 file changed, 3 deletions(-)
+Changelog:
+v2:
+  - Implement dispatching in map-event.c
+  - Rename map_acquire_mns to map_register_event_handler
+  - Pass obc_session directly instead of copying address
+--
 
-The first four patches have been applied. For the rest we'll wait until
-after the next BlueZ release. Thanks.
+This patch set completes the two patch sets "Add Message Notification Service
+(MNS) server" and "Read MASInstanceID for the current connection".
 
-Johan
+The notification dispatcher component dispatches event reports that are
+received by the MNS server to the correct MAS client instance.
+
+The message access part of every client instance registers a notification
+handler function. The MNS will call the associated handler for all received
+event reports.
+
+For now, the handler will only print a log message for the received
+notifications. This is the starting point where we can add the necessary
+DBus API parts.
+
+Christian Fetzer (6):
+  obexd: Add function to get the destination from the obc_session
+  obexd: Add MAP notification dispatching
+  build: Add support for building MAP notification dispatcher
+  obexd: Register notification handler in the MAP client
+  obexd: Notify registered notification handlers in MNS
+  obexd: Fix crash when retrieving multiple MAP event reports
+
+ Makefile.obexd           |   1 +
+ obexd/client/map-event.c | 112 +++++++++++++++++++++++++++++++++++++++++++++++
+ obexd/client/map-event.h |  29 ++++++++++++
+ obexd/client/map.c       |  25 +++++++++++
+ obexd/client/mns.c       |  18 ++++----
+ obexd/client/session.c   |   5 +++
+ obexd/client/session.h   |   1 +
+ 7 files changed, 181 insertions(+), 10 deletions(-)
+ create mode 100644 obexd/client/map-event.c
+
+-- 
+1.8.2.3
+
