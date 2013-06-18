@@ -1,35 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 18 Jun 2013 13:29:16 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] core: Fix crash when a duplicated record is found
-Message-ID: <20130618102916.GA15389@x220>
-References: <1371542934-23797-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1371542934-23797-1-git-send-email-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/3] audio/AVRCP: Fix invalid response to RegisterNotification
+Date: Tue, 18 Jun 2013 11:09:53 +0300
+Message-Id: <1371542994-24510-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1371542994-24510-1-git-send-email-luiz.dentz@gmail.com>
+References: <1371542994-24510-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Jun 18, 2013, Luiz Augusto von Dentz wrote:
->  Invalid read of size 8
->     at 0x470101: update_bredr_services (device.c:2784)
->     by 0x470591: browse_cb (device.c:2975)
->     by 0x458B0E: search_completed_cb (sdp-client.c:186)
->     by 0x47C154: sdp_process (sdp.c:4343)
->     by 0x458954: search_process_cb (sdp-client.c:205)
->     by 0x3F31A47A54: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3400.2)
->     by 0x3F31A47D87: ??? (in /usr/lib64/libglib-2.0.so.0.3400.2)
->     by 0x3F31A48181: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3400.2)
->     by 0x40A265: main (main.c:595)
->   Address 0x0 is not stack'd, malloc'd or (recently) free'd
-> ---
->  src/device.c | 65 +++++++++++++++++++++++++++++++++++-------------------------
->  1 file changed, 38 insertions(+), 27 deletions(-)
+The response to RegisterNotification for event settings changed was
+not setting the initial length properly which cause the code to send
+malformed/invalid PDUs.
+---
+ profiles/audio/avrcp.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-Applied. Thanks.
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index f0554fe..f028da9 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -1450,20 +1450,25 @@ static uint8_t avrcp_handle_register_notification(struct avrcp *session,
+ 		len = 1;
+ 		break;
+ 	case AVRCP_EVENT_SETTINGS_CHANGED:
++		len = 1;
+ 		settings = player_list_settings(player);
+ 
+-		pdu->params[++len] = g_list_length(settings);
++		pdu->params[len++] = g_list_length(settings);
+ 		for (; settings; settings = settings->next) {
+ 			const char *key = settings->data;
+-			uint8_t attr = attr_to_val(key);
++			int attr;
+ 			int val;
+ 
++			attr = attr_to_val(key);
++			if (attr < 0)
++				continue;
++
+ 			val = player_get_setting(player, attr);
+ 			if (val < 0)
+ 				continue;
+ 
+-			pdu->params[++len] = attr;
+-			pdu->params[++len] = val;
++			pdu->params[len++] = attr;
++			pdu->params[len++] = val;
+ 		}
+ 
+ 		break;
+-- 
+1.8.1.4
 
-Johan
