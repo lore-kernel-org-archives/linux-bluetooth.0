@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/5] adapter: Remove never used parameter
-Date: Tue, 18 Jun 2013 17:13:45 -0300
-Message-Id: <1371586427-7909-3-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: [PATCH BlueZ 5/5] client: prettify help table
+Date: Tue, 18 Jun 2013 17:13:47 -0300
+Message-Id: <1371586427-7909-5-git-send-email-lucas.demarchi@profusion.mobi>
 In-Reply-To: <1371586427-7909-1-git-send-email-lucas.demarchi@profusion.mobi>
 References: <1371586427-7909-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,80 +11,31 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Lucas De Marchi <lucas.demarchi@intel.com>
 
-adapter_remove_device() is always called with remove_storage set to
-TRUE, so remove it.
+cmd + options have a maximum length of 25. Align the description
+after this value. In order not to reach 80 chars so easily change the
+first \t to 2 spaces, like is done in udev, kmod, systemd, etc.
 ---
- src/adapter.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ client/main.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 9e817f2..17f5508 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1019,8 +1019,7 @@ static void service_auth_cancel(struct service_auth *auth)
- }
+diff --git a/client/main.c b/client/main.c
+index 54af807..db6705f 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -1182,9 +1182,10 @@ static void rl_handler(char *input)
+ 	printf("Available commands:\n");
  
- static void adapter_remove_device(struct btd_adapter *adapter,
--						struct btd_device *dev,
--						gboolean remove_storage)
-+						struct btd_device *dev)
- {
- 	GList *l;
- 
-@@ -1052,7 +1051,7 @@ static void adapter_remove_device(struct btd_adapter *adapter,
- 		service_auth_cancel(auth);
+ 	for (i = 0; cmd_table[i].cmd; i++) {
+-		printf("\t%s %s\t%s\n", cmd_table[i].cmd,
+-						cmd_table[i].arg ? : "    ",
+-						cmd_table[i].desc ? : "");
++		printf("  %s %-*s %s\n", cmd_table[i].cmd,
++					(int)(25 - strlen(cmd_table[i].cmd)),
++					cmd_table[i].arg ? : "",
++					cmd_table[i].desc ? : "");
  	}
  
--	device_remove(dev, remove_storage);
-+	device_remove(dev, TRUE);
- }
- 
- struct btd_device *adapter_get_device(struct btd_adapter *adapter,
-@@ -1514,7 +1513,7 @@ static gboolean remove_temp_devices(gpointer user_data)
- 		next = g_slist_next(l);
- 
- 		if (device_is_temporary(dev))
--			adapter_remove_device(adapter, dev, TRUE);
-+			adapter_remove_device(adapter, dev);
- 	}
- 
- 	return FALSE;
-@@ -2141,7 +2140,7 @@ static DBusMessage *remove_device(DBusConnection *conn,
- 	device_set_temporary(device, TRUE);
- 
- 	if (!device_is_connected(device)) {
--		adapter_remove_device(adapter, device, TRUE);
-+		adapter_remove_device(adapter, device);
- 		return dbus_message_new_method_return(msg);
- 	}
- 
-@@ -4252,7 +4251,7 @@ static void adapter_remove_connection(struct btd_adapter *adapter,
- 		const char *path = device_get_path(device);
- 
- 		DBG("Removing temporary device %s", path);
--		adapter_remove_device(adapter, device, TRUE);
-+		adapter_remove_device(adapter, device);
- 	}
- }
- 
-@@ -5808,7 +5807,7 @@ static void connect_failed_callback(uint16_t index, uint16_t length,
- 	 * when it is temporary. */
- 	if (device && !device_is_bonding(device, NULL)
- 						&& device_is_temporary(device))
--		adapter_remove_device(adapter, device, TRUE);
-+		adapter_remove_device(adapter, device);
- }
- 
- static void unpaired_callback(uint16_t index, uint16_t length,
-@@ -5839,7 +5838,7 @@ static void unpaired_callback(uint16_t index, uint16_t length,
- 	if (device_is_connected(device))
- 		device_request_disconnect(device, NULL);
- 	else
--		adapter_remove_device(adapter, device, TRUE);
-+		adapter_remove_device(adapter, device);
- }
- 
- static void read_info_complete(uint8_t status, uint16_t length,
+ done:
 -- 
 1.8.3.1
 
