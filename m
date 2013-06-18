@@ -1,12 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1371458131-2741-7-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1371458131-2741-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-	<1371458131-2741-7-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Date: Tue, 18 Jun 2013 14:53:37 +0300
-Message-ID: <CABBYNZLFFMNXfK_=YS6S+go+3ABLhFEH+RqL9mBb7HXra8F5Pg@mail.gmail.com>
-Subject: Re: [PATCH v2 6/6] obexd: Fix crash when retrieving multiple MAP
- event reports
+In-Reply-To: <1371471055-25591-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1371471055-25591-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Date: Tue, 18 Jun 2013 14:33:44 +0300
+Message-ID: <CABBYNZJa0Yeoi2X89UxZ9hzCk7kDBTmdYunjTOi9Jcrbozix4g@mail.gmail.com>
+Subject: Re: [PATCH 1/4] obexd: Fix handling error cases in setpath
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -16,73 +14,90 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Christian,
 
-On Mon, Jun 17, 2013 at 11:35 AM, Christian Fetzer
+On Mon, Jun 17, 2013 at 3:10 PM, Christian Fetzer
 <christian.fetzer@oss.bmw-carit.de> wrote:
 > From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 >
-> The remote address used for dispatching the MAP notifications is
-> initialized when the MNS is connected. Therefore it needs to be freed
-> when the session is destroyed and not after receiving an event report.
+> This adds a setpath_op_complete callback, that unpacks the user data and
+> finally calls the user callback. The callback is now used for success and error
+> cases.
 >
-> Trace:
+> The previous implementation was using setpath_complete which did not
+> work for error cases, because it was called with incorrect user data.
+> This was leading to a crash, that can be reproduced by disconnecting PBAP
+> after trying to select a non existing phone book.
 >
->   0  0x00007ffff6a6a1c9 in raise () from /usr/lib/libc.so.6
->   1  0x00007ffff6a6b5c8 in abort () from /usr/lib/libc.so.6
->   2  0x00007ffff6aa8037 in __libc_message () from /usr/lib/libc.so.6
->   3  0x00007ffff6aad8ae in malloc_printerr () from /usr/lib/libc.so.6
->   4  0x00007ffff6aae587 in _int_free () from /usr/lib/libc.so.6
->   5  0x00000000004273b0 in event_report_close (obj=0x69a5b0)
->      at obexd/client/mns.c:295
->   6  0x0000000000429549 in os_reset_session (os=0x69c210)
->      at obexd/src/obex.c:199
->   7  0x000000000041bec6 in transfer_complete (transfer=0x69a9d0, err=0x0)
->      at gobex/gobex-transfer.c:103
->   8  0x000000000041c20c in transfer_put_req (obex=0x69b470,
->      req=<optimized out>, user_data=0x69a9d0) at
->        gobex/gobex-transfer.c:407
->   9  0x000000000041988d in handle_request (req=0x69f3d0, obex=0x69b470)
->      at gobex/gobex.c:1022
->   10 incoming_data (io=<optimized out>, cond=<optimized out>,
->      user_data=0x69b470) at gobex/gobex.c:1194
->   11 0x00007ffff702de46 in g_main_context_dispatch ()
+>   0  setpath_complete (session=0x66bd90, transfer=0x0, err=0x69b370,
+>      user_data=0x69a810) at obexd/client/session.c:912
+>   1  0x000000000042d100 in obc_session_shutdown (session=0x66bd90)
+>      at obexd/client/session.c:537
+>   2  0x000000000040f227 in service_filter (connection=0x664b20,
+>      message=<optimized out>, user_data=0x66bed0) at gdbus/watch.c:486
+>   3  0x000000000040f49b in message_filter (connection=0x664b20,
+>      message=0x66ba30, user_data=<optimized out>) at gdbus/watch.c:554
+>   4  0x00007ffff72f40a6 in dbus_connection_dispatch ()
+>      from /usr/lib/libdbus-1.so.3
+>   5  0x000000000040e148 in message_dispatch (data=0x664b20)
+>      at gdbus/mainloop.c:76
+>   6  0x00007ffff702e9a3 in ?? () from /usr/lib/libglib-2.0.so.0
+>   7  0x00007ffff702de46 in g_main_context_dispatch ()
 >      from /usr/lib/libglib-2.0.so.0
->   12 0x00007ffff702e198 in ?? () from /usr/lib/libglib-2.0.so.0
->   13 0x00007ffff702e59a in g_main_loop_run () from
->        /usr/lib/libglib-2.0.so.0
->   14 0x000000000040dead in main (argc=1, argv=0x7fffffffddc8)
+>   8  0x00007ffff702e198 in ?? () from /usr/lib/libglib-2.0.so.0
+>   9  0x00007ffff702e59a in g_main_loop_run () from
+>      /usr/lib/libglib-2.0.so.0
+>   10 0x000000000040dd72 in main (argc=1, argv=0x7fffffffddc8)
 >      at obexd/src/main.c:319
 > ---
->  obexd/client/mns.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  obexd/client/session.c | 17 +++++++++++++----
+>  1 file changed, 13 insertions(+), 4 deletions(-)
 >
-> diff --git a/obexd/client/mns.c b/obexd/client/mns.c
-> index 3d64a9c..d22ec96 100644
-> --- a/obexd/client/mns.c
-> +++ b/obexd/client/mns.c
-> @@ -83,14 +83,15 @@ static void reset_request(struct mns_session *mns)
->                 g_obex_apparam_free(mns->inparams);
->                 mns->inparams = NULL;
->         }
-> -
-> -       if (mns->remote_address)
-> -               g_free(mns->remote_address);
->  }
->
->  static void mns_session_free(struct mns_session *mns)
+> diff --git a/obexd/client/session.c b/obexd/client/session.c
+> index f1915db..eda3412 100644
+> --- a/obexd/client/session.c
+> +++ b/obexd/client/session.c
+> @@ -907,10 +907,9 @@ static void setpath_complete(struct obc_session *session,
+>                                                 GError *err, void *user_data)
 >  {
->         reset_request(mns);
-> +
-> +       if (mns->remote_address)
-> +               g_free(mns->remote_address);
-> +
->         g_free(mns);
+>         struct pending_request *p = user_data;
+> -       struct setpath_data *data = p->data;
+>
+> -       if (data->func)
+> -               data->func(session, NULL, err, data->user_data);
+> +       if (p->func)
+> +               p->func(session, NULL, err, p->data);
+>
+>         if (session->p == p)
+>                 session->p = NULL;
+> @@ -920,6 +919,16 @@ static void setpath_complete(struct obc_session *session,
+>         session_process_queue(session);
 >  }
 >
+> +static void setpath_op_complete(struct obc_session *session,
+> +                                               struct obc_transfer *transfer,
+> +                                               GError *err, void *user_data)
+> +{
+> +       struct setpath_data *data = user_data;
+> +
+> +       if (data->func)
+> +               data->func(session, NULL, err, data->user_data);
+> +}
+> +
+>  static void setpath_cb(GObex *obex, GError *err, GObexPacket *rsp,
+>                                                         gpointer user_data)
+>  {
+> @@ -1005,7 +1014,7 @@ guint obc_session_setpath(struct obc_session *session, const char *path,
+>         data->remaining = g_strsplit(strlen(path) ? path : "/", "/", 0);
+>
+>         p = pending_request_new(session, session_process_setpath, NULL,
+> -                               setpath_complete, data, setpath_data_free);
+> +                               setpath_op_complete, data, setpath_data_free);
+>         session_queue(p);
+>         return p->id;
+>  }
 > --
 > 1.8.2.3
 
-This patch has been applied, the rest of the set I will review latter
-as we are preparing a new release.
+Pushed, thanks.
 
 
 --
