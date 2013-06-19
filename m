@@ -1,54 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 19 Jun 2013 12:56:30 +0300
+Date: Wed, 19 Jun 2013 12:08:50 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bruna Moreira <bruna.moreira@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: Re: [RFC BlueZ 05/35] emulator: Search virtual devices in LE
- advertising mode
-Message-ID: <20130619095630.GA6370@x220>
-References: <1371041841-21793-1-git-send-email-bruna.moreira@openbossa.org>
- <1371041841-21793-6-git-send-email-bruna.moreira@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 4/5] client: Display command even with no
+ description
+Message-ID: <20130619090850.GA4161@x220>
+References: <1371586427-7909-1-git-send-email-lucas.demarchi@profusion.mobi>
+ <1371586427-7909-4-git-send-email-lucas.demarchi@profusion.mobi>
+ <22954997-7A12-45B3-BA58-13F02AFE3184@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1371041841-21793-6-git-send-email-bruna.moreira@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <22954997-7A12-45B3-BA58-13F02AFE3184@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel, Lucas,
 
-On Wed, Jun 12, 2013, Bruna Moreira wrote:
-> From: Jefferson Delfes <jefferson.delfes@openbossa.org>
+On Wed, Jun 19, 2013, Marcel Holtmann wrote:
+> Hi Lucas,
 > 
-> After LE scan is enabled, the emulator search virtual devices that are
-> in advertising mode, in order to copy adv data.
-> ---
->  emulator/btdev.c |   15 +++++++++++++++
->  1 file changed, 15 insertions(+)
+> > Having no description doesn't mean it's not an available command. So add
+> > command to the output of "help" command, even if it has no description.
+> > ---
+> > client/main.c | 5 ++---
+> > 1 file changed, 2 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/client/main.c b/client/main.c
+> > index b0a66d8..54af807 100644
+> > --- a/client/main.c
+> > +++ b/client/main.c
+> > @@ -1182,10 +1182,9 @@ static void rl_handler(char *input)
+> > 	printf("Available commands:\n");
+> > 
+> > 	for (i = 0; cmd_table[i].cmd; i++) {
+> > -		if (cmd_table[i].desc)
+> > -			printf("\t%s %s\t%s\n", cmd_table[i].cmd,
+> > +		printf("\t%s %s\t%s\n", cmd_table[i].cmd,
+> > 						cmd_table[i].arg ? : "    ",
+> > -						cmd_table[i].desc);
+> > +						cmd_table[i].desc ? : "");
 > 
-> diff --git a/emulator/btdev.c b/emulator/btdev.c
-> index a7af6b3..160e5bf 100644
-> --- a/emulator/btdev.c
-> +++ b/emulator/btdev.c
-> @@ -876,6 +876,19 @@ static void remote_version_complete(struct btdev *btdev, uint16_t handle)
->  							&rvc, sizeof(rvc));
->  }
->  
-> +static void le_set_scan_enable_complete(struct btdev *btdev)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
-> +		if (!btdev_list[i] || btdev_list[i] == btdev)
-> +			continue;
-> +
-> +		if (!btdev_list[i]->le_adv_enable)
-> +			continue;
-> +	}
-> +}
+> 
+> if I remember this correctly, then I was doing it to be able to hide
+> commands from the help output. Mainly commands that are on purpose
+> duplicates.
 
-What's the purpose of this function? It doesn't seem to do anything but
-iterate through the btdev list. Should it be merged with some later
-patch (which actually does something useful)?
+So the right fix is to add the missing descriptions then? Lucas, can you
+provide an updated patch that does this?
 
 Johan
