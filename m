@@ -1,74 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] core: Add mode option to external profile default configuration
-Date: Thu, 20 Jun 2013 13:50:47 +0300
-Message-Id: <1371725447-5581-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 20 Jun 2013 12:13:38 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Alex Deymo <deymo@chromium.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	keybuk <keybuk@chromium.org>
+Subject: Re: [BUG] HCI_RESET and Num_HCI_Command_Packets limit
+Message-ID: <20130620091331.GA3317@aemeltch-MOBL1>
+References: <CAGd9gwhd4DuEw_jHJAZF99YwNT==-s9yW6KEkZ_A2w+eeFy88w@mail.gmail.com>
+ <6D8CE567-F4C5-42BE-8E0E-5D558E9C439D@holtmann.org>
+ <CAGd9gwjLr8vhqXNW0ALBsfpjZ+Rnt0bhif1sHDExqT7Syc4NFA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAGd9gwjLr8vhqXNW0ALBsfpjZ+Rnt0bhif1sHDExqT7Syc4NFA@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Alex,
 
-Some external profiles, FTP and OPP, require a different L2CAP mode such
-as ERTM to interoperate properly.
----
- src/profile.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+On Wed, Jun 19, 2013 at 08:18:09PM -0700, Alex Deymo wrote:
+> Hi Marcel,
+> 
+> On Wed, Jun 19, 2013 at 6:04 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> > Hi Alex,
+> >
+> >> I'm experiencing a problem that wedges the bluetooth adapter from time
+> >> to time. The repro case can be hit with this scenario:
+> >>
+> >> run bluetoothd
+> >> while hciconfig hci0 up && hciconfig hci0 down; do echo -n .; done
+> >>
+> >> In few iterations you will have a timeout while trying to bring up the
+> >> interface. This is just a repro case, the real scenario just happens
+> >> from time to time if you for instance restart bluetoothd at the right
+> >> (or wrong!) moment.
+> >
+> > can you give us at least a few details on the kernel you are running and what hardware this is?
+> 
+> I'm running kernel 3.8.11 on a x86_64 and BlueZ 5.4. The hardware is a
+> chromebook (I saw it with different hardware and I can also repro it
+> on my ubuntu) that uses the ath9k and ath3k drivers for the wifi/bt
+> chip (MD222)
+> 
+> > If you do not use hciconfig and instead use btmgmt or bluetoothctl, do you see the same issue?
+> 
+> Using btmgmt I see the same issue with a very similar hcidump (just
+> the timing is different).
+> while btmgmt power on && btmgmt power off; do echo -n; done
+> btmgmt power on after about 4 iterations is blocked and never returns.
+> 
+> Using the dbus interface to the running bluetoothd apparently doesn't
+> hit the problem (ran fine for a few hundred times)
+> while dbus-send --system --print-reply --dest=org.bluez
+> /org/bluez/hci0 org.freedesktop.DBus.Properties.Set
+> string:org.bluez.Adapter1 string:Powered variant:boolean:true &&
+> dbus-send --system --print-reply --dest=org.bluez /org/bluez/hci0
+> org.freedesktop.DBus.Properties.Set string:org.bluez.Adapter1
+> string:Powered variant:boolean:false; do echo -n; done
 
-diff --git a/src/profile.c b/src/profile.c
-index 9f98d65..52ef775 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -562,6 +562,7 @@ struct ext_profile {
- 
- 	guint id;
- 
-+	BtIOMode mode;
- 	BtIOSecLevel sec_level;
- 	bool authorize;
- 
-@@ -1260,6 +1261,7 @@ static uint32_t ext_start_servers(struct ext_profile *ext,
- 		io = bt_io_listen(connect, confirm, l2cap, NULL, &err,
- 					BT_IO_OPT_SOURCE_BDADDR,
- 					adapter_get_address(adapter),
-+					BT_IO_OPT_MODE, ext->mode,
- 					BT_IO_OPT_PSM, psm,
- 					BT_IO_OPT_SEC_LEVEL, ext->sec_level,
- 					BT_IO_OPT_INVALID);
-@@ -1891,6 +1893,7 @@ static struct default_settings {
- 	const char	*remote_uuid;
- 	int		channel;
- 	int		psm;
-+	BtIOMode	mode;
- 	BtIOSecLevel	sec_level;
- 	bool		authorize;
- 	bool		auto_connect;
-@@ -1942,6 +1945,7 @@ static struct default_settings {
- 		.name		= "Object Push",
- 		.channel	= OPP_DEFAULT_CHANNEL,
- 		.psm		= BTD_PROFILE_PSM_AUTO,
-+		.mode		= BT_IO_MODE_ERTM,
- 		.sec_level	= BT_IO_SEC_LOW,
- 		.authorize	= false,
- 		.get_record	= get_opp_record,
-@@ -1951,6 +1955,7 @@ static struct default_settings {
- 		.name		= "File Transfer",
- 		.channel	= FTP_DEFAULT_CHANNEL,
- 		.psm		= BTD_PROFILE_PSM_AUTO,
-+		.mode		= BT_IO_MODE_ERTM,
- 		.get_record	= get_ftp_record,
- 		.version	= 0x0102,
- 	}, {
-@@ -2020,6 +2025,9 @@ static void ext_set_defaults(struct ext_profile *ext)
- 		if (settings->sec_level)
- 			ext->sec_level = settings->sec_level;
- 
-+		if (settings->mode)
-+			ext->mode = settings->mode;
-+
- 		if (settings->auto_connect)
- 			ext->p.auto_connect = true;
- 
--- 
-1.8.1.4
+The D-Bus interface is very slow so you never face race condition.
 
+Best regards 
+Andrei Emeltchenko 
