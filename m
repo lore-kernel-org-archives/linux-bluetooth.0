@@ -1,47 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20130619095630.GA6370@x220>
-References: <1371041841-21793-1-git-send-email-bruna.moreira@openbossa.org>
-	<1371041841-21793-6-git-send-email-bruna.moreira@openbossa.org>
-	<20130619095630.GA6370@x220>
-Date: Thu, 20 Jun 2013 07:49:18 -0400
-Message-ID: <CA+=zyVFMOB9VQaxa67fs_V6PQjUseZrz2weo5qsbBaDa5UaE1A@mail.gmail.com>
-Subject: Re: [RFC BlueZ 05/35] emulator: Search virtual devices in LE
- advertising mode
-From: Bruna Moreira <bruna.moreira@openbossa.org>
-To: Bruna Moreira <bruna.moreira@openbossa.org>,
-	linux-bluetooth@vger.kernel.org,
-	Jefferson Delfes <jefferson.delfes@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] core: Add mode option to external profile default configuration
+Date: Thu, 20 Jun 2013 13:50:47 +0300
+Message-Id: <1371725447-5581-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
->> +static void le_set_scan_enable_complete(struct btdev *btdev)
->> +{
->> +     int i;
->> +
->> +     for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
->> +             if (!btdev_list[i] || btdev_list[i] == btdev)
->> +                     continue;
->> +
->> +             if (!btdev_list[i]->le_adv_enable)
->> +                     continue;
->> +     }
->> +}
->
-> What's the purpose of this function? It doesn't seem to do anything but
-> iterate through the btdev list. Should it be merged with some later
-> patch (which actually does something useful)?
->
-> Johan
+Some external profiles, FTP and OPP, require a different L2CAP mode such
+as ERTM to interoperate properly.
+---
+ src/profile.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Yes, this function is used in a later patch "emulator: Implement LE
-advertising report". I will merge it.
-
-BR,
+diff --git a/src/profile.c b/src/profile.c
+index 9f98d65..52ef775 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -562,6 +562,7 @@ struct ext_profile {
+ 
+ 	guint id;
+ 
++	BtIOMode mode;
+ 	BtIOSecLevel sec_level;
+ 	bool authorize;
+ 
+@@ -1260,6 +1261,7 @@ static uint32_t ext_start_servers(struct ext_profile *ext,
+ 		io = bt_io_listen(connect, confirm, l2cap, NULL, &err,
+ 					BT_IO_OPT_SOURCE_BDADDR,
+ 					adapter_get_address(adapter),
++					BT_IO_OPT_MODE, ext->mode,
+ 					BT_IO_OPT_PSM, psm,
+ 					BT_IO_OPT_SEC_LEVEL, ext->sec_level,
+ 					BT_IO_OPT_INVALID);
+@@ -1891,6 +1893,7 @@ static struct default_settings {
+ 	const char	*remote_uuid;
+ 	int		channel;
+ 	int		psm;
++	BtIOMode	mode;
+ 	BtIOSecLevel	sec_level;
+ 	bool		authorize;
+ 	bool		auto_connect;
+@@ -1942,6 +1945,7 @@ static struct default_settings {
+ 		.name		= "Object Push",
+ 		.channel	= OPP_DEFAULT_CHANNEL,
+ 		.psm		= BTD_PROFILE_PSM_AUTO,
++		.mode		= BT_IO_MODE_ERTM,
+ 		.sec_level	= BT_IO_SEC_LOW,
+ 		.authorize	= false,
+ 		.get_record	= get_opp_record,
+@@ -1951,6 +1955,7 @@ static struct default_settings {
+ 		.name		= "File Transfer",
+ 		.channel	= FTP_DEFAULT_CHANNEL,
+ 		.psm		= BTD_PROFILE_PSM_AUTO,
++		.mode		= BT_IO_MODE_ERTM,
+ 		.get_record	= get_ftp_record,
+ 		.version	= 0x0102,
+ 	}, {
+@@ -2020,6 +2025,9 @@ static void ext_set_defaults(struct ext_profile *ext)
+ 		if (settings->sec_level)
+ 			ext->sec_level = settings->sec_level;
+ 
++		if (settings->mode)
++			ext->mode = settings->mode;
++
+ 		if (settings->auto_connect)
+ 			ext->p.auto_connect = true;
+ 
 -- 
-Bruna Moreira
-Instituto Nokia de Tecnologia (INdT)
-Manaus - Brazil
+1.8.1.4
+
