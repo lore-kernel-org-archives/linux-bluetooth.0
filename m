@@ -1,12 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20130619095717.GB6370@x220>
+In-Reply-To: <20130619095630.GA6370@x220>
 References: <1371041841-21793-1-git-send-email-bruna.moreira@openbossa.org>
-	<1371041841-21793-7-git-send-email-bruna.moreira@openbossa.org>
-	<20130619095717.GB6370@x220>
-Date: Thu, 20 Jun 2013 07:52:19 -0400
-Message-ID: <CA+=zyVF6ybLdyt-gr4jZOiRjD-ash1CadsroY1sy_66+63si1Q@mail.gmail.com>
-Subject: Re: [RFC BlueZ 06/35] emulator: Search virtual devices in LE scan mode
+	<1371041841-21793-6-git-send-email-bruna.moreira@openbossa.org>
+	<20130619095630.GA6370@x220>
+Date: Thu, 20 Jun 2013 07:49:18 -0400
+Message-ID: <CA+=zyVFMOB9VQaxa67fs_V6PQjUseZrz2weo5qsbBaDa5UaE1A@mail.gmail.com>
+Subject: Re: [RFC BlueZ 05/35] emulator: Search virtual devices in LE
+ advertising mode
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: Bruna Moreira <bruna.moreira@openbossa.org>,
 	linux-bluetooth@vger.kernel.org,
@@ -15,10 +16,9 @@ Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi,
 
-On Wed, Jun 19, 2013 at 5:57 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
->> +static void le_set_adv_enable_complete(struct btdev *btdev)
+>> +static void le_set_scan_enable_complete(struct btdev *btdev)
 >> +{
 >> +     int i;
 >> +
@@ -26,16 +26,19 @@ On Wed, Jun 19, 2013 at 5:57 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
 >> +             if (!btdev_list[i] || btdev_list[i] == btdev)
 >> +                     continue;
 >> +
->> +             if (!btdev_list[i]->le_scan_enable)
+>> +             if (!btdev_list[i]->le_adv_enable)
 >> +                     continue;
 >> +     }
 >> +}
 >
-> Same thing as with my earlier comment. This function doesn't seem to do
-> anything useful and should probably be merged with some later patch that
-> actually does something (assuming such a patch exists).
+> What's the purpose of this function? It doesn't seem to do anything but
+> iterate through the btdev list. Should it be merged with some later
+> patch (which actually does something useful)?
+>
+> Johan
 
-Same here. This function is used in a later patch. I will merge it too.
+Yes, this function is used in a later patch "emulator: Implement LE
+advertising report". I will merge it.
 
 BR,
 -- 
