@@ -1,55 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <6D8CE567-F4C5-42BE-8E0E-5D558E9C439D@holtmann.org>
-References: <CAGd9gwhd4DuEw_jHJAZF99YwNT==-s9yW6KEkZ_A2w+eeFy88w@mail.gmail.com>
- <6D8CE567-F4C5-42BE-8E0E-5D558E9C439D@holtmann.org>
-From: Alex Deymo <deymo@chromium.org>
-Date: Wed, 19 Jun 2013 20:18:09 -0700
-Message-ID: <CAGd9gwjLr8vhqXNW0ALBsfpjZ+Rnt0bhif1sHDExqT7Syc4NFA@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
 Subject: Re: [BUG] HCI_RESET and Num_HCI_Command_Packets limit
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>, keybuk <keybuk@chromium.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAGd9gwhd4DuEw_jHJAZF99YwNT==-s9yW6KEkZ_A2w+eeFy88w@mail.gmail.com>
+Date: Wed, 19 Jun 2013 21:04:16 -0400
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	keybuk <keybuk@chromium.org>
+Message-Id: <6D8CE567-F4C5-42BE-8E0E-5D558E9C439D@holtmann.org>
+References: <CAGd9gwhd4DuEw_jHJAZF99YwNT==-s9yW6KEkZ_A2w+eeFy88w@mail.gmail.com>
+To: Alex Deymo <deymo@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Alex,
 
-On Wed, Jun 19, 2013 at 6:04 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Alex,
->
->> I'm experiencing a problem that wedges the bluetooth adapter from time
->> to time. The repro case can be hit with this scenario:
->>
->> run bluetoothd
->> while hciconfig hci0 up && hciconfig hci0 down; do echo -n .; done
->>
->> In few iterations you will have a timeout while trying to bring up the
->> interface. This is just a repro case, the real scenario just happens
->> from time to time if you for instance restart bluetoothd at the right
->> (or wrong!) moment.
->
-> can you give us at least a few details on the kernel you are running and what hardware this is?
+> I'm experiencing a problem that wedges the bluetooth adapter from time
+> to time. The repro case can be hit with this scenario:
+> 
+> run bluetoothd
+> while hciconfig hci0 up && hciconfig hci0 down; do echo -n .; done
+> 
+> In few iterations you will have a timeout while trying to bring up the
+> interface. This is just a repro case, the real scenario just happens
+> from time to time if you for instance restart bluetoothd at the right
+> (or wrong!) moment.
 
-I'm running kernel 3.8.11 on a x86_64 and BlueZ 5.4. The hardware is a
-chromebook (I saw it with different hardware and I can also repro it
-on my ubuntu) that uses the ath9k and ath3k drivers for the wifi/bt
-chip (MD222)
+can you give us at least a few details on the kernel you are running and what hardware this is?
 
-> If you do not use hciconfig and instead use btmgmt or bluetoothctl, do you see the same issue?
+If you do not use hciconfig and instead use btmgmt or bluetoothctl, do you see the same issue?
 
-Using btmgmt I see the same issue with a very similar hcidump (just
-the timing is different).
-while btmgmt power on && btmgmt power off; do echo -n; done
-btmgmt power on after about 4 iterations is blocked and never returns.
+Regards
 
-Using the dbus interface to the running bluetoothd apparently doesn't
-hit the problem (ran fine for a few hundred times)
-while dbus-send --system --print-reply --dest=org.bluez
-/org/bluez/hci0 org.freedesktop.DBus.Properties.Set
-string:org.bluez.Adapter1 string:Powered variant:boolean:true &&
-dbus-send --system --print-reply --dest=org.bluez /org/bluez/hci0
-org.freedesktop.DBus.Properties.Set string:org.bluez.Adapter1
-string:Powered variant:boolean:false; do echo -n; done
+Marcel
 
-Regards,
-Alex.
