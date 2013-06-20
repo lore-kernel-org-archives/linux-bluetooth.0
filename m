@@ -1,63 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 20 Jun 2013 12:13:38 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Alex Deymo <deymo@chromium.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	keybuk <keybuk@chromium.org>
-Subject: Re: [BUG] HCI_RESET and Num_HCI_Command_Packets limit
-Message-ID: <20130620091331.GA3317@aemeltch-MOBL1>
-References: <CAGd9gwhd4DuEw_jHJAZF99YwNT==-s9yW6KEkZ_A2w+eeFy88w@mail.gmail.com>
- <6D8CE567-F4C5-42BE-8E0E-5D558E9C439D@holtmann.org>
- <CAGd9gwjLr8vhqXNW0ALBsfpjZ+Rnt0bhif1sHDExqT7Syc4NFA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAGd9gwjLr8vhqXNW0ALBsfpjZ+Rnt0bhif1sHDExqT7Syc4NFA@mail.gmail.com>
+Sender: AceLan Kao <acelan@gmail.com>
+From: AceLan Kao <acelan.kao@canonical.com>
+To: linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Subject: [PATCH] Bluetooth: Add support for Atheros [0cf3:e003]
+Date: Thu, 20 Jun 2013 13:38:45 +0800
+Message-Id: <1371706725-2581-1-git-send-email-acelan.kao@canonical.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Add support for the AR9462 chip
 
-On Wed, Jun 19, 2013 at 08:18:09PM -0700, Alex Deymo wrote:
-> Hi Marcel,
-> 
-> On Wed, Jun 19, 2013 at 6:04 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> > Hi Alex,
-> >
-> >> I'm experiencing a problem that wedges the bluetooth adapter from time
-> >> to time. The repro case can be hit with this scenario:
-> >>
-> >> run bluetoothd
-> >> while hciconfig hci0 up && hciconfig hci0 down; do echo -n .; done
-> >>
-> >> In few iterations you will have a timeout while trying to bring up the
-> >> interface. This is just a repro case, the real scenario just happens
-> >> from time to time if you for instance restart bluetoothd at the right
-> >> (or wrong!) moment.
-> >
-> > can you give us at least a few details on the kernel you are running and what hardware this is?
-> 
-> I'm running kernel 3.8.11 on a x86_64 and BlueZ 5.4. The hardware is a
-> chromebook (I saw it with different hardware and I can also repro it
-> on my ubuntu) that uses the ath9k and ath3k drivers for the wifi/bt
-> chip (MD222)
-> 
-> > If you do not use hciconfig and instead use btmgmt or bluetoothctl, do you see the same issue?
-> 
-> Using btmgmt I see the same issue with a very similar hcidump (just
-> the timing is different).
-> while btmgmt power on && btmgmt power off; do echo -n; done
-> btmgmt power on after about 4 iterations is blocked and never returns.
-> 
-> Using the dbus interface to the running bluetoothd apparently doesn't
-> hit the problem (ran fine for a few hundred times)
-> while dbus-send --system --print-reply --dest=org.bluez
-> /org/bluez/hci0 org.freedesktop.DBus.Properties.Set
-> string:org.bluez.Adapter1 string:Powered variant:boolean:true &&
-> dbus-send --system --print-reply --dest=org.bluez /org/bluez/hci0
-> org.freedesktop.DBus.Properties.Set string:org.bluez.Adapter1
-> string:Powered variant:boolean:false; do echo -n; done
+T:  Bus=02 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#=  4 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0cf3 ProdID=e003 Rev=00.02
+C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-The D-Bus interface is very slow so you never face race condition.
+Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+---
+ drivers/bluetooth/ath3k.c | 2 ++
+ drivers/bluetooth/btusb.c | 1 +
+ 2 files changed, 3 insertions(+)
 
-Best regards 
-Andrei Emeltchenko 
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 11f467c..ae61b35 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -91,6 +91,7 @@ static struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe04e) },
+ 	{ USB_DEVICE(0x0489, 0xe056) },
+ 	{ USB_DEVICE(0x0489, 0xe04d) },
++	{ USB_DEVICE(0x0cf3, 0xe003) },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE02C) },
+@@ -128,6 +129,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+ 	{ USB_DEVICE(0x0489, 0xe04e), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe056), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe04d), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0xe003), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU22 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE03C), .driver_info = BTUSB_ATH3012 },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 7a7e5f8..1f63170 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -151,6 +151,7 @@ static struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe04e), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe056), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe04d), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0xe003), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+-- 
+1.8.1.2
