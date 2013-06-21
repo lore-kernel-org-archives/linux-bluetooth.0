@@ -1,172 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 1/5] build-sys: Don't build gdbus several times
-Date: Fri, 21 Jun 2013 11:17:31 -0300
-Message-Id: <1371824255-3071-1-git-send-email-lucas.demarchi@profusion.mobi>
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
+Subject: Re: [BUG] HCI_RESET and Num_HCI_Command_Packets limit
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAGd9gwjHXfcG6uaZYmoV2y+ymCX4PzCvuvA1mwT00wOExkwXmg@mail.gmail.com>
+Date: Fri, 21 Jun 2013 09:22:17 -0400
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	keybuk <keybuk@chromium.org>
+Message-Id: <8D8512CF-7924-48A3-9B8E-78145262DA99@holtmann.org>
+References: <CAGd9gwhd4DuEw_jHJAZF99YwNT==-s9yW6KEkZ_A2w+eeFy88w@mail.gmail.com> <6D8CE567-F4C5-42BE-8E0E-5D558E9C439D@holtmann.org> <CAGd9gwjLr8vhqXNW0ALBsfpjZ+Rnt0bhif1sHDExqT7Syc4NFA@mail.gmail.com> <38279439-FECC-452A-9514-A431580DFA7C@holtmann.org> <CAGd9gwjHXfcG6uaZYmoV2y+ymCX4PzCvuvA1mwT00wOExkwXmg@mail.gmail.com>
+To: Alex Deymo <deymo@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We are currently compiling gdbus 3 times: one for tests, one for
-bluetoothd and another for obexd.
+Hi Alex,
 
-$ ls gdbus/*watch.o
-gdbus/bluetoothd-watch.o  gdbus/obexd-watch.o  gdbus/watch.o
+>>> I'm running kernel 3.8.11 on a x86_64 and BlueZ 5.4. The hardware is a
+>>> chromebook (I saw it with different hardware and I can also repro it
+>>> on my ubuntu) that uses the ath9k and ath3k drivers for the wifi/bt
+>>> chip (MD222)
+>> 
+>> I do not have a Chromebook or actually looked into what Bluetooth chip it uses. Is that one also an ath3k one? Hope the hardware does not have a bug here. It is on USB, right?
+> 
+> Is an ath3k, and bluetooth is conected to the usb.
+> 
+>> Can you reproduce this with a off the shelf CSR or Broadcom chip. Maybe I should send you some of the Intel chips so you can test on our silicon as well ;)
+> 
+> I just tried it again on my desktop with a Broadcom usb 0a5c:21e8 (I
+> think that one is a BCM20702) and I was able to reproduce it with
+> btmgmt as well (bluez compiled from tip of tree). It took more
+> iterations (about 50) but eventually the repro case works (in a
+> different point, see the btmon traces below). I have a bunch of
+> different Broadcom, Atheros and CSR usb bluetooth adapters here, but
+> none from Intel ;)
 
-Instead of prepending $(gdbus_sources) to several _SOURCES variable, use
-a convenience library.
----
- Makefile.am    | 16 +++++++++++-----
- Makefile.obexd |  4 ++--
- Makefile.tools | 25 ++++++++++++-------------
- 3 files changed, 25 insertions(+), 20 deletions(-)
+let me see if we have some final production chips for you. I looked at my stack and it only has pre-production units in there. I rather not send these around.
 
-diff --git a/Makefile.am b/Makefile.am
-index 80edafd..82efba2 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -112,6 +112,11 @@ builtin_nodist =
- 
- include Makefile.plugins
- 
-+noinst_LTLIBRARIES += gdbus/libgdbus.la
-+gdbus_libgdbus_la_SOURCES = $(gdbus_sources)
-+gdbus_libgdbus_la_LDFLAGS = $(AM_LDFLAGS) @DBUS_LIBS@ @GLIB_LIBS@
-+gdbus_libgdbus_la_CFLAGS = $(AM_CFLAGS) @DBUS_CFLAGS@ @GLIB_CFLAGS@
-+
- if MAINTAINER_MODE
- plugin_LTLIBRARIES += plugins/external-dummy.la
- plugins_external_dummy_la_SOURCES = plugins/external-dummy.c
-@@ -122,7 +127,7 @@ endif
- 
- libexec_PROGRAMS += src/bluetoothd
- 
--src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
-+src_bluetoothd_SOURCES = $(builtin_sources) \
- 			$(attrib_sources) $(btio_sources) \
- 			src/bluetooth.ver \
- 			src/main.c src/log.h src/log.c \
-@@ -148,8 +153,9 @@ src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
- 			src/eir.h src/eir.c \
- 			src/shared/util.h src/shared/util.c \
- 			src/shared/mgmt.h src/shared/mgmt.c
--src_bluetoothd_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@ @DBUS_LIBS@ \
--								-ldl -lrt
-+src_bluetoothd_LDADD = lib/libbluetooth-private.la gdbus/libgdbus.la \
-+			@GLIB_LIBS@ @DBUS_LIBS@ \
-+			-ldl -lrt
- src_bluetoothd_LDFLAGS = $(AM_LDFLAGS) -Wl,--export-dynamic \
- 				-Wl,--version-script=$(srcdir)/src/bluetooth.ver
- 
-@@ -245,8 +251,8 @@ unit_test_sdp_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@
- 
- unit_tests += unit/test-gdbus-client
- 
--unit_test_gdbus_client_SOURCES = $(gdbus_sources) unit/test-gdbus-client.c
--unit_test_gdbus_client_LDADD = @GLIB_LIBS@ @DBUS_LIBS@
-+unit_test_gdbus_client_SOURCES = unit/test-gdbus-client.c
-+unit_test_gdbus_client_LDADD = gdbus/libgdbus.la @GLIB_LIBS@ @DBUS_LIBS@
- 
- unit_tests += unit/test-gobex-header unit/test-gobex-packet unit/test-gobex \
- 			unit/test-gobex-transfer unit/test-gobex-apparam
-diff --git a/Makefile.obexd b/Makefile.obexd
-index 5824e0a..37aa2d9 100644
---- a/Makefile.obexd
-+++ b/Makefile.obexd
-@@ -54,7 +54,7 @@ obexd_builtin_sources += obexd/client/mns.c obexd/src/map_ap.h \
- 
- libexec_PROGRAMS += obexd/src/obexd
- 
--obexd_src_obexd_SOURCES = $(gdbus_sources) $(btio_sources) $(gobex_sources) \
-+obexd_src_obexd_SOURCES = $(btio_sources) $(gobex_sources) \
- 			$(obexd_builtin_sources) \
- 			obexd/src/main.c obexd/src/obexd.h \
- 			obexd/src/plugin.h obexd/src/plugin.c \
-@@ -78,7 +78,7 @@ obexd_src_obexd_SOURCES = $(gdbus_sources) $(btio_sources) $(gobex_sources) \
- 			obexd/client/dbus.h obexd/client/dbus.c \
- 			obexd/client/driver.h obexd/client/driver.c \
- 			obexd/src/map_ap.h
--obexd_src_obexd_LDADD = lib/libbluetooth-private.la \
-+obexd_src_obexd_LDADD = gdbus/libgdbus.la lib/libbluetooth-private.la \
- 				@ICAL_LIBS@ @DBUS_LIBS@ @GLIB_LIBS@ -ldl
- 
- obexd_src_obexd_LDFLAGS = -Wl,--export-dynamic
-diff --git a/Makefile.tools b/Makefile.tools
-index 8f245e0..cc0d8ee 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -2,11 +2,12 @@
- if CLIENT
- bin_PROGRAMS += client/bluetoothctl
- 
--client_bluetoothctl_SOURCES = $(gdbus_sources) client/main.c \
-+client_bluetoothctl_SOURCES = client/main.c \
- 					client/display.h client/display.c \
- 					client/agent.h client/agent.c \
- 					monitor/uuid.h monitor/uuid.c
--client_bluetoothctl_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ -lreadline
-+client_bluetoothctl_LDADD = gdbus/libgdbus.la @GLIB_LIBS@ @DBUS_LIBS@ \
-+				-lreadline
- endif
- 
- if MONITOR
-@@ -57,14 +58,12 @@ tools_l2cap_tester_SOURCES = tools/l2cap-tester.c monitor/bt.h \
- 				src/shared/tester.h src/shared/tester.c
- tools_l2cap_tester_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@
- 
--tools_gap_tester_SOURCES = $(gdbus_sources) \
--				tools/gap-tester.c monitor/bt.h \
-+tools_gap_tester_SOURCES = tools/gap-tester.c monitor/bt.h \
- 				emulator/btdev.h emulator/btdev.c \
- 				emulator/bthost.h emulator/bthost.c \
- 				src/shared/hciemu.h src/shared/hciemu.c \
- 				src/shared/tester.h src/shared/tester.c
--
--tools_gap_tester_LDADD = @GLIB_LIBS@ @DBUS_LIBS@
-+tools_gap_tester_LDADD = gdbus/libgdbus.la @GLIB_LIBS@ @DBUS_LIBS@
- endif
- 
- if TOOLS
-@@ -188,8 +187,8 @@ tools_btmgmt_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@
- tools_btiotest_SOURCES = tools/btiotest.c btio/btio.h btio/btio.c
- tools_btiotest_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@
- 
--tools_mpris_player_SOURCES = $(gdbus_sources) tools/mpris-player.c
--tools_mpris_player_LDADD = @GLIB_LIBS@ @DBUS_LIBS@
-+tools_mpris_player_SOURCES = tools/mpris-player.c
-+tools_mpris_player_LDADD = gdbus/libgdbus.la @GLIB_LIBS@ @DBUS_LIBS@
- 
- tools_bluetooth_player_SOURCES = $(gdbus_sources) tools/bluetooth-player.c \
- 				client/display.h client/display.c
-@@ -222,8 +221,8 @@ endif
- if EXPERIMENTAL
- noinst_PROGRAMS += profiles/iap/iapd
- 
--profiles_iap_iapd_SOURCES = $(gdbus_sources) profiles/iap/main.c
--profiles_iap_iapd_LDADD = @GLIB_LIBS@ @DBUS_LIBS@
-+profiles_iap_iapd_SOURCES = profiles/iap/main.c
-+profiles_iap_iapd_LDADD = gdbus/libgdbus.la @GLIB_LIBS@ @DBUS_LIBS@
- endif
- 
- if CUPS
-@@ -231,14 +230,14 @@ cupsdir = $(libdir)/cups/backend
- 
- cups_PROGRAMS = profiles/cups/bluetooth
- 
--profiles_cups_bluetooth_SOURCES = $(gdbus_sources) profiles/cups/main.c \
-+profiles_cups_bluetooth_SOURCES = profiles/cups/main.c \
- 					profiles/cups/cups.h \
- 					profiles/cups/sdp.c \
- 					profiles/cups/spp.c \
- 					profiles/cups/hcrp.c
- 
--profiles_cups_bluetooth_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ \
--				lib/libbluetooth-private.la
-+profiles_cups_bluetooth_LDADD = gdbus/libgdbus.la lib/libbluetooth-private.la \
-+				@GLIB_LIBS@ @DBUS_LIBS@
- endif
- 
- test_scripts += test/sap_client.py test/bluezutils.py \
--- 
-1.8.3.1
+>> I can't say this for sure, but if this is our fault and not a hardware issue then this seems to be a pretty nasty race condition.
+>> 
+>> To debug this you might need to work with dynamic_debug for Bluetooth core and add a few more DBG statements so we get timing information that we can compare with the btmon trace.
+>> 
+>> So in theory all modern chips should send HCI_Reset on devup. Only a few old broken ones will send HCI_Reset on devdown. Can you check that the ath3k does not send a quirk here and really does HCI_Reset on devup. And that the ath3k firmware loading part not accidentally gets in the way.
+>> 
+>> It would be also good to verify if devup or devdown is the root cause here.
+> 
+> I don't understand how this could be a hardware problem. I must be
+> missing something. The host is sending to the controller two
+> consecutive commands, the second one is a HCI_Reset caused by the
+> power off/on, but the spec says that we should not send more than one
+> command at that point (ncmd of the last event is 1). So, since we are
+> out of spec the firmware is happy to block itself in a bad way :)
+> right?
+
+It is most likely our bug. Sometimes the hardware does however behave funny.
+
+My guess right now is that you are hitting a really nasty race conditions and in ath3k chips is shows up easier since the command processing is slower.
+
+So in hci_do_dev_close() we forcefully set the cmd_cnt to 1. And in case of HCI_QUIRK_RESET_ON_CLOSE we are sending a HCI Reset from close.
+
+Before we go ahead with this, I like you to confirm what HCI Reset behavior you actually have for your hardware. HCI Reset on devup or on devdown. Check your full btmon where we send the HCI Reset.
+
+What we might need to do different here is to check if we have a pending command, flush all other commands and then wait for this command to complete before sending HCI Reset.
+
+So in theory that HCI Request Lock should protect the whole init and shutdown procedures and all mgmt and ioctl interfaces should block each other. Why this is not the case is something else to investigate. Maybe we have some issue there as well.
+
+Regards
+
+Marcel
 
