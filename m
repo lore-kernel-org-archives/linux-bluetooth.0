@@ -1,51 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jaganath Kanakkassery <jaganath.k@samsung.com>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>,
-	Chan-Yeol Park <chanyeol.park@samsung.com>
-Subject: [PATCH] Bluetooth: Fix invalid length check in l2cap_information_rsp()
-Date: Fri, 21 Jun 2013 19:55:11 +0530
-Message-id: <1371824711-14500-1-git-send-email-jaganath.k@samsung.com>
+Subject: [PATCH BlueZ v3 5/5] client: prettify help table
+Date: Fri, 21 Jun 2013 11:17:35 -0300
+Message-Id: <1371824255-3071-5-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1371824255-3071-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1371824255-3071-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The length check is invalid since the length varies with type of
-info response.
+From: Lucas De Marchi <lucas.demarchi@intel.com>
 
-This was introduced by the commit cb3b3152b2f5939d67005cff841a1ca748b19888
-
-Because of this, l2cap info rsp is not handled and command reject is sent.
-
-> ACL data: handle 11 flags 0x02 dlen 16
-        L2CAP(s): Info rsp: type 2 result 0
-          Extended feature mask 0x00b8
-            Enhanced Retransmission mode
-            Streaming mode
-            FCS Option
-            Fixed Channels
-< ACL data: handle 11 flags 0x00 dlen 10
-        L2CAP(s): Command rej: reason 0
-          Command not understood
-
-Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Signed-off-by: Chan-Yeol Park <chanyeol.park@samsung.com>
+cmd + options have a maximum length of 25. Align the description
+after this value. In order not to reach 80 chars so easily change the
+first \t to 2 spaces, like is done in udev, kmod, systemd, etc.
 ---
- net/bluetooth/l2cap_core.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ client/main.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 4be6a26..68843a2 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4333,7 +4333,7 @@ static inline int l2cap_information_rsp(struct l2cap_conn *conn,
- 	struct l2cap_info_rsp *rsp = (struct l2cap_info_rsp *) data;
- 	u16 type, result;
+diff --git a/client/main.c b/client/main.c
+index ff2afc6..0dd1510 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -1184,9 +1184,10 @@ static void rl_handler(char *input)
  
--	if (cmd_len != sizeof(*rsp))
-+	if (cmd_len < sizeof(*rsp))
- 		return -EPROTO;
+ 	for (i = 0; cmd_table[i].cmd; i++) {
+ 		if (cmd_table[i].desc)
+-			printf("\t%s %s\t%s\n", cmd_table[i].cmd,
+-						cmd_table[i].arg ? : "    ",
+-						cmd_table[i].desc);
++			printf("  %s %-*s %s\n", cmd_table[i].cmd,
++					(int)(25 - strlen(cmd_table[i].cmd)),
++					cmd_table[i].arg ? : "",
++					cmd_table[i].desc ? : "");
+ 	}
  
- 	type   = __le16_to_cpu(rsp->type);
+ done:
 -- 
-1.7.9.5
+1.8.3.1
 
