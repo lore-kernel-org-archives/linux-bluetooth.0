@@ -1,45 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=iso-8859-1
-Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
-Subject: Re: [PATCH BlueZ v3 1/5] build-sys: Don't build gdbus several times
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAMOw1v7gJ-dV5akn0F4bDmG2zo8MYyO1D68Q6MZCE8SVViTgMQ@mail.gmail.com>
-Date: Fri, 21 Jun 2013 18:47:37 -0400
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <EF5E15A5-5F57-458F-8E6E-8B0850958E9A@holtmann.org>
-References: <1371824255-3071-1-git-send-email-lucas.demarchi@profusion.mobi> <ED8EF8E2-B635-404D-A328-2DCC55EEBCA7@holtmann.org> <CAMOw1v7gJ-dV5akn0F4bDmG2zo8MYyO1D68Q6MZCE8SVViTgMQ@mail.gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+MIME-Version: 1.0
+In-Reply-To: <1560638.biMD7yTzvv@athlon>
+References: <1560638.biMD7yTzvv@athlon>
+Date: Fri, 21 Jun 2013 18:38:34 -0400
+Message-ID: <CAJdJm_P90hv0PHwpk+VNSx=OivsLiA7bBSvS4E=4=6mT_BR81A@mail.gmail.com>
+Subject: Re: regression in sdp lib
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Szymon Janc <szymon.janc@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi Szymon,
 
->>> We are currently compiling gdbus 3 times: one for tests, one for
->>> bluetoothd and another for obexd.
->> 
->> we recompile because of the different CFLAGS for these binaries.
-> 
-> But they shouldn´t be affecting gdbus.
-> 
->> 
->>> $ ls gdbus/*watch.o
->>> gdbus/bluetoothd-watch.o  gdbus/obexd-watch.o  gdbus/watch.o
->>> 
->>> Instead of prepending $(gdbus_sources) to several _SOURCES variable, use
->>> a convenience library.
->> 
->> When we switched to non-recursive build, we stopped building interim libraries. What is the benefit of going back to building them. I am personally fine with building gdbus several times.
-> 
-> It´s more that there´s no advantage doing otherwise. The small benefit
-> is building less files and letting it simpler.
+On Fri, Jun 21, 2013 at 4:09 PM, Szymon Janc <szymon.janc@gmail.com> wrote:
+> Hi,
+>
+> commit 'lib: Add range check for SDP_SVC_ATTR_RSP/SDP_SVC_SEARCH_ATTR_RSP'
+> 1796f00e846561af broke sdp with Nokia BH217 headset.
 
-then at least get into a bit of a standard habit. We are building libbluetooth into a public and private version.
+Note that the commit only exposed the issue that the handling of these
+PDUs does not expect continuation PDUs. The reason the previous code
+worked was purely by luck, because the sdp_process() function
+allocates a large buffer and memset()s it to zero, so "pcstate" most
+likely will be zero (indicating the last continuation packet).
 
-Currently we name it libbluetooth-private, but maybe following the systemd "standard", we should start calling that libbluetooth-internal. And then libgdbus-internal.
+>
+>
+> As discussed on IRC, sending bluetoothd and monitor logs.
+>
+> It looks like if response is fragmented size should be verified after all
+> fragments are received, not for each fragment in separate..
+>
+> I'm not sure how this should be fixed correctly. Suggestions are welcome.
 
-You also do realize that I will make you do this for all other projects using gdbus.
+Can you send the raw dump as well? hcidump shows SDP information that
+is not necessarily present on the PDU (but is collected/calculated
+from previous PDUs).
 
-Regards
+One idea for a fix is to handle like the SDP_SVC_SEARCH_RSP, i.e.
+something like:
 
-Marcel
+if (t->rsp_concat_buf.data_size == 0)
+    rsp_count = bt_get_be16(pdata);
+else if (t->rsp_concat_buf.data_size >= sizeof(rsp_count))
+    rsp_count = bt_get_be16(t->rsp_concat_buf.data);
 
+
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
