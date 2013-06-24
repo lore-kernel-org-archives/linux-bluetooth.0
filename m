@@ -1,53 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 24 Jun 2013 14:46:13 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2013-06-23
+Message-ID: <20130624184613.GE1997@tuxdriver.com>
+References: <20130623022356.GB2327@joana>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Subject: bluetooth a2dp sink w/o pulseaudio
-Date: Mon, 24 Jun 2013 15:51:05 -0400
-Message-ID: <82D0F41172C8884FA074EBCBCC9AD5464456A6@FLINT.pickering.lenbrook.com>
-From: "Clint Reitsma" <CReitsma@lenbrook.com>
-To: <linux-bluetooth@vger.kernel.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130623022356.GB2327@joana>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I have spent some time trying to get an A2DP audio sink working with the
-alsa plugin but have had no luck (bluez 4.101 using bluez-tools).  I see
-the alsa plugin has been removed in bluez 5 and everyone is using the
-pulse audio plugin; but this isn't an option on our system as we can't
-run pulseaudio.  Has anyone had an a2dp stereo sink working with just
-the alsa plugin?  The sink shows up on an iPad and I play audio but the
-stream seems to keep suspending:
+On Sun, Jun 23, 2013 at 03:23:56AM +0100, Gustavo Padovan wrote:
+> Hi John,
+> 
+> Here goes a set of patches to 3.11. The biggest work here is from Andre Guedes
+> on the move of the Discovery to use the new request framework. Other than that
+> Johan provided a bunch of fixes to the L2CAP code. The rest are just small
+> fixes and clean ups. 
+> 
+> Please pull or let me know of any problem! Thanks.
+> 
+> 	Gustavo
+> 
+> ---
+> The following changes since commit b887664d882ee4f6a67e0bf05e5f141d32fcc067:
+> 
+>   mwifiex: channel switch handling for station (2013-06-19 15:28:43 -0400)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next for-upstream
+> 
+> for you to fetch changes up to b8f4e068004859eefac7b1ced59ddb67ca6d2d80:
+> 
+>   Bluetooth: Improve comments on the HCI_Delete_Store_Link_Key issue (2013-06-23 03:05:47 +0100)
 
-bluetoothd[24673]: audio/avdtp.c:avdtp_parse_cmd() Received START_CMD
-bluetoothd[24673]: audio/a2dp.c:start_ind() Sink 0x54b50758: Start_Ind
-bluetoothd[24673]: audio/avdtp.c:avdtp_ref() 0x54b57388: ref=3
-bluetoothd[24673]: audio/avdtp.c:avdtp_sep_set_state() stream state
-changed: OPEN -> STREAMING
-bluetoothd[24673]: audio/avdtp.c:avdtp_unref() 0x54b57388: ref=2
-bluetoothd[24673]: audio/avdtp.c:session_cb()
-bluetoothd[24673]: audio/avdtp.c:avdtp_parse_resp() SUSPEND request
-succeeded
-bluetoothd[24673]: audio/avdtp.c:avdtp_sep_set_state() stream state
-changed: STREAMING -> OPEN
-bluetoothd[24673]: audio/a2dp.c:suspend_cfm() Sink 0x54b50758:
-Suspend_Cfm
-bluetoothd[24673]: audio/avdtp.c:session_cb()
-bluetoothd[24673]: audio/avdtp.c:avdtp_parse_cmd() Received START_CMD
+Pulling now...
 
-
-I tried tracing through an "arecord -f cd -c 2 -D Bluetooth | aplay" but
-it was failing on the refine capabilities.  First without a supported
-channel format so I added "mode stereo" to asound.conf.  Then channels
-succeeded but was saying no supported formats.  
-
-If the alsa plugin does not work for a stereo a2dp sink, I am wondering
-if anyone can help me with a simple method that can pipe audio straight
-to aplay, is this possible?  Any programs or scripts that can do this?  
-
-If not, would my best option be looking through the pulseaudio plugin
-and writing a standalone program to do the same thing except?
-Appreciate any help you can give.  
-
-Regards,
-Clint
-
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
