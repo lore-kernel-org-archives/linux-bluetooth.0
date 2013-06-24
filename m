@@ -1,87 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 24 Jun 2013 11:19:05 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: Re: [PATCH BlueZ v0 0/6] Exploit btd_service's userdata pointer
+Message-ID: <20130624081905.GA23515@x220>
+References: <1369656249-27980-1-git-send-email-mikel.astiz.oss@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1371725447-5581-1-git-send-email-luiz.dentz@gmail.com>
-References: <1371725447-5581-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 24 Jun 2013 16:43:16 +0300
-Message-ID: <CABBYNZJ6pYgiFHDPvp9BxfXNXncjAO58OpA6Eh=tpP3PH+pbRg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core: Add mode option to external profile default configuration
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1369656249-27980-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Mikel,
 
-On Thu, Jun 20, 2013 at 1:50 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> Some external profiles, FTP and OPP, require a different L2CAP mode such
-> as ERTM to interoperate properly.
-> ---
->  src/profile.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
->
-> diff --git a/src/profile.c b/src/profile.c
-> index 9f98d65..52ef775 100644
-> --- a/src/profile.c
-> +++ b/src/profile.c
-> @@ -562,6 +562,7 @@ struct ext_profile {
->
->         guint id;
->
-> +       BtIOMode mode;
->         BtIOSecLevel sec_level;
->         bool authorize;
->
-> @@ -1260,6 +1261,7 @@ static uint32_t ext_start_servers(struct ext_profile *ext,
->                 io = bt_io_listen(connect, confirm, l2cap, NULL, &err,
->                                         BT_IO_OPT_SOURCE_BDADDR,
->                                         adapter_get_address(adapter),
-> +                                       BT_IO_OPT_MODE, ext->mode,
->                                         BT_IO_OPT_PSM, psm,
->                                         BT_IO_OPT_SEC_LEVEL, ext->sec_level,
->                                         BT_IO_OPT_INVALID);
-> @@ -1891,6 +1893,7 @@ static struct default_settings {
->         const char      *remote_uuid;
->         int             channel;
->         int             psm;
-> +       BtIOMode        mode;
->         BtIOSecLevel    sec_level;
->         bool            authorize;
->         bool            auto_connect;
-> @@ -1942,6 +1945,7 @@ static struct default_settings {
->                 .name           = "Object Push",
->                 .channel        = OPP_DEFAULT_CHANNEL,
->                 .psm            = BTD_PROFILE_PSM_AUTO,
-> +               .mode           = BT_IO_MODE_ERTM,
->                 .sec_level      = BT_IO_SEC_LOW,
->                 .authorize      = false,
->                 .get_record     = get_opp_record,
-> @@ -1951,6 +1955,7 @@ static struct default_settings {
->                 .name           = "File Transfer",
->                 .channel        = FTP_DEFAULT_CHANNEL,
->                 .psm            = BTD_PROFILE_PSM_AUTO,
-> +               .mode           = BT_IO_MODE_ERTM,
->                 .get_record     = get_ftp_record,
->                 .version        = 0x0102,
->         }, {
-> @@ -2020,6 +2025,9 @@ static void ext_set_defaults(struct ext_profile *ext)
->                 if (settings->sec_level)
->                         ext->sec_level = settings->sec_level;
->
-> +               if (settings->mode)
-> +                       ext->mode = settings->mode;
-> +
->                 if (settings->auto_connect)
->                         ext->p.auto_connect = true;
->
-> --
-> 1.8.1.4
+On Mon, May 27, 2013, Mikel Astiz wrote:
+> With the adoption of btd_service, profile implementations can benefit
+> from the provided userdata pointer which can replace the previously
+> necessary lists to associate services with custom private types.
+> 
+> The proposed change not only removes boilerplate code but also data
+> redundancy, presumably making the codebase more robust.
+> 
+> This patchset addresses the first examples which looked like more
+> obvious to refactor. Note that some of the profiles were not tested
+> due to lack of hardware.
+> 
+> Patch 2/6 fixes an issue that I came across during this work.
+> 
+> Mikel Astiz (6):
+>   network: Remove duplicated search
+>   network: Fix missing NULL check for given UUID
+>   network: Remove find_connection()
+>   deviceinfo: Use btd_service userdata pointer
+>   scanparam: Use btd_service userdata pointer
+>   input: Use btd_service userdata pointer
+> 
+>  profiles/deviceinfo/deviceinfo.c | 46 ++++++----------------------------------
+>  profiles/input/device.c          | 37 +++++++++-----------------------
+>  profiles/network/connection.c    | 38 ++++++++++++---------------------
+>  profiles/scanparam/scan.c        | 36 ++++++-------------------------
+>  4 files changed, 35 insertions(+), 122 deletions(-)
 
-This one is now upstream with a minor change to set the default to basic mode.
+Sorry for the delay in processing this set. It looks fine to me and all
+patches in it have now been pushed upstream.
 
-
---
-Luiz Augusto von Dentz
+Johan
