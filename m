@@ -1,48 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 24 Jun 2013 13:58:26 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth 2013-06-23
-Message-ID: <20130624175826.GC1997@tuxdriver.com>
-References: <20130623021351.GA2327@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130623021351.GA2327@joana>
+In-Reply-To: <1371725447-5581-1-git-send-email-luiz.dentz@gmail.com>
+References: <1371725447-5581-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 24 Jun 2013 16:43:16 +0300
+Message-ID: <CABBYNZJ6pYgiFHDPvp9BxfXNXncjAO58OpA6Eh=tpP3PH+pbRg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] core: Add mode option to external profile default configuration
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Jun 23, 2013 at 03:13:51AM +0100, Gustavo Padovan wrote:
-> Hi John,
-> 
-> A important fix to 3.10, this patch fixes an issues that was preventing the 
-> l2cap info response command to be handled properly. Please pull. Thanks!
-> 
->         Gustavo
->         
+Hi,
+
+On Thu, Jun 20, 2013 at 1:50 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> Some external profiles, FTP and OPP, require a different L2CAP mode such
+> as ERTM to interoperate properly.
 > ---
-> The following changes since commit fcb3701849957917a234a61b58ad70ed35c83eda:
-> 
->   brcmfmac: free primary net_device when brcmf_bus_start() fails (2013-06-13 13:24:12 -0400)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
-> 
-> for you to fetch changes up to 3f6fa3d489e127ca5a5b298eabac3ff5dbe0e112:
-> 
->   Bluetooth: Fix invalid length check in l2cap_information_rsp() (2013-06-23 00:24:58 +0100)
-> 
-> ----------------------------------------------------------------
-> Jaganath Kanakkassery (1):
->       Bluetooth: Fix invalid length check in l2cap_information_rsp()
-> 
->  net/bluetooth/l2cap_core.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  src/profile.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/src/profile.c b/src/profile.c
+> index 9f98d65..52ef775 100644
+> --- a/src/profile.c
+> +++ b/src/profile.c
+> @@ -562,6 +562,7 @@ struct ext_profile {
+>
+>         guint id;
+>
+> +       BtIOMode mode;
+>         BtIOSecLevel sec_level;
+>         bool authorize;
+>
+> @@ -1260,6 +1261,7 @@ static uint32_t ext_start_servers(struct ext_profile *ext,
+>                 io = bt_io_listen(connect, confirm, l2cap, NULL, &err,
+>                                         BT_IO_OPT_SOURCE_BDADDR,
+>                                         adapter_get_address(adapter),
+> +                                       BT_IO_OPT_MODE, ext->mode,
+>                                         BT_IO_OPT_PSM, psm,
+>                                         BT_IO_OPT_SEC_LEVEL, ext->sec_level,
+>                                         BT_IO_OPT_INVALID);
+> @@ -1891,6 +1893,7 @@ static struct default_settings {
+>         const char      *remote_uuid;
+>         int             channel;
+>         int             psm;
+> +       BtIOMode        mode;
+>         BtIOSecLevel    sec_level;
+>         bool            authorize;
+>         bool            auto_connect;
+> @@ -1942,6 +1945,7 @@ static struct default_settings {
+>                 .name           = "Object Push",
+>                 .channel        = OPP_DEFAULT_CHANNEL,
+>                 .psm            = BTD_PROFILE_PSM_AUTO,
+> +               .mode           = BT_IO_MODE_ERTM,
+>                 .sec_level      = BT_IO_SEC_LOW,
+>                 .authorize      = false,
+>                 .get_record     = get_opp_record,
+> @@ -1951,6 +1955,7 @@ static struct default_settings {
+>                 .name           = "File Transfer",
+>                 .channel        = FTP_DEFAULT_CHANNEL,
+>                 .psm            = BTD_PROFILE_PSM_AUTO,
+> +               .mode           = BT_IO_MODE_ERTM,
+>                 .get_record     = get_ftp_record,
+>                 .version        = 0x0102,
+>         }, {
+> @@ -2020,6 +2025,9 @@ static void ext_set_defaults(struct ext_profile *ext)
+>                 if (settings->sec_level)
+>                         ext->sec_level = settings->sec_level;
+>
+> +               if (settings->mode)
+> +                       ext->mode = settings->mode;
+> +
+>                 if (settings->auto_connect)
+>                         ext->p.auto_connect = true;
+>
+> --
+> 1.8.1.4
 
-Pulling now...
+This one is now upstream with a minor change to set the default to basic mode.
 
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+
+--
+Luiz Augusto von Dentz
