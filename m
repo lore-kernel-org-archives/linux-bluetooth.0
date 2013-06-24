@@ -1,42 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 24 Jun 2013 14:46:13 -0400
+Date: Mon, 24 Jun 2013 13:58:26 -0400
 From: "John W. Linville" <linville@tuxdriver.com>
 To: Gustavo Padovan <gustavo@padovan.org>,
 	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2013-06-23
-Message-ID: <20130624184613.GE1997@tuxdriver.com>
-References: <20130623022356.GB2327@joana>
+Subject: Re: pull request: bluetooth 2013-06-23
+Message-ID: <20130624175826.GC1997@tuxdriver.com>
+References: <20130623021351.GA2327@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130623022356.GB2327@joana>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20130623021351.GA2327@joana>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Jun 23, 2013 at 03:23:56AM +0100, Gustavo Padovan wrote:
+On Sun, Jun 23, 2013 at 03:13:51AM +0100, Gustavo Padovan wrote:
 > Hi John,
 > 
-> Here goes a set of patches to 3.11. The biggest work here is from Andre Guedes
-> on the move of the Discovery to use the new request framework. Other than that
-> Johan provided a bunch of fixes to the L2CAP code. The rest are just small
-> fixes and clean ups. 
+> A important fix to 3.10, this patch fixes an issues that was preventing the 
+> l2cap info response command to be handled properly. Please pull. Thanks!
 > 
-> Please pull or let me know of any problem! Thanks.
-> 
-> 	Gustavo
-> 
+>         Gustavo
+>         
 > ---
-> The following changes since commit b887664d882ee4f6a67e0bf05e5f141d32fcc067:
+> The following changes since commit fcb3701849957917a234a61b58ad70ed35c83eda:
 > 
->   mwifiex: channel switch handling for station (2013-06-19 15:28:43 -0400)
+>   brcmfmac: free primary net_device when brcmf_bus_start() fails (2013-06-13 13:24:12 -0400)
 > 
 > are available in the git repository at:
 > 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next for-upstream
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
 > 
-> for you to fetch changes up to b8f4e068004859eefac7b1ced59ddb67ca6d2d80:
+> for you to fetch changes up to 3f6fa3d489e127ca5a5b298eabac3ff5dbe0e112:
 > 
->   Bluetooth: Improve comments on the HCI_Delete_Store_Link_Key issue (2013-06-23 03:05:47 +0100)
+>   Bluetooth: Fix invalid length check in l2cap_information_rsp() (2013-06-23 00:24:58 +0100)
+> 
+> ----------------------------------------------------------------
+> Jaganath Kanakkassery (1):
+>       Bluetooth: Fix invalid length check in l2cap_information_rsp()
+> 
+>  net/bluetooth/l2cap_core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Pulling now...
 
