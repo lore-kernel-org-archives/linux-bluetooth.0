@@ -1,28 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 24 Jun 2013 11:14:22 +0300
+Date: Mon, 24 Jun 2013 11:09:41 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+To: Szymon Janc <szymon.janc@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v3 5/5] client: prettify help table
-Message-ID: <20130624081422.GB16051@x220>
-References: <1371824255-3071-1-git-send-email-lucas.demarchi@profusion.mobi>
- <1371824255-3071-5-git-send-email-lucas.demarchi@profusion.mobi>
+Subject: Re: [PATCH] lib: Cleanup SDP logs to not include double new lines
+Message-ID: <20130624080941.GA16051@x220>
+References: <1371847700-21192-1-git-send-email-szymon.janc@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1371824255-3071-5-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1371847700-21192-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi Szymon,
 
-On Fri, Jun 21, 2013, Lucas De Marchi wrote:
-> cmd + options have a maximum length of 25. Align the description
-> after this value. In order not to reach 80 chars so easily change the
-> first \t to 2 spaces, like is done in udev, kmod, systemd, etc.
+On Fri, Jun 21, 2013, Szymon Janc wrote:
+> SDPERR and SDPDBG already add new line to prints.
 > ---
->  client/main.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  lib/sdp.c | 183 +++++++++++++++++++++++++++++++-------------------------------
+>  1 file changed, 90 insertions(+), 93 deletions(-)
 
-Patches 2-5 have been applied. Thanks.
+Applied. Thanks.
 
 Johan
