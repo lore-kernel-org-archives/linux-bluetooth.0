@@ -1,27 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 25 Jun 2013 21:48:48 +0300
+Date: Tue, 25 Jun 2013 19:54:45 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: Re: regression in sdp lib
-Message-ID: <20130625184848.GA29741@x220.P-661HNU-F1>
-References: <1560638.biMD7yTzvv@athlon>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] core: Fix not adding UUID found during pairing
+Message-ID: <20130625165445.GA24596@x220.P-661HNU-F1>
+References: <1372178160-22870-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1560638.biMD7yTzvv@athlon>
+In-Reply-To: <1372178160-22870-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Luiz,
 
-On Fri, Jun 21, 2013, Szymon Janc wrote:
-> commit 'lib: Add range check for SDP_SVC_ATTR_RSP/SDP_SVC_SEARCH_ATTR_RSP'
-> 1796f00e846561af broke sdp with Nokia BH217 headset.
+On Tue, Jun 25, 2013, Luiz Augusto von Dentz wrote:
+> This is a regression introduce by de63199f0c89fce76180edd40359fde4b13c54c1
+> where the list of UUID found is always empty thus causing no driver to be
+> probed.
+> ---
+>  src/device.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Since there evidently wasn't any progress on this issue and we want to
-get a new release out (due to also another severe regression) I've gone
-ahead and simply reverted the original patch. Nevertheless, I'm still
-looking forward to seeing a proper fix for this issue.
+Applied. Thanks.
 
 Johan
