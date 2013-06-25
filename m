@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC BlueZ v0 02/16] adapter: Create btd_server instances when probing
-Date: Tue, 25 Jun 2013 18:24:35 +0200
-Message-Id: <1372177489-6858-3-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC BlueZ v0 01/16] core: Add btd_server
+Date: Tue, 25 Jun 2013 18:24:34 +0200
+Message-Id: <1372177489-6858-2-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1372177489-6858-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1372177489-6858-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,137 +12,199 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Instead of storing a list of probed btd_profile instances, maintain a
-similar list but with btd_server instances instead. This makes use of
-server_create() which guarantees that all existing instances of
-btd_server represent a probed (adapter, profile) pair.
----
- src/adapter.c | 50 ++++++++++++++++++++++++++++----------------------
- src/adapter.h |  2 ++
- 2 files changed, 30 insertions(+), 22 deletions(-)
+Add a core object representing a (adapter, profile) pair in a similar
+way that btd_service couples a (device, profile) pair. As opposed to
+btd_service, which represents the *remote* support of a profile,
+btd_server is introduced to represent a *locally* supported profile.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 17f5508..246b510 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -57,6 +57,7 @@
- #include "adapter.h"
- #include "device.h"
- #include "profile.h"
+The new struct should allow removing a lot of boilerplate code in the
+profile implementations, such as;
+- Maintaining an internal list of probed adapters.
+- The agent authorization procedure.
+- IO channel handling (listen, shutdown, error-cases, etc.).
+
+Eventually, btd_server is also a step towards supporting multiple local
+instances of the same UUID, which could be probed/removed independently.
+This extension is however not addressed yet.
+---
+ Makefile.am  |   1 +
+ src/server.c | 109 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/server.h |  38 +++++++++++++++++++++
+ 3 files changed, 148 insertions(+)
+ create mode 100644 src/server.c
+ create mode 100644 src/server.h
+
+diff --git a/Makefile.am b/Makefile.am
+index 80edafd..9aa21c0 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -143,6 +143,7 @@ src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
+ 			src/adapter.h src/adapter.c \
+ 			src/profile.h src/profile.c \
+ 			src/service.h src/service.c \
++			src/server.h src/server.c \
+ 			src/device.h src/device.c src/attio.h \
+ 			src/dbus-common.c src/dbus-common.h \
+ 			src/eir.h src/eir.c \
+diff --git a/src/server.c b/src/server.c
+new file mode 100644
+index 0000000..9337ff6
+--- /dev/null
++++ b/src/server.c
+@@ -0,0 +1,109 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012-2013  BMW Car IT GmbH. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <assert.h>
++#include <unistd.h>
++#include <fcntl.h>
++#include <stdbool.h>
++#include <sys/stat.h>
++#include <sys/ioctl.h>
++#include <errno.h>
++
++#include <bluetooth/bluetooth.h>
++
++#include <glib.h>
++
++#include "log.h"
++
++#include "adapter.h"
++#include "profile.h"
 +#include "server.h"
- #include "dbus-common.h"
- #include "error.h"
- #include "glib-helper.h"
-@@ -177,7 +178,7 @@ struct btd_adapter {
- 	GSList *pin_callbacks;
- 
- 	GSList *drivers;
--	GSList *profiles;
-+	GSList *servers;
- 
- 	struct oob_handler *oob_handler;
- 
-@@ -2616,18 +2617,16 @@ static void load_drivers(struct btd_adapter *adapter)
- static void probe_profile(struct btd_profile *profile, void *data)
- {
- 	struct btd_adapter *adapter = data;
--	int err;
-+	struct btd_server *server;
- 
- 	if (profile->adapter_probe == NULL)
- 		return;
- 
--	err = profile->adapter_probe(profile, adapter);
--	if (err < 0) {
--		error("%s: %s (%d)", profile->name, strerror(-err), -err);
-+	server = server_create(adapter, profile);
-+	if (server == NULL)
- 		return;
--	}
- 
--	adapter->profiles = g_slist_prepend(adapter->profiles, profile);
-+	adapter->servers = g_slist_prepend(adapter->servers, server);
- }
- 
- void adapter_add_profile(struct btd_adapter *adapter, gpointer p)
-@@ -2645,6 +2644,7 @@ void adapter_add_profile(struct btd_adapter *adapter, gpointer p)
- void adapter_remove_profile(struct btd_adapter *adapter, gpointer p)
- {
- 	struct btd_profile *profile = p;
-+	struct btd_server *server;
- 
- 	if (!adapter->initialized)
- 		return;
-@@ -2652,10 +2652,26 @@ void adapter_remove_profile(struct btd_adapter *adapter, gpointer p)
- 	if (profile->device_remove)
- 		g_slist_foreach(adapter->devices, device_remove_profile, p);
- 
--	adapter->profiles = g_slist_remove(adapter->profiles, profile);
-+	server = btd_adapter_get_server(adapter, profile->local_uuid);
-+	adapter->servers = g_slist_remove(adapter->servers, server);
- 
--	if (profile->adapter_remove)
--		profile->adapter_remove(profile, adapter);
-+	server_destroy(server);
-+}
 +
-+struct btd_server *btd_adapter_get_server(struct btd_adapter *adapter,
-+							const char *local_uuid)
++struct btd_server {
++	struct btd_adapter	*adapter;
++	struct btd_profile	*profile;
++	void			*user_data;
++};
++
++struct btd_server *server_create(struct btd_adapter *adapter,
++						struct btd_profile *profile)
 +{
-+	GSList *l;
++	struct btd_server *server;
++	char addr[18];
++	int err;
 +
-+	for (l = adapter->servers; l != NULL; l = g_slist_next(l)) {
-+		struct btd_server *server = l->data;
-+		struct btd_profile *p = btd_server_get_profile(server);
-+
-+		if (g_strcmp0(p->local_uuid, local_uuid) == 0)
-+			return server;
++	server = g_try_new0(struct btd_server, 1);
++	if (!server) {
++		error("server_create: failed to alloc memory");
++		return NULL;
 +	}
 +
++	server->adapter = adapter; /* Weak ref */
++	server->profile = profile;
++
++	err = profile->adapter_probe(server->profile, server->adapter);
++	if (err == 0)
++		return server;
++
++	ba2str(adapter_get_address(server->adapter), addr);
++	error("%s profile probe failed for %s (%d)", profile->name, addr, err);
++
++	g_free(server);
++
 +	return NULL;
- }
- 
- static void adapter_add_connection(struct btd_adapter *adapter,
-@@ -2868,24 +2884,14 @@ static void remove_driver(gpointer data, gpointer user_data)
- 		driver->remove(adapter);
- }
- 
--static void remove_profile(gpointer data, gpointer user_data)
--{
--	struct btd_profile *profile = data;
--	struct btd_adapter *adapter = user_data;
--
--	if (profile->adapter_remove)
--		profile->adapter_remove(profile, adapter);
--}
--
- static void unload_drivers(struct btd_adapter *adapter)
- {
- 	g_slist_foreach(adapter->drivers, remove_driver, adapter);
- 	g_slist_free(adapter->drivers);
- 	adapter->drivers = NULL;
- 
--	g_slist_foreach(adapter->profiles, remove_profile, adapter);
--	g_slist_free(adapter->profiles);
--	adapter->profiles = NULL;
-+	g_slist_free_full(adapter->servers, (GDestroyNotify) server_destroy);
-+	adapter->servers = NULL;
- }
- 
- static void free_service_auth(gpointer data, gpointer user_data)
-diff --git a/src/adapter.h b/src/adapter.h
-index 32b12c0..7fdf055 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -123,6 +123,8 @@ typedef void (*service_auth_cb) (DBusError *derr, void *user_data);
- 
- void adapter_add_profile(struct btd_adapter *adapter, gpointer p);
- void adapter_remove_profile(struct btd_adapter *adapter, gpointer p);
-+struct btd_server *btd_adapter_get_server(struct btd_adapter *adapter,
-+							const char *local_uuid);
- int btd_register_adapter_driver(struct btd_adapter_driver *driver);
- void btd_unregister_adapter_driver(struct btd_adapter_driver *driver);
- guint btd_request_authorization(const bdaddr_t *src, const bdaddr_t *dst,
++}
++
++void server_destroy(struct btd_server *server)
++{
++	if (server->profile->adapter_remove != NULL)
++		server->profile->adapter_remove(server->profile,
++							server->adapter);
++
++	g_free(server);
++}
++
++struct btd_adapter *btd_server_get_adapter(const struct btd_server *server)
++{
++	return server->adapter;
++}
++
++struct btd_profile *btd_server_get_profile(const struct btd_server *server)
++{
++	return server->profile;
++}
++
++void btd_server_set_user_data(struct btd_server *server, void *user_data)
++{
++	server->user_data = user_data;
++}
++
++void *btd_server_get_user_data(const struct btd_server *server)
++{
++	return server->user_data;
++}
+diff --git a/src/server.h b/src/server.h
+new file mode 100644
+index 0000000..9fd4891
+--- /dev/null
++++ b/src/server.h
+@@ -0,0 +1,38 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012-2013  BMW Car IT GmbH. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++struct btd_adapter;
++struct btd_profile;
++
++/* Server management functions used by the core */
++struct btd_server *server_create(struct btd_adapter *adapter,
++						struct btd_profile *profile);
++void server_destroy(struct btd_server *server);
++
++/* Public member access */
++struct btd_adapter *btd_server_get_adapter(const struct btd_server *server);
++struct btd_profile *btd_server_get_profile(const struct btd_server *server);
++
++/* Functions used by profile implementation */
++void btd_server_set_user_data(struct btd_server *server, void *user_data);
++void *btd_server_get_user_data(const struct btd_server *server);
 -- 
 1.8.1.4
 
