@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC BlueZ v0 16/16] network: Use btd_server userdata for network_server
-Date: Tue, 25 Jun 2013 18:24:49 +0200
-Message-Id: <1372177489-6858-17-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC BlueZ v0 14/16] network: Add a dedicated btd_profile for BNEP
+Date: Tue, 25 Jun 2013 18:24:47 +0200
+Message-Id: <1372177489-6858-15-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1372177489-6858-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1372177489-6858-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,134 +12,117 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Exploit the userdata pointer to avoid maintainig a list with instances
-of struct network_server.
+The profile is currently a dummy profile.
 ---
- profiles/network/server.c | 56 ++++++++++-------------------------------------
- 1 file changed, 11 insertions(+), 45 deletions(-)
+ profiles/network/manager.c |  6 +++---
+ profiles/network/server.c  | 47 +++++++++++++++++++++++++++++++++++-----------
+ profiles/network/server.h  |  4 ++--
+ 3 files changed, 41 insertions(+), 16 deletions(-)
 
+diff --git a/profiles/network/manager.c b/profiles/network/manager.c
+index 4f897dd..ca1e797 100644
+--- a/profiles/network/manager.c
++++ b/profiles/network/manager.c
+@@ -127,7 +127,7 @@ static int network_init(void)
+ 	 * field that defines which service the source is connecting to.
+ 	 */
+ 
+-	if (server_init(conf_security) < 0)
++	if (network_server_init(conf_security) < 0)
+ 		return -1;
+ 
+ 	btd_profile_register(&panu_profile);
+@@ -139,12 +139,12 @@ static int network_init(void)
+ 
+ static void network_exit(void)
+ {
+-	server_exit();
+-
+ 	btd_profile_unregister(&panu_profile);
+ 	btd_profile_unregister(&gn_profile);
+ 	btd_profile_unregister(&nap_profile);
+ 
++	network_server_exit();
++
+ 	bnep_cleanup();
+ }
+ 
 diff --git a/profiles/network/server.c b/profiles/network/server.c
-index 77e2c7e..8ca9013 100644
+index 02a74ab..0e52db0 100644
 --- a/profiles/network/server.c
 +++ b/profiles/network/server.c
-@@ -68,7 +68,6 @@ struct network_adapter {
- 	struct btd_adapter *adapter;	/* Adapter pointer */
- 	GIOChannel	*io;		/* Bnep socket */
- 	struct network_session *setup;	/* Setup in progress */
--	GSList		*servers;	/* Server register to adapter */
- };
- 
- /* Main server structure */
-@@ -88,16 +87,13 @@ static gboolean security = TRUE;
- static struct network_server *find_server(struct network_adapter *na,
- 								uint16_t id)
- {
--	GSList *list;
--
--	for (list = na->servers; list; list = list->next) {
--		struct network_server *ns = list->data;
-+	const char *uuid = bnep_uuid(id);
-+	struct btd_server *server = btd_adapter_get_server(na->adapter, uuid);
- 
--		if (ns->id == id)
--			return ns;
--	}
-+	if (server == NULL)
-+		return NULL;
- 
--	return NULL;
-+	return btd_server_get_user_data(server);
+@@ -555,17 +555,6 @@ drop:
+ 	g_io_channel_shutdown(chan, TRUE, NULL);
  }
  
- static sdp_record_t *server_record_new(const char *name, uint16_t id)
-@@ -676,10 +672,8 @@ static void adapter_free(struct network_adapter *na)
- 	g_free(na);
- }
- 
--static void server_free(void *data)
-+static void server_free(struct network_server *ns)
+-int server_init(gboolean secure)
+-{
+-	security = secure;
+-
+-	return 0;
+-}
+-
+-void server_exit(void)
+-{
+-}
+-
+ static uint32_t register_server_record(struct network_server *ns)
  {
--	struct network_server *ns = data;
--
- 	if (!ns)
- 		return;
- 
-@@ -701,7 +695,6 @@ static void path_unregister(void *data)
- 	DBG("Unregistered interface %s on path %s",
- 		NETWORK_SERVER_INTERFACE, adapter_get_path(na->adapter));
- 
--	g_slist_free_full(na->servers, server_free);
- 	adapter_free(na);
+ 	sdp_record_t *record;
+@@ -855,3 +844,39 @@ void network_server_remove(struct btd_server *server)
+ 						adapter_get_path(adapter),
+ 						NETWORK_SERVER_INTERFACE);
  }
- 
-@@ -747,34 +740,23 @@ int network_server_probe(struct btd_server *server)
- {
- 	struct btd_adapter *adapter = btd_server_get_adapter(server);
- 	struct btd_server *bnep_server;
--	struct network_adapter *na;
- 	struct network_server *ns;
- 	const char *uuid = btd_server_get_profile(server)->remote_uuid;
--	uint16_t id;
- 
- 	DBG("path %s uuid %s", adapter_get_path(adapter), uuid);
- 
--	id = bnep_service_id(uuid);
--
- 	bnep_server = btd_adapter_get_server(adapter, BNEP_SVC_UUID);
- 	if (bnep_server == NULL)
- 		return -EINVAL;
- 
--	na = btd_server_get_user_data(bnep_server);
--
--	ns = find_server(na, id);
--	if (ns)
--		return 0;
--
- 	ns = g_new0(struct network_server, 1);
--
- 	ns->name = g_strdup("Network service");
--
- 	bacpy(&ns->src, adapter_get_address(adapter));
--	ns->id = id;
--	ns->na = na;
-+	ns->id = bnep_service_id(uuid);
-+	ns->na = btd_server_get_user_data(bnep_server);
- 	ns->record_id = 0;
--	na->servers = g_slist_append(na->servers, ns);
 +
-+	btd_server_set_user_data(server, ns);
++static int bnep_server_probe(struct btd_server *server)
++{
++	struct btd_adapter *adapter = btd_server_get_adapter(server);
++	const char *path = adapter_get_path(adapter);
++
++	DBG("path %s", path);
++
++	return 0;
++}
++
++static void bnep_server_remove(struct btd_server *server)
++{
++	struct btd_adapter *adapter = btd_server_get_adapter(server);
++
++	DBG("path %s", adapter_get_path(adapter));
++}
++
++static struct btd_profile bnep_profile = {
++	.name		= "network-bnep",
++	.local_uuid	= BNEP_SVC_UUID,
++	.adapter_probe	= bnep_server_probe,
++	.adapter_remove	= bnep_server_remove,
++};
++
++int network_server_init(gboolean secure)
++{
++	security = secure;
++
++	return btd_profile_register(&bnep_profile);
++}
++
++void network_server_exit(void)
++{
++	btd_profile_unregister(&bnep_profile);
++}
+diff --git a/profiles/network/server.h b/profiles/network/server.h
+index 2d8b41c..438f74a 100644
+--- a/profiles/network/server.h
++++ b/profiles/network/server.h
+@@ -21,7 +21,7 @@
+  *
+  */
  
- 	return 0;
- }
-@@ -782,27 +764,11 @@ int network_server_probe(struct btd_server *server)
- void network_server_remove(struct btd_server *server)
- {
- 	struct btd_adapter *adapter = btd_server_get_adapter(server);
--	struct btd_server *bnep_server;
--	struct network_adapter *na;
--	struct network_server *ns;
-+	struct network_server *ns = btd_server_get_user_data(server);
- 	const char *uuid = btd_server_get_profile(server)->remote_uuid;
--	uint16_t id;
- 
- 	DBG("path %s uuid %s", adapter_get_path(adapter), uuid);
- 
--	id = bnep_service_id(uuid);
--
--	bnep_server = btd_adapter_get_server(adapter, BNEP_SVC_UUID);
--	if (bnep_server == NULL)
--		return;
--
--	na = btd_server_get_user_data(bnep_server);
--
--	ns = find_server(na, id);
--	if (!ns)
--		return;
--
--	na->servers = g_slist_remove(na->servers, ns);
- 	server_free(ns);
- }
- 
+-int server_init(gboolean secure);
+-void server_exit(void);
++int network_server_init(gboolean secure);
++void network_server_exit(void);
+ int network_server_probe(struct btd_server *server);
+ void network_server_remove(struct btd_server *server);
 -- 
 1.8.1.4
 
