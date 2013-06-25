@@ -1,78 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC BlueZ v0 00/16] Introduce btd_server
-Date: Tue, 25 Jun 2013 18:24:33 +0200
-Message-Id: <1372177489-6858-1-git-send-email-mikel.astiz.oss@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1371458131-2741-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1371458131-2741-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Date: Tue, 25 Jun 2013 17:28:06 +0300
+Message-ID: <CABBYNZKFW9J1Z3b5aH2aLOS_UQdwk5RyZNJ6st=02zrb=-L7Xw@mail.gmail.com>
+Subject: Re: [PATCH v2 0/6] MAP client: Add notification dispatching
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Christian,
 
-This RFC presents a proposal to extend the BlueZ core to simplify the implementation of profiles. It introduces a new core concept (btd_server) as a first step towards providing internal infrastructure in a similar way that external profiles have. This exact purpose of the new struct is described in patch 01.
+On Mon, Jun 17, 2013 at 11:35 AM, Christian Fetzer
+<christian.fetzer@oss.bmw-carit.de> wrote:
+> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+>
+> Changelog:
+> v2:
+>   - Implement dispatching in map-event.c
+>   - Rename map_acquire_mns to map_register_event_handler
+>   - Pass obc_session directly instead of copying address
+> --
+>
+> This patch set completes the two patch sets "Add Message Notification Service
+> (MNS) server" and "Read MASInstanceID for the current connection".
+>
+> The notification dispatcher component dispatches event reports that are
+> received by the MNS server to the correct MAS client instance.
+>
+> The message access part of every client instance registers a notification
+> handler function. The MNS will call the associated handler for all received
+> event reports.
+>
+> For now, the handler will only print a log message for the received
+> notifications. This is the starting point where we can add the necessary
+> DBus API parts.
+>
+> Christian Fetzer (6):
+>   obexd: Add function to get the destination from the obc_session
+>   obexd: Add MAP notification dispatching
+>   build: Add support for building MAP notification dispatcher
+>   obexd: Register notification handler in the MAP client
+>   obexd: Notify registered notification handlers in MNS
+>   obexd: Fix crash when retrieving multiple MAP event reports
+>
+>  Makefile.obexd           |   1 +
+>  obexd/client/map-event.c | 112 +++++++++++++++++++++++++++++++++++++++++++++++
+>  obexd/client/map-event.h |  29 ++++++++++++
+>  obexd/client/map.c       |  25 +++++++++++
+>  obexd/client/mns.c       |  18 ++++----
+>  obexd/client/session.c   |   5 +++
+>  obexd/client/session.h   |   1 +
+>  7 files changed, 181 insertions(+), 10 deletions(-)
+>  create mode 100644 obexd/client/map-event.c
+>
+> --
+> 1.8.2.3
 
-Currently, it's paradoxical that externally implemented profiles are in a way simpler to implement. There is a lot of helpful code in profile.c which could be reused for internal profiles too.
+Ive applied the rest of this set, note that I have do a lot of
+cleanups I hope you can take a look because at first it was a bit
+convoluted specially in map-event.c. I also found a very clear bug in
+the first attempt to trigger a notification so I hope next time we can
+do a smoke test at least.
 
-This first patchset consists of three main parts:
-1. The extension of the core (patches 01..03).
-2. Some simple examples of adoption (patches 04..10).
-3. A more complex adoption (patches 11..16).
-
-This part is fairly simple and doesn't offer great benefits besides the usage of the userdata pointer in btd_server, which can already be handy (see for example 08/16).
-
-Furhter and more interesting changes in the pipeline (but not submitted in v0) include:
-4. Handling of incoming connections.
-5. Integration with agent authorization.
-6. Adoption of new infrastructure for external profiles.
-
-For the record, the result of this whole work does not add more lines of code to maintain, it just moves the code complexity from profile implementations to the core. The result is less duplicated code and data throughout the codebase, hopefully leading to more robust profiles.
-
-Mikel Astiz (16):
-  core: Add btd_server
-  adapter: Create btd_server instances when probing
-  profile: Use btd_server to probe adapters
-  input: Bypass manager for profile server
-  input: Use btd_server userdata for input_server
-  thermometer: Remove boilerplate code
-  thermometer: Use btd_server userdata
-  cyclingspeed: Use btd_server userdata
-  heartrate: Remove boilerplate code
-  heartrate: Use btd_server userdata
-  network: Replace list with network_adapter
-  network: Bypass manager for profile server
-  network: Simplify search-by-UUID
-  network: Add a dedicated btd_profile for BNEP
-  network: Create network_adapter during BNEP probe
-  network: Use btd_server userdata for network_server
-
- Makefile.am                          |   1 +
- profiles/alert/server.c              |   9 +-
- profiles/audio/manager.c             |  41 +++++---
- profiles/cyclingspeed/cyclingspeed.c |  38 +++----
- profiles/health/hdp_manager.c        |  11 ++-
- profiles/heartrate/heartrate.c       |  51 +++-------
- profiles/input/manager.c             |  12 +--
- profiles/input/server.c              |  28 ++----
- profiles/input/server.h              |   4 +-
- profiles/network/manager.c           |  76 ++------------
- profiles/network/server.c            | 185 +++++++++++++++--------------------
- profiles/network/server.h            |   8 +-
- profiles/proximity/reporter.c        |   8 +-
- profiles/proximity/reporter.h        |   5 +-
- profiles/sap/manager.c               |   9 +-
- profiles/thermometer/thermometer.c   |  82 ++++------------
- profiles/time/server.c               |   8 +-
- src/adapter.c                        |  50 +++++-----
- src/adapter.h                        |   2 +
- src/profile.c                        |  11 ++-
- src/profile.h                        |   7 +-
- src/server.c                         | 108 ++++++++++++++++++++
- src/server.h                         |  38 +++++++
- 23 files changed, 389 insertions(+), 403 deletions(-)
- create mode 100644 src/server.c
- create mode 100644 src/server.h
-
--- 
-1.8.1.4
-
+--
+Luiz Augusto von Dentz
