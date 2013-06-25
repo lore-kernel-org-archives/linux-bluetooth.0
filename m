@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC BlueZ v0 10/16] heartrate: Use btd_server userdata
-Date: Tue, 25 Jun 2013 18:24:43 +0200
-Message-Id: <1372177489-6858-11-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC BlueZ v0 07/16] thermometer: Use btd_server userdata
+Date: Tue, 25 Jun 2013 18:24:40 +0200
+Message-Id: <1372177489-6858-8-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1372177489-6858-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1372177489-6858-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,34 +13,34 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
 Exploit the userdata pointer to avoid maintainig a list with instances
-of struct heartrate_adapter.
+of struct thermometer_adapter.
 ---
- profiles/heartrate/heartrate.c | 34 ++++++++--------------------------
+ profiles/thermometer/thermometer.c | 34 ++++++++--------------------------
  1 file changed, 8 insertions(+), 26 deletions(-)
 
-diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
-index 81ca2a8..99721352f 100644
---- a/profiles/heartrate/heartrate.c
-+++ b/profiles/heartrate/heartrate.c
-@@ -94,8 +94,6 @@ struct measurement {
- 	uint16_t		*interval;
+diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
+index 034e50b..f1aa9e0 100644
+--- a/profiles/thermometer/thermometer.c
++++ b/profiles/thermometer/thermometer.c
+@@ -119,8 +119,6 @@ struct tmp_interval_data {
+ 	uint16_t		interval;
  };
  
--static GSList *heartrate_adapters = NULL;
+-static GSList *thermometer_adapters = NULL;
 -
- static const char * const location_enum[] = {
- 	"other",
- 	"chest",
-@@ -116,17 +114,6 @@ static const char *location2str(uint8_t value)
- 	return NULL;
+ static const char * const temp_type[] = {
+ 	"<reserved>",
+ 	"armpit",
+@@ -191,17 +189,6 @@ static void destroy_thermometer_adapter(gpointer user_data)
+ 	g_free(tadapter);
  }
  
 -static int cmp_adapter(gconstpointer a, gconstpointer b)
 -{
--	const struct heartrate_adapter *hradapter = a;
+-	const struct thermometer_adapter *tadapter = a;
 -	const struct btd_adapter *adapter = b;
 -
--	if (adapter == hradapter->adapter)
+-	if (adapter == tadapter->adapter)
 -		return 0;
 -
 -	return -1;
@@ -48,17 +48,17 @@ index 81ca2a8..99721352f 100644
 -
  static int cmp_device(gconstpointer a, gconstpointer b)
  {
- 	const struct heartrate *hr = a;
-@@ -154,12 +141,13 @@ static int cmp_watcher(gconstpointer a, gconstpointer b)
- static struct heartrate_adapter *
- find_heartrate_adapter(struct btd_adapter *adapter)
+ 	const struct thermometer *t = a;
+@@ -229,12 +216,13 @@ static int cmp_watcher(gconstpointer a, gconstpointer b)
+ static struct thermometer_adapter *
+ find_thermometer_adapter(struct btd_adapter *adapter)
  {
--	GSList *l = g_slist_find_custom(heartrate_adapters, adapter,
+-	GSList *l = g_slist_find_custom(thermometer_adapters, adapter,
 -								cmp_adapter);
 -	if (!l)
 +	struct btd_server *server;
 +
-+	server = btd_adapter_get_server(adapter, HEART_RATE_UUID);
++	server = btd_adapter_get_server(adapter, HEALTH_THERMOMETER_UUID);
 +	if (server == NULL)
  		return NULL;
  
@@ -66,39 +66,39 @@ index 81ca2a8..99721352f 100644
 +	return btd_server_get_user_data(server);
  }
  
- static void destroy_watcher(gpointer user_data)
-@@ -744,21 +732,14 @@ static int heartrate_adapter_probe(struct btd_server *server)
+ static void change_property(struct thermometer *t, const char *name,
+@@ -1269,21 +1257,14 @@ static int thermometer_adapter_probe(struct btd_server *server)
  		return -EIO;
  	}
  
--	heartrate_adapters = g_slist_prepend(heartrate_adapters, hradapter);
-+	btd_server_set_user_data(server, hradapter);
+-	thermometer_adapters = g_slist_prepend(thermometer_adapters, tadapter);
++	btd_server_set_user_data(server, tadapter);
  
  	return 0;
  }
  
- static void heartrate_adapter_remove(struct btd_server *server)
+ static void thermometer_adapter_remove(struct btd_server *server)
  {
 -	struct btd_adapter *adapter = btd_server_get_adapter(server);
--	struct heartrate_adapter *hradapter;
+-	struct thermometer_adapter *tadapter;
 -
--	hradapter = find_heartrate_adapter(adapter);
--	if (hradapter == NULL)
+-	tadapter = find_thermometer_adapter(adapter);
+-	if (tadapter == NULL)
 -		return;
 -
--	heartrate_adapters = g_slist_remove(heartrate_adapters, hradapter);
-+	struct heartrate_adapter *hradapter = btd_server_get_user_data(server);
+-	thermometer_adapters = g_slist_remove(thermometer_adapters, tadapter);
++	struct thermometer_adapter *tadapter = btd_server_get_user_data(server);
  
  	g_dbus_unregister_interface(btd_get_dbus_connection(),
- 					adapter_get_path(hradapter->adapter),
-@@ -854,6 +835,7 @@ static void heartrate_device_remove(struct btd_service *service)
+ 					adapter_get_path(tadapter->adapter),
+@@ -1292,6 +1273,7 @@ static void thermometer_adapter_remove(struct btd_server *server)
  
- static struct btd_profile hrp_profile = {
- 	.name		= "Heart Rate GATT Driver",
-+	.local_uuid	= HEART_RATE_UUID,
- 	.remote_uuid	= HEART_RATE_UUID,
- 
- 	.device_probe	= heartrate_device_probe,
+ static struct btd_profile thermometer_profile = {
+ 	.name		= "Health Thermometer GATT driver",
++	.local_uuid	= HEALTH_THERMOMETER_UUID,
+ 	.remote_uuid	= HEALTH_THERMOMETER_UUID,
+ 	.device_probe	= thermometer_device_probe,
+ 	.device_remove	= thermometer_device_remove,
 -- 
 1.8.1.4
 
