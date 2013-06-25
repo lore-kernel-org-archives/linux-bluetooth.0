@@ -1,73 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <5C1A422A-58B6-47C7-A285-4BFD7D478B97@holtmann.org>
-References: <CAGd9gwhd4DuEw_jHJAZF99YwNT==-s9yW6KEkZ_A2w+eeFy88w@mail.gmail.com>
- <6D8CE567-F4C5-42BE-8E0E-5D558E9C439D@holtmann.org> <CAGd9gwjLr8vhqXNW0ALBsfpjZ+Rnt0bhif1sHDExqT7Syc4NFA@mail.gmail.com>
- <38279439-FECC-452A-9514-A431580DFA7C@holtmann.org> <CAGd9gwjHXfcG6uaZYmoV2y+ymCX4PzCvuvA1mwT00wOExkwXmg@mail.gmail.com>
- <8D8512CF-7924-48A3-9B8E-78145262DA99@holtmann.org> <CAGd9gwiBts9DE8taJ_MzpCsho6Eh7hsq1Eq7g7WbZySaHMfnSg@mail.gmail.com>
- <5C1A422A-58B6-47C7-A285-4BFD7D478B97@holtmann.org>
-From: Alex Deymo <deymo@chromium.org>
-Date: Tue, 25 Jun 2013 13:34:33 -0700
-Message-ID: <CAGd9gwiQJf7T_PS=618N3NNErxWY5TiqOh-QBLxxAHGovxOYTQ@mail.gmail.com>
-Subject: Re: [BUG] HCI_RESET and Num_HCI_Command_Packets limit
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>, keybuk <keybuk@chromium.org>
+In-Reply-To: <1429697.uq0A3eL4HE@athlon>
+References: <1560638.biMD7yTzvv@athlon>
+	<20130625184848.GA29741@x220.P-661HNU-F1>
+	<1429697.uq0A3eL4HE@athlon>
+Date: Tue, 25 Jun 2013 16:21:34 -0400
+Message-ID: <CAJdJm_NtNXFbMPBdzxb_Tmj4M76AxpB5CbdYakk94XUy+KMHiQ@mail.gmail.com>
+Subject: Re: regression in sdp lib
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Szymon Janc <szymon.janc@gmail.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Szymon,
 
-On Tue, Jun 25, 2013 at 6:33 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
->> I enabled dynamic debug on this kernel. Again, I'm running 3.8.11. I
->> added a debug line to check HCI_QUIRK_RESET_ON_CLOSE and
->> "test_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks)" evaluates to 0; so
->> the reset is sent during device up. Nevertheless, the bug is because a
->> combination of both:
+On Tue, Jun 25, 2013 at 3:54 PM, Szymon Janc <szymon.janc@gmail.com> wrote:
+> Hi Johan,
+>
+> On Tuesday 25 June 2013 21:48:48 Johan Hedberg wrote:
+>> Hi Szymon,
 >>
->> The timelime for the bug is the following.
-
->> 5. hci_dev_do_close clears the cmd, rx and tx queues in the kernel,
->> and sets the cmd_cnt to 1, even if the current command
->> (HCI_Write_Class_of_Device in this case) did not finish. From this
->> point we have an inconsistent state, since cmd_cnt is 1, but we are
->> not allowed to send a command to the adapter.
+>> On Fri, Jun 21, 2013, Szymon Janc wrote:
+>> > commit 'lib: Add range check for SDP_SVC_ATTR_RSP/SDP_SVC_SEARCH_ATTR_RSP'
+>> > 1796f00e846561af broke sdp with Nokia BH217 headset.
+>>
+>> Since there evidently wasn't any progress on this issue and we want to
+>> get a new release out (due to also another severe regression) I've gone
+>> ahead and simply reverted the original patch. Nevertheless, I'm still
+>> looking forward to seeing a proper fix for this issue.
 >
-> I think this forcefully setting cmd_cnt to 1 is actually a problem when w=
-e have pending commands.
-
-Yes, but the problem is that if the driver powers down the controller
-on close or the command complete event is in the rx_work queue (that
-we just flushed) then we need to set this cmd_cnt to 1.
-
-> You can trigger this via ioctl and also rfkill since both go via hci_dev_=
-do_close to shutdown the handling of the device.
+> Maybe it would be enough to verify size only if there is no continuation?
 >
-> We need to wait for the command timeout of the pending command. While we =
-could pretend that the ioctl is deprecated and should not be used, but rfki=
-ll clearly isn't. And honestly hciconfig hci0 up/down is way to useful for =
-low-level testing that it might not go away any time soon.
+>                 /* Valid range for rsp_count is 0x0002-0xFFFF */
+> -               if (rsp_count < 0x0002) {
+> +               if (t->rsp_concat_buf.data_size == 0 && rsp_count < 0x0002) {
+>                         t->err = EPROTO;
 >
->> I agree with Marcel that the right fix should be to wait until we
->> receive the completion event from the adapter. I'm certainly not very
->> familiar with this code, but I'll try to hack it =3D) Suggestions are
->> welcomed!
 >
-> Check if you have the patch that Johan mentioned in your tree. That shoul=
-d at least fix the problem when using mgmt. It is a bit funky, but at least=
- mgmt power off will be blocked until you mgmt power on finished and thus s=
-hould make this race a lot harder trigger.
+> Seems to be working for me but I'm that much familiar sdp code..
 
-I'm in 3.8.11 and I don't have that patch... and as I can see from the
-log in mgmt.c it is not going to apply... there are already several
-changes from this kernel to that point. But anyway... that won't fix
-the problem. The scenario is "send a command, btmgmt power off, btmgmt
-power on". The fact that the command was sent because a previous power
-on is not relevant, and bluetoothd normally sends more commands when
-it sees an interface going up that aren't covered by this lock (like
-Write EIR, Write Class of Device, Write Local Name)... right?
+I agree this change should work just fine (to my understanding). If
+rsp_count is invalid , it will fail with EPROTO and BlueZ will not
+issue a continuation SDP request anyway.
 
-I'll try to test that on a linux desktop with a recent compat-drivers
-and an usb adapter.
-
-Alex.
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
