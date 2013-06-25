@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC BlueZ v0 05/16] input: Use btd_server userdata for input_server
-Date: Tue, 25 Jun 2013 18:24:38 +0200
-Message-Id: <1372177489-6858-6-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC BlueZ v0 06/16] thermometer: Remove boilerplate code
+Date: Tue, 25 Jun 2013 18:24:39 +0200
+Message-Id: <1372177489-6858-7-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1372177489-6858-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1372177489-6858-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,72 +12,111 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Avoid maintaining an internal list of probed adapters and use instead
-the userdata pointer provided by btd_server.
+The helper fuctions to adapt btd_profile signatures with internal APIs
+add boilerplate code of little use, so remove them.
 ---
- profiles/input/server.c | 23 ++---------------------
- 1 file changed, 2 insertions(+), 21 deletions(-)
+ profiles/thermometer/thermometer.c | 51 ++++++++++----------------------------
+ 1 file changed, 13 insertions(+), 38 deletions(-)
 
-diff --git a/profiles/input/server.c b/profiles/input/server.c
-index 077429c..e1dbfba 100644
---- a/profiles/input/server.c
-+++ b/profiles/input/server.c
-@@ -48,7 +48,6 @@
- #include "device.h"
- #include "server.h"
+diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
+index 44f5e79..034e50b 100644
+--- a/profiles/thermometer/thermometer.c
++++ b/profiles/thermometer/thermometer.c
+@@ -1162,14 +1162,19 @@ static void attio_disconnected_cb(gpointer user_data)
+ 	t->attrib = NULL;
+ }
  
--static GSList *servers = NULL;
- struct input_server {
- 	bdaddr_t src;
- 	GIOChannel *ctrl;
-@@ -56,14 +55,6 @@ struct input_server {
- 	GIOChannel *confirm;
- };
- 
--static int server_cmp(gconstpointer s, gconstpointer user_data)
--{
--	const struct input_server *server = s;
--	const bdaddr_t *src = user_data;
--
--	return bacmp(&server->src, src);
--}
--
- static void connect_event_cb(GIOChannel *chan, GError *err, gpointer data)
+-static int thermometer_register(struct btd_device *device,
+-						struct gatt_primary *tattr)
++static int thermometer_device_probe(struct btd_service *service)
  {
- 	uint16_t psm;
-@@ -231,23 +222,14 @@ int hid_server_probe(struct btd_server *btd_server)
- 		return -1;
- 	}
++	struct btd_device *device = btd_service_get_device(service);
+ 	const char *path = device_get_path(device);
++	struct gatt_primary *tattr;
+ 	struct thermometer *t;
+ 	struct btd_adapter *adapter;
+ 	struct thermometer_adapter *tadapter;
  
--	servers = g_slist_append(servers, server);
-+	btd_server_set_user_data(btd_server, server);
++	tattr = btd_device_get_primary(device, HEALTH_THERMOMETER_UUID);
++	if (tattr == NULL)
++		return -EINVAL;
++
+ 	adapter = device_get_adapter(device);
  
+ 	tadapter = find_thermometer_adapter(adapter);
+@@ -1201,8 +1206,9 @@ static int thermometer_register(struct btd_device *device,
  	return 0;
  }
  
- void hid_server_remove(struct btd_server *btd_server)
+-static void thermometer_unregister(struct btd_device *device)
++static void thermometer_device_remove(struct btd_service *service)
  {
--	struct btd_adapter *adapter = btd_server_get_adapter(btd_server);
--	const bdaddr_t *src = adapter_get_address(adapter);
--	struct input_server *server;
--	GSList *l;
--
--	l = g_slist_find_custom(servers, src, server_cmp);
--	if (!l)
--		return;
--
--	server = l->data;
-+	struct input_server *server = btd_server_get_user_data(btd_server);
++	struct btd_device *device = btd_service_get_device(service);
+ 	struct thermometer *t;
+ 	struct btd_adapter *adapter;
+ 	struct thermometer_adapter *tadapter;
+@@ -1243,8 +1249,9 @@ static const GDBusMethodTable thermometer_manager_methods[] = {
+ 	{ }
+ };
  
- 	g_io_channel_shutdown(server->intr, TRUE, NULL);
- 	g_io_channel_unref(server->intr);
-@@ -255,6 +237,5 @@ void hid_server_remove(struct btd_server *btd_server)
- 	g_io_channel_shutdown(server->ctrl, TRUE, NULL);
- 	g_io_channel_unref(server->ctrl);
+-static int thermometer_adapter_register(struct btd_adapter *adapter)
++static int thermometer_adapter_probe(struct btd_server *server)
+ {
++	struct btd_adapter *adapter = btd_server_get_adapter(server);
+ 	struct thermometer_adapter *tadapter;
  
--	servers = g_slist_remove(servers, server);
- 	g_free(server);
+ 	tadapter = g_new0(struct thermometer_adapter, 1);
+@@ -1267,8 +1274,9 @@ static int thermometer_adapter_register(struct btd_adapter *adapter)
+ 	return 0;
  }
+ 
+-static void thermometer_adapter_unregister(struct btd_adapter *adapter)
++static void thermometer_adapter_remove(struct btd_server *server)
+ {
++	struct btd_adapter *adapter = btd_server_get_adapter(server);
+ 	struct thermometer_adapter *tadapter;
+ 
+ 	tadapter = find_thermometer_adapter(adapter);
+@@ -1282,39 +1290,6 @@ static void thermometer_adapter_unregister(struct btd_adapter *adapter)
+ 					THERMOMETER_MANAGER_INTERFACE);
+ }
+ 
+-static int thermometer_device_probe(struct btd_service *service)
+-{
+-	struct btd_device *device = btd_service_get_device(service);
+-	struct gatt_primary *tattr;
+-
+-	tattr = btd_device_get_primary(device, HEALTH_THERMOMETER_UUID);
+-	if (tattr == NULL)
+-		return -EINVAL;
+-
+-	return thermometer_register(device, tattr);
+-}
+-
+-static void thermometer_device_remove(struct btd_service *service)
+-{
+-	struct btd_device *device = btd_service_get_device(service);
+-
+-	thermometer_unregister(device);
+-}
+-
+-static int thermometer_adapter_probe(struct btd_server *server)
+-{
+-	struct btd_adapter *adapter = btd_server_get_adapter(server);
+-
+-	return thermometer_adapter_register(adapter);
+-}
+-
+-static void thermometer_adapter_remove(struct btd_server *server)
+-{
+-	struct btd_adapter *adapter = btd_server_get_adapter(server);
+-
+-	thermometer_adapter_unregister(adapter);
+-}
+-
+ static struct btd_profile thermometer_profile = {
+ 	.name		= "Health Thermometer GATT driver",
+ 	.remote_uuid	= HEALTH_THERMOMETER_UUID,
 -- 
 1.8.1.4
 
