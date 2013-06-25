@@ -1,42 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: Re: regression in sdp lib
-Date: Tue, 25 Jun 2013 21:54:29 +0200
-Message-ID: <1429697.uq0A3eL4HE@athlon>
-In-Reply-To: <20130625184848.GA29741@x220.P-661HNU-F1>
-References: <1560638.biMD7yTzvv@athlon> <20130625184848.GA29741@x220.P-661HNU-F1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <EF5E15A5-5F57-458F-8E6E-8B0850958E9A@holtmann.org>
+References: <1371824255-3071-1-git-send-email-lucas.demarchi@profusion.mobi>
+ <ED8EF8E2-B635-404D-A328-2DCC55EEBCA7@holtmann.org> <CAMOw1v7gJ-dV5akn0F4bDmG2zo8MYyO1D68Q6MZCE8SVViTgMQ@mail.gmail.com>
+ <EF5E15A5-5F57-458F-8E6E-8B0850958E9A@holtmann.org>
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Date: Tue, 25 Jun 2013 15:50:00 -0300
+Message-ID: <CAMOw1v6rsJA2R3xcTYjaRYsOX6N2jPhvTskVmn+ugqxUbLpgAg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3 1/5] build-sys: Don't build gdbus several times
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+On Fri, Jun 21, 2013 at 7:47 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Lucas,
+>
+>>>> We are currently compiling gdbus 3 times: one for tests, one for
+>>>> bluetoothd and another for obexd.
+>>>
+>>> we recompile because of the different CFLAGS for these binaries.
+>>
+>> But they shouldn=B4t be affecting gdbus.
+>>
+>>>
+>>>> $ ls gdbus/*watch.o
+>>>> gdbus/bluetoothd-watch.o  gdbus/obexd-watch.o  gdbus/watch.o
+>>>>
+>>>> Instead of prepending $(gdbus_sources) to several _SOURCES variable, u=
+se
+>>>> a convenience library.
+>>>
+>>> When we switched to non-recursive build, we stopped building interim li=
+braries. What is the benefit of going back to building them. I am personall=
+y fine with building gdbus several times.
+>>
+>> It=B4s more that there=B4s no advantage doing otherwise. The small benef=
+it
+>> is building less files and letting it simpler.
+>
+> then at least get into a bit of a standard habit. We are building libblue=
+tooth into a public and private version.
+>
+> Currently we name it libbluetooth-private, but maybe following the system=
+d "standard", we should start calling that libbluetooth-internal. And then =
+libgdbus-internal.
 
-On Tuesday 25 June 2013 21:48:48 Johan Hedberg wrote:
-> Hi Szymon,
-> 
-> On Fri, Jun 21, 2013, Szymon Janc wrote:
-> > commit 'lib: Add range check for SDP_SVC_ATTR_RSP/SDP_SVC_SEARCH_ATTR_RSP'
-> > 1796f00e846561af broke sdp with Nokia BH217 headset.
-> 
-> Since there evidently wasn't any progress on this issue and we want to
-> get a new release out (due to also another severe regression) I've gone
-> ahead and simply reverted the original patch. Nevertheless, I'm still
-> looking forward to seeing a proper fix for this issue.
+ok
 
-Maybe it would be enough to verify size only if there is no continuation?
+>
+> You also do realize that I will make you do this for all other projects u=
+sing gdbus.
 
-                /* Valid range for rsp_count is 0x0002-0xFFFF */
--               if (rsp_count < 0x0002) {
-+               if (t->rsp_concat_buf.data_size == 0 && rsp_count < 0x0002) {
-                        t->err = EPROTO;
+hahaha... ok
 
-
-Seems to be working for me but I'm that much familiar sdp code..
-
--- 
-Szymon K. Janc
-szymon.janc@gmail.com
+Lucas De Marchi
