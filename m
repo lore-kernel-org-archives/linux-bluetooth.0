@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC BlueZ v0 07/16] thermometer: Use btd_server userdata
-Date: Tue, 25 Jun 2013 18:24:40 +0200
-Message-Id: <1372177489-6858-8-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC BlueZ v0 08/16] cyclingspeed: Use btd_server userdata
+Date: Tue, 25 Jun 2013 18:24:41 +0200
+Message-Id: <1372177489-6858-9-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1372177489-6858-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1372177489-6858-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,34 +13,34 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
 Exploit the userdata pointer to avoid maintainig a list with instances
-of struct thermometer_adapter.
+of struct csc_adapter.
 ---
- profiles/thermometer/thermometer.c | 34 ++++++++--------------------------
- 1 file changed, 8 insertions(+), 26 deletions(-)
+ profiles/cyclingspeed/cyclingspeed.c | 32 +++++++-------------------------
+ 1 file changed, 7 insertions(+), 25 deletions(-)
 
-diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
-index 034e50b..f1aa9e0 100644
---- a/profiles/thermometer/thermometer.c
-+++ b/profiles/thermometer/thermometer.c
-@@ -119,8 +119,6 @@ struct tmp_interval_data {
- 	uint16_t		interval;
+diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
+index 14c2df7..8b7e2e1 100644
+--- a/profiles/cyclingspeed/cyclingspeed.c
++++ b/profiles/cyclingspeed/cyclingspeed.c
+@@ -138,8 +138,6 @@ struct characteristic {
+ 	char		uuid[MAX_LEN_UUID_STR + 1];
  };
  
--static GSList *thermometer_adapters = NULL;
+-static GSList *csc_adapters = NULL;
 -
- static const char * const temp_type[] = {
- 	"<reserved>",
- 	"armpit",
-@@ -191,17 +189,6 @@ static void destroy_thermometer_adapter(gpointer user_data)
- 	g_free(tadapter);
+ static const char * const location_enum[] = {
+ 	"other", "top-of-shoe", "in-shoe", "hip", "front-wheel", "left-crank",
+ 	"right-crank", "left-pedal", "right-pedal", "front-hub",
+@@ -167,17 +165,6 @@ static int str2location(const char *location)
+ 	return -1;
  }
  
 -static int cmp_adapter(gconstpointer a, gconstpointer b)
 -{
--	const struct thermometer_adapter *tadapter = a;
+-	const struct csc_adapter *cadapter = a;
 -	const struct btd_adapter *adapter = b;
 -
--	if (adapter == tadapter->adapter)
+-	if (adapter == cadapter->adapter)
 -		return 0;
 -
 -	return -1;
@@ -48,17 +48,16 @@ index 034e50b..f1aa9e0 100644
 -
  static int cmp_device(gconstpointer a, gconstpointer b)
  {
- 	const struct thermometer *t = a;
-@@ -229,12 +216,13 @@ static int cmp_watcher(gconstpointer a, gconstpointer b)
- static struct thermometer_adapter *
- find_thermometer_adapter(struct btd_adapter *adapter)
+ 	const struct csc *csc = a;
+@@ -204,12 +191,13 @@ static int cmp_watcher(gconstpointer a, gconstpointer b)
+ 
+ static struct csc_adapter *find_csc_adapter(struct btd_adapter *adapter)
  {
--	GSList *l = g_slist_find_custom(thermometer_adapters, adapter,
--								cmp_adapter);
--	if (!l)
+-	GSList *l = g_slist_find_custom(csc_adapters, adapter, cmp_adapter);
 +	struct btd_server *server;
-+
-+	server = btd_adapter_get_server(adapter, HEALTH_THERMOMETER_UUID);
+ 
+-	if (!l)
++	server = btd_adapter_get_server(adapter, CYCLING_SC_UUID);
 +	if (server == NULL)
  		return NULL;
  
@@ -66,39 +65,39 @@ index 034e50b..f1aa9e0 100644
 +	return btd_server_get_user_data(server);
  }
  
- static void change_property(struct thermometer *t, const char *name,
-@@ -1269,21 +1257,14 @@ static int thermometer_adapter_probe(struct btd_server *server)
+ static void destroy_watcher(gpointer user_data)
+@@ -978,21 +966,14 @@ static int csc_adapter_probe(struct btd_server *server)
  		return -EIO;
  	}
  
--	thermometer_adapters = g_slist_prepend(thermometer_adapters, tadapter);
-+	btd_server_set_user_data(server, tadapter);
+-	csc_adapters = g_slist_prepend(csc_adapters, cadapter);
++	btd_server_set_user_data(server, cadapter);
  
  	return 0;
  }
  
- static void thermometer_adapter_remove(struct btd_server *server)
+ static void csc_adapter_remove(struct btd_server *server)
  {
 -	struct btd_adapter *adapter = btd_server_get_adapter(server);
--	struct thermometer_adapter *tadapter;
+-	struct csc_adapter *cadapter;
 -
--	tadapter = find_thermometer_adapter(adapter);
--	if (tadapter == NULL)
+-	cadapter = find_csc_adapter(adapter);
+-	if (cadapter == NULL)
 -		return;
 -
--	thermometer_adapters = g_slist_remove(thermometer_adapters, tadapter);
-+	struct thermometer_adapter *tadapter = btd_server_get_user_data(server);
+-	csc_adapters = g_slist_remove(csc_adapters, cadapter);
++	struct csc_adapter *cadapter = btd_server_get_user_data(server);
  
  	g_dbus_unregister_interface(btd_get_dbus_connection(),
- 					adapter_get_path(tadapter->adapter),
-@@ -1292,6 +1273,7 @@ static void thermometer_adapter_remove(struct btd_server *server)
+ 					adapter_get_path(cadapter->adapter),
+@@ -1259,6 +1240,7 @@ static void csc_device_remove(struct btd_service *service)
  
- static struct btd_profile thermometer_profile = {
- 	.name		= "Health Thermometer GATT driver",
-+	.local_uuid	= HEALTH_THERMOMETER_UUID,
- 	.remote_uuid	= HEALTH_THERMOMETER_UUID,
- 	.device_probe	= thermometer_device_probe,
- 	.device_remove	= thermometer_device_remove,
+ static struct btd_profile cscp_profile = {
+ 	.name		= "Cycling Speed and Cadence GATT Driver",
++	.local_uuid	= CYCLING_SC_UUID,
+ 	.remote_uuid	= CYCLING_SC_UUID,
+ 
+ 	.adapter_probe	= csc_adapter_probe,
 -- 
 1.8.1.4
 
