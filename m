@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC BlueZ v0 12/16] network: Bypass manager for profile server
-Date: Tue, 25 Jun 2013 18:24:45 +0200
-Message-Id: <1372177489-6858-13-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC BlueZ v0 16/16] network: Use btd_server userdata for network_server
+Date: Tue, 25 Jun 2013 18:24:49 +0200
+Message-Id: <1372177489-6858-17-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1372177489-6858-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1372177489-6858-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,213 +12,134 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Trivially adopt the btd_profile signature regarding adapter probe in
-server.h in order to avoid boilerplate code in manager.c.
+Exploit the userdata pointer to avoid maintainig a list with instances
+of struct network_server.
 ---
- profiles/network/manager.c | 72 ++++------------------------------------------
- profiles/network/server.c  | 32 ++++++++++++++-------
- profiles/network/server.h  |  4 +--
- 3 files changed, 30 insertions(+), 78 deletions(-)
+ profiles/network/server.c | 56 ++++++++++-------------------------------------
+ 1 file changed, 11 insertions(+), 45 deletions(-)
 
-diff --git a/profiles/network/manager.c b/profiles/network/manager.c
-index 1ec2db2..4f897dd 100644
---- a/profiles/network/manager.c
-+++ b/profiles/network/manager.c
-@@ -75,66 +75,6 @@ done:
- 				conf_security ? "true" : "false");
- }
- 
--static int panu_server_probe(struct btd_server *server)
--{
--	struct btd_adapter *adapter = btd_server_get_adapter(server);
--	const char *path = adapter_get_path(adapter);
--
--	DBG("path %s", path);
--
--	return server_register(adapter, BNEP_SVC_PANU);
--}
--
--static void panu_server_remove(struct btd_server *server)
--{
--	struct btd_adapter *adapter = btd_server_get_adapter(server);
--	const char *path = adapter_get_path(adapter);
--
--	DBG("path %s", path);
--
--	server_unregister(adapter, BNEP_SVC_PANU);
--}
--
--static int gn_server_probe(struct btd_server *server)
--{
--	struct btd_adapter *adapter = btd_server_get_adapter(server);
--	const char *path = adapter_get_path(adapter);
--
--	DBG("path %s", path);
--
--	return server_register(adapter, BNEP_SVC_GN);
--}
--
--static void gn_server_remove(struct btd_server *server)
--{
--	struct btd_adapter *adapter = btd_server_get_adapter(server);
--	const char *path = adapter_get_path(adapter);
--
--	DBG("path %s", path);
--
--	server_unregister(adapter, BNEP_SVC_GN);
--}
--
--static int nap_server_probe(struct btd_server *server)
--{
--	struct btd_adapter *adapter = btd_server_get_adapter(server);
--	const char *path = adapter_get_path(adapter);
--
--	DBG("path %s", path);
--
--	return server_register(adapter, BNEP_SVC_NAP);
--}
--
--static void nap_server_remove(struct btd_server *server)
--{
--	struct btd_adapter *adapter = btd_server_get_adapter(server);
--	const char *path = adapter_get_path(adapter);
--
--	DBG("path %s", path);
--
--	server_unregister(adapter, BNEP_SVC_NAP);
--}
--
- static struct btd_profile panu_profile = {
- 	.name		= "network-panu",
- 	.local_uuid	= NAP_UUID,
-@@ -143,8 +83,8 @@ static struct btd_profile panu_profile = {
- 	.device_remove	= connection_unregister,
- 	.connect	= connection_connect,
- 	.disconnect	= connection_disconnect,
--	.adapter_probe	= panu_server_probe,
--	.adapter_remove	= panu_server_remove,
-+	.adapter_probe	= network_server_probe,
-+	.adapter_remove	= network_server_remove,
- };
- 
- static struct btd_profile gn_profile = {
-@@ -155,8 +95,8 @@ static struct btd_profile gn_profile = {
- 	.device_remove	= connection_unregister,
- 	.connect	= connection_connect,
- 	.disconnect	= connection_disconnect,
--	.adapter_probe	= gn_server_probe,
--	.adapter_remove	= gn_server_remove,
-+	.adapter_probe	= network_server_probe,
-+	.adapter_remove	= network_server_remove,
- };
- 
- static struct btd_profile nap_profile = {
-@@ -167,8 +107,8 @@ static struct btd_profile nap_profile = {
- 	.device_remove	= connection_unregister,
- 	.connect	= connection_connect,
- 	.disconnect	= connection_disconnect,
--	.adapter_probe	= nap_server_probe,
--	.adapter_remove	= nap_server_remove,
-+	.adapter_probe	= network_server_probe,
-+	.adapter_remove	= network_server_remove,
- };
- 
- static int network_init(void)
 diff --git a/profiles/network/server.c b/profiles/network/server.c
-index ace31c5..a0b7754 100644
+index 77e2c7e..8ca9013 100644
 --- a/profiles/network/server.c
 +++ b/profiles/network/server.c
-@@ -43,6 +43,8 @@
- #include "lib/uuid.h"
- #include "../src/dbus-common.h"
- #include "../src/adapter.h"
-+#include "../src/profile.h"
-+#include "../src/server.h"
+@@ -68,7 +68,6 @@ struct network_adapter {
+ 	struct btd_adapter *adapter;	/* Adapter pointer */
+ 	GIOChannel	*io;		/* Bnep socket */
+ 	struct network_session *setup;	/* Setup in progress */
+-	GSList		*servers;	/* Server register to adapter */
+ };
  
- #include "log.h"
- #include "error.h"
-@@ -786,11 +788,18 @@ static struct network_adapter *create_adapter(struct btd_adapter *adapter)
- 	return na;
+ /* Main server structure */
+@@ -88,16 +87,13 @@ static gboolean security = TRUE;
+ static struct network_server *find_server(struct network_adapter *na,
+ 								uint16_t id)
+ {
+-	GSList *list;
+-
+-	for (list = na->servers; list; list = list->next) {
+-		struct network_server *ns = list->data;
++	const char *uuid = bnep_uuid(id);
++	struct btd_server *server = btd_adapter_get_server(na->adapter, uuid);
+ 
+-		if (ns->id == id)
+-			return ns;
+-	}
++	if (server == NULL)
++		return NULL;
+ 
+-	return NULL;
++	return btd_server_get_user_data(server);
  }
  
--int server_register(struct btd_adapter *adapter, uint16_t id)
-+int network_server_probe(struct btd_server *server)
+ static sdp_record_t *server_record_new(const char *name, uint16_t id)
+@@ -676,10 +672,8 @@ static void adapter_free(struct network_adapter *na)
+ 	g_free(na);
+ }
+ 
+-static void server_free(void *data)
++static void server_free(struct network_server *ns)
  {
-+	struct btd_adapter *adapter = btd_server_get_adapter(server);
- 	struct network_adapter *na;
- 	struct network_server *ns;
--	const char *path;
-+	const char *path = adapter_get_path(adapter);
-+	const char *uuid = btd_server_get_profile(server)->remote_uuid;
-+	uint16_t id;
-+
-+	DBG("path %s uuid %s", path, uuid);
-+
-+	id = bnep_service_id(uuid);
- 
- 	na = find_adapter(adapters, adapter);
- 	if (!na) {
-@@ -808,8 +817,6 @@ int server_register(struct btd_adapter *adapter, uint16_t id)
- 
- 	ns->name = g_strdup("Network service");
- 
--	path = adapter_get_path(adapter);
+-	struct network_server *ns = data;
 -
- 	if (g_slist_length(na->servers) > 0)
- 		goto done;
+ 	if (!ns)
+ 		return;
  
-@@ -836,28 +843,33 @@ done:
+@@ -701,7 +695,6 @@ static void path_unregister(void *data)
+ 	DBG("Unregistered interface %s on path %s",
+ 		NETWORK_SERVER_INTERFACE, adapter_get_path(na->adapter));
+ 
+-	g_slist_free_full(na->servers, server_free);
+ 	adapter_free(na);
+ }
+ 
+@@ -747,34 +740,23 @@ int network_server_probe(struct btd_server *server)
+ {
+ 	struct btd_adapter *adapter = btd_server_get_adapter(server);
+ 	struct btd_server *bnep_server;
+-	struct network_adapter *na;
+ 	struct network_server *ns;
+ 	const char *uuid = btd_server_get_profile(server)->remote_uuid;
+-	uint16_t id;
+ 
+ 	DBG("path %s uuid %s", adapter_get_path(adapter), uuid);
+ 
+-	id = bnep_service_id(uuid);
+-
+ 	bnep_server = btd_adapter_get_server(adapter, BNEP_SVC_UUID);
+ 	if (bnep_server == NULL)
+ 		return -EINVAL;
+ 
+-	na = btd_server_get_user_data(bnep_server);
+-
+-	ns = find_server(na, id);
+-	if (ns)
+-		return 0;
+-
+ 	ns = g_new0(struct network_server, 1);
+-
+ 	ns->name = g_strdup("Network service");
+-
+ 	bacpy(&ns->src, adapter_get_address(adapter));
+-	ns->id = id;
+-	ns->na = na;
++	ns->id = bnep_service_id(uuid);
++	ns->na = btd_server_get_user_data(bnep_server);
+ 	ns->record_id = 0;
+-	na->servers = g_slist_append(na->servers, ns);
++
++	btd_server_set_user_data(server, ns);
+ 
  	return 0;
  }
- 
--int server_unregister(struct btd_adapter *adapter, uint16_t id)
-+void network_server_remove(struct btd_server *server)
+@@ -782,27 +764,11 @@ int network_server_probe(struct btd_server *server)
+ void network_server_remove(struct btd_server *server)
  {
-+	struct btd_adapter *adapter = btd_server_get_adapter(server);
- 	struct network_adapter *na;
- 	struct network_server *ns;
-+	const char *uuid = btd_server_get_profile(server)->remote_uuid;
-+	uint16_t id;
-+
-+	DBG("path %s uuid %s", adapter_get_path(adapter), uuid);
-+
-+	id = bnep_service_id(uuid);
+ 	struct btd_adapter *adapter = btd_server_get_adapter(server);
+-	struct btd_server *bnep_server;
+-	struct network_adapter *na;
+-	struct network_server *ns;
++	struct network_server *ns = btd_server_get_user_data(server);
+ 	const char *uuid = btd_server_get_profile(server)->remote_uuid;
+-	uint16_t id;
  
- 	na = find_adapter(adapters, adapter);
- 	if (!na)
--		return -EINVAL;
-+		return;
+ 	DBG("path %s uuid %s", adapter_get_path(adapter), uuid);
  
- 	ns = find_server(na, id);
- 	if (!ns)
--		return -EINVAL;
-+		return;
- 
- 	na->servers = g_slist_remove(na->servers, ns);
- 	server_free(ns);
- 
- 	if (g_slist_length(na->servers) > 0)
--		return 0;
-+		return;
- 
- 	g_dbus_unregister_interface(btd_get_dbus_connection(),
- 						adapter_get_path(adapter),
- 						NETWORK_SERVER_INTERFACE);
+-	id = bnep_service_id(uuid);
 -
--	return 0;
+-	bnep_server = btd_adapter_get_server(adapter, BNEP_SVC_UUID);
+-	if (bnep_server == NULL)
+-		return;
+-
+-	na = btd_server_get_user_data(bnep_server);
+-
+-	ns = find_server(na, id);
+-	if (!ns)
+-		return;
+-
+-	na->servers = g_slist_remove(na->servers, ns);
+ 	server_free(ns);
  }
-diff --git a/profiles/network/server.h b/profiles/network/server.h
-index 2edd342..2d8b41c 100644
---- a/profiles/network/server.h
-+++ b/profiles/network/server.h
-@@ -23,5 +23,5 @@
  
- int server_init(gboolean secure);
- void server_exit(void);
--int server_register(struct btd_adapter *adapter, uint16_t id);
--int server_unregister(struct btd_adapter *adapter, uint16_t id);
-+int network_server_probe(struct btd_server *server);
-+void network_server_remove(struct btd_server *server);
 -- 
 1.8.1.4
 
