@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC BlueZ v0 11/16] network: Replace list with network_adapter
-Date: Tue, 25 Jun 2013 18:24:44 +0200
-Message-Id: <1372177489-6858-12-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC BlueZ v0 09/16] heartrate: Remove boilerplate code
+Date: Tue, 25 Jun 2013 18:24:42 +0200
+Message-Id: <1372177489-6858-10-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1372177489-6858-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1372177489-6858-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,101 +12,59 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Trivially refactor the code such that find_server() receives a pointer
-to struct network_adapter instead of a GSList, given that the codebase
-always searches within the network_adapter->servers list.
+The helper fuctions to adapt btd_profile signatures with internal APIs
+add boilerplate code of little use, so remove them.
 ---
- profiles/network/server.c | 25 +++++++++++++++----------
- 1 file changed, 15 insertions(+), 10 deletions(-)
+ profiles/heartrate/heartrate.c | 20 ++++----------------
+ 1 file changed, 4 insertions(+), 16 deletions(-)
 
-diff --git a/profiles/network/server.c b/profiles/network/server.c
-index de48bec..ace31c5 100644
---- a/profiles/network/server.c
-+++ b/profiles/network/server.c
-@@ -97,9 +97,12 @@ static struct network_adapter *find_adapter(GSList *list,
- 	return NULL;
+diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
+index 1d902a8..81ca2a8 100644
+--- a/profiles/heartrate/heartrate.c
++++ b/profiles/heartrate/heartrate.c
+@@ -724,8 +724,9 @@ static const GDBusPropertyTable heartrate_device_properties[] = {
+ 	{ }
+ };
+ 
+-static int heartrate_adapter_register(struct btd_adapter *adapter)
++static int heartrate_adapter_probe(struct btd_server *server)
+ {
++	struct btd_adapter *adapter = btd_server_get_adapter(server);
+ 	struct heartrate_adapter *hradapter;
+ 
+ 	hradapter = g_new0(struct heartrate_adapter, 1);
+@@ -748,8 +749,9 @@ static int heartrate_adapter_register(struct btd_adapter *adapter)
+ 	return 0;
  }
  
--static struct network_server *find_server(GSList *list, uint16_t id)
-+static struct network_server *find_server(struct network_adapter *na,
-+								uint16_t id)
+-static void heartrate_adapter_unregister(struct btd_adapter *adapter)
++static void heartrate_adapter_remove(struct btd_server *server)
  {
--	for (; list; list = list->next) {
-+	GSList *list;
-+
-+	for (list = na->servers; list; list = list->next) {
- 		struct network_server *ns = list->data;
++	struct btd_adapter *adapter = btd_server_get_adapter(server);
+ 	struct heartrate_adapter *hradapter;
  
- 		if (ns->id == id)
-@@ -109,10 +112,12 @@ static struct network_server *find_server(GSList *list, uint16_t id)
- 	return NULL;
+ 	hradapter = find_heartrate_adapter(adapter);
+@@ -831,20 +833,6 @@ static void heartrate_device_unregister(struct btd_device *device)
+ 				device_get_path(device), HEART_RATE_INTERFACE);
  }
  
--static struct network_server *find_server_by_uuid(GSList *list,
-+static struct network_server *find_server_by_uuid(struct network_adapter *na,
- 							const char *uuid)
+-static int heartrate_adapter_probe(struct btd_server *server)
+-{
+-	struct btd_adapter *adapter = btd_server_get_adapter(server);
+-
+-	return heartrate_adapter_register(adapter);
+-}
+-
+-static void heartrate_adapter_remove(struct btd_server *server)
+-{
+-	struct btd_adapter *adapter = btd_server_get_adapter(server);
+-
+-	heartrate_adapter_unregister(adapter);
+-}
+-
+ static int heartrate_device_probe(struct btd_service *service)
  {
--	for (; list; list = list->next) {
-+	GSList *list;
-+
-+	for (list = na->servers; list; list = list->next) {
- 		struct network_server *ns = list->data;
- 
- 		if (strcasecmp(uuid, bnep_uuid(ns->id)) == 0)
-@@ -441,7 +446,7 @@ static gboolean bnep_setup(GIOChannel *chan,
- 
- 	rsp = BNEP_CONN_NOT_ALLOWED;
- 
--	ns = find_server(na->servers, dst_role);
-+	ns = find_server(na, dst_role);
- 	if (!ns) {
- 		error("Server unavailable: (0x%x)", dst_role);
- 		goto reply;
-@@ -538,7 +543,7 @@ static void confirm_event(GIOChannel *chan, gpointer user_data)
- 		goto drop;
- 	}
- 
--	ns = find_server(na->servers, BNEP_SVC_NAP);
-+	ns = find_server(na, BNEP_SVC_NAP);
- 	if (!ns)
- 		goto drop;
- 
-@@ -648,7 +653,7 @@ static DBusMessage *register_server(DBusConnection *conn,
- 				DBUS_TYPE_STRING, &bridge, DBUS_TYPE_INVALID))
- 		return btd_error_invalid_args(msg);
- 
--	ns = find_server_by_uuid(na->servers, uuid);
-+	ns = find_server_by_uuid(na, uuid);
- 	if (ns == NULL)
- 		return btd_error_failed(msg, "Invalid UUID");
- 
-@@ -685,7 +690,7 @@ static DBusMessage *unregister_server(DBusConnection *conn,
- 							DBUS_TYPE_INVALID))
- 		return btd_error_invalid_args(msg);
- 
--	ns = find_server_by_uuid(na->servers, uuid);
-+	ns = find_server_by_uuid(na, uuid);
- 	if (!ns)
- 		return btd_error_failed(msg, "Invalid UUID");
- 
-@@ -795,7 +800,7 @@ int server_register(struct btd_adapter *adapter, uint16_t id)
- 		adapters = g_slist_append(adapters, na);
- 	}
- 
--	ns = find_server(na->servers, id);
-+	ns = find_server(na, id);
- 	if (ns)
- 		return 0;
- 
-@@ -840,7 +845,7 @@ int server_unregister(struct btd_adapter *adapter, uint16_t id)
- 	if (!na)
- 		return -EINVAL;
- 
--	ns = find_server(na->servers, id);
-+	ns = find_server(na, id);
- 	if (!ns)
- 		return -EINVAL;
- 
+ 	struct btd_device *device = btd_service_get_device(service);
 -- 
 1.8.1.4
 
