@@ -1,42 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] audio/player: Fix crash when current item UID is set to 0
-Date: Wed, 26 Jun 2013 13:36:57 +0300
-Message-Id: <1372243017-1461-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <51CA9700.3040600@ahsoftware.de>
+Date: Wed, 26 Jun 2013 09:23:44 +0200
+From: Alexander Holler <holler@ahsoftware.de>
+MIME-Version: 1.0
+To: Dean Jenkins <Dean_Jenkins@mentor.com>
+CC: Peter Hurley <peter@hurleysoftware.com>,
+ linux-kernel@vger.kernel.org, Jiri Slaby <jslaby@suse.cz>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Gustavo Padovan <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ linux-bluetooth@vger.kernel.org
+Subject: Re: BUG: tty: memory corruption through tty_release/tty_ldisc_release
+References: <519480A1.6030909@ahsoftware.de> <5194E380.1030109@hurleysoftware.com> <5194E64A.3040003@ahsoftware.de> <5195553C.90608@hurleysoftware.com> <5195B561.3090503@ahsoftware.de> <51C9A6A9.3000202@mentor.com>
+In-Reply-To: <51C9A6A9.3000202@mentor.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Am 25.06.2013 16:18, schrieb Dean Jenkins:
+> On 17/05/13 05:43, Alexander Holler wrote:
 
-Apparently some stacks set the current UID to 0 when paused/stopped which
-causes the following:
+>> To reproduce it, call rfcomm connect /dev/rfcommN and after the
+>> connection to the remote device happened, power down the remote device
+>> and wait 20s (the timeout until a connection drop will be discovered).
+> I expect this behaviour depends on the remote device. Does the device
+> close the RFCOMM session cleanly ? Perhaps an out of range test would be
+> better so that the connection drops.
 
-bluetoothd[23185]: profiles/audio/player.c:media_player_set_playlist_item() 0
-bluetoothd[23185]: profiles/audio/player.c:media_folder_create_item() (null) type audio uid 0
-process 23185: arguments to dbus_message_iter_append_basic() were incorrect, assertion "_dbus_check_is_valid_path (*string_p)" failed in file dbus-message.c line 2531.
-This is normally a bug in some application using the D-Bus library.
-  D-Bus not built with -rdynamic so unable to print a backtrace
+Yes. With power down I meant a hard power down, such that the remote 
+doesn't has the chance to close the session cleanly. It's easier to do 
+than putting it out of range, at least if the remote isn't a 
+battery-powered device. I should have described that more clearly.
 
-UID 0 is not a valid UID according to the spec so the code should not attempt
-to create any object to represent it.
----
- profiles/audio/player.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> Is there a bugzilla bug report that is tracking this issue ? If I can
+> reproduce this issue then I would like to add more information to a bug
+> report.
 
-diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index 0834def..0c52ea9 100644
---- a/profiles/audio/player.c
-+++ b/profiles/audio/player.c
-@@ -1845,7 +1845,7 @@ struct media_item *media_player_set_playlist_item(struct media_player *mp,
- 
- 	DBG("%" PRIu64 "", uid);
- 
--	if (folder == NULL)
-+	if (folder == NULL || uid == 0)
- 		return NULL;
- 
- 	item = media_folder_create_item(mp, folder, NULL,
--- 
-1.8.1.4
+I haven't written a bugzilla bug report and won't write one.
 
+Furthermore I've already found and described the problem, so more crash 
+reports should not be necessary.
+
+And they don't make much sense because they happen because of a 
+disastreous memory corruption, which means the BUGs can include almost 
+everything (hopefully nothing which eats your disk contents).
+
+Regards,
+
+Alexander Holler
