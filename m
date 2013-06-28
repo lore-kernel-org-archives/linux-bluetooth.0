@@ -1,49 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 28 Jun 2013 14:40:07 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: =?iso-8859-1?Q?=C0lex?= Fiestas <afiestas@kde.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Discoverable devices
+Message-ID: <20130628174007.GA2735@samus.indt.org>
+References: <1599920.hvBb11VtN9@monsterbad>
 MIME-Version: 1.0
-In-Reply-To: <1372414567-994-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1372414567-994-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Date: Sun, 30 Jun 2013 22:16:58 +0300
-Message-ID: <CABBYNZK6QrWF0gBEKYVW=4_Ur0guD5U8Aoy_rNz0ZntXmHqpvQ@mail.gmail.com>
-Subject: Re: [PATCH 1/1] obexd: Re-add D-Bus session properties
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1599920.hvBb11VtN9@monsterbad>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+Hi Àlex,
 
-On Fri, Jun 28, 2013 at 1:16 PM, Christian Fetzer
-<christian.fetzer@oss.bmw-carit.de> wrote:
-> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
->
-> This got lost when switching to org.freedesktop.DBus.Properties.
-> ---
->  obexd/client/session.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/obexd/client/session.c b/obexd/client/session.c
-> index 8d32ed0..d971982 100644
-> --- a/obexd/client/session.c
-> +++ b/obexd/client/session.c
-> @@ -856,7 +856,8 @@ const char *obc_session_register(struct obc_session *session,
->
->         if (g_dbus_register_interface(session->conn, session->path,
->                                         SESSION_INTERFACE, session_methods,
-> -                                       NULL, NULL, session, destroy) == FALSE)
-> +                                       NULL, session_properties, session,
-> +                                       destroy) == FALSE)
->                 goto fail;
->
->         if (session->driver->probe && session->driver->probe(session) < 0) {
+On 18:39 Fri 28 Jun, Àlex Fiestas wrote:
+> Is there any way of knowing if a device that is ALREADY created is in 
+> Discoverable mode?
+
+The first thing that comes to mind is listening for changes in the RSSI
+property, i.e. monitor the org.freedesktop.DBus.Properties.PropertiesChanged
+as well.
+
+> 
+> Calling startDiscvoer + monitor interfaceAdded/Remove works nice but that only 
+> works for devices that are newly discovered, not for those devices that are 
+> are already registered in the bus.
+> 
+> I read about org.bluez.Device1.Appearance  but it does not seem to have any 
+> value on any of my devices under any circumstance.
+
+Appearance is only present for Low Energy devices.
+
+> 
+> Am I missing something?
+> 
+> thanks !
 > --
-> 1.8.3.1
->
-> --
-
-Applied, thanks.
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
---
-Luiz Augusto von Dentz
+Cheers,
+-- 
+Vinicius
