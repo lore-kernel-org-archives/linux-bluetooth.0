@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>,
-	Timo Mueller <timo.mueller@bmw-carit.de>
-Subject: [RFC BlueZ v3 2/8] Bluetooth: Use defines in in hci_get_auth_req()
-Date: Fri, 28 Jun 2013 10:56:28 +0200
-Message-Id: <1372409794-24688-3-git-send-email-mikel.astiz.oss@gmail.com>
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [RFC BlueZ v3 3/8] Bluetooth: Use defines instead of integer literals
+Date: Fri, 28 Jun 2013 10:56:29 +0200
+Message-Id: <1372409794-24688-4-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1372409794-24688-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1372409794-24688-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,45 +12,48 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Make the code in hci_get_auth_req() more readable by using the
-defined macros instead of inlining magic numbers.
+Replace the occurrences of integer literals in hci_event.c with the
+newly introduced macros in hci.h.
 
 Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Signed-off-by: Timo Mueller <timo.mueller@bmw-carit.de>
 ---
- net/bluetooth/hci_event.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ net/bluetooth/hci_event.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 0437200..ce8be0b 100644
+index ce8be0b..50e39f4 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -3024,17 +3024,20 @@ unlock:
- static u8 hci_get_auth_req(struct hci_conn *conn)
- {
- 	/* If remote requests dedicated bonding follow that lead */
--	if (conn->remote_auth == 0x02 || conn->remote_auth == 0x03) {
-+	if (conn->remote_auth == HCI_AT_DEDICATED_BONDING ||
-+	    conn->remote_auth == HCI_AT_DEDICATED_BONDING_MITM) {
- 		/* If both remote and local IO capabilities allow MITM
- 		 * protection then require it, otherwise don't */
--		if (conn->remote_cap == 0x03 || conn->io_capability == 0x03)
--			return 0x02;
-+		if (conn->remote_cap == HCI_IO_NO_INPUT_OUTPUT ||
-+		    conn->io_capability == HCI_IO_NO_INPUT_OUTPUT)
-+			return HCI_AT_DEDICATED_BONDING;
- 		else
--			return 0x03;
-+			return HCI_AT_DEDICATED_BONDING_MITM;
+@@ -3069,7 +3069,7 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		/* Change the IO capability from KeyboardDisplay
+ 		 * to DisplayYesNo as it is not supported by BT spec. */
+ 		cp.capability = (conn->io_capability == 0x04) ?
+-						0x01 : conn->io_capability;
++				HCI_IO_DISPLAY_YESNO : conn->io_capability;
+ 		conn->auth_type = hci_get_auth_req(conn);
+ 		cp.authentication = conn->auth_type;
+ 
+@@ -3143,7 +3143,8 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev,
+ 	 * request. The only exception is when we're dedicated bonding
+ 	 * initiators (connect_cfm_cb set) since then we always have the MITM
+ 	 * bit set. */
+-	if (!conn->connect_cfm_cb && loc_mitm && conn->remote_cap == 0x03) {
++	if (!conn->connect_cfm_cb && loc_mitm &&
++	    conn->remote_cap == HCI_IO_NO_INPUT_OUTPUT) {
+ 		BT_DBG("Rejecting request: remote device can't provide MITM");
+ 		hci_send_cmd(hdev, HCI_OP_USER_CONFIRM_NEG_REPLY,
+ 			     sizeof(ev->bdaddr), &ev->bdaddr);
+@@ -3151,8 +3152,8 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev,
  	}
  
- 	/* If remote requests no-bonding follow that lead */
--	if (conn->remote_auth == 0x00 || conn->remote_auth == 0x01)
-+	if (conn->remote_auth == HCI_AT_NO_BONDING ||
-+	    conn->remote_auth == HCI_AT_NO_BONDING_MITM)
- 		return conn->remote_auth | (conn->auth_type & 0x01);
+ 	/* If no side requires MITM protection; auto-accept */
+-	if ((!loc_mitm || conn->remote_cap == 0x03) &&
+-	    (!rem_mitm || conn->io_capability == 0x03)) {
++	if ((!loc_mitm || conn->remote_cap == HCI_IO_NO_INPUT_OUTPUT) &&
++	    (!rem_mitm || conn->io_capability == HCI_IO_NO_INPUT_OUTPUT)) {
  
- 	return conn->auth_type;
+ 		/* If we're not the initiators request authorization to
+ 		 * proceed from user space (mgmt_user_confirm with
 -- 
 1.8.1.4
 
