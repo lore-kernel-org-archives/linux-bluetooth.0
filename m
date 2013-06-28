@@ -1,57 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1372409794-24688-1-git-send-email-mikel.astiz.oss@gmail.com>
-References: <1372409794-24688-1-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Fri, 28 Jun 2013 13:40:26 +0200
-Message-ID: <CANT-zCX-0Vuhh9CDQQNB9b39bVW3sS2d_J9JFCqNAx7CU1SFMA@mail.gmail.com>
-Subject: Re: [RFC BlueZ v3 0/8] SSP MITM protection
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <4639059.6A5mfqIqsg@uw000953>
+References: <1356097469-24073-1-git-send-email-s.syam@samsung.com>
+	<CAFBvHie-XXKTh0ggsP522YkQ5y1s6wHcoLrxa2SnEL0FxDdyoQ@mail.gmail.com>
+	<CAFBvHieOqd9rT9=Ku=CZ5FCtrH3baBTpCGWnFLaFFE+4bW0J7Q@mail.gmail.com>
+	<4639059.6A5mfqIqsg@uw000953>
+Date: Fri, 28 Jun 2013 15:47:46 +0530
+Message-ID: <CAFBvHidA6JdOu_FH2D4_NB24VoOWDeX_LEMX89U1p_O_ezCoJA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Bluetooth: Fix ACL alive for long in case of non
+ pariable devices
+From: Syam Sidhardhan <syamsidhardh@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: Syam Sidhardhan <s.syam@samsung.com>,
+	User Name <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi
 
-On Fri, Jun 28, 2013 at 10:56 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> The way the kernel handles MITM Protection during pairing is inconsistent: General Bonding and Dedicated Bonding are not treated equally.
->
-> From the user's perspective, using the MITM Protection usually means he will have to confirm the pairing in the UI (some pop-up showing the passkey). Making a difference between General and Dedicated Bonding is undesired because, in practice, the user normally doesn't care about which of them is used. Currently, if an iPhone is paired (initiated on the phone), no pop-up will be shown (because it's using General Bonding). This differs from pairing an Android device (using Dedicated Bonding), which an average user would not understand why.
->
-> The GAP Specification describes when MITM Protection should be used (Bluetooth Core Specification v4.0 Volume 3, part C, section 6.5.3). It makes no distinction between General vs Dedicated Bonding: the recommendation is *not* to use it "unless the security policy of an available local service requires MITM Protection".
->
-> However, the kernel doesn't necessarily have this information in a reliable way. Therefore, the safest choice is to always request MITM Protection, also for General Bonding [1]. The proposal here is to do this for both incoming (patch 6/8) and outgoing (patch 7/8) procedures, as it was previously done for Dedicated Bonding. This "conservative" approach is smart enough to fall back to not using MITM Protection if the IO capabilities don't allow it (this policy already existed before for Dedicated Bonding, see patch 5/8).
->
-> Some systems might however know that MITM Protection is not required at all, because no supported profile requires high security. This can be expressed by userland using the newly introduced management command (patch 8/8). In this case, the recommendation in the spec will be followed (affecting both General and Dedicated Bonding).
->
-> Note that the first 5 patches are refactoring patches which shouldn't change the behavior of the code. Within this group, patch 5/8 is the most tricky one since side effects could exist (we weren't able to observed them though).
->
-> [1] We make an exception here for No-Bonding, which remains unmodified. In this case, no MITM Protection is required by default since an additional pop-up would be undesireable for most use-cases.
->
-> Mikel Astiz (6):
->   Bluetooth: Add HCI authentication capabilities macros
->   Bluetooth: Use defines in in hci_get_auth_req()
->   Bluetooth: Use defines instead of integer literals
->   Bluetooth: Refactor hci_get_auth_req()
->   Bluetooth: Refactor code for outgoing dedicated bonding
->   Bluetooth: Request MITM Protection when initiator
->
-> Timo Mueller (2):
->   Bluetooth: Use MITM Protection when IO caps allow it
->   Bluetooth: Add management command to relax MITM Protection
->
->  include/net/bluetooth/hci.h  |  9 ++++++-
->  include/net/bluetooth/mgmt.h |  3 +++
->  net/bluetooth/hci_event.c    | 63 ++++++++++++++++++++++++++++----------------
->  net/bluetooth/mgmt.c         | 53 +++++++++++++++++++++++++++++++++----
->  4 files changed, 100 insertions(+), 28 deletions(-)
 
-For the record, I have no particular interest in the last two patches.
-They're submitted here for completion purposes as a base for the
-discussion.
+On Wed, Jun 26, 2013 at 6:18 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+>
+> Hi,
+>
+> On Wednesday 26 of June 2013 17:03:23 Syam Sidhardhan wrote:
+> > Hi,
+> >
+> > On Tue, Jan 8, 2013 at 2:19 AM, Syam Sidhardhan <syamsidhardh@gmail.com> wrote:
+> > >
+> > > Hi,
+> > >
+> > > On Fri, Dec 21, 2012 at 7:14 PM, Syam Sidhardhan <s.syam@samsung.com> wrote:
+> > > > For certain devices (ex: HID mouse), support for authentication,
+> > > > pairing and bonding is optional. For such devices, the ACL alive
+> > > > for too long after the l2cap disconnection.
+> > > >
+> > > > To avoid keep ACL alive for too long, set the ACL timeout back to
+> > > > HCI_DISCONN_TIMEOUT when l2cap is connected.
+> > > >
+> > > > commit id:a9ea3ed9b71cc3271dd59e76f65748adcaa76422 might have introduce
+> > > > this issue.
+> > > >
+> > > > Signed-off-by: Sang-Ki Park <sangki79.park@samsung.com>
+> > > > Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
+> > > > ---
+> > > > I'm not sure whether we need hci_conn_hold() and hci_conn_put() across
+> > > > while updating the disc_timeout. In certain other places in the code
+> > > > it's done. Ex: hci_auth_complete_evt(), hci_link_key_notify_evt() etc.
+> > > > Here I took that as the reference.
+> > > >
+> > > >  net/bluetooth/l2cap_core.c |    5 ++++-
+> > > >  1 file changed, 4 insertions(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > > > index 82a3bdc..7a544c2 100644
+> > > > --- a/net/bluetooth/l2cap_core.c
+> > > > +++ b/net/bluetooth/l2cap_core.c
+> > > > @@ -1360,7 +1360,6 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+> > > >         sk = chan->sk;
+> > > >
+> > > >         hci_conn_hold(conn->hcon);
+> > > > -       conn->hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
 
-Cheers,
-Mikel
+The above change has been recently applied to the  bluetooth-next by Johan.
+https://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/commit/net/bluetooth/l2cap_core.c?id=0cc59a72c723979cf8973aff4df874a5f7a697c7
+>
+> > > >
+> > > >         bacpy(&bt_sk(sk)->src, conn->src);
+> > > >         bacpy(&bt_sk(sk)->dst, conn->dst);
+> > > > @@ -1380,6 +1379,10 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
+> > > >
+> > > >         BT_DBG("conn %p", conn);
+> > > >
+> > > > +       hci_conn_hold(conn->hcon);
+> > > > +       conn->hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
+> > > > +       hci_conn_put(conn->hcon);
+> > > > +
+> > > >         if (!hcon->out && hcon->type == LE_LINK)
+> > > >                 l2cap_le_conn_ready(conn);
+> > > >
+> > > > --
+> > > > 1.7.9.5
+> > > >
+> > >
+> > > ping.
+> > >
+> >
+> > Is there any comment on this patch?
+> > If this patch looks valid I can rebase it with the latest code and
+> > send it once again.
+> >
+>
+> The funny thing is that original patch send to ML has this timer set back to
+> HCI_DISCONN_TIMEOUT in l2cap_connect_req(), not in l2cap_le_conn_ready().
+> See [1]. There were some big changes in l2cap code in bluetooth-next.git
+> while this was committed to bluetooth.git so maybe some merge conflict was
+> incorrectly resolved or sth...
+>
+> This patch looks ok to me. Just please make sure it works correctly
+> in scenario described in original commit.
+>
+
+Unfortunately I'm unable to find such an Android device to check the correctness
+describing in original commit.
+>
+>
+> ps
+> hold/put was to restart timer with new value, I think now it is hold/drop and
+> timer is replaced with workqueue and is needed if you want new timeout to be
+> used.
+>
+> [1] http://comments.gmane.org/gmane.linux.bluez.kernel/27532
+
+
+Thanks Szymon for the clarification.
+I'll send another version based on the latest bluetooth-next.git.
