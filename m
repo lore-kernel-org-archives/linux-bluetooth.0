@@ -1,33 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+From: Syam Sidhardhan <s.syam@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/1] obexd: Re-add D-Bus session properties
-Date: Fri, 28 Jun 2013 12:16:07 +0200
-Message-Id: <1372414567-994-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Cc: Syam Sidhardhan <s.syam@samsung.com>,
+	Sang-Ki Park <sangki79.park@samsung.com>
+Subject: [PATCH 1/1 v1] Bluetooth: Fix ACL alive for long in case of non
+ pariable devices
+Date: Fri, 28 Jun 2013 15:44:32 +0530
+Message-id: <1372414472-15854-1-git-send-email-s.syam@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+For certain devices (ex: HID mouse), support for authentication,
+pairing and bonding is optional. For such devices, the ACL alive
+for too long after the l2cap disconnection.
 
-This got lost when switching to org.freedesktop.DBus.Properties.
+To avoid keep ACL alive for too long, set the ACL timeout back to
+HCI_DISCONN_TIMEOUT when l2cap is connected.
+
+While merging the commit id:a9ea3ed9b71cc3271dd59e76f65748adcaa76422
+this issue might have introduce.
+
+Signed-off-by: Sang-Ki Park <sangki79.park@samsung.com>
+Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
 ---
- obexd/client/session.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ net/bluetooth/l2cap_core.c |    4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/obexd/client/session.c b/obexd/client/session.c
-index 8d32ed0..d971982 100644
---- a/obexd/client/session.c
-+++ b/obexd/client/session.c
-@@ -856,7 +856,8 @@ const char *obc_session_register(struct obc_session *session,
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 9af3a76..80df756 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1383,6 +1383,10 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
  
- 	if (g_dbus_register_interface(session->conn, session->path,
- 					SESSION_INTERFACE, session_methods,
--					NULL, NULL, session, destroy) == FALSE)
-+					NULL, session_properties, session,
-+					destroy) == FALSE)
- 		goto fail;
+ 	BT_DBG("conn %p", conn);
  
- 	if (session->driver->probe && session->driver->probe(session) < 0) {
++	hci_conn_hold(conn->hcon);
++	conn->hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
++	hci_conn_drop(conn->hcon);
++
+ 	/* For outgoing pairing which doesn't necessarily have an
+ 	 * associated socket (e.g. mgmt_pair_device).
+ 	 */
 -- 
-1.8.3.1
+1.7.9.5
 
