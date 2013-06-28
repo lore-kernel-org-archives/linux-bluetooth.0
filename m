@@ -3,9 +3,9 @@ From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>,
 	Timo Mueller <timo.mueller@bmw-carit.de>
-Subject: [RFC BlueZ v3 7/8] Bluetooth: Request MITM Protection when initiator
-Date: Fri, 28 Jun 2013 10:56:33 +0200
-Message-Id: <1372409794-24688-8-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC BlueZ v3 4/8] Bluetooth: Refactor hci_get_auth_req()
+Date: Fri, 28 Jun 2013 10:56:30 +0200
+Message-Id: <1372409794-24688-5-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1372409794-24688-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1372409794-24688-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,51 +13,75 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-The GAP Specification gives the flexibility to decide whether MITM
-Protection is requested or not (Bluetooth Core Specification v4.0
-Volume 3, part C, section 6.5.3) when replying to an
-HCI_EV_IO_CAPA_REQUEST event.
-
-The recommendation is *not* to set this flag "unless the security
-policy of an available local service requires MITM Protection"
-(regardless of the bonding type). However, the kernel doesn't
-necessarily have this information and therefore the safest choice is
-to always use MITM Protection, also for General Bonding.
-
-This patch changes the behavior for the General Bonding initiator
-role, always requesting MITM Protection even if no high security level
-is used. Depending on the remote capabilities, the protection might
-not be actually used, and we will accept this locally unless of course
-a high security level was originally required.
-
-Note that this was already done for Dedicated Bonding. No-Bonding is
-left unmodified because MITM Protection is normally not desired in
-these cases.
+Refactor the code without changing its behavior by handling the
+no-bonding cases first followed by General Bonding.
 
 Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
 Signed-off-by: Timo Mueller <timo.mueller@bmw-carit.de>
 ---
- net/bluetooth/hci_event.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_event.c | 37 ++++++++++++++++++++++---------------
+ 1 file changed, 22 insertions(+), 15 deletions(-)
 
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 283cb3f..461150d 100644
+index 50e39f4..fe78b9c 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -3071,9 +3071,11 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		if (conn->remote_auth == 0xff) {
- 			cp.authentication = conn->auth_type;
+@@ -3023,24 +3023,25 @@ unlock:
  
--			/* Use MITM protection for outgoing dedicated bonding */
-+			/* Request MITM protection if our IO caps allow it
-+			 * except for the no-bonding case
-+			 */
- 			if (conn->io_capability != HCI_IO_NO_INPUT_OUTPUT &&
--			    cp.authentication == HCI_AT_DEDICATED_BONDING)
-+			    cp.authentication != HCI_AT_NO_BONDING)
- 				cp.authentication |= 0x01;
- 		} else {
- 			conn->auth_type = hci_get_auth_req(conn);
+ static u8 hci_get_auth_req(struct hci_conn *conn)
+ {
+-	/* If remote requests dedicated bonding follow that lead */
+-	if (conn->remote_auth == HCI_AT_DEDICATED_BONDING ||
+-	    conn->remote_auth == HCI_AT_DEDICATED_BONDING_MITM) {
+-		/* If both remote and local IO capabilities allow MITM
+-		 * protection then require it, otherwise don't */
+-		if (conn->remote_cap == HCI_IO_NO_INPUT_OUTPUT ||
+-		    conn->io_capability == HCI_IO_NO_INPUT_OUTPUT)
+-			return HCI_AT_DEDICATED_BONDING;
+-		else
+-			return HCI_AT_DEDICATED_BONDING_MITM;
+-	}
+-
+ 	/* If remote requests no-bonding follow that lead */
+ 	if (conn->remote_auth == HCI_AT_NO_BONDING ||
+ 	    conn->remote_auth == HCI_AT_NO_BONDING_MITM)
+ 		return conn->remote_auth | (conn->auth_type & 0x01);
+ 
+-	return conn->auth_type;
++	/* For general bonding, use the given auth_type */
++	if (conn->remote_auth == HCI_AT_GENERAL_BONDING ||
++	    conn->remote_auth == HCI_AT_GENERAL_BONDING_MITM)
++		return conn->auth_type;
++
++	/* If both remote and local have enough IO capabilities, require
++	 * MITM protection
++	 */
++	if (conn->remote_cap != HCI_IO_NO_INPUT_OUTPUT &&
++	    conn->io_capability != HCI_IO_NO_INPUT_OUTPUT)
++		return conn->remote_auth | 0x01;
++
++	/* No MITM protection possible so remove requirement */
++	return conn->remote_auth & ~0x01;
+ }
+ 
+ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -3070,8 +3071,14 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		 * to DisplayYesNo as it is not supported by BT spec. */
+ 		cp.capability = (conn->io_capability == 0x04) ?
+ 				HCI_IO_DISPLAY_YESNO : conn->io_capability;
+-		conn->auth_type = hci_get_auth_req(conn);
+-		cp.authentication = conn->auth_type;
++
++		/* If we are initiators, there is no remote information yet */
++		if (conn->remote_auth == 0xff) {
++			cp.authentication = conn->auth_type;
++		} else {
++			conn->auth_type = hci_get_auth_req(conn);
++			cp.authentication = conn->auth_type;
++		}
+ 
+ 		if (hci_find_remote_oob_data(hdev, &conn->dst) &&
+ 		    (conn->out || test_bit(HCI_CONN_REMOTE_OOB, &conn->flags)))
 -- 
 1.8.1.4
 
