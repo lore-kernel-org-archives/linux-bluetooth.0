@@ -1,86 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-From: martin.xu@linux.intel.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Martin <martin.xu@linux.intel.com>
-Subject: [PATCH] obexd/client: Add client session properties
-Date: Mon,  1 Jul 2013 11:13:57 +0800
-Message-Id: <1372648437-5849-1-git-send-email-martin.xu@linux.intel.com>
+MIME-Version: 1.0
+In-Reply-To: <1372267932-10965-3-git-send-email-frederic.dalleau@linux.intel.com>
+References: <1372267932-10965-1-git-send-email-frederic.dalleau@linux.intel.com>
+	<1372267932-10965-3-git-send-email-frederic.dalleau@linux.intel.com>
+Date: Mon, 1 Jul 2013 10:54:59 +0300
+Message-ID: <CABBYNZL+4rqmAw9cxQMvEy6KsQFPJ9+B=-Vg3uP9gSwuyzm=Hg@mail.gmail.com>
+Subject: Re: [RFC 2/5] btio: Add option for SCO voice setting
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: =?ISO-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Martin <martin.xu@linux.intel.com>
+Hi Fred,
 
----
- obexd/client/session.c |   38 ++++++++++++++++++++++++++++++++------
- 1 file changed, 32 insertions(+), 6 deletions(-)
+On Wed, Jun 26, 2013 at 8:32 PM, Frédéric Dalleau
+<frederic.dalleau@linux.intel.com> wrote:
+> ---
+>  btio/btio.c |   18 +++++++++++++++---
+>  btio/btio.h |    1 +
+>  2 files changed, 16 insertions(+), 3 deletions(-)
+>
+> diff --git a/btio/btio.c b/btio/btio.c
+> index cb8860a..df1630e 100644
+> --- a/btio/btio.c
+> +++ b/btio/btio.c
+> @@ -78,6 +78,7 @@ struct set_opts {
+>         uint8_t mode;
+>         int flushable;
+>         uint32_t priority;
+> +       uint16_t sco_voice;
+>  };
+>
+>  struct connect {
+> @@ -723,9 +724,10 @@ static int sco_connect(int sock, const bdaddr_t *dst)
+>         return 0;
+>  }
+>
+> -static gboolean sco_set(int sock, uint16_t mtu, GError **err)
+> +static gboolean sco_set(int sock, uint16_t mtu, uint16_t sco_voice, GError **err)
+>  {
+>         struct sco_options sco_opt;
+> +       struct bt_voice voice;
+>         socklen_t len;
+>
+>         if (!mtu)
+> @@ -745,6 +747,13 @@ static gboolean sco_set(int sock, uint16_t mtu, GError **err)
+>                 return FALSE;
+>         }
+>
+> +       voice.setting = sco_voice;
+> +       if (setsockopt(sock, SOL_BLUETOOTH, BT_VOICE, &voice,
+> +                                               sizeof(voice)) < 0) {
+> +               ERROR_FAILED(err, "setsockopt(BT_VOICE)", errno);
+> +               return FALSE;
+> +       }
+> +
+>         return TRUE;
+>  }
+>
+> @@ -832,6 +841,9 @@ static gboolean parse_set_opts(struct set_opts *opts, GError **err,
+>                 case BT_IO_OPT_PRIORITY:
+>                         opts->priority = va_arg(args, int);
+>                         break;
+> +               case BT_IO_OPT_SCO_VOICE:
+> +                       opts->sco_voice = va_arg(args, int);
+> +                       break;
+>                 default:
+>                         g_set_error(err, BT_IO_ERROR, EINVAL,
+>                                         "Unknown option %d", opt);
+> @@ -1310,7 +1322,7 @@ gboolean bt_io_set(GIOChannel *io, GError **err, BtIOOption opt1, ...)
+>         case BT_IO_RFCOMM:
+>                 return rfcomm_set(sock, opts.sec_level, opts.master, err);
+>         case BT_IO_SCO:
+> -               return sco_set(sock, opts.mtu, err);
+> +               return sco_set(sock, opts.mtu, opts.sco_voice, err);
+>         default:
+>                 g_set_error(err, BT_IO_ERROR, EINVAL,
+>                                 "Unknown BtIO type %d", type);
+> @@ -1377,7 +1389,7 @@ static GIOChannel *create_io(gboolean server, struct set_opts *opts,
+>                 }
+>                 if (sco_bind(sock, &opts->src, err) < 0)
+>                         goto failed;
+> -               if (!sco_set(sock, opts->mtu, err))
+> +               if (!sco_set(sock, opts->mtu, opts->sco_voice, err))
+>                         goto failed;
+>                 break;
+>         default:
+> diff --git a/btio/btio.h b/btio/btio.h
+> index ac1366b..9959483 100644
+> --- a/btio/btio.h
+> +++ b/btio/btio.h
+> @@ -55,6 +55,7 @@ typedef enum {
+>         BT_IO_OPT_MODE,
+>         BT_IO_OPT_FLUSHABLE,
+>         BT_IO_OPT_PRIORITY,
+> +       BT_IO_OPT_SCO_VOICE,
 
-diff --git a/obexd/client/session.c b/obexd/client/session.c
-index 8d32ed0..e9cbf00 100644
---- a/obexd/client/session.c
-+++ b/obexd/client/session.c
-@@ -630,9 +630,6 @@ static gboolean get_source(const GDBusPropertyTable *property,
- {
- 	struct obc_session *session = data;
- 
--	if (session->source == NULL)
--		return FALSE;
--
- 	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
- 							&session->source);
- 
-@@ -675,10 +672,35 @@ static const GDBusMethodTable session_methods[] = {
- 	{ }
- };
- 
-+static gboolean get_target(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct obc_session *session = data;
-+	char *uuid;
-+
-+	uuid = g_strdup(session->driver->uuid);
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
-+	g_free(uuid);
-+
-+	return TRUE;
-+}
-+
-+static gboolean session_target_exists(const GDBusPropertyTable *property,
-+								void *data)
-+{
-+	struct obc_session *session = data;
-+	if (session->driver)
-+		return session->driver->uuid ? TRUE : FALSE;
-+
-+	return FALSE;
-+}
-+
- static const GDBusPropertyTable session_properties[] = {
- 	{ "Source", "s", get_source, NULL, source_exists },
- 	{ "Destination", "s", get_destination },
- 	{ "Channel", "y", get_channel },
-+	{ "Target", "s", get_target, NULL, session_target_exists },
- 	{ }
- };
- 
-@@ -854,9 +876,13 @@ const char *obc_session_register(struct obc_session *session,
- 	session->path = g_strdup_printf("%s/session%ju",
- 						SESSION_BASEPATH, counter++);
- 
--	if (g_dbus_register_interface(session->conn, session->path,
--					SESSION_INTERFACE, session_methods,
--					NULL, NULL, session, destroy) == FALSE)
-+	if (g_dbus_register_interface(session->conn,
-+					session->path,
-+					SESSION_INTERFACE,
-+					session_methods,
-+					NULL,
-+					session_properties,
-+					session, destroy) == FALSE)
- 		goto fail;
- 
- 	if (session->driver->probe && session->driver->probe(session) < 0) {
--- 
-1.7.10.4
+I believe here is better to use BT_IO_OPT_VOICE for simplicity, the
+socket option itself doesn't carry SCO name so I don't thing it is
+necessary here either.
 
+
+--
+Luiz Augusto von Dentz
