@@ -1,45 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-From: <aji.kumar@accenture.com>
-To: <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>
-Subject: executing GetFolder Items leaves the session disconnected
-Date: Mon, 1 Jul 2013 18:00:32 +0000
-Message-ID: <558B77349A98DB438591B5FD930034092638D4A8@048-CH1MPN1-142.048d.mgd.msft.net>
-References: <1372243017-1461-1-git-send-email-luiz.dentz@gmail.com>
- <20130626104156.GA28255@x220.ger.corp.intel.com>
-In-Reply-To: <20130626104156.GA28255@x220.ger.corp.intel.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: martin.xu@linux.intel.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Martin <martin.xu@linux.intel.com>
+Subject: [PATCH] obexd/client: Add client session properties
+Date: Mon,  1 Jul 2013 11:11:12 +0800
+Message-Id: <1372648272-5801-1-git-send-email-martin.xu@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan/Luiz,
+From: Martin <martin.xu@linux.intel.com>
 
-I am currently involved in testing bluez for avrcp 1.4 controller roles with phones that support avrcp 1.4, but currently I am running out of luck..
+---
+ obexd/client/session.c |   38 ++++++++++++++++++++++++++++++++------
+ 1 file changed, 32 insertions(+), 6 deletions(-)
 
-Please help with the below questions?
-
-        Does bluez have support for avrcp 1.4 controller role??
-
-        If yes, How do we test bluez for 1.4 controller role with a phone that has implemented avrcp 1.4
-
-By going through the "doc" it looks like that we need to get "<variable_path>/dev_bd_address/playerid" object path first to do any browsing and searching activities, why does this appear after a "source" and "control" connection with the device under test??
-
-Is there any steps that is missing here?
-
-With thanks and regards
-Aji.
-
-
-
-
-
-
-This message is for the designated recipient only and may contain privileged, proprietary, or otherwise confidential information. If you have received it in error, please notify the sender immediately and delete the original. Any other use of the e-mail by you is prohibited.
-
-Where allowed by local law, electronic communications with Accenture and its affiliates, including e-mail and instant messaging (including content), may be scanned by our systems for the purposes of information security and assessment of internal compliance with Accenture policy.
-
-______________________________________________________________________________________
-
-www.accenture.com
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index 8d32ed0..e9cbf00 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -630,9 +630,6 @@ static gboolean get_source(const GDBusPropertyTable *property,
+ {
+ 	struct obc_session *session = data;
+ 
+-	if (session->source == NULL)
+-		return FALSE;
+-
+ 	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
+ 							&session->source);
+ 
+@@ -675,10 +672,35 @@ static const GDBusMethodTable session_methods[] = {
+ 	{ }
+ };
+ 
++static gboolean get_target(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct obc_session *session = data;
++	char *uuid;
++
++	uuid = g_strdup(session->driver->uuid);
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
++	g_free(uuid);
++
++	return TRUE;
++}
++
++static gboolean session_target_exists(const GDBusPropertyTable *property,
++								void *data)
++{
++	struct obc_session *session = data;
++	if (session->driver)
++		return session->driver->uuid ? TRUE : FALSE;
++
++	return FALSE;
++}
++
+ static const GDBusPropertyTable session_properties[] = {
+ 	{ "Source", "s", get_source, NULL, source_exists },
+ 	{ "Destination", "s", get_destination },
+ 	{ "Channel", "y", get_channel },
++	{ "Target", "s", get_target, NULL, session_target_exists },
+ 	{ }
+ };
+ 
+@@ -854,9 +876,13 @@ const char *obc_session_register(struct obc_session *session,
+ 	session->path = g_strdup_printf("%s/session%ju",
+ 						SESSION_BASEPATH, counter++);
+ 
+-	if (g_dbus_register_interface(session->conn, session->path,
+-					SESSION_INTERFACE, session_methods,
+-					NULL, NULL, session, destroy) == FALSE)
++	if (g_dbus_register_interface(session->conn,
++					session->path,
++					SESSION_INTERFACE,
++					session_methods,
++					NULL,
++					session_properties,
++					session, destroy) == FALSE)
+ 		goto fail;
+ 
+ 	if (session->driver->probe && session->driver->probe(session) < 0) {
+-- 
+1.7.10.4
 
