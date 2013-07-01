@@ -3,8 +3,8 @@ From: martin.xu@linux.intel.com
 To: linux-bluetooth@vger.kernel.org
 Cc: Martin <martin.xu@linux.intel.com>
 Subject: [PATCH] obexd/client: Add client session properties
-Date: Mon,  1 Jul 2013 11:11:12 +0800
-Message-Id: <1372648272-5801-1-git-send-email-martin.xu@linux.intel.com>
+Date: Mon,  1 Jul 2013 11:13:57 +0800
+Message-Id: <1372648437-5849-1-git-send-email-martin.xu@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
