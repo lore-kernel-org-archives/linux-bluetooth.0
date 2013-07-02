@@ -1,106 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1372648437-5849-1-git-send-email-martin.xu@linux.intel.com>
-References: <1372648437-5849-1-git-send-email-martin.xu@linux.intel.com>
-Date: Tue, 2 Jul 2013 11:11:39 +0300
-Message-ID: <CABBYNZK6miUKAJjk4JsKmt9TdqmOdOLtFbbUgEWXBPT6_2oY7A@mail.gmail.com>
-Subject: Re: [PATCH] obexd/client: Add client session properties
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: martin.xu@linux.intel.com
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <1372177489-6858-1-git-send-email-mikel.astiz.oss@gmail.com>
+References: <1372177489-6858-1-git-send-email-mikel.astiz.oss@gmail.com>
+Date: Tue, 2 Jul 2013 09:11:50 +0200
+Message-ID: <CANT-zCWS7QHC5-fif53qhR7Mvd+5pwEA-NGmbmHNDu2gfq9oMA@mail.gmail.com>
+Subject: Re: [RFC BlueZ v0 00/16] Introduce btd_server
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
-
-On Mon, Jul 1, 2013 at 6:13 AM,  <martin.xu@linux.intel.com> wrote:
-> From: Martin <martin.xu@linux.intel.com>
+On Tue, Jun 25, 2013 at 6:24 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 >
-> ---
->  obexd/client/session.c |   38 ++++++++++++++++++++++++++++++++------
->  1 file changed, 32 insertions(+), 6 deletions(-)
+> This RFC presents a proposal to extend the BlueZ core to simplify the implementation of profiles. It introduces a new core concept (btd_server) as a first step towards providing internal infrastructure in a similar way that external profiles have. This exact purpose of the new struct is described in patch 01.
 >
-> diff --git a/obexd/client/session.c b/obexd/client/session.c
-> index 8d32ed0..e9cbf00 100644
-> --- a/obexd/client/session.c
-> +++ b/obexd/client/session.c
-> @@ -630,9 +630,6 @@ static gboolean get_source(const GDBusPropertyTable *property,
->  {
->         struct obc_session *session = data;
+> Currently, it's paradoxical that externally implemented profiles are in a way simpler to implement. There is a lot of helpful code in profile.c which could be reused for internal profiles too.
 >
-> -       if (session->source == NULL)
-> -               return FALSE;
-> -
-
-Not sure what is this for? Anyway it doesn't seems related to the
-subject so I would at least have it as separate patch.
-
->         dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
->                                                         &session->source);
+> This first patchset consists of three main parts:
+> 1. The extension of the core (patches 01..03).
+> 2. Some simple examples of adoption (patches 04..10).
+> 3. A more complex adoption (patches 11..16).
 >
-> @@ -675,10 +672,35 @@ static const GDBusMethodTable session_methods[] = {
->         { }
->  };
+> This part is fairly simple and doesn't offer great benefits besides the usage of the userdata pointer in btd_server, which can already be handy (see for example 08/16).
 >
-> +static gboolean get_target(const GDBusPropertyTable *property,
-> +                                       DBusMessageIter *iter, void *data)
-> +{
-> +       struct obc_session *session = data;
-> +       char *uuid;
-> +
-> +       uuid = g_strdup(session->driver->uuid);
-
-You don't really need this copy, libdbus have its own copy, so you can
-pass session->driver->uuid directly.
-
-> +
-> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
-> +       g_free(uuid);
-> +
-> +       return TRUE;
-> +}
-> +
-> +static gboolean session_target_exists(const GDBusPropertyTable *property,
-> +                                                               void *data)
-> +{
-> +       struct obc_session *session = data;
-> +       if (session->driver)
-> +               return session->driver->uuid ? TRUE : FALSE;
-
-I prefer if (session->driver == NULL) return FALSE; then return
-session->driver->uuid != NULL;
-
-> +
-> +       return FALSE;
-> +}
-> +
->  static const GDBusPropertyTable session_properties[] = {
->         { "Source", "s", get_source, NULL, source_exists },
->         { "Destination", "s", get_destination },
->         { "Channel", "y", get_channel },
-> +       { "Target", "s", get_target, NULL, session_target_exists },
->         { }
->  };
+> Furhter and more interesting changes in the pipeline (but not submitted in v0) include:
+> 4. Handling of incoming connections.
+> 5. Integration with agent authorization.
+> 6. Adoption of new infrastructure for external profiles.
 >
-> @@ -854,9 +876,13 @@ const char *obc_session_register(struct obc_session *session,
->         session->path = g_strdup_printf("%s/session%ju",
->                                                 SESSION_BASEPATH, counter++);
+> For the record, the result of this whole work does not add more lines of code to maintain, it just moves the code complexity from profile implementations to the core. The result is less duplicated code and data throughout the codebase, hopefully leading to more robust profiles.
 >
-> -       if (g_dbus_register_interface(session->conn, session->path,
-> -                                       SESSION_INTERFACE, session_methods,
-> -                                       NULL, NULL, session, destroy) == FALSE)
-> +       if (g_dbus_register_interface(session->conn,
-> +                                       session->path,
-> +                                       SESSION_INTERFACE,
-> +                                       session_methods,
-> +                                       NULL,
-> +                                       session_properties,
-> +                                       session, destroy) == FALSE)
+> Mikel Astiz (16):
+>   core: Add btd_server
+>   adapter: Create btd_server instances when probing
+>   profile: Use btd_server to probe adapters
+>   input: Bypass manager for profile server
+>   input: Use btd_server userdata for input_server
+>   thermometer: Remove boilerplate code
+>   thermometer: Use btd_server userdata
+>   cyclingspeed: Use btd_server userdata
+>   heartrate: Remove boilerplate code
+>   heartrate: Use btd_server userdata
+>   network: Replace list with network_adapter
+>   network: Bypass manager for profile server
+>   network: Simplify search-by-UUID
+>   network: Add a dedicated btd_profile for BNEP
+>   network: Create network_adapter during BNEP probe
+>   network: Use btd_server userdata for network_server
+>
+>  Makefile.am                          |   1 +
+>  profiles/alert/server.c              |   9 +-
+>  profiles/audio/manager.c             |  41 +++++---
+>  profiles/cyclingspeed/cyclingspeed.c |  38 +++----
+>  profiles/health/hdp_manager.c        |  11 ++-
+>  profiles/heartrate/heartrate.c       |  51 +++-------
+>  profiles/input/manager.c             |  12 +--
+>  profiles/input/server.c              |  28 ++----
+>  profiles/input/server.h              |   4 +-
+>  profiles/network/manager.c           |  76 ++------------
+>  profiles/network/server.c            | 185 +++++++++++++++--------------------
+>  profiles/network/server.h            |   8 +-
+>  profiles/proximity/reporter.c        |   8 +-
+>  profiles/proximity/reporter.h        |   5 +-
+>  profiles/sap/manager.c               |   9 +-
+>  profiles/thermometer/thermometer.c   |  82 ++++------------
+>  profiles/time/server.c               |   8 +-
+>  src/adapter.c                        |  50 +++++-----
+>  src/adapter.h                        |   2 +
+>  src/profile.c                        |  11 ++-
+>  src/profile.h                        |   7 +-
+>  src/server.c                         | 108 ++++++++++++++++++++
+>  src/server.h                         |  38 +++++++
+>  23 files changed, 389 insertions(+), 403 deletions(-)
+>  create mode 100644 src/server.c
+>  create mode 100644 src/server.h
+>
+> --
+> 1.8.1.4
+>
 
-The change above does not apply as I already applied similar fix, please rebase.
+Ping.
 
+Side note: if there's missing context information for this patchset,
+and the next steps are considered relevant while reviewing this part,
+I can also submit the rest or make it available in github.
 
-
---
-Luiz Augusto von Dentz
+Cheers,
+Mikel
