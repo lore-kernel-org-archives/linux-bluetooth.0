@@ -1,92 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 00/20] Remove audio_device and introduce policy plugin
-Date: Wed,  3 Jul 2013 18:15:21 +0300
-Message-Id: <1372864541-10763-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 3 Jul 2013 10:36:40 -0400 (EDT)
+From: Alan Stern <stern@rowland.harvard.edu>
+To: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
+cc: Oliver Neukum <oneukum@suse.de>,
+	Tedd Ho-Jeong An <tedd.an@intel.com>,
+	<linux-bluetooth@vger.kernel.org>, <linux-usb@vger.kernel.org>,
+	"Grumbach, Emmanuel" <emmanuel.grumbach@intel.com>
+Subject: Re: autosuspend issues with the Intel Bluetooth device [8087:07dc]
+In-Reply-To: <8738rvn40p.fsf@nemi.mork.no>
+Message-ID: <Pine.LNX.4.44L0.1307031032540.1241-100000@iolanthe.rowland.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed, 3 Jul 2013, Bjørn Mork wrote:
 
-audio_device is no longer needed as btd_service can be used to track
-connection states, in fact audio_device probably obscured direct access
-to some data types like btd_device and use btd_service_set_user_data to
-set profile private data instead of storing everything inside
-audio_device.
+> Bjørn Mork <bjorn@mork.no> writes:
+> 
+> > Ah, this is probably a timing issue. 
+> 
+> It definitely is, and I believe it is a generic problem with the btusb
+> driver and not with this particular device.  That's just where I was
+> "lucky" enough to see it.
+> 
+> Enabling a bit of debugging in btusb, I see this for a hci version
+> command with wakeup actually working:
+> 
+> 
+> Jul  3 15:47:44 nemi kernel: [ 8864.982520] btusb_send_frame:716: hci1
+> Jul  3 15:47:44 nemi kernel: [ 8864.984197] uhci_hcd 0000:00:1d.1: setting latency timer to 64
+> Jul  3 15:47:44 nemi kernel: [ 8865.059400] btusb_resume:1560: intf ffff880230fb5800
+> Jul  3 15:47:44 nemi kernel: [ 8865.059414] btusb_resume:1560: intf ffff880230dc2800
+> Jul  3 15:47:44 nemi kernel: [ 8865.059423] btusb_submit_intr_urb:322: hci1
+> Jul  3 15:47:44 nemi kernel: [ 8865.059462] btusb_submit_bulk_urb:410: hci1
+> Jul  3 15:47:44 nemi kernel: [ 8865.059510] btusb_submit_bulk_urb:410: hci1
+> Jul  3 15:47:44 nemi kernel: [ 8865.060262] btusb_tx_complete:574: hci1 urb ffff88021f778540 status 0 count 3
+> Jul  3 15:47:44 nemi kernel: [ 8865.061266] btusb_intr_complete:281: hci1 urb ffff88021f778900 status 0 count 14
+> Jul  3 15:47:46 nemi kernel: [ 8867.060121] btusb_suspend:1516: intf ffff880230dc2800
+> Jul  3 15:47:46 nemi kernel: [ 8867.061333] btusb_intr_complete:281: hci1 urb ffff88021f778900 status -2 count 0
+> Jul  3 15:47:46 nemi kernel: [ 8867.062307] btusb_bulk_complete:369: hci1 urb ffff88021f7780c0 status -2 count 0
+> Jul  3 15:47:46 nemi kernel: [ 8867.068305] btusb_bulk_complete:369: hci1 urb ffff88021f7783c0 status -2 count 0
+> Jul  3 15:47:46 nemi kernel: [ 8867.068373] btusb_suspend:1516: intf ffff880230fb5800
+> 
+> 
+> and then repeating the exact same and seeing a failing one:
+> 
+> Jul  3 15:47:58 nemi kernel: [ 8878.765249] btusb_send_frame:716: hci1
+> Jul  3 15:47:58 nemi kernel: [ 8878.766855] uhci_hcd 0000:00:1d.1: setting latency timer to 64
+> Jul  3 15:47:58 nemi kernel: [ 8878.839639] btusb_resume:1560: intf ffff880230fb5800
+> Jul  3 15:47:58 nemi kernel: [ 8878.839654] btusb_resume:1560: intf ffff880230dc2800
+> Jul  3 15:47:58 nemi kernel: [ 8878.839663] btusb_submit_intr_urb:322: hci1
+> Jul  3 15:47:58 nemi kernel: [ 8878.839707] btusb_submit_bulk_urb:410: hci1
+> Jul  3 15:47:58 nemi kernel: [ 8878.839756] btusb_submit_bulk_urb:410: hci1
+> Jul  3 15:47:58 nemi kernel: [ 8878.840318] btusb_intr_complete:281: hci1 urb ffff88021f778300 status 0 count 6
+> Jul  3 15:47:58 nemi kernel: [ 8878.840397] btusb_tx_complete:574: hci1 urb ffff88021f7783c0 status 0 count 3
+> Jul  3 15:48:00 nemi kernel: [ 8880.840253] btusb_suspend:1516: intf ffff880230dc2800
+> Jul  3 15:48:00 nemi kernel: [ 8880.842343] btusb_intr_complete:281: hci1 urb ffff88021f778300 status -2 count 0
+> Jul  3 15:48:00 nemi kernel: [ 8880.843562] btusb_bulk_complete:369: hci1 urb ffff88021f778cc0 status -2 count 0
+> Jul  3 15:48:00 nemi kernel: [ 8880.844326] btusb_bulk_complete:369: hci1 urb ffff88021f778c00 status -2 count 0
+> Jul  3 15:48:00 nemi kernel: [ 8880.844705] btusb_suspend:1516: intf ffff880230fb5800
+> 
+> 
+> Notice how the interrupt completion runs before the tx completion in the
+> failing case?  I believe you have the problem right there...
 
-There are probably more cleanups to audio after this changes, some
-policies that should be moved to policy plugin and a much needed split
-of audio plugin into smaller plugins, but I decided to stop right here
-otherwise the patch-set will get too big to be properly reviewed.
+The relative order of those two completions doesn't mean anything,
+because they are on different endpoints and they happened during the
+same frame.  It just happens that uhci-hcd scans interrupt URBs before
+bulk URBs when looking for completions, but it could easily be the 
+other way around.
 
-Also since this refactore the audio policy quite extensively this may
-create some IOP issues that why Im using RFC here, but I did test this
-with quite a few stacks including:
+It may be that the device simply takes longer to resume than it should.  
+Or longer than btusb expects it to, which may not be the same thing.
 
- - iOS 6
- - Android 4.2
- - WP 8
- - Blackberry 10
- - MW600
- - Nokia Purity Pro
- - BlueZ 4
-
-They all seems to be working as before, but I discover some bugs
-related to the of btd_service to track connection states those are
-fixed in the last 2 patches but there could be more.
-
-Luiz Augusto von Dentz (20):
-  audio/sink: Use service user_data for private data
-  audio/source: Use service user_data for private data
-  audio/control: Use service user_data for private data
-  audio/sink: Reduce dependency on struct audio_device
-  audio/source: Reduce dependency on struct audio_device
-  audio/control: Reduce dependency on struct audio_device
-  audio/AVCTP: Remove dependency on struct audio_device
-  audio/AVDTP: Remove dependency on struct audio_device
-  audio/AVRCP: Remove dependency on struct audio_device
-  audio/control: Remove dependency on struct audio_device
-  audio/A2DP: Remove dependency on struct audio_device
-  audio/sink: Remove dependency on struct audio_device
-  audio/source: Remove dependency on struct audio_device
-  audio/media: Remove dependency on struct audio_device
-  audio/transport: Remove dependency on struct audio_device
-  audio/manager: Remove dependency on struct audio_device
-  audio/main: Remove dependency on struct audio_device
-  plugins/policy: Reword audio policy code in a simple plugin
-  audio/sink: Fix not notifying service about connection state
-  audio/source: Fix not notifying service about connection state
-
- Makefile.plugins           |   4 +-
- plugins/policy.c           | 341 +++++++++++++++++++++++++++++++++++++++++++++
- profiles/audio/a2dp.c      | 110 +++++++--------
- profiles/audio/a2dp.h      |   4 +-
- profiles/audio/avctp.c     |  69 ++++-----
- profiles/audio/avctp.h     |  12 +-
- profiles/audio/avdtp.c     |  97 ++++++-------
- profiles/audio/avdtp.h     |  13 +-
- profiles/audio/avrcp.c     |  89 +++++++-----
- profiles/audio/avrcp.h     |   8 +-
- profiles/audio/control.c   | 136 +++++++++---------
- profiles/audio/control.h   |  19 +--
- profiles/audio/device.c    | 261 ----------------------------------
- profiles/audio/device.h    |  43 ------
- profiles/audio/main.c      |   1 -
- profiles/audio/manager.c   | 186 ++++++-------------------
- profiles/audio/manager.h   |  10 --
- profiles/audio/media.c     |  39 +++---
- profiles/audio/sink.c      | 113 ++++++++-------
- profiles/audio/sink.h      |  18 +--
- profiles/audio/source.c    | 111 +++++++--------
- profiles/audio/source.h    |  20 +--
- profiles/audio/transport.c | 109 +++++++++------
- profiles/audio/transport.h |   8 +-
- 24 files changed, 884 insertions(+), 937 deletions(-)
- create mode 100644 plugins/policy.c
- delete mode 100644 profiles/audio/device.c
- delete mode 100644 profiles/audio/device.h
-
--- 
-1.8.1.4
+Alan Stern
 
