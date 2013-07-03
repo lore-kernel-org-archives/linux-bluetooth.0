@@ -1,111 +1,182 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
-To: Oliver Neukum <oneukum@suse.de>
-Cc: Tedd Ho-Jeong An <tedd.an@intel.com>,
-	linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org,
-	"Grumbach\, Emmanuel" <emmanuel.grumbach@intel.com>
-Subject: Re: autosuspend issues with the Intel Bluetooth device [8087:07dc]
-References: <87obajn8wv.fsf@nemi.mork.no> <2178464.gnEadSyMSQ@linux-5eaq.site>
-Date: Wed, 03 Jul 2013 14:56:44 +0200
-In-Reply-To: <2178464.gnEadSyMSQ@linux-5eaq.site> (Oliver Neukum's message of
-	"Wed, 03 Jul 2013 14:29:28 +0200")
-Message-ID: <877gh7n6nn.fsf@nemi.mork.no>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/2] build-sys: Don't build gdbus several times
+Date: Wed,  3 Jul 2013 09:29:20 -0300
+Message-Id: <1372854560-8731-2-git-send-email-lucas.demarchi@profusion.mobi>
+In-Reply-To: <1372854560-8731-1-git-send-email-lucas.demarchi@profusion.mobi>
+References: <1372854560-8731-1-git-send-email-lucas.demarchi@profusion.mobi>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Oliver Neukum <oneukum@suse.de> writes:
+We are currently compiling gdbus 3 times: one for tests, one for
+bluetoothd and another for obexd.
 
-> On Wednesday 03 July 2013 14:08:00 Bjørn Mork wrote:
->> But this just does not seem right? Any modern USB device is supposed to
->> support autosuspend, right? I am using the firmware patch included in
->
-> What should be and what is may be different although it oughn't be.
->
->> the latest public firmware repo:
->
-> Does the device respond to standard request, that is what does lsusb do?
+$ ls gdbus/*watch.o
+gdbus/bluetoothd-watch.o  gdbus/obexd-watch.o  gdbus/watch.o
 
-Yes, it does. Standard USB requests seems to wake the device.  Running
-"lsusb -vd 8087:07dc" from suspended state works fine for example:
+Instead of prepending $(gdbus_sources) to several _SOURCES variable, use
+a convenience library.
+---
+ Makefile.am    | 16 +++++++++++-----
+ Makefile.obexd |  5 +++--
+ Makefile.tools | 29 +++++++++++++++--------------
+ 3 files changed, 29 insertions(+), 21 deletions(-)
 
-nemi:/tmp# grep . /sys/bus/usb/devices/7-1/power/runtime_status; lsusb -vd 8087:07dc >/dev/null ;  grep . /sys/bus/usb/devices/7-1/power/runtime_status
-suspended
-active
+diff --git a/Makefile.am b/Makefile.am
+index df1b61b..c5b2fd5 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -112,6 +112,11 @@ builtin_nodist =
+ 
+ include Makefile.plugins
+ 
++noinst_LTLIBRARIES += gdbus/libgdbus-internal.la
++gdbus_libgdbus_internal_la_SOURCES = $(gdbus_sources)
++gdbus_libgdbus_internal_la_LDFLAGS = $(AM_LDFLAGS) @DBUS_LIBS@ @GLIB_LIBS@
++gdbus_libgdbus_internal_la_CFLAGS = $(AM_CFLAGS) @DBUS_CFLAGS@ @GLIB_CFLAGS@
++
+ if MAINTAINER_MODE
+ plugin_LTLIBRARIES += plugins/external-dummy.la
+ plugins_external_dummy_la_SOURCES = plugins/external-dummy.c
+@@ -122,7 +127,7 @@ endif
+ 
+ libexec_PROGRAMS += src/bluetoothd
+ 
+-src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
++src_bluetoothd_SOURCES = $(builtin_sources) \
+ 			$(attrib_sources) $(btio_sources) \
+ 			src/bluetooth.ver \
+ 			src/main.c src/log.h src/log.c \
+@@ -148,8 +153,8 @@ src_bluetoothd_SOURCES = $(gdbus_sources) $(builtin_sources) \
+ 			src/eir.h src/eir.c \
+ 			src/shared/util.h src/shared/util.c \
+ 			src/shared/mgmt.h src/shared/mgmt.c
+-src_bluetoothd_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@ @DBUS_LIBS@ \
+-								-ldl -lrt
++src_bluetoothd_LDADD = lib/libbluetooth-internal.la gdbus/libgdbus-internal.la \
++			@GLIB_LIBS@ @DBUS_LIBS@ -ldl -lrt
+ src_bluetoothd_LDFLAGS = $(AM_LDFLAGS) -Wl,--export-dynamic \
+ 				-Wl,--version-script=$(srcdir)/src/bluetooth.ver
+ 
+@@ -245,8 +250,9 @@ unit_test_sdp_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+ 
+ unit_tests += unit/test-gdbus-client
+ 
+-unit_test_gdbus_client_SOURCES = $(gdbus_sources) unit/test-gdbus-client.c
+-unit_test_gdbus_client_LDADD = @GLIB_LIBS@ @DBUS_LIBS@
++unit_test_gdbus_client_SOURCES = unit/test-gdbus-client.c
++unit_test_gdbus_client_LDADD = gdbus/libgdbus-internal.la \
++				@GLIB_LIBS@ @DBUS_LIBS@
+ 
+ unit_tests += unit/test-gobex-header unit/test-gobex-packet unit/test-gobex \
+ 			unit/test-gobex-transfer unit/test-gobex-apparam
+diff --git a/Makefile.obexd b/Makefile.obexd
+index 0d9b4c6..d5377cb 100644
+--- a/Makefile.obexd
++++ b/Makefile.obexd
+@@ -54,7 +54,7 @@ obexd_builtin_sources += obexd/client/mns.c obexd/src/map_ap.h \
+ 
+ libexec_PROGRAMS += obexd/src/obexd
+ 
+-obexd_src_obexd_SOURCES = $(gdbus_sources) $(btio_sources) $(gobex_sources) \
++obexd_src_obexd_SOURCES = $(btio_sources) $(gobex_sources) \
+ 			$(obexd_builtin_sources) \
+ 			obexd/src/main.c obexd/src/obexd.h \
+ 			obexd/src/plugin.h obexd/src/plugin.c \
+@@ -80,7 +80,8 @@ obexd_src_obexd_SOURCES = $(gdbus_sources) $(btio_sources) $(gobex_sources) \
+ 			obexd/client/driver.h obexd/client/driver.c \
+ 			obexd/src/map_ap.h
+ obexd_src_obexd_LDADD = lib/libbluetooth-internal.la \
+-				@ICAL_LIBS@ @DBUS_LIBS@ @GLIB_LIBS@ -ldl
++			gdbus/libgdbus-internal.la \
++			@ICAL_LIBS@ @DBUS_LIBS@ @GLIB_LIBS@ -ldl
+ 
+ obexd_src_obexd_LDFLAGS = -Wl,--export-dynamic
+ 
+diff --git a/Makefile.tools b/Makefile.tools
+index e59420f..a9b0182 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -2,11 +2,12 @@
+ if CLIENT
+ bin_PROGRAMS += client/bluetoothctl
+ 
+-client_bluetoothctl_SOURCES = $(gdbus_sources) client/main.c \
++client_bluetoothctl_SOURCES = client/main.c \
+ 					client/display.h client/display.c \
+ 					client/agent.h client/agent.c \
+ 					monitor/uuid.h monitor/uuid.c
+-client_bluetoothctl_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ -lreadline
++client_bluetoothctl_LDADD = gdbus/libgdbus-internal.la @GLIB_LIBS@ @DBUS_LIBS@ \
++				-lreadline
+ endif
+ 
+ if MONITOR
+@@ -57,14 +58,12 @@ tools_l2cap_tester_SOURCES = tools/l2cap-tester.c monitor/bt.h \
+ 				src/shared/tester.h src/shared/tester.c
+ tools_l2cap_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+ 
+-tools_gap_tester_SOURCES = $(gdbus_sources) \
+-				tools/gap-tester.c monitor/bt.h \
++tools_gap_tester_SOURCES = tools/gap-tester.c monitor/bt.h \
+ 				emulator/btdev.h emulator/btdev.c \
+ 				emulator/bthost.h emulator/bthost.c \
+ 				src/shared/hciemu.h src/shared/hciemu.c \
+ 				src/shared/tester.h src/shared/tester.c
+-
+-tools_gap_tester_LDADD = @GLIB_LIBS@ @DBUS_LIBS@
++tools_gap_tester_LDADD = gdbus/libgdbus-internal.la @GLIB_LIBS@ @DBUS_LIBS@
+ endif
+ 
+ if TOOLS
+@@ -188,12 +187,13 @@ tools_btmgmt_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+ tools_btiotest_SOURCES = tools/btiotest.c btio/btio.h btio/btio.c
+ tools_btiotest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+ 
+-tools_mpris_player_SOURCES = $(gdbus_sources) tools/mpris-player.c
+-tools_mpris_player_LDADD = @GLIB_LIBS@ @DBUS_LIBS@
++tools_mpris_player_SOURCES = tools/mpris-player.c
++tools_mpris_player_LDADD = gdbus/libgdbus-internal.la @GLIB_LIBS@ @DBUS_LIBS@
+ 
+-tools_bluetooth_player_SOURCES = $(gdbus_sources) tools/bluetooth-player.c \
++tools_bluetooth_player_SOURCES = tools/bluetooth-player.c \
+ 				client/display.h client/display.c
+-tools_bluetooth_player_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ -lreadline
++tools_bluetooth_player_LDADD = gdbus/libgdbus-internal.la \
++				@GLIB_LIBS@ @DBUS_LIBS@ -lreadline
+ 
+ EXTRA_DIST += tools/bdaddr.1
+ endif
+@@ -222,8 +222,8 @@ endif
+ if EXPERIMENTAL
+ noinst_PROGRAMS += profiles/iap/iapd
+ 
+-profiles_iap_iapd_SOURCES = $(gdbus_sources) profiles/iap/main.c
+-profiles_iap_iapd_LDADD = @GLIB_LIBS@ @DBUS_LIBS@
++profiles_iap_iapd_SOURCES = profiles/iap/main.c
++profiles_iap_iapd_LDADD = gdbus/libgdbus-internal.la @GLIB_LIBS@ @DBUS_LIBS@
+ endif
+ 
+ if CUPS
+@@ -231,14 +231,15 @@ cupsdir = $(libdir)/cups/backend
+ 
+ cups_PROGRAMS = profiles/cups/bluetooth
+ 
+-profiles_cups_bluetooth_SOURCES = $(gdbus_sources) profiles/cups/main.c \
++profiles_cups_bluetooth_SOURCES = profiles/cups/main.c \
+ 					profiles/cups/cups.h \
+ 					profiles/cups/sdp.c \
+ 					profiles/cups/spp.c \
+ 					profiles/cups/hcrp.c
+ 
+ profiles_cups_bluetooth_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ \
+-				lib/libbluetooth-internal.la
++				lib/libbluetooth-internal.la \
++				gdbus/libgdbus-internal.la
+ endif
+ 
+ test_scripts += test/sap_client.py test/bluezutils.py \
+-- 
+1.8.3.2
 
-
-usbmon trace of this:
-
-nemi:/tmp# cat /sys/kernel/debug/usb/usbmon/7t 
-ffff88021ae42680 3655354231 S Ci:001:00 s a3 00 0000 0001 0004 4 <
-ffff88021ae42680 3655354476 C Ci:001:00 0 4 = 07010000
-ffff88021ae42680 3655354683 S Ci:001:00 s a3 00 0000 0002 0004 4 <
-ffff88021ae42680 3655354825 C Ci:001:00 0 4 = 00010000
-ffff8802300c1680 3655354960 S Ii:001:01 -115 2 <
-ffff88021ae42680 3655355508 S Ci:001:00 s a3 00 0000 0001 0004 4 <
-ffff88021ae42680 3655355903 C Ci:001:00 0 4 = 07010000
-ffff88021ae42680 3655356070 S Co:001:00 s 23 01 0002 0001 0000 0
-ffff88021ae42680 3655356248 C Co:001:00 0 0
-ffff88022cac6ec0 3655386101 S Ci:001:00 s a3 00 0000 0001 0004 4 <
-ffff88022cac6ec0 3655386152 C Ci:001:00 0 4 = 03010400
-ffff88021ae42680 3655402102 S Co:001:00 s 23 01 0012 0001 0000 0
-ffff88021ae42680 3655402133 C Co:001:00 0 0
-ffff88021ae42680 3655402178 S Ci:002:00 s 80 00 0000 0000 0002 2 <
-ffff88021ae42680 3655404198 C Ci:002:00 0 2 = 0300
-ffff88021ae42680 3655404311 S Co:002:00 s 00 01 0001 0000 0000 0
-ffff88021ae42680 3655405219 C Co:002:00 0 0
-ffff88021ae42680 3655405422 S Ii:002:01 -115 64 <
-ffff88022cac6ec0 3655405459 S Bi:002:02 -115 1028 <
-ffff88022cac6e00 3655405510 S Bi:002:02 -115 1028 <
-ffff88022cac6d40 3655407116 S Ci:002:00 s 80 06 0600 0000 000a 10 <
-ffff88022cac6c80 3655407277 S Co:002:00 s 01 0b 0000 0001 0000 0
-ffff88022cac6d40 3655408225 C Ci:002:00 -32 0
-ffff88022cac6d40 3655408514 S Ci:002:00 s 80 06 0a00 0000 0004 4 <
-ffff88022cac6c80 3655409220 C Co:002:00 0 0
-ffff88022cac6d40 3655409258 C Ci:002:00 0 0
-ffff88022cac6d40 3655409528 S Ci:002:00 s 80 00 0000 0000 0002 2 <
-ffff88022cac6d40 3655410194 C Ci:002:00 0 2 = 0100
-
-And then when suspending:
-
-ffff88021ae42680 3657411219 C Ii:002:01 -2 0
-ffff88021ae42680 3657411253 S Ii:002:01 -115 64 <
-ffff88021ae42680 3657411298 E Ii:002:01 -1 0
-ffff88022cac6e00 3657412234 C Bi:002:02 -2 0
-ffff88022cac6e00 3657412261 S Bi:002:02 -115 1028 <
-ffff88022cac6e00 3657412280 E Bi:002:02 -1 0
-ffff88022cac6ec0 3657413234 C Bi:002:02 -2 0
-ffff88022cac6ec0 3657413261 S Bi:002:02 -115 1028 <
-ffff88022cac6ec0 3657413281 E Bi:002:02 -1 0
-ffff88022cac6ec0 3657413557 S Co:002:00 s 00 03 0001 0000 0000 0
-ffff88022cac6ec0 3657414209 C Co:002:00 0 0
-ffff88022cac6ec0 3657414531 S Co:001:00 s 23 03 0002 0001 0000 0
-ffff88022cac6ec0 3657414565 C Co:001:00 0 0
-ffff8802300c1680 3657430065 C Ii:001:01 -2 0
-
-
-
-Ah, this is probably a timing issue.  The HCI commands also wake the
-device, but too late most of the time. This fails:
-
-nemi:/tmp# grep . /sys/bus/usb/devices/7-1/power/runtime_status; hciconfig hci1 version ;  grep . /sys/bus/usb/devices/7-1/power/runtime_status
-suspended
-Can't read version info hci1: Connection timed out (110)
-active
-
-
-But repeating the command makes the second attempt work:
-
-nemi:/tmp# grep . /sys/bus/usb/devices/7-1/power/runtime_status; hciconfig hci1 version;  hciconfig hci1 version ;  grep . /sys/bus/usb/devices/7-1/power/runtime_status
-suspended
-Can't read version info hci1: Connection timed out (110)
-hci1:   Type: BR/EDR  Bus: USB
-        BD Address: 0C:8B:FD:08:09:75  ACL MTU: 1021:5  SCO MTU: 96:5
-        HCI Version: 4.0 (0x6)  Revision: 0x500
-        LMP Version: 4.0 (0x6)  Subversion: 0x500
-        Manufacturer: Intel Corp. (2)
-active
-
-
-Bjørn
