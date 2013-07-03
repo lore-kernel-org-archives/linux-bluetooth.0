@@ -6,66 +6,106 @@ Cc: Tedd Ho-Jeong An <tedd.an@intel.com>,
 	"Grumbach\, Emmanuel" <emmanuel.grumbach@intel.com>
 Subject: Re: autosuspend issues with the Intel Bluetooth device [8087:07dc]
 References: <87obajn8wv.fsf@nemi.mork.no> <2178464.gnEadSyMSQ@linux-5eaq.site>
-	<877gh7n6nn.fsf@nemi.mork.no>
-Date: Wed, 03 Jul 2013 15:53:42 +0200
-In-Reply-To: <877gh7n6nn.fsf@nemi.mork.no> (=?utf-8?Q?=22Bj=C3=B8rn?=
- Mork"'s message of "Wed, 03
-	Jul 2013 14:56:44 +0200")
-Message-ID: <8738rvn40p.fsf@nemi.mork.no>
+Date: Wed, 03 Jul 2013 14:56:44 +0200
+In-Reply-To: <2178464.gnEadSyMSQ@linux-5eaq.site> (Oliver Neukum's message of
+	"Wed, 03 Jul 2013 14:29:28 +0200")
+Message-ID: <877gh7n6nn.fsf@nemi.mork.no>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Bjørn Mork <bjorn@mork.no> writes:
+Oliver Neukum <oneukum@suse.de> writes:
 
-> Ah, this is probably a timing issue. 
+> On Wednesday 03 July 2013 14:08:00 Bjørn Mork wrote:
+>> But this just does not seem right? Any modern USB device is supposed to
+>> support autosuspend, right? I am using the firmware patch included in
+>
+> What should be and what is may be different although it oughn't be.
+>
+>> the latest public firmware repo:
+>
+> Does the device respond to standard request, that is what does lsusb do?
 
-It definitely is, and I believe it is a generic problem with the btusb
-driver and not with this particular device.  That's just where I was
-"lucky" enough to see it.
+Yes, it does. Standard USB requests seems to wake the device.  Running
+"lsusb -vd 8087:07dc" from suspended state works fine for example:
 
-Enabling a bit of debugging in btusb, I see this for a hci version
-command with wakeup actually working:
-
-
-Jul  3 15:47:44 nemi kernel: [ 8864.982520] btusb_send_frame:716: hci1
-Jul  3 15:47:44 nemi kernel: [ 8864.984197] uhci_hcd 0000:00:1d.1: setting latency timer to 64
-Jul  3 15:47:44 nemi kernel: [ 8865.059400] btusb_resume:1560: intf ffff880230fb5800
-Jul  3 15:47:44 nemi kernel: [ 8865.059414] btusb_resume:1560: intf ffff880230dc2800
-Jul  3 15:47:44 nemi kernel: [ 8865.059423] btusb_submit_intr_urb:322: hci1
-Jul  3 15:47:44 nemi kernel: [ 8865.059462] btusb_submit_bulk_urb:410: hci1
-Jul  3 15:47:44 nemi kernel: [ 8865.059510] btusb_submit_bulk_urb:410: hci1
-Jul  3 15:47:44 nemi kernel: [ 8865.060262] btusb_tx_complete:574: hci1 urb ffff88021f778540 status 0 count 3
-Jul  3 15:47:44 nemi kernel: [ 8865.061266] btusb_intr_complete:281: hci1 urb ffff88021f778900 status 0 count 14
-Jul  3 15:47:46 nemi kernel: [ 8867.060121] btusb_suspend:1516: intf ffff880230dc2800
-Jul  3 15:47:46 nemi kernel: [ 8867.061333] btusb_intr_complete:281: hci1 urb ffff88021f778900 status -2 count 0
-Jul  3 15:47:46 nemi kernel: [ 8867.062307] btusb_bulk_complete:369: hci1 urb ffff88021f7780c0 status -2 count 0
-Jul  3 15:47:46 nemi kernel: [ 8867.068305] btusb_bulk_complete:369: hci1 urb ffff88021f7783c0 status -2 count 0
-Jul  3 15:47:46 nemi kernel: [ 8867.068373] btusb_suspend:1516: intf ffff880230fb5800
+nemi:/tmp# grep . /sys/bus/usb/devices/7-1/power/runtime_status; lsusb -vd 8087:07dc >/dev/null ;  grep . /sys/bus/usb/devices/7-1/power/runtime_status
+suspended
+active
 
 
-and then repeating the exact same and seeing a failing one:
+usbmon trace of this:
 
-Jul  3 15:47:58 nemi kernel: [ 8878.765249] btusb_send_frame:716: hci1
-Jul  3 15:47:58 nemi kernel: [ 8878.766855] uhci_hcd 0000:00:1d.1: setting latency timer to 64
-Jul  3 15:47:58 nemi kernel: [ 8878.839639] btusb_resume:1560: intf ffff880230fb5800
-Jul  3 15:47:58 nemi kernel: [ 8878.839654] btusb_resume:1560: intf ffff880230dc2800
-Jul  3 15:47:58 nemi kernel: [ 8878.839663] btusb_submit_intr_urb:322: hci1
-Jul  3 15:47:58 nemi kernel: [ 8878.839707] btusb_submit_bulk_urb:410: hci1
-Jul  3 15:47:58 nemi kernel: [ 8878.839756] btusb_submit_bulk_urb:410: hci1
-Jul  3 15:47:58 nemi kernel: [ 8878.840318] btusb_intr_complete:281: hci1 urb ffff88021f778300 status 0 count 6
-Jul  3 15:47:58 nemi kernel: [ 8878.840397] btusb_tx_complete:574: hci1 urb ffff88021f7783c0 status 0 count 3
-Jul  3 15:48:00 nemi kernel: [ 8880.840253] btusb_suspend:1516: intf ffff880230dc2800
-Jul  3 15:48:00 nemi kernel: [ 8880.842343] btusb_intr_complete:281: hci1 urb ffff88021f778300 status -2 count 0
-Jul  3 15:48:00 nemi kernel: [ 8880.843562] btusb_bulk_complete:369: hci1 urb ffff88021f778cc0 status -2 count 0
-Jul  3 15:48:00 nemi kernel: [ 8880.844326] btusb_bulk_complete:369: hci1 urb ffff88021f778c00 status -2 count 0
-Jul  3 15:48:00 nemi kernel: [ 8880.844705] btusb_suspend:1516: intf ffff880230fb5800
+nemi:/tmp# cat /sys/kernel/debug/usb/usbmon/7t 
+ffff88021ae42680 3655354231 S Ci:001:00 s a3 00 0000 0001 0004 4 <
+ffff88021ae42680 3655354476 C Ci:001:00 0 4 = 07010000
+ffff88021ae42680 3655354683 S Ci:001:00 s a3 00 0000 0002 0004 4 <
+ffff88021ae42680 3655354825 C Ci:001:00 0 4 = 00010000
+ffff8802300c1680 3655354960 S Ii:001:01 -115 2 <
+ffff88021ae42680 3655355508 S Ci:001:00 s a3 00 0000 0001 0004 4 <
+ffff88021ae42680 3655355903 C Ci:001:00 0 4 = 07010000
+ffff88021ae42680 3655356070 S Co:001:00 s 23 01 0002 0001 0000 0
+ffff88021ae42680 3655356248 C Co:001:00 0 0
+ffff88022cac6ec0 3655386101 S Ci:001:00 s a3 00 0000 0001 0004 4 <
+ffff88022cac6ec0 3655386152 C Ci:001:00 0 4 = 03010400
+ffff88021ae42680 3655402102 S Co:001:00 s 23 01 0012 0001 0000 0
+ffff88021ae42680 3655402133 C Co:001:00 0 0
+ffff88021ae42680 3655402178 S Ci:002:00 s 80 00 0000 0000 0002 2 <
+ffff88021ae42680 3655404198 C Ci:002:00 0 2 = 0300
+ffff88021ae42680 3655404311 S Co:002:00 s 00 01 0001 0000 0000 0
+ffff88021ae42680 3655405219 C Co:002:00 0 0
+ffff88021ae42680 3655405422 S Ii:002:01 -115 64 <
+ffff88022cac6ec0 3655405459 S Bi:002:02 -115 1028 <
+ffff88022cac6e00 3655405510 S Bi:002:02 -115 1028 <
+ffff88022cac6d40 3655407116 S Ci:002:00 s 80 06 0600 0000 000a 10 <
+ffff88022cac6c80 3655407277 S Co:002:00 s 01 0b 0000 0001 0000 0
+ffff88022cac6d40 3655408225 C Ci:002:00 -32 0
+ffff88022cac6d40 3655408514 S Ci:002:00 s 80 06 0a00 0000 0004 4 <
+ffff88022cac6c80 3655409220 C Co:002:00 0 0
+ffff88022cac6d40 3655409258 C Ci:002:00 0 0
+ffff88022cac6d40 3655409528 S Ci:002:00 s 80 00 0000 0000 0002 2 <
+ffff88022cac6d40 3655410194 C Ci:002:00 0 2 = 0100
+
+And then when suspending:
+
+ffff88021ae42680 3657411219 C Ii:002:01 -2 0
+ffff88021ae42680 3657411253 S Ii:002:01 -115 64 <
+ffff88021ae42680 3657411298 E Ii:002:01 -1 0
+ffff88022cac6e00 3657412234 C Bi:002:02 -2 0
+ffff88022cac6e00 3657412261 S Bi:002:02 -115 1028 <
+ffff88022cac6e00 3657412280 E Bi:002:02 -1 0
+ffff88022cac6ec0 3657413234 C Bi:002:02 -2 0
+ffff88022cac6ec0 3657413261 S Bi:002:02 -115 1028 <
+ffff88022cac6ec0 3657413281 E Bi:002:02 -1 0
+ffff88022cac6ec0 3657413557 S Co:002:00 s 00 03 0001 0000 0000 0
+ffff88022cac6ec0 3657414209 C Co:002:00 0 0
+ffff88022cac6ec0 3657414531 S Co:001:00 s 23 03 0002 0001 0000 0
+ffff88022cac6ec0 3657414565 C Co:001:00 0 0
+ffff8802300c1680 3657430065 C Ii:001:01 -2 0
 
 
-Notice how the interrupt completion runs before the tx completion in the
-failing case?  I believe you have the problem right there...
 
+Ah, this is probably a timing issue.  The HCI commands also wake the
+device, but too late most of the time. This fails:
+
+nemi:/tmp# grep . /sys/bus/usb/devices/7-1/power/runtime_status; hciconfig hci1 version ;  grep . /sys/bus/usb/devices/7-1/power/runtime_status
+suspended
+Can't read version info hci1: Connection timed out (110)
+active
+
+
+But repeating the command makes the second attempt work:
+
+nemi:/tmp# grep . /sys/bus/usb/devices/7-1/power/runtime_status; hciconfig hci1 version;  hciconfig hci1 version ;  grep . /sys/bus/usb/devices/7-1/power/runtime_status
+suspended
+Can't read version info hci1: Connection timed out (110)
+hci1:   Type: BR/EDR  Bus: USB
+        BD Address: 0C:8B:FD:08:09:75  ACL MTU: 1021:5  SCO MTU: 96:5
+        HCI Version: 4.0 (0x6)  Revision: 0x500
+        LMP Version: 4.0 (0x6)  Subversion: 0x500
+        Manufacturer: Intel Corp. (2)
+active
 
 
 Bjørn
