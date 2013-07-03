@@ -1,41 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jefferson Delfes <jefferson.delfes@openbossa.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jefferson Delfes <jefferson.delfes@openbossa.org>
-Subject: [PATCH BlueZ 1/6] emulator: Store LE advertising data length in btdev
-Date: Wed,  3 Jul 2013 16:54:51 -0400
-Message-Id: <1372884896-11419-2-git-send-email-jefferson.delfes@openbossa.org>
-In-Reply-To: <1372884896-11419-1-git-send-email-jefferson.delfes@openbossa.org>
-References: <1372884896-11419-1-git-send-email-jefferson.delfes@openbossa.org>
+Subject: [RFC 20/20] audio/source: Fix not notifying service about connection state
+Date: Wed,  3 Jul 2013 18:15:41 +0300
+Message-Id: <1372864541-10763-21-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1372864541-10763-1-git-send-email-luiz.dentz@gmail.com>
+References: <1372864541-10763-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-LE advertising data length will be used for emulating reports in other
-virtual devices.
----
- emulator/btdev.c | 2 ++
- 1 file changed, 2 insertions(+)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index a602c05..73174a5 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -90,6 +90,7 @@ struct btdev {
- 	uint8_t  le_simultaneous;
- 	uint8_t  le_event_mask[8];
- 	uint8_t  le_adv_data[31];
-+	uint8_t  le_adv_data_len;
+btd_service_connecting_complete should be called whenever the service
+is connected otherwise the service state will not be consistent.
+---
+ profiles/audio/source.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/profiles/audio/source.c b/profiles/audio/source.c
+index 64570a6..c171620 100644
+--- a/profiles/audio/source.c
++++ b/profiles/audio/source.c
+@@ -163,6 +163,7 @@ static void stream_state_changed(struct avdtp_stream *stream,
+ 		source->cb_id = 0;
+ 		break;
+ 	case AVDTP_STATE_OPEN:
++		btd_service_connecting_complete(source->service, 0);
+ 		source_set_state(source, SOURCE_STATE_CONNECTED);
+ 		break;
+ 	case AVDTP_STATE_STREAMING:
+@@ -211,11 +212,8 @@ static void stream_setup_complete(struct avdtp *session, struct a2dp_sep *sep,
  
- 	uint16_t sync_train_interval;
- 	uint32_t sync_train_timeout;
-@@ -1487,6 +1488,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 		if (btdev->type == BTDEV_TYPE_BREDR)
- 			goto unsupported;
- 		lsad = data;
-+		btdev->le_adv_data_len = lsad->len;
- 		memcpy(btdev->le_adv_data, lsad->data, 31);
- 		status = BT_HCI_ERR_SUCCESS;
- 		cmd_complete(btdev, opcode, &status, sizeof(status));
+ 	source->connect_id = 0;
+ 
+-	if (stream) {
+-		DBG("Stream successfully created");
+-		btd_service_connecting_complete(source->service, 0);
++	if (stream)
+ 		return;
+-	}
+ 
+ 	avdtp_unref(source->session);
+ 	source->session = NULL;
 -- 
-1.8.3.2
+1.8.1.4
 
