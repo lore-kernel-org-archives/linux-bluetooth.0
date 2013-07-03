@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 04/20] audio/sink: Reduce dependency on struct audio_device
-Date: Wed,  3 Jul 2013 18:15:25 +0300
-Message-Id: <1372864541-10763-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC 01/20] audio/sink: Use service user_data for private data
+Date: Wed,  3 Jul 2013 18:15:22 +0300
+Message-Id: <1372864541-10763-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1372864541-10763-1-git-send-email-luiz.dentz@gmail.com>
 References: <1372864541-10763-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,424 +11,318 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is part of the work necessary to completely remove
-struct audio_device
+This remove the need of forward declaration of struct sink and prepare
+for a complete removal of struct audio_device.
 ---
- profiles/audio/a2dp.c      |  5 ++--
- profiles/audio/avdtp.c     |  2 +-
- profiles/audio/avrcp.c     |  2 +-
- profiles/audio/device.c    |  4 +--
- profiles/audio/manager.c   | 20 ++-----------
- profiles/audio/sink.c      | 72 +++++++++++++++++++++++++---------------------
- profiles/audio/sink.h      | 16 +++++------
- profiles/audio/transport.c |  4 +--
- 8 files changed, 59 insertions(+), 66 deletions(-)
+ profiles/audio/avdtp.c  |  2 +-
+ profiles/audio/device.c | 54 ++++++++++++++++++++++++++++++-------------------
+ profiles/audio/device.h |  3 +--
+ profiles/audio/sink.c   | 29 +++++++++++++++-----------
+ profiles/audio/sink.h   |  5 +++--
+ 5 files changed, 55 insertions(+), 38 deletions(-)
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index c6973ae..5dc9218 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -403,6 +403,7 @@ static void stream_state_changed(struct avdtp_stream *stream,
- static gboolean auto_config(gpointer data)
- {
- 	struct a2dp_setup *setup = data;
-+	struct audio_device *dev = setup->dev;
- 
- 	/* Check if configuration was aborted */
- 	if (setup->sep->stream == NULL)
-@@ -415,7 +416,7 @@ static gboolean auto_config(gpointer data)
- 				stream_state_changed, setup->sep);
- 
- 	if (setup->sep->type == AVDTP_SEP_TYPE_SOURCE)
--		sink_new_stream(setup->dev, setup->session, setup->stream);
-+		sink_new_stream(dev->sink, setup->session, setup->stream);
- 	else
- 		source_new_stream(setup->dev, setup->session, setup->stream);
- 
-@@ -618,7 +619,7 @@ static void setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 
- 	/* Notify D-Bus interface of the new stream */
- 	if (a2dp_sep->type == AVDTP_SEP_TYPE_SOURCE)
--		sink_new_stream(dev, session, setup->stream);
-+		sink_new_stream(dev->sink, session, setup->stream);
- 	else
- 		source_new_stream(dev, session, setup->stream);
- 
 diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 7874cf6..ca09802 100644
+index bd73572..0d67e67 100644
 --- a/profiles/audio/avdtp.c
 +++ b/profiles/audio/avdtp.c
 @@ -1165,7 +1165,7 @@ static gboolean disconnect_timeout(gpointer user_data)
  	dev = manager_get_audio_device(session->device, FALSE);
  
  	if (dev && dev->sink && stream_setup)
--		sink_setup_stream(dev, session);
-+		sink_setup_stream(dev->sink, session);
+-		sink_setup_stream(dev->sink, session);
++		sink_setup_stream(dev, session);
  	else if (dev && dev->source && stream_setup)
- 		source_setup_stream(dev, session);
+ 		source_setup_stream(dev->source, session);
  	else
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 4316f8e..763012d 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -3425,7 +3425,7 @@ static struct avrcp *session_create(struct avrcp_server *server,
- 		session->target = TRUE;
- 	else if (dev->source && !dev->sink)
- 		session->target = FALSE;
--	else if (dev->sink && sink_is_active(dev))
-+	else if (dev->sink && sink_is_active(dev->sink))
- 		session->target = TRUE;
- 	else
- 		session->target = FALSE;
 diff --git a/profiles/audio/device.c b/profiles/audio/device.c
-index f11c728..bc1ab26 100644
+index 3fa49ad..f11c728 100644
 --- a/profiles/audio/device.c
 +++ b/profiles/audio/device.c
-@@ -154,7 +154,7 @@ static void disconnect_cb(struct btd_device *btd_dev, gboolean removal,
+@@ -42,10 +42,12 @@
+ #include <dbus/dbus.h>
+ #include <gdbus/gdbus.h>
  
- 	sink = btd_device_get_service(btd_dev, A2DP_SINK_UUID);
- 	if (sink)
--		sink_disconnect(dev, TRUE);
-+		sink_disconnect(sink, TRUE);
+-#include "log.h"
+-#include "../src/adapter.h"
+-#include "../src/device.h"
++#include "lib/uuid.h"
++#include "src/adapter.h"
++#include "src/device.h"
++#include "src/service.h"
+ 
++#include "log.h"
+ #include "error.h"
+ #include "dbus-common.h"
+ #include "device.h"
+@@ -61,7 +63,7 @@
+ #define AVDTP_CONNECT_TIMEOUT_BOOST 1
+ 
+ struct dev_priv {
+-	sink_state_t sink_state;
++	btd_service_state_t sink_state;
+ 	avctp_state_t avctp_state;
+ 
+ 	guint control_timer;
+@@ -69,9 +71,9 @@ struct dev_priv {
+ 
+ 	gboolean disconnecting;
+ 
++	unsigned int service_cb_id;
+ 	unsigned int avdtp_callback_id;
+ 	unsigned int avctp_callback_id;
+-	unsigned int sink_callback_id;
+ };
+ 
+ static void device_free(struct audio_device *dev)
+@@ -87,7 +89,7 @@ static void device_free(struct audio_device *dev)
+ 
+ 		avdtp_remove_state_cb(priv->avdtp_callback_id);
+ 		avctp_remove_state_cb(priv->avctp_callback_id);
+-		sink_remove_state_cb(priv->sink_callback_id);
++		btd_service_remove_state_cb(priv->service_cb_id);
+ 
+ 		g_free(priv);
+ 	}
+@@ -138,6 +140,7 @@ static void disconnect_cb(struct btd_device *btd_dev, gboolean removal,
+ {
+ 	struct audio_device *dev = user_data;
+ 	struct dev_priv *priv = dev->priv;
++	struct btd_service *sink;
+ 
+ 	if (priv->disconnecting)
+ 		return;
+@@ -149,7 +152,8 @@ static void disconnect_cb(struct btd_device *btd_dev, gboolean removal,
+ 	if (dev->control && priv->avctp_state != AVCTP_STATE_DISCONNECTED)
+ 		avrcp_disconnect(dev);
+ 
+-	if (dev->sink && priv->sink_state != SINK_STATE_DISCONNECTED)
++	sink = btd_device_get_service(btd_dev, A2DP_SINK_UUID);
++	if (sink)
+ 		sink_disconnect(dev, TRUE);
  	else
  		priv->disconnecting = FALSE;
+@@ -171,30 +175,25 @@ static void device_avdtp_cb(struct audio_device *dev, struct avdtp *session,
  }
-@@ -261,7 +261,7 @@ void audio_device_unregister(struct audio_device *device)
- 	DBG("%s", device_get_path(device->btd_dev));
  
- 	if (device->sink)
--		sink_unregister(device);
-+		sink_unregister(device->sink);
- 
- 	if (device->source)
- 		source_unregister(device);
-diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
-index 7f02fbd..fa0bddd 100644
---- a/profiles/audio/manager.c
-+++ b/profiles/audio/manager.c
-@@ -148,7 +148,7 @@ static int avrcp_target_probe(struct btd_service *service)
- 
- 	audio_dev->control = control_init_target(audio_dev, service);
- 
--	if (audio_dev->sink && sink_is_active(audio_dev))
-+	if (audio_dev->sink && sink_is_active(audio_dev->sink))
- 		avrcp_connect(audio_dev);
- 
- 	return 0;
-@@ -208,34 +208,20 @@ static int a2dp_sink_connect(struct btd_service *service)
+ static void device_sink_cb(struct audio_device *dev,
+-				sink_state_t old_state,
+-				sink_state_t new_state,
+-				void *user_data)
++				btd_service_state_t old_state,
++				btd_service_state_t new_state)
  {
- 	struct btd_device *dev = btd_service_get_device(service);
- 	const char *path = device_get_path(dev);
--	struct audio_device *audio_dev;
+ 	struct dev_priv *priv = dev->priv;
  
- 	DBG("path %s", path);
- 
--	audio_dev = get_audio_dev(dev);
--	if (!audio_dev) {
--		DBG("unable to get a device object");
--		return -1;
--	}
+-	if (!dev->sink)
+-		return;
 -
--	return sink_connect(audio_dev);
-+	return sink_connect(service);
+ 	priv->sink_state = new_state;
+ 
+ 	switch (new_state) {
+-	case SINK_STATE_DISCONNECTED:
++	case BTD_SERVICE_STATE_UNAVAILABLE:
++	case BTD_SERVICE_STATE_DISCONNECTED:
+ 		if (dev->control) {
+ 			device_remove_control_timer(dev);
+ 			if (priv->avctp_state != AVCTP_STATE_DISCONNECTED)
+ 				avrcp_disconnect(dev);
+ 		}
+ 		break;
+-	case SINK_STATE_CONNECTING:
+-		break;
+-	case SINK_STATE_CONNECTED:
+-		break;
+-	case SINK_STATE_PLAYING:
++	case BTD_SERVICE_STATE_CONNECTING:
++	case BTD_SERVICE_STATE_CONNECTED:
++	case BTD_SERVICE_STATE_DISCONNECTING:
+ 		break;
+ 	}
+ }
+@@ -222,6 +221,20 @@ static void device_avctp_cb(struct audio_device *dev, avctp_state_t old_state,
+ 	}
  }
  
- static int a2dp_sink_disconnect(struct btd_service *service)
++static void service_cb(struct btd_service *service,
++						btd_service_state_t old_state,
++						btd_service_state_t new_state,
++						void *user_data)
++{
++	struct audio_device *dev = user_data;
++
++	if (dev->btd_dev != btd_service_get_device(service))
++		return;
++
++	if (service == dev->sink)
++		device_sink_cb(dev, old_state, new_state);
++}
++
+ struct audio_device *audio_device_register(struct btd_device *device)
  {
- 	struct btd_device *dev = btd_service_get_device(service);
- 	const char *path = device_get_path(dev);
--	struct audio_device *audio_dev;
+ 	struct audio_device *dev;
+@@ -236,8 +249,7 @@ struct audio_device *audio_device_register(struct btd_device *device)
+ 	dev->priv->dc_id = device_add_disconnect_watch(dev->btd_dev,
+ 							disconnect_cb, dev,
+ 							NULL);
+-	dev->priv->sink_callback_id = sink_add_state_cb(dev, device_sink_cb,
+-									NULL);
++	dev->priv->service_cb_id = btd_service_add_state_cb(service_cb, dev);
+ 	dev->priv->avdtp_callback_id = avdtp_add_state_cb(dev, device_avdtp_cb);
+ 	dev->priv->avctp_callback_id = avctp_add_state_cb(dev, device_avctp_cb);
  
- 	DBG("path %s", path);
+diff --git a/profiles/audio/device.h b/profiles/audio/device.h
+index 286bcdd..e24bdf9 100644
+--- a/profiles/audio/device.h
++++ b/profiles/audio/device.h
+@@ -25,13 +25,12 @@
+ struct audio_device;
+ struct source;
+ struct control;
+-struct sink;
+ struct dev_priv;
  
--	audio_dev = get_audio_dev(dev);
--	if (!audio_dev) {
--		DBG("unable to get a device object");
--		return -1;
--	}
--
--	return sink_disconnect(audio_dev, FALSE);
-+	return sink_disconnect(service, FALSE);
- }
+ struct audio_device {
+ 	struct btd_device *btd_dev;
  
- static int avrcp_target_connect(struct btd_service *service)
+-	struct sink *sink;
++	struct btd_service *sink;
+ 	struct source *source;
+ 	struct control *control;
+ 
 diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
-index f5b4e67..76bc2ad 100644
+index 3969417..f5b4e67 100644
 --- a/profiles/audio/sink.c
 +++ b/profiles/audio/sink.c
-@@ -71,7 +71,7 @@ struct sink {
+@@ -87,7 +87,7 @@ static char *str_state[] = {
  
- struct sink_state_callback {
- 	sink_state_cb cb;
--	struct audio_device *dev;
-+	struct btd_service *service;
- 	void *user_data;
- 	unsigned int id;
- };
-@@ -85,24 +85,25 @@ static char *str_state[] = {
- 	"SINK_STATE_PLAYING",
- };
- 
--static void sink_set_state(struct audio_device *dev, sink_state_t new_state)
-+static void sink_set_state(struct btd_service *service, sink_state_t new_state)
+ static void sink_set_state(struct audio_device *dev, sink_state_t new_state)
  {
--	struct sink *sink = btd_service_get_user_data(dev->sink);
-+	struct sink *sink = btd_service_get_user_data(service);
-+	struct btd_device *dev = btd_service_get_device(service);
+-	struct sink *sink = dev->sink;
++	struct sink *sink = btd_service_get_user_data(dev->sink);
  	sink_state_t old_state = sink->state;
  	GSList *l;
  
- 	sink->state = new_state;
- 
--	DBG("State changed %s: %s -> %s", device_get_path(dev->btd_dev),
-+	DBG("State changed %s: %s -> %s", device_get_path(dev),
- 				str_state[old_state], str_state[new_state]);
- 
- 	for (l = sink_callbacks; l != NULL; l = l->next) {
- 		struct sink_state_callback *cb = l->data;
- 
--		if (cb->dev != dev)
-+		if (cb->service != service)
- 			continue;
- 
--		cb->cb(dev, old_state, new_state, cb->user_data);
-+		cb->cb(service, old_state, new_state, cb->user_data);
- 	}
- 
- 	if (new_state != SINK_STATE_DISCONNECTED)
-@@ -123,10 +124,10 @@ static void avdtp_state_callback(struct audio_device *dev,
+@@ -119,7 +119,7 @@ static void avdtp_state_callback(struct audio_device *dev,
+ 					avdtp_session_state_t old_state,
+ 					avdtp_session_state_t new_state)
+ {
+-	struct sink *sink = dev->sink;
++	struct sink *sink = btd_service_get_user_data(dev->sink);
  
  	switch (new_state) {
  	case AVDTP_SESSION_STATE_DISCONNECTED:
--		sink_set_state(dev, SINK_STATE_DISCONNECTED);
-+		sink_set_state(dev->sink, SINK_STATE_DISCONNECTED);
- 		break;
- 	case AVDTP_SESSION_STATE_CONNECTING:
--		sink_set_state(dev, SINK_STATE_CONNECTING);
-+		sink_set_state(dev->sink, SINK_STATE_CONNECTING);
- 		break;
- 	case AVDTP_SESSION_STATE_CONNECTED:
- 		break;
-@@ -141,8 +142,8 @@ static void stream_state_changed(struct avdtp_stream *stream,
- 					struct avdtp_error *err,
+@@ -142,7 +142,7 @@ static void stream_state_changed(struct avdtp_stream *stream,
  					void *user_data)
  {
--	struct audio_device *dev = user_data;
--	struct sink *sink = btd_service_get_user_data(dev->sink);
-+	struct btd_service *service = user_data;
-+	struct sink *sink = btd_service_get_user_data(service);
+ 	struct audio_device *dev = user_data;
+-	struct sink *sink = dev->sink;
++	struct sink *sink = btd_service_get_user_data(dev->sink);
  
  	if (err)
  		return;
-@@ -152,7 +153,7 @@ static void stream_state_changed(struct avdtp_stream *stream,
- 		btd_service_disconnecting_complete(sink->service, 0);
- 
- 		if (sink->disconnect_id > 0) {
--			a2dp_cancel(dev, sink->disconnect_id);
-+			a2dp_cancel(sink->dev, sink->disconnect_id);
- 			sink->disconnect_id = 0;
- 		}
- 
-@@ -164,10 +165,10 @@ static void stream_state_changed(struct avdtp_stream *stream,
- 		sink->cb_id = 0;
- 		break;
- 	case AVDTP_STATE_OPEN:
--		sink_set_state(dev, SINK_STATE_CONNECTED);
-+		sink_set_state(service, SINK_STATE_CONNECTED);
- 		break;
- 	case AVDTP_STATE_STREAMING:
--		sink_set_state(dev, SINK_STATE_PLAYING);
-+		sink_set_state(service, SINK_STATE_PLAYING);
- 		break;
- 	case AVDTP_STATE_CONFIGURED:
- 	case AVDTP_STATE_CLOSING:
-@@ -291,9 +292,9 @@ failed:
+@@ -291,8 +291,10 @@ failed:
  	sink->session = NULL;
  }
  
--gboolean sink_setup_stream(struct audio_device *dev, struct avdtp *session)
-+gboolean sink_setup_stream(struct btd_service *service, struct avdtp *session)
+-gboolean sink_setup_stream(struct sink *sink, struct avdtp *session)
++gboolean sink_setup_stream(struct audio_device *dev, struct avdtp *session)
  {
--	struct sink *sink = btd_service_get_user_data(dev->sink);
-+	struct sink *sink = btd_service_get_user_data(service);
- 
++	struct sink *sink = btd_service_get_user_data(dev->sink);
++
  	if (sink->connect_id > 0 || sink->disconnect_id > 0)
  		return FALSE;
-@@ -310,12 +311,12 @@ gboolean sink_setup_stream(struct audio_device *dev, struct avdtp *session)
- 	return TRUE;
- }
  
--int sink_connect(struct audio_device *dev)
-+int sink_connect(struct btd_service *service)
+@@ -310,7 +312,7 @@ gboolean sink_setup_stream(struct sink *sink, struct avdtp *session)
+ 
+ int sink_connect(struct audio_device *dev)
  {
--	struct sink *sink = btd_service_get_user_data(dev->sink);
-+	struct sink *sink = btd_service_get_user_data(service);
+-	struct sink *sink = dev->sink;
++	struct sink *sink = btd_service_get_user_data(dev->sink);
  
  	if (!sink->session)
--		sink->session = avdtp_get(dev);
-+		sink->session = avdtp_get(sink->dev);
- 
- 	if (!sink->session) {
- 		DBG("Unable to get a session");
-@@ -328,7 +329,7 @@ int sink_connect(struct audio_device *dev)
+ 		sink->session = avdtp_get(dev);
+@@ -326,7 +328,7 @@ int sink_connect(struct audio_device *dev)
  	if (sink->stream_state >= AVDTP_STATE_OPEN)
  		return -EALREADY;
  
--	if (!sink_setup_stream(dev, NULL)) {
-+	if (!sink_setup_stream(service, NULL)) {
+-	if (!sink_setup_stream(sink, NULL)) {
++	if (!sink_setup_stream(dev, NULL)) {
  		DBG("Failed to create a stream");
  		return -EIO;
  	}
-@@ -338,9 +339,10 @@ int sink_connect(struct audio_device *dev)
- 	return 0;
- }
+@@ -338,7 +340,7 @@ int sink_connect(struct audio_device *dev)
  
--static void sink_free(struct audio_device *dev)
-+static void sink_free(struct btd_service *service)
+ static void sink_free(struct audio_device *dev)
  {
--	struct sink *sink = btd_service_get_user_data(dev->sink);
-+	struct sink *sink = btd_service_get_user_data(service);
-+	struct audio_device *dev = sink->dev;
+-	struct sink *sink = dev->sink;
++	struct sink *sink = btd_service_get_user_data(dev->sink);
  
  	if (sink->cb_id)
  		avdtp_stream_remove_cb(sink->session, sink->stream,
-@@ -371,10 +373,13 @@ static void sink_free(struct audio_device *dev)
- 	dev->sink = NULL;
+@@ -375,7 +377,8 @@ void sink_unregister(struct audio_device *dev)
+ 	sink_free(dev);
  }
  
--void sink_unregister(struct audio_device *dev)
-+void sink_unregister(struct btd_service *service)
+-struct sink *sink_init(struct audio_device *dev, struct btd_service *service)
++struct btd_service *sink_init(struct audio_device *dev,
++						struct btd_service *service)
  {
--	DBG("%s", device_get_path(dev->btd_dev));
--	sink_free(dev);
-+	struct btd_device *dev = btd_service_get_device(service);
+ 	struct sink *sink;
+ 
+@@ -388,12 +391,14 @@ struct sink *sink_init(struct audio_device *dev, struct btd_service *service)
+ 
+ 	sink->avdtp_callback_id = avdtp_add_state_cb(dev, avdtp_state_callback);
+ 
+-	return sink;
++	btd_service_set_user_data(service, sink);
 +
-+	DBG("%s", device_get_path(dev));
-+
-+	sink_free(service);
++	return service;
  }
  
- struct btd_service *sink_init(struct audio_device *dev,
-@@ -396,9 +401,9 @@ struct btd_service *sink_init(struct audio_device *dev,
- 	return service;
- }
- 
--gboolean sink_is_active(struct audio_device *dev)
-+gboolean sink_is_active(struct btd_service *service)
+ gboolean sink_is_active(struct audio_device *dev)
  {
--	struct sink *sink = btd_service_get_user_data(dev->sink);
-+	struct sink *sink = btd_service_get_user_data(service);
+-	struct sink *sink = dev->sink;
++	struct sink *sink = btd_service_get_user_data(dev->sink);
  
  	if (sink->session)
  		return TRUE;
-@@ -406,10 +411,10 @@ gboolean sink_is_active(struct audio_device *dev)
- 	return FALSE;
- }
- 
--gboolean sink_new_stream(struct audio_device *dev, struct avdtp *session,
-+gboolean sink_new_stream(struct btd_service *service, struct avdtp *session,
+@@ -404,7 +409,7 @@ gboolean sink_is_active(struct audio_device *dev)
+ gboolean sink_new_stream(struct audio_device *dev, struct avdtp *session,
  				struct avdtp_stream *stream)
  {
--	struct sink *sink = btd_service_get_user_data(dev->sink);
-+	struct sink *sink = btd_service_get_user_data(service);
+-	struct sink *sink = dev->sink;
++	struct sink *sink = btd_service_get_user_data(dev->sink);
  
  	if (sink->stream)
  		return FALSE;
-@@ -420,14 +425,15 @@ gboolean sink_new_stream(struct audio_device *dev, struct avdtp *session,
- 	sink->stream = stream;
+@@ -422,7 +427,7 @@ gboolean sink_new_stream(struct audio_device *dev, struct avdtp *session,
  
- 	sink->cb_id = avdtp_stream_add_cb(session, stream,
--						stream_state_changed, dev);
-+						stream_state_changed, service);
- 
- 	return TRUE;
- }
- 
--int sink_disconnect(struct audio_device *dev, gboolean shutdown)
-+int sink_disconnect(struct btd_service *service, gboolean shutdown)
+ int sink_disconnect(struct audio_device *dev, gboolean shutdown)
  {
--	struct sink *sink = btd_service_get_user_data(dev->sink);
-+	struct sink *sink = btd_service_get_user_data(service);
-+	struct audio_device *dev = sink->dev;
+-	struct sink *sink = dev->sink;
++	struct sink *sink = btd_service_get_user_data(dev->sink);
  
  	if (!sink->session)
  		return -ENOTCONN;
-@@ -457,7 +463,7 @@ int sink_disconnect(struct audio_device *dev, gboolean shutdown)
- 	return avdtp_close(sink->session, sink->stream, FALSE);
- }
- 
--unsigned int sink_add_state_cb(struct audio_device *dev, sink_state_cb cb,
-+unsigned int sink_add_state_cb(struct btd_service *service, sink_state_cb cb,
- 								void *user_data)
- {
- 	struct sink_state_callback *state_cb;
-@@ -465,7 +471,7 @@ unsigned int sink_add_state_cb(struct audio_device *dev, sink_state_cb cb,
- 
- 	state_cb = g_new(struct sink_state_callback, 1);
- 	state_cb->cb = cb;
--	state_cb->dev = dev;
-+	state_cb->service = service;
- 	state_cb->user_data = user_data;
- 	state_cb->id = ++id;
- 
 diff --git a/profiles/audio/sink.h b/profiles/audio/sink.h
-index e3f974b..b25089a 100644
+index 1a80756..e3f974b 100644
 --- a/profiles/audio/sink.h
 +++ b/profiles/audio/sink.h
-@@ -29,23 +29,23 @@ typedef enum {
- 	SINK_STATE_PLAYING,
- } sink_state_t;
- 
--typedef void (*sink_state_cb) (struct audio_device *dev,
-+typedef void (*sink_state_cb) (struct btd_service *service,
- 				sink_state_t old_state,
- 				sink_state_t new_state,
- 				void *user_data);
- 
- struct btd_service;
- 
--unsigned int sink_add_state_cb(struct audio_device *dev, sink_state_cb cb,
-+unsigned int sink_add_state_cb(struct btd_service *service, sink_state_cb cb,
+@@ -40,11 +40,12 @@ unsigned int sink_add_state_cb(struct audio_device *dev, sink_state_cb cb,
  							void *user_data);
  gboolean sink_remove_state_cb(unsigned int id);
  
- struct btd_service *sink_init(struct audio_device *dev,
- 						struct btd_service *service);
--void sink_unregister(struct audio_device *dev);
--gboolean sink_is_active(struct audio_device *dev);
--int sink_connect(struct audio_device *dev);
--gboolean sink_new_stream(struct audio_device *dev, struct avdtp *session,
-+void sink_unregister(struct btd_service *service);
-+gboolean sink_is_active(struct btd_service *service);
-+int sink_connect(struct btd_service *service);
-+gboolean sink_new_stream(struct btd_service *service, struct avdtp *session,
+-struct sink *sink_init(struct audio_device *dev, struct btd_service *service);
++struct btd_service *sink_init(struct audio_device *dev,
++						struct btd_service *service);
+ void sink_unregister(struct audio_device *dev);
+ gboolean sink_is_active(struct audio_device *dev);
+ int sink_connect(struct audio_device *dev);
+ gboolean sink_new_stream(struct audio_device *dev, struct avdtp *session,
  				struct avdtp_stream *stream);
--gboolean sink_setup_stream(struct audio_device *dev, struct avdtp *session);
--int sink_disconnect(struct audio_device *dev, gboolean shutdown);
-+gboolean sink_setup_stream(struct btd_service *service, struct avdtp *session);
-+int sink_disconnect(struct btd_service *service, gboolean shutdown);
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index f585c3a..3e83a95 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -744,7 +744,7 @@ static void transport_update_playing(struct media_transport *transport,
- 		transport_set_state(transport, TRANSPORT_STATE_PENDING);
- }
- 
--static void sink_state_changed(struct audio_device *dev,
-+static void sink_state_changed(struct btd_service *service,
- 						sink_state_t old_state,
- 						sink_state_t new_state,
- 						void *user_data)
-@@ -804,7 +804,7 @@ struct media_transport *media_transport_create(struct audio_device *device,
- 
- 		if (strcasecmp(uuid, A2DP_SOURCE_UUID) == 0) {
- 			a2dp->volume = -1;
--			transport->sink_watch = sink_add_state_cb(device,
-+			transport->sink_watch = sink_add_state_cb(device->sink,
- 							sink_state_changed,
- 							transport);
- 		} else {
+-gboolean sink_setup_stream(struct sink *sink, struct avdtp *session);
++gboolean sink_setup_stream(struct audio_device *dev, struct avdtp *session);
+ int sink_disconnect(struct audio_device *dev, gboolean shutdown);
 -- 
 1.8.1.4
 
