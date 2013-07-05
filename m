@@ -2,138 +2,85 @@ Return-Path: <cyrus@holtmann.org>
 From: martin.xu@linux.intel.com
 To: linux-bluetooth@vger.kernel.org
 Cc: Martin <martin.xu@linux.intel.com>
-Subject: [PATCH] Profile: fix set default external profile authorize
-Date: Mon,  8 Jul 2013 16:17:20 +0800
-Message-Id: <1373271440-8673-1-git-send-email-martin.xu@linux.intel.com>
+Subject: [PATCH] obexd/client: Add client session properties
+Date: Fri,  5 Jul 2013 17:08:26 +0800
+Message-Id: <1373015306-3519-1-git-send-email-martin.xu@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Martin <martin.xu@linux.intel.com>
 
-authorize is always set as "true" in function ext_set_defaults() by mistake.
-
-the static variable authorize of default_settings will be 0(false),
-if it is not initialized. So item authorize needs to be initized onlyif
-the value is true (non-0).
-And then function ext_set_defaults() can set default authorize properly.
 ---
- src/profile.c |   17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+ obexd/client/session.c |   38 ++++++++++++++++++++++++++++++++------
+ 1 file changed, 32 insertions(+), 6 deletions(-)
 
-diff --git a/src/profile.c b/src/profile.c
-index c745811..5795ca7 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -1907,12 +1907,14 @@ static struct default_settings {
- 		.uuid		= SPP_UUID,
- 		.name		= "Serial Port",
- 		.channel	= SPP_DEFAULT_CHANNEL,
-+		.authorize	= true,
- 		.get_record	= get_spp_record,
- 		.version	= 0x0102,
- 	}, {
- 		.uuid		= DUN_GW_UUID,
- 		.name		= "Dial-Up Networking",
- 		.channel	= DUN_DEFAULT_CHANNEL,
-+		.authorize	= true,
- 		.get_record	= get_dun_record,
- 		.version	= 0x0102,
- 	}, {
-@@ -1921,6 +1923,7 @@ static struct default_settings {
- 		.priority	= BTD_PROFILE_PRIORITY_HIGH,
- 		.remote_uuid	= HFP_AG_UUID,
- 		.channel	= HFP_HF_DEFAULT_CHANNEL,
-+		.authorize	= true,
- 		.auto_connect	= true,
- 		.get_record	= get_hfp_hf_record,
- 		.version	= 0x0105,
-@@ -1930,6 +1933,7 @@ static struct default_settings {
- 		.priority	= BTD_PROFILE_PRIORITY_HIGH,
- 		.remote_uuid	= HFP_HS_UUID,
- 		.channel	= HFP_AG_DEFAULT_CHANNEL,
-+		.authorize	= true,
- 		.auto_connect	= true,
- 		.get_record	= get_hfp_ag_record,
- 		.version	= 0x0105,
-@@ -1939,6 +1943,7 @@ static struct default_settings {
- 		.priority	= BTD_PROFILE_PRIORITY_HIGH,
- 		.remote_uuid	= HSP_HS_UUID,
- 		.channel	= HSP_AG_DEFAULT_CHANNEL,
-+		.authorize	= true,
- 		.auto_connect	= true,
- 	}, {
- 		.uuid		= OBEX_OPP_UUID,
-@@ -1947,7 +1952,6 @@ static struct default_settings {
- 		.psm		= BTD_PROFILE_PSM_AUTO,
- 		.mode		= BT_IO_MODE_ERTM,
- 		.sec_level	= BT_IO_SEC_LOW,
--		.authorize	= false,
- 		.get_record	= get_opp_record,
- 		.version	= 0x0102,
- 	}, {
-@@ -1956,30 +1960,35 @@ static struct default_settings {
- 		.channel	= FTP_DEFAULT_CHANNEL,
- 		.psm		= BTD_PROFILE_PSM_AUTO,
- 		.mode		= BT_IO_MODE_ERTM,
-+		.authorize	= true,
- 		.get_record	= get_ftp_record,
- 		.version	= 0x0102,
- 	}, {
- 		.uuid		= OBEX_SYNC_UUID,
- 		.name		= "Synchronization",
- 		.channel	= SYNC_DEFAULT_CHANNEL,
-+		.authorize	= true,
- 		.get_record	= get_sync_record,
- 		.version	= 0x0100,
- 	}, {
- 		.uuid		= OBEX_PSE_UUID,
- 		.name		= "Phone Book Access",
- 		.channel	= PBAP_DEFAULT_CHANNEL,
-+		.authorize	= true,
- 		.get_record	= get_pse_record,
- 		.version	= 0x0101,
- 	}, {
- 		.uuid		= OBEX_PCE_UUID,
- 		.name		= "Phone Book Access Client",
- 		.remote_uuid	= OBEX_PSE_UUID,
-+		.authorize	= true,
- 		.get_record	= get_pce_record,
- 		.version	= 0x0101,
- 	}, {
- 		.uuid		= OBEX_MAS_UUID,
- 		.name		= "Message Access",
- 		.channel	= MAS_DEFAULT_CHANNEL,
-+		.authorize	= true,
- 		.get_record	= get_mas_record,
- 		.version	= 0x0100
- 	}, {
-@@ -1987,6 +1996,7 @@ static struct default_settings {
- 		.name		= "Message Notification",
- 		.channel	= MNS_DEFAULT_CHANNEL,
- 		.psm		= BTD_PROFILE_PSM_AUTO,
-+		.authorize	= true,
- 		.get_record	= get_mns_record,
- 		.version	= 0x0100
- 	},
-@@ -1998,7 +2008,7 @@ static void ext_set_defaults(struct ext_profile *ext)
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index 8d32ed0..e9cbf00 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -630,9 +630,6 @@ static gboolean get_source(const GDBusPropertyTable *property,
+ {
+ 	struct obc_session *session = data;
  
- 	ext->mode = BT_IO_MODE_BASIC;
- 	ext->sec_level = BT_IO_SEC_MEDIUM;
--	ext->authorize = true;
-+	ext->authorize = false;
- 	ext->enable_client = true;
- 	ext->enable_server = true;
- 	ext->remote_uuid = NULL;
-@@ -2029,6 +2039,9 @@ static void ext_set_defaults(struct ext_profile *ext)
- 		if (settings->mode)
- 			ext->mode = settings->mode;
+-	if (session->source == NULL)
+-		return FALSE;
+-
+ 	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
+ 							&session->source);
  
-+		if (settings->authorize)
-+			ext->authorize = true;
+@@ -675,10 +672,35 @@ static const GDBusMethodTable session_methods[] = {
+ 	{ }
+ };
+ 
++static gboolean get_target(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct obc_session *session = data;
++	char *uuid;
 +
- 		if (settings->auto_connect)
- 			ext->p.auto_connect = true;
++	uuid = g_strdup(session->driver->uuid);
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
++	g_free(uuid);
++
++	return TRUE;
++}
++
++static gboolean session_target_exists(const GDBusPropertyTable *property,
++								void *data)
++{
++	struct obc_session *session = data;
++	if (session->driver)
++		return session->driver->uuid ? TRUE : FALSE;
++
++	return FALSE;
++}
++
+ static const GDBusPropertyTable session_properties[] = {
+ 	{ "Source", "s", get_source, NULL, source_exists },
+ 	{ "Destination", "s", get_destination },
+ 	{ "Channel", "y", get_channel },
++	{ "Target", "s", get_target, NULL, session_target_exists },
+ 	{ }
+ };
  
+@@ -854,9 +876,13 @@ const char *obc_session_register(struct obc_session *session,
+ 	session->path = g_strdup_printf("%s/session%ju",
+ 						SESSION_BASEPATH, counter++);
+ 
+-	if (g_dbus_register_interface(session->conn, session->path,
+-					SESSION_INTERFACE, session_methods,
+-					NULL, NULL, session, destroy) == FALSE)
++	if (g_dbus_register_interface(session->conn,
++					session->path,
++					SESSION_INTERFACE,
++					session_methods,
++					NULL,
++					session_properties,
++					session, destroy) == FALSE)
+ 		goto fail;
+ 
+ 	if (session->driver->probe && session->driver->probe(session) < 0) {
 -- 
 1.7.10.4
 
