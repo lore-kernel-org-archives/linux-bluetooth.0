@@ -1,86 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: martin.xu@linux.intel.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Martin <martin.xu@linux.intel.com>
-Subject: [PATCH] obexd/client: Add client session properties
-Date: Fri,  5 Jul 2013 17:38:26 +0800
-Message-Id: <1373017106-4571-1-git-send-email-martin.xu@linux.intel.com>
+Date: Fri, 5 Jul 2013 12:00:14 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jefferson Delfes <jefferson.delfes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 0/6] emulator: add LE advertising and scanning
+ support
+Message-ID: <20130705090014.GA2981@x220.p-661hnu-f1>
+References: <1372884896-11419-1-git-send-email-jefferson.delfes@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1372884896-11419-1-git-send-email-jefferson.delfes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Martin <martin.xu@linux.intel.com>
+Hi Jefferson,
 
----
- obexd/client/session.c |   38 ++++++++++++++++++++++++++++++++------
- 1 file changed, 32 insertions(+), 6 deletions(-)
+On Wed, Jul 03, 2013, Jefferson Delfes wrote:
+> In order to write discovery tests for LE, we need some implementation
+> on emulator side.
+> This patch series basically reports virtual devices in adv mode for
+> devices in scan mode.
+> 
+> This new series was reorganized by merging some commits and removing
+> others not related to discovery tests. Note that this is just a first
+> set, based on a RFC sent a while ago by Bruna Moreira. Future patches
+> will build on these patches.
+> 
+> Jefferson Delfes (6):
+>   emulator: Store LE advertising data length in btdev
+>   emulator: Implement basic LE set adv enable command
+>   emulator: Store LE scan state of virtual controller
+>   emulator: Disallow LE set scan params command when scan is enabled
+>   emulator: Dummy LE set advertising parameters
+>   emulator: Implement LE advertising report
+> 
+>  emulator/btdev.c | 102 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  monitor/bt.h     |  13 +++++++
+>  2 files changed, 113 insertions(+), 2 deletions(-)
 
-diff --git a/obexd/client/session.c b/obexd/client/session.c
-index 8d32ed0..e9cbf00 100644
---- a/obexd/client/session.c
-+++ b/obexd/client/session.c
-@@ -630,9 +630,6 @@ static gboolean get_source(const GDBusPropertyTable *property,
- {
- 	struct obc_session *session = data;
- 
--	if (session->source == NULL)
--		return FALSE;
--
- 	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
- 							&session->source);
- 
-@@ -675,10 +672,35 @@ static const GDBusMethodTable session_methods[] = {
- 	{ }
- };
- 
-+static gboolean get_target(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct obc_session *session = data;
-+	char *uuid;
-+
-+	uuid = g_strdup(session->driver->uuid);
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
-+	g_free(uuid);
-+
-+	return TRUE;
-+}
-+
-+static gboolean session_target_exists(const GDBusPropertyTable *property,
-+								void *data)
-+{
-+	struct obc_session *session = data;
-+	if (session->driver)
-+		return session->driver->uuid ? TRUE : FALSE;
-+
-+	return FALSE;
-+}
-+
- static const GDBusPropertyTable session_properties[] = {
- 	{ "Source", "s", get_source, NULL, source_exists },
- 	{ "Destination", "s", get_destination },
- 	{ "Channel", "y", get_channel },
-+	{ "Target", "s", get_target, NULL, session_target_exists },
- 	{ }
- };
- 
-@@ -854,9 +876,13 @@ const char *obc_session_register(struct obc_session *session,
- 	session->path = g_strdup_printf("%s/session%ju",
- 						SESSION_BASEPATH, counter++);
- 
--	if (g_dbus_register_interface(session->conn, session->path,
--					SESSION_INTERFACE, session_methods,
--					NULL, NULL, session, destroy) == FALSE)
-+	if (g_dbus_register_interface(session->conn,
-+					session->path,
-+					SESSION_INTERFACE,
-+					session_methods,
-+					NULL,
-+					session_properties,
-+					session, destroy) == FALSE)
- 		goto fail;
- 
- 	if (session->driver->probe && session->driver->probe(session) < 0) {
--- 
-1.7.10.4
+All patches in this set have been applied. Thanks.
 
+Johan
