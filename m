@@ -4,87 +4,65 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v8 1/8] Bluetooth: Use hci_connect_sco directly
-Date: Fri,  5 Jul 2013 17:01:35 +0200
-Message-Id: <1373036503-1349-2-git-send-email-frederic.dalleau@linux.intel.com>
-In-Reply-To: <1373036503-1349-1-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1373036503-1349-1-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v8 0/8] sco: SCO socket option for voice_setting
+Date: Fri,  5 Jul 2013 17:01:34 +0200
+Message-Id: <1373036503-1349-1-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hci_connect is a super function for connecting hci protocols. But the
-voice_setting parameter is only needed by SCO and security requirements are not
-needed for SCO channels. Thus, it makes sense to have a separate function.
+Hi,
 
-Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/hci_core.h |    2 ++
- net/bluetooth/hci_conn.c         |    9 +++------
- net/bluetooth/sco.c              |    3 +--
- 3 files changed, 6 insertions(+), 8 deletions(-)
+v8 declares BT_VOICE_CVSD_16BIT
+Merge T*, S* and D* patches in one
+The last patch returns -ECONNABORTED when trying to setup a transparent data
+connection if eSCO is not supported.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index f77885e..679b07f 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -584,6 +584,8 @@ struct hci_chan *hci_chan_lookup_handle(struct hci_dev *hdev, __u16 handle);
- 
- struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 			     __u8 dst_type, __u8 sec_level, __u8 auth_type);
-+struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
-+				 __u16 setting);
- int hci_conn_check_link_mode(struct hci_conn *conn);
- int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
- int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type);
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 6c7f363..d1d9919 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -560,13 +560,13 @@ static struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
- 	return acl;
- }
- 
--static struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type,
--				bdaddr_t *dst, u8 sec_level, u8 auth_type)
-+struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
-+				 __u16 setting)
- {
- 	struct hci_conn *acl;
- 	struct hci_conn *sco;
- 
--	acl = hci_connect_acl(hdev, dst, sec_level, auth_type);
-+	acl = hci_connect_acl(hdev, dst, BT_SECURITY_LOW, HCI_AT_NO_BONDING);
- 	if (IS_ERR(acl))
- 		return acl;
- 
-@@ -612,9 +612,6 @@ struct hci_conn *hci_connect(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 		return hci_connect_le(hdev, dst, dst_type, sec_level, auth_type);
- 	case ACL_LINK:
- 		return hci_connect_acl(hdev, dst, sec_level, auth_type);
--	case SCO_LINK:
--	case ESCO_LINK:
--		return hci_connect_sco(hdev, type, dst, sec_level, auth_type);
- 	}
- 
- 	return ERR_PTR(-EINVAL);
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index e7bd4ee..7114984 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -176,8 +176,7 @@ static int sco_connect(struct sock *sk)
- 	else
- 		type = SCO_LINK;
- 
--	hcon = hci_connect(hdev, type, dst, BDADDR_BREDR, BT_SECURITY_LOW,
--			   HCI_AT_NO_BONDING);
-+	hcon = hci_connect_sco(hdev, type, dst, sco_pi(sk)->setting);
- 	if (IS_ERR(hcon)) {
- 		err = PTR_ERR(hcon);
- 		goto done;
+v7 changes defaults to BT_VOICE_CVSD
+Remove mask parameter to sco_conn_defer_accept, it was always 0
+check the bits for air codec instead of use constants.
+Add S3, S2, S1, D1, D0 settings.
+The controller default is now only used to initialize the controller or fill
+in the missing information in case of using the old Add_SCO command
+
+v6 fixes style issues
+
+v5 changes interface to SOL_BLUETOOTH, BT_VOICE.
+Rework fallback mechanism.
+
+This is the patch version 4 of the socket option for enabling transparent SCO.
+As requested by Marcel, this is now a 16-bit voice_setting.
+0x0000 is the value corresponding to current behavior.
+0x0003 is the value to use for enabling transparent data.
+It is easy to allow all possible values from Bluetooth core spec, but I guess
+results can be unexpected...
+Should we filter allowed values in setsockopt ?
+
+Let me know what you think.
+Regards,
+Fred
+
+
+Frédéric Dalleau (8):
+  Bluetooth: Use hci_connect_sco directly
+  Bluetooth: Remove unused mask parameter in sco_conn_defer_accept
+  Bluetooth: Add bluetooth socket voice option
+  Bluetooth: Constants declaration for SCO airmode
+  Bluetooth: Use voice setting in defered SCO connection request
+  Bluetooth: Parameters for outgoing SCO connections
+  Bluetooth: SCO connection fallback
+  Bluetooth: Prevent transparent SCO on older devices
+
+ include/net/bluetooth/bluetooth.h |    8 ++++
+ include/net/bluetooth/hci_core.h  |    8 ++++
+ include/net/bluetooth/sco.h       |    1 +
+ net/bluetooth/hci_conn.c          |   56 +++++++++++++++++++++-----
+ net/bluetooth/hci_event.c         |    3 +-
+ net/bluetooth/sco.c               |   78 ++++++++++++++++++++++++++++++-------
+ 6 files changed, 130 insertions(+), 24 deletions(-)
+
 -- 
 1.7.9.5
 
