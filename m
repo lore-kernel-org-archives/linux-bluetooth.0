@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v8 8/8] Bluetooth: Prevent transparent SCO on older devices
-Date: Fri,  5 Jul 2013 17:01:42 +0200
-Message-Id: <1373036503-1349-9-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v8 6/8] Bluetooth: Parameters for outgoing SCO connections
+Date: Fri,  5 Jul 2013 17:01:40 +0200
+Message-Id: <1373036503-1349-7-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1373036503-1349-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1373036503-1349-1-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
@@ -15,38 +15,74 @@ Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Older Bluetooth devices may not support Setup Synchronous Connection. This is
-indicated by the eSCO support feature bit. It is not possible to know if the
-adapter support eSCO before setting BT_VOICE option since the socket is not
-bound to an adapter. An adapter can also be added after the socket is created.
-The socket can be bound to an address before adapter is plugged in.
-
-Thus, on a such adapters, if user requested something else than
-BT_VOICE_CVSD_16BIT, outgoing connections fail on connect() and returns
--ECONNABORTED. Incoming connections do not fail. However, they should only be
-allowed depending on what was specified in Write_Voice_Settings command.
+In order to establish a transparent SCO connection, the correct settings must
+be specified in the Setup Synchronous Connection request. For that,
+a setting field is added to ACL connection data to set up the desired
+parameters.
+Remove usage of hdev->voice_setting in CVSD connection.
+Make use of T2 parameters for transparent data.
 
 Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
 ---
- net/bluetooth/sco.c |    5 +++++
- 1 file changed, 5 insertions(+)
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_conn.c         |   22 ++++++++++++++++++----
+ 2 files changed, 19 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 546b7f6..02a602e 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -176,6 +176,11 @@ static int sco_connect(struct sock *sk)
- 	else
- 		type = SCO_LINK;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 69bdb67..61ca2ce 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -320,6 +320,7 @@ struct hci_conn {
+ 	__u32		passkey_notify;
+ 	__u8		passkey_entered;
+ 	__u16		disc_timeout;
++	__u16		setting;
+ 	unsigned long	flags;
  
-+	if (type == SCO_LINK && sco_pi(sk)->setting != BT_VOICE_CVSD_16BIT) {
-+		err = -ECONNABORTED;
-+		goto done;
-+	}
+ 	__u8		remote_cap;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index d1d9919..6282c26 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -185,13 +185,25 @@ void hci_setup_sync(struct hci_conn *conn, __u16 handle)
+ 	conn->attempt++;
+ 
+ 	cp.handle   = cpu_to_le16(handle);
+-	cp.pkt_type = cpu_to_le16(conn->pkt_type);
+ 
+ 	cp.tx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
+ 	cp.rx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
+-	cp.max_latency    = __constant_cpu_to_le16(0xffff);
+-	cp.voice_setting  = cpu_to_le16(hdev->voice_setting);
+-	cp.retrans_effort = 0xff;
 +
- 	hcon = hci_connect_sco(hdev, type, dst, sco_pi(sk)->setting);
- 	if (IS_ERR(hcon)) {
- 		err = PTR_ERR(hcon);
++	switch (conn->setting & SCO_AIRMODE_MASK) {
++	case SCO_AIRMODE_TRANSP:
++		cp.pkt_type       = __constant_cpu_to_le16(EDR_ESCO_MASK &
++							   ~ESCO_2EV3);
++		cp.max_latency    = __constant_cpu_to_le16(0x000d);
++		cp.voice_setting  = __constant_cpu_to_le16(SCO_AIRMODE_TRANSP);
++		cp.retrans_effort = 0x02;
++		break;
++	case SCO_AIRMODE_CVSD:
++		cp.pkt_type       = cpu_to_le16(conn->pkt_type);
++		cp.max_latency    = __constant_cpu_to_le16(0xffff);
++		cp.voice_setting  = cpu_to_le16(conn->setting);
++		cp.retrans_effort = 0xff;
++		break;
++	}
+ 
+ 	hci_send_cmd(hdev, HCI_OP_SETUP_SYNC_CONN, sizeof(cp), &cp);
+ }
+@@ -584,6 +596,8 @@ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 
+ 	hci_conn_hold(sco);
+ 
++	sco->setting = setting;
++
+ 	if (acl->state == BT_CONNECTED &&
+ 	    (sco->state == BT_OPEN || sco->state == BT_CLOSED)) {
+ 		set_bit(HCI_CONN_POWER_SAVE, &acl->flags);
 -- 
 1.7.9.5
 
