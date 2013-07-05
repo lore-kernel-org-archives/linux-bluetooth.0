@@ -4,103 +4,54 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [RFC v2 3/6] btiotest: Add option for SCO voice setting
-Date: Fri,  5 Jul 2013 17:46:44 +0200
-Message-Id: <1373039207-20959-4-git-send-email-frederic.dalleau@linux.intel.com>
-In-Reply-To: <1373039207-20959-1-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1373039207-20959-1-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [RFC v2 0/6] sco: Integrate SCO socket option in user space.
+Date: Fri,  5 Jul 2013 17:46:41 +0200
+Message-Id: <1373039207-20959-1-git-send-email-frederic.dalleau@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- tools/btiotest.c |   19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+Hi,
 
-diff --git a/tools/btiotest.c b/tools/btiotest.c
-index 2c77fb3..580e7a5 100644
---- a/tools/btiotest.c
-+++ b/tools/btiotest.c
-@@ -445,7 +445,7 @@ static void rfcomm_listen(const char *src, uint8_t ch, gboolean defer,
- 	g_io_channel_unref(rc_srv);
- }
- 
--static void sco_connect(const char *src, const char *dst, int disconn)
-+static void sco_connect(const char *src, const char *dst, int disconn, int voice)
- {
- 	struct io_data *data;
- 	GError *err = NULL;
-@@ -460,12 +460,14 @@ static void sco_connect(const char *src, const char *dst, int disconn)
- 						&err,
- 						BT_IO_OPT_SOURCE, src,
- 						BT_IO_OPT_DEST, dst,
-+						BT_IO_OPT_VOICE, voice,
- 						BT_IO_OPT_INVALID);
- 	else
- 		data->io = bt_io_connect(connect_cb, data,
- 						(GDestroyNotify) io_data_unref,
- 						&err,
- 						BT_IO_OPT_DEST, dst,
-+						BT_IO_OPT_VOICE, voice,
- 						BT_IO_OPT_INVALID);
- 
- 	if (!data->io) {
-@@ -476,7 +478,7 @@ static void sco_connect(const char *src, const char *dst, int disconn)
- }
- 
- static void sco_listen(const char *src, gboolean defer, int reject,
--				int disconn, int accept)
-+				int disconn, int accept, int voice)
- {
- 	struct io_data *data;
- 	BtIOConnect conn;
-@@ -501,11 +503,14 @@ static void sco_listen(const char *src, gboolean defer, int reject,
- 					(GDestroyNotify) io_data_unref,
- 					&err,
- 					BT_IO_OPT_SOURCE, src,
-+					BT_IO_OPT_VOICE, voice,
- 					BT_IO_OPT_INVALID);
- 	else
- 		sco_srv = bt_io_listen(conn, cfm, data,
- 					(GDestroyNotify) io_data_unref,
--					&err, BT_IO_OPT_INVALID);
-+					&err,
-+					BT_IO_OPT_VOICE, voice,
-+					BT_IO_OPT_INVALID);
- 
- 	if (!sco_srv) {
- 		printf("Listening failed: %s\n", err->message);
-@@ -520,6 +525,7 @@ static int opt_channel = -1;
- static int opt_psm = 0;
- static gboolean opt_sco = FALSE;
- static gboolean opt_defer = FALSE;
-+static gint opt_voice = 0;
- static char *opt_dev = NULL;
- static int opt_reject = -1;
- static int opt_disconn = -1;
-@@ -546,6 +552,9 @@ static GOptionEntry options[] = {
- 				"Use SCO" },
- 	{ "defer", 'd', 0, G_OPTION_ARG_NONE, &opt_defer,
- 				"Use DEFER_SETUP for incoming connections" },
-+	{ "voice", 'V', 0, G_OPTION_ARG_INT, &opt_voice,
-+				"Voice setting "
-+				"(0x0060 CVSD, 0x0003 Transparent)" },
- 	{ "sec-level", 'S', 0, G_OPTION_ARG_INT, &opt_sec,
- 				"Security level" },
- 	{ "update-sec-level", 'U', 0, G_OPTION_ARG_INT, &opt_update_sec,
-@@ -611,10 +620,10 @@ int main(int argc, char *argv[])
- 
- 	if (opt_sco) {
- 		if (argc > 1)
--			sco_connect(opt_dev, argv[1], opt_disconn);
-+			sco_connect(opt_dev, argv[1], opt_disconn, opt_voice);
- 		else
- 			sco_listen(opt_dev, opt_defer, opt_reject,
--					opt_disconn, opt_accept);
-+					opt_disconn, opt_accept, opt_voice);
- 	}
- 
- 	signal(SIGTERM, sig_term);
+This is the required patches for taking advantage of SCO voice setting from
+userspace.
+
+RFC v2:
+btio option is now called BT_IO_OPT_VOICE as per Luiz suggestion.
+Last patch include additional test in sco-tester for outgoing 1.1 connection,
+this include a change to hciemu (hciemu_get_features) to access feature array
+from btdev to get/set features.
+
+RFC v1:
+add a sco-tester that uses hci_vhci to test SCO.
+
+Regards,
+Fred
+
+Frédéric Dalleau (6):
+  lib: SCO voice setting support header
+  btio: Add option for SCO voice setting
+  btiotest: Add option for SCO voice setting
+  scotest: Add option for SCO voice setting
+  sco-tester: Initial sco tester implementation
+  sco-tester: Test BT_VOICE option with 1.1 adapter
+
+ Makefile.tools      |   12 +-
+ btio/btio.c         |   18 +-
+ btio/btio.h         |    1 +
+ emulator/btdev.c    |   57 +++++
+ emulator/btdev.h    |    1 +
+ lib/bluetooth.h     |    8 +
+ src/shared/hciemu.c |    8 +
+ src/shared/hciemu.h |    1 +
+ tools/btiotest.c    |   20 +-
+ tools/sco-tester.c  |  605 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ tools/scotest.c     |   40 +++-
+ 11 files changed, 759 insertions(+), 12 deletions(-)
+ create mode 100644 tools/sco-tester.c
+
 -- 
 1.7.9.5
 
