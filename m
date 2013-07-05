@@ -1,99 +1,297 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CANT-zCV0wkAZhVwaVo1Xb0Ch+zKiWHqOpHHyBn1PE+Giq43HTw@mail.gmail.com>
-References: <CANT-zCV0wkAZhVwaVo1Xb0Ch+zKiWHqOpHHyBn1PE+Giq43HTw@mail.gmail.com>
-Date: Fri, 5 Jul 2013 11:35:11 +0300
-Message-ID: <CABBYNZLDku=bYx_tVE3n0WA8NCv+FqmLr8bko1oZNxoYzVBQ1A@mail.gmail.com>
-Subject: Re: Multiple SCOs over USB
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <20130704142829.GA13087@samus.indt.org>
+References: <1372864541-10763-1-git-send-email-luiz.dentz@gmail.com>
+	<1372864541-10763-2-git-send-email-luiz.dentz@gmail.com>
+	<20130704142829.GA13087@samus.indt.org>
+Date: Fri, 5 Jul 2013 08:38:42 +0200
+Message-ID: <CANT-zCWK+feaYDNxiq=urOGFrt+0WFKWmbhMecqe3igioGR1aw@mail.gmail.com>
+Subject: Re: [RFC 01/20] audio/sink: Use service user_data for private data
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Vinicius,
 
-On Thu, Jul 4, 2013 at 3:49 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-
-> My best guess to explain this number is that the adapter tries to
-> maximize the usage of the USB frames. If we repeat the maths above,
-> the MTU sizes are again multiple of each other: 96 bytes payload + 3
-> header bytes = 99 bytes which is multiple of the USB MTU size (now 33,
-> see below). This is a wild guess though.
+On Thu, Jul 4, 2013 at 4:28 PM, Vinicius Costa Gomes
+<vinicius.gomes@openbossa.org> wrote:
+> Hi,
 >
-> The kernel traces:
+> On 18:15 Wed 03 Jul, Luiz Augusto von Dentz wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> This remove the need of forward declaration of struct sink and prepare
+>> for a complete removal of struct audio_device.
+>> ---
+>>  profiles/audio/avdtp.c  |  2 +-
+>>  profiles/audio/device.c | 54 ++++++++++++++++++++++++++++++-------------------
+>>  profiles/audio/device.h |  3 +--
+>>  profiles/audio/sink.c   | 29 +++++++++++++++-----------
+>>  profiles/audio/sink.h   |  5 +++--
+>>  5 files changed, 55 insertions(+), 38 deletions(-)
+>>
 >
-> [ 3472.202296] [1186] btusb_send_frame:716: hci0
-> [ 3472.202309] [1186] __fill_isoc_descriptor:499: len 51 mtu 33
-> [ 3472.202327] [1186] btusb_send_frame:716: hci0
-> [ 3472.202336] [1186] __fill_isoc_descriptor:499: len 51 mtu 33
-> [ 3472.202350] [1186] btusb_send_frame:716: hci0
-> [ 3472.202357] [1186] __fill_isoc_descriptor:499: len 51 mtu 33
-> [ 3472.202371] [1186] btusb_send_frame:716: hci0
-> [ 3472.202379] [1186] __fill_isoc_descriptor:499: len 51 mtu 33
-> [ 3472.202390] [1186] btusb_send_frame:716: hci0
-> [ 3472.202399] [1186] __fill_isoc_descriptor:499: len 51 mtu 33
-> [ 3472.202413] [1186] btusb_send_frame:716: hci0
-> [ 3472.202421] [1186] __fill_isoc_descriptor:499: len 51 mtu 33
-> [ 3472.202432] Bluetooth: hci0 urb ffff8801a558b600 submission failed (27)
-> [ 3472.202735] [1186] btusb_send_frame:716: hci0
-> [ 3472.202750] [1186] __fill_isoc_descriptor:499: len 51 mtu 33
-> [ 3472.202766] Bluetooth: hci0 urb ffff8801ac960800 submission failed (27)
-> [ 3472.202777] [1186] btusb_send_frame:716: hci0
-> [ 3472.202785] [1186] __fill_isoc_descriptor:499: len 51 mtu 33
-> [ 3472.202799] Bluetooth: hci0 urb ffff8801ac960800 submission failed (27)
-> [ 3472.202879] <intr> btusb_isoc_tx_complete:600: hci0 urb
-> ffff88019d55ba00 status 0 count 51
-> [ 3472.204880] <intr> btusb_isoc_tx_complete:600: hci0 urb
-> ffff8801a6634a00 status 0 count 51
-> [ 3472.206927] <intr> btusb_isoc_tx_complete:600: hci0 urb
-> ffff8801a04f3600 status 0 count 51
-> [ 3472.208927] <intr> btusb_isoc_tx_complete:600: hci0 urb
-> ffff8801ac9a5c00 status 0 count 51
-> [ 3472.210937] <intr> btusb_isoc_tx_complete:600: hci0 urb
-> ffff8801e17e8400 status 0 count 51
-> [ 3472.211940] <intr> btusb_isoc_complete:455: hci0 urb
-> ffff8801a54e1c00 status 0 count 330
+> [snip]
 >
-> This is logged in a loop, where the EFBIG (27) error always repeats.
-> According to URB.txt, it means "Too many requested ISO frames".
+>> @@ -171,30 +175,25 @@ static void device_avdtp_cb(struct audio_device *dev, struct avdtp *session,
+>>  }
+>>
+>>  static void device_sink_cb(struct audio_device *dev,
+>> -                             sink_state_t old_state,
+>> -                             sink_state_t new_state,
+>> -                             void *user_data)
+>> +                             btd_service_state_t old_state,
+>> +                             btd_service_state_t new_state)
+>>  {
+>>       struct dev_priv *priv = dev->priv;
+>>
+>> -     if (!dev->sink)
+>> -             return;
+>> -
+>>       priv->sink_state = new_state;
+>>
+>>       switch (new_state) {
+>> -     case SINK_STATE_DISCONNECTED:
+>> +     case BTD_SERVICE_STATE_UNAVAILABLE:
+>> +     case BTD_SERVICE_STATE_DISCONNECTED:
+>>               if (dev->control) {
+>>                       device_remove_control_timer(dev);
+>>                       if (priv->avctp_state != AVCTP_STATE_DISCONNECTED)
+>>                               avrcp_disconnect(dev);
+>>               }
+>>               break;
+>> -     case SINK_STATE_CONNECTING:
+>> -             break;
+>> -     case SINK_STATE_CONNECTED:
+>> -             break;
+>> -     case SINK_STATE_PLAYING:
+>> +     case BTD_SERVICE_STATE_CONNECTING:
+>> +     case BTD_SERVICE_STATE_CONNECTED:
+>> +     case BTD_SERVICE_STATE_DISCONNECTING:
+>>               break;
+>>       }
+>>  }
+>> @@ -222,6 +221,20 @@ static void device_avctp_cb(struct audio_device *dev, avctp_state_t old_state,
+>>       }
+>>  }
+>>
+>> +static void service_cb(struct btd_service *service,
+>> +                                             btd_service_state_t old_state,
+>> +                                             btd_service_state_t new_state,
+>> +                                             void *user_data)
+>> +{
+>> +     struct audio_device *dev = user_data;
+>> +
+>> +     if (dev->btd_dev != btd_service_get_device(service))
+>> +             return;
+>> +
+>> +     if (service == dev->sink)
+>> +             device_sink_cb(dev, old_state, new_state);
+>> +}
+>> +
+>>  struct audio_device *audio_device_register(struct btd_device *device)
+>>  {
+>>       struct audio_device *dev;
+>> @@ -236,8 +249,7 @@ struct audio_device *audio_device_register(struct btd_device *device)
+>>       dev->priv->dc_id = device_add_disconnect_watch(dev->btd_dev,
+>>                                                       disconnect_cb, dev,
+>>                                                       NULL);
+>> -     dev->priv->sink_callback_id = sink_add_state_cb(dev, device_sink_cb,
+>> -                                                                     NULL);
+>> +     dev->priv->service_cb_id = btd_service_add_state_cb(service_cb, dev);
 >
-> One thing I could point to is the fact that the USB packets are not
-> "filled" to their maximum size. In order to send an SCO packet of size
-> 48 (51, including header), two USB frames need to be sent with sizes
-> 33 (MTU) and 18 bytes. In this second frame, 15 bytes are "wasted".
-> Again, whether this is the root cause or not or even relevant at all,
-> I can't tell.
+> I just want to bring up an issue not related to the patch in itself.
+>
+> Wouldn't it be better if the state changed callback were per service? I can
+> see it being used a lot.
+>
+> Or was this point already discussed?
 
-I think we should concentrate on -EFBIG problem, Ive grep the code and
-it seems there is a couple of places where it could be generated:
+I don't remember this being discussed.
 
-host/ehci-sched.c:1457: status = -EFBIG;
-if (unlikely(start - base + span - period >= mod)) {
-     ehci_dbg(ehci, "request %p would overflow (%u+%u >= %u)\n",
-     urb, start - base, span - period, mod);
-     status = -EFBIG;
-     goto fail;
-}
+I do however agree with your proposal, there would be several
+interested users of this per-service callback. Perhaps
+btd_service_add_state_cb() can be extended with a pointer than can be
+optionally be NULL to express "any service"?
 
-/host/uhci-q.c:1267: return -EFBIG;
-* Values must not be too big (could overflow below) */
-if (urb->interval >= UHCI_NUMFRAMES ||
-                                urb->number_of_packets >= UHCI_NUMFRAMES)
-     return -EFBIG;
+Cheers,
+Mikel
 
-host/uhci-q.c:1327: return -EFBIG;
-/* Make sure we won't have to go too far into the future */
-if (uhci_frame_before_eq(uhci->last_iso_frame + UHCI_NUMFRAMES,
-                                frame + urb->number_of_packets * urb->interval))
-     return -EFBIG;
-
-I suspect it is either 1 or 3 and that indicate that we either are too
-fast or because we don't actually fill the URB completely the
-subsequent URBs will be added with next interval which is too far into
-the future so we would have to start feeding the URBs with data from
-multiple SCO connections/skbs. The other option is to update the MTU
-so that each connection skb would fill completely the URB, but we need
-to some infra to make the driver to announce what is the expected size
-so we can read and set in socket.
+>
+>
+>>       dev->priv->avdtp_callback_id = avdtp_add_state_cb(dev, device_avdtp_cb);
+>>       dev->priv->avctp_callback_id = avctp_add_state_cb(dev, device_avctp_cb);
+>>
+>> diff --git a/profiles/audio/device.h b/profiles/audio/device.h
+>> index 286bcdd..e24bdf9 100644
+>> --- a/profiles/audio/device.h
+>> +++ b/profiles/audio/device.h
+>> @@ -25,13 +25,12 @@
+>>  struct audio_device;
+>>  struct source;
+>>  struct control;
+>> -struct sink;
+>>  struct dev_priv;
+>>
+>>  struct audio_device {
+>>       struct btd_device *btd_dev;
+>>
+>> -     struct sink *sink;
+>> +     struct btd_service *sink;
+>>       struct source *source;
+>>       struct control *control;
+>>
+>> diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
+>> index 3969417..f5b4e67 100644
+>> --- a/profiles/audio/sink.c
+>> +++ b/profiles/audio/sink.c
+>> @@ -87,7 +87,7 @@ static char *str_state[] = {
+>>
+>>  static void sink_set_state(struct audio_device *dev, sink_state_t new_state)
+>>  {
+>> -     struct sink *sink = dev->sink;
+>> +     struct sink *sink = btd_service_get_user_data(dev->sink);
+>>       sink_state_t old_state = sink->state;
+>>       GSList *l;
+>>
+>> @@ -119,7 +119,7 @@ static void avdtp_state_callback(struct audio_device *dev,
+>>                                       avdtp_session_state_t old_state,
+>>                                       avdtp_session_state_t new_state)
+>>  {
+>> -     struct sink *sink = dev->sink;
+>> +     struct sink *sink = btd_service_get_user_data(dev->sink);
+>>
+>>       switch (new_state) {
+>>       case AVDTP_SESSION_STATE_DISCONNECTED:
+>> @@ -142,7 +142,7 @@ static void stream_state_changed(struct avdtp_stream *stream,
+>>                                       void *user_data)
+>>  {
+>>       struct audio_device *dev = user_data;
+>> -     struct sink *sink = dev->sink;
+>> +     struct sink *sink = btd_service_get_user_data(dev->sink);
+>>
+>>       if (err)
+>>               return;
+>> @@ -291,8 +291,10 @@ failed:
+>>       sink->session = NULL;
+>>  }
+>>
+>> -gboolean sink_setup_stream(struct sink *sink, struct avdtp *session)
+>> +gboolean sink_setup_stream(struct audio_device *dev, struct avdtp *session)
+>>  {
+>> +     struct sink *sink = btd_service_get_user_data(dev->sink);
+>> +
+>>       if (sink->connect_id > 0 || sink->disconnect_id > 0)
+>>               return FALSE;
+>>
+>> @@ -310,7 +312,7 @@ gboolean sink_setup_stream(struct sink *sink, struct avdtp *session)
+>>
+>>  int sink_connect(struct audio_device *dev)
+>>  {
+>> -     struct sink *sink = dev->sink;
+>> +     struct sink *sink = btd_service_get_user_data(dev->sink);
+>>
+>>       if (!sink->session)
+>>               sink->session = avdtp_get(dev);
+>> @@ -326,7 +328,7 @@ int sink_connect(struct audio_device *dev)
+>>       if (sink->stream_state >= AVDTP_STATE_OPEN)
+>>               return -EALREADY;
+>>
+>> -     if (!sink_setup_stream(sink, NULL)) {
+>> +     if (!sink_setup_stream(dev, NULL)) {
+>>               DBG("Failed to create a stream");
+>>               return -EIO;
+>>       }
+>> @@ -338,7 +340,7 @@ int sink_connect(struct audio_device *dev)
+>>
+>>  static void sink_free(struct audio_device *dev)
+>>  {
+>> -     struct sink *sink = dev->sink;
+>> +     struct sink *sink = btd_service_get_user_data(dev->sink);
+>>
+>>       if (sink->cb_id)
+>>               avdtp_stream_remove_cb(sink->session, sink->stream,
+>> @@ -375,7 +377,8 @@ void sink_unregister(struct audio_device *dev)
+>>       sink_free(dev);
+>>  }
+>>
+>> -struct sink *sink_init(struct audio_device *dev, struct btd_service *service)
+>> +struct btd_service *sink_init(struct audio_device *dev,
+>> +                                             struct btd_service *service)
+>>  {
+>>       struct sink *sink;
+>>
+>> @@ -388,12 +391,14 @@ struct sink *sink_init(struct audio_device *dev, struct btd_service *service)
+>>
+>>       sink->avdtp_callback_id = avdtp_add_state_cb(dev, avdtp_state_callback);
+>>
+>> -     return sink;
+>> +     btd_service_set_user_data(service, sink);
+>> +
+>> +     return service;
+>>  }
+>>
+>>  gboolean sink_is_active(struct audio_device *dev)
+>>  {
+>> -     struct sink *sink = dev->sink;
+>> +     struct sink *sink = btd_service_get_user_data(dev->sink);
+>>
+>>       if (sink->session)
+>>               return TRUE;
+>> @@ -404,7 +409,7 @@ gboolean sink_is_active(struct audio_device *dev)
+>>  gboolean sink_new_stream(struct audio_device *dev, struct avdtp *session,
+>>                               struct avdtp_stream *stream)
+>>  {
+>> -     struct sink *sink = dev->sink;
+>> +     struct sink *sink = btd_service_get_user_data(dev->sink);
+>>
+>>       if (sink->stream)
+>>               return FALSE;
+>> @@ -422,7 +427,7 @@ gboolean sink_new_stream(struct audio_device *dev, struct avdtp *session,
+>>
+>>  int sink_disconnect(struct audio_device *dev, gboolean shutdown)
+>>  {
+>> -     struct sink *sink = dev->sink;
+>> +     struct sink *sink = btd_service_get_user_data(dev->sink);
+>>
+>>       if (!sink->session)
+>>               return -ENOTCONN;
+>> diff --git a/profiles/audio/sink.h b/profiles/audio/sink.h
+>> index 1a80756..e3f974b 100644
+>> --- a/profiles/audio/sink.h
+>> +++ b/profiles/audio/sink.h
+>> @@ -40,11 +40,12 @@ unsigned int sink_add_state_cb(struct audio_device *dev, sink_state_cb cb,
+>>                                                       void *user_data);
+>>  gboolean sink_remove_state_cb(unsigned int id);
+>>
+>> -struct sink *sink_init(struct audio_device *dev, struct btd_service *service);
+>> +struct btd_service *sink_init(struct audio_device *dev,
+>> +                                             struct btd_service *service);
+>>  void sink_unregister(struct audio_device *dev);
+>>  gboolean sink_is_active(struct audio_device *dev);
+>>  int sink_connect(struct audio_device *dev);
+>>  gboolean sink_new_stream(struct audio_device *dev, struct avdtp *session,
+>>                               struct avdtp_stream *stream);
+>> -gboolean sink_setup_stream(struct sink *sink, struct avdtp *session);
+>> +gboolean sink_setup_stream(struct audio_device *dev, struct avdtp *session);
+>>  int sink_disconnect(struct audio_device *dev, gboolean shutdown);
+>> --
+>> 1.8.1.4
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+> Cheers,
+> --
+> Vinicius
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
