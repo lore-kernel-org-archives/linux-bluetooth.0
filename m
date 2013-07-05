@@ -1,68 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v8 0/8] sco: SCO socket option for voice_setting
-Date: Fri,  5 Jul 2013 17:01:34 +0200
-Message-Id: <1373036503-1349-1-git-send-email-frederic.dalleau@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+Subject: [PATCH BlueZ 2/2] core/device: Fix crash while freeing services list
+Date: Fri,  5 Jul 2013 17:03:42 +0300
+Message-Id: <1373033022-11180-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1373033022-11180-1-git-send-email-luiz.dentz@gmail.com>
+References: <1373033022-11180-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-v8 declares BT_VOICE_CVSD_16BIT
-Merge T*, S* and D* patches in one
-The last patch returns -ECONNABORTED when trying to setup a transparent data
-connection if eSCO is not supported.
+btd_service do alter its state on service_shutdown which can cause
+plugins to attempt to access services list which may have freed some
+services already.
 
-v7 changes defaults to BT_VOICE_CVSD
-Remove mask parameter to sco_conn_defer_accept, it was always 0
-check the bits for air codec instead of use constants.
-Add S3, S2, S1, D1, D0 settings.
-The controller default is now only used to initialize the controller or fill
-in the missing information in case of using the old Add_SCO command
+To fix this the code now updates the list  in place so any service that
+is gonna be shutdown is removed from the list so it no longer accessible
+after freed.
+---
+ src/device.c | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
 
-v6 fixes style issues
-
-v5 changes interface to SOL_BLUETOOTH, BT_VOICE.
-Rework fallback mechanism.
-
-This is the patch version 4 of the socket option for enabling transparent SCO.
-As requested by Marcel, this is now a 16-bit voice_setting.
-0x0000 is the value corresponding to current behavior.
-0x0003 is the value to use for enabling transparent data.
-It is easy to allow all possible values from Bluetooth core spec, but I guess
-results can be unexpected...
-Should we filter allowed values in setsockopt ?
-
-Let me know what you think.
-Regards,
-Fred
-
-
-Frédéric Dalleau (8):
-  Bluetooth: Use hci_connect_sco directly
-  Bluetooth: Remove unused mask parameter in sco_conn_defer_accept
-  Bluetooth: Add bluetooth socket voice option
-  Bluetooth: Constants declaration for SCO airmode
-  Bluetooth: Use voice setting in defered SCO connection request
-  Bluetooth: Parameters for outgoing SCO connections
-  Bluetooth: SCO connection fallback
-  Bluetooth: Prevent transparent SCO on older devices
-
- include/net/bluetooth/bluetooth.h |    8 ++++
- include/net/bluetooth/hci_core.h  |    8 ++++
- include/net/bluetooth/sco.h       |    1 +
- net/bluetooth/hci_conn.c          |   56 +++++++++++++++++++++-----
- net/bluetooth/hci_event.c         |    3 +-
- net/bluetooth/sco.c               |   78 ++++++++++++++++++++++++++++++-------
- 6 files changed, 130 insertions(+), 24 deletions(-)
-
+diff --git a/src/device.c b/src/device.c
+index edd377c..300c358 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -994,8 +994,13 @@ int device_block(struct btd_device *device, gboolean update_only)
+ 	if (device->connected)
+ 		do_disconnect(device);
+ 
+-	g_slist_free_full(device->services, remove_service);
+-	device->services = NULL;
++	while (device->services != NULL) {
++		struct btd_service *service = device->services->data;
++
++		device->services = g_slist_remove(device->services, service);
++		service_shutdown(service);
++		btd_service_unref(service);
++	}
+ 
+ 	if (!update_only)
+ 		err = btd_adapter_block_address(device->adapter,
+@@ -2362,7 +2367,6 @@ static void device_remove_stored(struct btd_device *device)
+ 
+ void device_remove(struct btd_device *device, gboolean remove_stored)
+ {
+-
+ 	DBG("Removing device %s", device->path);
+ 
+ 	if (device->bonding) {
+@@ -2379,7 +2383,13 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
+ 	if (device->browse)
+ 		browse_request_cancel(device->browse);
+ 
+-	g_slist_foreach(device->services, dev_disconn_service, NULL);
++	while (device->services != NULL) {
++		struct btd_service *service = device->services->data;
++
++		device->services = g_slist_remove(device->services, service);
++		service_shutdown(service);
++		btd_service_unref(service);
++	}
+ 
+ 	g_slist_free(device->pending);
+ 	device->pending = NULL;
+@@ -2398,9 +2408,6 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
+ 	if (remove_stored)
+ 		device_remove_stored(device);
+ 
+-	g_slist_free_full(device->services, remove_service);
+-	device->services = NULL;
+-
+ 	btd_device_unref(device);
+ }
+ 
 -- 
-1.7.9.5
+1.8.1.4
 
