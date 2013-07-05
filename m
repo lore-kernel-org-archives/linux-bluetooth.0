@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [RFC v2 5/6] sco-tester: Initial sco tester implementation
-Date: Fri,  5 Jul 2013 17:46:46 +0200
-Message-Id: <1373039207-20959-6-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [RFC v2 6/6] sco-tester: Test BT_VOICE option with 1.1 adapter
+Date: Fri,  5 Jul 2013 17:46:47 +0200
+Message-Id: <1373039207-20959-7-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1373039207-20959-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1373039207-20959-1-git-send-email-frederic.dalleau@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
@@ -14,471 +14,178 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- Makefile.tools     |   12 +-
- emulator/btdev.c   |   32 ++++
- tools/sco-tester.c |  541 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 584 insertions(+), 1 deletion(-)
- create mode 100644 tools/sco-tester.c
+ emulator/btdev.c    |   25 +++++++++++++++++++
+ emulator/btdev.h    |    1 +
+ src/shared/hciemu.c |    8 +++++++
+ src/shared/hciemu.h |    1 +
+ tools/sco-tester.c  |   66 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 5 files changed, 100 insertions(+), 1 deletion(-)
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 8f245e0..135954b 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -28,7 +28,7 @@ endif
- if EXPERIMENTAL
- noinst_PROGRAMS += emulator/btvirt emulator/b1ee \
- 					tools/mgmt-tester tools/gap-tester \
--					tools/l2cap-tester
-+					tools/l2cap-tester tools/sco-tester
- 
- emulator_btvirt_SOURCES = emulator/main.c monitor/bt.h \
- 					monitor/mainloop.h monitor/mainloop.c \
-@@ -65,6 +65,16 @@ tools_gap_tester_SOURCES = $(gdbus_sources) \
- 				src/shared/tester.h src/shared/tester.c
- 
- tools_gap_tester_LDADD = @GLIB_LIBS@ @DBUS_LIBS@
-+
-+tools_sco_tester_SOURCES = tools/sco-tester.c monitor/bt.h \
-+				emulator/btdev.h emulator/btdev.c \
-+				emulator/bthost.h emulator/bthost.c \
-+				src/shared/util.h src/shared/util.c \
-+				src/shared/mgmt.h src/shared/mgmt.c \
-+				src/shared/hciemu.h src/shared/hciemu.c \
-+				src/shared/tester.h src/shared/tester.c
-+tools_sco_tester_LDADD = lib/libbluetooth-private.la @GLIB_LIBS@
-+
- endif
- 
- if TOOLS
 diff --git a/emulator/btdev.c b/emulator/btdev.c
-index a602c05..ddeee63 100644
+index ddeee63..506b519 100644
 --- a/emulator/btdev.c
 +++ b/emulator/btdev.c
-@@ -660,6 +660,29 @@ static void conn_complete(struct btdev *btdev,
- 	send_event(btdev, BT_HCI_EVT_CONN_COMPLETE, &cc, sizeof(cc));
+@@ -450,6 +450,11 @@ const uint8_t *btdev_get_bdaddr(struct btdev *btdev)
+ 	return btdev->bdaddr;
  }
  
-+
-+static void sync_conn_complete(struct btdev *btdev, uint16_t voice_setting,
-+								uint8_t status)
++uint8_t *btdev_get_features(struct btdev *btdev)
 +{
-+	struct bt_hci_evt_sync_conn_complete cc;
++	return btdev->features;
++}
++
+ void btdev_set_command_handler(struct btdev *btdev, btdev_command_func handler,
+ 							void *user_data)
+ {
+@@ -683,6 +688,22 @@ static void sync_conn_complete(struct btdev *btdev, uint16_t voice_setting,
+ 	send_event(btdev, BT_HCI_EVT_SYNC_CONN_COMPLETE, &cc, sizeof(cc));
+ }
+ 
++static void sco_conn_complete(struct btdev *btdev, uint8_t status)
++{
++	struct bt_hci_evt_conn_complete cc;
 +
 +	if (!btdev->conn)
 +		return;
 +
 +	cc.status = status;
 +	memcpy(cc.bdaddr, btdev->conn->bdaddr, 6);
-+
 +	cc.handle = cpu_to_le16(status == BT_HCI_ERR_SUCCESS ? 257 : 0);
-+	cc.link_type = 0x02;
-+	cc.tx_interval = 0x000c;
-+	cc.retrans_window = 0x06;
-+	cc.rx_pkt_len = 60;
-+	cc.tx_pkt_len = 60;
-+	cc.air_mode = (voice_setting == 0x0060) ? 0x02 : 0x03;
++	cc.link_type = 0x00;
++	cc.encr_mode = 0x00;
 +
-+	send_event(btdev, BT_HCI_EVT_SYNC_CONN_COMPLETE, &cc, sizeof(cc));
++	send_event(btdev, BT_HCI_EVT_CONN_COMPLETE, &cc, sizeof(cc));
 +}
 +
  static void conn_request(struct btdev *btdev, const uint8_t *bdaddr)
  {
  	struct btdev *remote = find_btdev_by_bdaddr(bdaddr);
-@@ -840,6 +863,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 	const struct bt_hci_cmd_set_event_mask_page2 *semp2;
- 	const struct bt_hci_cmd_le_set_event_mask *lsem;
- 	const struct bt_hci_cmd_le_set_adv_data *lsad;
-+	const struct bt_hci_cmd_setup_sync_conn *ssc;
- 	struct bt_hci_rsp_read_default_link_policy rdlp;
- 	struct bt_hci_rsp_read_stored_link_key rslk;
- 	struct bt_hci_rsp_write_stored_link_key wslk;
-@@ -1492,6 +1516,14 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 		cmd_complete(btdev, opcode, &status, sizeof(status));
+@@ -1524,6 +1545,10 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+ 							BT_HCI_ERR_SUCCESS);
  		break;
  
-+	case BT_HCI_CMD_SETUP_SYNC_CONN:
-+		ssc = data;
-+		status = BT_HCI_ERR_SUCCESS;
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		sync_conn_complete(btdev, ssc->voice_setting,
-+							BT_HCI_ERR_SUCCESS);
++	case BT_HCI_CMD_ADD_SCO_CONN:
++		sco_conn_complete(btdev, BT_HCI_ERR_SUCCESS);
 +		break;
 +
  	default:
  		goto unsupported;
  	}
+diff --git a/emulator/btdev.h b/emulator/btdev.h
+index 9fb023c..a69e899 100644
+--- a/emulator/btdev.h
++++ b/emulator/btdev.h
+@@ -66,6 +66,7 @@ struct btdev *btdev_create(enum btdev_type type, uint16_t id);
+ void btdev_destroy(struct btdev *btdev);
+ 
+ const uint8_t *btdev_get_bdaddr(struct btdev *btdev);
++uint8_t *btdev_get_features(struct btdev *btdev);
+ 
+ void btdev_set_command_handler(struct btdev *btdev, btdev_command_func handler,
+ 							void *user_data);
+diff --git a/src/shared/hciemu.c b/src/shared/hciemu.c
+index a0b347c..60df435 100644
+--- a/src/shared/hciemu.c
++++ b/src/shared/hciemu.c
+@@ -353,6 +353,14 @@ const char *hciemu_get_address(struct hciemu *hciemu)
+ 	return hciemu->bdaddr_str;
+ }
+ 
++uint8_t *hciemu_get_features(struct hciemu *hciemu)
++{
++	if (!hciemu || !hciemu->master_dev)
++		return NULL;
++
++	return btdev_get_features(hciemu->master_dev);
++}
++
+ const uint8_t *hciemu_get_master_bdaddr(struct hciemu *hciemu)
+ {
+ 	if (!hciemu || !hciemu->master_dev)
+diff --git a/src/shared/hciemu.h b/src/shared/hciemu.h
+index a473c0e..aa53caf 100644
+--- a/src/shared/hciemu.h
++++ b/src/shared/hciemu.h
+@@ -40,6 +40,7 @@ void hciemu_unref(struct hciemu *hciemu);
+ struct bthost *hciemu_client_get_host(struct hciemu *hciemu);
+ 
+ const char *hciemu_get_address(struct hciemu *hciemu);
++uint8_t *hciemu_get_features(struct hciemu *hciemu);
+ 
+ const uint8_t *hciemu_get_master_bdaddr(struct hciemu *hciemu);
+ const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu);
 diff --git a/tools/sco-tester.c b/tools/sco-tester.c
-new file mode 100644
-index 0000000..80a199d
---- /dev/null
+index 80a199d..70b8a5d 100644
+--- a/tools/sco-tester.c
 +++ b/tools/sco-tester.c
-@@ -0,0 +1,541 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
+@@ -50,6 +50,7 @@ struct test_data {
+ 	struct hciemu *hciemu;
+ 	enum hciemu_type hciemu_type;
+ 	unsigned int io_id;
++	bool disable_esco;
+ };
+ 
+ struct sco_client_data {
+@@ -162,6 +163,16 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
+ 	}
+ 
+ 	tester_print("New hciemu instance created");
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
++	if (data->disable_esco) {
++		uint8_t *features;
 +
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <errno.h>
-+#include <stdbool.h>
++		tester_print("Disabling eSCO packet type support");
 +
-+#include <glib.h>
-+
-+#include "lib/bluetooth.h"
-+#include "lib/sco.h"
-+#include "lib/mgmt.h"
-+
-+#include "monitor/bt.h"
-+#include "emulator/bthost.h"
-+
-+#include "src/shared/tester.h"
-+#include "src/shared/mgmt.h"
-+#include "src/shared/hciemu.h"
-+
-+struct test_data {
-+	const void *test_data;
-+	struct mgmt *mgmt;
-+	uint16_t mgmt_index;
-+	struct hciemu *hciemu;
-+	enum hciemu_type hciemu_type;
-+	unsigned int io_id;
-+};
-+
-+struct sco_client_data {
-+	int expect_err;
-+};
-+
-+static void mgmt_debug(const char *str, void *user_data)
-+{
-+	const char *prefix = user_data;
-+
-+	tester_print("%s%s", prefix, str);
-+}
-+
-+static void read_info_callback(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	const struct mgmt_rp_read_info *rp = param;
-+	char addr[18];
-+	uint16_t manufacturer;
-+	uint32_t supported_settings, current_settings;
-+
-+	tester_print("Read Info callback");
-+	tester_print("  Status: 0x%02x", status);
-+
-+	if (status || !param) {
-+		tester_pre_setup_failed();
-+		return;
++		features = hciemu_get_features(data->hciemu);
++		if (features)
++			features[3] &= ~0x80;
 +	}
-+
-+	ba2str(&rp->bdaddr, addr);
-+	manufacturer = btohs(rp->manufacturer);
-+	supported_settings = btohl(rp->supported_settings);
-+	current_settings = btohl(rp->current_settings);
-+
-+	tester_print("  Address: %s", addr);
-+	tester_print("  Version: 0x%02x", rp->version);
-+	tester_print("  Manufacturer: 0x%04x", manufacturer);
-+	tester_print("  Supported settings: 0x%08x", supported_settings);
-+	tester_print("  Current settings: 0x%08x", current_settings);
-+	tester_print("  Class: 0x%02x%02x%02x",
-+			rp->dev_class[2], rp->dev_class[1], rp->dev_class[0]);
-+	tester_print("  Name: %s", rp->name);
-+	tester_print("  Short name: %s", rp->short_name);
-+
-+	if (strcmp(hciemu_get_address(data->hciemu), addr)) {
-+		tester_pre_setup_failed();
-+		return;
-+	}
-+
-+	tester_pre_setup_complete();
-+}
-+
-+static void index_added_callback(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	tester_print("Index Added callback");
-+	tester_print("  Index: 0x%04x", index);
-+
-+	data->mgmt_index = index;
-+
-+	mgmt_send(data->mgmt, MGMT_OP_READ_INFO, data->mgmt_index, 0, NULL,
-+					read_info_callback, NULL, NULL);
-+}
-+
-+static void index_removed_callback(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	tester_print("Index Removed callback");
-+	tester_print("  Index: 0x%04x", index);
-+
-+	if (index != data->mgmt_index)
-+		return;
-+
-+	mgmt_unregister_index(data->mgmt, data->mgmt_index);
-+
-+	mgmt_unref(data->mgmt);
-+	data->mgmt = NULL;
-+
-+	tester_post_teardown_complete();
-+}
-+
-+static void read_index_list_callback(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	tester_print("Read Index List callback");
-+	tester_print("  Status: 0x%02x", status);
-+
-+	if (status || !param) {
-+		tester_pre_setup_failed();
-+		return;
-+	}
-+
-+	mgmt_register(data->mgmt, MGMT_EV_INDEX_ADDED, MGMT_INDEX_NONE,
-+					index_added_callback, NULL, NULL);
-+
-+	mgmt_register(data->mgmt, MGMT_EV_INDEX_REMOVED, MGMT_INDEX_NONE,
-+					index_removed_callback, NULL, NULL);
-+
-+	data->hciemu = hciemu_new(HCIEMU_TYPE_BREDRLE);
-+	if (!data->hciemu) {
-+		tester_warn("Failed to setup HCI emulation");
-+		tester_pre_setup_failed();
-+	}
-+
-+	tester_print("New hciemu instance created");
-+}
-+
-+static void test_pre_setup(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	data->mgmt = mgmt_new_default();
-+	if (!data->mgmt) {
-+		tester_warn("Failed to setup management interface");
-+		tester_pre_setup_failed();
-+		return;
-+	}
-+
-+	if (tester_use_debug())
-+		mgmt_set_debug(data->mgmt, mgmt_debug, "mgmt: ", NULL);
-+
-+	mgmt_send(data->mgmt, MGMT_OP_READ_INDEX_LIST, MGMT_INDEX_NONE, 0, NULL,
-+					read_index_list_callback, NULL, NULL);
-+}
-+
-+static void test_post_teardown(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	hciemu_unref(data->hciemu);
-+	data->hciemu = NULL;
-+}
-+
-+static void test_data_free(void *test_data)
-+{
-+	struct test_data *data = test_data;
-+
-+	if (data->io_id > 0)
-+		g_source_remove(data->io_id);
-+
-+	free(data);
-+}
-+
+ }
+ 
+ static void test_pre_setup(const void *test_data)
+@@ -200,7 +211,7 @@ static void test_data_free(void *test_data)
+ 	free(data);
+ }
+ 
+-#define test_sco(name, data, setup, func) \
++#define test_sco_full(name, data, setup, func, _disable_esco) \
+ 	do { \
+ 		struct test_data *user; \
+ 		user = malloc(sizeof(struct test_data)); \
+@@ -209,11 +220,18 @@ static void test_data_free(void *test_data)
+ 		user->hciemu_type = HCIEMU_TYPE_BREDRLE; \
+ 		user->io_id = 0; \
+ 		user->test_data = data; \
++		user->disable_esco = _disable_esco; \
+ 		tester_add_full(name, data, \
+ 				test_pre_setup, setup, func, NULL, \
+ 				test_post_teardown, 2, user, test_data_free); \
+ 	} while (0)
+ 
 +#define test_sco(name, data, setup, func) \
-+	do { \
-+		struct test_data *user; \
-+		user = malloc(sizeof(struct test_data)); \
-+		if (!user) \
-+			break; \
-+		user->hciemu_type = HCIEMU_TYPE_BREDRLE; \
-+		user->io_id = 0; \
-+		user->test_data = data; \
-+		tester_add_full(name, data, \
-+				test_pre_setup, setup, func, NULL, \
-+				test_post_teardown, 2, user, test_data_free); \
-+	} while (0)
++	test_sco_full(name, data, setup, func, false)
 +
-+static const struct sco_client_data connect_success = {
-+	.expect_err = 0
-+};
++#define test_sco_11(name, data, setup, func) \
++	test_sco_full(name, data, setup, func, true)
 +
-+static const struct sco_client_data connect_failure = {
-+	.expect_err = ECONNABORTED
-+};
-+
-+static void client_connectable_complete(uint16_t opcode, uint8_t status,
-+					const void *param, uint8_t len,
-+					void *user_data)
-+{
-+	if (opcode != BT_HCI_CMD_WRITE_SCAN_ENABLE)
-+		return;
-+
-+	tester_print("Client set connectable status 0x%02x", status);
-+
-+	if (status)
-+		tester_setup_failed();
-+	else
-+		tester_setup_complete();
-+}
-+
-+static void setup_powered_callback(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
+ static const struct sco_client_data connect_success = {
+ 	.expect_err = 0
+ };
+@@ -518,6 +536,43 @@ static void test_connect(const void *test_data)
+ 	tester_print("Connect in progress");
+ }
+ 
++static void test_connect_transp(const void *test_data)
 +{
 +	struct test_data *data = tester_get_data();
-+	struct bthost *bthost;
-+
-+	if (status != MGMT_STATUS_SUCCESS) {
-+		tester_setup_failed();
-+		return;
-+	}
-+
-+	tester_print("Controller powered on");
-+
-+	bthost = hciemu_client_get_host(data->hciemu);
-+	bthost_set_cmd_complete_cb(bthost, client_connectable_complete, data);
-+	bthost_write_scan_enable(bthost, 0x03);
-+}
-+
-+static void setup_powered(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	unsigned char param[] = { 0x01 };
-+
-+	tester_print("Powering on controller");
-+
-+	mgmt_send(data->mgmt, MGMT_OP_SET_CONNECTABLE, data->mgmt_index,
-+					sizeof(param), param,
-+					NULL, NULL, NULL);
-+
-+	mgmt_send(data->mgmt, MGMT_OP_SET_SSP, data->mgmt_index,
-+				sizeof(param), param, NULL, NULL, NULL);
-+
-+	mgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,
-+				sizeof(param), param, NULL, NULL, NULL);
-+
-+	mgmt_send(data->mgmt, MGMT_OP_SET_POWERED, data->mgmt_index,
-+					sizeof(param), param,
-+					setup_powered_callback, NULL, NULL);
-+}
-+
-+static void test_framework(const void *test_data)
-+{
-+	tester_test_passed();
-+}
-+
-+static void test_socket(const void *test_data)
-+{
-+	int sk;
-+
-+	sk = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO);
-+	if (sk < 0) {
-+		tester_warn("Can't create socket: %s (%d)", strerror(errno),
-+									errno);
-+		tester_test_failed();
-+		return;
-+	}
-+
-+	close(sk);
-+
-+	tester_test_passed();
-+}
-+
-+static void test_getsockopt(const void *test_data)
-+{
++	const struct sco_client_data *scodata = data->test_data;
 +	int sk, err;
-+	socklen_t len;
 +	struct bt_voice voice;
 +
-+	sk = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO);
++	sk = create_sco_sock(data, 0);
 +	if (sk < 0) {
-+		tester_warn("Can't create socket: %s (%d)", strerror(errno),
-+									errno);
 +		tester_test_failed();
 +		return;
-+	}
-+
-+	voice.setting = 0;
-+	len = sizeof(voice);
-+	err = getsockopt(sk, SOL_BLUETOOTH, BT_VOICE, &voice, &len);
-+	if (err < 0) {
-+		tester_warn("Can't get socket option : %s (%d)",
-+							strerror(errno), errno);
-+		tester_test_failed();
-+		goto end;
-+	}
-+
-+	if (voice.setting != BT_VOICE_CVSD_16BIT) {
-+		tester_warn("Invalid voice setting");
-+		tester_test_failed();
-+		goto end;
-+	}
-+
-+	tester_test_passed();
-+
-+end:
-+	close(sk);
-+}
-+
-+static void test_setsockopt(const void *test_data)
-+{
-+	int sk, err;
-+	socklen_t len;
-+	struct bt_voice voice;
-+
-+	sk = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO);
-+	if (sk < 0) {
-+		tester_warn("Can't create socket: %s (%d)", strerror(errno),
-+									errno);
-+		tester_test_failed();
-+		goto end;
-+	}
-+
-+
-+	voice.setting = 0;
-+	len = sizeof(voice);
-+	err = getsockopt(sk, SOL_BLUETOOTH, BT_VOICE, &voice, &len);
-+	if (err < 0) {
-+		tester_warn("Can't get socket option : %s (%d)",
-+							strerror(errno), errno);
-+		tester_test_failed();
-+		goto end;
-+	}
-+
-+	if (voice.setting != BT_VOICE_CVSD_16BIT) {
-+		tester_warn("Invalid voice setting");
-+		tester_test_failed();
-+		goto end;
 +	}
 +
 +	voice.setting = BT_VOICE_TRANSPARENT;
@@ -490,170 +197,39 @@ index 0000000..80a199d
 +		goto end;
 +	}
 +
-+	voice.setting = 0;
-+	len = sizeof(voice);
-+	err = getsockopt(sk, SOL_BLUETOOTH, BT_VOICE, &voice, &len);
-+	if (err < 0) {
-+		tester_warn("Can't get socket option : %s (%d)",
-+							strerror(errno), errno);
-+		tester_test_failed();
-+		goto end;
-+	}
++	err = connect_sco_sock(data, sk);
 +
-+	if (voice.setting != BT_VOICE_TRANSPARENT) {
-+		tester_warn("Invalid voice setting");
-+		tester_test_failed();
-+		goto end;
-+	}
-+
-+	tester_test_passed();
-+
-+end:
-+	close(sk);
-+}
-+
-+static int create_sco_sock(struct test_data *data, uint16_t psm)
-+{
-+	const uint8_t *master_bdaddr;
-+	struct sockaddr_sco addr;
-+	int sk, err;
-+
-+	sk = socket(PF_BLUETOOTH, SOCK_SEQPACKET | SOCK_NONBLOCK,
-+								BTPROTO_SCO);
-+	if (sk < 0) {
-+		err = -errno;
-+		tester_warn("Can't create socket: %s (%d)", strerror(errno),
-+									errno);
-+		return err;
-+	}
-+
-+	master_bdaddr = hciemu_get_master_bdaddr(data->hciemu);
-+	if (!master_bdaddr) {
-+		tester_warn("No master bdaddr");
-+		return -ENODEV;
-+	}
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.sco_family = AF_BLUETOOTH;
-+	bacpy(&addr.sco_bdaddr, (void *) master_bdaddr);
-+
-+	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-+		err = -errno;
-+		tester_warn("Can't bind socket: %s (%d)", strerror(errno),
-+									errno);
-+		close(sk);
-+		return err;
-+	}
-+
-+	return sk;
-+}
-+
-+static int connect_sco_sock(struct test_data *data, int sk)
-+{
-+	const uint8_t *client_bdaddr;
-+	struct sockaddr_sco addr;
-+	int err;
-+
-+	client_bdaddr = hciemu_get_client_bdaddr(data->hciemu);
-+	if (!client_bdaddr) {
-+		tester_warn("No client bdaddr");
-+		return -ENODEV;
-+	}
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.sco_family = AF_BLUETOOTH;
-+	bacpy(&addr.sco_bdaddr, (void *) client_bdaddr);
-+
-+	err = connect(sk, (struct sockaddr *) &addr, sizeof(addr));
-+	if (err < 0 && !(errno == EAGAIN || errno == EINPROGRESS)) {
-+		err = -errno;
-+		tester_warn("Can't connect socket: %s (%d)", strerror(errno),
-+									errno);
-+		return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static gboolean sco_connect_cb(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	const struct sco_client_data *scodata = data->test_data;
-+	int err, sk_err, sk;
-+	socklen_t len = sizeof(sk_err);
-+
-+	data->io_id = 0;
-+
-+	sk = g_io_channel_unix_get_fd(io);
-+
-+	if (getsockopt(sk, SOL_SOCKET, SO_ERROR, &sk_err, &len) < 0)
-+		err = -errno;
-+	else
-+		err = -sk_err;
-+
-+	if (err < 0)
-+		tester_warn("Connect failed: %s (%d)", strerror(-err), -err);
-+	else
-+		tester_print("Successfully connected");
++	tester_warn("Connect returned %s (%d), expected %s (%d)",
++			strerror(-err), -err,
++			strerror(scodata->expect_err), scodata->expect_err);
 +
 +	if (-err != scodata->expect_err)
 +		tester_test_failed();
 +	else
 +		tester_test_passed();
 +
-+	return FALSE;
++end:
++	close(sk);
 +}
 +
-+static void test_connect(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	GIOChannel *io;
-+	int sk;
+ int main(int argc, char *argv[])
+ {
+ 	tester_init(&argc, &argv);
+@@ -537,5 +592,14 @@ int main(int argc, char *argv[])
+ 	test_sco("eSCO CVSD - Success", &connect_success, setup_powered,
+ 							test_connect);
+ 
++	test_sco("eSCO MSBC - Success", &connect_success, setup_powered,
++							test_connect_transp);
 +
-+	sk = create_sco_sock(data, 0);
-+	if (sk < 0) {
-+		tester_test_failed();
-+		return;
-+	}
-+
-+	if (connect_sco_sock(data, sk) < 0) {
-+		close(sk);
-+		tester_test_failed();
-+		return;
-+	}
-+
-+	io = g_io_channel_unix_new(sk);
-+	g_io_channel_set_close_on_unref(io, TRUE);
-+
-+	data->io_id = g_io_add_watch(io, G_IO_OUT, sco_connect_cb, NULL);
-+
-+	g_io_channel_unref(io);
-+
-+	tester_print("Connect in progress");
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	tester_init(&argc, &argv);
-+
-+	test_sco("Basic Framework - Success", NULL, setup_powered,
-+							test_framework);
-+
-+	test_sco("Basic SCO Socket - Success", NULL, setup_powered,
-+							test_socket);
-+
-+	test_sco("Basic SCO Get Socket Option - Success", NULL, setup_powered,
-+							test_getsockopt);
-+
-+	test_sco("Basic SCO Set Socket Option - Success", NULL, setup_powered,
-+							test_setsockopt);
-+
-+	test_sco("eSCO CVSD - Success", &connect_success, setup_powered,
++	test_sco_11("SCO CVSD 1.1 - Success", &connect_success, setup_powered,
 +							test_connect);
 +
-+	return tester_run();
-+}
++	test_sco_11("SCO MSBC 1.1 - Failure", &connect_failure, setup_powered,
++							test_connect_transp);
++
+ 	return tester_run();
+ }
 -- 
 1.7.9.5
 
