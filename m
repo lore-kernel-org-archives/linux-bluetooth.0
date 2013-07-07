@@ -1,82 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 7 Jul 2013 20:40:09 +0100
+Date: Sun, 7 Jul 2013 20:11:14 +0100
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Stanislaw Gruszka <sgruszka@redhat.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] ath3k: don't use stack memory for DMA
-Message-ID: <20130707194009.GB3966@joana>
-References: <20130627094837.GA2288@redhat.com>
+To: Thomas Loo <tloo@saltstorm.net>
+Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] bluetooth: ath3k: Add support for Fujitsu Lifebook UH5x2
+ [04c5:1330]
+Message-ID: <20130707191114.GA3966@joana>
+References: <1372812834-6955-1-git-send-email-tloo@saltstorm.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130627094837.GA2288@redhat.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1372812834-6955-1-git-send-email-tloo@saltstorm.net>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Stanislaw,
+Hi Thomas,
 
-* Stanislaw Gruszka <sgruszka@redhat.com> [2013-06-27 11:48:41 +0200]:
+* Thomas Loo <tloo@saltstorm.net> [2013-07-03 02:53:54 +0200]:
 
-> Memory allocated by vmalloc (including stack) can not be used for DMA,
-> i.e. data pointer on usb_control_msg() should not point to stack memory.
+> The Fujitsu Lifebook UH552/UH572 ships with a Qualcomm AR9462/AR3012 WLAN/BT-Combo card.
+> Add device ID to the ath3k driver to enable the bluetooth side of things.
+> Patch against v3.10.
 > 
-> Resolves:
-> https://bugzilla.redhat.com/show_bug.cgi?id=977558
+> T:  Bus=03 Lev=01 Prnt=01 Port=02 Cnt=01 Dev#=  3 Spd=12  MxCh= 0
+> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=04c5 ProdID=1330 Rev=00.02
+> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 > 
-> Reported-and-tested-by: Andy Lawrence <dr.diesel@gmail.com>
-> Signed-off-by: Stanislaw Gruszka <sgruszka@redhat.com>
+> Signed-off-by: Thomas Loo <tloo@saltstorm.net>
 > ---
->  drivers/bluetooth/ath3k.c | 38 +++++++++++++++++++++++++++++---------
->  1 file changed, 29 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-> index 11f467c..81b636c 100644
-> --- a/drivers/bluetooth/ath3k.c
-> +++ b/drivers/bluetooth/ath3k.c
-> @@ -193,24 +193,44 @@ error:
->  
->  static int ath3k_get_state(struct usb_device *udev, unsigned char *state)
->  {
-> -	int pipe = 0;
-> +	int ret, pipe = 0;
-> +	char *buf;
-> +
-> +	buf = kmalloc(1, GFP_KERNEL);
+>  drivers/bluetooth/ath3k.c | 2 ++
+>  drivers/bluetooth/btusb.c | 1 +
+>  2 files changed, 3 insertions(+)
 
-Can we make this:
-
-	buf = kmalloc(sizeof(*buf), GFP_KERNEL);
-
-> +	if (!buf)
-> +		return -ENOMEM;
->  
->  	pipe = usb_rcvctrlpipe(udev, 0);
-> -	return usb_control_msg(udev, pipe, ATH3K_GETSTATE,
-> -			USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
-> -			state, 0x01, USB_CTRL_SET_TIMEOUT);
-> +	ret = usb_control_msg(udev, pipe, ATH3K_GETSTATE,
-> +			      USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
-> +			      buf, 1, USB_CTRL_SET_TIMEOUT);
-
-sizeof(*buf) instead of "1"
-
-> +
-> +	*state = *buf;
-> +	kfree(buf);
-> +
-> +	return ret;
->  }
->  
->  static int ath3k_get_version(struct usb_device *udev,
->  			struct ath3k_version *version)
->  {
-> -	int pipe = 0;
-> +	int ret, pipe = 0;
-> +	char *buf;
-
-this should be struct ath3k_version *buf;
-
-> +	const int size = sizeof(struct ath3k_version);
-
-and here sizeof(*buf);
+Patch has been applied to bluetooth.git. Thanks.
 
 	Gustavo
