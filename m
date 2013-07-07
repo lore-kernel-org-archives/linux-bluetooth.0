@@ -1,51 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Xu, Martin" <martin.xu@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"martin.xu@linux.intel.com" <martin.xu@linux.intel.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] obexd/client: Add client session properties
-Date: Mon, 8 Jul 2013 00:21:13 +0000
-Message-ID: <29981E9CC6590A438DB8A519AEB0053010D3476F@SHSMSX103.ccr.corp.intel.com>
-References: <1373017106-4571-1-git-send-email-martin.xu@linux.intel.com>
- <CABBYNZKF67RPpERkQ7RfmQx+Jc_tPz=-Wv3pGrAw=nJqc2=brg@mail.gmail.com>
-In-Reply-To: <CABBYNZKF67RPpERkQ7RfmQx+Jc_tPz=-Wv3pGrAw=nJqc2=brg@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+Date: Sun, 7 Jul 2013 20:40:09 +0100
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Stanislaw Gruszka <sgruszka@redhat.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] ath3k: don't use stack memory for DMA
+Message-ID: <20130707194009.GB3966@joana>
+References: <20130627094837.GA2288@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130627094837.GA2288@redhat.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
-> Sent: Friday, July 05, 2013 18:04
-> To: martin.xu@linux.intel.com
-> Cc: linux-bluetooth@vger.kernel.org
-> Subject: Re: [PATCH] obexd/client: Add client session properties
+Hi Stanislaw,
+
+* Stanislaw Gruszka <sgruszka@redhat.com> [2013-06-27 11:48:41 +0200]:
+
+> Memory allocated by vmalloc (including stack) can not be used for DMA,
+> i.e. data pointer on usb_control_msg() should not point to stack memory.
 > 
-> Hi Martin,
+> Resolves:
+> https://bugzilla.redhat.com/show_bug.cgi?id=977558
 > 
-> On Fri, Jul 5, 2013 at 12:38 PM,  <martin.xu@linux.intel.com> wrote:
-> > From: Martin <martin.xu@linux.intel.com>
+> Reported-and-tested-by: Andy Lawrence <dr.diesel@gmail.com>
+> Signed-off-by: Stanislaw Gruszka <sgruszka@redhat.com>
+> ---
+>  drivers/bluetooth/ath3k.c | 38 +++++++++++++++++++++++++++++---------
+>  1 file changed, 29 insertions(+), 9 deletions(-)
 > 
-> Please add a description why are the changes necessary.
-> 
-> > ---
-> >  obexd/client/session.c |   38 ++++++++++++++++++++++++++++++++------
-> >  1 file changed, 32 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/obexd/client/session.c b/obexd/client/session.c index
-> > 8d32ed0..e9cbf00 100644
-> > --- a/obexd/client/session.c
-> > +++ b/obexd/client/session.c
-> > @@ -630,9 +630,6 @@ static gboolean get_source(const
-> > GDBusPropertyTable *property,  {
-> >         struct obc_session *session = data;
-> >
-> > -       if (session->source == NULL)
-> > -               return FALSE;
-> 
-> I guess you haven't read carefully may comments from the last time, did
-> you? This should not be necessary here, otherwise create another patch.
-Looks like I lost your last mail, could you repeat that.
-For others comments, I will resend the patch.
-Thanks!
+> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+> index 11f467c..81b636c 100644
+> --- a/drivers/bluetooth/ath3k.c
+> +++ b/drivers/bluetooth/ath3k.c
+> @@ -193,24 +193,44 @@ error:
+>  
+>  static int ath3k_get_state(struct usb_device *udev, unsigned char *state)
+>  {
+> -	int pipe = 0;
+> +	int ret, pipe = 0;
+> +	char *buf;
+> +
+> +	buf = kmalloc(1, GFP_KERNEL);
+
+Can we make this:
+
+	buf = kmalloc(sizeof(*buf), GFP_KERNEL);
+
+> +	if (!buf)
+> +		return -ENOMEM;
+>  
+>  	pipe = usb_rcvctrlpipe(udev, 0);
+> -	return usb_control_msg(udev, pipe, ATH3K_GETSTATE,
+> -			USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
+> -			state, 0x01, USB_CTRL_SET_TIMEOUT);
+> +	ret = usb_control_msg(udev, pipe, ATH3K_GETSTATE,
+> +			      USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
+> +			      buf, 1, USB_CTRL_SET_TIMEOUT);
+
+sizeof(*buf) instead of "1"
+
+> +
+> +	*state = *buf;
+> +	kfree(buf);
+> +
+> +	return ret;
+>  }
+>  
+>  static int ath3k_get_version(struct usb_device *udev,
+>  			struct ath3k_version *version)
+>  {
+> -	int pipe = 0;
+> +	int ret, pipe = 0;
+> +	char *buf;
+
+this should be struct ath3k_version *buf;
+
+> +	const int size = sizeof(struct ath3k_version);
+
+and here sizeof(*buf);
+
+	Gustavo
