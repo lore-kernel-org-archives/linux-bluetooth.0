@@ -1,62 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CANT-zCUJkBDoxJKX4c00d3MhQgLZMOVHRLWo01rfLtq8_7fF1A@mail.gmail.com>
+In-Reply-To: <CABBYNZ+Ab=rPfE5HaW1c3+n=wEF3=x2UQ2_+-JPwSvXgbTcYBg@mail.gmail.com>
 References: <1373033022-11180-1-git-send-email-luiz.dentz@gmail.com>
 	<CANT-zCUN8L_iVyPmXchmunoKwxt72KR7ZYhbQYtCBwUpxSWbJQ@mail.gmail.com>
 	<CABBYNZ+Ab=rPfE5HaW1c3+n=wEF3=x2UQ2_+-JPwSvXgbTcYBg@mail.gmail.com>
-	<CANT-zCUJkBDoxJKX4c00d3MhQgLZMOVHRLWo01rfLtq8_7fF1A@mail.gmail.com>
-Date: Mon, 8 Jul 2013 17:52:05 +0300
-Message-ID: <CABBYNZKOdWNkPwdcYcLX29xfV5KscwKWgdJZYeWEBE3mD-BLzA@mail.gmail.com>
+Date: Mon, 8 Jul 2013 16:13:22 +0200
+Message-ID: <CANT-zCUJkBDoxJKX4c00d3MhQgLZMOVHRLWo01rfLtq8_7fF1A@mail.gmail.com>
 Subject: Re: [PATCH BlueZ 1/2] core/service: Make sure service is disconnected
  before shutdown
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+Hi Luiz,
 
-On Mon, Jul 8, 2013 at 5:13 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
->>> Adding one more side effect to service_shutdown() is IMO undesirable,
->>> where the transitional DISCONNECTED state would be artificially
->>> introduced. Think about an external profile being unregistered while
->>> connected devices exist: not only calling
->>> Profile.RequestDisconnection() doesn't make any sense, but a
->>> transition such as STATE_CONNECTED->STATE_UNAVAILABLE is probably what
->>> you want to observe. This can be different from a graceful
->>> disconnection, and a policy module could use this distinction to
->>> reconnect the service once the external profile gets registered.
->>
->> While I agree that could be useful for tracking thinks like link loss
->> this would be initiated by the profile/service themselves somehow not
->> by device_remove code path that should never trigger any link loss
->> policy, it is a cleanup path btw so nothing should be pending after
->> that so your argument actually works against having this type of
->> transition from connected directly to unavailable.
+On Mon, Jul 8, 2013 at 2:50 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Mikel,
 >
-> I was not referring to link-loss cases here but for example a crash in
-> oFono, which would presumably restart immediately afterwards. A policy
-> module could remember that the profile was disconnected due to a crash
-> and reconnect automatically.
+> On Mon, Jul 8, 2013 at 2:46 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>> Hi Luiz,
+>>
+>> On Fri, Jul 5, 2013 at 4:03 PM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>
+>>> This ensures that the service is disconnected before setting the state
+>>> to unavailable.
+>>> ---
+>>>  src/service.c | 1 +
+>>>  1 file changed, 1 insertion(+)
+>>>
+>>> diff --git a/src/service.c b/src/service.c
+>>> index 83e1c1a..dce5c05 100644
+>>> --- a/src/service.c
+>>> +++ b/src/service.c
+>>> @@ -170,6 +170,7 @@ int service_probe(struct btd_service *service)
+>>>
+>>>  void service_shutdown(struct btd_service *service)
+>>>  {
+>>> +       btd_service_disconnect(service);
+>>>         change_state(service, BTD_SERVICE_STATE_UNAVAILABLE, 0);
+>>>         service->profile->device_remove(service);
+>>>         service->device = NULL;
+>>> --
+>>> 1.8.1.4
+>>>
+>>> --
+>>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>>> the body of a message to majordomo@vger.kernel.org
+>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>> I'm not a big fan of this approach. The service should already be
+>> disconnected by the time it's shut down, so this additional transition
+>> should not be needed.
+>
+> Im not following then, why do you call it shutdown then? If just to
+> free data this should have been service_remove or something like that.
 
-Well that can be considered a profile link loss, anyway what we are
-discussing here is related to device_remove path and the effects of
-having service_shutdown to do btd_service_disconnect, it seems that
-when we do DeviceRemove we actually do disconnect before so that is
-okay to no do it again on device_remove in the other hand if we are
-quitting we perhaps don't really need to disconnect after all it could
-be restarting for some reason like the device would reboot so it
-doesn't necessarily need to disconnect to avoid reconnection strategy
-to take place, so perhaps there is no real use of disconnecting after
-all.
+Perhaps the naming needs to be improved but it's not a simple free
+either. It just makes the object unusable since it's reference-counted
+and thus cannot be freed immediately.
 
-So I will do the following:
+>
+>> Having a look at the current code paths leading to service_shutdown(),
+>> one tricky case I can think of is the call to
+>> device_remove_profiles(), specially from search_cb(). I have my doubts
+>> whether a service shutdown makes sense if it's connected, but in case
+>> yes, I'd add the disconnection code to device_remove_profiles().
+>
+> It depends on whether we want a clean disconnect or a link loss, IMO
+> if the driver gets a .disconnect callback it should disconnect
 
-rename service_shutdown to service_remove which does btd_service_unref
-internally similarly to what device_remove does so we keep similar
-APIs for this matter, service_remove will not disconnect.
+That's clear.
 
---
-Luiz Augusto von Dentz
+> properly while .device_remove it basically frees private data but if
+> we are connected this most likely will cause an abrupt disconnect in
+> most drivers.
+
+I agree that the .disconnect callback should be called before
+.device_remove in most cases. I'm just questioning if this is the best
+way to do it, since most of the code paths already handle the
+disconnection explicitly in device.c. What's the exact case you're
+fixing here?
+
+Regarding external profiles, in particular, the .disconnect callback
+would be useless during removal because Profile.RequestDisconnection()
+shouldn't be called anyway, right? Unless the D-Bus API is designed in
+a way that this method is expected to be called as a side effect of
+ProfileManager1.UnregisterProfile(), which I'd personally find rather
+strange.
+
+>
+>> Or do you have some other examples where the disconnection is not triggered?
+>
+> All our shutdown related API, including g_io_channel_shutdown,
+> normally do disconnect as well.
+>
+>> Adding one more side effect to service_shutdown() is IMO undesirable,
+>> where the transitional DISCONNECTED state would be artificially
+>> introduced. Think about an external profile being unregistered while
+>> connected devices exist: not only calling
+>> Profile.RequestDisconnection() doesn't make any sense, but a
+>> transition such as STATE_CONNECTED->STATE_UNAVAILABLE is probably what
+>> you want to observe. This can be different from a graceful
+>> disconnection, and a policy module could use this distinction to
+>> reconnect the service once the external profile gets registered.
+>
+> While I agree that could be useful for tracking thinks like link loss
+> this would be initiated by the profile/service themselves somehow not
+> by device_remove code path that should never trigger any link loss
+> policy, it is a cleanup path btw so nothing should be pending after
+> that so your argument actually works against having this type of
+> transition from connected directly to unavailable.
+
+I was not referring to link-loss cases here but for example a crash in
+oFono, which would presumably restart immediately afterwards. A policy
+module could remember that the profile was disconnected due to a crash
+and reconnect automatically.
+
+Cheers,
+Mikel
