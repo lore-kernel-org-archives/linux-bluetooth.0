@@ -1,41 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <51DA8707.3010402@linux.intel.com>
-Date: Mon, 08 Jul 2013 11:31:51 +0200
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?=
-	<frederic.dalleau@linux.intel.com>
+Date: Mon, 8 Jul 2013 10:27:23 +0200
+From: Stanislaw Gruszka <sgruszka@redhat.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] ath3k: don't use stack memory for DMA
+Message-ID: <20130708082722.GB1569@redhat.com>
+References: <20130627094837.GA2288@redhat.com>
+ <20130707194009.GB3966@joana>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v8 8/8] Bluetooth: Prevent transparent SCO on older devices
-References: <1373036503-1349-1-git-send-email-frederic.dalleau@linux.intel.com> <1373036503-1349-9-git-send-email-frederic.dalleau@linux.intel.com> <20130708023309.GA31844@echo>
-In-Reply-To: <20130708023309.GA31844@echo>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130707194009.GB3966@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinicius,
+Memory allocated by vmalloc (including stack) can not be used for DMA,
+i.e. data pointer on usb_control_msg() should not point to stack memory.
 
-Le 08/07/2013 04:33, Vinicius Costa Gomes a écrit :
-> I remember seeing a couple of 2.0 controllers that have Transparent SCO
-> feature bit set but don't have support for eSCO.
->
-> I wonder if it would be better to use Setup Synchronous Connection if
-> transparent SCO is needed (and the controller supports it).
+Resolves:
+https://bugzilla.redhat.com/show_bug.cgi?id=977558
 
-I saw your previous mail about this. There are several other places in
-the code (hci_sco_setup, hci_conn_request_evt maybe others) where Bluez
-decides whether to use Add_Sco or Setup_Synchronous_Connection based on
-lmp_esco_capable() macro. Supporting transparent data on these adapters 
-would need these places changed as well.
+Reported-and-tested-by: Andy Lawrence <dr.diesel@gmail.com>
+Signed-off-by: Stanislaw Gruszka <sgruszka@redhat.com>
+---
+ drivers/bluetooth/ath3k.c | 38 +++++++++++++++++++++++++++++---------
+ 1 file changed, 29 insertions(+), 9 deletions(-)
 
-> Another problem is in the accepting side, we are using Add SCO if the
-> controller doesn't support eSCO, this fails (IIRC Invalid LMP Parameters
-> or somehing) if the other side has requested a SCO link expecting
-> transparent SCO data.
+v1 -> v2 : use sizeof(*buf)
 
-This patch only applies to connecting side. Accepting side should
-not be impacted. If voice settings on both side are matching, I don't
-see why it would fail.
-
-Regards,
-Fred
-
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 11f467c..5e3a86f 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -193,24 +193,44 @@ error:
+ 
+ static int ath3k_get_state(struct usb_device *udev, unsigned char *state)
+ {
+-	int pipe = 0;
++	int ret, pipe = 0;
++	char *buf;
++
++	buf = kmalloc(sizeof(*buf), GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
+ 
+ 	pipe = usb_rcvctrlpipe(udev, 0);
+-	return usb_control_msg(udev, pipe, ATH3K_GETSTATE,
+-			USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
+-			state, 0x01, USB_CTRL_SET_TIMEOUT);
++	ret = usb_control_msg(udev, pipe, ATH3K_GETSTATE,
++			      USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
++			      buf, sizeof(*buf), USB_CTRL_SET_TIMEOUT);
++
++	*state = *buf;
++	kfree(buf);
++
++	return ret;
+ }
+ 
+ static int ath3k_get_version(struct usb_device *udev,
+ 			struct ath3k_version *version)
+ {
+-	int pipe = 0;
++	int ret, pipe = 0;
++	struct ath3k_version *buf;
++	const int size = sizeof(*buf);
++
++	buf = kmalloc(size, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
+ 
+ 	pipe = usb_rcvctrlpipe(udev, 0);
+-	return usb_control_msg(udev, pipe, ATH3K_GETVERSION,
+-			USB_TYPE_VENDOR | USB_DIR_IN, 0, 0, version,
+-			sizeof(struct ath3k_version),
+-			USB_CTRL_SET_TIMEOUT);
++	ret = usb_control_msg(udev, pipe, ATH3K_GETVERSION,
++			      USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
++			      buf, size, USB_CTRL_SET_TIMEOUT);
++
++	memcpy(version, buf, size);
++	kfree(buf);
++
++	return ret;
+ }
+ 
+ static int ath3k_load_fwfile(struct usb_device *udev,
