@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 05/20] audio/source: Reduce dependency on struct audio_device
-Date: Mon,  8 Jul 2013 17:10:11 +0300
-Message-Id: <1373292626-3776-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 06/20] audio/control: Reduce dependency on struct audio_device
+Date: Mon,  8 Jul 2013 17:10:12 +0300
+Message-Id: <1373292626-3776-7-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1373292626-3776-1-git-send-email-luiz.dentz@gmail.com>
 References: <1373292626-3776-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,347 +14,307 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 This is part of the work necessary to completely remove
 struct audio_device
 ---
- profiles/audio/a2dp.c      |  4 +--
- profiles/audio/device.c    |  2 +-
- profiles/audio/manager.c   | 18 ++-----------
- profiles/audio/source.c    | 65 +++++++++++++++++++++++++---------------------
- profiles/audio/source.h    | 14 +++++-----
- profiles/audio/transport.c |  5 ++--
- 6 files changed, 50 insertions(+), 58 deletions(-)
+ profiles/audio/avrcp.c   | 39 +++++++++++++++++++++++++++++--------
+ profiles/audio/control.c | 50 +++++++++++++-----------------------------------
+ profiles/audio/control.h | 13 ++++---------
+ profiles/audio/device.c  |  2 +-
+ profiles/audio/manager.c | 18 ++---------------
+ 5 files changed, 51 insertions(+), 71 deletions(-)
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 5dc9218..e89be07 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -418,7 +418,7 @@ static gboolean auto_config(gpointer data)
- 	if (setup->sep->type == AVDTP_SEP_TYPE_SOURCE)
- 		sink_new_stream(dev->sink, setup->session, setup->stream);
- 	else
--		source_new_stream(setup->dev, setup->session, setup->stream);
-+		source_new_stream(dev->source, setup->session, setup->stream);
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 763012d..cc007c5 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -47,8 +47,9 @@
+ #include <gdbus/gdbus.h>
  
- done:
- 	if (setup->setconf_cb)
-@@ -621,7 +621,7 @@ static void setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 	if (a2dp_sep->type == AVDTP_SEP_TYPE_SOURCE)
- 		sink_new_stream(dev->sink, session, setup->stream);
- 	else
--		source_new_stream(dev, session, setup->stream);
-+		source_new_stream(dev->source, session, setup->stream);
+ #include "lib/uuid.h"
+-#include "../src/adapter.h"
+-#include "../src/device.h"
++#include "src/adapter.h"
++#include "src/device.h"
++#include "src/service.h"
  
- 	/* Notify Endpoint */
- 	if (a2dp_sep->endpoint) {
-diff --git a/profiles/audio/device.c b/profiles/audio/device.c
-index bc1ab26..ea9a771 100644
---- a/profiles/audio/device.c
-+++ b/profiles/audio/device.c
-@@ -264,7 +264,7 @@ void audio_device_unregister(struct audio_device *device)
- 		sink_unregister(device->sink);
- 
- 	if (device->source)
--		source_unregister(device);
-+		source_unregister(device->source);
- 
- 	if (device->control)
- 		control_unregister(device);
-diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
-index 7cc37e5..c63a8df 100644
---- a/profiles/audio/manager.c
-+++ b/profiles/audio/manager.c
-@@ -184,34 +184,20 @@ static int a2dp_source_connect(struct btd_service *service)
+ #include "log.h"
+ #include "error.h"
+@@ -3282,6 +3283,7 @@ static void session_tg_init_control(struct avrcp *session)
  {
- 	struct btd_device *dev = btd_service_get_device(service);
- 	const char *path = device_get_path(dev);
--	struct audio_device *audio_dev;
- 
- 	DBG("path %s", path);
- 
--	audio_dev = get_audio_dev(dev);
--	if (!audio_dev) {
--		DBG("unable to get a device object");
--		return -1;
--	}
--
--	return source_connect(audio_dev);
-+	return source_connect(service);
- }
- 
- static int a2dp_source_disconnect(struct btd_service *service)
- {
- 	struct btd_device *dev = btd_service_get_device(service);
- 	const char *path = device_get_path(dev);
--	struct audio_device *audio_dev;
- 
- 	DBG("path %s", path);
- 
--	audio_dev = get_audio_dev(dev);
--	if (!audio_dev) {
--		DBG("unable to get a device object");
--		return -1;
--	}
--
--	return source_disconnect(audio_dev, FALSE);
-+	return source_disconnect(service, FALSE);
- }
- 
- static int a2dp_sink_connect(struct btd_service *service)
-diff --git a/profiles/audio/source.c b/profiles/audio/source.c
-index a80df2a..5fed576 100644
---- a/profiles/audio/source.c
-+++ b/profiles/audio/source.c
-@@ -72,7 +72,7 @@ struct source {
- 
- struct source_state_callback {
- 	source_state_cb cb;
--	struct audio_device *dev;
+ 	struct avrcp_server *server = session->server;
+ 	struct avrcp_player *player;
 +	struct btd_service *service;
- 	void *user_data;
- 	unsigned int id;
- };
-@@ -86,9 +86,11 @@ static char *str_state[] = {
- 	"SOURCE_STATE_PLAYING",
- };
  
--static void source_set_state(struct audio_device *dev, source_state_t new_state)
-+static void source_set_state(struct btd_service *service,
-+						source_state_t new_state)
- {
--	struct source *source = btd_service_get_user_data(dev->source);
-+	struct source *source = btd_service_get_user_data(service);
-+	struct audio_device *dev = source->dev;
- 	source_state_t old_state = source->state;
- 	GSList *l;
- 
-@@ -100,10 +102,10 @@ static void source_set_state(struct audio_device *dev, source_state_t new_state)
- 	for (l = source_callbacks; l != NULL; l = l->next) {
- 		struct source_state_callback *cb = l->data;
- 
--		if (cb->dev != dev)
-+		if (cb->service != service)
- 			continue;
- 
--		cb->cb(dev, old_state, new_state, cb->user_data);
-+		cb->cb(service, old_state, new_state, cb->user_data);
- 	}
- 
- 	if (new_state != SOURCE_STATE_DISCONNECTED)
-@@ -124,10 +126,10 @@ static void avdtp_state_callback(struct audio_device *dev,
- 
- 	switch (new_state) {
- 	case AVDTP_SESSION_STATE_DISCONNECTED:
--		source_set_state(dev, SOURCE_STATE_DISCONNECTED);
-+		source_set_state(dev->source, SOURCE_STATE_DISCONNECTED);
- 		break;
- 	case AVDTP_SESSION_STATE_CONNECTING:
--		source_set_state(dev, SOURCE_STATE_CONNECTING);
-+		source_set_state(dev->source, SOURCE_STATE_CONNECTING);
- 		break;
- 	case AVDTP_SESSION_STATE_CONNECTED:
- 		break;
-@@ -142,8 +144,8 @@ static void stream_state_changed(struct avdtp_stream *stream,
- 					struct avdtp_error *err,
- 					void *user_data)
- {
--	struct audio_device *dev = user_data;
--	struct source *source = btd_service_get_user_data(dev->source);
-+	struct btd_service *service = user_data;
-+	struct source *source = btd_service_get_user_data(service);
- 
- 	if (err)
+ 	if (session->version < 0x0103)
  		return;
-@@ -153,7 +155,7 @@ static void stream_state_changed(struct avdtp_stream *stream,
- 		btd_service_disconnecting_complete(source->service, 0);
+@@ -3314,7 +3316,10 @@ static void session_tg_init_control(struct avrcp *session)
+ 		avrcp_register_notification(session,
+ 						AVRCP_EVENT_VOLUME_CHANGED);
  
- 		if (source->disconnect_id > 0) {
--			a2dp_cancel(dev, source->disconnect_id);
-+			a2dp_cancel(source->dev, source->disconnect_id);
- 			source->disconnect_id = 0;
- 		}
- 
-@@ -166,10 +168,10 @@ static void stream_state_changed(struct avdtp_stream *stream,
- 		break;
- 	case AVDTP_STATE_OPEN:
- 		btd_service_connecting_complete(source->service, 0);
--		source_set_state(dev, SOURCE_STATE_CONNECTED);
-+		source_set_state(service, SOURCE_STATE_CONNECTED);
- 		break;
- 	case AVDTP_STATE_STREAMING:
--		source_set_state(dev, SOURCE_STATE_PLAYING);
-+		source_set_state(service, SOURCE_STATE_PLAYING);
- 		break;
- 	case AVDTP_STATE_CONFIGURED:
- 	case AVDTP_STATE_CLOSING:
-@@ -307,12 +309,12 @@ gboolean source_setup_stream(struct btd_service *service,
- 	return TRUE;
+-	control_remote_connected(session->dev, 0);
++	service = btd_device_get_service(session->dev->btd_dev,
++							AVRCP_REMOTE_UUID);
++	if (service != NULL)
++		btd_service_connecting_complete(service, 0);
  }
  
--int source_connect(struct audio_device *dev)
-+int source_connect(struct btd_service *service)
+ static void session_ct_init_browsing(struct avrcp *session)
+@@ -3329,6 +3334,7 @@ static void session_ct_init_browsing(struct avrcp *session)
+ static void session_ct_init_control(struct avrcp *session)
  {
--	struct source *source = btd_service_get_user_data(dev->source);
-+	struct source *source = btd_service_get_user_data(service);
+ 	struct avrcp_player *player;
++	struct btd_service *service;
  
- 	if (!source->session)
--		source->session = avdtp_get(dev);
-+		source->session = avdtp_get(source->dev);
+ 	DBG("%p version 0x%04x", session, session->version);
  
- 	if (!source->session) {
- 		DBG("Unable to get a session");
-@@ -325,7 +327,7 @@ int source_connect(struct audio_device *dev)
- 	if (source->stream_state >= AVDTP_STATE_OPEN)
- 		return -EALREADY;
+@@ -3340,7 +3346,11 @@ static void session_ct_init_control(struct avrcp *session)
+ 	if (session->version >= 0x0104)
+ 		session->supported_events = (1 << AVRCP_EVENT_VOLUME_CHANGED);
  
--	if (!source_setup_stream(source->service, NULL)) {
-+	if (!source_setup_stream(service, NULL)) {
- 		DBG("Failed to create a stream");
- 		return -EIO;
+-	control_target_connected(session->dev, 0);
++
++	service = btd_device_get_service(session->dev->btd_dev,
++							AVRCP_TARGET_UUID);
++	if (service != NULL)
++		btd_service_connecting_complete(service, 0);
+ 
+ 	player = create_ct_player(session, 0);
+ 	if (player == NULL)
+@@ -3373,30 +3383,43 @@ static void session_destroy(struct avrcp *session)
+ static void session_tg_destroy(struct avrcp *session)
+ {
+ 	struct avrcp_player *player = session->player;
++	struct btd_service *service;
+ 
+ 	DBG("%p", session);
+ 
+ 	if (player != NULL)
+ 		player->sessions = g_slist_remove(player->sessions, session);
+ 
++	service = btd_device_get_service(session->dev->btd_dev,
++							AVRCP_REMOTE_UUID);
++	if (service == NULL)
++		return session_destroy(session);
++
+ 	if (session->control_id == 0)
+-		control_remote_connected(session->dev, -EIO);
++		btd_service_connecting_complete(service, -EIO);
+ 	else
+-		control_remote_disconnected(session->dev, 0);
++		btd_service_disconnecting_complete(service, 0);
+ 
+ 	session_destroy(session);
+ }
+ 
+ static void session_ct_destroy(struct avrcp *session)
+ {
++	struct btd_service *service;
++
+ 	DBG("%p", session);
+ 
+ 	g_slist_free_full(session->players, player_destroy);
+ 
++	service = btd_device_get_service(session->dev->btd_dev,
++							AVRCP_TARGET_UUID);
++	if (service == NULL)
++		return session_destroy(session);
++
+ 	if (session->control_id == 0)
+-		control_target_connected(session->dev, -EIO);
++		btd_service_connecting_complete(service, -EIO);
+ 	else
+-		control_target_disconnected(session->dev, 0);
++		btd_service_disconnecting_complete(service, 0);
+ 
+ 	session_destroy(session);
+ }
+diff --git a/profiles/audio/control.c b/profiles/audio/control.c
+index 0239bff..7cfbcc6 100644
+--- a/profiles/audio/control.c
++++ b/profiles/audio/control.c
+@@ -62,40 +62,13 @@
+ #include "dbus-common.h"
+ 
+ struct control {
++	struct audio_device *dev;
+ 	struct avctp *session;
+ 	struct btd_service *target;
+ 	struct btd_service *remote;
+ 	unsigned int avctp_id;
+ };
+ 
+-void control_target_connected(struct audio_device *dev, int err)
+-{
+-	struct control *control = btd_service_get_user_data(dev->control);
+-
+-	btd_service_connecting_complete(control->target, err);
+-}
+-
+-void control_target_disconnected(struct audio_device *dev, int err)
+-{
+-	struct control *control = btd_service_get_user_data(dev->control);
+-
+-	btd_service_disconnecting_complete(control->target, err);
+-}
+-
+-void control_remote_connected(struct audio_device *dev, int err)
+-{
+-	struct control *control = btd_service_get_user_data(dev->control);
+-
+-	btd_service_connecting_complete(control->remote, err);
+-}
+-
+-void control_remote_disconnected(struct audio_device *dev, int err)
+-{
+-	struct control *control = btd_service_get_user_data(dev->control);
+-
+-	btd_service_disconnecting_complete(control->remote, err);
+-}
+-
+ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
+ 							avctp_state_t new_state)
+ {
+@@ -127,9 +100,9 @@ static void state_changed(struct audio_device *dev, avctp_state_t old_state,
  	}
-@@ -335,9 +337,10 @@ int source_connect(struct audio_device *dev)
+ }
+ 
+-int control_connect(struct audio_device *dev)
++int control_connect(struct btd_service *service)
+ {
+-	struct control *control = btd_service_get_user_data(dev->control);
++	struct control *control = btd_service_get_user_data(service);
+ 
+ 	if (control->session)
+ 		return -EALREADY;
+@@ -137,16 +110,16 @@ int control_connect(struct audio_device *dev)
+ 	if (!control->target)
+ 		return -ENOTSUP;
+ 
+-	control->session = avctp_connect(dev);
++	control->session = avctp_connect(control->dev);
+ 	if (!control->session)
+ 		return -EIO;
+ 
  	return 0;
  }
  
--static void source_free(struct audio_device *dev)
-+static void source_free(struct btd_service *service)
+-int control_disconnect(struct audio_device *dev)
++int control_disconnect(struct btd_service *service)
  {
--	struct source *source = btd_service_get_user_data(dev->source);
-+	struct source *source = btd_service_get_user_data(service);
-+	struct audio_device *dev = source->dev;
+-	struct control *control = btd_service_get_user_data(dev->control);
++	struct control *control = btd_service_get_user_data(service);
  
- 	if (source->cb_id)
- 		avdtp_stream_remove_cb(source->session, source->stream,
-@@ -368,11 +371,13 @@ static void source_free(struct audio_device *dev)
- 	dev->source = NULL;
+ 	if (!control->session)
+ 		return -ENOTCONN;
+@@ -284,10 +257,12 @@ static void path_unregister(void *data)
+ 	dev->control = NULL;
  }
  
--void source_unregister(struct audio_device *dev)
-+void source_unregister(struct btd_service *service)
+-void control_unregister(struct audio_device *dev)
++void control_unregister(struct btd_service *service)
  {
--	DBG("%s", device_get_path(dev->btd_dev));
 +	struct btd_device *dev = btd_service_get_device(service);
 +
-+	DBG("%s", device_get_path(dev));
- 
--	source_free(dev);
-+	source_free(service);
+ 	g_dbus_unregister_interface(btd_get_dbus_connection(),
+-						device_get_path(dev->btd_dev),
++						device_get_path(dev),
+ 						AUDIO_CONTROL_INTERFACE);
  }
  
- int source_init(struct audio_device *dev, struct btd_service *service)
-@@ -394,10 +399,10 @@ int source_init(struct audio_device *dev, struct btd_service *service)
+@@ -311,6 +286,7 @@ static struct control *control_init(struct audio_device *dev)
+ 
+ 	control = g_new0(struct control, 1);
+ 
++	control->dev = dev;
+ 	control->avctp_id = avctp_add_state_cb(dev, state_changed);
+ 
+ 	return control;
+@@ -346,9 +322,9 @@ int control_init_remote(struct audio_device *dev, struct btd_service *service)
  	return 0;
  }
  
--gboolean source_new_stream(struct audio_device *dev, struct avdtp *session,
-+gboolean source_new_stream(struct btd_service *service, struct avdtp *session,
- 				struct avdtp_stream *stream)
+-gboolean control_is_active(struct audio_device *dev)
++gboolean control_is_active(struct btd_service *service)
  {
--	struct source *source = btd_service_get_user_data(dev->source);
-+	struct source *source = btd_service_get_user_data(service);
+-	struct control *control = btd_service_get_user_data(dev->control);
++	struct control *control = btd_service_get_user_data(service);
  
- 	if (source->stream)
- 		return FALSE;
-@@ -408,14 +413,14 @@ gboolean source_new_stream(struct audio_device *dev, struct avdtp *session,
- 	source->stream = stream;
+ 	if (control && control->session)
+ 		return TRUE;
+diff --git a/profiles/audio/control.h b/profiles/audio/control.h
+index d0aa3c3..5c59006 100644
+--- a/profiles/audio/control.h
++++ b/profiles/audio/control.h
+@@ -28,13 +28,8 @@ struct btd_service;
  
- 	source->cb_id = avdtp_stream_add_cb(session, stream,
--						stream_state_changed, dev);
-+						stream_state_changed, service);
+ int control_init_target(struct audio_device *dev, struct btd_service *service);
+ int control_init_remote(struct audio_device *dev, struct btd_service *service);
+-void control_unregister(struct audio_device *dev);
+-gboolean control_is_active(struct audio_device *dev);
++void control_unregister(struct btd_service *service);
++gboolean control_is_active(struct btd_service *service);
  
- 	return TRUE;
+-int control_connect(struct audio_device *dev);
+-int control_disconnect(struct audio_device *dev);
+-
+-void control_target_connected(struct audio_device *dev, int err);
+-void control_target_disconnected(struct audio_device *dev, int err);
+-void control_remote_connected(struct audio_device *dev, int err);
+-void control_remote_disconnected(struct audio_device *dev, int err);
++int control_connect(struct btd_service *service);
++int control_disconnect(struct btd_service *service);
+diff --git a/profiles/audio/device.c b/profiles/audio/device.c
+index ea9a771..416e1b2 100644
+--- a/profiles/audio/device.c
++++ b/profiles/audio/device.c
+@@ -267,7 +267,7 @@ void audio_device_unregister(struct audio_device *device)
+ 		source_unregister(device->source);
+ 
+ 	if (device->control)
+-		control_unregister(device);
++		control_unregister(device->control);
+ 
+ 	device_free(device);
+ }
+diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
+index c63a8df..046638d 100644
+--- a/profiles/audio/manager.c
++++ b/profiles/audio/manager.c
+@@ -224,34 +224,20 @@ static int avrcp_target_connect(struct btd_service *service)
+ {
+ 	struct btd_device *dev = btd_service_get_device(service);
+ 	const char *path = device_get_path(dev);
+-	struct audio_device *audio_dev;
+ 
+ 	DBG("path %s", path);
+ 
+-	audio_dev = get_audio_dev(dev);
+-	if (!audio_dev) {
+-		DBG("unable to get a device object");
+-		return -1;
+-	}
+-
+-	return control_connect(audio_dev);
++	return control_connect(service);
  }
  
--int source_disconnect(struct audio_device *dev, gboolean shutdown)
-+int source_disconnect(struct btd_service *service, gboolean shutdown)
+ static int avrcp_target_disconnect(struct btd_service *service)
  {
--	struct source *source = btd_service_get_user_data(dev->source);
-+	struct source *source = btd_service_get_user_data(service);
+ 	struct btd_device *dev = btd_service_get_device(service);
+ 	const char *path = device_get_path(dev);
+-	struct audio_device *audio_dev;
  
- 	if (!source->session)
- 		return -ENOTCONN;
-@@ -425,7 +430,7 @@ int source_disconnect(struct audio_device *dev, gboolean shutdown)
+ 	DBG("path %s", path);
  
- 	/* cancel pending connect */
- 	if (source->connect_id > 0) {
--		a2dp_cancel(dev, source->connect_id);
-+		a2dp_cancel(source->dev, source->connect_id);
- 		source->connect_id = 0;
- 		btd_service_connecting_complete(source->service, -ECANCELED);
- 
-@@ -445,15 +450,15 @@ int source_disconnect(struct audio_device *dev, gboolean shutdown)
- 	return avdtp_close(source->session, source->stream, FALSE);
+-	audio_dev = get_audio_dev(dev);
+-	if (!audio_dev) {
+-		DBG("unable to get a device object");
+-		return -1;
+-	}
+-
+-	return control_disconnect(audio_dev);
++	return control_disconnect(service);
  }
  
--unsigned int source_add_state_cb(struct audio_device *dev, source_state_cb cb,
--								void *user_data)
-+unsigned int source_add_state_cb(struct btd_service *service,
-+					source_state_cb cb, void *user_data)
- {
- 	struct source_state_callback *state_cb;
- 	static unsigned int id = 0;
- 
- 	state_cb = g_new(struct source_state_callback, 1);
- 	state_cb->cb = cb;
--	state_cb->dev = dev;
-+	state_cb->service = service;
- 	state_cb->user_data = user_data;
- 	state_cb->id = ++id;
- 
-diff --git a/profiles/audio/source.h b/profiles/audio/source.h
-index ac7ffbd..6c35d6e 100644
---- a/profiles/audio/source.h
-+++ b/profiles/audio/source.h
-@@ -30,22 +30,22 @@ typedef enum {
- 	SOURCE_STATE_PLAYING,
- } source_state_t;
- 
--typedef void (*source_state_cb) (struct audio_device *dev,
-+typedef void (*source_state_cb) (struct btd_service *service,
- 				source_state_t old_state,
- 				source_state_t new_state,
- 				void *user_data);
- 
- struct btd_service;
- 
--unsigned int source_add_state_cb(struct audio_device *dev, source_state_cb cb,
--							void *user_data);
-+unsigned int source_add_state_cb(struct btd_service *service,
-+					source_state_cb cb, void *user_data);
- gboolean source_remove_state_cb(unsigned int id);
- 
- int source_init(struct audio_device *dev, struct btd_service *service);
--void source_unregister(struct audio_device *dev);
--int source_connect(struct audio_device *dev);
--gboolean source_new_stream(struct audio_device *dev, struct avdtp *session,
-+void source_unregister(struct btd_service *service);
-+int source_connect(struct btd_service *service);
-+gboolean source_new_stream(struct btd_service *service, struct avdtp *session,
- 				struct avdtp_stream *stream);
- gboolean source_setup_stream(struct btd_service *service,
- 							struct avdtp *session);
--int source_disconnect(struct audio_device *dev, gboolean shutdown);
-+int source_disconnect(struct btd_service *service, gboolean shutdown);
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 3e83a95..b4da18d 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -757,7 +757,7 @@ static void sink_state_changed(struct btd_service *service,
- 		transport_update_playing(transport, FALSE);
- }
- 
--static void source_state_changed(struct audio_device *dev,
-+static void source_state_changed(struct btd_service *service,
- 						source_state_t old_state,
- 						source_state_t new_state,
- 						void *user_data)
-@@ -810,7 +810,8 @@ struct media_transport *media_transport_create(struct audio_device *device,
- 		} else {
- 			a2dp->volume = 127;
- 			avrcp_set_volume(device, a2dp->volume);
--			transport->source_watch = source_add_state_cb(device,
-+			transport->source_watch = source_add_state_cb(
-+							device->source,
- 							source_state_changed,
- 							transport);
- 		}
+ static int a2dp_source_server_probe(struct btd_profile *p,
 -- 
 1.8.1.4
 
