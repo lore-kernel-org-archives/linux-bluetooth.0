@@ -1,126 +1,240 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+Ab=rPfE5HaW1c3+n=wEF3=x2UQ2_+-JPwSvXgbTcYBg@mail.gmail.com>
-References: <1373033022-11180-1-git-send-email-luiz.dentz@gmail.com>
-	<CANT-zCUN8L_iVyPmXchmunoKwxt72KR7ZYhbQYtCBwUpxSWbJQ@mail.gmail.com>
-	<CABBYNZ+Ab=rPfE5HaW1c3+n=wEF3=x2UQ2_+-JPwSvXgbTcYBg@mail.gmail.com>
-Date: Mon, 8 Jul 2013 16:13:22 +0200
-Message-ID: <CANT-zCUJkBDoxJKX4c00d3MhQgLZMOVHRLWo01rfLtq8_7fF1A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] core/service: Make sure service is disconnected
- before shutdown
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 20/20] audio/sink: Move stream retry logic to policy plugin
+Date: Mon,  8 Jul 2013 17:10:26 +0300
+Message-Id: <1373292626-3776-21-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1373292626-3776-1-git-send-email-luiz.dentz@gmail.com>
+References: <1373292626-3776-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Jul 8, 2013 at 2:50 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Mikel,
->
-> On Mon, Jul 8, 2013 at 2:46 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
->> Hi Luiz,
->>
->> On Fri, Jul 5, 2013 at 4:03 PM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>
->>> This ensures that the service is disconnected before setting the state
->>> to unavailable.
->>> ---
->>>  src/service.c | 1 +
->>>  1 file changed, 1 insertion(+)
->>>
->>> diff --git a/src/service.c b/src/service.c
->>> index 83e1c1a..dce5c05 100644
->>> --- a/src/service.c
->>> +++ b/src/service.c
->>> @@ -170,6 +170,7 @@ int service_probe(struct btd_service *service)
->>>
->>>  void service_shutdown(struct btd_service *service)
->>>  {
->>> +       btd_service_disconnect(service);
->>>         change_state(service, BTD_SERVICE_STATE_UNAVAILABLE, 0);
->>>         service->profile->device_remove(service);
->>>         service->device = NULL;
->>> --
->>> 1.8.1.4
->>>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->> I'm not a big fan of this approach. The service should already be
->> disconnected by the time it's shut down, so this additional transition
->> should not be needed.
->
-> Im not following then, why do you call it shutdown then? If just to
-> free data this should have been service_remove or something like that.
+policy plugin is a better place to have such a logic as it is already
+handling other connection policies related to such profiles.
+---
+ plugins/policy.c      | 51 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ profiles/audio/sink.c | 52 +++++++++++----------------------------------------
+ 2 files changed, 60 insertions(+), 43 deletions(-)
 
-Perhaps the naming needs to be improved but it's not a simple free
-either. It just makes the object unusable since it's reference-counted
-and thus cannot be freed immediately.
+diff --git a/plugins/policy.c b/plugins/policy.c
+index 3b57baa..33258b3 100644
+--- a/plugins/policy.c
++++ b/plugins/policy.c
+@@ -42,6 +42,7 @@
+ 
+ #define CONTROL_CONNECT_TIMEOUT 2
+ #define SOURCE_RETRY_TIMEOUT 2
++#define SINK_RETRY_TIMEOUT SOURCE_RETRY_TIMEOUT
+ 
+ static unsigned int service_id = 0;
+ static GSList *devices = NULL;
+@@ -50,6 +51,7 @@ struct policy_data {
+ 	struct btd_device *dev;
+ 
+ 	guint source_timer;
++	guint sink_timer;
+ 	guint ct_timer;
+ 	guint tg_timer;
+ };
+@@ -118,6 +120,9 @@ static void policy_remove(void *user_data)
+ 	if (data->source_timer > 0)
+ 		g_source_remove(data->source_timer);
+ 
++	if (data->sink_timer > 0)
++		g_source_remove(data->sink_timer);
++
+ 	if (data->ct_timer > 0)
+ 		g_source_remove(data->ct_timer);
+ 
+@@ -143,9 +148,34 @@ static struct policy_data *policy_get_data(struct btd_device *dev)
+ 	return data;
+ }
+ 
+-static void sink_cb(struct btd_device *dev, btd_service_state_t old_state,
++static gboolean policy_connect_sink(gpointer user_data)
++{
++	struct policy_data *data = user_data;
++	struct btd_service *service;
++
++	data->source_timer = 0;
++
++	service = btd_device_get_service(data->dev, A2DP_SINK_UUID);
++	if (service != NULL)
++		policy_connect(data, service);
++
++	return FALSE;
++}
++
++static void policy_set_sink_timer(struct policy_data *data)
++{
++	if (data->sink_timer > 0)
++		g_source_remove(data->sink_timer);
++
++	data->sink_timer = g_timeout_add_seconds(SINK_RETRY_TIMEOUT,
++							policy_connect_sink,
++							data);
++}
++
++static void sink_cb(struct btd_service *service, btd_service_state_t old_state,
+ 						btd_service_state_t new_state)
+ {
++	struct btd_device *dev = btd_service_get_device(service);
+ 	struct policy_data *data;
+ 	struct btd_service *controller;
+ 
+@@ -158,6 +188,18 @@ static void sink_cb(struct btd_device *dev, btd_service_state_t old_state,
+ 	switch (new_state) {
+ 	case BTD_SERVICE_STATE_UNAVAILABLE:
+ 	case BTD_SERVICE_STATE_DISCONNECTED:
++		if (old_state == BTD_SERVICE_STATE_CONNECTING) {
++			int err = btd_service_get_error(service);
++
++			if (err == -EAGAIN) {
++				policy_set_sink_timer(data);
++				break;
++			} else if (data->sink_timer > 0) {
++				g_source_remove(data->sink_timer);
++				data->sink_timer = 0;
++			}
++		}
++
+ 		if (data->ct_timer > 0) {
+ 			g_source_remove(data->ct_timer);
+ 			data->ct_timer = 0;
+@@ -168,6 +210,11 @@ static void sink_cb(struct btd_device *dev, btd_service_state_t old_state,
+ 	case BTD_SERVICE_STATE_CONNECTING:
+ 		break;
+ 	case BTD_SERVICE_STATE_CONNECTED:
++		if (data->sink_timer > 0) {
++			g_source_remove(data->sink_timer);
++			data->sink_timer = 0;
++		}
++
+ 		/* Check if service initiate the connection then proceed
+ 		 * immediatelly otherwise set timer
+ 		 */
+@@ -350,7 +397,7 @@ static void service_cb(struct btd_service *service,
+ 	struct btd_profile *profile = btd_service_get_profile(service);
+ 
+ 	if (g_str_equal(profile->remote_uuid, A2DP_SINK_UUID))
+-		sink_cb(dev, old_state, new_state);
++		sink_cb(service, old_state, new_state);
+ 	else if (g_str_equal(profile->remote_uuid, A2DP_SOURCE_UUID))
+ 		source_cb(service, old_state, new_state);
+ 	else if (g_str_equal(profile->remote_uuid, AVRCP_REMOTE_UUID))
+diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
+index 9226002..7211e68 100644
+--- a/profiles/audio/sink.c
++++ b/profiles/audio/sink.c
+@@ -58,7 +58,6 @@ struct sink {
+ 	struct avdtp *session;
+ 	struct avdtp_stream *stream;
+ 	unsigned int cb_id;
+-	guint retry_id;
+ 	avdtp_session_state_t session_state;
+ 	avdtp_state_t stream_state;
+ 	sink_state_t state;
+@@ -180,25 +179,6 @@ static void stream_state_changed(struct avdtp_stream *stream,
+ 	sink->stream_state = new_state;
+ }
+ 
+-static gboolean stream_setup_retry(gpointer user_data)
+-{
+-	struct sink *sink = user_data;
+-
+-	sink->retry_id = 0;
+-
+-	if (sink->stream_state < AVDTP_STATE_OPEN) {
+-		DBG("Stream setup failed, after XCASE connect:connect");
+-		btd_service_connecting_complete(sink->service, -EIO);
+-	}
+-
+-	if (sink->connect_id > 0) {
+-		a2dp_cancel(sink->connect_id);
+-		sink->connect_id = 0;
+-	}
+-
+-	return FALSE;
+-}
+-
+ static void stream_setup_complete(struct avdtp *session, struct a2dp_sep *sep,
+ 					struct avdtp_stream *stream,
+ 					struct avdtp_error *err, void *user_data)
+@@ -213,15 +193,10 @@ static void stream_setup_complete(struct avdtp *session, struct a2dp_sep *sep,
+ 	avdtp_unref(sink->session);
+ 	sink->session = NULL;
+ 	if (avdtp_error_category(err) == AVDTP_ERRNO
+-			&& avdtp_error_posix_errno(err) != EHOSTDOWN) {
+-		DBG("connect:connect XCASE detected");
+-		sink->retry_id = g_timeout_add_seconds(STREAM_SETUP_RETRY_TIMER,
+-							stream_setup_retry,
+-							sink);
+-	} else {
+-		DBG("Stream setup failed : %s", avdtp_strerror(err));
++				&& avdtp_error_posix_errno(err) != EHOSTDOWN)
++		btd_service_connecting_complete(sink->service, -EAGAIN);
++	else
+ 		btd_service_connecting_complete(sink->service, -EIO);
+-	}
+ }
+ 
+ static void select_complete(struct avdtp *session, struct a2dp_sep *sep,
+@@ -250,35 +225,33 @@ static void discovery_complete(struct avdtp *session, GSList *seps, struct avdtp
+ 				void *user_data)
+ {
+ 	struct sink *sink = user_data;
+-	int id;
++	int id, perr;
+ 
+ 	if (err) {
+ 		avdtp_unref(sink->session);
+ 		sink->session = NULL;
+ 		if (avdtp_error_category(err) == AVDTP_ERRNO
+ 				&& avdtp_error_posix_errno(err) != EHOSTDOWN) {
+-			DBG("connect:connect XCASE detected");
+-			sink->retry_id =
+-				g_timeout_add_seconds(STREAM_SETUP_RETRY_TIMER,
+-							stream_setup_retry,
+-							sink);
++			perr = -EAGAIN;
+ 		} else
+-			goto failed;
+-		return;
++			perr = -EIO;
++		goto failed;
+ 	}
+ 
+ 	DBG("Discovery complete");
+ 
+ 	id = a2dp_select_capabilities(sink->session, AVDTP_SEP_TYPE_SINK, NULL,
+ 						select_complete, sink);
+-	if (id == 0)
++	if (id == 0) {
++		perr = -EIO;
+ 		goto failed;
++	}
+ 
+ 	sink->connect_id = id;
+ 	return;
+ 
+ failed:
+-	btd_service_connecting_complete(sink->service, -EIO);
++	btd_service_connecting_complete(sink->service, perr);
+ 	avdtp_unref(sink->session);
+ 	sink->session = NULL;
+ }
+@@ -353,9 +326,6 @@ static void sink_free(struct btd_service *service)
+ 		sink->disconnect_id = 0;
+ 	}
+ 
+-	if (sink->retry_id)
+-		g_source_remove(sink->retry_id);
+-
+ 	avdtp_remove_state_cb(sink->avdtp_callback_id);
+ 	btd_service_unref(sink->service);
+ 
+-- 
+1.8.1.4
 
->
->> Having a look at the current code paths leading to service_shutdown(),
->> one tricky case I can think of is the call to
->> device_remove_profiles(), specially from search_cb(). I have my doubts
->> whether a service shutdown makes sense if it's connected, but in case
->> yes, I'd add the disconnection code to device_remove_profiles().
->
-> It depends on whether we want a clean disconnect or a link loss, IMO
-> if the driver gets a .disconnect callback it should disconnect
-
-That's clear.
-
-> properly while .device_remove it basically frees private data but if
-> we are connected this most likely will cause an abrupt disconnect in
-> most drivers.
-
-I agree that the .disconnect callback should be called before
-.device_remove in most cases. I'm just questioning if this is the best
-way to do it, since most of the code paths already handle the
-disconnection explicitly in device.c. What's the exact case you're
-fixing here?
-
-Regarding external profiles, in particular, the .disconnect callback
-would be useless during removal because Profile.RequestDisconnection()
-shouldn't be called anyway, right? Unless the D-Bus API is designed in
-a way that this method is expected to be called as a side effect of
-ProfileManager1.UnregisterProfile(), which I'd personally find rather
-strange.
-
->
->> Or do you have some other examples where the disconnection is not triggered?
->
-> All our shutdown related API, including g_io_channel_shutdown,
-> normally do disconnect as well.
->
->> Adding one more side effect to service_shutdown() is IMO undesirable,
->> where the transitional DISCONNECTED state would be artificially
->> introduced. Think about an external profile being unregistered while
->> connected devices exist: not only calling
->> Profile.RequestDisconnection() doesn't make any sense, but a
->> transition such as STATE_CONNECTED->STATE_UNAVAILABLE is probably what
->> you want to observe. This can be different from a graceful
->> disconnection, and a policy module could use this distinction to
->> reconnect the service once the external profile gets registered.
->
-> While I agree that could be useful for tracking thinks like link loss
-> this would be initiated by the profile/service themselves somehow not
-> by device_remove code path that should never trigger any link loss
-> policy, it is a cleanup path btw so nothing should be pending after
-> that so your argument actually works against having this type of
-> transition from connected directly to unavailable.
-
-I was not referring to link-loss cases here but for example a crash in
-oFono, which would presumably restart immediately afterwards. A policy
-module could remember that the profile was disconnected due to a crash
-and reconnect automatically.
-
-Cheers,
-Mikel
