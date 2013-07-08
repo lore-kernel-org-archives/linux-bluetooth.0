@@ -1,13 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
-Subject: Re: [PATCH v8 8/8] Bluetooth: Prevent transparent SCO on older devices
+Subject: Re: [PATCH v8 7/8] Bluetooth: SCO connection fallback
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1373036503-1349-9-git-send-email-frederic.dalleau@linux.intel.com>
-Date: Mon, 8 Jul 2013 12:25:32 -0700
+In-Reply-To: <1373036503-1349-8-git-send-email-frederic.dalleau@linux.intel.com>
+Date: Mon, 8 Jul 2013 12:23:01 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <2F173411-4542-47EE-8DF5-65D21856ADAF@holtmann.org>
-References: <1373036503-1349-1-git-send-email-frederic.dalleau@linux.intel.com> <1373036503-1349-9-git-send-email-frederic.dalleau@linux.intel.com>
+Message-Id: <EAB92B0C-1120-4EC7-A4C6-83D3C7F185CB@holtmann.org>
+References: <1373036503-1349-1-git-send-email-frederic.dalleau@linux.intel.com> <1373036503-1349-8-git-send-email-frederic.dalleau@linux.intel.com>
 To: =?iso-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
 	<frederic.dalleau@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -15,39 +15,29 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Fred,
 
-> Older Bluetooth devices may not support Setup Synchronous Connection. This is
-> indicated by the eSCO support feature bit. It is not possible to know if the
-> adapter support eSCO before setting BT_VOICE option since the socket is not
-> bound to an adapter. An adapter can also be added after the socket is created.
-> The socket can be bound to an address before adapter is plugged in.
+> When initiating a transparent eSCO connection, make use of T2 settings at
+> first try. T2 is the recommended settings from HFP 1.6 WideBand Speech. Upon
+> connection failure, try T1 settings.
 > 
-> Thus, on a such adapters, if user requested something else than
-> BT_VOICE_CVSD_16BIT, outgoing connections fail on connect() and returns
-> -ECONNABORTED. Incoming connections do not fail. However, they should only be
-> allowed depending on what was specified in Write_Voice_Settings command.
+> When CVSD is requested and eSCO is supported, try to establish eSCO connection
+> using S3 settings. If it fails, fallback in sequence to S2, S1, D1, D0 settings.
 > 
-> Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
-> ---
-> net/bluetooth/sco.c |    5 +++++
-> 1 file changed, 5 insertions(+)
+> Failure is detected if Synchronous Connection Complete event fails with
+> error 0x0d. This error code has been found experimentally by sending a T2
+> request to a T1 only SCO listener. It means "Connection Rejected due to
+> Limited resource".
+> To know which setting should be used, conn->fallback is used.  Bluez only
+> attempt to reconnect twice. Since, more than 2 fallback are required,
+> conn->fallback is tested as an alternative measure. We want to fallback only if
+> conn->fallback is positive. Calling hci_setup_sync with conn->fallback == 0
+> triggers initial connection attempt.
 > 
-> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> index 546b7f6..02a602e 100644
-> --- a/net/bluetooth/sco.c
-> +++ b/net/bluetooth/sco.c
-> @@ -176,6 +176,11 @@ static int sco_connect(struct sock *sk)
-> 	else
-> 		type = SCO_LINK;
-> 
-> +	if (type == SCO_LINK && sco_pi(sk)->setting != BT_VOICE_CVSD_16BIT) {
-> +		err = -ECONNABORTED;
-> +		goto done;
-> +	}
-> +
+> These setting and the fallback order are described in Bluetooth HFP 1.6
+> specification p. 101.
 
-we should check for eSCO and transparent SCO support. We do need both. And we also need to figure out on how to handle the incoming situation correctly,
+before we do the fallback handling, lets get the basic CVSD vs transparent work done properly. The one thing that I am missing is the handling of SCO/eSCO setup error handling. Like say when using connect() and we try to establish transparent link where not available. Or accept() with defer setup and the transparent link does not work out.
 
-Is the error ECONNABORTED a correct one.
+The fallback handling can be a separate patch once the others are all in a mergable state.
 
 Regards
 
