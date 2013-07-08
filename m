@@ -1,94 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1373297311-14722-1-git-send-email-luiz.dentz@gmail.com>
-References: <1373297311-14722-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 8 Jul 2013 19:15:50 +0200
-Message-ID: <CANT-zCVneDv-FGBjk0MkUi-LPvoEL8mR1qWqWk=9i0TJHTas2A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] core/service: Rename service_shutdown to service_remove
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1373015306-3519-1-git-send-email-martin.xu@linux.intel.com>
+References: <1373015306-3519-1-git-send-email-martin.xu@linux.intel.com>
+Date: Mon, 8 Jul 2013 18:52:26 +0300
+Message-ID: <CABBYNZJeDJoBZkqvqdHPTVDnZRdUNNdjyFdLUUPV3VgqSNn4vA@mail.gmail.com>
+Subject: Re: [PATCH] obexd/client: Add client session properties
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: martin.xu@linux.intel.com
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Martin,
 
-On Mon, Jul 8, 2013 at 5:28 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Fri, Jul 5, 2013 at 12:08 PM,  <martin.xu@linux.intel.com> wrote:
+> From: Martin <martin.xu@linux.intel.com>
 >
-> This rename service_shutdown to service_remove to make it more similar to
-> other internal APIs such as device_remove which only do object
-> cleanup/free and do not have any disconnect logic.
-
-I personally don't like hiding unrefs in such a way but it's indeed
-more consistent with device_remove() so if this is the convention to
-be adopted, ack from my side.
-
-Note however that adapter_remove() doesn't automatically call
-btd_adapter_unref() so in this case it would need to be updated too.
-
-Cheers,
-Mikel
-
 > ---
->  src/device.c  | 3 +--
->  src/service.c | 3 ++-
->  src/service.h | 2 +-
->  3 files changed, 4 insertions(+), 4 deletions(-)
+>  obexd/client/session.c |   38 ++++++++++++++++++++++++++++++++------
+>  1 file changed, 32 insertions(+), 6 deletions(-)
 >
-> diff --git a/src/device.c b/src/device.c
-> index edd377c..afb0cfc 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -967,9 +967,8 @@ static void remove_service(gpointer data)
->         struct btd_service *service = data;
->         struct btd_device *device = btd_service_get_device(service);
->
-> -       service_shutdown(service);
->         device->pending = g_slist_remove(device->pending, service);
-> -       btd_service_unref(service);
-> +       service_remove(service);
->  }
->
->  static gboolean do_disconnect(gpointer user_data)
-> diff --git a/src/service.c b/src/service.c
-> index 83e1c1a..52a8291 100644
-> --- a/src/service.c
-> +++ b/src/service.c
-> @@ -168,12 +168,13 @@ int service_probe(struct btd_service *service)
->         return err;
->  }
->
-> -void service_shutdown(struct btd_service *service)
-> +void service_remove(struct btd_service *service)
+> diff --git a/obexd/client/session.c b/obexd/client/session.c
+> index 8d32ed0..e9cbf00 100644
+> --- a/obexd/client/session.c
+> +++ b/obexd/client/session.c
+> @@ -630,9 +630,6 @@ static gboolean get_source(const GDBusPropertyTable *property,
 >  {
->         change_state(service, BTD_SERVICE_STATE_UNAVAILABLE, 0);
->         service->profile->device_remove(service);
->         service->device = NULL;
->         service->profile = NULL;
-> +       btd_service_unref(service);
->  }
+>         struct obc_session *session = data;
 >
->  int btd_service_connect(struct btd_service *service)
-> diff --git a/src/service.h b/src/service.h
-> index 6ee8f17..5230115 100644
-> --- a/src/service.h
-> +++ b/src/service.h
-> @@ -46,7 +46,7 @@ struct btd_service *service_create(struct btd_device *device,
->                                                 struct btd_profile *profile);
+> -       if (session->source == NULL)
+> -               return FALSE;
+> -
+>         dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
+>                                                         &session->source);
 >
->  int service_probe(struct btd_service *service);
-> -void service_shutdown(struct btd_service *service);
-> +void service_remove(struct btd_service *service);
+> @@ -675,10 +672,35 @@ static const GDBusMethodTable session_methods[] = {
+>         { }
+>  };
 >
->  /* Connection control API */
->  int btd_service_connect(struct btd_service *service);
+> +static gboolean get_target(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data)
+> +{
+> +       struct obc_session *session = data;
+> +       char *uuid;
+> +
+> +       uuid = g_strdup(session->driver->uuid);
+> +
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
+> +       g_free(uuid);
+> +
+> +       return TRUE;
+> +}
+> +
+> +static gboolean session_target_exists(const GDBusPropertyTable *property,
+> +                                                               void *data)
+> +{
+> +       struct obc_session *session = data;
+> +       if (session->driver)
+> +               return session->driver->uuid ? TRUE : FALSE;
+> +
+> +       return FALSE;
+> +}
+> +
+>  static const GDBusPropertyTable session_properties[] = {
+>         { "Source", "s", get_source, NULL, source_exists },
+>         { "Destination", "s", get_destination },
+>         { "Channel", "y", get_channel },
+> +       { "Target", "s", get_target, NULL, session_target_exists },
+>         { }
+>  };
+>
+> @@ -854,9 +876,13 @@ const char *obc_session_register(struct obc_session *session,
+>         session->path = g_strdup_printf("%s/session%ju",
+>                                                 SESSION_BASEPATH, counter++);
+>
+> -       if (g_dbus_register_interface(session->conn, session->path,
+> -                                       SESSION_INTERFACE, session_methods,
+> -                                       NULL, NULL, session, destroy) == FALSE)
+> +       if (g_dbus_register_interface(session->conn,
+> +                                       session->path,
+> +                                       SESSION_INTERFACE,
+> +                                       session_methods,
+> +                                       NULL,
+> +                                       session_properties,
+> +                                       session, destroy) == FALSE)
+>                 goto fail;
+>
+>         if (session->driver->probe && session->driver->probe(session) < 0) {
 > --
-> 1.8.1.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 1.7.10.4
+
+After some cleanup Ive applied it, thanks.
+
+--
+Luiz Augusto von Dentz
