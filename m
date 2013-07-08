@@ -1,30 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
-Subject: Re: [PATCH v8 4/8] Bluetooth: Constants declaration for SCO airmode
+Subject: Re: Bluez with uclibc
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1373036503-1349-5-git-send-email-frederic.dalleau@linux.intel.com>
-Date: Mon, 8 Jul 2013 12:04:46 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <55123CBB-84A8-4BD2-AE4A-64862557CE04@holtmann.org>
-References: <1373036503-1349-1-git-send-email-frederic.dalleau@linux.intel.com> <1373036503-1349-5-git-send-email-frederic.dalleau@linux.intel.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
-	<frederic.dalleau@linux.intel.com>
+In-Reply-To: <747C1E83C744F44E9ACFB89FAEEC2C7B2414E86034@EXDCVYMBSTM005.EQ1STM.local>
+Date: Mon, 8 Jul 2013 12:02:46 -0700
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <601DC609-FB98-4A61-89E1-2EBC8639F667@holtmann.org>
+References: <747C1E83C744F44E9ACFB89FAEEC2C7B2414E86034@EXDCVYMBSTM005.EQ1STM.local>
+To: Julien COUVRAND <julien.couvrand@stericsson.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fred,
+Hi Julien,
 
-> This patchs define constants for SCO airmode from SCO voice setting. It refers
-> to Bluetooth Core V4.0 specification, Part E, Chap 6.12 which describe SCO
-> voice setting format.
+> Today, I need to cross compile Bluez for arm with uclibc library into Buildroot environment. 
+> However, I meet some dependencies between bluez-utils package and MMU deactivation due to dBus.
 > 
-> Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
-> ---
-> include/net/bluetooth/hci_core.h |    4 ++++
-> 1 file changed, 4 insertions(+)
+> Do you know a way to use Bluez with uclibc library?
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+you need to be more specific. I know from projects successfully building BlueZ with uclibc in the past, but I am not doing such thing on a daily basis. So things might have changed. What are the logs or errors you see?
 
 Regards
 
