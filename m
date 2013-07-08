@@ -1,25 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
-Subject: Re: Bluez with uclibc
+Subject: Re: [PATCH 2/2] bluetooth: Add l2cap sockopt for LE conn params
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <747C1E83C744F44E9ACFB89FAEEC2C7B2414E86034@EXDCVYMBSTM005.EQ1STM.local>
-Date: Mon, 8 Jul 2013 12:02:46 -0700
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <601DC609-FB98-4A61-89E1-2EBC8639F667@holtmann.org>
-References: <747C1E83C744F44E9ACFB89FAEEC2C7B2414E86034@EXDCVYMBSTM005.EQ1STM.local>
-To: Julien COUVRAND <julien.couvrand@stericsson.com>
+In-Reply-To: <1372980303-3007-3-git-send-email-kyle@kylemanna.com>
+Date: Mon, 8 Jul 2013 12:01:38 -0700
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <4F35141E-2B22-4905-952E-29764B784D5C@holtmann.org>
+References: <1372980303-3007-1-git-send-email-kyle@kylemanna.com> <1372980303-3007-3-git-send-email-kyle@kylemanna.com>
+To: Kyle Manna <kyle@kylemanna.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Julien,
+Hi Kyle,
 
-> Today, I need to cross compile Bluez for arm with uclibc library into Buildroot environment. 
-> However, I meet some dependencies between bluez-utils package and MMU deactivation due to dBus.
-> 
-> Do you know a way to use Bluez with uclibc library?
+here again, patches to linux-bluetooth only please.
 
-you need to be more specific. I know from projects successfully building BlueZ with uclibc in the past, but I am not doing such thing on a daily basis. So things might have changed. What are the logs or errors you see?
+> * Userspace can now specify connection parameters to override the
+>  defaults prior to connecting to the device.
+> * The intention is that setsockopt() will be called before connect() is
+>  called in userspace apps and BlueZ libraries.
+> * It is critical to set these parameters prior to connect() to avoid
+>  issues with hardware that must arbitrate the antenna access between
+>  Bluetooth LE and things like WiFi.  Aggressive connect (and scan)
+>  window and interval values result in significant WiFi degradation.
+> * Reduces the need to call the hci LE Connection Update Command to
+>  override the "defaults" when the desired values are known ahead of
+>  time.
+> * Add BT_LE_CONN_PARAM socket option.
+
+I am not convinced that this is a good idea. My idea is that bluetoothd should just program connection parameters into the kernel via mgmt and not via the L2CAP socket.
+
+Especially since with LE auto-connect handling most likely starting to use listen() + accept() instead in the future, the L2CAP socket is not a good option here.
 
 Regards
 
