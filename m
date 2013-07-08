@@ -1,70 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZKOdWNkPwdcYcLX29xfV5KscwKWgdJZYeWEBE3mD-BLzA@mail.gmail.com>
+References: <1373033022-11180-1-git-send-email-luiz.dentz@gmail.com>
+	<CANT-zCUN8L_iVyPmXchmunoKwxt72KR7ZYhbQYtCBwUpxSWbJQ@mail.gmail.com>
+	<CABBYNZ+Ab=rPfE5HaW1c3+n=wEF3=x2UQ2_+-JPwSvXgbTcYBg@mail.gmail.com>
+	<CANT-zCUJkBDoxJKX4c00d3MhQgLZMOVHRLWo01rfLtq8_7fF1A@mail.gmail.com>
+	<CABBYNZKOdWNkPwdcYcLX29xfV5KscwKWgdJZYeWEBE3mD-BLzA@mail.gmail.com>
+Date: Mon, 8 Jul 2013 18:18:47 +0300
+Message-ID: <CABBYNZ+r8WTOCB8S_+HRFrnjn36M_t+5cmZ78BDYzLWEE-kZcA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] core/service: Make sure service is disconnected
+ before shutdown
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] core/service: Rename service_shutdown to service_remove
-Date: Mon,  8 Jul 2013 18:28:30 +0300
-Message-Id: <1373297311-14722-1-git-send-email-luiz.dentz@gmail.com>
+To: Mikel Astiz <mikel.astiz.oss@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Mikel,
 
-This rename service_shutdown to service_remove to make it more similar to
-other internal APIs such as device_remove which only do object
-cleanup/free and do not have any disconnect logic.
----
- src/device.c  | 3 +--
- src/service.c | 3 ++-
- src/service.h | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+On Mon, Jul 8, 2013 at 5:52 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Mikel,
+>
+> On Mon, Jul 8, 2013 at 5:13 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>>>> Adding one more side effect to service_shutdown() is IMO undesirable,
+>>>> where the transitional DISCONNECTED state would be artificially
+>>>> introduced. Think about an external profile being unregistered while
+>>>> connected devices exist: not only calling
+>>>> Profile.RequestDisconnection() doesn't make any sense, but a
+>>>> transition such as STATE_CONNECTED->STATE_UNAVAILABLE is probably what
+>>>> you want to observe. This can be different from a graceful
+>>>> disconnection, and a policy module could use this distinction to
+>>>> reconnect the service once the external profile gets registered.
+>>>
+>>> While I agree that could be useful for tracking thinks like link loss
+>>> this would be initiated by the profile/service themselves somehow not
+>>> by device_remove code path that should never trigger any link loss
+>>> policy, it is a cleanup path btw so nothing should be pending after
+>>> that so your argument actually works against having this type of
+>>> transition from connected directly to unavailable.
+>>
+>> I was not referring to link-loss cases here but for example a crash in
+>> oFono, which would presumably restart immediately afterwards. A policy
+>> module could remember that the profile was disconnected due to a crash
+>> and reconnect automatically.
+>
+> Well that can be considered a profile link loss, anyway what we are
+> discussing here is related to device_remove path and the effects of
+> having service_shutdown to do btd_service_disconnect, it seems that
+> when we do DeviceRemove we actually do disconnect before so that is
+> okay to no do it again on device_remove in the other hand if we are
+> quitting we perhaps don't really need to disconnect after all it could
+> be restarting for some reason like the device would reboot so it
+> doesn't necessarily need to disconnect to avoid reconnection strategy
+> to take place, so perhaps there is no real use of disconnecting after
+> all.
+>
+> So I will do the following:
+>
+> rename service_shutdown to service_remove which does btd_service_unref
+> internally similarly to what device_remove does so we keep similar
+> APIs for this matter, service_remove will not disconnect.
 
-diff --git a/src/device.c b/src/device.c
-index edd377c..afb0cfc 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -967,9 +967,8 @@ static void remove_service(gpointer data)
- 	struct btd_service *service = data;
- 	struct btd_device *device = btd_service_get_device(service);
- 
--	service_shutdown(service);
- 	device->pending = g_slist_remove(device->pending, service);
--	btd_service_unref(service);
-+	service_remove(service);
- }
- 
- static gboolean do_disconnect(gpointer user_data)
-diff --git a/src/service.c b/src/service.c
-index 83e1c1a..52a8291 100644
---- a/src/service.c
-+++ b/src/service.c
-@@ -168,12 +168,13 @@ int service_probe(struct btd_service *service)
- 	return err;
- }
- 
--void service_shutdown(struct btd_service *service)
-+void service_remove(struct btd_service *service)
- {
- 	change_state(service, BTD_SERVICE_STATE_UNAVAILABLE, 0);
- 	service->profile->device_remove(service);
- 	service->device = NULL;
- 	service->profile = NULL;
-+	btd_service_unref(service);
- }
- 
- int btd_service_connect(struct btd_service *service)
-diff --git a/src/service.h b/src/service.h
-index 6ee8f17..5230115 100644
---- a/src/service.h
-+++ b/src/service.h
-@@ -46,7 +46,7 @@ struct btd_service *service_create(struct btd_device *device,
- 						struct btd_profile *profile);
- 
- int service_probe(struct btd_service *service);
--void service_shutdown(struct btd_service *service);
-+void service_remove(struct btd_service *service);
- 
- /* Connection control API */
- int btd_service_connect(struct btd_service *service);
--- 
-1.8.1.4
+One more detail, following this discussing Im removing
+dev_disconnect_service from device_remove as we don't really want this
+to happen on the cleanup case.
 
+
+--
+Luiz Augusto von Dentz
