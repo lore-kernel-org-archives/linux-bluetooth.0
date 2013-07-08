@@ -1,87 +1,139 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 8 Jul 2013 10:27:23 +0200
-From: Stanislaw Gruszka <sgruszka@redhat.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] ath3k: don't use stack memory for DMA
-Message-ID: <20130708082722.GB1569@redhat.com>
-References: <20130627094837.GA2288@redhat.com>
- <20130707194009.GB3966@joana>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130707194009.GB3966@joana>
+From: martin.xu@linux.intel.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Martin <martin.xu@linux.intel.com>
+Subject: [PATCH] Profile: fix set default external profile authorize
+Date: Mon,  8 Jul 2013 16:17:20 +0800
+Message-Id: <1373271440-8673-1-git-send-email-martin.xu@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Memory allocated by vmalloc (including stack) can not be used for DMA,
-i.e. data pointer on usb_control_msg() should not point to stack memory.
+From: Martin <martin.xu@linux.intel.com>
 
-Resolves:
-https://bugzilla.redhat.com/show_bug.cgi?id=977558
+authorize is always set as "true" in function ext_set_defaults() by mistake.
 
-Reported-and-tested-by: Andy Lawrence <dr.diesel@gmail.com>
-Signed-off-by: Stanislaw Gruszka <sgruszka@redhat.com>
+the static variable authorize of default_settings will be 0(false),
+if it is not initialized. So item authorize needs to be initized onlyif
+the value is true (non-0).
+And then function ext_set_defaults() can set default authorize properly.
 ---
- drivers/bluetooth/ath3k.c | 38 +++++++++++++++++++++++++++++---------
- 1 file changed, 29 insertions(+), 9 deletions(-)
+ src/profile.c |   17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-v1 -> v2 : use sizeof(*buf)
+diff --git a/src/profile.c b/src/profile.c
+index c745811..5795ca7 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -1907,12 +1907,14 @@ static struct default_settings {
+ 		.uuid		= SPP_UUID,
+ 		.name		= "Serial Port",
+ 		.channel	= SPP_DEFAULT_CHANNEL,
++		.authorize	= true,
+ 		.get_record	= get_spp_record,
+ 		.version	= 0x0102,
+ 	}, {
+ 		.uuid		= DUN_GW_UUID,
+ 		.name		= "Dial-Up Networking",
+ 		.channel	= DUN_DEFAULT_CHANNEL,
++		.authorize	= true,
+ 		.get_record	= get_dun_record,
+ 		.version	= 0x0102,
+ 	}, {
+@@ -1921,6 +1923,7 @@ static struct default_settings {
+ 		.priority	= BTD_PROFILE_PRIORITY_HIGH,
+ 		.remote_uuid	= HFP_AG_UUID,
+ 		.channel	= HFP_HF_DEFAULT_CHANNEL,
++		.authorize	= true,
+ 		.auto_connect	= true,
+ 		.get_record	= get_hfp_hf_record,
+ 		.version	= 0x0105,
+@@ -1930,6 +1933,7 @@ static struct default_settings {
+ 		.priority	= BTD_PROFILE_PRIORITY_HIGH,
+ 		.remote_uuid	= HFP_HS_UUID,
+ 		.channel	= HFP_AG_DEFAULT_CHANNEL,
++		.authorize	= true,
+ 		.auto_connect	= true,
+ 		.get_record	= get_hfp_ag_record,
+ 		.version	= 0x0105,
+@@ -1939,6 +1943,7 @@ static struct default_settings {
+ 		.priority	= BTD_PROFILE_PRIORITY_HIGH,
+ 		.remote_uuid	= HSP_HS_UUID,
+ 		.channel	= HSP_AG_DEFAULT_CHANNEL,
++		.authorize	= true,
+ 		.auto_connect	= true,
+ 	}, {
+ 		.uuid		= OBEX_OPP_UUID,
+@@ -1947,7 +1952,6 @@ static struct default_settings {
+ 		.psm		= BTD_PROFILE_PSM_AUTO,
+ 		.mode		= BT_IO_MODE_ERTM,
+ 		.sec_level	= BT_IO_SEC_LOW,
+-		.authorize	= false,
+ 		.get_record	= get_opp_record,
+ 		.version	= 0x0102,
+ 	}, {
+@@ -1956,30 +1960,35 @@ static struct default_settings {
+ 		.channel	= FTP_DEFAULT_CHANNEL,
+ 		.psm		= BTD_PROFILE_PSM_AUTO,
+ 		.mode		= BT_IO_MODE_ERTM,
++		.authorize	= true,
+ 		.get_record	= get_ftp_record,
+ 		.version	= 0x0102,
+ 	}, {
+ 		.uuid		= OBEX_SYNC_UUID,
+ 		.name		= "Synchronization",
+ 		.channel	= SYNC_DEFAULT_CHANNEL,
++		.authorize	= true,
+ 		.get_record	= get_sync_record,
+ 		.version	= 0x0100,
+ 	}, {
+ 		.uuid		= OBEX_PSE_UUID,
+ 		.name		= "Phone Book Access",
+ 		.channel	= PBAP_DEFAULT_CHANNEL,
++		.authorize	= true,
+ 		.get_record	= get_pse_record,
+ 		.version	= 0x0101,
+ 	}, {
+ 		.uuid		= OBEX_PCE_UUID,
+ 		.name		= "Phone Book Access Client",
+ 		.remote_uuid	= OBEX_PSE_UUID,
++		.authorize	= true,
+ 		.get_record	= get_pce_record,
+ 		.version	= 0x0101,
+ 	}, {
+ 		.uuid		= OBEX_MAS_UUID,
+ 		.name		= "Message Access",
+ 		.channel	= MAS_DEFAULT_CHANNEL,
++		.authorize	= true,
+ 		.get_record	= get_mas_record,
+ 		.version	= 0x0100
+ 	}, {
+@@ -1987,6 +1996,7 @@ static struct default_settings {
+ 		.name		= "Message Notification",
+ 		.channel	= MNS_DEFAULT_CHANNEL,
+ 		.psm		= BTD_PROFILE_PSM_AUTO,
++		.authorize	= true,
+ 		.get_record	= get_mns_record,
+ 		.version	= 0x0100
+ 	},
+@@ -1998,7 +2008,7 @@ static void ext_set_defaults(struct ext_profile *ext)
+ 
+ 	ext->mode = BT_IO_MODE_BASIC;
+ 	ext->sec_level = BT_IO_SEC_MEDIUM;
+-	ext->authorize = true;
++	ext->authorize = false;
+ 	ext->enable_client = true;
+ 	ext->enable_server = true;
+ 	ext->remote_uuid = NULL;
+@@ -2029,6 +2039,9 @@ static void ext_set_defaults(struct ext_profile *ext)
+ 		if (settings->mode)
+ 			ext->mode = settings->mode;
+ 
++		if (settings->authorize)
++			ext->authorize = true;
++
+ 		if (settings->auto_connect)
+ 			ext->p.auto_connect = true;
+ 
+-- 
+1.7.10.4
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 11f467c..5e3a86f 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -193,24 +193,44 @@ error:
- 
- static int ath3k_get_state(struct usb_device *udev, unsigned char *state)
- {
--	int pipe = 0;
-+	int ret, pipe = 0;
-+	char *buf;
-+
-+	buf = kmalloc(sizeof(*buf), GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
- 
- 	pipe = usb_rcvctrlpipe(udev, 0);
--	return usb_control_msg(udev, pipe, ATH3K_GETSTATE,
--			USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
--			state, 0x01, USB_CTRL_SET_TIMEOUT);
-+	ret = usb_control_msg(udev, pipe, ATH3K_GETSTATE,
-+			      USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
-+			      buf, sizeof(*buf), USB_CTRL_SET_TIMEOUT);
-+
-+	*state = *buf;
-+	kfree(buf);
-+
-+	return ret;
- }
- 
- static int ath3k_get_version(struct usb_device *udev,
- 			struct ath3k_version *version)
- {
--	int pipe = 0;
-+	int ret, pipe = 0;
-+	struct ath3k_version *buf;
-+	const int size = sizeof(*buf);
-+
-+	buf = kmalloc(size, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
- 
- 	pipe = usb_rcvctrlpipe(udev, 0);
--	return usb_control_msg(udev, pipe, ATH3K_GETVERSION,
--			USB_TYPE_VENDOR | USB_DIR_IN, 0, 0, version,
--			sizeof(struct ath3k_version),
--			USB_CTRL_SET_TIMEOUT);
-+	ret = usb_control_msg(udev, pipe, ATH3K_GETVERSION,
-+			      USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
-+			      buf, size, USB_CTRL_SET_TIMEOUT);
-+
-+	memcpy(version, buf, size);
-+	kfree(buf);
-+
-+	return ret;
- }
- 
- static int ath3k_load_fwfile(struct usb_device *udev,
