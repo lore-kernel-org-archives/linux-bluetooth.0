@@ -1,68 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
-Subject: Re: [PATCH] btusb: fix overflow return values
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1372941783-30657-1-git-send-email-adam.lee@canonical.com>
-Date: Mon, 8 Jul 2013 11:50:54 -0700
-Cc: linux-bluetooth@vger.kernel.org,
-	Wen-chien Jesse Sung <jesse.sung@canonical.com>,
-	AceLan Kao <acelan.kao@canonical.com>,
-	Tedd Ho-Jeong An <tedd.an@intel.com>,
-	Anthony Wong' <anthony.wong@canonical.com>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-kernel@vger.kernel.org (open list)
-Message-Id: <25CD2206-7B7B-4DAD-A714-A79976C9DB13@holtmann.org>
-References: <1372941783-30657-1-git-send-email-adam.lee@canonical.com>
-To: Adam Lee <adam.lee@canonical.com>
+MIME-Version: 1.0
+In-Reply-To: <1373297311-14722-2-git-send-email-luiz.dentz@gmail.com>
+References: <1373297311-14722-1-git-send-email-luiz.dentz@gmail.com>
+	<1373297311-14722-2-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 8 Jul 2013 19:22:10 +0200
+Message-ID: <CANT-zCXB=2TE-pchqsdn0yY8CxQ7_+ci4XkLFOCJy0PpNhr_6g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] core/device: Fix crash while freeing services list
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Adam,
+Hi Luiz,
 
-> PTR_ERR() returns a long type value, but btusb_setup_intel() and
-> btusb_setup_intel_patching() should return an int type value.
-> 
-> This bug makes the judgement "if (ret < 0)" not working on x86_64
-> architecture systems, leading to failure as below, even panic.
-> 
-> [   12.958920] Bluetooth: hci0 command 0xfc8e tx timeout
-> [   14.961765] Bluetooth: hci0 command 0xfc8e tx timeout
-> [   16.964688] Bluetooth: hci0 command 0xfc8e tx timeout
-> [   20.954501] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
-> [   22.957358] Bluetooth: hci0 command 0xfc8e tx timeout
-> [   30.948922] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
-> [   32.951780] Bluetooth: hci0 command 0xfc8e tx timeout
-> [   40.943359] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
-> [   42.946219] Bluetooth: hci0 command 0xfc8e tx timeout
-> [   50.937812] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
-> [   52.940670] Bluetooth: hci0 command 0xfc8e tx timeout
-> [   60.932236] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
-> [   62.935092] Bluetooth: hci0 command 0xfc8e tx timeout
-> [   70.926688] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
-> [   72.929545] Bluetooth: hci0 command 0xfc8e tx timeout
-> [   80.921111] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
-> [   82.923969] Bluetooth: hci0 command 0xfc2f tx timeout
-> [   90.915542] Bluetooth: hci0 sending Intel patch command (0xfc2f) failed (-110)
-> [   92.918406] Bluetooth: hci0 command 0xfc11 tx timeout
-> [  100.909955] Bluetooth: hci0 sending Intel patch command (0xfc11) failed (-110)
-> [  102.912858] Bluetooth: hci0 command 0xfc60 tx timeout
-> [  110.904394] Bluetooth: hci0 sending Intel patch command (0xfc60) failed (-110)
-> [  112.907293] Bluetooth: hci0 command 0xfc11 tx timeout
-> [  120.898831] Bluetooth: hci0 exiting Intel manufacturer mode failed (-110)
-> [  120.904757] bluetoothd[1030]: segfault at 4 ip 00007f8b2eb55236 sp 00007fff53ff6920 error 4 in bluetoothd[7f8b2eaff000+cb000]
-> 
-> For not affecting other modules, I choose to modify the return values
-> but not extend btusb_setup_intel() and btusb_setup_intel_patching()'s
-> return types. This is harmless, because the return values were only
-> used to comparing number 0.
+On Mon, Jul 8, 2013 at 5:28 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> btd_service do alter its state on service_remove which can cause
+> plugins to attempt to access services list which may have freed some
+> services already.
+>
+> To fix this the code now updates the list in place so the services are
+> first removed from services list before calling service_remove.
+> ---
+>  src/device.c | 20 +++++++++++---------
+>  1 file changed, 11 insertions(+), 9 deletions(-)
+>
+> diff --git a/src/device.c b/src/device.c
+> index afb0cfc..5a1f9c1 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -993,8 +993,12 @@ int device_block(struct btd_device *device, gboolean update_only)
+>         if (device->connected)
+>                 do_disconnect(device);
+>
+> -       g_slist_free_full(device->services, remove_service);
+> -       device->services = NULL;
+> +       while (device->services != NULL) {
+> +               struct btd_service *service = device->services->data;
+> +
+> +               device->services = g_slist_remove(device->services, service);
+> +               service_remove(service);
+> +       }
+>
+>         if (!update_only)
+>                 err = btd_adapter_block_address(device->adapter,
+> @@ -2361,7 +2365,6 @@ static void device_remove_stored(struct btd_device *device)
+>
+>  void device_remove(struct btd_device *device, gboolean remove_stored)
+>  {
+> -
+>         DBG("Removing device %s", device->path);
+>
+>         if (device->bonding) {
+> @@ -2378,10 +2381,12 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
+>         if (device->browse)
+>                 browse_request_cancel(device->browse);
+>
+> -       g_slist_foreach(device->services, dev_disconn_service, NULL);
 
-there are tons of examples in various subsystems and drivers where we return PTR_ERR from a function calls returning int.
+Wouldn't it be better to split this change to a separate patch? I
+believe it could be subject to backport or revert.
 
-So I wonder what is actually going wrong here. If this is x86_64 specific problem with PTR_ERR vs int, then we should have this problem everywhere in the kernel.
+> +       while (device->services != NULL) {
+> +               struct btd_service *service = device->services->data;
+>
+> -       g_slist_free(device->pending);
+> -       device->pending = NULL;
 
-Regards
+Why are the two lines above removed?
 
-Marcel
+> +               device->services = g_slist_remove(device->services, service);
+> +               service_remove(service);
+> +       }
+>
+>         if (device->connected)
+>                 do_disconnect(device);
+> @@ -2397,9 +2402,6 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
+>         if (remove_stored)
+>                 device_remove_stored(device);
+>
+> -       g_slist_free_full(device->services, remove_service);
+> -       device->services = NULL;
+> -
+>         btd_device_unref(device);
+>  }
+>
+> --
+> 1.8.1.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
+Cheers,
+Mikel
