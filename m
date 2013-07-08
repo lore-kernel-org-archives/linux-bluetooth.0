@@ -1,71 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1373033022-11180-1-git-send-email-luiz.dentz@gmail.com>
-References: <1373033022-11180-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 8 Jul 2013 13:46:08 +0200
-Message-ID: <CANT-zCUN8L_iVyPmXchmunoKwxt72KR7ZYhbQYtCBwUpxSWbJQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] core/service: Make sure service is disconnected
- before shutdown
+In-Reply-To: <CANT-zCX-0Vuhh9CDQQNB9b39bVW3sS2d_J9JFCqNAx7CU1SFMA@mail.gmail.com>
+References: <1372409794-24688-1-git-send-email-mikel.astiz.oss@gmail.com>
+	<CANT-zCX-0Vuhh9CDQQNB9b39bVW3sS2d_J9JFCqNAx7CU1SFMA@mail.gmail.com>
+Date: Mon, 8 Jul 2013 13:13:19 +0200
+Message-ID: <CANT-zCWveNPpBWQW6o6xMMeeY+vdVsP57H+OXFpkHEFfiZYwRA@mail.gmail.com>
+Subject: Re: [RFC BlueZ v3 0/8] SSP MITM protection
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-
-On Fri, Jul 5, 2013 at 4:03 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Fri, Jun 28, 2013 at 1:40 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+> Hi,
 >
-> This ensures that the service is disconnected before setting the state
-> to unavailable.
-> ---
->  src/service.c | 1 +
->  1 file changed, 1 insertion(+)
+> On Fri, Jun 28, 2013 at 10:56 AM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
+>> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+>>
+>> The way the kernel handles MITM Protection during pairing is inconsistent: General Bonding and Dedicated Bonding are not treated equally.
+>>
+>> From the user's perspective, using the MITM Protection usually means he will have to confirm the pairing in the UI (some pop-up showing the passkey). Making a difference between General and Dedicated Bonding is undesired because, in practice, the user normally doesn't care about which of them is used. Currently, if an iPhone is paired (initiated on the phone), no pop-up will be shown (because it's using General Bonding). This differs from pairing an Android device (using Dedicated Bonding), which an average user would not understand why.
+>>
+>> The GAP Specification describes when MITM Protection should be used (Bluetooth Core Specification v4.0 Volume 3, part C, section 6.5.3). It makes no distinction between General vs Dedicated Bonding: the recommendation is *not* to use it "unless the security policy of an available local service requires MITM Protection".
+>>
+>> However, the kernel doesn't necessarily have this information in a reliable way. Therefore, the safest choice is to always request MITM Protection, also for General Bonding [1]. The proposal here is to do this for both incoming (patch 6/8) and outgoing (patch 7/8) procedures, as it was previously done for Dedicated Bonding. This "conservative" approach is smart enough to fall back to not using MITM Protection if the IO capabilities don't allow it (this policy already existed before for Dedicated Bonding, see patch 5/8).
+>>
+>> Some systems might however know that MITM Protection is not required at all, because no supported profile requires high security. This can be expressed by userland using the newly introduced management command (patch 8/8). In this case, the recommendation in the spec will be followed (affecting both General and Dedicated Bonding).
+>>
+>> Note that the first 5 patches are refactoring patches which shouldn't change the behavior of the code. Within this group, patch 5/8 is the most tricky one since side effects could exist (we weren't able to observed them though).
+>>
+>> [1] We make an exception here for No-Bonding, which remains unmodified. In this case, no MITM Protection is required by default since an additional pop-up would be undesireable for most use-cases.
+>>
+>> Mikel Astiz (6):
+>>   Bluetooth: Add HCI authentication capabilities macros
+>>   Bluetooth: Use defines in in hci_get_auth_req()
+>>   Bluetooth: Use defines instead of integer literals
+>>   Bluetooth: Refactor hci_get_auth_req()
+>>   Bluetooth: Refactor code for outgoing dedicated bonding
+>>   Bluetooth: Request MITM Protection when initiator
+>>
+>> Timo Mueller (2):
+>>   Bluetooth: Use MITM Protection when IO caps allow it
+>>   Bluetooth: Add management command to relax MITM Protection
+>>
+>>  include/net/bluetooth/hci.h  |  9 ++++++-
+>>  include/net/bluetooth/mgmt.h |  3 +++
+>>  net/bluetooth/hci_event.c    | 63 ++++++++++++++++++++++++++++----------------
+>>  net/bluetooth/mgmt.c         | 53 +++++++++++++++++++++++++++++++++----
+>>  4 files changed, 100 insertions(+), 28 deletions(-)
 >
-> diff --git a/src/service.c b/src/service.c
-> index 83e1c1a..dce5c05 100644
-> --- a/src/service.c
-> +++ b/src/service.c
-> @@ -170,6 +170,7 @@ int service_probe(struct btd_service *service)
+> For the record, I have no particular interest in the last two patches.
+> They're submitted here for completion purposes as a base for the
+> discussion.
 >
->  void service_shutdown(struct btd_service *service)
->  {
-> +       btd_service_disconnect(service);
->         change_state(service, BTD_SERVICE_STATE_UNAVAILABLE, 0);
->         service->profile->device_remove(service);
->         service->device = NULL;
-> --
-> 1.8.1.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Cheers,
+> Mikel
 
-I'm not a big fan of this approach. The service should already be
-disconnected by the time it's shut down, so this additional transition
-should not be needed.
-
-Having a look at the current code paths leading to service_shutdown(),
-one tricky case I can think of is the call to
-device_remove_profiles(), specially from search_cb(). I have my doubts
-whether a service shutdown makes sense if it's connected, but in case
-yes, I'd add the disconnection code to device_remove_profiles().
-
-Or do you have some other examples where the disconnection is not triggered?
-
-Adding one more side effect to service_shutdown() is IMO undesirable,
-where the transitional DISCONNECTED state would be artificially
-introduced. Think about an external profile being unregistered while
-connected devices exist: not only calling
-Profile.RequestDisconnection() doesn't make any sense, but a
-transition such as STATE_CONNECTED->STATE_UNAVAILABLE is probably what
-you want to observe. This can be different from a graceful
-disconnection, and a policy module could use this distinction to
-reconnect the service once the external profile gets registered.
+Ping.
 
 Cheers,
 Mikel
