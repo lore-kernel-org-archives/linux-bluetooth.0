@@ -1,36 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <51DBB51D.9000607@linux.intel.com>
-Date: Tue, 09 Jul 2013 09:00:45 +0200
-From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?=
- <frederic.dalleau@linux.intel.com>
-MIME-Version: 1.0
+Date: Tue, 9 Jul 2013 10:55:01 +0800
+From: Adam Lee <adam.lee@canonical.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v8 2/8] Bluetooth: Remove unused mask parameter in sco_conn_defer_accept
-References: <1373036503-1349-1-git-send-email-frederic.dalleau@linux.intel.com> <1373036503-1349-3-git-send-email-frederic.dalleau@linux.intel.com> <45E64423-16D6-4473-A390-226E5E76AC97@holtmann.org>
-In-Reply-To: <45E64423-16D6-4473-A390-226E5E76AC97@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Cc: linux-bluetooth@vger.kernel.org,
+	Wen-chien Jesse Sung <jesse.sung@canonical.com>,
+	AceLan Kao <acelan.kao@canonical.com>,
+	Tedd Ho-Jeong An <tedd.an@intel.com>,
+	Anthony Wong <anthony.wong@canonical.com>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] btusb: fix overflow return values
+Message-ID: <20130709025501.GA6369@adam-laptop>
+References: <1372941783-30657-1-git-send-email-adam.lee@canonical.com>
+ <25CD2206-7B7B-4DAD-A714-A79976C9DB13@holtmann.org>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="huq684BweRXVnRxX"
+In-Reply-To: <25CD2206-7B7B-4DAD-A714-A79976C9DB13@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
 
-Le 08/07/2013 21:10, Marcel Holtmann a écrit :
-> can you give the exact reference where this is stated. Since I fail to find it.
+--huq684BweRXVnRxX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Core spec v4, 7.1.8 Accept Connection Request Command, p 472, just 
-before command paremeters
+On Mon, Jul 08, 2013 at 11:50:54AM -0700, Marcel Holtmann wrote:
+> Hi Adam,
+> 
+> > PTR_ERR() returns a long type value, but btusb_setup_intel() and
+> > btusb_setup_intel_patching() should return an int type value.
+> > 
+> > This bug makes the judgement "if (ret < 0)" not working on x86_64
+> > architecture systems, leading to failure as below, even panic.
+> > ...
+> > For not affecting other modules, I choose to modify the return values
+> > but not extend btusb_setup_intel() and btusb_setup_intel_patching()'s
+> > return types. This is harmless, because the return values were only
+> > used to comparing number 0.
+> 
+> there are tons of examples in various subsystems and drivers where we
+> return PTR_ERR from a function calls returning int.
+> 
+> So I wonder what is actually going wrong here. If this is x86_64
+> specific problem with PTR_ERR vs int, then we should have this problem
+> everywhere in the kernel.
 
-"Note: When accepting synchronous connection request, the Role parameter 
-is not used and will be ignored by the BR/EDR Controller."
+Hi, Marcel
 
->> -		if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
->> -			cp.role = 0x00; /* Become master */
->> -		else
->> -			cp.role = 0x01; /* Remain slave */
->> +		cp.role = 0x00; /* Ignored */
->
-> Is it really 0x00 and not 0x01 to stay slave.
+I see you point, the difference between here and other subsystems are:
 
-Since it is ignored, there is no need to care.
+1, it returns -PTR_ERR() here but all other places return PTR_ERR(), I
+checked.
+2, the judgement is "if (ret < 0)" here but other places are "if (ret)".
 
-Fred
+I'm not saying other subsystems are 100% right, but here, returning
+-PTR_ERR() and checking "if (ret < 0)" make the judgement broken much
+much more easily.
+
+I attached a testing C file, run it on x86_64, you will see the bug.
+
+PS, about other subsystems, I also think returning PTR_ERR() from a
+function calls returning int considered harmful sometimes, will talk
+about that in other thread.
+
+Great thanks.
+
+-- 
+Regards,
+Adam Lee
+Hardware Enablement
+
+--huq684BweRXVnRxX
+Content-Type: text/x-csrc; charset=us-ascii
+Content-Disposition: attachment; filename="ptr_err.c"
+
+#include <stdio.h>
+
+static inline long PTR_ERR(const void *ptr)
+{
+	return (long) ptr;
+}
+
+int main(int argc, const char *argv[])
+{
+	printf("sizeof(char) = %lu, sizeof(int) = %lu, sizeof(long) = %lu\n\n",
+			sizeof(char), sizeof(int), sizeof(long));
+
+	/*This address is in kernel space, check Documentation/x86/x86_64/mm.txt*/
+	void *ptr = (void *)0Xffff8900f0000000;
+
+	printf("ptr = %p, PTR_ERR(ptr) = %lx, (int)(-PTR_ERR(ptr)) = %d\n\n",
+			ptr, PTR_ERR(ptr), (int)(-PTR_ERR(ptr)));
+
+	if ((int)(-PTR_ERR(ptr)) < 0)
+		printf("That's what the codes want.\n");
+	else
+		printf("Bug happens!\n");
+
+	return 0;
+}
+
+--huq684BweRXVnRxX--
