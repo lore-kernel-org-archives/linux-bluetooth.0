@@ -1,94 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 00/21] Remove audio_device and introduce policy plugin
-Date: Tue,  9 Jul 2013 17:38:54 +0300
-Message-Id: <1373380758-16489-1-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
+Subject: Re: [PATCH v8 7/8] Bluetooth: SCO connection fallback
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <51DBDE82.20007@linux.intel.com>
+Date: Tue, 9 Jul 2013 07:25:21 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <CDC72D06-91B6-49BA-AD67-1A0A2C6E55E5@holtmann.org>
+References: <1373036503-1349-1-git-send-email-frederic.dalleau@linux.intel.com> <1373036503-1349-8-git-send-email-frederic.dalleau@linux.intel.com> <EAB92B0C-1120-4EC7-A4C6-83D3C7F185CB@holtmann.org> <51DBDE82.20007@linux.intel.com>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric_DALLEAU?=
+	<frederic.dalleau@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Fred,
 
-audio_device is no longer needed as btd_service can be used to track
-connection states, in fact audio_device probably obscured direct access
-to some data types like btd_device and use btd_service_set_user_data to
-set profile private data instead of storing everything inside
-audio_device.
+>> before we do the fallback handling, lets get the basic CVSD vs transparent work done properly. The one thing that I am missing is the handling of SCO/eSCO setup error handling. Like say when using connect() and we try to establish transparent link where not available. Or accept() with defer setup and the transparent link does not work out.
+>> 
+>> The fallback handling can be a separate patch once the others are all in a mergable state.
+> 
+> AFAIR if Accept Synchronous Connection does not specify a compatible
+> voice setting, Synchronous Connection Complete will return error
+> 2.13 INVALID HCI COMMAND PARAMETERS (0x12).
+> Setup Synchronous Connection also returns error in Synchronous Connection Complete.
+> 
+> This is the reason why it is negociated before in profile.
 
-There are probably more cleanups to audio after this changes, some
-policies that should be moved to policy plugin and a much needed split
-of audio plugin into smaller plugins, but I decided to stop right here
-otherwise the patch-set will get too big to be properly reviewed.
+I am not sure I like that. What we want is to return proper error codes when a connect() or accept() + read() fails due to an invalid combination.
 
-Also since this refactore the audio policy quite extensively this may
-create some IOP issues, but I did test this with quite a few stacks
-including:
+Regards
 
- - iOS 6
- - Android 4.2
- - WP 8
- - Blackberry 10
- - MW600
- - Nokia Purity Pro
- - BlueZ 4
- - BlueZ 5
-
-They all seems to be working as before.
-
-v2: Add patch 21/21 to enable initiating connections to CT role.
-
-Luiz Augusto von Dentz (21):
-  audio/sink: Use service user_data for private data
-  audio/source: Use service user_data for private data
-  audio/control: Use service user_data for private data
-  audio/sink: Reduce dependency on struct audio_device
-  audio/source: Reduce dependency on struct audio_device
-  audio/control: Reduce dependency on struct audio_device
-  audio/AVCTP: Remove dependency on struct audio_device
-  audio/AVDTP: Remove dependency on struct audio_device
-  audio/AVRCP: Remove dependency on struct audio_device
-  audio/control: Remove dependency on struct audio_device
-  audio/A2DP: Remove dependency on struct audio_device
-  audio/sink: Remove dependency on struct audio_device
-  audio/source: Remove dependency on struct audio_device
-  audio/media: Remove dependency on struct audio_device
-  audio/transport: Remove dependency on struct audio_device
-  audio/manager: Remove dependency on struct audio_device
-  audio/main: Remove dependency on struct audio_device
-  plugins/policy: Reword audio policy code in a simple plugin
-  audio/source: Move stream retry logic to policy plugin
-  audio/sink: Move stream retry logic to policy plugin
-  audio/control: Enable initiate connection to CT role
-
- Makefile.plugins           |   4 +-
- plugins/policy.c           | 426 +++++++++++++++++++++++++++++++++++++++++++++
- profiles/audio/a2dp.c      | 110 ++++++------
- profiles/audio/a2dp.h      |   4 +-
- profiles/audio/avctp.c     |  69 +++-----
- profiles/audio/avctp.h     |  12 +-
- profiles/audio/avdtp.c     |  97 +++++------
- profiles/audio/avdtp.h     |  13 +-
- profiles/audio/avrcp.c     |  89 ++++++----
- profiles/audio/avrcp.h     |   8 +-
- profiles/audio/control.c   | 143 +++++++--------
- profiles/audio/control.h   |  19 +-
- profiles/audio/device.c    | 261 ---------------------------
- profiles/audio/device.h    |  43 -----
- profiles/audio/main.c      |   1 -
- profiles/audio/manager.c   | 199 +++++----------------
- profiles/audio/manager.h   |  10 --
- profiles/audio/media.c     |  39 +++--
- profiles/audio/sink.c      | 157 +++++++----------
- profiles/audio/sink.h      |  18 +-
- profiles/audio/source.c    | 158 +++++++----------
- profiles/audio/source.h    |  20 +--
- profiles/audio/transport.c | 109 +++++++-----
- profiles/audio/transport.h |   8 +-
- 24 files changed, 993 insertions(+), 1024 deletions(-)
- create mode 100644 plugins/policy.c
- delete mode 100644 profiles/audio/device.c
- delete mode 100644 profiles/audio/device.h
-
--- 
-1.8.1.4
+Marcel
 
