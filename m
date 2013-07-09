@@ -1,30 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 9 Jul 2013 14:41:52 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
-	<frederic.dalleau@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC v2 5/6] sco-tester: Initial sco tester implementation
-Message-ID: <20130709114152.GB22976@x220.p-661hnu-f1>
-References: <1373039207-20959-1-git-send-email-frederic.dalleau@linux.intel.com>
- <1373039207-20959-6-git-send-email-frederic.dalleau@linux.intel.com>
+Message-ID: <51DBDE82.20007@linux.intel.com>
+Date: Tue, 09 Jul 2013 11:57:22 +0200
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?=
+ <frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1373039207-20959-6-git-send-email-frederic.dalleau@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v8 7/8] Bluetooth: SCO connection fallback
+References: <1373036503-1349-1-git-send-email-frederic.dalleau@linux.intel.com> <1373036503-1349-8-git-send-email-frederic.dalleau@linux.intel.com> <EAB92B0C-1120-4EC7-A4C6-83D3C7F185CB@holtmann.org>
+In-Reply-To: <EAB92B0C-1120-4EC7-A4C6-83D3C7F185CB@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frederic,
+Marcel,
 
-On Fri, Jul 05, 2013, Frédéric Dalleau wrote:
-> ---
->  Makefile.tools     |   12 +-
->  emulator/btdev.c   |   32 ++++
->  tools/sco-tester.c |  541 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 584 insertions(+), 1 deletion(-)
->  create mode 100644 tools/sco-tester.c
+Le 08/07/2013 21:23, Marcel Holtmann a écrit :
+> Hi Fred,
+> before we do the fallback handling, lets get the basic CVSD vs transparent work done properly. The one thing that I am missing is the handling of SCO/eSCO setup error handling. Like say when using connect() and we try to establish transparent link where not available. Or accept() with defer setup and the transparent link does not work out.
+>
+> The fallback handling can be a separate patch once the others are all in a mergable state.
 
-Could you please split the emulator update to a separate patch that
-comes before the first sco-tester patch?
+AFAIR if Accept Synchronous Connection does not specify a compatible
+voice setting, Synchronous Connection Complete will return error
+2.13 INVALID HCI COMMAND PARAMETERS (0x12).
+Setup Synchronous Connection also returns error in Synchronous 
+Connection Complete.
 
-Johan
+This is the reason why it is negociated before in profile.
+
+Regards,
+Fred
