@@ -1,43 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] core: Use proper header for S_IRUSR/S_IWUSR
-Date: Tue, 9 Jul 2013 09:40:00 +0200
-Message-ID: <1373355600-12674-1-git-send-email-szymon.janc@tieto.com>
+Date: Tue, 9 Jul 2013 15:40:39 +0800
+From: Adam Lee <adam.lee@canonical.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Wen-chien Jesse Sung <jesse.sung@canonical.com>,
+	AceLan Kao <acelan.kao@canonical.com>,
+	Tedd Ho-Jeong An <tedd.an@intel.com>,
+	Anthony Wong <anthony.wong@canonical.com>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] btusb: fix overflow return values
+Message-ID: <20130709074039.GA25268@adam-laptop>
+References: <1372941783-30657-1-git-send-email-adam.lee@canonical.com>
+ <25CD2206-7B7B-4DAD-A714-A79976C9DB13@holtmann.org>
+ <20130709025501.GA6369@adam-laptop>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130709025501.GA6369@adam-laptop>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-According to open() manual one should include <sys/stat.h>.
-This fix build with bionic library:
+On Tue, Jul 09, 2013 at 10:55:01AM +0800, Adam Lee wrote:
+> On Mon, Jul 08, 2013 at 11:50:54AM -0700, Marcel Holtmann wrote:
+> > Hi Adam,
+> > 
+> > > PTR_ERR() returns a long type value, but btusb_setup_intel() and
+> > > btusb_setup_intel_patching() should return an int type value.
+> > > 
+> > > This bug makes the judgement "if (ret < 0)" not working on x86_64
+> > > architecture systems, leading to failure as below, even panic.
+> > > ...
+> > > For not affecting other modules, I choose to modify the return values
+> > > but not extend btusb_setup_intel() and btusb_setup_intel_patching()'s
+> > > return types. This is harmless, because the return values were only
+> > > used to comparing number 0.
+> > 
+> > there are tons of examples in various subsystems and drivers where we
+> > return PTR_ERR from a function calls returning int.
+> > 
+> > So I wonder what is actually going wrong here. If this is x86_64
+> > specific problem with PTR_ERR vs int, then we should have this problem
+> > everywhere in the kernel.
+> 
+> Hi, Marcel
+> 
+> I see you point, the difference between here and other subsystems are:
+> 
+> 1, it returns -PTR_ERR() here but all other places return PTR_ERR(), I
+> checked.
+> 2, the judgement is "if (ret < 0)" here but other places are "if (ret)".
+> 
+> I'm not saying other subsystems are 100% right, but here, returning
+> -PTR_ERR() and checking "if (ret < 0)" make the judgement broken much
+> much more easily.
+> 
+> I attached a testing C file, run it on x86_64, you will see the bug.
+> 
+> PS, about other subsystems, I also think returning PTR_ERR() from a
+> function calls returning int considered harmful sometimes, will talk
+> about that in other thread.
 
-target thumb C: libbluetoothd <= external/bluetooth/bluez/src/attrib-server.c
-external/bluetooth/bluez/src/attrib-server.c: In function 'write_value':
-external/bluetooth/bluez/src/attrib-server.c:922:26: error: 'S_IRUSR'
-	 undeclared (first use in this function)
-external/bluetooth/bluez/src/attrib-server.c:922:26: note: each undeclared
-	identifier is reported only once for each function it appears in
-external/bluetooth/bluez/src/attrib-server.c:922:36: error: 'S_IWUSR'
-	undeclared (first use in this function)
----
- src/attrib-server.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi, all
 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index e5e3030..93f03b3 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -32,7 +32,7 @@
- #include <string.h>
- #include <unistd.h>
- #include <glib.h>
--#include <sys/file.h>
-+#include <sys/stat.h>
- 
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/sdp.h>
+After diving into the err.h, I realized this patch contains some
+modifications which are actually not necessary. Will submit a v2
+version and explain.
+
+PS, other subsystems are using it right, this not.
+
 -- 
-1.8.3.2
-
+Regards,
+Adam Lee
+Hardware Enablement
