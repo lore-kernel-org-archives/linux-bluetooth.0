@@ -1,85 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1372060588-4595-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1372060588-4595-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Date: Wed, 10 Jul 2013 11:56:02 +0300
-Message-ID: <CABBYNZLG0CW8hZTd=T292nSwAvo4rUGHN7Vq7RfYQNvKmqwJ6A@mail.gmail.com>
-Subject: Re: [RFC 0/1] MAP Notification API
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1373445561.4594.21.camel@smarty>
+Subject: Re: [PATCH 1/2] Fix tty refcounting in rfcomm/tty.c
+From: Mathias Hasselmann <mathias.hasselmann@kdab.com>
+To: Dean Jenkins <Dean_Jenkins@mentor.com>
+Cc: Gianluca Anzolin <gianluca@sottospazio.it>, marcel@holtmann.org,
+	gustavo@padovan.org, linux-bluetooth@vger.kernel.org
+Date: Wed, 10 Jul 2013 10:39:21 +0200
+In-Reply-To: <51DD1897.5020408@mentor.com>
+References: <20130709170502.GA32765@debian.seek.priv>
+	 <51DD1897.5020408@mentor.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+Am Mittwoch, den 10.07.2013, 09:17 +0100 schrieb Dean Jenkins:
+> Hi Gianluca,
+> 
+> On 09/07/13 18:05, Gianluca Anzolin wrote:
+> > In net/bluetooth/rfcomm/tty.c the struct tty is used without proper
+> > refcounting. This leads to OOPS and panics triggered by the tty layer functions
+> > which are invoked after the struct tty has already been destroyed.
+> >
+> > This happens for example when the bluetooth connection is lost because the host
+> > goes down unexpectedly.
+> >
+> > The fix uses the tty_port_* helpers already in place.
+> >
+> > This patch depends on patch "Fix refcount leak in tty_port.c" already sent to
+> > linux-kernel. [0]
+> >
+> > Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
+> >
+> > [0] http://lkml.indiana.edu/hypermail/linux/kernel/1307.1/00600.html
+> >
+> 
+> Do you have any backtraces of the OOPS and panics ?
+> 
+> In which kernel did you discover the failure ?
+> 
+> What platform were you using, I mean x86, ARM or something else ?
+> 
+> Is this failure easy to reproduce ?
 
-On Mon, Jun 24, 2013 at 10:56 AM, Christian Fetzer
-<christian.fetzer@oss.bmw-carit.de> wrote:
-> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
->
-> Now that the MAP MNS support is progressing, I'd like to start the discussion
-> on how the MAP event reports should be signaled in the D-Bus API.
->
-> I've listed therefore the 9 different event types and the parameters that we
-> get from the remote device, together with a proposal on how the API could look
-> like.
->
->
-> Prerequisite:
->
-> The current existing MAP client relies on the fact that the application tracks
-> the folder a message belongs to. Since notifications can be received for any
-> folder, it would make sense to remove this restriction and provide a 'Folder'
-> property for the Message interface. This is needed for the NewMessage,
-> MessageDeleted, and MessageShift event.
->
->
-> Events:
->
-> NewMessage(handle, folder, msg_type):
->   - New messages can be signaled by registering a corresponding Message
->     interface, that would be announced using the ObjectManager.
->   - Since we do not get any meta data, it would make sense to implicitly query
->     this information using GetMessagesListing with MaxListCount=1.
->     That way, the application would not have to query this data explicitly and
->     we would not expose an empty message with no properties set.
+Just setup a RFCOMM tty and then violently break the link, by killing
+the rfcomm tool, by plugging the bt adapter, by turning off one
+peer, ... As soon as timeouts occur on the still running side you'll get
+the panic. Almost 100% reproducible.
 
-Sound good to me.
-
-> DeliverySuccess,SendingSuccess,DeliveryFailure,
-> SendingFailure(handle, folder, msg_type):
->   - This events are only relevant when sending messages (PushMessage).
->     Therefore, I'd suggest to register the Message interface already in
->     PushMessage for the outgoing message and add a SendingStatus property
->     when we receive this events.
-
-I wonder how this is actually implemented, is there a NewMessage event
-when using PushMessage? If yes does it indicates Sent flag or we
-should listen to this event and notified when it is sent, anyway the
-event doesn't give us detailed error so perhaps we could just set
-Status to error or something like that, adding another status would be
-confusing IMO.
-
-> MemoryFull, MemoryAvailable():
->   - Add MemoryAvailable property in MessageAccess interface.
-
-It is not very clear how we would use this? Do you actually have any
-stack generating these events? Anyway we could also handle it
-internally and do not send any data upon receiving MemoryFull, anyway
-lets think about it latter.
-
-> MessageDeleted(handle, folder, msg_type),
-> MessageShift(handle, folder, old_folder, msg_type):
->   - If the message was moved into the current folder, we can register its
->     Message interface.
->   - If we don't have its interface yet and it was not moved into the current
->     folder, we could ignore the event.
->   - If we have the Message interface, we simply update property 'Folder'.
-
-Sounds good.
-
-
-
---
-Luiz Augusto von Dentz
+Ciao,
+Mathias
+-- 
+Mathias Hasselmann | mathias.hasselmann@kdab.com | Software Engineer
+KDAB (Deutschland) GmbH&Co KG, a KDAB Group company
+Tel. Germany +49-30-521325470, Sweden (HQ) +46-563-540090
+KDAB - Qt Experts - Platform-independent software solutions
