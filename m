@@ -1,84 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 10 Jul 2013 11:37:24 +0200
+From: Gianluca Anzolin <gianluca@sottospazio.it>
+To: Dean Jenkins <Dean_Jenkins@mentor.com>
+Cc: marcel@holtmann.org, gustavo@padovan.org,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Fix tty refcounting in rfcomm/tty.c
+Message-ID: <20130710093724.GA8829@debian.seek.priv>
+References: <20130709170502.GA32765@debian.seek.priv>
+ <51DD1897.5020408@mentor.com>
 MIME-Version: 1.0
-In-Reply-To: <1373380758-16489-3-git-send-email-luiz.dentz@gmail.com>
-References: <1373380758-16489-1-git-send-email-luiz.dentz@gmail.com>
-	<1373380758-16489-3-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 10 Jul 2013 13:00:24 +0300
-Message-ID: <CABBYNZLywe4UyQgiab81bdZPBVAvLdo+cFjrKFCGYAEw4Zf8NQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3 v2] core/service: Rename service_shutdown to service_remove
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <51DD1897.5020408@mentor.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Wed, Jul 10, 2013 at 09:17:27AM +0100, Dean Jenkins wrote:
+> Hi Gianluca,
+> 
+> On 09/07/13 18:05, Gianluca Anzolin wrote:
+> >In net/bluetooth/rfcomm/tty.c the struct tty is used without proper
+> >refcounting. This leads to OOPS and panics triggered by the tty layer functions
+> >which are invoked after the struct tty has already been destroyed.
+> >
+> >This happens for example when the bluetooth connection is lost because the host
+> >goes down unexpectedly.
+> >
+> >The fix uses the tty_port_* helpers already in place.
+> >
+> >This patch depends on patch "Fix refcount leak in tty_port.c" already sent to
+> >linux-kernel. [0]
+> >
+> >Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
+> >
+> >[0] http://lkml.indiana.edu/hypermail/linux/kernel/1307.1/00600.html
+> >
+> 
+> Do you have any backtraces of the OOPS and panics ?
 
-On Tue, Jul 9, 2013 at 5:38 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This rename service_shutdown to service_remove to make it more similar to
-> other internal APIs such as device_remove which only do object
-> cleanup/free and do not have any disconnect logic.
-> ---
->  src/device.c  | 3 +--
->  src/service.c | 3 ++-
->  src/service.h | 2 +-
->  3 files changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/src/device.c b/src/device.c
-> index edd377c..afb0cfc 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -967,9 +967,8 @@ static void remove_service(gpointer data)
->         struct btd_service *service = data;
->         struct btd_device *device = btd_service_get_device(service);
->
-> -       service_shutdown(service);
->         device->pending = g_slist_remove(device->pending, service);
-> -       btd_service_unref(service);
-> +       service_remove(service);
->  }
->
->  static gboolean do_disconnect(gpointer user_data)
-> diff --git a/src/service.c b/src/service.c
-> index 83e1c1a..52a8291 100644
-> --- a/src/service.c
-> +++ b/src/service.c
-> @@ -168,12 +168,13 @@ int service_probe(struct btd_service *service)
->         return err;
->  }
->
-> -void service_shutdown(struct btd_service *service)
-> +void service_remove(struct btd_service *service)
->  {
->         change_state(service, BTD_SERVICE_STATE_UNAVAILABLE, 0);
->         service->profile->device_remove(service);
->         service->device = NULL;
->         service->profile = NULL;
-> +       btd_service_unref(service);
->  }
->
->  int btd_service_connect(struct btd_service *service)
-> diff --git a/src/service.h b/src/service.h
-> index 6ee8f17..5230115 100644
-> --- a/src/service.h
-> +++ b/src/service.h
-> @@ -46,7 +46,7 @@ struct btd_service *service_create(struct btd_device *device,
->                                                 struct btd_profile *profile);
->
->  int service_probe(struct btd_service *service);
-> -void service_shutdown(struct btd_service *service);
-> +void service_remove(struct btd_service *service);
->
->  /* Connection control API */
->  int btd_service_connect(struct btd_service *service);
-> --
-> 1.8.1.4
+Not at hand because when they happen I can't even sync to disk. I could take a
+picture however maybe this evening.
 
-These 3 patches are now pushed.
+> 
+> In which kernel did you discover the failure ?
 
+Linux kernel 3.10, but I see the issue is reproducible also on 3.9 because
+other people reported it a while ago: have a look at this thread
 
---
-Luiz Augusto von Dentz
+http://marc.info/?t=136868685500006&r=1&w=2
+
+Unfortunately that discussion died without results so I gave a look at the
+code: the tty struct we were using died under us because it was missing
+proper refcounting. So I fixed that problem with the first patch.
+
+Then it turned out that also the tty_port structure didn't work as expected and
+was destroyed while being used: the code manually checked for port.count
+instead of relying on proper refcounting. That's what the 2nd patch is for.
+
+It had a look at usb-serial.c and changed the code to mimic that behaviour. It
+works for me reliably now, however it's better if someone with more knowledge
+gives the patches a look.
+
+> 
+> What platform were you using, I mean x86, ARM or something else ?
+> 
+> Is this failure easy to reproduce ?
+
+I'm seeing this on a x86_64 xeon cpu. It's very easy to reproduce, all you need
+to do is to power off the bluetooth host you're communicating to while reading
+from the tty device with some program, I use picocom for instance.
+
+But the current code fails in many other ways: removing the device or releasing
+the tty port with the port open for example.
+
+> 
+> Did you use Bluez userland to control Bluetooth ?
+
+I'm using the bluez4 packages of ARCH linux:
+
+blueman 1.23-10
+bluez-libs 5.7-1
+bluez-utils 5.7-1
+bluez4 4.101-3
+
+> 
+> In the failure case, what protocol or application was bound to the
+> RFCOMM TTY ? I mean was it SLIP, minicom or something else ?
+> 
+
+I was using picocom: picocom /dev/rfcomm0
+
+> Thanks,
+> 
+> Regards,
+> Dean Jenkins
+> Mentor Graphics
+
+Thank you for your reply :D
+
+Gianluca
