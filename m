@@ -1,65 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 10 Jul 2013 11:28:03 +0100
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Adam Lee <adam8157@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-	Wen-chien Jesse Sung <jesse.sung@canonical.com>,
-	AceLan Kao <acelan.kao@canonical.com>,
-	Tedd Ho-Jeong An <tedd.an@intel.com>,
-	Anthony Wong <anthony.wong@canonical.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3] btusb: fix wrong use of PTR_ERR()
-Message-ID: <20130710102803.GA2952@joana>
-References: <20130709153213.GC1772@joana>
- <20130710020212.GA16015@adam-laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130710020212.GA16015@adam-laptop>
+In-Reply-To: <1373380758-16489-3-git-send-email-luiz.dentz@gmail.com>
+References: <1373380758-16489-1-git-send-email-luiz.dentz@gmail.com>
+	<1373380758-16489-3-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 10 Jul 2013 13:00:24 +0300
+Message-ID: <CABBYNZLywe4UyQgiab81bdZPBVAvLdo+cFjrKFCGYAEw4Zf8NQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/3 v2] core/service: Rename service_shutdown to service_remove
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Adam,
+Hi,
 
-* Adam Lee <adam8157@gmail.com> [2013-07-10 10:02:12 +0800]:
-
-> PTR_ERR() returns a signed long type value which is limited by IS_ERR(),
-> it must be a negative number whose range is [-MAX_ERRNO, 0).
-> 
-> The bug here returns negative numbers as error codes, then check it by
-> "if (ret < 0)", but -PTR_ERR() is actually positive. The wrong use here
-> leads to failure as below, even panic.
-> 
-> [   12.958920] Bluetooth: hci0 command 0xfc8e tx timeout
-> [   14.961765] Bluetooth: hci0 command 0xfc8e tx timeout
-> [   16.964688] Bluetooth: hci0 command 0xfc8e tx timeout
-> [   20.954501] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
-> [   22.957358] Bluetooth: hci0 command 0xfc8e tx timeout
-> [   30.948922] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
-> [   32.951780] Bluetooth: hci0 command 0xfc8e tx timeout
-> [   40.943359] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
-> [   42.946219] Bluetooth: hci0 command 0xfc8e tx timeout
-> [   50.937812] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
-> [   52.940670] Bluetooth: hci0 command 0xfc8e tx timeout
-> [   60.932236] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
-> [   62.935092] Bluetooth: hci0 command 0xfc8e tx timeout
-> [   70.926688] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
-> [   72.929545] Bluetooth: hci0 command 0xfc8e tx timeout
-> [   80.921111] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
-> [   82.923969] Bluetooth: hci0 command 0xfc2f tx timeout
-> [   90.915542] Bluetooth: hci0 sending Intel patch command (0xfc2f) failed (-110)
-> [   92.918406] Bluetooth: hci0 command 0xfc11 tx timeout
-> [  100.909955] Bluetooth: hci0 sending Intel patch command (0xfc11) failed (-110)
-> [  102.912858] Bluetooth: hci0 command 0xfc60 tx timeout
-> [  110.904394] Bluetooth: hci0 sending Intel patch command (0xfc60) failed (-110)
-> [  112.907293] Bluetooth: hci0 command 0xfc11 tx timeout
-> [  120.898831] Bluetooth: hci0 exiting Intel manufacturer mode failed (-110)
-> [  120.904757] bluetoothd[1030]: segfault at 4 ip 00007f8b2eb55236 sp 00007fff53ff6920 error 4 in bluetoothd[7f8b2eaff000+cb000]
-> 
-> Signed-off-by: Adam Lee <adam.lee@canonical.com>
+On Tue, Jul 9, 2013 at 5:38 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This rename service_shutdown to service_remove to make it more similar to
+> other internal APIs such as device_remove which only do object
+> cleanup/free and do not have any disconnect logic.
 > ---
->  drivers/bluetooth/btusb.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
+>  src/device.c  | 3 +--
+>  src/service.c | 3 ++-
+>  src/service.h | 2 +-
+>  3 files changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/src/device.c b/src/device.c
+> index edd377c..afb0cfc 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -967,9 +967,8 @@ static void remove_service(gpointer data)
+>         struct btd_service *service = data;
+>         struct btd_device *device = btd_service_get_device(service);
+>
+> -       service_shutdown(service);
+>         device->pending = g_slist_remove(device->pending, service);
+> -       btd_service_unref(service);
+> +       service_remove(service);
+>  }
+>
+>  static gboolean do_disconnect(gpointer user_data)
+> diff --git a/src/service.c b/src/service.c
+> index 83e1c1a..52a8291 100644
+> --- a/src/service.c
+> +++ b/src/service.c
+> @@ -168,12 +168,13 @@ int service_probe(struct btd_service *service)
+>         return err;
+>  }
+>
+> -void service_shutdown(struct btd_service *service)
+> +void service_remove(struct btd_service *service)
+>  {
+>         change_state(service, BTD_SERVICE_STATE_UNAVAILABLE, 0);
+>         service->profile->device_remove(service);
+>         service->device = NULL;
+>         service->profile = NULL;
+> +       btd_service_unref(service);
+>  }
+>
+>  int btd_service_connect(struct btd_service *service)
+> diff --git a/src/service.h b/src/service.h
+> index 6ee8f17..5230115 100644
+> --- a/src/service.h
+> +++ b/src/service.h
+> @@ -46,7 +46,7 @@ struct btd_service *service_create(struct btd_device *device,
+>                                                 struct btd_profile *profile);
+>
+>  int service_probe(struct btd_service *service);
+> -void service_shutdown(struct btd_service *service);
+> +void service_remove(struct btd_service *service);
+>
+>  /* Connection control API */
+>  int btd_service_connect(struct btd_service *service);
+> --
+> 1.8.1.4
 
-Patch has been applied to bluetooth.git. Thanks.
+These 3 patches are now pushed.
 
-	Gustavo
+
+--
+Luiz Augusto von Dentz
