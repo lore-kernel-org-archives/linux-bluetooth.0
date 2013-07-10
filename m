@@ -1,53 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <51DD1897.5020408@mentor.com>
-Date: Wed, 10 Jul 2013 09:17:27 +0100
-From: Dean Jenkins <Dean_Jenkins@mentor.com>
+Date: Wed, 10 Jul 2013 10:02:12 +0800
+From: Adam Lee <adam8157@gmail.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+	Wen-chien Jesse Sung <jesse.sung@canonical.com>,
+	AceLan Kao <acelan.kao@canonical.com>,
+	Tedd Ho-Jeong An <tedd.an@intel.com>,
+	Anthony Wong <anthony.wong@canonical.com>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: [PATCH v3] btusb: fix wrong use of PTR_ERR()
+Message-ID: <20130710020212.GA16015@adam-laptop>
 MIME-Version: 1.0
-To: Gianluca Anzolin <gianluca@sottospazio.it>
-CC: marcel@holtmann.org, gustavo@padovan.org,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Fix tty refcounting in rfcomm/tty.c
-References: <20130709170502.GA32765@debian.seek.priv>
-In-Reply-To: <20130709170502.GA32765@debian.seek.priv>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130709153213.GC1772@joana>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gianluca,
+PTR_ERR() returns a signed long type value which is limited by IS_ERR(),
+it must be a negative number whose range is [-MAX_ERRNO, 0).
 
-On 09/07/13 18:05, Gianluca Anzolin wrote:
-> In net/bluetooth/rfcomm/tty.c the struct tty is used without proper
-> refcounting. This leads to OOPS and panics triggered by the tty layer functions
-> which are invoked after the struct tty has already been destroyed.
->
-> This happens for example when the bluetooth connection is lost because the host
-> goes down unexpectedly.
->
-> The fix uses the tty_port_* helpers already in place.
->
-> This patch depends on patch "Fix refcount leak in tty_port.c" already sent to
-> linux-kernel. [0]
->
-> Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
->
-> [0] http://lkml.indiana.edu/hypermail/linux/kernel/1307.1/00600.html
->
+The bug here returns negative numbers as error codes, then check it by
+"if (ret < 0)", but -PTR_ERR() is actually positive. The wrong use here
+leads to failure as below, even panic.
 
-Do you have any backtraces of the OOPS and panics ?
+[   12.958920] Bluetooth: hci0 command 0xfc8e tx timeout
+[   14.961765] Bluetooth: hci0 command 0xfc8e tx timeout
+[   16.964688] Bluetooth: hci0 command 0xfc8e tx timeout
+[   20.954501] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
+[   22.957358] Bluetooth: hci0 command 0xfc8e tx timeout
+[   30.948922] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
+[   32.951780] Bluetooth: hci0 command 0xfc8e tx timeout
+[   40.943359] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
+[   42.946219] Bluetooth: hci0 command 0xfc8e tx timeout
+[   50.937812] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
+[   52.940670] Bluetooth: hci0 command 0xfc8e tx timeout
+[   60.932236] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
+[   62.935092] Bluetooth: hci0 command 0xfc8e tx timeout
+[   70.926688] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
+[   72.929545] Bluetooth: hci0 command 0xfc8e tx timeout
+[   80.921111] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
+[   82.923969] Bluetooth: hci0 command 0xfc2f tx timeout
+[   90.915542] Bluetooth: hci0 sending Intel patch command (0xfc2f) failed (-110)
+[   92.918406] Bluetooth: hci0 command 0xfc11 tx timeout
+[  100.909955] Bluetooth: hci0 sending Intel patch command (0xfc11) failed (-110)
+[  102.912858] Bluetooth: hci0 command 0xfc60 tx timeout
+[  110.904394] Bluetooth: hci0 sending Intel patch command (0xfc60) failed (-110)
+[  112.907293] Bluetooth: hci0 command 0xfc11 tx timeout
+[  120.898831] Bluetooth: hci0 exiting Intel manufacturer mode failed (-110)
+[  120.904757] bluetoothd[1030]: segfault at 4 ip 00007f8b2eb55236 sp 00007fff53ff6920 error 4 in bluetoothd[7f8b2eaff000+cb000]
 
-In which kernel did you discover the failure ?
+Signed-off-by: Adam Lee <adam.lee@canonical.com>
+---
+ drivers/bluetooth/btusb.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-What platform were you using, I mean x86, ARM or something else ?
-
-Is this failure easy to reproduce ?
-
-Did you use Bluez userland to control Bluetooth ?
-
-In the failure case, what protocol or application was bound to the 
-RFCOMM TTY ? I mean was it SLIP, minicom or something else ?
-
-Thanks,
-
-Regards,
-Dean Jenkins
-Mentor Graphics
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 7a7e5f8..23df968 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -1092,7 +1092,7 @@ static int btusb_setup_intel_patching(struct hci_dev *hdev,
+ 	if (IS_ERR(skb)) {
+ 		BT_ERR("%s sending Intel patch command (0x%4.4x) failed (%ld)",
+ 		       hdev->name, cmd->opcode, PTR_ERR(skb));
+-		return -PTR_ERR(skb);
++		return PTR_ERR(skb);
+ 	}
+ 
+ 	/* It ensures that the returned event matches the event data read from
+@@ -1144,7 +1144,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+ 	if (IS_ERR(skb)) {
+ 		BT_ERR("%s sending initial HCI reset command failed (%ld)",
+ 		       hdev->name, PTR_ERR(skb));
+-		return -PTR_ERR(skb);
++		return PTR_ERR(skb);
+ 	}
+ 	kfree_skb(skb);
+ 
+@@ -1158,7 +1158,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+ 	if (IS_ERR(skb)) {
+ 		BT_ERR("%s reading Intel fw version command failed (%ld)",
+ 		       hdev->name, PTR_ERR(skb));
+-		return -PTR_ERR(skb);
++		return PTR_ERR(skb);
+ 	}
+ 
+ 	if (skb->len != sizeof(*ver)) {
+@@ -1216,7 +1216,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+ 		BT_ERR("%s entering Intel manufacturer mode failed (%ld)",
+ 		       hdev->name, PTR_ERR(skb));
+ 		release_firmware(fw);
+-		return -PTR_ERR(skb);
++		return PTR_ERR(skb);
+ 	}
+ 
+ 	if (skb->data[0]) {
+@@ -1273,7 +1273,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+ 	if (IS_ERR(skb)) {
+ 		BT_ERR("%s exiting Intel manufacturer mode failed (%ld)",
+ 		       hdev->name, PTR_ERR(skb));
+-		return -PTR_ERR(skb);
++		return PTR_ERR(skb);
+ 	}
+ 	kfree_skb(skb);
+ 
+@@ -1289,7 +1289,7 @@ exit_mfg_disable:
+ 	if (IS_ERR(skb)) {
+ 		BT_ERR("%s exiting Intel manufacturer mode failed (%ld)",
+ 		       hdev->name, PTR_ERR(skb));
+-		return -PTR_ERR(skb);
++		return PTR_ERR(skb);
+ 	}
+ 	kfree_skb(skb);
+ 
+@@ -1307,7 +1307,7 @@ exit_mfg_deactivate:
+ 	if (IS_ERR(skb)) {
+ 		BT_ERR("%s exiting Intel manufacturer mode failed (%ld)",
+ 		       hdev->name, PTR_ERR(skb));
+-		return -PTR_ERR(skb);
++		return PTR_ERR(skb);
+ 	}
+ 	kfree_skb(skb);
+ 
+-- 
+1.8.3.2
