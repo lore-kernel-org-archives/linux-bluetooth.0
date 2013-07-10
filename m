@@ -1,29 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 10 Jul 2013 12:43:10 +0200
-From: Gianluca Anzolin <gianluca@sottospazio.it>
-To: Dean Jenkins <Dean_Jenkins@mentor.com>
-Cc: marcel@holtmann.org, gustavo@padovan.org,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Fix tty refcounting in rfcomm/tty.c
-Message-ID: <20130710104310.GA9365@debian.seek.priv>
-References: <20130709170502.GA32765@debian.seek.priv>
- <51DD1897.5020408@mentor.com>
- <20130710093724.GA8829@debian.seek.priv>
+Date: Wed, 10 Jul 2013 11:28:03 +0100
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Adam Lee <adam8157@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+	Wen-chien Jesse Sung <jesse.sung@canonical.com>,
+	AceLan Kao <acelan.kao@canonical.com>,
+	Tedd Ho-Jeong An <tedd.an@intel.com>,
+	Anthony Wong <anthony.wong@canonical.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3] btusb: fix wrong use of PTR_ERR()
+Message-ID: <20130710102803.GA2952@joana>
+References: <20130709153213.GC1772@joana>
+ <20130710020212.GA16015@adam-laptop>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130710093724.GA8829@debian.seek.priv>
+In-Reply-To: <20130710020212.GA16015@adam-laptop>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Jul 10, 2013 at 11:37:24AM +0200, Gianluca Anzolin wrote:
-> Linux kernel 3.10, but I see the issue is reproducible also on 3.9 because
-> other people reported it a while ago: have a look at this thread
+Hi Adam,
+
+* Adam Lee <adam8157@gmail.com> [2013-07-10 10:02:12 +0800]:
+
+> PTR_ERR() returns a signed long type value which is limited by IS_ERR(),
+> it must be a negative number whose range is [-MAX_ERRNO, 0).
 > 
-> http://marc.info/?t=136868685500006&r=1&w=2
+> The bug here returns negative numbers as error codes, then check it by
+> "if (ret < 0)", but -PTR_ERR() is actually positive. The wrong use here
+> leads to failure as below, even panic.
+> 
+> [   12.958920] Bluetooth: hci0 command 0xfc8e tx timeout
+> [   14.961765] Bluetooth: hci0 command 0xfc8e tx timeout
+> [   16.964688] Bluetooth: hci0 command 0xfc8e tx timeout
+> [   20.954501] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
+> [   22.957358] Bluetooth: hci0 command 0xfc8e tx timeout
+> [   30.948922] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
+> [   32.951780] Bluetooth: hci0 command 0xfc8e tx timeout
+> [   40.943359] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
+> [   42.946219] Bluetooth: hci0 command 0xfc8e tx timeout
+> [   50.937812] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
+> [   52.940670] Bluetooth: hci0 command 0xfc8e tx timeout
+> [   60.932236] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
+> [   62.935092] Bluetooth: hci0 command 0xfc8e tx timeout
+> [   70.926688] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
+> [   72.929545] Bluetooth: hci0 command 0xfc8e tx timeout
+> [   80.921111] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-110)
+> [   82.923969] Bluetooth: hci0 command 0xfc2f tx timeout
+> [   90.915542] Bluetooth: hci0 sending Intel patch command (0xfc2f) failed (-110)
+> [   92.918406] Bluetooth: hci0 command 0xfc11 tx timeout
+> [  100.909955] Bluetooth: hci0 sending Intel patch command (0xfc11) failed (-110)
+> [  102.912858] Bluetooth: hci0 command 0xfc60 tx timeout
+> [  110.904394] Bluetooth: hci0 sending Intel patch command (0xfc60) failed (-110)
+> [  112.907293] Bluetooth: hci0 command 0xfc11 tx timeout
+> [  120.898831] Bluetooth: hci0 exiting Intel manufacturer mode failed (-110)
+> [  120.904757] bluetoothd[1030]: segfault at 4 ip 00007f8b2eb55236 sp 00007fff53ff6920 error 4 in bluetoothd[7f8b2eaff000+cb000]
+> 
+> Signed-off-by: Adam Lee <adam.lee@canonical.com>
+> ---
+>  drivers/bluetooth/btusb.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
 
-Oh wait, it seems you were already aware of this issue, since you were part of
-that discussion too...
+Patch has been applied to bluetooth.git. Thanks.
 
-Sorry if I didn't CC you directly when I sent the patches.
-
-Ciao,
-Gianluca
+	Gustavo
