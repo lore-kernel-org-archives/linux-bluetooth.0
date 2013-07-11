@@ -1,119 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-From: Frederic Danis <frederic.danis@linux.intel.com>
+From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] sdpd: Remove redundant include
-Date: Thu, 11 Jul 2013 14:37:28 +0200
-Message-Id: <1373546248-21018-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+Cc: sedat.dilek@gmail.com,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: [PATCH -v2] Bluetooth: Fix race between hci_register_dev() and hci_dev_open()
+Date: Thu, 11 Jul 2013 13:03:56 +0100
+Message-Id: <1373544236-9954-1-git-send-email-gustavo@padovan.org>
+In-Reply-To: <CA+icZUU8Xin-UapmBObQPt7kidek4GZusV1+fqYBMtvfoKKcmQ@mail.gmail.com>
+References: <CA+icZUU8Xin-UapmBObQPt7kidek4GZusV1+fqYBMtvfoKKcmQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/sdpd-database.c |    4 ----
- src/sdpd-request.c  |    5 -----
- src/sdpd-server.c   |    3 ---
- src/sdpd-service.c  |    7 -------
- 4 files changed, 19 deletions(-)
+From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-diff --git a/src/sdpd-database.c b/src/sdpd-database.c
-index ad896a4..cf33f19 100644
---- a/src/sdpd-database.c
-+++ b/src/sdpd-database.c
-@@ -28,13 +28,9 @@
- #include <config.h>
- #endif
+If hci_dev_open() is called after hci_register_dev() added the device to
+the hci_dev_list but before the workqueue are created we could run into a
+NULL pointer dereference (see below).
+
+This bug is very unlikely to happen, systems using bluetoothd to
+manage their bluetooth devices will never see this happen.
+
+BUG: unable to handle kernel NULL pointer dereference
+0100
+IP: [<ffffffff81077502>] __queue_work+0x32/0x3d0
+(...)
+Call Trace:
+ [<ffffffff81077be5>] queue_work_on+0x45/0x50
+ [<ffffffffa016e8ff>] hci_req_run+0xbf/0xf0 [bluetooth]
+ [<ffffffffa01709b0>] ? hci_init2_req+0x720/0x720 [bluetooth]
+ [<ffffffffa016ea06>] __hci_req_sync+0xd6/0x1c0 [bluetooth]
+ [<ffffffff8108ee10>] ? try_to_wake_up+0x2b0/0x2b0
+ [<ffffffff8150e3f0>] ? usb_autopm_put_interface+0x30/0x40
+ [<ffffffffa016fad5>] hci_dev_open+0x275/0x2e0 [bluetooth]
+ [<ffffffffa0182752>] hci_sock_ioctl+0x1f2/0x3f0 [bluetooth]
+ [<ffffffff815c6050>] sock_do_ioctl+0x30/0x70
+ [<ffffffff815c75f9>] sock_ioctl+0x79/0x2f0
+ [<ffffffff811a8046>] do_vfs_ioctl+0x96/0x560
+ [<ffffffff811a85a1>] SyS_ioctl+0x91/0xb0
+ [<ffffffff816d989d>] system_call_fastpath+0x1a/0x1f
+
+Reported-by: Sedat Dilek <sedat.dilek@gmail.com>
+Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+---
+ net/bluetooth/hci_core.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index dc34bfa..a77d42e 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2165,10 +2165,6 @@ int hci_register_dev(struct hci_dev *hdev)
  
--#include <stdio.h>
--#include <errno.h>
- #include <stdlib.h>
--#include <sys/socket.h>
+ 	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
  
- #include <bluetooth/bluetooth.h>
--#include <bluetooth/l2cap.h>
- #include <bluetooth/sdp.h>
- #include <bluetooth/sdp_lib.h>
- 
-diff --git a/src/sdpd-request.c b/src/sdpd-request.c
-index 0d5bf25..fbeb488 100644
---- a/src/sdpd-request.c
-+++ b/src/sdpd-request.c
-@@ -28,20 +28,15 @@
- #include <config.h>
- #endif
- 
--#include <stdio.h>
- #include <errno.h>
- #include <stdlib.h>
--#include <string.h>
- #include <limits.h>
--#include <sys/socket.h>
- 
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/l2cap.h>
- #include <bluetooth/sdp.h>
- #include <bluetooth/sdp_lib.h>
- 
--#include <netinet/in.h>
+-	write_lock(&hci_dev_list_lock);
+-	list_add(&hdev->list, &hci_dev_list);
+-	write_unlock(&hci_dev_list_lock);
 -
- #include "sdpd.h"
- #include "log.h"
+ 	hdev->workqueue = alloc_workqueue(hdev->name, WQ_HIGHPRI | WQ_UNBOUND |
+ 					  WQ_MEM_RECLAIM, 1);
+ 	if (!hdev->workqueue) {
+@@ -2204,6 +2200,10 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	if (hdev->dev_type != HCI_AMP)
+ 		set_bit(HCI_AUTO_OFF, &hdev->dev_flags);
  
-diff --git a/src/sdpd-server.c b/src/sdpd-server.c
-index bc96d3c..181d248 100644
---- a/src/sdpd-server.c
-+++ b/src/sdpd-server.c
-@@ -28,12 +28,10 @@
- #include <config.h>
- #endif
++	write_lock(&hci_dev_list_lock);
++	list_add(&hdev->list, &hci_dev_list);
++	write_unlock(&hci_dev_list_lock);
++
+ 	hci_notify(hdev, HCI_DEV_REG);
+ 	hci_dev_hold(hdev);
  
--#include <stdio.h>
- #include <errno.h>
- #include <unistd.h>
- #include <stdlib.h>
- #include <sys/stat.h>
--#include <sys/socket.h>
+@@ -2216,9 +2216,6 @@ err_wqueue:
+ 	destroy_workqueue(hdev->req_workqueue);
+ err:
+ 	ida_simple_remove(&hci_index_ida, hdev->id);
+-	write_lock(&hci_dev_list_lock);
+-	list_del(&hdev->list);
+-	write_unlock(&hci_dev_list_lock);
  
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/l2cap.h>
-@@ -41,7 +39,6 @@
- #include <bluetooth/sdp_lib.h>
- 
- #include <sys/un.h>
--#include <netinet/in.h>
- 
- #include <glib.h>
- 
-diff --git a/src/sdpd-service.c b/src/sdpd-service.c
-index b6b135d..38bf808 100644
---- a/src/sdpd-service.c
-+++ b/src/sdpd-service.c
-@@ -28,26 +28,19 @@
- #include <config.h>
- #endif
- 
--#include <stdio.h>
- #include <errno.h>
- #include <stdlib.h>
- #include <assert.h>
- #include <sys/time.h>
--#include <sys/socket.h>
- 
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/sdp.h>
- #include <bluetooth/sdp_lib.h>
- 
--#include <netinet/in.h>
--
- #include <glib.h>
--#include <dbus/dbus.h>
- 
--#include "hcid.h"
- #include "sdpd.h"
- #include "log.h"
--#include "adapter.h"
- 
- static sdp_record_t *server = NULL;
- static uint32_t fixed_dbts = 0;
+ 	return error;
+ }
 -- 
-1.7.9.5
+1.8.1.4
 
