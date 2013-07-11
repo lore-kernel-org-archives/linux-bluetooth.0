@@ -1,32 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Chen, Kris" <chongc@qca.qualcomm.com>
-To: Ben Hutchings <ben@decadent.org.uk>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] ar3k: add Bluetooth support for QCA98XX/QCA24XX
-Date: Thu, 11 Jul 2013 02:02:10 +0000
-Message-ID: <10D6808D35270940B9D88328A2DA283F16587502@nasanexd01h.na.qualcomm.com>
+Message-ID: <1373503656.24446.40.camel@deadeye.wl.decadent.org.uk>
+Subject: Re: [PATCH] ar3k: add Bluetooth support for QCA98XX/QCA24XX
+From: Ben Hutchings <ben@decadent.org.uk>
+To: Chen Chong <chongc@qca.qualcomm.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 11 Jul 2013 01:47:36 +0100
+In-Reply-To: <1372909240-4407-1-git-send-email-chongc@qca.qualcomm.com>
 References: <1372909240-4407-1-git-send-email-chongc@qca.qualcomm.com>
- <1373503656.24446.40.camel@deadeye.wl.decadent.org.uk>
-In-Reply-To: <1373503656.24446.40.camel@deadeye.wl.decadent.org.uk>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-LQQBlGhLDFIZ5JSBGMOd"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGksIEJlbg0KDQpJIHNhdyBpdCBhcHBsaWVkICx0aGFua3MhICA6KQ0KDQpSZWdhcmRzLA0KQ2hl
-biBDaG9uZyAoS3JpcykNClRlbDogKCs4NikwMjEtMjAzLTY1MjUyDQoNCi0tLS0tT3JpZ2luYWwg
-TWVzc2FnZS0tLS0tDQpGcm9tOiBCZW4gSHV0Y2hpbmdzIFttYWlsdG86YmVuQGRlY2FkZW50Lm9y
-Zy51a10gDQpTZW50OiBUaHVyc2RheSwgSnVseSAxMSwgMjAxMyA4OjQ4IEFNDQpUbzogQ2hlbiwg
-S3Jpcw0KQ2M6IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6IFJlOiBb
-UEFUQ0hdIGFyM2s6IGFkZCBCbHVldG9vdGggc3VwcG9ydCBmb3IgUUNBOThYWC9RQ0EyNFhYDQoN
-Ck9uIFRodSwgMjAxMy0wNy0wNCBhdCAxMTo0MCArMDgwMCwgQ2hlbiBDaG9uZyB3cm90ZToNCj4g
-YWRkIHBhdGNoICYgc3lzY2ZnIGZvciBRdWFsY29tbSBBdGhlcm9zIFFDQTk4WFgvUUNBMjRYWA0K
-PiANCj4gU2lnbmVkLW9mZi1ieTogQ2hlbiBDaG9uZyA8Y2hvbmdjQHFjYS5xdWFsY29tbS5jb20+
-DQo+IC0tLQ0KPiAgV0hFTkNFICAgICAgICAgICAgICAgICAgICAgICB8ICAgIDIgKysNCj4gIGFy
-M2svQXRockJUXzB4NDEwMjAwMDAuZGZ1ICAgfCAgQmluIDAgLT4gMzE1MDAgYnl0ZXMNCj4gIGFy
-M2svcmFtcHNfMHg0MTAyMDAwMF80MC5kZnUgfCAgQmluIDAgLT4gMTgyMCBieXRlcw0KPiAgMyBm
-aWxlcyBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKykNCj4gIGNyZWF0ZSBtb2RlIDEwMDc1NSBhcjNr
-L0F0aHJCVF8weDQxMDIwMDAwLmRmdSAgY3JlYXRlIG1vZGUgMTAwNzU1IA0KPiBhcjNrL3JhbXBz
-XzB4NDEwMjAwMDBfNDAuZGZ1DQpbLi4uXQ0KDQpBcHBsaWVkLCB0aGFua3MuDQoNCkJlbi4NCg0K
-LS0NCkJlbiBIdXRjaGluZ3MNClJlYWxpdHkgaXMganVzdCBhIGNydXRjaCBmb3IgcGVvcGxlIHdo
-byBjYW4ndCBoYW5kbGUgc2NpZW5jZSBmaWN0aW9uLg0K
+
+--=-LQQBlGhLDFIZ5JSBGMOd
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, 2013-07-04 at 11:40 +0800, Chen Chong wrote:
+> add patch & syscfg for Qualcomm Atheros QCA98XX/QCA24XX
+>=20
+> Signed-off-by: Chen Chong <chongc@qca.qualcomm.com>
+> ---
+>  WHENCE                       |    2 ++
+>  ar3k/AthrBT_0x41020000.dfu   |  Bin 0 -> 31500 bytes
+>  ar3k/ramps_0x41020000_40.dfu |  Bin 0 -> 1820 bytes
+>  3 files changed, 2 insertions(+)
+>  create mode 100755 ar3k/AthrBT_0x41020000.dfu
+>  create mode 100755 ar3k/ramps_0x41020000_40.dfu
+[...]
+
+Applied, thanks.
+
+Ben.
+
+--=20
+Ben Hutchings
+Reality is just a crutch for people who can't handle science fiction.
+
+--=-LQQBlGhLDFIZ5JSBGMOd
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIVAwUAUd4AqOe/yOyVhhEJAQqhuA//bMWGkLopdUYQ2AcdV/KMfTpKijn6Z4fG
+shHHS/OI8Axdsf5QI/53aiBm3HI0y7tUTNHUOKCL1IJrodkHFuT4eigNR3n9wc0x
+3brZhE3ZZFX7hhKHt3AB4vb9h/6n1thPkXVpn0tsx9OpLbh0TIXvGdmQ7fHGfv4U
+zo8A2kQ26G2HAW/6i6AY7L9srqP0nH/IL6QZxxfwaSwwBzaSQzCOYbjOmoSi08EV
+Xl/jfXZMfcJyHUxQLmUdI335vh3OLb3aWBTUi+VS4j1VrBeMcrZC2RcGeHay/V3M
+jMpCHxs8Xyay5kpAGPCERpklkiBQx+MKqzifFG7YD5ZywOSONY+jLDaIoSymzHP/
+aaYjslUVrRjgigfz9Vmlw4BOuJtOWK1o2oQ1KT+MZMxA03LTp1y2rDQo2EdSUuLD
+Q1MQBlWaBiKbODJVoeabsuXcSP3Ezdo/2eudVbcIlN2nHBZAx8lO385f0dcgRZSq
+OBV7VgL/jEEQxVx7ykvLQOTo6McQEuJcblc5rqbFVTtYC4Eu7MsuTYeJXLAF2fEE
+cNjDRyoAnUyVdU6gB9BGPrzW2T+KuFS0F5gJp4rJalTMCxiLj8hOSLpTI2g9nK4x
+g1Ww6d/nuBjwEuoC8eqth+tExt54/3QdGOQ0S3UlaZBKg3z8ISJmcHzfq7fV3OXD
+9+q7b2UoI1s=
+=DD5a
+-----END PGP SIGNATURE-----
+
+--=-LQQBlGhLDFIZ5JSBGMOd--
