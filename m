@@ -1,71 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-From: Benjamin Tissoires <benjamin.tissoires@redhat.com>
-To: Benjamin Tissoires <benjamin.tissoires@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        David Herrmann <dh.herrmann@gmail.com>, Jiri Kosina <jkosina@suse.cz>,
-        linux-bluetooth@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: hidp: implement hidinput_input_event callback
-Date: Thu, 11 Jul 2013 15:41:29 +0200
-Message-Id: <1373550090-30379-2-git-send-email-benjamin.tissoires@redhat.com>
-In-Reply-To: <1373550090-30379-1-git-send-email-benjamin.tissoires@redhat.com>
-References: <1373550090-30379-1-git-send-email-benjamin.tissoires@redhat.com>
+From: Frederic Danis <frederic.danis@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] sdpd: Remove redundant include
+Date: Thu, 11 Jul 2013 14:37:28 +0200
+Message-Id: <1373546248-21018-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We can re-enable hidinput_input_event to allow the leds of bluetooth
-keyboards to be set.
-Now the callbacks uses hid core to retrieve the right HID report to
-send, so this version is safer.
-
-Signed-off-by: Benjamin Tissoires <benjamin.tissoires@redhat.com>
 ---
- net/bluetooth/hidp/core.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ src/sdpd-database.c |    4 ----
+ src/sdpd-request.c  |    5 -----
+ src/sdpd-server.c   |    3 ---
+ src/sdpd-service.c  |    7 -------
+ 4 files changed, 19 deletions(-)
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index f13a8da..9c8b50d 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -238,6 +238,31 @@ static int hidp_send_report(struct hidp_session *session, struct hid_report *rep
- 	return hidp_send_intr_message(session, hdr, buf, rsize);
- }
+diff --git a/src/sdpd-database.c b/src/sdpd-database.c
+index ad896a4..cf33f19 100644
+--- a/src/sdpd-database.c
++++ b/src/sdpd-database.c
+@@ -28,13 +28,9 @@
+ #include <config.h>
+ #endif
  
-+static int hidp_hidinput_event(struct input_dev *dev, unsigned int type,
-+			       unsigned int code, int value)
-+{
-+	struct hid_device *hid = input_get_drvdata(dev);
-+	struct hidp_session *session = hid->driver_data;
-+	struct hid_field *field;
-+	int offset;
-+
-+	BT_DBG("session %p type %d code %d value %d",
-+	       session, type, code, value);
-+
-+	if (type != EV_LED)
-+		return -1;
-+
-+	offset = hidinput_find_field(hid, type, code, &field);
-+	if (offset == -1) {
-+		hid_warn(dev, "event field not found\n");
-+		return -1;
-+	}
-+
-+	hid_set_field(field, offset, value);
-+
-+	return hidp_send_report(session, field->report);
-+}
-+
- static int hidp_get_raw_report(struct hid_device *hid,
- 		unsigned char report_number,
- 		unsigned char *data, size_t count,
-@@ -711,6 +736,7 @@ static struct hid_ll_driver hidp_hid_driver = {
- 	.stop = hidp_stop,
- 	.open  = hidp_open,
- 	.close = hidp_close,
-+	.hidinput_input_event = hidp_hidinput_event,
- };
+-#include <stdio.h>
+-#include <errno.h>
+ #include <stdlib.h>
+-#include <sys/socket.h>
  
- /* This function sets up the hid device. It does not add it
+ #include <bluetooth/bluetooth.h>
+-#include <bluetooth/l2cap.h>
+ #include <bluetooth/sdp.h>
+ #include <bluetooth/sdp_lib.h>
+ 
+diff --git a/src/sdpd-request.c b/src/sdpd-request.c
+index 0d5bf25..fbeb488 100644
+--- a/src/sdpd-request.c
++++ b/src/sdpd-request.c
+@@ -28,20 +28,15 @@
+ #include <config.h>
+ #endif
+ 
+-#include <stdio.h>
+ #include <errno.h>
+ #include <stdlib.h>
+-#include <string.h>
+ #include <limits.h>
+-#include <sys/socket.h>
+ 
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/l2cap.h>
+ #include <bluetooth/sdp.h>
+ #include <bluetooth/sdp_lib.h>
+ 
+-#include <netinet/in.h>
+-
+ #include "sdpd.h"
+ #include "log.h"
+ 
+diff --git a/src/sdpd-server.c b/src/sdpd-server.c
+index bc96d3c..181d248 100644
+--- a/src/sdpd-server.c
++++ b/src/sdpd-server.c
+@@ -28,12 +28,10 @@
+ #include <config.h>
+ #endif
+ 
+-#include <stdio.h>
+ #include <errno.h>
+ #include <unistd.h>
+ #include <stdlib.h>
+ #include <sys/stat.h>
+-#include <sys/socket.h>
+ 
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/l2cap.h>
+@@ -41,7 +39,6 @@
+ #include <bluetooth/sdp_lib.h>
+ 
+ #include <sys/un.h>
+-#include <netinet/in.h>
+ 
+ #include <glib.h>
+ 
+diff --git a/src/sdpd-service.c b/src/sdpd-service.c
+index b6b135d..38bf808 100644
+--- a/src/sdpd-service.c
++++ b/src/sdpd-service.c
+@@ -28,26 +28,19 @@
+ #include <config.h>
+ #endif
+ 
+-#include <stdio.h>
+ #include <errno.h>
+ #include <stdlib.h>
+ #include <assert.h>
+ #include <sys/time.h>
+-#include <sys/socket.h>
+ 
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/sdp.h>
+ #include <bluetooth/sdp_lib.h>
+ 
+-#include <netinet/in.h>
+-
+ #include <glib.h>
+-#include <dbus/dbus.h>
+ 
+-#include "hcid.h"
+ #include "sdpd.h"
+ #include "log.h"
+-#include "adapter.h"
+ 
+ static sdp_record_t *server = NULL;
+ static uint32_t fixed_dbts = 0;
 -- 
-1.8.3.1
+1.7.9.5
+
