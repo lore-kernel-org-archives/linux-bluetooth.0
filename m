@@ -1,27 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 12 Jul 2013 09:56:54 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Frederic Danis <frederic.danis@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] sdpd: Remove redundant include
-Message-ID: <20130712065654.GA6865@x220.p-661hnu-f1>
-References: <1373546248-21018-1-git-send-email-frederic.danis@linux.intel.com>
+Date: Fri, 12 Jul 2013 00:51:12 +0200 (CEST)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+Cc: Benjamin Tissoires <benjamin.tissoires@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	David Herrmann <dh.herrmann@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-input@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: hidp: remove wrong send_report at init
+In-Reply-To: <1373550090-30379-3-git-send-email-benjamin.tissoires@redhat.com>
+Message-ID: <alpine.LNX.2.00.1307120050450.29788@pobox.suse.cz>
+References: <1373550090-30379-1-git-send-email-benjamin.tissoires@redhat.com> <1373550090-30379-3-git-send-email-benjamin.tissoires@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1373546248-21018-1-git-send-email-frederic.danis@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frederic,
+On Thu, 11 Jul 2013, Benjamin Tissoires wrote:
 
-On Thu, Jul 11, 2013, Frederic Danis wrote:
+> The USB hid implementation does retrieve the reports during the start.
+> However, this implementation does not call the HID command GET_REPORT
+> (which would fetch the current status of each report), but use the
+> DATA command, which is an Output Report (so transmitting data from the
+> host to the device).
+> The Wiimote controller is already guarded against this problem in the
+> protocol, but it is not conformant to the specification to set all the
+> reports to 0 on start.
+> 
+> Signed-off-by: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+
+Acked-by: Jiri Kosina <jkosina@suse.cz>
+
+Gustavo, could you please take it through your tree?
+
+Thanks Benjamin, thanks David.
+
 > ---
->  src/sdpd-database.c |    4 ----
->  src/sdpd-request.c  |    5 -----
->  src/sdpd-server.c   |    3 ---
->  src/sdpd-service.c  |    7 -------
->  4 files changed, 19 deletions(-)
+>  net/bluetooth/hidp/core.c | 14 --------------
+>  1 file changed, 14 deletions(-)
+> 
+> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+> index 9c8b50d..59d132a 100644
+> --- a/net/bluetooth/hidp/core.c
+> +++ b/net/bluetooth/hidp/core.c
+> @@ -703,20 +703,6 @@ static int hidp_parse(struct hid_device *hid)
+>  
+>  static int hidp_start(struct hid_device *hid)
+>  {
+> -	struct hidp_session *session = hid->driver_data;
+> -	struct hid_report *report;
+> -
+> -	if (hid->quirks & HID_QUIRK_NO_INIT_REPORTS)
+> -		return 0;
+> -
+> -	list_for_each_entry(report, &hid->report_enum[HID_INPUT_REPORT].
+> -			report_list, list)
+> -		hidp_send_report(session, report);
+> -
+> -	list_for_each_entry(report, &hid->report_enum[HID_FEATURE_REPORT].
+> -			report_list, list)
+> -		hidp_send_report(session, report);
+> -
+>  	return 0;
+>  }
+>  
+> -- 
+> 1.8.3.1
+> 
 
-Applied. Thanks.
-
-Johan
+-- 
+Jiri Kosina
+SUSE Labs
