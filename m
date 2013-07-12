@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Mikel Astiz <mikel.astiz.oss@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC BlueZ v0 03/10] transport: Regroup a2dp-specific members in struct
-Date: Fri, 12 Jul 2013 12:54:36 +0200
-Message-Id: <1373626483-2031-4-git-send-email-mikel.astiz.oss@gmail.com>
+Subject: [RFC BlueZ v0 02/10] media: Add callback to report new endpoints
+Date: Fri, 12 Jul 2013 12:54:35 +0200
+Message-Id: <1373626483-2031-3-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1373626483-2031-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1373626483-2031-1-git-send-email-mikel.astiz.oss@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,198 +12,180 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-Any property accessible in D-Bus should be associated to the transport
-object regardless of its type.
+When a new endpoint gets registered, propagate information to any
+interested user.
 ---
- profiles/audio/transport.c | 65 ++++++++++++++++++++--------------------------
- 1 file changed, 28 insertions(+), 37 deletions(-)
+ profiles/audio/media.c | 80 +++++++++++++++++++++++++++++++++++++++++++++-----
+ profiles/audio/media.h | 10 +++++++
+ 2 files changed, 82 insertions(+), 8 deletions(-)
 
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index f585c3a..9e9efe3 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -79,8 +79,8 @@ struct media_owner {
- 
- struct a2dp_transport {
- 	struct avdtp		*session;
--	uint16_t		delay;
--	uint16_t		volume;
-+	guint			source_watch;
-+	guint			sink_watch;
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index c24ac7d..8fa2fa3 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -60,6 +60,7 @@ struct media_adapter {
+ 	struct btd_adapter	*btd_adapter;
+ 	GSList			*endpoints;	/* Endpoints list */
+ 	GSList			*players;	/* Players list */
++	GSList			*endpoint_register_callbacks;
  };
  
- struct media_transport {
-@@ -93,10 +93,9 @@ struct media_transport {
- 	int			fd;		/* Transport file descriptor */
- 	uint16_t		imtu;		/* Transport input mtu */
- 	uint16_t		omtu;		/* Transport output mtu */
-+	uint16_t		delay;
-+	uint16_t		volume;
- 	transport_state_t	state;
--	guint			hs_watch;
--	guint			source_watch;
--	guint			sink_watch;
- 	guint			(*resume) (struct media_transport *transport,
- 					struct media_owner *owner);
- 	guint			(*suspend) (struct media_transport *transport,
-@@ -167,12 +166,6 @@ void media_transport_destroy(struct media_transport *transport)
- {
- 	char *path;
+ struct endpoint_request {
+@@ -109,8 +110,16 @@ struct media_player {
+ 	bool			control;
+ };
  
--	if (transport->sink_watch)
--		sink_remove_state_cb(transport->sink_watch);
--
--	if (transport->source_watch)
--		source_remove_state_cb(transport->source_watch);
--
- 	path = g_strdup(transport->path);
- 	g_dbus_unregister_interface(btd_get_dbus_connection(), path,
- 						MEDIA_TRANSPORT_INTERFACE);
-@@ -606,18 +599,17 @@ static gboolean get_state(const GDBusPropertyTable *property,
- static gboolean delay_exists(const GDBusPropertyTable *property, void *data)
- {
- 	struct media_transport *transport = data;
--	struct a2dp_transport *a2dp = transport->data;
- 
--	return a2dp->delay != 0;
-+	return transport->delay != 0;
- }
- 
- static gboolean get_delay(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *data)
- {
- 	struct media_transport *transport = data;
--	struct a2dp_transport *a2dp = transport->data;
- 
--	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &a2dp->delay);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
-+							&transport->delay);
- 
- 	return TRUE;
- }
-@@ -625,18 +617,17 @@ static gboolean get_delay(const GDBusPropertyTable *property,
- static gboolean volume_exists(const GDBusPropertyTable *property, void *data)
- {
- 	struct media_transport *transport = data;
--	struct a2dp_transport *a2dp = transport->data;
- 
--	return a2dp->volume <= 127;
-+	return transport->volume <= 127;
- }
- 
- static gboolean get_volume(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *data)
- {
- 	struct media_transport *transport = data;
--	struct a2dp_transport *a2dp = transport->data;
- 
--	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &a2dp->volume);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
-+							&transport->volume);
- 
- 	return TRUE;
- }
-@@ -646,7 +637,6 @@ static void set_volume(const GDBusPropertyTable *property,
- 			void *data)
- {
- 	struct media_transport *transport = data;
--	struct a2dp_transport *a2dp = transport->data;
- 	uint16_t volume;
- 
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16) {
-@@ -665,10 +655,10 @@ static void set_volume(const GDBusPropertyTable *property,
- 		return;
- 	}
- 
--	if (a2dp->volume != volume)
-+	if (transport->volume != volume)
- 		avrcp_set_volume(transport->device, volume);
- 
--	a2dp->volume = volume;
-+	transport->volume = volume;
- 
- 	g_dbus_pending_property_success(id);
- }
-@@ -703,6 +693,12 @@ static void destroy_a2dp(void *data)
- {
- 	struct a2dp_transport *a2dp = data;
- 
-+	if (a2dp->sink_watch)
-+		sink_remove_state_cb(a2dp->sink_watch);
++struct endpoint_register_callback {
++	media_endpoint_register_cb_t cb;
++	void			*user_data;
++	unsigned int		id;
++};
 +
-+	if (a2dp->source_watch)
-+		source_remove_state_cb(a2dp->source_watch);
+ static GSList *adapters = NULL;
+ 
++static struct media_adapter *find_adapter(struct btd_adapter *adapter);
 +
- 	if (a2dp->session)
- 		avdtp_unref(a2dp->session);
- 
-@@ -788,6 +784,7 @@ struct media_transport *media_transport_create(struct audio_device *device,
- 	transport->path = g_strdup_printf("%s/fd%d",
- 				device_get_path(device->btd_dev), fd++);
- 	transport->fd = -1;
-+	transport->volume = -1;
- 
- 	uuid = media_endpoint_get_uuid(endpoint);
- 	if (strcasecmp(uuid, A2DP_SOURCE_UUID) == 0 ||
-@@ -803,14 +800,13 @@ struct media_transport *media_transport_create(struct audio_device *device,
- 		transport->destroy = destroy_a2dp;
- 
- 		if (strcasecmp(uuid, A2DP_SOURCE_UUID) == 0) {
--			a2dp->volume = -1;
--			transport->sink_watch = sink_add_state_cb(device,
-+			a2dp->sink_watch = sink_add_state_cb(device,
- 							sink_state_changed,
- 							transport);
- 		} else {
--			a2dp->volume = 127;
--			avrcp_set_volume(device, a2dp->volume);
--			transport->source_watch = source_add_state_cb(device,
-+			transport->volume = 127;
-+			avrcp_set_volume(device, transport->volume);
-+			a2dp->source_watch = source_add_state_cb(device,
- 							source_state_changed,
- 							transport);
- 		}
-@@ -842,13 +838,11 @@ const char *media_transport_get_path(struct media_transport *transport)
- void media_transport_update_delay(struct media_transport *transport,
- 							uint16_t delay)
+ static void endpoint_request_free(struct endpoint_request *request)
  {
--	struct a2dp_transport *a2dp = transport->data;
--
- 	/* Check if delay really changed */
--	if (a2dp->delay == delay)
-+	if (transport->delay == delay)
- 		return;
- 
--	a2dp->delay = delay;
-+	transport->delay = delay;
- 
- 	g_dbus_emit_property_changed(btd_get_dbus_connection(),
- 					transport->path,
-@@ -862,20 +856,17 @@ struct audio_device *media_transport_get_dev(struct media_transport *transport)
- 
- uint16_t media_transport_get_volume(struct media_transport *transport)
- {
--	struct a2dp_transport *a2dp = transport->data;
--	return a2dp->volume;
-+	return transport->volume;
+ 	if (request->call)
+@@ -389,6 +398,54 @@ static int transport_device_cmp(gconstpointer data, gconstpointer user_data)
+ 	return -1;
  }
  
- void media_transport_update_volume(struct media_transport *transport,
- 								uint8_t volume)
++unsigned int btd_media_endpoint_add_register_cb(struct btd_adapter *btd_adapter,
++						media_endpoint_register_cb_t cb,
++						void *user_data)
++{
++	struct media_adapter *adapter;
++	struct endpoint_register_callback *register_cb;
++	static unsigned int id = 0;
++
++	adapter = find_adapter(btd_adapter);
++	if (adapter == NULL)
++		return 0;
++
++	register_cb = g_new0(struct endpoint_register_callback, 1);
++	register_cb->cb = cb;
++	register_cb->user_data = user_data;
++	register_cb->id = ++id;
++
++	adapter->endpoint_register_callbacks = g_slist_append(
++			adapter->endpoint_register_callbacks, register_cb);
++
++	return register_cb->id;
++}
++
++bool btd_media_endpoint_remove_register_cb(struct btd_adapter *btd_adapter,
++								unsigned int id)
++{
++	struct media_adapter *adapter;
++	GSList *l;
++
++	adapter = find_adapter(btd_adapter);
++	if (adapter == NULL)
++		return false;
++
++	for (l = adapter->endpoint_register_callbacks; l != NULL;
++							l = g_slist_next(l)) {
++		struct endpoint_register_callback *cb = l->data;
++
++		if (cb && cb->id == id) {
++			adapter->endpoint_register_callbacks = g_slist_remove(
++				adapter->endpoint_register_callbacks, cb);
++			g_free(cb);
++			return true;
++		}
++	}
++
++	return false;
++}
++
+ static struct media_transport *find_device_transport(
+ 					struct media_endpoint *endpoint,
+ 					struct audio_device *device)
+@@ -738,6 +795,7 @@ static struct media_endpoint *media_endpoint_create(struct media_adapter *adapte
+ 						int *err)
  {
--	struct a2dp_transport *a2dp = transport->data;
--
- 	/* Check if volume really changed */
--	if (a2dp->volume == volume)
-+	if (transport->volume == volume)
- 		return;
+ 	struct media_endpoint *endpoint;
++	GSList *l;
+ 	gboolean succeeded;
  
--	a2dp->volume = volume;
-+	transport->volume = volume;
+ 	endpoint = g_new0(struct media_endpoint, 1);
+@@ -792,6 +850,13 @@ static struct media_endpoint *media_endpoint_create(struct media_adapter *adapte
+ 	adapter->endpoints = g_slist_append(adapter->endpoints, endpoint);
+ 	info("Endpoint registered: sender=%s path=%s", sender, path);
  
- 	g_dbus_emit_property_changed(btd_get_dbus_connection(),
- 					transport->path,
++	for (l = adapter->endpoint_register_callbacks; l != NULL;
++							l = g_slist_next(l)) {
++		struct endpoint_register_callback *cb = l->data;
++
++		cb->cb(endpoint, cb->user_data);
++	}
++
+ 	if (err)
+ 		*err = 0;
+ 	return endpoint;
+@@ -1821,6 +1886,8 @@ static void path_free(void *data)
+ 	while (adapter->players)
+ 		media_player_destroy(adapter->players->data);
+ 
++	g_slist_free(adapter->endpoint_register_callbacks);
++
+ 	adapters = g_slist_remove(adapters, adapter);
+ 
+ 	btd_adapter_unref(adapter->btd_adapter);
+@@ -1852,18 +1919,15 @@ int media_register(struct btd_adapter *btd_adapter)
+ 
+ void media_unregister(struct btd_adapter *btd_adapter)
+ {
+-	GSList *l;
++	struct media_adapter *adapter;
+ 
+-	for (l = adapters; l; l = l->next) {
+-		struct media_adapter *adapter = l->data;
++	adapter = find_adapter(btd_adapter);
++	if (adapter == NULL)
++		return;
+ 
+-		if (adapter->btd_adapter == btd_adapter) {
+-			g_dbus_unregister_interface(btd_get_dbus_connection(),
++	g_dbus_unregister_interface(btd_get_dbus_connection(),
+ 						adapter_get_path(btd_adapter),
+ 						MEDIA_INTERFACE);
+-			return;
+-		}
+-	}
+ }
+ 
+ struct a2dp_sep *media_endpoint_get_sep(struct media_endpoint *endpoint)
+diff --git a/profiles/audio/media.h b/profiles/audio/media.h
+index ab187dd..25013d9 100644
+--- a/profiles/audio/media.h
++++ b/profiles/audio/media.h
+@@ -28,6 +28,9 @@ struct media_transport;
+ typedef void (*media_endpoint_cb_t) (struct media_endpoint *endpoint,
+ 					void *ret, int size, void *user_data);
+ 
++typedef void (*media_endpoint_register_cb_t) (struct media_endpoint *endpoint,
++							void *user_data);
++
+ int media_register(struct btd_adapter *btd_adapter);
+ void media_unregister(struct btd_adapter *btd_adapter);
+ 
+@@ -37,6 +40,13 @@ uint8_t media_endpoint_get_codec(struct media_endpoint *endpoint);
+ 
+ struct media_endpoint *btd_media_endpoint_find(struct btd_adapter *btd_adapter,
+ 							const char *uuid);
++
++unsigned int btd_media_endpoint_add_register_cb(struct btd_adapter *btd_adapter,
++						media_endpoint_register_cb_t cb,
++						void *user_data);
++bool btd_media_endpoint_remove_register_cb(struct btd_adapter *btd_adapter,
++							unsigned int id);
++
+ struct media_transport *btd_media_endpoint_set_configuration(
+ 					struct media_endpoint *endpoint,
+ 					struct audio_device *device,
 -- 
 1.8.1.4
 
