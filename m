@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v9 2/9] Bluetooth: Remove unused mask parameter in sco_conn_defer_accept
-Date: Fri, 12 Jul 2013 18:05:36 +0200
-Message-Id: <1373645143-7494-3-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v9 6/9] Bluetooth: Parameters for outgoing SCO connections
+Date: Fri, 12 Jul 2013 18:05:40 +0200
+Message-Id: <1373645143-7494-7-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1373645143-7494-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1373645143-7494-1-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
@@ -15,51 +15,73 @@ Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->From Bluetooth Core v4.0 specification, 7.1.8 Accept Connection Request Command
-"When accepting synchronous connection request, the Role parameter is not used
-and will be ignored by the BR/EDR Controller."
+In order to establish a transparent SCO connection, the correct settings must
+be specified in the Setup Synchronous Connection request. For that,
+a setting field is added to ACL connection data to set up the desired
+parameters.
+Remove usage of hdev->voice_setting in CVSD connection.
+Make use of T2 parameters for transparent data.
 
 Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/sco.c |   10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+ include/net/bluetooth/hci_core.h |    1 +
+ net/bluetooth/hci_conn.c         |   21 +++++++++++++++++----
+ 2 files changed, 18 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 7114984..0c15a0c 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -651,7 +651,7 @@ static int sco_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
- 	return err;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 69bdb67..61ca2ce 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -320,6 +320,7 @@ struct hci_conn {
+ 	__u32		passkey_notify;
+ 	__u8		passkey_entered;
+ 	__u16		disc_timeout;
++	__u16		setting;
+ 	unsigned long	flags;
+ 
+ 	__u8		remote_cap;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index d1d9919..c4d6163 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -185,13 +185,24 @@ void hci_setup_sync(struct hci_conn *conn, __u16 handle)
+ 	conn->attempt++;
+ 
+ 	cp.handle   = cpu_to_le16(handle);
+-	cp.pkt_type = cpu_to_le16(conn->pkt_type);
+ 
+ 	cp.tx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
+ 	cp.rx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
+-	cp.max_latency    = __constant_cpu_to_le16(0xffff);
+-	cp.voice_setting  = cpu_to_le16(hdev->voice_setting);
+-	cp.retrans_effort = 0xff;
++	cp.voice_setting  = cpu_to_le16(conn->setting);
++
++	switch (conn->setting & SCO_AIRMODE_MASK) {
++	case SCO_AIRMODE_TRANSP:
++		cp.pkt_type       = __constant_cpu_to_le16(EDR_ESCO_MASK &
++							   ~ESCO_2EV3);
++		cp.max_latency    = __constant_cpu_to_le16(0x000d);
++		cp.retrans_effort = 0x02;
++		break;
++	case SCO_AIRMODE_CVSD:
++		cp.pkt_type       = cpu_to_le16(conn->pkt_type);
++		cp.max_latency    = __constant_cpu_to_le16(0xffff);
++		cp.retrans_effort = 0xff;
++		break;
++	}
+ 
+ 	hci_send_cmd(hdev, HCI_OP_SETUP_SYNC_CONN, sizeof(cp), &cp);
  }
+@@ -584,6 +595,8 @@ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
  
--static void sco_conn_defer_accept(struct hci_conn *conn, int mask)
-+static void sco_conn_defer_accept(struct hci_conn *conn)
- {
- 	struct hci_dev *hdev = conn->hdev;
+ 	hci_conn_hold(sco);
  
-@@ -663,11 +663,7 @@ static void sco_conn_defer_accept(struct hci_conn *conn, int mask)
- 		struct hci_cp_accept_conn_req cp;
- 
- 		bacpy(&cp.bdaddr, &conn->dst);
--
--		if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
--			cp.role = 0x00; /* Become master */
--		else
--			cp.role = 0x01; /* Remain slave */
-+		cp.role = 0x00; /* Ignored */
- 
- 		hci_send_cmd(hdev, HCI_OP_ACCEPT_CONN_REQ, sizeof(cp), &cp);
- 	} else {
-@@ -697,7 +693,7 @@ static int sco_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
- 
- 	if (sk->sk_state == BT_CONNECT2 &&
- 	    test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
--		sco_conn_defer_accept(pi->conn->hcon, 0);
-+		sco_conn_defer_accept(pi->conn->hcon);
- 		sk->sk_state = BT_CONFIG;
- 		msg->msg_namelen = 0;
- 
++	sco->setting = setting;
++
+ 	if (acl->state == BT_CONNECTED &&
+ 	    (sco->state == BT_OPEN || sco->state == BT_CLOSED)) {
+ 		set_bit(HCI_CONN_POWER_SAVE, &acl->flags);
 -- 
 1.7.9.5
 
