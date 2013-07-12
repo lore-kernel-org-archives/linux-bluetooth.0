@@ -5,122 +5,181 @@ Cc: linux-bluetooth@vger.kernel.org,
 	peter@hurleysoftware.com,
 	marcel@holtmann.org,
 	Gianluca Anzolin <gianluca@sottospazio.it>
-Subject: [PATCH 2/8] Move functions before the definition of rfcomm_port_ops
-Date: Fri, 12 Jul 2013 22:40:42 +0200
-Message-Id: <1373661649-1385-2-git-send-email-gianluca@sottospazio.it>
+Subject: [PATCH 3/8] Move device initialization and shutdown to tty_port_operations
+Date: Fri, 12 Jul 2013 22:40:43 +0200
+Message-Id: <1373661649-1385-3-git-send-email-gianluca@sottospazio.it>
 In-Reply-To: <1373661649-1385-1-git-send-email-gianluca@sottospazio.it>
 References: <1373661649-1385-1-git-send-email-gianluca@sottospazio.it>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Move rfcomm_tty_copy_pending and rfcomm_get_device before the definition of
-rfcomm_port_ops.
+Move the device initialization from rfcomm_tty_open to the .activate function of
+tty_port.
 
-These functions will be called later from the .activate and .shutdown methods of
-the tty_port.
+At the same time move also the device shutdown from rfcomm_tty_close to the
+.shutdown function of tty_port.
 
 Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
 ---
- net/bluetooth/rfcomm/tty.c | 74 +++++++++++++++++++++++-----------------------
- 1 file changed, 37 insertions(+), 37 deletions(-)
+ net/bluetooth/rfcomm/tty.c | 120 ++++++++++++++++++++++++++++-----------------
+ 1 file changed, 75 insertions(+), 45 deletions(-)
 
 diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index 6c3efb5..ff60171 100644
+index ff60171..9b0b064 100644
 --- a/net/bluetooth/rfcomm/tty.c
 +++ b/net/bluetooth/rfcomm/tty.c
-@@ -112,6 +112,43 @@ static void rfcomm_dev_destruct(struct tty_port *port)
- 	module_put(THIS_MODULE);
+@@ -149,8 +149,80 @@ static void rfcomm_tty_copy_pending(struct rfcomm_dev *dev)
+ 		tty_flip_buffer_push(&dev->port);
  }
  
-+static struct device *rfcomm_get_device(struct rfcomm_dev *dev)
++/*
++ * Do the device-specific initialization by opening the DLC and waiting for
++ * a connection.
++ */
++static int rfcomm_dev_activate(struct tty_port *port, struct tty_struct *tty)
 +{
-+	struct hci_dev *hdev;
-+	struct hci_conn *conn;
++	DECLARE_WAITQUEUE(wait, current);
++	struct rfcomm_dev *dev = container_of(port, struct rfcomm_dev, port);
++	struct rfcomm_dlc *dlc = dev->dlc;
++	int err;
 +
-+	hdev = hci_get_route(&dev->dst, &dev->src);
-+	if (!hdev)
-+		return NULL;
++	err = rfcomm_dlc_open(dlc, &dev->src, &dev->dst, dev->channel);
++	if (err < 0)
++		goto error_no_dlc;
 +
-+	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &dev->dst);
++	/* Wait for DLC to connect */
++	add_wait_queue(&dev->wait, &wait);
++	while (1) {
++		set_current_state(TASK_INTERRUPTIBLE);
 +
-+	hci_dev_put(hdev);
++		if (dlc->state == BT_CLOSED) {
++			err = -dev->err;
++			break;
++		}
 +
-+	return conn ? &conn->dev : NULL;
++		if (dlc->state == BT_CONNECTED)
++			break;
++
++		if (signal_pending(current)) {
++			err = -EINTR;
++			break;
++		}
++
++		tty_unlock(tty);
++		schedule();
++		tty_lock(tty);
++	}
++	set_current_state(TASK_RUNNING);
++	remove_wait_queue(&dev->wait, &wait);
++
++	if (err < 0)
++		goto error_no_connection;
++
++	device_move(dev->tty_dev, rfcomm_get_device(dev),
++	            DPM_ORDER_DEV_AFTER_PARENT);
++
++	rfcomm_tty_copy_pending(dev);
++	rfcomm_dlc_unthrottle(dlc);
++	return 0;
++
++error_no_connection:
++	rfcomm_dlc_close(dlc, err);
++error_no_dlc:
++	return err;
 +}
 +
-+static void rfcomm_tty_copy_pending(struct rfcomm_dev *dev)
++/*
++ * Undo the device initialization by closing the DLC
++ */
++static void rfcomm_dev_shutdown(struct tty_port *port)
 +{
-+	struct sk_buff *skb;
-+	int inserted = 0;
++	struct rfcomm_dev *dev = container_of(port, struct rfcomm_dev, port);
 +
-+	BT_DBG("dev %p", dev);
++	if (dev->tty_dev->parent)
++		device_move(dev->tty_dev, NULL, DPM_ORDER_DEV_LAST);
 +
-+	rfcomm_dlc_lock(dev->dlc);
-+
-+	while ((skb = skb_dequeue(&dev->pending))) {
-+		inserted += tty_insert_flip_string(&dev->port, skb->data,
-+				skb->len);
-+		kfree_skb(skb);
-+	}
-+
-+	rfcomm_dlc_unlock(dev->dlc);
-+
-+	if (inserted > 0)
-+		tty_flip_buffer_push(&dev->port);
++	/* Close DLC */
++	rfcomm_dlc_close(dev->dlc, 0);
 +}
 +
  static const struct tty_port_operations rfcomm_port_ops = {
  	.destruct = rfcomm_dev_destruct,
++	.activate = rfcomm_dev_activate,
++	.shutdown = rfcomm_dev_shutdown,
  };
-@@ -147,22 +184,6 @@ static struct rfcomm_dev *rfcomm_dev_get(int id)
- 	return dev;
- }
  
--static struct device *rfcomm_get_device(struct rfcomm_dev *dev)
--{
--	struct hci_dev *hdev;
--	struct hci_conn *conn;
--
--	hdev = hci_get_route(&dev->dst, &dev->src);
--	if (!hdev)
--		return NULL;
--
--	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &dev->dst);
--
--	hci_dev_put(hdev);
--
--	return conn ? &conn->dev : NULL;
--}
--
- static ssize_t show_address(struct device *tty_dev, struct device_attribute *attr, char *buf)
- {
- 	struct rfcomm_dev *dev = dev_get_drvdata(tty_dev);
-@@ -624,27 +645,6 @@ static void rfcomm_dev_modem_status(struct rfcomm_dlc *dlc, u8 v24_sig)
- }
- 
+ static struct rfcomm_dev *__rfcomm_dev_get(int id)
+@@ -647,11 +719,10 @@ static void rfcomm_dev_modem_status(struct rfcomm_dlc *dlc, u8 v24_sig)
  /* ---- TTY functions ---- */
--static void rfcomm_tty_copy_pending(struct rfcomm_dev *dev)
--{
--	struct sk_buff *skb;
--	int inserted = 0;
--
--	BT_DBG("dev %p", dev);
--
--	rfcomm_dlc_lock(dev->dlc);
--
--	while ((skb = skb_dequeue(&dev->pending))) {
--		inserted += tty_insert_flip_string(&dev->port, skb->data,
--				skb->len);
--		kfree_skb(skb);
--	}
--
--	rfcomm_dlc_unlock(dev->dlc);
--
--	if (inserted > 0)
--		tty_flip_buffer_push(&dev->port);
--}
--
  static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
  {
- 	DECLARE_WAITQUEUE(wait, current);
+-	DECLARE_WAITQUEUE(wait, current);
+ 	struct rfcomm_dev *dev;
+ 	struct rfcomm_dlc *dlc;
+ 	unsigned long flags;
+-	int err, id;
++	int id;
+ 
+ 	id = tty->index;
+ 
+@@ -685,44 +756,7 @@ static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
+ 	rfcomm_dlc_unlock(dlc);
+ 	set_bit(RFCOMM_TTY_ATTACHED, &dev->flags);
+ 
+-	err = rfcomm_dlc_open(dlc, &dev->src, &dev->dst, dev->channel);
+-	if (err < 0)
+-		return err;
+-
+-	/* Wait for DLC to connect */
+-	add_wait_queue(&dev->wait, &wait);
+-	while (1) {
+-		set_current_state(TASK_INTERRUPTIBLE);
+-
+-		if (dlc->state == BT_CLOSED) {
+-			err = -dev->err;
+-			break;
+-		}
+-
+-		if (dlc->state == BT_CONNECTED)
+-			break;
+-
+-		if (signal_pending(current)) {
+-			err = -EINTR;
+-			break;
+-		}
+-
+-		tty_unlock(tty);
+-		schedule();
+-		tty_lock(tty);
+-	}
+-	set_current_state(TASK_RUNNING);
+-	remove_wait_queue(&dev->wait, &wait);
+-
+-	if (err == 0)
+-		device_move(dev->tty_dev, rfcomm_get_device(dev),
+-			    DPM_ORDER_DEV_AFTER_PARENT);
+-
+-	rfcomm_tty_copy_pending(dev);
+-
+-	rfcomm_dlc_unthrottle(dev->dlc);
+-
+-	return err;
++	return 0;
+ }
+ 
+ static void rfcomm_tty_close(struct tty_struct *tty, struct file *filp)
+@@ -739,12 +773,8 @@ static void rfcomm_tty_close(struct tty_struct *tty, struct file *filp)
+ 	spin_lock_irqsave(&dev->port.lock, flags);
+ 	if (!--dev->port.count) {
+ 		spin_unlock_irqrestore(&dev->port.lock, flags);
+-		if (dev->tty_dev->parent)
+-			device_move(dev->tty_dev, NULL, DPM_ORDER_DEV_LAST);
+-
+-		/* Close DLC and dettach TTY */
+-		rfcomm_dlc_close(dev->dlc, 0);
+ 
++		/* detach the TTY */
+ 		clear_bit(RFCOMM_TTY_ATTACHED, &dev->flags);
+ 
+ 		rfcomm_dlc_lock(dev->dlc);
 -- 
 1.8.3.2
