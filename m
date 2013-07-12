@@ -1,50 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Subject: [RFC BlueZ v0 00/10] HSP plugin
-Date: Fri, 12 Jul 2013 12:54:33 +0200
-Message-Id: <1373626483-2031-1-git-send-email-mikel.astiz.oss@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 12 Jul 2013 11:18:52 +0100
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Gianluca Anzolin <gianluca@sottospazio.it>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Subject: Re: [PATCH v2] Fix refcounting issues in rfcomm/tty.c
+Message-ID: <20130712101852.GB2065@joana>
+References: <20130711190150.GA24422@debian.seek.priv>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130711190150.GA24422@debian.seek.priv>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Hi Gianluca,
 
-GNOME 3.10 freeze date is 2013-08-19 and they want to upgrade to BlueZ 5.
+* Gianluca Anzolin <gianluca@sottospazio.it> [2013-07-11 21:01:50 +0200]:
 
-One of the arguments against the upgrade is the lack of headset support. oFono should be convering this feature but it's development as well as the required work in PulseAudio are advancing too slowly for the mentioned target date.
+> Hello,
+> 
+> This is a second version of the previous patches I sent to linux-bluetooth
+> list. I grouped the two patches together since they are related.
+> 
+> I fixed some bugs in my previous attempt:
 
-This patchset proposes a simple HSP plugin implementing the AG role, which is the most common use-case in desktop environments. It's a fallback alternative to a full-featured HSP/HFP implementation (i.e. oFono) in case the later is not available (i.e. not fully implemented or packaged in a specific distro).
+If you are fixing different bugs I want one patch for each fix.
 
-I think we could all agree about this not being the best long-term strategy, due to the overlap and conflict with oFono, but it might be useful in the short-term to boost the adoption of BlueZ 5.
+> 1. skb_queue_purge is now called in the cleanup method to avoid a circular
+> dependency between the dev struct and dlc struct.
+> 
+> 2. refcomm_dev_release should check REFCOMM_TTY_RELEASED instead of
+> REFCOMM_RELEASE_ONHUP.
+> 
+> I checked with both bluez4 and bluez5 and everything works as expected.
 
-The plugin approach is more intrusive than I first thought because the Media API code was significantly simplified when all HSP/HFP code was removed. Hence, the patchset brings this code back along with the necessary APIs to be able to implement this inside a plugin.
+Please send a proper inline patch with git-format-patch and git-send-email. Also
+get rid of all BT_DBG changes you've made, read the dynamic debug doc to learn
+how to print the function name when debugging. And if you are moving functions around
+please do this in a separated patch.
 
-In order to test this, some PulseAudio patches are required (the last 5 patches of "[RFC next v5 00/11] bluetooth: BlueZ 5 development patches"). These were never merged in PA due to a chicken-egg problem: there was no code in BlueZ to test against.
-
-Mikel Astiz (10):
-  media: Expose Media API internally
-  media: Add callback to report new endpoints
-  transport: Regroup a2dp-specific members in struct
-  transport: Add API to register drivers
-  transport: Add API to report suspend/resume complete
-  transport: Add microphone/speaker gains
-  audio: Add function to remove inactive devices
-  hsp: Add initial HSP plugin
-  hsp: Add Media API integration
-  hsp: Implement media transport driver
-
- Makefile.plugins           |    3 +
- plugins/hsp.c              | 1357 ++++++++++++++++++++++++++++++++++++++++++++
- profiles/audio/manager.c   |   12 +
- profiles/audio/manager.h   |    1 +
- profiles/audio/media.c     |  132 ++++-
- profiles/audio/media.h     |   30 +
- profiles/audio/transport.c |  384 +++++++++----
- profiles/audio/transport.h |   29 +
- 8 files changed, 1818 insertions(+), 130 deletions(-)
- create mode 100644 plugins/hsp.c
-
--- 
-1.8.1.4
-
+	Gustavo
