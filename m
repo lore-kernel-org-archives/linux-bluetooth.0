@@ -1,78 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v9 5/9] Bluetooth: Use voice setting in defered SCO connection request
-Date: Fri, 12 Jul 2013 18:05:39 +0200
-Message-Id: <1373645143-7494-6-git-send-email-frederic.dalleau@linux.intel.com>
-In-Reply-To: <1373645143-7494-1-git-send-email-frederic.dalleau@linux.intel.com>
-References: <1373645143-7494-1-git-send-email-frederic.dalleau@linux.intel.com>
+Message-ID: <51E0229D.5060404@hurleysoftware.com>
+Date: Fri, 12 Jul 2013 11:37:01 -0400
+From: Peter Hurley <peter@hurleysoftware.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+To: Alexander Holler <holler@ahsoftware.de>
+CC: Gianluca Anzolin <gianluca@sottospazio.it>,
+	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org
+Subject: Re: [RFC] PATCH: rfcomm tty refcount fixes
+References: <20130706084343.GA10500@debian.seek.priv> <51E01EB4.3090406@ahsoftware.de>
+In-Reply-To: <51E01EB4.3090406@ahsoftware.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When an incoming eSCO connection is requested, check the selected voice setting
-and reply appropriately. Voice setting should have been negotiated previously.
-For example, in case of HFP, the codec is negotiated using AT commands on the
-RFCOMM channel. This patch only changes replies for socket with defered setup
-enabled.
+On 07/12/2013 11:20 AM, Alexander Holler wrote:
+> Am 06.07.2013 10:43, schrieb Gianluca Anzolin:
+>> Hi,
+>>
+>> I'm getting panics and OOPS with the vanilla kernel 3.10 using rfcomm with a
+>> bluetooth module connected to a microcontroller: this occurs when I poweroff
+>> the microcontroller without closing first the rfcomm device.
+>>
+>> Searching the web I found that I'm not alone with this issue:
+>>
+>> http://marc.info/?l=linux-bluetooth&m=136868678418771&w=2
+>>
+>> In the thread the issue seems to be a refcounting problem.
+>>
+>> Indeed looking at the source there are places where dev->port.tty is accessed
+>> directly without taking references of the tty_struct.
+>>
+>> So I inspected every dev->port.tty access and changed the code to use
+>> tty_port_tty_get which gets the references properly.
+>>
+>> In other places I used directly the tty_port_* helpers already in place.
+>>
+>> I the process I changed also the tty_port_hangup helper because it seems to me
+>> that it could leak references in some cases (I sent another email for that).
+>>
+>> I attach the patch against net/bluetooth/rfcomm/tty.c and
+>> drivers/tty/tty_port.c
+>>
+>> With this patch I cannot reproduce the oopses I was getting before: I was able
+>> to trigger the panics very easily and now I cannot trigger them anymore.
+>
+> The patches with BUG_ON or WARN_ON don't work with 3.10 anymore and do
+> make things worse, at least here. They are fine for 3.7-3.9, but not
+> with 3.10.
 
-Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
----
- net/bluetooth/sco.c |   22 +++++++++++++++++-----
- 1 file changed, 17 insertions(+), 5 deletions(-)
+Someone sent me private mail with a crash report which occurs after the
+WARN_ON() anyway (which is why I wanted to test the WARN_ON patch :) ).
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index ce8690f..934002c 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -653,7 +653,7 @@ static int sco_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
- 	return err;
- }
- 
--static void sco_conn_defer_accept(struct hci_conn *conn)
-+static void sco_conn_defer_accept(struct hci_conn *conn, int setting)
- {
- 	struct hci_dev *hdev = conn->hdev;
- 
-@@ -676,9 +676,21 @@ static void sco_conn_defer_accept(struct hci_conn *conn)
- 
- 		cp.tx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
- 		cp.rx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
--		cp.max_latency    = __constant_cpu_to_le16(0xffff);
--		cp.content_format = cpu_to_le16(hdev->voice_setting);
--		cp.retrans_effort = 0xff;
-+		cp.content_format = cpu_to_le16(setting);
-+
-+		switch (setting & SCO_AIRMODE_MASK) {
-+		case SCO_AIRMODE_TRANSP:
-+			if (conn->pkt_type & ESCO_2EV3)
-+				cp.max_latency = __constant_cpu_to_le16(0x0008);
-+			else
-+				cp.max_latency = __constant_cpu_to_le16(0x000D);
-+			cp.retrans_effort = 0x02;
-+			break;
-+		case SCO_AIRMODE_CVSD:
-+			cp.max_latency    = __constant_cpu_to_le16(0xffff);
-+			cp.retrans_effort = 0xff;
-+			break;
-+		}
- 
- 		hci_send_cmd(hdev, HCI_OP_ACCEPT_SYNC_CONN_REQ,
- 			     sizeof(cp), &cp);
-@@ -695,7 +707,7 @@ static int sco_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
- 
- 	if (sk->sk_state == BT_CONNECT2 &&
- 	    test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
--		sco_conn_defer_accept(pi->conn->hcon);
-+		sco_conn_defer_accept(pi->conn->hcon, pi->setting);
- 		sk->sk_state = BT_CONFIG;
- 		msg->msg_namelen = 0;
- 
--- 
-1.7.9.5
+>> I cannot tell however if the problem is really fixed so I'm here request for
+>> comments from people who know this code better than me.
+>
+> I've just had the chance to test a 3.10(.0) kernel with your two patches
+> applied, they doesn't seem to help. The machine I've used to test just
+> stood still after the first or second disconnect. Unfortunatley I can't
+> provide any debug output, the machine I've just used doesn't have a
+> serial and without debugging such stuff is a pain.
+
+Look on the linux-bluetooth list: there is a new (monolithic) patch from the
+same author that might be interesting to test. But be warned, it's a big patch
+that basically reimplements rfcomm tty as a proper tty port, so there could
+be serious bugs there.
+
+I took a quick scan and the basic goal of the patch looks correct but there
+could be details missing. Because that patch has extensive changes, it's very
+difficult to review.
+
+>> To them I'd like also to have a look at rfcomm_tty_close: in some situations
+>> tty_port_put could be called two times: is that right?
+>
+> That doesn't sound sane.
+
+That's what the old code did; it wasn't sane, it was wrong. Which is why I said
+in my initial comments a while back that rfcomm tty didn't refcount correctly.
+
+Besides that, the old code also used a field from the refcounted structure
+as an input to obtain a refcount! Crazy.
+
+Regards,
+Peter Hurley
 
