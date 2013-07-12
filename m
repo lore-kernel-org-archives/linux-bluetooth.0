@@ -1,71 +1,188 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
+From: Mikel Astiz <mikel.astiz.oss@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [RFC BlueZ v0 09/10] hsp: Add Media API integration
+Date: Fri, 12 Jul 2013 12:54:42 +0200
+Message-Id: <1373626483-2031-10-git-send-email-mikel.astiz.oss@gmail.com>
 In-Reply-To: <1373626483-2031-1-git-send-email-mikel.astiz.oss@gmail.com>
 References: <1373626483-2031-1-git-send-email-mikel.astiz.oss@gmail.com>
-Date: Fri, 12 Jul 2013 14:28:37 +0300
-Message-ID: <CABBYNZLkVCNiqKpF=EsW+1uS4pK6mnvt26XzKEbFinQfGdLVyQ@mail.gmail.com>
-Subject: Re: [RFC BlueZ v0 00/10] HSP plugin
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Mikel Astiz <mikel.astiz.oss@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Mikel Astiz <mikel.astiz@bmw-carit.de>
-Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mikel,
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-On Fri, Jul 12, 2013 at 1:54 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> wrote:
-> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->
-> GNOME 3.10 freeze date is 2013-08-19 and they want to upgrade to BlueZ 5.
->
-> One of the arguments against the upgrade is the lack of headset support. oFono should be convering this feature but it's development as well as the required work in PulseAudio are advancing too slowly for the mentioned target date.
->
-> This patchset proposes a simple HSP plugin implementing the AG role, which is the most common use-case in desktop environments. It's a fallback alternative to a full-featured HSP/HFP implementation (i.e. oFono) in case the later is not available (i.e. not fully implemented or packaged in a specific distro).
->
-> I think we could all agree about this not being the best long-term strategy, due to the overlap and conflict with oFono, but it might be useful in the short-term to boost the adoption of BlueZ 5.
->
-> The plugin approach is more intrusive than I first thought because the Media API code was significantly simplified when all HSP/HFP code was removed. Hence, the patchset brings this code back along with the necessary APIs to be able to implement this inside a plugin.
->
-> In order to test this, some PulseAudio patches are required (the last 5 patches of "[RFC next v5 00/11] bluetooth: BlueZ 5 development patches"). These were never merged in PA due to a chicken-egg problem: there was no code in BlueZ to test against.
->
-> Mikel Astiz (10):
->   media: Expose Media API internally
->   media: Add callback to report new endpoints
->   transport: Regroup a2dp-specific members in struct
->   transport: Add API to register drivers
->   transport: Add API to report suspend/resume complete
->   transport: Add microphone/speaker gains
->   audio: Add function to remove inactive devices
->   hsp: Add initial HSP plugin
->   hsp: Add Media API integration
->   hsp: Implement media transport driver
->
->  Makefile.plugins           |    3 +
->  plugins/hsp.c              | 1357 ++++++++++++++++++++++++++++++++++++++++++++
->  profiles/audio/manager.c   |   12 +
->  profiles/audio/manager.h   |    1 +
->  profiles/audio/media.c     |  132 ++++-
->  profiles/audio/media.h     |   30 +
->  profiles/audio/transport.c |  384 +++++++++----
->  profiles/audio/transport.h |   29 +
->  8 files changed, 1818 insertions(+), 130 deletions(-)
->  create mode 100644 plugins/hsp.c
->
-> --
-> 1.8.1.4
+Extend the HSP plugin with the required interactions with the core Media
+API infrastructure.
+---
+ plugins/hsp.c | 91 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 91 insertions(+)
 
-I guess my suggestion of having this as a separate plugin was a bit
-misleading since we are going to depend on media API anyway that
-should be part of the same plugin, the other option would be to make
-it a core API which I don't think is a good idea. Btw it seems this
-would only work if audio plugin is loaded before hsp because you are
-not really linking media symbols I guess there are being resolved by
-pure luck and if you do link it might generate duplicated symbols when
-loading the plugins, so interdependency between plugins files should
-be avoided.
+diff --git a/plugins/hsp.c b/plugins/hsp.c
+index f0b55c9..740b857 100644
+--- a/plugins/hsp.c
++++ b/plugins/hsp.c
+@@ -60,6 +60,7 @@
+ #include "sdpd.h"
+ #include "btio.h"
+ #include "profiles/audio/manager.h"
++#include "profiles/audio/media.h"
+ 
+ #define DEFAULT_HS_AG_CHANNEL 12
+ #define BUF_SIZE 1024
+@@ -86,6 +87,7 @@ struct server {
+ 	GIOChannel *sco_io;
+ 	uint32_t record_id;
+ 	GSList *active_headsets;
++	unsigned int endpoint_register_cb_id;
+ };
+ 
+ struct headset {
+@@ -102,6 +104,9 @@ struct headset {
+ 	guint sco_id;
+ 
+ 	headset_state_t state;
++
++	struct media_endpoint *endpoint;
++	struct media_transport *transport;
+ };
+ 
+ struct event {
+@@ -305,6 +310,58 @@ static int handle_event(struct headset *hs, const char *buf)
+ 	return -EINVAL;
+ }
+ 
++static void headset_setconf_cb(struct media_endpoint *endpoint, void *ret,
++						int size, void *user_data)
++{
++	struct headset *hs = user_data;
++
++	DBG("%p: ret=%p", hs, ret);
++
++	if (ret != NULL) {
++		hs->endpoint = endpoint;
++		return;
++	}
++
++	hs->transport = NULL;
++
++	error("Transport SetConfiguration() failed");
++}
++
++static void headset_setconf(struct headset *hs)
++{
++	struct btd_device *device = btd_service_get_device(hs->service);
++	struct media_endpoint *endpoint;
++	struct btd_adapter *adapter;
++
++	adapter = device_get_adapter(device);
++	endpoint = btd_media_endpoint_find(adapter, HSP_AG_UUID);
++
++	if (endpoint == NULL)
++		endpoint = btd_media_endpoint_find(adapter, HFP_AG_UUID);
++
++	if (endpoint == NULL) {
++		DBG("No media enpoint registered for headset");
++		return;
++	}
++
++	DBG("Setting configuration using endpoint %p", endpoint);
++
++	hs->transport = btd_media_endpoint_set_configuration(
++					endpoint, hs->audio_dev, NULL, 0,
++					headset_setconf_cb, hs, NULL);
++}
++
++static void headset_clearconf(struct headset *hs)
++{
++	if (hs->endpoint == NULL)
++		return;
++
++	DBG("Clear endpoint %p (transport %p)", hs->endpoint, hs->transport);
++	btd_media_endpoint_clear_configuration(hs->endpoint, hs->transport);
++	hs->transport = NULL;
++	hs->endpoint = NULL;
++}
++
+ static gboolean rfcomm_io_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+@@ -413,6 +470,7 @@ static void headset_connect_rfcomm_cb(GIOChannel *io, GError *err,
+ 	ba2str(device_get_address(device), addr);
+ 	DBG("Connected to %s", addr);
+ 
++	headset_setconf(hs);
+ 	headset_set_state(hs, HEADSET_STATE_CONNECTED);
+ }
+ 
+@@ -604,6 +662,7 @@ static void headset_set_state(struct headset *hs, headset_state_t state)
+ 
+ 	switch (state) {
+ 	case HEADSET_STATE_DISCONNECTED:
++		headset_clearconf(hs);
+ 		headset_cancel_discovery(hs);
+ 		headset_close_sco(hs);
+ 		headset_close_rfcomm(hs);
+@@ -810,6 +869,7 @@ static void confirm_event_cb(GIOChannel *io, gpointer user_data)
+ 	DBG("Accepted headset RFCOMM connection from %s", addr);
+ 	hs->rfcomm = g_io_channel_ref(io);
+ 
++	headset_setconf(hs);
+ 	headset_set_state(hs, HEADSET_STATE_CONNECTED);
+ 
+ 	return;
+@@ -868,6 +928,29 @@ drop:
+ 	g_io_channel_shutdown(io, TRUE, NULL);
+ }
+ 
++static void media_endpoint_register_cb(struct media_endpoint *endpoint,
++								void *user_data)
++{
++	struct server *server = user_data;
++	GSList *l;
++
++	if (strcasecmp(media_endpoint_get_uuid(endpoint), HSP_AG_UUID) != 0 &&
++		strcasecmp(media_endpoint_get_uuid(endpoint), HFP_AG_UUID) != 0)
++		return;
++
++	DBG("HSP endpoint registered: configuring %u active headsets",
++				g_slist_length(server->active_headsets));
++
++	for (l = server->active_headsets; l != NULL; l = g_slist_next(l)) {
++		struct headset *hs = l->data;
++
++		hs->transport = btd_media_endpoint_set_configuration(
++						endpoint, hs->audio_dev,
++						NULL, 0, headset_setconf_cb,
++						hs, NULL);
++	}
++}
++
+ static int hsp_hs_server_probe(struct btd_profile *p,
+ 						struct btd_adapter *adapter)
+ {
+@@ -927,6 +1010,10 @@ static int hsp_hs_server_probe(struct btd_profile *p,
+ 		goto failed;
+ 	}
+ 
++	server->endpoint_register_cb_id = btd_media_endpoint_add_register_cb(
++					adapter, media_endpoint_register_cb,
++					server);
++
+ 	server->record_id = record->handle;
+ 	servers = g_slist_append(servers, server);
+ 
+@@ -961,6 +1048,10 @@ static void hsp_hs_server_remove(struct btd_profile *p,
+ 		return;
+ 	}
+ 
++	if (server->endpoint_register_cb_id != 0)
++		btd_media_endpoint_remove_register_cb(adapter,
++					server->endpoint_register_cb_id);
++
+ 	if (server->record_id != 0)
+ 		remove_record_from_server(server->record_id);
+ 
+-- 
+1.8.1.4
 
-
---
-Luiz Augusto von Dentz
