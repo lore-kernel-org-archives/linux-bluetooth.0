@@ -1,101 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <51E00910.5050401@linux.intel.com>
+Date: Fri, 12 Jul 2013 15:48:00 +0200
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?=
+ <frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLkVCNiqKpF=EsW+1uS4pK6mnvt26XzKEbFinQfGdLVyQ@mail.gmail.com>
-References: <1373626483-2031-1-git-send-email-mikel.astiz.oss@gmail.com>
-	<CABBYNZLkVCNiqKpF=EsW+1uS4pK6mnvt26XzKEbFinQfGdLVyQ@mail.gmail.com>
-Date: Fri, 12 Jul 2013 15:48:27 +0200
-Message-ID: <CANT-zCU9HFLUB0=ooxJHGeRXQLvbfTHnjPaQnmJ7adMSN6icqQ@mail.gmail.com>
-Subject: Re: [RFC BlueZ v0 00/10] HSP plugin
-From: Mikel Astiz <mikel.astiz.oss@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Vinicius Gomes <vinicius.gomes@openbossa.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v8 8/8] Bluetooth: Prevent transparent SCO on older devices
+References: <1373036503-1349-1-git-send-email-frederic.dalleau@linux.intel.com> <1373036503-1349-9-git-send-email-frederic.dalleau@linux.intel.com> <2F173411-4542-47EE-8DF5-65D21856ADAF@holtmann.org>
+In-Reply-To: <2F173411-4542-47EE-8DF5-65D21856ADAF@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Marcel, Vinicius,
 
-On Fri, Jul 12, 2013 at 1:28 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Mikel,
+Le 08/07/2013 21:25, Marcel Holtmann a écrit :
+> Hi Fred,
 >
-> On Fri, Jul 12, 2013 at 1:54 PM, Mikel Astiz <mikel.astiz.oss@gmail.com> =
-wrote:
->> From: Mikel Astiz <mikel.astiz@bmw-carit.de>
->>
->> GNOME 3.10 freeze date is 2013-08-19 and they want to upgrade to BlueZ 5=
-.
->>
->> One of the arguments against the upgrade is the lack of headset support.=
- oFono should be convering this feature but it's development as well as the=
- required work in PulseAudio are advancing too slowly for the mentioned tar=
-get date.
->>
->> This patchset proposes a simple HSP plugin implementing the AG role, whi=
-ch is the most common use-case in desktop environments. It's a fallback alt=
-ernative to a full-featured HSP/HFP implementation (i.e. oFono) in case the=
- later is not available (i.e. not fully implemented or packaged in a specif=
-ic distro).
->>
->> I think we could all agree about this not being the best long-term strat=
-egy, due to the overlap and conflict with oFono, but it might be useful in =
-the short-term to boost the adoption of BlueZ 5.
->>
->> The plugin approach is more intrusive than I first thought because the M=
-edia API code was significantly simplified when all HSP/HFP code was remove=
-d. Hence, the patchset brings this code back along with the necessary APIs =
-to be able to implement this inside a plugin.
->>
->> In order to test this, some PulseAudio patches are required (the last 5 =
-patches of "[RFC next v5 00/11] bluetooth: BlueZ 5 development patches"). T=
-hese were never merged in PA due to a chicken-egg problem: there was no cod=
-e in BlueZ to test against.
->>
->> Mikel Astiz (10):
->>   media: Expose Media API internally
->>   media: Add callback to report new endpoints
->>   transport: Regroup a2dp-specific members in struct
->>   transport: Add API to register drivers
->>   transport: Add API to report suspend/resume complete
->>   transport: Add microphone/speaker gains
->>   audio: Add function to remove inactive devices
->>   hsp: Add initial HSP plugin
->>   hsp: Add Media API integration
->>   hsp: Implement media transport driver
->>
->>  Makefile.plugins           |    3 +
->>  plugins/hsp.c              | 1357 +++++++++++++++++++++++++++++++++++++=
-+++++++
->>  profiles/audio/manager.c   |   12 +
->>  profiles/audio/manager.h   |    1 +
->>  profiles/audio/media.c     |  132 ++++-
->>  profiles/audio/media.h     |   30 +
->>  profiles/audio/transport.c |  384 +++++++++----
->>  profiles/audio/transport.h |   29 +
->>  8 files changed, 1818 insertions(+), 130 deletions(-)
->>  create mode 100644 plugins/hsp.c
->>
->> --
->> 1.8.1.4
+> we should check for eSCO and transparent SCO support. We do need both. And we also need to figure out on how to handle the incoming situation correctly,
 >
-> I guess my suggestion of having this as a separate plugin was a bit
-> misleading since we are going to depend on media API anyway that
-> should be part of the same plugin, the other option would be to make
-> it a core API which I don't think is a good idea. Btw it seems this
-> would only work if audio plugin is loaded before hsp because you are
-> not really linking media symbols I guess there are being resolved by
-> pure luck and if you do link it might generate duplicated symbols when
-> loading the plugins, so interdependency between plugins files should
-> be avoided.
+> Is the error ECONNABORTED a correct one.
+>
+> Regards
+>
+> Marcel
+>
 
-Besides the issues pointed out by Luiz, which I could fix in a next
-proposal, can you give your opinion on this approach?
+My understanding of Vinicius comment is that some adapters may not
+support esco but still have transparent data support thanks to Setup
+Sync Conn. Transparent data on these adapters can be supported for
+cheap since the connection establishment would be the same.
 
-It makes little sense to try to advance in this direction if it
-doesn't fit the project plan.
+If we choose to go for eSCO AND transparent SCO support, then these
+adapters get unused features.
 
-Johan also suggested that such a feature could be automatically
-disabled when an external profile (oFono) registers.
+One possibility is to check for Setup Synchronous Connection command bit
+instead of Esco feature bit. But that makes a ugly bunch of tests :
+if cvsd is requested
+    check esco feature bit.
+if transparent data is requested
+    check setup sync conn command bit and transparent data feature bit.
 
-Cheers,
-Mikel
+The only problem so far is that I have yet to see these adapters :)
+
+About the error ECONNABORTED, it is what the patch does : abort a 
+connection. It is not used for other purposes. If you really want to
+change, I'm ok with EOPNOTSUPP, otherwise please suggest.
+
+Regards,
+Fred
