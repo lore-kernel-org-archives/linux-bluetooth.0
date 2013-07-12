@@ -4,9 +4,9 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v9 8/9] Bluetooth: Prevent transparent SCO on older devices
-Date: Fri, 12 Jul 2013 18:05:42 +0200
-Message-Id: <1373645143-7494-9-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v9 2/9] Bluetooth: Remove unused mask parameter in sco_conn_defer_accept
+Date: Fri, 12 Jul 2013 18:05:36 +0200
+Message-Id: <1373645143-7494-3-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1373645143-7494-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1373645143-7494-1-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
@@ -15,40 +15,51 @@ Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Older Bluetooth devices may not support Setup Synchronous Connection or SCO
-transparent data. This is indicated by the corresponding LMP feature bits.
-It is not possible to know if the adapter support these features before setting
-BT_VOICE option since the socket is not bound to an adapter. An adapter can
-also be added after the socket is created.  The socket can be bound to an
-address before adapter is plugged in.
-
-Thus, on a such adapters, if user request BT_VOICE_TRANSPARENT, outgoing
-connections fail on connect() and returns -EOPNOTSUPP. Incoming connections
-do not fail. However, they should only be allowed depending on what was
-specified in Write_Voice_Settings command.
+>From Bluetooth Core v4.0 specification, 7.1.8 Accept Connection Request Command
+"When accepting synchronous connection request, the Role parameter is not used
+and will be ignored by the BR/EDR Controller."
 
 Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/sco.c |    6 ++++++
- 1 file changed, 6 insertions(+)
+ net/bluetooth/sco.c |   10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
 diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 934002c..190765c 100644
+index 7114984..0c15a0c 100644
 --- a/net/bluetooth/sco.c
 +++ b/net/bluetooth/sco.c
-@@ -176,6 +176,12 @@ static int sco_connect(struct sock *sk)
- 	else
- 		type = SCO_LINK;
+@@ -651,7 +651,7 @@ static int sco_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
+ 	return err;
+ }
  
-+	if (sco_pi(sk)->setting == BT_VOICE_TRANSPARENT &&
-+	    (!lmp_transp_capable(hdev) || !lmp_esco_capable(hdev))) {
-+		err = -ECONNABORTED;
-+		goto done;
-+	}
-+
- 	hcon = hci_connect_sco(hdev, type, dst, sco_pi(sk)->setting);
- 	if (IS_ERR(hcon)) {
- 		err = PTR_ERR(hcon);
+-static void sco_conn_defer_accept(struct hci_conn *conn, int mask)
++static void sco_conn_defer_accept(struct hci_conn *conn)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+ 
+@@ -663,11 +663,7 @@ static void sco_conn_defer_accept(struct hci_conn *conn, int mask)
+ 		struct hci_cp_accept_conn_req cp;
+ 
+ 		bacpy(&cp.bdaddr, &conn->dst);
+-
+-		if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
+-			cp.role = 0x00; /* Become master */
+-		else
+-			cp.role = 0x01; /* Remain slave */
++		cp.role = 0x00; /* Ignored */
+ 
+ 		hci_send_cmd(hdev, HCI_OP_ACCEPT_CONN_REQ, sizeof(cp), &cp);
+ 	} else {
+@@ -697,7 +693,7 @@ static int sco_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
+ 
+ 	if (sk->sk_state == BT_CONNECT2 &&
+ 	    test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
+-		sco_conn_defer_accept(pi->conn->hcon, 0);
++		sco_conn_defer_accept(pi->conn->hcon);
+ 		sk->sk_state = BT_CONFIG;
+ 		msg->msg_namelen = 0;
+ 
 -- 
 1.7.9.5
 
