@@ -1,40 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 12 Jul 2013 11:18:52 +0100
+Date: Fri, 12 Jul 2013 11:09:23 +0100
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Gianluca Anzolin <gianluca@sottospazio.it>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Subject: Re: [PATCH v2] Fix refcounting issues in rfcomm/tty.c
-Message-ID: <20130712101852.GB2065@joana>
-References: <20130711190150.GA24422@debian.seek.priv>
+To: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+Cc: Benjamin Tissoires <benjamin.tissoires@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	David Herrmann <dh.herrmann@gmail.com>,
+	Jiri Kosina <jkosina@suse.cz>, linux-bluetooth@vger.kernel.org,
+	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: hidp: remove wrong send_report at init
+Message-ID: <20130712100923.GA2065@joana>
+References: <1373550090-30379-1-git-send-email-benjamin.tissoires@redhat.com>
+ <1373550090-30379-3-git-send-email-benjamin.tissoires@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130711190150.GA24422@debian.seek.priv>
+In-Reply-To: <1373550090-30379-3-git-send-email-benjamin.tissoires@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gianluca,
+Hi Benjamin,
 
-* Gianluca Anzolin <gianluca@sottospazio.it> [2013-07-11 21:01:50 +0200]:
+* Benjamin Tissoires <benjamin.tissoires@redhat.com> [2013-07-11 15:41:30 +0200]:
 
-> Hello,
+> The USB hid implementation does retrieve the reports during the start.
+> However, this implementation does not call the HID command GET_REPORT
+> (which would fetch the current status of each report), but use the
+> DATA command, which is an Output Report (so transmitting data from the
+> host to the device).
+> The Wiimote controller is already guarded against this problem in the
+> protocol, but it is not conformant to the specification to set all the
+> reports to 0 on start.
 > 
-> This is a second version of the previous patches I sent to linux-bluetooth
-> list. I grouped the two patches together since they are related.
-> 
-> I fixed some bugs in my previous attempt:
+> Signed-off-by: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+> ---
+>  net/bluetooth/hidp/core.c | 14 --------------
+>  1 file changed, 14 deletions(-)
 
-If you are fixing different bugs I want one patch for each fix.
-
-> 1. skb_queue_purge is now called in the cleanup method to avoid a circular
-> dependency between the dev struct and dlc struct.
-> 
-> 2. refcomm_dev_release should check REFCOMM_TTY_RELEASED instead of
-> REFCOMM_RELEASE_ONHUP.
-> 
-> I checked with both bluez4 and bluez5 and everything works as expected.
-
-Please send a proper inline patch with git-format-patch and git-send-email. Also
-get rid of all BT_DBG changes you've made, read the dynamic debug doc to learn
-how to print the function name when debugging. And if you are moving functions around
-please do this in a separated patch.
+Both patches have been applied to bluetooth-next. Thanks.
 
 	Gustavo
