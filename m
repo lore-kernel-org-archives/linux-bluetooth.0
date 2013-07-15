@@ -1,53 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 15 Jul 2013 14:28:17 +0200
-From: Pavel Machek <pavel@ucw.cz>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	Marcel Holtmann <marcel@holtmann.org>, linville@tuxdriver.com,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, "Rafael J. Wysocki" <rjw@sisk.pl>
-Subject: Re: pull request: bluetooth 2013-06-23
-Message-ID: <20130715122816.GA8383@amd.pavel.ucw.cz>
-References: <20130623021351.GA2327@joana>
- <20130625201217.GA13879@amd.pavel.ucw.cz>
- <E95EC814-F064-4AEB-AE13-79982D3BE5E8@holtmann.org>
- <20130625210039.GA28448@joana>
- <20130626115255.GA7940@amd.pavel.ucw.cz>
- <20130626124736.GA3337@joana>
+Date: Mon, 15 Jul 2013 12:51:04 +0300
+From: Johan Hedberg <johan.hedberg@intel.com>
+To: "Xu, Martin" <martin.xu@intel.com>
+Cc: "martin.xu@linux.intel.com" <martin.xu@linux.intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/3] Profile: fix set default exteranl profile authorize
+Message-ID: <20130715095104.GA1869@x220.p-661hnu-f1>
+References: <1373857569-4191-1-git-send-email-martin.xu@linux.intel.com>
+ <20130715073518.GA24712@x220.p-661hnu-f1>
+ <29981E9CC6590A438DB8A519AEB0053010D41E05@SHSMSX103.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20130626124736.GA3337@joana>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <29981E9CC6590A438DB8A519AEB0053010D41E05@SHSMSX103.ccr.corp.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->On Wed 2013-06-26 13:47:36, Gustavo Padovan wrote:
-> * Pavel Machek <pavel@ucw.cz> [2013-06-26 13:52:55 +0200]:
-> 
-> > On Tue 2013-06-25 22:00:39, Gustavo Padovan wrote:
-> > > Hi Marcel,
-> > > 
-> > > * Marcel Holtmann <marcel@holtmann.org> [2013-06-25 13:49:19 -0700]:
-> > > 
-> > > > Hi Pavel,
-> > > > 
-> > > > >> Jaganath Kanakkassery (1):
-> > > > >>      Bluetooth: Fix invalid length check in l2cap_information_rsp()
-> > > > > 
-> > > > > Could we add the "3.10 vs. thinkpad x60" patch that fixes regression?
-> > > > > It is from Johan Hedberg…
-> > > > 
-> > > > that one went into net-next tree. It is scheduled for 3.11 right now.
-> > > > 
-> > > > After 3.10 is out, maybe it can go into -stable, but otherwise I think it is bit late now. Unless someone wants to cherry-pick it.
-> > > 
-> > > That patch is actually in 3.10 already, it was included in the last pull
-> > > request and John took it to wireless.git.
-> > 
-> > Is it? I tried pulling yesterday (some updates) and today (no
-> > changes), am on:
-> 
-> Dave already pulled it so it should land in mainline anytime soon.
+Hi Martin,
 
-It seems to work in 3.10 and 3.11-rc1. Thanks!
-									Pavel
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+On Mon, Jul 15, 2013, Xu, Martin wrote:
+> > >  	ext->sec_level = BT_IO_SEC_MEDIUM;
+> > > -	ext->authorize = true;
+> > >  	ext->enable_client = true;
+> > >  	ext->enable_server = true;
+> > >  	ext->remote_uuid = NULL;
+> > 
+> > The above change is still wrong. Not setting to true is the same as
+> > setting to false since g_new0 was used. Don't change that part at a
+> I can't find issue here
+> I set the ext->authorize = settings->authorize so no matter the
+> original value is, it will be just set as the same value with default
+> setting.
+
+That's true, but what if the external profile is something that we don't
+have a settings entry for? In that case ext->authorize will never be
+explicitly set to anything.
+
+Johan
