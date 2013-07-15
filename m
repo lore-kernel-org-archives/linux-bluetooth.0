@@ -1,43 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 15 Jul 2013 10:35:18 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: martin.xu@linux.intel.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Profile: fix set default exteranl profile authorize
-Message-ID: <20130715073518.GA24712@x220.p-661hnu-f1>
-References: <1373857569-4191-1-git-send-email-martin.xu@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1373857569-4191-1-git-send-email-martin.xu@linux.intel.com>
+From: sujith@msujith.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] ath3k: Add support for ID 0x13d3/0x3402
+Date: Mon, 15 Jul 2013 09:29:03 +0530
+Message-Id: <1373860743-8073-1-git-send-email-sujith@msujith.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
+From: Sujith Manoharan <sujith@msujith.org>
 
-On Mon, Jul 15, 2013, martin.xu@linux.intel.com wrote:
-> authorize is always set as "true" in function ext_set_defaults().
-> 
-> the static variable authorize of default_settings will be 0(false),
-> if it is not initialized. So item authorize needs to be initized if
-> the value is true (non-0).
-> And then function ext_set_defaults() can set default authorize properly
-> ---
->  src/profile.c |   15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
+Bug: https://bugzilla.kernel.org/show_bug.cgi?id=59701
 
-The subject says "PATCH 1/3". Did you intend to send three patches? I
-can only see this one.
+Signed-off-by: Sujith Manoharan <sujith@msujith.org>
+---
+ drivers/bluetooth/ath3k.c | 2 ++
+ drivers/bluetooth/btusb.c | 1 +
+ 2 files changed, 3 insertions(+)
 
-> @@ -1998,7 +2008,6 @@ static void ext_set_defaults(struct ext_profile *ext)
->  
->  	ext->mode = BT_IO_MODE_BASIC;
->  	ext->sec_level = BT_IO_SEC_MEDIUM;
-> -	ext->authorize = true;
->  	ext->enable_client = true;
->  	ext->enable_server = true;
->  	ext->remote_uuid = NULL;
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 11f467c..3f6f40c 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -91,6 +91,7 @@ static struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe04e) },
+ 	{ USB_DEVICE(0x0489, 0xe056) },
+ 	{ USB_DEVICE(0x0489, 0xe04d) },
++	{ USB_DEVICE(0x13d3, 0x3402) },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE02C) },
+@@ -128,6 +129,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+ 	{ USB_DEVICE(0x0489, 0xe04e), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe056), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe04d), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x13d3, 0x3402), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU22 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE03C), .driver_info = BTUSB_ATH3012 },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index de4cf4d..6f00691 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -154,6 +154,7 @@ static struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe04e), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe056), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe04d), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x13d3, 0x3402), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+-- 
+1.8.3.2
 
-The above change is still wrong. Not setting to true is the same as
-setting to false since g_new0 was used. Don't change that part at all.
-
-Johan
