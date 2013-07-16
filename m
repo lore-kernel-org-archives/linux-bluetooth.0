@@ -1,143 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <51E55E7B.8040505@hurleysoftware.com>
-Date: Tue, 16 Jul 2013 10:53:47 -0400
-From: Peter Hurley <peter@hurleysoftware.com>
 MIME-Version: 1.0
-To: Gianluca Anzolin <gianluca@sottospazio.it>
-CC: gustavo@padovan.org, linux-bluetooth@vger.kernel.org,
- marcel@holtmann.org, Greg KH <gregkh@linuxfoundation.org>,
- Jiri Slaby <jslaby@suse.cz>
-Subject: Re: [PATCH 1/8] Take proper tty references in net/bluetooth/rfcomm/tty.c
-References: <1373661649-1385-1-git-send-email-gianluca@sottospazio.it>
-In-Reply-To: <1373661649-1385-1-git-send-email-gianluca@sottospazio.it>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <1373854203-3338-1-git-send-email-martin.xu@linux.intel.com>
+References: <1373854203-3338-1-git-send-email-martin.xu@linux.intel.com>
+Date: Tue, 16 Jul 2013 14:36:37 +0300
+Message-ID: <CABBYNZKwZK6DQOYf-yd76KD3on0dcpXe4VoPg2iNwWvQD+F7mg@mail.gmail.com>
+Subject: Re: [PATCH] Obex/Session: Redefine session target property
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: martin.xu@linux.intel.com
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-[+cc Greg KH, Jiri Slaby ]
+Hi Martin,
 
-On 07/12/2013 04:40 PM, Gianluca Anzolin wrote:
-> In net/bluetooth/rfcomm/tty.c the struct tty_struct is used without taking
-> references. This leads to panics because the structure is freed under our feet
-> while being used.
-
-If you have a stack trace of a panic which is due to use-after-free
-of an rfcomm tty, it should go here. Otherwise, the above sentence should instead
-read sometime like, "This may lead to a use-after-free of the rfcomm tty."
-
-Everything else looks ok.
-
-Reviewed-by: Peter Hurley <peter@hurleysoftware.com>
-
+On Mon, Jul 15, 2013 at 5:10 AM,  <martin.xu@linux.intel.com> wrote:
+> From: Martin <martin.xu@linux.intel.com>
 >
-> Fix it by taking references properly, using the tty_port_* helpers when
-> possible.
+> The definition of Target should be the same with Target parameter
+> of CreateSession.
 >
-> Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
+> And add TargetUUID to save the Obex service UUID
 > ---
->   net/bluetooth/rfcomm/tty.c | 35 +++++++++++++++++++++--------------
->   1 file changed, 21 insertions(+), 14 deletions(-)
+>  doc/obex-api.txt |    8 ++++++++
+>  1 file changed, 8 insertions(+)
 >
-> diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-> index b6e44ad..6c3efb5 100644
-> --- a/net/bluetooth/rfcomm/tty.c
-> +++ b/net/bluetooth/rfcomm/tty.c
-> @@ -333,10 +333,11 @@ static inline unsigned int rfcomm_room(struct rfcomm_dlc *dlc)
->   static void rfcomm_wfree(struct sk_buff *skb)
->   {
->   	struct rfcomm_dev *dev = (void *) skb->sk;
-> -	struct tty_struct *tty = dev->port.tty;
+> diff --git a/doc/obex-api.txt b/doc/obex-api.txt
+> index 22449c4..ad03690 100644
+> --- a/doc/obex-api.txt
+> +++ b/doc/obex-api.txt
+> @@ -67,7 +67,15 @@ Properties   string Source [readonly]
+>                         Bluetooth channel
+>
+>                 string Target [readonly]
+> +                       The currently supported targets are the following:
 > +
->   	atomic_sub(skb->truesize, &dev->wmem_alloc);
-> -	if (test_bit(RFCOMM_TTY_ATTACHED, &dev->flags) && tty)
-> -		tty_wakeup(tty);
-> +	if (test_bit(RFCOMM_TTY_ATTACHED, &dev->flags))
-> +		tty_port_tty_wakeup(&dev->port);
-> +
->   	tty_port_put(&dev->port);
->   }
+> +                               "ftp"
+> +                               "map"
+> +                               "opp"
+> +                               "pbap"
+> +                               "sync"
 >
-> @@ -410,6 +411,7 @@ static int rfcomm_release_dev(void __user *arg)
->   {
->   	struct rfcomm_dev_req req;
->   	struct rfcomm_dev *dev;
-> +	struct tty_struct *tty;
+> +               string TargetUUID [readonly]
+>                         Target UUID
 >
->   	if (copy_from_user(&req, arg, sizeof(req)))
->   		return -EFAULT;
-> @@ -429,8 +431,11 @@ static int rfcomm_release_dev(void __user *arg)
->   		rfcomm_dlc_close(dev->dlc, 0);
->
->   	/* Shut down TTY synchronously before freeing rfcomm_dev */
-> -	if (dev->port.tty)
-> -		tty_vhangup(dev->port.tty);
-> +	tty = tty_port_tty_get(&dev->port);
-> +	if (tty) {
-> +		tty_vhangup(tty);
-> +		tty_kref_put(tty);
-> +	}
->
->   	if (!test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags))
->   		rfcomm_dev_del(dev);
-> @@ -563,6 +568,7 @@ static void rfcomm_dev_data_ready(struct rfcomm_dlc *dlc, struct sk_buff *skb)
->   static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
->   {
->   	struct rfcomm_dev *dev = dlc->owner;
-> +	struct tty_struct *tty;
->   	if (!dev)
->   		return;
->
-> @@ -572,7 +578,8 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
->   	wake_up_interruptible(&dev->wait);
->
->   	if (dlc->state == BT_CLOSED) {
-> -		if (!dev->port.tty) {
-> +		tty = tty_port_tty_get(&dev->port);
-> +		if (!tty) {
->   			if (test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags)) {
->   				/* Drop DLC lock here to avoid deadlock
->   				 * 1. rfcomm_dev_get will take rfcomm_dev_lock
-> @@ -591,8 +598,10 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
->   				tty_port_put(&dev->port);
->   				rfcomm_dlc_lock(dlc);
->   			}
-> -		} else
-> -			tty_hangup(dev->port.tty);
-> +		} else {
-> +			tty_hangup(tty);
-> +			tty_kref_put(tty);
-> +		}
->   	}
->   }
->
-> @@ -604,10 +613,8 @@ static void rfcomm_dev_modem_status(struct rfcomm_dlc *dlc, u8 v24_sig)
->
->   	BT_DBG("dlc %p dev %p v24_sig 0x%02x", dlc, dev, v24_sig);
->
-> -	if ((dev->modem_status & TIOCM_CD) && !(v24_sig & RFCOMM_V24_DV)) {
-> -		if (dev->port.tty && !C_CLOCAL(dev->port.tty))
-> -			tty_hangup(dev->port.tty);
-> -	}
-> +	if ((dev->modem_status & TIOCM_CD) && !(v24_sig & RFCOMM_V24_DV))
-> +		tty_port_tty_hangup(&dev->port, true);
->
->   	dev->modem_status =
->   		((v24_sig & RFCOMM_V24_RTC) ? (TIOCM_DSR | TIOCM_DTR) : 0) |
-> @@ -674,7 +681,7 @@ static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
->
->   	rfcomm_dlc_lock(dlc);
->   	tty->driver_data = dev;
-> -	dev->port.tty = tty;
-> +	tty_port_tty_set(&dev->port, tty);
->   	rfcomm_dlc_unlock(dlc);
->   	set_bit(RFCOMM_TTY_ATTACHED, &dev->flags);
->
-> @@ -742,7 +749,7 @@ static void rfcomm_tty_close(struct tty_struct *tty, struct file *filp)
->
->   		rfcomm_dlc_lock(dev->dlc);
->   		tty->driver_data = NULL;
-> -		dev->port.tty = NULL;
-> +		tty_port_tty_set(&dev->port, NULL);
->   		rfcomm_dlc_unlock(dev->dlc);
->
->   		if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags)) {
->
+>                 string Root [readonly]
+> --
+> 1.7.10.4
+
+I wonder what is the benefit of yet another property, would the UI
+double check if the UUID matches the friendly name? I like to see the
+use case in the description so we really tell how it is going to be
+used, otherwise Target is fine. Btw, for OPP there is as actually a
+UUID as well:
+
+static struct obc_driver opp = {
+.service = "OPP",
+.uuid = OPP_UUID,
+.probe = opp_probe,
+.remove = opp_remove
+};
+
+So I wonder if we should just update the documentation, anyway with
+ObjectManager we do get the interfaces with InterfacesAdded signal so
+you can tell what type of session is that from the interfaces it
+supports, the friendly names in the CreateSession are supported just
+for convenience but they map to UUIDs anyway.
+
+
+--
+Luiz Augusto von Dentz
