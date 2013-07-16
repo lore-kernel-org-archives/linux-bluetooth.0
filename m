@@ -1,72 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1373854203-3338-1-git-send-email-martin.xu@linux.intel.com>
-References: <1373854203-3338-1-git-send-email-martin.xu@linux.intel.com>
-Date: Tue, 16 Jul 2013 14:36:37 +0300
-Message-ID: <CABBYNZKwZK6DQOYf-yd76KD3on0dcpXe4VoPg2iNwWvQD+F7mg@mail.gmail.com>
-Subject: Re: [PATCH] Obex/Session: Redefine session target property
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: martin.xu@linux.intel.com
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: martin.xu@linux.intel.com
+To: linux-bluetooth@vger.kernel.org
+Cc: Martin <martin.xu@linux.intel.com>
+Subject: [PATCH] Profile: fix set default exteranl profile authorize
+Date: Tue, 16 Jul 2013 15:25:41 +0800
+Message-Id: <1373959541-12483-1-git-send-email-martin.xu@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
+From: Martin <martin.xu@linux.intel.com>
 
-On Mon, Jul 15, 2013 at 5:10 AM,  <martin.xu@linux.intel.com> wrote:
-> From: Martin <martin.xu@linux.intel.com>
->
-> The definition of Target should be the same with Target parameter
-> of CreateSession.
->
-> And add TargetUUID to save the Obex service UUID
-> ---
->  doc/obex-api.txt |    8 ++++++++
->  1 file changed, 8 insertions(+)
->
-> diff --git a/doc/obex-api.txt b/doc/obex-api.txt
-> index 22449c4..ad03690 100644
-> --- a/doc/obex-api.txt
-> +++ b/doc/obex-api.txt
-> @@ -67,7 +67,15 @@ Properties   string Source [readonly]
->                         Bluetooth channel
->
->                 string Target [readonly]
-> +                       The currently supported targets are the following:
-> +
-> +                               "ftp"
-> +                               "map"
-> +                               "opp"
-> +                               "pbap"
-> +                               "sync"
->
-> +               string TargetUUID [readonly]
->                         Target UUID
->
->                 string Root [readonly]
-> --
-> 1.7.10.4
+authorize is always set as "true" in function ext_set_defaults().
 
-I wonder what is the benefit of yet another property, would the UI
-double check if the UUID matches the friendly name? I like to see the
-use case in the description so we really tell how it is going to be
-used, otherwise Target is fine. Btw, for OPP there is as actually a
-UUID as well:
+the static variable authorize of default_settings will be 0(false),
+if it is not initialized. So item authorize needs to be initized if
+the value is true (non-0).
+And then function ext_set_defaults() can set default authorize properly
+---
+ src/profile.c |   15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-static struct obc_driver opp = {
-.service = "OPP",
-.uuid = OPP_UUID,
-.probe = opp_probe,
-.remove = opp_remove
-};
+diff --git a/src/profile.c b/src/profile.c
+index c745811..aedd5fd 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -1907,12 +1907,14 @@ static struct default_settings {
+ 		.uuid		= SPP_UUID,
+ 		.name		= "Serial Port",
+ 		.channel	= SPP_DEFAULT_CHANNEL,
++		.authorize	= true,
+ 		.get_record	= get_spp_record,
+ 		.version	= 0x0102,
+ 	}, {
+ 		.uuid		= DUN_GW_UUID,
+ 		.name		= "Dial-Up Networking",
+ 		.channel	= DUN_DEFAULT_CHANNEL,
++		.authorize	= true,
+ 		.get_record	= get_dun_record,
+ 		.version	= 0x0102,
+ 	}, {
+@@ -1921,6 +1923,7 @@ static struct default_settings {
+ 		.priority	= BTD_PROFILE_PRIORITY_HIGH,
+ 		.remote_uuid	= HFP_AG_UUID,
+ 		.channel	= HFP_HF_DEFAULT_CHANNEL,
++		.authorize	= true,
+ 		.auto_connect	= true,
+ 		.get_record	= get_hfp_hf_record,
+ 		.version	= 0x0105,
+@@ -1930,6 +1933,7 @@ static struct default_settings {
+ 		.priority	= BTD_PROFILE_PRIORITY_HIGH,
+ 		.remote_uuid	= HFP_HS_UUID,
+ 		.channel	= HFP_AG_DEFAULT_CHANNEL,
++		.authorize	= true,
+ 		.auto_connect	= true,
+ 		.get_record	= get_hfp_ag_record,
+ 		.version	= 0x0105,
+@@ -1939,6 +1943,7 @@ static struct default_settings {
+ 		.priority	= BTD_PROFILE_PRIORITY_HIGH,
+ 		.remote_uuid	= HSP_HS_UUID,
+ 		.channel	= HSP_AG_DEFAULT_CHANNEL,
++		.authorize	= true,
+ 		.auto_connect	= true,
+ 	}, {
+ 		.uuid		= OBEX_OPP_UUID,
+@@ -1947,7 +1952,6 @@ static struct default_settings {
+ 		.psm		= BTD_PROFILE_PSM_AUTO,
+ 		.mode		= BT_IO_MODE_ERTM,
+ 		.sec_level	= BT_IO_SEC_LOW,
+-		.authorize	= false,
+ 		.get_record	= get_opp_record,
+ 		.version	= 0x0102,
+ 	}, {
+@@ -1956,30 +1960,35 @@ static struct default_settings {
+ 		.channel	= FTP_DEFAULT_CHANNEL,
+ 		.psm		= BTD_PROFILE_PSM_AUTO,
+ 		.mode		= BT_IO_MODE_ERTM,
++		.authorize	= true,
+ 		.get_record	= get_ftp_record,
+ 		.version	= 0x0102,
+ 	}, {
+ 		.uuid		= OBEX_SYNC_UUID,
+ 		.name		= "Synchronization",
+ 		.channel	= SYNC_DEFAULT_CHANNEL,
++		.authorize	= true,
+ 		.get_record	= get_sync_record,
+ 		.version	= 0x0100,
+ 	}, {
+ 		.uuid		= OBEX_PSE_UUID,
+ 		.name		= "Phone Book Access",
+ 		.channel	= PBAP_DEFAULT_CHANNEL,
++		.authorize	= true,
+ 		.get_record	= get_pse_record,
+ 		.version	= 0x0101,
+ 	}, {
+ 		.uuid		= OBEX_PCE_UUID,
+ 		.name		= "Phone Book Access Client",
+ 		.remote_uuid	= OBEX_PSE_UUID,
++		.authorize	= true,
+ 		.get_record	= get_pce_record,
+ 		.version	= 0x0101,
+ 	}, {
+ 		.uuid		= OBEX_MAS_UUID,
+ 		.name		= "Message Access",
+ 		.channel	= MAS_DEFAULT_CHANNEL,
++		.authorize	= true,
+ 		.get_record	= get_mas_record,
+ 		.version	= 0x0100
+ 	}, {
+@@ -1987,6 +1996,7 @@ static struct default_settings {
+ 		.name		= "Message Notification",
+ 		.channel	= MNS_DEFAULT_CHANNEL,
+ 		.psm		= BTD_PROFILE_PSM_AUTO,
++		.authorize	= true,
+ 		.get_record	= get_mns_record,
+ 		.version	= 0x0100
+ 	},
+@@ -2029,6 +2039,9 @@ static void ext_set_defaults(struct ext_profile *ext)
+ 		if (settings->mode)
+ 			ext->mode = settings->mode;
+ 
++		if (!settings->authorize)
++			ext->authorize = false;
++
+ 		if (settings->auto_connect)
+ 			ext->p.auto_connect = true;
+ 
+-- 
+1.7.10.4
 
-So I wonder if we should just update the documentation, anyway with
-ObjectManager we do get the interfaces with InterfacesAdded signal so
-you can tell what type of session is that from the interfaces it
-supports, the friendly names in the CreateSession are supported just
-for convenience but they map to UUIDs anyway.
-
-
---
-Luiz Augusto von Dentz
