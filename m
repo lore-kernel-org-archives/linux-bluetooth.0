@@ -1,60 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 17 Jul 2013 19:05:00 +0200
-From: Gianluca Anzolin <gianluca@sottospazio.it>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: gustavo@padovan.org, linux-bluetooth@vger.kernel.org,
-	marcel@holtmann.org
-Subject: Re: [PATCH 6/8] Fix the reference counting of tty_port
-Message-ID: <20130717170500.GA10640@sottospazio.it>
-References: <1373661649-1385-1-git-send-email-gianluca@sottospazio.it>
- <1373661649-1385-6-git-send-email-gianluca@sottospazio.it>
- <51E6A3F7.20202@hurleysoftware.com>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <51E6A3F7.20202@hurleysoftware.com>
+Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
+Subject: Re: [PATCH 1/1 v2] Bluetooth: Fix ACL alive for long in case of non pariable devices
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1374078638-3248-1-git-send-email-syamsidhardh@gmail.com>
+Date: Wed, 17 Jul 2013 09:40:52 -0700
+Cc: linux-bluetooth@vger.kernel.org,
+	Syam Sidhardhan <s.syam@samsung.com>
+Message-Id: <EDEF901A-564A-4532-B291-61F0CCDB9BFD@holtmann.org>
+References: <1374078638-3248-1-git-send-email-syamsidhardh@gmail.com>
+To: Syam Sidhardhan <syamsidhardh@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Jul 17, 2013 at 10:02:31AM -0400, Peter Hurley wrote:
-> >
-> >@@ -687,7 +665,9 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
-> >  					return;
-> >  				}
-> >
-> >-				rfcomm_dev_del(dev);
-> >+				set_bit(RFCOMM_TTY_RELEASED, &dev->flags);
-> >+				tty_port_put(&dev->port);
-> >+
-> >  				tty_port_put(&dev->port);
-> >  				rfcomm_dlc_lock(dlc);
-> >  			}
-> 
-> While this is functionally correct, it ignores the larger issue in
-> rfcomm_dev_state_change(); namely, what prevents the rfcomm_dev from being
-> destructed immediately after
-> 
-> 	struct rfcomm_dev *dev = dlc->owner;
-> 
-> If the answer to that question is the dlc lock, then the whole function is
-> _broken_.
-> 
-> No amount of reference counting will prevent the rfcomm_dev destructor
-> from completing once the dlc lock is dropped. (Presumably the dlc is not
-> subject to destruction once the lock is dropped. Is this true?)
-> 
-> This means:
-> 1. Holding the dlc lock from the caller is pointless and should be dropped.
-> 2. Some other solution is required to either preserve rfcomm_dev lifetime
->    or determine that destruction is already in progress.
+Hi Syam,
 
-I'm afraid I lied in the commit message: there are three places where the
-tty_port may be released and the code above is the third one.
+> For certain devices (ex: HID mouse), support for authentication,
+> pairing and bonding is optional. For such devices, the ACL alive
+> for too long after the L2CAP disconnection.
+> 
+> To avoid the ACL alive for too long after L2CAP disconnection, reset the ACL
+> disconnect timeout back to HCI_DISCONN_TIMEOUT when L2CAP is connected.
+> 
+> While merging the commit id:a9ea3ed9b71cc3271dd59e76f65748adcaa76422
+> this issue might have introduced.
+> 
+> Signed-off-by: Sang-Ki Park <sangki79.park@samsung.com>
+> Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
+> ---
+> v1 -> Modified the code as per the latest code.
+> v2 -> Add descriptive comment as per Marcel request.
+> 
+> net/bluetooth/l2cap_core.c |    9 +++++++++
+> 1 file changed, 9 insertions(+)
 
-I wrote that message because at first I wanted to remove that code path but
-then noticed I shouldn't.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-Maybe we can simply save the dev->id before releasing the lock and then feed
-that integer to rfcomm_dev_get? After all if the destruction is in progress
-rfcomm_dev_get(id) == NULL and we return immediately. Otherwise we release the
-tty_port.
+Regards
 
-Gianluca
+Marcel
+
