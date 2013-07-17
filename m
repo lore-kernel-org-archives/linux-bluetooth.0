@@ -1,65 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <51E6B63D.8000709@hurleysoftware.com>
+Date: Wed, 17 Jul 2013 11:20:29 -0400
+From: Peter Hurley <peter@hurleysoftware.com>
 MIME-Version: 1.0
-In-Reply-To: <2DF36CCC-A852-48C4-9CA7-208406E7AE8A@holtmann.org>
-References: <1372414472-15854-1-git-send-email-s.syam@samsung.com>
-	<2DF36CCC-A852-48C4-9CA7-208406E7AE8A@holtmann.org>
-Date: Wed, 17 Jul 2013 21:58:44 +0530
-Message-ID: <CAFBvHid2U1YLFAGg0Za=kBz2qeasZrBTjiju+6qkLHRF0Y2bkw@mail.gmail.com>
-Subject: Re: [PATCH 1/1 v1] Bluetooth: Fix ACL alive for long in case of non
- pariable devices
-From: Syam Sidhardhan <syamsidhardh@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Syam Sidhardhan <s.syam@samsung.com>,
-	User Name <linux-bluetooth@vger.kernel.org>,
-	Sang-Ki Park <sangki79.park@samsung.com>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Gianluca Anzolin <gianluca@sottospazio.it>
+CC: gustavo@padovan.org, linux-bluetooth@vger.kernel.org,
+ marcel@holtmann.org
+Subject: Re: [PATCH 8/8] Add module_put in rfcomm_dev_add error path
+References: <1373661649-1385-1-git-send-email-gianluca@sottospazio.it> <1373661649-1385-8-git-send-email-gianluca@sottospazio.it>
+In-Reply-To: <1373661649-1385-8-git-send-email-gianluca@sottospazio.it>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On 07/12/2013 04:40 PM, Gianluca Anzolin wrote:
+> rfcomm_dev_add doesn't call module_put() in its error path when it took a
+> reference.
+
+Good catch.
+
+> Fix by always calling __module_get() and module_put() in the error path.
+>
+> Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
+> ---
+>   net/bluetooth/rfcomm/tty.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+> index 7bc603a..40288c3 100644
+> --- a/net/bluetooth/rfcomm/tty.c
+> +++ b/net/bluetooth/rfcomm/tty.c
+> @@ -357,11 +357,11 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
+>
+>   	rfcomm_dlc_unlock(dlc);
+>
+> +out:
+>   	/* It's safe to call __module_get() here because socket already
+>   	   holds reference to this module. */
+>   	__module_get(THIS_MODULE);
+>
+> -out:
+>   	spin_unlock(&rfcomm_dev_lock);
+>
+>   	if (err < 0)
+
+Is it possible to reverse the order-of-operations here:
+
+	spin_unlock(&rfcomm_dev_lock);
+	__module_get(THIS_MODULE);
+
+Then the out: label could be moved to the function exit as noted below.
+
+The rfcomm_dev_lock use here is what creates the mess in rfcomm_dev_state_change().
+Anyone know why the rfcomm_dev_lock critical section is so ridiculously large
+here? Does it really protect the module count??
 
 
-On Fri, Jun 28, 2013 at 9:53 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> @@ -386,6 +386,7 @@ out:
+>   	return dev->id;
 >
-> Hi Syam,
->
-> > For certain devices (ex: HID mouse), support for authentication,
-> > pairing and bonding is optional. For such devices, the ACL alive
-> > for too long after the l2cap disconnection.
-> >
-> > To avoid keep ACL alive for too long, set the ACL timeout back to
-> > HCI_DISCONN_TIMEOUT when l2cap is connected.
-> >
-> > While merging the commit id:a9ea3ed9b71cc3271dd59e76f65748adcaa76422
-> > this issue might have introduce.
-> >
-> > Signed-off-by: Sang-Ki Park <sangki79.park@samsung.com>
-> > Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
-> > ---
-> > net/bluetooth/l2cap_core.c |    4 ++++
-> > 1 file changed, 4 insertions(+)
-> >
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index 9af3a76..80df756 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -1383,6 +1383,10 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
-> >
-> >       BT_DBG("conn %p", conn);
-> >
->
-> might be a good idea to add a comment here on why we are resetting the disc_timeout back to the original value.
->
+>   free:
+> +	module_put(THIS_MODULE);
 
-Ok, Now I'll send a patch with the comment added.
+     out:
+	spin_unlock(&rfcomm_dev_lock);
 
-> > +     hci_conn_hold(conn->hcon);
-> > +     conn->hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
-> > +     hci_conn_drop(conn->hcon);
-> > +
-> >       /* For outgoing pairing which doesn't necessarily have an
-> >        * associated socket (e.g. mgmt_pair_device).
-> >        */
+>   	kfree(dev);
+>   	return err;
+>   }
 >
-Regards,
-Syam
