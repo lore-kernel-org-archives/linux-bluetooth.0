@@ -1,82 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Xu, Martin" <martin.xu@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"martin.xu@linux.intel.com" <martin.xu@linux.intel.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] Obex/Session: Redefine session target property
-Date: Wed, 17 Jul 2013 06:20:58 +0000
-Message-ID: <29981E9CC6590A438DB8A519AEB0053010D42E47@SHSMSX103.ccr.corp.intel.com>
-References: <1373854203-3338-1-git-send-email-martin.xu@linux.intel.com>
- <CABBYNZKwZK6DQOYf-yd76KD3on0dcpXe4VoPg2iNwWvQD+F7mg@mail.gmail.com>
-In-Reply-To: <CABBYNZKwZK6DQOYf-yd76KD3on0dcpXe4VoPg2iNwWvQD+F7mg@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: AceLan Kao <acelan.kao@canonical.com>
+To: linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Subject: [PATCH] Bluetooth: Add support for Atheros [0cf3:3121]
+Date: Wed, 17 Jul 2013 11:27:40 +0800
+Message-Id: <1374031660-13544-1-git-send-email-acelan.kao@canonical.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz:
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
-> Sent: Tuesday, July 16, 2013 19:37
-> To: martin.xu@linux.intel.com
-> Cc: linux-bluetooth@vger.kernel.org
-> Subject: Re: [PATCH] Obex/Session: Redefine session target property
-> 
-> Hi Martin,
-> 
-> On Mon, Jul 15, 2013 at 5:10 AM,  <martin.xu@linux.intel.com> wrote:
-> > From: Martin <martin.xu@linux.intel.com>
-> >
-> > The definition of Target should be the same with Target parameter of
-> > CreateSession.
-> >
-> > And add TargetUUID to save the Obex service UUID
-> > ---
-> >  doc/obex-api.txt |    8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> >
-> > diff --git a/doc/obex-api.txt b/doc/obex-api.txt index
-> > 22449c4..ad03690 100644
-> > --- a/doc/obex-api.txt
-> > +++ b/doc/obex-api.txt
-> > @@ -67,7 +67,15 @@ Properties   string Source [readonly]
-> >                         Bluetooth channel
-> >
-> >                 string Target [readonly]
-> > +                       The currently supported targets are the
-> following:
-> > +
-> > +                               "ftp"
-> > +                               "map"
-> > +                               "opp"
-> > +                               "pbap"
-> > +                               "sync"
-> >
-> > +               string TargetUUID [readonly]
-> >                         Target UUID
-> >
-> >                 string Root [readonly]
-> > --
-> > 1.7.10.4
-> 
-> I wonder what is the benefit of yet another property, would the UI
-> double check if the UUID matches the friendly name? I like to see the
-> use case in the description so we really tell how it is going to be
-> used, otherwise Target is fine. Btw, for OPP there is as actually a
-> UUID as well:
-> 
-> static struct obc_driver opp = {
-> .service = "OPP",
-> .uuid = OPP_UUID,
-> .probe = opp_probe,
-> .remove = opp_remove
-> };
-The target head of OPP is not used see
-SIG OBJECT PUSH PROFILE v.12 Section 5.4. At this situation it is not
-Proper for UI to decide the session type by Can't the TargetUUID. 
+Add support for the AR3012 chip.
 
-Furthermore, we need to make Target comply with that in CreateSession target parameter
-And it is friendly to UI to get the session type, otherwise, UI needs to check the UUID.
+T:  Bus=03 Lev=01 Prnt=01 Port=06 Cnt=01 Dev#=  6 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0cf3 ProdID=3121 Rev=00.02
+C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-Of course we need to use TargetUUID on external profile.
+Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+---
+ drivers/bluetooth/ath3k.c | 2 ++
+ drivers/bluetooth/btusb.c | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 6f17e4d..af89529 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -92,6 +92,7 @@ static struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe056) },
+ 	{ USB_DEVICE(0x0489, 0xe04d) },
+ 	{ USB_DEVICE(0x04c5, 0x1330) },
++	{ USB_DEVICE(0x0cf3, 0x3121) },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE02C) },
+@@ -130,6 +131,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+ 	{ USB_DEVICE(0x0489, 0xe056), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe04d), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04c5, 0x1330), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0x3121), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU22 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE03C), .driver_info = BTUSB_ATH3012 },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index ad03394..92dd860 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -152,6 +152,7 @@ static struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe056), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe04d), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04c5, 0x1330), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0cf3, 0x3121), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+-- 
+1.8.1.2
+
