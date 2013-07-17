@@ -1,88 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=iso-8859-1
-Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
-Subject: Re: [PATCH v9 5/9] Bluetooth: Use voice setting in defered SCO connection request
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1373645143-7494-6-git-send-email-frederic.dalleau@linux.intel.com>
-Date: Wed, 17 Jul 2013 18:08:49 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <972DEBBC-A2D1-433A-BB70-3FB9692E5278@holtmann.org>
-References: <1373645143-7494-1-git-send-email-frederic.dalleau@linux.intel.com> <1373645143-7494-6-git-send-email-frederic.dalleau@linux.intel.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <51E6DE1D.4020808@hurleysoftware.com>
+Date: Wed, 17 Jul 2013 14:10:37 -0400
+From: Peter Hurley <peter@hurleysoftware.com>
+MIME-Version: 1.0
+To: Gianluca Anzolin <gianluca@sottospazio.it>
+CC: gustavo@padovan.org, linux-bluetooth@vger.kernel.org,
+ marcel@holtmann.org
+Subject: Re: [PATCH 6/8] Fix the reference counting of tty_port
+References: <1373661649-1385-1-git-send-email-gianluca@sottospazio.it> <1373661649-1385-6-git-send-email-gianluca@sottospazio.it> <51E6A3F7.20202@hurleysoftware.com> <20130717170500.GA10640@sottospazio.it>
+In-Reply-To: <20130717170500.GA10640@sottospazio.it>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fred,
+On 07/17/2013 01:05 PM, Gianluca Anzolin wrote:
+> On Wed, Jul 17, 2013 at 10:02:31AM -0400, Peter Hurley wrote:
+>>>
+>>> @@ -687,7 +665,9 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
+>>>   					return;
+>>>   				}
+>>>
+>>> -				rfcomm_dev_del(dev);
+>>> +				set_bit(RFCOMM_TTY_RELEASED, &dev->flags);
+>>> +				tty_port_put(&dev->port);
+>>> +
+>>>   				tty_port_put(&dev->port);
+>>>   				rfcomm_dlc_lock(dlc);
+>>>   			}
+>>
+>> While this is functionally correct, it ignores the larger issue in
+>> rfcomm_dev_state_change(); namely, what prevents the rfcomm_dev from being
+>> destructed immediately after
+>>
+>> 	struct rfcomm_dev *dev = dlc->owner;
+>>
+>> If the answer to that question is the dlc lock, then the whole function is
+>> _broken_.
+>>
+>> No amount of reference counting will prevent the rfcomm_dev destructor
+>> from completing once the dlc lock is dropped. (Presumably the dlc is not
+>> subject to destruction once the lock is dropped. Is this true?)
+>>
+>> This means:
+>> 1. Holding the dlc lock from the caller is pointless and should be dropped.
+>> 2. Some other solution is required to either preserve rfcomm_dev lifetime
+>>     or determine that destruction is already in progress.
+>
+> I'm afraid I lied in the commit message: there are three places where the
+> tty_port may be released and the code above is the third one.
+>
+> I wrote that message because at first I wanted to remove that code path but
+> then noticed I shouldn't.
+>
+> Maybe we can simply save the dev->id before releasing the lock and then feed
+> that integer to rfcomm_dev_get? After all if the destruction is in progress
+> rfcomm_dev_get(id) == NULL and we return immediately. Otherwise we release the
+> tty_port.
 
-> When an incoming eSCO connection is requested, check the selected voice setting
-> and reply appropriately. Voice setting should have been negotiated previously.
-> For example, in case of HFP, the codec is negotiated using AT commands on the
-> RFCOMM channel. This patch only changes replies for socket with defered setup
-> enabled.
-> 
-> Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
-> ---
-> net/bluetooth/sco.c |   22 +++++++++++++++++-----
-> 1 file changed, 17 insertions(+), 5 deletions(-)
-> 
-> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> index ce8690f..934002c 100644
-> --- a/net/bluetooth/sco.c
-> +++ b/net/bluetooth/sco.c
-> @@ -653,7 +653,7 @@ static int sco_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
-> 	return err;
-> }
-> 
-> -static void sco_conn_defer_accept(struct hci_conn *conn)
-> +static void sco_conn_defer_accept(struct hci_conn *conn, int setting)
+I had forgotten about your earlier change to remove the rfcomm_dev node
+from the list as the first op of the destructor. That does ensure
+rfcomm_dev_get(id) will not return a rfcomm_dev which is destructing.
 
-since we are using the setting as input to cpu_to_le16, please make this __u16.
+That said, preventing rfcomm_dev destruction by holding the dlc lock
+is poor design (not that I'm suggesting you should be required to fix it though)
+and something that at least needs documenting.
 
-> {
-> 	struct hci_dev *hdev = conn->hdev;
-> 
-> @@ -676,9 +676,21 @@ static void sco_conn_defer_accept(struct hci_conn *conn)
-> 
-> 		cp.tx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
-> 		cp.rx_bandwidth   = __constant_cpu_to_le32(0x00001f40);
-> -		cp.max_latency    = __constant_cpu_to_le16(0xffff);
-> -		cp.content_format = cpu_to_le16(hdev->voice_setting);
-> -		cp.retrans_effort = 0xff;
-> +		cp.content_format = cpu_to_le16(setting);
-> +
-> +		switch (setting & SCO_AIRMODE_MASK) {
-> +		case SCO_AIRMODE_TRANSP:
-> +			if (conn->pkt_type & ESCO_2EV3)
-> +				cp.max_latency = __constant_cpu_to_le16(0x0008);
-> +			else
-> +				cp.max_latency = __constant_cpu_to_le16(0x000D);
-> +			cp.retrans_effort = 0x02;
-> +			break;
-> +		case SCO_AIRMODE_CVSD:
-> +			cp.max_latency    = __constant_cpu_to_le16(0xffff);
+Regarding acquiring a snapshot of dev->id is fine, provided that the id
+cannot be reallocated in between dropping the dlc lock and subsequently
+scanning the rfcomm_dev_list for that id.
 
-No need to align = here.
-
-> +			cp.retrans_effort = 0xff;
-> +			break;
-> +		}
-> 
-> 		hci_send_cmd(hdev, HCI_OP_ACCEPT_SYNC_CONN_REQ,
-> 			     sizeof(cp), &cp);
-> @@ -695,7 +707,7 @@ static int sco_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
-> 
-> 	if (sk->sk_state == BT_CONNECT2 &&
-> 	    test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
-> -		sco_conn_defer_accept(pi->conn->hcon);
-> +		sco_conn_defer_accept(pi->conn->hcon, pi->setting);
-
-Please check that pi->setting is not int type. It needs to be __u16.
-
-> 		sk->sk_state = BT_CONFIG;
-> 		msg->msg_namelen = 0;
-
-Regards
-
-Marcel
-
+Regards,
+Peter Hurley
