@@ -1,32 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 17 Jul 2013 11:36:07 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: martin.xu@linux.intel.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] profile: fix set default exteranl profile authorize
-Message-ID: <20130717083607.GA7940@x220.p-661hnu-f1>
-References: <1374028645-15366-1-git-send-email-martin.xu@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1374028645-15366-1-git-send-email-martin.xu@linux.intel.com>
+In-Reply-To: <1374030918-1730-1-git-send-email-martin.xu@linux.intel.com>
+References: <1374030918-1730-1-git-send-email-martin.xu@linux.intel.com>
+Date: Wed, 17 Jul 2013 11:17:37 +0300
+Message-ID: <CABBYNZ+9z--2pE6=uBBxVC7F4cJ6dx-8MjYHyk_t+Z-cThg2uw@mail.gmail.com>
+Subject: Re: [PATCH] obexd/session: Do not check session->driver->uuid in get_target()
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: martin.xu@linux.intel.com
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Martin,
 
-On Wed, Jul 17, 2013, martin.xu@linux.intel.com wrote:
+On Wed, Jul 17, 2013 at 6:15 AM,  <martin.xu@linux.intel.com> wrote:
 > From: Martin Xu <martin.xu@linux.intel.com>
-> 
-> authorize is always set as "true" in function ext_set_defaults().
-> 
-> the static variable authorize of default_settings will be 0(false),
-> if it is not initialized. So item authorize needs to be initized if
-> the value is true (non-0).
-> And then function ext_set_defaults() can set default authorize properly
+>
+> since it already be checked at target_exists(), so if session->driver->uuid
+> is NULL get_target() should not be called.
 > ---
->  src/profile.c |   14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
+>  obexd/client/session.c |    3 ---
+>  1 file changed, 3 deletions(-)
+>
+> diff --git a/obexd/client/session.c b/obexd/client/session.c
+> index 44e2bf8..361c921 100644
+> --- a/obexd/client/session.c
+> +++ b/obexd/client/session.c
+> @@ -680,9 +680,6 @@ static gboolean get_target(const GDBusPropertyTable *property,
+>  {
+>         struct obc_session *session = data;
+>
+> -       if (session->driver->uuid == NULL)
+> -               return FALSE;
+> -
+>         dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
+>                                                 &session->driver->uuid);
+>
+> --
+> 1.7.10.4
 
-Applied. Thanks.
+This is used as a safe guard to avoid any chance that NULL is passed
+to dbus_message_iter_append_basic in case get_target is called from
+another context, it isn't the case here but it is consistent with
+other parts of the code.
 
-Johan
+
+--
+Luiz Augusto von Dentz
