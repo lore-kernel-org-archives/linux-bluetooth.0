@@ -1,32 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 17 Jul 2013 10:03:19 +0200
-From: Gianluca Anzolin <gianluca@sottospazio.it>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: gustavo@padovan.org, linux-bluetooth@vger.kernel.org,
-	marcel@holtmann.org
-Subject: Re: [PATCH 5/8] Use the tty_port_* functions in
- tty_open/tty_close/tty_hangup
-Message-ID: <20130717080319.GA8226@sottospazio.it>
-References: <1373661649-1385-1-git-send-email-gianluca@sottospazio.it>
- <1373661649-1385-5-git-send-email-gianluca@sottospazio.it>
- <51E5B259.2090501@hurleysoftware.com>
+From: "Xu, Martin" <martin.xu@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"martin.xu@linux.intel.com" <martin.xu@linux.intel.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH] Obex/Session: Redefine session target property
+Date: Wed, 17 Jul 2013 06:20:58 +0000
+Message-ID: <29981E9CC6590A438DB8A519AEB0053010D42E47@SHSMSX103.ccr.corp.intel.com>
+References: <1373854203-3338-1-git-send-email-martin.xu@linux.intel.com>
+ <CABBYNZKwZK6DQOYf-yd76KD3on0dcpXe4VoPg2iNwWvQD+F7mg@mail.gmail.com>
+In-Reply-To: <CABBYNZKwZK6DQOYf-yd76KD3on0dcpXe4VoPg2iNwWvQD+F7mg@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <51E5B259.2090501@hurleysoftware.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jul 16, 2013 at 04:51:37PM -0400, Peter Hurley wrote:
-> On 07/12/2013 04:40 PM, Gianluca Anzolin wrote:
-> >Use the tty_port_open tty_port_close and tty_port_hangup functions that manage
-> >properly the port.count and the tty_port operations.
+Hi Luiz:
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
+> Sent: Tuesday, July 16, 2013 19:37
+> To: martin.xu@linux.intel.com
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: [PATCH] Obex/Session: Redefine session target property
 > 
-> Please merge this patch with 'Move device initialization and shutdown...".
-> See comments below.
+> Hi Martin,
+> 
+> On Mon, Jul 15, 2013 at 5:10 AM,  <martin.xu@linux.intel.com> wrote:
+> > From: Martin <martin.xu@linux.intel.com>
+> >
+> > The definition of Target should be the same with Target parameter of
+> > CreateSession.
+> >
+> > And add TargetUUID to save the Obex service UUID
+> > ---
+> >  doc/obex-api.txt |    8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> >
+> > diff --git a/doc/obex-api.txt b/doc/obex-api.txt index
+> > 22449c4..ad03690 100644
+> > --- a/doc/obex-api.txt
+> > +++ b/doc/obex-api.txt
+> > @@ -67,7 +67,15 @@ Properties   string Source [readonly]
+> >                         Bluetooth channel
+> >
+> >                 string Target [readonly]
+> > +                       The currently supported targets are the
+> following:
+> > +
+> > +                               "ftp"
+> > +                               "map"
+> > +                               "opp"
+> > +                               "pbap"
+> > +                               "sync"
+> >
+> > +               string TargetUUID [readonly]
+> >                         Target UUID
+> >
+> >                 string Root [readonly]
+> > --
+> > 1.7.10.4
+> 
+> I wonder what is the benefit of yet another property, would the UI
+> double check if the UUID matches the friendly name? I like to see the
+> use case in the description so we really tell how it is going to be
+> used, otherwise Target is fine. Btw, for OPP there is as actually a
+> UUID as well:
+> 
+> static struct obc_driver opp = {
+> .service = "OPP",
+> .uuid = OPP_UUID,
+> .probe = opp_probe,
+> .remove = opp_remove
+> };
+The target head of OPP is not used see
+SIG OBJECT PUSH PROFILE v.12 Section 5.4. At this situation it is not
+Proper for UI to decide the session type by Can't the TargetUUID. 
 
-Thank you for your review, I'll rework the patches following your
-instructions.
+Furthermore, we need to make Target comply with that in CreateSession target parameter
+And it is friendly to UI to get the session type, otherwise, UI needs to check the UUID.
 
-After I sent them I noticed also there were whitespace issues, for the next
-iteration I will be more careful.
-
-Gianluca
+Of course we need to use TargetUUID on external profile.
