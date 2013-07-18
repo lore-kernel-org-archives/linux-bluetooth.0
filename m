@@ -1,33 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sathish N <sathish.n@globaledgesoft.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: girish.br@globaledgesoft.com, sathish.n@globaledgesoft.com,
-	ajay.kv@globaledgesoft.com, anderson.lizardo@openbossa.org
-Subject: [PATCH bluez] attrib: gatttool segfault interactive
-Date: Thu, 18 Jul 2013 16:05:45 +0530
-Message-Id: <1374143745-16224-1-git-send-email-sathish.n@globaledgesoft.com>
+Date: Thu, 18 Jul 2013 12:33:40 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] lib: Remove duplicated HSP_HS_UUID definition
+Message-ID: <20130718093340.GA11622@x220.p-661hnu-f1>
+References: <1374114009-23434-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1374114009-23434-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: sathish N <sathish.n@globaledgesoft.com>
+Hi Lizardo,
 
----
- bluez/attrib/interactive.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On Wed, Jul 17, 2013, Anderson Lizardo wrote:
+> There is an identical definition on the same header file (next to
+> HSP_AG_UUID).
+> ---
+>  lib/uuid.h |    1 -
+>  1 file changed, 1 deletion(-)
 
-diff --git a/bluez/attrib/interactive.c b/bluez/attrib/interactive.c
-index f28dc22..4fd7276 100644
---- a/bluez/attrib/interactive.c
-+++ b/bluez/attrib/interactive.c
-@@ -867,7 +867,8 @@ static void parse_line(char *line_read)
- 
- 	add_history(line_read);
- 
--	g_shell_parse_argv(line_read, &argcp, &argvp, NULL);
-+	if (g_shell_parse_argv(line_read, &argcp, &argvp, NULL) == FALSE)
-+		goto done;
- 
- 	for (i = 0; commands[i].cmd; i++)
- 		if (strcasecmp(commands[i].cmd, argvp[0]) == 0)
--- 
-1.7.9.5
+Applied. Thanks.
+
+Johan
