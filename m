@@ -3,9 +3,9 @@ From: Sathish N <sathish.n@globaledgesoft.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: girish.br@globaledgesoft.com, sathish.n@globaledgesoft.com,
 	ajay.kv@globaledgesoft.com, anderson.lizardo@openbossa.org
-Subject: [PATCH bluez] attrib: Fix interactive gatttool segfault 
-Date: Thu, 18 Jul 2013 16:12:36 +0530
-Message-Id: <1374144156-16351-1-git-send-email-sathish.n@globaledgesoft.com>
+Subject: [PATCH bluez] attrib: gatttool segfault interactive
+Date: Thu, 18 Jul 2013 16:05:45 +0530
+Message-Id: <1374143745-16224-1-git-send-email-sathish.n@globaledgesoft.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
