@@ -1,36 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 19 Jul 2013 14:26:29 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Sathish Narasimman <sathish.n@globaledgesoft.com>
-Cc: linux-bluetooth@vger.kernel.org, girish.br@globaledgesoft.com,
-	anderson.lizardo@openbossa.org, ajay.kv@globaledgesoft.com
-Subject: Re: [PATCH BlueZ] attrib: Fix interactive gatttool segfault
-Message-ID: <20130719112629.GA741@x220.p-661hnu-f1>
-References: <1374208312-18661-1-git-send-email-sathish.n@globaledgesoft.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <1374208312-18661-1-git-send-email-sathish.n@globaledgesoft.com>
+References: <1374208312-18661-1-git-send-email-sathish.n@globaledgesoft.com>
+Date: Fri, 19 Jul 2013 07:03:56 -0400
+Message-ID: <CAJdJm_Ovac4BYhhRc-5H7t8wazeT28f0gvb5bOO8yzQ_rbuD-w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] attrib: Fix interactive gatttool segfault
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Sathish Narasimman <sathish.n@globaledgesoft.com>
+Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com,
+	girish.br@globaledgesoft.com, ajay.kv@globaledgesoft.com
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Satish,
+Hi Sathish,
 
-On Fri, Jul 19, 2013, Sathish Narasimman wrote:
+On Fri, Jul 19, 2013 at 12:31 AM, Sathish Narasimman
+<sathish.n@globaledgesoft.com> wrote:
 > passing the special character single quote
-> 
+>
 > $gatttool -I
 > [   ][                 ][LE]> '
 > Segmentation fault (core dumped)
-> 
+>
 > Checking g_shell_parse_argv fail status(return FALSE on failure), works fine.
-> 
+>
 > hope the fix to the previous "git am" error is solved
-> 
-> ---
->  attrib/interactive.c |    3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
 
-The patch has now been applied (after manually removing the last comment
-that doesn't belong in the commit message). Thanks.
+"git am" on this patch worked here. But one small note (for future
+patches; I think there is no need to resend this one as it is easily
+fixed locally): if you need to put a comment like the above that you
+don't want to appear on the GIT commit message, you should put it
+after "---" so it is ignored by "git am". They way I do this is use
+"git format-patch" to generate a *.patch file, then I edit this file
+to add the note after the "---" and send the patch using git send-mail
+<file>.patch.
 
-Johan
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
