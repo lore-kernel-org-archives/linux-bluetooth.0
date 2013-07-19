@@ -1,94 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
-Subject: [PATCH BlueZ 06/11] attrib: Fix coding style for various enc_*/dec_* functions
-Date: Fri, 19 Jul 2013 13:34:12 -0400
-Message-Id: <1374255257-8753-7-git-send-email-anderson.lizardo@openbossa.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 05/11] attrib: Simplify prepare_write()
+Date: Fri, 19 Jul 2013 13:34:11 -0400
+Message-Id: <1374255257-8753-6-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1374255257-8753-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1374255257-8753-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
-
-Fix coding style for enc_read_blob(), enc_read_blob_resp(),
-dec_read_resp(), enc_error_resp(), enc_find_info_req(),
-enc_find_info_resp() and enc_prep_write().
+All parameters can be retrieved from struct write_long_data fields,
+therefore there is no need to pass them separately.
 ---
- attrib/att.c |   17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+ attrib/gatt.c |   29 ++++++++++++-----------------
+ 1 file changed, 12 insertions(+), 17 deletions(-)
 
-diff --git a/attrib/att.c b/attrib/att.c
-index d2b78bd..675deb6 100644
---- a/attrib/att.c
-+++ b/attrib/att.c
-@@ -597,7 +597,7 @@ uint16_t enc_read_req(uint16_t handle, uint8_t *pdu, size_t len)
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index 3e6f040..90427a9 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -730,9 +730,7 @@ static guint execute_write(GAttrib *attrib, uint8_t flags,
+ 	return g_attrib_send(attrib, 0, buf, plen, func, user_data, NULL);
  }
  
- uint16_t enc_read_blob_req(uint16_t handle, uint16_t offset, uint8_t *pdu,
--									size_t len)
-+								size_t len)
- {
- 	const uint16_t min_len = sizeof(pdu[0]) + sizeof(handle) +
- 							sizeof(offset);
-@@ -682,7 +682,7 @@ uint16_t enc_read_resp(uint8_t *value, size_t vlen, uint8_t *pdu, size_t len)
+-static guint prepare_write(GAttrib *attrib, uint16_t handle, uint16_t offset,
+-			uint8_t *value, size_t vlen, GAttribResultFunc func,
+-			gpointer user_data);
++static guint prepare_write(struct write_long_data *long_write);
+ 
+ static void prepare_write_cb(guint8 status, const guint8 *rpdu, guint16 rlen,
+ 							gpointer user_data)
+@@ -756,28 +754,26 @@ static void prepare_write_cb(guint8 status, const guint8 *rpdu, guint16 rlen,
+ 		return;
+ 	}
+ 
+-	prepare_write(long_write->attrib, long_write->handle,
+-			long_write->offset, long_write->value, long_write->vlen,
+-			long_write->func, long_write);
++	prepare_write(long_write);
  }
  
- uint16_t enc_read_blob_resp(uint8_t *value, size_t vlen, uint16_t offset,
--							uint8_t *pdu, size_t len)
-+						uint8_t *pdu, size_t len)
+-static guint prepare_write(GAttrib *attrib, uint16_t handle, uint16_t offset,
+-			uint8_t *value, size_t vlen, GAttribResultFunc func,
+-			gpointer user_data)
++static guint prepare_write(struct write_long_data *long_write)
  {
- 	if (pdu == NULL)
++	GAttrib *attrib = long_write->attrib;
++	uint16_t handle = long_write->handle;
++	uint16_t offset = long_write->offset;
++	uint8_t *buf, *value = long_write->value + offset;
++	size_t buflen, vlen = long_write->vlen - offset;
+ 	guint16 plen;
+-	size_t buflen;
+-	uint8_t *buf;
+ 
+ 	buf = g_attrib_get_buffer(attrib, &buflen);
+ 
+-	plen = enc_prep_write_req(handle, offset, &value[offset], vlen - offset,
+-								buf, buflen);
++	plen = enc_prep_write_req(handle, offset, value, vlen, buf, buflen);
+ 	if (plen == 0)
  		return 0;
-@@ -698,7 +698,8 @@ uint16_t enc_read_blob_resp(uint8_t *value, size_t vlen, uint16_t offset,
- 	return vlen + 1;
+ 
+-	return g_attrib_send(attrib, 0, buf, plen, prepare_write_cb,
+-							user_data, NULL);
++	return g_attrib_send(attrib, 0, buf, plen, prepare_write_cb, long_write,
++									NULL);
  }
  
--ssize_t dec_read_resp(const uint8_t *pdu, size_t len, uint8_t *value, size_t vlen)
-+ssize_t dec_read_resp(const uint8_t *pdu, size_t len, uint8_t *value,
-+								size_t vlen)
- {
- 	if (pdu == NULL)
- 		return -EINVAL;
-@@ -718,7 +719,7 @@ ssize_t dec_read_resp(const uint8_t *pdu, size_t len, uint8_t *value, size_t vle
+ guint gatt_write_char(GAttrib *attrib, uint16_t handle, uint8_t *value,
+@@ -814,8 +810,7 @@ guint gatt_write_char(GAttrib *attrib, uint16_t handle, uint8_t *value,
+ 	long_write->value = g_memdup(value, vlen);
+ 	long_write->vlen = vlen;
+ 
+-	return prepare_write(attrib, handle, long_write->offset, value, vlen,
+-							func, long_write);
++	return prepare_write(long_write);
  }
  
- uint16_t enc_error_resp(uint8_t opcode, uint16_t handle, uint8_t status,
--							uint8_t *pdu, size_t len)
-+						uint8_t *pdu, size_t len)
- {
- 	const uint16_t min_len = sizeof(pdu[0]) + sizeof(opcode) +
- 						sizeof(handle) + sizeof(status);
-@@ -736,7 +737,8 @@ uint16_t enc_error_resp(uint8_t opcode, uint16_t handle, uint8_t status,
- 	return min_len;
- }
- 
--uint16_t enc_find_info_req(uint16_t start, uint16_t end, uint8_t *pdu, size_t len)
-+uint16_t enc_find_info_req(uint16_t start, uint16_t end, uint8_t *pdu,
-+								size_t len)
- {
- 	const uint16_t min_len = sizeof(pdu[0]) + sizeof(start) + sizeof(end);
- 
-@@ -777,7 +779,7 @@ uint16_t dec_find_info_req(const uint8_t *pdu, size_t len, uint16_t *start,
- }
- 
- uint16_t enc_find_info_resp(uint8_t format, struct att_data_list *list,
--							uint8_t *pdu, size_t len)
-+						uint8_t *pdu, size_t len)
- {
- 	uint8_t *ptr;
- 	size_t i, w;
-@@ -995,7 +997,8 @@ uint16_t dec_mtu_resp(const uint8_t *pdu, size_t len, uint16_t *mtu)
- }
- 
- uint16_t enc_prep_write_req(uint16_t handle, uint16_t offset,
--			const uint8_t *value, size_t vlen, uint8_t *pdu, size_t len)
-+					const uint8_t *value, size_t vlen,
-+					uint8_t *pdu, size_t len)
- {
- 	const uint16_t min_len = sizeof(pdu[0]) + sizeof(handle) +
- 								sizeof(offset);
+ guint gatt_exchange_mtu(GAttrib *attrib, uint16_t mtu, GAttribResultFunc func,
 -- 
 1.7.9.5
 
