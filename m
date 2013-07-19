@@ -1,72 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 20 Jul 2013 09:10:59 +0200
-From: Gianluca Anzolin <gianluca@sottospazio.it>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: gustavo@padovan.org, linux-bluetooth@vger.kernel.org,
-	marcel@holtmann.org
-Subject: Re: [PATCH 3/8] Move device initialization and shutdown to
- tty_port_operations
-Message-ID: <20130720071059.GA28216@sottospazio.it>
-References: <1373661649-1385-1-git-send-email-gianluca@sottospazio.it>
- <1373661649-1385-3-git-send-email-gianluca@sottospazio.it>
- <51E5B196.7010704@hurleysoftware.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <51E5B196.7010704@hurleysoftware.com>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 11/11] attrib: Reduce scope of variable declarations in char_discovered_cb()
+Date: Fri, 19 Jul 2013 13:34:17 -0400
+Message-Id: <1374255257-8753-12-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1374255257-8753-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1374255257-8753-1-git-send-email-anderson.lizardo@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jul 16, 2013 at 04:48:22PM -0400, Peter Hurley wrote:
-> >+static int rfcomm_dev_activate(struct tty_port *port, struct tty_struct *tty)
-> >+{
-> >+	DECLARE_WAITQUEUE(wait, current);
-> >+	struct rfcomm_dev *dev = container_of(port, struct rfcomm_dev, port);
-> >+	struct rfcomm_dlc *dlc = dev->dlc;
-> >+	int err;
-> >+
-> >+	err = rfcomm_dlc_open(dlc, &dev->src, &dev->dst, dev->channel);
-> >+	if (err < 0)
-> >+		goto error_no_dlc;
-> >+
-> >+	/* Wait for DLC to connect */
-> >+	add_wait_queue(&dev->wait, &wait);
-> >+	while (1) {
-> >+		set_current_state(TASK_INTERRUPTIBLE);
-> >+
-> 
-> 
-> >+		if (dlc->state == BT_CLOSED) {
-> >+			err = -dev->err;
-> >+			break;
-> >+		}
-> >+
-> >+		if (dlc->state == BT_CONNECTED)
-> >+			break;
-> 
-> Please consider moving these dlc->state tests into a
-> .carrier_raised() port method (this is what the gsm
-> driver does). Then this wait loop could go away.
-> 
+This makes it easy to identify where variables are being used.
+---
+ attrib/gatt.c |    9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-I have a question about this: how do I signal an error condition with
-carrier_raised? In case of success I should also call some device_move,
-rfcomm_tty_copy_pending and rfcomm_dlc_unthrottle. Could I do it in
-carrier_raised directly?
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index 90427a9..bb2cae1 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -447,10 +447,6 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
+ 	struct discover_char *dc = user_data;
+ 	struct att_data_list *list;
+ 	unsigned int i, err = ATT_ECODE_ATTR_NOT_FOUND;
+-	size_t buflen;
+-	uint8_t *buf;
+-	guint16 oplen;
+-	bt_uuid_t uuid;
+ 	uint16_t last = 0;
+ 
+ 	if (status) {
+@@ -497,6 +493,11 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
+ 	att_data_list_free(list);
+ 
+ 	if (last != 0 && (last + 1 < dc->end)) {
++		bt_uuid_t uuid;
++		guint16 oplen;
++		size_t buflen;
++		uint8_t *buf;
++
+ 		buf = g_attrib_get_buffer(dc->attrib, &buflen);
+ 
+ 		bt_uuid16_create(&uuid, GATT_CHARAC_UUID);
+-- 
+1.7.9.5
 
-Thanks,
-
-Gianluca
-
-> >+		goto error_no_connection;
-> >+
-> >+	device_move(dev->tty_dev, rfcomm_get_device(dev),
-> >+	            DPM_ORDER_DEV_AFTER_PARENT);
-> >+
-> >+	rfcomm_tty_copy_pending(dev);
-> >+	rfcomm_dlc_unthrottle(dlc);
-> >+	return 0;
-> >+
-> >+error_no_connection:
-> >+	rfcomm_dlc_close(dlc, err);
-> >+error_no_dlc:
-> >+	return err;
-> >+}
