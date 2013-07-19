@@ -1,33 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 19 Jul 2013 14:26:29 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Sathish Narasimman <sathish.n@globaledgesoft.com>
+Cc: linux-bluetooth@vger.kernel.org, girish.br@globaledgesoft.com,
+	anderson.lizardo@openbossa.org, ajay.kv@globaledgesoft.com
+Subject: Re: [PATCH BlueZ] attrib: Fix interactive gatttool segfault
+Message-ID: <20130719112629.GA741@x220.p-661hnu-f1>
+References: <1374208312-18661-1-git-send-email-sathish.n@globaledgesoft.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
-Subject: Re: [PATCH] bluetooth: replace strict_strtol() with kstrtol()
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <000f01ce844e$eeba10d0$cc2e3270$@samsung.com>
-Date: Fri, 19 Jul 2013 06:42:08 -0700
-Cc: 'Gustavo Padovan' <gustavo@padovan.org>,
-	'Johan Hedberg' <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <973071C0-FCE1-44D8-8EF8-B573476342A3@holtmann.org>
-References: <000f01ce844e$eeba10d0$cc2e3270$@samsung.com>
-To: Jingoo Han <jg1.han@samsung.com>
+In-Reply-To: <1374208312-18661-1-git-send-email-sathish.n@globaledgesoft.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jingoo,
+Hi Satish,
 
-> The usage of strict_strtol() is not preferred, because
-> strict_strtol() is obsolete. Thus, kstrtol() should be
-> used.
+On Fri, Jul 19, 2013, Sathish Narasimman wrote:
+> passing the special character single quote
 > 
-> Signed-off-by: Jingoo Han <jg1.han@samsung.com>
+> $gatttool -I
+> [   ][                 ][LE]> '
+> Segmentation fault (core dumped)
+> 
+> Checking g_shell_parse_argv fail status(return FALSE on failure), works fine.
+> 
+> hope the fix to the previous "git am" error is solved
+> 
 > ---
-> drivers/bluetooth/btmrvl_debugfs.c |    6 +++---
-> 1 file changed, 3 insertions(+), 3 deletions(-)
+>  attrib/interactive.c |    3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+The patch has now been applied (after manually removing the last comment
+that doesn't belong in the commit message). Thanks.
 
-Regards
-
-Marcel
-
+Johan
