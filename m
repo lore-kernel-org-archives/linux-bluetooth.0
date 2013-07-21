@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
-Subject: [PATCH BlueZ 3/8] emulator: Export command and event hooks for hciemu user
-Date: Sat, 20 Jul 2013 20:17:15 -0400
-Message-Id: <1374365840-14651-4-git-send-email-bruna.moreira@openbossa.org>
+Subject: [PATCH BlueZ 2/8] emulator: Add hook only if there aren't other with same type and opcode
+Date: Sat, 20 Jul 2013 20:17:14 -0400
+Message-Id: <1374365840-14651-3-git-send-email-bruna.moreira@openbossa.org>
 In-Reply-To: <1374365840-14651-1-git-send-email-bruna.moreira@openbossa.org>
 References: <1374365840-14651-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,79 +13,47 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
 
 ---
- src/shared/hciemu.c |   30 ++++++++++++++++++++++++++++++
- src/shared/hciemu.h |   14 ++++++++++++++
- 2 files changed, 44 insertions(+)
+ emulator/btdev.c |   20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/src/shared/hciemu.c b/src/shared/hciemu.c
-index a0b347c..76fd449 100644
---- a/src/shared/hciemu.c
-+++ b/src/shared/hciemu.c
-@@ -389,3 +389,33 @@ bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 52b58ce..30022d1 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -115,6 +115,23 @@ struct btdev {
  
- 	return true;
- }
-+
-+int hciemu_add_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
-+				uint16_t opcode, hciemu_hook_func_t function,
-+				void *user_data)
+ static struct btdev *btdev_list[MAX_BTDEV_ENTRIES] = { };
+ 
++static int get_hook_index(struct btdev *btdev, enum btdev_hook_type type,
++								uint16_t opcode)
 +{
-+	enum btdev_hook_type hook_type;
++	int i;
 +
-+	if (!hciemu)
-+		return -1;
++	for (i = 0; i < MAX_HOOK_ENTRIES; i++) {
++		if (btdev->hook_list[i] == NULL)
++			continue;
 +
-+	switch (type) {
-+	case HCIEMU_HOOK_PRE_CMD:
-+		hook_type = BTDEV_HOOK_PRE_CMD;
-+		break;
-+	case HCIEMU_HOOK_POST_CMD:
-+		hook_type = BTDEV_HOOK_POST_CMD;
-+		break;
-+	case HCIEMU_HOOK_PRE_EVT:
-+		hook_type = BTDEV_HOOK_PRE_EVT;
-+		break;
-+	case HCIEMU_HOOK_POST_EVT:
-+		hook_type = BTDEV_HOOK_POST_EVT;
-+		break;
-+	default:
-+		return -1;
++		if (btdev->hook_list[i]->type == type &&
++					btdev->hook_list[i]->opcode == opcode)
++			return i;
 +	}
 +
-+	return btdev_add_hook(hciemu->master_dev, hook_type, opcode, function,
-+								user_data);
++	return -1;
 +}
-diff --git a/src/shared/hciemu.h b/src/shared/hciemu.h
-index a473c0e..899acb0 100644
---- a/src/shared/hciemu.h
-+++ b/src/shared/hciemu.h
-@@ -32,6 +32,13 @@ enum hciemu_type {
- 	HCIEMU_TYPE_LE,
- };
- 
-+enum hciemu_hook_type {
-+	HCIEMU_HOOK_PRE_CMD,
-+	HCIEMU_HOOK_POST_CMD,
-+	HCIEMU_HOOK_PRE_EVT,
-+	HCIEMU_HOOK_POST_EVT,
-+};
 +
- struct hciemu *hciemu_new(enum hciemu_type type);
+ static inline int add_btdev(struct btdev *btdev)
+ {
+ 	int i, index = -1;
+@@ -1710,6 +1727,9 @@ int btdev_add_hook(struct btdev *btdev, enum btdev_hook_type type,
+ 	if (!btdev)
+ 		return -1;
  
- struct hciemu *hciemu_ref(struct hciemu *hciemu);
-@@ -47,5 +54,12 @@ const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu);
- typedef void (*hciemu_command_func_t)(uint16_t opcode, const void *data,
- 						uint8_t len, void *user_data);
- 
-+typedef bool (*hciemu_hook_func_t)(const void *data, uint16_t len,
-+							void *user_data);
++	if (get_hook_index(btdev, type, opcode) > 0)
++		return -1;
 +
- bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
- 			hciemu_command_func_t function, void *user_data);
-+
-+int hciemu_add_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
-+				uint16_t opcode, hciemu_hook_func_t function,
-+				void *user_data);
+ 	for (i = 0; i < MAX_HOOK_ENTRIES; i++) {
+ 		if (btdev->hook_list[i] == NULL) {
+ 			btdev->hook_list[i] = malloc(sizeof(struct hook));
 -- 
 1.7.9.5
 
