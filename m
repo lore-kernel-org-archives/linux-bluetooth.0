@@ -1,71 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Xu, Martin" <martin.xu@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"martin.xu@linux.intel.com" <martin.xu@linux.intel.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] obex/session: Export the right target uuid
-Date: Mon, 22 Jul 2013 01:59:46 +0000
-Message-ID: <29981E9CC6590A438DB8A519AEB0053010D456D5@SHSMSX103.ccr.corp.intel.com>
-References: <1374115110-11780-1-git-send-email-martin.xu@linux.intel.com>
- <CABBYNZLKOA6uY+J54TBP4+HtUxXvxwSy3Lb6zk5xR19iT8b9eQ@mail.gmail.com>
-In-Reply-To: <CABBYNZLKOA6uY+J54TBP4+HtUxXvxwSy3Lb6zk5xR19iT8b9eQ@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+Date: Sun, 21 Jul 2013 19:31:40 +0200
+From: Gianluca Anzolin <gianluca@sottospazio.it>
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: gustavo@padovan.org, linux-bluetooth@vger.kernel.org,
+	marcel@holtmann.org
+Subject: Re: [PATCH 3/8] Move device initialization and shutdown to
+ tty_port_operations
+Message-ID: <20130721173140.GA5678@sottospazio.it>
+References: <1373661649-1385-1-git-send-email-gianluca@sottospazio.it>
+ <1373661649-1385-3-git-send-email-gianluca@sottospazio.it>
+ <51E5B196.7010704@hurleysoftware.com>
+ <20130720071059.GA28216@sottospazio.it>
+ <51EA9AA6.3000000@hurleysoftware.com>
+ <20130721080838.GA2998@sottospazio.it>
+ <51EC1483.8030608@hurleysoftware.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <51EC1483.8030608@hurleysoftware.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz:
-> -----Original Message-----
-> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
-> owner@vger.kernel.org] On Behalf Of Luiz Augusto von Dentz
-> Sent: Friday, July 19, 2013 16:03
-> To: martin.xu@linux.intel.com
-> Cc: linux-bluetooth@vger.kernel.org
-> Subject: Re: [PATCH] obex/session: Export the right target uuid
-> 
-> Hi Martin,
-> 
-> On Thu, Jul 18, 2013 at 5:38 AM,  <martin.xu@linux.intel.com> wrote:
-> > From: Martin Xu <martin.xu@linux.intel.com>
+On Sun, Jul 21, 2013 at 01:04:03PM -0400, Peter Hurley wrote:
+> On 07/21/2013 04:08 AM, Gianluca Anzolin wrote:
+> >On Sat, Jul 20, 2013 at 10:11:50AM -0400, Peter Hurley wrote:
+> >>Sorry Gianluca, I should have been more specific here.
+> >>
+> >>There's no need to test for dlc->state == BT_CLOSED in carrier_raised().
+> >>At the point where port->carrier_raised is called, the tty will have been
+> >>linked with the file descriptor, so if the dlc->state goes to BT_CLOSED,
+> >>then rfcomm_dev_state_change() will call
+> >>   tty_hangup() -> driver hangup() -> tty_port_hangup() -> tty_port_shutdown()
+> >>This call chain will
+> >>   1. set the file_ops to hung_up_tty_fops which will cause tty_hung_up_p() to
+> >>      return true
+> >>   2. clear ASYNCB_INITIALIZED in port->flags
+> >>   3. wakeup port->open_wait
+> >>
+> >>So an open() parked in the schedule loop of tty_port_block_til_ready()
+> >>will wake and exit the loop with either -EAGAIN or -ERESTARTSYS.
+> >>
+> >>rfcomm_dev_state_change() should only do a wakeup on port->open_wait when
+> >>dlc->state == BT_CONNECTED.
+> >>
+> >>>In case of success I should also call some device_move,
+> >>>rfcomm_tty_copy_pending and rfcomm_dlc_unthrottle. Could I do it in
+> >>>carrier_raised directly?
+> >>
+> >>I wouldn't. That would be a nasty hack and a potential problem if a
+> >>signal occurred.
+> >>
+> >>The device_move() isn't dependent on success, and can stay in .activate().
 > >
-> > ---
-> > +       dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
-> > +       g_free(uuid);
+> >I changed the code and it's cleaner than before, very nice. However the
+> >device_move() is really dependent on success: the parent device is there only
+> >when the connection has been successfully established.
 > 
-> Did you ever test this? I suspect this will crash with OPP because
-I did. And session_target_exists() will check the target, if it is NULL above function will not be called.
-Of course, we can do more check before call target2str().
+> Oh, right.
 > 
-> >         return TRUE;
-> >  }
-> > @@ -690,7 +704,7 @@ static gboolean target_exists(const
-> > GDBusPropertyTable *property, void *data)  {
-> >         struct obc_session *session = data;
+> >So I have to call that function after the carrier is raised, or right before.
+> >Since you already told me that calling it in the .carrier_raised method is
+> >unwise the only place left is the state_change callback of the dlc.
+> 
+> That seems fine. [ Another place would be in rfcomm_tty_open() just after
+> tty_port_open() returns success -- the tty is still locked here so it won't
+> race with .close/.hangup() ]
+
+I will do it in state_change because open could be called multiple times by
+several user space programs.
+
+> 
+> I do wonder why the tty device is re-parented to the host controller device.
+> It's obviously not for subsystem teardown. Maybe one of the bluetooth
+> maintainers could clarify this? Are there userspace components waiting for
+> this uevent?
+> 
+> >Conversely in .shutdown the check for the device parent == NULL takes care of
+> >the scenario in which the aforementioned device_move() is never called.
 > >
-> > -       return session->driver->uuid != NULL;
-> > +       return session->driver->target != NULL;
-> >  }
+> >Another unrelated question: I'm working on the rfcomm_dev_add function to avoid
+> >the two nested locks. When the patch is ready should I send it separately or
+> >can I include it with the other patches?
 > 
-> I don't understand why you want to use the OBEX target here? There is
-> no other reference to it instead we should be using what Device1.UUIDs
-> provides that is Bluetooth 128 bits UUIDs in string format so the
-> applications can use them directly. So I will repeat again, what needs
-> to be done is reword the documentation to reflect what is implemented.
-You know, the original patch send by me is just use Bluetooth 128 UUIDs.
-But I found later that the client sessions is exporting the target UUIDs.
-Please check code obexd/client/session.c line 690.
-Target property of Client session does not need to align with Server session here?
- 
+> Your preference.
 > 
-> And let me repeat one last time, with ObjectManager you got signaled
-> what interfaces are supported, that is much more important than the
-It is not related with Objectmanager, I already use that.
-But with the new added interface, how could user know what kind of obex session it is?
-At many cases, UI just wants to display the transfer states of OPP.
+> Just a reminder: the dlc lock will still need to be dropped after bumping the
+> rfcomm_dev ref count via rfcomm_dev_get(), because when you subsequently drop
+> both references, rfcomm_dev destruction will attempt to gain the dlc lock,
+> resulting in deadlock. [Or do it as a work item]
 
-In fact, I have sent patches to proposal several suggestions:
-1. just use "OPP", "FTP" for the internal supported targetUUID for external profile to decide the profile
-2. do not use target UUID just use Bluetooth 128 UUID
-3. use target UUID
+Yes I noticed that and before the last tty_port_put I will unlock the dlc.
 
-But to very solution, at least, we need to keep the definition consistent.
+> 
+> Regards,
+> Peter Hurley
+> 
+
+Thanks,
+
+Gianluca
