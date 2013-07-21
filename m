@@ -1,65 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 21 Jul 2013 10:08:38 +0200
-From: Gianluca Anzolin <gianluca@sottospazio.it>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: gustavo@padovan.org, linux-bluetooth@vger.kernel.org,
-	marcel@holtmann.org
-Subject: Re: [PATCH 3/8] Move device initialization and shutdown to
- tty_port_operations
-Message-ID: <20130721080838.GA2998@sottospazio.it>
-References: <1373661649-1385-1-git-send-email-gianluca@sottospazio.it>
- <1373661649-1385-3-git-send-email-gianluca@sottospazio.it>
- <51E5B196.7010704@hurleysoftware.com>
- <20130720071059.GA28216@sottospazio.it>
- <51EA9AA6.3000000@hurleysoftware.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <51EA9AA6.3000000@hurleysoftware.com>
+From: Bruna Moreira <bruna.moreira@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
+Subject: [PATCH BlueZ 4/8] emulator: Add support for delete a hook
+Date: Sat, 20 Jul 2013 20:17:16 -0400
+Message-Id: <1374365840-14651-5-git-send-email-bruna.moreira@openbossa.org>
+In-Reply-To: <1374365840-14651-1-git-send-email-bruna.moreira@openbossa.org>
+References: <1374365840-14651-1-git-send-email-bruna.moreira@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Jul 20, 2013 at 10:11:50AM -0400, Peter Hurley wrote:
-> Sorry Gianluca, I should have been more specific here.
-> 
-> There's no need to test for dlc->state == BT_CLOSED in carrier_raised().
-> At the point where port->carrier_raised is called, the tty will have been
-> linked with the file descriptor, so if the dlc->state goes to BT_CLOSED,
-> then rfcomm_dev_state_change() will call
->   tty_hangup() -> driver hangup() -> tty_port_hangup() -> tty_port_shutdown()
-> This call chain will
->   1. set the file_ops to hung_up_tty_fops which will cause tty_hung_up_p() to
->      return true
->   2. clear ASYNCB_INITIALIZED in port->flags
->   3. wakeup port->open_wait
-> 
-> So an open() parked in the schedule loop of tty_port_block_til_ready()
-> will wake and exit the loop with either -EAGAIN or -ERESTARTSYS.
-> 
-> rfcomm_dev_state_change() should only do a wakeup on port->open_wait when
-> dlc->state == BT_CONNECTED.
-> 
-> >In case of success I should also call some device_move,
-> >rfcomm_tty_copy_pending and rfcomm_dlc_unthrottle. Could I do it in
-> >carrier_raised directly?
-> 
-> I wouldn't. That would be a nasty hack and a potential problem if a
-> signal occurred.
-> 
-> The device_move() isn't dependent on success, and can stay in .activate().
+From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
 
-I changed the code and it's cleaner than before, very nice. However the
-device_move() is really dependent on success: the parent device is there only
-when the connection has been successfully established.
+---
+ emulator/btdev.c    |   25 +++++++++++++++++++++++++
+ emulator/btdev.h    |    3 +++
+ src/shared/hciemu.c |   28 ++++++++++++++++++++++++++++
+ src/shared/hciemu.h |    3 +++
+ 4 files changed, 59 insertions(+)
 
-So I have to call that function after the carrier is raised, or right before.
-Since you already told me that calling it in the .carrier_raised method is
-unwise the only place left is the state_change callback of the dlc.
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 30022d1..b8ac8f6 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -1746,3 +1746,28 @@ int btdev_add_hook(struct btdev *btdev, enum btdev_hook_type type,
+ 
+ 	return -1;
+ }
++
++bool btdev_del_hook(struct btdev *btdev, enum btdev_hook_type type,
++								uint16_t opcode)
++{
++	int i;
++
++	if (!btdev)
++		return false;
++
++	for (i = 0; i < MAX_HOOK_ENTRIES; i++) {
++		if (btdev->hook_list[i] == NULL)
++			continue;
++
++		if (btdev->hook_list[i]->type != type ||
++					btdev->hook_list[i]->opcode != opcode)
++			continue;
++
++		free(btdev->hook_list[i]);
++		btdev->hook_list[i] = NULL;
++
++		return true;
++	}
++
++	return false;
++}
+diff --git a/emulator/btdev.h b/emulator/btdev.h
+index 085093f..5118a4a 100644
+--- a/emulator/btdev.h
++++ b/emulator/btdev.h
+@@ -89,3 +89,6 @@ void btdev_receive_h4(struct btdev *btdev, const void *data, uint16_t len);
+ int btdev_add_hook(struct btdev *btdev, enum btdev_hook_type type,
+ 				uint16_t opcode, btdev_hook_func handler,
+ 				void *user_data);
++
++bool btdev_del_hook(struct btdev *btdev, enum btdev_hook_type type,
++							uint16_t opcode);
+diff --git a/src/shared/hciemu.c b/src/shared/hciemu.c
+index 76fd449..f5648a5 100644
+--- a/src/shared/hciemu.c
++++ b/src/shared/hciemu.c
+@@ -419,3 +419,31 @@ int hciemu_add_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
+ 	return btdev_add_hook(hciemu->master_dev, hook_type, opcode, function,
+ 								user_data);
+ }
++
++bool hciemu_del_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
++								uint16_t opcode)
++{
++	enum btdev_hook_type hook_type;
++
++	if (!hciemu)
++		return false;
++
++	switch (type) {
++	case HCIEMU_HOOK_PRE_CMD:
++		hook_type = BTDEV_HOOK_PRE_CMD;
++		break;
++	case HCIEMU_HOOK_POST_CMD:
++		hook_type = BTDEV_HOOK_POST_CMD;
++		break;
++	case HCIEMU_HOOK_PRE_EVT:
++		hook_type = BTDEV_HOOK_PRE_EVT;
++		break;
++	case HCIEMU_HOOK_POST_EVT:
++		hook_type = BTDEV_HOOK_POST_EVT;
++		break;
++	default:
++		return false;
++	}
++
++	return btdev_del_hook(hciemu->master_dev, hook_type, opcode);
++}
+diff --git a/src/shared/hciemu.h b/src/shared/hciemu.h
+index 899acb0..7f17831 100644
+--- a/src/shared/hciemu.h
++++ b/src/shared/hciemu.h
+@@ -63,3 +63,6 @@ bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
+ int hciemu_add_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
+ 				uint16_t opcode, hciemu_hook_func_t function,
+ 				void *user_data);
++
++bool hciemu_del_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
++							uint16_t opcode);
+-- 
+1.7.9.5
 
-Conversely in .shutdown the check for the device parent == NULL takes care of
-the scenario in which the aforementioned device_move() is never called.
-
-Another unrelated question: I'm working on the rfcomm_dev_add function to avoid
-the two nested locks. When the patch is ready should I send it separately or
-can I include it with the other patches?
-
-Thanks,
-Gianluca
