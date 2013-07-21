@@ -1,127 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bruna Moreira <bruna.moreira@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Eder Ruiz Maria <eder.ruiz@openbossa.org>
-Subject: [PATCH BlueZ 1/8] emulator: Add support for pre/post command/event hooks
-Date: Sat, 20 Jul 2013 20:17:13 -0400
-Message-Id: <1374365840-14651-2-git-send-email-bruna.moreira@openbossa.org>
-In-Reply-To: <1374365840-14651-1-git-send-email-bruna.moreira@openbossa.org>
-References: <1374365840-14651-1-git-send-email-bruna.moreira@openbossa.org>
+Cc: Bruna Moreira <bruna.moreira@openbossa.org>
+Subject: [PATCH BlueZ 0/8] Hook mechanism for discovery tests
+Date: Sat, 20 Jul 2013 20:17:12 -0400
+Message-Id: <1374365840-14651-1-git-send-email-bruna.moreira@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Eder Ruiz Maria <eder.ruiz@openbossa.org>
+This series contains the hook mechanism implementation that will be used for
+discovery tests.
 
-Now who use emulator can add hooks to manipulate hci packets before
-and after process commands and send events.
----
- emulator/btdev.c |   37 +++++++++++++++++++++++++++++++++++++
- emulator/btdev.h |   15 +++++++++++++++
- 2 files changed, 52 insertions(+)
+The hook mechanism is a way to run custom code from tests before/after
+processing HCI commands and building events. It is also possible to "cancel"
+events if the post event hook returns false. This is necessary because the
+current emulator implementation is sequential and does not let having control
+about emulator behaviour.
+The hooks will only intercept the events which were registered previously using
+the hooks API exported by hciemu. If no hooks are added, the emulator will work
+as before.
+To simplify implementation, default_cmd() was split in two parts: the command
+response (command status/complete events) was kept in default_cmd() and "extra"
+events were moved to default_cmd completion().
+There are four hooks types:
+- pre command: before default_cmd() function.
+- post command: before sending packet in command status and command complete.
+- pre event: before default_cmd_completion() function.
+- post event: in send_event() function, before sending the packet.
+They can used in external applications like tools/mgmt-tester.
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 79d2f0e..52b58ce 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -42,6 +42,15 @@
- #define has_bredr(btdev)	(!((btdev)->features[4] & 0x20))
- #define has_le(btdev)		(!!((btdev)->features[4] & 0x40))
- 
-+struct hook {
-+	btdev_hook_func handler;
-+	void *user_data;
-+	enum btdev_hook_type type;
-+	uint16_t opcode;
-+};
-+
-+#define MAX_HOOK_ENTRIES 16
-+
- struct btdev {
- 	enum btdev_type type;
- 
-@@ -53,6 +62,8 @@ struct btdev {
- 	btdev_send_func send_handler;
- 	void *send_data;
- 
-+	struct hook *hook_list[MAX_HOOK_ENTRIES];
-+
-         uint16_t manufacturer;
-         uint8_t  version;
- 	uint16_t revision;
-@@ -1689,3 +1700,29 @@ void btdev_receive_h4(struct btdev *btdev, const void *data, uint16_t len)
- 		break;
- 	}
- }
-+
-+int btdev_add_hook(struct btdev *btdev, enum btdev_hook_type type,
-+				uint16_t opcode, btdev_hook_func handler,
-+				void *user_data)
-+{
-+	int i;
-+
-+	if (!btdev)
-+		return -1;
-+
-+	for (i = 0; i < MAX_HOOK_ENTRIES; i++) {
-+		if (btdev->hook_list[i] == NULL) {
-+			btdev->hook_list[i] = malloc(sizeof(struct hook));
-+			if (btdev->hook_list[i] == NULL)
-+				return -1;
-+
-+			btdev->hook_list[i]->handler = handler;
-+			btdev->hook_list[i]->user_data = user_data;
-+			btdev->hook_list[i]->opcode = opcode;
-+			btdev->hook_list[i]->type = type;
-+			return i;
-+		}
-+	}
-+
-+	return -1;
-+}
-diff --git a/emulator/btdev.h b/emulator/btdev.h
-index 9fb023c..085093f 100644
---- a/emulator/btdev.h
-+++ b/emulator/btdev.h
-@@ -23,6 +23,7 @@
-  */
- 
- #include <stdint.h>
-+#include <stdbool.h>
- 
- #define BTDEV_RESPONSE_DEFAULT		0
- #define BTDEV_RESPONSE_COMMAND_STATUS	1
-@@ -53,6 +54,9 @@ typedef void (*btdev_command_func) (uint16_t opcode,
- typedef void (*btdev_send_func) (const void *data, uint16_t len,
- 							void *user_data);
- 
-+typedef bool (*btdev_hook_func) (const void *data, uint16_t len,
-+							void *user_data);
-+
- enum btdev_type {
- 	BTDEV_TYPE_BREDRLE,
- 	BTDEV_TYPE_BREDR,
-@@ -60,6 +64,13 @@ enum btdev_type {
- 	BTDEV_TYPE_AMP,
- };
- 
-+enum btdev_hook_type {
-+	BTDEV_HOOK_PRE_CMD,
-+	BTDEV_HOOK_POST_CMD,
-+	BTDEV_HOOK_PRE_EVT,
-+	BTDEV_HOOK_POST_EVT,
-+};
-+
- struct btdev;
- 
- struct btdev *btdev_create(enum btdev_type type, uint16_t id);
-@@ -74,3 +85,7 @@ void btdev_set_send_handler(struct btdev *btdev, btdev_send_func handler,
- 							void *user_data);
- 
- void btdev_receive_h4(struct btdev *btdev, const void *data, uint16_t len);
-+
-+int btdev_add_hook(struct btdev *btdev, enum btdev_hook_type type,
-+				uint16_t opcode, btdev_hook_func handler,
-+				void *user_data);
+To illustrate this purpose, the following discovery test was implemented using
+this new infrastructure:
+- Stop discovery for BR/EDR only: this test sends stop command during inquiry,
+  checks if inquiry cancel is sent and discovering event is disabled.
+
+Note that in current implementation it is not possible to send a stop discovery
+before the discovery is finished due to emulator running sequentially during
+same mainloop iteration, i.e., the inquiry complete HCI command is sent
+immediately after inquiry command.
+
+Comments and suggestions are welcome.
+
+BR,
+Bruna Moreira.
+
+Bruna Moreira (2):
+  emulator: Add new function for running all hooks
+  tools/mgmt-tester: Add stop discovery for BR/EDR only
+
+Eder Ruiz Maria (6):
+  emulator: Add support for pre/post command/event hooks
+  emulator: Add hook only if there aren't other with same type and
+    opcode
+  emulator: Export command and event hooks for hciemu user
+  emulator: Add support for delete a hook
+  emulator: Split default_cmd() for better command and event handler
+  emulator: cmd_status() using send_packet() for run hooks easily
+
+ emulator/btdev.c    |  271 +++++++++++++++++++++++++++++++++++++++++++--------
+ emulator/btdev.h    |   18 ++++
+ src/shared/hciemu.c |   58 +++++++++++
+ src/shared/hciemu.h |   17 ++++
+ tools/mgmt-tester.c |   72 +++++++++++++-
+ 5 files changed, 395 insertions(+), 41 deletions(-)
+
 -- 
 1.7.9.5
 
