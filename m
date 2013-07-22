@@ -5,189 +5,124 @@ Cc: peter@hurleysoftware.com,
 	gustavo@padovan.org,
 	marcel@holtmann.org,
 	Gianluca Anzolin <gianluca@sottospazio.it>
-Subject: [PATCH v2 2/7] rfcomm: Move the tty initialization and cleanup out of open/close
-Date: Mon, 22 Jul 2013 18:27:10 +0200
-Message-Id: <1374510435-12149-2-git-send-email-gianluca@sottospazio.it>
-In-Reply-To: <1374510435-12149-1-git-send-email-gianluca@sottospazio.it>
-References: <1374510435-12149-1-git-send-email-gianluca@sottospazio.it>
+Subject: [PATCH v2 1/7] rfcomm: Take proper tty_struct references
+Date: Mon, 22 Jul 2013 18:27:09 +0200
+Message-Id: <1374510435-12149-1-git-send-email-gianluca@sottospazio.it>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Move the tty_struct initialization from rfcomm_tty_open to rfcomm_tty_install
-and do the same for the cleanup moving the code from rfcomm_tty_close to
-rfcomm_tty_cleanup.
+In net/bluetooth/rfcomm/tty.c the struct tty_struct is used without taking
+references. This may lead to a use-after-free of the rfcomm tty.
+
+Fix this by taking references properly, using the tty_port_* helpers when
+possible.
 
 Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
 ---
- net/bluetooth/rfcomm/tty.c | 100 +++++++++++++++++++++++++++------------------
- 1 file changed, 61 insertions(+), 39 deletions(-)
+ net/bluetooth/rfcomm/tty.c | 35 +++++++++++++++++++++--------------
+ 1 file changed, 21 insertions(+), 14 deletions(-)
 
 diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index 6c3efb5..c9913dd 100644
+index b6e44ad..6c3efb5 100644
 --- a/net/bluetooth/rfcomm/tty.c
 +++ b/net/bluetooth/rfcomm/tty.c
-@@ -645,49 +645,60 @@ static void rfcomm_tty_copy_pending(struct rfcomm_dev *dev)
- 		tty_flip_buffer_push(&dev->port);
+@@ -333,10 +333,11 @@ static inline unsigned int rfcomm_room(struct rfcomm_dlc *dlc)
+ static void rfcomm_wfree(struct sk_buff *skb)
+ {
+ 	struct rfcomm_dev *dev = (void *) skb->sk;
+-	struct tty_struct *tty = dev->port.tty;
++
+ 	atomic_sub(skb->truesize, &dev->wmem_alloc);
+-	if (test_bit(RFCOMM_TTY_ATTACHED, &dev->flags) && tty)
+-		tty_wakeup(tty);
++	if (test_bit(RFCOMM_TTY_ATTACHED, &dev->flags))
++		tty_port_tty_wakeup(&dev->port);
++
+ 	tty_port_put(&dev->port);
  }
  
--static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
-+/* do the reverse of install, clearing the tty fields and releasing the
-+ * reference to tty_port */
-+static void rfcomm_tty_cleanup(struct tty_struct *tty)
-+{
-+	struct rfcomm_dev *dev = tty->driver_data;
-+
-+	if (dev->tty_dev->parent)
-+		device_move(dev->tty_dev, NULL, DPM_ORDER_DEV_LAST);
-+
-+	/* Close DLC and dettach TTY */
-+	rfcomm_dlc_close(dev->dlc, 0);
-+
-+	clear_bit(RFCOMM_TTY_ATTACHED, &dev->flags);
-+
-+	rfcomm_dlc_lock(dev->dlc);
-+	tty->driver_data = NULL;
-+	rfcomm_dlc_unlock(dev->dlc);
-+
-+	tty_port_put(&dev->port);
-+}
-+
-+/* here we acquire the tty_port reference since it's here the tty is first used
-+ * by setting the termios. We also populate the driver_data field and install
-+ * the tty port */
-+static int rfcomm_tty_install(struct tty_driver *driver, struct tty_struct *tty)
+@@ -410,6 +411,7 @@ static int rfcomm_release_dev(void __user *arg)
  {
- 	DECLARE_WAITQUEUE(wait, current);
+ 	struct rfcomm_dev_req req;
  	struct rfcomm_dev *dev;
- 	struct rfcomm_dlc *dlc;
--	unsigned long flags;
--	int err, id;
--
--	id = tty->index;
--
--	BT_DBG("tty %p id %d", tty, id);
-+	int err;
++	struct tty_struct *tty;
  
--	/* We don't leak this refcount. For reasons which are not entirely
--	   clear, the TTY layer will call our ->close() method even if the
--	   open fails. We decrease the refcount there, and decreasing it
--	   here too would cause breakage. */
--	dev = rfcomm_dev_get(id);
-+	dev = rfcomm_dev_get(tty->index);
+ 	if (copy_from_user(&req, arg, sizeof(req)))
+ 		return -EFAULT;
+@@ -429,8 +431,11 @@ static int rfcomm_release_dev(void __user *arg)
+ 		rfcomm_dlc_close(dev->dlc, 0);
+ 
+ 	/* Shut down TTY synchronously before freeing rfcomm_dev */
+-	if (dev->port.tty)
+-		tty_vhangup(dev->port.tty);
++	tty = tty_port_tty_get(&dev->port);
++	if (tty) {
++		tty_vhangup(tty);
++		tty_kref_put(tty);
++	}
+ 
+ 	if (!test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags))
+ 		rfcomm_dev_del(dev);
+@@ -563,6 +568,7 @@ static void rfcomm_dev_data_ready(struct rfcomm_dlc *dlc, struct sk_buff *skb)
+ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
+ {
+ 	struct rfcomm_dev *dev = dlc->owner;
++	struct tty_struct *tty;
  	if (!dev)
- 		return -ENODEV;
+ 		return;
  
- 	BT_DBG("dev %p dst %pMR channel %d opened %d", dev, &dev->dst,
- 	       dev->channel, dev->port.count);
+@@ -572,7 +578,8 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
+ 	wake_up_interruptible(&dev->wait);
  
--	spin_lock_irqsave(&dev->port.lock, flags);
--	if (++dev->port.count > 1) {
--		spin_unlock_irqrestore(&dev->port.lock, flags);
--		return 0;
+ 	if (dlc->state == BT_CLOSED) {
+-		if (!dev->port.tty) {
++		tty = tty_port_tty_get(&dev->port);
++		if (!tty) {
+ 			if (test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags)) {
+ 				/* Drop DLC lock here to avoid deadlock
+ 				 * 1. rfcomm_dev_get will take rfcomm_dev_lock
+@@ -591,8 +598,10 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
+ 				tty_port_put(&dev->port);
+ 				rfcomm_dlc_lock(dlc);
+ 			}
+-		} else
+-			tty_hangup(dev->port.tty);
++		} else {
++			tty_hangup(tty);
++			tty_kref_put(tty);
++		}
+ 	}
+ }
+ 
+@@ -604,10 +613,8 @@ static void rfcomm_dev_modem_status(struct rfcomm_dlc *dlc, u8 v24_sig)
+ 
+ 	BT_DBG("dlc %p dev %p v24_sig 0x%02x", dlc, dev, v24_sig);
+ 
+-	if ((dev->modem_status & TIOCM_CD) && !(v24_sig & RFCOMM_V24_DV)) {
+-		if (dev->port.tty && !C_CLOCAL(dev->port.tty))
+-			tty_hangup(dev->port.tty);
 -	}
--	spin_unlock_irqrestore(&dev->port.lock, flags);
--
- 	dlc = dev->dlc;
++	if ((dev->modem_status & TIOCM_CD) && !(v24_sig & RFCOMM_V24_DV))
++		tty_port_tty_hangup(&dev->port, true);
  
- 	/* Attach TTY and open DLC */
--
+ 	dev->modem_status =
+ 		((v24_sig & RFCOMM_V24_RTC) ? (TIOCM_DSR | TIOCM_DTR) : 0) |
+@@ -674,7 +681,7 @@ static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
+ 
  	rfcomm_dlc_lock(dlc);
  	tty->driver_data = dev;
--	tty_port_tty_set(&dev->port, tty);
+-	dev->port.tty = tty;
++	tty_port_tty_set(&dev->port, tty);
  	rfcomm_dlc_unlock(dlc);
  	set_bit(RFCOMM_TTY_ATTACHED, &dev->flags);
  
-+	/* install the tty_port */
-+	err = tty_port_install(&dev->port, driver, tty);
-+	if (err < 0)
-+		goto error_no_dlc;
-+
- 	err = rfcomm_dlc_open(dlc, &dev->src, &dev->dst, dev->channel);
- 	if (err < 0)
--		return err;
-+		goto error_no_dlc;
+@@ -742,7 +749,7 @@ static void rfcomm_tty_close(struct tty_struct *tty, struct file *filp)
  
- 	/* Wait for DLC to connect */
- 	add_wait_queue(&dev->wait, &wait);
-@@ -714,17 +725,40 @@ static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
- 	set_current_state(TASK_RUNNING);
- 	remove_wait_queue(&dev->wait, &wait);
- 
--	if (err == 0)
--		device_move(dev->tty_dev, rfcomm_get_device(dev),
--			    DPM_ORDER_DEV_AFTER_PARENT);
-+	if (err < 0)
-+		goto error_no_connection;
-+
-+	device_move(dev->tty_dev, rfcomm_get_device(dev),
-+		    DPM_ORDER_DEV_AFTER_PARENT);
- 
- 	rfcomm_tty_copy_pending(dev);
- 
- 	rfcomm_dlc_unthrottle(dev->dlc);
- 
-+	return 0;
-+
-+error_no_connection:
-+	rfcomm_dlc_close(dlc, err);
-+error_no_dlc:
-+	clear_bit(RFCOMM_TTY_ATTACHED, &dev->flags);
-+	tty_port_put(&dev->port);
- 	return err;
- }
- 
-+static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
-+{
-+	struct rfcomm_dev *dev = tty->driver_data;
-+	unsigned long flags;
-+
-+	BT_DBG("tty %p id %d", tty, tty->index);
-+
-+	spin_lock_irqsave(&dev->port.lock, flags);
-+	dev->port.count++;
-+	spin_unlock_irqrestore(&dev->port.lock, flags);
-+
-+	return 0;
-+}
-+
- static void rfcomm_tty_close(struct tty_struct *tty, struct file *filp)
- {
- 	struct rfcomm_dev *dev = (struct rfcomm_dev *) tty->driver_data;
-@@ -739,18 +773,6 @@ static void rfcomm_tty_close(struct tty_struct *tty, struct file *filp)
- 	spin_lock_irqsave(&dev->port.lock, flags);
- 	if (!--dev->port.count) {
- 		spin_unlock_irqrestore(&dev->port.lock, flags);
--		if (dev->tty_dev->parent)
--			device_move(dev->tty_dev, NULL, DPM_ORDER_DEV_LAST);
--
--		/* Close DLC and dettach TTY */
--		rfcomm_dlc_close(dev->dlc, 0);
--
--		clear_bit(RFCOMM_TTY_ATTACHED, &dev->flags);
--
--		rfcomm_dlc_lock(dev->dlc);
--		tty->driver_data = NULL;
--		tty_port_tty_set(&dev->port, NULL);
--		rfcomm_dlc_unlock(dev->dlc);
+ 		rfcomm_dlc_lock(dev->dlc);
+ 		tty->driver_data = NULL;
+-		dev->port.tty = NULL;
++		tty_port_tty_set(&dev->port, NULL);
+ 		rfcomm_dlc_unlock(dev->dlc);
  
  		if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags)) {
- 			spin_lock(&rfcomm_dev_lock);
-@@ -761,8 +783,6 @@ static void rfcomm_tty_close(struct tty_struct *tty, struct file *filp)
- 		}
- 	} else
- 		spin_unlock_irqrestore(&dev->port.lock, flags);
--
--	tty_port_put(&dev->port);
- }
- 
- static int rfcomm_tty_write(struct tty_struct *tty, const unsigned char *buf, int count)
-@@ -1135,6 +1155,8 @@ static const struct tty_operations rfcomm_ops = {
- 	.wait_until_sent	= rfcomm_tty_wait_until_sent,
- 	.tiocmget		= rfcomm_tty_tiocmget,
- 	.tiocmset		= rfcomm_tty_tiocmset,
-+	.install                = rfcomm_tty_install,
-+	.cleanup                = rfcomm_tty_cleanup,
- };
- 
- int __init rfcomm_init_ttys(void)
 -- 
 1.8.3.3
