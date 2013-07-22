@@ -1,128 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gianluca Anzolin <gianluca@sottospazio.it>
-To: linux-bluetooth@vger.kernel.org
-Cc: peter@hurleysoftware.com,
-	gustavo@padovan.org,
-	marcel@holtmann.org,
-	Gianluca Anzolin <gianluca@sottospazio.it>
-Subject: [PATCH v2 1/7] rfcomm: Take proper tty_struct references
-Date: Mon, 22 Jul 2013 18:27:09 +0200
-Message-Id: <1374510435-12149-1-git-send-email-gianluca@sottospazio.it>
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
+Subject: Re: 057c:3800 BlueFRITZ! Bluetooth Stick broken since 2.6.something
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <51ECDB03.8090109@boh.de>
+Date: Mon, 22 Jul 2013 07:22:07 -0700
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <4A86B920-6A47-4E2D-8F6F-90A626CFC878@holtmann.org>
+References: <51E7ED11.7010103@boh.de> <36A79410-3FA3-408F-BA16-6A30568A7035@holtmann.org> <51E8DBFF.4060702@boh.de> <5BE2601B-7C94-4C24-AB9B-EF187CAD9098@holtmann.org> <20130719162051.GA7373@x220.p-661hnu-f1> <51ECDB03.8090109@boh.de>
+To: =?iso-8859-1?Q?J=F6rg_Esser?= <jackfritt@boh.de>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In net/bluetooth/rfcomm/tty.c the struct tty_struct is used without taking
-references. This may lead to a use-after-free of the rfcomm tty.
+Hi Johan,
 
-Fix this by taking references properly, using the tty_port_* helpers when
-possible.
+>>>>> HCI Event: Command Complete (0x0e) plen 12 [hci0] 0.043811
+>>>>      Read Local Version Information (0x04|0x0001) ncmd 1
+>>>>        Status: Success (0x00)
+>>>>        HCI version: 2 - 0x2006
+>>>>        LMP version: 2 - 0x1806
+>>>>        Manufacturer: AVM Berlin (31)
+>>> it declares itself here as Bluetooth 1.2 device. Which means it is the
+>>> second generation of BlueFritz! USB device.
+>>> 
+>>> <snip>
+>>> 
+>>>> < HCI Command: Read Local Supported Comm.. (0x04|0x0002) plen 0 [hci0] 0.210014
+>>>>> HCI Event: Command Status (0x0f) plen 4 [hci0] 0.217361
+>>>>      Read Local Supported Commands (0x04|0x0002) ncmd 1
+>>>>        Status: Unknown HCI Command (0x01)
+>>> And here is your failing command. Newer kernels have been strict with
+>>> failing commands and will just abort the setup if anything goes wrong.
+>>> 
+>>> Johan, we need to figure out on how to work around this one. Might
+>>> just match for the manufacturer before sending the command.
+>> Either that or a quirk based on the USB id. Wouldn't matching just the
+>> manufacturer be a bit problematic for any newer chips from this company,
+>> or they stopped doing Bluetooth dongles after this one?
+> They stopped doing Bluetooth dongles after this one. I found no more Product with bluetooth on their website.
+> The support from AVM endet on 01.12.2009.
+> As I read here http://www.wehavemorefun.de/fritzbox/BlueFRITZ!_USB
 
-Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
----
- net/bluetooth/rfcomm/tty.c | 35 +++++++++++++++++++++--------------
- 1 file changed, 21 insertions(+), 14 deletions(-)
+yes, they ever only made two products. And their baseband was based on Silicon Wave which actually got bought by Qualcomm if I remember this correctly. So going by the manufacturer id and adding a good comment into the code might make this work nicely again.
 
-diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index b6e44ad..6c3efb5 100644
---- a/net/bluetooth/rfcomm/tty.c
-+++ b/net/bluetooth/rfcomm/tty.c
-@@ -333,10 +333,11 @@ static inline unsigned int rfcomm_room(struct rfcomm_dlc *dlc)
- static void rfcomm_wfree(struct sk_buff *skb)
- {
- 	struct rfcomm_dev *dev = (void *) skb->sk;
--	struct tty_struct *tty = dev->port.tty;
-+
- 	atomic_sub(skb->truesize, &dev->wmem_alloc);
--	if (test_bit(RFCOMM_TTY_ATTACHED, &dev->flags) && tty)
--		tty_wakeup(tty);
-+	if (test_bit(RFCOMM_TTY_ATTACHED, &dev->flags))
-+		tty_port_tty_wakeup(&dev->port);
-+
- 	tty_port_put(&dev->port);
- }
- 
-@@ -410,6 +411,7 @@ static int rfcomm_release_dev(void __user *arg)
- {
- 	struct rfcomm_dev_req req;
- 	struct rfcomm_dev *dev;
-+	struct tty_struct *tty;
- 
- 	if (copy_from_user(&req, arg, sizeof(req)))
- 		return -EFAULT;
-@@ -429,8 +431,11 @@ static int rfcomm_release_dev(void __user *arg)
- 		rfcomm_dlc_close(dev->dlc, 0);
- 
- 	/* Shut down TTY synchronously before freeing rfcomm_dev */
--	if (dev->port.tty)
--		tty_vhangup(dev->port.tty);
-+	tty = tty_port_tty_get(&dev->port);
-+	if (tty) {
-+		tty_vhangup(tty);
-+		tty_kref_put(tty);
-+	}
- 
- 	if (!test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags))
- 		rfcomm_dev_del(dev);
-@@ -563,6 +568,7 @@ static void rfcomm_dev_data_ready(struct rfcomm_dlc *dlc, struct sk_buff *skb)
- static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
- {
- 	struct rfcomm_dev *dev = dlc->owner;
-+	struct tty_struct *tty;
- 	if (!dev)
- 		return;
- 
-@@ -572,7 +578,8 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
- 	wake_up_interruptible(&dev->wait);
- 
- 	if (dlc->state == BT_CLOSED) {
--		if (!dev->port.tty) {
-+		tty = tty_port_tty_get(&dev->port);
-+		if (!tty) {
- 			if (test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags)) {
- 				/* Drop DLC lock here to avoid deadlock
- 				 * 1. rfcomm_dev_get will take rfcomm_dev_lock
-@@ -591,8 +598,10 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
- 				tty_port_put(&dev->port);
- 				rfcomm_dlc_lock(dlc);
- 			}
--		} else
--			tty_hangup(dev->port.tty);
-+		} else {
-+			tty_hangup(tty);
-+			tty_kref_put(tty);
-+		}
- 	}
- }
- 
-@@ -604,10 +613,8 @@ static void rfcomm_dev_modem_status(struct rfcomm_dlc *dlc, u8 v24_sig)
- 
- 	BT_DBG("dlc %p dev %p v24_sig 0x%02x", dlc, dev, v24_sig);
- 
--	if ((dev->modem_status & TIOCM_CD) && !(v24_sig & RFCOMM_V24_DV)) {
--		if (dev->port.tty && !C_CLOCAL(dev->port.tty))
--			tty_hangup(dev->port.tty);
--	}
-+	if ((dev->modem_status & TIOCM_CD) && !(v24_sig & RFCOMM_V24_DV))
-+		tty_port_tty_hangup(&dev->port, true);
- 
- 	dev->modem_status =
- 		((v24_sig & RFCOMM_V24_RTC) ? (TIOCM_DSR | TIOCM_DTR) : 0) |
-@@ -674,7 +681,7 @@ static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
- 
- 	rfcomm_dlc_lock(dlc);
- 	tty->driver_data = dev;
--	dev->port.tty = tty;
-+	tty_port_tty_set(&dev->port, tty);
- 	rfcomm_dlc_unlock(dlc);
- 	set_bit(RFCOMM_TTY_ATTACHED, &dev->flags);
- 
-@@ -742,7 +749,7 @@ static void rfcomm_tty_close(struct tty_struct *tty, struct file *filp)
- 
- 		rfcomm_dlc_lock(dev->dlc);
- 		tty->driver_data = NULL;
--		dev->port.tty = NULL;
-+		tty_port_tty_set(&dev->port, NULL);
- 		rfcomm_dlc_unlock(dev->dlc);
- 
- 		if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags)) {
--- 
-1.8.3.3
+Johan, if you prefer a quirk, then go for that one.
+
+> Should I open my trash bin?
+
+It is nice to have these old-timers around. And we do want to make them work. Knowing where they fail is actually pretty good. Then again, it is a Bluetooth 1.2 dongle and your are missing features like Secure Simple Pairing or Low Energy.
+
+Regards
+
+Marcel
+
