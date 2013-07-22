@@ -5,108 +5,87 @@ Cc: peter@hurleysoftware.com,
 	gustavo@padovan.org,
 	marcel@holtmann.org,
 	Gianluca Anzolin <gianluca@sottospazio.it>
-Subject: [PATCH v2 6/7] rfcomm: Fix the reference counting of tty_port
-Date: Mon, 22 Jul 2013 18:27:14 +0200
-Message-Id: <1374510435-12149-6-git-send-email-gianluca@sottospazio.it>
+Subject: [PATCH v2 5/7] rfcomm: Remove the device from the dev_list in the destructor
+Date: Mon, 22 Jul 2013 18:27:13 +0200
+Message-Id: <1374510435-12149-5-git-send-email-gianluca@sottospazio.it>
 In-Reply-To: <1374510435-12149-1-git-send-email-gianluca@sottospazio.it>
 References: <1374510435-12149-1-git-send-email-gianluca@sottospazio.it>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The tty_port can be released in two cases: when we get a HUP in the fuctions
-rfcomm_tty_hangup or rfcomm_dev_state_change. Or when the user releases the
-device in rfcomm_release_dev.
-
-In these cases we set the flag RFCOMM_TTY_RELEASED so that no other function can
-get a reference to the tty_port.
-
-The rfcomm_dev_del function is removed because it isn't used anymore.
+Remove the device from rfcomm_dev_list in the tty_port destructor.
 
 Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
 ---
- net/bluetooth/rfcomm/tty.c | 36 ++++++++++--------------------------
- 1 file changed, 10 insertions(+), 26 deletions(-)
+ net/bluetooth/rfcomm/tty.c | 27 ++++++---------------------
+ 1 file changed, 6 insertions(+), 21 deletions(-)
 
 diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index 17e5faa..428543e 100644
+index 1258678..17e5faa 100644
 --- a/net/bluetooth/rfcomm/tty.c
 +++ b/net/bluetooth/rfcomm/tty.c
-@@ -308,23 +308,6 @@ free:
- 	return err;
- }
+@@ -75,13 +75,6 @@ static void rfcomm_dev_modem_status(struct rfcomm_dlc *dlc, u8 v24_sig);
  
--static void rfcomm_dev_del(struct rfcomm_dev *dev)
--{
--	unsigned long flags;
--	BT_DBG("dev %p", dev);
--
--	BUG_ON(test_and_set_bit(RFCOMM_TTY_RELEASED, &dev->flags));
--
--	spin_lock_irqsave(&dev->port.lock, flags);
--	if (dev->port.count > 0) {
--		spin_unlock_irqrestore(&dev->port.lock, flags);
--		return;
--	}
--	spin_unlock_irqrestore(&dev->port.lock, flags);
--
--	tty_port_put(&dev->port);
--}
--
- /* ---- Send buffer ---- */
- static inline unsigned int rfcomm_room(struct rfcomm_dlc *dlc)
+ /* ---- Device functions ---- */
+ 
+-/*
+- * The reason this isn't actually a race, as you no doubt have a little voice
+- * screaming at you in your head, is that the refcount should never actually
+- * reach zero unless the device has already been taken off the list, in
+- * rfcomm_dev_del(). And if that's not true, we'll hit the BUG() in
+- * rfcomm_dev_destruct() anyway.
+- */
+ static void rfcomm_dev_destruct(struct tty_port *port)
  {
-@@ -440,8 +423,9 @@ static int rfcomm_release_dev(void __user *arg)
- 		tty_kref_put(tty);
+ 	struct rfcomm_dev *dev = container_of(port, struct rfcomm_dev, port);
+@@ -89,10 +82,9 @@ static void rfcomm_dev_destruct(struct tty_port *port)
+ 
+ 	BT_DBG("dev %p dlc %p", dev, dlc);
+ 
+-	/* Refcount should only hit zero when called from rfcomm_dev_del()
+-	   which will have taken us off the list. Everything else are
+-	   refcounting bugs. */
+-	BUG_ON(!list_empty(&dev->list));
++	spin_lock(&rfcomm_dev_lock);
++	list_del(&dev->list);
++	spin_unlock(&rfcomm_dev_lock);
+ 
+ 	rfcomm_dlc_lock(dlc);
+ 	/* Detach DLC if it's owned by this dev */
+@@ -295,7 +287,9 @@ out:
+ 			dev->id, NULL);
+ 	if (IS_ERR(dev->tty_dev)) {
+ 		err = PTR_ERR(dev->tty_dev);
++		spin_lock(&rfcomm_dev_lock);
+ 		list_del(&dev->list);
++		spin_unlock(&rfcomm_dev_lock);
+ 		goto free;
  	}
  
--	if (!test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags))
--		rfcomm_dev_del(dev);
-+	if (!test_and_set_bit(RFCOMM_TTY_RELEASED, &dev->flags))
-+		tty_port_put(&dev->port);
-+
- 	tty_port_put(&dev->port);
- 	return 0;
- }
-@@ -609,6 +593,9 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
- 				 *    rfcomm_dev_lock -> dlc lock
- 				 * 2. tty_port_put will deadlock if it's
- 				 *    the last reference
-+				 *
-+				 * FIXME: when we release the lock anything
-+				 * could happen to dev, even its destruction
- 				 */
- 				rfcomm_dlc_unlock(dlc);
- 				if (rfcomm_dev_get(dev->id) == NULL) {
-@@ -616,7 +603,9 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
- 					return;
- 				}
+@@ -328,10 +322,6 @@ static void rfcomm_dev_del(struct rfcomm_dev *dev)
+ 	}
+ 	spin_unlock_irqrestore(&dev->port.lock, flags);
  
--				rfcomm_dev_del(dev);
-+				set_bit(RFCOMM_TTY_RELEASED, &dev->flags);
-+				tty_port_put(&dev->port);
-+
- 				tty_port_put(&dev->port);
- 				rfcomm_dlc_lock(dlc);
- 			}
-@@ -742,9 +731,6 @@ static void rfcomm_tty_close(struct tty_struct *tty, struct file *filp)
- 						dev->port.count);
+-	spin_lock(&rfcomm_dev_lock);
+-	list_del_init(&dev->list);
+-	spin_unlock(&rfcomm_dev_lock);
+-
+ 	tty_port_put(&dev->port);
+ }
+ 
+@@ -753,13 +743,8 @@ static void rfcomm_tty_close(struct tty_struct *tty, struct file *filp)
  
  	tty_port_close(&dev->port, tty, filp);
+ 
+-	if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags)) {
+-		spin_lock(&rfcomm_dev_lock);
+-		list_del_init(&dev->list);
+-		spin_unlock(&rfcomm_dev_lock);
 -
--	if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags))
--		tty_port_put(&dev->port);
++	if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags))
+ 		tty_port_put(&dev->port);
+-	}
  }
  
  static int rfcomm_tty_write(struct tty_struct *tty, const unsigned char *buf, int count)
-@@ -1047,9 +1033,7 @@ static void rfcomm_tty_hangup(struct tty_struct *tty)
- 	tty_port_hangup(&dev->port);
- 
- 	if (test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags)) {
--		if (rfcomm_dev_get(dev->id) == NULL)
--			return;
--		rfcomm_dev_del(dev);
-+		set_bit(RFCOMM_TTY_RELEASED, &dev->flags);
- 		tty_port_put(&dev->port);
- 	}
- }
 -- 
 1.8.3.3
