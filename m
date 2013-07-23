@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/5] audio: Remove audio plugin
-Date: Tue, 23 Jul 2013 18:01:25 +0300
-Message-Id: <1374591686-22646-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/5] audio: Move media code to its own plugin
+Date: Tue, 23 Jul 2013 18:01:24 +0300
+Message-Id: <1374591686-22646-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1374591686-22646-1-git-send-email-luiz.dentz@gmail.com>
 References: <1374591686-22646-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,346 +11,183 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Audio plugin is now splitted in multiple plugins so it is no longer
-necessary to have a manager to deal with many different drivers.
+This moves media inface related code to media plugin and making it
+possible to disable by passing -P media and increasing the modularity
+of the code.
 ---
- Makefile.plugins         |   4 --
- profiles/audio/a2dp.c    |   1 -
- profiles/audio/avctp.c   |   1 -
- profiles/audio/avdtp.c   |   1 -
- profiles/audio/control.c |   1 -
- profiles/audio/main.c    |  86 ----------------------------------------
- profiles/audio/manager.c | 101 -----------------------------------------------
- profiles/audio/manager.h |  30 --------------
- profiles/audio/sink.c    |   1 -
- profiles/audio/source.c  |   1 -
- 10 files changed, 227 deletions(-)
- delete mode 100644 profiles/audio/main.c
- delete mode 100644 profiles/audio/manager.c
- delete mode 100644 profiles/audio/manager.h
+ Makefile.plugins         |  8 +++++---
+ profiles/audio/manager.c | 24 ------------------------
+ profiles/audio/media.c   | 47 ++++++++++++++++++++++++++++++++++++-----------
+ 3 files changed, 41 insertions(+), 38 deletions(-)
 
 diff --git a/Makefile.plugins b/Makefile.plugins
-index 41d5be9..e11a013 100644
+index b9dc2f0..41d5be9 100644
 --- a/Makefile.plugins
 +++ b/Makefile.plugins
-@@ -30,10 +30,6 @@ noinst_LIBRARIES += profiles/sap/libsap.a
- profiles_sap_libsap_a_SOURCES = profiles/sap/sap.h profiles/sap/sap-u8500.c
- endif
+@@ -32,9 +32,7 @@ endif
  
--builtin_modules += audio
--builtin_sources += profiles/audio/main.c \
--			profiles/audio/manager.h profiles/audio/manager.c
--
+ builtin_modules += audio
+ builtin_sources += profiles/audio/main.c \
+-			profiles/audio/manager.h profiles/audio/manager.c \
+-			profiles/audio/media.h profiles/audio/media.c \
+-			profiles/audio/transport.h profiles/audio/transport.c
++			profiles/audio/manager.h profiles/audio/manager.c
+ 
  builtin_modules += a2dp
  builtin_sources += profiles/audio/source.h profiles/audio/source.c \
- 			profiles/audio/sink.h profiles/audio/sink.c \
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 148fb98..807bdd8 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -45,7 +45,6 @@
- #include "src/service.h"
+@@ -49,6 +47,10 @@ builtin_sources += profiles/audio/control.h profiles/audio/control.c \
+ 			profiles/audio/avrcp.h profiles/audio/avrcp.c \
+ 			profiles/audio/player.h profiles/audio/player.c
  
- #include "log.h"
--#include "manager.h"
- #include "avdtp.h"
- #include "sink.h"
- #include "source.h"
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 627252a..11e9365 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -53,7 +53,6 @@
- #include "log.h"
- #include "error.h"
- #include "uinput.h"
--#include "manager.h"
- #include "avctp.h"
- #include "avrcp.h"
++builtin_modules += media
++builtin_sources += profiles/audio/media.h profiles/audio/media.c \
++			profiles/audio/transport.h profiles/audio/transport.c
++
+ builtin_modules += network
+ builtin_sources += profiles/network/manager.c \
+ 			profiles/network/common.h profiles/network/common.c \
+diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
+index 91c9a4c..8065b70 100644
+--- a/profiles/audio/manager.c
++++ b/profiles/audio/manager.c
+@@ -69,33 +69,11 @@
  
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index f6c9408..818dbdd 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -50,7 +50,6 @@
+ static GKeyFile *config = NULL;
+ 
+-static int media_server_probe(struct btd_adapter *adapter)
+-{
+-	DBG("path %s", adapter_get_path(adapter));
+-
+-	return media_register(adapter);
+-}
+-
+-static void media_server_remove(struct btd_adapter *adapter)
+-{
+-	DBG("path %s", adapter_get_path(adapter));
+-
+-	media_unregister(adapter);
+-}
+-
+-static struct btd_adapter_driver media_driver = {
+-	.name	= "media",
+-	.probe	= media_server_probe,
+-	.remove	= media_server_remove,
+-};
+-
+ int audio_manager_init(GKeyFile *conf)
+ {
+ 	if (conf)
+ 		config = conf;
+ 
+-	btd_register_adapter_driver(&media_driver);
+-
+ 	return 0;
+ }
+ 
+@@ -105,8 +83,6 @@ void audio_manager_exit(void)
+ 		g_key_file_free(config);
+ 		config = NULL;
+ 	}
+-
+-	btd_unregister_adapter_driver(&media_driver);
+ }
+ 
+ static void set_fast_connectable(struct btd_adapter *adapter,
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index 715d49c..794362e 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -34,6 +34,7 @@
+ #include <gdbus/gdbus.h>
+ 
+ #include "lib/uuid.h"
++#include "src/plugin.h"
  #include "src/adapter.h"
  #include "src/device.h"
- 
--#include "manager.h"
- #include "control.h"
- #include "avdtp.h"
- #include "sink.h"
-diff --git a/profiles/audio/control.c b/profiles/audio/control.c
-index 912ca73..5f88a94 100644
---- a/profiles/audio/control.c
-+++ b/profiles/audio/control.c
-@@ -53,7 +53,6 @@
- 
- #include "log.h"
- #include "error.h"
--#include "manager.h"
- #include "avctp.h"
- #include "control.h"
- #include "sdpd.h"
-diff --git a/profiles/audio/main.c b/profiles/audio/main.c
-deleted file mode 100644
-index 996d2af..0000000
---- a/profiles/audio/main.c
-+++ /dev/null
-@@ -1,86 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2006-2010  Nokia Corporation
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <errno.h>
--#include <sys/socket.h>
--#include <unistd.h>
--#include <fcntl.h>
--#include <bluetooth/bluetooth.h>
--#include <bluetooth/sdp.h>
--#include <bluetooth/sdp_lib.h>
--
--#include <glib.h>
--#include <dbus/dbus.h>
--#include <btio/btio.h>
--
--#include "glib-helper.h"
--#include "plugin.h"
--#include "log.h"
--#include "manager.h"
--
--static GKeyFile *load_config_file(const char *file)
--{
--	GError *err = NULL;
--	GKeyFile *keyfile;
--
--	keyfile = g_key_file_new();
--
--	g_key_file_set_list_separator(keyfile, ',');
--
--	if (!g_key_file_load_from_file(keyfile, file, 0, &err)) {
--		if (!g_error_matches(err, G_FILE_ERROR, G_FILE_ERROR_NOENT))
--			error("Parsing %s failed: %s", file, err->message);
--		g_error_free(err);
--		g_key_file_free(keyfile);
--		return NULL;
--	}
--
--	return keyfile;
--}
--
--static int audio_init(void)
--{
--	GKeyFile *config;
--
--	config = load_config_file(CONFIGDIR "/audio.conf");
--
--	if (audio_manager_init(config) < 0) {
--		audio_manager_exit();
--		return -EIO;
--	}
--
--	return 0;
--}
--
--static void audio_exit(void)
--{
--	audio_manager_exit();
--}
--
--BLUETOOTH_PLUGIN_DEFINE(audio, VERSION,
--			BLUETOOTH_PLUGIN_PRIORITY_DEFAULT, audio_init, audio_exit)
-diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
-deleted file mode 100644
-index 8065b70..0000000
---- a/profiles/audio/manager.c
-+++ /dev/null
-@@ -1,101 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2006-2010  Nokia Corporation
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <stdio.h>
--#include <stdlib.h>
--#include <stdarg.h>
--#include <errno.h>
--#include <unistd.h>
--#include <fcntl.h>
--#include <stdint.h>
--#include <stdbool.h>
--#include <sys/stat.h>
--#include <dirent.h>
--#include <ctype.h>
--#include <signal.h>
--
--#include <bluetooth/bluetooth.h>
--#include <bluetooth/sdp.h>
--#include <bluetooth/sdp_lib.h>
--
--#include <glib.h>
--#include <dbus/dbus.h>
--#include <btio/btio.h>
--#include <gdbus/gdbus.h>
--
--#include "lib/uuid.h"
--#include "glib-helper.h"
--#include "src/adapter.h"
--#include "src/device.h"
--#include "src/profile.h"
--#include "src/service.h"
--
--#include "log.h"
--#include "error.h"
--#include "avdtp.h"
--#include "media.h"
--#include "a2dp.h"
--#include "sink.h"
--#include "source.h"
--#include "avrcp.h"
--#include "control.h"
--#include "manager.h"
--#include "sdpd.h"
--
--static GKeyFile *config = NULL;
--
--int audio_manager_init(GKeyFile *conf)
--{
--	if (conf)
--		config = conf;
--
--	return 0;
--}
--
--void audio_manager_exit(void)
--{
--	if (config) {
--		g_key_file_free(config);
--		config = NULL;
--	}
--}
--
--static void set_fast_connectable(struct btd_adapter *adapter,
--							gpointer user_data)
--{
--	gboolean enable = GPOINTER_TO_UINT(user_data);
--
--	if (btd_adapter_set_fast_connectable(adapter, enable))
--		error("Changing fast connectable for hci%d failed",
--					btd_adapter_get_index(adapter));
--}
--
--void manager_set_fast_connectable(gboolean enable)
--{
--	adapter_foreach(set_fast_connectable, GUINT_TO_POINTER(enable));
--}
-diff --git a/profiles/audio/manager.h b/profiles/audio/manager.h
-deleted file mode 100644
-index de8d791..0000000
---- a/profiles/audio/manager.h
-+++ /dev/null
-@@ -1,30 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2006-2010  Nokia Corporation
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--int audio_manager_init(GKeyFile *config);
--void audio_manager_exit(void);
--
--/* TRUE to enable fast connectable and FALSE to disable fast connectable for all
-- * audio adapters. */
--void manager_set_fast_connectable(gboolean enable);
-diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
-index 7211e68..400af06 100644
---- a/profiles/audio/sink.c
-+++ b/profiles/audio/sink.c
-@@ -47,7 +47,6 @@
- #include "media.h"
+ #include "src/dbus-common.h"
+@@ -47,7 +48,6 @@
+ #include "transport.h"
  #include "a2dp.h"
- #include "error.h"
+ #include "avrcp.h"
 -#include "manager.h"
- #include "sink.h"
- #include "dbus-common.h"
  
-diff --git a/profiles/audio/source.c b/profiles/audio/source.c
-index 0793af3..24a4353 100644
---- a/profiles/audio/source.c
-+++ b/profiles/audio/source.c
-@@ -48,7 +48,6 @@
- #include "media.h"
- #include "a2dp.h"
- #include "error.h"
--#include "manager.h"
- #include "source.h"
- #include "dbus-common.h"
+ #define MEDIA_INTERFACE "org.bluez.Media1"
+ #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
+@@ -1812,10 +1812,27 @@ static void path_free(void *data)
+ 	g_free(adapter);
+ }
  
+-int media_register(struct btd_adapter *btd_adapter)
++struct a2dp_sep *media_endpoint_get_sep(struct media_endpoint *endpoint)
++{
++	return endpoint->sep;
++}
++
++const char *media_endpoint_get_uuid(struct media_endpoint *endpoint)
++{
++	return endpoint->uuid;
++}
++
++uint8_t media_endpoint_get_codec(struct media_endpoint *endpoint)
++{
++	return endpoint->codec;
++}
++
++static int media_server_probe(struct btd_adapter *btd_adapter)
+ {
+ 	struct media_adapter *adapter;
+ 
++	DBG("path %s", adapter_get_path(btd_adapter));
++
+ 	adapter = g_new0(struct media_adapter, 1);
+ 	adapter->btd_adapter = btd_adapter_ref(btd_adapter);
+ 
+@@ -1835,10 +1852,12 @@ int media_register(struct btd_adapter *btd_adapter)
+ 	return 0;
+ }
+ 
+-void media_unregister(struct btd_adapter *btd_adapter)
++static void media_server_remove(struct btd_adapter *btd_adapter)
+ {
+ 	GSList *l;
+ 
++	DBG("path %s", adapter_get_path(btd_adapter));
++
+ 	for (l = adapters; l; l = l->next) {
+ 		struct media_adapter *adapter = l->data;
+ 
+@@ -1851,17 +1870,23 @@ void media_unregister(struct btd_adapter *btd_adapter)
+ 	}
+ }
+ 
+-struct a2dp_sep *media_endpoint_get_sep(struct media_endpoint *endpoint)
+-{
+-	return endpoint->sep;
+-}
++static struct btd_adapter_driver media_driver = {
++	.name	= "media",
++	.probe	= media_server_probe,
++	.remove	= media_server_remove,
++};
+ 
+-const char *media_endpoint_get_uuid(struct media_endpoint *endpoint)
++static int media_init(void)
+ {
+-	return endpoint->uuid;
++	btd_register_adapter_driver(&media_driver);
++
++	return 0;
+ }
+ 
+-uint8_t media_endpoint_get_codec(struct media_endpoint *endpoint)
++static void media_exit(void)
+ {
+-	return endpoint->codec;
++	btd_unregister_adapter_driver(&media_driver);
+ }
++
++BLUETOOTH_PLUGIN_DEFINE(media, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++							media_init, media_exit)
 -- 
 1.8.3.1
 
