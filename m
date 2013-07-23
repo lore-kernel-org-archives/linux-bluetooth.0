@@ -1,55 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/5] audio: Move A2DP code to its own plugin
-Date: Tue, 23 Jul 2013 18:01:23 +0300
-Message-Id: <1374591686-22646-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1374591686-22646-1-git-send-email-luiz.dentz@gmail.com>
-References: <1374591686-22646-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/5] audio: Move AVRCP related code to its own plugin
+Date: Tue, 23 Jul 2013 18:01:22 +0300
+Message-Id: <1374591686-22646-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This moves A2DP related code to a2dp plugin and making it possible to
-disable by passing -P a2dp and increasing the modularity of the code.
+This moves AVRCP related code to avrcp plugin and making it possible to
+disable by passing -P avrcp and increasing the modularity of the code.
 ---
- Makefile.plugins         |   8 +-
- profiles/audio/a2dp.c    | 296 ++++++++++++++++++++++++++++++++++-------------
- profiles/audio/a2dp.h    |   5 -
- profiles/audio/avdtp.c   |  18 +--
- profiles/audio/avdtp.h   |   2 +-
- profiles/audio/manager.c | 141 ----------------------
- 6 files changed, 222 insertions(+), 248 deletions(-)
+ Makefile.plugins         |  10 +-
+ profiles/audio/avrcp.c   | 345 ++++++++++++++++++++++++++++-------------------
+ profiles/audio/avrcp.h   |   7 -
+ profiles/audio/manager.c | 113 +---------------
+ 4 files changed, 214 insertions(+), 261 deletions(-)
 
 diff --git a/Makefile.plugins b/Makefile.plugins
-index 0f07b11..b9dc2f0 100644
+index 7fd9e2d..0f07b11 100644
 --- a/Makefile.plugins
 +++ b/Makefile.plugins
-@@ -33,12 +33,14 @@ endif
+@@ -33,18 +33,20 @@ endif
  builtin_modules += audio
  builtin_sources += profiles/audio/main.c \
  			profiles/audio/manager.h profiles/audio/manager.c \
--			profiles/audio/source.h profiles/audio/source.c \
-+			profiles/audio/media.h profiles/audio/media.c \
-+			profiles/audio/transport.h profiles/audio/transport.c
-+
-+builtin_modules += a2dp
-+builtin_sources += profiles/audio/source.h profiles/audio/source.c \
+-			profiles/audio/control.h profiles/audio/control.c \
+-			profiles/audio/avctp.h profiles/audio/avctp.c \
+-			profiles/audio/avrcp.h profiles/audio/avrcp.c \
+ 			profiles/audio/source.h profiles/audio/source.c \
  			profiles/audio/sink.h profiles/audio/sink.c \
  			profiles/audio/a2dp.h profiles/audio/a2dp.c \
  			profiles/audio/avdtp.h profiles/audio/avdtp.c \
--			profiles/audio/media.h profiles/audio/media.c \
--			profiles/audio/transport.h profiles/audio/transport.c \
+ 			profiles/audio/media.h profiles/audio/media.c \
+ 			profiles/audio/transport.h profiles/audio/transport.c \
+-			profiles/audio/player.h profiles/audio/player.c \
  			profiles/audio/a2dp-codecs.h
  
- builtin_modules += avrcp
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 8db43f9..148fb98 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -38,8 +38,10 @@
- #include <bluetooth/sdp_lib.h>
++builtin_modules += avrcp
++builtin_sources += profiles/audio/control.h profiles/audio/control.c \
++			profiles/audio/avctp.h profiles/audio/avctp.c \
++			profiles/audio/avrcp.h profiles/audio/avrcp.c \
++			profiles/audio/player.h profiles/audio/player.c
++
+ builtin_modules += network
+ builtin_sources += profiles/network/manager.c \
+ 			profiles/network/common.h profiles/network/common.c \
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 9baf0d3..a9373f3 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -47,20 +47,19 @@
+ #include <gdbus/gdbus.h>
  
  #include "lib/uuid.h"
 +#include "src/plugin.h"
@@ -59,217 +62,222 @@ index 8db43f9..148fb98 100644
  #include "src/service.h"
  
  #include "log.h"
-@@ -1182,15 +1184,14 @@ static struct a2dp_server *find_server(GSList *list, struct btd_adapter *a)
- 	return NULL;
+ #include "error.h"
+-#include "manager.h"
+ #include "avctp.h"
+ #include "avrcp.h"
+ #include "sdpd.h"
+ #include "dbus-common.h"
+ #include "control.h"
+-#include "avdtp.h"
+-#include "sink.h"
+ #include "player.h"
+ #include "transport.h"
+ 
+@@ -3538,46 +3537,11 @@ static void state_changed(struct btd_device *device, avctp_state_t old_state,
+ 	}
  }
  
--static struct a2dp_server *a2dp_server_register(struct btd_adapter *adapter,
--							GKeyFile *config)
-+static struct a2dp_server *a2dp_server_register(struct btd_adapter *adapter)
+-gboolean avrcp_connect(struct btd_device *dev)
++static struct avrcp_server *avrcp_server_register(struct btd_adapter *adapter)
  {
- 	struct a2dp_server *server;
- 	int av_err;
+-	struct avctp *session;
+-
+-	session = avctp_connect(dev);
+-	if (session)
+-		return FALSE;
+-
+-	return TRUE;
+-}
+-
+-void avrcp_disconnect(struct btd_device *dev)
+-{
+-	struct avctp *session;
+-
+-	session = avctp_get(dev);
+-	if (!session)
+-		return;
+-
+-	avctp_disconnect(session);
+-}
+-
+-static struct avrcp_server *avrcp_server_register(struct btd_adapter *adapter,
+-							GKeyFile *config)
+-{
+-	gboolean tmp, master = TRUE;
+-	GError *err = NULL;
+ 	struct avrcp_server *server;
  
- 	server = g_new0(struct a2dp_server, 1);
+-	if (config) {
+-		tmp = g_key_file_get_boolean(config, "General",
+-							"Master", &err);
+-		if (err) {
+-			DBG("audio.conf: %s", err->message);
+-			g_error_free(err);
+-		} else
+-			master = tmp;
+-	}
+-
+-	if (avctp_register(adapter, master) < 0)
++	if (avctp_register(adapter, TRUE) < 0)
+ 		return NULL;
  
--	av_err = avdtp_init(adapter, config);
-+	av_err = avdtp_init(adapter);
- 	if (av_err < 0) {
- 		DBG("AVDTP not registered");
- 		g_free(server);
-@@ -1203,42 +1204,6 @@ static struct a2dp_server *a2dp_server_register(struct btd_adapter *adapter,
+ 	server = g_new0(struct avrcp_server, 1);
+@@ -3591,70 +3555,6 @@ static struct avrcp_server *avrcp_server_register(struct btd_adapter *adapter,
  	return server;
  }
  
--int a2dp_source_register(struct btd_adapter *adapter, GKeyFile *config)
+-int avrcp_target_register(struct btd_adapter *adapter, GKeyFile *config)
 -{
--	struct a2dp_server *server;
+-	sdp_record_t *record;
+-	struct avrcp_server *server;
 -
 -	server = find_server(servers, adapter);
 -	if (server != NULL)
 -		goto done;
 -
--	server = a2dp_server_register(adapter, config);
+-	server = avrcp_server_register(adapter, config);
 -	if (server == NULL)
 -		return -EPROTONOSUPPORT;
 -
 -done:
--	server->source_enabled = TRUE;
+-	record = avrcp_tg_record();
+-	if (!record) {
+-		error("Unable to allocate new service record");
+-		avrcp_target_unregister(adapter);
+-		return -1;
+-	}
+-
+-	if (add_record_to_server(adapter_get_address(adapter), record) < 0) {
+-		error("Unable to register AVRCP target service record");
+-		avrcp_target_unregister(adapter);
+-		sdp_record_free(record);
+-		return -1;
+-	}
+-	server->tg_record_id = record->handle;
 -
 -	return 0;
 -}
 -
--int a2dp_sink_register(struct btd_adapter *adapter, GKeyFile *config)
+-int avrcp_remote_register(struct btd_adapter *adapter, GKeyFile *config)
 -{
--	struct a2dp_server *server;
+-	sdp_record_t *record;
+-	struct avrcp_server *server;
 -
 -	server = find_server(servers, adapter);
 -	if (server != NULL)
 -		goto done;
 -
--	server = a2dp_server_register(adapter, config);
+-	server = avrcp_server_register(adapter, config);
 -	if (server == NULL)
 -		return -EPROTONOSUPPORT;
 -
 -done:
--	server->sink_enabled = TRUE;
+-	record = avrcp_ct_record();
+-	if (!record) {
+-		error("Unable to allocate new service record");
+-		avrcp_remote_unregister(adapter);
+-		return -1;
+-	}
+-
+-	if (add_record_to_server(adapter_get_address(adapter), record) < 0) {
+-		error("Unable to register AVRCP service record");
+-		sdp_record_free(record);
+-		avrcp_remote_unregister(adapter);
+-		return -1;
+-	}
+-	server->ct_record_id = record->handle;
 -
 -	return 0;
 -}
 -
- static void a2dp_unregister_sep(struct a2dp_sep *sep)
+ static void avrcp_server_unregister(struct avrcp_server *server)
  {
- 	if (sep->destroy) {
-@@ -1259,49 +1224,6 @@ static void a2dp_server_unregister(struct a2dp_server *server)
- 	g_free(server);
+ 	g_slist_free_full(server->sessions, g_free);
+@@ -3675,40 +3575,6 @@ static void avrcp_server_unregister(struct avrcp_server *server)
+ 	}
  }
  
--void a2dp_sink_unregister(struct btd_adapter *adapter)
+-void avrcp_target_unregister(struct btd_adapter *adapter)
 -{
--	struct a2dp_server *server;
+-	struct avrcp_server *server;
 -
 -	server = find_server(servers, adapter);
 -	if (!server)
 -		return;
 -
--	g_slist_free_full(server->sinks, (GDestroyNotify) a2dp_unregister_sep);
--
--	if (server->sink_record_id) {
--		remove_record_from_server(server->sink_record_id);
--		server->sink_record_id = 0;
+-	if (server->tg_record_id != 0) {
+-		remove_record_from_server(server->tg_record_id);
+-		server->tg_record_id = 0;
 -	}
 -
--	if (server->source_record_id)
--		return;
--
--	a2dp_server_unregister(server);
+-	if (server->ct_record_id == 0)
+-		avrcp_server_unregister(server);
 -}
 -
--void a2dp_source_unregister(struct btd_adapter *adapter)
+-void avrcp_remote_unregister(struct btd_adapter *adapter)
 -{
--	struct a2dp_server *server;
+-	struct avrcp_server *server;
 -
 -	server = find_server(servers, adapter);
 -	if (!server)
 -		return;
 -
--	g_slist_free_full(server->sources,
--					(GDestroyNotify) a2dp_unregister_sep);
--
--	if (server->source_record_id) {
--		remove_record_from_server(server->source_record_id);
--		server->source_record_id = 0;
+-	if (server->ct_record_id != 0) {
+-		remove_record_from_server(server->ct_record_id);
+-		server->ct_record_id = 0;
 -	}
 -
--	if (server->sink_record_id)
--		return;
--
--	a2dp_server_unregister(server);
+-	if (server->tg_record_id == 0)
+-		avrcp_server_unregister(server);
 -}
 -
- struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
- 				uint8_t codec, gboolean delay_reporting,
- 				struct a2dp_endpoint *endpoint,
-@@ -1915,3 +1837,213 @@ struct btd_device *a2dp_setup_get_device(struct a2dp_setup *setup)
+ struct avrcp_player *avrcp_register_player(struct btd_adapter *adapter,
+ 						struct avrcp_player_cb *cb,
+ 						void *user_data,
+@@ -3841,3 +3707,206 @@ int avrcp_set_volume(struct btd_device *dev, uint8_t volume)
  
- 	return avdtp_get_device(setup->session);
+ 	return 0;
  }
 +
-+static int a2dp_source_probe(struct btd_service *service)
++static int avrcp_connect(struct btd_service *service)
++{
++	struct btd_device *dev = btd_service_get_device(service);
++	const char *path = device_get_path(dev);
++
++	DBG("path %s", path);
++
++	return control_connect(service);
++}
++
++static int avrcp_disconnect(struct btd_service *service)
++{
++	struct btd_device *dev = btd_service_get_device(service);
++	const char *path = device_get_path(dev);
++
++	DBG("path %s", path);
++
++	return control_disconnect(service);
++}
++
++static int avrcp_target_probe(struct btd_service *service)
 +{
 +	struct btd_device *dev = btd_service_get_device(service);
 +
 +	DBG("path %s", device_get_path(dev));
 +
-+	source_init(service);
-+
-+	return 0;
++	return control_init_target(service);
 +}
 +
-+static void a2dp_source_remove(struct btd_service *service)
++static void avrcp_target_remove(struct btd_service *service)
 +{
-+	source_unregister(service);
++	control_unregister(service);
 +}
 +
-+static int a2dp_sink_probe(struct btd_service *service)
-+{
-+	struct btd_device *dev = btd_service_get_device(service);
-+
-+	DBG("path %s", device_get_path(dev));
-+
-+	return sink_init(service);
-+}
-+
-+static void a2dp_sink_remove(struct btd_service *service)
-+{
-+	sink_unregister(service);
-+}
-+
-+static int a2dp_source_connect(struct btd_service *service)
-+{
-+	struct btd_device *dev = btd_service_get_device(service);
-+	const char *path = device_get_path(dev);
-+
-+	DBG("path %s", path);
-+
-+	return source_connect(service);
-+}
-+
-+static int a2dp_source_disconnect(struct btd_service *service)
-+{
-+	struct btd_device *dev = btd_service_get_device(service);
-+	const char *path = device_get_path(dev);
-+
-+	DBG("path %s", path);
-+
-+	return source_disconnect(service, FALSE);
-+}
-+
-+static int a2dp_sink_connect(struct btd_service *service)
-+{
-+	struct btd_device *dev = btd_service_get_device(service);
-+	const char *path = device_get_path(dev);
-+
-+	DBG("path %s", path);
-+
-+	return sink_connect(service);
-+}
-+
-+static int a2dp_sink_disconnect(struct btd_service *service)
-+{
-+	struct btd_device *dev = btd_service_get_device(service);
-+	const char *path = device_get_path(dev);
-+
-+	DBG("path %s", path);
-+
-+	return sink_disconnect(service, FALSE);
-+}
-+
-+static int a2dp_source_server_probe(struct btd_profile *p,
++static void avrcp_target_server_remove(struct btd_profile *p,
 +						struct btd_adapter *adapter)
 +{
-+	struct a2dp_server *server;
-+
-+	DBG("path %s", adapter_get_path(adapter));
-+
-+	server = find_server(servers, adapter);
-+	if (server != NULL)
-+		goto done;
-+
-+	server = a2dp_server_register(adapter);
-+	if (server == NULL)
-+		return -EPROTONOSUPPORT;
-+
-+done:
-+	server->source_enabled = TRUE;
-+
-+	return 0;
-+}
-+
-+static void a2dp_source_server_remove(struct btd_profile *p,
-+						struct btd_adapter *adapter)
-+{
-+	struct a2dp_server *server;
++	struct avrcp_server *server;
 +
 +	DBG("path %s", adapter_get_path(adapter));
 +
@@ -277,24 +285,20 @@ index 8db43f9..148fb98 100644
 +	if (!server)
 +		return;
 +
-+	g_slist_free_full(server->sources,
-+					(GDestroyNotify) a2dp_unregister_sep);
-+
-+	if (server->source_record_id) {
-+		remove_record_from_server(server->source_record_id);
-+		server->source_record_id = 0;
++	if (server->tg_record_id != 0) {
++		remove_record_from_server(server->tg_record_id);
++		server->tg_record_id = 0;
 +	}
 +
-+	if (server->sink_record_id)
-+		return;
-+
-+	a2dp_server_unregister(server);
++	if (server->ct_record_id == 0)
++		avrcp_server_unregister(server);
 +}
 +
-+static int a2dp_sink_server_probe(struct btd_profile *p,
++static int avrcp_target_server_probe(struct btd_profile *p,
 +						struct btd_adapter *adapter)
 +{
-+	struct a2dp_server *server;
++	sdp_record_t *record;
++	struct avrcp_server *server;
 +
 +	DBG("path %s", adapter_get_path(adapter));
 +
@@ -302,20 +306,61 @@ index 8db43f9..148fb98 100644
 +	if (server != NULL)
 +		goto done;
 +
-+	server = a2dp_server_register(adapter);
++	server = avrcp_server_register(adapter);
 +	if (server == NULL)
 +		return -EPROTONOSUPPORT;
 +
 +done:
-+	server->sink_enabled = TRUE;
++	record = avrcp_tg_record();
++	if (!record) {
++		error("Unable to allocate new service record");
++		avrcp_target_server_remove(p, adapter);
++		return -1;
++	}
++
++	if (add_record_to_server(adapter_get_address(adapter), record) < 0) {
++		error("Unable to register AVRCP target service record");
++		avrcp_target_server_remove(p, adapter);
++		sdp_record_free(record);
++		return -1;
++	}
++	server->tg_record_id = record->handle;
 +
 +	return 0;
 +}
 +
-+static void a2dp_sink_server_remove(struct btd_profile *p,
++static struct btd_profile avrcp_target_profile = {
++	.name		= "audio-avrcp-target",
++
++	.remote_uuid	= AVRCP_TARGET_UUID,
++	.device_probe	= avrcp_target_probe,
++	.device_remove	= avrcp_target_remove,
++
++	.connect	= avrcp_connect,
++	.disconnect	= avrcp_disconnect,
++
++	.adapter_probe	= avrcp_target_server_probe,
++	.adapter_remove = avrcp_target_server_remove,
++};
++
++static int avrcp_controller_probe(struct btd_service *service)
++{
++	struct btd_device *dev = btd_service_get_device(service);
++
++	DBG("path %s", device_get_path(dev));
++
++	return control_init_remote(service);
++}
++
++static void avrcp_controller_remove(struct btd_service *service)
++{
++	control_unregister(service);
++}
++
++static void avrcp_controller_server_remove(struct btd_profile *p,
 +						struct btd_adapter *adapter)
 +{
-+	struct a2dp_server *server;
++	struct avrcp_server *server;
 +
 +	DBG("path %s", adapter_get_path(adapter));
 +
@@ -323,301 +368,257 @@ index 8db43f9..148fb98 100644
 +	if (!server)
 +		return;
 +
-+	g_slist_free_full(server->sinks, (GDestroyNotify) a2dp_unregister_sep);
-+
-+	if (server->sink_record_id) {
-+		remove_record_from_server(server->sink_record_id);
-+		server->sink_record_id = 0;
++	if (server->ct_record_id != 0) {
++		remove_record_from_server(server->ct_record_id);
++		server->ct_record_id = 0;
 +	}
 +
-+	if (server->source_record_id)
-+		return;
-+
-+	a2dp_server_unregister(server);
++	if (server->tg_record_id == 0)
++		avrcp_server_unregister(server);
 +}
 +
-+static struct btd_profile a2dp_source_profile = {
-+	.name		= "a2dp-source",
-+	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
-+
-+	.remote_uuid	= A2DP_SOURCE_UUID,
-+	.device_probe	= a2dp_source_probe,
-+	.device_remove	= a2dp_source_remove,
-+
-+	.auto_connect	= true,
-+	.connect	= a2dp_source_connect,
-+	.disconnect	= a2dp_source_disconnect,
-+
-+	.adapter_probe	= a2dp_sink_server_probe,
-+	.adapter_remove	= a2dp_sink_server_remove,
-+};
-+
-+static struct btd_profile a2dp_sink_profile = {
-+	.name		= "a2dp-sink",
-+	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
-+
-+	.remote_uuid	= A2DP_SINK_UUID,
-+	.device_probe	= a2dp_sink_probe,
-+	.device_remove	= a2dp_sink_remove,
-+
-+	.auto_connect	= true,
-+	.connect	= a2dp_sink_connect,
-+	.disconnect	= a2dp_sink_disconnect,
-+
-+	.adapter_probe	= a2dp_source_server_probe,
-+	.adapter_remove	= a2dp_source_server_remove,
-+};
-+
-+static int a2dp_init(void)
++static int avrcp_controller_server_probe(struct btd_profile *p,
++						struct btd_adapter *adapter)
 +{
-+	btd_profile_register(&a2dp_source_profile);
-+	btd_profile_register(&a2dp_sink_profile);
++	sdp_record_t *record;
++	struct avrcp_server *server;
++
++	DBG("path %s", adapter_get_path(adapter));
++
++	server = find_server(servers, adapter);
++	if (server != NULL)
++		goto done;
++
++	server = avrcp_server_register(adapter);
++	if (server == NULL)
++		return -EPROTONOSUPPORT;
++
++done:
++	record = avrcp_ct_record();
++	if (!record) {
++		error("Unable to allocate new service record");
++		avrcp_controller_server_remove(p, adapter);
++		return -1;
++	}
++
++	if (add_record_to_server(adapter_get_address(adapter), record) < 0) {
++		error("Unable to register AVRCP service record");
++		avrcp_controller_server_remove(p, adapter);
++		sdp_record_free(record);
++		return -1;
++	}
++	server->ct_record_id = record->handle;
 +
 +	return 0;
 +}
 +
-+static void a2dp_exit(void)
++static struct btd_profile avrcp_controller_profile = {
++	.name		= "avrcp-controller",
++
++	.remote_uuid	= AVRCP_REMOTE_UUID,
++	.device_probe	= avrcp_controller_probe,
++	.device_remove	= avrcp_controller_remove,
++
++	.connect	= avrcp_connect,
++	.disconnect	= avrcp_disconnect,
++
++	.adapter_probe	= avrcp_controller_server_probe,
++	.adapter_remove = avrcp_controller_server_remove,
++};
++
++static int avrcp_init(void)
 +{
-+	btd_profile_unregister(&a2dp_source_profile);
-+	btd_profile_unregister(&a2dp_sink_profile);
++	btd_profile_register(&avrcp_controller_profile);
++	btd_profile_register(&avrcp_target_profile);
++
++	return 0;
 +}
 +
-+BLUETOOTH_PLUGIN_DEFINE(a2dp, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
-+							a2dp_init, a2dp_exit)
-diff --git a/profiles/audio/a2dp.h b/profiles/audio/a2dp.h
-index 2c06f74..ef3be5c 100644
---- a/profiles/audio/a2dp.h
-+++ b/profiles/audio/a2dp.h
-@@ -63,11 +63,6 @@ typedef void (*a2dp_stream_cb_t) (struct avdtp *session,
- 					struct avdtp_error *err,
- 					void *user_data);
++static void avrcp_exit(void)
++{
++	btd_profile_unregister(&avrcp_controller_profile);
++	btd_profile_unregister(&avrcp_target_profile);
++}
++
++BLUETOOTH_PLUGIN_DEFINE(avrcp, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++							avrcp_init, avrcp_exit)
+diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
+index 2ec1664..4c520ca 100644
+--- a/profiles/audio/avrcp.h
++++ b/profiles/audio/avrcp.h
+@@ -100,13 +100,6 @@ struct avrcp_player_cb {
+ 	bool (*previous) (void *user_data);
+ };
  
--int a2dp_source_register(struct btd_adapter *adapter, GKeyFile *config);
--void a2dp_source_unregister(struct btd_adapter *adapter);
--int a2dp_sink_register(struct btd_adapter *adapter, GKeyFile *config);
--void a2dp_sink_unregister(struct btd_adapter *adapter);
+-int avrcp_target_register(struct btd_adapter *adapter, GKeyFile *config);
+-void avrcp_target_unregister(struct btd_adapter *adapter);
+-int avrcp_remote_register(struct btd_adapter *adapter, GKeyFile *config);
+-void avrcp_remote_unregister(struct btd_adapter *adapter);
 -
- struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
- 				uint8_t codec, gboolean delay_reporting,
- 				struct a2dp_endpoint *endpoint,
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 07644e5..f6c9408 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -3846,27 +3846,13 @@ struct btd_device *avdtp_get_device(struct avdtp *session)
- 	return session->device;
- }
+-gboolean avrcp_connect(struct btd_device *dev);
+-void avrcp_disconnect(struct btd_device *dev);
+ int avrcp_set_volume(struct btd_device *dev, uint8_t volume);
  
--int avdtp_init(struct btd_adapter *adapter, GKeyFile *config)
-+int avdtp_init(struct btd_adapter *adapter)
- {
--	GError *err = NULL;
--	gboolean tmp, master = TRUE;
- 	struct avdtp_server *server;
- 
--	if (!config)
--		goto proceed;
--
--	tmp = g_key_file_get_boolean(config, "General",
--			"Master", &err);
--	if (err) {
--		DBG("audio.conf: %s", err->message);
--		g_clear_error(&err);
--	} else
--		master = tmp;
--
--proceed:
- 	server = g_new0(struct avdtp_server, 1);
- 
--	server->io = avdtp_server_socket(adapter_get_address(adapter), master);
-+	server->io = avdtp_server_socket(adapter_get_address(adapter), TRUE);
- 	if (!server->io) {
- 		g_free(server);
- 		return -1;
-diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
-index 4d3e6c8..b8aaf1d 100644
---- a/profiles/audio/avdtp.h
-+++ b/profiles/audio/avdtp.h
-@@ -312,5 +312,5 @@ struct btd_device *avdtp_get_device(struct avdtp *session);
- gboolean avdtp_stream_setup_active(struct avdtp *session);
- void avdtp_set_device_disconnect(struct avdtp *session, gboolean dev_dc);
- 
--int avdtp_init(struct btd_adapter *adapter, GKeyFile *config);
-+int avdtp_init(struct btd_adapter *adapter);
- void avdtp_exit(struct btd_adapter *adapter);
+ struct avrcp_player *avrcp_register_player(struct btd_adapter *adapter,
 diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
-index 6eeb207..91c9a4c 100644
+index b7522e1..6eeb207 100644
 --- a/profiles/audio/manager.c
 +++ b/profiles/audio/manager.c
-@@ -69,108 +69,6 @@
+@@ -99,34 +99,6 @@ static void a2dp_sink_remove(struct btd_service *service)
+ 	sink_unregister(service);
+ }
  
- static GKeyFile *config = NULL;
- 
--static int a2dp_source_probe(struct btd_service *service)
+-static int avrcp_target_probe(struct btd_service *service)
 -{
 -	struct btd_device *dev = btd_service_get_device(service);
 -
 -	DBG("path %s", device_get_path(dev));
 -
--	source_init(service);
--
--	return 0;
+-	return control_init_target(service);
 -}
 -
--static void a2dp_source_remove(struct btd_service *service)
+-static void avrcp_target_remove(struct btd_service *service)
 -{
--	source_unregister(service);
+-	control_unregister(service);
 -}
 -
--static int a2dp_sink_probe(struct btd_service *service)
+-static int avrcp_remote_probe(struct btd_service *service)
 -{
 -	struct btd_device *dev = btd_service_get_device(service);
 -
 -	DBG("path %s", device_get_path(dev));
 -
--	return sink_init(service);
+-	return control_init_remote(service);
 -}
 -
--static void a2dp_sink_remove(struct btd_service *service)
+-static void avrcp_remote_remove(struct btd_service *service)
 -{
--	sink_unregister(service);
+-	control_unregister(service);
 -}
 -
--static int a2dp_source_connect(struct btd_service *service)
--{
--	struct btd_device *dev = btd_service_get_device(service);
--	const char *path = device_get_path(dev);
--
--	DBG("path %s", path);
--
--	return source_connect(service);
--}
--
--static int a2dp_source_disconnect(struct btd_service *service)
+ static int a2dp_source_connect(struct btd_service *service)
+ {
+ 	struct btd_device *dev = btd_service_get_device(service);
+@@ -167,26 +139,6 @@ static int a2dp_sink_disconnect(struct btd_service *service)
+ 	return sink_disconnect(service, FALSE);
+ }
+ 
+-static int avrcp_control_connect(struct btd_service *service)
 -{
 -	struct btd_device *dev = btd_service_get_device(service);
 -	const char *path = device_get_path(dev);
 -
 -	DBG("path %s", path);
 -
--	return source_disconnect(service, FALSE);
+-	return control_connect(service);
 -}
 -
--static int a2dp_sink_connect(struct btd_service *service)
+-static int avrcp_control_disconnect(struct btd_service *service)
 -{
 -	struct btd_device *dev = btd_service_get_device(service);
 -	const char *path = device_get_path(dev);
 -
 -	DBG("path %s", path);
 -
--	return sink_connect(service);
+-	return control_disconnect(service);
 -}
 -
--static int a2dp_sink_disconnect(struct btd_service *service)
--{
--	struct btd_device *dev = btd_service_get_device(service);
--	const char *path = device_get_path(dev);
--
--	DBG("path %s", path);
--
--	return sink_disconnect(service, FALSE);
--}
--
--static int a2dp_source_server_probe(struct btd_profile *p,
+ static int a2dp_source_server_probe(struct btd_profile *p,
+ 						struct btd_adapter *adapter)
+ {
+@@ -219,38 +171,6 @@ static void a2dp_sink_server_remove(struct btd_profile *p,
+ 	a2dp_sink_unregister(adapter);
+ }
+ 
+-static int avrcp_target_server_probe(struct btd_profile *p,
 -						struct btd_adapter *adapter)
 -{
 -	DBG("path %s", adapter_get_path(adapter));
 -
--	return a2dp_source_register(adapter, config);
+-	return avrcp_target_register(adapter, config);
 -}
 -
--static void a2dp_source_server_remove(struct btd_profile *p,
+-static int avrcp_remote_server_probe(struct btd_profile *p,
 -						struct btd_adapter *adapter)
 -{
 -	DBG("path %s", adapter_get_path(adapter));
 -
--	a2dp_source_unregister(adapter);
+-	return avrcp_remote_register(adapter, config);
 -}
 -
--static int a2dp_sink_server_probe(struct btd_profile *p,
+-static void avrcp_target_server_remove(struct btd_profile *p,
 -						struct btd_adapter *adapter)
 -{
 -	DBG("path %s", adapter_get_path(adapter));
 -
--	return a2dp_sink_register(adapter, config);
+-	avrcp_target_unregister(adapter);
 -}
 -
--static void a2dp_sink_server_remove(struct btd_profile *p,
+-static void avrcp_remote_server_remove(struct btd_profile *p,
 -						struct btd_adapter *adapter)
 -{
 -	DBG("path %s", adapter_get_path(adapter));
 -
--	a2dp_sink_unregister(adapter);
+-	avrcp_remote_unregister(adapter);
 -}
 -
  static int media_server_probe(struct btd_adapter *adapter)
  {
  	DBG("path %s", adapter_get_path(adapter));
-@@ -185,38 +83,6 @@ static void media_server_remove(struct btd_adapter *adapter)
- 	media_unregister(adapter);
- }
+@@ -297,34 +217,6 @@ static struct btd_profile a2dp_sink_profile = {
+ 	.adapter_remove	= a2dp_source_server_remove,
+ };
  
--static struct btd_profile a2dp_source_profile = {
--	.name		= "audio-source",
--	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
+-static struct btd_profile avrcp_target_profile = {
+-	.name		= "audio-avrcp-target",
 -
--	.remote_uuid	= A2DP_SOURCE_UUID,
--	.device_probe	= a2dp_source_probe,
--	.device_remove	= a2dp_source_remove,
+-	.remote_uuid	= AVRCP_TARGET_UUID,
+-	.device_probe	= avrcp_target_probe,
+-	.device_remove	= avrcp_target_remove,
 -
--	.auto_connect	= true,
--	.connect	= a2dp_source_connect,
--	.disconnect	= a2dp_source_disconnect,
+-	.connect	= avrcp_control_connect,
+-	.disconnect	= avrcp_control_disconnect,
 -
--	.adapter_probe	= a2dp_sink_server_probe,
--	.adapter_remove	= a2dp_sink_server_remove,
+-	.adapter_probe	= avrcp_target_server_probe,
+-	.adapter_remove = avrcp_target_server_remove,
 -};
 -
--static struct btd_profile a2dp_sink_profile = {
--	.name		= "audio-sink",
--	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
+-static struct btd_profile avrcp_remote_profile = {
+-	.name		= "audio-avrcp-control",
 -
--	.remote_uuid	= A2DP_SINK_UUID,
--	.device_probe	= a2dp_sink_probe,
--	.device_remove	= a2dp_sink_remove,
+-	.remote_uuid	= AVRCP_REMOTE_UUID,
+-	.device_probe	= avrcp_remote_probe,
+-	.device_remove	= avrcp_remote_remove,
 -
--	.auto_connect	= true,
--	.connect	= a2dp_sink_connect,
--	.disconnect	= a2dp_sink_disconnect,
+-	.connect	= avrcp_control_connect,
+-	.disconnect	= avrcp_control_disconnect,
 -
--	.adapter_probe	= a2dp_source_server_probe,
--	.adapter_remove	= a2dp_source_server_remove,
+-	.adapter_probe	= avrcp_remote_server_probe,
+-	.adapter_remove = avrcp_remote_server_remove,
 -};
 -
  static struct btd_adapter_driver media_driver = {
  	.name	= "media",
  	.probe	= media_server_probe,
-@@ -228,10 +94,6 @@ int audio_manager_init(GKeyFile *conf)
- 	if (conf)
- 		config = conf;
+@@ -338,8 +230,7 @@ int audio_manager_init(GKeyFile *conf)
  
--	btd_profile_register(&a2dp_source_profile);
--	btd_profile_register(&a2dp_sink_profile);
--
--
+ 	btd_profile_register(&a2dp_source_profile);
+ 	btd_profile_register(&a2dp_sink_profile);
+-	btd_profile_register(&avrcp_remote_profile);
+-	btd_profile_register(&avrcp_target_profile);
++
+ 
  	btd_register_adapter_driver(&media_driver);
  
- 	return 0;
-@@ -244,9 +106,6 @@ void audio_manager_exit(void)
- 		config = NULL;
- 	}
+@@ -355,8 +246,6 @@ void audio_manager_exit(void)
  
--	btd_profile_unregister(&a2dp_source_profile);
--	btd_profile_unregister(&a2dp_sink_profile);
--
+ 	btd_profile_unregister(&a2dp_source_profile);
+ 	btd_profile_unregister(&a2dp_sink_profile);
+-	btd_profile_unregister(&avrcp_remote_profile);
+-	btd_profile_unregister(&avrcp_target_profile);
+ 
  	btd_unregister_adapter_driver(&media_driver);
  }
- 
 -- 
 1.8.3.1
 
