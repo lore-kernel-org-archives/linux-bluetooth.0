@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/4] audio/media: Fix not updating position
-Date: Tue, 23 Jul 2013 15:52:31 +0300
-Message-Id: <1374583952-16361-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/4] audio/AVRCP: Fix registration of VOLUME_CHANGED
+Date: Tue, 23 Jul 2013 15:52:30 +0300
+Message-Id: <1374583952-16361-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1374583952-16361-1-git-send-email-luiz.dentz@gmail.com>
 References: <1374583952-16361-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,26 +11,35 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The status may not be 'playing' as MPRIS documents it as 'Playing'
-instead, to make this less prone to typos like this the code now
-uses strcasecmp.
+First check with GetCapabilities if the event is really support before
+registering.
 ---
- profiles/audio/media.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ profiles/audio/avrcp.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index f1ad439..715d49c 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -1131,7 +1131,7 @@ static uint32_t get_position(void *user_data)
- 	double timedelta;
- 	uint32_t sec, msec;
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index ad7742d..9baf0d3 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -3205,6 +3205,7 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn,
+ 		case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
+ 		case AVRCP_EVENT_UIDS_CHANGED:
+ 		case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
++		case AVRCP_EVENT_VOLUME_CHANGED:
+ 			avrcp_register_notification(session, event);
+ 			break;
+ 		}
+@@ -3336,7 +3337,9 @@ static void target_init(struct avrcp *session)
+ 	if (target->version < 0x0104)
+ 		return;
  
--	if (g_strcmp0(mp->status, "playing") != 0)
-+	if (mp->status == NULL || strcasecmp(mp->status, "Playing") != 0)
- 		return mp->position;
+-	avrcp_register_notification(session, AVRCP_EVENT_VOLUME_CHANGED);
++	/* Only check capabilities if controller is not supported */
++	if (session->controller == NULL)
++		avrcp_get_capabilities(session);
  
- 	timedelta = g_timer_elapsed(mp->timer, NULL);
+ 	/* Auto-connect browsing channel only if initiator */
+ 	if (old_state == BTD_SERVICE_STATE_CONNECTING &&
 -- 
 1.8.3.1
 
