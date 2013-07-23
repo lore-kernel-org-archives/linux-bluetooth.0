@@ -1,103 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Dirk-Jan C. Binnema" <djcb.bulk@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] attrib/gatt_service_add: support 128-bit uuids for characteristics
-Date: Tue, 23 Jul 2013 16:47:23 +0300
-Message-Id: <1374587243-30452-1-git-send-email-djcb.bulk@gmail.com>
+Subject: [PATCH BlueZ 4/4] audio/player: Fix attempting to set the same setting value
+Date: Tue, 23 Jul 2013 15:52:32 +0300
+Message-Id: <1374583952-16361-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1374583952-16361-1-git-send-email-luiz.dentz@gmail.com>
+References: <1374583952-16361-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: "Dirk-Jan C. Binnema" <djcb.bulk@gmail.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add GATT_OPT_CHR_BT_UUID_T, which does what GATT_OPT_CHR_UUID does, but
-instead takes a bt_uuid_t*, so 128-bit uuids are supported as well.
-
-GATT_OPT_CHR_UUID is kept around for backward compatibility.
-
-Signed-off-by: Dirk-Jan C. Binnema <djcb@djcbsoftware.nl>
+This cause unnecessary commands to be sent over the air so instead the
+code should just return success as nothing should be changed.
 ---
- attrib/gatt-service.c | 19 ++++++++++++-------
- attrib/gatt-service.h |  1 +
- 2 files changed, 13 insertions(+), 7 deletions(-)
+ profiles/audio/player.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/attrib/gatt-service.c b/attrib/gatt-service.c
-index 4b02d39..bc17778 100644
---- a/attrib/gatt-service.c
-+++ b/attrib/gatt-service.c
-@@ -73,6 +73,11 @@ static GSList *parse_opts(gatt_option opt1, va_list args)
- 			/* characteristic declaration and value */
- 			info->num_attrs += 2;
- 			break;
-+		case GATT_OPT_CHR_BT_UUID_T:
-+			memcpy(&info->uuid, va_arg(args, bt_uuid_t *), sizeof(bt_uuid_t));
-+			/* characteristic declaration and value */
-+			info->num_attrs += 2;
-+			break;
- 		case GATT_OPT_CHR_PROPS:
- 			info->props = va_arg(args, int);
+diff --git a/profiles/audio/player.c b/profiles/audio/player.c
+index 917c66e..a817b54 100644
+--- a/profiles/audio/player.c
++++ b/profiles/audio/player.c
+@@ -263,7 +263,7 @@ static void set_setting(const GDBusPropertyTable *property,
+ 			void *data)
+ {
+ 	struct media_player *mp = data;
+-	const char *value;
++	const char *value, *current;
  
-@@ -108,7 +113,7 @@ static GSList *parse_opts(gatt_option opt1, va_list args)
- 		}
+ 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING) {
+ 		g_dbus_pending_property_error(id,
+@@ -274,6 +274,12 @@ static void set_setting(const GDBusPropertyTable *property,
  
- 		opt = va_arg(args, gatt_option);
--		if (opt == GATT_OPT_CHR_UUID) {
-+		if (opt == GATT_OPT_CHR_UUID || opt == GATT_OPT_CHR_BT_UUID_T) {
- 			info = g_new0(struct gatt_info, 1);
- 			l = g_slist_append(l, info);
- 		}
-@@ -177,16 +182,16 @@ static int find_callback(gconstpointer a, gconstpointer b)
+ 	dbus_message_iter_get_basic(iter, &value);
+ 
++	current = g_hash_table_lookup(mp->settings, property->name);
++	if (g_strcmp0(current, value) == 0) {
++		g_dbus_pending_property_success(id);
++		return;
++	}
++
+ 	player_set_setting(mp, id, property->name, value);
  }
  
- static gboolean add_characteristic(struct btd_adapter *adapter,
--				uint16_t *handle, struct gatt_info *info)
-+				   uint16_t *handle, struct gatt_info *info)
- {
- 	int read_req, write_req;
- 	uint16_t h = *handle;
- 	struct attribute *a;
- 	bt_uuid_t bt_uuid;
--	uint8_t atval[5];
-+	uint8_t atval[131];
- 	GSList *l;
- 
--	if (!info->uuid.value.u16 || !info->props) {
-+	if ((!info->uuid.value.u16 && info->uuid.type != BT_UUID128) || !info->props) {
- 		error("Characteristic UUID or properties are missing");
- 		return FALSE;
- 	}
-@@ -222,9 +227,9 @@ static gboolean add_characteristic(struct btd_adapter *adapter,
- 	bt_uuid16_create(&bt_uuid, GATT_CHARAC_UUID);
- 	atval[0] = info->props;
- 	att_put_u16(h + 1, &atval[1]);
--	att_put_u16(info->uuid.value.u16, &atval[3]);
-+	att_put_uuid(info->uuid, &atval[3]);
- 	if (attrib_db_add(adapter, h++, &bt_uuid, ATT_NONE, ATT_NOT_PERMITTED,
--						atval, sizeof(atval)) == NULL)
-+			  atval, 3 + info->uuid.type/8) == NULL)
- 		return FALSE;
- 
- 	/* characteristic value */
-@@ -341,7 +346,7 @@ gboolean gatt_service_add(struct btd_adapter *adapter, uint16_t uuid,
- 	}
- 
- 	g_assert(size < USHRT_MAX);
--	g_assert(h - start_handle == (uint16_t) size);
-+	g_assert((uint16_t)(h - start_handle) == (uint16_t) size);
- 	g_slist_free_full(chrs, free_gatt_info);
- 
- 	return TRUE;
-diff --git a/attrib/gatt-service.h b/attrib/gatt-service.h
-index b810e2e..5c3e15d 100644
---- a/attrib/gatt-service.h
-+++ b/attrib/gatt-service.h
-@@ -25,6 +25,7 @@
- typedef enum {
- 	GATT_OPT_INVALID = 0,
- 	GATT_OPT_CHR_UUID,
-+	GATT_OPT_CHR_BT_UUID_T,
- 	GATT_OPT_CHR_PROPS,
- 	GATT_OPT_CHR_VALUE_CB,
- 	GATT_OPT_CHR_AUTHENTICATION,
 -- 
-1.8.3.2
+1.8.3.1
 
