@@ -1,63 +1,356 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 24 Jul 2013 08:45:50 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 00/11] GATT/ATT C API improvements
-Message-ID: <20130724154550.GA22830@x220.p-661hnu-f1>
-References: <1374255257-8753-1-git-send-email-anderson.lizardo@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1374255257-8753-1-git-send-email-anderson.lizardo@openbossa.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 3/4 v2] audio: Remove audio plugin
+Date: Wed, 24 Jul 2013 14:56:23 +0300
+Message-Id: <1374666984-14158-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1374666984-14158-1-git-send-email-luiz.dentz@gmail.com>
+References: <1374666984-14158-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Jul 19, 2013, Anderson Lizardo wrote:
-> This patch set is based on patches sent earlier as "[RFC BlueZ 00/18] GATT C
-> API refactoring". See that cover letter for more details on what improvements
-> we are doing.
-> 
-> This first set contains only the changes that do not impact functionality.
-> Once these are upstream, we will send the more complex patches that will
-> further improve the API by simplifying GATT callbacks and adding unit tests.
-> 
-> Best Regards,
-> Anderson Lizardo
-> 
-> Alvaro Silva (3):
->   attrib: Remove unused parameter from enc_write_resp()
->   attrib: Add encode/decode prepare write support
->   attrib: Add encode/decode execute write support
-> 
-> Anderson Lizardo (6):
->   attrib: Rename gatt_find_info() to gatt_discover_char_desc()
->   attrib: Do not use Write Command in gatt_write_char()
->   attrib: Fix coding style in prepare_write_cb()
->   attrib: Simplify prepare_write()
->   attrib: Allow dec_read_resp() to just check if PDU is valid
->   attrib: Reduce scope of variable declarations in char_discovered_cb()
-> 
-> Eder Ruiz Maria (2):
->   gatttool: Remove unused code
->   attrib: Fix coding style for various enc_*/dec_* functions
-> 
->  attrib/att.c                         |  112 ++++++++++++++++++++++++++++++----
->  attrib/att.h                         |    9 ++-
->  attrib/gatt.c                        |   68 ++++++++++-----------
->  attrib/gatt.h                        |    2 +-
->  attrib/gatttool.c                    |   18 +-----
->  attrib/interactive.c                 |   38 +++---------
->  profiles/cyclingspeed/cyclingspeed.c |    2 +-
->  profiles/gatt/gas.c                  |    3 +-
->  profiles/heartrate/heartrate.c       |    2 +-
->  profiles/input/hog.c                 |   13 ++--
->  profiles/scanparam/scan.c            |    6 +-
->  profiles/thermometer/thermometer.c   |    2 +-
->  src/attrib-server.c                  |    2 +-
->  13 files changed, 167 insertions(+), 110 deletions(-)
+Audio plugin is now splitted in multiple plugins so it is no longer
+necessary to have a manager to deal with many different drivers.
+---
+ Makefile.plugins         |   4 --
+ profiles/audio/a2dp.c    |   1 -
+ profiles/audio/avctp.c   |   1 -
+ profiles/audio/avdtp.c   |   1 -
+ profiles/audio/control.c |   1 -
+ profiles/audio/main.c    |  86 ----------------------------------------
+ profiles/audio/manager.c | 101 -----------------------------------------------
+ profiles/audio/manager.h |  30 --------------
+ profiles/audio/sink.c    |   1 -
+ profiles/audio/source.c  |   1 -
+ 10 files changed, 227 deletions(-)
+ delete mode 100644 profiles/audio/main.c
+ delete mode 100644 profiles/audio/manager.c
+ delete mode 100644 profiles/audio/manager.h
 
-All patches in this set have been applied. Thanks.
+diff --git a/Makefile.plugins b/Makefile.plugins
+index b6743ba..7c5f71d 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -30,10 +30,6 @@ noinst_LIBRARIES += profiles/sap/libsap.a
+ profiles_sap_libsap_a_SOURCES = profiles/sap/sap.h profiles/sap/sap-u8500.c
+ endif
+ 
+-builtin_modules += audio
+-builtin_sources += profiles/audio/main.c \
+-			profiles/audio/manager.h profiles/audio/manager.c
+-
+ builtin_modules += a2dp
+ builtin_sources += profiles/audio/source.h profiles/audio/source.c \
+ 			profiles/audio/sink.h profiles/audio/sink.c \
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 40c68af..3f3cc1b 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -45,7 +45,6 @@
+ #include "src/service.h"
+ 
+ #include "log.h"
+-#include "manager.h"
+ #include "avdtp.h"
+ #include "sink.h"
+ #include "source.h"
+diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+index 627252a..11e9365 100644
+--- a/profiles/audio/avctp.c
++++ b/profiles/audio/avctp.c
+@@ -53,7 +53,6 @@
+ #include "log.h"
+ #include "error.h"
+ #include "uinput.h"
+-#include "manager.h"
+ #include "avctp.h"
+ #include "avrcp.h"
+ 
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index f6c9408..818dbdd 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -50,7 +50,6 @@
+ #include "src/adapter.h"
+ #include "src/device.h"
+ 
+-#include "manager.h"
+ #include "control.h"
+ #include "avdtp.h"
+ #include "sink.h"
+diff --git a/profiles/audio/control.c b/profiles/audio/control.c
+index 912ca73..5f88a94 100644
+--- a/profiles/audio/control.c
++++ b/profiles/audio/control.c
+@@ -53,7 +53,6 @@
+ 
+ #include "log.h"
+ #include "error.h"
+-#include "manager.h"
+ #include "avctp.h"
+ #include "control.h"
+ #include "sdpd.h"
+diff --git a/profiles/audio/main.c b/profiles/audio/main.c
+deleted file mode 100644
+index 996d2af..0000000
+--- a/profiles/audio/main.c
++++ /dev/null
+@@ -1,86 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2006-2010  Nokia Corporation
+- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <errno.h>
+-#include <sys/socket.h>
+-#include <unistd.h>
+-#include <fcntl.h>
+-#include <bluetooth/bluetooth.h>
+-#include <bluetooth/sdp.h>
+-#include <bluetooth/sdp_lib.h>
+-
+-#include <glib.h>
+-#include <dbus/dbus.h>
+-#include <btio/btio.h>
+-
+-#include "glib-helper.h"
+-#include "plugin.h"
+-#include "log.h"
+-#include "manager.h"
+-
+-static GKeyFile *load_config_file(const char *file)
+-{
+-	GError *err = NULL;
+-	GKeyFile *keyfile;
+-
+-	keyfile = g_key_file_new();
+-
+-	g_key_file_set_list_separator(keyfile, ',');
+-
+-	if (!g_key_file_load_from_file(keyfile, file, 0, &err)) {
+-		if (!g_error_matches(err, G_FILE_ERROR, G_FILE_ERROR_NOENT))
+-			error("Parsing %s failed: %s", file, err->message);
+-		g_error_free(err);
+-		g_key_file_free(keyfile);
+-		return NULL;
+-	}
+-
+-	return keyfile;
+-}
+-
+-static int audio_init(void)
+-{
+-	GKeyFile *config;
+-
+-	config = load_config_file(CONFIGDIR "/audio.conf");
+-
+-	if (audio_manager_init(config) < 0) {
+-		audio_manager_exit();
+-		return -EIO;
+-	}
+-
+-	return 0;
+-}
+-
+-static void audio_exit(void)
+-{
+-	audio_manager_exit();
+-}
+-
+-BLUETOOTH_PLUGIN_DEFINE(audio, VERSION,
+-			BLUETOOTH_PLUGIN_PRIORITY_DEFAULT, audio_init, audio_exit)
+diff --git a/profiles/audio/manager.c b/profiles/audio/manager.c
+deleted file mode 100644
+index 8065b70..0000000
+--- a/profiles/audio/manager.c
++++ /dev/null
+@@ -1,101 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2006-2010  Nokia Corporation
+- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <stdarg.h>
+-#include <errno.h>
+-#include <unistd.h>
+-#include <fcntl.h>
+-#include <stdint.h>
+-#include <stdbool.h>
+-#include <sys/stat.h>
+-#include <dirent.h>
+-#include <ctype.h>
+-#include <signal.h>
+-
+-#include <bluetooth/bluetooth.h>
+-#include <bluetooth/sdp.h>
+-#include <bluetooth/sdp_lib.h>
+-
+-#include <glib.h>
+-#include <dbus/dbus.h>
+-#include <btio/btio.h>
+-#include <gdbus/gdbus.h>
+-
+-#include "lib/uuid.h"
+-#include "glib-helper.h"
+-#include "src/adapter.h"
+-#include "src/device.h"
+-#include "src/profile.h"
+-#include "src/service.h"
+-
+-#include "log.h"
+-#include "error.h"
+-#include "avdtp.h"
+-#include "media.h"
+-#include "a2dp.h"
+-#include "sink.h"
+-#include "source.h"
+-#include "avrcp.h"
+-#include "control.h"
+-#include "manager.h"
+-#include "sdpd.h"
+-
+-static GKeyFile *config = NULL;
+-
+-int audio_manager_init(GKeyFile *conf)
+-{
+-	if (conf)
+-		config = conf;
+-
+-	return 0;
+-}
+-
+-void audio_manager_exit(void)
+-{
+-	if (config) {
+-		g_key_file_free(config);
+-		config = NULL;
+-	}
+-}
+-
+-static void set_fast_connectable(struct btd_adapter *adapter,
+-							gpointer user_data)
+-{
+-	gboolean enable = GPOINTER_TO_UINT(user_data);
+-
+-	if (btd_adapter_set_fast_connectable(adapter, enable))
+-		error("Changing fast connectable for hci%d failed",
+-					btd_adapter_get_index(adapter));
+-}
+-
+-void manager_set_fast_connectable(gboolean enable)
+-{
+-	adapter_foreach(set_fast_connectable, GUINT_TO_POINTER(enable));
+-}
+diff --git a/profiles/audio/manager.h b/profiles/audio/manager.h
+deleted file mode 100644
+index de8d791..0000000
+--- a/profiles/audio/manager.h
++++ /dev/null
+@@ -1,30 +0,0 @@
+-/*
+- *
+- *  BlueZ - Bluetooth protocol stack for Linux
+- *
+- *  Copyright (C) 2006-2010  Nokia Corporation
+- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License as published by
+- *  the Free Software Foundation; either version 2 of the License, or
+- *  (at your option) any later version.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-int audio_manager_init(GKeyFile *config);
+-void audio_manager_exit(void);
+-
+-/* TRUE to enable fast connectable and FALSE to disable fast connectable for all
+- * audio adapters. */
+-void manager_set_fast_connectable(gboolean enable);
+diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
+index 7211e68..400af06 100644
+--- a/profiles/audio/sink.c
++++ b/profiles/audio/sink.c
+@@ -47,7 +47,6 @@
+ #include "media.h"
+ #include "a2dp.h"
+ #include "error.h"
+-#include "manager.h"
+ #include "sink.h"
+ #include "dbus-common.h"
+ 
+diff --git a/profiles/audio/source.c b/profiles/audio/source.c
+index 0793af3..24a4353 100644
+--- a/profiles/audio/source.c
++++ b/profiles/audio/source.c
+@@ -48,7 +48,6 @@
+ #include "media.h"
+ #include "a2dp.h"
+ #include "error.h"
+-#include "manager.h"
+ #include "source.h"
+ #include "dbus-common.h"
+ 
+-- 
+1.8.3.1
 
-Johan
