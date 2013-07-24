@@ -2,218 +2,94 @@ Return-Path: <cyrus@holtmann.org>
 From: "Dirk-Jan C. Binnema" <djcb.bulk@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: "Dirk-Jan C. Binnema" <djcb@djcbsoftware.nl>
-Subject: [PATCH 2/2] Use GATT_OPT_CHR_UUID for bt_uuid_t*, GATT_OPT_CHR_UUID16 for uint16 chrs
-Date: Wed, 24 Jul 2013 20:51:55 +0300
-Message-Id: <1374688315-9435-2-git-send-email-djcb.bulk@gmail.com>
-In-Reply-To: <1374688315-9435-1-git-send-email-djcb.bulk@gmail.com>
+Subject: [PATCH 1/2] Add support for 128-bit UUIDs for characteristics.
+Date: Wed, 24 Jul 2013 20:51:54 +0300
+Message-Id: <1374688315-9435-1-git-send-email-djcb.bulk@gmail.com>
+In-Reply-To: <20130724170348.GA952@x220.p-661hnu-f1>
 References: <20130724170348.GA952@x220.p-661hnu-f1>
- <1374688315-9435-1-git-send-email-djcb.bulk@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: "Dirk-Jan C. Binnema" <djcb@djcbsoftware.nl>
 
-This renames GATT_OPT_CHR_UUID into GATT_OPT_CHR_UUID16, and renames the
-(temporary) GATT_OPT_CHR_BT_UUID_T into GATT_OPT_CHR_UUID. Also, updates all
-in-tree users.
 ---
- attrib/gatt-service.c         |  6 +++---
- attrib/gatt-service.h         |  2 +-
- plugins/gatt-example.c        |  2 +-
- profiles/alert/server.c       | 16 ++++++++--------
- profiles/proximity/immalert.c |  2 +-
- profiles/proximity/linkloss.c |  2 +-
- profiles/time/server.c        |  8 ++++----
- 7 files changed, 19 insertions(+), 19 deletions(-)
+ attrib/gatt-service.c | 19 +++++++++++++------
+ attrib/gatt-service.h |  1 +
+ 2 files changed, 14 insertions(+), 6 deletions(-)
 
 diff --git a/attrib/gatt-service.c b/attrib/gatt-service.c
-index e4ca78c..86e0093 100644
+index 4b02d39..e4ca78c 100644
 --- a/attrib/gatt-service.c
 +++ b/attrib/gatt-service.c
-@@ -68,12 +68,12 @@ static GSList *parse_opts(gatt_option opt1, va_list args)
- 
- 	while (opt != GATT_OPT_INVALID) {
- 		switch (opt) {
--		case GATT_OPT_CHR_UUID:
-+		case GATT_OPT_CHR_UUID16:
- 			bt_uuid16_create(&info->uuid, va_arg(args, int));
+@@ -73,6 +73,12 @@ static GSList *parse_opts(gatt_option opt1, va_list args)
  			/* characteristic declaration and value */
  			info->num_attrs += 2;
  			break;
--		case GATT_OPT_CHR_BT_UUID_T:
-+		case GATT_OPT_CHR_UUID:
- 			memcpy(&info->uuid, va_arg(args, bt_uuid_t *),
- 				sizeof(bt_uuid_t));
- 			/* characteristic declaration and value */
-@@ -114,7 +114,7 @@ static GSList *parse_opts(gatt_option opt1, va_list args)
++		case GATT_OPT_CHR_BT_UUID_T:
++			memcpy(&info->uuid, va_arg(args, bt_uuid_t *),
++				sizeof(bt_uuid_t));
++			/* characteristic declaration and value */
++			info->num_attrs += 2;
++			break;
+ 		case GATT_OPT_CHR_PROPS:
+ 			info->props = va_arg(args, int);
+ 
+@@ -108,7 +114,7 @@ static GSList *parse_opts(gatt_option opt1, va_list args)
  		}
  
  		opt = va_arg(args, gatt_option);
--		if (opt == GATT_OPT_CHR_UUID || opt == GATT_OPT_CHR_BT_UUID_T) {
-+		if (opt == GATT_OPT_CHR_UUID16 || opt == GATT_OPT_CHR_UUID) {
+-		if (opt == GATT_OPT_CHR_UUID) {
++		if (opt == GATT_OPT_CHR_UUID || opt == GATT_OPT_CHR_BT_UUID_T) {
  			info = g_new0(struct gatt_info, 1);
  			l = g_slist_append(l, info);
  		}
+@@ -183,10 +189,11 @@ static gboolean add_characteristic(struct btd_adapter *adapter,
+ 	uint16_t h = *handle;
+ 	struct attribute *a;
+ 	bt_uuid_t bt_uuid;
+-	uint8_t atval[5];
++	uint8_t atval[131];
+ 	GSList *l;
+ 
+-	if (!info->uuid.value.u16 || !info->props) {
++	if ((info->uuid.type != BT_UUID16 && info->uuid.type != BT_UUID128) ||
++		!info->props) {
+ 		error("Characteristic UUID or properties are missing");
+ 		return FALSE;
+ 	}
+@@ -222,9 +229,9 @@ static gboolean add_characteristic(struct btd_adapter *adapter,
+ 	bt_uuid16_create(&bt_uuid, GATT_CHARAC_UUID);
+ 	atval[0] = info->props;
+ 	att_put_u16(h + 1, &atval[1]);
+-	att_put_u16(info->uuid.value.u16, &atval[3]);
++	att_put_uuid(info->uuid, &atval[3]);
+ 	if (attrib_db_add(adapter, h++, &bt_uuid, ATT_NONE, ATT_NOT_PERMITTED,
+-						atval, sizeof(atval)) == NULL)
++				atval, 3 + info->uuid.type / 8) == NULL)
+ 		return FALSE;
+ 
+ 	/* characteristic value */
+@@ -341,7 +348,7 @@ gboolean gatt_service_add(struct btd_adapter *adapter, uint16_t uuid,
+ 	}
+ 
+ 	g_assert(size < USHRT_MAX);
+-	g_assert(h - start_handle == (uint16_t) size);
++	g_assert((uint16_t) (h - start_handle) == (uint16_t) size);
+ 	g_slist_free_full(chrs, free_gatt_info);
+ 
+ 	return TRUE;
 diff --git a/attrib/gatt-service.h b/attrib/gatt-service.h
-index 5c3e15d..2c05c7d 100644
+index b810e2e..5c3e15d 100644
 --- a/attrib/gatt-service.h
 +++ b/attrib/gatt-service.h
-@@ -24,8 +24,8 @@
- 
+@@ -25,6 +25,7 @@
  typedef enum {
  	GATT_OPT_INVALID = 0,
-+	GATT_OPT_CHR_UUID16,
  	GATT_OPT_CHR_UUID,
--	GATT_OPT_CHR_BT_UUID_T,
++	GATT_OPT_CHR_BT_UUID_T,
  	GATT_OPT_CHR_PROPS,
  	GATT_OPT_CHR_VALUE_CB,
  	GATT_OPT_CHR_AUTHENTICATION,
-diff --git a/plugins/gatt-example.c b/plugins/gatt-example.c
-index 37972e8..b926947 100644
---- a/plugins/gatt-example.c
-+++ b/plugins/gatt-example.c
-@@ -114,7 +114,7 @@ static gboolean register_battery_service(struct btd_adapter *adapter)
- 
- 	return gatt_service_add(adapter, GATT_PRIM_SVC_UUID, &uuid,
- 			/* battery state characteristic */
--			GATT_OPT_CHR_UUID, BATTERY_STATE_UUID,
-+			GATT_OPT_CHR_UUID16, BATTERY_STATE_UUID,
- 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ |
- 							ATT_CHAR_PROPER_NOTIFY,
- 			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
-diff --git a/profiles/alert/server.c b/profiles/alert/server.c
-index 8da1928..4565470 100644
---- a/profiles/alert/server.c
-+++ b/profiles/alert/server.c
-@@ -789,7 +789,7 @@ static void register_phone_alert_service(struct alert_adapter *al_adapter)
- 	/* Phone Alert Status Service */
- 	gatt_service_add(al_adapter->adapter, GATT_PRIM_SVC_UUID, &uuid,
- 			/* Alert Status characteristic */
--			GATT_OPT_CHR_UUID, ALERT_STATUS_CHR_UUID,
-+			GATT_OPT_CHR_UUID16, ALERT_STATUS_CHR_UUID,
- 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ |
- 							ATT_CHAR_PROPER_NOTIFY,
- 			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
-@@ -799,12 +799,12 @@ static void register_phone_alert_service(struct alert_adapter *al_adapter)
- 			GATT_OPT_CHR_VALUE_GET_HANDLE,
- 			&al_adapter->hnd_value[NOTIFY_ALERT_STATUS],
- 			/* Ringer Control Point characteristic */
--			GATT_OPT_CHR_UUID, RINGER_CP_CHR_UUID,
-+			GATT_OPT_CHR_UUID16, RINGER_CP_CHR_UUID,
- 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_WRITE_WITHOUT_RESP,
- 			GATT_OPT_CHR_VALUE_CB, ATTRIB_WRITE,
- 			ringer_cp_write, NULL,
- 			/* Ringer Setting characteristic */
--			GATT_OPT_CHR_UUID, RINGER_SETTING_CHR_UUID,
-+			GATT_OPT_CHR_UUID16, RINGER_SETTING_CHR_UUID,
- 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ |
- 							ATT_CHAR_PROPER_NOTIFY,
- 			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
-@@ -892,35 +892,35 @@ static void register_alert_notif_service(struct alert_adapter *al_adapter)
- 	/* Alert Notification Service */
- 	gatt_service_add(al_adapter->adapter, GATT_PRIM_SVC_UUID, &uuid,
- 			/* Supported New Alert Category */
--			GATT_OPT_CHR_UUID, SUPP_NEW_ALERT_CAT_CHR_UUID,
-+			GATT_OPT_CHR_UUID16, SUPP_NEW_ALERT_CAT_CHR_UUID,
- 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ,
- 			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
- 			supp_new_alert_cat_read, al_adapter->adapter,
- 			GATT_OPT_CHR_VALUE_GET_HANDLE,
- 			&al_adapter->supp_new_alert_cat_handle,
- 			/* New Alert */
--			GATT_OPT_CHR_UUID, NEW_ALERT_CHR_UUID,
-+			GATT_OPT_CHR_UUID16, NEW_ALERT_CHR_UUID,
- 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_NOTIFY,
- 			GATT_OPT_CCC_GET_HANDLE,
- 			&al_adapter->hnd_ccc[NOTIFY_NEW_ALERT],
- 			GATT_OPT_CHR_VALUE_GET_HANDLE,
- 			&al_adapter->hnd_value[NOTIFY_NEW_ALERT],
- 			/* Supported Unread Alert Category */
--			GATT_OPT_CHR_UUID, SUPP_UNREAD_ALERT_CAT_CHR_UUID,
-+			GATT_OPT_CHR_UUID16, SUPP_UNREAD_ALERT_CAT_CHR_UUID,
- 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ,
- 			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
- 			supp_unread_alert_cat_read, al_adapter->adapter,
- 			GATT_OPT_CHR_VALUE_GET_HANDLE,
- 			&al_adapter->supp_unread_alert_cat_handle,
- 			/* Unread Alert Status */
--			GATT_OPT_CHR_UUID, UNREAD_ALERT_CHR_UUID,
-+			GATT_OPT_CHR_UUID16, UNREAD_ALERT_CHR_UUID,
- 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_NOTIFY,
- 			GATT_OPT_CCC_GET_HANDLE,
- 			&al_adapter->hnd_ccc[NOTIFY_UNREAD_ALERT],
- 			GATT_OPT_CHR_VALUE_GET_HANDLE,
- 			&al_adapter->hnd_value[NOTIFY_UNREAD_ALERT],
- 			/* Alert Notification Control Point */
--			GATT_OPT_CHR_UUID, ALERT_NOTIF_CP_CHR_UUID,
-+			GATT_OPT_CHR_UUID16, ALERT_NOTIF_CP_CHR_UUID,
- 			GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_WRITE,
- 			GATT_OPT_CHR_VALUE_CB, ATTRIB_WRITE,
- 			alert_notif_cp_write, NULL,
-diff --git a/profiles/proximity/immalert.c b/profiles/proximity/immalert.c
-index 06e8eb8..2f8d4e7 100644
---- a/profiles/proximity/immalert.c
-+++ b/profiles/proximity/immalert.c
-@@ -249,7 +249,7 @@ void imm_alert_register(struct btd_adapter *adapter)
- 	svc_added = gatt_service_add(adapter,
- 				GATT_PRIM_SVC_UUID, &uuid,
- 				/* Alert level characteristic */
--				GATT_OPT_CHR_UUID, ALERT_LEVEL_CHR_UUID,
-+				GATT_OPT_CHR_UUID16, ALERT_LEVEL_CHR_UUID,
- 				GATT_OPT_CHR_PROPS,
- 					ATT_CHAR_PROPER_WRITE_WITHOUT_RESP,
- 				GATT_OPT_CHR_VALUE_CB, ATTRIB_WRITE,
-diff --git a/profiles/proximity/linkloss.c b/profiles/proximity/linkloss.c
-index cb87b12..a7ed96c 100644
---- a/profiles/proximity/linkloss.c
-+++ b/profiles/proximity/linkloss.c
-@@ -290,7 +290,7 @@ void link_loss_register(struct btd_adapter *adapter)
- 	svc_added = gatt_service_add(adapter,
- 			GATT_PRIM_SVC_UUID, &uuid,
- 			/* Alert level characteristic */
--			GATT_OPT_CHR_UUID, ALERT_LEVEL_CHR_UUID,
-+			GATT_OPT_CHR_UUID16, ALERT_LEVEL_CHR_UUID,
- 			GATT_OPT_CHR_PROPS,
- 				ATT_CHAR_PROPER_READ | ATT_CHAR_PROPER_WRITE,
- 			GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
-diff --git a/profiles/time/server.c b/profiles/time/server.c
-index 518a29f..178d4d2 100644
---- a/profiles/time/server.c
-+++ b/profiles/time/server.c
-@@ -152,14 +152,14 @@ static gboolean register_current_time_service(struct btd_adapter *adapter)
- 	/* Current Time service */
- 	return gatt_service_add(adapter, GATT_PRIM_SVC_UUID, &uuid,
- 				/* CT Time characteristic */
--				GATT_OPT_CHR_UUID, CT_TIME_CHR_UUID,
-+				GATT_OPT_CHR_UUID16, CT_TIME_CHR_UUID,
- 				GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ |
- 							ATT_CHAR_PROPER_NOTIFY,
- 				GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
- 						current_time_read, adapter,
- 
- 				/* Local Time Information characteristic */
--				GATT_OPT_CHR_UUID, LOCAL_TIME_INFO_CHR_UUID,
-+				GATT_OPT_CHR_UUID16, LOCAL_TIME_INFO_CHR_UUID,
- 				GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ,
- 				GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
- 						local_time_info_read, adapter,
-@@ -215,14 +215,14 @@ static gboolean register_ref_time_update_service(struct btd_adapter *adapter)
- 	/* Reference Time Update service */
- 	return gatt_service_add(adapter, GATT_PRIM_SVC_UUID, &uuid,
- 				/* Time Update control point */
--				GATT_OPT_CHR_UUID, TIME_UPDATE_CTRL_CHR_UUID,
-+				GATT_OPT_CHR_UUID16, TIME_UPDATE_CTRL_CHR_UUID,
- 				GATT_OPT_CHR_PROPS,
- 					ATT_CHAR_PROPER_WRITE_WITHOUT_RESP,
- 				GATT_OPT_CHR_VALUE_CB, ATTRIB_WRITE,
- 						time_update_control, adapter,
- 
- 				/* Time Update status */
--				GATT_OPT_CHR_UUID, TIME_UPDATE_STAT_CHR_UUID,
-+				GATT_OPT_CHR_UUID16, TIME_UPDATE_STAT_CHR_UUID,
- 				GATT_OPT_CHR_PROPS, ATT_CHAR_PROPER_READ,
- 				GATT_OPT_CHR_VALUE_CB, ATTRIB_READ,
- 						time_update_status, adapter,
 -- 
 1.8.3.2
 
