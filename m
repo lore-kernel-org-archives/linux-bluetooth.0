@@ -1,30 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] test: Fix ProximityMonitor1 interface name typo in test-proximity
-Date: Thu, 25 Jul 2013 15:23:43 -0400
-Message-Id: <1374780223-21677-1-git-send-email-anderson.lizardo@openbossa.org>
+Date: Thu, 25 Jul 2013 11:51:50 -0700
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] build: Fix make distcheck
+Message-ID: <20130725185150.GA27285@x220.p-661hnu-f1>
+References: <1374776746-14457-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1374776746-14457-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- test/test-proximity |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Lizardo,
 
-diff --git a/test/test-proximity b/test/test-proximity
-index 6b9b2b8..2f47824 100755
---- a/test/test-proximity
-+++ b/test/test-proximity
-@@ -15,7 +15,7 @@ from optparse import OptionParser, make_option
- import bluezutils
- 
- BUS_NAME = 'org.bluez'
--PROXIMITY_MONITOR_INTERFACE = 'org.bluez.ProxymityMonitor1'
-+PROXIMITY_MONITOR_INTERFACE = 'org.bluez.ProximityMonitor1'
- 
- def properties_changed(interface, changed, invalidated):
- 	if interface != PROXIMITY_MONITOR_INTERFACE:
--- 
-1.7.9.5
+On Thu, Jul 25, 2013, Anderson Lizardo wrote:
+> Fix this error:
+> 
+> make[1]: *** No rule to make target `profiles/audio/audio.conf', needed
+> by `distdir'.  Stop.
+> make: *** [test_build] Error 2
+> ---
+>  Makefile.am |    3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 
+Applied. Thanks.
+
+Johan
