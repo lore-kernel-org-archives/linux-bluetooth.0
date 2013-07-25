@@ -1,105 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 25 Jul 2013 14:05:54 +0100
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth 2013-07-25
-Message-ID: <20130725130552.GE9913@joana>
+Message-ID: <51F1213C.3030900@hurleysoftware.com>
+Date: Thu, 25 Jul 2013 08:59:40 -0400
+From: Peter Hurley <peter@hurleysoftware.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="AhhlLboLdkugWU4S"
-Sender: linux-wireless-owner@vger.kernel.org
+To: Gianluca Anzolin <gianluca@sottospazio.it>
+CC: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+ marcel@holtmann.org
+Subject: Re: [PATCH v2 2/7] rfcomm: Move the tty initialization and cleanup
+ out of open/close
+References: <1374510435-12149-1-git-send-email-gianluca@sottospazio.it> <1374510435-12149-2-git-send-email-gianluca@sottospazio.it> <51F0550A.1000402@hurleysoftware.com> <20130725053725.GA7214@sottospazio.it>
+In-Reply-To: <20130725053725.GA7214@sottospazio.it>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On 07/25/2013 01:37 AM, Gianluca Anzolin wrote:
+> On Wed, Jul 24, 2013 at 06:28:26PM -0400, Peter Hurley wrote:
+>> Gianluca,
+>>
+>> The code you intend to keep in rfcomm_tty_open() should not be moved to
+>> rfcomm_tty_install() in this patch and then moved back to rfcomm_tty_open()
+>> in 4/7. It should stay in rfcomm_tty_open().
+>>
+>> Likewise, the code being deleted in rfcomm_tty_install() in 4/7 should
+>> remain in rfcomm_tty_open() here, and be deleted from rfcomm_tty_open() in
+>> 4/7 instead.
+>>
+>> IOW, there's a much smaller changeset that will achieve the same end
+>> product.
+>
+> Hello,
+>
+> sorry I'm not very used to submit patches "the right way" and I missed the
+> point that I have to keep the changes to the minimum.
 
---AhhlLboLdkugWU4S
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+No need to apologize.
+Every kernel contributor goes through this learning curve.
 
-Hi John,
+> I also resent the tty_port patch, I hope it's fine now,
 
-A few fixes and devices ID additions for 3.11:=20
+Looks good. With Jiri's ack, that'll go into Greg's tree in the next day or
+two.
 
- * There are 3 new ath3k device ids=20
- * Fixed stack memory usage in ath3k.
- * Fixed the init process of BlueFRITZ! devices, they were failing to init
-   due to an unsupported command we sent.=20
- * Fixed wrong use of PTR_ERR in btusb code that was preventing intel devic=
-es
-   to work properly=20
- * Fixed race codition between hci_register_dev() and hci_dev_open() that
-   could cause a NULL pointer dereference.
+> I assumed it
+> was accepted but it wasn't and I also missed your last comment... I should lose
+> this bad habit to read only the the visible part of the mail body. :D
+>
+> Ok, I'll rearrange the code and resend the rfcomm patches.
 
-Please pull or let me know of any issues. Thanks.
+Ok.
 
-	Gustavo
+A subtlety I overlooked regarding the .carrier_raised() method is
+CLOCAL must _not_ be set in the driver's init_termios. This initialization is
+done in rfcomm_init_ttys().
 
---
-The following changes since commit 57bf74407bd501b0599568a3112fc16395b575d9:
-
-  Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/bl=
-uetooth/bluetooth (2013-06-24 13:53:15 -0400)
-
-are available in the git repository at:
-
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth for-ups=
-tream
-
-for you to fetch changes up to 352c3b276ca7e2df479cd0b9b87d227f14efb20a:
-
-  Bluetooth: Fix race between hci_register_dev() and hci_dev_open() (2013-0=
-7-25 13:55:59 +0100)
-
-----------------------------------------------------------------
-AceLan Kao (1):
-      Bluetooth: Add support for Atheros [0cf3:3121]
-
-Adam Lee (1):
-      Bluetooth: fix wrong use of PTR_ERR() in btusb
-
-Gustavo Padovan (1):
-      Bluetooth: Fix race between hci_register_dev() and hci_dev_open()
-
-Johan Hedberg (1):
-      Bluetooth: Fix HCI init for BlueFRITZ! devices
-
-Stanislaw Gruszka (1):
-      Bluetooth: ath3k: don't use stack memory for DMA
-
-Sujith Manoharan (1):
-      Bluetooth: ath3k: Add support for ID 0x13d3/0x3402
-
-Thomas Loo (1):
-      Bluetooth: ath3k: Add support for Fujitsu Lifebook UH5x2 [04c5:1330]
-
- drivers/bluetooth/ath3k.c | 44 +++++++++++++++++++++++++++++++++++---------
- drivers/bluetooth/btusb.c | 17 ++++++++++-------
- net/bluetooth/hci_core.c  | 16 ++++++++--------
- 3 files changed, 53 insertions(+), 24 deletions(-)
-
-
---AhhlLboLdkugWU4S
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.13 (GNU/Linux)
-
-iQIcBAEBAgAGBQJR8SKwAAoJEPs3PUX4s20oloMP/3xtV+rqwF8B7KDxMaRv4CgN
-Nh51XXfGotIph40PNDhj8Q/86FElTVpQYc48J0PqIx2RzMdjPOCDecVUqI5rgc+O
-Bf7U/z09mwYJnazQOn+nqAcxLFBn/0OrhRIZdQE8ex48Z1o6M2N/VapVa4gyXN4Y
-8xZTjQ8vdKOgaCMOWSkzhYYlOqdIw8qlFA7biL5KgSLeABZWn5KxDvGUf7ktgm3g
-YcaoU/7twRwwije3fO9523ak4IQNDREljfo0hw6CCslWKSeu2iVXqsPDViO16e+u
-0vFBA1yB+7094SNEI081+fBEE1us21nlUJNME6RGe3z5VGeJWTxy6L2ZWFpr00Px
-ZsLbv5zI4KycGuOu1L92RLWc3MXxFe84ccdil47CxLK/L6SEJGp/HanjmxLVlWFo
-m4DpOF4RHQ0DmqqnuP687C76TH2cUgmT4MXLhYFLj3LzUVQ1S+2IRp841Mqg+Gej
-QxHLw+tLqbIhxRgzCTnToZ18mQvTQGg2n8U+FbG7WfH/OY8Ts0ZkAuu4q2DH+P/Z
-FStw9u26kVvBXZAymxMB6JuQf1Ma/a7GjgjtrsFE6khwBu6uT1955M1IYtzt48fe
-C4nG6eAQAOmYuow2aNa+zI82si35SON9hWNOf6u2fmMqJzUmujVfJ1El3e5n8phx
-i5bCLARqvrOClrAExfIJ
-=GOMw
------END PGP SIGNATURE-----
-
---AhhlLboLdkugWU4S--
+Regards,
+Peter Hurley
