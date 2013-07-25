@@ -1,32 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 25 Jul 2013 13:07:33 +0100
+Date: Thu, 25 Jul 2013 12:02:33 +0100
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Sujith Manoharan <sujith@msujith.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] ath3k: Add support for ID 0x13d3/0x3402
-Message-ID: <20130725120732.GC9913@joana>
-References: <1373860743-8073-1-git-send-email-sujith@msujith.org>
- <20130715201413.GB21442@joana>
- <20964.29171.211422.614690@gargle.gargle.HOWL>
+To: Jingoo Han <jg1.han@samsung.com>
+Cc: 'Marcel Holtmann' <marcel@holtmann.org>,
+	'Johan Hedberg' <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] bluetooth: replace strict_strtol() with kstrtol()
+Message-ID: <20130725110232.GB9913@joana>
+References: <000f01ce844e$eeba10d0$cc2e3270$@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20964.29171.211422.614690@gargle.gargle.HOWL>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <000f01ce844e$eeba10d0$cc2e3270$@samsung.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sujith,
+Hi Jingoo,
 
-* Sujith Manoharan <sujith@msujith.org> [2013-07-16 03:34:35 +0530]:
+* Jingoo Han <jg1.han@samsung.com> [2013-07-19 16:09:38 +0900]:
 
-> Gustavo Padovan wrote:
-> > I would need the output of /sys/kernel/debug/usb/devices for this devices.
-> > We need to keep track of the devices we support. Could you please resend this
-> > patch with this information in the commit message? Thanks.
+> The usage of strict_strtol() is not preferred, because
+> strict_strtol() is obsolete. Thus, kstrtol() should be
+> used.
 > 
-> I don't have the hardware, but the kernel bug report has the details from
-> lsusb - if that's enough, I can send a v2.
+> Signed-off-by: Jingoo Han <jg1.han@samsung.com>
+> ---
+>  drivers/bluetooth/btmrvl_debugfs.c |    6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 
-I picked the information from the bug report, patch is now on
-bluetooth.git.
+Patch has been applied to bluetooth-next. Thanks.
 
 	Gustavo
