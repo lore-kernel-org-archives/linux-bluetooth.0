@@ -1,270 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
-Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
-Subject: Re: 057c:3800 BlueFRITZ! Bluetooth Stick broken since 2.6.something
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <51F0EB89.3050004@boh.de>
-Date: Thu, 25 Jul 2013 07:40:10 -0700
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <08CDDFCF-62FD-4000-8ECA-88D0C779F5FB@holtmann.org>
-References: <51E7ED11.7010103@boh.de> <36A79410-3FA3-408F-BA16-6A30568A7035@holtmann.org> <51E8DBFF.4060702@boh.de> <5BE2601B-7C94-4C24-AB9B-EF187CAD9098@holtmann.org> <20130719162051.GA7373@x220.p-661hnu-f1> <51ECDB03.8090109@boh.de> <4A86B920-6A47-4E2D-8F6F-90A626CFC878@holtmann.org> <20130723233902.GA7835@x220.p-661hnu-f1> <51F0EB89.3050004@boh.de>
-To: =?iso-8859-1?Q?J=F6rg_Esser?= <jackfritt@boh.de>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 25 Jul 2013 14:05:54 +0100
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth 2013-07-25
+Message-ID: <20130725130552.GE9913@joana>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="AhhlLboLdkugWU4S"
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
 
->>>>>>>> HCI Event: Command Complete (0x0e) plen 12 [hci0] 0.043811
->>>>>>>      Read Local Version Information (0x04|0x0001) ncmd 1
->>>>>>>        Status: Success (0x00)
->>>>>>>        HCI version: 2 - 0x2006
->>>>>>>        LMP version: 2 - 0x1806
->>>>>>>        Manufacturer: AVM Berlin (31)
->>>>>> it declares itself here as Bluetooth 1.2 device. Which means it is the
->>>>>> second generation of BlueFritz! USB device.
->>>>>> 
->>>>>> <snip>
->>>>>> 
->>>>>>> < HCI Command: Read Local Supported Comm.. (0x04|0x0002) plen 0 [hci0] 0.210014
->>>>>>>> HCI Event: Command Status (0x0f) plen 4 [hci0] 0.217361
->>>>>>>      Read Local Supported Commands (0x04|0x0002) ncmd 1
->>>>>>>        Status: Unknown HCI Command (0x01)
->>>>>> And here is your failing command. Newer kernels have been strict with
->>>>>> failing commands and will just abort the setup if anything goes wrong.
->>>>>> 
->>>>>> Johan, we need to figure out on how to work around this one. Might
->>>>>> just match for the manufacturer before sending the command.
->>>>> Either that or a quirk based on the USB id. Wouldn't matching just the
->>>>> manufacturer be a bit problematic for any newer chips from this company,
->>>>> or they stopped doing Bluetooth dongles after this one?
->>>> They stopped doing Bluetooth dongles after this one. I found no more
->>>> Product with bluetooth on their website.
->>>> The support from AVM endet on 01.12.2009.
->>>> As I read herehttp://www.wehavemorefun.de/fritzbox/BlueFRITZ!_USB
->>> yes, they ever only made two products. And their baseband was based on
->>> Silicon Wave which actually got bought by Qualcomm if I remember this
->>> correctly. So going by the manufacturer id and adding a good comment
->>> into the code might make this work nicely again.
->>> 
->>> Johan, if you prefer a quirk, then go for that one.
->> Since we know that these are the only pieces of hardware that exist with
->> this manufacturer id I think it's simplest to just use that instead of
->> creating more code for this.
->> 
->> Attached is a patch that still needs to be tested. It might e.g. reveal
->> other commands that also fail with this hardware.
->> 
->> Johan
-> After appling your patch I can use the adapter.
-> syslog says:
-> Jul 24 16:21:31 debian-capi kernel: [  153.864308] usb 1-3: new full-speed USB device number 4 using ohci_hcd
-> Jul 24 16:21:31 debian-capi kernel: [  154.120244] usb 1-3: New USB device found, idVendor=057c, idProduct=3800
-> Jul 24 16:21:31 debian-capi kernel: [  154.120251] usb 1-3: New USB device strings: Mfr=1, Product=2, SerialNumber=3
-> Jul 24 16:21:31 debian-capi kernel: [  154.120254] usb 1-3: Product: Bluetooth Device
-> Jul 24 16:21:31 debian-capi kernel: [  154.120257] usb 1-3: Manufacturer: Bluetooth Device
-> Jul 24 16:21:31 debian-capi kernel: [  154.120260] usb 1-3: SerialNumber: CC1C8D0E0400
-> Jul 24 16:21:31 debian-capi bluetoothd[2203]: HCI dev 0 registered
-> Jul 24 16:21:31 debian-capi bluetoothd[2203]: Listening for HCI events on hci0
-> Jul 24 16:21:31 debian-capi kernel: [  154.149949] usbcore: registered new interface driver btusb
-> Jul 24 16:21:31 debian-capi bluetoothd[2203]: HCI dev 0 up
-> Jul 24 16:21:31 debian-capi bluetoothd[2203]: Proximity GATT Reporter Driver: Operation not permitted (1)
-> Jul 24 16:21:31 debian-capi bluetoothd[2203]: Unable to load keys to adapter_ops: Function not implemented (38)
-> Jul 24 16:21:31 debian-capi bluetoothd[2203]: Adapter /org/bluez/2203/hci0 has been enabled
-> 
-> after scanning with hcitool scan, it finds my BT Speaker
-> btmon says:
-> 
-> btmon
-> Bluetooth monitor ver 5.7
-> = New Index: 00:00:00:00:00:00 (BR/EDR,USB,hci0) [hci0] 0.767719
-> < HCI Command: Reset (0x03|0x0003) plen 0 [hci0] 0.773725
-> > HCI Event: Command Complete (0x0e) plen 4 [hci0] 0.781039
->      Reset (0x03|0x0003) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: Read Local Supported Fea.. (0x04|0x0003) plen 0 [hci0] 0.781774
-> > HCI Event: Command Complete (0x0e) plen 12 [hci0] 0.785505
->      Read Local Supported Features (0x04|0x0003) ncmd 1
->        Status: Success (0x00)
->        Features: 0xff 0xff 0x05 0x00 0x18 0x18 0x00 0x00
->          3 slot packets
->          5 slot packets
->          Encryption
->          Slot offset
->          Timing accuracy
->          Role switch
->          Hold mode
->          Sniff mode
->          Park state
->          Power control requests
->          Channel quality driven data rate (CQDDR)
->          SCO link
->          HV2 packets
->          HV3 packets
->          u-law log synchronous data
->          A-law log synchronous data
->          CVSD synchronous data
->          Power control
->          AFH capable slave
->          AFH classification slave
->          AFH capable master
->          AFH classification master
-> < HCI Command: Read Local Version Infor.. (0x04|0x0001) plen 0 [hci0] 0.785575
-> > HCI Event: Command Complete (0x0e) plen 12 [hci0] 0.788286
->      Read Local Version Information (0x04|0x0001) ncmd 1
->        Status: Success (0x00)
->        HCI version: 2 - 0x2006
->        LMP version: 2 - 0x1806
->        Manufacturer: AVM Berlin (31)
-> < HCI Command: Read BD ADDR (0x04|0x0009) plen 0 [hci0] 0.788360
-> > HCI Event: Command Complete (0x0e) plen 10 [hci0] 0.791218
->      Read BD ADDR (0x04|0x0009) ncmd 1
->        Status: Success (0x00)
->        Address: 00:04:0E:8D:1C:CC (OUI 00-04-0E)
-> < HCI Command: Read Buffer Size (0x04|0x0005) plen 0 [hci0] 0.791858
-> > HCI Event: Command Complete (0x0e) plen 11 [hci0] 0.794638
->      Read Buffer Size (0x04|0x0005) ncmd 1
->        Status: Success (0x00)
->        ACL MTU: 120  ACL max packet: 20
->        SCO MTU: 24   SCO max packet: 5
-> < HCI Command: Read Class of Device (0x03|0x0023) plen 0 [hci0] 0.794704
-> > HCI Event: Command Complete (0x0e) plen 7 [hci0] 0.798330
->      Read Class of Device (0x03|0x0023) ncmd 1
->        Status: Success (0x00)
->        Class: 0x000000
->          Major class: Miscellaneous
->          Minor class: 0x00
-> < HCI Command: Read Local Name (0x03|0x0014) plen 0 [hci0] 0.798394
-> > HCI Event: Command Complete (0x0e) plen 252 [hci0] 0.836309
->      Read Local Name (0x03|0x0014) ncmd 1
->        Status: Success (0x00)
->        Name:
-> < HCI Command: Read Voice Setting (0x03|0x0025) plen 0 [hci0] 0.836479
-> > HCI Event: Command Complete (0x0e) plen 6 [hci0] 0.839240
->      Read Voice Setting (0x03|0x0025) ncmd 1
->        Status: Success (0x00)
->        Setting: 0x0060
-> < HCI Command: Set Event Filter (0x03|0x0005) plen 1 [hci0] 0.839409
->        Type: 0x00
-> > HCI Event: Command Complete (0x0e) plen 4 [hci0] 0.842197
->      Set Event Filter (0x03|0x0005) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: Write Connection Accept... (0x03|0x0016) plen 2 [hci0] 0.842365
->        Timeout: 20000.000 msec (0x7d00)
-> > HCI Event: Command Complete (0x0e) plen 4 [hci0] 0.845015
->      Write Connection Accept Timeout (0x03|0x0016) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: Read Page Scan Activity (0x03|0x001b) plen 0 [hci0] 0.845182
-> > HCI Event: Command Complete (0x0e) plen 8 [hci0] 0.849023
->      Read Page Scan Activity (0x03|0x001b) ncmd 1
->        Status: Success (0x00)
->        Interval: 1280.000 msec (0x0800)
->        Window: 11.250 msec (0x0012)
-> < HCI Command: Read Page Scan Type (0x03|0x0046) plen 0 [hci0] 0.849185
-> > HCI Event: Command Complete (0x0e) plen 5 [hci0] 0.853008
->      Read Page Scan Type (0x03|0x0046) ncmd 1
->        Status: Success (0x00)
->        Type: Standard Scan (0x00)
-> < HCI Command: Set Event Mask (0x03|0x0001) plen 8 [hci0] 0.853166
->        Mask: 0x00001807fffbffff
->          Inquiry Complete
->          Inquiry Result
->          Connection Complete
->          Connection Request
->          Disconnection Complete
->          Authentication Complete
->          Remote Name Request Complete
->          Encryption Change
->          Change Connection Link Key Complete
->          Master Link Key Complete
->          Read Remote Supported Features Complete
->          Read Remote Version Information Complete
->          QoS Setup Complete
->          Command Complete
->          Command Status
->          Hardware Error
->          Flush Occurred
->          Role Change
->          Mode Change
->          Return Link Keys
->          PIN Code Request
->          Link Key Request
->          Link Key Notification
->          Loopback Command
->          Data Buffer Overflow
->          Max Slots Change
->          Read Clock Offset Complete
->          Connection Packet Type Changed
->          QoS Violation
->          Page Scan Mode Change
->          Page Scan Repetition Mode Change
->          Flow Specification Complete
->          Inquiry Result with RSSI
->          Read Remote Extended Features Complete
->          Synchronous Connection Complete
->          Synchronous Connection Changed
-> > HCI Event: Command Complete (0x0e) plen 4 [hci0] 0.857379
->      Set Event Mask (0x03|0x0001) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: Write Page Timeout (0x03|0x0018) plen 2 [hci0] 0.858038
->        Timeout: 5120.000 msec (0x2000)
-> > HCI Event: Command Complete (0x0e) plen 4 [hci0] 0.859862
->      Write Page Timeout (0x03|0x0018) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: Read Stored Link Key (0x03|0x000d) plen 7 [hci0] 0.859932
->        Address: 00:00:00:00:00:00 (OUI 00-00-00)
->        Read all: 0x01
-> > HCI Event: Command Complete (0x0e) plen 8 [hci0] 0.863627
->      Read Stored Link Key (0x03|0x000d) ncmd 1
->        Status: Success (0x00)
->        Max num keys: 8
->        Num keys: 0
-> < HCI Command: Write Local Name (0x03|0x0013) plen 248 [hci0] 0.882030
->        Name: debian-capi-0
-> > HCI Event: Command Complete (0x0e) plen 4 [hci0] 0.885847
->      Write Local Name (0x03|0x0013) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: Set Event Mask (0x03|0x0001) plen 8 [hci0] 0.917369
->        Mask: 0x00001807fffbffff
->          Inquiry Complete
->          Inquiry Result
->          Connection Complete
->          Connection Request
->          Disconnection Complete
->          Authentication Complete
->          Remote Name Request Complete
->          Encryption Change
->          Change Connection Link Key Complete
->          Master Link Key Complete
->          Read Remote Supported Features Complete
->          Read Remote Version Information Complete
->          QoS Setup Complete
->          Command Complete
->          Command Status
->          Hardware Error
->          Flush Occurred
->          Role Change
->          Mode Change
->          Return Link Keys
->          PIN Code Request
->          Link Key Request
->          Link Key Notification
->          Loopback Command
->          Data Buffer Overflow
->          Max Slots Change
->          Read Clock Offset Complete
->          Connection Packet Type Changed
->          QoS Violation
->          Page Scan Mode Change
->          Page Scan Repetition Mode Change
->          Flow Specification Complete
->          Inquiry Result with RSSI
->          Read Remote Extended Features Complete
->          Synchronous Connection Complete
->          Synchronous Connection Changed
+--AhhlLboLdkugWU4S
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-any idea why we are sending Set Event Mask twice.
+Hi John,
 
-Regards
+A few fixes and devices ID additions for 3.11:=20
 
-Marcel
+ * There are 3 new ath3k device ids=20
+ * Fixed stack memory usage in ath3k.
+ * Fixed the init process of BlueFRITZ! devices, they were failing to init
+   due to an unsupported command we sent.=20
+ * Fixed wrong use of PTR_ERR in btusb code that was preventing intel devic=
+es
+   to work properly=20
+ * Fixed race codition between hci_register_dev() and hci_dev_open() that
+   could cause a NULL pointer dereference.
 
+Please pull or let me know of any issues. Thanks.
+
+	Gustavo
+
+--
+The following changes since commit 57bf74407bd501b0599568a3112fc16395b575d9:
+
+  Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/bl=
+uetooth/bluetooth (2013-06-24 13:53:15 -0400)
+
+are available in the git repository at:
+
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth for-ups=
+tream
+
+for you to fetch changes up to 352c3b276ca7e2df479cd0b9b87d227f14efb20a:
+
+  Bluetooth: Fix race between hci_register_dev() and hci_dev_open() (2013-0=
+7-25 13:55:59 +0100)
+
+----------------------------------------------------------------
+AceLan Kao (1):
+      Bluetooth: Add support for Atheros [0cf3:3121]
+
+Adam Lee (1):
+      Bluetooth: fix wrong use of PTR_ERR() in btusb
+
+Gustavo Padovan (1):
+      Bluetooth: Fix race between hci_register_dev() and hci_dev_open()
+
+Johan Hedberg (1):
+      Bluetooth: Fix HCI init for BlueFRITZ! devices
+
+Stanislaw Gruszka (1):
+      Bluetooth: ath3k: don't use stack memory for DMA
+
+Sujith Manoharan (1):
+      Bluetooth: ath3k: Add support for ID 0x13d3/0x3402
+
+Thomas Loo (1):
+      Bluetooth: ath3k: Add support for Fujitsu Lifebook UH5x2 [04c5:1330]
+
+ drivers/bluetooth/ath3k.c | 44 +++++++++++++++++++++++++++++++++++---------
+ drivers/bluetooth/btusb.c | 17 ++++++++++-------
+ net/bluetooth/hci_core.c  | 16 ++++++++--------
+ 3 files changed, 53 insertions(+), 24 deletions(-)
+
+
+--AhhlLboLdkugWU4S
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.13 (GNU/Linux)
+
+iQIcBAEBAgAGBQJR8SKwAAoJEPs3PUX4s20oloMP/3xtV+rqwF8B7KDxMaRv4CgN
+Nh51XXfGotIph40PNDhj8Q/86FElTVpQYc48J0PqIx2RzMdjPOCDecVUqI5rgc+O
+Bf7U/z09mwYJnazQOn+nqAcxLFBn/0OrhRIZdQE8ex48Z1o6M2N/VapVa4gyXN4Y
+8xZTjQ8vdKOgaCMOWSkzhYYlOqdIw8qlFA7biL5KgSLeABZWn5KxDvGUf7ktgm3g
+YcaoU/7twRwwije3fO9523ak4IQNDREljfo0hw6CCslWKSeu2iVXqsPDViO16e+u
+0vFBA1yB+7094SNEI081+fBEE1us21nlUJNME6RGe3z5VGeJWTxy6L2ZWFpr00Px
+ZsLbv5zI4KycGuOu1L92RLWc3MXxFe84ccdil47CxLK/L6SEJGp/HanjmxLVlWFo
+m4DpOF4RHQ0DmqqnuP687C76TH2cUgmT4MXLhYFLj3LzUVQ1S+2IRp841Mqg+Gej
+QxHLw+tLqbIhxRgzCTnToZ18mQvTQGg2n8U+FbG7WfH/OY8Ts0ZkAuu4q2DH+P/Z
+FStw9u26kVvBXZAymxMB6JuQf1Ma/a7GjgjtrsFE6khwBu6uT1955M1IYtzt48fe
+C4nG6eAQAOmYuow2aNa+zI82si35SON9hWNOf6u2fmMqJzUmujVfJ1El3e5n8phx
+i5bCLARqvrOClrAExfIJ
+=GOMw
+-----END PGP SIGNATURE-----
+
+--AhhlLboLdkugWU4S--
