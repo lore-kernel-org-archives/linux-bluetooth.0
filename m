@@ -1,36 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] build: Fix make distcheck
-Date: Thu, 25 Jul 2013 14:25:46 -0400
-Message-Id: <1374776746-14457-1-git-send-email-anderson.lizardo@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <51F16C70.2090100@hurleysoftware.com>
+Date: Thu, 25 Jul 2013 14:20:32 -0400
+From: Peter Hurley <peter@hurleysoftware.com>
+MIME-Version: 1.0
+To: Gianluca Anzolin <gianluca@sottospazio.it>
+CC: linux-bluetooth@vger.kernel.org, gustavo@padovan.org,
+ marcel@holtmann.org
+Subject: Re: [PATCH v2 2/7] rfcomm: Move the tty initialization and cleanup
+ out of open/close
+References: <1374510435-12149-1-git-send-email-gianluca@sottospazio.it> <1374510435-12149-2-git-send-email-gianluca@sottospazio.it> <51F0550A.1000402@hurleysoftware.com> <20130725053725.GA7214@sottospazio.it> <51F1213C.3030900@hurleysoftware.com> <20130725180749.GA12067@sottospazio.it>
+In-Reply-To: <20130725180749.GA12067@sottospazio.it>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix this error:
+On 07/25/2013 02:07 PM, Gianluca Anzolin wrote:
+> On Thu, Jul 25, 2013 at 08:59:40AM -0400, Peter Hurley wrote:
+>> On 07/25/2013 01:37 AM, Gianluca Anzolin wrote:
+>>> Hello,
+>>>
+>>> sorry I'm not very used to submit patches "the right way" and I missed the
+>>> point that I have to keep the changes to the minimum.
+>>
+>> No need to apologize.
+>> Every kernel contributor goes through this learning curve.
+>>
+>
+> Hello,
+>
+> I'm trying to reach the minimal changeset to reach my target, and in the
+> process I figured out that if I implement the .activate and .shutdown port
+> methods before the .install and .cleanup methods I could produce less changes.
+>
+> However I'm stuck now because I cannot guarantee that the intermediate code
+> between the patches works at all (however it compiles). What should I do?
 
-make[1]: *** No rule to make target `profiles/audio/audio.conf', needed
-by `distdir'.  Stop.
-make: *** [test_build] Error 2
----
- Makefile.am |    3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+The tty .install and .cleanup methods should be introduced first.
+Then the tty_port methods.
 
-diff --git a/Makefile.am b/Makefile.am
-index cec85b0..b844532 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -173,8 +173,7 @@ man_MANS = src/bluetoothd.8
- 
- EXTRA_DIST += src/genbuiltin src/bluetooth.conf \
- 			src/main.conf profiles/network/network.conf \
--			profiles/input/input.conf profiles/proximity/proximity.conf \
--			profiles/audio/audio.conf
-+			profiles/input/input.conf profiles/proximity/proximity.conf
- 
- test_scripts =
- 
--- 
-1.7.9.5
+The dev_list patch should be before both.
 
+If you want, feel free to send me private email with questions and/or
+code snippets, and I'll do my best to respond quickly.
+
+Regards,
+Peter Hurley
