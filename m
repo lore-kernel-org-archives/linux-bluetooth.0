@@ -1,26 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 26 Jul 2013 09:24:52 -0700
+Date: Fri, 26 Jul 2013 09:23:57 -0700
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] audio/player: Fix not setting playlist items as
- playable
-Message-ID: <20130726162452.GB6805@x220.p-661hnu-f1>
-References: <1374845040-17563-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH BlueZ] test: Fix ProximityMonitor1 interface name typo in
+ test-proximity
+Message-ID: <20130726162357.GA6805@x220.p-661hnu-f1>
+References: <1374780223-21677-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1374845040-17563-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1374780223-21677-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Lizardo,
 
-On Fri, Jul 26, 2013, Luiz Augusto von Dentz wrote:
-> All items in the playlist should have playable flag set otherwise they
-> cannot be part of the playlist.
+On Thu, Jul 25, 2013, Anderson Lizardo wrote:
 > ---
->  profiles/audio/player.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  test/test-proximity |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Applied. Thanks.
 
