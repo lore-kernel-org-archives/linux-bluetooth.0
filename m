@@ -7,110 +7,51 @@ Cc: peter@hurleysoftware.com,
 	gregkh@linuxfoundation.org,
 	jslaby@suse.cz,
 	Gianluca Anzolin <gianluca@sottospazio.it>
-Subject: [PATCH v4 1/6] rfcomm: Take proper tty_struct references
-Date: Fri, 26 Jul 2013 19:18:53 +0200
-Message-Id: <1374859138-19467-2-git-send-email-gianluca@sottospazio.it>
-In-Reply-To: <1374859138-19467-1-git-send-email-gianluca@sottospazio.it>
-References: <1374859138-19467-1-git-send-email-gianluca@sottospazio.it>
+Subject: [PATCH v4 0/6] rfcomm: Implement rfcomm as a proper tty_port
+Date: Fri, 26 Jul 2013 19:18:52 +0200
+Message-Id: <1374859138-19467-1-git-send-email-gianluca@sottospazio.it>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In net/bluetooth/rfcomm/tty.c the struct tty_struct is used without
-taking references. This may lead to a use-after-free of the rfcomm tty.
+This patchset addresses an issue with the rfcomm tty driver in the
+current stable kernels that manifests itself as a sudden lockup of the
+whole machine or as a OOPS if we are lucky enough (I wasn't).
 
-Fix this by taking references properly, using the tty_port_* helpers
-when possible.
+Triggering the problem is very easy:
 
-The raw assignments of dev->port.tty in rfcomm_tty_open/close are
-addressed in the later commit 'rfcomm: Implement .activate, .shutdown
-and .carrier_raised methods'.
+1) establish a bluetooth connection with a bluetooth host
+2) open the tty it provides with some program
+3) turn off the bluetooth host or take it out of range
 
-Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
----
- net/bluetooth/rfcomm/tty.c | 29 +++++++++++++++++------------
- 1 file changed, 17 insertions(+), 12 deletions(-)
+After a timeout the machine freezes.
 
-diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index b6e44ad..cd7ff37 100644
---- a/net/bluetooth/rfcomm/tty.c
-+++ b/net/bluetooth/rfcomm/tty.c
-@@ -333,10 +333,9 @@ static inline unsigned int rfcomm_room(struct rfcomm_dlc *dlc)
- static void rfcomm_wfree(struct sk_buff *skb)
- {
- 	struct rfcomm_dev *dev = (void *) skb->sk;
--	struct tty_struct *tty = dev->port.tty;
- 	atomic_sub(skb->truesize, &dev->wmem_alloc);
--	if (test_bit(RFCOMM_TTY_ATTACHED, &dev->flags) && tty)
--		tty_wakeup(tty);
-+	if (test_bit(RFCOMM_TTY_ATTACHED, &dev->flags))
-+		tty_port_tty_wakeup(&dev->port);
- 	tty_port_put(&dev->port);
- }
- 
-@@ -410,6 +409,7 @@ static int rfcomm_release_dev(void __user *arg)
- {
- 	struct rfcomm_dev_req req;
- 	struct rfcomm_dev *dev;
-+	struct tty_struct *tty;
- 
- 	if (copy_from_user(&req, arg, sizeof(req)))
- 		return -EFAULT;
-@@ -429,8 +429,11 @@ static int rfcomm_release_dev(void __user *arg)
- 		rfcomm_dlc_close(dev->dlc, 0);
- 
- 	/* Shut down TTY synchronously before freeing rfcomm_dev */
--	if (dev->port.tty)
--		tty_vhangup(dev->port.tty);
-+	tty = tty_port_tty_get(&dev->port);
-+	if (tty) {
-+		tty_vhangup(tty);
-+		tty_kref_put(tty);
-+	}
- 
- 	if (!test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags))
- 		rfcomm_dev_del(dev);
-@@ -563,6 +566,7 @@ static void rfcomm_dev_data_ready(struct rfcomm_dlc *dlc, struct sk_buff *skb)
- static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
- {
- 	struct rfcomm_dev *dev = dlc->owner;
-+	struct tty_struct *tty;
- 	if (!dev)
- 		return;
- 
-@@ -572,7 +576,8 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
- 	wake_up_interruptible(&dev->wait);
- 
- 	if (dlc->state == BT_CLOSED) {
--		if (!dev->port.tty) {
-+		tty = tty_port_tty_get(&dev->port);
-+		if (!tty) {
- 			if (test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags)) {
- 				/* Drop DLC lock here to avoid deadlock
- 				 * 1. rfcomm_dev_get will take rfcomm_dev_lock
-@@ -591,8 +596,10 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
- 				tty_port_put(&dev->port);
- 				rfcomm_dlc_lock(dlc);
- 			}
--		} else
--			tty_hangup(dev->port.tty);
-+		} else {
-+			tty_hangup(tty);
-+			tty_kref_put(tty);
-+		}
- 	}
- }
- 
-@@ -604,10 +611,8 @@ static void rfcomm_dev_modem_status(struct rfcomm_dlc *dlc, u8 v24_sig)
- 
- 	BT_DBG("dlc %p dev %p v24_sig 0x%02x", dlc, dev, v24_sig);
- 
--	if ((dev->modem_status & TIOCM_CD) && !(v24_sig & RFCOMM_V24_DV)) {
--		if (dev->port.tty && !C_CLOCAL(dev->port.tty))
--			tty_hangup(dev->port.tty);
--	}
-+	if ((dev->modem_status & TIOCM_CD) && !(v24_sig & RFCOMM_V24_DV))
-+		tty_port_tty_hangup(&dev->port, true);
- 
- 	dev->modem_status =
- 		((v24_sig & RFCOMM_V24_RTC) ? (TIOCM_DSR | TIOCM_DTR) : 0) |
+Another way to trigger these lockups is to simply release the rfcomm
+tty.
+
+This happens because the underlying tty_struct objects and tty_port
+objects are freed while being used: the code doesn't take references
+properly.
+
+The following patches address the problem by implementing a proper
+tty_port driver for rfcomm.
+
+There are still some issues left: one relevant to flow control (which is
+also missing in the current code) and another relevant to a corner case
+in rfcomm_dev_state_change() that I intend to fix with a future patch.
+They are commented with a FIXME.
+
+Thank you,
+Gianluca
+
+Gianluca Anzolin (6):
+  rfcomm: Take proper tty_struct references
+  rfcomm: Remove the device from the list in the destructor
+  rfcomm: Move the tty initialization and cleanup out of open/close
+  rfcomm: Implement .activate, .shutdown and .carrier_raised methods
+  rfcomm: Fix the reference counting of tty_port
+  rfcomm: Purge the dlc->tx_queue to avoid circular dependency
+
+ net/bluetooth/rfcomm/tty.c | 263 +++++++++++++++++++++------------------------
+ 1 file changed, 122 insertions(+), 141 deletions(-)
+
 -- 
 1.8.3.4
