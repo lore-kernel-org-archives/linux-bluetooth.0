@@ -1,64 +1,211 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 26 Jul 2013 14:50:40 +0200
-From: Gianluca Anzolin <gianluca@sottospazio.it>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: gustavo@padovan.org, marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 1/6] rfcomm: Take proper tty_struct references
-Message-ID: <20130726125040.GA17477@sottospazio.it>
-References: <1374777133-12397-1-git-send-email-gianluca@sottospazio.it>
- <51F26682.1010404@hurleysoftware.com>
+Message-ID: <51F2691E.7030002@hurleysoftware.com>
+Date: Fri, 26 Jul 2013 08:18:38 -0400
+From: Peter Hurley <peter@hurleysoftware.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <51F26682.1010404@hurleysoftware.com>
+To: Gianluca Anzolin <gianluca@sottospazio.it>
+CC: gustavo@padovan.org, marcel@holtmann.org,
+ linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 3/6] rfcomm: Move the tty initialization and cleanup
+ out of open/close
+References: <1374777133-12397-1-git-send-email-gianluca@sottospazio.it> <1374777133-12397-3-git-send-email-gianluca@sottospazio.it>
+In-Reply-To: <1374777133-12397-3-git-send-email-gianluca@sottospazio.it>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jul 26, 2013 at 08:07:30AM -0400, Peter Hurley wrote:
-> On 07/25/2013 02:32 PM, Gianluca Anzolin wrote:
-> >
-> >  	rfcomm_dlc_lock(dlc);
-> >  	tty->driver_data = dev;
-> >-	dev->port.tty = tty;
-> >+	tty_port_tty_set(&dev->port, tty);
-> 
-> Although strictly speaking, this is correct, I would drop this change
-> because its functionality is replaced in 4/6 with the call to tty_port_open().
-> If you want, you could note in the commit message that the
-> raw assignments in rfcomm_tty_open/close are addressed in commit
-> 'rfcomm: Implement .activate, .shutdown and .carrier_raised methods'.
+On 07/25/2013 02:32 PM, Gianluca Anzolin wrote:
+> Move the tty_struct initialization from rfcomm_tty_open to rfcomm_tty_install
+> and do the same for the cleanup moving the code from rfcomm_tty_close to
+> rfcomm_tty_cleanup.
 
-Ok I will do that.
+I would add here a comment regarding the necessity for the extra error
+handling required in rfcomm_tty_install because, unlike .open()/.close(),
+.cleanup() is not called if .install() fails.
 
-> 
-> [ BTW, you remove this line in 3/6 but it's needed until 4/6]
+> Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
+> ---
+>   net/bluetooth/rfcomm/tty.c | 108 ++++++++++++++++++++++++++++-----------------
+>   1 file changed, 68 insertions(+), 40 deletions(-)
+>
+> diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+> index f5c2a0b..cd37f9b 100644
+> --- a/net/bluetooth/rfcomm/tty.c
+> +++ b/net/bluetooth/rfcomm/tty.c
+> @@ -633,49 +633,62 @@ static void rfcomm_tty_copy_pending(struct rfcomm_dev *dev)
+>   		tty_flip_buffer_push(&dev->port);
+>   }
+>
+> -static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
+> +/* do the reverse of install, clearing the tty fields and releasing the
+> + * reference to tty_port
+> + */
+> +static void rfcomm_tty_cleanup(struct tty_struct *tty)
+> +{
+> +	struct rfcomm_dev *dev = tty->driver_data;
+> +
+> +	if (dev->tty_dev->parent)
+> +		device_move(dev->tty_dev, NULL, DPM_ORDER_DEV_LAST);
+> +
+> +	/* Close DLC and dettach TTY */
+> +	rfcomm_dlc_close(dev->dlc, 0);
+> +
+> +	clear_bit(RFCOMM_TTY_ATTACHED, &dev->flags);
+> +
+> +	rfcomm_dlc_lock(dev->dlc);
+> +	tty->driver_data = NULL;
+> +	rfcomm_dlc_unlock(dev->dlc);
+> +
+> +	tty_port_put(&dev->port);
+> +}
+> +
+> +/* we acquire the tty_port reference since it's here the tty is first used
+> + * by setting the termios. We also populate the driver_data field and install
+> + * the tty port
+> + */
+> +static int rfcomm_tty_install(struct tty_driver *driver, struct tty_struct *tty)
+>   {
+>   	DECLARE_WAITQUEUE(wait, current);
+>   	struct rfcomm_dev *dev;
+>   	struct rfcomm_dlc *dlc;
+> -	unsigned long flags;
+> -	int err, id;
+> -
+> -	id = tty->index;
+> +	int err;
+>
+> -	BT_DBG("tty %p id %d", tty, id);
+> -
+> -	/* We don't leak this refcount. For reasons which are not entirely
+> -	   clear, the TTY layer will call our ->close() method even if the
+> -	   open fails. We decrease the refcount there, and decreasing it
+> -	   here too would cause breakage. */
+> -	dev = rfcomm_dev_get(id);
+> +	dev = rfcomm_dev_get(tty->index);
+>   	if (!dev)
+>   		return -ENODEV;
+>
+>   	BT_DBG("dev %p dst %pMR channel %d opened %d", dev, &dev->dst,
+>   	       dev->channel, dev->port.count);
+>
+> -	spin_lock_irqsave(&dev->port.lock, flags);
+> -	if (++dev->port.count > 1) {
+> -		spin_unlock_irqrestore(&dev->port.lock, flags);
+> -		return 0;
+> -	}
+> -	spin_unlock_irqrestore(&dev->port.lock, flags);
+> -
+>   	dlc = dev->dlc;
+>
+>   	/* Attach TTY and open DLC */
+> -
+>   	rfcomm_dlc_lock(dlc);
+>   	tty->driver_data = dev;
+> -	tty_port_tty_set(&dev->port, tty);
 
-Oh, I overlooked that "detail" when I changed the order of the patches...
+As noted in my comment to 1/6, this line (or its equivalent) needs
+to be preserved until its functionality is replaced by the call to
+tty_port_open()/close() in 4/6
 
-> 
-> >  	rfcomm_dlc_unlock(dlc);
-> >  	set_bit(RFCOMM_TTY_ATTACHED, &dev->flags);
-> >
-> >@@ -742,7 +747,7 @@ static void rfcomm_tty_close(struct tty_struct *tty, struct file *filp)
-> >
-> >  		rfcomm_dlc_lock(dev->dlc);
-> >  		tty->driver_data = NULL;
-> >-		dev->port.tty = NULL;
-> >+		tty_port_tty_set(&dev->port, NULL);
-> 
-> Similarly, the call to tty_port_close() in 4/6 replaces this functionality.
-> 
-> Regards,
-> Peter Hurley
-> 
 
-Ok there is a need for a v4 after all.
+>   	rfcomm_dlc_unlock(dlc);
+>   	set_bit(RFCOMM_TTY_ATTACHED, &dev->flags);
+>
+> +	/* install the tty_port */
+> +	err = tty_port_install(&dev->port, driver, tty);
+> +	if (err < 0)
+> +		goto error_no_dlc;
+> +
+>   	err = rfcomm_dlc_open(dlc, &dev->src, &dev->dst, dev->channel);
+>   	if (err < 0)
+> -		return err;
+> +		goto error_no_dlc;
+>
+>   	/* Wait for DLC to connect */
+>   	add_wait_queue(&dev->wait, &wait);
+> @@ -702,15 +715,42 @@ static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
+>   	set_current_state(TASK_RUNNING);
+>   	remove_wait_queue(&dev->wait, &wait);
+>
+> -	if (err == 0)
+> -		device_move(dev->tty_dev, rfcomm_get_device(dev),
+> -			    DPM_ORDER_DEV_AFTER_PARENT);
+> +	if (err < 0)
+> +		goto error_no_connection;
+> +
+> +	device_move(dev->tty_dev, rfcomm_get_device(dev),
+> +		    DPM_ORDER_DEV_AFTER_PARENT);
+> +	return 0;
+> +
+> +error_no_connection:
+> +	rfcomm_dlc_close(dlc, err);
+> +error_no_dlc:
+> +	clear_bit(RFCOMM_TTY_ATTACHED, &dev->flags);
+> +	tty_port_put(&dev->port);
+> +	return err;
+> +}
+> +
+> +static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
+> +{
+> +	struct rfcomm_dev *dev = tty->driver_data;
+> +	unsigned long flags;
+> +
+> +	BT_DBG("tty %p id %d", tty, tty->index);
+> +
+> +	spin_lock_irqsave(&dev->port.lock, flags);
+> +	dev->port.count++;
+> +	spin_unlock_irqrestore(&dev->port.lock, flags);
+>
+> +	/*
+> +	 * FIXME: rfcomm should use proper flow control for
+> +	 * received data. This hack will be unnecessary and can
+> +	 * be removed when that's implemented
+> +	 */
+>   	rfcomm_tty_copy_pending(dev);
+>
+>   	rfcomm_dlc_unthrottle(dev->dlc);
+>
+> -	return err;
+> +	return 0;
+>   }
+>
+>   static void rfcomm_tty_close(struct tty_struct *tty, struct file *filp)
+> @@ -727,25 +767,11 @@ static void rfcomm_tty_close(struct tty_struct *tty, struct file *filp)
+>   	spin_lock_irqsave(&dev->port.lock, flags);
+>   	if (!--dev->port.count) {
+>   		spin_unlock_irqrestore(&dev->port.lock, flags);
+> -		if (dev->tty_dev->parent)
+> -			device_move(dev->tty_dev, NULL, DPM_ORDER_DEV_LAST);
+> -
+> -		/* Close DLC and dettach TTY */
+> -		rfcomm_dlc_close(dev->dlc, 0);
+> -
+> -		clear_bit(RFCOMM_TTY_ATTACHED, &dev->flags);
+> -
+> -		rfcomm_dlc_lock(dev->dlc);
+> -		tty->driver_data = NULL;
 
-Btw did you look at the RFC patch about the dev_add nested locks?
-Do you think it's acceptable? I tried to add the device to the list at the end
-of the function but the fact is that the dlc callbacks need dev->id so I had to
-allocate it or set it to something not valid, like -1.
+> -		tty_port_tty_set(&dev->port, NULL);
 
-I didn't also get any reply about the skb_queue_purge patch, I hope it's ok
+Similarly with this line.
 
-Thank you,
-Gianluca
+> -		rfcomm_dlc_unlock(dev->dlc);
+>
+>   		if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags))
+>   			tty_port_put(&dev->port);
+>   	} else
+>   		spin_unlock_irqrestore(&dev->port.lock, flags);
+> -
+> -	tty_port_put(&dev->port);
+>   }
+>
+>   static int rfcomm_tty_write(struct tty_struct *tty, const unsigned char *buf, int count)
+> @@ -1118,6 +1144,8 @@ static const struct tty_operations rfcomm_ops = {
+>   	.wait_until_sent	= rfcomm_tty_wait_until_sent,
+>   	.tiocmget		= rfcomm_tty_tiocmget,
+>   	.tiocmset		= rfcomm_tty_tiocmset,
+> +	.install                = rfcomm_tty_install,
+> +	.cleanup                = rfcomm_tty_cleanup,
+>   };
+>
+>   int __init rfcomm_init_ttys(void)
+>
