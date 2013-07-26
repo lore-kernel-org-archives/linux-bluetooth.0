@@ -1,85 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <51F2776F.7010108@hurleysoftware.com>
-Date: Fri, 26 Jul 2013 09:19:43 -0400
-From: Peter Hurley <peter@hurleysoftware.com>
 MIME-Version: 1.0
-To: Gianluca Anzolin <gianluca@sottospazio.it>
-CC: gustavo@padovan.org, marcel@holtmann.org,
- linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 1/6] rfcomm: Take proper tty_struct references
-References: <1374777133-12397-1-git-send-email-gianluca@sottospazio.it> <51F26682.1010404@hurleysoftware.com> <20130726125040.GA17477@sottospazio.it>
-In-Reply-To: <20130726125040.GA17477@sottospazio.it>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <CAGoJ=AsOk=TPHoc3S+qs-0ukTjsf057cEA5DuMBp5zbsrz0AZg@mail.gmail.com>
+References: <CAGoJ=AsOk=TPHoc3S+qs-0ukTjsf057cEA5DuMBp5zbsrz0AZg@mail.gmail.com>
+Date: Fri, 26 Jul 2013 09:01:18 -0400
+Message-ID: <CAJdJm_OFtRR1kT+F4zrnSYzPeC+m4SF1w-WkWa686isXF7wo6g@mail.gmail.com>
+Subject: Re: Accessing information transmitted by Ble tag.
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: James Baker <j.baker@outlook.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 07/26/2013 08:50 AM, Gianluca Anzolin wrote:
-> On Fri, Jul 26, 2013 at 08:07:30AM -0400, Peter Hurley wrote:
->> On 07/25/2013 02:32 PM, Gianluca Anzolin wrote:
->>>
->>>   	rfcomm_dlc_lock(dlc);
->>>   	tty->driver_data = dev;
->>> -	dev->port.tty = tty;
->>> +	tty_port_tty_set(&dev->port, tty);
->>
->> Although strictly speaking, this is correct, I would drop this change
->> because its functionality is replaced in 4/6 with the call to tty_port_open().
->> If you want, you could note in the commit message that the
->> raw assignments in rfcomm_tty_open/close are addressed in commit
->> 'rfcomm: Implement .activate, .shutdown and .carrier_raised methods'.
+Hi James,
+
+On Thu, Jul 25, 2013 at 7:42 PM, James Baker <j.baker@outlook.com> wrote:
+> As part of my summer placement, I've been introduced to some
+> non-connectable Ble tags. These are effectively beacons - advertising
+> and transmitting data every 250ms.
 >
-> Ok I will do that.
+> Now, this is where I'm less clear:
+> I am something of a bluetooth newbie as it were, but I know for sure
+> they're transmitting more than just the address and name of the device
+> (as displayed in hcidump when running hcitool lescan). I know this
+> because the data is picked up on an iPhone app I have lying around.
 >
->>
->> [ BTW, you remove this line in 3/6 but it's needed until 4/6]
->
-> Oh, I overlooked that "detail" when I changed the order of the patches...
+> My question is, how would I read data from a connectionless Ble broadcaster?
 
-Same thing just happened to me with a series of mine.
+You forgot to mention what you need to do with the data once you get
+it at which "level" you want to program to get this data.
 
->>
->>>   	rfcomm_dlc_unlock(dlc);
->>>   	set_bit(RFCOMM_TTY_ATTACHED, &dev->flags);
->>>
->>> @@ -742,7 +747,7 @@ static void rfcomm_tty_close(struct tty_struct *tty, struct file *filp)
->>>
->>>   		rfcomm_dlc_lock(dev->dlc);
->>>   		tty->driver_data = NULL;
->>> -		dev->port.tty = NULL;
->>> +		tty_port_tty_set(&dev->port, NULL);
->>
->> Similarly, the call to tty_port_close() in 4/6 replaces this functionality.
->>
->> Regards,
->> Peter Hurley
->>
->
-> Ok there is a need for a v4 after all.
->
-> Btw did you look at the RFC patch about the dev_add nested locks?
-> Do you think it's acceptable? I tried to add the device to the list at the end
-> of the function but the fact is that the dlc callbacks need dev->id so I had to
-> allocate it or set it to something not valid, like -1.
- >
- > I didn't also get any reply about the skb_queue_purge patch, I hope it's ok
+On Linux, you have basically two "levels" to communicate with
+Bluetooth devices. At the highest level, you have a D-Bus API
+(documented on doc/*-api.txt files on the BlueZ source code) that
+usually is the easiest way to get information from devices, because
+you don't have to worry about packet details. The Broadaster/Observer
+API you found works at this level, but as you noticed, it has not
+evolved yet to go upstream. It's not being actively developed at the
+moment.
 
-I'm testing the whole patch series now. Assuming nothing breaks and v4 changes
-are minimal, I'll give the whole series Reviewed-by: and Tested-by: tags.
+The second, lower level is to program using Bluetooth sockets. At this
+level you talk directly to the kernel and BlueZ is not involved. It's
+much like programming for TCP sockets, if you have some experience
+with socket programming on Linux it will not be much different.
+hcitool works at this level.
 
-When I'm done with that, I'll review the RFC patch.
+You already mentioned that with hcidump + hcitool lescan you were able
+to see the data you need to access. hcidump is just a "sniffer" that
+shows all the incoming/outgoing communication going through the
+bluetooth adapter. My advice is to take a look at the hcitool source
+code (tools/hcitool.c) and try to understand how lescan is
+implemented. With some effort, you will be able to modify hcitool to
+print the information you need.
 
-For v4, you should direct To: Gustavo Padovan, cc: me instead, and add
-cc's for Greg Kroah-Hartman <gregkh@linuxfoundation.org> and Jiri Slaby
-<jslaby@suse.cz>
+Once you are able to do this, you can reuse the C code to do whatever
+you need to do with that data (paying attention to the GPL license
+though).
 
-Regards,
-Peter Hurley
+You may need to study how the data in LE advertising packets is
+formatted, if you have not done this yet. Grab your copy of the Core
+Specification from
+https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=229737
+and take a look at sections like:
 
+* Volume 3 , Part C , Sections 9.1 "Broadcast Mode and Observation
+Procedure" and 11 "Advertising and Scan Response Data Format"
+* Volume 2, Part E, Sections 7.7.65 "LE Meta Event" and 7.8 "LE
+Controller Commands" if you want to better understand the output from
+HCI dump regarding LE related HCI packets.
 
-For future reference, for a series like this you might want to consider
-adding a cover letter 0/6 (with git format-patch --cover-letter) with an
-overview of the whole series.
+There is also a book on Bluetooth 4.0, but I don't remember the name
+right now (I haven't read it myself but people I know have read and
+liked it).
 
-Cover letters give you an opportunity to explain the motivation
-(rfcomm crashes on device disconnect because port reference counting
-was broken), explain your solution (implement rfcomm as a proper tty_port),
-and allows reviewers to comment on the series as whole (Good work :).
+> I was originally looking for some kind of observer-broadcaster api and
+> in fact found patches on this list regarding it, and even an orphaned
+> branch at http://gitorious.org/~jdelfes/bluez/jdelfes-bluez/commits/bo-new,
+> but those APIs don't seem to have made it into the official
+> repository.
+
+Unfortunately, we (== the team I work with) are not actively working
+on this API at the moment. Currently we are focusing on improving GATT
+APIs and LE support in general in BlueZ.
+
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
