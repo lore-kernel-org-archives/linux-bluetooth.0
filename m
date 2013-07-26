@@ -7,89 +7,110 @@ Cc: peter@hurleysoftware.com,
 	gregkh@linuxfoundation.org,
 	jslaby@suse.cz,
 	Gianluca Anzolin <gianluca@sottospazio.it>
-Subject: [PATCH v4 2/6] rfcomm: Remove the device from the list in the destructor
-Date: Fri, 26 Jul 2013 19:18:54 +0200
-Message-Id: <1374859138-19467-3-git-send-email-gianluca@sottospazio.it>
+Subject: [PATCH v4 1/6] rfcomm: Take proper tty_struct references
+Date: Fri, 26 Jul 2013 19:18:53 +0200
+Message-Id: <1374859138-19467-2-git-send-email-gianluca@sottospazio.it>
 In-Reply-To: <1374859138-19467-1-git-send-email-gianluca@sottospazio.it>
 References: <1374859138-19467-1-git-send-email-gianluca@sottospazio.it>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The current code removes the device from the device list in several
-places. Do it only in the destructor instead and in the error path of
-rfcomm_add_dev() if the device couldn't be initialized.
+In net/bluetooth/rfcomm/tty.c the struct tty_struct is used without
+taking references. This may lead to a use-after-free of the rfcomm tty.
+
+Fix this by taking references properly, using the tty_port_* helpers
+when possible.
+
+The raw assignments of dev->port.tty in rfcomm_tty_open/close are
+addressed in the later commit 'rfcomm: Implement .activate, .shutdown
+and .carrier_raised methods'.
 
 Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
 ---
- net/bluetooth/rfcomm/tty.c | 27 ++++++---------------------
- 1 file changed, 6 insertions(+), 21 deletions(-)
+ net/bluetooth/rfcomm/tty.c | 29 +++++++++++++++++------------
+ 1 file changed, 17 insertions(+), 12 deletions(-)
 
 diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index cd7ff37..9c0e142 100644
+index b6e44ad..cd7ff37 100644
 --- a/net/bluetooth/rfcomm/tty.c
 +++ b/net/bluetooth/rfcomm/tty.c
-@@ -76,13 +76,6 @@ static void rfcomm_dev_modem_status(struct rfcomm_dlc *dlc, u8 v24_sig);
- 
- /* ---- Device functions ---- */
- 
--/*
-- * The reason this isn't actually a race, as you no doubt have a little voice
-- * screaming at you in your head, is that the refcount should never actually
-- * reach zero unless the device has already been taken off the list, in
-- * rfcomm_dev_del(). And if that's not true, we'll hit the BUG() in
-- * rfcomm_dev_destruct() anyway.
-- */
- static void rfcomm_dev_destruct(struct tty_port *port)
+@@ -333,10 +333,9 @@ static inline unsigned int rfcomm_room(struct rfcomm_dlc *dlc)
+ static void rfcomm_wfree(struct sk_buff *skb)
  {
- 	struct rfcomm_dev *dev = container_of(port, struct rfcomm_dev, port);
-@@ -90,10 +83,9 @@ static void rfcomm_dev_destruct(struct tty_port *port)
- 
- 	BT_DBG("dev %p dlc %p", dev, dlc);
- 
--	/* Refcount should only hit zero when called from rfcomm_dev_del()
--	   which will have taken us off the list. Everything else are
--	   refcounting bugs. */
--	BUG_ON(!list_empty(&dev->list));
-+	spin_lock(&rfcomm_dev_lock);
-+	list_del(&dev->list);
-+	spin_unlock(&rfcomm_dev_lock);
- 
- 	rfcomm_dlc_lock(dlc);
- 	/* Detach DLC if it's owned by this dev */
-@@ -282,7 +274,9 @@ out:
- 			dev->id, NULL);
- 	if (IS_ERR(dev->tty_dev)) {
- 		err = PTR_ERR(dev->tty_dev);
-+		spin_lock(&rfcomm_dev_lock);
- 		list_del(&dev->list);
-+		spin_unlock(&rfcomm_dev_lock);
- 		goto free;
- 	}
- 
-@@ -315,10 +309,6 @@ static void rfcomm_dev_del(struct rfcomm_dev *dev)
- 	}
- 	spin_unlock_irqrestore(&dev->port.lock, flags);
- 
--	spin_lock(&rfcomm_dev_lock);
--	list_del_init(&dev->list);
--	spin_unlock(&rfcomm_dev_lock);
--
+ 	struct rfcomm_dev *dev = (void *) skb->sk;
+-	struct tty_struct *tty = dev->port.tty;
+ 	atomic_sub(skb->truesize, &dev->wmem_alloc);
+-	if (test_bit(RFCOMM_TTY_ATTACHED, &dev->flags) && tty)
+-		tty_wakeup(tty);
++	if (test_bit(RFCOMM_TTY_ATTACHED, &dev->flags))
++		tty_port_tty_wakeup(&dev->port);
  	tty_port_put(&dev->port);
  }
  
-@@ -750,13 +740,8 @@ static void rfcomm_tty_close(struct tty_struct *tty, struct file *filp)
- 		dev->port.tty = NULL;
- 		rfcomm_dlc_unlock(dev->dlc);
+@@ -410,6 +409,7 @@ static int rfcomm_release_dev(void __user *arg)
+ {
+ 	struct rfcomm_dev_req req;
+ 	struct rfcomm_dev *dev;
++	struct tty_struct *tty;
  
--		if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags)) {
--			spin_lock(&rfcomm_dev_lock);
--			list_del_init(&dev->list);
--			spin_unlock(&rfcomm_dev_lock);
--
-+		if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags))
- 			tty_port_put(&dev->port);
--		}
- 	} else
- 		spin_unlock_irqrestore(&dev->port.lock, flags);
+ 	if (copy_from_user(&req, arg, sizeof(req)))
+ 		return -EFAULT;
+@@ -429,8 +429,11 @@ static int rfcomm_release_dev(void __user *arg)
+ 		rfcomm_dlc_close(dev->dlc, 0);
  
+ 	/* Shut down TTY synchronously before freeing rfcomm_dev */
+-	if (dev->port.tty)
+-		tty_vhangup(dev->port.tty);
++	tty = tty_port_tty_get(&dev->port);
++	if (tty) {
++		tty_vhangup(tty);
++		tty_kref_put(tty);
++	}
+ 
+ 	if (!test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags))
+ 		rfcomm_dev_del(dev);
+@@ -563,6 +566,7 @@ static void rfcomm_dev_data_ready(struct rfcomm_dlc *dlc, struct sk_buff *skb)
+ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
+ {
+ 	struct rfcomm_dev *dev = dlc->owner;
++	struct tty_struct *tty;
+ 	if (!dev)
+ 		return;
+ 
+@@ -572,7 +576,8 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
+ 	wake_up_interruptible(&dev->wait);
+ 
+ 	if (dlc->state == BT_CLOSED) {
+-		if (!dev->port.tty) {
++		tty = tty_port_tty_get(&dev->port);
++		if (!tty) {
+ 			if (test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags)) {
+ 				/* Drop DLC lock here to avoid deadlock
+ 				 * 1. rfcomm_dev_get will take rfcomm_dev_lock
+@@ -591,8 +596,10 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
+ 				tty_port_put(&dev->port);
+ 				rfcomm_dlc_lock(dlc);
+ 			}
+-		} else
+-			tty_hangup(dev->port.tty);
++		} else {
++			tty_hangup(tty);
++			tty_kref_put(tty);
++		}
+ 	}
+ }
+ 
+@@ -604,10 +611,8 @@ static void rfcomm_dev_modem_status(struct rfcomm_dlc *dlc, u8 v24_sig)
+ 
+ 	BT_DBG("dlc %p dev %p v24_sig 0x%02x", dlc, dev, v24_sig);
+ 
+-	if ((dev->modem_status & TIOCM_CD) && !(v24_sig & RFCOMM_V24_DV)) {
+-		if (dev->port.tty && !C_CLOCAL(dev->port.tty))
+-			tty_hangup(dev->port.tty);
+-	}
++	if ((dev->modem_status & TIOCM_CD) && !(v24_sig & RFCOMM_V24_DV))
++		tty_port_tty_hangup(&dev->port, true);
+ 
+ 	dev->modem_status =
+ 		((v24_sig & RFCOMM_V24_RTC) ? (TIOCM_DSR | TIOCM_DTR) : 0) |
 -- 
 1.8.3.4
