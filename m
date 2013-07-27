@@ -1,67 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix calling request callback more than once
-Date: Sat, 27 Jul 2013 13:29:10 -0500
-Message-Id: <1374949750-3253-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <51F3B7E9.2040208@hurleysoftware.com>
+Date: Sat, 27 Jul 2013 08:07:05 -0400
+From: Peter Hurley <peter@hurleysoftware.com>
+MIME-Version: 1.0
+To: Gianluca Anzolin <gianluca@sottospazio.it>
+CC: gustavo@padovan.org, marcel@holtmann.org,
+ linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org,
+ jslaby@suse.cz
+Subject: Re: [PATCH v4 5/6] rfcomm: Fix the reference counting of tty_port
+References: <1374859138-19467-1-git-send-email-gianluca@sottospazio.it> <1374859138-19467-6-git-send-email-gianluca@sottospazio.it> <51F3125F.30303@hurleysoftware.com> <20130727044809.GA22696@sottospazio.it>
+In-Reply-To: <20130727044809.GA22696@sottospazio.it>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+On 07/27/2013 12:48 AM, Gianluca Anzolin wrote:
+> On Fri, Jul 26, 2013 at 08:20:47PM -0400, Peter Hurley wrote:
+>> On 07/26/2013 01:18 PM, Gianluca Anzolin wrote:
+>>> @@ -614,7 +601,9 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
+>>>   					return;
+>>>   				}
+>>>
+>>> -				rfcomm_dev_del(dev);
+>>> +				set_bit(RFCOMM_TTY_RELEASED, &dev->flags);
+>>> +				tty_port_put(&dev->port);
+>>
+>> Since this code can execute concurrently with rfcomm_release_dev(),
+>> and the 'initial' port reference must only be dropped once, this should be
+>>
+>> 				if (!test_and_set_bit(RFCOMM_TTY_RELEASED, &dev->flags)
+>> 					tty_port_put(&dev->port);
+>>
+>> Regards,
+>> Peter Hurley
+>
+> I somehow convinced myself that it was safe but clearly it wasn't. Should I
+> also change the same way the code in rfcomm_tty_hangup()?
 
-In certain circumstances, such as an HCI driver using __hci_cmd_sync_ev
-with HCI_EV_CMD_COMPLETE as the expected completion event there is the
-chance that hci_event_packet will call hci_req_cmd_complete twice (once
-for the explicitly looked after event and another time in the actual
-handler of cmd_complete).
+Yes, I think that's wise. For example,
 
-In the case of __hci_cmd_sync_ev this introduces a race where the first
-call wakes up the blocking __hci_cmd_sync_ev and lets it complete.
-However, by the time that a second __hci_cmd_sync_ev call is already in
-progress the second hci_req_cmd_complete call (from the previous
-operation) will wake up the blocking function prematurely and cause it
-to fail, as witnessed by the following log:
+CPU 0                                  | CPU 1
+                                        |
+rfcomm_dev_state_change                |
+   tty_port_tty_get                     |
+     tty_hangup                         | rfcomm_release_dev
+      .                                 |   .
+      .                                 |   .
+      .                                 |   .
+     do_tty_hangup                      |   .
+       __tty_hangup                     |   .
+         rfcomm_tty_hangup              |   .
+           tty_port_hangup              |   .
+                                        |   if (!test_and_set_bit(RFCOMM_TTY_RELEASED))
+                                        |     tty_port_put
+           set_bit(RFCOMM_TTY_RELEASED) |
+           tty_port_put                 |
 
-[  639.232195] hci_rx_work: hci0 Event packet
-[  639.232201] hci_req_cmd_complete: opcode 0xfc8e status 0x00
-[  639.232205] hci_sent_cmd_data: hci0 opcode 0xfc8e
-[  639.232210] hci_req_sync_complete: hci0 result 0x00
-[  639.232220] hci_cmd_complete_evt: hci0 opcode 0xfc8e
-[  639.232225] hci_req_cmd_complete: opcode 0xfc8e status 0x00
-[  639.232228] __hci_cmd_sync_ev: hci0 end: err 0
-[  639.232234] __hci_cmd_sync_ev: hci0
-[  639.232238] hci_req_add_ev: hci0 opcode 0xfc8e plen 250
-[  639.232242] hci_prepare_cmd: skb len 253
-[  639.232246] hci_req_run: length 1
-[  639.232250] hci_sent_cmd_data: hci0 opcode 0xfc8e
-[  639.232255] hci_req_sync_complete: hci0 result 0x00
-[  639.232266] hci_cmd_work: hci0 cmd_cnt 1 cmd queued 1
-[  639.232271] __hci_cmd_sync_ev: hci0 end: err 0
-[  639.232276] Bluetooth: hci0 sending Intel patch command (0xfc8e) failed (-61)
+Also, in the commit message you should explain that
+!test_and_set_bit(RFCOMM_TTY_RELEASED) ensures that the 'initial'
+tty_port reference is only dropped once.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_core.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+On a side note, I think this exposes a flaw in the tty layer hangup handling.
+It seems possible that an async hangup could be scheduled while a
+sync hangup is in-progress (and vice versa). While the two hangups would
+not execute concurrently (because the tty lock serializes hangups),
+they would execute sequentially and that would be bad.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index b821b19..1f461fc 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3399,6 +3399,13 @@ void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status)
- 	 */
- 	if (hdev->sent_cmd) {
- 		req_complete = bt_cb(hdev->sent_cmd)->req.complete;
-+
-+		/* We must set the complete callback to NULL to avoid
-+		 * calling the callback more than once if this
-+		 * function gets called again.
-+		 */
-+		bt_cb(hdev->sent_cmd)->req.complete = NULL;
-+
- 		if (req_complete)
- 			goto call_complete;
- 	}
--- 
-1.8.3.2
+I'm testing a mock-up now.
 
+Regards,
+Peter Hurley
