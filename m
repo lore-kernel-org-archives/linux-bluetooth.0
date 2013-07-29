@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/7] audio/AVRCP: Connect browsing channel when accepting the connection
-Date: Mon, 29 Jul 2013 17:04:36 +0300
-Message-Id: <1375106679-14645-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/7] audio/AVRCP: Fix not connecting Browsing channel when supported
+Date: Mon, 29 Jul 2013 17:04:34 +0300
+Message-Id: <1375106679-14645-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1375106679-14645-1-git-send-email-luiz.dentz@gmail.com>
 References: <1375106679-14645-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,121 +11,79 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If remote stack for some reason don't connect the browsing channel
-connect it after a timeout (1 sec.)
+Both controller and target services can initiate the connection but
+probably only one of the services will be in CONNECTING state which may
+happen to not have browsing feature set.
+
+Currently this happens when connecting BlueZ vs BlueZ where the CT record
+does not have browsing feature set so if the corresponding service start
+connecting it wont connect the browsing channel due to lack of feature.
 ---
- profiles/audio/avrcp.c | 56 ++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 48 insertions(+), 8 deletions(-)
+ profiles/audio/avrcp.c | 14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
 
 diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 32b9615..8c39d96 100644
+index 1160f68..b2135c5 100644
 --- a/profiles/audio/avrcp.c
 +++ b/profiles/audio/avrcp.c
-@@ -131,6 +131,8 @@
+@@ -3303,7 +3303,6 @@ static void target_init(struct avrcp *session)
+ 	struct avrcp_data *target;
+ 	struct avrcp_player *player;
+ 	struct btd_service *service;
+-	btd_service_state_t old_state = BTD_SERVICE_STATE_UNAVAILABLE;
  
- #define AVRCP_CHARSET_UTF8		106
+ 	if (session->target != NULL)
+ 		return;
+@@ -3314,10 +3313,8 @@ static void target_init(struct avrcp *session)
+ 	DBG("%p version 0x%04x", target, target->version);
  
-+#define AVRCP_BROWSING_TIMEOUT		1
-+
- #if __BYTE_ORDER == __LITTLE_ENDIAN
+ 	service = btd_device_get_service(session->dev, AVRCP_REMOTE_UUID);
+-	if (service != NULL) {
+-		old_state = btd_service_get_state(service);
++	if (service != NULL)
+ 		btd_service_connecting_complete(service, 0);
+-	}
  
- struct avrcp_header {
-@@ -228,6 +230,7 @@ struct avrcp {
- 	unsigned int passthrough_id;
- 	unsigned int control_id;
- 	unsigned int browsing_id;
-+	unsigned int browsing_timer;
- 	uint16_t supported_events;
- 	uint16_t registered_events;
- 	uint8_t transaction;
-@@ -3267,6 +3270,11 @@ static void destroy_browsing(void *data)
- 
- static void session_init_browsing(struct avrcp *session)
- {
-+	if (session->browsing_timer > 0) {
-+		g_source_remove(session->browsing_timer);
-+		session->browsing_timer = 0;
-+	}
-+
- 	session->browsing_id = avctp_register_browsing_pdu_handler(
- 							session->conn,
- 							handle_browsing_pdu,
-@@ -3298,6 +3306,35 @@ static struct avrcp_data *data_init(struct avrcp *session, const char *uuid)
- 	return data;
- }
- 
-+static gboolean connect_browsing(gpointer user_data)
-+{
-+	struct avrcp *session = user_data;
-+
-+	session->browsing_timer = 0;
-+
-+	avctp_connect_browsing(session->conn);
-+
-+	return FALSE;
-+}
-+
-+static void avrcp_connect_browsing(struct avrcp *session)
-+{
-+	/* Immediately connect browsing channel if initiator otherwise delay
-+	 * it to avoid possible collisions
-+	 */
-+	if (avctp_is_initiator(session->conn)) {
-+		avctp_connect_browsing(session->conn);
-+		return;
-+	}
-+
-+	if (session->browsing_timer > 0)
-+		return;
-+
-+	session->browsing_timer = g_timeout_add_seconds(AVRCP_BROWSING_TIMEOUT,
-+							connect_browsing,
-+							session);
-+}
-+
- static void target_init(struct avrcp *session)
- {
- 	struct avrcp_server *server = session->server;
-@@ -3339,10 +3376,10 @@ static void target_init(struct avrcp *session)
- 	if (session->controller == NULL)
+ 	if (target->version < 0x0103)
+ 		return;
+@@ -3342,7 +3339,7 @@ static void target_init(struct avrcp *session)
  		avrcp_get_capabilities(session);
  
--	/* Auto-connect browsing channel only if initiator */
--	if (avctp_is_initiator(session->conn) &&
--				target->features & AVRCP_FEATURE_BROWSING)
--		avctp_connect_browsing(session->conn);
-+	if (!(target->features & AVRCP_FEATURE_BROWSING))
-+		return;
-+
-+	avrcp_connect_browsing(session);
+ 	/* Auto-connect browsing channel only if initiator */
+-	if (old_state == BTD_SERVICE_STATE_CONNECTING &&
++	if (avctp_is_initiator(session->conn) &&
+ 				target->features & AVRCP_FEATURE_BROWSING)
+ 		avctp_connect_browsing(session->conn);
  }
+@@ -3352,7 +3349,6 @@ static void controller_init(struct avrcp *session)
+ 	struct avrcp_player *player;
+ 	struct btd_service *service;
+ 	struct avrcp_data *controller;
+-	btd_service_state_t old_state = BTD_SERVICE_STATE_UNAVAILABLE;
  
- static void controller_init(struct avrcp *session)
-@@ -3382,10 +3419,10 @@ static void controller_init(struct avrcp *session)
- 	if (controller->version < 0x0104)
+ 	if (session->controller != NULL)
+ 		return;
+@@ -3366,10 +3362,8 @@ static void controller_init(struct avrcp *session)
+ 		session->supported_events |= (1 << AVRCP_EVENT_VOLUME_CHANGED);
+ 
+ 	service = btd_device_get_service(session->dev, AVRCP_TARGET_UUID);
+-	if (service != NULL) {
+-		old_state = btd_service_get_state(service);
++	if (service != NULL)
+ 		btd_service_connecting_complete(service, 0);
+-	}
+ 
+ 	/* Only create player if category 1 is supported */
+ 	if (!(controller->features & AVRCP_FEATURE_CATEGORY_1))
+@@ -3388,7 +3382,7 @@ static void controller_init(struct avrcp *session)
  		return;
  
--	/* Auto-connect browsing channel only if initiator */
--	if (avctp_is_initiator(session->conn) &&
--				controller->features & AVRCP_FEATURE_BROWSING)
--		avctp_connect_browsing(session->conn);
-+	if (!(controller->features & AVRCP_FEATURE_BROWSING))
-+		return;
-+
-+	avrcp_connect_browsing(session);
+ 	/* Auto-connect browsing channel only if initiator */
+-	if (old_state == BTD_SERVICE_STATE_CONNECTING &&
++	if (avctp_is_initiator(session->conn) &&
+ 				controller->features & AVRCP_FEATURE_BROWSING)
+ 		avctp_connect_browsing(session->conn);
  }
- 
- static void session_init_control(struct avrcp *session)
-@@ -3454,6 +3491,9 @@ static void session_destroy(struct avrcp *session)
- 
- 	server->sessions = g_slist_remove(server->sessions, session);
- 
-+	if (session->browsing_timer > 0)
-+		g_source_remove(session->browsing_timer);
-+
- 	if (session->controller != NULL)
- 		controller_destroy(session);
- 
 -- 
 1.8.3.1
 
