@@ -1,36 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Hector Palacios <hector.palacios@digi.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <marcel@holtmann.org>, <gustavo@padovan.org>, <johan.hedberg@gmail.com>,
-	<linux-kernel@vger.kernel.org>, <vikram.kandukuri@atheros.com>,
-	<suraj@atheros.com>, <hector.palacios@digi.com>
-Subject: [PATCH] bluetooth: remove wrong dependency for BT_ATH3K
-Date: Mon, 29 Jul 2013 18:12:05 +0200
-Message-ID: <1375114325-25498-1-git-send-email-hector.palacios@digi.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Gianluca Anzolin <gianluca@sottospazio.it>
+To: gustavo@padovan.org
+Cc: peter@hurleysoftware.com,
+	marcel@holtmann.org,
+	linux-bluetooth@vger.kernel.org,
+	gregkh@linuxfoundation.org,
+	jslaby@suse.cz,
+	Gianluca Anzolin <gianluca@sottospazio.it>
+Subject: [PATCH v5 6/6] rfcomm: Purge the dlc->tx_queue to avoid circular dependency
+Date: Mon, 29 Jul 2013 17:08:13 +0200
+Message-Id: <1375110493-5237-7-git-send-email-gianluca@sottospazio.it>
+In-Reply-To: <1375110493-5237-1-git-send-email-gianluca@sottospazio.it>
+References: <1375110493-5237-1-git-send-email-gianluca@sottospazio.it>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Atheros firmware download driver is not dependent on HCI
-USB driver. This driver is needed to complement any Atheros
-driver like BT_HCIUART_ATH3K.
+In rfcomm_tty_cleanup we purge the dlc->tx_queue which may contain
+socket buffers referencing the tty_port and thus preventing the tty_port
+destruction.
 
-Signed-off-by: Hector Palacios <hector.palacios@digi.com>
-CC: Suraj Sumangala <suraj@atheros.com>
-CC: Vikram Kandukuri <vikram.kandukuri@atheros.com>
+Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
 ---
- drivers/bluetooth/Kconfig | 1 -
- 1 file changed, 1 deletion(-)
+ net/bluetooth/rfcomm/tty.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 11a6104..a1d482b 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -222,7 +222,6 @@ config BT_MRVL_SDIO
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index 3e078b7..6d126fa 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -668,6 +668,12 @@ static void rfcomm_tty_cleanup(struct tty_struct *tty)
+ 	tty->driver_data = NULL;
+ 	rfcomm_dlc_unlock(dev->dlc);
  
- config BT_ATH3K
- 	tristate "Atheros firmware download driver"
--	depends on BT_HCIBTUSB
- 	select FW_LOADER
- 	help
- 	  Bluetooth firmware download driver.
++	/*
++	 * purge the dlc->tx_queue to avoid circular dependencies
++	 * between dev and dlc
++	 */
++	skb_queue_purge(&dev->dlc->tx_queue);
++
+ 	tty_port_put(&dev->port);
+ }
+ 
+-- 
+1.8.3.4
