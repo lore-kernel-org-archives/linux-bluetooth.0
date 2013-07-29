@@ -1,62 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <51F7722E.9050708@digi.com>
-Date: Tue, 30 Jul 2013 09:58:38 +0200
-From: Hector Palacios <hector.palacios@digi.com>
-MIME-Version: 1.0
+From: Bing Zhao <bzhao@marvell.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"gustavo@padovan.org" <gustavo@padovan.org>, "johan.hedberg@gmail.com"
-	<johan.hedberg@gmail.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, <lrodriguez@atheros.com>, "suraj@atheros.com"
-	<suraj@atheros.com>
-Subject: Re: [PATCH] bluetooth: remove wrong dependency for BT_ATH3K
-References: <1375114325-25498-1-git-send-email-hector.palacios@digi.com> <5438CD3C-E28C-485C-94B8-F743E8B13D4A@holtmann.org>
-In-Reply-To: <5438CD3C-E28C-485C-94B8-F743E8B13D4A@holtmann.org>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+	Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, "linux-wireless@vger.kernel.org"
+	<linux-wireless@vger.kernel.org>, Amitkumar Karwar <akarwar@marvell.com>
+Date: Mon, 29 Jul 2013 16:20:03 -0700
+Subject: RE: [PATCH] Bluetooth: btmrvl: add calibration data download support
+Message-ID: <477F20668A386D41ADCC57781B1F70430EA3215F9B@SC-VEXCH1.marvell.com>
+References: <1375126147-28642-1-git-send-email-bzhao@marvell.com>
+ <39BF90E7-8341-412E-A372-6039B703980D@holtmann.org>
+ <477F20668A386D41ADCC57781B1F70430EA3215F2E@SC-VEXCH1.marvell.com>
+ <791D5341-CA33-425C-BFB8-CB65F5451E39@holtmann.org>
+In-Reply-To: <791D5341-CA33-425C-BFB8-CB65F5451E39@holtmann.org>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On 07/29/2013 06:43 PM, Marcel Holtmann wrote:
-> Hi Hector,
->
->> The Atheros firmware download driver is not dependent on HCI
->> USB driver. This driver is needed to complement any Atheros
->> driver like BT_HCIUART_ATH3K.
->>
->> Signed-off-by: Hector Palacios <hector.palacios@digi.com>
->> CC: Suraj Sumangala <suraj@atheros.com>
->> CC: Vikram Kandukuri <vikram.kandukuri@atheros.com>
->> ---
->> drivers/bluetooth/Kconfig | 1 -
->> 1 file changed, 1 deletion(-)
->>
->> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
->> index 11a6104..a1d482b 100644
->> --- a/drivers/bluetooth/Kconfig
->> +++ b/drivers/bluetooth/Kconfig
->> @@ -222,7 +222,6 @@ config BT_MRVL_SDIO
->>
->> config BT_ATH3K
->> 	tristate "Atheros firmware download driver"
->> -	depends on BT_HCIBTUSB
->> 	select FW_LOADER
->> 	help
->> 	  Bluetooth firmware download driver.
->>
->
-> I am confused now. How can an USB driver work with an UART driver? If you do not want to depend on BT_HCIBTUSB then that is fine, but at least you need to depend on USB.
+> it is also way harder to use and things need to be manually configured. D=
+on't know know when the
+> device needs calibration information or not. And you can just request_fir=
+mware() that file. If it is
+> there, then load it, if not then skip the step.
 
-The thing is I have an Atheros AR6233 chipset which has wireless and Bluetooth. 
-Bluetooth part in this chip operates as a UART. The driver for this is hci_ath.c but I 
-also need to download the firmware to the chip, and for this I need to compile 
-ath3k.c. However I don't need BT_HCIBTUSB.
-But you are right, looking at the source code of ath3k.c it is calling usb commands, 
-so it needs to depend on USB at least.
+Thanks for your suggestion. This approach should work for me.
 
-This brings an interesting question: shouldn't the firmware download part be isolated 
-from the USB driver? After all, I want to communicate with a UART bluetooth chip.
+>=20
+> > The firmware_request() requires a relative file path under /lib/firmwar=
+e/.
+> > What is the standard location you are referring to?
+>=20
+> You have to create proper filenames for your hardware. Like mrvl/cal_data=
+_v1.conf or similar.
 
-Best regards,
---
-Hector Palacios
+Sure.
+
+> As I said above, the device should know if it needs calibration or not. A=
+nd just installing a file on
+> disk is simpler than having to modify the module parameters somewhere.
+
+This makes sense. I'll take your approach and re-spin the patch.
+
+Thanks,
+Bing
