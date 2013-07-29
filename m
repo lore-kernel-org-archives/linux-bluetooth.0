@@ -1,38 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Dirk-Jan C. Binnema" <djcb.bulk@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: "Dirk-Jan C. Binnema" <djcb@djcbsoftware.nl>
-Subject: [PATCH 1/3] Update gatt_service_add size assert for dealing with 128-bit uuids
-Date: Mon, 29 Jul 2013 11:42:48 -0700
-Message-Id: <1375123370-20055-1-git-send-email-djcb.bulk@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
+Subject: Re: [PATCH] bluetooth: remove wrong dependency for BT_ATH3K
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1375114325-25498-1-git-send-email-hector.palacios@digi.com>
+Date: Mon, 29 Jul 2013 09:43:53 -0700
+Cc: <linux-bluetooth@vger.kernel.org>, <gustavo@padovan.org>,
+	<johan.hedberg@gmail.com>, <linux-kernel@vger.kernel.org>,
+	<vikram.kandukuri@atheros.com>, <suraj@atheros.com>
+Message-Id: <5438CD3C-E28C-485C-94B8-F743E8B13D4A@holtmann.org>
+References: <1375114325-25498-1-git-send-email-hector.palacios@digi.com>
+To: Hector Palacios <hector.palacios@digi.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: "Dirk-Jan C. Binnema" <djcb@djcbsoftware.nl>
+Hi Hector,
 
-To paraphrase Anderson Lizardo: "h" was overflowing for 128-bit services
-because the handle is incremented after each attribute is added so at the
-end we had: 0xffff + 1 == 0 (h is uint16_t).
+> The Atheros firmware download driver is not dependent on HCI
+> USB driver. This driver is needed to complement any Atheros
+> driver like BT_HCIUART_ATH3K.
+> 
+> Signed-off-by: Hector Palacios <hector.palacios@digi.com>
+> CC: Suraj Sumangala <suraj@atheros.com>
+> CC: Vikram Kandukuri <vikram.kandukuri@atheros.com>
+> ---
+> drivers/bluetooth/Kconfig | 1 -
+> 1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+> index 11a6104..a1d482b 100644
+> --- a/drivers/bluetooth/Kconfig
+> +++ b/drivers/bluetooth/Kconfig
+> @@ -222,7 +222,6 @@ config BT_MRVL_SDIO
+> 
+> config BT_ATH3K
+> 	tristate "Atheros firmware download driver"
+> -	depends on BT_HCIBTUSB
+> 	select FW_LOADER
+> 	help
+> 	  Bluetooth firmware download driver.
+> 
 
-As it seems more complex to try to remove the overflow without
-affecting the logic too much, we update the assertion.
----
- attrib/gatt-service.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I am confused now. How can an USB driver work with an UART driver? If you do not want to depend on BT_HCIBTUSB then that is fine, but at least you need to depend on USB.
 
-diff --git a/attrib/gatt-service.c b/attrib/gatt-service.c
-index 4b02d39..1b84c89 100644
---- a/attrib/gatt-service.c
-+++ b/attrib/gatt-service.c
-@@ -341,7 +341,7 @@ gboolean gatt_service_add(struct btd_adapter *adapter, uint16_t uuid,
- 	}
- 
- 	g_assert(size < USHRT_MAX);
--	g_assert(h - start_handle == (uint16_t) size);
-+	g_assert(h == 0 || (h - start_handle == (uint16_t) size));
- 	g_slist_free_full(chrs, free_gatt_info);
- 
- 	return TRUE;
--- 
-1.8.1.4
+Regards
+
+Marcel
 
