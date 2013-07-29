@@ -1,61 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gianluca Anzolin <gianluca@sottospazio.it>
-To: gustavo@padovan.org
-Cc: peter@hurleysoftware.com,
-	marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org,
-	gregkh@linuxfoundation.org,
-	jslaby@suse.cz,
-	Gianluca Anzolin <gianluca@sottospazio.it>
-Subject: [PATCH v5 0/6] rfcomm: Implement rfcomm as a proper tty_port
-Date: Mon, 29 Jul 2013 17:08:07 +0200
-Message-Id: <1375110493-5237-1-git-send-email-gianluca@sottospazio.it>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 7/7] audio/AVCTP: Do not process browsing queue until connection completes
+Date: Mon, 29 Jul 2013 17:04:39 +0300
+Message-Id: <1375106679-14645-7-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1375106679-14645-1-git-send-email-luiz.dentz@gmail.com>
+References: <1375106679-14645-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patchset addresses an issue with the rfcomm tty driver in the
-current stable kernels that manifests itself as a sudden lockup of the
-whole machine or as a OOPS if we are lucky enough (I wasn't).
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Triggering the problem is very easy:
+Any request processed before the connection completes will likely fail
+in avctp_browsing_send so instead delay the processing.
+---
+ profiles/audio/avctp.c | 24 ++++++++++++++++++------
+ 1 file changed, 18 insertions(+), 6 deletions(-)
 
-1) establish a bluetooth connection with a bluetooth host
-2) open the tty it provides with some program
-3) turn off the bluetooth host or take it out of range
-
-After a timeout the machine freezes.
-
-Another way to trigger these lockups is to simply release the rfcomm
-tty.
-
-This happens beacuse the underlying tty_struct objects and tty_port
-objects are freed while being used: the code doesn't take proper
-references to them.
-
-The following patches address the problem by implementing a proper
-tty_port driver for rfcomm.
-
-There are still some issues left: one relevant to flow control (which is
-also missing in the current code) and another relevant to a corner case
-in rfcomm_dev_state_change() that I intend to fix with a future patch.
-They are commented with a FIXME.
-
-Changes from v4:
-  [PATCH 3/6]: left the debug message in rfcomm_tty_open()
-  [PATCH 5/6]: always use !test_and_set_bit() to release the tty_port
-
-Thank you,
-Gianluca
-
-Gianluca Anzolin (6):
-  rfcomm: Take proper tty_struct references
-  rfcomm: Remove the device from the list in the destructor
-  rfcomm: Move the tty initialization and cleanup out of open/close
-  rfcomm: Implement .activate, .shutdown and .carrier_raised methods
-  rfcomm: Fix the reference counting of tty_port
-  rfcomm: Purge the dlc->tx_queue to avoid circular dependency
-
- net/bluetooth/rfcomm/tty.c | 271 +++++++++++++++++++++------------------------
- 1 file changed, 126 insertions(+), 145 deletions(-)
-
+diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+index 2c1aa94..845027f 100644
+--- a/profiles/audio/avctp.c
++++ b/profiles/audio/avctp.c
+@@ -1107,6 +1107,7 @@ static void avctp_connect_browsing_cb(GIOChannel *chan, GError *err,
+ 							gpointer data)
+ {
+ 	struct avctp *session = data;
++	struct avctp_channel *browsing = session->browsing;
+ 	char address[18];
+ 	uint16_t imtu, omtu;
+ 	GError *gerr = NULL;
+@@ -1131,18 +1132,25 @@ static void avctp_connect_browsing_cb(GIOChannel *chan, GError *err,
+ 
+ 	DBG("AVCTP Browsing: connected to %s", address);
+ 
+-	if (session->browsing == NULL)
+-		session->browsing = avctp_channel_create(session, chan,
++	if (browsing == NULL) {
++		browsing = avctp_channel_create(session, chan,
+ 						avctp_destroy_browsing);
++		session->browsing = browsing;
++	}
+ 
+-	session->browsing->imtu = imtu;
+-	session->browsing->omtu = omtu;
+-	session->browsing->buffer = g_malloc0(MAX(imtu, omtu));
+-	session->browsing->watch = g_io_add_watch(session->browsing->io,
++	browsing->imtu = imtu;
++	browsing->omtu = omtu;
++	browsing->buffer = g_malloc0(MAX(imtu, omtu));
++	browsing->watch = g_io_add_watch(session->browsing->io,
+ 				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
+ 				(GIOFunc) session_browsing_cb, session);
+ 
+ 	avctp_set_state(session, AVCTP_STATE_BROWSING_CONNECTED);
++
++	/* Process any request that was pending the connection to complete */
++	if (browsing->process_id == 0 && !g_queue_is_empty(browsing->queue))
++		browsing->process_id = g_idle_add(process_queue, browsing);
++
+ 	return;
+ 
+ fail:
+@@ -1543,6 +1551,10 @@ int avctp_send_browsing_req(struct avctp *session,
+ 
+ 	g_queue_push_tail(browsing->queue, p);
+ 
++	/* Connection did not complete, delay process of the request */
++	if (browsing->watch == 0)
++		return 0;
++
+ 	if (browsing->process_id == 0)
+ 		browsing->process_id = g_idle_add(process_queue, browsing);
+ 
 -- 
-1.8.3.4
+1.8.3.1
+
