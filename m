@@ -1,59 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 30 Jul 2013 13:38:48 +0100
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth 2013-07-30
+Message-ID: <20130730123848.GE5975@joana>
 MIME-Version: 1.0
-Date: Tue, 30 Jul 2013 06:08:08 -0700
-Message-ID: <CALvrRrayFrDqhm7hoDRpdnbaXhpzaSq9Q7+4GoXEnqBi82KcKQ@mail.gmail.com>
-Subject: gatt advertising
-From: Dirk-Jan Binnema <djcb.bulk@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="d6Gm4EdcadzBjdND"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
 
-I'm trying to build a GATT-based service that exposes some
-characteristics that can be accessed by clients; I'm using
-gatt_add_service_add for that, and the BLExplr app on the iPhone side.
+--d6Gm4EdcadzBjdND
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The good news is that it seems to be possibly to do so :-) (I'm using
-git master + the 128-bit uuid patch I wrote); however, it seems the
-service is not advertised; I need to connect to the device first before
-I can see it; at least when trying with an iPhone.
+Hi John,
 
-So, a few questions:
+A few fixes and devices ID additions for 3.11:=20
 
-- Is any extra step is needed to advertise the service beyond
-  gatt_service_add and 'hciconfig leadv'?
+ * There are 4 new ath3k device ids=20
+ * Fixed stack memory usage in ath3k.
+ * Fixed the init process of BlueFRITZ! devices, they were failing to init
+   due to an unsupported command we sent.=20
+ * Fixed wrong use of PTR_ERR in btusb code that was preventing intel devic=
+es
+   to work properly.
+ * Fixed race condition between hci_register_dev() and hci_dev_open() that
+   could cause a NULL pointer dereference.
+ * Fixed race condition that could call hci_req_cmd_complete() and make some
+   devices to fail as showed in the log added to the commit message.
 
-  (It seems that neither mine, nor any of the other services (proximity,
-  time, alert, ...) are recognized until after I connect(*). After
-  connection, I can see all of them.
+Please pull or let me know of any issues. Thanks.
 
-- It also seems the device stops advertising after a while -- is there
-  some way to programmatically put it in advertising mode (like
-  hciconfig leadv) and keep it that way?
+	Gustavo
 
-- Should the UUID of the service be part of the UUIDs property in
-  org.Bluez.Adapter1 and org.bluez.Device1? (I tried 'btmgmt aad-uuid
-  <uuid> 0' and then then <uuid> becomes visible in the
-  org.bluez.Device1 UUIDs, but sadly, the iPhone still doesn't seem to
-  see it, pre-connection).
+--
+The following changes since commit 075163bbb0f51174359947e1bce84f5edb23f21e:
 
-I don't really know what to expect, what things I may be missing, and if
-perhaps things are missing in Bluez implementation, so any help is
-welcome!
+  ath9k_htc: Handle IDLE state transition properly (2013-06-24 13:52:52 -04=
+00)
 
-Thanks in advance,
-Dirk.
+are available in the git repository at:
 
-[ my apologies if you received this message more than once; it seems
-the message didn't reach the mailing list, so I tried again... ]
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
 
+for you to fetch changes up to 53e21fbc288218a423959f878c86471a0e323a9a:
 
-(*) but for some reason, in the aforementioned app, I can see the 'Tx Power
-Level' value before connection.
+  Bluetooth: Fix calling request callback more than once (2013-07-29 12:28:=
+04 +0100)
 
--- 
-Dirk-Jan C. Binnema                  Helsinki, Finland
-e:djcb@djcbsoftware.nl           w:www.djcbsoftware.nl
-pgp: D09C E664 897D 7D39 5047 A178 E96A C7A1 017D DA3C
+----------------------------------------------------------------
+AceLan Kao (2):
+      Bluetooth: Add support for Atheros [0cf3:3121]
+      Bluetooth: Add support for Atheros [0cf3:e003]
+
+Adam Lee (1):
+      Bluetooth: fix wrong use of PTR_ERR() in btusb
+
+Gustavo Padovan (1):
+      Bluetooth: Fix race between hci_register_dev() and hci_dev_open()
+
+Jaganath Kanakkassery (1):
+      Bluetooth: Fix invalid length check in l2cap_information_rsp()
+
+Johan Hedberg (2):
+      Bluetooth: Fix HCI init for BlueFRITZ! devices
+      Bluetooth: Fix calling request callback more than once
+
+Stanislaw Gruszka (1):
+      Bluetooth: ath3k: don't use stack memory for DMA
+
+Sujith Manoharan (1):
+      Bluetooth: ath3k: Add support for ID 0x13d3/0x3402
+
+Thomas Loo (1):
+      Bluetooth: ath3k: Add support for Fujitsu Lifebook UH5x2 [04c5:1330]
+
+ drivers/bluetooth/ath3k.c  | 46 +++++++++++++++++++++++++++++++++++++-----=
+----
+ drivers/bluetooth/btusb.c  | 18 +++++++++++-------
+ net/bluetooth/hci_core.c   | 26 +++++++++++++++++---------
+ net/bluetooth/l2cap_core.c |  2 +-
+ 4 files changed, 66 insertions(+), 26 deletions(-)
+
+--d6Gm4EdcadzBjdND
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.13 (GNU/Linux)
+
+iQIcBAEBAgAGBQJR97PYAAoJEPs3PUX4s20ocDYP/jkiaZtLDJNxdG6WmcFaciBv
+hgjbraGZ1cW0jXJmOfbpjK0P+YcHcrx2j+RlDNj55rs+JY+GKeAuQUzXuR0vy7cB
+uxAWWaqNbUziLYG+QUD6gq0GnM6AkgGz5I62gVly3UZ0i+qr5Bo8ayEY1ZBSTqws
+jrTNE5FKUQtGjinxxxQalnpjbcnUyw0mfQ6xmbF+yYqRiJZUTUNVuKeDwu6e3xIQ
+ummvCcKyoucey9D0s2U8SvpmvXWrXo3cAEe9rXolYcfzKHjYPAihISdTovI7qL3q
+XRKfL7FSJTHzl4NudLS/d8klueItSjtFzVmRpdKihH2spSA+RNSMZr4IQHGJoJgw
+A4XdTRrM3CORAzF/hkjAe9TxkB8gsnVHjFazER/TUGYBsTuzfXEmQFtepqE/cRjH
+imzLiStzSgaIEJQgpUEchDy+RxPoDcOox/q0PUWeHhnjVShUcjTnuvxKtdcNbgFl
+G/qSxjUfsCIu/5+uw0PFu7mEt+CKnNesP21Y2vETujXz1p2murpm1rHqlS0gLrtE
+QlemfdKL735aWolFXkCNZ4YxjnNwm7zju7rh52xd+6h0wxQiqUb6CdNf7O87jtc7
+s+50+t7PAtiEWX+TtxJr80pQmCKndOh5e1lr1ZOa8rQvhOt6RRBzkyzuj11gf9mP
+aTUzvpALst82EWooWUd1
+=qQs1
+-----END PGP SIGNATURE-----
+
+--d6Gm4EdcadzBjdND--
