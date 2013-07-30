@@ -1,111 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 30 Jul 2013 13:38:48 +0100
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth 2013-07-30
-Message-ID: <20130730123848.GE5975@joana>
+Date: Tue, 30 Jul 2013 14:28:18 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: "Dirk-Jan C. Binnema" <djcb.bulk@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	"Dirk-Jan C. Binnema" <djcb@djcbsoftware.nl>
+Subject: Re: [PATCH 1/3] Update gatt_service_add size assert for dealing with
+ 128-bit uuids
+Message-ID: <20130730112818.GC12745@x220.p-661hnu-f1>
+References: <1375123370-20055-1-git-send-email-djcb.bulk@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="d6Gm4EdcadzBjdND"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1375123370-20055-1-git-send-email-djcb.bulk@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Dirk,
 
---d6Gm4EdcadzBjdND
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Mon, Jul 29, 2013, Dirk-Jan C. Binnema wrote:
+> To paraphrase Anderson Lizardo: "h" was overflowing for 128-bit services
+> because the handle is incremented after each attribute is added so at the
+> end we had: 0xffff + 1 == 0 (h is uint16_t).
+> 
+> As it seems more complex to try to remove the overflow without
+> affecting the logic too much, we update the assertion.
+> ---
+>  attrib/gatt-service.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Hi John,
+I made a couple of more cosmetic cleanups and after that pushed these
+patches upstream. Thanks.
 
-A few fixes and devices ID additions for 3.11:=20
+Some things to keep in mind for future patches:
 
- * There are 4 new ath3k device ids=20
- * Fixed stack memory usage in ath3k.
- * Fixed the init process of BlueFRITZ! devices, they were failing to init
-   due to an unsupported command we sent.=20
- * Fixed wrong use of PTR_ERR in btusb code that was preventing intel devic=
-es
-   to work properly.
- * Fixed race condition between hci_register_dev() and hci_dev_open() that
-   could cause a NULL pointer dereference.
- * Fixed race condition that could call hci_req_cmd_complete() and make some
-   devices to fail as showed in the log added to the commit message.
+- Keep your commit message line lengths max 72-74 (both git log and git
+  shortlog indent them and we don't want to run past a 80 char terminal)
+- Prefix the summary lines appropriately (in this case "attrib: ...")
+- Split lines are indented as much as possible while keeping them under
+  80 characters (i.e. not just past the opening parenthesis)
 
-Please pull or let me know of any issues. Thanks.
-
-	Gustavo
-
---
-The following changes since commit 075163bbb0f51174359947e1bce84f5edb23f21e:
-
-  ath9k_htc: Handle IDLE state transition properly (2013-06-24 13:52:52 -04=
-00)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
-
-for you to fetch changes up to 53e21fbc288218a423959f878c86471a0e323a9a:
-
-  Bluetooth: Fix calling request callback more than once (2013-07-29 12:28:=
-04 +0100)
-
-----------------------------------------------------------------
-AceLan Kao (2):
-      Bluetooth: Add support for Atheros [0cf3:3121]
-      Bluetooth: Add support for Atheros [0cf3:e003]
-
-Adam Lee (1):
-      Bluetooth: fix wrong use of PTR_ERR() in btusb
-
-Gustavo Padovan (1):
-      Bluetooth: Fix race between hci_register_dev() and hci_dev_open()
-
-Jaganath Kanakkassery (1):
-      Bluetooth: Fix invalid length check in l2cap_information_rsp()
-
-Johan Hedberg (2):
-      Bluetooth: Fix HCI init for BlueFRITZ! devices
-      Bluetooth: Fix calling request callback more than once
-
-Stanislaw Gruszka (1):
-      Bluetooth: ath3k: don't use stack memory for DMA
-
-Sujith Manoharan (1):
-      Bluetooth: ath3k: Add support for ID 0x13d3/0x3402
-
-Thomas Loo (1):
-      Bluetooth: ath3k: Add support for Fujitsu Lifebook UH5x2 [04c5:1330]
-
- drivers/bluetooth/ath3k.c  | 46 +++++++++++++++++++++++++++++++++++++-----=
-----
- drivers/bluetooth/btusb.c  | 18 +++++++++++-------
- net/bluetooth/hci_core.c   | 26 +++++++++++++++++---------
- net/bluetooth/l2cap_core.c |  2 +-
- 4 files changed, 66 insertions(+), 26 deletions(-)
-
---d6Gm4EdcadzBjdND
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.13 (GNU/Linux)
-
-iQIcBAEBAgAGBQJR97PYAAoJEPs3PUX4s20ocDYP/jkiaZtLDJNxdG6WmcFaciBv
-hgjbraGZ1cW0jXJmOfbpjK0P+YcHcrx2j+RlDNj55rs+JY+GKeAuQUzXuR0vy7cB
-uxAWWaqNbUziLYG+QUD6gq0GnM6AkgGz5I62gVly3UZ0i+qr5Bo8ayEY1ZBSTqws
-jrTNE5FKUQtGjinxxxQalnpjbcnUyw0mfQ6xmbF+yYqRiJZUTUNVuKeDwu6e3xIQ
-ummvCcKyoucey9D0s2U8SvpmvXWrXo3cAEe9rXolYcfzKHjYPAihISdTovI7qL3q
-XRKfL7FSJTHzl4NudLS/d8klueItSjtFzVmRpdKihH2spSA+RNSMZr4IQHGJoJgw
-A4XdTRrM3CORAzF/hkjAe9TxkB8gsnVHjFazER/TUGYBsTuzfXEmQFtepqE/cRjH
-imzLiStzSgaIEJQgpUEchDy+RxPoDcOox/q0PUWeHhnjVShUcjTnuvxKtdcNbgFl
-G/qSxjUfsCIu/5+uw0PFu7mEt+CKnNesP21Y2vETujXz1p2murpm1rHqlS0gLrtE
-QlemfdKL735aWolFXkCNZ4YxjnNwm7zju7rh52xd+6h0wxQiqUb6CdNf7O87jtc7
-s+50+t7PAtiEWX+TtxJr80pQmCKndOh5e1lr1ZOa8rQvhOt6RRBzkyzuj11gf9mP
-aTUzvpALst82EWooWUd1
-=qQs1
------END PGP SIGNATURE-----
-
---d6Gm4EdcadzBjdND--
+Johan
