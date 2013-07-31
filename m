@@ -1,53 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 31 Jul 2013 15:08:02 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth 2013-07-30
-Message-ID: <20130731190801.GE2311@tuxdriver.com>
-References: <20130730123848.GE5975@joana>
+Message-ID: <51F94E67.3040402@hurleysoftware.com>
+Date: Wed, 31 Jul 2013 13:50:31 -0400
+From: Peter Hurley <peter@hurleysoftware.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130730123848.GE5975@joana>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Gianluca Anzolin <gianluca@sottospazio.it>
+CC: gustavo@padovan.org, marcel@holtmann.org,
+ linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org,
+ jslaby@suse.cz
+Subject: Re: [PATCH v5 0/6] rfcomm: Implement rfcomm as a proper tty_port
+References: <1375110493-5237-1-git-send-email-gianluca@sottospazio.it>
+In-Reply-To: <1375110493-5237-1-git-send-email-gianluca@sottospazio.it>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jul 30, 2013 at 01:38:48PM +0100, Gustavo Padovan wrote:
-> Hi John,
-> 
-> A few fixes and devices ID additions for 3.11: 
-> 
->  * There are 4 new ath3k device ids 
->  * Fixed stack memory usage in ath3k.
->  * Fixed the init process of BlueFRITZ! devices, they were failing to init
->    due to an unsupported command we sent. 
->  * Fixed wrong use of PTR_ERR in btusb code that was preventing intel devices
->    to work properly.
->  * Fixed race condition between hci_register_dev() and hci_dev_open() that
->    could cause a NULL pointer dereference.
->  * Fixed race condition that could call hci_req_cmd_complete() and make some
->    devices to fail as showed in the log added to the commit message.
-> 
-> Please pull or let me know of any issues. Thanks.
-> 
-> 	Gustavo
-> 
-> --
-> The following changes since commit 075163bbb0f51174359947e1bce84f5edb23f21e:
-> 
->   ath9k_htc: Handle IDLE state transition properly (2013-06-24 13:52:52 -0400)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
-> 
-> for you to fetch changes up to 53e21fbc288218a423959f878c86471a0e323a9a:
-> 
->   Bluetooth: Fix calling request callback more than once (2013-07-29 12:28:04 +0100)
+On 07/29/2013 11:08 AM, Gianluca Anzolin wrote:
+> This patchset addresses an issue with the rfcomm tty driver in the
+> current stable kernels that manifests itself as a sudden lockup of the
+> whole machine or as a OOPS if we are lucky enough (I wasn't).
+>
+> Triggering the problem is very easy:
+>
+> 1) establish a bluetooth connection with a bluetooth host
+> 2) open the tty it provides with some program
+> 3) turn off the bluetooth host or take it out of range
+>
+> After a timeout the machine freezes.
+>
+> Another way to trigger these lockups is to simply release the rfcomm
+> tty.
+>
+> This happens beacuse the underlying tty_struct objects and tty_port
+> objects are freed while being used: the code doesn't take proper
+> references to them.
+>
+> The following patches address the problem by implementing a proper
+> tty_port driver for rfcomm.
+>
+> There are still some issues left: one relevant to flow control (which is
+> also missing in the current code) and another relevant to a corner case
+> in rfcomm_dev_state_change() that I intend to fix with a future patch.
+> They are commented with a FIXME.
+>
+> Changes from v4:
+>    [PATCH 3/6]: left the debug message in rfcomm_tty_open()
+>    [PATCH 5/6]: always use !test_and_set_bit() to release the tty_port
 
-Pulling now...
+I reviewed these changes and retested. All ok.
 
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Regards,
+Peter Hurley
+
+>
+> Thank you,
+> Gianluca
+>
+> Gianluca Anzolin (6):
+>    rfcomm: Take proper tty_struct references
+>    rfcomm: Remove the device from the list in the destructor
+>    rfcomm: Move the tty initialization and cleanup out of open/close
+>    rfcomm: Implement .activate, .shutdown and .carrier_raised methods
+>    rfcomm: Fix the reference counting of tty_port
+>    rfcomm: Purge the dlc->tx_queue to avoid circular dependency
+>
+>   net/bluetooth/rfcomm/tty.c | 271 +++++++++++++++++++++------------------------
+>   1 file changed, 126 insertions(+), 145 deletions(-)
+>
