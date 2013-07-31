@@ -1,45 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Fix security level for peripheral role
-Date: Wed, 31 Jul 2013 16:25:28 -0300
-Message-Id: <1375298729-23513-1-git-send-email-andre.guedes@openbossa.org>
+Date: Wed, 31 Jul 2013 15:08:02 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth 2013-07-30
+Message-ID: <20130731190801.GE2311@tuxdriver.com>
+References: <20130730123848.GE5975@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130730123848.GE5975@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-While playing the peripheral role, the host gets a LE Long Term Key
-Request Event from the controller when a connection is established
-with a bonded device. The host then informs the LTK which should be
-used for the connection. Once the link is encrypted, the host gets
-an Encryption Change Event.
+On Tue, Jul 30, 2013 at 01:38:48PM +0100, Gustavo Padovan wrote:
+> Hi John,
+> 
+> A few fixes and devices ID additions for 3.11: 
+> 
+>  * There are 4 new ath3k device ids 
+>  * Fixed stack memory usage in ath3k.
+>  * Fixed the init process of BlueFRITZ! devices, they were failing to init
+>    due to an unsupported command we sent. 
+>  * Fixed wrong use of PTR_ERR in btusb code that was preventing intel devices
+>    to work properly.
+>  * Fixed race condition between hci_register_dev() and hci_dev_open() that
+>    could cause a NULL pointer dereference.
+>  * Fixed race condition that could call hci_req_cmd_complete() and make some
+>    devices to fail as showed in the log added to the commit message.
+> 
+> Please pull or let me know of any issues. Thanks.
+> 
+> 	Gustavo
+> 
+> --
+> The following changes since commit 075163bbb0f51174359947e1bce84f5edb23f21e:
+> 
+>   ath9k_htc: Handle IDLE state transition properly (2013-06-24 13:52:52 -0400)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
+> 
+> for you to fetch changes up to 53e21fbc288218a423959f878c86471a0e323a9a:
+> 
+>   Bluetooth: Fix calling request callback more than once (2013-07-29 12:28:04 +0100)
 
-Therefore we should set conn->pending_sec_level instead of conn->
-sec_level in hci_le_ltk_request_evt. This way, conn->sec_level is
-properly updated in hci_encrypt_change_evt.
+Pulling now...
 
-Moreover, since we have a LTK associated to the device, we have at
-least BT_SECURITY_MEDIUM security level.
-
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
----
- net/bluetooth/hci_event.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 50e39f4..ea993ab 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3556,7 +3556,9 @@ static void hci_le_ltk_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	cp.handle = cpu_to_le16(conn->handle);
- 
- 	if (ltk->authenticated)
--		conn->sec_level = BT_SECURITY_HIGH;
-+		conn->pending_sec_level = BT_SECURITY_HIGH;
-+	else
-+		conn->pending_sec_level = BT_SECURITY_MEDIUM;
- 
- 	hci_send_cmd(hdev, HCI_OP_LE_LTK_REPLY, sizeof(cp), &cp);
- 
 -- 
-1.8.3.4
-
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
