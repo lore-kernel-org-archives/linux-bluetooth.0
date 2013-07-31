@@ -1,37 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 31 Jul 2013 10:57:51 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] core: Use proper header for S_IRUSR/S_IWUSR
-Message-ID: <20130731075751.GA13668@x220.p-661hnu-f1>
-References: <1373355600-12674-1-git-send-email-szymon.janc@tieto.com>
- <1668276.7oGYD4Lvyj@uw000953>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1668276.7oGYD4Lvyj@uw000953>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: mcgrof@gmail.com
+In-Reply-To: <1375253182.8289.3.camel@jlt4.sipsolutions.net>
+References: <1375114325-25498-1-git-send-email-hector.palacios@digi.com>
+ <5438CD3C-E28C-485C-94B8-F743E8B13D4A@holtmann.org> <51F7722E.9050708@digi.com>
+ <20130730205601.GI17130@pogo> <2C94C740-76BA-4058-B0D7-C37D44875CA1@holtmann.org>
+ <20130730224809.GN17130@pogo> <1375253182.8289.3.camel@jlt4.sipsolutions.net>
+From: "Luis R. Rodriguez" <rodrigue@qca.qualcomm.com>
+Date: Wed, 31 Jul 2013 00:48:28 -0700
+Message-ID: <CAB=NE6XOe2fXs-ZVWikxVj2zKuPN2VLaX6PMTYEP4mKb7+5cqA@mail.gmail.com>
+Subject: Re: ROM Patching (was: [PATCH] bluetooth: remove wrong dependency for BT_ATH3K)
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Hector Palacios <hector.palacios@digi.com>,
+	linux-wireless <linux-wireless@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"gustavo@padovan.org" <gustavo@padovan.org>, "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"surajs@qca.qualcomm.com" <surajs@qca.qualcomm.com>, jjohnson@qca.qualcomm.com,
+	Adrian Chadd <adrian@freebsd.org>, ddahlby@qca.qualcomm.com,
+	Ben Hutchings <ben@decadent.org.uk>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+On Tue, Jul 30, 2013 at 11:46 PM, Johannes Berg
+<johannes@sipsolutions.net> wrote:
+> On Tue, 2013-07-30 at 15:48 -0700, Luis R. Rodriguez wrote:
+>
+>> Neat. Perhaps we need something that we can share with 802.11 or other
+>> hardare I highly doubt we're the only ones patching ROM. Don't we even
+>> patch up core CPUs? I'm wondering if firmware_class could be expanded to
+>> support serialized ROM patching. The biggest hurdle I see with splititng
+>> ROM patching from a single firmware is serializing that, addressing
+>> revision dependencies and of course kernel dependencies.
+>
+> I don't really see what you're trying to get it so I arbitrarily picked
+> this ...
+>
+> I think "ROM patching" like in BT and 802.11 are two completely
+> different things. In BT at least you have a common transport to the
+> device, a more-or-less common command set (HCI) etc.
 
-On Wed, Jul 31, 2013, Szymon Janc wrote:
-> On Tuesday 09 of July 2013 09:40:00 Szymon Janc wrote:
-> > According to open() manual one should include <sys/stat.h>.
-> > This fix build with bionic library:
-> > 
-> > target thumb C: libbluetoothd <= external/bluetooth/bluez/src/attrib-server.c
-> > external/bluetooth/bluez/src/attrib-server.c: In function 'write_value':
-> > external/bluetooth/bluez/src/attrib-server.c:922:26: error: 'S_IRUSR'
-> > 	 undeclared (first use in this function)
-> > external/bluetooth/bluez/src/attrib-server.c:922:26: note: each undeclared
-> > 	identifier is reported only once for each function it appears in
-> > external/bluetooth/bluez/src/attrib-server.c:922:36: error: 'S_IWUSR'
-> > 	undeclared (first use in this function)
-> 
-> ping
+Sure.
 
-This was applied already a few weeks ago (July 15th) and I even sent the
-usual "applied" email about it.
+> None of that exists
+> for wireless (today) so trying to find common ground between firmware
+> (patches) for different 802.11 hardware seems completely futile?
 
-Johan
+So long as we can gaurantee mobile drivers get fw updated as much as
+is really needed in the industry great.
+
+  Luis
