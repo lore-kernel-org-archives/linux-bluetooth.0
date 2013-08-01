@@ -1,38 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 1 Aug 2013 12:57:21 +0300
+Date: Thu, 1 Aug 2013 10:55:01 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
-	<frederic.dalleau@linux.intel.com>, linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC v2 6/6] sco-tester: Test BT_VOICE option with 1.1 adapter
-Message-ID: <20130801095721.GA7487@x220.p-661hnu-f1>
-References: <1373039207-20959-1-git-send-email-frederic.dalleau@linux.intel.com>
- <1373039207-20959-7-git-send-email-frederic.dalleau@linux.intel.com>
- <20130709114245.GC22976@x220.p-661hnu-f1>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] monitor: Opencode strndupa in print_string
+Message-ID: <20130801075501.GA4068@x220.p-661hnu-f1>
+References: <1375260699-7271-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <20130709114245.GC22976@x220.p-661hnu-f1>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1375260699-7271-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frederic,
+Hi Szymon,
 
-On Tue, Jul 09, 2013, Johan Hedberg wrote:
-> Hi Frederic,
+On Wed, Jul 31, 2013, Szymon Janc wrote:
+> Strndupa is GNU extension. print_string is simple and opencoding
+> strndupa is not a big loss.
 > 
-> On Fri, Jul 05, 2013, Frédéric Dalleau wrote:
-> > ---
-> >  emulator/btdev.c    |   25 +++++++++++++++++++
-> >  emulator/btdev.h    |    1 +
-> >  src/shared/hciemu.c |    8 +++++++
-> >  src/shared/hciemu.h |    1 +
-> >  tools/sco-tester.c  |   66 ++++++++++++++++++++++++++++++++++++++++++++++++++-
-> >  5 files changed, 100 insertions(+), 1 deletion(-)
+> This fix linkage error with bionic library which doesn't provide
+> strndupa.
 > 
-> Here also, please split the emulator and hciemu changes to separate
-> patches before the sco-tester patch.
+> target Executable: btmon (out/target/product/grouper/obj/EXECUTABLES/
+>     btmon_intermediates/LINKED/btmon)
+> prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.6/bin/../lib/gcc/
+>     arm-linux-androideabi/4.6.x-google/../../../../
+>     arm-linux-androideabi/bin/ld: out/target/product/grouper/obj/
+>     EXECUTABLES/btmon_intermediates/monitor/sdp.o: in function
+>     print_string:external/bluetooth/bluez/monitor/sdp.c:146: error:
+>     undefined reference to 'strndupa'
+> collect2: ld returned 1 exit status
+> make: *** [out/target/product/grouper/obj/EXECUTABLES/
+>     btmon_intermediates/LINKED/btmon] Error
+> ---
+>  monitor/sdp.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 
-Since you never came back with these fixes and we need to get this
-feature progressing I went ahead and did the necessary changes myself.
-The patches are now upstream.
+Applied. Thanks.
 
 Johan
