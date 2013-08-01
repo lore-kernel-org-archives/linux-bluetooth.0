@@ -1,30 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Frederic Danis <frederic.danis@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] profile: Fix error message in ext_auth
-Date: Thu,  1 Aug 2013 16:12:58 +0200
-Message-Id: <1375366378-20689-1-git-send-email-frederic.danis@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+Date: Thu, 1 Aug 2013 12:57:21 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
+	<frederic.dalleau@linux.intel.com>, linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC v2 6/6] sco-tester: Test BT_VOICE option with 1.1 adapter
+Message-ID: <20130801095721.GA7487@x220.p-661hnu-f1>
+References: <1373039207-20959-1-git-send-email-frederic.dalleau@linux.intel.com>
+ <1373039207-20959-7-git-send-email-frederic.dalleau@linux.intel.com>
+ <20130709114245.GC22976@x220.p-661hnu-f1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20130709114245.GC22976@x220.p-661hnu-f1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/profile.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Frederic,
 
-diff --git a/src/profile.c b/src/profile.c
-index 4a980f2..90c3535 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -1010,7 +1010,7 @@ static void ext_auth(DBusError *err, void *user_data)
- 	bt_io_get(conn->io, &gerr, BT_IO_OPT_DEST, addr, BT_IO_OPT_INVALID);
- 	if (gerr != NULL) {
- 		error("Unable to get connect data for %s: %s",
--						ext->name, err->message);
-+						ext->name, gerr->message);
- 		g_error_free(gerr);
- 		goto drop;
- 	}
--- 
-1.7.9.5
+On Tue, Jul 09, 2013, Johan Hedberg wrote:
+> Hi Frederic,
+> 
+> On Fri, Jul 05, 2013, Frédéric Dalleau wrote:
+> > ---
+> >  emulator/btdev.c    |   25 +++++++++++++++++++
+> >  emulator/btdev.h    |    1 +
+> >  src/shared/hciemu.c |    8 +++++++
+> >  src/shared/hciemu.h |    1 +
+> >  tools/sco-tester.c  |   66 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+> >  5 files changed, 100 insertions(+), 1 deletion(-)
+> 
+> Here also, please split the emulator and hciemu changes to separate
+> patches before the sco-tester patch.
 
+Since you never came back with these fixes and we need to get this
+feature progressing I went ahead and did the necessary changes myself.
+The patches are now upstream.
+
+Johan
