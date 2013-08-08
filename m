@@ -1,64 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix getting SCO socket options in deferred state
-Date: Thu,  8 Aug 2013 14:53:56 +0300
-Message-Id: <1375962836-3050-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed; delsp=yes
+To: aji.kumar@accenture.com
+Subject: Re: fail to configure and compile the source of bluez-5.7 
+References: <op.w1fi20rze4gg2u@localhost>
+ <558B77349A98DB438591B5FD93003409263E702B@048-CH1MPN1-141.048d.mgd.msft.net>
+Date: Thu, 08 Aug 2013 08:29:01 -0000
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+MIME-Version: 1.0
+From: atar <atar.yosef@gmail.com>
+Message-ID: <op.w1hoinkoe4gg2u@localhost>
+In-Reply-To: <558B77349A98DB438591B5FD93003409263E702B@048-CH1MPN1-141.048d.mgd.msft.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+> Hi Atar,
+>
+>> -----Original Message-----
+>> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+>> owner@vger.kernel.org] On Behalf Of atar
+>> Sent: Wednesday, August 07, 2013 10:06 AM
+>> To: linux-bluetooth@vger.kernel.org
+>> Subject: fail to configure and compile the source of bluez-5.7
+>>
+>> Hi there!!
+>>
+>> My machine is running Debian Wheezy from the live-boot Debian project  
+>> which
+>> is installed on my USB stick.
+>>
+>> I've downloaded from bluez.org the source of the 5.7 package but when I  
+>> ran
+>> ./configure on it, it emitted an error message at the bottom of all the  
+>> messages
+>> saying:
+>>
+>> > "checking for GLIB... no
+>> > configure: error: GLib >= 2.28 is required"
+>>
+>> This, although I've the glib libraries installed.
+>>
+>> How can this problem be solved?
+>>
+>
+> Check the version of the glib library installed, you could use  
+> "apt-cache show <glib>"
+>
+> If you need to know the actual package name for glib, do "apt-cache  
+> search glib" and find out the right package, you could replace that in  
+> the above line.
+>
+> If version installed is less than required, you will have to install the  
+> later versions, the corresponding glib images can be downloaded from  
+> Ubuntu repositories...
+>
+>> Thanks in advance!!
+>>
+>> atar.
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe  
+>> linux-bluetooth" in the
+>> body of a message to majordomo@vger.kernel.org More majordomo info at
+>> http://vger.kernel.org/majordomo-info.html
+>
+>
+> This message is for the designated recipient only and may contain  
+> privileged, proprietary, or otherwise confidential information. If you  
+> have received it in error, please notify the sender immediately and  
+> delete the original. Any other use of the e-mail by you is prohibited.
+>
+> Where allowed by local law, electronic communications with Accenture and  
+> its affiliates, including e-mail and instant messaging (including  
+> content), may be scanned by our systems for the purposes of information  
+> security and assessment of internal compliance with Accenture policy.
+>
+> ______________________________________________________________________________________
+>
+> www.accenture.com
 
-When a socket is in deferred state there does actually exist an
-underlying connection even though the connection state is not yet
-BT_CONNECTED. In the deferred state it should therefore be allowed to
-get socket options that usually depend on a connection, such as
-SCO_OPTIONS and SCO_CONNINFO.
+Hi Kumar!
 
-This patch fixes the behavior of some user space code that behaves as
-follows without it:
+the command 'apt-cache search glib' produces a lot of output. I can't  
+figure out which line is really related to the glib library in question.  
+please help.
 
-$ sudo tools/btiotest -i 00:1B:DC:xx:xx:xx -d -s
-accept=2 reject=-1 discon=-1 defer=1 sec=0 update_sec=0 prio=0 voice=0x0000
-Listening for SCO connections
-bt_io_get(OPT_DEST): getsockopt(SCO_OPTIONS): Transport endpoint is not connected (107)
-Accepting connection
-Successfully connected to 60:D8:19:xx:xx:xx. handle=43, class=000000
+Thanks in advance!!
 
-The conditions that the patch updates the if-statements to is taken from
-similar code in l2cap_sock.c which correctly handles the deferred state.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/sco.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 1170b6e..96bd388 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -806,7 +806,9 @@ static int sco_sock_getsockopt_old(struct socket *sock, int optname, char __user
- 
- 	switch (optname) {
- 	case SCO_OPTIONS:
--		if (sk->sk_state != BT_CONNECTED) {
-+		if (sk->sk_state != BT_CONNECTED &&
-+		    !(sk->sk_state == BT_CONNECT2 &&
-+		      test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags))) {
- 			err = -ENOTCONN;
- 			break;
- 		}
-@@ -822,7 +824,9 @@ static int sco_sock_getsockopt_old(struct socket *sock, int optname, char __user
- 		break;
- 
- 	case SCO_CONNINFO:
--		if (sk->sk_state != BT_CONNECTED) {
-+		if (sk->sk_state != BT_CONNECTED &&
-+		    !(sk->sk_state == BT_CONNECT2 &&
-+		      test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags))) {
- 			err = -ENOTCONN;
- 			break;
- 		}
--- 
-1.8.3.1
-
+atar.
