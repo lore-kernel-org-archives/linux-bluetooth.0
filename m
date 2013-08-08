@@ -1,34 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH 1/3] sco-tester: Update ECONNABORTED to EOPNOTSUPP
-Date: Fri,  9 Aug 2013 17:42:55 +0200
-Message-Id: <1376062977-1497-1-git-send-email-frederic.dalleau@linux.intel.com>
-Content-Type: text/plain; charset="utf-8"
+Date: Thu, 8 Aug 2013 15:04:29 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: linux-wireless@vger.kernel.org
+Cc: johannes@sipsolutions.net, marcel@holtmann.org,
+	Samuel Ortiz <samuel@sortiz.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org, linux-nfc@ml01.01.org
+Subject: Re: Linux Wireless Mini-Summit in New Orleans -- 19-20 September (6
+ weeks from today!)
+Message-ID: <20130808190428.GF30925@tuxdriver.com>
+References: <20130808185410.GD30925@tuxdriver.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130808185410.GD30925@tuxdriver.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Kernel interface has evolved in between.
----
- tools/sco-tester.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Sorry, forgot to copy linux-bluetooth and linux-nfc...
 
-diff --git a/tools/sco-tester.c b/tools/sco-tester.c
-index 70b8a5d..1e8351f 100644
---- a/tools/sco-tester.c
-+++ b/tools/sco-tester.c
-@@ -237,7 +237,7 @@ static const struct sco_client_data connect_success = {
- };
- 
- static const struct sco_client_data connect_failure = {
--	.expect_err = ECONNABORTED
-+	.expect_err = EOPNOTSUPP
- };
- 
- static void client_connectable_complete(uint16_t opcode, uint8_t status,
+On Thu, Aug 08, 2013 at 02:54:11PM -0400, John W. Linville wrote:
+> Greetings!
+> 
+> This is a reminder that we will have a Linux Wireless Mini-Summit in
+> New Orleans this year on 19-20 September.  This will immediately follow
+> LinuxCon and will run concurrently with Linux Plumber's Conference.
+> This event includes Linux developers for wireless LAN (802.11),
+> Bluetooth, and NFC technologies.  Both kernel and userland developers
+> are welcomed and heartily encouraged to attend!
+> 
+> 	http://wireless.kernel.org/en/developers/Summits/New-Orleans-2013
+> 
+> The link above is a Wiki.  We are using it to collect discussion
+> topics and to negotiate agenda/scheduling options for the event.
+> Please go there to record your intent to attend the event and to
+> propopse topics for discussion.
+> 
+> Please be aware that in order to attend the event above one must
+> register for either LinuxCon or for Linux Plumbers Conference.
+> Act now, before those events fill-up and close their registrations!
+> 
+> We are allotted one "large" room (up to ~80 people "theater style"), and
+> two "small" rooms (up to ~25 people) for this event.  Based on history
+> and the numbers of contributors, the larger room will primarily be
+> for the 802.11 discussions and any "plenary" topics while the smaller
+> rooms will be for Bluetooth, NFC, and any "breakout" topics.
+> 
+> So...thoughts?  Topics to discuss?
+> 
+> John
+> -- 
+> John W. Linville		Someday the world will need a hero, and you
+> linville@tuxdriver.com			might be all we have.  Be ready.
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-wireless" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+
 -- 
-1.7.9.5
-
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
