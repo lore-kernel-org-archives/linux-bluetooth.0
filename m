@@ -1,60 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <41942.172.16.2.1.1375965758.squirrel@gesmail.globaledgesoft.com>
-Date: Thu, 8 Aug 2013 18:12:38 +0530 (IST)
-Subject: Gatt Thermometer Server Support
-From: ajay.kv@globaledgesoft.com
-To: linux-bluetooth@vger.kernel.org
-Cc: anderson.lizardo@openbossa.org
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAGoJ=AsiXm7=-0rK2Wm6k+DY85wDoM2WN-eCT8qFpm+sy2B62w@mail.gmail.com>
+References: <CAGoJ=AsiXm7=-0rK2Wm6k+DY85wDoM2WN-eCT8qFpm+sy2B62w@mail.gmail.com>
+Date: Thu, 8 Aug 2013 08:54:08 -0400
+Message-ID: <CAJdJm_Pxpzs7yWmY0gz-7ifEdjHV4Zk88OvjWZLni_xw2mF4Tw@mail.gmail.com>
+Subject: Re: using the DBus profiles in BlueZ 5
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: James Baker <j.baker@outlook.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-As i am experimenting the BlueZ BLE features. I have some query. I am
-using 2 Linux Ubuntu 12.04 Desktop with linux-3.10 kernel and Bluez-5.7
-configured with #./configure --enable-experimental
+Hi James,
 
-Server_System:
-     Enabled ThermometerManager->RegisterWatcher (d-feet
-application).
-     #hciconfig 0 leadv
+On Wed, Aug 7, 2013 at 10:21 AM, James Baker <j.baker@outlook.com> wrote:
+> What I've done (beyond compile 5.7 with the experimental additions):
+> Set systemd to launch with the argument -E in order to enable
+> experimental profiles (as mentioned in
+> https://gitorious.org/~moreira/bluez-le-docs/moreira-bluez-le-docs/blobs/master/bluez-le-howto.tex)
 
-Client_System:
-     #gatttool -I
-     [                 ][LE]>
-     [00:02:72:D6:97:79][LE]> connect 00:02:72:D6:97:79
-     Attempting to connect to 00:02:72:D6:97:79
-     Connection successful
+Note that this document, although mostly applicable to BlueZ 5, was
+written to showcase an experimental API that is not upstream yet (and
+that's why it is in our development trees as we have not published it
+yet). In any case, it is not relevant to using the HeartRate API,
+which works on latest BlueZ just fine (from my experience).
 
-     [00:02:72:D6:97:79][LE]> primary
-     attr handle: 0x0001, end grp handle: 0x0008 uuid:
-00001800-0000-1000-8000-00805f9b34fb
-     attr handle: 0x0009, end grp handle: 0x000b uuid:
-00001803-0000-1000-8000-00805f9b34fb
-     attr handle: 0x000c, end grp handle: 0x000f uuid:
-00001804-0000-1000-8000-00805f9b34fb
-     attr handle: 0x0010, end grp handle: 0x0010 uuid:
-00001801-0000-1000-8000-00805f9b34fb
-     attr handle: 0x0011, end grp handle: 0x0013 uuid:
-00001802-0000-1000-8000-00805f9b34fb
-     attr handle: 0x0014, end grp handle: 0x0019 uuid:
-00001805-0000-1000-8000-00805f9b34fb
-     attr handle: 0x001a, end grp handle: 0x001e uuid:
-00001806-0000-1000-8000-00805f9b34fb
-     attr handle: 0x001f, end grp handle: 0x0027 uuid:
-0000180e-0000-1000-8000-00805f9b34fb
-     attr handle: 0x0028, end grp handle: 0x0034 uuid:
-00001811-0000-1000-8000-00805f9b34fb
+> Launched d-feet and navigated to org.bluez. Found hci0, enabled
+> discovery. Waited to discover the correct device. Connected to the
+> device.
+> No heartrate information has been presented, and it is seemingly not
+> present in the whole of the object tree.
 
-    Here we could not find the UUID for Thermometer(1809) and heartrate ,
-which we are interested to debug more.
+I suggest you take a look on the example Python code: test/test-heartrate
 
-Query:
-How to set the dummy temperature or heartrate values in the server and
-to get them in the Client.?
+You need to register a agent to receive heart rate measurements, and
+this cannot be done with d-feet.
 
+> Executing /test/test-heartrate results in an error such as
+> org.freedesktop.DBus.Error.UnknownMethod "RegsterWatcher" with
+> signature "s" on interface "org.bluez.HeartRateManager" doesn't exist.
 
-Thanks in Advance,
-Ajay K V
+Can you paste the exact error message? The snippet above contains two
+typos which I'm not sure if it was on the original error or not:
 
+* RegsterWatcher -> RegisterWatcher
+* org.bluez.HeartRateManager -> org.bluez.HeartRateManager1
+
+Make sure the test-heartrate you are using matches the BlueZ version
+which is running.
+
+> Does anyone know of anything I've missed? I've been reading the docs
+> and they imply the service should have been registered when I
+> connected.
+>
+> The device is definitely exposing itself as a heart rate monitor; I've
+> checked with the Bluetooth SIG assigned numbers.
+
+Can you send the raw HCI dump (using "btmon -w btmon.dump" and
+attaching the generated *.dump file) from the connection up to when
+you try to run test/test-heartrate?
+
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
