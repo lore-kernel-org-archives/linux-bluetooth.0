@@ -1,68 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAGoJ=AsiXm7=-0rK2Wm6k+DY85wDoM2WN-eCT8qFpm+sy2B62w@mail.gmail.com>
-References: <CAGoJ=AsiXm7=-0rK2Wm6k+DY85wDoM2WN-eCT8qFpm+sy2B62w@mail.gmail.com>
-Date: Thu, 8 Aug 2013 08:54:08 -0400
-Message-ID: <CAJdJm_Pxpzs7yWmY0gz-7ifEdjHV4Zk88OvjWZLni_xw2mF4Tw@mail.gmail.com>
-Subject: Re: using the DBus profiles in BlueZ 5
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: James Baker <j.baker@outlook.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix getting SCO socket options in deferred state
+Date: Thu,  8 Aug 2013 14:53:56 +0300
+Message-Id: <1375962836-3050-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi James,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Wed, Aug 7, 2013 at 10:21 AM, James Baker <j.baker@outlook.com> wrote:
-> What I've done (beyond compile 5.7 with the experimental additions):
-> Set systemd to launch with the argument -E in order to enable
-> experimental profiles (as mentioned in
-> https://gitorious.org/~moreira/bluez-le-docs/moreira-bluez-le-docs/blobs/master/bluez-le-howto.tex)
+When a socket is in deferred state there does actually exist an
+underlying connection even though the connection state is not yet
+BT_CONNECTED. In the deferred state it should therefore be allowed to
+get socket options that usually depend on a connection, such as
+SCO_OPTIONS and SCO_CONNINFO.
 
-Note that this document, although mostly applicable to BlueZ 5, was
-written to showcase an experimental API that is not upstream yet (and
-that's why it is in our development trees as we have not published it
-yet). In any case, it is not relevant to using the HeartRate API,
-which works on latest BlueZ just fine (from my experience).
+This patch fixes the behavior of some user space code that behaves as
+follows without it:
 
-> Launched d-feet and navigated to org.bluez. Found hci0, enabled
-> discovery. Waited to discover the correct device. Connected to the
-> device.
-> No heartrate information has been presented, and it is seemingly not
-> present in the whole of the object tree.
+$ sudo tools/btiotest -i 00:1B:DC:xx:xx:xx -d -s
+accept=2 reject=-1 discon=-1 defer=1 sec=0 update_sec=0 prio=0 voice=0x0000
+Listening for SCO connections
+bt_io_get(OPT_DEST): getsockopt(SCO_OPTIONS): Transport endpoint is not connected (107)
+Accepting connection
+Successfully connected to 60:D8:19:xx:xx:xx. handle=43, class=000000
 
-I suggest you take a look on the example Python code: test/test-heartrate
+The conditions that the patch updates the if-statements to is taken from
+similar code in l2cap_sock.c which correctly handles the deferred state.
 
-You need to register a agent to receive heart rate measurements, and
-this cannot be done with d-feet.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/sco.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-> Executing /test/test-heartrate results in an error such as
-> org.freedesktop.DBus.Error.UnknownMethod "RegsterWatcher" with
-> signature "s" on interface "org.bluez.HeartRateManager" doesn't exist.
-
-Can you paste the exact error message? The snippet above contains two
-typos which I'm not sure if it was on the original error or not:
-
-* RegsterWatcher -> RegisterWatcher
-* org.bluez.HeartRateManager -> org.bluez.HeartRateManager1
-
-Make sure the test-heartrate you are using matches the BlueZ version
-which is running.
-
-> Does anyone know of anything I've missed? I've been reading the docs
-> and they imply the service should have been registered when I
-> connected.
->
-> The device is definitely exposing itself as a heart rate monitor; I've
-> checked with the Bluetooth SIG assigned numbers.
-
-Can you send the raw HCI dump (using "btmon -w btmon.dump" and
-attaching the generated *.dump file) from the connection up to when
-you try to run test/test-heartrate?
-
-Best Regards,
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 1170b6e..96bd388 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -806,7 +806,9 @@ static int sco_sock_getsockopt_old(struct socket *sock, int optname, char __user
+ 
+ 	switch (optname) {
+ 	case SCO_OPTIONS:
+-		if (sk->sk_state != BT_CONNECTED) {
++		if (sk->sk_state != BT_CONNECTED &&
++		    !(sk->sk_state == BT_CONNECT2 &&
++		      test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags))) {
+ 			err = -ENOTCONN;
+ 			break;
+ 		}
+@@ -822,7 +824,9 @@ static int sco_sock_getsockopt_old(struct socket *sock, int optname, char __user
+ 		break;
+ 
+ 	case SCO_CONNINFO:
+-		if (sk->sk_state != BT_CONNECTED) {
++		if (sk->sk_state != BT_CONNECTED &&
++		    !(sk->sk_state == BT_CONNECT2 &&
++		      test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags))) {
+ 			err = -ENOTCONN;
+ 			break;
+ 		}
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.8.3.1
+
