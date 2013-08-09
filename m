@@ -1,88 +1,158 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/6] Bluetooth: Set discovery parameters
-Date: Fri,  9 Aug 2013 20:12:31 -0300
-Message-Id: <1376089954-13639-4-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 1/6] Bluetooth: Discovery parameters per hci_dev
+Date: Fri,  9 Aug 2013 20:12:29 -0300
+Message-Id: <1376089954-13639-2-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1376089954-13639-1-git-send-email-andre.guedes@openbossa.org>
 References: <1376089954-13639-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for setting discovery parameters through
-debugfs filesystem.
+This patch adds discovery parameters to struct hci_dev. This way, we
+will be able to configure the discovery parameters per hci device.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_sysfs.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 44 insertions(+), 1 deletion(-)
+ include/net/bluetooth/hci_core.h | 13 +++++++++++++
+ net/bluetooth/hci_core.c         | 13 ++++++++++++-
+ net/bluetooth/mgmt.c             | 15 +++++++++------
+ 3 files changed, 34 insertions(+), 7 deletions(-)
 
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 90cb53b..17ebc4a 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -553,9 +553,52 @@ static int discovery_parameters_open(struct inode *inode, struct file *file)
- 	return single_open(file, discovery_parameters_show, inode->i_private);
- }
- 
-+static ssize_t discovery_parameters_write(struct file *file,
-+					  const char __user *data,
-+					  size_t count, loff_t *offset)
-+{
-+	struct seq_file *sfile = file->private_data;
-+	struct hci_dev *hdev = sfile->private;
-+	struct discovery_param param;
-+	char *buf;
-+	int n;
-+	ssize_t res = 0;
-+
-+	/* We don't allow partial writes */
-+	if (*offset != 0)
-+		return 0;
-+
-+	buf = kzalloc(count, GFP_KERNEL);
-+	if (!buf)
-+		return 0;
-+
-+	if (copy_from_user(buf, data, count))
-+		goto out;
-+
-+	memset(&param, 0, sizeof(param));
-+
-+	n = sscanf(buf, "%hhx %hx %hx %u %u %hhx %hhx",
-+		   &param.scan_type, &param.scan_interval, &param.scan_window,
-+		   &param.le_scan_duration, &param.interleaved_scan_duration,
-+		   &param.interleaved_inquiry_length,
-+		   &param.bredr_inquiry_length);
-+	if (n != 7)
-+		goto out;
-+
-+	hci_dev_lock(hdev);
-+	memcpy(&hdev->discovery_param, &param, sizeof(param));
-+	hci_dev_unlock(hdev);
-+
-+	res = count;
-+out:
-+	kfree(buf);
-+	return res;
-+}
-+
- static const struct file_operations discovery_parameters_fops = {
- 	.open		= discovery_parameters_open,
- 	.read		= seq_read,
-+	.write		= discovery_parameters_write,
- 	.llseek		= seq_lseek,
- 	.release	= single_release,
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index f77885e..0a02fdb 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -127,6 +127,17 @@ struct amp_assoc {
+ 	__u8	data[HCI_MAX_AMP_ASSOC_SIZE];
  };
-@@ -602,7 +645,7 @@ int hci_add_sysfs(struct hci_dev *hdev)
- 	debugfs_create_file("auto_accept_delay", 0444, hdev->debugfs, hdev,
- 			    &auto_accept_delay_fops);
  
--	debugfs_create_file("discovery_parameters", 0444, hdev->debugfs, hdev,
-+	debugfs_create_file("discovery_parameters", 0644, hdev->debugfs, hdev,
- 			    &discovery_parameters_fops);
- 	return 0;
++struct discovery_param {
++	u8		scan_type;
++	u16		scan_interval;
++	u16		scan_window;
++	unsigned int	interleaved_scan_duration;
++	unsigned int	le_scan_duration;
++
++	u8		interleaved_inquiry_length;
++	u8		bredr_inquiry_length;
++};
++
+ #define HCI_MAX_PAGES	3
+ 
+ #define NUM_REASSEMBLY 4
+@@ -280,6 +291,8 @@ struct hci_dev {
+ 	__u8			adv_data[HCI_MAX_AD_LENGTH];
+ 	__u8			adv_data_len;
+ 
++	struct discovery_param	discovery_param;
++
+ 	int (*open)(struct hci_dev *hdev);
+ 	int (*close)(struct hci_dev *hdev);
+ 	int (*flush)(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index b821b19..8750663 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2013,6 +2013,7 @@ static void le_scan_disable_work_complete(struct hci_dev *hdev, u8 status)
+ {
+ 	/* General inquiry access code (GIAC) */
+ 	u8 lap[3] = { 0x33, 0x8b, 0x9e };
++	struct discovery_param *discov = &hdev->discovery_param;
+ 	struct hci_request req;
+ 	struct hci_cp_inquiry cp;
+ 	int err;
+@@ -2034,7 +2035,7 @@ static void le_scan_disable_work_complete(struct hci_dev *hdev, u8 status)
+ 
+ 		memset(&cp, 0, sizeof(cp));
+ 		memcpy(&cp.lap, lap, sizeof(cp.lap));
+-		cp.length = DISCOV_INTERLEAVED_INQUIRY_LEN;
++		cp.length = discov->interleaved_inquiry_length;
+ 		hci_req_add(&req, HCI_OP_INQUIRY, sizeof(cp), &cp);
+ 
+ 		hci_dev_lock(hdev);
+@@ -2077,6 +2078,7 @@ static void le_scan_disable_work(struct work_struct *work)
+ struct hci_dev *hci_alloc_dev(void)
+ {
+ 	struct hci_dev *hdev;
++	struct discovery_param *discov;
+ 
+ 	hdev = kzalloc(sizeof(struct hci_dev), GFP_KERNEL);
+ 	if (!hdev)
+@@ -2123,6 +2125,15 @@ struct hci_dev *hci_alloc_dev(void)
+ 	hci_init_sysfs(hdev);
+ 	discovery_init(hdev);
+ 
++	discov = &hdev->discovery_param;
++	discov->scan_type = LE_SCAN_ACTIVE;
++	discov->scan_interval = DISCOV_LE_SCAN_INT;
++	discov->scan_window = DISCOV_LE_SCAN_WIN;
++	discov->le_scan_duration = DISCOV_LE_TIMEOUT;
++	discov->interleaved_scan_duration = DISCOV_INTERLEAVED_TIMEOUT;
++	discov->interleaved_inquiry_length = DISCOV_INTERLEAVED_INQUIRY_LEN;
++	discov->bredr_inquiry_length = DISCOV_BREDR_INQUIRY_LEN;
++
+ 	return hdev;
  }
+ EXPORT_SYMBOL(hci_alloc_dev);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index fedc539..2b4a3ba 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2642,6 +2642,8 @@ static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
+ 
+ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+ {
++	struct discovery_param *discov = &hdev->discovery_param;
++
+ 	BT_DBG("status %d", status);
+ 
+ 	if (status) {
+@@ -2658,12 +2660,12 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+ 	switch (hdev->discovery.type) {
+ 	case DISCOV_TYPE_LE:
+ 		queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
+-				   DISCOV_LE_TIMEOUT);
++				   discov->le_scan_duration);
+ 		break;
+ 
+ 	case DISCOV_TYPE_INTERLEAVED:
+ 		queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
+-				   DISCOV_INTERLEAVED_TIMEOUT);
++				   discov->interleaved_scan_duration);
+ 		break;
+ 
+ 	case DISCOV_TYPE_BREDR:
+@@ -2678,6 +2680,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 			   void *data, u16 len)
+ {
+ 	struct mgmt_cp_start_discovery *cp = data;
++	struct discovery_param *discov = &hdev->discovery_param;
+ 	struct pending_cmd *cmd;
+ 	struct hci_cp_le_set_scan_param param_cp;
+ 	struct hci_cp_le_set_scan_enable enable_cp;
+@@ -2739,7 +2742,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 
+ 		memset(&inq_cp, 0, sizeof(inq_cp));
+ 		memcpy(&inq_cp.lap, lap, sizeof(inq_cp.lap));
+-		inq_cp.length = DISCOV_BREDR_INQUIRY_LEN;
++		inq_cp.length = discov->bredr_inquiry_length;
+ 		hci_req_add(&req, HCI_OP_INQUIRY, sizeof(inq_cp), &inq_cp);
+ 		break;
+ 
+@@ -2775,9 +2778,9 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 		}
+ 
+ 		memset(&param_cp, 0, sizeof(param_cp));
+-		param_cp.type = LE_SCAN_ACTIVE;
+-		param_cp.interval = cpu_to_le16(DISCOV_LE_SCAN_INT);
+-		param_cp.window = cpu_to_le16(DISCOV_LE_SCAN_WIN);
++		param_cp.type = discov->scan_type;
++		param_cp.interval = cpu_to_le16(discov->scan_interval);
++		param_cp.window = cpu_to_le16(discov->scan_window);
+ 		hci_req_add(&req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
+ 			    &param_cp);
+ 
 -- 
 1.8.3.4
 
