@@ -1,41 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
+MIME-Version: 1.0
+Date: Fri, 9 Aug 2013 18:20:56 +0200
+Message-ID: <CAPs60Xw8KfrpRGX5NyxEeAarh_5rW=tjjS61G+P=Op4re9G=6g@mail.gmail.com>
+Subject: API documentation for BLE?
+From: Tim Aerts <tim.koder@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/6] LE parameters via debugfs 
-Date: Fri,  9 Aug 2013 20:12:28 -0300
-Message-Id: <1376089954-13639-1-git-send-email-andre.guedes@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hello everybody,
 
-This patchset exports discovery and LE connection parameters via debugfs
-filesystem. This might be useful for those who would like to do experiments
-with different parameters.
+Starting on Monday, I will need to implement BLE Central capabilities
+into a Linux app. On Mac/iOS I have a CoreBluetooth for this. But on
+Linux, I wouldn't know where to start. So far, this is my only lead.
 
-BR,
+I have found some online description to libbluetooth-dev, but it's
+pretty old, and does not include anything about BLE. So I'd appreciate
+whomever can get me going.
 
-Andre
+1. Is this the right place? Do I need libbluetooth-dev to create a BLE
+capable app?
+
+2. Is there any documentation about this API? Since BT and BLE have
+different semantics, I am guessing the BT-related documentation is not
+the one I should be looking at?
 
 
-Andre Guedes (3):
-  Bluetooth: Discovery parameters per hci_dev
-  Bluetooth: Export discovery parameters on debugfs
-  Bluetooth: Set discovery parameters
+Thanks in advance!
 
-Vinicius Costa Gomes (3):
-  Bluetooth: Keep the LE connection parameters in its own structure
-  Bluetooth: Add LE connection parameters to debugfs
-  Bluetooth: Add support for setting LE connection parameters via
-    debugfs
-
- include/net/bluetooth/hci_core.h |  23 ++++++
- net/bluetooth/hci_conn.c         |  11 +--
- net/bluetooth/hci_core.c         |  21 +++++-
- net/bluetooth/hci_sysfs.c        | 150 +++++++++++++++++++++++++++++++++++++++
- net/bluetooth/mgmt.c             |  15 ++--
- 5 files changed, 208 insertions(+), 12 deletions(-)
-
--- 
-1.8.3.4
-
+Tim
