@@ -1,32 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Fri, 9 Aug 2013 18:20:56 +0200
-Message-ID: <CAPs60Xw8KfrpRGX5NyxEeAarh_5rW=tjjS61G+P=Op4re9G=6g@mail.gmail.com>
-Subject: API documentation for BLE?
-From: Tim Aerts <tim.koder@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
+Subject: Re: [PATCH 1/3] sco-tester: Update ECONNABORTED to EOPNOTSUPP
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1376062977-1497-1-git-send-email-frederic.dalleau@linux.intel.com>
+Date: Fri, 9 Aug 2013 08:53:37 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <09231CA6-E5F3-453E-9479-68F08072893A@holtmann.org>
+References: <1376062977-1497-1-git-send-email-frederic.dalleau@linux.intel.com>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric_Dalleau?=
+	<frederic.dalleau@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello everybody,
+Hi Fred,
 
-Starting on Monday, I will need to implement BLE Central capabilities
-into a Linux app. On Mac/iOS I have a CoreBluetooth for this. But on
-Linux, I wouldn't know where to start. So far, this is my only lead.
+> Kernel interface has evolved in between.
+> ---
+> tools/sco-tester.c |    2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/sco-tester.c b/tools/sco-tester.c
+> index 70b8a5d..1e8351f 100644
+> --- a/tools/sco-tester.c
+> +++ b/tools/sco-tester.c
+> @@ -237,7 +237,7 @@ static const struct sco_client_data connect_success = {
+> };
+> 
+> static const struct sco_client_data connect_failure = {
+> -	.expect_err = ECONNABORTED
+> +	.expect_err = EOPNOTSUPP
+> };
 
-I have found some online description to libbluetooth-dev, but it's
-pretty old, and does not include anything about BLE. So I'd appreciate
-whomever can get me going.
+can we please have a proper thread on what error is appropriate to send from a socket interface when this situation happens. I see that we are flipping errors, but my request to discuss this gets ignored.
 
-1. Is this the right place? Do I need libbluetooth-dev to create a BLE
-capable app?
+Please look for a good reference of the error code usage in other socket protocols or manpages
 
-2. Is there any documentation about this API? Since BT and BLE have
-different semantics, I am guessing the BT-related documentation is not
-the one I should be looking at?
+Regards
 
+Marcel
 
-Thanks in advance!
-
-Tim
