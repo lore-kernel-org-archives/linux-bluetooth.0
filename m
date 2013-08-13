@@ -1,77 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v10 00/10] sco: SCO socket option for voice_setting
-Date: Wed, 14 Aug 2013 19:03:24 +0200
-Message-Id: <1376499814-11386-1-git-send-email-frederic.dalleau@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+Subject: [PATCH] Bluetooth: Set different event mask for LE-only controllers
+Date: Tue, 13 Aug 2013 10:00:54 -0700
+Message-Id: <1376413254-36536-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+In case of a Low Energy only controller it makes no sense to configure
+the full BR/EDR event mask. It will just enable events that can not be
+send anyway and there is no guarantee that such a controller will accept
+this value.
 
-v10 include contribution from Johan, he reworks fallback handling and fixes
-Marcel remarks from v9.
-error 0x0d handling moved into a separate patch
+Use event mask 0x90 0xe8 0x04 0x02 0x00 0x80 0x00 0x20 for LE-only
+controllers which enables the following events:
 
-v9 is mostly cosmetics. Introduces LMP_TRANSPARENT bit in patch 8/8.
+          Disconnection Complete
+          Encryption Change
+          Read Remote Version Information Complete
+          Command Complete
+          Command Status
+          Hardware Error
+          Number of Completed Packets
+          Data Buffer Overflow
+          Encryption Key Refresh Complete
+          LE Meta
 
-v8 declares BT_VOICE_CVSD_16BIT
-Merge T*, S* and D* patches in one
-The last patch returns -ECONNABORTED when trying to setup a transparent data
-connection if eSCO is not supported.
+This is according to Core Specification, Part E, Section 3.
 
-v7 changes defaults to BT_VOICE_CVSD
-Remove mask parameter to sco_conn_defer_accept, it was always 0
-check the bits for air codec instead of use constants.
-Add S3, S2, S1, D1, D0 settings.
-The controller default is now only used to initialize the controller or fill
-in the missing information in case of using the old Add_SCO command
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_core.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-v6 fixes style issues
-
-v5 changes interface to SOL_BLUETOOTH, BT_VOICE.
-Rework fallback mechanism.
-
-This is the patch version 4 of the socket option for enabling transparent SCO.
-As requested by Marcel, this is now a 16-bit voice_setting.
-0x0000 is the value corresponding to current behavior.
-0x0003 is the value to use for enabling transparent data.
-It is easy to allow all possible values from Bluetooth core spec, but I guess
-results can be unexpected...
-Should we filter allowed values in setsockopt ?
-
-Let me know what you think.
-Regards,
-Fred
-
-
-Frédéric Dalleau (10):
-  Bluetooth: Use hci_connect_sco directly
-  Bluetooth: Remove unused mask parameter in sco_conn_defer_accept
-  Bluetooth: Add Bluetooth socket voice option
-  Bluetooth: Add constants for SCO airmode
-  Bluetooth: Use voice setting in deferred SCO connection request
-  Bluetooth: Parameters for outgoing SCO connections
-  Bluetooth: Add constants and macro declaration for transparent data
-  Bluetooth: Prevent transparent SCO on older devices
-  Bluetooth: Handle specific error for SCO connection fallback
-  Bluetooth: Add SCO connection fallback
-
- include/net/bluetooth/bluetooth.h |    8 ++++
- include/net/bluetooth/hci.h       |    1 +
- include/net/bluetooth/hci_core.h  |   10 ++++-
- include/net/bluetooth/sco.h       |    1 +
- net/bluetooth/hci_conn.c          |   59 ++++++++++++++++++++++------
- net/bluetooth/hci_event.c         |    7 ++--
- net/bluetooth/sco.c               |   77 ++++++++++++++++++++++++++++++-------
- 7 files changed, 134 insertions(+), 29 deletions(-)
-
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index b821b19..8d9b87d 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -454,6 +454,18 @@ static void hci_setup_event_mask(struct hci_request *req)
+ 		events[4] |= 0x04; /* Read Remote Extended Features Complete */
+ 		events[5] |= 0x08; /* Synchronous Connection Complete */
+ 		events[5] |= 0x10; /* Synchronous Connection Changed */
++	} else {
++		/* Use a different default for LE-only devices */
++		memset(events, 0, sizeof(events));
++		events[0] |= 0x10; /* Disconnection Complete */
++		events[0] |= 0x80; /* Encryption Change */
++		events[1] |= 0x08; /* Read Remote Version Information Complete */
++		events[1] |= 0x20; /* Command Complete */
++		events[1] |= 0x40; /* Command Status */
++		events[1] |= 0x80; /* Hardware Error */
++		events[2] |= 0x04; /* Number of Completed Packets */
++		events[3] |= 0x02; /* Data Buffer Overflow */
++		events[5] |= 0x80; /* Encryption Key Refresh Complete */
+ 	}
+ 
+ 	if (lmp_inq_rssi_capable(hdev))
 -- 
-1.7.9.5
+1.8.3.1
 
