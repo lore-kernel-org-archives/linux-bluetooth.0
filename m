@@ -1,24 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Cesare Magri" <cesare.magri@corscience.de>
-To: <linux-bluetooth@vger.kernel.org>
-Subject: Bluez Certification
-Date: Tue, 13 Aug 2013 15:18:31 +0200
-Message-ID: <003401ce9827$9b83b690$d28b23b0$@corscience.de>
+Message-ID: <520A3040.2090209@linux.intel.com>
+Date: Tue, 13 Aug 2013 15:10:24 +0200
+From: =?ISO-8859-1?Q?Fr=E9d=E9ric_DALLEAU?=
+ <frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="US-ASCII"
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] sco-tester: Update ECONNABORTED to EOPNOTSUPP
+References: <1376062977-1497-1-git-send-email-frederic.dalleau@linux.intel.com> <09231CA6-E5F3-453E-9479-68F08072893A@holtmann.org> <52089E1F.60704@linux.intel.com> <88BDC584-6DC7-457A-92B3-3C00D30CCEBC@holtmann.org>
+In-Reply-To: <88BDC584-6DC7-457A-92B3-3C00D30CCEBC@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear All,
-I have a question regarding the BT certification of systems when using
-Bluez.
+Hi Marcel,
 
-Can I use Bluez together with any HCI BT-certified module without having to
-repeat the BT certification, i.e. using the BT logo on my device?
-Or is the BT-certification of Bluez valid only for certain Modules? If yes
-which ones?
+Le 13/08/2013 01:22, Marcel Holtmann a écrit :
 
-Many thanks in advance for your reply.
-Cesare
+> However I only looked at the error codes you listed in this email. Maybe there is even a better one, maybe there is not. I am pretty much open to discuss alternatives here.
 
+Thanks for detailed feedback. For the vast majority of other errors
+code, there was no need to go through code to eliminate them: Their 
+purpose if usually very restrictive.
+
+Let's list some potential candidate just in case:
+#define ENOSYS          38      /* Function not implemented */
+#define ENOSR           63      /* Out of streams resources */
+#define ENOMEDIUM       123     /* No medium found */
+
+Regards,
+Frederic
