@@ -1,137 +1,265 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 16 Aug 2013 00:29:31 -0300
-From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: Fix removing Long Term Key
-Message-ID: <20130816032931.GA24753@echo>
-References: <1374776057-2618-1-git-send-email-claudio.takahasi@openbossa.org>
- <1374780864-8529-1-git-send-email-claudio.takahasi@openbossa.org>
- <CAKT1EBeGHzSTZEPr6Ap=h2u5TyGy2wGxyXP2FfUCT2dKQQpK8Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAKT1EBeGHzSTZEPr6Ap=h2u5TyGy2wGxyXP2FfUCT2dKQQpK8Q@mail.gmail.com>
+In-Reply-To: <1375721952-3601-1-git-send-email-syamsidhardh@gmail.com>
+References: <1375721952-3601-1-git-send-email-syamsidhardh@gmail.com>
+Date: Thu, 15 Aug 2013 19:48:17 +0530
+Message-ID: <CAFBvHifzYHnFgBz1ESUUdVzPw=_MoY4vtDvEg06V7bGm0DSBHw@mail.gmail.com>
+Subject: Re: [PATCH 1/1 v4] Bluetooth: Fix ACL alive for long in case of non
+ pariable devices
+From: Syam Sidhardhan <syamsidhardh@gmail.com>
+To: User Name <linux-bluetooth@vger.kernel.org>
+Cc: Syam Sidhardhan <s.syam@samsung.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi,
 
-On 17:27 Thu 25 Jul, Claudio Takahasi wrote:
-> Hi Vinicius:
-> 
-> On Thu, Jul 25, 2013 at 4:34 PM, Claudio Takahasi
-> <claudio.takahasi@openbossa.org> wrote:
-> > This patch fixes authentication failure on LE link re-connection when
-> > BlueZ acts as slave (peripheral). LTK is removed from the internal list
-> > after its first use causing PIN or Key missing reply when re-connecting
-> > the link. The LE Long Term Key Request event indicates that the master
-> > is attempting to encrypt or re-encrypt the link.
-> >
-> > Pre-condition: BlueZ host paired and running as slave.
-> > How to reproduce(master):
-> >   1) Establish an ACL LE encrypted link
-> >   2) Disconnect the link
-> >   3) Try to re-establish the ACL LE encrypted link (fails)
-> >
-> >> HCI Event: LE Meta Event (0x3e) plen 19
-> >       LE Connection Complete (0x01)
-> >         Status: Success (0x00)
-> >         Handle: 64
-> >         Role: Slave (0x01)
-> > ...
-> > @ Device Connected: 00:02:72:DC:29:C9 (1) flags 0x0000
-> >> HCI Event: LE Meta Event (0x3e) plen 13
-> >       LE Long Term Key Request (0x05)
-> >         Handle: 64
-> >         Random number: 875be18439d9aa37
-> >         Encryption diversifier: 0x76ed
-> > < HCI Command: LE Long Term Key Request Reply (0x08|0x001a) plen 18
-> >         Handle: 64
-> >         Long term key: 2aa531db2fce9f00a0569c7d23d17409
-> >> HCI Event: Command Complete (0x0e) plen 6
-> >       LE Long Term Key Request Reply (0x08|0x001a) ncmd 1
-> >         Status: Success (0x00)
-> >         Handle: 64
-> >> HCI Event: Encryption Change (0x08) plen 4
-> >         Status: Success (0x00)
-> >         Handle: 64
-> >         Encryption: Enabled with AES-CCM (0x01)
-> > ...
-> > @ Device Disconnected: 00:02:72:DC:29:C9 (1) reason 3
-> > < HCI Command: LE Set Advertise Enable (0x08|0x000a) plen 1
-> >         Advertising: Enabled (0x01)
-> >> HCI Event: Command Complete (0x0e) plen 4
-> >       LE Set Advertise Enable (0x08|0x000a) ncmd 1
-> >         Status: Success (0x00)
-> >> HCI Event: LE Meta Event (0x3e) plen 19
-> >       LE Connection Complete (0x01)
-> >         Status: Success (0x00)
-> >         Handle: 64
-> >         Role: Slave (0x01)
-> > ...
-> > @ Device Connected: 00:02:72:DC:29:C9 (1) flags 0x0000
-> >> HCI Event: LE Meta Event (0x3e) plen 13
-> >       LE Long Term Key Request (0x05)
-> >         Handle: 64
-> >         Random number: 875be18439d9aa37
-> >         Encryption diversifier: 0x76ed
-> > < HCI Command: LE Long Term Key Request Neg Reply (0x08|0x001b) plen 2
-> >         Handle: 64
-> >> HCI Event: Command Complete (0x0e) plen 6
-> >       LE Long Term Key Request Neg Reply (0x08|0x001b) ncmd 1
-> >         Status: Success (0x00)
-> >         Handle: 64
-> >> HCI Event: Disconnect Complete (0x05) plen 4
-> >         Status: Success (0x00)
-> >         Handle: 64
-> >         Reason: Authentication Failure (0x05)
-> > @ Device Disconnected: 00:02:72:DC:29:C9 (1) reason 0
-> >
-> > Signed-off-by: Claudio Takahasi <claudio.takahasi@openbossa.org>
-> > ---
-> >  net/bluetooth/hci_event.c | 8 +++++++-
-> >  1 file changed, 7 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > index ae78738..124a5e2 100644
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -3558,7 +3558,13 @@ static void hci_le_ltk_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> >
-> >         hci_send_cmd(hdev, HCI_OP_LE_LTK_REPLY, sizeof(cp), &cp);
-> >
-> > -       if (ltk->type & HCI_SMP_STK) {
-> > +       /*
-> > +        * Ref. Bluetooth Core SPEC pages 1975 and 2004. STK is a temporary
-> > +        * key used to encrypt a connection following pairing. It is used
-> > +        * during the Encrypted Session Setup to distribute the keys. Later,
-> > +        * security can be re-established using a distributed LTK.
-> > +        */
-> > +       if (ltk->type == HCI_SMP_STK_SLAVE) {
+On Mon, Aug 5, 2013 at 10:29 PM, Syam Sidhardhan <syamsidhardh@gmail.com> wrote:
+> From: Syam Sidhardhan <s.syam@samsung.com>
+>
+> For certain devices (ex: HID mouse), support for authentication,
+> pairing and bonding is optional. For such devices, the ACL alive
+> for too long after the L2CAP disconnection.
+>
+> To avoid the ACL alive for too long after L2CAP disconnection, reset the
+> ACL disconnect timeout back to HCI_DISCONN_TIMEOUT during L2CAP connect.
+>
+> While merging the commit id:a9ea3ed9b71cc3271dd59e76f65748adcaa76422
+> this issue might have introduced.
+>
+> Hcidump info:
+> sh-4.1# /opt/hcidump -Xt
+> HCI sniffer - Bluetooth packet analyzer ver 2.4
+> device: hci0 snap_len: 1500 filter: 0xffffffff
+> 2013-08-05 16:48:47.847053 > HCI Event: Connect Request (0x04) plen 10
+>     bdaddr 00:12:A1:65:E5:B2 class 0x002580 type ACL
+> 2013-08-05 16:48:47.847310 < HCI Command: Accept Connection Request (0x01
+>     |0x0009) plen 7
+>     bdaddr 00:12:A1:65:E5:B2 role 0x00
+>     Role: Master
+> 2013-08-05 16:48:47.848436 > HCI Event: Command Status (0x0f) plen 4
+>     Accept Connection Request (0x01|0x0009) status 0x00 ncmd 1
+> 2013-08-05 16:48:48.007120 > HCI Event: Role Change (0x12) plen 8
+>     status 0x00 bdaddr 00:12:A1:65:E5:B2 role 0x00
+>     Role: Master
+> 2013-08-05 16:48:48.050475 > HCI Event: Connect Complete (0x03) plen 11
+>     status 0x00 handle 12 bdaddr 00:12:A1:65:E5:B2 type ACL encrypt 0x00
+> 2013-08-05 16:48:48.051235 < HCI Command: Read Remote Supported Features
+>     (0x01|0x001b) plen 2
+>     handle 12
+> 2013-08-05 16:48:48.051691 > HCI Event: Command Status (0x0f) plen 4
+>     Read Remote Supported Features (0x01|0x001b) status 0x00 ncmd 1
+> 2013-08-05 16:48:48.051864 > HCI Event: Read Remote Supported Features
+>     (0x0b) plen 11
+>     status 0x00 handle 12
+>     Features: 0xbc 0x02 0x04 0x38 0x08 0x00 0x00 0x00
+> 2013-08-05 16:48:48.051899 < HCI Command: Remote Name Request (0x01|
+>     0x0019) plen 10
+>     bdaddr 00:12:A1:65:E5:B2 mode 2 clkoffset 0x0000
+> 2013-08-05 16:48:48.052530 > HCI Event: Command Status (0x0f) plen 4
+>     Remote Name Request (0x01|0x0019) status 0x00 ncmd 1
+> 2013-08-05 16:48:48.056407 > ACL data: handle 12 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 17 scid 0x0049
+> 2013-08-05 16:48:48.056492 < ACL data: handle 12 flags 0x00 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0049 result 1 status 0
+>       Connection pending - No futher information available
+> 2013-08-05 16:48:48.056510 < ACL data: handle 12 flags 0x00 dlen 10
+>     L2CAP(s): Info req: type 2
+> 2013-08-05 16:48:48.061404 > HCI Event: Number of Completed Packets
+>     (0x13) plen 5
+>     handle 12 packets 2
+> 2013-08-05 16:48:48.064019 > ACL data: handle 12 flags 0x02 dlen 16
+>     L2CAP(s): Info rsp: type 2 result 0
+>       Extended feature mask 0x0004
+>         Bi-directional QoS
+> 2013-08-05 16:48:48.064059 < ACL data: handle 12 flags 0x00 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0040 scid 0x0049 result 0 status 0
+>       Connection successful
+> 2013-08-05 16:48:48.064071 < ACL data: handle 12 flags 0x00 dlen 12
+>     L2CAP(s): Config req: dcid 0x0049 flags 0x00 clen 0
+> 2013-08-05 16:48:48.067220 > HCI Event: Remote Name Req Complete (0x07)
+>     plen 255
+>     status 0x00 bdaddr 00:12:A1:65:E5:B2 name 'Bluetooth Mouse'
+> 2013-08-05 16:48:48.067627 > HCI Event: Number of Completed Packets
+>     (0x13) plen 5
+>     handle 12 packets 2
+> 2013-08-05 16:48:48.070114 > ACL data: handle 12 flags 0x02 dlen 16
+>     L2CAP(s): Config req: dcid 0x0040 flags 0x00 clen 4
+>       MTU 185
+> 2013-08-05 16:48:48.070148 < ACL data: handle 12 flags 0x00 dlen 18
+>     L2CAP(s): Config rsp: scid 0x0049 flags 0x00 result 0 clen 4
+>       MTU 185
+> 2013-08-05 16:48:48.072642 > ACL data: handle 12 flags 0x02 dlen 18
+>     L2CAP(s): Config rsp: scid 0x0040 flags 0x00 result 0 clen 4
+>       MTU 185
+> 2013-08-05 16:48:48.075123 > ACL data: handle 12 flags 0x02 dlen 12
+>     L2CAP(s): Connect req: psm 19 scid 0x004a
+> 2013-08-05 16:48:48.075196 < ACL data: handle 12 flags 0x00 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0041 scid 0x004a result 1 status 2
+>       Connection pending - Authorization pending
+> 2013-08-05 16:48:48.075364 < ACL data: handle 12 flags 0x00 dlen 16
+>     L2CAP(s): Connect rsp: dcid 0x0041 scid 0x004a result 0 status 0
+>       Connection successful
+> 2013-08-05 16:48:48.075403 < ACL data: handle 12 flags 0x00 dlen 12
+>     L2CAP(s): Config req: dcid 0x004a flags 0x00 clen 0
+> 2013-08-05 16:48:48.077633 > HCI Event: Number of Completed Packets
+>     (0x13) plen 5
+>     handle 12 packets 2
+> 2013-08-05 16:48:48.080127 > HCI Event: Number of Completed Packets
+>     (0x13) plen 5
+>     handle 12 packets 2
+> 2013-08-05 16:48:48.081355 > ACL data: handle 12 flags 0x02 dlen 16
+>     L2CAP(s): Config req: dcid 0x0041 flags 0x00 clen 4
+>       MTU 185
+> 2013-08-05 16:48:48.081402 < ACL data: handle 12 flags 0x00 dlen 18
+>     L2CAP(s): Config rsp: scid 0x004a flags 0x00 result 0 clen 4
+>       MTU 185
+> 2013-08-05 16:48:48.082633 > ACL data: handle 12 flags 0x02 dlen 18
+>     L2CAP(s): Config rsp: scid 0x0041 flags 0x00 result 0 clen 4
+>       MTU 185
+> 2013-08-05 16:48:48.084838 < ACL data: handle 12 flags 0x00 dlen 12
+>     L2CAP(d): cid 0x004a len 8 [psm 19]
+>       HIDP: Data: Output report
+>       0000: 02 00 00 00 00 00 00                              .......
+> ...
+> ...
+>
+> 2013-08-05 16:49:00.894129 < ACL data: handle 12 flags 0x00 dlen 12
+>     L2CAP(s): Disconn req: dcid 0x004a scid 0x0041
+> 2013-08-05 16:49:00.894195 < HCI Command: Exit Sniff Mode (0x02|0x0004)
+>     plen 2
+>     handle 12
+> 2013-08-05 16:49:00.894269 < ACL data: handle 12 flags 0x00 dlen 12
+>     L2CAP(s): Disconn req: dcid 0x0049 scid 0x0040
+> 2013-08-05 16:49:00.895645 > HCI Event: Command Status (0x0f) plen 4
+>     Exit Sniff Mode (0x02|0x0004) status 0x00 ncmd 1
+> 2013-08-05 16:49:00.934391 > HCI Event: Mode Change (0x14) plen 6
+>     status 0x00 handle 12 mode 0x00 interval 0
+>     Mode: Active
+> 2013-08-05 16:49:00.936592 > HCI Event: Number of Completed Packets
+>     (0x13) plen 5
+>     handle 12 packets 2
+> 2013-08-05 16:49:00.951577 > ACL data: handle 12 flags 0x02 dlen 12
+>     L2CAP(s): Disconn rsp: dcid 0x004a scid 0x0041
+> 2013-08-05 16:49:00.952820 > ACL data: handle 12 flags 0x02 dlen 12
+>     L2CAP(s): Disconn rsp: dcid 0x0049 scid 0x0040
+> 2013-08-05 16:49:00.969165 > HCI Event: Mode Change (0x14) plen 6
+>     status 0x00 handle 12 mode 0x02 interval 50
+>     Mode: Sniff
+>
+> 2013-08-05 16:49:48.175533 > HCI Event: Mode Change (0x14) plen 6
+>     status 0x00 handle 12 mode 0x00 interval 0
+>     Mode: Active
+> 2013-08-05 16:49:48.219045 > HCI Event: Mode Change (0x14) plen 6
+>     status 0x00 handle 12 mode 0x02 interval 108
+>     Mode: Sniff
+>
+> 2013-08-05 16:51:00.968209 < HCI Command: Disconnect (0x01|0x0006) plen 3
+>     handle 12 reason 0x13
+>     Reason: Remote User Terminated Connection
+> 2013-08-05 16:51:00.969056 > HCI Event: Command Status (0x0f) plen 4
+>     Disconnect (0x01|0x0006) status 0x00 ncmd 1
+> 2013-08-05 16:51:01.013495 > HCI Event: Mode Change (0x14) plen 6
+>     status 0x00 handle 12 mode 0x00 interval 0
+>     Mode: Active
+> 2013-08-05 16:51:01.073777 > HCI Event: Disconn Complete (0x05) plen 4
+>     status 0x00 handle 12 reason 0x16
+>     Reason: Connection Terminated by Local Host
+>
+> ========================= Conn status =================================
+> sh-4.1# date; hcitool con
+> Mon Aug  5 16:49:16 KST 2013
+> Connections:
+>         > ACL 00:12:A1:65:E5:B2 handle 12 state 1 lm MASTER
+> sh-4.1# date; hcitool con
+> Mon Aug  5 16:50:32 KST 2013
+> Connections:
+>         > ACL 00:12:A1:65:E5:B2 handle 12 state 1 lm MASTER
+> sh-4.1# date; hcitool con
+> Mon Aug  5 16:50:59 KST 2013
+> Connections:
+>         > ACL 00:12:A1:65:E5:B2 handle 12 state 1 lm MASTER
+> sh-4.1# date; hcitool con
+> Mon Aug  5 16:51:01 KST 2013
+> Connections:
+> sh-4.1#
+>
+> ============================ After  fix ================================
+>
+> 2013-08-05 16:57:35.986648 < ACL data: handle 11 flags 0x00 dlen 12
+>     L2CAP(s): Disconn req: dcid 0x004c scid 0x0041
+> 2013-08-05 16:57:35.986713 < HCI Command: Exit Sniff Mode (0x02|0x0004)
+>     plen 2
+>     handle 11
+> 2013-08-05 16:57:35.986785 < ACL data: handle 11 flags 0x00 dlen 12
+>     L2CAP(s): Disconn req: dcid 0x004b scid 0x0040
+> 2013-08-05 16:57:35.988110 > HCI Event: Command Status (0x0f) plen 4
+>     Exit Sniff Mode (0x02|0x0004) status 0x00 ncmd 1
+> 2013-08-05 16:57:36.030714 > HCI Event: Mode Change (0x14) plen 6
+>     status 0x00 handle 11 mode 0x00 interval 0
+>     Mode: Active
+> 2013-08-05 16:57:36.032950 > HCI Event: Number of Completed Packets
+>     (0x13) plen 5
+>     handle 11 packets 2
+> 2013-08-05 16:57:36.047926 > ACL data: handle 11 flags 0x02 dlen 12
+>     L2CAP(s): Disconn rsp: dcid 0x004c scid 0x0041
+> 2013-08-05 16:57:36.049200 > ACL data: handle 11 flags 0x02 dlen 12
+>     L2CAP(s): Disconn rsp: dcid 0x004b scid 0x0040
+> 2013-08-05 16:57:36.065509 > HCI Event: Mode Change (0x14) plen 6
+>     status 0x00 handle 11 mode 0x02 interval 50
+>     Mode: Sniff
+>
+> 2013-08-05 16:57:40.052006 < HCI Command: Disconnect (0x01|0x0006) plen 3
+>     handle 11 reason 0x13
+>     Reason: Remote User Terminated Connection
+> 2013-08-05 16:57:40.052869 > HCI Event: Command Status (0x0f) plen 4
+>     Disconnect (0x01|0x0006) status 0x00 ncmd 1
+> 2013-08-05 16:57:40.104731 > HCI Event: Mode Change (0x14) plen 6
+>     status 0x00 handle 11 mode 0x00 interval 0
+>     Mode: Active
+> 2013-08-05 16:57:40.146935 > HCI Event: Disconn Complete (0x05) plen 4
+>     status 0x00 handle 11 reason 0x16
+>     Reason: Connection Terminated by Local Host
+>
+> Signed-off-by: Sang-Ki Park <sangki79.park@samsung.com>
+> Signed-off-by: Chan-yeol Park <chanyeol.park@samsung.com>
+> Signed-off-by: Jaganath Kanakkassery <jaganath.k@samsung.com>
+> Signed-off-by: Szymon Janc <szymon.janc@tieto.com>
+> Signed-off-by: Syam Sidhardhan <s.syam@samsung.com>
+> ---
+>
+> v1 -> Modified the code as per the latest code.
+> v2 -> Add descriptive comment as per Marcel request.
+> v3 -> Moved from l2cap_conn_ready() to l2cap_connect() inorder to fix remote
+>       non ssp pairing timeout. Generated the patch based on bluetooth.git tree.
+> v4 -> Include hcidump logs showing the conn status before and after fix.
+>
+> This patch is generated the patch based on bluetooth.git tree.
+>
+>  net/bluetooth/l2cap_core.c |    7 +++++++
+>  1 file changed, 7 insertions(+)
+>
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 68843a2..8179fc3 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -3753,6 +3753,13 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+>
+>         hci_conn_hold(conn->hcon);
+>
+> +       /* For certain devices (ex: HID mouse), support for authentication,
+> +        * pairing and bonding is optional. For such devices, inorder to avoid
+> +        * the ACL alive for too long after L2CAP disconnection, reset the ACL
+> +        * disc_timeout back to HCI_DISCONN_TIMEOUT during L2CAP connect.
+> +        */
+> +       conn->hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
+> +
+>         bacpy(&bt_sk(sk)->src, conn->src);
+>         bacpy(&bt_sk(sk)->dst, conn->dst);
+>         chan->psm  = psm;
+> --
+> 1.7.9.5
+>
 
-The correct one should be something like this (not tested):
-
-if (ltk->type == HCI_SMP_STK || ltk->type == HCI_SMP_STK_SLAVE) {
-
-> >                 list_del(&ltk->list);
-> >                 kfree(ltk);
-> >         }
-> > --
-> > 1.7.11.7
-> >
-> 
-> Do you see another alternative?
-> Is it feasible to avoid adding the STK in the list without adding a
-> complex logic?
-
-At least I couldn't find a way. This question made me think about another
-problem, if the connection drops between the STK generation and its use to
-encrypt the link, it's going to stay there forever. 
-
-> 
-> Regards,
-> Claudio
-
-Cheers,
--- 
-Vinicius
+ping..
