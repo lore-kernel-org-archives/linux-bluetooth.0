@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 15 Aug 2013 10:18:38 +0200
+Date: Thu, 15 Aug 2013 10:16:45 +0200
 From: Gustavo Padovan <gustavo@padovan.org>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: [PATCH] Bluetooth: Set different event mask for LE-only
  controllers
-Message-ID: <20130815081838.GD1980@joana>
+Message-ID: <20130815081645.GC1980@joana>
 References: <1376413254-36536-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
