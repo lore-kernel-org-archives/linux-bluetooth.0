@@ -1,66 +1,137 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 16 Aug 2013 00:29:31 -0300
+From: Vinicius Costa Gomes <vinicius.gomes@openbossa.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: Fix removing Long Term Key
+Message-ID: <20130816032931.GA24753@echo>
+References: <1374776057-2618-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1374780864-8529-1-git-send-email-claudio.takahasi@openbossa.org>
+ <CAKT1EBeGHzSTZEPr6Ap=h2u5TyGy2wGxyXP2FfUCT2dKQQpK8Q@mail.gmail.com>
 MIME-Version: 1.0
-Date: Fri, 16 Aug 2013 19:03:33 +0200
-Message-ID: <CAE6_+Ucpps4syp9L=fj-QYCXmOyamgoABKJBSs1AghBKys42Sw@mail.gmail.com>
-Subject: RFCOMM Server over D-Bus
-From: Christoph Reiter <reiter.christoph@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAKT1EBeGHzSTZEPr6Ap=h2u5TyGy2wGxyXP2FfUCT2dKQQpK8Q@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Claudio,
 
-I'm trying to write a simple RFCOMM server with BlueZ5 and D-Bus. I've
-registered a default agent over D-Bus to confirm any RequestAuthorization
-events and a profile object for handling incoming connections.
+On 17:27 Thu 25 Jul, Claudio Takahasi wrote:
+> Hi Vinicius:
+> 
+> On Thu, Jul 25, 2013 at 4:34 PM, Claudio Takahasi
+> <claudio.takahasi@openbossa.org> wrote:
+> > This patch fixes authentication failure on LE link re-connection when
+> > BlueZ acts as slave (peripheral). LTK is removed from the internal list
+> > after its first use causing PIN or Key missing reply when re-connecting
+> > the link. The LE Long Term Key Request event indicates that the master
+> > is attempting to encrypt or re-encrypt the link.
+> >
+> > Pre-condition: BlueZ host paired and running as slave.
+> > How to reproduce(master):
+> >   1) Establish an ACL LE encrypted link
+> >   2) Disconnect the link
+> >   3) Try to re-establish the ACL LE encrypted link (fails)
+> >
+> >> HCI Event: LE Meta Event (0x3e) plen 19
+> >       LE Connection Complete (0x01)
+> >         Status: Success (0x00)
+> >         Handle: 64
+> >         Role: Slave (0x01)
+> > ...
+> > @ Device Connected: 00:02:72:DC:29:C9 (1) flags 0x0000
+> >> HCI Event: LE Meta Event (0x3e) plen 13
+> >       LE Long Term Key Request (0x05)
+> >         Handle: 64
+> >         Random number: 875be18439d9aa37
+> >         Encryption diversifier: 0x76ed
+> > < HCI Command: LE Long Term Key Request Reply (0x08|0x001a) plen 18
+> >         Handle: 64
+> >         Long term key: 2aa531db2fce9f00a0569c7d23d17409
+> >> HCI Event: Command Complete (0x0e) plen 6
+> >       LE Long Term Key Request Reply (0x08|0x001a) ncmd 1
+> >         Status: Success (0x00)
+> >         Handle: 64
+> >> HCI Event: Encryption Change (0x08) plen 4
+> >         Status: Success (0x00)
+> >         Handle: 64
+> >         Encryption: Enabled with AES-CCM (0x01)
+> > ...
+> > @ Device Disconnected: 00:02:72:DC:29:C9 (1) reason 3
+> > < HCI Command: LE Set Advertise Enable (0x08|0x000a) plen 1
+> >         Advertising: Enabled (0x01)
+> >> HCI Event: Command Complete (0x0e) plen 4
+> >       LE Set Advertise Enable (0x08|0x000a) ncmd 1
+> >         Status: Success (0x00)
+> >> HCI Event: LE Meta Event (0x3e) plen 19
+> >       LE Connection Complete (0x01)
+> >         Status: Success (0x00)
+> >         Handle: 64
+> >         Role: Slave (0x01)
+> > ...
+> > @ Device Connected: 00:02:72:DC:29:C9 (1) flags 0x0000
+> >> HCI Event: LE Meta Event (0x3e) plen 13
+> >       LE Long Term Key Request (0x05)
+> >         Handle: 64
+> >         Random number: 875be18439d9aa37
+> >         Encryption diversifier: 0x76ed
+> > < HCI Command: LE Long Term Key Request Neg Reply (0x08|0x001b) plen 2
+> >         Handle: 64
+> >> HCI Event: Command Complete (0x0e) plen 6
+> >       LE Long Term Key Request Neg Reply (0x08|0x001b) ncmd 1
+> >         Status: Success (0x00)
+> >         Handle: 64
+> >> HCI Event: Disconnect Complete (0x05) plen 4
+> >         Status: Success (0x00)
+> >         Handle: 64
+> >         Reason: Authentication Failure (0x05)
+> > @ Device Disconnected: 00:02:72:DC:29:C9 (1) reason 0
+> >
+> > Signed-off-by: Claudio Takahasi <claudio.takahasi@openbossa.org>
+> > ---
+> >  net/bluetooth/hci_event.c | 8 +++++++-
+> >  1 file changed, 7 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > index ae78738..124a5e2 100644
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -3558,7 +3558,13 @@ static void hci_le_ltk_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> >
+> >         hci_send_cmd(hdev, HCI_OP_LE_LTK_REPLY, sizeof(cp), &cp);
+> >
+> > -       if (ltk->type & HCI_SMP_STK) {
+> > +       /*
+> > +        * Ref. Bluetooth Core SPEC pages 1975 and 2004. STK is a temporary
+> > +        * key used to encrypt a connection following pairing. It is used
+> > +        * during the Encrypted Session Setup to distribute the keys. Later,
+> > +        * security can be re-established using a distributed LTK.
+> > +        */
+> > +       if (ltk->type == HCI_SMP_STK_SLAVE) {
 
-The profile options are the following:
+The correct one should be something like this (not tested):
 
-opts = {
-    "AutoConnect": True,
-    "Name": "FoobarService",
-    "Role": "server",
-    "Channel": dbus.UInt16(17),
-    "RequireAuthentication": False,
-    "RequireAuthorization": False,
-}
+if (ltk->type == HCI_SMP_STK || ltk->type == HCI_SMP_STK_SLAVE) {
 
-The client discovers my service, connects and sends data which I can see
-with btmon on the server.
+> >                 list_del(&ltk->list);
+> >                 kfree(ltk);
+> >         }
+> > --
+> > 1.7.11.7
+> >
+> 
+> Do you see another alternative?
+> Is it feasible to avoid adding the STK in the list without adding a
+> complex logic?
 
-My problem is now that my Profile object never gets called.
+At least I couldn't find a way. This question made me think about another
+problem, if the connection drops between the STK generation and its use to
+encrypt the link, it's going to stay there forever. 
 
-What am I doing wrong?
+> 
+> Regards,
+> Claudio
 
-regards
-
-----------------------------------
-
-bluetoothd logs (00:02:72:3F:3F:11 is the client trying to connect):
-
-bluetoothd[32663]: src/adapter.c:new_link_key_callback() hci1 new key
-for 00:02:72:3F:3F:11 type 4 pin_len 0
-bluetoothd[32663]: src/device.c:device_bonding_complete() bonding
-(nil) status 0x00
-bluetoothd[32663]: src/device.c:device_bonding_complete() setting
-timer for reverse service discovery
-bluetoothd[32663]: src/adapter.c:resume_discovery()
-bluetoothd[32663]: src/device.c:device_probe_profiles() Probing
-profiles for device 00:02:72:3F:3F:11
-bluetoothd[32663]: FoobarService service not found for device 00:02:72:3F:3F:11
-bluetoothd[32663]: src/device.c:device_probe_profiles() Probing
-profiles for device 00:02:72:3F:3F:11
-
-The stack trace at "service not found":
-
-#4  0x000000000045f6e7 in create_conn (server=server@entry=0x6d2bf0,
-io=io@entry=0x6cf2d0, dst=dst@entry=0x7fffffffe310,
-src=0x7fffffffe300) at src/profile.c:1065
-#5  0x000000000045f780 in ext_direct_connect (io=0x6cf2d0, err=0x0,
-user_data=0x6d2bf0) at src/profile.c:1192
-#6  0x0000000000445f44 in server_cb (io=0x6cf2d0, cond=(G_IO_IN |
-G_IO_OUT | G_IO_HUP | G_IO_NVAL | unknown: 19520), user_data=0x6ceef0)
-at btio/btio.c:264
-#7  0x00007ffff7b23ea6 in g_main_dispatch (context=0x6c20a0) at
-/tmp/buildd/glib2.0-2.36.4/./glib/gmain.c:3054
+Cheers,
+-- 
+Vinicius
