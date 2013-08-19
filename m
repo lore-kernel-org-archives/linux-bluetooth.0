@@ -1,27 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Sender: eminemix@gmail.com
-In-Reply-To: <1376322360-28824-1-git-send-email-valentin.ilie@gmail.com>
-References: <1376225793-22981-1-git-send-email-valentin.ilie@gmail.com>
-	<1376322360-28824-1-git-send-email-valentin.ilie@gmail.com>
-Date: Mon, 19 Aug 2013 11:41:39 +0300
-Message-ID: <CAHuBVBYQaDt6UZ6oJvY1D4DKQZnOmD+RmsgnFkYKxUPJ80L4Rw@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Remove assignment in if
-From: Valentin Ilie <valentin.ilie@gmail.com>
-To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
-	Dean_Jenkins@mentor.com
-Cc: linux-bluetooth@vger.kernel.org, Valentin Ilie <valentin.ilie@gmail.com>
+In-Reply-To: <CAK4aCBbDAG82YKZLhLg_jTG_dQoDykwimO3a18fb7eGHiXgA0Q@mail.gmail.com>
+References: <CAK4aCBbDAG82YKZLhLg_jTG_dQoDykwimO3a18fb7eGHiXgA0Q@mail.gmail.com>
+Date: Mon, 19 Aug 2013 11:04:06 +0300
+Message-ID: <CABBYNZKPwpg8=7Ehg86MkSuWxHfK62eEyJ2-XGV==ROF9K3W4w@mail.gmail.com>
+Subject: Re: Cannot connect to A2DP audio sink on Bluetooth headset
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Fabrice Delente <delentef@gmail.com>
+Cc: Liste Linux-Bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 12 August 2013 18:46, Valentin Ilie <valentin.ilie@gmail.com> wrote:
-> Remove assignment in if
+Hi Fabrice,
 
-Hello,
+On Mon, Aug 19, 2013 at 12:41 AM, Fabrice Delente <delentef@gmail.com> wrote:
+> Hello.
+>
+> I have a headset that used to work with bluez-4.101 (on gentoo), but
+> all of a sudden it was impossible to connect, even though I haven't
+> changed anything to my configuration...
+>
+> Anyway, I tried bluez-5.7 through a gentoo overlay, as stock gentoo
+> only carries bluez-4.101
+>
+> Since blueman doesn't work with bluez-5.7, I have tried to connect to
+> the sink through bluetoothctl. However, as root, I get this:
+>
+> [bluetooth]# connect 00:18:91:D0:7A:24
+> Attempting to connect to 00:18:91:D0:7A:24
+> [CHG] Device 00:18:91:D0:7A:24 Connected: yes
+> Failed to connect: org.bluez.Error.Failed
 
-Can anyone look into this patch? I've corrected it as requested.
-
-Regards,
-
--- 
-Valentin Ilie
+You probably need a newer PulseAudio with BlueZ 5 support, we are
+working on a release candidate for PulseAudio 5.0 that should work
+properly.
