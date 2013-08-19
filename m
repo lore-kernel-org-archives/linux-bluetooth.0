@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 8/8] obexd: Make use of g_dbus_send_message*
-Date: Mon, 19 Aug 2013 17:32:59 +0300
-Message-Id: <1376922779-11802-10-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 5/8] core: Make use of g_dbus_send_message_with_reply
+Date: Mon, 19 Aug 2013 17:32:56 +0300
+Message-Id: <1376922779-11802-7-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1376922779-11802-1-git-send-email-luiz.dentz@gmail.com>
 References: <1376922779-11802-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,96 +11,93 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This replaces dbus_connection_send* with g_dbus_send_message* which do
-not alter message order.
+This replaces dbus_connection_send_with_reply with
+g_dbus_send_message_with_reply which does not alter message order.
 ---
- obexd/plugins/bluetooth.c     | 2 +-
- obexd/plugins/pcsuite.c       | 5 ++---
- obexd/plugins/syncevolution.c | 6 +++---
- obexd/src/manager.c           | 3 +--
- 4 files changed, 7 insertions(+), 9 deletions(-)
+ src/agent.c   | 12 ++++++------
+ src/profile.c |  4 ++--
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
-index e4d518e..10f5e4f 100644
---- a/obexd/plugins/bluetooth.c
-+++ b/obexd/plugins/bluetooth.c
-@@ -317,7 +317,7 @@ static int register_profile(struct bluetooth_profile *profile)
- 	}
- 	dbus_message_iter_close_container(&iter, &opt);
+diff --git a/src/agent.c b/src/agent.c
+index b9e6e8c..7880ba6 100644
+--- a/src/agent.c
++++ b/src/agent.c
+@@ -370,7 +370,7 @@ static int agent_call_authorize_service(struct agent_request *req,
+ 				DBUS_TYPE_STRING, &uuid,
+ 				DBUS_TYPE_INVALID);
  
--	if (!dbus_connection_send_with_reply(connection, msg, &call, -1)) {
-+	if (!g_dbus_send_message_with_reply(connection, msg, &call, -1)) {
- 		ret = -1;
- 		unregister_profile(profile);
- 		goto failed;
-diff --git a/obexd/plugins/pcsuite.c b/obexd/plugins/pcsuite.c
-index 4ce2fe4..6460aa9 100644
---- a/obexd/plugins/pcsuite.c
-+++ b/obexd/plugins/pcsuite.c
-@@ -351,7 +351,7 @@ static gboolean send_backup_dbus_message(const char *oper,
+-	if (dbus_connection_send_with_reply(btd_get_dbus_connection(),
++	if (g_dbus_send_message_with_reply(btd_get_dbus_connection(),
+ 						req->msg, &req->call,
+ 						REQUEST_TIMEOUT) == FALSE) {
+ 		error("D-Bus send failed");
+@@ -480,7 +480,7 @@ static int pincode_request_new(struct agent_request *req, const char *device_pat
+ 	dbus_message_append_args(req->msg, DBUS_TYPE_OBJECT_PATH, &device_path,
  					DBUS_TYPE_INVALID);
  
- 	if (strcmp(oper, "open") == 0) {
--		ret = dbus_connection_send_with_reply(conn, msg, &pending_call,
-+		ret = g_dbus_send_message_with_reply(conn, msg, &pending_call,
- 							BACKUP_DBUS_TIMEOUT);
+-	if (dbus_connection_send_with_reply(btd_get_dbus_connection(), req->msg,
++	if (g_dbus_send_message_with_reply(btd_get_dbus_connection(), req->msg,
+ 					&req->call, REQUEST_TIMEOUT) == FALSE) {
+ 		error("D-Bus send failed");
+ 		return -EIO;
+@@ -574,7 +574,7 @@ static int passkey_request_new(struct agent_request *req,
+ 	dbus_message_append_args(req->msg, DBUS_TYPE_OBJECT_PATH, &device_path,
+ 					DBUS_TYPE_INVALID);
+ 
+-	if (dbus_connection_send_with_reply(btd_get_dbus_connection(), req->msg,
++	if (g_dbus_send_message_with_reply(btd_get_dbus_connection(), req->msg,
+ 					&req->call, REQUEST_TIMEOUT) == FALSE) {
+ 		error("D-Bus send failed");
+ 		return -EIO;
+@@ -632,7 +632,7 @@ static int confirmation_request_new(struct agent_request *req,
+ 				DBUS_TYPE_UINT32, &passkey,
+ 				DBUS_TYPE_INVALID);
+ 
+-	if (dbus_connection_send_with_reply(btd_get_dbus_connection(), req->msg,
++	if (g_dbus_send_message_with_reply(btd_get_dbus_connection(), req->msg,
+ 				&req->call, REQUEST_TIMEOUT) == FALSE) {
+ 		error("D-Bus send failed");
+ 		return -EIO;
+@@ -689,7 +689,7 @@ static int authorization_request_new(struct agent_request *req,
+ 				DBUS_TYPE_OBJECT_PATH, &device_path,
+ 				DBUS_TYPE_INVALID);
+ 
+-	if (dbus_connection_send_with_reply(btd_get_dbus_connection(), req->msg,
++	if (g_dbus_send_message_with_reply(btd_get_dbus_connection(), req->msg,
+ 				&req->call, REQUEST_TIMEOUT) == FALSE) {
+ 		error("D-Bus send failed");
+ 		return -EIO;
+@@ -823,7 +823,7 @@ static int display_pincode_request_new(struct agent_request *req,
+ 					DBUS_TYPE_STRING, &pincode,
+ 					DBUS_TYPE_INVALID);
+ 
+-	if (dbus_connection_send_with_reply(btd_get_dbus_connection(), req->msg,
++	if (g_dbus_send_message_with_reply(btd_get_dbus_connection(), req->msg,
+ 				&req->call, REQUEST_TIMEOUT) == FALSE) {
+ 		error("D-Bus send failed");
+ 		return -EIO;
+diff --git a/src/profile.c b/src/profile.c
+index 90c3535..57aead7 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -938,7 +938,7 @@ static bool send_new_connection(struct ext_profile *ext, struct ext_io *conn)
+ 
+ 	dbus_message_iter_close_container(&iter, &dict);
+ 
+-	if (!dbus_connection_send_with_reply(btd_get_dbus_connection(),
++	if (!g_dbus_send_message_with_reply(btd_get_dbus_connection(),
+ 						msg, &conn->pending, -1)) {
+ 		error("%s: sending NewConnection failed", ext->name);
  		dbus_message_unref(msg);
- 		if (ret) {
-@@ -363,8 +363,7 @@ static gboolean send_backup_dbus_message(const char *oper,
- 		} else
- 			dbus_connection_unref(conn);
- 	} else {
--		ret = dbus_connection_send(conn, msg, NULL);
--		dbus_message_unref(msg);
-+		g_dbus_send_message(conn, msg);
- 		dbus_connection_unref(conn);
- 	}
- 
-diff --git a/obexd/plugins/syncevolution.c b/obexd/plugins/syncevolution.c
-index 2d25d28..edc00c8 100644
---- a/obexd/plugins/syncevolution.c
-+++ b/obexd/plugins/syncevolution.c
-@@ -314,7 +314,7 @@ static int synce_close(void *object)
- 	dbus_message_append_args(msg, DBUS_TYPE_BOOLEAN, &normal,
- 				DBUS_TYPE_STRING, &error, DBUS_TYPE_INVALID);
- 
--	dbus_connection_send_with_reply(context->dbus_conn, msg, &call, -1);
-+	g_dbus_send_message_with_reply(context->dbus_conn, msg, &call, -1);
- 	dbus_pending_call_set_notify(call, close_cb, NULL, NULL);
- 	dbus_message_unref(msg);
- 	dbus_pending_call_unref(call);
-@@ -380,7 +380,7 @@ static ssize_t synce_read(void *object, void *buf, size_t count)
- 	dbus_message_append_args(msg, DBUS_TYPE_BOOLEAN, &authenticate,
- 			DBUS_TYPE_STRING, &session, DBUS_TYPE_INVALID);
- 
--	if (!dbus_connection_send_with_reply(conn, msg, &call, -1)) {
-+	if (!g_dbus_send_message_with_reply(conn, msg, &call, -1)) {
- 		error("D-Bus call to %s failed.", SYNCE_SERVER_INTERFACE);
- 		dbus_message_unref(msg);
- 		return -EPERM;
-@@ -424,7 +424,7 @@ static ssize_t synce_write(void *object, const void *buf, size_t count)
- 	dbus_message_append_args(msg, DBUS_TYPE_STRING, &type,
- 						DBUS_TYPE_INVALID);
- 
--	if (!dbus_connection_send_with_reply(context->dbus_conn, msg,
-+	if (!g_dbus_send_message_with_reply(context->dbus_conn, msg,
- 								&call, -1)) {
- 		error("D-Bus call to %s failed.", SYNCE_CONN_INTERFACE);
- 		dbus_message_unref(msg);
-diff --git a/obexd/src/manager.c b/obexd/src/manager.c
-index dbfbef8..f64b7b9 100644
---- a/obexd/src/manager.c
-+++ b/obexd/src/manager.c
-@@ -776,8 +776,7 @@ int manager_request_authorization(struct obex_transfer *transfer, int32_t time,
- 	dbus_message_append_args(msg, DBUS_TYPE_OBJECT_PATH, &transfer->path,
+@@ -1682,7 +1682,7 @@ static int send_disconn_req(struct ext_profile *ext, struct ext_io *conn)
+ 	dbus_message_append_args(msg, DBUS_TYPE_OBJECT_PATH, &path,
  							DBUS_TYPE_INVALID);
  
--	if (!dbus_connection_send_with_reply(connection,
--					msg, &call, TIMEOUT)) {
-+	if (!g_dbus_send_message_with_reply(connection, msg, &call, TIMEOUT)) {
+-	if (!dbus_connection_send_with_reply(btd_get_dbus_connection(),
++	if (!g_dbus_send_message_with_reply(btd_get_dbus_connection(),
+ 						msg, &conn->pending, -1)) {
+ 		error("%s: sending RequestDisconnection failed", ext->name);
  		dbus_message_unref(msg);
- 		return -EPERM;
- 	}
 -- 
 1.8.3.1
 
