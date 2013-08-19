@@ -5,9 +5,9 @@ To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>,
 	Johan Hedberg <johan.hedberg@intel.com>
-Subject: [PATCH v11 08/10] Bluetooth: Prevent transparent SCO on older devices
-Date: Mon, 19 Aug 2013 14:24:01 +0200
-Message-Id: <1376915043-24531-9-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: [PATCH v11 10/10] Bluetooth: Add SCO connection fallback
+Date: Mon, 19 Aug 2013 14:24:03 +0200
+Message-Id: <1376915043-24531-11-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1376915043-24531-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1376915043-24531-1-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
@@ -16,45 +16,139 @@ Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Older Bluetooth devices may not support Setup Synchronous Connection or
-SCO transparent data. This is indicated by the corresponding LMP feature
-bits. It is not possible to know if the adapter support these features
-before setting BT_VOICE option since the socket is not bound to an
-adapter. An adapter can also be added after the socket is created. The
-socket can be bound to an address before adapter is plugged in.
+When initiating a transparent eSCO connection, make use of T2 settings
+at first try. T2 is the recommended settings from HFP 1.6 WideBand
+Speech. Upon connection failure, try T1 settings.
 
-Thus, on a such adapters, if user request BT_VOICE_TRANSPARENT, outgoing
-connections fail on connect() and returns -EOPNOTSUPP. Incoming
-connections do not fail. However, they should only be allowed depending
-on what was specified in Write_Voice_Settings command.
+When CVSD is requested and eSCO is supported, try to establish eSCO
+connection using S3 settings. If it fails, fallback in sequence to S2,
+S1, D1, D0 settings.
 
-EOPNOTSUPP is choosen because connect() system call is failing after
-selecting route but before any connection attempt.
+To know which setting should be used, conn->attempt is used. It
+indicates the currently ongoing SCO connection attempt and can be used
+as the index for the fallback settings table.
+
+These setting and the fallback order are described in Bluetooth HFP 1.6
+specification p. 101.
 
 Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/sco.c |    6 ++++++
- 1 file changed, 6 insertions(+)
+ include/net/bluetooth/hci_core.h |    2 +-
+ net/bluetooth/hci_conn.c         |   44 +++++++++++++++++++++++++++++++-------
+ net/bluetooth/hci_event.c        |    6 +++---
+ 3 files changed, 40 insertions(+), 12 deletions(-)
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index e82d792..1170b6e 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -176,6 +176,12 @@ static int sco_connect(struct sock *sk)
- 	else
- 		type = SCO_LINK;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index b2bfab8..3ede820 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -570,7 +570,7 @@ static inline struct hci_conn *hci_conn_hash_lookup_state(struct hci_dev *hdev,
+ }
  
-+	if (sco_pi(sk)->setting == BT_VOICE_TRANSPARENT &&
-+	    (!lmp_transp_capable(hdev) || !lmp_esco_capable(hdev))) {
-+		err = -EOPNOTSUPP;
-+		goto done;
-+	}
+ void hci_disconnect(struct hci_conn *conn, __u8 reason);
+-void hci_setup_sync(struct hci_conn *conn, __u16 handle);
++bool hci_setup_sync(struct hci_conn *conn, __u16 handle);
+ void hci_sco_setup(struct hci_conn *conn, __u8 status);
+ 
+ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst);
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index c0e56a5..f081712 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -31,6 +31,24 @@
+ #include <net/bluetooth/a2mp.h>
+ #include <net/bluetooth/smp.h>
+ 
++struct sco_param {
++	u16 pkt_type;
++	u16 max_latency;
++};
 +
- 	hcon = hci_connect_sco(hdev, type, dst, sco_pi(sk)->setting);
- 	if (IS_ERR(hcon)) {
- 		err = PTR_ERR(hcon);
++static const struct sco_param sco_param_cvsd[] = {
++	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x000a }, /* S3 */
++	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x0007 }, /* S2 */
++	{ EDR_ESCO_MASK | ESCO_EV3,   0x0007 }, /* S1 */
++	{ EDR_ESCO_MASK | ESCO_HV3,   0xffff }, /* D1 */
++	{ EDR_ESCO_MASK | ESCO_HV1,   0xffff }, /* D0 */
++};
++
++static const struct sco_param sco_param_wideband[] = {
++	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x000d }, /* T2 */
++	{ EDR_ESCO_MASK | ESCO_EV3,   0x0008 }, /* T1 */
++};
++
+ static void hci_le_create_connection(struct hci_conn *conn)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+@@ -172,10 +190,11 @@ static void hci_add_sco(struct hci_conn *conn, __u16 handle)
+ 	hci_send_cmd(hdev, HCI_OP_ADD_SCO, sizeof(cp), &cp);
+ }
+ 
+-void hci_setup_sync(struct hci_conn *conn, __u16 handle)
++bool hci_setup_sync(struct hci_conn *conn, __u16 handle)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+ 	struct hci_cp_setup_sync_conn cp;
++	const struct sco_param *param;
+ 
+ 	BT_DBG("hcon %p", conn);
+ 
+@@ -192,19 +211,28 @@ void hci_setup_sync(struct hci_conn *conn, __u16 handle)
+ 
+ 	switch (conn->setting & SCO_AIRMODE_MASK) {
+ 	case SCO_AIRMODE_TRANSP:
+-		cp.pkt_type = __constant_cpu_to_le16(EDR_ESCO_MASK &
+-						     ~ESCO_2EV3);
+-		cp.max_latency = __constant_cpu_to_le16(0x000d);
++		if (conn->attempt > ARRAY_SIZE(sco_param_wideband))
++			return false;
+ 		cp.retrans_effort = 0x02;
++		param = &sco_param_wideband[conn->attempt - 1];
+ 		break;
+ 	case SCO_AIRMODE_CVSD:
+-		cp.pkt_type = cpu_to_le16(conn->pkt_type);
+-		cp.max_latency = __constant_cpu_to_le16(0xffff);
+-		cp.retrans_effort = 0xff;
++		if (conn->attempt > ARRAY_SIZE(sco_param_cvsd))
++			return false;
++		cp.retrans_effort = 0x01;
++		param = &sco_param_cvsd[conn->attempt - 1];
+ 		break;
++	default:
++		return false;
+ 	}
+ 
+-	hci_send_cmd(hdev, HCI_OP_SETUP_SYNC_CONN, sizeof(cp), &cp);
++	cp.pkt_type = __cpu_to_le16(param->pkt_type);
++	cp.max_latency = __cpu_to_le16(param->max_latency);
++
++	if (hci_send_cmd(hdev, HCI_OP_SETUP_SYNC_CONN, sizeof(cp), &cp) < 0)
++		return false;
++
++	return true;
+ }
+ 
+ void hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max,
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index a8bb7bb..94aab73 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2909,11 +2909,11 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
+ 	case 0x1c:	/* SCO interval rejected */
+ 	case 0x1a:	/* Unsupported Remote Feature */
+ 	case 0x1f:	/* Unspecified error */
+-		if (conn->out && conn->attempt < 2) {
++		if (conn->out) {
+ 			conn->pkt_type = (hdev->esco_type & SCO_ESCO_MASK) |
+ 					(hdev->esco_type & EDR_ESCO_MASK);
+-			hci_setup_sync(conn, conn->link->handle);
+-			goto unlock;
++			if (hci_setup_sync(conn, conn->link->handle))
++				goto unlock;
+ 		}
+ 		/* fall through */
+ 
 -- 
 1.7.9.5
 
