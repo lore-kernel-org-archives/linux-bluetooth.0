@@ -1,33 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] build: Fix not rebuilding bluetoothd if gdbus changes
-Date: Mon, 19 Aug 2013 17:48:46 +0300
-Message-Id: <1376923727-12152-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 7/8] audio/media: Make use of g_dbus_send_message_with_reply
+Date: Mon, 19 Aug 2013 17:32:58 +0300
+Message-Id: <1376922779-11802-9-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1376922779-11802-1-git-send-email-luiz.dentz@gmail.com>
+References: <1376922779-11802-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-src_bluetoothd_DEPENDENCIES should list all local libraries including gdbus
-otherwise it does not get recompiled whenever gdbus changes.
+This replaces dbus_connection_send_with_reply with
+g_dbus_send_message_with_reply which does not alter message order.
 ---
- Makefile.am | 2 +-
+ profiles/audio/media.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index b8890ec..bf66c2b 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -157,7 +157,7 @@ src_bluetoothd_LDFLAGS = $(AM_LDFLAGS) -Wl,--export-dynamic \
- 				-Wl,--version-script=$(srcdir)/src/bluetooth.ver
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index 5a06b99..9c72b8d 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -325,7 +325,7 @@ static gboolean media_endpoint_async_call(DBusMessage *msg,
+ 	request = g_new0(struct endpoint_request, 1);
  
- src_bluetoothd_DEPENDENCIES = lib/libbluetooth-internal.la \
--						src/bluetooth.service
-+				gdbus/libgdbus-internal.la src/bluetooth.service
- 
- src_bluetoothd_CFLAGS = $(AM_CFLAGS) -DBLUETOOTH_PLUGIN_BUILTIN \
- 					-DPLUGINDIR=\""$(build_plugindir)"\"
+ 	/* Timeout should be less than avdtp request timeout (4 seconds) */
+-	if (dbus_connection_send_with_reply(btd_get_dbus_connection(),
++	if (g_dbus_send_message_with_reply(btd_get_dbus_connection(),
+ 						msg, &request->call,
+ 						REQUEST_TIMEOUT) == FALSE) {
+ 		error("D-Bus send failed");
 -- 
 1.8.3.1
 
