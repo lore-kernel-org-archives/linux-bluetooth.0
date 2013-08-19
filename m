@@ -3,10 +3,11 @@ From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
 	<frederic.dalleau@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
-	<frederic.dalleau@linux.intel.com>
-Subject: [PATCH v11 09/10] Bluetooth: Handle specific error for SCO connection fallback
-Date: Mon, 19 Aug 2013 14:24:02 +0200
-Message-Id: <1376915043-24531-10-git-send-email-frederic.dalleau@linux.intel.com>
+	<frederic.dalleau@linux.intel.com>,
+	Johan Hedberg <johan.hedberg@intel.com>
+Subject: [PATCH v11 08/10] Bluetooth: Prevent transparent SCO on older devices
+Date: Mon, 19 Aug 2013 14:24:01 +0200
+Message-Id: <1376915043-24531-9-git-send-email-frederic.dalleau@linux.intel.com>
 In-Reply-To: <1376915043-24531-1-git-send-email-frederic.dalleau@linux.intel.com>
 References: <1376915043-24531-1-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
@@ -15,89 +16,45 @@ Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Synchronous Connection Complete event can return error "Connection
-Rejected due to Limited resources (0x10)".
-Handling this error is required for SCO connection fallback. This error
-happens when the server tried to accept the connection but failed to
-negotiate settings.
-This error code has been verified experimentally by sending a T2 request
-to a T1 only SCO listener.
+Older Bluetooth devices may not support Setup Synchronous Connection or
+SCO transparent data. This is indicated by the corresponding LMP feature
+bits. It is not possible to know if the adapter support these features
+before setting BT_VOICE option since the socket is not bound to an
+adapter. An adapter can also be added after the socket is created. The
+socket can be bound to an address before adapter is plugged in.
 
-Client dump follows :
+Thus, on a such adapters, if user request BT_VOICE_TRANSPARENT, outgoing
+connections fail on connect() and returns -EOPNOTSUPP. Incoming
+connections do not fail. However, they should only be allowed depending
+on what was specified in Write_Voice_Settings command.
 
-< HCI Command (0x01|0x0028) plen 17 [hci0] 3.696064
-        Handle: 12
-        Transmit bandwidth: 8000
-        Receive bandwidth: 8000
-        Max latency: 13
-        Setting: 0x0003
-        Retransmission effort: Optimize for link quality (0x02)
-        Packet type: 0x0380
-> HCI Event (0x0f) plen 4 [hci0] 3.697034
-      Setup Synchronous Connection (0x01|0x0028) ncmd 1
-        Status: Success (0x00)
-> HCI Event (0x2c) plen 17 [hci0] 3.736059
-        Status: Connection Rejected due to Limited Resources (0x0d)
-        Handle: 0
-        Address: xx:xx:xx:xx:xx:AB (OUI 70-F3-95)
-        Link type: eSCO (0x02)
-        Transmission interval: 0x0c
-        Retransmission window: 0x06
-        RX packet length: 60
-        TX packet length: 60
-        Air mode: Transparent (0x03)
-
-Server dump follows :
-
-> HCI Event (0x04) plen 10 [hci0] 4.741513
-        Address: xx:xx:xx:xx:xx:D9 (OUI 20-68-9D)
-        Class: 0x620100
-          Major class: Computer (desktop, notebook, PDA, organizers)
-          Minor class: Uncategorized, code for device not assigned
-          Networking (LAN, Ad hoc)
-          Audio (Speaker, Microphone, Headset)
-          Telephony (Cordless telephony, Modem, Headset)
-        Link type: eSCO (0x02)
-< HCI Command (0x01|0x0029) plen 21 [hci0] 4.743269
-        Address: xx:xx:xx:xx:xx:D9 (OUI 20-68-9D)
-        Transmit bandwidth: 8000
-        Receive bandwidth: 8000
-        Max latency: 13
-        Setting: 0x0003
-        Retransmission effort: Optimize for link quality (0x02)
-        Packet type: 0x03c1
-> HCI Event (0x0f) plen 4 [hci0] 4.745517
-      Accept Synchronous Connection (0x01|0x0029) ncmd 1
-        Status: Success (0x00)
-> HCI Event (0x2c) plen 17 [hci0] 4.749508
-        Status: Connection Rejected due to Limited Resources (0x0d)
-        Handle: 0
-        Address: xx:xx:xx:xx:xx:D9 (OUI 20-68-9D)
-        Link type: eSCO (0x02)
-        Transmission interval: 0x0c
-        Retransmission window: 0x06
-        RX packet length: 60
-        TX packet length: 60
-        Air mode: Transparent (0x03)
+EOPNOTSUPP is choosen because connect() system call is failing after
+selecting route but before any connection attempt.
 
 Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_event.c |    1 +
- 1 file changed, 1 insertion(+)
+ net/bluetooth/sco.c |    6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 50e39f4..a8bb7bb 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2904,6 +2904,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
- 		hci_conn_add_sysfs(conn);
- 		break;
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index e82d792..1170b6e 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -176,6 +176,12 @@ static int sco_connect(struct sock *sk)
+ 	else
+ 		type = SCO_LINK;
  
-+	case 0x0d:	/* Connection Rejected due to Limited Resources */
- 	case 0x11:	/* Unsupported Feature or Parameter Value */
- 	case 0x1c:	/* SCO interval rejected */
- 	case 0x1a:	/* Unsupported Remote Feature */
++	if (sco_pi(sk)->setting == BT_VOICE_TRANSPARENT &&
++	    (!lmp_transp_capable(hdev) || !lmp_esco_capable(hdev))) {
++		err = -EOPNOTSUPP;
++		goto done;
++	}
++
+ 	hcon = hci_connect_sco(hdev, type, dst, sco_pi(sk)->setting);
+ 	if (IS_ERR(hcon)) {
+ 		err = PTR_ERR(hcon);
 -- 
 1.7.9.5
 
