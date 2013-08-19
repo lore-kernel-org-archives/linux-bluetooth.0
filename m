@@ -1,108 +1,342 @@
 Return-Path: <cyrus@holtmann.org>
+From: Bing Zhao <bzhao@marvell.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
+	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	<linux-wireless@vger.kernel.org>, Bing Zhao <bzhao@marvell.com>, Amitkumar
+ Karwar <akarwar@marvell.com>
+Subject: [PATCH v3] Bluetooth: btmrvl: add calibration data download support
+Date: Mon, 19 Aug 2013 15:10:40 -0700
+Message-ID: <1376950240-31617-1-git-send-email-bzhao@marvell.com>
 MIME-Version: 1.0
-In-Reply-To: <1376922779-11802-3-git-send-email-luiz.dentz@gmail.com>
-References: <1376922779-11802-1-git-send-email-luiz.dentz@gmail.com> <1376922779-11802-3-git-send-email-luiz.dentz@gmail.com>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Mon, 19 Aug 2013 20:59:12 -0300
-Message-ID: <CAMOw1v5V5gr1LkQ=KfimkP7PiMHbo=fNf0BDjw8m7pOde3N2Hg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/8] gdbus: Fix not maintaining message order for signals
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Aug 19, 2013 at 11:32 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> In some cases the order of the messages is altered when a message is
-> sent without processing the pending signals first, currently this affect
+From: Amitkumar Karwar <akarwar@marvell.com>
 
-Here and in every commit message: I think it should be made clear that
-we are talking about properties and object manager signals, not
-generic signals. Other signals are not affected by the out-of-order
-issue.
+A text file containing calibration data in hex format can
+be provided at following path:
 
+/lib/firmware/mrvl/sd8797_caldata.conf
 
-> client_check_order unit test:
->
-> /gdbus/client_check_order: **
-> ERROR:unit/test-gdbus-client.c:795:property_check_order: assertion failed: (g_strcmp0(string, "value1") == 0)
->
-> As can be observed the value of the property is not yet updated because the
-> signal it is still pending, once this fix is applied the test pass:
->
-> /gdbus/client_check_order: OK
->
-> Note that the flushing only works when g_dbus_send_message is used so
-> places where dbus_connection_send and other variants are called directly
-> may still change the order.
-> ---
->  gdbus/object.c | 32 ++++++++++++++++++++++++++++++++
->  1 file changed, 32 insertions(+)
->
-> diff --git a/gdbus/object.c b/gdbus/object.c
-> index 2f8ef45..b2ca1c2 100644
-> --- a/gdbus/object.c
-> +++ b/gdbus/object.c
-> @@ -1494,6 +1494,35 @@ DBusMessage *g_dbus_create_reply(DBusMessage *message, int type, ...)
->         return reply;
->  }
->
-> +static void g_dbus_flush_object(struct generic_data *data)
-> +{
-> +       GSList *l;
-> +
-> +       if (data->process_id > 0) {
-> +               g_source_remove(data->process_id);
-> +               data->process_id = 0;
-> +       }
-> +
-> +       process_changes(data);
-> +
-> +       for (l = data->objects; l; l = l->next)
-> +               g_dbus_flush_object(l->data);
+The data will be downloaded to firmware during initialization.
 
-wouldn't it be better swap these 2 so we flush the pending messages
-from children first, then from the parent? Then we can even guarantee
-this ordering by moving this code to process_changes().
+Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+Signed-off-by: Bing Zhao <bzhao@marvell.com>
+---
+v2: Remove module parameter. The calibration data will be downloaded
+    only when the device speicific data file is provided.
+    (Marcel Holtmann)
+v3: Fix crash (misaligned memory access) on ARM
 
-> +}
-> +
-> +static void g_dbus_flush(DBusConnection *connection)
-> +{
-> +       static gboolean flushing = FALSE;
+ drivers/bluetooth/btmrvl_drv.h  |  10 ++-
+ drivers/bluetooth/btmrvl_main.c | 140 +++++++++++++++++++++++++++++++++++++++-
+ drivers/bluetooth/btmrvl_sdio.c |   9 ++-
+ drivers/bluetooth/btmrvl_sdio.h |   2 +
+ 4 files changed, 157 insertions(+), 4 deletions(-)
 
-this static var makes no sense with multiple connections, does it?
-
-
-> +
-> +       if (flushing || root == NULL || root->conn != connection)
-> +               return;
-> +
-> +       flushing = TRUE;
-> +
-> +       g_dbus_flush_object(root);
-> +
-> +       flushing = FALSE;
-> +}
-> +
->  gboolean g_dbus_send_message(DBusConnection *connection, DBusMessage *message)
->  {
->         dbus_bool_t result = FALSE;
-> @@ -1510,6 +1539,9 @@ gboolean g_dbus_send_message(DBusConnection *connection, DBusMessage *message)
->                         goto out;
->         }
->
-> +       /* Flush pending signal to guarantee message order */
-> +       g_dbus_flush(connection);
-> +
->         result = dbus_connection_send(connection, message, NULL);
->
->  out:
-> --
-
-Otherwise looks good.
-
-Lucas De Marchi
+diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
+index 27068d1..5ef5e84 100644
+--- a/drivers/bluetooth/btmrvl_drv.h
++++ b/drivers/bluetooth/btmrvl_drv.h
+@@ -23,6 +23,8 @@
+ #include <linux/bitops.h>
+ #include <linux/slab.h>
+ #include <net/bluetooth/bluetooth.h>
++#include <linux/ctype.h>
++#include <linux/firmware.h>
+ 
+ #define BTM_HEADER_LEN			4
+ #define BTM_UPLD_SIZE			2312
+@@ -41,6 +43,8 @@ struct btmrvl_thread {
+ struct btmrvl_device {
+ 	void *card;
+ 	struct hci_dev *hcidev;
++	struct device *dev;
++	const char *cal_data;
+ 
+ 	u8 dev_type;
+ 
+@@ -91,6 +95,7 @@ struct btmrvl_private {
+ #define BT_CMD_HOST_SLEEP_CONFIG	0x59
+ #define BT_CMD_HOST_SLEEP_ENABLE	0x5A
+ #define BT_CMD_MODULE_CFG_REQ		0x5B
++#define BT_CMD_LOAD_CONFIG_DATA		0x61
+ 
+ /* Sub-commands: Module Bringup/Shutdown Request/Response */
+ #define MODULE_BRINGUP_REQ		0xF1
+@@ -116,10 +121,13 @@ struct btmrvl_private {
+ #define PS_SLEEP			0x01
+ #define PS_AWAKE			0x00
+ 
++#define BT_CMD_DATA_SIZE		32
++#define BT_CAL_DATA_SIZE		28
++
+ struct btmrvl_cmd {
+ 	__le16 ocf_ogf;
+ 	u8 length;
+-	u8 data[4];
++	u8 data[BT_CMD_DATA_SIZE];
+ } __packed;
+ 
+ struct btmrvl_event {
+diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+index 9a9f518..77e940e 100644
+--- a/drivers/bluetooth/btmrvl_main.c
++++ b/drivers/bluetooth/btmrvl_main.c
+@@ -57,8 +57,9 @@ bool btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb)
+ 		ocf = hci_opcode_ocf(opcode);
+ 		ogf = hci_opcode_ogf(opcode);
+ 
+-		if (ocf == BT_CMD_MODULE_CFG_REQ &&
+-					priv->btmrvl_dev.sendcmdflag) {
++		if ((ocf == BT_CMD_MODULE_CFG_REQ ||
++		     ocf == BT_CMD_LOAD_CONFIG_DATA) &&
++		    priv->btmrvl_dev.sendcmdflag) {
+ 			priv->btmrvl_dev.sendcmdflag = false;
+ 			priv->adapter->cmd_complete = true;
+ 			wake_up_interruptible(&priv->adapter->cmd_wait_q);
+@@ -552,6 +553,132 @@ static int btmrvl_service_main_thread(void *data)
+ 	return 0;
+ }
+ 
++static int btmrvl_parse_cal_cfg(const u8 *src, u32 len, u8 *dst, u32 dst_size)
++{
++	const u8 *s = src;
++	u8 *d = dst;
++	int ret;
++	u8 tmp[3];
++
++	while ((s - src) < len) {
++		if (*s && (isspace(*s) || *s == '\t')) {
++			s++;
++			continue;
++		}
++
++		if (isxdigit(*s)) {
++			if ((d - dst) >= dst_size) {
++				BT_ERR("calibration data file too big!!!");
++				return -EINVAL;
++			}
++
++			memcpy(tmp, s, 2);
++			tmp[2] = '\0';
++
++			ret = kstrtou8(tmp, 16, d++);
++			if (ret < 0)
++				return ret;
++
++			s += 2;
++		} else {
++			s++;
++		}
++	}
++	if (d == dst)
++		return -EINVAL;
++
++	return 0;
++}
++
++static int btmrvl_load_cal_data(struct btmrvl_private *priv,
++				u8 *config_data)
++{
++	struct sk_buff *skb;
++	struct btmrvl_cmd *cmd;
++	int i;
++
++	skb = bt_skb_alloc(sizeof(*cmd), GFP_ATOMIC);
++	if (!skb)
++		return -ENOMEM;
++
++	cmd = (struct btmrvl_cmd *)skb->data;
++	cmd->ocf_ogf =
++		cpu_to_le16(hci_opcode_pack(OGF, BT_CMD_LOAD_CONFIG_DATA));
++	cmd->length = BT_CMD_DATA_SIZE;
++	cmd->data[0] = 0x00;
++	cmd->data[1] = 0x00;
++	cmd->data[2] = 0x00;
++	cmd->data[3] = BT_CMD_DATA_SIZE - 4;
++
++	/* swap cal-data bytes */
++	for (i = 4; i < BT_CMD_DATA_SIZE; i++)
++		cmd->data[i] = config_data[(i/4)*8 - 1 - i];
++
++	bt_cb(skb)->pkt_type = MRVL_VENDOR_PKT;
++	skb_put(skb, sizeof(*cmd));
++	skb->dev = (void *)priv->btmrvl_dev.hcidev;
++	skb_queue_head(&priv->adapter->tx_queue, skb);
++	priv->btmrvl_dev.sendcmdflag = true;
++	priv->adapter->cmd_complete = false;
++
++	print_hex_dump_bytes("Calibration data: ",
++			     DUMP_PREFIX_OFFSET, cmd->data, BT_CMD_DATA_SIZE);
++
++	wake_up_interruptible(&priv->main_thread.wait_q);
++	if (!wait_event_interruptible_timeout(priv->adapter->cmd_wait_q,
++					      priv->adapter->cmd_complete,
++				       msecs_to_jiffies(WAIT_UNTIL_CMD_RESP))) {
++		BT_ERR("Timeout while loading calibration data");
++		return -ETIMEDOUT;
++	}
++
++	return 0;
++}
++
++static int
++btmrvl_process_cal_cfg(struct btmrvl_private *priv, u8 *data, u32 size)
++{
++	u8 cal_data[BT_CAL_DATA_SIZE];
++	int ret;
++
++	ret = btmrvl_parse_cal_cfg(data, size, cal_data, sizeof(cal_data));
++	if (ret)
++		return ret;
++
++	ret = btmrvl_load_cal_data(priv, cal_data);
++	if (ret) {
++		BT_ERR("Fail to load calibrate data");
++		return ret;
++	}
++
++	return 0;
++}
++
++static int btmrvl_cal_data_config(struct btmrvl_private *priv)
++{
++	const struct firmware *cfg;
++	int ret;
++	const char *cal_data = priv->btmrvl_dev.cal_data;
++
++	if (!cal_data)
++		return 0;
++
++	ret = request_firmware(&cfg, cal_data, priv->btmrvl_dev.dev);
++	if (ret < 0) {
++		BT_DBG("Failed to get %s file, skipping cal data download",
++		       cal_data);
++		ret = 0;
++		goto done;
++	}
++
++	ret = btmrvl_process_cal_cfg(priv, (u8 *)cfg->data, cfg->size);
++done:
++	if (cfg)
++		release_firmware(cfg);
++
++	return ret;
++}
++
+ int btmrvl_register_hdev(struct btmrvl_private *priv)
+ {
+ 	struct hci_dev *hdev = NULL;
+@@ -583,12 +710,21 @@ int btmrvl_register_hdev(struct btmrvl_private *priv)
+ 		goto err_hci_register_dev;
+ 	}
+ 
++	ret = btmrvl_cal_data_config(priv);
++	if (ret) {
++		BT_ERR("Set cal data failed");
++		goto err_cal_data_config;
++	}
++
+ #ifdef CONFIG_DEBUG_FS
+ 	btmrvl_debugfs_init(hdev);
+ #endif
+ 
+ 	return 0;
+ 
++err_cal_data_config:
++	hci_unregister_dev(hdev);
++
+ err_hci_register_dev:
+ 	hci_free_dev(hdev);
+ 
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index 00da6df..af7f48d 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -18,7 +18,6 @@
+  * this warranty disclaimer.
+  **/
+ 
+-#include <linux/firmware.h>
+ #include <linux/slab.h>
+ 
+ #include <linux/mmc/sdio_ids.h>
+@@ -102,6 +101,7 @@ static const struct btmrvl_sdio_card_reg btmrvl_reg_88xx = {
+ static const struct btmrvl_sdio_device btmrvl_sdio_sd8688 = {
+ 	.helper		= "mrvl/sd8688_helper.bin",
+ 	.firmware	= "mrvl/sd8688.bin",
++	.cal_data	= NULL,
+ 	.reg		= &btmrvl_reg_8688,
+ 	.sd_blksz_fw_dl	= 64,
+ };
+@@ -109,6 +109,7 @@ static const struct btmrvl_sdio_device btmrvl_sdio_sd8688 = {
+ static const struct btmrvl_sdio_device btmrvl_sdio_sd8787 = {
+ 	.helper		= NULL,
+ 	.firmware	= "mrvl/sd8787_uapsta.bin",
++	.cal_data	= NULL,
+ 	.reg		= &btmrvl_reg_87xx,
+ 	.sd_blksz_fw_dl	= 256,
+ };
+@@ -116,6 +117,7 @@ static const struct btmrvl_sdio_device btmrvl_sdio_sd8787 = {
+ static const struct btmrvl_sdio_device btmrvl_sdio_sd8797 = {
+ 	.helper		= NULL,
+ 	.firmware	= "mrvl/sd8797_uapsta.bin",
++	.cal_data	= "mrvl/sd8797_caldata.conf",
+ 	.reg		= &btmrvl_reg_87xx,
+ 	.sd_blksz_fw_dl	= 256,
+ };
+@@ -123,6 +125,7 @@ static const struct btmrvl_sdio_device btmrvl_sdio_sd8797 = {
+ static const struct btmrvl_sdio_device btmrvl_sdio_sd8897 = {
+ 	.helper		= NULL,
+ 	.firmware	= "mrvl/sd8897_uapsta.bin",
++	.cal_data	= NULL,
+ 	.reg		= &btmrvl_reg_88xx,
+ 	.sd_blksz_fw_dl	= 256,
+ };
+@@ -1006,6 +1009,7 @@ static int btmrvl_sdio_probe(struct sdio_func *func,
+ 		struct btmrvl_sdio_device *data = (void *) id->driver_data;
+ 		card->helper = data->helper;
+ 		card->firmware = data->firmware;
++		card->cal_data = data->cal_data;
+ 		card->reg = data->reg;
+ 		card->sd_blksz_fw_dl = data->sd_blksz_fw_dl;
+ 	}
+@@ -1034,6 +1038,8 @@ static int btmrvl_sdio_probe(struct sdio_func *func,
+ 	}
+ 
+ 	card->priv = priv;
++	priv->btmrvl_dev.dev = &card->func->dev;
++	priv->btmrvl_dev.cal_data = card->cal_data;
+ 
+ 	/* Initialize the interface specific function pointers */
+ 	priv->hw_host_to_card = btmrvl_sdio_host_to_card;
+@@ -1222,4 +1228,5 @@ MODULE_FIRMWARE("mrvl/sd8688_helper.bin");
+ MODULE_FIRMWARE("mrvl/sd8688.bin");
+ MODULE_FIRMWARE("mrvl/sd8787_uapsta.bin");
+ MODULE_FIRMWARE("mrvl/sd8797_uapsta.bin");
++MODULE_FIRMWARE("mrvl/sd8797_caldata.conf");
+ MODULE_FIRMWARE("mrvl/sd8897_uapsta.bin");
+diff --git a/drivers/bluetooth/btmrvl_sdio.h b/drivers/bluetooth/btmrvl_sdio.h
+index 43d35a6..6872d9e 100644
+--- a/drivers/bluetooth/btmrvl_sdio.h
++++ b/drivers/bluetooth/btmrvl_sdio.h
+@@ -85,6 +85,7 @@ struct btmrvl_sdio_card {
+ 	u32 ioport;
+ 	const char *helper;
+ 	const char *firmware;
++	const char *cal_data;
+ 	const struct btmrvl_sdio_card_reg *reg;
+ 	u16 sd_blksz_fw_dl;
+ 	u8 rx_unit;
+@@ -94,6 +95,7 @@ struct btmrvl_sdio_card {
+ struct btmrvl_sdio_device {
+ 	const char *helper;
+ 	const char *firmware;
++	const char *cal_data;
+ 	const struct btmrvl_sdio_card_reg *reg;
+ 	u16 sd_blksz_fw_dl;
+ };
+-- 
+1.8.0
