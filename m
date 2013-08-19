@@ -1,44 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 0/8] Fix message order
-Date: Mon, 19 Aug 2013 17:32:50 +0300
-Message-Id: <1376922779-11802-1-git-send-email-luiz.dentz@gmail.com>
+Cc: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Dalleau?=
+	<frederic.dalleau@linux.intel.com>
+Subject: [PATCH v11 09/10] Bluetooth: Handle specific error for SCO connection fallback
+Date: Mon, 19 Aug 2013 14:24:02 +0200
+Message-Id: <1376915043-24531-10-git-send-email-frederic.dalleau@linux.intel.com>
+In-Reply-To: <1376915043-24531-1-git-send-email-frederic.dalleau@linux.intel.com>
+References: <1376915043-24531-1-git-send-email-frederic.dalleau@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Synchronous Connection Complete event can return error "Connection
+Rejected due to Limited resources (0x10)".
+Handling this error is required for SCO connection fallback. This error
+happens when the server tried to accept the connection but failed to
+negotiate settings.
+This error code has been verified experimentally by sending a T2 request
+to a T1 only SCO listener.
 
-This set fixes a couple of issues introduced with the use of ObjectManager due
-the processing of signals on idle to group changes, this has been causing
-issues with external components such as ofono and pulseaudio that sometimes
-receives connections from devices objects that have pending signals thus
-cannot be properly processed or have to be assumed paired and with certain
-UUIDs which is not ideal.
+Client dump follows :
 
-Luiz Augusto von Dentz (8):
-  gdbus: Fix not maintaining message order for signals
-  gdbus: Add g_dbus_send_message_with_reply
-  gdbus: Avoid calling dbus_connection_send*
-  gdbus: Fix emitting PropertiesChanged twice
-  core: Make use of g_dbus_send_message_with_reply
-  neard: Make use of g_dbus_send_message_with_reply
-  audio/media: Make use of g_dbus_send_message_with_reply
-  obexd: Make use of g_dbus_send_message*
+< HCI Command (0x01|0x0028) plen 17 [hci0] 3.696064
+        Handle: 12
+        Transmit bandwidth: 8000
+        Receive bandwidth: 8000
+        Max latency: 13
+        Setting: 0x0003
+        Retransmission effort: Optimize for link quality (0x02)
+        Packet type: 0x0380
+> HCI Event (0x0f) plen 4 [hci0] 3.697034
+      Setup Synchronous Connection (0x01|0x0028) ncmd 1
+        Status: Success (0x00)
+> HCI Event (0x2c) plen 17 [hci0] 3.736059
+        Status: Connection Rejected due to Limited Resources (0x0d)
+        Handle: 0
+        Address: xx:xx:xx:xx:xx:AB (OUI 70-F3-95)
+        Link type: eSCO (0x02)
+        Transmission interval: 0x0c
+        Retransmission window: 0x06
+        RX packet length: 60
+        TX packet length: 60
+        Air mode: Transparent (0x03)
 
- gdbus/client.c                |  14 ++---
- gdbus/gdbus.h                 |   3 +
- gdbus/object.c                | 143 ++++++++++++++++++++++++------------------
- obexd/plugins/bluetooth.c     |   2 +-
- obexd/plugins/pcsuite.c       |   5 +-
- obexd/plugins/syncevolution.c |   6 +-
- obexd/src/manager.c           |   3 +-
- plugins/neard.c               |   2 +-
- profiles/audio/media.c        |   2 +-
- src/agent.c                   |  12 ++--
- src/profile.c                 |   4 +-
- 11 files changed, 109 insertions(+), 87 deletions(-)
+Server dump follows :
 
+> HCI Event (0x04) plen 10 [hci0] 4.741513
+        Address: xx:xx:xx:xx:xx:D9 (OUI 20-68-9D)
+        Class: 0x620100
+          Major class: Computer (desktop, notebook, PDA, organizers)
+          Minor class: Uncategorized, code for device not assigned
+          Networking (LAN, Ad hoc)
+          Audio (Speaker, Microphone, Headset)
+          Telephony (Cordless telephony, Modem, Headset)
+        Link type: eSCO (0x02)
+< HCI Command (0x01|0x0029) plen 21 [hci0] 4.743269
+        Address: xx:xx:xx:xx:xx:D9 (OUI 20-68-9D)
+        Transmit bandwidth: 8000
+        Receive bandwidth: 8000
+        Max latency: 13
+        Setting: 0x0003
+        Retransmission effort: Optimize for link quality (0x02)
+        Packet type: 0x03c1
+> HCI Event (0x0f) plen 4 [hci0] 4.745517
+      Accept Synchronous Connection (0x01|0x0029) ncmd 1
+        Status: Success (0x00)
+> HCI Event (0x2c) plen 17 [hci0] 4.749508
+        Status: Connection Rejected due to Limited Resources (0x0d)
+        Handle: 0
+        Address: xx:xx:xx:xx:xx:D9 (OUI 20-68-9D)
+        Link type: eSCO (0x02)
+        Transmission interval: 0x0c
+        Retransmission window: 0x06
+        RX packet length: 60
+        TX packet length: 60
+        Air mode: Transparent (0x03)
+
+Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_event.c |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 50e39f4..a8bb7bb 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2904,6 +2904,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
+ 		hci_conn_add_sysfs(conn);
+ 		break;
+ 
++	case 0x0d:	/* Connection Rejected due to Limited Resources */
+ 	case 0x11:	/* Unsupported Feature or Parameter Value */
+ 	case 0x1c:	/* SCO interval rejected */
+ 	case 0x1a:	/* Unsupported Remote Feature */
 -- 
-1.8.3.1
+1.7.9.5
 
