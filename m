@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 04/10 v2] gdbus: Add g_dbus_send_message_with_reply
-Date: Tue, 20 Aug 2013 16:07:09 +0300
-Message-Id: <1377004035-16936-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 01/10 v2] build: Fix not rebuilding bluetoothd if gdbus changes
+Date: Tue, 20 Aug 2013 16:07:06 +0300
+Message-Id: <1377004035-16936-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1377004035-16936-1-git-send-email-luiz.dentz@gmail.com>
 References: <1377004035-16936-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,49 +11,25 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-g_dbus_send_message_with_reply flushes pending signals before calling
-dbus_connection_send_with_reply so it does not alter the message order
+src_bluetoothd_DEPENDENCIES should list all local libraries including gdbus
+otherwise it does not get relinked whenever gdbus changes.
 ---
- gdbus/gdbus.h  |  3 +++
- gdbus/object.c | 11 +++++++++++
- 2 files changed, 14 insertions(+)
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index 8b13393..9542109 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -250,6 +250,9 @@ DBusMessage *g_dbus_create_reply_valist(DBusMessage *message,
- 						int type, va_list args);
+diff --git a/Makefile.am b/Makefile.am
+index b8890ec..bf66c2b 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -157,7 +157,7 @@ src_bluetoothd_LDFLAGS = $(AM_LDFLAGS) -Wl,--export-dynamic \
+ 				-Wl,--version-script=$(srcdir)/src/bluetooth.ver
  
- gboolean g_dbus_send_message(DBusConnection *connection, DBusMessage *message);
-+gboolean g_dbus_send_message_with_reply(DBusConnection *connection,
-+					DBusMessage *message,
-+					DBusPendingCall **call, int timeout);
- gboolean g_dbus_send_error(DBusConnection *connection, DBusMessage *message,
- 				const char *name, const char *format, ...)
- 					 __attribute__((format(printf, 4, 5)));
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 5af771f..4f82ea9 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -1556,6 +1556,17 @@ out:
- 	return result;
- }
+ src_bluetoothd_DEPENDENCIES = lib/libbluetooth-internal.la \
+-						src/bluetooth.service
++				gdbus/libgdbus-internal.la src/bluetooth.service
  
-+gboolean g_dbus_send_message_with_reply(DBusConnection *connection,
-+					DBusMessage *message,
-+					DBusPendingCall **call, int timeout)
-+{
-+	/* Flush pending signal to guarantee message order */
-+	g_dbus_flush(connection);
-+
-+	return dbus_connection_send_with_reply(connection, message, call,
-+								timeout);
-+}
-+
- gboolean g_dbus_send_error_valist(DBusConnection *connection,
- 					DBusMessage *message, const char *name,
- 					const char *format, va_list args)
+ src_bluetoothd_CFLAGS = $(AM_CFLAGS) -DBLUETOOTH_PLUGIN_BUILTIN \
+ 					-DPLUGINDIR=\""$(build_plugindir)"\"
 -- 
 1.8.3.1
 
