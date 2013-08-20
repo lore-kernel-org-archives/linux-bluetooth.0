@@ -1,30 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 20 Aug 2013 11:25:03 +0200
+Date: Tue, 20 Aug 2013 11:21:27 +0200
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Valentin Ilie <valentin.ilie@gmail.com>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, Dean_Jenkins@mentor.com,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Remove assignment in if
-Message-ID: <20130820092503.GB1908@joana>
-References: <1376225793-22981-1-git-send-email-valentin.ilie@gmail.com>
- <1376322360-28824-1-git-send-email-valentin.ilie@gmail.com>
- <CAHuBVBYQaDt6UZ6oJvY1D4DKQZnOmD+RmsgnFkYKxUPJ80L4Rw@mail.gmail.com>
+To: Gianluca Anzolin <gianluca@sottospazio.it>
+Cc: peter@hurleysoftware.com, marcel@holtmann.org,
+	linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org,
+	jslaby@suse.cz
+Subject: Re: [PATCH v5 6/6] rfcomm: Purge the dlc->tx_queue to avoid circular
+ dependency
+Message-ID: <20130820092127.GA1908@joana>
+References: <1375110493-5237-1-git-send-email-gianluca@sottospazio.it>
+ <1375110493-5237-7-git-send-email-gianluca@sottospazio.it>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAHuBVBYQaDt6UZ6oJvY1D4DKQZnOmD+RmsgnFkYKxUPJ80L4Rw@mail.gmail.com>
+In-Reply-To: <1375110493-5237-7-git-send-email-gianluca@sottospazio.it>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Valentin,
+Hi Gianluca,
 
-2013-08-19 Valentin Ilie <valentin.ilie@gmail.com>:
+2013-07-29 Gianluca Anzolin <gianluca@sottospazio.it>:
 
-> On 12 August 2013 18:46, Valentin Ilie <valentin.ilie@gmail.com> wrote:
-> > Remove assignment in if
+> In rfcomm_tty_cleanup we purge the dlc->tx_queue which may contain
+> socket buffers referencing the tty_port and thus preventing the tty_port
+> destruction.
 > 
-> Hello,
-> 
-> Can anyone look into this patch? I've corrected it as requested.
+> Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
+> ---
+>  net/bluetooth/rfcomm/tty.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 
-I can't see your patch anywhere. Could you please resend it?
+all patches have been applied to bluetooth-next. Thanks.
 
 	Gustavo
