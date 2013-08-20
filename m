@@ -1,84 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1376922779-11802-2-git-send-email-luiz.dentz@gmail.com>
-References: <1376922779-11802-1-git-send-email-luiz.dentz@gmail.com>
-	<1376922779-11802-2-git-send-email-luiz.dentz@gmail.com>
-Date: Tue, 20 Aug 2013 15:28:04 +0300
-Message-ID: <CABBYNZKBB-KyOkKvRT_GZhkt6xWCjxcsMEun8wrKn3WCWrSBiA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] build: Fix not checking readline.h for bluetooth-player
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1375298729-23513-1-git-send-email-andre.guedes@openbossa.org>
+References: <1375298729-23513-1-git-send-email-andre.guedes@openbossa.org>
+Date: Tue, 20 Aug 2013 09:14:22 -0300
+Message-ID: <CACJA=fVcg95b_nCk6s_OFSc3c=yQUCPcpYP9-J2RPa8zZpVO2Q@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Bluetooth: Fix security level for peripheral role
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Ping.
 
-On Mon, Aug 19, 2013 at 5:32 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed, Jul 31, 2013 at 4:25 PM, Andre Guedes
+<andre.guedes@openbossa.org> wrote:
+> While playing the peripheral role, the host gets a LE Long Term Key
+> Request Event from the controller when a connection is established
+> with a bonded device. The host then informs the LTK which should be
+> used for the connection. Once the link is encrypted, the host gets
+> an Encryption Change Event.
 >
-> If --disable-client is passed to configure script is possible to build
-> BlueZ without readline which would cause the following error:
+> Therefore we should set conn->pending_sec_level instead of conn->
+> sec_level in hci_le_ltk_request_evt. This way, conn->sec_level is
+> properly updated in hci_encrypt_change_evt.
 >
-> tools/bluetooth-player.c:36:31: fatal error: readline/readline.h: No such file or directory
->  #include <readline/readline.h>
->                                ^
+> Moreover, since we have a LTK associated to the device, we have at
+> least BT_SECURITY_MEDIUM security level.
+>
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
->  Makefile.tools | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
+>  net/bluetooth/hci_event.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 >
-> diff --git a/Makefile.tools b/Makefile.tools
-> index 3bb0e82..4bcb18e 100644
-> --- a/Makefile.tools
-> +++ b/Makefile.tools
-> @@ -172,8 +172,7 @@ if EXPERIMENTAL
->  noinst_PROGRAMS += tools/bdaddr tools/avinfo tools/avtest tools/scotest \
->                         tools/hcieventmask tools/hcisecfilter tools/hwdb \
->                         tools/btmgmt tools/btattach tools/btsnoop \
-> -                       tools/btiotest tools/mpris-player \
-> -                       tools/bluetooth-player
-> +                       tools/btiotest tools/mpris-player
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 50e39f4..ea993ab 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -3556,7 +3556,9 @@ static void hci_le_ltk_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>         cp.handle = cpu_to_le16(conn->handle);
 >
->  tools_bdaddr_SOURCES = tools/bdaddr.c src/oui.h src/oui.c
->  tools_bdaddr_LDADD = lib/libbluetooth-internal.la @UDEV_LIBS@
-> @@ -199,17 +198,13 @@ tools_btiotest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
->  tools_mpris_player_SOURCES = tools/mpris-player.c
->  tools_mpris_player_LDADD = gdbus/libgdbus-internal.la @GLIB_LIBS@ @DBUS_LIBS@
+>         if (ltk->authenticated)
+> -               conn->sec_level = BT_SECURITY_HIGH;
+> +               conn->pending_sec_level = BT_SECURITY_HIGH;
+> +       else
+> +               conn->pending_sec_level = BT_SECURITY_MEDIUM;
 >
-> -tools_bluetooth_player_SOURCES = tools/bluetooth-player.c \
-> -                               client/display.h client/display.c
-> -tools_bluetooth_player_LDADD = gdbus/libgdbus-internal.la \
-> -                               @GLIB_LIBS@ @DBUS_LIBS@ -lreadline
-> -
->  EXTRA_DIST += tools/bdaddr.1
->  endif
+>         hci_send_cmd(hdev, HCI_OP_LE_LTK_REPLY, sizeof(cp), &cp);
 >
->  if READLINE
->  noinst_PROGRAMS += attrib/gatttool \
-> -                       tools/obex-client-tool tools/obex-server-tool
-> +                       tools/obex-client-tool tools/obex-server-tool \
-> +                       tools/bluetooth-player
->
->  attrib_gatttool_SOURCES = attrib/gatttool.c attrib/att.c attrib/gatt.c \
->                                 attrib/gattrib.c btio/btio.c \
-> @@ -226,6 +221,11 @@ tools_obex_client_tool_LDADD = lib/libbluetooth-internal.la \
->  tools_obex_server_tool_SOURCES = $(gobex_sources) $(btio_sources) \
->                                                 tools/obex-server-tool.c
->  tools_obex_server_tool_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
-> +
-> +tools_bluetooth_player_SOURCES = tools/bluetooth-player.c \
-> +                               client/display.h client/display.c
-> +tools_bluetooth_player_LDADD = gdbus/libgdbus-internal.la \
-> +                               @GLIB_LIBS@ @DBUS_LIBS@ -lreadline
->  endif
->
->  if EXPERIMENTAL
 > --
-> 1.8.3.1
-
-I went ahead and applied this one.
-
-
--- 
-Luiz Augusto von Dentz
+> 1.8.3.4
+>
