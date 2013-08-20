@@ -1,53 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 20 Aug 2013 11:41:14 +0200
+From: Gustavo Padovan <gustavo@padovan.org>
+To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
+	<frederic.dalleau@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@intel.com>
+Subject: Re: [PATCH v11 10/10] Bluetooth: Add SCO connection fallback
+Message-ID: <20130820094114.GC1908@joana>
+References: <1376915043-24531-1-git-send-email-frederic.dalleau@linux.intel.com>
+ <1376915043-24531-11-git-send-email-frederic.dalleau@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1375298729-23513-1-git-send-email-andre.guedes@openbossa.org>
-References: <1375298729-23513-1-git-send-email-andre.guedes@openbossa.org>
-Date: Tue, 20 Aug 2013 09:14:22 -0300
-Message-ID: <CACJA=fVcg95b_nCk6s_OFSc3c=yQUCPcpYP9-J2RPa8zZpVO2Q@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Bluetooth: Fix security level for peripheral role
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1376915043-24531-11-git-send-email-frederic.dalleau@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ping.
+Hi Frédéric,
 
-On Wed, Jul 31, 2013 at 4:25 PM, Andre Guedes
-<andre.guedes@openbossa.org> wrote:
-> While playing the peripheral role, the host gets a LE Long Term Key
-> Request Event from the controller when a connection is established
-> with a bonded device. The host then informs the LTK which should be
-> used for the connection. Once the link is encrypted, the host gets
-> an Encryption Change Event.
->
-> Therefore we should set conn->pending_sec_level instead of conn->
-> sec_level in hci_le_ltk_request_evt. This way, conn->sec_level is
-> properly updated in hci_encrypt_change_evt.
->
-> Moreover, since we have a LTK associated to the device, we have at
-> least BT_SECURITY_MEDIUM security level.
->
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+2013-08-19 Frédéric Dalleau <frederic.dalleau@linux.intel.com>:
+
+> When initiating a transparent eSCO connection, make use of T2 settings
+> at first try. T2 is the recommended settings from HFP 1.6 WideBand
+> Speech. Upon connection failure, try T1 settings.
+> 
+> When CVSD is requested and eSCO is supported, try to establish eSCO
+> connection using S3 settings. If it fails, fallback in sequence to S2,
+> S1, D1, D0 settings.
+> 
+> To know which setting should be used, conn->attempt is used. It
+> indicates the currently ongoing SCO connection attempt and can be used
+> as the index for the fallback settings table.
+> 
+> These setting and the fallback order are described in Bluetooth HFP 1.6
+> specification p. 101.
+> 
+> Signed-off-by: Frédéric Dalleau <frederic.dalleau@linux.intel.com>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  net/bluetooth/hci_event.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 50e39f4..ea993ab 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -3556,7 +3556,9 @@ static void hci_le_ltk_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
->         cp.handle = cpu_to_le16(conn->handle);
->
->         if (ltk->authenticated)
-> -               conn->sec_level = BT_SECURITY_HIGH;
-> +               conn->pending_sec_level = BT_SECURITY_HIGH;
-> +       else
-> +               conn->pending_sec_level = BT_SECURITY_MEDIUM;
->
->         hci_send_cmd(hdev, HCI_OP_LE_LTK_REPLY, sizeof(cp), &cp);
->
-> --
-> 1.8.3.4
->
+>  include/net/bluetooth/hci_core.h |    2 +-
+>  net/bluetooth/hci_conn.c         |   44 +++++++++++++++++++++++++++++++-------
+>  net/bluetooth/hci_event.c        |    6 +++---
+>  3 files changed, 40 insertions(+), 12 deletions(-)
+
+All 10 patches have been applied to bluetooth-next. Thanks.
+
+	Gustavo
