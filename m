@@ -1,41 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] core: Fix emitting empty Device1.UUIDs property
-Date: Wed, 21 Aug 2013 15:17:21 +0300
-Message-Id: <1377087441-11020-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 21 Aug 2013 10:41:55 +0200
+From: Gianluca Anzolin <gianluca@sottospazio.it>
+To: Gustavo Padovan <gustavo@padovan.org>, peter@hurleysoftware.com,
+	marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
+	gregkh@linuxfoundation.org, jslaby@suse.cz
+Subject: Re: [PATCH v5 6/6] rfcomm: Purge the dlc->tx_queue to avoid circular
+ dependency
+Message-ID: <20130821084155.GA1339@sottospazio.it>
+References: <1375110493-5237-1-git-send-email-gianluca@sottospazio.it>
+ <1375110493-5237-7-git-send-email-gianluca@sottospazio.it>
+ <20130820092127.GA1908@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130820092127.GA1908@joana>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Tue, Aug 20, 2013 at 11:21:27AM +0200, Gustavo Padovan wrote:
+> Hi Gianluca,
+> 
+> 2013-07-29 Gianluca Anzolin <gianluca@sottospazio.it>:
+> 
+> > In rfcomm_tty_cleanup we purge the dlc->tx_queue which may contain
+> > socket buffers referencing the tty_port and thus preventing the tty_port
+> > destruction.
+> > 
+> > Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
+> > ---
+> >  net/bluetooth/rfcomm/tty.c | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> 
+> all patches have been applied to bluetooth-next. Thanks.
+> 
+> 	Gustavo
 
-In case there is a incoming connection but services has not been
-resolved the UUID of the profile being connected is automatically added
-using btd_device_add_uuid which does update uuids not eir_uuids which is
-used if svc_resolved is false.
+Hello,
 
-To fix this the code will now fallback to uuids field whenever eir_uuids is
-empty so uuids added with btd_device_add_uuid previous to services being
-resolved should appear in UUIDs property.
----
- src/device.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Thank you!
 
-diff --git a/src/device.c b/src/device.c
-index f854ed9..457ab64 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -911,7 +911,9 @@ static gboolean dev_property_get_uuids(const GDBusPropertyTable *property,
- 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
- 				DBUS_TYPE_STRING_AS_STRING, &entry);
- 
--	if (!device->svc_resolved)
-+	if (device->svc_resolved)
-+		l = device->uuids;
-+	else if (device->eir_uuids)
- 		l = device->eir_uuids;
- 	else
- 		l = device->uuids;
--- 
-1.8.3.1
-
+Gianluca
