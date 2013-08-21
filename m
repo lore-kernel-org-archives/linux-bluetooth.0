@@ -1,113 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 21 Aug 2013 18:12:18 +0200
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth-next 2013-08-21
+Message-ID: <20130821161218.GH14645@joana>
 MIME-Version: 1.0
-In-Reply-To: <FE070485-AC61-4229-851F-9537CA50AB99@holtmann.org>
-References: <1376089954-13639-1-git-send-email-andre.guedes@openbossa.org>
-	<1376089954-13639-4-git-send-email-andre.guedes@openbossa.org>
-	<FE070485-AC61-4229-851F-9537CA50AB99@holtmann.org>
-Date: Wed, 21 Aug 2013 17:41:19 -0300
-Message-ID: <CACJA=fVmvqJu0YxfAZ9A8a-08z6NUvT-J97O3db9ii0vQVKsFg@mail.gmail.com>
-Subject: Re: [PATCH 3/6] Bluetooth: Set discovery parameters
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="+QahgC5+KEYLbs62"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
 
-On Sat, Aug 10, 2013 at 1:09 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Andre,
->
->> This patch adds support for setting discovery parameters through
->> debugfs filesystem.
->>
->> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->> ---
->> net/bluetooth/hci_sysfs.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
->> 1 file changed, 44 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
->> index 90cb53b..17ebc4a 100644
->> --- a/net/bluetooth/hci_sysfs.c
->> +++ b/net/bluetooth/hci_sysfs.c
->> @@ -553,9 +553,52 @@ static int discovery_parameters_open(struct inode *inode, struct file *file)
->>       return single_open(file, discovery_parameters_show, inode->i_private);
->> }
->>
->> +static ssize_t discovery_parameters_write(struct file *file,
->> +                                       const char __user *data,
->> +                                       size_t count, loff_t *offset)
->> +{
->> +     struct seq_file *sfile = file->private_data;
->> +     struct hci_dev *hdev = sfile->private;
->> +     struct discovery_param param;
->> +     char *buf;
->> +     int n;
->> +     ssize_t res = 0;
->> +
->> +     /* We don't allow partial writes */
->> +     if (*offset != 0)
->> +             return 0;
->> +
->> +     buf = kzalloc(count, GFP_KERNEL);
->> +     if (!buf)
->> +             return 0;
->> +
->> +     if (copy_from_user(buf, data, count))
->> +             goto out;
->> +
->> +     memset(&param, 0, sizeof(param));
->> +
->> +     n = sscanf(buf, "%hhx %hx %hx %u %u %hhx %hhx",
->> +                &param.scan_type, &param.scan_interval, &param.scan_window,
->> +                &param.le_scan_duration, &param.interleaved_scan_duration,
->> +                &param.interleaved_inquiry_length,
->> +                &param.bredr_inquiry_length);
->
-> I am not a huge fan of this crazy. I need a manual to know exactly what to do here. That is just silly. Unless things are a bit self-explanatory on how you can tweak things, I am not really interested here.
+--+QahgC5+KEYLbs62
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-What do you think about having the following hierarchy:
+Hi John,
 
-hciX/
-|
-|--> discovery_param/
-|	|--> scan_type
-|	|--> scan_window
-|	|--> scan_interval
-|	|--> le_scan_timeout
-|	|--> interleaved_scan_timeout
-|	|--> interleaved_inquiry_length
-|	|--> bredr_inquiry_length
-|
-|--> le_conn_param/
-	|--> scan_window
-	|--> scan_interval
-	|--> min_conn_interval
-	|--> max_conn_interval
-	|--> min_ce_length
-	|--> max_ce_length
-	|--> supervision_timeout
-	|--> conn_latency
+Patches to 3.12, here we have:
 
-It sounds much self-explanatory to me.
+* implementation of a proper tty_port for RFCOMM devices, this fixes some
+issues people were seeing lately in the kernel.
+* Add voice_setting option for SCO, it is used for SCO Codec selection
+* bugfixes, small improvements and clean ups
 
-> Also intermixing LE with BR/EDR is a bit pointless here. I would prefer if they are separate and not that BR/EDR only controller exports LE knobs and and LE only controller exports BR/EDR knobs.
+Please pull, Thanks.
 
-Sure. I'll fix this in the v2 patchset. We can also extend this to
-others debugfs entries (e.g. inquiry_cache and auto_accept_delay files
-should not be exported if controller is LE-only).
+	Gustavo
 
-In the current code, hdev is exported during device registration
-(hci_register_dev). However, in hci_register_dev(), hdev has not been
-initialized yet so we are not able to know is controller is BR/EDR, LE
-or dual mode. In order to fix this, we need to postpone exporting hdev
-by moving hci_add_sysfs call from hci_register_dev() to
-hci_dev_open().
+--
+The following changes since commit 72bb2f2678878dd4a758e628957f29ce28000d88:
 
-As a side effect, the hciX/ directory will be added to debugfs once
-the adapter is powered on and it will be removed once the adapter is
-powered off. Do you see any problem with that?
+  bgmac: make bgmac depend on bcm47xx (2013-07-24 11:05:19 -0400)
 
-BR,
+are available in the git repository at:
 
-Andre
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next ma=
+ster
+
+for you to fetch changes up to 2dea632f9acad076370fe871d4ccc93868621403:
+
+  Bluetooth: Add SCO connection fallback (2013-08-21 16:47:13 +0200)
+
+----------------------------------------------------------------
+Andy Shevchenko (1):
+      Bluetooth: use DIV_ROUND_UP in suitable places in btmrvl_sdio
+
+Benjamin Tissoires (2):
+      Bluetooth: hidp: implement hidinput_input_event callback
+      Bluetooth: hidp: remove wrong send_report at init
+
+Fr=E9d=E9ric Dalleau (10):
+      Bluetooth: Use hci_connect_sco directly
+      Bluetooth: Remove unused mask parameter in sco_conn_defer_accept
+      Bluetooth: Add Bluetooth socket voice option
+      Bluetooth: Add constants for SCO airmode
+      Bluetooth: Use voice setting in deferred SCO connection request
+      Bluetooth: Parameters for outgoing SCO connections
+      Bluetooth: Add constants and macro declaration for transparent data
+      Bluetooth: Prevent transparent SCO on older devices
+      Bluetooth: Handle specific error for SCO connection fallback
+      Bluetooth: Add SCO connection fallback
+
+Gianluca Anzolin (6):
+      Bluetooth: Take proper tty_struct references
+      Bluetooth: Remove the device from the list in the destructor
+      Bluetooth: Move the tty initialization and cleanup out of open/close
+      Bluetooth: Implement .activate, .shutdown and .carrier_raised methods
+      Bluetooth: Fix the reference counting of tty_port
+      Bluetooth: Purge the dlc->tx_queue to avoid circular dependency
+
+Gustavo Padovan (1):
+      Bluetooth: Add missing braces to an "else if"
+
+Jingoo Han (1):
+      Bluetooth: replace strict_strtol() with kstrtol()
+
+Johan Hedberg (1):
+      Bluetooth: Fix getting SCO socket options in deferred state
+
+Marcel Holtmann (2):
+      Bluetooth: Fix simple whitespace vs tab style issue
+      Bluetooth: Set different event mask for LE-only controllers
+
+Mikel Astiz (3):
+      Bluetooth: Add HCI authentication capabilities macros
+      Bluetooth: Use defines in in hci_get_auth_req()
+      Bluetooth: Use defines instead of integer literals
+
+ drivers/bluetooth/btmrvl_debugfs.c |   6 +-
+ drivers/bluetooth/btmrvl_sdio.c    |   4 +-
+ include/net/bluetooth/bluetooth.h  |   8 ++
+ include/net/bluetooth/hci.h        |   7 +
+ include/net/bluetooth/hci_core.h   |  10 +-
+ include/net/bluetooth/sco.h        |   1 +
+ net/bluetooth/hci_conn.c           |  62 +++++++--
+ net/bluetooth/hci_core.c           |  14 +-
+ net/bluetooth/hci_event.c          |  29 +++--
+ net/bluetooth/hidp/core.c          |  40 ++++--
+ net/bluetooth/l2cap_core.c         |   3 +-
+ net/bluetooth/rfcomm/tty.c         | 271 ++++++++++++++++++---------------=
+------
+ net/bluetooth/sco.c                |  85 +++++++++---
+ 13 files changed, 334 insertions(+), 206 deletions(-)
+
+
+
+--+QahgC5+KEYLbs62
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.13 (GNU/Linux)
+
+iQIcBAEBAgAGBQJSFObiAAoJEPs3PUX4s20odAUP+gJdtaJWVr7uFaGbxcRjV4OT
+eWpdJGDYdL8Oxlp19dwzJE9QGwzxiVYexnTn5XjOT0rJEMVyFe5lVqgcM+XuooUv
+mZ09acvF1FWsVkYLlpuCXNy6/kezulhRiJAw70kpEx7fywH+m18PDP+oNSMIif9U
+3tUxfhrGKrZAAqyI6WZ9PLqXm4MHOf6PbwdnbdVyC5SO6PSn5snaQlUY9F1tegrp
+0t3SKbM5rs/w3dffPdAdzmSh717/PamRN/Nw60Qs/rp7nGkaBqQm2RPgeK4zycDl
+Qep5lZ0mthhf6H/X/cZiqak+5MNOqjTUCPErG1wDtxkJ7zUoaPkd9BOC+QseuDik
+c/Gim0okwcPVhY1Ia5QU+x60VgGSVXl8DsnqpWBrHxOqWQQCSm2HpLAdWJjXohai
+CXj7+3uqaM06fz3EIpu2xVq6G1P+FAqIaA03tpZKpBbwE6/DakGL31t4TK2I/mqL
+f74QBL08SyB3poInFS8W8dUC8efDX2stwOHleT50lnDX9rT4TpcbQZqm3l51gCmt
+OE4b3PldIynfSpKDGBR56+uNPYJ4gYCGylXaasEG792W4NgLtsPwSntdkLhspv1h
+5vFa7OKC4hcKx1dQ4I4lGWlhhqOrInYr9aoICU7gD5vBua7HaP+7N8vtxKDXTD9F
+p3hCv0Y3BUDPrfixHVZ7
+=9L8j
+-----END PGP SIGNATURE-----
+
+--+QahgC5+KEYLbs62--
