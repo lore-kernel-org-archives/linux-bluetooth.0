@@ -1,30 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5214C9DD.3090000@globaledgesoft.com>
-Date: Wed, 21 Aug 2013 19:38:29 +0530
-From: Sathish Narasimman <sathish.n@globaledgesoft.com>
-MIME-Version: 1.0
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: LE GATT service discovery Over BR/EDR
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] core: Fix emitting empty Device1.UUIDs property
+Date: Wed, 21 Aug 2013 15:17:21 +0300
+Message-Id: <1377087441-11020-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-I am reading core spec 4.0.
-GATT Features regarding Primary Service Discovery in page: 1911
+In case there is a incoming connection but services has not been
+resolved the UUID of the profile being connected is automatically added
+using btd_device_add_uuid which does update uuids not eir_uuids which is
+used if svc_resolved is false.
 
-"GATT service discovery over BR/EDR transport will list services that 
-only run
-over an LE transport and therefore only SDP service discovery shall be used
-on BR/EDR."
+To fix this the code will now fallback to uuids field whenever eir_uuids is
+empty so uuids added with btd_device_add_uuid previous to services being
+resolved should appear in UUIDs property.
+---
+ src/device.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Though SDP Service Discovery is able to get all the related service 
-information. What is the use of
-GATT Service Discovery which gives only LE Information on BR/EDR Controller.
-
-Thanks,
-Sathish N
-
-
+diff --git a/src/device.c b/src/device.c
+index f854ed9..457ab64 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -911,7 +911,9 @@ static gboolean dev_property_get_uuids(const GDBusPropertyTable *property,
+ 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+ 				DBUS_TYPE_STRING_AS_STRING, &entry);
+ 
+-	if (!device->svc_resolved)
++	if (device->svc_resolved)
++		l = device->uuids;
++	else if (device->eir_uuids)
+ 		l = device->eir_uuids;
+ 	else
+ 		l = device->uuids;
+-- 
+1.8.3.1
 
