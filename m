@@ -1,240 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] obexd: Add property changed signals for 'org.bluez.obex.Message1'
-Date: Thu, 22 Aug 2013 18:08:41 +0200
-Message-Id: <1377187721-3758-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
-In-Reply-To: <1377187721-3758-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1377187721-3758-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH 1/1] obexd: Fix memleak when unregistering MAP event handler
+Date: Thu, 22 Aug 2013 18:07:49 +0200
+Message-Id: <1377187669-3691-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-This patch adds property changed signal emissions in case message properties
-change on the server.
+96 bytes in 3 blocks are definitely lost in loss record 217 of 310
+  at 0x4C29E84: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+  by 0x5977858: g_malloc0 (in /usr/lib/libglib-2.0.so.0.3600.3)
+  by 0x433A87: map_register_event_handler (map-event.c:76)
+  by 0x4324C1: set_notification_registration (map.c:1722)
+  by 0x4325BB: map_probe (map.c:1801)
+  by 0x42D55C: obc_session_register (session.c:862)
+  by 0x42BE4B: create_callback (manager.c:100)
+  by 0x42CA0D: connect_cb (session.c:281)
+  by 0x4191CB: handle_response (gobex.c:949)
+  by 0x4196F0: incoming_data (gobex.c:1192)
+  by 0x5971DA5: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.3600.3)
+  by 0x59720F7: ??? (in /usr/lib/libglib-2.0.so.0.3600.3)
 ---
- obexd/client/map.c | 94 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 92 insertions(+), 2 deletions(-)
+ obexd/client/map-event.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index 8864a54..a9a9bcd 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -792,121 +792,211 @@ static struct map_msg *map_msg_create(struct map_data *data, const char *handle)
- 
- static void parse_subject(struct map_msg *msg, const char *value)
- {
-+	if (g_strcmp0(msg->subject, value) == 0)
-+		return;
-+
- 	g_free(msg->subject);
- 	msg->subject = g_strdup(value);
-+
-+	g_dbus_emit_property_changed(conn, msg->path,
-+						MAP_MSG_INTERFACE, "Subject");
+diff --git a/obexd/client/map-event.c b/obexd/client/map-event.c
+index 76dfb84..bbe3519 100644
+--- a/obexd/client/map-event.c
++++ b/obexd/client/map-event.c
+@@ -97,6 +97,7 @@ void map_unregister_event_handler(struct obc_session *session, int mas_id)
+ 	handlers = g_slist_remove(handlers, handler);
+ 	DBG("Handler %p for %s:%d unregistered", handler,
+ 			obc_session_get_destination(session), mas_id);
++	g_free(handler);
  }
  
- static void parse_datetime(struct map_msg *msg, const char *value)
- {
-+	if (g_strcmp0(msg->timestamp, value) == 0)
-+		return;
-+
- 	g_free(msg->timestamp);
- 	msg->timestamp = g_strdup(value);
-+
-+	g_dbus_emit_property_changed(conn, msg->path,
-+						MAP_MSG_INTERFACE, "Timestamp");
- }
- 
- static void parse_sender(struct map_msg *msg, const char *value)
- {
-+	if (g_strcmp0(msg->sender, value) == 0)
-+		return;
-+
- 	g_free(msg->sender);
- 	msg->sender = g_strdup(value);
-+
-+	g_dbus_emit_property_changed(conn, msg->path,
-+						MAP_MSG_INTERFACE, "Sender");
- }
- 
- static void parse_sender_address(struct map_msg *msg, const char *value)
- {
-+	if (g_strcmp0(msg->sender_address, value) == 0)
-+		return;
-+
- 	g_free(msg->sender_address);
- 	msg->sender_address = g_strdup(value);
-+
-+	g_dbus_emit_property_changed(conn, msg->path,
-+					MAP_MSG_INTERFACE, "SenderAddress");
- }
- 
- static void parse_replyto(struct map_msg *msg, const char *value)
- {
-+	if (g_strcmp0(msg->replyto, value) == 0)
-+		return;
-+
- 	g_free(msg->replyto);
- 	msg->replyto = g_strdup(value);
-+
-+	g_dbus_emit_property_changed(conn, msg->path,
-+						MAP_MSG_INTERFACE, "ReplyTo");
- }
- 
- static void parse_recipient(struct map_msg *msg, const char *value)
- {
-+	if (g_strcmp0(msg->recipient, value) == 0)
-+		return;
-+
- 	g_free(msg->recipient);
- 	msg->recipient = g_strdup(value);
-+
-+	g_dbus_emit_property_changed(conn, msg->path,
-+						MAP_MSG_INTERFACE, "Recipient");
- }
- 
- static void parse_recipient_address(struct map_msg *msg, const char *value)
- {
-+	if (g_strcmp0(msg->recipient_address, value) == 0)
-+		return;
-+
- 	g_free(msg->recipient_address);
- 	msg->recipient_address = g_strdup(value);
-+
-+	g_dbus_emit_property_changed(conn, msg->path,
-+					MAP_MSG_INTERFACE, "RecipientAddress");
- }
- 
- static void parse_type(struct map_msg *msg, const char *value)
- {
-+	if (g_strcmp0(msg->type, value) == 0)
-+		return;
-+
- 	g_free(msg->type);
- 	msg->type = g_strdup(value);
-+
-+	g_dbus_emit_property_changed(conn, msg->path,
-+						MAP_MSG_INTERFACE, "Type");
- }
- 
- static void parse_size(struct map_msg *msg, const char *value)
- {
--	msg->size = g_ascii_strtoll(value, NULL, 10);
-+	uint64_t size = g_ascii_strtoll(value, NULL, 10);
-+
-+	if (msg->size == size)
-+		return;
-+
-+	msg->size = size;
-+
-+	g_dbus_emit_property_changed(conn, msg->path,
-+						MAP_MSG_INTERFACE, "Size");
- }
- 
- static void parse_text(struct map_msg *msg, const char *value)
- {
- 	gboolean flag = strcasecmp(value, "no") != 0;
- 
-+	uint8_t oldflags = msg->flags;
- 	if (flag)
- 		msg->flags |= MAP_MSG_FLAG_TEXT;
- 	else
- 		msg->flags &= ~MAP_MSG_FLAG_TEXT;
- 
-+	if (msg->flags != oldflags)
-+		g_dbus_emit_property_changed(conn, msg->path,
-+						MAP_MSG_INTERFACE, "Text");
- }
- 
- static void parse_status(struct map_msg *msg, const char *value)
- {
-+	if (g_strcmp0(msg->status, value) == 0)
-+		return;
-+
- 	g_free(msg->status);
- 	msg->status = g_strdup(value);
-+
-+	g_dbus_emit_property_changed(conn, msg->path,
-+						MAP_MSG_INTERFACE, "Status");
- }
- 
- static void parse_attachment_size(struct map_msg *msg, const char *value)
- {
--	msg->attachment_size = g_ascii_strtoll(value, NULL, 10);
-+	uint64_t attachment_size = g_ascii_strtoll(value, NULL, 10);
-+
-+	if (msg->attachment_size == attachment_size)
-+		return;
-+
-+	msg->attachment_size = attachment_size;
-+
-+	g_dbus_emit_property_changed(conn, msg->path,
-+					MAP_MSG_INTERFACE, "AttachmentSize");
- }
- 
- static void parse_priority(struct map_msg *msg, const char *value)
- {
- 	gboolean flag = strcasecmp(value, "no") != 0;
- 
-+	uint8_t oldflags = msg->flags;
- 	if (flag)
- 		msg->flags |= MAP_MSG_FLAG_PRIORITY;
- 	else
- 		msg->flags &= ~MAP_MSG_FLAG_PRIORITY;
- 
-+	if (msg->flags != oldflags)
-+		g_dbus_emit_property_changed(conn, msg->path,
-+						MAP_MSG_INTERFACE, "Priority");
- }
- 
- static void parse_read(struct map_msg *msg, const char *value)
- {
- 	gboolean flag = strcasecmp(value, "no") != 0;
- 
-+	uint8_t oldflags = msg->flags;
- 	if (flag)
- 		msg->flags |= MAP_MSG_FLAG_READ;
- 	else
- 		msg->flags &= ~MAP_MSG_FLAG_READ;
- 
-+	if (msg->flags != oldflags)
-+		g_dbus_emit_property_changed(conn, msg->path,
-+						MAP_MSG_INTERFACE, "Read");
- }
- 
- static void parse_sent(struct map_msg *msg, const char *value)
- {
- 	gboolean flag = strcasecmp(value, "no") != 0;
- 
-+	uint8_t oldflags = msg->flags;
- 	if (flag)
- 		msg->flags |= MAP_MSG_FLAG_SENT;
- 	else
- 		msg->flags &= ~MAP_MSG_FLAG_SENT;
- 
-+	if (msg->flags != oldflags)
-+		g_dbus_emit_property_changed(conn, msg->path,
-+						MAP_MSG_INTERFACE, "Sent");
- }
- 
- static void parse_protected(struct map_msg *msg, const char *value)
- {
- 	gboolean flag = strcasecmp(value, "no") != 0;
- 
-+	uint8_t oldflags = msg->flags;
- 	if (flag)
- 		msg->flags |= MAP_MSG_FLAG_PROTECTED;
- 	else
- 		msg->flags &= ~MAP_MSG_FLAG_PROTECTED;
- 
-+	if (msg->flags != oldflags)
-+		g_dbus_emit_property_changed(conn, msg->path,
-+						MAP_MSG_INTERFACE, "Protected");
- }
- 
- static struct map_msg_parser {
+ void map_dispatch_event(int mas_id, const char *device,
 -- 
 1.8.3.4
 
