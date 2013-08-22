@@ -1,89 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] obexd: Add property Folder to MAP message
-Date: Thu, 22 Aug 2013 18:00:23 +0200
-Message-Id: <1377187223-3427-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
-In-Reply-To: <1377187223-3427-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1377187223-3427-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1376756714-25479-25-git-send-email-ming.lei@canonical.com>
+References: <1376756714-25479-1-git-send-email-ming.lei@canonical.com>
+	<1376756714-25479-25-git-send-email-ming.lei@canonical.com>
+Date: Thu, 22 Aug 2013 20:23:41 +0800
+Message-ID: <CACVXFVOV8g-LzO8qHvHpHu+2CudvDyh2SHmZs==dNewdVnFZMQ@mail.gmail.com>
+Subject: Re: [PATCH v1 24/49] BT: btusb: prepare for enabling irq in complete()
+From: Ming Lei <ming.lei@canonical.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-usb <linux-usb@vger.kernel.org>, Oliver Neukum <oliver@neukum.org>,
+	Alan Stern <stern@rowland.harvard.edu>, Ming Lei <ming.lei@canonical.com>,
+	Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+On Sun, Aug 18, 2013 at 12:24 AM, Ming Lei <ming.lei@canonical.com> wrote:
+> Complete() will be run with interrupt enabled, so change to
+> spin_lock_irqsave().
+>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Gustavo Padovan <gustavo@padovan.org>
+> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> Cc: linux-bluetooth@vger.kernel.org
+> Signed-off-by: Ming Lei <ming.lei@canonical.com>
 
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index 3d8acc4..83da09b 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -123,6 +123,7 @@ struct map_msg {
- 	char *status;
- 	uint64_t attachment_size;
- 	uint8_t flags;
-+	char *folder;
- 	GDBusPendingPropertySet pending;
- };
- 
-@@ -379,6 +380,7 @@ static void map_msg_free(void *data)
- 	g_free(msg->path);
- 	g_free(msg->subject);
- 	g_free(msg->handle);
-+	g_free(msg->folder);
- 	g_free(msg->timestamp);
- 	g_free(msg->sender);
- 	g_free(msg->sender_address);
-@@ -451,6 +453,16 @@ done:
- 	msg->pending = 0;
- }
- 
-+static gboolean get_folder(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct map_msg *msg = data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &msg->folder);
-+
-+	return TRUE;
-+}
-+
- static gboolean subject_exists(const GDBusPropertyTable *property, void *data)
- {
- 	struct map_msg *msg = data;
-@@ -744,6 +756,7 @@ static const GDBusMethodTable map_msg_methods[] = {
- };
- 
- static const GDBusPropertyTable map_msg_properties[] = {
-+	{ "Folder", "s", get_folder },
- 	{ "Subject", "s", get_subject, NULL, subject_exists },
- 	{ "Timestamp", "s", get_timestamp, NULL, timestamp_exists },
- 	{ "Sender", "s", get_sender, NULL, sender_exists },
-@@ -766,7 +779,8 @@ static const GDBusPropertyTable map_msg_properties[] = {
- 	{ }
- };
- 
--static struct map_msg *map_msg_create(struct map_data *data, const char *handle)
-+static struct map_msg *map_msg_create(struct map_data *data, const char *handle,
-+							const char *folder)
- {
- 	struct map_msg *msg;
- 
-@@ -775,6 +789,7 @@ static struct map_msg *map_msg_create(struct map_data *data, const char *handle)
- 	msg->path = g_strdup_printf("%s/message%s",
- 					obc_session_get_path(data->session),
- 					handle);
-+	msg->folder = g_strdup(folder);
- 
- 	if (!g_dbus_register_interface(conn, msg->path, MAP_MSG_INTERFACE,
- 						map_msg_methods, NULL,
-@@ -989,7 +1004,8 @@ static void msg_element(GMarkupParseContext *ctxt, const char *element,
- 
- 	msg = g_hash_table_lookup(data->messages, values[i]);
- 	if (msg == NULL) {
--		msg = map_msg_create(data, values[i]);
-+		msg = map_msg_create(data, values[i],
-+				obc_session_get_current_path(data->session));
- 		if (msg == NULL)
- 			return;
- 	}
--- 
-1.8.3.4
+Marcel, Gustavo and Johan, could you review and give an Ack if
+this one and 25/49 are OK so they can be merged via Greg's USB
+tree?
 
+
+Thanks,
+--
+Ming Lei
