@@ -1,10 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1377187223-3427-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1377187223-3427-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Date: Mon, 26 Aug 2013 15:31:30 +0300
-Message-ID: <CABBYNZKZtU2_G-97+f-kDwokzBqZkWq9uzezoiC528RMAEmkEA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] obexd: Add obc_session_get_current_path function
+In-Reply-To: <1377187721-3758-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1377187721-3758-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+	<1377187721-3758-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Date: Mon, 26 Aug 2013 15:08:09 +0300
+Message-ID: <CABBYNZ+5viOEhXeaGzvO7ZtjCaNrxeFX+c01eqbyURg2_XAdZw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] obexd: Add property changed signals for 'org.bluez.obex.Message1'
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -14,140 +15,240 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Christian,
 
-On Thu, Aug 22, 2013 at 7:00 PM, Christian Fetzer
+On Thu, Aug 22, 2013 at 7:08 PM, Christian Fetzer
 <christian.fetzer@oss.bmw-carit.de> wrote:
 > From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 >
-> This patch extends client session by the tracking of the current path.
-> The current path can be accessed by obc_session_get_current_path.
->
-> This allows drivers to add a folder property to browsed objects so that
-> the application doesn't have to keep track of the folder an object
-> belongs to.
+> This patch adds property changed signal emissions in case message properties
+> change on the server.
 > ---
->  obexd/client/session.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
->  obexd/client/session.h |  2 ++
->  2 files changed, 48 insertions(+)
+>  obexd/client/map.c | 94 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 92 insertions(+), 2 deletions(-)
 >
-> diff --git a/obexd/client/session.c b/obexd/client/session.c
-> index 44e2bf8..293359b 100644
-> --- a/obexd/client/session.c
-> +++ b/obexd/client/session.c
-> @@ -110,6 +110,8 @@ struct obc_session {
->         guint watch;
->         GQueue *queue;
->         guint process_id;
-> +       GSList *cur_path_list;
-> +       char *cur_path;
->  };
+> diff --git a/obexd/client/map.c b/obexd/client/map.c
+> index 8864a54..a9a9bcd 100644
+> --- a/obexd/client/map.c
+> +++ b/obexd/client/map.c
+> @@ -792,121 +792,211 @@ static struct map_msg *map_msg_create(struct map_data *data, const char *handle)
 >
->  static GSList *sessions = NULL;
-> @@ -242,6 +244,8 @@ static void session_free(struct obc_session *session)
->         g_free(session->owner);
->         g_free(session->source);
->         g_free(session->destination);
-> +       g_slist_free_full(session->cur_path_list, g_free);
-> +       g_free(session->cur_path);
->         g_free(session);
+>  static void parse_subject(struct map_msg *msg, const char *value)
+>  {
+> +       if (g_strcmp0(msg->subject, value) == 0)
+> +               return;
+> +
+>         g_free(msg->subject);
+>         msg->subject = g_strdup(value);
+> +
+> +       g_dbus_emit_property_changed(conn, msg->path,
+> +                                               MAP_MSG_INTERFACE, "Subject");
 >  }
 >
-> @@ -500,6 +504,7 @@ struct obc_session *obc_session_create(const char *source,
->         session->destination = g_strdup(destination);
->         session->channel = channel;
->         session->queue = g_queue_new();
-> +       session->cur_path = g_strdup("/");
->
->         if (owner)
->                 obc_session_set_owner(session, owner, owner_disconnected);
-> @@ -930,12 +935,33 @@ const char *obc_session_get_target(struct obc_session *session)
->         return session->driver->target;
+>  static void parse_datetime(struct map_msg *msg, const char *value)
+>  {
+> +       if (g_strcmp0(msg->timestamp, value) == 0)
+> +               return;
+> +
+>         g_free(msg->timestamp);
+>         msg->timestamp = g_strdup(value);
+> +
+> +       g_dbus_emit_property_changed(conn, msg->path,
+> +                                               MAP_MSG_INTERFACE, "Timestamp");
 >  }
 >
-> +const char *obc_session_get_current_path(struct obc_session *session)
-> +{
-> +       GSList *l;
-> +       GString *strbuf;
-> +
-> +       if (!session->cur_path) {
-> +               strbuf = g_string_new("/");
-> +               for (l = session->cur_path_list; l; l = l->next) {
-> +                       g_string_append(strbuf, l->data);
-> +                       if (l->next)
-> +                               g_string_append_c(strbuf, '/');
-> +               }
-> +               session->cur_path = g_string_free(strbuf, FALSE);
-> +       }
-> +
-> +       return session->cur_path;
-> +}
-> +
->  static void setpath_complete(struct obc_session *session,
->                                                 struct obc_transfer *transfer,
->                                                 GError *err, void *user_data)
+>  static void parse_sender(struct map_msg *msg, const char *value)
 >  {
->         struct pending_request *p = user_data;
->
-> +       g_free(session->cur_path);
-> +       session->cur_path = NULL;
+> +       if (g_strcmp0(msg->sender, value) == 0)
+> +               return;
 > +
->         if (p->func)
->                 p->func(session, NULL, err, p->data);
+>         g_free(msg->sender);
+>         msg->sender = g_strdup(value);
+> +
+> +       g_dbus_emit_property_changed(conn, msg->path,
+> +                                               MAP_MSG_INTERFACE, "Sender");
+>  }
 >
-> @@ -962,7 +988,9 @@ static void setpath_cb(GObex *obex, GError *err, GObexPacket *rsp,
+>  static void parse_sender_address(struct map_msg *msg, const char *value)
 >  {
->         struct pending_request *p = user_data;
->         struct setpath_data *data = p->data;
-> +       char *prev;
->         char *next;
-> +       GSList *last;
->         guint8 code;
->
->         p->req_id = 0;
-> @@ -982,6 +1010,24 @@ static void setpath_cb(GObex *obex, GError *err, GObexPacket *rsp,
->                 return;
->         }
->
-> +       /* Track current folder in cur_folder_list */
-> +       if (strlen(data->remaining[data->index-1]) == 0) {
-> +               g_slist_free_full(p->session->cur_path_list, g_free);
-> +               p->session->cur_path_list = NULL;
-> +       } else {
-> +               prev = data->remaining[data->index-1];
-> +               if (strcmp(prev, "..") == 0) {
-> +                       if (p->session->cur_path_list) {
-> +                               last = g_slist_last(p->session->cur_path_list);
-> +                               g_free(last->data);
-> +                               p->session->cur_path_list = g_slist_delete_link(
-> +                                       p->session->cur_path_list, last);
-> +                       }
-> +               } else
-> +                       p->session->cur_path_list = g_slist_append(
-> +                               p->session->cur_path_list, g_strdup(prev));
-> +       }
+> +       if (g_strcmp0(msg->sender_address, value) == 0)
+> +               return;
 > +
->         /* Ignore empty folder names to avoid resetting the current path */
->         while ((next = data->remaining[data->index]) && strlen(next) == 0)
->                 data->index++;
-> diff --git a/obexd/client/session.h b/obexd/client/session.h
-> index 319d529..01034b5 100644
-> --- a/obexd/client/session.h
-> +++ b/obexd/client/session.h
-> @@ -58,6 +58,8 @@ const char *obc_session_register(struct obc_session *session,
->  const void *obc_session_get_attribute(struct obc_session *session,
->                                                         int attribute_id);
->
-> +const char *obc_session_get_current_path(struct obc_session *session);
+>         g_free(msg->sender_address);
+>         msg->sender_address = g_strdup(value);
 > +
->  guint obc_session_queue(struct obc_session *session,
->                                 struct obc_transfer *transfer,
->                                 session_callback_t func, void *user_data,
+> +       g_dbus_emit_property_changed(conn, msg->path,
+> +                                       MAP_MSG_INTERFACE, "SenderAddress");
+>  }
+>
+>  static void parse_replyto(struct map_msg *msg, const char *value)
+>  {
+> +       if (g_strcmp0(msg->replyto, value) == 0)
+> +               return;
+> +
+>         g_free(msg->replyto);
+>         msg->replyto = g_strdup(value);
+> +
+> +       g_dbus_emit_property_changed(conn, msg->path,
+> +                                               MAP_MSG_INTERFACE, "ReplyTo");
+>  }
+>
+>  static void parse_recipient(struct map_msg *msg, const char *value)
+>  {
+> +       if (g_strcmp0(msg->recipient, value) == 0)
+> +               return;
+> +
+>         g_free(msg->recipient);
+>         msg->recipient = g_strdup(value);
+> +
+> +       g_dbus_emit_property_changed(conn, msg->path,
+> +                                               MAP_MSG_INTERFACE, "Recipient");
+>  }
+>
+>  static void parse_recipient_address(struct map_msg *msg, const char *value)
+>  {
+> +       if (g_strcmp0(msg->recipient_address, value) == 0)
+> +               return;
+> +
+>         g_free(msg->recipient_address);
+>         msg->recipient_address = g_strdup(value);
+> +
+> +       g_dbus_emit_property_changed(conn, msg->path,
+> +                                       MAP_MSG_INTERFACE, "RecipientAddress");
+>  }
+>
+>  static void parse_type(struct map_msg *msg, const char *value)
+>  {
+> +       if (g_strcmp0(msg->type, value) == 0)
+> +               return;
+> +
+>         g_free(msg->type);
+>         msg->type = g_strdup(value);
+> +
+> +       g_dbus_emit_property_changed(conn, msg->path,
+> +                                               MAP_MSG_INTERFACE, "Type");
+>  }
+>
+>  static void parse_size(struct map_msg *msg, const char *value)
+>  {
+> -       msg->size = g_ascii_strtoll(value, NULL, 10);
+> +       uint64_t size = g_ascii_strtoll(value, NULL, 10);
+> +
+> +       if (msg->size == size)
+> +               return;
+> +
+> +       msg->size = size;
+> +
+> +       g_dbus_emit_property_changed(conn, msg->path,
+> +                                               MAP_MSG_INTERFACE, "Size");
+>  }
+>
+>  static void parse_text(struct map_msg *msg, const char *value)
+>  {
+>         gboolean flag = strcasecmp(value, "no") != 0;
+>
+> +       uint8_t oldflags = msg->flags;
+>         if (flag)
+>                 msg->flags |= MAP_MSG_FLAG_TEXT;
+>         else
+>                 msg->flags &= ~MAP_MSG_FLAG_TEXT;
+>
+> +       if (msg->flags != oldflags)
+> +               g_dbus_emit_property_changed(conn, msg->path,
+> +                                               MAP_MSG_INTERFACE, "Text");
+>  }
+>
+>  static void parse_status(struct map_msg *msg, const char *value)
+>  {
+> +       if (g_strcmp0(msg->status, value) == 0)
+> +               return;
+> +
+>         g_free(msg->status);
+>         msg->status = g_strdup(value);
+> +
+> +       g_dbus_emit_property_changed(conn, msg->path,
+> +                                               MAP_MSG_INTERFACE, "Status");
+>  }
+>
+>  static void parse_attachment_size(struct map_msg *msg, const char *value)
+>  {
+> -       msg->attachment_size = g_ascii_strtoll(value, NULL, 10);
+> +       uint64_t attachment_size = g_ascii_strtoll(value, NULL, 10);
+> +
+> +       if (msg->attachment_size == attachment_size)
+> +               return;
+> +
+> +       msg->attachment_size = attachment_size;
+> +
+> +       g_dbus_emit_property_changed(conn, msg->path,
+> +                                       MAP_MSG_INTERFACE, "AttachmentSize");
+>  }
+>
+>  static void parse_priority(struct map_msg *msg, const char *value)
+>  {
+>         gboolean flag = strcasecmp(value, "no") != 0;
+>
+> +       uint8_t oldflags = msg->flags;
+>         if (flag)
+>                 msg->flags |= MAP_MSG_FLAG_PRIORITY;
+>         else
+>                 msg->flags &= ~MAP_MSG_FLAG_PRIORITY;
+>
+> +       if (msg->flags != oldflags)
+> +               g_dbus_emit_property_changed(conn, msg->path,
+> +                                               MAP_MSG_INTERFACE, "Priority");
+>  }
+>
+>  static void parse_read(struct map_msg *msg, const char *value)
+>  {
+>         gboolean flag = strcasecmp(value, "no") != 0;
+>
+> +       uint8_t oldflags = msg->flags;
+>         if (flag)
+>                 msg->flags |= MAP_MSG_FLAG_READ;
+>         else
+>                 msg->flags &= ~MAP_MSG_FLAG_READ;
+>
+> +       if (msg->flags != oldflags)
+> +               g_dbus_emit_property_changed(conn, msg->path,
+> +                                               MAP_MSG_INTERFACE, "Read");
+>  }
+>
+>  static void parse_sent(struct map_msg *msg, const char *value)
+>  {
+>         gboolean flag = strcasecmp(value, "no") != 0;
+>
+> +       uint8_t oldflags = msg->flags;
+>         if (flag)
+>                 msg->flags |= MAP_MSG_FLAG_SENT;
+>         else
+>                 msg->flags &= ~MAP_MSG_FLAG_SENT;
+>
+> +       if (msg->flags != oldflags)
+> +               g_dbus_emit_property_changed(conn, msg->path,
+> +                                               MAP_MSG_INTERFACE, "Sent");
+>  }
+>
+>  static void parse_protected(struct map_msg *msg, const char *value)
+>  {
+>         gboolean flag = strcasecmp(value, "no") != 0;
+>
+> +       uint8_t oldflags = msg->flags;
+>         if (flag)
+>                 msg->flags |= MAP_MSG_FLAG_PROTECTED;
+>         else
+>                 msg->flags &= ~MAP_MSG_FLAG_PROTECTED;
+>
+> +       if (msg->flags != oldflags)
+> +               g_dbus_emit_property_changed(conn, msg->path,
+> +                                               MAP_MSG_INTERFACE, "Protected");
+>  }
+>
+>  static struct map_msg_parser {
 > --
 > 1.8.3.4
 
-Please use path or folder instead of cur_path/current_path to make it
-a bit shorter, also I don't think you should really needs to have 2
-fields for tracking this.
-
+Does this make us emit signals when creating the objects? That should
+probably not be necessary, only emit signals once the value really
+changes.
 
 
 -- 
