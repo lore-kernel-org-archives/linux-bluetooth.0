@@ -1,63 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Restrict ioctls to HCI raw channel sockets
-Date: Mon, 26 Aug 2013 09:39:55 -0700
-Message-Id: <1377535195-12121-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Fix error handling for HCI socket options
+Date: Mon, 26 Aug 2013 09:29:39 -0700
+Message-Id: <1377534579-5781-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The various legacy ioctls used with HCI sockets are limited to raw
-channel only. They are not used on the other channels and also have
-no meaning there. So return an error if tried to use them.
+The HCI sockets for monitor and control do not support any HCI specific
+socket options and if tried, an error will be returned. However the
+error used is EINVAL and that is not really descriptive. To make it
+clear that these sockets are not handling HCI socket options, return
+EBADFD instead.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_sock.c | 23 +++++++++++++++++------
- 1 file changed, 17 insertions(+), 6 deletions(-)
+ net/bluetooth/hci_sock.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index f92e913..ab57038 100644
+index 49c5c62..f92e913 100644
 --- a/net/bluetooth/hci_sock.c
 +++ b/net/bluetooth/hci_sock.c
-@@ -547,6 +547,15 @@ static int hci_sock_ioctl(struct socket *sock, unsigned int cmd,
+@@ -921,7 +921,7 @@ static int hci_sock_setsockopt(struct socket *sock, int level, int optname,
+ 	lock_sock(sk);
  
- 	BT_DBG("cmd %x arg %lx", cmd, arg);
- 
-+	lock_sock(sk);
-+
-+	if (hci_pi(sk)->channel != HCI_CHANNEL_RAW) {
+ 	if (hci_pi(sk)->channel != HCI_CHANNEL_RAW) {
+-		err = -EINVAL;
 +		err = -EBADFD;
-+		goto done;
-+	}
-+
-+	release_sock(sk);
-+
- 	switch (cmd) {
- 	case HCIGETDEVLIST:
- 		return hci_get_dev_list(argp);
-@@ -591,13 +600,15 @@ static int hci_sock_ioctl(struct socket *sock, unsigned int cmd,
- 
- 	case HCIINQUIRY:
- 		return hci_inquiry(argp);
--
--	default:
--		lock_sock(sk);
--		err = hci_sock_bound_ioctl(sk, cmd, arg);
--		release_sock(sk);
--		return err;
+ 		goto done;
  	}
-+
-+	lock_sock(sk);
-+
-+	err = hci_sock_bound_ioctl(sk, cmd, arg);
-+
-+done:
-+	release_sock(sk);
-+	return err;
- }
  
- static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+@@ -1007,7 +1007,7 @@ static int hci_sock_getsockopt(struct socket *sock, int level, int optname,
+ 	lock_sock(sk);
+ 
+ 	if (hci_pi(sk)->channel != HCI_CHANNEL_RAW) {
+-		err = -EINVAL;
++		err = -EBADFD;
+ 		goto done;
+ 	}
+ 
 -- 
 1.8.3.1
 
