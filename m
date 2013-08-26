@@ -1,255 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1377187721-3758-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1377187721-3758-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-	<1377187721-3758-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Date: Mon, 26 Aug 2013 15:08:09 +0300
-Message-ID: <CABBYNZ+5viOEhXeaGzvO7ZtjCaNrxeFX+c01eqbyURg2_XAdZw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] obexd: Add property changed signals for 'org.bluez.obex.Message1'
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix handling of getsockname() for HCI sockets
+Date: Mon, 26 Aug 2013 00:20:37 -0700
+Message-Id: <1377501637-40861-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+The hci_dev check is not protected and so move it into the socket lock. In
+addition return the HCI channel identifier instead of always 0 channel.
 
-On Thu, Aug 22, 2013 at 7:08 PM, Christian Fetzer
-<christian.fetzer@oss.bmw-carit.de> wrote:
-> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
->
-> This patch adds property changed signal emissions in case message properties
-> change on the server.
-> ---
->  obexd/client/map.c | 94 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 92 insertions(+), 2 deletions(-)
->
-> diff --git a/obexd/client/map.c b/obexd/client/map.c
-> index 8864a54..a9a9bcd 100644
-> --- a/obexd/client/map.c
-> +++ b/obexd/client/map.c
-> @@ -792,121 +792,211 @@ static struct map_msg *map_msg_create(struct map_data *data, const char *handle)
->
->  static void parse_subject(struct map_msg *msg, const char *value)
->  {
-> +       if (g_strcmp0(msg->subject, value) == 0)
-> +               return;
-> +
->         g_free(msg->subject);
->         msg->subject = g_strdup(value);
-> +
-> +       g_dbus_emit_property_changed(conn, msg->path,
-> +                                               MAP_MSG_INTERFACE, "Subject");
->  }
->
->  static void parse_datetime(struct map_msg *msg, const char *value)
->  {
-> +       if (g_strcmp0(msg->timestamp, value) == 0)
-> +               return;
-> +
->         g_free(msg->timestamp);
->         msg->timestamp = g_strdup(value);
-> +
-> +       g_dbus_emit_property_changed(conn, msg->path,
-> +                                               MAP_MSG_INTERFACE, "Timestamp");
->  }
->
->  static void parse_sender(struct map_msg *msg, const char *value)
->  {
-> +       if (g_strcmp0(msg->sender, value) == 0)
-> +               return;
-> +
->         g_free(msg->sender);
->         msg->sender = g_strdup(value);
-> +
-> +       g_dbus_emit_property_changed(conn, msg->path,
-> +                                               MAP_MSG_INTERFACE, "Sender");
->  }
->
->  static void parse_sender_address(struct map_msg *msg, const char *value)
->  {
-> +       if (g_strcmp0(msg->sender_address, value) == 0)
-> +               return;
-> +
->         g_free(msg->sender_address);
->         msg->sender_address = g_strdup(value);
-> +
-> +       g_dbus_emit_property_changed(conn, msg->path,
-> +                                       MAP_MSG_INTERFACE, "SenderAddress");
->  }
->
->  static void parse_replyto(struct map_msg *msg, const char *value)
->  {
-> +       if (g_strcmp0(msg->replyto, value) == 0)
-> +               return;
-> +
->         g_free(msg->replyto);
->         msg->replyto = g_strdup(value);
-> +
-> +       g_dbus_emit_property_changed(conn, msg->path,
-> +                                               MAP_MSG_INTERFACE, "ReplyTo");
->  }
->
->  static void parse_recipient(struct map_msg *msg, const char *value)
->  {
-> +       if (g_strcmp0(msg->recipient, value) == 0)
-> +               return;
-> +
->         g_free(msg->recipient);
->         msg->recipient = g_strdup(value);
-> +
-> +       g_dbus_emit_property_changed(conn, msg->path,
-> +                                               MAP_MSG_INTERFACE, "Recipient");
->  }
->
->  static void parse_recipient_address(struct map_msg *msg, const char *value)
->  {
-> +       if (g_strcmp0(msg->recipient_address, value) == 0)
-> +               return;
-> +
->         g_free(msg->recipient_address);
->         msg->recipient_address = g_strdup(value);
-> +
-> +       g_dbus_emit_property_changed(conn, msg->path,
-> +                                       MAP_MSG_INTERFACE, "RecipientAddress");
->  }
->
->  static void parse_type(struct map_msg *msg, const char *value)
->  {
-> +       if (g_strcmp0(msg->type, value) == 0)
-> +               return;
-> +
->         g_free(msg->type);
->         msg->type = g_strdup(value);
-> +
-> +       g_dbus_emit_property_changed(conn, msg->path,
-> +                                               MAP_MSG_INTERFACE, "Type");
->  }
->
->  static void parse_size(struct map_msg *msg, const char *value)
->  {
-> -       msg->size = g_ascii_strtoll(value, NULL, 10);
-> +       uint64_t size = g_ascii_strtoll(value, NULL, 10);
-> +
-> +       if (msg->size == size)
-> +               return;
-> +
-> +       msg->size = size;
-> +
-> +       g_dbus_emit_property_changed(conn, msg->path,
-> +                                               MAP_MSG_INTERFACE, "Size");
->  }
->
->  static void parse_text(struct map_msg *msg, const char *value)
->  {
->         gboolean flag = strcasecmp(value, "no") != 0;
->
-> +       uint8_t oldflags = msg->flags;
->         if (flag)
->                 msg->flags |= MAP_MSG_FLAG_TEXT;
->         else
->                 msg->flags &= ~MAP_MSG_FLAG_TEXT;
->
-> +       if (msg->flags != oldflags)
-> +               g_dbus_emit_property_changed(conn, msg->path,
-> +                                               MAP_MSG_INTERFACE, "Text");
->  }
->
->  static void parse_status(struct map_msg *msg, const char *value)
->  {
-> +       if (g_strcmp0(msg->status, value) == 0)
-> +               return;
-> +
->         g_free(msg->status);
->         msg->status = g_strdup(value);
-> +
-> +       g_dbus_emit_property_changed(conn, msg->path,
-> +                                               MAP_MSG_INTERFACE, "Status");
->  }
->
->  static void parse_attachment_size(struct map_msg *msg, const char *value)
->  {
-> -       msg->attachment_size = g_ascii_strtoll(value, NULL, 10);
-> +       uint64_t attachment_size = g_ascii_strtoll(value, NULL, 10);
-> +
-> +       if (msg->attachment_size == attachment_size)
-> +               return;
-> +
-> +       msg->attachment_size = attachment_size;
-> +
-> +       g_dbus_emit_property_changed(conn, msg->path,
-> +                                       MAP_MSG_INTERFACE, "AttachmentSize");
->  }
->
->  static void parse_priority(struct map_msg *msg, const char *value)
->  {
->         gboolean flag = strcasecmp(value, "no") != 0;
->
-> +       uint8_t oldflags = msg->flags;
->         if (flag)
->                 msg->flags |= MAP_MSG_FLAG_PRIORITY;
->         else
->                 msg->flags &= ~MAP_MSG_FLAG_PRIORITY;
->
-> +       if (msg->flags != oldflags)
-> +               g_dbus_emit_property_changed(conn, msg->path,
-> +                                               MAP_MSG_INTERFACE, "Priority");
->  }
->
->  static void parse_read(struct map_msg *msg, const char *value)
->  {
->         gboolean flag = strcasecmp(value, "no") != 0;
->
-> +       uint8_t oldflags = msg->flags;
->         if (flag)
->                 msg->flags |= MAP_MSG_FLAG_READ;
->         else
->                 msg->flags &= ~MAP_MSG_FLAG_READ;
->
-> +       if (msg->flags != oldflags)
-> +               g_dbus_emit_property_changed(conn, msg->path,
-> +                                               MAP_MSG_INTERFACE, "Read");
->  }
->
->  static void parse_sent(struct map_msg *msg, const char *value)
->  {
->         gboolean flag = strcasecmp(value, "no") != 0;
->
-> +       uint8_t oldflags = msg->flags;
->         if (flag)
->                 msg->flags |= MAP_MSG_FLAG_SENT;
->         else
->                 msg->flags &= ~MAP_MSG_FLAG_SENT;
->
-> +       if (msg->flags != oldflags)
-> +               g_dbus_emit_property_changed(conn, msg->path,
-> +                                               MAP_MSG_INTERFACE, "Sent");
->  }
->
->  static void parse_protected(struct map_msg *msg, const char *value)
->  {
->         gboolean flag = strcasecmp(value, "no") != 0;
->
-> +       uint8_t oldflags = msg->flags;
->         if (flag)
->                 msg->flags |= MAP_MSG_FLAG_PROTECTED;
->         else
->                 msg->flags &= ~MAP_MSG_FLAG_PROTECTED;
->
-> +       if (msg->flags != oldflags)
-> +               g_dbus_emit_property_changed(conn, msg->path,
-> +                                               MAP_MSG_INTERFACE, "Protected");
->  }
->
->  static struct map_msg_parser {
-> --
-> 1.8.3.4
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_sock.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-Does this make us emit signals when creating the objects? That should
-probably not be necessary, only emit signals once the value really
-changes.
-
-
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index d858941..49c5c62 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -695,25 +695,30 @@ static int hci_sock_getname(struct socket *sock, struct sockaddr *addr,
+ {
+ 	struct sockaddr_hci *haddr = (struct sockaddr_hci *) addr;
+ 	struct sock *sk = sock->sk;
+-	struct hci_dev *hdev = hci_pi(sk)->hdev;
++	struct hci_dev *hdev;
++	int err = 0;
+ 
+ 	BT_DBG("sock %p sk %p", sock, sk);
+ 
+ 	if (peer)
+ 		return -EOPNOTSUPP;
+ 
+-	if (!hdev)
+-		return -EBADFD;
+-
+ 	lock_sock(sk);
+ 
++	hdev = hci_pi(sk)->hdev;
++	if (!hdev) {
++		err = -EBADFD;
++		goto done;
++	}
++
+ 	*addr_len = sizeof(*haddr);
+ 	haddr->hci_family = AF_BLUETOOTH;
+ 	haddr->hci_dev    = hdev->id;
+-	haddr->hci_channel= 0;
++	haddr->hci_channel= hci_pi(sk)->channel;
+ 
++done:
+ 	release_sock(sk);
+-	return 0;
++	return err;
+ }
+ 
+ static void hci_sock_cmsg(struct sock *sk, struct msghdr *msg,
 -- 
-Luiz Augusto von Dentz
+1.8.3.1
+
