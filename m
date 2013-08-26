@@ -1,139 +1,199 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/4] sdp: Make sdp_record_add to be handled by adapter
-Date: Mon, 26 Aug 2013 15:07:20 +0200
-Message-Id: <1377522441-28671-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 4/4] sdp: Make sdp_record_remove to be handled by adapter
+Date: Mon, 26 Aug 2013 15:07:21 +0200
+Message-Id: <1377522441-28671-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1377522441-28671-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1377522441-28671-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Make sdp_record_add to be called from adapter. First write services to
-sdp db then to adapter db without revokes to adapter.
+Make sdp_record_remove to be called from adapter. First remove service
+from sdp db then from adapter db without revokes to adapter.
 
-Change-Id: I65d638096c91aadacc3cb5ef7a8a9181fa4dae6e
+Change-Id: I13a3113909bab2b4494a00ef05e25dc8d113e3ac
 ---
- profiles/audio/a2dp.c      |    2 +-
+ profiles/audio/a2dp.c      |    8 ++++----
  profiles/audio/avrcp.c     |    4 ++--
+ profiles/health/hdp.c      |    2 +-
  profiles/health/hdp_util.c |    2 +-
- profiles/network/server.c  |    2 +-
+ profiles/network/server.c  |    4 ++--
  profiles/sap/server.c      |    2 +-
- src/adapter.c              |   31 +++++++++++++++++++++++++++++++
- src/adapter.h              |    2 ++
- src/attrib-server.c        |    2 +-
+ src/adapter.c              |   40 ++++++++++++++++++++++++++++++++++++++++
+ src/adapter.h              |    1 +
+ src/attrib-server.c        |    6 +++---
  src/profile.c              |    2 +-
- src/sdpd-database.c        |   10 ----------
- 10 files changed, 41 insertions(+), 18 deletions(-)
+ src/sdpd-database.c        |   11 -----------
+ src/sdpd.h                 |    5 +++++
+ 12 files changed, 61 insertions(+), 26 deletions(-)
 
 diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 3f3cc1b..384b143 100644
+index 384b143..835fe9a 100644
 --- a/profiles/audio/a2dp.c
 +++ b/profiles/audio/a2dp.c
-@@ -1298,7 +1298,7 @@ struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
- 		return NULL;
+@@ -1327,7 +1327,7 @@ void a2dp_remove_sep(struct a2dp_sep *sep)
+ 			return;
+ 		server->sources = g_slist_remove(server->sources, sep);
+ 		if (server->sources == NULL && server->source_record_id) {
+-			remove_record_from_server(server->source_record_id);
++			adapter_remove_record_from_server(server->source_record_id);
+ 			server->source_record_id = 0;
+ 		}
+ 	} else {
+@@ -1335,7 +1335,7 @@ void a2dp_remove_sep(struct a2dp_sep *sep)
+ 			return;
+ 		server->sinks = g_slist_remove(server->sinks, sep);
+ 		if (server->sinks == NULL && server->sink_record_id) {
+-			remove_record_from_server(server->sink_record_id);
++			adapter_remove_record_from_server(server->sink_record_id);
+ 			server->sink_record_id = 0;
+ 		}
+ 	}
+@@ -1944,7 +1944,7 @@ static void a2dp_source_server_remove(struct btd_profile *p,
+ 					(GDestroyNotify) a2dp_unregister_sep);
+ 
+ 	if (server->source_record_id) {
+-		remove_record_from_server(server->source_record_id);
++		adapter_remove_record_from_server(server->source_record_id);
+ 		server->source_record_id = 0;
  	}
  
--	if (add_record_to_server(adapter_get_address(server->adapter),
-+	if (adapter_add_record_to_server(adapter_get_address(server->adapter),
- 								record) < 0) {
- 		error("Unable to register A2DP service record");
- 		sdp_record_free(record);
+@@ -1989,7 +1989,7 @@ static void a2dp_sink_server_remove(struct btd_profile *p,
+ 	g_slist_free_full(server->sinks, (GDestroyNotify) a2dp_unregister_sep);
+ 
+ 	if (server->sink_record_id) {
+-		remove_record_from_server(server->sink_record_id);
++		adapter_remove_record_from_server(server->sink_record_id);
+ 		server->sink_record_id = 0;
+ 	}
+ 
 diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 9f164e4..6734b0b 100644
+index 6734b0b..825e63c 100644
 --- a/profiles/audio/avrcp.c
 +++ b/profiles/audio/avrcp.c
-@@ -3829,7 +3829,7 @@ done:
- 		return -1;
+@@ -3797,7 +3797,7 @@ static void avrcp_target_server_remove(struct btd_profile *p,
+ 		return;
+ 
+ 	if (server->tg_record_id != 0) {
+-		remove_record_from_server(server->tg_record_id);
++		adapter_remove_record_from_server(server->tg_record_id);
+ 		server->tg_record_id = 0;
  	}
  
--	if (add_record_to_server(adapter_get_address(adapter), record) < 0) {
-+	if (adapter_add_record_to_server(adapter_get_address(adapter), record) < 0) {
- 		error("Unable to register AVRCP target service record");
- 		avrcp_target_server_remove(p, adapter);
- 		sdp_record_free(record);
-@@ -3912,7 +3912,7 @@ done:
- 		return -1;
+@@ -3880,7 +3880,7 @@ static void avrcp_controller_server_remove(struct btd_profile *p,
+ 		return;
+ 
+ 	if (server->ct_record_id != 0) {
+-		remove_record_from_server(server->ct_record_id);
++		adapter_remove_record_from_server(server->ct_record_id);
+ 		server->ct_record_id = 0;
  	}
  
--	if (add_record_to_server(adapter_get_address(adapter), record) < 0) {
-+	if (adapter_add_record_to_server(adapter_get_address(adapter), record) < 0) {
- 		error("Unable to register AVRCP service record");
- 		avrcp_controller_server_remove(p, adapter);
- 		sdp_record_free(record);
+diff --git a/profiles/health/hdp.c b/profiles/health/hdp.c
+index 7f24756..eeac102 100644
+--- a/profiles/health/hdp.c
++++ b/profiles/health/hdp.c
+@@ -1403,7 +1403,7 @@ void hdp_adapter_unregister(struct btd_adapter *adapter)
+ 	hdp_adapter = l->data;
+ 	adapters = g_slist_remove(adapters, hdp_adapter);
+ 	if (hdp_adapter->sdp_handler > 0)
+-		remove_record_from_server(hdp_adapter->sdp_handler);
++		adapter_remove_record_from_server(hdp_adapter->sdp_handler);
+ 	release_adapter_instance(hdp_adapter);
+ 	btd_adapter_unref(hdp_adapter->btd_adapter);
+ 	g_free(hdp_adapter);
 diff --git a/profiles/health/hdp_util.c b/profiles/health/hdp_util.c
-index b53f1db..30e59bb 100644
+index 30e59bb..34551df 100644
 --- a/profiles/health/hdp_util.c
 +++ b/profiles/health/hdp_util.c
-@@ -733,7 +733,7 @@ gboolean hdp_update_sdp_record(struct hdp_adapter *adapter, GSList *app_list)
- 	if (sdp_set_record_state(sdp_record, adapter->record_state++) < 0)
- 		goto fail;
+@@ -693,7 +693,7 @@ gboolean hdp_update_sdp_record(struct hdp_adapter *adapter, GSList *app_list)
+ 	sdp_record_t *sdp_record;
  
--	if (add_record_to_server(adapter_get_address(adapter->btd_adapter),
-+	if (adapter_add_record_to_server(adapter_get_address(adapter->btd_adapter),
- 					sdp_record) < 0)
- 		goto fail;
- 	adapter->sdp_handler = sdp_record->handle;
+ 	if (adapter->sdp_handler > 0)
+-		remove_record_from_server(adapter->sdp_handler);
++		adapter_remove_record_from_server(adapter->sdp_handler);
+ 
+ 	if (app_list == NULL) {
+ 		adapter->sdp_handler = 0;
 diff --git a/profiles/network/server.c b/profiles/network/server.c
-index de48bec..980dc3a 100644
+index 980dc3a..4efdd74 100644
 --- a/profiles/network/server.c
 +++ b/profiles/network/server.c
-@@ -587,7 +587,7 @@ static uint32_t register_server_record(struct network_server *ns)
- 		return 0;
+@@ -628,7 +628,7 @@ static void server_disconnect(DBusConnection *conn, void *user_data)
+ 	ns->watch_id = 0;
+ 
+ 	if (ns->record_id) {
+-		remove_record_from_server(ns->record_id);
++		adapter_remove_record_from_server(ns->record_id);
+ 		ns->record_id = 0;
  	}
  
--	if (add_record_to_server(&ns->src, record) < 0) {
-+	if (adapter_add_record_to_server(&ns->src, record) < 0) {
- 		error("Failed to register service record");
- 		sdp_record_free(record);
- 		return 0;
+@@ -722,7 +722,7 @@ static void server_free(void *data)
+ 	server_remove_sessions(ns);
+ 
+ 	if (ns->record_id)
+-		remove_record_from_server(ns->record_id);
++		adapter_remove_record_from_server(ns->record_id);
+ 
+ 	g_free(ns->name);
+ 	g_free(ns->bridge);
 diff --git a/profiles/sap/server.c b/profiles/sap/server.c
-index dfcf0f1..34a2e38 100644
+index 34a2e38..f2ccb63 100644
 --- a/profiles/sap/server.c
 +++ b/profiles/sap/server.c
-@@ -1358,7 +1358,7 @@ int sap_server_register(const char *path, const bdaddr_t *src)
- 		goto sdp_err;
- 	}
+@@ -1318,7 +1318,7 @@ static void server_remove(struct sap_server *server)
  
--	if (add_record_to_server(src, record) < 0) {
-+	if (adapter_add_record_to_server(src, record) < 0) {
- 		error("Adding SAP SDP record to the SDP server failed.");
- 		sdp_record_free(record);
- 		goto sdp_err;
+ 	sap_server_remove_conn(server);
+ 
+-	remove_record_from_server(server->record_id);
++	adapter_remove_record_from_server(server->record_id);
+ 
+ 	if (server->listen_io) {
+ 		g_io_channel_shutdown(server->listen_io, TRUE, NULL);
 diff --git a/src/adapter.c b/src/adapter.c
-index fd20d61..8e897ce 100644
+index 8e897ce..8a5398f 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -6307,6 +6307,37 @@ void adapter_start_sdp_server(uint16_t sdp_mtu, uint32_t sdp_flags) {
- 		adapter_foreach(adapter_service_insert, services->data);
+@@ -6338,6 +6338,46 @@ int adapter_add_record_to_server(const bdaddr_t *device, sdp_record_t *rec)
+ 	return chck;
  }
  
-+int adapter_add_record_to_server(const bdaddr_t *device, sdp_record_t *rec)
++int adapter_remove_record_from_server(uint32_t handle)
 +{
 +	int chck;
-+	struct btd_adapter *adapter;
++	sdp_list_t *p;
++	sdp_record_t *r;
++	sdp_access_t *a;
++	sdp_record_t rh, ah;
 +
-+	chck = add_record_to_server(device, rec);
++	chck = remove_record_from_server(handle);
 +
-+	//  Check if rec handle error occure
-+	//
-+	//  0       - Ok
-+	//
-+	//  handle == 0xffffffff
-+	//  -ENOSPC - next handle < 0x10000
-+	//
-+	//  -EEXIST - record already exist
 +	if (chck == 0) {
-+		//  Add rec for each adapter
-+		if (bacmp(device, BDADDR_ANY) == 0) {
-+			adapter_foreach(adapter_service_insert, rec);
-+			return chck;
-+		}
++		//	record_locate section
++		rh.handle = handle;
++		p = sdp_list_find(sdp_get_record_list(), &rh, record_sort);
 +
-+		//  Add rec for single adapter
-+		adapter = adapter_find(device);
-+		if (adapter)
-+			adapter_service_insert(adapter, rec);
++		r = p->data;
++
++		//	access_locate section
++		ah.handle = handle;
++		p = sdp_list_find(sdp_get_access_list(), &ah, record_sort);
++
++		if (p == NULL || p->data == NULL)
++			return 0;
++
++		a = p->data;
++
++		//	remove from adapter services
++		if (bacmp(&a->device, BDADDR_ANY) != 0) {
++			struct btd_adapter *adapter = adapter_find(&a->device);
++			if (adapter)
++				adapter_service_remove(adapter, r);
++		} else
++			adapter_foreach(adapter_service_remove, r);
++
++		free(a);
 +	}
 +
 +	return chck;
@@ -143,70 +203,100 @@ index fd20d61..8e897ce 100644
  {
  	sdp_list_t *p;
 diff --git a/src/adapter.h b/src/adapter.h
-index ad01710..3a4b4d9 100644
+index 3a4b4d9..4043347 100644
 --- a/src/adapter.h
 +++ b/src/adapter.h
-@@ -215,4 +215,6 @@ void btd_adapter_for_each_device(struct btd_adapter *adapter,
- 			void (*cb)(struct btd_device *device, void *data),
+@@ -216,5 +216,6 @@ void btd_adapter_for_each_device(struct btd_adapter *adapter,
  			void *data);
  
-+int adapter_add_record_to_server(const bdaddr_t *device, sdp_record_t *rec);
-+
+ int adapter_add_record_to_server(const bdaddr_t *device, sdp_record_t *rec);
++int adapter_remove_record_from_server(uint32_t handle);
+ 
  void adapter_sdp_init_services_list(bdaddr_t *device);
 diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 3f629b0..67631d1 100644
+index 67631d1..89aa4c2 100644
 --- a/src/attrib-server.c
 +++ b/src/attrib-server.c
-@@ -326,7 +326,7 @@ static uint32_t attrib_create_sdp_new(struct gatt_server *server,
- 				"http://www.bluez.org/");
- 	}
+@@ -139,10 +139,10 @@ static void gatt_server_free(struct gatt_server *server)
+ 	g_slist_free_full(server->clients, (GDestroyNotify) channel_free);
  
--	if (add_record_to_server(adapter_get_address(server->adapter), record)
-+	if (adapter_add_record_to_server(adapter_get_address(server->adapter), record)
- 			== 0)
- 		return record->handle;
+ 	if (server->gatt_sdp_handle > 0)
+-		remove_record_from_server(server->gatt_sdp_handle);
++		adapter_remove_record_from_server(server->gatt_sdp_handle);
  
-diff --git a/src/profile.c b/src/profile.c
-index 90c3535..8e9236c 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -1220,7 +1220,7 @@ static uint32_t ext_register_record(struct ext_profile *ext,
- 		return 0;
- 	}
+ 	if (server->gap_sdp_handle > 0)
+-		remove_record_from_server(server->gap_sdp_handle);
++		adapter_remove_record_from_server(server->gap_sdp_handle);
  
--	if (add_record_to_server(src, rec) < 0) {
-+	if (adapter_add_record_to_server(src, rec) < 0) {
- 		error("Failed to register service record");
- 		sdp_record_free(rec);
- 		return 0;
-diff --git a/src/sdpd-database.c b/src/sdpd-database.c
-index 7228cd7..335ea0e 100644
---- a/src/sdpd-database.c
-+++ b/src/sdpd-database.c
-@@ -168,7 +168,6 @@ void sdp_svcdb_set_collectable(sdp_record_t *record, int sock)
-  */
- void sdp_record_add(const bdaddr_t *device, sdp_record_t *rec)
+ 	if (server->adapter != NULL)
+ 		btd_adapter_unref(server->adapter);
+@@ -1380,7 +1380,7 @@ uint32_t attrib_create_sdp(struct btd_adapter *adapter, uint16_t handle,
+ 
+ void attrib_free_sdp(uint32_t sdp_handle)
  {
--	struct btd_adapter *adapter;
- 	sdp_access_t *dev;
- 
- 	SDPDBG("Adding rec : 0x%lx", (long) rec);
-@@ -184,15 +183,6 @@ void sdp_record_add(const bdaddr_t *device, sdp_record_t *rec)
- 	dev->handle = rec->handle;
- 
- 	access_db = sdp_list_insert_sorted(access_db, dev, access_sort);
--
--	if (bacmp(device, BDADDR_ANY) == 0) {
--		adapter_foreach(adapter_service_insert, rec);
--		return;
--	}
--
--	adapter = adapter_find(device);
--	if (adapter)
--		adapter_service_insert(adapter, rec);
+-	remove_record_from_server(sdp_handle);
++	adapter_remove_record_from_server(sdp_handle);
  }
  
- static sdp_list_t *record_locate(uint32_t handle)
+ static uint16_t find_uuid16_avail(struct btd_adapter *adapter, uint16_t nitems)
+diff --git a/src/profile.c b/src/profile.c
+index 8e9236c..2a0a6ad 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -1390,7 +1390,7 @@ static void ext_remove_records(struct ext_profile *ext,
+ 
+ 		ext->records = g_slist_remove(ext->records, r);
+ 
+-		remove_record_from_server(r->handle);
++		adapter_remove_record_from_server(r->handle);
+ 		btd_adapter_unref(r->adapter);
+ 		g_free(r);
+ 	}
+diff --git a/src/sdpd-database.c b/src/sdpd-database.c
+index 335ea0e..013f0f6 100644
+--- a/src/sdpd-database.c
++++ b/src/sdpd-database.c
+@@ -41,10 +41,6 @@
+ static sdp_list_t *service_db;
+ static sdp_list_t *access_db;
+ 
+-typedef struct {
+-	uint32_t handle;
+-	bdaddr_t device;
+-} sdp_access_t;
+ 
+ /*
+  * Ordering function called when inserting a service record.
+@@ -254,13 +250,6 @@ int sdp_record_remove(uint32_t handle)
+ 
+ 	a = p->data;
+ 
+-	if (bacmp(&a->device, BDADDR_ANY) != 0) {
+-		struct btd_adapter *adapter = adapter_find(&a->device);
+-		if (adapter)
+-			adapter_service_remove(adapter, r);
+-	} else
+-		adapter_foreach(adapter_service_remove, r);
+-
+ 	access_db = sdp_list_remove(access_db, a);
+ 	access_free(a);
+ 
+diff --git a/src/sdpd.h b/src/sdpd.h
+index ad384bd..769dc63 100644
+--- a/src/sdpd.h
++++ b/src/sdpd.h
+@@ -45,6 +45,11 @@ typedef struct request {
+ 	int      len;
+ } sdp_req_t;
+ 
++typedef struct {
++	uint32_t handle;
++	bdaddr_t device;
++} sdp_access_t;
++
+ void handle_internal_request(int sk, int mtu, void *data, int len);
+ void handle_request(int sk, uint8_t *data, int len);
+ 
 -- 
 1.7.9.5
 
