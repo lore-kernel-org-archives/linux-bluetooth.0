@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1377187669-3691-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1377187669-3691-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Date: Mon, 26 Aug 2013 15:33:01 +0300
-Message-ID: <CABBYNZJi2BhJTgSa29m3-_fmA05yoxD62+CTi+gT0AJYf9ZzQw@mail.gmail.com>
-Subject: Re: [PATCH 1/1] obexd: Fix memleak when unregistering MAP event handler
+In-Reply-To: <1377187223-3427-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1377187223-3427-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Date: Mon, 26 Aug 2013 15:31:30 +0300
+Message-ID: <CABBYNZKZtU2_G-97+f-kDwokzBqZkWq9uzezoiC528RMAEmkEA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] obexd: Add obc_session_get_current_path function
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -14,43 +14,140 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Christian,
 
-On Thu, Aug 22, 2013 at 7:07 PM, Christian Fetzer
+On Thu, Aug 22, 2013 at 7:00 PM, Christian Fetzer
 <christian.fetzer@oss.bmw-carit.de> wrote:
 > From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 >
-> 96 bytes in 3 blocks are definitely lost in loss record 217 of 310
->   at 0x4C29E84: calloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
->   by 0x5977858: g_malloc0 (in /usr/lib/libglib-2.0.so.0.3600.3)
->   by 0x433A87: map_register_event_handler (map-event.c:76)
->   by 0x4324C1: set_notification_registration (map.c:1722)
->   by 0x4325BB: map_probe (map.c:1801)
->   by 0x42D55C: obc_session_register (session.c:862)
->   by 0x42BE4B: create_callback (manager.c:100)
->   by 0x42CA0D: connect_cb (session.c:281)
->   by 0x4191CB: handle_response (gobex.c:949)
->   by 0x4196F0: incoming_data (gobex.c:1192)
->   by 0x5971DA5: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.3600.3)
->   by 0x59720F7: ??? (in /usr/lib/libglib-2.0.so.0.3600.3)
-> ---
->  obexd/client/map-event.c | 1 +
->  1 file changed, 1 insertion(+)
+> This patch extends client session by the tracking of the current path.
+> The current path can be accessed by obc_session_get_current_path.
 >
-> diff --git a/obexd/client/map-event.c b/obexd/client/map-event.c
-> index 76dfb84..bbe3519 100644
-> --- a/obexd/client/map-event.c
-> +++ b/obexd/client/map-event.c
-> @@ -97,6 +97,7 @@ void map_unregister_event_handler(struct obc_session *session, int mas_id)
->         handlers = g_slist_remove(handlers, handler);
->         DBG("Handler %p for %s:%d unregistered", handler,
->                         obc_session_get_destination(session), mas_id);
-> +       g_free(handler);
+> This allows drivers to add a folder property to browsed objects so that
+> the application doesn't have to keep track of the folder an object
+> belongs to.
+> ---
+>  obexd/client/session.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+>  obexd/client/session.h |  2 ++
+>  2 files changed, 48 insertions(+)
+>
+> diff --git a/obexd/client/session.c b/obexd/client/session.c
+> index 44e2bf8..293359b 100644
+> --- a/obexd/client/session.c
+> +++ b/obexd/client/session.c
+> @@ -110,6 +110,8 @@ struct obc_session {
+>         guint watch;
+>         GQueue *queue;
+>         guint process_id;
+> +       GSList *cur_path_list;
+> +       char *cur_path;
+>  };
+>
+>  static GSList *sessions = NULL;
+> @@ -242,6 +244,8 @@ static void session_free(struct obc_session *session)
+>         g_free(session->owner);
+>         g_free(session->source);
+>         g_free(session->destination);
+> +       g_slist_free_full(session->cur_path_list, g_free);
+> +       g_free(session->cur_path);
+>         g_free(session);
 >  }
 >
->  void map_dispatch_event(int mas_id, const char *device,
+> @@ -500,6 +504,7 @@ struct obc_session *obc_session_create(const char *source,
+>         session->destination = g_strdup(destination);
+>         session->channel = channel;
+>         session->queue = g_queue_new();
+> +       session->cur_path = g_strdup("/");
+>
+>         if (owner)
+>                 obc_session_set_owner(session, owner, owner_disconnected);
+> @@ -930,12 +935,33 @@ const char *obc_session_get_target(struct obc_session *session)
+>         return session->driver->target;
+>  }
+>
+> +const char *obc_session_get_current_path(struct obc_session *session)
+> +{
+> +       GSList *l;
+> +       GString *strbuf;
+> +
+> +       if (!session->cur_path) {
+> +               strbuf = g_string_new("/");
+> +               for (l = session->cur_path_list; l; l = l->next) {
+> +                       g_string_append(strbuf, l->data);
+> +                       if (l->next)
+> +                               g_string_append_c(strbuf, '/');
+> +               }
+> +               session->cur_path = g_string_free(strbuf, FALSE);
+> +       }
+> +
+> +       return session->cur_path;
+> +}
+> +
+>  static void setpath_complete(struct obc_session *session,
+>                                                 struct obc_transfer *transfer,
+>                                                 GError *err, void *user_data)
+>  {
+>         struct pending_request *p = user_data;
+>
+> +       g_free(session->cur_path);
+> +       session->cur_path = NULL;
+> +
+>         if (p->func)
+>                 p->func(session, NULL, err, p->data);
+>
+> @@ -962,7 +988,9 @@ static void setpath_cb(GObex *obex, GError *err, GObexPacket *rsp,
+>  {
+>         struct pending_request *p = user_data;
+>         struct setpath_data *data = p->data;
+> +       char *prev;
+>         char *next;
+> +       GSList *last;
+>         guint8 code;
+>
+>         p->req_id = 0;
+> @@ -982,6 +1010,24 @@ static void setpath_cb(GObex *obex, GError *err, GObexPacket *rsp,
+>                 return;
+>         }
+>
+> +       /* Track current folder in cur_folder_list */
+> +       if (strlen(data->remaining[data->index-1]) == 0) {
+> +               g_slist_free_full(p->session->cur_path_list, g_free);
+> +               p->session->cur_path_list = NULL;
+> +       } else {
+> +               prev = data->remaining[data->index-1];
+> +               if (strcmp(prev, "..") == 0) {
+> +                       if (p->session->cur_path_list) {
+> +                               last = g_slist_last(p->session->cur_path_list);
+> +                               g_free(last->data);
+> +                               p->session->cur_path_list = g_slist_delete_link(
+> +                                       p->session->cur_path_list, last);
+> +                       }
+> +               } else
+> +                       p->session->cur_path_list = g_slist_append(
+> +                               p->session->cur_path_list, g_strdup(prev));
+> +       }
+> +
+>         /* Ignore empty folder names to avoid resetting the current path */
+>         while ((next = data->remaining[data->index]) && strlen(next) == 0)
+>                 data->index++;
+> diff --git a/obexd/client/session.h b/obexd/client/session.h
+> index 319d529..01034b5 100644
+> --- a/obexd/client/session.h
+> +++ b/obexd/client/session.h
+> @@ -58,6 +58,8 @@ const char *obc_session_register(struct obc_session *session,
+>  const void *obc_session_get_attribute(struct obc_session *session,
+>                                                         int attribute_id);
+>
+> +const char *obc_session_get_current_path(struct obc_session *session);
+> +
+>  guint obc_session_queue(struct obc_session *session,
+>                                 struct obc_transfer *transfer,
+>                                 session_callback_t func, void *user_data,
 > --
 > 1.8.3.4
 
-Applied thanks.
+Please use path or folder instead of cur_path/current_path to make it
+a bit shorter, also I don't think you should really needs to have 2
+fields for tracking this.
+
 
 
 -- 
