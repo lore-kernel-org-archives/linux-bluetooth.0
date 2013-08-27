@@ -1,138 +1,263 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <521C9785.2020205@richardneill.org>
-Date: Tue, 27 Aug 2013 13:11:49 +0100
-From: Richard Neill <rn214@richardneill.org>
+Message-ID: <521C50AA.3090802@oss.bmw-carit.de>
+Date: Tue, 27 Aug 2013 09:09:30 +0200
+From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: hciconfig list commands (patch)
-Content-Type: multipart/mixed;
- boundary="------------050302010706060103000906"
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 2/2] obexd: Add property changed signals for 'org.bluez.obex.Message1'
+References: <1377187721-3758-1-git-send-email-christian.fetzer@oss.bmw-carit.de> <1377187721-3758-2-git-send-email-christian.fetzer@oss.bmw-carit.de> <CABBYNZ+5viOEhXeaGzvO7ZtjCaNrxeFX+c01eqbyURg2_XAdZw@mail.gmail.com>
+In-Reply-To: <CABBYNZ+5viOEhXeaGzvO7ZtjCaNrxeFX+c01eqbyURg2_XAdZw@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------050302010706060103000906
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-Dear All,
-
-I'd like to offer a small patch to tools/hciconfig.c (and the man page).
-
-Currently, running the command "hciconfig hci0 commands" creates a list 
-of supported codes and their names in this format[1]. It's rather tricky 
-to interpret this format, when trying to discover the command code for a 
-particular named action, because both lists are very long, and run 
-consecutively rather than concurrently.
-
-My patch adds an extra command ""hciconfig hci0 commands_list", which 
-hopefully makes this clearer, emitting output in the format of [2].
-
-I hope this is helpful :-)
-
-If it's necessary to have a legal declaration, then I hereby state for 
-the record that I, Richard Neill, wrote the attached code, and I release 
-it under the GPL 2+.
-
-
-[1] output of "hciconfig hci0 commands"
-------------------------
-Commands: Octet 0  = 0xff (Bit 0 1 2 3 4 5 6 7)
-           Octet 1  = 0xff (Bit 0 1 2 3 4 5 6 7)
-....
-'Inquiry' 'Inquiry Cancel' 'Periodic Inquiry Mode'
-'Exit Periodic Inquiry Mode' 'Create Connection' 'Disconnect'
-'Add SCO Connection' 'Cancel Create Connection'
-'Accept Connection Request' 'Reject Connection Request'
-....
-------------------------
-
-
-[2] output of "hciconfig hci0 commands_list"
--------------------------
-Byte:   Octet:  Bit:    Command:
-0x00     0       0      'Inquiry'
-0x01     0       1      'Inquiry Cancel'
-0x02     0       2      'Periodic Inquiry Mode'
-0x03     0       3      'Exit Periodic Inquiry Mode'
-0x04     0       4      'Create Connection'
-0x05     0       5      'Disconnect'
-0x06     0       6      'Add SCO Connection'
-0x07     0       7      'Cancel Create Connection'
-....
--------------------------
-
-
-Best wishes,
-
-Richard
-
-
-P.S. This is my contribution to bluez, so I hope I'm sending the right 
-format to the right place.  If I could do this better, I'd welcome 
-feedback off-list.
-
-
---------------050302010706060103000906
-Content-Type: text/x-patch;
- name="hciconfig.1.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="hciconfig.1.patch"
-
-225a226,228
-> .BI commands_list
-> Display supported commands in a list format (easier to parse).
-> .TP
-
---------------050302010706060103000906
-Content-Type: text/x-patch;
- name="hciconfig.c.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="hciconfig.c.patch"
-
-1119a1120,1155
-> static void cmd_commands_list(int ctl, int hdev, char *opt)
-> {
-> 	uint8_t cmds[64];
-> 	char *str;
-> 	int i, n, dd;
+On 08/26/2013 02:08 PM, Luiz Augusto von Dentz wrote:
+> Hi Christian,
 > 
-> 	dd = hci_open_dev(hdev);
-> 	if (dd < 0) {
-> 		fprintf(stderr, "Can't open device hci%d: %s (%d)\n",
-> 						hdev, strerror(errno), errno);
-> 		exit(1);
-> 	}
+> On Thu, Aug 22, 2013 at 7:08 PM, Christian Fetzer
+> <christian.fetzer@oss.bmw-carit.de> wrote:
+>> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+>>
+>> This patch adds property changed signal emissions in case message properties
+>> change on the server.
+>> ---
+>>  obexd/client/map.c | 94 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>>  1 file changed, 92 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/obexd/client/map.c b/obexd/client/map.c
+>> index 8864a54..a9a9bcd 100644
+>> --- a/obexd/client/map.c
+>> +++ b/obexd/client/map.c
+>> @@ -792,121 +792,211 @@ static struct map_msg *map_msg_create(struct map_data *data, const char *handle)
+>>
+>>  static void parse_subject(struct map_msg *msg, const char *value)
+>>  {
+>> +       if (g_strcmp0(msg->subject, value) == 0)
+>> +               return;
+>> +
+>>         g_free(msg->subject);
+>>         msg->subject = g_strdup(value);
+>> +
+>> +       g_dbus_emit_property_changed(conn, msg->path,
+>> +                                               MAP_MSG_INTERFACE, "Subject");
+>>  }
+>>
+>>  static void parse_datetime(struct map_msg *msg, const char *value)
+>>  {
+>> +       if (g_strcmp0(msg->timestamp, value) == 0)
+>> +               return;
+>> +
+>>         g_free(msg->timestamp);
+>>         msg->timestamp = g_strdup(value);
+>> +
+>> +       g_dbus_emit_property_changed(conn, msg->path,
+>> +                                               MAP_MSG_INTERFACE, "Timestamp");
+>>  }
+>>
+>>  static void parse_sender(struct map_msg *msg, const char *value)
+>>  {
+>> +       if (g_strcmp0(msg->sender, value) == 0)
+>> +               return;
+>> +
+>>         g_free(msg->sender);
+>>         msg->sender = g_strdup(value);
+>> +
+>> +       g_dbus_emit_property_changed(conn, msg->path,
+>> +                                               MAP_MSG_INTERFACE, "Sender");
+>>  }
+>>
+>>  static void parse_sender_address(struct map_msg *msg, const char *value)
+>>  {
+>> +       if (g_strcmp0(msg->sender_address, value) == 0)
+>> +               return;
+>> +
+>>         g_free(msg->sender_address);
+>>         msg->sender_address = g_strdup(value);
+>> +
+>> +       g_dbus_emit_property_changed(conn, msg->path,
+>> +                                       MAP_MSG_INTERFACE, "SenderAddress");
+>>  }
+>>
+>>  static void parse_replyto(struct map_msg *msg, const char *value)
+>>  {
+>> +       if (g_strcmp0(msg->replyto, value) == 0)
+>> +               return;
+>> +
+>>         g_free(msg->replyto);
+>>         msg->replyto = g_strdup(value);
+>> +
+>> +       g_dbus_emit_property_changed(conn, msg->path,
+>> +                                               MAP_MSG_INTERFACE, "ReplyTo");
+>>  }
+>>
+>>  static void parse_recipient(struct map_msg *msg, const char *value)
+>>  {
+>> +       if (g_strcmp0(msg->recipient, value) == 0)
+>> +               return;
+>> +
+>>         g_free(msg->recipient);
+>>         msg->recipient = g_strdup(value);
+>> +
+>> +       g_dbus_emit_property_changed(conn, msg->path,
+>> +                                               MAP_MSG_INTERFACE, "Recipient");
+>>  }
+>>
+>>  static void parse_recipient_address(struct map_msg *msg, const char *value)
+>>  {
+>> +       if (g_strcmp0(msg->recipient_address, value) == 0)
+>> +               return;
+>> +
+>>         g_free(msg->recipient_address);
+>>         msg->recipient_address = g_strdup(value);
+>> +
+>> +       g_dbus_emit_property_changed(conn, msg->path,
+>> +                                       MAP_MSG_INTERFACE, "RecipientAddress");
+>>  }
+>>
+>>  static void parse_type(struct map_msg *msg, const char *value)
+>>  {
+>> +       if (g_strcmp0(msg->type, value) == 0)
+>> +               return;
+>> +
+>>         g_free(msg->type);
+>>         msg->type = g_strdup(value);
+>> +
+>> +       g_dbus_emit_property_changed(conn, msg->path,
+>> +                                               MAP_MSG_INTERFACE, "Type");
+>>  }
+>>
+>>  static void parse_size(struct map_msg *msg, const char *value)
+>>  {
+>> -       msg->size = g_ascii_strtoll(value, NULL, 10);
+>> +       uint64_t size = g_ascii_strtoll(value, NULL, 10);
+>> +
+>> +       if (msg->size == size)
+>> +               return;
+>> +
+>> +       msg->size = size;
+>> +
+>> +       g_dbus_emit_property_changed(conn, msg->path,
+>> +                                               MAP_MSG_INTERFACE, "Size");
+>>  }
+>>
+>>  static void parse_text(struct map_msg *msg, const char *value)
+>>  {
+>>         gboolean flag = strcasecmp(value, "no") != 0;
+>>
+>> +       uint8_t oldflags = msg->flags;
+>>         if (flag)
+>>                 msg->flags |= MAP_MSG_FLAG_TEXT;
+>>         else
+>>                 msg->flags &= ~MAP_MSG_FLAG_TEXT;
+>>
+>> +       if (msg->flags != oldflags)
+>> +               g_dbus_emit_property_changed(conn, msg->path,
+>> +                                               MAP_MSG_INTERFACE, "Text");
+>>  }
+>>
+>>  static void parse_status(struct map_msg *msg, const char *value)
+>>  {
+>> +       if (g_strcmp0(msg->status, value) == 0)
+>> +               return;
+>> +
+>>         g_free(msg->status);
+>>         msg->status = g_strdup(value);
+>> +
+>> +       g_dbus_emit_property_changed(conn, msg->path,
+>> +                                               MAP_MSG_INTERFACE, "Status");
+>>  }
+>>
+>>  static void parse_attachment_size(struct map_msg *msg, const char *value)
+>>  {
+>> -       msg->attachment_size = g_ascii_strtoll(value, NULL, 10);
+>> +       uint64_t attachment_size = g_ascii_strtoll(value, NULL, 10);
+>> +
+>> +       if (msg->attachment_size == attachment_size)
+>> +               return;
+>> +
+>> +       msg->attachment_size = attachment_size;
+>> +
+>> +       g_dbus_emit_property_changed(conn, msg->path,
+>> +                                       MAP_MSG_INTERFACE, "AttachmentSize");
+>>  }
+>>
+>>  static void parse_priority(struct map_msg *msg, const char *value)
+>>  {
+>>         gboolean flag = strcasecmp(value, "no") != 0;
+>>
+>> +       uint8_t oldflags = msg->flags;
+>>         if (flag)
+>>                 msg->flags |= MAP_MSG_FLAG_PRIORITY;
+>>         else
+>>                 msg->flags &= ~MAP_MSG_FLAG_PRIORITY;
+>>
+>> +       if (msg->flags != oldflags)
+>> +               g_dbus_emit_property_changed(conn, msg->path,
+>> +                                               MAP_MSG_INTERFACE, "Priority");
+>>  }
+>>
+>>  static void parse_read(struct map_msg *msg, const char *value)
+>>  {
+>>         gboolean flag = strcasecmp(value, "no") != 0;
+>>
+>> +       uint8_t oldflags = msg->flags;
+>>         if (flag)
+>>                 msg->flags |= MAP_MSG_FLAG_READ;
+>>         else
+>>                 msg->flags &= ~MAP_MSG_FLAG_READ;
+>>
+>> +       if (msg->flags != oldflags)
+>> +               g_dbus_emit_property_changed(conn, msg->path,
+>> +                                               MAP_MSG_INTERFACE, "Read");
+>>  }
+>>
+>>  static void parse_sent(struct map_msg *msg, const char *value)
+>>  {
+>>         gboolean flag = strcasecmp(value, "no") != 0;
+>>
+>> +       uint8_t oldflags = msg->flags;
+>>         if (flag)
+>>                 msg->flags |= MAP_MSG_FLAG_SENT;
+>>         else
+>>                 msg->flags &= ~MAP_MSG_FLAG_SENT;
+>>
+>> +       if (msg->flags != oldflags)
+>> +               g_dbus_emit_property_changed(conn, msg->path,
+>> +                                               MAP_MSG_INTERFACE, "Sent");
+>>  }
+>>
+>>  static void parse_protected(struct map_msg *msg, const char *value)
+>>  {
+>>         gboolean flag = strcasecmp(value, "no") != 0;
+>>
+>> +       uint8_t oldflags = msg->flags;
+>>         if (flag)
+>>                 msg->flags |= MAP_MSG_FLAG_PROTECTED;
+>>         else
+>>                 msg->flags &= ~MAP_MSG_FLAG_PROTECTED;
+>>
+>> +       if (msg->flags != oldflags)
+>> +               g_dbus_emit_property_changed(conn, msg->path,
+>> +                                               MAP_MSG_INTERFACE, "Protected");
+>>  }
+>>
+>>  static struct map_msg_parser {
+>> --
+>> 1.8.3.4
 > 
-> 	if (hci_read_local_commands(dd, cmds, 1000) < 0) {
-> 		fprintf(stderr, "Can't read support commands on hci%d: %s (%d)\n",
-> 						hdev, strerror(errno), errno);
-> 		exit(1);
-> 	}
+> Does this make us emit signals when creating the objects? That should
+> probably not be necessary, only emit signals once the value really
+> changes.
 > 
-> 	print_dev_hdr(&di);
-> 	printf ("\tCommands:\n\tByte:   Octet:  Bit:    Command:\n");
-> 	for (i = 0; i < 64; i++) {
-> 		if (!cmds[i]){
-> 			continue;
-> 		}
-> 		for (n = 0; n < 8; n++){
-> 			if (cmds[i] & (1 << n)){
-> 				printf("\t0x%02x    %2d      %2d      '%s'\n",
-> 				       (8*i + n), i, n, hci_cmdtostr(8*i + n) ); 
-> 			}
-> 		}
-> 		printf ("\n");
-> 	}
-> 	hci_close_dev(dd);
-> }
 > 
-1926c1962,1963
-< 	{ "commands",	cmd_commands,	0,		"Display supported commands" },
----
-> 	{ "commands_list",cmd_commands_list,	0,	"Display supported commands (list format)" },
-> 	{ "commands",cmd_commands,	0,		"Display supported commands" },
 
---------------050302010706060103000906--
+The property changed signals are not sent for newly created objects.
+This is already ensured in g_dbus_emit_property_changed (gdbus/object.c:1709).
+Do you prefer an additional check?
+
+Thanks,
+Christian
+
