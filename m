@@ -1,33 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
-To: Tedd Ho-Jeong An <tedd.an@intel.com>
-Cc: dwmw2@infradead.org, ben@decadent.org.uk,
-	david.woodhouse@intel.com, linux-bluetooth@vger.kernel.org
-Subject: Re: linux-firmware: update Intel Bluetooth firmware patch file
-References: <2050211.gNpUdmFyHg@tedd-ubuntu>
-Date: Tue, 27 Aug 2013 21:33:56 +0200
-In-Reply-To: <2050211.gNpUdmFyHg@tedd-ubuntu> (Tedd Ho-Jeong An's message of
-	"Tue, 27 Aug 2013 09:58:14 -0700")
-Message-ID: <8738pv3p3v.fsf@nemi.mork.no>
+Message-ID: <521CE6E1.2020206@hurleysoftware.com>
+Date: Tue, 27 Aug 2013 13:50:25 -0400
+From: Peter Hurley <peter@hurleysoftware.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Alexander Holler <holler@ahsoftware.de>, gustavo@padovan.org,
+ Gianluca Anzolin <gianluca@sottospazio.it>,
+ marcel@holtmann.org
+CC: linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org,
+ jslaby@suse.cz
+Subject: Re: [PATCH v5 0/6] rfcomm: Implement rfcomm as a proper tty_port
+References: <1375110493-5237-1-git-send-email-gianluca@sottospazio.it> <51F94E67.3040402@hurleysoftware.com> <52127E0A.6060208@hurleysoftware.com> <521CB03B.1030003@ahsoftware.de>
+In-Reply-To: <521CB03B.1030003@ahsoftware.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Tedd Ho-Jeong An <tedd.an@intel.com> writes:
-
-> From: Tedd Ho-Jeong An <tedd.an@intel.com>
+On 08/27/2013 09:57 AM, Alexander Holler wrote:
+> Am 19.08.2013 22:20, schrieb Peter Hurley:
+>> On 07/31/2013 01:50 PM, Peter Hurley wrote:
 >
-> build version: 1334_02
-> firmware patch version: 2e
+>>> I reviewed these changes and retested. All ok.
+>>
+>> Gustavo,
+>>
+>> This series fixes a crashing regression from 3.10+ forward.
+>> Why is this not in linux-next yet?
 >
-> This patch fixes the following issues:
-> - Send invalid SCO connection handle
-> - Device goes into unexpected states while streaming A2DP audio
-> - HCI command buffer is overwritten by the following USB autosuspend command
+> 3.8+ to be exact, just in case someone has to deal with older kernels.
 
-Just wanted to confirm that this firmware fixes the autosuspend issues
-I observed.  Thanks!
+Thanks for the reminder.
 
+This series is too extensive to consider for -stable. Any ideas for
+how to address this crash for -stable?
 
-Bjørn
+Regards,
+Peter Hurley
