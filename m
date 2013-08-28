@@ -1,40 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/4] Make sdp independent from adapter
-Date: Thu, 29 Aug 2013 11:56:43 +0200
-Message-Id: <1377770207-22688-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Message-ID: <521E0CFE.2090702@richardneill.org>
+Date: Wed, 28 Aug 2013 15:45:18 +0100
+From: Richard Neill <rn214@richardneill.org>
+MIME-Version: 1.0
+CC: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: How to test/debug bluetooth advertising [with hciconfig]?
+References: <521DCF49.5020807@richardneill.org> <20130828103920.GD15469@aemeltch-MOBL1> <521DDAB3.2050407@richardneill.org> <20130828121249.GF15469@aemeltch-MOBL1> <CAKT1EBc+Dyz5OfBdpEj6u1G5iiL36qG4jS0X4rzRf_mW4g1Gkg@mail.gmail.com>
+In-Reply-To: <CAKT1EBc+Dyz5OfBdpEj6u1G5iiL36qG4jS0X4rzRf_mW4g1Gkg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+To: unlisted-recipients:; (no To-header on input)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Make sdp independent from adapter. Now adapter invokes sdp functions
-without revoking itself.
 
-Solutions to consider:
-- Access db has been expanded via sdp_get_access_list
-- sdp_access_t moved to sdpd.h
 
-Grzegorz Kolodziejczyk (4):
-  sdp: Move sdp server init to adapter
-  sdp: Move spd_init_services_list to adapter
-  sdp: Make sdp_record_add to be handled by adapter
-  sdp: Make sdp_record_remove to be handled by adapter
+On 28/08/13 15:10, Claudio Takahasi wrote:
 
- profiles/audio/a2dp.c      |   10 ++--
- profiles/audio/avrcp.c     |    8 ++--
- profiles/health/hdp.c      |    2 +-
- profiles/health/hdp_util.c |    4 +-
- profiles/network/server.c  |    6 +--
- profiles/sap/server.c      |    4 +-
- src/adapter.c              |  109 +++++++++++++++++++++++++++++++++++++++++++-
- src/adapter.h              |    7 +++
- src/attrib-server.c        |    8 ++--
- src/main.c                 |    2 +-
- src/profile.c              |    9 ++--
- src/sdpd-database.c        |   53 ++++-----------------
- src/sdpd.h                 |    8 +++-
- 13 files changed, 155 insertions(+), 75 deletions(-)
+> Sets the advertising data:
+> $sudo hcitool -i hci0 cmd 0x08 0x0008 03 02 01 06 $(perl -e 'print "00
+> " x 28 . "\n"')
+> Remember that the data needs to follow the EIR/AD format: see Core Spec page1761
+>
+> Enable adv
+> $sudo hciconfig hci0 leadv
+>
+> BR,
+> Claudio
 
--- 
-1.7.9.5
+Dear Claudio,
+
+Thanks very much - that's really helpful :-)
+
+Best wishes,
+
+Richard
+
 
