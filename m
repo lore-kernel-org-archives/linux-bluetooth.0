@@ -1,7 +1,7 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <521DDA79.7070208@richardneill.org>
-Date: Wed, 28 Aug 2013 12:09:45 +0100
-From: Richard Neill <rjn@richardneill.org>
+Message-ID: <521DDAB3.2050407@richardneill.org>
+Date: Wed, 28 Aug 2013 12:10:43 +0100
+From: Richard Neill <rn214@richardneill.org>
 MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
 Subject: Re: How to test/debug bluetooth advertising [with hciconfig]?
