@@ -1,46 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 28 Aug 2013 14:54:21 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Richard Neill <rn214@richardneill.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: How to test/debug bluetooth advertising [with hciconfig]?
-Message-ID: <20130828115343.GE15469@aemeltch-MOBL1>
-References: <521DCF49.5020807@richardneill.org>
- <20130828103920.GD15469@aemeltch-MOBL1>
- <521DDAB3.2050407@richardneill.org>
+Message-ID: <521DDDF1.1090703@ahsoftware.de>
+Date: Wed, 28 Aug 2013 13:24:33 +0200
+From: Alexander Holler <holler@ahsoftware.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <521DDAB3.2050407@richardneill.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Peter Hurley <peter@hurleysoftware.com>
+CC: gustavo@padovan.org, Gianluca Anzolin <gianluca@sottospazio.it>,
+ marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
+ gregkh@linuxfoundation.org, jslaby@suse.cz
+Subject: Re: [PATCH v5 0/6] rfcomm: Implement rfcomm as a proper tty_port
+References: <1375110493-5237-1-git-send-email-gianluca@sottospazio.it> <51F94E67.3040402@hurleysoftware.com> <52127E0A.6060208@hurleysoftware.com> <521CB03B.1030003@ahsoftware.de> <521CE6E1.2020206@hurleysoftware.com>
+In-Reply-To: <521CE6E1.2020206@hurleysoftware.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Richard,
-
-On Wed, Aug 28, 2013 at 12:10:43PM +0100, Richard Neill wrote:
+Am 27.08.2013 19:50, schrieb Peter Hurley:
+> On 08/27/2013 09:57 AM, Alexander Holler wrote:
+>> Am 19.08.2013 22:20, schrieb Peter Hurley:
+>>> On 07/31/2013 01:50 PM, Peter Hurley wrote:
+>>
+>>>> I reviewed these changes and retested. All ok.
+>>>
+>>> Gustavo,
+>>>
+>>> This series fixes a crashing regression from 3.10+ forward.
+>>> Why is this not in linux-next yet?
+>>
+>> 3.8+ to be exact, just in case someone has to deal with older kernels.
 > 
-> >On Wed, Aug 28, 2013 at 11:22:01AM +0100, Richard Neill wrote:
-> >>Dear All,
-> >>
-> >>I'm trying to get "hello world" working from the shell between 2
-> >>Bluetooth 4 dongles, in LE advertising mode. I wonder whether I
-> >>could ask for some pointers?
-> >
-> >Check ogf and ocf from the Bluetooth Specification.
+> Thanks for the reminder.
 > 
-> Dear Andrei,
-> 
-> Thanks for your reply. That was actually very helpful: by searching
-> specifically for "ogf ocf Bluetooth specification", I was able to
-> locate the right part of the relevant document (a 600 page PDF of
-> Bluetooth 4.0 core).
-> 
-> However, before I delve into this in great detail, I wonder whether
-> I am about to "re-invent the wheel".  For example, if I wanted to
-> use "ping" in a shell-script, I wouldn't normally begin by poking
-> registers in the ethernet card.
+> This series is too extensive to consider for -stable. Any ideas for
+> how to address this crash for -stable?
 
-Then you should not use "hcitool cmd". Better use high level API.
+Besides the BUG_ON() to prevent that something really bad happens, no.
 
-Best regards 
-Andrei Emeltchenko 
+Btw, I've just tested the series with 3.10.9, seems to work.
 
+Thanks a lot,
+
+Alexander Holler
