@@ -1,78 +1,229 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAKT1EBdjG_4+hOd0FCA+WbxCeHS85NEryMvZ3=+HHyPrqejk+A@mail.gmail.com>
-References: <CAKON4OziwQbTUymPddfu7i_6g2oMMXJsbf8RE3kZWZPDVbcFqQ@mail.gmail.com>
-	<CAKT1EBdjG_4+hOd0FCA+WbxCeHS85NEryMvZ3=+HHyPrqejk+A@mail.gmail.com>
-Date: Thu, 29 Aug 2013 14:31:10 -0400
-Message-ID: <CAKON4Ox2a_e5-=A3hsfR+KFZDcGkrVpHVWQT_HTt1H-rkJwQWQ@mail.gmail.com>
-Subject: Re: Simultaneous BLE connections
-From: "jonsmirl@gmail.com" <jonsmirl@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/4] sdp: Make sdp_record_add to be handled by adapter
+Date: Thu, 29 Aug 2013 11:56:46 +0200
+Message-Id: <1377770207-22688-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1377770207-22688-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1377770207-22688-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Aug 28, 2013 at 9:52 AM, Claudio Takahasi
-<claudio.takahasi@openbossa.org> wrote:
-> Hi Jon:
->
-> On Tue, Aug 27, 2013 at 6:04 PM, jonsmirl@gmail.com <jonsmirl@gmail.com> wrote:
->> How are multiple BLE connections implemented in Bluez? Is it a
->> function of host memory like IOS with a high limit (1000's)? I see an
->> old post saying that Bluez only supports one connection at a time.
->
-> BlueZ implements General Connection establishment procedure, multiple
-> connections can be active at a time. There is a plan to move the
-> "core" BLE connection management to the kernel, but at the moment
-> connection attempts and scanning are controlled by the user-space.
+Make sdp_record_add to be called from adapter. First write services to
+sdp db then to adapter db without revokes to adapter.
 
-I'm still trying to work out the best solution. I'm not convinced that
-a user space BLE connection implementation can do the fine grain
-scheduling needed to handle multiple open connections and get the
-connection events on each connection scheduled at the correct time.
-That's making me lean more toward a connectionless scheme that uses
-advertising.
+Change-Id: I65d638096c91aadacc3cb5ef7a8a9181fa4dae6e
+---
+ profiles/audio/a2dp.c      |    2 +-
+ profiles/audio/avrcp.c     |    4 ++--
+ profiles/health/hdp_util.c |    2 +-
+ profiles/network/server.c  |    2 +-
+ profiles/sap/server.c      |    2 +-
+ src/adapter.c              |   28 ++++++++++++++++++++++++++++
+ src/adapter.h              |    3 +++
+ src/attrib-server.c        |    2 +-
+ src/profile.c              |    7 +++----
+ src/sdpd-database.c        |   10 ----------
+ 10 files changed, 41 insertions(+), 21 deletions(-)
 
-If optimal scheduling can be achieved, a connection oriented scheme is
-better for power consumption. But if everything is going to get out of
-sync all of the time then the connectionless scheme is better.
-
-Of course larger transaction actions will still use a connection, they
-just won't use the BLE feature of leaving the connection open for long
-periods of time.
-
->
-> If your question is related to white-list, we don't support Selective
-> or Auto Connection procedures. The controllers that I have the
-> white-list size is limited to 16 to 64 entries, if you need to handle
-> more than the limit your host will need to implement some logic to
-> select the devices that you want to connect to. Another point is, if
-> you need to resolve address the entries in the list need to be more
-> dynamic.
->
->>
->> This has a large impact on host power consumption. With a connection
->> you know the windows where you have to listen for a peripheral
->> connection. If instead you use advertising to trigger the connection
->> the host has to always be scanning since you never know when the
->> peripheral is going to advertise.
->>
->> An example system might have twenty BLE sensors that send alerts when
->> they are tripped. Wouldn't it be better to have 20 long lasting
->> connections to these sensors? Now the host only has to wake up at the
->> windows where it is legal for the peripheral to transmit. And the
->> peripherals can take advantage of their ability to skip transmission
->> windows.
->
-> In this case, peripheral could use the signalling channel and starts
-> the Connection Update Parameter procedure.
->
-> BR,
-> Claudio
-
-
-
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 3f3cc1b..4b8d4f3 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -1298,7 +1298,7 @@ struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
+ 		return NULL;
+ 	}
+ 
+-	if (add_record_to_server(adapter_get_address(server->adapter),
++	if (adapter_add_record_to_server_adapter(server->adapter,
+ 								record) < 0) {
+ 		error("Unable to register A2DP service record");
+ 		sdp_record_free(record);
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 9f164e4..d64f228 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -3829,7 +3829,7 @@ done:
+ 		return -1;
+ 	}
+ 
+-	if (add_record_to_server(adapter_get_address(adapter), record) < 0) {
++	if (adapter_add_record_to_server_adapter(adapter, record) < 0) {
+ 		error("Unable to register AVRCP target service record");
+ 		avrcp_target_server_remove(p, adapter);
+ 		sdp_record_free(record);
+@@ -3912,7 +3912,7 @@ done:
+ 		return -1;
+ 	}
+ 
+-	if (add_record_to_server(adapter_get_address(adapter), record) < 0) {
++	if (adapter_add_record_to_server_adapter(adapter, record) < 0) {
+ 		error("Unable to register AVRCP service record");
+ 		avrcp_controller_server_remove(p, adapter);
+ 		sdp_record_free(record);
+diff --git a/profiles/health/hdp_util.c b/profiles/health/hdp_util.c
+index b53f1db..7692ca2 100644
+--- a/profiles/health/hdp_util.c
++++ b/profiles/health/hdp_util.c
+@@ -733,7 +733,7 @@ gboolean hdp_update_sdp_record(struct hdp_adapter *adapter, GSList *app_list)
+ 	if (sdp_set_record_state(sdp_record, adapter->record_state++) < 0)
+ 		goto fail;
+ 
+-	if (add_record_to_server(adapter_get_address(adapter->btd_adapter),
++	if (adapter_add_record_to_server_adapter(adapter->btd_adapter,
+ 					sdp_record) < 0)
+ 		goto fail;
+ 	adapter->sdp_handler = sdp_record->handle;
+diff --git a/profiles/network/server.c b/profiles/network/server.c
+index de48bec..d321998 100644
+--- a/profiles/network/server.c
++++ b/profiles/network/server.c
+@@ -587,7 +587,7 @@ static uint32_t register_server_record(struct network_server *ns)
+ 		return 0;
+ 	}
+ 
+-	if (add_record_to_server(&ns->src, record) < 0) {
++	if (adapter_add_record_to_server_bdaddr(&ns->src, record) < 0) {
+ 		error("Failed to register service record");
+ 		sdp_record_free(record);
+ 		return 0;
+diff --git a/profiles/sap/server.c b/profiles/sap/server.c
+index dfcf0f1..d1e2581 100644
+--- a/profiles/sap/server.c
++++ b/profiles/sap/server.c
+@@ -1358,7 +1358,7 @@ int sap_server_register(const char *path, const bdaddr_t *src)
+ 		goto sdp_err;
+ 	}
+ 
+-	if (add_record_to_server(src, record) < 0) {
++	if (adapter_add_record_to_server_bdaddr(src, record) < 0) {
+ 		error("Adding SAP SDP record to the SDP server failed.");
+ 		sdp_record_free(record);
+ 		goto sdp_err;
+diff --git a/src/adapter.c b/src/adapter.c
+index ba7be8a..6478ca7 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -6308,6 +6308,34 @@ void adapter_start_sdp_server(uint16_t sdp_mtu, uint32_t sdp_flags)
+ 		adapter_foreach(adapter_service_insert, services->data);
+ }
+ 
++int adapter_add_record_to_server_adapter(struct btd_adapter *adapter, sdp_record_t *rec)
++{
++	return adapter_add_record_to_server_bdaddr(adapter_get_address(adapter), rec);
++}
++
++int adapter_add_record_to_server_bdaddr(const bdaddr_t *device, sdp_record_t *rec)
++{
++	int error;
++	struct btd_adapter *adapter;
++
++	error = add_record_to_server(device, rec);
++
++	/* Check if add_record_to server error occurs */
++	if (!error) {
++		/* Add rec for each adapter */
++		if (bacmp(device, BDADDR_ANY) == 0) {
++			adapter_foreach(adapter_service_insert, rec);
++			return error;
++		}
++		/*  Add rec for single adapter */
++		adapter = adapter_find(device);
++		if (adapter)
++			adapter_service_insert(adapter, rec);
++	}
++
++	return error;
++}
++
+ void adapter_sdp_init_services_list(bdaddr_t *device)
+ {
+ 	sdp_list_t *p;
+diff --git a/src/adapter.h b/src/adapter.h
+index bd54372..8a5fc73 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -214,4 +214,7 @@ gboolean btd_adapter_check_oob_handler(struct btd_adapter *adapter);
+ void btd_adapter_for_each_device(struct btd_adapter *adapter,
+ 			void (*cb)(struct btd_device *device, void *data),
+ 			void *data);
++
++int adapter_add_record_to_server_adapter(struct btd_adapter *adapter, sdp_record_t *rec);
++int adapter_add_record_to_server_bdaddr(const bdaddr_t *device, sdp_record_t *rec);
+ void adapter_sdp_init_services_list(bdaddr_t *device);
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 3f629b0..19b878d 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -326,7 +326,7 @@ static uint32_t attrib_create_sdp_new(struct gatt_server *server,
+ 				"http://www.bluez.org/");
+ 	}
+ 
+-	if (add_record_to_server(adapter_get_address(server->adapter), record)
++	if (adapter_add_record_to_server_adapter(server->adapter, record)
+ 			== 0)
+ 		return record->handle;
+ 
+diff --git a/src/profile.c b/src/profile.c
+index 90c3535..9a1687d 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -1197,7 +1197,7 @@ static void ext_direct_connect(GIOChannel *io, GError *err, gpointer user_data)
+ static uint32_t ext_register_record(struct ext_profile *ext,
+ 							struct ext_io *l2cap,
+ 							struct ext_io *rfcomm,
+-							const bdaddr_t *src)
++							struct btd_adapter *adapter)
+ {
+ 	sdp_record_t *rec;
+ 	char *dyn_record = NULL;
+@@ -1220,7 +1220,7 @@ static uint32_t ext_register_record(struct ext_profile *ext,
+ 		return 0;
+ 	}
+ 
+-	if (add_record_to_server(src, rec) < 0) {
++	if (adapter_add_record_to_server_adapter(adapter, rec) < 0) {
+ 		error("Failed to register service record");
+ 		sdp_record_free(rec);
+ 		return 0;
+@@ -1322,8 +1322,7 @@ static uint32_t ext_start_servers(struct ext_profile *ext,
+ 		}
+ 	}
+ 
+-	return ext_register_record(ext, l2cap, rfcomm,
+-						adapter_get_address(adapter));
++	return ext_register_record(ext, l2cap, rfcomm, adapter);
+ 
+ failed:
+ 	if (l2cap) {
+diff --git a/src/sdpd-database.c b/src/sdpd-database.c
+index 7228cd7..335ea0e 100644
+--- a/src/sdpd-database.c
++++ b/src/sdpd-database.c
+@@ -168,7 +168,6 @@ void sdp_svcdb_set_collectable(sdp_record_t *record, int sock)
+  */
+ void sdp_record_add(const bdaddr_t *device, sdp_record_t *rec)
+ {
+-	struct btd_adapter *adapter;
+ 	sdp_access_t *dev;
+ 
+ 	SDPDBG("Adding rec : 0x%lx", (long) rec);
+@@ -184,15 +183,6 @@ void sdp_record_add(const bdaddr_t *device, sdp_record_t *rec)
+ 	dev->handle = rec->handle;
+ 
+ 	access_db = sdp_list_insert_sorted(access_db, dev, access_sort);
+-
+-	if (bacmp(device, BDADDR_ANY) == 0) {
+-		adapter_foreach(adapter_service_insert, rec);
+-		return;
+-	}
+-
+-	adapter = adapter_find(device);
+-	if (adapter)
+-		adapter_service_insert(adapter, rec);
+ }
+ 
+ static sdp_list_t *record_locate(uint32_t handle)
 -- 
-Jon Smirl
-jonsmirl@gmail.com
+1.7.9.5
+
