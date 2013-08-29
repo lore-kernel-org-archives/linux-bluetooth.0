@@ -1,82 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peng Chen <pengchen@qti.qualcomm.com>
-Cc: <kumo@qca.qualcomm.com>, <taowang@qti.qualcomm.com>, Peng Chen
-	<pengchen@qti.qualcomm.com>
-To: <gustavo@padovan.org>, <linux-bluetooth@vger.kernel.org>,
-	<marcel@holtmann.org>
-Subject: [PATCH] Add a new PID/VID 0cf3/e005 for AR3012.
-Date: Fri, 30 Aug 2013 17:09:52 +0800
-Message-ID: <1377853792-17589-1-git-send-email-pengchen@qca.qualcomm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <CAKT1EBdjG_4+hOd0FCA+WbxCeHS85NEryMvZ3=+HHyPrqejk+A@mail.gmail.com>
+References: <CAKON4OziwQbTUymPddfu7i_6g2oMMXJsbf8RE3kZWZPDVbcFqQ@mail.gmail.com>
+	<CAKT1EBdjG_4+hOd0FCA+WbxCeHS85NEryMvZ3=+HHyPrqejk+A@mail.gmail.com>
+Date: Thu, 29 Aug 2013 14:31:10 -0400
+Message-ID: <CAKON4Ox2a_e5-=A3hsfR+KFZDcGkrVpHVWQT_HTt1H-rkJwQWQ@mail.gmail.com>
+Subject: Re: Simultaneous BLE connections
+From: "jonsmirl@gmail.com" <jonsmirl@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-usb devices info:
+On Wed, Aug 28, 2013 at 9:52 AM, Claudio Takahasi
+<claudio.takahasi@openbossa.org> wrote:
+> Hi Jon:
+>
+> On Tue, Aug 27, 2013 at 6:04 PM, jonsmirl@gmail.com <jonsmirl@gmail.com> wrote:
+>> How are multiple BLE connections implemented in Bluez? Is it a
+>> function of host memory like IOS with a high limit (1000's)? I see an
+>> old post saying that Bluez only supports one connection at a time.
+>
+> BlueZ implements General Connection establishment procedure, multiple
+> connections can be active at a time. There is a plan to move the
+> "core" BLE connection management to the kernel, but at the moment
+> connection attempts and scanning are controlled by the user-space.
 
-T:  Bus=06 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 13 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0cf3 ProdID=e005 Rev= 0.02
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I'm still trying to work out the best solution. I'm not convinced that
+a user space BLE connection implementation can do the fine grain
+scheduling needed to handle multiple open connections and get the
+connection events on each connection scheduled at the correct time.
+That's making me lean more toward a connectionless scheme that uses
+advertising.
 
-Signed-off-by: Peng Chen <pengchen@qca.qualcomm.com>
----
- drivers/bluetooth/ath3k.c |    2 ++
- drivers/bluetooth/btusb.c |    1 +
- 2 files changed, 3 insertions(+)
+If optimal scheduling can be achieved, a connection oriented scheme is
+better for power consumption. But if everything is going to get out of
+sync all of the time then the connectionless scheme is better.
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 11f467c..10e9a64 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -85,6 +85,7 @@ static struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x04CA, 0x3008) },
- 	{ USB_DEVICE(0x13d3, 0x3362) },
- 	{ USB_DEVICE(0x0CF3, 0xE004) },
-+	{ USB_DEVICE(0x0CF3, 0xE005) },
- 	{ USB_DEVICE(0x0930, 0x0219) },
- 	{ USB_DEVICE(0x0489, 0xe057) },
- 	{ USB_DEVICE(0x13d3, 0x3393) },
-@@ -122,6 +123,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
- 	{ USB_DEVICE(0x04ca, 0x3008), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0cf3, 0xe005), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0489, 0xe057), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index de4cf4d..299df99 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -148,6 +148,7 @@ static struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x04ca, 0x3008), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0cf3, 0xe005), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0489, 0xe057), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
+Of course larger transaction actions will still use a connection, they
+just won't use the BLE feature of leaving the connection open for long
+periods of time.
+
+>
+> If your question is related to white-list, we don't support Selective
+> or Auto Connection procedures. The controllers that I have the
+> white-list size is limited to 16 to 64 entries, if you need to handle
+> more than the limit your host will need to implement some logic to
+> select the devices that you want to connect to. Another point is, if
+> you need to resolve address the entries in the list need to be more
+> dynamic.
+>
+>>
+>> This has a large impact on host power consumption. With a connection
+>> you know the windows where you have to listen for a peripheral
+>> connection. If instead you use advertising to trigger the connection
+>> the host has to always be scanning since you never know when the
+>> peripheral is going to advertise.
+>>
+>> An example system might have twenty BLE sensors that send alerts when
+>> they are tripped. Wouldn't it be better to have 20 long lasting
+>> connections to these sensors? Now the host only has to wake up at the
+>> windows where it is legal for the peripheral to transmit. And the
+>> peripherals can take advantage of their ability to skip transmission
+>> windows.
+>
+> In this case, peripheral could use the signalling channel and starts
+> the Connection Update Parameter procedure.
+>
+> BR,
+> Claudio
+
+
+
 -- 
-1.7.9.5
+Jon Smirl
+jonsmirl@gmail.com
