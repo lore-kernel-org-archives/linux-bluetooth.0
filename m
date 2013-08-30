@@ -1,128 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/2] obexd: Add obc_session_get_folder function
-Date: Fri, 30 Aug 2013 14:45:11 +0200
-Message-Id: <1377866712-5253-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH v2 2/2] obexd: Add property Folder to MAP message
+Date: Fri, 30 Aug 2013 14:45:12 +0200
+Message-Id: <1377866712-5253-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
+In-Reply-To: <1377866712-5253-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1377866712-5253-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-This patch extends client session by the tracking of the current folder.
-The current folder can be accessed by obc_session_get_current_folder.
-
-This allows drivers to add a folder property to browsed objects so that
-the application doesn't have to keep track of the folder an object
-belongs to.
----
- obexd/client/session.c | 38 ++++++++++++++++++++++++++++++++++++++
- obexd/client/session.h |  2 ++
- 2 files changed, 40 insertions(+)
-
-diff --git a/obexd/client/session.c b/obexd/client/session.c
-index 44e2bf8..632e114 100644
---- a/obexd/client/session.c
-+++ b/obexd/client/session.c
-@@ -110,6 +110,7 @@ struct obc_session {
- 	guint watch;
- 	GQueue *queue;
- 	guint process_id;
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index 8864a54..03be77f 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -123,6 +123,7 @@ struct map_msg {
+ 	char *status;
+ 	uint64_t attachment_size;
+ 	uint8_t flags;
 +	char *folder;
+ 	GDBusPendingPropertySet pending;
  };
  
- static GSList *sessions = NULL;
-@@ -242,6 +243,7 @@ static void session_free(struct obc_session *session)
- 	g_free(session->owner);
- 	g_free(session->source);
- 	g_free(session->destination);
-+	g_free(session->folder);
- 	g_free(session);
+@@ -379,6 +380,7 @@ static void map_msg_free(void *data)
+ 	g_free(msg->path);
+ 	g_free(msg->subject);
+ 	g_free(msg->handle);
++	g_free(msg->folder);
+ 	g_free(msg->timestamp);
+ 	g_free(msg->sender);
+ 	g_free(msg->sender_address);
+@@ -451,6 +453,16 @@ done:
+ 	msg->pending = 0;
  }
  
-@@ -500,6 +502,7 @@ struct obc_session *obc_session_create(const char *source,
- 	session->destination = g_strdup(destination);
- 	session->channel = channel;
- 	session->queue = g_queue_new();
-+	session->folder = g_strdup("/");
- 
- 	if (owner)
- 		obc_session_set_owner(session, owner, owner_disconnected);
-@@ -930,6 +933,11 @@ const char *obc_session_get_target(struct obc_session *session)
- 	return session->driver->target;
- }
- 
-+const char *obc_session_get_folder(struct obc_session *session)
++static gboolean get_folder(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
 +{
-+	return session->folder;
++	struct map_msg *msg = data;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &msg->folder);
++
++	return TRUE;
 +}
 +
- static void setpath_complete(struct obc_session *session,
- 						struct obc_transfer *transfer,
- 						GError *err, void *user_data)
-@@ -957,12 +965,39 @@ static void setpath_op_complete(struct obc_session *session,
- 		data->func(session, NULL, err, data->user_data);
- }
- 
-+static void setpath_set_folder(struct obc_session *session, const char *cur)
-+{
-+	char *folder = NULL;
-+	const char *delim;
-+
-+	delim = strrchr(session->folder, '/');
-+	if (strlen(cur) == 0 || delim == NULL ||
-+			(strcmp(cur, "..") == 0 && delim == session->folder)) {
-+		folder = g_strdup("/");
-+	} else {
-+		if (strcmp(cur, "..") == 0) {
-+			folder = g_strndup(session->folder,
-+						delim - session->folder);
-+		} else {
-+			if (g_str_has_suffix(session->folder, "/"))
-+				folder = g_strconcat(session->folder,
-+								cur, NULL);
-+			else
-+				folder = g_strconcat(session->folder, "/",
-+								cur, NULL);
-+		}
-+	}
-+	g_free(session->folder);
-+	session->folder = folder;
-+}
-+
- static void setpath_cb(GObex *obex, GError *err, GObexPacket *rsp,
- 							gpointer user_data)
+ static gboolean subject_exists(const GDBusPropertyTable *property, void *data)
  {
- 	struct pending_request *p = user_data;
- 	struct setpath_data *data = p->data;
- 	char *next;
-+	char *current;
- 	guint8 code;
+ 	struct map_msg *msg = data;
+@@ -744,6 +756,7 @@ static const GDBusMethodTable map_msg_methods[] = {
+ };
  
- 	p->req_id = 0;
-@@ -982,6 +1017,9 @@ static void setpath_cb(GObex *obex, GError *err, GObexPacket *rsp,
- 		return;
+ static const GDBusPropertyTable map_msg_properties[] = {
++	{ "Folder", "s", get_folder },
+ 	{ "Subject", "s", get_subject, NULL, subject_exists },
+ 	{ "Timestamp", "s", get_timestamp, NULL, timestamp_exists },
+ 	{ "Sender", "s", get_sender, NULL, sender_exists },
+@@ -766,7 +779,8 @@ static const GDBusPropertyTable map_msg_properties[] = {
+ 	{ }
+ };
+ 
+-static struct map_msg *map_msg_create(struct map_data *data, const char *handle)
++static struct map_msg *map_msg_create(struct map_data *data, const char *handle,
++							const char *folder)
+ {
+ 	struct map_msg *msg;
+ 
+@@ -775,6 +789,7 @@ static struct map_msg *map_msg_create(struct map_data *data, const char *handle)
+ 	msg->path = g_strdup_printf("%s/message%s",
+ 					obc_session_get_path(data->session),
+ 					handle);
++	msg->folder = g_strdup(folder);
+ 
+ 	if (!g_dbus_register_interface(conn, msg->path, MAP_MSG_INTERFACE,
+ 						map_msg_methods, NULL,
+@@ -953,7 +968,8 @@ static void msg_element(GMarkupParseContext *ctxt, const char *element,
+ 
+ 	msg = g_hash_table_lookup(data->messages, values[i]);
+ 	if (msg == NULL) {
+-		msg = map_msg_create(data, values[i]);
++		msg = map_msg_create(data, values[i],
++				obc_session_get_folder(data->session));
+ 		if (msg == NULL)
+ 			return;
  	}
- 
-+	current = data->remaining[data->index - 1];
-+	setpath_set_folder(p->session, current);
-+
- 	/* Ignore empty folder names to avoid resetting the current path */
- 	while ((next = data->remaining[data->index]) && strlen(next) == 0)
- 		data->index++;
-diff --git a/obexd/client/session.h b/obexd/client/session.h
-index 319d529..35899bc 100644
---- a/obexd/client/session.h
-+++ b/obexd/client/session.h
-@@ -58,6 +58,8 @@ const char *obc_session_register(struct obc_session *session,
- const void *obc_session_get_attribute(struct obc_session *session,
- 							int attribute_id);
- 
-+const char *obc_session_get_folder(struct obc_session *session);
-+
- guint obc_session_queue(struct obc_session *session,
- 				struct obc_transfer *transfer,
- 				session_callback_t func, void *user_data,
 -- 
 1.8.3.4
 
