@@ -5,38 +5,38 @@ Cc: <kumo@qca.qualcomm.com>, <taowang@qti.qualcomm.com>, Peng Chen
 To: <gustavo@padovan.org>, <linux-bluetooth@vger.kernel.org>,
 	<marcel@holtmann.org>
 Subject: [PATCH] Add a new PID/VID 0cf3/e005 for AR3012.
-Date: Fri, 30 Aug 2013 17:41:40 +0800
-Message-ID: <1377855700-18006-1-git-send-email-pengchen@qca.qualcomm.com>
+Date: Fri, 30 Aug 2013 17:09:52 +0800
+Message-ID: <1377853792-17589-1-git-send-email-pengchen@qca.qualcomm.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-usb device info:
+usb devices info:
 
-T:  Bus=06 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 15 Spd=12   MxCh= 0
+T:  Bus=06 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 13 Spd=12   MxCh= 0
 D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
 P:  Vendor=0cf3 ProdID=e005 Rev= 0.02
 C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
 E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
 E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
 E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
 E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
 E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
 E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
 E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
 E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
 E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
 E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
 E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
 E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
 E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
 E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
