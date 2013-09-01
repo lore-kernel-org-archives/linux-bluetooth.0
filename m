@@ -1,72 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 1 Sep 2013 20:50:38 +0200
-From: Pavel Machek <pavel@ucw.cz>
-To: Gustavo Padovan <gustavo@padovan.org>, marcel@holtmann.org,
-	johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-	kernel list <linux-kernel@vger.kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Cc: security@kernel.org
-Subject: 3.11-final plan: unpriviledged user can crash the kernel (using
- bluetooth rfcomm)
-Message-ID: <20130901185038.GA11714@amd.pavel.ucw.cz>
-References: <20130831100127.GA6711@amd.pavel.ucw.cz>
- <20130831100933.GA7029@amd.pavel.ucw.cz>
- <20130831101451.GC7029@amd.pavel.ucw.cz>
- <20130831104238.GA7767@amd.pavel.ucw.cz>
- <20130901165525.GK7440@joana>
+Date: Sun, 1 Sep 2013 18:44:17 +0100
+From: Gustavo Padovan <gustavo@padovan.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: Introduce new HCI socket channel for user
+ operation
+Message-ID: <20130901174417.GM7440@joana>
+References: <1377578452-7316-2-git-send-email-marcel@holtmann.org>
+ <20130901164544.GI7440@joana>
+ <28EA1BF5-3484-4ABE-9049-6845F006C778@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130901165525.GK7440@joana>
+In-Reply-To: <28EA1BF5-3484-4ABE-9049-6845F006C778@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+Hi Marcel,
 
-> > On Sat 2013-08-31 12:14:51, Pavel Machek wrote:
-> > > On Sat 2013-08-31 12:09:33, Pavel Machek wrote:
-> > > > Hi!
-> > > > 
-> > > > > . Python sources for client/server are at 
-> > > > > 
-> > > > > http://tui.cvs.sourceforge.net/viewvc/tui/tui/liveview/
-> > > > > 
-> > > > > . My kernels like to warn about
-> > > > System is debian stable with gnome2.
-> > > 
-> > > And no, it is not fixed in 3.11-rc7.
-> > 
-> > 2.6.32-5-686 from debian seems to work.
+2013-09-01 Marcel Holtmann <marcel@holtmann.org>:
+
+> Hi Gustavo,
 > 
-> Could you try linux-next? We recently pushed a rework of the RFCOMM tty
-> handling, it should fix this. The work was too big to be pushed to 3.11
+> >> This patch introcuces a new HCI socket channel that allows user
+> >> applications to take control over a specific HCI device. The application
+> >> gains exclusive access to this device and forces the kernel to stay away
+> >> and not manage it. In case of the management interface it will actually
+> >> hide the device.
+> >> 
+> >> Such operation is useful for security testing tools that need to operate
+> >> underneath the Bluetooth stack and need full control over a device. The
+> >> advantage here is that the kernel still provides the service of hardware
+> >> abstraction and HCI level access. The use of Bluetooth drivers for
+> >> hardware access also means that sniffing tools like btmon or hcidump
+> >> are still working and the whole set of transaction can be traced with
+> >> existing tools.
+> >> 
+> >> With the new channel it is possible to send HCI commands, ACL and SCO
+> >> data packets and receive HCI events, ACL and SCO packets from the
+> >> device. The format follows the well established H:4 protocol.
+> >> 
+> >> The new HCI user channel can only be established when a device has been
+> >> through its setup routine and is currently powered down. This is
+> >> enforced to not cause any problems with current operations. In addition
+> >> only one user channel per HCI device is allowed. It is exclusive access
+> >> for one user application. Access to this channel is limited to process
+> >> with CAP_NET_RAW capability.
+> >> 
+> >> Using this new facility does not require any external library or special
+> >> ioctl or socket filters. Just create the socket and bind it. After that
+> >> the file descriptor is ready to speak H:4 protocol.
+> >> 
+> >>        struct sockaddr_hci addr;
+> >>        int fd;
+> >> 
+> >>        fd = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
+> >> 
+> >>        memset(&addr, 0, sizeof(addr));
+> >>        addr.hci_family = AF_BLUETOOTH;
+> >>        addr.hci_dev = 0;
+> >>        addr.hci_channel = HCI_CHANNEL_USER;
+> >> 
+> >>        bind(fd, (struct sockaddr *) &addr, sizeof(addr));
+> >> 
+> >> The example shows on how to create a user channel for hci0 device. Error
+> >> handling has been left out of the example. However with the limitations
+> >> mentioned above it is advised to handle errors. Binding of the user
+> >> cahnnel socket can fail for various reasons. Specifically if the device
+> >> is currently activated by BlueZ or if the access permissions are not
+> >> present.
+> >> 
+> >> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> >> ---
+> >> include/net/bluetooth/hci.h |  1 +
+> >> net/bluetooth/hci_sock.c    | 86 ++++++++++++++++++++++++++++++++++++++++++---
+> >> 2 files changed, 82 insertions(+), 5 deletions(-)
+> >> 
+> >> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> >> index 128157d..30c88b5 100644
+> >> --- a/include/net/bluetooth/hci.h
+> >> +++ b/include/net/bluetooth/hci.h
+> >> @@ -1571,6 +1571,7 @@ struct sockaddr_hci {
+> >> #define HCI_DEV_NONE	0xffff
+> >> 
+> >> #define HCI_CHANNEL_RAW		0
+> >> +#define HCI_CHANNEL_USER	1
+> >> #define HCI_CHANNEL_MONITOR	2
+> >> #define HCI_CHANNEL_CONTROL	3
+> > 
+> > Wouldn't this break BlueZ 4.101? It would open the channel 1 thinking it is
+> > the CONTROL one but it is not. I think we need to redefine this to 4.
+> > I can do this when applying the patch if you are okay with it.
+> 
+> it would not break it since I am explicitly returning EINVAL when you try to establish a user channel with HCI_DEV_NONE.
 
-So... In 3.11 unpriviledged user can crash the kernel, but the fix is
-too big, so we release it without the fix?
+Fair enough. Both patches have been applied to bluetooth-next. Thanks.
 
-Somehow, I don't think that's good idea.
-
-Do you have an idea what is the impact? Is it crash-the-kernel or
-execute-arbitrary-code?
-
-What about:
-
-a) marking CONFIG_RFCOMM as dangerous in the help text. I just
-checked, help text makes it sound like a good thing.
-
-(joke) b) renaming CONFIG_RFCOMM to CONFIG_LET_USER_CRASH_KERNEL
-
-or better yet:
-
-c) removing CONFIG_RFCOMM option in affected releases? I know
-regressions are bad, but...
-
-Multiuser desktops are not too common these days, but all the
-Android cellphones are "multiuser"...
-
-Plus note that bug is so easy to trigger that I hit it in first minute
-trying to get non-malicious application to run.
-
-[3.10 seems also affected.]
-									Pavel
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+	Gustavo
