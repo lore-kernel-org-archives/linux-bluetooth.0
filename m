@@ -1,30 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 1 Sep 2013 16:31:01 +0100
+Date: Sun, 1 Sep 2013 16:01:29 +0100
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Marcel Holtmann <marcel@holtmann.org>
+To: wei junping <junping.wei@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Refactor raw socket filter into more readable
- code
-Message-ID: <20130901153101.GC7440@joana>
-References: <1377498315-22523-1-git-send-email-marcel@holtmann.org>
+Subject: Re: Compatible Kernels of a certain BlueZ version
+Message-ID: <20130901150129.GB7440@joana>
+References: <CAKCXgJ03bfgQYPgJt7R9dXPEX9J7ofiEHgbPBDK9-H=ifaLyRw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1377498315-22523-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <CAKCXgJ03bfgQYPgJt7R9dXPEX9J7ofiEHgbPBDK9-H=ifaLyRw@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Tim,
 
-2013-08-25 Marcel Holtmann <marcel@holtmann.org>:
+2013-08-31 wei junping <junping.wei@gmail.com>:
 
-> The handling of the raw socket filter is rather obscure code and it gets
-> in the way of future extensions. Instead of inline filtering in the raw
-> socket packet routine, refactor it into its own function.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/hci_sock.c | 64 +++++++++++++++++++++++++++++++-----------------
->  1 file changed, 41 insertions(+), 23 deletions(-)
+> Who can tell me how I know which kernel is compatible with which BlueZ
+> version, for example, BlueZ 5.7? I didn't find any info in the doc
+> folder of the package.
 
-Patch has been applied to bluetooth-next. Thanks.
+Any BlueZ 5 version works with an 3.4 kernel or newer. The old BlueZ 4 works
+with any kernel out there.
 
 	Gustavo
