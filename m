@@ -1,32 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 1 Sep 2013 18:09:12 +0100
+Date: Sun, 1 Sep 2013 17:55:25 +0100
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: Fix encryption key size for peripheral
- role
-Message-ID: <20130901170912.GL7440@joana>
-References: <1375298729-23513-1-git-send-email-andre.guedes@openbossa.org>
- <1375298729-23513-2-git-send-email-andre.guedes@openbossa.org>
+To: Pavel Machek <pavel@ucw.cz>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	kernel list <linux-kernel@vger.kernel.org>
+Subject: Re: 3.11-rc7: unpriviledged user crashes kernel using bluetooth
+Message-ID: <20130901165525.GK7440@joana>
+References: <20130831100127.GA6711@amd.pavel.ucw.cz>
+ <20130831100933.GA7029@amd.pavel.ucw.cz>
+ <20130831101451.GC7029@amd.pavel.ucw.cz>
+ <20130831104238.GA7767@amd.pavel.ucw.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1375298729-23513-2-git-send-email-andre.guedes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20130831104238.GA7767@amd.pavel.ucw.cz>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Pavel,
 
-2013-07-31 Andre Guedes <andre.guedes@openbossa.org>:
+2013-08-31 Pavel Machek <pavel@ucw.cz>:
 
-> This patch fixes the connection encryption key size information when
-> the host is playing the peripheral role. We should set conn->enc_key_
-> size in hci_le_ltk_request_evt, otherwise it is left uninitialized.
+> On Sat 2013-08-31 12:14:51, Pavel Machek wrote:
+> > On Sat 2013-08-31 12:09:33, Pavel Machek wrote:
+> > > Hi!
+> > > 
+> > > > . Python sources for client/server are at 
+> > > > 
+> > > > http://tui.cvs.sourceforge.net/viewvc/tui/tui/liveview/
+> > > > 
+> > > > . My kernels like to warn about
+> > > System is debian stable with gnome2.
+> > 
+> > And no, it is not fixed in 3.11-rc7.
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  net/bluetooth/hci_event.c | 2 ++
->  1 file changed, 2 insertions(+)
+> 2.6.32-5-686 from debian seems to work.
 
-Patches have been applied to bluetooth.git. Thanks.
+Could you try linux-next? We recently pushed a rework of the RFCOMM tty
+handling, it should fix this. The work was too big to be pushed to 3.11
 
 	Gustavo
