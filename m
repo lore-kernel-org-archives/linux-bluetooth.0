@@ -1,49 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
-Subject: Re: 3.11-final plan: unpriviledged user can crash the kernel (using bluetooth rfcomm)
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20130901185038.GA11714@amd.pavel.ucw.cz>
-Date: Sun, 1 Sep 2013 13:16:07 -0700
-Cc: Gustavo Padovan <gustavo@padovan.org>, johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org,
+Date: Sun, 1 Sep 2013 20:50:38 +0200
+From: Pavel Machek <pavel@ucw.cz>
+To: Gustavo Padovan <gustavo@padovan.org>, marcel@holtmann.org,
+	johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
 	kernel list <linux-kernel@vger.kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	security@kernel.org
-Message-Id: <B3715CDF-1D85-45C9-9AD1-DBBD0DF24624@holtmann.org>
-References: <20130831100127.GA6711@amd.pavel.ucw.cz> <20130831100933.GA7029@amd.pavel.ucw.cz> <20130831101451.GC7029@amd.pavel.ucw.cz> <20130831104238.GA7767@amd.pavel.ucw.cz> <20130901165525.GK7440@joana> <20130901185038.GA11714@amd.pavel.ucw.cz>
-To: Pavel Machek <pavel@ucw.cz>
-Sender: linux-bluetooth-owner@vger.kernel.org
+	Linus Torvalds <torvalds@linux-foundation.org>
+Cc: security@kernel.org
+Subject: 3.11-final plan: unpriviledged user can crash the kernel (using
+ bluetooth rfcomm)
+Message-ID: <20130901185038.GA11714@amd.pavel.ucw.cz>
+References: <20130831100127.GA6711@amd.pavel.ucw.cz>
+ <20130831100933.GA7029@amd.pavel.ucw.cz>
+ <20130831101451.GC7029@amd.pavel.ucw.cz>
+ <20130831104238.GA7767@amd.pavel.ucw.cz>
+ <20130901165525.GK7440@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130901165525.GK7440@joana>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pavel,
+Hi!
 
->>>>>> . Python sources for client/server are at 
->>>>>> 
->>>>>> http://tui.cvs.sourceforge.net/viewvc/tui/tui/liveview/
->>>>>> 
->>>>>> . My kernels like to warn about
->>>>> System is debian stable with gnome2.
->>>> 
->>>> And no, it is not fixed in 3.11-rc7.
->>> 
->>> 2.6.32-5-686 from debian seems to work.
->> 
->> Could you try linux-next? We recently pushed a rework of the RFCOMM tty
->> handling, it should fix this. The work was too big to be pushed to 3.11
+> > On Sat 2013-08-31 12:14:51, Pavel Machek wrote:
+> > > On Sat 2013-08-31 12:09:33, Pavel Machek wrote:
+> > > > Hi!
+> > > > 
+> > > > > . Python sources for client/server are at 
+> > > > > 
+> > > > > http://tui.cvs.sourceforge.net/viewvc/tui/tui/liveview/
+> > > > > 
+> > > > > . My kernels like to warn about
+> > > > System is debian stable with gnome2.
+> > > 
+> > > And no, it is not fixed in 3.11-rc7.
+> > 
+> > 2.6.32-5-686 from debian seems to work.
 > 
-> So... In 3.11 unpriviledged user can crash the kernel, but the fix is
-> too big, so we release it without the fix?
-> 
-> Somehow, I don't think that's good idea.
+> Could you try linux-next? We recently pushed a rework of the RFCOMM tty
+> handling, it should fix this. The work was too big to be pushed to 3.11
 
-can you boot a bluetooth-next kernel and see if the planned changes are fixing this or not. I would like to have that confirmed before we start any speculations here.
+So... In 3.11 unpriviledged user can crash the kernel, but the fix is
+too big, so we release it without the fix?
 
-If the RFCOMM TTY rework that we have in bluetooth-next fixes this issue, then we can have a look at if this can be patched for 3.11 or a stable kernel without having to include the whole patch series. Or if the TTY subsystem changed from 2.6.32 so much that we have to take the whole changes.
+Somehow, I don't think that's good idea.
 
-However, please also note there is a different between RFCOMM sockets and RFCOMM TTYs. I would be curious if only the TTY part is affected or also the socket part.
+Do you have an idea what is the impact? Is it crash-the-kernel or
+execute-arbitrary-code?
 
-Regards
+What about:
 
-Marcel
+a) marking CONFIG_RFCOMM as dangerous in the help text. I just
+checked, help text makes it sound like a good thing.
 
+(joke) b) renaming CONFIG_RFCOMM to CONFIG_LET_USER_CRASH_KERNEL
+
+or better yet:
+
+c) removing CONFIG_RFCOMM option in affected releases? I know
+regressions are bad, but...
+
+Multiuser desktops are not too common these days, but all the
+Android cellphones are "multiuser"...
+
+Plus note that bug is so easy to trigger that I hit it in first minute
+trying to get non-malicious application to run.
+
+[3.10 seems also affected.]
+									Pavel
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
