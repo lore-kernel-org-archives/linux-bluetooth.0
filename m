@@ -1,142 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1377866712-5253-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1377866712-5253-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Date: Mon, 2 Sep 2013 13:39:45 +0300
-Message-ID: <CABBYNZJpDoVLpELMx6oEPRUBzpvA_1htYa8joYp8UtsxdwFddA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] obexd: Add obc_session_get_folder function
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <3EF10060-3C76-4240-832A-901BE2831808@holtmann.org>
+References: <CAKCXgJ03bfgQYPgJt7R9dXPEX9J7ofiEHgbPBDK9-H=ifaLyRw@mail.gmail.com>
+	<20130901150129.GB7440@joana>
+	<CAKCXgJ1rgAk2VXzGsf2Un-mCm4H9MjT76bkh40-26TJ7Nh56Gg@mail.gmail.com>
+	<3EF10060-3C76-4240-832A-901BE2831808@holtmann.org>
+Date: Mon, 2 Sep 2013 15:59:44 +0800
+Message-ID: <CAKCXgJ1xYtfQqus+jxkgJpvPm7qqE=usWNVcNB=NqkoOXgDKhQ@mail.gmail.com>
+Subject: Re: Compatible Kernels of a certain BlueZ version
+From: wei junping <junping.wei@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Gustavo Padovan <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+Hi Marcel,
 
-On Fri, Aug 30, 2013 at 3:45 PM, Christian Fetzer
-<christian.fetzer@oss.bmw-carit.de> wrote:
-> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
->
-> This patch extends client session by the tracking of the current folder.
-> The current folder can be accessed by obc_session_get_current_folder.
->
-> This allows drivers to add a folder property to browsed objects so that
-> the application doesn't have to keep track of the folder an object
-> belongs to.
-> ---
->  obexd/client/session.c | 38 ++++++++++++++++++++++++++++++++++++++
->  obexd/client/session.h |  2 ++
->  2 files changed, 40 insertions(+)
->
-> diff --git a/obexd/client/session.c b/obexd/client/session.c
-> index 44e2bf8..632e114 100644
-> --- a/obexd/client/session.c
-> +++ b/obexd/client/session.c
-> @@ -110,6 +110,7 @@ struct obc_session {
->         guint watch;
->         GQueue *queue;
->         guint process_id;
-> +       char *folder;
->  };
->
->  static GSList *sessions = NULL;
-> @@ -242,6 +243,7 @@ static void session_free(struct obc_session *session)
->         g_free(session->owner);
->         g_free(session->source);
->         g_free(session->destination);
-> +       g_free(session->folder);
->         g_free(session);
->  }
->
-> @@ -500,6 +502,7 @@ struct obc_session *obc_session_create(const char *source,
->         session->destination = g_strdup(destination);
->         session->channel = channel;
->         session->queue = g_queue_new();
-> +       session->folder = g_strdup("/");
->
->         if (owner)
->                 obc_session_set_owner(session, owner, owner_disconnected);
-> @@ -930,6 +933,11 @@ const char *obc_session_get_target(struct obc_session *session)
->         return session->driver->target;
->  }
->
-> +const char *obc_session_get_folder(struct obc_session *session)
-> +{
-> +       return session->folder;
-> +}
-> +
->  static void setpath_complete(struct obc_session *session,
->                                                 struct obc_transfer *transfer,
->                                                 GError *err, void *user_data)
-> @@ -957,12 +965,39 @@ static void setpath_op_complete(struct obc_session *session,
->                 data->func(session, NULL, err, data->user_data);
->  }
->
-> +static void setpath_set_folder(struct obc_session *session, const char *cur)
-> +{
-> +       char *folder = NULL;
-> +       const char *delim;
-> +
-> +       delim = strrchr(session->folder, '/');
-> +       if (strlen(cur) == 0 || delim == NULL ||
-> +                       (strcmp(cur, "..") == 0 && delim == session->folder)) {
-> +               folder = g_strdup("/");
-> +       } else {
-> +               if (strcmp(cur, "..") == 0) {
-> +                       folder = g_strndup(session->folder,
-> +                                               delim - session->folder);
-> +               } else {
-> +                       if (g_str_has_suffix(session->folder, "/"))
-> +                               folder = g_strconcat(session->folder,
-> +                                                               cur, NULL);
-> +                       else
-> +                               folder = g_strconcat(session->folder, "/",
-> +                                                               cur, NULL);
-> +               }
-> +       }
-> +       g_free(session->folder);
-> +       session->folder = folder;
-> +}
-> +
->  static void setpath_cb(GObex *obex, GError *err, GObexPacket *rsp,
->                                                         gpointer user_data)
->  {
->         struct pending_request *p = user_data;
->         struct setpath_data *data = p->data;
->         char *next;
-> +       char *current;
->         guint8 code;
->
->         p->req_id = 0;
-> @@ -982,6 +1017,9 @@ static void setpath_cb(GObex *obex, GError *err, GObexPacket *rsp,
->                 return;
->         }
->
-> +       current = data->remaining[data->index - 1];
-> +       setpath_set_folder(p->session, current);
-> +
->         /* Ignore empty folder names to avoid resetting the current path */
->         while ((next = data->remaining[data->index]) && strlen(next) == 0)
->                 data->index++;
-> diff --git a/obexd/client/session.h b/obexd/client/session.h
-> index 319d529..35899bc 100644
-> --- a/obexd/client/session.h
-> +++ b/obexd/client/session.h
-> @@ -58,6 +58,8 @@ const char *obc_session_register(struct obc_session *session,
->  const void *obc_session_get_attribute(struct obc_session *session,
->                                                         int attribute_id);
->
-> +const char *obc_session_get_folder(struct obc_session *session);
-> +
->  guint obc_session_queue(struct obc_session *session,
->                                 struct obc_transfer *transfer,
->                                 session_callback_t func, void *user_data,
-> --
-> 1.8.3.4
+Thank you for your reply.
 
-Both patches applied, thanks.
+But what do you mean by "refrain from top posting on this mailing
+list"? Do you mean I should not have posted this question here? If so,
+where should new comers of BlueZ ask for help?
 
+Best Regards,
+Tim Wei
 
--- 
-Luiz Augusto von Dentz
+2013/9/2 Marcel Holtmann <marcel@holtmann.org>:
+> Hi Wei,
+>
+> please refrain from top posting on this mailing list.
+>
+>> Thank you for your reply.
+>> I am trying to make 4.93 come with Android 3.0.8 work with Kernel
+>> 3.9.6, and I found that values of some mgmt macros in user mode are
+>> different from those in kernel.
+>> For example:
+>> In user mode mgmt.h
+>> #define MGMT_OP_READ_FEATURES 0x0002
+>> struct mgmt_rp_read_features {
+>> uint8_t features[8];
+>> } __packed;
+>>
+>> but in kernel mode mgmt.h
+>> #define MGMT_OP_READ_COMMANDS 0x0002
+>> #define MGMT_READ_COMMANDS_SIZE 0
+>> struct mgmt_rp_read_commands {
+>> __le16 num_commands;
+>> __le16 num_events;
+>> __le16 opcodes[0];
+>> } __packed;
+>>
+>> I haven't tried it, but I would think the meaning of the same value in
+>> user and kernel should be the same. Is it?
+>
+> Before Linux 3.4, the mgmt interface was not official and disabled by default. So values and structs changed. Only with Linux 3.4 they became official. And BlueZ 5.x contains the official values as well.
+>
+> And version before BlueZ 5.0 will use the raw HCI interface and duplicate all the handling in user space.
+>
+> Regards
+>
+> Marcel
+>
