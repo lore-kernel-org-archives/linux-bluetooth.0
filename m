@@ -1,46 +1,274 @@
 Return-Path: <cyrus@holtmann.org>
-From: Raphael Kubo da Costa <rakuco@FreeBSD.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add support for BCM20702A0 [0b05, 17cb]
-Date: Mon,  2 Sep 2013 14:57:51 +0300
-Message-Id: <1378123071-16732-1-git-send-email-rakuco@FreeBSD.org>
+MIME-Version: 1.0
+In-Reply-To: <521C50AA.3090802@oss.bmw-carit.de>
+References: <1377187721-3758-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+	<1377187721-3758-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
+	<CABBYNZ+5viOEhXeaGzvO7ZtjCaNrxeFX+c01eqbyURg2_XAdZw@mail.gmail.com>
+	<521C50AA.3090802@oss.bmw-carit.de>
+Date: Mon, 2 Sep 2013 13:43:04 +0300
+Message-ID: <CABBYNZJwDHhh2n_jsr7f=KNfVcmcj5w=tDk5CGGJrgrX-TobGg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] obexd: Add property changed signals for 'org.bluez.obex.Message1'
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Yet another vendor specific ID for this chipset; this one for the ASUS
-USB-BT400 Bluetooth 4.0 adapter.
+Hi Christian,
 
-T:  Bus=03 Lev=02 Prnt=02 Port=01 Cnt=01 Dev#=  6 Spd=12  MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0b05 ProdID=17cb Rev=01.12
-S:  Manufacturer=Broadcom Corp
-S:  Product=BCM20702A0
-S:  SerialNumber=000272C64400
-C:  #Ifs= 4 Cfg#= 1 Atr=a0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=(none)
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+On Tue, Aug 27, 2013 at 10:09 AM, Christian Fetzer
+<christian.fetzer@oss.bmw-carit.de> wrote:
+> Hi Luiz,
+>
+> On 08/26/2013 02:08 PM, Luiz Augusto von Dentz wrote:
+>> Hi Christian,
+>>
+>> On Thu, Aug 22, 2013 at 7:08 PM, Christian Fetzer
+>> <christian.fetzer@oss.bmw-carit.de> wrote:
+>>> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+>>>
+>>> This patch adds property changed signal emissions in case message properties
+>>> change on the server.
+>>> ---
+>>>  obexd/client/map.c | 94 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>>>  1 file changed, 92 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/obexd/client/map.c b/obexd/client/map.c
+>>> index 8864a54..a9a9bcd 100644
+>>> --- a/obexd/client/map.c
+>>> +++ b/obexd/client/map.c
+>>> @@ -792,121 +792,211 @@ static struct map_msg *map_msg_create(struct map_data *data, const char *handle)
+>>>
+>>>  static void parse_subject(struct map_msg *msg, const char *value)
+>>>  {
+>>> +       if (g_strcmp0(msg->subject, value) == 0)
+>>> +               return;
+>>> +
+>>>         g_free(msg->subject);
+>>>         msg->subject = g_strdup(value);
+>>> +
+>>> +       g_dbus_emit_property_changed(conn, msg->path,
+>>> +                                               MAP_MSG_INTERFACE, "Subject");
+>>>  }
+>>>
+>>>  static void parse_datetime(struct map_msg *msg, const char *value)
+>>>  {
+>>> +       if (g_strcmp0(msg->timestamp, value) == 0)
+>>> +               return;
+>>> +
+>>>         g_free(msg->timestamp);
+>>>         msg->timestamp = g_strdup(value);
+>>> +
+>>> +       g_dbus_emit_property_changed(conn, msg->path,
+>>> +                                               MAP_MSG_INTERFACE, "Timestamp");
+>>>  }
+>>>
+>>>  static void parse_sender(struct map_msg *msg, const char *value)
+>>>  {
+>>> +       if (g_strcmp0(msg->sender, value) == 0)
+>>> +               return;
+>>> +
+>>>         g_free(msg->sender);
+>>>         msg->sender = g_strdup(value);
+>>> +
+>>> +       g_dbus_emit_property_changed(conn, msg->path,
+>>> +                                               MAP_MSG_INTERFACE, "Sender");
+>>>  }
+>>>
+>>>  static void parse_sender_address(struct map_msg *msg, const char *value)
+>>>  {
+>>> +       if (g_strcmp0(msg->sender_address, value) == 0)
+>>> +               return;
+>>> +
+>>>         g_free(msg->sender_address);
+>>>         msg->sender_address = g_strdup(value);
+>>> +
+>>> +       g_dbus_emit_property_changed(conn, msg->path,
+>>> +                                       MAP_MSG_INTERFACE, "SenderAddress");
+>>>  }
+>>>
+>>>  static void parse_replyto(struct map_msg *msg, const char *value)
+>>>  {
+>>> +       if (g_strcmp0(msg->replyto, value) == 0)
+>>> +               return;
+>>> +
+>>>         g_free(msg->replyto);
+>>>         msg->replyto = g_strdup(value);
+>>> +
+>>> +       g_dbus_emit_property_changed(conn, msg->path,
+>>> +                                               MAP_MSG_INTERFACE, "ReplyTo");
+>>>  }
+>>>
+>>>  static void parse_recipient(struct map_msg *msg, const char *value)
+>>>  {
+>>> +       if (g_strcmp0(msg->recipient, value) == 0)
+>>> +               return;
+>>> +
+>>>         g_free(msg->recipient);
+>>>         msg->recipient = g_strdup(value);
+>>> +
+>>> +       g_dbus_emit_property_changed(conn, msg->path,
+>>> +                                               MAP_MSG_INTERFACE, "Recipient");
+>>>  }
+>>>
+>>>  static void parse_recipient_address(struct map_msg *msg, const char *value)
+>>>  {
+>>> +       if (g_strcmp0(msg->recipient_address, value) == 0)
+>>> +               return;
+>>> +
+>>>         g_free(msg->recipient_address);
+>>>         msg->recipient_address = g_strdup(value);
+>>> +
+>>> +       g_dbus_emit_property_changed(conn, msg->path,
+>>> +                                       MAP_MSG_INTERFACE, "RecipientAddress");
+>>>  }
+>>>
+>>>  static void parse_type(struct map_msg *msg, const char *value)
+>>>  {
+>>> +       if (g_strcmp0(msg->type, value) == 0)
+>>> +               return;
+>>> +
+>>>         g_free(msg->type);
+>>>         msg->type = g_strdup(value);
+>>> +
+>>> +       g_dbus_emit_property_changed(conn, msg->path,
+>>> +                                               MAP_MSG_INTERFACE, "Type");
+>>>  }
+>>>
+>>>  static void parse_size(struct map_msg *msg, const char *value)
+>>>  {
+>>> -       msg->size = g_ascii_strtoll(value, NULL, 10);
+>>> +       uint64_t size = g_ascii_strtoll(value, NULL, 10);
+>>> +
+>>> +       if (msg->size == size)
+>>> +               return;
+>>> +
+>>> +       msg->size = size;
+>>> +
+>>> +       g_dbus_emit_property_changed(conn, msg->path,
+>>> +                                               MAP_MSG_INTERFACE, "Size");
+>>>  }
+>>>
+>>>  static void parse_text(struct map_msg *msg, const char *value)
+>>>  {
+>>>         gboolean flag = strcasecmp(value, "no") != 0;
+>>>
+>>> +       uint8_t oldflags = msg->flags;
+>>>         if (flag)
+>>>                 msg->flags |= MAP_MSG_FLAG_TEXT;
+>>>         else
+>>>                 msg->flags &= ~MAP_MSG_FLAG_TEXT;
+>>>
+>>> +       if (msg->flags != oldflags)
+>>> +               g_dbus_emit_property_changed(conn, msg->path,
+>>> +                                               MAP_MSG_INTERFACE, "Text");
+>>>  }
+>>>
+>>>  static void parse_status(struct map_msg *msg, const char *value)
+>>>  {
+>>> +       if (g_strcmp0(msg->status, value) == 0)
+>>> +               return;
+>>> +
+>>>         g_free(msg->status);
+>>>         msg->status = g_strdup(value);
+>>> +
+>>> +       g_dbus_emit_property_changed(conn, msg->path,
+>>> +                                               MAP_MSG_INTERFACE, "Status");
+>>>  }
+>>>
+>>>  static void parse_attachment_size(struct map_msg *msg, const char *value)
+>>>  {
+>>> -       msg->attachment_size = g_ascii_strtoll(value, NULL, 10);
+>>> +       uint64_t attachment_size = g_ascii_strtoll(value, NULL, 10);
+>>> +
+>>> +       if (msg->attachment_size == attachment_size)
+>>> +               return;
+>>> +
+>>> +       msg->attachment_size = attachment_size;
+>>> +
+>>> +       g_dbus_emit_property_changed(conn, msg->path,
+>>> +                                       MAP_MSG_INTERFACE, "AttachmentSize");
+>>>  }
+>>>
+>>>  static void parse_priority(struct map_msg *msg, const char *value)
+>>>  {
+>>>         gboolean flag = strcasecmp(value, "no") != 0;
+>>>
+>>> +       uint8_t oldflags = msg->flags;
+>>>         if (flag)
+>>>                 msg->flags |= MAP_MSG_FLAG_PRIORITY;
+>>>         else
+>>>                 msg->flags &= ~MAP_MSG_FLAG_PRIORITY;
+>>>
+>>> +       if (msg->flags != oldflags)
+>>> +               g_dbus_emit_property_changed(conn, msg->path,
+>>> +                                               MAP_MSG_INTERFACE, "Priority");
+>>>  }
+>>>
+>>>  static void parse_read(struct map_msg *msg, const char *value)
+>>>  {
+>>>         gboolean flag = strcasecmp(value, "no") != 0;
+>>>
+>>> +       uint8_t oldflags = msg->flags;
+>>>         if (flag)
+>>>                 msg->flags |= MAP_MSG_FLAG_READ;
+>>>         else
+>>>                 msg->flags &= ~MAP_MSG_FLAG_READ;
+>>>
+>>> +       if (msg->flags != oldflags)
+>>> +               g_dbus_emit_property_changed(conn, msg->path,
+>>> +                                               MAP_MSG_INTERFACE, "Read");
+>>>  }
+>>>
+>>>  static void parse_sent(struct map_msg *msg, const char *value)
+>>>  {
+>>>         gboolean flag = strcasecmp(value, "no") != 0;
+>>>
+>>> +       uint8_t oldflags = msg->flags;
+>>>         if (flag)
+>>>                 msg->flags |= MAP_MSG_FLAG_SENT;
+>>>         else
+>>>                 msg->flags &= ~MAP_MSG_FLAG_SENT;
+>>>
+>>> +       if (msg->flags != oldflags)
+>>> +               g_dbus_emit_property_changed(conn, msg->path,
+>>> +                                               MAP_MSG_INTERFACE, "Sent");
+>>>  }
+>>>
+>>>  static void parse_protected(struct map_msg *msg, const char *value)
+>>>  {
+>>>         gboolean flag = strcasecmp(value, "no") != 0;
+>>>
+>>> +       uint8_t oldflags = msg->flags;
+>>>         if (flag)
+>>>                 msg->flags |= MAP_MSG_FLAG_PROTECTED;
+>>>         else
+>>>                 msg->flags &= ~MAP_MSG_FLAG_PROTECTED;
+>>>
+>>> +       if (msg->flags != oldflags)
+>>> +               g_dbus_emit_property_changed(conn, msg->path,
+>>> +                                               MAP_MSG_INTERFACE, "Protected");
+>>>  }
+>>>
+>>>  static struct map_msg_parser {
+>>> --
+>>> 1.8.3.4
+>>
+>> Does this make us emit signals when creating the objects? That should
+>> probably not be necessary, only emit signals once the value really
+>> changes.
+>>
+>>
+>
+> The property changed signals are not sent for newly created objects.
+> This is already ensured in g_dbus_emit_property_changed (gdbus/object.c:1709).
+> Do you prefer an additional check?
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Raphael Kubo da Costa <rakuco@FreeBSD.org>
----
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+Fair enough, I applied it after fixing the new line before defining
+oldflags, it looks like it was a copy/paste error please make sure
+this does not happen again.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index d3313e6..c0a9df4 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -99,6 +99,7 @@ static struct usb_device_id btusb_table[] = {
- 
- 	/* Broadcom BCM20702A0 */
- 	{ USB_DEVICE(0x0b05, 0x17b5) },
-+	{ USB_DEVICE(0x0b05, 0x17cb) },
- 	{ USB_DEVICE(0x04ca, 0x2003) },
- 	{ USB_DEVICE(0x0489, 0xe042) },
- 	{ USB_DEVICE(0x413c, 0x8197) },
+
 -- 
-1.8.4
-
+Luiz Augusto von Dentz
