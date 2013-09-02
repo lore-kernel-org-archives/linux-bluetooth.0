@@ -1,77 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1377866712-5253-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1377866712-5253-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-	<1377866712-5253-2-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Date: Mon, 2 Sep 2013 10:33:24 +0300
-Message-ID: <CABBYNZ++JGkrWsm=rcKZoR4FKo1+-d-cRzWyP587Lk0QvL-b5w@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] obexd: Add property Folder to MAP message
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
+Subject: Re: Compatible Kernels of a certain BlueZ version
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAKCXgJ1rgAk2VXzGsf2Un-mCm4H9MjT76bkh40-26TJ7Nh56Gg@mail.gmail.com>
+Date: Sun, 1 Sep 2013 23:06:40 -0700
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <3EF10060-3C76-4240-832A-901BE2831808@holtmann.org>
+References: <CAKCXgJ03bfgQYPgJt7R9dXPEX9J7ofiEHgbPBDK9-H=ifaLyRw@mail.gmail.com> <20130901150129.GB7440@joana> <CAKCXgJ1rgAk2VXzGsf2Un-mCm4H9MjT76bkh40-26TJ7Nh56Gg@mail.gmail.com>
+To: wei junping <junping.wei@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+Hi Wei,
 
-On Fri, Aug 30, 2013 at 3:45 PM, Christian Fetzer
-<christian.fetzer@oss.bmw-carit.de> wrote:
-> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
->
-> diff --git a/obexd/client/map.c b/obexd/client/map.c
-> index 8864a54..03be77f 100644
-> --- a/obexd/client/map.c
-> +++ b/obexd/client/map.c
-> @@ -123,6 +123,7 @@ struct map_msg {
->         char *status;
->         uint64_t attachment_size;
->         uint8_t flags;
-> +       char *folder;
->         GDBusPendingPropertySet pending;
->  };
->
-> @@ -379,6 +380,7 @@ static void map_msg_free(void *data)
->         g_free(msg->path);
->         g_free(msg->subject);
->         g_free(msg->handle);
-> +       g_free(msg->folder);
->         g_free(msg->timestamp);
->         g_free(msg->sender);
->         g_free(msg->sender_address);
-> @@ -451,6 +453,16 @@ done:
->         msg->pending = 0;
->  }
->
-> +static gboolean get_folder(const GDBusPropertyTable *property,
-> +                                       DBusMessageIter *iter, void *data)
-> +{
-> +       struct map_msg *msg = data;
-> +
-> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &msg->folder);
-> +
-> +       return TRUE;
-> +}
-> +
->  static gboolean subject_exists(const GDBusPropertyTable *property, void *data)
->  {
->         struct map_msg *msg = data;
-> @@ -744,6 +756,7 @@ static const GDBusMethodTable map_msg_methods[] = {
->  };
->
->  static const GDBusPropertyTable map_msg_properties[] = {
-> +       { "Folder", "s", get_folder },
->         { "Subject", "s", get_subject, NULL, subject_exists },
->         { "Timestamp", "s", get_timestamp, NULL, timestamp_exists },
->         { "Sender", "s", get_sender, NULL, sender_exists },
-> @@ -766,7 +779,8 @@ static const GDBusPropertyTable map_msg_properties[] = {
->         { }
->  };
->
-> -static struct map_msg *map_msg_create(struct map_data *data, const char *handle)
-> +static struct map_msg *map_msg_create(struct map_data *data, const char *handle,
-> +                                                       const char *folder)
->  {
+please refrain from top posting on this mailing list.
 
-We can call obc_session_get_folder directly here using data so there
-is no need for an extra parameter.
+> Thank you for your reply.
+> I am trying to make 4.93 come with Android 3.0.8 work with Kernel
+> 3.9.6, and I found that values of some mgmt macros in user mode are
+> different from those in kernel.
+> For example:
+> In user mode mgmt.h
+> #define MGMT_OP_READ_FEATURES 0x0002
+> struct mgmt_rp_read_features {
+> uint8_t features[8];
+> } __packed;
+> 
+> but in kernel mode mgmt.h
+> #define MGMT_OP_READ_COMMANDS 0x0002
+> #define MGMT_READ_COMMANDS_SIZE 0
+> struct mgmt_rp_read_commands {
+> __le16 num_commands;
+> __le16 num_events;
+> __le16 opcodes[0];
+> } __packed;
+> 
+> I haven't tried it, but I would think the meaning of the same value in
+> user and kernel should be the same. Is it?
+
+Before Linux 3.4, the mgmt interface was not official and disabled by default. So values and structs changed. Only with Linux 3.4 they became official. And BlueZ 5.x contains the official values as well.
+
+And version before BlueZ 5.0 will use the raw HCI interface and duplicate all the handling in user space.
+
+Regards
+
+Marcel
+
