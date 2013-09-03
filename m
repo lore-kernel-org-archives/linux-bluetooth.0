@@ -1,51 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Only schedule raw queue when user channel is active
-Date: Tue,  3 Sep 2013 18:08:38 -0700
-Message-Id: <1378256918-50836-2-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Dan Aloni <alonid@postram.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Subject: [PATCH bluetooth-next] Bluetooth: Add support for BCM20702A0 [0a5c, 21e6]
+Date: Tue,  3 Sep 2013 14:42:22 +0300
+Message-Id: <1378208542-30729-1-git-send-email-alonid@postram.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the user channel is set and an user application has full control
-over the device, do not bother trying to schedule any queues except
-the raw queue.
+Tested with this patch and a Bluetooth mouse on 3.10.10, on ThinkPad W530.
 
-This is an optimization since with user channel, only the raw queue
-is in use.
+Bus 001 Device 004: ID 0a5c:21e6 Broadcom Corp. BCM20702 Bluetooth 4.0 [ThinkPad]
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=02 Dev#=  4 Spd=12  MxCh= 0
+D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0a5c ProdID=21e6 Rev=01.12
+S:  Manufacturer=Broadcom Corp
+S:  Product=BCM20702A0
+S:  SerialNumber=F4B7E2F6E438
+C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+
+Signed-off-by: Dan Aloni <alonid@postram.com>
 ---
- net/bluetooth/hci_core.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 541f4d5..1b86c78 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3292,15 +3292,13 @@ static void hci_tx_work(struct work_struct *work)
- 	BT_DBG("%s acl %d sco %d le %d", hdev->name, hdev->acl_cnt,
- 	       hdev->sco_cnt, hdev->le_cnt);
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index de4cf4d..e6313f8 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -104,6 +104,7 @@ static struct usb_device_id btusb_table[] = {
+ 	{ USB_DEVICE(0x0b05, 0x17b5) },
+ 	{ USB_DEVICE(0x04ca, 0x2003) },
+ 	{ USB_DEVICE(0x0489, 0xe042) },
++	{ USB_DEVICE(0x0a5c, 0x21e6) },
+ 	{ USB_DEVICE(0x413c, 0x8197) },
  
--	/* Schedule queues and send stuff to HCI driver */
--
--	hci_sched_acl(hdev);
--
--	hci_sched_sco(hdev);
--
--	hci_sched_esco(hdev);
--
--	hci_sched_le(hdev);
-+	if (!test_bit(HCI_USER_CHANNEL, &hdev->dev_flags)) {
-+		/* Schedule queues and send stuff to HCI driver */
-+		hci_sched_acl(hdev);
-+		hci_sched_sco(hdev);
-+		hci_sched_esco(hdev);
-+		hci_sched_le(hdev);
-+	}
- 
- 	/* Send next queued raw (unknown type) packet */
- 	while ((skb = skb_dequeue(&hdev->raw_q)))
+ 	/* Foxconn - Hon Hai */
 -- 
-1.8.3.1
-
+1.8.1.4
