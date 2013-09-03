@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 07/10 v3] core: Make use of g_dbus_send_message_with_reply
-Date: Tue,  3 Sep 2013 14:21:16 +0300
-Message-Id: <1378207279-14557-8-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 02/10 v3] unit: Add gdbus/client_check_order
+Date: Tue,  3 Sep 2013 14:21:11 +0300
+Message-Id: <1378207279-14557-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1378207279-14557-1-git-send-email-luiz.dentz@gmail.com>
 References: <1378207279-14557-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,93 +11,105 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This replaces dbus_connection_send_with_reply with
-g_dbus_send_message_with_reply which does not alter message order.
 ---
- src/agent.c   | 12 ++++++------
- src/profile.c |  4 ++--
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ unit/test-gdbus-client.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
 
-diff --git a/src/agent.c b/src/agent.c
-index b9e6e8c..7880ba6 100644
---- a/src/agent.c
-+++ b/src/agent.c
-@@ -370,7 +370,7 @@ static int agent_call_authorize_service(struct agent_request *req,
- 				DBUS_TYPE_STRING, &uuid,
- 				DBUS_TYPE_INVALID);
+diff --git a/unit/test-gdbus-client.c b/unit/test-gdbus-client.c
+index a594384..488d4ec 100644
+--- a/unit/test-gdbus-client.c
++++ b/unit/test-gdbus-client.c
+@@ -35,6 +35,7 @@ struct context {
+ 	GMainLoop *main_loop;
+ 	DBusConnection *dbus_conn;
+ 	GDBusClient *dbus_client;
++	GDBusProxy *proxy;
+ 	void *data;
+ 	guint timeout_source;
+ };
+@@ -779,6 +780,74 @@ static void client_string_changed(void)
+ 	destroy_context(context);
+ }
  
--	if (dbus_connection_send_with_reply(btd_get_dbus_connection(),
-+	if (g_dbus_send_message_with_reply(btd_get_dbus_connection(),
- 						req->msg, &req->call,
- 						REQUEST_TIMEOUT) == FALSE) {
- 		error("D-Bus send failed");
-@@ -480,7 +480,7 @@ static int pincode_request_new(struct agent_request *req, const char *device_pat
- 	dbus_message_append_args(req->msg, DBUS_TYPE_OBJECT_PATH, &device_path,
- 					DBUS_TYPE_INVALID);
++static void property_check_order(const DBusError *err, void *user_data)
++{
++	struct context *context = user_data;
++	GDBusProxy *proxy = context->proxy;
++	DBusMessageIter iter;
++	const char *string;
++
++	g_assert(!dbus_error_is_set(err));
++
++	g_assert(g_dbus_proxy_get_property(proxy, "String", &iter));
++
++	dbus_message_iter_get_basic(&iter, &string);
++	g_assert(g_strcmp0(string, "value1") == 0);
++
++	g_dbus_client_unref(context->dbus_client);
++}
++
++static void proxy_check_order(GDBusProxy *proxy, void *user_data)
++{
++	struct context *context = user_data;
++	const char *string;
++
++	if (g_test_verbose())
++		g_print("proxy %s found\n",
++					g_dbus_proxy_get_interface(proxy));
++
++	context->proxy = proxy;
++	string = "value1";
++	g_assert(g_dbus_proxy_set_property_basic(proxy, "String",
++					DBUS_TYPE_STRING, &string,
++					property_check_order, context,
++					NULL));
++}
++
++static void client_check_order(void)
++{
++	struct context *context = create_context();
++	static const GDBusPropertyTable string_properties[] = {
++		{ "String", "s", get_string, set_string, string_exists },
++		{ },
++	};
++
++	if (context == NULL)
++		return;
++
++	context->data = g_strdup("value");
++	g_dbus_register_interface(context->dbus_conn,
++				SERVICE_PATH, SERVICE_NAME,
++				methods, signals, string_properties,
++				context, NULL);
++
++	context->dbus_client = g_dbus_client_new(context->dbus_conn,
++						SERVICE_NAME, SERVICE_PATH);
++
++	g_dbus_client_set_disconnect_watch(context->dbus_client,
++						disconnect_handler, context);
++	g_dbus_client_set_proxy_handlers(context->dbus_client,
++						proxy_check_order, NULL, NULL,
++						context);
++
++	g_main_loop_run(context->main_loop);
++
++	g_dbus_unregister_interface(context->dbus_conn,
++					SERVICE_PATH, SERVICE_NAME);
++
++	destroy_context(context);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	g_test_init(&argc, &argv, NULL);
+@@ -809,5 +878,7 @@ int main(int argc, char *argv[])
+ 	g_test_add_func("/gdbus/client_string_changed",
+ 						client_string_changed);
  
--	if (dbus_connection_send_with_reply(btd_get_dbus_connection(), req->msg,
-+	if (g_dbus_send_message_with_reply(btd_get_dbus_connection(), req->msg,
- 					&req->call, REQUEST_TIMEOUT) == FALSE) {
- 		error("D-Bus send failed");
- 		return -EIO;
-@@ -574,7 +574,7 @@ static int passkey_request_new(struct agent_request *req,
- 	dbus_message_append_args(req->msg, DBUS_TYPE_OBJECT_PATH, &device_path,
- 					DBUS_TYPE_INVALID);
- 
--	if (dbus_connection_send_with_reply(btd_get_dbus_connection(), req->msg,
-+	if (g_dbus_send_message_with_reply(btd_get_dbus_connection(), req->msg,
- 					&req->call, REQUEST_TIMEOUT) == FALSE) {
- 		error("D-Bus send failed");
- 		return -EIO;
-@@ -632,7 +632,7 @@ static int confirmation_request_new(struct agent_request *req,
- 				DBUS_TYPE_UINT32, &passkey,
- 				DBUS_TYPE_INVALID);
- 
--	if (dbus_connection_send_with_reply(btd_get_dbus_connection(), req->msg,
-+	if (g_dbus_send_message_with_reply(btd_get_dbus_connection(), req->msg,
- 				&req->call, REQUEST_TIMEOUT) == FALSE) {
- 		error("D-Bus send failed");
- 		return -EIO;
-@@ -689,7 +689,7 @@ static int authorization_request_new(struct agent_request *req,
- 				DBUS_TYPE_OBJECT_PATH, &device_path,
- 				DBUS_TYPE_INVALID);
- 
--	if (dbus_connection_send_with_reply(btd_get_dbus_connection(), req->msg,
-+	if (g_dbus_send_message_with_reply(btd_get_dbus_connection(), req->msg,
- 				&req->call, REQUEST_TIMEOUT) == FALSE) {
- 		error("D-Bus send failed");
- 		return -EIO;
-@@ -823,7 +823,7 @@ static int display_pincode_request_new(struct agent_request *req,
- 					DBUS_TYPE_STRING, &pincode,
- 					DBUS_TYPE_INVALID);
- 
--	if (dbus_connection_send_with_reply(btd_get_dbus_connection(), req->msg,
-+	if (g_dbus_send_message_with_reply(btd_get_dbus_connection(), req->msg,
- 				&req->call, REQUEST_TIMEOUT) == FALSE) {
- 		error("D-Bus send failed");
- 		return -EIO;
-diff --git a/src/profile.c b/src/profile.c
-index 90c3535..57aead7 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -938,7 +938,7 @@ static bool send_new_connection(struct ext_profile *ext, struct ext_io *conn)
- 
- 	dbus_message_iter_close_container(&iter, &dict);
- 
--	if (!dbus_connection_send_with_reply(btd_get_dbus_connection(),
-+	if (!g_dbus_send_message_with_reply(btd_get_dbus_connection(),
- 						msg, &conn->pending, -1)) {
- 		error("%s: sending NewConnection failed", ext->name);
- 		dbus_message_unref(msg);
-@@ -1682,7 +1682,7 @@ static int send_disconn_req(struct ext_profile *ext, struct ext_io *conn)
- 	dbus_message_append_args(msg, DBUS_TYPE_OBJECT_PATH, &path,
- 							DBUS_TYPE_INVALID);
- 
--	if (!dbus_connection_send_with_reply(btd_get_dbus_connection(),
-+	if (!g_dbus_send_message_with_reply(btd_get_dbus_connection(),
- 						msg, &conn->pending, -1)) {
- 		error("%s: sending RequestDisconnection failed", ext->name);
- 		dbus_message_unref(msg);
++	g_test_add_func("/gdbus/client_check_order", client_check_order);
++
+ 	return g_test_run();
+ }
 -- 
 1.8.3.1
 
