@@ -1,240 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 05/10 v3] gdbus: Avoid calling dbus_connection_send*
-Date: Tue,  3 Sep 2013 14:21:14 +0300
-Message-Id: <1378207279-14557-6-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1378207279-14557-1-git-send-email-luiz.dentz@gmail.com>
-References: <1378207279-14557-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 00/10 v3] Fix message order
+Date: Tue,  3 Sep 2013 14:21:09 +0300
+Message-Id: <1378207279-14557-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-dbus_connection_send* should not be called directly except by
-g_dbus_send_message.
----
- gdbus/client.c | 14 ++++-----
- gdbus/object.c | 92 ++++++++++++++++++++++------------------------------------
- 2 files changed, 42 insertions(+), 64 deletions(-)
+s set fixes a couple of issues introduced with the use of ObjectManager due
+the processing of signals on idle to group changes, this has been causing
+issues with external components such as ofono and pulseaudio that sometimes
+receives connections from devices objects that have pending signals thus
+cannot be properly processed or have to be assumed paired and with certain
+UUIDs which is not ideal.
 
-diff --git a/gdbus/client.c b/gdbus/client.c
-index d80e252..8ebfaad 100644
---- a/gdbus/client.c
-+++ b/gdbus/client.c
-@@ -100,7 +100,7 @@ static gboolean modify_match(DBusConnection *conn, const char *member,
- 	dbus_message_append_args(msg, DBUS_TYPE_STRING, &rule,
- 						DBUS_TYPE_INVALID);
- 
--	if (dbus_connection_send_with_reply(conn, msg, &call, -1) == FALSE) {
-+	if (g_dbus_send_message_with_reply(conn, msg, &call, -1) == FALSE) {
- 		dbus_message_unref(msg);
- 		return FALSE;
- 	}
-@@ -319,7 +319,7 @@ static void get_all_properties(GDBusProxy *proxy)
- 	dbus_message_append_args(msg, DBUS_TYPE_STRING, &proxy->interface,
- 							DBUS_TYPE_INVALID);
- 
--	if (dbus_connection_send_with_reply(client->dbus_conn, msg,
-+	if (g_dbus_send_message_with_reply(client->dbus_conn, msg,
- 							&call, -1) == FALSE) {
- 		dbus_message_unref(msg);
- 		return;
-@@ -575,7 +575,7 @@ gboolean g_dbus_proxy_refresh_property(GDBusProxy *proxy, const char *name)
- 							&proxy->interface);
- 	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &name);
- 
--	if (dbus_connection_send_with_reply(client->dbus_conn, msg,
-+	if (g_dbus_send_message_with_reply(client->dbus_conn, msg,
- 							&call, -1) == FALSE) {
- 		dbus_message_unref(msg);
- 		refresh_property_free(data);
-@@ -668,7 +668,7 @@ gboolean g_dbus_proxy_set_property_basic(GDBusProxy *proxy,
- 	dbus_message_iter_append_basic(&variant, type, value);
- 	dbus_message_iter_close_container(&iter, &variant);
- 
--	if (dbus_connection_send_with_reply(client->dbus_conn, msg,
-+	if (g_dbus_send_message_with_reply(client->dbus_conn, msg,
- 							&call, -1) == FALSE) {
- 		dbus_message_unref(msg);
- 		g_free(data);
-@@ -742,7 +742,7 @@ gboolean g_dbus_proxy_method_call(GDBusProxy *proxy, const char *method,
- 		setup(&iter, data->user_data);
- 	}
- 
--	if (dbus_connection_send_with_reply(client->dbus_conn, msg,
-+	if (g_dbus_send_message_with_reply(client->dbus_conn, msg,
- 					&call, METHOD_CALL_TIMEOUT) == FALSE) {
- 		dbus_message_unref(msg);
- 		g_free(data);
-@@ -1038,7 +1038,7 @@ static void get_managed_objects(GDBusClient *client)
- 
- 	dbus_message_append_args(msg, DBUS_TYPE_INVALID);
- 
--	if (dbus_connection_send_with_reply(client->dbus_conn, msg,
-+	if (g_dbus_send_message_with_reply(client->dbus_conn, msg,
- 				&client->get_objects_call, -1) == FALSE) {
- 		dbus_message_unref(msg);
- 		return;
-@@ -1102,7 +1102,7 @@ static void get_name_owner(GDBusClient *client, const char *name)
- 	dbus_message_append_args(msg, DBUS_TYPE_STRING, &name,
- 						DBUS_TYPE_INVALID);
- 
--	if (dbus_connection_send_with_reply(client->dbus_conn, msg,
-+	if (g_dbus_send_message_with_reply(client->dbus_conn, msg,
- 					&client->pending_call, -1) == FALSE) {
- 		dbus_message_unref(msg);
- 		return;
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 773128c..c4cf724 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -272,8 +272,7 @@ static DBusHandlerResult process_message(DBusConnection *connection,
- 	if (reply == NULL)
- 		return DBUS_HANDLER_RESULT_NEED_MEMORY;
- 
--	dbus_connection_send(connection, reply, NULL);
--	dbus_message_unref(reply);
-+	g_dbus_send_message(connection, reply);
- 
- 	return DBUS_HANDLER_RESULT_HANDLED;
- }
-@@ -313,19 +312,14 @@ void g_dbus_pending_error_valist(DBusConnection *connection,
- 
- 	for (list = pending_security; list; list = list->next) {
- 		struct security_data *secdata = list->data;
--		DBusMessage *reply;
- 
- 		if (secdata->pending != pending)
- 			continue;
- 
- 		pending_security = g_slist_remove(pending_security, secdata);
- 
--		reply = g_dbus_create_error_valist(secdata->message,
-+		g_dbus_send_error_valist(connection, secdata->message,
- 							name, format, args);
--		if (reply != NULL) {
--			dbus_connection_send(connection, reply, NULL);
--			dbus_message_unref(reply);
--		}
- 
- 		dbus_message_unref(secdata->message);
- 		g_free(secdata);
-@@ -470,18 +464,13 @@ void g_dbus_pending_property_error_valist(GDBusPendingReply id,
- 					va_list args)
- {
- 	struct property_data *propdata;
--	DBusMessage *reply;
- 
- 	propdata = remove_pending_property_data(id);
- 	if (propdata == NULL)
- 		return;
- 
--	reply = g_dbus_create_error_valist(propdata->message, name, format,
--									args);
--	if (reply != NULL) {
--		dbus_connection_send(propdata->conn, reply, NULL);
--		dbus_message_unref(reply);
--	}
-+	g_dbus_send_error_valist(propdata->conn, propdata->message, name,
-+								format, args);
- 
- 	dbus_message_unref(propdata->message);
- 	g_free(propdata);
-@@ -1339,45 +1328,6 @@ static gboolean check_signal(DBusConnection *conn, const char *path,
- 	return FALSE;
- }
- 
--static dbus_bool_t emit_signal_valist(DBusConnection *conn,
--						const char *path,
--						const char *interface,
--						const char *name,
--						int first,
--						va_list var_args)
--{
--	DBusMessage *signal;
--	dbus_bool_t ret;
--	const GDBusArgInfo *args;
--
--	if (!check_signal(conn, path, interface, name, &args))
--		return FALSE;
--
--	signal = dbus_message_new_signal(path, interface, name);
--	if (signal == NULL) {
--		error("Unable to allocate new %s.%s signal", interface,  name);
--		return FALSE;
--	}
--
--	ret = dbus_message_append_args_valist(signal, first, var_args);
--	if (!ret)
--		goto fail;
--
--	if (g_dbus_args_have_signature(args, signal) == FALSE) {
--		error("%s.%s: got unexpected signature '%s'", interface, name,
--					dbus_message_get_signature(signal));
--		ret = FALSE;
--		goto fail;
--	}
--
--	ret = dbus_connection_send(conn, signal, NULL);
--
--fail:
--	dbus_message_unref(signal);
--
--	return ret;
--}
--
- gboolean g_dbus_register_interface(DBusConnection *connection,
- 					const char *path, const char *name,
- 					const GDBusMethodTable *methods,
-@@ -1640,7 +1590,7 @@ gboolean g_dbus_emit_signal(DBusConnection *connection,
- 
- 	va_start(args, type);
- 
--	result = emit_signal_valist(connection, path, interface,
-+	result = g_dbus_emit_signal_valist(connection, path, interface,
- 							name, type, args);
- 
- 	va_end(args);
-@@ -1652,8 +1602,36 @@ gboolean g_dbus_emit_signal_valist(DBusConnection *connection,
- 				const char *path, const char *interface,
- 				const char *name, int type, va_list args)
- {
--	return emit_signal_valist(connection, path, interface,
--							name, type, args);
-+	DBusMessage *signal;
-+	dbus_bool_t ret;
-+	const GDBusArgInfo *args_info;
-+
-+	if (!check_signal(connection, path, interface, name, &args_info))
-+		return FALSE;
-+
-+	signal = dbus_message_new_signal(path, interface, name);
-+	if (signal == NULL) {
-+		error("Unable to allocate new %s.%s signal", interface,  name);
-+		return FALSE;
-+	}
-+
-+	ret = dbus_message_append_args_valist(signal, type, args);
-+	if (!ret)
-+		goto fail;
-+
-+	if (g_dbus_args_have_signature(args_info, signal) == FALSE) {
-+		error("%s.%s: got unexpected signature '%s'", interface, name,
-+					dbus_message_get_signature(signal));
-+		ret = FALSE;
-+		goto fail;
-+	}
-+
-+	return g_dbus_send_message(connection, signal);
-+
-+fail:
-+	dbus_message_unref(signal);
-+
-+	return ret;
- }
- 
- static void process_properties_from_interface(struct generic_data *data,
+v2: Fixes some commit messages as suggested by Lucas Demarchi, in addition to
+that rework flush mechanism to honor the order of the pending signals and make
+it work with any connection.
+
+v3: Add comments regarding the use of dbus_connection_send to prevent recursive
+calls to g_dbus_flush.
+
+Luiz Augusto von Dentz (10):
+  build: Fix not rebuilding bluetoothd if gdbus changes
+  unit: Add gdbus/client_check_order
+  gdbus: Fix sending ObjectManager/Properties signals out of order
+  gdbus: Add g_dbus_send_message_with_reply
+  gdbus: Avoid calling dbus_connection_send*
+  gdbus: Fix emitting PropertiesChanged twice
+  core: Make use of g_dbus_send_message_with_reply
+  neard: Make use of g_dbus_send_message_with_reply
+  audio/media: Make use of g_dbus_send_message_with_reply
+  obexd: Make use of g_dbus_send_message*
+
+ Makefile.am                   |   2 +-
+ gdbus/client.c                |  14 ++--
+ gdbus/gdbus.h                 |   3 +
+ gdbus/object.c                | 176 ++++++++++++++++++++++++------------------
+ obexd/plugins/bluetooth.c     |   2 +-
+ obexd/plugins/pcsuite.c       |   5 +-
+ obexd/plugins/syncevolution.c |   6 +-
+ obexd/src/manager.c           |   3 +-
+ plugins/neard.c               |   2 +-
+ profiles/audio/media.c        |   2 +-
+ src/agent.c                   |  12 +--
+ src/profile.c                 |   4 +-
+ unit/test-gdbus-client.c      |  71 +++++++++++++++++
+ 13 files changed, 200 insertions(+), 102 deletions(-)
+
 -- 
 1.8.3.1
 
