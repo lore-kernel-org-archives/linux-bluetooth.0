@@ -1,35 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 01/10 v3] build: Fix not rebuilding bluetoothd if gdbus changes
-Date: Tue,  3 Sep 2013 14:21:10 +0300
-Message-Id: <1378207279-14557-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1378207279-14557-1-git-send-email-luiz.dentz@gmail.com>
-References: <1378207279-14557-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZ+L4h4Gt+pC3A3wJRgsyMkeKjbh-=SnXAKtVBeen-4VzQ@mail.gmail.com>
+References: <CAKCXgJ03bfgQYPgJt7R9dXPEX9J7ofiEHgbPBDK9-H=ifaLyRw@mail.gmail.com>
+	<20130901150129.GB7440@joana>
+	<CAKCXgJ1rgAk2VXzGsf2Un-mCm4H9MjT76bkh40-26TJ7Nh56Gg@mail.gmail.com>
+	<3EF10060-3C76-4240-832A-901BE2831808@holtmann.org>
+	<CAKCXgJ1xYtfQqus+jxkgJpvPm7qqE=usWNVcNB=NqkoOXgDKhQ@mail.gmail.com>
+	<CABBYNZ+L4h4Gt+pC3A3wJRgsyMkeKjbh-=SnXAKtVBeen-4VzQ@mail.gmail.com>
+Date: Tue, 3 Sep 2013 11:14:34 +0800
+Message-ID: <CAKCXgJ211oe+sOTFoBsHyvarnOyOELKyoeytW509RNvv2jB0PQ@mail.gmail.com>
+Subject: Re: Compatible Kernels of a certain BlueZ version
+From: wei junping <junping.wei@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Luiz,
 
-src_bluetoothd_DEPENDENCIES should list all local libraries including gdbus
-otherwise it does not get relinked whenever gdbus changes.
----
- Makefile.am | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+2013/9/3 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+> Hi wei,
+>
+> On Mon, Sep 2, 2013 at 10:59 AM, wei junping <junping.wei@gmail.com> wrote:
+>> Hi Marcel,
+>>
+>> Thank you for your reply.
+>>
+>> But what do you mean by "refrain from top posting on this mailing
+>> list"? Do you mean I should not have posted this question here? If so,
+>> where should new comers of BlueZ ask for help?
+>
+> He was referring to post style: http://en.wikipedia.org/wiki/Posting_style
+>
+> Please use inline/interleaved like Im doing right now.
 
-diff --git a/Makefile.am b/Makefile.am
-index 61daec4..4e4b1c5 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -157,7 +157,7 @@ src_bluetoothd_LDFLAGS = $(AM_LDFLAGS) -Wl,--export-dynamic \
- 				-Wl,--version-script=$(srcdir)/src/bluetooth.ver
- 
- src_bluetoothd_DEPENDENCIES = lib/libbluetooth-internal.la \
--						src/bluetooth.service
-+				gdbus/libgdbus-internal.la src/bluetooth.service
- 
- src_bluetoothd_CFLAGS = $(AM_CFLAGS) -DBLUETOOTH_PLUGIN_BUILTIN \
- 					-DPLUGINDIR=\""$(build_plugindir)"\"
--- 
-1.8.3.1
+Thank you for your reply. So it should be like this?
 
+Best Regards,
+Tim Wei
