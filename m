@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 09/10 v3] audio/media: Make use of g_dbus_send_message_with_reply
-Date: Tue,  3 Sep 2013 14:21:18 +0300
-Message-Id: <1378207279-14557-10-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 08/10 v3] neard: Make use of g_dbus_send_message_with_reply
+Date: Tue,  3 Sep 2013 14:21:17 +0300
+Message-Id: <1378207279-14557-9-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1378207279-14557-1-git-send-email-luiz.dentz@gmail.com>
 References: <1378207279-14557-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,21 +14,21 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 This replaces dbus_connection_send_with_reply with
 g_dbus_send_message_with_reply which does not alter message order.
 ---
- profiles/audio/media.c | 2 +-
+ plugins/neard.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 5a06b99..9c72b8d 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -325,7 +325,7 @@ static gboolean media_endpoint_async_call(DBusMessage *msg,
- 	request = g_new0(struct endpoint_request, 1);
+diff --git a/plugins/neard.c b/plugins/neard.c
+index e4a4d71..ea91c4d 100644
+--- a/plugins/neard.c
++++ b/plugins/neard.c
+@@ -158,7 +158,7 @@ static void register_agent(bool append_carrier)
+ 		dbus_message_append_args(message, DBUS_TYPE_STRING, &carrier,
+ 							DBUS_TYPE_INVALID);
  
- 	/* Timeout should be less than avdtp request timeout (4 seconds) */
--	if (dbus_connection_send_with_reply(btd_get_dbus_connection(),
-+	if (g_dbus_send_message_with_reply(btd_get_dbus_connection(),
- 						msg, &request->call,
- 						REQUEST_TIMEOUT) == FALSE) {
+-	if (!dbus_connection_send_with_reply(btd_get_dbus_connection(),
++	if (!g_dbus_send_message_with_reply(btd_get_dbus_connection(),
+ 							message, &call, -1)) {
+ 		dbus_message_unref(message);
  		error("D-Bus send failed");
 -- 
 1.8.3.1
