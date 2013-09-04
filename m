@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/5] gdbus/client: Use g_dbus_add_signal_watch to track signals
-Date: Wed,  4 Sep 2013 22:04:30 +0300
-Message-Id: <1378321471-9043-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/5] gdbus/watch: Fix aborting when removing D-Bus filter
+Date: Wed,  4 Sep 2013 22:04:28 +0300
+Message-Id: <1378321471-9043-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1378321471-9043-1-git-send-email-luiz.dentz@gmail.com>
 References: <1378321471-9043-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,178 +11,89 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This make the handling much simpler and avoids duplicates of the same
-match rule.
----
- gdbus/client.c | 73 +++++++++++++++++++++++++++++-----------------------------
- 1 file changed, 37 insertions(+), 36 deletions(-)
+In case of filter_data having a watch to a service name it may call
+dbus_connection_remove_filter twice causing libdbus to abort:
 
-diff --git a/gdbus/client.c b/gdbus/client.c
-index 7a14d7e..f1e6946 100644
---- a/gdbus/client.c
-+++ b/gdbus/client.c
-@@ -25,6 +25,7 @@
- #include <config.h>
- #endif
- 
-+#include <stdio.h>
- #include <glib.h>
- #include <dbus/dbus.h>
- 
-@@ -32,12 +33,18 @@
- 
- #define METHOD_CALL_TIMEOUT (300 * 1000)
- 
-+#ifndef DBUS_INTERFACE_OBJECT
-+#define DBUS_INTERFACE_OBJECT_MANAGER DBUS_INTERFACE_DBUS ".ObjectManager"
-+#endif
-+
- struct GDBusClient {
- 	int ref_count;
- 	DBusConnection *dbus_conn;
- 	char *service_name;
- 	char *base_path;
- 	guint watch;
-+	guint added_watch;
-+	guint removed_watch;
- 	GPtrArray *match_rules;
- 	DBusPendingCall *pending_call;
- 	DBusPendingCall *get_objects_call;
-@@ -908,16 +915,18 @@ static void parse_interfaces(GDBusClient *client, const char *path,
- 	}
- }
- 
--static void interfaces_added(GDBusClient *client, DBusMessage *msg)
-+static gboolean interfaces_added(DBusConnection *conn, DBusMessage *msg,
-+							void *user_data)
+process 24723: Attempt to remove filter function 0x4063e0 user data (nil), but no such filter has been added
+
+To fix this the code will now only attempt to call
+dbus_connection_remove_filter once in filter_data_free which is the
+counterpart of filter_data_get where dbus_connection_add_filter is called.
+---
+ gdbus/watch.c | 25 ++++++++-----------------
+ 1 file changed, 8 insertions(+), 17 deletions(-)
+
+diff --git a/gdbus/watch.c b/gdbus/watch.c
+index d334580..a918535 100644
+--- a/gdbus/watch.c
++++ b/gdbus/watch.c
+@@ -281,6 +281,11 @@ static void filter_data_free(struct filter_data *data)
  {
-+	GDBusClient *client = user_data;
- 	DBusMessageIter iter;
- 	const char *path;
+ 	GSList *l;
  
- 	if (dbus_message_iter_init(msg, &iter) == FALSE)
--		return;
-+		return TRUE;
- 
- 	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_OBJECT_PATH)
--		return;
-+		return TRUE;
- 
- 	dbus_message_iter_get_basic(&iter, &path);
- 	dbus_message_iter_next(&iter);
-@@ -927,24 +936,28 @@ static void interfaces_added(GDBusClient *client, DBusMessage *msg)
- 	parse_interfaces(client, path, &iter);
- 
- 	g_dbus_client_unref(client);
++	/* Remove filter if there are no listeners left for the connection */
++	if (filter_data_find(data->connection) == NULL)
++		dbus_connection_remove_filter(data->connection, message_filter,
++									NULL);
 +
-+	return TRUE;
- }
+ 	for (l = data->callbacks; l != NULL; l = l->next)
+ 		g_free(l->data);
  
--static void interfaces_removed(GDBusClient *client, DBusMessage *msg)
-+static gboolean interfaces_removed(DBusConnection *conn, DBusMessage *msg,
-+							void *user_data)
+@@ -360,8 +365,6 @@ static void service_data_free(struct service_data *data)
+ static gboolean filter_data_remove_callback(struct filter_data *data,
+ 						struct filter_callback *cb)
  {
-+	GDBusClient *client = user_data;
- 	DBusMessageIter iter, entry;
- 	const char *path;
+-	DBusConnection *connection;
+-
+ 	data->callbacks = g_slist_remove(data->callbacks, cb);
+ 	data->processed = g_slist_remove(data->processed, cb);
  
- 	if (dbus_message_iter_init(msg, &iter) == FALSE)
--		return;
-+		return TRUE;
+@@ -385,16 +388,8 @@ static gboolean filter_data_remove_callback(struct filter_data *data,
+ 	if (data->registered && !remove_match(data))
+ 		return FALSE;
  
- 	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_OBJECT_PATH)
--		return;
-+		return TRUE;
+-	connection = dbus_connection_ref(data->connection);
+ 	listeners = g_slist_remove(listeners, data);
+-
+-	/* Remove filter if there are no listeners left for the connection */
+-	if (filter_data_find(connection) == NULL)
+-		dbus_connection_remove_filter(connection, message_filter,
+-						NULL);
+-
+ 	filter_data_free(data);
+-	dbus_connection_unref(connection);
  
- 	dbus_message_iter_get_basic(&iter, &path);
- 	dbus_message_iter_next(&iter);
- 
- 	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
--		return;
-+		return TRUE;
- 
- 	dbus_message_iter_recurse(&iter, &entry);
- 
-@@ -959,6 +972,8 @@ static void interfaces_removed(GDBusClient *client, DBusMessage *msg)
+ 	return TRUE;
+ }
+@@ -563,6 +558,9 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
+ 								current);
  	}
  
- 	g_dbus_client_unref(client);
++	if (delete_listener == NULL)
++		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 +
-+	return TRUE;
+ 	for (current = delete_listener; current != NULL;
+ 					current = delete_listener->next) {
+ 		GSList *l = current->data;
+@@ -581,11 +579,6 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
+ 
+ 	g_slist_free(delete_listener);
+ 
+-	/* Remove filter if there are no listeners left for the connection */
+-	if (filter_data_find(connection) == NULL)
+-		dbus_connection_remove_filter(connection, message_filter,
+-						NULL);
+-
+ 	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
  }
  
- static void parse_managed_objects(GDBusClient *client, DBusMessage *msg)
-@@ -1093,24 +1108,6 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
- 	interface = dbus_message_get_interface(message);
- 	member = dbus_message_get_member(message);
- 
--	if (g_str_equal(path, "/") == TRUE) {
--		if (g_str_equal(interface, DBUS_INTERFACE_DBUS
--						".ObjectManager") == FALSE)
--			return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+@@ -814,6 +807,4 @@ void g_dbus_remove_all_watches(DBusConnection *connection)
+ 		listeners = g_slist_remove(listeners, data);
+ 		filter_data_call_and_free(data);
+ 	}
 -
--		if (g_str_equal(member, "InterfacesAdded") == TRUE) {
--			interfaces_added(client, message);
--			return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
--		}
--
--		if (g_str_equal(member, "InterfacesRemoved") == TRUE) {
--			interfaces_removed(client, message);
--			return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
--		}
--
--		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
--	}
--
- 	if (g_str_has_prefix(path, client->base_path) == FALSE)
- 		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- 
-@@ -1150,23 +1147,25 @@ GDBusClient *g_dbus_client_new(DBusConnection *connection,
- 	client->service_name = g_strdup(service);
- 	client->base_path = g_strdup(path);
- 
--	client->match_rules = g_ptr_array_sized_new(3);
-+	client->match_rules = g_ptr_array_sized_new(1);
- 	g_ptr_array_set_free_func(client->match_rules, g_free);
- 
- 	client->watch = g_dbus_add_service_watch(connection, service,
- 						service_connect,
- 						service_disconnect,
- 						client, NULL);
--	g_ptr_array_add(client->match_rules, g_strdup_printf("type='signal',"
--				"sender='%s',"
--				"path='/',interface='%s.ObjectManager',"
--				"member='InterfacesAdded'",
--				client->service_name, DBUS_INTERFACE_DBUS));
--	g_ptr_array_add(client->match_rules, g_strdup_printf("type='signal',"
--				"sender='%s',"
--				"path='/',interface='%s.ObjectManager',"
--				"member='InterfacesRemoved'",
--				client->service_name, DBUS_INTERFACE_DBUS));
-+	client->added_watch = g_dbus_add_signal_watch(connection, service,
-+						"/",
-+						DBUS_INTERFACE_OBJECT_MANAGER,
-+						"InterfacesAdded",
-+						interfaces_added,
-+						client, NULL);
-+	client->removed_watch = g_dbus_add_signal_watch(connection, service,
-+						"/",
-+						DBUS_INTERFACE_OBJECT_MANAGER,
-+						"InterfacesRemoved",
-+						interfaces_removed,
-+						client, NULL);
- 	g_ptr_array_add(client->match_rules, g_strdup_printf("type='signal',"
- 				"sender='%s',path_namespace='%s'",
- 				client->service_name, client->base_path));
-@@ -1225,6 +1224,8 @@ void g_dbus_client_unref(GDBusClient *client)
- 		client->disconn_func(client->dbus_conn, client->disconn_data);
- 
- 	g_dbus_remove_watch(client->dbus_conn, client->watch);
-+	g_dbus_remove_watch(client->dbus_conn, client->added_watch);
-+	g_dbus_remove_watch(client->dbus_conn, client->removed_watch);
- 
- 	dbus_connection_unref(client->dbus_conn);
- 
+-	dbus_connection_remove_filter(connection, message_filter, NULL);
+ }
 -- 
 1.8.3.1
 
