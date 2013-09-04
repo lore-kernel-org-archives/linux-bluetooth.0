@@ -1,65 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 4 Sep 2013 18:14:23 +0200
-From: Michael =?UTF-8?B?QsO8c2No?= <m@bues.ch>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
 Subject: Re: Bluetooth regression in 3.10
-Message-ID: <20130904181423.50ff9f20@milhouse>
-In-Reply-To: <F0FC77C9-DCEF-48B8-8ABF-12446908AAC4@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20130904155318.21cb6f37@milhouse>
+Date: Wed, 4 Sep 2013 08:40:00 -0700
+Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org
+Message-Id: <F0FC77C9-DCEF-48B8-8ABF-12446908AAC4@holtmann.org>
 References: <20130904155318.21cb6f37@milhouse>
-	<F0FC77C9-DCEF-48B8-8ABF-12446908AAC4@holtmann.org>
-Mime-Version: 1.0
-Content-Type: multipart/signed; micalg=PGP-SHA1;
- boundary="Sig_/Gqt_Z/REF+C9FUWRtrdfAHm"; protocol="application/pgp-signature"
+To: =?iso-8859-1?Q?Michael_B=FCsch?= <m@bues.ch>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Sig_/Gqt_Z/REF+C9FUWRtrdfAHm
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hi Michael,
 
-On Wed, 4 Sep 2013 08:40:00 -0700
-Marcel Holtmann <marcel@holtmann.org> wrote:
+> I noticed the thread "3.10-rc: bluetooth disappeared on thinkpad x60 (regression)"
+> on lkml, but unfortunately the resulting patch does not fix the regression
+> for me.
+> I'm running 3.10.10, so the fix from the thread is applied to my kernel.
+> 
+> I see similar issues when trying to bring up my Bluetooth dongle:
+> 
+> $ lsusb | grep Blue
+> Bus 004 Device 002: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)
+> 
+> This is a Broadcom chip based device.
 
-> > This is a Broadcom chip based device.
->=20
-> that device is CSR based and not Broadcom based. Check with hciconfig hci=
-0 version to see what it really is.
+that device is CSR based and not Broadcom based. Check with hciconfig hci0 version to see what it really is.
+> 
+> $ hciconfig hci0 up                                            
+> Can't init device hci0: Operation not supported (95)
+> 
+> hcidump hci0 -X shows:
+> 
+> < HCI Command: Delete Stored Link Key (0x03|0x0012) plen 7
+>    bdaddr 00:00:00:00:00:00 all 1
+>> HCI Event: Command Complete (0x0e) plen 4
+>    Delete Stored Link Key (0x03|0x0012) ncmd 1
+>    status 0x11 deleted 0
+>    Error: Unsupported Feature or Parameter Value
+> device: disconnected
 
-I'm pretty sure there is a Broadcom chip in there, because I opened it once.
+And hciconfig hci0 commands tells you that this command is actually supported.
 
-> Check with hciconfig hci0 version to see what it really is.
+> The following workaround fixes the problem for me:
+> 
+> Index: linux/net/bluetooth/hci_core.c
+> ===================================================================
+> --- linux.orig/net/bluetooth/hci_core.c	2013-07-21 17:34:22.749435335 +0200
+> +++ linux/net/bluetooth/hci_core.c	2013-09-04 15:39:07.580170034 +0200
+> @@ -598,7 +598,7 @@
+> 	u8 p;
+> 
+> 	/* Only send HCI_Delete_Stored_Link_Key if it is supported */
+> -	if (hdev->commands[6] & 0x80) {
+> +	if (0) {
+> 		struct hci_cp_delete_stored_link_key cp;
+> 
+> 		bacpy(&cp.bdaddr, BDADDR_ANY);
 
-$ hciconfig hci0 version | grep Manu
-        Manufacturer: Broadcom Corporation (15)
+Can you toy with hcitool cmd to send the HCI_Delete_Stored_Link_Key commands and see what parameters it would accept to delete all keys.
 
-> Can you toy with hcitool cmd to send the HCI_Delete_Stored_Link_Key comma=
-nds and see what parameters it would accept to delete all keys.
+Regards
 
-Can you give me a few hints and examples?
+Marcel
 
---=20
-Michael
-
---Sig_/Gqt_Z/REF+C9FUWRtrdfAHm
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Disposition: attachment; filename=signature.asc
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.21 (GNU/Linux)
-
-iQIcBAEBAgAGBQJSJ1xiAAoJEPUyvh2QjYsOTWEP/3AEuVgnsIwyN09lheCXdXKu
-RP7PTYZrUV5B3JoFVoIkZeGM+sWwMv/EpMqAPU+rsqpBLT913Am1LV4wsfxZ8KZr
-KPe3cjtPqQ4WVNYdkjQxtRuZCQi7W7A6ndPRsCq6Nul/ak/9YhSBilagQoTzpR+1
-W5LzdDdD1f4cxwndJmZ+mFUOM1HMH089xhFzvlzMnRuaKlKZgl0Jvsj/Ir26dNpA
-d9s2/PmkvPTi+Xrs62XdVGVjIzrKhhMQptaidDP09SRbCUwdJsLTYE63u0PY8V4m
-wRCrFWiCcS2TBBa/T+GVL1mQK5uAWsV6mWfGZGXhKBLvgjQXU1K8k+cw9DI9sZYV
-CSeeYkCRFrcdGZMM39PVrbUsD/2/2aWI1FnTyCHMC7cYQRTi9CI0hm8rzoZR8jdC
-q91ogA/4KL23aF4hBbg2FHYn7wtL/5Gfw5Axgeeik9o+i3DHfm+8hmT21m4I+OT4
-Kx+OTnIel/xSdG1MoIlmQZ2AkfIfNxwqWROItKBUTyf6raA35sUdl5MVwfkgp3+1
-3V6B+pq+oDErrw9mY6u5LJoYYcOvfP/N5KxJdLOMIvaoJrQNmMBs1/m71dRKqJM2
-2mHCgyh3G1VYwxHj3k3mPjYbTNpSlTrsyTqbOka2tf36L8u+EYOriuw+XIz3lvse
-cYiL7BdCXnZniFSJpfFu
-=ZOWq
------END PGP SIGNATURE-----
-
---Sig_/Gqt_Z/REF+C9FUWRtrdfAHm--
