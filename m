@@ -1,54 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Dirk-Jan C. Binnema" <djcb.bulk@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: "Dirk-Jan C. Binnema" <djcb@djcbsoftware.nl>
-Subject: [PATCH] build: use -lrt for clock_gettime on glibc < 2.17
-Date: Fri,  6 Sep 2013 11:09:16 +0300
-Message-Id: <1378454956-26605-1-git-send-email-djcb.bulk@gmail.com>
-In-Reply-To: <52E3B66B-DC7A-4225-8779-8C1E9B0FC15E@holtmann.org>
-References: <52E3B66B-DC7A-4225-8779-8C1E9B0FC15E@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+References: <1378449817-575-1-git-send-email-djcb.bulk@gmail.com> <52E3B66B-DC7A-4225-8779-8C1E9B0FC15E@holtmann.org>
+From: Dirk-Jan C. Binnema <djcb.bulk@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth\@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] build: use -lrt for clock_gettime on glibc < 2.17
+In-reply-to: <52E3B66B-DC7A-4225-8779-8C1E9B0FC15E@holtmann.org>
+Date: Fri, 06 Sep 2013 11:07:02 +0300
+Message-ID: <87mwnqnzkp.fsf@djcbsoftware.nl>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: "Dirk-Jan C. Binnema" <djcb@djcbsoftware.nl>
+Hi Marcel,
 
-glibc before 2.17 (e.g., fedora 18) requires -lrt for clock_gettime;
-add -lrt where needed in that case.
----
- Makefile.am  | 2 +-
- configure.ac | 6 ++++--
- 2 files changed, 5 insertions(+), 3 deletions(-)
+marcel@holtmann.org writes:
 
-diff --git a/Makefile.am b/Makefile.am
-index 61daec4..8069af2 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -152,7 +152,7 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
- 			src/shared/util.h src/shared/util.c \
- 			src/shared/mgmt.h src/shared/mgmt.c
- src_bluetoothd_LDADD = lib/libbluetooth-internal.la gdbus/libgdbus-internal.la \
--			@GLIB_LIBS@ @DBUS_LIBS@ -ldl -lrt
-+			@GLIB_LIBS@ @DBUS_LIBS@ @RT_LIBS@ -ldl
- src_bluetoothd_LDFLAGS = $(AM_LDFLAGS) -Wl,--export-dynamic \
- 				-Wl,--version-script=$(srcdir)/src/bluetooth.ver
- 
-diff --git a/configure.ac b/configure.ac
-index 050d30d..e7a7b85 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -40,8 +40,10 @@ AC_ARG_ENABLE(threads, AC_HELP_STRING([--enable-threads],
- AC_CHECK_FUNC(signalfd, dummy=yes,
- 			AC_MSG_ERROR(signalfd support is required))
- 
--AC_CHECK_FUNC(clock_gettime, dummy=yes,
--			AC_MSG_ERROR(realtime clock support is required))
-+AC_CHECK_FUNC(clock_gettime, [], [
-+  AC_CHECK_LIB(rt, clock_gettime, RT_LIBS="-lrt",
-+    AC_MSG_ERROR(realtime clock support is required))])
-+AC_SUBST(RT_LIBS)
- 
- AC_CHECK_LIB(pthread, pthread_create, dummy=yes,
- 			AC_MSG_ERROR(posix thread support is required))
+> Hi Dirk-Jan,,
+>
+>> glibc before 2.17 (e.g., fedora 18) requires -lrt for clock_gettime.
+>> AC_SEARCH_LIBS adds it to LIBS in that case
+>> ---
+>> configure.ac | 1 +
+>> 1 file changed, 1 insertion(+)
+>> 
+>> diff --git a/configure.ac b/configure.ac
+>> index 050d30d..403e323 100644
+>> --- a/configure.ac
+>> +++ b/configure.ac
+>> @@ -40,6 +40,7 @@ AC_ARG_ENABLE(threads, AC_HELP_STRING([--enable-threads],
+>> AC_CHECK_FUNC(signalfd, dummy=yes,
+>> 			AC_MSG_ERROR(signalfd support is required))
+>> 
+>> +AC_SEARCH_LIBS(clock_gettime,rt)
+>
+> I do like this since this now it links everything with -lrt even if it is not needed.
+
+Hmm, I suppose there's a missing 'not'...
+
+Note, AC_SEARCH_LIBS tries without rt first, and only adds -lrt if
+clock_gettime is not defined without it.
+
+Or did you mean building parts of bluez without -lrt in the glibc < 2.17
+case? If so, please see my next patch, which only uses -lrt (if needed)
+for bluetoothd.
+
+Cheers,
+Dirk.
+
+
 -- 
-1.8.3.1
-
+Dirk-Jan C. Binnema                  Helsinki, Finland
+e:djcb@djcbsoftware.nl           w:www.djcbsoftware.nl
+pgp: D09C E664 897D 7D39 5047 A178 E96A C7A1 017D DA3C
