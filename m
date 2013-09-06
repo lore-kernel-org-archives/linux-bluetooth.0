@@ -1,54 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-References: <1378449817-575-1-git-send-email-djcb.bulk@gmail.com> <52E3B66B-DC7A-4225-8779-8C1E9B0FC15E@holtmann.org>
-From: Dirk-Jan C. Binnema <djcb.bulk@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth\@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] build: use -lrt for clock_gettime on glibc < 2.17
-In-reply-to: <52E3B66B-DC7A-4225-8779-8C1E9B0FC15E@holtmann.org>
-Date: Fri, 06 Sep 2013 11:07:02 +0300
-Message-ID: <87mwnqnzkp.fsf@djcbsoftware.nl>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Change __FUNCTION__ to __func__
+Date: Fri,  6 Sep 2013 11:02:10 +0300
+Message-Id: <1378454530-24686-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1378454530-24686-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1378454530-24686-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-marcel@holtmann.org writes:
+checkpatch.pl recommends to use __func__ instead of __FUNCTION__.
+---
+ attrib/gattrib.c    | 2 +-
+ gobex/gobex-debug.h | 2 +-
+ obexd/src/log.h     | 2 +-
+ src/log.h           | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-> Hi Dirk-Jan,,
->
->> glibc before 2.17 (e.g., fedora 18) requires -lrt for clock_gettime.
->> AC_SEARCH_LIBS adds it to LIBS in that case
->> ---
->> configure.ac | 1 +
->> 1 file changed, 1 insertion(+)
->> 
->> diff --git a/configure.ac b/configure.ac
->> index 050d30d..403e323 100644
->> --- a/configure.ac
->> +++ b/configure.ac
->> @@ -40,6 +40,7 @@ AC_ARG_ENABLE(threads, AC_HELP_STRING([--enable-threads],
->> AC_CHECK_FUNC(signalfd, dummy=yes,
->> 			AC_MSG_ERROR(signalfd support is required))
->> 
->> +AC_SEARCH_LIBS(clock_gettime,rt)
->
-> I do like this since this now it links everything with -lrt even if it is not needed.
-
-Hmm, I suppose there's a missing 'not'...
-
-Note, AC_SEARCH_LIBS tries without rt first, and only adds -lrt if
-clock_gettime is not defined without it.
-
-Or did you mean building parts of bluez without -lrt in the glibc < 2.17
-case? If so, please see my next patch, which only uses -lrt (if needed)
-for bluetoothd.
-
-Cheers,
-Dirk.
-
-
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+index c662ace..609b908 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -718,7 +718,7 @@ gboolean g_attrib_unregister(GAttrib *attrib, guint id)
+ 	GSList *l;
+ 
+ 	if (id == 0) {
+-		warn("%s: invalid id", __FUNCTION__);
++		warn("%s: invalid id", __func__);
+ 		return FALSE;
+ 	}
+ 
+diff --git a/gobex/gobex-debug.h b/gobex/gobex-debug.h
+index 688466e..a98653d 100644
+--- a/gobex/gobex-debug.h
++++ b/gobex/gobex-debug.h
+@@ -40,7 +40,7 @@ extern guint gobex_debug;
+ #define g_obex_debug(level, format, ...) \
+ 	if (gobex_debug & level) \
+ 		g_log("gobex", G_LOG_LEVEL_DEBUG, "%s:%s() " format, __FILE__, \
+-						__FUNCTION__, ## __VA_ARGS__)
++						__func__, ## __VA_ARGS__)
+ 
+ static inline void g_obex_dump(guint level, const char *prefix,
+ 					const void *buf, gsize len)
+diff --git a/obexd/src/log.h b/obexd/src/log.h
+index 1bf1b05..d9fb867 100644
+--- a/obexd/src/log.h
++++ b/obexd/src/log.h
+@@ -52,5 +52,5 @@ struct obex_debug_desc {
+ 		.file = __FILE__, .flags = OBEX_DEBUG_FLAG_DEFAULT, \
+ 	}; \
+ 	if (__obex_debug_desc.flags & OBEX_DEBUG_FLAG_PRINT) \
+-		obex_debug("%s:%s() " fmt,  __FILE__, __FUNCTION__ , ## arg); \
++		obex_debug("%s:%s() " fmt,  __FILE__, __func__ , ## arg); \
+ } while (0)
+diff --git a/src/log.h b/src/log.h
+index 3d34fa3..bf9eac2 100644
+--- a/src/log.h
++++ b/src/log.h
+@@ -55,5 +55,5 @@ void __btd_enable_debug(struct btd_debug_desc *start,
+ 		.file = __FILE__, .flags = BTD_DEBUG_FLAG_DEFAULT, \
+ 	}; \
+ 	if (__btd_debug_desc.flags & BTD_DEBUG_FLAG_PRINT) \
+-		btd_debug("%s:%s() " fmt,  __FILE__, __FUNCTION__ , ## arg); \
++		btd_debug("%s:%s() " fmt,  __FILE__, __func__ , ## arg); \
+ } while (0)
 -- 
-Dirk-Jan C. Binnema                  Helsinki, Finland
-e:djcb@djcbsoftware.nl           w:www.djcbsoftware.nl
-pgp: D09C E664 897D 7D39 5047 A178 E96A C7A1 017D DA3C
+1.8.1.2
+
