@@ -1,65 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed; delsp=yes
-Date: Mon, 09 Sep 2013 07:08:48 -0000
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Can't initialize a Bluetooth antenna.
-MIME-Version: 1.0
-From: atar <atar.yosef@gmail.com>
-Message-ID: <op.w24t4yu9e4gg2u@localhost>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: David Herrmann <dh.herrmann@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	David Herrmann <dh.herrmann@gmail.com>
+Subject: [PATCH bluez] bnep: don't error() if kernel lacks bnep module
+Date: Fri,  6 Sep 2013 16:23:07 +0200
+Message-Id: <1378477387-13186-1-git-send-email-dh.herrmann@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi there!!
+If a user disables bnep kernel support, they normally do that on purpose.
+It's misleading to print an error during module-startup in this situation.
+Therefore, only print a hint that bnep-support is missing if
+EPROTONOSUPPORT is returned by the kernel.
 
-When I try to use the hciconfig command to initialized my Bluetooth  
-antenna like the command:
+Furthermore, allow modules to forward ENOSYS as error to bluetoothd core
+to handle it as "module is not compatible with system setup" instead of an
+error. ENOSYS is commonly used to signal "missing kernel infrastructure"
+so it seems appropriate here.
+---
+ profiles/network/common.c  |  7 ++++++-
+ profiles/network/manager.c | 17 ++++++++++++++---
+ src/plugin.c               | 11 +++++++++--
+ 3 files changed, 29 insertions(+), 6 deletions(-)
 
-hciconfig hci0 up OR hciconfig hci0 reset
-
-it emits an error message saying:
-
-Can't init device hci0: Connection timed out (110).
-
-dmesg reports the following errors messages:
-
-[   15.084017] Bluetooth: hci0 command tx timeout
-[   17.611516] input: ACPI Virtual Keyboard Device as  
-/devices/virtual/input/input5
-[   32.826814] Bluetooth: RFCOMM TTY layer initialized
-[   32.828142] Bluetooth: RFCOMM socket layer initialized
-[   32.829376] Bluetooth: RFCOMM ver 1.11
-[   32.869417] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[   32.870701] Bluetooth: BNEP filters: protocol multicast
-[   33.422622] lp0: using parport0 (interrupt-driven).
-[   33.433318] ppdev: user-space parallel port driver
-[   33.982250] atl2 0000:01:00.0: irq 43 for MSI/MSI-X
-[   33.982474] ADDRCONF(NETDEV_UP): eth1: link is not ready
-[   38.136034] usb 2-1: reset full-speed USB device number 2 using uhci_hcd
-[   38.286042] btusb 2-1:1.0: no reset_resume for driver btusb?
-[   38.286048] btusb 2-1:1.1: no reset_resume for driver btusb?
-[   66.706329] fuse init (API version 7.17)
-
-and the 'bluez-simple-agent' command emits the following error messages:
-
-Traceback (most recent call last):
-  File "/usr/bin/bluez-simple-agent", line 104, in <module>
-    path = manager.DefaultAdapter()
-  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 70, in  
-__call__
-    return self._proxy_method(*args, **keywords)
-  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 145, in  
-__call__
-    **keywords)
-  File "/usr/lib/python2.7/dist-packages/dbus/connection.py", line 651, in  
-call_blocking
-    message, timeout)
-dbus.exceptions.DBusException: org.bluez.Error.NoSuchAdapter: No such  
-adapter
-
-Has anyone here an idea what's going on?
-
-NOTE: the system is a Wheezy Debian system.
-
-Thanks in advance!!
-
-atar.
+diff --git a/profiles/network/common.c b/profiles/network/common.c
+index e069892..17bff30 100644
+--- a/profiles/network/common.c
++++ b/profiles/network/common.c
+@@ -110,8 +110,13 @@ int bnep_init(void)
+ 
+ 	if (ctl < 0) {
+ 		int err = -errno;
+-		error("Failed to open control socket: %s (%d)",
++
++		if (err == -EPROTONOSUPPORT)
++			info("kernel lacks bnep-protocol support");
++		else
++			error("Failed to open control socket: %s (%d)",
+ 						strerror(-err), -err);
++
+ 		return err;
+ 	}
+ 
+diff --git a/profiles/network/manager.c b/profiles/network/manager.c
+index 03b1b3d..7697766 100644
+--- a/profiles/network/manager.c
++++ b/profiles/network/manager.c
+@@ -25,6 +25,7 @@
+ #include <config.h>
+ #endif
+ 
++#include <errno.h>
+ #include <stdbool.h>
+ 
+ #include <bluetooth/bluetooth.h>
+@@ -169,11 +170,21 @@ static struct btd_profile nap_profile = {
+ 
+ static int network_init(void)
+ {
++	int r;
++
+ 	read_config(CONFIGDIR "/network.conf");
+ 
+-	if (bnep_init()) {
+-		error("Can't init bnep module");
+-		return -1;
++	r = bnep_init();
++	if (r) {
++		if (r == -EPROTONOSUPPORT) {
++			info("bnep module not available, disabling plugin");
++			r = -ENOSYS;
++		} else {
++			error("Can't init bnep module");
++			r = -1;
++		}
++
++		return r;
+ 	}
+ 
+ 	/*
+diff --git a/src/plugin.c b/src/plugin.c
+index 51c98bc..396c8af 100644
+--- a/src/plugin.c
++++ b/src/plugin.c
+@@ -119,6 +119,7 @@ gboolean plugin_init(const char *enable, const char *disable)
+ 	const char *file;
+ 	char **cli_disabled, **cli_enabled;
+ 	unsigned int i;
++	int r;
+ 
+ 	/* Make a call to BtIO API so its symbols got resolved before the
+ 	 * plugins are loaded. */
+@@ -196,8 +197,14 @@ start:
+ 	for (list = plugins; list; list = list->next) {
+ 		struct bluetooth_plugin *plugin = list->data;
+ 
+-		if (plugin->desc->init() < 0) {
+-			error("Failed to init %s plugin", plugin->desc->name);
++		r = plugin->desc->init();
++		if (r < 0) {
++			if (r == -ENOSYS)
++				info("System does not support %s plugin",
++							plugin->desc->name);
++			else
++				error("Failed to init %s plugin",
++							plugin->desc->name);
+ 			continue;
+ 		}
+ 
+-- 
+1.8.4
