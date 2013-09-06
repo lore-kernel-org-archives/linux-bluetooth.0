@@ -1,26 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 6 Sep 2013 13:38:06 +0300
+Date: Fri, 6 Sep 2013 12:06:21 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: David Herrmann <dh.herrmann@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH] hog: ignore UHID-setup events and document why
-Message-ID: <20130906103806.GA4139@x220.p-661hnu-f1>
-References: <1378123089-3980-1-git-send-email-dh.herrmann@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Bluetooth: Disable upper layer connections when user
+ channel is active
+Message-ID: <20130906090621.GA1608@x220.p-661hnu-f1>
+References: <1378256918-50836-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1378123089-3980-1-git-send-email-dh.herrmann@gmail.com>
+In-Reply-To: <1378256918-50836-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Marcel,
 
-On Mon, Sep 02, 2013, David Herrmann wrote:
-> The UHID_{START,STOP,OPEN,CLOSE} events should be ignored by us to avoid
-> triggering the warn(). It is safe to do that. Add few comments that
-> explain why we don't have to handle these.
+On Tue, Sep 03, 2013, Marcel Holtmann wrote:
+> When the device has the user channel flag set, it means it is driven by
+> an user application. In that case do not allow any connections from
+> L2CAP or SCO sockets.
+> 
+> This is the same situation as when the device has the raw flag set and
+> it will then return EHOSTUNREACH.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  profiles/input/hog.c | 32 +++++++++++++++++++++++++++++++-
->  1 file changed, 31 insertions(+), 1 deletion(-)
+>  net/bluetooth/hci_conn.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-Applied. Thanks.
+Acked-by: Johan Hedberg <johan.hedberg@intel.com>
 
 Johan
