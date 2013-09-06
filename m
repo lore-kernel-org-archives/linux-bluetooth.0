@@ -1,35 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: "Dirk-Jan C. Binnema" <djcb.bulk@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Fix crash setting NULL name
-Date: Fri,  6 Sep 2013 11:02:09 +0300
-Message-Id: <1378454530-24686-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: "Dirk-Jan C. Binnema" <djcb@djcbsoftware.nl>
+Subject: [PATCH] build: use -lrt for clock_gettime on glibc < 2.17
+Date: Fri,  6 Sep 2013 09:43:37 +0300
+Message-Id: <1378449817-575-1-git-send-email-djcb.bulk@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: "Dirk-Jan C. Binnema" <djcb@djcbsoftware.nl>
 
-set_name might be invoked with name argument as shown below:
-set_name(adapter, btd_adapter_get_name(adapter)) and
-btd_adapter_get_name may return NULL. Add check to prevent crash.
+glibc before 2.17 (e.g., fedora 18) requires -lrt for clock_gettime.
+AC_SEARCH_LIBS adds it to LIBS in that case
 ---
- src/adapter.c | 3 +++
- 1 file changed, 3 insertions(+)
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 17f5508..7291a6d 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -643,6 +643,9 @@ static int set_name(struct btd_adapter *adapter, const char *name)
- 	struct mgmt_cp_set_local_name cp;
- 	char maxname[MAX_NAME_LENGTH + 1];
+diff --git a/configure.ac b/configure.ac
+index 050d30d..403e323 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -40,6 +40,7 @@ AC_ARG_ENABLE(threads, AC_HELP_STRING([--enable-threads],
+ AC_CHECK_FUNC(signalfd, dummy=yes,
+ 			AC_MSG_ERROR(signalfd support is required))
  
-+	if (name == NULL)
-+		return -EINVAL;
-+
- 	memset(maxname, 0, sizeof(maxname));
- 	strncpy(maxname, name, MAX_NAME_LENGTH);
++AC_SEARCH_LIBS(clock_gettime,rt)
+ AC_CHECK_FUNC(clock_gettime, dummy=yes,
+ 			AC_MSG_ERROR(realtime clock support is required))
  
 -- 
-1.8.1.2
+1.8.3.1
 
