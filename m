@@ -1,94 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1378207279-14557-1-git-send-email-luiz.dentz@gmail.com>
+References: <1378207279-14557-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 9 Sep 2013 17:40:46 +0300
+Message-ID: <CABBYNZLM6vahniCiRZ3st6mBEHBgHEnJtOB9j+Vj-eK+7vyjfQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 00/10 v3] Fix message order
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/8] unit: Add gdbus/client_proxy_removed
-Date: Mon,  9 Sep 2013 17:49:32 +0300
-Message-Id: <1378738179-21047-1-git-send-email-luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi,
 
-This tests if watches created using g_dbus_proxy_set_removed_watch works
-when the interface is removed.
----
- unit/test-gdbus-client.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
+On Tue, Sep 3, 2013 at 2:21 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> s set fixes a couple of issues introduced with the use of ObjectManager due
+> the processing of signals on idle to group changes, this has been causing
+> issues with external components such as ofono and pulseaudio that sometimes
+> receives connections from devices objects that have pending signals thus
+> cannot be properly processed or have to be assumed paired and with certain
+> UUIDs which is not ideal.
+>
+> v2: Fixes some commit messages as suggested by Lucas Demarchi, in addition to
+> that rework flush mechanism to honor the order of the pending signals and make
+> it work with any connection.
+>
+> v3: Add comments regarding the use of dbus_connection_send to prevent recursive
+> calls to g_dbus_flush.
+>
+> Luiz Augusto von Dentz (10):
+>   build: Fix not rebuilding bluetoothd if gdbus changes
+>   unit: Add gdbus/client_check_order
+>   gdbus: Fix sending ObjectManager/Properties signals out of order
+>   gdbus: Add g_dbus_send_message_with_reply
+>   gdbus: Avoid calling dbus_connection_send*
+>   gdbus: Fix emitting PropertiesChanged twice
+>   core: Make use of g_dbus_send_message_with_reply
+>   neard: Make use of g_dbus_send_message_with_reply
+>   audio/media: Make use of g_dbus_send_message_with_reply
+>   obexd: Make use of g_dbus_send_message*
+>
+>  Makefile.am                   |   2 +-
+>  gdbus/client.c                |  14 ++--
+>  gdbus/gdbus.h                 |   3 +
+>  gdbus/object.c                | 176 ++++++++++++++++++++++++------------------
+>  obexd/plugins/bluetooth.c     |   2 +-
+>  obexd/plugins/pcsuite.c       |   5 +-
+>  obexd/plugins/syncevolution.c |   6 +-
+>  obexd/src/manager.c           |   3 +-
+>  plugins/neard.c               |   2 +-
+>  profiles/audio/media.c        |   2 +-
+>  src/agent.c                   |  12 +--
+>  src/profile.c                 |   4 +-
+>  unit/test-gdbus-client.c      |  71 +++++++++++++++++
+>  13 files changed, 200 insertions(+), 102 deletions(-)
+>
+> --
+> 1.8.3.1
 
-diff --git a/unit/test-gdbus-client.c b/unit/test-gdbus-client.c
-index 488d4ec..30b0ce3 100644
---- a/unit/test-gdbus-client.c
-+++ b/unit/test-gdbus-client.c
-@@ -848,6 +848,61 @@ static void client_check_order(void)
- 	destroy_context(context);
- }
- 
-+static void proxy_removed(GDBusProxy *proxy, void *user_data)
-+{
-+	struct context *context = user_data;
-+
-+	if (g_test_verbose())
-+		g_print("proxy removed\n");
-+
-+	g_main_loop_quit(context->main_loop);
-+}
-+
-+static void proxy_set_removed(GDBusProxy *proxy, void *user_data)
-+{
-+	struct context *context = user_data;
-+
-+	if (g_test_verbose())
-+		g_print("proxy %s found\n",
-+					g_dbus_proxy_get_interface(proxy));
-+
-+	g_assert(g_dbus_proxy_set_removed_watch(proxy, proxy_removed, context));
-+
-+	context->timeout_source = g_timeout_add_seconds(2, timeout_test,
-+								context);
-+
-+	g_dbus_unregister_interface(context->dbus_conn, SERVICE_PATH,
-+								SERVICE_NAME);
-+}
-+
-+static void client_proxy_removed(void)
-+{
-+	struct context *context = create_context();
-+	static const GDBusPropertyTable string_properties[] = {
-+		{ "String", "s", get_string, set_string, string_exists },
-+		{ },
-+	};
-+
-+	if (context == NULL)
-+		return;
-+
-+	g_dbus_register_interface(context->dbus_conn,
-+				SERVICE_PATH, SERVICE_NAME,
-+				methods, signals, string_properties,
-+				context, NULL);
-+
-+	context->dbus_client = g_dbus_client_new(context->dbus_conn,
-+						SERVICE_NAME, SERVICE_PATH);
-+
-+	g_dbus_client_set_proxy_handlers(context->dbus_client,
-+						proxy_set_removed, NULL, NULL,
-+						context);
-+
-+	g_main_loop_run(context->main_loop);
-+
-+	destroy_context(context);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	g_test_init(&argc, &argv, NULL);
-@@ -880,5 +935,7 @@ int main(int argc, char *argv[])
- 
- 	g_test_add_func("/gdbus/client_check_order", client_check_order);
- 
-+	g_test_add_func("/gdbus/client_proxy_removed", client_proxy_removed);
-+
- 	return g_test_run();
- }
+I went ahead and pushed this upstream.
+
+
 -- 
-1.8.3.1
-
+Luiz Augusto von Dentz
