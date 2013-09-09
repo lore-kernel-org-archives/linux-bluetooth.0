@@ -1,36 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1378794508.4799.33.camel@porter.coelho.fi>
-Subject: Re: Linux Wireless Mini-Summit in New Orleans -- 19-20 September
-From: Luca Coelho <luca@coelho.fi>
+Date: Mon, 9 Sep 2013 16:50:50 -0500
+From: Seth Forshee <seth.forshee@canonical.com>
 To: "John W. Linville" <linville@tuxdriver.com>
 Cc: Dan Williams <dcbw@redhat.com>, linux-wireless@vger.kernel.org,
- johannes@sipsolutions.net, marcel@holtmann.org, Samuel Ortiz
- <samuel@sortiz.org>,  Gustavo Padovan <gustavo@padovan.org>,
- linux-bluetooth@vger.kernel.org, linux-nfc@ml01.01.org
-Date: Tue, 10 Sep 2013 09:28:28 +0300
-In-Reply-To: <20130909192346.GC1955@tuxdriver.com>
+	johannes@sipsolutions.net, marcel@holtmann.org,
+	Samuel Ortiz <samuel@sortiz.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org, linux-nfc@ml01.01.org
+Subject: Re: Linux Wireless Mini-Summit in New Orleans -- 19-20 September
+Message-ID: <20130909215050.GC27771@thinkpad-t410>
 References: <20130808185410.GD30925@tuxdriver.com>
-	 <20130808190428.GF30925@tuxdriver.com>
-	 <20130905133907.GE1947@tuxdriver.com>
-	 <1378397092.3580.21.camel@dcbw.foobar.com>
-	 <20130909192346.GC1955@tuxdriver.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+ <20130808190428.GF30925@tuxdriver.com>
+ <20130905133907.GE1947@tuxdriver.com>
+ <1378397092.3580.21.camel@dcbw.foobar.com>
+ <20130909192346.GC1955@tuxdriver.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20130909192346.GC1955@tuxdriver.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+On Mon, Sep 09, 2013 at 03:23:46PM -0400, John W. Linville wrote:
+> Seth, Stanislaw, etc -- anyone want to cover issues dealing with
+> supporting wireless in distributions?
 
-On Mon, 2013-09-09 at 15:23 -0400, John W. Linville wrote:
-> Arend, Kalle, Johannes, Luca, etc -- anyone want to talk about driver
-> developments and/or issues between drivers and mac80211 or other
-> parts of the stack?
+Probably best if we can get input from all those present representing
+distros. I'm happy to share about what our biggest pain points are in
+Ubuntu.
 
-Unfortunately I didn't get "sponsorship" to join the summit this year.
-Second one (for different reasons) that I'll miss in a row.  Hopefully
-next time I'll be there.
-
-Have fun! :)
-
---
-Cheers,
-Luca.
+Seth
