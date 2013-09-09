@@ -1,27 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 9 Sep 2013 11:29:19 +0300
+Date: Mon, 9 Sep 2013 11:23:39 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau
-	<frederic.dalleau@linux.intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] sco-tester: Update ECONNABORTED to EOPNOTSUPP
-Message-ID: <20130909082919.GB29399@x220.p-661hnu-f1>
-References: <1376062977-1497-1-git-send-email-frederic.dalleau@linux.intel.com>
+Subject: Re: [PATCH 2/2] Bluetooth: Only schedule raw queue when user channel
+ is active
+Message-ID: <20130909082339.GA29399@x220.p-661hnu-f1>
+References: <1378256918-50836-2-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1376062977-1497-1-git-send-email-frederic.dalleau@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1378256918-50836-2-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Frederic,
+Hi Marcel,
 
-On Fri, Aug 09, 2013, Frédéric Dalleau wrote:
-> Kernel interface has evolved in between.
+On Tue, Sep 03, 2013, Marcel Holtmann wrote:
+> When the user channel is set and an user application has full control
+> over the device, do not bother trying to schedule any queues except
+> the raw queue.
+> 
+> This is an optimization since with user channel, only the raw queue
+> is in use.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  tools/sco-tester.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  net/bluetooth/hci_core.c | 16 +++++++---------
+>  1 file changed, 7 insertions(+), 9 deletions(-)
 
-I've applied and pushed this patch, but there are a couple of details in
-the other ones that I'd like to get fixed before pushing.
+Acked-by: Johan Hedberg <johan.hedberg@intel.com>
 
 Johan
