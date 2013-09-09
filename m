@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 7/8] gdbus/client: Use g_dbus_add_signal_watch to track signals
-Date: Mon,  9 Sep 2013 17:49:38 +0300
-Message-Id: <1378738179-21047-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/8] gdbus/watch: Fix crash when g_dbus_remove_watch is called from connect callback
+Date: Mon,  9 Sep 2013 17:49:34 +0300
+Message-Id: <1378738179-21047-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1378738179-21047-1-git-send-email-luiz.dentz@gmail.com>
 References: <1378738179-21047-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,178 +11,50 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This make the handling much simpler and avoids duplicates of the same
-match rule.
+ at 0x40570C: update_service (watch.c:601)
+ by 0x40584B: service_reply (watch.c:627)
+ by 0x3B0700C511: ??? (in /usr/lib64/libdbus-1.so.3.7.4)
+ by 0x3B0700F740: dbus_connection_dispatch (in /usr/lib64/libdbus-1.so.3.7.4)
+ by 0x405167: message_dispatch (mainloop.c:76)
+ by 0x3B03C48962: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
+ by 0x3B03C47E05: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3600.3)
+ by 0x3B03C48157: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
+ by 0x3B03C48559: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3600.3)
+Address 0x4c58a30 is 32 bytes inside a block of size 56 free'd
+ at 0x4A074C4: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+ by 0x3B03C4D9AE: g_free (in /usr/lib64/libglib-2.0.so.0.3600.3)
+ by 0x406102: filter_data_remove_callback (watch.c:378)
+ by 0x405FC0: g_dbus_remove_watch (watch.c:798)
+ by 0x40A22B: g_dbus_client_unref (client.c:1227)
+ by 0x40570B: update_service (watch.c:599)
+ by 0x40584B: service_reply (watch.c:627)
 ---
- gdbus/client.c | 73 +++++++++++++++++++++++++++++-----------------------------
- 1 file changed, 37 insertions(+), 36 deletions(-)
+ gdbus/watch.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/gdbus/client.c b/gdbus/client.c
-index 7a14d7e..01d7d02 100644
---- a/gdbus/client.c
-+++ b/gdbus/client.c
-@@ -25,6 +25,7 @@
- #include <config.h>
- #endif
- 
-+#include <stdio.h>
- #include <glib.h>
- #include <dbus/dbus.h>
- 
-@@ -32,12 +33,18 @@
- 
- #define METHOD_CALL_TIMEOUT (300 * 1000)
- 
-+#ifndef DBUS_INTERFACE_OBJECT_MANAGER
-+#define DBUS_INTERFACE_OBJECT_MANAGER DBUS_INTERFACE_DBUS ".ObjectManager"
-+#endif
-+
- struct GDBusClient {
- 	int ref_count;
- 	DBusConnection *dbus_conn;
- 	char *service_name;
- 	char *base_path;
- 	guint watch;
-+	guint added_watch;
-+	guint removed_watch;
- 	GPtrArray *match_rules;
- 	DBusPendingCall *pending_call;
- 	DBusPendingCall *get_objects_call;
-@@ -908,16 +915,18 @@ static void parse_interfaces(GDBusClient *client, const char *path,
- 	}
- }
- 
--static void interfaces_added(GDBusClient *client, DBusMessage *msg)
-+static gboolean interfaces_added(DBusConnection *conn, DBusMessage *msg,
-+							void *user_data)
+diff --git a/gdbus/watch.c b/gdbus/watch.c
+index 9e4f994..d334580 100644
+--- a/gdbus/watch.c
++++ b/gdbus/watch.c
+@@ -593,12 +593,16 @@ static gboolean update_service(void *user_data)
  {
-+	GDBusClient *client = user_data;
- 	DBusMessageIter iter;
- 	const char *path;
+ 	struct service_data *data = user_data;
+ 	struct filter_callback *cb = data->callback;
++	DBusConnection *conn;
  
- 	if (dbus_message_iter_init(msg, &iter) == FALSE)
--		return;
-+		return TRUE;
- 
- 	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_OBJECT_PATH)
--		return;
-+		return TRUE;
- 
- 	dbus_message_iter_get_basic(&iter, &path);
- 	dbus_message_iter_next(&iter);
-@@ -927,24 +936,28 @@ static void interfaces_added(GDBusClient *client, DBusMessage *msg)
- 	parse_interfaces(client, path, &iter);
- 
- 	g_dbus_client_unref(client);
+ 	update_name_cache(data->name, data->owner);
++	conn = dbus_connection_ref(data->conn);
++	service_data_free(cb->data);
 +
-+	return TRUE;
+ 	if (cb->conn_func)
+-		cb->conn_func(data->conn, cb->user_data);
++		cb->conn_func(conn, cb->user_data);
+ 
+-	service_data_free(data);
++	dbus_connection_unref(conn);
+ 
+ 	return FALSE;
  }
- 
--static void interfaces_removed(GDBusClient *client, DBusMessage *msg)
-+static gboolean interfaces_removed(DBusConnection *conn, DBusMessage *msg,
-+							void *user_data)
- {
-+	GDBusClient *client = user_data;
- 	DBusMessageIter iter, entry;
- 	const char *path;
- 
- 	if (dbus_message_iter_init(msg, &iter) == FALSE)
--		return;
-+		return TRUE;
- 
- 	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_OBJECT_PATH)
--		return;
-+		return TRUE;
- 
- 	dbus_message_iter_get_basic(&iter, &path);
- 	dbus_message_iter_next(&iter);
- 
- 	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
--		return;
-+		return TRUE;
- 
- 	dbus_message_iter_recurse(&iter, &entry);
- 
-@@ -959,6 +972,8 @@ static void interfaces_removed(GDBusClient *client, DBusMessage *msg)
- 	}
- 
- 	g_dbus_client_unref(client);
-+
-+	return TRUE;
- }
- 
- static void parse_managed_objects(GDBusClient *client, DBusMessage *msg)
-@@ -1093,24 +1108,6 @@ static DBusHandlerResult message_filter(DBusConnection *connection,
- 	interface = dbus_message_get_interface(message);
- 	member = dbus_message_get_member(message);
- 
--	if (g_str_equal(path, "/") == TRUE) {
--		if (g_str_equal(interface, DBUS_INTERFACE_DBUS
--						".ObjectManager") == FALSE)
--			return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
--
--		if (g_str_equal(member, "InterfacesAdded") == TRUE) {
--			interfaces_added(client, message);
--			return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
--		}
--
--		if (g_str_equal(member, "InterfacesRemoved") == TRUE) {
--			interfaces_removed(client, message);
--			return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
--		}
--
--		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
--	}
--
- 	if (g_str_has_prefix(path, client->base_path) == FALSE)
- 		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
- 
-@@ -1150,23 +1147,25 @@ GDBusClient *g_dbus_client_new(DBusConnection *connection,
- 	client->service_name = g_strdup(service);
- 	client->base_path = g_strdup(path);
- 
--	client->match_rules = g_ptr_array_sized_new(3);
-+	client->match_rules = g_ptr_array_sized_new(1);
- 	g_ptr_array_set_free_func(client->match_rules, g_free);
- 
- 	client->watch = g_dbus_add_service_watch(connection, service,
- 						service_connect,
- 						service_disconnect,
- 						client, NULL);
--	g_ptr_array_add(client->match_rules, g_strdup_printf("type='signal',"
--				"sender='%s',"
--				"path='/',interface='%s.ObjectManager',"
--				"member='InterfacesAdded'",
--				client->service_name, DBUS_INTERFACE_DBUS));
--	g_ptr_array_add(client->match_rules, g_strdup_printf("type='signal',"
--				"sender='%s',"
--				"path='/',interface='%s.ObjectManager',"
--				"member='InterfacesRemoved'",
--				client->service_name, DBUS_INTERFACE_DBUS));
-+	client->added_watch = g_dbus_add_signal_watch(connection, service,
-+						"/",
-+						DBUS_INTERFACE_OBJECT_MANAGER,
-+						"InterfacesAdded",
-+						interfaces_added,
-+						client, NULL);
-+	client->removed_watch = g_dbus_add_signal_watch(connection, service,
-+						"/",
-+						DBUS_INTERFACE_OBJECT_MANAGER,
-+						"InterfacesRemoved",
-+						interfaces_removed,
-+						client, NULL);
- 	g_ptr_array_add(client->match_rules, g_strdup_printf("type='signal',"
- 				"sender='%s',path_namespace='%s'",
- 				client->service_name, client->base_path));
-@@ -1225,6 +1224,8 @@ void g_dbus_client_unref(GDBusClient *client)
- 		client->disconn_func(client->dbus_conn, client->disconn_data);
- 
- 	g_dbus_remove_watch(client->dbus_conn, client->watch);
-+	g_dbus_remove_watch(client->dbus_conn, client->added_watch);
-+	g_dbus_remove_watch(client->dbus_conn, client->removed_watch);
- 
- 	dbus_connection_unref(client->dbus_conn);
- 
 -- 
 1.8.3.1
 
