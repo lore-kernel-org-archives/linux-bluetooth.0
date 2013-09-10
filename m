@@ -1,40 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <522ED166.3010107@broadcom.com>
-Date: Tue, 10 Sep 2013 09:59:34 +0200
-From: "Arend van Spriel" <arend@broadcom.com>
+Date: Tue, 10 Sep 2013 10:55:06 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: "Dirk-Jan C. Binnema" <djcb.bulk@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	"Dirk-Jan C. Binnema" <djcb@djcbsoftware.nl>
+Subject: Re: [PATCH] build: use -lrt for clock_gettime on glibc < 2.17
+Message-ID: <20130910075506.GA20611@x220.p-661hnu-f1>
+References: <52E3B66B-DC7A-4225-8779-8C1E9B0FC15E@holtmann.org>
+ <1378454956-26605-1-git-send-email-djcb.bulk@gmail.com>
 MIME-Version: 1.0
-To: "John W. Linville" <linville@tuxdriver.com>
-cc: "Dan Williams" <dcbw@redhat.com>,
-	linux-wireless@vger.kernel.org,
-	johannes@sipsolutions.net,
-	marcel@holtmann.org,
-	"Samuel Ortiz" <samuel@sortiz.org>,
-	"Gustavo Padovan" <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-nfc@ml01.01.org
-Subject: Re: Linux Wireless Mini-Summit in New Orleans -- 19-20
- September
-References: <20130808185410.GD30925@tuxdriver.com>
- <20130808190428.GF30925@tuxdriver.com>
- <20130905133907.GE1947@tuxdriver.com>
- <1378397092.3580.21.camel@dcbw.foobar.com>
- <20130909192346.GC1955@tuxdriver.com>
-In-Reply-To: <20130909192346.GC1955@tuxdriver.com>
-Content-Type: text/plain;
- charset=iso-8859-1;
- format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1378454956-26605-1-git-send-email-djcb.bulk@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 09/09/2013 09:23 PM, John W. Linville wrote:
-> Arend, Kalle, Johannes, Luca, etc -- anyone want to talk about driver
-> developments and/or issues between drivers and mac80211 or other
-> parts of the stack?
+Hi Dirk-Jan,
 
-Hi John
+On Fri, Sep 06, 2013, Dirk-Jan C. Binnema wrote:
+> From: "Dirk-Jan C. Binnema" <djcb@djcbsoftware.nl>
+> 
+> glibc before 2.17 (e.g., fedora 18) requires -lrt for clock_gettime;
+> add -lrt where needed in that case.
+> ---
+>  Makefile.am  | 2 +-
+>  configure.ac | 6 ++++--
+>  2 files changed, 5 insertions(+), 3 deletions(-)
 
-Because of personal reasons I am not attending this year. I would have 
-loved to celebrate my birthday in New Orleans and have a couple of beers 
-with you guys. Oh well. Guess I owe you.
+It seems Marcel went ahead and applied his own patch for this (I think
+he didn't realize there was a pending one here). Could you check if
+latest git now works for you?
 
-Regards,
-Arend
+Johan
