@@ -1,56 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 10 Sep 2013 16:45:32 +0100
+Date: Tue, 10 Sep 2013 16:33:17 +0100
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Dan Aloni <alonid@postram.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: [PATCH bluetooth-next] Bluetooth: Add support for BCM20702A0
- [0a5c, 21e6]
-Message-ID: <20130910154532.GB1916@joana>
-References: <1378208542-30729-1-git-send-email-alonid@postram.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Add support creating virtual AMP controllers
+Message-ID: <20130910153317.GA1916@joana>
+References: <1378143699-51039-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1378208542-30729-1-git-send-email-alonid@postram.com>
+In-Reply-To: <1378143699-51039-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dan,
+Hi Marcel,
 
-2013-09-03 Dan Aloni <alonid@postram.com>:
+2013-09-02 Marcel Holtmann <marcel@holtmann.org>:
 
-> Tested with this patch and a Bluetooth mouse on 3.10.10, on ThinkPad W530.
+> So far the only option to create a virtual AMP controller was by
+> setting a module parameter for the hci_vhci driver. This patch adds
+> the functionality to define inline to create either a BR/EDR or an
+> AMP controller.
 > 
-> Bus 001 Device 004: ID 0a5c:21e6 Broadcom Corp. BCM20702 Bluetooth 4.0 [ThinkPad]
+> In addition the client will be informed which HCI controller index
+> it got assigned. That is especially useful for automated end-to-end
+> testing.
 > 
-> T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=02 Dev#=  4 Spd=12  MxCh= 0
-> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0a5c ProdID=21e6 Rev=01.12
-> S:  Manufacturer=Broadcom Corp
-> S:  Product=BCM20702A0
-> S:  SerialNumber=F4B7E2F6E438
-> C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=0mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> I:  If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+> To keep backwards compatibility with existing userspace, the command
+> for creating a controller type needs to be send right after opening
+> the device node. If the command is not send, it defaults back to
+> automatically creating a BR/EDR controller.
 > 
-> Signed-off-by: Dan Aloni <alonid@postram.com>
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  drivers/bluetooth/btusb.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index de4cf4d..e6313f8 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -104,6 +104,7 @@ static struct usb_device_id btusb_table[] = {
->  	{ USB_DEVICE(0x0b05, 0x17b5) },
->  	{ USB_DEVICE(0x04ca, 0x2003) },
->  	{ USB_DEVICE(0x0489, 0xe042) },
-> +	{ USB_DEVICE(0x0a5c, 0x21e6) },
+>  drivers/bluetooth/hci_vhci.c | 169 +++++++++++++++++++++++++++++++------------
+>  1 file changed, 123 insertions(+), 46 deletions(-)
 
-In which kernel have you seen this issue? We have a generic rule to catch all
-0x0a5c Broadcom devices. And before we added this the device ID for your
-device was there, so in theory your device always worked.
+Patch has been applied to bluetooth-next. Thanks.
 
 	Gustavo
