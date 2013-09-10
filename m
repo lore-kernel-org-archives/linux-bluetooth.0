@@ -2,45 +2,32 @@ Return-Path: <cyrus@holtmann.org>
 From: Denis Kenzior <denkenz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Denis Kenzior <denkenz@gmail.com>
-Subject: [PATCH 2/3] doc: Remove Profile1.Cancel() method
-Date: Tue, 10 Sep 2013 11:42:22 -0500
-Message-Id: <1378831343-3534-2-git-send-email-denkenz@gmail.com>
-In-Reply-To: <1378831343-3534-1-git-send-email-denkenz@gmail.com>
-References: <1378831343-3534-1-git-send-email-denkenz@gmail.com>
+Subject: [PATCH 1/3] doc: Label Profile1.Release() method as no reply
+Date: Tue, 10 Sep 2013 11:42:21 -0500
+Message-Id: <1378831343-3534-1-git-send-email-denkenz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There does not seem to be any actual need for this method.
-
-The current implementation calls Cancel when a pending
-NewConnection() or RequestDisconnection() method call fails.
-Additionally it calls Cancel() when the remote client has disconnected.
-In either case BlueZ calls shutdown on the file descriptor associated
-with the agent and issues a Cancel() method call.
-
-The closing of the file descriptor will trigger a HUP on the agent side,
-which will trigger normal cleanup procedures.  The received Cancel()
-method call is redundant in both cases.
+The current implementation does not expect a reply, nor would it make
+sense for BlueZ to wait for one from the agent.  So explicitly label
+this method as noreply.
 ---
- doc/profile-api.txt | 8 --------
- 1 file changed, 8 deletions(-)
+ doc/profile-api.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/doc/profile-api.txt b/doc/profile-api.txt
-index 96cfce9..ec18034 100644
+index 03b7d2b..96cfce9 100644
 --- a/doc/profile-api.txt
 +++ b/doc/profile-api.txt
-@@ -145,11 +145,3 @@ Methods		void Release() [noreply]
+@@ -108,7 +108,7 @@ Service		unique name
+ Interface	org.bluez.Profile1
+ Object path	freely definable
  
- 			Possible errors: org.bluez.Error.Rejected
- 			                 org.bluez.Error.Canceled
--
--		void Cancel()
--
--			This method gets called to indicate that the profile
--			request failed before a reply was returned.
--
--			All request are queued and there will be only one
--			pending pequest at a time per profile.
+-Methods		void Release()
++Methods		void Release() [noreply]
+ 
+ 			This method gets called when the service daemon
+ 			unregisters the profile. A profile can use it to do
 -- 
 1.8.1.5
 
