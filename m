@@ -1,27 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Tue, 10 Sep 2013 20:47:11 +0200
-Message-ID: <CAGMh8s_RNftv8X32ayf4L-ZjBqSGv3HYxPAR28GthVPWUht-xw@mail.gmail.com>
-Subject: Device discovery/pairing issue w/ BlueZ on Debian
-From: Clemens Vasters <clemensv@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
+Subject: Re: [PATCH] Bluetooth: Add Intel Bluetooth Bootloader driver
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CE54ABF8.3D4D%don.fry@intel.com>
+Date: Tue, 10 Sep 2013 11:22:31 -0700
+Cc: "An, Tedd" <tedd.an@intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"gustavo@padovan.org" <gustavo@padovan.org>,
+	"Hedberg, Johan" <johan.hedberg@intel.com>
+Message-Id: <35740ABB-43B3-429A-89D1-475BBDF60EE3@holtmann.org>
+References: <CE54ABF8.3D4D%don.fry@intel.com>
+To: "Fry, Don" <don.fry@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I’ve got a cheap Bluetooth car diagnostics dongle (OBD-2, ELM327) that
-gets discovered by and pairs with Windows 8, Windows Phone 8, OSX
-Mountain Lion, iOS 6, and Android Jelly Bean.
+Hi Don,
 
-I can’t get it to be either discovered or paired with BlueZ on Debian
-Wheezy on my Notebook (bare metal, ThinkPad W510) or Raspbian Wheezy
-on the Raspberry Pi. On the latter I even went so far to pull the
-source for BlueZ 5.8 and install it from source. No dice.
+small reminder to not top post on this mailing list please
 
-I’m pretty puzzled about this. How would I go about debugging or,
-rather, what data do I need to gather (and how) for someone to help me
-with this.
+> 	What is the status of this patch?  Is it something that can go upstream
+> or does it need more rework?
 
+I have not had a chance too look at it in detail. I will try to get to it by the end of this week.
 
-Thanks
-Clemens
+Regards
+
+Marcel
+
