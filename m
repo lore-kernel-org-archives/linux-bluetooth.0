@@ -1,32 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 10 Sep 2013 16:51:18 +0100
+Date: Tue, 10 Sep 2013 16:49:32 +0100
 From: Gustavo Padovan <gustavo@padovan.org>
-To: atar <atar.yosef@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Can't initialize a Bluetooth antenna.
-Message-ID: <20130910155118.GF1916@joana>
-References: <op.w24t4yu9e4gg2u@localhost>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: Only schedule raw queue when user channel
+ is active
+Message-ID: <20130910154932.GE1916@joana>
+References: <1378256918-50836-2-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <op.w24t4yu9e4gg2u@localhost>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1378256918-50836-2-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Atar,
+Hi Marcel,
 
-2013-09-09 atar <atar.yosef@gmail.com>:
+2013-09-03 Marcel Holtmann <marcel@holtmann.org>:
 
-> Hi there!!
+> When the user channel is set and an user application has full control
+> over the device, do not bother trying to schedule any queues except
+> the raw queue.
 > 
-> When I try to use the hciconfig command to initialized my Bluetooth
-> antenna like the command:
+> This is an optimization since with user channel, only the raw queue
+> is in use.
 > 
-> hciconfig hci0 up OR hciconfig hci0 reset
-> 
-> it emits an error message saying:
-> 
-> Can't init device hci0: Connection timed out (110).
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/hci_core.c | 16 +++++++---------
+>  1 file changed, 7 insertions(+), 9 deletions(-)
 
-Could you please collect logs with hcidump or btmon and send them to us?
+Patch has been applied to bluetooth-next. Thanks.
 
 	Gustavo
