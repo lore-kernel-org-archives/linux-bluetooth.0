@@ -1,33 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 10 Sep 2013 10:55:06 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: "Dirk-Jan C. Binnema" <djcb.bulk@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	"Dirk-Jan C. Binnema" <djcb@djcbsoftware.nl>
+References: <52E3B66B-DC7A-4225-8779-8C1E9B0FC15E@holtmann.org> <1378454956-26605-1-git-send-email-djcb.bulk@gmail.com> <4A735792-B4D7-468A-A61A-488F605AAB30@holtmann.org>
+From: Dirk-Jan C. Binnema <djcb.bulk@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: [PATCH] build: use -lrt for clock_gettime on glibc < 2.17
-Message-ID: <20130910075506.GA20611@x220.p-661hnu-f1>
-References: <52E3B66B-DC7A-4225-8779-8C1E9B0FC15E@holtmann.org>
- <1378454956-26605-1-git-send-email-djcb.bulk@gmail.com>
+In-reply-to: <4A735792-B4D7-468A-A61A-488F605AAB30@holtmann.org>
+Date: Tue, 10 Sep 2013 10:20:32 +0300
+Message-ID: <87fvtdp2gv.fsf@djcbsoftware.nl>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1378454956-26605-1-git-send-email-djcb.bulk@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dirk-Jan,
 
-On Fri, Sep 06, 2013, Dirk-Jan C. Binnema wrote:
-> From: "Dirk-Jan C. Binnema" <djcb@djcbsoftware.nl>
-> 
-> glibc before 2.17 (e.g., fedora 18) requires -lrt for clock_gettime;
-> add -lrt where needed in that case.
-> ---
->  Makefile.am  | 2 +-
->  configure.ac | 6 ++++--
->  2 files changed, 5 insertions(+), 3 deletions(-)
+marcel@holtmann.org writes:
 
-It seems Marcel went ahead and applied his own patch for this (I think
-he didn't realize there was a pending one here). Could you check if
-latest git now works for you?
+> Hi Dirk-Jan,
+>
 
-Johan
+<snip>
+
+>
+> so I fixed this upstream a lot simpler by always checking for
+> clock_gettime in -lrt. Can you check if that works for you. On an
+> older Debian test box it just works fine for me.
+
+Sure, that works; but that's equivalent to the first patch I made... I
+only made the more complicated one after your comment:
+
+,----
+| > +AC_SEARCH_LIBS(clock_gettime,rt)
+|
+| I do [not] like this since this now it links everything with -lrt even if it
+| is not needed.
+`----
+
+AC_SEARCH_LIBS doesn't add -lrt if it's not needed, so I interpreted
+your comment as you not wanting -lrt in parts of the code that don't
+need it.
+
+Anyway, good it works now...
+
+Thanks,
+Dirk.
+
+-- 
+Dirk-Jan C. Binnema                  Helsinki, Finland
+e:djcb@djcbsoftware.nl           w:www.djcbsoftware.nl
+pgp: D09C E664 897D 7D39 5047 A178 E96A C7A1 017D DA3C
