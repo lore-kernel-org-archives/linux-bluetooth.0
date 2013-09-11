@@ -2,41 +2,54 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/3] avdtp: Remove not used includes
-Date: Wed, 11 Sep 2013 15:52:13 +0200
-Message-ID: <1378907534-6899-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1378907534-6899-1-git-send-email-szymon.janc@tieto.com>
-References: <1378907534-6899-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 1/3] avdtp: Remove not used pending_auth from struct avdtp
+Date: Wed, 11 Sep 2013 15:52:12 +0200
+Message-ID: <1378907534-6899-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- profiles/audio/avdtp.c | 3 ---
- 1 file changed, 3 deletions(-)
+ profiles/audio/avdtp.c | 11 ++---------
+ 1 file changed, 2 insertions(+), 9 deletions(-)
 
 diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 61f55d6..5422ca3 100644
+index 818dbdd..61f55d6 100644
 --- a/profiles/audio/avdtp.c
 +++ b/profiles/audio/avdtp.c
-@@ -33,8 +33,6 @@
- #include <errno.h>
- #include <unistd.h>
- #include <assert.h>
--#include <signal.h>
--#include <netinet/in.h>
+@@ -41,7 +41,6 @@
+ #include <bluetooth/sdp_lib.h>
  
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/sdp.h>
-@@ -49,7 +47,6 @@
- #include "src/adapter.h"
- #include "src/device.h"
+ #include <glib.h>
+-#include <dbus/dbus.h>
+ #include <btio/btio.h>
  
--#include "control.h"
- #include "avdtp.h"
- #include "sink.h"
- #include "source.h"
+ #include "log.h"
+@@ -426,8 +425,6 @@ struct avdtp {
+ 
+ 	/* Attempt stream setup instead of disconnecting */
+ 	gboolean stream_setup;
+-
+-	DBusPendingCall *pending_auth;
+ };
+ 
+ static GSList *servers = NULL;
+@@ -2325,12 +2322,8 @@ static struct avdtp *avdtp_get_internal(struct btd_device *device)
+ 		return NULL;
+ 
+ 	session = find_session(server->sessions, device);
+-	if (session) {
+-		if (session->pending_auth)
+-			return NULL;
+-		else
+-			return session;
+-	}
++	if (session)
++		return session;
+ 
+ 	session = g_new0(struct avdtp, 1);
+ 
 -- 
 1.8.4
 
