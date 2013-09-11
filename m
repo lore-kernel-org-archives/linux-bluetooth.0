@@ -1,31 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/2] Bluetooth: Fix race condition with rfkill handling
-Date: Wed, 11 Sep 2013 14:33:57 +0300
-Message-Id: <1378899239-5138-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 11 Sep 2013 13:23:11 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Change __FUNCTION__ to __func__
+Message-ID: <20130911102311.GA18429@x220.p-661hnu-f1>
+References: <1378454530-24686-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1378454530-24686-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1378454530-24686-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrei,
 
-These two patches fix a pretty severe (hence Cc: stable) race condition
-with rfkill handling. If a device gets rfkilled before the HCI setup
-stage completes it stays unaccessible through the mgmt interface even it
-eventually gets unblocked through rfkill.
+On Fri, Sep 06, 2013, Andrei Emeltchenko wrote:
+> checkpatch.pl recommends to use __func__ instead of __FUNCTION__.
+> ---
+>  attrib/gattrib.c    | 2 +-
+>  gobex/gobex-debug.h | 2 +-
+>  obexd/src/log.h     | 2 +-
+>  src/log.h           | 2 +-
+>  4 files changed, 4 insertions(+), 4 deletions(-)
 
-The situation is easy to reproduce by running "rfkill block all" before
-inserting a dongle, "rfkill unblock all" a bit later and then trying
-to do e.g. "btmgmt info". The device will not show up there.
+I've applied this patch with a more thorough explanation in the commit
+message.
 
 Johan
-
-----------------------------------------------------------------
-Johan Hedberg (2):
-      Bluetooth: Introduce a new HCI_RFKILLED flag
-      Bluetooth: Fix rfkill functionality during the HCI setup stage
-
- include/net/bluetooth/hci.h |  1 +
- net/bluetooth/hci_core.c    | 22 +++++++++++++++++-----
- 2 files changed, 18 insertions(+), 5 deletions(-)
-
