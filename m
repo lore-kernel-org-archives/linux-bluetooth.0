@@ -1,67 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Nedim Hadzic <nhadzic@blackberry.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [Bluetooth Low Energy] Pairing and writing characteristic property
- issue
-Date: Wed, 11 Sep 2013 12:34:57 +0000
-Message-ID: <285F7E29A611CC4197B552ED66CC20B8CE7EBA@XMB102ADS.rim.net>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Fix rfkill functionality during the HCI setup stage
+Date: Wed, 11 Sep 2013 14:33:59 +0300
+Message-Id: <1378899239-5138-3-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1378899239-5138-1-git-send-email-johan.hedberg@gmail.com>
+References: <1378899239-5138-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello everyone,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Recently I started working with Bluetooth Low Energy devices on Linux (developing some applications, testing devices etc). I am using two Bluetooth Low Energy devices SensorTag from Texas Instruments and HearRateMonitor BlueHR. 
+We need to let the setup stage complete cleanly even when the HCI device
+is rfkilled. Otherwise the HCI device will stay in an undefined state
+and never get notified to user space through mgmt (even when it gets
+unblocked through rfkill).
 
-Bluez version: 4.101-0ubuntu8b1
+This patch makes sure that hci_dev_open() can be called in the HCI_SETUP
+stage, that blocking the device doesn't abort the setup stage, and that
+the device gets proper powered down as soon as the setup stage completes
+in case it was blocked meanwhile.
 
-SensorTag: I can connect to the device, read and write characteristic values using gatttool and I can pair with the device using a simple-agent tool for this. After I pair with the device, I want to change value of the characteristic using org.bluez.Characteristic interface and SetProperty method, but it does not change; nor PropertyChanged signal is emitted nor I get any error. I checked hcidump:
-2013-09-11 12:07:15.827211 < ACL data: handle 75 flags 0x00 dlen 8
-    ATT: Write cmd (0x52)
-      handle 0x0029 value  0x01
+The bug that this patch fixed can be very easily reproduced using e.g.
+the rfkill command line too. By running "rfkill block all" before
+inserting a Bluetooth dongle the resulting HCI device goes into a state
+where it is never announced over mgmt, not even when "rfkill unblock all"
+is run.
 
-In case of changing the characteristic value with gatttool hcidump is following:
-2013-09-11 12:20:07.239012 < ACL data: handle 75 flags 0x00 dlen 8
-    ATT: Write req (0x12)
-      handle 0x0029 value  0x01
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Cc: stable@vger.kernel.org
+---
+ net/bluetooth/hci_core.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-Difference is in part of write cmd and req. Only difference between these two approaches is that with gatttool, you first connect to LE device (LE Create Connection in hcidump), and in hcdump when accessing through interface and using method SetProperty there is no interface or method for connecting. Any guesses what can be done? 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 70efa16..3ff99f2 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1148,7 +1148,11 @@ int hci_dev_open(__u16 dev)
+ 		goto done;
+ 	}
+ 
+-	if (test_bit(HCI_RFKILLED, &hdev->dev_flags)) {
++	/* Check for rfkill but allow the HCI setup stage to proceed
++	 * (which in itself doesn't cause any RF activity).
++	 */
++	if (test_bit(HCI_RFKILLED, &hdev->dev_flags) &&
++	    !test_bit(HCI_SETUP, &hdev->dev_flags)) {
+ 		ret = -ERFKILL;
+ 		goto done;
+ 	}
+@@ -1599,7 +1603,8 @@ static int hci_rfkill_set_block(void *data, bool blocked)
+ 
+ 	if (blocked) {
+ 		set_bit(HCI_RFKILLED, &hdev->dev_flags);
+-		hci_dev_do_close(hdev);
++		if (!test_bit(HCI_SETUP, &hdev->dev_flags))
++			hci_dev_do_close(hdev);
+ 	} else {
+ 		clear_bit(HCI_RFKILLED, &hdev->dev_flags);
+ 	}
+@@ -1624,6 +1629,11 @@ static void hci_power_on(struct work_struct *work)
+ 		return;
+ 	}
+ 
++	if (test_bit(HCI_RFKILLED, &hdev->dev_flags)) {
++		clear_bit(HCI_AUTO_OFF, &hdev->dev_flags);
++		hci_dev_do_close(hdev);
++	}
++
+ 	if (test_bit(HCI_AUTO_OFF, &hdev->dev_flags))
+ 		queue_delayed_work(hdev->req_workqueue, &hdev->power_off,
+ 				   HCI_AUTO_OFF_TIMEOUT);
+-- 
+1.8.4.rc3
 
-
-HearRateMonitor: I can connect to the device, read characteristic values using gatttool ( with adding "-t random" part to the command), but I can not pair with the device using simple-agent: Error: Creating device failed: org.bluez.Error.AuthenticationFailed: Authentication Failed.
-Hcidump is the following:
-2013-09-11 11:58:41.747749 < HCI Command: LE Create Connection (0x08|0x000d) plen 25
-    bdaddr D5:EA:8B:A9:EC:70 type 1
-2013-09-11 11:58:41.751989 > HCI Event: Command Status (0x0f) plen 4
-    LE Create Connection (0x08|0x000d) status 0x00 ncmd 1
-2013-09-11 11:58:44.311996 > HCI Event: LE Meta Event (0x3e) plen 19
-    LE Connection Complete
-      status 0x00 handle 75, role master
-      bdaddr D5:EA:8B:A9:EC:70 (Random)
-2013-09-11 11:58:44.312173 < ACL data: handle 75 flags 0x00 dlen 11
-    SMP: Pairing Request (0x01)
-      capability 0x04 oob 0x00 auth req 0x01
-      max key size 0x10 init key dist 0x00 resp key dist 0x01
-      Capability: KeyboardDisplay (OOB data not present)
-      Authentication: Bonding (No MITM Protection)
-      Initiator Key Distribution:    
-      Responder Key Distribution:  LTK  
-2013-09-11 11:58:44.348985 > HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 75 packets 1
-2013-09-11 11:58:44.418969 > ACL data: handle 75 flags 0x02 dlen 6
-    SMP: Pairing Failed (0x05)
-      reason 0x05
-      Reason Pairing Not Supported
-2013-09-11 11:58:44.560004 > HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 75 reason 0x13
-    Reason: Remote User Terminated Connection
-
-This device is using random device address, but I do not know how to pair with it in that case. I try to pair with it using a smartphone with support and it is working. Any help, or input on this?
-
-Looking forward to reply;
-
-Kind regards,
-Nedim Hadzic
----------------------------------------------------------------------
-This transmission (including any attachments) may contain confidential information, privileged material (including material protected by the solicitor-client or other applicable privileges), or constitute non-public information. Any use of this information by anyone other than the intended recipient is prohibited. If you have received this transmission in error, please immediately reply to the sender and delete this information from your system. Use, dissemination, distribution, or reproduction of this transmission by unintended recipients is not authorized and may be unlawful.
