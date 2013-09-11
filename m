@@ -1,24 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 11 Sep 2013 17:41:57 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] avdtp: Remove not used pending_auth from struct avdtp
-Message-ID: <20130911144157.GA10181@x220.p-661hnu-f1>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 3/3] avdtp: Remove unused STREAM_TIMEOUT define
+Date: Wed, 11 Sep 2013 15:52:14 +0200
+Message-ID: <1378907534-6899-3-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1378907534-6899-1-git-send-email-szymon.janc@tieto.com>
 References: <1378907534-6899-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1378907534-6899-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+---
+ profiles/audio/avdtp.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-On Wed, Sep 11, 2013, Szymon Janc wrote:
-> ---
->  profiles/audio/avdtp.c | 11 ++---------
->  1 file changed, 2 insertions(+), 9 deletions(-)
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index 5422ca3..fe63a40 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -86,7 +86,6 @@
+ #define REQ_TIMEOUT 6
+ #define ABORT_TIMEOUT 2
+ #define DISCONNECT_TIMEOUT 1
+-#define STREAM_TIMEOUT 20
+ #define START_TIMEOUT 1
+ 
+ #if __BYTE_ORDER == __LITTLE_ENDIAN
+-- 
+1.8.4
 
-All three patches have been applied. Thanks.
-
-Johan
