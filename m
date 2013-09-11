@@ -1,26 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 11 Sep 2013 21:49:57 +0300
+Date: Wed, 11 Sep 2013 17:41:57 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Denis Kenzior <denkenz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] doc: Label Profile1.Release() method as no reply
-Message-ID: <20130911184957.GA15930@x220.p-661hnu-f1>
-References: <1378831343-3534-1-git-send-email-denkenz@gmail.com>
+Subject: Re: [PATCH 1/3] avdtp: Remove not used pending_auth from struct avdtp
+Message-ID: <20130911144157.GA10181@x220.p-661hnu-f1>
+References: <1378907534-6899-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1378831343-3534-1-git-send-email-denkenz@gmail.com>
+In-Reply-To: <1378907534-6899-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Denis,
+Hi Szymon,
 
-On Tue, Sep 10, 2013, Denis Kenzior wrote:
-> The current implementation does not expect a reply, nor would it make
-> sense for BlueZ to wait for one from the agent.  So explicitly label
-> this method as noreply.
+On Wed, Sep 11, 2013, Szymon Janc wrote:
 > ---
->  doc/profile-api.txt | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  profiles/audio/avdtp.c | 11 ++---------
+>  1 file changed, 2 insertions(+), 9 deletions(-)
 
 All three patches have been applied. Thanks.
 
