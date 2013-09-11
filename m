@@ -1,77 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.5 \(1508\))
-Subject: Re: [PATCH 1/2] Bluetooth: Introduce a new HCI_RFKILLED flag
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1378899239-5138-2-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 11 Sep 2013 13:30:20 -0700
+Date: Wed, 11 Sep 2013 21:49:57 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Denis Kenzior <denkenz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <F7287D7D-08E5-4E27-872E-1876F67F8C21@holtmann.org>
-References: <1378899239-5138-1-git-send-email-johan.hedberg@gmail.com> <1378899239-5138-2-git-send-email-johan.hedberg@gmail.com>
-To: johan.hedberg@gmail.com
+Subject: Re: [PATCH 1/3] doc: Label Profile1.Release() method as no reply
+Message-ID: <20130911184957.GA15930@x220.p-661hnu-f1>
+References: <1378831343-3534-1-git-send-email-denkenz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1378831343-3534-1-git-send-email-denkenz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Denis,
 
-> This makes it more convenient to check for rfkill (no need to check for
-> dev->rfkill before calling rfkill_blocked()) and also avoids potential
-> races if the RFKILL state needs to be checked from within the rfkill
-> callback.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> Cc: stable@vger.kernel.org
+On Tue, Sep 10, 2013, Denis Kenzior wrote:
+> The current implementation does not expect a reply, nor would it make
+> sense for BlueZ to wait for one from the agent.  So explicitly label
+> this method as noreply.
 > ---
-> include/net/bluetooth/hci.h |  1 +
-> net/bluetooth/hci_core.c    | 12 +++++++-----
-> 2 files changed, 8 insertions(+), 5 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 30c88b5..ba008d5 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -104,6 +104,7 @@ enum {
-> enum {
-> 	HCI_SETUP,
-> 	HCI_AUTO_OFF,
-> +	HCI_RFKILLED,
-> 	HCI_MGMT,
-> 	HCI_PAIRABLE,
-> 	HCI_SERVICE_CACHE,
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 4dbb6cb..70efa16 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1148,7 +1148,7 @@ int hci_dev_open(__u16 dev)
-> 		goto done;
-> 	}
-> 
-> -	if (hdev->rfkill && rfkill_blocked(hdev->rfkill)) {
-> +	if (test_bit(HCI_RFKILLED, &hdev->dev_flags)) {
-> 		ret = -ERFKILL;
-> 		goto done;
-> 	}
+>  doc/profile-api.txt | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-the problem here is that we never set the initial value of HCI_RFKILLED properly. To make the patch fully equivalent, we should do that.
+All three patches have been applied. Thanks.
 
-> @@ -1597,10 +1597,12 @@ static int hci_rfkill_set_block(void *data, bool blocked)
-> 	if (test_bit(HCI_USER_CHANNEL, &hdev->dev_flags))
-> 		return -EBUSY;
-> 
-> -	if (!blocked)
-> -		return 0;
-> -
-> -	hci_dev_do_close(hdev);
-> +	if (blocked) {
-> +		set_bit(HCI_RFKILLED, &hdev->dev_flags);
-> +		hci_dev_do_close(hdev);
-> +	} else {
-> +		clear_bit(HCI_RFKILLED, &hdev->dev_flags);
-> +	}
-> 
-> 	return 0;
-
-Regards
-
-Marcel
-
+Johan
