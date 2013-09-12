@@ -1,35 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAGMh8s_RNftv8X32ayf4L-ZjBqSGv3HYxPAR28GthVPWUht-xw@mail.gmail.com>
-References: <CAGMh8s_RNftv8X32ayf4L-ZjBqSGv3HYxPAR28GthVPWUht-xw@mail.gmail.com>
-Date: Thu, 12 Sep 2013 06:31:11 -0400
-Message-ID: <CAJdJm_PpQoQeJ5SGrzD3RuA+7mOg-mAQgzSx5WV29528hU3stA@mail.gmail.com>
-Subject: Re: Device discovery/pairing issue w/ BlueZ on Debian
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Clemens Vasters <clemensv@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=windows-1252
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 2/2] Bluetooth: Fix rfkill functionality during the HCI setup stage
+Date: Thu, 12 Sep 2013 12:29:13 +0300
+Message-Id: <1378978153-5683-3-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1378978153-5683-1-git-send-email-johan.hedberg@gmail.com>
+References: <1378978153-5683-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Clemens,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Tue, Sep 10, 2013 at 2:47 PM, Clemens Vasters <clemensv@gmail.com> wrote:
-> I’ve got a cheap Bluetooth car diagnostics dongle (OBD-2, ELM327) that
-> gets discovered by and pairs with Windows 8, Windows Phone 8, OSX
-> Mountain Lion, iOS 6, and Android Jelly Bean.
->
-> I can’t get it to be either discovered or paired with BlueZ on Debian
-> Wheezy on my Notebook (bare metal, ThinkPad W510) or Raspbian Wheezy
-> on the Raspberry Pi. On the latter I even went so far to pull the
-> source for BlueZ 5.8 and install it from source. No dice.
+We need to let the setup stage complete cleanly even when the HCI device
+is rfkilled. Otherwise the HCI device will stay in an undefined state
+and never get notified to user space through mgmt (even when it gets
+unblocked through rfkill).
 
-Your description of the problem is a little vague. Which tools did you
-use on BlueZ 5.8 to attempt to discover/pair with the device? Which
-errors did you see (if any)?
+This patch makes sure that hci_dev_open() can be called in the HCI_SETUP
+stage, that blocking the device doesn't abort the setup stage, and that
+the device gets proper powered down as soon as the setup stage completes
+in case it was blocked meanwhile.
 
-Best Regards,
+The bug that this patch fixed can be very easily reproduced using e.g.
+the rfkill command line too. By running "rfkill block all" before
+inserting a Bluetooth dongle the resulting HCI device goes into a state
+where it is never announced over mgmt, not even when "rfkill unblock all"
+is run.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Cc: stable@vger.kernel.org
+---
+ net/bluetooth/hci_core.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index d0d6cf8..433820a 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1148,7 +1148,11 @@ int hci_dev_open(__u16 dev)
+ 		goto done;
+ 	}
+ 
+-	if (test_bit(HCI_RFKILLED, &hdev->dev_flags)) {
++	/* Check for rfkill but allow the HCI setup stage to proceed
++	 * (which in itself doesn't cause any RF activity).
++	 */
++	if (test_bit(HCI_RFKILLED, &hdev->dev_flags) &&
++	    !test_bit(HCI_SETUP, &hdev->dev_flags)) {
+ 		ret = -ERFKILL;
+ 		goto done;
+ 	}
+@@ -1599,7 +1603,8 @@ static int hci_rfkill_set_block(void *data, bool blocked)
+ 
+ 	if (blocked) {
+ 		set_bit(HCI_RFKILLED, &hdev->dev_flags);
+-		hci_dev_do_close(hdev);
++		if (!test_bit(HCI_SETUP, &hdev->dev_flags))
++			hci_dev_do_close(hdev);
+ 	} else {
+ 		clear_bit(HCI_RFKILLED, &hdev->dev_flags);
+ 	}
+@@ -1624,6 +1629,11 @@ static void hci_power_on(struct work_struct *work)
+ 		return;
+ 	}
+ 
++	if (test_bit(HCI_RFKILLED, &hdev->dev_flags)) {
++		clear_bit(HCI_AUTO_OFF, &hdev->dev_flags);
++		hci_dev_do_close(hdev);
++	}
++
+ 	if (test_bit(HCI_AUTO_OFF, &hdev->dev_flags))
+ 		queue_delayed_work(hdev->req_workqueue, &hdev->power_off,
+ 				   HCI_AUTO_OFF_TIMEOUT);
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.8.4.rc3
+
