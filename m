@@ -1,128 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52320A22.1040609@monom.org>
-Date: Thu, 12 Sep 2013 20:38:26 +0200
-From: Daniel Wagner <wagi@monom.org>
+From: Nedim Hadzic <nhadzic@blackberry.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [Bluetooth Low Energy] Pairing and writing characteristic
+ property issue
+Date: Thu, 12 Sep 2013 16:55:36 +0000
+Message-ID: <285F7E29A611CC4197B552ED66CC20B8CE898C@XMB102ADS.rim.net>
+References: <285F7E29A611CC4197B552ED66CC20B8CE7EBA@XMB102ADS.rim.net>
+In-Reply-To: <285F7E29A611CC4197B552ED66CC20B8CE7EBA@XMB102ADS.rim.net>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-To: "John W. Linville" <linville@tuxdriver.com>
-CC: Dan Williams <dcbw@redhat.com>, linux-wireless@vger.kernel.org,
- johannes@sipsolutions.net, marcel@holtmann.org,
- Samuel Ortiz <samuel@sortiz.org>,
- Gustavo Padovan <gustavo@padovan.org>, linux-bluetooth@vger.kernel.org,
- linux-nfc@ml01.01.org
-Subject: Re: Linux Wireless Mini-Summit in New Orleans -- 19-20 September
-References: <20130808185410.GD30925@tuxdriver.com> <20130808190428.GF30925@tuxdriver.com> <20130905133907.GE1947@tuxdriver.com> <1378397092.3580.21.camel@dcbw.foobar.com> <20130909192346.GC1955@tuxdriver.com>
-In-Reply-To: <20130909192346.GC1955@tuxdriver.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi again,
 
-On 09/09/2013 09:23 PM, John W. Linville wrote:
-> On Thu, Sep 05, 2013 at 11:04:52AM -0500, Dan Williams wrote:
->> On Thu, 2013-09-05 at 09:39 -0400, John W. Linville wrote:
->>> On Thu, Aug 08, 2013 at 03:04:29PM -0400, John W. Linville wrote:
->>>> Sorry, forgot to copy linux-bluetooth and linux-nfc...
->>>>
->>>> On Thu, Aug 08, 2013 at 02:54:11PM -0400, John W. Linville wrote:
->>>>> Greetings!
->>>>>
->>>>> This is a reminder that we will have a Linux Wireless Mini-Summit in
->>>>> New Orleans this year on 19-20 September.  This will immediately follow
->>>>> LinuxCon and will run concurrently with Linux Plumber's Conference.
->>>>> This event includes Linux developers for wireless LAN (802.11),
->>>>> Bluetooth, and NFC technologies.  Both kernel and userland developers
->>>>> are welcomed and heartily encouraged to attend!
->>>>>
->>>>> 	http://wireless.kernel.org/en/developers/Summits/New-Orleans-2013
->>>>>
->>>>> The link above is a Wiki.  We are using it to collect discussion
->>>>> topics and to negotiate agenda/scheduling options for the event.
->>>>> Please go there to record your intent to attend the event and to
->>>>> propopse topics for discussion.
->>>>>
->>>>> Please be aware that in order to attend the event above one must
->>>>> register for either LinuxCon or for Linux Plumbers Conference.
->>>>> Act now, before those events fill-up and close their registrations!
->>>>>
->>>>> We are allotted one "large" room (up to ~80 people "theater style"), and
->>>>> two "small" rooms (up to ~25 people) for this event.  Based on history
->>>>> and the numbers of contributors, the larger room will primarily be
->>>>> for the 802.11 discussions and any "plenary" topics while the smaller
->>>>> rooms will be for Bluetooth, NFC, and any "breakout" topics.
->>>>>
->>>>> So...thoughts?  Topics to discuss?
->>>
->>> Ping?  We're now just 2 weeks away!
->>>
->>> Is our topic list complete?  It looks a bit light...
->>>
->>> Anyone have any input on scheduling the topics?  Are there any
->>> overlapping LPC sessions that it would make sense to work around?
->>
->> I'm attending though I haven't put my name on the wiki yet.
->>
->> Random thoughts; it doesn't look like any of these are covered in the
->> regular LinuxConf or LPC sessions.
->>
->> 1) State of the Union (maybe by multiple people in the same session per
->> their expertise), since perhaps not everyone doing eg 802.11 stuff knows
->> what's happening in BT or NFC land, or not everyone working on a
->> specific driver may know what new stuff their driver might need to be
->> fixed up for.  Maybe 5 minutes or less for things like:
->>
->>    * what's under the most active development right now?
->>    * upcoming new driver, hardware, and new capabilities
->>    * new 802.11 standards
->>    * and what's coming up in the next year from the standards orgs
->>    * what people will start working on soon
->>    * what will 3.13 or 3.14 look like from a wireless perspective?
->>    * 11s mesh status?
->>    * anything interesting in wpa_supplicant land?
->>    * anything new/interesting on the Android front?
->>
->> 2) Bluetooth - update about what's new and what's coming up in Bluez
->> land, and interaction with kernel 802.11 if any,
->>
->> 3) NFC - update about what's new and what's coming up in NFC land, where
->> it's getting used, what the stack looks like
->>
->> 4) What are users having the most problems with and how these problems
->> be fixed better/more quickly?  Are they driver bugs?  Are they stack
->> bugs?  Supplicant bugs?  NM/GUI/etc bugs?  Is there anything in our
->> development processes that's not working as smoothly as it could be?
->
-> Thanks, Dan -- those all look like decent discussion points.
-> I've added most of the points above to the topic list:
->
-> 	http://wireless.kernel.org/en/developers/Summits/New-Orleans-2013
->
-> Now, we need a few volunteers...
->
-> Gustavo, can you do a session on Bluetooth developments?
->
-> Samuel, can you cover NFC?
->
-> Jouni, would you mind doing your usual update on the standards
-> activities?  Also, is there anything new/interesting to report on
-> wpa_suppliant and/or hostapd?
->
-> Johannes, would you cover your vision for mac80211 for the next year
-> or so?  Anything in progress now that needs to be discussed?
->
-> Who should cover any Android topics?
->
-> Arend, Kalle, Johannes, Luca, etc -- anyone want to talk about driver
-> developments and/or issues between drivers and mac80211 or other
-> parts of the stack?
->
-> Seth, Stanislaw, etc -- anyone want to cover issues dealing with
-> supporting wireless in distributions?
->
-> Dan Williams, Daniel Wagner, etc -- anyone got some user stories
-> to share?
+I am not sure if I sent mail to wrong list, but if I did can someone inform me. I am still having a problems with this issues so I would appreciate some help.
 
-Not much news from the user front, though I could give a short
-update what's happening on ConnMan if you like.
+Kind regards,
+Nedim
+________________________________________
+From: linux-bluetooth-owner@vger.kernel.org [linux-bluetooth-owner@vger.kernel.org] on behalf of Nedim Hadzic [nhadzic@blackberry.com]
+Sent: 11 September 2013 07:34
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bluetooth Low Energy] Pairing and writing characteristic property issue
 
-cheers,
-daniel
+Hello everyone,
+
+Recently I started working with Bluetooth Low Energy devices on Linux (developing some applications, testing devices etc). I am using two Bluetooth Low Energy devices SensorTag from Texas Instruments and HearRateMonitor BlueHR.
+
+Bluez version: 4.101-0ubuntu8b1
+
+SensorTag: I can connect to the device, read and write characteristic values using gatttool and I can pair with the device using a simple-agent tool for this. After I pair with the device, I want to change value of the characteristic using org.bluez.Characteristic interface and SetProperty method, but it does not change; nor PropertyChanged signal is emitted nor I get any error. I checked hcidump:
+2013-09-11 12:07:15.827211 < ACL data: handle 75 flags 0x00 dlen 8
+    ATT: Write cmd (0x52)
+      handle 0x0029 value  0x01
+
+In case of changing the characteristic value with gatttool hcidump is following:
+2013-09-11 12:20:07.239012 < ACL data: handle 75 flags 0x00 dlen 8
+    ATT: Write req (0x12)
+      handle 0x0029 value  0x01
+
+Difference is in part of write cmd and req. Only difference between these two approaches is that with gatttool, you first connect to LE device (LE Create Connection in hcidump), and in hcdump when accessing through interface and using method SetProperty there is no interface or method for connecting. Any guesses what can be done?
+
+
+HearRateMonitor: I can connect to the device, read characteristic values using gatttool ( with adding "-t random" part to the command), but I can not pair with the device using simple-agent: Error: Creating device failed: org.bluez.Error.AuthenticationFailed: Authentication Failed.
+Hcidump is the following:
+2013-09-11 11:58:41.747749 < HCI Command: LE Create Connection (0x08|0x000d) plen 25
+    bdaddr D5:EA:8B:A9:EC:70 type 1
+2013-09-11 11:58:41.751989 > HCI Event: Command Status (0x0f) plen 4
+    LE Create Connection (0x08|0x000d) status 0x00 ncmd 1
+2013-09-11 11:58:44.311996 > HCI Event: LE Meta Event (0x3e) plen 19
+    LE Connection Complete
+      status 0x00 handle 75, role master
+      bdaddr D5:EA:8B:A9:EC:70 (Random)
+2013-09-11 11:58:44.312173 < ACL data: handle 75 flags 0x00 dlen 11
+    SMP: Pairing Request (0x01)
+      capability 0x04 oob 0x00 auth req 0x01
+      max key size 0x10 init key dist 0x00 resp key dist 0x01
+      Capability: KeyboardDisplay (OOB data not present)
+      Authentication: Bonding (No MITM Protection)
+      Initiator Key Distribution:
+      Responder Key Distribution:  LTK
+2013-09-11 11:58:44.348985 > HCI Event: Number of Completed Packets (0x13) plen 5
+    handle 75 packets 1
+2013-09-11 11:58:44.418969 > ACL data: handle 75 flags 0x02 dlen 6
+    SMP: Pairing Failed (0x05)
+      reason 0x05
+      Reason Pairing Not Supported
+2013-09-11 11:58:44.560004 > HCI Event: Disconn Complete (0x05) plen 4
+    status 0x00 handle 75 reason 0x13
+    Reason: Remote User Terminated Connection
+
+This device is using random device address, but I do not know how to pair with it in that case. I try to pair with it using a smartphone with support and it is working. Any help, or input on this?
+
+
+Looking forward to reply;
+
+Kind regards,
+Nedim Hadzic
+---------------------------------------------------------------------
+This transmission (including any attachments) may contain confidential information, privileged material (including material protected by the solicitor-client or other applicable privileges), or constitute non-public information. Any use of this information by anyone other than the intended recipient is prohibited. If you have received this transmission in error, please immediately reply to the sender and delete this information from your system. Use, dissemination, distribution, or reproduction of this transmission by unintended recipients is not authorized and may be unlawful.
+--
+To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+---------------------------------------------------------------------
+This transmission (including any attachments) may contain confidential information, privileged material (including material protected by the solicitor-client or other applicable privileges), or constitute non-public information. Any use of this information by anyone other than the intended recipient is prohibited. If you have received this transmission in error, please immediately reply to the sender and delete this information from your system. Use, dissemination, distribution, or reproduction of this transmission by unintended recipients is not authorized and may be unlawful.
+
