@@ -1,31 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 13 Sep 2013 15:33:44 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/8] sap: Keep reference to btd_adapter in struct
- sap_server
-Message-ID: <20130913123344.GA28908@x220.p-661hnu-f1>
-References: <1379071852-10094-1-git-send-email-szymon.janc@tieto.com>
- <1379071852-10094-3-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1379071852-10094-3-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <5232FAC8.5090903@oss.bmw-carit.de>
+References: <1379064212-30056-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+	<1379064212-30056-3-git-send-email-christian.fetzer@oss.bmw-carit.de>
+	<CABBYNZL+d8CpQNJ2z750s30naUoY-049XpCs3gOtGMsG1hCJVw@mail.gmail.com>
+	<5232FAC8.5090903@oss.bmw-carit.de>
+Date: Fri, 13 Sep 2013 14:54:25 +0300
+Message-ID: <CABBYNZJ1Mb-zTsS7dmTOupWOebqHDrVyGuBwEqK--UzwHCm75w@mail.gmail.com>
+Subject: Re: [PATCH 2/4] obexd: Fix setting message folder for relative folder
+ in ListMessages
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Christian,
 
-On Fri, Sep 13, 2013, Szymon Janc wrote:
-> Path and adapter address can be obtained easily from btd_adapter
-> and there is no need to keep local copy.
-> ---
->  profiles/sap/manager.c |  6 ++----
->  profiles/sap/server.c  | 23 +++++++++++++----------
->  profiles/sap/server.h  |  2 +-
->  3 files changed, 16 insertions(+), 15 deletions(-)
+On Fri, Sep 13, 2013 at 2:45 PM, Christian Fetzer
+<christian.fetzer@oss.bmw-carit.de> wrote:
+> Hi Luiz,
+>
+> On 09/13/2013 12:47 PM, Luiz Augusto von Dentz wrote:
+>> Hi Christian,
+>>
+>> On Fri, Sep 13, 2013 at 12:23 PM, Christian Fetzer
+>> <christian.fetzer@oss.bmw-carit.de> wrote:
+>>> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+>>>
+>>> The method ListMessages allows to specify a relative subfolder.
+>>> This subfolder needs to be added to the current path when registering
+>>> a new message interface.
+>>> ---
+>>>  obexd/client/map.c | 19 +++++++++++++++++--
+>>>  1 file changed, 17 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/obexd/client/map.c b/obexd/client/map.c
+>>> index 9a1b140..54011d8 100644
+>>> --- a/obexd/client/map.c
+>>> +++ b/obexd/client/map.c
+>>> @@ -96,6 +96,7 @@ static const char * const filter_list[] = {
+>>>  struct map_data {
+>>>         struct obc_session *session;
+>>>         DBusMessage *msg;
+>>> +       char *folder;
+>>>         GHashTable *messages;
+>>>         int16_t mas_instance_id;
+>>>         uint8_t supported_message_types;
+>>> @@ -1058,8 +1059,7 @@ static void msg_element(GMarkupParseContext *ctxt, const char *element,
+>>>
+>>>         msg = g_hash_table_lookup(data->messages, values[i]);
+>>>         if (msg == NULL) {
+>>> -               msg = map_msg_create(data, values[i],
+>>> -                                       obc_session_get_folder(data->session));
+>>> +               msg = map_msg_create(data, values[i], data->folder);
+>>>                 if (msg == NULL)
+>>>                         return;
+>>>         }
+>>> @@ -1153,6 +1153,19 @@ static void message_listing_cb(struct obc_session *session,
+>>>  done:
+>>>         g_dbus_send_message(conn, reply);
+>>>         dbus_message_unref(map->msg);
+>>> +       g_free(map->folder);
+>>> +       map->folder = NULL;
+>>> +}
+>>> +
+>>> +static char *get_absolute_folder(const char *root, const char *subfolder)
+>>> +{
+>>> +       if (!subfolder || strlen(subfolder) == 0)
+>>> +               return g_strdup(root);
+>>> +       else
+>>> +               if (g_str_has_suffix(root, "/"))
+>>> +                       return g_strconcat(root, subfolder, NULL);
+>>> +               else
+>>> +                       return g_strconcat(root, "/", subfolder, NULL);
+>>>  }
+>>>
+>>>  static DBusMessage *get_message_listing(struct map_data *map,
+>>> @@ -1175,6 +1188,8 @@ static DBusMessage *get_message_listing(struct map_data *map,
+>>>         if (obc_session_queue(map->session, transfer, message_listing_cb, map,
+>>>                                                                 &err)) {
+>>>                 map->msg = dbus_message_ref(message);
+>>> +               map->folder = get_absolute_folder(obc_session_get_folder(
+>>> +                                                       map->session), folder);
+>>>                 return NULL;
+>>>         }
+>>>
+>>> --
+>>> 1.8.3.4
+>>
+>> This will probably not work in case of multiple outstanding requests
+>> the last will always overwrite the folder, which btw will leak, so
+>> probably we need a per request data.
+>>
+>>
+>
+> Yes, the issue exists already in the current code base, because the stored
+> dbus message is overridden if any MAP function is called before the previous
+> one is finished.
+>
+> I've been able to reproduce a crash with it and already started to write a patch
+> that adds a pending_request on top of this patch.
+>
+> Do you prefer to have a fix first and rebase this patchset on it, or do you
+> prefer to get the notification API patchset first? (which is already ready to be sent)
 
-I've applied patches 1-3 but for the rest I'm waiting for a v2 or some
-more discussion (on IRC or here).
+Fixes should take precedence over regular patches specially if it is
+fixing crashes.
 
-Johan
+
+-- 
+Luiz Augusto von Dentz
