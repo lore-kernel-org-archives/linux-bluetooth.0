@@ -1,42 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/3] Bluetooth: Fix L2CAP Disconnect response for unknown CID
-Date: Fri, 13 Sep 2013 14:29:25 +0300
-Message-Id: <1379071767-16604-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1379071767-16604-1-git-send-email-johan.hedberg@gmail.com>
-References: <1379071767-16604-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 0/3] Bluetooth: Various L2CAP fixes
+Date: Fri, 13 Sep 2013 14:29:24 +0300
+Message-Id: <1379071767-16604-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-If we receive an L2CAP Disconnect Request for an unknown CID we should
-not just silently drop it but reply with a proper Command Reject
-response. This patch fixes this by ensuring that the disconnect handler
-returns a proper error instead of 0 and will cause the function caller
-to send the right response.
+This one contains a fix for the locking bug spotted by Lizardo in patch
+3/3 as well as the minor coding style issue in the same patch.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
-v2: no changes
+Johan
 
- net/bluetooth/l2cap_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+----------------------------------------------------------------
+Johan Hedberg (3):
+      Bluetooth: Fix L2CAP Disconnect response for unknown CID
+      Bluetooth: Fix responding to invalid L2CAP signaling commands
+      Bluetooth: Fix waiting for clearing of BT_SK_SUSPEND flag
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b3bb7bc..ea3792f 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4206,7 +4206,7 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn,
- 	chan = __l2cap_get_chan_by_scid(conn, dcid);
- 	if (!chan) {
- 		mutex_unlock(&conn->chan_lock);
--		return 0;
-+		return -EINVAL;
- 	}
- 
- 	l2cap_chan_lock(chan);
--- 
-1.8.4.rc3
+ include/net/bluetooth/bluetooth.h |  1 +
+ net/bluetooth/af_bluetooth.c      | 39 +++++++++++++++++++++++++++++++++++++
+ net/bluetooth/l2cap_core.c        | 10 +++++++++-
+ net/bluetooth/l2cap_sock.c        |  6 ++++++
+ net/bluetooth/rfcomm/sock.c       |  9 +++++++--
+ 5 files changed, 62 insertions(+), 3 deletions(-)
 
