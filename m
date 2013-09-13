@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 4/8] sdp: Decouple Device ID profile implementation
-Date: Fri, 13 Sep 2013 13:30:48 +0200
-Message-ID: <1379071852-10094-4-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 2/8] core: Minor whitespace fix
+Date: Fri, 13 Sep 2013 13:30:46 +0200
+Message-ID: <1379071852-10094-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1379071852-10094-1-git-send-email-szymon.janc@tieto.com>
 References: <1379071852-10094-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,317 +12,29 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Make DeviceID profile similar to other profiles implementations. Use
-btd_profile for handling DeviceID profile while adding/removing
-adapters. The nice drawback is that SDP code no longer depends on
-main_opts.
 ---
- Makefile.plugins             |   3 +
- profiles/deviceid/deviceid.c | 181 +++++++++++++++++++++++++++++++++++++++++++
- src/sdpd-server.c            |   4 -
- src/sdpd-service.c           |  58 --------------
- src/sdpd.h                   |   2 -
- 5 files changed, 184 insertions(+), 64 deletions(-)
- create mode 100644 profiles/deviceid/deviceid.c
+ src/main.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index 7c5f71d..df5d2a1 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -82,6 +82,9 @@ builtin_sources += profiles/scanparam/scan.c
- builtin_modules += deviceinfo
- builtin_sources += profiles/deviceinfo/deviceinfo.c
+diff --git a/src/main.c b/src/main.c
+index dc0478e..eafe2ed 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -282,10 +282,10 @@ static void init_defaults(void)
+ 	if (sscanf(VERSION, "%hhu.%hhu", &major, &minor) != 2)
+ 		return;
  
-+builtin_modules += deviceid
-+builtin_sources += profiles/deviceid/deviceid.c
-+
- if EXPERIMENTAL
- builtin_modules += alert
- builtin_sources += profiles/alert/server.c
-diff --git a/profiles/deviceid/deviceid.c b/profiles/deviceid/deviceid.c
-new file mode 100644
-index 0000000..e5fc35a
---- /dev/null
-+++ b/profiles/deviceid/deviceid.c
-@@ -0,0 +1,181 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Intel Corporation
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <bluetooth/sdp.h>
-+#include <bluetooth/sdp_lib.h>
-+
-+#include <glib.h>
-+
-+#include "sdpd.h"
-+#include "hcid.h"
-+#include "adapter.h"
-+#include "profile.h"
-+#include "plugin.h"
-+#include "log.h"
-+
-+struct deviceid_adapter {
-+	struct btd_adapter *adapter;
-+	uint32_t handle;
-+};
-+
-+static GSList *deviceid_adapters = NULL;
-+
-+static struct deviceid_adapter *find_adapter(struct btd_adapter *adapter)
-+{
-+	GSList *list;
-+
-+	for (list = deviceid_adapters; list; list = list->next) {
-+		struct deviceid_adapter *da = list->data;
-+
-+		if (da->adapter == adapter)
-+			return da;
-+	}
-+
-+	return NULL;
-+}
-+
-+static sdp_record_t *create_record(uint16_t source, uint16_t vendor,
-+					uint16_t product, uint16_t version)
-+{
-+	const uint16_t spec = 0x0103;
-+	const uint8_t primary = 1;
-+	sdp_list_t *class_list, *group_list, *profile_list;
-+	uuid_t class_uuid, group_uuid;
-+	sdp_data_t *sdp_data, *primary_data, *source_data;
-+	sdp_data_t *spec_data, *vendor_data, *product_data, *version_data;
-+	sdp_profile_desc_t profile;
-+	sdp_record_t *record = sdp_record_alloc();
-+
-+	DBG("%04x:%04x:%04x:%04x", source, vendor, product, version);
-+
-+	record->handle = sdp_next_handle();
-+
-+	sdp_data = sdp_data_alloc(SDP_UINT32, &record->handle);
-+	sdp_attr_add(record, SDP_ATTR_RECORD_HANDLE, sdp_data);
-+
-+	sdp_uuid16_create(&class_uuid, PNP_INFO_SVCLASS_ID);
-+	class_list = sdp_list_append(0, &class_uuid);
-+	sdp_set_service_classes(record, class_list);
-+	sdp_list_free(class_list, NULL);
-+
-+	sdp_uuid16_create(&group_uuid, PUBLIC_BROWSE_GROUP);
-+	group_list = sdp_list_append(NULL, &group_uuid);
-+	sdp_set_browse_groups(record, group_list);
-+	sdp_list_free(group_list, NULL);
-+
-+	sdp_uuid16_create(&profile.uuid, PNP_INFO_PROFILE_ID);
-+	profile.version = spec;
-+	profile_list = sdp_list_append(NULL, &profile);
-+	sdp_set_profile_descs(record, profile_list);
-+	sdp_list_free(profile_list, NULL);
-+
-+	spec_data = sdp_data_alloc(SDP_UINT16, &spec);
-+	sdp_attr_add(record, 0x0200, spec_data);
-+
-+	vendor_data = sdp_data_alloc(SDP_UINT16, &vendor);
-+	sdp_attr_add(record, 0x0201, vendor_data);
-+
-+	product_data = sdp_data_alloc(SDP_UINT16, &product);
-+	sdp_attr_add(record, 0x0202, product_data);
-+
-+	version_data = sdp_data_alloc(SDP_UINT16, &version);
-+	sdp_attr_add(record, 0x0203, version_data);
-+
-+	primary_data = sdp_data_alloc(SDP_BOOL, &primary);
-+	sdp_attr_add(record, 0x0204, primary_data);
-+
-+	source_data = sdp_data_alloc(SDP_UINT16, &source);
-+	sdp_attr_add(record, 0x0205, source_data);
-+
-+	return record;
-+}
-+
-+static int deviceid_adapter_probe(struct btd_profile *p,
-+						struct btd_adapter *adapter)
-+{
-+	struct deviceid_adapter *dadapter;
-+	sdp_record_t *rec;
-+	int ret;
-+
-+	DBG("path %s", adapter_get_path(adapter));
-+
-+	rec = create_record(main_opts.did_source, main_opts.did_vendor,
-+				main_opts.did_product, main_opts.did_version);
-+
-+	ret = add_record_to_server(adapter_get_address(adapter), rec);
-+	if (ret < 0) {
-+		sdp_record_free(rec);
-+		return ret;
-+	}
-+
-+	dadapter = g_new0(struct deviceid_adapter, 1);
-+	dadapter->adapter = adapter;
-+	dadapter->handle = rec->handle;
-+
-+	deviceid_adapters = g_slist_prepend(deviceid_adapters, dadapter);
-+
-+	return 0;
-+}
-+
-+static void deviceid_adapter_remove(struct btd_profile *p,
-+						struct btd_adapter *adapter)
-+{
-+	struct deviceid_adapter *dadapter;
-+
-+	DBG("path %s", adapter_get_path(adapter));
-+
-+	dadapter = find_adapter(adapter);
-+	if (!dadapter)
-+		return;
-+
-+	remove_record_from_server(dadapter->handle);
-+}
-+
-+struct btd_profile deviceid_profile = {
-+	.name		= "deviceid",
-+	.adapter_probe	= deviceid_adapter_probe,
-+	.adapter_remove	= deviceid_adapter_remove,
-+};
-+
-+static int deviceid_init(void)
-+{
-+	if (main_opts.did_source == 0) {
-+		info("Device ID information disabled");
-+		return -1;
-+	}
-+
-+	return btd_profile_register(&deviceid_profile);
-+}
-+
-+static void deviceid_exit(void)
-+{
-+	btd_profile_unregister(&deviceid_profile);
-+}
-+
-+BLUETOOTH_PLUGIN_DEFINE(deviceid, VERSION,
-+			BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
-+			deviceid_init, deviceid_exit)
-diff --git a/src/sdpd-server.c b/src/sdpd-server.c
-index 181d248..8267e11 100644
---- a/src/sdpd-server.c
-+++ b/src/sdpd-server.c
-@@ -238,10 +238,6 @@ int start_sdp_server(uint16_t mtu, uint32_t flags)
- 		return -1;
- 	}
- 
--	if (main_opts.did_source > 0)
--		register_device_id(main_opts.did_source, main_opts.did_vendor,
--				main_opts.did_product, main_opts.did_version);
--
- 	io = g_io_channel_unix_new(l2cap_sock);
- 	g_io_channel_set_close_on_unref(io, TRUE);
- 
-diff --git a/src/sdpd-service.c b/src/sdpd-service.c
-index 38bf808..c4d3a02 100644
---- a/src/sdpd-service.c
-+++ b/src/sdpd-service.c
-@@ -176,64 +176,6 @@ void register_server_service(void)
- 	update_db_timestamp();
+-        main_opts.did_source = 0x0002;		/* USB */
+-        main_opts.did_vendor = 0x1d6b;		/* Linux Foundation */
+-        main_opts.did_product = 0x0246;		/* BlueZ */
+-        main_opts.did_version = (major << 8 | minor);
++	main_opts.did_source = 0x0002;		/* USB */
++	main_opts.did_vendor = 0x1d6b;		/* Linux Foundation */
++	main_opts.did_product = 0x0246;		/* BlueZ */
++	main_opts.did_version = (major << 8 | minor);
  }
  
--void register_device_id(uint16_t source, uint16_t vendor,
--					uint16_t product, uint16_t version)
--{
--	const uint16_t spec = 0x0103;
--	const uint8_t primary = 1;
--	sdp_list_t *class_list, *group_list, *profile_list;
--	uuid_t class_uuid, group_uuid;
--	sdp_data_t *sdp_data, *primary_data, *source_data;
--	sdp_data_t *spec_data, *vendor_data, *product_data, *version_data;
--	sdp_profile_desc_t profile;
--	sdp_record_t *record = sdp_record_alloc();
--
--	DBG("Adding device id record for %04x:%04x:%04x:%04x",
--					source, vendor, product, version);
--
--	record->handle = sdp_next_handle();
--
--	sdp_record_add(BDADDR_ANY, record);
--	sdp_data = sdp_data_alloc(SDP_UINT32, &record->handle);
--	sdp_attr_add(record, SDP_ATTR_RECORD_HANDLE, sdp_data);
--
--	sdp_uuid16_create(&class_uuid, PNP_INFO_SVCLASS_ID);
--	class_list = sdp_list_append(0, &class_uuid);
--	sdp_set_service_classes(record, class_list);
--	sdp_list_free(class_list, NULL);
--
--	sdp_uuid16_create(&group_uuid, PUBLIC_BROWSE_GROUP);
--	group_list = sdp_list_append(NULL, &group_uuid);
--	sdp_set_browse_groups(record, group_list);
--	sdp_list_free(group_list, NULL);
--
--	sdp_uuid16_create(&profile.uuid, PNP_INFO_PROFILE_ID);
--	profile.version = spec;
--	profile_list = sdp_list_append(NULL, &profile);
--	sdp_set_profile_descs(record, profile_list);
--	sdp_list_free(profile_list, NULL);
--
--	spec_data = sdp_data_alloc(SDP_UINT16, &spec);
--	sdp_attr_add(record, 0x0200, spec_data);
--
--	vendor_data = sdp_data_alloc(SDP_UINT16, &vendor);
--	sdp_attr_add(record, 0x0201, vendor_data);
--
--	product_data = sdp_data_alloc(SDP_UINT16, &product);
--	sdp_attr_add(record, 0x0202, product_data);
--
--	version_data = sdp_data_alloc(SDP_UINT16, &version);
--	sdp_attr_add(record, 0x0203, version_data);
--
--	primary_data = sdp_data_alloc(SDP_BOOL, &primary);
--	sdp_attr_add(record, 0x0204, primary_data);
--
--	source_data = sdp_data_alloc(SDP_UINT16, &source);
--	sdp_attr_add(record, 0x0205, source_data);
--
--	update_db_timestamp();
--}
--
- int add_record_to_server(const bdaddr_t *src, sdp_record_t *rec)
- {
- 	sdp_data_t *data;
-diff --git a/src/sdpd.h b/src/sdpd.h
-index 9a0e1e9..28d7f6d 100644
---- a/src/sdpd.h
-+++ b/src/sdpd.h
-@@ -56,8 +56,6 @@ int service_remove_req(sdp_req_t *req, sdp_buf_t *rsp);
- 
- void register_public_browse_group(void);
- void register_server_service(void);
--void register_device_id(uint16_t source, uint16_t vendor,
--					uint16_t product, uint16_t version);
- 
- int record_sort(const void *r1, const void *r2);
- void sdp_svcdb_reset(void);
+ static GMainLoop *event_loop;
 -- 
 1.8.4
 
