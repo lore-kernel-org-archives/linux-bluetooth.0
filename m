@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 3/8] sap: Keep reference to btd_adapter in struct sap_server
-Date: Fri, 13 Sep 2013 13:30:47 +0200
-Message-ID: <1379071852-10094-3-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 4/8] sdp: Decouple Device ID profile implementation
+Date: Fri, 13 Sep 2013 13:30:48 +0200
+Message-ID: <1379071852-10094-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1379071852-10094-1-git-send-email-szymon.janc@tieto.com>
 References: <1379071852-10094-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,133 +12,317 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Path and adapter address can be obtained easily from btd_adapter
-and there is no need to keep local copy.
+Make DeviceID profile similar to other profiles implementations. Use
+btd_profile for handling DeviceID profile while adding/removing
+adapters. The nice drawback is that SDP code no longer depends on
+main_opts.
 ---
- profiles/sap/manager.c |  6 ++----
- profiles/sap/server.c  | 23 +++++++++++++----------
- profiles/sap/server.h  |  2 +-
- 3 files changed, 16 insertions(+), 15 deletions(-)
+ Makefile.plugins             |   3 +
+ profiles/deviceid/deviceid.c | 181 +++++++++++++++++++++++++++++++++++++++++++
+ src/sdpd-server.c            |   4 -
+ src/sdpd-service.c           |  58 --------------
+ src/sdpd.h                   |   2 -
+ 5 files changed, 184 insertions(+), 64 deletions(-)
+ create mode 100644 profiles/deviceid/deviceid.c
 
-diff --git a/profiles/sap/manager.c b/profiles/sap/manager.c
-index 24b73e7..bfb81a5 100644
---- a/profiles/sap/manager.c
-+++ b/profiles/sap/manager.c
-@@ -35,11 +35,9 @@
+diff --git a/Makefile.plugins b/Makefile.plugins
+index 7c5f71d..df5d2a1 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -82,6 +82,9 @@ builtin_sources += profiles/scanparam/scan.c
+ builtin_modules += deviceinfo
+ builtin_sources += profiles/deviceinfo/deviceinfo.c
  
- static int sap_server_probe(struct btd_profile *p, struct btd_adapter *adapter)
- {
--	const char *path = adapter_get_path(adapter);
--
--	DBG("path %s", path);
-+	DBG("path %s", adapter_get_path(adapter));
- 
--	return sap_server_register(path, adapter_get_address(adapter));
-+	return sap_server_register(adapter);
- }
- 
- static void sap_server_remove(struct btd_profile *p,
-diff --git a/profiles/sap/server.c b/profiles/sap/server.c
-index dfcf0f1..1aacfe9 100644
---- a/profiles/sap/server.c
-+++ b/profiles/sap/server.c
-@@ -73,7 +73,7 @@ struct sap_connection {
- };
- 
- struct sap_server {
--	char *path;
++builtin_modules += deviceid
++builtin_sources += profiles/deviceid/deviceid.c
++
+ if EXPERIMENTAL
+ builtin_modules += alert
+ builtin_sources += profiles/alert/server.c
+diff --git a/profiles/deviceid/deviceid.c b/profiles/deviceid/deviceid.c
+new file mode 100644
+index 0000000..e5fc35a
+--- /dev/null
++++ b/profiles/deviceid/deviceid.c
+@@ -0,0 +1,181 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <bluetooth/sdp.h>
++#include <bluetooth/sdp_lib.h>
++
++#include <glib.h>
++
++#include "sdpd.h"
++#include "hcid.h"
++#include "adapter.h"
++#include "profile.h"
++#include "plugin.h"
++#include "log.h"
++
++struct deviceid_adapter {
 +	struct btd_adapter *adapter;
- 	uint32_t record_id;
- 	GIOChannel *listen_io;
- 	struct sap_connection *conn;
-@@ -620,7 +620,8 @@ static void sap_set_connected(struct sap_server *server)
++	uint32_t handle;
++};
++
++static GSList *deviceid_adapters = NULL;
++
++static struct deviceid_adapter *find_adapter(struct btd_adapter *adapter)
++{
++	GSList *list;
++
++	for (list = deviceid_adapters; list; list = list->next) {
++		struct deviceid_adapter *da = list->data;
++
++		if (da->adapter == adapter)
++			return da;
++	}
++
++	return NULL;
++}
++
++static sdp_record_t *create_record(uint16_t source, uint16_t vendor,
++					uint16_t product, uint16_t version)
++{
++	const uint16_t spec = 0x0103;
++	const uint8_t primary = 1;
++	sdp_list_t *class_list, *group_list, *profile_list;
++	uuid_t class_uuid, group_uuid;
++	sdp_data_t *sdp_data, *primary_data, *source_data;
++	sdp_data_t *spec_data, *vendor_data, *product_data, *version_data;
++	sdp_profile_desc_t profile;
++	sdp_record_t *record = sdp_record_alloc();
++
++	DBG("%04x:%04x:%04x:%04x", source, vendor, product, version);
++
++	record->handle = sdp_next_handle();
++
++	sdp_data = sdp_data_alloc(SDP_UINT32, &record->handle);
++	sdp_attr_add(record, SDP_ATTR_RECORD_HANDLE, sdp_data);
++
++	sdp_uuid16_create(&class_uuid, PNP_INFO_SVCLASS_ID);
++	class_list = sdp_list_append(0, &class_uuid);
++	sdp_set_service_classes(record, class_list);
++	sdp_list_free(class_list, NULL);
++
++	sdp_uuid16_create(&group_uuid, PUBLIC_BROWSE_GROUP);
++	group_list = sdp_list_append(NULL, &group_uuid);
++	sdp_set_browse_groups(record, group_list);
++	sdp_list_free(group_list, NULL);
++
++	sdp_uuid16_create(&profile.uuid, PNP_INFO_PROFILE_ID);
++	profile.version = spec;
++	profile_list = sdp_list_append(NULL, &profile);
++	sdp_set_profile_descs(record, profile_list);
++	sdp_list_free(profile_list, NULL);
++
++	spec_data = sdp_data_alloc(SDP_UINT16, &spec);
++	sdp_attr_add(record, 0x0200, spec_data);
++
++	vendor_data = sdp_data_alloc(SDP_UINT16, &vendor);
++	sdp_attr_add(record, 0x0201, vendor_data);
++
++	product_data = sdp_data_alloc(SDP_UINT16, &product);
++	sdp_attr_add(record, 0x0202, product_data);
++
++	version_data = sdp_data_alloc(SDP_UINT16, &version);
++	sdp_attr_add(record, 0x0203, version_data);
++
++	primary_data = sdp_data_alloc(SDP_BOOL, &primary);
++	sdp_attr_add(record, 0x0204, primary_data);
++
++	source_data = sdp_data_alloc(SDP_UINT16, &source);
++	sdp_attr_add(record, 0x0205, source_data);
++
++	return record;
++}
++
++static int deviceid_adapter_probe(struct btd_profile *p,
++						struct btd_adapter *adapter)
++{
++	struct deviceid_adapter *dadapter;
++	sdp_record_t *rec;
++	int ret;
++
++	DBG("path %s", adapter_get_path(adapter));
++
++	rec = create_record(main_opts.did_source, main_opts.did_vendor,
++				main_opts.did_product, main_opts.did_version);
++
++	ret = add_record_to_server(adapter_get_address(adapter), rec);
++	if (ret < 0) {
++		sdp_record_free(rec);
++		return ret;
++	}
++
++	dadapter = g_new0(struct deviceid_adapter, 1);
++	dadapter->adapter = adapter;
++	dadapter->handle = rec->handle;
++
++	deviceid_adapters = g_slist_prepend(deviceid_adapters, dadapter);
++
++	return 0;
++}
++
++static void deviceid_adapter_remove(struct btd_profile *p,
++						struct btd_adapter *adapter)
++{
++	struct deviceid_adapter *dadapter;
++
++	DBG("path %s", adapter_get_path(adapter));
++
++	dadapter = find_adapter(adapter);
++	if (!dadapter)
++		return;
++
++	remove_record_from_server(dadapter->handle);
++}
++
++struct btd_profile deviceid_profile = {
++	.name		= "deviceid",
++	.adapter_probe	= deviceid_adapter_probe,
++	.adapter_remove	= deviceid_adapter_remove,
++};
++
++static int deviceid_init(void)
++{
++	if (main_opts.did_source == 0) {
++		info("Device ID information disabled");
++		return -1;
++	}
++
++	return btd_profile_register(&deviceid_profile);
++}
++
++static void deviceid_exit(void)
++{
++	btd_profile_unregister(&deviceid_profile);
++}
++
++BLUETOOTH_PLUGIN_DEFINE(deviceid, VERSION,
++			BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++			deviceid_init, deviceid_exit)
+diff --git a/src/sdpd-server.c b/src/sdpd-server.c
+index 181d248..8267e11 100644
+--- a/src/sdpd-server.c
++++ b/src/sdpd-server.c
+@@ -238,10 +238,6 @@ int start_sdp_server(uint16_t mtu, uint32_t flags)
+ 		return -1;
+ 	}
+ 
+-	if (main_opts.did_source > 0)
+-		register_device_id(main_opts.did_source, main_opts.did_vendor,
+-				main_opts.did_product, main_opts.did_version);
+-
+ 	io = g_io_channel_unix_new(l2cap_sock);
+ 	g_io_channel_set_close_on_unref(io, TRUE);
+ 
+diff --git a/src/sdpd-service.c b/src/sdpd-service.c
+index 38bf808..c4d3a02 100644
+--- a/src/sdpd-service.c
++++ b/src/sdpd-service.c
+@@ -176,64 +176,6 @@ void register_server_service(void)
+ 	update_db_timestamp();
+ }
+ 
+-void register_device_id(uint16_t source, uint16_t vendor,
+-					uint16_t product, uint16_t version)
+-{
+-	const uint16_t spec = 0x0103;
+-	const uint8_t primary = 1;
+-	sdp_list_t *class_list, *group_list, *profile_list;
+-	uuid_t class_uuid, group_uuid;
+-	sdp_data_t *sdp_data, *primary_data, *source_data;
+-	sdp_data_t *spec_data, *vendor_data, *product_data, *version_data;
+-	sdp_profile_desc_t profile;
+-	sdp_record_t *record = sdp_record_alloc();
+-
+-	DBG("Adding device id record for %04x:%04x:%04x:%04x",
+-					source, vendor, product, version);
+-
+-	record->handle = sdp_next_handle();
+-
+-	sdp_record_add(BDADDR_ANY, record);
+-	sdp_data = sdp_data_alloc(SDP_UINT32, &record->handle);
+-	sdp_attr_add(record, SDP_ATTR_RECORD_HANDLE, sdp_data);
+-
+-	sdp_uuid16_create(&class_uuid, PNP_INFO_SVCLASS_ID);
+-	class_list = sdp_list_append(0, &class_uuid);
+-	sdp_set_service_classes(record, class_list);
+-	sdp_list_free(class_list, NULL);
+-
+-	sdp_uuid16_create(&group_uuid, PUBLIC_BROWSE_GROUP);
+-	group_list = sdp_list_append(NULL, &group_uuid);
+-	sdp_set_browse_groups(record, group_list);
+-	sdp_list_free(group_list, NULL);
+-
+-	sdp_uuid16_create(&profile.uuid, PNP_INFO_PROFILE_ID);
+-	profile.version = spec;
+-	profile_list = sdp_list_append(NULL, &profile);
+-	sdp_set_profile_descs(record, profile_list);
+-	sdp_list_free(profile_list, NULL);
+-
+-	spec_data = sdp_data_alloc(SDP_UINT16, &spec);
+-	sdp_attr_add(record, 0x0200, spec_data);
+-
+-	vendor_data = sdp_data_alloc(SDP_UINT16, &vendor);
+-	sdp_attr_add(record, 0x0201, vendor_data);
+-
+-	product_data = sdp_data_alloc(SDP_UINT16, &product);
+-	sdp_attr_add(record, 0x0202, product_data);
+-
+-	version_data = sdp_data_alloc(SDP_UINT16, &version);
+-	sdp_attr_add(record, 0x0203, version_data);
+-
+-	primary_data = sdp_data_alloc(SDP_BOOL, &primary);
+-	sdp_attr_add(record, 0x0204, primary_data);
+-
+-	source_data = sdp_data_alloc(SDP_UINT16, &source);
+-	sdp_attr_add(record, 0x0205, source_data);
+-
+-	update_db_timestamp();
+-}
+-
+ int add_record_to_server(const bdaddr_t *src, sdp_record_t *rec)
  {
- 	server->conn->state = SAP_STATE_CONNECTED;
+ 	sdp_data_t *data;
+diff --git a/src/sdpd.h b/src/sdpd.h
+index 9a0e1e9..28d7f6d 100644
+--- a/src/sdpd.h
++++ b/src/sdpd.h
+@@ -56,8 +56,6 @@ int service_remove_req(sdp_req_t *req, sdp_buf_t *rsp);
  
--	g_dbus_emit_property_changed(btd_get_dbus_connection(), server->path,
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+					adapter_get_path(server->adapter),
- 					SAP_SERVER_INTERFACE, "Connected");
- }
+ void register_public_browse_group(void);
+ void register_server_service(void);
+-void register_device_id(uint16_t source, uint16_t vendor,
+-					uint16_t product, uint16_t version);
  
-@@ -1144,7 +1145,8 @@ static void sap_io_destroy(void *data)
- 	if (conn->state != SAP_STATE_CONNECT_IN_PROGRESS &&
- 				conn->state != SAP_STATE_CONNECT_MODEM_BUSY)
- 		g_dbus_emit_property_changed(btd_get_dbus_connection(),
--					server->path, SAP_SERVER_INTERFACE,
-+					adapter_get_path(server->adapter),
-+					SAP_SERVER_INTERFACE,
- 					"Connected");
- 
- 	if (conn->state == SAP_STATE_CONNECT_IN_PROGRESS ||
-@@ -1326,7 +1328,7 @@ static void server_remove(struct sap_server *server)
- 		server->listen_io = NULL;
- 	}
- 
--	g_free(server->path);
-+	btd_adapter_unref(server->adapter);
- 	g_free(server);
- }
- 
-@@ -1335,12 +1337,12 @@ static void destroy_sap_interface(void *data)
- 	struct sap_server *server = data;
- 
- 	DBG("Unregistered interface %s on path %s", SAP_SERVER_INTERFACE,
--								server->path);
-+					adapter_get_path(server->adapter));
- 
- 	server_remove(server);
- }
- 
--int sap_server_register(const char *path, const bdaddr_t *src)
-+int sap_server_register(struct btd_adapter *adapter)
- {
- 	sdp_record_t *record = NULL;
- 	GError *gerr = NULL;
-@@ -1358,19 +1360,19 @@ int sap_server_register(const char *path, const bdaddr_t *src)
- 		goto sdp_err;
- 	}
- 
--	if (add_record_to_server(src, record) < 0) {
-+	if (add_record_to_server(adapter_get_address(adapter), record) < 0) {
- 		error("Adding SAP SDP record to the SDP server failed.");
- 		sdp_record_free(record);
- 		goto sdp_err;
- 	}
- 
- 	server = g_new0(struct sap_server, 1);
--	server->path = g_strdup(path);
-+	server->adapter = btd_adapter_ref(adapter);
- 	server->record_id = record->handle;
- 
- 	io = bt_io_listen(NULL, connect_confirm_cb, server,
- 			NULL, &gerr,
--			BT_IO_OPT_SOURCE_BDADDR, src,
-+			BT_IO_OPT_SOURCE_BDADDR, adapter_get_address(adapter),
- 			BT_IO_OPT_CHANNEL, SAP_SERVER_CHANNEL,
- 			BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_HIGH,
- 			BT_IO_OPT_MASTER, TRUE,
-@@ -1383,7 +1385,8 @@ int sap_server_register(const char *path, const bdaddr_t *src)
- 	server->listen_io = io;
- 
- 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
--					server->path, SAP_SERVER_INTERFACE,
-+					adapter_get_path(server->adapter),
-+					SAP_SERVER_INTERFACE,
- 					server_methods, NULL,
- 					server_properties, server,
- 					destroy_sap_interface)) {
-diff --git a/profiles/sap/server.h b/profiles/sap/server.h
-index 73b38ab..d7e674a 100644
---- a/profiles/sap/server.h
-+++ b/profiles/sap/server.h
-@@ -20,5 +20,5 @@
- 
- #include <gdbus/gdbus.h>
- 
--int sap_server_register(const char *path, const bdaddr_t *src);
-+int sap_server_register(struct btd_adapter *adapter);
- void sap_server_unregister(const char *path);
+ int record_sort(const void *r1, const void *r2);
+ void sdp_svcdb_reset(void);
 -- 
 1.8.4
 
