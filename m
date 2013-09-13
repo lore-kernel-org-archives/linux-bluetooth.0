@@ -1,74 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/4] obexd: Fix setting message folder for relative folder in ListMessages
-Date: Fri, 13 Sep 2013 11:23:30 +0200
-Message-Id: <1379064212-30056-3-git-send-email-christian.fetzer@oss.bmw-carit.de>
-In-Reply-To: <1379064212-30056-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1379064212-30056-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH 0/4] obexd: Fix setting message folder
+Date: Fri, 13 Sep 2013 11:23:28 +0200
+Message-Id: <1379064212-30056-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-The method ListMessages allows to specify a relative subfolder.
-This subfolder needs to be added to the current path when registering
-a new message interface.
----
- obexd/client/map.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+This fixes an issue that the folder property for messages was set incorrectly
+when ListMessages got called with a subfolder parameter.
 
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index 9a1b140..54011d8 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -96,6 +96,7 @@ static const char * const filter_list[] = {
- struct map_data {
- 	struct obc_session *session;
- 	DBusMessage *msg;
-+	char *folder;
- 	GHashTable *messages;
- 	int16_t mas_instance_id;
- 	uint8_t supported_message_types;
-@@ -1058,8 +1059,7 @@ static void msg_element(GMarkupParseContext *ctxt, const char *element,
- 
- 	msg = g_hash_table_lookup(data->messages, values[i]);
- 	if (msg == NULL) {
--		msg = map_msg_create(data, values[i],
--					obc_session_get_folder(data->session));
-+		msg = map_msg_create(data, values[i], data->folder);
- 		if (msg == NULL)
- 			return;
- 	}
-@@ -1153,6 +1153,19 @@ static void message_listing_cb(struct obc_session *session,
- done:
- 	g_dbus_send_message(conn, reply);
- 	dbus_message_unref(map->msg);
-+	g_free(map->folder);
-+	map->folder = NULL;
-+}
-+
-+static char *get_absolute_folder(const char *root, const char *subfolder)
-+{
-+	if (!subfolder || strlen(subfolder) == 0)
-+		return g_strdup(root);
-+	else
-+		if (g_str_has_suffix(root, "/"))
-+			return g_strconcat(root, subfolder, NULL);
-+		else
-+			return g_strconcat(root, "/", subfolder, NULL);
- }
- 
- static DBusMessage *get_message_listing(struct map_data *map,
-@@ -1175,6 +1188,8 @@ static DBusMessage *get_message_listing(struct map_data *map,
- 	if (obc_session_queue(map->session, transfer, message_listing_cb, map,
- 								&err)) {
- 		map->msg = dbus_message_ref(message);
-+		map->folder = get_absolute_folder(obc_session_get_folder(
-+							map->session), folder);
- 		return NULL;
- 	}
- 
+Calling ListMessages within /telecom/msg for the subfolder inbox would set the
+folder property to /telecom/msg instead of /telecom/msg/inbox.
+
+The patchset therefore changes map_msg_create to not set the folder property
+to the current folder, but to a folder given as parameter. This change will be
+needed as well for new message notifications (that can indicate new messages
+for any folder).
+
+In addition I've updated the documentation to clarify that the folder property
+for ListMessages and PushMessage can be used only for a subfolder of the
+current folder. It's not possible to specify an absolute or relative path.
+
+Christian Fetzer (4):
+  obexd: Add folder property to map_msg_create
+  obexd: Fix setting message folder for relative folder in ListMessages
+  obexd: Clarify the folder property of ListMessages
+  obexd: Clarify the folder property of PushMessage
+
+ doc/obex-api.txt   |  8 +++++---
+ obexd/client/map.c | 23 ++++++++++++++++++++---
+ 2 files changed, 25 insertions(+), 6 deletions(-)
+
 -- 
 1.8.3.4
 
