@@ -1,39 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: Clemens Vasters <clemensv@gmail.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: Device discovery/pairing issue w/ BlueZ on Debian
-Date: Fri, 13 Sep 2013 08:50:56 +0200
-Message-ID: <3855563.UW2fZNan4k@uw000953>
-In-Reply-To: <CAJdJm_PpQoQeJ5SGrzD3RuA+7mOg-mAQgzSx5WV29528hU3stA@mail.gmail.com>
-References: <CAGMh8s_RNftv8X32ayf4L-ZjBqSGv3HYxPAR28GthVPWUht-xw@mail.gmail.com> <CAJdJm_PpQoQeJ5SGrzD3RuA+7mOg-mAQgzSx5WV29528hU3stA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH v3 2/2] Bluetooth: Fix rfkill functionality during the HCI setup stage
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1379051898-2630-3-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 12 Sep 2013 23:23:49 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <EFD984BF-E92F-4959-9EC6-F12DEB974E69@holtmann.org>
+References: <1379051898-2630-1-git-send-email-johan.hedberg@gmail.com> <1379051898-2630-3-git-send-email-johan.hedberg@gmail.com>
+To: johan.hedberg@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan,
 
-> On Tue, Sep 10, 2013 at 2:47 PM, Clemens Vasters <clemensv@gmail.com> wrote:
-> > I’ve got a cheap Bluetooth car diagnostics dongle (OBD-2, ELM327) that
-> > gets discovered by and pairs with Windows 8, Windows Phone 8, OSX
-> > Mountain Lion, iOS 6, and Android Jelly Bean.
-> >
-> > I can’t get it to be either discovered or paired with BlueZ on Debian
-> > Wheezy on my Notebook (bare metal, ThinkPad W510) or Raspbian Wheezy
-> > on the Raspberry Pi. On the latter I even went so far to pull the
-> > source for BlueZ 5.8 and install it from source. No dice.
+> We need to let the setup stage complete cleanly even when the HCI device
+> is rfkilled. Otherwise the HCI device will stay in an undefined state
+> and never get notified to user space through mgmt (even when it gets
+> unblocked through rfkill).
 > 
-> Your description of the problem is a little vague. Which tools did you
-> use on BlueZ 5.8 to attempt to discover/pair with the device? Which
-> errors did you see (if any)?
+> This patch makes sure that hci_dev_open() can be called in the HCI_SETUP
+> stage, that blocking the device doesn't abort the setup stage, and that
+> the device gets proper powered down as soon as the setup stage completes
+> in case it was blocked meanwhile.
+> 
+> The bug that this patch fixed can be very easily reproduced using e.g.
+> the rfkill command line too. By running "rfkill block all" before
+> inserting a Bluetooth dongle the resulting HCI device goes into a state
+> where it is never announced over mgmt, not even when "rfkill unblock all"
+> is run.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Cc: stable@vger.kernel.org
+> ---
+> v3: Use "else if" instead of separate if-statement
+> 
+> net/bluetooth/hci_core.c | 15 ++++++++++++---
+> 1 file changed, 12 insertions(+), 3 deletions(-)
 
-Wheezy comes with kernel 3.2 so BlueZ 5 is no option there (at least on stock
-kernel).
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
--- 
-BR
-Szymon Janc
+Regards
 
+Marcel
 
