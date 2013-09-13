@@ -1,102 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5232FAC8.5090903@oss.bmw-carit.de>
-Date: Fri, 13 Sep 2013 13:45:12 +0200
+Message-ID: <5232F7F7.7030407@oss.bmw-carit.de>
+Date: Fri, 13 Sep 2013 13:33:11 +0200
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 MIME-Version: 1.0
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 2/4] obexd: Fix setting message folder for relative folder
- in ListMessages
-References: <1379064212-30056-1-git-send-email-christian.fetzer@oss.bmw-carit.de> <1379064212-30056-3-git-send-email-christian.fetzer@oss.bmw-carit.de> <CABBYNZL+d8CpQNJ2z750s30naUoY-049XpCs3gOtGMsG1hCJVw@mail.gmail.com>
-In-Reply-To: <CABBYNZL+d8CpQNJ2z750s30naUoY-049XpCs3gOtGMsG1hCJVw@mail.gmail.com>
+Subject: Re: [PATCH 1/4] obexd: Add folder property to map_msg_create
+References: <1379064212-30056-1-git-send-email-christian.fetzer@oss.bmw-carit.de> <1379064212-30056-2-git-send-email-christian.fetzer@oss.bmw-carit.de> <CABBYNZKYBd=S0G3Hvno7wQxgtCy5nwnamTD=1sKcVw+kBkAVVg@mail.gmail.com>
+In-Reply-To: <CABBYNZKYBd=S0G3Hvno7wQxgtCy5nwnamTD=1sKcVw+kBkAVVg@mail.gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-On 09/13/2013 12:47 PM, Luiz Augusto von Dentz wrote:
+On 09/13/2013 12:11 PM, Luiz Augusto von Dentz wrote:
 > Hi Christian,
 > 
 > On Fri, Sep 13, 2013 at 12:23 PM, Christian Fetzer
 > <christian.fetzer@oss.bmw-carit.de> wrote:
 >> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 >>
->> The method ListMessages allows to specify a relative subfolder.
->> This subfolder needs to be added to the current path when registering
->> a new message interface.
+>> Message interfaces are not necessarily created for the current folder,
+>> therefore the folder needs to be specified in a parameter.
+>>
+>> For example, messages can be created for sub folders when using the folder
+>> parameter in ListMessages.
 >> ---
->>  obexd/client/map.c | 19 +++++++++++++++++--
->>  1 file changed, 17 insertions(+), 2 deletions(-)
+>>  obexd/client/map.c | 8 +++++---
+>>  1 file changed, 5 insertions(+), 3 deletions(-)
 >>
 >> diff --git a/obexd/client/map.c b/obexd/client/map.c
->> index 9a1b140..54011d8 100644
+>> index f0dcf72..9a1b140 100644
 >> --- a/obexd/client/map.c
 >> +++ b/obexd/client/map.c
->> @@ -96,6 +96,7 @@ static const char * const filter_list[] = {
->>  struct map_data {
->>         struct obc_session *session;
->>         DBusMessage *msg;
->> +       char *folder;
->>         GHashTable *messages;
->>         int16_t mas_instance_id;
->>         uint8_t supported_message_types;
->> @@ -1058,8 +1059,7 @@ static void msg_element(GMarkupParseContext *ctxt, const char *element,
+>> @@ -779,7 +779,8 @@ static const GDBusPropertyTable map_msg_properties[] = {
+>>         { }
+>>  };
+>>
+>> -static struct map_msg *map_msg_create(struct map_data *data, const char *handle)
+>> +static struct map_msg *map_msg_create(struct map_data *data, const char *handle,
+>> +                                                       const char *folder)
+>>  {
+>>         struct map_msg *msg;
+>>
+>> @@ -788,7 +789,7 @@ static struct map_msg *map_msg_create(struct map_data *data, const char *handle)
+>>         msg->path = g_strdup_printf("%s/message%s",
+>>                                         obc_session_get_path(data->session),
+>>                                         handle);
+>> -       msg->folder = g_strdup(obc_session_get_folder(data->session));
+>> +       msg->folder = g_strdup(folder);
+>>
+>>         if (!g_dbus_register_interface(conn, msg->path, MAP_MSG_INTERFACE,
+>>                                                 map_msg_methods, NULL,
+>> @@ -1057,7 +1058,8 @@ static void msg_element(GMarkupParseContext *ctxt, const char *element,
 >>
 >>         msg = g_hash_table_lookup(data->messages, values[i]);
 >>         if (msg == NULL) {
->> -               msg = map_msg_create(data, values[i],
->> -                                       obc_session_get_folder(data->session));
->> +               msg = map_msg_create(data, values[i], data->folder);
->>                 if (msg == NULL)
->>                         return;
->>         }
->> @@ -1153,6 +1153,19 @@ static void message_listing_cb(struct obc_session *session,
->>  done:
->>         g_dbus_send_message(conn, reply);
->>         dbus_message_unref(map->msg);
->> +       g_free(map->folder);
->> +       map->folder = NULL;
->> +}
->> +
->> +static char *get_absolute_folder(const char *root, const char *subfolder)
->> +{
->> +       if (!subfolder || strlen(subfolder) == 0)
->> +               return g_strdup(root);
->> +       else
->> +               if (g_str_has_suffix(root, "/"))
->> +                       return g_strconcat(root, subfolder, NULL);
->> +               else
->> +                       return g_strconcat(root, "/", subfolder, NULL);
->>  }
->>
->>  static DBusMessage *get_message_listing(struct map_data *map,
->> @@ -1175,6 +1188,8 @@ static DBusMessage *get_message_listing(struct map_data *map,
->>         if (obc_session_queue(map->session, transfer, message_listing_cb, map,
->>                                                                 &err)) {
->>                 map->msg = dbus_message_ref(message);
->> +               map->folder = get_absolute_folder(obc_session_get_folder(
->> +                                                       map->session), folder);
->>                 return NULL;
->>         }
->>
->> --
->> 1.8.3.4
+>> -               msg = map_msg_create(data, values[i]);
+>> +               msg = map_msg_create(data, values[i],
+>> +                                       obc_session_get_folder(data->session));
 > 
-> This will probably not work in case of multiple outstanding requests
-> the last will always overwrite the folder, which btw will leak, so
-> probably we need a per request data.
+> Is this really fixing anything? Because it seems it is just changing
+> places where obc_session_get_folder is called when what you should
+> probably be doing is to store the folder parameter given to
+> ListMessages. 
+
+
+The fix itself is in patch 2. But as explained in the cover letter,
+I'll need the parameter as well when creating new messages from
+event reports. (I have a first notification API patchset ready but
+wanted to wait until this is applied.)
+
+
+> I actually regret to have this parameter as it makes
+> things a little bit more complicated just to avoid SetFolder.
 > 
+> Probably Session.SetPath would make more sense than having each
+> profile interface treating it differently but that would require to
+> break APIs so it is better not to do it right now.
 > 
 
-Yes, the issue exists already in the current code base, because the stored
-dbus message is overridden if any MAP function is called before the previous
-one is finished.
 
-I've been able to reproduce a crash with it and already started to write a patch
-that adds a pending_request on top of this patch.
-
-Do you prefer to have a fix first and rebase this patchset on it, or do you
-prefer to get the notification API patchset first? (which is already ready to be sent)
+Fully agree. Maybe it's a good thing to keep 
+those points in mind for future API changes.
 
 Christian
