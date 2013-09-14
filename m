@@ -1,49 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH 3/3] Bluetooth: Fix waiting for clearing of BT_SK_SUSPEND flag
+Subject: Re: [PATCH 2/3] Bluetooth: Fix responding to invalid L2CAP signaling commands
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1379061827-8595-4-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 13 Sep 2013 18:43:58 -0700
+In-Reply-To: <1379061827-8595-3-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 13 Sep 2013 18:42:12 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <4A92D017-F4C7-49FF-BFA3-D9E508E51DED@holtmann.org>
-References: <1379061827-8595-1-git-send-email-johan.hedberg@gmail.com> <1379061827-8595-4-git-send-email-johan.hedberg@gmail.com>
+Message-Id: <56BC5629-3745-4561-90CA-7BB66D52E205@holtmann.org>
+References: <1379061827-8595-1-git-send-email-johan.hedberg@gmail.com> <1379061827-8595-3-git-send-email-johan.hedberg@gmail.com>
 To: johan.hedberg@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> In the case of blocking sockets we should not proceed with sendmsg() if
-> the socket has the BT_SK_SUSPEND flag set. So far the code was only
-> ensuring that POLLOUT doesn't get set for non-blocking sockets using
-> poll() but there was no code in place to ensure that blocking sockets do
-> the right thing when writing to them.
-> 
-> This patch adds a new bt_sock_wait_unsuspend helper function to sleep in
-> the sendmsg call if the BT_SK_SUSPEND flag is set, and wake up as soon
-> as it is unset. It also updates the L2CAP and RFCOMM sendmsg callbacks
-> to take advantage of this new helper function.
+> When we have an LE link we should not respond to any data on the BR/EDR
+> L2CAP signaling channel (0x0001) and vice-versa when we have a BR/EDR
+> link we should not respond to LE L2CAP (CID 0x0005) signaling commands.
+> This patch fixes this issue by checking for a valid link type and
+> ignores data if it is wrong.
 > 
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> include/net/bluetooth/bluetooth.h |  1 +
-> net/bluetooth/af_bluetooth.c      | 38 ++++++++++++++++++++++++++++++++++++++
-> net/bluetooth/l2cap_sock.c        |  6 ++++++
-> net/bluetooth/rfcomm/sock.c       |  7 +++++--
-> 4 files changed, 50 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index 10d43d8..3299d42 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -249,6 +249,7 @@ int  bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
-> uint bt_sock_poll(struct file *file, struct socket *sock, poll_table *wait);
-> int  bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
-> int  bt_sock_wait_state(struct sock *sk, int state, unsigned long timeo);
-> +int  bt_sock_wait_unsuspend(struct sock *sk, unsigned long flags);
+> net/bluetooth/l2cap_core.c | 8 ++++++++
+> 1 file changed, 8 insertions(+)
 
-I am not a huge fan of the term unsuspend. Maybe wait_ready is better here.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index ea3792f..1d03644 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -5297,6 +5297,7 @@ static inline int l2cap_le_sig_cmd(struct l2cap_conn *conn,
+> static inline void l2cap_le_sig_channel(struct l2cap_conn *conn,
+> 					struct sk_buff *skb)
+> {
+> +	struct hci_conn *hcon = conn->hcon;
+> 	u8 *data = skb->data;
+> 	int len = skb->len;
+> 	struct l2cap_cmd_hdr cmd;
+> @@ -5304,6 +5305,9 @@ static inline void l2cap_le_sig_channel(struct l2cap_conn *conn,
+> 
+> 	l2cap_raw_recv(conn, skb);
+> 
+> +	if (hcon->type != LE_LINK)
+> +		return;
+> +
+
+However I do have a question here. Can we just drop the packet or should we even in this case return invalid CID. What does the core spec. recommend in this case?
 
 Regards
 
