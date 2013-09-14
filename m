@@ -1,37 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH 1/2] Bluetooth: Add synchronization train parameters reading support
+Subject: Re: [PATCH 2/8] core: Minor whitespace fix
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1379061602-8290-2-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 13 Sep 2013 18:36:59 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <B11CCE59-BB64-4D3F-BFD8-CE2248734B9B@holtmann.org>
-References: <1379061602-8290-1-git-send-email-johan.hedberg@gmail.com> <1379061602-8290-2-git-send-email-johan.hedberg@gmail.com>
-To: johan.hedberg@gmail.com
+In-Reply-To: <1379071852-10094-2-git-send-email-szymon.janc@tieto.com>
+Date: Fri, 13 Sep 2013 18:50:17 -0700
+Cc: <linux-bluetooth@vger.kernel.org>
+Message-Id: <252183CF-24CC-4DB7-BCC6-6E8AA0261870@holtmann.org>
+References: <1379071852-10094-1-git-send-email-szymon.janc@tieto.com> <1379071852-10094-2-git-send-email-szymon.janc@tieto.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Szymon,
 
-> This patch adds support for reading the synchronization train parameters
-> for controllers that support the feature. Since the feature is
-> detectable through the local features page 2, which is retreived only in
-> stage 3 of the HCI init sequence, there is no other option than to add a
-> fourth stage to the init sequence.
-> 
-> For now the patch doesn't yet add storing of the parameters, but it is
-> nevertheless convenient to have around to see what kind of parameters
-> various controllers use by default (analyzable e.g. with the btmon user
-> space tool).
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> include/net/bluetooth/hci.h |  2 ++
-> net/bluetooth/hci_core.c    | 15 ++++++++++++++-
-> 2 files changed, 16 insertions(+), 1 deletion(-)
+> src/main.c | 8 ++++----
+> 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+patch 1/8 and patch 2/8 are obviously correct. Get Johan to apply them.
 
 Regards
 
