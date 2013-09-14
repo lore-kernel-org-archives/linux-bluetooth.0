@@ -1,45 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH 4/8] sdp: Decouple Device ID profile implementation
+Subject: Re: [PATCH 3/3] Bluetooth: Fix waiting for clearing of BT_SK_SUSPEND flag
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1379071852-10094-4-git-send-email-szymon.janc@tieto.com>
-Date: Fri, 13 Sep 2013 18:49:22 -0700
-Cc: <linux-bluetooth@vger.kernel.org>
-Message-Id: <B531A8F3-8ABA-4CD1-A013-AB0AFF40302C@holtmann.org>
-References: <1379071852-10094-1-git-send-email-szymon.janc@tieto.com> <1379071852-10094-4-git-send-email-szymon.janc@tieto.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+In-Reply-To: <1379061827-8595-4-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 13 Sep 2013 18:43:58 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <4A92D017-F4C7-49FF-BFA3-D9E508E51DED@holtmann.org>
+References: <1379061827-8595-1-git-send-email-johan.hedberg@gmail.com> <1379061827-8595-4-git-send-email-johan.hedberg@gmail.com>
+To: johan.hedberg@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Johan,
 
-> Make DeviceID profile similar to other profiles implementations. Use
-> btd_profile for handling DeviceID profile while adding/removing
-> adapters. The nice drawback is that SDP code no longer depends on
-> main_opts.
+> In the case of blocking sockets we should not proceed with sendmsg() if
+> the socket has the BT_SK_SUSPEND flag set. So far the code was only
+> ensuring that POLLOUT doesn't get set for non-blocking sockets using
+> poll() but there was no code in place to ensure that blocking sockets do
+> the right thing when writing to them.
+> 
+> This patch adds a new bt_sock_wait_unsuspend helper function to sleep in
+> the sendmsg call if the BT_SK_SUSPEND flag is set, and wake up as soon
+> as it is unset. It also updates the L2CAP and RFCOMM sendmsg callbacks
+> to take advantage of this new helper function.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> Makefile.plugins             |   3 +
-> profiles/deviceid/deviceid.c | 181 +++++++++++++++++++++++++++++++++++++++++++
-> src/sdpd-server.c            |   4 -
-> src/sdpd-service.c           |  58 --------------
-> src/sdpd.h                   |   2 -
-> 5 files changed, 184 insertions(+), 64 deletions(-)
-> create mode 100644 profiles/deviceid/deviceid.c
+> include/net/bluetooth/bluetooth.h |  1 +
+> net/bluetooth/af_bluetooth.c      | 38 ++++++++++++++++++++++++++++++++++++++
+> net/bluetooth/l2cap_sock.c        |  6 ++++++
+> net/bluetooth/rfcomm/sock.c       |  7 +++++--
+> 4 files changed, 50 insertions(+), 2 deletions(-)
 > 
-> diff --git a/Makefile.plugins b/Makefile.plugins
-> index 7c5f71d..df5d2a1 100644
-> --- a/Makefile.plugins
-> +++ b/Makefile.plugins
-> @@ -82,6 +82,9 @@ builtin_sources += profiles/scanparam/scan.c
-> builtin_modules += deviceinfo
-> builtin_sources += profiles/deviceinfo/deviceinfo.c
-> 
-> +builtin_modules += deviceid
-> +builtin_sources += profiles/deviceid/deviceid.c
-> +
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index 10d43d8..3299d42 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -249,6 +249,7 @@ int  bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
+> uint bt_sock_poll(struct file *file, struct socket *sock, poll_table *wait);
+> int  bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
+> int  bt_sock_wait_state(struct sock *sk, int state, unsigned long timeo);
+> +int  bt_sock_wait_unsuspend(struct sock *sk, unsigned long flags);
 
-this is changing the semantics a little bit. Device Id record is guaranteed to have 0x10000 handle. I would prefer if we can keep it that way. Also we need to find a way to make this work with the extended inquiry response that can also included device id information.
+I am not a huge fan of the term unsuspend. Maybe wait_ready is better here.
 
 Regards
 
