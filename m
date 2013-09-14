@@ -1,112 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1379115162-10194-1-git-send-email-bzhao@marvell.com>
-References: <1379115162-10194-1-git-send-email-bzhao@marvell.com>
-From: Mike Frysinger <vapier@chromium.org>
-Date: Sat, 14 Sep 2013 00:04:25 -0400
-Message-ID: <CAAbOScnG8RHWbPdjq6=e=EBJPr_f6+R4o36f3h0T=NxGgQt7AQ@mail.gmail.com>
-Subject: Re: [PATCH v4] Bluetooth: btmrvl: add calibration data download support
-To: Bing Zhao <bzhao@marvell.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-wireless@vger.kernel.org,
-	Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
-	Amitkumar Karwar <akarwar@marvell.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH 1/2] Bluetooth: Add synchronization train parameters reading support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1379061602-8290-2-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 13 Sep 2013 18:36:59 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <B11CCE59-BB64-4D3F-BFD8-CE2248734B9B@holtmann.org>
+References: <1379061602-8290-1-git-send-email-johan.hedberg@gmail.com> <1379061602-8290-2-git-send-email-johan.hedberg@gmail.com>
+To: johan.hedberg@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Sep 13, 2013 at 7:32 PM, Bing Zhao wrote:
-> --- a/drivers/bluetooth/btmrvl_main.c
-> +++ b/drivers/bluetooth/btmrvl_main.c
->
-> +static int btmrvl_parse_cal_cfg(const u8 *src, u32 len, u8 *dst, u32 dst_size)
+Hi Johan,
 
-would be nice if you put a comment above this func explaining the
-expected format.  otherwise, we see arbitrary parsing with no idea if
-it's correct.
+> This patch adds support for reading the synchronization train parameters
+> for controllers that support the feature. Since the feature is
+> detectable through the local features page 2, which is retreived only in
+> stage 3 of the HCI init sequence, there is no other option than to add a
+> fourth stage to the init sequence.
+> 
+> For now the patch doesn't yet add storing of the parameters, but it is
+> nevertheless convenient to have around to see what kind of parameters
+> various controllers use by default (analyzable e.g. with the btmon user
+> space tool).
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> include/net/bluetooth/hci.h |  2 ++
+> net/bluetooth/hci_core.c    | 15 ++++++++++++++-
+> 2 files changed, 16 insertions(+), 1 deletion(-)
 
-> +       while ((s - src) < len) {
-> +               if (isspace(*s)) {
-> +                       s++;
-> +                       continue;
-> +               }
-> +
-> +               if (isxdigit(*s)) {
-> +                       if ((d - dst) >= dst_size) {
-> +                               BT_ERR("calibration data file too big!!!");
-> +                               return -EINVAL;
-> +                       }
-> +
-> +                       memcpy(tmp, s, 2);
-> +
-> +                       ret = kstrtou8(tmp, 16, d++);
-> +                       if (ret < 0)
-> +                               return ret;
-> +
-> +                       s += 2;
-> +               } else {
-> +                       s++;
-> +               }
-> +       }
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-so if it's a space, you skip it.  if it's a hexdigit, you parse two
-bytes.  if it's anything else, you skip it.  i'd imagine the "non
-space and non hexdigit" case should throw a warning if not reject the
-file out right.  otherwise, if you want to keep this logic, punt the
-explicit "isspace" check.
+Regards
 
-you might also copy one more byte than you should ?  your limit is "(s
-- src) < len", yet the isxdigit code always copies two bytes.
+Marcel
 
-> +static int btmrvl_load_cal_data(struct btmrvl_private *priv,
-> +                               u8 *config_data)
-> +{
-> +       struct sk_buff *skb;
-> +       struct btmrvl_cmd *cmd;
-> +       int i;
-> +
-> +       skb = bt_skb_alloc(sizeof(*cmd), GFP_ATOMIC);
-
-maybe i'm unfamiliar with bluetooth and this is common, but why is
-your code so special as to require GFP_ATOMIC allocations ?
-
-> +       for (i = 4; i < BT_CMD_DATA_SIZE; i++)
-> +               cmd->data[i] = config_data[(i/4)*8 - 1 - i];
-
-style nit, but there should be spacing around those math operators.
-ignoring the fact that this is some funky funky buffer offsets.
-
-i = 4
- config_data[(4 / 4) * 8 - 1 - 4] ->
- config_data[8 - 1 - 4] ->
- config_data[3]
-
-i = 5
- config_data[(5 / 4) * 8 - 1 - 5] ->
- config_data[8 - 1 - 5] ->
- config_data[2]
-
-i = 6
- config_data[(6 / 4) * 8 - 1 - 6] ->
- config_data[8 - 1 - 6] ->
- config_data[1]
-
-i = 7
- config_data[(7 / 4) * 8 - 1 - 7] ->
- config_data[8 - 1 - 7] ->
- config_data[0]
-
-i = 8
- config_data[(8 / 4) * 8 - 1 - 8] ->
- config_data[16 - 1 - 8] ->
- config_data[7]
-
-i = {4,5,6,7} -> config_data[{3,2,1,0}]
-i = {8,9,10,11} -> config_data[{7,6,5,4}]
-
-that really could do with a comment explaining the mapping of input
-bytes to output bytes.
--mike
