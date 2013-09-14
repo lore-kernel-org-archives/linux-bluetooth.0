@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 5/8] Bluetooth: Fix error code for invalid CID in l2cap_config_req
-Date: Sat, 14 Sep 2013 20:28:28 +0300
-Message-Id: <1379179711-16436-6-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v3 1/8] Bluetooth: Remove unused event mask struct
+Date: Sat, 14 Sep 2013 20:28:24 +0300
+Message-Id: <1379179711-16436-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1379179711-16436-1-git-send-email-johan.hedberg@gmail.com>
 References: <1379179711-16436-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,28 +11,29 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The convention of the L2CAP code is to return EFAULT when a CID in the
-request packet is invalid. This patch fixes the l2cap_config_req to use
-that error code instead of ENOENT.
+The struct for HCI_Set_Event_Mask is never used. Instead a local 8-byte
+array is used for sending this command. Therefore, remove the
+unnecessary struct definition.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/net/bluetooth/hci.h | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 9ec1561f..d134501 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3978,7 +3978,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 57aa408..7ede266 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -695,9 +695,6 @@ struct hci_cp_sniff_subrate {
+ } __packed;
  
- 	chan = l2cap_get_chan_by_scid(conn, dcid);
- 	if (!chan)
--		return -ENOENT;
-+		return -EFAULT;
+ #define HCI_OP_SET_EVENT_MASK		0x0c01
+-struct hci_cp_set_event_mask {
+-	__u8     mask[8];
+-} __packed;
  
- 	if (chan->state != BT_CONFIG && chan->state != BT_CONNECT2) {
- 		struct l2cap_cmd_rej_cid rej;
+ #define HCI_OP_RESET			0x0c03
+ 
 -- 
 1.8.4.rc3
 
