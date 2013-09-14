@@ -1,53 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH 2/3] Bluetooth: Fix responding to invalid L2CAP signaling commands
+Subject: Re: [PATCH 1/3] Bluetooth: Fix L2CAP Disconnect response for unknown CID
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1379061827-8595-3-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 13 Sep 2013 18:42:12 -0700
+In-Reply-To: <1379061827-8595-2-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 13 Sep 2013 18:40:25 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <56BC5629-3745-4561-90CA-7BB66D52E205@holtmann.org>
-References: <1379061827-8595-1-git-send-email-johan.hedberg@gmail.com> <1379061827-8595-3-git-send-email-johan.hedberg@gmail.com>
+Message-Id: <34565D06-3DDE-40FE-A9D7-D2667630C5A7@holtmann.org>
+References: <1379061827-8595-1-git-send-email-johan.hedberg@gmail.com> <1379061827-8595-2-git-send-email-johan.hedberg@gmail.com>
 To: johan.hedberg@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> When we have an LE link we should not respond to any data on the BR/EDR
-> L2CAP signaling channel (0x0001) and vice-versa when we have a BR/EDR
-> link we should not respond to LE L2CAP (CID 0x0005) signaling commands.
-> This patch fixes this issue by checking for a valid link type and
-> ignores data if it is wrong.
+> If we receive an L2CAP Disconnect Request for an unknown CID we should
+> not just silently drop it but reply with a proper Command Reject
+> response. This patch fixes this by ensuring that the disconnect handler
+> returns a proper error instead of 0 and will cause the function caller
+> to send the right response.
 > 
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> net/bluetooth/l2cap_core.c | 8 ++++++++
-> 1 file changed, 8 insertions(+)
-
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-
+> net/bluetooth/l2cap_core.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
 > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index ea3792f..1d03644 100644
+> index b3bb7bc..ea3792f 100644
 > --- a/net/bluetooth/l2cap_core.c
 > +++ b/net/bluetooth/l2cap_core.c
-> @@ -5297,6 +5297,7 @@ static inline int l2cap_le_sig_cmd(struct l2cap_conn *conn,
-> static inline void l2cap_le_sig_channel(struct l2cap_conn *conn,
-> 					struct sk_buff *skb)
-> {
-> +	struct hci_conn *hcon = conn->hcon;
-> 	u8 *data = skb->data;
-> 	int len = skb->len;
-> 	struct l2cap_cmd_hdr cmd;
-> @@ -5304,6 +5305,9 @@ static inline void l2cap_le_sig_channel(struct l2cap_conn *conn,
-> 
-> 	l2cap_raw_recv(conn, skb);
-> 
-> +	if (hcon->type != LE_LINK)
-> +		return;
-> +
+> @@ -4206,7 +4206,7 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn,
+> 	chan = __l2cap_get_chan_by_scid(conn, dcid);
+> 	if (!chan) {
+> 		mutex_unlock(&conn->chan_lock);
+> -		return 0;
+> +		return -EINVAL;
+> 	}
 
-However I do have a question here. Can we just drop the packet or should we even in this case return invalid CID. What does the core spec. recommend in this case?
+the only problem that I have here is that we end up with the wrong error code. The L2CAP core still contains this comment:
+
+/* FIXME: Map err to a valid reason */
+
+And now we default to L2CAP_REJ_NOT_UNDERSTOOD, but in this case it should be L2CAP_REJ_INVALID_CID.
 
 Regards
 
