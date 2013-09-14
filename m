@@ -1,45 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 14 Sep 2013 08:48:51 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/3] Bluetooth: Fix responding to invalid L2CAP signaling
- commands
-Message-ID: <20130914054851.GA2777@x220.p-661hnu-f1>
-References: <1379061827-8595-1-git-send-email-johan.hedberg@gmail.com>
- <1379061827-8595-3-git-send-email-johan.hedberg@gmail.com>
- <56BC5629-3745-4561-90CA-7BB66D52E205@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <56BC5629-3745-4561-90CA-7BB66D52E205@holtmann.org>
+In-Reply-To: <1379115162-10194-1-git-send-email-bzhao@marvell.com>
+References: <1379115162-10194-1-git-send-email-bzhao@marvell.com>
+From: Mike Frysinger <vapier@chromium.org>
+Date: Sat, 14 Sep 2013 00:04:25 -0400
+Message-ID: <CAAbOScnG8RHWbPdjq6=e=EBJPr_f6+R4o36f3h0T=NxGgQt7AQ@mail.gmail.com>
+Subject: Re: [PATCH v4] Bluetooth: btmrvl: add calibration data download support
+To: Bing Zhao <bzhao@marvell.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-wireless@vger.kernel.org,
+	Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
+	Amitkumar Karwar <akarwar@marvell.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+On Fri, Sep 13, 2013 at 7:32 PM, Bing Zhao wrote:
+> --- a/drivers/bluetooth/btmrvl_main.c
+> +++ b/drivers/bluetooth/btmrvl_main.c
+>
+> +static int btmrvl_parse_cal_cfg(const u8 *src, u32 len, u8 *dst, u32 dst_size)
 
-On Fri, Sep 13, 2013, Marcel Holtmann wrote:
-> > @@ -5304,6 +5305,9 @@ static inline void l2cap_le_sig_channel(struct l2cap_conn *conn,
-> > 
-> > 	l2cap_raw_recv(conn, skb);
-> > 
-> > +	if (hcon->type != LE_LINK)
-> > +		return;
-> > +
-> 
-> However I do have a question here. Can we just drop the packet or
-> should we even in this case return invalid CID. What does the core
-> spec. recommend in this case?
+would be nice if you put a comment above this func explaining the
+expected format.  otherwise, we see arbitrary parsing with no idea if
+it's correct.
 
-I faced this issue at the last UPF and had to do some thinking about it
-as well as discuss it with some other stack developers. The conclusion
-was that dropping is the right thing since on non-LE links this is in
-practice an unknown CID and unknown data.
+> +       while ((s - src) < len) {
+> +               if (isspace(*s)) {
+> +                       s++;
+> +                       continue;
+> +               }
+> +
+> +               if (isxdigit(*s)) {
+> +                       if ((d - dst) >= dst_size) {
+> +                               BT_ERR("calibration data file too big!!!");
+> +                               return -EINVAL;
+> +                       }
+> +
+> +                       memcpy(tmp, s, 2);
+> +
+> +                       ret = kstrtou8(tmp, 16, d++);
+> +                       if (ret < 0)
+> +                               return ret;
+> +
+> +                       s += 2;
+> +               } else {
+> +                       s++;
+> +               }
+> +       }
 
-The core spec doesn't explicitly say that data should be dropped in this
-case (it doesn't say anything about responding either). Instead, the LE
-signaling channel is simply not defined for non-LE links (the exact
-words in the spec are "not available" and "not supported"). It's like
-you'd receive data on any unknown CID. Responding something on it would
-be just as bad behavior as the peer sending the initial command.
+so if it's a space, you skip it.  if it's a hexdigit, you parse two
+bytes.  if it's anything else, you skip it.  i'd imagine the "non
+space and non hexdigit" case should throw a warning if not reject the
+file out right.  otherwise, if you want to keep this logic, punt the
+explicit "isspace" check.
 
-Johan
+you might also copy one more byte than you should ?  your limit is "(s
+- src) < len", yet the isxdigit code always copies two bytes.
+
+> +static int btmrvl_load_cal_data(struct btmrvl_private *priv,
+> +                               u8 *config_data)
+> +{
+> +       struct sk_buff *skb;
+> +       struct btmrvl_cmd *cmd;
+> +       int i;
+> +
+> +       skb = bt_skb_alloc(sizeof(*cmd), GFP_ATOMIC);
+
+maybe i'm unfamiliar with bluetooth and this is common, but why is
+your code so special as to require GFP_ATOMIC allocations ?
+
+> +       for (i = 4; i < BT_CMD_DATA_SIZE; i++)
+> +               cmd->data[i] = config_data[(i/4)*8 - 1 - i];
+
+style nit, but there should be spacing around those math operators.
+ignoring the fact that this is some funky funky buffer offsets.
+
+i = 4
+ config_data[(4 / 4) * 8 - 1 - 4] ->
+ config_data[8 - 1 - 4] ->
+ config_data[3]
+
+i = 5
+ config_data[(5 / 4) * 8 - 1 - 5] ->
+ config_data[8 - 1 - 5] ->
+ config_data[2]
+
+i = 6
+ config_data[(6 / 4) * 8 - 1 - 6] ->
+ config_data[8 - 1 - 6] ->
+ config_data[1]
+
+i = 7
+ config_data[(7 / 4) * 8 - 1 - 7] ->
+ config_data[8 - 1 - 7] ->
+ config_data[0]
+
+i = 8
+ config_data[(8 / 4) * 8 - 1 - 8] ->
+ config_data[16 - 1 - 8] ->
+ config_data[7]
+
+i = {4,5,6,7} -> config_data[{3,2,1,0}]
+i = {8,9,10,11} -> config_data[{7,6,5,4}]
+
+that really could do with a comment explaining the mapping of input
+bytes to output bytes.
+-mike
