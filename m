@@ -1,60 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 15 Sep 2013 21:15:52 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 5/8] Bluetooth: Fix error code for invalid CID in
- l2cap_config_req
-Message-ID: <20130915181552.GA6383@x220.p-661hnu-f1>
-References: <1379179711-16436-1-git-send-email-johan.hedberg@gmail.com>
- <1379179711-16436-6-git-send-email-johan.hedberg@gmail.com>
- <DDB6D220-2DB5-49B3-9200-4AD8FBAAADDE@holtmann.org>
- <20130915063017.GA22996@x220.p-661hnu-f1>
- <D242F6F2-162B-4904-8637-78BA01BF5737@holtmann.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <D242F6F2-162B-4904-8637-78BA01BF5737@holtmann.org>
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH v3 2/8] Bluetooth: Fix L2CAP command reject reason
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20130915063401.GB22996@x220.p-661hnu-f1>
+Date: Sun, 15 Sep 2013 11:05:40 -0500
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <44D3C0DF-040A-49F8-9140-33BCAE2816B7@holtmann.org>
+References: <1379179711-16436-1-git-send-email-johan.hedberg@gmail.com> <1379179711-16436-3-git-send-email-johan.hedberg@gmail.com> <036A3F37-5735-49B4-957A-8A5B1EE11680@holtmann.org> <20130915063401.GB22996@x220.p-661hnu-f1>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On Sun, Sep 15, 2013, Marcel Holtmann wrote:
-> >>> The convention of the L2CAP code is to return EFAULT when a CID in the
-> >>> request packet is invalid. This patch fixes the l2cap_config_req to use
-> >>> that error code instead of ENOENT.
-> >>> 
-> >>> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> >>> ---
-> >>> net/bluetooth/l2cap_core.c | 2 +-
-> >>> 1 file changed, 1 insertion(+), 1 deletion(-)
-> >>> 
-> >>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> >>> index 9ec1561f..d134501 100644
-> >>> --- a/net/bluetooth/l2cap_core.c
-> >>> +++ b/net/bluetooth/l2cap_core.c
-> >>> @@ -3978,7 +3978,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
-> >>> 
-> >>> 	chan = l2cap_get_chan_by_scid(conn, dcid);
-> >>> 	if (!chan)
-> >>> -		return -ENOENT;
-> >>> +		return -EFAULT;
-> >> 
-> >> do we really want to use EFAULT. That is normally only used if a
-> >> memory copy from userspace to kernel or vice versa fails.
-> > 
-> > EFAULT seemed to be the most common error code in this case, but now
-> > that I did some research it seems it's mostly from newish AMP related
-> > code. Would you be ok if I just switch all places to use ENOENT then?
+>>> There are several possible reason codes that can be sent in the command
+>>> reject L2CAP packet. Before this patch the code has used a hard-coded
+>>> single response code ("command not understood"). This patch adds a
+>>> helper function to map the return value of an L2CAP handler function to
+>>> the correct command reject reason.
+>>> 
+>>> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+>>> ---
+>>> net/bluetooth/l2cap_core.c | 22 ++++++++++++++++++----
+>>> 1 file changed, 18 insertions(+), 4 deletions(-)
+>>> 
+>>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+>>> index b3bb7bc..83acb28 100644
+>>> --- a/net/bluetooth/l2cap_core.c
+>>> +++ b/net/bluetooth/l2cap_core.c
+>>> @@ -5294,6 +5294,20 @@ static inline int l2cap_le_sig_cmd(struct l2cap_conn *conn,
+>>> 	}
+>>> }
+>>> 
+>>> +static u16 l2cap_err_to_reason(int err)
+>> 
+>> what we could to is return __le16 here. And then keep using
+>> __constant_cpu_to_le16.
 > 
-> EFAULT is really for memory address errors. It is a pretty bad idea to use CID errors.
+> I was mainly trying to follow the principle of using host endianness
+> until the very moment when we actually encode into the protocol struct.
+> However, I agree that we could be more pragmatic here since the only
+> users of this function are places where we're directly encoding into the
+> response PDU.
+
+the thing is that within the kernel you can nicely mark the endian of the return value with __le16. So tools like sparse will warn you if you mess it up.
+
+>>> +{
+>>> +	switch (err) {
+>>> +	case -EFAULT:
+>>> +		return L2CAP_REJ_INVALID_CID;
+>>> +	case -EMSGSIZE:
+>>> +		return L2CAP_REJ_MTU_EXCEEDED;
+>>> +	case -EINVAL:
+>>> +	case -EPROTO:
+>>> +	default:
+>>> +		return L2CAP_REJ_NOT_UNDERSTOOD;
+>>> +	}
+>>> +}
+>> 
+>> Is there really a point in listing EINVAL and EPROTO here.
 > 
-> I am fine with keep using ENOENT if we used that before. If that is
-> what the original code used, then lets keep using it. Otherwise we
-> better find a more descriptive error.
+> I thought it would make it clear which error codes are recommended for
+> parsing errors but I can remove them and just rely on default.
 
-If we ignore new AMP code there's only one "legacy" reference for this
-kind of situation which is l2cap_config_req. Since it has always used
-ENOENT for a failed CID lookup I'll follow that lead and use the same
-error for all places that need it.
+I am fine keeping them. Just asking.
 
-Johan
+Regards
+
+Marcel
+
