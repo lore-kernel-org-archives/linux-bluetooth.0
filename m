@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 2/8] Bluetooth: Fix double error response for l2cap_create_chan_req
-Date: Sun, 15 Sep 2013 21:16:35 +0300
-Message-Id: <1379269001-6313-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v4 7/8] Bluetooth: Fix responding to invalid L2CAP signaling commands
+Date: Sun, 15 Sep 2013 21:16:40 +0300
+Message-Id: <1379269001-6313-8-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1379269001-6313-1-git-send-email-johan.hedberg@gmail.com>
 References: <1379269001-6313-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,30 +11,58 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-When an L2CAP request handler returns non-zero the calling code will
-send a command reject response. The l2cap_create_chan_req function will
-in some cases send its own response but then still return a -EFAULT
-error which would cause two responses to be sent. This patch fixes this
-by making the function return 0 after sending its own response.
+When we have an LE link we should not respond to any data on the BR/EDR
+L2CAP signaling channel (0x0001) and vice-versa when we have a BR/EDR
+link we should not respond to LE L2CAP (CID 0x0005) signaling commands.
+This patch fixes this issue by checking for a valid link type and
+ignores data if it is wrong.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/l2cap_core.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b3bb7bc..0b8a270 100644
+index 020b723..fe40d3e 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -4462,7 +4462,7 @@ error:
- 	l2cap_send_cmd(conn, cmd->ident, L2CAP_CREATE_CHAN_RSP,
- 		       sizeof(rsp), &rsp);
+@@ -5311,6 +5311,7 @@ static __le16 l2cap_err_to_reason(int err)
+ static inline void l2cap_le_sig_channel(struct l2cap_conn *conn,
+ 					struct sk_buff *skb)
+ {
++	struct hci_conn *hcon = conn->hcon;
+ 	u8 *data = skb->data;
+ 	int len = skb->len;
+ 	struct l2cap_cmd_hdr cmd;
+@@ -5318,6 +5319,9 @@ static inline void l2cap_le_sig_channel(struct l2cap_conn *conn,
  
--	return -EFAULT;
-+	return 0;
- }
+ 	l2cap_raw_recv(conn, skb);
  
- static void l2cap_send_move_chan_req(struct l2cap_chan *chan, u8 dest_amp_id)
++	if (hcon->type != LE_LINK)
++		return;
++
+ 	while (len >= L2CAP_CMD_HDR_SIZE) {
+ 		u16 cmd_len;
+ 		memcpy(&cmd, data, L2CAP_CMD_HDR_SIZE);
+@@ -5355,6 +5359,7 @@ static inline void l2cap_le_sig_channel(struct l2cap_conn *conn,
+ static inline void l2cap_sig_channel(struct l2cap_conn *conn,
+ 				     struct sk_buff *skb)
+ {
++	struct hci_conn *hcon = conn->hcon;
+ 	u8 *data = skb->data;
+ 	int len = skb->len;
+ 	struct l2cap_cmd_hdr cmd;
+@@ -5362,6 +5367,9 @@ static inline void l2cap_sig_channel(struct l2cap_conn *conn,
+ 
+ 	l2cap_raw_recv(conn, skb);
+ 
++	if (hcon->type != ACL_LINK)
++		return;
++
+ 	while (len >= L2CAP_CMD_HDR_SIZE) {
+ 		u16 cmd_len;
+ 		memcpy(&cmd, data, L2CAP_CMD_HDR_SIZE);
 -- 
 1.8.4.rc3
 
