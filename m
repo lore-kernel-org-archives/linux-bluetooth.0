@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 3/8] Bluetooth: Fix L2CAP command reject reason
-Date: Sun, 15 Sep 2013 21:16:36 +0300
-Message-Id: <1379269001-6313-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v4 4/8] Bluetooth: Fix L2CAP Disconnect response for unknown CID
+Date: Sun, 15 Sep 2013 21:16:37 +0300
+Message-Id: <1379269001-6313-5-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1379269001-6313-1-git-send-email-johan.hedberg@gmail.com>
 References: <1379269001-6313-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,62 +11,30 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-There are several possible reason codes that can be sent in the command
-reject L2CAP packet. Before this patch the code has used a hard-coded
-single response code ("command not understood"). This patch adds a
-helper function to map the return value of an L2CAP handler function to
-the correct command reject reason.
+If we receive an L2CAP Disconnect Request for an unknown CID we should
+not just silently drop it but reply with a proper Command Reject
+response. This patch fixes this by ensuring that the disconnect handler
+returns a proper error instead of 0 and will cause the function caller
+to send the right response.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+ net/bluetooth/l2cap_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 0b8a270..8c718dd 100644
+index 8c718dd..0b1a656 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -5294,6 +5294,20 @@ static inline int l2cap_le_sig_cmd(struct l2cap_conn *conn,
+@@ -4206,7 +4206,7 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn,
+ 	chan = __l2cap_get_chan_by_scid(conn, dcid);
+ 	if (!chan) {
+ 		mutex_unlock(&conn->chan_lock);
+-		return 0;
++		return -ENOENT;
  	}
- }
  
-+static __le16 l2cap_err_to_reason(int err)
-+{
-+	switch (err) {
-+	case -ENOENT:
-+		return __constant_cpu_to_le16(L2CAP_REJ_INVALID_CID);
-+	case -EMSGSIZE:
-+		return __constant_cpu_to_le16(L2CAP_REJ_MTU_EXCEEDED);
-+	case -EINVAL:
-+	case -EPROTO:
-+	default:
-+		return __constant_cpu_to_le16(L2CAP_REJ_NOT_UNDERSTOOD);
-+	}
-+}
-+
- static inline void l2cap_le_sig_channel(struct l2cap_conn *conn,
- 					struct sk_buff *skb)
- {
-@@ -5326,8 +5340,7 @@ static inline void l2cap_le_sig_channel(struct l2cap_conn *conn,
- 
- 			BT_ERR("Wrong link type (%d)", err);
- 
--			/* FIXME: Map err to a valid reason */
--			rej.reason = __constant_cpu_to_le16(L2CAP_REJ_NOT_UNDERSTOOD);
-+			rej.reason = l2cap_err_to_reason(err);
- 			l2cap_send_cmd(conn, cmd.ident, L2CAP_COMMAND_REJ,
- 				       sizeof(rej), &rej);
- 		}
-@@ -5371,8 +5384,7 @@ static inline void l2cap_sig_channel(struct l2cap_conn *conn,
- 
- 			BT_ERR("Wrong link type (%d)", err);
- 
--			/* FIXME: Map err to a valid reason */
--			rej.reason = __constant_cpu_to_le16(L2CAP_REJ_NOT_UNDERSTOOD);
-+			rej.reason = l2cap_err_to_reason(err);
- 			l2cap_send_cmd(conn, cmd.ident, L2CAP_COMMAND_REJ,
- 				       sizeof(rej), &rej);
- 		}
+ 	l2cap_chan_lock(chan);
 -- 
 1.8.4.rc3
 
