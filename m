@@ -1,152 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH v4 8/8] Bluetooth: Fix waiting for clearing of BT_SK_SUSPEND flag
+Subject: Re: [PATCH v4 2/8] Bluetooth: Fix double error response for l2cap_create_chan_req
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1379269001-6313-9-git-send-email-johan.hedberg@gmail.com>
-Date: Sun, 15 Sep 2013 14:15:27 -0500
+In-Reply-To: <1379269001-6313-3-git-send-email-johan.hedberg@gmail.com>
+Date: Sun, 15 Sep 2013 14:05:59 -0500
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <63CB3872-A353-4997-9A00-E746DA99E6C6@holtmann.org>
-References: <1379269001-6313-1-git-send-email-johan.hedberg@gmail.com> <1379269001-6313-9-git-send-email-johan.hedberg@gmail.com>
+Message-Id: <6861E621-398F-4E7A-B0AA-68B5D17325B6@holtmann.org>
+References: <1379269001-6313-1-git-send-email-johan.hedberg@gmail.com> <1379269001-6313-3-git-send-email-johan.hedberg@gmail.com>
 To: johan.hedberg@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> In the case of blocking sockets we should not proceed with sendmsg() if
-> the socket has the BT_SK_SUSPEND flag set. So far the code was only
-> ensuring that POLLOUT doesn't get set for non-blocking sockets using
-> poll() but there was no code in place to ensure that blocking sockets do
-> the right thing when writing to them.
-> 
-> This patch adds a new bt_sock_wait_ready helper function to sleep in the
-> sendmsg call if the BT_SK_SUSPEND flag is set, and wake up as soon as it
-> is unset. It also updates the L2CAP and RFCOMM sendmsg callbacks to take
-> advantage of this new helper function.
+> When an L2CAP request handler returns non-zero the calling code will
+> send a command reject response. The l2cap_create_chan_req function will
+> in some cases send its own response but then still return a -EFAULT
+> error which would cause two responses to be sent. This patch fixes this
+> by making the function return 0 after sending its own response.
 > 
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> include/net/bluetooth/bluetooth.h |  1 +
-> net/bluetooth/af_bluetooth.c      | 39 +++++++++++++++++++++++++++++++++++++++
-> net/bluetooth/l2cap_sock.c        |  6 ++++++
-> net/bluetooth/rfcomm/sock.c       |  9 +++++++--
-> 4 files changed, 53 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index 10d43d8..afbc711 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -249,6 +249,7 @@ int  bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
-> uint bt_sock_poll(struct file *file, struct socket *sock, poll_table *wait);
-> int  bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
-> int  bt_sock_wait_state(struct sock *sk, int state, unsigned long timeo);
-> +int  bt_sock_wait_ready(struct sock *sk, unsigned long flags);
-> 
-> void bt_accept_enqueue(struct sock *parent, struct sock *sk);
-> void bt_accept_unlink(struct sock *sk);
-> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-> index 9096137..a883171c 100644
-> --- a/net/bluetooth/af_bluetooth.c
-> +++ b/net/bluetooth/af_bluetooth.c
-> @@ -525,6 +525,45 @@ int bt_sock_wait_state(struct sock *sk, int state, unsigned long timeo)
-> }
-> EXPORT_SYMBOL(bt_sock_wait_state);
-> 
+> net/bluetooth/l2cap_core.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-add a small comment here that this needs to be called with sk lock held.
-
-> +int bt_sock_wait_ready(struct sock *sk, unsigned long flags)
-> +{
-> +	DECLARE_WAITQUEUE(wait, current);
-> +	unsigned long timeo;
-> +	int err = 0;
-> +
-> +	BT_DBG("sk %p", sk);
-> +
-> +	timeo = sock_sndtimeo(sk, flags & O_NONBLOCK);
-> +
-> +	add_wait_queue(sk_sleep(sk), &wait);
-> +	set_current_state(TASK_INTERRUPTIBLE);
-> +	while (test_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags)) {
-> +		if (!timeo) {
-> +			err = -EAGAIN;
-> +			break;
-> +		}
-> +
-> +		if (signal_pending(current)) {
-> +			err = sock_intr_errno(timeo);
-> +			break;
-> +		}
-> +
-> +		release_sock(sk);
-> +		timeo = schedule_timeout(timeo);
-> +		lock_sock(sk);
-> +		set_current_state(TASK_INTERRUPTIBLE);
-> +
-> +		err = sock_error(sk);
-> +		if (err)
-> +			break;
-> +	}
-> +	__set_current_state(TASK_RUNNING);
-> +	remove_wait_queue(sk_sleep(sk), &wait);
-> +
-> +	return err;
-> +}
-> +EXPORT_SYMBOL(bt_sock_wait_ready);
-> +
-> #ifdef CONFIG_PROC_FS
-> struct bt_seq_state {
-> 	struct bt_sock_list *l;
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index 0098af8..ad95b42 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -777,6 +777,12 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
-> 	if (sk->sk_state != BT_CONNECTED)
-> 		return -ENOTCONN;
-> 
-> +	lock_sock(sk);
-> +	err = bt_sock_wait_ready(sk, msg->msg_flags);
-> +	release_sock(sk);
-> +	if (err)
-> +		return err;
-> +
-
-After starting to look into this now, I am not sure we have proper locking in that function in the first place. Can you check that it is actually fine not holding the socket lock for the send operation itself.
-
-> 	l2cap_chan_lock(chan);
-> 	err = l2cap_chan_send(chan, msg, len, sk->sk_priority);
-> 	l2cap_chan_unlock(chan);
-> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-> index 30b3721..02d96e4 100644
-> --- a/net/bluetooth/rfcomm/sock.c
-> +++ b/net/bluetooth/rfcomm/sock.c
-> @@ -544,7 +544,7 @@ static int rfcomm_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
-> 	struct sock *sk = sock->sk;
-> 	struct rfcomm_dlc *d = rfcomm_pi(sk)->dlc;
-> 	struct sk_buff *skb;
-> -	int sent = 0;
-> +	int err, sent = 0;
-> 
-> 	if (test_bit(RFCOMM_DEFER_SETUP, &d->flags))
-> 		return -ENOTCONN;
-> @@ -559,9 +559,14 @@ static int rfcomm_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
-> 
-> 	lock_sock(sk);
-> 
-> +	err = bt_sock_wait_ready(sk, msg->msg_flags);
-> +	if (err) {
-> +		release_sock(sk);
-> +		return err;
-> +	}
-> +
-
-I would be fine with using the sent variable here. And then of course create a label for the failure case. Assuming bt_sock_wait_ready() returning 0 on success you could use it to initialize sent here.
-
-However at minimum, I want a label here to jump at the end of the function in error case. I like to keep the number of lock_sock + release_sock balanced.
-
-Which is something that needs to be fixed for l2cap_sock_recvmsg() actually.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
