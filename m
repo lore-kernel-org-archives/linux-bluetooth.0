@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 5/8] Bluetooth: Fix L2CAP error return used for failed channel lookups
-Date: Sun, 15 Sep 2013 21:16:38 +0300
-Message-Id: <1379269001-6313-6-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v4 1/8] Bluetooth: Remove unused event mask struct
+Date: Sun, 15 Sep 2013 21:16:34 +0300
+Message-Id: <1379269001-6313-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1379269001-6313-1-git-send-email-johan.hedberg@gmail.com>
 References: <1379269001-6313-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,45 +11,30 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The EFAULT error should only be used for memory address related errors
-whereas ENOENT should be used for failed lookups for the given CID. This
-patch fixes the l2cap_connect_create_rsp and l2cap_create_channel_req
-handlers to use the correct ENOENT error return.
+The struct for HCI_Set_Event_Mask is never used. Instead a local 8-byte
+array is used for sending this command. Therefore, remove the
+unnecessary struct definition.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_core.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ include/net/bluetooth/hci.h | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 0b1a656..3b0633f 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3884,13 +3884,13 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
- 	if (scid) {
- 		chan = __l2cap_get_chan_by_scid(conn, scid);
- 		if (!chan) {
--			err = -EFAULT;
-+			err = -ENOENT;
- 			goto unlock;
- 		}
- 	} else {
- 		chan = __l2cap_get_chan_by_ident(conn, cmd->ident);
- 		if (!chan) {
--			err = -EFAULT;
-+			err = -ENOENT;
- 			goto unlock;
- 		}
- 	}
-@@ -4438,7 +4438,7 @@ static int l2cap_create_channel_req(struct l2cap_conn *conn,
- 		hs_hcon = hci_conn_hash_lookup_ba(hdev, AMP_LINK, conn->dst);
- 		if (!hs_hcon) {
- 			hci_dev_put(hdev);
--			return -EFAULT;
-+			return -ENOENT;
- 		}
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 57aa408..7ede266 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -695,9 +695,6 @@ struct hci_cp_sniff_subrate {
+ } __packed;
  
- 		BT_DBG("mgr %p bredr_chan %p hs_hcon %p", mgr, chan, hs_hcon);
+ #define HCI_OP_SET_EVENT_MASK		0x0c01
+-struct hci_cp_set_event_mask {
+-	__u8     mask[8];
+-} __packed;
+ 
+ #define HCI_OP_RESET			0x0c03
+ 
 -- 
 1.8.4.rc3
 
