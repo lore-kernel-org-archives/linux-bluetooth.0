@@ -1,33 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 0/8] Bluetooth: Various L2CAP fixes
-Date: Sun, 15 Sep 2013 21:16:33 +0300
-Message-Id: <1379269001-6313-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sun, 15 Sep 2013 21:15:52 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 5/8] Bluetooth: Fix error code for invalid CID in
+ l2cap_config_req
+Message-ID: <20130915181552.GA6383@x220.p-661hnu-f1>
+References: <1379179711-16436-1-git-send-email-johan.hedberg@gmail.com>
+ <1379179711-16436-6-git-send-email-johan.hedberg@gmail.com>
+ <DDB6D220-2DB5-49B3-9200-4AD8FBAAADDE@holtmann.org>
+ <20130915063017.GA22996@x220.p-661hnu-f1>
+ <D242F6F2-162B-4904-8637-78BA01BF5737@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <D242F6F2-162B-4904-8637-78BA01BF5737@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel,
 
-Here's a fourth revision of this patch set with all feedback received so
-far taken into account.
+On Sun, Sep 15, 2013, Marcel Holtmann wrote:
+> >>> The convention of the L2CAP code is to return EFAULT when a CID in the
+> >>> request packet is invalid. This patch fixes the l2cap_config_req to use
+> >>> that error code instead of ENOENT.
+> >>> 
+> >>> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> >>> ---
+> >>> net/bluetooth/l2cap_core.c | 2 +-
+> >>> 1 file changed, 1 insertion(+), 1 deletion(-)
+> >>> 
+> >>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> >>> index 9ec1561f..d134501 100644
+> >>> --- a/net/bluetooth/l2cap_core.c
+> >>> +++ b/net/bluetooth/l2cap_core.c
+> >>> @@ -3978,7 +3978,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
+> >>> 
+> >>> 	chan = l2cap_get_chan_by_scid(conn, dcid);
+> >>> 	if (!chan)
+> >>> -		return -ENOENT;
+> >>> +		return -EFAULT;
+> >> 
+> >> do we really want to use EFAULT. That is normally only used if a
+> >> memory copy from userspace to kernel or vice versa fails.
+> > 
+> > EFAULT seemed to be the most common error code in this case, but now
+> > that I did some research it seems it's mostly from newish AMP related
+> > code. Would you be ok if I just switch all places to use ENOENT then?
+> 
+> EFAULT is really for memory address errors. It is a pretty bad idea to use CID errors.
+> 
+> I am fine with keep using ENOENT if we used that before. If that is
+> what the original code used, then lets keep using it. Otherwise we
+> better find a more descriptive error.
 
-----------------------------------------------------------------
-Johan Hedberg (8):
-      Bluetooth: Remove unused event mask struct
-      Bluetooth: Fix double error response for l2cap_create_chan_req
-      Bluetooth: Fix L2CAP command reject reason
-      Bluetooth: Fix L2CAP Disconnect response for unknown CID
-      Bluetooth: Fix L2CAP error return used for failed channel lookups
-      Bluetooth: Fix sending responses to identified L2CAP response packets
-      Bluetooth: Fix responding to invalid L2CAP signaling commands
-      Bluetooth: Fix waiting for clearing of BT_SK_SUSPEND flag
+If we ignore new AMP code there's only one "legacy" reference for this
+kind of situation which is l2cap_config_req. Since it has always used
+ENOENT for a failed CID lookup I'll follow that lead and use the same
+error for all places that need it.
 
- include/net/bluetooth/bluetooth.h |  1 +
- include/net/bluetooth/hci.h       |  3 ---
- net/bluetooth/af_bluetooth.c      | 39 +++++++++++++++++++++++++++++
- net/bluetooth/l2cap_core.c        | 50 ++++++++++++++++++++++++++-----------
- net/bluetooth/l2cap_sock.c        |  6 +++++
- net/bluetooth/rfcomm/sock.c       |  9 +++++--
- 6 files changed, 88 insertions(+), 20 deletions(-)
-
+Johan
