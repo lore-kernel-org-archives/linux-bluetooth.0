@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 5/8] Bluetooth: Fix L2CAP command reject reason
-Date: Mon, 16 Sep 2013 13:05:16 +0300
-Message-Id: <1379325919-19003-6-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v5 6/8] Bluetooth: Fix sending responses to identified L2CAP response packets
+Date: Mon, 16 Sep 2013 13:05:17 +0300
+Message-Id: <1379325919-19003-7-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1379325919-19003-1-git-send-email-johan.hedberg@gmail.com>
 References: <1379325919-19003-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,62 +11,80 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-There are several possible reason codes that can be sent in the command
-reject L2CAP packet. Before this patch the code has used a hard-coded
-single response code ("command not understood"). This patch adds a
-helper function to map the return value of an L2CAP handler function to
-the correct command reject reason.
+When L2CAP packets return a non-zero error and the value is passed
+onwards by l2cap_bredr_sig_cmd this will trigger a command reject packet
+to be sent. However, the core specification (page 1416 in core 4.0) says
+the following: "Command Reject packets should not be sent in response to
+an identified Response packet.".
+
+This patch ensures that a command reject packet is not sent for any
+identified response packet by ignoring the error return value from the
+response handler functions.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_core.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+ net/bluetooth/l2cap_core.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 31bf812..2ff35a2 100644
+index 2ff35a2..b0947ae 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -5294,6 +5294,20 @@ static inline int l2cap_le_sig_cmd(struct l2cap_conn *conn,
- 	}
- }
+@@ -5212,7 +5212,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
  
-+static __le16 l2cap_err_to_reason(int err)
-+{
-+	switch (err) {
-+	case -EBADSLT:
-+		return __constant_cpu_to_le16(L2CAP_REJ_INVALID_CID);
-+	case -EMSGSIZE:
-+		return __constant_cpu_to_le16(L2CAP_REJ_MTU_EXCEEDED);
-+	case -EINVAL:
-+	case -EPROTO:
-+	default:
-+		return __constant_cpu_to_le16(L2CAP_REJ_NOT_UNDERSTOOD);
-+	}
-+}
-+
- static inline void l2cap_le_sig_channel(struct l2cap_conn *conn,
- 					struct sk_buff *skb)
- {
-@@ -5326,8 +5340,7 @@ static inline void l2cap_le_sig_channel(struct l2cap_conn *conn,
+ 	case L2CAP_CONN_RSP:
+ 	case L2CAP_CREATE_CHAN_RSP:
+-		err = l2cap_connect_create_rsp(conn, cmd, cmd_len, data);
++		l2cap_connect_create_rsp(conn, cmd, cmd_len, data);
+ 		break;
  
- 			BT_ERR("Wrong link type (%d)", err);
+ 	case L2CAP_CONF_REQ:
+@@ -5220,7 +5220,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
+ 		break;
  
--			/* FIXME: Map err to a valid reason */
--			rej.reason = __constant_cpu_to_le16(L2CAP_REJ_NOT_UNDERSTOOD);
-+			rej.reason = l2cap_err_to_reason(err);
- 			l2cap_send_cmd(conn, cmd.ident, L2CAP_COMMAND_REJ,
- 				       sizeof(rej), &rej);
- 		}
-@@ -5371,8 +5384,7 @@ static inline void l2cap_sig_channel(struct l2cap_conn *conn,
+ 	case L2CAP_CONF_RSP:
+-		err = l2cap_config_rsp(conn, cmd, cmd_len, data);
++		l2cap_config_rsp(conn, cmd, cmd_len, data);
+ 		break;
  
- 			BT_ERR("Wrong link type (%d)", err);
+ 	case L2CAP_DISCONN_REQ:
+@@ -5228,7 +5228,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
+ 		break;
  
--			/* FIXME: Map err to a valid reason */
--			rej.reason = __constant_cpu_to_le16(L2CAP_REJ_NOT_UNDERSTOOD);
-+			rej.reason = l2cap_err_to_reason(err);
- 			l2cap_send_cmd(conn, cmd.ident, L2CAP_COMMAND_REJ,
- 				       sizeof(rej), &rej);
- 		}
+ 	case L2CAP_DISCONN_RSP:
+-		err = l2cap_disconnect_rsp(conn, cmd, cmd_len, data);
++		l2cap_disconnect_rsp(conn, cmd, cmd_len, data);
+ 		break;
+ 
+ 	case L2CAP_ECHO_REQ:
+@@ -5243,7 +5243,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
+ 		break;
+ 
+ 	case L2CAP_INFO_RSP:
+-		err = l2cap_information_rsp(conn, cmd, cmd_len, data);
++		l2cap_information_rsp(conn, cmd, cmd_len, data);
+ 		break;
+ 
+ 	case L2CAP_CREATE_CHAN_REQ:
+@@ -5255,7 +5255,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
+ 		break;
+ 
+ 	case L2CAP_MOVE_CHAN_RSP:
+-		err = l2cap_move_channel_rsp(conn, cmd, cmd_len, data);
++		l2cap_move_channel_rsp(conn, cmd, cmd_len, data);
+ 		break;
+ 
+ 	case L2CAP_MOVE_CHAN_CFM:
+@@ -5263,7 +5263,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
+ 		break;
+ 
+ 	case L2CAP_MOVE_CHAN_CFM_RSP:
+-		err = l2cap_move_channel_confirm_rsp(conn, cmd, cmd_len, data);
++		l2cap_move_channel_confirm_rsp(conn, cmd, cmd_len, data);
+ 		break;
+ 
+ 	default:
 -- 
 1.8.4.rc3
 
