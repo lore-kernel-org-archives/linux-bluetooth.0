@@ -1,72 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <2389837.qqrqTJ68od@uw000953>
-References: <1379071852-10094-1-git-send-email-szymon.janc@tieto.com>
-	<1379071852-10094-4-git-send-email-szymon.janc@tieto.com>
-	<B531A8F3-8ABA-4CD1-A013-AB0AFF40302C@holtmann.org>
-	<2389837.qqrqTJ68od@uw000953>
-Date: Mon, 16 Sep 2013 15:04:04 +0300
-Message-ID: <CABBYNZ+hUzpvZsNN6rDSo0jezA80L_qYW0=BjaP_R2q8B87iug@mail.gmail.com>
-Subject: Re: [PATCH 4/8] sdp: Decouple Device ID profile implementation
+In-Reply-To: <1379086116-22617-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1379086116-22617-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Date: Mon, 16 Sep 2013 15:00:31 +0300
+Message-ID: <CABBYNZLpoTkn9E=TY-jG7dMi5=siMPiC1=YP8299Q3rF9Kk+wQ@mail.gmail.com>
+Subject: Re: [PATCH 1/6] obexd: Add request struct to MAP
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Christian,
 
-On Mon, Sep 16, 2013 at 2:10 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Hi Marcel,
+On Fri, Sep 13, 2013 at 6:28 PM, Christian Fetzer
+<christian.fetzer@oss.bmw-carit.de> wrote:
+> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 >
->> > Make DeviceID profile similar to other profiles implementations. Use
->> > btd_profile for handling DeviceID profile while adding/removing
->> > adapters. The nice drawback is that SDP code no longer depends on
->> > main_opts.
->> > ---
->> > Makefile.plugins             |   3 +
->> > profiles/deviceid/deviceid.c | 181 +++++++++++++++++++++++++++++++++++++++++++
->> > src/sdpd-server.c            |   4 -
->> > src/sdpd-service.c           |  58 --------------
->> > src/sdpd.h                   |   2 -
->> > 5 files changed, 184 insertions(+), 64 deletions(-)
->> > create mode 100644 profiles/deviceid/deviceid.c
->> >
->> > diff --git a/Makefile.plugins b/Makefile.plugins
->> > index 7c5f71d..df5d2a1 100644
->> > --- a/Makefile.plugins
->> > +++ b/Makefile.plugins
->> > @@ -82,6 +82,9 @@ builtin_sources += profiles/scanparam/scan.c
->> > builtin_modules += deviceinfo
->> > builtin_sources += profiles/deviceinfo/deviceinfo.c
->> >
->> > +builtin_modules += deviceid
->> > +builtin_sources += profiles/deviceid/deviceid.c
->> > +
->>
->> this is changing the semantics a little bit. Device Id record is guaranteed
->> to have 0x10000 handle. I would prefer if we can keep it that way.
+> This adds a pending_request struct in order to store the D-Bus request
+> data.
 >
-> Why? There is no such requirement in spec (is it?), and this is just another
-> profile so not sure why would you like to treat it in special way. (Also if one
-> disable deviceid other profiles might get 0x10000 handle.)
+> The current version stores the received D-Bus message in the MAP session
+> struct. The stored message is overridden by intermediate D-Bus method
+> calls which can lead into a crash.
 >
-> If that is really needed we could still have a plugin, just with high prio so
-> that it init is called first and then use insert instead of add record when
-> probing adapters.
+> Trace:
+>   arguments to dbus_message_unref() were incorrect,
+>   assertion "!message->in_cache" failed in file dbus-message.c line 1618.
 >
->> Also we need to find a way to make this work with the extended inquiry
->> response that can also included device id information.
+>  0  0x00007ffff6a6a1c9 in raise () from /usr/lib/libc.so.6
+>  1  0x00007ffff6a6b5c8 in abort () from /usr/lib/libc.so.6
+>  2  0x00007ffff7313de5 in ?? () from /usr/lib/libdbus-1.so.3
+>  3  0x00007ffff730ab91 in ?? () from /usr/lib/libdbus-1.so.3
+>  4  0x000000000043721c in message_listing_cb (session=0x6a7d30,
+>     transfer=0x6a9450, err=0x0, user_data=0x6a9950) at obexd/client/map.c:1166
+>  5  0x000000000042f7af in session_terminate_transfer (session=0x6a7d30,
+>     transfer=0x6a9450, gerr=0x0) at obexd/client/session.c:830
+>  6  0x000000000042f83d in session_notify_complete (session=0x6a7d30,
+>     transfer=0x6a9450) at obexd/client/session.c:845
+>  7  0x000000000042f8dc in transfer_complete (transfer=0x6a9450, err=0x0,
+>     user_data=0x6a7d30) at obexd/client/session.c:865
+>  8  0x0000000000439ee7 in xfer_complete (obex=0x677250, err=0x0,
+>     user_data=0x6a9450) at obexd/client/transfer.c:577
+>  9  0x000000000043a05f in get_xfer_progress_first (obex=0x677250, err=0x0,
+>     rsp=0x678730, user_data=0x6a9450) at obexd/client/transfer.c:621
+>  10 0x0000000000413f08 in handle_response (obex=0x677250, err=0x0,
+>     rsp=0x678730) at gobex/gobex.c:949
+>  11 0x00000000004147db in incoming_data (io=0x6a8a00, cond=G_IO_IN,
+>     user_data=0x677250) at gobex/gobex.c:1192
+>  12 0x00007ffff702dda6 in g_main_context_dispatch ()
+>    from /usr/lib/libglib-2.0.so.0
+>  13 0x00007ffff702e0f8 in ?? () from /usr/lib/libglib-2.0.so.0
+>  14 0x00007ffff702e4fa in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
+>  15 0x0000000000427ce8 in main (argc=1, argv=0x7fffffffdd48)
+>     at obexd/src/main.c:319
+> ---
+>  obexd/client/map.c | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
 >
-> Currently deviceid info is in main_opts and is handled from many places.
-> We could remove this from main_opts and put all the logic (config reading,
-> default values etc) to deviceid plugin and let it set proper values for
-> adapters.
+> diff --git a/obexd/client/map.c b/obexd/client/map.c
+> index 95f0334..f969aad 100644
+> --- a/obexd/client/map.c
+> +++ b/obexd/client/map.c
+> @@ -101,6 +101,11 @@ struct map_data {
+>         uint8_t supported_message_types;
+>  };
+>
+> +struct pending_request {
+> +       struct map_data *map;
+> +       DBusMessage *msg;
+> +};
+> +
+>  #define MAP_MSG_FLAG_PRIORITY  0x01
+>  #define MAP_MSG_FLAG_READ      0x02
+>  #define MAP_MSG_FLAG_SENT      0x04
+> @@ -134,6 +139,25 @@ struct map_parser {
+>
+>  static DBusConnection *conn = NULL;
+>
+> +static struct pending_request *pending_request_new(struct map_data *map,
+> +                                                       DBusMessage *message)
+> +{
+> +       struct pending_request *p;
+> +
+> +       p = g_new0(struct pending_request, 1);
+> +       p->map = map;
+> +       p->msg = dbus_message_ref(message);
+> +
+> +       return p;
+> +}
+> +
+> +static void pending_request_free(struct pending_request *p)
+> +{
+> +       dbus_message_unref(p->msg);
+> +
+> +       g_free(p);
+> +}
+> +
+>  static void simple_cb(struct obc_session *session,
+>                                                 struct obc_transfer *transfer,
+>                                                 GError *err, void *user_data)
+> --
+> 1.8.3.4
 
-I would prefer to stick with core managing the main.conf and then have
-an API to which the plugins can access it, iirc that how connman deals
-with plugins accessing information in the conf file.
+All patches applied, thanks.
 
 
 -- 
