@@ -1,29 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH v5 3/8] Bluetooth: Fix L2CAP error return used for failed channel lookups
+Subject: Re: [PATCH v5 5/8] Bluetooth: Fix L2CAP command reject reason
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1379325919-19003-4-git-send-email-johan.hedberg@gmail.com>
-Date: Mon, 16 Sep 2013 09:12:03 -0500
+In-Reply-To: <1379325919-19003-6-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 16 Sep 2013 09:11:08 -0500
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <E3F98756-278B-4F43-9DE9-11604217BA71@holtmann.org>
-References: <1379325919-19003-1-git-send-email-johan.hedberg@gmail.com> <1379325919-19003-4-git-send-email-johan.hedberg@gmail.com>
+Message-Id: <7EDE5489-018A-4FE9-941F-41BF8841944E@holtmann.org>
+References: <1379325919-19003-1-git-send-email-johan.hedberg@gmail.com> <1379325919-19003-6-git-send-email-johan.hedberg@gmail.com>
 To: johan.hedberg@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> The EFAULT error should only be used for memory address related errors
-> and ENOENT might be needed for other purposes than invalid CID errors.
-> This patch fixes the l2cap_config_req, l2cap_connect_create_rsp and
-> l2cap_create_channel_req handlers to use the unique EBADSLT error to
-> indicate failed lookups on a given CID.
+> There are several possible reason codes that can be sent in the command
+> reject L2CAP packet. Before this patch the code has used a hard-coded
+> single response code ("command not understood"). This patch adds a
+> helper function to map the return value of an L2CAP handler function to
+> the correct command reject reason.
 > 
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> net/bluetooth/l2cap_core.c | 8 ++++----
-> 1 file changed, 4 insertions(+), 4 deletions(-)
+> net/bluetooth/l2cap_core.c | 20 ++++++++++++++++----
+> 1 file changed, 16 insertions(+), 4 deletions(-)
 
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
