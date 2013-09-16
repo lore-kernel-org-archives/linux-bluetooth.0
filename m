@@ -1,111 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 16 Sep 2013 12:54:53 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 5/8] Bluetooth: Fix error code for invalid CID in
+ l2cap_config_req
+Message-ID: <20130916095453.GA18200@x220.p-661hnu-f1>
+References: <1379179711-16436-1-git-send-email-johan.hedberg@gmail.com>
+ <1379179711-16436-6-git-send-email-johan.hedberg@gmail.com>
+ <DDB6D220-2DB5-49B3-9200-4AD8FBAAADDE@holtmann.org>
+ <20130915063017.GA22996@x220.p-661hnu-f1>
+ <D242F6F2-162B-4904-8637-78BA01BF5737@holtmann.org>
+ <20130915181552.GA6383@x220.p-661hnu-f1>
+ <5A99E897-60EC-486C-94D9-775B3C01FB16@holtmann.org>
+ <20130915200021.GA8409@x220.p-661hnu-f1>
+ <B44973E0-9AF5-4AE2-8C81-E49EE46C6E31@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1379086116-22617-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1379086116-22617-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Date: Mon, 16 Sep 2013 15:00:31 +0300
-Message-ID: <CABBYNZLpoTkn9E=TY-jG7dMi5=siMPiC1=YP8299Q3rF9Kk+wQ@mail.gmail.com>
-Subject: Re: [PATCH 1/6] obexd: Add request struct to MAP
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <B44973E0-9AF5-4AE2-8C81-E49EE46C6E31@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+Hi Marcel,
 
-On Fri, Sep 13, 2013 at 6:28 PM, Christian Fetzer
-<christian.fetzer@oss.bmw-carit.de> wrote:
-> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
->
-> This adds a pending_request struct in order to store the D-Bus request
-> data.
->
-> The current version stores the received D-Bus message in the MAP session
-> struct. The stored message is overridden by intermediate D-Bus method
-> calls which can lead into a crash.
->
-> Trace:
->   arguments to dbus_message_unref() were incorrect,
->   assertion "!message->in_cache" failed in file dbus-message.c line 1618.
->
->  0  0x00007ffff6a6a1c9 in raise () from /usr/lib/libc.so.6
->  1  0x00007ffff6a6b5c8 in abort () from /usr/lib/libc.so.6
->  2  0x00007ffff7313de5 in ?? () from /usr/lib/libdbus-1.so.3
->  3  0x00007ffff730ab91 in ?? () from /usr/lib/libdbus-1.so.3
->  4  0x000000000043721c in message_listing_cb (session=0x6a7d30,
->     transfer=0x6a9450, err=0x0, user_data=0x6a9950) at obexd/client/map.c:1166
->  5  0x000000000042f7af in session_terminate_transfer (session=0x6a7d30,
->     transfer=0x6a9450, gerr=0x0) at obexd/client/session.c:830
->  6  0x000000000042f83d in session_notify_complete (session=0x6a7d30,
->     transfer=0x6a9450) at obexd/client/session.c:845
->  7  0x000000000042f8dc in transfer_complete (transfer=0x6a9450, err=0x0,
->     user_data=0x6a7d30) at obexd/client/session.c:865
->  8  0x0000000000439ee7 in xfer_complete (obex=0x677250, err=0x0,
->     user_data=0x6a9450) at obexd/client/transfer.c:577
->  9  0x000000000043a05f in get_xfer_progress_first (obex=0x677250, err=0x0,
->     rsp=0x678730, user_data=0x6a9450) at obexd/client/transfer.c:621
->  10 0x0000000000413f08 in handle_response (obex=0x677250, err=0x0,
->     rsp=0x678730) at gobex/gobex.c:949
->  11 0x00000000004147db in incoming_data (io=0x6a8a00, cond=G_IO_IN,
->     user_data=0x677250) at gobex/gobex.c:1192
->  12 0x00007ffff702dda6 in g_main_context_dispatch ()
->    from /usr/lib/libglib-2.0.so.0
->  13 0x00007ffff702e0f8 in ?? () from /usr/lib/libglib-2.0.so.0
->  14 0x00007ffff702e4fa in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
->  15 0x0000000000427ce8 in main (argc=1, argv=0x7fffffffdd48)
->     at obexd/src/main.c:319
-> ---
->  obexd/client/map.c | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
->
-> diff --git a/obexd/client/map.c b/obexd/client/map.c
-> index 95f0334..f969aad 100644
-> --- a/obexd/client/map.c
-> +++ b/obexd/client/map.c
-> @@ -101,6 +101,11 @@ struct map_data {
->         uint8_t supported_message_types;
->  };
->
-> +struct pending_request {
-> +       struct map_data *map;
-> +       DBusMessage *msg;
-> +};
-> +
->  #define MAP_MSG_FLAG_PRIORITY  0x01
->  #define MAP_MSG_FLAG_READ      0x02
->  #define MAP_MSG_FLAG_SENT      0x04
-> @@ -134,6 +139,25 @@ struct map_parser {
->
->  static DBusConnection *conn = NULL;
->
-> +static struct pending_request *pending_request_new(struct map_data *map,
-> +                                                       DBusMessage *message)
-> +{
-> +       struct pending_request *p;
-> +
-> +       p = g_new0(struct pending_request, 1);
-> +       p->map = map;
-> +       p->msg = dbus_message_ref(message);
-> +
-> +       return p;
-> +}
-> +
-> +static void pending_request_free(struct pending_request *p)
-> +{
-> +       dbus_message_unref(p->msg);
-> +
-> +       g_free(p);
-> +}
-> +
->  static void simple_cb(struct obc_session *session,
->                                                 struct obc_transfer *transfer,
->                                                 GError *err, void *user_data)
-> --
-> 1.8.3.4
+On Sun, Sep 15, 2013, Marcel Holtmann wrote:
+> I have nothing against ENOENT. I however am a bit concerned about that
+> we accidentally use ENOENT in some other case and end up overloading
+> its meaning.
+> 
+> So just for the sake of making this unique, I would consider going
+> with EBADSLT. I am not married to this at all. However I wanted to
+> have this talked through so that we understand the whole picture. If I
+> would know the perfect answer, I would have just forced you to use it
+> ;)
 
-All patches applied, thanks.
+I really don't have a strong opinion one way or another, both seem good
+enough to me, but since ENOENT has you feeling a bit uneasy I'll change
+this to EBADSLT for the next revision (which will hopefully be the last
+one for this error code issue).
 
-
--- 
-Luiz Augusto von Dentz
+Johan
