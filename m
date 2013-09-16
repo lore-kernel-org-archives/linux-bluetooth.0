@@ -1,140 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 16 Sep 2013 11:19:26 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 8/8] Bluetooth: Fix waiting for clearing of
- BT_SK_SUSPEND flag
-Message-ID: <20130916081926.GA13593@x220.p-661hnu-f1>
-References: <1379269001-6313-1-git-send-email-johan.hedberg@gmail.com>
- <1379269001-6313-9-git-send-email-johan.hedberg@gmail.com>
- <63CB3872-A353-4997-9A00-E746DA99E6C6@holtmann.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <63CB3872-A353-4997-9A00-E746DA99E6C6@holtmann.org>
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH v3 5/8] Bluetooth: Fix error code for invalid CID in l2cap_config_req
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20130915200021.GA8409@x220.p-661hnu-f1>
+Date: Sun, 15 Sep 2013 19:17:05 -0500
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <B44973E0-9AF5-4AE2-8C81-E49EE46C6E31@holtmann.org>
+References: <1379179711-16436-1-git-send-email-johan.hedberg@gmail.com> <1379179711-16436-6-git-send-email-johan.hedberg@gmail.com> <DDB6D220-2DB5-49B3-9200-4AD8FBAAADDE@holtmann.org> <20130915063017.GA22996@x220.p-661hnu-f1> <D242F6F2-162B-4904-8637-78BA01BF5737@holtmann.org> <20130915181552.GA6383@x220.p-661hnu-f1> <5A99E897-60EC-486C-94D9-775B3C01FB16@holtmann.org> <20130915200021.GA8409@x220.p-661hnu-f1>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On Sun, Sep 15, 2013, Marcel Holtmann wrote:
-> > @@ -525,6 +525,45 @@ int bt_sock_wait_state(struct sock *sk, int state, unsigned long timeo)
-> > }
-> > EXPORT_SYMBOL(bt_sock_wait_state);
-> > 
+>>>>>>> The convention of the L2CAP code is to return EFAULT when a CID in the
+>>>>>>> request packet is invalid. This patch fixes the l2cap_config_req to use
+>>>>>>> that error code instead of ENOENT.
+>>>>>>> 
+>>>>>>> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+>>>>>>> ---
+>>>>>>> net/bluetooth/l2cap_core.c | 2 +-
+>>>>>>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>>> 
+>>>>>>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+>>>>>>> index 9ec1561f..d134501 100644
+>>>>>>> --- a/net/bluetooth/l2cap_core.c
+>>>>>>> +++ b/net/bluetooth/l2cap_core.c
+>>>>>>> @@ -3978,7 +3978,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
+>>>>>>> 
+>>>>>>> 	chan = l2cap_get_chan_by_scid(conn, dcid);
+>>>>>>> 	if (!chan)
+>>>>>>> -		return -ENOENT;
+>>>>>>> +		return -EFAULT;
+>>>>>> 
+>>>>>> do we really want to use EFAULT. That is normally only used if a
+>>>>>> memory copy from userspace to kernel or vice versa fails.
+>>>>> 
+>>>>> EFAULT seemed to be the most common error code in this case, but now
+>>>>> that I did some research it seems it's mostly from newish AMP related
+>>>>> code. Would you be ok if I just switch all places to use ENOENT then?
+>>>> 
+>>>> EFAULT is really for memory address errors. It is a pretty bad idea to use CID errors.
+>>>> 
+>>>> I am fine with keep using ENOENT if we used that before. If that is
+>>>> what the original code used, then lets keep using it. Otherwise we
+>>>> better find a more descriptive error.
+>>> 
+>>> If we ignore new AMP code there's only one "legacy" reference for this
+>>> kind of situation which is l2cap_config_req. Since it has always used
+>>> ENOENT for a failed CID lookup I'll follow that lead and use the same
+>>> error for all places that need it.
+>> 
+>> have a look at EBADRQC, EBADSLT, EBADR or EBADE. They might be a
+>> better choice.
 > 
-> add a small comment here that this needs to be called with sk lock held.
-
-I suppose I should do that to the old bt_sock_wait_state function too?
-(which btw my wait_ready function is essentially a copy of, with the
-exception of which condition it looks for)
-
-> > +int bt_sock_wait_ready(struct sock *sk, unsigned long flags)
-> > +{
-> > +	DECLARE_WAITQUEUE(wait, current);
-> > +	unsigned long timeo;
-> > +	int err = 0;
-> > +
-> > +	BT_DBG("sk %p", sk);
-> > +
-> > +	timeo = sock_sndtimeo(sk, flags & O_NONBLOCK);
-> > +
-> > +	add_wait_queue(sk_sleep(sk), &wait);
-> > +	set_current_state(TASK_INTERRUPTIBLE);
-> > +	while (test_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags)) {
-> > +		if (!timeo) {
-> > +			err = -EAGAIN;
-> > +			break;
-> > +		}
-> > +
-> > +		if (signal_pending(current)) {
-> > +			err = sock_intr_errno(timeo);
-> > +			break;
-> > +		}
-> > +
-> > +		release_sock(sk);
-> > +		timeo = schedule_timeout(timeo);
-> > +		lock_sock(sk);
-> > +		set_current_state(TASK_INTERRUPTIBLE);
-> > +
-> > +		err = sock_error(sk);
-> > +		if (err)
-> > +			break;
-> > +	}
-> > +	__set_current_state(TASK_RUNNING);
-> > +	remove_wait_queue(sk_sleep(sk), &wait);
-> > +
-> > +	return err;
-> > +}
-> > +EXPORT_SYMBOL(bt_sock_wait_ready);
-> > +
-> > #ifdef CONFIG_PROC_FS
-> > struct bt_seq_state {
-> > 	struct bt_sock_list *l;
-> > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> > index 0098af8..ad95b42 100644
-> > --- a/net/bluetooth/l2cap_sock.c
-> > +++ b/net/bluetooth/l2cap_sock.c
-> > @@ -777,6 +777,12 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
-> > 	if (sk->sk_state != BT_CONNECTED)
-> > 		return -ENOTCONN;
-> > 
-> > +	lock_sock(sk);
-> > +	err = bt_sock_wait_ready(sk, msg->msg_flags);
-> > +	release_sock(sk);
-> > +	if (err)
-> > +		return err;
-> > +
+> I'd rather have a consensus here first before resending the entire patch
+> set yet another time because of this issue (which, let's face it, is not
+> about any public API but consistency inside a single c-file).
 > 
-> After starting to look into this now, I am not sure we have proper
-> locking in that function in the first place. Can you check that it is
-> actually fine not holding the socket lock for the send operation
-> itself.
-
-What procedure did you have in mind for checking what's fine and what's
-not? Some quick googling and trying to look at the code of other address
-families didn't help me getting much wiser about this.
-
-This is the way that RFCOMM and L2CAP sockets seem to always have done
-locking and we haven't seen any obvious breakage because of it. The
-RFCOMM side does indeed use lock_sock for the send operation and L2CAP
-doesn't. However, I think the reason it works is that l2cap_chan_lock
-(which is used before calling l2cap_chan_send) serves a similar purpose.
-
-> > --- a/net/bluetooth/rfcomm/sock.c
-> > +++ b/net/bluetooth/rfcomm/sock.c
-> > @@ -544,7 +544,7 @@ static int rfcomm_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
-> > 	struct sock *sk = sock->sk;
-> > 	struct rfcomm_dlc *d = rfcomm_pi(sk)->dlc;
-> > 	struct sk_buff *skb;
-> > -	int sent = 0;
-> > +	int err, sent = 0;
-> > 
-> > 	if (test_bit(RFCOMM_DEFER_SETUP, &d->flags))
-> > 		return -ENOTCONN;
-> > @@ -559,9 +559,14 @@ static int rfcomm_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
-> > 
-> > 	lock_sock(sk);
-> > 
-> > +	err = bt_sock_wait_ready(sk, msg->msg_flags);
-> > +	if (err) {
-> > +		release_sock(sk);
-> > +		return err;
-> > +	}
-> > +
+> As quite often with trying to map POSIX error codes to our own domain
+> we've ended up here with trying to find the "least bad" option in the
+> absence of a single obviously correct one.
 > 
-> I would be fine with using the sent variable here. And then of course
-> create a label for the failure case. Assuming bt_sock_wait_ready()
-> returning 0 on success you could use it to initialize sent here.
+> EBADRQC sounds like it's not related to PDU parameters but the request
+> code of the PDU. EBADSLT is "invalid slot", so if we consider the CID to
+> be a "slot" this might be an option. EBADR talks about a "request
+> descriptor" which I don't quite understand how it's different from a
+> "request code". EBADE means "invalid exchange" whereas this isn't really
+> about an exchange but just an incorrect CID in a PDU.
 > 
-> However at minimum, I want a label here to jump at the end of the
-> function in error case. I like to keep the number of lock_sock +
-> release_sock balanced.
+> I agree that ENOENT isn't perfect either since, even though internally
+> this is about a failed lookup, externally this is just the peer sending
+> us an invalid parameter value. Therefore, we could even consider EINVAL
+> if it wasn't for the fact that it's already used e.g. when we receive an
+> unknown opcode.
+> 
+> In the end I'm willing to accept pretty much any of the proposed options
+> since there really isn't a single right answer to this and since this is
+> not about public API that we really need to stick to once we decide
+> which value to use. The important thing is that the code is kept
+> consistent regarding the use of this error.
 
-Makes sense. I'll do these improvements to the next version.
+I have nothing against ENOENT. I however am a bit concerned about that we accidentally use ENOENT in some other case and end up overloading its meaning.
 
-> Which is something that needs to be fixed for l2cap_sock_recvmsg()
-> actually.
+So just for the sake of making this unique, I would consider going with EBADSLT. I am not married to this at all. However I wanted to have this talked through so that we understand the whole picture. If I would know the perfect answer, I would have just forced you to use it ;)
 
-I'll see if I can roll up a separate patch for that.
+If you want to keep using ENOENT, then I will sign off your current patches.
 
-Johan
+Regards
+
+Marcel
+
