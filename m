@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 7/8] Bluetooth: Fix responding to invalid L2CAP signaling commands
-Date: Mon, 16 Sep 2013 13:05:18 +0300
-Message-Id: <1379325919-19003-8-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v5 8/8] Bluetooth: Fix waiting for clearing of BT_SK_SUSPEND flag
+Date: Mon, 16 Sep 2013 13:05:19 +0300
+Message-Id: <1379325919-19003-9-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1379325919-19003-1-git-send-email-johan.hedberg@gmail.com>
 References: <1379325919-19003-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,58 +11,137 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-When we have an LE link we should not respond to any data on the BR/EDR
-L2CAP signaling channel (0x0001) and vice-versa when we have a BR/EDR
-link we should not respond to LE L2CAP (CID 0x0005) signaling commands.
-This patch fixes this issue by checking for a valid link type and
-ignores data if it is wrong.
+In the case of blocking sockets we should not proceed with sendmsg() if
+the socket has the BT_SK_SUSPEND flag set. So far the code was only
+ensuring that POLLOUT doesn't get set for non-blocking sockets using
+poll() but there was no code in place to ensure that blocking sockets do
+the right thing when writing to them.
+
+This patch adds a new bt_sock_wait_ready helper function to sleep in the
+sendmsg call if the BT_SK_SUSPEND flag is set, and wake up as soon as it
+is unset. It also updates the L2CAP and RFCOMM sendmsg callbacks to take
+advantage of this new helper function.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_core.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ include/net/bluetooth/bluetooth.h |  1 +
+ net/bluetooth/af_bluetooth.c      | 40 +++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/l2cap_sock.c        |  6 ++++++
+ net/bluetooth/rfcomm/sock.c       |  7 ++++++-
+ 4 files changed, 53 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b0947ae..636a3b4 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5311,6 +5311,7 @@ static __le16 l2cap_err_to_reason(int err)
- static inline void l2cap_le_sig_channel(struct l2cap_conn *conn,
- 					struct sk_buff *skb)
- {
-+	struct hci_conn *hcon = conn->hcon;
- 	u8 *data = skb->data;
- 	int len = skb->len;
- 	struct l2cap_cmd_hdr cmd;
-@@ -5318,6 +5319,9 @@ static inline void l2cap_le_sig_channel(struct l2cap_conn *conn,
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 10d43d8..afbc711 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -249,6 +249,7 @@ int  bt_sock_stream_recvmsg(struct kiocb *iocb, struct socket *sock,
+ uint bt_sock_poll(struct file *file, struct socket *sock, poll_table *wait);
+ int  bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
+ int  bt_sock_wait_state(struct sock *sk, int state, unsigned long timeo);
++int  bt_sock_wait_ready(struct sock *sk, unsigned long flags);
  
- 	l2cap_raw_recv(conn, skb);
+ void bt_accept_enqueue(struct sock *parent, struct sock *sk);
+ void bt_accept_unlink(struct sock *sk);
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 9096137..c600631 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -525,6 +525,46 @@ int bt_sock_wait_state(struct sock *sk, int state, unsigned long timeo)
+ }
+ EXPORT_SYMBOL(bt_sock_wait_state);
  
-+	if (hcon->type != LE_LINK)
-+		return;
++/* This function expects the sk lock to be held when called */
++int bt_sock_wait_ready(struct sock *sk, unsigned long flags)
++{
++	DECLARE_WAITQUEUE(wait, current);
++	unsigned long timeo;
++	int err = 0;
 +
- 	while (len >= L2CAP_CMD_HDR_SIZE) {
- 		u16 cmd_len;
- 		memcpy(&cmd, data, L2CAP_CMD_HDR_SIZE);
-@@ -5355,6 +5359,7 @@ static inline void l2cap_le_sig_channel(struct l2cap_conn *conn,
- static inline void l2cap_sig_channel(struct l2cap_conn *conn,
- 				     struct sk_buff *skb)
- {
-+	struct hci_conn *hcon = conn->hcon;
- 	u8 *data = skb->data;
- 	int len = skb->len;
- 	struct l2cap_cmd_hdr cmd;
-@@ -5362,6 +5367,9 @@ static inline void l2cap_sig_channel(struct l2cap_conn *conn,
- 
- 	l2cap_raw_recv(conn, skb);
- 
-+	if (hcon->type != ACL_LINK)
-+		return;
++	BT_DBG("sk %p", sk);
 +
- 	while (len >= L2CAP_CMD_HDR_SIZE) {
- 		u16 cmd_len;
- 		memcpy(&cmd, data, L2CAP_CMD_HDR_SIZE);
++	timeo = sock_sndtimeo(sk, flags & O_NONBLOCK);
++
++	add_wait_queue(sk_sleep(sk), &wait);
++	set_current_state(TASK_INTERRUPTIBLE);
++	while (test_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags)) {
++		if (!timeo) {
++			err = -EAGAIN;
++			break;
++		}
++
++		if (signal_pending(current)) {
++			err = sock_intr_errno(timeo);
++			break;
++		}
++
++		release_sock(sk);
++		timeo = schedule_timeout(timeo);
++		lock_sock(sk);
++		set_current_state(TASK_INTERRUPTIBLE);
++
++		err = sock_error(sk);
++		if (err)
++			break;
++	}
++	__set_current_state(TASK_RUNNING);
++	remove_wait_queue(sk_sleep(sk), &wait);
++
++	return err;
++}
++EXPORT_SYMBOL(bt_sock_wait_ready);
++
+ #ifdef CONFIG_PROC_FS
+ struct bt_seq_state {
+ 	struct bt_sock_list *l;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 0098af8..ad95b42 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -777,6 +777,12 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
+ 	if (sk->sk_state != BT_CONNECTED)
+ 		return -ENOTCONN;
+ 
++	lock_sock(sk);
++	err = bt_sock_wait_ready(sk, msg->msg_flags);
++	release_sock(sk);
++	if (err)
++		return err;
++
+ 	l2cap_chan_lock(chan);
+ 	err = l2cap_chan_send(chan, msg, len, sk->sk_priority);
+ 	l2cap_chan_unlock(chan);
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 30b3721..072938d 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -544,7 +544,7 @@ static int rfcomm_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
+ 	struct sock *sk = sock->sk;
+ 	struct rfcomm_dlc *d = rfcomm_pi(sk)->dlc;
+ 	struct sk_buff *skb;
+-	int sent = 0;
++	int sent;
+ 
+ 	if (test_bit(RFCOMM_DEFER_SETUP, &d->flags))
+ 		return -ENOTCONN;
+@@ -559,6 +559,10 @@ static int rfcomm_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
+ 
+ 	lock_sock(sk);
+ 
++	sent = bt_sock_wait_ready(sk, msg->msg_flags);
++	if (sent)
++		goto done;
++
+ 	while (len) {
+ 		size_t size = min_t(size_t, len, d->mtu);
+ 		int err;
+@@ -594,6 +598,7 @@ static int rfcomm_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
+ 		len  -= size;
+ 	}
+ 
++done:
+ 	release_sock(sk);
+ 
+ 	return sent;
 -- 
 1.8.4.rc3
 
