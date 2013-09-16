@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 6/8] Bluetooth: Fix sending responses to identified L2CAP response packets
-Date: Mon, 16 Sep 2013 13:05:17 +0300
-Message-Id: <1379325919-19003-7-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v5 4/8] Bluetooth: Fix L2CAP Disconnect response for unknown CID
+Date: Mon, 16 Sep 2013 13:05:15 +0300
+Message-Id: <1379325919-19003-5-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1379325919-19003-1-git-send-email-johan.hedberg@gmail.com>
 References: <1379325919-19003-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,80 +11,30 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-When L2CAP packets return a non-zero error and the value is passed
-onwards by l2cap_bredr_sig_cmd this will trigger a command reject packet
-to be sent. However, the core specification (page 1416 in core 4.0) says
-the following: "Command Reject packets should not be sent in response to
-an identified Response packet.".
-
-This patch ensures that a command reject packet is not sent for any
-identified response packet by ignoring the error return value from the
-response handler functions.
+If we receive an L2CAP Disconnect Request for an unknown CID we should
+not just silently drop it but reply with a proper Command Reject
+response. This patch fixes this by ensuring that the disconnect handler
+returns a proper error instead of 0 and will cause the function caller
+to send the right response.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_core.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ net/bluetooth/l2cap_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 2ff35a2..b0947ae 100644
+index eb60cf7..31bf812 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -5212,7 +5212,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
+@@ -4206,7 +4206,7 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn,
+ 	chan = __l2cap_get_chan_by_scid(conn, dcid);
+ 	if (!chan) {
+ 		mutex_unlock(&conn->chan_lock);
+-		return 0;
++		return -EBADSLT;
+ 	}
  
- 	case L2CAP_CONN_RSP:
- 	case L2CAP_CREATE_CHAN_RSP:
--		err = l2cap_connect_create_rsp(conn, cmd, cmd_len, data);
-+		l2cap_connect_create_rsp(conn, cmd, cmd_len, data);
- 		break;
- 
- 	case L2CAP_CONF_REQ:
-@@ -5220,7 +5220,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 		break;
- 
- 	case L2CAP_CONF_RSP:
--		err = l2cap_config_rsp(conn, cmd, cmd_len, data);
-+		l2cap_config_rsp(conn, cmd, cmd_len, data);
- 		break;
- 
- 	case L2CAP_DISCONN_REQ:
-@@ -5228,7 +5228,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 		break;
- 
- 	case L2CAP_DISCONN_RSP:
--		err = l2cap_disconnect_rsp(conn, cmd, cmd_len, data);
-+		l2cap_disconnect_rsp(conn, cmd, cmd_len, data);
- 		break;
- 
- 	case L2CAP_ECHO_REQ:
-@@ -5243,7 +5243,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 		break;
- 
- 	case L2CAP_INFO_RSP:
--		err = l2cap_information_rsp(conn, cmd, cmd_len, data);
-+		l2cap_information_rsp(conn, cmd, cmd_len, data);
- 		break;
- 
- 	case L2CAP_CREATE_CHAN_REQ:
-@@ -5255,7 +5255,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 		break;
- 
- 	case L2CAP_MOVE_CHAN_RSP:
--		err = l2cap_move_channel_rsp(conn, cmd, cmd_len, data);
-+		l2cap_move_channel_rsp(conn, cmd, cmd_len, data);
- 		break;
- 
- 	case L2CAP_MOVE_CHAN_CFM:
-@@ -5263,7 +5263,7 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
- 		break;
- 
- 	case L2CAP_MOVE_CHAN_CFM_RSP:
--		err = l2cap_move_channel_confirm_rsp(conn, cmd, cmd_len, data);
-+		l2cap_move_channel_confirm_rsp(conn, cmd, cmd_len, data);
- 		break;
- 
- 	default:
+ 	l2cap_chan_lock(chan);
 -- 
 1.8.4.rc3
 
