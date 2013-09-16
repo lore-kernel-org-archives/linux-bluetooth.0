@@ -1,32 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] sdp: Check correct number of bytes received in recv
-Date: Tue, 17 Sep 2013 17:40:20 +0300
-Message-Id: <1379428820-6952-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Bing Zhao <bzhao@marvell.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        Johan Hedberg
+	<johan.hedberg@gmail.com>,
+        "linux-wireless@vger.kernel.org"
+	<linux-wireless@vger.kernel.org>,
+        Mike Frysinger <vapier@chromium.org>,
+        Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
+        Amitkumar Karwar
+	<akarwar@marvell.com>
+Date: Mon, 16 Sep 2013 14:17:54 -0700
+Subject: RE: [PATCH v4] Bluetooth: btmrvl: add calibration data download
+ support
+Message-ID: <477F20668A386D41ADCC57781B1F70430F44C584A1@SC-VEXCH1.marvell.com>
+References: <1379115162-10194-1-git-send-email-bzhao@marvell.com>
+ <525C3DAD-2AD3-468F-8309-630EEE54A3CE@holtmann.org>
+In-Reply-To: <525C3DAD-2AD3-468F-8309-630EEE54A3CE@holtmann.org>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Marcel,
 
-Instead of checking for error check that correct number of bytes received.
----
- src/sdpd-server.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks for your comment.
 
-diff --git a/src/sdpd-server.c b/src/sdpd-server.c
-index 181d248..7b1351f 100644
---- a/src/sdpd-server.c
-+++ b/src/sdpd-server.c
-@@ -177,7 +177,7 @@ static gboolean io_session_event(GIOChannel *chan, GIOCondition cond, gpointer d
- 		return TRUE;
- 
- 	len = recv(sk, buf, size, 0);
--	if (len <= 0) {
-+	if (len != size) {
- 		sdp_svcdb_collect_all(sk);
- 		free(buf);
- 		return FALSE;
--- 
-1.7.10.4
+> > +	bt_cb(skb)->pkt_type =3D MRVL_VENDOR_PKT;
+> > +	skb_put(skb, sizeof(*cmd));
+> > +	skb->dev =3D (void *)priv->btmrvl_dev.hcidev;
+> > +	skb_queue_head(&priv->adapter->tx_queue, skb);
+> > +	priv->btmrvl_dev.sendcmdflag =3D true;
+> > +	priv->adapter->cmd_complete =3D false;
+>=20
+> since the Bluetooth HCI core got ->setup() support with proper synchronou=
+s HCI request handling
+> available for every single driver (see the Intel support in btusb.c), why=
+ not start using that with
+> this driver as well.
 
+We will convert btmrvl driver to use ->setup() callback.
+
+Thanks,
+Bing
