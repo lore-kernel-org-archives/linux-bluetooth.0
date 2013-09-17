@@ -1,50 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5238FF98.9020005@hurleysoftware.com>
-Date: Tue, 17 Sep 2013 21:19:20 -0400
-From: Peter Hurley <peter@hurleysoftware.com>
-MIME-Version: 1.0
-To: Gianluca Anzolin <gianluca@sottospazio.it>
-CC: gustavo@padovan.org, marcel@holtmann.org,
- linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org,
- jslaby@suse.cz
-Subject: Re: [PATCH] rfcomm: don't release the port in rfcomm_dev_state_change()
-References: <1377620926-23370-1-git-send-email-gianluca@sottospazio.it>
-In-Reply-To: <1377620926-23370-1-git-send-email-gianluca@sottospazio.it>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] sdp: Check correct number of bytes received in recv
+Date: Tue, 17 Sep 2013 17:40:20 +0300
+Message-Id: <1379428820-6952-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 08/27/2013 12:28 PM, Gianluca Anzolin wrote:
-> When the dlc is closed, rfcomm_dev_state_change() tries to release the
-> port in the case it cannot get a reference to the tty. However this is
-> racy and not even needed.
->
-> Infact as Peter Hurley points out:
->
-> 1. Only consider dlcs that are 'stolen' from a connected socket, ie.
->     reused. Allocated dlcs cannot have been closed prior to port
->     activate and so for these dlcs a tty reference will always be avail
->     in rfcomm_dev_state_change() -- except for the conditions covered by
->     #2b below.
-> 2. If a tty was at some point previously created for this rfcomm, then
->     either
->     (a) the tty reference is still avail, so rfcomm_dev_state_change()
->         will perform a hangup. So nothing to do, or,
->     (b) the tty reference is no longer avail, and the tty_port will be
->         destroyed by the last tty_port_put() in rfcomm_tty_cleanup.
->         Again, no action required.
-> 3. Prior to obtaining the dlc lock in rfcomm_dev_add(),
->     rfcomm_dev_state_change() will not 'see' a rfcomm_dev so nothing to
->     do here.
-> 4. After releasing the dlc lock in rfcomm_dev_add(),
->     rfcomm_dev_state_change() will 'see' an incomplete rfcomm_dev if a
->     tty reference could not be obtained. Again, the best thing to do here
->     is nothing. Any future attempted open() will block on
->     rfcomm_dev_carrier_raised(). The unconnected device will exist until
->     released by ioctl(RFCOMMRELEASEDEV).
->
-> The patch removes the aforementioned code and uses the
-> tty_port_tty_hangup() helper to hangup the tty.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Sorry for the delay in reviewing.
+Instead of checking for error check that correct number of bytes received.
+---
+ src/sdpd-server.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reviewed-by: Peter Hurley <peter@hurleysoftware.com>
+diff --git a/src/sdpd-server.c b/src/sdpd-server.c
+index 181d248..7b1351f 100644
+--- a/src/sdpd-server.c
++++ b/src/sdpd-server.c
+@@ -177,7 +177,7 @@ static gboolean io_session_event(GIOChannel *chan, GIOCondition cond, gpointer d
+ 		return TRUE;
+ 
+ 	len = recv(sk, buf, size, 0);
+-	if (len <= 0) {
++	if (len != size) {
+ 		sdp_svcdb_collect_all(sk);
+ 		free(buf);
+ 		return FALSE;
+-- 
+1.7.10.4
+
