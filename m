@@ -1,44 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 18 Sep 2013 17:04:17 -0500
-From: Gustavo Padovan <gustavo@padovan.org>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v5 8/8] Bluetooth: Fix waiting for clearing of
- BT_SK_SUSPEND flag
-Message-ID: <20130918220417.GC4006@joana>
-References: <1379325919-19003-1-git-send-email-johan.hedberg@gmail.com>
- <1379325919-19003-9-git-send-email-johan.hedberg@gmail.com>
+Message-ID: <5238FF98.9020005@hurleysoftware.com>
+Date: Tue, 17 Sep 2013 21:19:20 -0400
+From: Peter Hurley <peter@hurleysoftware.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1379325919-19003-9-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Gianluca Anzolin <gianluca@sottospazio.it>
+CC: gustavo@padovan.org, marcel@holtmann.org,
+ linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org,
+ jslaby@suse.cz
+Subject: Re: [PATCH] rfcomm: don't release the port in rfcomm_dev_state_change()
+References: <1377620926-23370-1-git-send-email-gianluca@sottospazio.it>
+In-Reply-To: <1377620926-23370-1-git-send-email-gianluca@sottospazio.it>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+On 08/27/2013 12:28 PM, Gianluca Anzolin wrote:
+> When the dlc is closed, rfcomm_dev_state_change() tries to release the
+> port in the case it cannot get a reference to the tty. However this is
+> racy and not even needed.
+>
+> Infact as Peter Hurley points out:
+>
+> 1. Only consider dlcs that are 'stolen' from a connected socket, ie.
+>     reused. Allocated dlcs cannot have been closed prior to port
+>     activate and so for these dlcs a tty reference will always be avail
+>     in rfcomm_dev_state_change() -- except for the conditions covered by
+>     #2b below.
+> 2. If a tty was at some point previously created for this rfcomm, then
+>     either
+>     (a) the tty reference is still avail, so rfcomm_dev_state_change()
+>         will perform a hangup. So nothing to do, or,
+>     (b) the tty reference is no longer avail, and the tty_port will be
+>         destroyed by the last tty_port_put() in rfcomm_tty_cleanup.
+>         Again, no action required.
+> 3. Prior to obtaining the dlc lock in rfcomm_dev_add(),
+>     rfcomm_dev_state_change() will not 'see' a rfcomm_dev so nothing to
+>     do here.
+> 4. After releasing the dlc lock in rfcomm_dev_add(),
+>     rfcomm_dev_state_change() will 'see' an incomplete rfcomm_dev if a
+>     tty reference could not be obtained. Again, the best thing to do here
+>     is nothing. Any future attempted open() will block on
+>     rfcomm_dev_carrier_raised(). The unconnected device will exist until
+>     released by ioctl(RFCOMMRELEASEDEV).
+>
+> The patch removes the aforementioned code and uses the
+> tty_port_tty_hangup() helper to hangup the tty.
 
-2013-09-16 johan.hedberg@gmail.com <johan.hedberg@gmail.com>:
+Sorry for the delay in reviewing.
 
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> In the case of blocking sockets we should not proceed with sendmsg() if
-> the socket has the BT_SK_SUSPEND flag set. So far the code was only
-> ensuring that POLLOUT doesn't get set for non-blocking sockets using
-> poll() but there was no code in place to ensure that blocking sockets do
-> the right thing when writing to them.
-> 
-> This patch adds a new bt_sock_wait_ready helper function to sleep in the
-> sendmsg call if the BT_SK_SUSPEND flag is set, and wake up as soon as it
-> is unset. It also updates the L2CAP and RFCOMM sendmsg callbacks to take
-> advantage of this new helper function.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  include/net/bluetooth/bluetooth.h |  1 +
->  net/bluetooth/af_bluetooth.c      | 40 +++++++++++++++++++++++++++++++++++++++
->  net/bluetooth/l2cap_sock.c        |  6 ++++++
->  net/bluetooth/rfcomm/sock.c       |  7 ++++++-
->  4 files changed, 53 insertions(+), 1 deletion(-)
-
-All patches have been applied to bluetooth-next. Thanks.
-
-	Gustavo
+Reviewed-by: Peter Hurley <peter@hurleysoftware.com>
