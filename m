@@ -1,42 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 1/8] adapter: Insert DeviceID record if setting DeviceID data to controller
-Date: Thu, 19 Sep 2013 16:00:41 +0200
-Message-ID: <1379599248-7923-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1379599248-7923-1-git-send-email-szymon.janc@tieto.com>
-References: <1379599248-7923-1-git-send-email-szymon.janc@tieto.com>
+Date: Wed, 18 Sep 2013 22:10:31 -0500
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] sdp: Check correct number of bytes received in recv
+Message-ID: <20130919031031.GA28835@x220.p-661hnu-f1>
+References: <1379428820-6952-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1379428820-6952-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-DeviceID is special since its record is registered on start by
-sdpd-server and always has handle 0x10000.
----
- src/adapter.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Hi Andrei,
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 17f5508..62783a6 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -5621,9 +5621,13 @@ static int adapter_register(struct btd_adapter *adapter)
- 
- 	adapter->initialized = TRUE;
- 
--	if (main_opts.did_source)
-+	if (main_opts.did_source) {
-+		/* DeviceID record is added by sdpd-server before any other
-+		 * record is registered. */
-+		adapter_service_insert(adapter, sdp_record_find(0x10000));
- 		set_did(adapter, main_opts.did_vendor, main_opts.did_product,
- 				main_opts.did_version, main_opts.did_source);
-+	}
- 
- 	DBG("Adapter %s registered", adapter->path);
- 
--- 
-1.8.4
+On Tue, Sep 17, 2013, Andrei Emeltchenko wrote:
+> Instead of checking for error check that correct number of bytes received.
+> ---
+>  src/sdpd-server.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
+Applied. Thanks.
+
+Johan
