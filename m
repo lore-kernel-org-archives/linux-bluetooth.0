@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 4/8] Remove not needed sdp_init_services_list function
-Date: Thu, 19 Sep 2013 16:00:44 +0200
-Message-ID: <1379599248-7923-5-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2 6/8] sdpd: Remove 'register' and 'remove' requests
+Date: Thu, 19 Sep 2013 16:00:46 +0200
+Message-ID: <1379599248-7923-7-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1379599248-7923-1-git-send-email-szymon.janc@tieto.com>
 References: <1379599248-7923-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,65 +12,175 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It is doing nothing now and can be removed.
+sdpd is now controlled by adapters and should not be modified with
+other means.
 ---
- src/adapter.c       |  2 --
- src/sdpd-database.c | 21 ---------------------
- src/sdpd.h          |  2 --
- 3 files changed, 25 deletions(-)
+ src/sdpd-request.c |  14 --------
+ src/sdpd-service.c | 100 -----------------------------------------------------
+ src/sdpd.h         |   2 --
+ 3 files changed, 116 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index fb005a6..b99bff9 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -5622,8 +5622,6 @@ static int adapter_register(struct btd_adapter *adapter)
- 		agent_unref(agent);
- 	}
+diff --git a/src/sdpd-request.c b/src/sdpd-request.c
+index fbeb488..5b88a10 100644
+--- a/src/sdpd-request.c
++++ b/src/sdpd-request.c
+@@ -997,13 +997,6 @@ static void process_request(sdp_req_t *req)
+ 		rsphdr->pdu_id = SDP_SVC_SEARCH_ATTR_RSP;
+ 		break;
+ 	/* Following requests are allowed only for local connections */
+-	case SDP_SVC_REGISTER_REQ:
+-		SDPDBG("Service register request");
+-		if (req->local) {
+-			status = service_register_req(req, &rsp);
+-			rsphdr->pdu_id = SDP_SVC_REGISTER_RSP;
+-		}
+-		break;
+ 	case SDP_SVC_UPDATE_REQ:
+ 		SDPDBG("Service update request");
+ 		if (req->local) {
+@@ -1011,13 +1004,6 @@ static void process_request(sdp_req_t *req)
+ 			rsphdr->pdu_id = SDP_SVC_UPDATE_RSP;
+ 		}
+ 		break;
+-	case SDP_SVC_REMOVE_REQ:
+-		SDPDBG("Service removal request");
+-		if (req->local) {
+-			status = service_remove_req(req, &rsp);
+-			rsphdr->pdu_id = SDP_SVC_REMOVE_RSP;
+-		}
+-		break;
+ 	default:
+ 		error("Unknown PDU ID : 0x%x received", reqhdr->pdu_id);
+ 		status = SDP_INVALID_SYNTAX;
+diff --git a/src/sdpd-service.c b/src/sdpd-service.c
+index 38bf808..09f6c0a 100644
+--- a/src/sdpd-service.c
++++ b/src/sdpd-service.c
+@@ -400,75 +400,6 @@ static sdp_record_t *extract_pdu_server(bdaddr_t *device, uint8_t *p,
+ }
  
--	sdp_init_services_list(&adapter->bdaddr);
+ /*
+- * Add the newly created service record to the service repository
+- */
+-int service_register_req(sdp_req_t *req, sdp_buf_t *rsp)
+-{
+-	int scanned = 0;
+-	sdp_data_t *handle;
+-	uint8_t *p = req->buf + sizeof(sdp_pdu_hdr_t);
+-	int bufsize = req->len - sizeof(sdp_pdu_hdr_t);
+-	sdp_record_t *rec;
 -
- 	btd_adapter_gatt_server_start(adapter);
- 
- 	load_config(adapter);
-diff --git a/src/sdpd-database.c b/src/sdpd-database.c
-index e4d4f98..f65a526 100644
---- a/src/sdpd-database.c
-+++ b/src/sdpd-database.c
-@@ -296,24 +296,3 @@ uint32_t sdp_next_handle(void)
- 
- 	return handle;
+-	req->flags = *p++;
+-	if (req->flags & SDP_DEVICE_RECORD) {
+-		bacpy(&req->device, (bdaddr_t *) p);
+-		p += sizeof(bdaddr_t);
+-		bufsize -= sizeof(bdaddr_t);
+-	}
+-
+-	/* save image of PDU: we need it when clients request this attribute */
+-	rec = extract_pdu_server(&req->device, p, bufsize, 0xffffffff, &scanned);
+-	if (!rec)
+-		goto invalid;
+-
+-	if (rec->handle == 0xffffffff) {
+-		rec->handle = sdp_next_handle();
+-		if (rec->handle < 0x10000) {
+-			sdp_record_free(rec);
+-			goto invalid;
+-		}
+-	} else {
+-		if (sdp_record_find(rec->handle)) {
+-			/* extract_pdu_server will add the record handle
+-			 * if it is missing. So instead of failing, skip
+-			 * the record adding to avoid duplication. */
+-			goto success;
+-		}
+-	}
+-
+-	sdp_record_add(&req->device, rec);
+-	if (!(req->flags & SDP_RECORD_PERSIST))
+-		sdp_svcdb_set_collectable(rec, req->sock);
+-
+-	handle = sdp_data_alloc(SDP_UINT32, &rec->handle);
+-	sdp_attr_replace(rec, SDP_ATTR_RECORD_HANDLE, handle);
+-
+-success:
+-	/* if the browse group descriptor is NULL,
+-	 * ensure that the record belongs to the ROOT group */
+-	if (sdp_data_get(rec, SDP_ATTR_BROWSE_GRP_LIST) == NULL) {
+-		uuid_t uuid;
+-		sdp_uuid16_create(&uuid, PUBLIC_BROWSE_GROUP);
+-		sdp_pattern_add_uuid(rec, &uuid);
+-	}
+-
+-	update_db_timestamp();
+-
+-	/* Build a rsp buffer */
+-	bt_put_be32(rec->handle, rsp->data);
+-	rsp->data_size = sizeof(uint32_t);
+-
+-	return 0;
+-
+-invalid:
+-	bt_put_be16(SDP_INVALID_SYNTAX, rsp->data);
+-	rsp->data_size = sizeof(uint16_t);
+-
+-	return -1;
+-}
+-
+-/*
+  * Update a service record
+  */
+ int service_update_req(sdp_req_t *req, sdp_buf_t *rsp)
+@@ -509,34 +440,3 @@ done:
+ 	rsp->data_size = sizeof(uint16_t);
+ 	return status;
  }
 -
--void sdp_init_services_list(bdaddr_t *device)
+-/*
+- * Remove a registered service record
+- */
+-int service_remove_req(sdp_req_t *req, sdp_buf_t *rsp)
 -{
--	sdp_list_t *p;
+-	uint8_t *p = req->buf + sizeof(sdp_pdu_hdr_t);
+-	uint32_t handle = bt_get_be32(p);
+-	sdp_record_t *rec;
+-	int status = 0;
 -
--	DBG("");
+-	/* extract service record handle */
 -
--	for (p = access_db; p != NULL; p = p->next) {
--		sdp_access_t *access = p->data;
--		sdp_record_t *rec;
--
--		if (bacmp(BDADDR_ANY, &access->device))
--			continue;
--
--		rec = sdp_record_find(access->handle);
--		if (rec == NULL)
--			continue;
--
--		SDPDBG("adding record with handle %x", access->handle);
+-	rec = sdp_record_find(handle);
+-	if (rec) {
+-		sdp_svcdb_collect(rec);
+-		status = sdp_record_remove(handle);
+-		sdp_record_free(rec);
+-		if (status == 0)
+-			update_db_timestamp();
+-	} else {
+-		status = SDP_INVALID_RECORD_HANDLE;
+-		SDPDBG("Could not find record : 0x%x", handle);
 -	}
+-
+-	p = rsp->data;
+-	bt_put_be16(status, p);
+-	rsp->data_size = sizeof(uint16_t);
+-
+-	return status;
 -}
 diff --git a/src/sdpd.h b/src/sdpd.h
-index 9a0e1e9..6de0af7 100644
+index 6de0af7..3c6ee01 100644
 --- a/src/sdpd.h
 +++ b/src/sdpd.h
-@@ -81,5 +81,3 @@ void stop_sdp_server(void);
+@@ -50,9 +50,7 @@ void handle_request(int sk, uint8_t *data, int len);
  
- int add_record_to_server(const bdaddr_t *src, sdp_record_t *rec);
- int remove_record_from_server(uint32_t handle);
--
--void sdp_init_services_list(bdaddr_t *device);
+ void set_fixed_db_timestamp(uint32_t dbts);
+ 
+-int service_register_req(sdp_req_t *req, sdp_buf_t *rsp);
+ int service_update_req(sdp_req_t *req, sdp_buf_t *rsp);
+-int service_remove_req(sdp_req_t *req, sdp_buf_t *rsp);
+ 
+ void register_public_browse_group(void);
+ void register_server_service(void);
 -- 
 1.8.4
 
