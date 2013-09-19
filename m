@@ -1,59 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 Sep 2013 11:24:13 -0500
+Date: Thu, 19 Sep 2013 10:22:35 -0500
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Gianluca Anzolin <gianluca@sottospazio.it>
-Cc: peter@hurleysoftware.com, marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org,
-	jslaby@suse.cz
-Subject: Re: [PATCH] rfcomm: don't release the port in
- rfcomm_dev_state_change()
-Message-ID: <20130919162413.GG4006@joana>
-References: <1377620926-23370-1-git-send-email-gianluca@sottospazio.it>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: Add event mask page 2 setting support
+Message-ID: <20130919152235.GF4006@joana>
+References: <1379061602-8290-1-git-send-email-johan.hedberg@gmail.com>
+ <1379061602-8290-3-git-send-email-johan.hedberg@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1377620926-23370-1-git-send-email-gianluca@sottospazio.it>
+In-Reply-To: <1379061602-8290-3-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gianluca,
+Hi Johan,
 
-2013-08-27 Gianluca Anzolin <gianluca@sottospazio.it>:
+2013-09-13 johan.hedberg@gmail.com <johan.hedberg@gmail.com>:
 
-> When the dlc is closed, rfcomm_dev_state_change() tries to release the
-> port in the case it cannot get a reference to the tty. However this is
-> racy and not even needed.
+> From: Johan Hedberg <johan.hedberg@intel.com>
 > 
-> Infact as Peter Hurley points out:
+> For those controller that support the HCI_Set_Event_Mask_Page_2 command
+> we should include it in the init sequence. This patch implements sending
+> of the command and enables the events in it based on supported features
+> (currently only CSB is checked).
 > 
-> 1. Only consider dlcs that are 'stolen' from a connected socket, ie.
->    reused. Allocated dlcs cannot have been closed prior to port
->    activate and so for these dlcs a tty reference will always be avail
->    in rfcomm_dev_state_change() -- except for the conditions covered by
->    #2b below.
-> 2. If a tty was at some point previously created for this rfcomm, then
->    either
->    (a) the tty reference is still avail, so rfcomm_dev_state_change()
->        will perform a hangup. So nothing to do, or,
->    (b) the tty reference is no longer avail, and the tty_port will be
->        destroyed by the last tty_port_put() in rfcomm_tty_cleanup.
->        Again, no action required.
-> 3. Prior to obtaining the dlc lock in rfcomm_dev_add(),
->    rfcomm_dev_state_change() will not 'see' a rfcomm_dev so nothing to
->    do here.
-> 4. After releasing the dlc lock in rfcomm_dev_add(),
->    rfcomm_dev_state_change() will 'see' an incomplete rfcomm_dev if a
->    tty reference could not be obtained. Again, the best thing to do here
->    is nothing. Any future attempted open() will block on
->    rfcomm_dev_carrier_raised(). The unconnected device will exist until
->    released by ioctl(RFCOMMRELEASEDEV).
-> 
-> The patch removes the aforementioned code and uses the
-> tty_port_tty_hangup() helper to hangup the tty.
-> 
-> Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  net/bluetooth/rfcomm/tty.c | 35 ++---------------------------------
->  1 file changed, 2 insertions(+), 33 deletions(-)
+>  include/net/bluetooth/hci.h |  2 ++
+>  net/bluetooth/hci_core.c    | 32 ++++++++++++++++++++++++++++++++
+>  2 files changed, 34 insertions(+)
 
-Patch has been applied to bluetooth.git. Thanks.
+Patch has been applied to bluetooth-next. Thanks.
 
 	Gustavo
