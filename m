@@ -1,56 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
 From: Frederic Danis <frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] android: Android version of log.c
-Date: Fri, 20 Sep 2013 14:24:31 +0200
-Message-Id: <1379679871-29623-2-git-send-email-frederic.danis@linux.intel.com>
-In-Reply-To: <1379679871-29623-1-git-send-email-frederic.danis@linux.intel.com>
-References: <1379679871-29623-1-git-send-email-frederic.danis@linux.intel.com>
+Subject: [PATCH 1/2] android: Add skeleton of BlueZ Android daemon
+Date: Fri, 20 Sep 2013 14:24:30 +0200
+Message-Id: <1379679871-29623-1-git-send-email-frederic.danis@linux.intel.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add logging system to BlueZ Android daemon.
-Android build will use android/log.c file while autotools build will use
-src/log.c instead.
----
- Makefile.android   |    2 +-
- android/Android.mk |    1 +
- android/log.c      |  184 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- android/main.c     |   39 +++++++++++
- 4 files changed, 225 insertions(+), 1 deletion(-)
- create mode 100644 android/log.c
+Define local mapping to glib path, otherwise this has to be inside central
+place in the build repository.
 
-diff --git a/Makefile.android b/Makefile.android
-index 7b901ff..8f65dbf 100644
---- a/Makefile.android
-+++ b/Makefile.android
-@@ -2,6 +2,6 @@
- if ANDROID_DAEMON
- noinst_PROGRAMS += android/bluezd
- 
--android_bluezd_SOURCES = android/main.c
-+android_bluezd_SOURCES = android/main.c src/log.c
- android_bluezd_LDADD = @GLIB_LIBS@
- endif
-diff --git a/android/Android.mk b/android/Android.mk
-index 50f3c36..25099b3 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -8,6 +8,7 @@ include $(CLEAR_VARS)
- 
- LOCAL_SRC_FILES := \
- 	main.c \
-+	log.c \
- 
- LOCAL_C_INCLUDES := \
- 	$(call include-path-for, glib) \
-diff --git a/android/log.c b/android/log.c
+Retrieve Bluetooth version from configure.ac.
+---
+ .gitignore         |    2 +
+ Android.mk         |    9 ++++
+ Makefile.am        |    1 +
+ Makefile.android   |    7 ++++
+ android/Android.mk |   24 +++++++++++
+ android/main.c     |  119 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ configure.ac       |    5 +++
+ 7 files changed, 167 insertions(+)
+ create mode 100644 Android.mk
+ create mode 100644 Makefile.android
+ create mode 100644 android/Android.mk
+ create mode 100644 android/main.c
+
+diff --git a/.gitignore b/.gitignore
+index 8a25a3e..331a18b 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -98,3 +98,5 @@ unit/test-gobex-packet
+ unit/test-gobex-transfer
+ unit/test-*.log
+ unit/test-*.trs
++
++android/bluezd
+diff --git a/Android.mk b/Android.mk
 new file mode 100644
-index 0000000..1f98196
+index 0000000..5ec3bb7
 --- /dev/null
-+++ b/android/log.c
-@@ -0,0 +1,184 @@
++++ b/Android.mk
+@@ -0,0 +1,9 @@
++LOCAL_PATH := $(call my-dir)
++
++# Retrieve BlueZ version from configure.ac file
++BLUEZ_VERSION := $(shell grep AC_INIT $(LOCAL_PATH)/configure.ac | tr -d ' ' | sed -e 's/.*(.*,\(.*\))/\1/')
++
++# Specify pathmap for glib
++pathmap_INCL += glib:external/bluetooth/glib
++
++include $(call all-subdir-makefiles)
+diff --git a/Makefile.am b/Makefile.am
+index 4e4b1c5..2c048bd 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -179,6 +179,7 @@ test_scripts =
+ 
+ include Makefile.tools
+ include Makefile.obexd
++include Makefile.android
+ 
+ if HID2HCI
+ rulesdir = @UDEV_DIR@/rules.d
+diff --git a/Makefile.android b/Makefile.android
+new file mode 100644
+index 0000000..7b901ff
+--- /dev/null
++++ b/Makefile.android
+@@ -0,0 +1,7 @@
++
++if ANDROID_DAEMON
++noinst_PROGRAMS += android/bluezd
++
++android_bluezd_SOURCES = android/main.c
++android_bluezd_LDADD = @GLIB_LIBS@
++endif
+diff --git a/android/Android.mk b/android/Android.mk
+new file mode 100644
+index 0000000..50f3c36
+--- /dev/null
++++ b/android/Android.mk
+@@ -0,0 +1,24 @@
++LOCAL_PATH := $(call my-dir)
++
++#
++# Android BlueZ daemon (bluezd)
++#
++
++include $(CLEAR_VARS)
++
++LOCAL_SRC_FILES := \
++	main.c \
++
++LOCAL_C_INCLUDES := \
++	$(call include-path-for, glib) \
++	$(call include-path-for, glib)/glib \
++	$(LOCAL_PATH)/../src \
++
++LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
++
++LOCAL_SHARED_LIBRARIES := \
++	libglib \
++
++LOCAL_MODULE := bluezd
++
++include $(BUILD_EXECUTABLE)
+diff --git a/android/main.c b/android/main.c
+new file mode 100644
+index 0000000..37a64c1
+--- /dev/null
++++ b/android/main.c
+@@ -0,0 +1,119 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -78,244 +139,112 @@ index 0000000..1f98196
 +#include <config.h>
 +#endif
 +
-+#include <fcntl.h>
++#include <signal.h>
++#include <stdint.h>
 +#include <stdio.h>
-+#include <stdarg.h>
-+#include <unistd.h>
-+#include <sys/uio.h>
++#include <stdlib.h>
++#include <string.h>
 +
 +#include <glib.h>
 +
-+#include "log.h"
++#include "hcid.h"
 +
-+#define LOG_DEBUG	3
-+#define LOG_INFO	4
-+#define LOG_WARN	5
-+#define LOG_ERR		6
++#define SHUTDOWN_GRACE_SECONDS 10
 +
-+const char tag[] = "BlueZ";
-+int system_fd;
-+int detached;
++static GMainLoop *event_loop;
 +
-+static void android_log(int pri, const char *fmt, va_list ap)
++void btd_exit(void)
 +{
-+	char *msg;
-+	struct iovec vec[3];
++	g_main_loop_quit(event_loop);
++}
 +
-+	msg = g_strdup_vprintf(fmt, ap);
++static gboolean quit_eventloop(gpointer user_data)
++{
++	btd_exit();
++	return FALSE;
++}
 +
-+	if (!detached) {
-+		vec[0].iov_base = (void *) msg;
-+		vec[0].iov_len = strlen(msg) + 1;
-+		vec[1].iov_base = "\n";
-+		vec[1].iov_len = 1;
-+		writev(STDERR_FILENO, vec, 2);
++static void signal_handler(int sig)
++{
++	static unsigned int __terminated = 0;
++
++	switch (sig) {
++	case SIGINT:
++	case SIGTERM:
++		if (__terminated == 0) {
++			g_timeout_add_seconds(SHUTDOWN_GRACE_SECONDS,
++							quit_eventloop, NULL);
++		}
++
++		__terminated = 1;
++		break;
++	}
++}
++
++static gboolean option_detach = TRUE;
++static gboolean option_version = FALSE;
++
++static GOptionEntry options[] = {
++	{ "nodetach", 'n', G_OPTION_FLAG_REVERSE,
++				G_OPTION_ARG_NONE, &option_detach,
++				"Run with logging in foreground", NULL },
++	{ "version", 'v', 0, G_OPTION_ARG_NONE, &option_version,
++				"Show version information and exit", NULL },
++	{ NULL }
++};
++
++int main(int argc, char *argv[])
++{
++	GOptionContext *context;
++	GError *err = NULL;
++	struct sigaction sa;
++
++	context = g_option_context_new(NULL);
++	g_option_context_add_main_entries(context, options, NULL);
++
++	if (g_option_context_parse(context, &argc, &argv, &err) == FALSE) {
++		if (err != NULL) {
++			g_printerr("%s\n", err->message);
++			g_error_free(err);
++		} else
++			g_printerr("An unknown error occurred\n");
++		exit(1);
 +	}
 +
-+	if (system_fd == -1)
-+		goto done;
++	g_option_context_free(context);
 +
-+	vec[0].iov_base = (unsigned char *) &pri;
-+	vec[0].iov_len = 1;
-+	vec[1].iov_base = (void *) tag;
-+	vec[1].iov_len = strlen(tag) + 1;
-+	vec[2].iov_base = (void *) msg;
-+	vec[2].iov_len = strlen(msg) + 1;
++	if (option_version == TRUE) {
++		printf("%s\n", VERSION);
++		exit(0);
++	}
 +
-+	writev(system_fd, vec, 3);
++	event_loop = g_main_loop_new(NULL, FALSE);
 +
-+done:
-+	g_free(msg);
-+}
++	memset(&sa, 0, sizeof(sa));
++	sa.sa_handler = signal_handler;
++	sigaction(SIGINT, &sa, NULL);
++	sigaction(SIGTERM, &sa, NULL);
 +
-+void info(const char *format, ...)
-+{
-+	va_list ap;
++	g_main_loop_run(event_loop);
 +
-+	va_start(ap, format);
-+
-+	android_log(LOG_INFO, format, ap);
-+
-+	va_end(ap);
-+}
-+
-+void warn(const char *format, ...)
-+{
-+	va_list ap;
-+
-+	va_start(ap, format);
-+
-+	android_log(LOG_WARN, format, ap);
-+
-+	va_end(ap);
-+}
-+
-+void error(const char *format, ...)
-+{
-+	va_list ap;
-+
-+	va_start(ap, format);
-+
-+	android_log(LOG_ERR, format, ap);
-+
-+	va_end(ap);
-+}
-+
-+void btd_debug(const char *format, ...)
-+{
-+	va_list ap;
-+
-+	va_start(ap, format);
-+
-+	android_log(LOG_DEBUG, format, ap);
-+
-+	va_end(ap);
-+}
-+
-+extern struct btd_debug_desc __start___debug[];
-+extern struct btd_debug_desc __stop___debug[];
-+
-+static char **enabled = NULL;
-+
-+static gboolean is_enabled(struct btd_debug_desc *desc)
-+{
-+	int i;
-+
-+	if (enabled == NULL)
-+		return 0;
-+
-+	for (i = 0; enabled[i] != NULL; i++)
-+		if (desc->file != NULL && g_pattern_match_simple(enabled[i],
-+							desc->file) == TRUE)
-+			return 1;
++	g_main_loop_unref(event_loop);
 +
 +	return 0;
 +}
-+
-+void __btd_enable_debug(struct btd_debug_desc *start,
-+					struct btd_debug_desc *stop)
-+{
-+	struct btd_debug_desc *desc;
-+
-+	if (start == NULL || stop == NULL)
-+		return;
-+
-+	for (desc = start; desc < stop; desc++) {
-+		if (is_enabled(desc))
-+			desc->flags |= BTD_DEBUG_FLAG_PRINT;
-+	}
-+}
-+
-+void __btd_toggle_debug(void)
-+{
-+	struct btd_debug_desc *desc;
-+
-+	for (desc = __start___debug; desc < __stop___debug; desc++)
-+		desc->flags |= BTD_DEBUG_FLAG_PRINT;
-+}
-+
-+void __btd_log_init(const char *debug, int detach)
-+{
-+	if (debug != NULL)
-+		enabled = g_strsplit_set(debug, ":, ", 0);
-+
-+	__btd_enable_debug(__start___debug, __stop___debug);
-+
-+	detached = detach;
-+
-+	system_fd = open("/dev/log/system", O_WRONLY);
-+
-+	info("Bluetooth daemon %s", VERSION);
-+}
-+
-+void __btd_log_cleanup(void)
-+{
-+	close(system_fd);
-+	system_fd = -1;
-+
-+	g_strfreev(enabled);
-+}
-diff --git a/android/main.c b/android/main.c
-index 37a64c1..ef62b3d 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -33,6 +33,7 @@
+diff --git a/configure.ac b/configure.ac
+index 41c2935..3b7a5d9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -242,4 +242,9 @@ AC_DEFINE_UNQUOTED(CONFIGDIR, "${configdir}",
+ 			[Directory for the configuration files])
+ AC_SUBST(CONFIGDIR, "${configdir}")
  
- #include <glib.h>
- 
-+#include "log.h"
- #include "hcid.h"
- 
- #define SHUTDOWN_GRACE_SECONDS 10
-@@ -58,19 +59,45 @@ static void signal_handler(int sig)
- 	case SIGINT:
- 	case SIGTERM:
- 		if (__terminated == 0) {
-+			info("Terminating");
- 			g_timeout_add_seconds(SHUTDOWN_GRACE_SECONDS,
- 							quit_eventloop, NULL);
- 		}
- 
- 		__terminated = 1;
- 		break;
++AC_ARG_ENABLE(android-daemon, AC_HELP_STRING([--enable-android-daemon],
++			[enable BlueZ Android daemon]),
++					[android_daemon=${enableval}])
++AM_CONDITIONAL(ANDROID_DAEMON, test "${android_daemon}" = "yes")
 +
-+	case SIGUSR2:
-+		__btd_toggle_debug();
-+		break;
- 	}
- }
- 
-+static char *option_debug = NULL;
- static gboolean option_detach = TRUE;
- static gboolean option_version = FALSE;
- 
-+static void free_options(void)
-+{
-+	g_free(option_debug);
-+	option_debug = NULL;
-+}
-+
-+static gboolean parse_debug(const char *key, const char *value,
-+				gpointer user_data, GError **error)
-+{
-+	if (value)
-+		option_debug = g_strdup(value);
-+	else
-+		option_debug = g_strdup("*");
-+
-+	return TRUE;
-+}
-+
- static GOptionEntry options[] = {
-+	{ "debug", 'd', G_OPTION_FLAG_OPTIONAL_ARG,
-+				G_OPTION_ARG_CALLBACK, parse_debug,
-+				"Specify debug options to enable", "DEBUG" },
- 	{ "nodetach", 'n', G_OPTION_FLAG_REVERSE,
- 				G_OPTION_ARG_NONE, &option_detach,
- 				"Run with logging in foreground", NULL },
-@@ -110,10 +137,22 @@ int main(int argc, char *argv[])
- 	sa.sa_handler = signal_handler;
- 	sigaction(SIGINT, &sa, NULL);
- 	sigaction(SIGTERM, &sa, NULL);
-+	sigaction(SIGUSR2, &sa, NULL);
-+
-+	__btd_log_init(option_debug, option_detach);
-+
-+	/* no need to keep parsed option in memory */
-+	free_options();
-+
-+	DBG("Entering main loop");
- 
- 	g_main_loop_run(event_loop);
- 
- 	g_main_loop_unref(event_loop);
- 
-+	info("Exit");
-+
-+	__btd_log_cleanup();
-+
- 	return 0;
- }
+ AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
 -- 
 1.7.9.5
 
