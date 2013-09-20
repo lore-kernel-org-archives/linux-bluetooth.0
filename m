@@ -1,14 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ken O'Brien <kernel@kenobrien.org>
-To: marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ken O'Brien <kernel@kenobrien.org>
+From: "Ken O'Brien" <kernel@kenobrien.org>
+To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Ken O'Brien" <kernel@kenobrien.org>
 Subject: [PATCH] drivers: bluetooth: btusb: Added support for Belkin F8065bf usb bluetooth device
-Date: Fri, 20 Sep 2013 20:24:01 +0100
-Message-Id: <1379705041-27821-1-git-send-email-kernel@kenobrien.org>
+Date: Fri, 20 Sep 2013 20:16:59 +0100
+Message-Id: <1379704619-27691-1-git-send-email-kernel@kenobrien.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Belkin bluetooth device's usb device id added to generic usb bluetooth driver.
