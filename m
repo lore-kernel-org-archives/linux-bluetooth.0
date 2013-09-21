@@ -1,93 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH v5 1/2] Bluetooth: btmrvl: add setup handler
+Subject: Re: [PATCH] drivers: bluetooth: btusb: Added support for Belkin F8065bf usb bluetooth device
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1379715667-22424-1-git-send-email-bzhao@marvell.com>
-Date: Sat, 21 Sep 2013 12:00:38 -0500
-Cc: <linux-bluetooth@vger.kernel.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	<linux-wireless@vger.kernel.org>,
-	Mike Frysinger <vapier@chromium.org>,
-	Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
-	Amitkumar Karwar <akarwar@marvell.com>
-Message-Id: <18678858-E711-43E5-AFE6-E637D1CECFFB@holtmann.org>
-References: <1379715667-22424-1-git-send-email-bzhao@marvell.com>
-To: Bing Zhao <bzhao@marvell.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1379718623-1845-1-git-send-email-kernel@kenobrien.org>
+Date: Sat, 21 Sep 2013 11:19:10 -0500
+Cc: gustavo@padovan.org, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <42DC2AB8-3313-42BF-8CFF-9012F16C4C02@holtmann.org>
+References: <1379718623-1845-1-git-send-email-kernel@kenobrien.org>
+To: Ken O'Brien <kernel@kenobrien.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bing,
+Hi Ken,
 
-> Move initialization code to hdev's setup handler. New flag
-> setup_done is added to make sure that initialization is done only
-> during driver load time. Our firmware doesn't expect
-> re-initialization later when interface is re-enabled.
+> Adding generic rule for broadcom devices to generic usb bluetooth driver on encountering another instance of Broadcom's BCM20702A0.
 > 
-> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
-> Signed-off-by: Bing Zhao <bzhao@marvell.com>
+> Relevant section from /sys/kernel/debug/usb/devices:
+> 
+> T:  Bus=03 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=050d ProdID=065a Rev= 1.12
+> S:  Manufacturer=Broadcom Corp
+> S:  Product=BCM20702A0
+> S:  SerialNumber=0002723E2D29
+> C:* #Ifs= 4 Cfg#= 1 Atr=a0 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+> 
+> Signed-off-by: Ken O'Brien <kernel@kenobrien.org>
 > ---
-> v5: make use of hdev's setup handler (Marcel Holtmann)
+> drivers/bluetooth/btusb.c | 1 +
+> 1 file changed, 1 insertion(+)
 > 
-> drivers/bluetooth/btmrvl_drv.h  |    1 +
-> drivers/bluetooth/btmrvl_main.c |   23 +++++++++++++++++++++--
-> drivers/bluetooth/btmrvl_sdio.c |    6 ------
-> 3 files changed, 22 insertions(+), 8 deletions(-)
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 8e16f0a..6d33dca 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -111,6 +111,7 @@ static struct usb_device_id btusb_table[] = {
 > 
-> diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
-> index 27068d1..e776b8b 100644
-> --- a/drivers/bluetooth/btmrvl_drv.h
-> +++ b/drivers/bluetooth/btmrvl_drv.h
-> @@ -68,6 +68,7 @@ struct btmrvl_adapter {
-> 	wait_queue_head_t cmd_wait_q;
-> 	u8 cmd_complete;
-> 	bool is_suspended;
-> +	bool setup_done;
-> };
-> 
-> struct btmrvl_private {
-> diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-> index 9a9f518..e352f8e 100644
-> --- a/drivers/bluetooth/btmrvl_main.c
-> +++ b/drivers/bluetooth/btmrvl_main.c
-> @@ -479,6 +479,27 @@ static int btmrvl_open(struct hci_dev *hdev)
-> 	return 0;
-> }
-> 
-> +static int btmrvl_setup(struct hci_dev *hdev)
-> +{
-> +	struct btmrvl_private *priv = hci_get_drvdata(hdev);
-> +	struct btmrvl_adapter *adapter = priv->adapter;
-> +
-> +	if (adapter->setup_done)
-> +		return 0;
-> +
-> +	btmrvl_send_module_cfg_cmd(priv, MODULE_BRINGUP_REQ);
-> +
-> +	priv->btmrvl_dev.psmode = 1;
-> +	btmrvl_enable_ps(priv);
-> +
-> +	priv->btmrvl_dev.gpio_gap = 0xffff;
-> +	btmrvl_send_hscfg_cmd(priv);
-> +
-> +	adapter->setup_done = true;
-> +
-> +	return 0;
-> +}
-> +
-> /*
->  * This function handles the event generated by firmware, rx data
->  * received from firmware, and tx data sent from kernel.
-> @@ -572,8 +592,7 @@ int btmrvl_register_hdev(struct btmrvl_private *priv)
-> 	hdev->flush = btmrvl_flush;
-> 	hdev->send = btmrvl_send_frame;
-> 	hdev->ioctl = btmrvl_ioctl;
-> -
-> -	btmrvl_send_module_cfg_cmd(priv, MODULE_BRINGUP_REQ);
-> +	hdev->setup = btmrvl_setup;
+> 	/*Broadcom devices with vendor specific id */
+> 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0a5c, 0xff, 0x01, 0x01) },
+> +	{ USB_VENDOR_AND_INTERFACE_INFO(0x050d, 0xff, 0x01, 0x01) },
 
-just to make sure you guys understand how ->setup() works. It is only called once. Bringing the adapter down and up again does not call ->setup() a second time. So do you guys need this setup_done variable and if so, then you need to be a bit more verbose and help me understand why.
+this is not correct. These devices are Broadcom based, but they are actually from Belkin. Same as the controllers from Apple. So it needs its own line and a comment that mentions Belkin.
 
 Regards
 
