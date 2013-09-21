@@ -1,116 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-From: Peter Senna Tschudin <peter.senna@gmail.com>
-To: marcel@holtmann.org
-Cc: gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
+From: Ken O'Brien <kernel@kenobrien.org>
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Peter Senna Tschudin <peter.senna@gmail.com>
-Subject: [PATCH 2/5] Bluetooth: Fix assignment of 0/1 to bool variables
-Date: Sun, 22 Sep 2013 20:44:10 +0200
-Message-Id: <1379875453-20083-2-git-send-email-peter.senna@gmail.com>
-In-Reply-To: <1379875453-20083-1-git-send-email-peter.senna@gmail.com>
-References: <1379875453-20083-1-git-send-email-peter.senna@gmail.com>
+	Ken O'Brien <kernel@kenobrien.org>
+Subject: [PATCH] drivers: bluetooth: btusb: Added support for Belkin F8065bf usb bluetooth device
+Date: Sat, 21 Sep 2013 19:14:43 +0100
+Message-Id: <1379787283-5579-1-git-send-email-kernel@kenobrien.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Convert 0 to false and 1 to true when assigning values to bool
-variables. Inspired by commit 3db1cd5c05f35fb43eb134df6f321de4e63141f2.
+Adding generic rule on encountering Belkin bluetooth usb device F8065bf.
 
-The simplified semantic patch that find this problem is as
-follows (http://coccinelle.lip6.fr/):
+Relevant section from /sys/kernel/debug/usb/devices:
 
-@@
-bool b;
-@@
-(
--b = 0
-+b = false
-|
--b = 1
-+b = true
-)
+T:  Bus=03 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=050d ProdID=065a Rev= 1.12
+S:  Manufacturer=Broadcom Corp
+S:  Product=BCM20702A0
+S:  SerialNumber=0002723E2D29
+C:* #Ifs= 4 Cfg#= 1 Atr=a0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 
-Signed-off-by: Peter Senna Tschudin <peter.senna@gmail.com>
-
+Signed-off-by: Ken O'Brien <kernel@kenobrien.org>
 ---
- net/bluetooth/l2cap_core.c |   16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ drivers/bluetooth/btusb.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff -u -p a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5797,7 +5797,7 @@ static int l2cap_rx_state_recv(struct l2
- 			       struct sk_buff *skb, u8 event)
- {
- 	int err = 0;
--	bool skb_in_use = 0;
-+	bool skb_in_use = false;
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 8e16f0a..dbfbc12 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -111,7 +111,10 @@ static struct usb_device_id btusb_table[] = {
  
- 	BT_DBG("chan %p, control %p, skb %p, event %d", chan, control, skb,
- 	       event);
-@@ -5818,7 +5818,7 @@ static int l2cap_rx_state_recv(struct l2
- 							   control->txseq);
+ 	/*Broadcom devices with vendor specific id */
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0a5c, 0xff, 0x01, 0x01) },
+-
++
++	/* Belkin F8065bf - Broadcom based */
++	{ USB_VENDOR_AND_INTERFACE_INFO(0x050d, 0xff, 0x01, 0x01) },
++
+ 	{ }	/* Terminating entry */
+ };
  
- 			chan->buffer_seq = chan->expected_tx_seq;
--			skb_in_use = 1;
-+			skb_in_use = true;
- 
- 			err = l2cap_reassemble_sdu(chan, skb, control);
- 			if (err)
-@@ -5854,7 +5854,7 @@ static int l2cap_rx_state_recv(struct l2
- 			 * current frame is stored for later use.
- 			 */
- 			skb_queue_tail(&chan->srej_q, skb);
--			skb_in_use = 1;
-+			skb_in_use = true;
- 			BT_DBG("Queued %p (queue len %d)", skb,
- 			       skb_queue_len(&chan->srej_q));
- 
-@@ -5932,7 +5932,7 @@ static int l2cap_rx_state_srej_sent(stru
- {
- 	int err = 0;
- 	u16 txseq = control->txseq;
--	bool skb_in_use = 0;
-+	bool skb_in_use = false;
- 
- 	BT_DBG("chan %p, control %p, skb %p, event %d", chan, control, skb,
- 	       event);
-@@ -5944,7 +5944,7 @@ static int l2cap_rx_state_srej_sent(stru
- 			/* Keep frame for reassembly later */
- 			l2cap_pass_to_tx(chan, control);
- 			skb_queue_tail(&chan->srej_q, skb);
--			skb_in_use = 1;
-+			skb_in_use = true;
- 			BT_DBG("Queued %p (queue len %d)", skb,
- 			       skb_queue_len(&chan->srej_q));
- 
-@@ -5955,7 +5955,7 @@ static int l2cap_rx_state_srej_sent(stru
- 
- 			l2cap_pass_to_tx(chan, control);
- 			skb_queue_tail(&chan->srej_q, skb);
--			skb_in_use = 1;
-+			skb_in_use = true;
- 			BT_DBG("Queued %p (queue len %d)", skb,
- 			       skb_queue_len(&chan->srej_q));
- 
-@@ -5970,7 +5970,7 @@ static int l2cap_rx_state_srej_sent(stru
- 			 * the missing frames.
- 			 */
- 			skb_queue_tail(&chan->srej_q, skb);
--			skb_in_use = 1;
-+			skb_in_use = true;
- 			BT_DBG("Queued %p (queue len %d)", skb,
- 			       skb_queue_len(&chan->srej_q));
- 
-@@ -5984,7 +5984,7 @@ static int l2cap_rx_state_srej_sent(stru
- 			 * SREJ'd frames.
- 			 */
- 			skb_queue_tail(&chan->srej_q, skb);
--			skb_in_use = 1;
-+			skb_in_use = true;
- 			BT_DBG("Queued %p (queue len %d)", skb,
- 			       skb_queue_len(&chan->srej_q));
- 
+-- 
+1.8.1.4
