@@ -1,45 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH v5 2/2] Bluetooth: btmrvl: add calibration data download support
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <477F20668A386D41ADCC57781B1F70430F44C59423@SC-VEXCH1.marvell.com>
-Date: Tue, 24 Sep 2013 06:21:56 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	Mike Frysinger <vapier@chromium.org>,
-	Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
-	Amitkumar Karwar <akarwar@marvell.com>
-Message-Id: <34088279-04B9-49D0-9387-88A602F518EC@holtmann.org>
-References: <1379715667-22424-1-git-send-email-bzhao@marvell.com> <1379715667-22424-2-git-send-email-bzhao@marvell.com> <05172D80-CE30-4B7D-A64E-11B8E320EF7F@holtmann.org> <477F20668A386D41ADCC57781B1F70430F44C59423@SC-VEXCH1.marvell.com>
-To: Bing Zhao <bzhao@marvell.com>
+Date: Mon, 23 Sep 2013 18:00:49 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth 2013-09-23
+Message-ID: <20130923210049.GG18215@joana>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="y0ulUmNC+osPPQO6"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bing,
 
->>> +	cmd = (struct btmrvl_cmd *)skb->data;
->>> +	cmd->ocf_ogf =
->>> +		cpu_to_le16(hci_opcode_pack(OGF, BT_CMD_LOAD_CONFIG_DATA));
->>> +	cmd->length = BT_CMD_DATA_SIZE;
->>> +	cmd->data[0] = 0x00;
->>> +	cmd->data[1] = 0x00;
->>> +	cmd->data[2] = 0x00;
->>> +	cmd->data[3] = BT_CMD_DATA_SIZE - 4;
->> 
->> why not use __hci_cmd_sync() here. It is designed to be used from ->setup() where it is guaranteed
->> that the HCI request lock is held. And it is guaranteed that ->setup() is executed in a workqueue.
-> 
-> The reason of not using __hci_cmd_sync() is that we are sending vendor specific command here (MRVL_VENDOR_PKT). The __hci_cmd_sync seems handle HCI_COMMAND_PKT only.
-> Please let us know if you have any suggestion to solve this problem.
+--y0ulUmNC+osPPQO6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-what is a MRVL_VENDOR_PKT actually?
+Hi John,
 
-If you guys are not using standard HCI command/event for vendor operation, then this obviously does not fit. However a similar model might make sense instead of manually building packets all the time.
+First Bluetooth fixes to 3.12, it includes:
 
-Regards
+* 3 patches to add device id for 3 new hardwares.
 
-Marcel
+* 2 patches from Johan to fix the rfkill behaviour during setup stage
 
+* a small clean up in the rfcomm TTY code that fixes a potential racy
+condition (by Gianluca Anzolin)
+
+* 2 fixes to proper set encryption key size and security level in the
+peripheral role of Bluetooth LE devices. (by Andre Guedes)
+
+* a fix for dealing devices where pairing is not necessary, we were keeping
+the Bluetooth ACL connection alive for too much time. (by Syam Sidhardhan)
+
+Please pull or let me know of any problems! Thanks!
+
+
+	Gustavo
+
+---
+The following changes since commit f4e1a4d3ecbb9e42bdf8e7869ee8a4ebfa27fb20:
+
+  rt2800: change initialization sequence to fix system freeze (2013-09-09 14:44:34 -0400)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
+
+for you to fetch changes up to 5bcecf325378218a8e248bb6bcae96ec7362f8ef:
+
+  Bluetooth: btusb: Add support for Belkin F8065bf (2013-09-23 17:44:25 -0300)
+
+----------------------------------------------------------------
+Andre Guedes (2):
+      Bluetooth: Fix security level for peripheral role
+      Bluetooth: Fix encryption key size for peripheral role
+
+Gianluca Anzolin (1):
+      Bluetooth: don't release the port in rfcomm_dev_state_change()
+
+Johan Hedberg (2):
+      Bluetooth: Introduce a new HCI_RFKILLED flag
+      Bluetooth: Fix rfkill functionality during the HCI setup stage
+
+Ken O'Brien (1):
+      Bluetooth: btusb: Add support for Belkin F8065bf
+
+Peng Chen (1):
+      Bluetooth: Add a new PID/VID 0cf3/e005 for AR3012.
+
+Raphael Kubo da Costa (1):
+      Bluetooth: Add support for BCM20702A0 [0b05, 17cb]
+
+Syam Sidhardhan (1):
+      Bluetooth: Fix ACL alive for long in case of non pariable devices
+
+ drivers/bluetooth/ath3k.c   |  2 ++
+ drivers/bluetooth/btusb.c   |  5 +++++
+ include/net/bluetooth/hci.h |  1 +
+ net/bluetooth/hci_core.c    | 26 ++++++++++++++++++++------
+ net/bluetooth/hci_event.c   |  6 +++++-
+ net/bluetooth/l2cap_core.c  |  7 +++++++
+ net/bluetooth/rfcomm/tty.c  | 35 ++---------------------------------
+ 7 files changed, 42 insertions(+), 40 deletions(-)
+
+
+--y0ulUmNC+osPPQO6
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (GNU/Linux)
+
+iQIcBAEBAgAGBQJSQKwBAAoJEPs3PUX4s20oo6QP/0R2LOHl5VRFKx7TJfKFLMLe
+ZeFGBxK2jKTA1xRGhJ4dUJ6Li6K8QpfA0TMkINk5HGmA9QMc2fO2IUF6o+I0jjlx
+j+A43w54bvG0I0xCG23sl+a3vkMUXWCXOCycZPE3a3GUCyphFwBxal6vEt3AlOQl
+gXhDzO/+DPxzTW3wPS6Am3z33q8d2IFbPZFQYC6TEPKgJw3og7Sc60pcBiZl8r0v
+8TeaT/n40IY2lBKHyhkTB3MnUJVV07F0FAnzgfg/Lp7Up5FQkPSgvq07aHYbSE6M
+S969jaNy0jN8KJk7gXF/1arwit566d1ymZRtk0At2AtUFyyaC2kLmAIS1LG8o8aB
++IZylN0N7SEstn3yjPitBEbEWjxBEJyeLn++SmHsMSspKxj0R3VKKpjogZ6jxpHY
+twhpUeIx4Ls3r3+I6u0hOornF6QydymcUs+thgEjyf+GaYj8M9OlOq3m6WDC1UL7
+64RTfq3KXQjpOw6A3ayessbmZHS7qIncfh+kcNO73+903/KyBmdDZVsnrwRrs07V
+E9m9cHiQg+TRzuncHDrD55jLKN4tICx3yf1oESBT4UrpsWlbP/9rE+nif8eQkJCj
+l4HnAA0KzsCy08zqlYh7XMMC9navDoyYR+AIZ1p1MtjNRKgXZJxT1Q5JhasAC3gr
+Gt+C8CMWPA6rH//aCnWW
+=TPFZ
+-----END PGP SIGNATURE-----
+
+--y0ulUmNC+osPPQO6--
