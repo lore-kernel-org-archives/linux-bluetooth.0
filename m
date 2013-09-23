@@ -1,120 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
+From: Bing Zhao <bzhao@marvell.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        Johan Hedberg
+	<johan.hedberg@gmail.com>,
+        "linux-wireless@vger.kernel.org"
+	<linux-wireless@vger.kernel.org>,
+        Mike Frysinger <vapier@chromium.org>,
+        Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
+        Amitkumar Karwar
+	<akarwar@marvell.com>
+Date: Mon, 23 Sep 2013 12:18:48 -0700
+Subject: RE: [PATCH v5 1/2] Bluetooth: btmrvl: add setup handler
+Message-ID: <477F20668A386D41ADCC57781B1F70430F44C59418@SC-VEXCH1.marvell.com>
+References: <1379715667-22424-1-git-send-email-bzhao@marvell.com>
+ <18678858-E711-43E5-AFE6-E637D1CECFFB@holtmann.org>
+In-Reply-To: <18678858-E711-43E5-AFE6-E637D1CECFFB@holtmann.org>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <52400F2B.9010501@linux.intel.com>
-References: <1379679871-29623-1-git-send-email-frederic.danis@linux.intel.com>
-	<226042C8-264A-469E-8D6A-F41141DC0552@holtmann.org>
-	<52400F2B.9010501@linux.intel.com>
-Date: Mon, 23 Sep 2013 21:26:27 +0200
-Message-ID: <CAN_7+YbCJGqBmT_UtdFXKsiLccuzUbCSv1aPdm3734aE4wHX1Q@mail.gmail.com>
-Subject: Re: [PATCH 1/2] android: Add skeleton of BlueZ Android daemon
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Frederic Danis <frederic.danis@linux.intel.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Content-Type: multipart/alternative; boundary=047d7b6721c418b9df04e711ff54
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---047d7b6721c418b9df04e711ff54
-Content-Type: text/plain; charset=ISO-8859-1
+Hi Marcel,
 
-Hi Marcel
+> > -	btmrvl_send_module_cfg_cmd(priv, MODULE_BRINGUP_REQ);
+> > +	hdev->setup =3D btmrvl_setup;
+>=20
+> just to make sure you guys understand how ->setup() works. It is only cal=
+led once. Bringing the
+> adapter down and up again does not call ->setup() a second time. So do yo=
+u guys need this setup_done
+> variable and if so, then you need to be a bit more verbose and help me un=
+derstand why.
 
+It's observed that sometimes the setup handler is called twice when Bluetoo=
+th daemon is running in background. We will rebase to latest commit on blue=
+tooth-next tree and test again. If the issue is gone with the latest code i=
+n -next tree we will remove the setup_done flag.
 
-On Mon, Sep 23, 2013 at 11:51 AM, Frederic Danis <
-frederic.danis@linux.intel.com> wrote:
-
-> Hello Marcel,
->
-> On 21/09/2013 19:14, Marcel Holtmann wrote:
->
->> Hi Fred,
->>
->>  Define local mapping to glib path, otherwise this has to be inside
->>> central
->>> place in the build repository.
->>>
->>> Retrieve Bluetooth version from configure.ac.
->>> ---
->>> .gitignore         |    2 +
->>> Android.mk         |    9 ++++
->>> Makefile.am        |    1 +
->>> Makefile.android   |    7 ++++
->>> android/Android.mk |   24 +++++++++++
->>> android/main.c     |  119 ++++++++++++++++++++++++++++++**
->>> ++++++++++++++++++++++
->>> configure.ac       |    5 +++
->>> 7 files changed, 167 insertions(+)
->>> create mode 100644 Android.mk
->>> create mode 100644 Makefile.android
->>> create mode 100644 android/Android.mk
->>> create mode 100644 android/main.c
->>>
->>
->> lets split this out a little bit. Code additions should not be intermixed
->> with additions to the build system and especially configure options.
->>
->> I rather not have a top-level Android.mk. It should be enough to provide
->> an android/Android.mk.
->>
->> BTW, do you expect to have only one Android.mk for the whole project or
-this is OK for you to have smaller Android.mk in different subfolders like
-/src/shared etc. Both ways are valid.
-
-BR
-Lukasz
-
---047d7b6721c418b9df04e711ff54
-Content-Type: text/html; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><br><div class=3D"gmail_extra">Hi Marcel<br><br><br><div c=
-lass=3D"gmail_quote">On Mon, Sep 23, 2013 at 11:51 AM, Frederic Danis <span=
- dir=3D"ltr">&lt;<a href=3D"mailto:frederic.danis@linux.intel.com" target=
-=3D"_blank">frederic.danis@linux.intel.com</a>&gt;</span> wrote:<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-=
-left-width:1px;border-left-color:rgb(204,204,204);border-left-style:solid;p=
-adding-left:1ex">Hello Marcel,<br>
-<br>
-On 21/09/2013 19:14, Marcel Holtmann wrote:<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-=
-left-width:1px;border-left-color:rgb(204,204,204);border-left-style:solid;p=
-adding-left:1ex">
-Hi Fred,<br>
-<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-=
-left-width:1px;border-left-color:rgb(204,204,204);border-left-style:solid;p=
-adding-left:1ex">
-Define local mapping to glib path, otherwise this has to be inside central<=
-br>
-place in the build repository.<br>
-<br>
-Retrieve Bluetooth version from <a href=3D"http://configure.ac" target=3D"_=
-blank">configure.ac</a>.<br>
----<br>
-.gitignore =A0 =A0 =A0 =A0 | =A0 =A02 +<br>
-Android.mk =A0 =A0 =A0 =A0 | =A0 =A09 ++++<br>
-Makefile.am =A0 =A0 =A0 =A0| =A0 =A01 +<br>
-Makefile.android =A0 | =A0 =A07 ++++<br>
-android/Android.mk | =A0 24 +++++++++++<br>
-android/main.c =A0 =A0 | =A0119 ++++++++++++++++++++++++++++++<u></u>++++++=
-++++++++++++++++<br>
-<a href=3D"http://configure.ac" target=3D"_blank">configure.ac</a> =A0 =A0 =
-=A0 | =A0 =A05 +++<br>
-7 files changed, 167 insertions(+)<br>
-create mode 100644 Android.mk<br>
-create mode 100644 Makefile.android<br>
-create mode 100644 android/Android.mk<br>
-create mode 100644 android/main.c<br>
-</blockquote>
-<br>
-lets split this out a little bit. Code additions should not be intermixed w=
-ith additions to the build system and especially configure options.<br>
-<br>
-I rather not have a top-level Android.mk. It should be enough to provide an=
- android/Android.mk.<br>
-<br></blockquote></blockquote><div>BTW, do you expect to have only one Andr=
-oid.mk for the whole project or this is OK for you to have smaller Android.=
-mk in different subfolders like /src/shared etc. Both ways are valid.=A0</d=
-iv>
-<div><br></div></div>BR<br>Lukasz</div></div>
-
---047d7b6721c418b9df04e711ff54--
+Thanks,
+Bing
