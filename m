@@ -1,48 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bing Zhao <bzhao@marvell.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        Johan Hedberg
-	<johan.hedberg@gmail.com>,
-        "linux-wireless@vger.kernel.org"
-	<linux-wireless@vger.kernel.org>,
-        Mike Frysinger <vapier@chromium.org>,
-        Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
-        Amitkumar Karwar
-	<akarwar@marvell.com>
-Date: Mon, 23 Sep 2013 12:35:43 -0700
-Subject: RE: [PATCH v5 2/2] Bluetooth: btmrvl: add calibration data download
- support
-Message-ID: <477F20668A386D41ADCC57781B1F70430F44C59423@SC-VEXCH1.marvell.com>
-References: <1379715667-22424-1-git-send-email-bzhao@marvell.com>
- <1379715667-22424-2-git-send-email-bzhao@marvell.com>
- <05172D80-CE30-4B7D-A64E-11B8E320EF7F@holtmann.org>
-In-Reply-To: <05172D80-CE30-4B7D-A64E-11B8E320EF7F@holtmann.org>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+In-Reply-To: <52400F2B.9010501@linux.intel.com>
+References: <1379679871-29623-1-git-send-email-frederic.danis@linux.intel.com>
+	<226042C8-264A-469E-8D6A-F41141DC0552@holtmann.org>
+	<52400F2B.9010501@linux.intel.com>
+Date: Mon, 23 Sep 2013 21:28:44 +0200
+Message-ID: <CAN_7+YYSLwsPTfJoYwJKcVtP6EMxOeD8MHox+Pvzcrk_YKcSaQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] android: Add skeleton of BlueZ Android daemon
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+To: Frederic Danis <frederic.danis@linux.intel.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-> > +	cmd =3D (struct btmrvl_cmd *)skb->data;
-> > +	cmd->ocf_ogf =3D
-> > +		cpu_to_le16(hci_opcode_pack(OGF, BT_CMD_LOAD_CONFIG_DATA));
-> > +	cmd->length =3D BT_CMD_DATA_SIZE;
-> > +	cmd->data[0] =3D 0x00;
-> > +	cmd->data[1] =3D 0x00;
-> > +	cmd->data[2] =3D 0x00;
-> > +	cmd->data[3] =3D BT_CMD_DATA_SIZE - 4;
->=20
-> why not use __hci_cmd_sync() here. It is designed to be used from ->setup=
-() where it is guaranteed
-> that the HCI request lock is held. And it is guaranteed that ->setup() is=
- executed in a workqueue.
+On Mon, Sep 23, 2013 at 11:51 AM, Frederic Danis
+<frederic.danis@linux.intel.com> wrote:
+> Hello Marcel,
+>
+> On 21/09/2013 19:14, Marcel Holtmann wrote:
+>>
+>> Hi Fred,
+>>
+>>> Define local mapping to glib path, otherwise this has to be inside
+>>> central
+>>> place in the build repository.
+>>>
+>>> Retrieve Bluetooth version from configure.ac.
+>>> ---
+>>> .gitignore         |    2 +
+>>> Android.mk         |    9 ++++
+>>> Makefile.am        |    1 +
+>>> Makefile.android   |    7 ++++
+>>> android/Android.mk |   24 +++++++++++
+>>> android/main.c     |  119
+>>> ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>> configure.ac       |    5 +++
+>>> 7 files changed, 167 insertions(+)
+>>> create mode 100644 Android.mk
+>>> create mode 100644 Makefile.android
+>>> create mode 100644 android/Android.mk
+>>> create mode 100644 android/main.c
+>>
+>>
+>> lets split this out a little bit. Code additions should not be intermixed
+>> with additions to the build system and especially configure options.
+>>
+>> I rather not have a top-level Android.mk. It should be enough to provide
+>> an android/Android.mk.
 
-The reason of not using __hci_cmd_sync() is that we are sending vendor spec=
-ific command here (MRVL_VENDOR_PKT). The __hci_cmd_sync seems handle HCI_CO=
-MMAND_PKT only.
-Please let us know if you have any suggestion to solve this problem.
+ BTW, do you expect to have only one Android.mk for the whole project or
+this is OK for you to have smaller Android.mk in different subfolders like
+/src/shared etc. Both ways are valid.
 
-Thanks,
-Bing
+Br
+Lukasz
