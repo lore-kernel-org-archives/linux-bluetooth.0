@@ -1,110 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Sep 2013 18:00:49 -0300
+Date: Mon, 23 Sep 2013 17:45:09 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth 2013-09-23
-Message-ID: <20130923210049.GG18215@joana>
+To: Ken O'Brien <kernel@kenobrien.org>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] drivers: bluetooth: btusb: Added support for Belkin
+ F8065bf usb bluetooth device
+Message-ID: <20130923204509.GF18215@joana>
+References: <1379787283-5579-1-git-send-email-kernel@kenobrien.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="y0ulUmNC+osPPQO6"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1379787283-5579-1-git-send-email-kernel@kenobrien.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Ken,
 
---y0ulUmNC+osPPQO6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+2013-09-21 Ken O'Brien <kernel@kenobrien.org>:
 
-Hi John,
+> Adding generic rule on encountering Belkin bluetooth usb device F8065bf.
+> 
+> Relevant section from /sys/kernel/debug/usb/devices:
+> 
+> T:  Bus=03 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=050d ProdID=065a Rev= 1.12
+> S:  Manufacturer=Broadcom Corp
+> S:  Product=BCM20702A0
+> S:  SerialNumber=0002723E2D29
+> C:* #Ifs= 4 Cfg#= 1 Atr=a0 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+> 
+> Signed-off-by: Ken O'Brien <kernel@kenobrien.org>
+> ---
+>  drivers/bluetooth/btusb.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 
-First Bluetooth fixes to 3.12, it includes:
-
-* 3 patches to add device id for 3 new hardwares.
-
-* 2 patches from Johan to fix the rfkill behaviour during setup stage
-
-* a small clean up in the rfcomm TTY code that fixes a potential racy
-condition (by Gianluca Anzolin)
-
-* 2 fixes to proper set encryption key size and security level in the
-peripheral role of Bluetooth LE devices. (by Andre Guedes)
-
-* a fix for dealing devices where pairing is not necessary, we were keeping
-the Bluetooth ACL connection alive for too much time. (by Syam Sidhardhan)
-
-Please pull or let me know of any problems! Thanks!
-
+Patch has been applied to bluetooth.git. Thanks.
 
 	Gustavo
-
----
-The following changes since commit f4e1a4d3ecbb9e42bdf8e7869ee8a4ebfa27fb20:
-
-  rt2800: change initialization sequence to fix system freeze (2013-09-09 14:44:34 -0400)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
-
-for you to fetch changes up to 5bcecf325378218a8e248bb6bcae96ec7362f8ef:
-
-  Bluetooth: btusb: Add support for Belkin F8065bf (2013-09-23 17:44:25 -0300)
-
-----------------------------------------------------------------
-Andre Guedes (2):
-      Bluetooth: Fix security level for peripheral role
-      Bluetooth: Fix encryption key size for peripheral role
-
-Gianluca Anzolin (1):
-      Bluetooth: don't release the port in rfcomm_dev_state_change()
-
-Johan Hedberg (2):
-      Bluetooth: Introduce a new HCI_RFKILLED flag
-      Bluetooth: Fix rfkill functionality during the HCI setup stage
-
-Ken O'Brien (1):
-      Bluetooth: btusb: Add support for Belkin F8065bf
-
-Peng Chen (1):
-      Bluetooth: Add a new PID/VID 0cf3/e005 for AR3012.
-
-Raphael Kubo da Costa (1):
-      Bluetooth: Add support for BCM20702A0 [0b05, 17cb]
-
-Syam Sidhardhan (1):
-      Bluetooth: Fix ACL alive for long in case of non pariable devices
-
- drivers/bluetooth/ath3k.c   |  2 ++
- drivers/bluetooth/btusb.c   |  5 +++++
- include/net/bluetooth/hci.h |  1 +
- net/bluetooth/hci_core.c    | 26 ++++++++++++++++++++------
- net/bluetooth/hci_event.c   |  6 +++++-
- net/bluetooth/l2cap_core.c  |  7 +++++++
- net/bluetooth/rfcomm/tty.c  | 35 ++---------------------------------
- 7 files changed, 42 insertions(+), 40 deletions(-)
-
-
---y0ulUmNC+osPPQO6
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.14 (GNU/Linux)
-
-iQIcBAEBAgAGBQJSQKwBAAoJEPs3PUX4s20oo6QP/0R2LOHl5VRFKx7TJfKFLMLe
-ZeFGBxK2jKTA1xRGhJ4dUJ6Li6K8QpfA0TMkINk5HGmA9QMc2fO2IUF6o+I0jjlx
-j+A43w54bvG0I0xCG23sl+a3vkMUXWCXOCycZPE3a3GUCyphFwBxal6vEt3AlOQl
-gXhDzO/+DPxzTW3wPS6Am3z33q8d2IFbPZFQYC6TEPKgJw3og7Sc60pcBiZl8r0v
-8TeaT/n40IY2lBKHyhkTB3MnUJVV07F0FAnzgfg/Lp7Up5FQkPSgvq07aHYbSE6M
-S969jaNy0jN8KJk7gXF/1arwit566d1ymZRtk0At2AtUFyyaC2kLmAIS1LG8o8aB
-+IZylN0N7SEstn3yjPitBEbEWjxBEJyeLn++SmHsMSspKxj0R3VKKpjogZ6jxpHY
-twhpUeIx4Ls3r3+I6u0hOornF6QydymcUs+thgEjyf+GaYj8M9OlOq3m6WDC1UL7
-64RTfq3KXQjpOw6A3ayessbmZHS7qIncfh+kcNO73+903/KyBmdDZVsnrwRrs07V
-E9m9cHiQg+TRzuncHDrD55jLKN4tICx3yf1oESBT4UrpsWlbP/9rE+nif8eQkJCj
-l4HnAA0KzsCy08zqlYh7XMMC9navDoyYR+AIZ1p1MtjNRKgXZJxT1Q5JhasAC3gr
-Gt+C8CMWPA6rH//aCnWW
-=TPFZ
------END PGP SIGNATURE-----
-
---y0ulUmNC+osPPQO6--
