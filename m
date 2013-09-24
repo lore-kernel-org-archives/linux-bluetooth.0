@@ -1,38 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 25 Sep 2013 13:03:53 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: Bing Zhao <bzhao@marvell.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/8] Bluetooth: Test for HCI_SETUP and HCI_USER_CHANNEL
- in mgmt_valid_hdev()
-Message-ID: <20130925100353.GA3158@x220.p-661hnu-f1>
-References: <1380031363-1266-1-git-send-email-johan.hedberg@gmail.com>
- <1380031363-1266-4-git-send-email-johan.hedberg@gmail.com>
- <DFCF34C2-5AA9-4644-BB4B-3D6073DA9D42@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        Johan Hedberg
+	<johan.hedberg@gmail.com>,
+        "linux-wireless@vger.kernel.org"
+	<linux-wireless@vger.kernel.org>,
+        Mike Frysinger <vapier@chromium.org>,
+        Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
+        Amitkumar Karwar
+	<akarwar@marvell.com>
+Date: Tue, 24 Sep 2013 12:54:09 -0700
+Subject: RE: [PATCH v5 2/2] Bluetooth: btmrvl: add calibration data download
+ support
+Message-ID: <477F20668A386D41ADCC57781B1F70430F450779E4@SC-VEXCH1.marvell.com>
+References: <1379715667-22424-1-git-send-email-bzhao@marvell.com>
+ <1379715667-22424-2-git-send-email-bzhao@marvell.com>
+ <05172D80-CE30-4B7D-A64E-11B8E320EF7F@holtmann.org>
+ <477F20668A386D41ADCC57781B1F70430F44C59423@SC-VEXCH1.marvell.com>
+ <34088279-04B9-49D0-9387-88A602F518EC@holtmann.org>
+ <477F20668A386D41ADCC57781B1F70430F450779BE@SC-VEXCH1.marvell.com>
+ <C42E9D11-1E8B-499E-96E0-74469F7649EC@holtmann.org>
+In-Reply-To: <C42E9D11-1E8B-499E-96E0-74469F7649EC@holtmann.org>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <DFCF34C2-5AA9-4644-BB4B-3D6073DA9D42@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Tue, Sep 24, 2013, Marcel Holtmann wrote:
-> > If either one of the HCI_SETUP or HCI_USER_CHANNEL flags is set the
-> > device is not considered valid for mgmt. By having these checks inside
-> > the mgmt_valid_hdev function the a couple of places using it can be
-> > simplified.
-> 
-> I looked at doing this and decided not to. Reason was that the device
-> gets removed from mgmt anyway.
+> > We can extend __hci_cmd_sync() function with a new parameter 'type'.
+> > This way we can pass HCI_VENDOR_PKT into __hci_cmd_sync(), while other =
+drivers will pass in
+> HCI_COMMAND_PKT.
+>=20
+> That will actually not work. And I also do not want to do that. The __hci=
+_cmd_sync() is for real HCI
+> packets. That means types 0x01 and 0x04 only. They need to adhere to the =
+HCI flow control mechanism
+> for commands.
 
-I'm not sure what significance you think "device gets removed from mgmt"
-has. All that is is a mgmt event saying that index has been removed. In
-addition to that we need to ensure that we don't send any more mgmt
-events for such devices and that we don't include such devices in the
-response to mgmt_read_index list.
+I see.
 
-These are the two places of the code that my patch simplifies, one is
-the check for whether to send a "power on" mgmt event and the other the
-response handling of read_index_list.
+>=20
+> > Our driver will make HCI_VENDOR_PKT -> MRVL_VENDOR_PKT conversion befor=
+e downloading the frame to
+> firmware. And the MRVL_VENDOR_PKT frame from firmware will be replaced wi=
+th HCI_VENDOR_PKT while
+> uploading the frame to stack.
+> >
+> > Please let us know if this approach works for you or not.
+>=20
+> I think this is best kept inside the driver. However you might consider b=
+uilding something like
+> __hci_cmd_sync() that is specific to your driver, but allows for a simila=
+r flow within ->setup().
 
-Johan
+Sure, we will consider building a function in the driver to handle this.
+
+Thanks,
+Bing
