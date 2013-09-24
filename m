@@ -1,195 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bing Zhao <bzhao@marvell.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        Johan Hedberg
-	<johan.hedberg@gmail.com>,
-        "linux-wireless@vger.kernel.org"
-	<linux-wireless@vger.kernel.org>,
-        Mike Frysinger <vapier@chromium.org>,
-        Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
-        Amitkumar Karwar
-	<akarwar@marvell.com>
-Date: Tue, 24 Sep 2013 12:04:41 -0700
-Subject: RE: [PATCH v5 1/2] Bluetooth: btmrvl: add setup handler
-Message-ID: <477F20668A386D41ADCC57781B1F70430F450779A4@SC-VEXCH1.marvell.com>
-References: <1379715667-22424-1-git-send-email-bzhao@marvell.com>
- <18678858-E711-43E5-AFE6-E637D1CECFFB@holtmann.org>
- <477F20668A386D41ADCC57781B1F70430F44C59418@SC-VEXCH1.marvell.com>
- <DF6283E3-8476-400F-A230-CB7CA0F98564@holtmann.org>
-In-Reply-To: <DF6283E3-8476-400F-A230-CB7CA0F98564@holtmann.org>
-Content-Type: multipart/mixed;
-	boundary="_004_477F20668A386D41ADCC57781B1F70430F450779A4SCVEXCH1marve_"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH 7/8] Bluetooth: Add new mgmt setting for LE advertising
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1380031363-1266-8-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 24 Sep 2013 20:29:55 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <B5745671-F199-4253-A0F3-3EDDDCA3F46D@holtmann.org>
+References: <1380031363-1266-1-git-send-email-johan.hedberg@gmail.com> <1380031363-1266-8-git-send-email-johan.hedberg@gmail.com>
+To: johan.hedberg@gmail.com
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---_004_477F20668A386D41ADCC57781B1F70430F450779A4SCVEXCH1marve_
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Hi Johan,
 
-Hi Marcel,
+> This patch adds a new mgmt setting for LE advertising and hooks up the
+> necessary places in the mgmt code to operate on the HCI_LE_PERIPHERAL
+> flag (which corresponds to this setting). This patch does not yet add
+> any new command for enabling the setting - that is left for a subsequent
+> patch.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> include/net/bluetooth/mgmt.h |  1 +
+> net/bluetooth/mgmt.c         | 24 +++++++++++++++++++++++-
+> 2 files changed, 24 insertions(+), 1 deletion(-)
 
-> > It's observed that sometimes the setup handler is called twice when Blu=
-etooth daemon is running in
-> background. We will rebase to latest commit on bluetooth-next tree and te=
-st again. If the issue is
-> gone with the latest code in -next tree we will remove the setup_done fla=
-g.
->=20
-> that is a bug. It should only be ever called once. Could this be due to R=
-FKILL issue we had? Please
-> re-test with Johan's patches applied and check if it makes a difference. =
-Otherwise please send some
-> logs since we want to get this fixed.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-Amitkumar Karwar has tested it with latest code on bluetooth-next tree but =
-the result is the same.
-Apparently two threads race to call hci_dev_open(). If the thread from hci_=
-sock calls hci_dev_open earlier, it ends up not updating HCI_SETUP hdev fla=
-g in hci_power_on(). This results that the setup handler gets called again =
-when user brings up the interface later.
+Regards
 
-Attached are the debug logs and the patch used to generate them.
+Marcel
 
-I checked the bluetooth-next tree, the following two patches (by Johan) are=
- not present in this tree.
-
-bf54303 Bluetooth: Fix rfkill functionality during the HCI setup stage
-5e13036 Bluetooth: Introduce a new HCI_RFKILLED flag
-
-They are in bluetooth.git tree. So, I'm not certain if Amitkumar has applie=
-d them manually or not. Anyway we will re-test with Johan's patches applied=
- and confirm if they fix the race or not.
-
-Thanks,
-Bing
-
-
---_004_477F20668A386D41ADCC57781B1F70430F450779A4SCVEXCH1marve_
-Content-Type: application/octet-stream; name="success.log"
-Content-Description: success.log
-Content-Disposition: attachment; filename="success.log"; size=1097;
-	creation-date="Tue, 24 Sep 2013 17:51:06 GMT";
-	modification-date="Tue, 24 Sep 2013 17:51:06 GMT"
-Content-Transfer-Encoding: base64
-
-WyAxNzE3LjEwMDYyOF0gbW1jMTogbmV3IFNESU8gY2FyZCBhdCBhZGRyZXNzIDAwMDEKWyAxNzE3
-LjEwMDg2Ml0gQmx1ZXRvb3RoOiB2ZW5kb3I9MHgyZGYsIGRldmljZT0weDkxMmEsIGNsYXNzPTI1
-NSwgZm49MgpbIDE3MTguMzgxMzA2XSBCVF9EQkc6IGVudGVyOiBoY2lfcmVnaXN0ZXJfZGV2Clsg
-MTcxOC4zODE2NjhdIEJUX0RCRzogaW4gaGNpX3JlZ2lzdGVyX2RldiBxdWV1ZWluZyB3b3JrIHBv
-d2VyX29uClsgMTcxOC4zODE2NzZdIEJUX0RCRzogZXhpdDogaGNpX3JlZ2lzdGVyX2RldgpbIDE3
-MTguMzgyNjU4XSBCVF9EQkc6IGVudGVyOiBoY2lfcG93ZXJfb24gbGluZT0xNjczIHBpZD0zNjg2
-ClsgMTcxOC4zODI2NjRdIEJUX0RCRzogaGNpX2Rldl9vcGVuIGxpbmU9MTE4NiBwaWQ9MzY4Ngpb
-IDE3MTguMzgyNjY5XSBCVF9EQkc6IGhjaV9kZXZfb3BlbiBsaW5lPTEyMDAgcGlkPTM2ODYKWyAx
-NzE4LjM4MjY3M10gQlRfREJHOiBoY2lfZGV2X29wZW4gbGluZT0xMjA2IHBpZD0zNjg2ClsgMTcx
-OC4zODI2NzddIEJUX0RCRzogaGNpX2Rldl9vcGVuIGxpbmU9MTIxMiBwaWQ9MzY4NgpbIDE3MTgu
-MzgyNjgxXSBCVF9EQkc6IGhjaV9kZXZfb3BlbiBsaW5lPTEyMTcgcGlkPTM2ODYKWyAxNzE4LjM4
-MjY4NF0gYnRtcnZsOiBlbnRlciBidG1ydmxfc2V0dXAoKQpbIDE3MTguMzgzMjMxXSBCVF9EQkc6
-IGNhbGxpbmcgaGNpX2Rldl9vcGVuIGZyb20gaGNpX3NvY2suYyBwaWQ9MzY4OQpbIDE3MTguMzgz
-MjM2XSBCVF9EQkc6IGhjaV9kZXZfb3BlbiBsaW5lPTExODYgcGlkPTM2ODkKWyAxNzE4LjQ4OTkz
-MF0gQlRfREJHOiBoY2lfZGV2X29wZW4gbGluZT0xMjI1IHBpZD0zNjg2ClsgMTcxOC42MzU5NzNd
-IEJUX0RCRzogaGNpX3Bvd2VyX29uIGxpbmU9MTY4NCB1cGRhdGluZyBIQ0lfU0VUVVAgaGRldiBm
-bGFnIHBpZD0zNjg2ClsgMTcxOC42MzU5ODRdIEJUX0RCRzogZXhpdDogaGNpX3Bvd2VyX29uIGxp
-bmU9MTY4NyBwaWQ9MzY4NgpbIDE3MTguNjM2MjgyXSBCVF9EQkc6IGhjaV9kZXZfb3BlbiBsaW5l
-PTEyMDAgcGlkPTM2ODkKWyAxNzE4LjYzNjI4OF0gQlRfREJHOiBoY2lfZGV2X29wZW4gbGluZT0x
-MjA2IHBpZD0zNjg5Cgo=
-
---_004_477F20668A386D41ADCC57781B1F70430F450779A4SCVEXCH1marve_
-Content-Type: application/octet-stream; name="failure.log"
-Content-Description: failure.log
-Content-Disposition: attachment; filename="failure.log"; size=951;
-	creation-date="Tue, 24 Sep 2013 17:51:13 GMT";
-	modification-date="Tue, 24 Sep 2013 17:51:13 GMT"
-Content-Transfer-Encoding: base64
-
-WyAgMTMyLjE4MDU2MF0gbW1jMTogbmV3IFNESU8gY2FyZCBhdCBhZGRyZXNzIDAwMDEKWyAgMTMy
-LjQxNTI4Ml0gQmx1ZXRvb3RoOiB2ZW5kb3I9MHgyZGYsIGRldmljZT0weDkxMmEsIGNsYXNzPTI1
-NSwgZm49MgpbICAxMzMuNzg0MzA5XSBCVF9EQkc6IGVudGVyOiBoY2lfcmVnaXN0ZXJfZGV2Clsg
-IDEzMy43ODQ2OTRdIEJUX0RCRzogaW4gaGNpX3JlZ2lzdGVyX2RldiBxdWV1ZWluZyB3b3JrIHBv
-d2VyX29uClsgIDEzMy43ODQ3MDNdIEJUX0RCRzogZXhpdDogaGNpX3JlZ2lzdGVyX2RldgpbICAx
-MzMuNzg2NjE2XSBCVF9EQkc6IGNhbGxpbmcgaGNpX2Rldl9vcGVuIGZyb20gaGNpX3NvY2suYyBw
-aWQ9MzI4NwpbICAxMzMuNzg2NjI0XSBCVF9EQkc6IGhjaV9kZXZfb3BlbiBsaW5lPTExODYgcGlk
-PTMyODcKWyAgMTMzLjc4NjYyOF0gQlRfREJHOiBoY2lfZGV2X29wZW4gbGluZT0xMjAwIHBpZD0z
-Mjg3ClsgIDEzMy43ODY2MzNdIEJUX0RCRzogaGNpX2Rldl9vcGVuIGxpbmU9MTIwNiBwaWQ9MzI4
-NwpbICAxMzMuNzg2NjM2XSBCVF9EQkc6IGhjaV9kZXZfb3BlbiBsaW5lPTEyMTIgcGlkPTMyODcK
-WyAgMTMzLjc4NjY0MF0gQlRfREJHOiBoY2lfZGV2X29wZW4gbGluZT0xMjE3IHBpZD0zMjg3Clsg
-IDEzMy43ODY2NDRdIGJ0bXJ2bDogZW50ZXIgYnRtcnZsX3NldHVwKCkKWyAgMTMzLjc4OTY4M10g
-QlRfREJHOiBlbnRlcjogaGNpX3Bvd2VyX29uIGxpbmU9MTY3MyBwaWQ9MzI4MwpbICAxMzMuNzg5
-NjkxXSBCVF9EQkc6IGhjaV9kZXZfb3BlbiBsaW5lPTExODYgcGlkPTMyODMKWyAgMTMzLjk1NDc0
-OV0gQlRfREJHOiBoY2lfZGV2X29wZW4gbGluZT0xMjI1IHBpZD0zMjg3ClsgIDEzNC4xMDE4NjNd
-IEJUX0RCRzogaGNpX2Rldl9vcGVuIGxpbmU9MTIwMCBwaWQ9MzI4MwpbICAxMzQuMTAxODcxXSBC
-VF9EQkc6IGhjaV9kZXZfb3BlbiBsaW5lPTEyMDYgcGlkPTMyODMK
-
---_004_477F20668A386D41ADCC57781B1F70430F450779A4SCVEXCH1marve_
-Content-Type: application/octet-stream; name="bt_debug.diff"
-Content-Description: bt_debug.diff
-Content-Disposition: attachment; filename="bt_debug.diff"; size=3517;
-	creation-date="Tue, 24 Sep 2013 17:51:22 GMT";
-	modification-date="Tue, 24 Sep 2013 17:51:22 GMT"
-Content-Transfer-Encoding: base64
-
-ZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0bXJ2bF9tYWluLmMgYi9kcml2ZXJzL2Js
-dWV0b290aC9idG1ydmxfbWFpbi5jCmluZGV4IDZlZWExODguLmI0NzRkZGUgMTAwNjQ0Ci0tLSBh
-L2RyaXZlcnMvYmx1ZXRvb3RoL2J0bXJ2bF9tYWluLmMKKysrIGIvZHJpdmVycy9ibHVldG9vdGgv
-YnRtcnZsX21haW4uYwpAQCAtNjIxLDYgKzYyMSw3IEBAIHN0YXRpYyBpbnQgYnRtcnZsX3NldHVw
-KHN0cnVjdCBoY2lfZGV2ICpoZGV2KQogCXN0cnVjdCBidG1ydmxfcHJpdmF0ZSAqcHJpdiA9IGhj
-aV9nZXRfZHJ2ZGF0YShoZGV2KTsKIAlzdHJ1Y3QgYnRtcnZsX2FkYXB0ZXIgKmFkYXB0ZXIgPSBw
-cml2LT5hZGFwdGVyOwogCisJcHJpbnRrKCJidG1ydmw6IGVudGVyIGJ0bXJ2bF9zZXR1cCgpXG4i
-KTsKIAlpZiAoYWRhcHRlci0+c2V0dXBfZG9uZSkKIAkJcmV0dXJuIDA7CiAKZGlmZiAtLWdpdCBh
-L25ldC9ibHVldG9vdGgvaGNpX2NvcmUuYyBiL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuYwppbmRl
-eCAzZDlmMDJiLi5kMDc5NWU5IDEwMDY0NAotLS0gYS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmMK
-KysrIGIvbmV0L2JsdWV0b290aC9oY2lfY29yZS5jCkBAIC0xMTgzLDYgKzExODMsNyBAQCBpbnQg
-aGNpX2Rldl9vcGVuKF9fdTE2IGRldikKIAlzdHJ1Y3QgaGNpX2RldiAqaGRldjsKIAlpbnQgcmV0
-ID0gMDsKIAorCXByaW50aygiQlRfREJHOiBoY2lfZGV2X29wZW4gbGluZT0lZCBwaWQ9JWRcbiIs
-IF9fTElORV9fLCBjdXJyZW50LT5waWQpOwogCWhkZXYgPSBoY2lfZGV2X2dldChkZXYpOwogCWlm
-ICghaGRldikKIAkJcmV0dXJuIC1FTk9ERVY7CkBAIC0xMTk2LDIwICsxMTk3LDI0IEBAIGludCBo
-Y2lfZGV2X29wZW4oX191MTYgZGV2KQogCQlnb3RvIGRvbmU7CiAJfQogCisJcHJpbnRrKCJCVF9E
-Qkc6IGhjaV9kZXZfb3BlbiBsaW5lPSVkIHBpZD0lZFxuIiwgX19MSU5FX18sIGN1cnJlbnQtPnBp
-ZCk7CiAJaWYgKGhkZXYtPnJma2lsbCAmJiByZmtpbGxfYmxvY2tlZChoZGV2LT5yZmtpbGwpKSB7
-CiAJCXJldCA9IC1FUkZLSUxMOwogCQlnb3RvIGRvbmU7CiAJfQogCisJcHJpbnRrKCJCVF9EQkc6
-IGhjaV9kZXZfb3BlbiBsaW5lPSVkIHBpZD0lZFxuIiwgX19MSU5FX18sIGN1cnJlbnQtPnBpZCk7
-CiAJaWYgKHRlc3RfYml0KEhDSV9VUCwgJmhkZXYtPmZsYWdzKSkgewogCQlyZXQgPSAtRUFMUkVB
-RFk7CiAJCWdvdG8gZG9uZTsKIAl9CiAKKwlwcmludGsoIkJUX0RCRzogaGNpX2Rldl9vcGVuIGxp
-bmU9JWQgcGlkPSVkXG4iLCBfX0xJTkVfXywgY3VycmVudC0+cGlkKTsKIAlpZiAoaGRldi0+b3Bl
-bihoZGV2KSkgewogCQlyZXQgPSAtRUlPOwogCQlnb3RvIGRvbmU7CiAJfQorCXByaW50aygiQlRf
-REJHOiBoY2lfZGV2X29wZW4gbGluZT0lZCBwaWQ9JWRcbiIsIF9fTElORV9fLCBjdXJyZW50LT5w
-aWQpOwogCiAJYXRvbWljX3NldCgmaGRldi0+Y21kX2NudCwgMSk7CiAJc2V0X2JpdChIQ0lfSU5J
-VCwgJmhkZXYtPmZsYWdzKTsKQEAgLTEyMTcsNiArMTIyMiw3IEBAIGludCBoY2lfZGV2X29wZW4o
-X191MTYgZGV2KQogCWlmIChoZGV2LT5zZXR1cCAmJiB0ZXN0X2JpdChIQ0lfU0VUVVAsICZoZGV2
-LT5kZXZfZmxhZ3MpKQogCQlyZXQgPSBoZGV2LT5zZXR1cChoZGV2KTsKIAorCXByaW50aygiQlRf
-REJHOiBoY2lfZGV2X29wZW4gbGluZT0lZCBwaWQ9JWRcbiIsIF9fTElORV9fLCBjdXJyZW50LT5w
-aWQpOwogCWlmICghcmV0KSB7CiAJCS8qIFRyZWF0IGFsbCBub24gQlIvRURSIGNvbnRyb2xsZXJz
-IGFzIHJhdyBkZXZpY2VzIGlmCiAJCSAqIGVuYWJsZV9ocyBpcyBub3Qgc2V0LgpAQCAtMTY2NCw2
-ICsxNjcwLDcgQEAgc3RhdGljIHZvaWQgaGNpX3Bvd2VyX29uKHN0cnVjdCB3b3JrX3N0cnVjdCAq
-d29yaykKIAogCUJUX0RCRygiJXMiLCBoZGV2LT5uYW1lKTsKIAorCXByaW50aygiQlRfREJHOiBl
-bnRlcjogaGNpX3Bvd2VyX29uIGxpbmU9JWQgcGlkPSVkXG4iLCBfX0xJTkVfXywgY3VycmVudC0+
-cGlkKTsKIAllcnIgPSBoY2lfZGV2X29wZW4oaGRldi0+aWQpOwogCWlmIChlcnIgPCAwKSB7CiAJ
-CW1nbXRfc2V0X3Bvd2VyZWRfZmFpbGVkKGhkZXYsIGVycik7CkBAIC0xNjc0LDggKzE2ODEsMTAg
-QEAgc3RhdGljIHZvaWQgaGNpX3Bvd2VyX29uKHN0cnVjdCB3b3JrX3N0cnVjdCAqd29yaykKIAkJ
-cXVldWVfZGVsYXllZF93b3JrKGhkZXYtPnJlcV93b3JrcXVldWUsICZoZGV2LT5wb3dlcl9vZmYs
-CiAJCQkJICAgSENJX0FVVE9fT0ZGX1RJTUVPVVQpOwogCisJcHJpbnRrKCJCVF9EQkc6IGhjaV9w
-b3dlcl9vbiBsaW5lPSVkIHVwZGF0aW5nIEhDSV9TRVRVUCBoZGV2IGZsYWcgcGlkPSVkXG4iLCBf
-X0xJTkVfXywgY3VycmVudC0+cGlkKTsKIAlpZiAodGVzdF9hbmRfY2xlYXJfYml0KEhDSV9TRVRV
-UCwgJmhkZXYtPmRldl9mbGFncykpCiAJCW1nbXRfaW5kZXhfYWRkZWQoaGRldik7CisJcHJpbnRr
-KCJCVF9EQkc6IGV4aXQ6IGhjaV9wb3dlcl9vbiBsaW5lPSVkIHBpZD0lZFxuIiwgX19MSU5FX18s
-IGN1cnJlbnQtPnBpZCk7CiB9CiAKIHN0YXRpYyB2b2lkIGhjaV9wb3dlcl9vZmYoc3RydWN0IHdv
-cmtfc3RydWN0ICp3b3JrKQpAQCAtMjIzNCw2ICsyMjQzLDcgQEAgaW50IGhjaV9yZWdpc3Rlcl9k
-ZXYoc3RydWN0IGhjaV9kZXYgKmhkZXYpCiB7CiAJaW50IGlkLCBlcnJvcjsKIAorCXByaW50aygi
-QlRfREJHOiBlbnRlcjogaGNpX3JlZ2lzdGVyX2RldlxuIik7CiAJaWYgKCFoZGV2LT5vcGVuIHx8
-ICFoZGV2LT5jbG9zZSkKIAkJcmV0dXJuIC1FSU5WQUw7CiAKQEAgLTIzMDAsNyArMjMxMCw5IEBA
-IGludCBoY2lfcmVnaXN0ZXJfZGV2KHN0cnVjdCBoY2lfZGV2ICpoZGV2KQogCWhjaV9ub3RpZnko
-aGRldiwgSENJX0RFVl9SRUcpOwogCWhjaV9kZXZfaG9sZChoZGV2KTsKIAorCXByaW50aygiQlRf
-REJHOiBpbiBoY2lfcmVnaXN0ZXJfZGV2IHF1ZXVlaW5nIHdvcmsgcG93ZXJfb25cbiIpOwogCXF1
-ZXVlX3dvcmsoaGRldi0+cmVxX3dvcmtxdWV1ZSwgJmhkZXYtPnBvd2VyX29uKTsKKwlwcmludGso
-IkJUX0RCRzogZXhpdDogaGNpX3JlZ2lzdGVyX2RldlxuIik7CiAKIAlyZXR1cm4gaWQ7CiAKZGlm
-ZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvaGNpX3NvY2suYyBiL25ldC9ibHVldG9vdGgvaGNpX3Nv
-Y2suYwppbmRleCBjMDllOTc2Li5kZGVmY2JlIDEwMDY0NAotLS0gYS9uZXQvYmx1ZXRvb3RoL2hj
-aV9zb2NrLmMKKysrIGIvbmV0L2JsdWV0b290aC9oY2lfc29jay5jCkBAIC01ODcsNiArNTg3LDcg
-QEAgc3RhdGljIGludCBoY2lfc29ja19pb2N0bChzdHJ1Y3Qgc29ja2V0ICpzb2NrLCB1bnNpZ25l
-ZCBpbnQgY21kLAogCWNhc2UgSENJREVWVVA6CiAJCWlmICghY2FwYWJsZShDQVBfTkVUX0FETUlO
-KSkKIAkJCXJldHVybiAtRVBFUk07CisJCXByaW50aygiQlRfREJHOiBjYWxsaW5nIGhjaV9kZXZf
-b3BlbiBmcm9tIGhjaV9zb2NrLmMgcGlkPSVkXG4iLCBjdXJyZW50LT5waWQpOwogCQlyZXR1cm4g
-aGNpX2Rldl9vcGVuKGFyZyk7CiAKIAljYXNlIEhDSURFVkRPV046Cg==
-
---_004_477F20668A386D41ADCC57781B1F70430F450779A4SCVEXCH1marve_--
