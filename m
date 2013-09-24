@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH v5 1/2] Bluetooth: btmrvl: add setup handler
+Subject: Re: [PATCH v5 2/2] Bluetooth: btmrvl: add calibration data download support
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <477F20668A386D41ADCC57781B1F70430F44C59418@SC-VEXCH1.marvell.com>
-Date: Tue, 24 Sep 2013 06:23:49 +0200
+In-Reply-To: <477F20668A386D41ADCC57781B1F70430F44C59423@SC-VEXCH1.marvell.com>
+Date: Tue, 24 Sep 2013 06:21:56 +0200
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
@@ -12,24 +12,32 @@ Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
 	Mike Frysinger <vapier@chromium.org>,
 	Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
 	Amitkumar Karwar <akarwar@marvell.com>
-Message-Id: <DF6283E3-8476-400F-A230-CB7CA0F98564@holtmann.org>
-References: <1379715667-22424-1-git-send-email-bzhao@marvell.com> <18678858-E711-43E5-AFE6-E637D1CECFFB@holtmann.org> <477F20668A386D41ADCC57781B1F70430F44C59418@SC-VEXCH1.marvell.com>
+Message-Id: <34088279-04B9-49D0-9387-88A602F518EC@holtmann.org>
+References: <1379715667-22424-1-git-send-email-bzhao@marvell.com> <1379715667-22424-2-git-send-email-bzhao@marvell.com> <05172D80-CE30-4B7D-A64E-11B8E320EF7F@holtmann.org> <477F20668A386D41ADCC57781B1F70430F44C59423@SC-VEXCH1.marvell.com>
 To: Bing Zhao <bzhao@marvell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Bing,
 
->>> -	btmrvl_send_module_cfg_cmd(priv, MODULE_BRINGUP_REQ);
->>> +	hdev->setup = btmrvl_setup;
+>>> +	cmd = (struct btmrvl_cmd *)skb->data;
+>>> +	cmd->ocf_ogf =
+>>> +		cpu_to_le16(hci_opcode_pack(OGF, BT_CMD_LOAD_CONFIG_DATA));
+>>> +	cmd->length = BT_CMD_DATA_SIZE;
+>>> +	cmd->data[0] = 0x00;
+>>> +	cmd->data[1] = 0x00;
+>>> +	cmd->data[2] = 0x00;
+>>> +	cmd->data[3] = BT_CMD_DATA_SIZE - 4;
 >> 
->> just to make sure you guys understand how ->setup() works. It is only called once. Bringing the
->> adapter down and up again does not call ->setup() a second time. So do you guys need this setup_done
->> variable and if so, then you need to be a bit more verbose and help me understand why.
+>> why not use __hci_cmd_sync() here. It is designed to be used from ->setup() where it is guaranteed
+>> that the HCI request lock is held. And it is guaranteed that ->setup() is executed in a workqueue.
 > 
-> It's observed that sometimes the setup handler is called twice when Bluetooth daemon is running in background. We will rebase to latest commit on bluetooth-next tree and test again. If the issue is gone with the latest code in -next tree we will remove the setup_done flag.
+> The reason of not using __hci_cmd_sync() is that we are sending vendor specific command here (MRVL_VENDOR_PKT). The __hci_cmd_sync seems handle HCI_COMMAND_PKT only.
+> Please let us know if you have any suggestion to solve this problem.
 
-that is a bug. It should only be ever called once. Could this be due to RFKILL issue we had? Please re-test with Johan's patches applied and check if it makes a difference. Otherwise please send some logs since we want to get this fixed.
+what is a MRVL_VENDOR_PKT actually?
+
+If you guys are not using standard HCI command/event for vendor operation, then this obviously does not fit. However a similar model might make sense instead of manually building packets all the time.
 
 Regards
 
