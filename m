@@ -1,51 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Subject: [PATCH BlueZ 1/2] gobex: Fix crash on g_obex_pending_req_abort
-Date: Tue, 24 Sep 2013 17:47:15 +0300
-Message-Id: <1380034036-25143-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 6/7] obexd: Handle message shift and message deleted events
+Date: Tue, 24 Sep 2013 16:16:06 +0200
+Message-Id: <1380032167-6440-7-git-send-email-christian.fetzer@oss.bmw-carit.de>
+In-Reply-To: <1380032167-6440-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1380032167-6440-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-It is not safe to call g_obex_pending_req_abort directly as pending_req
-can be NULL:
-Invalid read of size 4
-   at 0x41231E: g_obex_pending_req_abort (gobex.c:693)
-   by 0x416A8A: g_obex_cancel_transfer (gobex-transfer.c:647)
-   by 0x42DEF2: obc_transfer_cancel (transfer.c:180)
-   by 0x43D833: process_message.isra.5 (object.c:259)
-   by 0x3B0701CE85: ??? (in /usr/lib64/libdbus-1.so.3.7.4)
-   by 0x3B0700FA30: dbus_connection_dispatch (in /usr/lib64/libdbus-1.so.3.7.4)
-   by 0x43A5B7: message_dispatch (mainloop.c:76)
-   by 0x3B03C48962: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
-   by 0x3B03C47E05: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3600.3)
-   by 0x3B03C48157: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
-   by 0x3B03C48559: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3600.3)
-   by 0x40D53C: main (main.c:319)
- Address 0x30 is not stack'd, malloc'd or (recently) free'd
+For already existing messages, the folder property needs to be updated.
+Non existing messages are created only if they are moved into the
+current folder. Otherwise, the event will be ignored.
+
+A message deleted event signals that a message has been moved into the
+folder /telecom/msg/deleted.
 ---
- gobex/gobex-transfer.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ obexd/client/map.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
-index 4203fec..b815d60 100644
---- a/gobex/gobex-transfer.c
-+++ b/gobex/gobex-transfer.c
-@@ -644,7 +644,10 @@ gboolean g_obex_cancel_transfer(guint id, GObexFunc complete_func,
- 	transfer->complete_func = complete_func;
- 	transfer->user_data = user_data;
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index 8ddbc46..ee8d488 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -1875,6 +1875,25 @@ static void map_handle_status(struct map_data *map, struct map_event *event,
+ 		set_reception_status(msg, status);
+ }
  
--	ret = g_obex_pending_req_abort(transfer->obex, NULL);
-+	if (transfer->req_id == 0)
-+		goto done;
++static void map_handle_message_shift(struct map_data *map,
++							struct map_event *event,
++							const char *dest)
++{
++	struct map_msg *msg;
 +
-+	ret = g_obex_cancel_req(transfer->obex, transfer->req_id, FALSE);
- 	if (ret)
- 		return TRUE;
- 
++	if (!dest)
++		return;
++
++	msg = g_hash_table_lookup(map->messages, event->handle);
++
++	/* Change folder for existing messages; create non existing messages
++	 * only when they are moved into the current folder. */
++	if (msg)
++		set_folder(msg, dest);
++	else if (g_strcmp0(obc_session_get_folder(map->session), dest) == 0)
++		map_msg_create_from_event(map, event, dest);
++}
++
+ static void map_handle_notification(struct map_event *event, void *user_data)
+ {
+ 	struct map_data *map = user_data;
+@@ -1901,6 +1920,12 @@ static void map_handle_notification(struct map_event *event, void *user_data)
+ 	case MAP_ET_SENDING_FAILURE:
+ 		map_handle_status(map, event, "sending-failure");
+ 		break;
++	case MAP_ET_MESSAGE_DELETED:
++		map_handle_message_shift(map, event, "/telecom/msg/deleted");
++		break;
++	case MAP_ET_MESSAGE_SHIFT:
++		map_handle_message_shift(map, event, event->folder);
++		break;
+ 	default:
+ 		break;
+ 	}
 -- 
-1.8.3.1
+1.8.3.4
 
