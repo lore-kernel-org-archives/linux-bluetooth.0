@@ -1,61 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/1] obexd: Fix emitting Type property changed signals for messages
-Date: Tue, 24 Sep 2013 13:27:08 +0200
-Message-Id: <1380022028-31031-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <524155D9.4050807@linux.intel.com>
+Date: Tue, 24 Sep 2013 11:05:29 +0200
+From: Frederic Danis <frederic.danis@linux.intel.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] android: Android version of log.c
+References: <1379679871-29623-1-git-send-email-frederic.danis@linux.intel.com> <1379679871-29623-2-git-send-email-frederic.danis@linux.intel.com> <708DB870-5A40-4056-86C8-79092784757C@holtmann.org>
+In-Reply-To: <708DB870-5A40-4056-86C8-79092784757C@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+Hello Marcel,
 
-In order to determine if the message Type property has changed,
-the stored type needs to be compared with the parsed type and not with
-the raw value received from the MSE.
+On 21/09/2013 19:20, Marcel Holtmann wrote:
+<snip>
+>> @@ -110,10 +137,22 @@ int main(int argc, char *argv[])
+>> 	sa.sa_handler = signal_handler;
+>> 	sigaction(SIGINT, &sa, NULL);
+>> 	sigaction(SIGTERM, &sa, NULL);
+>> +	sigaction(SIGUSR2, &sa, NULL);
+>> +
+>> +	__btd_log_init(option_debug, option_detach);
+>> +
+>> +	/* no need to keep parsed option in memory */
+>> +	free_options();
+>> +
+>> +	DBG("Entering main loop");
+>
+> Don't do this debug. It is not helpful. The main() is so short, no point in logging that.
 
-This fixes the issue that the property changed signal for the Type
-property is emitted for every message on every ListMessage call.
----
- obexd/client/map.c | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+I need at least one DBG call to be able to build, otherwise I got 
+"undefined reference to `__start___debug'" error messages.
+So, this one seems ok to me.
 
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index 9fe872d..d349ef7 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -920,21 +920,22 @@ static void parse_recipient_address(struct map_msg *msg, const char *value)
- 
- static void parse_type(struct map_msg *msg, const char *value)
- {
--	if (g_strcmp0(msg->type, value) == 0)
--		return;
--
--	g_free(msg->type);
-+	const char *type = NULL;
- 
- 	if (strcasecmp(value, "SMS_GSM") == 0)
--		msg->type = g_strdup("sms-gsm");
-+		type = "sms-gsm";
- 	else if (strcasecmp(value, "SMS_CDMA") == 0)
--		msg->type = g_strdup("sms-cdma");
-+		type = "sms-cdma";
- 	else if (strcasecmp(value, "EMAIL") == 0)
--		msg->type = g_strdup("email");
-+		type = "email";
- 	else if (strcasecmp(value, "MMS") == 0)
--		msg->type = g_strdup("mms");
--	else
--		msg->type = NULL;
-+		type = "mms";
-+
-+	if (g_strcmp0(msg->type, type) == 0)
-+		return;
-+
-+	g_free(msg->type);
-+	msg->type = g_strdup(type);
- 
- 	g_dbus_emit_property_changed(conn, msg->path,
- 						MAP_MSG_INTERFACE, "Type");
+Regards
+
+Fred
+
 -- 
-1.8.3.4
-
+Frederic Danis                            Open Source Technology Center
+frederic.danis@intel.com                              Intel Corporation
