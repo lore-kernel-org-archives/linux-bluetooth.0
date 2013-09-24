@@ -1,44 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/8] Bluetooth: Cleanups and LE advertising support
-Date: Tue, 24 Sep 2013 17:02:35 +0300
-Message-Id: <1380031363-1266-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1380024798-32017-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1380024798-32017-1-git-send-email-frederic.danis@linux.intel.com>
+Date: Tue, 24 Sep 2013 08:57:24 -0400
+Message-ID: <CAJdJm_MJEd-tAfhQypGXd_yuAVZp=vNQ1Sa_wde3Co+uwyAxCg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] build: Add skeleton for BlueZ Android
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Frederic Danis <frederic.danis@linux.intel.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Frederic,
 
-This patch set is a combination of cleanups that I had in my tree
-(patches 1-3) a fix for set_powered (patch 4) and a new mgmt setting to
-allow enabling LE advertising (patches 5-8). What's still open is
-whether we want to rename the internal HCI_LE_PERIPHERAL flag to match
-the "advertising" name used for the mgmt setting, however that can be
-done as an independent patch on top of this set if necessary.
+On Tue, Sep 24, 2013 at 8:13 AM, Frederic Danis
+<frederic.danis@linux.intel.com> wrote:
+> --- /dev/null
+> +++ b/android/Android.mk
+> @@ -0,0 +1,5 @@
+> +LOCAL_PATH := $(call my-dir)
+> +
+> +# Retrieve BlueZ version from configure.ac file
+> +BLUEZ_VERSION := $(shell grep AC_INIT $(LOCAL_PATH)/../configure.ac | tr -d ' ' | sed -e 's/.*(.*,\(.*\))/\1/')
 
-I've tested this through my own additions to user space btmgmt and
-mgmt-tester tools. Once the general API is acked I'll push those
-additions to bluez.git.
+It also works if you use the C preprocessor to get the version:
 
-Johan
+BLUEZ_VERSION := $(shell grep ^AC_INIT $(LOCAL_PATH)/../configure.ac |
+cpp -P -D'AC_INIT(_,v)=v')
 
-----------------------------------------------------------------
-Johan Hedberg (8):
-      Bluetooth: Add clarifying comment to bt_sock_wait_state()
-      Bluetooth: Clean up socket locking in l2cap_sock_recvmsg
-      Bluetooth: Test for HCI_SETUP and HCI_USER_CHANNEL in mgmt_valid_hdev()
-      Bluetooth: Fix busy return for mgmt_set_powered in some cases
-      Bluetooth: Move mgmt response convenience functions to a better location
-      Bluetooth: Use async request for LE enable/disable
-      Bluetooth: Add new mgmt setting for LE advertising
-      Bluetooth: Add new mgmt_set_advertising command
 
- include/net/bluetooth/hci_core.h |   1 -
- include/net/bluetooth/mgmt.h     |   3 +
- net/bluetooth/af_bluetooth.c     |   1 +
- net/bluetooth/hci_core.c         |   4 +-
- net/bluetooth/hci_event.c        |  11 --
- net/bluetooth/l2cap_sock.c       |   5 +-
- net/bluetooth/mgmt.c             | 276 ++++++++++++++++++++++++++------------
- 7 files changed, 199 insertions(+), 102 deletions(-)
-
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
