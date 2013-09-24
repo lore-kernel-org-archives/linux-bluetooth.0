@@ -1,54 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 7/7] obexd: Prefix folders in event reports with leading slash
-Date: Tue, 24 Sep 2013 16:16:07 +0200
-Message-Id: <1380032167-6440-8-git-send-email-christian.fetzer@oss.bmw-carit.de>
-In-Reply-To: <1380032167-6440-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1380032167-6440-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH 0/7] MAP notification API
+Date: Tue, 24 Sep 2013 16:16:00 +0200
+Message-Id: <1380032167-6440-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-The internal representation of folder paths starts with a leading slash.
-Therefore we have to prepend it to the folders received in event reports.
----
- obexd/client/mns.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+This patchset adds the event handlers for new message, message shift/deleted
+and message status update events.
 
-diff --git a/obexd/client/mns.c b/obexd/client/mns.c
-index 76a5e24..ca44e5f 100644
---- a/obexd/client/mns.c
-+++ b/obexd/client/mns.c
-@@ -188,13 +188,25 @@ static void parse_event_report_handle(struct map_event *event,
- static void parse_event_report_folder(struct map_event *event,
- 							const char *value)
- {
--	event->folder = g_strdup(value);
-+	if (!value)
-+		return;
-+
-+	if (g_str_has_prefix(value, "/"))
-+		event->folder = g_strdup(value);
-+	else
-+		event->folder = g_strconcat("/", value, NULL);
- }
- 
- static void parse_event_report_old_folder(struct map_event *event,
- 							const char *value)
- {
--	event->old_folder = g_strdup(value);
-+	if (!value)
-+		return;
-+
-+	if (g_str_has_prefix(value, "/"))
-+		event->old_folder = g_strdup(value);
-+	else
-+		event->old_folder = g_strconcat("/", value, NULL);
- }
- 
- static void parse_event_report_msg_type(struct map_event *event,
+New messages are signaled by registering a corresponding message event, that
+is announced using the ObjectManager.
+
+For moved / deleted messages:
+  - If we have the Message interface, we simply update property 'Folder'.
+  - If the message was moved into the current folder, we register its
+    Message interface.
+
+The status update events change the property 'Status'.
+
+Note that this patchset depends on the changed map_msg_create function from
+'obexd: Fix setting message folder' sent on 23.09.2013.
+
+Christian Fetzer (7):
+  obexd: Handle new message event
+  obexd: Add function set_reception_status to MAP client
+  obexd: Handle message status events
+  obexd: Update Status property in map documentation
+  obexd: Add function set_folder to MAP client
+  obexd: Handle message shift and message deleted events
+  obexd: Prefix folders in event reports with leading slash
+
+ doc/obex-api.txt   | 10 ++++--
+ obexd/client/map.c | 99 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ obexd/client/mns.c | 16 +++++++--
+ 3 files changed, 120 insertions(+), 5 deletions(-)
+
 -- 
 1.8.3.4
 
