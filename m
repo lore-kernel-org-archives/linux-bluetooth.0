@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/7] obexd: Add function set_reception_status to MAP client
-Date: Tue, 24 Sep 2013 16:16:02 +0200
-Message-Id: <1380032167-6440-3-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Subject: [PATCH 7/7] obexd: Prefix folders in event reports with leading slash
+Date: Tue, 24 Sep 2013 16:16:07 +0200
+Message-Id: <1380032167-6440-8-git-send-email-christian.fetzer@oss.bmw-carit.de>
 In-Reply-To: <1380032167-6440-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 References: <1380032167-6440-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,34 +11,44 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 
-The function allows to change the status of a message.
+The internal representation of folder paths starts with a leading slash.
+Therefore we have to prepend it to the folders received in event reports.
 ---
- obexd/client/map.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ obexd/client/mns.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index 74c826e..ae7a334 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -1830,6 +1830,18 @@ static void map_msg_create_from_event(struct map_data *map,
- 		parse_type(msg, event->msg_type);
- }
- 
-+static void set_reception_status(struct map_msg *msg, const char *status)
-+{
-+	if (g_strcmp0(msg->status, status) == 0)
+diff --git a/obexd/client/mns.c b/obexd/client/mns.c
+index 76a5e24..ca44e5f 100644
+--- a/obexd/client/mns.c
++++ b/obexd/client/mns.c
+@@ -188,13 +188,25 @@ static void parse_event_report_handle(struct map_event *event,
+ static void parse_event_report_folder(struct map_event *event,
+ 							const char *value)
+ {
+-	event->folder = g_strdup(value);
++	if (!value)
 +		return;
 +
-+	g_free(msg->status);
-+	msg->status = g_strdup(status);
-+
-+	g_dbus_emit_property_changed(conn, msg->path, MAP_MSG_INTERFACE,
-+								"Status");
-+}
-+
- static void map_handle_new_message(struct map_data *map,
- 							struct map_event *event)
++	if (g_str_has_prefix(value, "/"))
++		event->folder = g_strdup(value);
++	else
++		event->folder = g_strconcat("/", value, NULL);
+ }
+ 
+ static void parse_event_report_old_folder(struct map_event *event,
+ 							const char *value)
  {
+-	event->old_folder = g_strdup(value);
++	if (!value)
++		return;
++
++	if (g_str_has_prefix(value, "/"))
++		event->old_folder = g_strdup(value);
++	else
++		event->old_folder = g_strconcat("/", value, NULL);
+ }
+ 
+ static void parse_event_report_msg_type(struct map_event *event,
 -- 
 1.8.3.4
 
