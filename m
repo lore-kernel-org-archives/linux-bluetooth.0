@@ -1,51 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH v5 2/2] Bluetooth: btmrvl: add calibration data download support
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <477F20668A386D41ADCC57781B1F70430F450779BE@SC-VEXCH1.marvell.com>
-Date: Tue, 24 Sep 2013 21:43:49 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	Mike Frysinger <vapier@chromium.org>,
-	Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
-	Amitkumar Karwar <akarwar@marvell.com>
-Message-Id: <C42E9D11-1E8B-499E-96E0-74469F7649EC@holtmann.org>
-References: <1379715667-22424-1-git-send-email-bzhao@marvell.com> <1379715667-22424-2-git-send-email-bzhao@marvell.com> <05172D80-CE30-4B7D-A64E-11B8E320EF7F@holtmann.org> <477F20668A386D41ADCC57781B1F70430F44C59423@SC-VEXCH1.marvell.com> <34088279-04B9-49D0-9387-88A602F518EC@holtmann.org> <477F20668A386D41ADCC57781B1F70430F450779BE@SC-VEXCH1.marvell.com>
-To: Bing Zhao <bzhao@marvell.com>
-Sender: linux-wireless-owner@vger.kernel.org
+From: Bing Zhao <bzhao@marvell.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+        "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+        Mike
+ Frysinger <vapier@chromium.org>,
+        Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
+        Amitkumar Karwar <akarwar@marvell.com>
+Date: Tue, 24 Sep 2013 12:42:57 -0700
+Subject: RE: [PATCH v5 1/2] Bluetooth: btmrvl: add setup handler
+Message-ID: <477F20668A386D41ADCC57781B1F70430F450779D4@SC-VEXCH1.marvell.com>
+References: <1379715667-22424-1-git-send-email-bzhao@marvell.com>
+ <18678858-E711-43E5-AFE6-E637D1CECFFB@holtmann.org>
+ <477F20668A386D41ADCC57781B1F70430F44C59418@SC-VEXCH1.marvell.com>
+ <DF6283E3-8476-400F-A230-CB7CA0F98564@holtmann.org>
+ <477F20668A386D41ADCC57781B1F70430F450779A4@SC-VEXCH1.marvell.com>
+ <20130924193010.GA2584@x220.p-661hnu-f1>
+In-Reply-To: <20130924193010.GA2584@x220.p-661hnu-f1>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bing,
+Hi Johan,
 
->>> The reason of not using __hci_cmd_sync() is that we are sending vendor specific command here
->> (MRVL_VENDOR_PKT). The __hci_cmd_sync seems handle HCI_COMMAND_PKT only.
->>> Please let us know if you have any suggestion to solve this problem.
->> 
->> what is a MRVL_VENDOR_PKT actually?
-> 
-> It's defined as 0xfe in our driver. The firmware doesn't understand 0xff (HCI_VENDOR_PKT).
+> Hi Bing,
+>=20
+> On Tue, Sep 24, 2013, Bing Zhao wrote:
+> > > that is a bug. It should only be ever called once. Could this be due
+> > > to RFKILL issue we had? Please re-test with Johan's patches applied
+> > > and check if it makes a difference. Otherwise please send some logs
+> > > since we want to get this fixed.
+> >
+> > Amitkumar Karwar has tested it with latest code on bluetooth-next tree
+> > but the result is the same.
+> > Apparently two threads race to call hci_dev_open(). If the thread from
+> > hci_sock calls hci_dev_open earlier, it ends up not updating HCI_SETUP
+> > hdev flag in hci_power_on(). This results that the setup handler gets
+> > called again when user brings up the interface later.
+>=20
+> Let's see if I understood this right: the only hci_dev_open call in
+> hci_sock.c is the one for the HCIDEVUP ioctl. So what you're doing is
+> having user space call the HCIDEVUP ioctl before our own hci_power_on
+> callback gets called to initialize the adapter?
 
-so it is actually out-of-channel vendor packet.
+That's right. The ioctl is initiated by the Bluetooth daemon.
+Amitkumar has a setup that can reproduce this corner case easily.
+I tested it on my Ubuntu but I couldn't replicate it.
 
->> 
->> If you guys are not using standard HCI command/event for vendor operation, then this obviously does
->> not fit. However a similar model might make sense instead of manually building packets all the time.
-> 
-> We can extend __hci_cmd_sync() function with a new parameter 'type'.
-> This way we can pass HCI_VENDOR_PKT into __hci_cmd_sync(), while other drivers will pass in HCI_COMMAND_PKT.
+>=20
+> You're right that we're missing the clearing of the HCI_SETUP flag for
+> such a scenario. Could you try the attached patch. It should fix the
+> issue. One problem that it does have is that if the HCIDEVUP ioctl path
+> goes through before hci_power_on gets called we will never notify mgmt
+> of the adapter. However, that might be acceptable here since if you're
+> using HCIDEVUP like this it seems it's not a mgmt based system anyway.
+>=20
+> > I checked the bluetooth-next tree, the following two patches (by
+> > Johan) are not present in this tree.
+> >
+> > bf54303 Bluetooth: Fix rfkill functionality during the HCI setup stage
+> > 5e13036 Bluetooth: Introduce a new HCI_RFKILLED flag
+> >
+> > They are in bluetooth.git tree. So, I'm not certain if Amitkumar has
+> > applied them manually or not. Anyway we will re-test with Johan's
+> > patches applied and confirm if they fix the race or not.
+>=20
+> I don't think these patches will help you in this case.
 
-That will actually not work. And I also do not want to do that. The __hci_cmd_sync() is for real HCI packets. That means types 0x01 and 0x04 only. They need to adhere to the HCI flow control mechanism for commands.
+OK, we will test your patch instead.
 
-> Our driver will make HCI_VENDOR_PKT -> MRVL_VENDOR_PKT conversion before downloading the frame to firmware. And the MRVL_VENDOR_PKT frame from firmware will be replaced with HCI_VENDOR_PKT while uploading the frame to stack.
-> 
-> Please let us know if this approach works for you or not.
-
-I think this is best kept inside the driver. However you might consider building something like __hci_cmd_sync() that is specific to your driver, but allows for a similar flow within ->setup().
-
-Regards
-
-Marcel
-
+Thanks,
+Bing
