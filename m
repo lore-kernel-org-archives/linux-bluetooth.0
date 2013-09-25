@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 4/7] Bluetooth: Move mgmt response convenience functions to a better location
-Date: Wed, 25 Sep 2013 13:26:07 +0300
-Message-Id: <1380104770-8022-5-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 6/7] Bluetooth: Add new mgmt setting for LE advertising
+Date: Wed, 25 Sep 2013 13:26:09 +0300
+Message-Id: <1380104770-8022-7-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1380104770-8022-1-git-send-email-johan.hedberg@gmail.com>
 References: <1380104770-8022-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,104 +11,105 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The settings_rsp and cmd_status_rsp functions can be useful for all mgmt
-command handlers when asynchronous request callbacks are used. They will
-e.g. be used by subsequent patches to change set_le to use an async
-request as well as a new set_advertising command. Therefore, move them
-higher up in the mgmt.c file to avoid unnecessary forward declarations
-or mixing this trivial change with other patches.
+This patch adds a new mgmt setting for LE advertising and hooks up the
+necessary places in the mgmt code to operate on the HCI_LE_PERIPHERAL
+flag (which corresponds to this setting). This patch does not yet add
+any new command for enabling the setting - that is left for a subsequent
+patch.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c | 60 ++++++++++++++++++++++++++--------------------------
- 1 file changed, 30 insertions(+), 30 deletions(-)
+ include/net/bluetooth/mgmt.h |  1 +
+ net/bluetooth/hci_event.c    |  1 +
+ net/bluetooth/mgmt.c         | 21 ++++++++++++++++++++-
+ 3 files changed, 22 insertions(+), 1 deletion(-)
 
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 9944c3e..6cc72b6 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -93,6 +93,7 @@ struct mgmt_rp_read_index_list {
+ #define MGMT_SETTING_BREDR		0x00000080
+ #define MGMT_SETTING_HS			0x00000100
+ #define MGMT_SETTING_LE			0x00000200
++#define MGMT_SETTING_ADVERTISING	0x00000400
+ 
+ #define MGMT_OP_READ_INFO		0x0004
+ #define MGMT_READ_INFO_SIZE		0
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 48db81f..917c7c8 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1000,6 +1000,7 @@ static void hci_cc_write_le_host_supported(struct hci_dev *hdev,
+ 		} else {
+ 			hdev->features[1][0] &= ~LMP_HOST_LE;
+ 			clear_bit(HCI_LE_ENABLED, &hdev->dev_flags);
++			clear_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags);
+ 		}
+ 
+ 		if (sent->simul)
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 85bfa21..61d4b19 100644
+index 4c3984e..9a2faa3 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -886,6 +886,36 @@ static int new_settings(struct hci_dev *hdev, struct sock *skip)
- 	return mgmt_event(MGMT_EV_NEW_SETTINGS, hdev, &ev, sizeof(ev), skip);
+@@ -384,8 +384,10 @@ static u32 get_supported_settings(struct hci_dev *hdev)
+ 	if (enable_hs)
+ 		settings |= MGMT_SETTING_HS;
+ 
+-	if (lmp_le_capable(hdev))
++	if (lmp_le_capable(hdev)) {
+ 		settings |= MGMT_SETTING_LE;
++		settings |= MGMT_SETTING_ADVERTISING;
++	}
+ 
+ 	return settings;
+ }
+@@ -424,6 +426,9 @@ static u32 get_current_settings(struct hci_dev *hdev)
+ 	if (test_bit(HCI_HS_ENABLED, &hdev->dev_flags))
+ 		settings |= MGMT_SETTING_HS;
+ 
++	if (test_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags))
++		settings |= MGMT_SETTING_ADVERTISING;
++
+ 	return settings;
  }
  
-+struct cmd_lookup {
-+	struct sock *sk;
-+	struct hci_dev *hdev;
-+	u8 mgmt_status;
-+};
+@@ -1411,6 +1416,11 @@ static int set_le(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ 			changed = true;
+ 		}
+ 
++		if (!val && test_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags)) {
++			clear_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags);
++			changed = true;
++		}
 +
-+static void settings_rsp(struct pending_cmd *cmd, void *data)
-+{
-+	struct cmd_lookup *match = data;
+ 		err = send_settings_rsp(sk, MGMT_OP_SET_LE, hdev);
+ 		if (err < 0)
+ 			goto unlock;
+@@ -1442,6 +1452,9 @@ static int set_le(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ 
+ 	hci_req_init(&req, hdev);
+ 
++	if (test_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags) && !val)
++		hci_req_add(&req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(val), &val);
 +
-+	send_settings_rsp(cmd->sk, cmd->opcode, match->hdev);
+ 	hci_req_add(&req, HCI_OP_WRITE_LE_HOST_SUPPORTED, sizeof(hci_cp),
+ 		    &hci_cp);
+ 
+@@ -3517,6 +3530,12 @@ static int powered_update_hci(struct hci_dev *hdev)
+ 				    sizeof(cp), &cp);
+ 	}
+ 
++	if (test_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags)) {
++		u8 adv = 0x01;
 +
-+	list_del(&cmd->list);
-+
-+	if (match->sk == NULL) {
-+		match->sk = cmd->sk;
-+		sock_hold(match->sk);
++		hci_req_add(&req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(adv), &adv);
 +	}
 +
-+	mgmt_pending_free(cmd);
-+}
-+
-+static void cmd_status_rsp(struct pending_cmd *cmd, void *data)
-+{
-+	u8 *status = data;
-+
-+	cmd_status(cmd->sk, cmd->index, cmd->opcode, *status);
-+	mgmt_pending_remove(cmd);
-+}
-+
- static int set_discoverable(struct sock *sk, struct hci_dev *hdev, void *data,
- 			    u16 len)
- {
-@@ -3374,14 +3404,6 @@ done:
- 	return err;
- }
- 
--static void cmd_status_rsp(struct pending_cmd *cmd, void *data)
--{
--	u8 *status = data;
--
--	cmd_status(cmd->sk, cmd->index, cmd->opcode, *status);
--	mgmt_pending_remove(cmd);
--}
--
- int mgmt_index_added(struct hci_dev *hdev)
- {
- 	if (!mgmt_valid_hdev(hdev))
-@@ -3402,28 +3424,6 @@ int mgmt_index_removed(struct hci_dev *hdev)
- 	return mgmt_event(MGMT_EV_INDEX_REMOVED, hdev, NULL, 0, NULL);
- }
- 
--struct cmd_lookup {
--	struct sock *sk;
--	struct hci_dev *hdev;
--	u8 mgmt_status;
--};
--
--static void settings_rsp(struct pending_cmd *cmd, void *data)
--{
--	struct cmd_lookup *match = data;
--
--	send_settings_rsp(cmd->sk, cmd->opcode, match->hdev);
--
--	list_del(&cmd->list);
--
--	if (match->sk == NULL) {
--		match->sk = cmd->sk;
--		sock_hold(match->sk);
--	}
--
--	mgmt_pending_free(cmd);
--}
--
- static void set_bredr_scan(struct hci_request *req)
- {
- 	struct hci_dev *hdev = req->hdev;
+ 	link_sec = test_bit(HCI_LINK_SECURITY, &hdev->dev_flags);
+ 	if (link_sec != test_bit(HCI_AUTH, &hdev->flags))
+ 		hci_req_add(&req, HCI_OP_WRITE_AUTH_ENABLE,
 -- 
 1.8.3.1
 
