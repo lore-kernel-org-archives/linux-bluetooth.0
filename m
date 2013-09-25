@@ -1,57 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 25 Sep 2013 13:28:26 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 7/8] Bluetooth: Add new mgmt setting for LE advertising
-Message-ID: <20130925102826.GA8101@x220.p-661hnu-f1>
-References: <1380031363-1266-1-git-send-email-johan.hedberg@gmail.com>
- <1380031363-1266-8-git-send-email-johan.hedberg@gmail.com>
- <CAJdJm_MDoR2ed6++x5JAxaG2=0+zUdAGztL_L3i-ObtaM+WbRA@mail.gmail.com>
- <20130924172120.GA30191@x220.p-661hnu-f1>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130924172120.GA30191@x220.p-661hnu-f1>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 4/7] Bluetooth: Move mgmt response convenience functions to a better location
+Date: Wed, 25 Sep 2013 13:26:07 +0300
+Message-Id: <1380104770-8022-5-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1380104770-8022-1-git-send-email-johan.hedberg@gmail.com>
+References: <1380104770-8022-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Tue, Sep 24, 2013, Johan Hedberg wrote:
-> On Tue, Sep 24, 2013, Anderson Lizardo wrote:
-> > On Tue, Sep 24, 2013 at 10:02 AM,  <johan.hedberg@gmail.com> wrote:
-> > > This patch adds a new mgmt setting for LE advertising and hooks up the
-> > > necessary places in the mgmt code to operate on the HCI_LE_PERIPHERAL
-> > > flag (which corresponds to this setting). This patch does not yet add
-> > > any new command for enabling the setting - that is left for a subsequent
-> > > patch.
-> > 
-> > How this code behaves if we enable/disable LE advertising using
-> > hciconfig hci0 leadv/noleadv? IIRC the LE_SET_ADV_ENABLE command will
-> > fail if advertising is already set on the controller.
-> 
-> You're right that a mix of mgmt and hciconfig will mix things up on the
-> kernel side. This is something I was aware of but didn't investigate
-> much further since I was assuming it would add too much complexity to
-> the code. The principle has always been that we keep compatibility/good
-> behavior with mixed mgmg/raw HCI access only as long as it doesn't
-> needlessly complicate the code.
-> 
-> That said, I'll take a another look if the flag setting could be moved
-> to a hci_event.c handler from the request callback without requiring the
-> addition of a second flag or state variable. This issue is not unique to
-> this new setting but actually exists for many of them. What we probably
-> need is a generic mgmt_send_new_settings function that hci_event.c
-> handlers can call when they know that new_settings should be emitted. I
-> suspect that might solve the issue.
+The settings_rsp and cmd_status_rsp functions can be useful for all mgmt
+command handlers when asynchronous request callbacks are used. They will
+e.g. be used by subsequent patches to change set_le to use an async
+request as well as a new set_advertising command. Therefore, move them
+higher up in the mgmt.c file to avoid unnecessary forward declarations
+or mixing this trivial change with other patches.
 
-So I did take another look and this gets tricky since we don't just need
-to emit a new_settings, but also ensure that it does not get emitted on
-the mgmt socket that may have caused the command to be sent. Therefore,
-I decided against trying to have "full" support of mixing mgmt with raw
-HCI. What I did do is ensure that our dev_flags remain correct by using
-the hci_event.c handler to set them. This ensures that subsequent mgmt
-commands still work even though bluetoothd may not always be completely
-up to date with these settings.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/mgmt.c | 60 ++++++++++++++++++++++++++--------------------------
+ 1 file changed, 30 insertions(+), 30 deletions(-)
 
-Johan
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 85bfa21..61d4b19 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -886,6 +886,36 @@ static int new_settings(struct hci_dev *hdev, struct sock *skip)
+ 	return mgmt_event(MGMT_EV_NEW_SETTINGS, hdev, &ev, sizeof(ev), skip);
+ }
+ 
++struct cmd_lookup {
++	struct sock *sk;
++	struct hci_dev *hdev;
++	u8 mgmt_status;
++};
++
++static void settings_rsp(struct pending_cmd *cmd, void *data)
++{
++	struct cmd_lookup *match = data;
++
++	send_settings_rsp(cmd->sk, cmd->opcode, match->hdev);
++
++	list_del(&cmd->list);
++
++	if (match->sk == NULL) {
++		match->sk = cmd->sk;
++		sock_hold(match->sk);
++	}
++
++	mgmt_pending_free(cmd);
++}
++
++static void cmd_status_rsp(struct pending_cmd *cmd, void *data)
++{
++	u8 *status = data;
++
++	cmd_status(cmd->sk, cmd->index, cmd->opcode, *status);
++	mgmt_pending_remove(cmd);
++}
++
+ static int set_discoverable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			    u16 len)
+ {
+@@ -3374,14 +3404,6 @@ done:
+ 	return err;
+ }
+ 
+-static void cmd_status_rsp(struct pending_cmd *cmd, void *data)
+-{
+-	u8 *status = data;
+-
+-	cmd_status(cmd->sk, cmd->index, cmd->opcode, *status);
+-	mgmt_pending_remove(cmd);
+-}
+-
+ int mgmt_index_added(struct hci_dev *hdev)
+ {
+ 	if (!mgmt_valid_hdev(hdev))
+@@ -3402,28 +3424,6 @@ int mgmt_index_removed(struct hci_dev *hdev)
+ 	return mgmt_event(MGMT_EV_INDEX_REMOVED, hdev, NULL, 0, NULL);
+ }
+ 
+-struct cmd_lookup {
+-	struct sock *sk;
+-	struct hci_dev *hdev;
+-	u8 mgmt_status;
+-};
+-
+-static void settings_rsp(struct pending_cmd *cmd, void *data)
+-{
+-	struct cmd_lookup *match = data;
+-
+-	send_settings_rsp(cmd->sk, cmd->opcode, match->hdev);
+-
+-	list_del(&cmd->list);
+-
+-	if (match->sk == NULL) {
+-		match->sk = cmd->sk;
+-		sock_hold(match->sk);
+-	}
+-
+-	mgmt_pending_free(cmd);
+-}
+-
+ static void set_bredr_scan(struct hci_request *req)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+-- 
+1.8.3.1
+
