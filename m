@@ -1,59 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Sender: AceLan Kao <acelan@gmail.com>
-From: AceLan Kao <acelan.kao@canonical.com>
-To: linux-bluetooth@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: [PATCH] Bluetooth: ath3k: enlarge the usb urb timeout
-Date: Thu, 26 Sep 2013 13:02:46 +0800
-Message-Id: <1380171766-21845-1-git-send-email-acelan.kao@canonical.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH v5 1/2] Bluetooth: btmrvl: add setup handler
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <477F20668A386D41ADCC57781B1F70430F45077E5B@SC-VEXCH1.marvell.com>
+Date: Thu, 26 Sep 2013 03:45:27 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	"linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	"linux-wireless@vger.kernel.org Wireless"
+	<linux-wireless@vger.kernel.org>,
+	Mike Frysinger <vapier@chromium.org>,
+	Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
+	Amitkumar Karwar <akarwar@marvell.com>
+Message-Id: <B3090D30-6F81-4E12-8F58-E650F77BB72E@holtmann.org>
+References: <1379715667-22424-1-git-send-email-bzhao@marvell.com> <18678858-E711-43E5-AFE6-E637D1CECFFB@holtmann.org> <477F20668A386D41ADCC57781B1F70430F44C59418@SC-VEXCH1.marvell.com> <DF6283E3-8476-400F-A230-CB7CA0F98564@holtmann.org> <477F20668A386D41ADCC57781B1F70430F450779A4@SC-VEXCH1.marvell.com> <20130924193010.GA2584@x220.p-661hnu-f1> <477F20668A386D41ADCC57781B1F70430F45077E5B@SC-VEXCH1.marvell.com>
+To: Bing Zhao <bzhao@marvell.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We encountered a issue that the time is not sufficient to load the firmware.
+Hi Bing,
 
-[   14.646698] Bluetooth: Error in firmware loading err = -110,len = 448, size = 4096
-[   14.646710] Bluetooth: Loading patch file failed
-[   14.646719] ath3k: probe of 3-4:1.0 failed with error -110
+>> You're right that we're missing the clearing of the HCI_SETUP flag for
+>> such a scenario. Could you try the attached patch. It should fix the
+> 
+> We have tested your patch. Yes, it fixes the problem. Thanks!
 
-And according to the log, it needs 10 times time to finish the transfer,
-so, enlarge the timeout 10 times to overcome it.
+then lets get a proper version with full commit message explaining the issue merged upstream. As I said, this is a real bug we need to fix.
 
-Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
----
- drivers/bluetooth/ath3k.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+>> issue. One problem that it does have is that if the HCIDEVUP ioctl path
+>> goes through before hci_power_on gets called we will never notify mgmt
+>> of the adapter. However, that might be acceptable here since if you're
+>> using HCIDEVUP like this it seems it's not a mgmt based system anyway.
+> 
+> Do you think the following change helps?
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 3d9f02b..24814b0 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1665,7 +1665,7 @@ static void hci_power_on(struct work_struct *work)
+> 	BT_DBG("%s", hdev->name);
+> 
+> 	err = hci_dev_open(hdev->id);
+> -	if (err < 0) {
+> +	if (err < 0 && err != -EALREADY) {
+> 		mgmt_set_powered_failed(hdev, err);
+> 		return;
+> 	}
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index a12b923..2047deb 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -49,6 +49,8 @@
- #define ATH3K_XTAL_FREQ_19P2			0x02
- #define ATH3K_NAME_LEN				0xFF
- 
-+#define USB_URB_TIMEOUT				30000
-+
- struct ath3k_version {
- 	unsigned int	rom_version;
- 	unsigned int	build_version;
-@@ -182,7 +184,7 @@ static int ath3k_load_firmware(struct usb_device *udev,
- 		memcpy(send_buf, firmware->data + sent, size);
- 
- 		err = usb_bulk_msg(udev, pipe, send_buf, size,
--					&len, 3000);
-+					&len, USB_URB_TIMEOUT);
- 
- 		if (err || (len != size)) {
- 			BT_ERR("Error in firmware loading err = %d,"
-@@ -279,7 +281,7 @@ static int ath3k_load_fwfile(struct usb_device *udev,
- 		memcpy(send_buf, firmware->data + sent, size);
- 
- 		err = usb_bulk_msg(udev, pipe, send_buf, size,
--					&len, 3000);
-+					&len, USB_URB_TIMEOUT);
- 		if (err || (len != size)) {
- 			BT_ERR("Error in firmware loading err = %d,"
- 				"len = %d, size = %d", err, len, size);
--- 
-1.8.3.2
+I am more and more convinced that we might just need to disable certain ioctl in case there is a mgmt socket/client present and HCI_MGMT is set. Trying to be graceful with legacy ioctl that BlueZ 5 will never use anymore seems to come at a too high cost. I rather fail on the legacy commands with a proper error than having mgmt interface behave inconsistent.
+
+We might actually be able to keep HCIDEVUP and HCIDEVDOWN around, but then they need to behave like mgmt set powered command. So both commands need to go through the same mgmt engine for this.
+
+Regards
+
+Marcel
+
