@@ -1,58 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1379928269-14651-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-References: <1379928269-14651-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
-Date: Thu, 26 Sep 2013 16:01:12 +0300
-Message-ID: <CABBYNZ+_-3akDp7r7Q3fbeAveiQS3tJ7CS1P71qsTEnxQu8rOA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/4] obexd: Fix setting message folder
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Sender: acelan@gmail.com
+In-Reply-To: <1380171766-21845-1-git-send-email-acelan.kao@canonical.com>
+References: <1380171766-21845-1-git-send-email-acelan.kao@canonical.com>
+Date: Thu, 26 Sep 2013 17:27:08 +0800
+Message-ID: <CAMz9Wg-fekAJNGsYr_tO0zvX4NOx3H9bTrjgMuN3cRO_rUjb6Q@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: ath3k: enlarge the usb urb timeout
+From: AceLan Kao <acelan.kao@canonical.com>
+To: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+Hi all,
 
-On Mon, Sep 23, 2013 at 12:24 PM, Christian Fetzer
-<christian.fetzer@oss.bmw-carit.de> wrote:
-> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
->
-> This fixes an issue that the folder property for messages was set incorrectly
-> when ListMessages got called with a subfolder parameter.
->
-> Calling ListMessages within /telecom/msg for the subfolder inbox would set the
-> folder property to /telecom/msg instead of /telecom/msg/inbox.
->
-> The patchset therefore changes map_msg_create to not set the folder property
-> to the current folder, but to a folder given as parameter. This change will be
-> needed as well for new message notifications (that can indicate new messages
-> for any folder).
->
-> In addition I've updated the documentation to clarify that the folder property
-> for ListMessages and PushMessage can be used only for a subfolder of the
-> current folder. It's not possible to specify an absolute or relative path.
->
-> --
-> v2: Store folder in MAP pending request
->
-> Christian Fetzer (4):
->   obexd: Add folder property to map_msg_create
->   obexd: Fix setting message folder for relative folder in ListMessages
->   obexd: Clarify the folder property of ListMessages
->   obexd: Clarify the folder property of PushMessage
->
->  doc/obex-api.txt   |  8 +++++---
->  obexd/client/map.c | 22 +++++++++++++++++++---
->  2 files changed, 24 insertions(+), 6 deletions(-)
->
-> --
-> 1.8.3.4
+Sorry, please ignore this patch.
+This is not the root cause, and it didn't fix the issue.
 
-All 4 patches are now applied, but Ive done some changes to
-get_absolute_folder so to have less lines breaks so it looks more
-readable now.
+Best regards,
+AceLan Kao.
+
+
+2013/9/26 AceLan Kao <acelan.kao@canonical.com>:
+> We encountered a issue that the time is not sufficient to load the firmware.
+>
+> [   14.646698] Bluetooth: Error in firmware loading err = -110,len = 448, size = 4096
+> [   14.646710] Bluetooth: Loading patch file failed
+> [   14.646719] ath3k: probe of 3-4:1.0 failed with error -110
+>
+> And according to the log, it needs 10 times time to finish the transfer,
+> so, enlarge the timeout 10 times to overcome it.
+>
+> Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+> ---
+>  drivers/bluetooth/ath3k.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+> index a12b923..2047deb 100644
+> --- a/drivers/bluetooth/ath3k.c
+> +++ b/drivers/bluetooth/ath3k.c
+> @@ -49,6 +49,8 @@
+>  #define ATH3K_XTAL_FREQ_19P2                   0x02
+>  #define ATH3K_NAME_LEN                         0xFF
+>
+> +#define USB_URB_TIMEOUT                                30000
+> +
+>  struct ath3k_version {
+>         unsigned int    rom_version;
+>         unsigned int    build_version;
+> @@ -182,7 +184,7 @@ static int ath3k_load_firmware(struct usb_device *udev,
+>                 memcpy(send_buf, firmware->data + sent, size);
+>
+>                 err = usb_bulk_msg(udev, pipe, send_buf, size,
+> -                                       &len, 3000);
+> +                                       &len, USB_URB_TIMEOUT);
+>
+>                 if (err || (len != size)) {
+>                         BT_ERR("Error in firmware loading err = %d,"
+> @@ -279,7 +281,7 @@ static int ath3k_load_fwfile(struct usb_device *udev,
+>                 memcpy(send_buf, firmware->data + sent, size);
+>
+>                 err = usb_bulk_msg(udev, pipe, send_buf, size,
+> -                                       &len, 3000);
+> +                                       &len, USB_URB_TIMEOUT);
+>                 if (err || (len != size)) {
+>                         BT_ERR("Error in firmware loading err = %d,"
+>                                 "len = %d, size = %d", err, len, size);
+> --
+> 1.8.3.2
+>
+
 
 
 -- 
-Luiz Augusto von Dentz
+Chia-Lin Kao(AceLan)
+http://blog.acelan.idv.tw/
+E-Mail: acelan.kaoATcanonical.com (s/AT/@/)
