@@ -1,112 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC] audio/AVCTP: Retry rejected outgoing connect if incoming was rejected
-Date: Thu, 26 Sep 2013 15:54:02 +0200
-Message-ID: <1380203642-26401-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1379928269-14651-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1379928269-14651-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Date: Thu, 26 Sep 2013 16:01:12 +0300
+Message-ID: <CABBYNZ+_-3akDp7r7Q3fbeAveiQS3tJ7CS1P71qsTEnxQu8rOA@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] obexd: Fix setting message folder
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Incoming AVCTP connection is rejected when there is outgoing connection
-in progress. It is possible that remote device will do the same and
-AVCTP will not be connected at all. In such case retry outgoing
-connection if it was rejected by remote and in the meantime incoming
-connection was rejected by bluetoothd.
+Hi Christian,
 
-profiles/audio/avrcp.c:avrcp_connect() path /org/bluez/hci0/
-    dev_00_1E_DE_21_85_6A
-profiles/audio/avctp.c:avctp_set_state() AVCTP Connecting
-profiles/audio/sink.c:sink_set_state() State changed
-    /org/bluez/hci0/dev_00_1E_DE_21_85_6A: SINK_STATE_CONNECTING ->
-    SINK_STATE_CONNECTED
-profiles/audio/transport.c:transport_update_playing()
-    /org/bluez/hci0/dev_00_1E_DE_21_85_6A/fd1
-    State=TRANSPORT_STATE_IDLE Playing=0
-profiles/audio/avctp.c:avctp_confirm_cb() AVCTP: incoming connect
-    from 00:1E:DE:21:85:6A
-Control: Refusing unexpected connect
-profiles/audio/avctp.c:avctp_set_state() AVCTP Disconnected
-connect error: Connection refused (111)
+On Mon, Sep 23, 2013 at 12:24 PM, Christian Fetzer
+<christian.fetzer@oss.bmw-carit.de> wrote:
+> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
+>
+> This fixes an issue that the folder property for messages was set incorrectly
+> when ListMessages got called with a subfolder parameter.
+>
+> Calling ListMessages within /telecom/msg for the subfolder inbox would set the
+> folder property to /telecom/msg instead of /telecom/msg/inbox.
+>
+> The patchset therefore changes map_msg_create to not set the folder property
+> to the current folder, but to a folder given as parameter. This change will be
+> needed as well for new message notifications (that can indicate new messages
+> for any folder).
+>
+> In addition I've updated the documentation to clarify that the folder property
+> for ListMessages and PushMessage can be used only for a subfolder of the
+> current folder. It's not possible to specify an absolute or relative path.
+>
+> --
+> v2: Store folder in MAP pending request
+>
+> Christian Fetzer (4):
+>   obexd: Add folder property to map_msg_create
+>   obexd: Fix setting message folder for relative folder in ListMessages
+>   obexd: Clarify the folder property of ListMessages
+>   obexd: Clarify the folder property of PushMessage
+>
+>  doc/obex-api.txt   |  8 +++++---
+>  obexd/client/map.c | 22 +++++++++++++++++++---
+>  2 files changed, 24 insertions(+), 6 deletions(-)
+>
+> --
+> 1.8.3.4
 
-This fix connecting to Nokia BH-505 headset.
----
- profiles/audio/avctp.c | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+All 4 patches are now applied, but Ive done some changes to
+get_absolute_folder so to have less lines breaks so it looks more
+readable now.
 
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 845027f..d9b798c 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -202,6 +202,8 @@ struct avctp {
- 	uint8_t key_quirks[256];
- 	struct key_pressed key;
- 	bool initiator;
-+
-+	bool incoming_refused;
- };
- 
- struct avctp_passthrough_handler {
-@@ -1162,6 +1164,36 @@ fail:
- 	}
- }
- 
-+static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data);
-+
-+static bool retry_control_connect(struct avctp *session)
-+{
-+	GIOChannel *io;
-+
-+	info ("Control: retrying to connect");
-+
-+	if (session->control) {
-+		avctp_channel_destroy(session->control);
-+		session->control = NULL;
-+	}
-+
-+	io = bt_io_connect(avctp_connect_cb, session, NULL, NULL,
-+				BT_IO_OPT_SOURCE_BDADDR,
-+				adapter_get_address(session->server->adapter),
-+				BT_IO_OPT_DEST_BDADDR,
-+				device_get_address(session->device),
-+				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
-+				BT_IO_OPT_PSM, AVCTP_CONTROL_PSM,
-+				BT_IO_OPT_INVALID);
-+	if (io == NULL)
-+		return false;
-+
-+	session->control = avctp_channel_create(session, io, NULL);
-+	g_io_channel_unref(io);
-+
-+	return true;
-+}
-+
- static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
- {
- 	struct avctp *session = data;
-@@ -1170,6 +1202,11 @@ static void avctp_connect_cb(GIOChannel *chan, GError *err, gpointer data)
- 	GError *gerr = NULL;
- 
- 	if (err) {
-+		if (session->incoming_refused && err->code == ECONNREFUSED) {
-+			if (retry_control_connect(session))
-+				return;
-+		}
-+
- 		avctp_set_state(session, AVCTP_STATE_DISCONNECTED);
- 		error("%s", err->message);
- 		return;
-@@ -1301,6 +1338,8 @@ static void avctp_control_confirm(struct avctp *session, GIOChannel *chan,
- 	if (session->control != NULL) {
- 		error("Control: Refusing unexpected connect");
- 		g_io_channel_shutdown(chan, TRUE, NULL);
-+
-+		session->incoming_refused = session->initiator;
- 		return;
- 	}
- 
+
 -- 
-1.8.4
-
+Luiz Augusto von Dentz
