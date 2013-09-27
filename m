@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 10/16] android: Add Android Makefile for libbluetooth
-Date: Fri, 27 Sep 2013 17:12:35 +0300
-Message-Id: <1380291161-10232-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFC 09/16] android: Add adapter and device struct for BlueZ daemon
+Date: Fri, 27 Sep 2013 17:12:34 +0300
+Message-Id: <1380291161-10232-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,74 +11,224 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Build libbluetooth library for Android.
+Adapter structure in BlueZ daemon keeps track of default adapter
+and device structure keeps track about found devices.
 ---
- android/Android.mk |   55 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 55 insertions(+)
+ android/bt_adapter.c |  129 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/bt_adapter.h |   68 ++++++++++++++++++++++++++
+ 2 files changed, 197 insertions(+)
+ create mode 100644 android/bt_adapter.c
+ create mode 100644 android/bt_adapter.h
 
-diff --git a/android/Android.mk b/android/Android.mk
-index e892249..36f8798 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -84,3 +84,58 @@ LOCAL_CFLAGS += -DSOCK_CLOEXEC=02000000 -DSOCK_NONBLOCK=04000
- LOCAL_MODULE    := libbluez
- 
- include $(BUILD_SHARED_LIBRARY)
+diff --git a/android/bt_adapter.c b/android/bt_adapter.c
+new file mode 100644
+index 0000000..9f64839
+--- /dev/null
++++ b/android/bt_adapter.c
+@@ -0,0 +1,129 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+#
-+# libbluetooth library
-+#
++#include "bt_adapter.h"
++#include "log.h"
++#include "src/shared/mgmt.h"
 +
-+include $(CLEAR_VARS)
++struct bt_device *bt_device_ref(struct bt_device *device)
++{
++	DBG("");
 +
-+LOCAL_SRC_FILES := \
-+	../lib/bluetooth.c \
-+	../lib/sdp.c \
-+	../lib/hci.c \
-+	../lib/uuid.c \
++	__sync_fetch_and_add(&device->refcnt, 1);
 +
-+LOCAL_C_INCLUDES := \
-+	$(LOCAL_PATH)/../lib/ \
-+	$(LOCAL_PATH)/../src/shared \
++	return device;
++}
 +
-+LOCAL_C_INCLUDES += \
-+	$(call include-path-for, glib) \
-+	$(call include-path-for, glib)/glib \
++void bt_device_unref(struct bt_device *device)
++{
++	DBG("");
 +
-+LOCAL_CFLAGS += -O3
++	if (__sync_sub_and_fetch(&device->refcnt, 1))
++		return;
 +
-+# to suppress the "pointer of type 'void *' used in arithmetic" warning
-+LOCAL_CFLAGS += -Wno-pointer-arith
++	/* TODO: */
++	DBG("%s: Freeing device %p name %s", __func__, device, device->name);
 +
-+# to suppress the "missing initializer near initialization" warning
-+LOCAL_CFLAGS += -Wno-missing-field-initializers
++	free(device->name);
++	free(device);
++}
 +
-+# to suppress the "may be used uninitialized in this function" warning
-+LOCAL_CFLAGS += -Wno-maybe-uninitialized
++struct bt_adapter *bt_adapter_lookup(uint16_t index)
++{
++	GList *list;
 +
-+# Define missing flags for Android 4.2
-+LOCAL_CFLAGS += -DSOCK_CLOEXEC=02000000 -DSOCK_NONBLOCK=04000
++	for (list = g_list_first(adapter_list); list;
++						list = g_list_next(list)) {
++		struct bt_adapter *adapter = list->data;
 +
-+lib_headers := \
-+	bluetooth.h \
-+	hci.h \
-+	hci_lib.h \
-+	sco.h \
-+	l2cap.h \
-+	sdp.h \
-+	sdp_lib.h \
-+	rfcomm.h \
-+	bnep.h \
-+	cmtp.h \
-+	hidp.h \
++		if (adapter->dev_id == index)
++			return adapter;
++	}
 +
-+$(shell mkdir -p $(LOCAL_PATH)/bluetooth)
++	return NULL;
++}
 +
-+$(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(LOCAL_PATH)/bluetooth/$(file)))
++struct bt_adapter *bt_adapter_ref(struct bt_adapter *adapter)
++{
++	DBG("");
 +
-+LOCAL_MODULE := libbluetooth
++	__sync_fetch_and_add(&adapter->refcnt, 1);
 +
-+include $(BUILD_SHARED_LIBRARY)
++	return adapter;
++}
++
++static void bt_adapter_free(struct bt_adapter *adapter)
++{
++	DBG("");
++
++	while (adapter->found_devices) {
++		struct bt_device *device = adapter->found_devices->data;
++
++		adapter->found_devices = g_list_remove(adapter->found_devices,
++								device);
++		bt_device_unref(device);
++	}
++
++	mgmt_unref(adapter->mgmt);
++	free(adapter);
++}
++
++void bt_adapter_unref(struct bt_adapter *adapter)
++{
++	DBG("");
++
++	if (__sync_sub_and_fetch(&adapter->refcnt, 1))
++		return;
++
++	bt_adapter_free(adapter);
++}
++
++struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if)
++{
++	struct bt_adapter *adapter;
++
++	adapter = g_try_new0(struct bt_adapter, 1);
++	if (!adapter)
++		return NULL;
++
++	adapter->dev_id = index;
++	adapter->mgmt = mgmt_ref(mgmt_if);
++
++	return bt_adapter_ref(adapter);
++}
++
++void adapter_start(struct bt_adapter *adapter)
++{
++	DBG("enabled %u", adapter->dev_id);
++
++	/* TODO: CB: report scan mode */
++
++	/* TODO: SDP start here */
++
++	/* TODO: CB: report state on */
++}
++
++void adapter_stop(struct bt_adapter *adapter)
++{
++	DBG("disabled %u", adapter->dev_id);
++}
+diff --git a/android/bt_adapter.h b/android/bt_adapter.h
+new file mode 100644
+index 0000000..5634729
+--- /dev/null
++++ b/android/bt_adapter.h
+@@ -0,0 +1,68 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <glib.h>
++
++#include "lib/bluetooth.h"
++
++struct bt_device {
++	int refcnt;
++
++	bdaddr_t bdaddr;
++	uint8_t bdaddr_type;
++	uint32_t cod;
++	char *name;
++};
++
++struct bt_adapter {
++	int refcnt;
++
++	uint16_t dev_id;
++	struct mgmt *mgmt;
++	bdaddr_t bdaddr;
++	uint32_t dev_class;
++
++	char *name;
++	char *short_name;
++
++	uint32_t supported_settings;
++	uint32_t current_settings;
++
++	GList *found_devices;
++};
++
++extern GList *adapter_list;
++
++struct bt_adapter *bt_adapter_lookup(uint16_t index);
++struct bt_adapter *bt_adapter_ref(struct bt_adapter *adapter);
++void bt_adapter_unref(struct bt_adapter *adapter);
++struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if);
++
++struct bt_device *bt_device_ref(struct bt_device *device);
++void bt_device_unref(struct bt_device *device);
++
++void adapter_start(struct bt_adapter *adapter);
++void adapter_stop(struct bt_adapter *adapter);
 -- 
 1.7.10.4
 
