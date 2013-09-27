@@ -1,57 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 27 Sep 2013 14:45:06 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/8] Bluetooth: Test for HCI_SETUP and HCI_USER_CHANNEL
- in mgmt_valid_hdev()
-Message-ID: <20130927114506.GA19210@x220.p-661hnu-f1>
-References: <1380031363-1266-1-git-send-email-johan.hedberg@gmail.com>
- <1380031363-1266-4-git-send-email-johan.hedberg@gmail.com>
- <DFCF34C2-5AA9-4644-BB4B-3D6073DA9D42@holtmann.org>
- <20130925100353.GA3158@x220.p-661hnu-f1>
- <C7C45B32-4EF9-4FD7-B774-E88917DFAC75@holtmann.org>
+Date: Fri, 27 Sep 2013 14:04:43 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth 2013-09-23
+Message-ID: <20130927180443.GA10994@tuxdriver.com>
+References: <20130923210049.GG18215@joana>
+ <20130926174750.GB1931@tuxdriver.com>
+ <20130927152413.GC13211@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <C7C45B32-4EF9-4FD7-B774-E88917DFAC75@holtmann.org>
+In-Reply-To: <20130927152413.GC13211@joana>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-On Fri, Sep 27, 2013, Marcel Holtmann wrote:
-> >>> If either one of the HCI_SETUP or HCI_USER_CHANNEL flags is set the
-> >>> device is not considered valid for mgmt. By having these checks inside
-> >>> the mgmt_valid_hdev function the a couple of places using it can be
-> >>> simplified.
-> >> 
-> >> I looked at doing this and decided not to. Reason was that the device
-> >> gets removed from mgmt anyway.
-> > 
-> > I'm not sure what significance you think "device gets removed from mgmt"
-> > has. All that is is a mgmt event saying that index has been removed. In
-> > addition to that we need to ensure that we don't send any more mgmt
-> > events for such devices and that we don't include such devices in the
-> > response to mgmt_read_index list.
-> > 
-> > These are the two places of the code that my patch simplifies, one is
-> > the check for whether to send a "power on" mgmt event and the other the
-> > response handling of read_index_list.
+On Fri, Sep 27, 2013 at 12:24:13PM -0300, Gustavo Padovan wrote:
+> Hi John,
 > 
-> I have taken care of that part. It is done inside mgmt_control() and
-> in case of a controller in user channel mode it returns invalid index.
+> 2013-09-26 John W. Linville <linville@tuxdriver.com>:
+> 
+> > On Mon, Sep 23, 2013 at 06:00:49PM -0300, Gustavo Padovan wrote:
 
-That's great, but it doesn't cover the read_index_list command which we
-were talking about here since the command doesn't target any specific
-controller (as per our mgmt-api.txt it has the value <non-controller> as
-the controller index). The command handler will in this case be invoked
-that that's where it'd be convenient to rely on mgmt_valid_hdev() for
-constructing the response.
+> > > The following changes since commit f4e1a4d3ecbb9e42bdf8e7869ee8a4ebfa27fb20:
+> > > 
+> > >   rt2800: change initialization sequence to fix system freeze (2013-09-09 14:44:34 -0400)
+> > > 
+> > > are available in the git repository at:
+> > > 
+> > >   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
+> > > 
+> > > for you to fetch changes up to 5bcecf325378218a8e248bb6bcae96ec7362f8ef:
+> > > 
+> > >   Bluetooth: btusb: Add support for Belkin F8065bf (2013-09-23 17:44:25 -0300)
+> > 
+> > Pulling now...
+> 
+> Thanks for pulling. However as Stephen pointed out in the linux-next merge
+> conflict email from today we have a style issue, a closing brace bad indented.
+> This is from conflict resolution I made last week. I fixed it when merging
+> bluetooth.git into bluetooth-next.git. 
+> 
+> So when pushing this to Dave could you please tell him about this issue and
+> that the fix is already provided by bluetooth-next. Do you agree with this
+> solution?
 
-> For the events, I have no idea on how we would generate events if we
-> are not going through hci_event.c when the user channel is active.
+I fixed it in my merge for Dave -- I think that will be fine.
 
-The "powered on" event in question doesn't come from hci_event.c but
-from the hci_dev_open() function, so again this is not covered by the
-existing user channel checks.
-
-Johan
+John
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
