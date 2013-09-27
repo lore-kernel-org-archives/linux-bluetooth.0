@@ -1,59 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH 1/2] android: Add skeleton of BlueZ Android daemon
+Subject: Re: Problems with too many connections
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20130924073124.GA26962@aemeltch-MOBL1>
-Date: Fri, 27 Sep 2013 03:56:14 +0200
-Cc: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>,
-	Frederic Danis <frederic.danis@linux.intel.com>,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <188944FA-9CB2-433B-A3D2-D706DBD6E1BD@holtmann.org>
-References: <1379679871-29623-1-git-send-email-frederic.danis@linux.intel.com> <226042C8-264A-469E-8D6A-F41141DC0552@holtmann.org> <52400F2B.9010501@linux.intel.com> <CAN_7+YYSLwsPTfJoYwJKcVtP6EMxOeD8MHox+Pvzcrk_YKcSaQ@mail.gmail.com> <20130924073124.GA26962@aemeltch-MOBL1>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+In-Reply-To: <CAOJw-HaHLZsbgCGi_e1ZspAf_16gKQuC6N7JM+5boWxQHCXWFQ@mail.gmail.com>
+Date: Fri, 27 Sep 2013 03:53:00 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <A43EED3E-8B1F-4C4C-B7A9-26065DE55928@holtmann.org>
+References: <CAOJw-HaHLZsbgCGi_e1ZspAf_16gKQuC6N7JM+5boWxQHCXWFQ@mail.gmail.com>
+To: Markus Roppelt <markus.roppelt@peus-testing.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Markus,
 
->>>>> Define local mapping to glib path, otherwise this has to be inside
->>>>> central
->>>>> place in the build repository.
->>>>> 
->>>>> Retrieve Bluetooth version from configure.ac.
->>>>> ---
->>>>> .gitignore         |    2 +
->>>>> Android.mk         |    9 ++++
->>>>> Makefile.am        |    1 +
->>>>> Makefile.android   |    7 ++++
->>>>> android/Android.mk |   24 +++++++++++
->>>>> android/main.c     |  119
->>>>> ++++++++++++++++++++++++++++++++++++++++++++++++++++
->>>>> configure.ac       |    5 +++
->>>>> 7 files changed, 167 insertions(+)
->>>>> create mode 100644 Android.mk
->>>>> create mode 100644 Makefile.android
->>>>> create mode 100644 android/Android.mk
->>>>> create mode 100644 android/main.c
->>>> 
->>>> 
->>>> lets split this out a little bit. Code additions should not be intermixed
->>>> with additions to the build system and especially configure options.
->>>> 
->>>> I rather not have a top-level Android.mk. It should be enough to provide
->>>> an android/Android.mk.
->> 
->> BTW, do you expect to have only one Android.mk for the whole project or
->> this is OK for you to have smaller Android.mk in different subfolders like
->> /src/shared etc. Both ways are valid.
+> I want to write an application which repeats the following procedure
+> for several (100+) bluetooth (low energy) devices:
 > 
-> While having a single huge Android makefile is somehow make sense it would have
-> several disadvantages:
-> - we cannot use local build with "mm" for building for example only tools
->  or libs
-> - Android.mk will become very large and difficult to read
+> 1. connect
+> 2. read register values
+> 3. disconnect
+> 
+> Therefore I modified the source code from /attrib/interactive.c.  For
+> testing purposes I am only looping  over one device. See attached
+> source code.
+> 
+> The code works fine. It connects, reads the values and disconnects.
+> However, after 1020 repetitions, the following error occurs:
+> (process:10205): GLib-WARNING **: poll(2) failed due to: Invalid argument.
+> 
+> I think the problem has to do with some sockets / file descriptors not
+> being closed properly.
+> 
+> Can someone help me to get this fixed?
 
-I have no idea what this means. Lets start with a single android/Android.mk and then go from there. I am strictly against cluttering the whole project with Android specific make files.
+have you considered trying to write this from scratch and not basing this off existing code.
+
+And yes, this will be most likely an issues with GSource handling of the attribute IO channel, but since you hacked the code is extremely hard to debug. It was never designed for what you are doing.
 
 Regards
 
