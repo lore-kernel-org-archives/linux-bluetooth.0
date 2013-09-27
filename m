@@ -1,39 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH 2/2] android: Android version of log.c
+Subject: Re: [PATCH 1/2] android: Add skeleton of BlueZ Android daemon
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <524155D9.4050807@linux.intel.com>
-Date: Fri, 27 Sep 2013 03:58:11 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <B0FC00FC-EEA4-435D-89D4-3AC95759DA03@holtmann.org>
-References: <1379679871-29623-1-git-send-email-frederic.danis@linux.intel.com> <1379679871-29623-2-git-send-email-frederic.danis@linux.intel.com> <708DB870-5A40-4056-86C8-79092784757C@holtmann.org> <524155D9.4050807@linux.intel.com>
-To: Frederic Danis <frederic.danis@linux.intel.com>
+In-Reply-To: <20130924073124.GA26962@aemeltch-MOBL1>
+Date: Fri, 27 Sep 2013 03:56:14 +0200
+Cc: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>,
+	Frederic Danis <frederic.danis@linux.intel.com>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <188944FA-9CB2-433B-A3D2-D706DBD6E1BD@holtmann.org>
+References: <1379679871-29623-1-git-send-email-frederic.danis@linux.intel.com> <226042C8-264A-469E-8D6A-F41141DC0552@holtmann.org> <52400F2B.9010501@linux.intel.com> <CAN_7+YYSLwsPTfJoYwJKcVtP6EMxOeD8MHox+Pvzcrk_YKcSaQ@mail.gmail.com> <20130924073124.GA26962@aemeltch-MOBL1>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fred,
+Hi Andrei,
 
-> <snip>
->>> @@ -110,10 +137,22 @@ int main(int argc, char *argv[])
->>> 	sa.sa_handler = signal_handler;
->>> 	sigaction(SIGINT, &sa, NULL);
->>> 	sigaction(SIGTERM, &sa, NULL);
->>> +	sigaction(SIGUSR2, &sa, NULL);
->>> +
->>> +	__btd_log_init(option_debug, option_detach);
->>> +
->>> +	/* no need to keep parsed option in memory */
->>> +	free_options();
->>> +
->>> +	DBG("Entering main loop");
+>>>>> Define local mapping to glib path, otherwise this has to be inside
+>>>>> central
+>>>>> place in the build repository.
+>>>>> 
+>>>>> Retrieve Bluetooth version from configure.ac.
+>>>>> ---
+>>>>> .gitignore         |    2 +
+>>>>> Android.mk         |    9 ++++
+>>>>> Makefile.am        |    1 +
+>>>>> Makefile.android   |    7 ++++
+>>>>> android/Android.mk |   24 +++++++++++
+>>>>> android/main.c     |  119
+>>>>> ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>>> configure.ac       |    5 +++
+>>>>> 7 files changed, 167 insertions(+)
+>>>>> create mode 100644 Android.mk
+>>>>> create mode 100644 Makefile.android
+>>>>> create mode 100644 android/Android.mk
+>>>>> create mode 100644 android/main.c
+>>>> 
+>>>> 
+>>>> lets split this out a little bit. Code additions should not be intermixed
+>>>> with additions to the build system and especially configure options.
+>>>> 
+>>>> I rather not have a top-level Android.mk. It should be enough to provide
+>>>> an android/Android.mk.
 >> 
->> Don't do this debug. It is not helpful. The main() is so short, no point in logging that.
+>> BTW, do you expect to have only one Android.mk for the whole project or
+>> this is OK for you to have smaller Android.mk in different subfolders like
+>> /src/shared etc. Both ways are valid.
 > 
-> I need at least one DBG call to be able to build, otherwise I got "undefined reference to `__start___debug'" error messages.
-> So, this one seems ok to me.
+> While having a single huge Android makefile is somehow make sense it would have
+> several disadvantages:
+> - we cannot use local build with "mm" for building for example only tools
+>  or libs
+> - Android.mk will become very large and difficult to read
 
-fair enough for the beginning. Just remove it once you have more than one DBG in the source code and this is no longer needed.
+I have no idea what this means. Lets start with a single android/Android.mk and then go from there. I am strictly against cluttering the whole project with Android specific make files.
 
 Regards
 
