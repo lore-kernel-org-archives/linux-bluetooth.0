@@ -1,53 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 27 Sep 2013 14:04:43 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth 2013-09-23
-Message-ID: <20130927180443.GA10994@tuxdriver.com>
-References: <20130923210049.GG18215@joana>
- <20130926174750.GB1931@tuxdriver.com>
- <20130927152413.GC13211@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130927152413.GC13211@joana>
+In-Reply-To: <1380291161-10232-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1380291161-10232-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 27 Sep 2013 14:01:31 -0400
+Message-ID: <CAJdJm_OYf-QjS9iS6vON7jw8biq0_8g0KpoHBW_-Gb0-U6w3Pg@mail.gmail.com>
+Subject: Re: [RFC 10/16] android: Add Android Makefile for libbluetooth
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Sep 27, 2013 at 12:24:13PM -0300, Gustavo Padovan wrote:
-> Hi John,
-> 
-> 2013-09-26 John W. Linville <linville@tuxdriver.com>:
-> 
-> > On Mon, Sep 23, 2013 at 06:00:49PM -0300, Gustavo Padovan wrote:
+Hi Andrei,
 
-> > > The following changes since commit f4e1a4d3ecbb9e42bdf8e7869ee8a4ebfa27fb20:
-> > > 
-> > >   rt2800: change initialization sequence to fix system freeze (2013-09-09 14:44:34 -0400)
-> > > 
-> > > are available in the git repository at:
-> > > 
-> > >   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
-> > > 
-> > > for you to fetch changes up to 5bcecf325378218a8e248bb6bcae96ec7362f8ef:
-> > > 
-> > >   Bluetooth: btusb: Add support for Belkin F8065bf (2013-09-23 17:44:25 -0300)
-> > 
-> > Pulling now...
-> 
-> Thanks for pulling. However as Stephen pointed out in the linux-next merge
-> conflict email from today we have a style issue, a closing brace bad indented.
-> This is from conflict resolution I made last week. I fixed it when merging
-> bluetooth.git into bluetooth-next.git. 
-> 
-> So when pushing this to Dave could you please tell him about this issue and
-> that the fix is already provided by bluetooth-next. Do you agree with this
-> solution?
+On Fri, Sep 27, 2013 at 10:12 AM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> +# to suppress the "pointer of type 'void *' used in arithmetic" warning
+> +LOCAL_CFLAGS += -Wno-pointer-arith
+> +
+> +# to suppress the "missing initializer near initialization" warning
+> +LOCAL_CFLAGS += -Wno-missing-field-initializers
+> +
+> +# to suppress the "may be used uninitialized in this function" warning
+> +LOCAL_CFLAGS += -Wno-maybe-uninitialized
 
-I fixed it in my merge for Dave -- I think that will be fine.
+I wonder why you are suppressing all those warnings. Do you plan to
+re-enable them once the implementation is more complete?
 
-John
+Best Regards,
 -- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
