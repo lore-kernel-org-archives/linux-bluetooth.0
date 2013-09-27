@@ -1,62 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 00/16] Basic code for Android BlueZ
-Date: Fri, 27 Sep 2013 17:12:25 +0300
-Message-Id: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 27 Sep 2013 09:50:54 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>,
+	Frederic Danis <frederic.danis@linux.intel.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] android: Add skeleton of BlueZ Android daemon
+Message-ID: <20130927065051.GA3066@aemeltch-MOBL1>
+References: <1379679871-29623-1-git-send-email-frederic.danis@linux.intel.com>
+ <226042C8-264A-469E-8D6A-F41141DC0552@holtmann.org>
+ <52400F2B.9010501@linux.intel.com>
+ <CAN_7+YYSLwsPTfJoYwJKcVtP6EMxOeD8MHox+Pvzcrk_YKcSaQ@mail.gmail.com>
+ <20130924073124.GA26962@aemeltch-MOBL1>
+ <188944FA-9CB2-433B-A3D2-D706DBD6E1BD@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <188944FA-9CB2-433B-A3D2-D706DBD6E1BD@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Marcel,
 
-Skeletons for Android Bluetooth and Socket HALs and BlueZ daemon.
+On Fri, Sep 27, 2013 at 03:56:14AM +0200, Marcel Holtmann wrote:
+> Hi Andrei,
+> 
+> >>>>> Define local mapping to glib path, otherwise this has to be inside
+> >>>>> central
+> >>>>> place in the build repository.
+> >>>>> 
+> >>>>> Retrieve Bluetooth version from configure.ac.
+> >>>>> ---
+> >>>>> .gitignore         |    2 +
+> >>>>> Android.mk         |    9 ++++
+> >>>>> Makefile.am        |    1 +
+> >>>>> Makefile.android   |    7 ++++
+> >>>>> android/Android.mk |   24 +++++++++++
+> >>>>> android/main.c     |  119
+> >>>>> ++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >>>>> configure.ac       |    5 +++
+> >>>>> 7 files changed, 167 insertions(+)
+> >>>>> create mode 100644 Android.mk
+> >>>>> create mode 100644 Makefile.android
+> >>>>> create mode 100644 android/Android.mk
+> >>>>> create mode 100644 android/main.c
+> >>>> 
+> >>>> 
+> >>>> lets split this out a little bit. Code additions should not be intermixed
+> >>>> with additions to the build system and especially configure options.
+> >>>> 
+> >>>> I rather not have a top-level Android.mk. It should be enough to provide
+> >>>> an android/Android.mk.
+> >> 
+> >> BTW, do you expect to have only one Android.mk for the whole project or
+> >> this is OK for you to have smaller Android.mk in different subfolders like
+> >> /src/shared etc. Both ways are valid.
+> > 
+> > While having a single huge Android makefile is somehow make sense it would have
+> > several disadvantages:
+> > - we cannot use local build with "mm" for building for example only tools
+> >  or libs
+> > - Android.mk will become very large and difficult to read
+> 
+> I have no idea what this means. Lets start with a single
+> android/Android.mk and then go from there. I am strictly against
+> cluttering the whole project with Android specific make files.
 
-Andrei Emeltchenko (16):
-  android: Add Adapter Bluetooth HAL template
-  android: Add Socket Bluetooth HAL template
-  android: Enable Socket interface
-  android: Start Android Bluetooth daemon
-  android: Add Android Makefile for mgmt library
-  android: Add basic mgmt initialization sequence
-  android: Create HAL API header skeleton
-  android: Add Android HAL callback task
-  android: Add adapter and device struct for BlueZ daemon
-  android: Add Android Makefile for libbluetooth
-  android: sdp: Reuse BlueZ SDP server in Android
-  android: Add cap to bind to port < 1024
-  android: Implement read_info_complete callback
-  android: Handle mgmt changed events
-  android: Implement basic HAL server
-  android: Add HAL message helpers
+OK, we will use the single Android makefile, it is actually not that big.
 
- Makefile.android         |   10 +-
- android/Android.mk       |  124 +++++++++++
- android/bt_adapter.c     |  132 ++++++++++++
- android/bt_adapter.h     |   68 +++++++
- android/hal.h            |   18 ++
- android/hal_bluetooth.c  |  412 +++++++++++++++++++++++++++++++++++++
- android/hal_bt_sock.c    |   84 ++++++++
- android/hal_cb_thread.c  |  144 +++++++++++++
- android/hal_msg.c        |  241 ++++++++++++++++++++++
- android/hal_msg.h        |  263 ++++++++++++++++++++++++
- android/hal_msg_client.c |  112 ++++++++++
- android/hal_msg_client.h |   25 +++
- android/main.c           |  508 ++++++++++++++++++++++++++++++++++++++++++++++
- android/main.h           |   25 +++
- configure.ac             |    4 +
- 15 files changed, 2168 insertions(+), 2 deletions(-)
- create mode 100644 android/bt_adapter.c
- create mode 100644 android/bt_adapter.h
- create mode 100644 android/hal.h
- create mode 100644 android/hal_bluetooth.c
- create mode 100644 android/hal_bt_sock.c
- create mode 100644 android/hal_cb_thread.c
- create mode 100644 android/hal_msg.c
- create mode 100644 android/hal_msg.h
- create mode 100644 android/hal_msg_client.c
- create mode 100644 android/hal_msg_client.h
- create mode 100644 android/main.h
-
--- 
-1.7.10.4
-
+Best regards 
+Andrei Emeltchenko 
