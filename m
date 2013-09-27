@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1380291161-10232-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1380291161-10232-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1380291161-10232-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Fri, 27 Sep 2013 13:07:11 -0400
-Message-ID: <CAJdJm_OxX5ZcdEtHdSKOcvRLumFQY9_HfYDskcSwfQXJ9SN6jA@mail.gmail.com>
-Subject: Re: [RFC 09/16] android: Add adapter and device struct for BlueZ daemon
+	<1380291161-10232-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 27 Sep 2013 12:04:54 -0400
+Message-ID: <CAJdJm_NB0qsJrVxqpXPrt3TKKOOzvVRYzkbgX6Ha6naEjHS-ZA@mail.gmail.com>
+Subject: Re: [RFC 03/16] android: Enable Socket interface
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
@@ -17,29 +17,16 @@ Hi Andrei,
 
 On Fri, Sep 27, 2013 at 10:12 AM, Andrei Emeltchenko
 <Andrei.Emeltchenko.news@gmail.com> wrote:
-> +struct bt_adapter {
-> +       int refcnt;
-> +
-> +       uint16_t dev_id;
-> +       struct mgmt *mgmt;
-> +       bdaddr_t bdaddr;
-> +       uint32_t dev_class;
-> +
-> +       char *name;
-> +       char *short_name;
-> +
-> +       uint32_t supported_settings;
-> +       uint32_t current_settings;
-> +
-> +       GList *found_devices;
+> +static bool is_profile(const char *profile, const char *str)
+> +{
+> +       return (strlen(str) == strlen(profile)) &&
+> +               (strncmp(profile, str, strlen(str)) == 0);
+> +}
 
-Why are you using GList instead of GSList above?
+If you are using strlen() (which requires both strings have the '\0'
+terminator) anyway, why not use just:
 
-> +};
-> +
-> +extern GList *adapter_list;
-
-Same here.
+return strcmp(profile, str) == 0;
 
 Best Regards,
 -- 
