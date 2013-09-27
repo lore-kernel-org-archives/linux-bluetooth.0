@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 02/16] android: Add Socket Bluetooth HAL template
-Date: Fri, 27 Sep 2013 17:12:27 +0300
-Message-Id: <1380291161-10232-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFC 13/16] android: Implement read_info_complete callback
+Date: Fri, 27 Sep 2013 17:12:38 +0300
+Message-Id: <1380291161-10232-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,115 +11,158 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-bt_sock HAL handles Bluetooth sockets for Android.
+Handle read info complete callback from mgmt interface.
 ---
- android/Android.mk    |    1 +
- android/hal_bt_sock.c |   84 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 85 insertions(+)
- create mode 100644 android/hal_bt_sock.c
+ android/main.c |  112 ++++++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 101 insertions(+), 11 deletions(-)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index ca9501f..93de803 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -32,6 +32,7 @@ include $(CLEAR_VARS)
+diff --git a/android/main.c b/android/main.c
+index 649867d..658cdd2 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -51,6 +51,7 @@
+ #include "hcid.h"
+ #include "sdpd.h"
+ #include "main.h"
++#include "bt_adapter.h"
  
- LOCAL_SRC_FILES := \
- 	hal_bluetooth.c \
-+	hal_bt_sock.c \
+ #include "lib/bluetooth.h"
+ #include "lib/mgmt.h"
+@@ -155,34 +156,123 @@ static GOptionEntry options[] = {
+ 	{ NULL }
+ };
  
- LOCAL_SHARED_LIBRARIES := \
- 	libcutils \
-diff --git a/android/hal_bt_sock.c b/android/hal_bt_sock.c
-new file mode 100644
-index 0000000..cbb42d1
---- /dev/null
-+++ b/android/hal_bt_sock.c
-@@ -0,0 +1,84 @@
-+/*
-+ * Copyright (C) 2013 Intel Corporation
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ *
-+ */
-+
-+#include <stdlib.h>
-+
-+#include <hardware/bluetooth.h>
-+#include <hardware/bt_sock.h>
-+
-+#define LOG_TAG "BlueZ"
-+#include <cutils/log.h>
-+
-+static bt_status_t btsock_listen_rfcomm(const char *service_name,
-+					const uint8_t *uuid, int chan,
-+					int *sock, int flags)
-+{
-+	ALOGD(__func__);
-+
-+	return BT_STATUS_UNSUPPORTED;
+-static void read_info_complete(uint8_t status, uint16_t length,
++static void load_link_keys_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+-	/* TODO: Store Controller information */
+-
+-	/**
+-	 * Register all event notification handlers for controller.
+-	 *
+-	 * The handlers are registered after a succcesful read of the
+-	 * controller info. From now on they can track updates and
+-	 * notifications.
+-	 */
++	DBG("status %u", status);
 +}
 +
-+static bt_status_t listen(btsock_type_t type, const char *service_name,
-+					const uint8_t *uuid, int chan,
-+					int *sock, int flags)
++static void load_link_keys(struct bt_adapter *adapter, GSList *keys)
 +{
-+	if ((uuid == NULL && chan <= 0) || sock == NULL) {
-+		ALOGE("%s: invalid params: uuid %p, chan %d, sock %p",
-+						__func__, uuid, chan, sock);
-+		return BT_STATUS_PARM_INVALID;
++	struct mgmt_cp_load_link_keys *cp;
++	uint16_t key_len = g_slist_length(keys);
++	struct mgmt_link_key_info *key;
++	uint16_t len;
++
++	DBG("");
++
++	len = sizeof(*cp) + key_len * sizeof(*key);
++	cp = malloc(len);
++	if (cp == NULL) {
++		error("%s: Not enough memory for link keys loading", __func__);
++		return;
 +	}
 +
-+	ALOGD("%s: uuid %p chan %d sock %p type %d service_name %s",
-+			__func__, uuid, chan, sock, type, service_name);
++	cp->debug_keys = 0;
++	cp->key_count = htobs(key_len);
 +
-+	switch (type) {
-+	case BTSOCK_RFCOMM:
-+		return btsock_listen_rfcomm(service_name, uuid, chan,
-+								sock, flags);
-+	default:
-+		ALOGE("%s: Socket type %d not supported", __func__, type);
++	mgmt_send(adapter->mgmt, MGMT_OP_LOAD_LINK_KEYS, adapter->dev_id, len,
++				cp, load_link_keys_complete, adapter, NULL);
++
++	free(cp);
+ }
+ 
++static void read_info_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	const struct mgmt_rp_read_info *rp = param;
++	struct bt_adapter *adapter = user_data;
++
++	DBG("");
++
++	if (status != MGMT_STATUS_SUCCESS) {
++		error("Failed to read info for index %u: %s (0x%02x)",
++			adapter->dev_id, mgmt_errstr(status), status);
++		goto failed;
 +	}
 +
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
-+					const uint8_t *uuid, int chan,
-+					int *sock, int flags)
-+{
-+	if ((uuid == NULL && chan <= 0) || bdaddr == NULL || sock == NULL) {
-+		ALOGE("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
-+					bdaddr, uuid, chan, sock);
-+		return BT_STATUS_PARM_INVALID;
++	if (length < sizeof(*rp)) {
++		error("Too small read info complete response");
++		goto failed;
 +	}
 +
-+	ALOGD("%s: uuid %p chan %d sock %p type %d", __func__, uuid, chan,
-+								sock, type);
++	if (bacmp(&rp->bdaddr, BDADDR_ANY) == 0) {
++		error("No Bluetooth address for index %u", adapter->dev_id);
++		goto failed;
++	}
 +
-+	return BT_STATUS_UNSUPPORTED;
++	/* Store adapter information */
++	bacpy(&adapter->bdaddr, &rp->bdaddr);
++	adapter->dev_class = rp->dev_class[0] | (rp->dev_class[1] << 8) |
++						(rp->dev_class[2] << 16);
++	adapter->name = g_strdup((const char *) rp->name);
++	adapter->short_name = g_strdup((const char *) rp->short_name);
++
++	adapter->supported_settings = btohs(rp->supported_settings);
++	adapter->current_settings = btohs(rp->current_settings);
++
++	/* TODO: Register all event notification handlers */
++
++	if (adapter->current_settings & MGMT_SETTING_POWERED)
++		adapter_start(adapter);
++
++	/* dummy link keys loading */
++	load_link_keys(adapter, NULL);
++
++	return;
++
++failed:
++	adapter_list = g_list_remove(adapter_list, adapter);
++
++	bt_adapter_unref(adapter);
 +}
+ 
+ static void mgmt_index_added_event(uint16_t index, uint16_t length,
+ 					const void *param, void *user_data)
+ {
++	struct bt_adapter *adapter;
 +
-+static btsock_interface_t btsock_if = {
-+	sizeof(btsock_if),
-+	listen,
-+	connect
-+};
+ 	info("%s: index %u", __func__, index);
+ 
++	adapter = bt_adapter_lookup(index);
++	if (adapter) {
++		warn("Ignoring %s for an already existing adapter", __func__);
++		return;
++	}
 +
-+btsock_interface_t *bt_get_sock_interface(void)
-+{
-+	return &btsock_if;
-+}
++	adapter = bt_adapter_new(index, mgmt_if);
++	if (adapter == NULL) {
++		error("Unable to create new adapter for index %u", index);
++		return;
++	}
++
++	adapter_list = g_list_append(adapter_list, adapter);
++
++	/* TODO: Add complex logic here */
++	if (index == 0)
++		default_adapter = adapter;
++
+ 	DBG("sending read info command for index %u", index);
+ 
+ 	if (mgmt_send(mgmt_if, MGMT_OP_READ_INFO, index, 0, NULL,
+-					read_info_complete, NULL, NULL) > 0)
++					read_info_complete, adapter, NULL) > 0)
+ 		return;
+ 
+ 	error("Failed to read adapter info for index %u", index);
+ 
++	adapter_list = g_list_remove(adapter_list, adapter);
++
++	bt_adapter_unref(adapter);
+ }
+ 
+ static void mgmt_index_removed_event(uint16_t index, uint16_t length,
 -- 
 1.7.10.4
 
