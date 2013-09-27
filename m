@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 11/16] android: sdp: Reuse BlueZ SDP server in Android
-Date: Fri, 27 Sep 2013 17:12:36 +0300
-Message-Id: <1380291161-10232-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFC 02/16] android: Add Socket Bluetooth HAL template
+Date: Fri, 27 Sep 2013 17:12:27 +0300
+Message-Id: <1380291161-10232-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,167 +11,115 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Reuse existing SDP server code in Android GPL daemon.
+bt_sock HAL handles Bluetooth sockets for Android.
 ---
- Makefile.android     |    7 +++++--
- android/Android.mk   |    6 ++++++
- android/bt_adapter.c |    5 ++++-
- android/main.c       |   27 +++++++++++++++++++++++++++
- android/main.h       |   25 +++++++++++++++++++++++++
- 5 files changed, 67 insertions(+), 3 deletions(-)
- create mode 100644 android/main.h
+ android/Android.mk    |    1 +
+ android/hal_bt_sock.c |   84 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 85 insertions(+)
+ create mode 100644 android/hal_bt_sock.c
 
-diff --git a/Makefile.android b/Makefile.android
-index 3e6fec0..bf82928 100644
---- a/Makefile.android
-+++ b/Makefile.android
-@@ -3,7 +3,10 @@ if ANDROID_DAEMON
- noinst_PROGRAMS += android/bluezd
- 
- android_bluezd_SOURCES = android/main.c src/log.c \
-+				src/sdpd-database.c src/sdpd-server.c \
-+				src/sdpd-service.c src/sdpd-request.c \
- 				src/shared/util.h src/shared/util.c \
--				src/shared/mgmt.h src/shared/mgmt.c
--android_bluezd_LDADD = @GLIB_LIBS@
-+				src/shared/mgmt.h src/shared/mgmt.c \
-+				android/bt_adapter.h android/bt_adapter.c
-+android_bluezd_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
- endif
 diff --git a/android/Android.mk b/android/Android.mk
-index 36f8798..08e35e4 100644
+index ca9501f..93de803 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -9,6 +9,11 @@ include $(CLEAR_VARS)
+@@ -32,6 +32,7 @@ include $(CLEAR_VARS)
+ 
  LOCAL_SRC_FILES := \
- 	log.c \
- 	main.c \
-+	bt_adapter.c \
-+	../src/sdpd-database.c \
-+	../src/sdpd-service.c \
-+	../src/sdpd-request.c \
-+	../src/sdpd-server.c \
+ 	hal_bluetooth.c \
++	hal_bt_sock.c \
  
- LOCAL_C_INCLUDES := \
- 	$(call include-path-for, glib) \
-@@ -24,6 +29,7 @@ LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
  LOCAL_SHARED_LIBRARIES := \
- 	libglib \
- 	libbluez \
-+	libbluetooth \
- 
- LOCAL_MODULE := bluezd
- 
-diff --git a/android/bt_adapter.c b/android/bt_adapter.c
-index 9f64839..42facb6 100644
---- a/android/bt_adapter.c
-+++ b/android/bt_adapter.c
-@@ -23,6 +23,7 @@
- 
- #include "bt_adapter.h"
- #include "log.h"
-+#include "main.h"
- #include "src/shared/mgmt.h"
- 
- struct bt_device *bt_device_ref(struct bt_device *device)
-@@ -118,7 +119,7 @@ void adapter_start(struct bt_adapter *adapter)
- 
- 	/* TODO: CB: report scan mode */
- 
--	/* TODO: SDP start here */
-+	sdp_start();
- 
- 	/* TODO: CB: report state on */
- }
-@@ -126,4 +127,6 @@ void adapter_start(struct bt_adapter *adapter)
- void adapter_stop(struct bt_adapter *adapter)
- {
- 	DBG("disabled %u", adapter->dev_id);
-+
-+	sdp_stop();
- }
-diff --git a/android/main.c b/android/main.c
-index 4792919..5fef095 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -36,6 +36,8 @@
- 
- #include "log.h"
- #include "hcid.h"
-+#include "sdpd.h"
-+#include "main.h"
- 
- #include "lib/bluetooth.h"
- #include "lib/mgmt.h"
-@@ -43,12 +45,37 @@
- 
- #define SHUTDOWN_GRACE_SECONDS 10
- 
-+struct main_opts main_opts;
-+
- static GMainLoop *event_loop;
- static struct mgmt *mgmt_if = NULL;
- 
- static uint8_t mgmt_version = 0;
- static uint8_t mgmt_revision = 0;
- 
-+GList *adapter_list = NULL;
-+struct bt_adapter *default_adapter = NULL;
-+
-+int sdp_start(void)
-+{
-+	uint16_t mtu = 0;
-+	uint32_t flags = 0;
-+
-+	DBG("");
-+
-+	/* sdpd-server use these settings */
-+	memset(&main_opts, 0, sizeof(main_opts));
-+
-+	return start_sdp_server(mtu, flags);
-+}
-+
-+void sdp_stop(void)
-+{
-+	DBG("");
-+
-+	stop_sdp_server();
-+}
-+
- void btd_exit(void)
- {
- 	g_main_loop_quit(event_loop);
-diff --git a/android/main.h b/android/main.h
+ 	libcutils \
+diff --git a/android/hal_bt_sock.c b/android/hal_bt_sock.c
 new file mode 100644
-index 0000000..6ecad14
+index 0000000..cbb42d1
 --- /dev/null
-+++ b/android/main.h
-@@ -0,0 +1,25 @@
++++ b/android/hal_bt_sock.c
+@@ -0,0 +1,84 @@
 +/*
++ * Copyright (C) 2013 Intel Corporation
 + *
-+ *  BlueZ - Bluetooth protocol stack for Linux
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
 + *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *      http://www.apache.org/licenses/LICENSE-2.0
 + *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
 + *
 + */
 +
-+int sdp_start(void);
-+void sdp_stop(void);
++#include <stdlib.h>
++
++#include <hardware/bluetooth.h>
++#include <hardware/bt_sock.h>
++
++#define LOG_TAG "BlueZ"
++#include <cutils/log.h>
++
++static bt_status_t btsock_listen_rfcomm(const char *service_name,
++					const uint8_t *uuid, int chan,
++					int *sock, int flags)
++{
++	ALOGD(__func__);
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static bt_status_t listen(btsock_type_t type, const char *service_name,
++					const uint8_t *uuid, int chan,
++					int *sock, int flags)
++{
++	if ((uuid == NULL && chan <= 0) || sock == NULL) {
++		ALOGE("%s: invalid params: uuid %p, chan %d, sock %p",
++						__func__, uuid, chan, sock);
++		return BT_STATUS_PARM_INVALID;
++	}
++
++	ALOGD("%s: uuid %p chan %d sock %p type %d service_name %s",
++			__func__, uuid, chan, sock, type, service_name);
++
++	switch (type) {
++	case BTSOCK_RFCOMM:
++		return btsock_listen_rfcomm(service_name, uuid, chan,
++								sock, flags);
++	default:
++		ALOGE("%s: Socket type %d not supported", __func__, type);
++	}
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static bt_status_t connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
++					const uint8_t *uuid, int chan,
++					int *sock, int flags)
++{
++	if ((uuid == NULL && chan <= 0) || bdaddr == NULL || sock == NULL) {
++		ALOGE("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
++					bdaddr, uuid, chan, sock);
++		return BT_STATUS_PARM_INVALID;
++	}
++
++	ALOGD("%s: uuid %p chan %d sock %p type %d", __func__, uuid, chan,
++								sock, type);
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static btsock_interface_t btsock_if = {
++	sizeof(btsock_if),
++	listen,
++	connect
++};
++
++btsock_interface_t *bt_get_sock_interface(void)
++{
++	return &btsock_if;
++}
 -- 
 1.7.10.4
 
