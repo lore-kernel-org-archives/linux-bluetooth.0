@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 08/16] android: Add Android HAL callback task
-Date: Fri, 27 Sep 2013 17:12:33 +0300
-Message-Id: <1380291161-10232-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFC 12/16] android: Add cap to bind to port < 1024
+Date: Fri, 27 Sep 2013 17:12:37 +0300
+Message-Id: <1380291161-10232-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,184 +11,103 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Android HAL callback task listens for messages from BlueZ GPL daemon.
+For SDP server we need to bind to lower port, acquire this capability.
 ---
- android/Android.mk      |    6 ++
- android/hal_cb_thread.c |  144 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 150 insertions(+)
- create mode 100644 android/hal_cb_thread.c
+ android/main.c |   53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ configure.ac   |    4 ++++
+ 2 files changed, 57 insertions(+)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index f9c73a2..e892249 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -37,10 +37,16 @@ include $(CLEAR_VARS)
- 
- LOCAL_SRC_FILES := \
- 	hal_bluetooth.c \
-+	hal_cb_thread.c \
- 	hal_bt_sock.c \
- 
- LOCAL_SHARED_LIBRARIES := \
- 	libcutils \
-+	libglib \
-+
-+LOCAL_C_INCLUDES := \
-+	$(call include-path-for, glib) \
-+	$(call include-path-for, glib)/glib \
- 
- LOCAL_MODULE := bluetooth.default
- LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
-diff --git a/android/hal_cb_thread.c b/android/hal_cb_thread.c
-new file mode 100644
-index 0000000..b7aebe8
---- /dev/null
-+++ b/android/hal_cb_thread.c
-@@ -0,0 +1,144 @@
-+/*
-+ * Copyright (C) 2013 Intel Corporation
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ *
-+ */
-+
-+#include <glib.h>
-+#include <stdbool.h>
-+#include <sys/socket.h>
-+#include <sys/stat.h>
-+#include <sys/un.h>
+diff --git a/android/main.c b/android/main.c
+index 5fef095..649867d 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -31,6 +31,19 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <unistd.h>
 +#include <errno.h>
++#include <sys/prctl.h>
++#include <linux/capability.h>
 +
-+#include <hardware/bluetooth.h>
-+
-+#define LOG_TAG "BlueZ"
-+#include <cutils/log.h>
-+
-+#include "hal_msg.h"
-+
-+#define HAL_CBACK(base, cb_function, ...)				\
-+	do {								\
-+		if (base && base->cb_function) {			\
-+			ALOGI("CB %s->%s", #base, #cb_function);	\
-+			base->cb_function(__VA_ARGS__);			\
-+		} else {						\
-+			ALOGE("%s: Callback is NULL", __func__);	\
-+		}							\
-+	} while (0)
-+
-+static GMainLoop *event_loop;
-+
-+extern bt_callbacks_t *bt_hal_cbacks;
-+
-+static void bthal_thread_associate(void)
++/**
++ * Include <sys/capability.h> for host build and
++ * also for Android 4.3 when it is added to bionic
++ */
++#if (defined(__ANDROID_API__) && (__ANDROID_API__ > 17)) || \
++					!defined(__ANDROID_API__)
++#include <sys/capability.h>
++#endif
+ 
+ #include <glib.h>
+ 
+@@ -319,6 +332,43 @@ static void cleanup_mgmt_interface(void)
+ 	mgmt_if = NULL;
+ }
+ 
++static bool android_set_aid_and_cap()
 +{
-+	ALOGI(__func__);
++	struct __user_cap_header_struct header;
++	struct __user_cap_data_struct cap;
 +
-+	HAL_CBACK(bt_hal_cbacks, thread_evt_cb, ASSOCIATE_JVM);
-+}
++	DBG("%s: pid %d uid %d gid %d", __func__, getpid(), getuid(), getgid());
 +
-+static void bthal_thread_disassociate(void)
-+{
-+	ALOGI(__func__);
++	header.version = _LINUX_CAPABILITY_VERSION;
++	header.pid = getpid();
++	if (capget(&header, &cap) < 0)
++		error("%s: capget(): %s", __func__, strerror(errno));
 +
-+	HAL_CBACK(bt_hal_cbacks, thread_evt_cb, DISASSOCIATE_JVM);
++	DBG("%s: Cap data 0x%x, 0x%x, 0x%x\n", __func__, cap.effective,
++					cap.permitted, cap.inheritable);
 +
-+	bt_hal_cbacks = NULL;
-+}
++	prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);
 +
-+void process_msg(struct hal_msg_hdr *msg)
-+{
-+	ALOGI(__func__);
++	header.version = _LINUX_CAPABILITY_VERSION;
++	header.pid = 0;
 +
-+	/* TODO: Process messages from daemon */
-+}
++	cap.effective = cap.permitted = cap.inheritable =
++		1 << CAP_NET_RAW |
++		1 << CAP_NET_ADMIN |
++		1 << CAP_NET_BIND_SERVICE |
++		1 << CAP_SYS_RAWIO |
++		1 << CAP_SYS_NICE |
++		1 << CAP_SETGID;
 +
-+static gboolean hal_session_event(GIOChannel *iochan, GIOCondition cond,
-+				  gpointer data)
-+{
-+	struct hal_msg_hdr msg;
-+	int sock, len, size;
-+	uint8_t *buf;
-+
-+	if (cond & (G_IO_NVAL | G_IO_HUP | G_IO_ERR)) {
-+		ALOGE("%s: error condition %d", __func__, cond);
-+		return FALSE;
++	if (capset(&header, &cap)) {
++		error("%s: capset(): %s", __func__, strerror(errno));
++		return false;
 +	}
 +
-+	sock = g_io_channel_unix_get_fd(iochan);
-+
-+	len = recv(sock, &msg, sizeof(msg), MSG_PEEK);
-+	if (len <= 0) {
-+		ALOGE("%s: recv(): %s %d", __func__, strerror(errno), sock);
-+		return FALSE;
-+	}
-+
-+	size = sizeof(msg) + msg.len;
-+
-+	ALOGD("%s: Read first %d bytes, total %d", __func__, len, size);
-+
-+	buf = malloc(size);
-+	if (buf == NULL)
-+		return FALSE;
-+
-+	len = recv(sock, buf, size, 0);
-+	if (len != size) {
-+		ALOGE("%s: recv(): %s %d", __func__, strerror(errno), sock);
-+		free(buf);
-+		return FALSE;
-+	}
-+
-+	process_msg((struct hal_msg_hdr *) buf);
-+
-+	free(buf);
-+
-+	return TRUE;
++	DBG("%s: capset(): Success", __func__);
++	return true;
 +}
 +
-+int hal_cb_init_sock(int sock)
-+{
-+	GIOChannel *iochan;
-+	int id;
+ int main(int argc, char *argv[])
+ {
+ 	GOptionContext *context;
+@@ -357,6 +407,9 @@ int main(int argc, char *argv[])
+ 	/* no need to keep parsed option in memory */
+ 	free_options();
+ 
++	if (android_set_aid_and_cap() == false)
++		exit(1);
 +
-+	ALOGD("%s: sock %d", __func__, sock);
+ 	init_mgmt_interface();
+ 
+ 	DBG("Entering main loop");
+diff --git a/configure.ac b/configure.ac
+index 3b7a5d9..af418d3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -247,4 +247,8 @@ AC_ARG_ENABLE(android-daemon, AC_HELP_STRING([--enable-android-daemon],
+ 					[android_daemon=${enableval}])
+ AM_CONDITIONAL(ANDROID_DAEMON, test "${android_daemon}" = "yes")
+ 
++if (test "${android_daemon}" = "yes"); then
++	AC_CHECK_LIB(cap, capget, dummy=yes, AC_MSG_ERROR(libcap is required))
++fi
 +
-+	iochan = g_io_channel_unix_new(sock);
-+	g_io_channel_set_close_on_unref(iochan, TRUE);
-+
-+	id = g_io_add_watch(iochan, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
-+			    hal_session_event, &sock);
-+
-+	ALOGD("%s: Add chan %p watch id %d", __func__, iochan, id);
-+
-+	g_io_channel_unref(iochan);
-+
-+	return id;
-+}
-+
-+void *hal_cb_task(void *arg)
-+{
-+	event_loop = g_main_loop_new(NULL, FALSE);
-+
-+	bthal_thread_associate();
-+
-+	g_main_loop_run(event_loop);
-+
-+	g_main_loop_unref(event_loop);
-+
-+	bthal_thread_disassociate();
-+
-+	return NULL;
-+}
+ AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
 -- 
 1.7.10.4
 
