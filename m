@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 13/16] android: Implement read_info_complete callback
-Date: Fri, 27 Sep 2013 17:12:38 +0300
-Message-Id: <1380291161-10232-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFC 08/16] android: Add Android HAL callback task
+Date: Fri, 27 Sep 2013 17:12:33 +0300
+Message-Id: <1380291161-10232-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,158 +11,184 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Handle read info complete callback from mgmt interface.
+Android HAL callback task listens for messages from BlueZ GPL daemon.
 ---
- android/main.c |  112 ++++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 101 insertions(+), 11 deletions(-)
+ android/Android.mk      |    6 ++
+ android/hal_cb_thread.c |  144 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 150 insertions(+)
+ create mode 100644 android/hal_cb_thread.c
 
-diff --git a/android/main.c b/android/main.c
-index 649867d..658cdd2 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -51,6 +51,7 @@
- #include "hcid.h"
- #include "sdpd.h"
- #include "main.h"
-+#include "bt_adapter.h"
+diff --git a/android/Android.mk b/android/Android.mk
+index f9c73a2..e892249 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -37,10 +37,16 @@ include $(CLEAR_VARS)
  
- #include "lib/bluetooth.h"
- #include "lib/mgmt.h"
-@@ -155,34 +156,123 @@ static GOptionEntry options[] = {
- 	{ NULL }
- };
+ LOCAL_SRC_FILES := \
+ 	hal_bluetooth.c \
++	hal_cb_thread.c \
+ 	hal_bt_sock.c \
  
--static void read_info_complete(uint8_t status, uint16_t length,
-+static void load_link_keys_complete(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
--	/* TODO: Store Controller information */
--
--	/**
--	 * Register all event notification handlers for controller.
--	 *
--	 * The handlers are registered after a succcesful read of the
--	 * controller info. From now on they can track updates and
--	 * notifications.
--	 */
-+	DBG("status %u", status);
+ LOCAL_SHARED_LIBRARIES := \
+ 	libcutils \
++	libglib \
++
++LOCAL_C_INCLUDES := \
++	$(call include-path-for, glib) \
++	$(call include-path-for, glib)/glib \
+ 
+ LOCAL_MODULE := bluetooth.default
+ LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
+diff --git a/android/hal_cb_thread.c b/android/hal_cb_thread.c
+new file mode 100644
+index 0000000..b7aebe8
+--- /dev/null
++++ b/android/hal_cb_thread.c
+@@ -0,0 +1,144 @@
++/*
++ * Copyright (C) 2013 Intel Corporation
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ *
++ */
++
++#include <glib.h>
++#include <stdbool.h>
++#include <sys/socket.h>
++#include <sys/stat.h>
++#include <sys/un.h>
++#include <errno.h>
++
++#include <hardware/bluetooth.h>
++
++#define LOG_TAG "BlueZ"
++#include <cutils/log.h>
++
++#include "hal_msg.h"
++
++#define HAL_CBACK(base, cb_function, ...)				\
++	do {								\
++		if (base && base->cb_function) {			\
++			ALOGI("CB %s->%s", #base, #cb_function);	\
++			base->cb_function(__VA_ARGS__);			\
++		} else {						\
++			ALOGE("%s: Callback is NULL", __func__);	\
++		}							\
++	} while (0)
++
++static GMainLoop *event_loop;
++
++extern bt_callbacks_t *bt_hal_cbacks;
++
++static void bthal_thread_associate(void)
++{
++	ALOGI(__func__);
++
++	HAL_CBACK(bt_hal_cbacks, thread_evt_cb, ASSOCIATE_JVM);
 +}
 +
-+static void load_link_keys(struct bt_adapter *adapter, GSList *keys)
++static void bthal_thread_disassociate(void)
 +{
-+	struct mgmt_cp_load_link_keys *cp;
-+	uint16_t key_len = g_slist_length(keys);
-+	struct mgmt_link_key_info *key;
-+	uint16_t len;
++	ALOGI(__func__);
 +
-+	DBG("");
++	HAL_CBACK(bt_hal_cbacks, thread_evt_cb, DISASSOCIATE_JVM);
 +
-+	len = sizeof(*cp) + key_len * sizeof(*key);
-+	cp = malloc(len);
-+	if (cp == NULL) {
-+		error("%s: Not enough memory for link keys loading", __func__);
-+		return;
-+	}
-+
-+	cp->debug_keys = 0;
-+	cp->key_count = htobs(key_len);
-+
-+	mgmt_send(adapter->mgmt, MGMT_OP_LOAD_LINK_KEYS, adapter->dev_id, len,
-+				cp, load_link_keys_complete, adapter, NULL);
-+
-+	free(cp);
- }
- 
-+static void read_info_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	const struct mgmt_rp_read_info *rp = param;
-+	struct bt_adapter *adapter = user_data;
-+
-+	DBG("");
-+
-+	if (status != MGMT_STATUS_SUCCESS) {
-+		error("Failed to read info for index %u: %s (0x%02x)",
-+			adapter->dev_id, mgmt_errstr(status), status);
-+		goto failed;
-+	}
-+
-+	if (length < sizeof(*rp)) {
-+		error("Too small read info complete response");
-+		goto failed;
-+	}
-+
-+	if (bacmp(&rp->bdaddr, BDADDR_ANY) == 0) {
-+		error("No Bluetooth address for index %u", adapter->dev_id);
-+		goto failed;
-+	}
-+
-+	/* Store adapter information */
-+	bacpy(&adapter->bdaddr, &rp->bdaddr);
-+	adapter->dev_class = rp->dev_class[0] | (rp->dev_class[1] << 8) |
-+						(rp->dev_class[2] << 16);
-+	adapter->name = g_strdup((const char *) rp->name);
-+	adapter->short_name = g_strdup((const char *) rp->short_name);
-+
-+	adapter->supported_settings = btohs(rp->supported_settings);
-+	adapter->current_settings = btohs(rp->current_settings);
-+
-+	/* TODO: Register all event notification handlers */
-+
-+	if (adapter->current_settings & MGMT_SETTING_POWERED)
-+		adapter_start(adapter);
-+
-+	/* dummy link keys loading */
-+	load_link_keys(adapter, NULL);
-+
-+	return;
-+
-+failed:
-+	adapter_list = g_list_remove(adapter_list, adapter);
-+
-+	bt_adapter_unref(adapter);
++	bt_hal_cbacks = NULL;
 +}
- 
- static void mgmt_index_added_event(uint16_t index, uint16_t length,
- 					const void *param, void *user_data)
- {
-+	struct bt_adapter *adapter;
 +
- 	info("%s: index %u", __func__, index);
- 
-+	adapter = bt_adapter_lookup(index);
-+	if (adapter) {
-+		warn("Ignoring %s for an already existing adapter", __func__);
-+		return;
++void process_msg(struct hal_msg_hdr *msg)
++{
++	ALOGI(__func__);
++
++	/* TODO: Process messages from daemon */
++}
++
++static gboolean hal_session_event(GIOChannel *iochan, GIOCondition cond,
++				  gpointer data)
++{
++	struct hal_msg_hdr msg;
++	int sock, len, size;
++	uint8_t *buf;
++
++	if (cond & (G_IO_NVAL | G_IO_HUP | G_IO_ERR)) {
++		ALOGE("%s: error condition %d", __func__, cond);
++		return FALSE;
 +	}
 +
-+	adapter = bt_adapter_new(index, mgmt_if);
-+	if (adapter == NULL) {
-+		error("Unable to create new adapter for index %u", index);
-+		return;
++	sock = g_io_channel_unix_get_fd(iochan);
++
++	len = recv(sock, &msg, sizeof(msg), MSG_PEEK);
++	if (len <= 0) {
++		ALOGE("%s: recv(): %s %d", __func__, strerror(errno), sock);
++		return FALSE;
 +	}
 +
-+	adapter_list = g_list_append(adapter_list, adapter);
++	size = sizeof(msg) + msg.len;
 +
-+	/* TODO: Add complex logic here */
-+	if (index == 0)
-+		default_adapter = adapter;
++	ALOGD("%s: Read first %d bytes, total %d", __func__, len, size);
 +
- 	DBG("sending read info command for index %u", index);
- 
- 	if (mgmt_send(mgmt_if, MGMT_OP_READ_INFO, index, 0, NULL,
--					read_info_complete, NULL, NULL) > 0)
-+					read_info_complete, adapter, NULL) > 0)
- 		return;
- 
- 	error("Failed to read adapter info for index %u", index);
- 
-+	adapter_list = g_list_remove(adapter_list, adapter);
++	buf = malloc(size);
++	if (buf == NULL)
++		return FALSE;
 +
-+	bt_adapter_unref(adapter);
- }
- 
- static void mgmt_index_removed_event(uint16_t index, uint16_t length,
++	len = recv(sock, buf, size, 0);
++	if (len != size) {
++		ALOGE("%s: recv(): %s %d", __func__, strerror(errno), sock);
++		free(buf);
++		return FALSE;
++	}
++
++	process_msg((struct hal_msg_hdr *) buf);
++
++	free(buf);
++
++	return TRUE;
++}
++
++int hal_cb_init_sock(int sock)
++{
++	GIOChannel *iochan;
++	int id;
++
++	ALOGD("%s: sock %d", __func__, sock);
++
++	iochan = g_io_channel_unix_new(sock);
++	g_io_channel_set_close_on_unref(iochan, TRUE);
++
++	id = g_io_add_watch(iochan, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++			    hal_session_event, &sock);
++
++	ALOGD("%s: Add chan %p watch id %d", __func__, iochan, id);
++
++	g_io_channel_unref(iochan);
++
++	return id;
++}
++
++void *hal_cb_task(void *arg)
++{
++	event_loop = g_main_loop_new(NULL, FALSE);
++
++	bthal_thread_associate();
++
++	g_main_loop_run(event_loop);
++
++	g_main_loop_unref(event_loop);
++
++	bthal_thread_disassociate();
++
++	return NULL;
++}
 -- 
 1.7.10.4
 
