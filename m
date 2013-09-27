@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1380291161-10232-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1380291161-10232-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1380291161-10232-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Fri, 27 Sep 2013 13:59:34 -0400
-Message-ID: <CAJdJm_Pzi4gpqby=TJHhrB7W0yXqy2Cy9qttq0ePHdj3L54-Zg@mail.gmail.com>
-Subject: Re: [RFC 14/16] android: Handle mgmt changed events
+	<1380291161-10232-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 27 Sep 2013 13:50:22 -0400
+Message-ID: <CAJdJm_PMy6pb-NnCc5fKc11ATUwKbSd71HMAWueWkxP_x4Ym=A@mail.gmail.com>
+Subject: Re: [RFC 15/16] android: Implement basic HAL server
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
@@ -17,42 +17,60 @@ Hi Andrei,
 
 On Fri, Sep 27, 2013 at 10:12 AM, Andrei Emeltchenko
 <Andrei.Emeltchenko.news@gmail.com> wrote:
-> +static void mgmt_dev_class_changed_event(uint16_t index, uint16_t length,
-> +                                       const void *param, void *user_data)
+> +static gboolean io_session_event(GIOChannel *chan, GIOCondition cond,
+> +                                                               gpointer data)
 > +{
-> +       struct bt_adapter *adapter = user_data;
-> +       const struct mgmt_cod *rp = param;
-> +       uint8_t appearance[3];
-> +       uint32_t dev_class;
+> +       struct hal_msg_hdr hdr;
+> +       struct hal_msg_rsp rsp;
+> +       uint8_t *buf;
+> +       int sock, len, size;
+> +       uint8_t status;
 > +
-> +       if (length < sizeof(*rp)) {
-> +               error("Wrong size of class of device changed parameters");
-> +               return;
+> +       if (cond & G_IO_NVAL)
+> +               return FALSE;
+> +
+> +       sock = g_io_channel_unix_get_fd(chan);
+> +
+> +       if (cond & (G_IO_HUP | G_IO_ERR)) {
+> +               error("%s: error condition %d", __func__, cond);
+> +               /* TODO: handle */
+> +               return FALSE;
 > +       }
 > +
-> +       dev_class = rp->val[0] | (rp->val[1] << 8) | (rp->val[2] << 16);
+> +       len = recv(sock, &hdr, sizeof(hdr), MSG_PEEK);
+> +       if (len != sizeof(hdr)) {
+> +               /* TODO: handle */
+> +               return FALSE;
+> +       }
 > +
-> +       if (dev_class == adapter->dev_class)
-> +               return;
+> +       size = sizeof(hdr) + hdr.len;
+> +       buf = malloc(size);
+> +       if (!buf)
+> +               return TRUE;
 > +
-> +       DBG("Class: 0x%06x", dev_class);
+> +       len = recv(sock, buf, size, 0);
+> +       if (len != size) {
+> +               /* TODO: handle */
+> +               free(buf);
+> +               return FALSE;
+> +       }
 > +
-> +       adapter->dev_class = dev_class;
+> +       status = process_hal_msg(buf, len);
 > +
-> +       /* TODO: Inform prop change: Class */
+> +       free(buf);
 > +
-> +       appearance[0] = rp->val[0];
-> +       appearance[1] = rp->val[1] & 0x1f;  /* removes service class */
-> +       appearance[2] = rp->val[2];
-> +
-> +       /* TODO: Gatt attrib set*/
-> +       (void)appearance;
+> +       memcpy(&rsp, &hdr, sizeof(hdr));
+> +       rsp.hdr.len = sizeof(uint8_t);
+> +       rsp.status = status;
 
-While it is clear this is incomplete code, doing things like above
-just to silence the compiler looks bad. better simply remove the
-"appearance" variable (adding it later when you implement GAP
-Appearance) and replace it with a TODO or print the value with a
-DBG().
+You are not using "rsp" on this function (and not TODO comment explaining why).
+
+> +       /* Since daemon would be run also on host we have to grant perms */
+> +       chmod(sock_path, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH |
+> +                                                               S_IWOTH);
+
+If it is really necessary to have a world writable socket, better
+explain in detail on the comment.
 
 Best Regards,
 -- 
