@@ -1,40 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH 3/8] Bluetooth: Test for HCI_SETUP and HCI_USER_CHANNEL in mgmt_valid_hdev()
+Subject: Re: [PATCH v2 1/3] build: Add skeleton for BlueZ Android
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20130925100353.GA3158@x220.p-661hnu-f1>
-Date: Fri, 27 Sep 2013 04:12:46 +0200
+In-Reply-To: <1380024798-32017-1-git-send-email-frederic.danis@linux.intel.com>
+Date: Fri, 27 Sep 2013 04:08:59 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <C7C45B32-4EF9-4FD7-B774-E88917DFAC75@holtmann.org>
-References: <1380031363-1266-1-git-send-email-johan.hedberg@gmail.com> <1380031363-1266-4-git-send-email-johan.hedberg@gmail.com> <DFCF34C2-5AA9-4644-BB4B-3D6073DA9D42@holtmann.org> <20130925100353.GA3158@x220.p-661hnu-f1>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <EAD23378-CBDD-4A1C-A656-21031000522F@holtmann.org>
+References: <1380024798-32017-1-git-send-email-frederic.danis@linux.intel.com>
+To: Frederic Danis <frederic.danis@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Fred,
 
->>> If either one of the HCI_SETUP or HCI_USER_CHANNEL flags is set the
->>> device is not considered valid for mgmt. By having these checks inside
->>> the mgmt_valid_hdev function the a couple of places using it can be
->>> simplified.
->> 
->> I looked at doing this and decided not to. Reason was that the device
->> gets removed from mgmt anyway.
+> Makefile.am         |    4 +++-
+> Makefile.android    |    4 ++++
+> android/Android.mk  |    5 +++++
+> bootstrap-configure |    3 ++-
+> configure.ac        |    4 ++++
+> 5 files changed, 18 insertions(+), 2 deletions(-)
+> create mode 100644 Makefile.android
+> create mode 100644 android/Android.mk
 > 
-> I'm not sure what significance you think "device gets removed from mgmt"
-> has. All that is is a mgmt event saying that index has been removed. In
-> addition to that we need to ensure that we don't send any more mgmt
-> events for such devices and that we don't include such devices in the
-> response to mgmt_read_index list.
+> diff --git a/Makefile.am b/Makefile.am
+> index 4e4b1c5..51204f4 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -179,6 +179,7 @@ test_scripts =
 > 
-> These are the two places of the code that my patch simplifies, one is
-> the check for whether to send a "power on" mgmt event and the other the
-> response handling of read_index_list.
+> include Makefile.tools
+> include Makefile.obexd
+> +include Makefile.android
+> 
+> if HID2HCI
+> rulesdir = @UDEV_DIR@/rules.d
+> @@ -293,7 +294,8 @@ pkgconfig_DATA = lib/bluez.pc
+> endif
+> 
+> DISTCHECK_CONFIGURE_FLAGS = --disable-datafiles --enable-library \
+> -					--disable-systemd --disable-udev
+> +					--disable-systemd --disable-udev \
+> +					--enable-android
+> 
+> DISTCLEANFILES = $(pkgconfig_DATA)
+> 
+> diff --git a/Makefile.android b/Makefile.android
+> new file mode 100644
+> index 0000000..5e43730
+> --- /dev/null
+> +++ b/Makefile.android
+> @@ -0,0 +1,4 @@
+> +
+> +if ANDROID
+> +EXTRA_DIST += android/Android.mk
+> +endif
 
-I have taken care of that part. It is done inside mgmt_control() and in case of a controller in user channel mode it returns invalid index.
+as I mentioned in another patch. No need for if around EXTRA_DIST.
 
-For the events, I have no idea on how we would generate events if we are not going through hci_event.c when the user channel is active.
+> diff --git a/android/Android.mk b/android/Android.mk
+> new file mode 100644
+> index 0000000..e810654
+> --- /dev/null
+> +++ b/android/Android.mk
+> @@ -0,0 +1,5 @@
+> +LOCAL_PATH := $(call my-dir)
+> +
+> +# Retrieve BlueZ version from configure.ac file
+> +BLUEZ_VERSION := $(shell grep AC_INIT $(LOCAL_PATH)/../configure.ac | tr -d ' ' | sed -e 's/.*(.*,\(.*\))/\1/')
+> +
+> diff --git a/bootstrap-configure b/bootstrap-configure
+> index 7a6e7d1..8bde920 100755
+> --- a/bootstrap-configure
+> +++ b/bootstrap-configure
+> @@ -12,4 +12,5 @@ fi
+> 		--sysconfdir=/etc \
+> 		--localstatedir=/var \
+> 		--enable-experimental \
+> -		--disable-datafiles $*
+> +		--disable-datafiles \
+> +		--enable-android $*
+
+Historically --disable-datafiles is always last. And I like to keep it that way. Please add it after --enable-experimental.
+
+> diff --git a/configure.ac b/configure.ac
+> index 41c2935..22ab240 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -242,4 +242,8 @@ AC_DEFINE_UNQUOTED(CONFIGDIR, "${configdir}",
+> 			[Directory for the configuration files])
+> AC_SUBST(CONFIGDIR, "${configdir}")
+> 
+> +AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
+> +			[enable BlueZ Android]), [android=${enableval}])
+
+I would call it BlueZ for Android, but that is minor details.
+
+> +AM_CONDITIONAL(ANDROID, test "${android}" = "yes")
+
+However this should be ${enable_android} like with every other configure option we have.
+
+> +
+> AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
 
 Regards
 
