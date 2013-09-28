@@ -1,110 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Zheng, Wu" <wu.zheng@intel.com>
-To: "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
-CC: "Hedberg, Johan" <johan.hedberg@intel.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: FW: [PATCH 1/2] obexd:Add Operation property to transfer properties
-Date: Sun, 29 Sep 2013 03:03:48 +0000
-Message-ID: <2CF57A644018A745B8FE029C7223E16E1179670E@SHSMSX104.ccr.corp.intel.com>
-References: <1380008221-30501-1-git-send-email-wu.zheng@intel.com>
-In-Reply-To: <1380008221-30501-1-git-send-email-wu.zheng@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+Date: Sat, 28 Sep 2013 18:34:59 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/8] Bluetooth: Test for HCI_SETUP and HCI_USER_CHANNEL
+ in mgmt_valid_hdev()
+Message-ID: <20130928153459.GA15003@x220.p-661hnu-f1>
+References: <1380031363-1266-1-git-send-email-johan.hedberg@gmail.com>
+ <1380031363-1266-4-git-send-email-johan.hedberg@gmail.com>
+ <DFCF34C2-5AA9-4644-BB4B-3D6073DA9D42@holtmann.org>
+ <20130925100353.GA3158@x220.p-661hnu-f1>
+ <C7C45B32-4EF9-4FD7-B774-E88917DFAC75@holtmann.org>
+ <20130927114506.GA19210@x220.p-661hnu-f1>
+ <8F3048F3-3CE4-4257-912C-325A78F2DD6E@holtmann.org>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <8F3048F3-3CE4-4257-912C-325A78F2DD6E@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Marcel,
 
-Can you help review the patches? Thanks
+On Sat, Sep 28, 2013, Marcel Holtmann wrote:
+> >>>>> If either one of the HCI_SETUP or HCI_USER_CHANNEL flags is set the
+> >>>>> device is not considered valid for mgmt. By having these checks inside
+> >>>>> the mgmt_valid_hdev function the a couple of places using it can be
+> >>>>> simplified.
+> >>>> 
+> >>>> I looked at doing this and decided not to. Reason was that the device
+> >>>> gets removed from mgmt anyway.
+> >>> 
+> >>> I'm not sure what significance you think "device gets removed from mgmt"
+> >>> has. All that is is a mgmt event saying that index has been removed. In
+> >>> addition to that we need to ensure that we don't send any more mgmt
+> >>> events for such devices and that we don't include such devices in the
+> >>> response to mgmt_read_index list.
+> >>> 
+> >>> These are the two places of the code that my patch simplifies, one is
+> >>> the check for whether to send a "power on" mgmt event and the other the
+> >>> response handling of read_index_list.
+> >> 
+> >> I have taken care of that part. It is done inside mgmt_control() and
+> >> in case of a controller in user channel mode it returns invalid index.
+> > 
+> > That's great, but it doesn't cover the read_index_list command which we
+> > were talking about here since the command doesn't target any specific
+> > controller (as per our mgmt-api.txt it has the value <non-controller> as
+> > the controller index). The command handler will in this case be invoked
+> > that that's where it'd be convenient to rely on mgmt_valid_hdev() for
+> > constructing the response.
+> 
+> the read index list command has a special check for user channel. As I
+> said, I looked into this and opted against extending valid hdev macro
+> since we only need it in a few specific cases. Adding it there
+> resulted in simpler code then some magic macro that is used in more
+> places.
+> 
+> When I wrote the patches for user channel this felt cleaner. I had
+> patches for both ways, but decided to go this route.
 
-Best Regards
-Zheng Wu
+Fair enough.
 
->-----Original Message-----
->From: linux-bluetooth-owner@vger.kernel.org
->[mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Wu Zheng
->Sent: Tuesday, September 24, 2013 3:37 PM
->To: linux-bluetooth@vger.kernel.org
->Cc: Zheng, Wu
->Subject: [PATCH 1/2] obexd:Add Operation property to transfer properties
->
->Sometime, operation property is needed by the Bluetooth APP.
->Therefore, add the property to transfer properties
->---
-> obexd/src/manager.c |   38
->++++++++++++++++++++++++++++++++++++++
-> 1 files changed, 38 insertions(+), 0 deletions(-)
->
->diff --git a/obexd/src/manager.c b/obexd/src/manager.c index
->f64b7b9..96976ec 100644
->--- a/obexd/src/manager.c
->+++ b/obexd/src/manager.c
->@@ -35,6 +35,7 @@
->
-> #include <btio/btio.h>
-> #include <gobex/gobex.h>
->+#include <gobex/gobex-packet.h>
->
-> #include "obexd.h"
-> #include "obex.h"
->@@ -515,6 +516,41 @@ static gboolean transfer_get_filename(const
->GDBusPropertyTable *property,
-> 	return TRUE;
-> }
->
->+static gboolean transfer_operation_exists(const GDBusPropertyTable
->*property,
->+								void *data)
->+{
->+	struct obex_transfer *transfer = data;
->+	struct obex_session *session = transfer->session;
->+
->+	if (session->cmd == G_OBEX_OP_PUT &&
->+				session->size != OBJECT_SIZE_DELETE)
->+		return TRUE;
->+	else if (session->cmd == G_OBEX_OP_GET)
->+		return TRUE;
->+	else
->+		return FALSE;
->+}
->+
->+static gboolean transfer_get_operation(const GDBusPropertyTable
->*property,
->+					DBusMessageIter *iter, void *data) {
->+	struct obex_transfer *transfer = data;
->+	struct obex_session *session = transfer->session;
->+	const char *operation;
->+
->+	if (session->cmd == G_OBEX_OP_PUT &&
->+				session->size != OBJECT_SIZE_DELETE)
->+		operation = "PUT";
->+	else if (session->cmd == G_OBEX_OP_GET)
->+		operation = "GET";
->+	else
->+		return FALSE;
->+
->+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
->&operation);
->+
->+	return TRUE;
->+}
->+
-> static gboolean transfer_get_transferred(const GDBusPropertyTable
->*property,
-> 					DBusMessageIter *iter, void *data)  { @@ -549,6
->+585,8 @@ static const GDBusPropertyTable transfer_properties[] = {
-> 	{ "Time", "t", transfer_get_time, NULL, transfer_time_exists },
-> 	{ "Filename", "s", transfer_get_filename, NULL,
-> 						transfer_filename_exists },
->+	{ "Operation", "s", transfer_get_operation, NULL,
->+						transfer_operation_exists },
-> 	{ "Transferred", "t", transfer_get_transferred },
-> 	{ }
-> };
->--
->1.7.7
->
->--
->To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->the body of a message to majordomo@vger.kernel.org More majordomo
->info at  http://vger.kernel.org/majordomo-info.html
+> >> For the events, I have no idea on how we would generate events if we
+> >> are not going through hci_event.c when the user channel is active.
+> > 
+> > The "powered on" event in question doesn't come from hci_event.c but
+> > from the hci_dev_open() function, so again this is not covered by the
+> > existing user channel checks.
+> 
+> How would you trigger a power on event. When user channel is active
+> everything else is blocked. So every other operation will fail. That
+> is taken care of.
+> 
+> In addition you can only activate user channel on a controller that is
+> powered off. That was a conscious design decision. Keep it really
+> simple. User channel mode is exclusive and exclusive to one user at a
+> time.
+
+Good point. The only hci_dev_open() call that comes to mind is the one
+automatically triggered by the setup stage, but user space doesn't yet
+know about the controller at that point.
+
+Johan
