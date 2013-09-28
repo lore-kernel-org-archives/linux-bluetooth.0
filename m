@@ -1,83 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 28 Sep 2013 18:34:59 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/8] Bluetooth: Test for HCI_SETUP and HCI_USER_CHANNEL
- in mgmt_valid_hdev()
-Message-ID: <20130928153459.GA15003@x220.p-661hnu-f1>
-References: <1380031363-1266-1-git-send-email-johan.hedberg@gmail.com>
- <1380031363-1266-4-git-send-email-johan.hedberg@gmail.com>
- <DFCF34C2-5AA9-4644-BB4B-3D6073DA9D42@holtmann.org>
- <20130925100353.GA3158@x220.p-661hnu-f1>
- <C7C45B32-4EF9-4FD7-B774-E88917DFAC75@holtmann.org>
- <20130927114506.GA19210@x220.p-661hnu-f1>
- <8F3048F3-3CE4-4257-912C-325A78F2DD6E@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <8F3048F3-3CE4-4257-912C-325A78F2DD6E@holtmann.org>
+From: Hans de Goede <hdegoede@redhat.com>
+To: USB list <linux-usb@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org
+Cc: Hans de Goede <hdegoede@redhat.com>,
+	Shuah Khan <shuah.kh@samsung.com>,
+	Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
+	stable@vger.kernel.org
+Subject: [PATCH] Regression fix revert: "Bluetooth: Add missing reset_resume dev_pm_ops"
+Date: Sat, 28 Sep 2013 15:25:39 +0200
+Message-Id: <1380374739-11581-1-git-send-email-hdegoede@redhat.com>
+Sender: linux-usb-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Many btusb devices have 2 modes, a hid mode and a bluetooth hci mode. These
+devices default to hid mode for BIOS use. This means that after having been
+reset they will revert to HID mode, and are no longer usable as a HCI.
 
-On Sat, Sep 28, 2013, Marcel Holtmann wrote:
-> >>>>> If either one of the HCI_SETUP or HCI_USER_CHANNEL flags is set the
-> >>>>> device is not considered valid for mgmt. By having these checks inside
-> >>>>> the mgmt_valid_hdev function the a couple of places using it can be
-> >>>>> simplified.
-> >>>> 
-> >>>> I looked at doing this and decided not to. Reason was that the device
-> >>>> gets removed from mgmt anyway.
-> >>> 
-> >>> I'm not sure what significance you think "device gets removed from mgmt"
-> >>> has. All that is is a mgmt event saying that index has been removed. In
-> >>> addition to that we need to ensure that we don't send any more mgmt
-> >>> events for such devices and that we don't include such devices in the
-> >>> response to mgmt_read_index list.
-> >>> 
-> >>> These are the two places of the code that my patch simplifies, one is
-> >>> the check for whether to send a "power on" mgmt event and the other the
-> >>> response handling of read_index_list.
-> >> 
-> >> I have taken care of that part. It is done inside mgmt_control() and
-> >> in case of a controller in user channel mode it returns invalid index.
-> > 
-> > That's great, but it doesn't cover the read_index_list command which we
-> > were talking about here since the command doesn't target any specific
-> > controller (as per our mgmt-api.txt it has the value <non-controller> as
-> > the controller index). The command handler will in this case be invoked
-> > that that's where it'd be convenient to rely on mgmt_valid_hdev() for
-> > constructing the response.
-> 
-> the read index list command has a special check for user channel. As I
-> said, I looked into this and opted against extending valid hdev macro
-> since we only need it in a few specific cases. Adding it there
-> resulted in simpler code then some magic macro that is used in more
-> places.
-> 
-> When I wrote the patches for user channel this felt cleaner. I had
-> patches for both ways, but decided to go this route.
+Therefor it is a very bad idea to just blindly make reset_resume point to
+the regular resume handler. Note that the btusb driver has no clue how to
+switch these devices from hid to hci mode, this is done in userspace through
+udev rules, so the proper way to deal with this is to not have a reset-resume
+handler and instead let the usb-system re-enumerate the device, and re-run
+the udev rules.
 
-Fair enough.
+I must also note, that the commit message for the commit causing this
+problem has a very weak motivation for the change:
 
-> >> For the events, I have no idea on how we would generate events if we
-> >> are not going through hci_event.c when the user channel is active.
-> > 
-> > The "powered on" event in question doesn't come from hci_event.c but
-> > from the hci_dev_open() function, so again this is not covered by the
-> > existing user channel checks.
-> 
-> How would you trigger a power on event. When user channel is active
-> everything else is blocked. So every other operation will fail. That
-> is taken care of.
-> 
-> In addition you can only activate user channel on a controller that is
-> powered off. That was a conscious design decision. Keep it really
-> simple. User channel mode is exclusive and exclusive to one user at a
-> time.
+"Add missing reset_resume dev_pm_ops. Missing reset_resume results in the
+following message after power management device test. This change sets
+reset_resume to btusb_resume().
 
-Good point. The only hci_dev_open() call that comes to mind is the one
-automatically triggered by the setup stage, but user space doesn't yet
-know about the controller at that point.
+[ 2506.936134] btusb 1-1.5:1.0: no reset_resume for driver btusb?
+[ 2506.936137] btusb 1-1.5:1.1: no reset_resume for driver btusb?"
 
-Johan
+Making a change solely to silence a warning while also changing important
+behavior (normal resume handling versus re-enumeration) requires a commit
+message with a proper explanation why it is safe to do so, which clearly lacks
+here, and unsurprisingly it turns out to not be safe to make this change.
+
+Reverting the commit in question fixes bt no longer working on my Dell
+E6430 after a suspend/resume, and I believe it likely also fixes the
+following bugs:
+https://bugzilla.redhat.com/show_bug.cgi?id=988481
+https://bugzilla.redhat.com/show_bug.cgi?id=1010649
+https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1213239
+
+This reverts commit 502f769662978a2fe99d0caed5e53e3006107381.
+
+Cc: Shuah Khan <shuah.kh@samsung.com>
+Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Cc: stable@vger.kernel.org
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ drivers/bluetooth/btusb.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 8e16f0a..d0b3d90 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -1623,7 +1623,6 @@ static struct usb_driver btusb_driver = {
+ #ifdef CONFIG_PM
+ 	.suspend	= btusb_suspend,
+ 	.resume		= btusb_resume,
+-	.reset_resume	= btusb_resume,
+ #endif
+ 	.id_table	= btusb_table,
+ 	.supports_autosuspend = 1,
+-- 
+1.8.3.1
+
