@@ -1,48 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 29 Sep 2013 17:59:47 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 15/16] android: Implement basic HAL server
-Message-ID: <20130929145947.GA28937@x220.p-661hnu-f1>
-References: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1380291161-10232-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1380291161-10232-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1380034036-25143-1-git-send-email-luiz.dentz@gmail.com>
+References: <1380034036-25143-1-git-send-email-luiz.dentz@gmail.com>
+Date: Sun, 29 Sep 2013 17:15:32 +0300
+Message-ID: <CABBYNZ+PUxNaV=C0cybZvrw=NYby3Vmoa6e2-6GA4A2t=XH05Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] gobex: Fix crash on g_obex_pending_req_abort
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi,
 
-On Fri, Sep 27, 2013, Andrei Emeltchenko wrote:
-> +	sock = socket(AF_UNIX, SOCK_STREAM, 0);
-> +	if (sock < 0) {
-> +		error("%s: socket(): %s", __func__, strerror(errno));
-> +		return sock;
-> +	}
+On Tue, Sep 24, 2013 at 5:47 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> It is not safe to call g_obex_pending_req_abort directly as pending_req
+> can be NULL:
+> Invalid read of size 4
+>    at 0x41231E: g_obex_pending_req_abort (gobex.c:693)
+>    by 0x416A8A: g_obex_cancel_transfer (gobex-transfer.c:647)
+>    by 0x42DEF2: obc_transfer_cancel (transfer.c:180)
+>    by 0x43D833: process_message.isra.5 (object.c:259)
+>    by 0x3B0701CE85: ??? (in /usr/lib64/libdbus-1.so.3.7.4)
+>    by 0x3B0700FA30: dbus_connection_dispatch (in /usr/lib64/libdbus-1.so.3.7.4)
+>    by 0x43A5B7: message_dispatch (mainloop.c:76)
+>    by 0x3B03C48962: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
+>    by 0x3B03C47E05: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3600.3)
+>    by 0x3B03C48157: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
+>    by 0x3B03C48559: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3600.3)
+>    by 0x40D53C: main (main.c:319)
+>  Address 0x30 is not stack'd, malloc'd or (recently) free'd
+> ---
+>  gobex/gobex-transfer.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
+> index 4203fec..b815d60 100644
+> --- a/gobex/gobex-transfer.c
+> +++ b/gobex/gobex-transfer.c
+> @@ -644,7 +644,10 @@ gboolean g_obex_cancel_transfer(guint id, GObexFunc complete_func,
+>         transfer->complete_func = complete_func;
+>         transfer->user_data = user_data;
+>
+> -       ret = g_obex_pending_req_abort(transfer->obex, NULL);
+> +       if (transfer->req_id == 0)
+> +               goto done;
+> +
+> +       ret = g_obex_cancel_req(transfer->obex, transfer->req_id, FALSE);
+>         if (ret)
+>                 return TRUE;
+>
+> --
+> 1.8.3.1
 
-This should be SOCK_SEQPACKET. It has been mentioned several times in
-our (offline) conversations and is also clearly stated in the IPC
-document we'll soon push upstream.
+I went ahead an pushed this set upstream.
 
-> +	/* Since daemon would be run also on host we have to grant perms */
-> +	chmod(sock_path, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH |
-> +								S_IWOTH);
 
-Is this really necessary? On the host (by which I presume you mean the
-system where you build BlueZ, i.e. a non-android system) couldn't the
-test tool that's used just exec the daemon and then you have the same
-context for both processes that need to access the socket.
 
-> @@ -646,11 +648,13 @@ int main(int argc, char *argv[])
->  		exit(1);
->  
->  	init_mgmt_interface();
-> +	start_hal_srv("/dev/socket/bluez_hal");
-
-Isn't /var/run the right place for stuff like this? Alternatively we
-could also go with an abstract socket and then not care about any
-associations with the file system at all.
-
-Johan
+-- 
+Luiz Augusto von Dentz
