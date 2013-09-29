@@ -1,65 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1380034036-25143-1-git-send-email-luiz.dentz@gmail.com>
-References: <1380034036-25143-1-git-send-email-luiz.dentz@gmail.com>
-Date: Sun, 29 Sep 2013 17:15:32 +0300
-Message-ID: <CABBYNZ+PUxNaV=C0cybZvrw=NYby3Vmoa6e2-6GA4A2t=XH05Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] gobex: Fix crash on g_obex_pending_req_abort
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: Jaganath Kanakkassery <jaganath.k@samsung.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [RFC 12/16] android: Add cap to bind to port < 1024
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1380291161-10232-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Sun, 29 Sep 2013 15:40:49 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <4816C977-BFF3-4FE3-A76F-42BF87836C39@holtmann.org>
+References: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1380291161-10232-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrei,
 
-On Tue, Sep 24, 2013 at 5:47 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> It is not safe to call g_obex_pending_req_abort directly as pending_req
-> can be NULL:
-> Invalid read of size 4
->    at 0x41231E: g_obex_pending_req_abort (gobex.c:693)
->    by 0x416A8A: g_obex_cancel_transfer (gobex-transfer.c:647)
->    by 0x42DEF2: obc_transfer_cancel (transfer.c:180)
->    by 0x43D833: process_message.isra.5 (object.c:259)
->    by 0x3B0701CE85: ??? (in /usr/lib64/libdbus-1.so.3.7.4)
->    by 0x3B0700FA30: dbus_connection_dispatch (in /usr/lib64/libdbus-1.so.3.7.4)
->    by 0x43A5B7: message_dispatch (mainloop.c:76)
->    by 0x3B03C48962: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
->    by 0x3B03C47E05: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3600.3)
->    by 0x3B03C48157: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
->    by 0x3B03C48559: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3600.3)
->    by 0x40D53C: main (main.c:319)
->  Address 0x30 is not stack'd, malloc'd or (recently) free'd
+> For SDP server we need to bind to lower port, acquire this capability.
 > ---
->  gobex/gobex-transfer.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
-> index 4203fec..b815d60 100644
-> --- a/gobex/gobex-transfer.c
-> +++ b/gobex/gobex-transfer.c
-> @@ -644,7 +644,10 @@ gboolean g_obex_cancel_transfer(guint id, GObexFunc complete_func,
->         transfer->complete_func = complete_func;
->         transfer->user_data = user_data;
->
-> -       ret = g_obex_pending_req_abort(transfer->obex, NULL);
-> +       if (transfer->req_id == 0)
-> +               goto done;
+> android/main.c |   53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+> configure.ac   |    4 ++++
+> 2 files changed, 57 insertions(+)
+> 
+> diff --git a/android/main.c b/android/main.c
+> index 5fef095..649867d 100644
+> --- a/android/main.c
+> +++ b/android/main.c
+> @@ -31,6 +31,19 @@
+> #include <stdio.h>
+> #include <stdlib.h>
+> #include <string.h>
+> +#include <unistd.h>
+> +#include <errno.h>
+> +#include <sys/prctl.h>
+> +#include <linux/capability.h>
 > +
-> +       ret = g_obex_cancel_req(transfer->obex, transfer->req_id, FALSE);
->         if (ret)
->                 return TRUE;
->
-> --
-> 1.8.3.1
+> +/**
+> + * Include <sys/capability.h> for host build and
+> + * also for Android 4.3 when it is added to bionic
+> + */
+> +#if (defined(__ANDROID_API__) && (__ANDROID_API__ > 17)) || \
+> +					!defined(__ANDROID_API__)
+> +#include <sys/capability.h>
+> +#endif
+> 
+> #include <glib.h>
+> 
+> @@ -319,6 +332,43 @@ static void cleanup_mgmt_interface(void)
+> 	mgmt_if = NULL;
+> }
+> 
+> +static bool android_set_aid_and_cap()
+> +{
+> +	struct __user_cap_header_struct header;
+> +	struct __user_cap_data_struct cap;
+> +
+> +	DBG("%s: pid %d uid %d gid %d", __func__, getpid(), getuid(), getgid());
+> +
+> +	header.version = _LINUX_CAPABILITY_VERSION;
+> +	header.pid = getpid();
+> +	if (capget(&header, &cap) < 0)
+> +		error("%s: capget(): %s", __func__, strerror(errno));
+> +
+> +	DBG("%s: Cap data 0x%x, 0x%x, 0x%x\n", __func__, cap.effective,
+> +					cap.permitted, cap.inheritable);
+> +
+> +	prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);
+> +
+> +	header.version = _LINUX_CAPABILITY_VERSION;
+> +	header.pid = 0;
+> +
+> +	cap.effective = cap.permitted = cap.inheritable =
+> +		1 << CAP_NET_RAW |
 
-I went ahead an pushed this set upstream.
+the CAP_NET_RAW should not be needed for the daemon.
 
+> +		1 << CAP_NET_ADMIN |
+> +		1 << CAP_NET_BIND_SERVICE |
+> +		1 << CAP_SYS_RAWIO |
 
+What kind of RAWIO are planning to do?
 
--- 
-Luiz Augusto von Dentz
+> +		1 << CAP_SYS_NICE |
+
+Do we need to renice ourselves?
+
+> +		1 << CAP_SETGID;
+> +
+> +	if (capset(&header, &cap)) {
+> +		error("%s: capset(): %s", __func__, strerror(errno));
+> +		return false;
+> +	}
+> +
+> +	DBG("%s: capset(): Success", __func__);
+> +	return true;
+> +}
+> +
+> int main(int argc, char *argv[])
+> {
+> 	GOptionContext *context;
+> @@ -357,6 +407,9 @@ int main(int argc, char *argv[])
+> 	/* no need to keep parsed option in memory */
+> 	free_options();
+> 
+> +	if (android_set_aid_and_cap() == false)
+> +		exit(1);
+> +
+> 	init_mgmt_interface();
+> 
+> 	DBG("Entering main loop");
+> diff --git a/configure.ac b/configure.ac
+> index 3b7a5d9..af418d3 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -247,4 +247,8 @@ AC_ARG_ENABLE(android-daemon, AC_HELP_STRING([--enable-android-daemon],
+> 					[android_daemon=${enableval}])
+> AM_CONDITIONAL(ANDROID_DAEMON, test "${android_daemon}" = "yes")
+> 
+> +if (test "${android_daemon}" = "yes"); then
+> +	AC_CHECK_LIB(cap, capget, dummy=yes, AC_MSG_ERROR(libcap is required))
+> +fi
+> +
+
+The configure option should be --enable-android.
+
+> AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
+
+Regards
+
+Marcel
+
