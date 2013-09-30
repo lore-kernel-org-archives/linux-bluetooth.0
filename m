@@ -1,61 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Send new settings event when changing high speed option
-Date: Mon, 30 Sep 2013 22:17:38 -0700
-Message-Id: <1380604658-34364-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <52498C8C.4070200@linux.intel.com>
+References: <1380024798-32017-1-git-send-email-frederic.danis@linux.intel.com>
+	<1380024798-32017-3-git-send-email-frederic.danis@linux.intel.com>
+	<7A4917A5-AD76-48AD-8C04-11707D64CE37@holtmann.org>
+	<52498C8C.4070200@linux.intel.com>
+Date: Mon, 30 Sep 2013 22:26:13 +0300
+Message-ID: <CAMXE1-pFYMRUEpKdjsZLov=k8tMQBYLA5QJcmCC+NqfXbBHkTA@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] android: Android version of log.c
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Frederic Danis <frederic.danis@linux.intel.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Bluetooth Linux <linux-bluetooth@vger.kernel.org>
+Content-Type: multipart/alternative; boundary=e89a8f3bae5d2dc1a004e79ecf15
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When enabling or disabling high speed setting it is required to send
-a new settings event to inform other management interface users about
-the changed settings.
+--e89a8f3bae5d2dc1a004e79ecf15
+Content-Type: text/plain; charset=ISO-8859-1
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/mgmt.c | 19 ++++++++++++++++---
- 1 file changed, 16 insertions(+), 3 deletions(-)
+Hi,
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 1b5b10f..13b5435 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1341,6 +1341,8 @@ failed:
- static int set_hs(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
- {
- 	struct mgmt_mode *cp = data;
-+	bool changed;
-+	int err;
- 
- 	BT_DBG("request for %s", hdev->name);
- 
-@@ -1352,12 +1354,23 @@ static int set_hs(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
- 		return cmd_status(sk, hdev->id, MGMT_OP_SET_HS,
- 				  MGMT_STATUS_INVALID_PARAMS);
- 
-+	hci_dev_lock(hdev);
-+
- 	if (cp->val)
--		set_bit(HCI_HS_ENABLED, &hdev->dev_flags);
-+		changed = !test_and_set_bit(HCI_HS_ENABLED, &hdev->dev_flags);
- 	else
--		clear_bit(HCI_HS_ENABLED, &hdev->dev_flags);
-+		changed = test_and_clear_bit(HCI_HS_ENABLED, &hdev->dev_flags);
-+
-+	err = send_settings_rsp(sk, MGMT_OP_SET_HS, hdev);
-+	if (err < 0)
-+		goto unlock;
- 
--	return send_settings_rsp(sk, MGMT_OP_SET_HS, hdev);
-+	if (changed)
-+		err = new_settings(hdev, sk);
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+	return err;
- }
- 
- static void le_enable_complete(struct hci_dev *hdev, u8 status)
--- 
-1.8.3.1
+"Frederic Danis" <frederic.danis@linux.intel.com>
+>
+> Hello Marcel,
+>
+>
+> On 27/09/2013 04:01, Marcel Holtmann wrote:
+>>>
+>>> Add logging system to BlueZ Android daemon.
+>>> >Android build will use android/log.c file while autotools build will
+use
+>>> >src/log.c instead.
+>>
+>> lets just use stdout for now. Changing this later is pretty trivial and
+introducing large build alternates is a bit too complicated at this point.
+>
+>
+> I do not understand how writing code to log to stdout can be more simple
+than building and linking existing code.
 
+I agree with Frederic here. Why do we use error, warn, DBG, etc if we print
+to stdout?
+
+This actually will significantly slow log parsing since first you pay
+attention to error messages. If all messages are printed with the same
+priorities then we loose this ability.
+
+Regards,
+Andrei
+
+--e89a8f3bae5d2dc1a004e79ecf15
+Content-Type: text/html; charset=ISO-8859-1
+
+<p dir="ltr">Hi,</p>
+<p dir="ltr">&quot;Frederic Danis&quot; &lt;<a href="mailto:frederic.danis@linux.intel.com">frederic.danis@linux.intel.com</a>&gt;<br>
+&gt;<br>
+&gt; Hello Marcel,<br>
+&gt;<br>
+&gt;<br>
+&gt; On 27/09/2013 04:01, Marcel Holtmann wrote:<br>
+&gt;&gt;&gt;<br>
+&gt;&gt;&gt; Add logging system to BlueZ Android daemon.<br>
+&gt;&gt;&gt; &gt;Android build will use android/log.c file while autotools build will use<br>
+&gt;&gt;&gt; &gt;src/log.c instead.<br>
+&gt;&gt;<br>
+&gt;&gt; lets just use stdout for now. Changing this later is pretty trivial and introducing large build alternates is a bit too complicated at this point.<br>
+&gt;<br>
+&gt;<br>
+&gt; I do not understand how writing code to log to stdout can be more simple than building and linking existing code.</p>
+<p dir="ltr">I agree with Frederic here. Why do we use error, warn, DBG, etc if we print to stdout?</p>
+<p dir="ltr">This actually will significantly slow log parsing since first you pay attention to error messages. If all messages are printed with the same priorities then we loose this ability.</p>
+<p dir="ltr">Regards,<br>
+Andrei <br>
+</p>
+
+--e89a8f3bae5d2dc1a004e79ecf15--
