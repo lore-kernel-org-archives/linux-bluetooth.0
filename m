@@ -1,125 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>, linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 11/16] android: sdp: Reuse BlueZ SDP server in Android
-Date: Mon, 30 Sep 2013 09:45:16 +0200
-Message-ID: <2967978.YkbqiyBFyK@uw000953>
-In-Reply-To: <B13A32F7-6E42-43FA-B821-D1815119ABBC@holtmann.org>
-References: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1380291161-10232-12-git-send-email-Andrei.Emeltchenko.news@gmail.com> <B13A32F7-6E42-43FA-B821-D1815119ABBC@holtmann.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 12/16] android: Add cap to bind to port < 1024
+Date: Mon, 30 Sep 2013 09:36:54 +0200
+Message-ID: <7348700.bQ9Re4jemt@uw000953>
+In-Reply-To: <1380291161-10232-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1380291161-10232-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="ISO-8859-1"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Andrei,
 
-> > Reuse existing SDP server code in Android GPL daemon.
-> > ---
-> > Makefile.android     |    7 +++++--
-> > android/Android.mk   |    6 ++++++
-> > android/bt_adapter.c |    5 ++++-
-> > android/main.c       |   27 +++++++++++++++++++++++++++
-> > android/main.h       |   25 +++++++++++++++++++++++++
-> > 5 files changed, 67 insertions(+), 3 deletions(-)
-> > create mode 100644 android/main.h
-> > 
-> > diff --git a/Makefile.android b/Makefile.android
-> > index 3e6fec0..bf82928 100644
-> > --- a/Makefile.android
-> > +++ b/Makefile.android
-> > @@ -3,7 +3,10 @@ if ANDROID_DAEMON
-> > noinst_PROGRAMS += android/bluezd
-> > 
-> > android_bluezd_SOURCES = android/main.c src/log.c \
-> > +				src/sdpd-database.c src/sdpd-server.c \
-> > +				src/sdpd-service.c src/sdpd-request.c \
-> > 				src/shared/util.h src/shared/util.c \
-> > -				src/shared/mgmt.h src/shared/mgmt.c
-> > -android_bluezd_LDADD = @GLIB_LIBS@
-> > +				src/shared/mgmt.h src/shared/mgmt.c \
-> > +				android/bt_adapter.h android/bt_adapter.c
-> > +android_bluezd_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
-> > endif
-> > diff --git a/android/Android.mk b/android/Android.mk
-> > index 36f8798..08e35e4 100644
-> > --- a/android/Android.mk
-> > +++ b/android/Android.mk
-> > @@ -9,6 +9,11 @@ include $(CLEAR_VARS)
-> > LOCAL_SRC_FILES := \
-> > 	log.c \
-> > 	main.c \
-> > +	bt_adapter.c \
-> > +	../src/sdpd-database.c \
-> > +	../src/sdpd-service.c \
-> > +	../src/sdpd-request.c \
-> > +	../src/sdpd-server.c \
-> > 
-> > LOCAL_C_INCLUDES := \
-> > 	$(call include-path-for, glib) \
-> > @@ -24,6 +29,7 @@ LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
-> > LOCAL_SHARED_LIBRARIES := \
-> > 	libglib \
-> > 	libbluez \
-> > +	libbluetooth \
-> > 
-> > LOCAL_MODULE := bluezd
-> > 
-> > diff --git a/android/bt_adapter.c b/android/bt_adapter.c
-> > index 9f64839..42facb6 100644
-> > --- a/android/bt_adapter.c
-> > +++ b/android/bt_adapter.c
-> > @@ -23,6 +23,7 @@
-> > 
-> > #include "bt_adapter.h"
-> > #include "log.h"
-> > +#include "main.h"
-> > #include "src/shared/mgmt.h"
-> > 
-> > struct bt_device *bt_device_ref(struct bt_device *device)
-> > @@ -118,7 +119,7 @@ void adapter_start(struct bt_adapter *adapter)
-> > 
-> > 	/* TODO: CB: report scan mode */
-> > 
-> > -	/* TODO: SDP start here */
-> > +	sdp_start();
-> > 
-> > 	/* TODO: CB: report state on */
-> > }
-> > @@ -126,4 +127,6 @@ void adapter_start(struct bt_adapter *adapter)
-> > void adapter_stop(struct bt_adapter *adapter)
-> > {
-> > 	DBG("disabled %u", adapter->dev_id);
-> > +
-> > +	sdp_stop();
-> > }
-> > diff --git a/android/main.c b/android/main.c
-> > index 4792919..5fef095 100644
-> > --- a/android/main.c
-> > +++ b/android/main.c
-> > @@ -36,6 +36,8 @@
-> > 
-> > #include "log.h"
-> > #include "hcid.h"
-> > +#include "sdpd.h"
-> > +#include "main.h"
-> > 
-> > #include "lib/bluetooth.h"
-> > #include "lib/mgmt.h"
-> > @@ -43,12 +45,37 @@
-> > 
-> > #define SHUTDOWN_GRACE_SECONDS 10
-> > 
-> > +struct main_opts main_opts;
-> > +
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> where is this main_opts coming from. I rather not have this.
+> For SDP server we need to bind to lower port, acquire this capability.
+> ---
+>  android/main.c |   53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  configure.ac   |    4 ++++
+>  2 files changed, 57 insertions(+)
+> 
+> diff --git a/android/main.c b/android/main.c
+> index 5fef095..649867d 100644
+> --- a/android/main.c
+> +++ b/android/main.c
+> @@ -31,6 +31,19 @@
+>  #include <stdio.h>
+>  #include <stdlib.h>
+>  #include <string.h>
+> +#include <unistd.h>
+> +#include <errno.h>
+> +#include <sys/prctl.h>
+> +#include <linux/capability.h>
+> +
+> +/**
+> + * Include <sys/capability.h> for host build and
+> + * also for Android 4.3 when it is added to bionic
+> + */
+> +#if (defined(__ANDROID_API__) && (__ANDROID_API__ > 17)) || \
+> +					!defined(__ANDROID_API__)
+> +#include <sys/capability.h>
+> +#endif
+>  
+>  #include <glib.h>
+>  
+> @@ -319,6 +332,43 @@ static void cleanup_mgmt_interface(void)
+>  	mgmt_if = NULL;
+>  }
+>  
+> +static bool android_set_aid_and_cap()
+> +{
+> +	struct __user_cap_header_struct header;
+> +	struct __user_cap_data_struct cap;
+> +
+> +	DBG("%s: pid %d uid %d gid %d", __func__, getpid(), getuid(), getgid());
 
-It is from deviceid related code in sdpd-server.
+DBG macro already adds function name to string so there is no need to double
+that. This applies to other places as well.
 
-We could pass device id info to start_sdp_server() to avoid that.
-Or have some more general interface for accessing config options - Luiz
-suggested ofono way (which is quite elegant imho).
+> +
+> +	header.version = _LINUX_CAPABILITY_VERSION;
+> +	header.pid = getpid();
+> +	if (capget(&header, &cap) < 0)
+> +		error("%s: capget(): %s", __func__, strerror(errno));
+> +
+> +	DBG("%s: Cap data 0x%x, 0x%x, 0x%x\n", __func__, cap.effective,
+> +					cap.permitted, cap.inheritable);
+> +
+> +	prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);
+> +
+> +	header.version = _LINUX_CAPABILITY_VERSION;
+> +	header.pid = 0;
+> +
+> +	cap.effective = cap.permitted = cap.inheritable =
+> +		1 << CAP_NET_RAW |
+> +		1 << CAP_NET_ADMIN |
+> +		1 << CAP_NET_BIND_SERVICE |
+> +		1 << CAP_SYS_RAWIO |
+> +		1 << CAP_SYS_NICE |
+> +		1 << CAP_SETGID;
+> +
+> +	if (capset(&header, &cap)) {
+> +		error("%s: capset(): %s", __func__, strerror(errno));
+> +		return false;
+> +	}
+> +
+> +	DBG("%s: capset(): Success", __func__);
+> +	return true;
+> +}
+> +
+>  int main(int argc, char *argv[])
+>  {
+>  	GOptionContext *context;
+> @@ -357,6 +407,9 @@ int main(int argc, char *argv[])
+>  	/* no need to keep parsed option in memory */
+>  	free_options();
+>  
+> +	if (android_set_aid_and_cap() == false)
+> +		exit(1);
+> +
+>  	init_mgmt_interface();
+>  
+>  	DBG("Entering main loop");
+> diff --git a/configure.ac b/configure.ac
+> index 3b7a5d9..af418d3 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -247,4 +247,8 @@ AC_ARG_ENABLE(android-daemon, AC_HELP_STRING([--enable-android-daemon],
+>  					[android_daemon=${enableval}])
+>  AM_CONDITIONAL(ANDROID_DAEMON, test "${android_daemon}" = "yes")
+>  
+> +if (test "${android_daemon}" = "yes"); then
+> +	AC_CHECK_LIB(cap, capget, dummy=yes, AC_MSG_ERROR(libcap is required))
+> +fi
+> +
+>  AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
+> 
 
 -- 
 BR
 Szymon Janc
+
+
