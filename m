@@ -1,85 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] lib: Fix use of uninitialized variable in sdp_set_profile_descs
-Date: Mon, 30 Sep 2013 15:06:03 +0200
-Message-ID: <1380546363-10722-1-git-send-email-szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC 10/16] android: Add Android Makefile for libbluetooth
+Date: Mon, 30 Sep 2013 14:14:09 +0200
+Message-ID: <6873848.d8uRT0mZyA@uw000953>
+In-Reply-To: <20130930073222.GC10262@aemeltch-MOBL1>
+References: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <CAJdJm_OYf-QjS9iS6vON7jw8biq0_8g0KpoHBW_-Gb0-U6w3Pg@mail.gmail.com> <20130930073222.GC10262@aemeltch-MOBL1>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Error path on default case was not breaking loop. To keep error
-handling similar all error path were converted to use goto.
+Hi,
 
-This fix following:
-target  C: libbluetooth <= external/bluetooth/bluez/android/../lib/sdp.c
-lib/sdp.c: In function 'sdp_set_profile_descs':
-lib/sdp.c:487:10: warning: 'values[0]' may be used uninitialized in
-    this function [-Wmaybe-uninitialized]
-lib/sdp.c:2562:19: note: 'values[0]' was declared here
-lib/sdp.c:545:11: warning: 'dtds[0]' may be used uninitialized in this
-    function [-Wmaybe-uninitialized]
-lib/sdp.c:2562:9: note: 'dtds[0]' was declared here
----
- lib/sdp.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+> > On Fri, Sep 27, 2013 at 10:12 AM, Andrei Emeltchenko
+> > <Andrei.Emeltchenko.news@gmail.com> wrote:
+> > > +# to suppress the "pointer of type 'void *' used in arithmetic" warning
+> > > +LOCAL_CFLAGS += -Wno-pointer-arith
+> > > +
+> > > +# to suppress the "missing initializer near initialization" warning
+> > > +LOCAL_CFLAGS += -Wno-missing-field-initializers
+> > > +
+> > > +# to suppress the "may be used uninitialized in this function" warning
+> > > +LOCAL_CFLAGS += -Wno-maybe-uninitialized
+> > 
+> > I wonder why you are suppressing all those warnings. Do you plan to
+> > re-enable them once the implementation is more complete?
+> 
+> I think most warnings are the same as in standard BlueZ build. At some
+> point those issue must be resolved IMO.
 
-diff --git a/lib/sdp.c b/lib/sdp.c
-index 54a99b6..1405c50 100644
---- a/lib/sdp.c
-+++ b/lib/sdp.c
-@@ -2546,6 +2546,7 @@ int sdp_set_profile_descs(sdp_record_t *rec, const sdp_list_t *profiles)
- 	int i = 0, seqlen = sdp_list_len(profiles);
- 	void **seqDTDs, **seqs;
- 	const sdp_list_t *p;
-+	sdp_data_t *pAPSeq;
- 
- 	seqDTDs = malloc(seqlen * sizeof(void *));
- 	if (!seqDTDs)
-@@ -2563,7 +2564,7 @@ int sdp_set_profile_descs(sdp_record_t *rec, const sdp_list_t *profiles)
- 		sdp_profile_desc_t *profile = p->data;
- 		if (!profile) {
- 			status = -1;
--			break;
-+			goto end;
- 		}
- 		switch (profile->uuid.type) {
- 		case SDP_UUID16:
-@@ -2580,7 +2581,7 @@ int sdp_set_profile_descs(sdp_record_t *rec, const sdp_list_t *profiles)
- 			break;
- 		default:
- 			status = -1;
--			break;
-+			goto end;
- 		}
- 		dtds[1] = &uint16;
- 		values[1] = &profile->version;
-@@ -2588,7 +2589,7 @@ int sdp_set_profile_descs(sdp_record_t *rec, const sdp_list_t *profiles)
- 
- 		if (seq == NULL) {
- 			status = -1;
--			break;
-+			goto end;
- 		}
- 
- 		seqDTDs[i] = &seq->dtd;
-@@ -2596,10 +2597,10 @@ int sdp_set_profile_descs(sdp_record_t *rec, const sdp_list_t *profiles)
- 		sdp_pattern_add_uuid(rec, &profile->uuid);
- 		i++;
- 	}
--	if (status == 0) {
--		sdp_data_t *pAPSeq = sdp_seq_alloc(seqDTDs, seqs, seqlen);
--		sdp_attr_add(rec, SDP_ATTR_PFILE_DESC_LIST, pAPSeq);
--	}
-+
-+	pAPSeq = sdp_seq_alloc(seqDTDs, seqs, seqlen);
-+	sdp_attr_add(rec, SDP_ATTR_PFILE_DESC_LIST, pAPSeq);
-+end:
- 	free(seqDTDs);
- 	free(seqs);
- 	return status;
+There seems to be a bug in sdp_set_profile_descs() error path, for some reason
+gcc 4.6 on my box doesn't generate warning, yet android one does.
+Will send a patch for that in a moment.
+
 -- 
-1.8.4
+Szymon Janc
+
 
