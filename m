@@ -1,76 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 30 Sep 2013 21:19:23 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] lib: Fix use of uninitialized variable in
+ sdp_set_profile_descs
+Message-ID: <20130930181923.GC26405@x220.p-661hnu-f1>
+References: <1380546363-10722-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <52498C8C.4070200@linux.intel.com>
-References: <1380024798-32017-1-git-send-email-frederic.danis@linux.intel.com>
-	<1380024798-32017-3-git-send-email-frederic.danis@linux.intel.com>
-	<7A4917A5-AD76-48AD-8C04-11707D64CE37@holtmann.org>
-	<52498C8C.4070200@linux.intel.com>
-Date: Mon, 30 Sep 2013 22:26:13 +0300
-Message-ID: <CAMXE1-pFYMRUEpKdjsZLov=k8tMQBYLA5QJcmCC+NqfXbBHkTA@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] android: Android version of log.c
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Frederic Danis <frederic.danis@linux.intel.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Bluetooth Linux <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/alternative; boundary=e89a8f3bae5d2dc1a004e79ecf15
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1380546363-10722-1-git-send-email-szymon.janc@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---e89a8f3bae5d2dc1a004e79ecf15
-Content-Type: text/plain; charset=ISO-8859-1
+Hi Szymon,
 
-Hi,
+On Mon, Sep 30, 2013, Szymon Janc wrote:
+> Error path on default case was not breaking loop. To keep error
+> handling similar all error path were converted to use goto.
+> 
+> This fix following:
+> target  C: libbluetooth <= external/bluetooth/bluez/android/../lib/sdp.c
+> lib/sdp.c: In function 'sdp_set_profile_descs':
+> lib/sdp.c:487:10: warning: 'values[0]' may be used uninitialized in
+>     this function [-Wmaybe-uninitialized]
+> lib/sdp.c:2562:19: note: 'values[0]' was declared here
+> lib/sdp.c:545:11: warning: 'dtds[0]' may be used uninitialized in this
+>     function [-Wmaybe-uninitialized]
+> lib/sdp.c:2562:9: note: 'dtds[0]' was declared here
+> ---
+>  lib/sdp.c | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
 
-"Frederic Danis" <frederic.danis@linux.intel.com>
->
-> Hello Marcel,
->
->
-> On 27/09/2013 04:01, Marcel Holtmann wrote:
->>>
->>> Add logging system to BlueZ Android daemon.
->>> >Android build will use android/log.c file while autotools build will
-use
->>> >src/log.c instead.
->>
->> lets just use stdout for now. Changing this later is pretty trivial and
-introducing large build alternates is a bit too complicated at this point.
->
->
-> I do not understand how writing code to log to stdout can be more simple
-than building and linking existing code.
+Applied. Thanks.
 
-I agree with Frederic here. Why do we use error, warn, DBG, etc if we print
-to stdout?
-
-This actually will significantly slow log parsing since first you pay
-attention to error messages. If all messages are printed with the same
-priorities then we loose this ability.
-
-Regards,
-Andrei
-
---e89a8f3bae5d2dc1a004e79ecf15
-Content-Type: text/html; charset=ISO-8859-1
-
-<p dir="ltr">Hi,</p>
-<p dir="ltr">&quot;Frederic Danis&quot; &lt;<a href="mailto:frederic.danis@linux.intel.com">frederic.danis@linux.intel.com</a>&gt;<br>
-&gt;<br>
-&gt; Hello Marcel,<br>
-&gt;<br>
-&gt;<br>
-&gt; On 27/09/2013 04:01, Marcel Holtmann wrote:<br>
-&gt;&gt;&gt;<br>
-&gt;&gt;&gt; Add logging system to BlueZ Android daemon.<br>
-&gt;&gt;&gt; &gt;Android build will use android/log.c file while autotools build will use<br>
-&gt;&gt;&gt; &gt;src/log.c instead.<br>
-&gt;&gt;<br>
-&gt;&gt; lets just use stdout for now. Changing this later is pretty trivial and introducing large build alternates is a bit too complicated at this point.<br>
-&gt;<br>
-&gt;<br>
-&gt; I do not understand how writing code to log to stdout can be more simple than building and linking existing code.</p>
-<p dir="ltr">I agree with Frederic here. Why do we use error, warn, DBG, etc if we print to stdout?</p>
-<p dir="ltr">This actually will significantly slow log parsing since first you pay attention to error messages. If all messages are printed with the same priorities then we loose this ability.</p>
-<p dir="ltr">Regards,<br>
-Andrei <br>
-</p>
-
---e89a8f3bae5d2dc1a004e79ecf15--
+Johan
