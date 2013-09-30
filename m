@@ -1,52 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [RFC] Bluetooth: Add command for setting static address
+Subject: Re: [PATCH] Bluetooth: Provide high speed configuration option
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20130929191102.GA32665@x220.p-661hnu-f1>
-Date: Mon, 30 Sep 2013 05:42:27 +0200
+In-Reply-To: <20130929192209.GA1115@x220.p-661hnu-f1>
+Date: Mon, 30 Sep 2013 05:20:23 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <83DE7E8F-F647-4349-85AB-5EDB14F292B9@holtmann.org>
-References: <1380441937-55298-1-git-send-email-marcel@holtmann.org> <20130929191102.GA32665@x220.p-661hnu-f1>
+Message-Id: <BCBD79F7-CC67-41CC-94C6-94310172A422@holtmann.org>
+References: <1380452005-7211-1-git-send-email-marcel@holtmann.org> <20130929192209.GA1115@x220.p-661hnu-f1>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
->> Add command for setting static address for use as LE random address.
+>> --- a/net/bluetooth/mgmt.c
+>> +++ b/net/bluetooth/mgmt.c
+>> @@ -32,8 +32,6 @@
+>> #include <net/bluetooth/mgmt.h>
+>> #include <net/bluetooth/smp.h>
 >> 
->> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
->> ---
->> include/net/bluetooth/hci.h      |  2 ++
->> include/net/bluetooth/hci_core.h |  1 +
->> include/net/bluetooth/mgmt.h     |  6 ++++++
->> net/bluetooth/hci_core.c         |  5 +++++
->> net/bluetooth/mgmt.c             | 43 +++++++++++++++++++++++++++++++++++++++-
->> 5 files changed, 56 insertions(+), 1 deletion(-)
+>> -bool enable_hs;
+>> -
+>> #define MGMT_VERSION	1
+>> #define MGMT_REVISION	3
+>> 
+>> @@ -382,8 +380,7 @@ static u32 get_supported_settings(struct hci_dev *hdev)
+>> 		settings |= MGMT_SETTING_LINK_SECURITY;
+>> 	}
+>> 
+>> -	if (enable_hs)
+>> -		settings |= MGMT_SETTING_HS;
+>> +	settings |= MGMT_SETTING_HS;
 > 
-> This looks all pretty good to me. Did you have any particular thoughts
-> on resolvable private address generation (which we have to support as
-> soon as we support the privacy feature as a central) or is that
-> completely orthogonal to this feature? I suppose we'll be implementing
-> that through a "privacy" mgmt settings bit and leave the rest up to the
-> kernel?
+> I know it's a bug in the original code, but we may as well fix it in the
+> same go: I suppose this setting should be behind the lmp_bredr_capable
+> check as LE-only controllers would not support it. That said, we might
+> also want to be looking at the controller version.
 
-originally I called this random address and had the idea to let userspace program the addresses all by itself. Then I got into reading on how they are defined and realized that it might be better to separate static addresses from private addresses.
+that is a good point since there is really no point in exposing this for LE only controllers.
 
-The kernel can easily generate a static address by itself during the initial setup of the controller and that would satisfy the requirement from the specification to only ever change and power cycle. Which would be essentially when you remove the controller or reboot the kernel.
+Version vise we could be extremely strict and limit it to 2.1 or later, but I am not sure if this matters. The Bluetooth SIG defined Bluetooth 3.0 + HS as minimum 2.1 BR/EDR controller + AMP. With that combination you are allowed to brand it as 3.0 + HS. They never defined anything for 2.0 and earlier controllers, but technically speaking it is possible to do high speed with these as well. The reason why it was not defined is because at that time only two specification were allowed to be active for qualification. So nobody bothered to look back past 2.1.
 
-However as we discussed in New Orleans, we might want to provide a way for userspace to generate a static address and keep it. So that this becomes more deterministic. It would also make it a bit simpler for testing since you can have a "fixed" address.
+>> 	if (lmp_le_capable(hdev)) {
+>> 		settings |= MGMT_SETTING_LE;
+>> @@ -1344,10 +1341,6 @@ static int set_hs(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+>> 
+>> 	BT_DBG("request for %s", hdev->name);
+>> 
+>> -	if (!enable_hs)
+>> -		return cmd_status(sk, hdev->id, MGMT_OP_SET_HS,
+>> -				  MGMT_STATUS_NOT_SUPPORTED);
+>> -
+>> 	if (cp->val != 0x00 && cp->val != 0x01)
+>> 		return cmd_status(sk, hdev->id, MGMT_OP_SET_HS,
+>> 				  MGMT_STATUS_INVALID_PARAMS);
+> 
+> It seems like the command handler is also missing a check for
+> lmp_bredr_capable and a NOT_SUPPORTED return in that case. This should
+> probably be part of a separate patch though.
 
-I limited this command to by only available when the controller is powered off so that we do not have to deal with changing the address at runtime. Since that is clearly against the specification that it should only change at power cycle.
+I think that I do that in the same patch. I completely overlooked the fact that we should have limited this to BR/EDR capable controllers.
 
-For private addresses, the resolvable ones involve our own IRK and that is something that we should provide to the kernel somehow. And then the kernel should create the key for us. Providing the IRK one way and then having userspace to generate the random address for it seemed like a bad idea.
+> Some mgmt-tester cases for all this would be nice too :)
 
-The non-resolvable private addresses are kinda funky on how they work. And I am not even sure they will be useful at all. They really only make sense for LE only controllers that do not have a public address. I am not sure anybody actually uses them at all. So we have to think about on how we use these addresses. If we want to use them at all.
-
-One thing that still bugs me is the case that when we encounter an LE only controller with no public address, then we return 00:00:00:00:00:00 to the management interface and also the legacy ioctl. The management interface can happily handle it, the ioctl and its command line tools break badly. bluetoothd also has some issues on how to actually use such a controller and store persistent data with it. That is where a "fixed" static address might be useful. We can just generate one, keep it and program it in the next LE only controller with no public address. At that point it does not really matter which hardware it is since they are all the same. But we need an address for it and here the static addresses come in handy.
-
-The current command already has the magic 00:00:00:00:00:00 that will disable static address again. By itself BDADDR_ANY is not a valid random address. I am thinking of adding 11:11:11:11:11:11 as another special case (since that is not valid either) and let the kernel generate a static random address for us. It can easily generate one that is not conflicting with any other controller in the system. Not sure if this is really worth it. This can be as easily achieved in userspace.
+Yes of course, once I get to it. If anybody wants to beat me to it, I am fine with that as well.
 
 Regards
 
