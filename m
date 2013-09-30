@@ -1,36 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 30 Sep 2013 21:15:47 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3] Bluetooth: Provide high speed configuration option
-Message-ID: <20130930181547.GA26405@x220.p-661hnu-f1>
-References: <1380514261-21742-3-git-send-email-marcel@holtmann.org>
+Message-ID: <52498C8C.4070200@linux.intel.com>
+Date: Mon, 30 Sep 2013 16:37:00 +0200
+From: Frederic Danis <frederic.danis@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1380514261-21742-3-git-send-email-marcel@holtmann.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 3/3] android: Android version of log.c
+References: <1380024798-32017-1-git-send-email-frederic.danis@linux.intel.com> <1380024798-32017-3-git-send-email-frederic.danis@linux.intel.com> <7A4917A5-AD76-48AD-8C04-11707D64CE37@holtmann.org>
+In-Reply-To: <7A4917A5-AD76-48AD-8C04-11707D64CE37@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hello Marcel,
 
-On Sun, Sep 29, 2013, Marcel Holtmann wrote:
-> Hiding the Bluetooth high speed support behind a module parameter is
-> not really useful. This can be enabled and disabled at runtime via
-> the management interface. This also has the advantage that his can
-> now be changed per controller and not just global.
-> 
-> This patch removes the module parameter and exposes the high speed
-> setting of the management interface to all controllers.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/l2cap.h |  1 +
->  net/bluetooth/hci_core.c      |  6 ------
->  net/bluetooth/l2cap_core.c    | 35 +++++++++++++++++++----------------
->  net/bluetooth/l2cap_sock.c    | 10 ----------
->  net/bluetooth/mgmt.c          | 11 ++---------
->  5 files changed, 22 insertions(+), 41 deletions(-)
+On 27/09/2013 04:01, Marcel Holtmann wrote:
+>> Add logging system to BlueZ Android daemon.
+>> >Android build will use android/log.c file while autotools build will use
+>> >src/log.c instead.
+> lets just use stdout for now. Changing this later is pretty trivial and introducing large build alternates is a bit too complicated at this point.
 
-Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+I do not understand how writing code to log to stdout can be more simple 
+than building and linking existing code.
 
-Johan
+Regards
+
+Fred
+
+-- 
+Frederic Danis                            Open Source Technology Center
+frederic.danis@intel.com                              Intel Corporation
