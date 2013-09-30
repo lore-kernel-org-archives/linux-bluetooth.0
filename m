@@ -1,87 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 30 Sep 2013 11:25:08 +0300
+Date: Mon, 30 Sep 2013 10:51:52 +0300
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC 15/16] android: Implement basic HAL server
-Message-ID: <20130930082507.GF10262@aemeltch-MOBL1>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 12/16] android: Add cap to bind to port < 1024
+Message-ID: <20130930075150.GE10262@aemeltch-MOBL1>
 References: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1380291161-10232-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <CAJdJm_PMy6pb-NnCc5fKc11ATUwKbSd71HMAWueWkxP_x4Ym=A@mail.gmail.com>
+ <1380291161-10232-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <7348700.bQ9Re4jemt@uw000953>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAJdJm_PMy6pb-NnCc5fKc11ATUwKbSd71HMAWueWkxP_x4Ym=A@mail.gmail.com>
+In-Reply-To: <7348700.bQ9Re4jemt@uw000953>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hi Szymon,
 
-On Fri, Sep 27, 2013 at 01:50:22PM -0400, Anderson Lizardo wrote:
+On Mon, Sep 30, 2013 at 09:36:54AM +0200, Szymon Janc wrote:
 > Hi Andrei,
 > 
-> On Fri, Sep 27, 2013 at 10:12 AM, Andrei Emeltchenko
-> <Andrei.Emeltchenko.news@gmail.com> wrote:
-> > +static gboolean io_session_event(GIOChannel *chan, GIOCondition cond,
-> > +                                                               gpointer data)
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > 
+> > For SDP server we need to bind to lower port, acquire this capability.
+> > ---
+> >  android/main.c |   53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  configure.ac   |    4 ++++
+> >  2 files changed, 57 insertions(+)
+> > 
+> > diff --git a/android/main.c b/android/main.c
+> > index 5fef095..649867d 100644
+> > --- a/android/main.c
+> > +++ b/android/main.c
+> > @@ -31,6 +31,19 @@
+> >  #include <stdio.h>
+> >  #include <stdlib.h>
+> >  #include <string.h>
+> > +#include <unistd.h>
+> > +#include <errno.h>
+> > +#include <sys/prctl.h>
+> > +#include <linux/capability.h>
+> > +
+> > +/**
+> > + * Include <sys/capability.h> for host build and
+> > + * also for Android 4.3 when it is added to bionic
+> > + */
+> > +#if (defined(__ANDROID_API__) && (__ANDROID_API__ > 17)) || \
+> > +					!defined(__ANDROID_API__)
+> > +#include <sys/capability.h>
+> > +#endif
+> >  
+> >  #include <glib.h>
+> >  
+> > @@ -319,6 +332,43 @@ static void cleanup_mgmt_interface(void)
+> >  	mgmt_if = NULL;
+> >  }
+> >  
+> > +static bool android_set_aid_and_cap()
 > > +{
-> > +       struct hal_msg_hdr hdr;
-> > +       struct hal_msg_rsp rsp;
-> > +       uint8_t *buf;
-> > +       int sock, len, size;
-> > +       uint8_t status;
+> > +	struct __user_cap_header_struct header;
+> > +	struct __user_cap_data_struct cap;
 > > +
-> > +       if (cond & G_IO_NVAL)
-> > +               return FALSE;
-> > +
-> > +       sock = g_io_channel_unix_get_fd(chan);
-> > +
-> > +       if (cond & (G_IO_HUP | G_IO_ERR)) {
-> > +               error("%s: error condition %d", __func__, cond);
-> > +               /* TODO: handle */
-> > +               return FALSE;
-> > +       }
-> > +
-> > +       len = recv(sock, &hdr, sizeof(hdr), MSG_PEEK);
-> > +       if (len != sizeof(hdr)) {
-> > +               /* TODO: handle */
-> > +               return FALSE;
-> > +       }
-> > +
-> > +       size = sizeof(hdr) + hdr.len;
-> > +       buf = malloc(size);
-> > +       if (!buf)
-> > +               return TRUE;
-> > +
-> > +       len = recv(sock, buf, size, 0);
-> > +       if (len != size) {
-> > +               /* TODO: handle */
-> > +               free(buf);
-> > +               return FALSE;
-> > +       }
-> > +
-> > +       status = process_hal_msg(buf, len);
-> > +
-> > +       free(buf);
-> > +
-> > +       memcpy(&rsp, &hdr, sizeof(hdr));
-> > +       rsp.hdr.len = sizeof(uint8_t);
-> > +       rsp.status = status;
+> > +	DBG("%s: pid %d uid %d gid %d", __func__, getpid(), getuid(), getgid());
 > 
-> You are not using "rsp" on this function (and not TODO comment explaining why).
+> DBG macro already adds function name to string so there is no need to double
+> that. This applies to other places as well.
 
-will fix this.
-
-> 
-> > +       /* Since daemon would be run also on host we have to grant perms */
-> > +       chmod(sock_path, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH |
-> > +                                                               S_IWOTH);
-> 
-> If it is really necessary to have a world writable socket, better
-> explain in detail on the comment.
-
-the problem here is that we need to run this on a host and on Android
-where HAL is running under user bluetooth, this has to be changed to use
-ifdef logic.
+Yes, I forgot to remove that when changed debug to DBG.
 
 Best regards 
 Andrei Emeltchenko 
