@@ -1,23 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 30 Sep 2013 10:47:39 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
+Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>, linux-bluetooth@vger.kernel.org
 Subject: Re: [RFC 11/16] android: sdp: Reuse BlueZ SDP server in Android
-Message-ID: <20130930074737.GD10262@aemeltch-MOBL1>
-References: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1380291161-10232-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <B13A32F7-6E42-43FA-B821-D1815119ABBC@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Date: Mon, 30 Sep 2013 09:45:16 +0200
+Message-ID: <2967978.YkbqiyBFyK@uw000953>
 In-Reply-To: <B13A32F7-6E42-43FA-B821-D1815119ABBC@holtmann.org>
+References: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1380291161-10232-12-git-send-email-Andrei.Emeltchenko.news@gmail.com> <B13A32F7-6E42-43FA-B821-D1815119ABBC@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Sun, Sep 29, 2013 at 03:31:24PM +0200, Marcel Holtmann wrote:
-> Hi Andrei,
-> 
 > > Reuse existing SDP server code in Android GPL daemon.
 > > ---
 > > Makefile.android     |    7 +++++--
@@ -119,43 +114,12 @@ On Sun, Sep 29, 2013 at 03:31:24PM +0200, Marcel Holtmann wrote:
 > 
 > where is this main_opts coming from. I rather not have this.
 
-Otherwise I get error:
+It is from deviceid related code in sdpd-server.
 
-sdpd-server.c:241: error: undefined reference to 'main_opts'
-collect2: ld returned 1 exit status
+We could pass device id info to start_sdp_server() to avoid that.
+Or have some more general interface for accessing config options - Luiz
+suggested ofono way (which is quite elegant imho).
 
-BTW: Is this now fixed?
-
-> > static GMainLoop *event_loop;
-> > static struct mgmt *mgmt_if = NULL;
-> > 
-> > static uint8_t mgmt_version = 0;
-> > static uint8_t mgmt_revision = 0;
-> > 
-> > +GList *adapter_list = NULL;
-> > +struct bt_adapter *default_adapter = NULL;
-> 
-> Why are this public variables.
-
-This is the default adapter, it probably needs to be public, otherwise we
-have to squash all daemon code to single main.c
-
-> > +
-> > +int sdp_start(void)
-> > +{
-> > +	uint16_t mtu = 0;
-> > +	uint32_t flags = 0;
-> > +
-> > +	DBG("");
-> > +
-> > +	/* sdpd-server use these settings */
-> > +	memset(&main_opts, 0, sizeof(main_opts));
-> > +
-> > +	return start_sdp_server(mtu, flags);
-> 
-> Just fill in mtu and flags manually here. No need for variable declaration above.
-
-OK
-
-Best regards 
-Andrei Emeltchenko 
+-- 
+BR
+Szymon Janc
