@@ -1,46 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 30 Sep 2013 13:26:37 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC 15/16] android: Implement basic HAL server
-Message-ID: <20130930102636.GI10262@aemeltch-MOBL1>
-References: <1380291161-10232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1380291161-10232-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <CAJdJm_PMy6pb-NnCc5fKc11ATUwKbSd71HMAWueWkxP_x4Ym=A@mail.gmail.com>
- <20130930082507.GF10262@aemeltch-MOBL1>
- <9C20AE4B-57C8-48A8-AE2B-80CE7E334C7D@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <9C20AE4B-57C8-48A8-AE2B-80CE7E334C7D@holtmann.org>
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH 3/3] Bluetooth: Provide high speed configuration option
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20130930091820.GH10262@aemeltch-MOBL1>
+Date: Mon, 30 Sep 2013 11:23:55 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <C07188EF-416D-4FD4-8834-711F3194CBE6@holtmann.org>
+References: <1380514261-21742-3-git-send-email-marcel@holtmann.org> <20130930091820.GH10262@aemeltch-MOBL1>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Andrei,
 
-On Mon, Sep 30, 2013 at 10:33:54AM +0200, Marcel Holtmann wrote:
-> >>> +       /* Since daemon would be run also on host we have to grant perms */
-> >>> +       chmod(sock_path, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH |
-> >>> +                                                               S_IWOTH);
-> >> 
-> >> If it is really necessary to have a world writable socket, better
-> >> explain in detail on the comment.
-> > 
-> > the problem here is that we need to run this on a host and on Android
-> > where HAL is running under user bluetooth, this has to be changed to use
-> > ifdef logic.
+>> Hiding the Bluetooth high speed support behind a module parameter is
+>> not really useful. This can be enabled and disabled at runtime via
+>> the management interface. This also has the advantage that his can
 > 
-> and why are we not starting the daemon as user bluetooth with proper capabilities.
+> typo here.
+> 
+> …
 
-there is an option capability in init.rc
-http://androidxref.com/4.3_r2.1/xref/system/core/init/init_parser.c#84
+the maintainer can fix that one up.
 
-but it does nothing:
-http://androidxref.com/4.3_r2.1/xref/system/core/init/init_parser.c#659
+>> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+>> index c85537c..9119898 100644
+>> --- a/net/bluetooth/l2cap_sock.c
+>> +++ b/net/bluetooth/l2cap_sock.c
+>> @@ -445,11 +445,6 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+>> 		break;
+>> 
+>> 	case BT_CHANNEL_POLICY:
+>> -		if (!enable_hs) {
+>> -			err = -ENOPROTOOPT;
+>> -			break;
+>> -		}
+>> -
+> 
+> Do you think we don't need to check that HS is enabled here and below?
 
-at least in Android 4.3
+We can not. The socket might not be bound or the controller does not exists. So we have no way of knowing.
 
-So we run as root and then drop uid and guid. Can we use some better way?
+It should also work no matter what. The presence of an AMP controller is optional. That is why the policy is defined as BREDR_ONLY, BREDR_PREFERRED and AMP_PREFERRED. You can not force the AMP transport.
 
-Best regards 
-Andrei Emeltchenko 
+Regards
+
+Marcel
+
