@@ -1,84 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 From: Bing Zhao <bzhao@marvell.com>
-To: <linux-bluetooth@vger.kernel.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 CC: Marcel Holtmann <marcel@holtmann.org>,
-        Gustavo Padovan
+        "linux-bluetooth@vger.kernel.org
+ development" <linux-bluetooth@vger.kernel.org>,
+        "Gustavo F. Padovan"
 	<gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        <linux-wireless@vger.kernel.org>, Mike Frysinger <vapier@chromium.org>,
+        "linux-wireless@vger.kernel.org Wireless"
+	<linux-wireless@vger.kernel.org>,
+        Mike Frysinger <vapier@chromium.org>,
         Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
         Amitkumar Karwar
-	<akarwar@marvell.com>, Bing Zhao <bzhao@marvell.com>
-Subject: [PATCH v6 2/4] Bluetooth: btmrvl: get rid of struct btmrvl_cmd
-Date: Tue, 1 Oct 2013 12:19:13 -0700
-Message-ID: <1380655155-10007-3-git-send-email-bzhao@marvell.com>
-In-Reply-To: <1380655155-10007-1-git-send-email-bzhao@marvell.com>
-References: <1380655155-10007-1-git-send-email-bzhao@marvell.com>
+	<akarwar@marvell.com>
+Date: Tue, 1 Oct 2013 09:23:56 -0700
+Subject: RE: [PATCH v5 1/2] Bluetooth: btmrvl: add setup handler
+Message-ID: <477F20668A386D41ADCC57781B1F70430F451FABE7@SC-VEXCH1.marvell.com>
+References: <1379715667-22424-1-git-send-email-bzhao@marvell.com>
+ <18678858-E711-43E5-AFE6-E637D1CECFFB@holtmann.org>
+ <477F20668A386D41ADCC57781B1F70430F44C59418@SC-VEXCH1.marvell.com>
+ <DF6283E3-8476-400F-A230-CB7CA0F98564@holtmann.org>
+ <477F20668A386D41ADCC57781B1F70430F450779A4@SC-VEXCH1.marvell.com>
+ <20130924193010.GA2584@x220.p-661hnu-f1>
+ <477F20668A386D41ADCC57781B1F70430F45077E5B@SC-VEXCH1.marvell.com>
+ <B3090D30-6F81-4E12-8F58-E650F77BB72E@holtmann.org>
+ <20131001111309.GA19641@x220.p-661hnu-f1>
+In-Reply-To: <20131001111309.GA19641@x220.p-661hnu-f1>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Amitkumar Karwar <akarwar@marvell.com>
+Hi Johan,
 
-Replace this proprietary structure with the standard one
-(struct hci_command_hdr).
+> Hi Marcel & Bing,
+>=20
+> On Thu, Sep 26, 2013, Marcel Holtmann wrote:
+> > >> You're right that we're missing the clearing of the HCI_SETUP flag
+> > >> for such a scenario. Could you try the attached patch. It should
+> > >> fix the
+> > >
+> > > We have tested your patch. Yes, it fixes the problem. Thanks!
+> >
+> > then lets get a proper version with full commit message explaining the
+> > issue merged upstream. As I said, this is a real bug we need to fix.
+>=20
+> I've just sent a new patch set titled "[PATCH 0/2] Bluetooth: Fix
+> hci_dev_open race condition". Bing, could you please test this with your
+> original setup so we ensure that the issue is still properly handled.
 
-Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
-Signed-off-by: Bing Zhao <bzhao@marvell.com>
----
-v6: remove proprietary struct btmrvl_cmd
+We tested this new patch set with our original setup and the issue is not s=
+een.
 
- drivers/bluetooth/btmrvl_drv.h  |  6 ------
- drivers/bluetooth/btmrvl_main.c | 12 ++++++------
- 2 files changed, 6 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
-index 27068d1..42f7028 100644
---- a/drivers/bluetooth/btmrvl_drv.h
-+++ b/drivers/bluetooth/btmrvl_drv.h
-@@ -116,12 +116,6 @@ struct btmrvl_private {
- #define PS_SLEEP			0x01
- #define PS_AWAKE			0x00
- 
--struct btmrvl_cmd {
--	__le16 ocf_ogf;
--	u8 length;
--	u8 data[4];
--} __packed;
--
- struct btmrvl_event {
- 	u8 ec;		/* event counter */
- 	u8 length;
-diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index d9d4229..a4da7c8 100644
---- a/drivers/bluetooth/btmrvl_main.c
-+++ b/drivers/bluetooth/btmrvl_main.c
-@@ -170,20 +170,20 @@ static int btmrvl_send_sync_cmd(struct btmrvl_private *priv, u16 cmd_no,
- 				const void *param, u8 len)
- {
- 	struct sk_buff *skb;
--	struct btmrvl_cmd *cmd;
-+	struct hci_command_hdr *hdr;
- 
--	skb = bt_skb_alloc(sizeof(*cmd), GFP_ATOMIC);
-+	skb = bt_skb_alloc(HCI_COMMAND_HDR_SIZE + len, GFP_ATOMIC);
- 	if (skb == NULL) {
- 		BT_ERR("No free skb");
- 		return -ENOMEM;
- 	}
- 
--	cmd = (struct btmrvl_cmd *) skb_put(skb, sizeof(*cmd));
--	cmd->ocf_ogf = cpu_to_le16(hci_opcode_pack(OGF, cmd_no));
--	cmd->length = len;
-+	hdr = (struct hci_command_hdr *)skb_put(skb, HCI_COMMAND_HDR_SIZE);
-+	hdr->opcode = cpu_to_le16(hci_opcode_pack(OGF, cmd_no));
-+	hdr->plen = len;
- 
- 	if (len)
--		memcpy(cmd->data, param, len);
-+		memcpy(skb_put(skb, len), param, len);
- 
- 	bt_cb(skb)->pkt_type = MRVL_VENDOR_PKT;
- 
--- 
-1.8.0
+Thanks,
+Bing
