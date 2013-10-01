@@ -1,36 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/2] Bluetooth: Fix hci_dev_open race condition
-Date: Tue,  1 Oct 2013 14:10:26 +0300
-Message-Id: <1380625828-19538-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/2] Bluetooth: Fix workqueue synchronization in hci_dev_open
+Date: Tue,  1 Oct 2013 14:10:28 +0300
+Message-Id: <1380625828-19538-3-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1380625828-19538-1-git-send-email-johan.hedberg@gmail.com>
+References: <1380625828-19538-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-There was recently a bug reported regarding the setup stage getting
-called twice (Subject: [PATCH v5 1/2] Bluetooth: btmrvl: add setup
-handler). There was an initial patch proposal to get an understanding of
-what exactly is happening, but the initial fix itself was not the one we
-want upstream.
+When hci_sock.c calls hci_dev_open it needs to ensure that there isn't
+pending work in progress, such as that which is scheduled for the
+initial setup procedure or the one for automatically powering off after
+the setup procedure. This adds the necessary calls to ensure that any
+previously scheduled work is completed before attempting to call
+hci_dev_do_open.
 
-After considering the various options we decided to simply ensure that
-the HCIDEVUP ioctl calling path needs to ensure that the req_workqueue
-is flushed before calling hci_dev_open. However, this requires some
-refactoring and hence two patches instead of one.
+This patch fixes a race with old user space versions where we might
+receive a HCIDEVUP ioctl before the setup procedure has been completed.
+When that happens the setup procedures callback may fail early and leave
+the device in an inconsistent state, causing e.g. the setup callback to
+be (incorrectly) called more than once.
+---
+ net/bluetooth/hci_core.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-I was able to test this with BlueZ 4.101 and Intel HW to see that the
-Intel setup handler doesn't get called twice, but it would still be good
-to test this with the setup that was used for the initial report.
-
-Johan
-
-----------------------------------------------------------------
-Johan Hedberg (2):
-      Bluetooth: Refactor hci_dev_open to a separate hci_dev_do_open function
-      Bluetooth: Fix workqueue synchronization in hci_dev_open
-
- net/bluetooth/hci_core.c | 35 +++++++++++++++++++++++++----------
- 1 file changed, 25 insertions(+), 10 deletions(-)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index fc63e78..a216dcf 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1227,6 +1227,11 @@ int hci_dev_open(__u16 dev)
+ 	if (!hdev)
+ 		return -ENODEV;
+ 
++	if (test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags))
++		cancel_delayed_work(&hdev->power_off);
++
++	flush_workqueue(hdev->req_workqueue);
++
+ 	err = hci_dev_do_open(hdev);
+ 
+ 	hci_dev_put(hdev);
+-- 
+1.8.3.1
 
