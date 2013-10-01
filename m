@@ -1,32 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [RFC 2/3] Bluetooth: Move set_bredr_scan() to a more convenient location
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1380640922-18647-3-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 1 Oct 2013 17:53:45 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <83BA41B5-C841-485D-94F2-DFFF66C318D6@holtmann.org>
-References: <1380640922-18647-1-git-send-email-johan.hedberg@gmail.com> <1380640922-18647-3-git-send-email-johan.hedberg@gmail.com>
-To: johan.hedberg@gmail.com
+MIME-Version: 1.0
+In-Reply-To: <1380640922-18647-4-git-send-email-johan.hedberg@gmail.com>
+References: <1380640922-18647-1-git-send-email-johan.hedberg@gmail.com>
+	<1380640922-18647-4-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 1 Oct 2013 11:46:40 -0400
+Message-ID: <CAJdJm_MWy0d=5HgqsKQDzhhAL5CZszNOwTai9LZXx8Sy=npyVA@mail.gmail.com>
+Subject: Re: [RFC 3/3] Bluetooth: Add a new mgmt_set_bredr command
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> The static set_bredr_scan function will soon be reused by a new
-> set_bredr method. This trivial patch moves the function to a new
-> location within the mgmt.c file where it can be reused without requiring
-> forward declarations.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/mgmt.c | 40 ++++++++++++++++++++--------------------
-> 1 file changed, 20 insertions(+), 20 deletions(-)
+On Tue, Oct 1, 2013 at 11:22 AM,  <johan.hedberg@gmail.com> wrote:
+> +       if (!lmp_bredr_capable(hdev) || !lmp_le_capable(hdev))
+> +               return cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
+> +                                 MGMT_STATUS_REJECTED);
+> +
+> +       if (!test_bit(HCI_LE_ENABLED, &hdev->dev_flags))
+> +               return cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
+> +                                 MGMT_STATUS_REJECTED);
+> +
+> +       if (cp->val != 0x00 && cp->val != 0x01)
+> +               return cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
+> +                                 MGMT_STATUS_INVALID_PARAMS);
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Looks like the above 3 cmd_status() should use MGMT_OP_SET_BREDR.
 
-Regards
+> +
+> +       hci_dev_lock(hdev);
+> +
+> +       val = !!cp->val;
+> +       enabled = test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
+> +
+> +       if (!hdev_is_powered(hdev) || val == enabled) {
+> +               bool changed = false;
+> +
+> +               if (val != test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags)) {
+> +                       change_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
+> +                       changed = true;
+> +               }
 
-Marcel
+IMHO the trick used in another patch from Marcel (sent a while ago for
+enabling/disabling HS) is easier to follow, something like (may
+require adaptation if the logic is not the same than MGMT_OP_SET_HS):
 
+if (cp->val)
+    changed = !test_and_set_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
+else
+    changed = test_and_clear_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
+
+
+> +
+> +               err = send_settings_rsp(sk, MGMT_OP_SET_BREDR, hdev);
+> +               if (err < 0)
+> +                       goto unlock;
+> +
+> +               if (changed)
+> +                       err = new_settings(hdev, sk);
+> +
+> +               goto unlock;
+> +       }
+
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
