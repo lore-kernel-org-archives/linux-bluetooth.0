@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 01/14] android: Add Adapter Bluetooth HAL template
-Date: Tue,  1 Oct 2013 18:03:06 +0300
-Message-Id: <1380639799-25790-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 05/14] android: Add basic mgmt initialization sequence
+Date: Tue,  1 Oct 2013 18:03:10 +0300
+Message-Id: <1380639799-25790-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1380639799-25790-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1380639799-25790-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,394 +11,285 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add template for bluetooth.h Android HAL.
+Initialize bluetooth controller via mgmt interface.
 ---
- android/Android.mk      |   19 +++
- android/hal_bluetooth.c |  348 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 367 insertions(+)
- create mode 100644 android/hal_bluetooth.c
+ Makefile.android   |    4 +-
+ android/Android.mk |   11 +++
+ android/main.c     |  189 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 203 insertions(+), 1 deletion(-)
 
+diff --git a/Makefile.android b/Makefile.android
+index 8f65dbf..3e6fec0 100644
+--- a/Makefile.android
++++ b/Makefile.android
+@@ -2,6 +2,8 @@
+ if ANDROID_DAEMON
+ noinst_PROGRAMS += android/bluezd
+ 
+-android_bluezd_SOURCES = android/main.c src/log.c
++android_bluezd_SOURCES = android/main.c src/log.c \
++				src/shared/util.h src/shared/util.c \
++				src/shared/mgmt.h src/shared/mgmt.c
+ android_bluezd_LDADD = @GLIB_LIBS@
+ endif
 diff --git a/android/Android.mk b/android/Android.mk
-index 5d09f00..ca9501f 100644
+index 93de803..99c497a 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -23,3 +23,22 @@ LOCAL_SHARED_LIBRARIES := \
- LOCAL_MODULE := bluezd
+@@ -9,14 +9,25 @@ include $(CLEAR_VARS)
+ LOCAL_SRC_FILES := \
+ 	log.c \
+ 	main.c \
++	../src/shared/mgmt.c \
++	../src/shared/util.c \
  
- include $(BUILD_EXECUTABLE)
+ LOCAL_C_INCLUDES := \
+ 	$(call include-path-for, glib) \
+ 	$(call include-path-for, glib)/glib \
 +
-+#
-+# bluetooth.default.so HAL
-+#
++LOCAL_C_INCLUDES += \
++	$(LOCAL_PATH)/../ \
+ 	$(LOCAL_PATH)/../src \
+ 
+ LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
+ 
++# to suppress the "pointer of type 'void *' used in arithmetic" warning
++LOCAL_CFLAGS += -Wno-pointer-arith
 +
-+include $(CLEAR_VARS)
++# Define missing flags for Android 4.2
++LOCAL_CFLAGS += -DSOCK_CLOEXEC=02000000 -DSOCK_NONBLOCK=04000
 +
-+LOCAL_SRC_FILES := \
-+	hal_bluetooth.c \
-+
-+LOCAL_SHARED_LIBRARIES := \
-+	libcutils \
-+
-+LOCAL_MODULE := bluetooth.default
-+LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
-+LOCAL_MODULE_TAGS := optional
-+LOCAL_MODULE_CLASS := SHARED_LIBRARIES
-+
-+include $(BUILD_SHARED_LIBRARY)
-diff --git a/android/hal_bluetooth.c b/android/hal_bluetooth.c
-new file mode 100644
-index 0000000..9970374
---- /dev/null
-+++ b/android/hal_bluetooth.c
-@@ -0,0 +1,348 @@
-+/*
-+ * Copyright (C) 2013 Intel Corporation
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ *
-+ */
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <unistd.h>
+ LOCAL_SHARED_LIBRARIES := \
+ 	libglib \
+ 
+diff --git a/android/main.c b/android/main.c
+index ef62b3d..4792919 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -25,6 +25,7 @@
+ #include <config.h>
+ #endif
+ 
 +#include <stdbool.h>
+ #include <signal.h>
+ #include <stdint.h>
+ #include <stdio.h>
+@@ -36,9 +37,17 @@
+ #include "log.h"
+ #include "hcid.h"
+ 
++#include "lib/bluetooth.h"
++#include "lib/mgmt.h"
++#include "src/shared/mgmt.h"
 +
-+#include <hardware/bluetooth.h>
+ #define SHUTDOWN_GRACE_SECONDS 10
+ 
+ static GMainLoop *event_loop;
++static struct mgmt *mgmt_if = NULL;
 +
-+#define LOG_TAG "BlueZ"
-+#include <cutils/log.h>
-+
-+bt_callbacks_t *bt_hal_cbacks = NULL;
-+
-+static bool interface_ready(void)
++static uint8_t mgmt_version = 0;
++static uint8_t mgmt_revision = 0;
+ 
+ void btd_exit(void)
+ {
+@@ -106,6 +115,183 @@ static GOptionEntry options[] = {
+ 	{ NULL }
+ };
+ 
++static void read_info_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
 +{
-+	return bt_hal_cbacks != NULL;
++	/* TODO: Store Controller information */
++
++	/**
++	 * Register all event notification handlers for controller.
++	 *
++	 * The handlers are registered after a succcesful read of the
++	 * controller info. From now on they can track updates and
++	 * notifications.
++	 */
 +}
 +
-+static int init(bt_callbacks_t *callbacks)
++
++static void mgmt_index_added_event(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
 +{
-+	ALOGD(__func__);
++	info("%s: index %u", __func__, index);
 +
-+	if (interface_ready() == true)
-+		return BT_STATUS_SUCCESS;
++	DBG("sending read info command for index %u", index);
 +
-+	/* store reference to user callbacks */
-+	bt_hal_cbacks = callbacks;
-+
-+	/* TODO: Init here bluezd task */
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int enable(void)
-+{
-+	ALOGD(__func__);
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int disable(void)
-+{
-+	ALOGD(__func__);
-+
-+	if (interface_ready() == false)
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static void cleanup(void)
-+{
-+	ALOGD(__func__);
-+
-+	if (interface_ready() == false)
++	if (mgmt_send(mgmt_if, MGMT_OP_READ_INFO, index, 0, NULL,
++					read_info_complete, NULL, NULL) > 0)
 +		return;
 +
-+	bt_hal_cbacks = NULL;
++	error("Failed to read adapter info for index %u", index);
++
 +}
 +
-+static int get_adapter_properties(void)
++static void mgmt_index_removed_event(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
 +{
-+	ALOGD(__func__);
-+
-+	if (interface_ready() == false)
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
++	info("%s: index %u", __func__, index);
 +}
 +
-+static int get_adapter_property(bt_property_type_t type)
++static void read_index_list_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
 +{
-+	ALOGD(__func__);
++	const struct mgmt_rp_read_index_list *rp = param;
++	uint16_t num;
++	int i;
 +
-+	if (interface_ready() == false)
-+		return BT_STATUS_NOT_READY;
++	info(__func__);
 +
-+	return BT_STATUS_UNSUPPORTED;
++	if (status != MGMT_STATUS_SUCCESS) {
++		error("%s: Failed to read index list: %s (0x%02x)",
++					__func__, mgmt_errstr(status), status);
++		return;
++	}
++
++	if (length < sizeof(*rp)) {
++		error("%s: Wrong size of read index list response", __func__);
++		return;
++	}
++
++	num = btohs(rp->num_controllers);
++
++	DBG("%s: Number of controllers: %d", __func__, num);
++
++	if (num * sizeof(uint16_t) + sizeof(*rp) != length) {
++		error("%s: Incorrect pkt size for index list rsp", __func__);
++		return;
++	}
++
++	for (i = 0; i < num; i++) {
++		uint16_t index;
++
++		index = btohs(rp->index[i]);
++
++		DBG("%s: Found index %u", __func__, index);
++
++		/**
++		 * Use index added event notification.
++		 */
++		mgmt_index_added_event(index, 0, NULL, NULL);
++	}
 +}
 +
-+static int set_adapter_property(const bt_property_t *property)
++
++static void read_commands_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
 +{
-+	ALOGD(__func__);
++	const struct mgmt_rp_read_commands *rp = param;
++	uint16_t num_commands, num_events;
 +
-+	if (interface_ready() == false)
-+		return BT_STATUS_NOT_READY;
++	info(__func__);
 +
-+	if (property == NULL)
-+		return BT_STATUS_PARM_INVALID;
++	if (status != MGMT_STATUS_SUCCESS) {
++		error("Failed to read supported commands: %s (0x%02x)",
++						mgmt_errstr(status), status);
++		return;
++	}
 +
-+	return BT_STATUS_UNSUPPORTED;
++	if (length < sizeof(*rp)) {
++		error("Wrong size of read commands response");
++		return;
++	}
++
++	num_commands = btohs(rp->num_commands);
++	num_events = btohs(rp->num_events);
++
++	DBG("Number of commands: %d", num_commands);
++	DBG("Number of events: %d", num_events);
 +}
 +
-+static int get_remote_device_properties(bt_bdaddr_t *remote_addr)
++static void read_version_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
 +{
-+	ALOGD(__func__);
++	const struct mgmt_rp_read_version *rp = param;
 +
-+	if (interface_ready() == false)
-+		return BT_STATUS_NOT_READY;
++	info(__func__);
 +
-+	return BT_STATUS_UNSUPPORTED;
++	if (status != MGMT_STATUS_SUCCESS) {
++		error("Failed to read version information: %s (0x%02x)",
++						mgmt_errstr(status), status);
++		return;
++	}
++
++	if (length < sizeof(*rp)) {
++		error("Wrong size response");
++		return;
++	}
++
++	mgmt_version = rp->version;
++	mgmt_revision = btohs(rp->revision);
++
++	info("Bluetooth management interface %u.%u initialized",
++						mgmt_version, mgmt_revision);
++
++	if (mgmt_version < 1) {
++		error("Version 1.0 or later of management interface required");
++		abort();
++	}
++
++	DBG("sending read supported commands command");
++
++	mgmt_send(mgmt_if, MGMT_OP_READ_COMMANDS, MGMT_INDEX_NONE, 0, NULL,
++					read_commands_complete, NULL, NULL);
++
++	mgmt_register(mgmt_if, MGMT_EV_INDEX_ADDED, MGMT_INDEX_NONE,
++					mgmt_index_added_event, NULL, NULL);
++	mgmt_register(mgmt_if, MGMT_EV_INDEX_REMOVED, MGMT_INDEX_NONE,
++					mgmt_index_removed_event, NULL, NULL);
++
++	DBG("sending read index list command");
++
++	if (mgmt_send(mgmt_if, MGMT_OP_READ_INDEX_LIST, MGMT_INDEX_NONE, 0,
++			NULL, read_index_list_complete, NULL, NULL) > 0)
++		return;
++
++	error("Failed to read controller index list");
 +}
 +
-+static int get_remote_device_property(bt_bdaddr_t *remote_addr,
-+						bt_property_type_t type)
++static bool init_mgmt_interface(void)
 +{
-+	ALOGD(__func__);
++	mgmt_if = mgmt_new_default();
++	if (mgmt_if == NULL) {
++		error("Failed to access management interface");
++		return false;
++	}
 +
-+	if (interface_ready() == false)
-+		return BT_STATUS_NOT_READY;
++	if (mgmt_send(mgmt_if, MGMT_OP_READ_VERSION, MGMT_INDEX_NONE, 0, NULL,
++				read_version_complete, NULL, NULL) == 0) {
++		error("Error sending READ_VERSION mgmt command");
++		return false;
++	}
 +
-+	return BT_STATUS_UNSUPPORTED;
++	return true;
 +}
 +
-+static int set_remote_device_property(bt_bdaddr_t *remote_addr,
-+						const bt_property_t *property)
++static void cleanup_mgmt_interface(void)
 +{
-+	ALOGD(__func__);
-+
-+	/* sanity check */
-+	if (interface_ready() == false)
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
++	mgmt_unref(mgmt_if);
++	mgmt_if = NULL;
 +}
 +
-+static int get_remote_service_record(bt_bdaddr_t *remote_addr, bt_uuid_t *uuid)
-+{
-+	ALOGD(__func__);
+ int main(int argc, char *argv[])
+ {
+ 	GOptionContext *context;
+@@ -144,10 +330,13 @@ int main(int argc, char *argv[])
+ 	/* no need to keep parsed option in memory */
+ 	free_options();
+ 
++	init_mgmt_interface();
 +
-+	if (interface_ready() == false)
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int get_remote_services(bt_bdaddr_t *remote_addr)
-+{
-+	ALOGD(__func__);
-+
-+	if (interface_ready() == false)
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int start_discovery(void)
-+{
-+	ALOGD(__func__);
-+
-+	if (interface_ready() == false)
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int cancel_discovery(void)
-+{
-+	ALOGD(__func__);
-+
-+	if (interface_ready() == false)
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int create_bond(const bt_bdaddr_t *bd_addr)
-+{
-+	ALOGD(__func__);
-+
-+	if (interface_ready() == false)
-+		return BT_STATUS_NOT_READY;
-+
-+	if (bd_addr == NULL)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int cancel_bond(const bt_bdaddr_t *bd_addr)
-+{
-+	ALOGD(__func__);
-+
-+	if (interface_ready() == false)
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int remove_bond(const bt_bdaddr_t *bd_addr)
-+{
-+	ALOGD(__func__);
-+
-+	if (interface_ready() == false)
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int pin_reply(const bt_bdaddr_t *bd_addr, uint8_t accept,
-+				uint8_t pin_len, bt_pin_code_t *pin_code)
-+{
-+	ALOGD(__func__);
-+
-+	if (interface_ready() == false)
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int ssp_reply(const bt_bdaddr_t *bd_addr, bt_ssp_variant_t variant,
-+					uint8_t accept, uint32_t passkey)
-+{
-+
-+	ALOGD(__func__);
-+
-+	if (interface_ready() == false)
-+		return BT_STATUS_NOT_READY;
-+
-+	if (bd_addr == NULL)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static const void *get_profile_interface(const char *profile_id)
-+{
-+	ALOGD("%s: %s", __func__, profile_id);
-+
-+	if (interface_ready() == false)
-+		return NULL;
-+
-+	return NULL;
-+}
-+
-+static int dut_mode_configure(uint8_t enable)
-+{
-+	ALOGD(__func__);
-+
-+	if (interface_ready() == false)
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int dut_mode_send(uint16_t opcode, uint8_t *buf, uint8_t len)
-+{
-+	ALOGD(__func__);
-+
-+	if (interface_ready() == false)
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+/**
-+ * HAL Interface declaration
-+ */
-+static const bt_interface_t bluetooth_if = {
-+	sizeof(bt_interface_t),
-+	init,
-+	enable,
-+	disable,
-+	cleanup,
-+	get_adapter_properties,
-+	get_adapter_property,
-+	set_adapter_property,
-+	get_remote_device_properties,
-+	get_remote_device_property,
-+	set_remote_device_property,
-+	get_remote_service_record,
-+	get_remote_services,
-+	start_discovery,
-+	cancel_discovery,
-+	create_bond,
-+	remove_bond,
-+	cancel_bond,
-+	pin_reply,
-+	ssp_reply,
-+	get_profile_interface,
-+	dut_mode_configure,
-+	dut_mode_send
-+};
-+
-+static const bt_interface_t *get_bluetooth_interface(void)
-+{
-+	ALOGD(__func__);
-+
-+	return &bluetooth_if;
-+}
-+
-+static int close_bluetooth(struct hw_device_t *device)
-+{
-+	ALOGD(__func__);
-+
-+	cleanup();
-+
-+	return 0;
-+}
-+
-+static int open_bluetooth(const struct hw_module_t *module, char const *name,
-+					struct hw_device_t **device)
-+{
-+	bluetooth_device_t *dev = malloc(sizeof(bluetooth_device_t));
-+
-+	ALOGD(__func__);
-+
-+	memset(dev, 0, sizeof(bluetooth_device_t));
-+	dev->common.tag = HARDWARE_DEVICE_TAG;
-+	dev->common.version = 0;
-+	dev->common.module = (struct hw_module_t *) module;
-+	dev->common.close = close_bluetooth;
-+	dev->get_bluetooth_interface = get_bluetooth_interface;
-+
-+	*device = (struct hw_device_t *) dev;
-+
-+	return 0;
-+}
-+
-+static struct hw_module_methods_t bluetooth_module_methods = {
-+	.open = open_bluetooth,
-+};
-+
-+struct hw_module_t HAL_MODULE_INFO_SYM = {
-+	.tag = HARDWARE_MODULE_TAG,
-+	.version_major = 1,
-+	.version_minor = 0,
-+	.id = BT_HARDWARE_MODULE_ID,
-+	.name = "BlueZ Bluetooth stack",
-+	.author = "Intel Corporation",
-+	.methods = &bluetooth_module_methods
-+};
+ 	DBG("Entering main loop");
+ 
+ 	g_main_loop_run(event_loop);
+ 
++	cleanup_mgmt_interface();
+ 	g_main_loop_unref(event_loop);
+ 
+ 	info("Exit");
 -- 
 1.7.10.4
 
