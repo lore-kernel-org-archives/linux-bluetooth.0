@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 03/14] android: Enable Socket interface
-Date: Tue,  1 Oct 2013 18:03:08 +0300
-Message-Id: <1380639799-25790-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 10/14] android: Add cap to bind to port < 1024
+Date: Tue,  1 Oct 2013 18:03:15 +0300
+Message-Id: <1380639799-25790-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1380639799-25790-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1380639799-25790-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,77 +11,113 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Returns socket interface, use header hal.h to avoid externs.
+For SDP server we need to bind to lower port, acquire this capability.
 ---
- android/hal.h           |   18 ++++++++++++++++++
- android/hal_bluetooth.c |   11 +++++++++++
- 2 files changed, 29 insertions(+)
- create mode 100644 android/hal.h
+ android/main.c |   63 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ configure.ac   |    4 ++++
+ 2 files changed, 67 insertions(+)
 
-diff --git a/android/hal.h b/android/hal.h
-new file mode 100644
-index 0000000..40fbf03
---- /dev/null
-+++ b/android/hal.h
-@@ -0,0 +1,18 @@
-+/*
-+ * Copyright (C) 2013 Intel Corporation
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ *
+diff --git a/android/main.c b/android/main.c
+index db435f9..36f9c1a 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -31,6 +31,22 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <unistd.h>
++#include <errno.h>
++#include <sys/prctl.h>
++#include <linux/capability.h>
++
++/**
++ * Include <sys/capability.h> for host build and
++ * also for Android 4.3 when it is added to bionic
 + */
++#if !defined(__ANDROID_API__) || (__ANDROID_API__ > 17)
++#include <sys/capability.h>
++#endif
 +
-+btsock_interface_t *bt_get_sock_interface(void);
-diff --git a/android/hal_bluetooth.c b/android/hal_bluetooth.c
-index 9970374..00f3e8d 100644
---- a/android/hal_bluetooth.c
-+++ b/android/hal_bluetooth.c
-@@ -21,10 +21,13 @@
- #include <stdbool.h>
++#if defined(__ANDROID_API__)
++#include <private/android_filesystem_config.h>
++#endif
  
- #include <hardware/bluetooth.h>
-+#include <hardware/bt_sock.h>
+ #include <glib.h>
  
- #define LOG_TAG "BlueZ"
- #include <cutils/log.h>
- 
-+#include "hal.h"
-+
- bt_callbacks_t *bt_hal_cbacks = NULL;
- 
- static bool interface_ready(void)
-@@ -32,6 +35,11 @@ static bool interface_ready(void)
- 	return bt_hal_cbacks != NULL;
+@@ -321,6 +337,50 @@ static void cleanup_mgmt_interface(void)
+ 	mgmt_if = NULL;
  }
  
-+static bool is_profile(const char *profile, const char *str)
++static bool android_set_aid_and_cap()
 +{
-+	return strcmp(profile, str) == 0;
++	struct __user_cap_header_struct header;
++	struct __user_cap_data_struct cap;
++
++	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
++
++	header.version = _LINUX_CAPABILITY_VERSION;
++	header.pid = getpid();
++	if (capget(&header, &cap) < 0)
++		error("%s: capget(): %s", __func__, strerror(errno));
++	else
++		DBG("Caps: eff: 0x%x, perm: 0x%x, inh: 0x%x", cap.effective,
++					cap.permitted, cap.inheritable);
++
++#if defined(__ANDROID_API__)
++	if (setgid(AID_BLUETOOTH) < 0) {
++		error("%s: setgid(): %s", __func__, strerror(errno));
++		return false;
++	}
++
++	if (setuid(AID_BLUETOOTH) < 0) {
++		error("%s: setuid(): %s", __func__, strerror(errno));
++		return false;
++	}
++#endif
++
++	prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);
++
++	header.version = _LINUX_CAPABILITY_VERSION;
++	header.pid = 0;
++
++	cap.effective = cap.permitted = cap.inheritable =
++		CAP_TO_MASK(CAP_NET_ADMIN) |
++		CAP_TO_MASK(CAP_NET_BIND_SERVICE);
++
++	if (capset(&header, &cap)) {
++		error("%s: capset(): %s", __func__, strerror(errno));
++		return false;
++	}
++
++	return true;
 +}
 +
- static int init(bt_callbacks_t *callbacks)
+ int main(int argc, char *argv[])
  {
- 	ALOGD(__func__);
-@@ -246,6 +254,9 @@ static const void *get_profile_interface(const char *profile_id)
- 	if (interface_ready() == false)
- 		return NULL;
+ 	GOptionContext *context;
+@@ -359,6 +419,9 @@ int main(int argc, char *argv[])
+ 	/* no need to keep parsed option in memory */
+ 	free_options();
  
-+	if (is_profile(profile_id, BT_PROFILE_SOCKETS_ID))
-+		return bt_get_sock_interface();
++	if (android_set_aid_and_cap() == false)
++		exit(EXIT_FAILURE);
 +
- 	return NULL;
- }
+ 	init_mgmt_interface();
  
+ 	DBG("Entering main loop");
+diff --git a/configure.ac b/configure.ac
+index 3b7a5d9..af418d3 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -247,4 +247,8 @@ AC_ARG_ENABLE(android-daemon, AC_HELP_STRING([--enable-android-daemon],
+ 					[android_daemon=${enableval}])
+ AM_CONDITIONAL(ANDROID_DAEMON, test "${android_daemon}" = "yes")
+ 
++if (test "${android_daemon}" = "yes"); then
++	AC_CHECK_LIB(cap, capget, dummy=yes, AC_MSG_ERROR(libcap is required))
++fi
++
+ AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
 -- 
 1.7.10.4
 
