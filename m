@@ -1,72 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1380640922-18647-4-git-send-email-johan.hedberg@gmail.com>
-References: <1380640922-18647-1-git-send-email-johan.hedberg@gmail.com>
-	<1380640922-18647-4-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 1 Oct 2013 11:46:40 -0400
-Message-ID: <CAJdJm_MWy0d=5HgqsKQDzhhAL5CZszNOwTai9LZXx8Sy=npyVA@mail.gmail.com>
-Subject: Re: [RFC 3/3] Bluetooth: Add a new mgmt_set_bredr command
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ] tools: Fix update_compids.sh to avoid non-ASCII output
+Date: Tue,  1 Oct 2013 11:46:06 -0400
+Message-Id: <1380642366-5726-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Some distros have html2text patches that may generate non-ASCII output
+even when -ascii is used. This patch adds another case (seen in Fedora)
+where HTML entity &#160; (non-breaking space) is converted into a
+multibyte whitespace.
 
-On Tue, Oct 1, 2013 at 11:22 AM,  <johan.hedberg@gmail.com> wrote:
-> +       if (!lmp_bredr_capable(hdev) || !lmp_le_capable(hdev))
-> +               return cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
-> +                                 MGMT_STATUS_REJECTED);
-> +
-> +       if (!test_bit(HCI_LE_ENABLED, &hdev->dev_flags))
-> +               return cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
-> +                                 MGMT_STATUS_REJECTED);
-> +
-> +       if (cp->val != 0x00 && cp->val != 0x01)
-> +               return cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
-> +                                 MGMT_STATUS_INVALID_PARAMS);
+Also add a sanity check to make sure non-ASCII text is not introduced in
+lib/bluetooth.c.
+---
+ tools/update_compids.sh |   17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
-Looks like the above 3 cmd_status() should use MGMT_OP_SET_BREDR.
-
-> +
-> +       hci_dev_lock(hdev);
-> +
-> +       val = !!cp->val;
-> +       enabled = test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
-> +
-> +       if (!hdev_is_powered(hdev) || val == enabled) {
-> +               bool changed = false;
-> +
-> +               if (val != test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags)) {
-> +                       change_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
-> +                       changed = true;
-> +               }
-
-IMHO the trick used in another patch from Marcel (sent a while ago for
-enabling/disabling HS) is easier to follow, something like (may
-require adaptation if the logic is not the same than MGMT_OP_SET_HS):
-
-if (cp->val)
-    changed = !test_and_set_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
-else
-    changed = test_and_clear_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
-
-
-> +
-> +               err = send_settings_rsp(sk, MGMT_OP_SET_BREDR, hdev);
-> +               if (err < 0)
-> +                       goto unlock;
-> +
-> +               if (changed)
-> +                       err = new_settings(hdev, sk);
-> +
-> +               goto unlock;
-> +       }
-
-Best Regards,
+diff --git a/tools/update_compids.sh b/tools/update_compids.sh
+index 332fb16..38d1fff 100755
+--- a/tools/update_compids.sh
++++ b/tools/update_compids.sh
+@@ -21,13 +21,16 @@ cd $tmpdir
+ 
+ path=en-us/specification/assigned-numbers/company-identifiers
+ # Use "iconv -c" to strip unwanted unicode characters
+-# Also strip <input> tags of type checkbox because html2text generates UTF-8
+-# for them in some distros even when using -ascii (e.g. Fedora 18)
++# Fixups:
++# - strip <input> tags of type "checkbox" because html2text generates UTF-8 for
++#   them in some distros even when using -ascii (e.g. Fedora)
++# - replace "&#160;" (non-breaking space) with whitespace manually, because
++#   some versions incorrectly convert it into "\xC2\xA0"
+ curl https://www.bluetooth.org/$path | iconv -c -f utf8 -t ascii | \
+-    sed '/<input.*type="checkbox"/d' | \
++    sed '/<input.*type="checkbox"/d; s/&#160;/ /g' | \
+     html2text -ascii -o identifiers.txt >/dev/null
+ 
+-# Some versions of html2text do not replace &amp; (e.g. Fedora 18)
++# Some versions of html2text do not replace &amp; (e.g. Fedora)
+ sed -i 's/&amp;/\&/g' identifiers.txt
+ 
+ sed -n '/^const char \*bt_compidtostr(int compid)/,/^}/p' \
+@@ -41,6 +44,12 @@ if ! grep -q "return \"" new.c; then
+     echo "ERROR: could not parse company IDs from bluetooth.org" >&2
+     exit 1
+ fi
++if [ -n "$(tr -d '[:print:]\t\n' < new.c)" ]; then
++    echo -n "ERROR: invalid non-ASCII characters found while parsing" >&2
++    echo -n " company IDs. Please identify offending sequence and fix" >&2
++    echo " tools/update_compids.sh accordingly." >&2
++    exit 1
++fi
+ echo -e '\tcase 65535:\n\t\treturn "internal use";' >> new.c
+ echo -e '\tdefault:\n\t\treturn "not assigned";\n\t}\n}' >> new.c
+ 
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.7.9.5
+
