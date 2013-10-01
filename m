@@ -1,42 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 1 Oct 2013 14:13:09 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bing Zhao <bzhao@marvell.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	"linux-wireless@vger.kernel.org Wireless" <linux-wireless@vger.kernel.org>,
-	Mike Frysinger <vapier@chromium.org>,
-	Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
-	Amitkumar Karwar <akarwar@marvell.com>
-Subject: Re: [PATCH v5 1/2] Bluetooth: btmrvl: add setup handler
-Message-ID: <20131001111309.GA19641@x220.p-661hnu-f1>
-References: <1379715667-22424-1-git-send-email-bzhao@marvell.com>
- <18678858-E711-43E5-AFE6-E637D1CECFFB@holtmann.org>
- <477F20668A386D41ADCC57781B1F70430F44C59418@SC-VEXCH1.marvell.com>
- <DF6283E3-8476-400F-A230-CB7CA0F98564@holtmann.org>
- <477F20668A386D41ADCC57781B1F70430F450779A4@SC-VEXCH1.marvell.com>
- <20130924193010.GA2584@x220.p-661hnu-f1>
- <477F20668A386D41ADCC57781B1F70430F45077E5B@SC-VEXCH1.marvell.com>
- <B3090D30-6F81-4E12-8F58-E650F77BB72E@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <B3090D30-6F81-4E12-8F58-E650F77BB72E@holtmann.org>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 0/2] Bluetooth: Fix hci_dev_open race condition
+Date: Tue,  1 Oct 2013 14:10:26 +0300
+Message-Id: <1380625828-19538-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel & Bing,
+Hi,
 
-On Thu, Sep 26, 2013, Marcel Holtmann wrote:
-> >> You're right that we're missing the clearing of the HCI_SETUP flag for
-> >> such a scenario. Could you try the attached patch. It should fix the
-> > 
-> > We have tested your patch. Yes, it fixes the problem. Thanks!
-> 
-> then lets get a proper version with full commit message explaining the
-> issue merged upstream. As I said, this is a real bug we need to fix.
+There was recently a bug reported regarding the setup stage getting
+called twice (Subject: [PATCH v5 1/2] Bluetooth: btmrvl: add setup
+handler). There was an initial patch proposal to get an understanding of
+what exactly is happening, but the initial fix itself was not the one we
+want upstream.
 
-I've just sent a new patch set titled "[PATCH 0/2] Bluetooth: Fix
-hci_dev_open race condition". Bing, could you please test this with your
-original setup so we ensure that the issue is still properly handled.
+After considering the various options we decided to simply ensure that
+the HCIDEVUP ioctl calling path needs to ensure that the req_workqueue
+is flushed before calling hci_dev_open. However, this requires some
+refactoring and hence two patches instead of one.
+
+I was able to test this with BlueZ 4.101 and Intel HW to see that the
+Intel setup handler doesn't get called twice, but it would still be good
+to test this with the setup that was used for the initial report.
 
 Johan
+
+----------------------------------------------------------------
+Johan Hedberg (2):
+      Bluetooth: Refactor hci_dev_open to a separate hci_dev_do_open function
+      Bluetooth: Fix workqueue synchronization in hci_dev_open
+
+ net/bluetooth/hci_core.c | 35 +++++++++++++++++++++++++----------
+ 1 file changed, 25 insertions(+), 10 deletions(-)
+
