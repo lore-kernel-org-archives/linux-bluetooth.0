@@ -1,32 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] sdp: Check for correct pkt size received instead of error
-Date: Tue,  1 Oct 2013 14:57:34 +0300
-Message-Id: <1380628654-6663-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 1 Oct 2013 14:13:09 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bing Zhao <bzhao@marvell.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	"linux-wireless@vger.kernel.org Wireless" <linux-wireless@vger.kernel.org>,
+	Mike Frysinger <vapier@chromium.org>,
+	Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
+	Amitkumar Karwar <akarwar@marvell.com>
+Subject: Re: [PATCH v5 1/2] Bluetooth: btmrvl: add setup handler
+Message-ID: <20131001111309.GA19641@x220.p-661hnu-f1>
+References: <1379715667-22424-1-git-send-email-bzhao@marvell.com>
+ <18678858-E711-43E5-AFE6-E637D1CECFFB@holtmann.org>
+ <477F20668A386D41ADCC57781B1F70430F44C59418@SC-VEXCH1.marvell.com>
+ <DF6283E3-8476-400F-A230-CB7CA0F98564@holtmann.org>
+ <477F20668A386D41ADCC57781B1F70430F450779A4@SC-VEXCH1.marvell.com>
+ <20130924193010.GA2584@x220.p-661hnu-f1>
+ <477F20668A386D41ADCC57781B1F70430F45077E5B@SC-VEXCH1.marvell.com>
+ <B3090D30-6F81-4E12-8F58-E650F77BB72E@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <B3090D30-6F81-4E12-8F58-E650F77BB72E@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Marcel & Bing,
 
-Check that the full header is received in recv().
----
- src/sdpd-server.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, Sep 26, 2013, Marcel Holtmann wrote:
+> >> You're right that we're missing the clearing of the HCI_SETUP flag for
+> >> such a scenario. Could you try the attached patch. It should fix the
+> > 
+> > We have tested your patch. Yes, it fixes the problem. Thanks!
+> 
+> then lets get a proper version with full commit message explaining the
+> issue merged upstream. As I said, this is a real bug we need to fix.
 
-diff --git a/src/sdpd-server.c b/src/sdpd-server.c
-index 7b1351f..10e46a1 100644
---- a/src/sdpd-server.c
-+++ b/src/sdpd-server.c
-@@ -166,7 +166,7 @@ static gboolean io_session_event(GIOChannel *chan, GIOCondition cond, gpointer d
- 	}
- 
- 	len = recv(sk, &hdr, sizeof(sdp_pdu_hdr_t), MSG_PEEK);
--	if (len <= 0) {
-+	if (len != sizeof(sdp_pdu_hdr_t)) {
- 		sdp_svcdb_collect_all(sk);
- 		return FALSE;
- 	}
--- 
-1.7.10.4
+I've just sent a new patch set titled "[PATCH 0/2] Bluetooth: Fix
+hci_dev_open race condition". Bing, could you please test this with your
+original setup so we ensure that the issue is still properly handled.
 
+Johan
