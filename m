@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 07/14] android: Add adapter and device struct for BlueZ daemon
-Date: Tue,  1 Oct 2013 18:03:12 +0300
-Message-Id: <1380639799-25790-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 03/14] android: Enable Socket interface
+Date: Tue,  1 Oct 2013 18:03:08 +0300
+Message-Id: <1380639799-25790-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1380639799-25790-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1380639799-25790-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,143 +11,77 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Adapter structure in BlueZ daemon keeps track of default adapter
-and device structure keeps track about found devices.
+Returns socket interface, use header hal.h to avoid externs.
 ---
- android/bt_adapter.c |   56 ++++++++++++++++++++++++++++++++++++++++++++++
- android/bt_adapter.h |   60 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 116 insertions(+)
- create mode 100644 android/bt_adapter.c
- create mode 100644 android/bt_adapter.h
+ android/hal.h           |   18 ++++++++++++++++++
+ android/hal_bluetooth.c |   11 +++++++++++
+ 2 files changed, 29 insertions(+)
+ create mode 100644 android/hal.h
 
-diff --git a/android/bt_adapter.c b/android/bt_adapter.c
+diff --git a/android/hal.h b/android/hal.h
 new file mode 100644
-index 0000000..e21d50c
+index 0000000..40fbf03
 --- /dev/null
-+++ b/android/bt_adapter.c
-@@ -0,0 +1,56 @@
++++ b/android/hal.h
+@@ -0,0 +1,18 @@
 +/*
++ * Copyright (C) 2013 Intel Corporation
 + *
-+ *  BlueZ - Bluetooth protocol stack for Linux
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
 + *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *      http://www.apache.org/licenses/LICENSE-2.0
 + *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
 + *
 + */
 +
-+#include "bt_adapter.h"
-+#include "log.h"
-+#include "src/shared/mgmt.h"
++btsock_interface_t *bt_get_sock_interface(void);
+diff --git a/android/hal_bluetooth.c b/android/hal_bluetooth.c
+index 9970374..00f3e8d 100644
+--- a/android/hal_bluetooth.c
++++ b/android/hal_bluetooth.c
+@@ -21,10 +21,13 @@
+ #include <stdbool.h>
+ 
+ #include <hardware/bluetooth.h>
++#include <hardware/bt_sock.h>
+ 
+ #define LOG_TAG "BlueZ"
+ #include <cutils/log.h>
+ 
++#include "hal.h"
 +
-+struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if)
+ bt_callbacks_t *bt_hal_cbacks = NULL;
+ 
+ static bool interface_ready(void)
+@@ -32,6 +35,11 @@ static bool interface_ready(void)
+ 	return bt_hal_cbacks != NULL;
+ }
+ 
++static bool is_profile(const char *profile, const char *str)
 +{
-+	struct bt_adapter *adapter;
-+
-+	adapter = g_try_new0(struct bt_adapter, 1);
-+	if (!adapter)
-+		return NULL;
-+
-+	adapter->dev_id = index;
-+	adapter->mgmt = mgmt_ref(mgmt_if);
-+
-+	return adapter;
++	return strcmp(profile, str) == 0;
 +}
 +
-+void adapter_start(struct bt_adapter *adapter)
-+{
-+	DBG("enabled %u", adapter->dev_id);
+ static int init(bt_callbacks_t *callbacks)
+ {
+ 	ALOGD(__func__);
+@@ -246,6 +254,9 @@ static const void *get_profile_interface(const char *profile_id)
+ 	if (interface_ready() == false)
+ 		return NULL;
+ 
++	if (is_profile(profile_id, BT_PROFILE_SOCKETS_ID))
++		return bt_get_sock_interface();
 +
-+	/* TODO: CB: report scan mode */
-+
-+	/* TODO: SDP start here */
-+
-+	/* TODO: CB: report state on */
-+}
-+
-+void adapter_stop(struct bt_adapter *adapter)
-+{
-+	DBG("disabled %u", adapter->dev_id);
-+}
-diff --git a/android/bt_adapter.h b/android/bt_adapter.h
-new file mode 100644
-index 0000000..6877cc7
---- /dev/null
-+++ b/android/bt_adapter.h
-@@ -0,0 +1,60 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <glib.h>
-+
-+#include "lib/bluetooth.h"
-+
-+struct bt_device {
-+	int refcnt;
-+
-+	bdaddr_t bdaddr;
-+	uint8_t bdaddr_type;
-+	uint32_t cod;
-+	char *name;
-+};
-+
-+struct bt_adapter {
-+	int refcnt;
-+
-+	uint16_t dev_id;
-+	struct mgmt *mgmt;
-+	bdaddr_t bdaddr;
-+	uint32_t dev_class;
-+
-+	char *name;
-+	char *short_name;
-+
-+	uint32_t supported_settings;
-+	uint32_t current_settings;
-+
-+	GList *found_devices;
-+};
-+
-+struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if);
-+
-+void adapter_start(struct bt_adapter *adapter);
-+void adapter_stop(struct bt_adapter *adapter);
+ 	return NULL;
+ }
+ 
 -- 
 1.7.10.4
 
