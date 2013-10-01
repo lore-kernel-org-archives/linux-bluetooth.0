@@ -1,54 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH 2/2] Bluetooth: Fix workqueue synchronization in hci_dev_open
+Subject: Re: [PATCH 1/2] Bluetooth: Refactor hci_dev_open to a separate hci_dev_do_open function
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1380625828-19538-3-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 1 Oct 2013 14:57:14 +0200
+In-Reply-To: <1380625828-19538-2-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 1 Oct 2013 14:56:12 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <766D2125-676D-4E8A-B3B8-8892872D96EA@holtmann.org>
-References: <1380625828-19538-1-git-send-email-johan.hedberg@gmail.com> <1380625828-19538-3-git-send-email-johan.hedberg@gmail.com>
+Message-Id: <2A68E1FB-20F9-4D72-BFBC-3FE63A2311A4@holtmann.org>
+References: <1380625828-19538-1-git-send-email-johan.hedberg@gmail.com> <1380625828-19538-2-git-send-email-johan.hedberg@gmail.com>
 To: johan.hedberg@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> When hci_sock.c calls hci_dev_open it needs to ensure that there isn't
-> pending work in progress, such as that which is scheduled for the
-> initial setup procedure or the one for automatically powering off after
-> the setup procedure. This adds the necessary calls to ensure that any
-> previously scheduled work is completed before attempting to call
-> hci_dev_do_open.
+> The requirements of an external call to hci_dev_open from hci_sock.c are
+> different to that from within hci_core.c. In the former case we want to
+> flush any pending work in hdev->req_workqueue whereas in the latter we
+> don't (since there we are already calling from within the workqueue
+> itself). This patch does the necessary refactoring to a separate
+> hci_dev_do_open function (analogous to hci_dev_do_close) but does not
+> yet introduce the synchronizations relating to the workqueue usage.
 > 
-> This patch fixes a race with old user space versions where we might
-> receive a HCIDEVUP ioctl before the setup procedure has been completed.
-> When that happens the setup procedures callback may fail early and leave
-> the device in an inconsistent state, causing e.g. the setup callback to
-> be (incorrectly) called more than once.
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> net/bluetooth/hci_core.c | 5 +++++
-> 1 file changed, 5 insertions(+)
+> net/bluetooth/hci_core.c | 30 ++++++++++++++++++++----------
+> 1 file changed, 20 insertions(+), 10 deletions(-)
 
-you might want to sign off your patch ;)
-
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index fc63e78..a216dcf 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1227,6 +1227,11 @@ int hci_dev_open(__u16 dev)
-> 	if (!hdev)
-> 		return -ENODEV;
-> 
-> +	if (test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags))
-> +		cancel_delayed_work(&hdev->power_off);
-> +
-> +	flush_workqueue(hdev->req_workqueue);
-> +
-> 	err = hci_dev_do_open(hdev);
-
-And I think we should have a comment here on why we are doing this. Just to remind ourselves.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
