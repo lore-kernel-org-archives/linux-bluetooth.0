@@ -1,60 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 00/14] Basic code for Android BlueZ
-Date: Tue,  1 Oct 2013 18:03:05 +0300
-Message-Id: <1380639799-25790-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] Bluetooth: Require CAP_NET_ADMIN for HCI User Channel operation
+Date: Tue,  1 Oct 2013 07:40:01 -0700
+Message-Id: <1380638401-39890-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+The HCI User Channel operation is an admin operation that puts the
+device into promiscuous mode for single use. It is more suitable
+to require CAP_NET_ADMIN than CAP_NET_RAW.
 
-Skeletons for Android Bluetooth and Socket HALs and BlueZ daemon.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_sock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Note: Still need rebase after patches from Frederic are applied.
-
-Changes:
-	* RFCv2: Took comments from mailing list reviewers. Use single
-	makefile, remove mgmt library and directly link, remove adapter
-	code and use default_adapter pointer and other style changes.
-	Dropped some patches due to major changes.
-
-Andrei Emeltchenko (14):
-  android: Add Adapter Bluetooth HAL template
-  android: Add Socket Bluetooth HAL template
-  android: Enable Socket interface
-  android: Start Android Bluetooth daemon
-  android: Add basic mgmt initialization sequence
-  android: Create HAL API header skeleton
-  android: Add adapter and device struct for BlueZ daemon
-  android: Add Android Makefile for libbluetooth
-  android: sdp: Reuse BlueZ SDP server in Android
-  android: Add cap to bind to port < 1024
-  android: Implement read_info_complete callback
-  android: Handle mgmt changed events
-  android: Add makefile for hciconfig
-  android: Add makefile for hcitool
-
- Makefile.android        |    9 +-
- android/Android.mk      |  165 +++++++++++++++
- android/bt_adapter.c    |   59 ++++++
- android/bt_adapter.h    |   60 ++++++
- android/hal.h           |   18 ++
- android/hal_bluetooth.c |  411 +++++++++++++++++++++++++++++++++++++
- android/hal_bt_sock.c   |   84 ++++++++
- android/hal_msg.h       |  260 ++++++++++++++++++++++++
- android/main.c          |  511 +++++++++++++++++++++++++++++++++++++++++++++++
- android/main.h          |   25 +++
- configure.ac            |    4 +
- 11 files changed, 1604 insertions(+), 2 deletions(-)
- create mode 100644 android/bt_adapter.c
- create mode 100644 android/bt_adapter.h
- create mode 100644 android/hal.h
- create mode 100644 android/hal_bluetooth.c
- create mode 100644 android/hal_bt_sock.c
- create mode 100644 android/hal_msg.h
- create mode 100644 android/main.h
-
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index c09e976..5798861 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -687,7 +687,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 			goto done;
+ 		}
+ 
+-		if (!capable(CAP_NET_RAW)) {
++		if (!capable(CAP_NET_ADMIN)) {
+ 			err = -EPERM;
+ 			goto done;
+ 		}
 -- 
-1.7.10.4
+1.8.3.1
 
