@@ -1,62 +1,188 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] tools: Fix update_compids.sh to avoid non-ASCII output
-Date: Tue,  1 Oct 2013 11:46:06 -0400
-Message-Id: <1380642366-5726-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [RFC 3/3] Bluetooth: Add a new mgmt_set_bredr command
+Date: Tue,  1 Oct 2013 18:22:02 +0300
+Message-Id: <1380640922-18647-4-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1380640922-18647-1-git-send-email-johan.hedberg@gmail.com>
+References: <1380640922-18647-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some distros have html2text patches that may generate non-ASCII output
-even when -ascii is used. This patch adds another case (seen in Fedora)
-where HTML entity &#160; (non-breaking space) is converted into a
-multibyte whitespace.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Also add a sanity check to make sure non-ASCII text is not introduced in
-lib/bluetooth.c.
+This patch introduces a new mgmt command for enabling/disabling BR/EDR
+functionality. This can be convenient when one wants to make a dual-mode
+controller behave like a single-mode one. The command is only available
+for dual-mode controllers and requires that LE is enabled before using
+it.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- tools/update_compids.sh |   17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+ include/net/bluetooth/mgmt.h |   2 +
+ net/bluetooth/mgmt.c         | 122 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 124 insertions(+)
 
-diff --git a/tools/update_compids.sh b/tools/update_compids.sh
-index 332fb16..38d1fff 100755
---- a/tools/update_compids.sh
-+++ b/tools/update_compids.sh
-@@ -21,13 +21,16 @@ cd $tmpdir
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 421d763..7347df8 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -354,6 +354,8 @@ struct mgmt_cp_set_device_id {
  
- path=en-us/specification/assigned-numbers/company-identifiers
- # Use "iconv -c" to strip unwanted unicode characters
--# Also strip <input> tags of type checkbox because html2text generates UTF-8
--# for them in some distros even when using -ascii (e.g. Fedora 18)
-+# Fixups:
-+# - strip <input> tags of type "checkbox" because html2text generates UTF-8 for
-+#   them in some distros even when using -ascii (e.g. Fedora)
-+# - replace "&#160;" (non-breaking space) with whitespace manually, because
-+#   some versions incorrectly convert it into "\xC2\xA0"
- curl https://www.bluetooth.org/$path | iconv -c -f utf8 -t ascii | \
--    sed '/<input.*type="checkbox"/d' | \
-+    sed '/<input.*type="checkbox"/d; s/&#160;/ /g' | \
-     html2text -ascii -o identifiers.txt >/dev/null
+ #define MGMT_OP_SET_ADVERTISING		0x0029
  
--# Some versions of html2text do not replace &amp; (e.g. Fedora 18)
-+# Some versions of html2text do not replace &amp; (e.g. Fedora)
- sed -i 's/&amp;/\&/g' identifiers.txt
++#define MGMT_OP_SET_BREDR		0x002A
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index eea0b97..6405406 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -75,6 +75,7 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_UNBLOCK_DEVICE,
+ 	MGMT_OP_SET_DEVICE_ID,
+ 	MGMT_OP_SET_ADVERTISING,
++	MGMT_OP_SET_BREDR,
+ };
  
- sed -n '/^const char \*bt_compidtostr(int compid)/,/^}/p' \
-@@ -41,6 +44,12 @@ if ! grep -q "return \"" new.c; then
-     echo "ERROR: could not parse company IDs from bluetooth.org" >&2
-     exit 1
- fi
-+if [ -n "$(tr -d '[:print:]\t\n' < new.c)" ]; then
-+    echo -n "ERROR: invalid non-ASCII characters found while parsing" >&2
-+    echo -n " company IDs. Please identify offending sequence and fix" >&2
-+    echo " tools/update_compids.sh accordingly." >&2
-+    exit 1
-+fi
- echo -e '\tcase 65535:\n\t\treturn "internal use";' >> new.c
- echo -e '\tdefault:\n\t\treturn "not assigned";\n\t}\n}' >> new.c
+ static const u16 mgmt_events[] = {
+@@ -3259,6 +3260,126 @@ unlock:
+ 	return err;
+ }
+ 
++static void set_no_scan(struct hci_request *req)
++{
++	struct hci_dev *hdev = req->hdev;
++	u8 scan = 0x00;
++
++	if (!test_bit(HCI_ISCAN, &hdev->flags) &&
++	    !test_bit(HCI_PSCAN, &hdev->flags))
++		return;
++
++	hci_req_add(req, HCI_OP_WRITE_SCAN_ENABLE, sizeof(scan), &scan);
++}
++
++static void set_bredr_complete(struct hci_dev *hdev, u8 status)
++{
++	struct pending_cmd *cmd;
++
++	BT_DBG("status 0x%02x", status);
++
++	hci_dev_lock(hdev);
++
++	cmd = mgmt_pending_find(MGMT_OP_SET_BREDR, hdev);
++	if (!cmd)
++		goto unlock;
++
++	if (status) {
++		u8 mgmt_err = mgmt_status(status);
++
++		/* We need to restore the flag if related HCI commands
++		 * failed.
++		 */
++		change_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
++
++		cmd_status(cmd->sk, cmd->index, cmd->opcode, mgmt_err);
++	} else {
++		send_settings_rsp(cmd->sk, MGMT_OP_SET_BREDR, hdev);
++	}
++
++	mgmt_pending_remove(cmd);
++
++unlock:
++	hci_dev_unlock(hdev);
++}
++
++static int set_bredr(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
++{
++	struct mgmt_mode *cp = data;
++	struct pending_cmd *cmd;
++	struct hci_request req;
++	u8 val, enabled;
++	int err;
++
++	BT_DBG("request for %s", hdev->name);
++
++	if (!lmp_bredr_capable(hdev) || !lmp_le_capable(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
++				  MGMT_STATUS_REJECTED);
++
++	if (!test_bit(HCI_LE_ENABLED, &hdev->dev_flags))
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
++				  MGMT_STATUS_REJECTED);
++
++	if (cp->val != 0x00 && cp->val != 0x01)
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
++				  MGMT_STATUS_INVALID_PARAMS);
++
++	hci_dev_lock(hdev);
++
++	val = !!cp->val;
++	enabled = test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
++
++	if (!hdev_is_powered(hdev) || val == enabled) {
++		bool changed = false;
++
++		if (val != test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags)) {
++			change_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
++			changed = true;
++		}
++
++		err = send_settings_rsp(sk, MGMT_OP_SET_BREDR, hdev);
++		if (err < 0)
++			goto unlock;
++
++		if (changed)
++			err = new_settings(hdev, sk);
++
++		goto unlock;
++	}
++
++	if (mgmt_pending_find(MGMT_OP_SET_BREDR, hdev)) {
++		err = cmd_status(sk, hdev->id, MGMT_OP_SET_BREDR,
++				 MGMT_STATUS_BUSY);
++		goto unlock;
++	}
++
++	cmd = mgmt_pending_add(sk, MGMT_OP_SET_BREDR, hdev, data, len);
++	if (!cmd) {
++		err = -ENOMEM;
++		goto unlock;
++	}
++
++	change_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
++
++	hci_req_init(&req, hdev);
++
++	if (val)
++		set_bredr_scan(&req);
++	else
++		set_no_scan(&req);
++
++	hci_update_ad(&req);
++
++	err = hci_req_run(&req, set_bredr_complete);
++	if (err < 0)
++		mgmt_pending_remove(cmd);
++
++unlock:
++	hci_dev_unlock(hdev);
++	return err;
++}
++
+ static void fast_connectable_complete(struct hci_dev *hdev, u8 status)
+ {
+ 	struct pending_cmd *cmd;
+@@ -3472,6 +3593,7 @@ static const struct mgmt_handler {
+ 	{ unblock_device,         false, MGMT_UNBLOCK_DEVICE_SIZE },
+ 	{ set_device_id,          false, MGMT_SET_DEVICE_ID_SIZE },
+ 	{ set_advertising,        false, MGMT_SETTING_SIZE },
++	{ set_bredr,              false, MGMT_SETTING_SIZE },
+ };
+ 
  
 -- 
-1.7.9.5
+1.8.3.1
 
