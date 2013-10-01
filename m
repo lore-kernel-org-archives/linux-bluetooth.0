@@ -1,35 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+From: Frederic Danis <frederic.danis@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: =?UTF-8?q?=5BPATCH=20BlueZ=5D=20lib=3A=20Fix=20invalid=20=22whitespace=22=20on=20company=20identifier=20string?=
-Date: Tue,  1 Oct 2013 10:11:22 -0400
-Message-Id: <1380636683-24380-1-git-send-email-anderson.lizardo@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH v4 7/7] build: Add logging system
+Date: Tue,  1 Oct 2013 14:58:39 +0200
+Message-Id: <1380632319-7701-7-git-send-email-frederic.danis@linux.intel.com>
+In-Reply-To: <1380632319-7701-1-git-send-email-frederic.danis@linux.intel.com>
+References: <1380632319-7701-1-git-send-email-frederic.danis@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Somehow, the invalid multibyte sequence "\xC2\xA0" (which is displayed
-as a whitespace) was inserted on a company identifier string. Fix this
-to avoid a bogus diff when running tools/update_compids.sh.
 ---
- lib/bluetooth.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Makefile.android |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/lib/bluetooth.c b/lib/bluetooth.c
-index bdc611a..62c5c00 100644
---- a/lib/bluetooth.c
-+++ b/lib/bluetooth.c
-@@ -682,7 +682,7 @@ const char *bt_compidtostr(int compid)
- 	case 210:
- 		return "Dialog Semiconductor B.V.";
- 	case 211:
--		return "Taixingbang Technology (HK) Co,. LTD.";
-+		return "Taixingbang Technology (HK) Co,. LTD.";
- 	case 212:
- 		return "Kawantech";
- 	case 213:
+diff --git a/Makefile.android b/Makefile.android
+index e792c10..e161e6d 100644
+--- a/Makefile.android
++++ b/Makefile.android
+@@ -1,8 +1,8 @@
+ if ANDROID
+ noinst_PROGRAMS += android/bluetoothd
+ 
+-android_bluetoothd_SOURCES = android/main.c
++android_bluetoothd_SOURCES = android/main.c src/log.c
+ android_bluetoothd_LDADD = @GLIB_LIBS@
+ endif
+ 
+-EXTRA_DIST += android/Android.mk
++EXTRA_DIST += android/Android.mk android/log.c
 -- 
 1.7.9.5
 
