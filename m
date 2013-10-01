@@ -1,52 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/7] Bluetooth: Initialize hci_conn fields in hci_connect_le
-Date: Tue,  1 Oct 2013 20:03:50 -0300
-Message-Id: <1380668636-30654-2-git-send-email-andre.guedes@openbossa.org>
-In-Reply-To: <1380668636-30654-1-git-send-email-andre.guedes@openbossa.org>
-References: <1380668636-30654-1-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v2 2/2] Bluetooth: Fix workqueue synchronization in hci_dev_open
+Date: Tue,  1 Oct 2013 22:44:50 +0300
+Message-Id: <1380656690-22246-3-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1380656690-22246-1-git-send-email-johan.hedberg@gmail.com>
+References: <1380656690-22246-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch moves some hci_conn fields initialization from hci_le_
-create_connection() to hci_connect_le(). It makes more sense to
-initialize these fields within the function that creates the hci_
-conn object.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+When hci_sock.c calls hci_dev_open it needs to ensure that there isn't
+pending work in progress, such as that which is scheduled for the
+initial setup procedure or the one for automatically powering off after
+the setup procedure. This adds the necessary calls to ensure that any
+previously scheduled work is completed before attempting to call
+hci_dev_do_open.
+
+This patch fixes a race with old user space versions where we might
+receive a HCIDEVUP ioctl before the setup procedure has been completed.
+When that happens the setup procedures callback may fail early and leave
+the device in an inconsistent state, causing e.g. the setup callback to
+be (incorrectly) called more than once.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_conn.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ net/bluetooth/hci_core.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index d2380e0..f473605 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -54,11 +54,6 @@ static void hci_le_create_connection(struct hci_conn *conn)
- 	struct hci_dev *hdev = conn->hdev;
- 	struct hci_cp_le_create_conn cp;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index fc63e78..a573aa2 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1227,6 +1227,16 @@ int hci_dev_open(__u16 dev)
+ 	if (!hdev)
+ 		return -ENODEV;
  
--	conn->state = BT_CONNECT;
--	conn->out = true;
--	conn->link_mode |= HCI_LM_MASTER;
--	conn->sec_level = BT_SECURITY_LOW;
--
- 	memset(&cp, 0, sizeof(cp));
- 	cp.scan_interval = __constant_cpu_to_le16(0x0060);
- 	cp.scan_window = __constant_cpu_to_le16(0x0030);
-@@ -565,6 +560,11 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 			return ERR_PTR(-ENOMEM);
- 
- 		le->dst_type = bdaddr_to_le(dst_type);
-+		le->state = BT_CONNECT;
-+		le->out = true;
-+		le->link_mode |= HCI_LM_MASTER;
-+		le->sec_level = BT_SECURITY_LOW;
++	/* We need to ensure that no other power on/off work is pending
++	 * before proceeding to call hci_dev_do_open. This is
++	 * particularly important if the setup procedure has not yet
++	 * completed.
++	 */
++	if (test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags))
++		cancel_delayed_work(&hdev->power_off);
 +
- 		hci_le_create_connection(le);
- 	}
++	flush_workqueue(hdev->req_workqueue);
++
+ 	err = hci_dev_do_open(hdev);
  
+ 	hci_dev_put(hdev);
 -- 
-1.8.4
+1.8.3.1
 
