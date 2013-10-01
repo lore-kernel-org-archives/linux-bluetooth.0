@@ -1,34 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Require CAP_NET_ADMIN for HCI User Channel operation
-Date: Tue,  1 Oct 2013 07:40:01 -0700
-Message-Id: <1380638401-39890-1-git-send-email-marcel@holtmann.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: =?UTF-8?q?=5BPATCH=20BlueZ=5D=20lib=3A=20Fix=20invalid=20=22whitespace=22=20on=20company=20identifier=20string?=
+Date: Tue,  1 Oct 2013 10:11:22 -0400
+Message-Id: <1380636683-24380-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The HCI User Channel operation is an admin operation that puts the
-device into promiscuous mode for single use. It is more suitable
-to require CAP_NET_ADMIN than CAP_NET_RAW.
-
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Somehow, the invalid multibyte sequence "\xC2\xA0" (which is displayed
+as a whitespace) was inserted on a company identifier string. Fix this
+to avoid a bogus diff when running tools/update_compids.sh.
 ---
- net/bluetooth/hci_sock.c | 2 +-
+ lib/bluetooth.c |    2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index c09e976..5798861 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -687,7 +687,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
- 			goto done;
- 		}
- 
--		if (!capable(CAP_NET_RAW)) {
-+		if (!capable(CAP_NET_ADMIN)) {
- 			err = -EPERM;
- 			goto done;
- 		}
+diff --git a/lib/bluetooth.c b/lib/bluetooth.c
+index bdc611a..62c5c00 100644
+--- a/lib/bluetooth.c
++++ b/lib/bluetooth.c
+@@ -682,7 +682,7 @@ const char *bt_compidtostr(int compid)
+ 	case 210:
+ 		return "Dialog Semiconductor B.V.";
+ 	case 211:
+-		return "Taixingbang Technology (HK) Co,. LTD.";
++		return "Taixingbang Technology (HK) Co,. LTD.";
+ 	case 212:
+ 		return "Kawantech";
+ 	case 213:
 -- 
-1.8.3.1
+1.7.9.5
 
