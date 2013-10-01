@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 12/14] android: Handle mgmt changed events
-Date: Tue,  1 Oct 2013 18:03:17 +0300
-Message-Id: <1380639799-25790-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 07/14] android: Add adapter and device struct for BlueZ daemon
+Date: Tue,  1 Oct 2013 18:03:12 +0300
+Message-Id: <1380639799-25790-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1380639799-25790-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1380639799-25790-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,183 +11,143 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add code handling changing adapter settings.
+Adapter structure in BlueZ daemon keeps track of default adapter
+and device structure keeps track about found devices.
 ---
- android/main.c |  154 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 154 insertions(+)
+ android/bt_adapter.c |   56 ++++++++++++++++++++++++++++++++++++++++++++++
+ android/bt_adapter.h |   60 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 116 insertions(+)
+ create mode 100644 android/bt_adapter.c
+ create mode 100644 android/bt_adapter.h
 
-diff --git a/android/main.c b/android/main.c
-index 29389d5..3af1b96 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -167,6 +167,159 @@ static void load_link_keys_complete(uint8_t status, uint16_t length,
- 	DBG("status %u", status);
- }
- 
-+static void mgmt_local_name_changed_event(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
+diff --git a/android/bt_adapter.c b/android/bt_adapter.c
+new file mode 100644
+index 0000000..e21d50c
+--- /dev/null
++++ b/android/bt_adapter.c
+@@ -0,0 +1,56 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#include "bt_adapter.h"
++#include "log.h"
++#include "src/shared/mgmt.h"
++
++struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if)
 +{
-+	struct bt_adapter *adapter = user_data;
-+	const struct mgmt_cp_set_local_name *rp = param;
++	struct bt_adapter *adapter;
 +
-+	if (length < sizeof(*rp)) {
-+		error("Wrong size of local name changed parameters");
-+		return;
-+	}
++	adapter = g_try_new0(struct bt_adapter, 1);
++	if (!adapter)
++		return NULL;
 +
-+	if (adapter != default_adapter) {
-+		error("Wrong adapter %p", adapter);
-+		return;
-+	}
++	adapter->dev_id = index;
++	adapter->mgmt = mgmt_ref(mgmt_if);
 +
-+	if (!g_strcmp0(adapter->short_name, (const char *) rp->short_name) &&
-+			!g_strcmp0(adapter->name, (const char *) rp->name))
-+		return;
-+
-+	DBG("name: %s short name: %s", rp->name, rp->short_name);
-+
-+	g_free(adapter->name);
-+	adapter->name = g_strdup((const char *) rp->name);
-+
-+	g_free(adapter->short_name);
-+	adapter->short_name = g_strdup((const char *) rp->short_name);
-+
-+	/* TODO Update services if needed */
++	return adapter;
 +}
 +
-+static void settings_changed_connectable(struct bt_adapter *adapter)
++void adapter_start(struct bt_adapter *adapter)
 +{
-+	/* TODO */
++	DBG("enabled %u", adapter->dev_id);
++
++	/* TODO: CB: report scan mode */
++
++	/* TODO: SDP start here */
++
++	/* TODO: CB: report state on */
 +}
 +
-+static void settings_changed_discoverable(struct bt_adapter *adapter)
++void adapter_stop(struct bt_adapter *adapter)
 +{
-+	/* TODO */
++	DBG("disabled %u", adapter->dev_id);
 +}
+diff --git a/android/bt_adapter.h b/android/bt_adapter.h
+new file mode 100644
+index 0000000..6877cc7
+--- /dev/null
++++ b/android/bt_adapter.h
+@@ -0,0 +1,60 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+static void settings_changed(struct bt_adapter *adapter, uint32_t settings)
-+{
-+	uint32_t changed_mask;
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <glib.h>
 +
-+	changed_mask = adapter->current_settings ^ settings;
++#include "lib/bluetooth.h"
 +
-+	adapter->current_settings = settings;
++struct bt_device {
++	int refcnt;
 +
-+	DBG("0x%08x", changed_mask);
++	bdaddr_t bdaddr;
++	uint8_t bdaddr_type;
++	uint32_t cod;
++	char *name;
++};
 +
-+	if (changed_mask & MGMT_SETTING_POWERED) {
-+		info("Powered");
++struct bt_adapter {
++	int refcnt;
 +
-+		if (adapter->current_settings & MGMT_SETTING_POWERED)
-+			adapter_start(adapter);
-+		else
-+			adapter_stop(adapter);
-+	}
-+
-+	/* Seems not needed for Android */
-+	if (changed_mask & MGMT_SETTING_PAIRABLE)
-+		DBG("Pairable");
-+
-+	/*
-+	 * There are only 2 scan modes:
-+	 * CONNECTABLE and CONNECTABLE_DISCOVERABLE
-+	 */
-+	if (changed_mask & MGMT_SETTING_CONNECTABLE) {
-+		DBG("Connectable");
-+
-+		settings_changed_connectable(adapter);
-+	}
-+
-+	if (changed_mask & MGMT_SETTING_DISCOVERABLE) {
-+		DBG("Discoverable");
-+
-+		settings_changed_discoverable(adapter);
-+	}
-+}
-+
-+static void new_settings_callback(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct bt_adapter *adapter = user_data;
-+	uint32_t settings;
-+
-+	if (length < sizeof(settings)) {
-+		error("Wrong size of new settings parameters");
-+		return;
-+	}
-+
-+	if (adapter != default_adapter) {
-+		error("Wrong adapter %p", adapter);
-+		return;
-+	}
-+
-+	settings = bt_get_le32(param);
-+
-+	DBG("settings: 0x%8.8x -> 0x%8.8x", adapter->current_settings,
-+								settings);
-+
-+	if (settings == adapter->current_settings)
-+		return;
-+
-+	settings_changed(adapter, settings);
-+}
-+
-+static void mgmt_dev_class_changed_event(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct bt_adapter *adapter = user_data;
-+	const struct mgmt_cod *rp = param;
++	uint16_t dev_id;
++	struct mgmt *mgmt;
++	bdaddr_t bdaddr;
 +	uint32_t dev_class;
 +
-+	if (length < sizeof(*rp)) {
-+		error("Wrong size of class of device changed parameters");
-+		return;
-+	}
++	char *name;
++	char *short_name;
 +
-+	if (adapter != default_adapter) {
-+		error("Wrong adapter %p", adapter);
-+		return;
-+	}
++	uint32_t supported_settings;
++	uint32_t current_settings;
 +
-+	dev_class = rp->val[0] | (rp->val[1] << 8) | (rp->val[2] << 16);
++	GList *found_devices;
++};
 +
-+	if (dev_class == adapter->dev_class)
-+		return;
++struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if);
 +
-+	DBG("Class: 0x%06x", dev_class);
-+
-+	adapter->dev_class = dev_class;
-+
-+	/* TODO: Inform prop change: Class */
-+
-+	/* TODO: Gatt attrib set*/
-+}
-+
-+static void register_mgmt_handlers(struct bt_adapter *adapter)
-+{
-+	mgmt_register(adapter->mgmt, MGMT_EV_NEW_SETTINGS, adapter->dev_id,
-+					new_settings_callback, adapter, NULL);
-+
-+	mgmt_register(adapter->mgmt, MGMT_EV_CLASS_OF_DEV_CHANGED,
-+			adapter->dev_id, mgmt_dev_class_changed_event,
-+			adapter, NULL);
-+
-+	mgmt_register(adapter->mgmt, MGMT_EV_LOCAL_NAME_CHANGED,
-+			adapter->dev_id, mgmt_local_name_changed_event,
-+			adapter, NULL);
-+}
-+
- static void load_link_keys(struct bt_adapter *adapter, GSList *keys)
- {
- 	struct mgmt_cp_load_link_keys *cp;
-@@ -228,6 +381,7 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 	default_adapter->current_settings = btohs(rp->current_settings);
- 
- 	/* TODO: Register all event notification handlers */
-+	register_mgmt_handlers(default_adapter);
- 
- 	if (default_adapter->current_settings & MGMT_SETTING_POWERED)
- 		adapter_start(default_adapter);
++void adapter_start(struct bt_adapter *adapter);
++void adapter_stop(struct bt_adapter *adapter);
 -- 
 1.7.10.4
 
