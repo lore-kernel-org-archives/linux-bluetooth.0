@@ -1,42 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@gmail.com>
+From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=
-	<jprvita@openbossa.org>
-Subject: [PATCH BlueZ] monitor: Fix EIR Data Type / AD Type assigned numbers
-Date: Tue,  1 Oct 2013 20:04:37 -0300
-Message-Id: <1380668677-5259-1-git-send-email-jprvita@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH 7/7] Bluetooth: Locking in hci_le_conn_complete_evt
+Date: Tue,  1 Oct 2013 20:03:56 -0300
+Message-Id: <1380668636-30654-8-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1380668636-30654-1-git-send-email-andre.guedes@openbossa.org>
+References: <1380668636-30654-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: João Paulo Rechi Vita <jprvita@openbossa.org>
+This patch moves hci_dev_lock and hci_dev_unlock calls to where they
+are really required, reducing the critical region in hci_le_conn_
+complete_evt function. hdev->lock is required only in hci_conn_del
+and hci_conn_add call to protect concurrent add and remove operations
+in hci_conn_hash list.
 
-The values for Public Target Address and Random Target Address were
-swapped. This information can be verified in the Bluetooth SIG Assigned
-numbers webpage:
-
-https://www.bluetooth.org/en-us/specification/assigned-numbers/generic-access-profile
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- monitor/packet.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_event.c | 24 ++++++++++++++----------
+ 1 file changed, 14 insertions(+), 10 deletions(-)
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index ddd3742..942d3de 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -2002,8 +2002,8 @@ static void print_fec(uint8_t fec)
- #define BT_EIR_SERVICE_UUID16		0x14
- #define BT_EIR_SERVICE_UUID128		0x15
- #define BT_EIR_SERVICE_DATA		0x16
--#define BT_EIR_RANDOM_ADDRESS		0x17
--#define BT_EIR_PUBLIC_ADDRESS		0x18
-+#define BT_EIR_PUBLIC_ADDRESS		0x17
-+#define BT_EIR_RANDOM_ADDRESS		0x18
- #define BT_EIR_GAP_APPEARANCE		0x19
- #define BT_EIR_MANUFACTURER_DATA	0xff
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 0e4a9f4..ffd5186 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3442,19 +3442,20 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
  
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
+ 
+-	hci_dev_lock(hdev);
+-
+ 	if (ev->status) {
+ 		conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
+ 		if (!conn)
+-			goto unlock;
++			return;
+ 
+ 		mgmt_connect_failed(hdev, &conn->dst, conn->type,
+ 				    conn->dst_type, ev->status);
+ 		hci_proto_connect_cfm(conn, ev->status);
+ 		conn->state = BT_CLOSED;
++
++		hci_dev_lock(hdev);
+ 		hci_conn_del(conn);
+-		goto unlock;
++		hci_dev_unlock(hdev);
++		return;
+ 	}
+ 
+ 	switch (ev->role) {
+@@ -3466,10 +3467,13 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		 * object.
+ 		 */
+ 		if (!conn) {
++			hci_dev_lock(hdev);
+ 			conn = hci_conn_add(hdev, LE_LINK, &ev->bdaddr);
++			hci_dev_unlock(hdev);
++
+ 			if (!conn) {
+ 				BT_ERR("No memory for new connection");
+-				goto unlock;
++				return;
+ 			}
+ 
+ 			conn->out = true;
+@@ -3480,10 +3484,13 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		break;
+ 
+ 	case LE_CONN_ROLE_SLAVE:
++		hci_dev_lock(hdev);
+ 		conn = hci_conn_add(hdev, LE_LINK, &ev->bdaddr);
++		hci_dev_unlock(hdev);
++
+ 		if (!conn) {
+ 			BT_ERR("No memory for new connection");
+-			goto unlock;
++			return;
+ 		}
+ 
+ 		conn->dst_type = ev->bdaddr_type;
+@@ -3492,7 +3499,7 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	default:
+ 		BT_ERR("Used reserved Role parameter %d", ev->role);
+-		goto unlock;
++		return;
+ 	}
+ 
+ 	if (!test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
+@@ -3505,9 +3512,6 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hci_conn_add_sysfs(conn);
+ 
+ 	hci_proto_connect_cfm(conn, ev->status);
+-
+-unlock:
+-	hci_dev_unlock(hdev);
+ }
+ 
+ static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
 -- 
-1.8.3.1
+1.8.4
 
