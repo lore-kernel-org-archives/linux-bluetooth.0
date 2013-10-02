@@ -1,50 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Dohyun Pyun <re20sfree@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix advertising data flags with disabled BR/EDR
-Date: Wed,  2 Oct 2013 16:02:24 +0300
-Message-Id: <1380718944-28164-1-git-send-email-johan.hedberg@gmail.com>
+Cc: steve.jun@samsung.com, DoHyun Pyun <dh79.pyun@samsung.com>,
+	C S Bhargava <cs.bhargava@samsung.com>
+Subject: [PATCH v4 8/8] Bluetooth: Add the definition for Slave Page Response Timeout
+Date: Wed,  2 Oct 2013 21:54:53 +0900
+Message-Id: <1380718493-4577-9-git-send-email-dh79.pyun@samsung.com>
+In-Reply-To: <1380718493-4577-1-git-send-email-dh79.pyun@samsung.com>
+References: <1380718493-4577-1-git-send-email-dh79.pyun@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+From: DoHyun Pyun <dh79.pyun@samsung.com>
 
-We shouldn't include the simultaneous LE & BR/EDR flags in the LE
-advertising data if BR/EDR is disabled on a dual-mode controller. This
-patch fixes this issue and ensures that the create_ad function generates
-the correct flags when BR/EDR is disabled.
+The Slave Page Response Timeout event indicates to the Host that a
+slave page response timeout has occurred in the BR/EDR Controller.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+The Core Spec Addendum 4 adds this command in part B Connectionless
+Slave Broadcast.
+
+Bluetooth Core Specification Addendum 4 - Page 110
+
+"7.7.72 Slave Page Response Timeout Event [New Section]
+...
+Note: this event will be generated if the slave BR/EDR Controller
+responds to a page but does not receive the master FHS packet
+(see Baseband, Section 8.3.3) within pagerespTO.
+
+Event Parameters: NONE"
+
+Signed-off-by: Dohyun Pyun <dh79.pyun@samsung.com>
+Signed-off-by: C S Bhargava <cs.bhargava@samsung.com>
 ---
- net/bluetooth/hci_core.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ include/net/bluetooth/hci.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 14df032..82dbdc6 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1108,14 +1108,14 @@ static u8 create_ad(struct hci_dev *hdev, u8 *ptr)
- 	if (test_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags))
- 		flags |= LE_AD_GENERAL;
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 03f2a91..b90eec5 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1510,6 +1510,8 @@ struct hci_ev_sync_train_complete {
+ 	__u8	status;
+ } __packed;
  
--	if (!test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags))
-+	if (test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags)) {
-+		if (lmp_le_br_capable(hdev))
-+			flags |= LE_AD_SIM_LE_BREDR_CTRL;
-+		if (lmp_host_le_br_capable(hdev))
-+			flags |= LE_AD_SIM_LE_BREDR_HOST;
-+	} else {
- 		flags |= LE_AD_NO_BREDR;
--
--	if (lmp_le_br_capable(hdev))
--		flags |= LE_AD_SIM_LE_BREDR_CTRL;
--
--	if (lmp_host_le_br_capable(hdev))
--		flags |= LE_AD_SIM_LE_BREDR_HOST;
-+	}
++#define HCI_EV_SLAVE_PAGE_RESP_TIMEOUT	0x54
++
+ /* Low energy meta events */
+ #define LE_CONN_ROLE_MASTER	0x00
  
- 	if (flags) {
- 		BT_DBG("adv flags 0x%02x", flags);
 -- 
-1.8.3.1
+1.8.1.2
 
