@@ -1,237 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH 2/2] Bluetooth: Add a new mgmt_set_bredr command
+Subject: Re: [PATCH 1/2] Bluetooth: Introduce a new HCI_BREDR_ENABLED flag
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1380705040-16300-3-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 2 Oct 2013 11:27:49 +0200
+In-Reply-To: <1380705040-16300-2-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 2 Oct 2013 11:23:43 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <7A81AFB1-5441-4548-8A16-AF700AA63371@holtmann.org>
-References: <1380705040-16300-1-git-send-email-johan.hedberg@gmail.com> <1380705040-16300-3-git-send-email-johan.hedberg@gmail.com>
+Message-Id: <6F59A8FC-14F1-4982-9A9A-66F4A022E0B1@holtmann.org>
+References: <1380705040-16300-1-git-send-email-johan.hedberg@gmail.com> <1380705040-16300-2-git-send-email-johan.hedberg@gmail.com>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> This patch introduces a new mgmt command for enabling/disabling BR/EDR
-> functionality. This can be convenient when one wants to make a dual-mode
-> controller behave like a single-mode one. The command is only available
-> for dual-mode controllers and requires that LE is enabled before using
-> it. The BR/EDR setting can be enabled at any point, however disabling it
-> requires the controller to be powered off (otherwise a "rejected"
-> response will be sent).
+> To allow treating dual-mode (BR/EDR/LE) controllers as single-mode ones
+> (LE-only) we want to introduce a new HCI_BREDR_ENABLED flag to track
+> whether BR/EDR is enabled or not (previously we simply looked at the
+> feature bit with lmp_bredr_enabled).
 > 
-> Disabling the BR/EDR setting will automatically disable all other BR/EDR
-> related settings.
+> This patch add the new flag and updates the relevant places to test
+> against it instead of using lmp_bredr_enabled. The flag is by default
+> enabled when registering an adapter and only cleared if necessary once
+> the local features have been read during the HCI init procedure.
+> 
+> We cannot completely block BR/EDR usage in case user space uses raw HCI
+> sockets but the patch tries to block this in places where possible, such
+> as the various BR/EDR specific ioctls.
 > 
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
-> include/net/bluetooth/mgmt.h |   2 +
-> net/bluetooth/hci_event.c    |   5 ++
-> net/bluetooth/mgmt.c         | 124 +++++++++++++++++++++++++++++++++++++++++++
-> 3 files changed, 131 insertions(+)
+> include/net/bluetooth/hci.h |  1 +
+> net/bluetooth/hci_conn.c    |  3 +++
+> net/bluetooth/hci_core.c    | 21 +++++++++++++++++++--
+> net/bluetooth/mgmt.c        | 24 +++++++++++++-----------
+> 4 files changed, 36 insertions(+), 13 deletions(-)
 > 
-> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-> index 421d763..7347df8 100644
-> --- a/include/net/bluetooth/mgmt.h
-> +++ b/include/net/bluetooth/mgmt.h
-> @@ -354,6 +354,8 @@ struct mgmt_cp_set_device_id {
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 7ede266..4fa08d7 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -122,6 +122,7 @@ enum {
+> 	HCI_LINK_SECURITY,
+> 	HCI_PERIODIC_INQ,
+> 	HCI_FAST_CONNECTABLE,
+> +	HCI_BREDR_ENABLED,
+> };
 > 
-> #define MGMT_OP_SET_ADVERTISING		0x0029
+> /* A mask for the flags that are supposed to remain when a reset happens
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index d2380e0..514148b 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -581,6 +581,9 @@ static struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
+> {
+> 	struct hci_conn *acl;
 > 
-> +#define MGMT_OP_SET_BREDR		0x002A
+> +	if (!test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags))
+> +		return ERR_PTR(-ENOTSUPP);
 > +
-> #define MGMT_EV_CMD_COMPLETE		0x0001
-> struct mgmt_ev_cmd_complete {
-> 	__le16	opcode;
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index d171c04b..4785ab0 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -297,6 +297,11 @@ static void hci_cc_write_scan_enable(struct hci_dev *hdev, struct sk_buff *skb)
+> 	acl = hci_conn_hash_lookup_ba(hdev, ACL_LINK, dst);
+> 	if (!acl) {
+> 		acl = hci_conn_add(hdev, ACL_LINK, dst);
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 7cbdd33..ed310e9 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -519,6 +519,8 @@ static void hci_init2_req(struct hci_request *req, unsigned long opt)
+> 
+> 	if (lmp_bredr_capable(hdev))
+> 		bredr_setup(req);
+> +	else
+> +		clear_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
+> 
+> 	if (lmp_le_capable(hdev))
+> 		le_setup(req);
+> @@ -1034,6 +1036,11 @@ int hci_inquiry(void __user *arg)
 > 		goto done;
 > 	}
 > 
-> +	/* We need to ensure that we set this back on if someone changed
-> +	 * the scan mode through a raw HCI socket.
-> +	 */
-> +	set_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
+> +	if (!test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags)) {
+> +		err = -ENOTSUPP;
+> +		goto done;
+> +	}
 > +
-> 	old_pscan = test_and_clear_bit(HCI_PSCAN, &hdev->flags);
-> 	old_iscan = test_and_clear_bit(HCI_ISCAN, &hdev->flags);
+> 	hci_dev_lock(hdev);
+> 	if (inquiry_cache_age(hdev) > INQUIRY_CACHE_AGE_MAX ||
+> 	    inquiry_cache_empty(hdev) || ir.flags & IREQ_CACHE_FLUSH) {
+> @@ -1101,7 +1108,7 @@ static u8 create_ad(struct hci_dev *hdev, u8 *ptr)
+> 	if (test_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags))
+> 		flags |= LE_AD_GENERAL;
 > 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index e1c41b0..8b9b337 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -75,6 +75,7 @@ static const u16 mgmt_commands[] = {
-> 	MGMT_OP_UNBLOCK_DEVICE,
-> 	MGMT_OP_SET_DEVICE_ID,
-> 	MGMT_OP_SET_ADVERTISING,
-> +	MGMT_OP_SET_BREDR,
-> };
+> -	if (!lmp_bredr_capable(hdev))
+> +	if (!test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags))
+> 		flags |= LE_AD_NO_BREDR;
 > 
-> static const u16 mgmt_events[] = {
-> @@ -3337,6 +3338,125 @@ unlock:
-> 	return err;
-> }
-> 
-> +static void set_bredr_complete(struct hci_dev *hdev, u8 status)
-> +{
-> +	struct pending_cmd *cmd;
-> +
-> +	BT_DBG("status 0x%02x", status);
-> +
-> +	hci_dev_lock(hdev);
-> +
-> +	cmd = mgmt_pending_find(MGMT_OP_SET_BREDR, hdev);
-> +	if (!cmd)
-> +		goto unlock;
-> +
-> +	if (status) {
-> +		u8 mgmt_err = mgmt_status(status);
-> +
-> +		/* We need to restore the flag if related HCI commands
-> +		 * failed.
-> +		 */
-> +		clear_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
-> +
-> +		cmd_status(cmd->sk, cmd->index, cmd->opcode, mgmt_err);
-> +	} else {
-> +		send_settings_rsp(cmd->sk, MGMT_OP_SET_BREDR, hdev);
-> +		new_settings(hdev, cmd->sk);
-> +	}
-> +
-> +	mgmt_pending_remove(cmd);
-> +
-> +unlock:
-> +	hci_dev_unlock(hdev);
-> +}
-> +
-> +static int set_bredr(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
-> +{
-> +	struct mgmt_mode *cp = data;
-> +	struct pending_cmd *cmd;
-> +	struct hci_request req;
-> +	u8 val, enabled;
-> +	int err;
-> +
-> +	BT_DBG("request for %s", hdev->name);
-> +
-> +	if (!lmp_bredr_capable(hdev) || !lmp_le_capable(hdev))
-> +		return cmd_status(sk, hdev->id, MGMT_OP_SET_BREDR,
-> +				  MGMT_STATUS_REJECTED);
-
-this should MGMT_STATUS_NOT_SUPPORTED to be in sync with how we do it for other commands.
-
-> +
-> +	if (!test_bit(HCI_LE_ENABLED, &hdev->dev_flags))
-> +		return cmd_status(sk, hdev->id, MGMT_OP_SET_BREDR,
-> +				  MGMT_STATUS_REJECTED);
-> +
-> +	if (cp->val != 0x00 && cp->val != 0x01)
-> +		return cmd_status(sk, hdev->id, MGMT_OP_SET_BREDR,
-> +				  MGMT_STATUS_INVALID_PARAMS);
-> +
-> +	hci_dev_lock(hdev);
-> +
-> +	val = !!cp->val;
-> +	enabled = test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
-> +
-> +	if (val == enabled) {
-> +		err = send_settings_rsp(sk, MGMT_OP_SET_BREDR, hdev);
-> +		goto unlock;
-> +	}
-> +
-> +	if (!hdev_is_powered(hdev)) {
-> +		if (!val) {
-> +			clear_bit(HCI_CONNECTABLE, &hdev->dev_flags);
-> +			clear_bit(HCI_DISCOVERABLE, &hdev->dev_flags);
-> +			clear_bit(HCI_SSP_ENABLED, &hdev->dev_flags);
-> +			clear_bit(HCI_LINK_SECURITY, &hdev->dev_flags);
-> +			clear_bit(HCI_FAST_CONNECTABLE, &hdev->dev_flags);
-> +			clear_bit(HCI_HS_ENABLED, &hdev->dev_flags);
-> +		}
-> +
-> +		change_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
-> +
-> +		err = send_settings_rsp(sk, MGMT_OP_SET_BREDR, hdev);
-> +		if (err < 0)
-> +			goto unlock;
-> +
-> +		err = new_settings(hdev, sk);
-> +		goto unlock;
-> +	}
-> +
-> +	/* Reject disabling when powered on */
-> +	if (!val) {
-> +		err = cmd_status(sk, hdev->id, MGMT_OP_SET_BREDR,
-> +				 MGMT_STATUS_REJECTED);
-> +		goto unlock;
-> +	}
-
-I would have done this the other way around with the if clauses.
-
-	if (val) {
-		…
-	} else {
-		if (hdev_is_powered())
-			fail
-
-		…
-	}
-
-> +
-> +	if (mgmt_pending_find(MGMT_OP_SET_BREDR, hdev)) {
-> +		err = cmd_status(sk, hdev->id, MGMT_OP_SET_BREDR,
-> +				 MGMT_STATUS_BUSY);
-> +		goto unlock;
-> +	}
-> +
-> +	cmd = mgmt_pending_add(sk, MGMT_OP_SET_BREDR, hdev, data, len);
-> +	if (!cmd) {
-> +		err = -ENOMEM;
-> +		goto unlock;
-> +	}
-> +
-> +	/* We need to flip the bit already here so that hci_update_ad
-> +	 * generates the correct flags.
-> +	 */
-> +	set_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
-> +
-> +	hci_req_init(&req, hdev);
-> +	hci_update_ad(&req);
-> +	err = hci_req_run(&req, set_bredr_complete);
-> +	if (err < 0)
-> +		mgmt_pending_remove(cmd);
-> +
-> +unlock:
-> +	hci_dev_unlock(hdev);
-> +	return err;
-> +}
-> +
-> static bool ltk_is_valid(struct mgmt_ltk_info *key)
-> {
-> 	if (key->authenticated != 0x00 && key->authenticated != 0x01)
-> @@ -3452,6 +3572,7 @@ static const struct mgmt_handler {
-> 	{ unblock_device,         false, MGMT_UNBLOCK_DEVICE_SIZE },
-> 	{ set_device_id,          false, MGMT_SET_DEVICE_ID_SIZE },
-> 	{ set_advertising,        false, MGMT_SETTING_SIZE },
-> +	{ set_bredr,              false, MGMT_SETTING_SIZE },
-> };
-> 
-> 
-> @@ -3633,6 +3754,9 @@ static int powered_update_hci(struct hci_dev *hdev)
-> 		    cp.simul != lmp_host_le_br_capable(hdev))
-> 			hci_req_add(&req, HCI_OP_WRITE_LE_HOST_SUPPORTED,
-> 				    sizeof(cp), &cp);
-> +
-> +		/* In case BR/EDR was toggled during the AUTO_OFF phase */
-> +		hci_update_ad(&req);
+> 	if (lmp_le_br_capable(hdev))
+> @@ -1493,6 +1500,11 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg)
+> 		goto done;
 > 	}
 > 
-> 	if (test_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags)) {
+> +	if (!test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags)) {
+> +		err = -ENOTSUPP;
+> +		goto done;
+> +	}
+> +
+
+quick question, shouldn't these be EOPNOTSUPP.
 
 Regards
 
