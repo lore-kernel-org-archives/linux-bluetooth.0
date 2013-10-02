@@ -1,43 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH v6 0/4] Bluetooth: btmrvl cal data downloading
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1380655155-10007-1-git-send-email-bzhao@marvell.com>
-Date: Wed, 2 Oct 2013 09:37:40 +0200
-Cc: <linux-bluetooth@vger.kernel.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	<linux-wireless@vger.kernel.org>,
-	Mike Frysinger <vapier@chromium.org>,
-	Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
-	Amitkumar Karwar <akarwar@marvell.com>
-Message-Id: <1EB87650-8518-47BE-B0D7-4F78E09F8691@holtmann.org>
-References: <1380655155-10007-1-git-send-email-bzhao@marvell.com>
-To: Bing Zhao <bzhao@marvell.com>
-Sender: linux-wireless-owner@vger.kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Restrict disabling of HS when controller is powered off
+Date: Wed,  2 Oct 2013 00:27:02 -0700
+Message-Id: <1380698822-25791-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bing,
+Disabling the high speed setting when the controller is powered on has
+too many side effects that are not taken care of. And in general it
+is not an useful operation anyway. So just make such a command fail
+with a rejection error message.
 
-> This series adds the calibration data downloading support
-> along with improvements in sending commands and setup handler.
-> 
-> Amitkumar Karwar (4):
->  Bluetooth: btmrvl: add btmrvl_send_sync_cmd() function
->  Bluetooth: btmrvl: get rid of struct btmrvl_cmd
->  Bluetooth: btmrvl: add setup handler
->  Bluetooth: btmrvl: add calibration data download support
-> 
-> drivers/bluetooth/btmrvl_drv.h  |  12 +-
-> drivers/bluetooth/btmrvl_main.c | 269 ++++++++++++++++++++++++++--------------
-> drivers/bluetooth/btmrvl_sdio.c |  15 +--
-> drivers/bluetooth/btmrvl_sdio.h |   2 +
-> 4 files changed, 193 insertions(+), 105 deletions(-)
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/mgmt.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-I have decided to apply all 4 patches to bluetooth-next. However please send a follow up patch that changes the code to operate on 16-bit opcodes and not the OGC/OCF and its packing.
-
-Regards
-
-Marcel
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index ad38629..35d3c12 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1352,10 +1352,17 @@ static int set_hs(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	if (cp->val)
++	if (cp->val) {
+ 		changed = !test_and_set_bit(HCI_HS_ENABLED, &hdev->dev_flags);
+-	else
++	} else {
++		if (hdev_is_powered(hdev)) {
++			err = cmd_status(sk, hdev->id, MGMT_OP_SET_HS,
++					 MGMT_STATUS_REJECTED);
++			goto unlock;
++		}
++
+ 		changed = test_and_clear_bit(HCI_HS_ENABLED, &hdev->dev_flags);
++	}
+ 
+ 	err = send_settings_rsp(sk, MGMT_OP_SET_HS, hdev);
+ 	if (err < 0)
+-- 
+1.8.3.1
 
