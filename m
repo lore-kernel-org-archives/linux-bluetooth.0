@@ -1,41 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1380715758-10334-9-git-send-email-dh79.pyun@samsung.com>
-References: <1380715758-10334-1-git-send-email-dh79.pyun@samsung.com>
-	<1380715758-10334-9-git-send-email-dh79.pyun@samsung.com>
-Date: Wed, 2 Oct 2013 08:20:32 -0400
-Message-ID: <CAJdJm_NYpd7J5wsHGEskzL1q_o5sFsf-RX20OVyja-Pn_c87xQ@mail.gmail.com>
-Subject: Re: [PATCH v3 8/8] Bluetooth: Add Slave Page Response Timeout Event
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Dohyun Pyun <re20sfree@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	steve.jun@samsung.com, DoHyun Pyun <dh79.pyun@samsung.com>,
-	C S Bhargava <cs.bhargava@samsung.com>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Increment management interface revision
+Date: Wed,  2 Oct 2013 05:18:31 -0700
+Message-Id: <1380716311-19403-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dohyun,
+This patch increments the management interface revision due to the
+various fixes, improvements and other changes that have gone in
+lately.
 
-On Wed, Oct 2, 2013 at 8:09 AM, Dohyun Pyun <re20sfree@gmail.com> wrote:
-> From: DoHyun Pyun <dh79.pyun@samsung.com>
->
-> The Slave Page Response Timeout event indicates to the Host that a
-> slave page response timeout has occurred in the BR/EDR Controller.
->
-> The Core Spec Addendum 4 adds this command in part B Connectionless
-> Slave Broadcast.
->
-> Bluetooth Core Specification Addendum 4 - Page 110
->
-> "7.7.67 Synchronization Train Complete Event [New Section]
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/mgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The section for this event is actually:
-
-"7.7.72 Slave Page Response Timeout Event [New Section]"
-
-Best Regards,
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index b871632..7a8702d 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -33,7 +33,7 @@
+ #include <net/bluetooth/smp.h>
+ 
+ #define MGMT_VERSION	1
+-#define MGMT_REVISION	3
++#define MGMT_REVISION	4
+ 
+ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_READ_INDEX_LIST,
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.8.3.1
+
