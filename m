@@ -3,9 +3,9 @@ From: Dohyun Pyun <re20sfree@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: steve.jun@samsung.com, DoHyun Pyun <dh79.pyun@samsung.com>,
 	C S Bhargava <cs.bhargava@samsung.com>
-Subject: [PATCH v4 2/8] Bluetooth: Add the definition and structure for Delete Reserved LT_ADDR
-Date: Wed,  2 Oct 2013 21:54:47 +0900
-Message-Id: <1380718493-4577-3-git-send-email-dh79.pyun@samsung.com>
+Subject: [PATCH v4 4/8] Bluetooth: Add the structure for Write Sync Train Parameters
+Date: Wed,  2 Oct 2013 21:54:49 +0900
+Message-Id: <1380718493-4577-5-git-send-email-dh79.pyun@samsung.com>
 In-Reply-To: <1380718493-4577-1-git-send-email-dh79.pyun@samsung.com>
 References: <1380718493-4577-1-git-send-email-dh79.pyun@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,49 +13,60 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: DoHyun Pyun <dh79.pyun@samsung.com>
 
-The Delete_Reserved_LT_ADDR command requests that the BR/EDR
-Controller cancel the reservation for a specific LT_ADDR reserved for the
-purposes of Connectionless Slave Broadcast.
+The Write_Synchronization_Train_Parameters command configures
+the Synchronization Train functionality in the BR/EDR Controller.
 
 The Core Spec Addendum 4 adds this command in part B Connectionless
 Slave Broadcast.
 
-Bluetooth Core Specification Addendum 4 - Page 92
+Bluetooth Core Specification Addendum 4 - Page 97
 
-"7.3.87 Delete Reserved LT_ADDR Command [New Section]
+"7.3.90 Write Synchronization Train Parameters Command [New Section]
 ...
-If the LT_ADDR indicated in the LT_ADDR parameter is not reserved by the
-BR/EDR Controller, it shall return the Unknown Connection Identifier (0x02)
-error code.
-If connectionless slave broadcast mode is still active, then the Controller
-shall return the Command Disallowed (0x0C) error code."
+Note: The AFH_Channel_Map used in the Synchronization Train packets is
+configured by the Set_AFH_Channel_Classification command and the local
+channel classification in the BR/EDR Controller.
+
+Interval_Min and Interval_Max specify the allowed range of
+Sync_Train_Interval. Refer to [Vol. 2], Part B, section 2.7.2 for
+a detailed description of Sync_Train_Interval. The BR/EDR Controller shall
+select an interval from this range and return it in Sync_Train_Interval.
+If the Controller is unable to select a value from this range, it shall
+return the Invalid HCI Command Parameters (0x12) error code.
+
+Once started (via the Start_Synchronization_Train Command) the
+Synchronization Train will continue until synchronization_trainTO slots have
+passed or Connectionless Slave Broadcast has been disabled."
 
 Signed-off-by: Dohyun Pyun <dh79.pyun@samsung.com>
 Signed-off-by: C S Bhargava <cs.bhargava@samsung.com>
 ---
- include/net/bluetooth/hci.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ include/net/bluetooth/hci.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 4d88809..9b071f1 100644
+index d9e0a84..cad6ca1 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -848,6 +848,15 @@ struct hci_rp_set_reserved_lt_addr {
- 	__u8	lt_addr;
- } __packed;
+@@ -873,6 +873,18 @@ struct hci_rp_set_csb_data {
  
-+#define HCI_OP_DELETE_RESERVED_LT_ADDR	0x0c75
-+struct hci_cp_delete_reserved_lt_addr {
-+	__u8	lt_addr;
-+} __packed;
-+struct hci_rp_delete_reserved_lt_addr {
-+	__u8	status;
-+	__u8	lt_addr;
-+} __packed;
-+
  #define HCI_OP_READ_SYNC_TRAIN_PARAMS	0x0c77
  
++#define HCI_OP_WRITE_SYNC_TRAIN_PARAMS	0x0c78
++struct hci_cp_write_sync_train_params {
++	__le16	interval_min;
++	__le16	interval_max;
++	__le32	sync_train_tout;
++	__u8	service_data;
++} __packed;
++struct hci_rp_write_sync_train_params {
++	__u8	status;
++	__le16	sync_train_int;
++} __packed;
++
  #define HCI_OP_READ_LOCAL_VERSION	0x1001
+ struct hci_rp_read_local_version {
+ 	__u8     status;
 -- 
 1.8.1.2
 
