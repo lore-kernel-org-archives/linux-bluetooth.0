@@ -1,38 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dohyun Pyun <re20sfree@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: steve.jun@samsung.com
-Subject: [PATCH v2 0/8] Add CSA 4 commands and events in hci.h
-Date: Wed,  2 Oct 2013 20:10:10 +0900
-Message-Id: <1380712218-9269-1-git-send-email-dh79.pyun@samsung.com>
+Date: Wed, 2 Oct 2013 14:10:03 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] tools: Fix update_compids.sh to avoid non-ASCII
+ output
+Message-ID: <20131002111002.GB26752@x220.p-661hnu-f1>
+References: <1380642366-5726-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1380642366-5726-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Lizardo,
 
-This patchset contains several HCI commands and events addition.
-These HCI commands and events are included in Bluetooth Core
-Specification Addendum 4, and it will be used to implement 3DS
-profile.
+On Tue, Oct 01, 2013, Anderson Lizardo wrote:
+> Some distros have html2text patches that may generate non-ASCII output
+> even when -ascii is used. This patch adds another case (seen in Fedora)
+> where HTML entity &#160; (non-breaking space) is converted into a
+> multibyte whitespace.
+> 
+> Also add a sanity check to make sure non-ASCII text is not introduced in
+> lib/bluetooth.c.
+> ---
+>  tools/update_compids.sh |   17 +++++++++++++----
+>  1 file changed, 13 insertions(+), 4 deletions(-)
 
-Also I'm still implementing 3DS profile's master role in the BR/EDR
-controller. Summit and I'll send the patchsets about 3DS MGMT APIs
-soon.
+Applied. Thanks.
 
-Regards,
-Pyun
-
-----------------------------------------------------------------
-Dohyun Pyun (8):
-      Bluetooth: Add Set Reserved LT_ADDR Command
-      Bluetooth: Add Delete Reserved LT_ADDR Command
-      Bluetooth: Add Set Connectionless Slave Broadcast Data Command
-      Bluetooth: Add Write Synchronization Train Parameters Command
-      Bluetooth: Add Set Connectionless Slave Broadcast Command
-      Bluetooth: Add Start Synchronization Train Command
-      Bluetooth: Add Synchronization Train Complete Event
-      Bluetooth: Add Slave Page Response Timeout Event
-
- include/net/bluetooth/hci.h | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 69 insertions(+)
-
+Johan
