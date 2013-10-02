@@ -1,57 +1,159 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH v2 8/8] Bluetooth: Add Slave Page Response Timeout Event
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1380712218-9269-9-git-send-email-dh79.pyun@samsung.com>
-Date: Wed, 2 Oct 2013 13:46:44 +0200
-Cc: linux-bluetooth@vger.kernel.org, steve.jun@samsung.com,
-	DoHyun Pyun <dh79.pyun@samsung.com>,
-	C S Bhargava <cs.bhargava@samsung.com>
-Message-Id: <34B4E475-5C0D-45BF-B9F9-1B47016F7636@holtmann.org>
-References: <1380712218-9269-1-git-send-email-dh79.pyun@samsung.com> <1380712218-9269-9-git-send-email-dh79.pyun@samsung.com>
-To: Dohyun Pyun <re20sfree@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Add management command for setting static address
+Date: Wed,  2 Oct 2013 04:41:30 -0700
+Message-Id: <1380714090-11609-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dohyun,
+On dual-mode BR/EDR/LE and LE only controllers it is possible
+to configure a random address. There are two types or random
+addresses, one is static and the other private. Since the
+random private addresses require special privacy feature to
+be supported, the configuration of these two are kept separate.
 
-> The Slave Page Response Timeout event indicates to the Host that a
-> slave page response timeout has occurred in the BR/EDR Controller.
-> 
-> The Core Spec Addendum 4 adds this command in part B Connectionless
-> Slave Broadcast.
-> 
-> Bluetooth Core Specification Addendum 4 - Page 110
-> 
-> "7.7.67 Synchronization Train Complete Event [New Section]
-> ...
-> Note: this event will be generated if the slave BR/EDR Controller
-> responds to a page but does not receive the master FHS packet
-> (see Baseband, Section 8.3.3) within pagerespTO.
-> 
-> Event Parameters: NONE"
-> 
-> Signed-off-by: Dohyun Pyun <dh79.pyun@samsung.com>
-> Signed-off-by: C S Bhargava <cs.bhargava@samsung.com>
-> ---
-> include/net/bluetooth/hci.h | 2 ++
-> 1 file changed, 2 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 8ec8ee8..34580f1 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -1508,6 +1508,8 @@ struct hci_ev_sync_train_complete {
-> 	__u8	status;
-> } __packed;
-> 
-> +#define HCI_EV_SLAVE_PAGE_RESP_TIMEOUT	0x54
-> +
+This command allows for setting the static random address. It is
+only supported on controllers with LE support. The static random
+address is suppose to be valid for the lifetime of the controller
+or at least until the next power cycle. To ensure such behavior,
+setting of the address is limited to when the controller is
+powered off.
 
-I do not know how clearly I can make myself. These structs and defines are done in order of either opcode or event code. So please get this right.
+The special BDADDR_ANY address (00:00:00:00:00:00) can be used to
+disable the static address. This is also the default value.
 
-Regards
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci.h      |  2 ++
+ include/net/bluetooth/hci_core.h |  1 +
+ include/net/bluetooth/mgmt.h     |  6 +++++
+ net/bluetooth/mgmt.c             | 49 ++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 58 insertions(+)
 
-Marcel
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 4fa08d7..d7fd825 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -978,6 +978,8 @@ struct hci_rp_le_read_local_features {
+ 	__u8     features[8];
+ } __packed;
+ 
++#define HCI_OP_LE_SET_RANDOM_ADDR	0x2005
++
+ #define HCI_OP_LE_READ_ADV_TX_POWER	0x2007
+ struct hci_rp_le_read_adv_tx_power {
+ 	__u8	status;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 26cc9f7..e09c305 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -140,6 +140,7 @@ struct hci_dev {
+ 	__u8		bus;
+ 	__u8		dev_type;
+ 	bdaddr_t	bdaddr;
++	bdaddr_t	static_addr;
+ 	__u8		dev_name[HCI_MAX_NAME_LENGTH];
+ 	__u8		short_name[HCI_MAX_SHORT_NAME_LENGTH];
+ 	__u8		eir[HCI_MAX_EIR_LENGTH];
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 7347df8..2ad433bb 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -356,6 +356,12 @@ struct mgmt_cp_set_device_id {
+ 
+ #define MGMT_OP_SET_BREDR		0x002A
+ 
++#define MGMT_OP_SET_STATIC_ADDRESS	0x002B
++struct mgmt_cp_set_static_address {
++	bdaddr_t bdaddr;
++} __packed;
++#define MGMT_SET_STATIC_ADDRESS_SIZE	6
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 4ac3169..b871632 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -76,6 +76,7 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_SET_DEVICE_ID,
+ 	MGMT_OP_SET_ADVERTISING,
+ 	MGMT_OP_SET_BREDR,
++	MGMT_OP_SET_STATIC_ADDRESS,
+ };
+ 
+ static const u16 mgmt_events[] = {
+@@ -3247,6 +3248,46 @@ unlock:
+ 	return err;
+ }
+ 
++static int set_static_address(struct sock *sk, struct hci_dev *hdev,
++			      void *data, u16 len)
++{
++	struct mgmt_cp_set_static_address *cp = data;
++	int err;
++
++	BT_DBG("%s", hdev->name);
++
++	if (!lmp_le_capable(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_STATIC_ADDRESS,
++				  MGMT_STATUS_NOT_SUPPORTED);
++
++	if (hdev_is_powered(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_STATIC_ADDRESS,
++				  MGMT_STATUS_REJECTED);
++
++	if (bacmp(&cp->bdaddr, BDADDR_ANY)) {
++		if (!bacmp(&cp->bdaddr, BDADDR_NONE))
++			return cmd_status(sk, hdev->id,
++					  MGMT_OP_SET_STATIC_ADDRESS,
++					  MGMT_STATUS_INVALID_PARAMS);
++
++		/* Two most significant bits shall be set */
++		if ((cp->bdaddr.b[5] & 0xc0) != 0xc0)
++			return cmd_status(sk, hdev->id,
++					  MGMT_OP_SET_STATIC_ADDRESS,
++					  MGMT_STATUS_INVALID_PARAMS);
++	}
++
++	hci_dev_lock(hdev);
++
++	bacpy(&hdev->static_addr, &cp->bdaddr);
++
++	err = cmd_complete(sk, hdev->id, MGMT_OP_SET_STATIC_ADDRESS, 0, NULL, 0);
++
++	hci_dev_unlock(hdev);
++
++	return err;
++}
++
+ static void fast_connectable_complete(struct hci_dev *hdev, u8 status)
+ {
+ 	struct pending_cmd *cmd;
+@@ -3576,6 +3617,7 @@ static const struct mgmt_handler {
+ 	{ set_device_id,          false, MGMT_SET_DEVICE_ID_SIZE },
+ 	{ set_advertising,        false, MGMT_SETTING_SIZE },
+ 	{ set_bredr,              false, MGMT_SETTING_SIZE },
++	{ set_static_address,     false, MGMT_SET_STATIC_ADDRESS_SIZE },
+ };
+ 
+ 
+@@ -3762,6 +3804,13 @@ static int powered_update_hci(struct hci_dev *hdev)
+ 		hci_update_ad(&req);
+ 	}
+ 
++	if (lmp_le_capable(hdev)) {
++		/* Set random address to static address if configured */
++		if (bacmp(&hdev->static_addr, BDADDR_ANY))
++			hci_req_add(&req, HCI_OP_LE_SET_RANDOM_ADDR, 6,
++				    &hdev->static_addr);
++	}
++
+ 	if (test_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags)) {
+ 		u8 adv = 0x01;
+ 
+-- 
+1.8.3.1
 
