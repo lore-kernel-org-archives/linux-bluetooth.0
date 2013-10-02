@@ -1,32 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 2 Oct 2013 09:39:39 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Bluetooth: Use only 2 bits for controller type
- information
-Message-ID: <20131002063939.GA28911@x220.p-661hnu-f1>
-References: <1380514261-21742-1-git-send-email-marcel@holtmann.org>
- <20130930181632.GB26405@x220.p-661hnu-f1>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20130930181632.GB26405@x220.p-661hnu-f1>
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH v2 0/2] Bluetooth: Fix hci_dev_open race condition
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1380656690-22246-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 2 Oct 2013 08:30:12 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <D497B811-786E-4458-B75B-CE95002B6042@holtmann.org>
+References: <1380656690-22246-1-git-send-email-johan.hedberg@gmail.com>
+To: johan.hedberg@gmail.com
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On Mon, Sep 30, 2013, Johan Hedberg wrote:
-> On Sun, Sep 29, 2013, Marcel Holtmann wrote:
-> > The controller type is limited to BR/EDR/LE and AMP controllers. This
-> > can be easily encoded with just 2 bits and still leave enough room
-> > for future controller types.
-> > 
-> > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> > ---
-> >  net/bluetooth/hci_core.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> Here's an updated set including fixes based on feedback. The patches
+> should go to bluetooth.git, but I'm not sure how important it is to try
+> to get them to the stable tree since we haven't had this issue reported
+> with the Intel setup procedure which (afaik) should be the only one that
+> could be affected in older kernels.
 > 
-> Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+> Johan
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (2):
+>      Bluetooth: Refactor hci_dev_open to a separate hci_dev_do_open function
+>      Bluetooth: Fix workqueue synchronization in hci_dev_open
+> 
+> net/bluetooth/hci_core.c | 40 ++++++++++++++++++++++++++++++----------
+> 1 file changed, 30 insertions(+), 10 deletions(-)
 
-All three patches in this set have been applied to bluetooth-next.
+both patches have been applied to bluetooth-next tree.
 
-Johan
+Regards
+
+Marcel
+
