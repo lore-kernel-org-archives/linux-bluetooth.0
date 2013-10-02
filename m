@@ -1,28 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 2 Oct 2013 14:09:44 +0300
+Date: Wed, 2 Oct 2013 13:53:05 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] lib: Fix invalid "whitespace" on company
- identifier string
-Message-ID: <20131002110944.GA26752@x220.p-661hnu-f1>
-References: <1380636683-24380-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: Re: [PATCH] Bluetooth: Restrict disabling of HS when controller is
+ powered off
+Message-ID: <20131002105305.GA26248@x220.p-661hnu-f1>
+References: <1380698822-25791-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1380636683-24380-1-git-send-email-anderson.lizardo@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1380698822-25791-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi Marcel,
 
-On Tue, Oct 01, 2013, Anderson Lizardo wrote:
-> Somehow, the invalid multibyte sequence "\xC2\xA0" (which is displayed
-> as a whitespace) was inserted on a company identifier string. Fix this
-> to avoid a bogus diff when running tools/update_compids.sh.
+On Wed, Oct 02, 2013, Marcel Holtmann wrote:
+> Disabling the high speed setting when the controller is powered on has
+> too many side effects that are not taken care of. And in general it
+> is not an useful operation anyway. So just make such a command fail
+> with a rejection error message.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  lib/bluetooth.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  net/bluetooth/mgmt.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
 
-Applied. Thanks.
+Applied to bluetooth-next. Thanks.
 
 Johan
