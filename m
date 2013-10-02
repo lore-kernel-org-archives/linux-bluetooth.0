@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Add management command for setting static address
-Date: Wed,  2 Oct 2013 04:41:30 -0700
-Message-Id: <1380714090-11609-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Add management command for setting static address
+Date: Wed,  2 Oct 2013 04:19:02 -0700
+Message-Id: <1380712742-3372-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -27,9 +27,10 @@ Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
  include/net/bluetooth/hci.h      |  2 ++
  include/net/bluetooth/hci_core.h |  1 +
- include/net/bluetooth/mgmt.h     |  6 +++++
- net/bluetooth/mgmt.c             | 49 ++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 58 insertions(+)
+ include/net/bluetooth/mgmt.h     |  6 ++++++
+ net/bluetooth/hci_core.c         |  5 +++++
+ net/bluetooth/mgmt.c             | 42 ++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 56 insertions(+)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
 index 4fa08d7..d7fd825 100644
@@ -73,8 +74,24 @@ index 7347df8..2ad433bb 100644
  #define MGMT_EV_CMD_COMPLETE		0x0001
  struct mgmt_ev_cmd_complete {
  	__le16	opcode;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 14df032..510ef3b 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -393,6 +393,11 @@ static void le_setup(struct hci_request *req)
+ 	/* LE-only controllers have LE implicitly enabled */
+ 	if (!lmp_bredr_capable(hdev))
+ 		set_bit(HCI_LE_ENABLED, &hdev->dev_flags);
++
++	/* Set random address to static address if configured */
++	if (bacmp(&hdev->static_addr, BDADDR_ANY))
++		hci_req_add(req, HCI_OP_LE_SET_RANDOM_ADDR, 6,
++			    &hdev->static_addr);
+ }
+ 
+ static u8 hci_get_inquiry_mode(struct hci_dev *hdev)
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 4ac3169..b871632 100644
+index 4ac3169..378dd91 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
 @@ -76,6 +76,7 @@ static const u16 mgmt_commands[] = {
@@ -139,20 +156,6 @@ index 4ac3169..b871632 100644
 +	{ set_static_address,     false, MGMT_SET_STATIC_ADDRESS_SIZE },
  };
  
- 
-@@ -3762,6 +3804,13 @@ static int powered_update_hci(struct hci_dev *hdev)
- 		hci_update_ad(&req);
- 	}
- 
-+	if (lmp_le_capable(hdev)) {
-+		/* Set random address to static address if configured */
-+		if (bacmp(&hdev->static_addr, BDADDR_ANY))
-+			hci_req_add(&req, HCI_OP_LE_SET_RANDOM_ADDR, 6,
-+				    &hdev->static_addr);
-+	}
-+
- 	if (test_bit(HCI_LE_PERIPHERAL, &hdev->dev_flags)) {
- 		u8 adv = 0x01;
  
 -- 
 1.8.3.1
