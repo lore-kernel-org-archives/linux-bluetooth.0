@@ -1,40 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH v2 2/2] Bluetooth: Fix workqueue synchronization in hci_dev_open
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1380656690-22246-3-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 2 Oct 2013 06:52:55 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <C9EF05DB-42CA-4660-8DA8-E06EACF0FB7A@holtmann.org>
-References: <1380656690-22246-1-git-send-email-johan.hedberg@gmail.com> <1380656690-22246-3-git-send-email-johan.hedberg@gmail.com>
-To: johan.hedberg@gmail.com
+MIME-Version: 1.0
+In-Reply-To: <1380668636-30654-6-git-send-email-andre.guedes@openbossa.org>
+References: <1380668636-30654-1-git-send-email-andre.guedes@openbossa.org>
+	<1380668636-30654-6-git-send-email-andre.guedes@openbossa.org>
+Date: Tue, 1 Oct 2013 20:05:26 -0400
+Message-ID: <CAJdJm_NoWi2ujbMW8vXbwfZpS56+HNtEm8s5N__yXTJjADTPhQ@mail.gmail.com>
+Subject: Re: [PATCH 5/7] Bluetooth: Refactor hci_connect_le
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Guedes,
 
-> When hci_sock.c calls hci_dev_open it needs to ensure that there isn't
-> pending work in progress, such as that which is scheduled for the
-> initial setup procedure or the one for automatically powering off after
-> the setup procedure. This adds the necessary calls to ensure that any
-> previously scheduled work is completed before attempting to call
-> hci_dev_do_open.
-> 
-> This patch fixes a race with old user space versions where we might
-> receive a HCIDEVUP ioctl before the setup procedure has been completed.
-> When that happens the setup procedures callback may fail early and leave
-> the device in an inconsistent state, causing e.g. the setup callback to
-> be (incorrectly) called more than once.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/hci_core.c | 10 ++++++++++
-> 1 file changed, 10 insertions(+)
+On Tue, Oct 1, 2013 at 7:03 PM, Andre Guedes <andre.guedes@openbossa.org> wrote:
+> +       /* If already exists a hci_conn object for the following connection
+> +        * attempt, we simply update pending_sec_level and auth_type fields
+> +        * and return the object found.
+> +        */
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Small textual improvement: "If a hci_conn object already exists [...]"
 
-Regards
+>         le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
+> -       if (!le) {
+> -               le = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
+> -               if (le)
+> -                       return ERR_PTR(-EBUSY);
+> -
+> -               le = hci_conn_add(hdev, LE_LINK, dst);
+> -               if (!le)
+> -                       return ERR_PTR(-ENOMEM);
+> -
+> -               le->dst_type = bdaddr_to_le(dst_type);
+> -               le->state = BT_CONNECT;
+> -               le->out = true;
+> -               le->link_mode |= HCI_LM_MASTER;
+> -               le->sec_level = BT_SECURITY_LOW;
+> -
+> -               err = hci_initiate_le_connection(hdev, &le->dst, le->dst_type);
+> -               if (err) {
+> -                       hci_conn_del(le);
+> -                       return ERR_PTR(err);
+> -               }
+> +       if (le) {
+> +               le->pending_sec_level = sec_level;
+> +               le->auth_type = auth_type;
+> +               goto out;
+>         }
+>
+> -       le->pending_sec_level = sec_level;
+> +       /* Since the controller supports only one LE connection attempt at the
+> +        * time, we return busy if there is any connection attempt running.
+> +        */
 
-Marcel
+s/at the time/at a time/
+s/busy/EBUSY/
 
+> +       le = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
+> +       if (le)
+> +               return ERR_PTR(-EBUSY);
+> +
+> +       le = hci_conn_add(hdev, LE_LINK, dst);
+> +       if (!le)
+> +               return ERR_PTR(-ENOMEM);
+> +
+> +       le->dst_type = bdaddr_to_le(dst_type);
+> +       le->state = BT_CONNECT;
+> +       le->out = true;
+> +       le->link_mode |= HCI_LM_MASTER;
+> +       le->sec_level = BT_SECURITY_LOW;
+> +       le->pending_sec_level = BT_SECURITY_LOW;
+
+I think the previous statement should be:
+
+le->pending_sec_level = sec_level;
+
+Otherwise, we are changing semantics.
+
+>         le->auth_type = auth_type;
+>
+> -       hci_conn_hold(le);
+> +       err = hci_initiate_le_connection(hdev, &le->dst, le->dst_type);
+> +       if (err) {
+> +               hci_conn_del(le);
+> +               return ERR_PTR(err);
+> +       }
+>
+> +out:
+> +       hci_conn_hold(le);
+>         return le;
+>  }
+
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
