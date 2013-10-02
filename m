@@ -1,39 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAJdJm_N=sFA8Zz3XBcY2wnp9h4u2k1gWRaU=+cH023pTSdNkhg@mail.gmail.com>
-References: <1380427749-14427-1-git-send-email-marcel@holtmann.org>
-	<CAJdJm_Ova_rzJy8pnO2VJRki7N=L=PEk=r=D5Zk1oPDkA=2mOA@mail.gmail.com>
-	<4C2644C5-D946-4CB6-AEF5-3948DC241BA6@holtmann.org>
-	<CAJdJm_N=sFA8Zz3XBcY2wnp9h4u2k1gWRaU=+cH023pTSdNkhg@mail.gmail.com>
-Date: Wed, 2 Oct 2013 08:41:09 -0400
-Message-ID: <CAJdJm_N8X+ejvM-Y+6+sue7AOTvTRahzM7N=_kFw68H_jzJSfQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Use only 2 bits for controller type information
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1380022028-31031-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1380022028-31031-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Date: Wed, 2 Oct 2013 15:36:10 +0300
+Message-ID: <CABBYNZLEgnF7KytMdcq8-AtaN1kpPuamWkV9Pw-mmKDztizGJw@mail.gmail.com>
+Subject: Re: [PATCH 1/1] obexd: Fix emitting Type property changed signals for messages
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Christian,
 
-On Mon, Sep 30, 2013 at 7:31 AM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Marcel,
+On Tue, Sep 24, 2013 at 2:27 PM, Christian Fetzer
+<christian.fetzer@oss.bmw-carit.de> wrote:
+> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 >
-> On Mon, Sep 30, 2013 at 12:01 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
->>>> -       di.type     = (hdev->bus & 0x0f) | (hdev->dev_type << 4);
->>>> +       di.type     = (hdev->bus & 0x0f) | ((hdev->dev_type & 0x30) << 4);
->>>
->>> Shouldn't it be (hdev->dev_type & 0x03) here?
->>
->> yes, this it should be 0x03 here. My mistake.
+> In order to determine if the message Type property has changed,
+> the stored type needs to be compared with the parsed type and not with
+> the raw value received from the MSE.
 >
-> Just a reminder that userspace needs fixing as well.
+> This fixes the issue that the property changed signal for the Type
+> property is emitted for every message on every ListMessage call.
+> ---
+>  obexd/client/map.c | 21 +++++++++++----------
+>  1 file changed, 11 insertions(+), 10 deletions(-)
+>
+> diff --git a/obexd/client/map.c b/obexd/client/map.c
+> index 9fe872d..d349ef7 100644
+> --- a/obexd/client/map.c
+> +++ b/obexd/client/map.c
+> @@ -920,21 +920,22 @@ static void parse_recipient_address(struct map_msg *msg, const char *value)
+>
+>  static void parse_type(struct map_msg *msg, const char *value)
+>  {
+> -       if (g_strcmp0(msg->type, value) == 0)
+> -               return;
+> -
+> -       g_free(msg->type);
+> +       const char *type = NULL;
+>
+>         if (strcasecmp(value, "SMS_GSM") == 0)
+> -               msg->type = g_strdup("sms-gsm");
+> +               type = "sms-gsm";
+>         else if (strcasecmp(value, "SMS_CDMA") == 0)
+> -               msg->type = g_strdup("sms-cdma");
+> +               type = "sms-cdma";
+>         else if (strcasecmp(value, "EMAIL") == 0)
+> -               msg->type = g_strdup("email");
+> +               type = "email";
+>         else if (strcasecmp(value, "MMS") == 0)
+> -               msg->type = g_strdup("mms");
+> -       else
+> -               msg->type = NULL;
+> +               type = "mms";
+> +
+> +       if (g_strcmp0(msg->type, type) == 0)
+> +               return;
+> +
+> +       g_free(msg->type);
+> +       msg->type = g_strdup(type);
+>
+>         g_dbus_emit_property_changed(conn, msg->path,
+>                                                 MAP_MSG_INTERFACE, "Type");
+> --
+> 1.8.3.4
 
-My mistake, userspace is fine. :)
+Pushed, thanks.
 
-Best Regards,
+
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Luiz Augusto von Dentz
