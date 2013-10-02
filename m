@@ -3,9 +3,9 @@ From: Dohyun Pyun <re20sfree@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: steve.jun@samsung.com, DoHyun Pyun <dh79.pyun@samsung.com>,
 	C S Bhargava <cs.bhargava@samsung.com>
-Subject: [PATCH v2 7/8] Bluetooth: Add Synchronization Train Complete Event
-Date: Wed,  2 Oct 2013 20:10:17 +0900
-Message-Id: <1380712218-9269-8-git-send-email-dh79.pyun@samsung.com>
+Subject: [PATCH v2 4/8] Bluetooth: Add Write Synchronization Train Parameters Command
+Date: Wed,  2 Oct 2013 20:10:14 +0900
+Message-Id: <1380712218-9269-5-git-send-email-dh79.pyun@samsung.com>
 In-Reply-To: <1380712218-9269-1-git-send-email-dh79.pyun@samsung.com>
 References: <1380712218-9269-1-git-send-email-dh79.pyun@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,47 +13,60 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: DoHyun Pyun <dh79.pyun@samsung.com>
 
-The Synchronization Train Complete event indicates that the Start
-Synchronization Train command has completed.
+The Write_Synchronization_Train_Parameters command configures
+the Synchronization Train functionality in the BR/EDR Controller.
 
 The Core Spec Addendum 4 adds this command in part B Connectionless
 Slave Broadcast.
 
-Bluetooth Core Specification Addendum 4 - Page 103
+Bluetooth Core Specification Addendum 4 - Page 97
 
-"7.7.67 Synchronization Train Complete Event [New Section]
+"7.3.90 Write Synchronization Train Parameters Command [New Section]
 ...
+Note: The AFH_Channel_Map used in the Synchronization Train packets is
+configured by the Set_AFH_Channel_Classification command and the local
+channel classification in the BR/EDR Controller.
 
-Event Parameters:
+Interval_Min and Interval_Max specify the allowed range of
+Sync_Train_Interval. Refer to [Vol. 2], Part B, section 2.7.2 for
+a detailed description of Sync_Train_Interval. The BR/EDR Controller shall
+select an interval from this range and return it in Sync_Train_Interval.
+If the Controller is unable to select a value from this range, it shall
+return the Invalid HCI Command Parameters (0x12) error code.
 
-Status 0x00       Start Synchronization Train command completed
-                  successfully.
-       0x01-0xFF  Start Synchronization Train command failed.
-                  See Part D, Error Codes, for error codes and
-                  descriptions."
+Once started (via the Start_Synchronization_Train Command) the
+Synchronization Train will continue until synchronization_trainTO slots have
+passed or Connectionless Slave Broadcast has been disabled."
 
 Signed-off-by: Dohyun Pyun <dh79.pyun@samsung.com>
 Signed-off-by: C S Bhargava <cs.bhargava@samsung.com>
 ---
- include/net/bluetooth/hci.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ include/net/bluetooth/hci.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 5f30012..8ec8ee8 100644
+index 57f73e3..8830bf2 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -1503,6 +1503,11 @@ struct hci_ev_num_comp_blocks {
- 	struct hci_comp_blocks_info handles[0];
- } __packed;
+@@ -873,6 +873,18 @@ struct hci_rp_set_csb_data {
  
-+#define HCI_EV_SYNC_TRAIN_COMPLETE	0x4F
-+struct hci_ev_sync_train_complete {
+ #define HCI_OP_READ_SYNC_TRAIN_PARAMS	0x0c77
+ 
++#define HCI_OP_WRITE_SYNC_TRAIN_PARAMS	0x0c78
++struct hci_cp_write_sync_train_params {
++	__le16	interval_min;
++	__le16	interval_max;
++	__le32	sync_train_tout;
++	__u8	service_data;
++} __packed;
++struct hci_rp_write_sync_train_params {
 +	__u8	status;
++	__le16	sync_train_int;
 +} __packed;
 +
- /* Low energy meta events */
- #define LE_CONN_ROLE_MASTER	0x00
- 
+ #define HCI_OP_READ_LOCAL_VERSION	0x1001
+ struct hci_rp_read_local_version {
+ 	__u8     status;
 -- 
 1.8.1.2
 
