@@ -1,55 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: Giovanni Campagna <scampa.giovanni@gmail.com>
+From: David Herrmann <dh.herrmann@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] hid2hci: fix regression in /dev format after moving away from libusb
-Date: Wed,  2 Oct 2013 18:00:16 +0200
-Message-Id: <1380729616-26519-1-git-send-email-scampa.giovanni@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	David Herrmann <dh.herrmann@gmail.com>
+Subject: [PATCH bluez v2 2/2] bnep: improve error-msg if bnep.ko is not loaded
+Date: Wed,  2 Oct 2013 17:57:31 +0200
+Message-Id: <1380729451-2266-2-git-send-email-dh.herrmann@gmail.com>
+In-Reply-To: <1380729451-2266-1-git-send-email-dh.herrmann@gmail.com>
+References: <1380729451-2266-1-git-send-email-dh.herrmann@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Giovanni Campagna <gcampagna@src.gnome.org>
-
-The paths under /dev, in the default udev configuration, are formatted
-with two leading zeros, but the number obtained from sysfs don't have
-them, so we must convert them to integers and reformat them.
-
-Signed-off-by: Giovanni Campagna <scampa.giovanni@gmail.com>
+bnep.ko, besides others, can be disabled in custom kernels if
+network-support is not required. To avoid strange error messages, handle
+EPROTONOSUPPORT as a special case and emit a warning that kernel support
+is missing.
 ---
- tools/hid2hci.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ profiles/network/common.c  |  7 ++++++-
+ profiles/network/manager.c | 16 +++++++++++++---
+ 2 files changed, 19 insertions(+), 4 deletions(-)
 
-diff --git a/tools/hid2hci.c b/tools/hid2hci.c
-index bb8a521..76d0b5a 100644
---- a/tools/hid2hci.c
-+++ b/tools/hid2hci.c
-@@ -221,18 +221,21 @@ static int usb_switch_dell(int fd, enum mode mode)
- static int find_device(struct udev_device *udev_dev)
+diff --git a/profiles/network/common.c b/profiles/network/common.c
+index e069892..0b291bd 100644
+--- a/profiles/network/common.c
++++ b/profiles/network/common.c
+@@ -110,8 +110,13 @@ int bnep_init(void)
+ 
+ 	if (ctl < 0) {
+ 		int err = -errno;
+-		error("Failed to open control socket: %s (%d)",
++
++		if (err == -EPROTONOSUPPORT)
++			warn("kernel lacks bnep-protocol support");
++		else
++			error("Failed to open control socket: %s (%d)",
+ 						strerror(-err), -err);
++
+ 		return err;
+ 	}
+ 
+diff --git a/profiles/network/manager.c b/profiles/network/manager.c
+index 03b1b3d..6617687 100644
+--- a/profiles/network/manager.c
++++ b/profiles/network/manager.c
+@@ -25,6 +25,7 @@
+ #include <config.h>
+ #endif
+ 
++#include <errno.h>
+ #include <stdbool.h>
+ 
+ #include <bluetooth/bluetooth.h>
+@@ -169,11 +170,20 @@ static struct btd_profile nap_profile = {
+ 
+ static int network_init(void)
  {
- 	char path[PATH_MAX];
--	const char *busnum, *devnum;
-+	const char *busnum_s, *devnum_s;
-+	int busnum, devnum;
- 	int fd;
++	int err;
++
+ 	read_config(CONFIGDIR "/network.conf");
  
--	busnum = udev_device_get_sysattr_value(udev_dev, "busnum");
--	if (!busnum)
-+	busnum_s = udev_device_get_sysattr_value(udev_dev, "busnum");
-+	if (!busnum_s)
- 		return -1;
-+	busnum = strtol(busnum_s, NULL, 10);
+-	if (bnep_init()) {
+-		error("Can't init bnep module");
+-		return -1;
++	err = bnep_init();
++	if (err) {
++		if (err == -EPROTONOSUPPORT) {
++			info("bnep module not available, disabling plugin");
++			err = -ENOSYS;
++		} else {
++			error("Can't init bnep module");
++		}
++
++		return err;
+ 	}
  
--	devnum = udev_device_get_sysattr_value(udev_dev, "devnum");
--	if (!devnum)
-+	devnum_s = udev_device_get_sysattr_value(udev_dev, "devnum");
-+	if (!devnum_s)
- 		return -1;
-+	devnum = strtol(devnum_s, NULL, 10);
- 
--	snprintf(path, sizeof(path), "/dev/bus/usb/%s/%s", busnum, devnum);
-+	snprintf(path, sizeof(path), "/dev/bus/usb/%03d/%03d", busnum, devnum);
- 
- 	fd = open(path, O_RDWR, O_CLOEXEC);
- 	if (fd < 0) {
+ 	/*
 -- 
-1.8.3.1
-
+1.8.4
