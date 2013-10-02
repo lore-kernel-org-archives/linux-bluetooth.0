@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH v6 1/4] Bluetooth: btmrvl: add btmrvl_send_sync_cmd() function
+Subject: Re: [PATCH v6 3/4] Bluetooth: btmrvl: add setup handler
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1380655155-10007-2-git-send-email-bzhao@marvell.com>
-Date: Wed, 2 Oct 2013 07:30:56 +0200
+In-Reply-To: <1380655155-10007-4-git-send-email-bzhao@marvell.com>
+Date: Wed, 2 Oct 2013 07:28:29 +0200
 Cc: <linux-bluetooth@vger.kernel.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
@@ -12,25 +12,26 @@ Cc: <linux-bluetooth@vger.kernel.org>,
 	Mike Frysinger <vapier@chromium.org>,
 	Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
 	Amitkumar Karwar <akarwar@marvell.com>
-Message-Id: <DE4D5E1A-86DB-410F-A9B6-618616D2BAD9@holtmann.org>
-References: <1380655155-10007-1-git-send-email-bzhao@marvell.com> <1380655155-10007-2-git-send-email-bzhao@marvell.com>
+Message-Id: <CCFF3D0B-57CE-40C7-A836-E0631822FF23@holtmann.org>
+References: <1380655155-10007-1-git-send-email-bzhao@marvell.com> <1380655155-10007-4-git-send-email-bzhao@marvell.com>
 To: Bing Zhao <bzhao@marvell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Bing,
 
-> Command preparation code is used multiple times. This patch
-> separate out this common code and create btmrvl_send_sync_cmd()
-> function.
+> Move initialization code to hdev's setup handler.
 > 
 > Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
 > Signed-off-by: Bing Zhao <bzhao@marvell.com>
 > ---
-> v6: separate out common code
+> v6: remove setup_done variable (Marcel Holtmann)
+>    This change requires a fix in hci_core for hci_setup.
+> v5: make use of hdev's setup handler (Marcel Holtmann)
 > 
-> drivers/bluetooth/btmrvl_main.c | 129 +++++++++++++---------------------------
-> 1 file changed, 41 insertions(+), 88 deletions(-)
+> drivers/bluetooth/btmrvl_main.c | 18 ++++++++++++++++--
+> drivers/bluetooth/btmrvl_sdio.c |  6 ------
+> 2 files changed, 16 insertions(+), 8 deletions(-)
 
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
