@@ -3,9 +3,9 @@ From: Dohyun Pyun <re20sfree@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: steve.jun@samsung.com, DoHyun Pyun <dh79.pyun@samsung.com>,
 	C S Bhargava <cs.bhargava@samsung.com>
-Subject: [PATCH v4 3/8] Bluetooth: Add the definition and structure for Set CSB Data
-Date: Wed,  2 Oct 2013 21:54:48 +0900
-Message-Id: <1380718493-4577-4-git-send-email-dh79.pyun@samsung.com>
+Subject: [PATCH v4 1/8] Bluetooth: Add the definition and structure for Set Reserved LT_ADDR
+Date: Wed,  2 Oct 2013 21:54:46 +0900
+Message-Id: <1380718493-4577-2-git-send-email-dh79.pyun@samsung.com>
 In-Reply-To: <1380718493-4577-1-git-send-email-dh79.pyun@samsung.com>
 References: <1380718493-4577-1-git-send-email-dh79.pyun@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,64 +13,47 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: DoHyun Pyun <dh79.pyun@samsung.com>
 
-The Set_Connectionless_Slave_Broadcast_Data command provides the
-ability for the Host to set Connectionless Slave Broadcast data in
-the BR/EDR Controller.
+The Set_Reserved_LT_ADDR command allows the host to request that the
+BR/EDR Controller reserve a specific LT_ADDR for Connectionless Slave
+Broadcast.
 
 The Core Spec Addendum 4 adds this command in part B Connectionless
 Slave Broadcast.
 
-Bluetooth Core Specification Addendum 4 - Page 93
+Bluetooth Core Specification Addendum 4 - Page 90
 
-"7.3.88 Set Connectionless Slave Broadcast Data Command [New Section]
+"7.3.86 Set Reserved LT_ADDR Command [New Section]
 ...
-If connectionless slave broadcast mode is disabled, this data shall be
-kept by the BR/EDR Controller and used once connectionless slave broadcast
-mode is enabled. If connectionless slave broadcast mode is enabled,
-and this command is successful, this data will be sent starting with
-the next Connectionless Slave Broadcast instant.
-
-The Data_Length field may be zero, in which case no data needs to be
-provided.
-
-The Host may fragment the data using the Fragment field in the command. If
-the combined length of the fragments exceeds the capacity of the largest
-allowed packet size specified in the Set Connectionless Slave Broadcast
-command, all fragments associated with the data being assembled shall be
-discarded and the Invalid HCI Command Parameters error (0x12) shall be
-returned."
+If the LT_ADDR indicated in the LT_ADDR parameter is already in use by the
+BR/EDR Controller, it shall return the ACL Connection Already Exists (0x0B)
+error code. If the LT_ADDR indicated in the LT_ADDR parameter is out of
+range, the controller shall return the Invalid HCI Command Parameters (0x12)
+error code. If the command succeeds, then the reserved LT_ADDR shall be
+used when issuing subsequent Set Connectionless Slave Broadcast Data and
+Set Connectionless Slave Broadcast commands.
+To ensure that the reserved LT_ADDR is not already allocated, it is
+recommended that this command be issued at some point after HCI_Reset is
+issued but before page scanning is enabled or paging is initiated."
 
 Signed-off-by: Dohyun Pyun <dh79.pyun@samsung.com>
 Signed-off-by: C S Bhargava <cs.bhargava@samsung.com>
 ---
- include/net/bluetooth/hci.h | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ include/net/bluetooth/hci.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 9b071f1..d9e0a84 100644
+index d7fd825..4d88809 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -35,6 +35,8 @@
- 
- #define HCI_MAX_AMP_ASSOC_SIZE	672
- 
-+#define HCI_MAX_CSB_DATA_SIZE	252
-+
- /* HCI dev events */
- #define HCI_DEV_REG			1
- #define HCI_DEV_UNREG			2
-@@ -857,6 +859,18 @@ struct hci_rp_delete_reserved_lt_addr {
- 	__u8	lt_addr;
+@@ -839,6 +839,15 @@ struct hci_cp_write_le_host_supported {
+ 	__u8	simul;
  } __packed;
  
-+#define HCI_OP_SET_CSB_DATA		0x0c76
-+struct hci_cp_set_csb_data {
++#define HCI_OP_SET_RESERVED_LT_ADDR	0x0c74
++struct hci_cp_set_reserved_lt_addr {
 +	__u8	lt_addr;
-+	__u8	fragment;
-+	__u8	data_length;
-+	__u8	data[HCI_MAX_CSB_DATA_SIZE];
 +} __packed;
-+struct hci_rp_set_csb_data {
++struct hci_rp_set_reserved_lt_addr {
 +	__u8	status;
 +	__u8	lt_addr;
 +} __packed;
