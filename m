@@ -1,38 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 From: Dohyun Pyun <re20sfree@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: steve.jun@samsung.com
-Subject: [0/8] Add CSA 4 commands and events in hci.h
-Date: Wed,  2 Oct 2013 18:17:50 +0900
-Message-Id: <1380705478-22338-1-git-send-email-dh79.pyun@samsung.com>
+Cc: steve.jun@samsung.com, DoHyun Pyun <dh79.pyun@samsung.com>,
+	C S Bhargava <cs.bhargava@samsung.com>
+Subject: [PATCH 8/8] Bluetooth: Add Slave Page Response Timeout Event
+Date: Wed,  2 Oct 2013 18:11:18 +0900
+Message-Id: <1380705078-22154-9-git-send-email-dh79.pyun@samsung.com>
+In-Reply-To: <1380705078-22154-1-git-send-email-dh79.pyun@samsung.com>
+References: <1380705078-22154-1-git-send-email-dh79.pyun@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+From: DoHyun Pyun <dh79.pyun@samsung.com>
 
-This patchset contains several HCI commands and events addition.
-These HCI commands and events are included in Bluetooth Core
-Specification Addendum 4, and it will be used to implement 3DS
-profile.
+The Slave Page Response Timeout event indicates to the Host that a
+slave page response timeout has occurred in the BR/EDR Controller.
 
-Also I'm still implementing 3DS profile's master role in the BR/EDR
-controller. Summit and I'll send the patchsets about 3DS MGMT APIs
-soon.
+The Core Spec Addendum 4 adds this command in part B Connectionless
+Slave Broadcast.
 
-Regards,
-Pyun
+Bluetooth Core Specification Addendum 4 - Page 110
 
-----------------------------------------------------------------
-Dohyun Pyun (8):
-      Bluetooth: Add Set Reserved LT_ADDR Command
-      Bluetooth: Add Delete Reserved LT_ADDR Command
-      Bluetooth: Add Set Connectionless Slave Broadcast Data Command
-      Bluetooth: Add Write Synchronization Train Parameters Command
-      Bluetooth: Add Set Connectionless Slave Broadcast Command
-      Bluetooth: Add Start Synchronization Train Command
-      Bluetooth: Add Synchronization Train Complete Event
-      Bluetooth: Add Slave Page Response Timeout Event
+"7.7.67 Synchronization Train Complete Event [New Section]
+...
+Note: this event will be generated if the slave BR/EDR Controller
+responds to a page but does not receive the master FHS packet
+(see Baseband, Section 8.3.3) within pagerespTO.
 
- include/net/bluetooth/hci.h | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 69 insertions(+)
+Event Parameters: NONE"
+
+Signed-off-by: Dohyun Pyun <dh79.pyun@samsung.com>
+Signed-off-by: C S Bhargava <cs.bhargava@samsung.com>
+---
+ include/net/bluetooth/hci.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 022d44f..809c9ee 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1507,6 +1507,8 @@ struct hci_ev_sync_train_complete {
+ 	__u8 status;
+ } __packed;
+ 
++#define HCI_EV_SLAVE_PAGE_RESP_TIMEOUT	0x54
++
+ /* Low energy meta events */
+ #define LE_CONN_ROLE_MASTER	0x00
+ 
+-- 
+1.8.1.2
 
