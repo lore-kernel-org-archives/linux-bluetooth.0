@@ -1,30 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 2 Oct 2013 13:53:05 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Restrict disabling of HS when controller is
- powered off
-Message-ID: <20131002105305.GA26248@x220.p-661hnu-f1>
-References: <1380698822-25791-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1380698822-25791-1-git-send-email-marcel@holtmann.org>
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH v2 0/2] Bluetooth: Add a new mgmt_set_bredr command
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1380710594-24555-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 2 Oct 2013 12:49:51 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <ED1977E2-DFDA-4274-9BA3-6EE359058A2A@holtmann.org>
+References: <1380710594-24555-1-git-send-email-johan.hedberg@gmail.com>
+To: johan.hedberg@gmail.com
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On Wed, Oct 02, 2013, Marcel Holtmann wrote:
-> Disabling the high speed setting when the controller is powered on has
-> too many side effects that are not taken care of. And in general it
-> is not an useful operation anyway. So just make such a command fail
-> with a rejection error message.
+> Yet another update with error code fixes in both patches based on
+> feedback. I also removed the unnecessary val and enabled variables as
+> suggested by Andrei Emeltchenko.
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/mgmt.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
+> Johan
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (2):
+>      Bluetooth: Introduce a new HCI_BREDR_ENABLED flag
+>      Bluetooth: Add a new mgmt_set_bredr command
+> 
+> include/net/bluetooth/hci.h  |   1 +
+> include/net/bluetooth/mgmt.h |   2 +
+> net/bluetooth/hci_conn.c     |   3 +
+> net/bluetooth/hci_core.c     |  21 +++++-
+> net/bluetooth/hci_event.c    |   5 ++
+> net/bluetooth/mgmt.c         | 144 ++++++++++++++++++++++++++++++++++++++----
+> 6 files changed, 163 insertions(+), 13 deletions(-)
 
-Applied to bluetooth-next. Thanks.
+both patches have been applied to bluetooth-next tree.
 
-Johan
+Regards
+
+Marcel
+
