@@ -1,66 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 From: Dohyun Pyun <re20sfree@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: steve.jun@samsung.com, DoHyun Pyun <dh79.pyun@samsung.com>,
-	C S Bhargava <cs.bhargava@samsung.com>
-Subject: [PATCH v3 1/8] Bluetooth: Add Set Reserved LT_ADDR Command
-Date: Wed,  2 Oct 2013 21:09:11 +0900
-Message-Id: <1380715758-10334-2-git-send-email-dh79.pyun@samsung.com>
-In-Reply-To: <1380715758-10334-1-git-send-email-dh79.pyun@samsung.com>
-References: <1380715758-10334-1-git-send-email-dh79.pyun@samsung.com>
+Cc: steve.jun@samsung.com
+Subject: [PATCH v3 0/8] Add CSA 4 commands and events in hci.h
+Date: Wed,  2 Oct 2013 21:09:10 +0900
+Message-Id: <1380715758-10334-1-git-send-email-dh79.pyun@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: DoHyun Pyun <dh79.pyun@samsung.com>
+Hi all,
 
-The Set_Reserved_LT_ADDR command allows the host to request that the
-BR/EDR Controller reserve a specific LT_ADDR for Connectionless Slave
-Broadcast.
+This patchset contains several HCI commands and events addition.
+These HCI commands and events are included in Bluetooth Core
+Specification Addendum 4, and it will be used to implement 3DS
+profile.
 
-The Core Spec Addendum 4 adds this command in part B Connectionless
-Slave Broadcast.
+Also I'm still implementing 3DS profile's master role in the BR/EDR
+controller. Summit and I'll send the patchsets about 3DS MGMT APIs
+soon.
 
-Bluetooth Core Specification Addendum 4 - Page 90
+Regards,
+Pyun
 
-"7.3.86 Set Reserved LT_ADDR Command [New Section]
-...
-If the LT_ADDR indicated in the LT_ADDR parameter is already in use by the
-BR/EDR Controller, it shall return the ACL Connection Already Exists (0x0B)
-error code. If the LT_ADDR indicated in the LT_ADDR parameter is out of
-range, the controller shall return the Invalid HCI Command Parameters (0x12)
-error code. If the command succeeds, then the reserved LT_ADDR shall be
-used when issuing subsequent Set Connectionless Slave Broadcast Data and
-Set Connectionless Slave Broadcast commands.
-To ensure that the reserved LT_ADDR is not already allocated, it is
-recommended that this command be issued at some point after HCI_Reset is
-issued but before page scanning is enabled or paging is initiated."
+* I rebased these patchsets in the latest bluetooth-next git
 
-Signed-off-by: Dohyun Pyun <dh79.pyun@samsung.com>
-Signed-off-by: C S Bhargava <cs.bhargava@samsung.com>
----
- include/net/bluetooth/hci.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+----------------------------------------------------------------
+Dohyun Pyun (8):
+      Bluetooth: Add Set Reserved LT_ADDR Command
+      Bluetooth: Add Delete Reserved LT_ADDR Command
+      Bluetooth: Add Set Connectionless Slave Broadcast Data Command
+      Bluetooth: Add Write Synchronization Train Parameters Command
+      Bluetooth: Add Set Connectionless Slave Broadcast Command
+      Bluetooth: Add Start Synchronization Train Command 
+      Bluetooth: Add Synchronization Train Complete Event
+      Bluetooth: Add Slave Page Response Timeout Event 
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index d7fd825..4d88809 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -839,6 +839,15 @@ struct hci_cp_write_le_host_supported {
- 	__u8	simul;
- } __packed;
- 
-+#define HCI_OP_SET_RESERVED_LT_ADDR	0x0c74
-+struct hci_cp_set_reserved_lt_addr {
-+	__u8	lt_addr;
-+} __packed;
-+struct hci_rp_set_reserved_lt_addr {
-+	__u8	status;
-+	__u8	lt_addr;
-+} __packed;
-+
- #define HCI_OP_READ_SYNC_TRAIN_PARAMS	0x0c77
- 
- #define HCI_OP_READ_LOCAL_VERSION	0x1001
--- 
-1.8.1.2
+ include/net/bluetooth/hci.h | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 69 insertions(+)
 
