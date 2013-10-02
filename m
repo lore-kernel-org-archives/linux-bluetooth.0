@@ -1,42 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dohyun Pyun <re20sfree@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: steve.jun@samsung.com
-Subject: [PATCH v4 0/8] Add CSA 4 commands and events in hci.h
-Date: Wed,  2 Oct 2013 21:54:45 +0900
-Message-Id: <1380718493-4577-1-git-send-email-dh79.pyun@samsung.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH] Bluetooth: Fix REJECTED vs NOT_SUPPORTED mgmt responses
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1380717922-25142-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 2 Oct 2013 14:53:58 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <55CB2C93-CEBC-4F8F-98A2-58AEC6888B94@holtmann.org>
+References: <1380717922-25142-1-git-send-email-johan.hedberg@gmail.com>
+To: johan.hedberg@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Johan,
 
+> The REJECTED management response should mainly be used when the adapter
+> is in a state where we cannot accept some command or a specific
+> parameter value. The NOT_SUPPORTED response in turn means that the
+> adapter really cannot support the command or parameter value.
+> 
+> This patch fixes this distinction and adds two helper functions to
+> easily get the appropriate LE or BR/EDR related status response.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/mgmt.c | 76 +++++++++++++++++++++++++++++++++++-----------------
+> 1 file changed, 51 insertions(+), 25 deletions(-)
 
-This patchset contains several HCI commands and events addition.
-These HCI commands and events are included in Bluetooth Core
-Specification Addendum 4, and it will be used to implement 3DS
-profile.
+patch has been applied to bluetooth-next.
 
-Also I'm still implementing 3DS profile's master role in the BR/EDR
-controller. Summit and I'll send the patchsets about 3DS MGMT APIs
-soon.
+Regards
 
-Regards,
-Pyun
-
-* Rebased the patchsets
-* Modify the subject and commit message
-
-----------------------------------------------------------------
-DoHyun Pyun (8):
-      Bluetooth: Add the definition and structure for Set Reserved LT_ADDR
-      Bluetooth: Add the definition and structure for Delete Reserved LT_ADDR
-      Bluetooth: Add the definition and structure for Set CSB Data
-      Bluetooth: Add the structure for Write Sync Train Parameters
-      Bluetooth: Add the definition and structure for Set CSB
-      Bluetooth: Add the definition for Start Synchronization Train
-      Bluetooth: Add the definition and stcuture for Sync Train Complete
-      Bluetooth: Add the definition for Slave Page Response Timeout
-
- include/net/bluetooth/hci.h | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 69 insertions(+)
+Marcel
 
