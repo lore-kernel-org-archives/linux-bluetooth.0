@@ -1,42 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH v6 4/4] Bluetooth: btmrvl: add calibration data download support
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Enable -D__CHECK_ENDIAN__ for sparse by default
-Date: Tue,  1 Oct 2013 23:06:47 -0700
-Message-Id: <1380694007-7946-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1380655155-10007-5-git-send-email-bzhao@marvell.com>
+Date: Wed, 2 Oct 2013 07:32:27 +0200
+Cc: <linux-bluetooth@vger.kernel.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	<linux-wireless@vger.kernel.org>,
+	Mike Frysinger <vapier@chromium.org>,
+	Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
+	Amitkumar Karwar <akarwar@marvell.com>
+Message-Id: <53A79334-AC60-4B9A-BD94-CD5EE3F7746C@holtmann.org>
+References: <1380655155-10007-1-git-send-email-bzhao@marvell.com> <1380655155-10007-5-git-send-email-bzhao@marvell.com>
+To: Bing Zhao <bzhao@marvell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Bluetooth protocol and hardware is pretty much all little endian
-and so when running sparse via "make C=2" for example, enable the
-endian checks by default.
+Hi Bing,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- drivers/bluetooth/Makefile | 2 ++
- net/bluetooth/Makefile     | 2 ++
- 2 files changed, 4 insertions(+)
+> A text file containing calibration data in hex format can
+> be provided at following path:
+> 
+> /lib/firmware/mrvl/sd8797_caldata.conf
+> 
+> The data will be downloaded to firmware during initialization.
+> 
+> Reviewed-by: Mike Frysinger <vapier@chromium.org>
+> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> Signed-off-by: Bing Zhao <bzhao@marvell.com>
+> Signed-off-by: Hyuckjoo Lee <hyuckjoo.lee@samsung.com>
+> ---
+> v2: Remove module parameter. The calibration data will be downloaded
+>    only when the device speicific data file is provided.
+>    (Marcel Holtmann)
+> v3: Fix crash (misaligned memory access) on ARM
+> v4: Simplify white space parsing and save some CPU cycles (Mike Frysinger)
+> v5: Improvements in cal data parsing logic. Add explanatory comments.
+>    Replace GFP_ATOMIC flag with GFP_KERNEL (Mike Frysinger)
+> v6: Remove redundant label 'done' and 'cfg' check, and a new line character check
+>    (Mike Frysinger)
+>    Use btmrvl_send_sync_cmd() for downloading calibration data.
+>    (Marcel Holtmann)
+> 
+> drivers/bluetooth/btmrvl_drv.h  |   8 +++
+> drivers/bluetooth/btmrvl_main.c | 116 ++++++++++++++++++++++++++++++++++++++++
+> drivers/bluetooth/btmrvl_sdio.c |   9 +++-
+> drivers/bluetooth/btmrvl_sdio.h |   2 +
+> 4 files changed, 134 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-index 4afae20..9fe8a87 100644
---- a/drivers/bluetooth/Makefile
-+++ b/drivers/bluetooth/Makefile
-@@ -30,3 +30,5 @@ hci_uart-$(CONFIG_BT_HCIUART_LL)	+= hci_ll.o
- hci_uart-$(CONFIG_BT_HCIUART_ATH3K)	+= hci_ath.o
- hci_uart-$(CONFIG_BT_HCIUART_3WIRE)	+= hci_h5.o
- hci_uart-objs				:= $(hci_uart-y)
-+
-+ccflags-y += -D__CHECK_ENDIAN__
-diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-index dea6a28..6a791e7 100644
---- a/net/bluetooth/Makefile
-+++ b/net/bluetooth/Makefile
-@@ -11,3 +11,5 @@ obj-$(CONFIG_BT_HIDP)	+= hidp/
- bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
- 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
- 	a2mp.o amp.o
-+
-+subdir-ccflags-y += -D__CHECK_ENDIAN__
--- 
-1.8.3.1
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+
+Regards
+
+Marcel
 
