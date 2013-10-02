@@ -1,31 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/2] Bluetooth: Add a new mgmt_set_bredr command
-Date: Wed,  2 Oct 2013 12:10:38 +0300
-Message-Id: <1380705040-16300-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH v6 0/4] Bluetooth: btmrvl cal data downloading
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1380655155-10007-1-git-send-email-bzhao@marvell.com>
+Date: Wed, 2 Oct 2013 09:37:40 +0200
+Cc: <linux-bluetooth@vger.kernel.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	<linux-wireless@vger.kernel.org>,
+	Mike Frysinger <vapier@chromium.org>,
+	Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
+	Amitkumar Karwar <akarwar@marvell.com>
+Message-Id: <1EB87650-8518-47BE-B0D7-4F78E09F8691@holtmann.org>
+References: <1380655155-10007-1-git-send-email-bzhao@marvell.com>
+To: Bing Zhao <bzhao@marvell.com>
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Bing,
 
-This is a new revision of the previous RFC with all feedback taken into
-account. Additionally, the setting can now only be disabled while
-powered off which means that the second patch from my previous set
-becomes unnecessary (and has therefore been dropped).
+> This series adds the calibration data downloading support
+> along with improvements in sending commands and setup handler.
+> 
+> Amitkumar Karwar (4):
+>  Bluetooth: btmrvl: add btmrvl_send_sync_cmd() function
+>  Bluetooth: btmrvl: get rid of struct btmrvl_cmd
+>  Bluetooth: btmrvl: add setup handler
+>  Bluetooth: btmrvl: add calibration data download support
+> 
+> drivers/bluetooth/btmrvl_drv.h  |  12 +-
+> drivers/bluetooth/btmrvl_main.c | 269 ++++++++++++++++++++++++++--------------
+> drivers/bluetooth/btmrvl_sdio.c |  15 +--
+> drivers/bluetooth/btmrvl_sdio.h |   2 +
+> 4 files changed, 193 insertions(+), 105 deletions(-)
 
-Johan
+I have decided to apply all 4 patches to bluetooth-next. However please send a follow up patch that changes the code to operate on 16-bit opcodes and not the OGC/OCF and its packing.
 
-----------------------------------------------------------------
-Johan Hedberg (2):
-      Bluetooth: Introduce a new HCI_BREDR_ENABLED flag
-      Bluetooth: Add a new mgmt_set_bredr command
+Regards
 
- include/net/bluetooth/hci.h  |   1 +
- include/net/bluetooth/mgmt.h |   2 +
- net/bluetooth/hci_conn.c     |   3 +
- net/bluetooth/hci_core.c     |  21 +++++-
- net/bluetooth/hci_event.c    |   5 ++
- net/bluetooth/mgmt.c         | 148 ++++++++++++++++++++++++++++++++++++++----
- 6 files changed, 167 insertions(+), 13 deletions(-)
+Marcel
 
