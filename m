@@ -1,34 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 2 Oct 2013 13:44:44 +0300
+Date: Wed, 2 Oct 2013 13:44:03 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Introduce a new HCI_BREDR_ENABLED flag
-Message-ID: <20131002104444.GB24910@x220.p-661hnu-f1>
-References: <1380705040-16300-1-git-send-email-johan.hedberg@gmail.com>
- <1380705040-16300-2-git-send-email-johan.hedberg@gmail.com>
- <6F59A8FC-14F1-4982-9A9A-66F4A022E0B1@holtmann.org>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 3/3] Bluetooth: Add a new mgmt_set_bredr command
+Message-ID: <20131002104403.GA24910@x220.p-661hnu-f1>
+References: <1380640922-18647-1-git-send-email-johan.hedberg@gmail.com>
+ <1380640922-18647-4-git-send-email-johan.hedberg@gmail.com>
+ <20131002070736.GB15884@aemeltch-MOBL1>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <6F59A8FC-14F1-4982-9A9A-66F4A022E0B1@holtmann.org>
+In-Reply-To: <20131002070736.GB15884@aemeltch-MOBL1>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Andrei,
 
-On Wed, Oct 02, 2013, Marcel Holtmann wrote:
-> > @@ -1493,6 +1500,11 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg)
-> > 		goto done;
-> > 	}
+On Wed, Oct 02, 2013, Andrei Emeltchenko wrote:
+> On Tue, Oct 01, 2013 at 06:22:02PM +0300, johan.hedberg@gmail.com wrote:
+> > From: Johan Hedberg <johan.hedberg@intel.com>
 > > 
-> > +	if (!test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags)) {
-> > +		err = -ENOTSUPP;
-> > +		goto done;
-> > +	}
-> > +
+> > This patch introduces a new mgmt command for enabling/disabling BR/EDR
+> > functionality. This can be convenient when one wants to make a dual-mode
+> > controller behave like a single-mode one. The command is only available
+> > for dual-mode controllers and requires that LE is enabled before using
+> > it.
 > 
-> quick question, shouldn't these be EOPNOTSUPP.
+> ...
+> 
+> > +
+> > +	if (cp->val != 0x00 && cp->val != 0x01)
+> > +		return cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
+> > +				  MGMT_STATUS_INVALID_PARAMS);
+> > +
+> > +	hci_dev_lock(hdev);
+> > +
+> > +	val = !!cp->val;
+> 
+> You have already checked that cp->val is 0x0 or 0x1, right?
 
-Yes, we should, except for the hci_conn.c change. I've fixed this in the
-latest set.
+Good point (this was inherited from code that I copied it from). I've
+removed both val and enabled in my latest set.
 
 Johan
