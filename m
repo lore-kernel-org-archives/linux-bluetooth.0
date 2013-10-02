@@ -1,44 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 2 Oct 2013 14:51:45 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Add management command for setting static
- address
-Message-ID: <20131002115145.GA10291@x220.p-661hnu-f1>
-References: <1380714090-11609-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1380714090-11609-1-git-send-email-marcel@holtmann.org>
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH v2 8/8] Bluetooth: Add Slave Page Response Timeout Event
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <34B4E475-5C0D-45BF-B9F9-1B47016F7636@holtmann.org>
+Date: Wed, 2 Oct 2013 13:51:17 +0200
+Cc: linux-bluetooth@vger.kernel.org, steve.jun@samsung.com,
+	DoHyun Pyun <dh79.pyun@samsung.com>,
+	C S Bhargava <cs.bhargava@samsung.com>
+Message-Id: <D92D1EED-F24F-4FCB-AFAA-17348CB6FF04@holtmann.org>
+References: <1380712218-9269-1-git-send-email-dh79.pyun@samsung.com> <1380712218-9269-9-git-send-email-dh79.pyun@samsung.com> <34B4E475-5C0D-45BF-B9F9-1B47016F7636@holtmann.org>
+To: Dohyun Pyun <re20sfree@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Dohyun,
 
-On Wed, Oct 02, 2013, Marcel Holtmann wrote:
-> On dual-mode BR/EDR/LE and LE only controllers it is possible
-> to configure a random address. There are two types or random
-> addresses, one is static and the other private. Since the
-> random private addresses require special privacy feature to
-> be supported, the configuration of these two are kept separate.
+>> The Slave Page Response Timeout event indicates to the Host that a
+>> slave page response timeout has occurred in the BR/EDR Controller.
+>> 
+>> The Core Spec Addendum 4 adds this command in part B Connectionless
+>> Slave Broadcast.
+>> 
+>> Bluetooth Core Specification Addendum 4 - Page 110
+>> 
+>> "7.7.67 Synchronization Train Complete Event [New Section]
+>> ...
+>> Note: this event will be generated if the slave BR/EDR Controller
+>> responds to a page but does not receive the master FHS packet
+>> (see Baseband, Section 8.3.3) within pagerespTO.
+>> 
+>> Event Parameters: NONE"
+>> 
+>> Signed-off-by: Dohyun Pyun <dh79.pyun@samsung.com>
+>> Signed-off-by: C S Bhargava <cs.bhargava@samsung.com>
+>> ---
+>> include/net/bluetooth/hci.h | 2 ++
+>> 1 file changed, 2 insertions(+)
+>> 
+>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+>> index 8ec8ee8..34580f1 100644
+>> --- a/include/net/bluetooth/hci.h
+>> +++ b/include/net/bluetooth/hci.h
+>> @@ -1508,6 +1508,8 @@ struct hci_ev_sync_train_complete {
+>> 	__u8	status;
+>> } __packed;
+>> 
+>> +#define HCI_EV_SLAVE_PAGE_RESP_TIMEOUT	0x54
+>> +
 > 
-> This command allows for setting the static random address. It is
-> only supported on controllers with LE support. The static random
-> address is suppose to be valid for the lifetime of the controller
-> or at least until the next power cycle. To ensure such behavior,
-> setting of the address is limited to when the controller is
-> powered off.
-> 
-> The special BDADDR_ANY address (00:00:00:00:00:00) can be used to
-> disable the static address. This is also the default value.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/hci.h      |  2 ++
->  include/net/bluetooth/hci_core.h |  1 +
->  include/net/bluetooth/mgmt.h     |  6 +++++
->  net/bluetooth/mgmt.c             | 49 ++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 58 insertions(+)
+> I do not know how clearly I can make myself. These structs and defines are done in order of either opcode or event code. So please get this right.
 
-Applied to bluetooth-next. Thanks.
+scratch this comment. Seems they are ordered correctly, but just not in my inbox when I tested the patches.
 
-Johan
+Just make sure to send a clean series of patches that git am against bluetooth-next. Current one doesn't. t had to apply them with a fuzz.
+
+Regards
+
+Marcel
+
