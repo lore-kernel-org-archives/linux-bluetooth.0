@@ -1,38 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH v2 0/2] Bluetooth: Fix hci_dev_open race condition
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1380656690-22246-1-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 2 Oct 2013 08:30:12 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <D497B811-786E-4458-B75B-CE95002B6042@holtmann.org>
-References: <1380656690-22246-1-git-send-email-johan.hedberg@gmail.com>
-To: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Enable -D__CHECK_ENDIAN__ for sparse by default
+Date: Tue,  1 Oct 2013 23:06:47 -0700
+Message-Id: <1380694007-7946-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+The Bluetooth protocol and hardware is pretty much all little endian
+and so when running sparse via "make C=2" for example, enable the
+endian checks by default.
 
-> Here's an updated set including fixes based on feedback. The patches
-> should go to bluetooth.git, but I'm not sure how important it is to try
-> to get them to the stable tree since we haven't had this issue reported
-> with the Intel setup procedure which (afaik) should be the only one that
-> could be affected in older kernels.
-> 
-> Johan
-> 
-> ----------------------------------------------------------------
-> Johan Hedberg (2):
->      Bluetooth: Refactor hci_dev_open to a separate hci_dev_do_open function
->      Bluetooth: Fix workqueue synchronization in hci_dev_open
-> 
-> net/bluetooth/hci_core.c | 40 ++++++++++++++++++++++++++++++----------
-> 1 file changed, 30 insertions(+), 10 deletions(-)
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/Makefile | 2 ++
+ net/bluetooth/Makefile     | 2 ++
+ 2 files changed, 4 insertions(+)
 
-both patches have been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index 4afae20..9fe8a87 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -30,3 +30,5 @@ hci_uart-$(CONFIG_BT_HCIUART_LL)	+= hci_ll.o
+ hci_uart-$(CONFIG_BT_HCIUART_ATH3K)	+= hci_ath.o
+ hci_uart-$(CONFIG_BT_HCIUART_3WIRE)	+= hci_h5.o
+ hci_uart-objs				:= $(hci_uart-y)
++
++ccflags-y += -D__CHECK_ENDIAN__
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index dea6a28..6a791e7 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -11,3 +11,5 @@ obj-$(CONFIG_BT_HIDP)	+= hidp/
+ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+ 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
+ 	a2mp.o amp.o
++
++subdir-ccflags-y += -D__CHECK_ENDIAN__
+-- 
+1.8.3.1
 
