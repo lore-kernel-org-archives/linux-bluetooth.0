@@ -1,28 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 2 Oct 2013 16:24:46 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Increment management interface revision
-Message-ID: <20131002132446.GA32689@x220.p-661hnu-f1>
-References: <1380716311-19403-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1380716311-19403-1-git-send-email-marcel@holtmann.org>
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH] Bluetooth: Fix advertising data flags with disabled BR/EDR
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1380718944-28164-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 2 Oct 2013 15:19:13 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <A17C3A88-E4AA-4627-9028-5FD16B36C1A9@holtmann.org>
+References: <1380718944-28164-1-git-send-email-johan.hedberg@gmail.com>
+To: johan.hedberg@gmail.com
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On Wed, Oct 02, 2013, Marcel Holtmann wrote:
-> This patch increments the management interface revision due to the
-> various fixes, improvements and other changes that have gone in
-> lately.
+> We shouldn't include the simultaneous LE & BR/EDR flags in the LE
+> advertising data if BR/EDR is disabled on a dual-mode controller. This
+> patch fixes this issue and ensures that the create_ad function generates
+> the correct flags when BR/EDR is disabled.
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  net/bluetooth/mgmt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> net/bluetooth/hci_core.c | 14 +++++++-------
+> 1 file changed, 7 insertions(+), 7 deletions(-)
 
-Applied. Thanks.
+patch has been applied to bluetooth-next tree.
 
-Johan
+Regards
+
+Marcel
+
