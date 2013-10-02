@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH v6 4/4] Bluetooth: btmrvl: add calibration data download support
+Subject: Re: [PATCH v6 1/4] Bluetooth: btmrvl: add btmrvl_send_sync_cmd() function
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1380655155-10007-5-git-send-email-bzhao@marvell.com>
-Date: Wed, 2 Oct 2013 07:32:27 +0200
+In-Reply-To: <1380655155-10007-2-git-send-email-bzhao@marvell.com>
+Date: Wed, 2 Oct 2013 07:30:56 +0200
 Cc: <linux-bluetooth@vger.kernel.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
@@ -12,43 +12,25 @@ Cc: <linux-bluetooth@vger.kernel.org>,
 	Mike Frysinger <vapier@chromium.org>,
 	Hyuckjoo Lee <hyuckjoo.lee@samsung.com>,
 	Amitkumar Karwar <akarwar@marvell.com>
-Message-Id: <53A79334-AC60-4B9A-BD94-CD5EE3F7746C@holtmann.org>
-References: <1380655155-10007-1-git-send-email-bzhao@marvell.com> <1380655155-10007-5-git-send-email-bzhao@marvell.com>
+Message-Id: <DE4D5E1A-86DB-410F-A9B6-618616D2BAD9@holtmann.org>
+References: <1380655155-10007-1-git-send-email-bzhao@marvell.com> <1380655155-10007-2-git-send-email-bzhao@marvell.com>
 To: Bing Zhao <bzhao@marvell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Bing,
 
-> A text file containing calibration data in hex format can
-> be provided at following path:
+> Command preparation code is used multiple times. This patch
+> separate out this common code and create btmrvl_send_sync_cmd()
+> function.
 > 
-> /lib/firmware/mrvl/sd8797_caldata.conf
-> 
-> The data will be downloaded to firmware during initialization.
-> 
-> Reviewed-by: Mike Frysinger <vapier@chromium.org>
 > Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
 > Signed-off-by: Bing Zhao <bzhao@marvell.com>
-> Signed-off-by: Hyuckjoo Lee <hyuckjoo.lee@samsung.com>
 > ---
-> v2: Remove module parameter. The calibration data will be downloaded
->    only when the device speicific data file is provided.
->    (Marcel Holtmann)
-> v3: Fix crash (misaligned memory access) on ARM
-> v4: Simplify white space parsing and save some CPU cycles (Mike Frysinger)
-> v5: Improvements in cal data parsing logic. Add explanatory comments.
->    Replace GFP_ATOMIC flag with GFP_KERNEL (Mike Frysinger)
-> v6: Remove redundant label 'done' and 'cfg' check, and a new line character check
->    (Mike Frysinger)
->    Use btmrvl_send_sync_cmd() for downloading calibration data.
->    (Marcel Holtmann)
+> v6: separate out common code
 > 
-> drivers/bluetooth/btmrvl_drv.h  |   8 +++
-> drivers/bluetooth/btmrvl_main.c | 116 ++++++++++++++++++++++++++++++++++++++++
-> drivers/bluetooth/btmrvl_sdio.c |   9 +++-
-> drivers/bluetooth/btmrvl_sdio.h |   2 +
-> 4 files changed, 134 insertions(+), 1 deletion(-)
+> drivers/bluetooth/btmrvl_main.c | 129 +++++++++++++---------------------------
+> 1 file changed, 41 insertions(+), 88 deletions(-)
 
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
