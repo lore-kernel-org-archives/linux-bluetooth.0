@@ -1,60 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix memory leak with L2CAP signal channels
-Date: Wed,  2 Oct 2013 08:28:21 -0700
-Message-Id: <1380727701-44925-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 2 Oct 2013 16:24:46 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Increment management interface revision
+Message-ID: <20131002132446.GA32689@x220.p-661hnu-f1>
+References: <1380716311-19403-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1380716311-19403-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The wrong type of L2CAP signalling packets on the wrong type of
-either BR/EDR or LE links need to be dropped. When that happens
-the packet is dropped, but the memory not freed. So actually
-free the memory as well.
+Hi Marcel,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/l2cap_core.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+On Wed, Oct 02, 2013, Marcel Holtmann wrote:
+> This patch increments the management interface revision due to the
+> various fixes, improvements and other changes that have gone in
+> lately.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/mgmt.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 6d42498..814563d 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5330,7 +5330,7 @@ static inline void l2cap_le_sig_channel(struct l2cap_conn *conn,
- 	l2cap_raw_recv(conn, skb);
- 
- 	if (hcon->type != LE_LINK)
--		return;
-+		goto drop;
- 
- 	while (len >= L2CAP_CMD_HDR_SIZE) {
- 		u16 cmd_len;
-@@ -5363,6 +5363,7 @@ static inline void l2cap_le_sig_channel(struct l2cap_conn *conn,
- 		len  -= cmd_len;
- 	}
- 
-+drop:
- 	kfree_skb(skb);
- }
- 
-@@ -5378,7 +5379,7 @@ static inline void l2cap_sig_channel(struct l2cap_conn *conn,
- 	l2cap_raw_recv(conn, skb);
- 
- 	if (hcon->type != ACL_LINK)
--		return;
-+		goto drop;
- 
- 	while (len >= L2CAP_CMD_HDR_SIZE) {
- 		u16 cmd_len;
-@@ -5411,6 +5412,7 @@ static inline void l2cap_sig_channel(struct l2cap_conn *conn,
- 		len  -= cmd_len;
- 	}
- 
-+drop:
- 	kfree_skb(skb);
- }
- 
--- 
-1.8.3.1
+Applied. Thanks.
 
+Johan
