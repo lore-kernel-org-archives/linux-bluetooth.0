@@ -1,40 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dohyun Pyun <re20sfree@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: steve.jun@samsung.com
-Subject: [PATCH v3 0/8] Add CSA 4 commands and events in hci.h
-Date: Wed,  2 Oct 2013 21:09:10 +0900
-Message-Id: <1380715758-10334-1-git-send-email-dh79.pyun@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 2 Oct 2013 14:51:45 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: Add management command for setting static
+ address
+Message-ID: <20131002115145.GA10291@x220.p-661hnu-f1>
+References: <1380714090-11609-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1380714090-11609-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Marcel,
 
-This patchset contains several HCI commands and events addition.
-These HCI commands and events are included in Bluetooth Core
-Specification Addendum 4, and it will be used to implement 3DS
-profile.
+On Wed, Oct 02, 2013, Marcel Holtmann wrote:
+> On dual-mode BR/EDR/LE and LE only controllers it is possible
+> to configure a random address. There are two types or random
+> addresses, one is static and the other private. Since the
+> random private addresses require special privacy feature to
+> be supported, the configuration of these two are kept separate.
+> 
+> This command allows for setting the static random address. It is
+> only supported on controllers with LE support. The static random
+> address is suppose to be valid for the lifetime of the controller
+> or at least until the next power cycle. To ensure such behavior,
+> setting of the address is limited to when the controller is
+> powered off.
+> 
+> The special BDADDR_ANY address (00:00:00:00:00:00) can be used to
+> disable the static address. This is also the default value.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  include/net/bluetooth/hci.h      |  2 ++
+>  include/net/bluetooth/hci_core.h |  1 +
+>  include/net/bluetooth/mgmt.h     |  6 +++++
+>  net/bluetooth/mgmt.c             | 49 ++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 58 insertions(+)
 
-Also I'm still implementing 3DS profile's master role in the BR/EDR
-controller. Summit and I'll send the patchsets about 3DS MGMT APIs
-soon.
+Applied to bluetooth-next. Thanks.
 
-Regards,
-Pyun
-
-* I rebased these patchsets in the latest bluetooth-next git
-
-----------------------------------------------------------------
-Dohyun Pyun (8):
-      Bluetooth: Add Set Reserved LT_ADDR Command
-      Bluetooth: Add Delete Reserved LT_ADDR Command
-      Bluetooth: Add Set Connectionless Slave Broadcast Data Command
-      Bluetooth: Add Write Synchronization Train Parameters Command
-      Bluetooth: Add Set Connectionless Slave Broadcast Command
-      Bluetooth: Add Start Synchronization Train Command 
-      Bluetooth: Add Synchronization Train Complete Event
-      Bluetooth: Add Slave Page Response Timeout Event 
-
- include/net/bluetooth/hci.h | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 69 insertions(+)
-
+Johan
