@@ -1,58 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH 1/7] Bluetooth: Initialize hci_conn fields in hci_connect_le
+Subject: Re: [PATCH v2 2/2] Bluetooth: Fix workqueue synchronization in hci_dev_open
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1380668636-30654-2-git-send-email-andre.guedes@openbossa.org>
-Date: Wed, 2 Oct 2013 06:57:40 +0200
+In-Reply-To: <1380656690-22246-3-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 2 Oct 2013 06:52:55 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <A1F8B46C-982C-4C37-8730-5993D28F324E@holtmann.org>
-References: <1380668636-30654-1-git-send-email-andre.guedes@openbossa.org> <1380668636-30654-2-git-send-email-andre.guedes@openbossa.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
+Message-Id: <C9EF05DB-42CA-4660-8DA8-E06EACF0FB7A@holtmann.org>
+References: <1380656690-22246-1-git-send-email-johan.hedberg@gmail.com> <1380656690-22246-3-git-send-email-johan.hedberg@gmail.com>
+To: johan.hedberg@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Johan,
 
-> This patch moves some hci_conn fields initialization from hci_le_
-> create_connection() to hci_connect_le(). It makes more sense to
-> initialize these fields within the function that creates the hci_
-> conn object.
+> When hci_sock.c calls hci_dev_open it needs to ensure that there isn't
+> pending work in progress, such as that which is scheduled for the
+> initial setup procedure or the one for automatically powering off after
+> the setup procedure. This adds the necessary calls to ensure that any
+> previously scheduled work is completed before attempting to call
+> hci_dev_do_open.
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> This patch fixes a race with old user space versions where we might
+> receive a HCIDEVUP ioctl before the setup procedure has been completed.
+> When that happens the setup procedures callback may fail early and leave
+> the device in an inconsistent state, causing e.g. the setup callback to
+> be (incorrectly) called more than once.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> net/bluetooth/hci_conn.c | 10 +++++-----
-> 1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index d2380e0..f473605 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -54,11 +54,6 @@ static void hci_le_create_connection(struct hci_conn *conn)
-> 	struct hci_dev *hdev = conn->hdev;
-> 	struct hci_cp_le_create_conn cp;
-> 
-> -	conn->state = BT_CONNECT;
-> -	conn->out = true;
-> -	conn->link_mode |= HCI_LM_MASTER;
-> -	conn->sec_level = BT_SECURITY_LOW;
-> -
-> 	memset(&cp, 0, sizeof(cp));
-> 	cp.scan_interval = __constant_cpu_to_le16(0x0060);
-> 	cp.scan_window = __constant_cpu_to_le16(0x0030);
-> @@ -565,6 +560,11 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
-> 			return ERR_PTR(-ENOMEM);
-> 
-> 		le->dst_type = bdaddr_to_le(dst_type);
-> +		le->state = BT_CONNECT;
-> +		le->out = true;
-> +		le->link_mode |= HCI_LM_MASTER;
-> +		le->sec_level = BT_SECURITY_LOW;
-> +
-> 		hci_le_create_connection(le);
-> 	}
+> net/bluetooth/hci_core.c | 10 ++++++++++
+> 1 file changed, 10 insertions(+)
 
-I do not understand on how this is the same. Maybe the confusion is the use of le-> instead of conn-> as variable for hci_conn. Seems that should be fixed first.
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
