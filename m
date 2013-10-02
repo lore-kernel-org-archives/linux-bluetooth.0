@@ -3,9 +3,9 @@ From: Dohyun Pyun <re20sfree@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: steve.jun@samsung.com, DoHyun Pyun <dh79.pyun@samsung.com>,
 	C S Bhargava <cs.bhargava@samsung.com>
-Subject: [PATCH v2 3/8] Bluetooth: Add Set Connectionless Slave Broadcast Data Command
-Date: Wed,  2 Oct 2013 20:10:13 +0900
-Message-Id: <1380712218-9269-4-git-send-email-dh79.pyun@samsung.com>
+Subject: [PATCH v2 2/8] Bluetooth: Add Delete Reserved LT_ADDR Command
+Date: Wed,  2 Oct 2013 20:10:12 +0900
+Message-Id: <1380712218-9269-3-git-send-email-dh79.pyun@samsung.com>
 In-Reply-To: <1380712218-9269-1-git-send-email-dh79.pyun@samsung.com>
 References: <1380712218-9269-1-git-send-email-dh79.pyun@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,64 +13,42 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: DoHyun Pyun <dh79.pyun@samsung.com>
 
-The Set_Connectionless_Slave_Broadcast_Data command provides the
-ability for the Host to set Connectionless Slave Broadcast data in
-the BR/EDR Controller.
+The Delete_Reserved_LT_ADDR command requests that the BR/EDR
+Controller cancel the reservation for a specific LT_ADDR reserved for the
+purposes of Connectionless Slave Broadcast.
 
 The Core Spec Addendum 4 adds this command in part B Connectionless
 Slave Broadcast.
 
-Bluetooth Core Specification Addendum 4 - Page 93
+Bluetooth Core Specification Addendum 4 - Page 92
 
-"7.3.88 Set Connectionless Slave Broadcast Data Command [New Section]
+"7.3.87 Delete Reserved LT_ADDR Command [New Section]
 ...
-If connectionless slave broadcast mode is disabled, this data shall be
-kept by the BR/EDR Controller and used once connectionless slave broadcast
-mode is enabled. If connectionless slave broadcast mode is enabled,
-and this command is successful, this data will be sent starting with
-the next Connectionless Slave Broadcast instant.
-
-The Data_Length field may be zero, in which case no data needs to be
-provided.
-
-The Host may fragment the data using the Fragment field in the command. If
-the combined length of the fragments exceeds the capacity of the largest
-allowed packet size specified in the Set Connectionless Slave Broadcast
-command, all fragments associated with the data being assembled shall be
-discarded and the Invalid HCI Command Parameters error (0x12) shall be
-returned."
+If the LT_ADDR indicated in the LT_ADDR parameter is not reserved by the
+BR/EDR Controller, it shall return the Unknown Connection Identifier (0x02)
+error code.
+If connectionless slave broadcast mode is still active, then the Controller
+shall return the Command Disallowed (0x0C) error code."
 
 Signed-off-by: Dohyun Pyun <dh79.pyun@samsung.com>
 Signed-off-by: C S Bhargava <cs.bhargava@samsung.com>
 ---
- include/net/bluetooth/hci.h | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ include/net/bluetooth/hci.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 187938c..57f73e3 100644
+index 420a8c4..187938c 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -35,6 +35,8 @@
- 
- #define HCI_MAX_AMP_ASSOC_SIZE	672
- 
-+#define HCI_MAX_CSB_DATA_SIZE	252
-+
- /* HCI dev events */
- #define HCI_DEV_REG			1
- #define HCI_DEV_UNREG			2
-@@ -857,6 +859,18 @@ struct hci_rp_delete_reserved_lt_addr {
+@@ -848,6 +848,15 @@ struct hci_rp_set_reserved_lt_addr {
  	__u8	lt_addr;
  } __packed;
  
-+#define HCI_OP_SET_CSB_DATA		0x0c76
-+struct hci_cp_set_csb_data {
++#define HCI_OP_DELETE_RESERVED_LT_ADDR	0x0c75
++struct hci_cp_delete_reserved_lt_addr {
 +	__u8	lt_addr;
-+	__u8	fragment;
-+	__u8	data_length;
-+	__u8	data[HCI_MAX_CSB_DATA_SIZE];
 +} __packed;
-+struct hci_rp_set_csb_data {
++struct hci_rp_delete_reserved_lt_addr {
 +	__u8	status;
 +	__u8	lt_addr;
 +} __packed;
