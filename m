@@ -1,30 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH v2 1/4] Bluetooth: Rename hci_conn variable in hci_connect_le()
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1380835547-3640-2-git-send-email-andre.guedes@openbossa.org>
-Date: Fri, 4 Oct 2013 08:08:48 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <01A7124C-8B1F-4525-9316-ABF2849964C5@holtmann.org>
-References: <1380835547-3640-1-git-send-email-andre.guedes@openbossa.org> <1380835547-3640-2-git-send-email-andre.guedes@openbossa.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <477F20668A386D41ADCC57781B1F70430F451FB266@SC-VEXCH1.marvell.com>
+References: <1380824600-13655-1-git-send-email-bzhao@marvell.com>
+	<CAJdJm_N1=a7URKmU8xOsOzOaYHKQdNXiR7VryeOc4+i2uf7RqQ@mail.gmail.com>
+	<477F20668A386D41ADCC57781B1F70430F451FB266@SC-VEXCH1.marvell.com>
+Date: Thu, 3 Oct 2013 19:26:41 -0400
+Message-ID: <CAJdJm_NJe-wrAHFgrGP5ytMxfgP0RREJCqnE9L=hAbVXbNqFdQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btmrvl: operate on 16-bit opcodes instead of ogf/ocf
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Bing Zhao <bzhao@marvell.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>, Amitkumar Karwar <akarwar@marvell.com>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Bing,
 
-> This patch simply rename the hci_conn variable "le" to "conn"
-> since it is a better name.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
-> net/bluetooth/hci_conn.c | 26 +++++++++++++-------------
-> 1 file changed, 13 insertions(+), 13 deletions(-)
+On Thu, Oct 3, 2013 at 5:06 PM, Bing Zhao <bzhao@marvell.com> wrote:
+>> >         hdr = (struct hci_command_hdr *)skb_put(skb, HCI_COMMAND_HDR_SIZE);
+>> > -       hdr->opcode = cpu_to_le16(hci_opcode_pack(OGF, cmd_no));
+>> > +       hdr->opcode = cpu_to_le16(opcode);
+>>
+>> Are you sure the callers of btmrvl_send_sync_cmd() do not need to be
+>> changed to pass an opcode instead of just the OCF?
+>
+> Previously we pass the cmd_no which is the OCF bits to the function, and the function packs it to opcode.
+>
+> Now I changed the macros of the cmd_no from OCF to opcode as shown below, so no change to the callers.
+>
+> -/* Bluetooth commands  */
+> -#define BT_CMD_AUTO_SLEEP_MODE         0x23
+> -#define BT_CMD_HOST_SLEEP_CONFIG       0x59
+> -#define BT_CMD_HOST_SLEEP_ENABLE       0x5A
+> -#define BT_CMD_MODULE_CFG_REQ          0x5B
+> -#define BT_CMD_LOAD_CONFIG_DATA                0x61
+> +/* Vendor specific Bluetooth commands */
+> +#define BT_CMD_AUTO_SLEEP_MODE         0xFC23
+> +#define BT_CMD_HOST_SLEEP_CONFIG       0xFC59
+> +#define BT_CMD_HOST_SLEEP_ENABLE       0xFC5A
+> +#define BT_CMD_MODULE_CFG_REQ          0xFC5B
+> +#define BT_CMD_LOAD_CONFIG_DATA                0xFC61
 
-patch has been applied to bluetooth-next tree.
+Now I got it :)
 
-Regards
-
-Marcel
-
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
