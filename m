@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 06/14] android: Create HAL API header skeleton
-Date: Thu,  3 Oct 2013 17:38:12 +0300
-Message-Id: <1380811100-30144-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv3 10/14] android: Add cap to bind to port < 1024
+Date: Thu,  3 Oct 2013 17:38:16 +0300
+Message-Id: <1380811100-30144-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1380811100-30144-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1380811100-30144-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,274 +11,118 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Header describes the protocol between Android HAL threads and BlueZ
-daemon.
+For SDP server we need to bind to lower port, acquire this capability.
 ---
- android/hal_msg.h |  255 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 255 insertions(+)
- create mode 100644 android/hal_msg.h
+ android/main.c |   68 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ configure.ac   |    4 ++++
+ 2 files changed, 72 insertions(+)
 
-diff --git a/android/hal_msg.h b/android/hal_msg.h
-new file mode 100644
-index 0000000..c6bc883
---- /dev/null
-+++ b/android/hal_msg.h
-@@ -0,0 +1,255 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
+diff --git a/android/main.c b/android/main.c
+index cbbeabc..2221618 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -32,6 +32,22 @@
+ #include <stdlib.h>
+ #include <stdbool.h>
+ #include <string.h>
++#include <unistd.h>
++#include <errno.h>
++#include <sys/prctl.h>
++#include <linux/capability.h>
 +
-+#ifndef __packed
-+#define __packed __attribute__((packed))
++/**
++ * Include <sys/capability.h> for host build and
++ * also for Android 4.3 when it is added to bionic
++ */
++#if !defined(__ANDROID_API__) || (__ANDROID_API__ > 17)
++#include <sys/capability.h>
 +#endif
 +
-+typedef struct {
-+	uint8_t b[6];
-+} __packed __bdaddr_t;
++#if defined(__ANDROID_API__)
++#include <private/android_filesystem_config.h>
++#endif
+ 
+ #include <glib.h>
+ 
+@@ -305,6 +321,55 @@ static void cleanup_mgmt_interface(void)
+ 	mgmt_if = NULL;
+ }
+ 
++static bool android_set_aid_and_cap()
++{
++	struct __user_cap_header_struct header;
++	struct __user_cap_data_struct cap;
++#if defined(__ANDROID_API__)
++	gid_t groups[] = {AID_NET_BT, AID_NET_BT_ADMIN, AID_BLUETOOTH};
++#endif
 +
-+struct hal_msg_hdr {
-+	uint8_t service_id;
-+	uint8_t opcode;
-+	uint16_t len;
-+	uint8_t payload[0];
-+} __packed;
++	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
 +
-+#define HAL_SERVICE_ID_CORE		0
-+#define HAL_SERVICE_ID_BLUETOOTH	1
-+#define HAL_SERVICE_ID_SOCK		2
-+#define HAL_SERVICE_ID_HIDHOST		3
-+#define HAL_SERVICE_ID_PAN		4
-+#define HAL_SERVICE_ID_HANDSFREE	5
-+#define HAL_SERVICE_ID_AD2P		6
-+#define HAL_SERVICE_ID_HEALTH		7
-+#define HAL_SERVICE_ID_AVRCP		8
-+#define HAL_SERVICE_ID_GATT		9
++	header.version = _LINUX_CAPABILITY_VERSION;
 +
-+/* Core Service */
++	prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);
 +
-+#define HAL_MSG_OP_ERROR		0x00
-+struct hal_msg_rp_error {
-+	uint8_t status;
-+} __packed;
++#if defined(__ANDROID_API__)
++	if (setgid(AID_BLUETOOTH) < 0)
++		warn("%s: setgid(): %s", __func__, strerror(errno));
 +
-+#define HAL_MSG_OP_REGISTER_MODULE	0x01
-+struct hal_msg_cp_register_module {
-+	uint8_t service_id;
-+} __packed;
-+struct hal_msg_rp_register_module {
-+	uint8_t service_id;
-+} __packed;
++	if (setuid(AID_BLUETOOTH) < 0)
++		warn("%s: setuid(): %s", __func__, strerror(errno));
++#endif
 +
-+#define HAL_MSG_OP_UNREGISTER_MODULE	0x02
-+struct hal_msg_cp_unregister_module {
-+	uint8_t service_id;
-+} __packed;
++	header.version = _LINUX_CAPABILITY_VERSION;
++	header.pid = 0;
 +
-+/* Bluetooth Core HAL API */
++	cap.effective = cap.permitted =
++		CAP_TO_MASK(CAP_NET_ADMIN) |
++		CAP_TO_MASK(CAP_NET_BIND_SERVICE);
++	cap.inheritable = 0;
 +
-+#define HAL_MSG_OP_BT_ENABLE		0x01
++	if (capset(&header, &cap) < 0) {
++		error("%s: capset(): %s", __func__, strerror(errno));
++		return false;
++	}
 +
-+#define HAL_MSG_OP_BT_DISABLE		0x02
++#if defined(__ANDROID_API__)
++	setgroups(sizeof(groups)/sizeof(groups[0]), groups);
++#endif
++	if (capget(&header, &cap) < 0)
++		error("%s: capget(): %s", __func__, strerror(errno));
++	else
++		DBG("Caps: eff: 0x%x, perm: 0x%x, inh: 0x%x", cap.effective,
++					cap.permitted, cap.inheritable);
 +
-+#define HAL_MSG_OP_BT_GET_ADAPTER_PROPS	0x03
++	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
 +
-+#define HAL_MSG_OP_BT_GET_ADAPTER_PROP	0x04
-+struct hal_msg_cp_bt_get_adapter_prop {
-+	uint8_t type;
-+} __packed;
++	return true;
++}
 +
-+#define HAL_MSG_OP_BT_SET_ADAPTER_PROP	0x05
-+struct hal_msg_cp_bt_set_adapter_prop {
-+	uint8_t type;
-+	uint16_t len;
-+	uint8_t val[0];
-+} __packed;
+ int main(int argc, char *argv[])
+ {
+ 	GOptionContext *context;
+@@ -343,6 +408,9 @@ int main(int argc, char *argv[])
+ 	/* no need to keep parsed option in memory */
+ 	free_options();
+ 
++	if (android_set_aid_and_cap() == false)
++		exit(EXIT_FAILURE);
 +
-+#define HAL_MSG_OP_BT_GET_REMOTE_DEVICE_PROPS	0x06
-+struct hal_msg_cp_bt_get_remote_device_props {
-+	__bdaddr_t bdaddr;
-+} __packed;
+ 	init_mgmt_interface();
+ 
+ 	DBG("Entering main loop");
+diff --git a/configure.ac b/configure.ac
+index 7b1f64a..5406434 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -247,4 +247,8 @@ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
+ 					[enable_android=${enableval}])
+ AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
+ 
++if (test "${android_daemon}" = "yes"); then
++	AC_CHECK_LIB(cap, capget, dummy=yes, AC_MSG_ERROR(libcap is required))
++fi
 +
-+#define HAL_MSG_OP_BT_GET_REMOTE_DEVICE_PROP	0x07
-+struct hal_msg_cp_bt_get_remote_device_prop {
-+	__bdaddr_t bdaddr;
-+	uint8_t type;
-+} __packed;
-+
-+#define HAL_MSG_OP_BT_SET_REMOTE_DEVICE_PROP	0x08
-+struct hal_msg_cp_bt_set_remote_device_prop {
-+	__bdaddr_t bdaddr;
-+	uint8_t type;
-+	uint16_t len;
-+	uint8_t val[0];
-+} __packed;
-+
-+#define HAL_MSG_OP_BT_GET_REMOTE_SERVICE_REC	0x09
-+struct hal_msg_cp_bt_get_remote_service_rec {
-+	__bdaddr_t bdaddr;
-+	uint8_t uuid[16];
-+} __packed;
-+
-+#define HAL_MSG_OP_BT_GET_REMOTE_SERVICE	0x0a
-+struct hal_msg_cp_bt_get_remote_service {
-+	__bdaddr_t bdaddr;
-+} __packed;
-+
-+#define HAL_MSG_OP_BT_START_DISCOVERY	0x0b
-+
-+#define HAL_MSG_OP_BT_CANCEL_DISCOVERY	0x0c
-+
-+#define HAL_MSG_OP_BT_CREATE_BOND	0x0d
-+struct hal_msg_cp_bt_create_bond {
-+	__bdaddr_t bdaddr;
-+} __packed;
-+
-+#define HAL_MSG_OP_BT_REMOVE_BOND	0x0d
-+struct hal_msg_cp_bt_remove_bond {
-+	__bdaddr_t bdaddr;
-+} __packed;
-+
-+#define HAL_MSG_OP_BT_CANCEL_BOND	0x0f
-+struct hal_msg_cp_bt_cancel_bond {
-+	__bdaddr_t bdaddr;
-+} __packed;
-+
-+#define HAL_MSG_OP_BT_PIN_REPLY		0x10
-+struct hal_msg_cp_bt_pin_reply {
-+	__bdaddr_t bdaddr;
-+	uint8_t accept;
-+	uint8_t pin_len;
-+	uint8_t pin_code[16];
-+} __packed;
-+
-+#define HAL_MSG_OP_BT_SSP_REPLY		0x11
-+struct hal_msg_cp_bt_ssp_reply {
-+	__bdaddr_t bdaddr;
-+	uint8_t ssp_variant;
-+	uint8_t accept;
-+	uint32_t passkey;
-+} __packed;
-+
-+#define HAL_MSG_OP_BT_DUT_MODE_CONF	0x12
-+struct hal_msg_cp_bt_dut_mode_conf {
-+	uint8_t enable;
-+} __packed;
-+
-+#define HAL_MSG_OP_BT_DUT_MODE_SEND	0x13
-+struct hal_msg_cp_bt_dut_mode_send {
-+	uint16_t opcode;
-+	uint8_t len;
-+	uint8_t data[0];
-+} __packed;
-+
-+#define HAL_MSG_OP_BT_LE_TEST_MODE	0x14
-+struct hal_msg_cp_bt_le_test_mode {
-+	uint16_t opcode;
-+	uint8_t len;
-+	uint8_t data[0];
-+} __packed;
-+
-+/* Notifications and confirmations */
-+
-+#define HAL_MSG_EV_BT_ERROR			0x80
-+
-+#define HAL_MSG_EV_BT_ADAPTER_STATE_CHANGED	0x81
-+struct hal_msg_ev_bt_adapter_state_changed {
-+	uint8_t state;
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_ADAPTER_PROPS_CHANGED	0x82
-+struct hal_property {
-+	uint8_t type;
-+	uint16_t len;
-+	uint8_t val[0];
-+} __packed;
-+struct hal_msg_ev_bt_adapter_props_changed {
-+	uint8_t status;
-+	uint8_t num_props;
-+	struct hal_property props[0];
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_REMOTE_DEVICE_PROPS	0x83
-+struct hal_msg_ev_bt_remote_device_props {
-+	uint8_t status;
-+	__bdaddr_t bdaddr;
-+	uint8_t num_props;
-+	struct hal_property props[0];
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_DEVICE_FOUND		0x84
-+struct hal_msg_ev_bt_device_found {
-+	uint8_t num_props;
-+	struct hal_property props[0];
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_DISCOVERY_STATE_CHANGED	0x85
-+struct hal_msg_ev_bt_discovery_state_changed {
-+	uint8_t state;
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_PIN_REQUEST		0x86
-+struct hal_msg_ev_bt_pin_request {
-+	__bdaddr_t bdaddr;
-+	uint8_t name[249 - 1];
-+	uint8_t class_of_dev[3];
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_SSP_REQUEST		0x87
-+struct hal_msg_ev_bt_ssp_request {
-+	__bdaddr_t bdaddr;
-+	uint8_t name[249 - 1];
-+	uint8_t class_of_dev[3];
-+	uint8_t pairing_variant;
-+	uint32_t passkey;
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_BOND_STATE_CHANGED	0x88
-+struct hal_msg_ev_bt_bond_state_changed {
-+	uint8_t status;
-+	__bdaddr_t bdaddr;
-+	uint8_t state;
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_ACL_STATE_CHANGED		0x89
-+struct hal_msg_ev_bt_acl_state_changed {
-+	uint8_t status;
-+	__bdaddr_t bdaddr;
-+	uint8_t state;
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_DUT_MODE_RECEIVE		0x8a
-+struct hal_msg_ev_bt_dut_mode_receive {
-+	uint16_t opcode;
-+	uint8_t len;
-+	uint8_t data[0];
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_LE_TEST_MODE		0x8b
-+struct hal_msg_ev_bt_le_test_mode {
-+	uint8_t status;
-+	uint16_t num_packets;
-+} __packed;
+ AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
 -- 
 1.7.10.4
 
