@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 11/14] android: Implement read_info_complete callback
-Date: Thu,  3 Oct 2013 17:38:17 +0300
-Message-Id: <1380811100-30144-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv3 05/14] android: Add basic mgmt initialization sequence
+Date: Thu,  3 Oct 2013 17:38:11 +0300
+Message-Id: <1380811100-30144-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1380811100-30144-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1380811100-30144-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,154 +11,286 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Handle read info complete callback from mgmt interface.
+Initialize bluetooth controller via mgmt interface.
 ---
- android/main.c |  102 +++++++++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 90 insertions(+), 12 deletions(-)
+ Makefile.android   |    4 +-
+ android/Android.mk |   11 +++
+ android/main.c     |  189 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 203 insertions(+), 1 deletion(-)
 
+diff --git a/Makefile.android b/Makefile.android
+index e161e6d..9a2c486 100644
+--- a/Makefile.android
++++ b/Makefile.android
+@@ -1,7 +1,9 @@
+ if ANDROID
+ noinst_PROGRAMS += android/bluetoothd
+ 
+-android_bluetoothd_SOURCES = android/main.c src/log.c
++android_bluetoothd_SOURCES = android/main.c src/log.c \
++				src/shared/util.h src/shared/util.c \
++				src/shared/mgmt.h src/shared/mgmt.c
+ android_bluetoothd_LDADD = @GLIB_LIBS@
+ endif
+ 
+diff --git a/android/Android.mk b/android/Android.mk
+index 0e025ac..ab11bd1 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -15,14 +15,25 @@ include $(CLEAR_VARS)
+ LOCAL_SRC_FILES := \
+ 	main.c \
+ 	log.c \
++	../src/shared/mgmt.c \
++	../src/shared/util.c \
+ 
+ LOCAL_C_INCLUDES := \
+ 	$(call include-path-for, glib) \
+ 	$(call include-path-for, glib)/glib \
++
++LOCAL_C_INCLUDES += \
++	$(LOCAL_PATH)/../ \
+ 	$(LOCAL_PATH)/../src \
+ 
+ LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
+ 
++# to suppress the "pointer of type 'void *' used in arithmetic" warning
++LOCAL_CFLAGS += -Wno-pointer-arith
++
++# Define missing flags for Android 4.2
++LOCAL_CFLAGS += -DSOCK_CLOEXEC=02000000 -DSOCK_NONBLOCK=04000
++
+ LOCAL_SHARED_LIBRARIES := \
+ 	libglib \
+ 
 diff --git a/android/main.c b/android/main.c
-index 2221618..ffa22ec 100644
+index c0a56b1..ae31f65 100644
 --- a/android/main.c
 +++ b/android/main.c
-@@ -55,6 +55,7 @@
- #include "hcid.h"
- #include "sdpd.h"
- #include "main.h"
-+#include "bt_adapter.h"
+@@ -25,6 +25,7 @@
+ #include <config.h>
+ #endif
  
- #include "lib/bluetooth.h"
- #include "lib/mgmt.h"
-@@ -70,6 +71,8 @@ static struct mgmt *mgmt_if = NULL;
- static uint8_t mgmt_version = 0;
- static uint8_t mgmt_revision = 0;
++#include <stdbool.h>
+ #include <signal.h>
+ #include <stdint.h>
+ #include <stdio.h>
+@@ -36,9 +37,17 @@
  
-+struct bt_adapter *default_adapter = NULL;
+ #include "log.h"
+ 
++#include "lib/bluetooth.h"
++#include "lib/mgmt.h"
++#include "src/shared/mgmt.h"
 +
- int sdp_start(void)
+ #define SHUTDOWN_GRACE_SECONDS 10
+ 
+ static GMainLoop *event_loop;
++static struct mgmt *mgmt_if = NULL;
++
++static uint8_t mgmt_version = 0;
++static uint8_t mgmt_revision = 0;
+ 
+ static gboolean quit_eventloop(gpointer user_data)
  {
- 	DBG("");
-@@ -144,34 +147,109 @@ static GOptionEntry options[] = {
+@@ -92,6 +101,183 @@ static GOptionEntry options[] = {
  	{ NULL }
  };
  
--static void read_info_complete(uint8_t status, uint16_t length,
-+static void load_link_keys_complete(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
--	/* TODO: Store Controller information */
--
--	/**
--	 * Register all event notification handlers for controller.
--	 *
--	 * The handlers are registered after a succcesful read of the
--	 * controller info. From now on they can track updates and
--	 * notifications.
--	 */
-+	DBG("status %u", status);
- }
- 
-+static void load_link_keys(struct bt_adapter *adapter, GSList *keys)
-+{
-+	struct mgmt_cp_load_link_keys *cp;
-+	uint16_t key_len = g_slist_length(keys);
-+	struct mgmt_link_key_info *key;
-+	uint16_t len;
-+
-+	DBG("");
-+
-+	len = sizeof(*cp) + key_len * sizeof(*key);
-+	cp = malloc(len);
-+	if (cp == NULL) {
-+		error("%s: Not enough memory for link keys loading", __func__);
-+		return;
-+	}
-+
-+	cp->debug_keys = 0;
-+	cp->key_count = htobs(key_len);
-+
-+	mgmt_send(adapter->mgmt, MGMT_OP_LOAD_LINK_KEYS, adapter->dev_id, len,
-+				cp, load_link_keys_complete, adapter, NULL);
-+
-+	free(cp);
-+}
-+
 +static void read_info_complete(uint8_t status, uint16_t length,
 +					const void *param, void *user_data)
 +{
-+	const struct mgmt_rp_read_info *rp = param;
++	/* TODO: Store Controller information */
 +
-+	DBG("");
++	/**
++	 * Register all event notification handlers for controller.
++	 *
++	 * The handlers are registered after a succcesful read of the
++	 * controller info. From now on they can track updates and
++	 * notifications.
++	 */
++}
++
++
++static void mgmt_index_added_event(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
++{
++	info("%s: index %u", __func__, index);
++
++	DBG("sending read info command for index %u", index);
++
++	if (mgmt_send(mgmt_if, MGMT_OP_READ_INFO, index, 0, NULL,
++					read_info_complete, NULL, NULL) > 0)
++		return;
++
++	error("Failed to read adapter info for index %u", index);
++
++}
++
++static void mgmt_index_removed_event(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
++{
++	info("%s: index %u", __func__, index);
++}
++
++static void read_index_list_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	const struct mgmt_rp_read_index_list *rp = param;
++	uint16_t num;
++	int i;
++
++	info(__func__);
 +
 +	if (status != MGMT_STATUS_SUCCESS) {
-+		error("Failed to read info for index %u: %s (0x%02x)",
-+			default_adapter->dev_id, mgmt_errstr(status), status);
-+		goto failed;
++		error("%s: Failed to read index list: %s (0x%02x)",
++					__func__, mgmt_errstr(status), status);
++		return;
 +	}
 +
 +	if (length < sizeof(*rp)) {
-+		error("Too small read info complete response");
-+		goto failed;
++		error("%s: Wrong size of read index list response", __func__);
++		return;
 +	}
 +
-+	if (bacmp(&rp->bdaddr, BDADDR_ANY) == 0) {
-+		error("No Bluetooth address for index %u",
-+						default_adapter->dev_id);
-+		goto failed;
++	num = btohs(rp->num_controllers);
++
++	DBG("%s: Number of controllers: %d", __func__, num);
++
++	if (num * sizeof(uint16_t) + sizeof(*rp) != length) {
++		error("%s: Incorrect pkt size for index list rsp", __func__);
++		return;
 +	}
 +
-+	/* Store adapter information */
-+	bacpy(&default_adapter->bdaddr, &rp->bdaddr);
-+	default_adapter->dev_class = rp->dev_class[0] |
-+						(rp->dev_class[1] << 8) |
-+						(rp->dev_class[2] << 16);
-+	default_adapter->name = g_strdup((const char *) rp->name);
-+	default_adapter->short_name = g_strdup((const char *) rp->short_name);
++	for (i = 0; i < num; i++) {
++		uint16_t index;
 +
-+	default_adapter->supported_settings = btohs(rp->supported_settings);
-+	default_adapter->current_settings = btohs(rp->current_settings);
++		index = btohs(rp->index[i]);
 +
-+	/* TODO: Register all event notification handlers */
++		DBG("%s: Found index %u", __func__, index);
 +
-+	if (default_adapter->current_settings & MGMT_SETTING_POWERED)
-+		adapter_start(default_adapter);
-+
-+	/* dummy link keys loading */
-+	load_link_keys(default_adapter, NULL);
-+
-+	return;
-+
-+failed:
-+	default_adapter = NULL;
++		/**
++		 * Use index added event notification.
++		 */
++		mgmt_index_added_event(index, 0, NULL, NULL);
++	}
 +}
- 
- static void mgmt_index_added_event(uint16_t index, uint16_t length,
- 					const void *param, void *user_data)
++
++
++static void read_commands_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	const struct mgmt_rp_read_commands *rp = param;
++	uint16_t num_commands, num_events;
++
++	info(__func__);
++
++	if (status != MGMT_STATUS_SUCCESS) {
++		error("Failed to read supported commands: %s (0x%02x)",
++						mgmt_errstr(status), status);
++		return;
++	}
++
++	if (length < sizeof(*rp)) {
++		error("Wrong size of read commands response");
++		return;
++	}
++
++	num_commands = btohs(rp->num_commands);
++	num_events = btohs(rp->num_events);
++
++	DBG("Number of commands: %d", num_commands);
++	DBG("Number of events: %d", num_events);
++}
++
++static void read_version_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	const struct mgmt_rp_read_version *rp = param;
++
++	info(__func__);
++
++	if (status != MGMT_STATUS_SUCCESS) {
++		error("Failed to read version information: %s (0x%02x)",
++						mgmt_errstr(status), status);
++		return;
++	}
++
++	if (length < sizeof(*rp)) {
++		error("Wrong size response");
++		return;
++	}
++
++	mgmt_version = rp->version;
++	mgmt_revision = btohs(rp->revision);
++
++	info("Bluetooth management interface %u.%u initialized",
++						mgmt_version, mgmt_revision);
++
++	if (mgmt_version < 1) {
++		error("Version 1.0 or later of management interface required");
++		abort();
++	}
++
++	DBG("sending read supported commands command");
++
++	mgmt_send(mgmt_if, MGMT_OP_READ_COMMANDS, MGMT_INDEX_NONE, 0, NULL,
++					read_commands_complete, NULL, NULL);
++
++	mgmt_register(mgmt_if, MGMT_EV_INDEX_ADDED, MGMT_INDEX_NONE,
++					mgmt_index_added_event, NULL, NULL);
++	mgmt_register(mgmt_if, MGMT_EV_INDEX_REMOVED, MGMT_INDEX_NONE,
++					mgmt_index_removed_event, NULL, NULL);
++
++	DBG("sending read index list command");
++
++	if (mgmt_send(mgmt_if, MGMT_OP_READ_INDEX_LIST, MGMT_INDEX_NONE, 0,
++			NULL, read_index_list_complete, NULL, NULL) > 0)
++		return;
++
++	error("Failed to read controller index list");
++}
++
++static bool init_mgmt_interface(void)
++{
++	mgmt_if = mgmt_new_default();
++	if (mgmt_if == NULL) {
++		error("Failed to access management interface");
++		return false;
++	}
++
++	if (mgmt_send(mgmt_if, MGMT_OP_READ_VERSION, MGMT_INDEX_NONE, 0, NULL,
++				read_version_complete, NULL, NULL) == 0) {
++		error("Error sending READ_VERSION mgmt command");
++		return false;
++	}
++
++	return true;
++}
++
++static void cleanup_mgmt_interface(void)
++{
++	mgmt_unref(mgmt_if);
++	mgmt_if = NULL;
++}
++
+ int main(int argc, char *argv[])
  {
- 	info("%s: index %u", __func__, index);
+ 	GOptionContext *context;
+@@ -130,10 +316,13 @@ int main(int argc, char *argv[])
+ 	/* no need to keep parsed option in memory */
+ 	free_options();
  
-+	if (default_adapter == NULL) {
-+		DBG("skip event for index %d", index);
-+		return;
-+	}
++	init_mgmt_interface();
 +
-+	default_adapter = bt_adapter_new(index, mgmt_if);
-+	if (default_adapter == NULL) {
-+		error("Unable to create new adapter for index %u", index);
-+		return;
-+	}
-+
- 	DBG("sending read info command for index %u", index);
+ 	DBG("Entering main loop");
  
- 	if (mgmt_send(mgmt_if, MGMT_OP_READ_INFO, index, 0, NULL,
--					read_info_complete, NULL, NULL) > 0)
-+				read_info_complete, NULL, NULL) > 0)
- 		return;
+ 	g_main_loop_run(event_loop);
  
- 	error("Failed to read adapter info for index %u", index);
--
- }
++	cleanup_mgmt_interface();
+ 	g_main_loop_unref(event_loop);
  
- static void mgmt_index_removed_event(uint16_t index, uint16_t length,
+ 	info("Exit");
 -- 
 1.7.10.4
 
