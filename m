@@ -1,125 +1,157 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 02/14] android: Add Socket Bluetooth HAL template
-Date: Thu,  3 Oct 2013 17:38:08 +0300
-Message-Id: <1380811100-30144-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1380811100-30144-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1380811100-30144-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH 6/7] Bluetooth: Refactor LE Connection Complete HCI event handler
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CACJA=fUFak6t2tEc9oFLF0cu_pPOAxf-pY1L-UH1jsFYUU46wg@mail.gmail.com>
+Date: Thu, 3 Oct 2013 16:15:56 +0200
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <349C4B8E-04AA-4122-8CC5-7C4342FA767E@holtmann.org>
+References: <1380668636-30654-1-git-send-email-andre.guedes@openbossa.org> <1380668636-30654-7-git-send-email-andre.guedes@openbossa.org> <E33B98BD-8E7D-4384-9893-29837A323066@holtmann.org> <CACJA=fUFak6t2tEc9oFLF0cu_pPOAxf-pY1L-UH1jsFYUU46wg@mail.gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Andre,
 
-bt_sock HAL handles Bluetooth sockets for Android.
----
- android/Android.mk    |    1 +
- android/hal_bt_sock.c |   84 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 85 insertions(+)
- create mode 100644 android/hal_bt_sock.c
+>>> This patch does some code refactorig in LE Connection Complete HCI
+>>> event handler. It basically adds a switch statement to separate new
+>>> master connection code from new slave connection code.
+>>> 
+>>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>>> ---
+>>> include/net/bluetooth/hci.h |  1 +
+>>> net/bluetooth/hci_event.c   | 55 ++++++++++++++++++++++++++++++++-------------
+>>> 2 files changed, 41 insertions(+), 15 deletions(-)
+>>> 
+>>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+>>> index 7ede266..8c98f60 100644
+>>> --- a/include/net/bluetooth/hci.h
+>>> +++ b/include/net/bluetooth/hci.h
+>>> @@ -1442,6 +1442,7 @@ struct hci_ev_num_comp_blocks {
+>>> 
+>>> /* Low energy meta events */
+>>> #define LE_CONN_ROLE_MASTER   0x00
+>>> +#define LE_CONN_ROLE_SLAVE   0x01
+>>> 
+>>> #define HCI_EV_LE_CONN_COMPLETE               0x01
+>>> struct hci_ev_le_conn_complete {
+>>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>>> index 1d1ffa6..0e4a9f4 100644
+>>> --- a/net/bluetooth/hci_event.c
+>>> +++ b/net/bluetooth/hci_event.c
+>>> @@ -3444,8 +3444,42 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>>> 
+>>>      hci_dev_lock(hdev);
+>>> 
+>>> -     conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
+>>> -     if (!conn) {
+>>> +     if (ev->status) {
+>>> +             conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
+>>> +             if (!conn)
+>>> +                     goto unlock;
+>>> +
+>>> +             mgmt_connect_failed(hdev, &conn->dst, conn->type,
+>>> +                                 conn->dst_type, ev->status);
+>>> +             hci_proto_connect_cfm(conn, ev->status);
+>>> +             conn->state = BT_CLOSED;
+>>> +             hci_conn_del(conn);
+>>> +             goto unlock;
+>>> +     }
+>>> +
+>>> +     switch (ev->role) {
+>>> +     case LE_CONN_ROLE_MASTER:
+>>> +             conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &ev->bdaddr);
+>>> +             /* If there is no hci_conn object with the given address, it
+>>> +              * means this new connection was triggered through HCI socket
+>>> +              * interface. For that case, we should create a new hci_conn
+>>> +              * object.
+>>> +              */
+>> 
+>> this comments belong one level down inside the if block. You already commenting on the negative outcome of the if check.
+> 
+> Ok, I'll fix it.
+> 
+>> 
+>> 
+>>> +             if (!conn) {
+>>> +                     conn = hci_conn_add(hdev, LE_LINK, &ev->bdaddr);
+>>> +                     if (!conn) {
+>>> +                             BT_ERR("No memory for new connection");
+>>> +                             goto unlock;
+>>> +                     }
+>>> +
+>>> +                     conn->out = true;
+>>> +                     conn->link_mode |= HCI_LM_MASTER;
+>>> +                     conn->sec_level = BT_SECURITY_LOW;
+>>> +                     conn->dst_type = ev->bdaddr_type;
+>>> +             }
+>>> +             break;
+>>> +
+>>> +     case LE_CONN_ROLE_SLAVE:
+>> 
+>> And why are we not checking for an existing connection here? At least a small comment is needed to make that part clear.
+> 
+> Differently from master connection, there is no existing hci_conn for
+> slave connections. For that reason we don't check for an existing
+> connection here. I'll add a comment.
+> 
+>> 
+>> 
+>>>              conn = hci_conn_add(hdev, LE_LINK, &ev->bdaddr);
+>>>              if (!conn) {
+>>>                      BT_ERR("No memory for new connection");
+>>> @@ -3453,19 +3487,11 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>>>              }
+>>> 
+>>>              conn->dst_type = ev->bdaddr_type;
+>>> +             conn->sec_level = BT_SECURITY_LOW;
+>>> +             break;
+>>> 
+>>> -             if (ev->role == LE_CONN_ROLE_MASTER) {
+>>> -                     conn->out = true;
+>>> -                     conn->link_mode |= HCI_LM_MASTER;
+>>> -             }
+>>> -     }
+>>> -
+>>> -     if (ev->status) {
+>>> -             mgmt_connect_failed(hdev, &conn->dst, conn->type,
+>>> -                                 conn->dst_type, ev->status);
+>>> -             hci_proto_connect_cfm(conn, ev->status);
+>>> -             conn->state = BT_CLOSED;
+>>> -             hci_conn_del(conn);
+>>> +     default:
+>>> +             BT_ERR("Used reserved Role parameter %d", ev->role);
+>>>              goto unlock;
+>>>      }
+>>> 
+>>> @@ -3473,7 +3499,6 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>>>              mgmt_device_connected(hdev, &ev->bdaddr, conn->type,
+>>>                                    conn->dst_type, 0, NULL, 0, NULL);
+>>> 
+>>> -     conn->sec_level = BT_SECURITY_LOW;
+>>>      conn->handle = __le16_to_cpu(ev->handle);
+>>>      conn->state = BT_CONNECTED;
+>> 
+>> All in all, I am not really understanding why this makes it this code simpler. I actually think it turns it into more complicated code. So please explain what we are really gaining here. I just see more hash table lookup and for hci_conn_add calls with more error checks.
+> 
+> When controller sends a LE Connection Complete event to host, we have
+> three different handling: failure, new master connection and new slave
+> connection. Additionally, new master connection has a special handling
+> since the connection could be triggered by HCI socket interface.
+> Before, all these logic were mixed up, making hard to add specific
+> code for new master connection for instance.
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 553b673..0e025ac 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -38,6 +38,7 @@ include $(CLEAR_VARS)
- 
- LOCAL_SRC_FILES := \
- 	hal_bluetooth.c \
-+	hal_bt_sock.c \
- 
- LOCAL_SHARED_LIBRARIES := \
- 	libcutils \
-diff --git a/android/hal_bt_sock.c b/android/hal_bt_sock.c
-new file mode 100644
-index 0000000..cbb42d1
---- /dev/null
-+++ b/android/hal_bt_sock.c
-@@ -0,0 +1,84 @@
-+/*
-+ * Copyright (C) 2013 Intel Corporation
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ *
-+ */
-+
-+#include <stdlib.h>
-+
-+#include <hardware/bluetooth.h>
-+#include <hardware/bt_sock.h>
-+
-+#define LOG_TAG "BlueZ"
-+#include <cutils/log.h>
-+
-+static bt_status_t btsock_listen_rfcomm(const char *service_name,
-+					const uint8_t *uuid, int chan,
-+					int *sock, int flags)
-+{
-+	ALOGD(__func__);
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t listen(btsock_type_t type, const char *service_name,
-+					const uint8_t *uuid, int chan,
-+					int *sock, int flags)
-+{
-+	if ((uuid == NULL && chan <= 0) || sock == NULL) {
-+		ALOGE("%s: invalid params: uuid %p, chan %d, sock %p",
-+						__func__, uuid, chan, sock);
-+		return BT_STATUS_PARM_INVALID;
-+	}
-+
-+	ALOGD("%s: uuid %p chan %d sock %p type %d service_name %s",
-+			__func__, uuid, chan, sock, type, service_name);
-+
-+	switch (type) {
-+	case BTSOCK_RFCOMM:
-+		return btsock_listen_rfcomm(service_name, uuid, chan,
-+								sock, flags);
-+	default:
-+		ALOGE("%s: Socket type %d not supported", __func__, type);
-+	}
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
-+					const uint8_t *uuid, int chan,
-+					int *sock, int flags)
-+{
-+	if ((uuid == NULL && chan <= 0) || bdaddr == NULL || sock == NULL) {
-+		ALOGE("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
-+					bdaddr, uuid, chan, sock);
-+		return BT_STATUS_PARM_INVALID;
-+	}
-+
-+	ALOGD("%s: uuid %p chan %d sock %p type %d", __func__, uuid, chan,
-+								sock, type);
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static btsock_interface_t btsock_if = {
-+	sizeof(btsock_if),
-+	listen,
-+	connect
-+};
-+
-+btsock_interface_t *bt_get_sock_interface(void)
-+{
-+	return &btsock_if;
-+}
--- 
-1.7.10.4
+I do not follow the difference between master and slave roles. Why do we have a difference here in the first place.
+
+> So this patch explicitly separates the three different handling and
+> adds extra comments aiming to improve hci_le_conn_complete_evt()
+> readability. Besides that, keeping these different handling separated,
+> it'll be easier to add the auto connection hooks.
+
+I am getting the feeling the overall code gets more complicated than simpler. The goal is to make the connection handling simpler. And right now, I do not see this.
+
+Regards
+
+Marcel
 
