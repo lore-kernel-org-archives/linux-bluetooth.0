@@ -1,172 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <E33B98BD-8E7D-4384-9893-29837A323066@holtmann.org>
+In-Reply-To: <CAJdJm_NoWi2ujbMW8vXbwfZpS56+HNtEm8s5N__yXTJjADTPhQ@mail.gmail.com>
 References: <1380668636-30654-1-git-send-email-andre.guedes@openbossa.org>
- <1380668636-30654-7-git-send-email-andre.guedes@openbossa.org> <E33B98BD-8E7D-4384-9893-29837A323066@holtmann.org>
+ <1380668636-30654-6-git-send-email-andre.guedes@openbossa.org> <CAJdJm_NoWi2ujbMW8vXbwfZpS56+HNtEm8s5N__yXTJjADTPhQ@mail.gmail.com>
 From: Andre Guedes <andre.guedes@openbossa.org>
-Date: Thu, 3 Oct 2013 11:06:05 -0300
-Message-ID: <CACJA=fUFak6t2tEc9oFLF0cu_pPOAxf-pY1L-UH1jsFYUU46wg@mail.gmail.com>
-Subject: Re: [PATCH 6/7] Bluetooth: Refactor LE Connection Complete HCI event handler
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 3 Oct 2013 11:04:56 -0300
+Message-ID: <CACJA=fVMZEkLuOjP8dAd6T5d_tSH49V-TqZ=yrLfJW4cc5nG9A@mail.gmail.com>
+Subject: Re: [PATCH 5/7] Bluetooth: Refactor hci_connect_le
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Lizardo,
 
-On Wed, Oct 2, 2013 at 2:21 AM, Marcel Holtmann <marcel@holtmann.org> wrote=
-:
+On Tue, Oct 1, 2013 at 9:05 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
 >
-> Hi Andre,
+> Hi Guedes,
 >
-> > This patch does some code refactorig in LE Connection Complete HCI
-> > event handler. It basically adds a switch statement to separate new
-> > master connection code from new slave connection code.
-> >
-> > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> > ---
-> > include/net/bluetooth/hci.h |  1 +
-> > net/bluetooth/hci_event.c   | 55 ++++++++++++++++++++++++++++++++------=
--------
-> > 2 files changed, 41 insertions(+), 15 deletions(-)
-> >
-> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > index 7ede266..8c98f60 100644
-> > --- a/include/net/bluetooth/hci.h
-> > +++ b/include/net/bluetooth/hci.h
-> > @@ -1442,6 +1442,7 @@ struct hci_ev_num_comp_blocks {
-> >
-> > /* Low energy meta events */
-> > #define LE_CONN_ROLE_MASTER   0x00
-> > +#define LE_CONN_ROLE_SLAVE   0x01
-> >
-> > #define HCI_EV_LE_CONN_COMPLETE               0x01
-> > struct hci_ev_le_conn_complete {
-> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > index 1d1ffa6..0e4a9f4 100644
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -3444,8 +3444,42 @@ static void hci_le_conn_complete_evt(struct hci_=
-dev *hdev, struct sk_buff *skb)
-> >
-> >       hci_dev_lock(hdev);
-> >
-> > -     conn =3D hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
-> > -     if (!conn) {
-> > +     if (ev->status) {
-> > +             conn =3D hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CON=
-NECT);
-> > +             if (!conn)
-> > +                     goto unlock;
-> > +
-> > +             mgmt_connect_failed(hdev, &conn->dst, conn->type,
-> > +                                 conn->dst_type, ev->status);
-> > +             hci_proto_connect_cfm(conn, ev->status);
-> > +             conn->state =3D BT_CLOSED;
-> > +             hci_conn_del(conn);
-> > +             goto unlock;
-> > +     }
-> > +
-> > +     switch (ev->role) {
-> > +     case LE_CONN_ROLE_MASTER:
-> > +             conn =3D hci_conn_hash_lookup_ba(hdev, LE_LINK, &ev->bdad=
-dr);
-> > +             /* If there is no hci_conn object with the given address,=
- it
-> > +              * means this new connection was triggered through HCI so=
-cket
-> > +              * interface. For that case, we should create a new hci_c=
-onn
-> > +              * object.
-> > +              */
+> On Tue, Oct 1, 2013 at 7:03 PM, Andre Guedes <andre.guedes@openbossa.org> wrote:
+> > +       /* If already exists a hci_conn object for the following connection
+> > +        * attempt, we simply update pending_sec_level and auth_type fields
+> > +        * and return the object found.
+> > +        */
 >
-> this comments belong one level down inside the if block. You already comm=
-enting on the negative outcome of the if check.
+> Small textual improvement: "If a hci_conn object already exists [...]"
 
-Ok, I'll fix it.
+I'll fix it.
 
 >
 >
-> > +             if (!conn) {
-> > +                     conn =3D hci_conn_add(hdev, LE_LINK, &ev->bdaddr)=
-;
-> > +                     if (!conn) {
-> > +                             BT_ERR("No memory for new connection");
-> > +                             goto unlock;
-> > +                     }
-> > +
-> > +                     conn->out =3D true;
-> > +                     conn->link_mode |=3D HCI_LM_MASTER;
-> > +                     conn->sec_level =3D BT_SECURITY_LOW;
-> > +                     conn->dst_type =3D ev->bdaddr_type;
-> > +             }
-> > +             break;
-> > +
-> > +     case LE_CONN_ROLE_SLAVE:
 >
-> And why are we not checking for an existing connection here? At least a s=
-mall comment is needed to make that part clear.
-
-Differently from master connection, there is no existing hci_conn for
-slave connections. For that reason we don't check for an existing
-connection here. I'll add a comment.
-
->
->
-> >               conn =3D hci_conn_add(hdev, LE_LINK, &ev->bdaddr);
-> >               if (!conn) {
-> >                       BT_ERR("No memory for new connection");
-> > @@ -3453,19 +3487,11 @@ static void hci_le_conn_complete_evt(struct hci=
-_dev *hdev, struct sk_buff *skb)
-> >               }
-> >
-> >               conn->dst_type =3D ev->bdaddr_type;
-> > +             conn->sec_level =3D BT_SECURITY_LOW;
-> > +             break;
-> >
-> > -             if (ev->role =3D=3D LE_CONN_ROLE_MASTER) {
-> > -                     conn->out =3D true;
-> > -                     conn->link_mode |=3D HCI_LM_MASTER;
-> > -             }
-> > -     }
+> >         le = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
+> > -       if (!le) {
+> > -               le = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
+> > -               if (le)
+> > -                       return ERR_PTR(-EBUSY);
 > > -
-> > -     if (ev->status) {
-> > -             mgmt_connect_failed(hdev, &conn->dst, conn->type,
-> > -                                 conn->dst_type, ev->status);
-> > -             hci_proto_connect_cfm(conn, ev->status);
-> > -             conn->state =3D BT_CLOSED;
-> > -             hci_conn_del(conn);
-> > +     default:
-> > +             BT_ERR("Used reserved Role parameter %d", ev->role);
-> >               goto unlock;
-> >       }
+> > -               le = hci_conn_add(hdev, LE_LINK, dst);
+> > -               if (!le)
+> > -                       return ERR_PTR(-ENOMEM);
+> > -
+> > -               le->dst_type = bdaddr_to_le(dst_type);
+> > -               le->state = BT_CONNECT;
+> > -               le->out = true;
+> > -               le->link_mode |= HCI_LM_MASTER;
+> > -               le->sec_level = BT_SECURITY_LOW;
+> > -
+> > -               err = hci_initiate_le_connection(hdev, &le->dst, le->dst_type);
+> > -               if (err) {
+> > -                       hci_conn_del(le);
+> > -                       return ERR_PTR(err);
+> > -               }
+> > +       if (le) {
+> > +               le->pending_sec_level = sec_level;
+> > +               le->auth_type = auth_type;
+> > +               goto out;
+> >         }
 > >
-> > @@ -3473,7 +3499,6 @@ static void hci_le_conn_complete_evt(struct hci_d=
-ev *hdev, struct sk_buff *skb)
-> >               mgmt_device_connected(hdev, &ev->bdaddr, conn->type,
-> >                                     conn->dst_type, 0, NULL, 0, NULL);
-> >
-> > -     conn->sec_level =3D BT_SECURITY_LOW;
-> >       conn->handle =3D __le16_to_cpu(ev->handle);
-> >       conn->state =3D BT_CONNECTED;
+> > -       le->pending_sec_level = sec_level;
+> > +       /* Since the controller supports only one LE connection attempt at the
+> > +        * time, we return busy if there is any connection attempt running.
+> > +        */
 >
-> All in all, I am not really understanding why this makes it this code sim=
-pler. I actually think it turns it into more complicated code. So please ex=
-plain what we are really gaining here. I just see more hash table lookup an=
-d for hci_conn_add calls with more error checks.
+> s/at the time/at a time/
+> s/busy/EBUSY/
 
-When controller sends a LE Connection Complete event to host, we have
-three different handling: failure, new master connection and new slave
-connection. Additionally, new master connection has a special handling
-since the connection could be triggered by HCI socket interface.
-Before, all these logic were mixed up, making hard to add specific
-code for new master connection for instance.
+I'll fix it.
 
-So this patch explicitly separates the three different handling and
-adds extra comments aiming to improve hci_le_conn_complete_evt()
-readability. Besides that, keeping these different handling separated,
-it'll be easier to add the auto connection hooks.
+>
+>
+>
+> > +       le = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
+> > +       if (le)
+> > +               return ERR_PTR(-EBUSY);
+> > +
+> > +       le = hci_conn_add(hdev, LE_LINK, dst);
+> > +       if (!le)
+> > +               return ERR_PTR(-ENOMEM);
+> > +
+> > +       le->dst_type = bdaddr_to_le(dst_type);
+> > +       le->state = BT_CONNECT;
+> > +       le->out = true;
+> > +       le->link_mode |= HCI_LM_MASTER;
+> > +       le->sec_level = BT_SECURITY_LOW;
+> > +       le->pending_sec_level = BT_SECURITY_LOW;
+>
+> I think the previous statement should be:
+>
+> le->pending_sec_level = sec_level;
+>
+> Otherwise, we are changing semantics.
 
-Regards,
+Yes, you're right. I'll fix this.
+
+>
+>
+> >         le->auth_type = auth_type;
+> >
+> > -       hci_conn_hold(le);
+> > +       err = hci_initiate_le_connection(hdev, &le->dst, le->dst_type);
+> > +       if (err) {
+> > +               hci_conn_del(le);
+> > +               return ERR_PTR(err);
+> > +       }
+> >
+> > +out:
+> > +       hci_conn_hold(le);
+> >         return le;
+> >  }
+
+Thanks for reviewing,
 
 Andre
