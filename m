@@ -1,46 +1,155 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 3 Oct 2013 16:19:35 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2013-10-03
-Message-ID: <20131003201935.GF3142@tuxdriver.com>
-References: <20131003174524.GA22728@joana>
+From: Bing Zhao <bzhao@marvell.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+        Gustavo Padovan
+	<gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        <linux-wireless@vger.kernel.org>,
+        Amitkumar Karwar <akarwar@marvell.com>, Bing Zhao <bzhao@marvell.com>
+Subject: [PATCH] Bluetooth: btmrvl: operate on 16-bit opcodes instead of ogf/ocf
+Date: Thu, 3 Oct 2013 11:23:20 -0700
+Message-ID: <1380824600-13655-1-git-send-email-bzhao@marvell.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20131003174524.GA22728@joana>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Oct 03, 2013 at 02:45:24PM -0300, Gustavo Padovan wrote:
-> Hi John,
-> 
-> A series of patches for 3.12. The big work here is from Marcel and Johan. They
-> did a lot of work in the L2CAP, HCI and MGMT layers. The most important ones
-> are the addition of a new MGMT command to enable/disable LE advertisement and
-> the introduction of the HCI user channel to allow applications to get directly
-> and exclusive access to Bluetooth devices.
-> 
-> Please pull, or let me know of any issues. Thanks!
-> 
-> 	Gustavo
-> 
-> --
-> The following changes since commit f4e1a4d3ecbb9e42bdf8e7869ee8a4ebfa27fb20:
-> 
->   rt2800: change initialization sequence to fix system freeze (2013-09-09 14:44:34 -0400)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next for-upstream
-> 
-> for you to fetch changes up to 4f3e219d95a3c31b916dcd5e2631c4e440736f79:
-> 
->   Bluetooth: Only one command per L2CAP LE signalling is supported (2013-10-03 16:09:59 +0300)
+Replace ogf/ocf and its packing with 16-bit opcodes.
 
-Pulling now...
+Signed-off-by: Bing Zhao <bzhao@marvell.com>
+Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+---
+ drivers/bluetooth/btmrvl_drv.h  | 19 +++++++++++--------
+ drivers/bluetooth/btmrvl_main.c | 21 +++++++++------------
+ 2 files changed, 20 insertions(+), 20 deletions(-)
 
+diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
+index f9d1833..e3b49c6 100644
+--- a/drivers/bluetooth/btmrvl_drv.h
++++ b/drivers/bluetooth/btmrvl_drv.h
+@@ -90,12 +90,12 @@ struct btmrvl_private {
+ 
+ #define MRVL_VENDOR_PKT			0xFE
+ 
+-/* Bluetooth commands  */
+-#define BT_CMD_AUTO_SLEEP_MODE		0x23
+-#define BT_CMD_HOST_SLEEP_CONFIG	0x59
+-#define BT_CMD_HOST_SLEEP_ENABLE	0x5A
+-#define BT_CMD_MODULE_CFG_REQ		0x5B
+-#define BT_CMD_LOAD_CONFIG_DATA		0x61
++/* Vendor specific Bluetooth commands */
++#define BT_CMD_AUTO_SLEEP_MODE		0xFC23
++#define BT_CMD_HOST_SLEEP_CONFIG	0xFC59
++#define BT_CMD_HOST_SLEEP_ENABLE	0xFC5A
++#define BT_CMD_MODULE_CFG_REQ		0xFC5B
++#define BT_CMD_LOAD_CONFIG_DATA		0xFC61
+ 
+ /* Sub-commands: Module Bringup/Shutdown Request/Response */
+ #define MODULE_BRINGUP_REQ		0xF1
+@@ -104,6 +104,11 @@ struct btmrvl_private {
+ 
+ #define MODULE_SHUTDOWN_REQ		0xF2
+ 
++/* Vendor specific Bluetooth events */
++#define BT_EVENT_AUTO_SLEEP_MODE	0x23
++#define BT_EVENT_HOST_SLEEP_CONFIG	0x59
++#define BT_EVENT_HOST_SLEEP_ENABLE	0x5A
++#define BT_EVENT_MODULE_CFG_REQ		0x5B
+ #define BT_EVENT_POWER_STATE		0x20
+ 
+ /* Bluetooth Power States */
+@@ -111,8 +116,6 @@ struct btmrvl_private {
+ #define BT_PS_DISABLE			0x03
+ #define BT_PS_SLEEP			0x01
+ 
+-#define OGF				0x3F
+-
+ /* Host Sleep states */
+ #define HS_ACTIVATED			0x01
+ #define HS_DEACTIVATED			0x00
+diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+index 6e7bd4e..b3dcb13 100644
+--- a/drivers/bluetooth/btmrvl_main.c
++++ b/drivers/bluetooth/btmrvl_main.c
+@@ -50,12 +50,10 @@ bool btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb)
+ 
+ 	if (hdr->evt == HCI_EV_CMD_COMPLETE) {
+ 		struct hci_ev_cmd_complete *ec;
+-		u16 opcode, ocf, ogf;
++		u16 opcode;
+ 
+ 		ec = (void *) (skb->data + HCI_EVENT_HDR_SIZE);
+ 		opcode = __le16_to_cpu(ec->opcode);
+-		ocf = hci_opcode_ocf(opcode);
+-		ogf = hci_opcode_ogf(opcode);
+ 
+ 		if (priv->btmrvl_dev.sendcmdflag) {
+ 			priv->btmrvl_dev.sendcmdflag = false;
+@@ -63,9 +61,8 @@ bool btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb)
+ 			wake_up_interruptible(&priv->adapter->cmd_wait_q);
+ 		}
+ 
+-		if (ogf == OGF) {
+-			BT_DBG("vendor event skipped: ogf 0x%4.4x ocf 0x%4.4x",
+-			       ogf, ocf);
++		if ((opcode & 0xfc00) == 0xfc00) {
++			BT_DBG("vendor event skipped: opcode=%#4.4x", opcode);
+ 			kfree_skb(skb);
+ 			return false;
+ 		}
+@@ -89,7 +86,7 @@ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb)
+ 	}
+ 
+ 	switch (event->data[0]) {
+-	case BT_CMD_AUTO_SLEEP_MODE:
++	case BT_EVENT_AUTO_SLEEP_MODE:
+ 		if (!event->data[2]) {
+ 			if (event->data[1] == BT_PS_ENABLE)
+ 				adapter->psmode = 1;
+@@ -102,7 +99,7 @@ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb)
+ 		}
+ 		break;
+ 
+-	case BT_CMD_HOST_SLEEP_CONFIG:
++	case BT_EVENT_HOST_SLEEP_CONFIG:
+ 		if (!event->data[3])
+ 			BT_DBG("gpio=%x, gap=%x", event->data[1],
+ 							event->data[2]);
+@@ -110,7 +107,7 @@ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb)
+ 			BT_DBG("HSCFG command failed");
+ 		break;
+ 
+-	case BT_CMD_HOST_SLEEP_ENABLE:
++	case BT_EVENT_HOST_SLEEP_ENABLE:
+ 		if (!event->data[1]) {
+ 			adapter->hs_state = HS_ACTIVATED;
+ 			if (adapter->psmode)
+@@ -121,7 +118,7 @@ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb)
+ 		}
+ 		break;
+ 
+-	case BT_CMD_MODULE_CFG_REQ:
++	case BT_EVENT_MODULE_CFG_REQ:
+ 		if (priv->btmrvl_dev.sendcmdflag &&
+ 				event->data[1] == MODULE_BRINGUP_REQ) {
+ 			BT_DBG("EVENT:%s",
+@@ -166,7 +163,7 @@ exit:
+ }
+ EXPORT_SYMBOL_GPL(btmrvl_process_event);
+ 
+-static int btmrvl_send_sync_cmd(struct btmrvl_private *priv, u16 cmd_no,
++static int btmrvl_send_sync_cmd(struct btmrvl_private *priv, u16 opcode,
+ 				const void *param, u8 len)
+ {
+ 	struct sk_buff *skb;
+@@ -179,7 +176,7 @@ static int btmrvl_send_sync_cmd(struct btmrvl_private *priv, u16 cmd_no,
+ 	}
+ 
+ 	hdr = (struct hci_command_hdr *)skb_put(skb, HCI_COMMAND_HDR_SIZE);
+-	hdr->opcode = cpu_to_le16(hci_opcode_pack(OGF, cmd_no));
++	hdr->opcode = cpu_to_le16(opcode);
+ 	hdr->plen = len;
+ 
+ 	if (len)
 -- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+1.8.0
