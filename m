@@ -1,55 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 3 Oct 2013 16:19:35 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2013-10-03
+Message-ID: <20131003201935.GF3142@tuxdriver.com>
+References: <20131003174524.GA22728@joana>
 MIME-Version: 1.0
-In-Reply-To: <1380824600-13655-1-git-send-email-bzhao@marvell.com>
-References: <1380824600-13655-1-git-send-email-bzhao@marvell.com>
-Date: Thu, 3 Oct 2013 16:34:11 -0400
-Message-ID: <CAJdJm_N1=a7URKmU8xOsOzOaYHKQdNXiR7VryeOc4+i2uf7RqQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btmrvl: operate on 16-bit opcodes instead of ogf/ocf
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Bing Zhao <bzhao@marvell.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-wireless@vger.kernel.org, Amitkumar Karwar <akarwar@marvell.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20131003174524.GA22728@joana>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bing,
+On Thu, Oct 03, 2013 at 02:45:24PM -0300, Gustavo Padovan wrote:
+> Hi John,
+> 
+> A series of patches for 3.12. The big work here is from Marcel and Johan. They
+> did a lot of work in the L2CAP, HCI and MGMT layers. The most important ones
+> are the addition of a new MGMT command to enable/disable LE advertisement and
+> the introduction of the HCI user channel to allow applications to get directly
+> and exclusive access to Bluetooth devices.
+> 
+> Please pull, or let me know of any issues. Thanks!
+> 
+> 	Gustavo
+> 
+> --
+> The following changes since commit f4e1a4d3ecbb9e42bdf8e7869ee8a4ebfa27fb20:
+> 
+>   rt2800: change initialization sequence to fix system freeze (2013-09-09 14:44:34 -0400)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next for-upstream
+> 
+> for you to fetch changes up to 4f3e219d95a3c31b916dcd5e2631c4e440736f79:
+> 
+>   Bluetooth: Only one command per L2CAP LE signalling is supported (2013-10-03 16:09:59 +0300)
 
-On Thu, Oct 3, 2013 at 2:23 PM, Bing Zhao <bzhao@marvell.com> wrote:
-> @@ -63,9 +61,8 @@ bool btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb)
->                         wake_up_interruptible(&priv->adapter->cmd_wait_q);
->                 }
->
-> -               if (ogf == OGF) {
-> -                       BT_DBG("vendor event skipped: ogf 0x%4.4x ocf 0x%4.4x",
-> -                              ogf, ocf);
-> +               if ((opcode & 0xfc00) == 0xfc00) {
-> +                       BT_DBG("vendor event skipped: opcode=%#4.4x", opcode);
+Pulling now...
 
-I think you could use "if (hci_opcode_ogf(opcode) == 0x3F)" to make it
-more readable.
-
-> @@ -166,7 +163,7 @@ exit:
->  }
->  EXPORT_SYMBOL_GPL(btmrvl_process_event);
->
-> -static int btmrvl_send_sync_cmd(struct btmrvl_private *priv, u16 cmd_no,
-> +static int btmrvl_send_sync_cmd(struct btmrvl_private *priv, u16 opcode,
->                                 const void *param, u8 len)
->  {
->         struct sk_buff *skb;
-> @@ -179,7 +176,7 @@ static int btmrvl_send_sync_cmd(struct btmrvl_private *priv, u16 cmd_no,
->         }
->
->         hdr = (struct hci_command_hdr *)skb_put(skb, HCI_COMMAND_HDR_SIZE);
-> -       hdr->opcode = cpu_to_le16(hci_opcode_pack(OGF, cmd_no));
-> +       hdr->opcode = cpu_to_le16(opcode);
-
-Are you sure the callers of btmrvl_send_sync_cmd() do not need to be
-changed to pass an opcode instead of just the OCF?
-
-Best Regards,
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
