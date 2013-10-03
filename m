@@ -1,62 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 00/14] Basic code for Android BlueZ
-Date: Thu,  3 Oct 2013 17:38:06 +0300
-Message-Id: <1380811100-30144-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv3 14/14] android: Add makefile for hcitool
+Date: Thu,  3 Oct 2013 17:38:20 +0300
+Message-Id: <1380811100-30144-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1380811100-30144-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1380811100-30144-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Skeletons for Android Bluetooth and Socket HALs and BlueZ daemon.
+---
+ android/Android.mk |   38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-Note: Still need rebase after patches from Frederic are applied.
-
-Changes:
-	* RFCv3: Rebased against recent FDanis patch set, fixed library build,
-	corrected process capabilities, corrected API header.
-	* RFCv2: Took comments from mailing list reviewers. Use single
-	makefile, remove mgmt library and directly link, remove adapter
-	code and use default_adapter pointer and other style changes.
-	Dropped some patches due to major changes.
-
-Andrei Emeltchenko (14):
-  android: Add Adapter Bluetooth HAL template
-  android: Add Socket Bluetooth HAL template
-  android: Enable Socket interface
-  android: Start Android Bluetooth daemon
-  android: Add basic mgmt initialization sequence
-  android: Create HAL API header skeleton
-  android: Add adapter and device struct for BlueZ daemon
-  android: Add Android Makefile for libbluetooth
-  android: sdp: Reuse BlueZ SDP server in Android
-  android: Add cap to bind to port < 1024
-  android: Implement read_info_complete callback
-  android: Handle mgmt changed events
-  android: Add makefile for hciconfig
-  android: Add makefile for hcitool
-
- Makefile.android        |    9 +-
- android/Android.mk      |  163 +++++++++++++++
- android/bt_adapter.c    |   59 ++++++
- android/bt_adapter.h    |   60 ++++++
- android/hal.h           |   18 ++
- android/hal_bluetooth.c |  411 +++++++++++++++++++++++++++++++++++++
- android/hal_bt_sock.c   |   84 ++++++++
- android/hal_msg.h       |  255 +++++++++++++++++++++++
- android/main.c          |  516 +++++++++++++++++++++++++++++++++++++++++++++++
- android/main.h          |   25 +++
- configure.ac            |    4 +
- 11 files changed, 1602 insertions(+), 2 deletions(-)
- create mode 100644 android/bt_adapter.c
- create mode 100644 android/bt_adapter.h
- create mode 100644 android/hal.h
- create mode 100644 android/hal_bluetooth.c
- create mode 100644 android/hal_bt_sock.c
- create mode 100644 android/hal_msg.h
- create mode 100644 android/main.h
-
+diff --git a/android/Android.mk b/android/Android.mk
+index 38f8f33..69a45eb 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -154,3 +154,41 @@ LOCAL_MODULE_TAGS := eng
+ LOCAL_MODULE := hciconfig
+ 
+ include $(BUILD_EXECUTABLE)
++
++#
++# hcitool
++#
++
++include $(CLEAR_VARS)
++
++LOCAL_SRC_FILES := \
++	../tools/hcitool.c \
++	../src/oui.c \
++
++LOCAL_C_INCLUDES := \
++	$(LOCAL_PATH)/../lib \
++	$(LOCAL_PATH)/../src \
++
++LOCAL_C_INCLUDES += \
++	$(call include-path-for, glib) \
++	$(call include-path-for, glib)/glib \
++
++LOCAL_CFLAGS := \
++	-DSTORAGEDIR=\"/tmp\" \
++	-DVERSION=\"$(BLUEZ_VERSION)\"
++
++# to suppress the "pointer of type 'void *' used in arithmetic" warning
++LOCAL_CFLAGS += -Wno-pointer-arith
++
++# to suppress the "warning: missing initializer near initialization.." warning
++LOCAL_CFLAGS += -Wno-missing-field-initializers
++
++LOCAL_SHARED_LIBRARIES := \
++	libbluetooth \
++	libglib \
++
++LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
++LOCAL_MODULE_TAGS := eng
++LOCAL_MODULE := hcitool
++
++include $(BUILD_EXECUTABLE)
 -- 
 1.7.10.4
 
