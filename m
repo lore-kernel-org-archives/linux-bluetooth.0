@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 09/14] android: sdp: Reuse BlueZ SDP server in Android
-Date: Thu,  3 Oct 2013 17:38:15 +0300
-Message-Id: <1380811100-30144-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv3 01/14] android: Add Adapter Bluetooth HAL template
+Date: Thu,  3 Oct 2013 17:38:07 +0300
+Message-Id: <1380811100-30144-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1380811100-30144-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1380811100-30144-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,177 +11,394 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Reuse existing SDP server code in Android GPL daemon.
+Add template for bluetooth.h Android HAL.
 ---
- Makefile.android     |    7 +++++--
- android/Android.mk   |    7 +++++++
- android/bt_adapter.c |    5 ++++-
- android/main.c       |   27 +++++++++++++++++++++++++++
- android/main.h       |   25 +++++++++++++++++++++++++
- 5 files changed, 68 insertions(+), 3 deletions(-)
- create mode 100644 android/main.h
+ android/Android.mk      |   19 +++
+ android/hal_bluetooth.c |  348 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 367 insertions(+)
+ create mode 100644 android/hal_bluetooth.c
 
-diff --git a/Makefile.android b/Makefile.android
-index 9a2c486..d576b52 100644
---- a/Makefile.android
-+++ b/Makefile.android
-@@ -2,9 +2,12 @@ if ANDROID
- noinst_PROGRAMS += android/bluetoothd
- 
- android_bluetoothd_SOURCES = android/main.c src/log.c \
-+				src/sdpd-database.c src/sdpd-server.c \
-+				src/sdpd-service.c src/sdpd-request.c \
- 				src/shared/util.h src/shared/util.c \
--				src/shared/mgmt.h src/shared/mgmt.c
--android_bluetoothd_LDADD = @GLIB_LIBS@
-+				src/shared/mgmt.h src/shared/mgmt.c \
-+				android/bt_adapter.h android/bt_adapter.c
-+android_bluetoothd_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
- endif
- 
- EXTRA_DIST += android/Android.mk android/log.c
 diff --git a/android/Android.mk b/android/Android.mk
-index 115a9d7..5ac68ba 100644
+index ec820ac..553b673 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -17,6 +17,11 @@ LOCAL_SRC_FILES := \
- 	log.c \
- 	../src/shared/mgmt.c \
- 	../src/shared/util.c \
-+	bt_adapter.c \
-+	../src/sdpd-database.c \
-+	../src/sdpd-service.c \
-+	../src/sdpd-request.c \
-+	../src/sdpd-server.c \
- 
- LOCAL_C_INCLUDES := \
- 	$(call include-path-for, glib) \
-@@ -25,6 +30,7 @@ LOCAL_C_INCLUDES := \
- LOCAL_C_INCLUDES += \
- 	$(LOCAL_PATH)/../ \
- 	$(LOCAL_PATH)/../src \
-+	$(LOCAL_PATH)/../lib \
- 
- LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
- 
-@@ -36,6 +42,7 @@ LOCAL_CFLAGS += -DSOCK_CLOEXEC=02000000 -DSOCK_NONBLOCK=04000
- 
- LOCAL_SHARED_LIBRARIES := \
- 	libglib \
-+	libbluetooth \
- 
+@@ -29,3 +29,22 @@ LOCAL_SHARED_LIBRARIES := \
  LOCAL_MODULE := bluetoothd
- LOCAL_REQUIRED_MODULES := libbluetooth
-diff --git a/android/bt_adapter.c b/android/bt_adapter.c
-index e21d50c..5016243 100644
---- a/android/bt_adapter.c
-+++ b/android/bt_adapter.c
-@@ -23,6 +23,7 @@
  
- #include "bt_adapter.h"
- #include "log.h"
-+#include "main.h"
- #include "src/shared/mgmt.h"
- 
- struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if)
-@@ -45,7 +46,7 @@ void adapter_start(struct bt_adapter *adapter)
- 
- 	/* TODO: CB: report scan mode */
- 
--	/* TODO: SDP start here */
-+	sdp_start();
- 
- 	/* TODO: CB: report state on */
- }
-@@ -53,4 +54,6 @@ void adapter_start(struct bt_adapter *adapter)
- void adapter_stop(struct bt_adapter *adapter)
- {
- 	DBG("disabled %u", adapter->dev_id);
+ include $(BUILD_EXECUTABLE)
 +
-+	sdp_stop();
- }
-diff --git a/android/main.c b/android/main.c
-index ae31f65..cbbeabc 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -36,6 +36,9 @@
- #include <glib.h>
- 
- #include "log.h"
-+#include "hcid.h"
-+#include "sdpd.h"
-+#include "main.h"
- 
- #include "lib/bluetooth.h"
- #include "lib/mgmt.h"
-@@ -43,12 +46,36 @@
- 
- #define SHUTDOWN_GRACE_SECONDS 10
- 
-+struct main_opts main_opts;
++#
++# bluetooth.default.so HAL
++#
 +
- static GMainLoop *event_loop;
- static struct mgmt *mgmt_if = NULL;
- 
- static uint8_t mgmt_version = 0;
- static uint8_t mgmt_revision = 0;
- 
-+int sdp_start(void)
-+{
-+	DBG("");
++include $(CLEAR_VARS)
 +
-+	/* TODO: add logic */
++LOCAL_SRC_FILES := \
++	hal_bluetooth.c \
 +
-+	/* sdpd-server use these settings */
-+	memset(&main_opts, 0, sizeof(main_opts));
++LOCAL_SHARED_LIBRARIES := \
++	libcutils \
 +
-+	/* Use params: mtu = 0, flags = 0 */
-+	return start_sdp_server(0, 0);
-+}
++LOCAL_MODULE := bluetooth.default
++LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
++LOCAL_MODULE_TAGS := optional
++LOCAL_MODULE_CLASS := SHARED_LIBRARIES
 +
-+void sdp_stop(void)
-+{
-+	DBG("");
-+
-+	/* TODO: add logic */
-+
-+	stop_sdp_server();
-+}
-+
- static gboolean quit_eventloop(gpointer user_data)
- {
- 	g_main_loop_quit(event_loop);
-diff --git a/android/main.h b/android/main.h
++include $(BUILD_SHARED_LIBRARY)
+diff --git a/android/hal_bluetooth.c b/android/hal_bluetooth.c
 new file mode 100644
-index 0000000..6ecad14
+index 0000000..9970374
 --- /dev/null
-+++ b/android/main.h
-@@ -0,0 +1,25 @@
++++ b/android/hal_bluetooth.c
+@@ -0,0 +1,348 @@
 +/*
++ * Copyright (C) 2013 Intel Corporation
 + *
-+ *  BlueZ - Bluetooth protocol stack for Linux
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
 + *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *      http://www.apache.org/licenses/LICENSE-2.0
 + *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
 + *
 + */
 +
-+int sdp_start(void);
-+void sdp_stop(void);
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <stdbool.h>
++
++#include <hardware/bluetooth.h>
++
++#define LOG_TAG "BlueZ"
++#include <cutils/log.h>
++
++bt_callbacks_t *bt_hal_cbacks = NULL;
++
++static bool interface_ready(void)
++{
++	return bt_hal_cbacks != NULL;
++}
++
++static int init(bt_callbacks_t *callbacks)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == true)
++		return BT_STATUS_SUCCESS;
++
++	/* store reference to user callbacks */
++	bt_hal_cbacks = callbacks;
++
++	/* TODO: Init here bluezd task */
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int enable(void)
++{
++	ALOGD(__func__);
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int disable(void)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static void cleanup(void)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return;
++
++	bt_hal_cbacks = NULL;
++}
++
++static int get_adapter_properties(void)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int get_adapter_property(bt_property_type_t type)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int set_adapter_property(const bt_property_t *property)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	if (property == NULL)
++		return BT_STATUS_PARM_INVALID;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int get_remote_device_properties(bt_bdaddr_t *remote_addr)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int get_remote_device_property(bt_bdaddr_t *remote_addr,
++						bt_property_type_t type)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int set_remote_device_property(bt_bdaddr_t *remote_addr,
++						const bt_property_t *property)
++{
++	ALOGD(__func__);
++
++	/* sanity check */
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int get_remote_service_record(bt_bdaddr_t *remote_addr, bt_uuid_t *uuid)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int get_remote_services(bt_bdaddr_t *remote_addr)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int start_discovery(void)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int cancel_discovery(void)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int create_bond(const bt_bdaddr_t *bd_addr)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	if (bd_addr == NULL)
++		return BT_STATUS_PARM_INVALID;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int cancel_bond(const bt_bdaddr_t *bd_addr)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int remove_bond(const bt_bdaddr_t *bd_addr)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int pin_reply(const bt_bdaddr_t *bd_addr, uint8_t accept,
++				uint8_t pin_len, bt_pin_code_t *pin_code)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int ssp_reply(const bt_bdaddr_t *bd_addr, bt_ssp_variant_t variant,
++					uint8_t accept, uint32_t passkey)
++{
++
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	if (bd_addr == NULL)
++		return BT_STATUS_PARM_INVALID;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static const void *get_profile_interface(const char *profile_id)
++{
++	ALOGD("%s: %s", __func__, profile_id);
++
++	if (interface_ready() == false)
++		return NULL;
++
++	return NULL;
++}
++
++static int dut_mode_configure(uint8_t enable)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int dut_mode_send(uint16_t opcode, uint8_t *buf, uint8_t len)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++/**
++ * HAL Interface declaration
++ */
++static const bt_interface_t bluetooth_if = {
++	sizeof(bt_interface_t),
++	init,
++	enable,
++	disable,
++	cleanup,
++	get_adapter_properties,
++	get_adapter_property,
++	set_adapter_property,
++	get_remote_device_properties,
++	get_remote_device_property,
++	set_remote_device_property,
++	get_remote_service_record,
++	get_remote_services,
++	start_discovery,
++	cancel_discovery,
++	create_bond,
++	remove_bond,
++	cancel_bond,
++	pin_reply,
++	ssp_reply,
++	get_profile_interface,
++	dut_mode_configure,
++	dut_mode_send
++};
++
++static const bt_interface_t *get_bluetooth_interface(void)
++{
++	ALOGD(__func__);
++
++	return &bluetooth_if;
++}
++
++static int close_bluetooth(struct hw_device_t *device)
++{
++	ALOGD(__func__);
++
++	cleanup();
++
++	return 0;
++}
++
++static int open_bluetooth(const struct hw_module_t *module, char const *name,
++					struct hw_device_t **device)
++{
++	bluetooth_device_t *dev = malloc(sizeof(bluetooth_device_t));
++
++	ALOGD(__func__);
++
++	memset(dev, 0, sizeof(bluetooth_device_t));
++	dev->common.tag = HARDWARE_DEVICE_TAG;
++	dev->common.version = 0;
++	dev->common.module = (struct hw_module_t *) module;
++	dev->common.close = close_bluetooth;
++	dev->get_bluetooth_interface = get_bluetooth_interface;
++
++	*device = (struct hw_device_t *) dev;
++
++	return 0;
++}
++
++static struct hw_module_methods_t bluetooth_module_methods = {
++	.open = open_bluetooth,
++};
++
++struct hw_module_t HAL_MODULE_INFO_SYM = {
++	.tag = HARDWARE_MODULE_TAG,
++	.version_major = 1,
++	.version_minor = 0,
++	.id = BT_HARDWARE_MODULE_ID,
++	.name = "BlueZ Bluetooth stack",
++	.author = "Intel Corporation",
++	.methods = &bluetooth_module_methods
++};
 -- 
 1.7.10.4
 
