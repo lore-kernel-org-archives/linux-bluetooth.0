@@ -1,53 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Giovanni Campagna <scampa.giovanni@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] hid2hci: fix regression in /dev format after moving away from libusb
-Date: Thu,  3 Oct 2013 13:03:49 +0200
-Message-Id: <1380798229-4319-1-git-send-email-scampa.giovanni@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 3 Oct 2013 13:08:24 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Check minimum length of SMP packets
+Message-ID: <20131003100824.GB7519@x220.p-661hnu-f1>
+References: <1380788588-7897-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1380788588-7897-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Giovanni Campagna <gcampagna@src.gnome.org>
+Hi Marcel,
 
-The paths under /dev, in the default udev configuration, are formatted
-with two leading zeros, but the number obtained from sysfs don't have
-them, so we must convert them to integers and reformat them.
----
- tools/hid2hci.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+On Thu, Oct 03, 2013, Marcel Holtmann wrote:
+> When SMP packets are received, make sure they contain at least 1 byte
+> header for the opcode. If not, drop the packet and disconnect the link.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/smp.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/tools/hid2hci.c b/tools/hid2hci.c
-index bb8a521..95b4abf 100644
---- a/tools/hid2hci.c
-+++ b/tools/hid2hci.c
-@@ -221,18 +221,21 @@ static int usb_switch_dell(int fd, enum mode mode)
- static int find_device(struct udev_device *udev_dev)
- {
- 	char path[PATH_MAX];
--	const char *busnum, *devnum;
-+	const char *busnum_str, *devnum_str;
-+	int busnum, devnum;
- 	int fd;
- 
--	busnum = udev_device_get_sysattr_value(udev_dev, "busnum");
--	if (!busnum)
-+	busnum_str = udev_device_get_sysattr_value(udev_dev, "busnum");
-+	if (!busnum_str)
- 		return -1;
-+	busnum = strtol(busnum_str, NULL, 10);
- 
--	devnum = udev_device_get_sysattr_value(udev_dev, "devnum");
--	if (!devnum)
-+	devnum_str = udev_device_get_sysattr_value(udev_dev, "devnum");
-+	if (!devnum_str)
- 		return -1;
-+	devnum = strtol(devnum_str, NULL, 10);
- 
--	snprintf(path, sizeof(path), "/dev/bus/usb/%s/%s", busnum, devnum);
-+	snprintf(path, sizeof(path), "/dev/bus/usb/%03d/%03d", busnum, devnum);
- 
- 	fd = open(path, O_RDWR, O_CLOEXEC);
- 	if (fd < 0) {
--- 
-1.8.3.1
+Applied to bluetooth-next. Thanks.
 
+Johan
