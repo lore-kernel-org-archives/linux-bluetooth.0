@@ -1,64 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <A1F8B46C-982C-4C37-8730-5993D28F324E@holtmann.org>
-References: <1380668636-30654-1-git-send-email-andre.guedes@openbossa.org>
- <1380668636-30654-2-git-send-email-andre.guedes@openbossa.org> <A1F8B46C-982C-4C37-8730-5993D28F324E@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-Date: Thu, 3 Oct 2013 11:03:14 -0300
-Message-ID: <CACJA=fVcO=Jy1mxnp1ntHiTjP8H2wsdECASP3MUd-+cR+OU3Og@mail.gmail.com>
-Subject: Re: [PATCH 1/7] Bluetooth: Initialize hci_conn fields in hci_connect_le
-To: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1380032167-6440-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+References: <1380032167-6440-1-git-send-email-christian.fetzer@oss.bmw-carit.de>
+Date: Thu, 3 Oct 2013 16:53:34 +0300
+Message-ID: <CABBYNZKrhU30qoVnq7AGr8wvdObfxv1Vb6S3Y9znT22QZV+FQg@mail.gmail.com>
+Subject: Re: [PATCH 0/7] MAP notification API
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Christian Fetzer <christian.fetzer@oss.bmw-carit.de>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Christian,
 
-On Wed, Oct 2, 2013 at 1:57 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+On Tue, Sep 24, 2013 at 5:16 PM, Christian Fetzer
+<christian.fetzer@oss.bmw-carit.de> wrote:
+> From: Christian Fetzer <christian.fetzer@bmw-carit.de>
 >
-> Hi Andre,
+> This patchset adds the event handlers for new message, message shift/deleted
+> and message status update events.
 >
-> > This patch moves some hci_conn fields initialization from hci_le_
-> > create_connection() to hci_connect_le(). It makes more sense to
-> > initialize these fields within the function that creates the hci_
-> > conn object.
-> >
-> > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> > ---
-> > net/bluetooth/hci_conn.c | 10 +++++-----
-> > 1 file changed, 5 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> > index d2380e0..f473605 100644
-> > --- a/net/bluetooth/hci_conn.c
-> > +++ b/net/bluetooth/hci_conn.c
-> > @@ -54,11 +54,6 @@ static void hci_le_create_connection(struct hci_conn *conn)
-> >       struct hci_dev *hdev = conn->hdev;
-> >       struct hci_cp_le_create_conn cp;
-> >
-> > -     conn->state = BT_CONNECT;
-> > -     conn->out = true;
-> > -     conn->link_mode |= HCI_LM_MASTER;
-> > -     conn->sec_level = BT_SECURITY_LOW;
-> > -
-> >       memset(&cp, 0, sizeof(cp));
-> >       cp.scan_interval = __constant_cpu_to_le16(0x0060);
-> >       cp.scan_window = __constant_cpu_to_le16(0x0030);
-> > @@ -565,6 +560,11 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
-> >                       return ERR_PTR(-ENOMEM);
-> >
-> >               le->dst_type = bdaddr_to_le(dst_type);
-> > +             le->state = BT_CONNECT;
-> > +             le->out = true;
-> > +             le->link_mode |= HCI_LM_MASTER;
-> > +             le->sec_level = BT_SECURITY_LOW;
-> > +
-> >               hci_le_create_connection(le);
-> >       }
+> New messages are signaled by registering a corresponding message event, that
+> is announced using the ObjectManager.
 >
-> I do not understand on how this is the same. Maybe the confusion is the use of le-> instead of conn-> as variable for hci_conn. Seems that should be fixed first.
+> For moved / deleted messages:
+>   - If we have the Message interface, we simply update property 'Folder'.
+>   - If the message was moved into the current folder, we register its
+>     Message interface.
+>
+> The status update events change the property 'Status'.
+>
+> Note that this patchset depends on the changed map_msg_create function from
+> 'obexd: Fix setting message folder' sent on 23.09.2013.
+>
+> Christian Fetzer (7):
+>   obexd: Handle new message event
+>   obexd: Add function set_reception_status to MAP client
+>   obexd: Handle message status events
+>   obexd: Update Status property in map documentation
+>   obexd: Add function set_folder to MAP client
+>   obexd: Handle message shift and message deleted events
+>   obexd: Prefix folders in event reports with leading slash
+>
+>  doc/obex-api.txt   | 10 ++++--
+>  obexd/client/map.c | 99 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  obexd/client/mns.c | 16 +++++++--
+>  3 files changed, 120 insertions(+), 5 deletions(-)
+>
+> --
+> 1.8.3.4
 
-Yes, I don't really like le-> either. I'll replace le-> by conn-> in
-this function in a first patch.
+After quite a few changes here and there I pushed this set, note some
+things I just ignored for now such as message not know changing
+location, if you provide a good explanation I can consider adding it
+back but it should probably be done in a separate patch.
 
-Andre
+
+-- 
+Luiz Augusto von Dentz
