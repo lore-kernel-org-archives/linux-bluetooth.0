@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 07/14] android: Add adapter and device struct for BlueZ daemon
-Date: Thu,  3 Oct 2013 17:38:13 +0300
-Message-Id: <1380811100-30144-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv3 08/14] android: Add Android Makefile for libbluetooth
+Date: Thu,  3 Oct 2013 17:38:14 +0300
+Message-Id: <1380811100-30144-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1380811100-30144-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1380811100-30144-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,143 +11,79 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Adapter structure in BlueZ daemon keeps track of default adapter
-and device structure keeps track about found devices.
+Build libbluetooth library for Android.
 ---
- android/bt_adapter.c |   56 ++++++++++++++++++++++++++++++++++++++++++++++
- android/bt_adapter.h |   60 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 116 insertions(+)
- create mode 100644 android/bt_adapter.c
- create mode 100644 android/bt_adapter.h
+ android/Android.mk |   53 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
 
-diff --git a/android/bt_adapter.c b/android/bt_adapter.c
-new file mode 100644
-index 0000000..e21d50c
---- /dev/null
-+++ b/android/bt_adapter.c
-@@ -0,0 +1,56 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
+diff --git a/android/Android.mk b/android/Android.mk
+index ab11bd1..115a9d7 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -38,6 +38,7 @@ LOCAL_SHARED_LIBRARIES := \
+ 	libglib \
+ 
+ LOCAL_MODULE := bluetoothd
++LOCAL_REQUIRED_MODULES := libbluetooth
+ 
+ include $(BUILD_EXECUTABLE)
+ 
+@@ -60,3 +61,55 @@ LOCAL_MODULE_TAGS := optional
+ LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+ 
+ include $(BUILD_SHARED_LIBRARY)
 +
-+#include "bt_adapter.h"
-+#include "log.h"
-+#include "src/shared/mgmt.h"
++#
++# libbluetooth library
++#
 +
-+struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if)
-+{
-+	struct bt_adapter *adapter;
++include $(CLEAR_VARS)
 +
-+	adapter = g_try_new0(struct bt_adapter, 1);
-+	if (!adapter)
-+		return NULL;
++LOCAL_SRC_FILES := \
++	../lib/bluetooth.c \
++	../lib/sdp.c \
++	../lib/hci.c \
++	../lib/uuid.c \
 +
-+	adapter->dev_id = index;
-+	adapter->mgmt = mgmt_ref(mgmt_if);
++LOCAL_C_INCLUDES := \
++	$(LOCAL_PATH)/../lib/ \
++	$(LOCAL_PATH)/../src/shared \
 +
-+	return adapter;
-+}
++LOCAL_C_INCLUDES += \
++	$(call include-path-for, glib) \
++	$(call include-path-for, glib)/glib \
 +
-+void adapter_start(struct bt_adapter *adapter)
-+{
-+	DBG("enabled %u", adapter->dev_id);
++LOCAL_CFLAGS += -O3
 +
-+	/* TODO: CB: report scan mode */
++# to suppress the "pointer of type 'void *' used in arithmetic" warning
++LOCAL_CFLAGS += -Wno-pointer-arith
 +
-+	/* TODO: SDP start here */
++# to suppress the "missing initializer near initialization" warning
++LOCAL_CFLAGS += -Wno-missing-field-initializers
 +
-+	/* TODO: CB: report state on */
-+}
++# Define missing flags for Android 4.2
++LOCAL_CFLAGS += -DSOCK_CLOEXEC=02000000 -DSOCK_NONBLOCK=04000
 +
-+void adapter_stop(struct bt_adapter *adapter)
-+{
-+	DBG("disabled %u", adapter->dev_id);
-+}
-diff --git a/android/bt_adapter.h b/android/bt_adapter.h
-new file mode 100644
-index 0000000..6877cc7
---- /dev/null
-+++ b/android/bt_adapter.h
-@@ -0,0 +1,60 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
++lib_headers := \
++	bluetooth.h \
++	hci.h \
++	hci_lib.h \
++	sco.h \
++	l2cap.h \
++	sdp.h \
++	sdp_lib.h \
++	rfcomm.h \
++	bnep.h \
++	cmtp.h \
++	hidp.h \
 +
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <glib.h>
++$(shell mkdir -p $(LOCAL_PATH)/../lib/bluetooth)
 +
-+#include "lib/bluetooth.h"
++$(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(LOCAL_PATH)/../lib/bluetooth/$(file)))
 +
-+struct bt_device {
-+	int refcnt;
++LOCAL_MODULE := libbluetooth
 +
-+	bdaddr_t bdaddr;
-+	uint8_t bdaddr_type;
-+	uint32_t cod;
-+	char *name;
-+};
-+
-+struct bt_adapter {
-+	int refcnt;
-+
-+	uint16_t dev_id;
-+	struct mgmt *mgmt;
-+	bdaddr_t bdaddr;
-+	uint32_t dev_class;
-+
-+	char *name;
-+	char *short_name;
-+
-+	uint32_t supported_settings;
-+	uint32_t current_settings;
-+
-+	GList *found_devices;
-+};
-+
-+struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if);
-+
-+void adapter_start(struct bt_adapter *adapter);
-+void adapter_stop(struct bt_adapter *adapter);
++include $(BUILD_SHARED_LIBRARY)
 -- 
 1.7.10.4
 
