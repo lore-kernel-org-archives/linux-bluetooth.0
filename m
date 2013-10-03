@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv3 08/14] android: Add Android Makefile for libbluetooth
-Date: Thu,  3 Oct 2013 17:38:14 +0300
-Message-Id: <1380811100-30144-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv3 11/14] android: Implement read_info_complete callback
+Date: Thu,  3 Oct 2013 17:38:17 +0300
+Message-Id: <1380811100-30144-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1380811100-30144-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1380811100-30144-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,79 +11,154 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Build libbluetooth library for Android.
+Handle read info complete callback from mgmt interface.
 ---
- android/Android.mk |   53 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+ android/main.c |  102 +++++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 90 insertions(+), 12 deletions(-)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index ab11bd1..115a9d7 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -38,6 +38,7 @@ LOCAL_SHARED_LIBRARIES := \
- 	libglib \
+diff --git a/android/main.c b/android/main.c
+index 2221618..ffa22ec 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -55,6 +55,7 @@
+ #include "hcid.h"
+ #include "sdpd.h"
+ #include "main.h"
++#include "bt_adapter.h"
  
- LOCAL_MODULE := bluetoothd
-+LOCAL_REQUIRED_MODULES := libbluetooth
+ #include "lib/bluetooth.h"
+ #include "lib/mgmt.h"
+@@ -70,6 +71,8 @@ static struct mgmt *mgmt_if = NULL;
+ static uint8_t mgmt_version = 0;
+ static uint8_t mgmt_revision = 0;
  
- include $(BUILD_EXECUTABLE)
++struct bt_adapter *default_adapter = NULL;
++
+ int sdp_start(void)
+ {
+ 	DBG("");
+@@ -144,34 +147,109 @@ static GOptionEntry options[] = {
+ 	{ NULL }
+ };
  
-@@ -60,3 +61,55 @@ LOCAL_MODULE_TAGS := optional
- LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+-static void read_info_complete(uint8_t status, uint16_t length,
++static void load_link_keys_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+-	/* TODO: Store Controller information */
+-
+-	/**
+-	 * Register all event notification handlers for controller.
+-	 *
+-	 * The handlers are registered after a succcesful read of the
+-	 * controller info. From now on they can track updates and
+-	 * notifications.
+-	 */
++	DBG("status %u", status);
+ }
  
- include $(BUILD_SHARED_LIBRARY)
++static void load_link_keys(struct bt_adapter *adapter, GSList *keys)
++{
++	struct mgmt_cp_load_link_keys *cp;
++	uint16_t key_len = g_slist_length(keys);
++	struct mgmt_link_key_info *key;
++	uint16_t len;
 +
-+#
-+# libbluetooth library
-+#
++	DBG("");
 +
-+include $(CLEAR_VARS)
++	len = sizeof(*cp) + key_len * sizeof(*key);
++	cp = malloc(len);
++	if (cp == NULL) {
++		error("%s: Not enough memory for link keys loading", __func__);
++		return;
++	}
 +
-+LOCAL_SRC_FILES := \
-+	../lib/bluetooth.c \
-+	../lib/sdp.c \
-+	../lib/hci.c \
-+	../lib/uuid.c \
++	cp->debug_keys = 0;
++	cp->key_count = htobs(key_len);
 +
-+LOCAL_C_INCLUDES := \
-+	$(LOCAL_PATH)/../lib/ \
-+	$(LOCAL_PATH)/../src/shared \
++	mgmt_send(adapter->mgmt, MGMT_OP_LOAD_LINK_KEYS, adapter->dev_id, len,
++				cp, load_link_keys_complete, adapter, NULL);
 +
-+LOCAL_C_INCLUDES += \
-+	$(call include-path-for, glib) \
-+	$(call include-path-for, glib)/glib \
++	free(cp);
++}
 +
-+LOCAL_CFLAGS += -O3
++static void read_info_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	const struct mgmt_rp_read_info *rp = param;
 +
-+# to suppress the "pointer of type 'void *' used in arithmetic" warning
-+LOCAL_CFLAGS += -Wno-pointer-arith
++	DBG("");
 +
-+# to suppress the "missing initializer near initialization" warning
-+LOCAL_CFLAGS += -Wno-missing-field-initializers
++	if (status != MGMT_STATUS_SUCCESS) {
++		error("Failed to read info for index %u: %s (0x%02x)",
++			default_adapter->dev_id, mgmt_errstr(status), status);
++		goto failed;
++	}
 +
-+# Define missing flags for Android 4.2
-+LOCAL_CFLAGS += -DSOCK_CLOEXEC=02000000 -DSOCK_NONBLOCK=04000
++	if (length < sizeof(*rp)) {
++		error("Too small read info complete response");
++		goto failed;
++	}
 +
-+lib_headers := \
-+	bluetooth.h \
-+	hci.h \
-+	hci_lib.h \
-+	sco.h \
-+	l2cap.h \
-+	sdp.h \
-+	sdp_lib.h \
-+	rfcomm.h \
-+	bnep.h \
-+	cmtp.h \
-+	hidp.h \
++	if (bacmp(&rp->bdaddr, BDADDR_ANY) == 0) {
++		error("No Bluetooth address for index %u",
++						default_adapter->dev_id);
++		goto failed;
++	}
 +
-+$(shell mkdir -p $(LOCAL_PATH)/../lib/bluetooth)
++	/* Store adapter information */
++	bacpy(&default_adapter->bdaddr, &rp->bdaddr);
++	default_adapter->dev_class = rp->dev_class[0] |
++						(rp->dev_class[1] << 8) |
++						(rp->dev_class[2] << 16);
++	default_adapter->name = g_strdup((const char *) rp->name);
++	default_adapter->short_name = g_strdup((const char *) rp->short_name);
 +
-+$(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(LOCAL_PATH)/../lib/bluetooth/$(file)))
++	default_adapter->supported_settings = btohs(rp->supported_settings);
++	default_adapter->current_settings = btohs(rp->current_settings);
 +
-+LOCAL_MODULE := libbluetooth
++	/* TODO: Register all event notification handlers */
 +
-+include $(BUILD_SHARED_LIBRARY)
++	if (default_adapter->current_settings & MGMT_SETTING_POWERED)
++		adapter_start(default_adapter);
++
++	/* dummy link keys loading */
++	load_link_keys(default_adapter, NULL);
++
++	return;
++
++failed:
++	default_adapter = NULL;
++}
+ 
+ static void mgmt_index_added_event(uint16_t index, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+ 	info("%s: index %u", __func__, index);
+ 
++	if (default_adapter == NULL) {
++		DBG("skip event for index %d", index);
++		return;
++	}
++
++	default_adapter = bt_adapter_new(index, mgmt_if);
++	if (default_adapter == NULL) {
++		error("Unable to create new adapter for index %u", index);
++		return;
++	}
++
+ 	DBG("sending read info command for index %u", index);
+ 
+ 	if (mgmt_send(mgmt_if, MGMT_OP_READ_INFO, index, 0, NULL,
+-					read_info_complete, NULL, NULL) > 0)
++				read_info_complete, NULL, NULL) > 0)
+ 		return;
+ 
+ 	error("Failed to read adapter info for index %u", index);
+-
+ }
+ 
+ static void mgmt_index_removed_event(uint16_t index, uint16_t length,
 -- 
 1.7.10.4
 
