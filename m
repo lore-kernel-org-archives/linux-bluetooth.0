@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Restrict SSP setting changes to BR/EDR enabled controllers
-Date: Wed,  2 Oct 2013 21:31:52 -0700
-Message-Id: <1380774712-13370-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Restrict SSP setting changes to BR/EDR enabled controllers
+Date: Wed,  2 Oct 2013 21:29:37 -0700
+Message-Id: <1380774577-13176-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -16,14 +16,14 @@ controller the not supported error message is now returned.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ net/bluetooth/mgmt.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 03fca4c..e93d19a 100644
+index 03fca4c..d15a184 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1296,11 +1296,15 @@ static int set_ssp(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+@@ -1296,11 +1296,16 @@ static int set_ssp(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
  {
  	struct mgmt_mode *cp = data;
  	struct pending_cmd *cmd;
@@ -35,7 +35,8 @@ index 03fca4c..e93d19a 100644
  
 +	status = mgmt_bredr_support(hdev);
 +	if (status)
-+		return cmd_status(sk, hdev->id, MGMT_OP_SET_SSP, status);
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_SSP,
++				  status);
 +
  	if (!lmp_ssp_capable(hdev))
  		return cmd_status(sk, hdev->id, MGMT_OP_SET_SSP,
