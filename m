@@ -1,155 +1,186 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bing Zhao <bzhao@marvell.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Marcel Holtmann <marcel@holtmann.org>,
-        Gustavo Padovan
-	<gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        <linux-wireless@vger.kernel.org>,
-        Amitkumar Karwar <akarwar@marvell.com>, Bing Zhao <bzhao@marvell.com>
-Subject: [PATCH] Bluetooth: btmrvl: operate on 16-bit opcodes instead of ogf/ocf
-Date: Thu, 3 Oct 2013 11:23:20 -0700
-Message-ID: <1380824600-13655-1-git-send-email-bzhao@marvell.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <349C4B8E-04AA-4122-8CC5-7C4342FA767E@holtmann.org>
+References: <1380668636-30654-1-git-send-email-andre.guedes@openbossa.org>
+ <1380668636-30654-7-git-send-email-andre.guedes@openbossa.org>
+ <E33B98BD-8E7D-4384-9893-29837A323066@holtmann.org> <CACJA=fUFak6t2tEc9oFLF0cu_pPOAxf-pY1L-UH1jsFYUU46wg@mail.gmail.com>
+ <349C4B8E-04AA-4122-8CC5-7C4342FA767E@holtmann.org>
+From: Andre Guedes <andre.guedes@openbossa.org>
+Date: Thu, 3 Oct 2013 15:22:00 -0300
+Message-ID: <CACJA=fXifO-bA8LJMQjuDzbjcvEWHGjG-4jSPq0-ABZDzKsHaQ@mail.gmail.com>
+Subject: Re: [PATCH 6/7] Bluetooth: Refactor LE Connection Complete HCI event handler
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Replace ogf/ocf and its packing with 16-bit opcodes.
+Hi Marcel,
 
-Signed-off-by: Bing Zhao <bzhao@marvell.com>
-Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
----
- drivers/bluetooth/btmrvl_drv.h  | 19 +++++++++++--------
- drivers/bluetooth/btmrvl_main.c | 21 +++++++++------------
- 2 files changed, 20 insertions(+), 20 deletions(-)
+On Thu, Oct 3, 2013 at 11:15 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Andre,
+>
+>>>> This patch does some code refactorig in LE Connection Complete HCI
+>>>> event handler. It basically adds a switch statement to separate new
+>>>> master connection code from new slave connection code.
+>>>>
+>>>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>>>> ---
+>>>> include/net/bluetooth/hci.h |  1 +
+>>>> net/bluetooth/hci_event.c   | 55 ++++++++++++++++++++++++++++++++-----=
+--------
+>>>> 2 files changed, 41 insertions(+), 15 deletions(-)
+>>>>
+>>>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+>>>> index 7ede266..8c98f60 100644
+>>>> --- a/include/net/bluetooth/hci.h
+>>>> +++ b/include/net/bluetooth/hci.h
+>>>> @@ -1442,6 +1442,7 @@ struct hci_ev_num_comp_blocks {
+>>>>
+>>>> /* Low energy meta events */
+>>>> #define LE_CONN_ROLE_MASTER   0x00
+>>>> +#define LE_CONN_ROLE_SLAVE   0x01
+>>>>
+>>>> #define HCI_EV_LE_CONN_COMPLETE               0x01
+>>>> struct hci_ev_le_conn_complete {
+>>>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>>>> index 1d1ffa6..0e4a9f4 100644
+>>>> --- a/net/bluetooth/hci_event.c
+>>>> +++ b/net/bluetooth/hci_event.c
+>>>> @@ -3444,8 +3444,42 @@ static void hci_le_conn_complete_evt(struct hci=
+_dev *hdev, struct sk_buff *skb)
+>>>>
+>>>>      hci_dev_lock(hdev);
+>>>>
+>>>> -     conn =3D hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
+>>>> -     if (!conn) {
+>>>> +     if (ev->status) {
+>>>> +             conn =3D hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CO=
+NNECT);
+>>>> +             if (!conn)
+>>>> +                     goto unlock;
+>>>> +
+>>>> +             mgmt_connect_failed(hdev, &conn->dst, conn->type,
+>>>> +                                 conn->dst_type, ev->status);
+>>>> +             hci_proto_connect_cfm(conn, ev->status);
+>>>> +             conn->state =3D BT_CLOSED;
+>>>> +             hci_conn_del(conn);
+>>>> +             goto unlock;
+>>>> +     }
+>>>> +
+>>>> +     switch (ev->role) {
+>>>> +     case LE_CONN_ROLE_MASTER:
+>>>> +             conn =3D hci_conn_hash_lookup_ba(hdev, LE_LINK, &ev->bda=
+ddr);
+>>>> +             /* If there is no hci_conn object with the given address=
+, it
+>>>> +              * means this new connection was triggered through HCI s=
+ocket
+>>>> +              * interface. For that case, we should create a new hci_=
+conn
+>>>> +              * object.
+>>>> +              */
+>>>
+>>> this comments belong one level down inside the if block. You already co=
+mmenting on the negative outcome of the if check.
+>>
+>> Ok, I'll fix it.
+>>
+>>>
+>>>
+>>>> +             if (!conn) {
+>>>> +                     conn =3D hci_conn_add(hdev, LE_LINK, &ev->bdaddr=
+);
+>>>> +                     if (!conn) {
+>>>> +                             BT_ERR("No memory for new connection");
+>>>> +                             goto unlock;
+>>>> +                     }
+>>>> +
+>>>> +                     conn->out =3D true;
+>>>> +                     conn->link_mode |=3D HCI_LM_MASTER;
+>>>> +                     conn->sec_level =3D BT_SECURITY_LOW;
+>>>> +                     conn->dst_type =3D ev->bdaddr_type;
+>>>> +             }
+>>>> +             break;
+>>>> +
+>>>> +     case LE_CONN_ROLE_SLAVE:
+>>>
+>>> And why are we not checking for an existing connection here? At least a=
+ small comment is needed to make that part clear.
+>>
+>> Differently from master connection, there is no existing hci_conn for
+>> slave connections. For that reason we don't check for an existing
+>> connection here. I'll add a comment.
+>>
+>>>
+>>>
+>>>>              conn =3D hci_conn_add(hdev, LE_LINK, &ev->bdaddr);
+>>>>              if (!conn) {
+>>>>                      BT_ERR("No memory for new connection");
+>>>> @@ -3453,19 +3487,11 @@ static void hci_le_conn_complete_evt(struct hc=
+i_dev *hdev, struct sk_buff *skb)
+>>>>              }
+>>>>
+>>>>              conn->dst_type =3D ev->bdaddr_type;
+>>>> +             conn->sec_level =3D BT_SECURITY_LOW;
+>>>> +             break;
+>>>>
+>>>> -             if (ev->role =3D=3D LE_CONN_ROLE_MASTER) {
+>>>> -                     conn->out =3D true;
+>>>> -                     conn->link_mode |=3D HCI_LM_MASTER;
+>>>> -             }
+>>>> -     }
+>>>> -
+>>>> -     if (ev->status) {
+>>>> -             mgmt_connect_failed(hdev, &conn->dst, conn->type,
+>>>> -                                 conn->dst_type, ev->status);
+>>>> -             hci_proto_connect_cfm(conn, ev->status);
+>>>> -             conn->state =3D BT_CLOSED;
+>>>> -             hci_conn_del(conn);
+>>>> +     default:
+>>>> +             BT_ERR("Used reserved Role parameter %d", ev->role);
+>>>>              goto unlock;
+>>>>      }
+>>>>
+>>>> @@ -3473,7 +3499,6 @@ static void hci_le_conn_complete_evt(struct hci_=
+dev *hdev, struct sk_buff *skb)
+>>>>              mgmt_device_connected(hdev, &ev->bdaddr, conn->type,
+>>>>                                    conn->dst_type, 0, NULL, 0, NULL);
+>>>>
+>>>> -     conn->sec_level =3D BT_SECURITY_LOW;
+>>>>      conn->handle =3D __le16_to_cpu(ev->handle);
+>>>>      conn->state =3D BT_CONNECTED;
+>>>
+>>> All in all, I am not really understanding why this makes it this code s=
+impler. I actually think it turns it into more complicated code. So please =
+explain what we are really gaining here. I just see more hash table lookup =
+and for hci_conn_add calls with more error checks.
+>>
+>> When controller sends a LE Connection Complete event to host, we have
+>> three different handling: failure, new master connection and new slave
+>> connection. Additionally, new master connection has a special handling
+>> since the connection could be triggered by HCI socket interface.
+>> Before, all these logic were mixed up, making hard to add specific
+>> code for new master connection for instance.
+>
+> I do not follow the difference between master and slave roles. Why do we =
+have a difference here in the first place.
+>
+>> So this patch explicitly separates the three different handling and
+>> adds extra comments aiming to improve hci_le_conn_complete_evt()
+>> readability. Besides that, keeping these different handling separated,
+>> it'll be easier to add the auto connection hooks.
+>
+> I am getting the feeling the overall code gets more complicated than simp=
+ler. The goal is to make the connection handling simpler. And right now, I =
+do not see this.
 
-diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
-index f9d1833..e3b49c6 100644
---- a/drivers/bluetooth/btmrvl_drv.h
-+++ b/drivers/bluetooth/btmrvl_drv.h
-@@ -90,12 +90,12 @@ struct btmrvl_private {
- 
- #define MRVL_VENDOR_PKT			0xFE
- 
--/* Bluetooth commands  */
--#define BT_CMD_AUTO_SLEEP_MODE		0x23
--#define BT_CMD_HOST_SLEEP_CONFIG	0x59
--#define BT_CMD_HOST_SLEEP_ENABLE	0x5A
--#define BT_CMD_MODULE_CFG_REQ		0x5B
--#define BT_CMD_LOAD_CONFIG_DATA		0x61
-+/* Vendor specific Bluetooth commands */
-+#define BT_CMD_AUTO_SLEEP_MODE		0xFC23
-+#define BT_CMD_HOST_SLEEP_CONFIG	0xFC59
-+#define BT_CMD_HOST_SLEEP_ENABLE	0xFC5A
-+#define BT_CMD_MODULE_CFG_REQ		0xFC5B
-+#define BT_CMD_LOAD_CONFIG_DATA		0xFC61
- 
- /* Sub-commands: Module Bringup/Shutdown Request/Response */
- #define MODULE_BRINGUP_REQ		0xF1
-@@ -104,6 +104,11 @@ struct btmrvl_private {
- 
- #define MODULE_SHUTDOWN_REQ		0xF2
- 
-+/* Vendor specific Bluetooth events */
-+#define BT_EVENT_AUTO_SLEEP_MODE	0x23
-+#define BT_EVENT_HOST_SLEEP_CONFIG	0x59
-+#define BT_EVENT_HOST_SLEEP_ENABLE	0x5A
-+#define BT_EVENT_MODULE_CFG_REQ		0x5B
- #define BT_EVENT_POWER_STATE		0x20
- 
- /* Bluetooth Power States */
-@@ -111,8 +116,6 @@ struct btmrvl_private {
- #define BT_PS_DISABLE			0x03
- #define BT_PS_SLEEP			0x01
- 
--#define OGF				0x3F
--
- /* Host Sleep states */
- #define HS_ACTIVATED			0x01
- #define HS_DEACTIVATED			0x00
-diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index 6e7bd4e..b3dcb13 100644
---- a/drivers/bluetooth/btmrvl_main.c
-+++ b/drivers/bluetooth/btmrvl_main.c
-@@ -50,12 +50,10 @@ bool btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb)
- 
- 	if (hdr->evt == HCI_EV_CMD_COMPLETE) {
- 		struct hci_ev_cmd_complete *ec;
--		u16 opcode, ocf, ogf;
-+		u16 opcode;
- 
- 		ec = (void *) (skb->data + HCI_EVENT_HDR_SIZE);
- 		opcode = __le16_to_cpu(ec->opcode);
--		ocf = hci_opcode_ocf(opcode);
--		ogf = hci_opcode_ogf(opcode);
- 
- 		if (priv->btmrvl_dev.sendcmdflag) {
- 			priv->btmrvl_dev.sendcmdflag = false;
-@@ -63,9 +61,8 @@ bool btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb)
- 			wake_up_interruptible(&priv->adapter->cmd_wait_q);
- 		}
- 
--		if (ogf == OGF) {
--			BT_DBG("vendor event skipped: ogf 0x%4.4x ocf 0x%4.4x",
--			       ogf, ocf);
-+		if ((opcode & 0xfc00) == 0xfc00) {
-+			BT_DBG("vendor event skipped: opcode=%#4.4x", opcode);
- 			kfree_skb(skb);
- 			return false;
- 		}
-@@ -89,7 +86,7 @@ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb)
- 	}
- 
- 	switch (event->data[0]) {
--	case BT_CMD_AUTO_SLEEP_MODE:
-+	case BT_EVENT_AUTO_SLEEP_MODE:
- 		if (!event->data[2]) {
- 			if (event->data[1] == BT_PS_ENABLE)
- 				adapter->psmode = 1;
-@@ -102,7 +99,7 @@ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb)
- 		}
- 		break;
- 
--	case BT_CMD_HOST_SLEEP_CONFIG:
-+	case BT_EVENT_HOST_SLEEP_CONFIG:
- 		if (!event->data[3])
- 			BT_DBG("gpio=%x, gap=%x", event->data[1],
- 							event->data[2]);
-@@ -110,7 +107,7 @@ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb)
- 			BT_DBG("HSCFG command failed");
- 		break;
- 
--	case BT_CMD_HOST_SLEEP_ENABLE:
-+	case BT_EVENT_HOST_SLEEP_ENABLE:
- 		if (!event->data[1]) {
- 			adapter->hs_state = HS_ACTIVATED;
- 			if (adapter->psmode)
-@@ -121,7 +118,7 @@ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb)
- 		}
- 		break;
- 
--	case BT_CMD_MODULE_CFG_REQ:
-+	case BT_EVENT_MODULE_CFG_REQ:
- 		if (priv->btmrvl_dev.sendcmdflag &&
- 				event->data[1] == MODULE_BRINGUP_REQ) {
- 			BT_DBG("EVENT:%s",
-@@ -166,7 +163,7 @@ exit:
- }
- EXPORT_SYMBOL_GPL(btmrvl_process_event);
- 
--static int btmrvl_send_sync_cmd(struct btmrvl_private *priv, u16 cmd_no,
-+static int btmrvl_send_sync_cmd(struct btmrvl_private *priv, u16 opcode,
- 				const void *param, u8 len)
- {
- 	struct sk_buff *skb;
-@@ -179,7 +176,7 @@ static int btmrvl_send_sync_cmd(struct btmrvl_private *priv, u16 cmd_no,
- 	}
- 
- 	hdr = (struct hci_command_hdr *)skb_put(skb, HCI_COMMAND_HDR_SIZE);
--	hdr->opcode = cpu_to_le16(hci_opcode_pack(OGF, cmd_no));
-+	hdr->opcode = cpu_to_le16(opcode);
- 	hdr->plen = len;
- 
- 	if (len)
--- 
-1.8.0
+Ok, I'll drop this patch in v2.
+
+I'll recheck if we really need to differentiate between master and
+slave new connection for auto connection. If positive, I can add this
+patch to auto connection patchset.
+
+Thanks,
+
+Andre
