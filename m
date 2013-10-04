@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 5/5] android: Android version of log.c
-Date: Fri,  4 Oct 2013 14:48:47 +0300
-Message-Id: <1380887327-6652-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv6 2/5] android: Add skeleton of BlueZ Android daemon
+Date: Fri,  4 Oct 2013 14:48:44 +0300
+Message-Id: <1380887327-6652-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1380887327-6652-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1380887327-6652-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,53 +11,17 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Frederic Danis <frederic.danis@linux.intel.com>
 
-Add logging for Android, currently print logs to stderr and stdout.
 ---
- Makefile.android   |    4 +--
- android/Android.mk |    2 ++
- android/log.c      |   82 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- android/main.c     |    6 ++++
- 4 files changed, 92 insertions(+), 2 deletions(-)
- create mode 100644 android/log.c
+ android/main.c |  106 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 106 insertions(+)
+ create mode 100644 android/main.c
 
-diff --git a/Makefile.android b/Makefile.android
-index e792c10..e161e6d 100644
---- a/Makefile.android
-+++ b/Makefile.android
-@@ -1,8 +1,8 @@
- if ANDROID
- noinst_PROGRAMS += android/bluetoothd
- 
--android_bluetoothd_SOURCES = android/main.c
-+android_bluetoothd_SOURCES = android/main.c src/log.c
- android_bluetoothd_LDADD = @GLIB_LIBS@
- endif
- 
--EXTRA_DIST += android/Android.mk
-+EXTRA_DIST += android/Android.mk android/log.c
-diff --git a/android/Android.mk b/android/Android.mk
-index fc3d6c2..ec820ac 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -14,10 +14,12 @@ include $(CLEAR_VARS)
- 
- LOCAL_SRC_FILES := \
- 	main.c \
-+	log.c \
- 
- LOCAL_C_INCLUDES := \
- 	$(call include-path-for, glib) \
- 	$(call include-path-for, glib)/glib \
-+	$(LOCAL_PATH)/../src \
- 
- LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
- 
-diff --git a/android/log.c b/android/log.c
+diff --git a/android/main.c b/android/main.c
 new file mode 100644
-index 0000000..ce07b82
+index 0000000..f4240c3
 --- /dev/null
-+++ b/android/log.c
-@@ -0,0 +1,82 @@
++++ b/android/main.c
+@@ -0,0 +1,106 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -85,88 +49,85 @@ index 0000000..ce07b82
 +#include <config.h>
 +#endif
 +
-+#include <fcntl.h>
++#include <signal.h>
++#include <stdint.h>
 +#include <stdio.h>
-+#include <stdarg.h>
-+#include <unistd.h>
-+#include <sys/uio.h>
++#include <stdlib.h>
++#include <stdbool.h>
++#include <string.h>
 +
 +#include <glib.h>
 +
-+void info(const char *format, ...)
++#define SHUTDOWN_GRACE_SECONDS 10
++
++static GMainLoop *event_loop;
++
++static gboolean quit_eventloop(gpointer user_data)
 +{
-+	va_list ap;
++	g_main_loop_quit(event_loop);
 +
-+	va_start(ap, format);
-+
-+	vfprintf(stdout, format, ap);
-+	fprintf(stdout, "\n");
-+
-+	va_end(ap);
++	return FALSE;
 +}
 +
-+void warn(const char *format, ...)
++static void sig_term(int sig)
 +{
-+	va_list ap;
++	static bool __terminated = false;
 +
-+	va_start(ap, format);
++	if (!__terminated) {
++		g_timeout_add_seconds(SHUTDOWN_GRACE_SECONDS,
++						quit_eventloop, NULL);
++	}
 +
-+	vfprintf(stderr, format, ap);
-+	fprintf(stderr, "\n");
-+
-+	va_end(ap);
++	__terminated = true;
 +}
 +
-+void error(const char *format, ...)
++static gboolean option_version = FALSE;
++
++static GOptionEntry options[] = {
++	{ "version", 'v', 0, G_OPTION_ARG_NONE, &option_version,
++				"Show version information and exit", NULL },
++	{ NULL }
++};
++
++int main(int argc, char *argv[])
 +{
-+	va_list ap;
++	GOptionContext *context;
++	GError *err = NULL;
++	struct sigaction sa;
 +
-+	va_start(ap, format);
++	context = g_option_context_new(NULL);
++	g_option_context_add_main_entries(context, options, NULL);
 +
-+	vfprintf(stderr, format, ap);
-+	fprintf(stderr, "\n");
++	if (g_option_context_parse(context, &argc, &argv, &err) == FALSE) {
++		if (err != NULL) {
++			g_printerr("%s\n", err->message);
++			g_error_free(err);
++		} else
++			g_printerr("An unknown error occurred\n");
 +
-+	va_end(ap);
++		exit(EXIT_FAILURE);
++	}
++
++	g_option_context_free(context);
++
++	if (option_version == TRUE) {
++		printf("%s\n", VERSION);
++		exit(EXIT_SUCCESS);
++	}
++
++	event_loop = g_main_loop_new(NULL, FALSE);
++
++	memset(&sa, 0, sizeof(sa));
++	sa.sa_handler = sig_term;
++	sigaction(SIGINT, &sa, NULL);
++	sigaction(SIGTERM, &sa, NULL);
++
++	g_main_loop_run(event_loop);
++
++	g_main_loop_unref(event_loop);
++
++	return EXIT_SUCCESS;
 +}
-+
-+void btd_debug(const char *format, ...)
-+{
-+	va_list ap;
-+
-+	va_start(ap, format);
-+
-+	vfprintf(stdout, format, ap);
-+	fprintf(stdout, "\n");
-+
-+	va_end(ap);
-+}
-diff --git a/android/main.c b/android/main.c
-index f4240c3..f75b0a8 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -34,6 +34,8 @@
- 
- #include <glib.h>
- 
-+#include "log.h"
-+
- #define SHUTDOWN_GRACE_SECONDS 10
- 
- static GMainLoop *event_loop;
-@@ -98,9 +100,13 @@ int main(int argc, char *argv[])
- 	sigaction(SIGINT, &sa, NULL);
- 	sigaction(SIGTERM, &sa, NULL);
- 
-+	DBG("Entering main loop");
-+
- 	g_main_loop_run(event_loop);
- 
- 	g_main_loop_unref(event_loop);
- 
-+	info("Exit");
-+
- 	return EXIT_SUCCESS;
- }
 -- 
 1.7.10.4
 
