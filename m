@@ -2,35 +2,40 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 14/14] build-sys: Add missing $(AM_CFLAGS) to obexd_src_obexd_CFLAGS
-Date: Fri, 4 Oct 2013 11:05:38 +0200
-Message-ID: <1380877538-22614-14-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 13/14] obexd/MAP: Fix protected property value
+Date: Fri, 4 Oct 2013 11:05:37 +0200
+Message-ID: <1380877538-22614-13-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1380877538-22614-1-git-send-email-szymon.janc@tieto.com>
 References: <1380877538-22614-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fix not passing extra build flags when --enable-maintainer-mode
-is used.
+"Sent" flag value was returned instead of "Protected" one.
+This also fix following build error:
+
+  CC     obexd/client/obexd-map.o
+obexd/client/map.c:711:17: error: ‘get_protected’ defined but not
+    used [-Werror=unused-function]
+cc1: all warnings being treated as errors
 ---
- Makefile.obexd | 2 +-
+ obexd/client/map.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile.obexd b/Makefile.obexd
-index d5377cb..2d4f10d 100644
---- a/Makefile.obexd
-+++ b/Makefile.obexd
-@@ -85,7 +85,7 @@ obexd_src_obexd_LDADD = lib/libbluetooth-internal.la \
- 
- obexd_src_obexd_LDFLAGS = -Wl,--export-dynamic
- 
--obexd_src_obexd_CFLAGS = @GLIB_CFLAGS@ @DBUS_CFLAGS@ @ICAL_CFLAGS@ \
-+obexd_src_obexd_CFLAGS = $(AM_CFLAGS) @GLIB_CFLAGS@ @DBUS_CFLAGS@ @ICAL_CFLAGS@ \
- 					-DOBEX_PLUGIN_BUILTIN \
- 					-DPLUGINDIR=\""$(obex_plugindir)"\" \
- 					-fPIC -D_FILE_OFFSET_BITS=64
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index 801d715..4373d74 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -814,7 +814,7 @@ static const GDBusPropertyTable map_msg_properties[] = {
+ 	{ "Priority", "b", get_priority },
+ 	{ "Read", "b", get_read, set_read },
+ 	{ "Sent", "b", get_sent },
+-	{ "Protected", "b", get_sent },
++	{ "Protected", "b", get_protected },
+ 	{ "Deleted", "b", NULL, set_deleted },
+ 	{ }
+ };
 -- 
 1.8.4
 
