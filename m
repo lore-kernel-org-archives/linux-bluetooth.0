@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 13/14] obexd/MAP: Fix protected property value
-Date: Fri, 4 Oct 2013 11:05:37 +0200
-Message-ID: <1380877538-22614-13-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 08/14] obexd: Return "error" for unknown status in status2str
+Date: Fri, 4 Oct 2013 11:05:32 +0200
+Message-ID: <1380877538-22614-8-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1380877538-22614-1-git-send-email-szymon.janc@tieto.com>
 References: <1380877538-22614-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,30 +12,29 @@ Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-"Sent" flag value was returned instead of "Protected" one.
-This also fix following build error:
+This can happend only if there is a bug in obexd code.
+This fix following buld error:
 
-  CC     obexd/client/obexd-map.o
-obexd/client/map.c:711:17: error: ‘get_protected’ defined but not
-    used [-Werror=unused-function]
-cc1: all warnings being treated as errors
+  CC     obexd/src/obexd-manager.o
+obexd/src/manager.c: In function ‘status2str’:
+obexd/src/manager.c:292:1: error: control reaches end of non-void
+    function [-Werror=return-type]
 ---
- obexd/client/map.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ obexd/src/manager.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index 801d715..4373d74 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -814,7 +814,7 @@ static const GDBusPropertyTable map_msg_properties[] = {
- 	{ "Priority", "b", get_priority },
- 	{ "Read", "b", get_read, set_read },
- 	{ "Sent", "b", get_sent },
--	{ "Protected", "b", get_sent },
-+	{ "Protected", "b", get_protected },
- 	{ "Deleted", "b", NULL, set_deleted },
- 	{ }
- };
+diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+index 00f3537..cec8a39 100644
+--- a/obexd/src/manager.c
++++ b/obexd/src/manager.c
+@@ -287,6 +287,7 @@ static const char *status2str(uint8_t status)
+ 	case TRANSFER_STATUS_COMPLETE:
+ 		return "complete";
+ 	case TRANSFER_STATUS_ERROR:
++	default:
+ 		return "error";
+ 	}
+ }
 -- 
 1.8.4
 
