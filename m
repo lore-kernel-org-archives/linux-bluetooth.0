@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 02/14] obexd/bluetooth: Make dict_append_entry function static
-Date: Fri, 4 Oct 2013 11:05:26 +0200
-Message-ID: <1380877538-22614-2-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 03/14] obexd/MAP: Fix missing include
+Date: Fri, 4 Oct 2013 11:05:27 +0200
+Message-ID: <1380877538-22614-3-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1380877538-22614-1-git-send-email-szymon.janc@tieto.com>
 References: <1380877538-22614-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -14,26 +14,30 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 This fix following build error:
 
-  CC     obexd/plugins/obexd-bluetooth.o
-obexd/plugins/bluetooth.c:242:6: error: no previous declaration for
-     ‘dict_append_entry’ [-Werror=missing-declarations]
+  CC     obexd/client/obexd-mns.o
+obexd/client/mns.c: In function ‘mns_connect’:
+obexd/client/mns.c:105:2: error: implicit declaration of function
+    ‘manager_register_session’ [-Werror=implicit-function-declaration]
+obexd/client/mns.c: In function ‘mns_disconnect’:
+obexd/client/mns.c:128:2: error: implicit declaration of function
+    ‘manager_unregister_session’ [-Werror=implicit-function-declaration]
 ---
- obexd/plugins/bluetooth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ obexd/client/mns.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
-index 7f8a26d..143d0c2 100644
---- a/obexd/plugins/bluetooth.c
-+++ b/obexd/plugins/bluetooth.c
-@@ -239,7 +239,7 @@ static void append_variant(DBusMessageIter *iter, int type, void *val)
- }
+diff --git a/obexd/client/mns.c b/obexd/client/mns.c
+index ee64ed6..b709650 100644
+--- a/obexd/client/mns.c
++++ b/obexd/client/mns.c
+@@ -44,6 +44,8 @@
+ #include "map_ap.h"
+ #include "map-event.h"
  
- 
--void dict_append_entry(DBusMessageIter *dict,
-+static void dict_append_entry(DBusMessageIter *dict,
- 			const char *key, int type, void *val)
- {
- 	DBusMessageIter entry;
++#include "../src/manager.h"
++
+ struct mns_session {
+ 	GString *buffer;
+ 	GObexApparam *inparams;
 -- 
 1.8.4
 
