@@ -1,44 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 4/5] build: Add BlueZ Android daemon
-Date: Fri,  4 Oct 2013 14:48:46 +0300
-Message-Id: <1380887327-6652-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1380887327-6652-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1380887327-6652-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1380877538-22614-1-git-send-email-szymon.janc@tieto.com>
+References: <1380877538-22614-1-git-send-email-szymon.janc@tieto.com>
+Date: Fri, 4 Oct 2013 14:22:50 +0300
+Message-ID: <CABBYNZKci+qeW6fgmgk_UFbm8bLFuVawme675JftwAfauPsbLQ@mail.gmail.com>
+Subject: Re: [PATCH 01/14] obexd/bluetooth: Remove unused local variables
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=windows-1252
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Frederic Danis <frederic.danis@linux.intel.com>
+Hi Szymon,
 
----
- .gitignore       |    2 ++
- Makefile.android |    7 +++++++
- 2 files changed, 9 insertions(+)
+On Fri, Oct 4, 2013 at 12:05 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> This ix following build errors:
+>
+>   CC     obexd/plugins/obexd-bluetooth.o
+> obexd/plugins/bluetooth.c: In function ‘register_profile_reply’:
+> obexd/plugins/bluetooth.c:202:10: error: unused variable ‘err’
+>     [-Werror=unused-variable]
+>
+> obexd/plugins/bluetooth.c: In function ‘name_acquired’:
+> obexd/plugins/bluetooth.c:367:15: error: unused variable ‘uuid’
+>     [-Werror=unused-variable]
+>
+> obexd/plugins/bluetooth.c: In function ‘name_released’:
+> obexd/plugins/bluetooth.c:389:15: error: unused variable ‘uuid’
+>     [-Werror=unused-variable]
+>
+> obexd/plugins/bluetooth.c: In function ‘bluetooth_start’:
+> obexd/plugins/bluetooth.c:400:10: error: unused variable ‘ios’
+>     [-Werror=unused-variable]
+> ---
+>  obexd/plugins/bluetooth.c | 4 ----
+>  1 file changed, 4 deletions(-)
+>
+> diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
+> index 017ff60..7f8a26d 100644
+> --- a/obexd/plugins/bluetooth.c
+> +++ b/obexd/plugins/bluetooth.c
+> @@ -199,7 +199,6 @@ static void register_profile_reply(DBusPendingCall *call, void *user_data)
+>         struct bluetooth_profile *profile = user_data;
+>         DBusMessage *reply = dbus_pending_call_steal_reply(call);
+>         DBusError derr;
+> -       GError *err = NULL;
+>
+>         dbus_error_init(&derr);
+>         if (!dbus_set_error_from_message(&derr, reply)) {
+> @@ -364,7 +363,6 @@ static void name_acquired(DBusConnection *conn, void *user_data)
+>
+>         for (l = profiles; l; l = l->next) {
+>                 struct bluetooth_profile *profile = l->data;
+> -               const char *uuid;
+>
+>                 if (profile->path != NULL)
+>                         continue;
+> @@ -386,7 +384,6 @@ static void name_released(DBusConnection *conn, void *user_data)
+>
+>         for (l = profiles; l; l = l->next) {
+>                 struct bluetooth_profile *profile = l->data;
+> -               const char *uuid;
+>
+>                 if (profile->path == NULL)
+>                         continue;
+> @@ -397,7 +394,6 @@ static void name_released(DBusConnection *conn, void *user_data)
+>
+>  static void *bluetooth_start(struct obex_server *server, int *err)
+>  {
+> -       GSList *ios = NULL;
+>         const GSList *l;
+>
+>         for (l = server->drivers; l; l = l->next) {
+> --
+> 1.8.4
 
-diff --git a/.gitignore b/.gitignore
-index 8a25a3e..3707209 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -98,3 +98,5 @@ unit/test-gobex-packet
- unit/test-gobex-transfer
- unit/test-*.log
- unit/test-*.trs
-+
-+android/bluetoothd
-diff --git a/Makefile.android b/Makefile.android
-index 56fa9a7..e792c10 100644
---- a/Makefile.android
-+++ b/Makefile.android
-@@ -1 +1,8 @@
-+if ANDROID
-+noinst_PROGRAMS += android/bluetoothd
-+
-+android_bluetoothd_SOURCES = android/main.c
-+android_bluetoothd_LDADD = @GLIB_LIBS@
-+endif
-+
- EXTRA_DIST += android/Android.mk
+All 14 patches applied, thanks.
+
+
 -- 
-1.7.10.4
-
+Luiz Augusto von Dentz
