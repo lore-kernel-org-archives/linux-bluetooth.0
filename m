@@ -1,42 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 0/7] Initial skeleton
-Date: Fri,  4 Oct 2013 13:54:09 +0300
-Message-Id: <1380884056-27808-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv5 7/7] build: Add logging system
+Date: Fri,  4 Oct 2013 13:54:16 +0300
+Message-Id: <1380884056-27808-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1380884056-27808-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1380884056-27808-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Frederic Danis <frederic.danis@linux.intel.com>
 
-Those are modified patches from Frederic Danis.
+---
+ Makefile.android |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Changes:
-	* log is now printed to stderr
-
-Frederic Danis (7):
-  build: Add skeleton for BlueZ Android
-  android: Add skeleton of BlueZ Android daemon
-  android-build: Add BlueZ Android daemon
-  build: Add BlueZ Android daemon
-  android: Android version of log.c
-  android-build: Add logging system
-  build: Add logging system
-
- .gitignore          |    2 +
- Makefile.am         |    4 +-
- Makefile.android    |    8 ++++
- android/Android.mk  |   31 ++++++++++++++
- android/log.c       |   82 ++++++++++++++++++++++++++++++++++++
- android/main.c      |  116 +++++++++++++++++++++++++++++++++++++++++++++++++++
- bootstrap-configure |    1 +
- configure.ac        |    5 +++
- 8 files changed, 248 insertions(+), 1 deletion(-)
- create mode 100644 Makefile.android
- create mode 100644 android/Android.mk
- create mode 100644 android/log.c
- create mode 100644 android/main.c
-
+diff --git a/Makefile.android b/Makefile.android
+index e792c10..e161e6d 100644
+--- a/Makefile.android
++++ b/Makefile.android
+@@ -1,8 +1,8 @@
+ if ANDROID
+ noinst_PROGRAMS += android/bluetoothd
+ 
+-android_bluetoothd_SOURCES = android/main.c
++android_bluetoothd_SOURCES = android/main.c src/log.c
+ android_bluetoothd_LDADD = @GLIB_LIBS@
+ endif
+ 
+-EXTRA_DIST += android/Android.mk
++EXTRA_DIST += android/Android.mk android/log.c
 -- 
 1.7.10.4
 
