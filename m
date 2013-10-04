@@ -2,39 +2,35 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 11/14] client/transfer: Return "error" for unknown status in status2str
-Date: Fri, 4 Oct 2013 11:05:35 +0200
-Message-ID: <1380877538-22614-11-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 14/14] build-sys: Add missing $(AM_CFLAGS) to obexd_src_obexd_CFLAGS
+Date: Fri, 4 Oct 2013 11:05:38 +0200
+Message-ID: <1380877538-22614-14-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1380877538-22614-1-git-send-email-szymon.janc@tieto.com>
 References: <1380877538-22614-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This can happen only if there is a bug in obexd code.
-This fix following build error:
-
-  CC     obexd/client/obexd-transfer.o
-obexd/client/transfer.c: In function ‘status2str’:
-obexd/client/transfer.c:277:1: error: control reaches end of non-void
-    function [-Werror=return-type]
+This fix not passing extra build flags when --enable-maintainer-mode
+is used.
 ---
- obexd/client/transfer.c | 1 +
- 1 file changed, 1 insertion(+)
+ Makefile.obexd | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/obexd/client/transfer.c b/obexd/client/transfer.c
-index 99a17e9..5a8d4f2 100644
---- a/obexd/client/transfer.c
-+++ b/obexd/client/transfer.c
-@@ -272,6 +272,7 @@ static const char *status2str(uint8_t status)
- 	case TRANSFER_STATUS_COMPLETE:
- 		return "complete";
- 	case TRANSFER_STATUS_ERROR:
-+	default:
- 		return "error";
- 	}
- }
+diff --git a/Makefile.obexd b/Makefile.obexd
+index d5377cb..2d4f10d 100644
+--- a/Makefile.obexd
++++ b/Makefile.obexd
+@@ -85,7 +85,7 @@ obexd_src_obexd_LDADD = lib/libbluetooth-internal.la \
+ 
+ obexd_src_obexd_LDFLAGS = -Wl,--export-dynamic
+ 
+-obexd_src_obexd_CFLAGS = @GLIB_CFLAGS@ @DBUS_CFLAGS@ @ICAL_CFLAGS@ \
++obexd_src_obexd_CFLAGS = $(AM_CFLAGS) @GLIB_CFLAGS@ @DBUS_CFLAGS@ @ICAL_CFLAGS@ \
+ 					-DOBEX_PLUGIN_BUILTIN \
+ 					-DPLUGINDIR=\""$(obex_plugindir)"\" \
+ 					-fPIC -D_FILE_OFFSET_BITS=64
 -- 
 1.8.4
 
