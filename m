@@ -1,77 +1,163 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <524F2BDC.7070804@openbossa.org>
-Date: Fri, 04 Oct 2013 17:58:04 -0300
+Message-ID: <524F2BBC.6060100@openbossa.org>
+Date: Fri, 04 Oct 2013 17:57:32 -0300
 From: Andre Guedes <andre.guedes@openbossa.org>
 MIME-Version: 1.0
 To: Marcel Holtmann <marcel@holtmann.org>
 CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 4/4] Bluetooth: Refactor hci_connect_le
-References: <1380835547-3640-1-git-send-email-andre.guedes@openbossa.org> <1380835547-3640-5-git-send-email-andre.guedes@openbossa.org> <AC94A523-A61F-4089-8BB8-5EFE52C34ACE@holtmann.org>
-In-Reply-To: <AC94A523-A61F-4089-8BB8-5EFE52C34ACE@holtmann.org>
+Subject: Re: [PATCH v2 3/4] Bluetooth: Use HCI request for LE connection
+References: <1380835547-3640-1-git-send-email-andre.guedes@openbossa.org> <1380835547-3640-4-git-send-email-andre.guedes@openbossa.org> <BDCBCB2D-249D-4E3A-92C3-BCD21E28255D@holtmann.org>
+In-Reply-To: <BDCBCB2D-249D-4E3A-92C3-BCD21E28255D@holtmann.org>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On 10/04/2013 03:27 AM, Marcel Holtmann wrote:
+On 10/04/2013 03:25 AM, Marcel Holtmann wrote:
 > Hi Andre,
 >
->> This patch does some code refactoring in hci_connect_le() by moving
->> the exception code into if statements and letting the main flow in
->> first level of function scope. It also adds extra comments to improve
->> the code readability.
+>> This patch introduces a new helper, which uses the HCI request
+>> framework, for creating LE connectons. All the handling is now
+>> done by this function so we can remove the hci_cs_le_create_conn()
+>> event handler.
+>>
+>> This patch also removes the old hci_le_create_connection() since
+>> it is not used anymore.
 >>
 >> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 >> ---
->> net/bluetooth/hci_conn.c | 55 ++++++++++++++++++++++++++++++------------------
->> 1 file changed, 35 insertions(+), 20 deletions(-)
+>> include/net/bluetooth/hci_core.h |  2 ++
+>> net/bluetooth/hci_conn.c         | 26 ++++++-----------------
+>> net/bluetooth/hci_core.c         | 46 ++++++++++++++++++++++++++++++++++++++++
+>> net/bluetooth/hci_event.c        | 31 ---------------------------
+>> 4 files changed, 54 insertions(+), 51 deletions(-)
 >>
+>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+>> index e09c305..0835cf9 100644
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -1217,6 +1217,8 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
+>>
+>> u8 bdaddr_to_le(u8 bdaddr_type);
+>>
+>> +int hci_create_le_conn(struct hci_dev *hdev, bdaddr_t *addr, u8 type);
+>> +
+>> #define SCO_AIRMODE_MASK       0x0003
+>> #define SCO_AIRMODE_CVSD       0x0000
+>> #define SCO_AIRMODE_TRANSP     0x0003
 >> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
->> index cb0e5d7..ff15841 100644
+>> index 08e601c..cb0e5d7 100644
 >> --- a/net/bluetooth/hci_conn.c
 >> +++ b/net/bluetooth/hci_conn.c
->> @@ -531,34 +531,49 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+>> @@ -49,25 +49,6 @@ static const struct sco_param sco_param_wideband[] = {
+>> 	{ EDR_ESCO_MASK | ESCO_EV3,   0x0008 }, /* T1 */
+>> };
+>>
+>> -static void hci_le_create_connection(struct hci_conn *conn)
+>> -{
+>> -	struct hci_dev *hdev = conn->hdev;
+>> -	struct hci_cp_le_create_conn cp;
+>> -
+>> -	memset(&cp, 0, sizeof(cp));
+>> -	cp.scan_interval = __constant_cpu_to_le16(0x0060);
+>> -	cp.scan_window = __constant_cpu_to_le16(0x0030);
+>> -	bacpy(&cp.peer_addr, &conn->dst);
+>> -	cp.peer_addr_type = conn->dst_type;
+>> -	cp.conn_interval_min = __constant_cpu_to_le16(0x0028);
+>> -	cp.conn_interval_max = __constant_cpu_to_le16(0x0038);
+>> -	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
+>> -	cp.min_ce_len = __constant_cpu_to_le16(0x0000);
+>> -	cp.max_ce_len = __constant_cpu_to_le16(0x0000);
+>> -
+>> -	hci_send_cmd(hdev, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
+>> -}
+>> -
+>> static void hci_le_create_connection_cancel(struct hci_conn *conn)
+>> {
+>> 	hci_send_cmd(conn->hdev, HCI_OP_LE_CREATE_CONN_CANCEL, 0, NULL);
+>> @@ -545,6 +526,7 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+>> 				    u8 dst_type, u8 sec_level, u8 auth_type)
+>> {
+>> 	struct hci_conn *conn;
+>> +	int err;
+>>
 >> 	if (test_bit(HCI_LE_PERIPHERAL, &hdev->flags))
 >> 		return ERR_PTR(-ENOTSUPP);
+>> @@ -565,7 +547,11 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+>> 		conn->link_mode |= HCI_LM_MASTER;
+>> 		conn->sec_level = BT_SECURITY_LOW;
 >>
->> +	/* XXX: Some devices send ATT messages as soon as the physical link
+>> -		hci_le_create_connection(conn);
+>> +		err = hci_create_le_conn(hdev, &conn->dst, conn->dst_type);
+>> +		if (err) {
+>> +			hci_conn_del(conn);
+>> +			return ERR_PTR(err);
+>> +		}
 >
-> no idea what the XXX wants to tell me here.
+> it is safe to sleep here? Since that is what the new call is doing.
 
-The XXX: tag is just a convention programmers use to warn other 
-programmers about some problematic or special condition in the code. It 
-is used widely in several projects, including the Linux kernel.
+We are not running in an atomic section here so we are allowed to sleep.
 
-I just "grep'ed" and realized we are not used to use XXX: in Bluetooth 
-subsystem so I'll remove it.
+Actually, there are other calls in this flow that may sleep. If you take 
+a look at a few lines up in this function, you'll find a call to 
+hci_conn_add() which allocates memory using GFP_KERNEL flag (so it may 
+sleep).
+
+Anyway, I always compile my kernels using all those kernel hacking 
+options which detects errors like that and it doesn't complain about this.
 
 >
->> +	 * is established. To be able to handle these ATT messages, the user-
->> +	 * space first establishes the connection and then starts the pairing
->> +	 * process.
->> +	 *
->> +	 * So if a hci_conn object already exists for the following connection
->> +	 * attempt, we simply update pending_sec_level and auth_type fields
->> +	 * and return the object found.
->> +	 */
->> 	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
->> -	if (!conn) {
->> -		conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
->> -		if (conn)
->> -			return ERR_PTR(-EBUSY);
->> -
->> -		conn = hci_conn_add(hdev, LE_LINK, dst);
->> -		if (!conn)
->> -			return ERR_PTR(-ENOMEM);
->> +	if (conn) {
->> +		conn->pending_sec_level = sec_level;
->> +		conn->auth_type = auth_type;
->> +		goto out;
->> +	}
+>> 	}
+>>
+>> 	conn->pending_sec_level = sec_level;
+>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>> index 82dbdc6..1002510 100644
+>> --- a/net/bluetooth/hci_core.c
+>> +++ b/net/bluetooth/hci_core.c
+>> @@ -3662,3 +3662,49 @@ u8 bdaddr_to_le(u8 bdaddr_type)
+>> 		return ADDR_LE_DEV_RANDOM;
+>> 	}
+>> }
+>> +
+>> +static void create_le_conn_complete(struct hci_dev *hdev, u8 status)
+>> +{
+>> +	struct hci_conn *conn;
+>> +
+>> +	if (status == 0)
+>> +		return;
+>> +
+>> +	BT_ERR("HCI request failed to initiate LE connection: status 0x%2.2x",
+>> +	       status);
 >
-> Call such a label "done". I never really liked the out part.
+> This should say "create" instead of "initiate".
 
-Ok, I'll rename this label.
+I'll fix it.
+
+>
+>> +
+>> +	conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
+>> +	if (!conn)
+>> +		return;
+>> +
+>
+> We are no longer setting conn->state to BT_CLOSED on purpose here?
+
+No, this is an error. I'll fix it in v3.
+
+>
+>> +	mgmt_connect_failed(hdev, &conn->dst, conn->type, conn->dst_type,
+>> +			    status);
+>> +
+>> +	hci_proto_connect_cfm(conn, status);
+>> +
+>> +	hci_dev_lock(hdev);
+>> +	hci_conn_del(conn);
+>> +	hci_dev_unlock(hdev);
+>> +}
+>
+> You are changing the locking behavior without any explanation. Previous code has it around the whole section. I am not a huge fan of changes that get sneaked in this way. That should be a separate patch to explain why it is correct. This patch should not change the current behavior.
+
+Sure, I'll fix it.
 
 Regards,
 
