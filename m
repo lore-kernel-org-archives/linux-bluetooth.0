@@ -1,68 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Make LE scan interval and window a controller option
-Date: Fri,  4 Oct 2013 03:19:14 -0700
-Message-Id: <1380881955-59853-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 2/2] Bluetooth: Add management command for setting LE scan parameters
+Date: Fri,  4 Oct 2013 03:19:15 -0700
+Message-Id: <1380881955-59853-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The scan interval and window for LE passive scanning and connection
-establishment should be configurable on a per controller basis. So
-introduce a setting that later on will allow modifying it.
+The scan interval and window parameters are used for LE passive
+background scanning and connection establishment. This allows
+userspace to change the values.
 
-This setting does not affect LE active scanning during device
-discovery phase. As long as that phase uses interleaved discovery,
-it will will continuously scan.
+These two values should be kept in sync with whatever is used for
+the scan parameters service on remote devices. And it puts the
+controlling daemon (for example bluetoothd) in charge of setting
+the values.
+
+Main use case would be to switch between two sets of values. One
+for foreground applications and one for background applications.
+
+At this moment, the values are only used for manual connection
+establishment, but soon that should be extended to background
+scanning and automatic connection establishment.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h | 2 ++
- net/bluetooth/hci_conn.c         | 4 ++--
- net/bluetooth/hci_core.c         | 3 +++
- 3 files changed, 7 insertions(+), 2 deletions(-)
+ include/net/bluetooth/mgmt.h |  7 +++++++
+ net/bluetooth/mgmt.c         | 38 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 45 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index e09c305..7442ece 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -164,6 +164,8 @@ struct hci_dev {
- 	__u16		page_scan_interval;
- 	__u16		page_scan_window;
- 	__u8		page_scan_type;
-+	__u16		le_scan_interval;
-+	__u16		le_scan_window;
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 2ad433bb..518c5c8 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -362,6 +362,13 @@ struct mgmt_cp_set_static_address {
+ } __packed;
+ #define MGMT_SET_STATIC_ADDRESS_SIZE	6
  
- 	__u16		devid_source;
- 	__u16		devid_vendor;
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 08e601c..c5b115e 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -55,8 +55,8 @@ static void hci_le_create_connection(struct hci_conn *conn)
- 	struct hci_cp_le_create_conn cp;
- 
- 	memset(&cp, 0, sizeof(cp));
--	cp.scan_interval = __constant_cpu_to_le16(0x0060);
--	cp.scan_window = __constant_cpu_to_le16(0x0030);
-+	cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
-+	cp.scan_window = cpu_to_le16(hdev->le_scan_window);
- 	bacpy(&cp.peer_addr, &conn->dst);
- 	cp.peer_addr_type = conn->dst_type;
- 	cp.conn_interval_min = __constant_cpu_to_le16(0x0028);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 82dbdc6..6c2eff0 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2223,6 +2223,9 @@ struct hci_dev *hci_alloc_dev(void)
- 	hdev->sniff_max_interval = 800;
- 	hdev->sniff_min_interval = 80;
- 
-+	hdev->le_scan_interval = 0x0060;
-+	hdev->le_scan_window = 0x0030;
++#define MGMT_OP_SET_SCAN_PARAMS		0x002C
++struct mgmt_cp_set_scan_params {
++	__le16	interval;
++	__le16	window;
++} __packed;
++#define MGMT_SET_SCAN_PARAMS_SIZE	4
 +
- 	mutex_init(&hdev->lock);
- 	mutex_init(&hdev->req_lock);
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 16125ff9..2af2f4f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3322,6 +3322,43 @@ static int set_static_address(struct sock *sk, struct hci_dev *hdev,
+ 	return err;
+ }
+ 
++static int set_scan_params(struct sock *sk, struct hci_dev *hdev,
++			   void *data, u16 len)
++{
++	struct mgmt_cp_set_scan_params *cp = data;
++	__u16 interval, window;
++	int err;
++
++	BT_DBG("%s", hdev->name);
++
++	if (!lmp_le_capable(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_SCAN_PARAMS,
++				  MGMT_STATUS_NOT_SUPPORTED);
++
++	interval = __le16_to_cpu(cp->interval);
++
++	if (interval < 0x0004 || interval > 0x4000)
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_SCAN_PARAMS,
++				  MGMT_STATUS_INVALID_PARAMS);
++
++	window = __le16_to_cpu(cp->window);
++
++	if (window < 0x0004 || window > 0x4000)
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_SCAN_PARAMS,
++				  MGMT_STATUS_INVALID_PARAMS);
++
++	hci_dev_lock(hdev);
++
++	hdev->le_scan_interval = interval;
++	hdev->le_scan_window = window;
++
++	err = cmd_complete(sk, hdev->id, MGMT_OP_SET_SCAN_PARAMS, 0, NULL, 0);
++
++	hci_dev_unlock(hdev);
++
++	return err;
++}
++
+ static void fast_connectable_complete(struct hci_dev *hdev, u8 status)
+ {
+ 	struct pending_cmd *cmd;
+@@ -3658,6 +3695,7 @@ static const struct mgmt_handler {
+ 	{ set_advertising,        false, MGMT_SETTING_SIZE },
+ 	{ set_bredr,              false, MGMT_SETTING_SIZE },
+ 	{ set_static_address,     false, MGMT_SET_STATIC_ADDRESS_SIZE },
++	{ set_scan_params,        false, MGMT_SET_SCAN_PARAMS_SIZE },
+ };
+ 
  
 -- 
 1.8.3.1
