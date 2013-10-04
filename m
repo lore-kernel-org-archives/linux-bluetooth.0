@@ -1,41 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 0/5] Initial skeleton
-Date: Fri,  4 Oct 2013 14:48:42 +0300
-Message-Id: <1380887327-6652-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv6 3/5] android-build: Add BlueZ Android daemon
+Date: Fri,  4 Oct 2013 14:48:45 +0300
+Message-Id: <1380887327-6652-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1380887327-6652-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1380887327-6652-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Frederic Danis <frederic.danis@linux.intel.com>
 
-Those are modified patches from Frederic Danis.
+Define local mapping to glib path, otherwise this has to be inside central
+place in the build repository.
+---
+ android/Android.mk |   25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-Changes:
-	* v6: removed -n option, print to stdout & stderr depending on type of logs.
-	* v5: log is now printed to stderr
-
-Frederic Danis (5):
-  build: Add skeleton for BlueZ Android
-  android: Add skeleton of BlueZ Android daemon
-  android-build: Add BlueZ Android daemon
-  build: Add BlueZ Android daemon
-  android: Android version of log.c
-
- .gitignore          |    2 +
- Makefile.am         |    4 +-
- Makefile.android    |    8 ++++
- android/Android.mk  |   31 ++++++++++++++
- android/log.c       |   82 +++++++++++++++++++++++++++++++++++++
- android/main.c      |  112 +++++++++++++++++++++++++++++++++++++++++++++++++++
- bootstrap-configure |    1 +
- configure.ac        |    5 +++
- 8 files changed, 244 insertions(+), 1 deletion(-)
- create mode 100644 Makefile.android
- create mode 100644 android/Android.mk
- create mode 100644 android/log.c
- create mode 100644 android/main.c
-
+diff --git a/android/Android.mk b/android/Android.mk
+index 183f7e2..fc3d6c2 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -2,3 +2,28 @@ LOCAL_PATH := $(call my-dir)
+ 
+ # Retrieve BlueZ version from configure.ac file
+ BLUEZ_VERSION := $(shell grep ^AC_INIT $(LOCAL_PATH)/../configure.ac | cpp -P -D'AC_INIT(_,v)=v')
++
++# Specify pathmap for glib
++pathmap_INCL += glib:external/bluetooth/glib
++
++#
++# Android BlueZ daemon (bluetoothd)
++#
++
++include $(CLEAR_VARS)
++
++LOCAL_SRC_FILES := \
++	main.c \
++
++LOCAL_C_INCLUDES := \
++	$(call include-path-for, glib) \
++	$(call include-path-for, glib)/glib \
++
++LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
++
++LOCAL_SHARED_LIBRARIES := \
++	libglib \
++
++LOCAL_MODULE := bluetoothd
++
++include $(BUILD_EXECUTABLE)
 -- 
 1.7.10.4
 
