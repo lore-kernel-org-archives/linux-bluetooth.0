@@ -1,32 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/3] Bluetooth: LE Advertising fixes & improvements
-Date: Sat,  5 Oct 2013 12:01:03 +0200
-Message-Id: <1380967266-28782-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [RFC] Bluetooth: Set ISOC altsetting from within notify callback
+Date: Fri,  4 Oct 2013 22:51:45 -0700
+Message-Id: <1380952305-14104-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Since the event handling is done within a workqueue, the notify
+callback can now sleep. So no need to trigger a separate workqueue
+from within the Bluetooth USB driver.
 
-Here's a patch set to improve and fix LE advertising behavior. The first
-one renames the used flag to something more appropriate, and the two
-other ones fix advertising re-enablement due to the automatic disabling
-that controllers do when they get a new connection.
+This should give a little bit better latency with the SCO packet
+processing since the ISOC altsetting is correct from the beginning.
 
-Johan
+However I am not sure if we can actually sleep in the USB reset
+handler and what we need to do to restore the correct altsetting
+in there. This could potentially fail, so please test ;)
 
-----------------------------------------------------------------
-Johan Hedberg (3):
-      Bluetooth: Rename HCI_LE_PERIPHERAL to HCI_ADVERTISING
-      Bluetooth: Add public mgmt function to send New Settings event
-      Bluetooth: Fix re-enabling advertising after a connection
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/btusb.c | 34 ++++++++++++++--------------------
+ 1 file changed, 14 insertions(+), 20 deletions(-)
 
- include/net/bluetooth/hci.h      |  2 +-
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_conn.c         |  2 +-
- net/bluetooth/hci_core.c         |  2 +-
- net/bluetooth/hci_event.c        | 57 +++++++++++++++++++++++++++++++++++++---
- net/bluetooth/mgmt.c             | 23 +++++++++-------
- 6 files changed, 71 insertions(+), 16 deletions(-)
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index f3dfc0a..32cae73 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -245,7 +245,6 @@ struct btusb_data {
+ 
+ 	unsigned long flags;
+ 
+-	struct work_struct work;
+ 	struct work_struct waker;
+ 
+ 	struct usb_anchor tx_anchor;
+@@ -685,7 +684,6 @@ static int btusb_close(struct hci_dev *hdev)
+ 	if (!test_and_clear_bit(HCI_RUNNING, &hdev->flags))
+ 		return 0;
+ 
+-	cancel_work_sync(&data->work);
+ 	cancel_work_sync(&data->waker);
+ 
+ 	clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+@@ -827,18 +825,6 @@ done:
+ 	return err;
+ }
+ 
+-static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
+-{
+-	struct btusb_data *data = hci_get_drvdata(hdev);
+-
+-	BT_DBG("%s evt %d", hdev->name, evt);
+-
+-	if (hdev->conn_hash.sco_num != data->sco_num) {
+-		data->sco_num = hdev->conn_hash.sco_num;
+-		schedule_work(&data->work);
+-	}
+-}
+-
+ static inline int __set_isoc_interface(struct hci_dev *hdev, int altsetting)
+ {
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+@@ -882,9 +868,8 @@ static inline int __set_isoc_interface(struct hci_dev *hdev, int altsetting)
+ 	return 0;
+ }
+ 
+-static void btusb_work(struct work_struct *work)
++static void btusb_update_isoc_altsetting(struct btusb_data *data)
+ {
+-	struct btusb_data *data = container_of(work, struct btusb_data, work);
+ 	struct hci_dev *hdev = data->hdev;
+ 	int new_alts;
+ 	int err;
+@@ -932,6 +917,18 @@ static void btusb_work(struct work_struct *work)
+ 	}
+ }
+ 
++static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
++{
++	struct btusb_data *data = hci_get_drvdata(hdev);
++
++	BT_DBG("%s evt %d", hdev->name, evt);
++
++	if (hdev->conn_hash.sco_num != data->sco_num) {
++		data->sco_num = hdev->conn_hash.sco_num;
++		btusb_update_isoc_altsetting(data);
++	}
++}
++
+ static void btusb_waker(struct work_struct *work)
+ {
+ 	struct btusb_data *data = container_of(work, struct btusb_data, waker);
+@@ -1404,7 +1401,6 @@ static int btusb_probe(struct usb_interface *intf,
+ 
+ 	spin_lock_init(&data->lock);
+ 
+-	INIT_WORK(&data->work, btusb_work);
+ 	INIT_WORK(&data->waker, btusb_waker);
+ 	spin_lock_init(&data->txlock);
+ 
+@@ -1540,8 +1536,6 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
+ 		return -EBUSY;
+ 	}
+ 
+-	cancel_work_sync(&data->work);
+-
+ 	btusb_stop_traffic(data);
+ 	usb_kill_anchored_urbs(&data->tx_anchor);
+ 
+@@ -1606,8 +1600,8 @@ static int btusb_resume(struct usb_interface *intf)
+ 	play_deferred(data);
+ 	clear_bit(BTUSB_SUSPENDING, &data->flags);
+ 	spin_unlock_irq(&data->txlock);
+-	schedule_work(&data->work);
+ 
++	btusb_update_isoc_altsetting(data);
+ 	return 0;
+ 
+ failed:
+-- 
+1.8.3.1
 
