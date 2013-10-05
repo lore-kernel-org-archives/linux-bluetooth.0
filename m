@@ -1,33 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Check for non BR/EDR controller in AMP discover response
-Date: Sat,  5 Oct 2013 13:57:53 -0700
-Message-Id: <1381006673-14570-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Extra sanity check for AMP discover response
+Date: Sat,  5 Oct 2013 11:56:16 -0700
+Message-Id: <1380999376-9045-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Within the AMP discover response, all controllers that are not the
-primary BR/EDR controller are valid.
+Just in case the Bluetooth standard introduces a third device type,
+make sure that we only include AMP controllers in the AMP discover
+response.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/a2mp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/a2mp.c | 18 +++++++-----------
+ 1 file changed, 7 insertions(+), 11 deletions(-)
 
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 5278a65..9410e27 100644
+index 529789d..5278a65 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -206,7 +206,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 		BT_DBG("Remote AMP id %d type %d status %d", cl->id, cl->type,
- 		       cl->status);
+@@ -78,24 +78,20 @@ u8 __next_ident(struct amp_mgr *mgr)
+ /* hci_dev_list shall be locked */
+ static void __a2mp_add_cl(struct amp_mgr *mgr, struct a2mp_cl *cl)
+ {
+-	int i = 0;
+ 	struct hci_dev *hdev;
++	int i = 1;
  
--		if (cl->id != AMP_ID_BREDR && cl->type == HCI_AMP) {
-+		if (cl->id != AMP_ID_BREDR && cl->type != AMP_TYPE_BREDR) {
- 			struct a2mp_info_req req;
+ 	cl[0].id = AMP_ID_BREDR;
+ 	cl[0].type = AMP_TYPE_BREDR;
+ 	cl[0].status = AMP_STATUS_BLUETOOTH_ONLY;
  
- 			found = true;
+ 	list_for_each_entry(hdev, &hci_dev_list, list) {
+-		/* Iterate through AMP controllers */
+-		if (hdev->dev_type != HCI_AMP)
+-			continue;
+-
+-		/* Starting from second entry */
+-		++i;
+-
+-		cl[i].id = hdev->id;
+-		cl[i].type = hdev->amp_type;
+-		cl[i].status = hdev->amp_status;
++		if (hdev->dev_type == HCI_AMP) {
++			cl[i].id = hdev->id;
++			cl[i].type = hdev->amp_type;
++			cl[i].status = hdev->amp_status;
++			i++;
++		}
+ 	}
+ }
+ 
 -- 
 1.8.3.1
 
