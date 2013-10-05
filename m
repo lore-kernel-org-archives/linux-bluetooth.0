@@ -1,49 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 07/10] Bluetooth: Remove pointless inline function
-Date: Sat,  5 Oct 2013 11:47:46 -0700
-Message-Id: <1380998869-64411-7-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 10/10] Bluetooth: Simplify check if L2CAP connection is AMP capable
+Date: Sat,  5 Oct 2013 11:47:49 -0700
+Message-Id: <1380998869-64411-10-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The inline function for BR/EDR controller AMP discover response
-info is rather useless. Just include the code into the function
-that builds the whole response.
+The check if a L2CAP connection is AMP capable was a little bit
+complicated. This changes the code to make it simpler and more
+readable.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/a2mp.c | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
+ net/bluetooth/l2cap_core.c | 34 +++++++++++++++++-----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 6dfef73..a1aae5c 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -75,20 +75,15 @@ u8 __next_ident(struct amp_mgr *mgr)
- 	return mgr->ident;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 2efdb17..a9a7df6 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1012,30 +1012,30 @@ static inline int __l2cap_no_conn_pending(struct l2cap_chan *chan)
+ 	return !test_bit(CONF_CONNECT_PEND, &chan->conf_state);
  }
  
--static inline void __a2mp_cl_bredr(struct a2mp_cl *cl)
--{
--	cl->id = AMP_ID_BREDR;
--	cl->type = AMP_TYPE_BREDR;
--	cl->status = AMP_STATUS_BLUETOOTH_ONLY;
+-/* returns true if at least one AMP active */
+-static inline bool hci_amp_capable(void)
++static bool __amp_capable(struct l2cap_chan *chan)
+ {
++	struct l2cap_conn *conn = chan->conn;
+ 	struct hci_dev *hdev;
+-	bool ret = false;
++	bool amp_available = false;
++
++	if (!conn->hs_enabled)
++		return false;
++
++	if (!(conn->fixed_chan_mask & L2CAP_FC_A2MP))
++		return false;
+ 
+ 	read_lock(&hci_dev_list_lock);
+-	list_for_each_entry(hdev, &hci_dev_list, list)
++	list_for_each_entry(hdev, &hci_dev_list, list) {
+ 		if (hdev->amp_type != AMP_TYPE_BREDR &&
+-		    test_bit(HCI_UP, &hdev->flags))
+-			ret = true;
++		    test_bit(HCI_UP, &hdev->flags)) {
++			amp_available = true;
++			break;
++		}
++	}
+ 	read_unlock(&hci_dev_list_lock);
+ 
+-	return ret;
 -}
 -
- /* hci_dev_list shall be locked */
- static void __a2mp_add_cl(struct amp_mgr *mgr, struct a2mp_cl *cl, u8 num_ctrl)
- {
- 	int i = 0;
- 	struct hci_dev *hdev;
+-static bool __amp_capable(struct l2cap_chan *chan)
+-{
+-	struct l2cap_conn *conn = chan->conn;
+-
+-	if (conn->hs_enabled && hci_amp_capable() &&
+-	    chan->chan_policy == BT_CHANNEL_POLICY_AMP_PREFERRED &&
+-	    conn->fixed_chan_mask & L2CAP_FC_A2MP)
+-		return true;
++	if (chan->chan_policy == BT_CHANNEL_POLICY_AMP_PREFERRED)
++		return amp_available;
  
--	__a2mp_cl_bredr(cl);
-+	cl[0].id = AMP_ID_BREDR;
-+	cl[0].type = AMP_TYPE_BREDR;
-+	cl[0].status = AMP_STATUS_BLUETOOTH_ONLY;
- 
- 	list_for_each_entry(hdev, &hci_dev_list, list) {
- 		/* Iterate through AMP controllers */
+ 	return false;
+ }
 -- 
 1.8.3.1
 
