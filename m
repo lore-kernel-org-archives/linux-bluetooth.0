@@ -1,73 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 06/10] Bluetooth: Rename AMP status constants and use them
-Date: Sat,  5 Oct 2013 11:47:45 -0700
-Message-Id: <1380998869-64411-6-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 08/10] Bluetooth: Remove check for number of AMP controller
+Date: Sat,  5 Oct 2013 11:47:47 -0700
+Message-Id: <1380998869-64411-8-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The AMP controller status constants need to be actually used to avoid
-crypted hardcoded numbers.
+The number of controllers for the AMP discover response has already
+been calculated. And since the hci_dev_list lock is held, it can not
+change. So there is no need for any extra checks.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h | 14 +++++++-------
- net/bluetooth/a2mp.c        |  2 +-
- net/bluetooth/hci_core.c    |  2 +-
- 3 files changed, 9 insertions(+), 9 deletions(-)
+ net/bluetooth/a2mp.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 393eabc..9f8d1c1 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -71,13 +71,13 @@
- #define AMP_TYPE_80211	0x01
- 
- /* AMP controller status */
--#define AMP_CTRL_POWERED_DOWN			0x00
--#define AMP_CTRL_BLUETOOTH_ONLY			0x01
--#define AMP_CTRL_NO_CAPACITY			0x02
--#define AMP_CTRL_LOW_CAPACITY			0x03
--#define AMP_CTRL_MEDIUM_CAPACITY		0x04
--#define AMP_CTRL_HIGH_CAPACITY			0x05
--#define AMP_CTRL_FULL_CAPACITY			0x06
-+#define AMP_STATUS_POWERED_DOWN			0x00
-+#define AMP_STATUS_BLUETOOTH_ONLY		0x01
-+#define AMP_STATUS_NO_CAPACITY			0x02
-+#define AMP_STATUS_LOW_CAPACITY			0x03
-+#define AMP_STATUS_MEDIUM_CAPACITY		0x04
-+#define AMP_STATUS_HIGH_CAPACITY		0x05
-+#define AMP_STATUS_FULL_CAPACITY		0x06
- 
- /* HCI device quirks */
- enum {
 diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 6d62d31..6dfef73 100644
+index a1aae5c..529789d 100644
 --- a/net/bluetooth/a2mp.c
 +++ b/net/bluetooth/a2mp.c
-@@ -79,7 +79,7 @@ static inline void __a2mp_cl_bredr(struct a2mp_cl *cl)
- {
- 	cl->id = AMP_ID_BREDR;
- 	cl->type = AMP_TYPE_BREDR;
--	cl->status = 1;
-+	cl->status = AMP_STATUS_BLUETOOTH_ONLY;
+@@ -76,7 +76,7 @@ u8 __next_ident(struct amp_mgr *mgr)
  }
  
  /* hci_dev_list shall be locked */
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index c3c7c12..a8bb9fd 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1381,7 +1381,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 	}
+-static void __a2mp_add_cl(struct amp_mgr *mgr, struct a2mp_cl *cl, u8 num_ctrl)
++static void __a2mp_add_cl(struct amp_mgr *mgr, struct a2mp_cl *cl)
+ {
+ 	int i = 0;
+ 	struct hci_dev *hdev;
+@@ -91,8 +91,7 @@ static void __a2mp_add_cl(struct amp_mgr *mgr, struct a2mp_cl *cl, u8 num_ctrl)
+ 			continue;
  
- 	/* Controller radio is available but is currently powered down */
--	hdev->amp_status = 0;
-+	hdev->amp_status = AMP_STATUS_POWERED_DOWN;
+ 		/* Starting from second entry */
+-		if (++i >= num_ctrl)
+-			return;
++		++i;
  
- 	memset(hdev->eir, 0, sizeof(hdev->eir));
- 	memset(hdev->dev_class, 0, sizeof(hdev->dev_class));
+ 		cl[i].id = hdev->id;
+ 		cl[i].type = hdev->amp_type;
+@@ -166,7 +165,7 @@ static int a2mp_discover_req(struct amp_mgr *mgr, struct sk_buff *skb,
+ 	rsp->mtu = __constant_cpu_to_le16(L2CAP_A2MP_DEFAULT_MTU);
+ 	rsp->ext_feat = 0;
+ 
+-	__a2mp_add_cl(mgr, rsp->cl, num_ctrl);
++	__a2mp_add_cl(mgr, rsp->cl);
+ 
+ 	read_unlock(&hci_dev_list_lock);
+ 
 -- 
 1.8.3.1
 
