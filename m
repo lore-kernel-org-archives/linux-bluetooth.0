@@ -1,38 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 6 Oct 2013 11:04:57 +0200
+Date: Sun, 6 Oct 2013 10:47:58 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Reject enabling controllers without valid
- addresses
-Message-ID: <20131006090457.GA22667@x220.p-661hnu-f1>
-References: <1381046938-34970-1-git-send-email-marcel@holtmann.org>
+Subject: Re: [PATCH] Bluetooth: Check for non BR/EDR controller in AMP
+ discover response
+Message-ID: <20131006084758.GB5157@x220.p-661hnu-f1>
+References: <1381006673-14570-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381046938-34970-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1381006673-14570-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Sun, Oct 06, 2013, Marcel Holtmann wrote:
-> In case of a single mode LE-only controller it is possible that no
-> public address is used. These type of controllers require a random
-> address to be configured.
-> 
-> Without a configured static random address, such a controller is
-> not functional. So reject powering on the controller in this case
-> until it gets configured with a random address.
-> 
-> The controller setup stage is still run since it is the only way
-> to determinate if a public address is available or not. So it is
-> similar on how RFKILL gets handled during initial setup of the
-> controller.
+On Sat, Oct 05, 2013, Marcel Holtmann wrote:
+> Within the AMP discover response, all controllers that are not the
+> primary BR/EDR controller are valid.
 > 
 > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  net/bluetooth/hci_core.c | 43 +++++++++++++++++++++++++++++++++++--------
->  1 file changed, 35 insertions(+), 8 deletions(-)
+>  net/bluetooth/a2mp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-This patch has been applied to bluetooth-next. Thanks.
+Applied to bluetooth-next. Thanks.
 
 Johan
