@@ -1,35 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 6 Oct 2013 15:14:08 +0200
+Date: Sun, 6 Oct 2013 15:13:58 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Use helper function for re-enabling
- advertising
-Message-ID: <20131006131408.GF32754@x220.p-661hnu-f1>
-References: <1381057694-30810-1-git-send-email-marcel@holtmann.org>
+Subject: Re: [PATCH] Bluetooth: Set LE advertising parameters before enabling
+ it
+Message-ID: <20131006131358.GE32754@x220.p-661hnu-f1>
+References: <1381054676-15507-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381057694-30810-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1381054676-15507-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
 On Sun, Oct 06, 2013, Marcel Holtmann wrote:
-> When the all LE connections have been disconneted, then it is up to
-> the host to re-enable advertising at that point. To ensure that the
-> correct advertising parameters are used, force the usage of the
-> common helper to enable advertising.
+> The LE advertising parameters can only be modified when advertising
+> is disabled. So before enabling it, make sure the controller has all
+> the right parameters.
 > 
-> The change just moves the manual enabling of advertising from the
-> event handler into the management core so that the helper can
-> be actually shared.
+> Right now all default values are used and thus this does no change
+> any existing behavior. One minor exception is that in case of single
+> mode LE-only controllers without a public address, now the random
+> address is used for advertising.
 > 
 > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  include/net/bluetooth/hci_core.h |  1 +
->  net/bluetooth/hci_event.c        | 36 +-----------------------------------
->  net/bluetooth/mgmt.c             | 33 +++++++++++++++++++++++++++++++++
->  3 files changed, 35 insertions(+), 35 deletions(-)
+>  net/bluetooth/mgmt.c | 22 ++++++++++++++++++----
+>  1 file changed, 18 insertions(+), 4 deletions(-)
 
 Applied. Thanks.
 
