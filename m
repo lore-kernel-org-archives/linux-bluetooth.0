@@ -1,52 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Use random address if public address is not available
-Date: Sun,  6 Oct 2013 02:08:36 -0700
-Message-Id: <1381050516-44319-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/2] Bluetooth: Simplify device type check for AMP discover response
+Date: Sun,  6 Oct 2013 02:08:35 -0700
+Message-Id: <1381050516-44319-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For single mode LE-only controllers, it is possible that they come
-without a public address. If a public address is not available,
-then use the random address for connection establishment and
-scanning.
+When counting the number for AMP controllers, a positive check is
+used. To be consistent, use the same check when actually adding
+the data for the AMP contollers.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_conn.c | 4 ++++
- net/bluetooth/mgmt.c     | 4 ++++
- 2 files changed, 8 insertions(+)
+ net/bluetooth/a2mp.c | 18 +++++++-----------
+ 1 file changed, 7 insertions(+), 11 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 8b0d08f..2a220a8 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -59,6 +59,10 @@ static void hci_le_create_connection(struct hci_conn *conn)
- 	cp.scan_window = __constant_cpu_to_le16(0x0030);
- 	bacpy(&cp.peer_addr, &conn->dst);
- 	cp.peer_addr_type = conn->dst_type;
-+	if (bacmp(&hdev->bdaddr, BDADDR_ANY))
-+		cp.own_address_type = ADDR_LE_DEV_PUBLIC;
-+	else
-+		cp.own_address_type = ADDR_LE_DEV_RANDOM;
- 	cp.conn_interval_min = __constant_cpu_to_le16(0x0028);
- 	cp.conn_interval_max = __constant_cpu_to_le16(0x0038);
- 	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 6e808d1..7196722 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2911,6 +2911,10 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 		param_cp.type = LE_SCAN_ACTIVE;
- 		param_cp.interval = cpu_to_le16(DISCOV_LE_SCAN_INT);
- 		param_cp.window = cpu_to_le16(DISCOV_LE_SCAN_WIN);
-+		if (bacmp(&hdev->bdaddr, BDADDR_ANY))
-+			param_cp.own_address_type = ADDR_LE_DEV_PUBLIC;
-+		else
-+			param_cp.own_address_type = ADDR_LE_DEV_RANDOM;
- 		hci_req_add(&req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
- 			    &param_cp);
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index ad8bda3..9410e27 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -78,24 +78,20 @@ u8 __next_ident(struct amp_mgr *mgr)
+ /* hci_dev_list shall be locked */
+ static void __a2mp_add_cl(struct amp_mgr *mgr, struct a2mp_cl *cl)
+ {
+-	int i = 0;
+ 	struct hci_dev *hdev;
++	int i = 1;
+ 
+ 	cl[0].id = AMP_ID_BREDR;
+ 	cl[0].type = AMP_TYPE_BREDR;
+ 	cl[0].status = AMP_STATUS_BLUETOOTH_ONLY;
+ 
+ 	list_for_each_entry(hdev, &hci_dev_list, list) {
+-		/* Iterate through AMP controllers */
+-		if (hdev->dev_type != HCI_AMP)
+-			continue;
+-
+-		/* Starting from second entry */
+-		++i;
+-
+-		cl[i].id = hdev->id;
+-		cl[i].type = hdev->amp_type;
+-		cl[i].status = hdev->amp_status;
++		if (hdev->dev_type == HCI_AMP) {
++			cl[i].id = hdev->id;
++			cl[i].type = hdev->amp_type;
++			cl[i].status = hdev->amp_status;
++			i++;
++		}
+ 	}
+ }
  
 -- 
 1.8.3.1
