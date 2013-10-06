@@ -1,57 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Send new settings only when pairable changes
-Date: Sun,  6 Oct 2013 16:11:57 -0700
-Message-Id: <1381101117-64767-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sun, 6 Oct 2013 18:04:39 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Remove mgmt_valid_hdev() helper function
+Message-ID: <20131006160439.GA16633@x220.p-661hnu-f1>
+References: <1381073101-53030-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1381073101-53030-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In case the current value of pairable is already configured, do not
-send a new settings event indicating that something has changed while
-in reality everything is the same.
+Hi Marcel,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/mgmt.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+On Sun, Oct 06, 2013, Marcel Holtmann wrote:
+> The helper function mgmt_valid_hdev() is more obfuscating the code
+> then it makes it easier to read. So intead of this helper, use the
+> direct check for BR/EDR device type.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  include/net/bluetooth/hci_core.h |  1 -
+>  net/bluetooth/hci_core.c         |  4 ++--
+>  net/bluetooth/mgmt.c             | 24 ++++++++----------------
+>  3 files changed, 10 insertions(+), 19 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9702079..3f628fd 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1188,6 +1188,7 @@ static int set_pairable(struct sock *sk, struct hci_dev *hdev, void *data,
- 			u16 len)
- {
- 	struct mgmt_mode *cp = data;
-+	bool changed;
- 	int err;
- 
- 	BT_DBG("request for %s", hdev->name);
-@@ -1199,17 +1200,18 @@ static int set_pairable(struct sock *sk, struct hci_dev *hdev, void *data,
- 	hci_dev_lock(hdev);
- 
- 	if (cp->val)
--		set_bit(HCI_PAIRABLE, &hdev->dev_flags);
-+		changed = !test_and_set_bit(HCI_PAIRABLE, &hdev->dev_flags);
- 	else
--		clear_bit(HCI_PAIRABLE, &hdev->dev_flags);
-+		changed = test_and_clear_bit(HCI_PAIRABLE, &hdev->dev_flags);
- 
- 	err = send_settings_rsp(sk, MGMT_OP_SET_PAIRABLE, hdev);
- 	if (err < 0)
--		goto failed;
-+		goto unlock;
- 
--	err = new_settings(hdev, sk);
-+	if (changed)
-+		err = new_settings(hdev, sk);
- 
--failed:
-+unlock:
- 	hci_dev_unlock(hdev);
- 	return err;
- }
--- 
-1.8.3.1
+Applied to bluetooth-next. Thanks.
 
+Johan
