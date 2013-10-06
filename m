@@ -1,29 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 6 Oct 2013 11:14:27 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Simplify device type check for AMP
- discover response
-Message-ID: <20131006091427.GA26445@x220.p-661hnu-f1>
-References: <1381050516-44319-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381050516-44319-1-git-send-email-marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Use random address if public address is not available
+Date: Sun,  6 Oct 2013 02:08:36 -0700
+Message-Id: <1381050516-44319-2-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+For single mode LE-only controllers, it is possible that they come
+without a public address. If a public address is not available,
+then use the random address for connection establishment and
+scanning.
 
-On Sun, Oct 06, 2013, Marcel Holtmann wrote:
-> When counting the number for AMP controllers, a positive check is
-> used. To be consistent, use the same check when actually adding
-> the data for the AMP contollers.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/a2mp.c | 18 +++++++-----------
->  1 file changed, 7 insertions(+), 11 deletions(-)
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_conn.c | 4 ++++
+ net/bluetooth/mgmt.c     | 4 ++++
+ 2 files changed, 8 insertions(+)
 
-Both patches in this set have been applied to bluetooth-next. Thanks.
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 8b0d08f..2a220a8 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -59,6 +59,10 @@ static void hci_le_create_connection(struct hci_conn *conn)
+ 	cp.scan_window = __constant_cpu_to_le16(0x0030);
+ 	bacpy(&cp.peer_addr, &conn->dst);
+ 	cp.peer_addr_type = conn->dst_type;
++	if (bacmp(&hdev->bdaddr, BDADDR_ANY))
++		cp.own_address_type = ADDR_LE_DEV_PUBLIC;
++	else
++		cp.own_address_type = ADDR_LE_DEV_RANDOM;
+ 	cp.conn_interval_min = __constant_cpu_to_le16(0x0028);
+ 	cp.conn_interval_max = __constant_cpu_to_le16(0x0038);
+ 	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 6e808d1..7196722 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2911,6 +2911,10 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 		param_cp.type = LE_SCAN_ACTIVE;
+ 		param_cp.interval = cpu_to_le16(DISCOV_LE_SCAN_INT);
+ 		param_cp.window = cpu_to_le16(DISCOV_LE_SCAN_WIN);
++		if (bacmp(&hdev->bdaddr, BDADDR_ANY))
++			param_cp.own_address_type = ADDR_LE_DEV_PUBLIC;
++		else
++			param_cp.own_address_type = ADDR_LE_DEV_RANDOM;
+ 		hci_req_add(&req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
+ 			    &param_cp);
+ 
+-- 
+1.8.3.1
 
-Johan
