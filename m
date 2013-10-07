@@ -1,64 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 7 Oct 2013 10:50:59 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Extra sanity check for AMP discover response
-Message-ID: <20131007075057.GF2804@aemeltch-MOBL1>
-References: <1380999376-9045-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1380999376-9045-1-git-send-email-marcel@holtmann.org>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv1 14/15] android: Add makefile for hciconfig
+Date: Mon,  7 Oct 2013 10:38:15 +0300
+Message-Id: <1381131496-9417-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Sat, Oct 05, 2013 at 11:56:16AM -0700, Marcel Holtmann wrote:
-> Just in case the Bluetooth standard introduces a third device type,
-> make sure that we only include AMP controllers in the AMP discover
-> response.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/a2mp.c | 18 +++++++-----------
->  1 file changed, 7 insertions(+), 11 deletions(-)
-> 
-> diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-> index 529789d..5278a65 100644
-> --- a/net/bluetooth/a2mp.c
-> +++ b/net/bluetooth/a2mp.c
-> @@ -78,24 +78,20 @@ u8 __next_ident(struct amp_mgr *mgr)
->  /* hci_dev_list shall be locked */
->  static void __a2mp_add_cl(struct amp_mgr *mgr, struct a2mp_cl *cl)
->  {
-> -	int i = 0;
->  	struct hci_dev *hdev;
-> +	int i = 1;
->  
->  	cl[0].id = AMP_ID_BREDR;
->  	cl[0].type = AMP_TYPE_BREDR;
->  	cl[0].status = AMP_STATUS_BLUETOOTH_ONLY;
->  
->  	list_for_each_entry(hdev, &hci_dev_list, list) {
-> -		/* Iterate through AMP controllers */
-> -		if (hdev->dev_type != HCI_AMP)
-> -			continue;
-> -
-> -		/* Starting from second entry */
-> -		++i;
-> -
-> -		cl[i].id = hdev->id;
-> -		cl[i].type = hdev->amp_type;
-> -		cl[i].status = hdev->amp_status;
-> +		if (hdev->dev_type == HCI_AMP) {
-> +			cl[i].id = hdev->id;
-> +			cl[i].type = hdev->amp_type;
-> +			cl[i].status = hdev->amp_status;
-> +			i++;
-> +		}
+---
+ android/Android.mk |   34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-I wonder did it make sense to merge 3 patches which touches this small
-function together?
+diff --git a/android/Android.mk b/android/Android.mk
+index e7a70d0..09c4579 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -123,3 +123,37 @@ $(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(LOCAL_PATH)/../lib/bl
+ LOCAL_MODULE := libbluetooth
+ 
+ include $(BUILD_SHARED_LIBRARY)
++
++#
++# hciconfig
++#
++
++include $(CLEAR_VARS)
++
++LOCAL_SRC_FILES := \
++	../tools/csr.c \
++	../tools/csr_h4.c \
++	../tools/hciconfig.c \
++
++LOCAL_C_INCLUDES := \
++	$(LOCAL_PATH)/../lib \
++	$(LOCAL_PATH)/../src \
++
++LOCAL_C_INCLUDES += \
++	$(call include-path-for, glib) \
++	$(call include-path-for, glib)/glib \
++
++LOCAL_SHARED_LIBRARIES := \
++	libbluetooth
++
++# to suppress the "pointer of type 'void *' used in arithmetic" warning
++LOCAL_CFLAGS := -Wno-pointer-arith
++
++# to suppress the "warning: missing initializer near initialization.." warning
++LOCAL_CFLAGS += -Wno-missing-field-initializers
++
++LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
++LOCAL_MODULE_TAGS := eng
++LOCAL_MODULE := hciconfig
++
++include $(BUILD_EXECUTABLE)
+-- 
+1.7.10.4
 
-Best regards 
-Andrei Emeltchenko 
