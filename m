@@ -1,28 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 7 Oct 2013 16:54:49 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Read location data on AMP controller init
-Message-ID: <20131007145449.GA31497@x220.p-661hnu-f1>
-References: <1381143353-57149-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381143353-57149-1-git-send-email-marcel@holtmann.org>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC 0/2] Initial code for PAN and HID HALs
+Date: Mon,  7 Oct 2013 16:39:16 +0300
+Message-Id: <1381153158-13207-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Mon, Oct 07, 2013, Marcel Holtmann wrote:
-> When initializing an AMP controller, read its current known location
-> data so that it can be analyzed later on.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/hci.h | 2 ++
->  net/bluetooth/hci_core.c    | 3 +++
->  2 files changed, 5 insertions(+)
+Slightly modified code from Frederic Danis.
 
-Both patches in this set have been applied to bluetooth-next. Thanks.
+Frederic Danis (2):
+  android: Add HID Host skeleton
+  android: Add PAN skeleton
 
-Johan
+ android/Android.mk      |    2 +
+ android/hal.h           |    2 +
+ android/hal_bluetooth.c |    8 ++
+ android/hal_hidhost.c   |  232 +++++++++++++++++++++++++++++++++++++++++++++++
+ android/hal_pan.c       |  130 ++++++++++++++++++++++++++
+ 5 files changed, 374 insertions(+)
+ create mode 100644 android/hal_hidhost.c
+ create mode 100644 android/hal_pan.c
+
+-- 
+1.7.10.4
+
