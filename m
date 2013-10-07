@@ -1,87 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 04/15] android: Enable Socket interface
-Date: Mon,  7 Oct 2013 10:38:05 +0300
-Message-Id: <1381131496-9417-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 3/3] Bluetooth: List powered down AMP controllers correctly
+Date: Mon,  7 Oct 2013 00:26:07 -0700
+Message-Id: <1381130767-42488-3-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Within the AMP discover response, list powered down AMP controllers
+as powered down. No point in trying to make them look any different.
 
-Returns socket interface, use header hal.h to avoid externs.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- android/hal.h           |   18 ++++++++++++++++++
- android/hal_bluetooth.c |   11 +++++++++++
- 2 files changed, 29 insertions(+)
- create mode 100644 android/hal.h
+ net/bluetooth/a2mp.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/android/hal.h b/android/hal.h
-new file mode 100644
-index 0000000..40fbf03
---- /dev/null
-+++ b/android/hal.h
-@@ -0,0 +1,18 @@
-+/*
-+ * Copyright (C) 2013 Intel Corporation
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ *
-+ */
-+
-+btsock_interface_t *bt_get_sock_interface(void);
-diff --git a/android/hal_bluetooth.c b/android/hal_bluetooth.c
-index 9970374..00f3e8d 100644
---- a/android/hal_bluetooth.c
-+++ b/android/hal_bluetooth.c
-@@ -21,10 +21,13 @@
- #include <stdbool.h>
- 
- #include <hardware/bluetooth.h>
-+#include <hardware/bt_sock.h>
- 
- #define LOG_TAG "BlueZ"
- #include <cutils/log.h>
- 
-+#include "hal.h"
-+
- bt_callbacks_t *bt_hal_cbacks = NULL;
- 
- static bool interface_ready(void)
-@@ -32,6 +35,11 @@ static bool interface_ready(void)
- 	return bt_hal_cbacks != NULL;
- }
- 
-+static bool is_profile(const char *profile, const char *str)
-+{
-+	return strcmp(profile, str) == 0;
-+}
-+
- static int init(bt_callbacks_t *callbacks)
- {
- 	ALOGD(__func__);
-@@ -246,6 +254,9 @@ static const void *get_profile_interface(const char *profile_id)
- 	if (interface_ready() == false)
- 		return NULL;
- 
-+	if (is_profile(profile_id, BT_PROFILE_SOCKETS_ID))
-+		return bt_get_sock_interface();
-+
- 	return NULL;
- }
- 
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 9410e27..b38d074 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -89,7 +89,10 @@ static void __a2mp_add_cl(struct amp_mgr *mgr, struct a2mp_cl *cl)
+ 		if (hdev->dev_type == HCI_AMP) {
+ 			cl[i].id = hdev->id;
+ 			cl[i].type = hdev->amp_type;
+-			cl[i].status = hdev->amp_status;
++			if (test_bit(HCI_UP, &hdev->flags))
++				cl[i].status = hdev->amp_status;
++			else
++				cl[i].status = AMP_STATUS_POWERED_DOWN;
+ 			i++;
+ 		}
+ 	}
 -- 
-1.7.10.4
+1.8.3.1
 
