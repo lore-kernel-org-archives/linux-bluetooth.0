@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 07/15] android: Create HAL API header skeleton
-Date: Mon,  7 Oct 2013 10:38:08 +0300
-Message-Id: <1381131496-9417-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 02/15] android: Add Adapter Bluetooth HAL template
+Date: Mon,  7 Oct 2013 10:38:03 +0300
+Message-Id: <1381131496-9417-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,274 +11,394 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Header describes the protocol between Android HAL threads and BlueZ
-daemon.
+Add template for bluetooth.h Android HAL.
 ---
- android/hal_msg.h |  255 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 255 insertions(+)
- create mode 100644 android/hal_msg.h
+ android/Android.mk      |   19 +++
+ android/hal_bluetooth.c |  348 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 367 insertions(+)
+ create mode 100644 android/hal_bluetooth.c
 
-diff --git a/android/hal_msg.h b/android/hal_msg.h
+diff --git a/android/Android.mk b/android/Android.mk
+index 5498b41..7adbbcd 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -32,3 +32,22 @@ LOCAL_SHARED_LIBRARIES := \
+ LOCAL_MODULE := bluetoothd
+ 
+ include $(BUILD_EXECUTABLE)
++
++#
++# bluetooth.default.so HAL
++#
++
++include $(CLEAR_VARS)
++
++LOCAL_SRC_FILES := \
++	hal_bluetooth.c \
++
++LOCAL_SHARED_LIBRARIES := \
++	libcutils \
++
++LOCAL_MODULE := bluetooth.default
++LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
++LOCAL_MODULE_TAGS := optional
++LOCAL_MODULE_CLASS := SHARED_LIBRARIES
++
++include $(BUILD_SHARED_LIBRARY)
+diff --git a/android/hal_bluetooth.c b/android/hal_bluetooth.c
 new file mode 100644
-index 0000000..c6bc883
+index 0000000..9970374
 --- /dev/null
-+++ b/android/hal_msg.h
-@@ -0,0 +1,255 @@
++++ b/android/hal_bluetooth.c
+@@ -0,0 +1,348 @@
 +/*
++ * Copyright (C) 2013 Intel Corporation
 + *
-+ *  BlueZ - Bluetooth protocol stack for Linux
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
 + *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *      http://www.apache.org/licenses/LICENSE-2.0
 + *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
 + *
 + */
 +
-+#ifndef __packed
-+#define __packed __attribute__((packed))
-+#endif
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <stdbool.h>
 +
-+typedef struct {
-+	uint8_t b[6];
-+} __packed __bdaddr_t;
++#include <hardware/bluetooth.h>
 +
-+struct hal_msg_hdr {
-+	uint8_t service_id;
-+	uint8_t opcode;
-+	uint16_t len;
-+	uint8_t payload[0];
-+} __packed;
++#define LOG_TAG "BlueZ"
++#include <cutils/log.h>
 +
-+#define HAL_SERVICE_ID_CORE		0
-+#define HAL_SERVICE_ID_BLUETOOTH	1
-+#define HAL_SERVICE_ID_SOCK		2
-+#define HAL_SERVICE_ID_HIDHOST		3
-+#define HAL_SERVICE_ID_PAN		4
-+#define HAL_SERVICE_ID_HANDSFREE	5
-+#define HAL_SERVICE_ID_AD2P		6
-+#define HAL_SERVICE_ID_HEALTH		7
-+#define HAL_SERVICE_ID_AVRCP		8
-+#define HAL_SERVICE_ID_GATT		9
++bt_callbacks_t *bt_hal_cbacks = NULL;
 +
-+/* Core Service */
++static bool interface_ready(void)
++{
++	return bt_hal_cbacks != NULL;
++}
 +
-+#define HAL_MSG_OP_ERROR		0x00
-+struct hal_msg_rp_error {
-+	uint8_t status;
-+} __packed;
++static int init(bt_callbacks_t *callbacks)
++{
++	ALOGD(__func__);
 +
-+#define HAL_MSG_OP_REGISTER_MODULE	0x01
-+struct hal_msg_cp_register_module {
-+	uint8_t service_id;
-+} __packed;
-+struct hal_msg_rp_register_module {
-+	uint8_t service_id;
-+} __packed;
++	if (interface_ready() == true)
++		return BT_STATUS_SUCCESS;
 +
-+#define HAL_MSG_OP_UNREGISTER_MODULE	0x02
-+struct hal_msg_cp_unregister_module {
-+	uint8_t service_id;
-+} __packed;
++	/* store reference to user callbacks */
++	bt_hal_cbacks = callbacks;
 +
-+/* Bluetooth Core HAL API */
++	/* TODO: Init here bluezd task */
 +
-+#define HAL_MSG_OP_BT_ENABLE		0x01
++	return BT_STATUS_UNSUPPORTED;
++}
 +
-+#define HAL_MSG_OP_BT_DISABLE		0x02
++static int enable(void)
++{
++	ALOGD(__func__);
 +
-+#define HAL_MSG_OP_BT_GET_ADAPTER_PROPS	0x03
++	return BT_STATUS_UNSUPPORTED;
++}
 +
-+#define HAL_MSG_OP_BT_GET_ADAPTER_PROP	0x04
-+struct hal_msg_cp_bt_get_adapter_prop {
-+	uint8_t type;
-+} __packed;
++static int disable(void)
++{
++	ALOGD(__func__);
 +
-+#define HAL_MSG_OP_BT_SET_ADAPTER_PROP	0x05
-+struct hal_msg_cp_bt_set_adapter_prop {
-+	uint8_t type;
-+	uint16_t len;
-+	uint8_t val[0];
-+} __packed;
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
 +
-+#define HAL_MSG_OP_BT_GET_REMOTE_DEVICE_PROPS	0x06
-+struct hal_msg_cp_bt_get_remote_device_props {
-+	__bdaddr_t bdaddr;
-+} __packed;
++	return BT_STATUS_UNSUPPORTED;
++}
 +
-+#define HAL_MSG_OP_BT_GET_REMOTE_DEVICE_PROP	0x07
-+struct hal_msg_cp_bt_get_remote_device_prop {
-+	__bdaddr_t bdaddr;
-+	uint8_t type;
-+} __packed;
++static void cleanup(void)
++{
++	ALOGD(__func__);
 +
-+#define HAL_MSG_OP_BT_SET_REMOTE_DEVICE_PROP	0x08
-+struct hal_msg_cp_bt_set_remote_device_prop {
-+	__bdaddr_t bdaddr;
-+	uint8_t type;
-+	uint16_t len;
-+	uint8_t val[0];
-+} __packed;
++	if (interface_ready() == false)
++		return;
 +
-+#define HAL_MSG_OP_BT_GET_REMOTE_SERVICE_REC	0x09
-+struct hal_msg_cp_bt_get_remote_service_rec {
-+	__bdaddr_t bdaddr;
-+	uint8_t uuid[16];
-+} __packed;
++	bt_hal_cbacks = NULL;
++}
 +
-+#define HAL_MSG_OP_BT_GET_REMOTE_SERVICE	0x0a
-+struct hal_msg_cp_bt_get_remote_service {
-+	__bdaddr_t bdaddr;
-+} __packed;
++static int get_adapter_properties(void)
++{
++	ALOGD(__func__);
 +
-+#define HAL_MSG_OP_BT_START_DISCOVERY	0x0b
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
 +
-+#define HAL_MSG_OP_BT_CANCEL_DISCOVERY	0x0c
++	return BT_STATUS_UNSUPPORTED;
++}
 +
-+#define HAL_MSG_OP_BT_CREATE_BOND	0x0d
-+struct hal_msg_cp_bt_create_bond {
-+	__bdaddr_t bdaddr;
-+} __packed;
++static int get_adapter_property(bt_property_type_t type)
++{
++	ALOGD(__func__);
 +
-+#define HAL_MSG_OP_BT_REMOVE_BOND	0x0d
-+struct hal_msg_cp_bt_remove_bond {
-+	__bdaddr_t bdaddr;
-+} __packed;
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
 +
-+#define HAL_MSG_OP_BT_CANCEL_BOND	0x0f
-+struct hal_msg_cp_bt_cancel_bond {
-+	__bdaddr_t bdaddr;
-+} __packed;
++	return BT_STATUS_UNSUPPORTED;
++}
 +
-+#define HAL_MSG_OP_BT_PIN_REPLY		0x10
-+struct hal_msg_cp_bt_pin_reply {
-+	__bdaddr_t bdaddr;
-+	uint8_t accept;
-+	uint8_t pin_len;
-+	uint8_t pin_code[16];
-+} __packed;
++static int set_adapter_property(const bt_property_t *property)
++{
++	ALOGD(__func__);
 +
-+#define HAL_MSG_OP_BT_SSP_REPLY		0x11
-+struct hal_msg_cp_bt_ssp_reply {
-+	__bdaddr_t bdaddr;
-+	uint8_t ssp_variant;
-+	uint8_t accept;
-+	uint32_t passkey;
-+} __packed;
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
 +
-+#define HAL_MSG_OP_BT_DUT_MODE_CONF	0x12
-+struct hal_msg_cp_bt_dut_mode_conf {
-+	uint8_t enable;
-+} __packed;
++	if (property == NULL)
++		return BT_STATUS_PARM_INVALID;
 +
-+#define HAL_MSG_OP_BT_DUT_MODE_SEND	0x13
-+struct hal_msg_cp_bt_dut_mode_send {
-+	uint16_t opcode;
-+	uint8_t len;
-+	uint8_t data[0];
-+} __packed;
++	return BT_STATUS_UNSUPPORTED;
++}
 +
-+#define HAL_MSG_OP_BT_LE_TEST_MODE	0x14
-+struct hal_msg_cp_bt_le_test_mode {
-+	uint16_t opcode;
-+	uint8_t len;
-+	uint8_t data[0];
-+} __packed;
++static int get_remote_device_properties(bt_bdaddr_t *remote_addr)
++{
++	ALOGD(__func__);
 +
-+/* Notifications and confirmations */
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
 +
-+#define HAL_MSG_EV_BT_ERROR			0x80
++	return BT_STATUS_UNSUPPORTED;
++}
 +
-+#define HAL_MSG_EV_BT_ADAPTER_STATE_CHANGED	0x81
-+struct hal_msg_ev_bt_adapter_state_changed {
-+	uint8_t state;
-+} __packed;
++static int get_remote_device_property(bt_bdaddr_t *remote_addr,
++						bt_property_type_t type)
++{
++	ALOGD(__func__);
 +
-+#define HAL_MSG_EV_BT_ADAPTER_PROPS_CHANGED	0x82
-+struct hal_property {
-+	uint8_t type;
-+	uint16_t len;
-+	uint8_t val[0];
-+} __packed;
-+struct hal_msg_ev_bt_adapter_props_changed {
-+	uint8_t status;
-+	uint8_t num_props;
-+	struct hal_property props[0];
-+} __packed;
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
 +
-+#define HAL_MSG_EV_BT_REMOTE_DEVICE_PROPS	0x83
-+struct hal_msg_ev_bt_remote_device_props {
-+	uint8_t status;
-+	__bdaddr_t bdaddr;
-+	uint8_t num_props;
-+	struct hal_property props[0];
-+} __packed;
++	return BT_STATUS_UNSUPPORTED;
++}
 +
-+#define HAL_MSG_EV_BT_DEVICE_FOUND		0x84
-+struct hal_msg_ev_bt_device_found {
-+	uint8_t num_props;
-+	struct hal_property props[0];
-+} __packed;
++static int set_remote_device_property(bt_bdaddr_t *remote_addr,
++						const bt_property_t *property)
++{
++	ALOGD(__func__);
 +
-+#define HAL_MSG_EV_BT_DISCOVERY_STATE_CHANGED	0x85
-+struct hal_msg_ev_bt_discovery_state_changed {
-+	uint8_t state;
-+} __packed;
++	/* sanity check */
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
 +
-+#define HAL_MSG_EV_BT_PIN_REQUEST		0x86
-+struct hal_msg_ev_bt_pin_request {
-+	__bdaddr_t bdaddr;
-+	uint8_t name[249 - 1];
-+	uint8_t class_of_dev[3];
-+} __packed;
++	return BT_STATUS_UNSUPPORTED;
++}
 +
-+#define HAL_MSG_EV_BT_SSP_REQUEST		0x87
-+struct hal_msg_ev_bt_ssp_request {
-+	__bdaddr_t bdaddr;
-+	uint8_t name[249 - 1];
-+	uint8_t class_of_dev[3];
-+	uint8_t pairing_variant;
-+	uint32_t passkey;
-+} __packed;
++static int get_remote_service_record(bt_bdaddr_t *remote_addr, bt_uuid_t *uuid)
++{
++	ALOGD(__func__);
 +
-+#define HAL_MSG_EV_BT_BOND_STATE_CHANGED	0x88
-+struct hal_msg_ev_bt_bond_state_changed {
-+	uint8_t status;
-+	__bdaddr_t bdaddr;
-+	uint8_t state;
-+} __packed;
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
 +
-+#define HAL_MSG_EV_BT_ACL_STATE_CHANGED		0x89
-+struct hal_msg_ev_bt_acl_state_changed {
-+	uint8_t status;
-+	__bdaddr_t bdaddr;
-+	uint8_t state;
-+} __packed;
++	return BT_STATUS_UNSUPPORTED;
++}
 +
-+#define HAL_MSG_EV_BT_DUT_MODE_RECEIVE		0x8a
-+struct hal_msg_ev_bt_dut_mode_receive {
-+	uint16_t opcode;
-+	uint8_t len;
-+	uint8_t data[0];
-+} __packed;
++static int get_remote_services(bt_bdaddr_t *remote_addr)
++{
++	ALOGD(__func__);
 +
-+#define HAL_MSG_EV_BT_LE_TEST_MODE		0x8b
-+struct hal_msg_ev_bt_le_test_mode {
-+	uint8_t status;
-+	uint16_t num_packets;
-+} __packed;
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int start_discovery(void)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int cancel_discovery(void)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int create_bond(const bt_bdaddr_t *bd_addr)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	if (bd_addr == NULL)
++		return BT_STATUS_PARM_INVALID;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int cancel_bond(const bt_bdaddr_t *bd_addr)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int remove_bond(const bt_bdaddr_t *bd_addr)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int pin_reply(const bt_bdaddr_t *bd_addr, uint8_t accept,
++				uint8_t pin_len, bt_pin_code_t *pin_code)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int ssp_reply(const bt_bdaddr_t *bd_addr, bt_ssp_variant_t variant,
++					uint8_t accept, uint32_t passkey)
++{
++
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	if (bd_addr == NULL)
++		return BT_STATUS_PARM_INVALID;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static const void *get_profile_interface(const char *profile_id)
++{
++	ALOGD("%s: %s", __func__, profile_id);
++
++	if (interface_ready() == false)
++		return NULL;
++
++	return NULL;
++}
++
++static int dut_mode_configure(uint8_t enable)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int dut_mode_send(uint16_t opcode, uint8_t *buf, uint8_t len)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++/**
++ * HAL Interface declaration
++ */
++static const bt_interface_t bluetooth_if = {
++	sizeof(bt_interface_t),
++	init,
++	enable,
++	disable,
++	cleanup,
++	get_adapter_properties,
++	get_adapter_property,
++	set_adapter_property,
++	get_remote_device_properties,
++	get_remote_device_property,
++	set_remote_device_property,
++	get_remote_service_record,
++	get_remote_services,
++	start_discovery,
++	cancel_discovery,
++	create_bond,
++	remove_bond,
++	cancel_bond,
++	pin_reply,
++	ssp_reply,
++	get_profile_interface,
++	dut_mode_configure,
++	dut_mode_send
++};
++
++static const bt_interface_t *get_bluetooth_interface(void)
++{
++	ALOGD(__func__);
++
++	return &bluetooth_if;
++}
++
++static int close_bluetooth(struct hw_device_t *device)
++{
++	ALOGD(__func__);
++
++	cleanup();
++
++	return 0;
++}
++
++static int open_bluetooth(const struct hw_module_t *module, char const *name,
++					struct hw_device_t **device)
++{
++	bluetooth_device_t *dev = malloc(sizeof(bluetooth_device_t));
++
++	ALOGD(__func__);
++
++	memset(dev, 0, sizeof(bluetooth_device_t));
++	dev->common.tag = HARDWARE_DEVICE_TAG;
++	dev->common.version = 0;
++	dev->common.module = (struct hw_module_t *) module;
++	dev->common.close = close_bluetooth;
++	dev->get_bluetooth_interface = get_bluetooth_interface;
++
++	*device = (struct hw_device_t *) dev;
++
++	return 0;
++}
++
++static struct hw_module_methods_t bluetooth_module_methods = {
++	.open = open_bluetooth,
++};
++
++struct hw_module_t HAL_MODULE_INFO_SYM = {
++	.tag = HARDWARE_MODULE_TAG,
++	.version_major = 1,
++	.version_minor = 0,
++	.id = BT_HARDWARE_MODULE_ID,
++	.name = "BlueZ Bluetooth stack",
++	.author = "Intel Corporation",
++	.methods = &bluetooth_module_methods
++};
 -- 
 1.7.10.4
 
