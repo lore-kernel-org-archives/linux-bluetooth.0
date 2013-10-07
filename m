@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 13/15] android: Handle mgmt changed events
-Date: Mon,  7 Oct 2013 10:38:14 +0300
-Message-Id: <1381131496-9417-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 05/15] android: Start Android Bluetooth daemon
+Date: Mon,  7 Oct 2013 10:38:06 +0300
+Message-Id: <1381131496-9417-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,183 +11,96 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add code handling changing adapter settings.
+Start Android Bluetooth daemon from HAL init(). Make sure
+that daemon is in "running" state.
 ---
- android/main.c |  154 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 154 insertions(+)
+ android/hal_bluetooth.c |   54 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 53 insertions(+), 1 deletion(-)
 
-diff --git a/android/main.c b/android/main.c
-index 3a63eb9..2cc4efc 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -127,6 +127,159 @@ static void load_link_keys_complete(uint8_t status, uint16_t length,
- 	DBG("status %u", status);
+diff --git a/android/hal_bluetooth.c b/android/hal_bluetooth.c
+index 00f3e8d..f8139a7 100644
+--- a/android/hal_bluetooth.c
++++ b/android/hal_bluetooth.c
+@@ -23,11 +23,16 @@
+ #include <hardware/bluetooth.h>
+ #include <hardware/bt_sock.h>
+ 
++#include <cutils/sockets.h>
++#include <cutils/properties.h>
++
+ #define LOG_TAG "BlueZ"
+ #include <cutils/log.h>
+ 
+ #include "hal.h"
+ 
++#define ANDROID_BLUEZ "btd"
++
+ bt_callbacks_t *bt_hal_cbacks = NULL;
+ 
+ static bool interface_ready(void)
+@@ -35,6 +40,49 @@ static bool interface_ready(void)
+ 	return bt_hal_cbacks != NULL;
  }
  
-+static void mgmt_local_name_changed_event(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
++static bool is_running(const char *service_name)
 +{
-+	struct bt_adapter *adapter = user_data;
-+	const struct mgmt_cp_set_local_name *rp = param;
++	char val[PROPERTY_VALUE_MAX];
++	char name[PROPERTY_KEY_MAX];
++	int ret;
 +
-+	if (length < sizeof(*rp)) {
-+		error("Wrong size of local name changed parameters");
-+		return;
++	ALOGI(__func__);
++
++	ret = snprintf(name, sizeof(name), "init.svc.%s", service_name);
++	if (ret > PROPERTY_KEY_MAX - 1) {
++		ALOGD("Service name '%s' is too long", service_name);
++		return false;
 +	}
 +
-+	if (adapter != default_adapter) {
-+		error("Wrong adapter %p", adapter);
-+		return;
++	if (property_get(name, val, NULL)) {
++		if (strcmp(val, "running") == 0)
++			return true;
 +	}
 +
-+	if (!g_strcmp0(adapter->short_name, (const char *) rp->short_name) &&
-+			!g_strcmp0(adapter->name, (const char *) rp->name))
-+		return;
-+
-+	DBG("name: %s short name: %s", rp->name, rp->short_name);
-+
-+	g_free(adapter->name);
-+	adapter->name = g_strdup((const char *) rp->name);
-+
-+	g_free(adapter->short_name);
-+	adapter->short_name = g_strdup((const char *) rp->short_name);
-+
-+	/* TODO Update services if needed */
++	return false;
 +}
 +
-+static void settings_changed_connectable(struct bt_adapter *adapter)
++static bool start_bt_daemon(void)
 +{
-+	/* TODO */
++	int tries = 40; /* wait 4 seconds for completion */
++
++	ALOGI(__func__);
++
++	/* Start Android Bluetooth daemon service */
++	property_set("ctl.start", ANDROID_BLUEZ);
++
++	while (tries-- > 0) {
++		if (is_running(ANDROID_BLUEZ) == true) {
++			ALOGI("Android BlueZ daemon started");
++			return true;
++		}
++
++		usleep(100000);
++	}
++
++	return false;
 +}
 +
-+static void settings_changed_discoverable(struct bt_adapter *adapter)
-+{
-+	/* TODO */
-+}
-+
-+static void settings_changed(struct bt_adapter *adapter, uint32_t settings)
-+{
-+	uint32_t changed_mask;
-+
-+	changed_mask = adapter->current_settings ^ settings;
-+
-+	adapter->current_settings = settings;
-+
-+	DBG("0x%08x", changed_mask);
-+
-+	if (changed_mask & MGMT_SETTING_POWERED) {
-+		info("Powered");
-+
-+		if (adapter->current_settings & MGMT_SETTING_POWERED)
-+			adapter_start(adapter);
-+		else
-+			adapter_stop(adapter);
-+	}
-+
-+	/* Seems not needed for Android */
-+	if (changed_mask & MGMT_SETTING_PAIRABLE)
-+		DBG("Pairable");
-+
-+	/*
-+	 * There are only 2 scan modes:
-+	 * CONNECTABLE and CONNECTABLE_DISCOVERABLE
-+	 */
-+	if (changed_mask & MGMT_SETTING_CONNECTABLE) {
-+		DBG("Connectable");
-+
-+		settings_changed_connectable(adapter);
-+	}
-+
-+	if (changed_mask & MGMT_SETTING_DISCOVERABLE) {
-+		DBG("Discoverable");
-+
-+		settings_changed_discoverable(adapter);
-+	}
-+}
-+
-+static void new_settings_callback(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct bt_adapter *adapter = user_data;
-+	uint32_t settings;
-+
-+	if (length < sizeof(settings)) {
-+		error("Wrong size of new settings parameters");
-+		return;
-+	}
-+
-+	if (adapter != default_adapter) {
-+		error("Wrong adapter %p", adapter);
-+		return;
-+	}
-+
-+	settings = bt_get_le32(param);
-+
-+	DBG("settings: 0x%8.8x -> 0x%8.8x", adapter->current_settings,
-+								settings);
-+
-+	if (settings == adapter->current_settings)
-+		return;
-+
-+	settings_changed(adapter, settings);
-+}
-+
-+static void mgmt_dev_class_changed_event(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct bt_adapter *adapter = user_data;
-+	const struct mgmt_cod *rp = param;
-+	uint32_t dev_class;
-+
-+	if (length < sizeof(*rp)) {
-+		error("Wrong size of class of device changed parameters");
-+		return;
-+	}
-+
-+	if (adapter != default_adapter) {
-+		error("Wrong adapter %p", adapter);
-+		return;
-+	}
-+
-+	dev_class = rp->val[0] | (rp->val[1] << 8) | (rp->val[2] << 16);
-+
-+	if (dev_class == adapter->dev_class)
-+		return;
-+
-+	DBG("Class: 0x%06x", dev_class);
-+
-+	adapter->dev_class = dev_class;
-+
-+	/* TODO: Inform prop change: Class */
-+
-+	/* TODO: Gatt attrib set*/
-+}
-+
-+static void register_mgmt_handlers(struct bt_adapter *adapter)
-+{
-+	mgmt_register(adapter->mgmt, MGMT_EV_NEW_SETTINGS, adapter->dev_id,
-+					new_settings_callback, adapter, NULL);
-+
-+	mgmt_register(adapter->mgmt, MGMT_EV_CLASS_OF_DEV_CHANGED,
-+			adapter->dev_id, mgmt_dev_class_changed_event,
-+			adapter, NULL);
-+
-+	mgmt_register(adapter->mgmt, MGMT_EV_LOCAL_NAME_CHANGED,
-+			adapter->dev_id, mgmt_local_name_changed_event,
-+			adapter, NULL);
-+}
-+
- static void load_link_keys(struct bt_adapter *adapter, GSList *keys)
+ static bool is_profile(const char *profile, const char *str)
  {
- 	struct mgmt_cp_load_link_keys *cp;
-@@ -188,6 +341,7 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 	default_adapter->current_settings = btohs(rp->current_settings);
+ 	return strcmp(profile, str) == 0;
+@@ -50,7 +98,11 @@ static int init(bt_callbacks_t *callbacks)
+ 	/* store reference to user callbacks */
+ 	bt_hal_cbacks = callbacks;
  
- 	/* TODO: Register all event notification handlers */
-+	register_mgmt_handlers(default_adapter);
+-	/* TODO: Init here bluezd task */
++	if (start_bt_daemon() == true) {
++		/* TODO: open channel */
++
++		return BT_STATUS_SUCCESS;
++	}
  
- 	if (default_adapter->current_settings & MGMT_SETTING_POWERED)
- 		adapter_start(default_adapter);
+ 	return BT_STATUS_UNSUPPORTED;
+ }
 -- 
 1.7.10.4
 
