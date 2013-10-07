@@ -1,41 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Power off AMP controllers after setup phase
-Date: Mon,  7 Oct 2013 00:26:05 -0700
-Message-Id: <1381130767-42488-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 7 Oct 2013 10:50:59 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Extra sanity check for AMP discover response
+Message-ID: <20131007075057.GF2804@aemeltch-MOBL1>
+References: <1380999376-9045-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1380999376-9045-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Even AMP controllers should be powered off after the setup phase. It
-is not a good idea to keep AMP controllers powered on all the time
-if they are not in use.
+Hi Marcel,
 
-Power on of the AMP controller can either be done manually via
-command line commands or directly via A2MP. Especially since there
-is an indication in A2MP for powered down controllers that can
-be activated.
+On Sat, Oct 05, 2013 at 11:56:16AM -0700, Marcel Holtmann wrote:
+> Just in case the Bluetooth standard introduces a third device type,
+> make sure that we only include AMP controllers in the AMP discover
+> response.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/a2mp.c | 18 +++++++-----------
+>  1 file changed, 7 insertions(+), 11 deletions(-)
+> 
+> diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+> index 529789d..5278a65 100644
+> --- a/net/bluetooth/a2mp.c
+> +++ b/net/bluetooth/a2mp.c
+> @@ -78,24 +78,20 @@ u8 __next_ident(struct amp_mgr *mgr)
+>  /* hci_dev_list shall be locked */
+>  static void __a2mp_add_cl(struct amp_mgr *mgr, struct a2mp_cl *cl)
+>  {
+> -	int i = 0;
+>  	struct hci_dev *hdev;
+> +	int i = 1;
+>  
+>  	cl[0].id = AMP_ID_BREDR;
+>  	cl[0].type = AMP_TYPE_BREDR;
+>  	cl[0].status = AMP_STATUS_BLUETOOTH_ONLY;
+>  
+>  	list_for_each_entry(hdev, &hci_dev_list, list) {
+> -		/* Iterate through AMP controllers */
+> -		if (hdev->dev_type != HCI_AMP)
+> -			continue;
+> -
+> -		/* Starting from second entry */
+> -		++i;
+> -
+> -		cl[i].id = hdev->id;
+> -		cl[i].type = hdev->amp_type;
+> -		cl[i].status = hdev->amp_status;
+> +		if (hdev->dev_type == HCI_AMP) {
+> +			cl[i].id = hdev->id;
+> +			cl[i].type = hdev->amp_type;
+> +			cl[i].status = hdev->amp_status;
+> +			i++;
+> +		}
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I wonder did it make sense to merge 3 patches which touches this small
+function together?
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index d9626aa..2ee5a8e 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2356,9 +2356,9 @@ int hci_register_dev(struct hci_dev *hdev)
- 		set_bit(HCI_RFKILLED, &hdev->dev_flags);
- 
- 	set_bit(HCI_SETUP, &hdev->dev_flags);
-+	set_bit(HCI_AUTO_OFF, &hdev->dev_flags);
- 
- 	if (hdev->dev_type == HCI_BREDR) {
--		set_bit(HCI_AUTO_OFF, &hdev->dev_flags);
- 		/* Assume BR/EDR support until proven otherwise (such as
- 		 * through reading supported features during init.
- 		 */
--- 
-1.8.3.1
-
+Best regards 
+Andrei Emeltchenko 
