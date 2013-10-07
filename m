@@ -1,38 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Read supported features and commands on AMP controllers
-Date: Mon,  7 Oct 2013 02:31:39 -0700
-Message-Id: <1381138299-49639-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 7 Oct 2013 10:14:40 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] Bluetooth: Power off AMP controllers after setup
+ phase
+Message-ID: <20131007081440.GA16692@x220.p-661hnu-f1>
+References: <1381130767-42488-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1381130767-42488-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The commands for reading supported features and commands are both
-supported by AMP controllers. Issue them during controller init
-phase so their values are known.
+Hi Marcel,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_core.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+On Mon, Oct 07, 2013, Marcel Holtmann wrote:
+> Even AMP controllers should be powered off after the setup phase. It
+> is not a good idea to keep AMP controllers powered on all the time
+> if they are not in use.
+> 
+> Power on of the AMP controller can either be done manually via
+> command line commands or directly via A2MP. Especially since there
+> is an indication in A2MP for powered down controllers that can
+> be activated.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/hci_core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 3572611..99f83ab 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -307,6 +307,12 @@ static void amp_init(struct hci_request *req)
- 	/* Read Local Version */
- 	hci_req_add(req, HCI_OP_READ_LOCAL_VERSION, 0, NULL);
- 
-+	/* Read Local Supported Commands */
-+	hci_req_add(req, HCI_OP_READ_LOCAL_COMMANDS, 0, NULL);
-+
-+	/* Read Local Supported Features */
-+	hci_req_add(req, HCI_OP_READ_LOCAL_FEATURES, 0, NULL);
-+
- 	/* Read Local AMP Info */
- 	hci_req_add(req, HCI_OP_READ_LOCAL_AMP_INFO, 0, NULL);
- 
--- 
-1.8.3.1
+All patches in this set have been applied to bluetooth-next. Thanks.
 
+Johan
