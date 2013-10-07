@@ -1,45 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=US-ASCII
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH 1/2] Bluetooth: Make LE scan interval and window a controller option
+Subject: Re: [PATCH v3 1/2] Bluetooth: Use HCI request for LE connection
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <52532774.60903@openbossa.org>
-Date: Tue, 8 Oct 2013 00:19:00 +0200
+In-Reply-To: <52532B6D.2020504@openbossa.org>
+Date: Tue, 8 Oct 2013 00:13:23 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <16725035-59E1-413B-A534-18585ACC20F8@holtmann.org>
-References: <1380881955-59853-1-git-send-email-marcel@holtmann.org> <524F3872.7070609@openbossa.org> <B6CE6A9A-E989-4F48-B12D-D23C47FC36A2@holtmann.org> <52532774.60903@openbossa.org>
+Message-Id: <39C71568-4803-48BC-92A2-F47360EF4243@holtmann.org>
+References: <1381165148-14156-1-git-send-email-andre.guedes@openbossa.org> <1381165148-14156-2-git-send-email-andre.guedes@openbossa.org> <1A822672-4ED1-4124-89EA-357325B6AF1B@holtmann.org> <52532B6D.2020504@openbossa.org>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
->>>> The scan interval and window for LE passive scanning and connection
->>>> establishment should be configurable on a per controller basis. So
->>>> introduce a setting that later on will allow modifying it.
+>>> This patch introduces a new helper, which uses the HCI request
+>>> framework, for creating LE connectons. All the handling is now
+>>> done by this function so we can remove the hci_cs_le_create_conn()
+>>> event handler.
 >>> 
->>> Each remote device has their particular set of parameters based on the profiles it support. So, these parameters should be per device, not per controller.
+>>> This patch also removes the old hci_le_create_connection() since
+>>> it is not used anymore.
 >>> 
->>> IIRC, we discussed about this in New Orleans and the connection parameters will be informed to the kernel through the Mgmt command to load the connection list. This way, we'll have the parameters set per device.
+>>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>>> ---
+>>> include/net/bluetooth/hci_core.h |  2 ++
+>>> net/bluetooth/hci_conn.c         | 30 +++++-----------------
+>>> net/bluetooth/hci_core.c         | 55 ++++++++++++++++++++++++++++++++++++++++
+>>> net/bluetooth/hci_event.c        | 31 ----------------------
+>>> 4 files changed, 63 insertions(+), 55 deletions(-)
 >>> 
->>> So I don't understand exactly what is the purpose of this command you are introducing. Am I missing something?
+>>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+>>> index c065527..6ac542c 100644
+>>> --- a/include/net/bluetooth/hci_core.h
+>>> +++ b/include/net/bluetooth/hci_core.h
+>>> @@ -1188,6 +1188,8 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
+>>> 
+>>> u8 bdaddr_to_le(u8 bdaddr_type);
+>>> 
+>>> +int hci_create_le_conn(struct hci_dev *hdev, bdaddr_t *addr, u8 type);
+>>> +
+>>> #define SCO_AIRMODE_MASK       0x0003
+>>> #define SCO_AIRMODE_CVSD       0x0000
+>>> #define SCO_AIRMODE_TRANSP     0x0003
+>>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+>>> index 2a220a8..31f6712 100644
+>>> --- a/net/bluetooth/hci_conn.c
+>>> +++ b/net/bluetooth/hci_conn.c
+>>> @@ -49,29 +49,6 @@ static const struct sco_param sco_param_wideband[] = {
+>>> 	{ EDR_ESCO_MASK | ESCO_EV3,   0x0008 }, /* T1 */
+>>> };
+>>> 
+>>> -static void hci_le_create_connection(struct hci_conn *conn)
+>>> -{
+>>> -	struct hci_dev *hdev = conn->hdev;
+>>> -	struct hci_cp_le_create_conn cp;
+>>> -
+>>> -	memset(&cp, 0, sizeof(cp));
+>>> -	cp.scan_interval = __constant_cpu_to_le16(0x0060);
+>>> -	cp.scan_window = __constant_cpu_to_le16(0x0030);
+>>> -	bacpy(&cp.peer_addr, &conn->dst);
+>>> -	cp.peer_addr_type = conn->dst_type;
+>>> -	if (bacmp(&hdev->bdaddr, BDADDR_ANY))
+>>> -		cp.own_address_type = ADDR_LE_DEV_PUBLIC;
+>>> -	else
+>>> -		cp.own_address_type = ADDR_LE_DEV_RANDOM;
+>>> -	cp.conn_interval_min = __constant_cpu_to_le16(0x0028);
+>>> -	cp.conn_interval_max = __constant_cpu_to_le16(0x0038);
+>>> -	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
+>>> -	cp.min_ce_len = __constant_cpu_to_le16(0x0000);
+>>> -	cp.max_ce_len = __constant_cpu_to_le16(0x0000);
+>>> -
+>>> -	hci_send_cmd(hdev, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
+>>> -}
+>>> -
+>>> static void hci_le_create_connection_cancel(struct hci_conn *conn)
+>>> {
+>>> 	hci_send_cmd(conn->hdev, HCI_OP_LE_CREATE_CONN_CANCEL, 0, NULL);
+>>> @@ -549,6 +526,7 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+>>> 				    u8 dst_type, u8 sec_level, u8 auth_type)
+>>> {
+>>> 	struct hci_conn *conn;
+>>> +	int err;
+>>> 
+>>> 	if (test_bit(HCI_ADVERTISING, &hdev->flags))
+>>> 		return ERR_PTR(-ENOTSUPP);
+>>> @@ -569,7 +547,11 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+>>> 		conn->link_mode |= HCI_LM_MASTER;
+>>> 		conn->sec_level = BT_SECURITY_LOW;
+>>> 
+>>> -		hci_le_create_connection(conn);
+>>> +		err = hci_create_le_conn(hdev, &conn->dst, conn->dst_type);
+>>> +		if (err) {
+>>> +			hci_conn_del(conn);
+>>> +			return ERR_PTR(err);
+>>> +		}
 >> 
->> I looked through the core specification and also the scan parameters profile. And actually the way I read it is that these two values are pretty much controller centric.
+>> I am wondering why we do not keep the void function here and handle the error directly in hci_create_le_conn.
 >> 
->> So yes, depending on the profile you are running you can change them. Or if you are running on an active device or if your device is in sleep mode. However at the end of day, the kernel does not really care much what these two values are. It can not make any smart decision about it.
+>> Any reason why you are doing it this way?
 > 
-> The way I see it, for connection (including background scan), the scan window and interval are Peripheral centric. I'll explain.
-> 
-> Each profile specification recommends the set of parameters for connection establishment (see the "Connection Establishment" section of the profiles specification, for instance HoGP, PXP, FMP). At that section we find the advertising parameters the profile recommends for those who are implementing the Peripheral side and the connection parameters (scan window, scan interval, connection maximum and minimum interval) recommended for those who are implementing the Central side. The profiles may have different connection parameters (e.g. HoGP and FMP).
-> 
-> So, based on the scanning parameters defined by the profiles the Central supports, we should configure the background scan. For instance, let's say we have three devices with the following scanning parameters:
-> - Device A (HoGP): interval 22.5ms window 11.25ms
-> - Device B (PXP): interval 60ms window 30ms
-> - Device C (FMP): interval 60ms window 30ms
-> 
-> For that list of devices, the background scan should be configured with interval 22.5ms window 11.25ms. Now, let's say Device A connects. Then the background scan should be configured with interval 60ms window 30ms.
+> Yes, hci_create_le_conn() may return error if hci_req_run() returns error (e.g. ENOMEM). For that case, we have to destroy the hci_conn object created by hci_conn_add() otherwise this object will leak. Besides, if the HCI command could not be sent to controller we should notify the caller about this (e.g. connect() returns error to the user or MGMT_OP_PAIR_DEVICE completes with error)
 
-so I wonder if it is worth it to put this into the kernel. Or let userspace just configure it. And if needed just change it.
+you are not answering my question. Why is the error handling not done directly in hci_create_le_conn? Do it where hci_req_run fails and not some other place.
 
 Regards
 
