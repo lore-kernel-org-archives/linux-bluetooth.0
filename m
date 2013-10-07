@@ -1,36 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] Bluetooth: List powered down AMP controllers correctly
-Date: Mon,  7 Oct 2013 00:26:07 -0700
-Message-Id: <1381130767-42488-3-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 2/3] Bluetooth: Make mgmt power down notification for BR/EDR explicit
+Date: Mon,  7 Oct 2013 00:26:06 -0700
+Message-Id: <1381130767-42488-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Within the AMP discover response, list powered down AMP controllers
-as powered down. No point in trying to make them look any different.
+The management interface only operates on BR/EDR controllers. The check
+for the power down notification is a bit intermixed with the check if
+controller auto power off is active. Since there are more than just
+BR/EDR controllers supported, make this check explicit since the auto
+power off check also applies to AMP controllers and it has to happen
+in this exact order. Otherwise the bit will not be cleared.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/a2mp.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ net/bluetooth/hci_core.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 9410e27..b38d074 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -89,7 +89,10 @@ static void __a2mp_add_cl(struct amp_mgr *mgr, struct a2mp_cl *cl)
- 		if (hdev->dev_type == HCI_AMP) {
- 			cl[i].id = hdev->id;
- 			cl[i].type = hdev->amp_type;
--			cl[i].status = hdev->amp_status;
-+			if (test_bit(HCI_UP, &hdev->flags))
-+				cl[i].status = hdev->amp_status;
-+			else
-+				cl[i].status = AMP_STATUS_POWERED_DOWN;
- 			i++;
- 		}
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 2ee5a8e..3572611 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1393,11 +1393,12 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 	hdev->flags = 0;
+ 	hdev->dev_flags &= ~HCI_PERSISTENT_MASK;
+ 
+-	if (!test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags) &&
+-	    hdev->dev_type == HCI_BREDR) {
+-		hci_dev_lock(hdev);
+-		mgmt_powered(hdev, 0);
+-		hci_dev_unlock(hdev);
++	if (!test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags)) {
++		if (hdev->dev_type == HCI_BREDR) {
++			hci_dev_lock(hdev);
++			mgmt_powered(hdev, 0);
++			hci_dev_unlock(hdev);
++		}
  	}
+ 
+ 	/* Controller radio is available but is currently powered down */
 -- 
 1.8.3.1
 
