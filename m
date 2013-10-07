@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv1 11/15] android: Add cap to bind to port < 1024
-Date: Mon, 07 Oct 2013 14:14:09 +0200
-Message-ID: <8033220.yHOuagLSyP@uw000953>
-In-Reply-To: <1381131496-9417-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381131496-9417-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCHv1 05/15] android: Start Android Bluetooth daemon
+Date: Mon, 07 Oct 2013 14:09:07 +0200
+Message-ID: <11707931.bYymfLjOgL@uw000953>
+In-Reply-To: <1381131496-9417-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381131496-9417-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="ISO-8859-1"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,127 +14,110 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
+On Monday 07 of October 2013 10:38:06 Andrei Emeltchenko wrote:
 > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> For SDP server we need to bind to lower port, acquire this capability.
+> Start Android Bluetooth daemon from HAL init(). Make sure
+> that daemon is in "running" state.
 > ---
->  android/main.c |   72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  configure.ac   |    4 ++++
->  2 files changed, 76 insertions(+)
+>  android/hal_bluetooth.c |   54 ++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 53 insertions(+), 1 deletion(-)
 > 
-> diff --git a/android/main.c b/android/main.c
-> index 7968ed0..dab54ce 100644
-> --- a/android/main.c
-> +++ b/android/main.c
-> @@ -32,6 +32,22 @@
->  #include <stdlib.h>
->  #include <stdbool.h>
->  #include <string.h>
-> +#include <unistd.h>
-> +#include <errno.h>
-> +#include <sys/prctl.h>
-> +#include <linux/capability.h>
-> +
-> +/**
-> + * Include <sys/capability.h> for host build and
-> + * also for Android 4.3 when it is added to bionic
-> + */
-> +#if !defined(__ANDROID_API__) || (__ANDROID_API__ > 17)
-> +#include <sys/capability.h>
-> +#endif
-> +
-> +#if defined(__ANDROID_API__)
-> +#include <private/android_filesystem_config.h>
-> +#endif
+> diff --git a/android/hal_bluetooth.c b/android/hal_bluetooth.c
+> index 00f3e8d..f8139a7 100644
+> --- a/android/hal_bluetooth.c
+> +++ b/android/hal_bluetooth.c
+> @@ -23,11 +23,16 @@
+>  #include <hardware/bluetooth.h>
+>  #include <hardware/bt_sock.h>
 >  
->  #include <glib.h>
+> +#include <cutils/sockets.h>
+> +#include <cutils/properties.h>
+> +
+>  #define LOG_TAG "BlueZ"
+>  #include <cutils/log.h>
 >  
-> @@ -279,6 +295,59 @@ static void cleanup_mgmt_interface(void)
->  	mgmt_if = NULL;
+>  #include "hal.h"
+>  
+> +#define ANDROID_BLUEZ "btd"
+
+Shouldn't this be 'bluetoothd'?
+Service name can be different than binary but I think we should keep it same
+to avoid confusion.
+
+> +
+>  bt_callbacks_t *bt_hal_cbacks = NULL;
+>  
+>  static bool interface_ready(void)
+> @@ -35,6 +40,49 @@ static bool interface_ready(void)
+>  	return bt_hal_cbacks != NULL;
 >  }
 >  
-> +static bool android_set_aid_and_cap()
-
-Missing void in ().
-
+> +static bool is_running(const char *service_name)
 > +{
-> +	struct __user_cap_header_struct header;
-> +	struct __user_cap_data_struct cap;
-> +#if defined(__ANDROID_API__)
-> +	gid_t groups[] = {AID_NET_BT, AID_NET_BT_ADMIN, AID_BLUETOOTH,
-> +								AID_NET_ADMIN};
-> +#endif
+> +	char val[PROPERTY_VALUE_MAX];
+> +	char name[PROPERTY_KEY_MAX];
+> +	int ret;
 > +
-> +	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
+> +	ALOGI(__func__);
 > +
-> +	header.version = _LINUX_CAPABILITY_VERSION;
-> +
-> +	prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);
-> +
-> +#if defined(__ANDROID_API__)
-> +	if (setgid(AID_BLUETOOTH) < 0)
-> +		warn("%s: setgid(): %s", __func__, strerror(errno));
-> +
-> +	if (setuid(AID_BLUETOOTH) < 0)
-> +		warn("%s: setuid(): %s", __func__, strerror(errno));
-> +#endif
-> +
-> +	header.version = _LINUX_CAPABILITY_VERSION;
-> +	header.pid = 0;
-> +
-> +	cap.effective = cap.permitted =
-> +		CAP_TO_MASK(CAP_SETGID) |
-> +		CAP_TO_MASK(CAP_NET_RAW) |
-> +		CAP_TO_MASK(CAP_NET_ADMIN) |
-> +		CAP_TO_MASK(CAP_NET_BIND_SERVICE);
-> +	cap.inheritable = 0;
-> +
-> +	if (capset(&header, &cap) < 0) {
-> +		error("%s: capset(): %s", __func__, strerror(errno));
+> +	ret = snprintf(name, sizeof(name), "init.svc.%s", service_name);
+> +	if (ret > PROPERTY_KEY_MAX - 1) {
+> +		ALOGD("Service name '%s' is too long", service_name);
 > +		return false;
 > +	}
 > +
-> +#if defined(__ANDROID_API__)
-> +	if (setgroups(sizeof(groups)/sizeof(groups[0]), groups) < 0)
-> +		warn("%s: setgroups: %s", __func__, strerror(errno));
-> +#endif
-> +	if (capget(&header, &cap) < 0)
-> +		error("%s: capget(): %s", __func__, strerror(errno));
-> +	else
-> +		DBG("Caps: eff: 0x%x, perm: 0x%x, inh: 0x%x", cap.effective,
-> +					cap.permitted, cap.inheritable);
+> +	if (property_get(name, val, NULL)) {
+
+Maybe pass "init.svc."ANDROID_BLUEZ directly to property_get()?
+
+> +		if (strcmp(val, "running") == 0)
+> +			return true;
+> +	}
 > +
-> +	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
-> +
-> +	return true;
+> +	return false;
 > +}
 > +
->  int main(int argc, char *argv[])
+> +static bool start_bt_daemon(void)
+> +{
+> +	int tries = 40; /* wait 4 seconds for completion */
+> +
+> +	ALOGI(__func__);
+> +
+> +	/* Start Android Bluetooth daemon service */
+> +	property_set("ctl.start", ANDROID_BLUEZ);
+> +
+> +	while (tries-- > 0) {
+> +		if (is_running(ANDROID_BLUEZ) == true) {
+> +			ALOGI("Android BlueZ daemon started");
+> +			return true;
+> +		}
+> +
+> +		usleep(100000);
+> +	}
+> +
+> +	return false;
+> +}
+> +
+>  static bool is_profile(const char *profile, const char *str)
 >  {
->  	GOptionContext *context;
-> @@ -312,6 +381,9 @@ int main(int argc, char *argv[])
->  	sigaction(SIGINT, &sa, NULL);
->  	sigaction(SIGTERM, &sa, NULL);
+>  	return strcmp(profile, str) == 0;
+> @@ -50,7 +98,11 @@ static int init(bt_callbacks_t *callbacks)
+>  	/* store reference to user callbacks */
+>  	bt_hal_cbacks = callbacks;
 >  
-> +	if (android_set_aid_and_cap() == false)
-> +		exit(EXIT_FAILURE);
+> -	/* TODO: Init here bluezd task */
+> +	if (start_bt_daemon() == true) {
+> +		/* TODO: open channel */
 > +
->  	init_mgmt_interface();
->  	sdp_start();
+> +		return BT_STATUS_SUCCESS;
+> +	}
+
+bt_hal_cbacks should be set back to NULL here.
+
 >  
-> diff --git a/configure.ac b/configure.ac
-> index 7b1f64a..5406434 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -247,4 +247,8 @@ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
->  					[enable_android=${enableval}])
->  AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
->  
-> +if (test "${android_daemon}" = "yes"); then
-> +	AC_CHECK_LIB(cap, capget, dummy=yes, AC_MSG_ERROR(libcap is required))
-> +fi
-> +
->  AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
+>  	return BT_STATUS_UNSUPPORTED;
+>  }
 > 
 
 -- 
