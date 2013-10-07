@@ -1,70 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] autopair: Remove time(NULL) fallback when seeding rand()
-Date: Mon,  7 Oct 2013 17:05:24 -0400
-Message-Id: <1381179924-19529-1-git-send-email-anderson.lizardo@openbossa.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH v2] bluetooth: fix variable shadow warnings
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1381162756-18353-1-git-send-email-johannes@sipsolutions.net>
+Date: Mon, 7 Oct 2013 18:53:38 +0200
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Johannes Berg <johannes.berg@intel.com>
+Message-Id: <815BA104-681B-4C6B-AD03-E52EB8834904@holtmann.org>
+References: <1381162756-18353-1-git-send-email-johannes@sipsolutions.net>
+To: Johannes Berg <johannes@sipsolutions.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If /dev/urandom cannot be opened or read, just fail the plugin
-initialization, as it is very unlikely that a fully working Linux system
-does not have a working /dev/urandom. This also simplifies the code
-logic.
----
- plugins/autopair.c |   27 ++++++++++++++++++---------
- 1 file changed, 18 insertions(+), 9 deletions(-)
+Hi Johannes,
 
-diff --git a/plugins/autopair.c b/plugins/autopair.c
-index e6e5035..266b695 100644
---- a/plugins/autopair.c
-+++ b/plugins/autopair.c
-@@ -29,6 +29,7 @@
- #include <stdlib.h>
- #include <fcntl.h>
- #include <unistd.h>
-+#include <errno.h>
- 
- #include <bluetooth/bluetooth.h>
- #include <glib.h>
-@@ -149,19 +150,27 @@ static int autopair_init(void)
- {
- 	/* Initialize the random seed from /dev/urandom */
- 	unsigned int seed;
--	int fd;
-+	int fd, err;
-+	ssize_t n;
- 
- 	fd = open("/dev/urandom", O_RDONLY);
--	if (fd >= 0) {
--		ssize_t n;
--
--		n = read(fd, &seed, sizeof(seed));
--		if (n < (ssize_t) sizeof(seed))
--			seed = time(NULL);
-+	if (fd < 0) {
-+		err = -errno;
-+		error("Failed to open /dev/urandom: %s (%d)", strerror(-err),
-+									-err);
-+		return err;
-+	}
- 
-+	n = read(fd, &seed, sizeof(seed));
-+	if (n < (ssize_t) sizeof(seed)) {
-+		err = (n == -1) ? -errno : -EIO;
-+		error("Failed to read %d bytes from /dev/urandom",
-+								sizeof(seed));
- 		close(fd);
--	} else
--		seed = time(NULL);
-+		return err;
-+	}
-+
-+	close(fd);
- 
- 	srand(seed);
- 
--- 
-1.7.9.5
+> From: Johannes Berg <johannes.berg@intel.com>
+> 
+> Sparse points out three places where variables are shadowed,
+> rename two of the variables and remove the duplicate third.
+> 
+> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+> ---
+> net/bluetooth/hci_event.c  | 12 +++++++-----
+> net/bluetooth/l2cap_sock.c |  2 +-
+> 2 files changed, 8 insertions(+), 6 deletions(-)
+
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
