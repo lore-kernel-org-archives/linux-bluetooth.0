@@ -1,126 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv1 05/15] android: Start Android Bluetooth daemon
-Date: Mon, 07 Oct 2013 14:09:07 +0200
-Message-ID: <11707931.bYymfLjOgL@uw000953>
-In-Reply-To: <1381131496-9417-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381131496-9417-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2] Bluetooth: Read location data on AMP controller init
+Date: Mon,  7 Oct 2013 03:55:52 -0700
+Message-Id: <1381143353-57149-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+When initializing an AMP controller, read its current known location
+data so that it can be analyzed later on.
 
-On Monday 07 of October 2013 10:38:06 Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Start Android Bluetooth daemon from HAL init(). Make sure
-> that daemon is in "running" state.
-> ---
->  android/hal_bluetooth.c |   54 ++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 53 insertions(+), 1 deletion(-)
-> 
-> diff --git a/android/hal_bluetooth.c b/android/hal_bluetooth.c
-> index 00f3e8d..f8139a7 100644
-> --- a/android/hal_bluetooth.c
-> +++ b/android/hal_bluetooth.c
-> @@ -23,11 +23,16 @@
->  #include <hardware/bluetooth.h>
->  #include <hardware/bt_sock.h>
->  
-> +#include <cutils/sockets.h>
-> +#include <cutils/properties.h>
-> +
->  #define LOG_TAG "BlueZ"
->  #include <cutils/log.h>
->  
->  #include "hal.h"
->  
-> +#define ANDROID_BLUEZ "btd"
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci.h | 2 ++
+ net/bluetooth/hci_core.c    | 3 +++
+ 2 files changed, 5 insertions(+)
 
-Shouldn't this be 'bluetoothd'?
-Service name can be different than binary but I think we should keep it same
-to avoid confusion.
-
-> +
->  bt_callbacks_t *bt_hal_cbacks = NULL;
->  
->  static bool interface_ready(void)
-> @@ -35,6 +40,49 @@ static bool interface_ready(void)
->  	return bt_hal_cbacks != NULL;
->  }
->  
-> +static bool is_running(const char *service_name)
-> +{
-> +	char val[PROPERTY_VALUE_MAX];
-> +	char name[PROPERTY_KEY_MAX];
-> +	int ret;
-> +
-> +	ALOGI(__func__);
-> +
-> +	ret = snprintf(name, sizeof(name), "init.svc.%s", service_name);
-> +	if (ret > PROPERTY_KEY_MAX - 1) {
-> +		ALOGD("Service name '%s' is too long", service_name);
-> +		return false;
-> +	}
-> +
-> +	if (property_get(name, val, NULL)) {
-
-Maybe pass "init.svc."ANDROID_BLUEZ directly to property_get()?
-
-> +		if (strcmp(val, "running") == 0)
-> +			return true;
-> +	}
-> +
-> +	return false;
-> +}
-> +
-> +static bool start_bt_daemon(void)
-> +{
-> +	int tries = 40; /* wait 4 seconds for completion */
-> +
-> +	ALOGI(__func__);
-> +
-> +	/* Start Android Bluetooth daemon service */
-> +	property_set("ctl.start", ANDROID_BLUEZ);
-> +
-> +	while (tries-- > 0) {
-> +		if (is_running(ANDROID_BLUEZ) == true) {
-> +			ALOGI("Android BlueZ daemon started");
-> +			return true;
-> +		}
-> +
-> +		usleep(100000);
-> +	}
-> +
-> +	return false;
-> +}
-> +
->  static bool is_profile(const char *profile, const char *str)
->  {
->  	return strcmp(profile, str) == 0;
-> @@ -50,7 +98,11 @@ static int init(bt_callbacks_t *callbacks)
->  	/* store reference to user callbacks */
->  	bt_hal_cbacks = callbacks;
->  
-> -	/* TODO: Init here bluezd task */
-> +	if (start_bt_daemon() == true) {
-> +		/* TODO: open channel */
-> +
-> +		return BT_STATUS_SUCCESS;
-> +	}
-
-bt_hal_cbacks should be set back to NULL here.
-
->  
->  	return BT_STATUS_UNSUPPORTED;
->  }
-> 
-
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 3616ea7..c8a91cb 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -851,6 +851,8 @@ struct hci_rp_read_inq_rsp_tx_power {
+ 
+ #define HCI_OP_SET_EVENT_MASK_PAGE_2	0x0c63
+ 
++#define HCI_OP_READ_LOCATION_DATA	0x0c64
++
+ #define HCI_OP_READ_FLOW_CONTROL_MODE	0x0c66
+ struct hci_rp_read_flow_control_mode {
+ 	__u8     status;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 99f83ab..967739c 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -318,6 +318,9 @@ static void amp_init(struct hci_request *req)
+ 
+ 	/* Read Data Blk size */
+ 	hci_req_add(req, HCI_OP_READ_DATA_BLOCK_SIZE, 0, NULL);
++
++	/* Read Location Data */
++	hci_req_add(req, HCI_OP_READ_LOCATION_DATA, 0, NULL);
+ }
+ 
+ static void hci_init1_req(struct hci_request *req, unsigned long opt)
 -- 
-BR
-Szymon Janc
+1.8.3.1
 
