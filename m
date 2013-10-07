@@ -1,34 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH v2] bluetooth: fix variable shadow warnings
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1381162756-18353-1-git-send-email-johannes@sipsolutions.net>
-Date: Mon, 7 Oct 2013 18:53:38 +0200
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Johannes Berg <johannes.berg@intel.com>
-Message-Id: <815BA104-681B-4C6B-AD03-E52EB8834904@holtmann.org>
-References: <1381162756-18353-1-git-send-email-johannes@sipsolutions.net>
-To: Johannes Berg <johannes@sipsolutions.net>
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 2/2] Bluetooth: Refactor hci_connect_le
+Date: Mon,  7 Oct 2013 13:59:08 -0300
+Message-Id: <1381165148-14156-3-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1381165148-14156-1-git-send-email-andre.guedes@openbossa.org>
+References: <1381165148-14156-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johannes,
+This patch does some code refactoring in hci_connect_le() by moving
+the exception code into if statements and letting the main flow in
+first level of function scope. It also adds extra comments to improve
+the code readability.
 
-> From: Johannes Berg <johannes.berg@intel.com>
-> 
-> Sparse points out three places where variables are shadowed,
-> rename two of the variables and remove the duplicate third.
-> 
-> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-> ---
-> net/bluetooth/hci_event.c  | 12 +++++++-----
-> net/bluetooth/l2cap_sock.c |  2 +-
-> 2 files changed, 8 insertions(+), 6 deletions(-)
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ net/bluetooth/hci_conn.c | 55 ++++++++++++++++++++++++++++++------------------
+ 1 file changed, 35 insertions(+), 20 deletions(-)
 
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 31f6712..de211ca 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -531,34 +531,49 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	if (test_bit(HCI_ADVERTISING, &hdev->flags))
+ 		return ERR_PTR(-ENOTSUPP);
+ 
++	/* Some devices send ATT messages as soon as the physical link is
++	 * established. To be able to handle these ATT messages, the user-
++	 * space first establishes the connection and then starts the pairing
++	 * process.
++	 *
++	 * So if a hci_conn object already exists for the following connection
++	 * attempt, we simply update pending_sec_level and auth_type fields
++	 * and return the object found.
++	 */
+ 	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, dst);
+-	if (!conn) {
+-		conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
+-		if (conn)
+-			return ERR_PTR(-EBUSY);
+-
+-		conn = hci_conn_add(hdev, LE_LINK, dst);
+-		if (!conn)
+-			return ERR_PTR(-ENOMEM);
++	if (conn) {
++		conn->pending_sec_level = sec_level;
++		conn->auth_type = auth_type;
++		goto done;
++	}
+ 
+-		conn->dst_type = bdaddr_to_le(dst_type);
+-		conn->state = BT_CONNECT;
+-		conn->out = true;
+-		conn->link_mode |= HCI_LM_MASTER;
+-		conn->sec_level = BT_SECURITY_LOW;
++	/* Since the controller supports only one LE connection attempt at a
++	 * time, we return -EBUSY if there is any connection attempt running.
++	 */
++	conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
++	if (conn)
++		return ERR_PTR(-EBUSY);
+ 
+-		err = hci_create_le_conn(hdev, &conn->dst, conn->dst_type);
+-		if (err) {
+-			hci_conn_del(conn);
+-			return ERR_PTR(err);
+-		}
+-	}
++	conn = hci_conn_add(hdev, LE_LINK, dst);
++	if (!conn)
++		return ERR_PTR(-ENOMEM);
+ 
++	conn->dst_type = bdaddr_to_le(dst_type);
++	conn->state = BT_CONNECT;
++	conn->out = true;
++	conn->link_mode |= HCI_LM_MASTER;
++	conn->sec_level = BT_SECURITY_LOW;
+ 	conn->pending_sec_level = sec_level;
+ 	conn->auth_type = auth_type;
+ 
+-	hci_conn_hold(conn);
++	err = hci_create_le_conn(hdev, &conn->dst, conn->dst_type);
++	if (err) {
++		hci_conn_del(conn);
++		return ERR_PTR(err);
++	}
+ 
++done:
++	hci_conn_hold(conn);
+ 	return conn;
+ }
+ 
+-- 
+1.8.4
 
