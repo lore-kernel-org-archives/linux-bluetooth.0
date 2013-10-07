@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 05/15] android: Start Android Bluetooth daemon
-Date: Mon,  7 Oct 2013 10:38:06 +0300
-Message-Id: <1381131496-9417-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 08/15] android: Add adapter and device struct for BlueZ daemon
+Date: Mon,  7 Oct 2013 10:38:09 +0300
+Message-Id: <1381131496-9417-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,96 +11,143 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Start Android Bluetooth daemon from HAL init(). Make sure
-that daemon is in "running" state.
+Adapter structure in BlueZ daemon keeps track of default adapter
+and device structure keeps track about found devices.
 ---
- android/hal_bluetooth.c |   54 ++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 53 insertions(+), 1 deletion(-)
+ android/bt_adapter.c |   56 ++++++++++++++++++++++++++++++++++++++++++++++
+ android/bt_adapter.h |   60 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 116 insertions(+)
+ create mode 100644 android/bt_adapter.c
+ create mode 100644 android/bt_adapter.h
 
-diff --git a/android/hal_bluetooth.c b/android/hal_bluetooth.c
-index 00f3e8d..f8139a7 100644
---- a/android/hal_bluetooth.c
-+++ b/android/hal_bluetooth.c
-@@ -23,11 +23,16 @@
- #include <hardware/bluetooth.h>
- #include <hardware/bt_sock.h>
- 
-+#include <cutils/sockets.h>
-+#include <cutils/properties.h>
+diff --git a/android/bt_adapter.c b/android/bt_adapter.c
+new file mode 100644
+index 0000000..e21d50c
+--- /dev/null
++++ b/android/bt_adapter.c
+@@ -0,0 +1,56 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
- #define LOG_TAG "BlueZ"
- #include <cutils/log.h>
- 
- #include "hal.h"
- 
-+#define ANDROID_BLUEZ "btd"
++#include "bt_adapter.h"
++#include "log.h"
++#include "src/shared/mgmt.h"
 +
- bt_callbacks_t *bt_hal_cbacks = NULL;
- 
- static bool interface_ready(void)
-@@ -35,6 +40,49 @@ static bool interface_ready(void)
- 	return bt_hal_cbacks != NULL;
- }
- 
-+static bool is_running(const char *service_name)
++struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if)
 +{
-+	char val[PROPERTY_VALUE_MAX];
-+	char name[PROPERTY_KEY_MAX];
-+	int ret;
++	struct bt_adapter *adapter;
 +
-+	ALOGI(__func__);
++	adapter = g_try_new0(struct bt_adapter, 1);
++	if (!adapter)
++		return NULL;
 +
-+	ret = snprintf(name, sizeof(name), "init.svc.%s", service_name);
-+	if (ret > PROPERTY_KEY_MAX - 1) {
-+		ALOGD("Service name '%s' is too long", service_name);
-+		return false;
-+	}
++	adapter->dev_id = index;
++	adapter->mgmt = mgmt_ref(mgmt_if);
 +
-+	if (property_get(name, val, NULL)) {
-+		if (strcmp(val, "running") == 0)
-+			return true;
-+	}
-+
-+	return false;
++	return adapter;
 +}
 +
-+static bool start_bt_daemon(void)
++void adapter_start(struct bt_adapter *adapter)
 +{
-+	int tries = 40; /* wait 4 seconds for completion */
++	DBG("enabled %u", adapter->dev_id);
 +
-+	ALOGI(__func__);
++	/* TODO: CB: report scan mode */
 +
-+	/* Start Android Bluetooth daemon service */
-+	property_set("ctl.start", ANDROID_BLUEZ);
++	/* TODO: SDP start here */
 +
-+	while (tries-- > 0) {
-+		if (is_running(ANDROID_BLUEZ) == true) {
-+			ALOGI("Android BlueZ daemon started");
-+			return true;
-+		}
-+
-+		usleep(100000);
-+	}
-+
-+	return false;
++	/* TODO: CB: report state on */
 +}
 +
- static bool is_profile(const char *profile, const char *str)
- {
- 	return strcmp(profile, str) == 0;
-@@ -50,7 +98,11 @@ static int init(bt_callbacks_t *callbacks)
- 	/* store reference to user callbacks */
- 	bt_hal_cbacks = callbacks;
- 
--	/* TODO: Init here bluezd task */
-+	if (start_bt_daemon() == true) {
-+		/* TODO: open channel */
++void adapter_stop(struct bt_adapter *adapter)
++{
++	DBG("disabled %u", adapter->dev_id);
++}
+diff --git a/android/bt_adapter.h b/android/bt_adapter.h
+new file mode 100644
+index 0000000..6877cc7
+--- /dev/null
++++ b/android/bt_adapter.h
+@@ -0,0 +1,60 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+		return BT_STATUS_SUCCESS;
-+	}
- 
- 	return BT_STATUS_UNSUPPORTED;
- }
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <glib.h>
++
++#include "lib/bluetooth.h"
++
++struct bt_device {
++	int refcnt;
++
++	bdaddr_t bdaddr;
++	uint8_t bdaddr_type;
++	uint32_t cod;
++	char *name;
++};
++
++struct bt_adapter {
++	int refcnt;
++
++	uint16_t dev_id;
++	struct mgmt *mgmt;
++	bdaddr_t bdaddr;
++	uint32_t dev_class;
++
++	char *name;
++	char *short_name;
++
++	uint32_t supported_settings;
++	uint32_t current_settings;
++
++	GList *found_devices;
++};
++
++struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if);
++
++void adapter_start(struct bt_adapter *adapter);
++void adapter_stop(struct bt_adapter *adapter);
 -- 
 1.7.10.4
 
