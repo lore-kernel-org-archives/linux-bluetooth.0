@@ -1,46 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: Make mgmt power down notification for BR/EDR explicit
-Date: Mon,  7 Oct 2013 00:26:06 -0700
-Message-Id: <1381130767-42488-2-git-send-email-marcel@holtmann.org>
+Date: Mon, 7 Oct 2013 09:21:07 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/9] Bluetooth: Make mgmt_index_added() and
+ mgmt_index_removed() return void
+Message-ID: <20131007072107.GB5838@x220.p-661hnu-f1>
+References: <1381128953-32080-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1381128953-32080-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The management interface only operates on BR/EDR controllers. The check
-for the power down notification is a bit intermixed with the check if
-controller auto power off is active. Since there are more than just
-BR/EDR controllers supported, make this check explicit since the auto
-power off check also applies to AMP controllers and it has to happen
-in this exact order. Otherwise the bit will not be cleared.
+Hi Marcel,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_core.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+On Sun, Oct 06, 2013, Marcel Holtmann wrote:
+> The return value from mgmt_index_added() and mgmt_index_removed()
+> functions is never used. So do not pretend that returning an error
+> would actually be handled and just make both functions return void.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  include/net/bluetooth/hci_core.h |  4 ++--
+>  net/bluetooth/mgmt.c             | 12 ++++++------
+>  2 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 2ee5a8e..3572611 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1393,11 +1393,12 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 	hdev->flags = 0;
- 	hdev->dev_flags &= ~HCI_PERSISTENT_MASK;
- 
--	if (!test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags) &&
--	    hdev->dev_type == HCI_BREDR) {
--		hci_dev_lock(hdev);
--		mgmt_powered(hdev, 0);
--		hci_dev_unlock(hdev);
-+	if (!test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags)) {
-+		if (hdev->dev_type == HCI_BREDR) {
-+			hci_dev_lock(hdev);
-+			mgmt_powered(hdev, 0);
-+			hci_dev_unlock(hdev);
-+		}
- 	}
- 
- 	/* Controller radio is available but is currently powered down */
--- 
-1.8.3.1
+All patches in this set have been applied to bluetooth-next. Thanks.
 
+Johan
