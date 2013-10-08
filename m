@@ -1,63 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 14/15] android: Add makefile for hciconfig
-Date: Tue,  8 Oct 2013 17:51:22 +0300
-Message-Id: <1381243883-2745-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 00/15] Basic code for Android BlueZ
+Date: Tue,  8 Oct 2013 17:51:08 +0300
+Message-Id: <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
----
- android/Android.mk |   34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+Skeletons for Android Bluetooth and Socket HALs and BlueZ daemon.
 
-diff --git a/android/Android.mk b/android/Android.mk
-index e7a70d0..09c4579 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -123,3 +123,37 @@ $(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(LOCAL_PATH)/../lib/bl
- LOCAL_MODULE := libbluetooth
- 
- include $(BUILD_SHARED_LIBRARY)
-+
-+#
-+# hciconfig
-+#
-+
-+include $(CLEAR_VARS)
-+
-+LOCAL_SRC_FILES := \
-+	../tools/csr.c \
-+	../tools/csr_h4.c \
-+	../tools/hciconfig.c \
-+
-+LOCAL_C_INCLUDES := \
-+	$(LOCAL_PATH)/../lib \
-+	$(LOCAL_PATH)/../src \
-+
-+LOCAL_C_INCLUDES += \
-+	$(call include-path-for, glib) \
-+	$(call include-path-for, glib)/glib \
-+
-+LOCAL_SHARED_LIBRARIES := \
-+	libbluetooth
-+
-+# to suppress the "pointer of type 'void *' used in arithmetic" warning
-+LOCAL_CFLAGS := -Wno-pointer-arith
-+
-+# to suppress the "warning: missing initializer near initialization.." warning
-+LOCAL_CFLAGS += -Wno-missing-field-initializers
-+
-+LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
-+LOCAL_MODULE_TAGS := eng
-+LOCAL_MODULE := hciconfig
-+
-+include $(BUILD_EXECUTABLE)
+Code is located also here:
+https://code.google.com/p/android-bluez.bluez/
+
+Getting Started
+https://code.google.com/p/android-bluez/wiki/GettingStarted
+
+Changes:
+	* PATCHv3: Changed __ANDROID_API__ to ANDROID and PLATFORM_SDK_VERSION.
+	* PATCHv2: Fixed Szymon's comments from review.
+	* PATCHv1: Rebased against applied fdanis patch set, moved SDP init from
+	adapter start to daemon start, other minor fixes.
+	* RFCv3: Rebased against recent FDanis patch set, fixed library build,
+	corrected process capabilities, corrected API header.
+	* RFCv2: Took comments from mailing list reviewers. Use single
+	makefile, remove mgmt library and directly link, remove adapter
+	code and use default_adapter pointer and other style changes.
+	Dropped some patches due to major changes.
+
+Andrei Emeltchenko (15):
+  android: Supress missing initializers warnings
+  android: Add Adapter Bluetooth HAL template
+  android: Add Socket Bluetooth HAL template
+  android: Enable Socket interface
+  android: Start Android Bluetooth daemon
+  android: Add basic mgmt initialization sequence
+  android: Create HAL API header skeleton
+  android: Add adapter and device struct for BlueZ daemon
+  android: Add Android Makefile for libbluetooth
+  android: sdp: Reuse BlueZ SDP server in Android
+  android: Add cap to bind to port < 1024
+  android: Implement read_info_complete callback
+  android: Handle mgmt changed events
+  android: Add makefile for hciconfig
+  android: Add makefile for hcitool
+
+ Makefile.android        |    9 +-
+ android/Android.mk      |  166 +++++++++++++++
+ android/bt_adapter.c    |   54 +++++
+ android/bt_adapter.h    |   60 ++++++
+ android/hal.h           |   18 ++
+ android/hal_bluetooth.c |  403 ++++++++++++++++++++++++++++++++++++
+ android/hal_bt_sock.c   |   84 ++++++++
+ android/hal_msg.h       |  255 +++++++++++++++++++++++
+ android/main.c          |  519 +++++++++++++++++++++++++++++++++++++++++++++++
+ configure.ac            |    4 +
+ 10 files changed, 1570 insertions(+), 2 deletions(-)
+ create mode 100644 android/bt_adapter.c
+ create mode 100644 android/bt_adapter.h
+ create mode 100644 android/hal.h
+ create mode 100644 android/hal_bluetooth.c
+ create mode 100644 android/hal_bt_sock.c
+ create mode 100644 android/hal_msg.h
+
 -- 
 1.7.10.4
 
