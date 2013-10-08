@@ -1,70 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 00/15] Basic code for Android BlueZ
-Date: Tue,  8 Oct 2013 13:33:42 +0300
-Message-Id: <1381228437-5553-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 03/15] android: Add Socket Bluetooth HAL template
+Date: Tue,  8 Oct 2013 13:33:45 +0300
+Message-Id: <1381228437-5553-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1381228437-5553-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1381228437-5553-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Skeletons for Android Bluetooth and Socket HALs and BlueZ daemon.
-
-Code is located also here:
-https://code.google.com/p/android-bluez.bluez/
-
-Getting Started
-https://code.google.com/p/android-bluez/wiki/GettingStarted
-
-Changes:
-	* PATCHv2: Fixed Szymon's comments from review.
-	* PATCHv1: Rebased against applied fdanis patch set, moved SDP init from
-	adapter start to daemon start, other minor fixes.
-	* RFCv3: Rebased against recent FDanis patch set, fixed library build,
-	corrected process capabilities, corrected API header.
-	* RFCv2: Took comments from mailing list reviewers. Use single
-	makefile, remove mgmt library and directly link, remove adapter
-	code and use default_adapter pointer and other style changes.
-	Dropped some patches due to major changes.
-
-Andrei Emeltchenko (15):
-  android: Supress missing initializers warnings
-  android: Add Adapter Bluetooth HAL template
-  android: Add Socket Bluetooth HAL template
-  android: Enable Socket interface
-  android: Start Android Bluetooth daemon
-  android: Add basic mgmt initialization sequence
-  android: Create HAL API header skeleton
-  android: Add adapter and device struct for BlueZ daemon
-  android: Add Android Makefile for libbluetooth
-  android: sdp: Reuse BlueZ SDP server in Android
-  android: Add cap to bind to port < 1024
-  android: Implement read_info_complete callback
-  android: Handle mgmt changed events
-  android: Add makefile for hciconfig
-  android: Add makefile for hcitool
-
- Makefile.android        |    9 +-
- android/Android.mk      |  166 +++++++++++++++
- android/bt_adapter.c    |   54 +++++
- android/bt_adapter.h    |   60 ++++++
- android/hal.h           |   18 ++
- android/hal_bluetooth.c |  403 ++++++++++++++++++++++++++++++++++++
- android/hal_bt_sock.c   |   84 ++++++++
- android/hal_msg.h       |  255 +++++++++++++++++++++++
- android/main.c          |  519 +++++++++++++++++++++++++++++++++++++++++++++++
- configure.ac            |    4 +
- 10 files changed, 1570 insertions(+), 2 deletions(-)
- create mode 100644 android/bt_adapter.c
- create mode 100644 android/bt_adapter.h
- create mode 100644 android/hal.h
- create mode 100644 android/hal_bluetooth.c
+bt_sock HAL handles Bluetooth sockets for Android.
+---
+ android/Android.mk    |    1 +
+ android/hal_bt_sock.c |   84 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 85 insertions(+)
  create mode 100644 android/hal_bt_sock.c
- create mode 100644 android/hal_msg.h
 
+diff --git a/android/Android.mk b/android/Android.mk
+index 7adbbcd..2cabff4 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -41,6 +41,7 @@ include $(CLEAR_VARS)
+ 
+ LOCAL_SRC_FILES := \
+ 	hal_bluetooth.c \
++	hal_bt_sock.c \
+ 
+ LOCAL_SHARED_LIBRARIES := \
+ 	libcutils \
+diff --git a/android/hal_bt_sock.c b/android/hal_bt_sock.c
+new file mode 100644
+index 0000000..cbb42d1
+--- /dev/null
++++ b/android/hal_bt_sock.c
+@@ -0,0 +1,84 @@
++/*
++ * Copyright (C) 2013 Intel Corporation
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ *
++ */
++
++#include <stdlib.h>
++
++#include <hardware/bluetooth.h>
++#include <hardware/bt_sock.h>
++
++#define LOG_TAG "BlueZ"
++#include <cutils/log.h>
++
++static bt_status_t btsock_listen_rfcomm(const char *service_name,
++					const uint8_t *uuid, int chan,
++					int *sock, int flags)
++{
++	ALOGD(__func__);
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static bt_status_t listen(btsock_type_t type, const char *service_name,
++					const uint8_t *uuid, int chan,
++					int *sock, int flags)
++{
++	if ((uuid == NULL && chan <= 0) || sock == NULL) {
++		ALOGE("%s: invalid params: uuid %p, chan %d, sock %p",
++						__func__, uuid, chan, sock);
++		return BT_STATUS_PARM_INVALID;
++	}
++
++	ALOGD("%s: uuid %p chan %d sock %p type %d service_name %s",
++			__func__, uuid, chan, sock, type, service_name);
++
++	switch (type) {
++	case BTSOCK_RFCOMM:
++		return btsock_listen_rfcomm(service_name, uuid, chan,
++								sock, flags);
++	default:
++		ALOGE("%s: Socket type %d not supported", __func__, type);
++	}
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static bt_status_t connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
++					const uint8_t *uuid, int chan,
++					int *sock, int flags)
++{
++	if ((uuid == NULL && chan <= 0) || bdaddr == NULL || sock == NULL) {
++		ALOGE("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
++					bdaddr, uuid, chan, sock);
++		return BT_STATUS_PARM_INVALID;
++	}
++
++	ALOGD("%s: uuid %p chan %d sock %p type %d", __func__, uuid, chan,
++								sock, type);
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static btsock_interface_t btsock_if = {
++	sizeof(btsock_if),
++	listen,
++	connect
++};
++
++btsock_interface_t *bt_get_sock_interface(void)
++{
++	return &btsock_if;
++}
 -- 
 1.7.10.4
 
