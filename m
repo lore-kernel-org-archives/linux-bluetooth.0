@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 03/15] android: Add Socket Bluetooth HAL template
-Date: Tue,  8 Oct 2013 17:51:11 +0300
-Message-Id: <1381243883-2745-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 09/15] android: Add Android Makefile for libbluetooth
+Date: Tue,  8 Oct 2013 17:51:17 +0300
+Message-Id: <1381243883-2745-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,115 +12,79 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-bt_sock HAL handles Bluetooth sockets for Android.
+Build libbluetooth library for Android.
 ---
- android/Android.mk    |    1 +
- android/hal_bt_sock.c |   84 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 85 insertions(+)
- create mode 100644 android/hal_bt_sock.c
+ android/Android.mk |   53 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
 
 diff --git a/android/Android.mk b/android/Android.mk
-index 7adbbcd..2cabff4 100644
+index f5fd863..8f95a66 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -41,6 +41,7 @@ include $(CLEAR_VARS)
+@@ -41,6 +41,7 @@ LOCAL_SHARED_LIBRARIES := \
+ 	libglib \
  
- LOCAL_SRC_FILES := \
- 	hal_bluetooth.c \
-+	hal_bt_sock.c \
+ LOCAL_MODULE := bluetoothd
++LOCAL_REQUIRED_MODULES := libbluetooth
  
- LOCAL_SHARED_LIBRARIES := \
- 	libcutils \
-diff --git a/android/hal_bt_sock.c b/android/hal_bt_sock.c
-new file mode 100644
-index 0000000..cbb42d1
---- /dev/null
-+++ b/android/hal_bt_sock.c
-@@ -0,0 +1,84 @@
-+/*
-+ * Copyright (C) 2013 Intel Corporation
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ *
-+ */
+ include $(BUILD_EXECUTABLE)
+ 
+@@ -63,3 +64,55 @@ LOCAL_MODULE_TAGS := optional
+ LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+ 
+ include $(BUILD_SHARED_LIBRARY)
 +
-+#include <stdlib.h>
++#
++# libbluetooth library
++#
 +
-+#include <hardware/bluetooth.h>
-+#include <hardware/bt_sock.h>
++include $(CLEAR_VARS)
 +
-+#define LOG_TAG "BlueZ"
-+#include <cutils/log.h>
++LOCAL_SRC_FILES := \
++	../lib/bluetooth.c \
++	../lib/sdp.c \
++	../lib/hci.c \
++	../lib/uuid.c \
 +
-+static bt_status_t btsock_listen_rfcomm(const char *service_name,
-+					const uint8_t *uuid, int chan,
-+					int *sock, int flags)
-+{
-+	ALOGD(__func__);
++LOCAL_C_INCLUDES := \
++	$(LOCAL_PATH)/../lib/ \
++	$(LOCAL_PATH)/../src/shared \
 +
-+	return BT_STATUS_UNSUPPORTED;
-+}
++LOCAL_C_INCLUDES += \
++	$(call include-path-for, glib) \
++	$(call include-path-for, glib)/glib \
 +
-+static bt_status_t listen(btsock_type_t type, const char *service_name,
-+					const uint8_t *uuid, int chan,
-+					int *sock, int flags)
-+{
-+	if ((uuid == NULL && chan <= 0) || sock == NULL) {
-+		ALOGE("%s: invalid params: uuid %p, chan %d, sock %p",
-+						__func__, uuid, chan, sock);
-+		return BT_STATUS_PARM_INVALID;
-+	}
++LOCAL_CFLAGS += -O3
 +
-+	ALOGD("%s: uuid %p chan %d sock %p type %d service_name %s",
-+			__func__, uuid, chan, sock, type, service_name);
++# to suppress the "pointer of type 'void *' used in arithmetic" warning
++LOCAL_CFLAGS += -Wno-pointer-arith
 +
-+	switch (type) {
-+	case BTSOCK_RFCOMM:
-+		return btsock_listen_rfcomm(service_name, uuid, chan,
-+								sock, flags);
-+	default:
-+		ALOGE("%s: Socket type %d not supported", __func__, type);
-+	}
++# to suppress the "missing initializer near initialization" warning
++LOCAL_CFLAGS += -Wno-missing-field-initializers
 +
-+	return BT_STATUS_UNSUPPORTED;
-+}
++# Define missing flags for Android 4.2
++LOCAL_CFLAGS += -DSOCK_CLOEXEC=02000000 -DSOCK_NONBLOCK=04000
 +
-+static bt_status_t connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
-+					const uint8_t *uuid, int chan,
-+					int *sock, int flags)
-+{
-+	if ((uuid == NULL && chan <= 0) || bdaddr == NULL || sock == NULL) {
-+		ALOGE("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
-+					bdaddr, uuid, chan, sock);
-+		return BT_STATUS_PARM_INVALID;
-+	}
++lib_headers := \
++	bluetooth.h \
++	hci.h \
++	hci_lib.h \
++	sco.h \
++	l2cap.h \
++	sdp.h \
++	sdp_lib.h \
++	rfcomm.h \
++	bnep.h \
++	cmtp.h \
++	hidp.h \
 +
-+	ALOGD("%s: uuid %p chan %d sock %p type %d", __func__, uuid, chan,
-+								sock, type);
++$(shell mkdir -p $(LOCAL_PATH)/../lib/bluetooth)
 +
-+	return BT_STATUS_UNSUPPORTED;
-+}
++$(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(LOCAL_PATH)/../lib/bluetooth/$(file)))
 +
-+static btsock_interface_t btsock_if = {
-+	sizeof(btsock_if),
-+	listen,
-+	connect
-+};
++LOCAL_MODULE := libbluetooth
 +
-+btsock_interface_t *bt_get_sock_interface(void)
-+{
-+	return &btsock_if;
-+}
++include $(BUILD_SHARED_LIBRARY)
 -- 
 1.7.10.4
 
