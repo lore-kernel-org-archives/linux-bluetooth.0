@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 07/15] android: Create HAL API header skeleton
-Date: Tue,  8 Oct 2013 13:33:49 +0300
-Message-Id: <1381228437-5553-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 12/15] android: Implement read_info_complete callback
+Date: Tue,  8 Oct 2013 13:33:54 +0300
+Message-Id: <1381228437-5553-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381228437-5553-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1381228437-5553-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,274 +12,153 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Header describes the protocol between Android HAL threads and BlueZ
-daemon.
+Handle read info complete callback from mgmt interface.
 ---
- android/hal_msg.h |  255 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 255 insertions(+)
- create mode 100644 android/hal_msg.h
+ android/main.c |  101 +++++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 89 insertions(+), 12 deletions(-)
 
-diff --git a/android/hal_msg.h b/android/hal_msg.h
-new file mode 100644
-index 0000000..c6bc883
---- /dev/null
-+++ b/android/hal_msg.h
-@@ -0,0 +1,255 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
+diff --git a/android/main.c b/android/main.c
+index 4ef70bd..83aa6ed 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -54,6 +54,7 @@
+ #include "log.h"
+ #include "hcid.h"
+ #include "sdpd.h"
++#include "bt_adapter.h"
+ 
+ #include "lib/bluetooth.h"
+ #include "lib/mgmt.h"
+@@ -69,6 +70,8 @@ static struct mgmt *mgmt_if = NULL;
+ static uint8_t mgmt_version = 0;
+ static uint8_t mgmt_revision = 0;
+ 
++struct bt_adapter *default_adapter = NULL;
 +
-+#ifndef __packed
-+#define __packed __attribute__((packed))
-+#endif
+ static int sdp_start(void)
+ {
+ 	DBG("");
+@@ -118,34 +121,108 @@ static GOptionEntry options[] = {
+ 	{ NULL }
+ };
+ 
+-static void read_info_complete(uint8_t status, uint16_t length,
++static void load_link_keys_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+-	/* TODO: Store Controller information */
+-
+-	/**
+-	 * Register all event notification handlers for controller.
+-	 *
+-	 * The handlers are registered after a succcesful read of the
+-	 * controller info. From now on they can track updates and
+-	 * notifications.
+-	 */
++	DBG("status %u", status);
+ }
+ 
++static void load_link_keys(struct bt_adapter *adapter, GSList *keys)
++{
++	struct mgmt_cp_load_link_keys *cp;
++	size_t key_len = g_slist_length(keys);
++	struct mgmt_link_key_info *key;
++	size_t len;
 +
-+typedef struct {
-+	uint8_t b[6];
-+} __packed __bdaddr_t;
++	DBG("");
 +
-+struct hal_msg_hdr {
-+	uint8_t service_id;
-+	uint8_t opcode;
-+	uint16_t len;
-+	uint8_t payload[0];
-+} __packed;
++	len = sizeof(*cp) + key_len * sizeof(*key);
++	cp = g_try_malloc0(len);
++	if (cp == NULL) {
++		error("%s: Not enough memory for link keys loading", __func__);
++		return;
++	}
 +
-+#define HAL_SERVICE_ID_CORE		0
-+#define HAL_SERVICE_ID_BLUETOOTH	1
-+#define HAL_SERVICE_ID_SOCK		2
-+#define HAL_SERVICE_ID_HIDHOST		3
-+#define HAL_SERVICE_ID_PAN		4
-+#define HAL_SERVICE_ID_HANDSFREE	5
-+#define HAL_SERVICE_ID_AD2P		6
-+#define HAL_SERVICE_ID_HEALTH		7
-+#define HAL_SERVICE_ID_AVRCP		8
-+#define HAL_SERVICE_ID_GATT		9
++	cp->debug_keys = 0;
++	cp->key_count = htobs(key_len);
 +
-+/* Core Service */
++	mgmt_send(adapter->mgmt, MGMT_OP_LOAD_LINK_KEYS, adapter->dev_id, len,
++				cp, load_link_keys_complete, adapter, NULL);
 +
-+#define HAL_MSG_OP_ERROR		0x00
-+struct hal_msg_rp_error {
-+	uint8_t status;
-+} __packed;
++	free(cp);
++}
 +
-+#define HAL_MSG_OP_REGISTER_MODULE	0x01
-+struct hal_msg_cp_register_module {
-+	uint8_t service_id;
-+} __packed;
-+struct hal_msg_rp_register_module {
-+	uint8_t service_id;
-+} __packed;
++static void read_info_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	struct bt_adapter *adapter = user_data;
++	const struct mgmt_rp_read_info *rp = param;
 +
-+#define HAL_MSG_OP_UNREGISTER_MODULE	0x02
-+struct hal_msg_cp_unregister_module {
-+	uint8_t service_id;
-+} __packed;
++	DBG("");
 +
-+/* Bluetooth Core HAL API */
++	if (status != MGMT_STATUS_SUCCESS) {
++		error("Failed to read info for index %u: %s (0x%02x)",
++			adapter->dev_id, mgmt_errstr(status), status);
++		goto failed;
++	}
 +
-+#define HAL_MSG_OP_BT_ENABLE		0x01
++	if (length < sizeof(*rp)) {
++		error("Too small read info complete response");
++		goto failed;
++	}
 +
-+#define HAL_MSG_OP_BT_DISABLE		0x02
++	if (bacmp(&rp->bdaddr, BDADDR_ANY) == 0) {
++		error("No Bluetooth address for index %u", adapter->dev_id);
++		goto failed;
++	}
 +
-+#define HAL_MSG_OP_BT_GET_ADAPTER_PROPS	0x03
++	/* Store adapter information */
++	bacpy(&adapter->bdaddr, &rp->bdaddr);
++	adapter->dev_class = rp->dev_class[0] | (rp->dev_class[1] << 8) |
++						(rp->dev_class[2] << 16);
++	adapter->name = g_strdup((const char *) rp->name);
++	adapter->short_name = g_strdup((const char *) rp->short_name);
 +
-+#define HAL_MSG_OP_BT_GET_ADAPTER_PROP	0x04
-+struct hal_msg_cp_bt_get_adapter_prop {
-+	uint8_t type;
-+} __packed;
++	adapter->supported_settings = btohs(rp->supported_settings);
++	adapter->current_settings = btohs(rp->current_settings);
 +
-+#define HAL_MSG_OP_BT_SET_ADAPTER_PROP	0x05
-+struct hal_msg_cp_bt_set_adapter_prop {
-+	uint8_t type;
-+	uint16_t len;
-+	uint8_t val[0];
-+} __packed;
++	/* TODO: Register all event notification handlers */
 +
-+#define HAL_MSG_OP_BT_GET_REMOTE_DEVICE_PROPS	0x06
-+struct hal_msg_cp_bt_get_remote_device_props {
-+	__bdaddr_t bdaddr;
-+} __packed;
++	if (adapter->current_settings & MGMT_SETTING_POWERED)
++		adapter_start(adapter);
 +
-+#define HAL_MSG_OP_BT_GET_REMOTE_DEVICE_PROP	0x07
-+struct hal_msg_cp_bt_get_remote_device_prop {
-+	__bdaddr_t bdaddr;
-+	uint8_t type;
-+} __packed;
++	/* dummy link keys loading */
++	load_link_keys(adapter, NULL);
 +
-+#define HAL_MSG_OP_BT_SET_REMOTE_DEVICE_PROP	0x08
-+struct hal_msg_cp_bt_set_remote_device_prop {
-+	__bdaddr_t bdaddr;
-+	uint8_t type;
-+	uint16_t len;
-+	uint8_t val[0];
-+} __packed;
++	return;
 +
-+#define HAL_MSG_OP_BT_GET_REMOTE_SERVICE_REC	0x09
-+struct hal_msg_cp_bt_get_remote_service_rec {
-+	__bdaddr_t bdaddr;
-+	uint8_t uuid[16];
-+} __packed;
++failed:
++	default_adapter = NULL;
++}
+ 
+ static void mgmt_index_added_event(uint16_t index, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+ 	info("%s: index %u", __func__, index);
+ 
++	if (default_adapter != NULL) {
++		DBG("skip event for index %d", index);
++		return;
++	}
 +
-+#define HAL_MSG_OP_BT_GET_REMOTE_SERVICE	0x0a
-+struct hal_msg_cp_bt_get_remote_service {
-+	__bdaddr_t bdaddr;
-+} __packed;
++	default_adapter = bt_adapter_new(index, mgmt_if);
++	if (default_adapter == NULL) {
++		error("Unable to create new adapter for index %u", index);
++		return;
++	}
 +
-+#define HAL_MSG_OP_BT_START_DISCOVERY	0x0b
-+
-+#define HAL_MSG_OP_BT_CANCEL_DISCOVERY	0x0c
-+
-+#define HAL_MSG_OP_BT_CREATE_BOND	0x0d
-+struct hal_msg_cp_bt_create_bond {
-+	__bdaddr_t bdaddr;
-+} __packed;
-+
-+#define HAL_MSG_OP_BT_REMOVE_BOND	0x0d
-+struct hal_msg_cp_bt_remove_bond {
-+	__bdaddr_t bdaddr;
-+} __packed;
-+
-+#define HAL_MSG_OP_BT_CANCEL_BOND	0x0f
-+struct hal_msg_cp_bt_cancel_bond {
-+	__bdaddr_t bdaddr;
-+} __packed;
-+
-+#define HAL_MSG_OP_BT_PIN_REPLY		0x10
-+struct hal_msg_cp_bt_pin_reply {
-+	__bdaddr_t bdaddr;
-+	uint8_t accept;
-+	uint8_t pin_len;
-+	uint8_t pin_code[16];
-+} __packed;
-+
-+#define HAL_MSG_OP_BT_SSP_REPLY		0x11
-+struct hal_msg_cp_bt_ssp_reply {
-+	__bdaddr_t bdaddr;
-+	uint8_t ssp_variant;
-+	uint8_t accept;
-+	uint32_t passkey;
-+} __packed;
-+
-+#define HAL_MSG_OP_BT_DUT_MODE_CONF	0x12
-+struct hal_msg_cp_bt_dut_mode_conf {
-+	uint8_t enable;
-+} __packed;
-+
-+#define HAL_MSG_OP_BT_DUT_MODE_SEND	0x13
-+struct hal_msg_cp_bt_dut_mode_send {
-+	uint16_t opcode;
-+	uint8_t len;
-+	uint8_t data[0];
-+} __packed;
-+
-+#define HAL_MSG_OP_BT_LE_TEST_MODE	0x14
-+struct hal_msg_cp_bt_le_test_mode {
-+	uint16_t opcode;
-+	uint8_t len;
-+	uint8_t data[0];
-+} __packed;
-+
-+/* Notifications and confirmations */
-+
-+#define HAL_MSG_EV_BT_ERROR			0x80
-+
-+#define HAL_MSG_EV_BT_ADAPTER_STATE_CHANGED	0x81
-+struct hal_msg_ev_bt_adapter_state_changed {
-+	uint8_t state;
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_ADAPTER_PROPS_CHANGED	0x82
-+struct hal_property {
-+	uint8_t type;
-+	uint16_t len;
-+	uint8_t val[0];
-+} __packed;
-+struct hal_msg_ev_bt_adapter_props_changed {
-+	uint8_t status;
-+	uint8_t num_props;
-+	struct hal_property props[0];
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_REMOTE_DEVICE_PROPS	0x83
-+struct hal_msg_ev_bt_remote_device_props {
-+	uint8_t status;
-+	__bdaddr_t bdaddr;
-+	uint8_t num_props;
-+	struct hal_property props[0];
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_DEVICE_FOUND		0x84
-+struct hal_msg_ev_bt_device_found {
-+	uint8_t num_props;
-+	struct hal_property props[0];
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_DISCOVERY_STATE_CHANGED	0x85
-+struct hal_msg_ev_bt_discovery_state_changed {
-+	uint8_t state;
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_PIN_REQUEST		0x86
-+struct hal_msg_ev_bt_pin_request {
-+	__bdaddr_t bdaddr;
-+	uint8_t name[249 - 1];
-+	uint8_t class_of_dev[3];
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_SSP_REQUEST		0x87
-+struct hal_msg_ev_bt_ssp_request {
-+	__bdaddr_t bdaddr;
-+	uint8_t name[249 - 1];
-+	uint8_t class_of_dev[3];
-+	uint8_t pairing_variant;
-+	uint32_t passkey;
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_BOND_STATE_CHANGED	0x88
-+struct hal_msg_ev_bt_bond_state_changed {
-+	uint8_t status;
-+	__bdaddr_t bdaddr;
-+	uint8_t state;
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_ACL_STATE_CHANGED		0x89
-+struct hal_msg_ev_bt_acl_state_changed {
-+	uint8_t status;
-+	__bdaddr_t bdaddr;
-+	uint8_t state;
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_DUT_MODE_RECEIVE		0x8a
-+struct hal_msg_ev_bt_dut_mode_receive {
-+	uint16_t opcode;
-+	uint8_t len;
-+	uint8_t data[0];
-+} __packed;
-+
-+#define HAL_MSG_EV_BT_LE_TEST_MODE		0x8b
-+struct hal_msg_ev_bt_le_test_mode {
-+	uint8_t status;
-+	uint16_t num_packets;
-+} __packed;
+ 	DBG("sending read info command for index %u", index);
+ 
+ 	if (mgmt_send(mgmt_if, MGMT_OP_READ_INFO, index, 0, NULL,
+-					read_info_complete, NULL, NULL) > 0)
++				read_info_complete, default_adapter, NULL) > 0)
+ 		return;
+ 
+ 	error("Failed to read adapter info for index %u", index);
+-
+ }
+ 
+ static void mgmt_index_removed_event(uint16_t index, uint16_t length,
 -- 
 1.7.10.4
 
