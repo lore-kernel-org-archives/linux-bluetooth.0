@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 08/15] android: Add adapter and device struct for BlueZ daemon
-Date: Tue,  8 Oct 2013 13:33:50 +0300
-Message-Id: <1381228437-5553-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 10/15] android: sdp: Reuse BlueZ SDP server in Android
+Date: Tue,  8 Oct 2013 13:33:52 +0300
+Message-Id: <1381228437-5553-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381228437-5553-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1381228437-5553-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,143 +12,142 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Adapter structure in BlueZ daemon keeps track of default adapter
-and device structure keeps track about found devices.
+Reuse existing SDP server code in Android GPL daemon.
 ---
- android/bt_adapter.c |   56 ++++++++++++++++++++++++++++++++++++++++++++++
- android/bt_adapter.h |   60 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 116 insertions(+)
- create mode 100644 android/bt_adapter.c
- create mode 100644 android/bt_adapter.h
+ Makefile.android     |    7 +++++--
+ android/Android.mk   |    7 +++++++
+ android/bt_adapter.c |    2 --
+ android/main.c       |   28 ++++++++++++++++++++++++++++
+ 4 files changed, 40 insertions(+), 4 deletions(-)
 
+diff --git a/Makefile.android b/Makefile.android
+index 9a2c486..d576b52 100644
+--- a/Makefile.android
++++ b/Makefile.android
+@@ -2,9 +2,12 @@ if ANDROID
+ noinst_PROGRAMS += android/bluetoothd
+ 
+ android_bluetoothd_SOURCES = android/main.c src/log.c \
++				src/sdpd-database.c src/sdpd-server.c \
++				src/sdpd-service.c src/sdpd-request.c \
+ 				src/shared/util.h src/shared/util.c \
+-				src/shared/mgmt.h src/shared/mgmt.c
+-android_bluetoothd_LDADD = @GLIB_LIBS@
++				src/shared/mgmt.h src/shared/mgmt.c \
++				android/bt_adapter.h android/bt_adapter.c
++android_bluetoothd_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+ endif
+ 
+ EXTRA_DIST += android/Android.mk android/log.c
+diff --git a/android/Android.mk b/android/Android.mk
+index 8f95a66..e7a70d0 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -17,6 +17,11 @@ LOCAL_SRC_FILES := \
+ 	log.c \
+ 	../src/shared/mgmt.c \
+ 	../src/shared/util.c \
++	bt_adapter.c \
++	../src/sdpd-database.c \
++	../src/sdpd-service.c \
++	../src/sdpd-request.c \
++	../src/sdpd-server.c \
+ 
+ LOCAL_C_INCLUDES := \
+ 	$(call include-path-for, glib) \
+@@ -25,6 +30,7 @@ LOCAL_C_INCLUDES := \
+ LOCAL_C_INCLUDES += \
+ 	$(LOCAL_PATH)/../ \
+ 	$(LOCAL_PATH)/../src \
++	$(LOCAL_PATH)/../lib \
+ 
+ LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
+ 
+@@ -39,6 +45,7 @@ LOCAL_CFLAGS += -DSOCK_CLOEXEC=02000000 -DSOCK_NONBLOCK=04000
+ 
+ LOCAL_SHARED_LIBRARIES := \
+ 	libglib \
++	libbluetooth \
+ 
+ LOCAL_MODULE := bluetoothd
+ LOCAL_REQUIRED_MODULES := libbluetooth
 diff --git a/android/bt_adapter.c b/android/bt_adapter.c
-new file mode 100644
-index 0000000..e21d50c
---- /dev/null
+index e21d50c..6b758bf 100644
+--- a/android/bt_adapter.c
 +++ b/android/bt_adapter.c
-@@ -0,0 +1,56 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
+@@ -45,8 +45,6 @@ void adapter_start(struct bt_adapter *adapter)
+ 
+ 	/* TODO: CB: report scan mode */
+ 
+-	/* TODO: SDP start here */
+-
+ 	/* TODO: CB: report state on */
+ }
+ 
+diff --git a/android/main.c b/android/main.c
+index 3580ac7..7968ed0 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -36,6 +36,8 @@
+ #include <glib.h>
+ 
+ #include "log.h"
++#include "hcid.h"
++#include "sdpd.h"
+ 
+ #include "lib/bluetooth.h"
+ #include "lib/mgmt.h"
+@@ -43,12 +45,36 @@
+ 
+ #define SHUTDOWN_GRACE_SECONDS 10
+ 
++struct main_opts main_opts;
 +
-+#include "bt_adapter.h"
-+#include "log.h"
-+#include "src/shared/mgmt.h"
-+
-+struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if)
+ static GMainLoop *event_loop;
+ static struct mgmt *mgmt_if = NULL;
+ 
+ static uint8_t mgmt_version = 0;
+ static uint8_t mgmt_revision = 0;
+ 
++static int sdp_start(void)
 +{
-+	struct bt_adapter *adapter;
++	DBG("");
 +
-+	adapter = g_try_new0(struct bt_adapter, 1);
-+	if (!adapter)
-+		return NULL;
++	/* TODO: add logic */
 +
-+	adapter->dev_id = index;
-+	adapter->mgmt = mgmt_ref(mgmt_if);
++	/* sdpd-server use these settings */
++	memset(&main_opts, 0, sizeof(main_opts));
 +
-+	return adapter;
++	/* Use params: mtu = 0, flags = 0 */
++	return start_sdp_server(0, 0);
 +}
 +
-+void adapter_start(struct bt_adapter *adapter)
++static void sdp_stop(void)
 +{
-+	DBG("enabled %u", adapter->dev_id);
++	DBG("");
 +
-+	/* TODO: CB: report scan mode */
++	/* TODO: add logic */
 +
-+	/* TODO: SDP start here */
-+
-+	/* TODO: CB: report state on */
++	stop_sdp_server();
 +}
 +
-+void adapter_stop(struct bt_adapter *adapter)
-+{
-+	DBG("disabled %u", adapter->dev_id);
-+}
-diff --git a/android/bt_adapter.h b/android/bt_adapter.h
-new file mode 100644
-index 0000000..6877cc7
---- /dev/null
-+++ b/android/bt_adapter.h
-@@ -0,0 +1,60 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <glib.h>
-+
-+#include "lib/bluetooth.h"
-+
-+struct bt_device {
-+	int refcnt;
-+
-+	bdaddr_t bdaddr;
-+	uint8_t bdaddr_type;
-+	uint32_t cod;
-+	char *name;
-+};
-+
-+struct bt_adapter {
-+	int refcnt;
-+
-+	uint16_t dev_id;
-+	struct mgmt *mgmt;
-+	bdaddr_t bdaddr;
-+	uint32_t dev_class;
-+
-+	char *name;
-+	char *short_name;
-+
-+	uint32_t supported_settings;
-+	uint32_t current_settings;
-+
-+	GList *found_devices;
-+};
-+
-+struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if);
-+
-+void adapter_start(struct bt_adapter *adapter);
-+void adapter_stop(struct bt_adapter *adapter);
+ static gboolean quit_eventloop(gpointer user_data)
+ {
+ 	g_main_loop_quit(event_loop);
+@@ -287,11 +313,13 @@ int main(int argc, char *argv[])
+ 	sigaction(SIGTERM, &sa, NULL);
+ 
+ 	init_mgmt_interface();
++	sdp_start();
+ 
+ 	DBG("Entering main loop");
+ 
+ 	g_main_loop_run(event_loop);
+ 
++	sdp_stop();
+ 	cleanup_mgmt_interface();
+ 	g_main_loop_unref(event_loop);
+ 
 -- 
 1.7.10.4
 
