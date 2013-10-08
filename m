@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 01/15] android: Supress missing initializers warnings
-Date: Tue,  8 Oct 2013 17:51:09 +0300
-Message-Id: <1381243883-2745-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 03/15] android: Add Socket Bluetooth HAL template
+Date: Tue,  8 Oct 2013 17:51:11 +0300
+Message-Id: <1381243883-2745-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,29 +12,115 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-These types of warnings are disabled in BlueZ makeifiles
-
-main.c:67:2: warning: missing initializer [-Wmissing-field-initializers]
-main.c:67:2: warning: (near initialization for 'options[1].short_name')
-	[-Wmissing-field-initializers]
+bt_sock HAL handles Bluetooth sockets for Android.
 ---
- android/Android.mk |    3 +++
- 1 file changed, 3 insertions(+)
+ android/Android.mk    |    1 +
+ android/hal_bt_sock.c |   84 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 85 insertions(+)
+ create mode 100644 android/hal_bt_sock.c
 
 diff --git a/android/Android.mk b/android/Android.mk
-index ec820ac..5498b41 100644
+index 7adbbcd..2cabff4 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -23,6 +23,9 @@ LOCAL_C_INCLUDES := \
+@@ -41,6 +41,7 @@ include $(CLEAR_VARS)
  
- LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
+ LOCAL_SRC_FILES := \
+ 	hal_bluetooth.c \
++	hal_bt_sock.c \
  
-+# to suppress the "warning: missing initializer near initialization.." warning
-+LOCAL_CFLAGS += -Wno-missing-field-initializers
-+
  LOCAL_SHARED_LIBRARIES := \
- 	libglib \
- 
+ 	libcutils \
+diff --git a/android/hal_bt_sock.c b/android/hal_bt_sock.c
+new file mode 100644
+index 0000000..cbb42d1
+--- /dev/null
++++ b/android/hal_bt_sock.c
+@@ -0,0 +1,84 @@
++/*
++ * Copyright (C) 2013 Intel Corporation
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ *
++ */
++
++#include <stdlib.h>
++
++#include <hardware/bluetooth.h>
++#include <hardware/bt_sock.h>
++
++#define LOG_TAG "BlueZ"
++#include <cutils/log.h>
++
++static bt_status_t btsock_listen_rfcomm(const char *service_name,
++					const uint8_t *uuid, int chan,
++					int *sock, int flags)
++{
++	ALOGD(__func__);
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static bt_status_t listen(btsock_type_t type, const char *service_name,
++					const uint8_t *uuid, int chan,
++					int *sock, int flags)
++{
++	if ((uuid == NULL && chan <= 0) || sock == NULL) {
++		ALOGE("%s: invalid params: uuid %p, chan %d, sock %p",
++						__func__, uuid, chan, sock);
++		return BT_STATUS_PARM_INVALID;
++	}
++
++	ALOGD("%s: uuid %p chan %d sock %p type %d service_name %s",
++			__func__, uuid, chan, sock, type, service_name);
++
++	switch (type) {
++	case BTSOCK_RFCOMM:
++		return btsock_listen_rfcomm(service_name, uuid, chan,
++								sock, flags);
++	default:
++		ALOGE("%s: Socket type %d not supported", __func__, type);
++	}
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static bt_status_t connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
++					const uint8_t *uuid, int chan,
++					int *sock, int flags)
++{
++	if ((uuid == NULL && chan <= 0) || bdaddr == NULL || sock == NULL) {
++		ALOGE("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
++					bdaddr, uuid, chan, sock);
++		return BT_STATUS_PARM_INVALID;
++	}
++
++	ALOGD("%s: uuid %p chan %d sock %p type %d", __func__, uuid, chan,
++								sock, type);
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static btsock_interface_t btsock_if = {
++	sizeof(btsock_if),
++	listen,
++	connect
++};
++
++btsock_interface_t *bt_get_sock_interface(void)
++{
++	return &btsock_if;
++}
 -- 
 1.7.10.4
 
