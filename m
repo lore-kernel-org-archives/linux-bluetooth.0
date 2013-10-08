@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 13/15] android: Handle mgmt changed events
-Date: Tue,  8 Oct 2013 17:51:21 +0300
-Message-Id: <1381243883-2745-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 11/15] android: Add cap to bind to port < 1024
+Date: Tue,  8 Oct 2013 17:51:19 +0300
+Message-Id: <1381243883-2745-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,183 +12,121 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add code handling changing adapter settings.
+For SDP server we need to bind to lower port, acquire this capability.
 ---
- android/main.c |  154 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 154 insertions(+)
+ android/main.c |   71 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ configure.ac   |    4 ++++
+ 2 files changed, 75 insertions(+)
 
 diff --git a/android/main.c b/android/main.c
-index a2ed8a4..c181d3a 100644
+index 7968ed0..a100013 100644
 --- a/android/main.c
 +++ b/android/main.c
-@@ -127,6 +127,159 @@ static void load_link_keys_complete(uint8_t status, uint16_t length,
- 	DBG("status %u", status);
+@@ -32,6 +32,22 @@
+ #include <stdlib.h>
+ #include <stdbool.h>
+ #include <string.h>
++#include <unistd.h>
++#include <errno.h>
++#include <sys/prctl.h>
++#include <linux/capability.h>
++
++/**
++ * Include <sys/capability.h> for host build and
++ * also for Android 4.3 when it is added to bionic
++ */
++#if !defined(ANDROID) || (PLATFORM_SDK_VERSION > 17)
++#include <sys/capability.h>
++#endif
++
++#if defined(ANDROID)
++#include <private/android_filesystem_config.h>
++#endif
+ 
+ #include <glib.h>
+ 
+@@ -279,6 +295,58 @@ static void cleanup_mgmt_interface(void)
+ 	mgmt_if = NULL;
  }
  
-+static void mgmt_local_name_changed_event(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
++static bool android_set_aid_and_cap(void)
 +{
-+	struct bt_adapter *adapter = user_data;
-+	const struct mgmt_cp_set_local_name *rp = param;
++	struct __user_cap_header_struct header;
++	struct __user_cap_data_struct cap;
++#if defined(ANDROID)
++	gid_t groups[] = {AID_NET_BT, AID_NET_BT_ADMIN, AID_NET_ADMIN};
++#endif
 +
-+	if (length < sizeof(*rp)) {
-+		error("Wrong size of local name changed parameters");
-+		return;
++	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
++
++	header.version = _LINUX_CAPABILITY_VERSION;
++
++	prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);
++
++#if defined(ANDROID)
++	if (setgid(AID_BLUETOOTH) < 0)
++		warn("%s: setgid(): %s", __func__, strerror(errno));
++
++	if (setuid(AID_BLUETOOTH) < 0)
++		warn("%s: setuid(): %s", __func__, strerror(errno));
++#endif
++
++	header.version = _LINUX_CAPABILITY_VERSION;
++	header.pid = 0;
++
++	cap.effective = cap.permitted =
++		CAP_TO_MASK(CAP_SETGID) |
++		CAP_TO_MASK(CAP_NET_RAW) |
++		CAP_TO_MASK(CAP_NET_ADMIN) |
++		CAP_TO_MASK(CAP_NET_BIND_SERVICE);
++	cap.inheritable = 0;
++
++	if (capset(&header, &cap) < 0) {
++		error("%s: capset(): %s", __func__, strerror(errno));
++		return false;
 +	}
 +
-+	if (adapter != default_adapter) {
-+		error("Wrong adapter %p", adapter);
-+		return;
-+	}
++#if defined(ANDROID)
++	if (setgroups(sizeof(groups)/sizeof(groups[0]), groups) < 0)
++		warn("%s: setgroups: %s", __func__, strerror(errno));
++#endif
++	if (capget(&header, &cap) < 0)
++		error("%s: capget(): %s", __func__, strerror(errno));
++	else
++		DBG("Caps: eff: 0x%x, perm: 0x%x, inh: 0x%x", cap.effective,
++					cap.permitted, cap.inheritable);
 +
-+	if (!g_strcmp0(adapter->short_name, (const char *) rp->short_name) &&
-+			!g_strcmp0(adapter->name, (const char *) rp->name))
-+		return;
++	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
 +
-+	DBG("name: %s short name: %s", rp->name, rp->short_name);
-+
-+	g_free(adapter->name);
-+	adapter->name = g_strdup((const char *) rp->name);
-+
-+	g_free(adapter->short_name);
-+	adapter->short_name = g_strdup((const char *) rp->short_name);
-+
-+	/* TODO Update services if needed */
++	return true;
 +}
 +
-+static void settings_changed_connectable(struct bt_adapter *adapter)
-+{
-+	/* TODO */
-+}
-+
-+static void settings_changed_discoverable(struct bt_adapter *adapter)
-+{
-+	/* TODO */
-+}
-+
-+static void settings_changed(struct bt_adapter *adapter, uint32_t settings)
-+{
-+	uint32_t changed_mask;
-+
-+	changed_mask = adapter->current_settings ^ settings;
-+
-+	adapter->current_settings = settings;
-+
-+	DBG("0x%08x", changed_mask);
-+
-+	if (changed_mask & MGMT_SETTING_POWERED) {
-+		info("Powered");
-+
-+		if (adapter->current_settings & MGMT_SETTING_POWERED)
-+			adapter_start(adapter);
-+		else
-+			adapter_stop(adapter);
-+	}
-+
-+	/* Seems not needed for Android */
-+	if (changed_mask & MGMT_SETTING_PAIRABLE)
-+		DBG("Pairable");
-+
-+	/*
-+	 * There are only 2 scan modes:
-+	 * CONNECTABLE and CONNECTABLE_DISCOVERABLE
-+	 */
-+	if (changed_mask & MGMT_SETTING_CONNECTABLE) {
-+		DBG("Connectable");
-+
-+		settings_changed_connectable(adapter);
-+	}
-+
-+	if (changed_mask & MGMT_SETTING_DISCOVERABLE) {
-+		DBG("Discoverable");
-+
-+		settings_changed_discoverable(adapter);
-+	}
-+}
-+
-+static void new_settings_callback(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct bt_adapter *adapter = user_data;
-+	uint32_t settings;
-+
-+	if (length < sizeof(settings)) {
-+		error("Wrong size of new settings parameters");
-+		return;
-+	}
-+
-+	if (adapter != default_adapter) {
-+		error("Wrong adapter %p", adapter);
-+		return;
-+	}
-+
-+	settings = bt_get_le32(param);
-+
-+	DBG("settings: 0x%8.8x -> 0x%8.8x", adapter->current_settings,
-+								settings);
-+
-+	if (settings == adapter->current_settings)
-+		return;
-+
-+	settings_changed(adapter, settings);
-+}
-+
-+static void mgmt_dev_class_changed_event(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct bt_adapter *adapter = user_data;
-+	const struct mgmt_cod *rp = param;
-+	uint32_t dev_class;
-+
-+	if (length < sizeof(*rp)) {
-+		error("Wrong size of class of device changed parameters");
-+		return;
-+	}
-+
-+	if (adapter != default_adapter) {
-+		error("Wrong adapter %p", adapter);
-+		return;
-+	}
-+
-+	dev_class = rp->val[0] | (rp->val[1] << 8) | (rp->val[2] << 16);
-+
-+	if (dev_class == adapter->dev_class)
-+		return;
-+
-+	DBG("Class: 0x%06x", dev_class);
-+
-+	adapter->dev_class = dev_class;
-+
-+	/* TODO: Inform prop change: Class */
-+
-+	/* TODO: Gatt attrib set*/
-+}
-+
-+static void register_mgmt_handlers(struct bt_adapter *adapter)
-+{
-+	mgmt_register(adapter->mgmt, MGMT_EV_NEW_SETTINGS, adapter->dev_id,
-+					new_settings_callback, adapter, NULL);
-+
-+	mgmt_register(adapter->mgmt, MGMT_EV_CLASS_OF_DEV_CHANGED,
-+			adapter->dev_id, mgmt_dev_class_changed_event,
-+			adapter, NULL);
-+
-+	mgmt_register(adapter->mgmt, MGMT_EV_LOCAL_NAME_CHANGED,
-+			adapter->dev_id, mgmt_local_name_changed_event,
-+			adapter, NULL);
-+}
-+
- static void load_link_keys(struct bt_adapter *adapter, GSList *keys)
+ int main(int argc, char *argv[])
  {
- 	struct mgmt_cp_load_link_keys *cp;
-@@ -187,6 +340,7 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 	adapter->current_settings = btohs(rp->current_settings);
+ 	GOptionContext *context;
+@@ -312,6 +380,9 @@ int main(int argc, char *argv[])
+ 	sigaction(SIGINT, &sa, NULL);
+ 	sigaction(SIGTERM, &sa, NULL);
  
- 	/* TODO: Register all event notification handlers */
-+	register_mgmt_handlers(default_adapter);
++	if (android_set_aid_and_cap() == false)
++		exit(EXIT_FAILURE);
++
+ 	init_mgmt_interface();
+ 	sdp_start();
  
- 	if (adapter->current_settings & MGMT_SETTING_POWERED)
- 		adapter_start(adapter);
+diff --git a/configure.ac b/configure.ac
+index 7b1f64a..5406434 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -247,4 +247,8 @@ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
+ 					[enable_android=${enableval}])
+ AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
+ 
++if (test "${android_daemon}" = "yes"); then
++	AC_CHECK_LIB(cap, capget, dummy=yes, AC_MSG_ERROR(libcap is required))
++fi
++
+ AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
 -- 
 1.7.10.4
 
