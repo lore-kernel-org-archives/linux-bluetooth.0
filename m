@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 09/15] android: Add Android Makefile for libbluetooth
-Date: Tue,  8 Oct 2013 13:33:51 +0300
-Message-Id: <1381228437-5553-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 05/15] android: Start Android Bluetooth daemon
+Date: Tue,  8 Oct 2013 13:33:47 +0300
+Message-Id: <1381228437-5553-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381228437-5553-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1381228437-5553-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,79 +12,93 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Build libbluetooth library for Android.
+Start Android Bluetooth daemon from HAL init(). Make sure
+that daemon is in "running" state.
 ---
- android/Android.mk |   53 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+ android/hal_bluetooth.c |   50 ++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 47 insertions(+), 3 deletions(-)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index f5fd863..8f95a66 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -41,6 +41,7 @@ LOCAL_SHARED_LIBRARIES := \
- 	libglib \
+diff --git a/android/hal_bluetooth.c b/android/hal_bluetooth.c
+index 00f3e8d..f1e306f 100644
+--- a/android/hal_bluetooth.c
++++ b/android/hal_bluetooth.c
+@@ -23,11 +23,16 @@
+ #include <hardware/bluetooth.h>
+ #include <hardware/bt_sock.h>
  
- LOCAL_MODULE := bluetoothd
-+LOCAL_REQUIRED_MODULES := libbluetooth
++#include <cutils/sockets.h>
++#include <cutils/properties.h>
++
+ #define LOG_TAG "BlueZ"
+ #include <cutils/log.h>
  
- include $(BUILD_EXECUTABLE)
+ #include "hal.h"
  
-@@ -63,3 +64,55 @@ LOCAL_MODULE_TAGS := optional
- LOCAL_MODULE_CLASS := SHARED_LIBRARIES
++#define ANDROID_BLUEZ "bluetoothd"
++
+ bt_callbacks_t *bt_hal_cbacks = NULL;
  
- include $(BUILD_SHARED_LIBRARY)
+ static bool interface_ready(void)
+@@ -35,6 +40,42 @@ static bool interface_ready(void)
+ 	return bt_hal_cbacks != NULL;
+ }
+ 
++static bool is_svc_running(void)
++{
++	char val[PROPERTY_VALUE_MAX];
++	int ret;
 +
-+#
-+# libbluetooth library
-+#
++	ALOGD(__func__);
 +
-+include $(CLEAR_VARS)
++	if (property_get("init.svc." ANDROID_BLUEZ, val, NULL)) {
++		if (strcmp(val, "running") == 0)
++			return true;
++	}
 +
-+LOCAL_SRC_FILES := \
-+	../lib/bluetooth.c \
-+	../lib/sdp.c \
-+	../lib/hci.c \
-+	../lib/uuid.c \
++	return false;
++}
 +
-+LOCAL_C_INCLUDES := \
-+	$(LOCAL_PATH)/../lib/ \
-+	$(LOCAL_PATH)/../src/shared \
++static bool start_bt_daemon(void)
++{
++	int tries = 40; /* wait 4 seconds for completion */
 +
-+LOCAL_C_INCLUDES += \
-+	$(call include-path-for, glib) \
-+	$(call include-path-for, glib)/glib \
++	ALOGD(__func__);
 +
-+LOCAL_CFLAGS += -O3
++	/* Start Android Bluetooth daemon service */
++	property_set("ctl.start", ANDROID_BLUEZ);
 +
-+# to suppress the "pointer of type 'void *' used in arithmetic" warning
-+LOCAL_CFLAGS += -Wno-pointer-arith
++	while (tries-- > 0) {
++		if (is_svc_running() == true) {
++			ALOGI("Android BlueZ daemon started");
++			return true;
++		}
 +
-+# to suppress the "missing initializer near initialization" warning
-+LOCAL_CFLAGS += -Wno-missing-field-initializers
++		usleep(100000);
++	}
 +
-+# Define missing flags for Android 4.2
-+LOCAL_CFLAGS += -DSOCK_CLOEXEC=02000000 -DSOCK_NONBLOCK=04000
++	return false;
++}
 +
-+lib_headers := \
-+	bluetooth.h \
-+	hci.h \
-+	hci_lib.h \
-+	sco.h \
-+	l2cap.h \
-+	sdp.h \
-+	sdp_lib.h \
-+	rfcomm.h \
-+	bnep.h \
-+	cmtp.h \
-+	hidp.h \
+ static bool is_profile(const char *profile, const char *str)
+ {
+ 	return strcmp(profile, str) == 0;
+@@ -47,10 +88,13 @@ static int init(bt_callbacks_t *callbacks)
+ 	if (interface_ready() == true)
+ 		return BT_STATUS_SUCCESS;
+ 
+-	/* store reference to user callbacks */
+-	bt_hal_cbacks = callbacks;
++	if (start_bt_daemon() == true) {
++		/* TODO: open channel */
+ 
+-	/* TODO: Init here bluezd task */
++		bt_hal_cbacks = callbacks;
 +
-+$(shell mkdir -p $(LOCAL_PATH)/../lib/bluetooth)
-+
-+$(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(LOCAL_PATH)/../lib/bluetooth/$(file)))
-+
-+LOCAL_MODULE := libbluetooth
-+
-+include $(BUILD_SHARED_LIBRARY)
++		return BT_STATUS_SUCCESS;
++	}
+ 
+ 	return BT_STATUS_UNSUPPORTED;
+ }
 -- 
 1.7.10.4
 
