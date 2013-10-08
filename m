@@ -1,75 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/7] obexd/MAP: Fix sending \0 after filler byte
-Date: Wed,  9 Oct 2013 14:11:40 +0300
-Message-Id: <1381317105-10729-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1381317105-10729-1-git-send-email-luiz.dentz@gmail.com>
-References: <1381317105-10729-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCHv3 05/15] android: Start Android Bluetooth daemon
+Date: Tue,  8 Oct 2013 17:51:13 +0300
+Message-Id: <1381243883-2745-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-It is not necessary to append \0 after the filler byte (0x30), the spec
-just talk about the a byte not bytes.
+Start Android Bluetooth daemon from HAL init(). Make sure
+that daemon is in "running" state.
 ---
- obexd/client/map.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ android/hal_bluetooth.c |   50 ++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 47 insertions(+), 3 deletions(-)
 
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index 4373d74..9d90a92 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -729,7 +729,7 @@ static void set_status(const GDBusPropertyTable *property,
- 	gboolean value;
- 	GError *err = NULL;
- 	GObexApparam *apparam;
--	char contents[2];
-+	char contents[1];
- 	char handle[21];
+diff --git a/android/hal_bluetooth.c b/android/hal_bluetooth.c
+index 00f3e8d..f1e306f 100644
+--- a/android/hal_bluetooth.c
++++ b/android/hal_bluetooth.c
+@@ -23,11 +23,16 @@
+ #include <hardware/bluetooth.h>
+ #include <hardware/bt_sock.h>
  
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN) {
-@@ -742,7 +742,6 @@ static void set_status(const GDBusPropertyTable *property,
- 	dbus_message_iter_get_basic(iter, &value);
++#include <cutils/sockets.h>
++#include <cutils/properties.h>
++
+ #define LOG_TAG "BlueZ"
+ #include <cutils/log.h>
  
- 	contents[0] = FILLER_BYTE;
--	contents[1] = '\0';
+ #include "hal.h"
  
- 	if (snprintf(handle, sizeof(handle), "%" PRIu64, msg->handle) < 0)
- 		goto fail;
-@@ -1612,13 +1611,12 @@ static DBusMessage *map_update_inbox(DBusConnection *connection,
++#define ANDROID_BLUEZ "bluetoothd"
++
+ bt_callbacks_t *bt_hal_cbacks = NULL;
+ 
+ static bool interface_ready(void)
+@@ -35,6 +40,42 @@ static bool interface_ready(void)
+ 	return bt_hal_cbacks != NULL;
+ }
+ 
++static bool is_svc_running(void)
++{
++	char val[PROPERTY_VALUE_MAX];
++	int ret;
++
++	ALOGD(__func__);
++
++	if (property_get("init.svc." ANDROID_BLUEZ, val, NULL)) {
++		if (strcmp(val, "running") == 0)
++			return true;
++	}
++
++	return false;
++}
++
++static bool start_bt_daemon(void)
++{
++	int tries = 40; /* wait 4 seconds for completion */
++
++	ALOGD(__func__);
++
++	/* Start Android Bluetooth daemon service */
++	property_set("ctl.start", ANDROID_BLUEZ);
++
++	while (tries-- > 0) {
++		if (is_svc_running() == true) {
++			ALOGI("Android BlueZ daemon started");
++			return true;
++		}
++
++		usleep(100000);
++	}
++
++	return false;
++}
++
+ static bool is_profile(const char *profile, const char *str)
  {
- 	struct map_data *map = user_data;
- 	DBusMessage *reply;
--	char contents[2];
-+	char contents[1];
- 	struct obc_transfer *transfer;
- 	GError *err = NULL;
- 	struct pending_request *request;
+ 	return strcmp(profile, str) == 0;
+@@ -47,10 +88,13 @@ static int init(bt_callbacks_t *callbacks)
+ 	if (interface_ready() == true)
+ 		return BT_STATUS_SUCCESS;
  
- 	contents[0] = FILLER_BYTE;
--	contents[1] = '\0';
+-	/* store reference to user callbacks */
+-	bt_hal_cbacks = callbacks;
++	if (start_bt_daemon() == true) {
++		/* TODO: open channel */
  
- 	transfer = obc_transfer_put("x-bt/MAP-messageUpdate", NULL, NULL,
- 						contents, sizeof(contents),
-@@ -1935,7 +1933,7 @@ static bool set_notification_registration(struct map_data *map, bool status)
- 	struct obc_transfer *transfer;
- 	GError *err = NULL;
- 	GObexApparam *apparam;
--	char contents[2];
-+	char contents[1];
- 	const char *address;
+-	/* TODO: Init here bluezd task */
++		bt_hal_cbacks = callbacks;
++
++		return BT_STATUS_SUCCESS;
++	}
  
- 	address = obc_session_get_destination(map->session);
-@@ -1951,7 +1949,6 @@ static bool set_notification_registration(struct map_data *map, bool status)
- 	}
- 
- 	contents[0] = FILLER_BYTE;
--	contents[1] = '\0';
- 
- 	transfer = obc_transfer_put("x-bt/MAP-NotificationRegistration", NULL,
- 					NULL, contents, sizeof(contents), &err);
+ 	return BT_STATUS_UNSUPPORTED;
+ }
 -- 
-1.8.3.1
+1.7.10.4
 
