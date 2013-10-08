@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 15/15] android: Add makefile for hcitool
-Date: Tue,  8 Oct 2013 13:33:57 +0300
-Message-Id: <1381228437-5553-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 02/15] android: Add Adapter Bluetooth HAL template
+Date: Tue,  8 Oct 2013 13:33:44 +0300
+Message-Id: <1381228437-5553-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381228437-5553-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1381228437-5553-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,56 +12,394 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Add template for bluetooth.h Android HAL.
 ---
- android/Android.mk |   38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+ android/Android.mk      |   19 +++
+ android/hal_bluetooth.c |  348 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 367 insertions(+)
+ create mode 100644 android/hal_bluetooth.c
 
 diff --git a/android/Android.mk b/android/Android.mk
-index 09c4579..5798749 100644
+index 5498b41..7adbbcd 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -157,3 +157,41 @@ LOCAL_MODULE_TAGS := eng
- LOCAL_MODULE := hciconfig
+@@ -32,3 +32,22 @@ LOCAL_SHARED_LIBRARIES := \
+ LOCAL_MODULE := bluetoothd
  
  include $(BUILD_EXECUTABLE)
 +
 +#
-+# hcitool
++# bluetooth.default.so HAL
 +#
 +
 +include $(CLEAR_VARS)
 +
 +LOCAL_SRC_FILES := \
-+	../tools/hcitool.c \
-+	../src/oui.c \
-+
-+LOCAL_C_INCLUDES := \
-+	$(LOCAL_PATH)/../lib \
-+	$(LOCAL_PATH)/../src \
-+
-+LOCAL_C_INCLUDES += \
-+	$(call include-path-for, glib) \
-+	$(call include-path-for, glib)/glib \
-+
-+LOCAL_CFLAGS := \
-+	-DSTORAGEDIR=\"/tmp\" \
-+	-DVERSION=\"$(BLUEZ_VERSION)\"
-+
-+# to suppress the "pointer of type 'void *' used in arithmetic" warning
-+LOCAL_CFLAGS += -Wno-pointer-arith
-+
-+# to suppress the "warning: missing initializer near initialization.." warning
-+LOCAL_CFLAGS += -Wno-missing-field-initializers
++	hal_bluetooth.c \
 +
 +LOCAL_SHARED_LIBRARIES := \
-+	libbluetooth \
-+	libglib \
++	libcutils \
 +
-+LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
-+LOCAL_MODULE_TAGS := eng
-+LOCAL_MODULE := hcitool
++LOCAL_MODULE := bluetooth.default
++LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
++LOCAL_MODULE_TAGS := optional
++LOCAL_MODULE_CLASS := SHARED_LIBRARIES
 +
-+include $(BUILD_EXECUTABLE)
++include $(BUILD_SHARED_LIBRARY)
+diff --git a/android/hal_bluetooth.c b/android/hal_bluetooth.c
+new file mode 100644
+index 0000000..9970374
+--- /dev/null
++++ b/android/hal_bluetooth.c
+@@ -0,0 +1,348 @@
++/*
++ * Copyright (C) 2013 Intel Corporation
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ *
++ */
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <stdbool.h>
++
++#include <hardware/bluetooth.h>
++
++#define LOG_TAG "BlueZ"
++#include <cutils/log.h>
++
++bt_callbacks_t *bt_hal_cbacks = NULL;
++
++static bool interface_ready(void)
++{
++	return bt_hal_cbacks != NULL;
++}
++
++static int init(bt_callbacks_t *callbacks)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == true)
++		return BT_STATUS_SUCCESS;
++
++	/* store reference to user callbacks */
++	bt_hal_cbacks = callbacks;
++
++	/* TODO: Init here bluezd task */
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int enable(void)
++{
++	ALOGD(__func__);
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int disable(void)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static void cleanup(void)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return;
++
++	bt_hal_cbacks = NULL;
++}
++
++static int get_adapter_properties(void)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int get_adapter_property(bt_property_type_t type)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int set_adapter_property(const bt_property_t *property)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	if (property == NULL)
++		return BT_STATUS_PARM_INVALID;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int get_remote_device_properties(bt_bdaddr_t *remote_addr)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int get_remote_device_property(bt_bdaddr_t *remote_addr,
++						bt_property_type_t type)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int set_remote_device_property(bt_bdaddr_t *remote_addr,
++						const bt_property_t *property)
++{
++	ALOGD(__func__);
++
++	/* sanity check */
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int get_remote_service_record(bt_bdaddr_t *remote_addr, bt_uuid_t *uuid)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int get_remote_services(bt_bdaddr_t *remote_addr)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int start_discovery(void)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int cancel_discovery(void)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int create_bond(const bt_bdaddr_t *bd_addr)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	if (bd_addr == NULL)
++		return BT_STATUS_PARM_INVALID;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int cancel_bond(const bt_bdaddr_t *bd_addr)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int remove_bond(const bt_bdaddr_t *bd_addr)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int pin_reply(const bt_bdaddr_t *bd_addr, uint8_t accept,
++				uint8_t pin_len, bt_pin_code_t *pin_code)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int ssp_reply(const bt_bdaddr_t *bd_addr, bt_ssp_variant_t variant,
++					uint8_t accept, uint32_t passkey)
++{
++
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	if (bd_addr == NULL)
++		return BT_STATUS_PARM_INVALID;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static const void *get_profile_interface(const char *profile_id)
++{
++	ALOGD("%s: %s", __func__, profile_id);
++
++	if (interface_ready() == false)
++		return NULL;
++
++	return NULL;
++}
++
++static int dut_mode_configure(uint8_t enable)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int dut_mode_send(uint16_t opcode, uint8_t *buf, uint8_t len)
++{
++	ALOGD(__func__);
++
++	if (interface_ready() == false)
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++/**
++ * HAL Interface declaration
++ */
++static const bt_interface_t bluetooth_if = {
++	sizeof(bt_interface_t),
++	init,
++	enable,
++	disable,
++	cleanup,
++	get_adapter_properties,
++	get_adapter_property,
++	set_adapter_property,
++	get_remote_device_properties,
++	get_remote_device_property,
++	set_remote_device_property,
++	get_remote_service_record,
++	get_remote_services,
++	start_discovery,
++	cancel_discovery,
++	create_bond,
++	remove_bond,
++	cancel_bond,
++	pin_reply,
++	ssp_reply,
++	get_profile_interface,
++	dut_mode_configure,
++	dut_mode_send
++};
++
++static const bt_interface_t *get_bluetooth_interface(void)
++{
++	ALOGD(__func__);
++
++	return &bluetooth_if;
++}
++
++static int close_bluetooth(struct hw_device_t *device)
++{
++	ALOGD(__func__);
++
++	cleanup();
++
++	return 0;
++}
++
++static int open_bluetooth(const struct hw_module_t *module, char const *name,
++					struct hw_device_t **device)
++{
++	bluetooth_device_t *dev = malloc(sizeof(bluetooth_device_t));
++
++	ALOGD(__func__);
++
++	memset(dev, 0, sizeof(bluetooth_device_t));
++	dev->common.tag = HARDWARE_DEVICE_TAG;
++	dev->common.version = 0;
++	dev->common.module = (struct hw_module_t *) module;
++	dev->common.close = close_bluetooth;
++	dev->get_bluetooth_interface = get_bluetooth_interface;
++
++	*device = (struct hw_device_t *) dev;
++
++	return 0;
++}
++
++static struct hw_module_methods_t bluetooth_module_methods = {
++	.open = open_bluetooth,
++};
++
++struct hw_module_t HAL_MODULE_INFO_SYM = {
++	.tag = HARDWARE_MODULE_TAG,
++	.version_major = 1,
++	.version_minor = 0,
++	.id = BT_HARDWARE_MODULE_ID,
++	.name = "BlueZ Bluetooth stack",
++	.author = "Intel Corporation",
++	.methods = &bluetooth_module_methods
++};
 -- 
 1.7.10.4
 
