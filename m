@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 6/7] tools/sdptool: Fix parsing for service class 0x110f
-Date: Wed,  9 Oct 2013 14:11:44 +0300
-Message-Id: <1381317105-10729-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 7/7] tools/hcidump: Fix parsing for service class 0x110f
+Date: Wed,  9 Oct 2013 14:11:45 +0300
+Message-Id: <1381317105-10729-7-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1381317105-10729-1-git-send-email-luiz.dentz@gmail.com>
 References: <1381317105-10729-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,30 +13,52 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 According to assigned number 0x110f is AV Remote Controller not VCP.
 ---
- tools/sdptool.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ tools/parser/sdp.c | 3 +--
+ tools/parser/sdp.h | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/tools/sdptool.c b/tools/sdptool.c
-index c241655..f985b1e 100644
---- a/tools/sdptool.c
-+++ b/tools/sdptool.c
-@@ -286,7 +286,7 @@ static struct uuid_def uuid16_names[] = {
- 	{ 0x110c, "RemoteControlTarget", NULL, 0 },
- 	{ 0x110d, "AdvancedAudio", NULL, 0 },
- 	{ 0x110e, "RemoteControl", NULL, 0 },
--	{ 0x110f, "VideoConferencing", NULL, 0 },
-+	{ 0x110f, "RemoteControlController", NULL, 0 },
- 	{ 0x1110, "Intercom", NULL, 0 },
- 	{ 0x1111, "Fax", NULL, 0 },
- 	{ 0x1112, "HeadsetAudioGateway", NULL, 0 },
-@@ -316,7 +316,6 @@ static struct uuid_def uuid16_names[] = {
- 	{ 0x1126, "HCR_Print (HCR)", NULL, 0 },
- 	{ 0x1127, "HCR_Scan (HCR)", NULL, 0 },
- 	{ 0x1128, "Common ISDN Access (CIP)", NULL, 0 },
--	{ 0x1129, "VideoConferencingGW (VCP)", NULL, 0 },
- 	{ 0x112a, "UDI-MT", NULL, 0 },
- 	{ 0x112b, "UDI-TA", NULL, 0 },
- 	{ 0x112c, "Audio/Video", NULL, 0 },
+diff --git a/tools/parser/sdp.c b/tools/parser/sdp.c
+index b48e3ff..29708e3 100644
+--- a/tools/parser/sdp.c
++++ b/tools/parser/sdp.c
+@@ -121,7 +121,7 @@ static sdp_uuid_nam_lookup_table_t sdp_uuid_nam_lookup_table[] = {
+ 	{ SDP_UUID_AV_REMOTE_TARGET,         "AVRemTarget"  }, /* AVRCP */
+ 	{ SDP_UUID_ADVANCED_AUDIO,           "AdvAudio"     }, /* A2DP */
+ 	{ SDP_UUID_AV_REMOTE,                "AVRemote"     }, /* AVRCP */
+-	{ SDP_UUID_VIDEO_CONFERENCING,       "VideoConf"    }, /* VCP */
++	{ SDP_UUID_AV_REMOTE,                "AVRemCt"      }, /* AVRCP */
+ 	{ SDP_UUID_INTERCOM,                 "Intercom"     },
+ 	{ SDP_UUID_FAX,                      "Fax"          },
+ 	{ SDP_UUID_HEADSET_AUDIO_GATEWAY,    "Headset AG"   },
+@@ -145,7 +145,6 @@ static sdp_uuid_nam_lookup_table_t sdp_uuid_nam_lookup_table[] = {
+ 	{ SDP_UUID_HCR_PRINT,                "HCRPrint"     }, /* HCRP */
+ 	{ SDP_UUID_HCR_SCAN,                 "HCRScan"      }, /* HCRP */
+ 	{ SDP_UUID_COMMON_ISDN_ACCESS,       "CIP"          }, /* CIP */
+-	{ SDP_UUID_VIDEO_CONFERENCING_GW,    "VideoConf GW" }, /* VCP */
+ 	{ SDP_UUID_UDI_MT,                   "UDI MT"       }, /* UDI */
+ 	{ SDP_UUID_UDI_TA,                   "UDI TA"       }, /* UDI */
+ 	{ SDP_UUID_AUDIO_VIDEO,              "AudioVideo"   }, /* VCP */
+diff --git a/tools/parser/sdp.h b/tools/parser/sdp.h
+index 41fc209..ed55a23 100644
+--- a/tools/parser/sdp.h
++++ b/tools/parser/sdp.h
+@@ -66,7 +66,7 @@
+ #define SDP_UUID_AV_REMOTE_TARGET                      0x110c /* AVRCP */
+ #define SDP_UUID_ADVANCED_AUDIO                        0x110d /* A2DP */
+ #define SDP_UUID_AV_REMOTE                             0x110e /* AVRCP */
+-#define SDP_UUID_VIDEO_CONFERENCING                    0x110f /* VCP */
++#define SDP_UUID_AV_REMOTE_CONTROLLER                  0x110f /* AVRCP */
+ #define SDP_UUID_INTERCOM                              0x1110
+ #define SDP_UUID_FAX                                   0x1111
+ #define SDP_UUID_HEADSET_AUDIO_GATEWAY                 0x1112
+@@ -93,7 +93,6 @@
+ #define SDP_UUID_HCR_PRINT                             0x1126 /* HCRP */
+ #define SDP_UUID_HCR_SCAN                              0x1127 /* HCRP */
+ #define SDP_UUID_COMMON_ISDN_ACCESS                    0x1128 /* CIP */
+-#define SDP_UUID_VIDEO_CONFERENCING_GW                 0x1129 /* VCP */
+ #define SDP_UUID_UDI_MT                                0x112a /* UDI */
+ #define SDP_UUID_UDI_TA                                0x112b /* UDI */
+ #define SDP_UUID_AUDIO_VIDEO                           0x112c /* VCP */
 -- 
 1.8.3.1
 
