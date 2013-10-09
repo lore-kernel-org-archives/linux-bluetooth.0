@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/7] lib/sdp: Replace VIDEO_CONF_SVCLASS_ID with AV_REMOTE_CONTROLLER_SVCLASS_ID
-Date: Wed,  9 Oct 2013 14:11:42 +0300
-Message-Id: <1381317105-10729-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 5/7] profiles/AVRCP: Add AV Remote Controller service class id to CT
+Date: Wed,  9 Oct 2013 14:11:43 +0300
+Message-Id: <1381317105-10729-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1381317105-10729-1-git-send-email-luiz.dentz@gmail.com>
 References: <1381317105-10729-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,54 +11,39 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-VCP apparently was never adopted so 0x110f was latter reused by AVRCP 1.3
-controller as per current assigned numbers page:
+Both AV Remote and AV Remote Controller service classes are mandatory
+by AVRCP CT role from 1.3 onwards. Also the assigned numbers page mention
+that AV Remote must appear before AV Remote Controller:
 
-https://www.bluetooth.org/en-us/specification/assigned-numbers/service-discovery
+  "The AVRCP specification v1.3 and later require that 0x110E also be
+  included in the ServiceClassIDList before 0x110F for backwards
+  compatibility."
 ---
- lib/sdp.c         | 2 +-
- lib/sdp.h         | 2 +-
- src/glib-helper.c | 1 -
- 3 files changed, 2 insertions(+), 3 deletions(-)
+ profiles/audio/avrcp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/lib/sdp.c b/lib/sdp.c
-index 1405c50..cbdf15e 100644
---- a/lib/sdp.c
-+++ b/lib/sdp.c
-@@ -125,7 +125,7 @@ static struct tupla ServiceClass[] = {
- 	{ AV_REMOTE_TARGET_SVCLASS_ID,		"AV Remote Target"		},
- 	{ ADVANCED_AUDIO_SVCLASS_ID,		"Advanced Audio"		},
- 	{ AV_REMOTE_SVCLASS_ID,			"AV Remote"			},
--	{ VIDEO_CONF_SVCLASS_ID,		"Video Conferencing"		},
-+	{ AV_REMOTE_CONTROLLER_SVCLASS_ID,	"AV Remote Controller"		},
- 	{ INTERCOM_SVCLASS_ID,			"Intercom"			},
- 	{ FAX_SVCLASS_ID,			"Fax"				},
- 	{ HEADSET_AGW_SVCLASS_ID,		"Headset Audio Gateway"		},
-diff --git a/lib/sdp.h b/lib/sdp.h
-index 4ef2176..f2f2484 100644
---- a/lib/sdp.h
-+++ b/lib/sdp.h
-@@ -95,7 +95,7 @@ extern "C" {
- #define AV_REMOTE_TARGET_SVCLASS_ID	0x110c
- #define ADVANCED_AUDIO_SVCLASS_ID	0x110d
- #define AV_REMOTE_SVCLASS_ID		0x110e
--#define VIDEO_CONF_SVCLASS_ID		0x110f
-+#define AV_REMOTE_CONTROLLER_SVCLASS_ID	0x110f
- #define INTERCOM_SVCLASS_ID		0x1110
- #define FAX_SVCLASS_ID			0x1111
- #define HEADSET_AGW_SVCLASS_ID		0x1112
-diff --git a/src/glib-helper.c b/src/glib-helper.c
-index a9a9a6e..4a020e9 100644
---- a/src/glib-helper.c
-+++ b/src/glib-helper.c
-@@ -103,7 +103,6 @@ static struct {
- 	const char	*name;
- 	uint16_t	class;
- } bt_services[] = {
--	{ "vcp",	VIDEO_CONF_SVCLASS_ID		},
- 	{ "pbap",	PBAP_SVCLASS_ID			},
- 	{ "sap",	SAP_SVCLASS_ID			},
- 	{ "ftp",	OBEX_FILETRANS_SVCLASS_ID	},
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index b1b2ae6..296067c 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -263,7 +263,7 @@ static void avrcp_register_notification(struct avrcp *session, uint8_t event);
+ static sdp_record_t *avrcp_ct_record(void)
+ {
+ 	sdp_list_t *svclass_id, *pfseq, *apseq, *apseq1, *root;
+-	uuid_t root_uuid, l2cap, avctp, avrct;
++	uuid_t root_uuid, l2cap, avctp, avrct, avrctr;
+ 	sdp_profile_desc_t profile[1];
+ 	sdp_list_t *aproto, *aproto1, *proto[2], *proto1[2];
+ 	sdp_record_t *record;
+@@ -287,6 +287,8 @@ static sdp_record_t *avrcp_ct_record(void)
+ 	/* Service Class ID List */
+ 	sdp_uuid16_create(&avrct, AV_REMOTE_SVCLASS_ID);
+ 	svclass_id = sdp_list_append(0, &avrct);
++	sdp_uuid16_create(&avrctr, AV_REMOTE_CONTROLLER_SVCLASS_ID);
++	svclass_id = sdp_list_append(svclass_id, &avrctr);
+ 	sdp_set_service_classes(record, svclass_id);
+ 
+ 	/* Protocol Descriptor List */
 -- 
 1.8.3.1
 
