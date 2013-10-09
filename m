@@ -1,302 +1,332 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCHv3 07/15] android: Create HAL API header skeleton
+Subject: Re: [PATCHv3 06/15] android: Add basic mgmt initialization sequence
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1381243883-2745-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Wed, 9 Oct 2013 21:34:17 +0200
+In-Reply-To: <1381243883-2745-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 9 Oct 2013 21:30:22 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <69ADBAAE-9261-4C56-9779-5708DE897CBA@holtmann.org>
-References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-Id: <0147C8F8-0491-44CD-BCDB-51DF9F6D3315@holtmann.org>
+References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-> Header describes the protocol between Android HAL threads and BlueZ
-> daemon.
+> Initialize bluetooth controller via mgmt interface.
 > ---
-> android/hal_msg.h |  255 +++++++++++++++++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 255 insertions(+)
-> create mode 100644 android/hal_msg.h
+> Makefile.android   |    4 +-
+> android/Android.mk |   11 +++
+> android/main.c     |  189 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+> 3 files changed, 203 insertions(+), 1 deletion(-)
 > 
-> diff --git a/android/hal_msg.h b/android/hal_msg.h
-> new file mode 100644
-> index 0000000..c6bc883
-> --- /dev/null
-> +++ b/android/hal_msg.h
-> @@ -0,0 +1,255 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2013  Intel Corporation. All rights reserved.
-> + *
-> + *
-> + *  This library is free software; you can redistribute it and/or
-> + *  modify it under the terms of the GNU Lesser General Public
-> + *  License as published by the Free Software Foundation; either
-> + *  version 2.1 of the License, or (at your option) any later version.
-> + *
-> + *  This library is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + *  Lesser General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU Lesser General Public
-> + *  License along with this library; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> + *
-> + */
+> diff --git a/Makefile.android b/Makefile.android
+> index e161e6d..9a2c486 100644
+> --- a/Makefile.android
+> +++ b/Makefile.android
+> @@ -1,7 +1,9 @@
+> if ANDROID
+> noinst_PROGRAMS += android/bluetoothd
+> 
+> -android_bluetoothd_SOURCES = android/main.c src/log.c
+> +android_bluetoothd_SOURCES = android/main.c src/log.c \
+> +				src/shared/util.h src/shared/util.c \
+> +				src/shared/mgmt.h src/shared/mgmt.c
+> android_bluetoothd_LDADD = @GLIB_LIBS@
+> endif
+> 
+> diff --git a/android/Android.mk b/android/Android.mk
+> index 2cabff4..f5fd863 100644
+> --- a/android/Android.mk
+> +++ b/android/Android.mk
+> @@ -15,10 +15,15 @@ include $(CLEAR_VARS)
+> LOCAL_SRC_FILES := \
+> 	main.c \
+> 	log.c \
+> +	../src/shared/mgmt.c \
+> +	../src/shared/util.c \
+> 
+> LOCAL_C_INCLUDES := \
+> 	$(call include-path-for, glib) \
+> 	$(call include-path-for, glib)/glib \
 > +
-> +#ifndef __packed
-> +#define __packed __attribute__((packed))
-> +#endif
+> +LOCAL_C_INCLUDES += \
+> +	$(LOCAL_PATH)/../ \
+> 	$(LOCAL_PATH)/../src \
 
-nowhere in the code we are using __packed. That is more a kernel thing. Just use the gcc style directly.
+do we need these nested includes actually? We could also just fix the includes. BlueZ historically has not been good with clear includes. I started to fix this, but it seems I have not gotten to all of them yet.
 
-> +
-> +typedef struct {
-> +	uint8_t b[6];
-> +} __packed __bdaddr_t;
+> 
+> LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
+> @@ -26,6 +31,12 @@ LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
+> # to suppress the "warning: missing initializer near initialization.." warning
+> LOCAL_CFLAGS += -Wno-missing-field-initializers
+> 
+> +# to suppress the "pointer of type 'void *' used in arithmetic" warning
+> +LOCAL_CFLAGS += -Wno-pointer-arith
 
-Just use a uint8_t bdaddr[6] instead.
-
-> +
-> +struct hal_msg_hdr {
-> +	uint8_t service_id;
-> +	uint8_t opcode;
-> +	uint16_t len;
-> +	uint8_t payload[0];
-
-I would not include the payload[0] here.
-
-> +} __packed;
-> +
-> +#define HAL_SERVICE_ID_CORE		0
-> +#define HAL_SERVICE_ID_BLUETOOTH	1
-> +#define HAL_SERVICE_ID_SOCK		2
-> +#define HAL_SERVICE_ID_HIDHOST		3
-> +#define HAL_SERVICE_ID_PAN		4
-> +#define HAL_SERVICE_ID_HANDSFREE	5
-> +#define HAL_SERVICE_ID_AD2P		6
-> +#define HAL_SERVICE_ID_HEALTH		7
-> +#define HAL_SERVICE_ID_AVRCP		8
-> +#define HAL_SERVICE_ID_GATT		9
-> +
-> +/* Core Service */
-> +
-> +#define HAL_MSG_OP_ERROR		0x00
-> +struct hal_msg_rp_error {
-> +	uint8_t status;
-> +} __packed;
-
-using RSP, rsp, CMD, cmd, EVT and EVT seems to be clearer I think.
+Why do we need to suppress these warning. Can we not just fix them.
 
 > +
-> +#define HAL_MSG_OP_REGISTER_MODULE	0x01
-> +struct hal_msg_cp_register_module {
-> +	uint8_t service_id;
-> +} __packed;
-> +struct hal_msg_rp_register_module {
-> +	uint8_t service_id;
-> +} __packed;
+> +# Define missing flags for Android 4.2
+> +LOCAL_CFLAGS += -DSOCK_CLOEXEC=02000000 -DSOCK_NONBLOCK=04000
 > +
-> +#define HAL_MSG_OP_UNREGISTER_MODULE	0x02
-> +struct hal_msg_cp_unregister_module {
-> +	uint8_t service_id;
-> +} __packed;
-> +
-> +/* Bluetooth Core HAL API */
-> +
-> +#define HAL_MSG_OP_BT_ENABLE		0x01
-> +
-> +#define HAL_MSG_OP_BT_DISABLE		0x02
-> +
-> +#define HAL_MSG_OP_BT_GET_ADAPTER_PROPS	0x03
-> +
-> +#define HAL_MSG_OP_BT_GET_ADAPTER_PROP	0x04
-> +struct hal_msg_cp_bt_get_adapter_prop {
-> +	uint8_t type;
-> +} __packed;
-> +
-> +#define HAL_MSG_OP_BT_SET_ADAPTER_PROP	0x05
-> +struct hal_msg_cp_bt_set_adapter_prop {
-> +	uint8_t type;
-> +	uint16_t len;
-> +	uint8_t val[0];
-> +} __packed;
-> +
-> +#define HAL_MSG_OP_BT_GET_REMOTE_DEVICE_PROPS	0x06
-> +struct hal_msg_cp_bt_get_remote_device_props {
-> +	__bdaddr_t bdaddr;
-> +} __packed;
-> +
-> +#define HAL_MSG_OP_BT_GET_REMOTE_DEVICE_PROP	0x07
-> +struct hal_msg_cp_bt_get_remote_device_prop {
-> +	__bdaddr_t bdaddr;
-> +	uint8_t type;
-> +} __packed;
-> +
-> +#define HAL_MSG_OP_BT_SET_REMOTE_DEVICE_PROP	0x08
-> +struct hal_msg_cp_bt_set_remote_device_prop {
-> +	__bdaddr_t bdaddr;
-> +	uint8_t type;
-> +	uint16_t len;
 
-Lets make these all align properly.
+This thing is dangerous. Do we really bother with Android 4.2 support and can not rely on a newer version that has this fixed properly in bionic.
 
-> +	uint8_t val[0];
-> +} __packed;
+> LOCAL_SHARED_LIBRARIES := \
+> 	libglib \
+> 
+> diff --git a/android/main.c b/android/main.c
+> index f75b0a8..3580ac7 100644
+> --- a/android/main.c
+> +++ b/android/main.c
+> @@ -25,6 +25,7 @@
+> #include <config.h>
+> #endif
+> 
+> +#include <stdbool.h>
+> #include <signal.h>
+> #include <stdint.h>
+> #include <stdio.h>
+> @@ -36,9 +37,17 @@
+> 
+> #include "log.h"
+> 
+> +#include "lib/bluetooth.h"
+> +#include "lib/mgmt.h"
+> +#include "src/shared/mgmt.h"
 > +
-> +#define HAL_MSG_OP_BT_GET_REMOTE_SERVICE_REC	0x09
-> +struct hal_msg_cp_bt_get_remote_service_rec {
-> +	__bdaddr_t bdaddr;
-> +	uint8_t uuid[16];
-> +} __packed;
+> #define SHUTDOWN_GRACE_SECONDS 10
+> 
+> static GMainLoop *event_loop;
+> +static struct mgmt *mgmt_if = NULL;
 > +
-> +#define HAL_MSG_OP_BT_GET_REMOTE_SERVICE	0x0a
-> +struct hal_msg_cp_bt_get_remote_service {
-> +	__bdaddr_t bdaddr;
-> +} __packed;
+> +static uint8_t mgmt_version = 0;
+> +static uint8_t mgmt_revision = 0;
+> 
+> static gboolean quit_eventloop(gpointer user_data)
+> {
+> @@ -67,6 +76,183 @@ static GOptionEntry options[] = {
+> 	{ NULL }
+> };
+> 
+> +static void read_info_complete(uint8_t status, uint16_t length,
+> +					const void *param, void *user_data)
+> +{
+> +	/* TODO: Store Controller information */
 > +
-> +#define HAL_MSG_OP_BT_START_DISCOVERY	0x0b
+> +	/**
+> +	 * Register all event notification handlers for controller.
+> +	 *
+> +	 * The handlers are registered after a succcesful read of the
+> +	 * controller info. From now on they can track updates and
+> +	 * notifications.
+> +	 */
+
+This is not our comment style.
+
+> +}
 > +
-> +#define HAL_MSG_OP_BT_CANCEL_DISCOVERY	0x0c
 > +
-> +#define HAL_MSG_OP_BT_CREATE_BOND	0x0d
-> +struct hal_msg_cp_bt_create_bond {
-> +	__bdaddr_t bdaddr;
-> +} __packed;
+> +static void mgmt_index_added_event(uint16_t index, uint16_t length,
+> +					const void *param, void *user_data)
+> +{
+> +	info("%s: index %u", __func__, index);
 > +
-> +#define HAL_MSG_OP_BT_REMOVE_BOND	0x0d
-> +struct hal_msg_cp_bt_remove_bond {
-> +	__bdaddr_t bdaddr;
-> +} __packed;
+> +	DBG("sending read info command for index %u", index);
 > +
-> +#define HAL_MSG_OP_BT_CANCEL_BOND	0x0f
-> +struct hal_msg_cp_bt_cancel_bond {
-> +	__bdaddr_t bdaddr;
-> +} __packed;
+> +	if (mgmt_send(mgmt_if, MGMT_OP_READ_INFO, index, 0, NULL,
+> +					read_info_complete, NULL, NULL) > 0)
+> +		return;
 > +
-> +#define HAL_MSG_OP_BT_PIN_REPLY		0x10
-> +struct hal_msg_cp_bt_pin_reply {
-> +	__bdaddr_t bdaddr;
-> +	uint8_t accept;
-> +	uint8_t pin_len;
-> +	uint8_t pin_code[16];
-> +} __packed;
+> +	error("Failed to read adapter info for index %u", index);
 > +
-> +#define HAL_MSG_OP_BT_SSP_REPLY		0x11
-> +struct hal_msg_cp_bt_ssp_reply {
-> +	__bdaddr_t bdaddr;
-> +	uint8_t ssp_variant;
-> +	uint8_t accept;
-> +	uint32_t passkey;
-> +} __packed;
+> +}
+
+I prefer if we focus on one controller index and one controller index only. There is no need to bother reading information from controllers that we will never use.
+
 > +
-> +#define HAL_MSG_OP_BT_DUT_MODE_CONF	0x12
-> +struct hal_msg_cp_bt_dut_mode_conf {
-> +	uint8_t enable;
-> +} __packed;
+> +static void mgmt_index_removed_event(uint16_t index, uint16_t length,
+> +					const void *param, void *user_data)
+> +{
+> +	info("%s: index %u", __func__, index);
+> +}
 > +
-> +#define HAL_MSG_OP_BT_DUT_MODE_SEND	0x13
-> +struct hal_msg_cp_bt_dut_mode_send {
-> +	uint16_t opcode;
-> +	uint8_t len;
-> +	uint8_t data[0];
-> +} __packed;
+> +static void read_index_list_complete(uint8_t status, uint16_t length,
+> +					const void *param, void *user_data)
+> +{
+> +	const struct mgmt_rp_read_index_list *rp = param;
+> +	uint16_t num;
+> +	int i;
 > +
-> +#define HAL_MSG_OP_BT_LE_TEST_MODE	0x14
-> +struct hal_msg_cp_bt_le_test_mode {
-> +	uint16_t opcode;
-> +	uint8_t len;
-> +	uint8_t data[0];
-> +} __packed;
+> +	info(__func__);
 > +
-> +/* Notifications and confirmations */
+> +	if (status != MGMT_STATUS_SUCCESS) {
+> +		error("%s: Failed to read index list: %s (0x%02x)",
+> +					__func__, mgmt_errstr(status), status);
+> +		return;
+> +	}
 > +
-> +#define HAL_MSG_EV_BT_ERROR			0x80
+> +	if (length < sizeof(*rp)) {
+> +		error("%s: Wrong size of read index list response", __func__);
+> +		return;
+> +	}
 > +
-> +#define HAL_MSG_EV_BT_ADAPTER_STATE_CHANGED	0x81
-> +struct hal_msg_ev_bt_adapter_state_changed {
-> +	uint8_t state;
-> +} __packed;
+> +	num = btohs(rp->num_controllers);
 > +
-> +#define HAL_MSG_EV_BT_ADAPTER_PROPS_CHANGED	0x82
-> +struct hal_property {
-> +	uint8_t type;
-> +	uint16_t len;
-> +	uint8_t val[0];
-> +} __packed;
-> +struct hal_msg_ev_bt_adapter_props_changed {
-> +	uint8_t status;
-> +	uint8_t num_props;
-> +	struct hal_property props[0];
-> +} __packed;
+> +	DBG("%s: Number of controllers: %d", __func__, num);
 > +
-> +#define HAL_MSG_EV_BT_REMOTE_DEVICE_PROPS	0x83
-> +struct hal_msg_ev_bt_remote_device_props {
-> +	uint8_t status;
-> +	__bdaddr_t bdaddr;
-> +	uint8_t num_props;
-> +	struct hal_property props[0];
-> +} __packed;
+> +	if (num * sizeof(uint16_t) + sizeof(*rp) != length) {
+> +		error("%s: Incorrect pkt size for index list rsp", __func__);
+> +		return;
+> +	}
 > +
-> +#define HAL_MSG_EV_BT_DEVICE_FOUND		0x84
-> +struct hal_msg_ev_bt_device_found {
-> +	uint8_t num_props;
-> +	struct hal_property props[0];
-> +} __packed;
+> +	for (i = 0; i < num; i++) {
+> +		uint16_t index;
 > +
-> +#define HAL_MSG_EV_BT_DISCOVERY_STATE_CHANGED	0x85
-> +struct hal_msg_ev_bt_discovery_state_changed {
-> +	uint8_t state;
-> +} __packed;
+> +		index = btohs(rp->index[i]);
 > +
-> +#define HAL_MSG_EV_BT_PIN_REQUEST		0x86
-> +struct hal_msg_ev_bt_pin_request {
-> +	__bdaddr_t bdaddr;
-> +	uint8_t name[249 - 1];
-> +	uint8_t class_of_dev[3];
-> +} __packed;
+> +		DBG("%s: Found index %u", __func__, index);
 > +
-> +#define HAL_MSG_EV_BT_SSP_REQUEST		0x87
-> +struct hal_msg_ev_bt_ssp_request {
-> +	__bdaddr_t bdaddr;
-> +	uint8_t name[249 - 1];
-> +	uint8_t class_of_dev[3];
-> +	uint8_t pairing_variant;
-> +	uint32_t passkey;
-> +} __packed;
+> +		/**
+> +		 * Use index added event notification.
+> +		 */
+> +		mgmt_index_added_event(index, 0, NULL, NULL);
+> +	}
+
+Same here. Lets just pick one controller and be done with it.
+
+> +}
 > +
-> +#define HAL_MSG_EV_BT_BOND_STATE_CHANGED	0x88
-> +struct hal_msg_ev_bt_bond_state_changed {
-> +	uint8_t status;
-> +	__bdaddr_t bdaddr;
-> +	uint8_t state;
-> +} __packed;
 > +
-> +#define HAL_MSG_EV_BT_ACL_STATE_CHANGED		0x89
-> +struct hal_msg_ev_bt_acl_state_changed {
-> +	uint8_t status;
-> +	__bdaddr_t bdaddr;
-> +	uint8_t state;
-> +} __packed;
+
+Avoid double empty lines.
+
+> +static void read_commands_complete(uint8_t status, uint16_t length,
+> +					const void *param, void *user_data)
+> +{
+> +	const struct mgmt_rp_read_commands *rp = param;
+> +	uint16_t num_commands, num_events;
 > +
-> +#define HAL_MSG_EV_BT_DUT_MODE_RECEIVE		0x8a
-> +struct hal_msg_ev_bt_dut_mode_receive {
-> +	uint16_t opcode;
-> +	uint8_t len;
-> +	uint8_t data[0];
-> +} __packed;
+> +	info(__func__);
+
+These can not be info() ever. Make them DBG().
+
 > +
-> +#define HAL_MSG_EV_BT_LE_TEST_MODE		0x8b
-> +struct hal_msg_ev_bt_le_test_mode {
-> +	uint8_t status;
-> +	uint16_t num_packets;
-> +} __packed;
+> +	if (status != MGMT_STATUS_SUCCESS) {
+> +		error("Failed to read supported commands: %s (0x%02x)",
+> +						mgmt_errstr(status), status);
+> +		return;
+> +	}
+> +
+> +	if (length < sizeof(*rp)) {
+> +		error("Wrong size of read commands response");
+> +		return;
+> +	}
+> +
+> +	num_commands = btohs(rp->num_commands);
+> +	num_events = btohs(rp->num_events);
+> +
+> +	DBG("Number of commands: %d", num_commands);
+> +	DBG("Number of events: %d", num_events);
+> +}
+
+When copying code from src/adapter.c can we please at least be smart about it. Code that has no benefit should not be run. If it is currently not used, then leave it out for now.
+
+> +
+> +static void read_version_complete(uint8_t status, uint16_t length,
+> +					const void *param, void *user_data)
+> +{
+> +	const struct mgmt_rp_read_version *rp = param;
+> +
+> +	info(__func__);
+> +
+> +	if (status != MGMT_STATUS_SUCCESS) {
+> +		error("Failed to read version information: %s (0x%02x)",
+> +						mgmt_errstr(status), status);
+> +		return;
+> +	}
+> +
+> +	if (length < sizeof(*rp)) {
+> +		error("Wrong size response");
+> +		return;
+> +	}
+> +
+> +	mgmt_version = rp->version;
+> +	mgmt_revision = btohs(rp->revision);
+> +
+> +	info("Bluetooth management interface %u.%u initialized",
+> +						mgmt_version, mgmt_revision);
+> +
+> +	if (mgmt_version < 1) {
+> +		error("Version 1.0 or later of management interface required");
+> +		abort();
+> +	}
+> +
+> +	DBG("sending read supported commands command");
+> +
+> +	mgmt_send(mgmt_if, MGMT_OP_READ_COMMANDS, MGMT_INDEX_NONE, 0, NULL,
+> +					read_commands_complete, NULL, NULL);
+> +
+> +	mgmt_register(mgmt_if, MGMT_EV_INDEX_ADDED, MGMT_INDEX_NONE,
+> +					mgmt_index_added_event, NULL, NULL);
+> +	mgmt_register(mgmt_if, MGMT_EV_INDEX_REMOVED, MGMT_INDEX_NONE,
+> +					mgmt_index_removed_event, NULL, NULL);
+> +
+> +	DBG("sending read index list command");
+> +
+> +	if (mgmt_send(mgmt_if, MGMT_OP_READ_INDEX_LIST, MGMT_INDEX_NONE, 0,
+> +			NULL, read_index_list_complete, NULL, NULL) > 0)
+> +		return;
+> +
+> +	error("Failed to read controller index list");
+> +}
+> +
+> +static bool init_mgmt_interface(void)
+> +{
+
+If you are not using the return value, then do not return it.
+
+> +	mgmt_if = mgmt_new_default();
+> +	if (mgmt_if == NULL) {
+> +		error("Failed to access management interface");
+> +		return false;
+> +	}
+> +
+> +	if (mgmt_send(mgmt_if, MGMT_OP_READ_VERSION, MGMT_INDEX_NONE, 0, NULL,
+> +				read_version_complete, NULL, NULL) == 0) {
+> +		error("Error sending READ_VERSION mgmt command");
+> +		return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+> +static void cleanup_mgmt_interface(void)
+> +{
+> +	mgmt_unref(mgmt_if);
+> +	mgmt_if = NULL;
+> +}
+> +
+> int main(int argc, char *argv[])
+> {
+> 	GOptionContext *context;
+> @@ -100,10 +286,13 @@ int main(int argc, char *argv[])
+> 	sigaction(SIGINT, &sa, NULL);
+> 	sigaction(SIGTERM, &sa, NULL);
+> 
+> +	init_mgmt_interface();
+> +
+> 	DBG("Entering main loop");
+> 
+> 	g_main_loop_run(event_loop);
+> 
+> +	cleanup_mgmt_interface();
+> 	g_main_loop_unref(event_loop);
+> 
+> 	info("Exit");
 
 Regards
 
