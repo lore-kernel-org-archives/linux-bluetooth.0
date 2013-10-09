@@ -1,210 +1,182 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCHv3 13/15] android: Handle mgmt changed events
+Subject: Re: [PATCHv3 12/15] android: Implement read_info_complete callback
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1381243883-2745-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Wed, 9 Oct 2013 21:58:44 +0200
+In-Reply-To: <1381243883-2745-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 9 Oct 2013 21:54:01 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <D4A19DA6-3D92-4D08-B2B8-6A725B927E3A@holtmann.org>
-References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-Id: <8703FFF8-DF9E-420D-B974-FCB2B0CDDDAE@holtmann.org>
+References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Add code handling changing adapter settings.
+> Handle read info complete callback from mgmt interface.
 > ---
-> android/main.c |  154 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 154 insertions(+)
+> android/main.c |  101 +++++++++++++++++++++++++++++++++++++++++++++++++-------
+> 1 file changed, 89 insertions(+), 12 deletions(-)
 > 
 > diff --git a/android/main.c b/android/main.c
-> index a2ed8a4..c181d3a 100644
+> index a100013..a2ed8a4 100644
 > --- a/android/main.c
 > +++ b/android/main.c
-> @@ -127,6 +127,159 @@ static void load_link_keys_complete(uint8_t status, uint16_t length,
-> 	DBG("status %u", status);
+> @@ -54,6 +54,7 @@
+> #include "log.h"
+> #include "hcid.h"
+> #include "sdpd.h"
+> +#include "bt_adapter.h"
+> 
+> #include "lib/bluetooth.h"
+> #include "lib/mgmt.h"
+> @@ -69,6 +70,8 @@ static struct mgmt *mgmt_if = NULL;
+> static uint8_t mgmt_version = 0;
+> static uint8_t mgmt_revision = 0;
+> 
+> +struct bt_adapter *default_adapter = NULL;
+> +
+> static int sdp_start(void)
+> {
+> 	DBG("");
+> @@ -118,34 +121,108 @@ static GOptionEntry options[] = {
+> 	{ NULL }
+> };
+> 
+> -static void read_info_complete(uint8_t status, uint16_t length,
+> +static void load_link_keys_complete(uint8_t status, uint16_t length,
+> 					const void *param, void *user_data)
+> {
+> -	/* TODO: Store Controller information */
+> -
+> -	/**
+> -	 * Register all event notification handlers for controller.
+> -	 *
+> -	 * The handlers are registered after a succcesful read of the
+> -	 * controller info. From now on they can track updates and
+> -	 * notifications.
+> -	 */
+> +	DBG("status %u", status);
 > }
 > 
-> +static void mgmt_local_name_changed_event(uint16_t index, uint16_t length,
+> +static void load_link_keys(struct bt_adapter *adapter, GSList *keys)
+> +{
+> +	struct mgmt_cp_load_link_keys *cp;
+> +	size_t key_len = g_slist_length(keys);
+> +	struct mgmt_link_key_info *key;
+> +	size_t len;
+> +
+> +	DBG("");
+> +
+> +	len = sizeof(*cp) + key_len * sizeof(*key);
+> +	cp = g_try_malloc0(len);
+> +	if (cp == NULL) {
+> +		error("%s: Not enough memory for link keys loading", __func__);
+> +		return;
+> +	}
+
+I am really fine with just using g_malloc0 and aborting the program in case of memory allocation errors.
+
+> +
+> +	cp->debug_keys = 0;
+> +	cp->key_count = htobs(key_len);
+> +
+> +	mgmt_send(adapter->mgmt, MGMT_OP_LOAD_LINK_KEYS, adapter->dev_id, len,
+> +				cp, load_link_keys_complete, adapter, NULL);
+> +
+> +	free(cp);
+> +}
+> +
+> +static void read_info_complete(uint8_t status, uint16_t length,
 > +					const void *param, void *user_data)
 > +{
 > +	struct bt_adapter *adapter = user_data;
-> +	const struct mgmt_cp_set_local_name *rp = param;
+> +	const struct mgmt_rp_read_info *rp = param;
+> +
+> +	DBG("");
+> +
+> +	if (status != MGMT_STATUS_SUCCESS) {
+> +		error("Failed to read info for index %u: %s (0x%02x)",
+> +			adapter->dev_id, mgmt_errstr(status), status);
+> +		goto failed;
+> +	}
 > +
 > +	if (length < sizeof(*rp)) {
-> +		error("Wrong size of local name changed parameters");
-> +		return;
+> +		error("Too small read info complete response");
+> +		goto failed;
 > +	}
 > +
-> +	if (adapter != default_adapter) {
-> +		error("Wrong adapter %p", adapter);
-> +		return;
+> +	if (bacmp(&rp->bdaddr, BDADDR_ANY) == 0) {
+> +		error("No Bluetooth address for index %u", adapter->dev_id);
+> +		goto failed;
 > +	}
-
-this check is rather useless if the events are all registered per adapter. With mgmt you can register events for a specific index.
-
 > +
-> +	if (!g_strcmp0(adapter->short_name, (const char *) rp->short_name) &&
-> +			!g_strcmp0(adapter->name, (const char *) rp->name))
-> +		return;
+> +	/* Store adapter information */
+> +	bacpy(&adapter->bdaddr, &rp->bdaddr);
+> +	adapter->dev_class = rp->dev_class[0] | (rp->dev_class[1] << 8) |
+> +						(rp->dev_class[2] << 16);
+> +	adapter->name = g_strdup((const char *) rp->name);
+> +	adapter->short_name = g_strdup((const char *) rp->short_name);
 
 Don't bother with the short name.
 
 > +
-> +	DBG("name: %s short name: %s", rp->name, rp->short_name);
+> +	adapter->supported_settings = btohs(rp->supported_settings);
+> +	adapter->current_settings = btohs(rp->current_settings);
 > +
-> +	g_free(adapter->name);
-> +	adapter->name = g_strdup((const char *) rp->name);
+> +	/* TODO: Register all event notification handlers */
 > +
-> +	g_free(adapter->short_name);
-> +	adapter->short_name = g_strdup((const char *) rp->short_name);
+> +	if (adapter->current_settings & MGMT_SETTING_POWERED)
+> +		adapter_start(adapter);
 > +
-> +	/* TODO Update services if needed */
-> +}
-> +
-> +static void settings_changed_connectable(struct bt_adapter *adapter)
-> +{
-> +	/* TODO */
-> +}
-> +
-> +static void settings_changed_discoverable(struct bt_adapter *adapter)
-> +{
-> +	/* TODO */
-> +}
-> +
-> +static void settings_changed(struct bt_adapter *adapter, uint32_t settings)
-> +{
-> +	uint32_t changed_mask;
-> +
-> +	changed_mask = adapter->current_settings ^ settings;
-> +
-> +	adapter->current_settings = settings;
-> +
-> +	DBG("0x%08x", changed_mask);
-> +
-> +	if (changed_mask & MGMT_SETTING_POWERED) {
-> +		info("Powered");
-> +
-> +		if (adapter->current_settings & MGMT_SETTING_POWERED)
-> +			adapter_start(adapter);
-> +		else
-> +			adapter_stop(adapter);
-> +	}
-> +
-> +	/* Seems not needed for Android */
-> +	if (changed_mask & MGMT_SETTING_PAIRABLE)
-> +		DBG("Pairable");
+> +	/* dummy link keys loading */
 
-We should always enable pairable when setting up the adapter.
+The comment is wrong here. Just load the link keys. Even an empty list of keys needs to be loaded.
 
+> +	load_link_keys(adapter, NULL);
 > +
-> +	/*
-> +	 * There are only 2 scan modes:
-> +	 * CONNECTABLE and CONNECTABLE_DISCOVERABLE
-> +	 */
-
-I can not make heads or tails out of this comment.
-
-> +	if (changed_mask & MGMT_SETTING_CONNECTABLE) {
-> +		DBG("Connectable");
+> +	return;
 > +
-> +		settings_changed_connectable(adapter);
-> +	}
-> +
-> +	if (changed_mask & MGMT_SETTING_DISCOVERABLE) {
-> +		DBG("Discoverable");
-> +
-> +		settings_changed_discoverable(adapter);
-> +	}
+> +failed:
+> +	default_adapter = NULL;
 > +}
-> +
-> +static void new_settings_callback(uint16_t index, uint16_t length,
-> +					const void *param, void *user_data)
-> +{
-> +	struct bt_adapter *adapter = user_data;
-> +	uint32_t settings;
-> +
-> +	if (length < sizeof(settings)) {
-> +		error("Wrong size of new settings parameters");
-> +		return;
-> +	}
-> +
-> +	if (adapter != default_adapter) {
-> +		error("Wrong adapter %p", adapter);
-> +		return;
-> +	}
-> +
-> +	settings = bt_get_le32(param);
-> +
-> +	DBG("settings: 0x%8.8x -> 0x%8.8x", adapter->current_settings,
-> +								settings);
-> +
-> +	if (settings == adapter->current_settings)
-> +		return;
-> +
-> +	settings_changed(adapter, settings);
-> +}
-> +
-> +static void mgmt_dev_class_changed_event(uint16_t index, uint16_t length,
-> +					const void *param, void *user_data)
-> +{
-> +	struct bt_adapter *adapter = user_data;
-> +	const struct mgmt_cod *rp = param;
-> +	uint32_t dev_class;
-> +
-> +	if (length < sizeof(*rp)) {
-> +		error("Wrong size of class of device changed parameters");
-> +		return;
-> +	}
-> +
-> +	if (adapter != default_adapter) {
-> +		error("Wrong adapter %p", adapter);
-> +		return;
-> +	}
-> +
-> +	dev_class = rp->val[0] | (rp->val[1] << 8) | (rp->val[2] << 16);
-> +
-> +	if (dev_class == adapter->dev_class)
-> +		return;
-> +
-> +	DBG("Class: 0x%06x", dev_class);
-> +
-> +	adapter->dev_class = dev_class;
-> +
-> +	/* TODO: Inform prop change: Class */
-> +
-> +	/* TODO: Gatt attrib set*/
-> +}
-> +
-> +static void register_mgmt_handlers(struct bt_adapter *adapter)
-> +{
-> +	mgmt_register(adapter->mgmt, MGMT_EV_NEW_SETTINGS, adapter->dev_id,
-> +					new_settings_callback, adapter, NULL);
-> +
-> +	mgmt_register(adapter->mgmt, MGMT_EV_CLASS_OF_DEV_CHANGED,
-> +			adapter->dev_id, mgmt_dev_class_changed_event,
-> +			adapter, NULL);
-> +
-> +	mgmt_register(adapter->mgmt, MGMT_EV_LOCAL_NAME_CHANGED,
-> +			adapter->dev_id, mgmt_local_name_changed_event,
-> +			adapter, NULL);
-> +}
-> +
-> static void load_link_keys(struct bt_adapter *adapter, GSList *keys)
+> 
+> static void mgmt_index_added_event(uint16_t index, uint16_t length,
+> 					const void *param, void *user_data)
 > {
-> 	struct mgmt_cp_load_link_keys *cp;
-> @@ -187,6 +340,7 @@ static void read_info_complete(uint8_t status, uint16_t length,
-> 	adapter->current_settings = btohs(rp->current_settings);
+> 	info("%s: index %u", __func__, index);
 > 
-> 	/* TODO: Register all event notification handlers */
-> +	register_mgmt_handlers(default_adapter);
+> +	if (default_adapter != NULL) {
+
+if (default_adapter)
+
+> +		DBG("skip event for index %d", index);
+
+If you copy code from src/adapter.c that uses %u for the index, then be consistent.
+
+> +		return;
+> +	}
+> +
+> +	default_adapter = bt_adapter_new(index, mgmt_if);
+> +	if (default_adapter == NULL) {
+
+And here again, just assume memory allocation succeeds.
+
+> +		error("Unable to create new adapter for index %u", index);
+> +		return;
+> +	}
+> +
+> 	DBG("sending read info command for index %u", index);
 > 
-> 	if (adapter->current_settings & MGMT_SETTING_POWERED)
-> 		adapter_start(adapter);
+> 	if (mgmt_send(mgmt_if, MGMT_OP_READ_INFO, index, 0, NULL,
+> -					read_info_complete, NULL, NULL) > 0)
+> +				read_info_complete, default_adapter, NULL) > 0)
+> 		return;
+> 
+> 	error("Failed to read adapter info for index %u", index);
+> -
+> }
 
 Regards
 
