@@ -1,163 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCHv3 10/15] android: sdp: Reuse BlueZ SDP server in Android
+Subject: Re: [PATCHv3 09/15] android: Add Android Makefile for libbluetooth
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1381243883-2745-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Wed, 9 Oct 2013 21:45:58 +0200
+In-Reply-To: <1381243883-2745-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 9 Oct 2013 21:43:18 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <03940FC1-C9E9-40C6-922A-07F5A87D3BDA@holtmann.org>
-References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-Id: <67FF7DAD-8C17-4ADB-8050-5F35CC7C34D4@holtmann.org>
+References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andei,
+Hi Andrei,
 
-> Reuse existing SDP server code in Android GPL daemon.
+> Build libbluetooth library for Android.
 > ---
-> Makefile.android     |    7 +++++--
-> android/Android.mk   |    7 +++++++
-> android/bt_adapter.c |    2 --
-> android/main.c       |   28 ++++++++++++++++++++++++++++
-> 4 files changed, 40 insertions(+), 4 deletions(-)
+> android/Android.mk |   53 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 53 insertions(+)
 > 
-> diff --git a/Makefile.android b/Makefile.android
-> index 9a2c486..d576b52 100644
-> --- a/Makefile.android
-> +++ b/Makefile.android
-> @@ -2,9 +2,12 @@ if ANDROID
-> noinst_PROGRAMS += android/bluetoothd
-> 
-> android_bluetoothd_SOURCES = android/main.c src/log.c \
-> +				src/sdpd-database.c src/sdpd-server.c \
-> +				src/sdpd-service.c src/sdpd-request.c \
-> 				src/shared/util.h src/shared/util.c \
-> -				src/shared/mgmt.h src/shared/mgmt.c
-> -android_bluetoothd_LDADD = @GLIB_LIBS@
-> +				src/shared/mgmt.h src/shared/mgmt.c \
-> +				android/bt_adapter.h android/bt_adapter.c
-> +android_bluetoothd_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
-> endif
-> 
-> EXTRA_DIST += android/Android.mk android/log.c
 > diff --git a/android/Android.mk b/android/Android.mk
-> index 8f95a66..e7a70d0 100644
+> index f5fd863..8f95a66 100644
 > --- a/android/Android.mk
 > +++ b/android/Android.mk
-> @@ -17,6 +17,11 @@ LOCAL_SRC_FILES := \
-> 	log.c \
-> 	../src/shared/mgmt.c \
-> 	../src/shared/util.c \
-> +	bt_adapter.c \
-> +	../src/sdpd-database.c \
-> +	../src/sdpd-service.c \
-> +	../src/sdpd-request.c \
-> +	../src/sdpd-server.c \
-> 
-> LOCAL_C_INCLUDES := \
-> 	$(call include-path-for, glib) \
-> @@ -25,6 +30,7 @@ LOCAL_C_INCLUDES := \
-> LOCAL_C_INCLUDES += \
-> 	$(LOCAL_PATH)/../ \
-> 	$(LOCAL_PATH)/../src \
-> +	$(LOCAL_PATH)/../lib \
-> 
-> LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
-> 
-> @@ -39,6 +45,7 @@ LOCAL_CFLAGS += -DSOCK_CLOEXEC=02000000 -DSOCK_NONBLOCK=04000
-> 
-> LOCAL_SHARED_LIBRARIES := \
+> @@ -41,6 +41,7 @@ LOCAL_SHARED_LIBRARIES := \
 > 	libglib \
-> +	libbluetooth \
 > 
 > LOCAL_MODULE := bluetoothd
-> LOCAL_REQUIRED_MODULES := libbluetooth
-> diff --git a/android/bt_adapter.c b/android/bt_adapter.c
-> index e21d50c..6b758bf 100644
-> --- a/android/bt_adapter.c
-> +++ b/android/bt_adapter.c
-> @@ -45,8 +45,6 @@ void adapter_start(struct bt_adapter *adapter)
+> +LOCAL_REQUIRED_MODULES := libbluetooth
 > 
-> 	/* TODO: CB: report scan mode */
+> include $(BUILD_EXECUTABLE)
 > 
-> -	/* TODO: SDP start here */
-> -
-> 	/* TODO: CB: report state on */
-> }
+> @@ -63,3 +64,55 @@ LOCAL_MODULE_TAGS := optional
+> LOCAL_MODULE_CLASS := SHARED_LIBRARIES
 > 
-> diff --git a/android/main.c b/android/main.c
-> index 3580ac7..7968ed0 100644
-> --- a/android/main.c
-> +++ b/android/main.c
-> @@ -36,6 +36,8 @@
-> #include <glib.h>
-> 
-> #include "log.h"
-> +#include "hcid.h"
-
-The hcid.h include is bogus. That should not be needed. If it is, then we need to fix that first.
-
-> +#include "sdpd.h"
-> 
-> #include "lib/bluetooth.h"
-> #include "lib/mgmt.h"
-> @@ -43,12 +45,36 @@
-> 
-> #define SHUTDOWN_GRACE_SECONDS 10
-> 
-> +struct main_opts main_opts;
+> include $(BUILD_SHARED_LIBRARY)
 > +
-> static GMainLoop *event_loop;
-> static struct mgmt *mgmt_if = NULL;
-> 
-> static uint8_t mgmt_version = 0;
-> static uint8_t mgmt_revision = 0;
-> 
-> +static int sdp_start(void)
-> +{
-> +	DBG("");
+> +#
+> +# libbluetooth library
+> +#
 > +
-> +	/* TODO: add logic */
+> +include $(CLEAR_VARS)
 > +
-> +	/* sdpd-server use these settings */
-> +	memset(&main_opts, 0, sizeof(main_opts));
+> +LOCAL_SRC_FILES := \
+> +	../lib/bluetooth.c \
+> +	../lib/sdp.c \
+> +	../lib/hci.c \
+> +	../lib/uuid.c \
 
-Then fix sdpd-server to not use these. I do not want this included.
+why are we building a shared library here. What is it useful for. Even within BlueZ we do not install libbluetooth anymore.
 
 > +
-> +	/* Use params: mtu = 0, flags = 0 */
-> +	return start_sdp_server(0, 0);
-> +}
-> +
-> +static void sdp_stop(void)
-> +{
-> +	DBG("");
-> +
-> +	/* TODO: add logic */
-> +
-> +	stop_sdp_server();
-> +}
-> +
+> +LOCAL_C_INCLUDES := \
+> +	$(LOCAL_PATH)/../lib/ \
+> +	$(LOCAL_PATH)/../src/shared \
 
-Right now sdp_start and sdp_stop look like pointless wrappers around nothing.
+The library clearly does not include anything from src/shared/. So what is that doing here.
 
-> static gboolean quit_eventloop(gpointer user_data)
-> {
-> 	g_main_loop_quit(event_loop);
-> @@ -287,11 +313,13 @@ int main(int argc, char *argv[])
-> 	sigaction(SIGTERM, &sa, NULL);
-> 
-> 	init_mgmt_interface();
-> +	sdp_start();
-> 
-> 	DBG("Entering main loop");
-> 
-> 	g_main_loop_run(event_loop);
-> 
-> +	sdp_stop();
-> 	cleanup_mgmt_interface();
-> 	g_main_loop_unref(event_loop);
+> +
+> +LOCAL_C_INCLUDES += \
+> +	$(call include-path-for, glib) \
+> +	$(call include-path-for, glib)/glib \
+
+The library clearly does not need GLib. So why are we doing that here.
+
+> +
+> +LOCAL_CFLAGS += -O3
+> +
+> +# to suppress the "pointer of type 'void *' used in arithmetic" warning
+> +LOCAL_CFLAGS += -Wno-pointer-arith
+> +
+> +# to suppress the "missing initializer near initialization" warning
+> +LOCAL_CFLAGS += -Wno-missing-field-initializers
+
+Lets fix the actual warnings.
+
+> +
+> +# Define missing flags for Android 4.2
+> +LOCAL_CFLAGS += -DSOCK_CLOEXEC=02000000 -DSOCK_NONBLOCK=04000
+
+And are we sure that these flags are needed for the library.
+
+> +
+> +lib_headers := \
+> +	bluetooth.h \
+> +	hci.h \
+> +	hci_lib.h \
+> +	sco.h \
+> +	l2cap.h \
+> +	sdp.h \
+> +	sdp_lib.h \
+> +	rfcomm.h \
+> +	bnep.h \
+> +	cmtp.h \
+> +	hidp.h \
+
+I would really prefer we do not install these.
+
+> +
+> +$(shell mkdir -p $(LOCAL_PATH)/../lib/bluetooth)
+> +
+> +$(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(LOCAL_PATH)/../lib/bluetooth/$(file)))
+> +
+> +LOCAL_MODULE := libbluetooth
+> +
+> +include $(BUILD_SHARED_LIBRARY)
 
 Regards
 
