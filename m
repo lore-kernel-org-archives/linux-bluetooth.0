@@ -1,33 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <525571E2.50409@redhat.com>
-Date: Wed, 09 Oct 2013 17:10:26 +0200
-From: Hans de Goede <hdegoede@redhat.com>
-MIME-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Possible problem with btusb suspend resume handling
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [PATCH BlueZ 7/7] tools/hcidump: Fix parsing for service class 0x110f
+Date: Wed,  9 Oct 2013 14:16:17 +0300
+Message-Id: <1381317377-11013-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-While reviewing all users of usb_anchor-s (because of some
-usb_anchor fixes I've been writing), I noticed that btusb normally
-puts to be transmitted urbs on an anchor called tx_anchor and then
-submits them, unless suspended, then they are put on an anchor called
-deferred without being submitted.
+According to assigned number 0x110f is AV Remote Controller not VCP.
+---
+ tools/parser/sdp.c | 3 +--
+ tools/parser/sdp.h | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-On resume any urbs on the deferred anchor get removed from the deferred
-anchor, and submitted to the device.
+diff --git a/tools/parser/sdp.c b/tools/parser/sdp.c
+index b48e3ff..0e28328 100644
+--- a/tools/parser/sdp.c
++++ b/tools/parser/sdp.c
+@@ -121,7 +121,7 @@ static sdp_uuid_nam_lookup_table_t sdp_uuid_nam_lookup_table[] = {
+ 	{ SDP_UUID_AV_REMOTE_TARGET,         "AVRemTarget"  }, /* AVRCP */
+ 	{ SDP_UUID_ADVANCED_AUDIO,           "AdvAudio"     }, /* A2DP */
+ 	{ SDP_UUID_AV_REMOTE,                "AVRemote"     }, /* AVRCP */
+-	{ SDP_UUID_VIDEO_CONFERENCING,       "VideoConf"    }, /* VCP */
++	{ SDP_UUID_AV_REMOTE_CONTROLLER,     "AVRemCt"      }, /* AVRCP */
+ 	{ SDP_UUID_INTERCOM,                 "Intercom"     },
+ 	{ SDP_UUID_FAX,                      "Fax"          },
+ 	{ SDP_UUID_HEADSET_AUDIO_GATEWAY,    "Headset AG"   },
+@@ -145,7 +145,6 @@ static sdp_uuid_nam_lookup_table_t sdp_uuid_nam_lookup_table[] = {
+ 	{ SDP_UUID_HCR_PRINT,                "HCRPrint"     }, /* HCRP */
+ 	{ SDP_UUID_HCR_SCAN,                 "HCRScan"      }, /* HCRP */
+ 	{ SDP_UUID_COMMON_ISDN_ACCESS,       "CIP"          }, /* CIP */
+-	{ SDP_UUID_VIDEO_CONFERENCING_GW,    "VideoConf GW" }, /* VCP */
+ 	{ SDP_UUID_UDI_MT,                   "UDI MT"       }, /* UDI */
+ 	{ SDP_UUID_UDI_TA,                   "UDI TA"       }, /* UDI */
+ 	{ SDP_UUID_AUDIO_VIDEO,              "AudioVideo"   }, /* VCP */
+diff --git a/tools/parser/sdp.h b/tools/parser/sdp.h
+index 41fc209..ed55a23 100644
+--- a/tools/parser/sdp.h
++++ b/tools/parser/sdp.h
+@@ -66,7 +66,7 @@
+ #define SDP_UUID_AV_REMOTE_TARGET                      0x110c /* AVRCP */
+ #define SDP_UUID_ADVANCED_AUDIO                        0x110d /* A2DP */
+ #define SDP_UUID_AV_REMOTE                             0x110e /* AVRCP */
+-#define SDP_UUID_VIDEO_CONFERENCING                    0x110f /* VCP */
++#define SDP_UUID_AV_REMOTE_CONTROLLER                  0x110f /* AVRCP */
+ #define SDP_UUID_INTERCOM                              0x1110
+ #define SDP_UUID_FAX                                   0x1111
+ #define SDP_UUID_HEADSET_AUDIO_GATEWAY                 0x1112
+@@ -93,7 +93,6 @@
+ #define SDP_UUID_HCR_PRINT                             0x1126 /* HCRP */
+ #define SDP_UUID_HCR_SCAN                              0x1127 /* HCRP */
+ #define SDP_UUID_COMMON_ISDN_ACCESS                    0x1128 /* CIP */
+-#define SDP_UUID_VIDEO_CONFERENCING_GW                 0x1129 /* VCP */
+ #define SDP_UUID_UDI_MT                                0x112a /* UDI */
+ #define SDP_UUID_UDI_TA                                0x112b /* UDI */
+ #define SDP_UUID_AUDIO_VIDEO                           0x112c /* VCP */
+-- 
+1.8.3.1
 
-But unlike other drivers which similar constructs, btusb does not
-move put them on the tx_anchor when submitting then from the resume
-handler.
-
-So after a resume with deferred transmits, there will be tx urbs in
-flight which are not anchored on the tx_anchor. I believe this is
-a bug, but I don't know the code well enough to be sure.
-
-Regards,
-
-Hans
