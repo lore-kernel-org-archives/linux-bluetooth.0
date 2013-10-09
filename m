@@ -1,62 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 7/7] tools/hcidump: Fix parsing for service class 0x110f
-Date: Wed,  9 Oct 2013 14:16:17 +0300
-Message-Id: <1381317377-11013-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 4/7] lib/sdp: Replace VIDEO_CONF_SVCLASS_ID with AV_REMOTE_CONTROLLER_SVCLASS_ID
+Date: Wed,  9 Oct 2013 14:11:42 +0300
+Message-Id: <1381317105-10729-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1381317105-10729-1-git-send-email-luiz.dentz@gmail.com>
+References: <1381317105-10729-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-According to assigned number 0x110f is AV Remote Controller not VCP.
----
- tools/parser/sdp.c | 3 +--
- tools/parser/sdp.h | 3 +--
- 2 files changed, 2 insertions(+), 4 deletions(-)
+VCP apparently was never adopted so 0x110f was latter reused by AVRCP 1.3
+controller as per current assigned numbers page:
 
-diff --git a/tools/parser/sdp.c b/tools/parser/sdp.c
-index b48e3ff..0e28328 100644
---- a/tools/parser/sdp.c
-+++ b/tools/parser/sdp.c
-@@ -121,7 +121,7 @@ static sdp_uuid_nam_lookup_table_t sdp_uuid_nam_lookup_table[] = {
- 	{ SDP_UUID_AV_REMOTE_TARGET,         "AVRemTarget"  }, /* AVRCP */
- 	{ SDP_UUID_ADVANCED_AUDIO,           "AdvAudio"     }, /* A2DP */
- 	{ SDP_UUID_AV_REMOTE,                "AVRemote"     }, /* AVRCP */
--	{ SDP_UUID_VIDEO_CONFERENCING,       "VideoConf"    }, /* VCP */
-+	{ SDP_UUID_AV_REMOTE_CONTROLLER,     "AVRemCt"      }, /* AVRCP */
- 	{ SDP_UUID_INTERCOM,                 "Intercom"     },
- 	{ SDP_UUID_FAX,                      "Fax"          },
- 	{ SDP_UUID_HEADSET_AUDIO_GATEWAY,    "Headset AG"   },
-@@ -145,7 +145,6 @@ static sdp_uuid_nam_lookup_table_t sdp_uuid_nam_lookup_table[] = {
- 	{ SDP_UUID_HCR_PRINT,                "HCRPrint"     }, /* HCRP */
- 	{ SDP_UUID_HCR_SCAN,                 "HCRScan"      }, /* HCRP */
- 	{ SDP_UUID_COMMON_ISDN_ACCESS,       "CIP"          }, /* CIP */
--	{ SDP_UUID_VIDEO_CONFERENCING_GW,    "VideoConf GW" }, /* VCP */
- 	{ SDP_UUID_UDI_MT,                   "UDI MT"       }, /* UDI */
- 	{ SDP_UUID_UDI_TA,                   "UDI TA"       }, /* UDI */
- 	{ SDP_UUID_AUDIO_VIDEO,              "AudioVideo"   }, /* VCP */
-diff --git a/tools/parser/sdp.h b/tools/parser/sdp.h
-index 41fc209..ed55a23 100644
---- a/tools/parser/sdp.h
-+++ b/tools/parser/sdp.h
-@@ -66,7 +66,7 @@
- #define SDP_UUID_AV_REMOTE_TARGET                      0x110c /* AVRCP */
- #define SDP_UUID_ADVANCED_AUDIO                        0x110d /* A2DP */
- #define SDP_UUID_AV_REMOTE                             0x110e /* AVRCP */
--#define SDP_UUID_VIDEO_CONFERENCING                    0x110f /* VCP */
-+#define SDP_UUID_AV_REMOTE_CONTROLLER                  0x110f /* AVRCP */
- #define SDP_UUID_INTERCOM                              0x1110
- #define SDP_UUID_FAX                                   0x1111
- #define SDP_UUID_HEADSET_AUDIO_GATEWAY                 0x1112
-@@ -93,7 +93,6 @@
- #define SDP_UUID_HCR_PRINT                             0x1126 /* HCRP */
- #define SDP_UUID_HCR_SCAN                              0x1127 /* HCRP */
- #define SDP_UUID_COMMON_ISDN_ACCESS                    0x1128 /* CIP */
--#define SDP_UUID_VIDEO_CONFERENCING_GW                 0x1129 /* VCP */
- #define SDP_UUID_UDI_MT                                0x112a /* UDI */
- #define SDP_UUID_UDI_TA                                0x112b /* UDI */
- #define SDP_UUID_AUDIO_VIDEO                           0x112c /* VCP */
+https://www.bluetooth.org/en-us/specification/assigned-numbers/service-discovery
+---
+ lib/sdp.c         | 2 +-
+ lib/sdp.h         | 2 +-
+ src/glib-helper.c | 1 -
+ 3 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/lib/sdp.c b/lib/sdp.c
+index 1405c50..cbdf15e 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -125,7 +125,7 @@ static struct tupla ServiceClass[] = {
+ 	{ AV_REMOTE_TARGET_SVCLASS_ID,		"AV Remote Target"		},
+ 	{ ADVANCED_AUDIO_SVCLASS_ID,		"Advanced Audio"		},
+ 	{ AV_REMOTE_SVCLASS_ID,			"AV Remote"			},
+-	{ VIDEO_CONF_SVCLASS_ID,		"Video Conferencing"		},
++	{ AV_REMOTE_CONTROLLER_SVCLASS_ID,	"AV Remote Controller"		},
+ 	{ INTERCOM_SVCLASS_ID,			"Intercom"			},
+ 	{ FAX_SVCLASS_ID,			"Fax"				},
+ 	{ HEADSET_AGW_SVCLASS_ID,		"Headset Audio Gateway"		},
+diff --git a/lib/sdp.h b/lib/sdp.h
+index 4ef2176..f2f2484 100644
+--- a/lib/sdp.h
++++ b/lib/sdp.h
+@@ -95,7 +95,7 @@ extern "C" {
+ #define AV_REMOTE_TARGET_SVCLASS_ID	0x110c
+ #define ADVANCED_AUDIO_SVCLASS_ID	0x110d
+ #define AV_REMOTE_SVCLASS_ID		0x110e
+-#define VIDEO_CONF_SVCLASS_ID		0x110f
++#define AV_REMOTE_CONTROLLER_SVCLASS_ID	0x110f
+ #define INTERCOM_SVCLASS_ID		0x1110
+ #define FAX_SVCLASS_ID			0x1111
+ #define HEADSET_AGW_SVCLASS_ID		0x1112
+diff --git a/src/glib-helper.c b/src/glib-helper.c
+index a9a9a6e..4a020e9 100644
+--- a/src/glib-helper.c
++++ b/src/glib-helper.c
+@@ -103,7 +103,6 @@ static struct {
+ 	const char	*name;
+ 	uint16_t	class;
+ } bt_services[] = {
+-	{ "vcp",	VIDEO_CONF_SVCLASS_ID		},
+ 	{ "pbap",	PBAP_SVCLASS_ID			},
+ 	{ "sap",	SAP_SVCLASS_ID			},
+ 	{ "ftp",	OBEX_FILETRANS_SVCLASS_ID	},
 -- 
 1.8.3.1
 
