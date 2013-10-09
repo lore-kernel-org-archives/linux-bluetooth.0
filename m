@@ -1,184 +1,145 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCHv3 12/15] android: Implement read_info_complete callback
+Subject: Re: [PATCHv3 11/15] android: Add cap to bind to port < 1024
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1381243883-2745-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Wed, 9 Oct 2013 21:54:01 +0200
+In-Reply-To: <1381243883-2745-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 9 Oct 2013 21:48:33 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <8703FFF8-DF9E-420D-B974-FCB2B0CDDDAE@holtmann.org>
-References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-Id: <8E82FD20-395B-4EFC-8D5F-DB349B8227C5@holtmann.org>
+References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-> Handle read info complete callback from mgmt interface.
+> For SDP server we need to bind to lower port, acquire this capability.
 > ---
-> android/main.c |  101 +++++++++++++++++++++++++++++++++++++++++++++++++-------
-> 1 file changed, 89 insertions(+), 12 deletions(-)
+> android/main.c |   71 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> configure.ac   |    4 ++++
+> 2 files changed, 75 insertions(+)
 > 
 > diff --git a/android/main.c b/android/main.c
-> index a100013..a2ed8a4 100644
+> index 7968ed0..a100013 100644
 > --- a/android/main.c
 > +++ b/android/main.c
-> @@ -54,6 +54,7 @@
-> #include "log.h"
-> #include "hcid.h"
-> #include "sdpd.h"
-> +#include "bt_adapter.h"
-> 
-> #include "lib/bluetooth.h"
-> #include "lib/mgmt.h"
-> @@ -69,6 +70,8 @@ static struct mgmt *mgmt_if = NULL;
-> static uint8_t mgmt_version = 0;
-> static uint8_t mgmt_revision = 0;
-> 
-> +struct bt_adapter *default_adapter = NULL;
+> @@ -32,6 +32,22 @@
+> #include <stdlib.h>
+> #include <stdbool.h>
+> #include <string.h>
+> +#include <unistd.h>
+> +#include <errno.h>
+> +#include <sys/prctl.h>
+> +#include <linux/capability.h>
 > +
-> static int sdp_start(void)
-> {
-> 	DBG("");
-> @@ -118,34 +121,108 @@ static GOptionEntry options[] = {
-> 	{ NULL }
-> };
+> +/**
+> + * Include <sys/capability.h> for host build and
+> + * also for Android 4.3 when it is added to bionic
+> + */
+
+why focus on anything before Android 4.3?
+
+> +#if !defined(ANDROID) || (PLATFORM_SDK_VERSION > 17)
+> +#include <sys/capability.h>
+> +#endif
+> +
+> +#if defined(ANDROID)
+> +#include <private/android_filesystem_config.h>
+> +#endif
 > 
-> -static void read_info_complete(uint8_t status, uint16_t length,
-> +static void load_link_keys_complete(uint8_t status, uint16_t length,
-> 					const void *param, void *user_data)
-> {
-> -	/* TODO: Store Controller information */
-> -
-> -	/**
-> -	 * Register all event notification handlers for controller.
-> -	 *
-> -	 * The handlers are registered after a succcesful read of the
-> -	 * controller info. From now on they can track updates and
-> -	 * notifications.
-> -	 */
-> +	DBG("status %u", status);
+> #include <glib.h>
+> 
+> @@ -279,6 +295,58 @@ static void cleanup_mgmt_interface(void)
+> 	mgmt_if = NULL;
 > }
 > 
-> +static void load_link_keys(struct bt_adapter *adapter, GSList *keys)
+> +static bool android_set_aid_and_cap(void)
 > +{
-> +	struct mgmt_cp_load_link_keys *cp;
-> +	size_t key_len = g_slist_length(keys);
-> +	struct mgmt_link_key_info *key;
-> +	size_t len;
+> +	struct __user_cap_header_struct header;
+> +	struct __user_cap_data_struct cap;
+> +#if defined(ANDROID)
+> +	gid_t groups[] = {AID_NET_BT, AID_NET_BT_ADMIN, AID_NET_ADMIN};
+> +#endif
 > +
-> +	DBG("");
+> +	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
 > +
-> +	len = sizeof(*cp) + key_len * sizeof(*key);
-> +	cp = g_try_malloc0(len);
-> +	if (cp == NULL) {
-> +		error("%s: Not enough memory for link keys loading", __func__);
-> +		return;
+> +	header.version = _LINUX_CAPABILITY_VERSION;
+> +
+> +	prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);
+> +
+> +#if defined(ANDROID)
+> +	if (setgid(AID_BLUETOOTH) < 0)
+> +		warn("%s: setgid(): %s", __func__, strerror(errno));
+> +
+> +	if (setuid(AID_BLUETOOTH) < 0)
+> +		warn("%s: setuid(): %s", __func__, strerror(errno));
+> +#endif
+> +
+> +	header.version = _LINUX_CAPABILITY_VERSION;
+> +	header.pid = 0;
+> +
+> +	cap.effective = cap.permitted =
+> +		CAP_TO_MASK(CAP_SETGID) |
+> +		CAP_TO_MASK(CAP_NET_RAW) |
+> +		CAP_TO_MASK(CAP_NET_ADMIN) |
+> +		CAP_TO_MASK(CAP_NET_BIND_SERVICE);
+> +	cap.inheritable = 0;
+> +
+> +	if (capset(&header, &cap) < 0) {
+> +		error("%s: capset(): %s", __func__, strerror(errno));
+> +		return false;
 > +	}
-
-I am really fine with just using g_malloc0 and aborting the program in case of memory allocation errors.
-
 > +
-> +	cp->debug_keys = 0;
-> +	cp->key_count = htobs(key_len);
+> +#if defined(ANDROID)
+> +	if (setgroups(sizeof(groups)/sizeof(groups[0]), groups) < 0)
+> +		warn("%s: setgroups: %s", __func__, strerror(errno));
+> +#endif
+> +	if (capget(&header, &cap) < 0)
+> +		error("%s: capget(): %s", __func__, strerror(errno));
+> +	else
+> +		DBG("Caps: eff: 0x%x, perm: 0x%x, inh: 0x%x", cap.effective,
+> +					cap.permitted, cap.inheritable);
 > +
-> +	mgmt_send(adapter->mgmt, MGMT_OP_LOAD_LINK_KEYS, adapter->dev_id, len,
-> +				cp, load_link_keys_complete, adapter, NULL);
+> +	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
 > +
-> +	free(cp);
+> +	return true;
 > +}
 > +
-> +static void read_info_complete(uint8_t status, uint16_t length,
-> +					const void *param, void *user_data)
-> +{
-> +	struct bt_adapter *adapter = user_data;
-> +	const struct mgmt_rp_read_info *rp = param;
-> +
-> +	DBG("");
-> +
-> +	if (status != MGMT_STATUS_SUCCESS) {
-> +		error("Failed to read info for index %u: %s (0x%02x)",
-> +			adapter->dev_id, mgmt_errstr(status), status);
-> +		goto failed;
-> +	}
-> +
-> +	if (length < sizeof(*rp)) {
-> +		error("Too small read info complete response");
-> +		goto failed;
-> +	}
-> +
-> +	if (bacmp(&rp->bdaddr, BDADDR_ANY) == 0) {
-> +		error("No Bluetooth address for index %u", adapter->dev_id);
-> +		goto failed;
-> +	}
-> +
-> +	/* Store adapter information */
-> +	bacpy(&adapter->bdaddr, &rp->bdaddr);
-> +	adapter->dev_class = rp->dev_class[0] | (rp->dev_class[1] << 8) |
-> +						(rp->dev_class[2] << 16);
-> +	adapter->name = g_strdup((const char *) rp->name);
-> +	adapter->short_name = g_strdup((const char *) rp->short_name);
-
-Don't bother with the short name.
-
-> +
-> +	adapter->supported_settings = btohs(rp->supported_settings);
-> +	adapter->current_settings = btohs(rp->current_settings);
-> +
-> +	/* TODO: Register all event notification handlers */
-> +
-> +	if (adapter->current_settings & MGMT_SETTING_POWERED)
-> +		adapter_start(adapter);
-> +
-> +	/* dummy link keys loading */
-
-The comment is wrong here. Just load the link keys. Even an empty list of keys needs to be loaded.
-
-> +	load_link_keys(adapter, NULL);
-> +
-> +	return;
-> +
-> +failed:
-> +	default_adapter = NULL;
-> +}
-> 
-> static void mgmt_index_added_event(uint16_t index, uint16_t length,
-> 					const void *param, void *user_data)
+> int main(int argc, char *argv[])
 > {
-> 	info("%s: index %u", __func__, index);
+> 	GOptionContext *context;
+> @@ -312,6 +380,9 @@ int main(int argc, char *argv[])
+> 	sigaction(SIGINT, &sa, NULL);
+> 	sigaction(SIGTERM, &sa, NULL);
 > 
-> +	if (default_adapter != NULL) {
+> +	if (android_set_aid_and_cap() == false)
 
-if (default_adapter)
+Please check with if (!android…())
 
-> +		DBG("skip event for index %d", index);
-
-If you copy code from src/adapter.c that uses %u for the index, then be consistent.
-
-> +		return;
-> +	}
+> +		exit(EXIT_FAILURE);
 > +
-> +	default_adapter = bt_adapter_new(index, mgmt_if);
-> +	if (default_adapter == NULL) {
 
-And here again, just assume memory allocation succeeds.
+I prefer return EXIT_FAILURE;
 
-> +		error("Unable to create new adapter for index %u", index);
-> +		return;
-> +	}
+> 	init_mgmt_interface();
+> 	sdp_start();
+> 
+> diff --git a/configure.ac b/configure.ac
+> index 7b1f64a..5406434 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -247,4 +247,8 @@ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
+> 					[enable_android=${enableval}])
+> AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
+> 
+> +if (test "${android_daemon}" = "yes"); then
+> +	AC_CHECK_LIB(cap, capget, dummy=yes, AC_MSG_ERROR(libcap is required))
+> +fi
 > +
-> 	DBG("sending read info command for index %u", index);
-> 
-> 	if (mgmt_send(mgmt_if, MGMT_OP_READ_INFO, index, 0, NULL,
-> -					read_info_complete, NULL, NULL) > 0)
-> +				read_info_complete, default_adapter, NULL) > 0)
-> 		return;
-> 
-> 	error("Failed to read adapter info for index %u", index);
-> -
-> }
+> AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
 
-Regards
+REgards
 
 Marcel
 
