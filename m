@@ -1,145 +1,165 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCHv3 11/15] android: Add cap to bind to port < 1024
+Subject: Re: [PATCHv3 10/15] android: sdp: Reuse BlueZ SDP server in Android
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1381243883-2745-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Wed, 9 Oct 2013 21:48:33 +0200
+In-Reply-To: <1381243883-2745-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 9 Oct 2013 21:45:58 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <8E82FD20-395B-4EFC-8D5F-DB349B8227C5@holtmann.org>
-References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-Id: <03940FC1-C9E9-40C6-922A-07F5A87D3BDA@holtmann.org>
+References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Andei,
 
-> For SDP server we need to bind to lower port, acquire this capability.
+> Reuse existing SDP server code in Android GPL daemon.
 > ---
-> android/main.c |   71 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> configure.ac   |    4 ++++
-> 2 files changed, 75 insertions(+)
+> Makefile.android     |    7 +++++--
+> android/Android.mk   |    7 +++++++
+> android/bt_adapter.c |    2 --
+> android/main.c       |   28 ++++++++++++++++++++++++++++
+> 4 files changed, 40 insertions(+), 4 deletions(-)
 > 
-> diff --git a/android/main.c b/android/main.c
-> index 7968ed0..a100013 100644
-> --- a/android/main.c
-> +++ b/android/main.c
-> @@ -32,6 +32,22 @@
-> #include <stdlib.h>
-> #include <stdbool.h>
-> #include <string.h>
-> +#include <unistd.h>
-> +#include <errno.h>
-> +#include <sys/prctl.h>
-> +#include <linux/capability.h>
-> +
-> +/**
-> + * Include <sys/capability.h> for host build and
-> + * also for Android 4.3 when it is added to bionic
-> + */
-
-why focus on anything before Android 4.3?
-
-> +#if !defined(ANDROID) || (PLATFORM_SDK_VERSION > 17)
-> +#include <sys/capability.h>
-> +#endif
-> +
-> +#if defined(ANDROID)
-> +#include <private/android_filesystem_config.h>
-> +#endif
+> diff --git a/Makefile.android b/Makefile.android
+> index 9a2c486..d576b52 100644
+> --- a/Makefile.android
+> +++ b/Makefile.android
+> @@ -2,9 +2,12 @@ if ANDROID
+> noinst_PROGRAMS += android/bluetoothd
 > 
-> #include <glib.h>
+> android_bluetoothd_SOURCES = android/main.c src/log.c \
+> +				src/sdpd-database.c src/sdpd-server.c \
+> +				src/sdpd-service.c src/sdpd-request.c \
+> 				src/shared/util.h src/shared/util.c \
+> -				src/shared/mgmt.h src/shared/mgmt.c
+> -android_bluetoothd_LDADD = @GLIB_LIBS@
+> +				src/shared/mgmt.h src/shared/mgmt.c \
+> +				android/bt_adapter.h android/bt_adapter.c
+> +android_bluetoothd_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+> endif
 > 
-> @@ -279,6 +295,58 @@ static void cleanup_mgmt_interface(void)
-> 	mgmt_if = NULL;
+> EXTRA_DIST += android/Android.mk android/log.c
+> diff --git a/android/Android.mk b/android/Android.mk
+> index 8f95a66..e7a70d0 100644
+> --- a/android/Android.mk
+> +++ b/android/Android.mk
+> @@ -17,6 +17,11 @@ LOCAL_SRC_FILES := \
+> 	log.c \
+> 	../src/shared/mgmt.c \
+> 	../src/shared/util.c \
+> +	bt_adapter.c \
+> +	../src/sdpd-database.c \
+> +	../src/sdpd-service.c \
+> +	../src/sdpd-request.c \
+> +	../src/sdpd-server.c \
+> 
+> LOCAL_C_INCLUDES := \
+> 	$(call include-path-for, glib) \
+> @@ -25,6 +30,7 @@ LOCAL_C_INCLUDES := \
+> LOCAL_C_INCLUDES += \
+> 	$(LOCAL_PATH)/../ \
+> 	$(LOCAL_PATH)/../src \
+> +	$(LOCAL_PATH)/../lib \
+> 
+> LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
+> 
+> @@ -39,6 +45,7 @@ LOCAL_CFLAGS += -DSOCK_CLOEXEC=02000000 -DSOCK_NONBLOCK=04000
+> 
+> LOCAL_SHARED_LIBRARIES := \
+> 	libglib \
+> +	libbluetooth \
+> 
+> LOCAL_MODULE := bluetoothd
+> LOCAL_REQUIRED_MODULES := libbluetooth
+> diff --git a/android/bt_adapter.c b/android/bt_adapter.c
+> index e21d50c..6b758bf 100644
+> --- a/android/bt_adapter.c
+> +++ b/android/bt_adapter.c
+> @@ -45,8 +45,6 @@ void adapter_start(struct bt_adapter *adapter)
+> 
+> 	/* TODO: CB: report scan mode */
+> 
+> -	/* TODO: SDP start here */
+> -
+> 	/* TODO: CB: report state on */
 > }
 > 
-> +static bool android_set_aid_and_cap(void)
+> diff --git a/android/main.c b/android/main.c
+> index 3580ac7..7968ed0 100644
+> --- a/android/main.c
+> +++ b/android/main.c
+> @@ -36,6 +36,8 @@
+> #include <glib.h>
+> 
+> #include "log.h"
+> +#include "hcid.h"
+
+The hcid.h include is bogus. That should not be needed. If it is, then we need to fix that first.
+
+> +#include "sdpd.h"
+> 
+> #include "lib/bluetooth.h"
+> #include "lib/mgmt.h"
+> @@ -43,12 +45,36 @@
+> 
+> #define SHUTDOWN_GRACE_SECONDS 10
+> 
+> +struct main_opts main_opts;
+> +
+> static GMainLoop *event_loop;
+> static struct mgmt *mgmt_if = NULL;
+> 
+> static uint8_t mgmt_version = 0;
+> static uint8_t mgmt_revision = 0;
+> 
+> +static int sdp_start(void)
 > +{
-> +	struct __user_cap_header_struct header;
-> +	struct __user_cap_data_struct cap;
-> +#if defined(ANDROID)
-> +	gid_t groups[] = {AID_NET_BT, AID_NET_BT_ADMIN, AID_NET_ADMIN};
-> +#endif
+> +	DBG("");
 > +
-> +	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
+> +	/* TODO: add logic */
 > +
-> +	header.version = _LINUX_CAPABILITY_VERSION;
+> +	/* sdpd-server use these settings */
+> +	memset(&main_opts, 0, sizeof(main_opts));
+
+Then fix sdpd-server to not use these. I do not want this included.
+
 > +
-> +	prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);
-> +
-> +#if defined(ANDROID)
-> +	if (setgid(AID_BLUETOOTH) < 0)
-> +		warn("%s: setgid(): %s", __func__, strerror(errno));
-> +
-> +	if (setuid(AID_BLUETOOTH) < 0)
-> +		warn("%s: setuid(): %s", __func__, strerror(errno));
-> +#endif
-> +
-> +	header.version = _LINUX_CAPABILITY_VERSION;
-> +	header.pid = 0;
-> +
-> +	cap.effective = cap.permitted =
-> +		CAP_TO_MASK(CAP_SETGID) |
-> +		CAP_TO_MASK(CAP_NET_RAW) |
-> +		CAP_TO_MASK(CAP_NET_ADMIN) |
-> +		CAP_TO_MASK(CAP_NET_BIND_SERVICE);
-> +	cap.inheritable = 0;
-> +
-> +	if (capset(&header, &cap) < 0) {
-> +		error("%s: capset(): %s", __func__, strerror(errno));
-> +		return false;
-> +	}
-> +
-> +#if defined(ANDROID)
-> +	if (setgroups(sizeof(groups)/sizeof(groups[0]), groups) < 0)
-> +		warn("%s: setgroups: %s", __func__, strerror(errno));
-> +#endif
-> +	if (capget(&header, &cap) < 0)
-> +		error("%s: capget(): %s", __func__, strerror(errno));
-> +	else
-> +		DBG("Caps: eff: 0x%x, perm: 0x%x, inh: 0x%x", cap.effective,
-> +					cap.permitted, cap.inheritable);
-> +
-> +	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
-> +
-> +	return true;
+> +	/* Use params: mtu = 0, flags = 0 */
+> +	return start_sdp_server(0, 0);
 > +}
 > +
-> int main(int argc, char *argv[])
+> +static void sdp_stop(void)
+> +{
+> +	DBG("");
+> +
+> +	/* TODO: add logic */
+> +
+> +	stop_sdp_server();
+> +}
+> +
+
+Right now sdp_start and sdp_stop look like pointless wrappers around nothing.
+
+> static gboolean quit_eventloop(gpointer user_data)
 > {
-> 	GOptionContext *context;
-> @@ -312,6 +380,9 @@ int main(int argc, char *argv[])
-> 	sigaction(SIGINT, &sa, NULL);
+> 	g_main_loop_quit(event_loop);
+> @@ -287,11 +313,13 @@ int main(int argc, char *argv[])
 > 	sigaction(SIGTERM, &sa, NULL);
 > 
-> +	if (android_set_aid_and_cap() == false)
-
-Please check with if (!android…())
-
-> +		exit(EXIT_FAILURE);
-> +
-
-I prefer return EXIT_FAILURE;
-
 > 	init_mgmt_interface();
-> 	sdp_start();
+> +	sdp_start();
 > 
-> diff --git a/configure.ac b/configure.ac
-> index 7b1f64a..5406434 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -247,4 +247,8 @@ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
-> 					[enable_android=${enableval}])
-> AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
+> 	DBG("Entering main loop");
 > 
-> +if (test "${android_daemon}" = "yes"); then
-> +	AC_CHECK_LIB(cap, capget, dummy=yes, AC_MSG_ERROR(libcap is required))
-> +fi
-> +
-> AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
+> 	g_main_loop_run(event_loop);
+> 
+> +	sdp_stop();
+> 	cleanup_mgmt_interface();
+> 	g_main_loop_unref(event_loop);
 
-REgards
+Regards
 
 Marcel
 
