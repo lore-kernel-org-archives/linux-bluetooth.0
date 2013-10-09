@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 7/7] tools/hcidump: Fix parsing for service class 0x110f
-Date: Wed,  9 Oct 2013 14:11:45 +0300
-Message-Id: <1381317105-10729-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/7] obexd/MAP: Fix parsing message handles as decimal numbers
+Date: Wed,  9 Oct 2013 14:11:41 +0300
+Message-Id: <1381317105-10729-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1381317105-10729-1-git-send-email-luiz.dentz@gmail.com>
 References: <1381317105-10729-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,54 +11,90 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-According to assigned number 0x110f is AV Remote Controller not VCP.
----
- tools/parser/sdp.c | 3 +--
- tools/parser/sdp.h | 3 +--
- 2 files changed, 2 insertions(+), 4 deletions(-)
+The spec clearly states the handles are hexadecimal:
 
-diff --git a/tools/parser/sdp.c b/tools/parser/sdp.c
-index b48e3ff..29708e3 100644
---- a/tools/parser/sdp.c
-+++ b/tools/parser/sdp.c
-@@ -121,7 +121,7 @@ static sdp_uuid_nam_lookup_table_t sdp_uuid_nam_lookup_table[] = {
- 	{ SDP_UUID_AV_REMOTE_TARGET,         "AVRemTarget"  }, /* AVRCP */
- 	{ SDP_UUID_ADVANCED_AUDIO,           "AdvAudio"     }, /* A2DP */
- 	{ SDP_UUID_AV_REMOTE,                "AVRemote"     }, /* AVRCP */
--	{ SDP_UUID_VIDEO_CONFERENCING,       "VideoConf"    }, /* VCP */
-+	{ SDP_UUID_AV_REMOTE,                "AVRemCt"      }, /* AVRCP */
- 	{ SDP_UUID_INTERCOM,                 "Intercom"     },
- 	{ SDP_UUID_FAX,                      "Fax"          },
- 	{ SDP_UUID_HEADSET_AUDIO_GATEWAY,    "Headset AG"   },
-@@ -145,7 +145,6 @@ static sdp_uuid_nam_lookup_table_t sdp_uuid_nam_lookup_table[] = {
- 	{ SDP_UUID_HCR_PRINT,                "HCRPrint"     }, /* HCRP */
- 	{ SDP_UUID_HCR_SCAN,                 "HCRScan"      }, /* HCRP */
- 	{ SDP_UUID_COMMON_ISDN_ACCESS,       "CIP"          }, /* CIP */
--	{ SDP_UUID_VIDEO_CONFERENCING_GW,    "VideoConf GW" }, /* VCP */
- 	{ SDP_UUID_UDI_MT,                   "UDI MT"       }, /* UDI */
- 	{ SDP_UUID_UDI_TA,                   "UDI TA"       }, /* UDI */
- 	{ SDP_UUID_AUDIO_VIDEO,              "AudioVideo"   }, /* VCP */
-diff --git a/tools/parser/sdp.h b/tools/parser/sdp.h
-index 41fc209..ed55a23 100644
---- a/tools/parser/sdp.h
-+++ b/tools/parser/sdp.h
-@@ -66,7 +66,7 @@
- #define SDP_UUID_AV_REMOTE_TARGET                      0x110c /* AVRCP */
- #define SDP_UUID_ADVANCED_AUDIO                        0x110d /* A2DP */
- #define SDP_UUID_AV_REMOTE                             0x110e /* AVRCP */
--#define SDP_UUID_VIDEO_CONFERENCING                    0x110f /* VCP */
-+#define SDP_UUID_AV_REMOTE_CONTROLLER                  0x110f /* AVRCP */
- #define SDP_UUID_INTERCOM                              0x1110
- #define SDP_UUID_FAX                                   0x1111
- #define SDP_UUID_HEADSET_AUDIO_GATEWAY                 0x1112
-@@ -93,7 +93,6 @@
- #define SDP_UUID_HCR_PRINT                             0x1126 /* HCRP */
- #define SDP_UUID_HCR_SCAN                              0x1127 /* HCRP */
- #define SDP_UUID_COMMON_ISDN_ACCESS                    0x1128 /* CIP */
--#define SDP_UUID_VIDEO_CONFERENCING_GW                 0x1129 /* VCP */
- #define SDP_UUID_UDI_MT                                0x112a /* UDI */
- #define SDP_UUID_UDI_TA                                0x112b /* UDI */
- #define SDP_UUID_AUDIO_VIDEO                           0x112c /* VCP */
+MAP 1.2 - Page 29
+
+  ""handle" is the message handle in hexadecimal representation with up
+  to 16 digits; leading zero digits may be used so the MCE shall accept
+  both handles with and without leading zeros (e.g.,"00000012345678AB"
+  or "12345678AB")."
+---
+ obexd/client/map.c | 12 ++++++------
+ obexd/client/mns.c |  2 +-
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index 9d90a92..d2d3d81 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -435,7 +435,7 @@ static DBusMessage *map_msg_get(DBusConnection *connection,
+ 	GError *err = NULL;
+ 	DBusMessage *reply;
+ 	GObexApparam *apparam;
+-	char handle[21];
++	char handle[17];
+ 
+ 	if (dbus_message_get_args(message, NULL,
+ 				DBUS_TYPE_STRING, &target_file,
+@@ -444,7 +444,7 @@ static DBusMessage *map_msg_get(DBusConnection *connection,
+ 		return g_dbus_create_error(message,
+ 				ERROR_INTERFACE ".InvalidArguments", NULL);
+ 
+-	if (snprintf(handle, sizeof(handle), "%" PRIu64, msg->handle) < 0)
++	if (snprintf(handle, sizeof(handle), "%" PRIx64, msg->handle) < 0)
+ 		goto fail;
+ 
+ 	transfer = obc_transfer_get("x-bt/message", handle, target_file, &err);
+@@ -730,7 +730,7 @@ static void set_status(const GDBusPropertyTable *property,
+ 	GError *err = NULL;
+ 	GObexApparam *apparam;
+ 	char contents[1];
+-	char handle[21];
++	char handle[17];
+ 
+ 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN) {
+ 		g_dbus_pending_property_error(id,
+@@ -743,7 +743,7 @@ static void set_status(const GDBusPropertyTable *property,
+ 
+ 	contents[0] = FILLER_BYTE;
+ 
+-	if (snprintf(handle, sizeof(handle), "%" PRIu64, msg->handle) < 0)
++	if (snprintf(handle, sizeof(handle), "%" PRIx64, msg->handle) < 0)
+ 		goto fail;
+ 
+ 	transfer = obc_transfer_put("x-bt/messageStatus", handle, NULL,
+@@ -1110,7 +1110,7 @@ static void msg_element(GMarkupParseContext *ctxt, const char *element,
+ 			break;
+ 	}
+ 
+-	handle = strtoull(values[i], NULL, 10);
++	handle = strtoull(values[i], NULL, 16);
+ 
+ 	msg = g_hash_table_lookup(data->messages, &handle);
+ 	if (msg == NULL) {
+@@ -1897,7 +1897,7 @@ static void map_handle_notification(struct map_event *event, void *user_data)
+ 
+ 	DBG("Event report for %s:%d", obc_session_get_destination(map->session),
+ 							map->mas_instance_id);
+-	DBG("type=%x handle=%" PRIu64 " folder=%s old_folder=%s msg_type=%s",
++	DBG("type=%x handle=%" PRIx64 " folder=%s old_folder=%s msg_type=%s",
+ 		event->type, event->handle, event->folder, event->old_folder,
+ 		event->msg_type);
+ 
+diff --git a/obexd/client/mns.c b/obexd/client/mns.c
+index 2d2730d..d638886 100644
+--- a/obexd/client/mns.c
++++ b/obexd/client/mns.c
+@@ -185,7 +185,7 @@ static void parse_event_report_type(struct map_event *event, const char *value)
+ static void parse_event_report_handle(struct map_event *event,
+ 							const char *value)
+ {
+-	event->handle = strtoull(value, NULL, 10);
++	event->handle = strtoull(value, NULL, 16);
+ }
+ 
+ static void parse_event_report_folder(struct map_event *event,
 -- 
 1.8.3.1
 
