@@ -1,52 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <E4E245F7-8EE6-4FE2-AC99-3246F1541C99@holtmann.org>
-References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1381243883-2745-2-git-send-email-Andrei.Emeltchenko.news@gmail.com> <E4E245F7-8EE6-4FE2-AC99-3246F1541C99@holtmann.org>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Wed, 9 Oct 2013 19:55:01 -0300
-Message-ID: <CAMOw1v4Vj9w6CceuaKH0xoNFq9_ps+11+MACqYzAmU+f6naOKg@mail.gmail.com>
-Subject: Re: [PATCHv3 01/15] android: Supress missing initializers warnings
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCHv3 14/15] android: Add makefile for hciconfig
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1381243883-2745-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 9 Oct 2013 21:59:42 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <60443344-0A54-4EF4-ABBB-1EAAE168E541@holtmann.org>
+References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Oct 9, 2013 at 4:11 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Andrei,
->
->> These types of warnings are disabled in BlueZ makeifiles
->>
->> main.c:67:2: warning: missing initializer [-Wmissing-field-initializers]
->> main.c:67:2: warning: (near initialization for 'options[1].short_name')
->>       [-Wmissing-field-initializers]
->> ---
->> android/Android.mk |    3 +++
->> 1 file changed, 3 insertions(+)
->>
->> diff --git a/android/Android.mk b/android/Android.mk
->> index ec820ac..5498b41 100644
->> --- a/android/Android.mk
->> +++ b/android/Android.mk
->> @@ -23,6 +23,9 @@ LOCAL_C_INCLUDES := \
->>
->> LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
->>
->> +# to suppress the "warning: missing initializer near initialization.." warning
->> +LOCAL_CFLAGS += -Wno-missing-field-initializers
->> +
->
-> why are we doing this and not fixing the actual warning?
+Hi Andrei,
 
-I guess because this is a stupid warning.
+> 
+> ---
+> android/Android.mk |   34 ++++++++++++++++++++++++++++++++++
+> 1 file changed, 34 insertions(+)
+> 
+> diff --git a/android/Android.mk b/android/Android.mk
+> index e7a70d0..09c4579 100644
+> --- a/android/Android.mk
+> +++ b/android/Android.mk
+> @@ -123,3 +123,37 @@ $(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(LOCAL_PATH)/../lib/bl
+> LOCAL_MODULE := libbluetooth
+> 
+> include $(BUILD_SHARED_LIBRARY)
+> +
+> +#
+> +# hciconfig
+> +#
 
-We do the same in autotools because otherwise we can't initialize
-structs and rely on compiler setting the rest to 0. This is
-particularly annoying on d-bus tables (see the exists and flags on the
-end of the GDBusPropertyTable struct). I'm sure it's annoying in other
-places, too.
+why are we building this one. Only btmgmt should be needed for testing. If at all.
 
+Regards
 
-Lucas De Marchi
+Marcel
+
