@@ -1,51 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 3/6] avdtp: Remove unused avdtp_stream_setup_active function
-Date: Thu, 10 Oct 2013 10:53:38 +0200
-Message-ID: <1381395221-5067-3-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1381395221-5067-1-git-send-email-szymon.janc@tieto.com>
-References: <1381395221-5067-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH v4 2/2] Bluetooth: Refactor hci_connect_le
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1381231278-20534-2-git-send-email-andre.guedes@openbossa.org>
+Date: Thu, 10 Oct 2013 10:31:56 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <1EC7A162-46E7-4BCA-96EE-E4D01265FB9A@holtmann.org>
+References: <1381231278-20534-1-git-send-email-andre.guedes@openbossa.org> <1381231278-20534-2-git-send-email-andre.guedes@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It is not used anywhere and can be removed.
----
- profiles/audio/avdtp.c | 5 -----
- profiles/audio/avdtp.h | 1 -
- 2 files changed, 6 deletions(-)
+Hi Andrei,
 
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 1f29050..e83245e 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -3857,11 +3857,6 @@ gboolean avdtp_has_stream(struct avdtp *session, struct avdtp_stream *stream)
- 	return g_slist_find(session->streams, stream) ? TRUE : FALSE;
- }
- 
--gboolean avdtp_stream_setup_active(struct avdtp *session)
--{
--	return session->stream_setup;
--}
--
- void avdtp_set_device_disconnect(struct avdtp *session, gboolean dev_dc)
- {
- 	session->device_disconnect = dev_dc;
-diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
-index e19dfc3..3bf7503 100644
---- a/profiles/audio/avdtp.h
-+++ b/profiles/audio/avdtp.h
-@@ -307,7 +307,6 @@ int avdtp_error_posix_errno(struct avdtp_error *err);
- struct btd_adapter *avdtp_get_adapter(struct avdtp *session);
- struct btd_device *avdtp_get_device(struct avdtp *session);
- 
--gboolean avdtp_stream_setup_active(struct avdtp *session);
- void avdtp_set_device_disconnect(struct avdtp *session, gboolean dev_dc);
- 
- int avdtp_init(struct btd_adapter *adapter);
--- 
-1.8.4
+> This patch does some code refactoring in hci_connect_le() by moving
+> the exception code into if statements and letting the main flow in
+> first level of function scope. It also adds extra comments to improve
+> the code readability.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+> net/bluetooth/hci_conn.c | 51 +++++++++++++++++++++++++++++++-----------------
+> 1 file changed, 33 insertions(+), 18 deletions(-)
+
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
