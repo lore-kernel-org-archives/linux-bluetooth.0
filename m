@@ -1,36 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCHv3 07/15] android: Create HAL API header skeleton
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20131010124839.GN23879@aemeltch-MOBL1>
-Date: Thu, 10 Oct 2013 15:02:46 +0200
+Date: Thu, 10 Oct 2013 16:01:29 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <2B3E99AA-FBEB-4BF4-9D11-3BDEBEDE38AB@holtmann.org>
-References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-8-git-send-email-Andrei.Emeltchenko.news@gmail.com> <69ADBAAE-9261-4C56-9779-5708DE897CBA@holtmann.org> <20131010122911.GJ23879@aemeltch-MOBL1> <56EFB0C2-81B7-4E25-B1ED-B61465248141@holtmann.org> <20131010124839.GN23879@aemeltch-MOBL1>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCHv3 11/15] android: Add cap to bind to port < 1024
+Message-ID: <20131010130128.GP23879@aemeltch-MOBL1>
+References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1381243883-2745-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <8E82FD20-395B-4EFC-8D5F-DB349B8227C5@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <8E82FD20-395B-4EFC-8D5F-DB349B8227C5@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Marcel,
 
->>>>> +#define HAL_MSG_OP_BT_SET_REMOTE_DEVICE_PROP	0x08
->>>>> +struct hal_msg_cp_bt_set_remote_device_prop {
->>>>> +	__bdaddr_t bdaddr;
->>>>> +	uint8_t type;
->>>>> +	uint16_t len;
->>>> 
->>>> Lets make these all align properly.
->>> 
->>> Align with tabs? So this will be very different from lib/mgmt.h ?
->> 
->> In monitor/bt.h, I did align them with spaces.
+On Wed, Oct 09, 2013 at 09:48:33PM +0200, Marcel Holtmann wrote:
+> Hi Andrei,
 > 
-> Just to be sure: align structures with spaces always?
+> > For SDP server we need to bind to lower port, acquire this capability.
+> > ---
+> > android/main.c |   71 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> > configure.ac   |    4 ++++
+> > 2 files changed, 75 insertions(+)
+> > 
+> > diff --git a/android/main.c b/android/main.c
+> > index 7968ed0..a100013 100644
+> > --- a/android/main.c
+> > +++ b/android/main.c
+> > @@ -32,6 +32,22 @@
+> > #include <stdlib.h>
+> > #include <stdbool.h>
+> > #include <string.h>
+> > +#include <unistd.h>
+> > +#include <errno.h>
+> > +#include <sys/prctl.h>
+> > +#include <linux/capability.h>
+> > +
+> > +/**
+> > + * Include <sys/capability.h> for host build and
+> > + * also for Android 4.3 when it is added to bionic
+> > + */
+> 
+> why focus on anything before Android 4.3?
 
-between uint16_t and len uses spaces to make them align. For everything else use tabs. This only applies to protocol data structures. See monitor/bt.h for how it is suppose to be done.
+Because we have currently 4.2.2 and test with hardware running 4.2.2. Do
+you want us to write theoretical code? And do you believe that Google
+magically fix everything in 4.4?
 
-Regards
-
-Marcel
-
+Best regards 
+Andrei Emeltchenko 
