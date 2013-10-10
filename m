@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 6/6] avdtp: Remove not needed forward declaration
-Date: Thu, 10 Oct 2013 10:53:41 +0200
-Message-ID: <1381395221-5067-6-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 4/6] avdtp: Rename avdtp_callbacks to state_callbacks
+Date: Thu, 10 Oct 2013 10:53:39 +0200
+Message-ID: <1381395221-5067-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1381395221-5067-1-git-send-email-szymon.janc@tieto.com>
 References: <1381395221-5067-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,24 +12,56 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-auth_cb function is not used before definition so no need to forward
-declare it.
+This better describes what list contains.
 ---
- profiles/audio/avdtp.c | 1 -
- 1 file changed, 1 deletion(-)
+ profiles/audio/avdtp.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index e5d4139..5b8d7b1 100644
+index e83245e..bf15935 100644
 --- a/profiles/audio/avdtp.c
 +++ b/profiles/audio/avdtp.c
-@@ -442,7 +442,6 @@ static int process_queue(struct avdtp *session);
- static void avdtp_sep_set_state(struct avdtp *session,
- 				struct avdtp_local_sep *sep,
- 				avdtp_state_t state);
--static void auth_cb(DBusError *derr, void *user_data);
+@@ -425,7 +425,7 @@ struct avdtp {
  
- static struct avdtp_server *find_server(GSList *list, struct btd_adapter *a)
+ static GSList *servers = NULL;
+ 
+-static GSList *avdtp_callbacks = NULL;
++static GSList *state_callbacks = NULL;
+ 
+ static int send_request(struct avdtp *session, gboolean priority,
+ 			struct avdtp_stream *stream, uint8_t signal_id,
+@@ -710,7 +710,7 @@ static void avdtp_set_state(struct avdtp *session,
+ 
+ 	session->state = new_state;
+ 
+-	for (l = avdtp_callbacks; l != NULL; l = l->next) {
++	for (l = state_callbacks; l != NULL; l = l->next) {
+ 		struct avdtp_state_callback *cb = l->data;
+ 
+ 		if (session->device != cb->dev)
+@@ -3874,7 +3874,8 @@ unsigned int avdtp_add_state_cb(struct btd_device *dev,
+ 	state_cb->id = ++id;
+ 	state_cb->user_data = user_data;
+ 
+-	avdtp_callbacks = g_slist_append(avdtp_callbacks, state_cb);
++	state_callbacks = g_slist_append(state_callbacks,
++								state_cb);
+ 
+ 	return state_cb->id;
+ }
+@@ -3883,10 +3884,10 @@ gboolean avdtp_remove_state_cb(unsigned int id)
  {
+ 	GSList *l;
+ 
+-	for (l = avdtp_callbacks; l != NULL; l = l->next) {
++	for (l = state_callbacks; l != NULL; l = l->next) {
+ 		struct avdtp_state_callback *cb = l->data;
+ 		if (cb && cb->id == id) {
+-			avdtp_callbacks = g_slist_remove(avdtp_callbacks, cb);
++			state_callbacks = g_slist_remove(state_callbacks, cb);
+ 			g_free(cb);
+ 			return TRUE;
+ 		}
 -- 
 1.8.4
 
