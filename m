@@ -1,160 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCHv3 08/15] android: Add adapter and device struct for BlueZ daemon
+Subject: Re: [PATCHv3 06/15] android: Add basic mgmt initialization sequence
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20131010123638.GL23879@aemeltch-MOBL1>
-Date: Thu, 10 Oct 2013 14:40:18 +0200
+In-Reply-To: <20131010095952.GH23879@aemeltch-MOBL1>
+Date: Thu, 10 Oct 2013 14:38:08 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <712DEE67-E6FE-4C4C-AD34-48A1308AC3A5@holtmann.org>
-References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-9-git-send-email-Andrei.Emeltchenko.news@gmail.com> <02A1A12C-50FA-4B1E-A85F-979EE842C2D4@holtmann.org> <20131010123638.GL23879@aemeltch-MOBL1>
+Message-Id: <A3F24017-452A-43C3-9F98-14CC585FD7A6@holtmann.org>
+References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-7-git-send-email-Andrei.Emeltchenko.news@gmail.com> <0147C8F8-0491-44CD-BCDB-51DF9F6D3315@holtmann.org> <20131010095952.GH23879@aemeltch-MOBL1>
 To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
->>> Adapter structure in BlueZ daemon keeps track of default adapter
->>> and device structure keeps track about found devices.
+>>> Initialize bluetooth controller via mgmt interface.
 >>> ---
->>> android/bt_adapter.c |   56 ++++++++++++++++++++++++++++++++++++++++++++++
->>> android/bt_adapter.h |   60 ++++++++++++++++++++++++++++++++++++++++++++++++++
->>> 2 files changed, 116 insertions(+)
->>> create mode 100644 android/bt_adapter.c
->>> create mode 100644 android/bt_adapter.h
+>>> Makefile.android   |    4 +-
+>>> android/Android.mk |   11 +++
+>>> android/main.c     |  189 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>> 3 files changed, 203 insertions(+), 1 deletion(-)
 >>> 
->>> diff --git a/android/bt_adapter.c b/android/bt_adapter.c
->>> new file mode 100644
->>> index 0000000..e21d50c
->>> --- /dev/null
->>> +++ b/android/bt_adapter.c
->>> @@ -0,0 +1,56 @@
->>> +/*
->>> + *
->>> + *  BlueZ - Bluetooth protocol stack for Linux
->>> + *
->>> + *  Copyright (C) 2013  Intel Corporation. All rights reserved.
->>> + *
->>> + *
->>> + *  This program is free software; you can redistribute it and/or modify
->>> + *  it under the terms of the GNU General Public License as published by
->>> + *  the Free Software Foundation; either version 2 of the License, or
->>> + *  (at your option) any later version.
->>> + *
->>> + *  This program is distributed in the hope that it will be useful,
->>> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
->>> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->>> + *  GNU General Public License for more details.
->>> + *
->>> + *  You should have received a copy of the GNU General Public License
->>> + *  along with this program; if not, write to the Free Software
->>> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
->>> + *
->>> + */
+>>> diff --git a/Makefile.android b/Makefile.android
+>>> index e161e6d..9a2c486 100644
+>>> --- a/Makefile.android
+>>> +++ b/Makefile.android
+>>> @@ -1,7 +1,9 @@
+>>> if ANDROID
+>>> noinst_PROGRAMS += android/bluetoothd
+>>> 
+>>> -android_bluetoothd_SOURCES = android/main.c src/log.c
+>>> +android_bluetoothd_SOURCES = android/main.c src/log.c \
+>>> +				src/shared/util.h src/shared/util.c \
+>>> +				src/shared/mgmt.h src/shared/mgmt.c
+>>> android_bluetoothd_LDADD = @GLIB_LIBS@
+>>> endif
+>>> 
+>>> diff --git a/android/Android.mk b/android/Android.mk
+>>> index 2cabff4..f5fd863 100644
+>>> --- a/android/Android.mk
+>>> +++ b/android/Android.mk
+>>> @@ -15,10 +15,15 @@ include $(CLEAR_VARS)
+>>> LOCAL_SRC_FILES := \
+>>> 	main.c \
+>>> 	log.c \
+>>> +	../src/shared/mgmt.c \
+>>> +	../src/shared/util.c \
+>>> 
+>>> LOCAL_C_INCLUDES := \
+>>> 	$(call include-path-for, glib) \
+>>> 	$(call include-path-for, glib)/glib \
 >>> +
->>> +#include "bt_adapter.h"
->> 
->> the include of its own header should always be the last one. Never the first one.
->> 
->> 
->>> +#include "log.h"
->>> +#include "src/shared/mgmt.h"
->>> +
->>> +struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if)
->>> +{
->>> +	struct bt_adapter *adapter;
->>> +
->>> +	adapter = g_try_new0(struct bt_adapter, 1);
->>> +	if (!adapter)
->>> +		return NULL;
->> 
->> Since this all brand new code, use g_new0 and we just exit on memory allocation failures for our own data structures.
+>>> +LOCAL_C_INCLUDES += \
+>>> +	$(LOCAL_PATH)/../ \
+>>> 	$(LOCAL_PATH)/../src \
+>> do we need these nested includes actually? We could also just fix the includes. BlueZ historically has not been good with clear includes. I started to fix this, but it seems I have not gotten to all of them yet.
 >> 
 > 
-> Do you mean exit(1)?
-
-please understand on how g_new0 works.
-
+> So how do you want it to be? Here I just added BlueZ top-dir.
 > 
->>> +
->>> +	adapter->dev_id = index;
->>> +	adapter->mgmt = mgmt_ref(mgmt_if);
->>> +
->>> +	return adapter;
->>> +}
->>> +
->>> +void adapter_start(struct bt_adapter *adapter)
+>>> LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
+>>> @@ -26,6 +31,12 @@ LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
+>>> # to suppress the "warning: missing initializer near initialization.." warning
+>>> LOCAL_CFLAGS += -Wno-missing-field-initializers
+>>> 
+>>> +# to suppress the "pointer of type 'void *' used in arithmetic" warning
+>>> +LOCAL_CFLAGS += -Wno-pointer-arith
 >> 
->> Why does this now have no bt_ prefix?
+>> Why do we need to suppress these warning. Can we not just fix them.
 >> 
->>> +{
->>> +	DBG("enabled %u", adapter->dev_id);
->>> +
->>> +	/* TODO: CB: report scan mode */
->>> +
->>> +	/* TODO: SDP start here */
->>> +
->>> +	/* TODO: CB: report state on */
->>> +}
->>> +
->>> +void adapter_stop(struct bt_adapter *adapter)
->>> +{
->>> +	DBG("disabled %u", adapter->dev_id);
->>> +}
->>> diff --git a/android/bt_adapter.h b/android/bt_adapter.h
->>> new file mode 100644
->>> index 0000000..6877cc7
->>> --- /dev/null
->>> +++ b/android/bt_adapter.h
->>> @@ -0,0 +1,60 @@
->>> +/*
->>> + *
->>> + *  BlueZ - Bluetooth protocol stack for Linux
->>> + *
->>> + *  Copyright (C) 2013  Intel Corporation. All rights reserved.
->>> + *
->>> + *
->>> + *  This program is free software; you can redistribute it and/or modify
->>> + *  it under the terms of the GNU General Public License as published by
->>> + *  the Free Software Foundation; either version 2 of the License, or
->>> + *  (at your option) any later version.
->>> + *
->>> + *  This program is distributed in the hope that it will be useful,
->>> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
->>> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->>> + *  GNU General Public License for more details.
->>> + *
->>> + *  You should have received a copy of the GNU General Public License
->>> + *  along with this program; if not, write to the Free Software
->>> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
->>> + *
->>> + */
->>> +
->>> +#include <stdio.h>
->>> +#include <stdlib.h>
->>> +#include <unistd.h>
->>> +#include <glib.h>
->>> +
->>> +#include "lib/bluetooth.h"
->>> +
->>> +struct bt_device {
->>> +	int refcnt;
->>> +
->>> +	bdaddr_t bdaddr;
->>> +	uint8_t bdaddr_type;
->>> +	uint32_t cod;
->>> +	char *name;
->>> +};
->> 
->> Why is bt_device declared in bt_adapter.
->> And why are these public in the first place. Please hide these details.
 > 
-> So do you want it to be added in main.c? Those structs are public also in
-> BlueZ.
+> Is this fix good:
+> 
+> diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
+> index 2c79886..b2f5506 100644
+> --- a/src/shared/mgmt.c
+> +++ b/src/shared/mgmt.c
+> @@ -55,7 +55,7 @@ struct mgmt {
+>        unsigned int next_notify_id;
+>        bool in_notify;
+>        bool destroyed;
+> -       void *buf;
+> +       uint8_t *buf;
+>        uint16_t len;
+>        mgmt_debug_func_t debug_callback;
+>        mgmt_destroy_func_t debug_destroy;
+> @@ -299,7 +299,7 @@ static gboolean received_data(GIOChannel *channel,
+> GIOCondition cond,
+>        if (bytes_read < MGMT_HDR_SIZE)
+>                return TRUE;
+> 
+> -       hdr = mgmt->buf;
+> +       hdr = (struct mgmt_hdr *) mgmt->buf;
 
-struct bt_adapter;
+are we using a different compiler or why does this happen on Android and not on a regular system like Fedora.
 
-Just forward declare them in the header. The actual fields do not need to be public. As I said before, this is new code and not BlueZ code that is many years old. We follow brand new style here and not copy old mistakes.
+>>> +
+>>> +# Define missing flags for Android 4.2
+>>> +LOCAL_CFLAGS += -DSOCK_CLOEXEC=02000000 -DSOCK_NONBLOCK=04000
+>>> +
+>> 
+>> This thing is dangerous. Do we really bother with Android 4.2 support
+>> and can not rely on a newer version that has this fixed properly in
+>> bionic.
+> 
+> The problem here is that our base android-ia from 01.org is based on
+> 4.2.2. Do you still want to remove this?
+
+I don't think we should care much about Android 4.2.2. Why is our base not updated to Android 4.3 yet. And as soon as 4.4 is out, we can ignore 4.3 as well. Chasing after old versions seems a bit pointless until someone actually integrated this into a product.
 
 Regards
 
