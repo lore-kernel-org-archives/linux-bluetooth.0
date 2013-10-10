@@ -1,36 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH v4 1/2] Bluetooth: Use HCI request for LE connection
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1381231278-20534-1-git-send-email-andre.guedes@openbossa.org>
-Date: Thu, 10 Oct 2013 10:31:29 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <0AEB24A8-B18E-4107-AD06-DD25534ACC83@holtmann.org>
-References: <1381231278-20534-1-git-send-email-andre.guedes@openbossa.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] emulator: Fix AMP emulation build error
+Date: Thu, 10 Oct 2013 10:15:34 +0200
+Message-ID: <1381392934-12197-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+This fix build with GCC 4.6.3.
 
-> This patch introduces a new helper, which uses the HCI request
-> framework, for creating LE connectons. All the handling is now
-> done by this function so we can remove the hci_cs_le_create_conn()
-> event handler.
-> 
-> This patch also removes the old hci_le_create_connection() since
-> it is not used anymore.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
-> net/bluetooth/hci_conn.c  | 91 ++++++++++++++++++++++++++++++++++-------------
-> net/bluetooth/hci_event.c | 31 ----------------
-> 2 files changed, 67 insertions(+), 55 deletions(-)
+  CC     emulator/amp.o
+emulator/amp.c: In function ‘send_packet’:
+emulator/amp.c:172:7: error: ignoring return value of ‘write’,
+    declared with attribute warn_unused_result [-Werror=unused-result]
+cc1: all warnings being treated as errors
+make[1]: *** [emulator/amp.o] Error
+---
+ emulator/amp.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/emulator/amp.c b/emulator/amp.c
+index e80d9a8..714854b 100644
+--- a/emulator/amp.c
++++ b/emulator/amp.c
+@@ -169,7 +169,8 @@ static void reset_defaults(struct bt_amp *amp)
+ 
+ static void send_packet(struct bt_amp *amp, const void *data, uint16_t len)
+ {
+-	write(amp->vhci_fd, data, len);
++	if (write(amp->vhci_fd, data, len) < 0)
++		fprintf(stderr, "Write to /dev/vhci failed\n");
+ }
+ 
+ static void send_event(struct bt_amp *amp, uint8_t event,
+-- 
+1.8.4
 
