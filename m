@@ -2,24 +2,20 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2] Don't register Device ID record on sdp server start
-Date: Thu, 10 Oct 2013 11:38:49 +0200
-Message-ID: <1381397929-7817-1-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1381397344-7389-1-git-send-email-szymon.janc@tieto.com>
-References: <1381397344-7389-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH] Don't register Device ID record on sdp server start
+Date: Thu, 10 Oct 2013 11:29:04 +0200
+Message-ID: <1381397344-7389-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This makes SDP code no longer depends on main_opts. DID record is now
-registered from main() after sdp server was started. This is OK since
-mainloop is not yet running and record will be present when first
-request comes.
+DID record is now registered from main() after sdp server was started.
+This is OK since mainloop is not yet running and record will be present
+when first request comes.
+
+Another benefit is that sdp code no longer depends on main_opts.
 ---
-
-v2 - commit message improved
-
  src/main.c        | 4 ++++
  src/sdpd-server.c | 5 -----
  2 files changed, 4 insertions(+), 5 deletions(-)
