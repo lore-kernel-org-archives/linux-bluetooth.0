@@ -1,51 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix potential double-frees of L2CAP skbs
-Date: Thu, 10 Oct 2013 13:33:37 +0200
-Message-Id: <1381404817-5645-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH 1/2] Bluetooth: Remove unneeded val variable when setting SSP
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20131010110117.GI23879@aemeltch-MOBL1>
+Date: Thu, 10 Oct 2013 13:07:08 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <DB2A2D4A-F434-4D90-A6A4-A687AD48E72E@holtmann.org>
+References: <1381399691-42391-1-git-send-email-marcel@holtmann.org> <20131010110117.GI23879@aemeltch-MOBL1>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Andrei,
 
-The l2cap_recv_frame function is expected to take ownership and
-eventually free the skb passed to it. We need to ensure that the
-conn->rx_skb pointer is no longer reachable when calling
-l2cap_recv_frame so that no other function, such as l2cap_conn_del, may
-think that it can free conn->rx_skb.
+>> The variable val in the set_ssp() function of the management interface
+>> is not needed. Just use cp->val directly since its input values have
+>> already been validated.
+>> 
+>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+>> ---
+>> net/bluetooth/mgmt.c | 8 +++-----
+>> 1 file changed, 3 insertions(+), 5 deletions(-)
+>> 
+>> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+>> index a9d7506..2fb4d35 100644
+>> --- a/net/bluetooth/mgmt.c
+>> +++ b/net/bluetooth/mgmt.c
+>> @@ -1290,7 +1290,7 @@ static int set_ssp(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+>> {
+>> 	struct mgmt_mode *cp = data;
+>> 	struct pending_cmd *cmd;
+>> -	u8 val, status;
+>> +	u8 status;
+>> 	int err;
+>> 
+>> 	BT_DBG("request for %s", hdev->name);
+>> @@ -1309,8 +1309,6 @@ static int set_ssp(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+>> 
+>> 	hci_dev_lock(hdev);
+>> 
+>> -	val = !!cp->val;
+>> -
+>> 	if (!hdev_is_powered(hdev)) {
+>> 		bool changed = false;
+>> 
+>> @@ -1335,7 +1333,7 @@ static int set_ssp(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+>> 		goto failed;
+>> 	}
+>> 
+>> -	if (test_bit(HCI_SSP_ENABLED, &hdev->dev_flags) == val) {
+>> +	if (!!cp->val == test_bit(HCI_SSP_ENABLED, &hdev->dev_flags)) {
+>> 		err = send_settings_rsp(sk, MGMT_OP_SET_SSP, hdev);
+>> 		goto failed;
+>> 	}
+>> @@ -1346,7 +1344,7 @@ static int set_ssp(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+>> 		goto failed;
+>> 	}
+>> 
+>> -	err = hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE, sizeof(val), &val);
+>> +	err = hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE, 1, &cp->val);
+> 
+> I think sizeof is read better then magic number
 
-An actual situation when this can happen is when smp_sig_channel (called
-from l2cap_recv_frame) fails and l2cap_conn_del gets called as a
-consequence. The l2cap_conn_del function would then try to free
-conn->rx_skb, but as the same skb was just passed to smp_sig_channel and
-freed we get a double-free.
+if you look at the whole code base, for cases of single u8, we use the "magic" number 1 a lot to keep the lines shorter.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/l2cap_core.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Regards
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index a9a7df6..06e7173 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -6798,9 +6798,13 @@ int l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 		conn->rx_len -= skb->len;
- 
- 		if (!conn->rx_len) {
--			/* Complete frame received */
--			l2cap_recv_frame(conn, conn->rx_skb);
-+			/* Complete frame received. l2cap_recv_frame
-+			 * takes ownership of the skb so set the global
-+			 * rx_skb pointer to NULL first.
-+			 */
-+			struct sk_buff *rx_skb = conn->rx_skb;
- 			conn->rx_skb = NULL;
-+			l2cap_recv_frame(conn, rx_skb);
- 		}
- 		break;
- 	}
--- 
-1.8.3.1
+Marcel
 
