@@ -1,77 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 11 Oct 2013 13:58:40 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/2] audio/AVCTP: Fix crash after disconnecting
-Message-ID: <20131011115840.GA7403@x220.p-661hnu-f1>
-References: <1381491762-25395-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381491762-25395-1-git-send-email-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 3/3] tools/mpris-player: Forward player signals
+Date: Fri, 11 Oct 2013 14:53:24 +0300
+Message-Id: <1381492404-25765-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1381492404-25765-1-git-send-email-luiz.dentz@gmail.com>
+References: <1381492404-25765-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Oct 11, 2013, Luiz Augusto von Dentz wrote:
->   at 0x414C08: finalize_discovery (avdtp.c:1050)
->   by 0x414C5A: process_discover (avdtp.c:3346)
->   by 0x3D46047E05: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3600.3)
->   by 0x3D46048157: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
->   by 0x3D46048559: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3600.3)
->   by 0x40A3B6: main (main.c:595)
-> Address 0x5e25de8 is 1,144 bytes inside a block of size 1,176 free'd
-> at 0x4A074C4: free (in
-> /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
->   by 0x3D4604D9AE: g_free (in /usr/lib64/libglib-2.0.so.0.3600.3)
->   by 0x4152F2: connection_lost (avdtp.c:1206)
->   by 0x4162C4: cancel_request (avdtp.c:2662)
->   by 0x4164BD: request_timeout (avdtp.c:2672)
->   by 0x3D46048962: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
->   by 0x3D46047E05: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3600.3)
->   by 0x3D46048157: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
->   by 0x3D46048559: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3600.3)
->   by 0x40A3B6: main (main.c:595)
-> ---
->  profiles/audio/avdtp.c | 42 +++++++++++++++++++++++++-----------------
->  1 file changed, 25 insertions(+), 17 deletions(-)
-> 
-> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> index 622dff8..b938ee7 100644
-> --- a/profiles/audio/avdtp.c
-> +++ b/profiles/audio/avdtp.c
-> @@ -354,6 +354,12 @@ struct avdtp_state_callback {
->  	void *user_data;
->  };
->  
-> +struct discover_callback {
-> +	unsigned int id;
-> +	avdtp_discover_cb_t cb;
-> +	void *user_data;
-> +};
-> +
->  struct avdtp_stream {
->  	GIOChannel *io;
->  	uint16_t imtu;
-> @@ -412,9 +418,7 @@ struct avdtp {
->  
->  	char *buf;
->  
-> -	avdtp_discover_cb_t discov_cb;
-> -	void *user_data;
-> -
-> +	struct discover_callback *discover;
->  	struct pending_req *req;
+Forward signals received from player in the session bus to the system
+bus where bluetoothd can catch them.
+---
+ tools/mpris-player.c | 27 +++++++++++++++------------
+ 1 file changed, 15 insertions(+), 12 deletions(-)
 
-It seems to me that this patch is doing two things:
+diff --git a/tools/mpris-player.c b/tools/mpris-player.c
+index 03b8875..c94330c 100644
+--- a/tools/mpris-player.c
++++ b/tools/mpris-player.c
+@@ -543,8 +543,8 @@ static void remove_player(DBusConnection *conn, const char *sender)
+ 	g_free(owner);
+ }
+ 
+-static gboolean properties_changed(DBusConnection *conn,
+-					DBusMessage *msg, void *user_data)
++static gboolean player_signal(DBusConnection *conn, DBusMessage *msg,
++								void *user_data)
+ {
+ 	DBusMessage *signal;
+ 	DBusMessageIter iter, args;
+@@ -558,17 +558,15 @@ static gboolean properties_changed(DBusConnection *conn,
+ 	if (owner == NULL)
+ 		goto done;
+ 
+-	signal = dbus_message_new_signal(path, DBUS_INTERFACE_PROPERTIES,
+-							"PropertiesChanged");
++	signal = dbus_message_new_signal(path, dbus_message_get_interface(msg),
++						dbus_message_get_member(msg));
+ 	if (signal == NULL) {
+-		fprintf(stderr, "Unable to allocate new %s.PropertisChanged"
+-					" signal", DBUS_INTERFACE_PROPERTIES);
++		fprintf(stderr, "Unable to allocate new %s.%s signal",
++						dbus_message_get_interface(msg),
++						dbus_message_get_member(msg));
+ 		goto done;
+ 	}
+ 
+-	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
+-		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+-
+ 	dbus_message_iter_init_append(signal, &args);
+ 
+ 	append_iter(&args, &iter);
+@@ -2512,7 +2510,7 @@ int main(int argc, char *argv[])
+ {
+ 	GOptionContext *context;
+ 	GError *error = NULL;
+-	guint owner_watch, properties_watch;
++	guint owner_watch, properties_watch, signal_watch;
+ 	struct sigaction sa;
+ 
+ 	context = g_option_context_new(NULL);
+@@ -2554,10 +2552,14 @@ int main(int argc, char *argv[])
+ 						name_owner_changed,
+ 						NULL, NULL);
+ 
+-
+ 	properties_watch = g_dbus_add_properties_watch(session, NULL, NULL,
+ 							MPRIS_PLAYER_INTERFACE,
+-							properties_changed,
++							player_signal,
++							NULL, NULL);
++
++	signal_watch = g_dbus_add_signal_watch(session, NULL, NULL,
++							MPRIS_PLAYER_INTERFACE,
++							NULL, player_signal,
+ 							NULL, NULL);
+ 
+ 	memset(&sa, 0, sizeof(sa));
+@@ -2578,6 +2580,7 @@ int main(int argc, char *argv[])
+ 
+ 	g_dbus_remove_watch(session, owner_watch);
+ 	g_dbus_remove_watch(session, properties_watch);
++	g_dbus_remove_watch(session, signal_watch);
+ 
+ 	g_dbus_client_unref(client);
+ 
+-- 
+1.8.3.1
 
-1. Refactor the discov data out to a separate struct
-2. Add an idle callback id for some extra tracking
-
-Shouldn't these be done in separate patches? Furthermore, I had to read
-through the patch several times to figure out exactly what the fix is -
-something I wouldn't have needed to do if there was a proper commit
-message explaining what was wrong and how you fix it.
-
-Johan
