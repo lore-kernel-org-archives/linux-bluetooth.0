@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 1/4] android: Add Adapter Bluetooth HAL template
-Date: Fri, 11 Oct 2013 10:45:52 +0300
-Message-Id: <1381477555-11319-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 2/4] android: Add Socket Bluetooth HAL template
+Date: Fri, 11 Oct 2013 10:45:53 +0300
+Message-Id: <1381477555-11319-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381477555-11319-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381477555-11319-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,46 +11,31 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add template for bluetooth.h Android HAL.
+bt_sock HAL handles Bluetooth sockets for Android.
 ---
- android/Android.mk      |   19 +++
- android/hal_bluetooth.c |  343 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 362 insertions(+)
- create mode 100644 android/hal_bluetooth.c
+ android/Android.mk    |    1 +
+ android/hal_bt_sock.c |   85 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 86 insertions(+)
+ create mode 100644 android/hal_bt_sock.c
 
 diff --git a/android/Android.mk b/android/Android.mk
-index ec820ac..553b673 100644
+index 553b673..0e025ac 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -29,3 +29,22 @@ LOCAL_SHARED_LIBRARIES := \
- LOCAL_MODULE := bluetoothd
+@@ -38,6 +38,7 @@ include $(CLEAR_VARS)
  
- include $(BUILD_EXECUTABLE)
-+
-+#
-+# bluetooth.default.so HAL
-+#
-+
-+include $(CLEAR_VARS)
-+
-+LOCAL_SRC_FILES := \
-+	hal_bluetooth.c \
-+
-+LOCAL_SHARED_LIBRARIES := \
-+	libcutils \
-+
-+LOCAL_MODULE := bluetooth.default
-+LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
-+LOCAL_MODULE_TAGS := optional
-+LOCAL_MODULE_CLASS := SHARED_LIBRARIES
-+
-+include $(BUILD_SHARED_LIBRARY)
-diff --git a/android/hal_bluetooth.c b/android/hal_bluetooth.c
+ LOCAL_SRC_FILES := \
+ 	hal_bluetooth.c \
++	hal_bt_sock.c \
+ 
+ LOCAL_SHARED_LIBRARIES := \
+ 	libcutils \
+diff --git a/android/hal_bt_sock.c b/android/hal_bt_sock.c
 new file mode 100644
-index 0000000..48638a5
+index 0000000..3a6d173
 --- /dev/null
-+++ b/android/hal_bluetooth.c
-@@ -0,0 +1,343 @@
++++ b/android/hal_bt_sock.c
+@@ -0,0 +1,85 @@
 +/*
 + * Copyright (C) 2013 Intel Corporation
 + *
@@ -68,332 +53,74 @@ index 0000000..48638a5
 + *
 + */
 +
-+#include <stdio.h>
 +#include <stdlib.h>
-+#include <unistd.h>
-+#include <stdbool.h>
 +
 +#include <hardware/bluetooth.h>
++#include <hardware/bt_sock.h>
 +
 +#define LOG_TAG "BlueZ"
 +#include <cutils/log.h>
 +
-+bt_callbacks_t *bt_hal_cbacks = NULL;
-+
-+static bool interface_ready(void)
-+{
-+	return bt_hal_cbacks != NULL;
-+}
-+
-+static int init(bt_callbacks_t *callbacks)
-+{
-+	ALOGD(__func__);
-+
-+	if (interface_ready())
-+		return BT_STATUS_SUCCESS;
-+
-+	/* store reference to user callbacks */
-+	bt_hal_cbacks = callbacks;
-+
-+	/* TODO: Init here bluezd task */
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int enable(void)
++static bt_status_t btsock_listen_rfcomm(const char *service_name,
++					const uint8_t *uuid, int chan,
++					int *sock, int flags)
 +{
 +	ALOGD(__func__);
 +
 +	return BT_STATUS_UNSUPPORTED;
 +}
 +
-+static int disable(void)
++static bt_status_t listen(btsock_type_t type, const char *service_name,
++					const uint8_t *uuid, int chan,
++					int *sock, int flags)
 +{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static void cleanup(void)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return;
-+
-+	bt_hal_cbacks = NULL;
-+}
-+
-+static int get_adapter_properties(void)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int get_adapter_property(bt_property_type_t type)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int set_adapter_property(const bt_property_t *property)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (property == NULL)
++	if ((!uuid && chan <= 0) || !sock) {
++		ALOGE("%s: invalid params: uuid %p, chan %d, sock %p",
++						__func__, uuid, chan, sock);
 +		return BT_STATUS_PARM_INVALID;
++	}
++
++	ALOGD("%s: uuid %p chan %d sock %p type %d service_name %s",
++			__func__, uuid, chan, sock, type, service_name);
++
++	switch (type) {
++	case BTSOCK_RFCOMM:
++		return btsock_listen_rfcomm(service_name, uuid, chan,
++								sock, flags);
++	default:
++		ALOGE("%s: Socket type %d not supported", __func__, type);
++		break;
++	}
 +
 +	return BT_STATUS_UNSUPPORTED;
 +}
 +
-+static int get_remote_device_properties(bt_bdaddr_t *remote_addr)
++static bt_status_t connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
++					const uint8_t *uuid, int chan,
++					int *sock, int flags)
 +{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int get_remote_device_property(bt_bdaddr_t *remote_addr,
-+						bt_property_type_t type)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int set_remote_device_property(bt_bdaddr_t *remote_addr,
-+						const bt_property_t *property)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int get_remote_service_record(bt_bdaddr_t *remote_addr, bt_uuid_t *uuid)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int get_remote_services(bt_bdaddr_t *remote_addr)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int start_discovery(void)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int cancel_discovery(void)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int create_bond(const bt_bdaddr_t *bd_addr)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr)
++	if ((!uuid && chan <= 0) || !bdaddr || !sock) {
++		ALOGE("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
++					bdaddr, uuid, chan, sock);
 +		return BT_STATUS_PARM_INVALID;
++	}
++
++	ALOGD("%s: uuid %p chan %d sock %p type %d", __func__, uuid, chan,
++								sock, type);
 +
 +	return BT_STATUS_UNSUPPORTED;
 +}
 +
-+static int cancel_bond(const bt_bdaddr_t *bd_addr)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int remove_bond(const bt_bdaddr_t *bd_addr)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int pin_reply(const bt_bdaddr_t *bd_addr, uint8_t accept,
-+				uint8_t pin_len, bt_pin_code_t *pin_code)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int ssp_reply(const bt_bdaddr_t *bd_addr, bt_ssp_variant_t variant,
-+					uint8_t accept, uint32_t passkey)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static const void *get_profile_interface(const char *profile_id)
-+{
-+	ALOGD("%s: %s", __func__, profile_id);
-+
-+	if (!interface_ready())
-+		return NULL;
-+
-+	return NULL;
-+}
-+
-+static int dut_mode_configure(uint8_t enable)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int dut_mode_send(uint16_t opcode, uint8_t *buf, uint8_t len)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static const bt_interface_t bluetooth_if = {
-+	sizeof(bt_interface_t),
-+	init,
-+	enable,
-+	disable,
-+	cleanup,
-+	get_adapter_properties,
-+	get_adapter_property,
-+	set_adapter_property,
-+	get_remote_device_properties,
-+	get_remote_device_property,
-+	set_remote_device_property,
-+	get_remote_service_record,
-+	get_remote_services,
-+	start_discovery,
-+	cancel_discovery,
-+	create_bond,
-+	remove_bond,
-+	cancel_bond,
-+	pin_reply,
-+	ssp_reply,
-+	get_profile_interface,
-+	dut_mode_configure,
-+	dut_mode_send
++static btsock_interface_t btsock_if = {
++	sizeof(btsock_if),
++	listen,
++	connect
 +};
 +
-+static const bt_interface_t *get_bluetooth_interface(void)
++btsock_interface_t *bt_get_sock_interface(void)
 +{
-+	ALOGD(__func__);
-+
-+	return &bluetooth_if;
++	return &btsock_if;
 +}
-+
-+static int close_bluetooth(struct hw_device_t *device)
-+{
-+	ALOGD(__func__);
-+
-+	cleanup();
-+
-+	return 0;
-+}
-+
-+static int open_bluetooth(const struct hw_module_t *module, char const *name,
-+					struct hw_device_t **device)
-+{
-+	bluetooth_device_t *dev = malloc(sizeof(bluetooth_device_t));
-+
-+	ALOGD(__func__);
-+
-+	memset(dev, 0, sizeof(bluetooth_device_t));
-+	dev->common.tag = HARDWARE_DEVICE_TAG;
-+	dev->common.version = 0;
-+	dev->common.module = (struct hw_module_t *) module;
-+	dev->common.close = close_bluetooth;
-+	dev->get_bluetooth_interface = get_bluetooth_interface;
-+
-+	*device = (struct hw_device_t *) dev;
-+
-+	return 0;
-+}
-+
-+static struct hw_module_methods_t bluetooth_module_methods = {
-+	.open = open_bluetooth,
-+};
-+
-+struct hw_module_t HAL_MODULE_INFO_SYM = {
-+	.tag = HARDWARE_MODULE_TAG,
-+	.version_major = 1,
-+	.version_minor = 0,
-+	.id = BT_HARDWARE_MODULE_ID,
-+	.name = "BlueZ Bluetooth stack",
-+	.author = "Intel Corporation",
-+	.methods = &bluetooth_module_methods
-+};
 -- 
 1.7.10.4
 
