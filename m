@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 3/4] android: Enable Socket interface
-Date: Fri, 11 Oct 2013 13:02:02 +0300
-Message-Id: <1381485723-15898-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 4/4] android: Start Android Bluetooth daemon
+Date: Fri, 11 Oct 2013 13:02:03 +0300
+Message-Id: <1381485723-15898-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381485723-15898-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <172688778.UF0VyY4IqK@uw000953>
  <1381485723-15898-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,65 +12,86 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Returns socket interface, use header hal.h to avoid externs.
----
- android/hal.h           |   18 ++++++++++++++++++
- android/hal_bluetooth.c |    6 ++++++
- 2 files changed, 24 insertions(+)
- create mode 100644 android/hal.h
+Start Android Bluetooth daemon from HAL init(). Make sure
+that daemon is in "running" state.
 
-diff --git a/android/hal.h b/android/hal.h
-new file mode 100644
-index 0000000..40fbf03
---- /dev/null
-+++ b/android/hal.h
-@@ -0,0 +1,18 @@
-+/*
-+ * Copyright (C) 2013 Intel Corporation
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ *
-+ */
-+
-+btsock_interface_t *bt_get_sock_interface(void);
+Change-Id: I6f26d8167c0633f009f5805f0c8dd515461cae2a
+---
+ android/hal_bluetooth.c |   41 ++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 38 insertions(+), 3 deletions(-)
+
 diff --git a/android/hal_bluetooth.c b/android/hal_bluetooth.c
-index 48638a5..517f0b4 100644
+index 517f0b4..9bb9dcf 100644
 --- a/android/hal_bluetooth.c
 +++ b/android/hal_bluetooth.c
-@@ -21,10 +21,13 @@
- #include <stdbool.h>
- 
+@@ -23,11 +23,16 @@
  #include <hardware/bluetooth.h>
-+#include <hardware/bt_sock.h>
+ #include <hardware/bt_sock.h>
  
++#include <cutils/sockets.h>
++#include <cutils/properties.h>
++
  #define LOG_TAG "BlueZ"
  #include <cutils/log.h>
  
-+#include "hal.h"
+ #include "hal.h"
+ 
++#define SERVICE_NAME "bluetoothd"
 +
  bt_callbacks_t *bt_hal_cbacks = NULL;
  
  static bool interface_ready(void)
-@@ -244,6 +247,9 @@ static const void *get_profile_interface(const char *profile_id)
- 	if (!interface_ready())
- 		return NULL;
- 
-+	if (!strcmp(profile_id, BT_PROFILE_SOCKETS_ID))
-+		return bt_get_sock_interface();
-+
- 	return NULL;
+@@ -35,6 +40,33 @@ static bool interface_ready(void)
+ 	return bt_hal_cbacks != NULL;
  }
  
++static bool start_bt_daemon(void)
++{
++	int tries = 40; /* wait 4 seconds for completion */
++
++	ALOGD(__func__);
++
++	/* Start Android Bluetooth daemon service */
++	property_set("ctl.start", SERVICE_NAME);
++
++	while (tries-- > 0) {
++		char val[PROPERTY_VALUE_MAX];
++
++		if (property_get("init.svc." SERVICE_NAME, val, NULL)) {
++			if (!strcmp(val, "running")) {
++				ALOGI("Android BlueZ daemon started");
++				return true;
++			}
++		} else {
++			return false;
++		}
++
++		usleep(100000);
++	}
++
++	return false;
++}
++
+ static int init(bt_callbacks_t *callbacks)
+ {
+ 	ALOGD(__func__);
+@@ -42,10 +74,13 @@ static int init(bt_callbacks_t *callbacks)
+ 	if (interface_ready())
+ 		return BT_STATUS_SUCCESS;
+ 
+-	/* store reference to user callbacks */
+-	bt_hal_cbacks = callbacks;
++	if (start_bt_daemon()) {
++		/* TODO: open channel */
++
++		bt_hal_cbacks = callbacks;
+ 
+-	/* TODO: Init here bluezd task */
++		return BT_STATUS_SUCCESS;
++	}
+ 
+ 	return BT_STATUS_UNSUPPORTED;
+ }
 -- 
 1.7.10.4
 
