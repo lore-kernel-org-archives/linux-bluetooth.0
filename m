@@ -1,94 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 4/4] android: Start Android Bluetooth daemon
-Date: Fri, 11 Oct 2013 10:45:55 +0300
-Message-Id: <1381477555-11319-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1381477555-11319-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1381477555-11319-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 11 Oct 2013 07:54:52 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] Bluetooth: Remove unused h4_check_data_len() function
+Message-ID: <20131011055452.GA10523@x220.p-661hnu-f1>
+References: <1381449163-19932-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1381449163-19932-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Marcel,
 
-Start Android Bluetooth daemon from HAL init(). Make sure
-that daemon is in "running" state.
----
- android/hal_bluetooth.c |   41 ++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 38 insertions(+), 3 deletions(-)
+On Thu, Oct 10, 2013, Marcel Holtmann wrote:
+> The function h4_check_data_len() is actually not used. So just
+> remove it.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  drivers/bluetooth/hci_h4.c | 24 ------------------------
+>  1 file changed, 24 deletions(-)
 
-diff --git a/android/hal_bluetooth.c b/android/hal_bluetooth.c
-index 688314b..a5dd090 100644
---- a/android/hal_bluetooth.c
-+++ b/android/hal_bluetooth.c
-@@ -23,11 +23,16 @@
- #include <hardware/bluetooth.h>
- #include <hardware/bt_sock.h>
- 
-+#include <cutils/sockets.h>
-+#include <cutils/properties.h>
-+
- #define LOG_TAG "BlueZ"
- #include <cutils/log.h>
- 
- #include "hal.h"
- 
-+#define SERVICE_NAME "bluetoothd"
-+
- bt_callbacks_t *bt_hal_cbacks = NULL;
- 
- static bool interface_ready(void)
-@@ -35,6 +40,33 @@ static bool interface_ready(void)
- 	return bt_hal_cbacks != NULL;
- }
- 
-+static bool start_bt_daemon(void)
-+{
-+	int tries = 40; /* wait 4 seconds for completion */
-+
-+	ALOGD(__func__);
-+
-+	/* Start Android Bluetooth daemon service */
-+	property_set("ctl.start", SERVICE_NAME);
-+
-+	while (tries-- > 0) {
-+		char val[PROPERTY_VALUE_MAX];
-+
-+		if (property_get("init.svc." SERVICE_NAME, val, NULL)) {
-+			if (!strcmp(val, "running")) {
-+				ALOGI("Android BlueZ daemon started");
-+				return true;
-+			}
-+		} else {
-+			return false;
-+		}
-+
-+		usleep(100000);
-+	}
-+
-+	return false;
-+}
-+
- static bool is_profile(const char *profile, const char *str)
- {
- 	return strcmp(profile, str) == 0;
-@@ -47,10 +79,13 @@ static int init(bt_callbacks_t *callbacks)
- 	if (interface_ready())
- 		return BT_STATUS_SUCCESS;
- 
--	/* store reference to user callbacks */
--	bt_hal_cbacks = callbacks;
-+	if (start_bt_daemon()) {
-+		/* TODO: open channel */
-+
-+		bt_hal_cbacks = callbacks;
- 
--	/* TODO: Init here bluezd task */
-+		return BT_STATUS_SUCCESS;
-+	}
- 
- 	return BT_STATUS_UNSUPPORTED;
- }
--- 
-1.7.10.4
+Both patches in this set have been applied to bluetooth-next. Thanks.
 
+Johan
