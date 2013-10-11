@@ -1,65 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/3] audio/media: Send status changed if position changes
-Date: Fri, 11 Oct 2013 14:53:23 +0300
-Message-Id: <1381492404-25765-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1381492404-25765-1-git-send-email-luiz.dentz@gmail.com>
-References: <1381492404-25765-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/3] audio/media: Add support for tracking Seeked signal
+Date: Fri, 11 Oct 2013 14:53:22 +0300
+Message-Id: <1381492404-25765-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If position changes send a status changed event to force the position to
-be resynced.
+This tracks Seeked signal and update the position in case it happens.
 ---
- profiles/audio/media.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+ profiles/audio/media.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 646c76a..0adc7c2 100644
+index 9c72b8d..646c76a 100644
 --- a/profiles/audio/media.c
 +++ b/profiles/audio/media.c
-@@ -1306,13 +1306,21 @@ static gboolean set_status(struct media_player *mp, DBusMessageIter *iter)
- static gboolean set_position(struct media_player *mp, DBusMessageIter *iter)
- {
- 	uint64_t value;
-+	const char *status;
+@@ -96,6 +96,7 @@ struct media_player {
+ 	guint			watch;
+ 	guint			properties_watch;
+ 	guint			track_watch;
++	guint			seek_watch;
+ 	char			*status;
+ 	uint32_t		position;
+ 	uint32_t		duration;
+@@ -949,6 +950,7 @@ static void media_player_free(gpointer data)
+ 	g_dbus_remove_watch(conn, mp->watch);
+ 	g_dbus_remove_watch(conn, mp->properties_watch);
+ 	g_dbus_remove_watch(conn, mp->track_watch);
++	g_dbus_remove_watch(conn, mp->seek_watch);
  
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_INT64)
- 			return FALSE;
- 
- 	dbus_message_iter_get_basic(iter, &value);
- 
--	mp->position = value / 1000;
-+	value /= 1000;
-+
-+	if (value > get_position(mp))
-+		status = "forward-seek";
-+	else
-+		status = "reverse-seek";
-+
-+	mp->position = value;
- 	g_timer_start(mp->timer);
- 
- 	DBG("Position=%u", mp->position);
-@@ -1327,9 +1335,14 @@ static gboolean set_position(struct media_player *mp, DBusMessageIter *iter)
- 	 * If position is the maximum value allowed or greater than track's
- 	 * duration, we send a track-reached-end event.
- 	 */
--	if (mp->position == UINT32_MAX || mp->position >= mp->duration)
-+	if (mp->position == UINT32_MAX || mp->position >= mp->duration) {
- 		avrcp_player_event(mp->player, AVRCP_EVENT_TRACK_REACHED_END,
- 									NULL);
-+		return TRUE;
-+	}
-+
-+	/* Send a status change to force resync the position */
-+	avrcp_player_event(mp->player, AVRCP_EVENT_STATUS_CHANGED, status);
- 
+ 	if (mp->track)
+ 		g_hash_table_unref(mp->track);
+@@ -1681,6 +1683,21 @@ static gboolean properties_changed(DBusConnection *connection, DBusMessage *msg,
  	return TRUE;
  }
+ 
++static gboolean position_changed(DBusConnection *connection, DBusMessage *msg,
++							void *user_data)
++{
++	struct media_player *mp = user_data;
++	DBusMessageIter iter;
++
++	DBG("sender=%s path=%s", mp->sender, mp->path);
++
++	dbus_message_iter_init(msg, &iter);
++
++	set_position(mp, &iter);
++
++	return TRUE;
++}
++
+ static struct media_player *media_player_create(struct media_adapter *adapter,
+ 						const char *sender,
+ 						const char *path,
+@@ -1702,6 +1719,10 @@ static struct media_player *media_player_create(struct media_adapter *adapter,
+ 						path, MEDIA_PLAYER_INTERFACE,
+ 						properties_changed,
+ 						mp, NULL);
++	mp->seek_watch = g_dbus_add_signal_watch(conn, sender,
++						path, MEDIA_PLAYER_INTERFACE,
++						"Seeked", position_changed,
++						mp, NULL);
+ 	mp->player = avrcp_register_player(adapter->btd_adapter, &player_cb,
+ 							mp, media_player_free);
+ 	if (!mp->player) {
 -- 
 1.8.3.1
 
