@@ -1,98 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv1 3/4] android: Enable Socket interface
-Date: Fri, 11 Oct 2013 11:31:44 +0200
-Message-ID: <172688778.UF0VyY4IqK@uw000953>
-In-Reply-To: <1381477555-11319-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1381477555-11319-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381477555-11319-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv1 0/4] Initial patches splitted
+Date: Fri, 11 Oct 2013 10:45:51 +0300
+Message-Id: <1381477555-11319-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Returns socket interface, use header hal.h to avoid externs.
-> ---
->  android/hal.h           |   18 ++++++++++++++++++
->  android/hal_bluetooth.c |   11 +++++++++++
->  2 files changed, 29 insertions(+)
->  create mode 100644 android/hal.h
-> 
-> diff --git a/android/hal.h b/android/hal.h
-> new file mode 100644
-> index 0000000..40fbf03
-> --- /dev/null
-> +++ b/android/hal.h
-> @@ -0,0 +1,18 @@
-> +/*
-> + * Copyright (C) 2013 Intel Corporation
-> + *
-> + * Licensed under the Apache License, Version 2.0 (the "License");
-> + * you may not use this file except in compliance with the License.
-> + * You may obtain a copy of the License at
-> + *
-> + *      http://www.apache.org/licenses/LICENSE-2.0
-> + *
-> + * Unless required by applicable law or agreed to in writing, software
-> + * distributed under the License is distributed on an "AS IS" BASIS,
-> + * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-> + * See the License for the specific language governing permissions and
-> + * limitations under the License.
-> + *
-> + */
-> +
-> +btsock_interface_t *bt_get_sock_interface(void);
-> diff --git a/android/hal_bluetooth.c b/android/hal_bluetooth.c
-> index 48638a5..688314b 100644
-> --- a/android/hal_bluetooth.c
-> +++ b/android/hal_bluetooth.c
-> @@ -21,10 +21,13 @@
->  #include <stdbool.h>
->  
->  #include <hardware/bluetooth.h>
-> +#include <hardware/bt_sock.h>
->  
->  #define LOG_TAG "BlueZ"
->  #include <cutils/log.h>
->  
-> +#include "hal.h"
-> +
->  bt_callbacks_t *bt_hal_cbacks = NULL;
->  
->  static bool interface_ready(void)
-> @@ -32,6 +35,11 @@ static bool interface_ready(void)
->  	return bt_hal_cbacks != NULL;
->  }
->  
-> +static bool is_profile(const char *profile, const char *str)
-> +{
-> +	return strcmp(profile, str) == 0;
-> +}
+This is small chunk form my previous patch series splitted for easy review.
+I need to understand what is current coding style for our project, so far it seems
+very different from BlueZ I took as example first. Please comment.
 
-This is not used since you use strcmp directly and should be removed.
+Andrei Emeltchenko (4):
+  android: Add Adapter Bluetooth HAL template
+  android: Add Socket Bluetooth HAL template
+  android: Enable Socket interface
+  android: Start Android Bluetooth daemon
 
-> +
->  static int init(bt_callbacks_t *callbacks)
->  {
->  	ALOGD(__func__);
-> @@ -244,6 +252,9 @@ static const void *get_profile_interface(const char *profile_id)
->  	if (!interface_ready())
->  		return NULL;
->  
-> +	if (!strcmp(profile_id, BT_PROFILE_SOCKETS_ID))
-> +		return bt_get_sock_interface();
-> +
->  	return NULL;
->  }
->  
-> 
+ android/Android.mk      |   20 +++
+ android/hal.h           |   18 +++
+ android/hal_bluetooth.c |  389 +++++++++++++++++++++++++++++++++++++++++++++++
+ android/hal_bt_sock.c   |   85 +++++++++++
+ 4 files changed, 512 insertions(+)
+ create mode 100644 android/hal.h
+ create mode 100644 android/hal_bluetooth.c
+ create mode 100644 android/hal_bt_sock.c
 
 -- 
-BR
-Szymon Janc
+1.7.10.4
 
