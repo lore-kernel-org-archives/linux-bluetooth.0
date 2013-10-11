@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/3] tools/mpris-player: Forward player signals
-Date: Fri, 11 Oct 2013 14:53:24 +0300
-Message-Id: <1381492404-25765-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/3] audio/media: Send status changed if position changes
+Date: Fri, 11 Oct 2013 14:53:23 +0300
+Message-Id: <1381492404-25765-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1381492404-25765-1-git-send-email-luiz.dentz@gmail.com>
 References: <1381492404-25765-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,84 +11,55 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Forward signals received from player in the session bus to the system
-bus where bluetoothd can catch them.
+If position changes send a status changed event to force the position to
+be resynced.
 ---
- tools/mpris-player.c | 27 +++++++++++++++------------
- 1 file changed, 15 insertions(+), 12 deletions(-)
+ profiles/audio/media.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/tools/mpris-player.c b/tools/mpris-player.c
-index 03b8875..c94330c 100644
---- a/tools/mpris-player.c
-+++ b/tools/mpris-player.c
-@@ -543,8 +543,8 @@ static void remove_player(DBusConnection *conn, const char *sender)
- 	g_free(owner);
- }
- 
--static gboolean properties_changed(DBusConnection *conn,
--					DBusMessage *msg, void *user_data)
-+static gboolean player_signal(DBusConnection *conn, DBusMessage *msg,
-+								void *user_data)
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index 646c76a..0adc7c2 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -1306,13 +1306,21 @@ static gboolean set_status(struct media_player *mp, DBusMessageIter *iter)
+ static gboolean set_position(struct media_player *mp, DBusMessageIter *iter)
  {
- 	DBusMessage *signal;
- 	DBusMessageIter iter, args;
-@@ -558,17 +558,15 @@ static gboolean properties_changed(DBusConnection *conn,
- 	if (owner == NULL)
- 		goto done;
+ 	uint64_t value;
++	const char *status;
  
--	signal = dbus_message_new_signal(path, DBUS_INTERFACE_PROPERTIES,
--							"PropertiesChanged");
-+	signal = dbus_message_new_signal(path, dbus_message_get_interface(msg),
-+						dbus_message_get_member(msg));
- 	if (signal == NULL) {
--		fprintf(stderr, "Unable to allocate new %s.PropertisChanged"
--					" signal", DBUS_INTERFACE_PROPERTIES);
-+		fprintf(stderr, "Unable to allocate new %s.%s signal",
-+						dbus_message_get_interface(msg),
-+						dbus_message_get_member(msg));
- 		goto done;
- 	}
+ 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_INT64)
+ 			return FALSE;
  
--	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
--		return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
--
- 	dbus_message_iter_init_append(signal, &args);
+ 	dbus_message_iter_get_basic(iter, &value);
  
- 	append_iter(&args, &iter);
-@@ -2512,7 +2510,7 @@ int main(int argc, char *argv[])
- {
- 	GOptionContext *context;
- 	GError *error = NULL;
--	guint owner_watch, properties_watch;
-+	guint owner_watch, properties_watch, signal_watch;
- 	struct sigaction sa;
- 
- 	context = g_option_context_new(NULL);
-@@ -2554,10 +2552,14 @@ int main(int argc, char *argv[])
- 						name_owner_changed,
- 						NULL, NULL);
- 
--
- 	properties_watch = g_dbus_add_properties_watch(session, NULL, NULL,
- 							MPRIS_PLAYER_INTERFACE,
--							properties_changed,
-+							player_signal,
-+							NULL, NULL);
+-	mp->position = value / 1000;
++	value /= 1000;
 +
-+	signal_watch = g_dbus_add_signal_watch(session, NULL, NULL,
-+							MPRIS_PLAYER_INTERFACE,
-+							NULL, player_signal,
- 							NULL, NULL);
++	if (value > get_position(mp))
++		status = "forward-seek";
++	else
++		status = "reverse-seek";
++
++	mp->position = value;
+ 	g_timer_start(mp->timer);
  
- 	memset(&sa, 0, sizeof(sa));
-@@ -2578,6 +2580,7 @@ int main(int argc, char *argv[])
+ 	DBG("Position=%u", mp->position);
+@@ -1327,9 +1335,14 @@ static gboolean set_position(struct media_player *mp, DBusMessageIter *iter)
+ 	 * If position is the maximum value allowed or greater than track's
+ 	 * duration, we send a track-reached-end event.
+ 	 */
+-	if (mp->position == UINT32_MAX || mp->position >= mp->duration)
++	if (mp->position == UINT32_MAX || mp->position >= mp->duration) {
+ 		avrcp_player_event(mp->player, AVRCP_EVENT_TRACK_REACHED_END,
+ 									NULL);
++		return TRUE;
++	}
++
++	/* Send a status change to force resync the position */
++	avrcp_player_event(mp->player, AVRCP_EVENT_STATUS_CHANGED, status);
  
- 	g_dbus_remove_watch(session, owner_watch);
- 	g_dbus_remove_watch(session, properties_watch);
-+	g_dbus_remove_watch(session, signal_watch);
- 
- 	g_dbus_client_unref(client);
- 
+ 	return TRUE;
+ }
 -- 
 1.8.3.1
 
