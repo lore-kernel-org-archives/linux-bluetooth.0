@@ -1,52 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Allow 3D profile to use security mode 4 level 0
-Date: Sat, 12 Oct 2013 06:58:42 -0700
-Message-Id: <1381586322-55591-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Limit security mode 4 level 0 to connection oriented channels
+Date: Sat, 12 Oct 2013 06:46:55 -0700
+Message-Id: <1381585615-50786-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The PSM 0x0021 is dedicated to the 3D profile and has permission to
-use security mode 4 level 0 for L2CAP connectionless unicast data
-transfers.
-
-When establishing a L2CAP connectionless channel on PSM 0x0021, it
-will no longer force Secure Simple Pairing.
+The exception for SDP and RFCOMM channels when it comes to security
+mode 4 level 0 should only be checked when actually a connection
+oriented channel is established.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/l2cap.h | 1 +
- net/bluetooth/l2cap_sock.c    | 4 ++++
- 2 files changed, 5 insertions(+)
+ net/bluetooth/l2cap_sock.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index f141b5f..12523c7 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -237,6 +237,7 @@ struct l2cap_conn_rsp {
- /* protocol/service multiplexer (PSM) */
- #define L2CAP_PSM_SDP		0x0001
- #define L2CAP_PSM_RFCOMM	0x0003
-+#define L2CAP_PSM_3DSP		0x0021
- 
- /* channel indentifier */
- #define L2CAP_CID_SIGNALING	0x0001
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index bee98eb..bd6fe7f 100644
+index 69e42db..bee98eb 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -101,6 +101,10 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
+@@ -100,9 +100,13 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
+ 	if (err < 0)
  		goto done;
  
- 	switch (chan->chan_type) {
-+	case L2CAP_CHAN_CONN_LESS:
-+		if (__le16_to_cpu(la.l2_psm) == L2CAP_PSM_3DSP)
+-	if (__le16_to_cpu(la.l2_psm) == L2CAP_PSM_SDP ||
+-	    __le16_to_cpu(la.l2_psm) == L2CAP_PSM_RFCOMM)
+-		chan->sec_level = BT_SECURITY_SDP;
++	switch (chan->chan_type) {
++	case L2CAP_CHAN_CONN_ORIENTED:
++		if (__le16_to_cpu(la.l2_psm) == L2CAP_PSM_SDP ||
++		    __le16_to_cpu(la.l2_psm) == L2CAP_PSM_RFCOMM)
 +			chan->sec_level = BT_SECURITY_SDP;
 +		break;
- 	case L2CAP_CHAN_CONN_ORIENTED:
- 		if (__le16_to_cpu(la.l2_psm) == L2CAP_PSM_SDP ||
- 		    __le16_to_cpu(la.l2_psm) == L2CAP_PSM_RFCOMM)
++	}
+ 
+ 	bacpy(&bt_sk(sk)->src, &la.l2_bdaddr);
+ 
 -- 
 1.8.3.1
 
