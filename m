@@ -1,65 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Giovanni Campagna <scampa.giovanni@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Giovanni Campagna <gcampagna@src.gnome.org>
-Subject: [PATCH] Allow using obexd without systemd in the user session
-Date: Sat, 12 Oct 2013 17:45:25 +0200
-Message-Id: <1381592725-28212-1-git-send-email-scampa.giovanni@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sat, 12 Oct 2013 18:32:24 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: Unicast connectionless data reception is
+ supported
+Message-ID: <20131012153224.GB26826@x220.p-661hnu-f1>
+References: <1381591099-13207-2-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1381591099-13207-2-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Giovanni Campagna <gcampagna@src.gnome.org>
+Hi Marcel,
 
-Not all sessions run systemd --user (actually, the majority
-doesn't), so the dbus daemon must be able to spawn obexd
-directly, and to do so it needs the full path of the daemon.
----
- Makefile.obexd                      | 4 ++--
- obexd/src/org.bluez.obex.service    | 4 ----
- obexd/src/org.bluez.obex.service.in | 4 ++++
- 3 files changed, 6 insertions(+), 6 deletions(-)
- delete mode 100644 obexd/src/org.bluez.obex.service
- create mode 100644 obexd/src/org.bluez.obex.service.in
+On Sat, Oct 12, 2013, Marcel Holtmann wrote:
+> The unicast connectionless data reception feature is actually support
+> and has been supported all along. Mark it as supported in the L2CAP
+> features bitmask.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/l2cap_core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile.obexd b/Makefile.obexd
-index d5377cb..751e0e5 100644
---- a/Makefile.obexd
-+++ b/Makefile.obexd
-@@ -2,12 +2,12 @@
- if SYSTEMD
- systemduserunitdir = @SYSTEMD_USERUNITDIR@
- systemduserunit_DATA = obexd/src/obex.service
-+endif
- 
- dbussessionbusdir = @DBUS_SESSIONBUSDIR@
- dbussessionbus_DATA = obexd/src/org.bluez.obex.service
--endif
- 
--EXTRA_DIST += obexd/src/obex.service.in obexd/src/org.bluez.obex.service
-+EXTRA_DIST += obexd/src/obex.service.in obexd/src/org.bluez.obex.service.in
- 
- obex_plugindir = $(libdir)/obex/plugins
- 
-diff --git a/obexd/src/org.bluez.obex.service b/obexd/src/org.bluez.obex.service
-deleted file mode 100644
-index a538088..0000000
---- a/obexd/src/org.bluez.obex.service
-+++ /dev/null
-@@ -1,4 +0,0 @@
--[D-BUS Service]
--Name=org.bluez.obex
--Exec=/bin/false
--SystemdService=dbus-org.bluez.obex.service
-diff --git a/obexd/src/org.bluez.obex.service.in b/obexd/src/org.bluez.obex.service.in
-new file mode 100644
-index 0000000..9c815f2
---- /dev/null
-+++ b/obexd/src/org.bluez.obex.service.in
-@@ -0,0 +1,4 @@
-+[D-BUS Service]
-+Name=org.bluez.obex
-+Exec=@libexecdir@/obexd
-+SystemdService=dbus-org.bluez.obex.service
--- 
-1.8.3.1
+Applied to bluetooth-next. Thanks.
 
+Johan
