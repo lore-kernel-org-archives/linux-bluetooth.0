@@ -1,25 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1381595148.21761.0.camel@nuvo>
-Subject: Re: [PATCH] Allow using obexd without systemd in the user session
-From: Bastien Nocera <hadess@hadess.net>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Giovanni Campagna <scampa.giovanni@gmail.com>,
- linux-bluetooth@vger.kernel.org, Giovanni Campagna <gcampagna@src.gnome.org>
-Date: Sat, 12 Oct 2013 18:25:48 +0200
+MIME-Version: 1.0
 In-Reply-To: <0262656B-5656-422C-B12D-C6BF7239AA11@holtmann.org>
-References: <1381592725-28212-1-git-send-email-scampa.giovanni@gmail.com>
-	 <0262656B-5656-422C-B12D-C6BF7239AA11@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+References: <1381592725-28212-1-git-send-email-scampa.giovanni@gmail.com> <0262656B-5656-422C-B12D-C6BF7239AA11@holtmann.org>
+From: Giovanni Campagna <scampa.giovanni@gmail.com>
+Date: Sat, 12 Oct 2013 18:18:43 +0200
+Message-ID: <CABkLShFUcOTuBsy1Ej=i8p1fjKdOmgTKWthHbL+Wx6KDhhjFMg@mail.gmail.com>
+Subject: Re: [PATCH] Allow using obexd without systemd in the user session
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, 2013-10-12 at 18:08 +0200, Marcel Holtmann wrote:
+2013/10/12 Marcel Holtmann <marcel@holtmann.org>:
 > Hi Giovanni,
-<snip>
-> that is something your distro specific package should be fixing if
-> that is needed. The focus is on integration with systemd and nothing
-> else. You can use --disable-systemd and provide your own set of D-Bus
-> service files.
+>
+> [...]
+>
+> that is something your distro specific package should be fixing if that is needed. The focus is on integration with systemd and nothing else. You can use --disable-systemd and provide your own set of D-Bus service files.
 
-There aren't any distributions that ship systemd for user sessions
-though.
+I don't think shipping with upstream packages that require distro
+patches in common configurations is a good idea (it breaks jhbuild
+setups, for example), but ok, I filed
+https://bugzilla.redhat.com/show_bug.cgi?id=1018496
+
+Thanks for the quick answer,
+
+Giovanni
