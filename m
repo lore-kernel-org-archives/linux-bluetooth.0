@@ -1,28 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 13 Oct 2013 17:59:25 +0300
+Date: Sun, 13 Oct 2013 17:59:13 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Update source address and type for incoming
- LE connections
-Message-ID: <20131013145925.GF23382@x220.p-661hnu-f1>
-References: <1381674318-6590-1-git-send-email-marcel@holtmann.org>
+Subject: Re: [PATCH] Bluetooth: Update L2CAP socket source address from HCI
+ connection
+Message-ID: <20131013145913.GE23382@x220.p-661hnu-f1>
+References: <1381668997-1240-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381674318-6590-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1381668997-1240-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
 On Sun, Oct 13, 2013, Marcel Holtmann wrote:
-> The incoming LE connections do not have a proper source address and
-> address type set. The connection needs to be set with the same values
-> as used for advertising parameters.
+> When having LE connections, the source address is not always the
+> public address of the controller. So update the socket address
+> based on the actual used source address of the HCI connection.
+> 
+> This also remove the pointless source address pointer and adds
+> a proper lock around the socket structure.
 > 
 > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  net/bluetooth/hci_event.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+>  net/bluetooth/l2cap_core.c | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
 
 Applied to bluetooth-next. Thanks.
 
