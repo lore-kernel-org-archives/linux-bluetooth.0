@@ -1,31 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/2] build: Add android/hal-ipc-api.txt to EXTRA_DIST
-Date: Mon, 14 Oct 2013 10:05:59 +0200
-Message-ID: <1381737959-9138-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1381737959-9138-1-git-send-email-szymon.janc@tieto.com>
-References: <1381737959-9138-1-git-send-email-szymon.janc@tieto.com>
+Date: Sun, 13 Oct 2013 23:36:47 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Increase minor version of core module
+Message-ID: <20131013203647.GA17845@x220.p-661hnu-f1>
+References: <1381694942-59440-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1381694942-59440-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- Makefile.android | 2 ++
- 1 file changed, 2 insertions(+)
+Hi Marcel,
 
-diff --git a/Makefile.android b/Makefile.android
-index e161e6d..3ceefd8 100644
---- a/Makefile.android
-+++ b/Makefile.android
-@@ -6,3 +6,5 @@ android_bluetoothd_LDADD = @GLIB_LIBS@
- endif
- 
- EXTRA_DIST += android/Android.mk android/log.c
-+
-+EXTRA_DIST += android/hal-ipc-api.txt
--- 
-1.8.4
+On Sun, Oct 13, 2013, Marcel Holtmann wrote:
+> There have been a lot of changes in the core Bluetooth handling
+> lately. So it is a good idea to increase the module version.
+> 
+> The module version is not used anywhere, but it makes debugging
+> a little bit simpler if versions can be distinguished.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/af_bluetooth.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
+Applied to bluetooth-next. Thanks.
+
+Johan
