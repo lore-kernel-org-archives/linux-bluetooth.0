@@ -1,71 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Use l2cap_pi(sk) directly where possible
-Date: Sun, 13 Oct 2013 11:36:07 -0700
-Message-Id: <1381689367-7104-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 3/3] Bluetooth: Remove src and dst fields from bt_sock structure
+Date: Sun, 13 Oct 2013 10:34:03 -0700
+Message-Id: <1381685643-57066-3-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There are few places where it makes sense to use l2cap_pi(sk) directly
-instead of assigning it to temporary structure.
+Every socket protocol now stores its own address information. So
+just remove the generic src and dst fields since they are no longer
+needed.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_sock.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ include/net/bluetooth/bluetooth.h | 2 --
+ net/bluetooth/af_bluetooth.c      | 4 +---
+ 2 files changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 6262e23..8fe9f49 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -976,13 +976,12 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 5fd5106..1d6e484 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -218,8 +218,6 @@ void baswap(bdaddr_t *dst, bdaddr_t *src);
  
- static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- {
--	int err;
- 	struct sock *sk = chan->data;
--	struct l2cap_pinfo *pi = l2cap_pi(sk);
-+	int err;
+ struct bt_sock {
+ 	struct sock sk;
+-	bdaddr_t    src;
+-	bdaddr_t    dst;
+ 	struct list_head accept_q;
+ 	struct sock *parent;
+ 	unsigned long flags;
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index e6e1278..9c7e4ed 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -617,15 +617,13 @@ static int bt_seq_show(struct seq_file *seq, void *v)
+ 		struct bt_sock *bt = bt_sk(sk);
  
- 	lock_sock(sk);
+ 		seq_printf(seq,
+-			   "%pK %-6d %-6u %-6u %-6u %-6lu %pMR %pMR %-6lu",
++			   "%pK %-6d %-6u %-6u %-6u %-6lu %-6lu",
+ 			   sk,
+ 			   atomic_read(&sk->sk_refcnt),
+ 			   sk_rmem_alloc_get(sk),
+ 			   sk_wmem_alloc_get(sk),
+ 			   from_kuid(seq_user_ns(seq), sock_i_uid(sk)),
+ 			   sock_i_ino(sk),
+-			   &bt->src,
+-			   &bt->dst,
+ 			   bt->parent? sock_i_ino(bt->parent): 0LU);
  
--	if (pi->rx_busy_skb) {
-+	if (l2cap_pi(sk)->rx_busy_skb) {
- 		err = -ENOMEM;
- 		goto done;
- 	}
-@@ -998,9 +997,9 @@ static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 	 * acked and reassembled until there is buffer space
- 	 * available.
- 	 */
--	if (err < 0 && pi->chan->mode == L2CAP_MODE_ERTM) {
--		pi->rx_busy_skb = skb;
--		l2cap_chan_busy(pi->chan, 1);
-+	if (err < 0 && chan->mode == L2CAP_MODE_ERTM) {
-+		l2cap_pi(sk)->rx_busy_skb = skb;
-+		l2cap_chan_busy(chan, 1);
- 		err = 0;
- 	}
- 
-@@ -1128,6 +1127,7 @@ static void l2cap_sock_destruct(struct sock *sk)
- 
- 	if (l2cap_pi(sk)->chan)
- 		l2cap_chan_put(l2cap_pi(sk)->chan);
-+
- 	if (l2cap_pi(sk)->rx_busy_skb) {
- 		kfree_skb(l2cap_pi(sk)->rx_busy_skb);
- 		l2cap_pi(sk)->rx_busy_skb = NULL;
-@@ -1139,8 +1139,7 @@ static void l2cap_sock_destruct(struct sock *sk)
- 
- static void l2cap_sock_init(struct sock *sk, struct sock *parent)
- {
--	struct l2cap_pinfo *pi = l2cap_pi(sk);
--	struct l2cap_chan *chan = pi->chan;
-+	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
- 
- 	BT_DBG("sk %p", sk);
- 
+ 		if (l->custom_seq_show) {
 -- 
 1.8.3.1
 
