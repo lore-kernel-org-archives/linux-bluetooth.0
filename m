@@ -1,36 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 13 Oct 2013 20:02:45 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Store address information in L2CAP channel
- structure
-Message-ID: <20131013170245.GA29427@x220.p-661hnu-f1>
-References: <1381677167-41315-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381677167-41315-1-git-send-email-marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/4] Bluetooth: Access RFCOMM session addresses through L2CAP channel
+Date: Sun, 13 Oct 2013 09:49:54 -0700
+Message-Id: <1381682997-26437-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+The L2CAP socket structure does not contain the address information
+anymore. They need to be accessed through the L2CAP channel.
 
-On Sun, Oct 13, 2013, Marcel Holtmann wrote:
-> With the effort of abstracting the L2CAP socket from the underlying
-> L2CAP channel it is important to store the source and destination
-> address information directly in the L2CAP channel structure.
-> 
-> Direct access to the HCI connection address information is not
-> possible since they might not be avaiable at L2CAP channel
-> creation time. The address information will be updated when
-> the underlying BR/EDR or LE connection status changes.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/l2cap.h |  2 ++
->  net/bluetooth/l2cap_core.c    | 61 +++++++++++++++++--------------------------
->  net/bluetooth/l2cap_sock.c    |  6 ++---
->  3 files changed, 29 insertions(+), 40 deletions(-)
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/rfcomm/core.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-Applied to bluetooth-next. Thanks.
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index ca957d3..27e936a 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -641,13 +641,13 @@ static struct rfcomm_session *rfcomm_session_get(bdaddr_t *src, bdaddr_t *dst)
+ {
+ 	struct rfcomm_session *s;
+ 	struct list_head *p, *n;
+-	struct bt_sock *sk;
++	struct l2cap_chan *chan;
+ 	list_for_each_safe(p, n, &session_list) {
+ 		s = list_entry(p, struct rfcomm_session, list);
+-		sk = bt_sk(s->sock->sk);
++		chan = l2cap_pi(s->sock->sk)->chan;
+ 
+-		if ((!bacmp(src, BDADDR_ANY) || !bacmp(&sk->src, src)) &&
+-				!bacmp(&sk->dst, dst))
++		if ((!bacmp(src, BDADDR_ANY) || !bacmp(&chan->src, src)) &&
++		    !bacmp(&chan->dst, dst))
+ 			return s;
+ 	}
+ 	return NULL;
+@@ -732,11 +732,11 @@ failed:
+ 
+ void rfcomm_session_getaddr(struct rfcomm_session *s, bdaddr_t *src, bdaddr_t *dst)
+ {
+-	struct sock *sk = s->sock->sk;
++	struct l2cap_chan *chan = l2cap_pi(s->sock->sk)->chan;
+ 	if (src)
+-		bacpy(src, &bt_sk(sk)->src);
++		bacpy(src, &chan->src);
+ 	if (dst)
+-		bacpy(dst, &bt_sk(sk)->dst);
++		bacpy(dst, &chan->dst);
+ }
+ 
+ /* ---- RFCOMM frame sending ---- */
+@@ -2112,12 +2112,11 @@ static int rfcomm_dlc_debugfs_show(struct seq_file *f, void *x)
+ 	rfcomm_lock();
+ 
+ 	list_for_each_entry(s, &session_list, list) {
++		struct l2cap_chan *chan = l2cap_pi(s->sock->sk)->chan;
+ 		struct rfcomm_dlc *d;
+ 		list_for_each_entry(d, &s->dlcs, list) {
+-			struct sock *sk = s->sock->sk;
+-
+ 			seq_printf(f, "%pMR %pMR %ld %d %d %d %d\n",
+-				   &bt_sk(sk)->src, &bt_sk(sk)->dst,
++				   &chan->src, &chan->dst,
+ 				   d->state, d->dlci, d->mtu,
+ 				   d->rx_credits, d->tx_credits);
+ 		}
+-- 
+1.8.3.1
 
-Johan
