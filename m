@@ -1,56 +1,139 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] Bluetooth: Remove src and dst fields from bt_sock structure
-Date: Sun, 13 Oct 2013 10:34:03 -0700
-Message-Id: <1381685643-57066-3-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 2/3] Bluetooth: Store RFCOMM address information in its own socket structure
+Date: Sun, 13 Oct 2013 10:34:02 -0700
+Message-Id: <1381685643-57066-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Every socket protocol now stores its own address information. So
-just remove the generic src and dst fields since they are no longer
-needed.
+The address information of RFCOMM sockets should be stored in its
+own socket structure. Trying to generalize them is not helpful since
+different transports have different address types.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/bluetooth.h | 2 --
- net/bluetooth/af_bluetooth.c      | 4 +---
- 2 files changed, 1 insertion(+), 5 deletions(-)
+ include/net/bluetooth/rfcomm.h |  2 ++
+ net/bluetooth/rfcomm/sock.c    | 28 +++++++++++++++-------------
+ 2 files changed, 17 insertions(+), 13 deletions(-)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 5fd5106..1d6e484 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -218,8 +218,6 @@ void baswap(bdaddr_t *dst, bdaddr_t *src);
+diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
+index 7afd419..3588f48 100644
+--- a/include/net/bluetooth/rfcomm.h
++++ b/include/net/bluetooth/rfcomm.h
+@@ -300,6 +300,8 @@ struct rfcomm_conninfo {
  
- struct bt_sock {
- 	struct sock sk;
--	bdaddr_t    src;
--	bdaddr_t    dst;
- 	struct list_head accept_q;
- 	struct sock *parent;
- 	unsigned long flags;
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index e6e1278..9c7e4ed 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -617,15 +617,13 @@ static int bt_seq_show(struct seq_file *seq, void *v)
- 		struct bt_sock *bt = bt_sk(sk);
+ struct rfcomm_pinfo {
+ 	struct bt_sock bt;
++	bdaddr_t src;
++	bdaddr_t dst;
+ 	struct rfcomm_dlc   *dlc;
+ 	u8     channel;
+ 	u8     sec_level;
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 072938d..df17276 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -87,7 +87,8 @@ static void rfcomm_sk_state_change(struct rfcomm_dlc *d, int err)
+ 		parent->sk_data_ready(parent, 0);
+ 	} else {
+ 		if (d->state == BT_CONNECTED)
+-			rfcomm_session_getaddr(d->session, &bt_sk(sk)->src, NULL);
++			rfcomm_session_getaddr(d->session,
++					       &rfcomm_pi(sk)->src, NULL);
+ 		sk->sk_state_change(sk);
+ 	}
  
- 		seq_printf(seq,
--			   "%pK %-6d %-6u %-6u %-6u %-6lu %pMR %pMR %-6lu",
-+			   "%pK %-6d %-6u %-6u %-6u %-6lu %-6lu",
- 			   sk,
- 			   atomic_read(&sk->sk_refcnt),
- 			   sk_rmem_alloc_get(sk),
- 			   sk_wmem_alloc_get(sk),
- 			   from_kuid(seq_user_ns(seq), sock_i_uid(sk)),
- 			   sock_i_ino(sk),
--			   &bt->src,
--			   &bt->dst,
- 			   bt->parent? sock_i_ino(bt->parent): 0LU);
+@@ -110,7 +111,7 @@ static struct sock *__rfcomm_get_sock_by_addr(u8 channel, bdaddr_t *src)
  
- 		if (l->custom_seq_show) {
+ 	sk_for_each(sk, &rfcomm_sk_list.head) {
+ 		if (rfcomm_pi(sk)->channel == channel &&
+-				!bacmp(&bt_sk(sk)->src, src))
++				!bacmp(&rfcomm_pi(sk)->src, src))
+ 			break;
+ 	}
+ 
+@@ -132,11 +133,11 @@ static struct sock *rfcomm_get_sock_by_channel(int state, u8 channel, bdaddr_t *
+ 
+ 		if (rfcomm_pi(sk)->channel == channel) {
+ 			/* Exact match. */
+-			if (!bacmp(&bt_sk(sk)->src, src))
++			if (!bacmp(&rfcomm_pi(sk)->src, src))
+ 				break;
+ 
+ 			/* Closest match */
+-			if (!bacmp(&bt_sk(sk)->src, BDADDR_ANY))
++			if (!bacmp(&rfcomm_pi(sk)->src, BDADDR_ANY))
+ 				sk1 = sk;
+ 		}
+ 	}
+@@ -355,7 +356,7 @@ static int rfcomm_sock_bind(struct socket *sock, struct sockaddr *addr, int addr
+ 		err = -EADDRINUSE;
+ 	} else {
+ 		/* Save source address */
+-		bacpy(&bt_sk(sk)->src, &sa->rc_bdaddr);
++		bacpy(&rfcomm_pi(sk)->src, &sa->rc_bdaddr);
+ 		rfcomm_pi(sk)->channel = sa->rc_channel;
+ 		sk->sk_state = BT_BOUND;
+ 	}
+@@ -393,13 +394,14 @@ static int rfcomm_sock_connect(struct socket *sock, struct sockaddr *addr, int a
+ 	}
+ 
+ 	sk->sk_state = BT_CONNECT;
+-	bacpy(&bt_sk(sk)->dst, &sa->rc_bdaddr);
++	bacpy(&rfcomm_pi(sk)->dst, &sa->rc_bdaddr);
+ 	rfcomm_pi(sk)->channel = sa->rc_channel;
+ 
+ 	d->sec_level = rfcomm_pi(sk)->sec_level;
+ 	d->role_switch = rfcomm_pi(sk)->role_switch;
+ 
+-	err = rfcomm_dlc_open(d, &bt_sk(sk)->src, &sa->rc_bdaddr, sa->rc_channel);
++	err = rfcomm_dlc_open(d, &rfcomm_pi(sk)->src, &sa->rc_bdaddr,
++			      sa->rc_channel);
+ 	if (!err)
+ 		err = bt_sock_wait_state(sk, BT_CONNECTED,
+ 				sock_sndtimeo(sk, flags & O_NONBLOCK));
+@@ -429,7 +431,7 @@ static int rfcomm_sock_listen(struct socket *sock, int backlog)
+ 	}
+ 
+ 	if (!rfcomm_pi(sk)->channel) {
+-		bdaddr_t *src = &bt_sk(sk)->src;
++		bdaddr_t *src = &rfcomm_pi(sk)->src;
+ 		u8 channel;
+ 
+ 		err = -EINVAL;
+@@ -530,9 +532,9 @@ static int rfcomm_sock_getname(struct socket *sock, struct sockaddr *addr, int *
+ 	sa->rc_family  = AF_BLUETOOTH;
+ 	sa->rc_channel = rfcomm_pi(sk)->channel;
+ 	if (peer)
+-		bacpy(&sa->rc_bdaddr, &bt_sk(sk)->dst);
++		bacpy(&sa->rc_bdaddr, &rfcomm_pi(sk)->dst);
+ 	else
+-		bacpy(&sa->rc_bdaddr, &bt_sk(sk)->src);
++		bacpy(&sa->rc_bdaddr, &rfcomm_pi(sk)->src);
+ 
+ 	*len = sizeof(struct sockaddr_rc);
+ 	return 0;
+@@ -951,8 +953,8 @@ int rfcomm_connect_ind(struct rfcomm_session *s, u8 channel, struct rfcomm_dlc *
+ 	bt_sock_reclassify_lock(sk, BTPROTO_RFCOMM);
+ 
+ 	rfcomm_sock_init(sk, parent);
+-	bacpy(&bt_sk(sk)->src, &src);
+-	bacpy(&bt_sk(sk)->dst, &dst);
++	bacpy(&rfcomm_pi(sk)->src, &src);
++	bacpy(&rfcomm_pi(sk)->dst, &dst);
+ 	rfcomm_pi(sk)->channel = channel;
+ 
+ 	sk->sk_state = BT_CONFIG;
+@@ -979,7 +981,7 @@ static int rfcomm_sock_debugfs_show(struct seq_file *f, void *p)
+ 
+ 	sk_for_each(sk, &rfcomm_sk_list.head) {
+ 		seq_printf(f, "%pMR %pMR %d %d\n",
+-			   &bt_sk(sk)->src, &bt_sk(sk)->dst,
++			   &rfcomm_pi(sk)->src, &rfcomm_pi(sk)->dst,
+ 			   sk->sk_state, rfcomm_pi(sk)->channel);
+ 	}
+ 
 -- 
 1.8.3.1
 
