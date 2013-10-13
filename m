@@ -1,27 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 13 Oct 2013 22:33:28 +0300
+Date: Sun, 13 Oct 2013 22:32:49 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Use l2cap_pi(sk) directly where possible
-Message-ID: <20131013193328.GC30265@x220.p-661hnu-f1>
-References: <1381689367-7104-1-git-send-email-marcel@holtmann.org>
+Subject: Re: [PATCH 1/3] Bluetooth: Store SCO address information in its own
+ socket structure
+Message-ID: <20131013193249.GB30265@x220.p-661hnu-f1>
+References: <1381685643-57066-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381689367-7104-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1381685643-57066-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
 On Sun, Oct 13, 2013, Marcel Holtmann wrote:
-> There are few places where it makes sense to use l2cap_pi(sk) directly
-> instead of assigning it to temporary structure.
+> The address information of SCO sockets should be stored in its own
+> socket structure. Trying to generalize them is not helpful since
+> different transports have different address types.
 > 
 > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  net/bluetooth/l2cap_sock.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
+>  include/net/bluetooth/sco.h |  2 ++
+>  net/bluetooth/sco.c         | 36 ++++++++++++++++++------------------
+>  2 files changed, 20 insertions(+), 18 deletions(-)
 
-Applied to bluetooth-next. Thanks.
+All three patches have been applied to bluetooth-next. Thanks.
 
 Johan
