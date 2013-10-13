@@ -1,43 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Update source address and type for incoming LE connections
-Date: Sun, 13 Oct 2013 07:25:18 -0700
-Message-Id: <1381674318-6590-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Update L2CAP socket source address from HCI connection
+Date: Sun, 13 Oct 2013 05:56:37 -0700
+Message-Id: <1381668997-1240-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The incoming LE connections do not have a proper source address and
-address type set. The connection needs to be set with the same values
-as used for advertising parameters.
+When having LE connections, the source address is not always the
+public address of the controller. So update the socket address
+based on the actual used source address of the HCI connection.
+
+This also remove the pointless source address pointer and adds
+a proper lock around the socket structure.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_event.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ net/bluetooth/l2cap_core.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index bbe2d29..aa6fed3 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3477,6 +3477,17 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 3ed9a2b..062e28e 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1756,17 +1756,16 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 		       bdaddr_t *dst, u8 dst_type)
+ {
+ 	struct sock *sk = chan->sk;
+-	bdaddr_t *src = &bt_sk(sk)->src;
+ 	struct l2cap_conn *conn;
+ 	struct hci_conn *hcon;
+ 	struct hci_dev *hdev;
+ 	__u8 auth_type;
+ 	int err;
  
- 		conn->dst_type = ev->bdaddr_type;
+-	BT_DBG("%pMR -> %pMR (type %u) psm 0x%2.2x", src, dst,
++	BT_DBG("%pMR -> %pMR (type %u) psm 0x%2.2x", &bt_sk(sk)->src, dst,
+ 	       dst_type, __le16_to_cpu(psm));
  
-+		/* The advertising parameters for own address type
-+		 * define which source address and source address
-+		 * type this connections has.
-+		 */
-+		if (bacmp(&conn->src, BDADDR_ANY)) {
-+			conn->src_type = ADDR_LE_DEV_PUBLIC;
-+		} else {
-+			bacpy(&conn->src, &hdev->static_addr);
-+			conn->src_type = ADDR_LE_DEV_RANDOM;
-+		}
-+
- 		if (ev->role == LE_CONN_ROLE_MASTER) {
- 			conn->out = true;
- 			conn->link_mode |= HCI_LM_MASTER;
+-	hdev = hci_get_route(dst, src);
++	hdev = hci_get_route(dst, &bt_sk(sk)->src);
+ 	if (!hdev)
+ 		return -EHOSTUNREACH;
+ 
+@@ -1858,7 +1857,9 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 	}
+ 
+ 	/* Update source addr of the socket */
+-	bacpy(src, &hdev->bdaddr);
++	lock_sock(sk);
++	bacpy(&bt_sk(sk)->src, &hcon->src);
++	release_sock(sk);
+ 
+ 	l2cap_chan_unlock(chan);
+ 	l2cap_chan_add(conn, chan);
 -- 
 1.8.3.1
 
