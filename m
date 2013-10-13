@@ -1,107 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Remove pointless bdaddr_to_le() helper function
-Date: Sun, 13 Oct 2013 03:57:38 -0700
-Message-Id: <1381661859-32200-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 3/4] Bluetooth: Remove l2cap_conn->src and l2cap_conn->dst usage from L2CAP
+Date: Sun, 13 Oct 2013 02:23:40 -0700
+Message-Id: <1381656221-9821-3-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The bdaddr_to_le() function tries to convert the internal address
-type to one that matches the HCI address type for LE. It does not
-handle any address types not used by LE and in the end just make
-the code a lot harder to read.
-
-So instead of just hiding behind a magic function, just convert
-the internal address type where it needs to be converted. And it
-turns out that these are only two cases anyway. One when creating
-new LE connections and the other when loading the long term keys.
-In both cases this makes it more clear on what it going on.
+The l2cap_conn->src and l2cap_conn->dst addresses are just a pointers
+to hci_conn structure. Use hci_conn->hdev->bdaddr and hci_conn->dst
+directly instead.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h |  2 --
- net/bluetooth/hci_conn.c         |  5 ++++-
- net/bluetooth/hci_core.c         | 12 ------------
- net/bluetooth/mgmt.c             | 10 +++++++---
- 4 files changed, 11 insertions(+), 18 deletions(-)
+ net/bluetooth/l2cap_core.c | 31 +++++++++++++++++--------------
+ 1 file changed, 17 insertions(+), 14 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 6900454..7889495 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1187,8 +1187,6 @@ void hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max,
- void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
- 							__u8 ltk[16]);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 13bb9da..41e2efe 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1381,7 +1381,8 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
  
--u8 bdaddr_to_le(u8 bdaddr_type);
--
- #define SCO_AIRMODE_MASK       0x0003
- #define SCO_AIRMODE_CVSD       0x0000
- #define SCO_AIRMODE_TRANSP     0x0003
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index c52bfb7..bb32f48 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -622,7 +622,10 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 	if (!conn)
- 		return ERR_PTR(-ENOMEM);
+ 	/* Check if we have socket listening on cid */
+ 	pchan = l2cap_global_chan_by_scid(BT_LISTEN, L2CAP_CID_ATT,
+-					  conn->src, conn->dst);
++					  &conn->hcon->hdev->bdaddr,
++					  &conn->hcon->dst);
+ 	if (!pchan)
+ 		return;
  
--	conn->dst_type = bdaddr_to_le(dst_type);
-+	if (dst_type == BDADDR_LE_PUBLIC)
-+		conn->dst_type = ADDR_LE_DEV_PUBLIC;
-+	else
-+		conn->dst_type = ADDR_LE_DEV_RANDOM;
- 	conn->state = BT_CONNECT;
- 	conn->out = true;
- 	conn->link_mode |= HCI_LM_MASTER;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 082f396..0e05ede 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3695,15 +3695,3 @@ static void hci_cmd_work(struct work_struct *work)
- 		}
+@@ -1399,8 +1400,8 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 
+ 	chan->dcid = L2CAP_CID_ATT;
+ 
+-	bacpy(&bt_sk(chan->sk)->src, conn->src);
+-	bacpy(&bt_sk(chan->sk)->dst, conn->dst);
++	bacpy(&bt_sk(chan->sk)->src, &conn->hcon->hdev->bdaddr);
++	bacpy(&bt_sk(chan->sk)->dst, &conn->hcon->dst);
+ 
+ 	__l2cap_chan_add(conn, chan);
+ 
+@@ -1665,9 +1666,6 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
+ 		break;
  	}
- }
+ 
+-	conn->src = &hcon->hdev->bdaddr;
+-	conn->dst = &hcon->dst;
 -
--u8 bdaddr_to_le(u8 bdaddr_type)
--{
--	switch (bdaddr_type) {
--	case BDADDR_LE_PUBLIC:
--		return ADDR_LE_DEV_PUBLIC;
--
--	default:
--		/* Fallback to LE Random address type */
--		return ADDR_LE_DEV_RANDOM;
--	}
--}
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 338878c..020f95b 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3678,15 +3678,19 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
+ 	conn->feat_mask = 0;
  
- 	for (i = 0; i < key_count; i++) {
- 		struct mgmt_ltk_info *key = &cp->keys[i];
--		u8 type;
-+		u8 type, addr_type;
-+
-+		if (key->addr.type == BDADDR_LE_PUBLIC)
-+			addr_type = ADDR_LE_DEV_PUBLIC;
-+		else
-+			addr_type = ADDR_LE_DEV_RANDOM;
- 
- 		if (key->master)
- 			type = HCI_SMP_LTK;
- 		else
- 			type = HCI_SMP_LTK_SLAVE;
- 
--		hci_add_ltk(hdev, &key->addr.bdaddr,
--			    bdaddr_to_le(key->addr.type),
-+		hci_add_ltk(hdev, &key->addr.bdaddr, addr_type,
- 			    type, 0, key->authenticated, key->val,
- 			    key->enc_size, key->ediv, key->rand);
+ 	if (hcon->type == ACL_LINK)
+@@ -1861,7 +1859,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
  	}
+ 
+ 	/* Update source addr of the socket */
+-	bacpy(src, conn->src);
++	bacpy(src, &hdev->bdaddr);
+ 
+ 	l2cap_chan_unlock(chan);
+ 	l2cap_chan_add(conn, chan);
+@@ -3761,7 +3759,9 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+ 	BT_DBG("psm 0x%2.2x scid 0x%4.4x", __le16_to_cpu(psm), scid);
+ 
+ 	/* Check if we have socket listening on psm */
+-	pchan = l2cap_global_chan_by_psm(BT_LISTEN, psm, conn->src, conn->dst);
++	pchan = l2cap_global_chan_by_psm(BT_LISTEN, psm,
++					 &conn->hcon->hdev->bdaddr,
++					 &conn->hcon->dst);
+ 	if (!pchan) {
+ 		result = L2CAP_CR_BAD_PSM;
+ 		goto sendresp;
+@@ -3799,8 +3799,8 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+ 	 */
+ 	conn->hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
+ 
+-	bacpy(&bt_sk(sk)->src, conn->src);
+-	bacpy(&bt_sk(sk)->dst, conn->dst);
++	bacpy(&bt_sk(sk)->src, &conn->hcon->hdev->bdaddr);
++	bacpy(&bt_sk(sk)->dst, &conn->hcon->dst);
+ 	chan->psm  = psm;
+ 	chan->dcid = scid;
+ 	chan->local_amp_id = amp_id;
+@@ -4479,7 +4479,8 @@ static int l2cap_create_channel_req(struct l2cap_conn *conn,
+ 		struct amp_mgr *mgr = conn->hcon->amp_mgr;
+ 		struct hci_conn *hs_hcon;
+ 
+-		hs_hcon = hci_conn_hash_lookup_ba(hdev, AMP_LINK, conn->dst);
++		hs_hcon = hci_conn_hash_lookup_ba(hdev, AMP_LINK,
++						  &conn->hcon->dst);
+ 		if (!hs_hcon) {
+ 			hci_dev_put(hdev);
+ 			return -EBADSLT;
+@@ -4922,7 +4923,7 @@ static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
+ 	 */
+ 	if ((__chan_is_moving(chan) ||
+ 	     chan->move_role != L2CAP_MOVE_ROLE_NONE) &&
+-	    bacmp(conn->src, conn->dst) > 0) {
++	    bacmp(&conn->hcon->hdev->bdaddr, &conn->hcon->dst) > 0) {
+ 		result = L2CAP_MR_COLLISION;
+ 		goto send_move_response;
+ 	}
+@@ -6437,7 +6438,8 @@ static void l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm,
+ 	if (hcon->type != ACL_LINK)
+ 		goto drop;
+ 
+-	chan = l2cap_global_chan_by_psm(0, psm, conn->src, conn->dst);
++	chan = l2cap_global_chan_by_psm(0, psm, &conn->hcon->hdev->bdaddr,
++					&conn->hcon->dst);
+ 	if (!chan)
+ 		goto drop;
+ 
+@@ -6466,7 +6468,8 @@ static void l2cap_att_channel(struct l2cap_conn *conn,
+ 		goto drop;
+ 
+ 	chan = l2cap_global_chan_by_scid(BT_CONNECTED, L2CAP_CID_ATT,
+-					 conn->src, conn->dst);
++					 &conn->hcon->hdev->bdaddr,
++					 &conn->hcon->dst);
+ 	if (!chan)
+ 		goto drop;
+ 
 -- 
 1.8.3.1
 
