@@ -1,64 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/4] Bluetooth: Fix input address type for SMP C1 function
-Date: Sun, 13 Oct 2013 05:24:02 -0700
-Message-Id: <1381667042-46368-4-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 2/4] Bluetooth: Use hci_conn->src address for SMP functions
+Date: Sun, 13 Oct 2013 05:24:00 -0700
+Message-Id: <1381667042-46368-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The smp_c1() so far always assumed public addresses as input for its
-operation. However it should provide actually the source address type
-of the actual connection.
-
-Finally the source address type is tracked in hci_conn->src_type and
-so use that one as input.
+The source address is now stored in hci_conn->src and so use that
+one for SMP functions.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/smp.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+ net/bluetooth/smp.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index f57b209..112e581 100644
+index 06a082ea..f57b209 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -387,13 +387,13 @@ static void confirm_work(struct work_struct *work)
- 	smp->tfm = tfm;
+@@ -388,12 +388,12 @@ static void confirm_work(struct work_struct *work)
  
  	if (conn->hcon->out)
--		ret = smp_c1(tfm, smp->tk, smp->prnd, smp->preq, smp->prsp, 0,
--			     &conn->hcon->src, conn->hcon->dst_type,
--			     &conn->hcon->dst, res);
-+		ret = smp_c1(tfm, smp->tk, smp->prnd, smp->preq, smp->prsp,
-+			     conn->hcon->src_type, &conn->hcon->src,
-+			     conn->hcon->dst_type, &conn->hcon->dst, res);
+ 		ret = smp_c1(tfm, smp->tk, smp->prnd, smp->preq, smp->prsp, 0,
+-			     &conn->hcon->hdev->bdaddr, conn->hcon->dst_type,
++			     &conn->hcon->src, conn->hcon->dst_type,
+ 			     &conn->hcon->dst, res);
  	else
  		ret = smp_c1(tfm, smp->tk, smp->prnd, smp->preq, smp->prsp,
--			     conn->hcon->dst_type, &conn->hcon->dst, 0,
--			     &conn->hcon->src, res);
-+			     conn->hcon->dst_type, &conn->hcon->dst,
-+			     conn->hcon->src_type, &conn->hcon->src, res);
+ 			     conn->hcon->dst_type, &conn->hcon->dst, 0,
+-			     &conn->hcon->hdev->bdaddr, res);
++			     &conn->hcon->src, res);
  	if (ret) {
  		reason = SMP_UNSPECIFIED;
  		goto error;
-@@ -427,11 +427,13 @@ static void random_work(struct work_struct *work)
- 	BT_DBG("conn %p %s", conn, conn->hcon->out ? "master" : "slave");
+@@ -428,12 +428,10 @@ static void random_work(struct work_struct *work)
  
  	if (hcon->out)
--		ret = smp_c1(tfm, smp->tk, smp->rrnd, smp->preq, smp->prsp, 0,
--			     &hcon->src, hcon->dst_type, &hcon->dst, res);
-+		ret = smp_c1(tfm, smp->tk, smp->rrnd, smp->preq, smp->prsp,
-+			     hcon->src_type, &hcon->src,
-+			     hcon->dst_type, &hcon->dst, res);
+ 		ret = smp_c1(tfm, smp->tk, smp->rrnd, smp->preq, smp->prsp, 0,
+-			     &hcon->hdev->bdaddr, hcon->dst_type, &hcon->dst,
+-			     res);
++			     &hcon->src, hcon->dst_type, &hcon->dst, res);
  	else
  		ret = smp_c1(tfm, smp->tk, smp->rrnd, smp->preq, smp->prsp,
--			     hcon->dst_type, &hcon->dst, 0, &hcon->src, res);
-+			     hcon->dst_type, &hcon->dst,
-+			     hcon->src_type, &hcon->src, res);
+-			     hcon->dst_type, &hcon->dst, 0, &hcon->hdev->bdaddr,
+-			     res);
++			     hcon->dst_type, &hcon->dst, 0, &hcon->src, res);
  	if (ret) {
  		reason = SMP_UNSPECIFIED;
  		goto error;
+@@ -1011,7 +1009,7 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
+ 
+ 		/* Just public address */
+ 		memset(&addrinfo, 0, sizeof(addrinfo));
+-		bacpy(&addrinfo.bdaddr, &conn->hcon->hdev->bdaddr);
++		bacpy(&addrinfo.bdaddr, &conn->hcon->src);
+ 
+ 		smp_send_cmd(conn, SMP_CMD_IDENT_ADDR_INFO, sizeof(addrinfo),
+ 								&addrinfo);
 -- 
 1.8.3.1
 
