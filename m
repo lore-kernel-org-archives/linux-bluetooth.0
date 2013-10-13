@@ -1,139 +1,164 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: Store RFCOMM address information in its own socket structure
-Date: Sun, 13 Oct 2013 10:34:02 -0700
-Message-Id: <1381685643-57066-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/3] Bluetooth: Store SCO address information in its own socket structure
+Date: Sun, 13 Oct 2013 10:34:01 -0700
+Message-Id: <1381685643-57066-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The address information of RFCOMM sockets should be stored in its
-own socket structure. Trying to generalize them is not helpful since
+The address information of SCO sockets should be stored in its own
+socket structure. Trying to generalize them is not helpful since
 different transports have different address types.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/rfcomm.h |  2 ++
- net/bluetooth/rfcomm/sock.c    | 28 +++++++++++++++-------------
- 2 files changed, 17 insertions(+), 13 deletions(-)
+ include/net/bluetooth/sco.h |  2 ++
+ net/bluetooth/sco.c         | 36 ++++++++++++++++++------------------
+ 2 files changed, 20 insertions(+), 18 deletions(-)
 
-diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
-index 7afd419..3588f48 100644
---- a/include/net/bluetooth/rfcomm.h
-+++ b/include/net/bluetooth/rfcomm.h
-@@ -300,6 +300,8 @@ struct rfcomm_conninfo {
+diff --git a/include/net/bluetooth/sco.h b/include/net/bluetooth/sco.h
+index 94703a2..2019d1a 100644
+--- a/include/net/bluetooth/sco.h
++++ b/include/net/bluetooth/sco.h
+@@ -69,6 +69,8 @@ struct sco_conn {
  
- struct rfcomm_pinfo {
- 	struct bt_sock bt;
-+	bdaddr_t src;
-+	bdaddr_t dst;
- 	struct rfcomm_dlc   *dlc;
- 	u8     channel;
- 	u8     sec_level;
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index 072938d..df17276 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -87,7 +87,8 @@ static void rfcomm_sk_state_change(struct rfcomm_dlc *d, int err)
- 		parent->sk_data_ready(parent, 0);
- 	} else {
- 		if (d->state == BT_CONNECTED)
--			rfcomm_session_getaddr(d->session, &bt_sk(sk)->src, NULL);
-+			rfcomm_session_getaddr(d->session,
-+					       &rfcomm_pi(sk)->src, NULL);
- 		sk->sk_state_change(sk);
+ struct sco_pinfo {
+ 	struct bt_sock	bt;
++	bdaddr_t	src;
++	bdaddr_t	dst;
+ 	__u32		flags;
+ 	__u16		setting;
+ 	struct sco_conn	*conn;
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 2cc8f42..a92aeba 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -158,9 +158,9 @@ static int sco_connect(struct sock *sk)
+ 	struct hci_dev  *hdev;
+ 	int err, type;
+ 
+-	BT_DBG("%pMR -> %pMR", &bt_sk(sk)->src, &bt_sk(sk)->dst);
++	BT_DBG("%pMR -> %pMR", &sco_pi(sk)->src, &sco_pi(sk)->dst);
+ 
+-	hdev = hci_get_route(&bt_sk(sk)->dst, &bt_sk(sk)->src);
++	hdev = hci_get_route(&sco_pi(sk)->dst, &sco_pi(sk)->src);
+ 	if (!hdev)
+ 		return -EHOSTUNREACH;
+ 
+@@ -177,7 +177,7 @@ static int sco_connect(struct sock *sk)
+ 		goto done;
  	}
  
-@@ -110,7 +111,7 @@ static struct sock *__rfcomm_get_sock_by_addr(u8 channel, bdaddr_t *src)
+-	hcon = hci_connect_sco(hdev, type, &bt_sk(sk)->dst,
++	hcon = hci_connect_sco(hdev, type, &sco_pi(sk)->dst,
+ 			       sco_pi(sk)->setting);
+ 	if (IS_ERR(hcon)) {
+ 		err = PTR_ERR(hcon);
+@@ -192,7 +192,7 @@ static int sco_connect(struct sock *sk)
+ 	}
  
- 	sk_for_each(sk, &rfcomm_sk_list.head) {
- 		if (rfcomm_pi(sk)->channel == channel &&
--				!bacmp(&bt_sk(sk)->src, src))
-+				!bacmp(&rfcomm_pi(sk)->src, src))
+ 	/* Update source addr of the socket */
+-	bacpy(&bt_sk(sk)->src, &hcon->src);
++	bacpy(&sco_pi(sk)->src, &hcon->src);
+ 
+ 	err = sco_chan_add(conn, sk, NULL);
+ 	if (err)
+@@ -266,7 +266,7 @@ static struct sock *__sco_get_sock_listen_by_addr(bdaddr_t *ba)
+ 		if (sk->sk_state != BT_LISTEN)
+ 			continue;
+ 
+-		if (!bacmp(&bt_sk(sk)->src, ba))
++		if (!bacmp(&sco_pi(sk)->src, ba))
+ 			return sk;
+ 	}
+ 
+@@ -287,11 +287,11 @@ static struct sock *sco_get_sock_listen(bdaddr_t *src)
+ 			continue;
+ 
+ 		/* Exact match. */
+-		if (!bacmp(&bt_sk(sk)->src, src))
++		if (!bacmp(&sco_pi(sk)->src, src))
  			break;
+ 
+ 		/* Closest match */
+-		if (!bacmp(&bt_sk(sk)->src, BDADDR_ANY))
++		if (!bacmp(&sco_pi(sk)->src, BDADDR_ANY))
+ 			sk1 = sk;
  	}
  
-@@ -132,11 +133,11 @@ static struct sock *rfcomm_get_sock_by_channel(int state, u8 channel, bdaddr_t *
- 
- 		if (rfcomm_pi(sk)->channel == channel) {
- 			/* Exact match. */
--			if (!bacmp(&bt_sk(sk)->src, src))
-+			if (!bacmp(&rfcomm_pi(sk)->src, src))
- 				break;
- 
- 			/* Closest match */
--			if (!bacmp(&bt_sk(sk)->src, BDADDR_ANY))
-+			if (!bacmp(&rfcomm_pi(sk)->src, BDADDR_ANY))
- 				sk1 = sk;
- 		}
- 	}
-@@ -355,7 +356,7 @@ static int rfcomm_sock_bind(struct socket *sock, struct sockaddr *addr, int addr
- 		err = -EADDRINUSE;
- 	} else {
- 		/* Save source address */
--		bacpy(&bt_sk(sk)->src, &sa->rc_bdaddr);
-+		bacpy(&rfcomm_pi(sk)->src, &sa->rc_bdaddr);
- 		rfcomm_pi(sk)->channel = sa->rc_channel;
- 		sk->sk_state = BT_BOUND;
- 	}
-@@ -393,13 +394,14 @@ static int rfcomm_sock_connect(struct socket *sock, struct sockaddr *addr, int a
+@@ -471,7 +471,7 @@ static int sco_sock_bind(struct socket *sock, struct sockaddr *addr, int addr_le
+ 		goto done;
  	}
  
- 	sk->sk_state = BT_CONNECT;
--	bacpy(&bt_sk(sk)->dst, &sa->rc_bdaddr);
-+	bacpy(&rfcomm_pi(sk)->dst, &sa->rc_bdaddr);
- 	rfcomm_pi(sk)->channel = sa->rc_channel;
+-	bacpy(&bt_sk(sk)->src, &sa->sco_bdaddr);
++	bacpy(&sco_pi(sk)->src, &sa->sco_bdaddr);
  
- 	d->sec_level = rfcomm_pi(sk)->sec_level;
- 	d->role_switch = rfcomm_pi(sk)->role_switch;
+ 	sk->sk_state = BT_BOUND;
  
--	err = rfcomm_dlc_open(d, &bt_sk(sk)->src, &sa->rc_bdaddr, sa->rc_channel);
-+	err = rfcomm_dlc_open(d, &rfcomm_pi(sk)->src, &sa->rc_bdaddr,
-+			      sa->rc_channel);
- 	if (!err)
- 		err = bt_sock_wait_state(sk, BT_CONNECTED,
- 				sock_sndtimeo(sk, flags & O_NONBLOCK));
-@@ -429,7 +431,7 @@ static int rfcomm_sock_listen(struct socket *sock, int backlog)
- 	}
+@@ -501,7 +501,7 @@ static int sco_sock_connect(struct socket *sock, struct sockaddr *addr, int alen
+ 	lock_sock(sk);
  
- 	if (!rfcomm_pi(sk)->channel) {
--		bdaddr_t *src = &bt_sk(sk)->src;
-+		bdaddr_t *src = &rfcomm_pi(sk)->src;
- 		u8 channel;
+ 	/* Set destination address and psm */
+-	bacpy(&bt_sk(sk)->dst, &sa->sco_bdaddr);
++	bacpy(&sco_pi(sk)->dst, &sa->sco_bdaddr);
  
- 		err = -EINVAL;
-@@ -530,9 +532,9 @@ static int rfcomm_sock_getname(struct socket *sock, struct sockaddr *addr, int *
- 	sa->rc_family  = AF_BLUETOOTH;
- 	sa->rc_channel = rfcomm_pi(sk)->channel;
+ 	err = sco_connect(sk);
+ 	if (err)
+@@ -518,7 +518,7 @@ done:
+ static int sco_sock_listen(struct socket *sock, int backlog)
+ {
+ 	struct sock *sk = sock->sk;
+-	bdaddr_t *src = &bt_sk(sk)->src;
++	bdaddr_t *src = &sco_pi(sk)->src;
+ 	int err = 0;
+ 
+ 	BT_DBG("sk %p backlog %d", sk, backlog);
+@@ -622,9 +622,9 @@ static int sco_sock_getname(struct socket *sock, struct sockaddr *addr, int *len
+ 	*len = sizeof(struct sockaddr_sco);
+ 
  	if (peer)
--		bacpy(&sa->rc_bdaddr, &bt_sk(sk)->dst);
-+		bacpy(&sa->rc_bdaddr, &rfcomm_pi(sk)->dst);
+-		bacpy(&sa->sco_bdaddr, &bt_sk(sk)->dst);
++		bacpy(&sa->sco_bdaddr, &sco_pi(sk)->dst);
  	else
--		bacpy(&sa->rc_bdaddr, &bt_sk(sk)->src);
-+		bacpy(&sa->rc_bdaddr, &rfcomm_pi(sk)->src);
+-		bacpy(&sa->sco_bdaddr, &bt_sk(sk)->src);
++		bacpy(&sa->sco_bdaddr, &sco_pi(sk)->src);
  
- 	*len = sizeof(struct sockaddr_rc);
  	return 0;
-@@ -951,8 +953,8 @@ int rfcomm_connect_ind(struct rfcomm_session *s, u8 channel, struct rfcomm_dlc *
- 	bt_sock_reclassify_lock(sk, BTPROTO_RFCOMM);
+ }
+@@ -1013,8 +1013,8 @@ static void sco_conn_ready(struct sco_conn *conn)
  
- 	rfcomm_sock_init(sk, parent);
--	bacpy(&bt_sk(sk)->src, &src);
--	bacpy(&bt_sk(sk)->dst, &dst);
-+	bacpy(&rfcomm_pi(sk)->src, &src);
-+	bacpy(&rfcomm_pi(sk)->dst, &dst);
- 	rfcomm_pi(sk)->channel = channel;
+ 		sco_sock_init(sk, parent);
  
- 	sk->sk_state = BT_CONFIG;
-@@ -979,7 +981,7 @@ static int rfcomm_sock_debugfs_show(struct seq_file *f, void *p)
+-		bacpy(&bt_sk(sk)->src, &conn->hcon->src);
+-		bacpy(&bt_sk(sk)->dst, &conn->hcon->dst);
++		bacpy(&sco_pi(sk)->src, &conn->hcon->src);
++		bacpy(&sco_pi(sk)->dst, &conn->hcon->dst);
  
- 	sk_for_each(sk, &rfcomm_sk_list.head) {
- 		seq_printf(f, "%pMR %pMR %d %d\n",
--			   &bt_sk(sk)->src, &bt_sk(sk)->dst,
-+			   &rfcomm_pi(sk)->src, &rfcomm_pi(sk)->dst,
- 			   sk->sk_state, rfcomm_pi(sk)->channel);
+ 		hci_conn_hold(conn->hcon);
+ 		__sco_chan_add(conn, sk, parent);
+@@ -1047,8 +1047,8 @@ int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 		if (sk->sk_state != BT_LISTEN)
+ 			continue;
+ 
+-		if (!bacmp(&bt_sk(sk)->src, &hdev->bdaddr) ||
+-		    !bacmp(&bt_sk(sk)->src, BDADDR_ANY)) {
++		if (!bacmp(&sco_pi(sk)->src, &hdev->bdaddr) ||
++		    !bacmp(&sco_pi(sk)->src, BDADDR_ANY)) {
+ 			lm |= HCI_LM_ACCEPT;
+ 
+ 			if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags))
+@@ -1107,8 +1107,8 @@ static int sco_debugfs_show(struct seq_file *f, void *p)
+ 	read_lock(&sco_sk_list.lock);
+ 
+ 	sk_for_each(sk, &sco_sk_list.head) {
+-		seq_printf(f, "%pMR %pMR %d\n", &bt_sk(sk)->src,
+-			   &bt_sk(sk)->dst, sk->sk_state);
++		seq_printf(f, "%pMR %pMR %d\n", &sco_pi(sk)->src,
++			   &sco_pi(sk)->dst, sk->sk_state);
  	}
  
+ 	read_unlock(&sco_sk_list.lock);
 -- 
 1.8.3.1
 
