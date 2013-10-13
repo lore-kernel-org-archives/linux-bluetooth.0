@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/4] Bluetooth: Access BNEP session addresses through L2CAP channel
-Date: Sun, 13 Oct 2013 09:49:57 -0700
-Message-Id: <1381682997-26437-4-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 2/4] Bluetooth: Access CMTP session addresses through L2CAP channel
+Date: Sun, 13 Oct 2013 09:49:55 -0700
+Message-Id: <1381682997-26437-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -12,56 +12,37 @@ anymore. They need to be accessed through the L2CAP channel.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/bnep/core.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+ net/bluetooth/cmtp/core.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-index e430b1a..a841d3e 100644
---- a/net/bluetooth/bnep/core.c
-+++ b/net/bluetooth/bnep/core.c
-@@ -32,6 +32,7 @@
- #include <asm/unaligned.h>
+diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
+index e0a6ebf..67fe5e8 100644
+--- a/net/bluetooth/cmtp/core.c
++++ b/net/bluetooth/cmtp/core.c
+@@ -340,20 +340,20 @@ int cmtp_add_connection(struct cmtp_connadd_req *req, struct socket *sock)
  
- #include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/hci_core.h>
+ 	down_write(&cmtp_session_sem);
  
- #include "bnep.h"
-@@ -510,20 +511,13 @@ static int bnep_session(void *arg)
+-	s = __cmtp_get_session(&bt_sk(sock->sk)->dst);
++	s = __cmtp_get_session(&l2cap_pi(sock->sk)->chan->dst);
+ 	if (s && s->state == BT_CONNECTED) {
+ 		err = -EEXIST;
+ 		goto failed;
+ 	}
  
- static struct device *bnep_get_device(struct bnep_session *session)
- {
--	bdaddr_t *src = &bt_sk(session->sock->sk)->src;
--	bdaddr_t *dst = &bt_sk(session->sock->sk)->dst;
--	struct hci_dev *hdev;
- 	struct hci_conn *conn;
+-	bacpy(&session->bdaddr, &bt_sk(sock->sk)->dst);
++	bacpy(&session->bdaddr, &l2cap_pi(sock->sk)->chan->dst);
  
--	hdev = hci_get_route(dst, src);
--	if (!hdev)
-+	conn = l2cap_pi(session->sock->sk)->chan->conn->hcon;
-+	if (!conn)
- 		return NULL;
+ 	session->mtu = min_t(uint, l2cap_pi(sock->sk)->chan->omtu,
+ 					l2cap_pi(sock->sk)->chan->imtu);
  
--	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, dst);
--
--	hci_dev_put(hdev);
--
--	return conn ? &conn->dev : NULL;
-+	return &conn->dev;
- }
+ 	BT_DBG("mtu %d", session->mtu);
  
- static struct device_type bnep_type = {
-@@ -539,8 +533,8 @@ int bnep_add_connection(struct bnep_connadd_req *req, struct socket *sock)
+-	sprintf(session->name, "%pMR", &bt_sk(sock->sk)->dst);
++	sprintf(session->name, "%pMR", &session->bdaddr);
  
- 	BT_DBG("");
- 
--	baswap((void *) dst, &bt_sk(sock->sk)->dst);
--	baswap((void *) src, &bt_sk(sock->sk)->src);
-+	baswap((void *) dst, &l2cap_pi(sock->sk)->chan->dst);
-+	baswap((void *) src, &l2cap_pi(sock->sk)->chan->src);
- 
- 	/* session struct allocated as private part of net_device */
- 	dev = alloc_netdev(sizeof(struct bnep_session),
+ 	session->sock  = sock;
+ 	session->state = BT_CONFIG;
 -- 
 1.8.3.1
 
