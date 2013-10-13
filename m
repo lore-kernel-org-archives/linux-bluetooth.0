@@ -1,90 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/4] Bluetooth: Use hci_conn->src address for L2CAP functions
-Date: Sun, 13 Oct 2013 05:24:01 -0700
-Message-Id: <1381667042-46368-3-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 4/4] Bluetooth: Fix input address type for SMP C1 function
+Date: Sun, 13 Oct 2013 05:24:02 -0700
+Message-Id: <1381667042-46368-4-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The source address is now stored in hci_conn->src and so use that
-one for L2CAP functions.
+The smp_c1() so far always assumed public addresses as input for its
+operation. However it should provide actually the source address type
+of the actual connection.
+
+Finally the source address type is tracked in hci_conn->src_type and
+so use that one as input.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_core.c | 17 +++++++----------
- 1 file changed, 7 insertions(+), 10 deletions(-)
+ net/bluetooth/smp.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 41e2efe..3ed9a2b 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1381,8 +1381,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index f57b209..112e581 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -387,13 +387,13 @@ static void confirm_work(struct work_struct *work)
+ 	smp->tfm = tfm;
  
- 	/* Check if we have socket listening on cid */
- 	pchan = l2cap_global_chan_by_scid(BT_LISTEN, L2CAP_CID_ATT,
--					  &conn->hcon->hdev->bdaddr,
--					  &conn->hcon->dst);
-+					  &conn->hcon->src, &conn->hcon->dst);
- 	if (!pchan)
- 		return;
+ 	if (conn->hcon->out)
+-		ret = smp_c1(tfm, smp->tk, smp->prnd, smp->preq, smp->prsp, 0,
+-			     &conn->hcon->src, conn->hcon->dst_type,
+-			     &conn->hcon->dst, res);
++		ret = smp_c1(tfm, smp->tk, smp->prnd, smp->preq, smp->prsp,
++			     conn->hcon->src_type, &conn->hcon->src,
++			     conn->hcon->dst_type, &conn->hcon->dst, res);
+ 	else
+ 		ret = smp_c1(tfm, smp->tk, smp->prnd, smp->preq, smp->prsp,
+-			     conn->hcon->dst_type, &conn->hcon->dst, 0,
+-			     &conn->hcon->src, res);
++			     conn->hcon->dst_type, &conn->hcon->dst,
++			     conn->hcon->src_type, &conn->hcon->src, res);
+ 	if (ret) {
+ 		reason = SMP_UNSPECIFIED;
+ 		goto error;
+@@ -427,11 +427,13 @@ static void random_work(struct work_struct *work)
+ 	BT_DBG("conn %p %s", conn, conn->hcon->out ? "master" : "slave");
  
-@@ -1400,7 +1399,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
- 
- 	chan->dcid = L2CAP_CID_ATT;
- 
--	bacpy(&bt_sk(chan->sk)->src, &conn->hcon->hdev->bdaddr);
-+	bacpy(&bt_sk(chan->sk)->src, &conn->hcon->src);
- 	bacpy(&bt_sk(chan->sk)->dst, &conn->hcon->dst);
- 
- 	__l2cap_chan_add(conn, chan);
-@@ -3759,8 +3758,7 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
- 	BT_DBG("psm 0x%2.2x scid 0x%4.4x", __le16_to_cpu(psm), scid);
- 
- 	/* Check if we have socket listening on psm */
--	pchan = l2cap_global_chan_by_psm(BT_LISTEN, psm,
--					 &conn->hcon->hdev->bdaddr,
-+	pchan = l2cap_global_chan_by_psm(BT_LISTEN, psm, &conn->hcon->src,
- 					 &conn->hcon->dst);
- 	if (!pchan) {
- 		result = L2CAP_CR_BAD_PSM;
-@@ -3799,7 +3797,7 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
- 	 */
- 	conn->hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
- 
--	bacpy(&bt_sk(sk)->src, &conn->hcon->hdev->bdaddr);
-+	bacpy(&bt_sk(sk)->src, &conn->hcon->src);
- 	bacpy(&bt_sk(sk)->dst, &conn->hcon->dst);
- 	chan->psm  = psm;
- 	chan->dcid = scid;
-@@ -4923,7 +4921,7 @@ static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
- 	 */
- 	if ((__chan_is_moving(chan) ||
- 	     chan->move_role != L2CAP_MOVE_ROLE_NONE) &&
--	    bacmp(&conn->hcon->hdev->bdaddr, &conn->hcon->dst) > 0) {
-+	    bacmp(&conn->hcon->src, &conn->hcon->dst) > 0) {
- 		result = L2CAP_MR_COLLISION;
- 		goto send_move_response;
- 	}
-@@ -6438,7 +6436,7 @@ static void l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm,
- 	if (hcon->type != ACL_LINK)
- 		goto drop;
- 
--	chan = l2cap_global_chan_by_psm(0, psm, &conn->hcon->hdev->bdaddr,
-+	chan = l2cap_global_chan_by_psm(0, psm, &conn->hcon->src,
- 					&conn->hcon->dst);
- 	if (!chan)
- 		goto drop;
-@@ -6468,8 +6466,7 @@ static void l2cap_att_channel(struct l2cap_conn *conn,
- 		goto drop;
- 
- 	chan = l2cap_global_chan_by_scid(BT_CONNECTED, L2CAP_CID_ATT,
--					 &conn->hcon->hdev->bdaddr,
--					 &conn->hcon->dst);
-+					 &conn->hcon->src, &conn->hcon->dst);
- 	if (!chan)
- 		goto drop;
- 
+ 	if (hcon->out)
+-		ret = smp_c1(tfm, smp->tk, smp->rrnd, smp->preq, smp->prsp, 0,
+-			     &hcon->src, hcon->dst_type, &hcon->dst, res);
++		ret = smp_c1(tfm, smp->tk, smp->rrnd, smp->preq, smp->prsp,
++			     hcon->src_type, &hcon->src,
++			     hcon->dst_type, &hcon->dst, res);
+ 	else
+ 		ret = smp_c1(tfm, smp->tk, smp->rrnd, smp->preq, smp->prsp,
+-			     hcon->dst_type, &hcon->dst, 0, &hcon->src, res);
++			     hcon->dst_type, &hcon->dst,
++			     hcon->src_type, &hcon->src, res);
+ 	if (ret) {
+ 		reason = SMP_UNSPECIFIED;
+ 		goto error;
 -- 
 1.8.3.1
 
