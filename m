@@ -1,151 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix coding style violations in SMP handling
-Date: Sun, 13 Oct 2013 05:43:25 -0700
-Message-Id: <1381668205-52698-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 3/4] Bluetooth: Use hci_conn->src address for L2CAP functions
+Date: Sun, 13 Oct 2013 05:24:01 -0700
+Message-Id: <1381667042-46368-3-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The SMP source code has a few coding style violations. Fix them up
-all at once. No actual code has changed.
+The source address is now stored in hci_conn->src and so use that
+one for L2CAP functions.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/smp.c | 35 +++++++++++++++++------------------
- 1 file changed, 17 insertions(+), 18 deletions(-)
+ net/bluetooth/l2cap_core.c | 17 +++++++----------
+ 1 file changed, 7 insertions(+), 10 deletions(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 112e581..463e50c 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -86,8 +86,8 @@ static int smp_e(struct crypto_blkcipher *tfm, const u8 *k, u8 *r)
- }
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 41e2efe..3ed9a2b 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1381,8 +1381,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
  
- static int smp_c1(struct crypto_blkcipher *tfm, u8 k[16], u8 r[16],
--		u8 preq[7], u8 pres[7], u8 _iat, bdaddr_t *ia,
--		u8 _rat, bdaddr_t *ra, u8 res[16])
-+		  u8 preq[7], u8 pres[7], u8 _iat, bdaddr_t *ia,
-+		  u8 _rat, bdaddr_t *ra, u8 res[16])
- {
- 	u8 p1[16], p2[16];
- 	int err;
-@@ -127,8 +127,8 @@ static int smp_c1(struct crypto_blkcipher *tfm, u8 k[16], u8 r[16],
- 	return err;
- }
+ 	/* Check if we have socket listening on cid */
+ 	pchan = l2cap_global_chan_by_scid(BT_LISTEN, L2CAP_CID_ATT,
+-					  &conn->hcon->hdev->bdaddr,
+-					  &conn->hcon->dst);
++					  &conn->hcon->src, &conn->hcon->dst);
+ 	if (!pchan)
+ 		return;
  
--static int smp_s1(struct crypto_blkcipher *tfm, u8 k[16],
--			u8 r1[16], u8 r2[16], u8 _r[16])
-+static int smp_s1(struct crypto_blkcipher *tfm, u8 k[16], u8 r1[16],
-+		  u8 r2[16], u8 _r[16])
- {
- 	int err;
+@@ -1400,7 +1399,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
  
-@@ -151,7 +151,7 @@ static int smp_rand(u8 *buf)
- }
+ 	chan->dcid = L2CAP_CID_ATT;
  
- static struct sk_buff *smp_build_cmd(struct l2cap_conn *conn, u8 code,
--						u16 dlen, void *data)
-+				     u16 dlen, void *data)
- {
- 	struct sk_buff *skb;
- 	struct l2cap_hdr *lh;
-@@ -214,9 +214,8 @@ static __u8 seclevel_to_authreq(__u8 sec_level)
- }
+-	bacpy(&bt_sk(chan->sk)->src, &conn->hcon->hdev->bdaddr);
++	bacpy(&bt_sk(chan->sk)->src, &conn->hcon->src);
+ 	bacpy(&bt_sk(chan->sk)->dst, &conn->hcon->dst);
  
- static void build_pairing_cmd(struct l2cap_conn *conn,
--				struct smp_cmd_pairing *req,
--				struct smp_cmd_pairing *rsp,
--				__u8 authreq)
-+			      struct smp_cmd_pairing *req,
-+			      struct smp_cmd_pairing *rsp, __u8 authreq)
- {
- 	u8 dist_keys = 0;
+ 	__l2cap_chan_add(conn, chan);
+@@ -3759,8 +3758,7 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+ 	BT_DBG("psm 0x%2.2x scid 0x%4.4x", __le16_to_cpu(psm), scid);
  
-@@ -250,7 +249,7 @@ static u8 check_enc_key_size(struct l2cap_conn *conn, __u8 max_key_size)
- 	struct smp_chan *smp = conn->smp_chan;
+ 	/* Check if we have socket listening on psm */
+-	pchan = l2cap_global_chan_by_psm(BT_LISTEN, psm,
+-					 &conn->hcon->hdev->bdaddr,
++	pchan = l2cap_global_chan_by_psm(BT_LISTEN, psm, &conn->hcon->src,
+ 					 &conn->hcon->dst);
+ 	if (!pchan) {
+ 		result = L2CAP_CR_BAD_PSM;
+@@ -3799,7 +3797,7 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+ 	 */
+ 	conn->hcon->disc_timeout = HCI_DISCONN_TIMEOUT;
  
- 	if ((max_key_size > SMP_MAX_ENC_KEY_SIZE) ||
--			(max_key_size < SMP_MIN_ENC_KEY_SIZE))
-+	    (max_key_size < SMP_MIN_ENC_KEY_SIZE))
- 		return SMP_ENC_KEY_SIZE;
- 
- 	smp->enc_key_size = max_key_size;
-@@ -264,7 +263,7 @@ static void smp_failure(struct l2cap_conn *conn, u8 reason, u8 send)
- 
- 	if (send)
- 		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, sizeof(reason),
--								&reason);
-+			     &reason);
- 
- 	clear_bit(HCI_CONN_ENCRYPT_PEND, &hcon->flags);
- 	mgmt_auth_failed(hcon->hdev, &hcon->dst, hcon->type, hcon->dst_type,
-@@ -310,8 +309,8 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
- 	/* If either side has unknown io_caps, use JUST WORKS */
- 	/* Otherwise, look up method from the table */
- 	if (!(auth & SMP_AUTH_MITM) ||
--			local_io > SMP_IO_KEYBOARD_DISPLAY ||
--			remote_io > SMP_IO_KEYBOARD_DISPLAY)
-+	    local_io > SMP_IO_KEYBOARD_DISPLAY ||
-+	    remote_io > SMP_IO_KEYBOARD_DISPLAY)
- 		method = JUST_WORKS;
- 	else
- 		method = gen_method[remote_io][local_io];
-@@ -481,7 +480,7 @@ static void random_work(struct work_struct *work)
- 		swap128(key, stk);
- 
- 		memset(stk + smp->enc_key_size, 0,
--				SMP_MAX_ENC_KEY_SIZE - smp->enc_key_size);
-+		       SMP_MAX_ENC_KEY_SIZE - smp->enc_key_size);
- 
- 		hci_add_ltk(hcon->hdev, &hcon->dst, hcon->dst_type,
- 			    HCI_SMP_STK_SLAVE, 0, 0, stk, smp->enc_key_size,
-@@ -498,7 +497,7 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
- {
- 	struct smp_chan *smp;
- 
--	smp = kzalloc(sizeof(struct smp_chan), GFP_ATOMIC);
-+	smp = kzalloc(sizeof(*smp), GFP_ATOMIC);
- 	if (!smp)
- 		return NULL;
- 
-@@ -653,7 +652,7 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
- 	memcpy(&smp->prsp[1], rsp, sizeof(*rsp));
- 
- 	if ((req->auth_req & SMP_AUTH_BONDING) &&
--			(rsp->auth_req & SMP_AUTH_BONDING))
-+	    (rsp->auth_req & SMP_AUTH_BONDING))
- 		auth = SMP_AUTH_BONDING;
- 
- 	auth |= (req->auth_req | rsp->auth_req) & SMP_AUTH_MITM;
-@@ -688,7 +687,7 @@ static u8 smp_cmd_pairing_confirm(struct l2cap_conn *conn, struct sk_buff *skb)
- 
- 		swap128(smp->prnd, random);
- 		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(random),
--								random);
-+			     random);
- 	} else if (test_bit(SMP_FLAG_TK_VALID, &smp->smp_flags)) {
- 		queue_work(hdev->workqueue, &smp->confirm);
- 	} else {
-@@ -732,8 +731,8 @@ static u8 smp_ltk_encrypt(struct l2cap_conn *conn, u8 sec_level)
- 	hcon->enc_key_size = key->enc_size;
- 
- 	return 1;
--
- }
-+
- static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
- {
- 	struct smp_cmd_security_req *rp = (void *) skb->data;
-@@ -1014,7 +1013,7 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
- 		bacpy(&addrinfo.bdaddr, &conn->hcon->src);
- 
- 		smp_send_cmd(conn, SMP_CMD_IDENT_ADDR_INFO, sizeof(addrinfo),
--								&addrinfo);
-+			     &addrinfo);
- 
- 		*keydist &= ~SMP_DIST_ID_KEY;
+-	bacpy(&bt_sk(sk)->src, &conn->hcon->hdev->bdaddr);
++	bacpy(&bt_sk(sk)->src, &conn->hcon->src);
+ 	bacpy(&bt_sk(sk)->dst, &conn->hcon->dst);
+ 	chan->psm  = psm;
+ 	chan->dcid = scid;
+@@ -4923,7 +4921,7 @@ static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
+ 	 */
+ 	if ((__chan_is_moving(chan) ||
+ 	     chan->move_role != L2CAP_MOVE_ROLE_NONE) &&
+-	    bacmp(&conn->hcon->hdev->bdaddr, &conn->hcon->dst) > 0) {
++	    bacmp(&conn->hcon->src, &conn->hcon->dst) > 0) {
+ 		result = L2CAP_MR_COLLISION;
+ 		goto send_move_response;
  	}
+@@ -6438,7 +6436,7 @@ static void l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm,
+ 	if (hcon->type != ACL_LINK)
+ 		goto drop;
+ 
+-	chan = l2cap_global_chan_by_psm(0, psm, &conn->hcon->hdev->bdaddr,
++	chan = l2cap_global_chan_by_psm(0, psm, &conn->hcon->src,
+ 					&conn->hcon->dst);
+ 	if (!chan)
+ 		goto drop;
+@@ -6468,8 +6466,7 @@ static void l2cap_att_channel(struct l2cap_conn *conn,
+ 		goto drop;
+ 
+ 	chan = l2cap_global_chan_by_scid(BT_CONNECTED, L2CAP_CID_ATT,
+-					 &conn->hcon->hdev->bdaddr,
+-					 &conn->hcon->dst);
++					 &conn->hcon->src, &conn->hcon->dst);
+ 	if (!chan)
+ 		goto drop;
+ 
 -- 
 1.8.3.1
 
