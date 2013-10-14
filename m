@@ -1,47 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Reject invalid bdaddr types for sockets
-Date: Mon, 14 Oct 2013 21:17:52 +0300
-Message-Id: <1381774673-14150-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 3/4] Bluetooth: Fix updating scan mode in set_bredr()
+Date: Mon, 14 Oct 2013 21:15:26 +0300
+Message-Id: <1381774527-13746-4-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1381774527-13746-1-git-send-email-johan.hedberg@gmail.com>
+References: <1381774527-13746-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-We need to verify that the bdaddr type passed to connect() and bind() is
-within the set of valid values. If it is not we need to cleanly fail
-with EINVAL.
+Now that the connectable setting is also applicable for the LE side it's
+possible that the HCI_CONNECTABLE flag is already set when changing the
+BR/EDR setting from false to true while the controller is powered. In
+this situation we need to update the BR/EDR scan mode to reflect the
+setting. Additionally, since HCI_CONNECTABLE also applies to LE we must
+not clear the HCI_CONNECTABLE flag when disabling bredr.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_sock.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ net/bluetooth/mgmt.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index f1b462f..982915d 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -69,6 +69,9 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 	if (la.l2_cid && la.l2_psm)
- 		return -EINVAL;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 48aa239..0bad451 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3640,7 +3640,6 @@ static int set_bredr(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
  
-+	if (!bdaddr_type_is_valid(la.l2_bdaddr_type))
-+		return -EINVAL;
+ 	if (!hdev_is_powered(hdev)) {
+ 		if (!cp->val) {
+-			clear_bit(HCI_CONNECTABLE, &hdev->dev_flags);
+ 			clear_bit(HCI_DISCOVERABLE, &hdev->dev_flags);
+ 			clear_bit(HCI_SSP_ENABLED, &hdev->dev_flags);
+ 			clear_bit(HCI_LINK_SECURITY, &hdev->dev_flags);
+@@ -3683,7 +3682,12 @@ static int set_bredr(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ 	set_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
+ 
+ 	hci_req_init(&req, hdev);
 +
- 	lock_sock(sk);
- 
- 	if (sk->sk_state != BT_OPEN) {
-@@ -144,6 +147,9 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
- 	if (la.l2_cid && la.l2_psm)
- 		return -EINVAL;
- 
-+	if (!bdaddr_type_is_valid(la.l2_bdaddr_type))
-+		return -EINVAL;
++	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
++		set_bredr_scan(&req);
 +
- 	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
- 				 &la.l2_bdaddr, la.l2_bdaddr_type);
- 	if (err)
+ 	hci_update_ad(&req);
++
+ 	err = hci_req_run(&req, set_bredr_complete);
+ 	if (err < 0)
+ 		mgmt_pending_remove(cmd);
 -- 
 1.8.3.1
 
