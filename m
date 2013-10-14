@@ -1,38 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Check that scan window is smaller or equal than scan interval
-Date: Mon, 14 Oct 2013 09:55:32 -0700
-Message-Id: <1381769732-19707-1-git-send-email-marcel@holtmann.org>
+Date: Mon, 14 Oct 2013 18:30:55 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] android: Add initial Android Bluetooth HAL protocol
+ API doc
+Message-ID: <20131014153055.GB26449@x220.p-661hnu-f1>
+References: <1381737959-9138-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1381737959-9138-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The scan window parameter for connection establishment and passive
-scanning needs to be smaller or equal than the scan interval.
+Hi Szymon,
 
-Instead of waiting for a controller to reject these values later on,
-just reject them right away.
+On Mon, Oct 14, 2013, Szymon Janc wrote:
+> This IPC is used to communicate Android BlueZ daemon and HAL.
+> 
+> Currently specified are BT HAL "bluetooth" (BT_HARDWARE_MODULE_ID)
+> and following profile HALs:
+>   "socket"    (BT_PROFILE_SOCKETS_ID)
+>   "hidhost"   (BT_PROFILE_HIDHOST_ID)
+>   "pan"       (BT_PROFILE_PAN_ID)
+>   "handsfree" (BT_PROFILE_HANDSFREE_ID)
+>   "ad2p"      (BT_PROFILE_ADVANCED_AUDIO_ID)
+>   "health"    (BT_PROFILE_HEALTH_ID)
+> ---
+>  android/hal-ipc-api.txt | 1247 +++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 1247 insertions(+)
+>  create mode 100644 android/hal-ipc-api.txt
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/mgmt.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Both patches have been applied. Thanks.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index caa552c..40c85ed 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3423,6 +3423,10 @@ static int set_scan_params(struct sock *sk, struct hci_dev *hdev,
- 		return cmd_status(sk, hdev->id, MGMT_OP_SET_SCAN_PARAMS,
- 				  MGMT_STATUS_INVALID_PARAMS);
- 
-+	if (window > interval)
-+		return cmd_status(sk, hdev->id, MGMT_OP_SET_SCAN_PARAMS,
-+				  MGMT_STATUS_INVALID_PARAMS);
-+
- 	hci_dev_lock(hdev);
- 
- 	hdev->le_scan_interval = interval;
--- 
-1.8.3.1
-
+Johan
