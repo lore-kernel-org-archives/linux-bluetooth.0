@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/5] Bluetooth: Move static advertising functions to avoid forward declarations
-Date: Mon, 14 Oct 2013 16:20:06 +0300
-Message-Id: <1381756807-14900-5-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/5] Bluetooth: Move move logic into set_connectable complete callback
+Date: Mon, 14 Oct 2013 16:20:04 +0300
+Message-Id: <1381756807-14900-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1381756807-14900-1-git-send-email-johan.hedberg@gmail.com>
 References: <1381756807-14900-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,88 +11,77 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-These functions will soon be used by set_connectable() so move them to a
-location in mgmt.c that doesn't require forward declarations.
+This patch moves the responsibility of setting/clearing the
+HCI_CONNECTABLE flag to the request completion callback of the Set
+Connectable command. This will allow us to cleanly add support for LE
+Advertising hooks in later patches.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c | 56 ++++++++++++++++++++++++++--------------------------
- 1 file changed, 28 insertions(+), 28 deletions(-)
+ net/bluetooth/mgmt.c | 23 +++++++++++++++++++----
+ 1 file changed, 19 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a5c015c..caa552c 100644
+index cfd8d44..8dcea77 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1072,6 +1072,34 @@ static void write_fast_connectable(struct hci_request *req, bool enable)
- 		hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
- }
- 
-+static void enable_advertising(struct hci_request *req)
-+{
-+	struct hci_dev *hdev = req->hdev;
-+	struct hci_cp_le_set_adv_param cp;
-+	u8 enable = 0x01;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.min_interval = __constant_cpu_to_le16(0x0800);
-+	cp.max_interval = __constant_cpu_to_le16(0x0800);
-+	cp.type = LE_ADV_IND;
-+	if (bacmp(&hdev->bdaddr, BDADDR_ANY))
-+		cp.own_address_type = ADDR_LE_DEV_PUBLIC;
-+	else
-+		cp.own_address_type = ADDR_LE_DEV_RANDOM;
-+	cp.channel_map = 0x07;
-+
-+	hci_req_add(req, HCI_OP_LE_SET_ADV_PARAM, sizeof(cp), &cp);
-+
-+	hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable), &enable);
-+}
-+
-+static void disable_advertising(struct hci_request *req)
-+{
-+	u8 enable = 0x00;
-+
-+	hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable), &enable);
-+}
-+
+@@ -1075,6 +1075,8 @@ static void write_fast_connectable(struct hci_request *req, bool enable)
  static void set_connectable_complete(struct hci_dev *hdev, u8 status)
  {
  	struct pending_cmd *cmd;
-@@ -1440,34 +1468,6 @@ unlock:
++	struct mgmt_mode *cp;
++	bool changed;
+ 
+ 	BT_DBG("status 0x%02x", status);
+ 
+@@ -1084,8 +1086,17 @@ static void set_connectable_complete(struct hci_dev *hdev, u8 status)
+ 	if (!cmd)
+ 		goto unlock;
+ 
++	cp = cmd->param;
++	if (cp->val)
++		changed = !test_and_set_bit(HCI_CONNECTABLE, &hdev->dev_flags);
++	else
++		changed = test_and_clear_bit(HCI_CONNECTABLE, &hdev->dev_flags);
++
+ 	send_settings_rsp(cmd->sk, MGMT_OP_SET_CONNECTABLE, hdev);
+ 
++	if (changed)
++		new_settings(hdev, cmd->sk);
++
+ 	mgmt_pending_remove(cmd);
+ 
+ unlock:
+@@ -4053,10 +4064,16 @@ int mgmt_discoverable(struct hci_dev *hdev, u8 discoverable)
+ 
+ int mgmt_connectable(struct hci_dev *hdev, u8 connectable)
+ {
+-	struct pending_cmd *cmd;
+ 	bool changed = false;
+ 	int err = 0;
+ 
++	/* Nothing needed here if there's a pending command since that
++	 * commands request completion callback takes care of everything
++	 * necessary.
++	 */
++	if (mgmt_pending_find(MGMT_OP_SET_CONNECTABLE, hdev))
++		return 0;
++
+ 	if (connectable) {
+ 		if (!test_and_set_bit(HCI_CONNECTABLE, &hdev->dev_flags))
+ 			changed = true;
+@@ -4065,10 +4082,8 @@ int mgmt_connectable(struct hci_dev *hdev, u8 connectable)
+ 			changed = true;
+ 	}
+ 
+-	cmd = mgmt_pending_find(MGMT_OP_SET_CONNECTABLE, hdev);
+-
+ 	if (changed)
+-		err = new_settings(hdev, cmd ? cmd->sk : NULL);
++		err = new_settings(hdev, NULL);
+ 
  	return err;
  }
- 
--static void enable_advertising(struct hci_request *req)
--{
--	struct hci_dev *hdev = req->hdev;
--	struct hci_cp_le_set_adv_param cp;
--	u8 enable = 0x01;
--
--	memset(&cp, 0, sizeof(cp));
--	cp.min_interval = __constant_cpu_to_le16(0x0800);
--	cp.max_interval = __constant_cpu_to_le16(0x0800);
--	cp.type = LE_ADV_IND;
--	if (bacmp(&hdev->bdaddr, BDADDR_ANY))
--		cp.own_address_type = ADDR_LE_DEV_PUBLIC;
--	else
--		cp.own_address_type = ADDR_LE_DEV_RANDOM;
--	cp.channel_map = 0x07;
--
--	hci_req_add(req, HCI_OP_LE_SET_ADV_PARAM, sizeof(cp), &cp);
--
--	hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable), &enable);
--}
--
--static void disable_advertising(struct hci_request *req)
--{
--	u8 enable = 0x00;
--
--	hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable), &enable);
--}
--
- static void le_enable_complete(struct hci_dev *hdev, u8 status)
- {
- 	struct cmd_lookup match = { NULL, hdev };
 -- 
 1.8.3.1
 
