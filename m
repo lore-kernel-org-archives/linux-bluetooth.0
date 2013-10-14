@@ -1,50 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/5] Bluetooth: Add missing error handling for Set Connectable
-Date: Mon, 14 Oct 2013 16:20:05 +0300
-Message-Id: <1381756807-14900-4-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1381756807-14900-1-git-send-email-johan.hedberg@gmail.com>
-References: <1381756807-14900-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 0/5] Bluetooth: Clean up Set Connectable related code
+Date: Mon, 14 Oct 2013 16:20:02 +0300
+Message-Id: <1381756807-14900-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-If the HCI commands related to the Set Connectable command fail we will
-get a non-zero status in the request completion callback. In such a case
-we must respond with the appropriate command status message to user space.
+This is a set of cleanup patches (and one fix) split out from my earlier
+set. I'm hoping to get these in first to make it easier to understand
+how the code works and what the possible ways of adding LE Advertising
+hooks are.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+The main thing with these patches is that we make a clear separation of
+what happens if someone uses a raw HCI socket compared to sending a Set
+Connectable command using the management interface. Now both cases have
+their clear functions for handling the HCI_CONNECTABLE flag and the
+necessary mgmt events.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 8dcea77..a5c015c 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1086,6 +1086,12 @@ static void set_connectable_complete(struct hci_dev *hdev, u8 status)
- 	if (!cmd)
- 		goto unlock;
- 
-+	if (status) {
-+		u8 mgmt_err = mgmt_status(status);
-+		cmd_status(cmd->sk, cmd->index, cmd->opcode, mgmt_err);
-+		goto remove_cmd;
-+	}
-+
- 	cp = cmd->param;
- 	if (cp->val)
- 		changed = !test_and_set_bit(HCI_CONNECTABLE, &hdev->dev_flags);
-@@ -1097,6 +1103,7 @@ static void set_connectable_complete(struct hci_dev *hdev, u8 status)
- 	if (changed)
- 		new_settings(hdev, cmd->sk);
- 
-+remove_cmd:
- 	mgmt_pending_remove(cmd);
- 
- unlock:
--- 
-1.8.3.1
+----------------------------------------------------------------
+Johan Hedberg (5):
+      Bluetooth: Reorganize set_connectable HCI command sending
+      Bluetooth: Move move logic into set_connectable complete callback
+      Bluetooth: Add missing error handling for Set Connectable
+      Bluetooth: Move static advertising functions to avoid forward declarations
+      Bluetooth: Fix updating advertising data needlessly
+
+ net/bluetooth/hci_event.c |   2 +-
+ net/bluetooth/mgmt.c      | 122 ++++++++++++++++++++++++++++------------------
+ 2 files changed, 75 insertions(+), 49 deletions(-)
 
