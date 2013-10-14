@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Subject: [PATCH 2/5] android: Add line editing to haltest
-Date: Mon, 14 Oct 2013 11:59:51 +0200
-Message-ID: <1381744794-17994-3-git-send-email-jerzy.kasenberg@tieto.com>
+Subject: [PATCH 3/5] android: Add history to line editor in haltest
+Date: Mon, 14 Oct 2013 11:59:52 +0200
+Message-ID: <1381744794-17994-4-git-send-email-jerzy.kasenberg@tieto.com>
 In-Reply-To: <1381744794-17994-1-git-send-email-jerzy.kasenberg@tieto.com>
 References: <1381744794-17994-1-git-send-email-jerzy.kasenberg@tieto.com>
 MIME-Version: 1.0
@@ -12,605 +12,323 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Android does not have readline.
-This patch allows to edit command line.
+Added simple history to editor to save time.
 ---
  android/Android.mk            |    1 +
- android/hal_client/haltest.c  |   39 +++-
- android/hal_client/terminal.c |  434 +++++++++++++++++++++++++++++++++++++++++
- android/hal_client/terminal.h |   65 ++++++
- 4 files changed, 536 insertions(+), 3 deletions(-)
- create mode 100644 android/hal_client/terminal.c
- create mode 100644 android/hal_client/terminal.h
+ android/hal_client/history.c  |  104 ++++++++++++++++++++++++++++++++++++++++
+ android/hal_client/history.h  |   27 +++++++++++
+ android/hal_client/terminal.c |  106 +++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 238 insertions(+)
+ create mode 100644 android/hal_client/history.c
+ create mode 100644 android/hal_client/history.h
 
 diff --git a/android/Android.mk b/android/Android.mk
-index c6bab81..c75187d 100644
+index c75187d..b26a766 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -39,6 +39,7 @@ include $(CLEAR_VARS)
- LOCAL_SRC_FILES := \
+@@ -40,6 +40,7 @@ LOCAL_SRC_FILES := \
  	hal_client/haltest.c \
  	hal_client/pollhandler.c \
-+	hal_client/terminal.c \
+ 	hal_client/terminal.c \
++	hal_client/history.c \
  
  LOCAL_SHARED_LIBRARIES := libhardware
  
-diff --git a/android/hal_client/haltest.c b/android/hal_client/haltest.c
-index 8a733a2..a618cf0 100644
---- a/android/hal_client/haltest.c
-+++ b/android/hal_client/haltest.c
-@@ -25,8 +25,40 @@
- #include <poll.h>
- #include <unistd.h>
- 
-+#include "terminal.h"
- #include "pollhandler.h"
- 
+diff --git a/android/hal_client/history.c b/android/hal_client/history.c
+new file mode 100644
+index 0000000..71c1e73
+--- /dev/null
++++ b/android/hal_client/history.c
+@@ -0,0 +1,104 @@
 +/*
-+ * This function changes input parameter line_buffer so it has
-+ * null termination after each token (due to strtok)
-+ * Output argv is filled with pointers to arguments
-+ * returns number of tokens parsed - argc
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
 + */
-+static int command_line_to_argv(char *line_buffer,
-+				char *argv[], int argv_size)
-+{
-+	static const char *token_breaks = "\r\n\t ";
-+	char *token;
-+	int argc = 0;
 +
-+	token = strtok(line_buffer, token_breaks);
-+	while (token != NULL && argc < (int)argv_size) {
-+		argv[argc++] = token;
-+		token = strtok(NULL, token_breaks);
++#include <stdlib.h>
++#include <string.h>
++#include <stdio.h>
++#include <ctype.h>
++
++#include "history.h"
++
++/*
++ * Very simple history storage for easy usage of tool
++ */
++
++#define HISTORY_DEPTH 20
++#define LINE_SIZE 100
++static char lines[HISTORY_DEPTH][LINE_SIZE];
++static int last_line = 0;
++static int history_size = 0;
++
++/* TODO: Storing history not implemented yet */
++void history_store(const char *filename)
++{
++}
++
++/* Restoring history from file */
++void history_restore(const char *filename)
++{
++	char line[1000];
++	FILE *f = fopen(filename, "rt");
++
++	if (f == NULL)
++		return;
++
++	for (;;) {
++		if (fgets(line, 1000, f) != NULL) {
++			int l = strlen(line);
++			while (l > 0 && isspace(line[--l]))
++				line[l] = 0;
++			if (l > 0)
++				history_add_line(line);
++		} else
++			break;
 +	}
-+
-+	return argc;
++	fclose(f);
 +}
 +
-+static void process_line(char *line_buffer)
++/* Add new line to history buffer */
++void history_add_line(const char *line)
 +{
-+	char *argv[10];
-+	int argc;
++	if (line == NULL || strlen(line) == 0)
++		return;
 +
-+	argc = command_line_to_argv(line_buffer, argv, 10);
++	if (strcmp(line, lines[last_line]) == 0)
++		return;
 +
-+	/* TODO: process command line */
++	last_line = (last_line + 1) % HISTORY_DEPTH;
++	strncpy(&lines[last_line][0], line, LINE_SIZE - 1);
++	if (history_size < HISTORY_DEPTH)
++		history_size++;
 +}
++
++/*
++ * Get n-th line from history
++ * 0 - means latest
++ * -1 - means oldest
++ * return -1 if there is no such line
++ */
++int history_get_line(int n, char *buf, int buf_size)
++{
++	if (n == -1)
++		n = history_size - 1;
++
++	if (n >= history_size || buf_size == 0 || n < 0)
++		return -1;
++
++	strncpy(buf,
++		&lines[(HISTORY_DEPTH + last_line - n) % HISTORY_DEPTH][0],
++		buf_size - 1);
++	buf[buf_size - 1] = 0;
++
++	return n;
++}
++
+diff --git a/android/hal_client/history.h b/android/hal_client/history.h
+new file mode 100644
+index 0000000..981f81e
+--- /dev/null
++++ b/android/hal_client/history.h
+@@ -0,0 +1,27 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++void history_store(const char *filename);
++void history_restore(const char *filename);
++void history_add_line(const char *line);
++int history_get_line(int n, char *buf, int buf_size);
+diff --git a/android/hal_client/terminal.c b/android/hal_client/terminal.c
+index e48a413..837e459 100644
+--- a/android/hal_client/terminal.c
++++ b/android/hal_client/terminal.c
+@@ -28,6 +28,7 @@
+ #include <termios.h>
  
- /* called when there is something on stdin */
- static void stdin_handler(struct pollfd *pollfd)
-@@ -39,15 +71,16 @@ static void stdin_handler(struct pollfd *pollfd)
- 		if (count > 0) {
- 			int i;
+ #include "terminal.h"
++#include "history.h"
  
--			for (i = 0; i < count; ++i) {
--				/* TODO: process input */
--			}
-+			for (i = 0; i < count; ++i)
-+				terminal_process_char(buf[i], process_line);
- 		}
- 	}
+ /*
+  * Character sequences recognized by code in this file
+@@ -113,6 +114,9 @@ static int line_buf_ix = 0;
+ /* current length of input line */
+ static int line_len = 0;
+ 
++/* line index used for fetching lines from history */
++static int line_index = 0;
++
+ /*
+  * Moves cursor to right or left
+  *
+@@ -193,6 +197,86 @@ int terminal_vprint(const char *format, va_list args)
  }
  
- int main(int argc, char **argv)
- {
-+	terminal_setup();
-+
- 	/* Register command line handler */
- 	poll_register_fd(0, POLLIN, stdin_handler);
- 
-diff --git a/android/hal_client/terminal.c b/android/hal_client/terminal.c
-new file mode 100644
-index 0000000..e48a413
---- /dev/null
-+++ b/android/hal_client/terminal.c
-@@ -0,0 +1,434 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Intel Corporation
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
+ /*
++ * Call this when text in line_buf was changed
++ * and line needs to be redrawn
 + */
-+
-+#include <stdio.h>
-+#include <string.h>
-+#include <ctype.h>
-+#include <stdbool.h>
-+#include <termios.h>
-+
-+#include "terminal.h"
-+
-+/*
-+ * Character sequences recognized by code in this file
-+ * Leading ESC 0x1B is not included
-+ */
-+#define SEQ_INSERT "[2~"
-+#define SEQ_DELETE "[3~"
-+#define SEQ_HOME   "OH"
-+#define SEQ_END    "OF"
-+#define SEQ_PGUP   "[5~"
-+#define SEQ_PGDOWN "[6~"
-+#define SEQ_LEFT   "[D"
-+#define SEQ_RIGHT  "[C"
-+#define SEQ_UP     "[A"
-+#define SEQ_DOWN   "[B"
-+#define SEQ_STAB   "[Z"
-+#define SEQ_M_n    "n"
-+#define SEQ_M_p    "p"
-+#define SEQ_CLEFT  "[1;5D"
-+#define SEQ_CRIGHT "[1;5C"
-+#define SEQ_CUP    "[1;5A"
-+#define SEQ_CDOWN  "[1;5B"
-+#define SEQ_SLEFT  "[1;2D"
-+#define SEQ_SRIGHT "[1;2C"
-+#define SEQ_SUP    "[1;2A"
-+#define SEQ_SDOWN  "[1;2B"
-+#define SEQ_MLEFT  "[1;3D"
-+#define SEQ_MRIGHT "[1;3C"
-+#define SEQ_MUP    "[1;3A"
-+#define SEQ_MDOWN  "[1;3B"
-+
-+#define KEY_SEQUENCE(k) { KEY_##k, SEQ_##k }
-+struct ansii_sequence {
-+	int code;
-+	const char *sequence;
-+};
-+
-+/* Table connects single int key codes with character sequences */
-+static const struct ansii_sequence ansii_sequnces[] = {
-+	KEY_SEQUENCE(INSERT),
-+	KEY_SEQUENCE(DELETE),
-+	KEY_SEQUENCE(HOME),
-+	KEY_SEQUENCE(END),
-+	KEY_SEQUENCE(PGUP),
-+	KEY_SEQUENCE(PGDOWN),
-+	KEY_SEQUENCE(LEFT),
-+	KEY_SEQUENCE(RIGHT),
-+	KEY_SEQUENCE(UP),
-+	KEY_SEQUENCE(DOWN),
-+	KEY_SEQUENCE(CLEFT),
-+	KEY_SEQUENCE(CRIGHT),
-+	KEY_SEQUENCE(CUP),
-+	KEY_SEQUENCE(CDOWN),
-+	KEY_SEQUENCE(SLEFT),
-+	KEY_SEQUENCE(SRIGHT),
-+	KEY_SEQUENCE(SUP),
-+	KEY_SEQUENCE(SDOWN),
-+	KEY_SEQUENCE(MLEFT),
-+	KEY_SEQUENCE(MRIGHT),
-+	KEY_SEQUENCE(MUP),
-+	KEY_SEQUENCE(MDOWN),
-+	KEY_SEQUENCE(STAB),
-+	KEY_SEQUENCE(M_p),
-+	KEY_SEQUENCE(M_n),
-+	{ 0, NULL }
-+};
-+
-+#define isseqence(c) ((c) == 0x1B)
-+
-+/*
-+ * Number of characters that consist of ANSII sequence
-+ * Should not be less then longest string in ansii_sequnces
-+ */
-+#define MAX_ASCII_SEQUENCE 10
-+
-+static char current_sequence[MAX_ASCII_SEQUENCE];
-+static int current_sequence_len = -1;
-+
-+/* single line typed by user goes here */
-+static char line_buf[LINE_BUF_MAX];
-+/* index of cursor in input line */
-+static int line_buf_ix = 0;
-+/* current length of input line */
-+static int line_len = 0;
-+
-+/*
-+ * Moves cursor to right or left
-+ *
-+ * n - positive - moves cursor right
-+ * n - negative - moves cursor left
-+ */
-+static void terminal_move_cursor(int n)
++static void terminal_line_replaced(void)
 +{
-+	if (n < 0) {
-+		for (; n < 0; n++)
++	int len = strlen(line_buf);
++
++	/* line is shorter that previous */
++	if (len < line_len) {
++		/* if new line is shorter move cursor to end of new end */
++		while (line_buf_ix > len) {
 +			putchar('\b');
-+	} else if (n > 0)
-+		printf("%*s", n, line_buf + line_buf_ix);
-+}
-+
-+/* Draw command line */
-+void terminal_draw_command_line(void)
-+{
-+	/*
-+	 * this needs to be checked here since line_buf is not cleard
-+	 * before parsing event though line_len and line_buf_ix are
-+	 */
-+	if (line_len > 0)
-+		printf(">%s", line_buf);
-+	else
-+		putchar('>');
-+
-+	/* move cursor to it's place */
-+	terminal_move_cursor(line_len - line_buf_ix);
-+}
-+
-+/* inserts string into command line at cursor position */
-+void terminal_insert_into_command_line(const char *p)
-+{
-+	int len = strlen(p);
-+
-+	if (line_len == line_buf_ix) {
-+		strcat(line_buf, p);
-+		printf("%s", p);
-+		line_buf_ix = line_len = line_len + len;
-+	} else {
-+		memmove(line_buf + line_buf_ix + len,
-+			line_buf + line_buf_ix, line_len - line_buf_ix + 1);
-+		memmove(line_buf + line_buf_ix, p, len);
-+		printf("%s", line_buf + line_buf_ix);
-+		line_buf_ix += len;
-+		line_len += len;
-+		terminal_move_cursor(line_buf_ix - line_len);
-+	}
-+}
-+
-+/* Prints string and redraws command line */
-+int terminal_print(const char *format, ...)
-+{
-+	va_list args;
-+	int ret;
-+
-+	va_start(args, format);
-+
-+	ret = terminal_vprint(format, args);
-+
-+	va_end(args);
-+	return ret;
-+}
-+
-+/* Prints string and redraws command line */
-+int terminal_vprint(const char *format, va_list args)
-+{
-+	int ret;
-+
-+	printf("\r%*s\r", (int)line_len + 1, " ");
-+
-+	ret = vprintf(format, args);
-+
-+	terminal_draw_command_line();
-+
-+	return ret;
-+}
-+
-+/*
-+ * Converts terminal character sequences to single value representing
-+ * keyboard keys
-+ */
-+static int terminal_convert_sequence(int c)
-+{
-+	int i;
-+
-+	/* Not in sequence yet? */
-+	if (current_sequence_len == -1) {
-+		/* Is ansii sequence detected by 0x1B ? */
-+		if (isseqence(c)) {
-+			current_sequence_len++;
-+			return 0;
-+	       }
-+	       return c;
-+	}
-+	/* Inside sequence */
-+	current_sequence[current_sequence_len++] = c;
-+	current_sequence[current_sequence_len] = '\0';
-+	for (i = 0; ansii_sequnces[i].code; ++i) {
-+		/* Matches so far? */
-+		if (0 != strncmp(current_sequence,
-+			ansii_sequnces[i].sequence, current_sequence_len))
-+			continue;
-+
-+		/* Matches as a whole? */
-+		if (ansii_sequnces[i].sequence[current_sequence_len] == 0) {
-+			current_sequence_len = -1;
-+			return ansii_sequnces[i].code;
++			line_buf_ix--;
 +		}
-+		/* partial match (not whole sequence yet) */
-+		return 0;
-+	}
-+	terminal_print("ansii char 0x%X %c\n", c);
-+	/*
-+	 * Sequence does not match
-+	 * mark that no in sequence any more, return char
-+	 */
-+	current_sequence_len = -1;
-+	return c;
-+}
-+
-+void terminal_process_char(int c, void (*process_line)(char *line))
-+{
-+	int refresh_from = -1;
-+	int old_pos;
-+
-+	c = terminal_convert_sequence(c);
-+
-+	switch (c) {
-+	case 0:
-+		break;
-+	case KEY_LEFT:
-+		/* if not at the beginning move to previous character */
-+		if (line_buf_ix <= 0)
-+			break;
-+		line_buf_ix--;
-+		terminal_move_cursor(-1);
-+		break;
-+	case KEY_RIGHT:
-+		/*
-+		 * If not at the end, just print current character
-+		 * and modify position
-+		 */
++		/* If cursor was not at the end, move it to the end */
 +		if (line_buf_ix < line_len)
-+			putchar(line_buf[line_buf_ix++]);
-+		break;
-+	case KEY_HOME:
-+		/* move to beginning of line and update position */
-+		putchar('\r');
-+		putchar('>');
-+		line_buf_ix = 0;
-+		break;
-+	case KEY_END:
-+		/* if not at the end of line */
-+		if (line_buf_ix < line_len) {
-+			/* print everything from cursor */
-+			printf("%s", line_buf + line_buf_ix);
-+			/* just modify current position */
-+			line_buf_ix = line_len;
-+		}
-+		break;
-+	case KEY_DELETE:
-+		/* delete character under cursor if not at the very end */
-+		if (line_buf_ix >= line_len)
-+			break;
-+		/*
-+		 * Prepare buffer with one character missing
-+		 * trailing 0 is moved
-+		 */
-+		line_len--;
-+		memmove(line_buf + line_buf_ix,
-+			line_buf + line_buf_ix + 1,
-+			line_len - line_buf_ix + 1);
-+		/* print rest of line from current cursor position */
-+		printf("%s \b", line_buf + line_buf_ix);
-+		/* move back cursor */
-+		terminal_move_cursor(line_buf_ix - line_len);
-+		break;
-+	case KEY_CLEFT:
-+		/*
-+		 * Move by word left
-+		 *
-+		 * Are we at the beginning of line?
-+		 */
-+		if (line_buf_ix <= 0)
-+			break;
-+
-+		old_pos = line_buf_ix;
-+		line_buf_ix--;
-+		/* skip spaces left */
-+		while (line_buf_ix && isspace(line_buf[line_buf_ix]))
-+			line_buf_ix--;
-+		/* skip all non spaces to the left */
-+		while (line_buf_ix > 0 &&
-+		       !isspace(line_buf[line_buf_ix - 1]))
-+			line_buf_ix--;
-+		/* move cursor to new position */
-+		terminal_move_cursor(line_buf_ix - old_pos);
-+		break;
-+	case KEY_CRIGHT:
-+		/*
-+		 * Move by word right
-+		 *
-+		 * are we at the end of line?
-+		 */
-+		if (line_buf_ix >= line_len)
-+			break;
-+
-+		old_pos = line_buf_ix;
-+		/* skip all spaces */
-+		while (line_buf_ix < line_len &&
-+			isspace(line_buf[line_buf_ix]))
-+			line_buf_ix++;
-+		/* skip all non spaces */
-+		while (line_buf_ix < line_len &&
-+			!isspace(line_buf[line_buf_ix]))
-+			line_buf_ix++;
-+		/*
-+		 * Move cursor to right by printing text
-+		 * between old cursor and new
-+		 */
-+		if (line_buf_ix > old_pos)
-+			printf("%.*s", (int)(line_buf_ix - old_pos),
-+				line_buf + old_pos);
-+		break;
-+	case KEY_UP:
-+	case KEY_DOWN:
-+		break;
-+	case '\n':
-+	case '\r':
-+		line_len = line_buf_ix = 0;
-+		/* print new line */
-+		putchar(c);
-+		process_line(line_buf);
-+		/* clear current line */
-+		line_buf[0] = '\0';
-+		putchar('>');
-+		break;
-+	case '\t':
-+		/* tab processing */
-+		/* TODO Add completion here */
-+		break;
-+	case KEY_BACKSPACE:
-+		if (line_buf_ix <= 0)
-+			break;
-+
-+		if (line_buf_ix == line_len) {
-+			printf("\b \b");
-+			line_len = --line_buf_ix;
-+			line_buf[line_len] = 0;
-+		} else {
-+			putchar('\b');
-+			refresh_from = --line_buf_ix;
-+			line_len--;
-+			memmove(line_buf + line_buf_ix,
-+				line_buf + line_buf_ix + 1,
-+				line_len - line_buf_ix + 1);
-+		}
-+		break;
-+	case KEY_INSERT:
-+	case KEY_PGUP:
-+	case KEY_PGDOWN:
-+	case KEY_CUP:
-+	case KEY_CDOWN:
-+	case KEY_SLEFT:
-+	case KEY_SRIGHT:
-+	case KEY_MLEFT:
-+	case KEY_MRIGHT:
-+	case KEY_MUP:
-+	case KEY_MDOWN:
-+	case KEY_STAB:
-+	case KEY_M_n:
-+	case KEY_M_p:
-+		break;
-+	default:
-+		if (!isprint(c)) {
-+			/*
-+			 * TODO: remove this print once all meaningful sequences
-+			 * are identified
-+			 */
-+			printf("char-0x%02x\n", c);
-+			break;
-+		}
-+		if (line_buf_ix < LINE_BUF_MAX - 1) {
-+			if (line_len == line_buf_ix) {
-+				putchar(c);
-+				line_buf[line_buf_ix++] = (char)c;
-+				line_len++;
-+				line_buf[line_len] = '\0';
-+			} else {
-+				memmove(line_buf + line_buf_ix + 1,
-+					line_buf + line_buf_ix,
-+					line_len - line_buf_ix + 1);
-+				line_buf[line_buf_ix] = c;
-+				refresh_from = line_buf_ix++;
-+				line_len++;
-+			}
-+		}
-+		break;
++			printf("%.*s", line_len - line_buf_ix,
++					line_buf + line_buf_ix);
++		/* over write end of previous line */
++		while (line_len >= len++)
++			putchar(' ');
 +	}
-+
-+	if (refresh_from >= 0) {
-+		printf("%s \b", line_buf + refresh_from);
-+		terminal_move_cursor(line_buf_ix - line_len);
-+	}
++	/* draw new line */
++	printf("\r>%s", line_buf);
++	/* set up indexes to new line */
++	line_len = line_buf_ix = strlen(line_buf);
 +}
 +
-+void terminal_setup(void)
-+{
-+	struct termios tios;
-+
-+	/* Turn off echo since all editing is done by hand */
-+	tcgetattr(0, &tios);
-+	tios.c_lflag &= ~(ICANON | ECHO);
-+	tcsetattr(0, TCSANOW, &tios);
-+	putchar('>');
-+}
-+
-diff --git a/android/hal_client/terminal.h b/android/hal_client/terminal.h
-new file mode 100644
-index 0000000..073ebf0
---- /dev/null
-+++ b/android/hal_client/terminal.h
-@@ -0,0 +1,65 @@
 +/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Intel Corporation
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
++ * Function tries to replace current line with specified line in history
++ * new_line_index - new line to show, -1 to show oldest
 + */
++static void terminal_get_line_from_history(int new_line_index)
++{
++	new_line_index = history_get_line(new_line_index,
++						line_buf, LINE_BUF_MAX);
 +
-+#include <stdarg.h>
++	if (new_line_index >= 0) {
++		terminal_line_replaced();
++		line_index = new_line_index;
++	}
++}
 +
-+/* size of supported line */
-+#define LINE_BUF_MAX 1024
++/*
++ * Function searches history back or forward for command line that starts
++ * with characters up to cursor position
++ *
++ * back - true - searches backward
++ * back - false - searches forward (more recent commands)
++ */
++static void terminal_match_hitory(bool back)
++{
++	char buf[line_buf_ix + 1];
++	int line;
++	int matching_line = -1;
++	int dir = back ? 1 : -1;
 +
-+enum key_codes {
-+	KEY_BACKSPACE = 0x7F,
-+	KEY_INSERT = 1000, /* arbitrary value */
-+	KEY_DELETE,
-+	KEY_HOME,
-+	KEY_END,
-+	KEY_PGUP,
-+	KEY_PGDOWN,
-+	KEY_LEFT,
-+	KEY_RIGHT,
-+	KEY_UP,
-+	KEY_DOWN,
-+	KEY_CLEFT,
-+	KEY_CRIGHT,
-+	KEY_CUP,
-+	KEY_CDOWN,
-+	KEY_SLEFT,
-+	KEY_SRIGHT,
-+	KEY_SUP,
-+	KEY_SDOWN,
-+	KEY_MLEFT,
-+	KEY_MRIGHT,
-+	KEY_MUP,
-+	KEY_MDOWN,
-+	KEY_STAB,
-+	KEY_M_p,
-+	KEY_M_n
-+};
++	line = line_index + dir;
++	while (matching_line == -1 && line >= 0) {
++		int new_line_index;
 +
-+void terminal_setup(void);
-+int terminal_print(const char *format, ...);
-+int terminal_vprint(const char *format, va_list args);
-+void terminal_process_char(int c, void (*process_line)(char *line));
-+void terminal_insert_into_command_line(const char *p);
-+void terminal_draw_command_line(void);
++		new_line_index = history_get_line(line, buf, line_buf_ix + 1);
++		if (new_line_index < 0)
++			break;
 +
-+void process_tab(const char *line, int len);
++		if (0 == strncmp(line_buf, buf, line_buf_ix))
++			matching_line = line;
++		line += dir;
++	}
++
++	if (matching_line >= 0) {
++		int pos = line_buf_ix;
++		terminal_get_line_from_history(matching_line);
++		/* move back to cursor position to origianl place */
++		line_buf_ix = pos;
++		terminal_move_cursor(pos - line_len);
++	}
++}
++
++/*
+  * Converts terminal character sequences to single value representing
+  * keyboard keys
+  */
+@@ -339,12 +423,29 @@ void terminal_process_char(int c, void (*process_line)(char *line))
+ 			printf("%.*s", (int)(line_buf_ix - old_pos),
+ 				line_buf + old_pos);
+ 		break;
++	case KEY_SUP:
++		terminal_get_line_from_history(-1);
++		break;
++	case KEY_SDOWN:
++		if (line_index > 0)
++			terminal_get_line_from_history(0);
++		break;
+ 	case KEY_UP:
++		terminal_get_line_from_history(line_index + 1);
++		break;
+ 	case KEY_DOWN:
++		if (line_index > 0)
++			terminal_get_line_from_history(line_index - 1);
+ 		break;
+ 	case '\n':
+ 	case '\r':
++		/*
++		 * On new line add line to history
++		 * forget history position
++		 */
++		history_add_line(line_buf);
+ 		line_len = line_buf_ix = 0;
++		line_index = -1;
+ 		/* print new line */
+ 		putchar(c);
+ 		process_line(line_buf);
+@@ -386,7 +487,12 @@ void terminal_process_char(int c, void (*process_line)(char *line))
+ 	case KEY_MDOWN:
+ 	case KEY_STAB:
+ 	case KEY_M_n:
++		/* Search history forward */
++		terminal_match_hitory(false);
++		break;
+ 	case KEY_M_p:
++		/* Search history backward */
++		terminal_match_hitory(true);
+ 		break;
+ 	default:
+ 		if (!isprint(c)) {
 -- 
 1.7.9.5
 
