@@ -1,80 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] audio/AVDTP: Fix crash after disconnecting
-Date: Mon, 14 Oct 2013 13:14:45 +0300
-Message-Id: <1381745687-5677-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/3] audio/AVDTP: Add struct for discover specific data
+Date: Mon, 14 Oct 2013 13:14:46 +0300
+Message-Id: <1381745687-5677-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1381745687-5677-1-git-send-email-luiz.dentz@gmail.com>
+References: <1381745687-5677-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If the session is disconnected while process_discover is pending the
-source id is not removed causing the following crash:
-      at 0x414C08: finalize_discovery (avdtp.c:1050)
-      by 0x414C5A: process_discover (avdtp.c:3346)
-      by 0x3D46047E05: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3600.3)
-      by 0x3D46048157: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
-      by 0x3D46048559: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3600.3)
-      by 0x40A3B6: main (main.c:595)
-    Address 0x5e25de8 is 1,144 bytes inside a block of size 1,176 free'd
-    at 0x4A074C4: free (in
-    /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-      by 0x3D4604D9AE: g_free (in /usr/lib64/libglib-2.0.so.0.3600.3)
-      by 0x4152F2: connection_lost (avdtp.c:1206)
-      by 0x4162C4: cancel_request (avdtp.c:2662)
-      by 0x4164BD: request_timeout (avdtp.c:2672)
-      by 0x3D46048962: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
-      by 0x3D46047E05: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3600.3)
-      by 0x3D46048157: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
-      by 0x3D46048559: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3600.3)
-      by 0x40A3B6: main (main.c:595)
+This pushes discover specific data to a struct which is a common practice
+if the field contains callback and user_data specific to certain
+operations.
 ---
- profiles/audio/avdtp.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ profiles/audio/avdtp.c | 48 +++++++++++++++++++++++++-----------------------
+ 1 file changed, 25 insertions(+), 23 deletions(-)
 
 diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 622dff8..57e644c 100644
+index 57e644c..dab8f1c 100644
 --- a/profiles/audio/avdtp.c
 +++ b/profiles/audio/avdtp.c
-@@ -412,6 +412,7 @@ struct avdtp {
+@@ -354,6 +354,12 @@ struct avdtp_state_callback {
+ 	void *user_data;
+ };
+ 
++struct discover_callback {
++	unsigned int id;
++	avdtp_discover_cb_t cb;
++	void *user_data;
++};
++
+ struct avdtp_stream {
+ 	GIOChannel *io;
+ 	uint16_t imtu;
+@@ -412,10 +418,7 @@ struct avdtp {
  
  	char *buf;
  
-+	guint discov_id;
- 	avdtp_discover_cb_t discov_cb;
- 	void *user_data;
+-	guint discov_id;
+-	avdtp_discover_cb_t discov_cb;
+-	void *user_data;
+-
++	struct discover_callback *discover;
+ 	struct pending_req *req;
  
-@@ -1048,6 +1049,11 @@ static void finalize_discovery(struct avdtp *session, int err)
- 	if (!session->discov_cb)
+ 	guint dc_timer;
+@@ -1042,24 +1045,21 @@ static void avdtp_sep_set_state(struct avdtp *session,
+ 
+ static void finalize_discovery(struct avdtp *session, int err)
+ {
++	struct discover_callback *discover = session->discover;
+ 	struct avdtp_error avdtp_err;
+ 
+-	avdtp_error_init(&avdtp_err, AVDTP_ERRNO, err);
+-
+-	if (!session->discov_cb)
++	if (!discover)
  		return;
  
-+	if (session->discov_id > 0) {
-+		g_source_remove(session->discov_id);
-+		session->discov_id = 0;
-+	}
-+
- 	session->discov_cb(session, session->seps,
- 				err ? &avdtp_err : NULL,
- 				session->user_data);
-@@ -3322,6 +3328,8 @@ static gboolean process_discover(gpointer data)
+-	if (session->discov_id > 0) {
+-		g_source_remove(session->discov_id);
+-		session->discov_id = 0;
+-	}
++	avdtp_error_init(&avdtp_err, AVDTP_ERRNO, err);
+ 
+-	session->discov_cb(session, session->seps,
+-				err ? &avdtp_err : NULL,
+-				session->user_data);
++	if (discover->id > 0)
++		g_source_remove(discover->id);
+ 
+-	session->discov_cb = NULL;
+-	session->user_data = NULL;
++	discover->cb(session, session->seps, err ? &avdtp_err : NULL,
++							discover->user_data);
++	g_free(discover);
++	session->discover = NULL;
+ }
+ 
+ static void release_stream(struct avdtp_stream *stream, struct avdtp *session)
+@@ -3328,7 +3328,7 @@ static gboolean process_discover(gpointer data)
  {
  	struct avdtp *session = data;
  
-+	session->discov_id = 0;
-+
+-	session->discov_id = 0;
++	session->discover->id = 0;
+ 
  	finalize_discovery(session, 0);
  
- 	return FALSE;
-@@ -3338,7 +3346,7 @@ int avdtp_discover(struct avdtp *session, avdtp_discover_cb_t cb,
+@@ -3340,20 +3340,22 @@ int avdtp_discover(struct avdtp *session, avdtp_discover_cb_t cb,
+ {
+ 	int err;
+ 
+-	if (session->discov_cb)
++	if (session->discover)
+ 		return -EBUSY;
+ 
++	session->discover = g_new0(struct discover_callback, 1);
++
  	if (session->seps) {
- 		session->discov_cb = cb;
- 		session->user_data = user_data;
--		g_idle_add(process_discover, session);
-+		session->discov_id = g_idle_add(process_discover, session);
+-		session->discov_cb = cb;
+-		session->user_data = user_data;
+-		session->discov_id = g_idle_add(process_discover, session);
++		session->discover->cb = cb;
++		session->discover->user_data = user_data;
++		session->discover->id = g_idle_add(process_discover, session);
  		return 0;
  	}
  
+ 	err = send_request(session, FALSE, NULL, AVDTP_DISCOVER, NULL, 0);
+ 	if (err == 0) {
+-		session->discov_cb = cb;
+-		session->user_data = user_data;
++		session->discover->cb = cb;
++		session->discover->user_data = user_data;
+ 	}
+ 
+ 	return err;
 -- 
 1.8.3.1
 
