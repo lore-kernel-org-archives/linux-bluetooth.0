@@ -1,79 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Introduce L2CAP channel callback for resuming
-Date: Mon, 14 Oct 2013 02:53:54 -0700
-Message-Id: <1381744434-35580-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Introduce L2CAP channel flag for defer setup
+Date: Mon, 14 Oct 2013 02:45:34 -0700
+Message-Id: <1381743934-29348-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Clearing the BT_SK_SUSPEND socket flag from the L2CAP core is causing
-a dependency on the socket. So intead of doing that, use a channel
-callback into the socket handling to resume.
+The L2CAP core should not look into the socket flags to figure out the
+setting of defer setup. So introduce a L2CAP channel flag that mirrors
+the socket flag.
+
+Since the defer setup option is only set in one place this becomes a
+really easy thing to do.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/l2cap.h | 1 +
- net/bluetooth/l2cap_core.c    | 6 +-----
- net/bluetooth/l2cap_sock.c    | 9 +++++++++
- 3 files changed, 11 insertions(+), 5 deletions(-)
+ include/net/bluetooth/l2cap.h |  1 +
+ net/bluetooth/l2cap_core.c    | 15 +++++++--------
+ net/bluetooth/l2cap_sock.c    |  7 +++++--
+ 3 files changed, 13 insertions(+), 10 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 1a38ede..07757a2 100644
+index a27d51d..1a38ede 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -554,6 +554,7 @@ struct l2cap_ops {
- 						 int state);
- 	void			(*ready) (struct l2cap_chan *chan);
- 	void			(*defer) (struct l2cap_chan *chan);
-+	void			(*resume) (struct l2cap_chan *chan);
- 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
- 					       unsigned long len, int nb);
+@@ -652,6 +652,7 @@ enum {
+ 	FLAG_FLUSHABLE,
+ 	FLAG_EXT_CTRL,
+ 	FLAG_EFS_ENABLE,
++	FLAG_DEFER_SETUP,
  };
+ 
+ enum {
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index e5819cb..0c3446d 100644
+index f6b5f94..e5819cb 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -6669,11 +6669,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 
- 		if (!status && (chan->state == BT_CONNECTED ||
- 				chan->state == BT_CONFIG)) {
+@@ -655,14 +655,14 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
+ 	case BT_CONNECT2:
+ 		if (chan->chan_type == L2CAP_CHAN_CONN_ORIENTED &&
+ 		    conn->hcon->type == ACL_LINK) {
 -			struct sock *sk = chan->sk;
--
--			clear_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
--			sk->sk_state_change(sk);
--
-+			chan->ops->resume(chan);
- 			l2cap_check_encryption(chan, encrypt);
- 			l2cap_chan_unlock(chan);
- 			continue;
+ 			struct l2cap_conn_rsp rsp;
+ 			__u16 result;
+ 
+-			if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags))
++			if (test_bit(FLAG_DEFER_SETUP, &chan->flags))
+ 				result = L2CAP_CR_SEC_BLOCK;
+ 			else
+ 				result = L2CAP_CR_BAD_PSM;
++
+ 			l2cap_state_change(chan, BT_DISCONN);
+ 
+ 			rsp.scid   = cpu_to_le16(chan->dcid);
+@@ -1294,16 +1294,16 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
+ 			l2cap_start_connection(chan);
+ 
+ 		} else if (chan->state == BT_CONNECT2) {
+-			struct sock *sk = chan->sk;
+ 			struct l2cap_conn_rsp rsp;
+ 			char buf[128];
+ 			rsp.scid = cpu_to_le16(chan->dcid);
+ 			rsp.dcid = cpu_to_le16(chan->scid);
+ 
+ 			if (l2cap_chan_check_security(chan)) {
++				struct sock *sk = chan->sk;
++
+ 				lock_sock(sk);
+-				if (test_bit(BT_SK_DEFER_SETUP,
+-					     &bt_sk(sk)->flags)) {
++				if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
+ 					rsp.result = __constant_cpu_to_le16(L2CAP_CR_PEND);
+ 					rsp.status = __constant_cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
+ 					chan->ops->defer(chan);
+@@ -3823,7 +3823,7 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+ 
+ 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE) {
+ 		if (l2cap_chan_check_security(chan)) {
+-			if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
++			if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
+ 				__l2cap_state_change(chan, BT_CONNECT2);
+ 				result = L2CAP_CR_PEND;
+ 				status = L2CAP_CS_AUTHOR_PEND;
+@@ -6693,8 +6693,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 			lock_sock(sk);
+ 
+ 			if (!status) {
+-				if (test_bit(BT_SK_DEFER_SETUP,
+-					     &bt_sk(sk)->flags)) {
++				if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
+ 					res = L2CAP_CR_PEND;
+ 					stat = L2CAP_CS_AUTHOR_PEND;
+ 					chan->ops->defer(chan);
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index f5d9573..fcf012a 100644
+index f1b462f..f5d9573 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -1112,6 +1112,14 @@ static void l2cap_sock_defer_cb(struct l2cap_chan *chan)
- 		parent->sk_data_ready(parent, 0);
- }
+@@ -672,10 +672,13 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+ 			break;
+ 		}
  
-+static void l2cap_sock_resume_cb(struct l2cap_chan *chan)
-+{
-+	struct sock *sk = chan->data;
-+
-+	clear_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
-+	sk->sk_state_change(sk);
-+}
-+
- static struct l2cap_ops l2cap_chan_ops = {
- 	.name		= "L2CAP Socket Interface",
- 	.new_connection	= l2cap_sock_new_connection_cb,
-@@ -1121,6 +1129,7 @@ static struct l2cap_ops l2cap_chan_ops = {
- 	.state_change	= l2cap_sock_state_change_cb,
- 	.ready		= l2cap_sock_ready_cb,
- 	.defer		= l2cap_sock_defer_cb,
-+	.resume		= l2cap_sock_resume_cb,
- 	.alloc_skb	= l2cap_sock_alloc_skb_cb,
- };
+-		if (opt)
++		if (opt) {
+ 			set_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
+-		else
++			set_bit(FLAG_DEFER_SETUP, &chan->flags);
++		} else {
+ 			clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
++			clear_bit(FLAG_DEFER_SETUP, &chan->flags);
++		}
+ 		break;
  
+ 	case BT_FLUSHABLE:
 -- 
 1.8.3.1
 
