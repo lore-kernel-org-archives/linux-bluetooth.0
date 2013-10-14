@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/5] Bluetooth: Move move logic into set_connectable complete callback
-Date: Mon, 14 Oct 2013 16:20:04 +0300
-Message-Id: <1381756807-14900-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/5] Bluetooth: Reorganize set_connectable HCI command sending
+Date: Mon, 14 Oct 2013 16:20:03 +0300
+Message-Id: <1381756807-14900-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1381756807-14900-1-git-send-email-johan.hedberg@gmail.com>
 References: <1381756807-14900-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,77 +11,81 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch moves the responsibility of setting/clearing the
-HCI_CONNECTABLE flag to the request completion callback of the Set
-Connectable command. This will allow us to cleanly add support for LE
-Advertising hooks in later patches.
+This patch moves all the decisions of which HCI commands to send (or not
+to send) to the code between hci_req_init() and hci_req_run() this
+allows us to further extend the request with further commands but still
+keep the same logic of handling whether to return a direct mgmt response
+in the case that no HCI commands were sent.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c | 23 +++++++++++++++++++----
- 1 file changed, 19 insertions(+), 4 deletions(-)
+ net/bluetooth/mgmt.c | 36 ++++++++++++++++++++----------------
+ 1 file changed, 20 insertions(+), 16 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index cfd8d44..8dcea77 100644
+index 020f95b..cfd8d44 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -1075,6 +1075,8 @@ static void write_fast_connectable(struct hci_request *req, bool enable)
- static void set_connectable_complete(struct hci_dev *hdev, u8 status)
- {
- 	struct pending_cmd *cmd;
-+	struct mgmt_mode *cp;
-+	bool changed;
- 
- 	BT_DBG("status 0x%02x", status);
- 
-@@ -1084,8 +1086,17 @@ static void set_connectable_complete(struct hci_dev *hdev, u8 status)
- 	if (!cmd)
- 		goto unlock;
- 
-+	cp = cmd->param;
-+	if (cp->val)
-+		changed = !test_and_set_bit(HCI_CONNECTABLE, &hdev->dev_flags);
-+	else
-+		changed = test_and_clear_bit(HCI_CONNECTABLE, &hdev->dev_flags);
-+
- 	send_settings_rsp(cmd->sk, MGMT_OP_SET_CONNECTABLE, hdev);
- 
-+	if (changed)
-+		new_settings(hdev, cmd->sk);
-+
- 	mgmt_pending_remove(cmd);
- 
- unlock:
-@@ -4053,10 +4064,16 @@ int mgmt_discoverable(struct hci_dev *hdev, u8 discoverable)
- 
- int mgmt_connectable(struct hci_dev *hdev, u8 connectable)
- {
--	struct pending_cmd *cmd;
- 	bool changed = false;
- 	int err = 0;
- 
-+	/* Nothing needed here if there's a pending command since that
-+	 * commands request completion callback takes care of everything
-+	 * necessary.
-+	 */
-+	if (mgmt_pending_find(MGMT_OP_SET_CONNECTABLE, hdev))
-+		return 0;
-+
- 	if (connectable) {
- 		if (!test_and_set_bit(HCI_CONNECTABLE, &hdev->dev_flags))
- 			changed = true;
-@@ -4065,10 +4082,8 @@ int mgmt_connectable(struct hci_dev *hdev, u8 connectable)
- 			changed = true;
+@@ -1144,30 +1144,29 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto failed;
  	}
  
--	cmd = mgmt_pending_find(MGMT_OP_SET_CONNECTABLE, hdev);
+-	if (!!cp->val == test_bit(HCI_PSCAN, &hdev->flags)) {
+-		err = send_settings_rsp(sk, MGMT_OP_SET_CONNECTABLE, hdev);
+-		goto failed;
+-	}
 -
- 	if (changed)
--		err = new_settings(hdev, cmd ? cmd->sk : NULL);
-+		err = new_settings(hdev, NULL);
+ 	cmd = mgmt_pending_add(sk, MGMT_OP_SET_CONNECTABLE, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto failed;
+ 	}
  
- 	return err;
- }
+-	if (cp->val) {
+-		scan = SCAN_PAGE;
+-	} else {
+-		scan = 0;
++	hci_req_init(&req, hdev);
+ 
+-		if (test_bit(HCI_ISCAN, &hdev->flags) &&
+-		    hdev->discov_timeout > 0)
+-			cancel_delayed_work(&hdev->discov_off);
+-	}
++	if (test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags) &&
++	    cp->val != test_bit(HCI_PSCAN, &hdev->flags)) {
+ 
+-	hci_req_init(&req, hdev);
++		if (cp->val) {
++			scan = SCAN_PAGE;
++		} else {
++			scan = 0;
+ 
+-	hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
++			if (test_bit(HCI_ISCAN, &hdev->flags) &&
++					hdev->discov_timeout > 0)
++				cancel_delayed_work(&hdev->discov_off);
++		}
++
++		hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
++	}
+ 
+ 	/* If we're going from non-connectable to connectable or
+ 	 * vice-versa when fast connectable is enabled ensure that fast
+@@ -1179,8 +1178,13 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		write_fast_connectable(&req, false);
+ 
+ 	err = hci_req_run(&req, set_connectable_complete);
+-	if (err < 0)
++	if (err < 0) {
+ 		mgmt_pending_remove(cmd);
++		if (err == -ENODATA)
++			err = send_settings_rsp(sk, MGMT_OP_SET_CONNECTABLE,
++						hdev);
++		goto failed;
++	}
+ 
+ failed:
+ 	hci_dev_unlock(hdev);
 -- 
 1.8.3.1
 
