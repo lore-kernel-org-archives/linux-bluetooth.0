@@ -1,37 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1381595148.21761.0.camel@nuvo>
-References: <1381592725-28212-1-git-send-email-scampa.giovanni@gmail.com>
-	<0262656B-5656-422C-B12D-C6BF7239AA11@holtmann.org>
-	<1381595148.21761.0.camel@nuvo>
-Date: Mon, 14 Oct 2013 18:02:25 +0300
-Message-ID: <CABBYNZJt2n_DZmR2SQk8HvgkRgf4yuPJnYr=HFxqb3H-Y0mQyw@mail.gmail.com>
-Subject: Re: [PATCH] Allow using obexd without systemd in the user session
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Giovanni Campagna <scampa.giovanni@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Giovanni Campagna <gcampagna@src.gnome.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH 0/5] Bluetooth: Clean up Set Connectable related code
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1381756807-14900-1-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 14 Oct 2013 15:46:22 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <E7F808EA-BF99-4C6B-8A62-8E5BEBC859E9@holtmann.org>
+References: <1381756807-14900-1-git-send-email-johan.hedberg@gmail.com>
+To: johan.hedberg@gmail.com
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Johan,
 
-On Sat, Oct 12, 2013 at 7:25 PM, Bastien Nocera <hadess@hadess.net> wrote:
-> On Sat, 2013-10-12 at 18:08 +0200, Marcel Holtmann wrote:
->> Hi Giovanni,
-> <snip>
->> that is something your distro specific package should be fixing if
->> that is needed. The focus is on integration with systemd and nothing
->> else. You can use --disable-systemd and provide your own set of D-Bus
->> service files.
->
-> There aren't any distributions that ship systemd for user sessions
-> though.
+> This is a set of cleanup patches (and one fix) split out from my earlier
+> set. I'm hoping to get these in first to make it easier to understand
+> how the code works and what the possible ways of adding LE Advertising
+> hooks are.
+> 
+> The main thing with these patches is that we make a clear separation of
+> what happens if someone uses a raw HCI socket compared to sending a Set
+> Connectable command using the management interface. Now both cases have
+> their clear functions for handling the HCI_CONNECTABLE flag and the
+> necessary mgmt events.
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (5):
+>      Bluetooth: Reorganize set_connectable HCI command sending
+>      Bluetooth: Move move logic into set_connectable complete callback
+>      Bluetooth: Add missing error handling for Set Connectable
+>      Bluetooth: Move static advertising functions to avoid forward declarations
+>      Bluetooth: Fix updating advertising data needlessly
+> 
+> net/bluetooth/hci_event.c |   2 +-
+> net/bluetooth/mgmt.c      | 122 ++++++++++++++++++++++++++++------------------
+> 2 files changed, 75 insertions(+), 49 deletions(-)
 
-How far we are with this? If that will take a while perhaps we should
-support the old D-Bus service too.
+all 5 patches have been applied to bluetooth-next tree.
 
+Regards
 
--- 
-Luiz Augusto von Dentz
+Marcel
+
