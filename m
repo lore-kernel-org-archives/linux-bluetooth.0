@@ -1,45 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH 0/4] Bluetooth: Associate connectable setting with adv type
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1381774527-13746-1-git-send-email-johan.hedberg@gmail.com>
-Date: Mon, 14 Oct 2013 20:24:19 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <E37D9250-EE14-4B24-B3BA-C7C7AEC97123@holtmann.org>
-References: <1381774527-13746-1-git-send-email-johan.hedberg@gmail.com>
-To: johan.hedberg@gmail.com
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Check that bind() bdaddr type matches connect()
+Date: Mon, 14 Oct 2013 21:17:53 +0300
+Message-Id: <1381774673-14150-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1381774673-14150-1-git-send-email-johan.hedberg@gmail.com>
+References: <1381774673-14150-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> Here's a rewritten patch set to allow associating the connectable
-> setting with the advertising type. Unlike the first attempt this one
-> doesn't introduce a new parameter to enable_advertising() but instead
-> does a pending mgmt command lookup to help determine the right
-> advertising type.
-> 
-> There's also a fourth patch to do similar refactoring for
-> set_discoverable as we did for set_connectable wrt. splitting raw HCI
-> sockets from mgmt control, but I didn't quite get around to tying that
-> to the advertising data yet (the general discoverable flag).
-> 
-> Johan
-> 
-> ----------------------------------------------------------------
-> Johan Hedberg (4):
->      Bluetooth: Make Set Connectable also update the LE advertising type
->      Bluetooth: Move set_bredr_scan() to avoid forward declaration
->      Bluetooth: Fix updating scan mode in set_bredr()
->      Bluetooth: Convert Set Discoverable to use an asynchronous request
-> 
-> net/bluetooth/mgmt.c | 144 ++++++++++++++++++++++++++++++++++++++-------------
-> 1 file changed, 109 insertions(+), 35 deletions(-)
+If a socket was bound to an address type other than BR/EDR (such as LE)
+we should reject trying to connect it to a BR/EDR address. The same
+applies for binding to BR/EDR and trying to connect to non-BR/EDR.
 
-all four patches have been applied to bluetooth-next tree.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/l2cap_sock.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Regards
-
-Marcel
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 982915d..87e17b7 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -150,6 +150,12 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
+ 	if (!bdaddr_type_is_valid(la.l2_bdaddr_type))
+ 		return -EINVAL;
+ 
++	if (chan->src_type == BDADDR_BREDR && la.l2_bdaddr_type != BDADDR_BREDR)
++		return -EINVAL;
++
++	if (chan->src_type != BDADDR_BREDR && la.l2_bdaddr_type == BDADDR_BREDR)
++		return -EINVAL;
++
+ 	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
+ 				 &la.l2_bdaddr, la.l2_bdaddr_type);
+ 	if (err)
+-- 
+1.8.3.1
 
