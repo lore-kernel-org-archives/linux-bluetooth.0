@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/4] Bluetooth: Convert Set Discoverable to use an asynchronous request
-Date: Mon, 14 Oct 2013 21:15:27 +0300
-Message-Id: <1381774527-13746-5-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/4] Bluetooth: Make Set Connectable also update the LE advertising type
+Date: Mon, 14 Oct 2013 21:15:24 +0300
+Message-Id: <1381774527-13746-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1381774527-13746-1-git-send-email-johan.hedberg@gmail.com>
 References: <1381774527-13746-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,128 +11,90 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch converts Set Discoverable to use an asynchronous request
-along with its own completion callback. This is necessary for splitting
-raw HCI socket use cases from mgmt, as well as for enabling the hooking
-up of Advertising parameters together with the HCI_DISCOVERABLE flag
-(coming in later patches).
+This patch updates the Set Connectable Management command to also update
+the LE advertising type to either connectable or non-connectable
+advertising. An extra helper function is needed for getting the right
+advertising type since we can not only rely on the HCI_CONNECTABLE flag
+but must also check for a pending Set Connectable command (in which case
+the flag does not yet have its final value).
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c | 63 ++++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 54 insertions(+), 9 deletions(-)
+ net/bluetooth/mgmt.c | 35 ++++++++++++++++++++++++++++++-----
+ 1 file changed, 30 insertions(+), 5 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 0bad451..813012f 100644
+index caa552c..a07b081 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -935,11 +935,52 @@ static u8 mgmt_le_support(struct hci_dev *hdev)
- 		return MGMT_STATUS_SUCCESS;
+@@ -1072,6 +1072,25 @@ static void write_fast_connectable(struct hci_request *req, bool enable)
+ 		hci_req_add(req, HCI_OP_WRITE_PAGE_SCAN_TYPE, 1, &type);
  }
  
-+static void set_discoverable_complete(struct hci_dev *hdev, u8 status)
++static u8 get_adv_type(struct hci_dev *hdev)
 +{
 +	struct pending_cmd *cmd;
-+	struct mgmt_mode *cp;
-+	bool changed;
++	bool connectable;
 +
-+	BT_DBG("status 0x%02x", status);
-+
-+	hci_dev_lock(hdev);
-+
-+	cmd = mgmt_pending_find(MGMT_OP_SET_DISCOVERABLE, hdev);
-+	if (!cmd)
-+		goto unlock;
-+
-+	if (status) {
-+		u8 mgmt_err = mgmt_status(status);
-+		cmd_status(cmd->sk, cmd->index, cmd->opcode, mgmt_err);
-+		goto remove_cmd;
++	/* If there's a pending mgmt command the flag will not yet have
++	 * it's final value, so check for this first.
++	 */
++	cmd = mgmt_pending_find(MGMT_OP_SET_CONNECTABLE, hdev);
++	if (cmd) {
++		struct mgmt_mode *cp = cmd->param;
++		connectable = !!cp->val;
++	} else {
++		connectable = test_bit(HCI_CONNECTABLE, &hdev->dev_flags);
 +	}
 +
-+	cp = cmd->param;
-+	if (cp->val)
-+		changed = !test_and_set_bit(HCI_DISCOVERABLE,
-+					    &hdev->dev_flags);
-+	else
-+		changed = test_and_clear_bit(HCI_DISCOVERABLE,
-+					     &hdev->dev_flags);
-+
-+	send_settings_rsp(cmd->sk, MGMT_OP_SET_DISCOVERABLE, hdev);
-+
-+	if (changed)
-+		new_settings(hdev, cmd->sk);
-+
-+remove_cmd:
-+	mgmt_pending_remove(cmd);
-+
-+unlock:
-+	hci_dev_unlock(hdev);
++	return connectable ? LE_ADV_IND : LE_ADV_NONCONN_IND;
 +}
 +
- static int set_discoverable(struct sock *sk, struct hci_dev *hdev, void *data,
- 			    u16 len)
+ static void enable_advertising(struct hci_request *req)
  {
- 	struct mgmt_cp_set_discoverable *cp = data;
- 	struct pending_cmd *cmd;
-+	struct hci_request req;
- 	u16 timeout;
- 	u8 scan, status;
- 	int err;
-@@ -1021,6 +1062,8 @@ static int set_discoverable(struct sock *sk, struct hci_dev *hdev, void *data,
- 		goto failed;
- 	}
- 
-+	hci_req_init(&req, hdev);
-+
- 	scan = SCAN_PAGE;
- 
- 	if (cp->val)
-@@ -1028,7 +1071,9 @@ static int set_discoverable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	struct hci_dev *hdev = req->hdev;
+@@ -1081,7 +1100,7 @@ static void enable_advertising(struct hci_request *req)
+ 	memset(&cp, 0, sizeof(cp));
+ 	cp.min_interval = __constant_cpu_to_le16(0x0800);
+ 	cp.max_interval = __constant_cpu_to_le16(0x0800);
+-	cp.type = LE_ADV_IND;
++	cp.type = get_adv_type(hdev);
+ 	if (bacmp(&hdev->bdaddr, BDADDR_ANY))
+ 		cp.own_address_type = ADDR_LE_DEV_PUBLIC;
  	else
- 		cancel_delayed_work(&hdev->discov_off);
+@@ -1144,15 +1163,15 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	struct mgmt_mode *cp = data;
+ 	struct pending_cmd *cmd;
+ 	struct hci_request req;
+-	u8 scan, status;
++	u8 scan;
+ 	int err;
  
--	err = hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
-+	hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
+ 	BT_DBG("request for %s", hdev->name);
+ 
+-	status = mgmt_bredr_support(hdev);
+-	if (status)
++	if (!test_bit(HCI_LE_ENABLED, &hdev->dev_flags) &&
++	    !test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags))
+ 		return cmd_status(sk, hdev->id, MGMT_OP_SET_CONNECTABLE,
+-				  status);
++				  MGMT_STATUS_REJECTED);
+ 
+ 	if (cp->val != 0x00 && cp->val != 0x01)
+ 		return cmd_status(sk, hdev->id, MGMT_OP_SET_CONNECTABLE,
+@@ -1223,6 +1242,12 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	if (cp->val || test_bit(HCI_FAST_CONNECTABLE, &hdev->dev_flags))
+ 		write_fast_connectable(&req, false);
+ 
++	if (test_bit(HCI_ADVERTISING, &hdev->dev_flags) &&
++	    hci_conn_num(hdev, LE_LINK) == 0) {
++		disable_advertising(&req);
++		enable_advertising(&req);
++	}
 +
-+	err = hci_req_run(&req, set_discoverable_complete);
- 	if (err < 0)
+ 	err = hci_req_run(&req, set_connectable_complete);
+ 	if (err < 0) {
  		mgmt_pending_remove(cmd);
- 
-@@ -4074,10 +4119,16 @@ void mgmt_set_powered_failed(struct hci_dev *hdev, int err)
- 
- int mgmt_discoverable(struct hci_dev *hdev, u8 discoverable)
- {
--	struct cmd_lookup match = { NULL, hdev };
- 	bool changed = false;
- 	int err = 0;
- 
-+	/* Nothing needed here if there's a pending command since that
-+	 * commands request completion callback takes care of everything
-+	 * necessary.
-+	 */
-+	if (mgmt_pending_find(MGMT_OP_SET_DISCOVERABLE, hdev))
-+		return 0;
-+
- 	if (discoverable) {
- 		if (!test_and_set_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
- 			changed = true;
-@@ -4086,14 +4137,8 @@ int mgmt_discoverable(struct hci_dev *hdev, u8 discoverable)
- 			changed = true;
- 	}
- 
--	mgmt_pending_foreach(MGMT_OP_SET_DISCOVERABLE, hdev, settings_rsp,
--			     &match);
--
- 	if (changed)
--		err = new_settings(hdev, match.sk);
--
--	if (match.sk)
--		sock_put(match.sk);
-+		err = new_settings(hdev, NULL);
- 
- 	return err;
- }
 -- 
 1.8.3.1
 
