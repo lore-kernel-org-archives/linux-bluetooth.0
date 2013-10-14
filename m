@@ -1,169 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 13/22] blueatchat: Buffered data sanity check
-Date: Mon, 14 Oct 2013 10:34:29 +0200
-Message-Id: <1381739678-16260-14-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 11/22] cbuffer: Add discard method
+Date: Mon, 14 Oct 2013 10:34:27 +0200
+Message-Id: <1381739678-16260-12-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1381739678-16260-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1381739678-16260-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds checking for AT command prefix and postfix to determine
-data completeness.
+This patch adds discarding desired amount of oldest data from the buffer.
 ---
- src/shared/blueatchat.c |  109 ++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 94 insertions(+), 15 deletions(-)
+ src/shared/cbuffer.c |    9 +++++++++
+ src/shared/cbuffer.h |    1 +
+ 2 files changed, 10 insertions(+)
 
-diff --git a/src/shared/blueatchat.c b/src/shared/blueatchat.c
-index a32a7bf..c7eee4a 100644
---- a/src/shared/blueatchat.c
-+++ b/src/shared/blueatchat.c
-@@ -22,6 +22,8 @@
-  */
- 
- #include <stdlib.h>
-+#include <string.h>
-+#include <errno.h>
- #include <glib.h>
- 
- #include "cbuffer.h"
-@@ -38,6 +40,77 @@ struct blueatchat_session {
- 	blueatchat_debug_func_t debug_callback;
- };
- 
-+/*
-+ * returns offset:
-+ *	> 0	- if complete command found, which ends at offset
-+ *	< 0	- if no complete command found wait for more
-+ *	= 0	- some garbage was consumed check again
-+ */
-+static int blueatchat_get_complete_cmd_end(struct blueatchat_session *session)
-+{
-+	struct blueatchat_config *config = session->config;
-+	struct circular_buffer *buffer = session->buffer;
-+	int offset;
-+	unsigned int prelen = strlen(config->cmd_prefix);
-+
-+	/* Check for command prefix */
-+	offset = cbuffer_seek_tail_for_seq(buffer, config->cmd_prefix, 0);
-+
-+	/* Not enough data if only prefix in the buffer */
-+	if (cbuffer_get_length(session->buffer) == prelen)
-+		return -ENODATA;
-+
-+	/* No prefix - drain the buffer */
-+	if (offset < 0) {
-+		cbuffer_drain(buffer);
-+		return -ENODATA;
-+	}
-+
-+	/* Discard data before the prefix */
-+	if (offset) {
-+		cbuffer_discard(session->buffer, offset);
-+		return 0;
-+	}
-+
-+	/* check for postfix */
-+	offset = cbuffer_seek_tail_for_seq(buffer, config->cmd_postfix, prelen);
-+
-+	/* If prefix != postfix check for multiple prefixing before postfix */
-+	if (strncmp(config->cmd_prefix, config->cmd_postfix, prelen)) {
-+		int off = cbuffer_seek_tail_for_seq(buffer, config->cmd_prefix,
-+								prelen);
-+
-+		/* If second prefix exist before postfix consume */
-+		if (off > 0 && off < offset) {
-+			cbuffer_discard(session->buffer, off);
-+			return 0;
-+		}
-+	}
-+
-+	/* If <fix><fix> consume one fix and check again later */
-+	if (offset == (int)prelen) {
-+		cbuffer_discard(session->buffer, offset);
-+		return 0;
-+	} else if (offset > 0) {
-+		return offset + strlen(config->cmd_postfix);
-+	}
-+
-+	/* If offset == 0 no tail found wait for more */
-+	return -ENODATA;
-+}
-+
-+static void process_bufferred_data(struct blueatchat_session *session)
-+{
-+	struct circular_buffer *buffer = session->buffer;
-+	int offset;
-+
-+	while ((offset = blueatchat_get_complete_cmd_end(session)) >= 0) {
-+		/* TODO: parse the data */
-+
-+		if (cbuffer_is_empty(buffer))
-+			return;
-+	}
-+}
- 
- bool blueatchat_read(struct blueatchat_session *session, GIOChannel *gio)
- {
-@@ -48,10 +121,24 @@ bool blueatchat_read(struct blueatchat_session *session, GIOChannel *gio)
- 	gsize len;
- 	gsize i;
- 
--	/* read all data into the buffer */
-+	/* Fill the buffer in chunks if needed to drain the IO */
- 	do {
- 		freechunk = cbuffer_get_free_chunk_size(session->buffer);
- 
-+		/* Free some space by processing the buffer if its full */
-+		if (!freechunk) {
-+			process_bufferred_data(session);
-+
-+			/* If couldn't process anything discard all data */
-+			if (!cbuffer_get_free_chunk_size(session->buffer))
-+				cbuffer_drain(session->buffer);
-+			continue;
-+		}
-+
-+		/*
-+		 * If there is no space after processing or draining the buffer
-+		 * we have a serious buffer error.
-+		 */
- 		msg = cbuffer_get_free_cell(session->buffer);
- 		if (!msg) {
- 			BLUEATCHAT_DEBUG(session, "Buffer malfunction!");
-@@ -65,25 +152,17 @@ bool blueatchat_read(struct blueatchat_session *session, GIOChannel *gio)
- 			return false;
- 		}
- 
--		if (len != 0)
--			BLUEATCHAT_DEBUG(session,
--					"Blueatchat red %u bytes: %.*s",
--					(unsigned int)len, (unsigned int)len,
--					msg);
--
- 		for (i = 0; i < len; ++i)
- 			cbuffer_consume_next_cell(session->buffer);
-+
-+		freechunk = cbuffer_get_free_chunk_size(session->buffer);
- 	} while ((len != 0) && (ret != G_IO_STATUS_EOF));
- 
--	/* TODO: process buffered data
--	 *	-> check for complete command (check for head, tail)
--	 *	-> start consuming buffered data and parsing it
--	 *	-> iterate through session->cmd_list and match commands
--	 *	-> peek a char to choose appropriate parser routine or use
--	 *		syntax descriptor string?
--	 *	-> fill in sessions GSList* data with parsed data
--	 *	-> call '*(session->cmd_list[cmd_index].notify)(session->data)
-+	/*
-+	 * Now check for data completeness (command prefix and postfix).
-+	 * Than parse it and consume parsed data from the buffer.
- 	 */
-+	process_bufferred_data(session);
- 	return true;
+diff --git a/src/shared/cbuffer.c b/src/shared/cbuffer.c
+index 8d85059..a5ed7c5 100644
+--- a/src/shared/cbuffer.c
++++ b/src/shared/cbuffer.c
+@@ -124,6 +124,15 @@ unsigned int cbuffer_get_size(struct circular_buffer *cbuff)
+ 	return cbuff->size;
  }
  
++int cbuffer_discard(struct circular_buffer *cbuff, unsigned int amount)
++{
++	unsigned int len = cbuffer_get_length(cbuff);
++
++	amount = amount > len ? len : amount;
++	cbuff->start = (cbuff->start + amount) & (2 * cbuff->size - 1);
++	return amount;
++}
++
+ /* Manual mode gives direct access to buffers memory space */
+ char *cbuffer_get_free_cell(struct circular_buffer *cbuff)
+ {
+diff --git a/src/shared/cbuffer.h b/src/shared/cbuffer.h
+index ff29d22..759d8a7 100644
+--- a/src/shared/cbuffer.h
++++ b/src/shared/cbuffer.h
+@@ -27,6 +27,7 @@ struct circular_buffer *cbuffer_init(unsigned int size);
+ void cbuffer_free(struct circular_buffer *cbuff);
+ int cbuffer_write(struct circular_buffer *cbuff, char source);
+ int cbuffer_read(struct circular_buffer *cbuff, char *dest);
++int cbuffer_discard(struct circular_buffer *cbuff, unsigned int amount);
+ void cbuffer_drain(struct circular_buffer *cbuff);
+ int cbuffer_is_full(struct circular_buffer *cbuff);
+ int cbuffer_is_empty(struct circular_buffer *cbuff);
 -- 
 1.7.9.5
 
