@@ -1,57 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] audio/AVCTP: Fix sending requests with same transaction id
-Date: Mon, 14 Oct 2013 15:46:03 +0300
-Message-Id: <1381754763-27278-1-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCHv3 14/15] android: Add makefile for hciconfig
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20131014115131.GG2861@aemeltch-MOBL1>
+Date: Mon, 14 Oct 2013 14:06:11 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <863CEBAE-1469-4E15-A90A-ED373C614FAB@holtmann.org>
+References: <1381131496-9417-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381243883-2745-15-git-send-email-Andrei.Emeltchenko.news@gmail.com> <60443344-0A54-4EF4-ABBB-1EAAE168E541@holtmann.org> <20131014115131.GG2861@aemeltch-MOBL1>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Andrei,
 
-If a request is outstanding in the processed list its transaction shall
-not be reused as it can cause the wrong callback to be called.
+>>> 
+>>> ---
+>>> android/Android.mk |   34 ++++++++++++++++++++++++++++++++++
+>>> 1 file changed, 34 insertions(+)
+>>> 
+>>> diff --git a/android/Android.mk b/android/Android.mk
+>>> index e7a70d0..09c4579 100644
+>>> --- a/android/Android.mk
+>>> +++ b/android/Android.mk
+>>> @@ -123,3 +123,37 @@ $(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(LOCAL_PATH)/../lib/bl
+>>> LOCAL_MODULE := libbluetooth
+>>> 
+>>> include $(BUILD_SHARED_LIBRARY)
+>>> +
+>>> +#
+>>> +# hciconfig
+>>> +#
+>> 
+>> why are we building this one. Only btmgmt should be needed for testing. If at all.
+>> 
+> 
+> Can btmon now save packet dump in a format understandable for wireshark?
 
-This can be reproduced in very rare occasions where e.g. a notification
-using the same transaction of the current request arrives before the
-response itself.
----
- profiles/audio/avctp.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+btmon stores in the new BTSnoop format that allows for multiple controllers in the same trace. If Wireshark does not support these, then that should be fixed in Wireshark.
 
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 845027f..dac7a66 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -1480,7 +1480,28 @@ static struct avctp_pending_req *pending_create(struct avctp_channel *chan,
- 						GDestroyNotify destroy)
- {
- 	struct avctp_pending_req *p;
-+	GSList *l, *tmp;
- 
-+	if (!chan->processed)
-+		goto done;
-+
-+	tmp = g_slist_copy(chan->processed);
-+
-+	/* Find first unused transaction id */
-+	for (l = tmp; l; l = l->next) {
-+		struct avctp_pending_req *req = l->data;
-+
-+		if (req->transaction == chan->transaction) {
-+			chan->transaction++;
-+			chan->transaction %= 16;
-+			tmp = g_slist_delete_link(tmp, l);
-+			l = tmp;
-+		}
-+	}
-+
-+	g_slist_free(tmp);
-+
-+done:
- 	p = g_new0(struct avctp_pending_req, 1);
- 	p->chan = chan;
- 	p->transaction = chan->transaction;
--- 
-1.8.3.1
+Regards
+
+Marcel
 
