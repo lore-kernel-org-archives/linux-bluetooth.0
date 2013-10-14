@@ -1,124 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/3] audio/AVDTP: Add struct for discover specific data
-Date: Mon, 14 Oct 2013 13:14:46 +0300
-Message-Id: <1381745687-5677-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1381745687-5677-1-git-send-email-luiz.dentz@gmail.com>
-References: <1381745687-5677-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH] Bluetooth: Introduce L2CAP channel callback for resuming
+Date: Mon, 14 Oct 2013 02:53:54 -0700
+Message-Id: <1381744434-35580-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Clearing the BT_SK_SUSPEND socket flag from the L2CAP core is causing
+a dependency on the socket. So intead of doing that, use a channel
+callback into the socket handling to resume.
 
-This pushes discover specific data to a struct which is a common practice
-if the field contains callback and user_data specific to certain
-operations.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- profiles/audio/avdtp.c | 48 +++++++++++++++++++++++++-----------------------
- 1 file changed, 25 insertions(+), 23 deletions(-)
+ include/net/bluetooth/l2cap.h | 1 +
+ net/bluetooth/l2cap_core.c    | 6 +-----
+ net/bluetooth/l2cap_sock.c    | 9 +++++++++
+ 3 files changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 57e644c..dab8f1c 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -354,6 +354,12 @@ struct avdtp_state_callback {
- 	void *user_data;
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 1a38ede..07757a2 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -554,6 +554,7 @@ struct l2cap_ops {
+ 						 int state);
+ 	void			(*ready) (struct l2cap_chan *chan);
+ 	void			(*defer) (struct l2cap_chan *chan);
++	void			(*resume) (struct l2cap_chan *chan);
+ 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
+ 					       unsigned long len, int nb);
  };
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index e5819cb..0c3446d 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -6669,11 +6669,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
  
-+struct discover_callback {
-+	unsigned int id;
-+	avdtp_discover_cb_t cb;
-+	void *user_data;
-+};
-+
- struct avdtp_stream {
- 	GIOChannel *io;
- 	uint16_t imtu;
-@@ -412,10 +418,7 @@ struct avdtp {
- 
- 	char *buf;
- 
--	guint discov_id;
--	avdtp_discover_cb_t discov_cb;
--	void *user_data;
+ 		if (!status && (chan->state == BT_CONNECTED ||
+ 				chan->state == BT_CONFIG)) {
+-			struct sock *sk = chan->sk;
 -
-+	struct discover_callback *discover;
- 	struct pending_req *req;
- 
- 	guint dc_timer;
-@@ -1042,24 +1045,21 @@ static void avdtp_sep_set_state(struct avdtp *session,
- 
- static void finalize_discovery(struct avdtp *session, int err)
- {
-+	struct discover_callback *discover = session->discover;
- 	struct avdtp_error avdtp_err;
- 
--	avdtp_error_init(&avdtp_err, AVDTP_ERRNO, err);
+-			clear_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
+-			sk->sk_state_change(sk);
 -
--	if (!session->discov_cb)
-+	if (!discover)
- 		return;
- 
--	if (session->discov_id > 0) {
--		g_source_remove(session->discov_id);
--		session->discov_id = 0;
--	}
-+	avdtp_error_init(&avdtp_err, AVDTP_ERRNO, err);
- 
--	session->discov_cb(session, session->seps,
--				err ? &avdtp_err : NULL,
--				session->user_data);
-+	if (discover->id > 0)
-+		g_source_remove(discover->id);
- 
--	session->discov_cb = NULL;
--	session->user_data = NULL;
-+	discover->cb(session, session->seps, err ? &avdtp_err : NULL,
-+							discover->user_data);
-+	g_free(discover);
-+	session->discover = NULL;
++			chan->ops->resume(chan);
+ 			l2cap_check_encryption(chan, encrypt);
+ 			l2cap_chan_unlock(chan);
+ 			continue;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index f5d9573..fcf012a 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1112,6 +1112,14 @@ static void l2cap_sock_defer_cb(struct l2cap_chan *chan)
+ 		parent->sk_data_ready(parent, 0);
  }
  
- static void release_stream(struct avdtp_stream *stream, struct avdtp *session)
-@@ -3328,7 +3328,7 @@ static gboolean process_discover(gpointer data)
- {
- 	struct avdtp *session = data;
- 
--	session->discov_id = 0;
-+	session->discover->id = 0;
- 
- 	finalize_discovery(session, 0);
- 
-@@ -3340,20 +3340,22 @@ int avdtp_discover(struct avdtp *session, avdtp_discover_cb_t cb,
- {
- 	int err;
- 
--	if (session->discov_cb)
-+	if (session->discover)
- 		return -EBUSY;
- 
-+	session->discover = g_new0(struct discover_callback, 1);
++static void l2cap_sock_resume_cb(struct l2cap_chan *chan)
++{
++	struct sock *sk = chan->data;
 +
- 	if (session->seps) {
--		session->discov_cb = cb;
--		session->user_data = user_data;
--		session->discov_id = g_idle_add(process_discover, session);
-+		session->discover->cb = cb;
-+		session->discover->user_data = user_data;
-+		session->discover->id = g_idle_add(process_discover, session);
- 		return 0;
- 	}
++	clear_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
++	sk->sk_state_change(sk);
++}
++
+ static struct l2cap_ops l2cap_chan_ops = {
+ 	.name		= "L2CAP Socket Interface",
+ 	.new_connection	= l2cap_sock_new_connection_cb,
+@@ -1121,6 +1129,7 @@ static struct l2cap_ops l2cap_chan_ops = {
+ 	.state_change	= l2cap_sock_state_change_cb,
+ 	.ready		= l2cap_sock_ready_cb,
+ 	.defer		= l2cap_sock_defer_cb,
++	.resume		= l2cap_sock_resume_cb,
+ 	.alloc_skb	= l2cap_sock_alloc_skb_cb,
+ };
  
- 	err = send_request(session, FALSE, NULL, AVDTP_DISCOVER, NULL, 0);
- 	if (err == 0) {
--		session->discov_cb = cb;
--		session->user_data = user_data;
-+		session->discover->cb = cb;
-+		session->discover->user_data = user_data;
- 	}
- 
- 	return err;
 -- 
 1.8.3.1
 
