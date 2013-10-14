@@ -1,31 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 Oct 2013 21:36:53 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Check that scan window is smaller or equal
- than scan interval
-Message-ID: <20131014183653.GA14748@x220.p-661hnu-f1>
-References: <1381769732-19707-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381769732-19707-1-git-send-email-marcel@holtmann.org>
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH 2/2] Bluetooth: Check that bind() bdaddr type matches connect()
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1381774673-14150-2-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 14 Oct 2013 20:27:47 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <44D17FE9-B4CC-4D4A-966E-EE60ACE2E4B7@holtmann.org>
+References: <1381774673-14150-1-git-send-email-johan.hedberg@gmail.com> <1381774673-14150-2-git-send-email-johan.hedberg@gmail.com>
+To: johan.hedberg@gmail.com
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On Mon, Oct 14, 2013, Marcel Holtmann wrote:
-> The scan window parameter for connection establishment and passive
-> scanning needs to be smaller or equal than the scan interval.
+> If a socket was bound to an address type other than BR/EDR (such as LE)
+> we should reject trying to connect it to a BR/EDR address. The same
+> applies for binding to BR/EDR and trying to connect to non-BR/EDR.
 > 
-> Instead of waiting for a controller to reject these values later on,
-> just reject them right away.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  net/bluetooth/mgmt.c | 4 ++++
->  1 file changed, 4 insertions(+)
+> net/bluetooth/l2cap_sock.c | 6 ++++++
+> 1 file changed, 6 insertions(+)
 
-Applied to bluetooth-next. Thanks.
+patch has been applied to bluetooth-next tree.
 
-Johan
+Regards
+
+Marcel
+
