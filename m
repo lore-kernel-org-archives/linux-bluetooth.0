@@ -1,42 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 Oct 2013 18:30:35 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 0/4] Initial patches splitted
-Message-ID: <20131014153035.GA26449@x220.p-661hnu-f1>
-References: <1381485723-15898-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381485723-15898-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1381595148.21761.0.camel@nuvo>
+References: <1381592725-28212-1-git-send-email-scampa.giovanni@gmail.com>
+	<0262656B-5656-422C-B12D-C6BF7239AA11@holtmann.org>
+	<1381595148.21761.0.camel@nuvo>
+Date: Mon, 14 Oct 2013 18:02:25 +0300
+Message-ID: <CABBYNZJt2n_DZmR2SQk8HvgkRgf4yuPJnYr=HFxqb3H-Y0mQyw@mail.gmail.com>
+Subject: Re: [PATCH] Allow using obexd without systemd in the user session
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Giovanni Campagna <scampa.giovanni@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Giovanni Campagna <gcampagna@src.gnome.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Bastien,
 
-On Fri, Oct 11, 2013, Andrei Emeltchenko wrote:
-> This is small chunk form my previous patch series splitted for easy review.
-> I need to understand what is current coding style for our project, so far it seems
-> very different from BlueZ I took as example first. Please comment.
-> 
-> Changes:
-> 	* PATCHv2: removed unused function
-> 
-> Andrei Emeltchenko (4):
->   android: Add Adapter Bluetooth HAL template
->   android: Add Socket Bluetooth HAL template
->   android: Enable Socket interface
->   android: Start Android Bluetooth daemon
-> 
->  android/Android.mk      |   20 +++
->  android/hal.h           |   18 +++
->  android/hal_bluetooth.c |  384 +++++++++++++++++++++++++++++++++++++++++++++++
->  android/hal_bt_sock.c   |   85 +++++++++++
->  4 files changed, 507 insertions(+)
->  create mode 100644 android/hal.h
->  create mode 100644 android/hal_bluetooth.c
->  create mode 100644 android/hal_bt_sock.c
+On Sat, Oct 12, 2013 at 7:25 PM, Bastien Nocera <hadess@hadess.net> wrote:
+> On Sat, 2013-10-12 at 18:08 +0200, Marcel Holtmann wrote:
+>> Hi Giovanni,
+> <snip>
+>> that is something your distro specific package should be fixing if
+>> that is needed. The focus is on integration with systemd and nothing
+>> else. You can use --disable-systemd and provide your own set of D-Bus
+>> service files.
+>
+> There aren't any distributions that ship systemd for user sessions
+> though.
 
-All four patches have been applied to bluez.git.
+How far we are with this? If that will take a while perhaps we should
+support the old D-Bus service too.
 
-Johan
+
+-- 
+Luiz Augusto von Dentz
