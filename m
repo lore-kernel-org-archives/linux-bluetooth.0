@@ -1,156 +1,186 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 06/22] unit: Add test cases for cbuffer memory acess routines
-Date: Mon, 14 Oct 2013 10:34:22 +0200
-Message-Id: <1381739678-16260-7-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 08/22] unit: Add test cases for cbuffer seek, check, get_length
+Date: Mon, 14 Oct 2013 10:34:24 +0200
+Message-Id: <1381739678-16260-9-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1381739678-16260-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1381739678-16260-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds unit tests for cbuffer's memory direct access
-finctionality and browsing methods.
 ---
- unit/test-cbuffer.c |  121 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 121 insertions(+)
+ unit/test-cbuffer.c |  153 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 153 insertions(+)
 
 diff --git a/unit/test-cbuffer.c b/unit/test-cbuffer.c
-index 5a3482d..d5507a1 100644
+index d5507a1..d51ce64 100644
 --- a/unit/test-cbuffer.c
 +++ b/unit/test-cbuffer.c
-@@ -200,6 +200,123 @@ static void cbt_manual(struct cbt_fixture *fix, gconstpointer test_data)
- 	g_assert(cbuffer_is_empty(fix->cbuff));
+@@ -317,6 +317,151 @@ static void cbt_get_freechunk(struct cbt_fixture *fix, gconstpointer test_data)
+ 				==, cbuffer_get_size(fix->cbuff) - 1);
  }
  
-+static void cbt_peek(struct cbt_fixture *fix, gconstpointer test_data)
++static void cbt_seek_head(struct cbt_fixture *fix, gconstpointer test_data)
 +{
-+	char ch = 1;
++	int found = -128;
++
 +	/* tail */
++	cbuffer_write(fix->cbuff, '<');
++	cbuffer_write(fix->cbuff, '.');
++	cbuffer_write(fix->cbuff, '>');
 +	cbuffer_write(fix->cbuff, 'a');
 +	cbuffer_write(fix->cbuff, 'b');
 +	cbuffer_write(fix->cbuff, 'c');
-+	cbuffer_write(fix->cbuff, 'd');
 +	/* head */
 +
-+	/* peek from head of "abcd" string */
-+	g_assert_cmpint('a', ==, *cbuffer_peek_tail(fix->cbuff, 0));
-+	g_assert_cmpint('b', ==, *cbuffer_peek_tail(fix->cbuff, 1));
-+	g_assert_cmpint('c', ==, *cbuffer_peek_tail(fix->cbuff, 2));
-+	g_assert_cmpint('d', ==, *cbuffer_peek_tail(fix->cbuff, 3));
-+	/* no boundary check here - will wrap around if index  > buffer size */
-+	/* g_assert_cmpint('\0', ==, *cbuffer_peek_head(fix->cbuff, 4)); */
++	found = cbuffer_seek_head_for_seq(fix->cbuff, "<.>", 0);
++	g_assert_cmpint(found, ==, 0);
 +
-+	/* peek from tail of "abcd" string */
-+	g_assert_cmpint('d', ==, *cbuffer_peek_head(fix->cbuff, 0));
-+	g_assert_cmpint('c', ==, *cbuffer_peek_head(fix->cbuff, 1));
-+	g_assert_cmpint('b', ==, *cbuffer_peek_head(fix->cbuff, 2));
-+	g_assert_cmpint('a', ==, *cbuffer_peek_head(fix->cbuff, 3));
-+	/* no boundary check here - will wrap around if index  > buffer size */
-+	/* g_assert_cmpint('\0', ==, *cbuffer_peek_tail(fix->cbuff, 4)); */
++	g_assert_cmpint('<', ==, *cbuffer_peek_tail(fix->cbuff, found));
++	g_assert_cmpint('.', ==, *cbuffer_peek_tail(fix->cbuff, found + 1));
++	g_assert_cmpint('>', ==, *cbuffer_peek_tail(fix->cbuff, found + 2));
 +
-+	/* now read peeked chars in the right sequence */
-+	cbuffer_read(fix->cbuff, &ch);
-+	g_assert_cmpint('a', ==, ch);
-+	cbuffer_read(fix->cbuff, &ch);
-+	g_assert_cmpint('b', ==, ch);
-+	cbuffer_read(fix->cbuff, &ch);
-+	g_assert_cmpint('c', ==, ch);
-+	cbuffer_read(fix->cbuff, &ch);
-+	g_assert_cmpint('d', ==, ch);
-+	ch = 1;
-+	cbuffer_read(fix->cbuff, &ch);
-+	g_assert_cmpint(1, ==, ch);
-+	g_assert(cbuffer_is_empty(fix->cbuff));
++	found = cbuffer_seek_head_for_seq(fix->cbuff, ">.>", 0);
++	g_assert_cmpint(found, <, 0);
++	found = cbuffer_seek_head_for_seq(fix->cbuff, "<>", 0);
++	g_assert_cmpint(found, <, 0);
++
++	found = cbuffer_seek_head_for_seq(fix->cbuff, "a", 1);
++	g_assert_cmpint(found, ==, 3);
++	found = cbuffer_seek_head_for_seq(fix->cbuff, "b", 2);
++	g_assert_cmpint(found, ==, 4);
++	found = cbuffer_seek_head_for_seq(fix->cbuff, "c", 3);
++	g_assert_cmpint(found, ==, 5);
++
++	found = cbuffer_seek_head_for_seq(fix->cbuff, "abc", 0);
++	g_assert(found == 3);
++	g_assert_cmpint('a', ==, *cbuffer_peek_tail(fix->cbuff, found));
++	g_assert_cmpint('b', ==, *cbuffer_peek_tail(fix->cbuff, found + 1));
++	g_assert_cmpint('c', ==, *cbuffer_peek_tail(fix->cbuff, found + 2));
 +}
 +
-+static void cbt_get_freechunk(struct cbt_fixture *fix, gconstpointer test_data)
++static void cbt_seek_tail(struct cbt_fixture *fix, gconstpointer test_data)
++{
++	int found = -1;
++
++	/* tail */
++	cbuffer_write(fix->cbuff, 'z');
++	cbuffer_write(fix->cbuff, 'x');
++	cbuffer_write(fix->cbuff, 'c');
++	cbuffer_write(fix->cbuff, 'v');
++	cbuffer_write(fix->cbuff, 'b');
++	cbuffer_write(fix->cbuff, 'n');
++	cbuffer_write(fix->cbuff, 'm');
++	/* head */
++
++	/* starts seeking for the exact sequence 3 bytes from the end */
++	found = cbuffer_seek_tail_for_seq(fix->cbuff, "bnm", 3);
++	/* should return its distance from the begining */
++	g_assert_cmpint(found, ==, 4);
++	found = cbuffer_seek_tail_for_seq(fix->cbuff, "zxc", 0);
++	g_assert_cmpint(found, ==, 0);
++}
++
++static void cbt_check_for(struct cbt_fixture *fix, gconstpointer test_data)
++{
++	/* tail */
++	cbuffer_write(fix->cbuff, 'z');
++	cbuffer_write(fix->cbuff, 'x');
++	cbuffer_write(fix->cbuff, 'c');
++	cbuffer_write(fix->cbuff, 'v');
++	cbuffer_write(fix->cbuff, 'b');
++	cbuffer_write(fix->cbuff, 'n');
++	cbuffer_write(fix->cbuff, 'm');
++	/* head */
++
++	g_assert_cmpint(0, ==,
++		cbuffer_starts_with_seq(fix->cbuff, "zxcvbm", 0));
++	g_assert_cmpint(1, ==,
++		cbuffer_starts_with_seq(fix->cbuff, "zxcvbn", 0));
++	g_assert_cmpint(0, ==,
++		cbuffer_starts_with_seq(fix->cbuff, "cvb", 1));
++	g_assert_cmpint(1, ==,
++		cbuffer_starts_with_seq(fix->cbuff, "cvb", 2));
++	g_assert_cmpint(0, ==,
++		cbuffer_starts_with_seq(fix->cbuff, "cvb", 3));
++	g_assert_cmpint(1, ==,
++		cbuffer_starts_with_seq(fix->cbuff, "nm", 5));
++}
++
++static void cbt_get_length(struct cbt_fixture *fix, gconstpointer test_data)
 +{
 +	char ch = 0;
-+	unsigned int i;
++	int unsigned i;
++	g_assert_cmpint(0, ==, cbuffer_get_length(fix->cbuff));
 +
-+	g_assert_cmpuint(cbuffer_get_free_chunk_size(fix->cbuff),
-+				==, cbuffer_get_size(fix->cbuff));
++	/* tail */
++	cbuffer_write(fix->cbuff, 'z');
++	cbuffer_write(fix->cbuff, 'x');
++	cbuffer_write(fix->cbuff, 'c');
++	/* head */
++	g_assert_cmpint(3, ==, cbuffer_get_length(fix->cbuff));
++
++	cbuffer_write(fix->cbuff, 'v');
++	cbuffer_write(fix->cbuff, 'b');
++	cbuffer_write(fix->cbuff, 'n');
++	cbuffer_write(fix->cbuff, 'm');
++	/* head */
++	g_assert_cmpint(7, ==, cbuffer_get_length(fix->cbuff));
++
++	cbuffer_read(fix->cbuff, &ch);
++	cbuffer_read(fix->cbuff, &ch);
++	g_assert_cmpint(5, ==, cbuffer_get_length(fix->cbuff));
++
++	cbuffer_drain(fix->cbuff);
++	g_assert_cmpint(0, ==, cbuffer_get_length(fix->cbuff));
++
++	/* test for buffer wrapping around */
 +
 +	/* fill the whole buffer */
 +	for (i = 0; i < cbuffer_get_size(fix->cbuff); ++i) {
 +		g_assert(!cbuffer_is_full(fix->cbuff));
 +		cbuffer_write(fix->cbuff, 'a');
 +	}
-+	g_assert_cmpint(cbuffer_get_size(fix->cbuff),
-+					==, cbuffer_get_length(fix->cbuff));
-+	g_assert_cmpuint(cbuffer_get_free_chunk_size(fix->cbuff), ==, 0);
++	g_assert_cmpint(cbuffer_get_size(fix->cbuff), ==,
++						cbuffer_get_length(fix->cbuff));
 +
-+	/* read more than a half of the data */
-+	for (i = 0; i <= cbuffer_get_size(fix->cbuff) / 2; ++i) {
++	/* read half of the data */
++	for (i = 0; i < cbuffer_get_size(fix->cbuff) / 2; ++i) {
 +		g_assert(!cbuffer_is_empty(fix->cbuff));
 +		cbuffer_read(fix->cbuff, &ch);
 +		g_assert_cmpint('a', ==, ch);
++
 +	}
-+	g_assert_cmpint((cbuffer_get_size(fix->cbuff) / 2) - 1, ==,
++	g_assert_cmpint(cbuffer_get_size(fix->cbuff) / 2, ==,
 +				cbuffer_get_length(fix->cbuff));
 +
-+	/* fill it again leaving 2 empty spaces */
-+	for (i = 0; i < (cbuffer_get_size(fix->cbuff) / 2) - 1; ++i) {
-+		g_assert(!cbuffer_is_full(fix->cbuff));
-+		cbuffer_write(fix->cbuff, 'b');
-+	}
-+	g_assert_cmpint(cbuffer_get_size(fix->cbuff) - 2, ==,
-+				cbuffer_get_length(fix->cbuff));
-+
-+	/* s- buffers start offset
-+	 * e- buffers end offset
-+	 * n- place where new data will be appended
-+	 */
-+	/* [XXXX|n...|XXXXX]
-+	 *      e    s
-+	 */
-+	g_assert_cmpuint(cbuffer_get_free_chunk_size(fix->cbuff), ==, 2);
-+
-+	/* [|n.............]
-+	 * s/e
-+	 */
-+	cbuffer_drain(fix->cbuff);
-+	g_assert_cmpuint(cbuffer_get_free_chunk_size(fix->cbuff),
-+				==, cbuffer_get_size(fix->cbuff));
-+
-+	/* [|X|n...........]
-+	 *  s e
-+	 */
-+	cbuffer_drain(fix->cbuff);
-+	cbuffer_write(fix->cbuff, 'b');
-+	g_assert_cmpuint(cbuffer_get_free_chunk_size(fix->cbuff),
-+				==, cbuffer_get_size(fix->cbuff) - 1);
-+
-+	/* [n...........|X|]
-+	 *		e s
-+	 */
-+	cbuffer_drain(fix->cbuff);
-+	for (i = 0; i < cbuffer_get_size(fix->cbuff); ++i) {
++	/* fill it again */
++	for (i = 0; i < cbuffer_get_size(fix->cbuff) / 2; ++i) {
 +		g_assert(!cbuffer_is_full(fix->cbuff));
 +		cbuffer_write(fix->cbuff, 'a');
 +	}
-+	/* read all but one */
-+	for (i = 0; i < cbuffer_get_size(fix->cbuff) - 1; ++i) {
-+		g_assert(!cbuffer_is_empty(fix->cbuff));
-+		cbuffer_read(fix->cbuff, &ch);
-+		g_assert_cmpint('a', ==, ch);
-+	}
-+	g_assert_cmpuint(cbuffer_get_free_chunk_size(fix->cbuff),
-+				==, cbuffer_get_size(fix->cbuff) - 1);
++
++	/* after refilling should be full */
++	g_assert_cmpint(cbuffer_get_size(fix->cbuff), ==,
++						cbuffer_get_length(fix->cbuff));
 +}
 +
  int main(int argc, char **argv)
  {
  	g_test_init(&argc, &argv, NULL);
-@@ -217,5 +334,9 @@ int main(int argc, char **argv)
- 			cbt_drain, cbt_fix_teardown);
- 	g_test_add("/cbuffer/manual", struct cbt_fixture, 0, cbt_fix_setup,
- 			cbt_manual, cbt_fix_teardown);
-+	g_test_add("/cbuffer/peek", struct cbt_fixture, 0, cbt_fix_setup,
-+			cbt_peek, cbt_fix_teardown);
-+	g_test_add("/cbuffer/get_freechunk", struct cbt_fixture, 0,
-+			cbt_fix_setup, cbt_get_freechunk, cbt_fix_teardown);
+@@ -338,5 +483,13 @@ int main(int argc, char **argv)
+ 			cbt_peek, cbt_fix_teardown);
+ 	g_test_add("/cbuffer/get_freechunk", struct cbt_fixture, 0,
+ 			cbt_fix_setup, cbt_get_freechunk, cbt_fix_teardown);
++	g_test_add("/cbuffer/seek_head", struct cbt_fixture, 0, cbt_fix_setup,
++			cbt_seek_head, cbt_fix_teardown);
++	g_test_add("/cbuffer/seek_tail", struct cbt_fixture, 0, cbt_fix_setup,
++			cbt_seek_tail, cbt_fix_teardown);
++	g_test_add("/cbuffer/check_for", struct cbt_fixture, 0, cbt_fix_setup,
++			cbt_check_for, cbt_fix_teardown);
++	g_test_add("/cbuffer/get_length", struct cbt_fixture, 0, cbt_fix_setup,
++			cbt_get_length, cbt_fix_teardown);
  	return g_test_run();
  }
 -- 
