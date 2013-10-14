@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/4] Bluetooth: Move set_bredr_scan() to avoid forward declaration
-Date: Mon, 14 Oct 2013 21:15:25 +0300
-Message-Id: <1381774527-13746-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 4/4] Bluetooth: Convert Set Discoverable to use an asynchronous request
+Date: Mon, 14 Oct 2013 21:15:27 +0300
+Message-Id: <1381774527-13746-5-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1381774527-13746-1-git-send-email-johan.hedberg@gmail.com>
 References: <1381774527-13746-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,73 +11,128 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The set_bredr_scan() function will soon be needed by the set_bredr()
-function, so move it to a new location to avoid having to add a forward
-declaration.
+This patch converts Set Discoverable to use an asynchronous request
+along with its own completion callback. This is necessary for splitting
+raw HCI socket use cases from mgmt, as well as for enabling the hooking
+up of Advertising parameters together with the HCI_DISCOVERABLE flag
+(coming in later patches).
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c | 40 ++++++++++++++++++++--------------------
- 1 file changed, 20 insertions(+), 20 deletions(-)
+ net/bluetooth/mgmt.c | 63 ++++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 54 insertions(+), 9 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a07b081..48aa239 100644
+index 0bad451..813012f 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -3558,6 +3558,26 @@ unlock:
- 	return err;
+@@ -935,11 +935,52 @@ static u8 mgmt_le_support(struct hci_dev *hdev)
+ 		return MGMT_STATUS_SUCCESS;
  }
  
-+static void set_bredr_scan(struct hci_request *req)
++static void set_discoverable_complete(struct hci_dev *hdev, u8 status)
 +{
-+	struct hci_dev *hdev = req->hdev;
-+	u8 scan = 0;
++	struct pending_cmd *cmd;
++	struct mgmt_mode *cp;
++	bool changed;
 +
-+	/* Ensure that fast connectable is disabled. This function will
-+	 * not do anything if the page scan parameters are already what
-+	 * they should be.
-+	 */
-+	write_fast_connectable(req, false);
++	BT_DBG("status 0x%02x", status);
 +
-+	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
-+		scan |= SCAN_PAGE;
-+	if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
-+		scan |= SCAN_INQUIRY;
++	hci_dev_lock(hdev);
 +
-+	if (scan)
-+		hci_req_add(req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
++	cmd = mgmt_pending_find(MGMT_OP_SET_DISCOVERABLE, hdev);
++	if (!cmd)
++		goto unlock;
++
++	if (status) {
++		u8 mgmt_err = mgmt_status(status);
++		cmd_status(cmd->sk, cmd->index, cmd->opcode, mgmt_err);
++		goto remove_cmd;
++	}
++
++	cp = cmd->param;
++	if (cp->val)
++		changed = !test_and_set_bit(HCI_DISCOVERABLE,
++					    &hdev->dev_flags);
++	else
++		changed = test_and_clear_bit(HCI_DISCOVERABLE,
++					     &hdev->dev_flags);
++
++	send_settings_rsp(cmd->sk, MGMT_OP_SET_DISCOVERABLE, hdev);
++
++	if (changed)
++		new_settings(hdev, cmd->sk);
++
++remove_cmd:
++	mgmt_pending_remove(cmd);
++
++unlock:
++	hci_dev_unlock(hdev);
 +}
 +
- static void set_bredr_complete(struct hci_dev *hdev, u8 status)
+ static int set_discoverable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			    u16 len)
  {
+ 	struct mgmt_cp_set_discoverable *cp = data;
  	struct pending_cmd *cmd;
-@@ -3917,26 +3937,6 @@ void mgmt_index_removed(struct hci_dev *hdev)
- 	mgmt_event(MGMT_EV_INDEX_REMOVED, hdev, NULL, 0, NULL);
- }
++	struct hci_request req;
+ 	u16 timeout;
+ 	u8 scan, status;
+ 	int err;
+@@ -1021,6 +1062,8 @@ static int set_discoverable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto failed;
+ 	}
  
--static void set_bredr_scan(struct hci_request *req)
--{
--	struct hci_dev *hdev = req->hdev;
--	u8 scan = 0;
--
--	/* Ensure that fast connectable is disabled. This function will
--	 * not do anything if the page scan parameters are already what
--	 * they should be.
--	 */
--	write_fast_connectable(req, false);
--
--	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
--		scan |= SCAN_PAGE;
--	if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
--		scan |= SCAN_INQUIRY;
--
--	if (scan)
--		hci_req_add(req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
--}
--
- static void powered_complete(struct hci_dev *hdev, u8 status)
++	hci_req_init(&req, hdev);
++
+ 	scan = SCAN_PAGE;
+ 
+ 	if (cp->val)
+@@ -1028,7 +1071,9 @@ static int set_discoverable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	else
+ 		cancel_delayed_work(&hdev->discov_off);
+ 
+-	err = hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
++	hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
++
++	err = hci_req_run(&req, set_discoverable_complete);
+ 	if (err < 0)
+ 		mgmt_pending_remove(cmd);
+ 
+@@ -4074,10 +4119,16 @@ void mgmt_set_powered_failed(struct hci_dev *hdev, int err)
+ 
+ int mgmt_discoverable(struct hci_dev *hdev, u8 discoverable)
  {
- 	struct cmd_lookup match = { NULL, hdev };
+-	struct cmd_lookup match = { NULL, hdev };
+ 	bool changed = false;
+ 	int err = 0;
+ 
++	/* Nothing needed here if there's a pending command since that
++	 * commands request completion callback takes care of everything
++	 * necessary.
++	 */
++	if (mgmt_pending_find(MGMT_OP_SET_DISCOVERABLE, hdev))
++		return 0;
++
+ 	if (discoverable) {
+ 		if (!test_and_set_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
+ 			changed = true;
+@@ -4086,14 +4137,8 @@ int mgmt_discoverable(struct hci_dev *hdev, u8 discoverable)
+ 			changed = true;
+ 	}
+ 
+-	mgmt_pending_foreach(MGMT_OP_SET_DISCOVERABLE, hdev, settings_rsp,
+-			     &match);
+-
+ 	if (changed)
+-		err = new_settings(hdev, match.sk);
+-
+-	if (match.sk)
+-		sock_put(match.sk);
++		err = new_settings(hdev, NULL);
+ 
+ 	return err;
+ }
 -- 
 1.8.3.1
 
