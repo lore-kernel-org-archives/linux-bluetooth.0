@@ -1,70 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/3] obexd/session: Fix crash when transport is disconnected
-Date: Mon, 14 Oct 2013 13:14:47 +0300
-Message-Id: <1381745687-5677-3-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1381745687-5677-1-git-send-email-luiz.dentz@gmail.com>
-References: <1381745687-5677-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/3] audio/AVDTP: Fix crash after disconnecting
+Date: Mon, 14 Oct 2013 13:14:45 +0300
+Message-Id: <1381745687-5677-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-When transport is disconnected unexpectedly it can cause the following
-crash:
-gobex-DEBUG: gobex/gobex.c:g_obex_send_internal() The transport is not connected
-Invalid read of size 8
-   at 0x42662E: session_process_queue (session.c:789)
-   by 0x42668F: session_process (session.c:719)
-   by 0x3D46047E05: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3600.3)
-   by 0x3D46048157: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
-   by 0x3D46048559: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3600.3)
-   by 0x40D5FC: main (main.c:319)
- Address 0x5086760 is 32 bytes inside a block of size 56 free'd
-   at 0x4A074C4: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
-   by 0x3D4604D9AE: g_free (in /usr/lib64/libglib-2.0.so.0.3600.3)
-   by 0x426146: session_process_setpath (session.c:1063)
-   by 0x426629: session_process_queue (session.c:786)
-   by 0x42668F: session_process (session.c:719)
-   by 0x3D46047E05: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3600.3)
-   by 0x3D46048157: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
-   by 0x3D46048559: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3600.3)
-   by 0x40D5FC: main (main.c:319)
+If the session is disconnected while process_discover is pending the
+source id is not removed causing the following crash:
+      at 0x414C08: finalize_discovery (avdtp.c:1050)
+      by 0x414C5A: process_discover (avdtp.c:3346)
+      by 0x3D46047E05: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3600.3)
+      by 0x3D46048157: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
+      by 0x3D46048559: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3600.3)
+      by 0x40A3B6: main (main.c:595)
+    Address 0x5e25de8 is 1,144 bytes inside a block of size 1,176 free'd
+    at 0x4A074C4: free (in
+    /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+      by 0x3D4604D9AE: g_free (in /usr/lib64/libglib-2.0.so.0.3600.3)
+      by 0x4152F2: connection_lost (avdtp.c:1206)
+      by 0x4162C4: cancel_request (avdtp.c:2662)
+      by 0x4164BD: request_timeout (avdtp.c:2672)
+      by 0x3D46048962: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
+      by 0x3D46047E05: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3600.3)
+      by 0x3D46048157: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
+      by 0x3D46048559: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3600.3)
+      by 0x40A3B6: main (main.c:595)
 ---
- obexd/client/session.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ profiles/audio/avdtp.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/obexd/client/session.c b/obexd/client/session.c
-index 67c2b83..8138b1e 100644
---- a/obexd/client/session.c
-+++ b/obexd/client/session.c
-@@ -296,6 +296,16 @@ done:
- 	g_free(callback);
- }
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index 622dff8..57e644c 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -412,6 +412,7 @@ struct avdtp {
  
-+static void session_disconnected(GObex *obex, GError *err, gpointer user_data)
-+{
-+	struct obc_session *session = user_data;
+ 	char *buf;
+ 
++	guint discov_id;
+ 	avdtp_discover_cb_t discov_cb;
+ 	void *user_data;
+ 
+@@ -1048,6 +1049,11 @@ static void finalize_discovery(struct avdtp *session, int err)
+ 	if (!session->discov_cb)
+ 		return;
+ 
++	if (session->discov_id > 0) {
++		g_source_remove(session->discov_id);
++		session->discov_id = 0;
++	}
 +
-+	if (err)
-+		error("%s", err->message);
-+
-+	obc_session_shutdown(session);
-+}
-+
- static void transport_func(GIOChannel *io, GError *err, gpointer user_data)
+ 	session->discov_cb(session, session->seps,
+ 				err ? &avdtp_err : NULL,
+ 				session->user_data);
+@@ -3322,6 +3328,8 @@ static gboolean process_discover(gpointer data)
  {
- 	struct callback_data *callback = user_data;
-@@ -345,6 +355,8 @@ static void transport_func(GIOChannel *io, GError *err, gpointer user_data)
- 	session->obex = obex;
- 	sessions = g_slist_prepend(sessions, session);
+ 	struct avdtp *session = data;
  
-+	g_obex_set_disconnect_function(obex, session_disconnected, session);
++	session->discov_id = 0;
 +
- 	return;
- done:
- 	callback->func(callback->session, NULL, err, callback->data);
+ 	finalize_discovery(session, 0);
+ 
+ 	return FALSE;
+@@ -3338,7 +3346,7 @@ int avdtp_discover(struct avdtp *session, avdtp_discover_cb_t cb,
+ 	if (session->seps) {
+ 		session->discov_cb = cb;
+ 		session->user_data = user_data;
+-		g_idle_add(process_discover, session);
++		session->discov_id = g_idle_add(process_discover, session);
+ 		return 0;
+ 	}
+ 
 -- 
 1.8.3.1
 
