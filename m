@@ -1,44 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 0/5] Initial Android BlueZ patches
-Date: Tue, 15 Oct 2013 13:36:58 +0300
-Message-Id: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1381492404-25765-1-git-send-email-luiz.dentz@gmail.com>
+References: <1381492404-25765-1-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 15 Oct 2013 13:11:54 +0300
+Message-ID: <CABBYNZKf=2nC2gHZOdXqW3XPS9rvHpFJe=Y3P9+o+E_yXCahCQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/3] audio/media: Add support for tracking Seeked signal
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi,
 
-This is second chunk from my initial big patch set. Fixed style issues commented
-by Marcel.
+On Fri, Oct 11, 2013 at 2:53 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This tracks Seeked signal and update the position in case it happens.
+> ---
+>  profiles/audio/media.c | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+>
+> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+> index 9c72b8d..646c76a 100644
+> --- a/profiles/audio/media.c
+> +++ b/profiles/audio/media.c
+> @@ -96,6 +96,7 @@ struct media_player {
+>         guint                   watch;
+>         guint                   properties_watch;
+>         guint                   track_watch;
+> +       guint                   seek_watch;
+>         char                    *status;
+>         uint32_t                position;
+>         uint32_t                duration;
+> @@ -949,6 +950,7 @@ static void media_player_free(gpointer data)
+>         g_dbus_remove_watch(conn, mp->watch);
+>         g_dbus_remove_watch(conn, mp->properties_watch);
+>         g_dbus_remove_watch(conn, mp->track_watch);
+> +       g_dbus_remove_watch(conn, mp->seek_watch);
+>
+>         if (mp->track)
+>                 g_hash_table_unref(mp->track);
+> @@ -1681,6 +1683,21 @@ static gboolean properties_changed(DBusConnection *connection, DBusMessage *msg,
+>         return TRUE;
+>  }
+>
+> +static gboolean position_changed(DBusConnection *connection, DBusMessage *msg,
+> +                                                       void *user_data)
+> +{
+> +       struct media_player *mp = user_data;
+> +       DBusMessageIter iter;
+> +
+> +       DBG("sender=%s path=%s", mp->sender, mp->path);
+> +
+> +       dbus_message_iter_init(msg, &iter);
+> +
+> +       set_position(mp, &iter);
+> +
+> +       return TRUE;
+> +}
+> +
+>  static struct media_player *media_player_create(struct media_adapter *adapter,
+>                                                 const char *sender,
+>                                                 const char *path,
+> @@ -1702,6 +1719,10 @@ static struct media_player *media_player_create(struct media_adapter *adapter,
+>                                                 path, MEDIA_PLAYER_INTERFACE,
+>                                                 properties_changed,
+>                                                 mp, NULL);
+> +       mp->seek_watch = g_dbus_add_signal_watch(conn, sender,
+> +                                               path, MEDIA_PLAYER_INTERFACE,
+> +                                               "Seeked", position_changed,
+> +                                               mp, NULL);
+>         mp->player = avrcp_register_player(adapter->btd_adapter, &player_cb,
+>                                                         mp, media_player_free);
+>         if (!mp->player) {
+> --
+> 1.8.3.1
 
-Note that due to Marcel comment this cannot be built unless you include my patch
-for Android bionic library:
-http://code.google.com/p/android-bluez/source/detail?r=77a07e7703b63e280d9880baad30b3375e7df079&repo=bionic#
+Pushed.
 
-Andrei Emeltchenko (5):
-  android: Create HAL API header skeleton
-  android: Add basic mgmt initialization sequence
-  android: Add adapter and device struct for BlueZ daemon
-  android: sdp: Reuse BlueZ SDP server in Android
-  android: Add cap to bind to port < 1024
-
- Makefile.android   |    8 +-
- android/Android.mk |   13 +++
- android/adapter.c  |   63 ++++++++++++++
- android/adapter.h  |   36 ++++++++
- android/device.c   |   29 +++++++
- android/device.h   |   24 +++++
- android/hal_msg.h  |  246 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- android/main.c     |  244 +++++++++++++++++++++++++++++++++++++++++++++++++++
- configure.ac       |    4 +
- 9 files changed, 665 insertions(+), 2 deletions(-)
- create mode 100644 android/adapter.c
- create mode 100644 android/adapter.h
- create mode 100644 android/device.c
- create mode 100644 android/device.h
- create mode 100644 android/hal_msg.h
 
 -- 
-1.7.10.4
-
+Luiz Augusto von Dentz
