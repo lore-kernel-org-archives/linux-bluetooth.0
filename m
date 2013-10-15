@@ -1,52 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 Oct 2013 16:44:34 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Kevin Wilson <wkevils@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: BlueZ and Android - question
-Message-ID: <20131015134354.GH2861@aemeltch-MOBL1>
-References: <CAGXs5wXGtexDMRmVNA64bMrHt4ZW3pB6SwZA7K9c_5qQkGh6GA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAGXs5wXGtexDMRmVNA64bMrHt4ZW3pB6SwZA7K9c_5qQkGh6GA@mail.gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 7/7] Bluetooth: Update class of device after changing discoverable mode
+Date: Tue, 15 Oct 2013 06:33:57 -0700
+Message-Id: <1381844037-24424-8-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kevin,
+When the discoverable mode gets changed, ensure that the class of
+device value has the correct limited discoverable bit value set.
 
-On Tue, Oct 15, 2013 at 04:16:45PM +0300, Kevin Wilson wrote:
-> Hello all,
-> I have a question:
-> 
-> I saw in several places on the web text which says, in some
-> variations,  that "BlueZ has been removed starting from Android  4.2
-> and the  Broadcom-supplied Bluetooth stack (bluedroid) has replaced
-> it. It says also that the bluedroid
-> stack relies on HAL-loading like most other hardware types.
-> 
-> On the other hand I see in the official page,
-> http://www.bluez.org/
-> something which I am not sure how to interpret.
-> 
-> 
-> I want to resolve my confusion.
-> So here is my question:
-> In Android 4.2 and above - is the BlueZ removed ? 
+Since the class of device HCI command will only be send to the
+controller when the value changes, it is safe to just always
+trigger the update.
 
-Yes
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/mgmt.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-> is the BlueDroid
-> used instead ?
-
-Yes
-
->or are they both used?
-
-No.
-
-Now there is a project to provide alternative for Bluetooth stack in
-Android. 
-
-Best regards 
-Andrei Emeltchenko 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 12d1cb02..6db2393 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1025,6 +1025,7 @@ static void set_discoverable_complete(struct hci_dev *hdev, u8 status)
+ {
+ 	struct pending_cmd *cmd;
+ 	struct mgmt_mode *cp;
++	struct hci_request req;
+ 	bool changed;
+ 
+ 	BT_DBG("status 0x%02x", status);
+@@ -1054,6 +1055,14 @@ static void set_discoverable_complete(struct hci_dev *hdev, u8 status)
+ 	if (changed)
+ 		new_settings(hdev, cmd->sk);
+ 
++	/* When the discoverable mode gets changed, make sure
++	 * that class of device has the limited discoverable
++	 * bit correctly set.
++	 */
++	hci_req_init(&req, hdev);
++	update_class(&req);
++	hci_req_run(&req, NULL);
++
+ remove_cmd:
+ 	mgmt_pending_remove(cmd);
+ 
+-- 
+1.8.3.1
 
