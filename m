@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 5/5] android: Add cap to bind to port < 1024
-Date: Tue, 15 Oct 2013 13:37:03 +0300
-Message-Id: <1381833423-862-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 3/5] android: Add adapter and device struct for BlueZ daemon
+Date: Tue, 15 Oct 2013 13:37:01 +0300
+Message-Id: <1381833423-862-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,121 +11,195 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-For SDP server we need to bind to lower port, acquire this capability.
+Adapter structure in BlueZ daemon keeps track of default adapter
+and device structure keeps track about found devices.
 ---
- android/main.c |   71 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- configure.ac   |    4 ++++
- 2 files changed, 75 insertions(+)
+ android/adapter.c |   63 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/adapter.h |   36 ++++++++++++++++++++++++++++++
+ android/device.c  |   29 ++++++++++++++++++++++++
+ android/device.h  |   24 ++++++++++++++++++++
+ 4 files changed, 152 insertions(+)
+ create mode 100644 android/adapter.c
+ create mode 100644 android/adapter.h
+ create mode 100644 android/device.c
+ create mode 100644 android/device.h
 
-diff --git a/android/main.c b/android/main.c
-index 2b8675d..5206d3d 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -32,6 +32,22 @@
- #include <stdlib.h>
- #include <stdbool.h>
- #include <string.h>
-+#include <unistd.h>
-+#include <errno.h>
-+#include <sys/prctl.h>
-+#include <linux/capability.h>
-+
-+/**
-+ * Include <sys/capability.h> for host build and
-+ * also for Android 4.3 when it is added to bionic
+diff --git a/android/adapter.c b/android/adapter.c
+new file mode 100644
+index 0000000..b97a7c7
+--- /dev/null
++++ b/android/adapter.c
+@@ -0,0 +1,63 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
 + */
-+#if !defined(ANDROID) || (PLATFORM_SDK_VERSION > 17)
-+#include <sys/capability.h>
-+#endif
 +
-+#if defined(ANDROID)
-+#include <private/android_filesystem_config.h>
-+#endif
- 
- #include <glib.h>
- 
-@@ -232,6 +248,58 @@ static void cleanup_mgmt_interface(void)
- 	mgmt_if = NULL;
- }
- 
-+static bool android_set_aid_and_cap(void)
++#include "src/shared/mgmt.h"
++#include "log.h"
++#include "adapter.h"
++
++struct bt_adapter {
++	struct mgmt *mgmt;
++	bdaddr_t bdaddr;
++	uint32_t dev_class;
++
++	char *name;
++
++	uint32_t supported_settings;
++	uint32_t current_settings;
++
++	GList *found_devices;
++};
++
++struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if)
 +{
-+	struct __user_cap_header_struct header;
-+	struct __user_cap_data_struct cap;
-+#if defined(ANDROID)
-+	gid_t groups[] = {AID_NET_BT, AID_NET_BT_ADMIN, AID_NET_ADMIN};
-+#endif
++	struct bt_adapter *adapter;
 +
-+	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
++	adapter = g_new0(struct bt_adapter, 1);
 +
-+	header.version = _LINUX_CAPABILITY_VERSION;
++	adapter->mgmt = mgmt_ref(mgmt_if);
 +
-+	prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);
-+
-+#if defined(ANDROID)
-+	if (setgid(AID_BLUETOOTH) < 0)
-+		warn("%s: setgid(): %s", __func__, strerror(errno));
-+
-+	if (setuid(AID_BLUETOOTH) < 0)
-+		warn("%s: setuid(): %s", __func__, strerror(errno));
-+#endif
-+
-+	header.version = _LINUX_CAPABILITY_VERSION;
-+	header.pid = 0;
-+
-+	cap.effective = cap.permitted =
-+		CAP_TO_MASK(CAP_SETGID) |
-+		CAP_TO_MASK(CAP_NET_RAW) |
-+		CAP_TO_MASK(CAP_NET_ADMIN) |
-+		CAP_TO_MASK(CAP_NET_BIND_SERVICE);
-+	cap.inheritable = 0;
-+
-+	if (capset(&header, &cap) < 0) {
-+		error("%s: capset(): %s", __func__, strerror(errno));
-+		return false;
-+	}
-+
-+#if defined(ANDROID)
-+	if (setgroups(sizeof(groups)/sizeof(groups[0]), groups) < 0)
-+		warn("%s: setgroups: %s", __func__, strerror(errno));
-+#endif
-+	if (capget(&header, &cap) < 0)
-+		error("%s: capget(): %s", __func__, strerror(errno));
-+	else
-+		DBG("Caps: eff: 0x%x, perm: 0x%x, inh: 0x%x", cap.effective,
-+					cap.permitted, cap.inheritable);
-+
-+	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
-+
-+	return true;
++	return adapter;
 +}
 +
- int main(int argc, char *argv[])
- {
- 	GOptionContext *context;
-@@ -265,6 +333,9 @@ int main(int argc, char *argv[])
- 	sigaction(SIGINT, &sa, NULL);
- 	sigaction(SIGTERM, &sa, NULL);
- 
-+	if (!android_set_aid_and_cap())
-+		return EXIT_FAILURE;
++void bt_adapter_start(struct bt_adapter *adapter)
++{
++	DBG("");
 +
- 	if (!init_mgmt_interface())
- 		return EXIT_FAILURE;
- 
-diff --git a/configure.ac b/configure.ac
-index 7b1f64a..5406434 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -247,4 +247,8 @@ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
- 					[enable_android=${enableval}])
- AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
- 
-+if (test "${android_daemon}" = "yes"); then
-+	AC_CHECK_LIB(cap, capget, dummy=yes, AC_MSG_ERROR(libcap is required))
-+fi
++	/* TODO: CB: report scan mode */
++	/* TODO: CB: report state on */
++}
 +
- AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
++void bt_adapter_stop(struct bt_adapter *adapter)
++{
++	DBG("");
++}
+diff --git a/android/adapter.h b/android/adapter.h
+new file mode 100644
+index 0000000..0f1445a
+--- /dev/null
++++ b/android/adapter.h
+@@ -0,0 +1,36 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <glib.h>
++
++#include "lib/bluetooth.h"
++
++struct bt_adapter;
++
++struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if);
++
++void bt_adapter_start(struct bt_adapter *adapter);
++void bt_adapter_stop(struct bt_adapter *adapter);
+diff --git a/android/device.c b/android/device.c
+new file mode 100644
+index 0000000..224a317
+--- /dev/null
++++ b/android/device.c
+@@ -0,0 +1,29 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++struct bt_device {
++	bdaddr_t bdaddr;
++	uint8_t bdaddr_type;
++	uint32_t cod;
++	char *name;
++};
+diff --git a/android/device.h b/android/device.h
+new file mode 100644
+index 0000000..f5b1da6
+--- /dev/null
++++ b/android/device.h
+@@ -0,0 +1,24 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++struct bt_device;
 -- 
 1.7.10.4
 
