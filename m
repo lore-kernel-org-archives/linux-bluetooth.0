@@ -1,86 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 05/10] Bluetooth: Make mgmt_auth_enable_complete() return void
-Date: Tue, 15 Oct 2013 14:26:24 -0700
-Message-Id: <1381872389-34389-5-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 03/10] Bluetooth: Make mgmt_pin_code_neg_reply_complete() return void
+Date: Tue, 15 Oct 2013 14:26:22 -0700
+Message-Id: <1381872389-34389-3-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The return value of mgmt_auth_enable_complete() function is not
-used and so just change it to return void.
+The return value of mgmt_pin_code_neg_reply_complete() function is
+not used and so just change it to return void.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h |  2 +-
- net/bluetooth/mgmt.c             | 24 ++++++++++--------------
- 2 files changed, 11 insertions(+), 15 deletions(-)
+ include/net/bluetooth/hci_core.h |  4 ++--
+ net/bluetooth/mgmt.c             | 13 +++++--------
+ 2 files changed, 7 insertions(+), 10 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index c742716..3ee5691 100644
+index 95baf35..aaa897f 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1110,7 +1110,7 @@ int mgmt_user_passkey_notify(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			     u8 entered);
- void mgmt_auth_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 		      u8 addr_type, u8 status);
--int mgmt_auth_enable_complete(struct hci_dev *hdev, u8 status);
-+void mgmt_auth_enable_complete(struct hci_dev *hdev, u8 status);
- int mgmt_ssp_enable_complete(struct hci_dev *hdev, u8 enable, u8 status);
- int mgmt_set_class_of_dev_complete(struct hci_dev *hdev, u8 *dev_class,
- 				   u8 status);
+@@ -1090,8 +1090,8 @@ void mgmt_connect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ void mgmt_pin_code_request(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 secure);
+ void mgmt_pin_code_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 				  u8 status);
+-int mgmt_pin_code_neg_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
+-				     u8 status);
++void mgmt_pin_code_neg_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
++				      u8 status);
+ int mgmt_user_confirm_request(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 			      u8 link_type, u8 addr_type, __le32 value,
+ 			      u8 confirm_hint);
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 3c44990..0672a8c 100644
+index 608aa0f..c959915 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -4693,37 +4693,33 @@ void mgmt_auth_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	mgmt_event(MGMT_EV_AUTH_FAILED, hdev, &ev, sizeof(ev), NULL);
+@@ -4563,26 +4563,23 @@ void mgmt_pin_code_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 	mgmt_pending_remove(cmd);
  }
  
--int mgmt_auth_enable_complete(struct hci_dev *hdev, u8 status)
-+void mgmt_auth_enable_complete(struct hci_dev *hdev, u8 status)
+-int mgmt_pin_code_neg_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
+-				     u8 status)
++void mgmt_pin_code_neg_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
++				      u8 status)
  {
- 	struct cmd_lookup match = { NULL, hdev };
--	bool changed = false;
--	int err = 0;
-+	bool changed;
+ 	struct pending_cmd *cmd;
+ 	struct mgmt_rp_pin_code_reply rp;
+-	int err;
  
- 	if (status) {
- 		u8 mgmt_err = mgmt_status(status);
- 		mgmt_pending_foreach(MGMT_OP_SET_LINK_SECURITY, hdev,
- 				     cmd_status_rsp, &mgmt_err);
--		return 0;
+ 	cmd = mgmt_pending_find(MGMT_OP_PIN_CODE_NEG_REPLY, hdev);
+ 	if (!cmd)
+-		return -ENOENT;
 +		return;
- 	}
  
--	if (test_bit(HCI_AUTH, &hdev->flags)) {
--		if (!test_and_set_bit(HCI_LINK_SECURITY, &hdev->dev_flags))
--			changed = true;
--	} else {
--		if (test_and_clear_bit(HCI_LINK_SECURITY, &hdev->dev_flags))
--			changed = true;
--	}
-+	if (test_bit(HCI_AUTH, &hdev->flags))
-+		changed = !test_and_set_bit(HCI_LINK_SECURITY,
-+					    &hdev->dev_flags);
-+	else
-+		changed = test_and_clear_bit(HCI_LINK_SECURITY,
-+					     &hdev->dev_flags);
+ 	bacpy(&rp.addr.bdaddr, bdaddr);
+ 	rp.addr.type = BDADDR_BREDR;
  
- 	mgmt_pending_foreach(MGMT_OP_SET_LINK_SECURITY, hdev, settings_rsp,
- 			     &match);
+-	err = cmd_complete(cmd->sk, hdev->id, MGMT_OP_PIN_CODE_NEG_REPLY,
+-			   mgmt_status(status), &rp, sizeof(rp));
++	cmd_complete(cmd->sk, hdev->id, MGMT_OP_PIN_CODE_NEG_REPLY,
++		     mgmt_status(status), &rp, sizeof(rp));
  
- 	if (changed)
--		err = new_settings(hdev, match.sk);
-+		new_settings(hdev, match.sk);
- 
- 	if (match.sk)
- 		sock_put(match.sk);
+ 	mgmt_pending_remove(cmd);
 -
 -	return err;
  }
  
- static void clear_eir(struct hci_request *req)
+ int mgmt_user_confirm_request(struct hci_dev *hdev, bdaddr_t *bdaddr,
 -- 
 1.8.3.1
 
