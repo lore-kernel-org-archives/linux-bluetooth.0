@@ -1,28 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 Oct 2013 11:28:00 +0300
+Date: Tue, 15 Oct 2013 10:40:37 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix minor coding style issue in
- set_connectable()
-Message-ID: <20131015082800.GA1856@x220.p-661hnu-f1>
-References: <1381793925-14134-1-git-send-email-marcel@holtmann.org>
+To: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Add support for entering limited discoverable
+ mode
+Message-ID: <20131015074037.GA28346@x220.p-661hnu-f1>
+References: <1381792099-8732-1-git-send-email-marcel@holtmann.org>
+ <20131015073157.GA24495@x220.p-661hnu-f1>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381793925-14134-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <20131015073157.GA24495@x220.p-661hnu-f1>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi,
 
-On Mon, Oct 14, 2013, Marcel Holtmann wrote:
-> There is a minor coding style violation and so just fix it. No actual
-> logic has changed.
+On Tue, Oct 15, 2013, Johan Hedberg wrote:
+> On Mon, Oct 14, 2013, Marcel Holtmann wrote:
+> > +	if (cp->val) {
+> > +		struct hci_cp_write_current_iac_lap cp;
+> > +
+> > +		if (timeout > 0) {
+> > +			/* Limited discoverable mode */
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/mgmt.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+> Wouldn't we want to follow the recommendation from the Core spec here,
+> volume 3, part C, section 4.1.2.1:
+> 
+> "A Bluetooth device should not be in limited discoverable mode for more than
+> TGAP(104)"
+> 
+> TGAP(104) in turn is defined as 1 minute (vol 3, part C, Appendix A).
 
-Applied to bluetooth-next. Thanks.
+We might even want to limit this to 30 seconds so the same can be used
+for LE once this is hooked up to advertising:
+
+TGAP(lim_adv_timeout)	30.72s	Maximum time to remain		Required value
+				advertising when in the
+				limited discoverable mode
 
 Johan
