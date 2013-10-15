@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Update class of device on discoverable timeout
-Date: Tue, 15 Oct 2013 10:57:40 -0700
-Message-Id: <1381859860-59886-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Update class of device on discoverable timeout
+Date: Tue, 15 Oct 2013 10:45:58 -0700
+Message-Id: <1381859158-57636-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -14,7 +14,7 @@ the limited discoverable bit.
 To keep the class of device logic in a central place, expose a new
 function mgmt_discoverable_timeout that can be called from the
 timeout callback. In case the class of device value needs updating,
-it will add the HCI command to the transaction.
+it will add the HCI command the transaction.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
