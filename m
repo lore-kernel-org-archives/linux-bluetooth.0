@@ -1,31 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 Oct 2013 18:20:36 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Move arming of discoverable timeout to
- complete handler
-Message-ID: <20131015152036.GA22796@x220.p-661hnu-f1>
-References: <1381849862-32025-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381849862-32025-1-git-send-email-marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Move arming of discoverable timeout to complete handler
+Date: Tue, 15 Oct 2013 08:11:02 -0700
+Message-Id: <1381849862-32025-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+The discoverable timeout is currently armed from hci_event.c and causes
+some side effects when using HCI commands instead of the management
+interface. To make this clear, only arm the discoverable timeout from
+the management command complete handler.
 
-On Tue, Oct 15, 2013, Marcel Holtmann wrote:
-> The discoverable timeout is currently armed from hci_event.c and causes
-> some side effects when using HCI commands instead of the management
-> interface. To make this clear, only arm the discoverable timeout from
-> the management command complete handler.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/hci_event.c |  5 -----
->  net/bluetooth/mgmt.c      | 11 +++++++++--
->  2 files changed, 9 insertions(+), 7 deletions(-)
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_event.c |  5 -----
+ net/bluetooth/mgmt.c      | 11 +++++++++--
+ 2 files changed, 9 insertions(+), 7 deletions(-)
 
-Applied to bluetooth-next. Thanks.
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 7b133f0..071c0df 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -310,11 +310,6 @@ static void hci_cc_write_scan_enable(struct hci_dev *hdev, struct sk_buff *skb)
+ 		set_bit(HCI_ISCAN, &hdev->flags);
+ 		if (!old_iscan)
+ 			mgmt_discoverable(hdev, 1);
+-		if (hdev->discov_timeout > 0) {
+-			int to = msecs_to_jiffies(hdev->discov_timeout * 1000);
+-			queue_delayed_work(hdev->workqueue, &hdev->discov_off,
+-					   to);
+-		}
+ 	} else if (old_iscan)
+ 		mgmt_discoverable(hdev, 0);
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 6db2393..686bda76 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1043,12 +1043,19 @@ static void set_discoverable_complete(struct hci_dev *hdev, u8 status)
+ 	}
+ 
+ 	cp = cmd->param;
+-	if (cp->val)
++	if (cp->val) {
+ 		changed = !test_and_set_bit(HCI_DISCOVERABLE,
+ 					    &hdev->dev_flags);
+-	else
++
++		if (hdev->discov_timeout > 0) {
++			int to = msecs_to_jiffies(hdev->discov_timeout * 1000);
++			queue_delayed_work(hdev->workqueue, &hdev->discov_off,
++					   to);
++		}
++	} else {
+ 		changed = test_and_clear_bit(HCI_DISCOVERABLE,
+ 					     &hdev->dev_flags);
++	}
+ 
+ 	send_settings_rsp(cmd->sk, MGMT_OP_SET_DISCOVERABLE, hdev);
+ 
+-- 
+1.8.3.1
 
-Johan
