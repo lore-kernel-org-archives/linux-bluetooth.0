@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Subject: [PATCH v2 5/5] android: Add calls to adapter methods in haltest
-Date: Tue, 15 Oct 2013 15:13:20 +0200
-Message-ID: <1381842800-3554-6-git-send-email-jerzy.kasenberg@tieto.com>
+Subject: [PATCH v2 2/5] android: Add line editing to haltest
+Date: Tue, 15 Oct 2013 15:13:17 +0200
+Message-ID: <1381842800-3554-3-git-send-email-jerzy.kasenberg@tieto.com>
 In-Reply-To: <1381842800-3554-1-git-send-email-jerzy.kasenberg@tieto.com>
 References: <1381842800-3554-1-git-send-email-jerzy.kasenberg@tieto.com>
 MIME-Version: 1.0
@@ -12,784 +12,100 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is first code that actually calls HAL functions.
-Functions defined in bt_interface_t can be executed.
+Android does not have readline.
+This patch allows to edit command line.
 ---
- android/Android.mk           |    1 +
- android/hal-client/haltest.c |   79 +++++-
- android/hal-client/if_bt.c   |  631 ++++++++++++++++++++++++++++++++++++++++++
- android/hal-client/if_main.h |   99 +++++++
- 4 files changed, 809 insertions(+), 1 deletion(-)
- create mode 100644 android/hal-client/if_bt.c
- create mode 100644 android/hal-client/if_main.h
+ android/Android.mk            |    1 +
+ android/hal-client/haltest.c  |   39 +++-
+ android/hal-client/terminal.c |  428 +++++++++++++++++++++++++++++++++++++++++
+ android/hal-client/terminal.h |   59 ++++++
+ 4 files changed, 524 insertions(+), 3 deletions(-)
+ create mode 100644 android/hal-client/terminal.c
+ create mode 100644 android/hal-client/terminal.h
 
 diff --git a/android/Android.mk b/android/Android.mk
-index d2cbdac..229f106 100644
+index c84fbe3..292c50e 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -62,6 +62,7 @@ LOCAL_SRC_FILES := \
- 	hal-client/terminal.c \
- 	hal-client/history.c \
- 	hal-client/textconv.c \
-+	hal-client/if_bt.c \
+@@ -59,6 +59,7 @@ include $(CLEAR_VARS)
+ LOCAL_SRC_FILES := \
+ 	hal-client/haltest.c \
+ 	hal-client/pollhandler.c \
++	hal-client/terminal.c \
  
  LOCAL_SHARED_LIBRARIES := libhardware
  
 diff --git a/android/hal-client/haltest.c b/android/hal-client/haltest.c
-index edde0ee..ca80d66 100644
+index 11cdd97..edde0ee 100644
 --- a/android/hal-client/haltest.c
 +++ b/android/hal-client/haltest.c
-@@ -16,11 +16,53 @@
-  */
- 
- #include <stdlib.h>
-+#include <stdbool.h>
-+#include <string.h>
-+#include <stdio.h>
-+#include <stdarg.h>
-+#include <unistd.h>
+@@ -19,8 +19,40 @@
  #include <poll.h>
  #include <unistd.h>
  
-+#include "if_main.h"
- #include "terminal.h"
++#include "terminal.h"
  #include "pollhandler.h"
-+#include "history.h"
-+
-+const struct interface *interfaces[] = {
-+	&bluetooth_if,
-+	NULL
-+};
-+
-+int haltest_error(const char *format, ...)
-+{
-+	va_list args;
-+	int ret;
-+	va_start(args, format);
-+	ret = terminal_vprint(format, args);
-+	va_end(args);
-+	return ret;
-+}
-+
-+int haltest_info(const char *format, ...)
-+{
-+	va_list args;
-+	int ret;
-+	va_start(args, format);
-+	ret = terminal_vprint(format, args);
-+	va_end(args);
-+	return ret;
-+}
-+
-+int haltest_warn(const char *format, ...)
-+{
-+	va_list args;
-+	int ret;
-+	va_start(args, format);
-+	ret = terminal_vprint(format, args);
-+	va_end(args);
-+	return ret;
-+}
  
- /*
-  * This function changes input parameter line_buffer so it has
-@@ -48,10 +90,44 @@ static void process_line(char *line_buffer)
- {
- 	char *argv[10];
- 	int argc;
-+	int i = 0;
-+	int j;
- 
- 	argc = command_line_to_argv(line_buffer, argv, 10);
-+	if (argc < 1)
-+		return;
++/*
++ * This function changes input parameter line_buffer so it has
++ * null termination after each token (due to strtok)
++ * Output argv is filled with pointers to arguments
++ * returns number of tokens parsed - argc
++ */
++static int command_line_to_argv(char *line_buffer,
++				char *argv[], int argv_size)
++{
++	static const char *token_breaks = "\r\n\t ";
++	char *token;
++	int argc = 0;
 +
-+	while (interfaces[i] != NULL) {
-+		if (strcmp(interfaces[i]->name, argv[0])) {
-+			i++;
-+			continue;
-+		}
-+		if (argc < 2 || strcmp(argv[1], "?") == 0) {
-+			j = 0;
-+			while (strcmp(interfaces[i]->methods[j].name, "")) {
-+				haltest_info("%s %s\n", argv[0],
-+						interfaces[i]->methods[j].name);
-+				++j;
-+			}
-+			return;
-+		}
-+		j = 0;
-+		while (strcmp(interfaces[i]->methods[j].name, "")) {
-+			if (strcmp(interfaces[i]->methods[j].name, argv[1])) {
-+				j++;
-+				continue;
-+			}
-+			interfaces[i]->methods[j].func(argc,
-+							(const char **)argv);
-+			break;
-+		}
-+		if (strcmp(interfaces[i]->methods[j].name, "") == 0)
-+			printf("No function %s found\n", argv[1]);
-+		break;
++	token = strtok(line_buffer, token_breaks);
++	while (token != NULL && argc < (int)argv_size) {
++		argv[argc++] = token;
++		token = strtok(NULL, token_breaks);
 +	}
- 
--	/* TODO: process command line */
-+	if (interfaces[i] == NULL)
-+		printf("No such interface %s\n", argv[0]);
- }
++
++	return argc;
++}
++
++static void process_line(char *line_buffer)
++{
++	char *argv[10];
++	int argc;
++
++	argc = command_line_to_argv(line_buffer, argv, 10);
++
++	/* TODO: process command line */
++}
  
  /* called when there is something on stdin */
-@@ -74,6 +150,7 @@ static void stdin_handler(struct pollfd *pollfd)
+ static void stdin_handler(struct pollfd *pollfd)
+@@ -33,15 +65,16 @@ static void stdin_handler(struct pollfd *pollfd)
+ 		if (count > 0) {
+ 			int i;
+ 
+-			for (i = 0; i < count; ++i) {
+-				/* TODO: process input */
+-			}
++			for (i = 0; i < count; ++i)
++				terminal_process_char(buf[i], process_line);
+ 		}
+ 	}
+ }
+ 
  int main(int argc, char **argv)
  {
- 	terminal_setup();
-+	history_restore(".haltest_history");
- 
++	terminal_setup();
++
  	/* Register command line handler */
  	poll_register_fd(0, POLLIN, stdin_handler);
-diff --git a/android/hal-client/if_bt.c b/android/hal-client/if_bt.c
+ 
+diff --git a/android/hal-client/terminal.c b/android/hal-client/terminal.c
 new file mode 100644
-index 0000000..fa65737
+index 0000000..e449c71
 --- /dev/null
-+++ b/android/hal-client/if_bt.c
-@@ -0,0 +1,631 @@
-+/*
-+ * Copyright (C) 2013 Intel Corporation
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ *
-+ */
-+
-+#include "if_main.h"
-+
-+const bt_interface_t *if_bluetooth;
-+
-+static char *bdaddr2str(const bt_bdaddr_t *bd_addr)
-+{
-+	static char buf[18];
-+
-+	return bt_bdaddr_t2str(bd_addr, buf);
-+}
-+
-+static char *btuuid2str(const bt_uuid_t *uuid)
-+{
-+	static char buf[39];
-+
-+	return bt_uuid_t2str(uuid, buf);
-+}
-+
-+static bt_scan_mode_t str2btscanmode(const char *str)
-+{
-+	bt_scan_mode_t v = str2bt_scan_mode_t(str);
-+
-+	if ((int)v != -1)
-+		return v;
-+
-+	haltest_warn("WARN: %s cannot convert %s\n", __func__, str);
-+	return (bt_scan_mode_t)atoi(str);
-+}
-+
-+static bt_ssp_variant_t str2btsspvariant(const char *str)
-+{
-+	bt_ssp_variant_t v = str2bt_ssp_variant_t(str);
-+
-+	if ((int)v != -1)
-+		return v;
-+
-+	haltest_warn("WARN: %s cannot convert %s\n", __func__, str);
-+	return (bt_ssp_variant_t)atoi(str);
-+}
-+
-+static bt_property_type_t str2btpropertytype(const char *str)
-+{
-+	bt_property_type_t v = str2bt_property_type_t(str);
-+
-+	if ((int)v != -1)
-+		return v;
-+
-+	haltest_warn("WARN: %s cannot convert %s\n", __func__, str);
-+	return (bt_property_type_t)atoi(str);
-+}
-+
-+static char *btproperty2str(bt_property_t property)
-+{
-+	static char buf[4096];
-+	char *p;
-+
-+	p = buf + sprintf(buf, "type=%s len=%d val=",
-+			  bt_property_type_t2str(property.type), property.len);
-+
-+	switch (property.type) {
-+	case BT_PROPERTY_BDNAME:
-+	case BT_PROPERTY_REMOTE_FRIENDLY_NAME:
-+		sprintf(p, "%*s", property.len,
-+			((bt_bdname_t *) property.val)->name);
-+		break;
-+
-+	case BT_PROPERTY_BDADDR:
-+		sprintf(p, "%s", bdaddr2str((bt_bdaddr_t *)property.val));
-+		break;
-+
-+	case BT_PROPERTY_CLASS_OF_DEVICE:
-+		sprintf(p, "%06x", *((int *)property.val));
-+		break;
-+
-+	case BT_PROPERTY_TYPE_OF_DEVICE:
-+		sprintf(p, "%s", bt_device_type_t2str(
-+					*((bt_device_type_t *)property.val)));
-+		break;
-+
-+	case BT_PROPERTY_REMOTE_RSSI:
-+		sprintf(p, "%d", *((char *)property.val));
-+		break;
-+
-+	case BT_PROPERTY_ADAPTER_SCAN_MODE:
-+		sprintf(p, "%s",
-+			bt_scan_mode_t2str(*((bt_scan_mode_t *)property.val)));
-+		break;
-+
-+	case BT_PROPERTY_ADAPTER_DISCOVERY_TIMEOUT:
-+		sprintf(p, "%d", *((int *)property.val));
-+		break;
-+
-+	case BT_PROPERTY_ADAPTER_BONDED_DEVICES:
-+		{
-+			int count = property.len / sizeof(bt_bdaddr_t);
-+			char *ptr = property.val;
-+
-+			strcat(p, "{");
-+
-+			while (count--) {
-+				strcat(p, bdaddr2str((bt_bdaddr_t *)ptr));
-+				if (count)
-+					strcat(p, ", ");
-+				ptr += sizeof(bt_bdaddr_t);
-+			}
-+
-+			strcat(p, "}");
-+
-+		}
-+		break;
-+
-+	case BT_PROPERTY_UUIDS:
-+		{
-+			int count = property.len / sizeof(bt_uuid_t);
-+			char *ptr = property.val;
-+
-+			strcat(p, "{");
-+
-+			while (count--) {
-+				strcat(p, btuuid2str((bt_uuid_t *)ptr));
-+				if (count)
-+					strcat(p, ", ");
-+				ptr += sizeof(bt_uuid_t);
-+			}
-+
-+			strcat(p, "}");
-+
-+		}
-+		break;
-+
-+	case BT_PROPERTY_SERVICE_RECORD:
-+		{
-+			bt_service_record_t *rec = property.val;
-+
-+			sprintf(p, "{%s, %d, %s}", btuuid2str(&rec->uuid),
-+				rec->channel, rec->name);
-+		}
-+		break;
-+
-+	default:
-+		sprintf(p, "%p", property.val);
-+	}
-+
-+	return buf;
-+}
-+
-+static void dump_properties(int num_properties, bt_property_t *properties)
-+{
-+	int i;
-+
-+	for (i = 0; i < num_properties; i++) {
-+		/*
-+		 * properities sometimes come unaligned hence memcp to
-+		 * aligned buffer
-+		 */
-+		bt_property_t prop;
-+		memcpy(&prop, properties + i, sizeof(prop));
-+
-+		haltest_info("prop: %s\n", btproperty2str(prop));
-+	}
-+}
-+
-+static void adapter_state_changed_cb(bt_state_t state)
-+{
-+	haltest_info("%s: state=%s\n", __func__, bt_state_t2str(state));
-+}
-+
-+static void adapter_properties_cb(bt_status_t status,
-+	int num_properties, bt_property_t *properties)
-+{
-+	haltest_info("%s: status=%s num_properties=%d\n",
-+	       __func__, bt_status_t2str(status), num_properties);
-+
-+	dump_properties(num_properties, properties);
-+}
-+
-+static void remote_device_properties_cb(bt_status_t status,
-+	bt_bdaddr_t *bd_addr, int num_properties, bt_property_t *properties)
-+{
-+	haltest_info("%s: status=%s bd_addr=%s num_properties=%d\n",
-+	       __func__, bt_status_t2str(status), bdaddr2str(bd_addr),
-+	       num_properties);
-+
-+	dump_properties(num_properties, properties);
-+}
-+
-+static void device_found_cb(int num_properties, bt_property_t *properties)
-+{
-+	haltest_info("%s: num_properties=%d\n", __func__, num_properties);
-+
-+	dump_properties(num_properties, properties);
-+}
-+
-+static void discovery_state_changed_cb(bt_discovery_state_t state)
-+{
-+	haltest_info("%s: state=%s\n", __func__,
-+		bt_discovery_state_t2str(state));
-+}
-+
-+static void pin_request_cb(bt_bdaddr_t *remote_bd_addr, bt_bdname_t *bd_name,
-+	uint32_t cod)
-+{
-+	haltest_info("%s: remote_bd_addr=%s bd_name=%s cod=%06x\n", __func__,
-+			       bdaddr2str(remote_bd_addr), bd_name->name, cod);
-+}
-+
-+static void ssp_request_cb(bt_bdaddr_t *remote_bd_addr, bt_bdname_t *bd_name,
-+				uint32_t cod, bt_ssp_variant_t pairing_variant,
-+				uint32_t pass_key)
-+{
-+	haltest_info("%s: remote_bd_addr=%s bd_name=%s cod=%06x pairing_variant=%s pass_key=%d\n",
-+		     __func__, bdaddr2str(remote_bd_addr), bd_name->name, cod,
-+		     bt_ssp_variant_t2str(pairing_variant), pass_key);
-+}
-+
-+static void bond_state_changed_cb(bt_status_t status,
-+					bt_bdaddr_t *remote_bd_addr,
-+					bt_bond_state_t state)
-+{
-+	haltest_info("%s: status=%s remote_bd_addr=%s state=%s\n", __func__,
-+		       bt_status_t2str(status), bdaddr2str(remote_bd_addr),
-+		       bt_bond_state_t2str(state));
-+}
-+
-+static void acl_state_changed_cb(bt_status_t status,
-+					bt_bdaddr_t *remote_bd_addr,
-+					bt_acl_state_t state)
-+{
-+	haltest_info("%s: status=%s remote_bd_addr=%s state=%s\n", __func__,
-+		       bt_status_t2str(status), bdaddr2str(remote_bd_addr),
-+		       bt_acl_state_t2str(state));
-+}
-+
-+static void thread_evt_cb(bt_cb_thread_evt evt)
-+{
-+	haltest_info("%s: evt=%s\n", __func__, bt_cb_thread_evt2str(evt));
-+}
-+
-+static void dut_mode_recv_cb(uint16_t opcode, uint8_t *buf, uint8_t len)
-+{
-+	haltest_info("%s\n", __func__);
-+}
-+
-+static void le_test_mode_cb(bt_status_t status, uint16_t num_packets)
-+{
-+	haltest_info("%s %s %d\n", __func__, bt_state_t2str(status),
-+								num_packets);
-+}
-+
-+static bt_callbacks_t bt_callbacks = {
-+	sizeof(bt_callbacks),
-+	adapter_state_changed_cb,
-+	adapter_properties_cb,
-+	remote_device_properties_cb,
-+	device_found_cb,
-+	discovery_state_changed_cb,
-+	pin_request_cb,
-+	ssp_request_cb,
-+	bond_state_changed_cb,
-+	acl_state_changed_cb,
-+	thread_evt_cb,
-+	dut_mode_recv_cb,
-+	le_test_mode_cb
-+};
-+
-+static void init_p(int argc, const char **argv)
-+{
-+	int err;
-+	const hw_module_t *module;
-+	hw_device_t *device;
-+
-+	err = hw_get_module(BT_HARDWARE_MODULE_ID, &module);
-+	if (err) {
-+		haltest_error("he_get_module returned %d\n", err);
-+		return;
-+	}
-+
-+	err = module->methods->open(module, BT_HARDWARE_MODULE_ID, &device);
-+	if (err) {
-+		haltest_error("module->methods->open returned %d\n", err);
-+		return;
-+	}
-+
-+	if_bluetooth =
-+	    ((bluetooth_device_t *)device)->get_bluetooth_interface();
-+	if (!if_bluetooth) {
-+		haltest_error("get_bluetooth_interface returned NULL\n");
-+		return;
-+	}
-+
-+	EXEC(if_bluetooth->init, &bt_callbacks);
-+}
-+
-+static void cleanup_p(int argc, const char **argv)
-+{
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	EXECV(if_bluetooth->cleanup);
-+
-+	if_bluetooth = NULL;
-+}
-+
-+static void enable_p(int argc, const char **argv)
-+{
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	EXEC(if_bluetooth->enable);
-+}
-+
-+static void disable_p(int argc, const char **argv)
-+{
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	EXEC(if_bluetooth->disable);
-+}
-+
-+static void get_adapter_properties_p(int argc, const char **argv)
-+{
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	EXEC(if_bluetooth->get_adapter_properties);
-+}
-+
-+static void get_adapter_property_p(int argc, const char **argv)
-+{
-+	int type = str2btpropertytype(argv[2]);
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	EXEC(if_bluetooth->get_adapter_property, type);
-+}
-+
-+static void set_adapter_property_p(int argc, const char **argv)
-+{
-+	bt_property_t property;
-+	bt_scan_mode_t mode;
-+	int timeout;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	property.type = str2btpropertytype(argv[2]);
-+
-+	switch (property.type) {
-+	case BT_PROPERTY_BDNAME:
-+		property.len = strlen(argv[3]) + 1;
-+		property.val = (char *)argv[3];
-+		break;
-+
-+	case BT_PROPERTY_ADAPTER_SCAN_MODE:
-+		mode = str2btscanmode(argv[3]);
-+		property.len = sizeof(bt_scan_mode_t);
-+		property.val = &mode;
-+		break;
-+
-+	case BT_PROPERTY_ADAPTER_DISCOVERY_TIMEOUT:
-+		timeout = atoi(argv[3]);
-+		property.val = &timeout;
-+		property.len = sizeof(timeout);
-+		break;
-+
-+	default:
-+		haltest_error("Invalid property %s\n", argv[3]);
-+		return;
-+	}
-+
-+	EXEC(if_bluetooth->set_adapter_property, &property);
-+}
-+
-+static void get_remote_device_properties_p(int argc, const char **argv)
-+{
-+	bt_bdaddr_t addr;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	str2bt_bdaddr_t(argv[2], &addr);
-+
-+	EXEC(if_bluetooth->get_remote_device_properties, &addr);
-+}
-+
-+static void get_remote_device_property_p(int argc, const char **argv)
-+{
-+	bt_property_type_t type;
-+	bt_bdaddr_t addr;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	str2bt_bdaddr_t(argv[2], &addr);
-+	type = str2btpropertytype(argv[3]);
-+
-+	EXEC(if_bluetooth->get_remote_device_property, &addr, type);
-+}
-+
-+static void set_remote_device_property_p(int argc, const char **argv)
-+{
-+	bt_property_t property;
-+	bt_bdaddr_t addr;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	str2bt_bdaddr_t(argv[2], &addr);
-+	property.type = str2btpropertytype(argv[3]);
-+
-+	switch (property.type) {
-+	case BT_PROPERTY_REMOTE_FRIENDLY_NAME:
-+		property.len = strlen(argv[4]);
-+		property.val = (char *)argv[4];
-+		break;
-+
-+	default:
-+		return;
-+	}
-+
-+	EXEC(if_bluetooth->set_remote_device_property, &addr, &property);
-+}
-+
-+static void get_remote_service_record_p(int argc, const char **argv)
-+{
-+	bt_bdaddr_t addr;
-+	bt_uuid_t uuid;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	str2bt_bdaddr_t(argv[2], &addr);
-+	str2bt_uuid_t(argv[3], &uuid);
-+
-+	EXEC(if_bluetooth->get_remote_service_record, &addr, &uuid);
-+}
-+
-+static void get_remote_services_p(int argc, const char **argv)
-+{
-+	bt_bdaddr_t addr;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	str2bt_bdaddr_t(argv[2], &addr);
-+
-+	EXEC(if_bluetooth->get_remote_services, &addr);
-+}
-+
-+static void start_discovery_p(int argc, const char **argv)
-+{
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	EXEC(if_bluetooth->start_discovery);
-+}
-+
-+static void cancel_discovery_p(int argc, const char **argv)
-+{
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	EXEC(if_bluetooth->cancel_discovery);
-+}
-+
-+static void create_bond_p(int argc, const char **argv)
-+{
-+	bt_bdaddr_t addr;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	str2bt_bdaddr_t(argv[2], &addr);
-+
-+	EXEC(if_bluetooth->create_bond, &addr);
-+}
-+
-+static void remove_bond_p(int argc, const char **argv)
-+{
-+	bt_bdaddr_t addr;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	str2bt_bdaddr_t(argv[2], &addr);
-+
-+	EXEC(if_bluetooth->remove_bond, &addr);
-+}
-+
-+static void cancel_bond_p(int argc, const char **argv)
-+{
-+	bt_bdaddr_t addr;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	str2bt_bdaddr_t(argv[2], &addr);
-+
-+	EXEC(if_bluetooth->cancel_bond, &addr);
-+}
-+
-+static void pin_reply_p(int argc, const char **argv)
-+{
-+	bt_bdaddr_t addr;
-+	bt_pin_code_t pin;
-+	int pin_len = 0;
-+	int accept;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	if (argc < 3) {
-+		haltest_error("No address specified\n");
-+		return;
-+	}
-+	str2bt_bdaddr_t(argv[2], &addr);
-+
-+	if (argc >= 4) {
-+		accept = 1;
-+		pin_len = strlen(argv[3]);
-+		memcpy(pin.pin, argv[3], pin_len);
-+	}
-+
-+	EXEC(if_bluetooth->pin_reply, &addr, accept, pin_len, &pin);
-+}
-+
-+static void ssp_reply_p(int argc, const char **argv)
-+{
-+	bt_bdaddr_t addr;
-+	bt_ssp_variant_t var;
-+	int accept;
-+	int passkey;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	if (argc < 3) {
-+		haltest_error("No address specified\n");
-+		return;
-+	}
-+	str2bt_bdaddr_t(argv[2], &addr);
-+	if (argc < 4) {
-+		haltest_error("No ssp variant specified\n");
-+		return;
-+	}
-+	var = str2btsspvariant(argv[3]);
-+	if (argc < 5) {
-+		haltest_error("No accept value specified\n");
-+		return;
-+	}
-+	accept = atoi(argv[4]);
-+	passkey = 0;
-+
-+	if (accept && var == BT_SSP_VARIANT_PASSKEY_ENTRY && argc >= 5)
-+		passkey = atoi(argv[4]);
-+
-+	EXEC(if_bluetooth->ssp_reply, &addr, var, accept, passkey);
-+}
-+
-+static void get_profile_interface_p(int argc, const char **argv)
-+{
-+	const char *id = argv[2];
-+	const void **pif = NULL;
-+	const void *dummy = NULL;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	if (strcmp(BT_PROFILE_HANDSFREE_ID, id) == 0)
-+		pif = &dummy; /* TODO: chenge when if_hf is there */
-+	else if (strcmp(BT_PROFILE_ADVANCED_AUDIO_ID, id) == 0)
-+		pif = &dummy; /* TODO: chenge when if_av is there */
-+	else if (strcmp(BT_PROFILE_HEALTH_ID, id) == 0)
-+		pif = &dummy; /* TODO: chenge when if_hl is there */
-+	else if (strcmp(BT_PROFILE_SOCKETS_ID, id) == 0)
-+		pif = &dummy; /* TODO: chenge when if_sock is there */
-+	else if (strcmp(BT_PROFILE_HIDHOST_ID, id) == 0)
-+		pif = &dummy; /* TODO: chenge when if_hh is there */
-+	else if (strcmp(BT_PROFILE_PAN_ID, id) == 0)
-+		pif = &dummy; /* TODO: chenge when if_pan is there */
-+	else if (strcmp(BT_PROFILE_AV_RC_ID, id) == 0)
-+		pif = &dummy; /* TODO: chenge when if_rc is there */
-+	else
-+		haltest_error("%s is not correct for get_profile_interface\n",
-+		     id);
-+
-+	if (pif != NULL) {
-+		*pif = if_bluetooth->get_profile_interface(id);
-+		haltest_info("get_profile_interface(%s) : %p\n", id, *pif);
-+	}
-+}
-+
-+static void dut_mode_configure_p(int argc, const char **argv)
-+{
-+	uint8_t mode;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	mode = strtol(argv[2], NULL, 0);
-+
-+	EXEC(if_bluetooth->dut_mode_configure, mode);
-+}
-+
-+static struct method methods[] = {
-+	STD_METHOD(init),
-+	STD_METHOD(cleanup),
-+	STD_METHOD(enable),
-+	STD_METHOD(disable),
-+	STD_METHOD(get_adapter_properties),
-+	STD_METHOD(get_adapter_property),
-+	STD_METHOD(set_adapter_property),
-+	STD_METHOD(get_remote_device_properties),
-+	STD_METHOD(get_remote_device_property),
-+	STD_METHOD(set_remote_device_property),
-+	STD_METHOD(get_remote_service_record),
-+	STD_METHOD(get_remote_services),
-+	STD_METHOD(start_discovery),
-+	STD_METHOD(cancel_discovery),
-+	STD_METHOD(create_bond),
-+	STD_METHOD(remove_bond),
-+	STD_METHOD(cancel_bond),
-+	STD_METHOD(pin_reply),
-+	STD_METHOD(ssp_reply),
-+	STD_METHOD(get_profile_interface),
-+	STD_METHOD(dut_mode_configure),
-+	END_METHOD
-+};
-+
-+const struct interface bluetooth_if = {
-+	.name = "adapter",
-+	.methods = methods
-+};
-diff --git a/android/hal-client/if_main.h b/android/hal-client/if_main.h
-new file mode 100644
-index 0000000..9cac7ef
---- /dev/null
-+++ b/android/hal-client/if_main.h
-@@ -0,0 +1,99 @@
++++ b/android/hal-client/terminal.c
+@@ -0,0 +1,428 @@
 +/*
 + * Copyright (C) 2013 Intel Corporation
 + *
@@ -808,87 +124,481 @@ index 0000000..9cac7ef
 + */
 +
 +#include <stdio.h>
-+#include <stdlib.h>
++#include <string.h>
++#include <ctype.h>
 +#include <stdbool.h>
-+#include <signal.h>
-+#include <fcntl.h>
-+#include <errno.h>
-+#include <sys/socket.h>
-+#include <sys/stat.h>
-+#include <sys/types.h>
-+#include <sys/time.h>
-+#include <sys/un.h>
-+#include <poll.h>
++#include <termios.h>
 +
-+#include <hardware/bluetooth.h>
-+#include <hardware/bt_av.h>
-+#include <hardware/bt_hh.h>
-+#include <hardware/bt_pan.h>
-+#include <hardware/bt_sock.h>
-+#include <hardware/bt_hf.h>
-+#include <hardware/bt_hl.h>
-+#include <hardware/bt_rc.h>
-+
-+#include "textconv.h"
-+
-+/* Interfaces from hal that can be populated during application lifetime */
-+extern const bt_interface_t *if_bluetooth;
++#include "terminal.h"
 +
 +/*
-+ * Structure defines top level interfaces that can be used in test tool
-+ * this will contain values as: adapter, av, gatt, sock, pan...
++ * Character sequences recognized by code in this file
++ * Leading ESC 0x1B is not included
 + */
-+struct interface {
-+	const char *name; /* interface name */
-+	struct method *methods; /* methods available for this interface */
++#define SEQ_INSERT "[2~"
++#define SEQ_DELETE "[3~"
++#define SEQ_HOME   "OH"
++#define SEQ_END    "OF"
++#define SEQ_PGUP   "[5~"
++#define SEQ_PGDOWN "[6~"
++#define SEQ_LEFT   "[D"
++#define SEQ_RIGHT  "[C"
++#define SEQ_UP     "[A"
++#define SEQ_DOWN   "[B"
++#define SEQ_STAB   "[Z"
++#define SEQ_M_n    "n"
++#define SEQ_M_p    "p"
++#define SEQ_CLEFT  "[1;5D"
++#define SEQ_CRIGHT "[1;5C"
++#define SEQ_CUP    "[1;5A"
++#define SEQ_CDOWN  "[1;5B"
++#define SEQ_SLEFT  "[1;2D"
++#define SEQ_SRIGHT "[1;2C"
++#define SEQ_SUP    "[1;2A"
++#define SEQ_SDOWN  "[1;2B"
++#define SEQ_MLEFT  "[1;3D"
++#define SEQ_MRIGHT "[1;3C"
++#define SEQ_MUP    "[1;3A"
++#define SEQ_MDOWN  "[1;3B"
++
++#define KEY_SEQUENCE(k) { KEY_##k, SEQ_##k }
++struct ansii_sequence {
++	int code;
++	const char *sequence;
 +};
 +
-+extern const struct interface bluetooth_if;
-+
-+/* Interfaces that will show up in tool (first part of command line) */
-+extern const struct interface *interfaces[];
-+
-+#define METHOD(name, func) {name, func}
-+#define STD_METHOD(m) {#m, m##_p}
-+#define END_METHOD {"", NULL}
-+
-+/*
-+ * Function to parse argument for function, argv[0] and argv[1] are already
-+ * parsed before this function is called and contain interface and method name
-+ * up to argc - 1 arguments are finished and should be used to decide which
-+ * function enumeration function to return
-+ */
-+typedef void (*parse_and_call)(int argc, const char **argv);
-+
-+/*
-+ * For each method there is name and two functions to parse command line
-+ * and call proper hal function on.
-+ */
-+struct method {
-+	const char *name;
-+	parse_and_call func;
++/* Table connects single int key codes with character sequences */
++static const struct ansii_sequence ansii_sequnces[] = {
++	KEY_SEQUENCE(INSERT),
++	KEY_SEQUENCE(DELETE),
++	KEY_SEQUENCE(HOME),
++	KEY_SEQUENCE(END),
++	KEY_SEQUENCE(PGUP),
++	KEY_SEQUENCE(PGDOWN),
++	KEY_SEQUENCE(LEFT),
++	KEY_SEQUENCE(RIGHT),
++	KEY_SEQUENCE(UP),
++	KEY_SEQUENCE(DOWN),
++	KEY_SEQUENCE(CLEFT),
++	KEY_SEQUENCE(CRIGHT),
++	KEY_SEQUENCE(CUP),
++	KEY_SEQUENCE(CDOWN),
++	KEY_SEQUENCE(SLEFT),
++	KEY_SEQUENCE(SRIGHT),
++	KEY_SEQUENCE(SUP),
++	KEY_SEQUENCE(SDOWN),
++	KEY_SEQUENCE(MLEFT),
++	KEY_SEQUENCE(MRIGHT),
++	KEY_SEQUENCE(MUP),
++	KEY_SEQUENCE(MDOWN),
++	KEY_SEQUENCE(STAB),
++	KEY_SEQUENCE(M_p),
++	KEY_SEQUENCE(M_n),
++	{ 0, NULL }
 +};
 +
-+int haltest_error(const char *format, ...);
-+int haltest_info(const char *format, ...);
-+int haltest_warn(const char *format, ...);
++#define isseqence(c) ((c) == 0x1B)
 +
-+/* Helper macro for executing function on interface and printing BT_STATUS */
-+#define EXEC(f, ...) \
-+	{ \
-+		int err = f(__VA_ARGS__); \
-+		haltest_info("%s: %s\n", #f, bt_status_t2str(err)); \
++/*
++ * Number of characters that consist of ANSII sequence
++ * Should not be less then longest string in ansii_sequnces
++ */
++#define MAX_ASCII_SEQUENCE 10
++
++static char current_sequence[MAX_ASCII_SEQUENCE];
++static int current_sequence_len = -1;
++
++/* single line typed by user goes here */
++static char line_buf[LINE_BUF_MAX];
++/* index of cursor in input line */
++static int line_buf_ix = 0;
++/* current length of input line */
++static int line_len = 0;
++
++/*
++ * Moves cursor to right or left
++ *
++ * n - positive - moves cursor right
++ * n - negative - moves cursor left
++ */
++static void terminal_move_cursor(int n)
++{
++	if (n < 0) {
++		for (; n < 0; n++)
++			putchar('\b');
++	} else if (n > 0)
++		printf("%*s", n, line_buf + line_buf_ix);
++}
++
++/* Draw command line */
++void terminal_draw_command_line(void)
++{
++	/*
++	 * this needs to be checked here since line_buf is not cleard
++	 * before parsing event though line_len and line_buf_ix are
++	 */
++	if (line_len > 0)
++		printf(">%s", line_buf);
++	else
++		putchar('>');
++
++	/* move cursor to it's place */
++	terminal_move_cursor(line_len - line_buf_ix);
++}
++
++/* inserts string into command line at cursor position */
++void terminal_insert_into_command_line(const char *p)
++{
++	int len = strlen(p);
++
++	if (line_len == line_buf_ix) {
++		strcat(line_buf, p);
++		printf("%s", p);
++		line_buf_ix = line_len = line_len + len;
++	} else {
++		memmove(line_buf + line_buf_ix + len,
++			line_buf + line_buf_ix, line_len - line_buf_ix + 1);
++		memmove(line_buf + line_buf_ix, p, len);
++		printf("%s", line_buf + line_buf_ix);
++		line_buf_ix += len;
++		line_len += len;
++		terminal_move_cursor(line_buf_ix - line_len);
++	}
++}
++
++/* Prints string and redraws command line */
++int terminal_print(const char *format, ...)
++{
++	va_list args;
++	int ret;
++
++	va_start(args, format);
++
++	ret = terminal_vprint(format, args);
++
++	va_end(args);
++	return ret;
++}
++
++/* Prints string and redraws command line */
++int terminal_vprint(const char *format, va_list args)
++{
++	int ret;
++
++	printf("\r%*s\r", (int)line_len + 1, " ");
++
++	ret = vprintf(format, args);
++
++	terminal_draw_command_line();
++
++	return ret;
++}
++
++/*
++ * Converts terminal character sequences to single value representing
++ * keyboard keys
++ */
++static int terminal_convert_sequence(int c)
++{
++	int i;
++
++	/* Not in sequence yet? */
++	if (current_sequence_len == -1) {
++		/* Is ansii sequence detected by 0x1B ? */
++		if (isseqence(c)) {
++			current_sequence_len++;
++			return 0;
++	       }
++	       return c;
++	}
++	/* Inside sequence */
++	current_sequence[current_sequence_len++] = c;
++	current_sequence[current_sequence_len] = '\0';
++	for (i = 0; ansii_sequnces[i].code; ++i) {
++		/* Matches so far? */
++		if (0 != strncmp(current_sequence,
++			ansii_sequnces[i].sequence, current_sequence_len))
++			continue;
++
++		/* Matches as a whole? */
++		if (ansii_sequnces[i].sequence[current_sequence_len] == 0) {
++			current_sequence_len = -1;
++			return ansii_sequnces[i].code;
++		}
++		/* partial match (not whole sequence yet) */
++		return 0;
++	}
++	terminal_print("ansii char 0x%X %c\n", c);
++	/*
++	 * Sequence does not match
++	 * mark that no in sequence any more, return char
++	 */
++	current_sequence_len = -1;
++	return c;
++}
++
++void terminal_process_char(int c, void (*process_line)(char *line))
++{
++	int refresh_from = -1;
++	int old_pos;
++
++	c = terminal_convert_sequence(c);
++
++	switch (c) {
++	case 0:
++		break;
++	case KEY_LEFT:
++		/* if not at the beginning move to previous character */
++		if (line_buf_ix <= 0)
++			break;
++		line_buf_ix--;
++		terminal_move_cursor(-1);
++		break;
++	case KEY_RIGHT:
++		/*
++		 * If not at the end, just print current character
++		 * and modify position
++		 */
++		if (line_buf_ix < line_len)
++			putchar(line_buf[line_buf_ix++]);
++		break;
++	case KEY_HOME:
++		/* move to beginning of line and update position */
++		putchar('\r');
++		putchar('>');
++		line_buf_ix = 0;
++		break;
++	case KEY_END:
++		/* if not at the end of line */
++		if (line_buf_ix < line_len) {
++			/* print everything from cursor */
++			printf("%s", line_buf + line_buf_ix);
++			/* just modify current position */
++			line_buf_ix = line_len;
++		}
++		break;
++	case KEY_DELETE:
++		/* delete character under cursor if not at the very end */
++		if (line_buf_ix >= line_len)
++			break;
++		/*
++		 * Prepare buffer with one character missing
++		 * trailing 0 is moved
++		 */
++		line_len--;
++		memmove(line_buf + line_buf_ix,
++			line_buf + line_buf_ix + 1,
++			line_len - line_buf_ix + 1);
++		/* print rest of line from current cursor position */
++		printf("%s \b", line_buf + line_buf_ix);
++		/* move back cursor */
++		terminal_move_cursor(line_buf_ix - line_len);
++		break;
++	case KEY_CLEFT:
++		/*
++		 * Move by word left
++		 *
++		 * Are we at the beginning of line?
++		 */
++		if (line_buf_ix <= 0)
++			break;
++
++		old_pos = line_buf_ix;
++		line_buf_ix--;
++		/* skip spaces left */
++		while (line_buf_ix && isspace(line_buf[line_buf_ix]))
++			line_buf_ix--;
++		/* skip all non spaces to the left */
++		while (line_buf_ix > 0 &&
++		       !isspace(line_buf[line_buf_ix - 1]))
++			line_buf_ix--;
++		/* move cursor to new position */
++		terminal_move_cursor(line_buf_ix - old_pos);
++		break;
++	case KEY_CRIGHT:
++		/*
++		 * Move by word right
++		 *
++		 * are we at the end of line?
++		 */
++		if (line_buf_ix >= line_len)
++			break;
++
++		old_pos = line_buf_ix;
++		/* skip all spaces */
++		while (line_buf_ix < line_len &&
++			isspace(line_buf[line_buf_ix]))
++			line_buf_ix++;
++		/* skip all non spaces */
++		while (line_buf_ix < line_len &&
++			!isspace(line_buf[line_buf_ix]))
++			line_buf_ix++;
++		/*
++		 * Move cursor to right by printing text
++		 * between old cursor and new
++		 */
++		if (line_buf_ix > old_pos)
++			printf("%.*s", (int)(line_buf_ix - old_pos),
++				line_buf + old_pos);
++		break;
++	case KEY_UP:
++	case KEY_DOWN:
++		break;
++	case '\n':
++	case '\r':
++		line_len = line_buf_ix = 0;
++		/* print new line */
++		putchar(c);
++		process_line(line_buf);
++		/* clear current line */
++		line_buf[0] = '\0';
++		putchar('>');
++		break;
++	case '\t':
++		/* tab processing */
++		/* TODO Add completion here */
++		break;
++	case KEY_BACKSPACE:
++		if (line_buf_ix <= 0)
++			break;
++
++		if (line_buf_ix == line_len) {
++			printf("\b \b");
++			line_len = --line_buf_ix;
++			line_buf[line_len] = 0;
++		} else {
++			putchar('\b');
++			refresh_from = --line_buf_ix;
++			line_len--;
++			memmove(line_buf + line_buf_ix,
++				line_buf + line_buf_ix + 1,
++				line_len - line_buf_ix + 1);
++		}
++		break;
++	case KEY_INSERT:
++	case KEY_PGUP:
++	case KEY_PGDOWN:
++	case KEY_CUP:
++	case KEY_CDOWN:
++	case KEY_SLEFT:
++	case KEY_SRIGHT:
++	case KEY_MLEFT:
++	case KEY_MRIGHT:
++	case KEY_MUP:
++	case KEY_MDOWN:
++	case KEY_STAB:
++	case KEY_M_n:
++	case KEY_M_p:
++		break;
++	default:
++		if (!isprint(c)) {
++			/*
++			 * TODO: remove this print once all meaningful sequences
++			 * are identified
++			 */
++			printf("char-0x%02x\n", c);
++			break;
++		}
++		if (line_buf_ix < LINE_BUF_MAX - 1) {
++			if (line_len == line_buf_ix) {
++				putchar(c);
++				line_buf[line_buf_ix++] = (char)c;
++				line_len++;
++				line_buf[line_len] = '\0';
++			} else {
++				memmove(line_buf + line_buf_ix + 1,
++					line_buf + line_buf_ix,
++					line_len - line_buf_ix + 1);
++				line_buf[line_buf_ix] = c;
++				refresh_from = line_buf_ix++;
++				line_len++;
++			}
++		}
++		break;
 +	}
 +
-+/* Helper macro for executing void function on interface */
-+#define EXECV(f, ...) \
-+	{ \
-+		(void) f(__VA_ARGS__); \
-+		haltest_info("%s: void\n", #f); \
++	if (refresh_from >= 0) {
++		printf("%s \b", line_buf + refresh_from);
++		terminal_move_cursor(line_buf_ix - line_len);
 +	}
++}
 +
-+#define RETURN_IF_NULL(x) \
-+	do { if (!x) { haltest_error("%s is NULL\n", #x); return; } } while (0)
++void terminal_setup(void)
++{
++	struct termios tios;
++
++	/* Turn off echo since all editing is done by hand */
++	tcgetattr(0, &tios);
++	tios.c_lflag &= ~(ICANON | ECHO);
++	tcsetattr(0, TCSANOW, &tios);
++	putchar('>');
++}
++
+diff --git a/android/hal-client/terminal.h b/android/hal-client/terminal.h
+new file mode 100644
+index 0000000..e53750f
+--- /dev/null
++++ b/android/hal-client/terminal.h
+@@ -0,0 +1,59 @@
++/*
++ * Copyright (C) 2013 Intel Corporation
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ *
++ */
++
++#include <stdarg.h>
++
++/* size of supported line */
++#define LINE_BUF_MAX 1024
++
++enum key_codes {
++	KEY_BACKSPACE = 0x7F,
++	KEY_INSERT = 1000, /* arbitrary value */
++	KEY_DELETE,
++	KEY_HOME,
++	KEY_END,
++	KEY_PGUP,
++	KEY_PGDOWN,
++	KEY_LEFT,
++	KEY_RIGHT,
++	KEY_UP,
++	KEY_DOWN,
++	KEY_CLEFT,
++	KEY_CRIGHT,
++	KEY_CUP,
++	KEY_CDOWN,
++	KEY_SLEFT,
++	KEY_SRIGHT,
++	KEY_SUP,
++	KEY_SDOWN,
++	KEY_MLEFT,
++	KEY_MRIGHT,
++	KEY_MUP,
++	KEY_MDOWN,
++	KEY_STAB,
++	KEY_M_p,
++	KEY_M_n
++};
++
++void terminal_setup(void);
++int terminal_print(const char *format, ...);
++int terminal_vprint(const char *format, va_list args);
++void terminal_process_char(int c, void (*process_line)(char *line));
++void terminal_insert_into_command_line(const char *p);
++void terminal_draw_command_line(void);
++
++void process_tab(const char *line, int len);
 -- 
 1.7.9.5
 
