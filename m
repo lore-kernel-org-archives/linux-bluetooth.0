@@ -1,108 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gustavo Padovan <gustavo@padovan.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 1/7] Bluetooth: Extend state_change() call to report errors too
-Date: Tue, 15 Oct 2013 19:24:45 -0300
-Message-Id: <1381875891-27953-1-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 10/10] Bluetooth: Make mgmt_new_ltk() return void
+Date: Tue, 15 Oct 2013 14:26:29 -0700
+Message-Id: <1381872389-34389-10-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+The return value of mgmt_new_ltk() function is not used and
+so just change it to return void.
 
-Instead of creating an new function pointer to report errors we are just
-reusing state_change for that and there is a simple reason for this, one
-place in the l2cap_core.c code needs, in a locked sk, set both the sk_state
-and sk_err. If we create two different functions for this we would need to
-release the lock between the two operation putting the socket in non
-desired state.
-
-The change is transparent to the l2cap_core.c code, user that only needs
-to set the state won't need any modification.
-
-This is another step of an ongoing work to make l2cap_core.c totally
-independent from l2cap's struct sock.
-
-Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/l2cap.h | 2 +-
- net/bluetooth/a2mp.c          | 3 ++-
- net/bluetooth/l2cap_core.c    | 6 ++----
- net/bluetooth/l2cap_sock.c    | 6 +++++-
- 4 files changed, 10 insertions(+), 7 deletions(-)
+ include/net/bluetooth/hci_core.h | 2 +-
+ net/bluetooth/mgmt.c             | 5 ++---
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 07757a2..4ec86ce 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -551,7 +551,7 @@ struct l2cap_ops {
- 	void			(*teardown) (struct l2cap_chan *chan, int err);
- 	void			(*close) (struct l2cap_chan *chan);
- 	void			(*state_change) (struct l2cap_chan *chan,
--						 int state);
-+						 int state, int err);
- 	void			(*ready) (struct l2cap_chan *chan);
- 	void			(*defer) (struct l2cap_chan *chan);
- 	void			(*resume) (struct l2cap_chan *chan);
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 60ca528..6b8cc23 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -672,7 +672,8 @@ static void a2mp_chan_close_cb(struct l2cap_chan *chan)
- 	l2cap_chan_put(chan);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 5d8d322..0a3a10a 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1125,7 +1125,7 @@ void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ void mgmt_discovering(struct hci_dev *hdev, u8 discovering);
+ int mgmt_device_blocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
+ int mgmt_device_unblocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
+-int mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, u8 persistent);
++void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, u8 persistent);
+ void mgmt_reenable_advertising(struct hci_dev *hdev);
+ 
+ /* HCI info for socket */
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 1ed0b3e..90d9353 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4382,7 +4382,7 @@ void mgmt_new_link_key(struct hci_dev *hdev, struct link_key *key,
+ 	mgmt_event(MGMT_EV_NEW_LINK_KEY, hdev, &ev, sizeof(ev), NULL);
  }
  
--static void a2mp_chan_state_change_cb(struct l2cap_chan *chan, int state)
-+static void a2mp_chan_state_change_cb(struct l2cap_chan *chan, int state,
-+				      int err)
+-int mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, u8 persistent)
++void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, u8 persistent)
  {
- 	struct amp_mgr *mgr = chan->data;
+ 	struct mgmt_ev_new_long_term_key ev;
  
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 0c3446d..df5670d 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -229,7 +229,7 @@ static void __l2cap_state_change(struct l2cap_chan *chan, int state)
- 	       state_to_string(state));
+@@ -4401,8 +4401,7 @@ int mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, u8 persistent)
+ 	memcpy(ev.key.rand, key->rand, sizeof(key->rand));
+ 	memcpy(ev.key.val, key->val, sizeof(key->val));
  
- 	chan->state = state;
--	chan->ops->state_change(chan, state);
-+	chan->ops->state_change(chan, state, 0);
+-	return mgmt_event(MGMT_EV_NEW_LONG_TERM_KEY, hdev, &ev, sizeof(ev),
+-			  NULL);
++	mgmt_event(MGMT_EV_NEW_LONG_TERM_KEY, hdev, &ev, sizeof(ev), NULL);
  }
  
- static void l2cap_state_change(struct l2cap_chan *chan, int state)
-@@ -243,9 +243,7 @@ static void l2cap_state_change(struct l2cap_chan *chan, int state)
- 
- static inline void __l2cap_chan_set_err(struct l2cap_chan *chan, int err)
- {
--	struct sock *sk = chan->sk;
--
--	sk->sk_err = err;
-+	chan->ops->state_change(chan, chan->state, err);
- }
- 
- static inline void l2cap_chan_set_err(struct l2cap_chan *chan, int err)
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 5ffd75e..0de8a30 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1072,11 +1072,15 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
- 	release_sock(sk);
- }
- 
--static void l2cap_sock_state_change_cb(struct l2cap_chan *chan, int state)
-+static void l2cap_sock_state_change_cb(struct l2cap_chan *chan, int state,
-+				       int err)
- {
- 	struct sock *sk = chan->data;
- 
- 	sk->sk_state = state;
-+
-+	if (err)
-+		sk->sk_err = err;
- }
- 
- static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
+ static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type, u8 *data,
 -- 
 1.8.3.1
 
