@@ -1,72 +1,186 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 02/10] Bluetooth: Make mgmt_pin_code_reply_complete() return void
-Date: Tue, 15 Oct 2013 14:26:21 -0700
-Message-Id: <1381872389-34389-2-git-send-email-marcel@holtmann.org>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [RFC BlueZ v1] doc: Add GATT API
+Date: Tue, 15 Oct 2013 15:39:43 -0300
+Message-Id: <1381862383-9866-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1381777790-28891-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1381777790-28891-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The return value of mgmt_pin_code_reply_complete() function is not
-used and so just change it to return void.
-
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+This patch proposes an unified GATT API for local and remote services.
 ---
- include/net/bluetooth/hci_core.h |  4 ++--
- net/bluetooth/mgmt.c             | 13 +++++--------
- 2 files changed, 7 insertions(+), 10 deletions(-)
+ doc/gatt-api.txt | 159 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 159 insertions(+)
+ create mode 100644 doc/gatt-api.txt
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index a167a9d..95baf35 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1088,8 +1088,8 @@ void mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr,
- void mgmt_connect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 			 u8 addr_type, u8 status);
- void mgmt_pin_code_request(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 secure);
--int mgmt_pin_code_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
--				 u8 status);
-+void mgmt_pin_code_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
-+				  u8 status);
- int mgmt_pin_code_neg_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 				     u8 status);
- int mgmt_user_confirm_request(struct hci_dev *hdev, bdaddr_t *bdaddr,
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index efa2c52..608aa0f 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4544,26 +4544,23 @@ void mgmt_pin_code_request(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 secure)
- 	mgmt_event(MGMT_EV_PIN_CODE_REQUEST, hdev, &ev, sizeof(ev), NULL);
- }
- 
--int mgmt_pin_code_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
--				 u8 status)
-+void mgmt_pin_code_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
-+				  u8 status)
- {
- 	struct pending_cmd *cmd;
- 	struct mgmt_rp_pin_code_reply rp;
--	int err;
- 
- 	cmd = mgmt_pending_find(MGMT_OP_PIN_CODE_REPLY, hdev);
- 	if (!cmd)
--		return -ENOENT;
-+		return;
- 
- 	bacpy(&rp.addr.bdaddr, bdaddr);
- 	rp.addr.type = BDADDR_BREDR;
- 
--	err = cmd_complete(cmd->sk, hdev->id, MGMT_OP_PIN_CODE_REPLY,
--			   mgmt_status(status), &rp, sizeof(rp));
-+	cmd_complete(cmd->sk, hdev->id, MGMT_OP_PIN_CODE_REPLY,
-+		     mgmt_status(status), &rp, sizeof(rp));
- 
- 	mgmt_pending_remove(cmd);
--
--	return err;
- }
- 
- int mgmt_pin_code_neg_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+new file mode 100644
+index 0000000..a60d146
+--- /dev/null
++++ b/doc/gatt-api.txt
+@@ -0,0 +1,159 @@
++BlueZ D-Bus GATT API description
++********************************
++
++GATT local and remote services share the same high-level D-Bus API. Local
++refers to local GATT based service exported by a BlueZ plugin or an external
++application. Remote refers to GATT services exported by the peer.
++
++BlueZ acts as a proxy, translating ATT operations to D-Bus method calls and
++Properties (or the opposite). Support for D-Bus Object Manager is mandatory for
++external services to allow seamless GATT declarations (Service, Characteristic
++and Descriptors) discovery.
++
++Service hierarchy
++=================
++
++GATT remote and local service representation. Object path for local services
++is freely definable.
++
++External local services should register the services using ServiceManager1
++registration method and must implement ServiceAgent1 interface.
++
++Service		org.bluez
++Interface	org.bluez.Service1 [Experimental]
++Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX
++
++Properties	string UUID [read-only]
++
++			128-bit UUID of the GATT based service. It represents
++			the UUID of a local external service or remote GATT
++			service.
++
++		array{object} Includes [read-only]: Not implemented
++
++			Array of object paths representing the included
++			services of this service.
++
++
++Characteristic hierarchy
++========================
++
++For local GATT defined services, the object paths need to follow the service
++path hierarchy and are freely definable.
++
++Service		org.bluez
++Interface	org.bluez.Characteristic1 [Experimental]
++Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY
++
++Properties	string UUID [read-only]
++
++			128-bit characteristic UUID. It represents the UUID of
++			a local external characteristic or remote GATT
++			characteristic.
++
++		object Service [read-only]
++
++			Object path of the GATT service the characteristc
++			belongs to.
++
++		array{byte} Value [read-write]
++
++			Cached Value of the characteristic. If present, the
++			value will be cached by bluetoothd and updated when the
++			PropertiesChanged signal is emitted.
++
++			External services must emit this signal when the
++			characteristic supports notification/indication, so
++			that clients can be notified of the new value.
++
++		array{string} Flags [read-only, optional]
++
++			Defines how the characteristic value can be used. See
++			Core spec page 1898, "Table 3.5: Characteristic
++			Properties bit field" and page 1900, "Table 3.8:
++			Characteristic Extended Properties bit field". Allowed
++			values: "broadcast", "read", "write-without-response",
++			"write", "notify", "indicate",
++			"authenticated-signed-writes", "reliable-write", and
++			"writable-auxiliaries".
++
++
++Characteristic Descriptors hierarchy
++====================================
++
++Local or remote GATT characteristic descriptors hierarchy.
++
++Service		org.bluez
++Interface	org.bluez.Descriptor1 [Experimental]
++Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY/descriptorZZZ
++
++Properties	string UUID [read-only]
++
++			128-bit descriptor UUID. It represents the UUID of a
++			local external descriptor or remote descriptor.
++
++		object Characteristic [read-only]
++
++			Object path of the GATT characteristc the descriptor
++			belongs to.
++
++		array{byte} Value [read-write]
++
++			Raw characteristic descriptor value. For external GATT
++			services, value changes should be reported through
++			PropertiesChanged signal.
++
++		string Permissions [read-only]: To be defined
++
++			Defines read/write authentication and authorization
++			requirements.
++
++Application Manager hierarchy
++=============================
++
++Application Manager allows external applications to register GATT based
++services. Services should follow the API for Service and Characteristic
++described above.
++
++For GATT local services, services and characteristics definitions are
++discovered automatically using D-Bus Object Manager.
++
++Service		org.bluez
++Interface	org.bluez.ApplicationManager1 [Experimental]
++Object path	/org/bluez
++
++Methods		RegisterAgent(object application, dict options)
++
++			Registers remote application services exported under
++			the interface Service1. Characteristic objects must
++			be hierarchical to their service and must use the
++			interface Characteristic1. D-Bus Object Manager is
++			used to fetch the exported objects.
++
++			"application" object path together with the D-Bus system
++			bus connection ID define the identification of the
++			application registering a GATT based service.
++
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.AlreadyExists
++
++		UnregisterAgent(object application)
++
++			This unregisters the application that has been
++			previously registered. The object path parameter
++			must match the same value that has been used
++			on registration.
++
++			Possible errors: org.bluez.Error.DoesNotExist
++
++Application Agent hierarchy
++===========================
++
++Service		unique name
++Interface	org.bluez.ApplicationAgent1 [Experimental]
++Object path	freely definable
++
++Methods		void Release()
++
++			Release this agent. At this point, it will not be used
++			by BlueZ anymore and can be destroyed by the owner.
 -- 
 1.8.3.1
 
