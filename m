@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Subject: [PATCH v2 2/5] android: Add line editing to haltest
-Date: Tue, 15 Oct 2013 15:13:17 +0200
-Message-ID: <1381842800-3554-3-git-send-email-jerzy.kasenberg@tieto.com>
+Subject: [PATCH v2 4/5] android: Add text conversion helpers to haltest
+Date: Tue, 15 Oct 2013 15:13:19 +0200
+Message-ID: <1381842800-3554-5-git-send-email-jerzy.kasenberg@tieto.com>
 In-Reply-To: <1381842800-3554-1-git-send-email-jerzy.kasenberg@tieto.com>
 References: <1381842800-3554-1-git-send-email-jerzy.kasenberg@tieto.com>
 MIME-Version: 1.0
@@ -12,100 +12,36 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Android does not have readline.
-This patch allows to edit command line.
+Application uses a lot of text in the form of defines found in header
+files to represent arguments and output.
+Conversion helpers keep functionality of converting string as
+bt_status_t or uuid in one place.
 ---
  android/Android.mk            |    1 +
- android/hal-client/haltest.c  |   39 +++-
- android/hal-client/terminal.c |  428 +++++++++++++++++++++++++++++++++++++++++
- android/hal-client/terminal.h |   59 ++++++
- 4 files changed, 524 insertions(+), 3 deletions(-)
- create mode 100644 android/hal-client/terminal.c
- create mode 100644 android/hal-client/terminal.h
+ android/hal-client/textconv.c |  205 +++++++++++++++++++++++++++++++++++++++++
+ android/hal-client/textconv.h |  113 +++++++++++++++++++++++
+ 3 files changed, 319 insertions(+)
+ create mode 100644 android/hal-client/textconv.c
+ create mode 100644 android/hal-client/textconv.h
 
 diff --git a/android/Android.mk b/android/Android.mk
-index c84fbe3..292c50e 100644
+index a8daf92..d2cbdac 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -59,6 +59,7 @@ include $(CLEAR_VARS)
- LOCAL_SRC_FILES := \
- 	hal-client/haltest.c \
+@@ -61,6 +61,7 @@ LOCAL_SRC_FILES := \
  	hal-client/pollhandler.c \
-+	hal-client/terminal.c \
+ 	hal-client/terminal.c \
+ 	hal-client/history.c \
++	hal-client/textconv.c \
  
  LOCAL_SHARED_LIBRARIES := libhardware
  
-diff --git a/android/hal-client/haltest.c b/android/hal-client/haltest.c
-index 11cdd97..edde0ee 100644
---- a/android/hal-client/haltest.c
-+++ b/android/hal-client/haltest.c
-@@ -19,8 +19,40 @@
- #include <poll.h>
- #include <unistd.h>
- 
-+#include "terminal.h"
- #include "pollhandler.h"
- 
-+/*
-+ * This function changes input parameter line_buffer so it has
-+ * null termination after each token (due to strtok)
-+ * Output argv is filled with pointers to arguments
-+ * returns number of tokens parsed - argc
-+ */
-+static int command_line_to_argv(char *line_buffer,
-+				char *argv[], int argv_size)
-+{
-+	static const char *token_breaks = "\r\n\t ";
-+	char *token;
-+	int argc = 0;
-+
-+	token = strtok(line_buffer, token_breaks);
-+	while (token != NULL && argc < (int)argv_size) {
-+		argv[argc++] = token;
-+		token = strtok(NULL, token_breaks);
-+	}
-+
-+	return argc;
-+}
-+
-+static void process_line(char *line_buffer)
-+{
-+	char *argv[10];
-+	int argc;
-+
-+	argc = command_line_to_argv(line_buffer, argv, 10);
-+
-+	/* TODO: process command line */
-+}
- 
- /* called when there is something on stdin */
- static void stdin_handler(struct pollfd *pollfd)
-@@ -33,15 +65,16 @@ static void stdin_handler(struct pollfd *pollfd)
- 		if (count > 0) {
- 			int i;
- 
--			for (i = 0; i < count; ++i) {
--				/* TODO: process input */
--			}
-+			for (i = 0; i < count; ++i)
-+				terminal_process_char(buf[i], process_line);
- 		}
- 	}
- }
- 
- int main(int argc, char **argv)
- {
-+	terminal_setup();
-+
- 	/* Register command line handler */
- 	poll_register_fd(0, POLLIN, stdin_handler);
- 
-diff --git a/android/hal-client/terminal.c b/android/hal-client/terminal.c
+diff --git a/android/hal-client/textconv.c b/android/hal-client/textconv.c
 new file mode 100644
-index 0000000..e449c71
+index 0000000..2de729d
 --- /dev/null
-+++ b/android/hal-client/terminal.c
-@@ -0,0 +1,428 @@
++++ b/android/hal-client/textconv.c
+@@ -0,0 +1,205 @@
 +/*
 + * Copyright (C) 2013 Intel Corporation
 + *
@@ -123,423 +59,200 @@ index 0000000..e449c71
 + *
 + */
 +
-+#include <stdio.h>
 +#include <string.h>
-+#include <ctype.h>
-+#include <stdbool.h>
-+#include <termios.h>
++#include <stdio.h>
++#include <hardware/bluetooth.h>
 +
-+#include "terminal.h"
-+
-+/*
-+ * Character sequences recognized by code in this file
-+ * Leading ESC 0x1B is not included
-+ */
-+#define SEQ_INSERT "[2~"
-+#define SEQ_DELETE "[3~"
-+#define SEQ_HOME   "OH"
-+#define SEQ_END    "OF"
-+#define SEQ_PGUP   "[5~"
-+#define SEQ_PGDOWN "[6~"
-+#define SEQ_LEFT   "[D"
-+#define SEQ_RIGHT  "[C"
-+#define SEQ_UP     "[A"
-+#define SEQ_DOWN   "[B"
-+#define SEQ_STAB   "[Z"
-+#define SEQ_M_n    "n"
-+#define SEQ_M_p    "p"
-+#define SEQ_CLEFT  "[1;5D"
-+#define SEQ_CRIGHT "[1;5C"
-+#define SEQ_CUP    "[1;5A"
-+#define SEQ_CDOWN  "[1;5B"
-+#define SEQ_SLEFT  "[1;2D"
-+#define SEQ_SRIGHT "[1;2C"
-+#define SEQ_SUP    "[1;2A"
-+#define SEQ_SDOWN  "[1;2B"
-+#define SEQ_MLEFT  "[1;3D"
-+#define SEQ_MRIGHT "[1;3C"
-+#define SEQ_MUP    "[1;3A"
-+#define SEQ_MDOWN  "[1;3B"
-+
-+#define KEY_SEQUENCE(k) { KEY_##k, SEQ_##k }
-+struct ansii_sequence {
-+	int code;
-+	const char *sequence;
-+};
-+
-+/* Table connects single int key codes with character sequences */
-+static const struct ansii_sequence ansii_sequnces[] = {
-+	KEY_SEQUENCE(INSERT),
-+	KEY_SEQUENCE(DELETE),
-+	KEY_SEQUENCE(HOME),
-+	KEY_SEQUENCE(END),
-+	KEY_SEQUENCE(PGUP),
-+	KEY_SEQUENCE(PGDOWN),
-+	KEY_SEQUENCE(LEFT),
-+	KEY_SEQUENCE(RIGHT),
-+	KEY_SEQUENCE(UP),
-+	KEY_SEQUENCE(DOWN),
-+	KEY_SEQUENCE(CLEFT),
-+	KEY_SEQUENCE(CRIGHT),
-+	KEY_SEQUENCE(CUP),
-+	KEY_SEQUENCE(CDOWN),
-+	KEY_SEQUENCE(SLEFT),
-+	KEY_SEQUENCE(SRIGHT),
-+	KEY_SEQUENCE(SUP),
-+	KEY_SEQUENCE(SDOWN),
-+	KEY_SEQUENCE(MLEFT),
-+	KEY_SEQUENCE(MRIGHT),
-+	KEY_SEQUENCE(MUP),
-+	KEY_SEQUENCE(MDOWN),
-+	KEY_SEQUENCE(STAB),
-+	KEY_SEQUENCE(M_p),
-+	KEY_SEQUENCE(M_n),
-+	{ 0, NULL }
-+};
-+
-+#define isseqence(c) ((c) == 0x1B)
++#include "textconv.h"
 +
 +/*
-+ * Number of characters that consist of ANSII sequence
-+ * Should not be less then longest string in ansii_sequnces
-+ */
-+#define MAX_ASCII_SEQUENCE 10
-+
-+static char current_sequence[MAX_ASCII_SEQUENCE];
-+static int current_sequence_len = -1;
-+
-+/* single line typed by user goes here */
-+static char line_buf[LINE_BUF_MAX];
-+/* index of cursor in input line */
-+static int line_buf_ix = 0;
-+/* current length of input line */
-+static int line_len = 0;
-+
-+/*
-+ * Moves cursor to right or left
++ * Following are maps of defines found in bluetooth header files to strings
 + *
-+ * n - positive - moves cursor right
-+ * n - negative - moves cursor left
++ * Those mappings are used to accurately use defines as input parameters in
++ * command line as well as for printing of statuses
 + */
-+static void terminal_move_cursor(int n)
-+{
-+	if (n < 0) {
-+		for (; n < 0; n++)
-+			putchar('\b');
-+	} else if (n > 0)
-+		printf("%*s", n, line_buf + line_buf_ix);
-+}
 +
-+/* Draw command line */
-+void terminal_draw_command_line(void)
-+{
-+	/*
-+	 * this needs to be checked here since line_buf is not cleard
-+	 * before parsing event though line_len and line_buf_ix are
-+	 */
-+	if (line_len > 0)
-+		printf(">%s", line_buf);
-+	else
-+		putchar('>');
++INTMAP(bt_status_t, -1, "(unknown)")
++	DELEMENT(BT_STATUS_SUCCESS),
++	DELEMENT(BT_STATUS_FAIL),
++	DELEMENT(BT_STATUS_NOT_READY),
++	DELEMENT(BT_STATUS_NOMEM),
++	DELEMENT(BT_STATUS_BUSY),
++	DELEMENT(BT_STATUS_DONE),
++	DELEMENT(BT_STATUS_UNSUPPORTED),
++	DELEMENT(BT_STATUS_PARM_INVALID),
++	DELEMENT(BT_STATUS_UNHANDLED),
++	DELEMENT(BT_STATUS_AUTH_FAILURE),
++	DELEMENT(BT_STATUS_RMT_DEV_DOWN),
++ENDMAP
 +
-+	/* move cursor to it's place */
-+	terminal_move_cursor(line_len - line_buf_ix);
-+}
++INTMAP(bt_state_t, -1, "(unknown)")
++	DELEMENT(BT_STATE_OFF),
++	DELEMENT(BT_STATE_ON),
++ENDMAP
 +
-+/* inserts string into command line at cursor position */
-+void terminal_insert_into_command_line(const char *p)
-+{
-+	int len = strlen(p);
++INTMAP(bt_device_type_t, -1, "(unknown)")
++	DELEMENT(BT_DEVICE_DEVTYPE_BREDR),
++	DELEMENT(BT_DEVICE_DEVTYPE_BLE),
++	DELEMENT(BT_DEVICE_DEVTYPE_DUAL),
++ENDMAP
 +
-+	if (line_len == line_buf_ix) {
-+		strcat(line_buf, p);
-+		printf("%s", p);
-+		line_buf_ix = line_len = line_len + len;
-+	} else {
-+		memmove(line_buf + line_buf_ix + len,
-+			line_buf + line_buf_ix, line_len - line_buf_ix + 1);
-+		memmove(line_buf + line_buf_ix, p, len);
-+		printf("%s", line_buf + line_buf_ix);
-+		line_buf_ix += len;
-+		line_len += len;
-+		terminal_move_cursor(line_buf_ix - line_len);
-+	}
-+}
++INTMAP(bt_scan_mode_t, -1, "(unknown)")
++	DELEMENT(BT_SCAN_MODE_NONE),
++	DELEMENT(BT_SCAN_MODE_CONNECTABLE),
++	DELEMENT(BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE),
++ENDMAP
 +
-+/* Prints string and redraws command line */
-+int terminal_print(const char *format, ...)
-+{
-+	va_list args;
-+	int ret;
++INTMAP(bt_discovery_state_t, -1, "(unknown)")
++	DELEMENT(BT_DISCOVERY_STOPPED),
++	DELEMENT(BT_DISCOVERY_STARTED),
++ENDMAP
 +
-+	va_start(args, format);
++INTMAP(bt_acl_state_t, -1, "(unknown)")
++	DELEMENT(BT_ACL_STATE_CONNECTED),
++	DELEMENT(BT_ACL_STATE_DISCONNECTED),
++ENDMAP
 +
-+	ret = terminal_vprint(format, args);
++INTMAP(bt_bond_state_t, -1, "(unknown)")
++	DELEMENT(BT_BOND_STATE_NONE),
++	DELEMENT(BT_BOND_STATE_BONDING),
++	DELEMENT(BT_BOND_STATE_BONDED),
++ENDMAP
 +
-+	va_end(args);
-+	return ret;
-+}
++INTMAP(bt_ssp_variant_t, -1, "(unknown)")
++	DELEMENT(BT_SSP_VARIANT_PASSKEY_CONFIRMATION),
++	DELEMENT(BT_SSP_VARIANT_PASSKEY_ENTRY),
++	DELEMENT(BT_SSP_VARIANT_CONSENT),
++	DELEMENT(BT_SSP_VARIANT_PASSKEY_NOTIFICATION),
++ENDMAP
 +
-+/* Prints string and redraws command line */
-+int terminal_vprint(const char *format, va_list args)
-+{
-+	int ret;
++INTMAP(bt_property_type_t, -1, "(unknown)")
++	DELEMENT(BT_PROPERTY_BDNAME),
++	DELEMENT(BT_PROPERTY_BDADDR),
++	DELEMENT(BT_PROPERTY_UUIDS),
++	DELEMENT(BT_PROPERTY_CLASS_OF_DEVICE),
++	DELEMENT(BT_PROPERTY_TYPE_OF_DEVICE),
++	DELEMENT(BT_PROPERTY_SERVICE_RECORD),
++	DELEMENT(BT_PROPERTY_ADAPTER_SCAN_MODE),
++	DELEMENT(BT_PROPERTY_ADAPTER_BONDED_DEVICES),
++	DELEMENT(BT_PROPERTY_ADAPTER_DISCOVERY_TIMEOUT),
++	DELEMENT(BT_PROPERTY_REMOTE_FRIENDLY_NAME),
++	DELEMENT(BT_PROPERTY_REMOTE_RSSI),
++	DELEMENT(BT_PROPERTY_REMOTE_VERSION_INFO),
++	DELEMENT(BT_PROPERTY_REMOTE_DEVICE_TIMESTAMP),
++ENDMAP
 +
-+	printf("\r%*s\r", (int)line_len + 1, " ");
++INTMAP(bt_cb_thread_evt, -1, "(unknown)")
++	DELEMENT(ASSOCIATE_JVM),
++	DELEMENT(DISASSOCIATE_JVM),
++ENDMAP
 +
-+	ret = vprintf(format, args);
-+
-+	terminal_draw_command_line();
-+
-+	return ret;
-+}
-+
-+/*
-+ * Converts terminal character sequences to single value representing
-+ * keyboard keys
-+ */
-+static int terminal_convert_sequence(int c)
++/* Find first index of given value in table m */
++int int2str_findint(int v, const struct int2str m[])
 +{
 +	int i;
 +
-+	/* Not in sequence yet? */
-+	if (current_sequence_len == -1) {
-+		/* Is ansii sequence detected by 0x1B ? */
-+		if (isseqence(c)) {
-+			current_sequence_len++;
-+			return 0;
-+	       }
-+	       return c;
++	for (i = 0; m[i].str; ++i) {
++		if (m[i].val == v)
++			return i;
 +	}
-+	/* Inside sequence */
-+	current_sequence[current_sequence_len++] = c;
-+	current_sequence[current_sequence_len] = '\0';
-+	for (i = 0; ansii_sequnces[i].code; ++i) {
-+		/* Matches so far? */
-+		if (0 != strncmp(current_sequence,
-+			ansii_sequnces[i].sequence, current_sequence_len))
-+			continue;
-+
-+		/* Matches as a whole? */
-+		if (ansii_sequnces[i].sequence[current_sequence_len] == 0) {
-+			current_sequence_len = -1;
-+			return ansii_sequnces[i].code;
-+		}
-+		/* partial match (not whole sequence yet) */
-+		return 0;
-+	}
-+	terminal_print("ansii char 0x%X %c\n", c);
-+	/*
-+	 * Sequence does not match
-+	 * mark that no in sequence any more, return char
-+	 */
-+	current_sequence_len = -1;
-+	return c;
++	return -1;
 +}
 +
-+void terminal_process_char(int c, void (*process_line)(char *line))
++/* Find first index of given string in table m */
++int int2str_findstr(const char *str, const struct int2str m[])
 +{
-+	int refresh_from = -1;
-+	int old_pos;
++	int i;
 +
-+	c = terminal_convert_sequence(c);
-+
-+	switch (c) {
-+	case 0:
-+		break;
-+	case KEY_LEFT:
-+		/* if not at the beginning move to previous character */
-+		if (line_buf_ix <= 0)
-+			break;
-+		line_buf_ix--;
-+		terminal_move_cursor(-1);
-+		break;
-+	case KEY_RIGHT:
-+		/*
-+		 * If not at the end, just print current character
-+		 * and modify position
-+		 */
-+		if (line_buf_ix < line_len)
-+			putchar(line_buf[line_buf_ix++]);
-+		break;
-+	case KEY_HOME:
-+		/* move to beginning of line and update position */
-+		putchar('\r');
-+		putchar('>');
-+		line_buf_ix = 0;
-+		break;
-+	case KEY_END:
-+		/* if not at the end of line */
-+		if (line_buf_ix < line_len) {
-+			/* print everything from cursor */
-+			printf("%s", line_buf + line_buf_ix);
-+			/* just modify current position */
-+			line_buf_ix = line_len;
-+		}
-+		break;
-+	case KEY_DELETE:
-+		/* delete character under cursor if not at the very end */
-+		if (line_buf_ix >= line_len)
-+			break;
-+		/*
-+		 * Prepare buffer with one character missing
-+		 * trailing 0 is moved
-+		 */
-+		line_len--;
-+		memmove(line_buf + line_buf_ix,
-+			line_buf + line_buf_ix + 1,
-+			line_len - line_buf_ix + 1);
-+		/* print rest of line from current cursor position */
-+		printf("%s \b", line_buf + line_buf_ix);
-+		/* move back cursor */
-+		terminal_move_cursor(line_buf_ix - line_len);
-+		break;
-+	case KEY_CLEFT:
-+		/*
-+		 * Move by word left
-+		 *
-+		 * Are we at the beginning of line?
-+		 */
-+		if (line_buf_ix <= 0)
-+			break;
-+
-+		old_pos = line_buf_ix;
-+		line_buf_ix--;
-+		/* skip spaces left */
-+		while (line_buf_ix && isspace(line_buf[line_buf_ix]))
-+			line_buf_ix--;
-+		/* skip all non spaces to the left */
-+		while (line_buf_ix > 0 &&
-+		       !isspace(line_buf[line_buf_ix - 1]))
-+			line_buf_ix--;
-+		/* move cursor to new position */
-+		terminal_move_cursor(line_buf_ix - old_pos);
-+		break;
-+	case KEY_CRIGHT:
-+		/*
-+		 * Move by word right
-+		 *
-+		 * are we at the end of line?
-+		 */
-+		if (line_buf_ix >= line_len)
-+			break;
-+
-+		old_pos = line_buf_ix;
-+		/* skip all spaces */
-+		while (line_buf_ix < line_len &&
-+			isspace(line_buf[line_buf_ix]))
-+			line_buf_ix++;
-+		/* skip all non spaces */
-+		while (line_buf_ix < line_len &&
-+			!isspace(line_buf[line_buf_ix]))
-+			line_buf_ix++;
-+		/*
-+		 * Move cursor to right by printing text
-+		 * between old cursor and new
-+		 */
-+		if (line_buf_ix > old_pos)
-+			printf("%.*s", (int)(line_buf_ix - old_pos),
-+				line_buf + old_pos);
-+		break;
-+	case KEY_UP:
-+	case KEY_DOWN:
-+		break;
-+	case '\n':
-+	case '\r':
-+		line_len = line_buf_ix = 0;
-+		/* print new line */
-+		putchar(c);
-+		process_line(line_buf);
-+		/* clear current line */
-+		line_buf[0] = '\0';
-+		putchar('>');
-+		break;
-+	case '\t':
-+		/* tab processing */
-+		/* TODO Add completion here */
-+		break;
-+	case KEY_BACKSPACE:
-+		if (line_buf_ix <= 0)
-+			break;
-+
-+		if (line_buf_ix == line_len) {
-+			printf("\b \b");
-+			line_len = --line_buf_ix;
-+			line_buf[line_len] = 0;
-+		} else {
-+			putchar('\b');
-+			refresh_from = --line_buf_ix;
-+			line_len--;
-+			memmove(line_buf + line_buf_ix,
-+				line_buf + line_buf_ix + 1,
-+				line_len - line_buf_ix + 1);
-+		}
-+		break;
-+	case KEY_INSERT:
-+	case KEY_PGUP:
-+	case KEY_PGDOWN:
-+	case KEY_CUP:
-+	case KEY_CDOWN:
-+	case KEY_SLEFT:
-+	case KEY_SRIGHT:
-+	case KEY_MLEFT:
-+	case KEY_MRIGHT:
-+	case KEY_MUP:
-+	case KEY_MDOWN:
-+	case KEY_STAB:
-+	case KEY_M_n:
-+	case KEY_M_p:
-+		break;
-+	default:
-+		if (!isprint(c)) {
-+			/*
-+			 * TODO: remove this print once all meaningful sequences
-+			 * are identified
-+			 */
-+			printf("char-0x%02x\n", c);
-+			break;
-+		}
-+		if (line_buf_ix < LINE_BUF_MAX - 1) {
-+			if (line_len == line_buf_ix) {
-+				putchar(c);
-+				line_buf[line_buf_ix++] = (char)c;
-+				line_len++;
-+				line_buf[line_len] = '\0';
-+			} else {
-+				memmove(line_buf + line_buf_ix + 1,
-+					line_buf + line_buf_ix,
-+					line_len - line_buf_ix + 1);
-+				line_buf[line_buf_ix] = c;
-+				refresh_from = line_buf_ix++;
-+				line_len++;
-+			}
-+		}
-+		break;
++	for (i = 0; m[i].str; ++i) {
++		if (strcmp(m[i].str, str) == 0)
++			return i;
 +	}
-+
-+	if (refresh_from >= 0) {
-+		printf("%s \b", line_buf + refresh_from);
-+		terminal_move_cursor(line_buf_ix - line_len);
-+	}
++	return -1;
 +}
 +
-+void terminal_setup(void)
++/*
++ * convert bd_addr to string
++ * buf must be at least 18 char long
++ *
++ * returns buf
++ */
++char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
 +{
-+	struct termios tios;
++	const char *p = (const char *)bd_addr;
 +
-+	/* Turn off echo since all editing is done by hand */
-+	tcgetattr(0, &tios);
-+	tios.c_lflag &= ~(ICANON | ECHO);
-+	tcsetattr(0, TCSANOW, &tios);
-+	putchar('>');
++	snprintf(buf, 18, "%02x:%02x:%02x:%02x:%02x:%02x",
++					p[0], p[1], p[2], p[3], p[4], p[5]);
++
++	return buf;
 +}
 +
-diff --git a/android/hal-client/terminal.h b/android/hal-client/terminal.h
++/* converts string to bt_bdaddr_t */
++void str2bt_bdaddr_t(const char *str, bt_bdaddr_t *bd_addr)
++{
++	char *p = (char *)bd_addr;
++
++	sscanf(str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx",
++			       &p[0], &p[1], &p[2], &p[3], &p[4], &p[5]);
++}
++
++static const char BT_BASE_UUID[] = {
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
++	0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb
++};
++
++/*
++ * converts uuid to string
++ * buf should be at least 39 bytes
++ *
++ * returns string representation of uuid
++ */
++char *bt_uuid_t2str(const bt_uuid_t *uuid, char *buf)
++{
++	int shift = 0;
++	int i;
++	int is_bt;
++
++	is_bt = !memcmp(&uuid->uu[4], &BT_BASE_UUID[4], sizeof(bt_uuid_t) - 4);
++
++	for (i = 0; i < (int)sizeof(bt_uuid_t); i++) {
++		if (i == 4 && is_bt)
++			break;
++
++		if (i == 4 || i == 6 || i == 8 || i == 10) {
++			buf[i * 2 + shift] = '-';
++			shift++;
++		}
++		sprintf(buf + i * 2 + shift, "%02x", uuid->uu[i]);
++	}
++
++	return buf;
++}
++
++/* converts string to uuid */
++void str2bt_uuid_t(const char *str, bt_uuid_t *uuid)
++{
++	int i = 0;
++
++	memcpy(uuid, BT_BASE_UUID, sizeof(bt_uuid_t));
++
++	while (*str && i < (int)sizeof(bt_uuid_t)) {
++		while (*str == '-')
++			str++;
++
++		if (sscanf(str, "%02hhx", &uuid->uu[i]) != 1)
++			break;
++
++		i++;
++		str += 2;
++	}
++}
+diff --git a/android/hal-client/textconv.h b/android/hal-client/textconv.h
 new file mode 100644
-index 0000000..e53750f
+index 0000000..80aaf7b
 --- /dev/null
-+++ b/android/hal-client/terminal.h
-@@ -0,0 +1,59 @@
++++ b/android/hal-client/textconv.h
+@@ -0,0 +1,113 @@
 +/*
 + * Copyright (C) 2013 Intel Corporation
 + *
@@ -557,48 +270,102 @@ index 0000000..e53750f
 + *
 + */
 +
-+#include <stdarg.h>
++/**
++ * Begin mapping section
++ *
++ * There are some mappings between integer values (enums) and strings
++ * to be presented to user. To make it easier to convert between those two
++ * set of macros is given. It is specially useful when we want to have
++ * strings that match constants from header files like:
++ *  BT_STATUS_SUCCESS (0) and corresponding "BT_STATUS_SUCCESS"
++ * Example of usage:
++ *
++ * INTMAP(int, -1, "invalid")
++ *   DELEMENT(BT_STATUS_SUCCESS)
++ *   DELEMENT(BT_STATUS_FAIL)
++ *   MELEMENT(123, "Some strange value")
++ * ENDMAP
++ *
++ * Just by doing this we have mapping table plus two functions:
++ *  int str2int(const char *str);
++ *  const char *int2str(int v);
++ *
++ * second argument to INTMAP specifies value to be returned from
++ * str2int function when there is not mapping for such number
++ * third argument specifies default value to be returned from int2str
++ *
++ * If same mapping is to be used in several source files put
++ * INTMAP in c file and DECINTMAP in h file.
++ *
++ * For mappings that are to be used in single file only
++ * use SINTMAP which will create the same but everything will be marked
++ * as static.
++ */
 +
-+/* size of supported line */
-+#define LINE_BUF_MAX 1024
-+
-+enum key_codes {
-+	KEY_BACKSPACE = 0x7F,
-+	KEY_INSERT = 1000, /* arbitrary value */
-+	KEY_DELETE,
-+	KEY_HOME,
-+	KEY_END,
-+	KEY_PGUP,
-+	KEY_PGDOWN,
-+	KEY_LEFT,
-+	KEY_RIGHT,
-+	KEY_UP,
-+	KEY_DOWN,
-+	KEY_CLEFT,
-+	KEY_CRIGHT,
-+	KEY_CUP,
-+	KEY_CDOWN,
-+	KEY_SLEFT,
-+	KEY_SRIGHT,
-+	KEY_SUP,
-+	KEY_SDOWN,
-+	KEY_MLEFT,
-+	KEY_MRIGHT,
-+	KEY_MUP,
-+	KEY_MDOWN,
-+	KEY_STAB,
-+	KEY_M_p,
-+	KEY_M_n
++struct int2str {
++	int val;		/* int value */
++	const char *str;	/* corresponding string */
 +};
 +
-+void terminal_setup(void);
-+int terminal_print(const char *format, ...);
-+int terminal_vprint(const char *format, va_list args);
-+void terminal_process_char(int c, void (*process_line)(char *line));
-+void terminal_insert_into_command_line(const char *p);
-+void terminal_draw_command_line(void);
++int int2str_findint(int v, const struct int2str m[]);
++int int2str_findstr(const char *str, const struct int2str m[]);
 +
-+void process_tab(const char *line, int len);
++#define DECINTMAP(type) \
++extern struct int2str __##type##2str[]; \
++const char *type##2##str(type v); \
++type str##2##type(const char *str); \
++
++#define INTMAP(type, deft, defs) \
++const char *type##2##str(type v) \
++{ \
++	int i = int2str_findint((int)v, __##type##2str); \
++	return (i < 0) ? defs : __##type##2str[i].str; \
++} \
++type str##2##type(const char *str) \
++{ \
++	int i = int2str_findstr(str, __##type##2str); \
++	return (i < 0) ? (type)deft : (type)(__##type##2str[i].val); \
++} \
++struct int2str __##type##2str[] = {
++
++#define SINTMAP(type, deft, defs) \
++static struct int2str __##type##2str[]; \
++static inline const char *type##2##str(type v) \
++{ \
++	int i = int2str_findint((int)v, __##type##2str); \
++	return (i < 0) ? defs : __##type##2str[i].str; \
++} \
++static inline type str##2##type(const char *str) \
++{ \
++	int i = int2str_findstr(str, __##type##2str); \
++	return (i < 0) ? (type)deft : (type)(__##type##2str[i].val); \
++} \
++static struct int2str __##type##2str[] = {
++
++#define ENDMAP {0, NULL} };
++
++/* use this to generate string from header file constant */
++#define MELEMENT(v, s) {v, s}
++/* use this to have arbitrary mapping from int to string */
++#define DELEMENT(s) {s, #s}
++/* End of mapping section */
++
++char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf);
++void str2bt_bdaddr_t(const char *str, bt_bdaddr_t *bd_addr);
++
++char *bt_uuid_t2str(const bt_uuid_t *uuid, char *buf);
++void str2bt_uuid_t(const char *str, bt_uuid_t *uuid);
++
++DECINTMAP(bt_status_t);
++DECINTMAP(bt_state_t);
++DECINTMAP(bt_device_type_t);
++DECINTMAP(bt_scan_mode_t);
++DECINTMAP(bt_discovery_state_t);
++DECINTMAP(bt_acl_state_t);
++DECINTMAP(bt_bond_state_t);
++DECINTMAP(bt_ssp_variant_t);
++DECINTMAP(bt_property_type_t);
++DECINTMAP(bt_cb_thread_evt);
 -- 
 1.7.9.5
 
