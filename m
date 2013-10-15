@@ -1,38 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH] Bluetooth: Add support for entering limited discoverable mode
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20131015073157.GA24495@x220.p-661hnu-f1>
-Date: Tue, 15 Oct 2013 10:52:11 +0200
+Date: Tue, 15 Oct 2013 11:35:56 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <66F13BAB-8341-44B5-9D84-A55DFDD6C324@holtmann.org>
-References: <1381792099-8732-1-git-send-email-marcel@holtmann.org> <20131015073157.GA24495@x220.p-661hnu-f1>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [RFC BlueZ v0] doc: Add GATT API
+Message-ID: <20131015083556.GA3716@x220.p-661hnu-f1>
+References: <1381777790-28891-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1381777790-28891-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Claudio,
 
->> +	if (cp->val) {
->> +		struct hci_cp_write_current_iac_lap cp;
->> +
->> +		if (timeout > 0) {
->> +			/* Limited discoverable mode */
-> 
-> Wouldn't we want to follow the recommendation from the Core spec here,
-> volume 3, part C, section 4.1.2.1:
-> 
-> "A Bluetooth device should not be in limited discoverable mode for more than
-> TGAP(104)"
-> 
-> TGAP(104) in turn is defined as 1 minute (vol 3, part C, Appendix A).
+On Mon, Oct 14, 2013, Claudio Takahasi wrote:
+> +Service Manager hierarchy
+> +=========================
+> +
+> +ServiceManager allows external applications to register GATT based services.
+> +Services should follow the API for Service and Characteristic described above.
+> +
+> +For GATT local services, services and characteristics definitions are
+> +discovered automatically using D-Bus Object Manager.
+> +
+> +Service		org.bluez
+> +Interface	org.bluez.ServiceManager1 [Experimental]
+> +Object path	/org/bluez
+> +
+> +Methods		RegisterApplication(object application, dict options)
+> +
+> +			Registers remote application services exported under
+> +			the interface Service1. Characteristic objects must
+> +			be hierarchical to their service and must use the
+> +			interface Characteristic1. D-Bus Object Manager is
+> +			used to fetch the exported objects.
+> +
+> +			"application" object path together with the D-Bus system
+> +			bus connection ID define the identification of the
+> +			application registering a GATT based service.
+> +
+> +			Possible errors: org.bluez.Error.InvalidArguments
+> +					 org.bluez.Error.AlreadyExists
+> +
+> +		UnregisterApplication(object application)
+> +
+> +			This unregisters the application that has been
+> +			previously registered. The object path parameter
+> +			must match the same value that has been used
+> +			on registration.
+> +
+> +			Possible errors: org.bluez.Error.DoesNotExist
+> +
+> +Service Agent hierarchy
+> +=======================
+> +
+> +Service		org.bluez
 
-I was not going to be this strict. So yes, userspace can violate the GAP part here, but it might be a good idea to ensure that when a too large value is entered we stick with general discoverable mode. However is this really worth it.
+I suppose this should not be "org.bluez" since it's the agent that's
+providing it.
 
-Another option is to just reject too large timeout values as invalid parameters and force userspace to implement large timeouts with general discoverable mode in userspace.
+> +Interface	org.bluez.ServiceAgent1 [Experimental]
+> +Object path	freely definable
 
-Regards
+If this is the object registered by ServiceManager1.RegisterApplication
+I think we need some renaming. Either this interface should be called
+org.bluez.ServiceApplication1 or the registration method shoud be
+renamed to RegisterAgent.
 
-Marcel
+Or is the idea that an "application" is a set of objects and interfaces
+(services, characteristics, etc.) and as a minimum there must be this
+ServiceAgent1 interface at the root object? In that case the naming
+might make sense.
 
+Johan
