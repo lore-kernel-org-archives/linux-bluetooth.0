@@ -1,65 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Move arming of discoverable timeout to complete handler
-Date: Tue, 15 Oct 2013 08:11:02 -0700
-Message-Id: <1381849862-32025-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <20131015134354.GH2861@aemeltch-MOBL1>
+References: <CAGXs5wXGtexDMRmVNA64bMrHt4ZW3pB6SwZA7K9c_5qQkGh6GA@mail.gmail.com>
+	<20131015134354.GH2861@aemeltch-MOBL1>
+Date: Tue, 15 Oct 2013 18:00:19 +0300
+Message-ID: <CAGXs5wU-L=Khuto4SJfYE4QqRZNWL2RAc-hjxqLEEE1aU6aC-w@mail.gmail.com>
+Subject: Re: BlueZ and Android - question
+From: Kevin Wilson <wkevils@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	Kevin Wilson <wkevils@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The discoverable timeout is currently armed from hci_event.c and causes
-some side effects when using HCI commands instead of the management
-interface. To make this clear, only arm the discoverable timeout from
-the management command complete handler.
+Andrei,
+Thanks a lot for the Quick response.
+Can you please provide a link for the alternative for Bluetooth stack in
+Android or specify its name ?  I did not know about it.
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_event.c |  5 -----
- net/bluetooth/mgmt.c      | 11 +++++++++--
- 2 files changed, 9 insertions(+), 7 deletions(-)
+Best Regards,
+Kevin
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 7b133f0..071c0df 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -310,11 +310,6 @@ static void hci_cc_write_scan_enable(struct hci_dev *hdev, struct sk_buff *skb)
- 		set_bit(HCI_ISCAN, &hdev->flags);
- 		if (!old_iscan)
- 			mgmt_discoverable(hdev, 1);
--		if (hdev->discov_timeout > 0) {
--			int to = msecs_to_jiffies(hdev->discov_timeout * 1000);
--			queue_delayed_work(hdev->workqueue, &hdev->discov_off,
--					   to);
--		}
- 	} else if (old_iscan)
- 		mgmt_discoverable(hdev, 0);
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 6db2393..686bda76 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1043,12 +1043,19 @@ static void set_discoverable_complete(struct hci_dev *hdev, u8 status)
- 	}
- 
- 	cp = cmd->param;
--	if (cp->val)
-+	if (cp->val) {
- 		changed = !test_and_set_bit(HCI_DISCOVERABLE,
- 					    &hdev->dev_flags);
--	else
-+
-+		if (hdev->discov_timeout > 0) {
-+			int to = msecs_to_jiffies(hdev->discov_timeout * 1000);
-+			queue_delayed_work(hdev->workqueue, &hdev->discov_off,
-+					   to);
-+		}
-+	} else {
- 		changed = test_and_clear_bit(HCI_DISCOVERABLE,
- 					     &hdev->dev_flags);
-+	}
- 
- 	send_settings_rsp(cmd->sk, MGMT_OP_SET_DISCOVERABLE, hdev);
- 
--- 
-1.8.3.1
-
+On Tue, Oct 15, 2013 at 4:44 PM, Andrei Emeltchenko
+<andrei.emeltchenko.news@gmail.com> wrote:
+> Hi Kevin,
+>
+> On Tue, Oct 15, 2013 at 04:16:45PM +0300, Kevin Wilson wrote:
+>> Hello all,
+>> I have a question:
+>>
+>> I saw in several places on the web text which says, in some
+>> variations,  that "BlueZ has been removed starting from Android  4.2
+>> and the  Broadcom-supplied Bluetooth stack (bluedroid) has replaced
+>> it. It says also that the bluedroid
+>> stack relies on HAL-loading like most other hardware types.
+>>
+>> On the other hand I see in the official page,
+>> http://www.bluez.org/
+>> something which I am not sure how to interpret.
+>>
+>>
+>> I want to resolve my confusion.
+>> So here is my question:
+>> In Android 4.2 and above - is the BlueZ removed ?
+>
+> Yes
+>
+>> is the BlueDroid
+>> used instead ?
+>
+> Yes
+>
+>>or are they both used?
+>
+> No.
+>
+> Now there is a project to provide alternative for Bluetooth stack in
+> Android.
+>
+> Best regards
+> Andrei Emeltchenko
+>
