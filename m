@@ -1,40 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 15 Oct 2013 16:44:34 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Kevin Wilson <wkevils@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: BlueZ and Android - question
+Message-ID: <20131015134354.GH2861@aemeltch-MOBL1>
+References: <CAGXs5wXGtexDMRmVNA64bMrHt4ZW3pB6SwZA7K9c_5qQkGh6GA@mail.gmail.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH 1/2] Bluetooth: Add support for entering limited discoverable mode
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1381844037-24424-1-git-send-email-marcel@holtmann.org>
-Date: Tue, 15 Oct 2013 15:45:51 +0200
-Message-Id: <674BAD06-AFE6-4DB2-ABB1-6BFB119981E9@holtmann.org>
-References: <1381844037-24424-1-git-send-email-marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <CAGXs5wXGtexDMRmVNA64bMrHt4ZW3pB6SwZA7K9c_5qQkGh6GA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Kevin,
 
-> The limited discoverable mode should be used when a device is only
-> discoverable for a certain amount of time and after that it returns
-> back into being non-discoverable.
+On Tue, Oct 15, 2013 at 04:16:45PM +0300, Kevin Wilson wrote:
+> Hello all,
+> I have a question:
 > 
-> The management interface allows to specify a timeout parameter when
-> makeing a device discoverable. If such a timeout is specified or
-> changed, enter limited discoverable mode. Otherwise enter general
-> discoverable mode.
+> I saw in several places on the web text which says, in some
+> variations,  that "BlueZ has been removed starting from Android  4.2
+> and the  Broadcom-supplied Bluetooth stack (bluedroid) has replaced
+> it. It says also that the bluedroid
+> stack relies on HAL-loading like most other hardware types.
 > 
-> Devices in limited discoverable mode can still be found by the
-> general discovery procedure. It is mandatory that a device sets
-> both GIAC and LIAC when entering limited discoverable mode.
+> On the other hand I see in the official page,
+> http://www.bluez.org/
+> something which I am not sure how to interpret.
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
-> include/net/bluetooth/hci.h |  6 ++++++
-> net/bluetooth/mgmt.c        | 41 +++++++++++++++++++++++++++++++++++++----
-> 2 files changed, 43 insertions(+), 4 deletions(-)
+> 
+> I want to resolve my confusion.
+> So here is my question:
+> In Android 4.2 and above - is the BlueZ removed ? 
 
-I send this by accident. It is the same as the last one and better be not applied. I am re-working this one right now.
+Yes
 
-Regards
+> is the BlueDroid
+> used instead ?
 
-Marcel
+Yes
+
+>or are they both used?
+
+No.
+
+Now there is a project to provide alternative for Bluetooth stack in
+Android. 
+
+Best regards 
+Andrei Emeltchenko 
 
