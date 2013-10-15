@@ -1,28 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 Oct 2013 17:29:34 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/7] Bluetooth: Use hci_request for discoverable timeout
- handling
-Message-ID: <20131015142934.GA17486@x220.p-661hnu-f1>
-References: <1381844037-24424-2-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381844037-24424-2-git-send-email-marcel@holtmann.org>
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH 1/2] Bluetooth: Add support for entering limited discoverable mode
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1381844037-24424-1-git-send-email-marcel@holtmann.org>
+Date: Tue, 15 Oct 2013 15:45:51 +0200
+Message-Id: <674BAD06-AFE6-4DB2-ABB1-6BFB119981E9@holtmann.org>
+References: <1381844037-24424-1-git-send-email-marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi,
 
-On Tue, Oct 15, 2013, Marcel Holtmann wrote:
-> When the discoverable timeout triggers and it is time to turn inquiry
-> scan back off, use the HCI request framework to do it.
+> The limited discoverable mode should be used when a device is only
+> discoverable for a certain amount of time and after that it returns
+> back into being non-discoverable.
+> 
+> The management interface allows to specify a timeout parameter when
+> makeing a device discoverable. If such a timeout is specified or
+> changed, enter limited discoverable mode. Otherwise enter general
+> discoverable mode.
+> 
+> Devices in limited discoverable mode can still be found by the
+> general discovery procedure. It is mandatory that a device sets
+> both GIAC and LIAC when entering limited discoverable mode.
 > 
 > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  net/bluetooth/hci_core.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+> include/net/bluetooth/hci.h |  6 ++++++
+> net/bluetooth/mgmt.c        | 41 +++++++++++++++++++++++++++++++++++++----
+> 2 files changed, 43 insertions(+), 4 deletions(-)
 
-All seven patches have been applied to bluetooth-next. Thanks.
+I send this by accident. It is the same as the last one and better be not applied. I am re-working this one right now.
 
-Johan
+Regards
+
+Marcel
+
