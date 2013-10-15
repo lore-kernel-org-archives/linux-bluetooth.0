@@ -1,76 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 Oct 2013 11:35:56 +0300
+Date: Tue, 15 Oct 2013 11:28:00 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC BlueZ v0] doc: Add GATT API
-Message-ID: <20131015083556.GA3716@x220.p-661hnu-f1>
-References: <1381777790-28891-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: Re: [PATCH] Bluetooth: Fix minor coding style issue in
+ set_connectable()
+Message-ID: <20131015082800.GA1856@x220.p-661hnu-f1>
+References: <1381793925-14134-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381777790-28891-1-git-send-email-claudio.takahasi@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1381793925-14134-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Marcel,
 
-On Mon, Oct 14, 2013, Claudio Takahasi wrote:
-> +Service Manager hierarchy
-> +=========================
-> +
-> +ServiceManager allows external applications to register GATT based services.
-> +Services should follow the API for Service and Characteristic described above.
-> +
-> +For GATT local services, services and characteristics definitions are
-> +discovered automatically using D-Bus Object Manager.
-> +
-> +Service		org.bluez
-> +Interface	org.bluez.ServiceManager1 [Experimental]
-> +Object path	/org/bluez
-> +
-> +Methods		RegisterApplication(object application, dict options)
-> +
-> +			Registers remote application services exported under
-> +			the interface Service1. Characteristic objects must
-> +			be hierarchical to their service and must use the
-> +			interface Characteristic1. D-Bus Object Manager is
-> +			used to fetch the exported objects.
-> +
-> +			"application" object path together with the D-Bus system
-> +			bus connection ID define the identification of the
-> +			application registering a GATT based service.
-> +
-> +			Possible errors: org.bluez.Error.InvalidArguments
-> +					 org.bluez.Error.AlreadyExists
-> +
-> +		UnregisterApplication(object application)
-> +
-> +			This unregisters the application that has been
-> +			previously registered. The object path parameter
-> +			must match the same value that has been used
-> +			on registration.
-> +
-> +			Possible errors: org.bluez.Error.DoesNotExist
-> +
-> +Service Agent hierarchy
-> +=======================
-> +
-> +Service		org.bluez
+On Mon, Oct 14, 2013, Marcel Holtmann wrote:
+> There is a minor coding style violation and so just fix it. No actual
+> logic has changed.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/mgmt.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 
-I suppose this should not be "org.bluez" since it's the agent that's
-providing it.
-
-> +Interface	org.bluez.ServiceAgent1 [Experimental]
-> +Object path	freely definable
-
-If this is the object registered by ServiceManager1.RegisterApplication
-I think we need some renaming. Either this interface should be called
-org.bluez.ServiceApplication1 or the registration method shoud be
-renamed to RegisterAgent.
-
-Or is the idea that an "application" is a set of objects and interfaces
-(services, characteristics, etc.) and as a minimum there must be this
-ServiceAgent1 interface at the root object? In that case the naming
-might make sense.
+Applied to bluetooth-next. Thanks.
 
 Johan
