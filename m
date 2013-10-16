@@ -1,32 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Oct 2013 23:35:18 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] l2test: Set CID due to socket restrictions for LE
-Message-ID: <20131016203518.GA947@x220.p-661hnu-f1>
-References: <1381950307-7155-1-git-send-email-claudio.takahasi@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381950307-7155-1-git-send-email-claudio.takahasi@openbossa.org>
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: [PATCH 7/7] Bluetooth: Remove sk member from struct l2cap_chan
+Date: Wed, 16 Oct 2013 16:08:35 -0300
+Message-Id: <1381950515-25256-7-git-send-email-gustavo@padovan.org>
+In-Reply-To: <1381950515-25256-1-git-send-email-gustavo@padovan.org>
+References: <1381950515-25256-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-On Wed, Oct 16, 2013, Claudio Takahasi wrote:
-> Bluetooth kernel now restricts LE L2CAP sockets to ATT channels only.
-> For LE L2CAP socket bind, ATT CID is now mandatory. Reference: kernel patch
-> bfe4655f05d7ec4a7c0c1c7e4051862f824cd8ec
-> ---
->  tools/l2test.c | 2 ++
->  1 file changed, 2 insertions(+)
+There is no access to chan->sk in L2CAP core now. This change marks the
+of the task of splitting L2CAP between Core and Socket, thus sk is now
+gone from struct l2cap_chan.
 
-Applied thanks.
+Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+---
+ include/net/bluetooth/l2cap.h | 2 --
+ net/bluetooth/l2cap_sock.c    | 2 --
+ 2 files changed, 4 deletions(-)
 
-Btw, I didn't realize that this check wasn't there before. It seems like
-it shouldn't cause any "real life" issues as our btio has always done a
-bind with the correct CID. Can you confirm that this should only be an
-issue for l2test?
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index af5eb23..65356bf 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -435,8 +435,6 @@ struct l2cap_seq_list {
+ #define L2CAP_SEQ_LIST_TAIL	0x8000
+ 
+ struct l2cap_chan {
+-	struct sock *sk;
+-
+ 	struct l2cap_conn	*conn;
+ 	struct hci_conn		*hs_hcon;
+ 	struct hci_chan		*hs_hchan;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 5c84f8a..93fc464 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1371,8 +1371,6 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
+ 
+ 	l2cap_chan_hold(chan);
+ 
+-	chan->sk = sk;
+-
+ 	l2cap_pi(sk)->chan = chan;
+ 
+ 	return sk;
+-- 
+1.8.3.1
 
-Johan
