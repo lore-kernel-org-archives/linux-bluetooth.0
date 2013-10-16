@@ -1,146 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 06/15] Bluetooth: Background scanning
-Date: Wed, 16 Oct 2013 20:17:56 -0300
-Message-Id: <1381965485-9159-7-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC 05/15] Bluetooth: Use connection parameters if any
+Date: Wed, 16 Oct 2013 20:17:55 -0300
+Message-Id: <1381965485-9159-6-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org>
 References: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds helpers to trigger and untrigger the background
-scanning. As long as the number of triggers are greater than zero,
-we keep the background scanning running. Once the number of triggers
-reaches zero, it is stopped.
+This patch changes hci_create_le_conn() so it uses the connection
+parameters specified by the user. If no parameters were configured,
+we use the default values.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |  7 ++++
- net/bluetooth/hci_core.c         | 83 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 90 insertions(+)
+ net/bluetooth/hci_conn.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 1e67da5..cb6458a 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -288,6 +288,10 @@ struct hci_dev {
- 	__u8			scan_rsp_data[HCI_MAX_AD_LENGTH];
- 	__u8			scan_rsp_data_len;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 4e72650..d64000e 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -548,6 +548,7 @@ static int hci_create_le_conn(struct hci_conn *conn)
+ 	struct hci_dev *hdev = conn->hdev;
+ 	struct hci_cp_le_create_conn cp;
+ 	struct hci_request req;
++	struct hci_conn_param *param;
+ 	int err;
  
-+	/* This counter tracks the number of background scanning triggers
-+	 */
-+	atomic_t		background_scan_cnt;
-+
- 	int (*open)(struct hci_dev *hdev);
- 	int (*close)(struct hci_dev *hdev);
- 	int (*flush)(struct hci_dev *hdev);
-@@ -1191,4 +1195,7 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
- #define SCO_AIRMODE_CVSD       0x0000
- #define SCO_AIRMODE_TRANSP     0x0003
+ 	hci_req_init(&req, hdev);
+@@ -558,11 +559,18 @@ static int hci_create_le_conn(struct hci_conn *conn)
+ 	bacpy(&cp.peer_addr, &conn->dst);
+ 	cp.peer_addr_type = conn->dst_type;
+ 	cp.own_address_type = conn->src_type;
+-	cp.conn_interval_min = __constant_cpu_to_le16(0x0028);
+-	cp.conn_interval_max = __constant_cpu_to_le16(0x0038);
+ 	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
+ 	cp.min_ce_len = __constant_cpu_to_le16(0x0000);
+ 	cp.max_ce_len = __constant_cpu_to_le16(0x0000);
++	param = hci_find_conn_param(hdev, &conn->dst, conn->dst_type);
++	if (param) {
++		cp.conn_interval_min = cpu_to_le16(param->min_conn_interval);
++		cp.conn_interval_max = cpu_to_le16(param->max_conn_interval);
++		hci_conn_param_put(param);
++	} else {
++		cp.conn_interval_min = __constant_cpu_to_le16(0x0028);
++		cp.conn_interval_max = __constant_cpu_to_le16(0x0038);
++	}
+ 	hci_req_add(&req, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
  
-+int hci_trigger_background_scan(struct hci_dev *hdev);
-+int hci_untrigger_background_scan(struct hci_dev *hdev);
-+
- #endif /* __HCI_CORE_H */
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index c9c3390..c3e47e9 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2402,6 +2402,8 @@ struct hci_dev *hci_alloc_dev(void)
- 	hci_init_sysfs(hdev);
- 	discovery_init(hdev);
- 
-+	atomic_set(&hdev->background_scan_cnt, 0);
-+
- 	return hdev;
- }
- EXPORT_SYMBOL(hci_alloc_dev);
-@@ -3786,3 +3788,84 @@ static void hci_cmd_work(struct work_struct *work)
- 		}
- 	}
- }
-+
-+static void start_background_scan_complete(struct hci_dev *hdev, u8 status)
-+{
-+	if (status)
-+		BT_DBG("HCI request failed to start background scanning: "
-+		       "status 0x%2.2x", status);
-+}
-+
-+int hci_trigger_background_scan(struct hci_dev *hdev)
-+{
-+	struct hci_cp_le_set_scan_param param_cp;
-+	struct hci_cp_le_set_scan_enable enable_cp;
-+	struct hci_request req;
-+	int err;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	/* If we already have triggers, there is no need to send HCI command
-+	 * to start the background scanning.
-+	 */
-+	if (atomic_read(&hdev->background_scan_cnt) > 0)
-+		goto done;
-+
-+	hci_req_init(&req, hdev);
-+
-+	memset(&param_cp, 0, sizeof(param_cp));
-+	param_cp.type = LE_SCAN_PASSIVE;
-+	param_cp.interval = cpu_to_le16(hdev->le_scan_interval);
-+	param_cp.window = cpu_to_le16(hdev->le_scan_window);
-+	hci_req_add(&req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
-+		    &param_cp);
-+
-+	memset(&enable_cp, 0, sizeof(enable_cp));
-+	enable_cp.enable = LE_SCAN_ENABLE;
-+	enable_cp.filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
-+	hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
-+		    &enable_cp);
-+
-+	err = hci_req_run(&req, start_background_scan_complete);
-+	if (err)
-+		return err;
-+
-+done:
-+	atomic_inc(&hdev->background_scan_cnt);
-+	return 0;
-+}
-+
-+static void stop_background_scan_complete(struct hci_dev *hdev, u8 status)
-+{
-+	if (status)
-+		BT_DBG("HCI request failed to stop background scanning: "
-+		       "status 0x%2.2x", status);
-+}
-+
-+int hci_untrigger_background_scan(struct hci_dev *hdev)
-+{
-+	struct hci_cp_le_set_scan_enable cp;
-+	struct hci_request req;
-+	int err;
-+
-+	/* If we have more triggers, we should keep scanning. */
-+	if (atomic_read(&hdev->background_scan_cnt) > 1)
-+		goto done;
-+
-+	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
-+		goto done;
-+
-+	hci_req_init(&req, hdev);
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.enable = LE_SCAN_DISABLE;
-+	hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-+
-+	err = hci_req_run(&req, stop_background_scan_complete);
-+	if (err)
-+		return err;
-+
-+done:
-+	atomic_dec(&hdev->background_scan_cnt);
-+	return 0;
-+}
+ 	err = hci_req_run(&req, create_le_conn_complete);
 -- 
 1.8.4
 
