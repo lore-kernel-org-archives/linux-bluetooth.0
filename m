@@ -1,64 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 12/15] Bluetooth: Temporarily stop background scanning on discovery
-Date: Wed, 16 Oct 2013 20:18:02 -0300
-Message-Id: <1381965485-9159-13-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC 13/15] Bluetooth: Fix background trigger/untrigger functions
+Date: Wed, 16 Oct 2013 20:18:03 -0300
+Message-Id: <1381965485-9159-14-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org>
 References: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If the user send a mgmt start discovery command while the background
-scanning is running, we should temporarily stop it. Once the discovery
-finishes, we start the background scanning again.
+This patch fixes to hci_trigger_background_scan() and hci_untrigger_
+background_scan() so they can be called concurrently with the device
+discovery procedure.
+
+In hci_trigger_background_scan(), if it is the first trigger, we are
+supposed to start the background scanning. However, if device discovery
+is running, we should not send any HCI command. The background scanning
+will be started once the discovery procedure is finished.
+
+In hci_untrigger_background_scan(), if it is the last trigger, we are
+supposed to stop the background scanning. However, if discovery is
+running, it means the background is stopped so we don't need to send
+any HCI command.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_core.c |  5 +++++
- net/bluetooth/mgmt.c     | 12 ++++++++----
- 2 files changed, 13 insertions(+), 4 deletions(-)
+ net/bluetooth/hci_core.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index e1e8f8a..ed5ce58 100644
+index ed5ce58..ace77e3 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -877,6 +877,11 @@ void hci_discovery_set_state(struct hci_dev *hdev, int state)
+@@ -3929,6 +3929,12 @@ int hci_trigger_background_scan(struct hci_dev *hdev)
+ 	if (atomic_read(&hdev->background_scan_cnt) > 0)
+ 		goto done;
  
- 	switch (state) {
- 	case DISCOVERY_STOPPED:
-+		/* Check the background scanning since it may have been
-+		 * temporarily stopped by the start discovery command.
-+		 */
-+		hci_check_background_scan(hdev);
++	/* If discovery is running, we should not start the background
++	 * scanning. It will be started once the discovery procedure finishes.
++	 */
++	if (hdev->discovery.state == DISCOVERY_FINDING)
++		goto done;
 +
- 		if (hdev->discovery.state != DISCOVERY_STARTING)
- 			mgmt_discovering(hdev, 0);
- 		break;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index c68aea5..f6f1524 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3228,11 +3228,15 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 			goto failed;
- 		}
+ 	err = start_background_scan(hdev);
+ 	if (err)
+ 		return err;
+@@ -3958,6 +3964,10 @@ int hci_untrigger_background_scan(struct hci_dev *hdev)
+ 	if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
+ 		goto done;
  
-+		/* If controller is scanning, it means the background scanning
-+		 * is running. Thus, we should temporarily stop it in order to
-+		 * set the discovery scanning parameters.
-+		 */
- 		if (test_bit(HCI_LE_SCAN, &hdev->dev_flags)) {
--			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
--					 MGMT_STATUS_BUSY);
--			mgmt_pending_remove(cmd);
--			goto failed;
-+			memset(&enable_cp, 0, sizeof(enable_cp));
-+			enable_cp.enable = LE_SCAN_DISABLE;
-+			hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE,
-+				    sizeof(enable_cp), &enable_cp);
- 		}
++	/* If device discovery is running, don't stop scanning. */
++	if (hdev->discovery.state == DISCOVERY_FINDING)
++		goto done;
++
+ 	hci_req_init(&req, hdev);
  
- 		memset(&param_cp, 0, sizeof(param_cp));
+ 	memset(&cp, 0, sizeof(cp));
 -- 
 1.8.4
 
