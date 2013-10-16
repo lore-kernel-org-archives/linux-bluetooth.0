@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Subject: [PATCH v3 5/5] android: Add calls to adapter methods in haltest
-Date: Wed, 16 Oct 2013 16:00:12 +0200
-Message-ID: <1381932012-29641-6-git-send-email-jerzy.kasenberg@tieto.com>
+Subject: [PATCH v3 4/5] android: Add text conversion helpers to haltest
+Date: Wed, 16 Oct 2013 16:00:11 +0200
+Message-ID: <1381932012-29641-5-git-send-email-jerzy.kasenberg@tieto.com>
 In-Reply-To: <1381932012-29641-1-git-send-email-jerzy.kasenberg@tieto.com>
 References: <1381932012-29641-1-git-send-email-jerzy.kasenberg@tieto.com>
 MIME-Version: 1.0
@@ -12,147 +12,36 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is first code that actually calls HAL functions.
-Functions defined in bt_interface_t can be executed.
+Application uses a lot of text in the form of defines found in header
+files to represent arguments and output.
+Conversion helpers keep functionality of converting string as
+bt_status_t or uuid in one place.
 ---
- android/Android.mk       |    1 +
- android/client/haltest.c |   79 +++++-
- android/client/if-bt.c   |  631 ++++++++++++++++++++++++++++++++++++++++++++++
- android/client/if-main.h |   99 ++++++++
- 4 files changed, 809 insertions(+), 1 deletion(-)
- create mode 100644 android/client/if-bt.c
- create mode 100644 android/client/if-main.h
+ android/Android.mk        |    1 +
+ android/client/textconv.c |  205 +++++++++++++++++++++++++++++++++++++++++++++
+ android/client/textconv.h |  113 +++++++++++++++++++++++++
+ 3 files changed, 319 insertions(+)
+ create mode 100644 android/client/textconv.c
+ create mode 100644 android/client/textconv.h
 
 diff --git a/android/Android.mk b/android/Android.mk
-index 6931c9c..88cb960 100644
+index d49056c..6931c9c 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -62,6 +62,7 @@ LOCAL_SRC_FILES := \
+@@ -61,6 +61,7 @@ LOCAL_SRC_FILES := \
+ 	client/pollhandler.c \
  	client/terminal.c \
  	client/history.c \
- 	client/textconv.c \
-+	client/if-bt.c \
++	client/textconv.c \
  
  LOCAL_SHARED_LIBRARIES := libhardware
  
-diff --git a/android/client/haltest.c b/android/client/haltest.c
-index de98079..6dcabbc 100644
---- a/android/client/haltest.c
-+++ b/android/client/haltest.c
-@@ -16,11 +16,53 @@
-  */
- 
- #include <stdlib.h>
-+#include <stdbool.h>
-+#include <string.h>
-+#include <stdio.h>
-+#include <stdarg.h>
-+#include <unistd.h>
- #include <poll.h>
- #include <unistd.h>
- 
-+#include "if-main.h"
- #include "terminal.h"
- #include "pollhandler.h"
-+#include "history.h"
-+
-+const struct interface *interfaces[] = {
-+	&bluetooth_if,
-+	NULL
-+};
-+
-+int haltest_error(const char *format, ...)
-+{
-+	va_list args;
-+	int ret;
-+	va_start(args, format);
-+	ret = terminal_vprint(format, args);
-+	va_end(args);
-+	return ret;
-+}
-+
-+int haltest_info(const char *format, ...)
-+{
-+	va_list args;
-+	int ret;
-+	va_start(args, format);
-+	ret = terminal_vprint(format, args);
-+	va_end(args);
-+	return ret;
-+}
-+
-+int haltest_warn(const char *format, ...)
-+{
-+	va_list args;
-+	int ret;
-+	va_start(args, format);
-+	ret = terminal_vprint(format, args);
-+	va_end(args);
-+	return ret;
-+}
- 
- /*
-  * This function changes input parameter line_buffer so it has
-@@ -48,10 +90,44 @@ static void process_line(char *line_buffer)
- {
- 	char *argv[10];
- 	int argc;
-+	int i = 0;
-+	int j;
- 
- 	argc = command_line_to_argv(line_buffer, argv, 10);
-+	if (argc < 1)
-+		return;
-+
-+	while (interfaces[i] != NULL) {
-+		if (strcmp(interfaces[i]->name, argv[0])) {
-+			i++;
-+			continue;
-+		}
-+		if (argc < 2 || strcmp(argv[1], "?") == 0) {
-+			j = 0;
-+			while (strcmp(interfaces[i]->methods[j].name, "")) {
-+				haltest_info("%s %s\n", argv[0],
-+						interfaces[i]->methods[j].name);
-+				++j;
-+			}
-+			return;
-+		}
-+		j = 0;
-+		while (strcmp(interfaces[i]->methods[j].name, "")) {
-+			if (strcmp(interfaces[i]->methods[j].name, argv[1])) {
-+				j++;
-+				continue;
-+			}
-+			interfaces[i]->methods[j].func(argc,
-+							(const char **)argv);
-+			break;
-+		}
-+		if (strcmp(interfaces[i]->methods[j].name, "") == 0)
-+			printf("No function %s found\n", argv[1]);
-+		break;
-+	}
- 
--	/* TODO: process command line */
-+	if (interfaces[i] == NULL)
-+		printf("No such interface %s\n", argv[0]);
- }
- 
- /* called when there is something on stdin */
-@@ -74,6 +150,7 @@ static void stdin_handler(struct pollfd *pollfd)
- int main(int argc, char **argv)
- {
- 	terminal_setup();
-+	history_restore(".haltest_history");
- 
- 	/* Register command line handler */
- 	poll_register_fd(0, POLLIN, stdin_handler);
-diff --git a/android/client/if-bt.c b/android/client/if-bt.c
+diff --git a/android/client/textconv.c b/android/client/textconv.c
 new file mode 100644
-index 0000000..a0a4bd9
+index 0000000..eebad70
 --- /dev/null
-+++ b/android/client/if-bt.c
-@@ -0,0 +1,631 @@
++++ b/android/client/textconv.c
+@@ -0,0 +1,205 @@
 +/*
 + * Copyright (C) 2013 Intel Corporation
 + *
@@ -170,626 +59,200 @@ index 0000000..a0a4bd9
 + *
 + */
 +
-+#include "if-main.h"
++#include <string.h>
++#include <stdio.h>
++#include <hardware/bluetooth.h>
 +
-+const bt_interface_t *if_bluetooth;
++#include "textconv.h"
 +
-+static char *bdaddr2str(const bt_bdaddr_t *bd_addr)
++/*
++ * Following are maps of defines found in bluetooth header files to strings
++ *
++ * Those mappings are used to accurately use defines as input parameters in
++ * command line as well as for printing of statuses
++ */
++
++INTMAP(bt_status_t, -1, "(unknown)")
++	DELEMENT(BT_STATUS_SUCCESS),
++	DELEMENT(BT_STATUS_FAIL),
++	DELEMENT(BT_STATUS_NOT_READY),
++	DELEMENT(BT_STATUS_NOMEM),
++	DELEMENT(BT_STATUS_BUSY),
++	DELEMENT(BT_STATUS_DONE),
++	DELEMENT(BT_STATUS_UNSUPPORTED),
++	DELEMENT(BT_STATUS_PARM_INVALID),
++	DELEMENT(BT_STATUS_UNHANDLED),
++	DELEMENT(BT_STATUS_AUTH_FAILURE),
++	DELEMENT(BT_STATUS_RMT_DEV_DOWN),
++ENDMAP
++
++INTMAP(bt_state_t, -1, "(unknown)")
++	DELEMENT(BT_STATE_OFF),
++	DELEMENT(BT_STATE_ON),
++ENDMAP
++
++INTMAP(bt_device_type_t, -1, "(unknown)")
++	DELEMENT(BT_DEVICE_DEVTYPE_BREDR),
++	DELEMENT(BT_DEVICE_DEVTYPE_BLE),
++	DELEMENT(BT_DEVICE_DEVTYPE_DUAL),
++ENDMAP
++
++INTMAP(bt_scan_mode_t, -1, "(unknown)")
++	DELEMENT(BT_SCAN_MODE_NONE),
++	DELEMENT(BT_SCAN_MODE_CONNECTABLE),
++	DELEMENT(BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE),
++ENDMAP
++
++INTMAP(bt_discovery_state_t, -1, "(unknown)")
++	DELEMENT(BT_DISCOVERY_STOPPED),
++	DELEMENT(BT_DISCOVERY_STARTED),
++ENDMAP
++
++INTMAP(bt_acl_state_t, -1, "(unknown)")
++	DELEMENT(BT_ACL_STATE_CONNECTED),
++	DELEMENT(BT_ACL_STATE_DISCONNECTED),
++ENDMAP
++
++INTMAP(bt_bond_state_t, -1, "(unknown)")
++	DELEMENT(BT_BOND_STATE_NONE),
++	DELEMENT(BT_BOND_STATE_BONDING),
++	DELEMENT(BT_BOND_STATE_BONDED),
++ENDMAP
++
++INTMAP(bt_ssp_variant_t, -1, "(unknown)")
++	DELEMENT(BT_SSP_VARIANT_PASSKEY_CONFIRMATION),
++	DELEMENT(BT_SSP_VARIANT_PASSKEY_ENTRY),
++	DELEMENT(BT_SSP_VARIANT_CONSENT),
++	DELEMENT(BT_SSP_VARIANT_PASSKEY_NOTIFICATION),
++ENDMAP
++
++INTMAP(bt_property_type_t, -1, "(unknown)")
++	DELEMENT(BT_PROPERTY_BDNAME),
++	DELEMENT(BT_PROPERTY_BDADDR),
++	DELEMENT(BT_PROPERTY_UUIDS),
++	DELEMENT(BT_PROPERTY_CLASS_OF_DEVICE),
++	DELEMENT(BT_PROPERTY_TYPE_OF_DEVICE),
++	DELEMENT(BT_PROPERTY_SERVICE_RECORD),
++	DELEMENT(BT_PROPERTY_ADAPTER_SCAN_MODE),
++	DELEMENT(BT_PROPERTY_ADAPTER_BONDED_DEVICES),
++	DELEMENT(BT_PROPERTY_ADAPTER_DISCOVERY_TIMEOUT),
++	DELEMENT(BT_PROPERTY_REMOTE_FRIENDLY_NAME),
++	DELEMENT(BT_PROPERTY_REMOTE_RSSI),
++	DELEMENT(BT_PROPERTY_REMOTE_VERSION_INFO),
++	DELEMENT(BT_PROPERTY_REMOTE_DEVICE_TIMESTAMP),
++ENDMAP
++
++INTMAP(bt_cb_thread_evt, -1, "(unknown)")
++	DELEMENT(ASSOCIATE_JVM),
++	DELEMENT(DISASSOCIATE_JVM),
++ENDMAP
++
++/* Find first index of given value in table m */
++int int2str_findint(int v, const struct int2str m[])
 +{
-+	static char buf[18];
++	int i;
 +
-+	return bt_bdaddr_t2str(bd_addr, buf);
++	for (i = 0; m[i].str; ++i) {
++		if (m[i].val == v)
++			return i;
++	}
++	return -1;
 +}
 +
-+static char *btuuid2str(const bt_uuid_t *uuid)
++/* Find first index of given string in table m */
++int int2str_findstr(const char *str, const struct int2str m[])
 +{
-+	static char buf[39];
++	int i;
 +
-+	return bt_uuid_t2str(uuid, buf);
++	for (i = 0; m[i].str; ++i) {
++		if (strcmp(m[i].str, str) == 0)
++			return i;
++	}
++	return -1;
 +}
 +
-+static bt_scan_mode_t str2btscanmode(const char *str)
++/*
++ * convert bd_addr to string
++ * buf must be at least 18 char long
++ *
++ * returns buf
++ */
++char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
 +{
-+	bt_scan_mode_t v = str2bt_scan_mode_t(str);
++	const char *p = (const char *) bd_addr;
 +
-+	if ((int) v != -1)
-+		return v;
++	snprintf(buf, 18, "%02x:%02x:%02x:%02x:%02x:%02x",
++					p[0], p[1], p[2], p[3], p[4], p[5]);
 +
-+	haltest_warn("WARN: %s cannot convert %s\n", __func__, str);
-+	return (bt_scan_mode_t) atoi(str);
++	return buf;
 +}
 +
-+static bt_ssp_variant_t str2btsspvariant(const char *str)
++/* converts string to bt_bdaddr_t */
++void str2bt_bdaddr_t(const char *str, bt_bdaddr_t *bd_addr)
 +{
-+	bt_ssp_variant_t v = str2bt_ssp_variant_t(str);
++	char *p = (char *) bd_addr;
 +
-+	if ((int) v != -1)
-+		return v;
-+
-+	haltest_warn("WARN: %s cannot convert %s\n", __func__, str);
-+	return (bt_ssp_variant_t) atoi(str);
++	sscanf(str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx",
++			       &p[0], &p[1], &p[2], &p[3], &p[4], &p[5]);
 +}
 +
-+static bt_property_type_t str2btpropertytype(const char *str)
++static const char BT_BASE_UUID[] = {
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
++	0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb
++};
++
++/*
++ * converts uuid to string
++ * buf should be at least 39 bytes
++ *
++ * returns string representation of uuid
++ */
++char *bt_uuid_t2str(const bt_uuid_t *uuid, char *buf)
 +{
-+	bt_property_type_t v = str2bt_property_type_t(str);
++	int shift = 0;
++	int i;
++	int is_bt;
 +
-+	if ((int) v != -1)
-+		return v;
++	is_bt = !memcmp(&uuid->uu[4], &BT_BASE_UUID[4], sizeof(bt_uuid_t) - 4);
 +
-+	haltest_warn("WARN: %s cannot convert %s\n", __func__, str);
-+	return (bt_property_type_t) atoi(str);
-+}
++	for (i = 0; i < (int) sizeof(bt_uuid_t); i++) {
++		if (i == 4 && is_bt)
++			break;
 +
-+static char *btproperty2str(bt_property_t property)
-+{
-+	static char buf[4096];
-+	char *p;
-+
-+	p = buf + sprintf(buf, "type=%s len=%d val=",
-+			  bt_property_type_t2str(property.type), property.len);
-+
-+	switch (property.type) {
-+	case BT_PROPERTY_BDNAME:
-+	case BT_PROPERTY_REMOTE_FRIENDLY_NAME:
-+		sprintf(p, "%*s", property.len,
-+			((bt_bdname_t *) property.val)->name);
-+		break;
-+
-+	case BT_PROPERTY_BDADDR:
-+		sprintf(p, "%s", bdaddr2str((bt_bdaddr_t *) property.val));
-+		break;
-+
-+	case BT_PROPERTY_CLASS_OF_DEVICE:
-+		sprintf(p, "%06x", *((int *) property.val));
-+		break;
-+
-+	case BT_PROPERTY_TYPE_OF_DEVICE:
-+		sprintf(p, "%s", bt_device_type_t2str(
-+					*((bt_device_type_t *) property.val)));
-+		break;
-+
-+	case BT_PROPERTY_REMOTE_RSSI:
-+		sprintf(p, "%d", *((char *) property.val));
-+		break;
-+
-+	case BT_PROPERTY_ADAPTER_SCAN_MODE:
-+		sprintf(p, "%s",
-+			bt_scan_mode_t2str(*((bt_scan_mode_t *) property.val)));
-+		break;
-+
-+	case BT_PROPERTY_ADAPTER_DISCOVERY_TIMEOUT:
-+		sprintf(p, "%d", *((int *) property.val));
-+		break;
-+
-+	case BT_PROPERTY_ADAPTER_BONDED_DEVICES:
-+		{
-+			int count = property.len / sizeof(bt_bdaddr_t);
-+			char *ptr = property.val;
-+
-+			strcat(p, "{");
-+
-+			while (count--) {
-+				strcat(p, bdaddr2str((bt_bdaddr_t *) ptr));
-+				if (count)
-+					strcat(p, ", ");
-+				ptr += sizeof(bt_bdaddr_t);
-+			}
-+
-+			strcat(p, "}");
-+
++		if (i == 4 || i == 6 || i == 8 || i == 10) {
++			buf[i * 2 + shift] = '-';
++			shift++;
 +		}
-+		break;
-+
-+	case BT_PROPERTY_UUIDS:
-+		{
-+			int count = property.len / sizeof(bt_uuid_t);
-+			char *ptr = property.val;
-+
-+			strcat(p, "{");
-+
-+			while (count--) {
-+				strcat(p, btuuid2str((bt_uuid_t *) ptr));
-+				if (count)
-+					strcat(p, ", ");
-+				ptr += sizeof(bt_uuid_t);
-+			}
-+
-+			strcat(p, "}");
-+
-+		}
-+		break;
-+
-+	case BT_PROPERTY_SERVICE_RECORD:
-+		{
-+			bt_service_record_t *rec = property.val;
-+
-+			sprintf(p, "{%s, %d, %s}", btuuid2str(&rec->uuid),
-+				rec->channel, rec->name);
-+		}
-+		break;
-+
-+	default:
-+		sprintf(p, "%p", property.val);
++		sprintf(buf + i * 2 + shift, "%02x", uuid->uu[i]);
 +	}
 +
 +	return buf;
 +}
 +
-+static void dump_properties(int num_properties, bt_property_t *properties)
++/* converts string to uuid */
++void str2bt_uuid_t(const char *str, bt_uuid_t *uuid)
 +{
-+	int i;
++	int i = 0;
 +
-+	for (i = 0; i < num_properties; i++) {
-+		/*
-+		 * properities sometimes come unaligned hence memcp to
-+		 * aligned buffer
-+		 */
-+		bt_property_t prop;
-+		memcpy(&prop, properties + i, sizeof(prop));
++	memcpy(uuid, BT_BASE_UUID, sizeof(bt_uuid_t));
 +
-+		haltest_info("prop: %s\n", btproperty2str(prop));
++	while (*str && i < (int) sizeof(bt_uuid_t)) {
++		while (*str == '-')
++			str++;
++
++		if (sscanf(str, "%02hhx", &uuid->uu[i]) != 1)
++			break;
++
++		i++;
++		str += 2;
 +	}
 +}
-+
-+static void adapter_state_changed_cb(bt_state_t state)
-+{
-+	haltest_info("%s: state=%s\n", __func__, bt_state_t2str(state));
-+}
-+
-+static void adapter_properties_cb(bt_status_t status,
-+	int num_properties, bt_property_t *properties)
-+{
-+	haltest_info("%s: status=%s num_properties=%d\n",
-+	       __func__, bt_status_t2str(status), num_properties);
-+
-+	dump_properties(num_properties, properties);
-+}
-+
-+static void remote_device_properties_cb(bt_status_t status,
-+	bt_bdaddr_t *bd_addr, int num_properties, bt_property_t *properties)
-+{
-+	haltest_info("%s: status=%s bd_addr=%s num_properties=%d\n",
-+	       __func__, bt_status_t2str(status), bdaddr2str(bd_addr),
-+	       num_properties);
-+
-+	dump_properties(num_properties, properties);
-+}
-+
-+static void device_found_cb(int num_properties, bt_property_t *properties)
-+{
-+	haltest_info("%s: num_properties=%d\n", __func__, num_properties);
-+
-+	dump_properties(num_properties, properties);
-+}
-+
-+static void discovery_state_changed_cb(bt_discovery_state_t state)
-+{
-+	haltest_info("%s: state=%s\n", __func__,
-+		bt_discovery_state_t2str(state));
-+}
-+
-+static void pin_request_cb(bt_bdaddr_t *remote_bd_addr, bt_bdname_t *bd_name,
-+	uint32_t cod)
-+{
-+	haltest_info("%s: remote_bd_addr=%s bd_name=%s cod=%06x\n", __func__,
-+			       bdaddr2str(remote_bd_addr), bd_name->name, cod);
-+}
-+
-+static void ssp_request_cb(bt_bdaddr_t *remote_bd_addr, bt_bdname_t *bd_name,
-+				uint32_t cod, bt_ssp_variant_t pairing_variant,
-+				uint32_t pass_key)
-+{
-+	haltest_info("%s: remote_bd_addr=%s bd_name=%s cod=%06x pairing_variant=%s pass_key=%d\n",
-+		     __func__, bdaddr2str(remote_bd_addr), bd_name->name, cod,
-+		     bt_ssp_variant_t2str(pairing_variant), pass_key);
-+}
-+
-+static void bond_state_changed_cb(bt_status_t status,
-+					bt_bdaddr_t *remote_bd_addr,
-+					bt_bond_state_t state)
-+{
-+	haltest_info("%s: status=%s remote_bd_addr=%s state=%s\n", __func__,
-+		       bt_status_t2str(status), bdaddr2str(remote_bd_addr),
-+		       bt_bond_state_t2str(state));
-+}
-+
-+static void acl_state_changed_cb(bt_status_t status,
-+					bt_bdaddr_t *remote_bd_addr,
-+					bt_acl_state_t state)
-+{
-+	haltest_info("%s: status=%s remote_bd_addr=%s state=%s\n", __func__,
-+		       bt_status_t2str(status), bdaddr2str(remote_bd_addr),
-+		       bt_acl_state_t2str(state));
-+}
-+
-+static void thread_evt_cb(bt_cb_thread_evt evt)
-+{
-+	haltest_info("%s: evt=%s\n", __func__, bt_cb_thread_evt2str(evt));
-+}
-+
-+static void dut_mode_recv_cb(uint16_t opcode, uint8_t *buf, uint8_t len)
-+{
-+	haltest_info("%s\n", __func__);
-+}
-+
-+static void le_test_mode_cb(bt_status_t status, uint16_t num_packets)
-+{
-+	haltest_info("%s %s %d\n", __func__, bt_state_t2str(status),
-+								num_packets);
-+}
-+
-+static bt_callbacks_t bt_callbacks = {
-+	.size = sizeof(bt_callbacks),
-+	.adapter_state_changed_cb = adapter_state_changed_cb,
-+	.adapter_properties_cb = adapter_properties_cb,
-+	.remote_device_properties_cb = remote_device_properties_cb,
-+	.device_found_cb = device_found_cb,
-+	.discovery_state_changed_cb = discovery_state_changed_cb,
-+	.pin_request_cb = pin_request_cb,
-+	.ssp_request_cb = ssp_request_cb,
-+	.bond_state_changed_cb = bond_state_changed_cb,
-+	.acl_state_changed_cb = acl_state_changed_cb,
-+	.thread_evt_cb = thread_evt_cb,
-+	.dut_mode_recv_cb = dut_mode_recv_cb,
-+	.le_test_mode_cb = le_test_mode_cb
-+};
-+
-+static void init_p(int argc, const char **argv)
-+{
-+	int err;
-+	const hw_module_t *module;
-+	hw_device_t *device;
-+
-+	err = hw_get_module(BT_HARDWARE_MODULE_ID, &module);
-+	if (err) {
-+		haltest_error("he_get_module returned %d\n", err);
-+		return;
-+	}
-+
-+	err = module->methods->open(module, BT_HARDWARE_MODULE_ID, &device);
-+	if (err) {
-+		haltest_error("module->methods->open returned %d\n", err);
-+		return;
-+	}
-+
-+	if_bluetooth =
-+	    ((bluetooth_device_t *) device)->get_bluetooth_interface();
-+	if (!if_bluetooth) {
-+		haltest_error("get_bluetooth_interface returned NULL\n");
-+		return;
-+	}
-+
-+	EXEC(if_bluetooth->init, &bt_callbacks);
-+}
-+
-+static void cleanup_p(int argc, const char **argv)
-+{
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	EXECV(if_bluetooth->cleanup);
-+
-+	if_bluetooth = NULL;
-+}
-+
-+static void enable_p(int argc, const char **argv)
-+{
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	EXEC(if_bluetooth->enable);
-+}
-+
-+static void disable_p(int argc, const char **argv)
-+{
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	EXEC(if_bluetooth->disable);
-+}
-+
-+static void get_adapter_properties_p(int argc, const char **argv)
-+{
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	EXEC(if_bluetooth->get_adapter_properties);
-+}
-+
-+static void get_adapter_property_p(int argc, const char **argv)
-+{
-+	int type = str2btpropertytype(argv[2]);
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	EXEC(if_bluetooth->get_adapter_property, type);
-+}
-+
-+static void set_adapter_property_p(int argc, const char **argv)
-+{
-+	bt_property_t property;
-+	bt_scan_mode_t mode;
-+	int timeout;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	property.type = str2btpropertytype(argv[2]);
-+
-+	switch (property.type) {
-+	case BT_PROPERTY_BDNAME:
-+		property.len = strlen(argv[3]) + 1;
-+		property.val = (char *) argv[3];
-+		break;
-+
-+	case BT_PROPERTY_ADAPTER_SCAN_MODE:
-+		mode = str2btscanmode(argv[3]);
-+		property.len = sizeof(bt_scan_mode_t);
-+		property.val = &mode;
-+		break;
-+
-+	case BT_PROPERTY_ADAPTER_DISCOVERY_TIMEOUT:
-+		timeout = atoi(argv[3]);
-+		property.val = &timeout;
-+		property.len = sizeof(timeout);
-+		break;
-+
-+	default:
-+		haltest_error("Invalid property %s\n", argv[3]);
-+		return;
-+	}
-+
-+	EXEC(if_bluetooth->set_adapter_property, &property);
-+}
-+
-+static void get_remote_device_properties_p(int argc, const char **argv)
-+{
-+	bt_bdaddr_t addr;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	str2bt_bdaddr_t(argv[2], &addr);
-+
-+	EXEC(if_bluetooth->get_remote_device_properties, &addr);
-+}
-+
-+static void get_remote_device_property_p(int argc, const char **argv)
-+{
-+	bt_property_type_t type;
-+	bt_bdaddr_t addr;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	str2bt_bdaddr_t(argv[2], &addr);
-+	type = str2btpropertytype(argv[3]);
-+
-+	EXEC(if_bluetooth->get_remote_device_property, &addr, type);
-+}
-+
-+static void set_remote_device_property_p(int argc, const char **argv)
-+{
-+	bt_property_t property;
-+	bt_bdaddr_t addr;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	str2bt_bdaddr_t(argv[2], &addr);
-+	property.type = str2btpropertytype(argv[3]);
-+
-+	switch (property.type) {
-+	case BT_PROPERTY_REMOTE_FRIENDLY_NAME:
-+		property.len = strlen(argv[4]);
-+		property.val = (char *) argv[4];
-+		break;
-+
-+	default:
-+		return;
-+	}
-+
-+	EXEC(if_bluetooth->set_remote_device_property, &addr, &property);
-+}
-+
-+static void get_remote_service_record_p(int argc, const char **argv)
-+{
-+	bt_bdaddr_t addr;
-+	bt_uuid_t uuid;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	str2bt_bdaddr_t(argv[2], &addr);
-+	str2bt_uuid_t(argv[3], &uuid);
-+
-+	EXEC(if_bluetooth->get_remote_service_record, &addr, &uuid);
-+}
-+
-+static void get_remote_services_p(int argc, const char **argv)
-+{
-+	bt_bdaddr_t addr;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	str2bt_bdaddr_t(argv[2], &addr);
-+
-+	EXEC(if_bluetooth->get_remote_services, &addr);
-+}
-+
-+static void start_discovery_p(int argc, const char **argv)
-+{
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	EXEC(if_bluetooth->start_discovery);
-+}
-+
-+static void cancel_discovery_p(int argc, const char **argv)
-+{
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	EXEC(if_bluetooth->cancel_discovery);
-+}
-+
-+static void create_bond_p(int argc, const char **argv)
-+{
-+	bt_bdaddr_t addr;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	str2bt_bdaddr_t(argv[2], &addr);
-+
-+	EXEC(if_bluetooth->create_bond, &addr);
-+}
-+
-+static void remove_bond_p(int argc, const char **argv)
-+{
-+	bt_bdaddr_t addr;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	str2bt_bdaddr_t(argv[2], &addr);
-+
-+	EXEC(if_bluetooth->remove_bond, &addr);
-+}
-+
-+static void cancel_bond_p(int argc, const char **argv)
-+{
-+	bt_bdaddr_t addr;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	str2bt_bdaddr_t(argv[2], &addr);
-+
-+	EXEC(if_bluetooth->cancel_bond, &addr);
-+}
-+
-+static void pin_reply_p(int argc, const char **argv)
-+{
-+	bt_bdaddr_t addr;
-+	bt_pin_code_t pin;
-+	int pin_len = 0;
-+	int accept;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	if (argc < 3) {
-+		haltest_error("No address specified\n");
-+		return;
-+	}
-+	str2bt_bdaddr_t(argv[2], &addr);
-+
-+	if (argc >= 4) {
-+		accept = 1;
-+		pin_len = strlen(argv[3]);
-+		memcpy(pin.pin, argv[3], pin_len);
-+	}
-+
-+	EXEC(if_bluetooth->pin_reply, &addr, accept, pin_len, &pin);
-+}
-+
-+static void ssp_reply_p(int argc, const char **argv)
-+{
-+	bt_bdaddr_t addr;
-+	bt_ssp_variant_t var;
-+	int accept;
-+	int passkey;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	if (argc < 3) {
-+		haltest_error("No address specified\n");
-+		return;
-+	}
-+	str2bt_bdaddr_t(argv[2], &addr);
-+	if (argc < 4) {
-+		haltest_error("No ssp variant specified\n");
-+		return;
-+	}
-+	var = str2btsspvariant(argv[3]);
-+	if (argc < 5) {
-+		haltest_error("No accept value specified\n");
-+		return;
-+	}
-+	accept = atoi(argv[4]);
-+	passkey = 0;
-+
-+	if (accept && var == BT_SSP_VARIANT_PASSKEY_ENTRY && argc >= 5)
-+		passkey = atoi(argv[4]);
-+
-+	EXEC(if_bluetooth->ssp_reply, &addr, var, accept, passkey);
-+}
-+
-+static void get_profile_interface_p(int argc, const char **argv)
-+{
-+	const char *id = argv[2];
-+	const void **pif = NULL;
-+	const void *dummy = NULL;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	if (strcmp(BT_PROFILE_HANDSFREE_ID, id) == 0)
-+		pif = &dummy; /* TODO: chenge when if_hf is there */
-+	else if (strcmp(BT_PROFILE_ADVANCED_AUDIO_ID, id) == 0)
-+		pif = &dummy; /* TODO: chenge when if_av is there */
-+	else if (strcmp(BT_PROFILE_HEALTH_ID, id) == 0)
-+		pif = &dummy; /* TODO: chenge when if_hl is there */
-+	else if (strcmp(BT_PROFILE_SOCKETS_ID, id) == 0)
-+		pif = &dummy; /* TODO: chenge when if_sock is there */
-+	else if (strcmp(BT_PROFILE_HIDHOST_ID, id) == 0)
-+		pif = &dummy; /* TODO: chenge when if_hh is there */
-+	else if (strcmp(BT_PROFILE_PAN_ID, id) == 0)
-+		pif = &dummy; /* TODO: chenge when if_pan is there */
-+	else if (strcmp(BT_PROFILE_AV_RC_ID, id) == 0)
-+		pif = &dummy; /* TODO: chenge when if_rc is there */
-+	else
-+		haltest_error("%s is not correct for get_profile_interface\n",
-+		     id);
-+
-+	if (pif != NULL) {
-+		*pif = if_bluetooth->get_profile_interface(id);
-+		haltest_info("get_profile_interface(%s) : %p\n", id, *pif);
-+	}
-+}
-+
-+static void dut_mode_configure_p(int argc, const char **argv)
-+{
-+	uint8_t mode;
-+
-+	RETURN_IF_NULL(if_bluetooth);
-+
-+	mode = strtol(argv[2], NULL, 0);
-+
-+	EXEC(if_bluetooth->dut_mode_configure, mode);
-+}
-+
-+static struct method methods[] = {
-+	STD_METHOD(init),
-+	STD_METHOD(cleanup),
-+	STD_METHOD(enable),
-+	STD_METHOD(disable),
-+	STD_METHOD(get_adapter_properties),
-+	STD_METHOD(get_adapter_property),
-+	STD_METHOD(set_adapter_property),
-+	STD_METHOD(get_remote_device_properties),
-+	STD_METHOD(get_remote_device_property),
-+	STD_METHOD(set_remote_device_property),
-+	STD_METHOD(get_remote_service_record),
-+	STD_METHOD(get_remote_services),
-+	STD_METHOD(start_discovery),
-+	STD_METHOD(cancel_discovery),
-+	STD_METHOD(create_bond),
-+	STD_METHOD(remove_bond),
-+	STD_METHOD(cancel_bond),
-+	STD_METHOD(pin_reply),
-+	STD_METHOD(ssp_reply),
-+	STD_METHOD(get_profile_interface),
-+	STD_METHOD(dut_mode_configure),
-+	END_METHOD
-+};
-+
-+const struct interface bluetooth_if = {
-+	.name = "adapter",
-+	.methods = methods
-+};
-diff --git a/android/client/if-main.h b/android/client/if-main.h
+diff --git a/android/client/textconv.h b/android/client/textconv.h
 new file mode 100644
-index 0000000..9cac7ef
+index 0000000..8fe976c
 --- /dev/null
-+++ b/android/client/if-main.h
-@@ -0,0 +1,99 @@
++++ b/android/client/textconv.h
+@@ -0,0 +1,113 @@
 +/*
 + * Copyright (C) 2013 Intel Corporation
 + *
@@ -807,88 +270,102 @@ index 0000000..9cac7ef
 + *
 + */
 +
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <stdbool.h>
-+#include <signal.h>
-+#include <fcntl.h>
-+#include <errno.h>
-+#include <sys/socket.h>
-+#include <sys/stat.h>
-+#include <sys/types.h>
-+#include <sys/time.h>
-+#include <sys/un.h>
-+#include <poll.h>
-+
-+#include <hardware/bluetooth.h>
-+#include <hardware/bt_av.h>
-+#include <hardware/bt_hh.h>
-+#include <hardware/bt_pan.h>
-+#include <hardware/bt_sock.h>
-+#include <hardware/bt_hf.h>
-+#include <hardware/bt_hl.h>
-+#include <hardware/bt_rc.h>
-+
-+#include "textconv.h"
-+
-+/* Interfaces from hal that can be populated during application lifetime */
-+extern const bt_interface_t *if_bluetooth;
-+
-+/*
-+ * Structure defines top level interfaces that can be used in test tool
-+ * this will contain values as: adapter, av, gatt, sock, pan...
++/**
++ * Begin mapping section
++ *
++ * There are some mappings between integer values (enums) and strings
++ * to be presented to user. To make it easier to convert between those two
++ * set of macros is given. It is specially useful when we want to have
++ * strings that match constants from header files like:
++ *  BT_STATUS_SUCCESS (0) and corresponding "BT_STATUS_SUCCESS"
++ * Example of usage:
++ *
++ * INTMAP(int, -1, "invalid")
++ *   DELEMENT(BT_STATUS_SUCCESS)
++ *   DELEMENT(BT_STATUS_FAIL)
++ *   MELEMENT(123, "Some strange value")
++ * ENDMAP
++ *
++ * Just by doing this we have mapping table plus two functions:
++ *  int str2int(const char *str);
++ *  const char *int2str(int v);
++ *
++ * second argument to INTMAP specifies value to be returned from
++ * str2int function when there is not mapping for such number
++ * third argument specifies default value to be returned from int2str
++ *
++ * If same mapping is to be used in several source files put
++ * INTMAP in c file and DECINTMAP in h file.
++ *
++ * For mappings that are to be used in single file only
++ * use SINTMAP which will create the same but everything will be marked
++ * as static.
 + */
-+struct interface {
-+	const char *name; /* interface name */
-+	struct method *methods; /* methods available for this interface */
++
++struct int2str {
++	int val;		/* int value */
++	const char *str;	/* corresponding string */
 +};
 +
-+extern const struct interface bluetooth_if;
++int int2str_findint(int v, const struct int2str m[]);
++int int2str_findstr(const char *str, const struct int2str m[]);
 +
-+/* Interfaces that will show up in tool (first part of command line) */
-+extern const struct interface *interfaces[];
++#define DECINTMAP(type) \
++extern struct int2str __##type##2str[]; \
++const char *type##2##str(type v); \
++type str##2##type(const char *str); \
 +
-+#define METHOD(name, func) {name, func}
-+#define STD_METHOD(m) {#m, m##_p}
-+#define END_METHOD {"", NULL}
++#define INTMAP(type, deft, defs) \
++const char *type##2##str(type v) \
++{ \
++	int i = int2str_findint((int) v, __##type##2str); \
++	return (i < 0) ? defs : __##type##2str[i].str; \
++} \
++type str##2##type(const char *str) \
++{ \
++	int i = int2str_findstr(str, __##type##2str); \
++	return (i < 0) ? (type) deft : (type) (__##type##2str[i].val); \
++} \
++struct int2str __##type##2str[] = {
 +
-+/*
-+ * Function to parse argument for function, argv[0] and argv[1] are already
-+ * parsed before this function is called and contain interface and method name
-+ * up to argc - 1 arguments are finished and should be used to decide which
-+ * function enumeration function to return
-+ */
-+typedef void (*parse_and_call)(int argc, const char **argv);
++#define SINTMAP(type, deft, defs) \
++static struct int2str __##type##2str[]; \
++static inline const char *type##2##str(type v) \
++{ \
++	int i = int2str_findint((int) v, __##type##2str); \
++	return (i < 0) ? defs : __##type##2str[i].str; \
++} \
++static inline type str##2##type(const char *str) \
++{ \
++	int i = int2str_findstr(str, __##type##2str); \
++	return (i < 0) ? (type) deft : (type) (__##type##2str[i].val); \
++} \
++static struct int2str __##type##2str[] = {
 +
-+/*
-+ * For each method there is name and two functions to parse command line
-+ * and call proper hal function on.
-+ */
-+struct method {
-+	const char *name;
-+	parse_and_call func;
-+};
++#define ENDMAP {0, NULL} };
 +
-+int haltest_error(const char *format, ...);
-+int haltest_info(const char *format, ...);
-+int haltest_warn(const char *format, ...);
++/* use this to generate string from header file constant */
++#define MELEMENT(v, s) {v, s}
++/* use this to have arbitrary mapping from int to string */
++#define DELEMENT(s) {s, #s}
++/* End of mapping section */
 +
-+/* Helper macro for executing function on interface and printing BT_STATUS */
-+#define EXEC(f, ...) \
-+	{ \
-+		int err = f(__VA_ARGS__); \
-+		haltest_info("%s: %s\n", #f, bt_status_t2str(err)); \
-+	}
++char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf);
++void str2bt_bdaddr_t(const char *str, bt_bdaddr_t *bd_addr);
 +
-+/* Helper macro for executing void function on interface */
-+#define EXECV(f, ...) \
-+	{ \
-+		(void) f(__VA_ARGS__); \
-+		haltest_info("%s: void\n", #f); \
-+	}
++char *bt_uuid_t2str(const bt_uuid_t *uuid, char *buf);
++void str2bt_uuid_t(const char *str, bt_uuid_t *uuid);
 +
-+#define RETURN_IF_NULL(x) \
-+	do { if (!x) { haltest_error("%s is NULL\n", #x); return; } } while (0)
++DECINTMAP(bt_status_t);
++DECINTMAP(bt_state_t);
++DECINTMAP(bt_device_type_t);
++DECINTMAP(bt_scan_mode_t);
++DECINTMAP(bt_discovery_state_t);
++DECINTMAP(bt_acl_state_t);
++DECINTMAP(bt_bond_state_t);
++DECINTMAP(bt_ssp_variant_t);
++DECINTMAP(bt_property_type_t);
++DECINTMAP(bt_cb_thread_evt);
 -- 
 1.7.9.5
 
