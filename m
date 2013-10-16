@@ -1,67 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Subject: [PATCH v3 0/5] Stack independent BT HAL test tool
-Date: Wed, 16 Oct 2013 16:00:07 +0200
-Message-ID: <1381932012-29641-1-git-send-email-jerzy.kasenberg@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH] Bluetooth: Reintroduce socket restrictions for LE sockets
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1381919863-27504-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 16 Oct 2013 16:01:01 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <088BACEA-5E9A-4ECF-A447-56A9F8D03525@holtmann.org>
+References: <1381919863-27504-1-git-send-email-johan.hedberg@gmail.com>
+To: johan.hedberg@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-v3:
- - underscores changed to dash in file names.
- - corrected cast style (space after cast).
- - structure initialization with explicit filed names.
-v2:
- - license changed to apache
- - source folder changed to hal-client (underscore to dash)
-v1:
-This tool is for testing Android HAL interfaces from command line.
-Due to lack of readline on Android simple equivalent is hand coded.
-This tool can be used with bluedroid stack so no glib dependency.
+Hi Johan,
 
-Tool source code is in folder hal_client, please comment if it should be
-somewhere else.
+> Right now we do not allow user space to use connection oriented channels
+> on LE, and the only CID that can be used is the Attribute Protocol one.
+> These restrictions went away together with the recent refactoring of the
+> L2CAP code, but this patch puts them back to their appropriate places.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/l2cap_sock.c | 20 ++++++++++++++++++++
+> 1 file changed, 20 insertions(+)
+> 
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 68f486a..bda52d7 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -72,6 +72,16 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
+> 	if (!bdaddr_type_is_valid(la.l2_bdaddr_type))
+> 		return -EINVAL;
+> 
+> +	if (la.l2_bdaddr_type == BDADDR_LE_PUBLIC ||
+> +	    la.l2_bdaddr_type == BDADDR_LE_RANDOM) {
 
-Comments welcome.
+can we use bdaddr_type_is_le() here instead.
 
-Best regards
-Jerzy Kasenberg
+Regards
 
-Jerzy Kasenberg (5):
-  android: Add haltest skeleton
-  android: Add line editing to haltest
-  android: Add history to line editor in haltest
-  android: Add text conversion helpers to haltest
-  android: Add calls to adapter methods in haltest
-
- android/Android.mk           |   21 ++
- android/client/haltest.c     |  161 +++++++++++
- android/client/history.c     |   98 +++++++
- android/client/history.h     |   21 ++
- android/client/if-bt.c       |  631 ++++++++++++++++++++++++++++++++++++++++++
- android/client/if-main.h     |   99 +++++++
- android/client/pollhandler.c |  123 ++++++++
- android/client/pollhandler.h |   26 ++
- android/client/terminal.c    |  538 +++++++++++++++++++++++++++++++++++
- android/client/terminal.h    |   59 ++++
- android/client/textconv.c    |  205 ++++++++++++++
- android/client/textconv.h    |  113 ++++++++
- 12 files changed, 2095 insertions(+)
- create mode 100644 android/client/haltest.c
- create mode 100644 android/client/history.c
- create mode 100644 android/client/history.h
- create mode 100644 android/client/if-bt.c
- create mode 100644 android/client/if-main.h
- create mode 100644 android/client/pollhandler.c
- create mode 100644 android/client/pollhandler.h
- create mode 100644 android/client/terminal.c
- create mode 100644 android/client/terminal.h
- create mode 100644 android/client/textconv.c
- create mode 100644 android/client/textconv.h
-
--- 
-1.7.9.5
+Marcel
 
