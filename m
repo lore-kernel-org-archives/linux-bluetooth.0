@@ -1,52 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] android: trivial typo fix
-Date: Thu, 17 Oct 2013 10:11:38 +0300
-Message-Id: <1381993898-30445-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1381993898-30445-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1381993898-30445-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFC 15/15] Bluetooth: Auto connection and power off/on
+Date: Wed, 16 Oct 2013 20:18:05 -0300
+Message-Id: <1381965485-9159-16-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org>
+References: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+If hdev is closed (e.g. Mgmt power off command, RFKILL or controller is
+reset), the established connections are dropped and no Disconnection
+Complete Event is sent to host. This way, the background scan is not
+triggered when devices configured with BT_AUTO_CONN_ALWAYS option
+disconnect. To fix this issue, before dropping the LE connections, we
+trigger the background scan for each connected device that requires
+BT_AUTO_CONN_ALWAYS auto connection.
 
+Moreover, once the adapter is powered on, we should start the background
+scan if we have triggers registered. This way, we keep the background
+scan running after a power off and power on sequence.
+
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- android/client/if-bt.c |   14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ net/bluetooth/hci_conn.c | 35 +++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_core.c |  2 ++
+ 2 files changed, 37 insertions(+)
 
-diff --git a/android/client/if-bt.c b/android/client/if-bt.c
-index 7b4e71e..6aadeef 100644
---- a/android/client/if-bt.c
-+++ b/android/client/if-bt.c
-@@ -568,20 +568,20 @@ static void get_profile_interface_p(int argc, const char **argv)
- 	RETURN_IF_NULL(if_bluetooth);
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 5caf13b..66823eb 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -954,6 +954,31 @@ timer:
+ 				   msecs_to_jiffies(hdev->idle_timeout));
+ }
  
- 	if (strcmp(BT_PROFILE_HANDSFREE_ID, id) == 0)
--		pif = &dummy; /* TODO: chenge when if_hf is there */
-+		pif = &dummy; /* TODO: change when if_hf is there */
- 	else if (strcmp(BT_PROFILE_ADVANCED_AUDIO_ID, id) == 0)
--		pif = &dummy; /* TODO: chenge when if_av is there */
-+		pif = &dummy; /* TODO: change when if_av is there */
- 	else if (strcmp(BT_PROFILE_HEALTH_ID, id) == 0)
--		pif = &dummy; /* TODO: chenge when if_hl is there */
-+		pif = &dummy; /* TODO: change when if_hl is there */
- 	else if (strcmp(BT_PROFILE_SOCKETS_ID, id) == 0)
--		pif = &dummy; /* TODO: chenge when if_sock is there */
-+		pif = &dummy; /* TODO: change when if_sock is there */
- 	else if (strcmp(BT_PROFILE_HIDHOST_ID, id) == 0)
--		pif = &dummy; /* TODO: chenge when if_hh is there */
-+		pif = &dummy; /* TODO: change when if_hh is there */
- 	else if (strcmp(BT_PROFILE_PAN_ID, id) == 0)
--		pif = &dummy; /* TODO: chenge when if_pan is there */
-+		pif = &dummy; /* TODO: change when if_pan is there */
- #if PLATFORM_SDK_VERSION > 17
- 	else if (strcmp(BT_PROFILE_AV_RC_ID, id) == 0)
--		pif = &dummy; /* TODO: chenge when if_rc is there */
-+		pif = &dummy; /* TODO: change when if_rc is there */
- #endif
- 	else
- 		haltest_error("%s is not correct for get_profile_interface\n",
++static void le_conn_drop_fixup(struct hci_conn *conn)
++{
++	struct hci_dev *hdev = conn->hdev;
++	struct hci_conn_param *param;
++	int err;
++
++	param = hci_find_conn_param(hdev, &conn->dst, conn->dst_type);
++	if (!param)
++		return;
++
++	if (param->auto_connect != BT_AUTO_CONN_ALWAYS)
++		goto done;
++
++	err = hci_trigger_background_scan(hdev);
++	if (err) {
++		BT_ERR("Failed to trigger background scanning: %d", err);
++		goto done;
++	}
++
++	param->bg_scan_triggered = true;
++
++done:
++	hci_conn_param_put(param);
++}
++
+ /* Drop all connection on the device */
+ void hci_conn_hash_flush(struct hci_dev *hdev)
+ {
+@@ -963,6 +988,16 @@ void hci_conn_hash_flush(struct hci_dev *hdev)
+ 	BT_DBG("hdev %s", hdev->name);
+ 
+ 	list_for_each_entry_safe(c, n, &h->list, list) {
++		/* If this is a LE connection in connected state we should do
++		 * some fixup before dropping this connection. Since no
++		 * Disconnection Complete Event will be sent to the host, we
++		 * have to trigger the background scan in case this is a
++		 * BT_AUTO_CONN_ALWAYS device. This is handled by the le_conn_
++		 * drop_fixup() helper.
++		 */
++		if (c->type == LE_LINK && c->state == BT_CONNECTED)
++			le_conn_drop_fixup(c);
++
+ 		c->state = BT_CLOSED;
+ 
+ 		hci_proto_disconn_cfm(c, HCI_ERROR_LOCAL_HOST_TERM);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index ace77e3..fe18801 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1748,6 +1748,8 @@ static void hci_power_on(struct work_struct *work)
+ 
+ 	if (test_and_clear_bit(HCI_SETUP, &hdev->dev_flags))
+ 		mgmt_index_added(hdev);
++
++	hci_check_background_scan(hdev);
+ }
+ 
+ static void hci_power_off(struct work_struct *work)
 -- 
-1.7.10.4
+1.8.4
 
