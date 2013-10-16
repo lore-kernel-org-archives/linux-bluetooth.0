@@ -1,111 +1,220 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Convert idle timer to use delayed work
-Date: Wed, 16 Oct 2013 18:11:40 +0300
-Message-Id: <1381936300-18629-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1381936300-18629-1-git-send-email-johan.hedberg@gmail.com>
-References: <1381936300-18629-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCHv4 09/11] android: Rename hal_bt_sock.c to hal-bt-sock.c
+Date: Wed, 16 Oct 2013 17:36:36 +0300
+Message-Id: <1381934198-7955-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1381934198-7955-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1381934198-7955-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-There is no need to use a timer since the entire Bluetooth subsystem
-runs using workqueues these days.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  4 ++--
- net/bluetooth/hci_conn.c         | 22 +++++++---------------
- 2 files changed, 9 insertions(+), 17 deletions(-)
+ android/Android.mk    |    2 +-
+ android/hal-bt-sock.c |   85 +++++++++++++++++++++++++++++++++++++++++++++++++
+ android/hal_bt_sock.c |   85 -------------------------------------------------
+ 3 files changed, 86 insertions(+), 86 deletions(-)
+ create mode 100644 android/hal-bt-sock.c
+ delete mode 100644 android/hal_bt_sock.c
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 2504a25..07c2da4 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -342,7 +342,7 @@ struct hci_conn {
+diff --git a/android/Android.mk b/android/Android.mk
+index 021bb91..fb4383d 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -52,7 +52,7 @@ include $(CLEAR_VARS)
  
- 	struct delayed_work disc_work;
- 	struct delayed_work auto_accept_work;
--	struct timer_list idle_timer;
-+	struct delayed_work idle_work;
+ LOCAL_SRC_FILES := \
+ 	hal-bluetooth.c \
+-	hal_bt_sock.c \
++	hal-bt-sock.c \
  
- 	struct device	dev;
- 
-@@ -651,7 +651,7 @@ static inline void hci_conn_drop(struct hci_conn *conn)
- 		switch (conn->type) {
- 		case ACL_LINK:
- 		case LE_LINK:
--			del_timer(&conn->idle_timer);
-+			cancel_delayed_work(&conn->idle_work);
- 			if (conn->state == BT_CONNECTED) {
- 				timeo = conn->disc_timeout;
- 				if (!conn->out)
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 8d1f466..4e72650 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -317,8 +317,10 @@ static void hci_conn_timeout(struct work_struct *work)
- }
- 
- /* Enter sniff mode */
--static void hci_conn_enter_sniff_mode(struct hci_conn *conn)
-+static void hci_conn_idle(struct work_struct *work)
- {
-+	struct hci_conn *conn = container_of(work, struct hci_conn,
-+					     idle_work.work);
- 	struct hci_dev *hdev = conn->hdev;
- 
- 	BT_DBG("hcon %p mode %d", conn, conn->mode);
-@@ -352,15 +354,6 @@ static void hci_conn_enter_sniff_mode(struct hci_conn *conn)
- 	}
- }
- 
--static void hci_conn_idle(unsigned long arg)
+ LOCAL_SHARED_LIBRARIES := \
+ 	libcutils \
+diff --git a/android/hal-bt-sock.c b/android/hal-bt-sock.c
+new file mode 100644
+index 0000000..3a6d173
+--- /dev/null
++++ b/android/hal-bt-sock.c
+@@ -0,0 +1,85 @@
++/*
++ * Copyright (C) 2013 Intel Corporation
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ *
++ */
++
++#include <stdlib.h>
++
++#include <hardware/bluetooth.h>
++#include <hardware/bt_sock.h>
++
++#define LOG_TAG "BlueZ"
++#include <cutils/log.h>
++
++static bt_status_t btsock_listen_rfcomm(const char *service_name,
++					const uint8_t *uuid, int chan,
++					int *sock, int flags)
++{
++	ALOGD(__func__);
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static bt_status_t listen(btsock_type_t type, const char *service_name,
++					const uint8_t *uuid, int chan,
++					int *sock, int flags)
++{
++	if ((!uuid && chan <= 0) || !sock) {
++		ALOGE("%s: invalid params: uuid %p, chan %d, sock %p",
++						__func__, uuid, chan, sock);
++		return BT_STATUS_PARM_INVALID;
++	}
++
++	ALOGD("%s: uuid %p chan %d sock %p type %d service_name %s",
++			__func__, uuid, chan, sock, type, service_name);
++
++	switch (type) {
++	case BTSOCK_RFCOMM:
++		return btsock_listen_rfcomm(service_name, uuid, chan,
++								sock, flags);
++	default:
++		ALOGE("%s: Socket type %d not supported", __func__, type);
++		break;
++	}
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static bt_status_t connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
++					const uint8_t *uuid, int chan,
++					int *sock, int flags)
++{
++	if ((!uuid && chan <= 0) || !bdaddr || !sock) {
++		ALOGE("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
++					bdaddr, uuid, chan, sock);
++		return BT_STATUS_PARM_INVALID;
++	}
++
++	ALOGD("%s: uuid %p chan %d sock %p type %d", __func__, uuid, chan,
++								sock, type);
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static btsock_interface_t btsock_if = {
++	sizeof(btsock_if),
++	listen,
++	connect
++};
++
++btsock_interface_t *bt_get_sock_interface(void)
++{
++	return &btsock_if;
++}
+diff --git a/android/hal_bt_sock.c b/android/hal_bt_sock.c
+deleted file mode 100644
+index 3a6d173..0000000
+--- a/android/hal_bt_sock.c
++++ /dev/null
+@@ -1,85 +0,0 @@
+-/*
+- * Copyright (C) 2013 Intel Corporation
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- *      http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- *
+- */
+-
+-#include <stdlib.h>
+-
+-#include <hardware/bluetooth.h>
+-#include <hardware/bt_sock.h>
+-
+-#define LOG_TAG "BlueZ"
+-#include <cutils/log.h>
+-
+-static bt_status_t btsock_listen_rfcomm(const char *service_name,
+-					const uint8_t *uuid, int chan,
+-					int *sock, int flags)
 -{
--	struct hci_conn *conn = (void *) arg;
+-	ALOGD(__func__);
 -
--	BT_DBG("hcon %p mode %d", conn, conn->mode);
--
--	hci_conn_enter_sniff_mode(conn);
+-	return BT_STATUS_UNSUPPORTED;
 -}
 -
- static void hci_conn_auto_accept(struct work_struct *work)
- {
- 	struct hci_conn *conn = container_of(work, struct hci_conn,
-@@ -416,7 +409,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
- 
- 	INIT_DELAYED_WORK(&conn->disc_work, hci_conn_timeout);
- 	INIT_DELAYED_WORK(&conn->auto_accept_work, hci_conn_auto_accept);
--	setup_timer(&conn->idle_timer, hci_conn_idle, (unsigned long)conn);
-+	INIT_DELAYED_WORK(&conn->idle_work, hci_conn_idle);
- 
- 	atomic_set(&conn->refcnt, 0);
- 
-@@ -437,10 +430,9 @@ int hci_conn_del(struct hci_conn *conn)
- 
- 	BT_DBG("%s hcon %p handle %d", hdev->name, conn, conn->handle);
- 
--	del_timer(&conn->idle_timer);
+-static bt_status_t listen(btsock_type_t type, const char *service_name,
+-					const uint8_t *uuid, int chan,
+-					int *sock, int flags)
+-{
+-	if ((!uuid && chan <= 0) || !sock) {
+-		ALOGE("%s: invalid params: uuid %p, chan %d, sock %p",
+-						__func__, uuid, chan, sock);
+-		return BT_STATUS_PARM_INVALID;
+-	}
 -
- 	cancel_delayed_work_sync(&conn->disc_work);
- 	cancel_delayed_work_sync(&conn->auto_accept_work);
-+	cancel_delayed_work_sync(&conn->idle_work);
- 
- 	if (conn->type == ACL_LINK) {
- 		struct hci_conn *sco = conn->link;
-@@ -920,8 +912,8 @@ void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active)
- 
- timer:
- 	if (hdev->idle_timeout > 0)
--		mod_timer(&conn->idle_timer,
--			  jiffies + msecs_to_jiffies(hdev->idle_timeout));
-+		queue_delayed_work(hdev->workqueue, &conn->idle_work,
-+				   msecs_to_jiffies(hdev->idle_timeout));
- }
- 
- /* Drop all connection on the device */
+-	ALOGD("%s: uuid %p chan %d sock %p type %d service_name %s",
+-			__func__, uuid, chan, sock, type, service_name);
+-
+-	switch (type) {
+-	case BTSOCK_RFCOMM:
+-		return btsock_listen_rfcomm(service_name, uuid, chan,
+-								sock, flags);
+-	default:
+-		ALOGE("%s: Socket type %d not supported", __func__, type);
+-		break;
+-	}
+-
+-	return BT_STATUS_UNSUPPORTED;
+-}
+-
+-static bt_status_t connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
+-					const uint8_t *uuid, int chan,
+-					int *sock, int flags)
+-{
+-	if ((!uuid && chan <= 0) || !bdaddr || !sock) {
+-		ALOGE("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
+-					bdaddr, uuid, chan, sock);
+-		return BT_STATUS_PARM_INVALID;
+-	}
+-
+-	ALOGD("%s: uuid %p chan %d sock %p type %d", __func__, uuid, chan,
+-								sock, type);
+-
+-	return BT_STATUS_UNSUPPORTED;
+-}
+-
+-static btsock_interface_t btsock_if = {
+-	sizeof(btsock_if),
+-	listen,
+-	connect
+-};
+-
+-btsock_interface_t *bt_get_sock_interface(void)
+-{
+-	return &btsock_if;
+-}
 -- 
-1.8.3.1
+1.7.10.4
 
