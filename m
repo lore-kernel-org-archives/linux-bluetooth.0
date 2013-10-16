@@ -1,71 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 00/11] Android BlueZ patches, second chunk
-Date: Wed, 16 Oct 2013 17:08:37 +0300
-Message-Id: <1381932528-31584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH] Bluetooth: Fix updating the right variable in update_scan_rsp_data()
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1381926667-6255-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 16 Oct 2013 16:03:11 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <43BDD80F-5A24-41E7-8CA1-D4C694300B01@holtmann.org>
+References: <1381926667-6255-1-git-send-email-johan.hedberg@gmail.com>
+To: johan.hedberg@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Johan,
 
-This is second chunk from my initial big patch set. Fixed style issues commented
-by Marcel.
+> This function should be operating on scan_rsp_data_len and scan_rsp_data
+> and not the advertising data variables.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/mgmt.c | 8 ++++----
+> 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Changes:
-	* v3: Following upstream comments file names are changed from "_" to "-", added kernel style
-	struct initialization, fixed bug checking status for mgmt commands, added 2 HALs skeletons.
-	* v2: Corrected android_daemon -> enable_android autoconf stuff, better name for acquiring caps,
-	renamed hal_msg.h to hal-msg.h due to Johan's comment. Added small test-sdp fix.
+good catch. Patch has been applied to bluetooth-next tree.
 
-Note that due to Marcel comment this cannot be built unless you include my patch
-for Android bionic library:
-http://code.google.com/p/android-bluez/source/detail?r=77a07e7703b63e280d9880baad30b3375e7df079&repo=bionic#
+Regards
 
-Andrei Emeltchenko (11):
-  android: Create HAL API header skeleton
-  android: Add basic mgmt initialization sequence
-  android: Add adapter and device struct for BlueZ daemon
-  android: sdp: Reuse BlueZ SDP server in Android
-  android: Add cap to bind to port < 1024
-  android: Implement read_info_complete callback
-  android: Use kernel style to initialize struct fields
-  android: Rename hal_bluetooth.c to hal-bluetooth.c
-  android: Rename hal_bt_sock.c to hal-bt-sock.c
-  android: Add HID Host skeleton
-  android: Add PAN skeleton
-
- Makefile.android        |   12 +-
- android/Android.mk      |   20 ++-
- android/adapter.c       |  138 +++++++++++++++++
- android/adapter.h       |   40 +++++
- android/device.c        |   25 +++
- android/device.h        |   24 +++
- android/hal-bluetooth.c |  392 +++++++++++++++++++++++++++++++++++++++++++++++
- android/hal-bt-sock.c   |   85 ++++++++++
- android/hal-hidhost.c   |  204 ++++++++++++++++++++++++
- android/hal-msg.h       |  246 +++++++++++++++++++++++++++++
- android/hal-pan.c       |  120 +++++++++++++++
- android/hal.h           |    2 +
- android/hal_bluetooth.c |  384 ----------------------------------------------
- android/hal_bt_sock.c   |   85 ----------
- android/main.c          |  248 ++++++++++++++++++++++++++++++
- configure.ac            |    4 +
- 16 files changed, 1556 insertions(+), 473 deletions(-)
- create mode 100644 android/adapter.c
- create mode 100644 android/adapter.h
- create mode 100644 android/device.c
- create mode 100644 android/device.h
- create mode 100644 android/hal-bluetooth.c
- create mode 100644 android/hal-bt-sock.c
- create mode 100644 android/hal-hidhost.c
- create mode 100644 android/hal-msg.h
- create mode 100644 android/hal-pan.c
- delete mode 100644 android/hal_bluetooth.c
- delete mode 100644 android/hal_bt_sock.c
-
--- 
-1.7.10.4
+Marcel
 
