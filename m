@@ -1,54 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Oct 2013 14:14:53 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
+Date: Wed, 16 Oct 2013 19:54:11 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: Re: [PATCH] Bluetooth: Remove not used struct sock
-Message-ID: <20131016171453.GA2107@joana>
-References: <1381937991-12645-1-git-send-email-gustavo@padovan.org>
- <121AE7E9-6B79-4132-8B59-DEDB1F6EBEE3@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Expose inquiry_cache debugfs only on BR/EDR
+ controllers
+Message-ID: <20131016165411.GB30104@x220.p-661hnu-f1>
+References: <1381919335-59602-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <121AE7E9-6B79-4132-8B59-DEDB1F6EBEE3@holtmann.org>
+In-Reply-To: <1381919335-59602-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-2013-10-16 Marcel Holtmann <marcel@holtmann.org>:
-
-> Hi Gustavo,
+On Wed, Oct 16, 2013, Marcel Holtmann wrote:
+> The inquiry_cache debugfs entry is only valid for BR/EDR capable
+> controllers. In case of single mode LE-only controllers that
+> entry is not valid.
 > 
-> > It is a leftover from the recent effort of remove sk usage from L2CAP
-> > core.
-> > 
-> > Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-> > ---
-> > net/bluetooth/l2cap_core.c | 4 +---
-> > 1 file changed, 1 insertion(+), 3 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index b77e178..2681880 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -3714,7 +3714,7 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
-> > 	struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
-> > 	struct l2cap_conn_rsp rsp;
-> > 	struct l2cap_chan *chan = NULL, *pchan;
-> > -	struct sock *parent, *sk = NULL;
-> > +	struct sock *parent;
-> > 	int result, status = L2CAP_CS_NO_INFO;
-> > 
-> > 	u16 dcid = 0, scid = __le16_to_cpu(req->scid);
-> > @@ -3753,8 +3753,6 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
-> > 	if (!chan)
-> > 		goto response;
-> > 
-> > -	sk = chan->sk;
-> > -
+> Move the creating of the debugfs entries to the end of controller
+> init and only create the inquiry_cache entry if BR/EDR is actually
+> supported.
 > 
-> can we already do that? I still do not like the chan->data != sk magic check.
+> At the same time this avoids creating any debugfs entries for
+> AMP controllers since none of the entries are valid there.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/hci_core.c  | 57 +++++++++++++++++++++++++++++++++++++++++++++--
+>  net/bluetooth/hci_sysfs.c | 39 --------------------------------
+>  2 files changed, 55 insertions(+), 41 deletions(-)
 
-Yes, this is just a dead assignment. It is totally safe to remove it.
+Applied to bluetooth-next. Thanks.
 
-	Gustavo
+Johan
