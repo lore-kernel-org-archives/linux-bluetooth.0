@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 05/11] android: Add cap to bind to port < 1024
-Date: Wed, 16 Oct 2013 17:36:32 +0300
-Message-Id: <1381934198-7955-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 04/11] android: sdp: Reuse BlueZ SDP server in Android
+Date: Wed, 16 Oct 2013 17:36:31 +0300
+Message-Id: <1381934198-7955-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381934198-7955-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1381934198-7955-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,120 +12,84 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-For SDP server we need to bind to lower port, acquire this capability.
+Reuse existing SDP server code in Android GPL daemon.
 ---
- android/main.c |   70 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- configure.ac   |    4 ++++
- 2 files changed, 74 insertions(+)
+ Makefile.android   |    4 +++-
+ android/Android.mk |    8 ++++++++
+ android/main.c     |    5 +++++
+ 3 files changed, 16 insertions(+), 1 deletion(-)
 
+diff --git a/Makefile.android b/Makefile.android
+index ab328a9..4d7da39 100644
+--- a/Makefile.android
++++ b/Makefile.android
+@@ -4,10 +4,12 @@ noinst_PROGRAMS += android/bluetoothd
+ android_bluetoothd_SOURCES =	android/main.c \
+ 				src/log.c \
+ 				android/hal-msg.h \
++				src/sdpd-database.c src/sdpd-server.c \
++				src/sdpd-service.c src/sdpd-request.c \
+ 				src/shared/util.h src/shared/util.c \
+ 				src/shared/mgmt.h src/shared/mgmt.c
+ 
+-android_bluetoothd_LDADD = @GLIB_LIBS@
++android_bluetoothd_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+ endif
+ 
+ EXTRA_DIST += android/Android.mk android/log.c
+diff --git a/android/Android.mk b/android/Android.mk
+index 4996080..560fb0a 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -17,6 +17,13 @@ LOCAL_SRC_FILES := \
+ 	log.c \
+ 	../src/shared/mgmt.c \
+ 	../src/shared/util.c \
++	../src/sdpd-database.c \
++	../src/sdpd-service.c \
++	../src/sdpd-request.c \
++	../src/sdpd-server.c \
++	../lib/sdp.c \
++	../lib/bluetooth.c \
++	../lib/hci.c \
+ 
+ LOCAL_C_INCLUDES := \
+ 	$(call include-path-for, glib) \
+@@ -25,6 +32,7 @@ LOCAL_C_INCLUDES := \
+ LOCAL_C_INCLUDES += \
+ 	$(LOCAL_PATH)/../ \
+ 	$(LOCAL_PATH)/../src \
++	$(LOCAL_PATH)/../lib \
+ 
+ LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
+ 
 diff --git a/android/main.c b/android/main.c
-index 3a20148..091ef20 100644
+index 512bfd9..3a20148 100644
 --- a/android/main.c
 +++ b/android/main.c
-@@ -32,6 +32,21 @@
- #include <stdlib.h>
- #include <stdbool.h>
- #include <string.h>
-+#include <unistd.h>
-+#include <errno.h>
-+#include <sys/prctl.h>
-+
-+/**
-+ * Include <sys/capability.h> for host build and
-+ * also for Android 4.3 when it is added to bionic
-+ */
-+#if !defined(ANDROID) || (PLATFORM_SDK_VERSION > 17)
-+#include <sys/capability.h>
-+#endif
-+
-+#if defined(ANDROID)
-+#include <private/android_filesystem_config.h>
-+#endif
- 
+@@ -36,6 +36,7 @@
  #include <glib.h>
  
-@@ -230,6 +245,58 @@ static void cleanup_mgmt_interface(void)
- 	mgmt_if = NULL;
- }
+ #include "log.h"
++#include "src/sdpd.h"
  
-+static bool set_capabilities(void)
-+{
-+	struct __user_cap_header_struct header;
-+	struct __user_cap_data_struct cap;
-+#if defined(ANDROID)
-+	gid_t groups[] = {AID_NET_BT, AID_NET_BT_ADMIN, AID_NET_ADMIN};
-+#endif
-+
-+	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
-+
-+	header.version = _LINUX_CAPABILITY_VERSION;
-+
-+	prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);
-+
-+#if defined(ANDROID)
-+	if (setgid(AID_BLUETOOTH) < 0)
-+		warn("%s: setgid(): %s", __func__, strerror(errno));
-+
-+	if (setuid(AID_BLUETOOTH) < 0)
-+		warn("%s: setuid(): %s", __func__, strerror(errno));
-+#endif
-+
-+	header.version = _LINUX_CAPABILITY_VERSION;
-+	header.pid = 0;
-+
-+	cap.effective = cap.permitted =
-+		CAP_TO_MASK(CAP_SETGID) |
-+		CAP_TO_MASK(CAP_NET_RAW) |
-+		CAP_TO_MASK(CAP_NET_ADMIN) |
-+		CAP_TO_MASK(CAP_NET_BIND_SERVICE);
-+	cap.inheritable = 0;
-+
-+	if (capset(&header, &cap) < 0) {
-+		error("%s: capset(): %s", __func__, strerror(errno));
-+		return false;
-+	}
-+
-+#if defined(ANDROID)
-+	if (setgroups(sizeof(groups)/sizeof(groups[0]), groups) < 0)
-+		warn("%s: setgroups: %s", __func__, strerror(errno));
-+#endif
-+	if (capget(&header, &cap) < 0)
-+		error("%s: capget(): %s", __func__, strerror(errno));
-+	else
-+		DBG("Caps: eff: 0x%x, perm: 0x%x, inh: 0x%x", cap.effective,
-+					cap.permitted, cap.inheritable);
-+
-+	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
-+
-+	return true;
-+}
-+
- int main(int argc, char *argv[])
- {
- 	GOptionContext *context;
-@@ -263,6 +330,9 @@ int main(int argc, char *argv[])
- 	sigaction(SIGINT, &sa, NULL);
- 	sigaction(SIGTERM, &sa, NULL);
- 
-+	if (!set_capabilities())
-+		return EXIT_FAILURE;
-+
+ #include "lib/bluetooth.h"
+ #include "lib/mgmt.h"
+@@ -265,10 +266,14 @@ int main(int argc, char *argv[])
  	if (!init_mgmt_interface())
  		return EXIT_FAILURE;
  
-diff --git a/configure.ac b/configure.ac
-index b4d3998..e3b5220 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -247,4 +247,8 @@ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
- 					[enable_android=${enableval}])
- AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
- 
-+if (test "${enable_android}" = "yes"); then
-+	AC_CHECK_LIB(cap, capget, dummy=yes, AC_MSG_ERROR(libcap is required))
-+fi
++	/* Use params: mtu = 0, flags = 0 */
++	start_sdp_server(0, 0);
 +
- AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
+ 	DBG("Entering main loop");
+ 
+ 	g_main_loop_run(event_loop);
+ 
++	stop_sdp_server();
+ 	cleanup_mgmt_interface();
+ 	g_main_loop_unref(event_loop);
+ 
 -- 
 1.7.10.4
 
