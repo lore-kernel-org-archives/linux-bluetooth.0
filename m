@@ -1,36 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Ignore A2MP data on non-BR/EDR links
-Date: Wed, 16 Oct 2013 11:37:00 +0300
-Message-Id: <1381912621-10238-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH 0/3] Fix L2CAP command reject PDUs
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1381910801-3130-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 16 Oct 2013 10:16:57 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <5E3135CB-20AF-4625-87E2-0D2407F740A9@holtmann.org>
+References: <1381910801-3130-1-git-send-email-johan.hedberg@gmail.com>
+To: johan.hedberg@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Johan,
 
-The A2MP CID is only valid for BR/EDR transports. We should ignore A2MP
-data on non-BR/EDR links and refuse to create an amp_mgr object.
+> The L2CAP command reject PDU is required to have some extra data for
+> "invalid MTU" and "invalid CID" cases. These patches fixes the code to
+> always return the right kind of PDU.
+> 
+> Johan
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (3):
+>      Bluetooth: Fix L2CAP "Command Reject: Invalid CID" response
+>      Bluetooth: Remove unused command reject mapping for EMSGSIZE
+>      Bluetooth: Remove useless l2cap_err_to_reason function
+> 
+> net/bluetooth/l2cap_core.c | 54 +++++++++++++++++++++------------------------
+> 1 file changed, 25 insertions(+), 29 deletions(-)
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/a2mp.c | 3 +++
- 1 file changed, 3 insertions(+)
+all 3 patches have been applied to bluetooth-next tree.
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index fe32a33..efcd108 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -836,6 +836,9 @@ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
- {
- 	struct amp_mgr *mgr;
- 
-+	if (conn->hcon->type != ACL_LINK)
-+		return NULL;
-+
- 	mgr = amp_mgr_create(conn, false);
- 	if (!mgr) {
- 		BT_ERR("Could not create AMP manager");
--- 
-1.8.3.1
+Regards
+
+Marcel
 
