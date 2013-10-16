@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH 5/7] Bluetooth: Create recv_raw() channel callback
-Date: Wed, 16 Oct 2013 16:08:33 -0300
-Message-Id: <1381950515-25256-5-git-send-email-gustavo@padovan.org>
+Subject: [PATCH 4/7] Bluetooth: Remove parent socket usage from l2cap_core.c
+Date: Wed, 16 Oct 2013 16:08:32 -0300
+Message-Id: <1381950515-25256-4-git-send-email-gustavo@padovan.org>
 In-Reply-To: <1381950515-25256-1-git-send-email-gustavo@padovan.org>
 References: <1381950515-25256-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,129 +12,106 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-This new callback isolates socket specific code from L2CAP core.
-A dummy version of the callback, l2cap_chan_no_recv_raw() is provided for
-users that do not need to receive raw data.
+The parent socket is not used inside the L2CAP core anymore. We only lock
+it to indirect access through the new_connection() callback. The hold of
+the socket lock was moved to the new_connection() callback.
+
+Inside L2CAP core the channel lock is now used in l2cap_le_conn_ready()
+and l2cap_conn_ready() to protect the execution of these two functions
+during the handling of new incoming connections.
+
+This change remove the socket lock usage from L2CAP core while keeping
+the code safe against race conditions.
 
 Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 ---
- include/net/bluetooth/l2cap.h |  8 ++++++++
- net/bluetooth/a2mp.c          |  1 +
- net/bluetooth/l2cap_core.c    | 12 +-----------
- net/bluetooth/l2cap_sock.c    | 22 ++++++++++++++++++++++
- 4 files changed, 32 insertions(+), 11 deletions(-)
+ net/bluetooth/l2cap_core.c | 14 ++++----------
+ net/bluetooth/l2cap_sock.c |  4 ++++
+ 2 files changed, 8 insertions(+), 10 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 3d922b9..af5eb23 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -548,6 +548,8 @@ struct l2cap_ops {
- 	struct l2cap_chan	*(*new_connection) (struct l2cap_chan *chan);
- 	int			(*recv) (struct l2cap_chan * chan,
- 					 struct sk_buff *skb);
-+	int			(*recv_raw) (struct l2cap_chan * chan,
-+					 struct sk_buff *skb);
- 	void			(*teardown) (struct l2cap_chan *chan, int err);
- 	void			(*close) (struct l2cap_chan *chan);
- 	void			(*state_change) (struct l2cap_chan *chan,
-@@ -785,6 +787,12 @@ static inline struct l2cap_chan *l2cap_chan_no_new_connection(struct l2cap_chan
- 	return NULL;
- }
- 
-+static inline int l2cap_chan_no_recv_raw(struct l2cap_chan *chan,
-+					 struct sk_buff *skb)
-+{
-+	return 0;
-+}
-+
- static inline void l2cap_chan_no_teardown(struct l2cap_chan *chan, int err)
- {
- }
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index efcd108..72540a7 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -707,6 +707,7 @@ static struct l2cap_ops a2mp_chan_ops = {
- 
- 	/* Not implemented for A2MP */
- 	.new_connection = l2cap_chan_no_new_connection,
-+	.recv_raw = l2cap_chan_no_recv_raw,
- 	.teardown = l2cap_chan_no_teardown,
- 	.ready = l2cap_chan_no_ready,
- 	.defer = l2cap_chan_no_defer,
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index e30a53a..45fcf5e 100644
+index 8c757c0..e30a53a 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -2797,7 +2797,6 @@ static void l2cap_pass_to_tx_fbit(struct l2cap_chan *chan,
- /* Copy frame to all raw sockets on that connection */
- static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
+@@ -1361,7 +1361,6 @@ static struct l2cap_chan *l2cap_global_chan_by_scid(int state, u16 cid,
+ 
+ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
  {
--	struct sk_buff *nskb;
- 	struct l2cap_chan *chan;
+-	struct sock *parent;
+ 	struct l2cap_chan *chan, *pchan;
  
- 	BT_DBG("conn %p", conn);
-@@ -2805,19 +2804,10 @@ static void l2cap_raw_recv(struct l2cap_conn *conn, struct sk_buff *skb)
- 	mutex_lock(&conn->chan_lock);
+ 	BT_DBG("");
+@@ -1376,9 +1375,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 	if (__l2cap_get_chan_by_dcid(conn, L2CAP_CID_ATT))
+ 		return;
  
- 	list_for_each_entry(chan, &conn->chan_l, list) {
--		struct sock *sk = chan->sk;
- 		if (chan->chan_type != L2CAP_CHAN_RAW)
- 			continue;
- 
--		/* Don't send frame to the socket it came from */
--		if (skb->sk == sk)
--			continue;
--		nskb = skb_clone(skb, GFP_KERNEL);
--		if (!nskb)
--			continue;
+-	parent = pchan->sk;
 -
--		if (chan->ops->recv(chan, nskb))
--			kfree_skb(nskb);
-+		chan->ops->recv_raw(chan, skb);
- 	}
+-	lock_sock(parent);
++	l2cap_chan_lock(pchan);
  
- 	mutex_unlock(&conn->chan_lock);
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index f5a7c66..b8be4fb 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1078,6 +1078,27 @@ done:
- 	return err;
+ 	chan = pchan->ops->new_connection(pchan);
+ 	if (!chan)
+@@ -1394,7 +1391,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 	__l2cap_chan_add(conn, chan);
+ 
+ clean:
+-	release_sock(parent);
++	l2cap_chan_unlock(pchan);
  }
  
-+static int l2cap_sock_recv_raw_cb(struct l2cap_chan *chan, struct sk_buff *skb)
-+{
-+	struct sock *sk = chan->data;
-+	struct sk_buff *nskb;
-+	int err;
-+
-+	/* Don't send frame to the socket it came from */
-+	if (skb->sk == sk)
-+		return 0;
-+
-+	nskb = skb_clone(skb, GFP_KERNEL);
-+	if (!nskb)
-+		return -ENOMEM;
-+
-+	err = sock_queue_rcv_skb(sk, nskb);
-+	if (err < 0)
-+		kfree_skb(nskb);
-+
-+	return err;
-+}
-+
- static void l2cap_sock_close_cb(struct l2cap_chan *chan)
+ static void l2cap_conn_ready(struct l2cap_conn *conn)
+@@ -3697,7 +3694,6 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+ 	struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
+ 	struct l2cap_conn_rsp rsp;
+ 	struct l2cap_chan *chan = NULL, *pchan;
+-	struct sock *parent;
+ 	int result, status = L2CAP_CS_NO_INFO;
+ 
+ 	u16 dcid = 0, scid = __le16_to_cpu(req->scid);
+@@ -3713,10 +3709,8 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+ 		goto sendresp;
+ 	}
+ 
+-	parent = pchan->sk;
+-
+ 	mutex_lock(&conn->chan_lock);
+-	lock_sock(parent);
++	l2cap_chan_lock(pchan);
+ 
+ 	/* Check if the ACL is secure enough (if not SDP) */
+ 	if (psm != __constant_cpu_to_le16(L2CAP_PSM_SDP) &&
+@@ -3792,7 +3786,7 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+ 	}
+ 
+ response:
+-	release_sock(parent);
++	l2cap_chan_unlock(pchan);
+ 	mutex_unlock(&conn->chan_lock);
+ 
+ sendresp:
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 347cc63..f5a7c66 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1019,6 +1019,8 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
  {
- 	struct sock *sk = chan->data;
-@@ -1214,6 +1235,7 @@ static struct l2cap_ops l2cap_chan_ops = {
- 	.name		= "L2CAP Socket Interface",
- 	.new_connection	= l2cap_sock_new_connection_cb,
- 	.recv		= l2cap_sock_recv_cb,
-+	.recv_raw	= l2cap_sock_recv_raw_cb,
- 	.close		= l2cap_sock_close_cb,
- 	.teardown	= l2cap_sock_teardown_cb,
- 	.state_change	= l2cap_sock_state_change_cb,
+ 	struct sock *sk, *parent = chan->data;
+ 
++	lock_sock(parent);
++
+ 	/* Check for backlog size */
+ 	if (sk_acceptq_is_full(parent)) {
+ 		BT_DBG("backlog full %d", parent->sk_ack_backlog);
+@@ -1036,6 +1038,8 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
+ 
+ 	bt_accept_enqueue(parent, sk);
+ 
++	release_sock(parent);
++
+ 	return l2cap_pi(sk)->chan;
+ }
+ 
 -- 
 1.8.3.1
 
