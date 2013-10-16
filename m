@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 09/11] android: Rename hal_bt_sock.c to hal-bt-sock.c
-Date: Wed, 16 Oct 2013 17:36:36 +0300
-Message-Id: <1381934198-7955-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 11/11] android: Add PAN skeleton
+Date: Wed, 16 Oct 2013 17:36:38 +0300
+Message-Id: <1381934198-7955-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381934198-7955-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1381934198-7955-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,33 +12,56 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Add skeleton for pan Android HAL. This is modified version
+from Frederic Danis earlier patch set.
 ---
- android/Android.mk    |    2 +-
- android/hal-bt-sock.c |   85 +++++++++++++++++++++++++++++++++++++++++++++++++
- android/hal_bt_sock.c |   85 -------------------------------------------------
- 3 files changed, 86 insertions(+), 86 deletions(-)
- create mode 100644 android/hal-bt-sock.c
- delete mode 100644 android/hal_bt_sock.c
+ android/Android.mk      |    1 +
+ android/hal-bluetooth.c |    4 ++
+ android/hal-pan.c       |  120 +++++++++++++++++++++++++++++++++++++++++++++++
+ android/hal.h           |    1 +
+ 4 files changed, 126 insertions(+)
+ create mode 100644 android/hal-pan.c
 
 diff --git a/android/Android.mk b/android/Android.mk
-index 021bb91..fb4383d 100644
+index ab2171c..f369e34 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -52,7 +52,7 @@ include $(CLEAR_VARS)
- 
- LOCAL_SRC_FILES := \
+@@ -54,6 +54,7 @@ LOCAL_SRC_FILES := \
  	hal-bluetooth.c \
--	hal_bt_sock.c \
-+	hal-bt-sock.c \
+ 	hal-bt-sock.c \
+ 	hal-hidhost.c \
++	hal-pan.c \
  
  LOCAL_SHARED_LIBRARIES := \
  	libcutils \
-diff --git a/android/hal-bt-sock.c b/android/hal-bt-sock.c
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index 488606d..5f9d00b 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -23,6 +23,7 @@
+ #include <hardware/bluetooth.h>
+ #include <hardware/bt_sock.h>
+ #include <hardware/bt_hh.h>
++#include <hardware/bt_pan.h>
+ 
+ #include <cutils/sockets.h>
+ #include <cutils/properties.h>
+@@ -289,6 +290,9 @@ static const void *get_profile_interface(const char *profile_id)
+ 	if (!strcmp(profile_id, BT_PROFILE_HIDHOST_ID))
+ 		return bt_get_hidhost_interface();
+ 
++	if (!strcmp(profile_id, BT_PROFILE_PAN_ID))
++		return bt_get_pan_interface();
++
+ 	return NULL;
+ }
+ 
+diff --git a/android/hal-pan.c b/android/hal-pan.c
 new file mode 100644
-index 0000000..3a6d173
+index 0000000..373494e
 --- /dev/null
-+++ b/android/hal-bt-sock.c
-@@ -0,0 +1,85 @@
++++ b/android/hal-pan.c
+@@ -0,0 +1,120 @@
 +/*
 + * Copyright (C) 2013 Intel Corporation
 + *
@@ -56,165 +79,118 @@ index 0000000..3a6d173
 + *
 + */
 +
-+#include <stdlib.h>
++#include <stdbool.h>
 +
 +#include <hardware/bluetooth.h>
-+#include <hardware/bt_sock.h>
++#include <hardware/bt_pan.h>
 +
 +#define LOG_TAG "BlueZ"
 +#include <cutils/log.h>
 +
-+static bt_status_t btsock_listen_rfcomm(const char *service_name,
-+					const uint8_t *uuid, int chan,
-+					int *sock, int flags)
++const btpan_callbacks_t *bt_pan_cbacks = NULL;
++
++static bool interface_ready(void)
++{
++	return bt_pan_cbacks != NULL;
++}
++
++static bt_status_t bt_pan_enable(int local_role)
 +{
 +	ALOGD(__func__);
 +
++	if (!interface_ready())
++		return BT_STATUS_NOT_READY;
++
 +	return BT_STATUS_UNSUPPORTED;
 +}
 +
-+static bt_status_t listen(btsock_type_t type, const char *service_name,
-+					const uint8_t *uuid, int chan,
-+					int *sock, int flags)
++static int bt_pan_get_local_role(void)
 +{
-+	if ((!uuid && chan <= 0) || !sock) {
-+		ALOGE("%s: invalid params: uuid %p, chan %d, sock %p",
-+						__func__, uuid, chan, sock);
-+		return BT_STATUS_PARM_INVALID;
-+	}
++	ALOGD(__func__);
 +
-+	ALOGD("%s: uuid %p chan %d sock %p type %d service_name %s",
-+			__func__, uuid, chan, sock, type, service_name);
++	if (!interface_ready())
++		return BTPAN_ROLE_NONE;
 +
-+	switch (type) {
-+	case BTSOCK_RFCOMM:
-+		return btsock_listen_rfcomm(service_name, uuid, chan,
-+								sock, flags);
-+	default:
-+		ALOGE("%s: Socket type %d not supported", __func__, type);
-+		break;
-+	}
-+
-+	return BT_STATUS_UNSUPPORTED;
++	return BTPAN_ROLE_NONE;
 +}
 +
-+static bt_status_t connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
-+					const uint8_t *uuid, int chan,
-+					int *sock, int flags)
++static bt_status_t bt_pan_connect(const bt_bdaddr_t *bd_addr, int local_role,
++					int remote_role)
 +{
-+	if ((!uuid && chan <= 0) || !bdaddr || !sock) {
-+		ALOGE("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
-+					bdaddr, uuid, chan, sock);
-+		return BT_STATUS_PARM_INVALID;
-+	}
++	ALOGD(__func__);
 +
-+	ALOGD("%s: uuid %p chan %d sock %p type %d", __func__, uuid, chan,
-+								sock, type);
++	if (!interface_ready())
++		return BT_STATUS_NOT_READY;
++
++	if (!bd_addr)
++		return BT_STATUS_PARM_INVALID;
 +
 +	return BT_STATUS_UNSUPPORTED;
 +}
 +
-+static btsock_interface_t btsock_if = {
-+	sizeof(btsock_if),
-+	listen,
-+	connect
++static bt_status_t bt_pan_disconnect(const bt_bdaddr_t *bd_addr)
++{
++	ALOGD(__func__);
++
++	if (!interface_ready())
++		return BT_STATUS_NOT_READY;
++
++	if (!bd_addr)
++		return BT_STATUS_PARM_INVALID;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static bt_status_t bt_pan_init(const btpan_callbacks_t *callbacks)
++{
++	ALOGI(__func__);
++
++	bt_pan_cbacks = callbacks;
++
++	/* TODO: start HID Host thread */
++
++	/* TODO: enable service */
++
++	return BT_STATUS_SUCCESS;
++}
++
++static void bt_pan_cleanup()
++{
++	ALOGD(__func__);
++
++	if (!interface_ready())
++		return;
++
++	/* TODO: disable service */
++
++	/* TODO: stop PAN thread */
++
++	bt_pan_cbacks = NULL;
++}
++
++static btpan_interface_t bt_pan_if = {
++	sizeof(bt_pan_if),
++	bt_pan_init,
++	bt_pan_enable,
++	bt_pan_get_local_role,
++	bt_pan_connect,
++	bt_pan_disconnect,
++	bt_pan_cleanup
 +};
 +
-+btsock_interface_t *bt_get_sock_interface(void)
++btpan_interface_t *bt_get_pan_interface()
 +{
-+	return &btsock_if;
++	return &bt_pan_if;
 +}
-diff --git a/android/hal_bt_sock.c b/android/hal_bt_sock.c
-deleted file mode 100644
-index 3a6d173..0000000
---- a/android/hal_bt_sock.c
-+++ /dev/null
-@@ -1,85 +0,0 @@
--/*
-- * Copyright (C) 2013 Intel Corporation
-- *
-- * Licensed under the Apache License, Version 2.0 (the "License");
-- * you may not use this file except in compliance with the License.
-- * You may obtain a copy of the License at
-- *
-- *      http://www.apache.org/licenses/LICENSE-2.0
-- *
-- * Unless required by applicable law or agreed to in writing, software
-- * distributed under the License is distributed on an "AS IS" BASIS,
-- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-- * See the License for the specific language governing permissions and
-- * limitations under the License.
-- *
-- */
--
--#include <stdlib.h>
--
--#include <hardware/bluetooth.h>
--#include <hardware/bt_sock.h>
--
--#define LOG_TAG "BlueZ"
--#include <cutils/log.h>
--
--static bt_status_t btsock_listen_rfcomm(const char *service_name,
--					const uint8_t *uuid, int chan,
--					int *sock, int flags)
--{
--	ALOGD(__func__);
--
--	return BT_STATUS_UNSUPPORTED;
--}
--
--static bt_status_t listen(btsock_type_t type, const char *service_name,
--					const uint8_t *uuid, int chan,
--					int *sock, int flags)
--{
--	if ((!uuid && chan <= 0) || !sock) {
--		ALOGE("%s: invalid params: uuid %p, chan %d, sock %p",
--						__func__, uuid, chan, sock);
--		return BT_STATUS_PARM_INVALID;
--	}
--
--	ALOGD("%s: uuid %p chan %d sock %p type %d service_name %s",
--			__func__, uuid, chan, sock, type, service_name);
--
--	switch (type) {
--	case BTSOCK_RFCOMM:
--		return btsock_listen_rfcomm(service_name, uuid, chan,
--								sock, flags);
--	default:
--		ALOGE("%s: Socket type %d not supported", __func__, type);
--		break;
--	}
--
--	return BT_STATUS_UNSUPPORTED;
--}
--
--static bt_status_t connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
--					const uint8_t *uuid, int chan,
--					int *sock, int flags)
--{
--	if ((!uuid && chan <= 0) || !bdaddr || !sock) {
--		ALOGE("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
--					bdaddr, uuid, chan, sock);
--		return BT_STATUS_PARM_INVALID;
--	}
--
--	ALOGD("%s: uuid %p chan %d sock %p type %d", __func__, uuid, chan,
--								sock, type);
--
--	return BT_STATUS_UNSUPPORTED;
--}
--
--static btsock_interface_t btsock_if = {
--	sizeof(btsock_if),
--	listen,
--	connect
--};
--
--btsock_interface_t *bt_get_sock_interface(void)
--{
--	return &btsock_if;
--}
+diff --git a/android/hal.h b/android/hal.h
+index be69339..38b90b2 100644
+--- a/android/hal.h
++++ b/android/hal.h
+@@ -17,3 +17,4 @@
+ 
+ btsock_interface_t *bt_get_sock_interface(void);
+ bthh_interface_t *bt_get_hidhost_interface(void);
++btpan_interface_t *bt_get_pan_interface(void);
 -- 
 1.7.10.4
 
