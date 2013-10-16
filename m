@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 3/6] android: Add basic mgmt initialization sequence
-Date: Wed, 16 Oct 2013 11:46:52 +0300
-Message-Id: <1381913215-17957-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 4/6] android: Add adapter and device struct for BlueZ daemon
+Date: Wed, 16 Oct 2013 11:46:53 +0300
+Message-Id: <1381913215-17957-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381913215-17957-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1381913215-17957-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,255 +12,195 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Initialize bluetooth controller via mgmt interface.
+Adapter structure in BlueZ daemon keeps track of default adapter
+and device structure keeps track about found devices.
 ---
- Makefile.android   |    4 +-
- android/Android.mk |    5 ++
- android/main.c     |  168 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 176 insertions(+), 1 deletion(-)
+ android/adapter.c |   63 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/adapter.h |   36 ++++++++++++++++++++++++++++++
+ android/device.c  |   29 ++++++++++++++++++++++++
+ android/device.h  |   24 ++++++++++++++++++++
+ 4 files changed, 152 insertions(+)
+ create mode 100644 android/adapter.c
+ create mode 100644 android/adapter.h
+ create mode 100644 android/device.c
+ create mode 100644 android/device.h
 
-diff --git a/Makefile.android b/Makefile.android
-index 3ceefd8..7371a77 100644
---- a/Makefile.android
-+++ b/Makefile.android
-@@ -1,7 +1,9 @@
- if ANDROID
- noinst_PROGRAMS += android/bluetoothd
- 
--android_bluetoothd_SOURCES = android/main.c src/log.c
-+android_bluetoothd_SOURCES = android/main.c src/log.c \
-+				src/shared/util.h src/shared/util.c \
-+				src/shared/mgmt.h src/shared/mgmt.c
- android_bluetoothd_LDADD = @GLIB_LIBS@
- endif
- 
-diff --git a/android/Android.mk b/android/Android.mk
-index 0e025ac..4996080 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -15,10 +15,15 @@ include $(CLEAR_VARS)
- LOCAL_SRC_FILES := \
- 	main.c \
- 	log.c \
-+	../src/shared/mgmt.c \
-+	../src/shared/util.c \
- 
- LOCAL_C_INCLUDES := \
- 	$(call include-path-for, glib) \
- 	$(call include-path-for, glib)/glib \
+diff --git a/android/adapter.c b/android/adapter.c
+new file mode 100644
+index 0000000..b97a7c7
+--- /dev/null
++++ b/android/adapter.c
+@@ -0,0 +1,63 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+LOCAL_C_INCLUDES += \
-+	$(LOCAL_PATH)/../ \
- 	$(LOCAL_PATH)/../src \
- 
- LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
-diff --git a/android/main.c b/android/main.c
-index f75b0a8..ba25b84 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -25,6 +25,7 @@
- #include <config.h>
- #endif
- 
-+#include <stdbool.h>
- #include <signal.h>
- #include <stdint.h>
- #include <stdio.h>
-@@ -36,9 +37,17 @@
- 
- #include "log.h"
- 
-+#include "lib/bluetooth.h"
-+#include "lib/mgmt.h"
 +#include "src/shared/mgmt.h"
++#include "log.h"
++#include "adapter.h"
 +
- #define SHUTDOWN_GRACE_SECONDS 10
- 
- static GMainLoop *event_loop;
-+static struct mgmt *mgmt_if = NULL;
++struct bt_adapter {
++	struct mgmt *mgmt;
++	bdaddr_t bdaddr;
++	uint32_t dev_class;
 +
-+static uint8_t mgmt_version = 0;
-+static uint8_t mgmt_revision = 0;
- 
- static gboolean quit_eventloop(gpointer user_data)
- {
-@@ -67,6 +76,161 @@ static GOptionEntry options[] = {
- 	{ NULL }
- };
- 
-+static void read_info_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
++	char *name;
++
++	uint32_t supported_settings;
++	uint32_t current_settings;
++
++	GList *found_devices;
++};
++
++struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if)
 +{
-+	/* TODO: Store Controller information */
++	struct bt_adapter *adapter;
 +
-+	/* TODO: Register all event notification handlers */
++	adapter = g_new0(struct bt_adapter, 1);
++
++	adapter->mgmt = mgmt_ref(mgmt_if);
++
++	return adapter;
 +}
 +
-+
-+static void mgmt_index_added_event(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
++void bt_adapter_start(struct bt_adapter *adapter)
 +{
-+	DBG("index %u", index);
-+
-+	if (mgmt_send(mgmt_if, MGMT_OP_READ_INFO, index, 0, NULL,
-+					read_info_complete, NULL, NULL) > 0)
-+		return;
-+
-+	error("Failed to read adapter info for index %u", index);
-+
-+}
-+
-+static void mgmt_index_removed_event(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	DBG("index %u", index);
-+}
-+
-+static void read_index_list_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	const struct mgmt_rp_read_index_list *rp = param;
-+	uint16_t num;
-+	int i;
-+
-+	info(__func__);
-+
-+	if (!status) {
-+		error("%s: Failed to read index list: %s (0x%02x)",
-+					__func__, mgmt_errstr(status), status);
-+		return;
-+	}
-+
-+	if (length < sizeof(*rp)) {
-+		error("%s: Wrong size of read index list response", __func__);
-+		return;
-+	}
-+
-+	num = btohs(rp->num_controllers);
-+
-+	DBG("%s: Number of controllers: %u", __func__, num);
-+
-+	if (num * sizeof(uint16_t) + sizeof(*rp) != length) {
-+		error("%s: Incorrect pkt size for index list rsp", __func__);
-+		return;
-+	}
-+
-+	for (i = 0; i < num; i++) {
-+		uint16_t index;
-+
-+		index = btohs(rp->index[i]);
-+
-+		/**
-+		 * Use index added event notification.
-+		 */
-+		mgmt_index_added_event(index, 0, NULL, NULL);
-+	}
-+}
-+
-+static void read_commands_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	const struct mgmt_rp_read_commands *rp = param;
-+
 +	DBG("");
 +
-+	if (!status) {
-+		error("Failed to read supported commands: %s (0x%02x)",
-+						mgmt_errstr(status), status);
-+		return;
-+	}
-+
-+	if (length < sizeof(*rp)) {
-+		error("Wrong size response");
-+		return;
-+	}
++	/* TODO: CB: report scan mode */
++	/* TODO: CB: report state on */
 +}
 +
-+static void read_version_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
++void bt_adapter_stop(struct bt_adapter *adapter)
 +{
-+	const struct mgmt_rp_read_version *rp = param;
-+
 +	DBG("");
-+
-+	if (!status) {
-+		error("Failed to read version information: %s (0x%02x)",
-+						mgmt_errstr(status), status);
-+		return;
-+	}
-+
-+	if (length < sizeof(*rp)) {
-+		error("Wrong size response");
-+		return;
-+	}
-+
-+	mgmt_version = rp->version;
-+	mgmt_revision = btohs(rp->revision);
-+
-+	info("Bluetooth management interface %u.%u initialized",
-+						mgmt_version, mgmt_revision);
-+
-+	if (mgmt_version < 1) {
-+		error("Version 1.0 or later of management interface required");
-+		abort();
-+	}
-+
-+	mgmt_send(mgmt_if, MGMT_OP_READ_COMMANDS, MGMT_INDEX_NONE, 0, NULL,
-+					read_commands_complete, NULL, NULL);
-+
-+	mgmt_register(mgmt_if, MGMT_EV_INDEX_ADDED, MGMT_INDEX_NONE,
-+					mgmt_index_added_event, NULL, NULL);
-+	mgmt_register(mgmt_if, MGMT_EV_INDEX_REMOVED, MGMT_INDEX_NONE,
-+					mgmt_index_removed_event, NULL, NULL);
-+
-+	if (mgmt_send(mgmt_if, MGMT_OP_READ_INDEX_LIST, MGMT_INDEX_NONE, 0,
-+			NULL, read_index_list_complete, NULL, NULL) > 0)
-+		return;
-+
-+	error("Failed to read controller index list");
 +}
+diff --git a/android/adapter.h b/android/adapter.h
+new file mode 100644
+index 0000000..0f1445a
+--- /dev/null
++++ b/android/adapter.h
+@@ -0,0 +1,36 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+static bool init_mgmt_interface(void)
-+{
-+	mgmt_if = mgmt_new_default();
-+	if (!mgmt_if) {
-+		error("Failed to access management interface");
-+		return false;
-+	}
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <glib.h>
 +
-+	if (mgmt_send(mgmt_if, MGMT_OP_READ_VERSION, MGMT_INDEX_NONE, 0, NULL,
-+				read_version_complete, NULL, NULL) == 0) {
-+		error("Error sending READ_VERSION mgmt command");
-+		return false;
-+	}
++#include "lib/bluetooth.h"
 +
-+	return true;
-+}
++struct bt_adapter;
 +
-+static void cleanup_mgmt_interface(void)
-+{
-+	mgmt_unref(mgmt_if);
-+	mgmt_if = NULL;
-+}
++struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if);
 +
- int main(int argc, char *argv[])
- {
- 	GOptionContext *context;
-@@ -100,10 +264,14 @@ int main(int argc, char *argv[])
- 	sigaction(SIGINT, &sa, NULL);
- 	sigaction(SIGTERM, &sa, NULL);
- 
-+	if (!init_mgmt_interface())
-+		return EXIT_FAILURE;
++void bt_adapter_start(struct bt_adapter *adapter);
++void bt_adapter_stop(struct bt_adapter *adapter);
+diff --git a/android/device.c b/android/device.c
+new file mode 100644
+index 0000000..224a317
+--- /dev/null
++++ b/android/device.c
+@@ -0,0 +1,29 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
- 	DBG("Entering main loop");
- 
- 	g_main_loop_run(event_loop);
- 
-+	cleanup_mgmt_interface();
- 	g_main_loop_unref(event_loop);
- 
- 	info("Exit");
++struct bt_device {
++	bdaddr_t bdaddr;
++	uint8_t bdaddr_type;
++	uint32_t cod;
++	char *name;
++};
+diff --git a/android/device.h b/android/device.h
+new file mode 100644
+index 0000000..f5b1da6
+--- /dev/null
++++ b/android/device.h
+@@ -0,0 +1,24 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++struct bt_device;
 -- 
 1.7.10.4
 
