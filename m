@@ -1,95 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 04/11] android: sdp: Reuse BlueZ SDP server in Android
-Date: Wed, 16 Oct 2013 17:36:31 +0300
-Message-Id: <1381934198-7955-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1381934198-7955-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1381934198-7955-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH v2] Bluetooth: Reintroduce socket restrictions for LE sockets
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1381932806-13506-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 16 Oct 2013 16:37:30 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <F7DC8DE5-03D2-4EE9-9FA8-58D4B30A810D@holtmann.org>
+References: <1381932806-13506-1-git-send-email-johan.hedberg@gmail.com>
+To: johan.hedberg@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Johan,
 
-Reuse existing SDP server code in Android GPL daemon.
----
- Makefile.android   |    4 +++-
- android/Android.mk |    8 ++++++++
- android/main.c     |    5 +++++
- 3 files changed, 16 insertions(+), 1 deletion(-)
+> Right now we do not allow user space to use connection oriented channels
+> on LE, and the only CID that can be used is the Attribute Protocol one.
+> These restrictions went away together with the recent refactoring of the
+> L2CAP code, but this patch puts them back to their appropriate places.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/l2cap_sock.c | 18 ++++++++++++++++++
+> 1 file changed, 18 insertions(+)
 
-diff --git a/Makefile.android b/Makefile.android
-index ab328a9..4d7da39 100644
---- a/Makefile.android
-+++ b/Makefile.android
-@@ -4,10 +4,12 @@ noinst_PROGRAMS += android/bluetoothd
- android_bluetoothd_SOURCES =	android/main.c \
- 				src/log.c \
- 				android/hal-msg.h \
-+				src/sdpd-database.c src/sdpd-server.c \
-+				src/sdpd-service.c src/sdpd-request.c \
- 				src/shared/util.h src/shared/util.c \
- 				src/shared/mgmt.h src/shared/mgmt.c
- 
--android_bluetoothd_LDADD = @GLIB_LIBS@
-+android_bluetoothd_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
- endif
- 
- EXTRA_DIST += android/Android.mk android/log.c
-diff --git a/android/Android.mk b/android/Android.mk
-index 4996080..560fb0a 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -17,6 +17,13 @@ LOCAL_SRC_FILES := \
- 	log.c \
- 	../src/shared/mgmt.c \
- 	../src/shared/util.c \
-+	../src/sdpd-database.c \
-+	../src/sdpd-service.c \
-+	../src/sdpd-request.c \
-+	../src/sdpd-server.c \
-+	../lib/sdp.c \
-+	../lib/bluetooth.c \
-+	../lib/hci.c \
- 
- LOCAL_C_INCLUDES := \
- 	$(call include-path-for, glib) \
-@@ -25,6 +32,7 @@ LOCAL_C_INCLUDES := \
- LOCAL_C_INCLUDES += \
- 	$(LOCAL_PATH)/../ \
- 	$(LOCAL_PATH)/../src \
-+	$(LOCAL_PATH)/../lib \
- 
- LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
- 
-diff --git a/android/main.c b/android/main.c
-index 512bfd9..3a20148 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -36,6 +36,7 @@
- #include <glib.h>
- 
- #include "log.h"
-+#include "src/sdpd.h"
- 
- #include "lib/bluetooth.h"
- #include "lib/mgmt.h"
-@@ -265,10 +266,14 @@ int main(int argc, char *argv[])
- 	if (!init_mgmt_interface())
- 		return EXIT_FAILURE;
- 
-+	/* Use params: mtu = 0, flags = 0 */
-+	start_sdp_server(0, 0);
-+
- 	DBG("Entering main loop");
- 
- 	g_main_loop_run(event_loop);
- 
-+	stop_sdp_server();
- 	cleanup_mgmt_interface();
- 	g_main_loop_unref(event_loop);
- 
--- 
-1.7.10.4
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
