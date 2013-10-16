@@ -1,94 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 5/6] android: sdp: Reuse BlueZ SDP server in Android
-Date: Wed, 16 Oct 2013 11:46:54 +0300
-Message-Id: <1381913215-17957-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1381913215-17957-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1381913215-17957-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/2] Bluetooth: Ignore SMP data on non-LE links
+Date: Wed, 16 Oct 2013 11:37:01 +0300
+Message-Id: <1381912621-10238-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1381912621-10238-1-git-send-email-johan.hedberg@gmail.com>
+References: <1381912621-10238-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Reuse existing SDP server code in Android GPL daemon.
+The SMP CID is only defined for LE transports. Instead of returning an
+error from smp_sig_channel() in this case (which would cause a
+disconnection) just return 0 to ignore the data, which is consistent
+with the behavior for other unknown CIDs.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- Makefile.android   |    4 +++-
- android/Android.mk |    8 ++++++++
- android/main.c     |    5 +++++
- 3 files changed, 16 insertions(+), 1 deletion(-)
+ net/bluetooth/smp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile.android b/Makefile.android
-index 7371a77..48af2e2 100644
---- a/Makefile.android
-+++ b/Makefile.android
-@@ -2,9 +2,11 @@ if ANDROID
- noinst_PROGRAMS += android/bluetoothd
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 463e50c..fc200e0 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -856,7 +856,7 @@ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
  
- android_bluetoothd_SOURCES = android/main.c src/log.c \
-+				src/sdpd-database.c src/sdpd-server.c \
-+				src/sdpd-service.c src/sdpd-request.c \
- 				src/shared/util.h src/shared/util.c \
- 				src/shared/mgmt.h src/shared/mgmt.c
--android_bluetoothd_LDADD = @GLIB_LIBS@
-+android_bluetoothd_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
- endif
+ 	if (hcon->type != LE_LINK) {
+ 		kfree_skb(skb);
+-		return -ENOTSUPP;
++		return 0;
+ 	}
  
- EXTRA_DIST += android/Android.mk android/log.c
-diff --git a/android/Android.mk b/android/Android.mk
-index 4996080..560fb0a 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -17,6 +17,13 @@ LOCAL_SRC_FILES := \
- 	log.c \
- 	../src/shared/mgmt.c \
- 	../src/shared/util.c \
-+	../src/sdpd-database.c \
-+	../src/sdpd-service.c \
-+	../src/sdpd-request.c \
-+	../src/sdpd-server.c \
-+	../lib/sdp.c \
-+	../lib/bluetooth.c \
-+	../lib/hci.c \
- 
- LOCAL_C_INCLUDES := \
- 	$(call include-path-for, glib) \
-@@ -25,6 +32,7 @@ LOCAL_C_INCLUDES := \
- LOCAL_C_INCLUDES += \
- 	$(LOCAL_PATH)/../ \
- 	$(LOCAL_PATH)/../src \
-+	$(LOCAL_PATH)/../lib \
- 
- LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
- 
-diff --git a/android/main.c b/android/main.c
-index ba25b84..2b8675d 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -36,6 +36,7 @@
- #include <glib.h>
- 
- #include "log.h"
-+#include "sdpd.h"
- 
- #include "lib/bluetooth.h"
- #include "lib/mgmt.h"
-@@ -267,10 +268,14 @@ int main(int argc, char *argv[])
- 	if (!init_mgmt_interface())
- 		return EXIT_FAILURE;
- 
-+	/* Use params: mtu = 0, flags = 0 */
-+	start_sdp_server(0, 0);
-+
- 	DBG("Entering main loop");
- 
- 	g_main_loop_run(event_loop);
- 
-+	stop_sdp_server();
- 	cleanup_mgmt_interface();
- 	g_main_loop_unref(event_loop);
- 
+ 	if (skb->len < 1) {
 -- 
-1.7.10.4
+1.8.3.1
 
