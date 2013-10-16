@@ -1,60 +1,131 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Reintroduce socket restrictions for LE sockets
-Date: Wed, 16 Oct 2013 17:13:26 +0300
-Message-Id: <1381932806-13506-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCHv3 05/11] android: Add cap to bind to port < 1024
+Date: Wed, 16 Oct 2013 17:08:42 +0300
+Message-Id: <1381932528-31584-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1381932528-31584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1381932528-31584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Right now we do not allow user space to use connection oriented channels
-on LE, and the only CID that can be used is the Attribute Protocol one.
-These restrictions went away together with the recent refactoring of the
-L2CAP code, but this patch puts them back to their appropriate places.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+For SDP server we need to bind to lower port, acquire this capability.
 ---
- net/bluetooth/l2cap_sock.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ android/main.c |   70 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ configure.ac   |    4 ++++
+ 2 files changed, 74 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 68f486a..95498d5 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -72,6 +72,15 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 	if (!bdaddr_type_is_valid(la.l2_bdaddr_type))
- 		return -EINVAL;
+diff --git a/android/main.c b/android/main.c
+index 5dd359c..2eecec9 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -32,6 +32,21 @@
+ #include <stdlib.h>
+ #include <stdbool.h>
+ #include <string.h>
++#include <unistd.h>
++#include <errno.h>
++#include <sys/prctl.h>
++
++/**
++ * Include <sys/capability.h> for host build and
++ * also for Android 4.3 when it is added to bionic
++ */
++#if !defined(ANDROID) || (PLATFORM_SDK_VERSION > 17)
++#include <sys/capability.h>
++#endif
++
++#if defined(ANDROID)
++#include <private/android_filesystem_config.h>
++#endif
  
-+	if (bdaddr_type_is_le(la.l2_bdaddr_type)) {
-+		/* Connection oriented channels are not supported on LE */
-+		if (la.l2_psm)
-+			return -EINVAL;
-+		/* We only allow ATT user space socket */
-+		if (la.l2_cid != L2CAP_CID_ATT)
-+			return -EINVAL;
+ #include <glib.h>
+ 
+@@ -232,6 +247,58 @@ static void cleanup_mgmt_interface(void)
+ 	mgmt_if = NULL;
+ }
+ 
++static bool set_capabilities(void)
++{
++	struct __user_cap_header_struct header;
++	struct __user_cap_data_struct cap;
++#if defined(ANDROID)
++	gid_t groups[] = {AID_NET_BT, AID_NET_BT_ADMIN, AID_NET_ADMIN};
++#endif
++
++	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
++
++	header.version = _LINUX_CAPABILITY_VERSION;
++
++	prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);
++
++#if defined(ANDROID)
++	if (setgid(AID_BLUETOOTH) < 0)
++		warn("%s: setgid(): %s", __func__, strerror(errno));
++
++	if (setuid(AID_BLUETOOTH) < 0)
++		warn("%s: setuid(): %s", __func__, strerror(errno));
++#endif
++
++	header.version = _LINUX_CAPABILITY_VERSION;
++	header.pid = 0;
++
++	cap.effective = cap.permitted =
++		CAP_TO_MASK(CAP_SETGID) |
++		CAP_TO_MASK(CAP_NET_RAW) |
++		CAP_TO_MASK(CAP_NET_ADMIN) |
++		CAP_TO_MASK(CAP_NET_BIND_SERVICE);
++	cap.inheritable = 0;
++
++	if (capset(&header, &cap) < 0) {
++		error("%s: capset(): %s", __func__, strerror(errno));
++		return false;
 +	}
 +
- 	lock_sock(sk);
- 
- 	if (sk->sk_state != BT_OPEN) {
-@@ -156,6 +165,15 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
- 	if (chan->src_type != BDADDR_BREDR && la.l2_bdaddr_type == BDADDR_BREDR)
- 		return -EINVAL;
- 
-+	if (bdaddr_type_is_le(la.l2_bdaddr_type)) {
-+		/* Connection oriented channels are not supported on LE */
-+		if (la.l2_psm)
-+			return -EINVAL;
-+		/* We only allow ATT user space socket */
-+		if (la.l2_cid != L2CAP_CID_ATT)
-+			return -EINVAL;
-+	}
++#if defined(ANDROID)
++	if (setgroups(sizeof(groups)/sizeof(groups[0]), groups) < 0)
++		warn("%s: setgroups: %s", __func__, strerror(errno));
++#endif
++	if (capget(&header, &cap) < 0)
++		error("%s: capget(): %s", __func__, strerror(errno));
++	else
++		DBG("Caps: eff: 0x%x, perm: 0x%x, inh: 0x%x", cap.effective,
++					cap.permitted, cap.inheritable);
 +
- 	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
- 				 &la.l2_bdaddr, la.l2_bdaddr_type);
- 	if (err)
++	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
++
++	return true;
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	GOptionContext *context;
+@@ -265,6 +332,9 @@ int main(int argc, char *argv[])
+ 	sigaction(SIGINT, &sa, NULL);
+ 	sigaction(SIGTERM, &sa, NULL);
+ 
++	if (!set_capabilities())
++		return EXIT_FAILURE;
++
+ 	if (!init_mgmt_interface())
+ 		return EXIT_FAILURE;
+ 
+diff --git a/configure.ac b/configure.ac
+index b4d3998..e3b5220 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -247,4 +247,8 @@ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
+ 					[enable_android=${enableval}])
+ AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
+ 
++if (test "${enable_android}" = "yes"); then
++	AC_CHECK_LIB(cap, capget, dummy=yes, AC_MSG_ERROR(libcap is required))
++fi
++
+ AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
 -- 
-1.8.3.1
+1.7.10.4
 
