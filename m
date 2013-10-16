@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 11/11] android: Add PAN skeleton
-Date: Wed, 16 Oct 2013 17:36:38 +0300
-Message-Id: <1381934198-7955-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 03/11] android: Add adapter and device struct for BlueZ daemon
+Date: Wed, 16 Oct 2013 17:36:30 +0300
+Message-Id: <1381934198-7955-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381934198-7955-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1381934198-7955-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,185 +12,182 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add skeleton for pan Android HAL. This is modified version
-from Frederic Danis earlier patch set.
+Adapter structure in BlueZ daemon keeps track of default adapter
+and device structure keeps track about found devices.
 ---
- android/Android.mk      |    1 +
- android/hal-bluetooth.c |    4 ++
- android/hal-pan.c       |  120 +++++++++++++++++++++++++++++++++++++++++++++++
- android/hal.h           |    1 +
- 4 files changed, 126 insertions(+)
- create mode 100644 android/hal-pan.c
+ android/adapter.c |   54 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/adapter.h |   36 +++++++++++++++++++++++++++++++++++
+ android/device.c  |   25 +++++++++++++++++++++++++
+ android/device.h  |   24 ++++++++++++++++++++++++
+ 4 files changed, 139 insertions(+)
+ create mode 100644 android/adapter.c
+ create mode 100644 android/adapter.h
+ create mode 100644 android/device.c
+ create mode 100644 android/device.h
 
-diff --git a/android/Android.mk b/android/Android.mk
-index ab2171c..f369e34 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -54,6 +54,7 @@ LOCAL_SRC_FILES := \
- 	hal-bluetooth.c \
- 	hal-bt-sock.c \
- 	hal-hidhost.c \
-+	hal-pan.c \
- 
- LOCAL_SHARED_LIBRARIES := \
- 	libcutils \
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 488606d..5f9d00b 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -23,6 +23,7 @@
- #include <hardware/bluetooth.h>
- #include <hardware/bt_sock.h>
- #include <hardware/bt_hh.h>
-+#include <hardware/bt_pan.h>
- 
- #include <cutils/sockets.h>
- #include <cutils/properties.h>
-@@ -289,6 +290,9 @@ static const void *get_profile_interface(const char *profile_id)
- 	if (!strcmp(profile_id, BT_PROFILE_HIDHOST_ID))
- 		return bt_get_hidhost_interface();
- 
-+	if (!strcmp(profile_id, BT_PROFILE_PAN_ID))
-+		return bt_get_pan_interface();
-+
- 	return NULL;
- }
- 
-diff --git a/android/hal-pan.c b/android/hal-pan.c
+diff --git a/android/adapter.c b/android/adapter.c
 new file mode 100644
-index 0000000..373494e
+index 0000000..9763530
 --- /dev/null
-+++ b/android/hal-pan.c
-@@ -0,0 +1,120 @@
++++ b/android/adapter.c
+@@ -0,0 +1,54 @@
 +/*
-+ * Copyright (C) 2013 Intel Corporation
 + *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
++ *  BlueZ - Bluetooth protocol stack for Linux
 + *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
 + *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 + *
 + */
 +
-+#include <stdbool.h>
++#include "src/shared/mgmt.h"
++#include "log.h"
++#include "adapter.h"
 +
-+#include <hardware/bluetooth.h>
-+#include <hardware/bt_pan.h>
-+
-+#define LOG_TAG "BlueZ"
-+#include <cutils/log.h>
-+
-+const btpan_callbacks_t *bt_pan_cbacks = NULL;
-+
-+static bool interface_ready(void)
-+{
-+	return bt_pan_cbacks != NULL;
-+}
-+
-+static bt_status_t bt_pan_enable(int local_role)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static int bt_pan_get_local_role(void)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BTPAN_ROLE_NONE;
-+
-+	return BTPAN_ROLE_NONE;
-+}
-+
-+static bt_status_t bt_pan_connect(const bt_bdaddr_t *bd_addr, int local_role,
-+					int remote_role)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t bt_pan_disconnect(const bt_bdaddr_t *bd_addr)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t bt_pan_init(const btpan_callbacks_t *callbacks)
-+{
-+	ALOGI(__func__);
-+
-+	bt_pan_cbacks = callbacks;
-+
-+	/* TODO: start HID Host thread */
-+
-+	/* TODO: enable service */
-+
-+	return BT_STATUS_SUCCESS;
-+}
-+
-+static void bt_pan_cleanup()
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return;
-+
-+	/* TODO: disable service */
-+
-+	/* TODO: stop PAN thread */
-+
-+	bt_pan_cbacks = NULL;
-+}
-+
-+static btpan_interface_t bt_pan_if = {
-+	sizeof(bt_pan_if),
-+	bt_pan_init,
-+	bt_pan_enable,
-+	bt_pan_get_local_role,
-+	bt_pan_connect,
-+	bt_pan_disconnect,
-+	bt_pan_cleanup
++struct bt_adapter {
++	struct mgmt *mgmt;
 +};
 +
-+btpan_interface_t *bt_get_pan_interface()
++struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if)
 +{
-+	return &bt_pan_if;
++	struct bt_adapter *adapter;
++
++	adapter = g_new0(struct bt_adapter, 1);
++
++	adapter->mgmt = mgmt_ref(mgmt_if);
++
++	return adapter;
 +}
-diff --git a/android/hal.h b/android/hal.h
-index be69339..38b90b2 100644
---- a/android/hal.h
-+++ b/android/hal.h
-@@ -17,3 +17,4 @@
- 
- btsock_interface_t *bt_get_sock_interface(void);
- bthh_interface_t *bt_get_hidhost_interface(void);
-+btpan_interface_t *bt_get_pan_interface(void);
++
++void bt_adapter_start(struct bt_adapter *adapter)
++{
++	DBG("");
++
++	/* TODO: CB: report scan mode */
++	/* TODO: CB: report state on */
++}
++
++void bt_adapter_stop(struct bt_adapter *adapter)
++{
++	DBG("");
++}
+diff --git a/android/adapter.h b/android/adapter.h
+new file mode 100644
+index 0000000..0f1445a
+--- /dev/null
++++ b/android/adapter.h
+@@ -0,0 +1,36 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <glib.h>
++
++#include "lib/bluetooth.h"
++
++struct bt_adapter;
++
++struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if);
++
++void bt_adapter_start(struct bt_adapter *adapter);
++void bt_adapter_stop(struct bt_adapter *adapter);
+diff --git a/android/device.c b/android/device.c
+new file mode 100644
+index 0000000..f9ca3ec
+--- /dev/null
++++ b/android/device.c
+@@ -0,0 +1,25 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++struct bt_device {
++};
+diff --git a/android/device.h b/android/device.h
+new file mode 100644
+index 0000000..f5b1da6
+--- /dev/null
++++ b/android/device.h
+@@ -0,0 +1,24 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++struct bt_device;
 -- 
 1.7.10.4
 
