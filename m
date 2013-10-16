@@ -1,193 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 03/11] android: Add adapter and device struct for BlueZ daemon
-Date: Wed, 16 Oct 2013 17:08:40 +0300
-Message-Id: <1381932528-31584-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1381932528-31584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 00/11] Android BlueZ patches, second chunk
+Date: Wed, 16 Oct 2013 17:08:37 +0300
+Message-Id: <1381932528-31584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1381932528-31584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Adapter structure in BlueZ daemon keeps track of default adapter
-and device structure keeps track about found devices.
----
- android/adapter.c |   54 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- android/adapter.h |   36 +++++++++++++++++++++++++++++++++++
- android/device.c  |   25 +++++++++++++++++++++++++
- android/device.h  |   24 ++++++++++++++++++++++++
- 4 files changed, 139 insertions(+)
+This is second chunk from my initial big patch set. Fixed style issues commented
+by Marcel.
+
+Changes:
+	* v3: Following upstream comments file names are changed from "_" to "-", added kernel style
+	struct initialization, fixed bug checking status for mgmt commands, added 2 HALs skeletons.
+	* v2: Corrected android_daemon -> enable_android autoconf stuff, better name for acquiring caps,
+	renamed hal_msg.h to hal-msg.h due to Johan's comment. Added small test-sdp fix.
+
+Note that due to Marcel comment this cannot be built unless you include my patch
+for Android bionic library:
+http://code.google.com/p/android-bluez/source/detail?r=77a07e7703b63e280d9880baad30b3375e7df079&repo=bionic#
+
+Andrei Emeltchenko (11):
+  android: Create HAL API header skeleton
+  android: Add basic mgmt initialization sequence
+  android: Add adapter and device struct for BlueZ daemon
+  android: sdp: Reuse BlueZ SDP server in Android
+  android: Add cap to bind to port < 1024
+  android: Implement read_info_complete callback
+  android: Use kernel style to initialize struct fields
+  android: Rename hal_bluetooth.c to hal-bluetooth.c
+  android: Rename hal_bt_sock.c to hal-bt-sock.c
+  android: Add HID Host skeleton
+  android: Add PAN skeleton
+
+ Makefile.android        |   12 +-
+ android/Android.mk      |   20 ++-
+ android/adapter.c       |  138 +++++++++++++++++
+ android/adapter.h       |   40 +++++
+ android/device.c        |   25 +++
+ android/device.h        |   24 +++
+ android/hal-bluetooth.c |  392 +++++++++++++++++++++++++++++++++++++++++++++++
+ android/hal-bt-sock.c   |   85 ++++++++++
+ android/hal-hidhost.c   |  204 ++++++++++++++++++++++++
+ android/hal-msg.h       |  246 +++++++++++++++++++++++++++++
+ android/hal-pan.c       |  120 +++++++++++++++
+ android/hal.h           |    2 +
+ android/hal_bluetooth.c |  384 ----------------------------------------------
+ android/hal_bt_sock.c   |   85 ----------
+ android/main.c          |  248 ++++++++++++++++++++++++++++++
+ configure.ac            |    4 +
+ 16 files changed, 1556 insertions(+), 473 deletions(-)
  create mode 100644 android/adapter.c
  create mode 100644 android/adapter.h
  create mode 100644 android/device.c
  create mode 100644 android/device.h
+ create mode 100644 android/hal-bluetooth.c
+ create mode 100644 android/hal-bt-sock.c
+ create mode 100644 android/hal-hidhost.c
+ create mode 100644 android/hal-msg.h
+ create mode 100644 android/hal-pan.c
+ delete mode 100644 android/hal_bluetooth.c
+ delete mode 100644 android/hal_bt_sock.c
 
-diff --git a/android/adapter.c b/android/adapter.c
-new file mode 100644
-index 0000000..9763530
---- /dev/null
-+++ b/android/adapter.c
-@@ -0,0 +1,54 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include "src/shared/mgmt.h"
-+#include "log.h"
-+#include "adapter.h"
-+
-+struct bt_adapter {
-+	struct mgmt *mgmt;
-+};
-+
-+struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if)
-+{
-+	struct bt_adapter *adapter;
-+
-+	adapter = g_new0(struct bt_adapter, 1);
-+
-+	adapter->mgmt = mgmt_ref(mgmt_if);
-+
-+	return adapter;
-+}
-+
-+void bt_adapter_start(struct bt_adapter *adapter)
-+{
-+	DBG("");
-+
-+	/* TODO: CB: report scan mode */
-+	/* TODO: CB: report state on */
-+}
-+
-+void bt_adapter_stop(struct bt_adapter *adapter)
-+{
-+	DBG("");
-+}
-diff --git a/android/adapter.h b/android/adapter.h
-new file mode 100644
-index 0000000..0f1445a
---- /dev/null
-+++ b/android/adapter.h
-@@ -0,0 +1,36 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <glib.h>
-+
-+#include "lib/bluetooth.h"
-+
-+struct bt_adapter;
-+
-+struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if);
-+
-+void bt_adapter_start(struct bt_adapter *adapter);
-+void bt_adapter_stop(struct bt_adapter *adapter);
-diff --git a/android/device.c b/android/device.c
-new file mode 100644
-index 0000000..f9ca3ec
---- /dev/null
-+++ b/android/device.c
-@@ -0,0 +1,25 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+struct bt_device {
-+};
-diff --git a/android/device.h b/android/device.h
-new file mode 100644
-index 0000000..f5b1da6
---- /dev/null
-+++ b/android/device.h
-@@ -0,0 +1,24 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+struct bt_device;
 -- 
 1.7.10.4
 
