@@ -1,56 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 05/15] Bluetooth: Use connection parameters if any
-Date: Wed, 16 Oct 2013 20:17:55 -0300
-Message-Id: <1381965485-9159-6-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC 03/15] Bluetooth: Mgmt command for removing connection parameters
+Date: Wed, 16 Oct 2013 20:17:53 -0300
+Message-Id: <1381965485-9159-4-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org>
 References: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch changes hci_create_le_conn() so it uses the connection
-parameters specified by the user. If no parameters were configured,
-we use the default values.
+This patch introduces the MGMT_OP_REMOVE_CONN_PARAM which removes from
+the controller's list the connection parameters from a given device.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_conn.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ include/net/bluetooth/mgmt.h |  6 ++++++
+ net/bluetooth/mgmt.c         | 29 +++++++++++++++++++++++++++++
+ 2 files changed, 35 insertions(+)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 4e72650..d64000e 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -548,6 +548,7 @@ static int hci_create_le_conn(struct hci_conn *conn)
- 	struct hci_dev *hdev = conn->hdev;
- 	struct hci_cp_le_create_conn cp;
- 	struct hci_request req;
-+	struct hci_conn_param *param;
- 	int err;
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index ed689b5..a79100a 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -378,6 +378,12 @@ struct mgmt_cp_add_conn_param {
+ } __packed;
+ #define MGMT_ADD_CONN_PARAM_SIZE	(MGMT_ADDR_INFO_SIZE + 5)
  
- 	hci_req_init(&req, hdev);
-@@ -558,11 +559,18 @@ static int hci_create_le_conn(struct hci_conn *conn)
- 	bacpy(&cp.peer_addr, &conn->dst);
- 	cp.peer_addr_type = conn->dst_type;
- 	cp.own_address_type = conn->src_type;
--	cp.conn_interval_min = __constant_cpu_to_le16(0x0028);
--	cp.conn_interval_max = __constant_cpu_to_le16(0x0038);
- 	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
- 	cp.min_ce_len = __constant_cpu_to_le16(0x0000);
- 	cp.max_ce_len = __constant_cpu_to_le16(0x0000);
-+	param = hci_find_conn_param(hdev, &conn->dst, conn->dst_type);
-+	if (param) {
-+		cp.conn_interval_min = cpu_to_le16(param->min_conn_interval);
-+		cp.conn_interval_max = cpu_to_le16(param->max_conn_interval);
-+		hci_conn_param_put(param);
-+	} else {
-+		cp.conn_interval_min = __constant_cpu_to_le16(0x0028);
-+		cp.conn_interval_max = __constant_cpu_to_le16(0x0038);
-+	}
- 	hci_req_add(&req, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
++#define MGMT_OP_REMOVE_CONN_PARAM	0x002E
++struct mgmt_cp_remove_conn_param {
++	struct mgmt_addr_info addr;
++} __packed;
++#define MGMT_REMOVE_CONN_PARAM_SIZE	MGMT_ADDR_INFO_SIZE
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 5d1a2e8..c68aea5 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -80,6 +80,7 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_SET_STATIC_ADDRESS,
+ 	MGMT_OP_SET_SCAN_PARAMS,
+ 	MGMT_OP_ADD_CONN_PARAM,
++	MGMT_OP_REMOVE_CONN_PARAM,
+ };
  
- 	err = hci_req_run(&req, create_le_conn_complete);
+ static const u16 mgmt_events[] = {
+@@ -4059,6 +4060,33 @@ static int add_conn_param(struct sock *sk, struct hci_dev *hdev, void *cp_data,
+ 			    NULL, 0);
+ }
+ 
++static int remove_conn_param(struct sock *sk, struct hci_dev *hdev,
++			     void *cp_data, u16 len)
++{
++	struct mgmt_cp_remove_conn_param *cp = cp_data;
++	u8 status;
++	u8 addr_type;
++
++	if (cp->addr.type == BDADDR_BREDR)
++		return cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_CONN_PARAM,
++				    MGMT_STATUS_NOT_SUPPORTED, NULL, 0);
++
++	status = mgmt_le_support(hdev);
++	if (status)
++		return cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_CONN_PARAM,
++				    status, NULL, 0);
++
++	if (cp->addr.type == BDADDR_LE_PUBLIC)
++		addr_type = ADDR_LE_DEV_PUBLIC;
++	else
++		addr_type = ADDR_LE_DEV_RANDOM;
++
++	hci_remove_conn_param(hdev, &cp->addr.bdaddr, addr_type);
++
++	return cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_CONN_PARAM,
++			    MGMT_STATUS_SUCCESS, NULL, 0);
++}
++
+ static const struct mgmt_handler {
+ 	int (*func) (struct sock *sk, struct hci_dev *hdev, void *data,
+ 		     u16 data_len);
+@@ -4111,6 +4139,7 @@ static const struct mgmt_handler {
+ 	{ set_static_address,     false, MGMT_SET_STATIC_ADDRESS_SIZE },
+ 	{ set_scan_params,        false, MGMT_SET_SCAN_PARAMS_SIZE },
+ 	{ add_conn_param,         false, MGMT_ADD_CONN_PARAM_SIZE },
++	{ remove_conn_param,      false, MGMT_REMOVE_CONN_PARAM_SIZE },
+ };
+ 
+ 
 -- 
 1.8.4
 
