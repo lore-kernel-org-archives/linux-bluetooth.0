@@ -1,44 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/6] Bluetooth: Rename create_ad into create_adv_data
-Date: Wed, 16 Oct 2013 00:16:46 -0700
-Message-Id: <1381907811-33872-1-git-send-email-marcel@holtmann.org>
+Date: Wed, 16 Oct 2013 10:01:39 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Kevin Wilson <wkevils@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: BlueZ and Android - question
+Message-ID: <20131016070137.GI2861@aemeltch-MOBL1>
+References: <CAGXs5wXGtexDMRmVNA64bMrHt4ZW3pB6SwZA7K9c_5qQkGh6GA@mail.gmail.com>
+ <20131015134354.GH2861@aemeltch-MOBL1>
+ <CAGXs5wU-L=Khuto4SJfYE4QqRZNWL2RAc-hjxqLEEE1aU6aC-w@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAGXs5wU-L=Khuto4SJfYE4QqRZNWL2RAc-hjxqLEEE1aU6aC-w@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Rename the create_ad function into create_adv_data to make it clear
-that it is used to create the advertising data. This is important
-since later on a function adding the scan response data will be
-added.
+Hi Kevin,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/mgmt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Tue, Oct 15, 2013 at 06:00:19PM +0300, Kevin Wilson wrote:
+> Andrei,
+> Thanks a lot for the Quick response.
+> Can you please provide a link for the alternative for Bluetooth stack in
+> Android or specify its name ?  I did not know about it.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 90d9353..54f1454 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -536,7 +536,7 @@ static u8 *create_uuid128_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
- 	return ptr;
- }
- 
--static u8 create_ad(struct hci_dev *hdev, u8 *ptr)
-+static u8 create_adv_data(struct hci_dev *hdev, u8 *ptr)
- {
- 	u8 ad_len = 0, flags = 0;
- 	size_t name_len;
-@@ -605,7 +605,7 @@ static void update_ad(struct hci_request *req)
- 
- 	memset(&cp, 0, sizeof(cp));
- 
--	len = create_ad(hdev, cp.data);
-+	len = create_adv_data(hdev, cp.data);
- 
- 	if (hdev->adv_data_len == len &&
- 	    memcmp(cp.data, hdev->adv_data, len) == 0)
--- 
-1.8.3.1
+The alternatives seems to be:
 
+1) backport old BlueZ + Bluetooth framework from Android 4.1.2
+https://gitorious.org/android-bluez
+
+2) The new project with the latest BlueZ and Android:
+http://code.google.com/p/android-bluez/
+(this is initial phase)
+
+3) You can also use Bluedroid with BlueZ kernel drivers via CHANNEL_USER
+
+Best regards 
+Andrei Emeltchenko 
+
+> 
+> Best Regards,
+> Kevin
+> 
+> On Tue, Oct 15, 2013 at 4:44 PM, Andrei Emeltchenko
+> <andrei.emeltchenko.news@gmail.com> wrote:
+> > Hi Kevin,
+> >
+> > On Tue, Oct 15, 2013 at 04:16:45PM +0300, Kevin Wilson wrote:
+> >> Hello all,
+> >> I have a question:
+> >>
+> >> I saw in several places on the web text which says, in some
+> >> variations,  that "BlueZ has been removed starting from Android  4.2
+> >> and the  Broadcom-supplied Bluetooth stack (bluedroid) has replaced
+> >> it. It says also that the bluedroid
+> >> stack relies on HAL-loading like most other hardware types.
+> >>
+> >> On the other hand I see in the official page,
+> >> http://www.bluez.org/
+> >> something which I am not sure how to interpret.
+> >>
+> >>
+> >> I want to resolve my confusion.
+> >> So here is my question:
+> >> In Android 4.2 and above - is the BlueZ removed ?
+> >
+> > Yes
+> >
+> >> is the BlueDroid
+> >> used instead ?
+> >
+> > Yes
+> >
+> >>or are they both used?
+> >
+> > No.
+> >
+> > Now there is a project to provide alternative for Bluetooth stack in
+> > Android.
+> >
+> > Best regards
+> > Andrei Emeltchenko
+> >
