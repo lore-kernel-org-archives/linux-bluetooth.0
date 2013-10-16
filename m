@@ -1,44 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Oct 2013 18:20:18 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Expose inquiry_cache debugfs only on BR/EDR
- controllers
-Message-ID: <20131016152018.GA18754@x220.p-661hnu-f1>
-References: <1381919335-59602-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381919335-59602-1-git-send-email-marcel@holtmann.org>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2] Bluetooth: Convert auto accept timer to use delayed work
+Date: Wed, 16 Oct 2013 18:11:39 +0300
+Message-Id: <1381936300-18629-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Wed, Oct 16, 2013, Marcel Holtmann wrote:
->  static void hci_req_sync_complete(struct hci_dev *hdev, u8 result)
-> @@ -734,7 +772,22 @@ static int __hci_init(struct hci_dev *hdev)
->  	if (err < 0)
->  		return err;
->  
-> -	return __hci_req_sync(hdev, hci_init4_req, 0, HCI_INIT_TIMEOUT);
-> +	err = __hci_req_sync(hdev, hci_init4_req, 0, HCI_INIT_TIMEOUT);
-> +	if (err < 0)
-> +		return err;
-> +
-> +	/* Only create debugfs entries during the initial setup
-> +	 * phase and not every time the controller gets powered on.
-> +	 */
-> +	if (!test_bit(HCI_SETUP, &hdev->dev_flags))
-> +		return 0;
-> +
-> +	if (lmp_bredr_capable(hdev)) {
-> +		debugfs_create_file("inquiry_cache", 0444, hdev->debugfs,
-> +				    hdev, &inquiry_cache_fops);
-> +	}
+Since the entire Bluetooth subsystem runs in workqueues these days there
+is no need to use a timer for deferring work.
 
-The patch looks good but just a minor nit-pick here: do you really want
-to have the curly braces for this one? Even though the function call is
-split across two lines it doesn't make it any harder to read without the
-braces, for me at least.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci_core.h |  2 +-
+ net/bluetooth/hci_conn.c         | 14 ++++++--------
+ net/bluetooth/hci_event.c        |  3 ++-
+ 3 files changed, 9 insertions(+), 10 deletions(-)
 
-Johan
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index d987c79..2504a25 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -341,8 +341,8 @@ struct hci_conn {
+ 	struct list_head chan_list;
+ 
+ 	struct delayed_work disc_work;
++	struct delayed_work auto_accept_work;
+ 	struct timer_list idle_timer;
+-	struct timer_list auto_accept_timer;
+ 
+ 	struct device	dev;
+ 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index ff04b05..8d1f466 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -361,12 +361,12 @@ static void hci_conn_idle(unsigned long arg)
+ 	hci_conn_enter_sniff_mode(conn);
+ }
+ 
+-static void hci_conn_auto_accept(unsigned long arg)
++static void hci_conn_auto_accept(struct work_struct *work)
+ {
+-	struct hci_conn *conn = (void *) arg;
+-	struct hci_dev *hdev = conn->hdev;
++	struct hci_conn *conn = container_of(work, struct hci_conn,
++					     auto_accept_work.work);
+ 
+-	hci_send_cmd(hdev, HCI_OP_USER_CONFIRM_REPLY, sizeof(conn->dst),
++	hci_send_cmd(conn->hdev, HCI_OP_USER_CONFIRM_REPLY, sizeof(conn->dst),
+ 		     &conn->dst);
+ }
+ 
+@@ -415,9 +415,8 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
+ 	INIT_LIST_HEAD(&conn->chan_list);
+ 
+ 	INIT_DELAYED_WORK(&conn->disc_work, hci_conn_timeout);
++	INIT_DELAYED_WORK(&conn->auto_accept_work, hci_conn_auto_accept);
+ 	setup_timer(&conn->idle_timer, hci_conn_idle, (unsigned long)conn);
+-	setup_timer(&conn->auto_accept_timer, hci_conn_auto_accept,
+-		    (unsigned long) conn);
+ 
+ 	atomic_set(&conn->refcnt, 0);
+ 
+@@ -441,8 +440,7 @@ int hci_conn_del(struct hci_conn *conn)
+ 	del_timer(&conn->idle_timer);
+ 
+ 	cancel_delayed_work_sync(&conn->disc_work);
+-
+-	del_timer(&conn->auto_accept_timer);
++	cancel_delayed_work_sync(&conn->auto_accept_work);
+ 
+ 	if (conn->type == ACL_LINK) {
+ 		struct hci_conn *sco = conn->link;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index e71c98f..6c3b193 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3188,7 +3188,8 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev,
+ 
+ 		if (hdev->auto_accept_delay > 0) {
+ 			int delay = msecs_to_jiffies(hdev->auto_accept_delay);
+-			mod_timer(&conn->auto_accept_timer, jiffies + delay);
++			queue_delayed_work(conn->hdev->workqueue,
++					   &conn->auto_accept_work, delay);
+ 			goto unlock;
+ 		}
+ 
+-- 
+1.8.3.1
+
