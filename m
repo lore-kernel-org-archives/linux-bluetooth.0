@@ -1,143 +1,194 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 02/15] Bluetooth: Mgmt command for adding connection parameters
-Date: Wed, 16 Oct 2013 20:17:52 -0300
-Message-Id: <1381965485-9159-3-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC 01/15] Bluetooth: Introduce connection parameters list
+Date: Wed, 16 Oct 2013 20:17:51 -0300
+Message-Id: <1381965485-9159-2-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org>
 References: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch introduces a new Mgmt command (MGMT_OP_ADD_CONN_PARAM) which
-adds the connection parameters to controller's connection parameters
-list. These parameters will be used by the kernel when it establishes a
-connection with the given device.
+This patch adds to hdev the connection parameters list (hdev->
+conn_param). The elements from this list (struct hci_conn_param)
+contains the connection parameters (for now, minimum and maximum
+connection interval) that should be used for establishing
+connection.
 
-This patch also moves the 'auto_connect' enum from hci_core.h to
-bluetooth.h since the will accessed used by userspace in order to
-send the MGMT_OP_ADD_CONN_PARAM command.
+The struct hci_conn_param also defines the 'auto_connect' field
+which will be used to implement the auto connection mechanism.
+
+Moreover, this patch adds helper functions to manipulate hdev->conn_
+param list. Some of these functions are also declared in hci_core.h
+since they will be used outside hci_core.c in upcoming patches.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/bluetooth.h |  6 ++++++
- include/net/bluetooth/hci_core.h  |  6 +-----
- include/net/bluetooth/mgmt.h      |  9 +++++++++
- net/bluetooth/mgmt.c              | 35 +++++++++++++++++++++++++++++++++++
- 4 files changed, 51 insertions(+), 5 deletions(-)
+ include/net/bluetooth/hci_core.h | 23 +++++++++++
+ net/bluetooth/hci_core.c         | 88 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 111 insertions(+)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index bf2ddff..8509520 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -354,4 +354,10 @@ void sco_exit(void);
- 
- void bt_sock_reclassify_lock(struct sock *sk, int proto);
- 
-+enum {
-+	BT_AUTO_CONN_DISABLED,
-+	BT_AUTO_CONN_ALWAYS,
-+	BT_AUTO_CONN_LINK_LOSS,
-+};
-+
- #endif /* __BLUETOOTH_H */
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 5052bf0..98be273 100644
+index 07c2da4..5052bf0 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -376,11 +376,7 @@ struct hci_conn_param {
- 	bdaddr_t addr;
- 	u8 addr_type;
+@@ -266,6 +266,8 @@ struct hci_dev {
  
--	enum {
--		HCI_AUTO_CONN_DISABLED,
--		HCI_AUTO_CONN_ALWAYS,
--		HCI_AUTO_CONN_LINK_LOSS,
--	} auto_connect;
-+	u8 auto_connect;
+ 	struct list_head	remote_oob_data;
  
- 	u16 min_conn_interval;
- 	u16 max_conn_interval;
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 518c5c8..ed689b5 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -369,6 +369,15 @@ struct mgmt_cp_set_scan_params {
- } __packed;
- #define MGMT_SET_SCAN_PARAMS_SIZE	4
- 
-+#define MGMT_OP_ADD_CONN_PARAM		0x002D
-+struct mgmt_cp_add_conn_param {
-+	struct mgmt_addr_info addr;
-+	__u8 auto_connect;
-+	__le16 min_conn_interval;
-+	__le16 max_conn_interval;
-+} __packed;
-+#define MGMT_ADD_CONN_PARAM_SIZE	(MGMT_ADDR_INFO_SIZE + 5)
++	struct list_head	conn_param;
 +
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16	opcode;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a727b47..5d1a2e8 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -79,6 +79,7 @@ static const u16 mgmt_commands[] = {
- 	MGMT_OP_SET_BREDR,
- 	MGMT_OP_SET_STATIC_ADDRESS,
- 	MGMT_OP_SET_SCAN_PARAMS,
-+	MGMT_OP_ADD_CONN_PARAM,
+ 	struct hci_dev_stats	stat;
+ 
+ 	atomic_t		promisc;
+@@ -368,6 +370,22 @@ struct hci_chan {
+ 	__u8		state;
  };
  
- static const u16 mgmt_events[] = {
-@@ -4025,6 +4026,39 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
- 	return err;
- }
- 
-+static int add_conn_param(struct sock *sk, struct hci_dev *hdev, void *cp_data,
-+			  u16 len)
-+{
-+	struct mgmt_cp_add_conn_param *cp = cp_data;
-+	u8 status;
++struct hci_conn_param {
++	struct list_head list;
++
++	bdaddr_t addr;
 +	u8 addr_type;
 +
-+	if (cp->addr.type == BDADDR_BREDR)
-+		return cmd_complete(sk, hdev->id, MGMT_OP_ADD_CONN_PARAM,
-+				    MGMT_STATUS_NOT_SUPPORTED, NULL, 0);
++	enum {
++		HCI_AUTO_CONN_DISABLED,
++		HCI_AUTO_CONN_ALWAYS,
++		HCI_AUTO_CONN_LINK_LOSS,
++	} auto_connect;
 +
-+	status = mgmt_le_support(hdev);
-+	if (status)
-+		return cmd_complete(sk, hdev->id, MGMT_OP_ADD_CONN_PARAM,
-+				    status, NULL, 0);
++	u16 min_conn_interval;
++	u16 max_conn_interval;
++};
 +
-+	if (cp->addr.type == BDADDR_LE_PUBLIC)
-+		addr_type = ADDR_LE_DEV_PUBLIC;
-+	else
-+		addr_type = ADDR_LE_DEV_RANDOM;
+ extern struct list_head hci_dev_list;
+ extern struct list_head hci_cb_list;
+ extern rwlock_t hci_dev_list_lock;
+@@ -737,6 +755,11 @@ int hci_blacklist_clear(struct hci_dev *hdev);
+ int hci_blacklist_add(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
+ int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
+ 
++int hci_add_conn_param(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
++		       u8 auto_connect, u16 min_conn_interval,
++		       u16 max_conn_interval);
++void hci_remove_conn_param(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
 +
-+	if (hci_add_conn_param(hdev, &cp->addr.bdaddr, addr_type,
-+			       cp->auto_connect,
-+			       __le16_to_cpu(cp->min_conn_interval),
-+			       __le16_to_cpu(cp->max_conn_interval)))
-+		status = MGMT_STATUS_FAILED;
-+	else
-+		status = MGMT_STATUS_SUCCESS;
+ int hci_uuids_clear(struct hci_dev *hdev);
+ 
+ int hci_link_keys_clear(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 73c8def..a4242ac 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2151,6 +2151,92 @@ int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type)
+ 	return mgmt_device_unblocked(hdev, bdaddr, type);
+ }
+ 
++struct hci_conn_param *find_conn_param(struct hci_dev *hdev,
++				       bdaddr_t *addr, u8 addr_type)
++{
++	struct hci_conn_param *param;
 +
-+	return cmd_complete(sk, hdev->id, MGMT_OP_ADD_CONN_PARAM, status,
-+			    NULL, 0);
++	rcu_read_lock();
++
++	list_for_each_entry(param, &hdev->conn_param, list) {
++		if (bacmp(&param->addr, addr))
++			continue;
++		if (param->addr_type != addr_type)
++			continue;
++
++		rcu_read_unlock();
++		return param;
++	}
++
++	rcu_read_unlock();
++	return NULL;
 +}
 +
- static const struct mgmt_handler {
- 	int (*func) (struct sock *sk, struct hci_dev *hdev, void *data,
- 		     u16 data_len);
-@@ -4076,6 +4110,7 @@ static const struct mgmt_handler {
- 	{ set_bredr,              false, MGMT_SETTING_SIZE },
- 	{ set_static_address,     false, MGMT_SET_STATIC_ADDRESS_SIZE },
- 	{ set_scan_params,        false, MGMT_SET_SCAN_PARAMS_SIZE },
-+	{ add_conn_param,         false, MGMT_ADD_CONN_PARAM_SIZE },
- };
++int hci_add_conn_param(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
++		       u8 auto_connect, u16 min_conn_interval,
++		       u16 max_conn_interval)
++{
++	struct hci_conn_param *param;
++
++	param = find_conn_param(hdev, addr, addr_type);
++	if (param)
++		return -EEXIST;
++
++	param = kmalloc(sizeof(*param), GFP_KERNEL);
++	if (!param)
++		return -ENOMEM;
++
++	bacpy(&param->addr, addr);
++	param->addr_type = addr_type;
++	param->auto_connect = auto_connect;
++	param->min_conn_interval = min_conn_interval;
++	param->max_conn_interval = max_conn_interval;
++
++	hci_dev_lock(hdev);
++	list_add_rcu(&param->list, &hdev->conn_param);
++	hci_dev_unlock(hdev);
++	return 0;
++}
++
++/*
++ * Remove from hdev->conn_param and free hci_conn_param.
++ *
++ * This function requires the caller holds hdev->lock.
++ */
++static void __remove_conn_param(struct hci_conn_param *param)
++{
++	list_del_rcu(&param->list);
++	synchronize_rcu();
++
++	kfree(param);
++}
++
++void hci_remove_conn_param(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
++{
++	struct hci_conn_param *param;
++
++	param = find_conn_param(hdev, addr, addr_type);
++	if (!param)
++		return;
++
++	hci_dev_lock(hdev);
++	__remove_conn_param(param);
++	hci_dev_unlock(hdev);
++}
++
++/*
++ * Remove all elements from hdev->conn_param list.
++ *
++ * This function requires the caller holds hdev->lock.
++ */
++static void __clear_conn_param(struct hci_dev *hdev)
++{
++	struct hci_conn_param *param, *tmp;
++
++	list_for_each_entry_safe(param, tmp, &hdev->conn_param, list)
++		__remove_conn_param(param);
++}
++
+ static void inquiry_complete(struct hci_dev *hdev, u8 status)
+ {
+ 	if (status) {
+@@ -2259,6 +2345,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 	INIT_LIST_HEAD(&hdev->link_keys);
+ 	INIT_LIST_HEAD(&hdev->long_term_keys);
+ 	INIT_LIST_HEAD(&hdev->remote_oob_data);
++	INIT_LIST_HEAD(&hdev->conn_param);
+ 	INIT_LIST_HEAD(&hdev->conn_hash.list);
  
+ 	INIT_WORK(&hdev->rx_work, hci_rx_work);
+@@ -2437,6 +2524,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	hci_link_keys_clear(hdev);
+ 	hci_smp_ltks_clear(hdev);
+ 	hci_remote_oob_data_clear(hdev);
++	__clear_conn_param(hdev);
+ 	hci_dev_unlock(hdev);
  
+ 	hci_dev_put(hdev);
 -- 
 1.8.4
 
