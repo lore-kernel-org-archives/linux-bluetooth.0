@@ -1,113 +1,151 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 07/15] Bluetooth: Refactor hci_disconn_complete_evt
-Date: Wed, 16 Oct 2013 20:17:57 -0300
-Message-Id: <1381965485-9159-8-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC 04/15] Bluetooth: Make find_conn_param() helper non-local
+Date: Wed, 16 Oct 2013 20:17:54 -0300
+Message-Id: <1381965485-9159-5-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org>
 References: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hci_disconn_complete_evt() logic is more complicated than what it
-should be, making it hard to follow and add new features. This patch
-does some code refactoring by letting the main flow of the function
-in first level of function scope.
+This patch makes the find_conn_param() helper non-local by adding the
+hci_ prefix and declaring it in hci_core.h. This helper will be used
+in hci_conn.c to get the connection parameters when establishing
+connections.
+
+Since hci_find_conn_param() returns a reference to the hci_conn_param
+object, it was added a refcount to hci_conn_param to control its
+lifetime. This way, we avoid bugs such as one thread deletes hci_conn_
+param (e.g. thread running MGMT_OP_REMOVE_CONN_PARAM command) while
+another thread holds a reference to that object (e.g thread carrying
+out the connection establishment).	.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_event.c | 62 +++++++++++++++++++++++++----------------------
- 1 file changed, 33 insertions(+), 29 deletions(-)
+ include/net/bluetooth/hci_core.h |  5 +++++
+ net/bluetooth/hci_core.c         | 46 ++++++++++++++++++++++++++++++++++------
+ 2 files changed, 45 insertions(+), 6 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 6c3b193..edb2342 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1781,6 +1781,8 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_disconn_complete *ev = (void *) skb->data;
- 	struct hci_conn *conn;
-+	u8 type;
-+	bool send_mgmt_event = false;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 98be273..1e67da5 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -371,6 +371,8 @@ struct hci_chan {
+ };
  
- 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
- 
-@@ -1790,44 +1792,46 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (!conn)
- 		goto unlock;
- 
--	if (ev->status == 0)
--		conn->state = BT_CLOSED;
--
- 	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags) &&
--	    (conn->type == ACL_LINK || conn->type == LE_LINK)) {
--		if (ev->status) {
-+	    (conn->type == ACL_LINK || conn->type == LE_LINK))
-+		send_mgmt_event = true;
+ struct hci_conn_param {
++	struct kref refcount;
 +
-+	if (ev->status) {
-+		if (send_mgmt_event)
- 			mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
- 					       conn->dst_type, ev->status);
--		} else {
--			u8 reason = hci_to_mgmt_reason(ev->reason);
--
--			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
--						 conn->dst_type, reason);
--		}
-+		return;
- 	}
+ 	struct list_head list;
  
--	if (ev->status == 0) {
--		u8 type = conn->type;
-+	conn->state = BT_CLOSED;
+ 	bdaddr_t addr;
+@@ -751,6 +753,9 @@ int hci_blacklist_clear(struct hci_dev *hdev);
+ int hci_blacklist_add(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
+ int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
  
--		if (type == ACL_LINK && conn->flush_key)
--			hci_remove_link_key(hdev, &conn->dst);
--		hci_proto_disconn_cfm(conn, ev->reason);
--		hci_conn_del(conn);
-+	if (send_mgmt_event) {
-+		u8 reason = hci_to_mgmt_reason(ev->reason);
- 
--		/* Re-enable advertising if necessary, since it might
--		 * have been disabled by the connection. From the
--		 * HCI_LE_Set_Advertise_Enable command description in
--		 * the core specification (v4.0):
--		 * "The Controller shall continue advertising until the Host
--		 * issues an LE_Set_Advertise_Enable command with
--		 * Advertising_Enable set to 0x00 (Advertising is disabled)
--		 * or until a connection is created or until the Advertising
--		 * is timed out due to Directed Advertising."
--		 */
--		if (type == LE_LINK)
--			mgmt_reenable_advertising(hdev);
-+		mgmt_device_disconnected(hdev, &conn->dst, conn->type,
-+					 conn->dst_type, reason);
- 	}
- 
-+	if (conn->type == ACL_LINK && conn->flush_key)
-+		hci_remove_link_key(hdev, &conn->dst);
-+
-+	type = conn->type;
-+	hci_proto_disconn_cfm(conn, ev->reason);
-+	hci_conn_del(conn);
-+
-+	/* Re-enable advertising if necessary, since it might
-+	 * have been disabled by the connection. From the
-+	 * HCI_LE_Set_Advertise_Enable command description in
-+	 * the core specification (v4.0):
-+	 * "The Controller shall continue advertising until the Host
-+	 * issues an LE_Set_Advertise_Enable command with
-+	 * Advertising_Enable set to 0x00 (Advertising is disabled)
-+	 * or until a connection is created or until the Advertising
-+	 * is timed out due to Directed Advertising."
-+	 */
-+	if (type == LE_LINK)
-+		mgmt_reenable_advertising(hdev);
-+
- unlock:
- 	hci_dev_unlock(hdev);
++struct hci_conn_param *hci_find_conn_param(struct hci_dev *hdev,
++					   bdaddr_t *addr, u8 addr_type);
++void hci_conn_param_put(struct hci_conn_param *param);
+ int hci_add_conn_param(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
+ 		       u8 auto_connect, u16 min_conn_interval,
+ 		       u16 max_conn_interval);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index a4242ac..c9c3390 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2151,8 +2151,34 @@ int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type)
+ 	return mgmt_device_unblocked(hdev, bdaddr, type);
  }
+ 
+-struct hci_conn_param *find_conn_param(struct hci_dev *hdev,
+-				       bdaddr_t *addr, u8 addr_type)
++static void hci_conn_param_get(struct hci_conn_param *param)
++{
++	kref_get(&param->refcount);
++}
++
++static void release_hci_conn_param(struct kref *kref)
++{
++	struct hci_conn_param *param = container_of(kref,
++						    struct hci_conn_param,
++						    refcount);
++
++	kfree(param);
++}
++
++void hci_conn_param_put(struct hci_conn_param *param)
++{
++	kref_put(&param->refcount, release_hci_conn_param);
++}
++
++/*
++ * Lookup hci_conn_param in hdev->conn_param list.
++ *
++ * Return a reference to hci_conn_param object with refcount incremented.
++ * The caller should drop its reference by using hci_conn_param_put(). If
++ * hci_conn_param is not found, NULL is returned.
++ */
++struct hci_conn_param *hci_find_conn_param(struct hci_dev *hdev,
++					   bdaddr_t *addr, u8 addr_type)
+ {
+ 	struct hci_conn_param *param;
+ 
+@@ -2164,6 +2190,8 @@ struct hci_conn_param *find_conn_param(struct hci_dev *hdev,
+ 		if (param->addr_type != addr_type)
+ 			continue;
+ 
++		hci_conn_param_get(param);
++
+ 		rcu_read_unlock();
+ 		return param;
+ 	}
+@@ -2178,14 +2206,18 @@ int hci_add_conn_param(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
+ {
+ 	struct hci_conn_param *param;
+ 
+-	param = find_conn_param(hdev, addr, addr_type);
+-	if (param)
++	param = hci_find_conn_param(hdev, addr, addr_type);
++	if (param) {
++		hci_conn_param_put(param);
+ 		return -EEXIST;
++	}
+ 
+ 	param = kmalloc(sizeof(*param), GFP_KERNEL);
+ 	if (!param)
+ 		return -ENOMEM;
+ 
++	kref_init(&param->refcount);
++
+ 	bacpy(&param->addr, addr);
+ 	param->addr_type = addr_type;
+ 	param->auto_connect = auto_connect;
+@@ -2208,20 +2240,22 @@ static void __remove_conn_param(struct hci_conn_param *param)
+ 	list_del_rcu(&param->list);
+ 	synchronize_rcu();
+ 
+-	kfree(param);
++	hci_conn_param_put(param);
+ }
+ 
+ void hci_remove_conn_param(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
+ {
+ 	struct hci_conn_param *param;
+ 
+-	param = find_conn_param(hdev, addr, addr_type);
++	param = hci_find_conn_param(hdev, addr, addr_type);
+ 	if (!param)
+ 		return;
+ 
+ 	hci_dev_lock(hdev);
+ 	__remove_conn_param(param);
+ 	hci_dev_unlock(hdev);
++
++	hci_conn_param_put(param);
+ }
+ 
+ /*
 -- 
 1.8.4
 
