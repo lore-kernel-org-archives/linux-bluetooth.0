@@ -1,49 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/6] Bluetooth: Store scan response data in HCI device
-Date: Wed, 16 Oct 2013 00:16:47 -0700
-Message-Id: <1381907811-33872-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/6] Bluetooth: Rename create_ad into create_adv_data
+Date: Wed, 16 Oct 2013 00:16:46 -0700
+Message-Id: <1381907811-33872-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The scan response data needs to be stored in HCI device and so
-add a buffer for it and also ensure to clear it when resetting
-the controller.
+Rename the create_ad function into create_adv_data to make it clear
+that it is used to create the advertising data. This is important
+since later on a function adding the scan response data will be
+added.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h | 2 ++
- net/bluetooth/hci_event.c        | 3 +++
- 2 files changed, 5 insertions(+)
+ net/bluetooth/mgmt.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 0a3a10a..d987c79 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -283,6 +283,8 @@ struct hci_dev {
- 	__s8			adv_tx_power;
- 	__u8			adv_data[HCI_MAX_AD_LENGTH];
- 	__u8			adv_data_len;
-+	__u8			scan_rsp_data[HCI_MAX_AD_LENGTH];
-+	__u8			scan_rsp_data_len;
- 
- 	int (*open)(struct hci_dev *hdev);
- 	int (*close)(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 7450626..e71c98f 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -195,6 +195,9 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	memset(hdev->adv_data, 0, sizeof(hdev->adv_data));
- 	hdev->adv_data_len = 0;
-+
-+	memset(hdev->scan_rsp_data, 0, sizeof(hdev->scan_rsp_data));
-+	hdev->scan_rsp_data_len = 0;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 90d9353..54f1454 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -536,7 +536,7 @@ static u8 *create_uuid128_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
+ 	return ptr;
  }
  
- static void hci_cc_write_local_name(struct hci_dev *hdev, struct sk_buff *skb)
+-static u8 create_ad(struct hci_dev *hdev, u8 *ptr)
++static u8 create_adv_data(struct hci_dev *hdev, u8 *ptr)
+ {
+ 	u8 ad_len = 0, flags = 0;
+ 	size_t name_len;
+@@ -605,7 +605,7 @@ static void update_ad(struct hci_request *req)
+ 
+ 	memset(&cp, 0, sizeof(cp));
+ 
+-	len = create_ad(hdev, cp.data);
++	len = create_adv_data(hdev, cp.data);
+ 
+ 	if (hdev->adv_data_len == len &&
+ 	    memcmp(cp.data, hdev->adv_data, len) == 0)
 -- 
 1.8.3.1
 
