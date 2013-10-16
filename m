@@ -1,32 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH 2/2] Bluetooth: Ignore SMP data on non-LE links
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Remove enable_hs declaration
-Date: Wed, 16 Oct 2013 02:09:01 -0700
-Message-Id: <1381914541-48086-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1381912621-10238-2-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 16 Oct 2013 10:42:50 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <08718B49-E464-4704-8CC8-E45B101A298B@holtmann.org>
+References: <1381912621-10238-1-git-send-email-johan.hedberg@gmail.com> <1381912621-10238-2-git-send-email-johan.hedberg@gmail.com>
+To: johan.hedberg@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This seems to be a left-over. The module parameter enable_hs has
-been removed, but its extern declaration is still present. It is
-not needed anymore, so just remove it.
+Hi Johan,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/hci.h | 2 --
- 1 file changed, 2 deletions(-)
+> The SMP CID is only defined for LE transports. Instead of returning an
+> error from smp_sig_channel() in this case (which would cause a
+> disconnection) just return 0 to ignore the data, which is consistent
+> with the behavior for other unknown CIDs.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/smp.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index c8bc7bf..77a971a 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1787,6 +1787,4 @@ struct hci_inquiry_req {
- };
- #define IREQ_CACHE_FLUSH 0x0001
- 
--extern bool enable_hs;
--
- #endif /* __HCI_H */
--- 
-1.8.3.1
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
