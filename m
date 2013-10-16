@@ -1,45 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH] Bluetooth: Remove not used struct sock
-Date: Wed, 16 Oct 2013 12:39:51 -0300
-Message-Id: <1381937991-12645-1-git-send-email-gustavo@padovan.org>
+Date: Wed, 16 Oct 2013 18:34:00 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 0/5] Stack independent BT HAL test tool
+Message-ID: <20131016153400.GA19385@x220.p-661hnu-f1>
+References: <1381932012-29641-1-git-send-email-jerzy.kasenberg@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1381932012-29641-1-git-send-email-jerzy.kasenberg@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Hi Jerzy,
 
-It is a leftover from the recent effort of remove sk usage from L2CAP
-core.
+On Wed, Oct 16, 2013, Jerzy Kasenberg wrote:
+> v3:
+>  - underscores changed to dash in file names.
+>  - corrected cast style (space after cast).
+>  - structure initialization with explicit filed names.
+> v2:
+>  - license changed to apache
+>  - source folder changed to hal-client (underscore to dash)
+> v1:
+> This tool is for testing Android HAL interfaces from command line.
+> Due to lack of readline on Android simple equivalent is hand coded.
+> This tool can be used with bluedroid stack so no glib dependency.
+> 
+> Tool source code is in folder hal_client, please comment if it should be
+> somewhere else.
+> 
+> Comments welcome.
+> 
+> Best regards
+> Jerzy Kasenberg
+> 
+> Jerzy Kasenberg (5):
+>   android: Add haltest skeleton
+>   android: Add line editing to haltest
+>   android: Add history to line editor in haltest
+>   android: Add text conversion helpers to haltest
+>   android: Add calls to adapter methods in haltest
+> 
+>  android/Android.mk           |   21 ++
+>  android/client/haltest.c     |  161 +++++++++++
+>  android/client/history.c     |   98 +++++++
+>  android/client/history.h     |   21 ++
+>  android/client/if-bt.c       |  631 ++++++++++++++++++++++++++++++++++++++++++
+>  android/client/if-main.h     |   99 +++++++
+>  android/client/pollhandler.c |  123 ++++++++
+>  android/client/pollhandler.h |   26 ++
+>  android/client/terminal.c    |  538 +++++++++++++++++++++++++++++++++++
+>  android/client/terminal.h    |   59 ++++
+>  android/client/textconv.c    |  205 ++++++++++++++
+>  android/client/textconv.h    |  113 ++++++++
+>  12 files changed, 2095 insertions(+)
+>  create mode 100644 android/client/haltest.c
+>  create mode 100644 android/client/history.c
+>  create mode 100644 android/client/history.h
+>  create mode 100644 android/client/if-bt.c
+>  create mode 100644 android/client/if-main.h
+>  create mode 100644 android/client/pollhandler.c
+>  create mode 100644 android/client/pollhandler.h
+>  create mode 100644 android/client/terminal.c
+>  create mode 100644 android/client/terminal.h
+>  create mode 100644 android/client/textconv.c
+>  create mode 100644 android/client/textconv.h
 
-Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
----
- net/bluetooth/l2cap_core.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+All five patches have been pushed upstream. I did have to fix "empty
+line before EOL" errors for each of the first three patches though, so
+please avoid that in the future.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b77e178..2681880 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3714,7 +3714,7 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
- 	struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
- 	struct l2cap_conn_rsp rsp;
- 	struct l2cap_chan *chan = NULL, *pchan;
--	struct sock *parent, *sk = NULL;
-+	struct sock *parent;
- 	int result, status = L2CAP_CS_NO_INFO;
- 
- 	u16 dcid = 0, scid = __le16_to_cpu(req->scid);
-@@ -3753,8 +3753,6 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
- 	if (!chan)
- 		goto response;
- 
--	sk = chan->sk;
--
- 	/* For certain devices (ex: HID mouse), support for authentication,
- 	 * pairing and bonding is optional. For such devices, inorder to avoid
- 	 * the ACL alive for too long after L2CAP disconnection, reset the ACL
--- 
-1.8.3.1
-
+Johan
