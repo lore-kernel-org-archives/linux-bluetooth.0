@@ -1,44 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Oct 2013 11:54:47 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Ignore A2MP data on non-BR/EDR links
-Message-ID: <20131016085445.GL2861@aemeltch-MOBL1>
-References: <1381912621-10238-1-git-send-email-johan.hedberg@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381912621-10238-1-git-send-email-johan.hedberg@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 0/6] Android BlueZ patches, second chunk
+Date: Wed, 16 Oct 2013 11:46:49 +0300
+Message-Id: <1381913215-17957-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Wed, Oct 16, 2013 at 11:37:00AM +0300, johan.hedberg@gmail.com wrote:
-> From: Johan Hedberg <johan.hedberg@intel.com>
-> 
-> The A2MP CID is only valid for BR/EDR transports. We should ignore A2MP
-> data on non-BR/EDR links and refuse to create an amp_mgr object.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  net/bluetooth/a2mp.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-> index fe32a33..efcd108 100644
-> --- a/net/bluetooth/a2mp.c
-> +++ b/net/bluetooth/a2mp.c
-> @@ -836,6 +836,9 @@ struct l2cap_chan *a2mp_channel_create(struct l2cap_conn *conn,
->  {
->  	struct amp_mgr *mgr;
->  
-> +	if (conn->hcon->type != ACL_LINK)
-> +		return NULL;
-> +
+This is second chunk from my initial big patch set. Fixed style issues commented
+by Marcel.
 
-Have you experienced this ever happened?
+Changes:
+	* v2: Corrected android_daemon -> enable_android autoconf stuff, better name for acquiring caps,
+	renamed hal_msg.h to hal-msg.h due to Johan's comment. Added small test-sdp fix.
 
-Best regards 
-Andrei Emeltchenko 
+Note that due to Marcel comment this cannot be built unless you include my patch
+for Android bionic library:
+http://code.google.com/p/android-bluez/source/detail?r=77a07e7703b63e280d9880baad30b3375e7df079&repo=bionic#
+
+Andrei Emeltchenko (6):
+  sdp: Check that correct packet received in recv
+  android: Create HAL API header skeleton
+  android: Add basic mgmt initialization sequence
+  android: Add adapter and device struct for BlueZ daemon
+  android: sdp: Reuse BlueZ SDP server in Android
+  android: Add cap to bind to port < 1024
+
+ Makefile.android   |    8 +-
+ android/Android.mk |   13 +++
+ android/adapter.c  |   63 ++++++++++++++
+ android/adapter.h  |   36 ++++++++
+ android/device.c   |   29 +++++++
+ android/device.h   |   24 +++++
+ android/hal-msg.h  |  246 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/main.c     |  244 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ configure.ac       |    4 +
+ unit/test-sdp.c    |    5 +-
+ 10 files changed, 667 insertions(+), 5 deletions(-)
+ create mode 100644 android/adapter.c
+ create mode 100644 android/adapter.h
+ create mode 100644 android/device.c
+ create mode 100644 android/device.h
+ create mode 100644 android/hal-msg.h
+
+-- 
+1.7.10.4
 
