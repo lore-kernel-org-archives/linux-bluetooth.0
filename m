@@ -1,280 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 10/11] android: Add HID Host skeleton
-Date: Wed, 16 Oct 2013 17:36:37 +0300
-Message-Id: <1381934198-7955-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1381934198-7955-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 00/11] Android BlueZ patches, second chunk
+Date: Wed, 16 Oct 2013 17:36:27 +0300
+Message-Id: <1381934198-7955-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1381934198-7955-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add skeleton for hidhost Android HAL. This is modified version
-from Frederic Danis earlier patch set.
----
- android/Android.mk      |    1 +
- android/hal-bluetooth.c |    4 +
- android/hal-hidhost.c   |  204 +++++++++++++++++++++++++++++++++++++++++++++++
- android/hal.h           |    1 +
- 4 files changed, 210 insertions(+)
- create mode 100644 android/hal-hidhost.c
+This is second chunk from my initial big patch set. Fixed style issues commented
+by Marcel.
 
-diff --git a/android/Android.mk b/android/Android.mk
-index fb4383d..ab2171c 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -53,6 +53,7 @@ include $(CLEAR_VARS)
- LOCAL_SRC_FILES := \
- 	hal-bluetooth.c \
- 	hal-bt-sock.c \
-+	hal-hidhost.c \
- 
- LOCAL_SHARED_LIBRARIES := \
- 	libcutils \
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 89b8ebb..488606d 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -22,6 +22,7 @@
- 
- #include <hardware/bluetooth.h>
- #include <hardware/bt_sock.h>
-+#include <hardware/bt_hh.h>
- 
- #include <cutils/sockets.h>
- #include <cutils/properties.h>
-@@ -285,6 +286,9 @@ static const void *get_profile_interface(const char *profile_id)
- 	if (!strcmp(profile_id, BT_PROFILE_SOCKETS_ID))
- 		return bt_get_sock_interface();
- 
-+	if (!strcmp(profile_id, BT_PROFILE_HIDHOST_ID))
-+		return bt_get_hidhost_interface();
-+
- 	return NULL;
- }
- 
-diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
-new file mode 100644
-index 0000000..27cd1be
---- /dev/null
-+++ b/android/hal-hidhost.c
-@@ -0,0 +1,204 @@
-+/*
-+ * Copyright (C) 2013 Intel Corporation
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ *
-+ */
-+
-+#include <stdbool.h>
-+
-+#include <hardware/bluetooth.h>
-+#include <hardware/bt_hh.h>
-+
-+#define LOG_TAG "BlueZ"
-+#include <cutils/log.h>
-+
-+bthh_callbacks_t *bt_hh_cbacks;
-+
-+static bool interface_ready(void)
-+{
-+	return bt_hh_cbacks != NULL;
-+}
-+
-+static bt_status_t bt_hidhost_connect(bt_bdaddr_t *bd_addr)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t bt_hidhost_disconnect(bt_bdaddr_t *bd_addr)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t bt_hidhost_virtual_unplug(bt_bdaddr_t *bd_addr)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t bt_hidhost_set_info(bt_bdaddr_t *bd_addr,
-+						bthh_hid_info_t hid_info)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t bt_hidhost_get_protocol(bt_bdaddr_t *bd_addr,
-+					bthh_protocol_mode_t protocolMode)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t bt_hidhost_set_protocol(bt_bdaddr_t *bd_addr,
-+					bthh_protocol_mode_t protocolMode)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t bt_hidhost_get_report(bt_bdaddr_t *bd_addr,
-+						bthh_report_type_t reportType,
-+						uint8_t reportId,
-+						int bufferSize)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t bt_hidhost_set_report(bt_bdaddr_t *bd_addr,
-+						bthh_report_type_t reportType,
-+						char *report)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr || !report)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t bt_hidhost_send_data(bt_bdaddr_t *bd_addr, char *data)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr || !data)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t bt_hidhost_init(bthh_callbacks_t *callbacks)
-+{
-+	ALOGI(__func__);
-+
-+	/* store reference to user callbacks */
-+	bt_hh_cbacks = callbacks;
-+
-+	/* TODO: start HID Host thread */
-+
-+	/* TODO: enable service */
-+
-+	return BT_STATUS_SUCCESS;
-+}
-+
-+static void bt_hidhost_cleanup(void)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return;
-+
-+	/* TODO: disable service */
-+
-+	/* TODO: stop HID Host thread */
-+
-+	bt_hh_cbacks = NULL;
-+}
-+
-+static bthh_interface_t bt_hidhost_if = {
-+	sizeof(bt_hidhost_if),
-+	bt_hidhost_init,
-+	bt_hidhost_connect,
-+	bt_hidhost_disconnect,
-+	bt_hidhost_virtual_unplug,
-+	bt_hidhost_set_info,
-+	bt_hidhost_get_protocol,
-+	bt_hidhost_set_protocol,
-+	bt_hidhost_get_report,
-+	bt_hidhost_set_report,
-+	bt_hidhost_send_data,
-+	bt_hidhost_cleanup
-+};
-+
-+bthh_interface_t *bt_get_hidhost_interface(void)
-+{
-+	return &bt_hidhost_if;
-+}
-diff --git a/android/hal.h b/android/hal.h
-index 40fbf03..be69339 100644
---- a/android/hal.h
-+++ b/android/hal.h
-@@ -16,3 +16,4 @@
-  */
- 
- btsock_interface_t *bt_get_sock_interface(void);
-+bthh_interface_t *bt_get_hidhost_interface(void);
+Changes:
+	* v4: Fixes several typos and missing style issues commented by Marcel earlier.
+	* v3: Following upstream comments file names are changed from "_" to "-", added kernel style
+	struct initialization, fixed bug checking status for mgmt commands, added 2 HALs skeletons.
+	* v2: Corrected android_daemon -> enable_android autoconf stuff, better name for acquiring caps,
+	renamed hal_msg.h to hal-msg.h due to Johan's comment. Added small test-sdp fix.
+
+Note that due to Marcel comment this cannot be built unless you include my patch
+for Android bionic library:
+http://code.google.com/p/android-bluez/source/detail?r=77a07e7703b63e280d9880baad30b3375e7df079&repo=bionic#
+
+Andrei Emeltchenko (11):
+  android: Create HAL API header skeleton
+  android: Add basic mgmt initialization sequence
+  android: Add adapter and device struct for BlueZ daemon
+  android: sdp: Reuse BlueZ SDP server in Android
+  android: Add cap to bind to port < 1024
+  android: Implement read_info_complete callback
+  android: Use kernel style to initialize struct fields
+  android: Rename hal_bluetooth.c to hal-bluetooth.c
+  android: Rename hal_bt_sock.c to hal-bt-sock.c
+  android: Add HID Host skeleton
+  android: Add PAN skeleton
+
+ Makefile.android        |   12 +-
+ android/Android.mk      |   20 ++-
+ android/adapter.c       |  138 +++++++++++++++++
+ android/adapter.h       |   40 +++++
+ android/device.c        |   25 +++
+ android/device.h        |   24 +++
+ android/hal-bluetooth.c |  392 +++++++++++++++++++++++++++++++++++++++++++++++
+ android/hal-bt-sock.c   |   85 ++++++++++
+ android/hal-hidhost.c   |  204 ++++++++++++++++++++++++
+ android/hal-msg.h       |  246 +++++++++++++++++++++++++++++
+ android/hal-pan.c       |  120 +++++++++++++++
+ android/hal.h           |    2 +
+ android/hal_bluetooth.c |  384 ----------------------------------------------
+ android/hal_bt_sock.c   |   85 ----------
+ android/main.c          |  244 +++++++++++++++++++++++++++++
+ configure.ac            |    4 +
+ 16 files changed, 1552 insertions(+), 473 deletions(-)
+ create mode 100644 android/adapter.c
+ create mode 100644 android/adapter.h
+ create mode 100644 android/device.c
+ create mode 100644 android/device.h
+ create mode 100644 android/hal-bluetooth.c
+ create mode 100644 android/hal-bt-sock.c
+ create mode 100644 android/hal-hidhost.c
+ create mode 100644 android/hal-msg.h
+ create mode 100644 android/hal-pan.c
+ delete mode 100644 android/hal_bluetooth.c
+ delete mode 100644 android/hal_bt_sock.c
+
 -- 
 1.7.10.4
 
