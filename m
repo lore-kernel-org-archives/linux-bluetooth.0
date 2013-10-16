@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 09/11] android: Rename hal_bt_sock.c to hal-bt-sock.c
-Date: Wed, 16 Oct 2013 17:08:46 +0300
-Message-Id: <1381932528-31584-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 02/11] android: Add basic mgmt initialization sequence
+Date: Wed, 16 Oct 2013 17:08:39 +0300
+Message-Id: <1381932528-31584-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381932528-31584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1381932528-31584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,209 +12,255 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Initialize bluetooth controller via mgmt interface.
 ---
- android/Android.mk    |    2 +-
- android/hal-bt-sock.c |   85 +++++++++++++++++++++++++++++++++++++++++++++++++
- android/hal_bt_sock.c |   85 -------------------------------------------------
- 3 files changed, 86 insertions(+), 86 deletions(-)
- create mode 100644 android/hal-bt-sock.c
- delete mode 100644 android/hal_bt_sock.c
+ Makefile.android   |    4 +-
+ android/Android.mk |    5 ++
+ android/main.c     |  168 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 176 insertions(+), 1 deletion(-)
 
+diff --git a/Makefile.android b/Makefile.android
+index 02f3341..ab328a9 100644
+--- a/Makefile.android
++++ b/Makefile.android
+@@ -3,7 +3,9 @@ noinst_PROGRAMS += android/bluetoothd
+ 
+ android_bluetoothd_SOURCES =	android/main.c \
+ 				src/log.c \
+-				android/hal-msg.h
++				android/hal-msg.h \
++				src/shared/util.h src/shared/util.c \
++				src/shared/mgmt.h src/shared/mgmt.c
+ 
+ android_bluetoothd_LDADD = @GLIB_LIBS@
+ endif
 diff --git a/android/Android.mk b/android/Android.mk
-index 021bb91..fb4383d 100644
+index 0e025ac..4996080 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -52,7 +52,7 @@ include $(CLEAR_VARS)
- 
+@@ -15,10 +15,15 @@ include $(CLEAR_VARS)
  LOCAL_SRC_FILES := \
- 	hal-bluetooth.c \
--	hal_bt_sock.c \
-+	hal-bt-sock.c \
+ 	main.c \
+ 	log.c \
++	../src/shared/mgmt.c \
++	../src/shared/util.c \
  
- LOCAL_SHARED_LIBRARIES := \
- 	libcutils \
-diff --git a/android/hal-bt-sock.c b/android/hal-bt-sock.c
-new file mode 100644
-index 0000000..3a6d173
---- /dev/null
-+++ b/android/hal-bt-sock.c
-@@ -0,0 +1,85 @@
-+/*
-+ * Copyright (C) 2013 Intel Corporation
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ *
-+ */
+ LOCAL_C_INCLUDES := \
+ 	$(call include-path-for, glib) \
+ 	$(call include-path-for, glib)/glib \
 +
-+#include <stdlib.h>
++LOCAL_C_INCLUDES += \
++	$(LOCAL_PATH)/../ \
+ 	$(LOCAL_PATH)/../src \
+ 
+ LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
+diff --git a/android/main.c b/android/main.c
+index f75b0a8..64f1a02 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -25,6 +25,7 @@
+ #include <config.h>
+ #endif
+ 
++#include <stdbool.h>
+ #include <signal.h>
+ #include <stdint.h>
+ #include <stdio.h>
+@@ -36,9 +37,17 @@
+ 
+ #include "log.h"
+ 
++#include "lib/bluetooth.h"
++#include "lib/mgmt.h"
++#include "src/shared/mgmt.h"
 +
-+#include <hardware/bluetooth.h>
-+#include <hardware/bt_sock.h>
+ #define SHUTDOWN_GRACE_SECONDS 10
+ 
+ static GMainLoop *event_loop;
++static struct mgmt *mgmt_if = NULL;
 +
-+#define LOG_TAG "BlueZ"
-+#include <cutils/log.h>
-+
-+static bt_status_t btsock_listen_rfcomm(const char *service_name,
-+					const uint8_t *uuid, int chan,
-+					int *sock, int flags)
++static uint8_t mgmt_version = 0;
++static uint8_t mgmt_revision = 0;
+ 
+ static gboolean quit_eventloop(gpointer user_data)
+ {
+@@ -67,6 +76,161 @@ static GOptionEntry options[] = {
+ 	{ NULL }
+ };
+ 
++static void read_info_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
 +{
-+	ALOGD(__func__);
++	/* TODO: Store Controller information */
 +
-+	return BT_STATUS_UNSUPPORTED;
++	/* TODO: Register all event notification handlers */
 +}
 +
-+static bt_status_t listen(btsock_type_t type, const char *service_name,
-+					const uint8_t *uuid, int chan,
-+					int *sock, int flags)
++
++static void mgmt_index_added_event(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
 +{
-+	if ((!uuid && chan <= 0) || !sock) {
-+		ALOGE("%s: invalid params: uuid %p, chan %d, sock %p",
-+						__func__, uuid, chan, sock);
-+		return BT_STATUS_PARM_INVALID;
++	DBG("index %u", index);
++
++	if (mgmt_send(mgmt_if, MGMT_OP_READ_INFO, index, 0, NULL,
++					read_info_complete, NULL, NULL) > 0)
++		return;
++
++	error("Failed to read adapter info for index %u", index);
++
++}
++
++static void mgmt_index_removed_event(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
++{
++	DBG("index %u", index);
++}
++
++static void read_index_list_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	const struct mgmt_rp_read_index_list *rp = param;
++	uint16_t num;
++	int i;
++
++	DBG("");
++
++	if (status) {
++		error("%s: Failed to read index list: %s (0x%02x)",
++					__func__, mgmt_errstr(status), status);
++		return;
 +	}
 +
-+	ALOGD("%s: uuid %p chan %d sock %p type %d service_name %s",
-+			__func__, uuid, chan, sock, type, service_name);
-+
-+	switch (type) {
-+	case BTSOCK_RFCOMM:
-+		return btsock_listen_rfcomm(service_name, uuid, chan,
-+								sock, flags);
-+	default:
-+		ALOGE("%s: Socket type %d not supported", __func__, type);
-+		break;
++	if (length < sizeof(*rp)) {
++		error("%s: Wrong size of read index list response", __func__);
++		return;
 +	}
 +
-+	return BT_STATUS_UNSUPPORTED;
-+}
++	num = btohs(rp->num_controllers);
 +
-+static bt_status_t connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
-+					const uint8_t *uuid, int chan,
-+					int *sock, int flags)
-+{
-+	if ((!uuid && chan <= 0) || !bdaddr || !sock) {
-+		ALOGE("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
-+					bdaddr, uuid, chan, sock);
-+		return BT_STATUS_PARM_INVALID;
++	DBG("Number of controllers: %u", num);
++
++	if (num * sizeof(uint16_t) + sizeof(*rp) != length) {
++		error("%s: Incorrect pkt size for index list rsp", __func__);
++		return;
 +	}
 +
-+	ALOGD("%s: uuid %p chan %d sock %p type %d", __func__, uuid, chan,
-+								sock, type);
++	for (i = 0; i < num; i++) {
++		uint16_t index;
 +
-+	return BT_STATUS_UNSUPPORTED;
++		index = btohs(rp->index[i]);
++
++		/**
++		 * Use index added event notification.
++		 */
++		mgmt_index_added_event(index, 0, NULL, NULL);
++	}
 +}
 +
-+static btsock_interface_t btsock_if = {
-+	sizeof(btsock_if),
-+	listen,
-+	connect
-+};
-+
-+btsock_interface_t *bt_get_sock_interface(void)
++static void read_commands_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
 +{
-+	return &btsock_if;
++	const struct mgmt_rp_read_commands *rp = param;
++
++	DBG("");
++
++	if (status) {
++		error("Failed to read supported commands: %s (0x%02x)",
++						mgmt_errstr(status), status);
++		return;
++	}
++
++	if (length < sizeof(*rp)) {
++		error("Wrong size response");
++		return;
++	}
 +}
-diff --git a/android/hal_bt_sock.c b/android/hal_bt_sock.c
-deleted file mode 100644
-index 3a6d173..0000000
---- a/android/hal_bt_sock.c
-+++ /dev/null
-@@ -1,85 +0,0 @@
--/*
-- * Copyright (C) 2013 Intel Corporation
-- *
-- * Licensed under the Apache License, Version 2.0 (the "License");
-- * you may not use this file except in compliance with the License.
-- * You may obtain a copy of the License at
-- *
-- *      http://www.apache.org/licenses/LICENSE-2.0
-- *
-- * Unless required by applicable law or agreed to in writing, software
-- * distributed under the License is distributed on an "AS IS" BASIS,
-- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-- * See the License for the specific language governing permissions and
-- * limitations under the License.
-- *
-- */
--
--#include <stdlib.h>
--
--#include <hardware/bluetooth.h>
--#include <hardware/bt_sock.h>
--
--#define LOG_TAG "BlueZ"
--#include <cutils/log.h>
--
--static bt_status_t btsock_listen_rfcomm(const char *service_name,
--					const uint8_t *uuid, int chan,
--					int *sock, int flags)
--{
--	ALOGD(__func__);
--
--	return BT_STATUS_UNSUPPORTED;
--}
--
--static bt_status_t listen(btsock_type_t type, const char *service_name,
--					const uint8_t *uuid, int chan,
--					int *sock, int flags)
--{
--	if ((!uuid && chan <= 0) || !sock) {
--		ALOGE("%s: invalid params: uuid %p, chan %d, sock %p",
--						__func__, uuid, chan, sock);
--		return BT_STATUS_PARM_INVALID;
--	}
--
--	ALOGD("%s: uuid %p chan %d sock %p type %d service_name %s",
--			__func__, uuid, chan, sock, type, service_name);
--
--	switch (type) {
--	case BTSOCK_RFCOMM:
--		return btsock_listen_rfcomm(service_name, uuid, chan,
--								sock, flags);
--	default:
--		ALOGE("%s: Socket type %d not supported", __func__, type);
--		break;
--	}
--
--	return BT_STATUS_UNSUPPORTED;
--}
--
--static bt_status_t connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
--					const uint8_t *uuid, int chan,
--					int *sock, int flags)
--{
--	if ((!uuid && chan <= 0) || !bdaddr || !sock) {
--		ALOGE("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
--					bdaddr, uuid, chan, sock);
--		return BT_STATUS_PARM_INVALID;
--	}
--
--	ALOGD("%s: uuid %p chan %d sock %p type %d", __func__, uuid, chan,
--								sock, type);
--
--	return BT_STATUS_UNSUPPORTED;
--}
--
--static btsock_interface_t btsock_if = {
--	sizeof(btsock_if),
--	listen,
--	connect
--};
--
--btsock_interface_t *bt_get_sock_interface(void)
--{
--	return &btsock_if;
--}
++
++static void read_version_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	const struct mgmt_rp_read_version *rp = param;
++
++	DBG("");
++
++	if (status) {
++		error("Failed to read version information: %s (0x%02x)",
++						mgmt_errstr(status), status);
++		return;
++	}
++
++	if (length < sizeof(*rp)) {
++		error("Wrong size response");
++		return;
++	}
++
++	mgmt_version = rp->version;
++	mgmt_revision = btohs(rp->revision);
++
++	info("Bluetooth management interface %u.%u initialized",
++						mgmt_version, mgmt_revision);
++
++	if (mgmt_version < 1) {
++		error("Version 1.0 or later of management interface required");
++		abort();
++	}
++
++	mgmt_send(mgmt_if, MGMT_OP_READ_COMMANDS, MGMT_INDEX_NONE, 0, NULL,
++					read_commands_complete, NULL, NULL);
++
++	mgmt_register(mgmt_if, MGMT_EV_INDEX_ADDED, MGMT_INDEX_NONE,
++					mgmt_index_added_event, NULL, NULL);
++	mgmt_register(mgmt_if, MGMT_EV_INDEX_REMOVED, MGMT_INDEX_NONE,
++					mgmt_index_removed_event, NULL, NULL);
++
++	if (mgmt_send(mgmt_if, MGMT_OP_READ_INDEX_LIST, MGMT_INDEX_NONE, 0,
++			NULL, read_index_list_complete, NULL, NULL) > 0)
++		return;
++
++	error("Failed to read controller index list");
++}
++
++static bool init_mgmt_interface(void)
++{
++	mgmt_if = mgmt_new_default();
++	if (!mgmt_if) {
++		error("Failed to access management interface");
++		return false;
++	}
++
++	if (mgmt_send(mgmt_if, MGMT_OP_READ_VERSION, MGMT_INDEX_NONE, 0, NULL,
++				read_version_complete, NULL, NULL) == 0) {
++		error("Error sending READ_VERSION mgmt command");
++		return false;
++	}
++
++	return true;
++}
++
++static void cleanup_mgmt_interface(void)
++{
++	mgmt_unref(mgmt_if);
++	mgmt_if = NULL;
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	GOptionContext *context;
+@@ -100,10 +264,14 @@ int main(int argc, char *argv[])
+ 	sigaction(SIGINT, &sa, NULL);
+ 	sigaction(SIGTERM, &sa, NULL);
+ 
++	if (!init_mgmt_interface())
++		return EXIT_FAILURE;
++
+ 	DBG("Entering main loop");
+ 
+ 	g_main_loop_run(event_loop);
+ 
++	cleanup_mgmt_interface();
+ 	g_main_loop_unref(event_loop);
+ 
+ 	info("Exit");
 -- 
 1.7.10.4
 
