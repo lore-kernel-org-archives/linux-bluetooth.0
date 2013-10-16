@@ -1,62 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Reintroduce socket restrictions for LE sockets
-Date: Wed, 16 Oct 2013 13:37:43 +0300
-Message-Id: <1381919863-27504-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 16 Oct 2013 13:31:40 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 4/6] android: Add adapter and device struct for BlueZ
+ daemon
+Message-ID: <20131016103140.GD14764@x220.p-661hnu-f1>
+References: <1381913215-17957-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1381913215-17957-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1381913215-17957-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+On Wed, Oct 16, 2013, Andrei Emeltchenko wrote:
+> +struct bt_adapter {
+> +	struct mgmt *mgmt;
+> +	bdaddr_t bdaddr;
+> +	uint32_t dev_class;
+> +
+> +	char *name;
+> +
+> +	uint32_t supported_settings;
+> +	uint32_t current_settings;
+> +
+> +	GList *found_devices;
+> +};
 
-Right now we do not allow user space to use connection oriented channels
-on LE, and the only CID that can be used is the Attribute Protocol one.
-These restrictions went away together with the recent refactoring of the
-L2CAP code, but this patch puts them back to their appropriate places.
+Please don't add variables this way if you don't have code that actually
+uses them at least later in the patch set. Just add them when they
+eventually are needed.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/l2cap_sock.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+> +struct bt_device {
+> +	bdaddr_t bdaddr;
+> +	uint8_t bdaddr_type;
+> +	uint32_t cod;
+> +	char *name;
+> +};
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 68f486a..bda52d7 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -72,6 +72,16 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 	if (!bdaddr_type_is_valid(la.l2_bdaddr_type))
- 		return -EINVAL;
- 
-+	if (la.l2_bdaddr_type == BDADDR_LE_PUBLIC ||
-+	    la.l2_bdaddr_type == BDADDR_LE_RANDOM) {
-+		/* Connection oriented channels are not supported on LE */
-+		if (la.l2_psm)
-+			return -EINVAL;
-+		/* We only allow ATT user space socket */
-+		if (la.l2_cid != L2CAP_CID_ATT)
-+			return -EINVAL;
-+	}
-+
- 	lock_sock(sk);
- 
- 	if (sk->sk_state != BT_OPEN) {
-@@ -156,6 +166,16 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
- 	if (chan->src_type != BDADDR_BREDR && la.l2_bdaddr_type == BDADDR_BREDR)
- 		return -EINVAL;
- 
-+	if (la.l2_bdaddr_type == BDADDR_LE_PUBLIC ||
-+	    la.l2_bdaddr_type == BDADDR_LE_RANDOM) {
-+		/* Connection oriented channels are not supported on LE */
-+		if (la.l2_psm)
-+			return -EINVAL;
-+		/* We only allow ATT user space socket */
-+		if (la.l2_cid != L2CAP_CID_ATT)
-+			return -EINVAL;
-+	}
-+
- 	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
- 				 &la.l2_bdaddr, la.l2_bdaddr_type);
- 	if (err)
--- 
-1.8.3.1
+Same thing here.
 
+Johan
