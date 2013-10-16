@@ -1,53 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Oct 2013 15:31:54 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 3/6] Bluetooth: Set the scan response data when needed
-Message-ID: <20131016123153.GA6306@x220.p-661hnu-f1>
-References: <1381907811-33872-3-git-send-email-marcel@holtmann.org>
- <CAJdJm_NtG8XyMYFL5DbiAiuwN=-kf-WFzckiiY_7uSpowTGKYA@mail.gmail.com>
- <20131016122801.GA2803@x220.p-661hnu-f1>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20131016122801.GA2803@x220.p-661hnu-f1>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix updating the right variable in update_scan_rsp_data()
+Date: Wed, 16 Oct 2013 15:31:07 +0300
+Message-Id: <1381926667-6255-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Wed, Oct 16, 2013, Johan Hedberg wrote:
-> On Wed, Oct 16, 2013, Anderson Lizardo wrote:
-> > On Wed, Oct 16, 2013 at 3:16 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> > > +static void update_scan_rsp_data(struct hci_request *req)
-> > > +{
-> > > +       struct hci_dev *hdev = req->hdev;
-> > > +       struct hci_cp_le_set_scan_rsp_data cp;
-> > > +       u8 len;
-> > > +
-> > > +       if (!lmp_le_capable(hdev))
-> > > +               return;
-> > > +
-> > > +       memset(&cp, 0, sizeof(cp));
-> > > +
-> > > +       len = create_scan_rsp_data(hdev, cp.data);
-> > > +
-> > > +       if (hdev->adv_data_len == len &&
-> > > +           memcmp(cp.data, hdev->adv_data, len) == 0)
-> > > +               return;
-> > > +
-> > > +       memcpy(hdev->adv_data, cp.data, sizeof(cp.data));
-> > > +       hdev->adv_data_len = len;
-> > 
-> > Shouldn't you be using hdev->scan_rsp_data/scan_rsp_data_len here?
-> > 
-> > (I still haven't read the later patches, so this may already be fixed.)
-> 
-> Nope, it's still broken upstream. Good that you noticed it. Bad that I
-> didn't and bad that it seems Marcel didn't actually test this one
-> properly ;)
+This function should be operating on scan_rsp_data_len and scan_rsp_data
+and not the advertising data variables.
 
-I just sent a patch to fix this which Marcel can push if he's fine with
-it.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Johan
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 0bf823b..a727b47 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -575,12 +575,12 @@ static void update_scan_rsp_data(struct hci_request *req)
+ 
+ 	len = create_scan_rsp_data(hdev, cp.data);
+ 
+-	if (hdev->adv_data_len == len &&
+-	    memcmp(cp.data, hdev->adv_data, len) == 0)
++	if (hdev->scan_rsp_data_len == len &&
++	    memcmp(cp.data, hdev->scan_rsp_data, len) == 0)
+ 		return;
+ 
+-	memcpy(hdev->adv_data, cp.data, sizeof(cp.data));
+-	hdev->adv_data_len = len;
++	memcpy(hdev->scan_rsp_data, cp.data, sizeof(cp.data));
++	hdev->scan_rsp_data_len = len;
+ 
+ 	cp.length = len;
+ 
+-- 
+1.8.3.1
+
