@@ -1,74 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Oct 2013 18:34:00 +0300
+Date: Wed, 16 Oct 2013 18:20:18 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 0/5] Stack independent BT HAL test tool
-Message-ID: <20131016153400.GA19385@x220.p-661hnu-f1>
-References: <1381932012-29641-1-git-send-email-jerzy.kasenberg@tieto.com>
+Subject: Re: [PATCH] Bluetooth: Expose inquiry_cache debugfs only on BR/EDR
+ controllers
+Message-ID: <20131016152018.GA18754@x220.p-661hnu-f1>
+References: <1381919335-59602-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381932012-29641-1-git-send-email-jerzy.kasenberg@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1381919335-59602-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jerzy,
+Hi Marcel,
 
-On Wed, Oct 16, 2013, Jerzy Kasenberg wrote:
-> v3:
->  - underscores changed to dash in file names.
->  - corrected cast style (space after cast).
->  - structure initialization with explicit filed names.
-> v2:
->  - license changed to apache
->  - source folder changed to hal-client (underscore to dash)
-> v1:
-> This tool is for testing Android HAL interfaces from command line.
-> Due to lack of readline on Android simple equivalent is hand coded.
-> This tool can be used with bluedroid stack so no glib dependency.
-> 
-> Tool source code is in folder hal_client, please comment if it should be
-> somewhere else.
-> 
-> Comments welcome.
-> 
-> Best regards
-> Jerzy Kasenberg
-> 
-> Jerzy Kasenberg (5):
->   android: Add haltest skeleton
->   android: Add line editing to haltest
->   android: Add history to line editor in haltest
->   android: Add text conversion helpers to haltest
->   android: Add calls to adapter methods in haltest
-> 
->  android/Android.mk           |   21 ++
->  android/client/haltest.c     |  161 +++++++++++
->  android/client/history.c     |   98 +++++++
->  android/client/history.h     |   21 ++
->  android/client/if-bt.c       |  631 ++++++++++++++++++++++++++++++++++++++++++
->  android/client/if-main.h     |   99 +++++++
->  android/client/pollhandler.c |  123 ++++++++
->  android/client/pollhandler.h |   26 ++
->  android/client/terminal.c    |  538 +++++++++++++++++++++++++++++++++++
->  android/client/terminal.h    |   59 ++++
->  android/client/textconv.c    |  205 ++++++++++++++
->  android/client/textconv.h    |  113 ++++++++
->  12 files changed, 2095 insertions(+)
->  create mode 100644 android/client/haltest.c
->  create mode 100644 android/client/history.c
->  create mode 100644 android/client/history.h
->  create mode 100644 android/client/if-bt.c
->  create mode 100644 android/client/if-main.h
->  create mode 100644 android/client/pollhandler.c
->  create mode 100644 android/client/pollhandler.h
->  create mode 100644 android/client/terminal.c
->  create mode 100644 android/client/terminal.h
->  create mode 100644 android/client/textconv.c
->  create mode 100644 android/client/textconv.h
+On Wed, Oct 16, 2013, Marcel Holtmann wrote:
+>  static void hci_req_sync_complete(struct hci_dev *hdev, u8 result)
+> @@ -734,7 +772,22 @@ static int __hci_init(struct hci_dev *hdev)
+>  	if (err < 0)
+>  		return err;
+>  
+> -	return __hci_req_sync(hdev, hci_init4_req, 0, HCI_INIT_TIMEOUT);
+> +	err = __hci_req_sync(hdev, hci_init4_req, 0, HCI_INIT_TIMEOUT);
+> +	if (err < 0)
+> +		return err;
+> +
+> +	/* Only create debugfs entries during the initial setup
+> +	 * phase and not every time the controller gets powered on.
+> +	 */
+> +	if (!test_bit(HCI_SETUP, &hdev->dev_flags))
+> +		return 0;
+> +
+> +	if (lmp_bredr_capable(hdev)) {
+> +		debugfs_create_file("inquiry_cache", 0444, hdev->debugfs,
+> +				    hdev, &inquiry_cache_fops);
+> +	}
 
-All five patches have been pushed upstream. I did have to fix "empty
-line before EOL" errors for each of the first three patches though, so
-please avoid that in the future.
+The patch looks good but just a minor nit-pick here: do you really want
+to have the curly braces for this one? Even though the function call is
+split across two lines it doesn't make it any harder to read without the
+braces, for me at least.
 
 Johan
