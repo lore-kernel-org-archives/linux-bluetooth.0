@@ -1,25 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Oct 2013 13:21:39 +0300
+Date: Wed, 16 Oct 2013 12:29:23 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 1/6] sdp: Check that correct packet received in recv
-Message-ID: <20131016102139.GA14764@x220.p-661hnu-f1>
-References: <1381913215-17957-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1381913215-17957-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH] Bluetooth: Remove enable_hs declaration
+Message-ID: <20131016092923.GA11537@x220.p-661hnu-f1>
+References: <1381914541-48086-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381913215-17957-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1381914541-48086-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Marcel,
 
-On Wed, Oct 16, 2013, Andrei Emeltchenko wrote:
+On Wed, Oct 16, 2013, Marcel Holtmann wrote:
+> This seems to be a left-over. The module parameter enable_hs has
+> been removed, but its extern declaration is still present. It is
+> not needed anymore, so just remove it.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  unit/test-sdp.c |    5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
+>  include/net/bluetooth/hci.h | 2 --
+>  1 file changed, 2 deletions(-)
 
-This patch has been applied. Thanks.
+Applied to bluetooth-next. Thanks.
 
 Johan
