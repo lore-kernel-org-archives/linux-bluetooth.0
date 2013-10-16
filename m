@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 04/11] android: sdp: Reuse BlueZ SDP server in Android
-Date: Wed, 16 Oct 2013 17:08:41 +0300
-Message-Id: <1381932528-31584-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 03/11] android: Add adapter and device struct for BlueZ daemon
+Date: Wed, 16 Oct 2013 17:08:40 +0300
+Message-Id: <1381932528-31584-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381932528-31584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1381932528-31584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,84 +12,182 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Reuse existing SDP server code in Android GPL daemon.
+Adapter structure in BlueZ daemon keeps track of default adapter
+and device structure keeps track about found devices.
 ---
- Makefile.android   |    4 +++-
- android/Android.mk |    8 ++++++++
- android/main.c     |    5 +++++
- 3 files changed, 16 insertions(+), 1 deletion(-)
+ android/adapter.c |   54 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/adapter.h |   36 +++++++++++++++++++++++++++++++++++
+ android/device.c  |   25 +++++++++++++++++++++++++
+ android/device.h  |   24 ++++++++++++++++++++++++
+ 4 files changed, 139 insertions(+)
+ create mode 100644 android/adapter.c
+ create mode 100644 android/adapter.h
+ create mode 100644 android/device.c
+ create mode 100644 android/device.h
 
-diff --git a/Makefile.android b/Makefile.android
-index ab328a9..4d7da39 100644
---- a/Makefile.android
-+++ b/Makefile.android
-@@ -4,10 +4,12 @@ noinst_PROGRAMS += android/bluetoothd
- android_bluetoothd_SOURCES =	android/main.c \
- 				src/log.c \
- 				android/hal-msg.h \
-+				src/sdpd-database.c src/sdpd-server.c \
-+				src/sdpd-service.c src/sdpd-request.c \
- 				src/shared/util.h src/shared/util.c \
- 				src/shared/mgmt.h src/shared/mgmt.c
- 
--android_bluetoothd_LDADD = @GLIB_LIBS@
-+android_bluetoothd_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
- endif
- 
- EXTRA_DIST += android/Android.mk android/log.c
-diff --git a/android/Android.mk b/android/Android.mk
-index 4996080..560fb0a 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -17,6 +17,13 @@ LOCAL_SRC_FILES := \
- 	log.c \
- 	../src/shared/mgmt.c \
- 	../src/shared/util.c \
-+	../src/sdpd-database.c \
-+	../src/sdpd-service.c \
-+	../src/sdpd-request.c \
-+	../src/sdpd-server.c \
-+	../lib/sdp.c \
-+	../lib/bluetooth.c \
-+	../lib/hci.c \
- 
- LOCAL_C_INCLUDES := \
- 	$(call include-path-for, glib) \
-@@ -25,6 +32,7 @@ LOCAL_C_INCLUDES := \
- LOCAL_C_INCLUDES += \
- 	$(LOCAL_PATH)/../ \
- 	$(LOCAL_PATH)/../src \
-+	$(LOCAL_PATH)/../lib \
- 
- LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
- 
-diff --git a/android/main.c b/android/main.c
-index 64f1a02..5dd359c 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -36,6 +36,7 @@
- #include <glib.h>
- 
- #include "log.h"
-+#include "src/sdpd.h"
- 
- #include "lib/bluetooth.h"
- #include "lib/mgmt.h"
-@@ -267,10 +268,14 @@ int main(int argc, char *argv[])
- 	if (!init_mgmt_interface())
- 		return EXIT_FAILURE;
- 
-+	/* Use params: mtu = 0, flags = 0 */
-+	start_sdp_server(0, 0);
+diff --git a/android/adapter.c b/android/adapter.c
+new file mode 100644
+index 0000000..9763530
+--- /dev/null
++++ b/android/adapter.c
+@@ -0,0 +1,54 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
- 	DBG("Entering main loop");
- 
- 	g_main_loop_run(event_loop);
- 
-+	stop_sdp_server();
- 	cleanup_mgmt_interface();
- 	g_main_loop_unref(event_loop);
- 
++#include "src/shared/mgmt.h"
++#include "log.h"
++#include "adapter.h"
++
++struct bt_adapter {
++	struct mgmt *mgmt;
++};
++
++struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if)
++{
++	struct bt_adapter *adapter;
++
++	adapter = g_new0(struct bt_adapter, 1);
++
++	adapter->mgmt = mgmt_ref(mgmt_if);
++
++	return adapter;
++}
++
++void bt_adapter_start(struct bt_adapter *adapter)
++{
++	DBG("");
++
++	/* TODO: CB: report scan mode */
++	/* TODO: CB: report state on */
++}
++
++void bt_adapter_stop(struct bt_adapter *adapter)
++{
++	DBG("");
++}
+diff --git a/android/adapter.h b/android/adapter.h
+new file mode 100644
+index 0000000..0f1445a
+--- /dev/null
++++ b/android/adapter.h
+@@ -0,0 +1,36 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <glib.h>
++
++#include "lib/bluetooth.h"
++
++struct bt_adapter;
++
++struct bt_adapter *bt_adapter_new(uint16_t index, struct mgmt *mgmt_if);
++
++void bt_adapter_start(struct bt_adapter *adapter);
++void bt_adapter_stop(struct bt_adapter *adapter);
+diff --git a/android/device.c b/android/device.c
+new file mode 100644
+index 0000000..f9ca3ec
+--- /dev/null
++++ b/android/device.c
+@@ -0,0 +1,25 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++struct bt_device {
++};
+diff --git a/android/device.h b/android/device.h
+new file mode 100644
+index 0000000..f5b1da6
+--- /dev/null
++++ b/android/device.h
+@@ -0,0 +1,24 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++struct bt_device;
 -- 
 1.7.10.4
 
