@@ -1,62 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Oct 2013 18:44:50 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv4 05/11] android: Add cap to bind to port < 1024
-Message-ID: <20131016154450.GB19385@x220.p-661hnu-f1>
-References: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1381934198-7955-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1381934198-7955-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381934198-7955-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Subject: [PATCH] Bluetooth: Remove not used struct sock
+Date: Wed, 16 Oct 2013 12:39:51 -0300
+Message-Id: <1381937991-12645-1-git-send-email-gustavo@padovan.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 
-On Wed, Oct 16, 2013, Andrei Emeltchenko wrote:
-> For SDP server we need to bind to lower port, acquire this capability.
+It is a leftover from the recent effort of remove sk usage from L2CAP
+core.
 
-You might want to mention here exactly which capability it is instead of
-just saying "this" :)
+Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+---
+ net/bluetooth/l2cap_core.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-The patch also seems to do more than just related to POSIX capabilities
-so you should also mention these things in the commit message.
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index b77e178..2681880 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -3714,7 +3714,7 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+ 	struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
+ 	struct l2cap_conn_rsp rsp;
+ 	struct l2cap_chan *chan = NULL, *pchan;
+-	struct sock *parent, *sk = NULL;
++	struct sock *parent;
+ 	int result, status = L2CAP_CS_NO_INFO;
+ 
+ 	u16 dcid = 0, scid = __le16_to_cpu(req->scid);
+@@ -3753,8 +3753,6 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+ 	if (!chan)
+ 		goto response;
+ 
+-	sk = chan->sk;
+-
+ 	/* For certain devices (ex: HID mouse), support for authentication,
+ 	 * pairing and bonding is optional. For such devices, inorder to avoid
+ 	 * the ACL alive for too long after L2CAP disconnection, reset the ACL
+-- 
+1.8.3.1
 
-> diff --git a/android/main.c b/android/main.c
-> index 3a20148..091ef20 100644
-> --- a/android/main.c
-> +++ b/android/main.c
-> @@ -32,6 +32,21 @@
->  #include <stdlib.h>
->  #include <stdbool.h>
->  #include <string.h>
-> +#include <unistd.h>
-> +#include <errno.h>
-> +#include <sys/prctl.h>
-> +
-> +/**
-> + * Include <sys/capability.h> for host build and
-> + * also for Android 4.3 when it is added to bionic
-> + */
-> +#if !defined(ANDROID) || (PLATFORM_SDK_VERSION > 17)
-> +#include <sys/capability.h>
-> +#endif
-> +
-> +#if defined(ANDROID)
-> +#include <private/android_filesystem_config.h>
-> +#endif
->  
->  #include <glib.h>
->  
-> @@ -230,6 +245,58 @@ static void cleanup_mgmt_interface(void)
->  	mgmt_if = NULL;
->  }
->  
-> +static bool set_capabilities(void)
-
-This whole function seems to me like something that's not needed on
-non-android (since we can just execute the daemon as root if necessary),
-so I'd consider putting its entire contents behind #if defined(ANDROID)
