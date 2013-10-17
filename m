@@ -1,157 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH] Bluetooth: Fix ATT socket backwards compatibility with user space
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/8] Bluetooth: Move uuids debugfs entry creation into hci_core.c
-Date: Thu, 17 Oct 2013 17:24:15 -0700
-Message-Id: <1382055860-12572-3-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1382037386-17396-1-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 18 Oct 2013 00:36:24 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <699FBB88-B7E3-4F64-92C8-54A70F1DE751@holtmann.org>
+References: <1382037386-17396-1-git-send-email-johan.hedberg@gmail.com>
+To: johan.hedberg@gmail.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The uuids debugfs should only be created together with the other
-entries after the setup procedure has been finished.
+Hi Johan,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_core.c  | 40 ++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_sysfs.c | 46 ----------------------------------------------
- 2 files changed, 40 insertions(+), 46 deletions(-)
+> Old user space versions bind the Attribute Protocol socket to
+> BDADDR_BREDR when they should be using BDADDR_LE_PUBLIC or
+> BDADDR_LE_RANDOM. The kernel recently introduced stricter checks on the
+> socket parameters but we need to punch this hole to them to ensure that
+> old user space versions keep working.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/l2cap_sock.c | 19 +++++++++++++++++--
+> 1 file changed, 17 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 34e5a58..a43aead 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -159,8 +159,23 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
+> 	if (!bdaddr_type_is_valid(la.l2_bdaddr_type))
+> 		return -EINVAL;
+> 
+> -	if (chan->src_type == BDADDR_BREDR && la.l2_bdaddr_type != BDADDR_BREDR)
+> -		return -EINVAL;
+> +	if (chan->src_type == BDADDR_BREDR &&
+> +	    la.l2_bdaddr_type != BDADDR_BREDR) {
+> +		if (!bdaddr_type_is_le(la.l2_bdaddr_type))
+> +			return -EINVAL;
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index de59bb1..0fb9f6d 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -29,6 +29,7 @@
- #include <linux/idr.h>
- #include <linux/rfkill.h>
- #include <linux/debugfs.h>
-+#include <asm/unaligned.h>
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -82,6 +83,43 @@ static const struct file_operations blacklist_fops = {
- 	.release	= single_release,
- };
- 
-+static int uuids_show(struct seq_file *f, void *p)
-+{
-+	struct hci_dev *hdev = f->private;
-+	struct bt_uuid *uuid;
-+
-+	hci_dev_lock(hdev);
-+	list_for_each_entry(uuid, &hdev->uuids, list) {
-+		u32 data0, data5;
-+		u16 data1, data2, data3, data4;
-+
-+		data5 = get_unaligned_le32(uuid);
-+		data4 = get_unaligned_le16(uuid + 4);
-+		data3 = get_unaligned_le16(uuid + 6);
-+		data2 = get_unaligned_le16(uuid + 8);
-+		data1 = get_unaligned_le16(uuid + 10);
-+		data0 = get_unaligned_le32(uuid + 12);
-+
-+		seq_printf(f, "%.8x-%.4x-%.4x-%.4x-%.4x%.8x\n",
-+			   data0, data1, data2, data3, data4, data5);
-+	}
-+	hci_dev_unlock(hdev);
-+
-+	return 0;
-+}
-+
-+static int uuids_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, uuids_show, inode->i_private);
-+}
-+
-+static const struct file_operations uuids_fops = {
-+	.open		= uuids_open,
-+	.read		= seq_read,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+};
-+
- static int inquiry_cache_show(struct seq_file *f, void *p)
- {
- 	struct hci_dev *hdev = f->private;
-@@ -872,6 +910,8 @@ static int __hci_init(struct hci_dev *hdev)
- 	debugfs_create_file("blacklist", 0444, hdev->debugfs, hdev,
- 			    &blacklist_fops);
- 
-+	debugfs_create_file("uuids", 0444, hdev->debugfs, hdev, &uuids_fops);
-+
- 	if (lmp_bredr_capable(hdev)) {
- 		debugfs_create_file("inquiry_cache", 0444, hdev->debugfs,
- 				    hdev, &inquiry_cache_fops);
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 863e313..077037e 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -2,7 +2,6 @@
- 
- #include <linux/debugfs.h>
- #include <linux/module.h>
--#include <asm/unaligned.h>
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -396,49 +395,6 @@ static struct device_type bt_host = {
- 	.release = bt_host_release,
- };
- 
--static void print_bt_uuid(struct seq_file *f, u8 *uuid)
--{
--	u32 data0, data5;
--	u16 data1, data2, data3, data4;
--
--	data5 = get_unaligned_le32(uuid);
--	data4 = get_unaligned_le16(uuid + 4);
--	data3 = get_unaligned_le16(uuid + 6);
--	data2 = get_unaligned_le16(uuid + 8);
--	data1 = get_unaligned_le16(uuid + 10);
--	data0 = get_unaligned_le32(uuid + 12);
--
--	seq_printf(f, "%.8x-%.4x-%.4x-%.4x-%.4x%.8x\n",
--		   data0, data1, data2, data3, data4, data5);
--}
--
--static int uuids_show(struct seq_file *f, void *p)
--{
--	struct hci_dev *hdev = f->private;
--	struct bt_uuid *uuid;
--
--	hci_dev_lock(hdev);
--
--	list_for_each_entry(uuid, &hdev->uuids, list)
--		print_bt_uuid(f, uuid->uuid);
--
--	hci_dev_unlock(hdev);
--
--	return 0;
--}
--
--static int uuids_open(struct inode *inode, struct file *file)
--{
--	return single_open(file, uuids_show, inode->i_private);
--}
--
--static const struct file_operations uuids_fops = {
--	.open		= uuids_open,
--	.read		= seq_read,
--	.llseek		= seq_lseek,
--	.release	= single_release,
--};
--
- void hci_init_sysfs(struct hci_dev *hdev)
- {
- 	struct device *dev = &hdev->dev;
-@@ -470,8 +426,6 @@ int hci_add_sysfs(struct hci_dev *hdev)
- 	if (!hdev->debugfs)
- 		return 0;
- 
--	debugfs_create_file("uuids", 0444, hdev->debugfs, hdev, &uuids_fops);
--
- 	return 0;
- }
- 
--- 
-1.8.3.1
+I do not understand this. The check for that la.l2_bdaddr_type is LE is done twice here.
+
+> +
+> +		/* Old user space versions will try to bind the ATT
+> +		 * socket using BDADDR_BREDR, so we have to allow this
+> +		 * to pass and fix chan->src_type to the correct value.
+> +		 */
+> +		if (la.l2_cid != __constant_cpu_to_le16(L2CAP_CID_ATT))
+> +			return -EINVAL;
+
+I think we should also check that the src address is BDADDR_ANY. If it is not BDADDR_ANY, we should reject it as well. That is enough to make old userspace work. I do not want us to be any more flexible. Or are we actually bind to the right source adapter when calling connect().
+
+> +
+> +		if (chan->scid != L2CAP_CID_ATT)
+> +			return -EINVAL;
+> +
+> +		chan->src_type = BDADDR_LE_PUBLIC;
+> +	}
+
+I do not like the fact that we are just defaulting to BDADDR_LE_PUBLIC here. It might be fine since the old userspace only ever understood public addresses anyway. However I do not like it that much. And if we keep it this way, then a comment needs to explain that this is good enough.
+
+> 
+> 	if (chan->src_type != BDADDR_BREDR && la.l2_bdaddr_type == BDADDR_BREDR)
+> 		return -EINVAL;
+
+Regards
+
+Marcel
 
