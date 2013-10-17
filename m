@@ -1,66 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 17 Oct 2013 12:05:29 +0300
+Date: Thu, 17 Oct 2013 12:01:10 +0300
 From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 To: Szymon Janc <szymon.janc@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org,
 	Szymon Janc <szymon.janc@gmail.com>
-Subject: Re: [RFC 1/8] android: Import Android HAL headers
-Message-ID: <20131017090527.GR2861@aemeltch-MOBL1>
+Subject: Re: [RFC 2/8] build: Add haltest command line tester
+Message-ID: <20131017090107.GQ2861@aemeltch-MOBL1>
 References: <1381999629-9589-1-git-send-email-szymon.janc@tieto.com>
- <1381999629-9589-2-git-send-email-szymon.janc@tieto.com>
+ <1381999629-9589-3-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381999629-9589-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1381999629-9589-3-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Oct 17, 2013 at 10:47:02AM +0200, Szymon Janc wrote:
+Hi Szymon,
+
+On Thu, Oct 17, 2013 at 10:47:03AM +0200, Szymon Janc wrote:
 > From: Szymon Janc <szymon.janc@gmail.com>
 > 
-> This imports BT HAL headers as of tag android-4.3_r3.1 from
-> https://android.googlesource.com/platform/hardware/libhardware
-> 
-> Only changes made compared to original files are trailing whitespace
-> cleanup to keep git happy and commenting out includes of
-> cutils/native_handle.h and system/graphics.h from hardware.h which are
-> not present on Linux.
-> 
-> Those files are needed for building HAL library and haltester tool on
-> Linux.
+> This is intended for testing Android daemon and HAL library on Linux.
 > ---
->  android/hardware/bluetooth.h      | 468 ++++++++++++++++++++++++++++++++++++++
->  android/hardware/bt_av.h          |  90 ++++++++
->  android/hardware/bt_gatt.h        |  61 +++++
->  android/hardware/bt_gatt_client.h | 275 ++++++++++++++++++++++
->  android/hardware/bt_gatt_server.h | 175 ++++++++++++++
->  android/hardware/bt_gatt_types.h  |  48 ++++
->  android/hardware/bt_hf.h          | 284 +++++++++++++++++++++++
->  android/hardware/bt_hh.h          | 179 +++++++++++++++
->  android/hardware/bt_hl.h          | 123 ++++++++++
->  android/hardware/bt_pan.h         |  87 +++++++
->  android/hardware/bt_rc.h          | 234 +++++++++++++++++++
->  android/hardware/bt_sock.h        |  58 +++++
->  android/hardware/hardware.h       | 232 +++++++++++++++++++
->  13 files changed, 2314 insertions(+)
->  create mode 100644 android/hardware/bluetooth.h
->  create mode 100644 android/hardware/bt_av.h
->  create mode 100644 android/hardware/bt_gatt.h
->  create mode 100644 android/hardware/bt_gatt_client.h
->  create mode 100644 android/hardware/bt_gatt_server.h
->  create mode 100644 android/hardware/bt_gatt_types.h
->  create mode 100644 android/hardware/bt_hf.h
->  create mode 100644 android/hardware/bt_hh.h
->  create mode 100644 android/hardware/bt_hl.h
->  create mode 100644 android/hardware/bt_pan.h
->  create mode 100644 android/hardware/bt_rc.h
->  create mode 100644 android/hardware/bt_sock.h
->  create mode 100644 android/hardware/hardware.h
+>  Makefile.android | 27 +++++++++++++++++++++++++++
+>  1 file changed, 27 insertions(+)
+> 
+> diff --git a/Makefile.android b/Makefile.android
+> index 4d7da39..e4482b2 100644
+> --- a/Makefile.android
+> +++ b/Makefile.android
+> @@ -10,8 +10,35 @@ android_bluetoothd_SOURCES =	android/main.c \
+>  				src/shared/mgmt.h src/shared/mgmt.c
+>
 
-That android/hardware does not sound good to me maybe 
-android/include/hardware ? It might be so that we would need to import
-some other library; then we put it also to android/include.
+Looks like it is not rebased ?
+ 
+>  android_bluetoothd_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+> +
+> +noinst_PROGRAMS += android/haltest
+> +
+> +android_haltest_SOURCES =	android/client/haltest.c \
+> +				android/client/pollhandler.c \
+> +				android/client/terminal.c \
+> +				android/client/history.c \
+> +				android/client/textconv.c \
+> +				android/client/if-bt.c \
+> +				android/hal_bluetooth.c \
+> +				android/hal_bt_sock.c \
+> +				android/hardware/bt_hf.h \
+> +				android/hardware/hardware.h \
+> +				android/hardware/bt_hh.h \
+> +				android/hardware/bluetooth.h \
+> +				android/hardware/bt_hl.h \
+> +				android/hardware/bt_gatt_server.h \
+> +				android/hardware/bt_av.h \
+> +				android/hardware/bt_gatt_types.h \
+> +				android/hardware/bt_gatt.h \
+> +				android/hardware/bt_rc.h \
+> +				android/hardware/bt_gatt_client.h \
+> +				android/hardware/bt_pan.h
+> +
+> +android_haltest_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
+> +
+>  endif
+>  
+>  EXTRA_DIST += android/Android.mk android/log.c
+>  
+>  EXTRA_DIST += android/hal-ipc-api.txt
+> +
 
-But let's maintainers decide this.
+extra space
 
 Best regards 
 Andrei Emeltchenko 
