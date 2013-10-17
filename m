@@ -1,56 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [RFC 06/15] Bluetooth: Background scanning
+Subject: Re: [RFC 05/15] Bluetooth: Use connection parameters if any
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1381965485-9159-7-git-send-email-andre.guedes@openbossa.org>
-Date: Thu, 17 Oct 2013 11:31:26 +0200
+In-Reply-To: <1381965485-9159-6-git-send-email-andre.guedes@openbossa.org>
+Date: Thu, 17 Oct 2013 11:27:35 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <CA624B73-F848-407A-B7DB-10D564049EAF@holtmann.org>
-References: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org> <1381965485-9159-7-git-send-email-andre.guedes@openbossa.org>
+Message-Id: <06808003-600D-45E8-88FD-E8F766DCFBA4@holtmann.org>
+References: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org> <1381965485-9159-6-git-send-email-andre.guedes@openbossa.org>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-> This patch adds helpers to trigger and untrigger the background
-> scanning. As long as the number of triggers are greater than zero,
-> we keep the background scanning running. Once the number of triggers
-> reaches zero, it is stopped.
+> This patch changes hci_create_le_conn() so it uses the connection
+> parameters specified by the user. If no parameters were configured,
+> we use the default values.
 > 
 > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
-> include/net/bluetooth/hci_core.h |  7 ++++
-> net/bluetooth/hci_core.c         | 83 ++++++++++++++++++++++++++++++++++++++++
-> 2 files changed, 90 insertions(+)
+> net/bluetooth/hci_conn.c | 12 ++++++++++--
+> 1 file changed, 10 insertions(+), 2 deletions(-)
 > 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 1e67da5..cb6458a 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -288,6 +288,10 @@ struct hci_dev {
-> 	__u8			scan_rsp_data[HCI_MAX_AD_LENGTH];
-> 	__u8			scan_rsp_data_len;
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 4e72650..d64000e 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -548,6 +548,7 @@ static int hci_create_le_conn(struct hci_conn *conn)
+> 	struct hci_dev *hdev = conn->hdev;
+> 	struct hci_cp_le_create_conn cp;
+> 	struct hci_request req;
+> +	struct hci_conn_param *param;
+> 	int err;
 > 
-> +	/* This counter tracks the number of background scanning triggers
-> +	 */
-> +	atomic_t		background_scan_cnt;
-> +
-> 	int (*open)(struct hci_dev *hdev);
-> 	int (*close)(struct hci_dev *hdev);
-> 	int (*flush)(struct hci_dev *hdev);
-> @@ -1191,4 +1195,7 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
-> #define SCO_AIRMODE_CVSD       0x0000
-> #define SCO_AIRMODE_TRANSP     0x0003
-> 
-> +int hci_trigger_background_scan(struct hci_dev *hdev);
-> +int hci_untrigger_background_scan(struct hci_dev *hdev);
-> +
+> 	hci_req_init(&req, hdev);
+> @@ -558,11 +559,18 @@ static int hci_create_le_conn(struct hci_conn *conn)
+> 	bacpy(&cp.peer_addr, &conn->dst);
+> 	cp.peer_addr_type = conn->dst_type;
+> 	cp.own_address_type = conn->src_type;
+> -	cp.conn_interval_min = __constant_cpu_to_le16(0x0028);
+> -	cp.conn_interval_max = __constant_cpu_to_le16(0x0038);
+> 	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
+> 	cp.min_ce_len = __constant_cpu_to_le16(0x0000);
+> 	cp.max_ce_len = __constant_cpu_to_le16(0x0000);
+> +	param = hci_find_conn_param(hdev, &conn->dst, conn->dst_type);
+> +	if (param) {
+> +		cp.conn_interval_min = cpu_to_le16(param->min_conn_interval);
+> +		cp.conn_interval_max = cpu_to_le16(param->max_conn_interval);
+> +		hci_conn_param_put(param);
+> +	} else {
+> +		cp.conn_interval_min = __constant_cpu_to_le16(0x0028);
+> +		cp.conn_interval_max = __constant_cpu_to_le16(0x0038);
+> +	}
+> 	hci_req_add(&req, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
 
-instead of plastering the code with all these places it might be better to create a connection parameter hash that actually knows if it has any connection parameters stored that need require a passive scan now.
+so this is part that I do not like at all. We already have the hci_conn connection object at this point. So why are these values not stored in there. In the end we are paying the price for code like this where we have to check if parameters exists, if they do apply them, if not use the defaults.
 
-So instead of trigger and intriguer, the code that adds or removes the actual data from our hash can be the trigger itself. Since it knows better. And checking after disconnection or other cases becomes a lot simpler since you just check the hash if you should be connecting.
+I did change the code back from the check for public address and what own address type to use. Since it turned out that later on you actually need to what you where doing.
+
+And this is the same thing in the future. We actually want to know what connection parameters we current used. In case we have to update them or they change while the connection is on-going.
 
 Regards
 
