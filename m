@@ -1,82 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 17 Oct 2013 12:05:29 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Szymon Janc <szymon.janc@gmail.com>
+Subject: Re: [RFC 1/8] android: Import Android HAL headers
+Message-ID: <20131017090527.GR2861@aemeltch-MOBL1>
+References: <1381999629-9589-1-git-send-email-szymon.janc@tieto.com>
+ <1381999629-9589-2-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCHv5 3/7] android: Use kernel style to initialize struct fields
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1381998406-16662-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Thu, 17 Oct 2013 11:04:54 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <DC9444E8-D8BD-487E-AC4C-053BE979A8C8@holtmann.org>
-References: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381998406-16662-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1381998406-16662-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1381999629-9589-2-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
-
+On Thu, Oct 17, 2013 at 10:47:02AM +0200, Szymon Janc wrote:
+> From: Szymon Janc <szymon.janc@gmail.com>
+> 
+> This imports BT HAL headers as of tag android-4.3_r3.1 from
+> https://android.googlesource.com/platform/hardware/libhardware
+> 
+> Only changes made compared to original files are trailing whitespace
+> cleanup to keep git happy and commenting out includes of
+> cutils/native_handle.h and system/graphics.h from hardware.h which are
+> not present on Linux.
+> 
+> Those files are needed for building HAL library and haltester tool on
+> Linux.
 > ---
-> android/hal_bluetooth.c |   46 +++++++++++++++++++++++-----------------------
-> 1 file changed, 23 insertions(+), 23 deletions(-)
-> 
-> diff --git a/android/hal_bluetooth.c b/android/hal_bluetooth.c
-> index 9bb9dcf..89b8ebb 100644
-> --- a/android/hal_bluetooth.c
-> +++ b/android/hal_bluetooth.c
-> @@ -309,29 +309,29 @@ static int dut_mode_send(uint16_t opcode, uint8_t *buf, uint8_t len)
-> }
-> 
-> static const bt_interface_t bluetooth_if = {
-> -	sizeof(bt_interface_t),
-> -	init,
-> -	enable,
-> -	disable,
-> -	cleanup,
-> -	get_adapter_properties,
-> -	get_adapter_property,
-> -	set_adapter_property,
-> -	get_remote_device_properties,
-> -	get_remote_device_property,
-> -	set_remote_device_property,
-> -	get_remote_service_record,
-> -	get_remote_services,
-> -	start_discovery,
-> -	cancel_discovery,
-> -	create_bond,
-> -	remove_bond,
-> -	cancel_bond,
-> -	pin_reply,
-> -	ssp_reply,
-> -	get_profile_interface,
-> -	dut_mode_configure,
-> -	dut_mode_send
-> +	.size = sizeof(bt_interface_t),
-> +	.init = init,
-> +	.enable = enable,
-> +	.disable = disable,
-> +	.cleanup = cleanup,
-> +	.get_adapter_properties = get_adapter_properties,
-> +	.get_adapter_property = get_adapter_property,
-> +	.set_adapter_property = set_adapter_property,
-> +	.get_remote_device_properties = get_remote_device_properties,
-> +	.get_remote_device_property = get_remote_device_property,
-> +	.set_remote_device_property = set_remote_device_property,
-> +	.get_remote_service_record = get_remote_service_record,
-> +	.get_remote_services = get_remote_services,
-> +	.start_discovery = start_discovery,
-> +	.cancel_discovery = cancel_discovery,
-> +	.create_bond = create_bond,
-> +	.remove_bond = remove_bond,
-> +	.cancel_bond = cancel_bond,
-> +	.pin_reply = pin_reply,
-> +	.ssp_reply = ssp_reply,
-> +	.get_profile_interface = get_profile_interface,
-> +	.dut_mode_configure = dut_mode_configure,
-> +	.dut_mode_send = dut_mode_send
-> };
+>  android/hardware/bluetooth.h      | 468 ++++++++++++++++++++++++++++++++++++++
+>  android/hardware/bt_av.h          |  90 ++++++++
+>  android/hardware/bt_gatt.h        |  61 +++++
+>  android/hardware/bt_gatt_client.h | 275 ++++++++++++++++++++++
+>  android/hardware/bt_gatt_server.h | 175 ++++++++++++++
+>  android/hardware/bt_gatt_types.h  |  48 ++++
+>  android/hardware/bt_hf.h          | 284 +++++++++++++++++++++++
+>  android/hardware/bt_hh.h          | 179 +++++++++++++++
+>  android/hardware/bt_hl.h          | 123 ++++++++++
+>  android/hardware/bt_pan.h         |  87 +++++++
+>  android/hardware/bt_rc.h          | 234 +++++++++++++++++++
+>  android/hardware/bt_sock.h        |  58 +++++
+>  android/hardware/hardware.h       | 232 +++++++++++++++++++
+>  13 files changed, 2314 insertions(+)
+>  create mode 100644 android/hardware/bluetooth.h
+>  create mode 100644 android/hardware/bt_av.h
+>  create mode 100644 android/hardware/bt_gatt.h
+>  create mode 100644 android/hardware/bt_gatt_client.h
+>  create mode 100644 android/hardware/bt_gatt_server.h
+>  create mode 100644 android/hardware/bt_gatt_types.h
+>  create mode 100644 android/hardware/bt_hf.h
+>  create mode 100644 android/hardware/bt_hh.h
+>  create mode 100644 android/hardware/bt_hl.h
+>  create mode 100644 android/hardware/bt_pan.h
+>  create mode 100644 android/hardware/bt_rc.h
+>  create mode 100644 android/hardware/bt_sock.h
+>  create mode 100644 android/hardware/hardware.h
 
-we could also leave it as is here. Since this does not give any visible improvement for anybody. Also these structure are ABI. So no unintentional reordering will ever happen.
+That android/hardware does not sound good to me maybe 
+android/include/hardware ? It might be so that we would need to import
+some other library; then we put it also to android/include.
 
-Regards
+But let's maintainers decide this.
 
-Marcel
+Best regards 
+Andrei Emeltchenko 
 
