@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 6/7] android: Add HID Host skeleton
-Date: Thu, 17 Oct 2013 11:26:45 +0300
-Message-Id: <1381998406-16662-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv5 7/7] android: Add PAN skeleton
+Date: Thu, 17 Oct 2013 11:26:46 +0300
+Message-Id: <1381998406-16662-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1381998406-16662-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1381998406-16662-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,56 +12,56 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add skeleton for hidhost Android HAL. This is modified version
+Add skeleton for pan Android HAL. This is modified version
 from Frederic Danis earlier patch set.
 ---
  android/Android.mk      |    1 +
- android/hal-bluetooth.c |    4 +
- android/hal-hidhost.c   |  204 +++++++++++++++++++++++++++++++++++++++++++++++
+ android/hal-bluetooth.c |    4 ++
+ android/hal-pan.c       |  120 +++++++++++++++++++++++++++++++++++++++++++++++
  android/hal.h           |    1 +
- 4 files changed, 210 insertions(+)
- create mode 100644 android/hal-hidhost.c
+ 4 files changed, 126 insertions(+)
+ create mode 100644 android/hal-pan.c
 
 diff --git a/android/Android.mk b/android/Android.mk
-index afd445a..25b4048 100644
+index 25b4048..f273094 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -53,6 +53,7 @@ include $(CLEAR_VARS)
- LOCAL_SRC_FILES := \
+@@ -54,6 +54,7 @@ LOCAL_SRC_FILES := \
  	hal-bluetooth.c \
  	hal-bt-sock.c \
-+	hal-hidhost.c \
+ 	hal-hidhost.c \
++	hal-pan.c \
  
  LOCAL_SHARED_LIBRARIES := \
  	libcutils \
 diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 89b8ebb..488606d 100644
+index 488606d..5f9d00b 100644
 --- a/android/hal-bluetooth.c
 +++ b/android/hal-bluetooth.c
-@@ -22,6 +22,7 @@
- 
+@@ -23,6 +23,7 @@
  #include <hardware/bluetooth.h>
  #include <hardware/bt_sock.h>
-+#include <hardware/bt_hh.h>
+ #include <hardware/bt_hh.h>
++#include <hardware/bt_pan.h>
  
  #include <cutils/sockets.h>
  #include <cutils/properties.h>
-@@ -285,6 +286,9 @@ static const void *get_profile_interface(const char *profile_id)
- 	if (!strcmp(profile_id, BT_PROFILE_SOCKETS_ID))
- 		return bt_get_sock_interface();
+@@ -289,6 +290,9 @@ static const void *get_profile_interface(const char *profile_id)
+ 	if (!strcmp(profile_id, BT_PROFILE_HIDHOST_ID))
+ 		return bt_get_hidhost_interface();
  
-+	if (!strcmp(profile_id, BT_PROFILE_HIDHOST_ID))
-+		return bt_get_hidhost_interface();
++	if (!strcmp(profile_id, BT_PROFILE_PAN_ID))
++		return bt_get_pan_interface();
 +
  	return NULL;
  }
  
-diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
+diff --git a/android/hal-pan.c b/android/hal-pan.c
 new file mode 100644
-index 0000000..f040cba
+index 0000000..2f5c256
 --- /dev/null
-+++ b/android/hal-hidhost.c
-@@ -0,0 +1,204 @@
++++ b/android/hal-pan.c
+@@ -0,0 +1,120 @@
 +/*
 + * Copyright (C) 2013 Intel Corporation
 + *
@@ -82,19 +82,40 @@ index 0000000..f040cba
 +#include <stdbool.h>
 +
 +#include <hardware/bluetooth.h>
-+#include <hardware/bt_hh.h>
++#include <hardware/bt_pan.h>
 +
 +#define LOG_TAG "BlueZ"
 +#include <cutils/log.h>
 +
-+bthh_callbacks_t *bt_hh_cbacks;
++const btpan_callbacks_t *bt_pan_cbacks = NULL;
 +
 +static bool interface_ready(void)
 +{
-+	return bt_hh_cbacks != NULL;
++	return bt_pan_cbacks != NULL;
 +}
 +
-+static bt_status_t bt_hidhost_connect(bt_bdaddr_t *bd_addr)
++static bt_status_t bt_pan_enable(int local_role)
++{
++	ALOGD(__func__);
++
++	if (!interface_ready())
++		return BT_STATUS_NOT_READY;
++
++	return BT_STATUS_UNSUPPORTED;
++}
++
++static int bt_pan_get_local_role(void)
++{
++	ALOGD(__func__);
++
++	if (!interface_ready())
++		return BTPAN_ROLE_NONE;
++
++	return BTPAN_ROLE_NONE;
++}
++
++static bt_status_t bt_pan_connect(const bt_bdaddr_t *bd_addr, int local_role,
++					int remote_role)
 +{
 +	ALOGD(__func__);
 +
@@ -107,7 +128,7 @@ index 0000000..f040cba
 +	return BT_STATUS_UNSUPPORTED;
 +}
 +
-+static bt_status_t bt_hidhost_disconnect(bt_bdaddr_t *bd_addr)
++static bt_status_t bt_pan_disconnect(const bt_bdaddr_t *bd_addr)
 +{
 +	ALOGD(__func__);
 +
@@ -120,111 +141,11 @@ index 0000000..f040cba
 +	return BT_STATUS_UNSUPPORTED;
 +}
 +
-+static bt_status_t bt_hidhost_virtual_unplug(bt_bdaddr_t *bd_addr)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t bt_hidhost_set_info(bt_bdaddr_t *bd_addr,
-+						bthh_hid_info_t hid_info)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t bt_hidhost_get_protocol(bt_bdaddr_t *bd_addr,
-+					bthh_protocol_mode_t protocolMode)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t bt_hidhost_set_protocol(bt_bdaddr_t *bd_addr,
-+					bthh_protocol_mode_t protocolMode)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t bt_hidhost_get_report(bt_bdaddr_t *bd_addr,
-+						bthh_report_type_t reportType,
-+						uint8_t reportId,
-+						int bufferSize)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t bt_hidhost_set_report(bt_bdaddr_t *bd_addr,
-+						bthh_report_type_t reportType,
-+						char *report)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr || !report)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t bt_hidhost_send_data(bt_bdaddr_t *bd_addr, char *data)
-+{
-+	ALOGD(__func__);
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!bd_addr || !data)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	return BT_STATUS_UNSUPPORTED;
-+}
-+
-+static bt_status_t bt_hidhost_init(bthh_callbacks_t *callbacks)
++static bt_status_t bt_pan_init(const btpan_callbacks_t *callbacks)
 +{
 +	ALOGI(__func__);
 +
-+	/* store reference to user callbacks */
-+	bt_hh_cbacks = callbacks;
++	bt_pan_cbacks = callbacks;
 +
 +	/* TODO: start HID Host thread */
 +
@@ -233,7 +154,7 @@ index 0000000..f040cba
 +	return BT_STATUS_SUCCESS;
 +}
 +
-+static void bt_hidhost_cleanup(void)
++static void bt_pan_cleanup()
 +{
 +	ALOGD(__func__);
 +
@@ -242,39 +163,34 @@ index 0000000..f040cba
 +
 +	/* TODO: disable service */
 +
-+	/* TODO: stop HID Host thread */
++	/* TODO: stop PAN thread */
 +
-+	bt_hh_cbacks = NULL;
++	bt_pan_cbacks = NULL;
 +}
 +
-+static bthh_interface_t bt_hidhost_if = {
-+	.size = sizeof(bt_hidhost_if),
-+	.init = bt_hidhost_init,
-+	.connect = bt_hidhost_connect,
-+	.disconnect = bt_hidhost_disconnect,
-+	.virtual_unplug = bt_hidhost_virtual_unplug,
-+	.set_info = bt_hidhost_set_info,
-+	.get_protocol = bt_hidhost_get_protocol,
-+	.set_protocol = bt_hidhost_set_protocol,
-+	.get_report = bt_hidhost_get_report,
-+	.set_report = bt_hidhost_set_report,
-+	.send_data = bt_hidhost_send_data,
-+	.cleanup = bt_hidhost_cleanup
++static btpan_interface_t bt_pan_if = {
++	.size = sizeof(bt_pan_if),
++	.init = bt_pan_init,
++	.enable = bt_pan_enable,
++	.get_local_role = bt_pan_get_local_role,
++	.connect = bt_pan_connect,
++	.disconnect = bt_pan_disconnect,
++	.cleanup = bt_pan_cleanup
 +};
 +
-+bthh_interface_t *bt_get_hidhost_interface(void)
++btpan_interface_t *bt_get_pan_interface()
 +{
-+	return &bt_hidhost_if;
++	return &bt_pan_if;
 +}
 diff --git a/android/hal.h b/android/hal.h
-index 40fbf03..be69339 100644
+index be69339..38b90b2 100644
 --- a/android/hal.h
 +++ b/android/hal.h
-@@ -16,3 +16,4 @@
-  */
+@@ -17,3 +17,4 @@
  
  btsock_interface_t *bt_get_sock_interface(void);
-+bthh_interface_t *bt_get_hidhost_interface(void);
+ bthh_interface_t *bt_get_hidhost_interface(void);
++btpan_interface_t *bt_get_pan_interface(void);
 -- 
 1.7.10.4
 
