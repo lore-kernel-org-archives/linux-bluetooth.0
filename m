@@ -1,69 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH] Bluetooth: Fix ATT socket backwards compatibility with user space
+Subject: Re: [PATCH] Bluetooth: Add hci_h4p driver
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1382037386-17396-1-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 18 Oct 2013 00:36:24 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <699FBB88-B7E3-4F64-92C8-54A70F1DE751@holtmann.org>
-References: <1382037386-17396-1-git-send-email-johan.hedberg@gmail.com>
-To: johan.hedberg@gmail.com
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <201310172225.33343@pali>
+Date: Fri, 18 Oct 2013 00:11:44 +0200
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Pavel Machek <pavel@ucw.cz>, linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	=?utf-8?B?0JjQstCw0LnQu9C+INCU0LjQvNC40YLRgNC+0LI=?=
+	<freemangordon@abv.bg>,
+	Joni Lapilainen <joni.lapilainen@gmail.com>,
+	Sebastian Reichel <sre@ring0.de>,
+	Aaro Koskinen <aaro.koskinen@iki.fi>
+Message-Id: <3B0F039C-4680-46FF-A654-48D6A28B9B5E@holtmann.org>
+References: <1379703710-5757-1-git-send-email-pali.rohar@gmail.com> <201310172225.33343@pali>
+To: =?iso-8859-1?Q?Pali_Roh=E1r?= <pali.rohar@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Pali,
 
-> Old user space versions bind the Attribute Protocol socket to
-> BDADDR_BREDR when they should be using BDADDR_LE_PUBLIC or
-> BDADDR_LE_RANDOM. The kernel recently introduced stricter checks on the
-> socket parameters but we need to punch this hole to them to ensure that
-> old user space versions keep working.
+>> This driver adding support for Nokia N900 bluetooth hardware
+>> 
+>> Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
+>> Signed-off-by: Pali Rohár <pali.rohar@gmail.com>
+>> ---
+>> drivers/bluetooth/Kconfig             |   10 +
+>> drivers/bluetooth/Makefile            |    2 +
+>> drivers/bluetooth/hci_h4p/Makefile    |    7 +
+>> drivers/bluetooth/hci_h4p/core.c      | 1085
+>> +++++++++++++++++++++++++++++++++
+>> drivers/bluetooth/hci_h4p/fw-bcm.c    |  149 +++++
+>> drivers/bluetooth/hci_h4p/fw-csr.c    |  152 +++++
+>> drivers/bluetooth/hci_h4p/fw-ti1273.c |  113 ++++
+>> drivers/bluetooth/hci_h4p/fw.c        |  166 +++++
+>> drivers/bluetooth/hci_h4p/hci_h4p.h   |  238 ++++++++
+>> drivers/bluetooth/hci_h4p/uart.c      |  203 ++++++
+>> include/linux/bluetooth/hci_h4p.h     |   41 ++
+>> 11 files changed, 2166 insertions(+)
+>> create mode 100644 drivers/bluetooth/hci_h4p/Makefile
+>> create mode 100644 drivers/bluetooth/hci_h4p/core.c
+>> create mode 100644 drivers/bluetooth/hci_h4p/fw-bcm.c
+>> create mode 100644 drivers/bluetooth/hci_h4p/fw-csr.c
+>> create mode 100644 drivers/bluetooth/hci_h4p/fw-ti1273.c
+>> create mode 100644 drivers/bluetooth/hci_h4p/fw.c
+>> create mode 100644 drivers/bluetooth/hci_h4p/hci_h4p.h
+>> create mode 100644 drivers/bluetooth/hci_h4p/uart.c
+>> create mode 100644 include/linux/bluetooth/hci_h4p.h
+>> 
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/l2cap_sock.c | 19 +++++++++++++++++--
-> 1 file changed, 17 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index 34e5a58..a43aead 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -159,8 +159,23 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
-> 	if (!bdaddr_type_is_valid(la.l2_bdaddr_type))
-> 		return -EINVAL;
-> 
-> -	if (chan->src_type == BDADDR_BREDR && la.l2_bdaddr_type != BDADDR_BREDR)
-> -		return -EINVAL;
-> +	if (chan->src_type == BDADDR_BREDR &&
-> +	    la.l2_bdaddr_type != BDADDR_BREDR) {
-> +		if (!bdaddr_type_is_le(la.l2_bdaddr_type))
-> +			return -EINVAL;
+> Can somebody look & comment this patch? What is needed to be part 
+> of upstream kernel?
 
-I do not understand this. The check for that la.l2_bdaddr_type is LE is done twice here.
-
-> +
-> +		/* Old user space versions will try to bind the ATT
-> +		 * socket using BDADDR_BREDR, so we have to allow this
-> +		 * to pass and fix chan->src_type to the correct value.
-> +		 */
-> +		if (la.l2_cid != __constant_cpu_to_le16(L2CAP_CID_ATT))
-> +			return -EINVAL;
-
-I think we should also check that the src address is BDADDR_ANY. If it is not BDADDR_ANY, we should reject it as well. That is enough to make old userspace work. I do not want us to be any more flexible. Or are we actually bind to the right source adapter when calling connect().
-
-> +
-> +		if (chan->scid != L2CAP_CID_ATT)
-> +			return -EINVAL;
-> +
-> +		chan->src_type = BDADDR_LE_PUBLIC;
-> +	}
-
-I do not like the fact that we are just defaulting to BDADDR_LE_PUBLIC here. It might be fine since the old userspace only ever understood public addresses anyway. However I do not like it that much. And if we keep it this way, then a comment needs to explain that this is good enough.
-
-> 
-> 	if (chan->src_type != BDADDR_BREDR && la.l2_bdaddr_type == BDADDR_BREDR)
-> 		return -EINVAL;
+you need to rebase against bluetooth-next at least.
 
 Regards
 
