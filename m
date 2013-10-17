@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 5/9] android: Add cutils/properties.h
-Date: Thu, 17 Oct 2013 11:55:24 +0300
-Message-Id: <1382000128-23762-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC 6/9] build: Enable building HAL as libbt-internal.la
+Date: Thu, 17 Oct 2013 11:55:25 +0300
+Message-Id: <1382000128-23762-7-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1382000128-23762-1-git-send-email-luiz.dentz@gmail.com>
 References: <1382000128-23762-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,81 +12,26 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/cutils/properties.h | 65 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 65 insertions(+)
- create mode 100644 android/cutils/properties.h
+ Makefile.android | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/android/cutils/properties.h b/android/cutils/properties.h
-new file mode 100644
-index 0000000..a9f7554
---- /dev/null
-+++ b/android/cutils/properties.h
-@@ -0,0 +1,65 @@
-+/*
-+ * Copyright (C) 2006 The Android Open Source Project
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ */
+diff --git a/Makefile.android b/Makefile.android
+index 4d7da39..6d7437d 100644
+--- a/Makefile.android
++++ b/Makefile.android
+@@ -10,6 +10,12 @@ android_bluetoothd_SOURCES =	android/main.c \
+ 				src/shared/mgmt.h src/shared/mgmt.c
+ 
+ android_bluetoothd_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
 +
-+#ifndef __CUTILS_PROPERTIES_H
-+#define __CUTILS_PROPERTIES_H
++noinst_LTLIBRARIES += android/libbt-internal.la
 +
-+#include <stdlib.h>
-+#include <string.h>
-+
-+#ifdef __cplusplus
-+extern "C" {
-+#endif
-+
-+#define PROPERTY_KEY_MAX   32
-+#define PROPERTY_VALUE_MAX  92
-+
-+/* property_get: returns the length of the value which will never be
-+** greater than PROPERTY_VALUE_MAX - 1 and will always be zero terminated.
-+** (the length does not include the terminating zero).
-+**
-+** If the property read fails or returns an empty value, the default
-+** value is used (if nonnull).
-+*/
-+static inline int property_get(const char *key, char *value,
-+						const char *default_value)
-+{
-+	const char *env;
-+
-+	env = getenv(key);
-+	if (!env)
-+		env = default_value;
-+
-+	if (!value)
-+		return 0;
-+
-+	strncpy(value, env, PROPERTY_VALUE_MAX);
-+
-+	return strlen(value);
-+}
-+
-+/* property_set: returns 0 on success, < 0 on failure
-+*/
-+static inline int property_set(const char *key, const char *value)
-+{
-+	return setenv(key, value, 0);
-+}
-+
-+#ifdef __cplusplus
-+}
-+#endif
-+
-+#endif
++android_libbt_internal_la_SOURCES = android/hal.h android/hal_bluetooth.c \
++					android/hal_bt_sock.c
++android_libbt_internal_la_CPPFLAGS = -I$(srcdir)/android
+ endif
+ 
+ EXTRA_DIST += android/Android.mk android/log.c
 -- 
 1.8.3.1
 
