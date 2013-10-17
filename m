@@ -1,35 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 17 Oct 2013 14:20:10 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv5 1/7] android: Add capabilities and set userid
-Message-ID: <20131017112010.GA19836@x220.p-661hnu-f1>
-References: <1381833423-862-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1381998406-16662-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1381998406-16662-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 17 Oct 2013 14:20:00 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC 7/9] android: Fix building with local cutils/log.h
+Message-ID: <20131017111958.GT2861@aemeltch-MOBL1>
+References: <1382000128-23762-1-git-send-email-luiz.dentz@gmail.com>
+ <1382000128-23762-8-git-send-email-luiz.dentz@gmail.com>
+ <CAJdJm_MNvbK7XaLaapeE_rR4fTxsENjoNouBqx2eLXBOkaTfsQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1381998406-16662-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <CAJdJm_MNvbK7XaLaapeE_rR4fTxsENjoNouBqx2eLXBOkaTfsQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi all,
 
-On Thu, Oct 17, 2013, Andrei Emeltchenko wrote:
-> The patch set UID as standard Bluetooth user for Android (AID_BLUETOOTH).
-> For SDP server we need to bind to lower port, acquire this capability.
+On Thu, Oct 17, 2013 at 06:57:29AM -0400, Anderson Lizardo wrote:
+> Hi Luiz,
+> 
+> On Thu, Oct 17, 2013 at 4:55 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >
+> > android/hal_bt_sock.c: In function 'btsock_listen_rfcomm':
+> > android/hal_bt_sock.c:30:47: error: expected ')' before '__func__'
+> >   ALOGD(__func__);
+> 
+> You can implement ALOGD() using vfprintf() (just like DBG(), but which
+> uses vsyslog() instead) and avoid this commit.
 
-Which POSIX capability is "this capability" exactly?
+I agree here, we are anyway implementing ALOGD, let's implement it
+correctly.
 
-> +	cap.effective = cap.permitted =
-> +		CAP_TO_MASK(CAP_SETGID) |
-> +		CAP_TO_MASK(CAP_NET_RAW) |
-> +		CAP_TO_MASK(CAP_NET_ADMIN) |
-> +		CAP_TO_MASK(CAP_NET_BIND_SERVICE);
+Best regards 
+Andrei Emeltchenko 
 
-I just checked the kernel L2CAP socket code and all it requires for
-binding to a low L2CAP PSM (needed e.g. by SDP) is CAP_NET_BIND_SERVICE.
-So you'll need to explain what you need these other capabilities for.
-
-Johan
