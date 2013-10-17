@@ -1,34 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 17 Oct 2013 23:56:57 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Expose auto_accept_delay debugfs only when
- SSP is supported
-Message-ID: <20131017205657.GA17492@x220.p-661hnu-f1>
-References: <1382032486-31010-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1382032486-31010-1-git-send-email-marcel@holtmann.org>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 5/5] build: Add missing Android files to EXTRA_DIST
+Date: Thu, 17 Oct 2013 22:28:41 +0200
+Message-Id: <1382041721-19960-5-git-send-email-szymon.janc@gmail.com>
+In-Reply-To: <1382041721-19960-1-git-send-email-szymon.janc@gmail.com>
+References: <1382041721-19960-1-git-send-email-szymon.janc@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Szymon Janc <szymon.janc@tieto.com>
 
-On Thu, Oct 17, 2013, Marcel Holtmann wrote:
-> The auto_accept_delay debugfs entry is only valid for BR/EDR capable
-> controllers that also support SSP. If SSP is not available or it is
-> a LE-only single mode controller this value has no affect and so do
-> not expose it.
-> 
-> Since the value can be actually changed, switch the permissions
-> to 0644 to clearly indicate that the value is indeed writeable.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/hci_core.c  | 29 +++++++++++++++++++++++++++++
->  net/bluetooth/hci_sysfs.c | 31 -------------------------------
->  2 files changed, 29 insertions(+), 31 deletions(-)
+---
+ Makefile.android | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-Applied to bluetooth-next. Thanks.
+diff --git a/Makefile.android b/Makefile.android
+index 00d962d..8ae3ddc 100644
+--- a/Makefile.android
++++ b/Makefile.android
+@@ -48,7 +48,24 @@ android_haltest_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
+ 
+ endif
+ 
+-EXTRA_DIST += android/Android.mk android/log.c
++EXTRA_DIST += android/Android.mk android/log.c android/device.c \
++		android/adapter.c android/main.c android/hal-msg.h \
++		android/hal.h
++
++EXTRA_DIST += android/hal_bt_sock.c android/hal_bluetooth.c
++
++EXTRA_DIST += android/client/terminal.c \
++		android/client/haltest.c \
++		android/client/hwmodule.c \
++		android/client/pollhandler.c \
++		android/client/history.c \
++		android/client/if-bt.c \
++		android/client/textconv.c \
++		android/client/textconv.h \
++		android/client/if-main.h \
++		android/client/pollhandler.h \
++		android/client/history.h \
++		android/client/terminal.h
+ 
+ EXTRA_DIST += android/hal-ipc-api.txt
+ 
+-- 
+1.8.4.rc3
 
-Johan
