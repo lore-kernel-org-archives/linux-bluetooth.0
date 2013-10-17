@@ -1,45 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@gmail.com>
-Subject: [RFC 6/8] android: Fix missing include in HAL library
-Date: Thu, 17 Oct 2013 10:47:07 +0200
-Message-ID: <1381999629-9589-7-git-send-email-szymon.janc@tieto.com>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [RFC 8/8] build: Add missing android files to EXTRA_DIST
+Date: Thu, 17 Oct 2013 10:47:09 +0200
+Message-ID: <1381999629-9589-9-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1381999629-9589-1-git-send-email-szymon.janc@tieto.com>
 References: <1381999629-9589-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Szymon Janc <szymon.janc@gmail.com>
-
-This fix following build error on Linux:
-
-  CC       android/android_haltest-hal_bt_sock.o
-android/hal_bt_sock.c:86:21: error: no previous declaration
-     for ‘bt_get_sock_interface’ [-Werror=missing-declarations]
- btsock_interface_t *bt_get_sock_interface(void)
-                     ^
-cc1: all warnings being treated as errors
-make[1]: *** [android/android_haltest-hal_bt_sock.o] Error 1
 ---
- android/hal_bt_sock.c | 2 ++
- 1 file changed, 2 insertions(+)
+ Makefile.android | 28 +++++++++++++++++++++++++++-
+ 1 file changed, 27 insertions(+), 1 deletion(-)
 
-diff --git a/android/hal_bt_sock.c b/android/hal_bt_sock.c
-index 397d1fa..3fcf9ec 100644
---- a/android/hal_bt_sock.c
-+++ b/android/hal_bt_sock.c
-@@ -27,6 +27,8 @@
- #include "android_compat.h"
- #endif
+diff --git a/Makefile.android b/Makefile.android
+index 5abfeaa..da3b699 100644
+--- a/Makefile.android
++++ b/Makefile.android
+@@ -39,7 +39,33 @@ android_haltest_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
  
-+#include "hal.h"
+ endif
+ 
+-EXTRA_DIST += android/Android.mk android/log.c
++EXTRA_DIST += android/Android.mk android/log.c android/device.c \
++		android/adapter.c android/main.c android/hal-msg.h \
++		android/hal.h
 +
- static bt_status_t btsock_listen_rfcomm(const char *service_name,
- 					const uint8_t *uuid, int chan,
- 					int *sock, int flags)
++EXTRA_DIST += android/hal_bt_sock.c android/hal_bluetooth.c
++
++EXTRA_DIST += android/client/terminal.c \
++		android/client/haltest.c \
++		android/client/hwmodule.c \
++		android/client/pollhandler.c \
++		android/client/history.c \
++		android/client/if-bt.c \
++		android/client/textconv.c \
++		android/client/textconv.h \
++		android/client/if-main.h \
++		android/client/pollhandler.h \
++		android/client/history.h \
++		android/client/terminal.h \
++		android/android_compat.h
++
++EXTRA_DIST += android/hardware/bt_gatt_client.h android/hardware/bt_hl.h \
++		android/hardware/bt_hh.h android/hardware/bt_av.h \
++		android/hardware/bluetooth.h android/hardware/bt_rc.h \
++		android/hardware/hardware.h android/hardware/bt_gatt_types.h \
++		android/hardware/bt_hf.h android/hardware/bt_gatt_server.h \
++		android/hardware/bt_pan.h android/hardware/bt_gatt.h \
++		android/hardware/bt_sock.h
+ 
+ EXTRA_DIST += android/hal-ipc-api.txt
+ 
 -- 
 1.8.4
 
