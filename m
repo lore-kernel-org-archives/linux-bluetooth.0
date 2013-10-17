@@ -1,75 +1,271 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [RFC 11/15] Bluetooth: Temporarily stop background scanning on connection
+Subject: Re: [RFC 08/15] Bluetooth: Add support for BT_AUTO_CONN_ALWAYS
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1381965485-9159-12-git-send-email-andre.guedes@openbossa.org>
-Date: Thu, 17 Oct 2013 11:43:32 +0200
+In-Reply-To: <1381965485-9159-9-git-send-email-andre.guedes@openbossa.org>
+Date: Thu, 17 Oct 2013 11:40:19 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <A1459AED-62FA-4042-B021-7A3157823952@holtmann.org>
-References: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org> <1381965485-9159-12-git-send-email-andre.guedes@openbossa.org>
+Message-Id: <5BA09A09-B70B-40E9-843C-C6E3EC7205FB@holtmann.org>
+References: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org> <1381965485-9159-9-git-send-email-andre.guedes@openbossa.org>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-> Some LE controllers don't support scanning and initiating a connection
-> at the same time. So, for those controllers, we should temporarily
-> stop the background scanning and start it again once the connection
-> attempt is finished (successfully or not).
+> This patch adds support for the BT_AUTO_CONN_ALWAYS option which
+> configures the kernel to autonomously establish a connection to
+> certain device. This option configures the kernel to always
+> establish the connection, no matter the reason the connection was
+> terminated.
 > 
-> So this patch introduces the hci_check_background_scan() which checks
-> if the background scanning should be started.
+> This feature is required by some LE profiles such as HID over GATT,
+> Health Termomether and Blood Pressure. These profiles require the
+> host autonomously connect to the device as soon as it enters in
+> connectable mode (start advertising) so the device is able to
+> delivery a notification or indication.
+> 
+> The auto connection procedure the BT_AUTO_CONN_ALWAYS option implements
+> is summarized as follows: when a new device configured with BT_AUTO_
+> CONN_ALWAYS is added to the connection parameter list, the background
+> scan is triggered. Once the target device is found in range, the kernel
+> creates a connection to the device. If the connection is established
+> successfully, the background scan is untriggered. If the target device
+> disconnects, the background scan is triggered again and the whole auto
+> connect procedure starts again.
 > 
 > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
-> include/net/bluetooth/hci_core.h |  1 +
-> net/bluetooth/hci_conn.c         | 25 +++++++++++++++++++++++++
-> net/bluetooth/hci_core.c         | 18 ++++++++++++++++++
-> net/bluetooth/hci_event.c        |  6 ++++++
-> 4 files changed, 50 insertions(+)
+> include/net/bluetooth/hci_core.h |  4 ++
+> net/bluetooth/hci_core.c         | 92 ++++++++++++++++++++++++++++++++++++++++
+> net/bluetooth/hci_event.c        | 36 ++++++++++++++++
+> 3 files changed, 132 insertions(+)
 > 
 > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index db39eca..017decc 100644
+> index cb6458a..db39eca 100644
 > --- a/include/net/bluetooth/hci_core.h
 > +++ b/include/net/bluetooth/hci_core.h
-> @@ -1201,5 +1201,6 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
+> @@ -383,6 +383,7 @@ struct hci_conn_param {
+> 	u8 addr_type;
 > 
-> int hci_trigger_background_scan(struct hci_dev *hdev);
-> int hci_untrigger_background_scan(struct hci_dev *hdev);
-> +void hci_check_background_scan(struct hci_dev *hdev);
+> 	u8 auto_connect;
+> +	bool bg_scan_triggered;
 > 
-> #endif /* __HCI_CORE_H */
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index d64000e..6ae42c2 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -541,6 +541,18 @@ static void create_le_conn_complete(struct hci_dev *hdev, u8 status)
+> 	u16 min_conn_interval;
+> 	u16 max_conn_interval;
+> @@ -765,6 +766,9 @@ int hci_add_conn_param(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
+> 		       u16 max_conn_interval);
+> void hci_remove_conn_param(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
 > 
-> done:
-> 	hci_dev_unlock(hdev);
+> +void hci_auto_connect_check(struct hci_dev *hdev, bdaddr_t *addr,
+> +			    u8 addr_type);
 > +
-> +	/* Check the background scanning since it may have been temporarily
-> +	 * stopped if the controller doesn't support scanning and initiate
-> +	 * state combination.
-> +	 */
-> +	hci_check_background_scan(hdev);
-> +}
-
-so what I would do first is assume the controller can not scan while being in initiating state or being connected. Make the dead simple only a single connection at a time work perfectly. Get the basic infrastructure in place.
-
-> +
-> +/* Check if controller supports scanning and initiating states combination */
-> +static bool is_state_combination_supported(struct hci_dev *hdev)
-> +{
-> +        return (hdev->le_states[2] & BIT(6)) ? true : false;
+> int hci_uuids_clear(struct hci_dev *hdev);
+> 
+> int hci_link_keys_clear(struct hci_dev *hdev);
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index c3e47e9..f232965 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -2200,6 +2200,24 @@ struct hci_conn_param *hci_find_conn_param(struct hci_dev *hdev,
+> 	return NULL;
 > }
 > 
+> +static bool is_connected(struct hci_dev *hdev, bdaddr_t *addr, u8 type)
+> +{
+> +	struct hci_conn *conn;
+> +
+> +	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, addr);
+> +
+> +	if (!conn)
+> +		return false;
+> +
+> +	if (conn->dst_type != type)
+> +		return false;
+> +
+> +	if (conn->state != BT_CONNECTED)
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+> int hci_add_conn_param(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
+> 		       u8 auto_connect, u16 min_conn_interval,
+> 		       u16 max_conn_interval)
+> @@ -2221,12 +2239,29 @@ int hci_add_conn_param(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
+> 	bacpy(&param->addr, addr);
+> 	param->addr_type = addr_type;
+> 	param->auto_connect = auto_connect;
+> +	param->bg_scan_triggered = false;
+> 	param->min_conn_interval = min_conn_interval;
+> 	param->max_conn_interval = max_conn_interval;
+> 
+> 	hci_dev_lock(hdev);
+> 	list_add_rcu(&param->list, &hdev->conn_param);
+> 	hci_dev_unlock(hdev);
+> +
+> +	/* If it is configured to always automatically connect and we are not
+> +	 * connected to the given device, we trigger the background scan so
+> +	 * the connection is established as soon as the device gets in range.
+> +	 */
+> +	if (auto_connect == BT_AUTO_CONN_ALWAYS &&
+> +	    !is_connected(hdev, addr, addr_type)) {
+> +		int err;
+> +
+> +		err = hci_trigger_background_scan(hdev);
+> +		if (err)
+> +			return err;
+> +
+> +		param->bg_scan_triggered = true;
+> +	}
 
-Worst function name ever. Also this should use !!(hdev->le_states & x) style.
+and this will get complicated very quickly. You have the counter for number of triggers and now you also store locally if someone triggered.
 
-Also we need this more generic anyway. So get the simple part working for dumb controllers and we deal with the rest when that part works.
+> +
+> 	return 0;
+> }
+> 
+> @@ -2251,6 +2286,17 @@ void hci_remove_conn_param(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
+> 	if (!param)
+> 		return;
+> 
+> +	if (param->bg_scan_triggered) {
+> +		int err;
+> +
+> +		err = hci_untrigger_background_scan(hdev);
+> +		if (err)
+> +			BT_ERR("Failed to untrigger background scanning: %d",
+> +			       err);
+> +
+> +		param->bg_scan_triggered = false;
+> +	}
+> +
+> 	hci_dev_lock(hdev);
+> 	__remove_conn_param(param);
+> 	hci_dev_unlock(hdev);
+> @@ -2271,6 +2317,52 @@ static void __clear_conn_param(struct hci_dev *hdev)
+> 		__remove_conn_param(param);
+> }
+> 
+> +void hci_auto_connect_check(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
+> +{
+> +	struct hci_conn_param *param;
+> +	struct hci_conn *conn;
+> +	u8 bdaddr_type;
+> +
+> +	/* If there is no background scan trigger, it means the auto connection
+> +	 * procedure is not runninng.
+> +	 */
+> +	if (atomic_read(&hdev->background_scan_cnt) == 0)
+> +		return;
+> +
+> +	param = hci_find_conn_param(hdev, addr, addr_type);
+> +	if (!param)
+> +		return;
+> +
+> +	if (!param->bg_scan_triggered)
+> +		goto done;
+> +
+> +	if (addr_type == ADDR_LE_DEV_PUBLIC)
+> +		bdaddr_type = BDADDR_LE_PUBLIC;
+> +	else
+> +		bdaddr_type = BDADDR_LE_RANDOM;
+> +
+> +	conn = hci_connect(hdev, LE_LINK, addr, bdaddr_type, BT_SECURITY_LOW,
+> +			   HCI_AT_NO_BONDING);
+> +	if (IS_ERR(conn)) {
+> +		switch(PTR_ERR(conn)) {
+> +		case -EBUSY:
+> +			/* When hci_connect() returns EBUSY it means there is
+> +			 * already an LE connection attempt going on. Since the
+> +			 * controller supports only one connection attempt at
+> +			 * the time, we simply return.
+> +			 */
+> +			goto done;
+> +		default:
+> +			BT_ERR("Failed to auto connect: err %ld",
+> +			       PTR_ERR(conn));
+> +			goto done;
+> +		}
+> +	}
+> +
+> +done:
+> +	hci_conn_param_put(param);
+> +}
+> +
+> static void inquiry_complete(struct hci_dev *hdev, u8 status)
+> {
+> 	if (status) {
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index edb2342..b34ff1d 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -1782,6 +1782,7 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> 	struct hci_ev_disconn_complete *ev = (void *) skb->data;
+> 	struct hci_conn *conn;
+> 	u8 type;
+> +	struct hci_conn_param *param;
+> 	bool send_mgmt_event = false;
+> 
+> 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
+> @@ -1815,6 +1816,22 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> 	if (conn->type == ACL_LINK && conn->flush_key)
+> 		hci_remove_link_key(hdev, &conn->dst);
+> 
+> +	/* Trigger the background scan if auto connection is required for this
+> +	 * device.
+> +	 */
+> +	param = hci_find_conn_param(hdev, &conn->dst, conn->dst_type);
+> +	if (param && param->auto_connect == BT_AUTO_CONN_ALWAYS) {
+> +		int err;
+> +
+> +		err = hci_trigger_background_scan(hdev);
+> +		if (err)
+> +			BT_ERR("Failed to trigger background "
+> +					"scanning: %d", err);
+> +
+> +		param->bg_scan_triggered = true;
+> +		hci_conn_param_put(param);
+> +	}
+> +
+> 	type = conn->type;
+> 	hci_proto_disconn_cfm(conn, ev->reason);
+> 	hci_conn_del(conn);
+> @@ -3493,6 +3510,7 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> {
+> 	struct hci_ev_le_conn_complete *ev = (void *) skb->data;
+> 	struct hci_conn *conn;
+> +	struct hci_conn_param *param;
+> 
+> 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
+> 
+> @@ -3546,6 +3564,22 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> 
+> 	hci_proto_connect_cfm(conn, ev->status);
+> 
+> +	/* Since the connection has been established successfully, we should
+> +	 * untrigger the background scan if this is an auto connect device.
+> +	 */
+> +	param = hci_find_conn_param(hdev, &ev->bdaddr, ev->bdaddr_type);
+> +	if (param && param->bg_scan_triggered) {
+> +		int err;
+> +
+> +		err = hci_untrigger_background_scan(hdev);
+> +		if (err)
+> +			BT_ERR("Failed to untrigger background "
+> +					"scanning: %d", err);
+> +
+> +		param->bg_scan_triggered = false;
+> +		hci_conn_param_put(param);
+> +	}
+> +
+
+The worst part here is actually that you make this part of the connection parameters, but the value is really only needed during the lifetime of a hci_conn. It is mainly, do we need to keep scanning after this connection has been established aka do we have more devices in the list or not.
+
+If all connections including connnect() would go through the background scan handling then this would not even be needed since everything would be in a central place.
+
+That is why I am saying, first convert connect() into a connect once passive scanning consumer that uses the auto-connection handling.
 
 Regards
 
