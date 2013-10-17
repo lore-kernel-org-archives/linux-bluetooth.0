@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@gmail.com>
-Subject: [RFC 4/8] android: Fix build of HAL library on Linux
-Date: Thu, 17 Oct 2013 10:47:05 +0200
-Message-ID: <1381999629-9589-5-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC 3/8] android: Fix haltest build on Linux
+Date: Thu, 17 Oct 2013 10:47:04 +0200
+Message-ID: <1381999629-9589-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1381999629-9589-1-git-send-email-szymon.janc@tieto.com>
 References: <1381999629-9589-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -14,21 +14,33 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Szymon Janc <szymon.janc@gmail.com>
 
-Use compat header for stubbing Android specific features not needed
-on Linux.
+On Linux HAL library is build into haltest binary and can be access
+directly. Provide simple implementation of hw_get_module() that does
+it.
 ---
- android/android_compat.h | 33 +++++++++++++++++++++++++++++++++
- android/hal_bluetooth.c  |  4 ++++
- android/hal_bt_sock.c    |  4 ++++
- 3 files changed, 41 insertions(+)
- create mode 100644 android/android_compat.h
+ Makefile.android          |  1 +
+ android/client/hwmodule.c | 27 +++++++++++++++++++++++++++
+ 2 files changed, 28 insertions(+)
+ create mode 100644 android/client/hwmodule.c
 
-diff --git a/android/android_compat.h b/android/android_compat.h
+diff --git a/Makefile.android b/Makefile.android
+index e4482b2..5abfeaa 100644
+--- a/Makefile.android
++++ b/Makefile.android
+@@ -19,6 +19,7 @@ android_haltest_SOURCES =	android/client/haltest.c \
+ 				android/client/history.c \
+ 				android/client/textconv.c \
+ 				android/client/if-bt.c \
++				android/client/hwmodule.c \
+ 				android/hal_bluetooth.c \
+ 				android/hal_bt_sock.c \
+ 				android/hardware/bt_hf.h \
+diff --git a/android/client/hwmodule.c b/android/client/hwmodule.c
 new file mode 100644
-index 0000000..dfe0a0e
+index 0000000..be3a57b
 --- /dev/null
-+++ b/android/android_compat.h
-@@ -0,0 +1,33 @@
++++ b/android/client/hwmodule.c
+@@ -0,0 +1,27 @@
 +/*
 + * Copyright (C) 2013 Intel Corporation
 + *
@@ -46,59 +58,16 @@ index 0000000..dfe0a0e
 + *
 + */
 +
-+#define ALOGD(...)
-+#define ALOGI(...)
-+#define ALOGE(...)
++#include "hardware/hardware.h"
 +
-+#define PROPERTY_VALUE_MAX 64
-+
-+static inline int property_get(const char *key, char *value,
-+						const char *default_value)
++int hw_get_module(const char *id, const struct hw_module_t **module)
 +{
++	extern struct hw_module_t HAL_MODULE_INFO_SYM;
++
++	*module = &HAL_MODULE_INFO_SYM;
++
 +	return 0;
 +}
-+
-+static inline int property_set(const char *key, const char *value)
-+{
-+	return 0;
-+}
-diff --git a/android/hal_bluetooth.c b/android/hal_bluetooth.c
-index 9bb9dcf..a34dc91 100644
---- a/android/hal_bluetooth.c
-+++ b/android/hal_bluetooth.c
-@@ -23,11 +23,15 @@
- #include <hardware/bluetooth.h>
- #include <hardware/bt_sock.h>
- 
-+#ifdef __BIONIC__
- #include <cutils/sockets.h>
- #include <cutils/properties.h>
- 
- #define LOG_TAG "BlueZ"
- #include <cutils/log.h>
-+#else
-+#include "android_compat.h"
-+#endif
- 
- #include "hal.h"
- 
-diff --git a/android/hal_bt_sock.c b/android/hal_bt_sock.c
-index 3a6d173..397d1fa 100644
---- a/android/hal_bt_sock.c
-+++ b/android/hal_bt_sock.c
-@@ -20,8 +20,12 @@
- #include <hardware/bluetooth.h>
- #include <hardware/bt_sock.h>
- 
-+#ifdef __BIONIC__
- #define LOG_TAG "BlueZ"
- #include <cutils/log.h>
-+#else
-+#include "android_compat.h"
-+#endif
- 
- static bt_status_t btsock_listen_rfcomm(const char *service_name,
- 					const uint8_t *uuid, int chan,
 -- 
 1.8.4
 
