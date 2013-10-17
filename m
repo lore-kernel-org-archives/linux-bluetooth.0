@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 8/9] android: Fix build error when compiling with autotools
-Date: Thu, 17 Oct 2013 11:55:27 +0300
-Message-Id: <1382000128-23762-9-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC 4/9] android: Add cutils/log.h
+Date: Thu, 17 Oct 2013 11:55:23 +0300
+Message-Id: <1382000128-23762-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1382000128-23762-1-git-send-email-luiz.dentz@gmail.com>
 References: <1382000128-23762-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,25 +11,51 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-android/hal_bt_sock.c:82:21: error: no previous declaration for 'bt_get_sock_interface' [-Werror=missing-declarations]
- btsock_interface_t *bt_get_sock_interface(void)
 ---
- android/hal_bt_sock.c | 2 ++
- 1 file changed, 2 insertions(+)
+ android/cutils/log.h | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
+ create mode 100644 android/cutils/log.h
 
-diff --git a/android/hal_bt_sock.c b/android/hal_bt_sock.c
-index 318c9c9..2a59e7e 100644
---- a/android/hal_bt_sock.c
-+++ b/android/hal_bt_sock.c
-@@ -23,6 +23,8 @@
- #define LOG_TAG "BlueZ"
- #include <cutils/log.h>
- 
-+#include "hal.h"
+diff --git a/android/cutils/log.h b/android/cutils/log.h
+new file mode 100644
+index 0000000..ecdc585
+--- /dev/null
++++ b/android/cutils/log.h
+@@ -0,0 +1,34 @@
++/*
++ * Copyright (C) 2007 The Android Open Source Project
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
 +
- static bt_status_t btsock_listen_rfcomm(const char *service_name,
- 					const uint8_t *uuid, int chan,
- 					int *sock, int flags)
++/**
++ * This is a temporary hack to enable logging from cutils.
++ */
++
++#ifndef _CUTILS_LOG_H
++#define _CUTILS_LOG_H
++
++#include <stdio.h>
++#define ALOG(level, ...) \
++        ((void)printf("cutils:" level "/" LOG_TAG ": " __VA_ARGS__))
++#define ALOGV(...)   ALOG("V", __VA_ARGS__)
++#define ALOGD(...)   ALOG("D", __VA_ARGS__)
++#define ALOGI(...)   ALOG("I", __VA_ARGS__)
++#define ALOGW(...)   ALOG("W", __VA_ARGS__)
++#define ALOGE(...)   ALOG("E", __VA_ARGS__)
++#define LOG_ALWAYS_FATAL(...)   do { ALOGE(__VA_ARGS__); exit(1); } while (0)
++
++#endif // _CUTILS_LOG_H
 -- 
 1.8.3.1
 
