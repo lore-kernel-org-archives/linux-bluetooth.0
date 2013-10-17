@@ -1,55 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix ATT socket backwards compatibility with user space
-Date: Thu, 17 Oct 2013 22:16:26 +0300
-Message-Id: <1382037386-17396-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH] Bluetooth: Expose current voice setting in debugfs
+Date: Thu, 17 Oct 2013 12:02:31 -0700
+Message-Id: <1382036551-54592-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+For easier debugging of the current voice setting, expose the value
+in debugfs if the controller is BR/EDR capable.
 
-Old user space versions bind the Attribute Protocol socket to
-BDADDR_BREDR when they should be using BDADDR_LE_PUBLIC or
-BDADDR_LE_RANDOM. The kernel recently introduced stricter checks on the
-socket parameters but we need to punch this hole to them to ensure that
-old user space versions keep working.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_sock.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_core.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 34e5a58..a43aead 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -159,8 +159,23 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
- 	if (!bdaddr_type_is_valid(la.l2_bdaddr_type))
- 		return -EINVAL;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 3c1014c..b7c4ada 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -93,6 +93,20 @@ static const struct file_operations inquiry_cache_fops = {
+ 	.release	= single_release,
+ };
  
--	if (chan->src_type == BDADDR_BREDR && la.l2_bdaddr_type != BDADDR_BREDR)
--		return -EINVAL;
-+	if (chan->src_type == BDADDR_BREDR &&
-+	    la.l2_bdaddr_type != BDADDR_BREDR) {
-+		if (!bdaddr_type_is_le(la.l2_bdaddr_type))
-+			return -EINVAL;
++static int voice_setting_get(void *data, u64 *val)
++{
++	struct hci_dev *hdev = data;
 +
-+		/* Old user space versions will try to bind the ATT
-+		 * socket using BDADDR_BREDR, so we have to allow this
-+		 * to pass and fix chan->src_type to the correct value.
-+		 */
-+		if (la.l2_cid != __constant_cpu_to_le16(L2CAP_CID_ATT))
-+			return -EINVAL;
++	hci_dev_lock(hdev);
++	*val = hdev->voice_setting;
++	hci_dev_unlock(hdev);
 +
-+		if (chan->scid != L2CAP_CID_ATT)
-+			return -EINVAL;
++	return 0;
++}
 +
-+		chan->src_type = BDADDR_LE_PUBLIC;
-+	}
++DEFINE_SIMPLE_ATTRIBUTE(voice_setting_fops, voice_setting_get,
++			NULL, "0x%4.4llx\n");
++
+ static int auto_accept_delay_set(void *data, u64 val)
+ {
+ 	struct hci_dev *hdev = data;
+@@ -833,6 +847,8 @@ static int __hci_init(struct hci_dev *hdev)
+ 	if (lmp_bredr_capable(hdev)) {
+ 		debugfs_create_file("inquiry_cache", 0444, hdev->debugfs,
+ 				    hdev, &inquiry_cache_fops);
++		debugfs_create_file("voice_setting", 0444, hdev->debugfs,
++				    hdev, &voice_setting_fops);
+ 	}
  
- 	if (chan->src_type != BDADDR_BREDR && la.l2_bdaddr_type == BDADDR_BREDR)
- 		return -EINVAL;
+ 	if (lmp_ssp_capable(hdev))
 -- 
 1.8.3.1
 
