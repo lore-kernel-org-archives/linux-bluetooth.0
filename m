@@ -1,58 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Expose setting if debug keys are used or not
-Date: Fri, 18 Oct 2013 17:14:22 -0700
-Message-Id: <1382141662-6799-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 2/2] Bluetooth: Expose debugfs entry read/write own address type
+Date: Fri, 18 Oct 2013 16:38:10 -0700
+Message-Id: <1382139490-306-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The system can be figured to accept and use debug keys. Expose this
-value in debugfs for debugging purposes.
+For some testing it is important to know the current own addres type,
+but also be able to change it. The change is lost over powery cycles
+and only intended for debugging.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_core.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ net/bluetooth/hci_core.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index d47c8ec..94d5342 100644
+index c130a23..d47c8ec 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -215,6 +215,24 @@ static const struct file_operations link_keys_fops = {
+@@ -385,6 +385,34 @@ static const struct file_operations static_address_fops = {
  	.release	= single_release,
  };
  
-+static ssize_t use_debug_keys_read(struct file *file, char __user *user_buf,
-+				   size_t count, loff_t *ppos)
++static int own_address_type_set(void *data, u64 val)
 +{
-+	struct hci_dev *hdev = file->private_data;
-+	char buf[3];
++	struct hci_dev *hdev = data;
 +
-+	buf[0] = test_bit(HCI_DEBUG_KEYS, &hdev->dev_flags) ? 'Y': 'N';
-+	buf[1] = '\n';
-+	buf[2] = '\0';
-+	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
++	if (val != 0 && val != 1)
++		return -EINVAL;
++
++	hci_dev_lock(hdev);
++	hdev->own_addr_type = val;
++	hci_dev_unlock(hdev);
++
++	return 0;
 +}
 +
-+static const struct file_operations use_debug_keys_fops = {
-+	.open		= simple_open,
-+	.read		= use_debug_keys_read,
-+	.llseek		= default_llseek,
-+};
++static int own_address_type_get(void *data, u64 *val)
++{
++	struct hci_dev *hdev = data;
 +
- static int dev_class_show(struct seq_file *f, void *ptr)
++	hci_dev_lock(hdev);
++	*val = hdev->own_addr_type;
++	hci_dev_unlock(hdev);
++
++	return 0;
++}
++
++DEFINE_SIMPLE_ATTRIBUTE(own_address_type_fops, own_address_type_get,
++			own_address_type_set, "%llu\n");
++
+ static int long_term_keys_show(struct seq_file *f, void *ptr)
  {
  	struct hci_dev *hdev = f->private;
-@@ -1166,6 +1184,8 @@ static int __hci_init(struct hci_dev *hdev)
- 				    hdev, &inquiry_cache_fops);
- 		debugfs_create_file("link_keys", 0400, hdev->debugfs,
- 				    hdev, &link_keys_fops);
-+		debugfs_create_file("use_debug_keys", 0444, hdev->debugfs,
-+				    hdev, &use_debug_keys_fops);
- 		debugfs_create_file("dev_class", 0444, hdev->debugfs,
- 				    hdev, &dev_class_fops);
- 		debugfs_create_file("voice_setting", 0444, hdev->debugfs,
+@@ -1162,6 +1190,8 @@ static int __hci_init(struct hci_dev *hdev)
+ 				  &hdev->le_white_list_size);
+ 		debugfs_create_file("static_address", 0444, hdev->debugfs,
+ 				   hdev, &static_address_fops);
++		debugfs_create_file("own_address_type", 0644, hdev->debugfs,
++				    hdev, &own_address_type_fops);
+ 		debugfs_create_file("long_term_keys", 0400, hdev->debugfs,
+ 				    hdev, &long_term_keys_fops);
+ 	}
 -- 
 1.8.3.1
 
