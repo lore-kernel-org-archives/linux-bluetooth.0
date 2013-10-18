@@ -1,41 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 0/5] Initial Android IPC
-Date: Sat, 19 Oct 2013 01:01:37 +0200
-Message-Id: <1382137302-17237-1-git-send-email-szymon.janc@gmail.com>
+Subject: [PATCH] Bluetooth: Expose current list of long term keys via debugfs
+Date: Fri, 18 Oct 2013 15:56:57 -0700
+Message-Id: <1382137017-56186-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+For debugging purposes expose the current list of long term keys
+via debugfs. This file is read-only and limited to root access.
 
-This adds initial code for Android IPC
-- only connection establishment
-- connecting ipc from daemon to HAL after adapter is initialized
-- daemon track HAL lib lifetime and shutdown if socket is closed
-- HAL library starts daemon (via android init) and wait for it to
-  connect
-- HAL library is *not* yet tracking lifetime of daemon
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_core.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 8710d1f..6b1844f 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -385,6 +385,36 @@ static const struct file_operations static_address_fops = {
+ 	.release	= single_release,
+ };
+ 
++static int long_term_keys_show(struct seq_file *f, void *ptr)
++{
++	struct hci_dev *hdev = f->private;
++	struct list_head *p, *n;
++
++	hci_dev_lock(hdev);
++	list_for_each_safe(p, n, &hdev->link_keys) {
++		struct smp_ltk *ltk = list_entry(p, struct smp_ltk, list);
++		seq_printf(f, "%pMR (type %u) %u %u %u %.4x %*phN %*phN\\n",
++			   &ltk->bdaddr, ltk->bdaddr_type, ltk->authenticated,
++			   ltk->type, ltk->enc_size, __le16_to_cpu(ltk->ediv),
++			   8, ltk->rand, 16, ltk->val);
++	}
++	hci_dev_unlock(hdev);
++
++	return 0;
++}
++
++static int long_term_keys_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, long_term_keys_show, inode->i_private);
++}
++
++static const struct file_operations long_term_keys_fops = {
++	.open		= long_term_keys_open,
++	.read		= seq_read,
++	.llseek		= seq_lseek,
++	.release	= single_release,
++};
++
+ /* ---- HCI requests ---- */
+ 
+ static void hci_req_sync_complete(struct hci_dev *hdev, u8 result)
+@@ -1121,6 +1151,8 @@ static int __hci_init(struct hci_dev *hdev)
+ 				  &hdev->le_white_list_size);
+ 		debugfs_create_file("static_address", 0444, hdev->debugfs,
+ 				   hdev, &static_address_fops);
++		debugfs_create_file("long_term_keys", 0400, hdev->debugfs,
++				    hdev, &long_term_keys_fops);
+ 	}
+ 
+ 	return 0;
 -- 
-BR
-Szymon Janc
-
-Szymon Janc (5):
-  android: Fix cutils/log.h stubs
-  android: Define path for HAL communication socket
-  android: Connect daemon to HAL library
-  android: Make HAL library wait for daemon to connect on init
-  android: Remove not needed property_get function form cutils stubs
-
- android/cutils/log.h        |  12 ++--
- android/cutils/properties.h |  27 ---------
- android/hal-bluetooth.c     | 127 ++++++++++++++++++++++++++++++++++--------
- android/hal-msg.h           |   2 +
- android/main.c              | 133 ++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 246 insertions(+), 55 deletions(-)
-
--- 
-1.8.4.rc3
+1.8.3.1
 
