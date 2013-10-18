@@ -1,107 +1,203 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Select the own address type during initial setup phase
-Date: Fri, 18 Oct 2013 16:38:09 -0700
-Message-Id: <1382139490-306-1-git-send-email-marcel@holtmann.org>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 4/5] android: Make HAL library wait for daemon to connect on init
+Date: Sat, 19 Oct 2013 01:01:41 +0200
+Message-Id: <1382137302-17237-5-git-send-email-szymon.janc@gmail.com>
+In-Reply-To: <1382137302-17237-1-git-send-email-szymon.janc@gmail.com>
+References: <1382137302-17237-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The own address type is based on the fact if the controller has
-a public address or not. This means that this detail can be just
-configured once during setup phase.
+From: Szymon Janc <szymon.janc@tieto.com>
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+After starting up, daemon is responsible for connecting to HAL library.
+If this doesn't happen before timeout occured init will fail.
 ---
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_conn.c         |  7 +------
- net/bluetooth/hci_core.c         | 13 ++++++++++++-
- net/bluetooth/mgmt.c             | 10 ++--------
- 4 files changed, 16 insertions(+), 15 deletions(-)
+ android/hal-bluetooth.c | 127 +++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 104 insertions(+), 23 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 9b5db01..0daac39 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -142,6 +142,7 @@ struct hci_dev {
- 	__u8		dev_type;
- 	bdaddr_t	bdaddr;
- 	bdaddr_t	static_addr;
-+	__u8		own_addr_type;
- 	__u8		dev_name[HCI_MAX_NAME_LENGTH];
- 	__u8		short_name[HCI_MAX_SHORT_NAME_LENGTH];
- 	__u8		eir[HCI_MAX_EIR_LENGTH];
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 4e72650..974d7bc 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -615,12 +615,7 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 	else
- 		conn->dst_type = ADDR_LE_DEV_RANDOM;
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index 2c6c2eb..c91bc98 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -19,6 +19,10 @@
+ #include <stdlib.h>
+ #include <unistd.h>
+ #include <stdbool.h>
++#include <errno.h>
++#include <sys/socket.h>
++#include <sys/un.h>
++#include <poll.h>
  
--	if (bacmp(&conn->src, BDADDR_ANY)) {
--		conn->src_type = ADDR_LE_DEV_PUBLIC;
--	} else {
--		bacpy(&conn->src, &hdev->static_addr);
--		conn->src_type = ADDR_LE_DEV_RANDOM;
--	}
-+	conn->src_type = hdev->own_addr_type;
+ #include <hardware/bluetooth.h>
+ #include <hardware/bt_sock.h>
+@@ -31,41 +35,119 @@
+ #include <cutils/log.h>
  
- 	conn->state = BT_CONNECT;
- 	conn->out = true;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 6b1844f..c130a23 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1053,8 +1053,19 @@ static void hci_init3_req(struct hci_request *req, unsigned long opt)
- 	if (hdev->commands[5] & 0x10)
- 		hci_setup_link_policy(req);
+ #include "hal.h"
++#include "hal-msg.h"
  
--	if (lmp_le_capable(hdev))
-+	if (lmp_le_capable(hdev)) {
-+		/* If the controller has a public BD_ADDR, then by
-+		 * default use that one. If this is a LE only
-+		 * controller without one, default to the random
-+		 * address.
-+		 */
-+		if (bacmp(&hdev->bdaddr, BDADDR_ANY))
-+			hdev->own_addr_type = ADDR_LE_DEV_PUBLIC;
-+		else
-+			hdev->own_addr_type = ADDR_LE_DEV_RANDOM;
+ #define SERVICE_NAME "bluetoothd"
++#define CONNECT_TIMEOUT (5 * 1000)
+ 
+ bt_callbacks_t *bt_hal_cbacks = NULL;
+ 
++static int cmd_sk = -1;
++static int notif_sk = -1;
 +
- 		hci_set_le_support(req);
+ static bool interface_ready(void)
+ {
+ 	return bt_hal_cbacks != NULL;
+ }
+ 
+-static bool start_bt_daemon(void)
++static int accept_connection(int sk)
+ {
+-	int tries = 40; /* wait 4 seconds for completion */
++	int err;
++	struct pollfd pfd;
++	int new_sk;
++
++	memset(&pfd, 0 , sizeof(pfd));
++	pfd.fd = sk;
++	pfd.events = POLLIN;
++
++	err = poll(&pfd, 1, CONNECT_TIMEOUT);
++	if (err < 0) {
++		err = errno;
++		ALOGE("Failed to poll: %d (%s)", err, strerror(err));
++		return -1;
 +	}
  
- 	/* Read features beyond page 1 if available */
- 	for (p = 2; p < HCI_MAX_PAGES && p <= hdev->max_page; p++) {
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a727b47..fb7fc9f 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1325,10 +1325,7 @@ static void enable_advertising(struct hci_request *req)
- 	cp.min_interval = __constant_cpu_to_le16(0x0800);
- 	cp.max_interval = __constant_cpu_to_le16(0x0800);
- 	cp.type = get_adv_type(hdev);
--	if (bacmp(&hdev->bdaddr, BDADDR_ANY))
--		cp.own_address_type = ADDR_LE_DEV_PUBLIC;
--	else
--		cp.own_address_type = ADDR_LE_DEV_RANDOM;
-+	cp.own_address_type = hdev->own_addr_type;
- 	cp.channel_map = 0x07;
+-	ALOGD(__func__);
++	if (err == 0) {
++		ALOGE("bluetoothd connect timeout");
++		return -1;
++	}
++
++	new_sk = accept(sk, NULL, NULL);
++	if (new_sk < 0) {
++		err = errno;
++		ALOGE("Failed to accept socket: %d (%s)", err, strerror(err));
++		return -1;
++	}
++
++	return new_sk;
++}
++
++static bool start_daemon(void)
++{
++	struct sockaddr_un addr;
++	int sk;
++	int err;
++
++	sk = socket(AF_LOCAL, SOCK_SEQPACKET, 0);
++	if (sk < 0) {
++		err = errno;
++		ALOGE("Failed to create socket: %d (%s)", err,
++							strerror(err));
++		return false;
++	}
++
++	memset(&addr, 0, sizeof(addr));
++	addr.sun_family = AF_UNIX;
++
++	/* Use abstract sockets so first byte needs to be \0 */
++	strcpy(addr.sun_path + 1, BLUEZ_HAL_SK_PATH);
++
++	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
++		err = errno;
++		ALOGE("Failed to bind socket: %d (%s)", err, strerror(err));
++		close(sk);
++		return false;
++	}
++
++	if (listen(sk, 2) < 0) {
++		err = errno;
++		ALOGE("Failed to listen on socket: %d (%s)", err,
++								strerror(err));
++		close(sk);
++		return false;
++	}
  
- 	hci_req_add(req, HCI_OP_LE_SET_ADV_PARAM, sizeof(cp), &cp);
-@@ -3237,10 +3234,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 		param_cp.type = LE_SCAN_ACTIVE;
- 		param_cp.interval = cpu_to_le16(DISCOV_LE_SCAN_INT);
- 		param_cp.window = cpu_to_le16(DISCOV_LE_SCAN_WIN);
--		if (bacmp(&hdev->bdaddr, BDADDR_ANY))
--			param_cp.own_address_type = ADDR_LE_DEV_PUBLIC;
--		else
--			param_cp.own_address_type = ADDR_LE_DEV_RANDOM;
-+		param_cp.own_address_type = hdev->own_addr_type;
- 		hci_req_add(&req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
- 			    &param_cp);
+ 	/* Start Android Bluetooth daemon service */
+ 	property_set("ctl.start", SERVICE_NAME);
+ 
+-	while (tries-- > 0) {
+-		char val[PROPERTY_VALUE_MAX];
+-
+-		if (property_get("init.svc." SERVICE_NAME, val, NULL)) {
+-			if (!strcmp(val, "running")) {
+-				ALOGI("Android BlueZ daemon started");
+-				return true;
+-			}
+-		} else {
+-			return false;
+-		}
++	cmd_sk = accept_connection(sk);
++	if (cmd_sk < 0) {
++		close(sk);
++		return false;
++	}
+ 
+-		usleep(100000);
++	notif_sk = accept_connection(sk);
++	if (notif_sk < 0) {
++		close(sk);
++		close(cmd_sk);
++		cmd_sk = -1;
++		return false;
+ 	}
+ 
+-	return false;
++	ALOGI("bluetoothd connected");
++
++	close(sk);
++
++	return true;
++}
++
++static void stop_daemon(void)
++{
++	close(cmd_sk);
++	cmd_sk = -1;
++
++	close(notif_sk);
++	notif_sk = 1;
+ }
+ 
+ static int init(bt_callbacks_t *callbacks)
+@@ -75,15 +157,12 @@ static int init(bt_callbacks_t *callbacks)
+ 	if (interface_ready())
+ 		return BT_STATUS_SUCCESS;
+ 
+-	if (start_bt_daemon()) {
+-		/* TODO: open channel */
++	if (!start_daemon())
++		return BT_STATUS_FAIL;
+ 
+-		bt_hal_cbacks = callbacks;
++	bt_hal_cbacks = callbacks;
+ 
+-		return BT_STATUS_SUCCESS;
+-	}
+-
+-	return BT_STATUS_UNSUPPORTED;
++	return BT_STATUS_SUCCESS;
+ }
+ 
+ static int enable(void)
+@@ -110,6 +189,8 @@ static void cleanup(void)
+ 	if (!interface_ready())
+ 		return;
+ 
++	stop_daemon();
++
+ 	bt_hal_cbacks = NULL;
+ }
  
 -- 
-1.8.3.1
+1.8.4.rc3
 
