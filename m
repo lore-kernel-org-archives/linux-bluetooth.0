@@ -1,71 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC 06/15] Bluetooth: Background scanning
+Subject: Re: [RFC 07/15] Bluetooth: Refactor hci_disconn_complete_evt
 Mime-Version: 1.0 (Apple Message framework v1283)
 Content-Type: text/plain; charset=us-ascii
 From: Andre Guedes <andre.guedes@openbossa.org>
-In-Reply-To: <CA624B73-F848-407A-B7DB-10D564049EAF@holtmann.org>
-Date: Fri, 18 Oct 2013 11:26:04 -0300
+In-Reply-To: <FDFC9B6A-260D-4A54-83B7-ACCA36DF7B42@holtmann.org>
+Date: Fri, 18 Oct 2013 11:17:57 -0300
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <92D59E31-6A7C-4D17-BC08-66DB402A9513@openbossa.org>
-References: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org> <1381965485-9159-7-git-send-email-andre.guedes@openbossa.org> <CA624B73-F848-407A-B7DB-10D564049EAF@holtmann.org>
+Message-Id: <C5B322A6-6B26-4A3B-A08B-B14A31C6ADE9@openbossa.org>
+References: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org> <1381965485-9159-8-git-send-email-andre.guedes@openbossa.org> <FDFC9B6A-260D-4A54-83B7-ACCA36DF7B42@holtmann.org>
 To: Marcel Holtmann <marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Oct 17, 2013, at 6:31 AM, Marcel Holtmann wrote:
+On Oct 17, 2013, at 6:33 AM, Marcel Holtmann wrote:
 
-> Hi Andre,
+> Hi Andrei,
 >=20
->> This patch adds helpers to trigger and untrigger the background
->> scanning. As long as the number of triggers are greater than zero,
->> we keep the background scanning running. Once the number of triggers
->> reaches zero, it is stopped.
+>> hci_disconn_complete_evt() logic is more complicated than what it
+>> should be, making it hard to follow and add new features. This patch
+>> does some code refactoring by letting the main flow of the function
+>> in first level of function scope.
 >>=20
 >> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 >> ---
->> include/net/bluetooth/hci_core.h |  7 ++++
->> net/bluetooth/hci_core.c         | 83 =
-++++++++++++++++++++++++++++++++++++++++
->> 2 files changed, 90 insertions(+)
->>=20
->> diff --git a/include/net/bluetooth/hci_core.h =
-b/include/net/bluetooth/hci_core.h
->> index 1e67da5..cb6458a 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -288,6 +288,10 @@ struct hci_dev {
->> 	__u8			scan_rsp_data[HCI_MAX_AD_LENGTH];
->> 	__u8			scan_rsp_data_len;
->>=20
->> +	/* This counter tracks the number of background scanning =
-triggers
->> +	 */
->> +	atomic_t		background_scan_cnt;
->> +
->> 	int (*open)(struct hci_dev *hdev);
->> 	int (*close)(struct hci_dev *hdev);
->> 	int (*flush)(struct hci_dev *hdev);
->> @@ -1191,4 +1195,7 @@ void hci_le_start_enc(struct hci_conn *conn, =
-__le16 ediv, __u8 rand[8],
->> #define SCO_AIRMODE_CVSD       0x0000
->> #define SCO_AIRMODE_TRANSP     0x0003
->>=20
->> +int hci_trigger_background_scan(struct hci_dev *hdev);
->> +int hci_untrigger_background_scan(struct hci_dev *hdev);
->> +
+>> net/bluetooth/hci_event.c | 62 =
++++++++++++++++++++++++++----------------------
+>> 1 file changed, 33 insertions(+), 29 deletions(-)
 >=20
-> instead of plastering the code with all these places it might be =
-better to create a connection parameter hash that actually knows if it =
-has any connection parameters stored that need require a passive scan =
-now.
->=20
-> So instead of trigger and intriguer, the code that adds or removes the =
-actual data from our hash can be the trigger itself. Since it knows =
-better. And checking after disconnection or other cases becomes a lot =
-simpler since you just check the hash if you should be connecting.
+> why this is patch 7/15 is beyond me. These things should go first and =
+with a clear commit message why they are are needed. Since if that is =
+clear and easily to review, then you do not have to re-base them all the =
+time.
 
-I'll follow this approach in v2.
+I'll move this patch to the beginning of v2 patch set.
+
+>=20
+>>=20
+>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>> index 6c3b193..edb2342 100644
+>> --- a/net/bluetooth/hci_event.c
+>> +++ b/net/bluetooth/hci_event.c
+>> @@ -1781,6 +1781,8 @@ static void hci_disconn_complete_evt(struct =
+hci_dev *hdev, struct sk_buff *skb)
+>> {
+>> 	struct hci_ev_disconn_complete *ev =3D (void *) skb->data;
+>> 	struct hci_conn *conn;
+>> +	u8 type;
+>> +	bool send_mgmt_event =3D false;
+>>=20
+>> 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
+>>=20
+>> @@ -1790,44 +1792,46 @@ static void hci_disconn_complete_evt(struct =
+hci_dev *hdev, struct sk_buff *skb)
+>> 	if (!conn)
+>> 		goto unlock;
+>>=20
+>> -	if (ev->status =3D=3D 0)
+>> -		conn->state =3D BT_CLOSED;
+>> -
+>> 	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags) &&
+>> -	    (conn->type =3D=3D ACL_LINK || conn->type =3D=3D LE_LINK)) {
+>> -		if (ev->status) {
+>> +	    (conn->type =3D=3D ACL_LINK || conn->type =3D=3D LE_LINK))
+>> +		send_mgmt_event =3D true;
+>> +
+>> +	if (ev->status) {
+>> +		if (send_mgmt_event)
+>> 			mgmt_disconnect_failed(hdev, &conn->dst, =
+conn->type,
+>> 					       conn->dst_type, =
+ev->status);
+>> -		} else {
+>> -			u8 reason =3D hci_to_mgmt_reason(ev->reason);
+>> -
+>> -			mgmt_device_disconnected(hdev, &conn->dst, =
+conn->type,
+>> -						 conn->dst_type, =
+reason);
+>> -		}
+>> +		return;
+>> 	}
+>=20
+> Unfortunately this diff is hard to read. So you need to explain to me =
+in plain English why we are doing this and how it is the same.
+
+Yeah, diff is not good. I'll be more verbose on next version.
 
 Regards,
 
