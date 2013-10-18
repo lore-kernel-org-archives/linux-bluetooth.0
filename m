@@ -1,88 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 7/8] Bluetooth: Move device_add handling into hci_register_dev
-Date: Thu, 17 Oct 2013 17:24:19 -0700
-Message-Id: <1382055860-12572-7-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 4/8] Bluetooth: Use IS_ERR_OR_NULL for checking bt_debugfs
+Date: Thu, 17 Oct 2013 17:24:16 -0700
+Message-Id: <1382055860-12572-4-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The device_add handling can be done directly in hci_register_dev and
-device_remove within hci_unregister_dev.
+Make sure to use IS_ERR_OR_NULL for checking the existing of the root
+debugfs dentry bt_debugfs.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h |  2 --
- net/bluetooth/hci_core.c         |  6 ++++--
- net/bluetooth/hci_sysfs.c        | 18 ------------------
- 3 files changed, 4 insertions(+), 22 deletions(-)
+ net/bluetooth/l2cap_core.c  | 11 +++++------
+ net/bluetooth/rfcomm/core.c | 14 +++++++-------
+ net/bluetooth/rfcomm/sock.c | 14 +++++++-------
+ net/bluetooth/sco.c         | 13 ++++++-------
+ 4 files changed, 25 insertions(+), 27 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index c6becda..9b5db01 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -768,8 +768,6 @@ int hci_recv_fragment(struct hci_dev *hdev, int type, void *data, int count);
- int hci_recv_stream_fragment(struct hci_dev *hdev, void *data, int count);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 8af34d2..763b741 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -6833,12 +6833,11 @@ int __init l2cap_init(void)
+ 	if (err < 0)
+ 		return err;
  
- void hci_init_sysfs(struct hci_dev *hdev);
--int hci_add_sysfs(struct hci_dev *hdev);
--void hci_del_sysfs(struct hci_dev *hdev);
- void hci_conn_init_sysfs(struct hci_conn *conn);
- void hci_conn_add_sysfs(struct hci_conn *conn);
- void hci_conn_del_sysfs(struct hci_conn *conn);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index f7ba818..940da80 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2482,7 +2482,9 @@ int hci_register_dev(struct hci_dev *hdev)
- 	if (!IS_ERR_OR_NULL(bt_debugfs))
- 		hdev->debugfs = debugfs_create_dir(hdev->name, bt_debugfs);
- 
--	error = hci_add_sysfs(hdev);
-+	dev_set_name(&hdev->dev, "%s", hdev->name);
+-	if (bt_debugfs) {
+-		l2cap_debugfs = debugfs_create_file("l2cap", 0444, bt_debugfs,
+-						    NULL, &l2cap_debugfs_fops);
+-		if (!l2cap_debugfs)
+-			BT_ERR("Failed to create L2CAP debug file");
+-	}
++	if (IS_ERR_OR_NULL(bt_debugfs))
++		return 0;
 +
-+	error = device_add(&hdev->dev);
- 	if (error < 0)
- 		goto err_wqueue;
++	l2cap_debugfs = debugfs_create_file("l2cap", 0444, bt_debugfs,
++					    NULL, &l2cap_debugfs_fops);
  
-@@ -2570,7 +2572,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 		rfkill_destroy(hdev->rfkill);
+ 	return 0;
+ }
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 27e936a..94d06cb 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -2154,13 +2154,6 @@ static int __init rfcomm_init(void)
+ 		goto unregister;
  	}
  
--	hci_del_sysfs(hdev);
-+	device_del(&hdev->dev);
+-	if (bt_debugfs) {
+-		rfcomm_dlc_debugfs = debugfs_create_file("rfcomm_dlc", 0444,
+-				bt_debugfs, NULL, &rfcomm_dlc_debugfs_fops);
+-		if (!rfcomm_dlc_debugfs)
+-			BT_ERR("Failed to create RFCOMM debug file");
+-	}
+-
+ 	err = rfcomm_init_ttys();
+ 	if (err < 0)
+ 		goto stop;
+@@ -2171,6 +2164,13 @@ static int __init rfcomm_init(void)
  
- 	debugfs_remove_recursive(hdev->debugfs);
+ 	BT_INFO("RFCOMM ver %s", VERSION);
  
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 320a761..9cbf8fe 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -402,24 +402,6 @@ void hci_init_sysfs(struct hci_dev *hdev)
- 	device_initialize(dev);
- }
++	if (IS_ERR_OR_NULL(bt_debugfs))
++		return 0;
++
++	rfcomm_dlc_debugfs = debugfs_create_file("rfcomm_dlc", 0444,
++						 bt_debugfs, NULL,
++						 &rfcomm_dlc_debugfs_fops);
++
+ 	return 0;
  
--int hci_add_sysfs(struct hci_dev *hdev)
--{
--	struct device *dev = &hdev->dev;
+ cleanup:
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index df17276..c4d3d42 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -1051,15 +1051,15 @@ int __init rfcomm_init_sockets(void)
+ 		goto error;
+ 	}
+ 
+-	if (bt_debugfs) {
+-		rfcomm_sock_debugfs = debugfs_create_file("rfcomm", 0444,
+-				bt_debugfs, NULL, &rfcomm_sock_debugfs_fops);
+-		if (!rfcomm_sock_debugfs)
+-			BT_ERR("Failed to create RFCOMM debug file");
+-	}
 -
--	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
+ 	BT_INFO("RFCOMM socket layer initialized");
+ 
++	if (IS_ERR_OR_NULL(bt_debugfs))
++		return 0;
++
++	rfcomm_sock_debugfs = debugfs_create_file("rfcomm", 0444,
++						  bt_debugfs, NULL,
++						  &rfcomm_sock_debugfs_fops);
++
+ 	return 0;
+ 
+ error:
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index a92aeba..12a0e51 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -1177,15 +1177,14 @@ int __init sco_init(void)
+ 		goto error;
+ 	}
+ 
+-	if (bt_debugfs) {
+-		sco_debugfs = debugfs_create_file("sco", 0444, bt_debugfs,
+-						  NULL, &sco_debugfs_fops);
+-		if (!sco_debugfs)
+-			BT_ERR("Failed to create SCO debug file");
+-	}
 -
--	dev_set_name(dev, "%s", hdev->name);
--
--	return device_add(dev);
--}
--
--void hci_del_sysfs(struct hci_dev *hdev)
--{
--	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
--
--	device_del(&hdev->dev);
--}
--
- int __init bt_sysfs_init(void)
- {
- 	bt_class = class_create(THIS_MODULE, "bluetooth");
+ 	BT_INFO("SCO socket layer initialized");
+ 
++	if (IS_ERR_OR_NULL(bt_debugfs))
++		return 0;
++
++	sco_debugfs = debugfs_create_file("sco", 0444, bt_debugfs,
++					  NULL, &sco_debugfs_fops);
++
+ 	return 0;
+ 
+ error:
 -- 
 1.8.3.1
 
