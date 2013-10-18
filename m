@@ -1,54 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/7] Bluetooth: Remove debug entry for connection features
-Date: Fri, 18 Oct 2013 12:04:48 -0700
-Message-Id: <1382123092-35256-3-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 5/7] Bluetooth: Store local version information only during setup phase
+Date: Fri, 18 Oct 2013 12:04:50 -0700
+Message-Id: <1382123092-35256-5-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The debug entry for connection features is incomplete and also does
-not work with AMP controllers and physical links. So just remove it.
+The local version information from the controller can not change
+since they are static. So store them only once during setup
+phase and not bother overwriting them every time this command
+gets executed.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_sysfs.c | 14 --------------
- 1 file changed, 14 deletions(-)
+ net/bluetooth/hci_event.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 90142ae..c5aa42f 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -37,29 +37,15 @@ static ssize_t show_link_address(struct device *dev,
- 	return sprintf(buf, "%pMR\n", &conn->dst);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index c171c07..8480452 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -468,14 +468,13 @@ static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (rp->status)
+ 		return;
+ 
+-	hdev->hci_ver = rp->hci_ver;
+-	hdev->hci_rev = __le16_to_cpu(rp->hci_rev);
+-	hdev->lmp_ver = rp->lmp_ver;
+-	hdev->manufacturer = __le16_to_cpu(rp->manufacturer);
+-	hdev->lmp_subver = __le16_to_cpu(rp->lmp_subver);
+-
+-	BT_DBG("%s manufacturer 0x%4.4x hci ver %d:%d", hdev->name,
+-	       hdev->manufacturer, hdev->hci_ver, hdev->hci_rev);
++	if (test_bit(HCI_SETUP, &hdev->dev_flags)) {
++		hdev->hci_ver = rp->hci_ver;
++		hdev->hci_rev = __le16_to_cpu(rp->hci_rev);
++		hdev->lmp_ver = rp->lmp_ver;
++		hdev->manufacturer = __le16_to_cpu(rp->manufacturer);
++		hdev->lmp_subver = __le16_to_cpu(rp->lmp_subver);
++	}
  }
  
--static ssize_t show_link_features(struct device *dev,
--				  struct device_attribute *attr, char *buf)
--{
--	struct hci_conn *conn = to_hci_conn(dev);
--
--	return sprintf(buf, "0x%02x%02x%02x%02x%02x%02x%02x%02x\n",
--		       conn->features[0][0], conn->features[0][1],
--		       conn->features[0][2], conn->features[0][3],
--		       conn->features[0][4], conn->features[0][5],
--		       conn->features[0][6], conn->features[0][7]);
--}
--
- #define LINK_ATTR(_name, _mode, _show, _store) \
- struct device_attribute link_attr_##_name = __ATTR(_name, _mode, _show, _store)
- 
- static LINK_ATTR(type, S_IRUGO, show_link_type, NULL);
- static LINK_ATTR(address, S_IRUGO, show_link_address, NULL);
--static LINK_ATTR(features, S_IRUGO, show_link_features, NULL);
- 
- static struct attribute *bt_link_attrs[] = {
- 	&link_attr_type.attr,
- 	&link_attr_address.attr,
--	&link_attr_features.attr,
- 	NULL
- };
- 
+ static void hci_cc_read_local_commands(struct hci_dev *hdev,
 -- 
 1.8.3.1
 
