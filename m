@@ -1,29 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 18 Oct 2013 12:27:56 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Use BDADDR_BREDR type for old blacklist ioctl
- interface
-Message-ID: <20131018092756.GA24891@x220.p-661hnu-f1>
-References: <1382083828-23001-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1382083828-23001-1-git-send-email-marcel@holtmann.org>
+Content-Type: text/plain; charset=iso-8859-1
+Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
+Subject: Re: [PATCH] Bluetooth: Add hci_h4p driver
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <201310180739.47841@pali>
+Date: Fri, 18 Oct 2013 10:56:42 +0200
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <FA673359-08E1-4642-98D8-F66F457542C8@holtmann.org>
+References: <1379703710-5757-1-git-send-email-pali.rohar@gmail.com> <201310172225.33343@pali> <3B0F039C-4680-46FF-A654-48D6A28B9B5E@holtmann.org> <201310180739.47841@pali>
+To: =?iso-8859-1?Q?Pali_Roh=E1r?= <pali.rohar@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Pali,
 
-On Fri, Oct 18, 2013, Marcel Holtmann wrote:
-> The old blacklist ioctl interface was only able to operate on BR/EDR
-> addresses. So use the BDADDR_BREDR address type definition instead
-> of an open coded magic 0 value.
+>>>> This driver adding support for Nokia N900 bluetooth
+>>>> hardware
+>>>> 
+>>>> Signed-off-by: Ville Tervo <ville.tervo@nokia.com>
+>>>> Signed-off-by: Pali Rohár <pali.rohar@gmail.com>
+>>>> ---
+>>>> drivers/bluetooth/Kconfig             |   10 +
+>>>> drivers/bluetooth/Makefile            |    2 +
+>>>> drivers/bluetooth/hci_h4p/Makefile    |    7 +
+>>>> drivers/bluetooth/hci_h4p/core.c      | 1085
+>>>> +++++++++++++++++++++++++++++++++
+>>>> drivers/bluetooth/hci_h4p/fw-bcm.c    |  149 +++++
+>>>> drivers/bluetooth/hci_h4p/fw-csr.c    |  152 +++++
+>>>> drivers/bluetooth/hci_h4p/fw-ti1273.c |  113 ++++
+>>>> drivers/bluetooth/hci_h4p/fw.c        |  166 +++++
+>>>> drivers/bluetooth/hci_h4p/hci_h4p.h   |  238 ++++++++
+>>>> drivers/bluetooth/hci_h4p/uart.c      |  203 ++++++
+>>>> include/linux/bluetooth/hci_h4p.h     |   41 ++
+>>>> 11 files changed, 2166 insertions(+)
+>>>> create mode 100644 drivers/bluetooth/hci_h4p/Makefile
+>>>> create mode 100644 drivers/bluetooth/hci_h4p/core.c
+>>>> create mode 100644 drivers/bluetooth/hci_h4p/fw-bcm.c
+>>>> create mode 100644 drivers/bluetooth/hci_h4p/fw-csr.c
+>>>> create mode 100644 drivers/bluetooth/hci_h4p/fw-ti1273.c
+>>>> create mode 100644 drivers/bluetooth/hci_h4p/fw.c
+>>>> create mode 100644 drivers/bluetooth/hci_h4p/hci_h4p.h
+>>>> create mode 100644 drivers/bluetooth/hci_h4p/uart.c
+>>>> create mode 100644 include/linux/bluetooth/hci_h4p.h
+>>> 
+>>> Can somebody look & comment this patch? What is needed to be
+>>> part of upstream kernel?
+>> 
+>> you need to rebase against bluetooth-next at least.
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/hci_sock.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Can you specify full url to that repo?
 
-Applied to bluetooth-next. Thanks.
+you can find that tree on git.kernel.org.
 
-Johan
+Regards
+
+Marcel
+
