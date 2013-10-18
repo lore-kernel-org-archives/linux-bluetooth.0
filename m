@@ -1,48 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/7] Bluetooth: Store local version information only during setup phase
-Date: Fri, 18 Oct 2013 12:04:50 -0700
-Message-Id: <1382123092-35256-5-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 18 Oct 2013 13:56:43 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2013-10-14
+Message-ID: <20131018175642.GC28130@tuxdriver.com>
+References: <20131014235218.GE2305@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20131014235218.GE2305@joana>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The local version information from the controller can not change
-since they are static. So store them only once during setup
-phase and not bother overwriting them every time this command
-gets executed.
+On Mon, Oct 14, 2013 at 08:52:18PM -0300, Gustavo Padovan wrote:
+> Hi John,
+> 
+> More patches for 3.12, busy times for Bluetooth. More than a 100 commits since
+> the last pull. The bulk of work comes from Johan and Marcel, they are doing
+> fixes and improvements all over the Bluetooth subsystem, as the diffstat can
+> show.
+> 
+> Please pull or let me know of any problems! Thanks.
+> 
+> 	Gustavo
+> --
+> The following changes since commit 4f3e219d95a3c31b916dcd5e2631c4e440736f79:
+> 
+>   Bluetooth: Only one command per L2CAP LE signalling is supported (2013-10-03 16:09:59 +0300)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next for-upstream
+> 
+> for you to fetch changes up to 4b836f393bd8ed111857a6ee1865e44627266ec6:
+> 
+>   Bluetooth: Read current IAC LAP on controller setup (2013-10-14 19:31:18 -0300)
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_event.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+Pulling now...
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index c171c07..8480452 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -468,14 +468,13 @@ static void hci_cc_read_local_version(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (rp->status)
- 		return;
- 
--	hdev->hci_ver = rp->hci_ver;
--	hdev->hci_rev = __le16_to_cpu(rp->hci_rev);
--	hdev->lmp_ver = rp->lmp_ver;
--	hdev->manufacturer = __le16_to_cpu(rp->manufacturer);
--	hdev->lmp_subver = __le16_to_cpu(rp->lmp_subver);
--
--	BT_DBG("%s manufacturer 0x%4.4x hci ver %d:%d", hdev->name,
--	       hdev->manufacturer, hdev->hci_ver, hdev->hci_rev);
-+	if (test_bit(HCI_SETUP, &hdev->dev_flags)) {
-+		hdev->hci_ver = rp->hci_ver;
-+		hdev->hci_rev = __le16_to_cpu(rp->hci_rev);
-+		hdev->lmp_ver = rp->lmp_ver;
-+		hdev->manufacturer = __le16_to_cpu(rp->manufacturer);
-+		hdev->lmp_subver = __le16_to_cpu(rp->lmp_subver);
-+	}
- }
- 
- static void hci_cc_read_local_commands(struct hci_dev *hdev,
 -- 
-1.8.3.1
-
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
