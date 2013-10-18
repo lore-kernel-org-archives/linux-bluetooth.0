@@ -1,34 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 18 Oct 2013 10:50:06 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/8] Bluetooth: Add address type to device blacklist table
-Message-ID: <20131018075006.GA4148@x220.p-661hnu-f1>
-References: <1382055860-12572-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1382055860-12572-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <CAKCXgJ25JzJ7H4sYdA6z7EFZYNC1OBpZ_rwPvLkgAirbqDd74A@mail.gmail.com>
+References: <CAKCXgJ25JzJ7H4sYdA6z7EFZYNC1OBpZ_rwPvLkgAirbqDd74A@mail.gmail.com>
+Date: Fri, 18 Oct 2013 10:48:34 +0300
+Message-ID: <CABBYNZJqE_iY=LgZ82bpwmWWfM6wZULR0Ux-JSbVA8AaERCzVg@mail.gmail.com>
+Subject: Re: How to contribute
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Tim Wei <junping.wei@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Tim,
 
-On Thu, Oct 17, 2013, Marcel Holtmann wrote:
-> The device blacklist is not taking care of the address type. Actually
-> store the address type in the list entries and also use them when
-> looking up addresses in the table.
-> 
-> This is actually a serious bug. When adding a LE public address to
-> the blacklist, then it would be blocking a device on BR/EDR. And this
-> is not the expected behavior.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/hci_core.h |  3 ++-
->  net/bluetooth/hci_core.c         | 21 +++++++++++----------
->  net/bluetooth/hci_event.c        |  2 +-
->  3 files changed, 14 insertions(+), 12 deletions(-)
+On Fri, Oct 18, 2013 at 5:36 AM, Tim Wei <junping.wei@gmail.com> wrote:
+> I just fixed a bug in kernel. How can I contribute it?
+> My base version is Linux kernel 3.9.6. Should I download the latest
+> kernel and check whether it has been fixed?
 
-All eight patches have been applied to bluetooth-next. Thanks.
+Any patch going upstream should probably be based on bluetooth-next:
+https://git.kernel.org/cgit/linux/kernel/git/bluetooth/bluetooth-next.git/
 
-Johan
+Patches are expected to be send via git commit -s <try to be as
+descriptive as possible in the commit message> + git format-patch +
+git send-email like any other kernel patch and please be patient
+sometimes the patches takes a while to be reviewed because the
+maintainers are busy.
+
+
+-- 
+Luiz Augusto von Dentz
