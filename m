@@ -1,91 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: [RFC 07/15] Bluetooth: Refactor hci_disconn_complete_evt
+Subject: Re: [RFC 11/15] Bluetooth: Temporarily stop background scanning on connection
 Mime-Version: 1.0 (Apple Message framework v1283)
 Content-Type: text/plain; charset=us-ascii
 From: Andre Guedes <andre.guedes@openbossa.org>
-In-Reply-To: <FDFC9B6A-260D-4A54-83B7-ACCA36DF7B42@holtmann.org>
-Date: Fri, 18 Oct 2013 11:17:57 -0300
+In-Reply-To: <A1459AED-62FA-4042-B021-7A3157823952@holtmann.org>
+Date: Fri, 18 Oct 2013 11:08:28 -0300
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <C5B322A6-6B26-4A3B-A08B-B14A31C6ADE9@openbossa.org>
-References: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org> <1381965485-9159-8-git-send-email-andre.guedes@openbossa.org> <FDFC9B6A-260D-4A54-83B7-ACCA36DF7B42@holtmann.org>
+Message-Id: <987BFDAF-282C-4F28-84C1-D7998C620531@openbossa.org>
+References: <1381965485-9159-1-git-send-email-andre.guedes@openbossa.org> <1381965485-9159-12-git-send-email-andre.guedes@openbossa.org> <A1459AED-62FA-4042-B021-7A3157823952@holtmann.org>
 To: Marcel Holtmann <marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Oct 17, 2013, at 6:33 AM, Marcel Holtmann wrote:
+On Oct 17, 2013, at 6:43 AM, Marcel Holtmann wrote:
 
-> Hi Andrei,
+> Hi Andre,
 >=20
->> hci_disconn_complete_evt() logic is more complicated than what it
->> should be, making it hard to follow and add new features. This patch
->> does some code refactoring by letting the main flow of the function
->> in first level of function scope.
+>> Some LE controllers don't support scanning and initiating a =
+connection
+>> at the same time. So, for those controllers, we should temporarily
+>> stop the background scanning and start it again once the connection
+>> attempt is finished (successfully or not).
+>>=20
+>> So this patch introduces the hci_check_background_scan() which checks
+>> if the background scanning should be started.
 >>=20
 >> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 >> ---
->> net/bluetooth/hci_event.c | 62 =
-+++++++++++++++++++++++++----------------------
->> 1 file changed, 33 insertions(+), 29 deletions(-)
->=20
-> why this is patch 7/15 is beyond me. These things should go first and =
-with a clear commit message why they are are needed. Since if that is =
-clear and easily to review, then you do not have to re-base them all the =
-time.
-
-I'll move this patch to the beginning of v2 patch set.
-
->=20
+>> include/net/bluetooth/hci_core.h |  1 +
+>> net/bluetooth/hci_conn.c         | 25 +++++++++++++++++++++++++
+>> net/bluetooth/hci_core.c         | 18 ++++++++++++++++++
+>> net/bluetooth/hci_event.c        |  6 ++++++
+>> 4 files changed, 50 insertions(+)
 >>=20
->> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->> index 6c3b193..edb2342 100644
->> --- a/net/bluetooth/hci_event.c
->> +++ b/net/bluetooth/hci_event.c
->> @@ -1781,6 +1781,8 @@ static void hci_disconn_complete_evt(struct =
-hci_dev *hdev, struct sk_buff *skb)
->> {
->> 	struct hci_ev_disconn_complete *ev =3D (void *) skb->data;
->> 	struct hci_conn *conn;
->> +	u8 type;
->> +	bool send_mgmt_event =3D false;
+>> diff --git a/include/net/bluetooth/hci_core.h =
+b/include/net/bluetooth/hci_core.h
+>> index db39eca..017decc 100644
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -1201,5 +1201,6 @@ void hci_le_start_enc(struct hci_conn *conn, =
+__le16 ediv, __u8 rand[8],
 >>=20
->> 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
+>> int hci_trigger_background_scan(struct hci_dev *hdev);
+>> int hci_untrigger_background_scan(struct hci_dev *hdev);
+>> +void hci_check_background_scan(struct hci_dev *hdev);
 >>=20
->> @@ -1790,44 +1792,46 @@ static void hci_disconn_complete_evt(struct =
-hci_dev *hdev, struct sk_buff *skb)
->> 	if (!conn)
->> 		goto unlock;
+>> #endif /* __HCI_CORE_H */
+>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+>> index d64000e..6ae42c2 100644
+>> --- a/net/bluetooth/hci_conn.c
+>> +++ b/net/bluetooth/hci_conn.c
+>> @@ -541,6 +541,18 @@ static void create_le_conn_complete(struct =
+hci_dev *hdev, u8 status)
 >>=20
->> -	if (ev->status =3D=3D 0)
->> -		conn->state =3D BT_CLOSED;
->> -
->> 	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags) &&
->> -	    (conn->type =3D=3D ACL_LINK || conn->type =3D=3D LE_LINK)) {
->> -		if (ev->status) {
->> +	    (conn->type =3D=3D ACL_LINK || conn->type =3D=3D LE_LINK))
->> +		send_mgmt_event =3D true;
+>> done:
+>> 	hci_dev_unlock(hdev);
 >> +
->> +	if (ev->status) {
->> +		if (send_mgmt_event)
->> 			mgmt_disconnect_failed(hdev, &conn->dst, =
-conn->type,
->> 					       conn->dst_type, =
-ev->status);
->> -		} else {
->> -			u8 reason =3D hci_to_mgmt_reason(ev->reason);
->> -
->> -			mgmt_device_disconnected(hdev, &conn->dst, =
-conn->type,
->> -						 conn->dst_type, =
-reason);
->> -		}
->> +		return;
->> 	}
+>> +	/* Check the background scanning since it may have been =
+temporarily
+>> +	 * stopped if the controller doesn't support scanning and =
+initiate
+>> +	 * state combination.
+>> +	 */
+>> +	hci_check_background_scan(hdev);
+>> +}
 >=20
-> Unfortunately this diff is hard to read. So you need to explain to me =
-in plain English why we are doing this and how it is the same.
+> so what I would do first is assume the controller can not scan while =
+being in initiating state or being connected. Make the dead simple only =
+a single connection at a time work perfectly. Get the basic =
+infrastructure in place.
 
-Yeah, diff is not good. I'll be more verbose on next version.
+Ok, I'll do like that.
+
+>=20
+>> +
+>> +/* Check if controller supports scanning and initiating states =
+combination */
+>> +static bool is_state_combination_supported(struct hci_dev *hdev)
+>> +{
+>> +        return (hdev->le_states[2] & BIT(6)) ? true : false;
+>> }
+>>=20
+>=20
+> Worst function name ever. Also this should use !!(hdev->le_states & x) =
+style.
+
+I'll come up with a better name for this helper and use the !! approach.
+
+>=20
+> Also we need this more generic anyway. So get the simple part working =
+for dumb controllers and we deal with the rest when that part works.
+
+Ok.
 
 Regards,
 
