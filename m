@@ -1,32 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/9] Bluetooth: Add LE support for mgmt_set_discoverable
-Date: Sat, 19 Oct 2013 23:38:14 +0300
-Message-Id: <1382215103-6968-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sat, 19 Oct 2013 20:52:02 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix minor coding style issue in hci_core.c
+Message-ID: <20131019175202.GB8080@x220.p-661hnu-f1>
+References: <1382203155-27291-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1382203155-27291-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel,
 
-In addition to a couple if fixes in the existing mgmt code (first 5
-patches), this patch set adds support for hooking up the
-set_discoverable command to LE, in particular the advertising flags.
+On Sat, Oct 19, 2013, Marcel Holtmann wrote:
+> A few variable assignments ended up with missing a space between the
+> variable and equal sign.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/hci_core.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+
+Applied to bluetooth-next. Thanks.
 
 Johan
-
-----------------------------------------------------------------
-Johan Hedberg (9):
-      Bluetooth: Check for flag instead of features in update_scan_rsp_data()
-      Bluetooth: Check for flag instead of features in update_adv_data()
-      Bluetooth: Add missing check for BREDR_ENABLED flag in update_class()
-      Bluetooth: Refactor set_connectable settings update to separate function
-      Bluetooth: Fix updating settings when there are no HCI commands to send
-      Bluetooth: Move mgmt_pending_find to avoid forward declarations
-      Bluetooth: Fix sending write_scan_enable when BR/EDR is disabled
-      Bluetooth: Move HCI_LIMITED_DISCOVERABLE changes to a general place
-      Bluetooth: Update Set Discoverable to support LE
-
- net/bluetooth/mgmt.c | 147 +++++++++++++++++++++++++++++++++----------------
- 1 file changed, 100 insertions(+), 47 deletions(-)
-
