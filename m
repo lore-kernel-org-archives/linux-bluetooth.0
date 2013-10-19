@@ -1,27 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/5] Initial Android IPC
-Date: Sat, 19 Oct 2013 15:28:53 +0200
-Message-ID: <4903006.DicA8W53b6@athlon>
-In-Reply-To: <1382137302-17237-1-git-send-email-szymon.janc@gmail.com>
-References: <1382137302-17237-1-git-send-email-szymon.janc@gmail.com>
+Date: Sat, 19 Oct 2013 16:27:56 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Expose current list of long term keys via
+ debugfs
+Message-ID: <20131019132756.GD11607@x220.p-661hnu-f1>
+References: <1382137017-56186-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1382137017-56186-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> This adds initial code for Android IPC
-> - only connection establishment
-> - connecting ipc from daemon to HAL after adapter is initialized
-> - daemon track HAL lib lifetime and shutdown if socket is closed
-> - HAL library starts daemon (via android init) and wait for it to
->   connect
-> - HAL library is *not* yet tracking lifetime of daemon
+Hi Marcel,
 
-One more note I forgot to mention: this is not yet runtime tested on Android.
-(build was verified though)
+On Fri, Oct 18, 2013, Marcel Holtmann wrote:
+> For debugging purposes expose the current list of long term keys
+> via debugfs. This file is read-only and limited to root access.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/hci_core.c | 32 ++++++++++++++++++++++++++++++++
+>  1 file changed, 32 insertions(+)
 
--- 
-Szymon K. Janc
-szymon.janc@gmail.com
+Applied to bluetooth-next. Thanks.
+
+Johan
