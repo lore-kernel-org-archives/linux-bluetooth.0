@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Add support for setting SSP debug mode
-Date: Sat, 19 Oct 2013 02:13:20 -0700
-Message-Id: <1382174000-18946-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Add support for setting SSP debug mode
+Date: Sat, 19 Oct 2013 02:06:00 -0700
+Message-Id: <1382173560-17049-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -18,8 +18,7 @@ Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
  include/net/bluetooth/hci.h      |  2 ++
  include/net/bluetooth/hci_core.h |  1 +
  net/bluetooth/hci_core.c         | 53 +++++++++++++++++++++++++++++++++++++++-
- net/bluetooth/hci_event.c        |  2 ++
- 4 files changed, 57 insertions(+), 1 deletion(-)
+ 3 files changed, 55 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
 index 77a971a..ac9c4a7 100644
@@ -119,19 +118,6 @@ index 94d5342..8aae80b 100644
  
  	if (lmp_sniff_capable(hdev)) {
  		debugfs_create_file("idle_timeout", 0644, hdev->debugfs,
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 8480452..83478da 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -198,6 +198,8 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	memset(hdev->scan_rsp_data, 0, sizeof(hdev->scan_rsp_data));
- 	hdev->scan_rsp_data_len = 0;
-+
-+	hdev->ssp_debug_mode = 0;
- }
- 
- static void hci_cc_write_local_name(struct hci_dev *hdev, struct sk_buff *skb)
 -- 
 1.8.3.1
 
