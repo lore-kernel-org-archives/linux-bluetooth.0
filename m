@@ -1,32 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 19 Oct 2013 20:51:44 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix UUID values in blacklist debugfs file
-Message-ID: <20131019175144.GA8080@x220.p-661hnu-f1>
-References: <1382200319-26951-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1382200319-26951-1-git-send-email-marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix minor coding style issue in hci_core.c
+Date: Sat, 19 Oct 2013 10:19:15 -0700
+Message-Id: <1382203155-27291-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+A few variable assignments ended up with missing a space between the
+variable and equal sign.
 
-On Sat, Oct 19, 2013, Marcel Holtmann wrote:
-> The uuid entry struct is used for the UUID byte stream. That is
-> actually the wrong value. The correct value is uuid->uuid.
-> 
-> Besides fixing this up, use the %pUb modifier to print the UUID
-> string. However since the UUID is stored in big endian with
-> reversed byte order, change the byte order before printing.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/hci_core.c | 22 ++++++++++------------
->  1 file changed, 10 insertions(+), 12 deletions(-)
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_core.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Applied (after removing the bogus "blacklist" word from the subject).
-Thanks.
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index c5fb3a3..6ccc4eb 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -423,7 +423,7 @@ static int idle_timeout_set(void *data, u64 val)
+ 		return -EINVAL;
+ 
+ 	hci_dev_lock(hdev);
+-	hdev->idle_timeout= val;
++	hdev->idle_timeout = val;
+ 	hci_dev_unlock(hdev);
+ 
+ 	return 0;
+@@ -451,7 +451,7 @@ static int sniff_min_interval_set(void *data, u64 val)
+ 		return -EINVAL;
+ 
+ 	hci_dev_lock(hdev);
+-	hdev->sniff_min_interval= val;
++	hdev->sniff_min_interval = val;
+ 	hci_dev_unlock(hdev);
+ 
+ 	return 0;
+@@ -479,7 +479,7 @@ static int sniff_max_interval_set(void *data, u64 val)
+ 		return -EINVAL;
+ 
+ 	hci_dev_lock(hdev);
+-	hdev->sniff_max_interval= val;
++	hdev->sniff_max_interval = val;
+ 	hci_dev_unlock(hdev);
+ 
+ 	return 0;
+@@ -588,7 +588,7 @@ static int conn_min_interval_set(void *data, u64 val)
+ 		return -EINVAL;
+ 
+ 	hci_dev_lock(hdev);
+-	hdev->le_conn_min_interval= val;
++	hdev->le_conn_min_interval = val;
+ 	hci_dev_unlock(hdev);
+ 
+ 	return 0;
+@@ -616,7 +616,7 @@ static int conn_max_interval_set(void *data, u64 val)
+ 		return -EINVAL;
+ 
+ 	hci_dev_lock(hdev);
+-	hdev->le_conn_max_interval= val;
++	hdev->le_conn_max_interval = val;
+ 	hci_dev_unlock(hdev);
+ 
+ 	return 0;
+-- 
+1.8.3.1
 
-Johan
