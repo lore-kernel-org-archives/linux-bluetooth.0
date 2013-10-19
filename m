@@ -1,97 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/3] Bluetooth: Add support for setting DUT mode
-Date: Sat, 19 Oct 2013 07:09:12 -0700
-Message-Id: <1382191753-59287-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2 1/3] Bluetooth: Add support for setting SSP debug mode
+Date: Sat, 19 Oct 2013 07:09:11 -0700
+Message-Id: <1382191753-59287-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Device Under Test (DUT) mode is useful for doing certification
-testing and so expose this as debugfs option.
+Enabling and disabling SSP debug mode is useful for development. This
+adds a debugfs entry that allows to configure the SSP debug mode.
 
-This mode is actually special since you can only enter it. Restoring
-normal operation means that a HCI Reset is required. The current mode
-value gets tracked as a new device flag and when disabling it, the
-correct command to reset the controller is sent.
+On purpose this has been implemented as debugfs entry and not a public
+API since it is really only useful during testing and development.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h |  3 ++
- net/bluetooth/hci_core.c    | 73 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 76 insertions(+)
+ include/net/bluetooth/hci.h      |  2 ++
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_core.c         | 54 +++++++++++++++++++++++++++++++++++++++-
+ net/bluetooth/hci_event.c        |  2 ++
+ 4 files changed, 58 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index ac9c4a7..1784c48 100644
+index 77a971a..ac9c4a7 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -115,6 +115,7 @@ enum {
- 	HCI_PAIRABLE,
- 	HCI_SERVICE_CACHE,
- 	HCI_DEBUG_KEYS,
-+	HCI_DUT_MODE,
- 	HCI_UNREGISTER,
- 	HCI_USER_CHANNEL,
- 
-@@ -1043,6 +1044,8 @@ struct hci_rp_write_remote_amp_assoc {
+@@ -1043,6 +1043,8 @@ struct hci_rp_write_remote_amp_assoc {
  	__u8     phy_handle;
  } __packed;
  
-+#define HCI_OP_ENABLE_DUT_MODE		0x1803
++#define HCI_OP_WRITE_SSP_DEBUG_MODE	0x1804
 +
- #define HCI_OP_WRITE_SSP_DEBUG_MODE	0x1804
- 
  #define HCI_OP_LE_SET_EVENT_MASK	0x2001
+ struct hci_cp_le_set_event_mask {
+ 	__u8     mask[8];
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index c689bcf..d50cc7a 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -169,6 +169,7 @@ struct hci_dev {
+ 	__u8		page_scan_type;
+ 	__u16		le_scan_interval;
+ 	__u16		le_scan_window;
++	__u8		ssp_debug_mode;
+ 
+ 	__u16		devid_source;
+ 	__u16		devid_vendor;
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 2a9e925..4a5e567 100644
+index 384b9db..2a9e925 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -58,6 +58,71 @@ static void hci_notify(struct hci_dev *hdev, int event)
+@@ -303,6 +303,55 @@ static int auto_accept_delay_get(void *data, u64 *val)
+ DEFINE_SIMPLE_ATTRIBUTE(auto_accept_delay_fops, auto_accept_delay_get,
+ 			auto_accept_delay_set, "%llu\n");
  
- /* ---- HCI debugfs entries ---- */
- 
-+static ssize_t dut_mode_read(struct file *file, char __user *user_buf,
-+			     size_t count, loff_t *ppos)
++static int ssp_debug_mode_set(void *data, u64 val)
 +{
-+	struct hci_dev *hdev = file->private_data;
-+	char buf[3];
-+
-+	buf[0] = test_bit(HCI_DUT_MODE, &hdev->dev_flags) ? 'Y': 'N';
-+	buf[1] = '\n';
-+	buf[2] = '\0';
-+	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
-+}
-+
-+static ssize_t dut_mode_write(struct file *file, const char __user *user_buf,
-+			      size_t count, loff_t *ppos)
-+{
-+	struct hci_dev *hdev = file->private_data;
++	struct hci_dev *hdev = data;
 +	struct sk_buff *skb;
-+	char buf[32];
-+	size_t buf_size = min(count, (sizeof(buf)-1));
-+	bool enable;
++	__u8 mode;
 +	int err;
++
++	if (val != 0 && val != 1)
++		return -EINVAL;
 +
 +	if (!test_bit(HCI_UP, &hdev->flags))
 +		return -ENETDOWN;
 +
-+	if (copy_from_user(buf, user_buf, buf_size))
-+		return -EFAULT;
-+
-+	buf[buf_size] = '\0';
-+	if (strtobool(buf, &enable))
-+		return -EINVAL;
-+
-+	if (enable == test_bit(HCI_DUT_MODE, &hdev->dev_flags))
-+		return -EALREADY;
-+
 +	hci_req_lock(hdev);
-+	if (enable)
-+		skb = __hci_cmd_sync(hdev, HCI_OP_ENABLE_DUT_MODE, 0, NULL,
-+				     HCI_CMD_TIMEOUT);
-+	else
-+		skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL,
-+				     HCI_CMD_TIMEOUT);
++	mode = val;
++	skb = __hci_cmd_sync(hdev, HCI_OP_WRITE_SSP_DEBUG_MODE, sizeof(mode),
++			     &mode, HCI_CMD_TIMEOUT);
 +	hci_req_unlock(hdev);
 +
 +	if (IS_ERR(skb))
@@ -103,36 +82,57 @@ index 2a9e925..4a5e567 100644
 +	if (err < 0)
 +		return err;
 +
-+	change_bit(HCI_DUT_MODE, &hdev->dev_flags);
++	hci_dev_lock(hdev);
++	hdev->ssp_debug_mode = val;
++	hci_dev_unlock(hdev);
 +
-+	return count;
++	return 0;
 +}
 +
-+static const struct file_operations dut_mode_fops = {
-+	.open		= simple_open,
-+	.read		= dut_mode_read,
-+	.write		= dut_mode_write,
-+	.llseek		= default_llseek,
-+};
++static int ssp_debug_mode_get(void *data, u64 *val)
++{
++	struct hci_dev *hdev = data;
 +
- static int features_show(struct seq_file *f, void *ptr)
++	hci_dev_lock(hdev);
++	*val = hdev->ssp_debug_mode;
++	hci_dev_unlock(hdev);
++
++	return 0;
++}
++
++DEFINE_SIMPLE_ATTRIBUTE(ssp_debug_mode_fops, ssp_debug_mode_get,
++			ssp_debug_mode_set, "%llu\n");
++
+ static int idle_timeout_set(void *data, u64 val)
  {
- 	struct hci_dev *hdev = f->private;
-@@ -1200,6 +1265,14 @@ static int __hci_init(struct hci_dev *hdev)
- 	if (err < 0)
- 		return err;
+ 	struct hci_dev *hdev = data;
+@@ -1199,9 +1248,12 @@ static int __hci_init(struct hci_dev *hdev)
+ 				    hdev, &voice_setting_fops);
+ 	}
  
-+	/* The Device Under Test (DUT) mode is special and available for
-+	 * all controller types. So just create it early on.
-+	 */
-+	if (test_bit(HCI_SETUP, &hdev->dev_flags)) {
-+		debugfs_create_file("dut_mode", 0644, hdev->debugfs, hdev,
-+				    &dut_mode_fops);
+-	if (lmp_ssp_capable(hdev))
++	if (lmp_ssp_capable(hdev)) {
+ 		debugfs_create_file("auto_accept_delay", 0644, hdev->debugfs,
+ 				    hdev, &auto_accept_delay_fops);
++		debugfs_create_file("ssp_debug_mode", 0644, hdev->debugfs,
++				    hdev, &ssp_debug_mode_fops);
 +	}
+ 
+ 	if (lmp_sniff_capable(hdev)) {
+ 		debugfs_create_file("idle_timeout", 0644, hdev->debugfs,
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 1214d4b..5935f74 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -198,6 +198,8 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	memset(hdev->scan_rsp_data, 0, sizeof(hdev->scan_rsp_data));
+ 	hdev->scan_rsp_data_len = 0;
 +
- 	/* HCI_BREDR covers both single-mode LE, BR/EDR and dual-mode
- 	 * BR/EDR/LE type controllers. AMP controllers only need the
- 	 * first stage init.
++	hdev->ssp_debug_mode = 0;
+ }
+ 
+ static void hci_cc_write_local_name(struct hci_dev *hdev, struct sk_buff *skb)
 -- 
 1.8.3.1
 
