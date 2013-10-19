@@ -1,69 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix minor coding style issue in hci_core.c
-Date: Sat, 19 Oct 2013 10:19:15 -0700
-Message-Id: <1382203155-27291-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1382191753-59287-3-git-send-email-marcel@holtmann.org>
+References: <1382191753-59287-3-git-send-email-marcel@holtmann.org>
+Date: Sat, 19 Oct 2013 13:07:20 -0400
+Message-ID: <CAJdJm_NOH+P=uzoD4na6J3jwuPMrLcPNCx2r8bMXvKWNMg-=eQ@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] Bluetooth: Expose debugfs settings for LE
+ connection interval
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-A few variable assignments ended up with missing a space between the
-variable and equal sign.
+Hi Marcel,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_core.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+On Sat, Oct 19, 2013 at 10:09 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> +static int conn_min_interval_set(void *data, u64 val)
+> +{
+> +       struct hci_dev *hdev = data;
+> +
+> +       if (val < 0x0006 || val > 0x0c80 || val > hdev->le_conn_max_interval)
+> +               return -EINVAL;
+> +
+> +       hci_dev_lock(hdev);
+> +       hdev->le_conn_min_interval= val;
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index c5fb3a3..6ccc4eb 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -423,7 +423,7 @@ static int idle_timeout_set(void *data, u64 val)
- 		return -EINVAL;
- 
- 	hci_dev_lock(hdev);
--	hdev->idle_timeout= val;
-+	hdev->idle_timeout = val;
- 	hci_dev_unlock(hdev);
- 
- 	return 0;
-@@ -451,7 +451,7 @@ static int sniff_min_interval_set(void *data, u64 val)
- 		return -EINVAL;
- 
- 	hci_dev_lock(hdev);
--	hdev->sniff_min_interval= val;
-+	hdev->sniff_min_interval = val;
- 	hci_dev_unlock(hdev);
- 
- 	return 0;
-@@ -479,7 +479,7 @@ static int sniff_max_interval_set(void *data, u64 val)
- 		return -EINVAL;
- 
- 	hci_dev_lock(hdev);
--	hdev->sniff_max_interval= val;
-+	hdev->sniff_max_interval = val;
- 	hci_dev_unlock(hdev);
- 
- 	return 0;
-@@ -588,7 +588,7 @@ static int conn_min_interval_set(void *data, u64 val)
- 		return -EINVAL;
- 
- 	hci_dev_lock(hdev);
--	hdev->le_conn_min_interval= val;
-+	hdev->le_conn_min_interval = val;
- 	hci_dev_unlock(hdev);
- 
- 	return 0;
-@@ -616,7 +616,7 @@ static int conn_max_interval_set(void *data, u64 val)
- 		return -EINVAL;
- 
- 	hci_dev_lock(hdev);
--	hdev->le_conn_max_interval= val;
-+	hdev->le_conn_max_interval = val;
- 	hci_dev_unlock(hdev);
- 
- 	return 0;
+Minor style issue: missing space before "=".
+
+> +       hci_dev_unlock(hdev);
+> +
+> +       return 0;
+> +}
+> [snip]
+> +static int conn_max_interval_set(void *data, u64 val)
+> +{
+> +       struct hci_dev *hdev = data;
+> +
+> +       if (val < 0x0006 || val > 0x0c80 || val < hdev->le_conn_min_interval)
+> +               return -EINVAL;
+> +
+> +       hci_dev_lock(hdev);
+> +       hdev->le_conn_max_interval= val;
+
+Same above.
+
+> +       hci_dev_unlock(hdev);
+> +
+> +       return 0;
+> +}
+
+Best Regards,
 -- 
-1.8.3.1
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
