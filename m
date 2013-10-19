@@ -1,38 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/9] Bluetooth: Check for flag instead of features in update_scan_rsp_data()
-Date: Sat, 19 Oct 2013 23:38:15 +0300
-Message-Id: <1382215103-6968-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1382215103-6968-1-git-send-email-johan.hedberg@gmail.com>
-References: <1382215103-6968-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 0/9] Bluetooth: Add LE support for mgmt_set_discoverable
+Date: Sat, 19 Oct 2013 23:38:14 +0300
+Message-Id: <1382215103-6968-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-It's better to check for the device flag instead of device features so
-that we avoid unnecessary HCI commands when the feature is supported but
-disabled (i.e. the flag is unset).
+In addition to a couple if fixes in the existing mgmt code (first 5
+patches), this patch set adds support for hooking up the
+set_discoverable command to LE, in particular the advertising flags.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Johan
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index fb7fc9f..f39bab0 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -568,7 +568,7 @@ static void update_scan_rsp_data(struct hci_request *req)
- 	struct hci_cp_le_set_scan_rsp_data cp;
- 	u8 len;
- 
--	if (!lmp_le_capable(hdev))
-+	if (!test_bit(HCI_LE_ENABLED, &hdev->dev_flags))
- 		return;
- 
- 	memset(&cp, 0, sizeof(cp));
--- 
-1.8.3.1
+----------------------------------------------------------------
+Johan Hedberg (9):
+      Bluetooth: Check for flag instead of features in update_scan_rsp_data()
+      Bluetooth: Check for flag instead of features in update_adv_data()
+      Bluetooth: Add missing check for BREDR_ENABLED flag in update_class()
+      Bluetooth: Refactor set_connectable settings update to separate function
+      Bluetooth: Fix updating settings when there are no HCI commands to send
+      Bluetooth: Move mgmt_pending_find to avoid forward declarations
+      Bluetooth: Fix sending write_scan_enable when BR/EDR is disabled
+      Bluetooth: Move HCI_LIMITED_DISCOVERABLE changes to a general place
+      Bluetooth: Update Set Discoverable to support LE
+
+ net/bluetooth/mgmt.c | 147 +++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 100 insertions(+), 47 deletions(-)
 
