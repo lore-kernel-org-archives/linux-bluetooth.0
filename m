@@ -1,56 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1382191753-59287-3-git-send-email-marcel@holtmann.org>
-References: <1382191753-59287-3-git-send-email-marcel@holtmann.org>
-Date: Sat, 19 Oct 2013 13:07:20 -0400
-Message-ID: <CAJdJm_NOH+P=uzoD4na6J3jwuPMrLcPNCx2r8bMXvKWNMg-=eQ@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] Bluetooth: Expose debugfs settings for LE
- connection interval
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix UUID values in blacklist debugfs file
+Date: Sat, 19 Oct 2013 09:31:59 -0700
+Message-Id: <1382200319-26951-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+The uuid entry struct is used for the UUID byte stream. That is
+actually the wrong value. The correct value is uuid->uuid.
 
-On Sat, Oct 19, 2013 at 10:09 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> +static int conn_min_interval_set(void *data, u64 val)
-> +{
-> +       struct hci_dev *hdev = data;
-> +
-> +       if (val < 0x0006 || val > 0x0c80 || val > hdev->le_conn_max_interval)
-> +               return -EINVAL;
-> +
-> +       hci_dev_lock(hdev);
-> +       hdev->le_conn_min_interval= val;
+Besides fixing this up, use the %pUb modifier to print the UUID
+string. However since the UUID is stored in big endian with
+reversed byte order, change the byte order before printing.
 
-Minor style issue: missing space before "=".
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_core.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
-> +       hci_dev_unlock(hdev);
-> +
-> +       return 0;
-> +}
-> [snip]
-> +static int conn_max_interval_set(void *data, u64 val)
-> +{
-> +       struct hci_dev *hdev = data;
-> +
-> +       if (val < 0x0006 || val > 0x0c80 || val < hdev->le_conn_min_interval)
-> +               return -EINVAL;
-> +
-> +       hci_dev_lock(hdev);
-> +       hdev->le_conn_max_interval= val;
-
-Same above.
-
-> +       hci_dev_unlock(hdev);
-> +
-> +       return 0;
-> +}
-
-Best Regards,
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index b5c8cb3..c5fb3a3 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -193,18 +193,16 @@ static int uuids_show(struct seq_file *f, void *p)
+ 
+ 	hci_dev_lock(hdev);
+ 	list_for_each_entry(uuid, &hdev->uuids, list) {
+-		u32 data0, data5;
+-		u16 data1, data2, data3, data4;
+-
+-		data5 = get_unaligned_le32(uuid);
+-		data4 = get_unaligned_le16(uuid + 4);
+-		data3 = get_unaligned_le16(uuid + 6);
+-		data2 = get_unaligned_le16(uuid + 8);
+-		data1 = get_unaligned_le16(uuid + 10);
+-		data0 = get_unaligned_le32(uuid + 12);
+-
+-		seq_printf(f, "%.8x-%.4x-%.4x-%.4x-%.4x%.8x\n",
+-			   data0, data1, data2, data3, data4, data5);
++		u8 i, val[16];
++
++		/* The Bluetooth UUID values are stored in big endian,
++		 * but with reversed byte order. So convert them into
++		 * the right order for the %pUb modifier.
++		 */
++		for (i = 0; i < 16; i++)
++			val[i] = uuid->uuid[15 - i];
++
++		seq_printf(f, "%pUb\n", val);
+ 	}
+ 	hci_dev_unlock(hdev);
+ 
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.8.3.1
+
