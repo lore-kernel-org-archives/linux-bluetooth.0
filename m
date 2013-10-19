@@ -1,141 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/3] Bluetooth: Expose debugfs settings for LE connection interval
-Date: Sat, 19 Oct 2013 07:09:13 -0700
-Message-Id: <1382191753-59287-3-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2 2/3] Bluetooth: Add support for setting DUT mode
+Date: Sat, 19 Oct 2013 07:09:12 -0700
+Message-Id: <1382191753-59287-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For testing purposes expose the default LE connection interval values
-via debugfs.
+The Device Under Test (DUT) mode is useful for doing certification
+testing and so expose this as debugfs option.
+
+This mode is actually special since you can only enter it. Restoring
+normal operation means that a HCI Reset is required. The current mode
+value gets tracked as a new device flag and when disabling it, the
+correct command to reset the controller is sent.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h |  2 ++
- net/bluetooth/hci_conn.c         |  5 ++--
- net/bluetooth/hci_core.c         | 62 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 67 insertions(+), 2 deletions(-)
+ include/net/bluetooth/hci.h |  3 ++
+ net/bluetooth/hci_core.c    | 73 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 76 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index d50cc7a..8c0ab3d 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -169,6 +169,8 @@ struct hci_dev {
- 	__u8		page_scan_type;
- 	__u16		le_scan_interval;
- 	__u16		le_scan_window;
-+	__u16		le_conn_min_interval;
-+	__u16		le_conn_max_interval;
- 	__u8		ssp_debug_mode;
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index ac9c4a7..1784c48 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -115,6 +115,7 @@ enum {
+ 	HCI_PAIRABLE,
+ 	HCI_SERVICE_CACHE,
+ 	HCI_DEBUG_KEYS,
++	HCI_DUT_MODE,
+ 	HCI_UNREGISTER,
+ 	HCI_USER_CHANNEL,
  
- 	__u16		devid_source;
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 974d7bc..ba5366c 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -558,11 +558,12 @@ static int hci_create_le_conn(struct hci_conn *conn)
- 	bacpy(&cp.peer_addr, &conn->dst);
- 	cp.peer_addr_type = conn->dst_type;
- 	cp.own_address_type = conn->src_type;
--	cp.conn_interval_min = __constant_cpu_to_le16(0x0028);
--	cp.conn_interval_max = __constant_cpu_to_le16(0x0038);
-+	cp.conn_interval_min = cpu_to_le16(hdev->le_conn_min_interval);
-+	cp.conn_interval_max = cpu_to_le16(hdev->le_conn_max_interval);
- 	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
- 	cp.min_ce_len = __constant_cpu_to_le16(0x0000);
- 	cp.max_ce_len = __constant_cpu_to_le16(0x0000);
+@@ -1043,6 +1044,8 @@ struct hci_rp_write_remote_amp_assoc {
+ 	__u8     phy_handle;
+ } __packed;
+ 
++#define HCI_OP_ENABLE_DUT_MODE		0x1803
 +
- 	hci_req_add(&req, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
+ #define HCI_OP_WRITE_SSP_DEBUG_MODE	0x1804
  
- 	err = hci_req_run(&req, create_le_conn_complete);
+ #define HCI_OP_LE_SET_EVENT_MASK	0x2001
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 4a5e567..b5c8cb3 100644
+index 2a9e925..4a5e567 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -582,6 +582,62 @@ static const struct file_operations long_term_keys_fops = {
- 	.release	= single_release,
- };
+@@ -58,6 +58,71 @@ static void hci_notify(struct hci_dev *hdev, int event)
  
-+static int conn_min_interval_set(void *data, u64 val)
+ /* ---- HCI debugfs entries ---- */
+ 
++static ssize_t dut_mode_read(struct file *file, char __user *user_buf,
++			     size_t count, loff_t *ppos)
 +{
-+	struct hci_dev *hdev = data;
++	struct hci_dev *hdev = file->private_data;
++	char buf[3];
 +
-+	if (val < 0x0006 || val > 0x0c80 || val > hdev->le_conn_max_interval)
++	buf[0] = test_bit(HCI_DUT_MODE, &hdev->dev_flags) ? 'Y': 'N';
++	buf[1] = '\n';
++	buf[2] = '\0';
++	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
++}
++
++static ssize_t dut_mode_write(struct file *file, const char __user *user_buf,
++			      size_t count, loff_t *ppos)
++{
++	struct hci_dev *hdev = file->private_data;
++	struct sk_buff *skb;
++	char buf[32];
++	size_t buf_size = min(count, (sizeof(buf)-1));
++	bool enable;
++	int err;
++
++	if (!test_bit(HCI_UP, &hdev->flags))
++		return -ENETDOWN;
++
++	if (copy_from_user(buf, user_buf, buf_size))
++		return -EFAULT;
++
++	buf[buf_size] = '\0';
++	if (strtobool(buf, &enable))
 +		return -EINVAL;
 +
-+	hci_dev_lock(hdev);
-+	hdev->le_conn_min_interval= val;
-+	hci_dev_unlock(hdev);
++	if (enable == test_bit(HCI_DUT_MODE, &hdev->dev_flags))
++		return -EALREADY;
 +
-+	return 0;
++	hci_req_lock(hdev);
++	if (enable)
++		skb = __hci_cmd_sync(hdev, HCI_OP_ENABLE_DUT_MODE, 0, NULL,
++				     HCI_CMD_TIMEOUT);
++	else
++		skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL,
++				     HCI_CMD_TIMEOUT);
++	hci_req_unlock(hdev);
++
++	if (IS_ERR(skb))
++		return PTR_ERR(skb);
++
++	err = -bt_to_errno(skb->data[0]);
++	kfree_skb(skb);
++
++	if (err < 0)
++		return err;
++
++	change_bit(HCI_DUT_MODE, &hdev->dev_flags);
++
++	return count;
 +}
 +
-+static int conn_min_interval_get(void *data, u64 *val)
-+{
-+	struct hci_dev *hdev = data;
++static const struct file_operations dut_mode_fops = {
++	.open		= simple_open,
++	.read		= dut_mode_read,
++	.write		= dut_mode_write,
++	.llseek		= default_llseek,
++};
 +
-+	hci_dev_lock(hdev);
-+	*val = hdev->le_conn_min_interval;
-+	hci_dev_unlock(hdev);
-+
-+	return 0;
-+}
-+
-+DEFINE_SIMPLE_ATTRIBUTE(conn_min_interval_fops, conn_min_interval_get,
-+			conn_min_interval_set, "%llu\n");
-+
-+static int conn_max_interval_set(void *data, u64 val)
-+{
-+	struct hci_dev *hdev = data;
-+
-+	if (val < 0x0006 || val > 0x0c80 || val < hdev->le_conn_min_interval)
-+		return -EINVAL;
-+
-+	hci_dev_lock(hdev);
-+	hdev->le_conn_max_interval= val;
-+	hci_dev_unlock(hdev);
-+
-+	return 0;
-+}
-+
-+static int conn_max_interval_get(void *data, u64 *val)
-+{
-+	struct hci_dev *hdev = data;
-+
-+	hci_dev_lock(hdev);
-+	*val = hdev->le_conn_max_interval;
-+	hci_dev_unlock(hdev);
-+
-+	return 0;
-+}
-+
-+DEFINE_SIMPLE_ATTRIBUTE(conn_max_interval_fops, conn_max_interval_get,
-+			conn_max_interval_set, "%llu\n");
-+
- /* ---- HCI requests ---- */
+ static int features_show(struct seq_file *f, void *ptr)
+ {
+ 	struct hci_dev *hdev = f->private;
+@@ -1200,6 +1265,14 @@ static int __hci_init(struct hci_dev *hdev)
+ 	if (err < 0)
+ 		return err;
  
- static void hci_req_sync_complete(struct hci_dev *hdev, u8 result)
-@@ -1346,6 +1402,10 @@ static int __hci_init(struct hci_dev *hdev)
- 				    hdev, &own_address_type_fops);
- 		debugfs_create_file("long_term_keys", 0400, hdev->debugfs,
- 				    hdev, &long_term_keys_fops);
-+		debugfs_create_file("conn_min_interval", 0644, hdev->debugfs,
-+				    hdev, &conn_min_interval_fops);
-+		debugfs_create_file("conn_max_interval", 0644, hdev->debugfs,
-+				    hdev, &conn_max_interval_fops);
- 	}
- 
- 	return 0;
-@@ -2811,6 +2871,8 @@ struct hci_dev *hci_alloc_dev(void)
- 
- 	hdev->le_scan_interval = 0x0060;
- 	hdev->le_scan_window = 0x0030;
-+	hdev->le_conn_min_interval = 0x0028;
-+	hdev->le_conn_max_interval = 0x0038;
- 
- 	mutex_init(&hdev->lock);
- 	mutex_init(&hdev->req_lock);
++	/* The Device Under Test (DUT) mode is special and available for
++	 * all controller types. So just create it early on.
++	 */
++	if (test_bit(HCI_SETUP, &hdev->dev_flags)) {
++		debugfs_create_file("dut_mode", 0644, hdev->debugfs, hdev,
++				    &dut_mode_fops);
++	}
++
+ 	/* HCI_BREDR covers both single-mode LE, BR/EDR and dual-mode
+ 	 * BR/EDR/LE type controllers. AMP controllers only need the
+ 	 * first stage init.
 -- 
 1.8.3.1
 
