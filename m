@@ -2,73 +2,83 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 6/6] android: Remove not needed cutils/log.h stub
-Date: Sun, 20 Oct 2013 19:45:46 +0200
-Message-Id: <1382291146-23518-7-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC 5/6] android: Use hal-log.h for logging in socket HAL
+Date: Sun, 20 Oct 2013 19:45:45 +0200
+Message-Id: <1382291146-23518-6-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1382291146-23518-1-git-send-email-szymon.janc@tieto.com>
 References: <1382291146-23518-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This will allow to log both on Android and Linux (in haltest)
 ---
- Makefile.android     |  2 --
- android/cutils/log.h | 29 -----------------------------
- 2 files changed, 31 deletions(-)
- delete mode 100644 android/cutils/log.h
+ android/hal-sock.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
 
-diff --git a/Makefile.android b/Makefile.android
-index e9992d9..8196583 100644
---- a/Makefile.android
-+++ b/Makefile.android
-@@ -31,7 +31,6 @@ android_libhal_internal_la_SOURCES = android/hal.h android/hal-bluetooth.c \
- 					android/hardware/bt_rc.h \
- 					android/hardware/bt_sock.h \
- 					android/hardware/hardware.h \
--					android/cutils/log.h \
- 					android/cutils/properties.h \
- 					android/hal-log.h
+diff --git a/android/hal-sock.c b/android/hal-sock.c
+index 31e6b59..dab3756 100644
+--- a/android/hal-sock.c
++++ b/android/hal-sock.c
+@@ -20,16 +20,14 @@
+ #include <hardware/bluetooth.h>
+ #include <hardware/bt_sock.h>
  
-@@ -93,5 +92,4 @@ EXTRA_DIST += android/hardware/bluetooth.h \
- 		android/hardware/bt_rc.h \
- 		android/hardware/bt_sock.h \
- 		android/hardware/hardware.h \
--		android/cutils/log.h \
- 		android/cutils/properties.h
-diff --git a/android/cutils/log.h b/android/cutils/log.h
-deleted file mode 100644
-index 389542b..0000000
---- a/android/cutils/log.h
-+++ /dev/null
-@@ -1,29 +0,0 @@
--/*
-- * Copyright (C) 2007 The Android Open Source Project
-- *
-- * Licensed under the Apache License, Version 2.0 (the "License");
-- * you may not use this file except in compliance with the License.
-- * You may obtain a copy of the License at
-- *
-- *      http://www.apache.org/licenses/LICENSE-2.0
-- *
-- * Unless required by applicable law or agreed to in writing, software
-- * distributed under the License is distributed on an "AS IS" BASIS,
-- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-- * See the License for the specific language governing permissions and
-- * limitations under the License.
-- */
+-#define LOG_TAG "BlueZ"
+-#include <cutils/log.h>
 -
--#ifndef _CUTILS_LOG_H
--#define _CUTILS_LOG_H
--
--static inline void ALOG() {};
--
--#define ALOGV(...) ALOG("V", __VA_ARGS__)
--#define ALOGD(...) ALOG("D", __VA_ARGS__)
--#define ALOGI(...) ALOG("I", __VA_ARGS__)
--#define ALOGW(...) ALOG("W", __VA_ARGS__)
--#define ALOGE(...) ALOG("E", __VA_ARGS__)
--#define LOG_ALWAYS_FATAL(...)   do { ALOGE(__VA_ARGS__); exit(1); } while (0)
--
--#endif // _CUTILS_LOG_H
++#include "hal-log.h"
+ #include "hal.h"
+ 
+ static bt_status_t btsock_listen_rfcomm(const char *service_name,
+ 					const uint8_t *uuid, int chan,
+ 					int *sock, int flags)
+ {
+-	ALOGD(__func__);
++	DBG("");
+ 
+ 	return BT_STATUS_UNSUPPORTED;
+ }
+@@ -39,20 +37,20 @@ static bt_status_t listen(btsock_type_t type, const char *service_name,
+ 					int *sock, int flags)
+ {
+ 	if ((!uuid && chan <= 0) || !sock) {
+-		ALOGE("%s: invalid params: uuid %p, chan %d, sock %p",
++		error("%s: invalid params: uuid %p, chan %d, sock %p",
+ 						__func__, uuid, chan, sock);
+ 		return BT_STATUS_PARM_INVALID;
+ 	}
+ 
+-	ALOGD("%s: uuid %p chan %d sock %p type %d service_name %s",
+-			__func__, uuid, chan, sock, type, service_name);
++	DBG("uuid %p chan %d sock %p type %d service_name %s",
++					uuid, chan, sock, type, service_name);
+ 
+ 	switch (type) {
+ 	case BTSOCK_RFCOMM:
+ 		return btsock_listen_rfcomm(service_name, uuid, chan,
+ 								sock, flags);
+ 	default:
+-		ALOGE("%s: Socket type %d not supported", __func__, type);
++		error("%s: Socket type %d not supported", __func__, type);
+ 		break;
+ 	}
+ 
+@@ -64,13 +62,12 @@ static bt_status_t connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
+ 					int *sock, int flags)
+ {
+ 	if ((!uuid && chan <= 0) || !bdaddr || !sock) {
+-		ALOGE("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
++		error("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
+ 					bdaddr, uuid, chan, sock);
+ 		return BT_STATUS_PARM_INVALID;
+ 	}
+ 
+-	ALOGD("%s: uuid %p chan %d sock %p type %d", __func__, uuid, chan,
+-								sock, type);
++	DBG("uuid %p chan %d sock %p type %d", uuid, chan, sock, type);
+ 
+ 	return BT_STATUS_UNSUPPORTED;
+ }
 -- 
 1.8.4
 
