@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 5/6] android: Use hal-log.h for logging in socket HAL
-Date: Sun, 20 Oct 2013 19:45:45 +0200
-Message-Id: <1382291146-23518-6-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC 4/6] android: Use hal-log.h for logging in pan HAL
+Date: Sun, 20 Oct 2013 19:45:44 +0200
+Message-Id: <1382291146-23518-5-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1382291146-23518-1-git-send-email-szymon.janc@tieto.com>
 References: <1382291146-23518-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,16 +12,16 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 This will allow to log both on Android and Linux (in haltest)
 ---
- android/hal-sock.c | 19 ++++++++-----------
- 1 file changed, 8 insertions(+), 11 deletions(-)
+ android/hal-pan.c | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
-diff --git a/android/hal-sock.c b/android/hal-sock.c
-index 31e6b59..dab3756 100644
---- a/android/hal-sock.c
-+++ b/android/hal-sock.c
-@@ -20,16 +20,14 @@
+diff --git a/android/hal-pan.c b/android/hal-pan.c
+index f63e83d..645fe8c 100644
+--- a/android/hal-pan.c
++++ b/android/hal-pan.c
+@@ -21,9 +21,7 @@
  #include <hardware/bluetooth.h>
- #include <hardware/bt_sock.h>
+ #include <hardware/bt_pan.h>
  
 -#define LOG_TAG "BlueZ"
 -#include <cutils/log.h>
@@ -29,56 +29,61 @@ index 31e6b59..dab3756 100644
 +#include "hal-log.h"
  #include "hal.h"
  
- static bt_status_t btsock_listen_rfcomm(const char *service_name,
- 					const uint8_t *uuid, int chan,
- 					int *sock, int flags)
+ const btpan_callbacks_t *bt_pan_cbacks = NULL;
+@@ -35,7 +33,7 @@ static bool interface_ready(void)
+ 
+ static bt_status_t bt_pan_enable(int local_role)
  {
 -	ALOGD(__func__);
 +	DBG("");
  
- 	return BT_STATUS_UNSUPPORTED;
- }
-@@ -39,20 +37,20 @@ static bt_status_t listen(btsock_type_t type, const char *service_name,
- 					int *sock, int flags)
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+@@ -45,7 +43,7 @@ static bt_status_t bt_pan_enable(int local_role)
+ 
+ static int bt_pan_get_local_role(void)
  {
- 	if ((!uuid && chan <= 0) || !sock) {
--		ALOGE("%s: invalid params: uuid %p, chan %d, sock %p",
-+		error("%s: invalid params: uuid %p, chan %d, sock %p",
- 						__func__, uuid, chan, sock);
- 		return BT_STATUS_PARM_INVALID;
- 	}
+-	ALOGD(__func__);
++	DBG("");
  
--	ALOGD("%s: uuid %p chan %d sock %p type %d service_name %s",
--			__func__, uuid, chan, sock, type, service_name);
-+	DBG("uuid %p chan %d sock %p type %d service_name %s",
-+					uuid, chan, sock, type, service_name);
- 
- 	switch (type) {
- 	case BTSOCK_RFCOMM:
- 		return btsock_listen_rfcomm(service_name, uuid, chan,
- 								sock, flags);
- 	default:
--		ALOGE("%s: Socket type %d not supported", __func__, type);
-+		error("%s: Socket type %d not supported", __func__, type);
- 		break;
- 	}
- 
-@@ -64,13 +62,12 @@ static bt_status_t connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
- 					int *sock, int flags)
+ 	if (!interface_ready())
+ 		return BTPAN_ROLE_NONE;
+@@ -56,7 +54,7 @@ static int bt_pan_get_local_role(void)
+ static bt_status_t bt_pan_connect(const bt_bdaddr_t *bd_addr, int local_role,
+ 					int remote_role)
  {
- 	if ((!uuid && chan <= 0) || !bdaddr || !sock) {
--		ALOGE("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
-+		error("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
- 					bdaddr, uuid, chan, sock);
- 		return BT_STATUS_PARM_INVALID;
- 	}
+-	ALOGD(__func__);
++	DBG("");
  
--	ALOGD("%s: uuid %p chan %d sock %p type %d", __func__, uuid, chan,
--								sock, type);
-+	DBG("uuid %p chan %d sock %p type %d", uuid, chan, sock, type);
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+@@ -69,7 +67,7 @@ static bt_status_t bt_pan_connect(const bt_bdaddr_t *bd_addr, int local_role,
  
- 	return BT_STATUS_UNSUPPORTED;
- }
+ static bt_status_t bt_pan_disconnect(const bt_bdaddr_t *bd_addr)
+ {
+-	ALOGD(__func__);
++	DBG("");
+ 
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+@@ -82,7 +80,7 @@ static bt_status_t bt_pan_disconnect(const bt_bdaddr_t *bd_addr)
+ 
+ static bt_status_t bt_pan_init(const btpan_callbacks_t *callbacks)
+ {
+-	ALOGI(__func__);
++	DBG("");
+ 
+ 	bt_pan_cbacks = callbacks;
+ 
+@@ -95,7 +93,7 @@ static bt_status_t bt_pan_init(const btpan_callbacks_t *callbacks)
+ 
+ static void bt_pan_cleanup()
+ {
+-	ALOGD(__func__);
++	DBG("");
+ 
+ 	if (!interface_ready())
+ 		return;
 -- 
 1.8.4
 
