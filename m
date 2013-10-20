@@ -1,104 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] android: Add audio plugin protocol to API doc
-Date: Mon, 21 Oct 2013 10:59:36 +0300
-Message-Id: <1382342376-6116-1-git-send-email-luiz.dentz@gmail.com>
+Date: Sun, 20 Oct 2013 22:40:46 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 0/6] Logging from Android HAL library
+Message-ID: <20131020194046.GB31268@x220.p-661hnu-f1>
+References: <1382291146-23518-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1382291146-23518-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Szymon,
 
-This adds audio plugin IPC is used to communicate Android BlueZ daemon
-and audio plugin.
----
- android/hal-ipc-api.txt | 76 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 76 insertions(+)
+On Sun, Oct 20, 2013, Szymon Janc wrote:
+> This is an attempt to make library logging API similar to other parts of code.
+> It maps log levels used in BlueZ to Android levels and provides log printing
+> when HAL library is used by haltest on Linux. Since cutils/log.h is not used
+> directly there is no need to stub it on Linux.
+> 
+> Another advantage is that LOG_TAG and message format is configured in single
+> file (eg. modules tags could be easily added to improve readibility of
+> non-debug messages)
+> 
+> Comments are welcome.
+> 
+> Szymon Janc (6):
+>   android: Add wrapper for HAL logging
+>   android: Use hal-log.h for logging in bluetooth HAL
+>   android: Use hal-log.h for logging in hidhost HAL
+>   android: Use hal-log.h for logging in pan HAL
+>   android: Use hal-log.h for logging in socket HAL
+>   android: Remove not needed cutils/log.h stub
+> 
+>  Makefile.android        |  9 ++++---
+>  android/cutils/log.h    | 29 ---------------------
+>  android/hal-bluetooth.c | 68 ++++++++++++++++++++++++-------------------------
+>  android/hal-hidhost.c   | 26 +++++++++----------
+>  android/hal-log.h       | 35 +++++++++++++++++++++++++
+>  android/hal-pan.c       | 16 +++++-------
+>  android/hal-sock.c      | 19 ++++++--------
+>  7 files changed, 100 insertions(+), 102 deletions(-)
+>  delete mode 100644 android/cutils/log.h
+>  create mode 100644 android/hal-log.h
 
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 9a8b770..bc8a128 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -1245,3 +1245,79 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
- 	Opcode 0x9c - Request Write notification
- 	Opcode 0x9d - Request Execute Write notification
- 	Opcode 0x9e - Response Confirmation notification
-+
-+Bluetooth Audio Plugin (ID = 10)
-+================================
-+
-+The audio plugin happen to be in a different socket but all the rules for
-+HAL socket apply here as well.
-+
-+	.--Android--.                             .---Audio---.
-+	|  daemon   |                             |   Plugin  |
-+	|           |          Command            |           |
-+	|           | <-------------------------- |           |
-+	|           | --------------------------> |           |
-+	|           |          Response           |           |
-+	|           |                             |           |
-+	|           |                             |           |
-+	|           |        Notification         |           |
-+	|           | --------------------------> |           |
-+	|           |                             |           |
-+	'-----------'                             '-----------'
-+
-+Android HAL name: "audio" (BT_AUDIO_ID)
-+
-+	Opcode 0x00 - Error response
-+
-+		Response parameters: Status (1 octet)
-+
-+		Valid status values: 0x01 = Fail
-+		                     0x02 = Not ready
-+		                     0x03 = No memory
-+		                     0x04 = Busy
-+		                     0x05 = Done (already completed)
-+		                     0x06 = Unsupported
-+		                     0x07 = Parameter invalid
-+		                     0x08 = Unhandled
-+		                     0x09 = Authentication failure
-+		                     0x0a = Remote device down
-+
-+	Opcode 0x01 - Register Audio Endpoint commmand
-+
-+		Command parameters: Service UUID (16 octets)
-+		                    Codec ID (1 octets)
-+		                    Codec capabilities length (1 octets)
-+		                    Codec capabilities (variable)
-+		                    Codec configuration length (1 octets)
-+		                    Codec configuration (variable)
-+		Response parameters: Endpoint ID (1 octets)
-+
-+	Opcode 0x02 - Unregister Audio Endpoint command
-+
-+		Command parameters: Endpoint ID (1 octets)
-+
-+	Opcode 0x03 - Resume Audio command
-+
-+		Command parameters: Endpoint ID (1 octets)
-+
-+	Opcode 0x04 - Suspend Audio command
-+
-+		Command parameters: Endpoint ID (1 octets)
-+
-+Notifications:
-+
-+	Opcode 0x80 - Audio State Changed notification
-+
-+		Notification paremters: Endpoint ID (1 octets)
-+		                        State (1 octets)
-+
-+		Valid state values: 0x01 = Idle
-+		                    0x02 = Suspended
-+		                    0x03 = Running
-+
-+	Opcode 0x81 - New Audio Connection notification
-+
-+		Notification parameters: Endpoint ID (1 octets)
-+		                         Codec configuration length (1 octets)
-+		                         Codec configuration (variable)
-+		                         File descriptor (inline)
--- 
-1.8.3.1
+Even though you flagged this as RFC it looked fine to me and I like the
+idea that we don't need to wrap our brains to different logging
+conventions depending on which side of the IPC we are. So all patches
+have been applied. Thanks.
 
+Johan
