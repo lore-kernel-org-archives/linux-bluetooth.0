@@ -2,32 +2,43 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 3/6] android: Define path for HAL communication socket
-Date: Sun, 20 Oct 2013 11:53:55 +0200
-Message-Id: <1382262838-25725-4-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2 2/6] android: Improve cutils/log.h stubs
+Date: Sun, 20 Oct 2013 11:53:54 +0200
+Message-Id: <1382262838-25725-3-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1382262838-25725-1-git-send-email-szymon.janc@tieto.com>
 References: <1382262838-25725-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This socket will be used by android daemon and libhal to communitate.
+Provide dummy function that will use ALOG* macros parameters. This fix
+build errors about set-but-not-used used local variables on linux.
 ---
- android/hal-msg.h | 2 ++
- 1 file changed, 2 insertions(+)
+ android/cutils/log.h | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 4c5ca69..4440fc8 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -21,6 +21,8 @@
-  *
-  */
+diff --git a/android/cutils/log.h b/android/cutils/log.h
+index d87da72..389542b 100644
+--- a/android/cutils/log.h
++++ b/android/cutils/log.h
+@@ -17,11 +17,13 @@
+ #ifndef _CUTILS_LOG_H
+ #define _CUTILS_LOG_H
  
-+static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
+-#define ALOGV(...)
+-#define ALOGD(...)
+-#define ALOGI(...)
+-#define ALOGW(...)
+-#define ALOGE(...)
++static inline void ALOG() {};
 +
- struct hal_msg_hdr {
- 	uint8_t service_id;
- 	uint8_t opcode;
++#define ALOGV(...) ALOG("V", __VA_ARGS__)
++#define ALOGD(...) ALOG("D", __VA_ARGS__)
++#define ALOGI(...) ALOG("I", __VA_ARGS__)
++#define ALOGW(...) ALOG("W", __VA_ARGS__)
++#define ALOGE(...) ALOG("E", __VA_ARGS__)
+ #define LOG_ALWAYS_FATAL(...)   do { ALOGE(__VA_ARGS__); exit(1); } while (0)
+ 
+ #endif // _CUTILS_LOG_H
 -- 
 1.8.4
 
