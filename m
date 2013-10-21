@@ -1,32 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Subject: [PATCH 0/3] Add basic commands to haltest
-Date: Mon, 21 Oct 2013 16:02:13 +0200
-Message-ID: <1382364136-13665-1-git-send-email-jerzy.kasenberg@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix enabling fast connectable on LE-only controllers
+Date: Mon, 21 Oct 2013 16:51:53 +0300
+Message-Id: <1382363513-4083-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-- Adds handling of Ctrl-c Ctrl-d as requested
-- Prompted changed to includ space
-- Added commands: quit exit help
-- Added completion for help
-- Terminal settings restored on exit
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Jerzy Kasenberg (3):
-  android: Add space in prompt in haltest
-  android: Add handling of Ctrl-c to haltest
-  android: Add help and quit to haltest
+The current "fast connectable" feature is BR/EDR-only, so add a proper
+check for BR/EDR support before proceeding with the associated HCI
+commands.
 
- android/client/haltest.c       |  151 ++++++++++++++++++++++++++++++++++------
- android/client/if-main.h       |    6 ++
- android/client/tabcompletion.c |  151 ++++++++++++++++++++++++++++------------
- android/client/terminal.c      |  100 ++++++++++++++++++--------
- 4 files changed, 312 insertions(+), 96 deletions(-)
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index bd91ee5..074d836 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1307,6 +1307,9 @@ static void write_fast_connectable(struct hci_request *req, bool enable)
+ 	struct hci_cp_write_page_scan_activity acp;
+ 	u8 type;
+ 
++	if (!test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags))
++		return;
++
+ 	if (hdev->hci_ver < BLUETOOTH_VER_1_2)
+ 		return;
+ 
 -- 
-1.7.9.5
+1.8.3.1
 
