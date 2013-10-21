@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2] android: Add A2DP skeleton
-Date: Mon, 21 Oct 2013 13:27:21 +0300
-Message-Id: <1382351241-17513-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ] android: Add A2DP skeleton
+Date: Mon, 21 Oct 2013 11:39:21 +0300
+Message-Id: <1382344761-8358-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -11,17 +11,14 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 This adds initial skeleton for A2DP Android HAL.
 ---
-v2: Adds hal-av.c to Android.mk
-
- Makefile.android   |  2 ++
- android/Android.mk |  1 +
- android/hal-av.c   | 94 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- android/hal.h      |  2 ++
- 4 files changed, 99 insertions(+)
+ Makefile.android |  1 +
+ android/hal-av.c | 94 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/hal.h    |  2 ++
+ 3 files changed, 97 insertions(+)
  create mode 100644 android/hal-av.c
 
 diff --git a/Makefile.android b/Makefile.android
-index 8196583..f5a5834 100644
+index 8196583..ec9e4be 100644
 --- a/Makefile.android
 +++ b/Makefile.android
 @@ -18,6 +18,7 @@ android_libhal_internal_la_SOURCES = android/hal.h android/hal-bluetooth.c \
@@ -32,26 +29,6 @@ index 8196583..f5a5834 100644
  					android/hardware/bluetooth.h \
  					android/hardware/bt_av.h \
  					android/hardware/bt_gatt.h \
-@@ -61,6 +62,7 @@ EXTRA_DIST += android/hal-bluetooth.c \
- 		android/hal-sock.c \
- 		android/hal-hidhost.c \
- 		android/hal-pan.c \
-+		android/hal-av.c \
- 		android/hal-log.h
- 
- EXTRA_DIST += android/client/terminal.c \
-diff --git a/android/Android.mk b/android/Android.mk
-index 30b2169..87445ed 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -55,6 +55,7 @@ LOCAL_SRC_FILES := \
- 	hal-sock.c \
- 	hal-hidhost.c \
- 	hal-pan.c \
-+	hal-av.c \
- 
- LOCAL_SHARED_LIBRARIES := \
- 	libcutils \
 diff --git a/android/hal-av.c b/android/hal-av.c
 new file mode 100644
 index 0000000..ef45066
