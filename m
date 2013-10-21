@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 5/6] android: Add helper to send fd using SCM_RIGHTS
-Date: Mon, 21 Oct 2013 14:28:36 +0300
-Message-Id: <1382354917-8632-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 6/6] android: Add Android HAL callback task
+Date: Mon, 21 Oct 2013 14:28:37 +0300
+Message-Id: <1382354917-8632-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1382354917-8632-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1382354917-8632-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,31 +11,39 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This is used in accept message to Android framework.
+Android HAL callback task listens for messages from BlueZ GPL daemon.
 ---
- android/Android.mk |    1 +
- android/bt-sock.c  |   64 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 65 insertions(+)
- create mode 100644 android/bt-sock.c
+ android/Android.mk      |    6 ++++
+ android/hal-cb-thread.c |   86 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 92 insertions(+)
+ create mode 100644 android/hal-cb-thread.c
 
 diff --git a/android/Android.mk b/android/Android.mk
-index 4bd4116..786c9fb 100644
+index 786c9fb..c5c6e7b 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -57,6 +57,7 @@ LOCAL_SRC_FILES := \
- 	hal-hidhost.c \
+@@ -58,9 +58,15 @@ LOCAL_SRC_FILES := \
  	hal-pan.c \
  	hal-msg-client.c \
-+	bt-sock.c \
+ 	bt-sock.c \
++	hal-cb-thread.c \
  
  LOCAL_SHARED_LIBRARIES := \
  	libcutils \
-diff --git a/android/bt-sock.c b/android/bt-sock.c
++	libglib \
++
++LOCAL_C_INCLUDES := \
++	$(call include-path-for, glib) \
++	$(call include-path-for, glib)/glib \
+ 
+ LOCAL_MODULE := bluetooth.default
+ LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
+diff --git a/android/hal-cb-thread.c b/android/hal-cb-thread.c
 new file mode 100644
-index 0000000..68dbe32
+index 0000000..1b1e228
 --- /dev/null
-+++ b/android/bt-sock.c
-@@ -0,0 +1,64 @@
++++ b/android/hal-cb-thread.c
+@@ -0,0 +1,86 @@
 +/*
 + * Copyright (C) 2013 Intel Corporation
 + *
@@ -53,52 +61,74 @@ index 0000000..68dbe32
 + *
 + */
 +
++#include <stdlib.h>
++#include <stdbool.h>
 +#include <sys/socket.h>
++#include <sys/stat.h>
 +#include <sys/un.h>
 +#include <errno.h>
++#include <sys/epoll.h>
++#include <hardware/bluetooth.h>
++#include <fcntl.h>
 +
++#define LOG_TAG "BlueZ"
 +#include <cutils/log.h>
 +
-+int bt_sock_send_acc_fd(int sock_fd, const unsigned char *buf, int len,
-+								int send_fd)
++#include "hal-msg.h"
++
++#define HAL_CBACK(base, cb_function, ...)				\
++	do {								\
++		if (base && base->cb_function) {			\
++			ALOGI("CB %s->%s", #base, #cb_function);	\
++			base->cb_function(__VA_ARGS__);			\
++		} else {						\
++			ALOGE("%s: Callback is NULL", __func__);	\
++		}							\
++	} while (0)
++
++extern bt_callbacks_t *bt_hal_cbacks;
++
++static int epfd;
++
++static void bthal_thread_associate(void)
 +{
-+	ssize_t ret;
-+	struct msghdr msg;
-+	struct cmsghdr *cmsg;
-+	struct iovec iv;
-+	char msgbuf[CMSG_SPACE(1)];
++	ALOGI(__func__);
 +
-+	ALOGD("%s: len %d sock_fd %d send_fd %d", __func__, len, sock_fd,
-+								send_fd);
++	HAL_CBACK(bt_hal_cbacks, thread_evt_cb, ASSOCIATE_JVM);
++}
 +
-+	if (sock_fd == -1 || send_fd == -1)
-+		return -1;
++static void bthal_thread_disassociate(void)
++{
++	ALOGI(__func__);
 +
-+	memset(&msg, 0, sizeof(msg));
++	HAL_CBACK(bt_hal_cbacks, thread_evt_cb, DISASSOCIATE_JVM);
 +
-+	msg.msg_control = msgbuf;
-+	msg.msg_controllen = sizeof(msgbuf);
-+	cmsg = CMSG_FIRSTHDR(&msg);
-+	cmsg->cmsg_level = SOL_SOCKET;
-+	cmsg->cmsg_type = SCM_RIGHTS;
-+	cmsg->cmsg_len = CMSG_LEN(sizeof(send_fd));
-+	memcpy(CMSG_DATA(cmsg), &send_fd, sizeof(send_fd));
++	bt_hal_cbacks = NULL;
++}
 +
-+	iv.iov_base = (unsigned char *) buf;
-+	iv.iov_len = len;
++void process_msg(struct hal_msg_hdr *msg)
++{
++	ALOGI(__func__);
 +
-+	msg.msg_iov = &iv;
-+	msg.msg_iovlen = 1;
++	/* TODO: Process messages from daemon */
++}
 +
-+	ret = sendmsg(sock_fd, &msg, MSG_NOSIGNAL);
-+	if (ret < 0) {
-+		ALOGE("%s: sock_fd %d send_fd %d sendmsg ret %d errno %d %s",
-+				__func__, sock_fd, send_fd, (int)ret, errno,
-+				strerror(errno));
-+		return ret;
-+	}
++int mainloop(void)
++{
++	return EXIT_SUCCESS;
++}
 +
-+	return ret;
++void *hal_cb_task(void *arg)
++{
++	int sock;
++
++	sock = open_hal_chan();
++
++	bthal_thread_associate();
++
++	bthal_thread_disassociate();
++
++	return NULL;
 +}
 -- 
 1.7.10.4
