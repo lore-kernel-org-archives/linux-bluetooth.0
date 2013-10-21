@@ -1,26 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 Oct 2013 16:25:04 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] android: Add missing error status description for
- Core Service
-Message-ID: <20131021132504.GA31014@x220.p-661hnu-f1>
-References: <1382360211-3565-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1382360211-3565-1-git-send-email-szymon.janc@tieto.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] core: Fix not forwarding errors caused by SDP search properly
+Date: Mon, 21 Oct 2013 16:04:08 +0300
+Message-Id: <1382360648-5167-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Oct 21, 2013, Szymon Janc wrote:
-> We need at least one failed status description.
-> ---
->  android/hal-ipc-api.txt | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+In case bt_search_service fails while processing (e.g. connection is
+dropped) the error forward is a positive value leading
+btd_service_connecting_complete to not change any state at all.
 
-This first patch has been applied. Thanks.
+Futhermore the error from sdp_process was completely ignored which may
+cause problems as well.
+---
+ src/sdp-client.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-Johan
+diff --git a/src/sdp-client.c b/src/sdp-client.c
+index 2789db6..1221f5e 100644
+--- a/src/sdp-client.c
++++ b/src/sdp-client.c
+@@ -196,14 +196,15 @@ static gboolean search_process_cb(GIOChannel *chan, GIOCondition cond,
+ 							gpointer user_data)
+ {
+ 	struct search_context *ctxt = user_data;
+-	int err = 0;
++	int err;
+ 
+ 	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
+-		err = EIO;
++		err = -EIO;
+ 		goto failed;
+ 	}
+ 
+-	if (sdp_process(ctxt->session) < 0)
++	err = sdp_process(ctxt->session);
++	if (err < 0)
+ 		goto failed;
+ 
+ 	return TRUE;
+-- 
+1.8.3.1
+
