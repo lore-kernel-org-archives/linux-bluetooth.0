@@ -1,382 +1,146 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 01/11] android/hal: Move IPC and sockets related code to separate file
-Date: Mon, 21 Oct 2013 20:56:41 +0200
-Message-Id: <1382381811-28123-1-git-send-email-szymon.janc@tieto.com>
+Date: Mon, 21 Oct 2013 20:48:39 +0200
+From: Pavel Machek <pavel@ucw.cz>
+To: "alexandre@maloteaux.net" <alexandre@maloteaux.net>,
+	marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org
+Cc: johan.hedberg@intel.com
+Subject: Re: Issue with the kernel  bluetooth  HCI_Delete_Stored_Link_Key
+ command patch
+Message-ID: <20131021184839.GA10592@amd.pavel.ucw.cz>
+References: <413864804.130358.1382295198929.open-xchange@oxwebmail.registrar-servers.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <413864804.130358.1382295198929.open-xchange@oxwebmail.registrar-servers.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hal-ipc will provide functionality related to IPC initialization and
-sockets handling (including upcoming callbacks thread).
+Hi!
 
-This allow to remove code from bluetooth HAL not related to adapter.
----
- Makefile.android        |   3 +-
- android/Android.mk      |   1 +
- android/hal-bluetooth.c | 118 ++---------------------------------------
- android/hal-ipc.c       | 137 ++++++++++++++++++++++++++++++++++++++++++++++++
- android/hal-ipc.h       |  19 +++++++
- 5 files changed, 163 insertions(+), 115 deletions(-)
- create mode 100644 android/hal-ipc.c
- create mode 100644 android/hal-ipc.h
+Bouncing to right people.
 
-diff --git a/Makefile.android b/Makefile.android
-index f5a5834..c2010b3 100644
---- a/Makefile.android
-+++ b/Makefile.android
-@@ -33,7 +33,8 @@ android_libhal_internal_la_SOURCES = android/hal.h android/hal-bluetooth.c \
- 					android/hardware/bt_sock.h \
- 					android/hardware/hardware.h \
- 					android/cutils/properties.h \
--					android/hal-log.h
-+					android/hal-log.h \
-+					android/hal-ipc.h android/hal-ipc.c
- 
- android_libhal_internal_la_CPPFLAGS = -I$(srcdir)/android
- 
-diff --git a/android/Android.mk b/android/Android.mk
-index 87445ed..bd3d48a 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -51,6 +51,7 @@ include $(BUILD_EXECUTABLE)
- include $(CLEAR_VARS)
- 
- LOCAL_SRC_FILES := \
-+	hal-ipc.c \
- 	hal-bluetooth.c \
- 	hal-sock.c \
- 	hal-hidhost.c \
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 589cb1b..b9a78b6 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -17,136 +17,26 @@
- 
- #include <stdio.h>
- #include <stdlib.h>
--#include <unistd.h>
- #include <stdbool.h>
--#include <errno.h>
--#include <sys/socket.h>
--#include <sys/un.h>
--#include <poll.h>
-+#include <string.h>
- 
- #include <hardware/bluetooth.h>
- #include <hardware/bt_sock.h>
- #include <hardware/bt_hh.h>
- #include <hardware/bt_pan.h>
- 
--#include <cutils/properties.h>
--
- #include "hal-log.h"
- #include "hal.h"
- #include "hal-msg.h"
--
--#define SERVICE_NAME "bluetoothd"
--#define CONNECT_TIMEOUT (5 * 1000)
-+#include "hal-ipc.h"
- 
- bt_callbacks_t *bt_hal_cbacks = NULL;
- 
--static int cmd_sk = -1;
--static int notif_sk = -1;
--
- static bool interface_ready(void)
- {
- 	return bt_hal_cbacks != NULL;
- }
- 
--static int accept_connection(int sk)
--{
--	int err;
--	struct pollfd pfd;
--	int new_sk;
--
--	memset(&pfd, 0 , sizeof(pfd));
--	pfd.fd = sk;
--	pfd.events = POLLIN;
--
--	err = poll(&pfd, 1, CONNECT_TIMEOUT);
--	if (err < 0) {
--		err = errno;
--		error("Failed to poll: %d (%s)", err, strerror(err));
--		return -1;
--	}
--
--	if (err == 0) {
--		error("bluetoothd connect timeout");
--		return -1;
--	}
--
--	new_sk = accept(sk, NULL, NULL);
--	if (new_sk < 0) {
--		err = errno;
--		error("Failed to accept socket: %d (%s)", err, strerror(err));
--		return -1;
--	}
--
--	return new_sk;
--}
--
--static bool start_daemon(void)
--{
--	struct sockaddr_un addr;
--	int sk;
--	int err;
--
--	sk = socket(AF_LOCAL, SOCK_SEQPACKET, 0);
--	if (sk < 0) {
--		err = errno;
--		error("Failed to create socket: %d (%s)", err,
--							strerror(err));
--		return false;
--	}
--
--	memset(&addr, 0, sizeof(addr));
--	addr.sun_family = AF_UNIX;
--
--	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
--
--	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
--		err = errno;
--		error("Failed to bind socket: %d (%s)", err, strerror(err));
--		close(sk);
--		return false;
--	}
--
--	if (listen(sk, 2) < 0) {
--		err = errno;
--		error("Failed to listen on socket: %d (%s)", err,
--								strerror(err));
--		close(sk);
--		return false;
--	}
--
--	/* Start Android Bluetooth daemon service */
--	property_set("ctl.start", SERVICE_NAME);
--
--	cmd_sk = accept_connection(sk);
--	if (cmd_sk < 0) {
--		close(sk);
--		return false;
--	}
--
--	notif_sk = accept_connection(sk);
--	if (notif_sk < 0) {
--		close(sk);
--		close(cmd_sk);
--		cmd_sk = -1;
--		return false;
--	}
--
--	info("bluetoothd connected");
--
--	close(sk);
--
--	return true;
--}
--
--static void stop_daemon(void)
--{
--	close(cmd_sk);
--	cmd_sk = -1;
--
--	close(notif_sk);
--	notif_sk = -1;
--}
--
- static int init(bt_callbacks_t *callbacks)
- {
- 	DBG("");
-@@ -154,7 +44,7 @@ static int init(bt_callbacks_t *callbacks)
- 	if (interface_ready())
- 		return BT_STATUS_SUCCESS;
- 
--	if (!start_daemon())
-+	if (!hal_ipc_init())
- 		return BT_STATUS_FAIL;
- 
- 	bt_hal_cbacks = callbacks;
-@@ -186,7 +76,7 @@ static void cleanup(void)
- 	if (!interface_ready())
- 		return;
- 
--	stop_daemon();
-+	hal_ipc_cleanup();
- 
- 	bt_hal_cbacks = NULL;
- }
-diff --git a/android/hal-ipc.c b/android/hal-ipc.c
-new file mode 100644
-index 0000000..6db67f2
---- /dev/null
-+++ b/android/hal-ipc.c
-@@ -0,0 +1,137 @@
-+/*
-+ * Copyright (C) 2013 Intel Corporation
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ *
-+ */
-+
-+#include <pthread.h>
-+#include <errno.h>
-+#include <sys/socket.h>
-+#include <sys/un.h>
-+#include <stdbool.h>
-+#include <errno.h>
-+#include <poll.h>
-+#include <unistd.h>
-+#include <stdint.h>
-+
-+#include <cutils/properties.h>
-+
-+#include "hal-msg.h"
-+#include "hal-log.h"
-+#include "hal-ipc.h"
-+
-+#define CONNECT_TIMEOUT (5 * 1000)
-+#define SERVICE_NAME "bluetoothd"
-+
-+static int cmd_sk = -1;
-+static int notif_sk = -1;
-+
-+static int accept_connection(int sk)
-+{
-+	int err;
-+	struct pollfd pfd;
-+	int new_sk;
-+
-+	memset(&pfd, 0 , sizeof(pfd));
-+	pfd.fd = sk;
-+	pfd.events = POLLIN;
-+
-+	err = poll(&pfd, 1, CONNECT_TIMEOUT);
-+	if (err < 0) {
-+		err = errno;
-+		error("Failed to poll: %d (%s)", err, strerror(err));
-+		return -1;
-+	}
-+
-+	if (err == 0) {
-+		error("bluetoothd connect timeout");
-+		return -1;
-+	}
-+
-+	new_sk = accept(sk, NULL, NULL);
-+	if (new_sk < 0) {
-+		err = errno;
-+		error("Failed to accept socket: %d (%s)", err, strerror(err));
-+		return -1;
-+	}
-+
-+	return new_sk;
-+}
-+
-+bool hal_ipc_init(void)
-+{
-+	struct sockaddr_un addr;
-+	int sk;
-+	int err;
-+
-+	sk = socket(AF_LOCAL, SOCK_SEQPACKET, 0);
-+	if (sk < 0) {
-+		err = errno;
-+		error("Failed to create socket: %d (%s)", err,
-+							strerror(err));
-+		return false;
-+	}
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.sun_family = AF_UNIX;
-+
-+	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
-+
-+	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-+		err = errno;
-+		error("Failed to bind socket: %d (%s)", err, strerror(err));
-+		close(sk);
-+		return false;
-+	}
-+
-+	if (listen(sk, 2) < 0) {
-+		err = errno;
-+		error("Failed to listen on socket: %d (%s)", err,
-+								strerror(err));
-+		close(sk);
-+		return false;
-+	}
-+
-+	/* Start Android Bluetooth daemon service */
-+	property_set("ctl.start", SERVICE_NAME);
-+
-+	cmd_sk = accept_connection(sk);
-+	if (cmd_sk < 0) {
-+		close(sk);
-+		return false;
-+	}
-+
-+	notif_sk = accept_connection(sk);
-+	if (notif_sk < 0) {
-+		close(sk);
-+		close(cmd_sk);
-+		cmd_sk = -1;
-+		return false;
-+	}
-+
-+	info("bluetoothd connected");
-+
-+	close(sk);
-+
-+	return true;
-+}
-+
-+void hal_ipc_cleanup(void)
-+{
-+	close(cmd_sk);
-+	cmd_sk = -1;
-+
-+	close(notif_sk);
-+	notif_sk = -1;
-+}
-diff --git a/android/hal-ipc.h b/android/hal-ipc.h
-new file mode 100644
-index 0000000..2f71668
---- /dev/null
-+++ b/android/hal-ipc.h
-@@ -0,0 +1,19 @@
-+/*
-+ * Copyright (C) 2013 Intel Corporation
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ *
-+ */
-+
-+bool hal_ipc_init(void);
-+void hal_ipc_cleanup(void);
+And yes, my thinkpad was hit by something similar, but this one was
+subsequently fixed.
+
+									Pavel
+
+On Sun 2013-10-20 14:53:18, alexandre@maloteaux.net wrote:
+>  Hi
+> I bought recently an old blutooth dongle in Gabon/Africa. I guess it is a pretty
+> old 2.0 as it was written "Vista Compatible" on the box : Bus 004 Device 004: ID
+> 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)
+> 
+> When trying to use it on ubuntu 13.10 - 3.11.0-12-generic, i got the same issue 
+> with hcitool :
+> Can't init device hci0: Operation not supported (95)
+> 
+> The main issue is that the bit7 of octet 6 is set in the supported command
+> response (see attached hcidump).
+> 
+> i tried to recompile the kernel by commenting this code :
+> 
+> +       if (hdev->commands[6] & 0x80) {
+> +               struct hci_cp_delete_stored_link_key cp;
+> +
+> +               bacpy(&cp.bdaddr, BDADDR_ANY);
+> +               cp.delete_all = 0x01;
+> +               hci_req_add(req, HCI_OP_DELETE_STORED_LINK_KEY,
+> +                           sizeof(cp), &cp);
+> +       }
+> 
+> and it worked.
+> 
+> Are you sure about the flag position in the supported command ?
+> If so , is not possible on fail just to continue the init process as this
+> command seems obsolete.
+> 
+> Best Regards
+
+> hcidump -X
+> HCI sniffer - Bluetooth packet analyzer ver 2.5
+> device: hci0 snap_len: 1500 filter: 0xffffffff
+> < HCI Command: Read Local Supported Features (0x04|0x0003) plen 0
+> > HCI Event: Command Complete (0x0e) plen 12
+>     Read Local Supported Features (0x04|0x0003) ncmd 1
+>     status 0x00
+>     Features: 0xff 0xff 0x8d 0xfe 0x9b 0xf9 0x00 0x80
+> < HCI Command: Read Local Version Information (0x04|0x0001) plen 0
+> > HCI Event: Command Complete (0x0e) plen 12
+>     Read Local Version Information (0x04|0x0001) ncmd 1
+>     status 0x00
+>     HCI Version: 2.0 (0x3) HCI Revision: 0x3000
+>     LMP Version: 2.0 (0x3) LMP Subversion: 0x420b
+>     Manufacturer: Broadcom Corporation (15)
+> < HCI Command: Read BD ADDR (0x04|0x0009) plen 0
+> > HCI Event: Command Complete (0x0e) plen 10
+>     Read BD ADDR (0x04|0x0009) ncmd 1
+>     status 0x00 bdaddr 00:19:86:00:19:C2
+> < HCI Command: Read Buffer Size (0x04|0x0005) plen 0
+> > HCI Event: Command Complete (0x0e) plen 11
+>     Read Buffer Size (0x04|0x0005) ncmd 1
+>     status 0x00
+>     ACL MTU 1017:8 SCO MTU 64:0
+> < HCI Command: Read Class of Device (0x03|0x0023) plen 0
+> > HCI Event: Command Complete (0x0e) plen 7
+>     Read Class of Device (0x03|0x0023) ncmd 1
+>     status 0x00 class 0x000000
+> < HCI Command: Read Local Name (0x03|0x0014) plen 0
+> > HCI Event: Command Complete (0x0e) plen 252
+>     Read Local Name (0x03|0x0014) ncmd 1
+>     status 0x00 name 'BCM2045B'
+> < HCI Command: Read Voice Setting (0x03|0x0025) plen 0
+> > HCI Event: Command Complete (0x0e) plen 6
+>     Read Voice Setting (0x03|0x0025) ncmd 1
+>     status 0x00 voice setting 0x0060
+> < HCI Command: Set Event Filter (0x03|0x0005) plen 1
+>     type 0 condition 0
+>     Clear all filters
+> > HCI Event: Command Complete (0x0e) plen 4
+>     Set Event Filter (0x03|0x0005) ncmd 1
+>     status 0x00
+> < HCI Command: Write Connection Accept Timeout (0x03|0x0016) plen 2
+>     timeout 32000
+> > HCI Event: Command Complete (0x0e) plen 4
+>     Write Connection Accept Timeout (0x03|0x0016) ncmd 1
+>     status 0x00
+> < HCI Command: Read Page Scan Activity (0x03|0x001b) plen 0
+> > HCI Event: Command Complete (0x0e) plen 8
+>     Read Page Scan Activity (0x03|0x001b) ncmd 1
+>     status 0x00 interval 2048 window 18
+> < HCI Command: Read Page Scan Type (0x03|0x0046) plen 0
+> > HCI Event: Command Complete (0x0e) plen 5
+>     Read Page Scan Type (0x03|0x0046) ncmd 1
+>     0000: 00 00                                             ..
+> < HCI Command: Set Event Mask (0x03|0x0001) plen 8
+>     Mask: 0xfffffbff07180000
+> > HCI Event: Command Complete (0x0e) plen 4
+>     Set Event Mask (0x03|0x0001) ncmd 1
+>     status 0x00
+> < HCI Command: Read Local Supported Commands (0x04|0x0002) plen 0
+> > HCI Event: Command Complete (0x0e) plen 68
+>     Read Local Supported Commands (0x04|0x0002) ncmd 1
+>     status 0x00
+>     Commands: ffffffffffffcfffffffffff0300ffff07
+> < HCI Command: Write Inquiry Mode (0x03|0x0045) plen 1
+>     mode 1
+> > HCI Event: Command Complete (0x0e) plen 4
+>     Write Inquiry Mode (0x03|0x0045) ncmd 1
+>     status 0x00
+> < HCI Command: Read Local Extended Features (0x04|0x0004) plen 1
+>     page 1
+> > HCI Event: Command Complete (0x0e) plen 14
+>     Read Local Extended Features (0x04|0x0004) ncmd 1
+>     status 0x00 page 1 max 0
+>     Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+> < HCI Command: Delete Stored Link Key (0x03|0x0012) plen 7
+>     bdaddr 00:00:00:00:00:00 all 1
+> > HCI Event: Command Complete (0x0e) plen 4
+>     Delete Stored Link Key (0x03|0x0012) ncmd 1
+>     status 0x11 deleted 0
+>     Error: Unsupported Feature or Parameter Value
+> 
+
+
 -- 
-1.8.4
-
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
