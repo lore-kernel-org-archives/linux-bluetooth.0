@@ -2,62 +2,67 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 04/11] android: Split command and notification socket watch
-Date: Mon, 21 Oct 2013 20:56:44 +0200
-Message-Id: <1382381811-28123-4-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v3 03/11] android/hal: Register adapter and socket interface on HAL init
+Date: Mon, 21 Oct 2013 20:56:43 +0200
+Message-Id: <1382381811-28123-3-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1382381811-28123-1-git-send-email-szymon.janc@tieto.com>
 References: <1382381811-28123-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+After daemon is started HAL needs to register those two interfaces
+to performe initialization procedure as described in IPC documentation.
 ---
- android/main.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+ android/hal-bluetooth.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/android/main.c b/android/main.c
-index fac1003..b24451e 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -62,10 +62,19 @@ static GIOChannel *hal_notif_io = NULL;
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index b9a78b6..f408a7d 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -39,6 +39,9 @@ static bool interface_ready(void)
  
- static volatile sig_atomic_t __terminated = 0;
- 
--static gboolean watch_cb(GIOChannel *io, GIOCondition cond,
-+static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
- 							gpointer user_data)
+ static int init(bt_callbacks_t *callbacks)
  {
--	info("HAL socket closed, terminating");
-+	info("HAL command socket closed, terminating");
-+	g_main_loop_quit(event_loop);
++	struct hal_msg_cmd_register_module cmd;
++	struct hal_msg_rsp_error rsp;
 +
-+	return FALSE;
-+}
+ 	DBG("");
+ 
+ 	if (interface_ready())
+@@ -49,7 +52,32 @@ static int init(bt_callbacks_t *callbacks)
+ 
+ 	bt_hal_cbacks = callbacks;
+ 
++	cmd.service_id = HAL_SERVICE_ID_BLUETOOTH;
 +
-+static gboolean notif_watch_cb(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	info("HAL notification socket closed, terminating");
- 	g_main_loop_quit(event_loop);
++	if (hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_MSG_OP_REGISTER_MODULE,
++						sizeof(cmd), &cmd,
++						sizeof(rsp), &rsp, NULL) < 0) {
++		error("Failed to register 'bluetooth' service");
++		goto fail;
++	}
++
++	cmd.service_id = HAL_SERVICE_ID_SOCK;
++
++	if (hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_MSG_OP_REGISTER_MODULE,
++						sizeof(cmd), &cmd,
++						sizeof(rsp), &rsp, NULL) < 0) {
++		error("Failed to register 'socket' service");
++		goto fail;
++	}
++
+ 	return BT_STATUS_SUCCESS;
++
++fail:
++
++	hal_ipc_cleanup();
++	bt_hal_cbacks = NULL;
++	return BT_STATUS_FAIL;
++
+ }
  
- 	return FALSE;
-@@ -123,7 +132,7 @@ static gboolean notif_connect_cb(GIOChannel *io, GIOCondition cond,
- 
- 	cond = G_IO_ERR | G_IO_HUP | G_IO_NVAL;
- 
--	g_io_add_watch(io, cond, watch_cb, NULL);
-+	g_io_add_watch(io, cond, notif_watch_cb, NULL);
- 
- 	info("Successfully connected to HAL");
- 
-@@ -144,7 +153,7 @@ static gboolean cmd_connect_cb(GIOChannel *io, GIOCondition cond,
- 
- 	cond = G_IO_ERR | G_IO_HUP | G_IO_NVAL;
- 
--	g_io_add_watch(io, cond, watch_cb, NULL);
-+	g_io_add_watch(io, cond, cmd_watch_cb, NULL);
- 
- 	hal_notif_io = connect_hal(notif_connect_cb);
- 	if (!hal_notif_io) {
+ static int enable(void)
 -- 
 1.8.4
 
