@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 4/6] android: Add HAL message helpers
-Date: Mon, 21 Oct 2013 14:28:35 +0300
-Message-Id: <1382354917-8632-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 1/6] android: Add capabilities and set userid
+Date: Mon, 21 Oct 2013 14:28:32 +0300
+Message-Id: <1382354917-8632-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1382354917-8632-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1382354917-8632-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,187 +11,114 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add helper to ease opening channel and sending commands.
+The patch set UID as standard Bluetooth user for Android (AID_BLUETOOTH).
+For SDP server we need to bind to lower port, acquire this capability.
+Other capabilities are required to access management interface.
 ---
- android/Android.mk       |    1 +
- android/hal-msg-client.c |  123 ++++++++++++++++++++++++++++++++++++++++++++++
- android/hal-msg-client.h |   25 ++++++++++
- 3 files changed, 149 insertions(+)
- create mode 100644 android/hal-msg-client.c
- create mode 100644 android/hal-msg-client.h
+ android/main.c |   58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ configure.ac   |    4 ++++
+ 2 files changed, 62 insertions(+)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index d5dfde7..4bd4116 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -56,6 +56,7 @@ LOCAL_SRC_FILES := \
- 	hal-sock.c \
- 	hal-hidhost.c \
- 	hal-pan.c \
-+	hal-msg-client.c \
- 
- LOCAL_SHARED_LIBRARIES := \
- 	libcutils \
-diff --git a/android/hal-msg-client.c b/android/hal-msg-client.c
-new file mode 100644
-index 0000000..43af9a1
---- /dev/null
-+++ b/android/hal-msg-client.c
-@@ -0,0 +1,123 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <stdio.h>
-+#include <stdlib.h>
+diff --git a/android/main.c b/android/main.c
+index fac1003..4a716be 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -33,10 +33,17 @@
+ #include <stdbool.h>
+ #include <string.h>
+ #include <errno.h>
 +#include <unistd.h>
-+#include <stdbool.h>
 +
-+#include <hardware/bluetooth.h>
-+#include <cutils/sockets.h>
-+#include <cutils/properties.h>
+ #include <sys/signalfd.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
+ 
++#if defined(ANDROID)
++#include <sys/prctl.h>
++#include <private/android_filesystem_config.h>
++#endif
 +
-+#define LOG_TAG "BlueZ"
-+#include <cutils/log.h>
-+
-+#include "hal-msg.h"
-+#include "hal-msg-client.h"
-+
-+#define BLUEZ_SOCKET "/tmp/bt_hal"
-+
-+int open_hal_chan(void)
+ #include <glib.h>
+ 
+ #include "log.h"
+@@ -409,6 +416,54 @@ static void cleanup_hal_connection(void)
+ 	}
+ }
+ 
++static bool set_capabilities(void)
 +{
-+	int tries = 10;
-+	int sock;
++#if defined(ANDROID)
++	struct __user_cap_header_struct header;
++	struct __user_cap_data_struct cap;
++	gid_t groups[] = {AID_NET_BT, AID_NET_BT_ADMIN, AID_NET_ADMIN};
 +
-+	while (tries-- > 0) {
-+		sock = socket_local_client(BLUEZ_SOCKET,
-+					ANDROID_SOCKET_NAMESPACE_FILESYSTEM,
-+					SOCK_SEQPACKET);
-+		if (sock < 0)
-+			ALOGE("%s: Cannot open chan: %s", __func__,
-+							strerror(errno));
-+		else
-+			return sock;
++	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
 +
-+		usleep(100000);
++	header.version = _LINUX_CAPABILITY_VERSION;
++
++	prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);
++
++	if (setgid(AID_BLUETOOTH) < 0)
++		warn("%s: setgid(): %s", __func__, strerror(errno));
++
++	if (setuid(AID_BLUETOOTH) < 0)
++		warn("%s: setuid(): %s", __func__, strerror(errno));
++
++	header.version = _LINUX_CAPABILITY_VERSION;
++	header.pid = 0;
++
++	cap.effective = cap.permitted =
++		CAP_TO_MASK(CAP_SETGID) |
++		CAP_TO_MASK(CAP_NET_RAW) |
++		CAP_TO_MASK(CAP_NET_ADMIN) |
++		CAP_TO_MASK(CAP_NET_BIND_SERVICE);
++	cap.inheritable = 0;
++
++	if (capset(&header, &cap) < 0) {
++		error("%s: capset(): %s", __func__, strerror(errno));
++		return false;
 +	}
 +
-+	return sock;
++	if (setgroups(sizeof(groups)/sizeof(groups[0]), groups) < 0)
++		warn("%s: setgroups: %s", __func__, strerror(errno));
++
++	if (capget(&header, &cap) < 0)
++		error("%s: capget(): %s", __func__, strerror(errno));
++	else
++		DBG("Caps: eff: 0x%x, perm: 0x%x, inh: 0x%x", cap.effective,
++					cap.permitted, cap.inheritable);
++
++	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
++#endif
++	return true;
 +}
 +
-+static int hal_send(int sock, struct hal_msg_hdr *msg)
-+{
-+	int len, size;
-+	uint8_t buf[MAX_HAL_BUF_SIZE];
-+	struct hal_msg_rsp {
-+		struct hal_msg_hdr hdr;
-+		uint8_t status;
-+	} *rsp;
+ int main(int argc, char *argv[])
+ {
+ 	GOptionContext *context;
+@@ -442,6 +497,9 @@ int main(int argc, char *argv[])
+ 
+ 	__btd_log_init("*", 0);
+ 
++	if (!set_capabilities())
++		return EXIT_FAILURE;
 +
-+	if (sock < 0) {
-+		ALOGE("%s: socket not ready", __func__);
-+		return BT_STATUS_NOT_READY;
-+	}
+ 	if (!init_mgmt_interface())
+ 		return EXIT_FAILURE;
+ 
+diff --git a/configure.ac b/configure.ac
+index b4d3998..e3b5220 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -247,4 +247,8 @@ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
+ 					[enable_android=${enableval}])
+ AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
+ 
++if (test "${enable_android}" = "yes"); then
++	AC_CHECK_LIB(cap, capget, dummy=yes, AC_MSG_ERROR(libcap is required))
++fi
 +
-+	size = sizeof(*msg) + msg->len;
-+	len = send(sock, msg, size, 0);
-+	if (len != size) {
-+		ALOGE("%s: send(): %s", __func__, strerror(errno));
-+		close(sock);
-+		return BT_STATUS_FAIL;
-+	}
-+
-+	ALOGD("%s: Sent %d bytes", __func__, len);
-+
-+	len = recv(sock, &buf, sizeof(buf), 0);
-+	if (len <= 0) {
-+		ALOGE("%s: recv(): %s", __func__, strerror(errno));
-+		return BT_STATUS_FAIL;
-+	}
-+
-+	if (len == sizeof(struct hal_msg_hdr))
-+		return BT_STATUS_SUCCESS;
-+
-+	rsp = (struct hal_msg_rsp *) buf;
-+
-+	ALOGE("%s: error returned: %u", __func__, rsp->status);
-+
-+	return rsp->status;
-+}
-+
-+int hal_register_module(int sock, uint8_t service_id)
-+{
-+	struct hal_msg_hdr *hdr;
-+	struct hal_msg_cmd_register_module *msg;
-+	int err;
-+
-+	hdr = malloc(sizeof(*hdr) + sizeof(*msg));
-+	if (hdr == NULL)
-+		return BT_STATUS_NOMEM;
-+
-+	hdr->service_id = 0;
-+	hdr->opcode = HAL_MSG_OP_REGISTER_MODULE;
-+	hdr->len = sizeof(*msg);
-+
-+	msg = (struct  hal_msg_cmd_register_module *) hdr + sizeof(*hdr);
-+	msg->service_id = service_id;
-+
-+	err = hal_send(sock, hdr);
-+
-+	free(hdr);
-+	return err;
-+}
-diff --git a/android/hal-msg-client.h b/android/hal-msg-client.h
-new file mode 100644
-index 0000000..c620dea
---- /dev/null
-+++ b/android/hal-msg-client.h
-@@ -0,0 +1,25 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+int hal_register_module(int sock, uint8_t service_id);
-+int open_hal_chan(void);
+ AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
 -- 
 1.7.10.4
 
