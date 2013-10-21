@@ -1,45 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Subject: [PATCH -v2 1/5] Bluetooth: Remove not used struct sock
-Date: Mon, 21 Oct 2013 14:21:37 -0200
-Message-Id: <1382372501-28562-1-git-send-email-gustavo@padovan.org>
+Date: Mon, 21 Oct 2013 19:18:59 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/3] Add basic commands to haltest
+Message-ID: <20131021161859.GA9153@x220.p-661hnu-f1>
+References: <1382364136-13665-1-git-send-email-jerzy.kasenberg@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1382364136-13665-1-git-send-email-jerzy.kasenberg@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+Hi Jerzy,
 
-It is a leftover from the recent effort of remove sk usage from L2CAP
-core.
+On Mon, Oct 21, 2013, Jerzy Kasenberg wrote:
+> - Adds handling of Ctrl-c Ctrl-d as requested
+> - Prompted changed to includ space
+> - Added commands: quit exit help
+> - Added completion for help
+> - Terminal settings restored on exit
+> 
+> Jerzy Kasenberg (3):
+>   android: Add space in prompt in haltest
+>   android: Add handling of Ctrl-c to haltest
+>   android: Add help and quit to haltest
+> 
+>  android/client/haltest.c       |  151 ++++++++++++++++++++++++++++++++++------
+>  android/client/if-main.h       |    6 ++
+>  android/client/tabcompletion.c |  151 ++++++++++++++++++++++++++++------------
+>  android/client/terminal.c      |  100 ++++++++++++++++++--------
+>  4 files changed, 312 insertions(+), 96 deletions(-)
 
-Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
----
- net/bluetooth/l2cap_core.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Patches 1 and 3 have been applied. It seems we had a bit of a
+misunderstanding about 2 though. I was looking for ctrl-d (i.e. EOF)
+support. Sorry for not being more precise here. Right now when I try
+it the following just happens:
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index d52bd0d..4141545 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3726,7 +3726,7 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
- 	struct l2cap_conn_req *req = (struct l2cap_conn_req *) data;
- 	struct l2cap_conn_rsp rsp;
- 	struct l2cap_chan *chan = NULL, *pchan;
--	struct sock *parent, *sk = NULL;
-+	struct sock *parent;
- 	int result, status = L2CAP_CS_NO_INFO;
- 
- 	u16 dcid = 0, scid = __le16_to_cpu(req->scid);
-@@ -3765,8 +3765,6 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
- 	if (!chan)
- 		goto response;
- 
--	sk = chan->sk;
--
- 	/* For certain devices (ex: HID mouse), support for authentication,
- 	 * pairing and bonding is optional. For such devices, inorder to avoid
- 	 * the ACL alive for too long after L2CAP disconnection, reset the ACL
--- 
-1.8.3.1
+jh@x220:bluez{master}$ android/haltest 
+> char-0x04
 
+I wouldn't have expected this to be an issue if stdin is processed
+properly, but it seems even something like the following doesn't result
+in the expected behavior right now (to run all commands in the file and
+then exit the tool):
+
+$ tools/haltest < my-script.txt
+
+Another thing I'd like to see fixed is getting the terminal back to a
+sane state when exiting. Right now even after a clean exit I seem to
+have to do a hard terminal reset to get normal behavior back. As an
+example, the following is what I get after cleanly exiting using "exit"
+and then pressing enter a couple of times:
+
+jh@x220:bluez{master}$ android/haltest 
+> exit
+jh@x220:bluez{master}$ jh@x220:bluez{master}$ jh@x220:bluez{master}$ 
+
+Johan
