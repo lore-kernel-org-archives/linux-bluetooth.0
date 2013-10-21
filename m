@@ -1,33 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 21 Oct 2013 22:58:04 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 01/11] android/hal: Move IPC and sockets related code
+ to separate file
+Message-ID: <20131021195804.GB19575@x220.p-661hnu-f1>
+References: <1382381811-28123-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 6.6 \(1510\))
-Subject: Re: [PATCH -v2 1/5] Bluetooth: Remove not used struct sock
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1382372501-28562-1-git-send-email-gustavo@padovan.org>
-Date: Mon, 21 Oct 2013 22:01:55 +0200
-Cc: linux-bluetooth@vger.kernel.org,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>
-Message-Id: <611C02D7-B371-46E8-A5AC-9FE89CE6C967@holtmann.org>
-References: <1382372501-28562-1-git-send-email-gustavo@padovan.org>
-To: Gustavo Padovan <gustavo@padovan.org>
+In-Reply-To: <1382381811-28123-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Szymon,
 
-> From: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+On Mon, Oct 21, 2013, Szymon Janc wrote:
+> hal-ipc will provide functionality related to IPC initialization and
+> sockets handling (including upcoming callbacks thread).
 > 
-> It is a leftover from the recent effort of remove sk usage from L2CAP
-> core.
-> 
-> Signed-off-by: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> This allow to remove code from bluetooth HAL not related to adapter.
 > ---
-> net/bluetooth/l2cap_core.c | 4 +---
-> 1 file changed, 1 insertion(+), 3 deletions(-)
+>  Makefile.android        |   3 +-
+>  android/Android.mk      |   1 +
+>  android/hal-bluetooth.c | 118 ++---------------------------------------
+>  android/hal-ipc.c       | 137 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  android/hal-ipc.h       |  19 +++++++
+>  5 files changed, 163 insertions(+), 115 deletions(-)
+>  create mode 100644 android/hal-ipc.c
+>  create mode 100644 android/hal-ipc.h
 
-all 5 patches have been applied to bluetooth-next tree.
+All patches, except 5/11 (which was unnecessary) have been applied along
+with minor fixes. Thanks.
 
-Regards
-
-Marcel
-
+Johan
