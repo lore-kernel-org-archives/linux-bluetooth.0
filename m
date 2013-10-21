@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 2/6] android: Handle mgmt changed events
-Date: Mon, 21 Oct 2013 14:28:33 +0300
-Message-Id: <1382354917-8632-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 5/6] android: Add helper to send fd using SCM_RIGHTS
+Date: Mon, 21 Oct 2013 14:28:36 +0300
+Message-Id: <1382354917-8632-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1382354917-8632-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1382354917-8632-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,158 +11,95 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add code handling changing adapter settings.
+This is used in accept message to Android framework.
 ---
- android/adapter.c |  129 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 129 insertions(+)
+ android/Android.mk |    1 +
+ android/bt-sock.c  |   64 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 65 insertions(+)
+ create mode 100644 android/bt-sock.c
 
-diff --git a/android/adapter.c b/android/adapter.c
-index 4009f4d..cae3187 100644
---- a/android/adapter.c
-+++ b/android/adapter.c
-@@ -69,6 +69,134 @@ failed:
- 	adapter->ready(NULL, err);
- }
+diff --git a/android/Android.mk b/android/Android.mk
+index 4bd4116..786c9fb 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -57,6 +57,7 @@ LOCAL_SRC_FILES := \
+ 	hal-hidhost.c \
+ 	hal-pan.c \
+ 	hal-msg-client.c \
++	bt-sock.c \
  
-+static void mgmt_local_name_changed_event(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct bt_adapter *adapter = user_data;
-+	const struct mgmt_cp_set_local_name *rp = param;
+ LOCAL_SHARED_LIBRARIES := \
+ 	libcutils \
+diff --git a/android/bt-sock.c b/android/bt-sock.c
+new file mode 100644
+index 0000000..68dbe32
+--- /dev/null
++++ b/android/bt-sock.c
+@@ -0,0 +1,64 @@
++/*
++ * Copyright (C) 2013 Intel Corporation
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ *
++ */
 +
-+	if (length < sizeof(*rp)) {
-+		error("Wrong size of local name changed parameters");
-+		return;
++#include <sys/socket.h>
++#include <sys/un.h>
++#include <errno.h>
++
++#include <cutils/log.h>
++
++int bt_sock_send_acc_fd(int sock_fd, const unsigned char *buf, int len,
++								int send_fd)
++{
++	ssize_t ret;
++	struct msghdr msg;
++	struct cmsghdr *cmsg;
++	struct iovec iv;
++	char msgbuf[CMSG_SPACE(1)];
++
++	ALOGD("%s: len %d sock_fd %d send_fd %d", __func__, len, sock_fd,
++								send_fd);
++
++	if (sock_fd == -1 || send_fd == -1)
++		return -1;
++
++	memset(&msg, 0, sizeof(msg));
++
++	msg.msg_control = msgbuf;
++	msg.msg_controllen = sizeof(msgbuf);
++	cmsg = CMSG_FIRSTHDR(&msg);
++	cmsg->cmsg_level = SOL_SOCKET;
++	cmsg->cmsg_type = SCM_RIGHTS;
++	cmsg->cmsg_len = CMSG_LEN(sizeof(send_fd));
++	memcpy(CMSG_DATA(cmsg), &send_fd, sizeof(send_fd));
++
++	iv.iov_base = (unsigned char *) buf;
++	iv.iov_len = len;
++
++	msg.msg_iov = &iv;
++	msg.msg_iovlen = 1;
++
++	ret = sendmsg(sock_fd, &msg, MSG_NOSIGNAL);
++	if (ret < 0) {
++		ALOGE("%s: sock_fd %d send_fd %d sendmsg ret %d errno %d %s",
++				__func__, sock_fd, send_fd, (int)ret, errno,
++				strerror(errno));
++		return ret;
 +	}
 +
-+	if (!g_strcmp0(adapter->name, (const char *) rp->name))
-+		return;
-+
-+	DBG("name: %s", rp->name);
-+
-+	g_free(adapter->name);
-+	adapter->name = g_strdup((const char *) rp->name);
-+
-+	/* TODO Update services if needed */
++	return ret;
 +}
-+
-+static void settings_changed_connectable(struct bt_adapter *adapter)
-+{
-+	/* TODO */
-+}
-+
-+static void settings_changed_discoverable(struct bt_adapter *adapter)
-+{
-+	/* TODO */
-+}
-+
-+static void settings_changed(struct bt_adapter *adapter, uint32_t settings)
-+{
-+	uint32_t changed_mask;
-+
-+	changed_mask = adapter->current_settings ^ settings;
-+
-+	adapter->current_settings = settings;
-+
-+	DBG("0x%08x", changed_mask);
-+
-+	if (changed_mask & MGMT_SETTING_POWERED) {
-+		info("Powered");
-+
-+		/*
-+		if (adapter->current_settings & MGMT_SETTING_POWERED)
-+			start_adapter()
-+		else
-+			stop_adapter()
-+		*/
-+	}
-+
-+	if (changed_mask & MGMT_SETTING_CONNECTABLE) {
-+		DBG("Connectable");
-+
-+		settings_changed_connectable(adapter);
-+	}
-+
-+	if (changed_mask & MGMT_SETTING_DISCOVERABLE) {
-+		DBG("Discoverable");
-+
-+		settings_changed_discoverable(adapter);
-+	}
-+}
-+
-+static void new_settings_callback(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct bt_adapter *adapter = user_data;
-+	uint32_t settings;
-+
-+	if (length < sizeof(settings)) {
-+		error("Wrong size of new settings parameters");
-+		return;
-+	}
-+
-+	settings = bt_get_le32(param);
-+
-+	DBG("settings: 0x%8.8x -> 0x%8.8x", adapter->current_settings,
-+								settings);
-+
-+	if (settings == adapter->current_settings)
-+		return;
-+
-+	settings_changed(adapter, settings);
-+}
-+
-+static void mgmt_dev_class_changed_event(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct bt_adapter *adapter = user_data;
-+	const struct mgmt_cod *rp = param;
-+	uint32_t dev_class;
-+
-+	if (length < sizeof(*rp)) {
-+		error("Wrong size of class of device changed parameters");
-+		return;
-+	}
-+
-+	dev_class = rp->val[0] | (rp->val[1] << 8) | (rp->val[2] << 16);
-+
-+	if (dev_class == adapter->dev_class)
-+		return;
-+
-+	DBG("Class: 0x%06x", dev_class);
-+
-+	adapter->dev_class = dev_class;
-+
-+	/* TODO: Inform prop change: Class */
-+
-+	/* TODO: Gatt attrib set*/
-+}
-+
-+static void register_mgmt_handlers(struct bt_adapter *adapter)
-+{
-+	mgmt_register(adapter->mgmt, MGMT_EV_NEW_SETTINGS, 0,
-+			new_settings_callback, adapter, NULL);
-+
-+	mgmt_register(adapter->mgmt, MGMT_EV_CLASS_OF_DEV_CHANGED,
-+			0, mgmt_dev_class_changed_event,
-+			adapter, NULL);
-+
-+	mgmt_register(adapter->mgmt, MGMT_EV_LOCAL_NAME_CHANGED,
-+			0, mgmt_local_name_changed_event,
-+			adapter, NULL);
-+}
-+
- static void load_link_keys(struct bt_adapter *adapter, GSList *keys)
- {
- 	struct mgmt_cp_load_link_keys *cp;
-@@ -128,6 +256,7 @@ static void read_info_complete(uint8_t status, uint16_t length, const void *para
- 	adapter->current_settings = btohs(rp->current_settings);
- 
- 	/* TODO: Register all event notification handlers */
-+	register_mgmt_handlers(adapter);
- 
- 	load_link_keys(adapter, NULL);
- 
 -- 
 1.7.10.4
 
