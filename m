@@ -1,57 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 Oct 2013 22:20:21 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Pavel Machek <pavel@ucw.cz>
-Cc: "alexandre@maloteaux.net" <alexandre@maloteaux.net>,
-	marcel@holtmann.org, gustavo@padovan.org,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: Issue with the kernel  bluetooth  HCI_Delete_Stored_Link_Key
- command patch
-Message-ID: <20131021192021.GA19575@x220.p-661hnu-f1>
-References: <413864804.130358.1382295198929.open-xchange@oxwebmail.registrar-servers.com>
- <20131021184839.GA10592@amd.pavel.ucw.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20131021184839.GA10592@amd.pavel.ucw.cz>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v3 10/11] android: Add initial code for handling HAL commands
+Date: Mon, 21 Oct 2013 20:56:50 +0200
+Message-Id: <1382381811-28123-10-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1382381811-28123-1-git-send-email-szymon.janc@tieto.com>
+References: <1382381811-28123-1-git-send-email-szymon.janc@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This enable watch for input and do basic sanity checks on received
+command. If there is protocol error mainloop is stopped and daemon
+exits.
+---
+ android/main.c | 43 ++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 40 insertions(+), 3 deletions(-)
 
-On Mon, Oct 21, 2013, Pavel Machek wrote:
-> > old 2.0 as it was written "Vista Compatible" on the box : Bus 004
-> > Device 004: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth
-> > Dongle (HCI mode)
-<snip>
-> > < HCI Command: Read Local Version Information (0x04|0x0001) plen 0
-> > > HCI Event: Command Complete (0x0e) plen 12
-> >     Read Local Version Information (0x04|0x0001) ncmd 1
-> >     status 0x00
-> >     HCI Version: 2.0 (0x3) HCI Revision: 0x3000
-> >     LMP Version: 2.0 (0x3) LMP Subversion: 0x420b
-> >     Manufacturer: Broadcom Corporation (15)
-> > < HCI Command: Read BD ADDR (0x04|0x0009) plen 0
-> > > HCI Event: Command Complete (0x0e) plen 10
-> >     Read BD ADDR (0x04|0x0009) ncmd 1
-> >     status 0x00 bdaddr 00:19:86:00:19:C2
-> > < HCI Command: Read Buffer Size (0x04|0x0005) plen 0
-> > > HCI Event: Command Complete (0x0e) plen 11
-> >     Read Buffer Size (0x04|0x0005) ncmd 1
-> >     status 0x00
-> >     ACL MTU 1017:8 SCO MTU 64:0
-> > < HCI Command: Read Class of Device (0x03|0x0023) plen 0
-> > > HCI Event: Command Complete (0x0e) plen 7
-> >     Read Class of Device (0x03|0x0023) ncmd 1
-> >     status 0x00 class 0x000000
-> > < HCI Command: Read Local Name (0x03|0x0014) plen 0
-> > > HCI Event: Command Complete (0x0e) plen 252
-> >     Read Local Name (0x03|0x0014) ncmd 1
-> >     status 0x00 name 'BCM2045B'
+diff --git a/android/main.c b/android/main.c
+index 04e8a48..72a1272 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -48,6 +48,7 @@
+ 
+ #include "adapter.h"
+ #include "hal-msg.h"
++#include "ipc.h"
+ #include "main.h"
+ 
+ static GMainLoop *event_loop;
+@@ -66,9 +67,45 @@ static volatile sig_atomic_t __terminated = 0;
+ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+-	info("HAL command socket closed, terminating");
+-	g_main_loop_quit(event_loop);
++	int fd;
++	ssize_t ret;
++	char buf[BLUEZ_HAL_MTU];
++	struct hal_msg_hdr *msg = (void *) buf;
++
++	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
++		info("HAL command socket closed, terminating");
++		goto fail;
++	}
++
++	fd = g_io_channel_unix_get_fd(io);
++
++	ret = read(fd, buf, sizeof(buf));
++	if (ret < 0) {
++		error("HAL command read failed, terminating (%s)",
++							strerror(errno));
++		goto fail;
++	}
++
++	if (ret < (ssize_t) sizeof(*msg)) {
++		error("HAL command too small, terminating (%zd)", ret);
++		goto fail;
++	}
++
++	if (ret != (ssize_t) (sizeof(*msg) + msg->len)) {
++		error("Malformed HAL command (%zd bytes), terminating", ret);
++		goto fail;
++	}
++
++	switch (msg->service_id) {
++	default:
++		ipc_send_error(hal_cmd_io, msg->service_id, 0x01);
++		break;
++	}
++
++	return TRUE;
+ 
++fail:
++	g_main_loop_quit(event_loop);
+ 	return FALSE;
+ }
+ 
+@@ -152,7 +189,7 @@ static gboolean cmd_connect_cb(GIOChannel *io, GIOCondition cond,
+ 		return FALSE;
+ 	}
+ 
+-	cond = G_IO_ERR | G_IO_HUP | G_IO_NVAL;
++	cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
+ 
+ 	g_io_add_watch(io, cond, cmd_watch_cb, NULL);
+ 
+-- 
+1.8.4
 
-There is something very strange in this hardware if it's reporting
-Broadcom on HCI but CSR over USB. Considering that these two companies
-are competitors I'd be inclined to think this HW is by neither one, i.e.
-possibly counterfeit. This, combined with the fact that it's not
-compliant with the Bluetooth specification, is not very likely to
-inspire efforts to get it fixed.
-
-Johan
