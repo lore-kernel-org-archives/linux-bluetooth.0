@@ -1,124 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android: Add README file with instructions
-Date: Mon, 21 Oct 2013 21:47:56 +0200
-Message-Id: <1382384876-11834-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 21 Oct 2013 22:20:21 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Pavel Machek <pavel@ucw.cz>
+Cc: "alexandre@maloteaux.net" <alexandre@maloteaux.net>,
+	marcel@holtmann.org, gustavo@padovan.org,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: Issue with the kernel  bluetooth  HCI_Delete_Stored_Link_Key
+ command patch
+Message-ID: <20131021192021.GA19575@x220.p-661hnu-f1>
+References: <413864804.130358.1382295198929.open-xchange@oxwebmail.registrar-servers.com>
+ <20131021184839.GA10592@amd.pavel.ucw.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20131021184839.GA10592@amd.pavel.ucw.cz>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This file cotains help on how BlueZ for Android should be build, run
-and test.
----
- Makefile.android |  2 +-
- android/README   | 83 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 84 insertions(+), 1 deletion(-)
- create mode 100644 android/README
+Hi,
 
-diff --git a/Makefile.android b/Makefile.android
-index f5a5834..1252682 100644
---- a/Makefile.android
-+++ b/Makefile.android
-@@ -79,7 +79,7 @@ EXTRA_DIST += android/client/terminal.c \
- 		android/client/history.h \
- 		android/client/terminal.h
- 
--EXTRA_DIST += android/hal-ipc-api.txt
-+EXTRA_DIST += android/hal-ipc-api.txt android/README
- 
- EXTRA_DIST += android/hardware/bluetooth.h \
- 		android/hardware/bt_av.h \
-diff --git a/android/README b/android/README
-new file mode 100644
-index 0000000..21690d4
---- /dev/null
-+++ b/android/README
-@@ -0,0 +1,83 @@
-+BlueZ for Android
-+*****************
-+
-+Since Android 4.2 there exists a well standardized HAL interface that the
-+Bluetooth stack is expected to provide and which enables the easy replacement
-+of the stack of choice on Android. Android BlueZ is intended as a drop-in
-+replacement to Android provided Bluetooth stack.
-+
-+More details about BlueZ for Android architecture and components can be found
-+in android/hal-apc-api.txt file.
-+
-+===============================
-+Building and running on Android
-+===============================
-+
-+Build requirements
-+==================
-+
-+- GLib - Android 4.2 or later don't provide GLib and one must provide it in
-+'external/bluetooth/glib' folder of Android tree. Sample Android GLib port
-+is available at https://code.google.com/p/android-bluez.glib/
-+
-+- Bionic support - BlueZ requires signalfd and timerfd APIs to be provided
-+by libc library. Currently only 'master' branch available at
-+https://android.googlesource.com/platform/bionic provides all required
-+functionality and running BlueZ on older branch requires backporting missing
-+features. Sample Bionic for Android on Intel Architecture (Android-IA) with all
-+required features backported is available at
-+https://code.google.com/p/android-bluez.bionic/
-+
-+Runtime requirements
-+====================
-+
-+BlueZ HAL library requires 'bluetoothd' service to be available on Android
-+system. This can be done by defining service in init.rc file of targeted board:
-+
-+service bluetoothd logwrapper /system/bin/bluetoothd
-+  class main
-+  group bluetooth net_bt_stack
-+  disabled
-+  oneshot
-+
-+Sample can be found at https://code.google.com/p/android-bluez.system-core/
-+
-+Downloading and building
-+========================
-+
-+Building for Android requires full Android AOSP source tree. Sample Android-IA
-+tree with all required components present is available at
-+http://code.google.com/p/android-bluez/
-+
-+Downloading:
-+repo init -u https://code.google.com/p/android-bluez.manifest/ -m topics/bluez
-+repo sync
-+
-+Build for Intel ultrabook:
-+'source build/envsetup.sh'
-+'lunch core_mesa-eng'
-+'make allimages -j8'
-+
-+After full build is done it is possible to rebuild only BlueZ:
-+'cd external/bluetooth/bluez/android/'
-+'mm' (or 'mm -B' to force rebuilding of all files)
-+'adb sync' to update target device.
-+
-+=============================
-+Building and running on Linux
-+=============================
-+It is possible to build and test BlueZ for Android daemon on Linux (eg. PC).
-+Simply follow instructions available at README file in BlueZ top directory.
-+Android daemon binary is located at android/bluetoothd.
-+
-+=======
-+Testing
-+=======
-+
-+BT HAL test tools located in android/haltest is provided for HAL level testing
-+of both Android daemon and HAL library. Start it and type 'adapter init' in
-+prompt to initialize HAL library. On Android required bluetoothd service will
-+be started automatically. On Linux it is required to start android/bluetoothd
-+manually before init command timeout. To deinitialize HAL library and stop
-+daemon type 'adapter cleanup'. Type 'help' for more information. Tab completion
-+is also supported.
-\ No newline at end of file
--- 
-1.8.4
+On Mon, Oct 21, 2013, Pavel Machek wrote:
+> > old 2.0 as it was written "Vista Compatible" on the box : Bus 004
+> > Device 004: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth
+> > Dongle (HCI mode)
+<snip>
+> > < HCI Command: Read Local Version Information (0x04|0x0001) plen 0
+> > > HCI Event: Command Complete (0x0e) plen 12
+> >     Read Local Version Information (0x04|0x0001) ncmd 1
+> >     status 0x00
+> >     HCI Version: 2.0 (0x3) HCI Revision: 0x3000
+> >     LMP Version: 2.0 (0x3) LMP Subversion: 0x420b
+> >     Manufacturer: Broadcom Corporation (15)
+> > < HCI Command: Read BD ADDR (0x04|0x0009) plen 0
+> > > HCI Event: Command Complete (0x0e) plen 10
+> >     Read BD ADDR (0x04|0x0009) ncmd 1
+> >     status 0x00 bdaddr 00:19:86:00:19:C2
+> > < HCI Command: Read Buffer Size (0x04|0x0005) plen 0
+> > > HCI Event: Command Complete (0x0e) plen 11
+> >     Read Buffer Size (0x04|0x0005) ncmd 1
+> >     status 0x00
+> >     ACL MTU 1017:8 SCO MTU 64:0
+> > < HCI Command: Read Class of Device (0x03|0x0023) plen 0
+> > > HCI Event: Command Complete (0x0e) plen 7
+> >     Read Class of Device (0x03|0x0023) ncmd 1
+> >     status 0x00 class 0x000000
+> > < HCI Command: Read Local Name (0x03|0x0014) plen 0
+> > > HCI Event: Command Complete (0x0e) plen 252
+> >     Read Local Name (0x03|0x0014) ncmd 1
+> >     status 0x00 name 'BCM2045B'
 
+There is something very strange in this hardware if it's reporting
+Broadcom on HCI but CSR over USB. Considering that these two companies
+are competitors I'd be inclined to think this HW is by neither one, i.e.
+possibly counterfeit. This, combined with the fact that it's not
+compliant with the Bluetooth specification, is not very likely to
+inspire efforts to get it fixed.
+
+Johan
