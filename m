@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 6/6] android: Add Android HAL callback task
-Date: Mon, 21 Oct 2013 14:28:37 +0300
-Message-Id: <1382354917-8632-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 4/6] android: Add HAL message helpers
+Date: Mon, 21 Oct 2013 14:28:35 +0300
+Message-Id: <1382354917-8632-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1382354917-8632-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1382354917-8632-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,125 +11,187 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Android HAL callback task listens for messages from BlueZ GPL daemon.
+Add helper to ease opening channel and sending commands.
 ---
- android/Android.mk      |    6 ++++
- android/hal-cb-thread.c |   86 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 92 insertions(+)
- create mode 100644 android/hal-cb-thread.c
+ android/Android.mk       |    1 +
+ android/hal-msg-client.c |  123 ++++++++++++++++++++++++++++++++++++++++++++++
+ android/hal-msg-client.h |   25 ++++++++++
+ 3 files changed, 149 insertions(+)
+ create mode 100644 android/hal-msg-client.c
+ create mode 100644 android/hal-msg-client.h
 
 diff --git a/android/Android.mk b/android/Android.mk
-index 786c9fb..c5c6e7b 100644
+index d5dfde7..4bd4116 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -58,9 +58,15 @@ LOCAL_SRC_FILES := \
+@@ -56,6 +56,7 @@ LOCAL_SRC_FILES := \
+ 	hal-sock.c \
+ 	hal-hidhost.c \
  	hal-pan.c \
- 	hal-msg-client.c \
- 	bt-sock.c \
-+	hal-cb-thread.c \
++	hal-msg-client.c \
  
  LOCAL_SHARED_LIBRARIES := \
  	libcutils \
-+	libglib \
-+
-+LOCAL_C_INCLUDES := \
-+	$(call include-path-for, glib) \
-+	$(call include-path-for, glib)/glib \
- 
- LOCAL_MODULE := bluetooth.default
- LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
-diff --git a/android/hal-cb-thread.c b/android/hal-cb-thread.c
+diff --git a/android/hal-msg-client.c b/android/hal-msg-client.c
 new file mode 100644
-index 0000000..1b1e228
+index 0000000..43af9a1
 --- /dev/null
-+++ b/android/hal-cb-thread.c
-@@ -0,0 +1,86 @@
++++ b/android/hal-msg-client.c
+@@ -0,0 +1,123 @@
 +/*
-+ * Copyright (C) 2013 Intel Corporation
 + *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
++ *  BlueZ - Bluetooth protocol stack for Linux
 + *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
 + *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 + *
 + */
 +
++#include <stdio.h>
 +#include <stdlib.h>
++#include <unistd.h>
 +#include <stdbool.h>
-+#include <sys/socket.h>
-+#include <sys/stat.h>
-+#include <sys/un.h>
-+#include <errno.h>
-+#include <sys/epoll.h>
++
 +#include <hardware/bluetooth.h>
-+#include <fcntl.h>
++#include <cutils/sockets.h>
++#include <cutils/properties.h>
 +
 +#define LOG_TAG "BlueZ"
 +#include <cutils/log.h>
 +
 +#include "hal-msg.h"
++#include "hal-msg-client.h"
 +
-+#define HAL_CBACK(base, cb_function, ...)				\
-+	do {								\
-+		if (base && base->cb_function) {			\
-+			ALOGI("CB %s->%s", #base, #cb_function);	\
-+			base->cb_function(__VA_ARGS__);			\
-+		} else {						\
-+			ALOGE("%s: Callback is NULL", __func__);	\
-+		}							\
-+	} while (0)
++#define BLUEZ_SOCKET "/tmp/bt_hal"
 +
-+extern bt_callbacks_t *bt_hal_cbacks;
-+
-+static int epfd;
-+
-+static void bthal_thread_associate(void)
++int open_hal_chan(void)
 +{
-+	ALOGI(__func__);
-+
-+	HAL_CBACK(bt_hal_cbacks, thread_evt_cb, ASSOCIATE_JVM);
-+}
-+
-+static void bthal_thread_disassociate(void)
-+{
-+	ALOGI(__func__);
-+
-+	HAL_CBACK(bt_hal_cbacks, thread_evt_cb, DISASSOCIATE_JVM);
-+
-+	bt_hal_cbacks = NULL;
-+}
-+
-+void process_msg(struct hal_msg_hdr *msg)
-+{
-+	ALOGI(__func__);
-+
-+	/* TODO: Process messages from daemon */
-+}
-+
-+int mainloop(void)
-+{
-+	return EXIT_SUCCESS;
-+}
-+
-+void *hal_cb_task(void *arg)
-+{
++	int tries = 10;
 +	int sock;
 +
-+	sock = open_hal_chan();
++	while (tries-- > 0) {
++		sock = socket_local_client(BLUEZ_SOCKET,
++					ANDROID_SOCKET_NAMESPACE_FILESYSTEM,
++					SOCK_SEQPACKET);
++		if (sock < 0)
++			ALOGE("%s: Cannot open chan: %s", __func__,
++							strerror(errno));
++		else
++			return sock;
 +
-+	bthal_thread_associate();
++		usleep(100000);
++	}
 +
-+	bthal_thread_disassociate();
-+
-+	return NULL;
++	return sock;
 +}
++
++static int hal_send(int sock, struct hal_msg_hdr *msg)
++{
++	int len, size;
++	uint8_t buf[MAX_HAL_BUF_SIZE];
++	struct hal_msg_rsp {
++		struct hal_msg_hdr hdr;
++		uint8_t status;
++	} *rsp;
++
++	if (sock < 0) {
++		ALOGE("%s: socket not ready", __func__);
++		return BT_STATUS_NOT_READY;
++	}
++
++	size = sizeof(*msg) + msg->len;
++	len = send(sock, msg, size, 0);
++	if (len != size) {
++		ALOGE("%s: send(): %s", __func__, strerror(errno));
++		close(sock);
++		return BT_STATUS_FAIL;
++	}
++
++	ALOGD("%s: Sent %d bytes", __func__, len);
++
++	len = recv(sock, &buf, sizeof(buf), 0);
++	if (len <= 0) {
++		ALOGE("%s: recv(): %s", __func__, strerror(errno));
++		return BT_STATUS_FAIL;
++	}
++
++	if (len == sizeof(struct hal_msg_hdr))
++		return BT_STATUS_SUCCESS;
++
++	rsp = (struct hal_msg_rsp *) buf;
++
++	ALOGE("%s: error returned: %u", __func__, rsp->status);
++
++	return rsp->status;
++}
++
++int hal_register_module(int sock, uint8_t service_id)
++{
++	struct hal_msg_hdr *hdr;
++	struct hal_msg_cmd_register_module *msg;
++	int err;
++
++	hdr = malloc(sizeof(*hdr) + sizeof(*msg));
++	if (hdr == NULL)
++		return BT_STATUS_NOMEM;
++
++	hdr->service_id = 0;
++	hdr->opcode = HAL_MSG_OP_REGISTER_MODULE;
++	hdr->len = sizeof(*msg);
++
++	msg = (struct  hal_msg_cmd_register_module *) hdr + sizeof(*hdr);
++	msg->service_id = service_id;
++
++	err = hal_send(sock, hdr);
++
++	free(hdr);
++	return err;
++}
+diff --git a/android/hal-msg-client.h b/android/hal-msg-client.h
+new file mode 100644
+index 0000000..c620dea
+--- /dev/null
++++ b/android/hal-msg-client.h
+@@ -0,0 +1,25 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++int hal_register_module(int sock, uint8_t service_id);
++int open_hal_chan(void);
 -- 
 1.7.10.4
 
