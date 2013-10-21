@@ -1,124 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 1/6] android: Add capabilities and set userid
-Date: Mon, 21 Oct 2013 14:28:32 +0300
-Message-Id: <1382354917-8632-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1382354917-8632-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1382354917-8632-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 0/6] Set of patches implementing missing IPC functionality
+Date: Mon, 21 Oct 2013 14:28:31 +0300
+Message-Id: <1382354917-8632-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-The patch set UID as standard Bluetooth user for Android (AID_BLUETOOTH).
-For SDP server we need to bind to lower port, acquire this capability.
-Other capabilities are required to access management interface.
----
- android/main.c |   58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- configure.ac   |    4 ++++
- 2 files changed, 62 insertions(+)
+This is my set of patches rebased against very recent bluez.git
+(most probably there might be some issues related to style used).
 
-diff --git a/android/main.c b/android/main.c
-index fac1003..4a716be 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -33,10 +33,17 @@
- #include <stdbool.h>
- #include <string.h>
- #include <errno.h>
-+#include <unistd.h>
-+
- #include <sys/signalfd.h>
- #include <sys/socket.h>
- #include <sys/un.h>
- 
-+#if defined(ANDROID)
-+#include <sys/prctl.h>
-+#include <private/android_filesystem_config.h>
-+#endif
-+
- #include <glib.h>
- 
- #include "log.h"
-@@ -409,6 +416,54 @@ static void cleanup_hal_connection(void)
- 	}
- }
- 
-+static bool set_capabilities(void)
-+{
-+#if defined(ANDROID)
-+	struct __user_cap_header_struct header;
-+	struct __user_cap_data_struct cap;
-+	gid_t groups[] = {AID_NET_BT, AID_NET_BT_ADMIN, AID_NET_ADMIN};
-+
-+	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
-+
-+	header.version = _LINUX_CAPABILITY_VERSION;
-+
-+	prctl(PR_SET_KEEPCAPS, 1, 0, 0, 0);
-+
-+	if (setgid(AID_BLUETOOTH) < 0)
-+		warn("%s: setgid(): %s", __func__, strerror(errno));
-+
-+	if (setuid(AID_BLUETOOTH) < 0)
-+		warn("%s: setuid(): %s", __func__, strerror(errno));
-+
-+	header.version = _LINUX_CAPABILITY_VERSION;
-+	header.pid = 0;
-+
-+	cap.effective = cap.permitted =
-+		CAP_TO_MASK(CAP_SETGID) |
-+		CAP_TO_MASK(CAP_NET_RAW) |
-+		CAP_TO_MASK(CAP_NET_ADMIN) |
-+		CAP_TO_MASK(CAP_NET_BIND_SERVICE);
-+	cap.inheritable = 0;
-+
-+	if (capset(&header, &cap) < 0) {
-+		error("%s: capset(): %s", __func__, strerror(errno));
-+		return false;
-+	}
-+
-+	if (setgroups(sizeof(groups)/sizeof(groups[0]), groups) < 0)
-+		warn("%s: setgroups: %s", __func__, strerror(errno));
-+
-+	if (capget(&header, &cap) < 0)
-+		error("%s: capget(): %s", __func__, strerror(errno));
-+	else
-+		DBG("Caps: eff: 0x%x, perm: 0x%x, inh: 0x%x", cap.effective,
-+					cap.permitted, cap.inheritable);
-+
-+	DBG("pid %d uid %d gid %d", getpid(), getuid(), getgid());
-+#endif
-+	return true;
-+}
-+
- int main(int argc, char *argv[])
- {
- 	GOptionContext *context;
-@@ -442,6 +497,9 @@ int main(int argc, char *argv[])
- 
- 	__btd_log_init("*", 0);
- 
-+	if (!set_capabilities())
-+		return EXIT_FAILURE;
-+
- 	if (!init_mgmt_interface())
- 		return EXIT_FAILURE;
- 
-diff --git a/configure.ac b/configure.ac
-index b4d3998..e3b5220 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -247,4 +247,8 @@ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
- 					[enable_android=${enableval}])
- AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
- 
-+if (test "${enable_android}" = "yes"); then
-+	AC_CHECK_LIB(cap, capget, dummy=yes, AC_MSG_ERROR(libcap is required))
-+fi
-+
- AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
+These patches add some missing capability to the process, add basic IPC server
+and client. Daemon listens for incoming connections from HALs so it acts
+as a server, while HALs connect and act as client. Please advise what
+are better names for hal-msg and hal-msg-client, should some code be moved
+to adapter.c?
+
+Andrei Emeltchenko (6):
+  android: Add capabilities and set userid
+  android: Handle mgmt changed events
+  android: Implement basic HAL server
+  android: Add HAL message helpers
+  android: Add helper to send fd using SCM_RIGHTS
+  android: Add Android HAL callback task
+
+ Makefile.android         |    2 +-
+ android/Android.mk       |    9 ++
+ android/adapter.c        |  129 ++++++++++++++++++++++
+ android/bt-sock.c        |   64 +++++++++++
+ android/hal-cb-thread.c  |   86 +++++++++++++++
+ android/hal-msg-client.c |  123 +++++++++++++++++++++
+ android/hal-msg-client.h |   25 +++++
+ android/hal-msg.c        |  267 ++++++++++++++++++++++++++++++++++++++++++++++
+ android/hal-msg.h        |    5 +
+ android/main.c           |   69 ++++++++++++
+ configure.ac             |    4 +
+ 11 files changed, 782 insertions(+), 1 deletion(-)
+ create mode 100644 android/bt-sock.c
+ create mode 100644 android/hal-cb-thread.c
+ create mode 100644 android/hal-msg-client.c
+ create mode 100644 android/hal-msg-client.h
+ create mode 100644 android/hal-msg.c
+
 -- 
 1.7.10.4
 
