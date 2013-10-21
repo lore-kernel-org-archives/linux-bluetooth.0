@@ -1,36 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 Oct 2013 22:58:04 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 01/11] android/hal: Move IPC and sockets related code
- to separate file
-Message-ID: <20131021195804.GB19575@x220.p-661hnu-f1>
-References: <1382381811-28123-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1382381811-28123-1-git-send-email-szymon.janc@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] android: Add README file with instructions
+Date: Mon, 21 Oct 2013 21:47:56 +0200
+Message-Id: <1382384876-11834-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+This file cotains help on how BlueZ for Android should be build, run
+and test.
+---
+ Makefile.android |  2 +-
+ android/README   | 83 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 84 insertions(+), 1 deletion(-)
+ create mode 100644 android/README
 
-On Mon, Oct 21, 2013, Szymon Janc wrote:
-> hal-ipc will provide functionality related to IPC initialization and
-> sockets handling (including upcoming callbacks thread).
-> 
-> This allow to remove code from bluetooth HAL not related to adapter.
-> ---
->  Makefile.android        |   3 +-
->  android/Android.mk      |   1 +
->  android/hal-bluetooth.c | 118 ++---------------------------------------
->  android/hal-ipc.c       | 137 ++++++++++++++++++++++++++++++++++++++++++++++++
->  android/hal-ipc.h       |  19 +++++++
->  5 files changed, 163 insertions(+), 115 deletions(-)
->  create mode 100644 android/hal-ipc.c
->  create mode 100644 android/hal-ipc.h
+diff --git a/Makefile.android b/Makefile.android
+index f5a5834..1252682 100644
+--- a/Makefile.android
++++ b/Makefile.android
+@@ -79,7 +79,7 @@ EXTRA_DIST += android/client/terminal.c \
+ 		android/client/history.h \
+ 		android/client/terminal.h
+ 
+-EXTRA_DIST += android/hal-ipc-api.txt
++EXTRA_DIST += android/hal-ipc-api.txt android/README
+ 
+ EXTRA_DIST += android/hardware/bluetooth.h \
+ 		android/hardware/bt_av.h \
+diff --git a/android/README b/android/README
+new file mode 100644
+index 0000000..21690d4
+--- /dev/null
++++ b/android/README
+@@ -0,0 +1,83 @@
++BlueZ for Android
++*****************
++
++Since Android 4.2 there exists a well standardized HAL interface that the
++Bluetooth stack is expected to provide and which enables the easy replacement
++of the stack of choice on Android. Android BlueZ is intended as a drop-in
++replacement to Android provided Bluetooth stack.
++
++More details about BlueZ for Android architecture and components can be found
++in android/hal-apc-api.txt file.
++
++===============================
++Building and running on Android
++===============================
++
++Build requirements
++==================
++
++- GLib - Android 4.2 or later don't provide GLib and one must provide it in
++'external/bluetooth/glib' folder of Android tree. Sample Android GLib port
++is available at https://code.google.com/p/android-bluez.glib/
++
++- Bionic support - BlueZ requires signalfd and timerfd APIs to be provided
++by libc library. Currently only 'master' branch available at
++https://android.googlesource.com/platform/bionic provides all required
++functionality and running BlueZ on older branch requires backporting missing
++features. Sample Bionic for Android on Intel Architecture (Android-IA) with all
++required features backported is available at
++https://code.google.com/p/android-bluez.bionic/
++
++Runtime requirements
++====================
++
++BlueZ HAL library requires 'bluetoothd' service to be available on Android
++system. This can be done by defining service in init.rc file of targeted board:
++
++service bluetoothd logwrapper /system/bin/bluetoothd
++  class main
++  group bluetooth net_bt_stack
++  disabled
++  oneshot
++
++Sample can be found at https://code.google.com/p/android-bluez.system-core/
++
++Downloading and building
++========================
++
++Building for Android requires full Android AOSP source tree. Sample Android-IA
++tree with all required components present is available at
++http://code.google.com/p/android-bluez/
++
++Downloading:
++repo init -u https://code.google.com/p/android-bluez.manifest/ -m topics/bluez
++repo sync
++
++Build for Intel ultrabook:
++'source build/envsetup.sh'
++'lunch core_mesa-eng'
++'make allimages -j8'
++
++After full build is done it is possible to rebuild only BlueZ:
++'cd external/bluetooth/bluez/android/'
++'mm' (or 'mm -B' to force rebuilding of all files)
++'adb sync' to update target device.
++
++=============================
++Building and running on Linux
++=============================
++It is possible to build and test BlueZ for Android daemon on Linux (eg. PC).
++Simply follow instructions available at README file in BlueZ top directory.
++Android daemon binary is located at android/bluetoothd.
++
++=======
++Testing
++=======
++
++BT HAL test tools located in android/haltest is provided for HAL level testing
++of both Android daemon and HAL library. Start it and type 'adapter init' in
++prompt to initialize HAL library. On Android required bluetoothd service will
++be started automatically. On Linux it is required to start android/bluetoothd
++manually before init command timeout. To deinitialize HAL library and stop
++daemon type 'adapter cleanup'. Type 'help' for more information. Tab completion
++is also supported.
+\ No newline at end of file
+-- 
+1.8.4
 
-All patches, except 5/11 (which was unnecessary) have been applied along
-with minor fixes. Thanks.
-
-Johan
