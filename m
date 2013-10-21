@@ -1,47 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] core: Fix not forwarding errors caused by SDP search properly
-Date: Mon, 21 Oct 2013 16:04:08 +0300
-Message-Id: <1382360648-5167-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2 3/3] android/hal: Register adapter and socket interface on HAL init
+Date: Mon, 21 Oct 2013 14:56:51 +0200
+Message-Id: <1382360211-3565-3-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1382360211-3565-1-git-send-email-szymon.janc@tieto.com>
+References: <1382360211-3565-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-In case bt_search_service fails while processing (e.g. connection is
-dropped) the error forward is a positive value leading
-btd_service_connecting_complete to not change any state at all.
-
-Futhermore the error from sdp_process was completely ignored which may
-cause problems as well.
+After daemon is started HAL needs to register those two interfaces
+to performe initialization procedure as described in IPC documentation.
 ---
- src/sdp-client.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ android/hal-bluetooth.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-diff --git a/src/sdp-client.c b/src/sdp-client.c
-index 2789db6..1221f5e 100644
---- a/src/sdp-client.c
-+++ b/src/sdp-client.c
-@@ -196,14 +196,15 @@ static gboolean search_process_cb(GIOChannel *chan, GIOCondition cond,
- 							gpointer user_data)
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index 3d3023f..c1e0261 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -257,6 +257,9 @@ static void stop_daemon(void)
+ 
+ static int init(bt_callbacks_t *callbacks)
  {
- 	struct search_context *ctxt = user_data;
--	int err = 0;
-+	int err;
++	struct hal_msg_cmd_register_module cmd;
++	struct hal_msg_rsp_error rsp;
++
+ 	DBG("");
  
- 	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
--		err = EIO;
-+		err = -EIO;
- 		goto failed;
- 	}
+ 	if (interface_ready())
+@@ -267,7 +270,27 @@ static int init(bt_callbacks_t *callbacks)
  
--	if (sdp_process(ctxt->session) < 0)
-+	err = sdp_process(ctxt->session);
-+	if (err < 0)
- 		goto failed;
+ 	bt_hal_cbacks = callbacks;
  
- 	return TRUE;
++	cmd.service_id = HAL_SERVICE_ID_BLUETOOTH;
++
++	if (hal_send_msg(HAL_SERVICE_ID_CORE, HAL_MSG_OP_REGISTER_MODULE,
++						sizeof(cmd), &cmd,
++						sizeof(rsp), &rsp, NULL) < 0)
++		 goto fail;
++
++	cmd.service_id = HAL_SERVICE_ID_SOCK;
++
++	if (hal_send_msg(HAL_SERVICE_ID_CORE, HAL_MSG_OP_REGISTER_MODULE,
++						sizeof(cmd), &cmd,
++						sizeof(rsp), &rsp, NULL) < 0)
++		 goto fail;
++
+ 	return BT_STATUS_SUCCESS;
++
++fail:
++	stop_daemon();
++	bt_hal_cbacks = NULL;
++	return BT_STATUS_FAIL;
++
+ }
+ 
+ static int enable(void)
 -- 
-1.8.3.1
+1.8.4
 
