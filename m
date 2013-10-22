@@ -1,167 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-Subject: [PATCH 1/6] android: Handle mgmt changed events
-Date: Tue, 22 Oct 2013 18:47:51 +0200
-Message-Id: <1382460476-6604-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH] android: Create header links for lib
+Date: Tue, 22 Oct 2013 19:42:23 +0300
+Message-Id: <1382460144-11483-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add code handling changing adapter settings.
+BlueZ headers are referring as bluetooth/* for headers which are
+located in lib/*. Create symlinks for now until we find better solution.
 ---
- android/adapter.c | 129 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 129 insertions(+)
+ android/Android.mk |   17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/android/adapter.c b/android/adapter.c
-index 4009f4d..cae3187 100644
---- a/android/adapter.c
-+++ b/android/adapter.c
-@@ -69,6 +69,134 @@ failed:
- 	adapter->ready(NULL, err);
- }
+diff --git a/android/Android.mk b/android/Android.mk
+index c4b0621..a13d6f1 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -41,6 +41,23 @@ LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
+ LOCAL_SHARED_LIBRARIES := \
+ 	libglib \
  
-+static void mgmt_local_name_changed_event(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct bt_adapter *adapter = user_data;
-+	const struct mgmt_cp_set_local_name *rp = param;
++lib_headers := \
++        bluetooth.h \
++        hci.h \
++        hci_lib.h \
++        sco.h \
++        l2cap.h \
++        sdp.h \
++        sdp_lib.h \
++        rfcomm.h \
++        bnep.h \
++        cmtp.h \
++        hidp.h \
 +
-+	if (length < sizeof(*rp)) {
-+		error("Wrong size of local name changed parameters");
-+		return;
-+	}
++$(shell mkdir -p $(LOCAL_PATH)/../lib/bluetooth)
 +
-+	if (!g_strcmp0(adapter->name, (const char *) rp->name))
-+		return;
++$(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(LOCAL_PATH)/../lib/bluetooth/$(file)))
 +
-+	DBG("name: %s", rp->name);
-+
-+	g_free(adapter->name);
-+	adapter->name = g_strdup((const char *) rp->name);
-+
-+	/* TODO Update services if needed */
-+}
-+
-+static void settings_changed_connectable(struct bt_adapter *adapter)
-+{
-+	/* TODO */
-+}
-+
-+static void settings_changed_discoverable(struct bt_adapter *adapter)
-+{
-+	/* TODO */
-+}
-+
-+static void settings_changed(struct bt_adapter *adapter, uint32_t settings)
-+{
-+	uint32_t changed_mask;
-+
-+	changed_mask = adapter->current_settings ^ settings;
-+
-+	adapter->current_settings = settings;
-+
-+	DBG("0x%08x", changed_mask);
-+
-+	if (changed_mask & MGMT_SETTING_POWERED) {
-+		info("Powered");
-+
-+		/*
-+		if (adapter->current_settings & MGMT_SETTING_POWERED)
-+			start_adapter()
-+		else
-+			stop_adapter()
-+		*/
-+	}
-+
-+	if (changed_mask & MGMT_SETTING_CONNECTABLE) {
-+		DBG("Connectable");
-+
-+		settings_changed_connectable(adapter);
-+	}
-+
-+	if (changed_mask & MGMT_SETTING_DISCOVERABLE) {
-+		DBG("Discoverable");
-+
-+		settings_changed_discoverable(adapter);
-+	}
-+}
-+
-+static void new_settings_callback(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct bt_adapter *adapter = user_data;
-+	uint32_t settings;
-+
-+	if (length < sizeof(settings)) {
-+		error("Wrong size of new settings parameters");
-+		return;
-+	}
-+
-+	settings = bt_get_le32(param);
-+
-+	DBG("settings: 0x%8.8x -> 0x%8.8x", adapter->current_settings,
-+								settings);
-+
-+	if (settings == adapter->current_settings)
-+		return;
-+
-+	settings_changed(adapter, settings);
-+}
-+
-+static void mgmt_dev_class_changed_event(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct bt_adapter *adapter = user_data;
-+	const struct mgmt_cod *rp = param;
-+	uint32_t dev_class;
-+
-+	if (length < sizeof(*rp)) {
-+		error("Wrong size of class of device changed parameters");
-+		return;
-+	}
-+
-+	dev_class = rp->val[0] | (rp->val[1] << 8) | (rp->val[2] << 16);
-+
-+	if (dev_class == adapter->dev_class)
-+		return;
-+
-+	DBG("Class: 0x%06x", dev_class);
-+
-+	adapter->dev_class = dev_class;
-+
-+	/* TODO: Inform prop change: Class */
-+
-+	/* TODO: Gatt attrib set*/
-+}
-+
-+static void register_mgmt_handlers(struct bt_adapter *adapter)
-+{
-+	mgmt_register(adapter->mgmt, MGMT_EV_NEW_SETTINGS, 0,
-+			new_settings_callback, adapter, NULL);
-+
-+	mgmt_register(adapter->mgmt, MGMT_EV_CLASS_OF_DEV_CHANGED,
-+			0, mgmt_dev_class_changed_event,
-+			adapter, NULL);
-+
-+	mgmt_register(adapter->mgmt, MGMT_EV_LOCAL_NAME_CHANGED,
-+			0, mgmt_local_name_changed_event,
-+			adapter, NULL);
-+}
-+
- static void load_link_keys(struct bt_adapter *adapter, GSList *keys)
- {
- 	struct mgmt_cp_load_link_keys *cp;
-@@ -128,6 +256,7 @@ static void read_info_complete(uint8_t status, uint16_t length, const void *para
- 	adapter->current_settings = btohs(rp->current_settings);
+ LOCAL_MODULE := bluetoothd
  
- 	/* TODO: Register all event notification handlers */
-+	register_mgmt_handlers(adapter);
- 
- 	load_link_keys(adapter, NULL);
- 
+ include $(BUILD_EXECUTABLE)
 -- 
-1.8.4
+1.7.10.4
 
