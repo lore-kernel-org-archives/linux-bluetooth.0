@@ -1,46 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 1/5] android: Add initial code for hidhost virtual unplug
-Date: Tue, 22 Oct 2013 11:49:49 -0700
-Message-Id: <1382467793-4709-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 4/6] android/hal: Use correct service id for adapter commands
+Date: Tue, 22 Oct 2013 18:47:54 +0200
+Message-Id: <1382460476-6604-4-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1382460476-6604-1-git-send-email-szymon.janc@tieto.com>
+References: <1382460476-6604-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds initial code for hidhost .virtual_unplug interface
+This fix enabling and disabling adapter commands.
 ---
- android/hal-hidhost.c |   10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ android/hal-bluetooth.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
-index f941f2f..523ce6d 100644
---- a/android/hal-hidhost.c
-+++ b/android/hal-hidhost.c
-@@ -79,6 +79,8 @@ static bt_status_t hh_disconnect(bt_bdaddr_t *bd_addr)
- 
- static bt_status_t hh_virtual_unplug(bt_bdaddr_t *bd_addr)
- {
-+	struct hal_msg_cmd_bt_hid_vp cmd;
-+
- 	DBG("");
- 
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index 852dc85..d988778 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -104,8 +104,8 @@ static int enable(void)
  	if (!interface_ready())
-@@ -87,7 +89,13 @@ static bt_status_t hh_virtual_unplug(bt_bdaddr_t *bd_addr)
- 	if (!bd_addr)
- 		return BT_STATUS_PARM_INVALID;
+ 		return BT_STATUS_NOT_READY;
  
--	return BT_STATUS_UNSUPPORTED;
-+	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
-+
-+	if (hal_ipc_cmd(HAL_SERVICE_ID_HIDHOST, HAL_MSG_OP_BT_HID_VP,
-+			sizeof(cmd), &cmd, 0, NULL, NULL) < 0)
-+		return BT_STATUS_FAIL;
-+
-+	return BT_STATUS_SUCCESS;
+-	return hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_MSG_OP_BT_ENABLE, 0, NULL,
+-								0, NULL, NULL);
++	return hal_ipc_cmd(HAL_SERVICE_ID_BLUETOOTH, HAL_MSG_OP_BT_ENABLE, 0,
++							NULL, 0, NULL, NULL);
  }
  
- static bt_status_t hh_set_info(bt_bdaddr_t *bd_addr, bthh_hid_info_t hid_info)
+ static int disable(void)
+@@ -115,8 +115,8 @@ static int disable(void)
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+ 
+-	return hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_MSG_OP_BT_DISABLE, 0, NULL,
+-								0, NULL, NULL);
++	return hal_ipc_cmd(HAL_SERVICE_ID_BLUETOOTH, HAL_MSG_OP_BT_DISABLE, 0,
++							NULL, 0, NULL, NULL);
+ }
+ 
+ static void cleanup(void)
 -- 
-1.7.9.5
+1.8.4
 
