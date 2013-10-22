@@ -1,96 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2] android: Add hidhost defines and structures to header file
-Date: Tue, 22 Oct 2013 02:07:02 -0700
-Message-Id: <1382432822-22888-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH BlueZ] core: Fix crash while processing SDP records
+Date: Tue, 22 Oct 2013 12:03:20 +0300
+Message-Id: <1382432600-6101-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-	v2: Changed 2 byte arrays to uint16_t as per Luiz comments
----
- android/hal-msg.h |   67 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 67 insertions(+)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 6266903..9dcfbf6 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -179,6 +179,73 @@ struct hal_msg_cmd_bt_le_test_mode {
- 	uint8_t  data[0];
- } __attribute__((packed));
+This was introduced by commit 073714c3ff70379131be3e19d9ccb8b85fe3f0d9
+which attempted to treat the return of sdp_process but caused the crash
+bellow because sdp_process actually calls search_completed_cb if it
+fails:
+Invalid read of size 8
+   at 0x44FC93: search_process_cb (sdp-client.c:214)
+   by 0x3D46047E05: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3600.3)
+   by 0x3D46048157: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
+   by 0x3D46048559: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3600.3)
+   by 0x40A2DF: main (main.c:587)
+ Address 0x59febd0 is 16 bytes inside a block of size 72 free'd
+   at 0x4A074C4: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+   by 0x3D4604D9AE: g_free (in /usr/lib64/libglib-2.0.so.0.3600.3)
+   by 0x44FE44: search_completed_cb (sdp-client.c:192)
+   by 0x4732E7: sdp_process (sdp.c:4341)
+   by 0x44FCD8: search_process_cb (sdp-client.c:206)
+   by 0x3D46047E05: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3600.3)
+   by 0x3D46048157: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
+   by 0x3D46048559: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3600.3)
+   by 0x40A2DF: main (main.c:587)
+---
+ src/sdp-client.c | 22 +++++++---------------
+ 1 file changed, 7 insertions(+), 15 deletions(-)
+
+diff --git a/src/sdp-client.c b/src/sdp-client.c
+index 1221f5e..51f3048 100644
+--- a/src/sdp-client.c
++++ b/src/sdp-client.c
+@@ -196,31 +196,23 @@ static gboolean search_process_cb(GIOChannel *chan, GIOCondition cond,
+ 							gpointer user_data)
+ {
+ 	struct search_context *ctxt = user_data;
+-	int err;
  
-+#define HAL_MSG_OP_BT_HID_CONNECT	0x01
-+struct hal_msg_cmd_bt_hid_connect {
-+	uint8_t bdaddr[6];
-+} __attribute__((packed));
-+
-+#define HAL_MSG_OP_BT_HID_DISCONNECT	0x02
-+struct hal_msg_cmd_bt_hid_disconnect {
-+	uint8_t bdaddr[6];
-+} __attribute__((packed));
-+
-+#define HAL_MSG_OP_BT_HID_VP		0x03
-+struct hal_msg_cmd_bt_hid_vp {
-+	uint8_t bdaddr[6];
-+} __attribute__((packed));
-+
-+#define HAL_MSG_OP_BT_HID_SET_INFO	0x04
-+struct hal_msg_cmd_bt_hid_set_info {
-+	uint8_t bdaddr[6];
-+	uint8_t attr;
-+	uint8_t subclass;
-+	uint8_t app_id;
-+	uint16_t vendor;
-+	uint16_t product;
-+	uint16_t country;
-+	uint16_t descr_len;
-+	uint8_t descr[0];
-+} __attribute__((packed));
-+
-+#define HAL_MSG_BT_HID_REPORT_PROTOCOL		0x00
-+#define HAL_MSG_BT_HID_BOOT_PROTOCOL		0x01
-+#define HAL_MSG_BT_HID_UNSUPPORTED_PROTOCOL	0xff
-+
-+#define HAL_MSG_OP_BT_HID_GET_PROTOCOL	0x05
-+struct hal_msg_cmd_bt_hid_get_protocol {
-+	uint8_t bdaddr[6];
-+	uint8_t mode;
-+} __attribute__((packed));
-+
-+#define HAL_MSG_OP_BT_HID_SET_PROTOCOL	0x06
-+struct hal_msg_cmd_bt_hid_set_protocol {
-+	uint8_t bdaddr[6];
-+	uint8_t mode;
-+} __attribute__((packed));
-+
-+#define HAL_MSG_BT_HID_INPUT_REPORT	0x01
-+#define HAL_MSG_BT_HID_OUTPUT_REPORT	0x02
-+#define HAL_MSG_BT_HID_FEATURE_REPORT	0x03
-+
-+#define HAL_MSG_OP_BT_HID_GET_REPORT	0x07
-+struct hal_msg_cmd_bt_hid_get_report {
-+	uint8_t bdaddr[6];
-+	uint8_t type;
-+	uint8_t id;
-+	uint16_t buf;
-+} __attribute__((packed));
-+
-+#define HAL_MSG_OP_BT_HID_SET_REPORT	0x08
-+struct hal_msg_cmd_bt_hid_set_report {
-+	uint8_t bdaddr[6];
-+	uint8_t type;
-+} __attribute__((packed));
-+
-+#define HAL_MSG_OP_BT_HID_SEND_DATA	0x09
-+struct hal_msg_cmd_bt_hid_send_data {
-+	uint8_t bdaddr[6];
-+} __attribute__((packed));
-+
- /* Notifications and confirmations */
+ 	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
+-		err = -EIO;
+-		goto failed;
+-	}
+-
+-	err = sdp_process(ctxt->session);
+-	if (err < 0)
+-		goto failed;
+-
+-	return TRUE;
+-
+-failed:
+-	if (err) {
+ 		sdp_close(ctxt->session);
+ 		ctxt->session = NULL;
  
- #define HAL_MSG_EV_BT_ERROR			0x80
+ 		if (ctxt->cb)
+-			ctxt->cb(NULL, err, ctxt->user_data);
++			ctxt->cb(NULL, -EIO, ctxt->user_data);
+ 
+ 		search_context_cleanup(ctxt);
++		return FALSE;
+ 	}
+ 
+-	return FALSE;
++	/* If sdp_process fails it calls search_completed_cb */
++	if (sdp_process(ctxt->session) < 0)
++		return FALSE;
++
++	return TRUE;
+ }
+ 
+ static gboolean connect_watch(GIOChannel *chan, GIOCondition cond,
 -- 
-1.7.9.5
+1.8.3.1
 
