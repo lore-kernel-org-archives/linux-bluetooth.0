@@ -2,8 +2,8 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Subject: [PATCH] android: Add capabilities and set userid
-Date: Mon, 21 Oct 2013 18:09:12 +0300
-Message-Id: <1382368152-11444-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 22 Oct 2013 09:28:12 +0300
+Message-Id: <1382423292-9122-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
