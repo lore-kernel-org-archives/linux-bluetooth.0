@@ -1,29 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 23 Oct 2013 10:51:35 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <andrei.emeltchenko@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android: Fix compilation error for Android 4.2.2
-Message-ID: <20131023075135.GA4406@x220.p-661hnu-f1>
-References: <1382436600-8598-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1382438228-23422-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1382438228-23422-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2] android: Create header links for lib
+Date: Wed, 23 Oct 2013 10:48:21 +0300
+Message-Id: <1382514501-20335-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Tue, Oct 22, 2013, Andrei Emeltchenko wrote:
-> On our current target the tools cannot be compiled.
-> ---
->  android/Android.mk        | 2 ++
->  android/client/if-bt.c    | 6 ++++++
->  android/client/if-main.h  | 3 +++
->  android/client/textconv.c | 2 ++
->  4 files changed, 13 insertions(+)
+BlueZ headers are referring as bluetooth/* for headers which are
+located in lib/*. Create symlinks for now until we find better solution.
+---
+ android/Android.mk |   12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-Applied. Thanks.
+diff --git a/android/Android.mk b/android/Android.mk
+index c4b0621..3163763 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -41,6 +41,18 @@ LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
+ LOCAL_SHARED_LIBRARIES := \
+ 	libglib \
+ 
++lib_headers := \
++	bluetooth.h \
++	hci.h \
++	hci_lib.h \
++	l2cap.h \
++	sdp_lib.h \
++	sdp.h \
++
++$(shell mkdir -p $(LOCAL_PATH)/../lib/bluetooth)
++
++$(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(LOCAL_PATH)/../lib/bluetooth/$(file)))
++
+ LOCAL_MODULE := bluetoothd
+ 
+ include $(BUILD_EXECUTABLE)
+-- 
+1.7.10.4
 
-Johan
