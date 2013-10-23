@@ -1,35 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 BlueZ 2/4] android: Fix build dependency of bluetooth.default.so HAL on target
-Date: Wed, 23 Oct 2013 11:08:17 +0300
-Message-Id: <1382515699-30338-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1382515699-30338-1-git-send-email-luiz.dentz@gmail.com>
-References: <1382515699-30338-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 23 Oct 2013 11:00:04 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2] android: Create header links for lib
+Message-ID: <20131023080004.GB5084@x220.p-661hnu-f1>
+References: <1382514501-20335-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1382514501-20335-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Andrei,
 
-This adds missing headers necessary to build bluetooth.default.so
----
- android/Android.mk | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On Wed, Oct 23, 2013, Andrei Emeltchenko wrote:
+> BlueZ headers are referring as bluetooth/* for headers which are
+> located in lib/*. Create symlinks for now until we find better solution.
+> ---
+>  android/Android.mk |   12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index d276102..01ef3e7 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -66,7 +66,8 @@ include $(BUILD_EXECUTABLE)
- include $(CLEAR_VARS)
- 
- LOCAL_SRC_FILES := \
--	hal-ipc.c \
-+	hal.h hal-msg.h hal-log.h \
-+	hal-ipc.c hal-ipc.h \
- 	hal-bluetooth.c \
- 	hal-sock.c \
- 	hal-hidhost.c \
--- 
-1.8.3.1
+Applied. Thanks.
 
+Johan
