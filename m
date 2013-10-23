@@ -1,54 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/4] android: Fix build dependency of bluetoothd on target
-Date: Wed, 23 Oct 2013 10:58:15 +0300
-Message-Id: <1382515098-28782-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 23 Oct 2013 10:51:35 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android: Fix compilation error for Android 4.2.2
+Message-ID: <20131023075135.GA4406@x220.p-661hnu-f1>
+References: <1382436600-8598-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1382438228-23422-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1382438228-23422-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Andrei,
 
-This adds missing headers necessary to build bluetoothd.
----
- android/Android.mk | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
+On Tue, Oct 22, 2013, Andrei Emeltchenko wrote:
+> On our current target the tools cannot be compiled.
+> ---
+>  android/Android.mk        | 2 ++
+>  android/client/if-bt.c    | 6 ++++++
+>  android/client/if-main.h  | 3 +++
+>  android/client/textconv.c | 2 ++
+>  4 files changed, 13 insertions(+)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index eef809a..a00b658 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -15,18 +15,19 @@ include $(CLEAR_VARS)
- LOCAL_SRC_FILES := \
- 	main.c \
- 	log.c \
--	adapter.c \
--	hid.c \
-+	adapter.c adapter.h \
-+	hid.c hid.h \
- 	ipc.c ipc.h \
--	../src/shared/mgmt.c \
--	../src/shared/util.c \
--	../src/sdpd-database.c \
--	../src/sdpd-service.c \
--	../src/sdpd-request.c \
--	../src/sdpd-server.c \
--	../lib/sdp.c \
--	../lib/bluetooth.c \
--	../lib/hci.c \
-+	$(LOCAL_PATH)/../src/sdp.h \
-+	$(LOCAL_PATH)/../src/shared/mgmt.c \
-+	$(LOCAL_PATH)/../src/shared/util.c \
-+	$(LOCAL_PATH)/../src/sdpd-database.c \
-+	$(LOCAL_PATH)/../src/sdpd-service.c \
-+	$(LOCAL_PATH)/../src/sdpd-request.c \
-+	$(LOCAL_PATH)/../src/sdpd-server.c \
-+	$(LOCAL_PATH)/../lib/sdp.c \
-+	$(LOCAL_PATH)/../lib/bluetooth.c \
-+	$(LOCAL_PATH)/../lib/hci.c \
- 
- LOCAL_C_INCLUDES := \
- 	$(call include-path-for, glib) \
--- 
-1.8.3.1
+Applied. Thanks.
 
+Johan
