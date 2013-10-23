@@ -2,40 +2,31 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 1/7] android: Return right from hal_ipc_cmd call in hal hid connect
-Date: Wed, 23 Oct 2013 00:41:53 -0700
-Message-Id: <1382514120-13152-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1382514120-13152-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1382514120-13152-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 0/7] Initial code for hal hid host
+Date: Wed, 23 Oct 2013 00:41:52 -0700
+Message-Id: <1382514120-13152-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Do not print any error message and return from hal_ipc_cmd call in hal
-hid connect
+Patch set is all about initial code for hal hidhost interfaces which
+are .virtual_unplug, .set_info, .get_protocol, .set_protocol,
+.get_report, .set_report and .send_data. Also includes issue fixes
+for .connect and .disconnect interfaces.
 ---
- android/hal-hidhost.c |    9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+_v2 is about fixing issues as per Johan comments.
 
-diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
-index f941f2f..f7d8cbf 100644
---- a/android/hal-hidhost.c
-+++ b/android/hal-hidhost.c
-@@ -45,13 +45,8 @@ static bt_status_t hh_connect(bt_bdaddr_t *bd_addr)
- 
- 	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
- 
--	if (hal_ipc_cmd(HAL_SERVICE_ID_HIDHOST, HAL_MSG_OP_BT_HID_CONNECT,
--			sizeof(cmd), &cmd, 0, NULL, NULL) < 0) {
--		error("Failed to connect hid device");
--		return BT_STATUS_FAIL;
--	}
--
--	return BT_STATUS_SUCCESS;
-+	return hal_ipc_cmd(HAL_SERVICE_ID_HIDHOST, HAL_MSG_OP_BT_HID_CONNECT,
-+			sizeof(cmd), &cmd, 0, NULL, NULL);
- }
- 
- static bt_status_t hh_disconnect(bt_bdaddr_t *bd_addr)
+Ravi kumar Veeramally (7):
+  android: Return right from hal_ipc_cmd call in hal hid connect
+  android: Return right from hal_ipc_cmd call in hal hid disconnect
+  android: Add initial code for hidhost virtual unplug
+  android: Add initial code for hidhost get and set protocol
+  android: Add initial code for hidhost get and set report
+  android: Add initial code for hidhost send data
+  android: Add initial code for hidhost set hid information
+
+ android/hal-hidhost.c |  126 ++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 105 insertions(+), 21 deletions(-)
+
 -- 
 1.7.9.5
 
