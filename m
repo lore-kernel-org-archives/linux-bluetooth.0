@@ -1,38 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <johan.hedberg@gmail.com>, <andrei.emeltchenko@intel.com>,
-	<szymon.janc@tieto.com>,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] android: Fix build error for Android
-Date: Wed, 23 Oct 2013 10:26:29 +0200
-Message-ID: <1382516789-374-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 BlueZ 3/4] android: Fix build dependency of haltest on target
+Date: Wed, 23 Oct 2013 11:08:18 +0300
+Message-Id: <1382515699-30338-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1382515699-30338-1-git-send-email-luiz.dentz@gmail.com>
+References: <1382515699-30338-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Android uses functions and defines from sys/capability.h which
-requires additional include
----
- android/main.c | 4 ++++
- 1 file changed, 4 insertions(+)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/android/main.c b/android/main.c
-index 988d08b..606baf2 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -52,6 +52,10 @@
- #include "hal-msg.h"
- #include "ipc.h"
+This adds missing headers necessary to build haltest.
+---
+ android/Android.mk | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/android/Android.mk b/android/Android.mk
+index 01ef3e7..4c87a9b 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -92,11 +92,12 @@ include $(CLEAR_VARS)
  
-+#if defined(ANDROID)
-+#include <sys/capability.h>
-+#endif
-+
- static GMainLoop *event_loop;
- static struct mgmt *mgmt_if = NULL;
+ LOCAL_SRC_FILES := \
+ 	client/haltest.c \
+-	client/pollhandler.c \
+-	client/terminal.c \
+-	client/history.c \
+-	client/textconv.c \
++	client/pollhandler.c client/pollhandler.h \
++	client/terminal.c client/terminal.h \
++	client/history.c client/history.h \
++	client/textconv.c client/textconv.h \
+ 	client/tabcompletion.c \
++	client/if-main.h \
+ 	client/if-bt.c \
+ 	client/if-hh.c \
  
 -- 
-1.8.4
+1.8.3.1
 
