@@ -1,58 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <szymon.janc@tieto.com>, <andrei.emeltchenko@intel.com>,
-	<johan.hedberg@gmail.com>,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3] android: Fix build error for Android
-Date: Wed, 23 Oct 2013 14:49:19 +0200
-Message-ID: <1382532559-25830-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Andrei Emeltchenko <andrei.emeltchenko@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android: Make use of Android system headers instead of local one
+Date: Wed, 23 Oct 2013 15:44:41 +0300
+Message-Id: <1382532281-5445-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Android uses functions and defines from sys/capability.h which
-requires additional include. However file capability.h shows up
-in bionic in version Android 4.3, therefore we do check
-PLATFORM_SDK_VERSION to no break builds of previous Android versions.
-In previous Android version unistd.h contain this functionality.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+
+Since the headers were copied to android/ folder Android build started
+to use those instead of original Android system headers. The patch
+puts Android system headers first.
 ---
- android/Android.mk | 3 ++-
- android/main.c     | 6 ++++++
- 2 files changed, 8 insertions(+), 1 deletion(-)
+ android/Android.mk | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/android/Android.mk b/android/Android.mk
-index c4b0621..a569650 100644
+index 3163763..0640842 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -36,7 +36,8 @@ LOCAL_C_INCLUDES += \
- 	$(LOCAL_PATH)/../src \
- 	$(LOCAL_PATH)/../lib \
+@@ -71,6 +71,9 @@ LOCAL_SRC_FILES := \
+ 	hal-pan.c \
+ 	hal-av.c \
  
--LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
-+LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\" \
-+	-DPLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
- 
- LOCAL_SHARED_LIBRARIES := \
- 	libglib \
-diff --git a/android/main.c b/android/main.c
-index 988d08b..5a85f74 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -52,6 +52,12 @@
- #include "hal-msg.h"
- #include "ipc.h"
- 
-+/* TODO: Consider to remove PLATFORM_SDKVERSION check if requirement
-+*  for minimal Android platform version increases. */
-+#if defined(ANDROID) && PLATFORM_SDK_VERSION >= 18
-+#include <sys/capability.h>
-+#endif
++LOCAL_C_INCLUDES += \
++	system/core/include \
 +
- static GMainLoop *event_loop;
- static struct mgmt *mgmt_if = NULL;
+ LOCAL_SHARED_LIBRARIES := \
+ 	libcutils \
  
 -- 
-1.8.4
+1.8.1.2
 
