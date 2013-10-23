@@ -1,27 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Date: Thu, 24 Oct 2013 00:16:21 +0200
+Message-ID: <CALN1cnt9UuSgEpcg47Rt9HooU+idURYHyeOd8905coOJV8qaZg@mail.gmail.com>
+Subject: Use Bluez as peripheral
+From: Elvis Angelaccio <angelaccioelvis@libero.it>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 0/2] Enable av interface
-Date: Thu, 24 Oct 2013 10:10:37 +0300
-Message-Id: <1382598639-6920-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi all, this is my first post to this mailing list, sorry if I am in the
+wrong place.
+I'm learning Bluetooth Low Energy with a simple Android application. Since
+the Android API implements only the "central" side of the BTLE stack, I
+need to implement the "peripheral" side on my laptop (thinkpad edge e130,
+bluetooth 4.0, linux 3.11).
 
-For some reason get av interface was missing from hal-bluetooth and from
-hal test tool.
+As I understand, Bluez should support this feature (while Windows 8 and Max
+OSX don't).
+For now I'm able to "advertise" my laptop using the command "hciconfig hci0
+leadv". My android app succeeds to find my laptop after a btleScan().
+Of course actually there is no a GATT server and no "characteristics" to
+read and write.
 
-PS: Not sure that haltest is fully implemented, Jerzy please comment here.
+I really need some hints on how to create a GATT server using Bluez, so I
+have some questions.
 
-Andrei Emeltchenko (2):
-  android: haltest: Enable av interface in test tool
-  android: Enable AV interface
+1. In my distro, I have by default Bluez 4.101. Should I compile Bluez 5?
+2. If I have to use Bluez 5, should I learn how to program using DBus?
+3. I I can use Bluez 4, what are the header files that I'm required to
+include? (i.e. the function that I have to use?)
 
- android/client/if-bt.c  |    2 +-
- android/hal-bluetooth.c |    3 +++
- 2 files changed, 4 insertions(+), 1 deletion(-)
 
--- 
-1.7.10.4
+I know the C language, but I have no idea how to deal with kernel code as
+Bluez seems to be, sorry if these are noob questions.
 
+Thank you all in Advance,
+Elvis
