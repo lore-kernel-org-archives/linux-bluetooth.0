@@ -1,33 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/6] android: Add missing adapter state values to IPC documentation
-Date: Wed, 23 Oct 2013 15:46:21 +0200
-Message-ID: <1382535986-30684-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Andrei Emeltchenko <andrei.emeltchenko@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android: Use helper function for finding headers
+Date: Wed, 23 Oct 2013 16:42:17 +0300
+Message-Id: <1382535737-9757-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/hal-ipc-api.txt | 3 +++
- 1 file changed, 3 insertions(+)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index dcd1553..a5437c1 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -314,6 +314,9 @@ Notifications:
+Using helper function allows us to overcome possible location
+change in future Android releases. This was inspired by
+Szymon Janc's comment to my previous patch.
+---
+ android/Android.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/android/Android.mk b/android/Android.mk
+index dd9c36d..1f20e57 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -75,7 +75,7 @@ LOCAL_SRC_FILES := \
+ 	hal-av.c \
  
- 		Notifications parameters: State (1 octect)
+ LOCAL_C_INCLUDES += \
+-	system/core/include \
++	$(call include-path-for, system-core) \
  
-+		Valid state values: 0x00 = Off
-+		                    0x01 = On
-+
- 	Opcode 0x82 - Adapter Properties Changed notification
- 
- 		Notification parameters: Status (1 octect)
+ LOCAL_SHARED_LIBRARIES := \
+ 	libcutils \
 -- 
-1.8.4
+1.8.1.2
 
