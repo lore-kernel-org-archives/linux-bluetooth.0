@@ -1,52 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/6] android: Add initial code for services register
-Date: Wed, 23 Oct 2013 13:04:36 +0200
-Message-ID: <1382526281-19711-1-git-send-email-szymon.janc@tieto.com>
+Date: Wed, 23 Oct 2013 14:03:31 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android: Check that service is started
+Message-ID: <20131023110331.GA9685@x220.p-661hnu-f1>
+References: <1382523998-30722-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1382523998-30722-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will be used to enable services on respective HAL init calls.
----
- android/main.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+Hi Andrei,
 
-diff --git a/android/main.c b/android/main.c
-index e13e5b0..af7ebf3 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -72,10 +72,13 @@ static void service_register(void *buf, uint16_t len)
- {
- 	struct hal_msg_cmd_register_module *m = buf;
- 
--	if (m->service_id > HAL_SERVICE_ID_MAX || services[m->service_id]) {
--		ipc_send_error(hal_cmd_io, HAL_SERVICE_ID_CORE,
--							HAL_ERROR_FAILED);
--		return;
-+	if (m->service_id > HAL_SERVICE_ID_MAX || services[m->service_id])
-+		goto error;
-+
-+	switch (m->service_id) {
-+	default:
-+		DBG("service %u not supported", m->service_id);
-+		goto error;
- 	}
- 
- 	services[m->service_id] = true;
-@@ -84,6 +87,9 @@ static void service_register(void *buf, uint16_t len)
- 								NULL, -1);
- 
- 	info("Service ID=%u registered", m->service_id);
-+	return;
-+error:
-+	ipc_send_error(hal_cmd_io, HAL_SERVICE_ID_CORE, HAL_ERROR_FAILED);
- }
- 
- static void service_unregister(void *buf, uint16_t len)
--- 
-1.8.4
+On Wed, Oct 23, 2013, Andrei Emeltchenko wrote:
+> Add check that we are able to start Bluetooth service in
+> Android. If service is not started we should not try to connect to it.
+> ---
+>  android/hal-ipc.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 
+Applied. Thanks.
+
+Johan
