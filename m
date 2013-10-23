@@ -1,42 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/4] android: Fix build dependency of haltest on target
-Date: Wed, 23 Oct 2013 10:58:17 +0300
-Message-Id: <1382515098-28782-3-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1382515098-28782-1-git-send-email-luiz.dentz@gmail.com>
-References: <1382515098-28782-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/4] android: Fix build dependency of bluetoothd on target
+Date: Wed, 23 Oct 2013 10:58:15 +0300
+Message-Id: <1382515098-28782-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds missing headers necessary to build haltest.
+This adds missing headers necessary to build bluetoothd.
 ---
- android/Android.mk | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ android/Android.mk | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
 
 diff --git a/android/Android.mk b/android/Android.mk
-index cdc99a8..9becddc 100644
+index eef809a..a00b658 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -80,11 +80,12 @@ include $(CLEAR_VARS)
- 
+@@ -15,18 +15,19 @@ include $(CLEAR_VARS)
  LOCAL_SRC_FILES := \
- 	client/haltest.c \
--	client/pollhandler.c \
--	client/terminal.c \
--	client/history.c \
--	client/textconv.c \
-+	client/pollhandler.c client/pollhandler.h \
-+	client/terminal.c client/terminal.h \
-+	client/history.c client/history.h \
-+	client/textconv.c client/textconv.h \
- 	client/tabcompletion.c \
-+	client/if-main.h \
- 	client/if-bt.c \
- 	client/if-hh.c \
+ 	main.c \
+ 	log.c \
+-	adapter.c \
+-	hid.c \
++	adapter.c adapter.h \
++	hid.c hid.h \
+ 	ipc.c ipc.h \
+-	../src/shared/mgmt.c \
+-	../src/shared/util.c \
+-	../src/sdpd-database.c \
+-	../src/sdpd-service.c \
+-	../src/sdpd-request.c \
+-	../src/sdpd-server.c \
+-	../lib/sdp.c \
+-	../lib/bluetooth.c \
+-	../lib/hci.c \
++	$(LOCAL_PATH)/../src/sdp.h \
++	$(LOCAL_PATH)/../src/shared/mgmt.c \
++	$(LOCAL_PATH)/../src/shared/util.c \
++	$(LOCAL_PATH)/../src/sdpd-database.c \
++	$(LOCAL_PATH)/../src/sdpd-service.c \
++	$(LOCAL_PATH)/../src/sdpd-request.c \
++	$(LOCAL_PATH)/../src/sdpd-server.c \
++	$(LOCAL_PATH)/../lib/sdp.c \
++	$(LOCAL_PATH)/../lib/bluetooth.c \
++	$(LOCAL_PATH)/../lib/hci.c \
  
+ LOCAL_C_INCLUDES := \
+ 	$(call include-path-for, glib) \
 -- 
 1.8.3.1
 
