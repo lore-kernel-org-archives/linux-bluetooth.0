@@ -1,307 +1,565 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 5/5] Bluetooth: Manually enable or disable 6LoWPAN between devices
-Date: Wed, 23 Oct 2013 09:52:44 +0300
-Message-Id: <1382511164-1989-6-git-send-email-jukka.rissanen@linux.intel.com>
+Subject: [RFC 1/5] Bluetooth: Initial skeleton code for BT LE 6LoWPAN
+Date: Wed, 23 Oct 2013 09:52:40 +0300
+Message-Id: <1382511164-1989-2-git-send-email-jukka.rissanen@linux.intel.com>
 In-Reply-To: <1382511164-1989-1-git-send-email-jukka.rissanen@linux.intel.com>
 References: <1382511164-1989-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a temporary patch where user can manually enable or
-disable BT LE 6LoWPAN functionality between devices.
-Eventually the connection is established automatically if
-the devices are advertising suitable capability and this patch
-can be removed.
-
-If you have two devices with these BT addresses
-        device1  00:11:22:33:44:55
-        device2  66:77:88:99:00:11
-
-First add the desired devices manually into kernel
-
-root@dev1# echo 66:77:88:99:00:11 > /sys/kernel/debug/bluetooth/hci0/ble6lowpan
-root@dev2# echo 00:11:22:33:44:55 > /sys/kernel/debug/bluetooth/hci0/ble6lowpan
-
-then connect the devices
-
-root@dev1# hciconfig hci0 leadv
-root@dev2# hcitool lecc 00:11:22:33:44:55
-
-if the connection is established, then you can send IPv6 packets
-between these two systems using the link local addresses
-
-root@dev1# ping6 fe80::6477:88ff:fe99:0011
-root@dev2# ping6 fe80::211:22ff:fe33:4455
-
-By default 6LoWPAN connection is not established between devices,
-so you need to add the MAC addresses manually into the
-/sys/kernel/debug/bluetooth/hci0/ble6lowpan file.
-If you want to prevent further connections you can remove
-MAC address from the debugfs file like this
-echo "00:11:22:33:44:55 d" > /sys/kernel/debug/bluetooth/hci0/ble6lowpan
-Rebooting or unloading the bluetooth kernel module will also clear the
-settings from the kernel.
 ---
- net/bluetooth/ble_6lowpan.c | 164 ++++++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/ble_6lowpan.h |   1 +
- net/bluetooth/hci_core.c    |   4 ++
- net/bluetooth/l2cap_core.c  |  12 ++--
- 4 files changed, 174 insertions(+), 7 deletions(-)
+ include/net/bluetooth/l2cap.h |   1 +
+ net/bluetooth/Makefile        |   2 +-
+ net/bluetooth/ble_6lowpan.c   | 404 ++++++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/ble_6lowpan.h   |  27 +++
+ net/bluetooth/l2cap_core.c    |  22 ++-
+ 5 files changed, 454 insertions(+), 2 deletions(-)
+ create mode 100644 net/bluetooth/ble_6lowpan.c
+ create mode 100644 net/bluetooth/ble_6lowpan.h
 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 3d922b9..645cd30 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -133,6 +133,7 @@ struct l2cap_conninfo {
+ #define L2CAP_FC_L2CAP		0x02
+ #define L2CAP_FC_CONNLESS	0x04
+ #define L2CAP_FC_A2MP		0x08
++#define L2CAP_FC_6LOWPAN        0x3e
+ 
+ /* L2CAP Control Field bit masks */
+ #define L2CAP_CTRL_SAR			0xC000
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index 6a791e7..a70625b 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -10,6 +10,6 @@ obj-$(CONFIG_BT_HIDP)	+= hidp/
+ 
+ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+ 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
+-	a2mp.o amp.o
++	a2mp.o amp.o ble_6lowpan.o
+ 
+ subdir-ccflags-y += -D__CHECK_ENDIAN__
 diff --git a/net/bluetooth/ble_6lowpan.c b/net/bluetooth/ble_6lowpan.c
-index 44d65b3..0baf211 100644
---- a/net/bluetooth/ble_6lowpan.c
+new file mode 100644
+index 0000000..0fd3302
+--- /dev/null
 +++ b/net/bluetooth/ble_6lowpan.c
-@@ -12,6 +12,7 @@
- */
- 
- #include <linux/version.h>
-+#include <linux/debugfs.h>
- #include <linux/bitops.h>
- #include <linux/if_arp.h>
- #include <linux/netdevice.h>
-@@ -1535,6 +1536,169 @@ static struct notifier_block ble_6lowpan_dev_notifier = {
- 	.notifier_call = ble_6lowpan_device_event,
- };
- 
-+static LIST_HEAD(user_enabled);
-+DEFINE_RWLOCK(user_enabled_list_lock);
+@@ -0,0 +1,404 @@
++/*
++   Copyright (c) 2013 Intel Corp.
 +
-+struct ble_6lowpan_enabled {
-+	__u8 dev_name[HCI_MAX_NAME_LENGTH];
-+	bdaddr_t addr;
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License version 2 and
++   only version 2 as published by the Free Software Foundation.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++*/
++
++#include <linux/version.h>
++#include <linux/bitops.h>
++#include <linux/if_arp.h>
++#include <linux/netdevice.h>
++#include <linux/etherdevice.h>
++
++#include <net/ipv6.h>
++#include <net/ip6_route.h>
++#include <net/addrconf.h>
++
++#include <net/af_ieee802154.h>
++
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++#include <net/bluetooth/l2cap.h>
++
++#include "../ieee802154/6lowpan.h" /* for the compression defines */
++
++#define IFACE_NAME_TEMPLATE "ble6lowpan%d"
++
++/*
++ * The devices list contains those devices that we are acting
++ * as a proxy. The BT LE 6LoWPAN device is a virtual device that
++ * connects to the Bluetooth LE device. The real connection to
++ * BT LE device is done via l2cap layer. There exists one
++ * virtual device / one BT LE 6LoWPAN device. The list contains
++ * struct ble_6lowpan_dev_record elements.
++ */
++static LIST_HEAD(ble_6lowpan_devices);
++DEFINE_RWLOCK(net_dev_list_lock);
++
++struct ble_6lowpan_dev_record {
++	struct net_device *dev;
++	struct delayed_work delete_timer;
 +	struct list_head list;
 +};
 +
-+bool ble_6lowpan_is_enabled(struct hci_dev *hdev, bdaddr_t *dst)
-+{
-+	struct ble_6lowpan_enabled *entry, *tmp;
-+	bool found = false;
++struct ble_6lowpan_dev_info {
++	struct net_device *net;
++	struct l2cap_conn *conn;
++	uint16_t ifindex;
++	bdaddr_t myaddr;
 +
-+	write_lock(&user_enabled_list_lock);
-+	list_for_each_entry_safe(entry, tmp, &user_enabled, list) {
-+		if (!strncmp(entry->dev_name, hdev->dev_name,
-+				HCI_MAX_NAME_LENGTH) &&
-+				!bacmp(dst, &entry->addr)) {
-+			found = true;
++	/* peer addresses in various formats */
++	bdaddr_t addr;
++	unsigned char ieee802154_addr[IEEE802154_ADDR_LEN];
++	struct in6_addr peer;
++};
++
++struct lowpan_fragment {
++	struct sk_buff		*skb;		/* skb to be assembled */
++	u16			length;		/* length to be assemled */
++	u32			bytes_rcv;	/* bytes received */
++	u16			tag;		/* current fragment tag */
++	struct timer_list	timer;		/* assembling timer */
++	struct list_head	list;		/* fragments list */
++};
++
++#define DELETE_TIMEOUT msecs_to_jiffies(1)
++
++/* TTL uncompression values */
++static const u8 lowpan_ttl_values[] = {0, 1, 64, 255};
++
++static inline struct
++ble_6lowpan_dev_info *ble_6lowpan_dev_info(const struct net_device *dev)
++{
++	return netdev_priv(dev);
++}
++
++/* print data in line */
++static inline void ble_6lowpan_raw_dump_inline(const char *caller, char *msg,
++				   unsigned char *buf, int len)
++{
++#ifdef DEBUG
++	if (msg)
++		pr_debug("%s():%s: ", caller, msg);
++	print_hex_dump(KERN_DEBUG, "", DUMP_PREFIX_NONE,
++		       16, 1, buf, len, false);
++#endif /* DEBUG */
++}
++
++/*
++ * print data in a table format:
++ *
++ * addr: xx xx xx xx xx xx
++ * addr: xx xx xx xx xx xx
++ * ...
++ */
++static inline void ble_6lowpan_raw_dump_table(const char *caller, char *msg,
++				   unsigned char *buf, int len)
++{
++#ifdef DEBUG
++	if (msg)
++		pr_debug("%s():%s:\n", caller, msg);
++	print_hex_dump(KERN_DEBUG, "\t", DUMP_PREFIX_OFFSET,
++		       16, 1, buf, len, false);
++#endif /* DEBUG */
++}
++
++static int ble_6lowpan_recv_pkt(struct sk_buff *skb, struct net_device *dev)
++{
++	kfree_skb(skb);
++	return NET_RX_DROP;
++}
++
++/* Packet from BT LE device */
++int ble_6lowpan_recv(struct l2cap_conn *conn, struct sk_buff *skb)
++{
++	struct ble_6lowpan_dev_record *entry, *tmp;
++	struct net_device *dev = NULL;
++	int status = -ENOENT;
++
++	write_lock(&net_dev_list_lock);
++
++	list_for_each_entry_safe(entry, tmp, &ble_6lowpan_devices, list) {
++		if (ble_6lowpan_dev_info(entry->dev)->conn == conn) {
++			dev = ble_6lowpan_dev_info(entry->dev)->net;
 +			break;
 +		}
 +	}
-+	write_unlock(&user_enabled_list_lock);
 +
-+	/* Check also the device list just in case we removed the
-+	 * device from debugfs before disconnecting.
-+	 */
-+	if (!found) {
-+		struct ble_6lowpan_dev_record *entry, *tmp;
-+		struct ble_6lowpan_dev_info *info;
++	write_unlock(&net_dev_list_lock);
 +
-+		write_lock(&net_dev_list_lock);
-+		list_for_each_entry_safe(entry, tmp,
-+					&ble_6lowpan_devices,
-+					list) {
-+			info = ble_6lowpan_dev_info(entry->dev);
-+			if (info->conn->hcon->hdev == hdev &&
-+						!bacmp(&info->addr, dst)) {
-+				found = true;
-+				break;
-+			}
-+		}
-+		write_unlock(&net_dev_list_lock);
++	if (dev) {
++		status = ble_6lowpan_recv_pkt(skb, dev);
++		BT_DBG("recv pkt %d", status);
 +	}
 +
-+	return found;
++	return status;
 +}
 +
-+static int ble_6lowpan_debugfs_show(struct seq_file *f, void *p)
++static void ble_6lowpan_do_send(struct l2cap_conn *conn, struct sk_buff *skb)
 +{
-+	struct ble_6lowpan_enabled *entry, *tmp;
++	BT_DBG("conn %p, skb %p len %d priority %u", conn, skb, skb->len,
++	       skb->priority);
 +
-+	write_lock(&user_enabled_list_lock);
-+	list_for_each_entry_safe(entry, tmp, &user_enabled, list)
-+		seq_printf(f, "%pMR\n", &entry->addr);
++	return;
++}
 +
-+	write_unlock(&user_enabled_list_lock);
++static int lowpan_conn_send(struct l2cap_conn *conn,
++			void *msg, size_t len, u32 priority,
++			struct net_device *dev)
++{
++	struct sk_buff *skb = {0};
++
++	ble_6lowpan_do_send(conn, skb);
++	return 0;
++}
++
++/* Packet to BT LE device */
++static int ble_6lowpan_send(struct l2cap_conn *conn, const void *saddr,
++			const void *daddr, struct sk_buff *skb,
++			struct net_device *dev)
++{
++	ble_6lowpan_raw_dump_table(__func__,
++				"raw skb data dump before fragmentation",
++				skb->data, skb->len);
++
++	return lowpan_conn_send(conn, skb->data, skb->len, 0, dev);
++}
++
++static netdev_tx_t ble_6lowpan_xmit(struct sk_buff *skb, struct net_device *dev)
++{
++	int err = -1;
++
++	pr_debug("ble 6lowpan packet xmit\n");
++
++	if (ble_6lowpan_dev_info(dev)->conn)
++		err = ble_6lowpan_send(ble_6lowpan_dev_info(dev)->conn,
++				dev->dev_addr,
++				&ble_6lowpan_dev_info(dev)->ieee802154_addr,
++				skb,
++				dev);
++	else
++		BT_DBG("ERROR: no BT LE 6LoWPAN device found");
++
++	dev_kfree_skb(skb);
++
++	if (err)
++		BT_DBG("ERROR: xmit failed (%d)", err);
++
++	return (err < 0) ? NET_XMIT_DROP : err;
++}
++
++static const struct net_device_ops ble_6lowpan_netdev_ops = {
++	.ndo_start_xmit		= ble_6lowpan_xmit,
++};
++
++static void ble_6lowpan_setup(struct net_device *dev)
++{
++	dev->addr_len		= IEEE802154_ADDR_LEN;
++	dev->type		= ARPHRD_IEEE802154;
++
++	dev->hard_header_len	= 0;
++	dev->needed_tailroom	= 0;
++	dev->mtu		= IPV6_MIN_MTU;
++	dev->tx_queue_len	= 0;
++	dev->flags		= IFF_RUNNING | IFF_POINTOPOINT;
++	dev->watchdog_timeo	= 0;
++
++	dev->netdev_ops		= &ble_6lowpan_netdev_ops;
++	dev->destructor		= free_netdev;
++}
++
++static struct device_type ble_type = {
++	.name	= "ble6lowpan",
++};
++
++static void set_addr(u8 *eui, u8 *addr)
++{
++	/* addr is the BT address in little-endian format */
++	eui[0] = addr[5];
++	eui[1] = addr[4];
++	eui[2] = addr[3];
++	eui[3] = 0xFF;
++	eui[4] = 0xFE;
++	eui[5] = addr[2];
++	eui[6] = addr[1];
++	eui[7] = addr[0];
++
++	eui[0] ^= 2;
++}
++
++static void set_dev_addr(struct net_device *net, bdaddr_t *addr)
++{
++	net->addr_assign_type = NET_ADDR_PERM;
++	set_addr(net->dev_addr, addr->b);
++	net->dev_addr[0] ^= 2;
++}
++
++static void ifup(struct net_device *net)
++{
++	int status;
++
++	rtnl_lock();
++	if ((status = dev_open(net)) < 0)
++		BT_INFO("iface %s cannot be opened (%d)", net->name,
++			status);
++	rtnl_unlock();
++}
++
++/*
++ * This gets called when BT LE 6LoWPan device is connected. We then
++ * create network device that acts as a proxy between BT LE device
++ * and kernel network stack.
++ */
++int ble_6lowpan_add_conn(struct l2cap_conn *conn)
++{
++	struct net_device *net;
++	struct ble_6lowpan_dev_info *dev;
++	struct ble_6lowpan_dev_record *entry;
++	int status;
++
++	net = alloc_netdev(sizeof(struct ble_6lowpan_dev_info),
++			IFACE_NAME_TEMPLATE, ble_6lowpan_setup);
++	if (!net)
++		return -ENOMEM;
++
++	dev = netdev_priv(net);
++	dev->net = net;
++
++	memcpy(&dev->myaddr, &conn->hcon->hdev->bdaddr, sizeof(bdaddr_t));
++	memcpy(&dev->addr, &conn->hcon->dst, sizeof(bdaddr_t));
++
++	set_dev_addr(net, &dev->myaddr);
++
++	dev->conn = conn;
++
++	net->netdev_ops = &ble_6lowpan_netdev_ops;
++	SET_NETDEV_DEV(net, &conn->hcon->dev);
++	SET_NETDEV_DEVTYPE(net, &ble_type);
++
++	status = register_netdev(net);
++	if (status < 0) {
++		BT_INFO("register_netdev failed %d", status);
++		free_netdev(net);
++		return status;
++	} else {
++		struct inet6_dev *idev;
++
++		BT_DBG("ifindex %d peer bdaddr %pMR my addr %pMR",
++			net->ifindex, &dev->addr, &dev->myaddr);
++		dev->ifindex = net->ifindex;
++		set_bit(__LINK_STATE_PRESENT, &net->state);
++
++		idev = in6_dev_get(net);
++		if (idev) {
++			idev->cnf.autoconf = 1;
++			idev->cnf.forwarding = 1;
++			idev->cnf.accept_ra = 2;
++
++			in6_dev_put(idev);
++		}
++
++		entry = kzalloc(sizeof(struct ble_6lowpan_dev_record),
++				GFP_KERNEL);
++		if (!entry)
++			return -ENOMEM;
++
++		entry->dev = net;
++
++		write_lock(&net_dev_list_lock);
++		INIT_LIST_HEAD(&entry->list);
++		list_add(&entry->list, &ble_6lowpan_devices);
++		write_unlock(&net_dev_list_lock);
++
++		ifup(net);
++	}
 +
 +	return 0;
 +}
 +
-+static int ble_6lowpan_debugfs_open(struct inode *inode, struct file *file)
++static void delete_timeout(struct work_struct *work)
 +{
-+	return single_open(file, ble_6lowpan_debugfs_show, inode->i_private);
++	struct ble_6lowpan_dev_record *entry = container_of(work,
++						struct ble_6lowpan_dev_record,
++						delete_timer.work);
++
++	unregister_netdev(entry->dev);
++	kfree(entry);
 +}
 +
-+static ssize_t ble_6lowpan_writer(struct file *fp,
-+				const char __user *user_buffer,
-+                                size_t count, loff_t *position)
++int ble_6lowpan_del_conn(struct l2cap_conn *conn)
 +{
-+#define MAC_STR_LEN 17
-+	char mac_buf[MAC_STR_LEN + 1];
-+	ssize_t ret;
-+	bool delete_mode = false;
++	struct ble_6lowpan_dev_record *entry, *tmp;
++	int status = -ENOENT;
 +
-+        if(count > (MAC_STR_LEN + 1))
-+		delete_mode = true;
-+	else if (count < MAC_STR_LEN)
-+		return count;
++	write_lock(&net_dev_list_lock);
 +
-+	BT_DBG("count %zd mode %d", count, delete_mode);
++	list_for_each_entry_safe(entry, tmp, &ble_6lowpan_devices, list) {
++		if (ble_6lowpan_dev_info(entry->dev)->conn == conn) {
++			list_del(&entry->list);
++			status = 0;
++			break;
++		}
++	}
 +
-+	memset(mac_buf, 0, MAC_STR_LEN + 1);
-+        ret = simple_write_to_buffer(mac_buf, MAC_STR_LEN, position,
-+							user_buffer, count);
-+	if (ret > 0) {
-+		struct ble_6lowpan_enabled *entry = NULL, *tmp;
-+		bdaddr_t bdaddr;
++	write_unlock(&net_dev_list_lock);
 +
-+		if (sscanf(mac_buf, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx",
-+				&bdaddr.b[5], &bdaddr.b[4],
-+				&bdaddr.b[3], &bdaddr.b[2],
-+				&bdaddr.b[1], &bdaddr.b[0]) != 6)
-+			return -EINVAL;
++	if (!status) {
++		INIT_DELAYED_WORK(&entry->delete_timer, delete_timeout);
++		schedule_delayed_work(&entry->delete_timer, DELETE_TIMEOUT);
++	}
 +
-+		BT_DBG("user %pMR", &bdaddr);
++	return status;
++}
 +
-+		write_lock(&user_enabled_list_lock);
-+		list_for_each_entry_safe(entry, tmp, &user_enabled, list) {
-+			if (!bacmp(&entry->addr, &bdaddr)) {
-+				struct hci_dev *hdev = fp->f_inode->i_private;
++static int ble_6lowpan_device_event(struct notifier_block *unused,
++				unsigned long event, void *ptr)
++{
++	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
++	struct ble_6lowpan_dev_record *entry, *tmp;
 +
-+				if (!strncmp(entry->dev_name, hdev->dev_name,
-+						HCI_MAX_NAME_LENGTH) &&
-+								delete_mode) {
-+					break;
-+				} else {
-+					ret = -EEXIST;
++	if (dev->type == ARPHRD_IEEE802154) {
++		switch (event) {
++		case NETDEV_UNREGISTER:
++			write_lock(&net_dev_list_lock);
++			list_for_each_entry_safe(entry, tmp,
++						&ble_6lowpan_devices,
++						list) {
++				if (entry->dev == dev) {
++					list_del(&entry->list);
++					kfree(entry);
 +					break;
 +				}
 +			}
-+		}
-+		write_unlock(&user_enabled_list_lock);
-+
-+		if (ret > 0) {
-+			struct hci_dev *hdev = fp->f_inode->i_private;
-+
-+			if (delete_mode) {
-+				write_lock(&user_enabled_list_lock);
-+				list_del(&entry->list);
-+				kfree(entry);
-+				write_unlock(&user_enabled_list_lock);
-+			} else {
-+				entry = kzalloc(sizeof(*entry), GFP_KERNEL);
-+				if (!entry)
-+					return -ENOMEM;
-+
-+				strncpy(entry->dev_name, hdev->dev_name,
-+					HCI_MAX_NAME_LENGTH);
-+				entry->addr = bdaddr;
-+
-+				write_lock(&user_enabled_list_lock);
-+				INIT_LIST_HEAD(&entry->list);
-+				list_add(&entry->list, &user_enabled);
-+				write_unlock(&user_enabled_list_lock);
-+			}
++			write_unlock(&net_dev_list_lock);
++			break;
 +		}
 +	}
 +
-+	return ret;
++	return NOTIFY_DONE;
 +}
 +
-+static const struct file_operations ble_6lowpan_debugfs_fops = {
-+	.open		= ble_6lowpan_debugfs_open,
-+	.read		= seq_read,
-+	.write		= ble_6lowpan_writer,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
++static struct notifier_block ble_6lowpan_dev_notifier = {
++	.notifier_call = ble_6lowpan_device_event,
 +};
 +
-+static struct dentry *ble_6lowpan_debugfs;
-+
-+void ble_6lowpan_add_debugfs(struct hci_dev *hdev)
++int ble_6lowpan_init(void)
 +{
-+	if (hdev->debugfs) {
-+		ble_6lowpan_debugfs = debugfs_create_file("ble6lowpan", 0644,
-+			hdev->debugfs, hdev, &ble_6lowpan_debugfs_fops);
-+		if (!ble_6lowpan_debugfs)
-+			BT_ERR("Failed to create 6LoWPAN debug file");
-+	}
++	int err;
++
++	err = register_netdevice_notifier(&ble_6lowpan_dev_notifier);
++
++	return err;
 +}
 +
- int ble_6lowpan_init(void)
- {
- 	int err;
++void ble_6lowpan_cleanup(void)
++{
++	unregister_netdevice_notifier(&ble_6lowpan_dev_notifier);
++}
 diff --git a/net/bluetooth/ble_6lowpan.h b/net/bluetooth/ble_6lowpan.h
-index 7975a55..047b8b7 100644
---- a/net/bluetooth/ble_6lowpan.h
+new file mode 100644
+index 0000000..7975a55
+--- /dev/null
 +++ b/net/bluetooth/ble_6lowpan.h
-@@ -23,5 +23,6 @@ int ble_6lowpan_del_conn(struct l2cap_conn *conn);
- int ble_6lowpan_init(void);
- void ble_6lowpan_cleanup(void);
- bool ble_6lowpan_is_enabled(struct hci_dev *hdev, bdaddr_t *dst);
-+void ble_6lowpan_add_debugfs(struct hci_dev *hdev);
- 
- #endif /* __BLE_LOWPAN_H */
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 6ccc4eb..d0db818 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -34,6 +34,8 @@
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
- 
-+#include "ble_6lowpan.h"
+@@ -0,0 +1,27 @@
++/*
++   Copyright (c) 2013 Intel Corp.
 +
- static void hci_rx_work(struct work_struct *work);
- static void hci_cmd_work(struct work_struct *work);
- static void hci_tx_work(struct work_struct *work);
-@@ -1406,6 +1408,8 @@ static int __hci_init(struct hci_dev *hdev)
- 				    hdev, &conn_max_interval_fops);
- 	}
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License version 2 and
++   only version 2 as published by the Free Software Foundation.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++*/
++
++#ifndef __BLE_LOWPAN_H
++#define __BLE_LOWPAN_H
++
++#include <linux/skbuff.h>
++#include <net/bluetooth/l2cap.h>
++
++int ble_6lowpan_recv(struct l2cap_conn *conn, struct sk_buff *skb);
++int ble_6lowpan_add_conn(struct l2cap_conn *conn);
++int ble_6lowpan_del_conn(struct l2cap_conn *conn);
++int ble_6lowpan_init(void);
++void ble_6lowpan_cleanup(void);
++bool ble_6lowpan_is_enabled(struct hci_dev *hdev, bdaddr_t *dst);
++
++#endif /* __BLE_LOWPAN_H */
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index d52bd0d..fb1a49c 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -40,6 +40,7 @@
+ #include "smp.h"
+ #include "a2mp.h"
+ #include "amp.h"
++#include "ble_6lowpan.h"
  
-+	ble_6lowpan_add_debugfs(hdev);
+ bool disable_ertm;
+ 
+@@ -6500,6 +6501,10 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+ 			l2cap_conn_del(conn->hcon, EACCES);
+ 		break;
+ 
++	case L2CAP_FC_6LOWPAN:
++		ble_6lowpan_recv(conn, skb);
++		break;
++
+ 	default:
+ 		l2cap_data_channel(conn, cid, skb);
+ 		break;
+@@ -6537,6 +6542,11 @@ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ 	return exact ? lm1 : lm2;
+ }
+ 
++static bool is_ble_6lowpan(void)
++{
++	return false;
++}
++
+ void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ {
+ 	struct l2cap_conn *conn;
+@@ -6545,8 +6555,12 @@ void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 
+ 	if (!status) {
+ 		conn = l2cap_conn_add(hcon);
+-		if (conn)
++		if (conn) {
+ 			l2cap_conn_ready(conn);
++
++			if (hcon->type == LE_LINK && is_ble_6lowpan())
++				ble_6lowpan_add_conn(conn);
++		}
+ 	} else {
+ 		l2cap_conn_del(hcon, bt_to_errno(status));
+ 	}
+@@ -6567,6 +6581,9 @@ void l2cap_disconn_cfm(struct hci_conn *hcon, u8 reason)
+ {
+ 	BT_DBG("hcon %p reason %d", hcon, reason);
+ 
++	if (hcon->type == LE_LINK && is_ble_6lowpan())
++		ble_6lowpan_del_conn(hcon->l2cap_data);
++
+ 	l2cap_conn_del(hcon, bt_to_errno(reason));
+ }
+ 
+@@ -6849,11 +6866,14 @@ int __init l2cap_init(void)
+ 	l2cap_debugfs = debugfs_create_file("l2cap", 0444, bt_debugfs,
+ 					    NULL, &l2cap_debugfs_fops);
+ 
++	ble_6lowpan_init();
 +
  	return 0;
  }
  
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index fb1a49c..e3b30dd 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -6542,11 +6542,6 @@ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
- 	return exact ? lm1 : lm2;
+ void l2cap_exit(void)
+ {
++	ble_6lowpan_cleanup();
+ 	debugfs_remove(l2cap_debugfs);
+ 	l2cap_cleanup_sockets();
  }
- 
--static bool is_ble_6lowpan(void)
--{
--	return false;
--}
--
- void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
- {
- 	struct l2cap_conn *conn;
-@@ -6558,7 +6553,9 @@ void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
- 		if (conn) {
- 			l2cap_conn_ready(conn);
- 
--			if (hcon->type == LE_LINK && is_ble_6lowpan())
-+			if (hcon->type == LE_LINK &&
-+					ble_6lowpan_is_enabled(hcon->hdev,
-+								&hcon->dst))
- 				ble_6lowpan_add_conn(conn);
- 		}
- 	} else {
-@@ -6581,7 +6578,8 @@ void l2cap_disconn_cfm(struct hci_conn *hcon, u8 reason)
- {
- 	BT_DBG("hcon %p reason %d", hcon, reason);
- 
--	if (hcon->type == LE_LINK && is_ble_6lowpan())
-+	if (hcon->type == LE_LINK && ble_6lowpan_is_enabled(hcon->hdev,
-+							&hcon->dst))
- 		ble_6lowpan_del_conn(hcon->l2cap_data);
- 
- 	l2cap_conn_del(hcon, bt_to_errno(reason));
 -- 
 1.7.11.7
 
