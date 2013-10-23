@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 4/6] android: Send notification on adapter power state change
-Date: Wed, 23 Oct 2013 15:46:24 +0200
-Message-ID: <1382535986-30684-4-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 3/6] android/hal: Fix crash while receiving notification
+Date: Wed, 23 Oct 2013 15:46:23 +0200
+Message-ID: <1382535986-30684-3-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1382535986-30684-1-git-send-email-szymon.janc@tieto.com>
 References: <1382535986-30684-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,54 +12,28 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This fix following crash:
+Invalid read of size 8
+   at 0x408B33: notification_handler (hal-ipc.c:122)
+   by 0x4E39E99: start_thread (pthread_create.c:308)
+ Address 0x8 is not stack'd, malloc'd or (recently) free'd
 ---
- android/adapter.c | 26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
+ android/hal-ipc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/android/adapter.c b/android/adapter.c
-index f9843d1..7a219df 100644
---- a/android/adapter.c
-+++ b/android/adapter.c
-@@ -74,6 +74,20 @@ static void mgmt_local_name_changed_event(uint16_t index, uint16_t length,
- 	/* TODO Update services if needed */
- }
+diff --git a/android/hal-ipc.c b/android/hal-ipc.c
+index e8bba11..97a3d29 100644
+--- a/android/hal-ipc.c
++++ b/android/hal-ipc.c
+@@ -118,7 +118,7 @@ static void *notification_handler(void *data)
+ 		fd = -1;
  
-+static void settings_changed_powered(struct bt_adapter *adapter)
-+{
-+	struct hal_msg_ev_bt_adapter_state_changed ev;
-+
-+	ev.state = (adapter->current_settings & MGMT_SETTING_POWERED) ?
-+			HAL_BT_ADAPTER_STATE_ON : HAL_BT_ADAPTER_STATE_OFF;
-+
-+	DBG("%u", ev.state);
-+
-+	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
-+					HAL_MSG_EV_BT_ADAPTER_STATE_CHANGED,
-+					sizeof(ev), &ev, -1);
-+}
-+
- static void settings_changed_connectable(struct bt_adapter *adapter)
- {
- 	/* TODO */
-@@ -94,16 +108,8 @@ static void settings_changed(struct bt_adapter *adapter, uint32_t settings)
- 
- 	DBG("0x%08x", changed_mask);
- 
--	if (changed_mask & MGMT_SETTING_POWERED) {
--		info("Powered");
--
--		/*
--		if (adapter->current_settings & MGMT_SETTING_POWERED)
--			start_adapter()
--		else
--			stop_adapter()
--		*/
--	}
-+	if (changed_mask & MGMT_SETTING_POWERED)
-+		settings_changed_powered(adapter);
- 
- 	if (changed_mask & MGMT_SETTING_CONNECTABLE) {
- 		DBG("Connectable");
+ 		/* Receive auxiliary data in msg */
+-		for (cmsg = CMSG_FIRSTHDR(&msg); !cmsg;
++		for (cmsg = CMSG_FIRSTHDR(&msg); cmsg;
+ 					cmsg = CMSG_NXTHDR(&msg, cmsg)) {
+ 			if (cmsg->cmsg_level == SOL_SOCKET
+ 					&& cmsg->cmsg_type == SCM_RIGHTS) {
 -- 
 1.8.4
 
