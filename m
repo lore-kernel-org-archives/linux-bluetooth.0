@@ -1,37 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <andrei.emeltchenko@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android: Check that service is started
-Date: Wed, 23 Oct 2013 13:26:38 +0300
-Message-Id: <1382523998-30722-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 23 Oct 2013 13:05:09 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/2] Add support to pan and socket in haltest
+Message-ID: <20131023100509.GA11748@x220.p-661hnu-f1>
+References: <1382517298-28093-1-git-send-email-jerzy.kasenberg@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1382517298-28093-1-git-send-email-jerzy.kasenberg@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Jerzy,
 
-Add check that we are able to start Bluetooth service in
-Android. If service is not started we should not try to connect to it.
----
- android/hal-ipc.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+On Wed, Oct 23, 2013, Jerzy Kasenberg wrote:
+> - Add calls to methods of socket and pan
+> 
+> Jerzy Kasenberg (2):
+>   android: Add calls to socket methods in haltest
+>   android: Add calls to pan methods to haltest
+> 
+>  Makefile.android         |    4 +
+>  android/Android.mk       |    2 +
+>  android/client/haltest.c |    2 +
+>  android/client/if-bt.c   |    4 +-
+>  android/client/if-main.h |    4 +
+>  android/client/if-pan.c  |  209 +++++++++++++++++++++++++++++
+>  android/client/if-sock.c |  334 ++++++++++++++++++++++++++++++++++++++++++++++
+>  7 files changed, 557 insertions(+), 2 deletions(-)
+>  create mode 100644 android/client/if-pan.c
+>  create mode 100644 android/client/if-sock.c
 
-diff --git a/android/hal-ipc.c b/android/hal-ipc.c
-index 2d58038..a7948a6 100644
---- a/android/hal-ipc.c
-+++ b/android/hal-ipc.c
-@@ -204,7 +204,11 @@ bool hal_ipc_init(void)
- 	}
- 
- 	/* Start Android Bluetooth daemon service */
--	property_set("ctl.start", SERVICE_NAME);
-+	if (property_set("ctl.start", SERVICE_NAME) < 0) {
-+		error("Failed to start service %s", SERVICE_NAME);
-+		close(sk);
-+		return false;
-+	}
- 
- 	cmd_sk = accept_connection(sk);
- 	if (cmd_sk < 0) {
--- 
-1.8.1.2
+Both patches have been applied. Thanks.
 
+Johan
