@@ -1,67 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1382516789-374-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1382516789-374-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Wed, 23 Oct 2013 12:18:50 +0300
-Message-ID: <CA+yX-WOvxAiWfQ2COp6tSeCanJrJxo9w1=SrOwuSY+eb=Qe0tA@mail.gmail.com>
-Subject: Re: [PATCH] android: Fix build error for Android
-From: "Emeltchenko, Andrei" <andrei.emeltchenko@intel.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com,
-	szymon.janc@tieto.com
-Content-Type: text/plain; charset=ISO-8859-1
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 BlueZ 4/4] android: Add variable ROOT_PATH to Android.mk
+Date: Wed, 23 Oct 2013 11:50:40 +0300
+Message-Id: <1382518240-31896-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1382518240-31896-1-git-send-email-luiz.dentz@gmail.com>
+References: <1382518240-31896-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Oct 23, 2013 at 11:26 AM, Lukasz Rymanowski
-<lukasz.rymanowski@tieto.com> wrote:
-> Android uses functions and defines from sys/capability.h which
-> requires additional include
-> ---
->  android/main.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/android/main.c b/android/main.c
-> index 988d08b..606baf2 100644
-> --- a/android/main.c
-> +++ b/android/main.c
-> @@ -52,6 +52,10 @@
->  #include "hal-msg.h"
->  #include "ipc.h"
->
-> +#if defined(ANDROID)
+This makes it simpler to include files from other parts of the code.
+---
+ android/Android.mk | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-check also for platform version in order to compile for 4.2.2
-
-Regards,
-Andrei
-
-> +#include <sys/capability.h>
-> +#endif
-> +
->  static GMainLoop *event_loop;
->  static struct mgmt *mgmt_if = NULL;
->
-> --
-> 1.8.4
->
-> ---------------------------------------------------------------------
-> Intel Finland Oy
-> Registered Address: PL 281, 00181 Helsinki
-> Business Identity Code: 0357606 - 4
-> Domiciled in Helsinki
->
-> This e-mail and any attachments may contain confidential material for
-> the sole use of the intended recipient(s). Any review or distribution
-> by others is strictly prohibited. If you are not the intended
-> recipient, please contact the sender and delete all copies.
->
-
-
-
+diff --git a/android/Android.mk b/android/Android.mk
+index 93dcc23..2dffe71 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -1,7 +1,8 @@
+ LOCAL_PATH := $(call my-dir)
++ROOT_PATH := $(LOCAL_PATH)/..
+ 
+ # Retrieve BlueZ version from configure.ac file
+-BLUEZ_VERSION := $(shell grep ^AC_INIT $(LOCAL_PATH)/../configure.ac | cpp -P -D'AC_INIT(_,v)=v')
++BLUEZ_VERSION := $(shell grep ^AC_INIT $(ROOT_PATH)/configure.ac | cpp -P -D'AC_INIT(_,v)=v')
+ 
+ # Specify pathmap for glib
+ pathmap_INCL += glib:external/bluetooth/glib
+@@ -34,9 +35,9 @@ LOCAL_C_INCLUDES := \
+ 	$(call include-path-for, glib)/glib \
+ 
+ LOCAL_C_INCLUDES += \
+-	$(LOCAL_PATH)/../ \
+-	$(LOCAL_PATH)/../src \
+-	$(LOCAL_PATH)/../lib \
++	$(ROOT_PATH)/ \
++	$(ROOT_PATH)/src \
++	$(ROOT_PATH)/lib \
+ 
+ LOCAL_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
+ 
+@@ -51,9 +52,9 @@ lib_headers := \
+ 	sdp_lib.h \
+ 	sdp.h \
+ 
+-$(shell mkdir -p $(LOCAL_PATH)/../lib/bluetooth)
++$(shell mkdir -p $(ROOT_PATH)/lib/bluetooth)
+ 
+-$(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(LOCAL_PATH)/../lib/bluetooth/$(file)))
++$(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(ROOT_PATH)/lib/bluetooth/$(file)))
+ 
+ LOCAL_MODULE := bluetoothd
+ 
 -- 
-Best regards,
-Andrei Emeltchenko
-Intel / OTC / Helsinki
+1.8.3.1
+
