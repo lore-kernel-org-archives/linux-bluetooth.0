@@ -1,37 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 23 Oct 2013 13:05:09 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/2] Add support to pan and socket in haltest
-Message-ID: <20131023100509.GA11748@x220.p-661hnu-f1>
-References: <1382517298-28093-1-git-send-email-jerzy.kasenberg@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1382517298-28093-1-git-send-email-jerzy.kasenberg@tieto.com>
+In-Reply-To: <1382516789-374-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1382516789-374-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Wed, 23 Oct 2013 12:18:50 +0300
+Message-ID: <CA+yX-WOvxAiWfQ2COp6tSeCanJrJxo9w1=SrOwuSY+eb=Qe0tA@mail.gmail.com>
+Subject: Re: [PATCH] android: Fix build error for Android
+From: "Emeltchenko, Andrei" <andrei.emeltchenko@intel.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com,
+	szymon.janc@tieto.com
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jerzy,
+Hi Lukasz,
 
-On Wed, Oct 23, 2013, Jerzy Kasenberg wrote:
-> - Add calls to methods of socket and pan
-> 
-> Jerzy Kasenberg (2):
->   android: Add calls to socket methods in haltest
->   android: Add calls to pan methods to haltest
-> 
->  Makefile.android         |    4 +
->  android/Android.mk       |    2 +
->  android/client/haltest.c |    2 +
->  android/client/if-bt.c   |    4 +-
->  android/client/if-main.h |    4 +
->  android/client/if-pan.c  |  209 +++++++++++++++++++++++++++++
->  android/client/if-sock.c |  334 ++++++++++++++++++++++++++++++++++++++++++++++
->  7 files changed, 557 insertions(+), 2 deletions(-)
->  create mode 100644 android/client/if-pan.c
->  create mode 100644 android/client/if-sock.c
+On Wed, Oct 23, 2013 at 11:26 AM, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> Android uses functions and defines from sys/capability.h which
+> requires additional include
+> ---
+>  android/main.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/android/main.c b/android/main.c
+> index 988d08b..606baf2 100644
+> --- a/android/main.c
+> +++ b/android/main.c
+> @@ -52,6 +52,10 @@
+>  #include "hal-msg.h"
+>  #include "ipc.h"
+>
+> +#if defined(ANDROID)
 
-Both patches have been applied. Thanks.
+check also for platform version in order to compile for 4.2.2
 
-Johan
+Regards,
+Andrei
+
+> +#include <sys/capability.h>
+> +#endif
+> +
+>  static GMainLoop *event_loop;
+>  static struct mgmt *mgmt_if = NULL;
+>
+> --
+> 1.8.4
+>
+> ---------------------------------------------------------------------
+> Intel Finland Oy
+> Registered Address: PL 281, 00181 Helsinki
+> Business Identity Code: 0357606 - 4
+> Domiciled in Helsinki
+>
+> This e-mail and any attachments may contain confidential material for
+> the sole use of the intended recipient(s). Any review or distribution
+> by others is strictly prohibited. If you are not the intended
+> recipient, please contact the sender and delete all copies.
+>
+
+
+
+-- 
+Best regards,
+Andrei Emeltchenko
+Intel / OTC / Helsinki
