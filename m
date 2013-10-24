@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 3/5] android: Remove not needed adapter parameter from bt_adapter_ready
-Date: Thu, 24 Oct 2013 10:36:51 +0200
-Message-ID: <1382603813-9157-3-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 5/5] android: Use adapter index in mgmt functions
+Date: Thu, 24 Oct 2013 10:36:53 +0200
+Message-ID: <1382603813-9157-5-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1382603813-9157-1-git-send-email-szymon.janc@tieto.com>
 References: <1382603813-9157-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -14,69 +14,48 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Szymon Janc <szymon.janc@gmail.com>
 
-There is no need to pass adapter pointer in bt_adapter_ready callback
-as there is only one present.
+Instead of hardcoding index 0 use real index of adapter. This fix
+using invalid index if adapter ID happens to be different than 0.
+
+This should not happen on Android but is possible while testing on
+Linux PC.
 ---
- android/adapter.c | 6 +++---
- android/adapter.h | 4 +---
- android/main.c    | 2 +-
- 3 files changed, 5 insertions(+), 7 deletions(-)
+ android/adapter.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/android/adapter.c b/android/adapter.c
-index d85fa1f..0a53021 100644
+index 0305ccb..532f964 100644
 --- a/android/adapter.c
 +++ b/android/adapter.c
-@@ -201,11 +201,11 @@ static void load_link_keys_complete(uint8_t status, uint16_t length,
- 	DBG("status %u", status);
+@@ -170,14 +170,16 @@ static void mgmt_dev_class_changed_event(uint16_t index, uint16_t length,
  
- 	default_adapter = adapter;
--	adapter->ready(adapter, 0);
-+	adapter->ready(0);
- 	return;
- 
- failed:
--	adapter->ready(NULL, err);
-+	adapter->ready(err);
- }
- 
- static void load_link_keys(struct bt_adapter *adapter, GSList *keys)
-@@ -274,7 +274,7 @@ static void read_info_complete(uint8_t status, uint16_t length, const void *para
- 	return;
- 
- failed:
--	adapter->ready(NULL, err);
-+	adapter->ready(err);
- }
- 
- void bt_adapter_init(uint16_t index, struct mgmt *mgmt_if,
-diff --git a/android/adapter.h b/android/adapter.h
-index 9ae2d33..3d7b804 100644
---- a/android/adapter.h
-+++ b/android/adapter.h
-@@ -28,9 +28,7 @@
- 
- #include "lib/bluetooth.h"
- 
--struct bt_adapter;
--
--typedef void (*bt_adapter_ready)(struct bt_adapter *adapter, int err);
-+typedef void (*bt_adapter_ready)(int err);
- 
- void bt_adapter_init(uint16_t index, struct mgmt *mgmt_if,
- 						bt_adapter_ready func);
-diff --git a/android/main.c b/android/main.c
-index 740b532..50b5901 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -392,7 +392,7 @@ static GOptionEntry options[] = {
- 	{ NULL }
- };
- 
--static void adapter_ready(struct bt_adapter *adapter, int err)
-+static void adapter_ready(int err)
+ static void register_mgmt_handlers(void)
  {
- 	if (err) {
- 		error("Adapter initialization failed: %s", strerror(err));
+-	mgmt_register(adapter->mgmt, MGMT_EV_NEW_SETTINGS, 0,
++	mgmt_register(adapter->mgmt, MGMT_EV_NEW_SETTINGS, adapter->index,
+ 					new_settings_callback, NULL, NULL);
+ 
+ 	mgmt_register(adapter->mgmt, MGMT_EV_CLASS_OF_DEV_CHANGED,
+-			0, mgmt_dev_class_changed_event, NULL, NULL);
++				adapter->index, mgmt_dev_class_changed_event,
++				NULL, NULL);
+ 
+ 	mgmt_register(adapter->mgmt, MGMT_EV_LOCAL_NAME_CHANGED,
+-			0, mgmt_local_name_changed_event, NULL, NULL);
++				adapter->index, mgmt_local_name_changed_event,
++				NULL, NULL);
+ }
+ 
+ static void load_link_keys_complete(uint8_t status, uint16_t length,
+@@ -216,7 +218,7 @@ static void load_link_keys(GSList *keys)
+ 	cp->debug_keys = 0;
+ 	cp->key_count = htobs(key_len);
+ 
+-	mgmt_send(adapter->mgmt, MGMT_OP_LOAD_LINK_KEYS, 0, len,
++	mgmt_send(adapter->mgmt, MGMT_OP_LOAD_LINK_KEYS, adapter->index, len,
+ 				cp, load_link_keys_complete, NULL, NULL);
+ 
+ 	g_free(cp);
 -- 
 1.8.4
 
