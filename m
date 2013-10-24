@@ -1,47 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1382624561-9294-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1382624561-9294-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Fri, 25 Oct 2013 11:11:53 +0300
-Message-ID: <CABBYNZJhrM_+9UzxO7_pZcteVrT03hjv5MyE-i_EZPREo_KcNg@mail.gmail.com>
-Subject: Re: [PATCH] android: Make haltest and bluetoothd depend on HAL lib
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <CAJdJm_P4kq2WFRhhSbr9KROqTaqwmV2p3u9NzHW1Lt1v8hX0tA@mail.gmail.com>
+References: <CAHZ1yC=vh0PUS7ZgZ_zUff_gPzLwjYx8EABxbT71uU5zQAChTQ@mail.gmail.com>
+	<CAJdJm_P4kq2WFRhhSbr9KROqTaqwmV2p3u9NzHW1Lt1v8hX0tA@mail.gmail.com>
+Date: Thu, 24 Oct 2013 13:46:13 -0700
+Message-ID: <CAHZ1yCkAcqZqr8DwtRdPvdhQP8NheitbMM8qf6HLPenc6pf_2Q@mail.gmail.com>
+Subject: Re: GATT - How to mark an attribute as requiring encryption
+From: Scott James Remnant <keybuk@google.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+On Mon, Oct 21, 2013 at 6:31 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
 
-On Thu, Oct 24, 2013 at 5:22 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> On Mon, Oct 21, 2013 at 9:01 PM, Scott James Remnant <keybuk@google.com> wrote:
+>> While there is a way to mark an attribute as needing authentication
+>> and/or authorization, there does not seem to be a way to mark an
+>> attribute as requiring encryption (or a particular key size), and I
+>> couldn't find any code that would return the ATT_ECODE_INSUFF_ENC or
+>> ATT_ECODE_INSUFF_ENCR_KEY_SIZE responses.
 >
-> The patch makes haltest and bluetoothd depend on bluetooth.default target
-> which is already defined. glib dependency Android resolves itself.
-> Fixes issue that for the fresh build only bluetooth.default.so is built.
-> ---
->  android/Android.mk |    1 +
->  1 file changed, 1 insertion(+)
+> There is a FIXME for this on function att_check_reqs()
+> (src/attrib-server.c). Feel free to fix it :)
 >
-> diff --git a/android/Android.mk b/android/Android.mk
-> index aac5c67..7049a20 100644
-> --- a/android/Android.mk
-> +++ b/android/Android.mk
-> @@ -84,6 +84,7 @@ LOCAL_MODULE := bluetooth.default
->  LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
->  LOCAL_MODULE_TAGS := optional
->  LOCAL_MODULE_CLASS := SHARED_LIBRARIES
-> +LOCAL_REQUIRED_MODULES := haltest bluetoothd
->
->  include $(BUILD_SHARED_LIBRARY)
->
-> --
-> 1.7.10.4
+Actually the FIXME seems unrelated, that seems to be about looking at
+the reported security level of the connection and only considering the
+"have authentication" check to be passed if the level is
+BT_IO_SEC_HIGH -- right now it would accept BT_IO_SEC_MEDIUM as
+evidence of authentication.
 
-Applied, thanks.
+At least that's how I read it.
 
 
+That said, having stared at the standard and the Test Purposes a
+little longer, the test isn't even checking for "insufficient
+encryption" but "insufficient encryption key size". In these tests the
+PTS actually does negotiate encryption, it's expecting the attribute
+server to record the key size and allow attributes to declare that
+they need a bigger key.
+
+> Note that, as part of the ongoing implementation of a D-Bus API for
+> implementing external GATT services, we have patches (currently being
+> cleaned up for upstream submission) that will refactor the internal C
+> API for creating GATT services. If you are interested, take a look at
+> (note that it is work-in-progress code):
+>
+> git://git.infradead.org/users/cktakahasi/bluez.git (branch gatt-api-devel)
+>
+> Also take a look at the API document sent by Claudio a few days ago:
+> "[RFC BlueZ v0] doc: Add GATT API"
+>
+I have this on my TODO to read once we're clear through qualification.
+
+Scott
 -- 
-Luiz Augusto von Dentz
+Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
