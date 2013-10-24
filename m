@@ -2,9 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 1/5] android: Start command watch after notify channel is connected
-Date: Thu, 24 Oct 2013 10:36:49 +0200
-Message-ID: <1382603813-9157-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 2/5] android: Fix bt_adapter_init
+Date: Thu, 24 Oct 2013 10:36:50 +0200
+Message-ID: <1382603813-9157-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1382603813-9157-1-git-send-email-szymon.janc@tieto.com>
+References: <1382603813-9157-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,41 +14,57 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Szymon Janc <szymon.janc@gmail.com>
 
-Daemon should start processing commands only after both communication
-channels were connected.
+Make bt_adapter_init return void and use ready callback for error
+reporting. This also fix returning incorrect status and invalid
+mgmt_if unref (mgmt_send return 0 on error or >0 on success).
 ---
- android/main.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ android/adapter.c | 11 +++++------
+ android/adapter.h |  2 +-
+ 2 files changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/android/main.c b/android/main.c
-index 9879f05..740b532 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -288,9 +288,11 @@ static gboolean notif_connect_cb(GIOChannel *io, GIOCondition cond,
- 
- 	g_io_add_watch(io, cond, notif_watch_cb, NULL);
- 
--	info("Successfully connected to HAL");
-+	cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
- 
--	/* TODO start handling commands */
-+	g_io_add_watch(hal_cmd_io, cond, cmd_watch_cb, NULL);
-+
-+	info("Successfully connected to HAL");
- 
- 	return FALSE;
+diff --git a/android/adapter.c b/android/adapter.c
+index 88ac19f..d85fa1f 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -277,7 +277,7 @@ failed:
+ 	adapter->ready(NULL, err);
  }
-@@ -305,10 +307,6 @@ static gboolean cmd_connect_cb(GIOChannel *io, GIOCondition cond,
- 		return FALSE;
- 	}
  
--	cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
--
--	g_io_add_watch(io, cond, cmd_watch_cb, NULL);
--
- 	hal_notif_io = connect_hal(notif_connect_cb);
- 	if (!hal_notif_io) {
- 		error("Cannot connect to HAL, terminating");
+-bool bt_adapter_init(uint16_t index, struct mgmt *mgmt_if,
++void bt_adapter_init(uint16_t index, struct mgmt *mgmt_if,
+ 						bt_adapter_ready ready)
+ {
+ 	struct bt_adapter *adapter;
+@@ -289,12 +289,11 @@ bool bt_adapter_init(uint16_t index, struct mgmt *mgmt_if,
+ 	adapter->ready = ready;
+ 
+ 	if (mgmt_send(mgmt_if, MGMT_OP_READ_INFO, index, 0, NULL,
+-				read_info_complete, adapter, NULL) > 0) {
+-		mgmt_unref(mgmt_if);
+-		return false;
+-	}
++				read_info_complete, adapter, NULL) > 0)
++		return;
+ 
+-	return adapter;
++	ready(-EIO);
++	mgmt_unref(mgmt_if);
+ }
+ 
+ static void set_mode_complete(uint8_t status, uint16_t length,
+diff --git a/android/adapter.h b/android/adapter.h
+index b8d0a58..9ae2d33 100644
+--- a/android/adapter.h
++++ b/android/adapter.h
+@@ -32,7 +32,7 @@ struct bt_adapter;
+ 
+ typedef void (*bt_adapter_ready)(struct bt_adapter *adapter, int err);
+ 
+-bool bt_adapter_init(uint16_t index, struct mgmt *mgmt_if,
++void bt_adapter_init(uint16_t index, struct mgmt *mgmt_if,
+ 						bt_adapter_ready func);
+ 
+ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
 -- 
 1.8.4
 
