@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Subject: [PATCH v2] android/client: Fix various coding style issues
-Date: Thu, 24 Oct 2013 11:50:20 +0200
-Message-ID: <1382608220-25572-1-git-send-email-jerzy.kasenberg@tieto.com>
+Subject: [PATCH] android/client: Fix various coding style issues
+Date: Thu, 24 Oct 2013 10:50:18 +0200
+Message-ID: <1382604618-9077-1-git-send-email-jerzy.kasenberg@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,22 +14,16 @@ Mostly indentation of arguments in functions and calls.
 Prefix p remove from puser/penum_func.
 Some empty lines added after closing } when needed.
 Magic number for string length changed to preprocessor define.
-Added spaces after casts.
 ---
- 
-v2:
- - fixed casts
-
  android/client/haltest.c       |   18 +++--
- android/client/if-bt.c         |  154 ++++++++++++++++++++++------------------
- android/client/if-hh.c         |   64 ++++++++---------
+ android/client/if-bt.c         |  144 ++++++++++++++++++++++------------------
+ android/client/if-hh.c         |   64 +++++++++---------
  android/client/if-main.h       |   12 ++--
- android/client/if-pan.c        |   34 ++++-----
- android/client/if-sock.c       |   26 +++----
+ android/client/if-pan.c        |   34 +++++-----
+ android/client/if-sock.c       |   26 ++++----
  android/client/tabcompletion.c |    8 +--
  android/client/terminal.c      |    5 ++
- android/client/textconv.h      |    2 +-
- 9 files changed, 175 insertions(+), 148 deletions(-)
+ 8 files changed, 169 insertions(+), 142 deletions(-)
 
 diff --git a/android/client/haltest.c b/android/client/haltest.c
 index 19e81b8..189af0b 100644
@@ -124,7 +118,7 @@ index 19e81b8..189af0b 100644
  		return;
  	}
 diff --git a/android/client/if-bt.c b/android/client/if-bt.c
-index f5c84c1..dd5d12e 100644
+index f5c84c1..4dc9f6b 100644
 --- a/android/client/if-bt.c
 +++ b/android/client/if-bt.c
 @@ -82,13 +82,14 @@ static char *btproperty2str(bt_property_t property)
@@ -217,12 +211,8 @@ index f5c84c1..dd5d12e 100644
  }
  
  /*
-@@ -311,16 +317,16 @@ static void discovery_state_changed_cb(bt_discovery_state_t state)
-  * It's stored for command completion.
-  */
- static char last_remote_addr[MAX_ADDR_STR_LEN];
--static bt_ssp_variant_t last_ssp_variant = (bt_ssp_variant_t)-1;
-+static bt_ssp_variant_t last_ssp_variant = (bt_ssp_variant_t) -1;
+@@ -314,13 +320,13 @@ static char last_remote_addr[MAX_ADDR_STR_LEN];
+ static bt_ssp_variant_t last_ssp_variant = (bt_ssp_variant_t)-1;
  
  static void pin_request_cb(bt_bdaddr_t *remote_bd_addr, bt_bdname_t *bd_name,
 -	uint32_t cod)
@@ -470,26 +460,7 @@ index f5c84c1..dd5d12e 100644
  	}
  }
  
-@@ -803,22 +813,22 @@ static void get_profile_interface_p(int argc, const char **argv)
- 	if (strcmp(BT_PROFILE_HANDSFREE_ID, id) == 0)
- 		pif = &dummy; /* TODO: change when if_hf is there */
- 	else if (strcmp(BT_PROFILE_ADVANCED_AUDIO_ID, id) == 0)
--		pif = (const void **)&if_av;
-+		pif = (const void **) &if_av;
- 	else if (strcmp(BT_PROFILE_HEALTH_ID, id) == 0)
- 		pif = &dummy; /* TODO: change when if_hl is there */
- 	else if (strcmp(BT_PROFILE_SOCKETS_ID, id) == 0)
--		pif = (const void **)&if_sock;
-+		pif = (const void **) &if_sock;
- 	else if (strcmp(BT_PROFILE_HIDHOST_ID, id) == 0)
--		pif = (const void **)&if_hh;
-+		pif = (const void **) &if_hh;
- 	else if (strcmp(BT_PROFILE_PAN_ID, id) == 0)
--		pif = (const void **)&if_pan;
-+		pif = (const void **) &if_pan;
- #if PLATFORM_SDK_VERSION > 17
- 	else if (strcmp(BT_PROFILE_AV_RC_ID, id) == 0)
- 		pif = &dummy; /* TODO: change when if_rc is there */
+@@ -818,7 +828,7 @@ static void get_profile_interface_p(int argc, const char **argv)
  #endif
  	else
  		haltest_error("%s is not correct for get_profile_interface\n",
@@ -930,19 +901,6 @@ index a57068a..88c963b 100644
  		if (line_buf_ix < LINE_BUF_MAX - 1) {
  			if (line_len == line_buf_ix) {
  				putchar(c);
-diff --git a/android/client/textconv.h b/android/client/textconv.h
-index 056e706..085b141 100644
---- a/android/client/textconv.h
-+++ b/android/client/textconv.h
-@@ -58,7 +58,7 @@ const char *enum_defines(void *v, int i);
- const char *enum_strings(void *v, int i);
- const char *enum_one_string(void *v, int i);
- 
--#define TYPE_ENUM(type) ((void *)&__##type##2str[0])
-+#define TYPE_ENUM(type) ((void *) &__##type##2str[0])
- #define DECINTMAP(type) \
- extern struct int2str __##type##2str[]; \
- const char *type##2##str(type v); \
 -- 
 1.7.9.5
 
