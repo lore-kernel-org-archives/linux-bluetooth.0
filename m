@@ -1,70 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 2/5] android: Fix bt_adapter_init
-Date: Thu, 24 Oct 2013 10:36:50 +0200
-Message-ID: <1382603813-9157-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1382603813-9157-1-git-send-email-szymon.janc@tieto.com>
-References: <1382603813-9157-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1382598639-6920-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1382598639-6920-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 24 Oct 2013 09:39:07 +0200
+Message-ID: <CAHCYCox-C7ApZmPmvQPcgYt-fBfT7mUS7qe4mubfbjv_eaR+Og@mail.gmail.com>
+Subject: Re: [PATCHv1 0/2] Enable av interface
+From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Szymon Janc <szymon.janc@gmail.com>
+On 24 October 2013 09:10, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> For some reason get av interface was missing from hal-bluetooth and from
+> hal test tool.
+>
+> PS: Not sure that haltest is fully implemented, Jerzy please comment here.
 
-Make bt_adapter_init return void and use ready callback for error
-reporting. This also fix returning incorrect status and invalid
-mgmt_if unref (mgmt_send return 0 on error or >0 on success).
----
- android/adapter.c | 11 +++++------
- android/adapter.h |  2 +-
- 2 files changed, 6 insertions(+), 7 deletions(-)
+I must have missed if-bt in commit.
+Thanks Andrei.
+Apart from one line in if-bt.c all code to call av interface is there
+and should be
+functional.
 
-diff --git a/android/adapter.c b/android/adapter.c
-index 88ac19f..d85fa1f 100644
---- a/android/adapter.c
-+++ b/android/adapter.c
-@@ -277,7 +277,7 @@ failed:
- 	adapter->ready(NULL, err);
- }
- 
--bool bt_adapter_init(uint16_t index, struct mgmt *mgmt_if,
-+void bt_adapter_init(uint16_t index, struct mgmt *mgmt_if,
- 						bt_adapter_ready ready)
- {
- 	struct bt_adapter *adapter;
-@@ -289,12 +289,11 @@ bool bt_adapter_init(uint16_t index, struct mgmt *mgmt_if,
- 	adapter->ready = ready;
- 
- 	if (mgmt_send(mgmt_if, MGMT_OP_READ_INFO, index, 0, NULL,
--				read_info_complete, adapter, NULL) > 0) {
--		mgmt_unref(mgmt_if);
--		return false;
--	}
-+				read_info_complete, adapter, NULL) > 0)
-+		return;
- 
--	return adapter;
-+	ready(-EIO);
-+	mgmt_unref(mgmt_if);
- }
- 
- static void set_mode_complete(uint8_t status, uint16_t length,
-diff --git a/android/adapter.h b/android/adapter.h
-index b8d0a58..9ae2d33 100644
---- a/android/adapter.h
-+++ b/android/adapter.h
-@@ -32,7 +32,7 @@ struct bt_adapter;
- 
- typedef void (*bt_adapter_ready)(struct bt_adapter *adapter, int err);
- 
--bool bt_adapter_init(uint16_t index, struct mgmt *mgmt_if,
-+void bt_adapter_init(uint16_t index, struct mgmt *mgmt_if,
- 						bt_adapter_ready func);
- 
- void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
+>
+> Andrei Emeltchenko (2):
+>   android: haltest: Enable av interface in test tool
+>   android: Enable AV interface
+>
+>  android/client/if-bt.c  |    2 +-
+>  android/hal-bluetooth.c |    3 +++
+>  2 files changed, 4 insertions(+), 1 deletion(-)
+>
+> --
+> 1.7.10.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
 -- 
-1.8.4
-
+Jerzy
