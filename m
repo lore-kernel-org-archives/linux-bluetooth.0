@@ -1,93 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1382700886-6289-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1382700886-6289-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Fri, 25 Oct 2013 16:11:14 +0300
-Message-ID: <CABBYNZLE88=TOvznjrfquOO=0sCnbN+g2joQuOYYFa4HpoxAnQ@mail.gmail.com>
-Subject: Re: [PATCH] android/hal: Associate thread to Java
+In-Reply-To: <1382698211-9123-1-git-send-email-szymon.janc@tieto.com>
+References: <1382698211-9123-1-git-send-email-szymon.janc@tieto.com>
+Date: Fri, 25 Oct 2013 15:29:18 +0300
+Message-ID: <CABBYNZKCT+i7qpsYyj=ZFFecN1M3B5qexHybsindb38H-7zLnQ@mail.gmail.com>
+Subject: Re: [PATCH v2 01/15] android: Remove not needed local variable in connect_hal
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Szymon,
 
-On Fri, Oct 25, 2013 at 2:34 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Without thread assiciation callbacks are not received by Java.
-> They are blocked by JNI:
-> E/BluetoothServiceJni( 2844): Callback env check fail: env: 0x0, callback: 0x0
-> E/BluetoothServiceJni( 2844): Callback: 'adapter_state_change_callback' is not
-> called on the correct thread
+On Fri, Oct 25, 2013 at 1:49 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> err variable was set but never read.
 > ---
->  android/hal-bluetooth.c |   12 ++++++++++++
->  android/hal-ipc.c       |    4 ++++
->  android/hal.h           |    2 ++
->  3 files changed, 18 insertions(+)
+>  android/main.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
 >
-> diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-> index f8ecec5..26f4fd9 100644
-> --- a/android/hal-bluetooth.c
-> +++ b/android/hal-bluetooth.c
-> @@ -40,6 +40,18 @@ static bool interface_ready(void)
->         return bt_hal_cbacks != NULL;
->  }
+> diff --git a/android/main.c b/android/main.c
+> index 50b5901..18dc9f7 100644
+> --- a/android/main.c
+> +++ b/android/main.c
+> @@ -239,12 +239,12 @@ static GIOChannel *connect_hal(GIOFunc connect_cb)
+>         struct sockaddr_un addr;
+>         GIOCondition cond;
+>         GIOChannel *io;
+> -       int err, sk;
+> +       int sk;
 >
-> +void bt_thread_associate(void)
-> +{
-> +       if (bt_hal_cbacks->thread_evt_cb)
-> +               bt_hal_cbacks->thread_evt_cb(ASSOCIATE_JVM);
-> +}
-> +
-> +void bt_thread_disassociate(void)
-> +{
-> +       if (bt_hal_cbacks->thread_evt_cb)
-> +               bt_hal_cbacks->thread_evt_cb(DISASSOCIATE_JVM);
-> +}
-> +
->  /* will be called from notification thread context */
->  void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len)
->  {
-> diff --git a/android/hal-ipc.c b/android/hal-ipc.c
-> index 20421db..240ac9d 100644
-> --- a/android/hal-ipc.c
-> +++ b/android/hal-ipc.c
-> @@ -67,6 +67,8 @@ static void *notification_handler(void *data)
->         ssize_t ret;
->         int fd;
+>         sk = socket(PF_LOCAL, SOCK_SEQPACKET, 0);
+>         if (sk < 0) {
+> -               err = errno;
+> -               error("Failed to create socket: %d (%s)", err, strerror(err));
+> +               error("Failed to create socket: %d (%s)", errno,
+> +                                                       strerror(errno));
+>                 return NULL;
+>         }
 >
-> +       bt_thread_associate();
-> +
->         while (true) {
->                 memset(&msg, 0, sizeof(msg));
->                 memset(buf, 0, sizeof(buf));
-> @@ -133,6 +135,8 @@ static void *notification_handler(void *data)
->         close(notif_sk);
->         notif_sk = -1;
+> @@ -258,9 +258,7 @@ static GIOChannel *connect_hal(GIOFunc connect_cb)
 >
-> +       bt_thread_disassociate();
-> +
->         DBG("exit");
+>         memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
 >
->         return NULL;
-> diff --git a/android/hal.h b/android/hal.h
-> index ef9a107..5cd5cab 100644
-> --- a/android/hal.h
-> +++ b/android/hal.h
-> @@ -27,3 +27,5 @@ btpan_interface_t *bt_get_pan_interface(void);
->  btav_interface_t *bt_get_av_interface(void);
->
->  void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len);
-> +void bt_thread_associate(void);
-> +void bt_thread_disassociate(void);
+> -       err = connect(sk, (struct sockaddr *) &addr, sizeof(addr));
+> -       if (err < 0) {
+> -               err = -errno;
+> +       if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+>                 error("Failed to connect HAL socket: %d (%s)", errno,
+>                                                         strerror(errno));
+>                 g_io_channel_unref(io);
 > --
-> 1.7.10.4
+> 1.8.4.1
 
-Pushed, thanks.
+Applied, thanks.
 
 
 -- 
