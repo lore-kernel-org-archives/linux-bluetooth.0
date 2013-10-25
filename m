@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 10/15] android: Add missing SSP Variant definitions to IPC document
-Date: Fri, 25 Oct 2013 10:56:13 +0200
-Message-ID: <1382691378-31940-10-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 05/15] android/hal: Add support for sending adapter get properties command
+Date: Fri, 25 Oct 2013 10:56:08 +0200
+Message-ID: <1382691378-31940-5-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1382691378-31940-1-git-send-email-szymon.janc@tieto.com>
 References: <1382691378-31940-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,27 +12,25 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Those are used to specify SSP association model.
+This allows HAL to get all adapter properties.
 ---
- android/hal-ipc-api.txt | 5 +++++
- 1 file changed, 5 insertions(+)
+ android/hal-bluetooth.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index a5437c1..0c2fd25 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -281,6 +281,11 @@ Commands and responses:
- 		                    Passkey (4 octets)
- 		Response parameters: <none>
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index a71de83..b81f8dd 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -138,7 +138,8 @@ static int get_adapter_properties(void)
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
  
-+		Valid SSP variant values: 0x00 = Passkey Confirmation
-+		                          0x01 = Passkey Entry
-+		                          0x02 = Consent (for Just Works)
-+		                          0x03 = Passkey Notification
-+
- 		In case of an error, the error response will be returned.
+-	return BT_STATUS_UNSUPPORTED;
++	return hal_ipc_cmd(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_GET_ADAPTER_PROPS,
++						0, NULL, 0, NULL, NULL);
+ }
  
- 	Opcode 0x12 - DUT Mode Configure command/response
+ static int get_adapter_property(bt_property_type_t type)
 -- 
 1.8.4.1
 
