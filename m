@@ -1,51 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 01/15] android: Remove not needed local variable in connect_hal
-Date: Fri, 25 Oct 2013 10:56:04 +0200
-Message-ID: <1382691378-31940-1-git-send-email-szymon.janc@tieto.com>
+CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+Subject: [PATCH] android/client: Fix incorrect casts of addresses
+Date: Fri, 25 Oct 2013 10:51:10 +0200
+Message-ID: <1382691070-24358-1-git-send-email-jerzy.kasenberg@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-err variable was set but never read.
+This fixes printing of addresses.
+If char is set to be signed (as it should) some addresses were
+printed with leading FFFFFF.
 ---
- android/main.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+This issue did not showed up before due to unsigned char for Android build
+on Qualcomm platform.
 
-diff --git a/android/main.c b/android/main.c
-index 50b5901..18dc9f7 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -239,12 +239,12 @@ static GIOChannel *connect_hal(GIOFunc connect_cb)
- 	struct sockaddr_un addr;
- 	GIOCondition cond;
- 	GIOChannel *io;
--	int err, sk;
-+	int sk;
+ android/client/textconv.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/android/client/textconv.c b/android/client/textconv.c
+index 1188477..bcdf4d9 100644
+--- a/android/client/textconv.c
++++ b/android/client/textconv.c
+@@ -137,7 +137,7 @@ int int2str_findstr(const char *str, const struct int2str m[])
+  */
+ char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
+ {
+-	const char *p = (const char *) bd_addr;
++	const uint8_t *p = bd_addr->address;
  
- 	sk = socket(PF_LOCAL, SOCK_SEQPACKET, 0);
- 	if (sk < 0) {
--		err = errno;
--		error("Failed to create socket: %d (%s)", err, strerror(err));
-+		error("Failed to create socket: %d (%s)", errno,
-+							strerror(errno));
- 		return NULL;
- 	}
+ 	snprintf(buf, MAX_ADDR_STR_LEN, "%02x:%02x:%02x:%02x:%02x:%02x",
+ 					p[0], p[1], p[2], p[3], p[4], p[5]);
+@@ -148,7 +148,7 @@ char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
+ /* converts string to bt_bdaddr_t */
+ void str2bt_bdaddr_t(const char *str, bt_bdaddr_t *bd_addr)
+ {
+-	char *p = (char *) bd_addr;
++	uint8_t *p = bd_addr->address;
  
-@@ -258,9 +258,7 @@ static GIOChannel *connect_hal(GIOFunc connect_cb)
- 
- 	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
- 
--	err = connect(sk, (struct sockaddr *) &addr, sizeof(addr));
--	if (err < 0) {
--		err = -errno;
-+	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
- 		error("Failed to connect HAL socket: %d (%s)", errno,
- 							strerror(errno));
- 		g_io_channel_unref(io);
+ 	sscanf(str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx",
+ 			       &p[0], &p[1], &p[2], &p[3], &p[4], &p[5]);
 -- 
-1.8.4.1
+1.7.9.5
 
