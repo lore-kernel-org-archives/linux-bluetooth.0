@@ -1,98 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20131025100821.GD6113@aemeltch-MOBL1>
-References: <1382691070-24358-1-git-send-email-jerzy.kasenberg@tieto.com>
-	<20131025093227.GB6113@aemeltch-MOBL1>
-	<CAHCYCozKG2K+QOvX_2eYSD96DGikc-v9dK1VNtX81tLdFzXvXg@mail.gmail.com>
-	<20131025100821.GD6113@aemeltch-MOBL1>
-Date: Fri, 25 Oct 2013 13:34:27 +0300
-Message-ID: <CABBYNZL3xBNNoLxN=kCOZqOE4XwJ6GHQQSnA4LbOYeV1+pohbw@mail.gmail.com>
-Subject: Re: [PATCH] android/client: Fix incorrect casts of addresses
+In-Reply-To: <20131025093616.GC6113@aemeltch-MOBL1>
+References: <1382691378-31940-1-git-send-email-szymon.janc@tieto.com>
+	<1382691378-31940-6-git-send-email-szymon.janc@tieto.com>
+	<20131025093616.GC6113@aemeltch-MOBL1>
+Date: Fri, 25 Oct 2013 13:15:43 +0300
+Message-ID: <CABBYNZ+edtiAGUL9rfyUd-kaLMc1L5CPr=isYU1Mb-4yBzVfCw@mail.gmail.com>
+Subject: Re: [PATCH 06/15] android/hal: Add support for sending create bond command
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	Jerzy Kasenberg <jerzy.kasenberg@tieto.com>,
+	Szymon Janc <szymon.janc@tieto.com>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jerzy,
+Hi,
 
-On Fri, Oct 25, 2013 at 1:08 PM, Andrei Emeltchenko
+On Fri, Oct 25, 2013 at 12:36 PM, Andrei Emeltchenko
 <andrei.emeltchenko.news@gmail.com> wrote:
-> Hi Jerzy,
+> Hi Szymon,
 >
-> On Fri, Oct 25, 2013 at 11:50:22AM +0200, Jerzy Kasenberg wrote:
->> Hi Andrei,
+> On Fri, Oct 25, 2013 at 10:56:09AM +0200, Szymon Janc wrote:
+>> This allows HAL to start bonding.
+>> ---
+>>  android/hal-bluetooth.c | 8 +++++---
+>>  1 file changed, 5 insertions(+), 3 deletions(-)
 >>
->> On 25 October 2013 11:32, Andrei Emeltchenko
->> <andrei.emeltchenko.news@gmail.com> wrote:
->> > Hi Jerzy,
->> >
->> > On Fri, Oct 25, 2013 at 10:51:10AM +0200, Jerzy Kasenberg wrote:
->> >> This fixes printing of addresses.
->> >> If char is set to be signed (as it should) some addresses were
->> >> printed with leading FFFFFF.
->> >> ---
->> >> This issue did not showed up before due to unsigned char for Android build
->> >> on Qualcomm platform.
->> >>
->> >>  android/client/textconv.c |    4 ++--
->> >>  1 file changed, 2 insertions(+), 2 deletions(-)
->> >>
->> >> diff --git a/android/client/textconv.c b/android/client/textconv.c
->> >> index 1188477..bcdf4d9 100644
->> >> --- a/android/client/textconv.c
->> >> +++ b/android/client/textconv.c
->> >> @@ -137,7 +137,7 @@ int int2str_findstr(const char *str, const struct int2str m[])
->> >>   */
->> >>  char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
->> >>  {
->> >> -     const char *p = (const char *) bd_addr;
->> >> +     const uint8_t *p = bd_addr->address;
->> >>
->> >>       snprintf(buf, MAX_ADDR_STR_LEN, "%02x:%02x:%02x:%02x:%02x:%02x",
->> >>                                       p[0], p[1], p[2], p[3], p[4], p[5]);
->> >
->> > is this correct order btw?
+>> diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+>> index b81f8dd..6f7ef45 100644
+>> --- a/android/hal-bluetooth.c
+>> +++ b/android/hal-bluetooth.c
+>> @@ -275,15 +275,17 @@ static int cancel_discovery(void)
 >>
->> Tool print same address for my mouse as I see printed on the mouse so
->> I guess it's correct.
+>>  static int create_bond(const bt_bdaddr_t *bd_addr)
+>>  {
+>> +     struct hal_cmd_create_bond cmd;
+>> +
+>>       DBG("");
+>>
+>>       if (!interface_ready())
+>>               return BT_STATUS_NOT_READY;
+>>
+>> -     if (!bd_addr)
+>> -             return BT_STATUS_PARM_INVALID;
 >
-> OK, those are addresses sent through HAL, they are in different format.
->
-> Best regards
-> Andrei Emeltchenko
->
->>
->> >
->> > Best regards
->> > Andrei Emeltchenko
->> >
->> >> @@ -148,7 +148,7 @@ char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
->> >>  /* converts string to bt_bdaddr_t */
->> >>  void str2bt_bdaddr_t(const char *str, bt_bdaddr_t *bd_addr)
->> >>  {
->> >> -     char *p = (char *) bd_addr;
->> >> +     uint8_t *p = bd_addr->address;
->> >>
->> >>       sscanf(str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx",
->> >>                              &p[0], &p[1], &p[2], &p[3], &p[4], &p[5]);
->> >> --
->> >> 1.7.9.5
->> >>
->> >> --
->> >> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> >> the body of a message to majordomo@vger.kernel.org
->> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->> --
->> Best regards
->> Jerzy
-> --
+> I think we can leave check here
 
-Applied, please rebase since I had done a code style fix since
-str2bt_bdaddr_t was mixing spaces with tabs.
+If we are sure it will never be NULL then yes we can remove, otherwise leave it.
+
 
 
 -- 
