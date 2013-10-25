@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 02/15] android: Add properties defines to hal-msg.h
-Date: Fri, 25 Oct 2013 12:49:58 +0200
-Message-ID: <1382698211-9123-2-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2 04/15] android/hal: Add support for sending adapter get property command
+Date: Fri, 25 Oct 2013 12:50:00 +0200
+Message-ID: <1382698211-9123-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1382698211-9123-1-git-send-email-szymon.janc@tieto.com>
 References: <1382698211-9123-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,45 +12,50 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Android HAL defines some properties as adapter specific, some as
-device specific and some as common. We split those to separate
-adapter and device properties hence overlaping or holes in codes.
+This allows HAL to get adapter property.
 ---
- android/hal-msg.h | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ android/hal-bluetooth.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 854e9b8..352a64c 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -91,6 +91,27 @@ struct hal_cmd_get_adapter_prop {
- 	uint8_t type;
- } __attribute__((packed));
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index aae6078..a71de83 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -143,12 +143,33 @@ static int get_adapter_properties(void)
  
-+#define HAL_PROP_ADAPTER_NAME			0x01
-+#define HAL_PROP_ADAPTER_ADDR			0x02
-+#define HAL_PROP_ADAPTER_UUIDS			0x03
-+#define HAL_PROP_ADAPTER_CLASS			0x04
-+#define HAL_PROP_ADAPTER_TYPE			0x05
-+#define HAL_PROP_ADAPTER_SERVICE_REC		0x06
-+#define HAL_PROP_ADAPTER_SCAN_MODE		0x07
-+#define HAL_PROP_ADAPTER_BONDED_DEVICES		0x08
-+#define HAL_PROP_ADAPTER_DISC_TIMEOUT		0x09
+ static int get_adapter_property(bt_property_type_t type)
+ {
++	struct hal_cmd_get_adapter_prop cmd;
 +
-+#define HAL_PROP_DEVICE_NAME			0x01
-+#define HAL_PROP_DEVICE_ADDR			0x02
-+#define HAL_PROP_DEVICE_UUIDS			0x03
-+#define HAL_PROP_DEVICE_CLASS			0x04
-+#define HAL_PROP_DEVICE_TYPE			0x05
-+#define HAL_PROP_DEVICE_SERVICE_REC		0x06
-+#define HAL_PROP_DEVICE_FRIENDLY_NAME		0x0a
-+#define HAL_PROP_DEVICE_RSSI			0x0b
-+#define HAL_PROP_DEVICE_VERSION_INFO		0x0c
-+#define HAL_PROP_DEVICE_TIMESTAMP		0xFF
+ 	DBG("");
+ 
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+ 
+-	return BT_STATUS_UNSUPPORTED;
++	switch (type) {
++	case BT_PROPERTY_BDNAME:
++	case BT_PROPERTY_BDADDR:
++	case BT_PROPERTY_UUIDS:
++	case BT_PROPERTY_CLASS_OF_DEVICE:
++	case BT_PROPERTY_TYPE_OF_DEVICE:
++	case BT_PROPERTY_SERVICE_RECORD:
++	case BT_PROPERTY_ADAPTER_SCAN_MODE:
++	case BT_PROPERTY_ADAPTER_BONDED_DEVICES:
++	case BT_PROPERTY_ADAPTER_DISCOVERY_TIMEOUT:
++		break;
++	default:
++		return BT_STATUS_PARM_INVALID;
++	}
 +
- #define HAL_OP_SET_ADAPTER_PROP		0x05
- struct hal_cmd_set_adapter_prop {
- 	uint8_t  type;
++	/* type match IPC type */
++	cmd.type = type;
++
++	return hal_ipc_cmd(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_GET_ADAPTER_PROP,
++					sizeof(cmd), &cmd, 0, NULL, NULL);
+ }
+ 
+ static int set_adapter_property(const bt_property_t *property)
 -- 
 1.8.4.1
 
