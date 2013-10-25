@@ -1,51 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 01/15] android: Remove not needed local variable in connect_hal
-Date: Fri, 25 Oct 2013 12:49:57 +0200
-Message-ID: <1382698211-9123-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1382618807-14605-2-git-send-email-jerzy.kasenberg@tieto.com>
+References: <1382618807-14605-1-git-send-email-jerzy.kasenberg@tieto.com>
+	<1382618807-14605-2-git-send-email-jerzy.kasenberg@tieto.com>
+Date: Fri, 25 Oct 2013 13:36:44 +0300
+Message-ID: <CABBYNZ+9Qn2sH46HiOZNQix__VoPuWg__2aPm1+eO9NuyvP3eA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] android/client: Add source command to haltest
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-err variable was set but never read.
----
- android/main.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+Hi Jerzy,
 
-diff --git a/android/main.c b/android/main.c
-index 50b5901..18dc9f7 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -239,12 +239,12 @@ static GIOChannel *connect_hal(GIOFunc connect_cb)
- 	struct sockaddr_un addr;
- 	GIOCondition cond;
- 	GIOChannel *io;
--	int err, sk;
-+	int sk;
- 
- 	sk = socket(PF_LOCAL, SOCK_SEQPACKET, 0);
- 	if (sk < 0) {
--		err = errno;
--		error("Failed to create socket: %d (%s)", err, strerror(err));
-+		error("Failed to create socket: %d (%s)", errno,
-+							strerror(errno));
- 		return NULL;
- 	}
- 
-@@ -258,9 +258,7 @@ static GIOChannel *connect_hal(GIOFunc connect_cb)
- 
- 	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
- 
--	err = connect(sk, (struct sockaddr *) &addr, sizeof(addr));
--	if (err < 0) {
--		err = -errno;
-+	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
- 		error("Failed to connect HAL socket: %d (%s)", errno,
- 							strerror(errno));
- 		g_io_channel_unref(io);
+On Thu, Oct 24, 2013 at 3:46 PM, Jerzy Kasenberg
+<jerzy.kasenberg@tieto.com> wrote:
+> New command allows to read script file into tool and
+> execute its contents as if it was typed.
+> ---
+>  android/client/haltest.c |   50 +++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 49 insertions(+), 1 deletion(-)
+>
+> diff --git a/android/client/haltest.c b/android/client/haltest.c
+> index 189af0b..efed16e 100644
+> --- a/android/client/haltest.c
+> +++ b/android/client/haltest.c
+> @@ -157,11 +157,47 @@ static void quit_p(int argc, const char **argv)
+>         exit(0);
+>  }
+>
+> +static int fd_stack[10];
+> +static int fd_stack_pointer = 0;
+> +
+> +static void stdin_handler(struct pollfd *pollfd);
+> +
+> +static void process_file(const char *name)
+> +{
+> +       int fd = open(name, O_RDONLY);
+> +
+> +       if (fd == -1) {
+> +               haltest_error("Can't open file: %s for reading\n", name);
+> +               return;
+> +       }
+
+Usually for int returns we check errors with < 0, so please change the
+code above to follow this practice.
+
+
+
 -- 
-1.8.4.1
-
+Luiz Augusto von Dentz
