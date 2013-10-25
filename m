@@ -1,82 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/6] android: Use common exit path for commands in bt_adapter_handle_cmd
-Date: Fri, 25 Oct 2013 17:14:58 +0200
-Message-ID: <1382714103-27689-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] android/hal: Use debug helpers from hal client
+Date: Fri, 25 Oct 2013 16:28:46 +0300
+Message-Id: <1382707726-20118-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1382707726-20118-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1382707726-20118-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-All adapter commands return no parameters so putting error and success
-response on common exit path. This will make function easier to follow
-when more commands support will be added.
----
- android/adapter.c | 34 ++++++++++++++++------------------
- 1 file changed, 16 insertions(+), 18 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/android/adapter.c b/android/adapter.c
-index ec90cca..685b00d 100644
---- a/android/adapter.c
-+++ b/android/adapter.c
-@@ -374,39 +374,37 @@ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
- 	case HAL_OP_ENABLE:
- 		if (adapter->current_settings & MGMT_SETTING_POWERED) {
- 			status = HAL_STATUS_DONE;
--			break;
-+			goto error;
- 		}
+Debug helpers really helps a lot when debugging on Android target. The
+patch uses helper functions already defined for hal test tool so
+we do not need to reimplement them.
+---
+ android/Android.mk      |    1 +
+ android/hal-bluetooth.c |    6 ++++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/android/Android.mk b/android/Android.mk
+index 946e9cd..56c43cb 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -73,6 +73,7 @@ LOCAL_SRC_FILES := \
+ 	hal-hidhost.c \
+ 	hal-pan.c \
+ 	hal-av.c \
++	client/textconv.c \
  
--		if (set_mode(MGMT_OP_SET_POWERED, 0x01)) {
--			ipc_send(io, HAL_SERVICE_ID_BLUETOOTH, opcode, 0, NULL,
--									-1);
--			return;
--		}
-+		if (!set_mode(MGMT_OP_SET_POWERED, 0x01))
-+			goto error;
-+
- 		break;
- 	case HAL_OP_DISABLE:
- 		if (!(adapter->current_settings & MGMT_SETTING_POWERED)) {
- 			status = HAL_STATUS_DONE;
--			break;
-+			goto error;
- 		}
+ LOCAL_C_INCLUDES += \
+ 	$(call include-path-for, system-core) \
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index 282a680..5929fff 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -25,6 +25,8 @@
+ #include "hal-msg.h"
+ #include "hal-ipc.h"
  
--		if (set_mode(MGMT_OP_SET_POWERED, 0x00)) {
--			ipc_send(io, HAL_SERVICE_ID_BLUETOOTH, opcode, 0, NULL,
--									-1);
--			return;
--		}
-+		if (!set_mode(MGMT_OP_SET_POWERED, 0x00))
-+			goto error;
++#include "client/textconv.h"
 +
- 		break;
- 	case HAL_OP_GET_ADAPTER_PROP:
--		if (get_property(buf, len)) {
--			ipc_send(io, HAL_SERVICE_ID_BLUETOOTH, opcode, 0, NULL,
--									-1);
--			return;
--		}
-+		if (!get_property(buf, len))
-+			goto error;
-+
- 		break;
- 	default:
- 		DBG("Unhandled command, opcode 0x%x", opcode);
--		break;
-+		goto error;
- 	}
+ static const bt_callbacks_t *bt_hal_cbacks = NULL;
  
-+	ipc_send(io, HAL_SERVICE_ID_BLUETOOTH, opcode, 0, NULL, -1);
-+	return;
-+
-+error:
- 	ipc_send_rsp(io, HAL_SERVICE_ID_BLUETOOTH, status);
- }
+ static void handle_adapter_state_changed(void *buf)
+@@ -192,7 +194,7 @@ static int get_adapter_property(bt_property_type_t type)
+ {
+ 	struct hal_cmd_get_adapter_prop cmd;
  
+-	DBG("");
++	DBG("prop: %s", bt_property_type_t2str(type));
+ 
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+@@ -224,7 +226,7 @@ static int set_adapter_property(const bt_property_t *property)
+ 	char buf[sizeof(struct hal_cmd_set_adapter_prop) + property->len];
+ 	struct hal_cmd_set_adapter_prop *cmd = (void *) buf;
+ 
+-	DBG("");
++	DBG("prop: %s", bt_property_type_t2str(property->type));
+ 
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
 -- 
-1.8.4.1
+1.7.10.4
 
