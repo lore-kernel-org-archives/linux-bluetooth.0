@@ -1,62 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/6] android/hal: Add support for handling av audio state event
-Date: Fri, 25 Oct 2013 17:52:05 +0200
-Message-Id: <1382716327-25283-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 6/6] android/hal: Add support for send av disconnect command
+Date: Fri, 25 Oct 2013 17:52:07 +0200
+Message-Id: <1382716327-25283-6-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1382716327-25283-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1382716327-25283-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This allows HAL to send av disconnect command
 ---
- android/hal-av.c  | 11 +++++++++++
- android/hal-msg.h |  6 ++++++
- 2 files changed, 17 insertions(+)
+ android/hal-av.c  | 8 +++++---
+ android/hal-msg.h | 5 +++++
+ 2 files changed, 10 insertions(+), 3 deletions(-)
 
 diff --git a/android/hal-av.c b/android/hal-av.c
-index 8aa096d..d537e84 100644
+index 239088f..483dcf1 100644
 --- a/android/hal-av.c
 +++ b/android/hal-av.c
-@@ -38,6 +38,14 @@ static void handle_connection_state(void *buf)
- 						(bt_bdaddr_t *) (ev->bdaddr));
+@@ -84,15 +84,17 @@ static bt_status_t av_connect(bt_bdaddr_t *bd_addr)
+ 
+ static bt_status_t av_disconnect(bt_bdaddr_t *bd_addr)
+ {
++	struct hal_msg_op_bt_av_disconnect cmd;
++
+ 	DBG("");
+ 
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+ 
+-	if (!bd_addr)
+-		return BT_STATUS_PARM_INVALID;
++	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
+ 
+-	return BT_STATUS_UNSUPPORTED;
++	return hal_ipc_cmd(HAL_SERVICE_ID_A2DP, HAL_MSG_OP_BT_AV_DISCONNECT,
++					sizeof(cmd), &cmd, NULL, NULL, NULL);
  }
  
-+static void handle_audio_state(void *buf)
-+{
-+	struct hal_msg_ev_bt_av_audio_state *ev = buf;
-+
-+	if (cbs->audio_state_cb)
-+		cbs->audio_state_cb(ev->state, (bt_bdaddr_t *)(ev->bdaddr));
-+}
-+
- /* will be called from notification thread context */
- void bt_notify_av(uint16_t opcode, void *buf, uint16_t len)
- {
-@@ -48,6 +56,9 @@ void bt_notify_av(uint16_t opcode, void *buf, uint16_t len)
- 	case HAL_MSG_EV_BT_AV_CONNECTION_STATE:
- 		handle_connection_state(buf);
- 		break;
-+	case HAL_MSG_EV_BT_AV_AUDIO_STATE:
-+		handle_audio_state(buf);
-+		break;
- 	default:
- 		DBG("Unhandled callback opcode=0x%x", opcode);
- 		break;
+ static bt_status_t av_init(btav_callbacks_t *callbacks)
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 558e030..2206f47 100644
+index 66486f1..193ecae 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -366,3 +366,9 @@ struct hal_msg_ev_bt_av_connection_state {
- 	uint8_t state;
+@@ -281,6 +281,11 @@ struct hal_msg_op_bt_av_connect {
  	uint8_t bdaddr[6];
  } __attribute__((packed));
-+
-+#define HAL_MSG_EV_BT_AV_AUDIO_STATE	0x82
-+struct hal_msg_ev_bt_av_audio_state {
-+	uint8_t state;
+ 
++#define HAL_MSG_OP_BT_AV_DISCONNECT	0x02
++struct hal_msg_op_bt_av_disconnect {
 +	uint8_t bdaddr[6];
 +} __attribute__((packed));
++
+ /* Notifications and confirmations */
+ 
+ 
 -- 
 1.8.4.1
 
