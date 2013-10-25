@@ -1,62 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 25 Oct 2013 12:32:28 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/client: Fix incorrect casts of addresses
-Message-ID: <20131025093227.GB6113@aemeltch-MOBL1>
-References: <1382691070-24358-1-git-send-email-jerzy.kasenberg@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1382691070-24358-1-git-send-email-jerzy.kasenberg@tieto.com>
+In-Reply-To: <1382690606-20721-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1382690606-20721-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 25 Oct 2013 12:26:12 +0300
+Message-ID: <CABBYNZK4B5_3wP3Og=XWgohDV0UmdqZnBro-1Onv5gtJViNgKw@mail.gmail.com>
+Subject: Re: [PATCH] android: Cleanup error handling
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jerzy,
+Hi Andrei,
 
-On Fri, Oct 25, 2013 at 10:51:10AM +0200, Jerzy Kasenberg wrote:
-> This fixes printing of addresses.
-> If char is set to be signed (as it should) some addresses were
-> printed with leading FFFFFF.
+On Fri, Oct 25, 2013 at 11:43 AM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> Remove unneeded assignment err=errno and instead use errno directly.
 > ---
-> This issue did not showed up before due to unsigned char for Android build
-> on Qualcomm platform.
-> 
->  android/client/textconv.c |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/android/client/textconv.c b/android/client/textconv.c
-> index 1188477..bcdf4d9 100644
-> --- a/android/client/textconv.c
-> +++ b/android/client/textconv.c
-> @@ -137,7 +137,7 @@ int int2str_findstr(const char *str, const struct int2str m[])
->   */
->  char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
->  {
-> -	const char *p = (const char *) bd_addr;
-> +	const uint8_t *p = bd_addr->address;
->  
->  	snprintf(buf, MAX_ADDR_STR_LEN, "%02x:%02x:%02x:%02x:%02x:%02x",
->  					p[0], p[1], p[2], p[3], p[4], p[5]);
-
-is this correct order btw?
-
-Best regards 
-Andrei Emeltchenko 
-
-> @@ -148,7 +148,7 @@ char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
->  /* converts string to bt_bdaddr_t */
->  void str2bt_bdaddr_t(const char *str, bt_bdaddr_t *bd_addr)
->  {
-> -	char *p = (char *) bd_addr;
-> +	uint8_t *p = bd_addr->address;
->  
->  	sscanf(str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx",
->  			       &p[0], &p[1], &p[2], &p[3], &p[4], &p[5]);
-> -- 
-> 1.7.9.5
-> 
+>  android/hal-ipc.c |   26 ++++++++++----------------
+>  1 file changed, 10 insertions(+), 16 deletions(-)
+>
+> diff --git a/android/hal-ipc.c b/android/hal-ipc.c
+> index 6566ebb..20421db 100644
+> --- a/android/hal-ipc.c
+> +++ b/android/hal-ipc.c
+> @@ -150,9 +150,8 @@ static int accept_connection(int sk)
+>
+>         err = poll(&pfd, 1, CONNECT_TIMEOUT);
+>         if (err < 0) {
+> -               err = errno;
+> -               error("Failed to poll: %d (%s)", err, strerror(err));
+> -               return -1;
+> +               error("Failed to poll: %d (%s)", errno, strerror(errno));
+> +               return err;
+>         }
+>
+>         if (err == 0) {
+> @@ -161,11 +160,9 @@ static int accept_connection(int sk)
+>         }
+>
+>         new_sk = accept(sk, NULL, NULL);
+> -       if (new_sk < 0) {
+> -               err = errno;
+> -               error("Failed to accept socket: %d (%s)", err, strerror(err));
+> -               return -1;
+> -       }
+> +       if (new_sk < 0)
+> +               error("Failed to accept socket: %d (%s)", errno,
+> +                                                       strerror(errno));
+>
+>         return new_sk;
+>  }
+> @@ -178,9 +175,8 @@ bool hal_ipc_init(void)
+>
+>         sk = socket(AF_LOCAL, SOCK_SEQPACKET, 0);
+>         if (sk < 0) {
+> -               err = errno;
+> -               error("Failed to create socket: %d (%s)", err,
+> -                                                       strerror(err));
+> +               error("Failed to create socket: %d (%s)", errno,
+> +                                                       strerror(errno));
+>                 return false;
+>         }
+>
+> @@ -190,16 +186,14 @@ bool hal_ipc_init(void)
+>         memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
+>
+>         if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+> -               err = errno;
+> -               error("Failed to bind socket: %d (%s)", err, strerror(err));
+> +               error("Failed to bind socket: %d (%s)", errno, strerror(errno));
+>                 close(sk);
+>                 return false;
+>         }
+>
+>         if (listen(sk, 2) < 0) {
+> -               err = errno;
+> -               error("Failed to listen on socket: %d (%s)", err,
+> -                                                               strerror(err));
+> +               error("Failed to listen on socket: %d (%s)", errno,
+> +                                                       strerror(errno));
+>                 close(sk);
+>                 return false;
+>         }
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 1.7.10.4
+
+Since the HAL is running multiple threads Im afraid errno can be
+overwritten and at least strerror_r should be used instead or use %m
+that afaik should be thread safe.
+
+
+-- 
+Luiz Augusto von Dentz
