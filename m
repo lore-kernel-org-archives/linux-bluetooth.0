@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 13/15] android/hal: Add support for handling adapter properties change event
-Date: Fri, 25 Oct 2013 12:50:09 +0200
-Message-ID: <1382698211-9123-13-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2 15/15] android: Add initial support for handling adapter get property command
+Date: Fri, 25 Oct 2013 12:50:11 +0200
+Message-ID: <1382698211-9123-15-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1382698211-9123-1-git-send-email-szymon.janc@tieto.com>
 References: <1382698211-9123-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,61 +12,78 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Support for HAL_BT_PROP_BDADDR property only.
 ---
- android/hal-bluetooth.c | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ android/adapter.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index eb400ee..9c7fbea 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -35,6 +35,37 @@ static void handle_adapter_state_changed(void *buf)
- 		bt_hal_cbacks->adapter_state_changed_cb(ev->state);
+diff --git a/android/adapter.c b/android/adapter.c
+index 5837e99..df90db6 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -322,6 +322,49 @@ static bool set_mode(uint16_t opcode, uint8_t mode)
+ 	return false;
  }
  
-+static void handle_adapter_props_changed(void *buf, uint16_t len)
++static void send_adapter_name(void)
 +{
-+	struct hal_ev_adapter_props_changed *ev = buf;
-+	bt_property_t props[ev->num_props];
-+	struct hal_property *hal_prop;
-+	void *p;
-+	int i;
++	struct hal_ev_adapter_props_changed *ev;
++	int len;
 +
-+	if (!bt_hal_cbacks->adapter_properties_cb)
-+		return;
++	len = sizeof(*ev) + sizeof(struct hal_property) + sizeof(bdaddr_t);
 +
-+	hal_prop = ev->props;
-+	p = ev->props;
++	ev = g_malloc(len);
 +
-+	for (i = 0; i < ev->num_props; i++) {
-+		if (p + sizeof(*hal_prop) + hal_prop->len > buf + len) {
-+			error("invalid adapter properties event, aborting");
-+			exit(EXIT_FAILURE);
-+		}
++	ev->num_props = 1;
++	ev->status = HAL_ERROR_SUCCESS;
 +
-+		props[i].type = hal_prop->type;
-+		props[i].len = hal_prop->len;
-+		props[i].val = hal_prop->val;
++	ev->props[0].type = HAL_PROP_ADAPTER_ADDR;
++	ev->props[0].len = sizeof(bdaddr_t);
++	baswap((bdaddr_t *) ev->props[0].val, &adapter->bdaddr);
 +
-+		p += sizeof(*hal_prop) + hal_prop->len;
-+		hal_prop = p;
-+	}
++	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
++				HAL_EV_ADAPTER_PROPS_CHANGED, len, ev, -1);
 +
-+	bt_hal_cbacks->adapter_properties_cb(ev->status, ev->num_props, props);
++	g_free(ev);
 +}
 +
- /* will be called from notification thread context */
- void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len)
++static bool get_property(void *buf, uint16_t len)
++{
++	struct hal_cmd_get_adapter_prop *cmd = buf;
++
++	switch (cmd->type) {
++	case HAL_PROP_ADAPTER_ADDR:
++		send_adapter_name();
++		return true;
++	case HAL_PROP_ADAPTER_NAME:
++	case HAL_PROP_ADAPTER_UUIDS:
++	case HAL_PROP_ADAPTER_CLASS:
++	case HAL_PROP_ADAPTER_TYPE:
++	case HAL_PROP_ADAPTER_SERVICE_REC:
++	case HAL_PROP_ADAPTER_SCAN_MODE:
++	case HAL_PROP_ADAPTER_BONDED_DEVICES:
++	case HAL_PROP_ADAPTER_DISC_TIMEOUT:
++	default:
++		return false;
++	}
++}
++
+ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
+ 								uint16_t len)
  {
-@@ -45,6 +76,9 @@ void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len)
- 	case HAL_EV_ADAPTER_STATE_CHANGED:
- 		handle_adapter_state_changed(buf);
+@@ -352,6 +395,13 @@ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
+ 			return;
+ 		}
  		break;
-+	case HAL_EV_ADAPTER_PROPS_CHANGED:
-+		handle_adapter_props_changed(buf, len);
++	case HAL_OP_GET_ADAPTER_PROP:
++		if (get_property(buf, len)) {
++			ipc_send(io, HAL_SERVICE_ID_BLUETOOTH, opcode, 0, NULL,
++									-1);
++			return;
++		}
 +		break;
  	default:
- 		DBG("Unhandled callback opcode=0x%x", opcode);
+ 		DBG("Unhandled command, opcode 0x%x", opcode);
  		break;
 -- 
 1.8.4.1
