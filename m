@@ -1,80 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/hal: Associate thread to Java
-Date: Fri, 25 Oct 2013 14:34:46 +0300
-Message-Id: <1382700886-6289-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+Subject: [PATCH v2 1/2] android/client: Add source command to haltest
+Date: Fri, 25 Oct 2013 12:51:45 +0200
+Message-ID: <1382698306-30914-2-git-send-email-jerzy.kasenberg@tieto.com>
+In-Reply-To: <1382698306-30914-1-git-send-email-jerzy.kasenberg@tieto.com>
+References: <1382698306-30914-1-git-send-email-jerzy.kasenberg@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-Without thread assiciation callbacks are not received by Java.
-They are blocked by JNI:
-E/BluetoothServiceJni( 2844): Callback env check fail: env: 0x0, callback: 0x0
-E/BluetoothServiceJni( 2844): Callback: 'adapter_state_change_callback' is not
-called on the correct thread
+New command allows to read script file into tool and
+execute its contents as if it was typed.
 ---
- android/hal-bluetooth.c |   12 ++++++++++++
- android/hal-ipc.c       |    4 ++++
- android/hal.h           |    2 ++
- 3 files changed, 18 insertions(+)
+ android/client/haltest.c |   50 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 49 insertions(+), 1 deletion(-)
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index f8ecec5..26f4fd9 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -40,6 +40,18 @@ static bool interface_ready(void)
- 	return bt_hal_cbacks != NULL;
+diff --git a/android/client/haltest.c b/android/client/haltest.c
+index 189af0b..ac43afb 100644
+--- a/android/client/haltest.c
++++ b/android/client/haltest.c
+@@ -157,11 +157,47 @@ static void quit_p(int argc, const char **argv)
+ 	exit(0);
  }
  
-+void bt_thread_associate(void)
++static int fd_stack[10];
++static int fd_stack_pointer = 0;
++
++static void stdin_handler(struct pollfd *pollfd);
++
++static void process_file(const char *name)
 +{
-+	if (bt_hal_cbacks->thread_evt_cb)
-+		bt_hal_cbacks->thread_evt_cb(ASSOCIATE_JVM);
++	int fd = open(name, O_RDONLY);
++
++	if (fd < 0) {
++		haltest_error("Can't open file: %s for reading\n", name);
++		return;
++	}
++
++	if (fd_stack_pointer >= 10) {
++		haltest_error("To many open files\n");
++		close(fd);
++		return;
++	}
++
++	fd_stack[fd_stack_pointer++] = fd;
++	poll_unregister_fd(fd_stack[fd_stack_pointer - 2], stdin_handler);
++	poll_register_fd(fd_stack[fd_stack_pointer - 1], POLLIN, stdin_handler);
 +}
 +
-+void bt_thread_disassociate(void)
++static void source_p(int argc, const char **argv)
 +{
-+	if (bt_hal_cbacks->thread_evt_cb)
-+		bt_hal_cbacks->thread_evt_cb(DISASSOCIATE_JVM);
++	if (argc < 2) {
++		haltest_error("No file specified");
++		return;
++	}
++
++	process_file(argv[1]);
 +}
 +
- /* will be called from notification thread context */
- void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len)
- {
-diff --git a/android/hal-ipc.c b/android/hal-ipc.c
-index 20421db..240ac9d 100644
---- a/android/hal-ipc.c
-+++ b/android/hal-ipc.c
-@@ -67,6 +67,8 @@ static void *notification_handler(void *data)
- 	ssize_t ret;
- 	int fd;
+ /* Commands available without interface */
+ static struct method commands[] = {
+ 	STD_METHODCH(help, "[<interface>]"),
+ 	STD_METHOD(quit),
+ 	METHOD("exit", quit_p, NULL, NULL),
++	STD_METHODH(source, "<file>"),
+ 	END_METHOD
+ };
  
-+	bt_thread_associate();
+@@ -254,15 +290,26 @@ static void stdin_handler(struct pollfd *pollfd)
+ 	char buf[10];
+ 
+ 	if (pollfd->revents & POLLIN) {
+-		int count = read(0, buf, 10);
++		int count = read(fd_stack[fd_stack_pointer - 1], buf, 10);
+ 
+ 		if (count > 0) {
+ 			int i;
+ 
+ 			for (i = 0; i < count; ++i)
+ 				terminal_process_char(buf[i], process_line);
++			return;
+ 		}
+ 	}
 +
- 	while (true) {
- 		memset(&msg, 0, sizeof(msg));
- 		memset(buf, 0, sizeof(buf));
-@@ -133,6 +135,8 @@ static void *notification_handler(void *data)
- 	close(notif_sk);
- 	notif_sk = -1;
- 
-+	bt_thread_disassociate();
++	if (fd_stack_pointer > 1)
++		poll_register_fd(fd_stack[fd_stack_pointer - 2], POLLIN,
++								stdin_handler);
++	if (fd_stack_pointer > 0) {
++		poll_unregister_fd(fd_stack[--fd_stack_pointer], stdin_handler);
 +
- 	DBG("exit");
++		if (fd_stack[fd_stack_pointer])
++			close(fd_stack[fd_stack_pointer]);
++	}
+ }
  
- 	return NULL;
-diff --git a/android/hal.h b/android/hal.h
-index ef9a107..5cd5cab 100644
---- a/android/hal.h
-+++ b/android/hal.h
-@@ -27,3 +27,5 @@ btpan_interface_t *bt_get_pan_interface(void);
- btav_interface_t *bt_get_av_interface(void);
+ int main(int argc, char **argv)
+@@ -270,6 +317,7 @@ int main(int argc, char **argv)
+ 	terminal_setup();
+ 	history_restore(".haltest_history");
  
- void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len);
-+void bt_thread_associate(void);
-+void bt_thread_disassociate(void);
++	fd_stack[fd_stack_pointer++] = 0;
+ 	/* Register command line handler */
+ 	poll_register_fd(0, POLLIN, stdin_handler);
+ 
 -- 
-1.7.10.4
+1.7.9.5
 
