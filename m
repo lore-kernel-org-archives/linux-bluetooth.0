@@ -2,46 +2,50 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 06/15] android/hal: Add support for sending create bond command
-Date: Fri, 25 Oct 2013 12:50:02 +0200
-Message-ID: <1382698211-9123-6-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1382698211-9123-1-git-send-email-szymon.janc@tieto.com>
-References: <1382698211-9123-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2 01/15] android: Remove not needed local variable in connect_hal
+Date: Fri, 25 Oct 2013 12:49:57 +0200
+Message-ID: <1382698211-9123-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows HAL to start bonding.
+err variable was set but never read.
 ---
- android/hal-bluetooth.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ android/main.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index b81f8dd..6f7ef45 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -275,15 +275,17 @@ static int cancel_discovery(void)
+diff --git a/android/main.c b/android/main.c
+index 50b5901..18dc9f7 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -239,12 +239,12 @@ static GIOChannel *connect_hal(GIOFunc connect_cb)
+ 	struct sockaddr_un addr;
+ 	GIOCondition cond;
+ 	GIOChannel *io;
+-	int err, sk;
++	int sk;
  
- static int create_bond(const bt_bdaddr_t *bd_addr)
- {
-+	struct hal_cmd_create_bond cmd;
-+
- 	DBG("");
+ 	sk = socket(PF_LOCAL, SOCK_SEQPACKET, 0);
+ 	if (sk < 0) {
+-		err = errno;
+-		error("Failed to create socket: %d (%s)", err, strerror(err));
++		error("Failed to create socket: %d (%s)", errno,
++							strerror(errno));
+ 		return NULL;
+ 	}
  
- 	if (!interface_ready())
- 		return BT_STATUS_NOT_READY;
+@@ -258,9 +258,7 @@ static GIOChannel *connect_hal(GIOFunc connect_cb)
  
--	if (!bd_addr)
--		return BT_STATUS_PARM_INVALID;
-+	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
+ 	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
  
--	return BT_STATUS_UNSUPPORTED;
-+	return hal_ipc_cmd(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_CREATE_BOND,
-+					sizeof(cmd), &cmd, 0, NULL, NULL);
- }
- 
- static int cancel_bond(const bt_bdaddr_t *bd_addr)
+-	err = connect(sk, (struct sockaddr *) &addr, sizeof(addr));
+-	if (err < 0) {
+-		err = -errno;
++	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+ 		error("Failed to connect HAL socket: %d (%s)", errno,
+ 							strerror(errno));
+ 		g_io_channel_unref(io);
 -- 
 1.8.4.1
 
