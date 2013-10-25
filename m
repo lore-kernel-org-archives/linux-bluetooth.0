@@ -1,47 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Subject: [PATCH] android/client: Fix incorrect casts of addresses
-Date: Fri, 25 Oct 2013 10:51:10 +0200
-Message-ID: <1382691070-24358-1-git-send-email-jerzy.kasenberg@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android: Cleanup error handling
+Date: Fri, 25 Oct 2013 11:43:26 +0300
+Message-Id: <1382690606-20721-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fixes printing of addresses.
-If char is set to be signed (as it should) some addresses were
-printed with leading FFFFFF.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+
+Remove unneeded assignment err=errno and instead use errno directly.
 ---
-This issue did not showed up before due to unsigned char for Android build
-on Qualcomm platform.
+ android/hal-ipc.c |   26 ++++++++++----------------
+ 1 file changed, 10 insertions(+), 16 deletions(-)
 
- android/client/textconv.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/android/client/textconv.c b/android/client/textconv.c
-index 1188477..bcdf4d9 100644
---- a/android/client/textconv.c
-+++ b/android/client/textconv.c
-@@ -137,7 +137,7 @@ int int2str_findstr(const char *str, const struct int2str m[])
-  */
- char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
- {
--	const char *p = (const char *) bd_addr;
-+	const uint8_t *p = bd_addr->address;
+diff --git a/android/hal-ipc.c b/android/hal-ipc.c
+index 6566ebb..20421db 100644
+--- a/android/hal-ipc.c
++++ b/android/hal-ipc.c
+@@ -150,9 +150,8 @@ static int accept_connection(int sk)
  
- 	snprintf(buf, MAX_ADDR_STR_LEN, "%02x:%02x:%02x:%02x:%02x:%02x",
- 					p[0], p[1], p[2], p[3], p[4], p[5]);
-@@ -148,7 +148,7 @@ char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
- /* converts string to bt_bdaddr_t */
- void str2bt_bdaddr_t(const char *str, bt_bdaddr_t *bd_addr)
- {
--	char *p = (char *) bd_addr;
-+	uint8_t *p = bd_addr->address;
+ 	err = poll(&pfd, 1, CONNECT_TIMEOUT);
+ 	if (err < 0) {
+-		err = errno;
+-		error("Failed to poll: %d (%s)", err, strerror(err));
+-		return -1;
++		error("Failed to poll: %d (%s)", errno, strerror(errno));
++		return err;
+ 	}
  
- 	sscanf(str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx",
- 			       &p[0], &p[1], &p[2], &p[3], &p[4], &p[5]);
+ 	if (err == 0) {
+@@ -161,11 +160,9 @@ static int accept_connection(int sk)
+ 	}
+ 
+ 	new_sk = accept(sk, NULL, NULL);
+-	if (new_sk < 0) {
+-		err = errno;
+-		error("Failed to accept socket: %d (%s)", err, strerror(err));
+-		return -1;
+-	}
++	if (new_sk < 0)
++		error("Failed to accept socket: %d (%s)", errno,
++							strerror(errno));
+ 
+ 	return new_sk;
+ }
+@@ -178,9 +175,8 @@ bool hal_ipc_init(void)
+ 
+ 	sk = socket(AF_LOCAL, SOCK_SEQPACKET, 0);
+ 	if (sk < 0) {
+-		err = errno;
+-		error("Failed to create socket: %d (%s)", err,
+-							strerror(err));
++		error("Failed to create socket: %d (%s)", errno,
++							strerror(errno));
+ 		return false;
+ 	}
+ 
+@@ -190,16 +186,14 @@ bool hal_ipc_init(void)
+ 	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
+ 
+ 	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+-		err = errno;
+-		error("Failed to bind socket: %d (%s)", err, strerror(err));
++		error("Failed to bind socket: %d (%s)", errno, strerror(errno));
+ 		close(sk);
+ 		return false;
+ 	}
+ 
+ 	if (listen(sk, 2) < 0) {
+-		err = errno;
+-		error("Failed to listen on socket: %d (%s)", err,
+-								strerror(err));
++		error("Failed to listen on socket: %d (%s)", errno,
++							strerror(errno));
+ 		close(sk);
+ 		return false;
+ 	}
 -- 
-1.7.9.5
+1.7.10.4
 
