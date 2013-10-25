@@ -1,53 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1382618807-14605-2-git-send-email-jerzy.kasenberg@tieto.com>
-References: <1382618807-14605-1-git-send-email-jerzy.kasenberg@tieto.com>
-	<1382618807-14605-2-git-send-email-jerzy.kasenberg@tieto.com>
-Date: Fri, 25 Oct 2013 13:36:44 +0300
-Message-ID: <CABBYNZ+9Qn2sH46HiOZNQix__VoPuWg__2aPm1+eO9NuyvP3eA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] android/client: Add source command to haltest
+In-Reply-To: <20131025100821.GD6113@aemeltch-MOBL1>
+References: <1382691070-24358-1-git-send-email-jerzy.kasenberg@tieto.com>
+	<20131025093227.GB6113@aemeltch-MOBL1>
+	<CAHCYCozKG2K+QOvX_2eYSD96DGikc-v9dK1VNtX81tLdFzXvXg@mail.gmail.com>
+	<20131025100821.GD6113@aemeltch-MOBL1>
+Date: Fri, 25 Oct 2013 13:34:27 +0300
+Message-ID: <CABBYNZL3xBNNoLxN=kCOZqOE4XwJ6GHQQSnA4LbOYeV1+pohbw@mail.gmail.com>
+Subject: Re: [PATCH] android/client: Fix incorrect casts of addresses
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	Jerzy Kasenberg <jerzy.kasenberg@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Jerzy,
 
-On Thu, Oct 24, 2013 at 3:46 PM, Jerzy Kasenberg
-<jerzy.kasenberg@tieto.com> wrote:
-> New command allows to read script file into tool and
-> execute its contents as if it was typed.
-> ---
->  android/client/haltest.c |   50 +++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 49 insertions(+), 1 deletion(-)
+On Fri, Oct 25, 2013 at 1:08 PM, Andrei Emeltchenko
+<andrei.emeltchenko.news@gmail.com> wrote:
+> Hi Jerzy,
 >
-> diff --git a/android/client/haltest.c b/android/client/haltest.c
-> index 189af0b..efed16e 100644
-> --- a/android/client/haltest.c
-> +++ b/android/client/haltest.c
-> @@ -157,11 +157,47 @@ static void quit_p(int argc, const char **argv)
->         exit(0);
->  }
+> On Fri, Oct 25, 2013 at 11:50:22AM +0200, Jerzy Kasenberg wrote:
+>> Hi Andrei,
+>>
+>> On 25 October 2013 11:32, Andrei Emeltchenko
+>> <andrei.emeltchenko.news@gmail.com> wrote:
+>> > Hi Jerzy,
+>> >
+>> > On Fri, Oct 25, 2013 at 10:51:10AM +0200, Jerzy Kasenberg wrote:
+>> >> This fixes printing of addresses.
+>> >> If char is set to be signed (as it should) some addresses were
+>> >> printed with leading FFFFFF.
+>> >> ---
+>> >> This issue did not showed up before due to unsigned char for Android build
+>> >> on Qualcomm platform.
+>> >>
+>> >>  android/client/textconv.c |    4 ++--
+>> >>  1 file changed, 2 insertions(+), 2 deletions(-)
+>> >>
+>> >> diff --git a/android/client/textconv.c b/android/client/textconv.c
+>> >> index 1188477..bcdf4d9 100644
+>> >> --- a/android/client/textconv.c
+>> >> +++ b/android/client/textconv.c
+>> >> @@ -137,7 +137,7 @@ int int2str_findstr(const char *str, const struct int2str m[])
+>> >>   */
+>> >>  char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
+>> >>  {
+>> >> -     const char *p = (const char *) bd_addr;
+>> >> +     const uint8_t *p = bd_addr->address;
+>> >>
+>> >>       snprintf(buf, MAX_ADDR_STR_LEN, "%02x:%02x:%02x:%02x:%02x:%02x",
+>> >>                                       p[0], p[1], p[2], p[3], p[4], p[5]);
+>> >
+>> > is this correct order btw?
+>>
+>> Tool print same address for my mouse as I see printed on the mouse so
+>> I guess it's correct.
 >
-> +static int fd_stack[10];
-> +static int fd_stack_pointer = 0;
-> +
-> +static void stdin_handler(struct pollfd *pollfd);
-> +
-> +static void process_file(const char *name)
-> +{
-> +       int fd = open(name, O_RDONLY);
-> +
-> +       if (fd == -1) {
-> +               haltest_error("Can't open file: %s for reading\n", name);
-> +               return;
-> +       }
+> OK, those are addresses sent through HAL, they are in different format.
+>
+> Best regards
+> Andrei Emeltchenko
+>
+>>
+>> >
+>> > Best regards
+>> > Andrei Emeltchenko
+>> >
+>> >> @@ -148,7 +148,7 @@ char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
+>> >>  /* converts string to bt_bdaddr_t */
+>> >>  void str2bt_bdaddr_t(const char *str, bt_bdaddr_t *bd_addr)
+>> >>  {
+>> >> -     char *p = (char *) bd_addr;
+>> >> +     uint8_t *p = bd_addr->address;
+>> >>
+>> >>       sscanf(str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx",
+>> >>                              &p[0], &p[1], &p[2], &p[3], &p[4], &p[5]);
+>> >> --
+>> >> 1.7.9.5
+>> >>
+>> >> --
+>> >> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> >> the body of a message to majordomo@vger.kernel.org
+>> >> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>> --
+>> Best regards
+>> Jerzy
+> --
 
-Usually for int returns we check errors with < 0, so please change the
-code above to follow this practice.
-
+Applied, please rebase since I had done a code style fix since
+str2bt_bdaddr_t was mixing spaces with tabs.
 
 
 -- 
