@@ -1,60 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 25 Oct 2013 12:36:17 +0300
+Date: Fri, 25 Oct 2013 12:32:28 +0300
 From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+To: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 06/15] android/hal: Add support for sending create bond
- command
-Message-ID: <20131025093616.GC6113@aemeltch-MOBL1>
-References: <1382691378-31940-1-git-send-email-szymon.janc@tieto.com>
- <1382691378-31940-6-git-send-email-szymon.janc@tieto.com>
+Subject: Re: [PATCH] android/client: Fix incorrect casts of addresses
+Message-ID: <20131025093227.GB6113@aemeltch-MOBL1>
+References: <1382691070-24358-1-git-send-email-jerzy.kasenberg@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1382691378-31940-6-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1382691070-24358-1-git-send-email-jerzy.kasenberg@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Jerzy,
 
-On Fri, Oct 25, 2013 at 10:56:09AM +0200, Szymon Janc wrote:
-> This allows HAL to start bonding.
+On Fri, Oct 25, 2013 at 10:51:10AM +0200, Jerzy Kasenberg wrote:
+> This fixes printing of addresses.
+> If char is set to be signed (as it should) some addresses were
+> printed with leading FFFFFF.
 > ---
->  android/hal-bluetooth.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+> This issue did not showed up before due to unsigned char for Android build
+> on Qualcomm platform.
 > 
-> diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-> index b81f8dd..6f7ef45 100644
-> --- a/android/hal-bluetooth.c
-> +++ b/android/hal-bluetooth.c
-> @@ -275,15 +275,17 @@ static int cancel_discovery(void)
->  
->  static int create_bond(const bt_bdaddr_t *bd_addr)
+>  android/client/textconv.c |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/android/client/textconv.c b/android/client/textconv.c
+> index 1188477..bcdf4d9 100644
+> --- a/android/client/textconv.c
+> +++ b/android/client/textconv.c
+> @@ -137,7 +137,7 @@ int int2str_findstr(const char *str, const struct int2str m[])
+>   */
+>  char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
 >  {
-> +	struct hal_cmd_create_bond cmd;
-> +
->  	DBG("");
+> -	const char *p = (const char *) bd_addr;
+> +	const uint8_t *p = bd_addr->address;
 >  
->  	if (!interface_ready())
->  		return BT_STATUS_NOT_READY;
->  
-> -	if (!bd_addr)
-> -		return BT_STATUS_PARM_INVALID;
+>  	snprintf(buf, MAX_ADDR_STR_LEN, "%02x:%02x:%02x:%02x:%02x:%02x",
+>  					p[0], p[1], p[2], p[3], p[4], p[5]);
 
-I think we can leave check here
+is this correct order btw?
 
 Best regards 
 Andrei Emeltchenko 
 
-> +	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
+> @@ -148,7 +148,7 @@ char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
+>  /* converts string to bt_bdaddr_t */
+>  void str2bt_bdaddr_t(const char *str, bt_bdaddr_t *bd_addr)
+>  {
+> -	char *p = (char *) bd_addr;
+> +	uint8_t *p = bd_addr->address;
 >  
-> -	return BT_STATUS_UNSUPPORTED;
-> +	return hal_ipc_cmd(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_CREATE_BOND,
-> +					sizeof(cmd), &cmd, 0, NULL, NULL);
->  }
->  
->  static int cancel_bond(const bt_bdaddr_t *bd_addr)
+>  	sscanf(str, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx",
+>  			       &p[0], &p[1], &p[2], &p[3], &p[4], &p[5]);
 > -- 
-> 1.8.4.1
+> 1.7.9.5
 > 
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
