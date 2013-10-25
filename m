@@ -1,27 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Subject: [PATCH v2 0/2] Add basic scripting to haltest
-Date: Fri, 25 Oct 2013 12:51:44 +0200
-Message-ID: <1382698306-30914-1-git-send-email-jerzy.kasenberg@tieto.com>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2 03/15] android/hal: Add support for sending adapter set property command
+Date: Fri, 25 Oct 2013 12:49:59 +0200
+Message-ID: <1382698211-9123-3-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1382698211-9123-1-git-send-email-szymon.janc@tieto.com>
+References: <1382698211-9123-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patcheset adds command 'source' to interpret scripts
-and processing of .haltestrc to execute some commands automatically.
-v2:
- - small styl changed (fd == -1) changed to (fd < 0)
+This allows HAL to set adapter property.
+---
+ android/hal-bluetooth.c | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-Jerzy Kasenberg (2):
-  android/client: Add source command to haltest
-  android/client: Add processing of .haltestrc
-
- android/client/haltest.c |   55 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 54 insertions(+), 1 deletion(-)
-
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index 6e28c91..aae6078 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -153,15 +153,30 @@ static int get_adapter_property(bt_property_type_t type)
+ 
+ static int set_adapter_property(const bt_property_t *property)
+ {
++	char buf[sizeof(struct hal_cmd_set_adapter_prop) + property->len];
++	struct hal_cmd_set_adapter_prop *cmd = (void *) buf;
++
+ 	DBG("");
+ 
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+ 
+-	if (property == NULL)
++	switch (property->type) {
++	case BT_PROPERTY_BDNAME:
++	case BT_PROPERTY_ADAPTER_SCAN_MODE:
++	case BT_PROPERTY_ADAPTER_DISCOVERY_TIMEOUT:
++		break;
++	default:
+ 		return BT_STATUS_PARM_INVALID;
++	}
+ 
+-	return BT_STATUS_UNSUPPORTED;
++	/* type match IPC type */
++	cmd->type = property->type;
++	cmd->len = property->len;
++	memcpy(cmd->val, property->val, property->len);
++
++	return hal_ipc_cmd(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_SET_ADAPTER_PROP,
++					sizeof(buf), cmd, 0, NULL, NULL);
+ }
+ 
+ static int get_remote_device_properties(bt_bdaddr_t *remote_addr)
 -- 
-1.7.9.5
+1.8.4.1
 
