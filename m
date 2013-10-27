@@ -1,57 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1382716327-25283-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1382716327-25283-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-Date: Mon, 28 Oct 2013 11:53:36 +0200
-Message-ID: <CABBYNZLpen=3t+N45oDQYpHOd3y8D=sJk8ybjSnbFnKm2ggMhw@mail.gmail.com>
-Subject: Re: [PATCH 1/6] android/hal: Fix typo in A2DP HAL service name
+In-Reply-To: <1382714103-27689-1-git-send-email-szymon.janc@tieto.com>
+References: <1382714103-27689-1-git-send-email-szymon.janc@tieto.com>
+Date: Sun, 27 Oct 2013 14:03:21 +0200
+Message-ID: <CABBYNZJ2hYtEDTvCcwbzNBifhOG+6JSA6hLJbSK2MHoLfu0igA@mail.gmail.com>
+Subject: Re: [PATCH 1/6] android: Use common exit path for commands in bt_adapter_handle_cmd
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Szymon,
 
-On Fri, Oct 25, 2013 at 6:52 PM, Grzegorz Kolodziejczyk
-<grzegorz.kolodziejczyk@tieto.com> wrote:
-> A2DP was misspelled as AD2P
+On Fri, Oct 25, 2013 at 6:14 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> All adapter commands return no parameters so putting error and success
+> response on common exit path. This will make function easier to follow
+> when more commands support will be added.
 > ---
->  android/hal-ipc-api.txt | 2 +-
->  android/hal-msg.h       | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+>  android/adapter.c | 34 ++++++++++++++++------------------
+>  1 file changed, 16 insertions(+), 18 deletions(-)
 >
-> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-> index 0c2fd25..dc0d067 100644
-> --- a/android/hal-ipc-api.txt
-> +++ b/android/hal-ipc-api.txt
-> @@ -1023,7 +1023,7 @@ Notifications:
->  Bluetooth Advanced Audio HAL (ID 6)
->  ===================================
+> diff --git a/android/adapter.c b/android/adapter.c
+> index ec90cca..685b00d 100644
+> --- a/android/adapter.c
+> +++ b/android/adapter.c
+> @@ -374,39 +374,37 @@ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
+>         case HAL_OP_ENABLE:
+>                 if (adapter->current_settings & MGMT_SETTING_POWERED) {
+>                         status = HAL_STATUS_DONE;
+> -                       break;
+> +                       goto error;
+>                 }
 >
-> -Android HAL name: "ad2p" (BT_PROFILE_ADVANCED_AUDIO_ID)
-> +Android HAL name: "a2dp" (BT_PROFILE_ADVANCED_AUDIO_ID)
+> -               if (set_mode(MGMT_OP_SET_POWERED, 0x01)) {
+> -                       ipc_send(io, HAL_SERVICE_ID_BLUETOOTH, opcode, 0, NULL,
+> -                                                                       -1);
+> -                       return;
+> -               }
+> +               if (!set_mode(MGMT_OP_SET_POWERED, 0x01))
+> +                       goto error;
+> +
+>                 break;
+>         case HAL_OP_DISABLE:
+>                 if (!(adapter->current_settings & MGMT_SETTING_POWERED)) {
+>                         status = HAL_STATUS_DONE;
+> -                       break;
+> +                       goto error;
+>                 }
 >
->  Commands and responses:
+> -               if (set_mode(MGMT_OP_SET_POWERED, 0x00)) {
+> -                       ipc_send(io, HAL_SERVICE_ID_BLUETOOTH, opcode, 0, NULL,
+> -                                                                       -1);
+> -                       return;
+> -               }
+> +               if (!set_mode(MGMT_OP_SET_POWERED, 0x00))
+> +                       goto error;
+> +
+>                 break;
+>         case HAL_OP_GET_ADAPTER_PROP:
+> -               if (get_property(buf, len)) {
+> -                       ipc_send(io, HAL_SERVICE_ID_BLUETOOTH, opcode, 0, NULL,
+> -                                                                       -1);
+> -                       return;
+> -               }
+> +               if (!get_property(buf, len))
+> +                       goto error;
+> +
+>                 break;
+>         default:
+>                 DBG("Unhandled command, opcode 0x%x", opcode);
+> -               break;
+> +               goto error;
+>         }
 >
-> diff --git a/android/hal-msg.h b/android/hal-msg.h
-> index 172cecb..5de8eb2 100644
-> --- a/android/hal-msg.h
-> +++ b/android/hal-msg.h
-> @@ -40,7 +40,7 @@ struct hal_hdr {
->  #define HAL_SERVICE_ID_HIDHOST         3
->  #define HAL_SERVICE_ID_PAN             4
->  #define HAL_SERVICE_ID_HANDSFREE       5
-> -#define HAL_SERVICE_ID_AD2P            6
-> +#define HAL_SERVICE_ID_A2DP            6
->  #define HAL_SERVICE_ID_HEALTH          7
->  #define HAL_SERVICE_ID_AVRCP           8
->  #define HAL_SERVICE_ID_GATT            9
+> +       ipc_send(io, HAL_SERVICE_ID_BLUETOOTH, opcode, 0, NULL, -1);
+> +       return;
+> +
+> +error:
+>         ipc_send_rsp(io, HAL_SERVICE_ID_BLUETOOTH, status);
+>  }
+>
 > --
 > 1.8.4.1
 
-Applied, thanks.
+Pushed, thanks.
 
 
 -- 
