@@ -2,116 +2,106 @@ Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: [PATCH 1/5] android/hal: Add initial socket implementation
-Date: Mon, 28 Oct 2013 13:30:05 +0100
-Message-ID: <1382963409-1012-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 2/5] android: Initial implementation of socket interface
+Date: Mon, 28 Oct 2013 13:30:06 +0100
+Message-ID: <1382963409-1012-2-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1382963409-1012-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1382963409-1012-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added socket api opcodes and structures and its implementation
-in hal-sock.c.
+Add stub implementation of socket interace on daemon side.
 ---
- android/hal-msg.h  | 20 ++++++++++++++++++++
- android/hal-sock.c | 28 ++++++++++++++++++++++++++--
- 2 files changed, 46 insertions(+), 2 deletions(-)
+ android/main.c   |  4 ++++
+ android/socket.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ android/socket.h |  3 +++
+ 3 files changed, 49 insertions(+)
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 677b00b..ec7d181 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -213,6 +213,26 @@ struct hal_cmd_le_test_mode {
- 	uint8_t  data[0];
- } __attribute__((packed));
+diff --git a/android/main.c b/android/main.c
+index 6ff30a9..2b40621 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -213,6 +213,10 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
+ 		bt_hid_handle_cmd(hal_cmd_io, msg->opcode, msg->payload,
+ 								msg->len);
+ 		break;
++	case HAL_SERVICE_ID_SOCK:
++		bt_sock_handle_cmd(hal_cmd_io, msg->opcode, msg->payload,
++								msg->len);
++		break;
+ 	default:
+ 		ipc_send_rsp(hal_cmd_io, msg->service_id, HAL_STATUS_FAILED);
+ 		break;
+diff --git a/android/socket.c b/android/socket.c
+index 22d2acb..39709cd 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -26,8 +26,50 @@
  
-+/* Bluetooth Socket HAL api */
+ #include "lib/bluetooth.h"
+ #include "log.h"
++#include "hal-msg.h"
++#include "hal-ipc.h"
++#include "ipc.h"
+ #include "socket.h"
+ 
 +
-+#define HAL_OP_SOCK_LISTEN		0x01
-+struct hal_op_sock_listen {
-+	uint8_t type;
-+	uint8_t name[256];
-+	uint8_t uuid[16];
-+	uint16_t channel;
-+	uint8_t flags;
-+} __attribute__((packed));
++static int handle_listen(void *buf)
++{
++	return -1;
++}
 +
-+#define HAL_OP_SOCK_CONNECT		0x02
-+struct hal_op_sock_connect {
-+	uint8_t bdaddr[6];
-+	uint8_t type;
-+	uint8_t uuid[16];
-+	uint16_t channel;
-+	uint8_t flags;
-+} __attribute__((packed));
++static int handle_connect(void *buf)
++{
++	return -1;
++}
 +
- #define HAL_OP_HID_CONNECT		0x01
- struct hal_cmd_hid_connect {
- 	uint8_t bdaddr[6];
-diff --git a/android/hal-sock.c b/android/hal-sock.c
-index 7642ee3..131877a 100644
---- a/android/hal-sock.c
-+++ b/android/hal-sock.c
-@@ -15,18 +15,33 @@
++void bt_sock_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
++							uint16_t len)
++{
++	int fd;
++
++	switch (opcode) {
++	case HAL_OP_SOCK_LISTEN:
++		fd = handle_listen(buf);
++		if (fd < 0)
++			break;
++
++		ipc_send(io, HAL_SERVICE_ID_SOCK, opcode, 0, NULL, fd);
++		return;
++	case HAL_OP_SOCK_CONNECT:
++		fd = handle_connect(buf);
++		if (fd < 0)
++			break;
++
++		ipc_send(io, HAL_SERVICE_ID_SOCK, opcode, 0, NULL, fd);
++		return;
++	default:
++		DBG("Unhandled command, opcode 0x%x", opcode);
++		break;
++	}
++
++	ipc_send_rsp(io, HAL_SERVICE_ID_SOCK, HAL_STATUS_FAILED);
++}
++
+ bool bt_socket_register(GIOChannel *io, const bdaddr_t *addr)
+ {
+ 	DBG("");
+diff --git a/android/socket.h b/android/socket.h
+index b13e84c..2b3b940 100644
+--- a/android/socket.h
++++ b/android/socket.h
+@@ -21,5 +21,8 @@
   *
   */
  
-+#include <stdbool.h>
-+#include <stdint.h>
- #include <stdlib.h>
-+#include <string.h>
- 
-+#include "hal-ipc.h"
- #include "hal-log.h"
-+#include "hal-msg.h"
- #include "hal.h"
- 
- static bt_status_t sock_listen_rfcomm(const char *service_name,
- 					const uint8_t *uuid, int chan,
- 					int *sock, int flags)
- {
-+	struct hal_op_sock_listen cmd;
++void bt_sock_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
++						uint16_t len);
 +
- 	DBG("");
- 
--	return BT_STATUS_UNSUPPORTED;
-+	cmd.flags = flags;
-+	cmd.type = BTSOCK_RFCOMM;
-+	cmd.channel = chan;
-+	memcpy(cmd.uuid, uuid, sizeof(cmd.uuid));
-+	memset(cmd.name, 0, sizeof(cmd.name));
-+	memcpy(cmd.name, service_name, strlen(service_name));
-+
-+	return hal_ipc_cmd(HAL_SERVICE_ID_SOCK, HAL_OP_SOCK_LISTEN,
-+				sizeof(cmd), &cmd, NULL, NULL, sock);
- }
- 
- static bt_status_t sock_listen(btsock_type_t type, const char *service_name,
-@@ -58,6 +73,8 @@ static bt_status_t sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
- 					const uint8_t *uuid, int chan,
- 					int *sock, int flags)
- {
-+	struct hal_op_sock_connect cmd;
-+
- 	if ((!uuid && chan <= 0) || !bdaddr || !sock) {
- 		error("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
- 					bdaddr, uuid, chan, sock);
-@@ -66,7 +83,14 @@ static bt_status_t sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
- 
- 	DBG("uuid %p chan %d sock %p type %d", uuid, chan, sock, type);
- 
--	return BT_STATUS_UNSUPPORTED;
-+	cmd.flags = flags;
-+	cmd.type = type;
-+	cmd.channel = chan;
-+	memcpy(cmd.uuid, uuid, sizeof(cmd.uuid));
-+	memcpy(cmd.bdaddr, bdaddr, sizeof(cmd.bdaddr));
-+
-+	return hal_ipc_cmd(HAL_SERVICE_ID_SOCK, HAL_OP_SOCK_CONNECT,
-+					sizeof(cmd), &cmd, NULL, NULL, sock);
- }
- 
- static btsock_interface_t sock_if = {
+ bool bt_socket_register(GIOChannel *io, const bdaddr_t *addr);
+ void bt_socket_unregister(void);
 -- 
 1.8.2.2
 
