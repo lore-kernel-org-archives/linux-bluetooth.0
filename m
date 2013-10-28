@@ -1,62 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 2/2] android: Add initial HID disconnect implementation.
-Date: Mon, 28 Oct 2013 16:47:32 +0200
-Message-Id: <1382971653-11727-3-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1382971653-11727-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1382971653-11727-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [RFC 1/2] android: Add thread-safe helpers
+Date: Mon, 28 Oct 2013 16:06:50 +0200
+Message-Id: <1382969211-7402-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1382969211-7402-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1382969211-7402-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implemented basic HID disconnect method. Host disconnects
-with bt device at L2CAP level.
----
- android/hid.c |   23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/android/hid.c b/android/hid.c
-index b7bdc07..3e7ac0d 100644
---- a/android/hid.c
-+++ b/android/hid.c
-@@ -270,6 +270,27 @@ static uint8_t dev_connect(struct hal_cmd_hid_connect *cmd, uint16_t len)
- 	return HAL_STATUS_SUCCESS;
- }
- 
-+static uint8_t dev_disconnect(struct hal_cmd_hid_disconnect *cmd, uint16_t len)
-+{
-+	GSList *l;
-+	bdaddr_t dst;
+Add thread safe helpers to make HAL debug printing thread-safe. The code
+is inherited from Android bionic and it is used for strerror, strsignal,
+etc.
+---
+ android/pthread-local.h |   51 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
+ create mode 100644 android/pthread-local.h
+
+diff --git a/android/pthread-local.h b/android/pthread-local.h
+new file mode 100644
+index 0000000..07012f3
+--- /dev/null
++++ b/android/pthread-local.h
+@@ -0,0 +1,51 @@
++/*
++ * Copyright (C) 2012 The Android Open Source Project
++ * Copyright (C) 2013 Intel Corp.
++ *
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *  * Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *  * Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in
++ *    the documentation and/or other materials provided with the
++ *    distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
++ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
++ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
++ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
++ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
++ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
++ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
++ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
++ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ */
 +
-+	DBG("");
 +
-+	if (len < sizeof(*cmd))
-+		return HAL_STATUS_INVALID;
++#include <pthread.h>
 +
-+	android2bdaddr((bdaddr_t *)&cmd->bdaddr, &dst);
++#define GLOBAL_INIT_THREAD_LOCAL_BUFFER(name) \
++  static pthread_key_t __bionic_tls_ ## name ## _key; \
++  static void __bionic_tls_ ## name ## _key_destroy(void* buffer) { \
++    free(buffer); \
++  } \
++  __attribute__((constructor)) static void __bionic_tls_ ## name ## _key_init() { \
++    pthread_key_create(&__bionic_tls_ ## name ## _key, __bionic_tls_ ## name ## _key_destroy); \
++  }
 +
-+	l = g_slist_find_custom(devices, &dst, device_cmp);
-+	if (!l)
-+		return HAL_STATUS_FAILED;
-+
-+	input_device_free(l->data);
-+
-+	return HAL_STATUS_SUCCESS;
-+}
-+
- void bt_hid_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf, uint16_t len)
- {
- 	uint8_t status = HAL_STATUS_FAILED;
-@@ -279,6 +300,8 @@ void bt_hid_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf, uint16_t len)
- 		status = dev_connect((struct hal_cmd_hid_connect *) buf, len);
- 		break;
- 	case HAL_OP_HID_DISCONNECT:
-+		status = dev_disconnect((struct hal_cmd_hid_disconnect *) buf,
-+									len);
- 		break;
- 	default:
- 		DBG("Unhandled command, opcode 0x%x", opcode);
++// Leaves "name_tls_buffer" and "name_tls_buffer_size" defined and initialized.
++#define LOCAL_INIT_THREAD_LOCAL_BUFFER(type, name, byte_count) \
++  type name ## _tls_buffer = \
++      (pthread_getspecific(__bionic_tls_ ## name ## _key)); \
++  if (name ## _tls_buffer == NULL) { \
++    name ## _tls_buffer = (calloc(1, byte_count)); \
++    pthread_setspecific(__bionic_tls_ ## name ## _key, name ## _tls_buffer); \
++  } \
++  const size_t name ## _tls_buffer_size __attribute__((unused)) = byte_count
 -- 
-1.7.9.5
+1.7.10.4
 
