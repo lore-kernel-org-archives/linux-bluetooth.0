@@ -2,26 +2,61 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 0/2] Initial HID connect disconnect methods
-Date: Mon, 28 Oct 2013 16:47:30 +0200
-Message-Id: <1382971653-11727-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 2/2] android: Add initial HID disconnect implementation.
+Date: Mon, 28 Oct 2013 16:47:32 +0200
+Message-Id: <1382971653-11727-3-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1382971653-11727-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1382971653-11727-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Patchset adds hid connect and disconnect mechanisms at
-L2CAP level. It opens the control channel and interrupt
-channel and listens on io events. UHID, hid server and
-reconnect related features not yet done.
+Implemented basic HID disconnect method. Host disconnects
+with bt device at L2CAP level.
+---
+ android/hid.c |   23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-Ravi kumar Veeramally (2):
-  android: Add initial HID connect implementation
-  android: Add initial HID disconnect implementation.
-
- Makefile.android   |    3 +-
- android/Android.mk |    1 +
- android/hid.c      |  260 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 263 insertions(+), 1 deletion(-)
-
+diff --git a/android/hid.c b/android/hid.c
+index b7bdc07..3e7ac0d 100644
+--- a/android/hid.c
++++ b/android/hid.c
+@@ -270,6 +270,27 @@ static uint8_t dev_connect(struct hal_cmd_hid_connect *cmd, uint16_t len)
+ 	return HAL_STATUS_SUCCESS;
+ }
+ 
++static uint8_t dev_disconnect(struct hal_cmd_hid_disconnect *cmd, uint16_t len)
++{
++	GSList *l;
++	bdaddr_t dst;
++
++	DBG("");
++
++	if (len < sizeof(*cmd))
++		return HAL_STATUS_INVALID;
++
++	android2bdaddr((bdaddr_t *)&cmd->bdaddr, &dst);
++
++	l = g_slist_find_custom(devices, &dst, device_cmp);
++	if (!l)
++		return HAL_STATUS_FAILED;
++
++	input_device_free(l->data);
++
++	return HAL_STATUS_SUCCESS;
++}
++
+ void bt_hid_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf, uint16_t len)
+ {
+ 	uint8_t status = HAL_STATUS_FAILED;
+@@ -279,6 +300,8 @@ void bt_hid_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf, uint16_t len)
+ 		status = dev_connect((struct hal_cmd_hid_connect *) buf, len);
+ 		break;
+ 	case HAL_OP_HID_DISCONNECT:
++		status = dev_disconnect((struct hal_cmd_hid_disconnect *) buf,
++									len);
+ 		break;
+ 	default:
+ 		DBG("Unhandled command, opcode 0x%x", opcode);
 -- 
 1.7.9.5
 
