@@ -1,83 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] android: Add thread-safe helpers
-Date: Mon, 28 Oct 2013 17:30:24 +0200
-Message-Id: <1382974225-13855-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1382969211-7402-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/2] android: Use thread-safe helpers
+Date: Mon, 28 Oct 2013 17:30:25 +0200
+Message-Id: <1382974225-13855-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1382974225-13855-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1382969211-7402-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1382974225-13855-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add thread safe helpers to make HAL debug printing thread-safe. The code
-is inherited from Android bionic and it is used for strerror, strsignal,
-etc.
+Make use of thread-safe helpers.
 ---
- android/pthread-local.h |   53 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
- create mode 100644 android/pthread-local.h
+ android/client/textconv.c |   15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/android/pthread-local.h b/android/pthread-local.h
-new file mode 100644
-index 0000000..4bf22f3
---- /dev/null
-+++ b/android/pthread-local.h
-@@ -0,0 +1,53 @@
-+/*
-+ * Copyright (C) 2012 The Android Open Source Project
-+ * Copyright (C) 2013 Intel Corp.
-+ *
-+ * All rights reserved.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ *  * Redistributions of source code must retain the above copyright
-+ *    notice, this list of conditions and the following disclaimer.
-+ *  * Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in
-+ *    the documentation and/or other materials provided with the
-+ *    distribution.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-+ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
-+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
-+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-+ * SUCH DAMAGE.
-+ */
+diff --git a/android/client/textconv.c b/android/client/textconv.c
+index 1dc6ad0..c09f47d 100644
+--- a/android/client/textconv.c
++++ b/android/client/textconv.c
+@@ -19,6 +19,8 @@
+ #include <stdio.h>
+ #include <hardware/bluetooth.h>
+ 
++#include "../pthread-local.h"
 +
-+#include <pthread.h>
-+#include <stdlib.h>
-+
-+#define GLOBAL_INIT_THREAD_LOCAL_BUFFER(name) \
-+  static pthread_key_t __bionic_tls_ ## name ## _key; \
-+  static void __bionic_tls_ ## name ## _key_destroy(void* buffer) { \
-+    free(buffer); \
-+  } \
-+  __attribute__((constructor)) static void __bionic_tls_ ## name ## _key_init() { \
-+    pthread_key_create(&__bionic_tls_ ## name ## _key, __bionic_tls_ ## name ## _key_destroy); \
-+  }
-+
-+/*
-+ * Leaves "name_tls_buffer" and "name_tls_buffer_size" defined and initialized.
-+ */
-+#define LOCAL_INIT_THREAD_LOCAL_BUFFER(type, name, byte_count) \
-+  const size_t name ## _tls_buffer_size __attribute__((unused)) = byte_count; \
-+  type name ## _tls_buffer = \
-+      (pthread_getspecific(__bionic_tls_ ## name ## _key)); \
-+  if (name ## _tls_buffer == NULL) { \
-+    name ## _tls_buffer = (calloc(1, byte_count)); \
-+    pthread_setspecific(__bionic_tls_ ## name ## _key, name ## _tls_buffer); \
-+  }
+ #include "textconv.h"
+ 
+ /*
+@@ -227,11 +229,12 @@ const char *enum_one_string(void *v, int i)
+ 	return (i == 0) && (m[0] != 0) ? m : NULL;
+ }
+ 
++GLOBAL_INIT_THREAD_LOCAL_BUFFER(bdaddr_buf);
+ char *bdaddr2str(const bt_bdaddr_t *bd_addr)
+ {
+-	static char buf[MAX_ADDR_STR_LEN];
++	LOCAL_INIT_THREAD_LOCAL_BUFFER(char*, bdaddr_buf, MAX_ADDR_STR_LEN);
+ 
+-	return bt_bdaddr_t2str(bd_addr, buf);
++	return bt_bdaddr_t2str(bd_addr, bdaddr_buf_tls_buffer);
+ }
+ 
+ static char *btuuid2str(const bt_uuid_t *uuid)
+@@ -241,12 +244,14 @@ static char *btuuid2str(const bt_uuid_t *uuid)
+ 	return bt_uuid_t2str(uuid, buf);
+ }
+ 
++GLOBAL_INIT_THREAD_LOCAL_BUFFER(property_buf);
+ char *btproperty2str(const bt_property_t *property)
+ {
+-	static char buf[4096];
+ 	char *p;
++	LOCAL_INIT_THREAD_LOCAL_BUFFER(char*, property_buf, 4096);
+ 
+-	p = buf + sprintf(buf, "type=%s len=%d val=",
++	p = property_buf_tls_buffer + sprintf(property_buf_tls_buffer,
++					"type=%s len=%d val=",
+ 					bt_property_type_t2str(property->type),
+ 					property->len);
+ 
+@@ -334,5 +339,5 @@ char *btproperty2str(const bt_property_t *property)
+ 		sprintf(p, "%p", property->val);
+ 	}
+ 
+-	return buf;
++	return property_buf_tls_buffer;
+ }
 -- 
 1.7.10.4
 
