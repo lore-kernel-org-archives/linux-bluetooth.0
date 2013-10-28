@@ -1,36 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <526E7AA2.5010701@redhat.com>
-Date: Mon, 28 Oct 2013 15:54:26 +0100
-From: Hans de Goede <hdegoede@redhat.com>
 MIME-Version: 1.0
-To: Gustavo Padovan <gustavo@padovan.org>
-CC: USB list <linux-usb@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org, Shuah Khan <shuah.kh@samsung.com>,
-	Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] Regression fix revert: "Bluetooth: Add missing reset_resume
- dev_pm_ops"
-References: <1380374739-11581-1-git-send-email-hdegoede@redhat.com> <20131002190248.GB3130@joana> <508150F6-D142-4406-8CC9-57DDE754F391@holtmann.org>
-In-Reply-To: <508150F6-D142-4406-8CC9-57DDE754F391@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-usb-owner@vger.kernel.org
+In-Reply-To: <1382971653-11727-3-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1382971653-11727-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+	<1382971653-11727-3-git-send-email-ravikumar.veeramally@linux.intel.com>
+Date: Mon, 28 Oct 2013 16:53:18 +0200
+Message-ID: <CABBYNZKeZCLfz+jf_9tubvxAw9hPc0pCVuskY4vNKo3heZA_JA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] android: Add initial HID disconnect implementation.
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Ravi,
 
-> Patch has been applied to bluetooth.git. Thanks.
+On Mon, Oct 28, 2013 at 4:47 PM, Ravi kumar Veeramally
+<ravikumar.veeramally@linux.intel.com> wrote:
+> Implemented basic HID disconnect method. Host disconnects
+> with bt device at L2CAP level.
+> ---
+>  android/hid.c |   23 +++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
+>
+> diff --git a/android/hid.c b/android/hid.c
+> index b7bdc07..3e7ac0d 100644
+> --- a/android/hid.c
+> +++ b/android/hid.c
+> @@ -270,6 +270,27 @@ static uint8_t dev_connect(struct hal_cmd_hid_connect *cmd, uint16_t len)
+>         return HAL_STATUS_SUCCESS;
+>  }
+>
+> +static uint8_t dev_disconnect(struct hal_cmd_hid_disconnect *cmd, uint16_t len)
+> +{
+> +       GSList *l;
+> +       bdaddr_t dst;
+> +
+> +       DBG("");
+> +
+> +       if (len < sizeof(*cmd))
+> +               return HAL_STATUS_INVALID;
+> +
+> +       android2bdaddr((bdaddr_t *)&cmd->bdaddr, &dst);
+> +
+> +       l = g_slist_find_custom(devices, &dst, device_cmp);
+> +       if (!l)
+> +               return HAL_STATUS_FAILED;
+> +
+> +       input_device_free(l->data);
+> +
+> +       return HAL_STATUS_SUCCESS;
+> +}
+> +
+>  void bt_hid_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf, uint16_t len)
+>  {
+>         uint8_t status = HAL_STATUS_FAILED;
+> @@ -279,6 +300,8 @@ void bt_hid_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf, uint16_t len)
+>                 status = dev_connect((struct hal_cmd_hid_connect *) buf, len);
+>                 break;
+>         case HAL_OP_HID_DISCONNECT:
+> +               status = dev_disconnect((struct hal_cmd_hid_disconnect *) buf,
+> +                                                                       len);
 
-Hmm, I'm not seeing this in 3.12 yet, not only should this be added
-to 3.12 asap, it should also really get added to 3.11.x soon.
+Look at the other files, we are not doing the casts upfront but in the
+function itself.
 
-The regression this patch fixes is breaking btusb for lots of users, see:
-https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1213239
-https://bugzilla.redhat.com/show_bug.cgi?id=988481
 
-Where lots of people are adding me too comments (and some are building
-their own kernels with the revert and confirming it fixes things for
-them).
-
-Regards,
-
-Hans
+-- 
+Luiz Augusto von Dentz
