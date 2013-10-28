@@ -2,277 +2,58 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] build: Move Makefile.android to android/Makefile.am
-Date: Mon, 28 Oct 2013 17:37:06 +0100
-Message-ID: <1382978226-28073-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH] android/hal: Set callbacks before initializing IPC
+Date: Mon, 28 Oct 2013 16:45:37 +0100
+Message-ID: <1382975137-12604-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will keep all Android related changes within android directory.
+Notification thread is started on IPC init and it can be scheduled
+before main thread.
+
+Fix following crash on HAL init:
+
+pid: 3392, tid: 3492, name: droid.bluetooth  >>> com.android.bluetooth <<<
+signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 00000028
+    eax 00000000  ebx ce047f64  ecx ce0405d0  edx f7763724
+    esi cdf3af00  edi f837fb90
+    xcs 00000023  xds 0000002b  xes 0000002b  xfs 00000000  xss 0000002b
+    eip ce042289  ebp cdf3a9f8  esp cdf3a9e0  flags 00010292
+
+backtrace:
+    #00  pc 00003289  /system/lib/hw/bluetooth.default.so (bt_thread_associate+25)
+    #01  pc 000015f8  /system/lib/hw/bluetooth.default.so (notification_handler+40)
+    #02  pc 0000f804  /system/lib/libc.so (__thread_entry+276)
+    #03  pc 0002999d  /system/lib/libc.so
+    #04  pc 00082ae7  /system/lib/libdvm.so (dvmThreadSelf()+39)
+    #05  pc 00010db9  /system/lib/libc.so (pthread_mutex_unlock+25)
 ---
+ android/hal-bluetooth.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-Will also fix messing with Marcel's tab completion habits :-)
-
- Makefile.am         |   2 +-
- Makefile.android    | 113 ----------------------------------------------------
- android/Makefile.am | 113 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 114 insertions(+), 114 deletions(-)
- delete mode 100644 Makefile.android
- create mode 100644 android/Makefile.am
-
-diff --git a/Makefile.am b/Makefile.am
-index 8aed6f7..69a2805 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -179,7 +179,7 @@ test_scripts =
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index 5929fff..5f6dcbe 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -114,11 +114,13 @@ static int init(bt_callbacks_t *callbacks)
+ 	if (interface_ready())
+ 		return BT_STATUS_SUCCESS;
  
- include Makefile.tools
- include Makefile.obexd
--include Makefile.android
-+include android/Makefile.am
+-	if (!hal_ipc_init())
+-		return BT_STATUS_FAIL;
+-
+ 	bt_hal_cbacks = callbacks;
  
- if HID2HCI
- rulesdir = @UDEV_DIR@/rules.d
-diff --git a/Makefile.android b/Makefile.android
-deleted file mode 100644
-index 2b57daa..0000000
---- a/Makefile.android
-+++ /dev/null
-@@ -1,113 +0,0 @@
--if ANDROID
--noinst_PROGRAMS += android/bluetoothd
--
--android_bluetoothd_SOURCES =	android/main.c \
--				src/log.c \
--				android/hal-msg.h \
--				android/utils.h \
--				src/sdpd-database.c src/sdpd-server.c \
--				src/sdpd-service.c src/sdpd-request.c \
--				src/shared/util.h src/shared/util.c \
--				src/shared/mgmt.h src/shared/mgmt.c \
--				android/adapter.h android/adapter.c \
--				android/hid.h android/hid.c \
--				android/ipc.h android/ipc.c \
--				android/socket.h android/socket.c
--
--android_bluetoothd_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
--
--noinst_LTLIBRARIES += android/libhal-internal.la
--
--android_libhal_internal_la_SOURCES = android/hal.h android/hal-bluetooth.c \
--					android/hal-sock.c \
--					android/hal-hidhost.c \
--					android/hal-pan.c \
--					android/hal-av.c \
--					android/hardware/bluetooth.h \
--					android/hardware/bt_av.h \
--					android/hardware/bt_gatt.h \
--					android/hardware/bt_gatt_client.h \
--					android/hardware/bt_gatt_server.h \
--					android/hardware/bt_gatt_types.h \
--					android/hardware/bt_hf.h \
--					android/hardware/bt_hh.h \
--					android/hardware/bt_hl.h \
--					android/hardware/bt_pan.h \
--					android/hardware/bt_rc.h \
--					android/hardware/bt_sock.h \
--					android/hardware/hardware.h \
--					android/cutils/properties.h \
--					android/hal-log.h \
--					android/hal-ipc.h android/hal-ipc.c
--
--android_libhal_internal_la_CPPFLAGS = -I$(srcdir)/android
--
--noinst_PROGRAMS += android/haltest
--
--android_haltest_SOURCES = android/client/haltest.c \
--				android/client/pollhandler.c \
--				android/client/terminal.c \
--				android/client/history.c \
--				android/client/textconv.c \
--				android/client/tabcompletion.c \
--				android/client/if-av.c \
--				android/client/if-bt.c \
--				android/client/if-hf.c \
--				android/client/if-hh.c \
--				android/client/if-pan.c \
--				android/client/if-sock.c \
--				android/client/hwmodule.c
--
--android_haltest_LDADD = android/libhal-internal.la
--
--android_haltest_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
--
--android_haltest_LDFLAGS = -pthread
--
--endif
--
--EXTRA_DIST += android/Android.mk android/device.c android/adapter.c\
--		android/main.c android/hal-msg.h android/hal.h
--
--EXTRA_DIST += android/hal-bluetooth.c \
--		android/hal-sock.c \
--		android/hal-hidhost.c \
--		android/hal-pan.c \
--		android/hal-av.c \
--		android/hal-log.h
--
--EXTRA_DIST += android/client/terminal.c \
--		android/client/haltest.c \
--		android/client/hwmodule.c \
--		android/client/pollhandler.c \
--		android/client/history.c \
--		android/client/if-av.c \
--		android/client/if-bt.c \
--		android/client/if-hf.c \
--		android/client/if-hh.c \
--		android/client/if-pan.c \
--		android/client/if-sock.c \
--		android/client/textconv.c \
--		android/client/tabcompletion.c \
--		android/client/textconv.h \
--		android/client/if-main.h \
--		android/client/pollhandler.h \
--		android/client/history.h \
--		android/client/terminal.h
--
--EXTRA_DIST += android/hal-ipc-api.txt
--
--EXTRA_DIST += android/hardware/bluetooth.h \
--		android/hardware/bt_av.h \
--		android/hardware/bt_gatt.h \
--		android/hardware/bt_gatt_client.h \
--		android/hardware/bt_gatt_server.h \
--		android/hardware/bt_gatt_types.h \
--		android/hardware/bt_hf.h \
--		android/hardware/bt_hh.h \
--		android/hardware/bt_hl.h \
--		android/hardware/bt_pan.h \
--		android/hardware/bt_rc.h \
--		android/hardware/bt_sock.h \
--		android/hardware/hardware.h \
--		android/cutils/properties.h
-diff --git a/android/Makefile.am b/android/Makefile.am
-new file mode 100644
-index 0000000..2b57daa
---- /dev/null
-+++ b/android/Makefile.am
-@@ -0,0 +1,113 @@
-+if ANDROID
-+noinst_PROGRAMS += android/bluetoothd
++	if (!hal_ipc_init()) {
++		bt_hal_cbacks = NULL;
++		return BT_STATUS_FAIL;
++	}
 +
-+android_bluetoothd_SOURCES =	android/main.c \
-+				src/log.c \
-+				android/hal-msg.h \
-+				android/utils.h \
-+				src/sdpd-database.c src/sdpd-server.c \
-+				src/sdpd-service.c src/sdpd-request.c \
-+				src/shared/util.h src/shared/util.c \
-+				src/shared/mgmt.h src/shared/mgmt.c \
-+				android/adapter.h android/adapter.c \
-+				android/hid.h android/hid.c \
-+				android/ipc.h android/ipc.c \
-+				android/socket.h android/socket.c
-+
-+android_bluetoothd_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
-+
-+noinst_LTLIBRARIES += android/libhal-internal.la
-+
-+android_libhal_internal_la_SOURCES = android/hal.h android/hal-bluetooth.c \
-+					android/hal-sock.c \
-+					android/hal-hidhost.c \
-+					android/hal-pan.c \
-+					android/hal-av.c \
-+					android/hardware/bluetooth.h \
-+					android/hardware/bt_av.h \
-+					android/hardware/bt_gatt.h \
-+					android/hardware/bt_gatt_client.h \
-+					android/hardware/bt_gatt_server.h \
-+					android/hardware/bt_gatt_types.h \
-+					android/hardware/bt_hf.h \
-+					android/hardware/bt_hh.h \
-+					android/hardware/bt_hl.h \
-+					android/hardware/bt_pan.h \
-+					android/hardware/bt_rc.h \
-+					android/hardware/bt_sock.h \
-+					android/hardware/hardware.h \
-+					android/cutils/properties.h \
-+					android/hal-log.h \
-+					android/hal-ipc.h android/hal-ipc.c
-+
-+android_libhal_internal_la_CPPFLAGS = -I$(srcdir)/android
-+
-+noinst_PROGRAMS += android/haltest
-+
-+android_haltest_SOURCES = android/client/haltest.c \
-+				android/client/pollhandler.c \
-+				android/client/terminal.c \
-+				android/client/history.c \
-+				android/client/textconv.c \
-+				android/client/tabcompletion.c \
-+				android/client/if-av.c \
-+				android/client/if-bt.c \
-+				android/client/if-hf.c \
-+				android/client/if-hh.c \
-+				android/client/if-pan.c \
-+				android/client/if-sock.c \
-+				android/client/hwmodule.c
-+
-+android_haltest_LDADD = android/libhal-internal.la
-+
-+android_haltest_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
-+
-+android_haltest_LDFLAGS = -pthread
-+
-+endif
-+
-+EXTRA_DIST += android/Android.mk android/device.c android/adapter.c\
-+		android/main.c android/hal-msg.h android/hal.h
-+
-+EXTRA_DIST += android/hal-bluetooth.c \
-+		android/hal-sock.c \
-+		android/hal-hidhost.c \
-+		android/hal-pan.c \
-+		android/hal-av.c \
-+		android/hal-log.h
-+
-+EXTRA_DIST += android/client/terminal.c \
-+		android/client/haltest.c \
-+		android/client/hwmodule.c \
-+		android/client/pollhandler.c \
-+		android/client/history.c \
-+		android/client/if-av.c \
-+		android/client/if-bt.c \
-+		android/client/if-hf.c \
-+		android/client/if-hh.c \
-+		android/client/if-pan.c \
-+		android/client/if-sock.c \
-+		android/client/textconv.c \
-+		android/client/tabcompletion.c \
-+		android/client/textconv.h \
-+		android/client/if-main.h \
-+		android/client/pollhandler.h \
-+		android/client/history.h \
-+		android/client/terminal.h
-+
-+EXTRA_DIST += android/hal-ipc-api.txt
-+
-+EXTRA_DIST += android/hardware/bluetooth.h \
-+		android/hardware/bt_av.h \
-+		android/hardware/bt_gatt.h \
-+		android/hardware/bt_gatt_client.h \
-+		android/hardware/bt_gatt_server.h \
-+		android/hardware/bt_gatt_types.h \
-+		android/hardware/bt_hf.h \
-+		android/hardware/bt_hh.h \
-+		android/hardware/bt_hl.h \
-+		android/hardware/bt_pan.h \
-+		android/hardware/bt_rc.h \
-+		android/hardware/bt_sock.h \
-+		android/hardware/hardware.h \
-+		android/cutils/properties.h
+ 	cmd.service_id = HAL_SERVICE_ID_BLUETOOTH;
+ 
+ 	status = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
 -- 
 1.8.4.1
 
