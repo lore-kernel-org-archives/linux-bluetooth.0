@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 5/5] android/hal: Add support for handling SSP request event
-Date: Tue, 29 Oct 2013 12:52:42 +0100
-Message-ID: <1383047562-4799-6-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v3 1/5] android: Define class of device as four bytes in IPC doc
+Date: Tue, 29 Oct 2013 12:52:38 +0100
+Message-ID: <1383047562-4799-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1383047562-4799-1-git-send-email-szymon.janc@tieto.com>
 References: <1383047562-4799-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,43 +12,33 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+For PIN and SSP requests callback define CoD as 4 bytes. This will
+allow HAL library to pass CoD direclty to callback. Will also match
+how CoD is passed as property.
 ---
- android/hal-bluetooth.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ android/hal-ipc-api.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index a1a4ef4..f14fbb5 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -88,6 +88,18 @@ static void handle_pin_request(void *buf)
- 		bt_hal_cbacks->pin_request_cb(addr, name, ev->class_of_dev);
- }
+diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+index dc0d067..e7af8a3 100644
+--- a/android/hal-ipc-api.txt
++++ b/android/hal-ipc-api.txt
+@@ -354,13 +354,13 @@ Notifications:
  
-+static void handle_ssp_request(void *buf)
-+{
-+	struct hal_ev_ssp_request *ev = buf;
-+	bt_bdaddr_t *addr = (bt_bdaddr_t *) ev->bdaddr;
-+	bt_bdname_t *name = (bt_bdname_t *) ev->name;
-+
-+	if (bt_hal_cbacks->ssp_request_cb)
-+		bt_hal_cbacks->ssp_request_cb(addr, name, ev->class_of_dev,
-+							ev->pairing_variant,
-+							ev->passkey);
-+}
-+
- void bt_thread_associate(void)
- {
- 	if (bt_hal_cbacks->thread_evt_cb)
-@@ -124,6 +136,9 @@ void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len)
- 	case HAL_EV_PIN_REQUEST:
- 		handle_pin_request(buf);
- 		break;
-+	case HAL_EV_SSP_REQUEST:
-+		handle_ssp_request(buf);
-+		break;
- 	default:
- 		DBG("Unhandled callback opcode=0x%x", opcode);
- 		break;
+ 		Notification parameters: Remote address (6 octets)
+ 		                         Remote name (249 octets)
+-		                         Class of device (3 octets)
++		                         Class of device (4 octets)
+ 
+ 	Opcode 0x87 - SSP Request notification
+ 
+ 		Notification parameters: Remote address (6 octets)
+ 		                         Remote name (249 octets)
+-		                         Class of device (3 octets)
++		                         Class of device (4 octets)
+ 		                         Pairing variant (1 octet)
+ 		                         Passkey (4 octets)
+ 
 -- 
 1.8.4.1
 
