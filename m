@@ -1,193 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <526FAC6C.1090306@timomueller.eu>
-Date: Tue, 29 Oct 2013 13:39:08 +0100
-From: =?windows-1252?Q?Timo_M=FCller?= <mail@timomueller.eu>
+Date: Tue, 29 Oct 2013 14:36:24 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 5/6] android/hal: Add device state changed event handler
+Message-ID: <20131029123622.GF27517@aemeltch-MOBL1>
+References: <1383049016-23371-1-git-send-email-jakub.tyszkowski@tieto.com>
+ <1383049016-23371-5-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: Set ISOC altsetting from within notify callback
-References: <1380952305-14104-1-git-send-email-marcel@holtmann.org> <5257EB7A.7010407@timomueller.eu> <DC0E2A8A-DF32-4E70-ACF4-B203D17057B9@holtmann.org> <525BB77A.7030803@timomueller.eu>
-In-Reply-To: <525BB77A.7030803@timomueller.eu>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1383049016-23371-5-git-send-email-jakub.tyszkowski@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Jakub,
 
-Timo Mueller wrote, On 14.10.2013 11:20:
-> Hi Marcel,
->
-> Am 11.10.2013 14:36, schrieb Marcel Holtmann:
->> Hi Timo,
->>
->>>> Since the event handling is done within a workqueue, the notify
->>>> callback can now sleep. So no need to trigger a separate workqueue
->>>> from within the Bluetooth USB driver.
->>>>
->>>> This should give a little bit better latency with the SCO packet
->>>> processing since the ISOC altsetting is correct from the beginning.
->>>>
->>>> However I am not sure if we can actually sleep in the USB reset
->>>> handler and what we need to do to restore the correct altsetting
->>>> in there. This could potentially fail, so please test ;)
->>>>
->>>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
->>>> ---
->>>>   drivers/bluetooth/btusb.c | 34 ++++++++++++++--------------------
->>>>   1 file changed, 14 insertions(+), 20 deletions(-)
->>>>
->>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->>>> index f3dfc0a..32cae73 100644
->>>> --- a/drivers/bluetooth/btusb.c
->>>> +++ b/drivers/bluetooth/btusb.c
->>>> @@ -245,7 +245,6 @@ struct btusb_data {
->>>>
->>>>       unsigned long flags;
->>>>
->>>> -    struct work_struct work;
->>>>       struct work_struct waker;
->>>>
->>>>       struct usb_anchor tx_anchor;
->>>> @@ -685,7 +684,6 @@ static int btusb_close(struct hci_dev *hdev)
->>>>       if (!test_and_clear_bit(HCI_RUNNING, &hdev->flags))
->>>>           return 0;
->>>>
->>>> -    cancel_work_sync(&data->work);
->>>>       cancel_work_sync(&data->waker);
->>>>
->>>>       clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
->>>> @@ -827,18 +825,6 @@ done:
->>>>       return err;
->>>>   }
->>>>
->>>> -static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
->>>> -{
->>>> -    struct btusb_data *data = hci_get_drvdata(hdev);
->>>> -
->>>> -    BT_DBG("%s evt %d", hdev->name, evt);
->>>> -
->>>> -    if (hdev->conn_hash.sco_num != data->sco_num) {
->>>> -        data->sco_num = hdev->conn_hash.sco_num;
->>>> -        schedule_work(&data->work);
->>>> -    }
->>>> -}
->>>> -
->>>>   static inline int __set_isoc_interface(struct hci_dev *hdev, int
->>>> altsetting)
->>>>   {
->>>>       struct btusb_data *data = hci_get_drvdata(hdev);
->>>> @@ -882,9 +868,8 @@ static inline int __set_isoc_interface(struct
->>>> hci_dev *hdev, int altsetting)
->>>>       return 0;
->>>>   }
->>>>
->>>> -static void btusb_work(struct work_struct *work)
->>>> +static void btusb_update_isoc_altsetting(struct btusb_data *data)
->>>>   {
->>>> -    struct btusb_data *data = container_of(work, struct btusb_data,
->>>> work);
->>>>       struct hci_dev *hdev = data->hdev;
->>>>       int new_alts;
->>>>       int err;
->>>> @@ -932,6 +917,18 @@ static void btusb_work(struct work_struct *work)
->>>>       }
->>>>   }
->>>>
->>>> +static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
->>>> +{
->>>> +    struct btusb_data *data = hci_get_drvdata(hdev);
->>>> +
->>>> +    BT_DBG("%s evt %d", hdev->name, evt);
->>>> +
->>>> +    if (hdev->conn_hash.sco_num != data->sco_num) {
->>>> +        data->sco_num = hdev->conn_hash.sco_num;
->>>> +        btusb_update_isoc_altsetting(data);
->>>> +    }
->>>> +}
->>>> +
->>>>   static void btusb_waker(struct work_struct *work)
->>>>   {
->>>>       struct btusb_data *data = container_of(work, struct
->>>> btusb_data, waker);
->>>> @@ -1404,7 +1401,6 @@ static int btusb_probe(struct usb_interface
->>>> *intf,
->>>>
->>>>       spin_lock_init(&data->lock);
->>>>
->>>> -    INIT_WORK(&data->work, btusb_work);
->>>>       INIT_WORK(&data->waker, btusb_waker);
->>>>       spin_lock_init(&data->txlock);
->>>>
->>>> @@ -1540,8 +1536,6 @@ static int btusb_suspend(struct usb_interface
->>>> *intf, pm_message_t message)
->>>>           return -EBUSY;
->>>>       }
->>>>
->>>> -    cancel_work_sync(&data->work);
->>>> -
->>>>       btusb_stop_traffic(data);
->>>>       usb_kill_anchored_urbs(&data->tx_anchor);
->>>>
->>>> @@ -1606,8 +1600,8 @@ static int btusb_resume(struct usb_interface
->>>> *intf)
->>>>       play_deferred(data);
->>>>       clear_bit(BTUSB_SUSPENDING, &data->flags);
->>>>       spin_unlock_irq(&data->txlock);
->>>> -    schedule_work(&data->work);
->>>>
->>>> +    btusb_update_isoc_altsetting(data);
->>>>       return 0;
->>>>
->>>>   failed:
->>>>
->>> I have been testing this patch for the last two days at the UPF in
->>> Vienna. It was running fine most of the time, but I experienced two
->>> crashes. Both crashes appeared when there was an active call and the
->>> phone transferred audio to the phone and back. Both times I wasn't
->>> able to reproduce, when I restarted everything and tested again it
->>> worked fine.
->>>
->>> Unfortunately the kernel log is not complete but, when it failed the
->>> kernel reported:
->>> [147.344546] Bluetooth: hci0 SCO packet for unknown connection handle 5
->>> [147.354515] Bluetooth: hci0 SCO packet for unknown connection handle 21
->>> [147.354537] Bluetooth: hci0 SCO packet for unknown connection handle 29
->>> [147.354548] Bluetooth: hci0 SCO packet for unknown connection handle
->>> 65534
->>> [147.364574] Bluetooth: hci0 SCO packet for unknown connection handle
->>> 65532
->>> [147.364581] Bluetooth: hci0 SCO packet for unknown connection handle 27
->>> …
->> what kind of hardware where you testing with?
->
-> It was nothing special, an off-the-shelf CSR USB BT Dongle.
->
->>
->> This handle mismatch normally means that our SCO packet frames are out
->> of sync. I think we are not doing a good job trying to keep them
->> nicely lined up.
->>
->> For the crash, do you happen to have a backtrace of the crash.
->> Personally I was worried about the reset handling and not the actual
->> alternate setting switching.
->
-> Unfortunately I haven't. To be precise the first crash wasn't even a
-> crash, as everything was continuing to run, but without a working audio
-> of course. The second time my system completely froze, but due to my
-> fault I wasn't able to pull the backtrace. I'll see if I can reproduce
-> this week and send a backtrace if I manage to.
+On Tue, Oct 29, 2013 at 01:16:55PM +0100, Jakub Tyszkowski wrote:
+> This is used to report property change of already reported remote
+> device.
+> 
+> ---
+>  android/hal-bluetooth.c | 26 ++++++++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+> 
+> diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+> index 261ae85..0fef680 100644
+> --- a/android/hal-bluetooth.c
+> +++ b/android/hal-bluetooth.c
+> @@ -114,6 +114,29 @@ static void handle_device_found(void *buf)
+>  	bt_hal_cbacks->device_found_cb(ev->num_props, send_props);
+>  }
+>  
+> +static void handle_device_state_changed(void *buf)
+> +{
+> +	uint8_t i;
 
-I've been unsuccessfully trying to reproduce the system crash with an 
-iPhone 3 and a Nexus 4. Routing the Audio to the phone and back 
-occasionally leads to the observed handle mismatches, but no 
-crashes/freezes whatsoever. Sometimes the mismatch is even recovered.
+I've got comment myself that first we put variables with assignments.
 
->>
->> Regards
->>
->> Marcel
->
-> Regards,
-> Timo
+> +	struct hal_ev_remote_device_props *ev = buf;
+> +	bt_property_t send_props[ev->num_props];
+> +	struct hal_property *prop = ev->props;
+> +
+> +	if (!bt_hal_cbacks->remote_device_properties_cb)
+> +		return;
+> +
+> +	/* repack props */
+> +	for (i = 0; i < ev->num_props; ++i) {
+> +		send_props[i].type = prop->type;
+> +		send_props[i].len = prop->len;
+> +		send_props[i].val = prop->val;
+> +
+> +		prop = (void *) prop + (sizeof(*prop) + prop->len);
+> +	}
 
-Regards,
-Timo
+I would put empty line here. This looks a bit more readable then
+handle_adapter_props_changed. Do you think those 2 might have reused code?
+
+Best regards 
+Andrei Emeltchenko 
+
+
+> +	bt_hal_cbacks->remote_device_properties_cb(ev->status,
+> +						(bt_bdaddr_t *)ev->bdaddr,
+> +						ev->num_props, send_props);
+> +}
+> +
+>  /* will be called from notification thread context */
+>  void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len)
+>  {
+> @@ -133,6 +156,9 @@ void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len)
+>  	case HAL_EV_DEVICE_FOUND:
+>  		handle_device_found(buf);
+>  		break;
+> +	case HAL_EV_REMOTE_DEVICE_PROPS:
+> +		handle_device_state_changed(buf);
+> +		break;
+>  	default:
+>  		DBG("Unhandled callback opcode=0x%x", opcode);
+>  		break;
+> -- 
+> 1.8.4.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
