@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 6/9] android/hal: Print adapter property in callback
-Date: Tue, 29 Oct 2013 14:57:36 +0200
-Message-Id: <1383051459-29495-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 9/9] android: Fix build errors
+Date: Tue, 29 Oct 2013 14:57:39 +0200
+Message-Id: <1383051459-29495-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1383051459-29495-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1383051459-29495-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,23 +11,33 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+The patch fixes following issues when building:
+
+Make links to sco.h and rfcomm.h needed for Android sockets.
+...
+btio.c:39:30: fatal error: bluetooth/rfcomm.h: No such file or directory
+compilation terminated.
+...
+btio.c:40:27: fatal error: bluetooth/sco.h: No such file or directory
+compilation terminated.
+...
 ---
- android/hal-bluetooth.c |    2 ++
+ android/Android.mk |    2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 4d467ee..cc63bd9 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -65,6 +65,8 @@ static void handle_adapter_props_changed(void *buf, uint16_t len)
+diff --git a/android/Android.mk b/android/Android.mk
+index 28ec465..d8f9d0d 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -52,6 +52,8 @@ lib_headers := \
+ 	l2cap.h \
+ 	sdp_lib.h \
+ 	sdp.h \
++	rfcomm.h \
++	sco.h \
  
- 		p += sizeof(*hal_prop) + hal_prop->len;
- 		hal_prop = p;
-+
-+		DBG("prop[%d]: %s", i, btproperty2str(&props[i]));
- 	}
+ $(shell mkdir -p $(LOCAL_PATH)/../lib/bluetooth)
  
- 	bt_hal_cbacks->adapter_properties_cb(ev->status, ev->num_props, props);
 -- 
 1.7.10.4
 
