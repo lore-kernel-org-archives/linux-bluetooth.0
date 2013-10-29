@@ -1,133 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
-Subject: Re: [RFC v2 01/15] Bluetooth: Refactor hci_disconn_complete_evt
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1383053160-10175-2-git-send-email-andre.guedes@openbossa.org>
-Date: Tue, 29 Oct 2013 23:52:19 +0100
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <227F5D6B-6B76-428E-9893-37ED1562F833@holtmann.org>
-References: <1383053160-10175-1-git-send-email-andre.guedes@openbossa.org> <1383053160-10175-2-git-send-email-andre.guedes@openbossa.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
+From: Tim Tisdall <tim.tisdall@flemingcollege.ca>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: l2cap sockets not properly multiplexed on ARM
+Date: Tue, 29 Oct 2013 20:44:36 +0000
+Message-ID: <D9B9EB3A112B8F489DFFA00A6D5C0FE20324078F@AD-BR-EX-2.adroot.flemingc.local>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+on IRC:
+<lizardo> dack: it would be nice if you could provide a sample C code that shows the issue you described on the mailing list
+<lizardo> specially the arguments you are using for bind/connect/setsockopt/listen/*   (I'm assuming you are using sockets directly)
+<dack> lizardo:  unfortunately my code is a mess of C mixed with Python.   yeah, I could provide the argument details
 
-> hci_disconn_complete_evt() logic is more complicated than what it
-> should be, making it hard to follow and add new features.
-> 
-> So this patch does some code refactoring by handling the error cases
-> in the beginning of the function and by moving the main flow into the
-> first level of function scope. No change is done in the event handling
-> logic itself.
-> 
-> Besides organizing this messy code, this patch makes easier to add
-> code for handling LE auto connection (which will be added in a further
-> patch).
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
-> net/bluetooth/hci_event.c | 62 +++++++++++++++++++++++++----------------------
-> 1 file changed, 33 insertions(+), 29 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 5935f74..8b7cd37 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -1783,6 +1783,8 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> {
-> 	struct hci_ev_disconn_complete *ev = (void *) skb->data;
-> 	struct hci_conn *conn;
-> +	u8 type;
-> +	bool send_mgmt_event = false;
-> 
-> 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
-> 
-> @@ -1792,44 +1794,46 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> 	if (!conn)
-> 		goto unlock;
-> 
-> -	if (ev->status == 0)
-> -		conn->state = BT_CLOSED;
-> -
-> 	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags) &&
-> -	    (conn->type == ACL_LINK || conn->type == LE_LINK)) {
-> -		if (ev->status) {
-> +	    (conn->type == ACL_LINK || conn->type == LE_LINK))
-> +		send_mgmt_event = true;
-> +
-> +	if (ev->status) {
-> +		if (send_mgmt_event)
-> 			mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
-> 					       conn->dst_type, ev->status);
-> -		} else {
-> -			u8 reason = hci_to_mgmt_reason(ev->reason);
-> -
-> -			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
-> -						 conn->dst_type, reason);
-> -		}
-> +		return;
-> 	}
 
-so I get the feeling that mgmt_disconnect_failed should check the link type all by itself. Since we are handing it over to the function anyway. And then this send_mgmt_event could be just removed.
 
-> -	if (ev->status == 0) {
-> -		u8 type = conn->type;
-> +	conn->state = BT_CLOSED;
-> 
-> -		if (type == ACL_LINK && conn->flush_key)
-> -			hci_remove_link_key(hdev, &conn->dst);
-> -		hci_proto_disconn_cfm(conn, ev->reason);
-> -		hci_conn_del(conn);
-> +	if (send_mgmt_event) {
-> +		u8 reason = hci_to_mgmt_reason(ev->reason);
-> 
-> -		/* Re-enable advertising if necessary, since it might
-> -		 * have been disabled by the connection. From the
-> -		 * HCI_LE_Set_Advertise_Enable command description in
-> -		 * the core specification (v4.0):
-> -		 * "The Controller shall continue advertising until the Host
-> -		 * issues an LE_Set_Advertise_Enable command with
-> -		 * Advertising_Enable set to 0x00 (Advertising is disabled)
-> -		 * or until a connection is created or until the Advertising
-> -		 * is timed out due to Directed Advertising."
-> -		 */
-> -		if (type == LE_LINK)
-> -			mgmt_reenable_advertising(hdev);
-> +		mgmt_device_disconnected(hdev, &conn->dst, conn->type,
-> +					 conn->dst_type, reason);
-> 	}
+HCI sockets
+-----------
 
-Same here. Just make sure that mgmt_device_disconneted checks the link type by itself and call it unconditional.
+socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI)
+bind(device_id)  // I get device_id's from udev
+hci_le_set_scan_parameters(fd, 0, 0x10, 0x10, 0, 0, 1000)  // bluez method in the shared library
+setsockopt(SOL_HCI, HCI_FILTER, hci_filter) // I set the filter to let everything through (for testing)
+hci_le_set_scan_enable(fd, 1, 0, 1000)  // bluez method in the shared library to turn on scanning
+// I shut blocking off on the socket
+// I then use epoll to wait for events
 
-> 
-> +	if (conn->type == ACL_LINK && conn->flush_key)
-> +		hci_remove_link_key(hdev, &conn->dst);
-> +
-> +	type = conn->type;
-> +	hci_proto_disconn_cfm(conn, ev->reason);
-> +	hci_conn_del(conn);
-> +
-> +	/* Re-enable advertising if necessary, since it might
-> +	 * have been disabled by the connection. From the
-> +	 * HCI_LE_Set_Advertise_Enable command description in
-> +	 * the core specification (v4.0):
-> +	 * "The Controller shall continue advertising until the Host
-> +	 * issues an LE_Set_Advertise_Enable command with
-> +	 * Advertising_Enable set to 0x00 (Advertising is disabled)
-> +	 * or until a connection is created or until the Advertising
-> +	 * is timed out due to Directed Advertising."
-> +	 */
-> +	if (type == LE_LINK)
-> +		mgmt_reenable_advertising(hdev);
-> +
-> unlock:
-> 	hci_dev_unlock(hdev);
-> }
+L2CAP sockets
+-------------
 
-Regards
+socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP)
+bind(bdaddr, 0)  // bind to bluetooth address and PSM 0 (Python doesn't support LE directly,
+                 // but this is enough for binding to the right device
+// shut blocking off
 
-Marcel
+// next part I do in C because of the lack of support in Python...
+    PySocketSockObject *sock;  // the socket I created in Python
+    char *bdaddr;
+    int cid = 0;
+    int psm = 0;
+    int bdaddr_type = BDADDR_LE_PUBLIC;
+    int err;
+    struct sockaddr_l2 addr;
+       
 
+    // code here to set &bdaddr, &cid, &psm, &bdaddr_type
+    // from arguments passed from Python or they're
+    // left to their defaults
+
+       
+    memset(&addr, 0, sizeof(addr));
+    addr.l2_family = sock->sock_family;
+    str2ba(bdaddr, &addr.l2_bdaddr);
+    
+    if (cid)
+            addr.l2_cid = htobs(cid);
+    else
+            addr.l2_psm = htobs(psm);
+   
+    addr.l2_bdaddr_type = bdaddr_type;
+   
+   
+    err = connect(sock->sock_fd, (struct sockaddr *) &addr, sizeof(addr));
+
+// lastly use epoll to wait for events
+
+
+I then set CCC values on some attributes to get notifications of changes to sensor readings
+
+
+Results
+-------
+
+On my x86 tests:  everything works fine, notifications come down the proper L2CAP sockets
+on my ARM tests:  all notifications come down whatever L2CAP socket was established last
+
+
+I just realized I missed some fundamental details in the previous emails...
+
+bluez 4.101
+linux kernel 3.4.43 compiled with ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf on Allwinner A10 chipset
+tried on various armhf chipsets with the same results using kernel 3.0.X
