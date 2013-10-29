@@ -1,74 +1,131 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
-Subject: Re: [RFC v2 02/15] Bluetooth: Save connection interval parameters in hci_conn
+Subject: Re: [RFC v2 01/15] Bluetooth: Refactor hci_disconn_complete_evt
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1383053160-10175-3-git-send-email-andre.guedes@openbossa.org>
-Date: Tue, 29 Oct 2013 23:55:07 +0100
+In-Reply-To: <1383053160-10175-2-git-send-email-andre.guedes@openbossa.org>
+Date: Tue, 29 Oct 2013 23:52:19 +0100
 Cc: "linux-bluetooth@vger.kernel.org development"
 	<linux-bluetooth@vger.kernel.org>
-Message-Id: <42E05D26-ED0B-45CD-9443-86E0F315D40F@holtmann.org>
-References: <1383053160-10175-1-git-send-email-andre.guedes@openbossa.org> <1383053160-10175-3-git-send-email-andre.guedes@openbossa.org>
+Message-Id: <227F5D6B-6B76-428E-9893-37ED1562F833@holtmann.org>
+References: <1383053160-10175-1-git-send-email-andre.guedes@openbossa.org> <1383053160-10175-2-git-send-email-andre.guedes@openbossa.org>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-> This patch creates two new fields in struct hci_conn to save the
-> minimum and maximum connection interval values used to establish
-> the connection this object represents.
+> hci_disconn_complete_evt() logic is more complicated than what it
+> should be, making it hard to follow and add new features.
 > 
-> This change is required in order to know what parameters the
-> connection is currently using.
+> So this patch does some code refactoring by handling the error cases
+> in the beginning of the function and by moving the main flow into the
+> first level of function scope. No change is done in the event handling
+> logic itself.
+> 
+> Besides organizing this messy code, this patch makes easier to add
+> code for handling LE auto connection (which will be added in a further
+> patch).
 > 
 > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
-> include/net/bluetooth/hci_core.h | 3 +++
-> net/bluetooth/hci_conn.c         | 6 ++++--
-> 2 files changed, 7 insertions(+), 2 deletions(-)
+> net/bluetooth/hci_event.c | 62 +++++++++++++++++++++++++----------------------
+> 1 file changed, 33 insertions(+), 29 deletions(-)
 > 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 8c0ab3d..037a7b5 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -341,6 +341,9 @@ struct hci_conn {
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 5935f74..8b7cd37 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -1783,6 +1783,8 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> {
+> 	struct hci_ev_disconn_complete *ev = (void *) skb->data;
+> 	struct hci_conn *conn;
+> +	u8 type;
+> +	bool send_mgmt_event = false;
 > 
-> 	unsigned int	sent;
+> 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
 > 
-> +	__u16		conn_interval_min;
-> +	__u16		conn_interval_max;
+> @@ -1792,44 +1794,46 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> 	if (!conn)
+> 		goto unlock;
+> 
+> -	if (ev->status == 0)
+> -		conn->state = BT_CLOSED;
+> -
+> 	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags) &&
+> -	    (conn->type == ACL_LINK || conn->type == LE_LINK)) {
+> -		if (ev->status) {
+> +	    (conn->type == ACL_LINK || conn->type == LE_LINK))
+> +		send_mgmt_event = true;
 > +
+> +	if (ev->status) {
+> +		if (send_mgmt_event)
+> 			mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
+> 					       conn->dst_type, ev->status);
+> -		} else {
+> -			u8 reason = hci_to_mgmt_reason(ev->reason);
+> -
+> -			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
+> -						 conn->dst_type, reason);
+> -		}
+> +		return;
+> 	}
 
-please move these somewhere between setting and flags. I hate the clutter in these structs.
+so I get the feeling that mgmt_disconnect_failed should check the link type all by itself. Since we are handing it over to the function anyway. And then this send_mgmt_event could be just removed.
 
-And maybe prefix it with le_ and use le_conn_{min,max}_interval as we do in hdev.
-
-> 	struct sk_buff_head data_q;
-> 	struct list_head chan_list;
+> -	if (ev->status == 0) {
+> -		u8 type = conn->type;
+> +	conn->state = BT_CLOSED;
 > 
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index ba5366c..9fb7b44 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -558,8 +558,8 @@ static int hci_create_le_conn(struct hci_conn *conn)
-> 	bacpy(&cp.peer_addr, &conn->dst);
-> 	cp.peer_addr_type = conn->dst_type;
-> 	cp.own_address_type = conn->src_type;
-> -	cp.conn_interval_min = cpu_to_le16(hdev->le_conn_min_interval);
-> -	cp.conn_interval_max = cpu_to_le16(hdev->le_conn_max_interval);
-> +	cp.conn_interval_min = cpu_to_le16(conn->conn_interval_min);
-> +	cp.conn_interval_max = cpu_to_le16(conn->conn_interval_max);
-> 	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
-> 	cp.min_ce_len = __constant_cpu_to_le16(0x0000);
-> 	cp.max_ce_len = __constant_cpu_to_le16(0x0000);
-> @@ -624,6 +624,8 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
-> 	conn->sec_level = BT_SECURITY_LOW;
-> 	conn->pending_sec_level = sec_level;
-> 	conn->auth_type = auth_type;
-> +	conn->conn_interval_min = hdev->le_conn_min_interval;
-> +	conn->conn_interval_max = hdev->le_conn_max_interval;
+> -		if (type == ACL_LINK && conn->flush_key)
+> -			hci_remove_link_key(hdev, &conn->dst);
+> -		hci_proto_disconn_cfm(conn, ev->reason);
+> -		hci_conn_del(conn);
+> +	if (send_mgmt_event) {
+> +		u8 reason = hci_to_mgmt_reason(ev->reason);
 > 
+> -		/* Re-enable advertising if necessary, since it might
+> -		 * have been disabled by the connection. From the
+> -		 * HCI_LE_Set_Advertise_Enable command description in
+> -		 * the core specification (v4.0):
+> -		 * "The Controller shall continue advertising until the Host
+> -		 * issues an LE_Set_Advertise_Enable command with
+> -		 * Advertising_Enable set to 0x00 (Advertising is disabled)
+> -		 * or until a connection is created or until the Advertising
+> -		 * is timed out due to Directed Advertising."
+> -		 */
+> -		if (type == LE_LINK)
+> -			mgmt_reenable_advertising(hdev);
+> +		mgmt_device_disconnected(hdev, &conn->dst, conn->type,
+> +					 conn->dst_type, reason);
+> 	}
+
+Same here. Just make sure that mgmt_device_disconneted checks the link type by itself and call it unconditional.
+
+> 
+> +	if (conn->type == ACL_LINK && conn->flush_key)
+> +		hci_remove_link_key(hdev, &conn->dst);
+> +
+> +	type = conn->type;
+> +	hci_proto_disconn_cfm(conn, ev->reason);
+> +	hci_conn_del(conn);
+> +
+> +	/* Re-enable advertising if necessary, since it might
+> +	 * have been disabled by the connection. From the
+> +	 * HCI_LE_Set_Advertise_Enable command description in
+> +	 * the core specification (v4.0):
+> +	 * "The Controller shall continue advertising until the Host
+> +	 * issues an LE_Set_Advertise_Enable command with
+> +	 * Advertising_Enable set to 0x00 (Advertising is disabled)
+> +	 * or until a connection is created or until the Advertising
+> +	 * is timed out due to Directed Advertising."
+> +	 */
+> +	if (type == LE_LINK)
+> +		mgmt_reenable_advertising(hdev);
+> +
+> unlock:
+> 	hci_dev_unlock(hdev);
+> }
 
 Regards
 
