@@ -1,70 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1383042118-21205-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1382957047-31775-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1383042118-21205-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Tue, 29 Oct 2013 12:43:32 +0100
-Message-ID: <CAHCYCoz4tSeimwrwVNENWsGf-ZDq9Huq9jB9dOgwccrPiF8Fow@mail.gmail.com>
-Subject: Re: [PATCHv2 0/9] Improve logging for Android
-From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
+Subject: Re: Intel 7260 bluetooth malfunction when it is connected to EHCI bus
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <526F8804.9060906@canonical.com>
+Date: Tue, 29 Oct 2013 12:16:58 +0100
+Cc: Tedd An <tedd.an@intel.com>,
+	Johan Hedberg <johan.hedberg@intel.com>,
+	xiong.y.zhang@intel.com,
+	"Gustavo F. Padovan" <gustavo.padovan@collabora.co.uk>,
+	"linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <A07820C9-C272-4AD4-AE16-49F81956C2D7@holtmann.org>
+References: <526F8804.9060906@canonical.com>
+To: Hui Wang <hui.wang@canonical.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Hui,
 
-On 29 October 2013 11:21, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Changes:
->         *v2: Added thread-safe helpers for printing properties, bdaddr, etc
->         after comments that simple printing is not thread-safe. The idea is to
->         use TLS (thread local storage) like bionic is doing for strerror for
+> The problem is:
+> On the machine which has Intel 7260 BT module, i use it to connect a bluetooth headset,
+> it can successfully scan and connect to the headset, when i play sound to the bt headset,
+> the problem comes, if the bt module is connected to the XHCI, it can work very well.
+> 
+> u@u-Lenovo-B4400:~$ lsusb -t
+> 1-7:1.0: No such file or directory
+> /: Bus 02.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/4p, 5000M
+> /: Bus 01.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/14p, 480M
+>    |__ Port 6: Dev 8, If 0, Class=HID, Driver=usbhid, 1.5M
+>    |__ Port 7: Dev 2, If 0, Class=vend., Driver=, 12M
+>    |__ Port 11: Dev 3, If 0, Class='bInterfaceClass 0xe0 not yet handled', Driver=btusb, 12M
+>    |__ Port 11: Dev 3, If 1, Class='bInterfaceClass 0xe0 not yet handled', Driver=btusb, 12M
+> 
+> But if the bt module is connected to the EHCI, it always fails to play sound.
+> 
+> u@u-Lenovo-B4400:~$ lsusb -t
+> /: Bus 04.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/4p, 5000M
+> /: Bus 03.Port 1: Dev 1, Class=root_hub, Driver=xhci_hcd/14p, 480M
+> /: Bus 02.Port 1: Dev 1, Class=root_hub, Driver=ehci_hcd/3p, 480M
+>    |__ Port 1: Dev 2, If 0, Class=hub, Driver=hub/8p, 480M
+> /: Bus 01.Port 1: Dev 1, Class=root_hub, Driver=ehci_hcd/3p, 480M
+>    |__ Port 1: Dev 2, If 0, Class=hub, Driver=hub/6p, 480M
+>        |__ Port 5: Dev 3, If 0, Class='bInterfaceClass 0xe0 not yet handled', Driver=btusb, 12M
+>        |__ Port 5: Dev 3, If 1, Class='bInterfaceClass 0xe0 not yet handled', Driver=btusb, 12M
+>        |__ Port 6: Dev 4, If 0, Class='bInterfaceClass 0x0e not yet handled', Driver=uvcvideo, 480M
+>        |__ Port 6: Dev 4, If 1, Class='bInterfaceClass 0x0e not yet handled', Driver=uvcvideo, 480M
 
-Implementation of strerror in bionic and what is proposed here is
-thread safe but not
-useful if one wants to use one print to for two addresses or two
-properties (one buffer
-in one thread for two strings).
+can you paste /sys/kernel/debug/usb/devices here.
 
-In my opinion there should be safe functions that explicitly get
-string buffer as
-argument. For address and uuid they already exist, property printing
-was used in haltest
-only in one place and moving buffer form btproperty2str to function
-that calls it
-makes sense to me.
+If the uvcvideo driver is also using ISOC URBs, we might have just exhausted the bandwidth of the USB bus here or these two devices just do not play nice with each other.
 
-If there is need for shortcut as for code lines that could be removed
-in compilation,
-wrapper function with pthread stuff can still be used (provided that
-there is no same
-type conversion call used in one print)
+Try to unload the uvcvideo driver and try it again.
 
-BTW strerror() works fine when called with value in range 0..131.
-But when you call it with higher number there will be a problem
-printf("%s\n%s\n\%s\n%s\n", strerror(1), strerror(2), strerror(132),
-strerror(133));
-prints:
-Operation not permitted
-No such file or directory
-Unknown error 133
-Unknown error 133
+Regards
 
->         example. More info can be found on manpage for pthread_key_create.
->
-> This patch series uses debug functions defined already for haltest and
-> allows to print very helpful logs on Android target like shown below:
->
-> ...
-> hal-bluetooth.c:set_adapter_property() prop: type=BT_PROPERTY_ADAPTER_SCAN_MODE len=4 val=BT_SCAN_MODE_NONE
-> ...
->
-> Andrei Emeltchenko (9):
-...
+Marcel
 
--- 
-Jerzy
