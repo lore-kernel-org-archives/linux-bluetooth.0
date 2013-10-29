@@ -1,140 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3] android: Add README file with instructions
-Date: Tue, 29 Oct 2013 14:36:45 +0100
-Message-ID: <1383053805-17320-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
+Subject: Re: [PATCH] android/daemon: Solves warnings when compiling for Android
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1383053394-22664-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 29 Oct 2013 14:34:43 +0100
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <7DDFBD1F-03E5-469A-9609-4F336890D521@holtmann.org>
+References: <1383053394-22664-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This file cotains help on how BlueZ for Android should be build, run
-and test. Some hints and examples on how BlueZ can be intergrated into
-Android are present as well.
----
-v3:
- - fixed init service issues pointer by Andrei
- - clarify that bluetoothd needs to be whitelisted to be started by
-   bluetooth user
- - note about haltest being also usable on Linux PC
+Hi Andrei,
 
- android/Makefile.am |  2 +-
- android/README      | 90 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 91 insertions(+), 1 deletion(-)
- create mode 100644 android/README
+> When compiling for Android I get very annoying warnings shown below.
+> Though the issue is with android this really helps to clear Android
+> build screen.
+> 
+> external/bluetooth/bluez/android/main.c: In function 'cmd_watch_cb':
+> external/bluetooth/bluez/android/main.c:192:3: warning: format '%zd' expects
+>  argument of type 'signed size_t', but argument 2 has type 'ssize_t' [-Wformat]
+> external/bluetooth/bluez/android/main.c:197:3: warning: format '%zd' expects
+>  argument of type 'signed size_t', but argument 2 has type 'ssize_t' [-Wformat]
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 22002be..5690e93 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -96,7 +96,7 @@ EXTRA_DIST += android/client/terminal.c \
- 		android/client/history.h \
- 		android/client/terminal.h
- 
--EXTRA_DIST += android/hal-ipc-api.txt
-+EXTRA_DIST += android/hal-ipc-api.txt android/README
- 
- EXTRA_DIST += android/hardware/bluetooth.h \
- 		android/hardware/bt_av.h \
-diff --git a/android/README b/android/README
-new file mode 100644
-index 0000000..3614026
---- /dev/null
-+++ b/android/README
-@@ -0,0 +1,90 @@
-+BlueZ for Android
-+*****************
-+
-+Since Android 4.2 there exists a well standardized HAL interface that the
-+Bluetooth stack is expected to provide and which enables the easy replacement
-+of the stack of choice on Android. Android BlueZ is intended as a drop-in
-+replacement to Android provided Bluetooth stack.
-+
-+More details about BlueZ for Android architecture and components can be found
-+in android/hal-apc-api.txt file.
-+
-+===============================
-+Building and running on Android
-+===============================
-+
-+Build requirements
-+==================
-+
-+- GLib - Android 4.2 or later don't provide GLib and one must provide it in
-+'external/bluetooth/glib' folder of Android tree. Sample Android GLib port
-+is available at https://code.google.com/p/android-bluez.glib/
-+
-+- Bionic support - BlueZ requires signalfd and timerfd APIs to be provided
-+by libc library. Currently only 'master' branch available at
-+https://android.googlesource.com/platform/bionic provides all required
-+functionality and running BlueZ on older branch requires backporting missing
-+features. Sample Bionic for Android on Intel Architecture (Android-IA) with all
-+required features backported is available at
-+https://code.google.com/p/android-bluez.bionic/
-+
-+Runtime requirements
-+====================
-+
-+BlueZ HAL library requires 'bluetoothd' service to be available on Android
-+system. This can be done by defining service in init.rc file of targeted board:
-+
-+service bluetoothd /system/bin/logwrapper /system/bin/bluetoothd
-+  class main
-+  group bluetooth net_admin
-+  disabled
-+  oneshot
-+
-+It is required that bluetooth user could start and stop bluetoothd service by
-+setting 'ctl.start' or 'ctl.stop' property. This can be achieved by
-+whitelisting bluetooth user and bluetoothd service in init source code.
-+
-+Required Android init system modifications can be found at
-+https://code.google.com/p/android-bluez.system-core/
-+
-+Downloading and building
-+========================
-+
-+Building for Android requires full Android AOSP source tree. Sample Android-IA
-+tree with all required components present is available at
-+http://code.google.com/p/android-bluez/
-+
-+Downloading:
-+repo init -u https://code.google.com/p/android-bluez.manifest/ -m topics/bluez
-+repo sync
-+
-+Build for Intel ultrabook:
-+'source build/envsetup.sh'
-+'lunch core_mesa-eng'
-+'make allimages -j8'
-+
-+After full build is done it is possible to rebuild only BlueZ:
-+'cd external/bluetooth/bluez/android/'
-+'mm' (or 'mm -B' to force rebuilding of all files)
-+'adb sync' to update target device.
-+
-+=============================
-+Building and running on Linux
-+=============================
-+
-+It is possible to build and test BlueZ for Android daemon on Linux (eg. PC).
-+Simply follow instructions available at README file in BlueZ top directory.
-+Android daemon binary is located at android/bluetoothd. See next section on
-+how to test Android daemon on Linux.
-+
-+=======
-+Testing
-+=======
-+
-+BT HAL test tools located in android/haltest is provided for HAL level testing
-+of both Android daemon and HAL library. Start it and type 'adapter init' in
-+prompt to initialize HAL library. On Android required bluetoothd service will
-+be started automatically. On Linux it is required to start android/bluetoothd
-+manually before init command timeout. To deinitialize HAL library and stop
-+daemon type 'adapter cleanup'. Type 'help' for more information. Tab completion
-+is also supported.
-\ No newline at end of file
--- 
-1.8.4.1
+do we actually know piece inside Android is causing this stupid warning. Is this a bug in bionic and should be fixed.
+
+> ---
+> Let me know if this solution is OK and I will change other parts as well.
+> 
+> android/main.c |    6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/android/main.c b/android/main.c
+> index 6ff30a9..63c9eda 100644
+> --- a/android/main.c
+> +++ b/android/main.c
+> @@ -171,7 +171,7 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
+> {
+> 	char buf[BLUEZ_HAL_MTU];
+> 	struct hal_hdr *msg = (void *) buf;
+> -	ssize_t ret;
+> +	int ret;
+> 	int fd;
+> 
+> 	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
+> @@ -189,12 +189,12 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
+> 	}
+> 
+> 	if (ret < (ssize_t) sizeof(*msg)) {
+
+And why is this cast still ssize_t.
+
+> -		error("HAL command too small, terminating (%zd)", ret);
+> +		error("HAL command too small, terminating (%d)", ret);
+> 		goto fail;
+> 	}
+> 
+> 	if (ret != (ssize_t) (sizeof(*msg) + msg->len)) {
+
+And here as well.
+
+> -		error("Malformed HAL command (%zd bytes), terminating", ret);
+> +		error("Malformed HAL command (%d bytes), terminating", ret);
+> 		goto fail;
+> 	}
+
+Regards
+
+Marcel
 
