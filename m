@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 2/9] android/haltest: Use pointer as parameter for debug
-Date: Tue, 29 Oct 2013 14:57:32 +0200
-Message-Id: <1383051459-29495-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 1/9] android/haltest: Export print property
+Date: Tue, 29 Oct 2013 14:57:31 +0200
+Message-Id: <1383051459-29495-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1383051459-29495-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1383051459-29495-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,140 +11,273 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Pass structure as pointer. This makes it consistent with the rest of
-the code and helps to reuse this function in other parts.
+Export property printing debug function.
 ---
- android/client/if-bt.c    |    2 +-
- android/client/textconv.c |   36 ++++++++++++++++++------------------
- android/client/textconv.h |    2 +-
- 3 files changed, 20 insertions(+), 20 deletions(-)
+ android/client/if-bt.c    |  110 ---------------------------------------------
+ android/client/textconv.c |  110 +++++++++++++++++++++++++++++++++++++++++++++
+ android/client/textconv.h |    3 ++
+ 3 files changed, 113 insertions(+), 110 deletions(-)
 
 diff --git a/android/client/if-bt.c b/android/client/if-bt.c
-index e9edec5..cbb828b 100644
+index a20a7c6..e9edec5 100644
 --- a/android/client/if-bt.c
 +++ b/android/client/if-bt.c
-@@ -74,7 +74,7 @@ static void dump_properties(int num_properties, bt_property_t *properties)
- 		bt_property_t prop;
- 		memcpy(&prop, properties + i, sizeof(prop));
+@@ -29,20 +29,6 @@ const bt_interface_t *if_bluetooth;
+ 		} \
+ 	} while (0)
  
--		haltest_info("prop: %s\n", btproperty2str(prop));
-+		haltest_info("prop: %s\n", btproperty2str(&prop));
- 	}
- }
- 
-diff --git a/android/client/textconv.c b/android/client/textconv.c
-index 8f27948..1dc6ad0 100644
---- a/android/client/textconv.c
-+++ b/android/client/textconv.c
-@@ -241,52 +241,52 @@ static char *btuuid2str(const bt_uuid_t *uuid)
- 	return bt_uuid_t2str(uuid, buf);
- }
- 
--char *btproperty2str(bt_property_t property)
-+char *btproperty2str(const bt_property_t *property)
+-static char *bdaddr2str(const bt_bdaddr_t *bd_addr)
+-{
+-	static char buf[MAX_ADDR_STR_LEN];
+-
+-	return bt_bdaddr_t2str(bd_addr, buf);
+-}
+-
+-static char *btuuid2str(const bt_uuid_t *uuid)
+-{
+-	static char buf[MAX_UUID_STR_LEN];
+-
+-	return bt_uuid_t2str(uuid, buf);
+-}
+-
+ static bt_scan_mode_t str2btscanmode(const char *str)
  {
- 	static char buf[4096];
- 	char *p;
+ 	bt_scan_mode_t v = str2bt_scan_mode_t(str);
+@@ -76,102 +62,6 @@ static bt_property_type_t str2btpropertytype(const char *str)
+ 	return (bt_property_type_t) atoi(str);
+ }
  
- 	p = buf + sprintf(buf, "type=%s len=%d val=",
+-static char *btproperty2str(bt_property_t property)
+-{
+-	static char buf[4096];
+-	char *p;
+-
+-	p = buf + sprintf(buf, "type=%s len=%d val=",
 -					bt_property_type_t2str(property.type),
 -					property.len);
-+					bt_property_type_t2str(property->type),
-+					property->len);
- 
+-
 -	switch (property.type) {
-+	switch (property->type) {
- 	case BT_PROPERTY_BDNAME:
- 	case BT_PROPERTY_REMOTE_FRIENDLY_NAME:
+-	case BT_PROPERTY_BDNAME:
+-	case BT_PROPERTY_REMOTE_FRIENDLY_NAME:
 -		sprintf(p, "%*s", property.len,
 -					((bt_bdname_t *) property.val)->name);
-+		sprintf(p, "%*s", property->len,
-+					((bt_bdname_t *) property->val)->name);
- 		break;
- 
- 	case BT_PROPERTY_BDADDR:
+-		break;
+-
+-	case BT_PROPERTY_BDADDR:
 -		sprintf(p, "%s", bdaddr2str((bt_bdaddr_t *) property.val));
-+		sprintf(p, "%s", bdaddr2str((bt_bdaddr_t *) property->val));
- 		break;
- 
- 	case BT_PROPERTY_CLASS_OF_DEVICE:
+-		break;
+-
+-	case BT_PROPERTY_CLASS_OF_DEVICE:
 -		sprintf(p, "%06x", *((int *) property.val));
-+		sprintf(p, "%06x", *((int *) property->val));
- 		break;
- 
- 	case BT_PROPERTY_TYPE_OF_DEVICE:
- 		sprintf(p, "%s", bt_device_type_t2str(
+-		break;
+-
+-	case BT_PROPERTY_TYPE_OF_DEVICE:
+-		sprintf(p, "%s", bt_device_type_t2str(
 -					*((bt_device_type_t *) property.val)));
-+				*((bt_device_type_t *) property->val)));
- 		break;
- 
- 	case BT_PROPERTY_REMOTE_RSSI:
+-		break;
+-
+-	case BT_PROPERTY_REMOTE_RSSI:
 -		sprintf(p, "%d", *((char *) property.val));
-+		sprintf(p, "%d", *((char *) property->val));
- 		break;
- 
- 	case BT_PROPERTY_ADAPTER_SCAN_MODE:
- 		sprintf(p, "%s",
+-		break;
+-
+-	case BT_PROPERTY_ADAPTER_SCAN_MODE:
+-		sprintf(p, "%s",
 -			bt_scan_mode_t2str(*((bt_scan_mode_t *) property.val)));
-+			bt_scan_mode_t2str(*((bt_scan_mode_t *) property->val)));
- 		break;
- 
- 	case BT_PROPERTY_ADAPTER_DISCOVERY_TIMEOUT:
+-		break;
+-
+-	case BT_PROPERTY_ADAPTER_DISCOVERY_TIMEOUT:
 -		sprintf(p, "%d", *((int *) property.val));
-+		sprintf(p, "%d", *((int *) property->val));
- 		break;
- 
- 	case BT_PROPERTY_ADAPTER_BONDED_DEVICES:
- 		{
+-		break;
+-
+-	case BT_PROPERTY_ADAPTER_BONDED_DEVICES:
+-		{
 -			int count = property.len / sizeof(bt_bdaddr_t);
 -			char *ptr = property.val;
-+			int count = property->len / sizeof(bt_bdaddr_t);
-+			char *ptr = property->val;
- 
- 			strcat(p, "{");
- 
-@@ -304,8 +304,8 @@ char *btproperty2str(bt_property_t property)
- 
- 	case BT_PROPERTY_UUIDS:
- 		{
+-
+-			strcat(p, "{");
+-
+-			while (count--) {
+-				strcat(p, bdaddr2str((bt_bdaddr_t *) ptr));
+-				if (count)
+-					strcat(p, ", ");
+-				ptr += sizeof(bt_bdaddr_t);
+-			}
+-
+-			strcat(p, "}");
+-
+-		}
+-		break;
+-
+-	case BT_PROPERTY_UUIDS:
+-		{
 -			int count = property.len / sizeof(bt_uuid_t);
 -			char *ptr = property.val;
-+			int count = property->len / sizeof(bt_uuid_t);
-+			char *ptr = property->val;
- 
- 			strcat(p, "{");
- 
-@@ -323,7 +323,7 @@ char *btproperty2str(bt_property_t property)
- 
- 	case BT_PROPERTY_SERVICE_RECORD:
- 		{
+-
+-			strcat(p, "{");
+-
+-			while (count--) {
+-				strcat(p, btuuid2str((bt_uuid_t *) ptr));
+-				if (count)
+-					strcat(p, ", ");
+-				ptr += sizeof(bt_uuid_t);
+-			}
+-
+-			strcat(p, "}");
+-
+-		}
+-		break;
+-
+-	case BT_PROPERTY_SERVICE_RECORD:
+-		{
 -			bt_service_record_t *rec = property.val;
-+			bt_service_record_t *rec = property->val;
- 
- 			sprintf(p, "{%s, %d, %s}", btuuid2str(&rec->uuid),
- 						rec->channel, rec->name);
-@@ -331,7 +331,7 @@ char *btproperty2str(bt_property_t property)
- 		break;
- 
- 	default:
+-
+-			sprintf(p, "{%s, %d, %s}", btuuid2str(&rec->uuid),
+-						rec->channel, rec->name);
+-		}
+-		break;
+-
+-	default:
 -		sprintf(p, "%p", property.val);
-+		sprintf(p, "%p", property->val);
- 	}
+-	}
+-
+-	return buf;
+-}
+-
+ static void dump_properties(int num_properties, bt_property_t *properties)
+ {
+ 	int i;
+diff --git a/android/client/textconv.c b/android/client/textconv.c
+index 32b1cab..8f27948 100644
+--- a/android/client/textconv.c
++++ b/android/client/textconv.c
+@@ -226,3 +226,113 @@ const char *enum_one_string(void *v, int i)
  
- 	return buf;
+ 	return (i == 0) && (m[0] != 0) ? m : NULL;
+ }
++
++char *bdaddr2str(const bt_bdaddr_t *bd_addr)
++{
++	static char buf[MAX_ADDR_STR_LEN];
++
++	return bt_bdaddr_t2str(bd_addr, buf);
++}
++
++static char *btuuid2str(const bt_uuid_t *uuid)
++{
++	static char buf[MAX_UUID_STR_LEN];
++
++	return bt_uuid_t2str(uuid, buf);
++}
++
++char *btproperty2str(bt_property_t property)
++{
++	static char buf[4096];
++	char *p;
++
++	p = buf + sprintf(buf, "type=%s len=%d val=",
++					bt_property_type_t2str(property.type),
++					property.len);
++
++	switch (property.type) {
++	case BT_PROPERTY_BDNAME:
++	case BT_PROPERTY_REMOTE_FRIENDLY_NAME:
++		sprintf(p, "%*s", property.len,
++					((bt_bdname_t *) property.val)->name);
++		break;
++
++	case BT_PROPERTY_BDADDR:
++		sprintf(p, "%s", bdaddr2str((bt_bdaddr_t *) property.val));
++		break;
++
++	case BT_PROPERTY_CLASS_OF_DEVICE:
++		sprintf(p, "%06x", *((int *) property.val));
++		break;
++
++	case BT_PROPERTY_TYPE_OF_DEVICE:
++		sprintf(p, "%s", bt_device_type_t2str(
++					*((bt_device_type_t *) property.val)));
++		break;
++
++	case BT_PROPERTY_REMOTE_RSSI:
++		sprintf(p, "%d", *((char *) property.val));
++		break;
++
++	case BT_PROPERTY_ADAPTER_SCAN_MODE:
++		sprintf(p, "%s",
++			bt_scan_mode_t2str(*((bt_scan_mode_t *) property.val)));
++		break;
++
++	case BT_PROPERTY_ADAPTER_DISCOVERY_TIMEOUT:
++		sprintf(p, "%d", *((int *) property.val));
++		break;
++
++	case BT_PROPERTY_ADAPTER_BONDED_DEVICES:
++		{
++			int count = property.len / sizeof(bt_bdaddr_t);
++			char *ptr = property.val;
++
++			strcat(p, "{");
++
++			while (count--) {
++				strcat(p, bdaddr2str((bt_bdaddr_t *) ptr));
++				if (count)
++					strcat(p, ", ");
++				ptr += sizeof(bt_bdaddr_t);
++			}
++
++			strcat(p, "}");
++
++		}
++		break;
++
++	case BT_PROPERTY_UUIDS:
++		{
++			int count = property.len / sizeof(bt_uuid_t);
++			char *ptr = property.val;
++
++			strcat(p, "{");
++
++			while (count--) {
++				strcat(p, btuuid2str((bt_uuid_t *) ptr));
++				if (count)
++					strcat(p, ", ");
++				ptr += sizeof(bt_uuid_t);
++			}
++
++			strcat(p, "}");
++
++		}
++		break;
++
++	case BT_PROPERTY_SERVICE_RECORD:
++		{
++			bt_service_record_t *rec = property.val;
++
++			sprintf(p, "{%s, %d, %s}", btuuid2str(&rec->uuid),
++						rec->channel, rec->name);
++		}
++		break;
++
++	default:
++		sprintf(p, "%p", property.val);
++	}
++
++	return buf;
++}
 diff --git a/android/client/textconv.h b/android/client/textconv.h
-index 89b29c6..1c848ef 100644
+index 085b141..89b29c6 100644
 --- a/android/client/textconv.h
 +++ b/android/client/textconv.h
-@@ -107,7 +107,7 @@ void str2bt_bdaddr_t(const char *str, bt_bdaddr_t *bd_addr);
+@@ -107,6 +107,9 @@ void str2bt_bdaddr_t(const char *str, bt_bdaddr_t *bd_addr);
  char *bt_uuid_t2str(const bt_uuid_t *uuid, char *buf);
  void str2bt_uuid_t(const char *str, bt_uuid_t *uuid);
  
--char *btproperty2str(bt_property_t property);
-+char *btproperty2str(const bt_property_t *property);
- char *bdaddr2str(const bt_bdaddr_t *bd_addr);
- 
++char *btproperty2str(bt_property_t property);
++char *bdaddr2str(const bt_bdaddr_t *bd_addr);
++
  DECINTMAP(bt_status_t);
+ DECINTMAP(bt_state_t);
+ DECINTMAP(bt_device_type_t);
 -- 
 1.7.10.4
 
