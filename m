@@ -1,27 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 Oct 2013 15:06:33 +0200
+Date: Tue, 29 Oct 2013 15:05:12 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 1/2] android/hal: Add support for handling pin request
- event
-Message-ID: <20131029130633.GB12758@x220.p-661hnu-f1>
-References: <1383050945-7984-1-git-send-email-szymon.janc@tieto.com>
+Subject: Re: [PATCH] android: Fix build errors
+Message-ID: <20131029130512.GA12758@x220.p-661hnu-f1>
+References: <1383050922-27758-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383050945-7984-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1383050922-27758-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Andrei,
 
-On Tue, Oct 29, 2013, Szymon Janc wrote:
-> ---
-> v4: Added comment clarifying that pointer casting is safe here
+On Tue, Oct 29, 2013, Andrei Emeltchenko wrote:
+> The patch fixes following issues when building:
 > 
->  android/hal-bluetooth.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
+> Make links to sco.h and rfcomm.h needed for Android sockets.
+> ...
+> btio.c:39:30: fatal error: bluetooth/rfcomm.h: No such file or directory
+> compilation terminated.
+> ...
+> btio.c:40:27: fatal error: bluetooth/sco.h: No such file or directory
+> compilation terminated.
+> ...
+> ---
+>  android/Android.mk |    2 ++
+>  1 file changed, 2 insertions(+)
 
-Both patches have been applied. Thanks.
+Applied. Thanks.
 
 Johan
