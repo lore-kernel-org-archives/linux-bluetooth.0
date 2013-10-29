@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 4/5] android/hal: Add support for handling pin request event
-Date: Tue, 29 Oct 2013 11:16:28 +0100
-Message-ID: <1383041789-28360-4-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2 5/5] android/hal: Add support for handling SSP request event
+Date: Tue, 29 Oct 2013 11:16:29 +0100
+Message-ID: <1383041789-28360-5-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1383041789-28360-1-git-send-email-szymon.janc@tieto.com>
 References: <1383041789-28360-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -13,36 +13,38 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-bluetooth.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ android/hal-bluetooth.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
 diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 067f420..43db8cb 100644
+index 43db8cb..0c9e8c8 100644
 --- a/android/hal-bluetooth.c
 +++ b/android/hal-bluetooth.c
-@@ -79,6 +79,16 @@ static void handle_bond_state_change(void *buf)
- 	bt_hal_cbacks->bond_state_changed_cb(ev->status, addr, ev->state);
+@@ -89,6 +89,18 @@ static void handle_pin_request(void *buf)
+ 		bt_hal_cbacks->pin_request_cb(addr, name, ev->class_of_dev);
  }
  
-+static void handle_pin_request(void *buf)
++static void handle_ssp_request(void *buf)
 +{
-+	struct hal_ev_pin_request *ev = buf;
++	struct hal_ev_ssp_request *ev = buf;
 +	bt_bdaddr_t *addr = (bt_bdaddr_t *) ev->bdaddr;
 +	bt_bdname_t *name = (bt_bdname_t *) ev->name;
 +
-+	if (bt_hal_cbacks->pin_request_cb)
-+		bt_hal_cbacks->pin_request_cb(addr, name, ev->class_of_dev);
++	if (bt_hal_cbacks->ssp_request_cb)
++		bt_hal_cbacks->ssp_request_cb(addr, name, ev->class_of_dev,
++							ev->pairing_variant,
++							ev->passkey);
 +}
 +
  void bt_thread_associate(void)
  {
  	if (bt_hal_cbacks->thread_evt_cb)
-@@ -112,6 +122,9 @@ void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len)
- 	case HAL_EV_BOND_STATE_CHANGED:
- 		handle_bond_state_change(buf);
+@@ -125,6 +137,9 @@ void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len)
+ 	case HAL_EV_PIN_REQUEST:
+ 		handle_pin_request(buf);
  		break;
-+	case HAL_EV_PIN_REQUEST:
-+		handle_pin_request(buf);
++	case HAL_EV_SSP_REQUEST:
++		handle_ssp_request(buf);
 +		break;
  	default:
  		DBG("Unhandled callback opcode=0x%x", opcode);
