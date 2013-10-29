@@ -1,48 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 0/9] Improve logging for Android
-Date: Tue, 29 Oct 2013 12:21:49 +0200
-Message-Id: <1383042118-21205-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1382957047-31775-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 6/9] android/hal: Print adapter state
+Date: Tue, 29 Oct 2013 12:21:55 +0200
+Message-Id: <1383042118-21205-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1383042118-21205-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1382957047-31775-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1383042118-21205-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Changes:
-	*v2: Added thread-safe helpers for printing properties, bdaddr, etc
-	after comments that simple printing is not thread-safe. The idea is to
-	use TLS (thread local storage) like bionic is doing for strerror for
-	example. More info can be found on manpage for pthread_key_create.
+---
+ android/hal-bluetooth.c |    2 ++
+ 1 file changed, 2 insertions(+)
 
-This patch series uses debug functions defined already for haltest and
-allows to print very helpful logs on Android target like shown below:
-
-...
-hal-bluetooth.c:set_adapter_property() prop: type=BT_PROPERTY_ADAPTER_SCAN_MODE len=4 val=BT_SCAN_MODE_NONE
-...
-
-Andrei Emeltchenko (9):
-  android/haltest: Export print property
-  android/haltest: Fix compile error making function static
-  android/haltest: Use pointer as parameter for debug
-  android/hal: Print full property in debug
-  android/hal: Add extra logs
-  android/hal: Print adapter state
-  android/hal: Print adapter property in callback
-  android: Add thread-safe helpers
-  android: Use thread-safe helpers
-
- android/client/if-bt.c    |  112 +------------------------------------------
- android/client/textconv.c |  115 +++++++++++++++++++++++++++++++++++++++++++++
- android/client/textconv.h |    3 ++
- android/hal-bluetooth.c   |   28 ++++++-----
- android/pthread-local.h   |   58 +++++++++++++++++++++++
- 5 files changed, 194 insertions(+), 122 deletions(-)
- create mode 100644 android/pthread-local.h
-
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index 81e23cb..4dbfeec 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -33,6 +33,8 @@ static void handle_adapter_state_changed(void *buf)
+ {
+ 	struct hal_ev_adapter_state_changed *ev = buf;
+ 
++	DBG("state: %s", bt_state_t2str(ev->state));
++
+ 	if (bt_hal_cbacks->adapter_state_changed_cb)
+ 		bt_hal_cbacks->adapter_state_changed_cb(ev->state);
+ }
 -- 
 1.7.10.4
 
