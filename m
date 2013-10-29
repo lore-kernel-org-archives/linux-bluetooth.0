@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 8/9] android: Use thread-safe helpers
-Date: Tue, 29 Oct 2013 14:57:38 +0200
-Message-Id: <1383051459-29495-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 4/9] android/hal: Add extra logs
+Date: Tue, 29 Oct 2013 14:57:34 +0200
+Message-Id: <1383051459-29495-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1383051459-29495-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1383051459-29495-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,63 +11,107 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Make use of thread-safe helpers.
+Add extra log prints for printing properties and bluetooth addresses.
 ---
- android/client/textconv.c |   15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+ android/hal-bluetooth.c |   22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/android/client/textconv.c b/android/client/textconv.c
-index 1dc6ad0..effd1b3 100644
---- a/android/client/textconv.c
-+++ b/android/client/textconv.c
-@@ -19,6 +19,8 @@
- #include <stdio.h>
- #include <hardware/bluetooth.h>
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index 0b46465..85ccded 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -266,7 +266,7 @@ static int set_adapter_property(const bt_property_t *property)
  
-+#include "../pthread-local.h"
-+
- #include "textconv.h"
- 
- /*
-@@ -227,11 +229,12 @@ const char *enum_one_string(void *v, int i)
- 	return (i == 0) && (m[0] != 0) ? m : NULL;
- }
- 
-+GLOBAL_INIT_THREAD_LOCAL_BUFFER(bdaddr);
- char *bdaddr2str(const bt_bdaddr_t *bd_addr)
+ static int get_remote_device_properties(bt_bdaddr_t *remote_addr)
  {
--	static char buf[MAX_ADDR_STR_LEN];
-+	LOCAL_INIT_THREAD_LOCAL_BUFFER(char*, bdaddr, MAX_ADDR_STR_LEN);
+-	DBG("");
++	DBG("bdaddr: %s", bdaddr2str(remote_addr));
  
--	return bt_bdaddr_t2str(bd_addr, buf);
-+	return bt_bdaddr_t2str(bd_addr, bdaddr_tls_buffer);
- }
- 
- static char *btuuid2str(const bt_uuid_t *uuid)
-@@ -241,12 +244,14 @@ static char *btuuid2str(const bt_uuid_t *uuid)
- 	return bt_uuid_t2str(uuid, buf);
- }
- 
-+GLOBAL_INIT_THREAD_LOCAL_BUFFER(property);
- char *btproperty2str(const bt_property_t *property)
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+@@ -277,7 +277,8 @@ static int get_remote_device_properties(bt_bdaddr_t *remote_addr)
+ static int get_remote_device_property(bt_bdaddr_t *remote_addr,
+ 						bt_property_type_t type)
  {
--	static char buf[4096];
- 	char *p;
-+	LOCAL_INIT_THREAD_LOCAL_BUFFER(char*, property, 4096);
+-	DBG("");
++	DBG("bdaddr: %s prop: %s", bdaddr2str(remote_addr),
++						bt_property_type_t2str(type));
  
--	p = buf + sprintf(buf, "type=%s len=%d val=",
-+	p = property_tls_buffer + sprintf(property_tls_buffer,
-+					"type=%s len=%d val=",
- 					bt_property_type_t2str(property->type),
- 					property->len);
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+@@ -288,7 +289,8 @@ static int get_remote_device_property(bt_bdaddr_t *remote_addr,
+ static int set_remote_device_property(bt_bdaddr_t *remote_addr,
+ 						const bt_property_t *property)
+ {
+-	DBG("");
++	DBG("bdaddr: %s prop: %s", bdaddr2str(remote_addr),
++						btproperty2str(property));
  
-@@ -334,5 +339,5 @@ char *btproperty2str(const bt_property_t *property)
- 		sprintf(p, "%p", property->val);
- 	}
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+@@ -298,7 +300,7 @@ static int set_remote_device_property(bt_bdaddr_t *remote_addr,
  
--	return buf;
-+	return property_tls_buffer;
- }
+ static int get_remote_service_record(bt_bdaddr_t *remote_addr, bt_uuid_t *uuid)
+ {
+-	DBG("");
++	DBG("bdaddr: %s", bdaddr2str(remote_addr));
+ 
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+@@ -308,7 +310,7 @@ static int get_remote_service_record(bt_bdaddr_t *remote_addr, bt_uuid_t *uuid)
+ 
+ static int get_remote_services(bt_bdaddr_t *remote_addr)
+ {
+-	DBG("");
++	DBG("bdaddr: %s", bdaddr2str(remote_addr));
+ 
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+@@ -340,7 +342,7 @@ static int create_bond(const bt_bdaddr_t *bd_addr)
+ {
+ 	struct hal_cmd_create_bond cmd;
+ 
+-	DBG("");
++	DBG("bdaddr: %s", bdaddr2str(bd_addr));
+ 
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+@@ -355,7 +357,7 @@ static int cancel_bond(const bt_bdaddr_t *bd_addr)
+ {
+ 	struct hal_cmd_cancel_bond cmd;
+ 
+-	DBG("");
++	DBG("bdaddr: %s", bdaddr2str(bd_addr));
+ 
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+@@ -370,7 +372,7 @@ static int remove_bond(const bt_bdaddr_t *bd_addr)
+ {
+ 	struct hal_cmd_remove_bond cmd;
+ 
+-	DBG("");
++	DBG("bdaddr: %s", bdaddr2str(bd_addr));
+ 
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+@@ -386,7 +388,7 @@ static int pin_reply(const bt_bdaddr_t *bd_addr, uint8_t accept,
+ {
+ 	struct hal_cmd_pin_reply cmd;
+ 
+-	DBG("");
++	DBG("bdaddr: %s", bdaddr2str(bd_addr));
+ 
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+@@ -405,7 +407,7 @@ static int ssp_reply(const bt_bdaddr_t *bd_addr, bt_ssp_variant_t variant,
+ {
+ 	struct hal_cmd_ssp_reply cmd;
+ 
+-	DBG("");
++	DBG("bdaddr: %s", bdaddr2str(bd_addr));
+ 
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
 -- 
 1.7.10.4
 
