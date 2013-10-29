@@ -1,135 +1,188 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2] android: Add README file with instructions
-Date: Tue, 29 Oct 2013 13:55:02 +0100
-Message-ID: <1383051302-9754-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
+Subject: Re: [RFC] Bluetooth: Set ISOC altsetting from within notify callback
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <526FAC6C.1090306@timomueller.eu>
+Date: Tue, 29 Oct 2013 13:53:29 +0100
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <3DCF3537-8249-4560-AA95-9513159425B1@holtmann.org>
+References: <1380952305-14104-1-git-send-email-marcel@holtmann.org> <5257EB7A.7010407@timomueller.eu> <DC0E2A8A-DF32-4E70-ACF4-B203D17057B9@holtmann.org> <525BB77A.7030803@timomueller.eu> <526FAC6C.1090306@timomueller.eu>
+To: =?windows-1252?Q?Timo_M=FCller?= <mail@timomueller.eu>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This file cotains help on how BlueZ for Android should be build, run
-and test. Some hints and examples on how BlueZ can be intergrated into
-Android are present as well.
----
-V2:
- - rebased against master
- - clarify requirements on Android init system  
+Hi Timo,
 
- android/Makefile.am |  2 +-
- android/README      | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 88 insertions(+), 1 deletion(-)
- create mode 100644 android/README
+>>>>> Since the event handling is done within a workqueue, the notify
+>>>>> callback can now sleep. So no need to trigger a separate workqueue
+>>>>> from within the Bluetooth USB driver.
+>>>>> 
+>>>>> This should give a little bit better latency with the SCO packet
+>>>>> processing since the ISOC altsetting is correct from the beginning.
+>>>>> 
+>>>>> However I am not sure if we can actually sleep in the USB reset
+>>>>> handler and what we need to do to restore the correct altsetting
+>>>>> in there. This could potentially fail, so please test ;)
+>>>>> 
+>>>>> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+>>>>> ---
+>>>>>  drivers/bluetooth/btusb.c | 34 ++++++++++++++--------------------
+>>>>>  1 file changed, 14 insertions(+), 20 deletions(-)
+>>>>> 
+>>>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>>>>> index f3dfc0a..32cae73 100644
+>>>>> --- a/drivers/bluetooth/btusb.c
+>>>>> +++ b/drivers/bluetooth/btusb.c
+>>>>> @@ -245,7 +245,6 @@ struct btusb_data {
+>>>>> 
+>>>>>      unsigned long flags;
+>>>>> 
+>>>>> -    struct work_struct work;
+>>>>>      struct work_struct waker;
+>>>>> 
+>>>>>      struct usb_anchor tx_anchor;
+>>>>> @@ -685,7 +684,6 @@ static int btusb_close(struct hci_dev *hdev)
+>>>>>      if (!test_and_clear_bit(HCI_RUNNING, &hdev->flags))
+>>>>>          return 0;
+>>>>> 
+>>>>> -    cancel_work_sync(&data->work);
+>>>>>      cancel_work_sync(&data->waker);
+>>>>> 
+>>>>>      clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+>>>>> @@ -827,18 +825,6 @@ done:
+>>>>>      return err;
+>>>>>  }
+>>>>> 
+>>>>> -static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
+>>>>> -{
+>>>>> -    struct btusb_data *data = hci_get_drvdata(hdev);
+>>>>> -
+>>>>> -    BT_DBG("%s evt %d", hdev->name, evt);
+>>>>> -
+>>>>> -    if (hdev->conn_hash.sco_num != data->sco_num) {
+>>>>> -        data->sco_num = hdev->conn_hash.sco_num;
+>>>>> -        schedule_work(&data->work);
+>>>>> -    }
+>>>>> -}
+>>>>> -
+>>>>>  static inline int __set_isoc_interface(struct hci_dev *hdev, int
+>>>>> altsetting)
+>>>>>  {
+>>>>>      struct btusb_data *data = hci_get_drvdata(hdev);
+>>>>> @@ -882,9 +868,8 @@ static inline int __set_isoc_interface(struct
+>>>>> hci_dev *hdev, int altsetting)
+>>>>>      return 0;
+>>>>>  }
+>>>>> 
+>>>>> -static void btusb_work(struct work_struct *work)
+>>>>> +static void btusb_update_isoc_altsetting(struct btusb_data *data)
+>>>>>  {
+>>>>> -    struct btusb_data *data = container_of(work, struct btusb_data,
+>>>>> work);
+>>>>>      struct hci_dev *hdev = data->hdev;
+>>>>>      int new_alts;
+>>>>>      int err;
+>>>>> @@ -932,6 +917,18 @@ static void btusb_work(struct work_struct *work)
+>>>>>      }
+>>>>>  }
+>>>>> 
+>>>>> +static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
+>>>>> +{
+>>>>> +    struct btusb_data *data = hci_get_drvdata(hdev);
+>>>>> +
+>>>>> +    BT_DBG("%s evt %d", hdev->name, evt);
+>>>>> +
+>>>>> +    if (hdev->conn_hash.sco_num != data->sco_num) {
+>>>>> +        data->sco_num = hdev->conn_hash.sco_num;
+>>>>> +        btusb_update_isoc_altsetting(data);
+>>>>> +    }
+>>>>> +}
+>>>>> +
+>>>>>  static void btusb_waker(struct work_struct *work)
+>>>>>  {
+>>>>>      struct btusb_data *data = container_of(work, struct
+>>>>> btusb_data, waker);
+>>>>> @@ -1404,7 +1401,6 @@ static int btusb_probe(struct usb_interface
+>>>>> *intf,
+>>>>> 
+>>>>>      spin_lock_init(&data->lock);
+>>>>> 
+>>>>> -    INIT_WORK(&data->work, btusb_work);
+>>>>>      INIT_WORK(&data->waker, btusb_waker);
+>>>>>      spin_lock_init(&data->txlock);
+>>>>> 
+>>>>> @@ -1540,8 +1536,6 @@ static int btusb_suspend(struct usb_interface
+>>>>> *intf, pm_message_t message)
+>>>>>          return -EBUSY;
+>>>>>      }
+>>>>> 
+>>>>> -    cancel_work_sync(&data->work);
+>>>>> -
+>>>>>      btusb_stop_traffic(data);
+>>>>>      usb_kill_anchored_urbs(&data->tx_anchor);
+>>>>> 
+>>>>> @@ -1606,8 +1600,8 @@ static int btusb_resume(struct usb_interface
+>>>>> *intf)
+>>>>>      play_deferred(data);
+>>>>>      clear_bit(BTUSB_SUSPENDING, &data->flags);
+>>>>>      spin_unlock_irq(&data->txlock);
+>>>>> -    schedule_work(&data->work);
+>>>>> 
+>>>>> +    btusb_update_isoc_altsetting(data);
+>>>>>      return 0;
+>>>>> 
+>>>>>  failed:
+>>>>> 
+>>>> I have been testing this patch for the last two days at the UPF in
+>>>> Vienna. It was running fine most of the time, but I experienced two
+>>>> crashes. Both crashes appeared when there was an active call and the
+>>>> phone transferred audio to the phone and back. Both times I wasn't
+>>>> able to reproduce, when I restarted everything and tested again it
+>>>> worked fine.
+>>>> 
+>>>> Unfortunately the kernel log is not complete but, when it failed the
+>>>> kernel reported:
+>>>> [147.344546] Bluetooth: hci0 SCO packet for unknown connection handle 5
+>>>> [147.354515] Bluetooth: hci0 SCO packet for unknown connection handle 21
+>>>> [147.354537] Bluetooth: hci0 SCO packet for unknown connection handle 29
+>>>> [147.354548] Bluetooth: hci0 SCO packet for unknown connection handle
+>>>> 65534
+>>>> [147.364574] Bluetooth: hci0 SCO packet for unknown connection handle
+>>>> 65532
+>>>> [147.364581] Bluetooth: hci0 SCO packet for unknown connection handle 27
+>>>> …
+>>> what kind of hardware where you testing with?
+>> 
+>> It was nothing special, an off-the-shelf CSR USB BT Dongle.
+>> 
+>>> 
+>>> This handle mismatch normally means that our SCO packet frames are out
+>>> of sync. I think we are not doing a good job trying to keep them
+>>> nicely lined up.
+>>> 
+>>> For the crash, do you happen to have a backtrace of the crash.
+>>> Personally I was worried about the reset handling and not the actual
+>>> alternate setting switching.
+>> 
+>> Unfortunately I haven't. To be precise the first crash wasn't even a
+>> crash, as everything was continuing to run, but without a working audio
+>> of course. The second time my system completely froze, but due to my
+>> fault I wasn't able to pull the backtrace. I'll see if I can reproduce
+>> this week and send a backtrace if I manage to.
+> 
+> I've been unsuccessfully trying to reproduce the system crash with an iPhone 3 and a Nexus 4. Routing the Audio to the phone and back occasionally leads to the observed handle mismatches, but no crashes/freezes whatsoever. Sometimes the mismatch is even recovered.
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 22002be..5690e93 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -96,7 +96,7 @@ EXTRA_DIST += android/client/terminal.c \
- 		android/client/history.h \
- 		android/client/terminal.h
- 
--EXTRA_DIST += android/hal-ipc-api.txt
-+EXTRA_DIST += android/hal-ipc-api.txt android/README
- 
- EXTRA_DIST += android/hardware/bluetooth.h \
- 		android/hardware/bt_av.h \
-diff --git a/android/README b/android/README
-new file mode 100644
-index 0000000..ada2c2f
---- /dev/null
-+++ b/android/README
-@@ -0,0 +1,87 @@
-+BlueZ for Android
-+*****************
-+
-+Since Android 4.2 there exists a well standardized HAL interface that the
-+Bluetooth stack is expected to provide and which enables the easy replacement
-+of the stack of choice on Android. Android BlueZ is intended as a drop-in
-+replacement to Android provided Bluetooth stack.
-+
-+More details about BlueZ for Android architecture and components can be found
-+in android/hal-apc-api.txt file.
-+
-+===============================
-+Building and running on Android
-+===============================
-+
-+Build requirements
-+==================
-+
-+- GLib - Android 4.2 or later don't provide GLib and one must provide it in
-+'external/bluetooth/glib' folder of Android tree. Sample Android GLib port
-+is available at https://code.google.com/p/android-bluez.glib/
-+
-+- Bionic support - BlueZ requires signalfd and timerfd APIs to be provided
-+by libc library. Currently only 'master' branch available at
-+https://android.googlesource.com/platform/bionic provides all required
-+functionality and running BlueZ on older branch requires backporting missing
-+features. Sample Bionic for Android on Intel Architecture (Android-IA) with all
-+required features backported is available at
-+https://code.google.com/p/android-bluez.bionic/
-+
-+Runtime requirements
-+====================
-+
-+BlueZ HAL library requires 'bluetoothd' service to be available on Android
-+system. This can be done by defining service in init.rc file of targeted board:
-+
-+service bluetoothd logwrapper /system/bin/bluetoothd
-+  class main
-+  group bluetooth net_bt_stack
-+  disabled
-+  oneshot
-+
-+It is required that bluetooth user could start and stop bluetoothd service by
-+setting 'ctl.start' or 'ctl.stop' property.
-+
-+Required Android init system modifications can be found at
-+https://code.google.com/p/android-bluez.system-core/
-+
-+Downloading and building
-+========================
-+
-+Building for Android requires full Android AOSP source tree. Sample Android-IA
-+tree with all required components present is available at
-+http://code.google.com/p/android-bluez/
-+
-+Downloading:
-+repo init -u https://code.google.com/p/android-bluez.manifest/ -m topics/bluez
-+repo sync
-+
-+Build for Intel ultrabook:
-+'source build/envsetup.sh'
-+'lunch core_mesa-eng'
-+'make allimages -j8'
-+
-+After full build is done it is possible to rebuild only BlueZ:
-+'cd external/bluetooth/bluez/android/'
-+'mm' (or 'mm -B' to force rebuilding of all files)
-+'adb sync' to update target device.
-+
-+=============================
-+Building and running on Linux
-+=============================
-+It is possible to build and test BlueZ for Android daemon on Linux (eg. PC).
-+Simply follow instructions available at README file in BlueZ top directory.
-+Android daemon binary is located at android/bluetoothd.
-+
-+=======
-+Testing
-+=======
-+
-+BT HAL test tools located in android/haltest is provided for HAL level testing
-+of both Android daemon and HAL library. Start it and type 'adapter init' in
-+prompt to initialize HAL library. On Android required bluetoothd service will
-+be started automatically. On Linux it is required to start android/bluetoothd
-+manually before init command timeout. To deinitialize HAL library and stop
-+daemon type 'adapter cleanup'. Type 'help' for more information. Tab completion
-+is also supported.
-\ No newline at end of file
--- 
-1.8.4.1
+we could start more than 2 ISOC URBs and see if that improves the behavior. However at the end of the day, we might just have to deal with the fact that with ISOC URBs, we sometimes loose a few bytes. So btusb.ko needs to re-sync by itself.
+
+My wild guess is that HFP 1.5 in most of the cases we just got lucky that the stream of PCM data is pretty constant. And once throwing HFP 1.6 and mSBC into the mix these problem manifest itself.
+
+Then again, my main concern with this patch is the reset and resume handling. I have no idea if the URB allocation is correct there.
+
+One other thing we could be doing is that we tell the driver first to switch the alternate endpoints before even establishing the eSCO connection. That might bring this a lot better into sync as well. We would still then need to filter out the packets for unknown handles since their might be some. One problem however might be that we not always know ahead of time what kind of voice setting we actually get.
+
+Regards
+
+Marcel
 
