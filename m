@@ -1,91 +1,141 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
-Subject: Re: [RFC v2 12/15] Bleutooth: Add support for auto connect options
+Subject: Re: [RFC v2 11/15] Bluetooth: Auto connection and power on
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1383053160-10175-13-git-send-email-andre.guedes@openbossa.org>
-Date: Wed, 30 Oct 2013 00:15:24 +0100
+In-Reply-To: <1383053160-10175-12-git-send-email-andre.guedes@openbossa.org>
+Date: Wed, 30 Oct 2013 00:13:24 +0100
 Cc: "linux-bluetooth@vger.kernel.org development"
 	<linux-bluetooth@vger.kernel.org>
-Message-Id: <5BFD1E7B-590C-4648-8074-169FA18F0178@holtmann.org>
-References: <1383053160-10175-1-git-send-email-andre.guedes@openbossa.org> <1383053160-10175-13-git-send-email-andre.guedes@openbossa.org>
+Message-Id: <3B1C06E3-001A-4B2E-8DD8-BB119CA002BD@holtmann.org>
+References: <1383053160-10175-1-git-send-email-andre.guedes@openbossa.org> <1383053160-10175-12-git-send-email-andre.guedes@openbossa.org>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-> This patch adds support for the HCI_AUTO_CONN_ALWAYS and HCI_AUTO_
-> CONN_LINK_LOSS options from struct hci_conn_params.
+> This patch implements a fixup required by auto connection mechanism
+> in order to work properly after a power on.
 > 
-> The HCI_AUTO_CONN_ALWAYS option configures the kernel to always re-
-> establish the connection, no matter the reason the connection was
-> terminated. This feature is required by some LE profiles such as
-> HID over GATT, Health Thermometer and Blood Pressure. These profiles
-> require the host autonomously connect to the device as soon as it
-> enters in connectable mode (start advertising) so the device is able
-> to delivery a notification or indication.
+> When hdev is closed (e.g. Mgmt power off command, RFKILL or controller
+> is reset), the ongoing active connections are silently dropped by the
+> controller (no Disconnection Complete Event is sent to host). For that
+> reason, the devices that require HCI_AUTO_CONN_ALWAYS are not added to
+> hdev->pending_auto_conn list and they won't auto connect. So to fix
+> this issue, after adapter is powered on, we should add all HCI_AUTO_
+> CONN_ALWAYS address to hdev->pending_auto_conn list. Besides that, we
+> always have to check if there are pending auto connections and start
+> the background scanning if it is the case.
 > 
-> The BT_AUTO_CONN_LINK_LOSS option configures the kernel to re-
-> establish the connection in case the connection was terminated due
-> to a link loss. This feature is required by the majority of LE
-> profiles such as Proximity, Find Me, Cycling Speed and Cadence and
-> Time.
+> This way, the auto connection mechanism works propely after a power
+> off and power on sequence as well as RFKILL block/unblock.
 > 
 > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
-> net/bluetooth/hci_event.c | 26 ++++++++++++++++++++++++++
-> 1 file changed, 26 insertions(+)
+> include/net/bluetooth/hci_core.h |  2 ++
+> net/bluetooth/hci_core.c         | 49 ++++++++++++++++++++++++++++++++++++++++
+> net/bluetooth/mgmt.c             |  2 ++
+> 3 files changed, 53 insertions(+)
 > 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index e48601d..b2d8aee 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -1785,6 +1785,7 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> 	struct hci_conn *conn;
-> 	u8 type;
-> 	bool send_mgmt_event = false;
-> +	struct hci_conn_params *params;
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 322918f..379bb36 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -786,6 +786,8 @@ bool hci_is_scan_and_conn_supported(struct hci_dev *hdev);
 > 
-> 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
+> void hci_check_background_scan(struct hci_dev *hdev);
 > 
-> @@ -1817,6 +1818,31 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> 	if (conn->type == ACL_LINK && conn->flush_key)
-> 		hci_remove_link_key(hdev, &conn->dst);
-> 
-> +	params = hci_find_conn_params(hdev, &conn->dst, conn->dst_type);
-> +	if (params) {
-> +		int err;
+> +void __hci_fixup_auto_conn(struct hci_dev *hdev);
 > +
-> +		switch (params->auto_connect) {
-> +		case HCI_AUTO_CONN_LINK_LOSS:
-> +			if (ev->reason != HCI_ERROR_CONNECTION_TIMEOUT)
-> +				break;
-> +			/* Fall through */
-> +
-> +		case HCI_AUTO_CONN_ALWAYS:
-> +			err = __hci_add_pending_auto_conn(hdev, &conn->dst,
-> +							  conn->dst_type);
-> +			if (err)
-> +				BT_ERR("Failed to add pending auto connection "
-> +				       " %d", err);
+> int hci_uuids_clear(struct hci_dev *hdev);
+> 
+> int hci_link_keys_clear(struct hci_dev *hdev);
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 44d3f99..63a56f5 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -3090,6 +3090,55 @@ void hci_check_background_scan(struct hci_dev *hdev)
+> 		BT_ERR("Failed to start background scanning: err %d", err);
+> }
+> 
+> +/* This functions implements a fixup required by auto connection mechanism
+> + * in order to work properly after a power on.
+> + *
+> + * When hdev is closed (e.g. Mgmt power off command, RFKILL or controller is
+> + * reset), the ongoing active connections are silently dropped by the
+> + * by the controller (no Disconnection Complete Event is sent to host). For
+> + * that reason, the devices that require HCI_AUTO_CONN_ALWAYS are not add to
+> + * hdev->pending_auto_conn list and they won't auto connect. So to fix this
+> + * issue, after adapter is powered on, we should add all HCI_AUTO_CONN_ALWAYS
+> + * address to hdev->pending_auto_conn list. Besides that, we always have to
+> + * check if there are pending auto connections and start the background
+> + * scanning if it is the case.
+> + *
+> + * This function requires the caller holds hdev->lock.
+> + */
+> +void __hci_fixup_auto_conn(struct hci_dev *hdev)
 
-I really wonder what we are getting from pushing the errors out here if the only thing we do is print an error message anyway. I do not see the point. Print the error where it happens and make the rest void.
+I have no idea why you call this a fixup function. For me this is normal procedure. On power down we should clear the list of pending connections and on power up we re-establish it.
 
-> +			break;
+> +{
+> +	struct hci_conn_params *p;
+> +	struct bdaddr_list *entry;
 > +
-> +		default:
-> +			break;
+> +	list_for_each_entry(p, &hdev->conn_params, list) {
+> +		if (p->auto_connect != HCI_AUTO_CONN_ALWAYS)
+> +			continue;
+> +
+> +		entry = __find_pending_auto_conn(hdev, &p->addr, p->addr_type);
+> +		if (entry)
+> +			continue;
+
+Why are we bothering here with checking if it exists. The list should be empty when we start.
+
+> +
+> +		entry = kzalloc(sizeof(*entry), GFP_KERNEL);
+> +		if (!entry) {
+> +			BT_ERR("Out of memory of auto connection");
+> +			return;
 > +		}
 > +
-> +		hci_conn_params_put(params);
+> +		bacpy(&entry->bdaddr, &p->addr);
+> +		entry->bdaddr_type = p->addr_type;
+> +		list_add(&entry->list, &hdev->pending_auto_conn);
 > +	}
 > +
-> 	type = conn->type;
-> 	hci_proto_disconn_cfm(conn, ev->reason);
-> 	hci_conn_del(conn);
+> +	if (!list_empty(&hdev->pending_auto_conn)) {
+> +		int err;
+> +
+> +		err = start_background_scan(hdev);
+> +		if (err)
+> +			BT_ERR("Failed to start background scanning: err %d",
+> +			       err);
+
+Is it really worth to have the error here and not directly in start_background_scan.
+
+> +	}
+> +}
+> +
+> static void inquiry_complete(struct hci_dev *hdev, u8 status)
+> {
+> 	if (status) {
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 0e329e5..d396e47 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -4255,6 +4255,8 @@ static void powered_complete(struct hci_dev *hdev, u8 status)
+> 
+> 	hci_dev_lock(hdev);
+> 
+> +	__hci_fixup_auto_conn(hdev);
+> +
+> 	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
+> 
+> 	new_settings(hdev, match.sk);
 
 Regards
 
 Marcel
+
 
