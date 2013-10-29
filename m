@@ -1,120 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v2 01/15] Bluetooth: Refactor hci_disconn_complete_evt
-Date: Tue, 29 Oct 2013 10:25:46 -0300
-Message-Id: <1383053160-10175-2-git-send-email-andre.guedes@openbossa.org>
-In-Reply-To: <1383053160-10175-1-git-send-email-andre.guedes@openbossa.org>
-References: <1383053160-10175-1-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v2 00/15] LE auto connection and connection parameters
+Date: Tue, 29 Oct 2013 10:25:45 -0300
+Message-Id: <1383053160-10175-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hci_disconn_complete_evt() logic is more complicated than what it
-should be, making it hard to follow and add new features.
+Hi all,
 
-So this patch does some code refactoring by handling the error cases
-in the beginning of the function and by moving the main flow into the
-first level of function scope. No change is done in the event handling
-logic itself.
+Sorry about the delay of this patch set.
 
-Besides organizing this messy code, this patch makes easier to add
-code for handling LE auto connection (which will be added in a further
-patch).
+This v2 patch set implements Marcel's comments from the previous one. The main
+changes are:
+* The patch set was reorganized, all refactoring and improving was placed at
+  the beginning of the set.
+* Minimum and maximum connection interval are saved in hci_conn so we are able
+  to know the connection parameters that are currently being used.
+* The trigger/untrigger background scanning mechanism was replaced by a list
+  of pending auto connection. We keep background scan running as long as we
+  have elements in the list.
+* New mgmt commands patches were moved to the end of the set.
 
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
----
- net/bluetooth/hci_event.c | 62 +++++++++++++++++++++++++----------------------
- 1 file changed, 33 insertions(+), 29 deletions(-)
+It was suggested we change connect() behavior to use LE auto connection
+infrastructure. To achieve that, we would have to change hci_connect_le() to
+add a pending auto connection and hci_conn_timeout() to remove that pending
+auto connection. However, this change is more complicated than what it seems.
+The trick part is handling connection timeout. To properly handle connection
+timeout, we have to delete the hci_conn object inside hci_conn_timeout() but
+we cannot do it since since we get a dead lock. The problem is: a delayed work
+thread executes hci_conn_timeout() which calls hci_conn_del(). hci_conn_del()
+calls cancel_delayed_work_sync() which waits for itself.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 5935f74..8b7cd37 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1783,6 +1783,8 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_disconn_complete *ev = (void *) skb->data;
- 	struct hci_conn *conn;
-+	u8 type;
-+	bool send_mgmt_event = false;
- 
- 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
- 
-@@ -1792,44 +1794,46 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (!conn)
- 		goto unlock;
- 
--	if (ev->status == 0)
--		conn->state = BT_CLOSED;
--
- 	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags) &&
--	    (conn->type == ACL_LINK || conn->type == LE_LINK)) {
--		if (ev->status) {
-+	    (conn->type == ACL_LINK || conn->type == LE_LINK))
-+		send_mgmt_event = true;
-+
-+	if (ev->status) {
-+		if (send_mgmt_event)
- 			mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
- 					       conn->dst_type, ev->status);
--		} else {
--			u8 reason = hci_to_mgmt_reason(ev->reason);
--
--			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
--						 conn->dst_type, reason);
--		}
-+		return;
- 	}
- 
--	if (ev->status == 0) {
--		u8 type = conn->type;
-+	conn->state = BT_CLOSED;
- 
--		if (type == ACL_LINK && conn->flush_key)
--			hci_remove_link_key(hdev, &conn->dst);
--		hci_proto_disconn_cfm(conn, ev->reason);
--		hci_conn_del(conn);
-+	if (send_mgmt_event) {
-+		u8 reason = hci_to_mgmt_reason(ev->reason);
- 
--		/* Re-enable advertising if necessary, since it might
--		 * have been disabled by the connection. From the
--		 * HCI_LE_Set_Advertise_Enable command description in
--		 * the core specification (v4.0):
--		 * "The Controller shall continue advertising until the Host
--		 * issues an LE_Set_Advertise_Enable command with
--		 * Advertising_Enable set to 0x00 (Advertising is disabled)
--		 * or until a connection is created or until the Advertising
--		 * is timed out due to Directed Advertising."
--		 */
--		if (type == LE_LINK)
--			mgmt_reenable_advertising(hdev);
-+		mgmt_device_disconnected(hdev, &conn->dst, conn->type,
-+					 conn->dst_type, reason);
- 	}
- 
-+	if (conn->type == ACL_LINK && conn->flush_key)
-+		hci_remove_link_key(hdev, &conn->dst);
-+
-+	type = conn->type;
-+	hci_proto_disconn_cfm(conn, ev->reason);
-+	hci_conn_del(conn);
-+
-+	/* Re-enable advertising if necessary, since it might
-+	 * have been disabled by the connection. From the
-+	 * HCI_LE_Set_Advertise_Enable command description in
-+	 * the core specification (v4.0):
-+	 * "The Controller shall continue advertising until the Host
-+	 * issues an LE_Set_Advertise_Enable command with
-+	 * Advertising_Enable set to 0x00 (Advertising is disabled)
-+	 * or until a connection is created or until the Advertising
-+	 * is timed out due to Directed Advertising."
-+	 */
-+	if (type == LE_LINK)
-+		mgmt_reenable_advertising(hdev);
-+
- unlock:
- 	hci_dev_unlock(hdev);
- }
+Thus, since this change is not required to support LE auto connection and it
+would delay even more this v2 patch set, connect() behavior was not changed.
+If this change is really worth, we can do it in a separate patch set.
+
+This patch set has been extensively tested with dongles that don't support
+scanning and connection at the same time (e.g. PTS dongle) as well as with
+dongles that support it. For testing purposes, patched btmgmt tool to support
+the new mgmt commands (you can find patches in [1]).
+
+Finally, this patch set is organized as follows:
+* Patch 1-3: Refactoring and improvements.
+* Patch 4-6: Use connection parameters specified by user.
+* Patch 7-11: Add support for LE auto connection infrastructure
+* Patch 12: Add support for auto connection options 
+* Patch 13-15: Add mgmt commands
+
+Regards,
+
+Andre
+
+[1] - https://github.com/aguedes/bluez/commits/auto-connect
+
+Andre Guedes (15):
+  Bluetooth: Refactor hci_disconn_complete_evt
+  Bluetooth: Save connection interval parameters in hci_conn
+  Bluetooth: Stop scanning on connection
+  Bluetooth: Introduce connection parameters list
+  Bluetooth: Make find_conn_param() helper non-local
+  Bluetooth: Use connection parameters if any
+  Bluetooth: Introduce hdev->pending_auto_conn list
+  Bluetooth: Move is_scan_and_conn_supported() to hci_core
+  Bluetooth: Introduce LE auto connection infrastructure
+  Bluetooth: Temporarily stop background scanning on discovery
+  Bluetooth: Auto connection and power on
+  Bleutooth: Add support for auto connect options
+  Bluetooth: Add thread-safe version of helpers
+  Bluetooth: Mgmt command for adding connection parameters
+  Bluetooth: Mgmt command for removing connection parameters
+
+ include/net/bluetooth/hci_core.h |  51 +++++
+ include/net/bluetooth/mgmt.h     |  15 ++
+ net/bluetooth/hci_conn.c         |  40 +++-
+ net/bluetooth/hci_core.c         | 403 +++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        | 129 ++++++++++---
+ net/bluetooth/mgmt.c             |  93 ++++++++-
+ 6 files changed, 696 insertions(+), 35 deletions(-)
+
 -- 
 1.8.4
 
