@@ -2,52 +2,41 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 3/5] android/hal: Add support for handling bond state change event
-Date: Tue, 29 Oct 2013 11:07:33 +0100
-Message-ID: <1383041255-26549-3-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1383041255-26549-1-git-send-email-szymon.janc@tieto.com>
-References: <1383041255-26549-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 1/5] android: Define class of device as four bytes in IPC doc
+Date: Tue, 29 Oct 2013 11:07:31 +0100
+Message-ID: <1383041255-26549-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+For PIN and SSP requests callback define CoD as 4 bytes. This will
+allow HAL library to pass CoD direclty to callback. Will also match
+how CoD is passed as property.
 ---
- android/hal-bluetooth.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ android/hal-ipc-api.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 5f6dcbe..067f420 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -68,6 +68,17 @@ static void handle_adapter_props_changed(void *buf, uint16_t len)
- 	bt_hal_cbacks->adapter_properties_cb(ev->status, ev->num_props, props);
- }
+diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+index dc0d067..e7af8a3 100644
+--- a/android/hal-ipc-api.txt
++++ b/android/hal-ipc-api.txt
+@@ -354,13 +354,13 @@ Notifications:
  
-+static void handle_bond_state_change(void *buf)
-+{
-+	struct hal_ev_bond_state_changed *ev = buf;
-+	bt_bdaddr_t *addr = (bt_bdaddr_t *) ev->bdaddr;
-+
-+	if (!bt_hal_cbacks->bond_state_changed_cb)
-+		return;
-+
-+	bt_hal_cbacks->bond_state_changed_cb(ev->status, addr, ev->state);
-+}
-+
- void bt_thread_associate(void)
- {
- 	if (bt_hal_cbacks->thread_evt_cb)
-@@ -98,6 +109,9 @@ void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len)
- 	case HAL_EV_ADAPTER_PROPS_CHANGED:
- 		handle_adapter_props_changed(buf, len);
- 		break;
-+	case HAL_EV_BOND_STATE_CHANGED:
-+		handle_bond_state_change(buf);
-+		break;
- 	default:
- 		DBG("Unhandled callback opcode=0x%x", opcode);
- 		break;
+ 		Notification parameters: Remote address (6 octets)
+ 		                         Remote name (249 octets)
+-		                         Class of device (3 octets)
++		                         Class of device (4 octets)
+ 
+ 	Opcode 0x87 - SSP Request notification
+ 
+ 		Notification parameters: Remote address (6 octets)
+ 		                         Remote name (249 octets)
+-		                         Class of device (3 octets)
++		                         Class of device (4 octets)
+ 		                         Pairing variant (1 octet)
+ 		                         Passkey (4 octets)
+ 
 -- 
 1.8.4.1
 
