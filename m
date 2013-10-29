@@ -1,35 +1,135 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 3/9] android/hal: Print full property in debug
-Date: Tue, 29 Oct 2013 14:57:33 +0200
-Message-Id: <1383051459-29495-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1383051459-29495-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1383051459-29495-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2] android: Add README file with instructions
+Date: Tue, 29 Oct 2013 13:55:02 +0100
+Message-ID: <1383051302-9754-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-Instead of printing property type print type and value. Use exported
-function from hal test tool.
+This file cotains help on how BlueZ for Android should be build, run
+and test. Some hints and examples on how BlueZ can be intergrated into
+Android are present as well.
 ---
- android/hal-bluetooth.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+V2:
+ - rebased against master
+ - clarify requirements on Android init system  
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index a3f5038..0b46465 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -241,7 +241,7 @@ static int set_adapter_property(const bt_property_t *property)
- 	char buf[sizeof(struct hal_cmd_set_adapter_prop) + property->len];
- 	struct hal_cmd_set_adapter_prop *cmd = (void *) buf;
+ android/Makefile.am |  2 +-
+ android/README      | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 88 insertions(+), 1 deletion(-)
+ create mode 100644 android/README
+
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 22002be..5690e93 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -96,7 +96,7 @@ EXTRA_DIST += android/client/terminal.c \
+ 		android/client/history.h \
+ 		android/client/terminal.h
  
--	DBG("prop: %s", bt_property_type_t2str(property->type));
-+	DBG("prop: %s", btproperty2str(property));
+-EXTRA_DIST += android/hal-ipc-api.txt
++EXTRA_DIST += android/hal-ipc-api.txt android/README
  
- 	if (!interface_ready())
- 		return BT_STATUS_NOT_READY;
+ EXTRA_DIST += android/hardware/bluetooth.h \
+ 		android/hardware/bt_av.h \
+diff --git a/android/README b/android/README
+new file mode 100644
+index 0000000..ada2c2f
+--- /dev/null
++++ b/android/README
+@@ -0,0 +1,87 @@
++BlueZ for Android
++*****************
++
++Since Android 4.2 there exists a well standardized HAL interface that the
++Bluetooth stack is expected to provide and which enables the easy replacement
++of the stack of choice on Android. Android BlueZ is intended as a drop-in
++replacement to Android provided Bluetooth stack.
++
++More details about BlueZ for Android architecture and components can be found
++in android/hal-apc-api.txt file.
++
++===============================
++Building and running on Android
++===============================
++
++Build requirements
++==================
++
++- GLib - Android 4.2 or later don't provide GLib and one must provide it in
++'external/bluetooth/glib' folder of Android tree. Sample Android GLib port
++is available at https://code.google.com/p/android-bluez.glib/
++
++- Bionic support - BlueZ requires signalfd and timerfd APIs to be provided
++by libc library. Currently only 'master' branch available at
++https://android.googlesource.com/platform/bionic provides all required
++functionality and running BlueZ on older branch requires backporting missing
++features. Sample Bionic for Android on Intel Architecture (Android-IA) with all
++required features backported is available at
++https://code.google.com/p/android-bluez.bionic/
++
++Runtime requirements
++====================
++
++BlueZ HAL library requires 'bluetoothd' service to be available on Android
++system. This can be done by defining service in init.rc file of targeted board:
++
++service bluetoothd logwrapper /system/bin/bluetoothd
++  class main
++  group bluetooth net_bt_stack
++  disabled
++  oneshot
++
++It is required that bluetooth user could start and stop bluetoothd service by
++setting 'ctl.start' or 'ctl.stop' property.
++
++Required Android init system modifications can be found at
++https://code.google.com/p/android-bluez.system-core/
++
++Downloading and building
++========================
++
++Building for Android requires full Android AOSP source tree. Sample Android-IA
++tree with all required components present is available at
++http://code.google.com/p/android-bluez/
++
++Downloading:
++repo init -u https://code.google.com/p/android-bluez.manifest/ -m topics/bluez
++repo sync
++
++Build for Intel ultrabook:
++'source build/envsetup.sh'
++'lunch core_mesa-eng'
++'make allimages -j8'
++
++After full build is done it is possible to rebuild only BlueZ:
++'cd external/bluetooth/bluez/android/'
++'mm' (or 'mm -B' to force rebuilding of all files)
++'adb sync' to update target device.
++
++=============================
++Building and running on Linux
++=============================
++It is possible to build and test BlueZ for Android daemon on Linux (eg. PC).
++Simply follow instructions available at README file in BlueZ top directory.
++Android daemon binary is located at android/bluetoothd.
++
++=======
++Testing
++=======
++
++BT HAL test tools located in android/haltest is provided for HAL level testing
++of both Android daemon and HAL library. Start it and type 'adapter init' in
++prompt to initialize HAL library. On Android required bluetoothd service will
++be started automatically. On Linux it is required to start android/bluetoothd
++manually before init command timeout. To deinitialize HAL library and stop
++daemon type 'adapter cleanup'. Type 'help' for more information. Tab completion
++is also supported.
+\ No newline at end of file
 -- 
-1.7.10.4
+1.8.4.1
 
