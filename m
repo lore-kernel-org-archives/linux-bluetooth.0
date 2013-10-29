@@ -1,34 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/6] android: Remove reduntant structure
-Date: Tue, 29 Oct 2013 13:16:51 +0100
-Message-Id: <1383049016-23371-1-git-send-email-jakub.tyszkowski@tieto.com>
+Date: Tue, 29 Oct 2013 14:11:09 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] build: Move Makefile.android to android/Makefile.am
+Message-ID: <20131029121109.GB31901@x220.p-661hnu-f1>
+References: <1382978226-28073-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1382978226-28073-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/adapter.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Hi Szymon,
 
-diff --git a/android/adapter.c b/android/adapter.c
-index 15b65e5..7e5c1a1 100644
---- a/android/adapter.c
-+++ b/android/adapter.c
-@@ -234,12 +234,11 @@ static void load_link_keys(GSList *keys)
- {
- 	struct mgmt_cp_load_link_keys *cp;
- 	size_t key_len = g_slist_length(keys);
--	struct mgmt_link_key_info *key;
- 	size_t len;
- 
- 	DBG("");
- 
--	len = sizeof(*cp) + key_len * sizeof(*key);
-+	len = sizeof(*cp) + key_len * sizeof(struct mgmt_link_key_info);
- 	cp = g_malloc0(len);
- 
- 	cp->debug_keys = 0;
--- 
-1.8.4.1
+On Mon, Oct 28, 2013, Szymon Janc wrote:
+> This will keep all Android related changes within android directory.
+> ---
+> 
+> Will also fix messing with Marcel's tab completion habits :-)
+> 
+>  Makefile.am         |   2 +-
+>  Makefile.android    | 113 ----------------------------------------------------
+>  android/Makefile.am | 113 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 114 insertions(+), 114 deletions(-)
+>  delete mode 100644 Makefile.android
+>  create mode 100644 android/Makefile.am
 
+Applied. Thanks.
+
+Johan
