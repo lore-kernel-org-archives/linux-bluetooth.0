@@ -1,52 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20131029122827.GA12345@x220.p-661hnu-f1>
-References: <1383049016-23371-1-git-send-email-jakub.tyszkowski@tieto.com>
-	<20131029122827.GA12345@x220.p-661hnu-f1>
-Date: Tue, 29 Oct 2013 14:01:17 +0100
-Message-ID: <CANmD6r2PhPc4BNEBausGV3GohfEojiEBEmNpJheJiVq_EVj0qg@mail.gmail.com>
-Subject: Re: [PATCH 1/6] android: Remove reduntant structure
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv3 8/9] android: Use thread-safe helpers
+Date: Tue, 29 Oct 2013 14:57:38 +0200
+Message-Id: <1383051459-29495-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1383051459-29495-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1383051459-29495-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Please ignore this patch then. I'll fix this or Szymon will.
+Make use of thread-safe helpers.
+---
+ android/client/textconv.c |   15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-On 29 October 2013 13:28, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Jakub,
->
-> On Tue, Oct 29, 2013, Jakub Tyszkowski wrote:
->> ---
->>  android/adapter.c | 3 +--
->>  1 file changed, 1 insertion(+), 2 deletions(-)
->>
->> diff --git a/android/adapter.c b/android/adapter.c
->> index 15b65e5..7e5c1a1 100644
->> --- a/android/adapter.c
->> +++ b/android/adapter.c
->> @@ -234,12 +234,11 @@ static void load_link_keys(GSList *keys)
->>  {
->>       struct mgmt_cp_load_link_keys *cp;
->>       size_t key_len = g_slist_length(keys);
->> -     struct mgmt_link_key_info *key;
->>       size_t len;
->>
->>       DBG("");
->>
->> -     len = sizeof(*cp) + key_len * sizeof(*key);
->> +     len = sizeof(*cp) + key_len * sizeof(struct mgmt_link_key_info);
->>       cp = g_malloc0(len);
->>
->>       cp->debug_keys = 0;
->
-> If the point of the keys list is to contain struct mgmt_link_key_info
-> entries I'd rather fix this function to properly fill in the mgmt
-> command with those since right now it's broken if the list contains any
-> entries at all.
->
-> Johan
+diff --git a/android/client/textconv.c b/android/client/textconv.c
+index 1dc6ad0..effd1b3 100644
+--- a/android/client/textconv.c
++++ b/android/client/textconv.c
+@@ -19,6 +19,8 @@
+ #include <stdio.h>
+ #include <hardware/bluetooth.h>
+ 
++#include "../pthread-local.h"
++
+ #include "textconv.h"
+ 
+ /*
+@@ -227,11 +229,12 @@ const char *enum_one_string(void *v, int i)
+ 	return (i == 0) && (m[0] != 0) ? m : NULL;
+ }
+ 
++GLOBAL_INIT_THREAD_LOCAL_BUFFER(bdaddr);
+ char *bdaddr2str(const bt_bdaddr_t *bd_addr)
+ {
+-	static char buf[MAX_ADDR_STR_LEN];
++	LOCAL_INIT_THREAD_LOCAL_BUFFER(char*, bdaddr, MAX_ADDR_STR_LEN);
+ 
+-	return bt_bdaddr_t2str(bd_addr, buf);
++	return bt_bdaddr_t2str(bd_addr, bdaddr_tls_buffer);
+ }
+ 
+ static char *btuuid2str(const bt_uuid_t *uuid)
+@@ -241,12 +244,14 @@ static char *btuuid2str(const bt_uuid_t *uuid)
+ 	return bt_uuid_t2str(uuid, buf);
+ }
+ 
++GLOBAL_INIT_THREAD_LOCAL_BUFFER(property);
+ char *btproperty2str(const bt_property_t *property)
+ {
+-	static char buf[4096];
+ 	char *p;
++	LOCAL_INIT_THREAD_LOCAL_BUFFER(char*, property, 4096);
+ 
+-	p = buf + sprintf(buf, "type=%s len=%d val=",
++	p = property_tls_buffer + sprintf(property_tls_buffer,
++					"type=%s len=%d val=",
+ 					bt_property_type_t2str(property->type),
+ 					property->len);
+ 
+@@ -334,5 +339,5 @@ char *btproperty2str(const bt_property_t *property)
+ 		sprintf(p, "%p", property->val);
+ 	}
+ 
+-	return buf;
++	return property_tls_buffer;
+ }
+-- 
+1.7.10.4
+
