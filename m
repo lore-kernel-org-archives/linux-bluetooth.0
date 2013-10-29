@@ -2,47 +2,41 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 2/5] android: Update IPC headers to match SSP and PIN requests events
-Date: Tue, 29 Oct 2013 11:16:26 +0100
-Message-ID: <1383041789-28360-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1383041789-28360-1-git-send-email-szymon.janc@tieto.com>
-References: <1383041789-28360-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2 1/5] android: Define class of device as four bytes in IPC doc
+Date: Tue, 29 Oct 2013 11:16:25 +0100
+Message-ID: <1383041789-28360-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Name should be 249 bytes so it is always NULL terminated string.
-Class of device is send as uint32. This will allow to make simple
-passing of data in HAL library without need of copying data.
+For PIN and SSP requests callback define CoD as 4 bytes. This will
+allow HAL library to pass CoD direclty to callback. Will also match
+how CoD is passed as property.
 ---
- android/hal-msg.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ android/hal-ipc-api.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index a4eb2a8..80b47d6 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -356,15 +356,15 @@ struct hal_ev_discovery_state_changed {
- #define HAL_EV_PIN_REQUEST		0x86
- struct hal_ev_pin_request {
- 	uint8_t bdaddr[6];
--	uint8_t name[249 - 1];
--	uint8_t class_of_dev[3];
-+	uint8_t name[249];
-+	uint32_t class_of_dev;
- } __attribute__((packed));
+diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+index dc0d067..e7af8a3 100644
+--- a/android/hal-ipc-api.txt
++++ b/android/hal-ipc-api.txt
+@@ -354,13 +354,13 @@ Notifications:
  
- #define HAL_EV_SSP_REQUEST		0x87
- struct hal_ev_ssp_request {
- 	uint8_t  bdaddr[6];
--	uint8_t  name[249 - 1];
--	uint8_t  class_of_dev[3];
-+	uint8_t  name[249];
-+	uint32_t  class_of_dev;
- 	uint8_t  pairing_variant;
- 	uint32_t passkey;
- } __attribute__((packed));
+ 		Notification parameters: Remote address (6 octets)
+ 		                         Remote name (249 octets)
+-		                         Class of device (3 octets)
++		                         Class of device (4 octets)
+ 
+ 	Opcode 0x87 - SSP Request notification
+ 
+ 		Notification parameters: Remote address (6 octets)
+ 		                         Remote name (249 octets)
+-		                         Class of device (3 octets)
++		                         Class of device (4 octets)
+ 		                         Pairing variant (1 octet)
+ 		                         Passkey (4 octets)
+ 
 -- 
 1.8.4.1
 
