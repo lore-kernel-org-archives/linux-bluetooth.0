@@ -1,89 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v2 03/15] Bluetooth: Stop scanning on connection
-Date: Tue, 29 Oct 2013 10:25:48 -0300
-Message-Id: <1383053160-10175-4-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v2 02/15] Bluetooth: Save connection interval parameters in hci_conn
+Date: Tue, 29 Oct 2013 10:25:47 -0300
+Message-Id: <1383053160-10175-3-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1383053160-10175-1-git-send-email-andre.guedes@openbossa.org>
 References: <1383053160-10175-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some LE controllers don't support scanning and creating a connection
-at the same time. So, for those controllers, we should stop scanning
-in order to establish the connection.
+This patch creates two new fields in struct hci_conn to save the
+minimum and maximum connection interval values used to establish
+the connection this object represents.
 
-Since we may prematurely stop the discovery procedure in favor of
-the connection establishment, we should also cancel hdev->le_scan_
-disable delayed work and set the discovery state to DISCOVERY_STOPPED.
-
-This change does a small improvement since it is not mandatory user
-stops scanning before connecting anymore. Moreover, this change is
-required by upcoming LE auto connection mechanism in order to work
-properly with controllers that don't support background scanning and
-connection establishment at the same time.
+This change is required in order to know what parameters the
+connection is currently using.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_conn.c | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+ include/net/bluetooth/hci_core.h | 3 +++
+ net/bluetooth/hci_conn.c         | 6 ++++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 8c0ab3d..037a7b5 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -341,6 +341,9 @@ struct hci_conn {
+ 
+ 	unsigned int	sent;
+ 
++	__u16		conn_interval_min;
++	__u16		conn_interval_max;
++
+ 	struct sk_buff_head data_q;
+ 	struct list_head chan_list;
+ 
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 9fb7b44..195b78f 100644
+index ba5366c..9fb7b44 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -518,8 +518,11 @@ static void create_le_conn_complete(struct hci_dev *hdev, u8 status)
- {
- 	struct hci_conn *conn;
+@@ -558,8 +558,8 @@ static int hci_create_le_conn(struct hci_conn *conn)
+ 	bacpy(&cp.peer_addr, &conn->dst);
+ 	cp.peer_addr_type = conn->dst_type;
+ 	cp.own_address_type = conn->src_type;
+-	cp.conn_interval_min = cpu_to_le16(hdev->le_conn_min_interval);
+-	cp.conn_interval_max = cpu_to_le16(hdev->le_conn_max_interval);
++	cp.conn_interval_min = cpu_to_le16(conn->conn_interval_min);
++	cp.conn_interval_max = cpu_to_le16(conn->conn_interval_max);
+ 	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
+ 	cp.min_ce_len = __constant_cpu_to_le16(0x0000);
+ 	cp.max_ce_len = __constant_cpu_to_le16(0x0000);
+@@ -624,6 +624,8 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	conn->sec_level = BT_SECURITY_LOW;
+ 	conn->pending_sec_level = sec_level;
+ 	conn->auth_type = auth_type;
++	conn->conn_interval_min = hdev->le_conn_min_interval;
++	conn->conn_interval_max = hdev->le_conn_max_interval;
  
--	if (status == 0)
-+	if (status == 0) {
-+		cancel_delayed_work(&hdev->le_scan_disable);
-+		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
- 		return;
-+	}
- 
- 	BT_ERR("HCI request failed to create LE connection: status 0x%2.2x",
- 	       status);
-@@ -543,6 +546,17 @@ done:
- 	hci_dev_unlock(hdev);
- }
- 
-+/* Check if controller supports creating a connection while scanning is
-+ * runnning.
-+ */
-+static bool is_scan_and_conn_supported(struct hci_dev *hdev)
-+{
-+	u8 mask = BIT(6) | BIT(7);
-+
-+	/* Return true if both bits are set */
-+	return (hdev->le_states[2] & mask) == mask;
-+}
-+
- static int hci_create_le_conn(struct hci_conn *conn)
- {
- 	struct hci_dev *hdev = conn->hdev;
-@@ -552,6 +566,20 @@ static int hci_create_le_conn(struct hci_conn *conn)
- 
- 	hci_req_init(&req, hdev);
- 
-+	/* If controller is scanning but it doesn't support scanning and
-+	 * creating a connection at the same time, we stop scanning.
-+	 * Otherwise, LE Create Connection command fails.
-+	 */
-+	if (test_bit(HCI_LE_SCAN, &hdev->dev_flags) &&
-+	    !is_scan_and_conn_supported(hdev)) {
-+		struct hci_cp_le_set_scan_enable enable_cp;
-+
-+		memset(&enable_cp, 0, sizeof(enable_cp));
-+		enable_cp.enable = LE_SCAN_DISABLE;
-+		hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
-+			    &enable_cp);
-+	}
-+
- 	memset(&cp, 0, sizeof(cp));
- 	cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
- 	cp.scan_window = cpu_to_le16(hdev->le_scan_window);
+ 	err = hci_create_le_conn(conn);
+ 	if (err)
 -- 
 1.8.4
 
