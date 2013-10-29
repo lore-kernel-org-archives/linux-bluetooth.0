@@ -1,46 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 Oct 2013 14:28:27 +0200
+Date: Tue, 29 Oct 2013 14:19:45 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/6] android: Remove reduntant structure
-Message-ID: <20131029122827.GA12345@x220.p-661hnu-f1>
-References: <1383049016-23371-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: Re: [PATCH v3 4/5] android/hal: Add support for handling pin request
+ event
+Message-ID: <20131029121945.GA1008@x220.p-661hnu-f1>
+References: <1383047562-4799-1-git-send-email-szymon.janc@tieto.com>
+ <1383047562-4799-5-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383049016-23371-1-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1383047562-4799-5-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Szymon,
 
-On Tue, Oct 29, 2013, Jakub Tyszkowski wrote:
+On Tue, Oct 29, 2013, Szymon Janc wrote:
 > ---
->  android/adapter.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/android/adapter.c b/android/adapter.c
-> index 15b65e5..7e5c1a1 100644
-> --- a/android/adapter.c
-> +++ b/android/adapter.c
-> @@ -234,12 +234,11 @@ static void load_link_keys(GSList *keys)
->  {
->  	struct mgmt_cp_load_link_keys *cp;
->  	size_t key_len = g_slist_length(keys);
-> -	struct mgmt_link_key_info *key;
->  	size_t len;
->  
->  	DBG("");
->  
-> -	len = sizeof(*cp) + key_len * sizeof(*key);
-> +	len = sizeof(*cp) + key_len * sizeof(struct mgmt_link_key_info);
->  	cp = g_malloc0(len);
->  
->  	cp->debug_keys = 0;
+>  android/hal-bluetooth.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
 
-If the point of the keys list is to contain struct mgmt_link_key_info
-entries I'd rather fix this function to properly fill in the mgmt
-command with those since right now it's broken if the list contains any
-entries at all.
+I've applied the first three patches in this set, but are you sure the
+following isn't prone to unaligned access issues:
+
+> +	bt_bdaddr_t *addr = (bt_bdaddr_t *) ev->bdaddr;
+> +	bt_bdname_t *name = (bt_bdname_t *) ev->name;
+
+I.e. wouldn't this be an issue if the expected alignment of bt_bdaddr_t
+and bt_bdname_t pointers is different from the alignment of ev->bdaddr
+and ev->name.
 
 Johan
