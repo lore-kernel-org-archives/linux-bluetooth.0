@@ -1,44 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/6] android/hal: Add support for start/cancel device discovery commands
-Date: Tue, 29 Oct 2013 13:16:52 +0100
-Message-Id: <1383049016-23371-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1383049016-23371-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1383049016-23371-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/6] android: Remove reduntant structure
+Date: Tue, 29 Oct 2013 13:16:51 +0100
+Message-Id: <1383049016-23371-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-bluetooth.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ android/adapter.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 5929fff..aa104ba 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -308,7 +308,9 @@ static int start_discovery(void)
- 	if (!interface_ready())
- 		return BT_STATUS_NOT_READY;
+diff --git a/android/adapter.c b/android/adapter.c
+index 15b65e5..7e5c1a1 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -234,12 +234,11 @@ static void load_link_keys(GSList *keys)
+ {
+ 	struct mgmt_cp_load_link_keys *cp;
+ 	size_t key_len = g_slist_length(keys);
+-	struct mgmt_link_key_info *key;
+ 	size_t len;
  
--	return BT_STATUS_UNSUPPORTED;
-+	return hal_ipc_cmd(HAL_SERVICE_ID_BLUETOOTH,
-+				HAL_OP_START_DISCOVERY, 0, NULL, 0,
-+				NULL, NULL);
- }
+ 	DBG("");
  
- static int cancel_discovery(void)
-@@ -318,7 +320,9 @@ static int cancel_discovery(void)
- 	if (!interface_ready())
- 		return BT_STATUS_NOT_READY;
+-	len = sizeof(*cp) + key_len * sizeof(*key);
++	len = sizeof(*cp) + key_len * sizeof(struct mgmt_link_key_info);
+ 	cp = g_malloc0(len);
  
--	return BT_STATUS_UNSUPPORTED;
-+	return hal_ipc_cmd(HAL_SERVICE_ID_BLUETOOTH,
-+				HAL_OP_CANCEL_DISCOVERY, 0, NULL, 0,
-+				NULL, NULL);
- }
- 
- static int create_bond(const bt_bdaddr_t *bd_addr)
+ 	cp->debug_keys = 0;
 -- 
 1.8.4.1
 
