@@ -1,193 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v2 04/15] Bluetooth: Introduce connection parameters list
-Date: Tue, 29 Oct 2013 10:25:49 -0300
-Message-Id: <1383053160-10175-5-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v2 03/15] Bluetooth: Stop scanning on connection
+Date: Tue, 29 Oct 2013 10:25:48 -0300
+Message-Id: <1383053160-10175-4-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1383053160-10175-1-git-send-email-andre.guedes@openbossa.org>
 References: <1383053160-10175-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds to hdev the connection parameters list (hdev->
-conn_params). The elements from this list (struct hci_conn_params)
-contains the connection parameters (for now, minimum and maximum
-connection interval) that should be used during the connection
-establishment.
+Some LE controllers don't support scanning and creating a connection
+at the same time. So, for those controllers, we should stop scanning
+in order to establish the connection.
 
-The struct hci_conn_params also defines the 'auto_connect' field
-which will be used to implement the auto connection mechanism.
+Since we may prematurely stop the discovery procedure in favor of
+the connection establishment, we should also cancel hdev->le_scan_
+disable delayed work and set the discovery state to DISCOVERY_STOPPED.
 
-Moreover, this patch adds helper functions to manipulate hdev->conn_
-params list. Some of these functions are also declared in hci_core.h
-since they will be used outside hci_core.c in upcoming patches.
+This change does a small improvement since it is not mandatory user
+stops scanning before connecting anymore. Moreover, this change is
+required by upcoming LE auto connection mechanism in order to work
+properly with controllers that don't support background scanning and
+connection establishment at the same time.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h | 24 +++++++++++
- net/bluetooth/hci_core.c         | 86 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 110 insertions(+)
+ net/bluetooth/hci_conn.c | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 037a7b5..22d16d9 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -271,6 +271,8 @@ struct hci_dev {
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 9fb7b44..195b78f 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -518,8 +518,11 @@ static void create_le_conn_complete(struct hci_dev *hdev, u8 status)
+ {
+ 	struct hci_conn *conn;
  
- 	struct list_head	remote_oob_data;
+-	if (status == 0)
++	if (status == 0) {
++		cancel_delayed_work(&hdev->le_scan_disable);
++		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+ 		return;
++	}
  
-+	struct list_head	conn_params;
-+
- 	struct hci_dev_stats	stat;
- 
- 	atomic_t		promisc;
-@@ -375,6 +377,22 @@ struct hci_chan {
- 	__u8		state;
- };
- 
-+struct hci_conn_params {
-+	struct list_head list;
-+
-+	bdaddr_t addr;
-+	u8 addr_type;
-+
-+	enum {
-+		HCI_AUTO_CONN_DISABLED,
-+		HCI_AUTO_CONN_ALWAYS,
-+		HCI_AUTO_CONN_LINK_LOSS,
-+	} auto_connect;
-+
-+	u16 conn_interval_min;
-+	u16 conn_interval_max;
-+};
-+
- extern struct list_head hci_dev_list;
- extern struct list_head hci_cb_list;
- extern rwlock_t hci_dev_list_lock;
-@@ -744,6 +762,12 @@ int hci_blacklist_clear(struct hci_dev *hdev);
- int hci_blacklist_add(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
- int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
- 
-+int hci_add_conn_params(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
-+			u8 auto_connect, u16 conn_interval_min,
-+			u16 conn_interval_max);
-+void hci_remove_conn_params(struct hci_dev *hdev, bdaddr_t *addr,
-+			    u8 addr_type);
-+
- int hci_uuids_clear(struct hci_dev *hdev);
- 
- int hci_link_keys_clear(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 6ccc4eb..fa41a58 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2771,6 +2771,90 @@ int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type)
- 	return mgmt_device_unblocked(hdev, bdaddr, type);
+ 	BT_ERR("HCI request failed to create LE connection: status 0x%2.2x",
+ 	       status);
+@@ -543,6 +546,17 @@ done:
+ 	hci_dev_unlock(hdev);
  }
  
-+static struct hci_conn_params *find_conn_params(struct hci_dev *hdev,
-+						bdaddr_t *addr, u8 addr_type)
++/* Check if controller supports creating a connection while scanning is
++ * runnning.
++ */
++static bool is_scan_and_conn_supported(struct hci_dev *hdev)
 +{
-+	struct hci_conn_params *params;
++	u8 mask = BIT(6) | BIT(7);
 +
-+	rcu_read_lock();
++	/* Return true if both bits are set */
++	return (hdev->le_states[2] & mask) == mask;
++}
 +
-+	list_for_each_entry(params, &hdev->conn_params, list) {
-+		if (bacmp(&params->addr, addr))
-+			continue;
-+		if (params->addr_type != addr_type)
-+			continue;
+ static int hci_create_le_conn(struct hci_conn *conn)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+@@ -552,6 +566,20 @@ static int hci_create_le_conn(struct hci_conn *conn)
+ 
+ 	hci_req_init(&req, hdev);
+ 
++	/* If controller is scanning but it doesn't support scanning and
++	 * creating a connection at the same time, we stop scanning.
++	 * Otherwise, LE Create Connection command fails.
++	 */
++	if (test_bit(HCI_LE_SCAN, &hdev->dev_flags) &&
++	    !is_scan_and_conn_supported(hdev)) {
++		struct hci_cp_le_set_scan_enable enable_cp;
 +
-+		rcu_read_unlock();
-+		return params;
++		memset(&enable_cp, 0, sizeof(enable_cp));
++		enable_cp.enable = LE_SCAN_DISABLE;
++		hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
++			    &enable_cp);
 +	}
 +
-+	rcu_read_unlock();
-+	return NULL;
-+}
-+
-+int hci_add_conn_params(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
-+		       u8 auto_connect, u16 conn_interval_min,
-+		       u16 conn_interval_max)
-+{
-+	struct hci_conn_params *params;
-+
-+	params = find_conn_params(hdev, addr, addr_type);
-+	if (params)
-+		return -EEXIST;
-+
-+	params = kmalloc(sizeof(*params), GFP_KERNEL);
-+	if (!params)
-+		return -ENOMEM;
-+
-+	bacpy(&params->addr, addr);
-+	params->addr_type = addr_type;
-+	params->auto_connect = auto_connect;
-+	params->conn_interval_min = conn_interval_min;
-+	params->conn_interval_max = conn_interval_max;
-+
-+	hci_dev_lock(hdev);
-+	list_add_rcu(&params->list, &hdev->conn_params);
-+	hci_dev_unlock(hdev);
-+	return 0;
-+}
-+
-+/* Remove from hdev->conn_params and free hci_conn_params.
-+ *
-+ * This function requires the caller holds hdev->lock.
-+ */
-+static void __remove_conn_params(struct hci_conn_params *params)
-+{
-+	list_del_rcu(&params->list);
-+	synchronize_rcu();
-+
-+	kfree(params);
-+}
-+
-+void hci_remove_conn_params(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
-+{
-+	struct hci_conn_params *params;
-+
-+	params = find_conn_params(hdev, addr, addr_type);
-+	if (!params)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+	__remove_conn_params(params);
-+	hci_dev_unlock(hdev);
-+}
-+
-+/* Remove all elements from hdev->conn_params list.
-+ *
-+ * This function requires the caller holds hdev->lock.
-+ */
-+static void __clear_conn_params(struct hci_dev *hdev)
-+{
-+	struct hci_conn_params *params, *tmp;
-+
-+	list_for_each_entry_safe(params, tmp, &hdev->conn_params, list)
-+		__remove_conn_params(params);
-+}
-+
- static void inquiry_complete(struct hci_dev *hdev, u8 status)
- {
- 	if (status) {
-@@ -2881,6 +2965,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_LIST_HEAD(&hdev->link_keys);
- 	INIT_LIST_HEAD(&hdev->long_term_keys);
- 	INIT_LIST_HEAD(&hdev->remote_oob_data);
-+	INIT_LIST_HEAD(&hdev->conn_params);
- 	INIT_LIST_HEAD(&hdev->conn_hash.list);
- 
- 	INIT_WORK(&hdev->rx_work, hci_rx_work);
-@@ -3066,6 +3151,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	hci_link_keys_clear(hdev);
- 	hci_smp_ltks_clear(hdev);
- 	hci_remote_oob_data_clear(hdev);
-+	__clear_conn_params(hdev);
- 	hci_dev_unlock(hdev);
- 
- 	hci_dev_put(hdev);
+ 	memset(&cp, 0, sizeof(cp));
+ 	cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
+ 	cp.scan_window = cpu_to_le16(hdev->le_scan_window);
 -- 
 1.8.4
 
