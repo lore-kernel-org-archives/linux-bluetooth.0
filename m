@@ -1,34 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 6/9] android/hal: Print adapter state
-Date: Tue, 29 Oct 2013 12:21:55 +0200
-Message-Id: <1383042118-21205-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1383042118-21205-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1382957047-31775-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1383042118-21205-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2 4/5] android/hal: Add support for handling pin request event
+Date: Tue, 29 Oct 2013 11:16:28 +0100
+Message-ID: <1383041789-28360-4-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1383041789-28360-1-git-send-email-szymon.janc@tieto.com>
+References: <1383041789-28360-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
 ---
- android/hal-bluetooth.c |    2 ++
- 1 file changed, 2 insertions(+)
+ android/hal-bluetooth.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 81e23cb..4dbfeec 100644
+index 067f420..43db8cb 100644
 --- a/android/hal-bluetooth.c
 +++ b/android/hal-bluetooth.c
-@@ -33,6 +33,8 @@ static void handle_adapter_state_changed(void *buf)
- {
- 	struct hal_ev_adapter_state_changed *ev = buf;
- 
-+	DBG("state: %s", bt_state_t2str(ev->state));
-+
- 	if (bt_hal_cbacks->adapter_state_changed_cb)
- 		bt_hal_cbacks->adapter_state_changed_cb(ev->state);
+@@ -79,6 +79,16 @@ static void handle_bond_state_change(void *buf)
+ 	bt_hal_cbacks->bond_state_changed_cb(ev->status, addr, ev->state);
  }
+ 
++static void handle_pin_request(void *buf)
++{
++	struct hal_ev_pin_request *ev = buf;
++	bt_bdaddr_t *addr = (bt_bdaddr_t *) ev->bdaddr;
++	bt_bdname_t *name = (bt_bdname_t *) ev->name;
++
++	if (bt_hal_cbacks->pin_request_cb)
++		bt_hal_cbacks->pin_request_cb(addr, name, ev->class_of_dev);
++}
++
+ void bt_thread_associate(void)
+ {
+ 	if (bt_hal_cbacks->thread_evt_cb)
+@@ -112,6 +122,9 @@ void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len)
+ 	case HAL_EV_BOND_STATE_CHANGED:
+ 		handle_bond_state_change(buf);
+ 		break;
++	case HAL_EV_PIN_REQUEST:
++		handle_pin_request(buf);
++		break;
+ 	default:
+ 		DBG("Unhandled callback opcode=0x%x", opcode);
+ 		break;
 -- 
-1.7.10.4
+1.8.4.1
 
