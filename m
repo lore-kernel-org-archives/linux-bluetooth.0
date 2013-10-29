@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 7/9] android/hal: Print adapter property in callback
-Date: Tue, 29 Oct 2013 12:21:56 +0200
-Message-Id: <1383042118-21205-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 4/9] android/hal: Print full property in debug
+Date: Tue, 29 Oct 2013 12:21:53 +0200
+Message-Id: <1383042118-21205-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1383042118-21205-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1382957047-31775-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1383042118-21205-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,23 +12,25 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Instead of printing property type print type and value. Use exported
+function from hal test tool.
 ---
- android/hal-bluetooth.c |    2 ++
- 1 file changed, 2 insertions(+)
+ android/hal-bluetooth.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 4dbfeec..4fb6837 100644
+index 5929fff..da96202 100644
 --- a/android/hal-bluetooth.c
 +++ b/android/hal-bluetooth.c
-@@ -65,6 +65,8 @@ static void handle_adapter_props_changed(void *buf, uint16_t len)
+@@ -226,7 +226,7 @@ static int set_adapter_property(const bt_property_t *property)
+ 	char buf[sizeof(struct hal_cmd_set_adapter_prop) + property->len];
+ 	struct hal_cmd_set_adapter_prop *cmd = (void *) buf;
  
- 		p += sizeof(*hal_prop) + hal_prop->len;
- 		hal_prop = p;
-+
-+		DBG("prop[%d]: %s", i, btproperty2str(&props[i]));
- 	}
+-	DBG("prop: %s", bt_property_type_t2str(property->type));
++	DBG("prop: %s", btproperty2str(property));
  
- 	bt_hal_cbacks->adapter_properties_cb(ev->status, ev->num_props, props);
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
 -- 
 1.7.10.4
 
