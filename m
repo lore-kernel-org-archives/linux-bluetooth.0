@@ -1,34 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 Oct 2013 14:19:45 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+Date: Tue, 29 Oct 2013 14:18:17 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 4/5] android/hal: Add support for handling pin request
- event
-Message-ID: <20131029121945.GA1008@x220.p-661hnu-f1>
-References: <1383047562-4799-1-git-send-email-szymon.janc@tieto.com>
- <1383047562-4799-5-git-send-email-szymon.janc@tieto.com>
+Subject: Re: [PATCHv2 0/9] Improve logging for Android
+Message-ID: <20131029121811.GE27517@aemeltch-MOBL1>
+References: <1382957047-31775-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1383042118-21205-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CAHCYCoz4tSeimwrwVNENWsGf-ZDq9Huq9jB9dOgwccrPiF8Fow@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383047562-4799-5-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <CAHCYCoz4tSeimwrwVNENWsGf-ZDq9Huq9jB9dOgwccrPiF8Fow@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Jerzy,
 
-On Tue, Oct 29, 2013, Szymon Janc wrote:
-> ---
->  android/hal-bluetooth.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
+On Tue, Oct 29, 2013 at 12:43:32PM +0100, Jerzy Kasenberg wrote:
+> Hi Andrei,
+> 
+> On 29 October 2013 11:21, Andrei Emeltchenko
+> <Andrei.Emeltchenko.news@gmail.com> wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> >
+> > Changes:
+> >         *v2: Added thread-safe helpers for printing properties, bdaddr, etc
+> >         after comments that simple printing is not thread-safe. The idea is to
+> >         use TLS (thread local storage) like bionic is doing for strerror for
+> 
+> Implementation of strerror in bionic and what is proposed here is
+> thread safe but not
+> useful if one wants to use one print to for two addresses or two
+> properties (one buffer
+> in one thread for two strings).
 
-I've applied the first three patches in this set, but are you sure the
-following isn't prone to unaligned access issues:
+Then just print 2 times.
 
-> +	bt_bdaddr_t *addr = (bt_bdaddr_t *) ev->bdaddr;
-> +	bt_bdname_t *name = (bt_bdname_t *) ev->name;
+> In my opinion there should be safe functions that explicitly get
+> string buffer as
+> argument. For address and uuid they already exist, property printing
+> was used in haltest
+> only in one place and moving buffer form btproperty2str to function
+> that calls it
+> makes sense to me.
 
-I.e. wouldn't this be an issue if the expected alignment of bt_bdaddr_t
-and bt_bdname_t pointers is different from the alignment of ev->bdaddr
-and ev->name.
+Then every function calling need to define a buffer and for property the
+buffer is not small.
 
-Johan
+For example current code
+
+...
+static int set_adapter_property(const bt_property_t *property)
+{
+	char buf[sizeof(struct hal_cmd_set_adapter_prop) + property->len];
+	struct hal_cmd_set_adapter_prop *cmd = (void *) buf;
+
+	DBG("prop: %s", btproperty2str(property));
+...
+
+would need to define 4K buffer !!!, the same for many other functions.
+
+> 
+> If there is need for shortcut as for code lines that could be removed
+> in compilation,
+> wrapper function with pthread stuff can still be used (provided that
+> there is no same
+> type conversion call used in one print)
+> 
+> BTW strerror() works fine when called with value in range 0..131.
+> But when you call it with higher number there will be a problem
+> printf("%s\n%s\n\%s\n%s\n", strerror(1), strerror(2), strerror(132),
+> strerror(133));
+> prints:
+> Operation not permitted
+> No such file or directory
+> Unknown error 133
+> Unknown error 133
+
+Yes, just print 2 times :)
+
+Best regards 
+Andrei Emeltchenko 
+
