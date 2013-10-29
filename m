@@ -1,98 +1,159 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 29 Oct 2013 15:07:59 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] android: Add README file with instructions
+Message-ID: <20131029130758.GG27517@aemeltch-MOBL1>
+References: <1383051302-9754-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <20131029123622.GF27517@aemeltch-MOBL1>
-References: <1383049016-23371-1-git-send-email-jakub.tyszkowski@tieto.com>
-	<1383049016-23371-5-git-send-email-jakub.tyszkowski@tieto.com>
-	<20131029123622.GF27517@aemeltch-MOBL1>
-Date: Tue, 29 Oct 2013 14:18:13 +0100
-Message-ID: <CANmD6r2UQz7FEkfAuY66=4hD-G6sSR-F+bFpwxRy++4O1YnqLw@mail.gmail.com>
-Subject: Re: [PATCH 5/6] android/hal: Add device state changed event handler
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	Jakub Tyszkowski <jakub.tyszkowski@tieto.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1383051302-9754-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Szymon,
 
-I think the props packing part can be extracted and reused. Not sure
-if other events will benefit from this.. probably just adapter props
-event?
-Thanks, I'll fix those.
+On Tue, Oct 29, 2013 at 01:55:02PM +0100, Szymon Janc wrote:
+> This file cotains help on how BlueZ for Android should be build, run
+> and test. Some hints and examples on how BlueZ can be intergrated into
+> Android are present as well.
+> ---
+> V2:
+>  - rebased against master
+>  - clarify requirements on Android init system  
+> 
+>  android/Makefile.am |  2 +-
+>  android/README      | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 88 insertions(+), 1 deletion(-)
+>  create mode 100644 android/README
+> 
+> diff --git a/android/Makefile.am b/android/Makefile.am
+> index 22002be..5690e93 100644
+> --- a/android/Makefile.am
+> +++ b/android/Makefile.am
+> @@ -96,7 +96,7 @@ EXTRA_DIST += android/client/terminal.c \
+>  		android/client/history.h \
+>  		android/client/terminal.h
+>  
+> -EXTRA_DIST += android/hal-ipc-api.txt
+> +EXTRA_DIST += android/hal-ipc-api.txt android/README
+>  
+>  EXTRA_DIST += android/hardware/bluetooth.h \
+>  		android/hardware/bt_av.h \
+> diff --git a/android/README b/android/README
+> new file mode 100644
+> index 0000000..ada2c2f
+> --- /dev/null
+> +++ b/android/README
+> @@ -0,0 +1,87 @@
+> +BlueZ for Android
+> +*****************
+> +
+> +Since Android 4.2 there exists a well standardized HAL interface that the
+> +Bluetooth stack is expected to provide and which enables the easy replacement
+> +of the stack of choice on Android. Android BlueZ is intended as a drop-in
+> +replacement to Android provided Bluetooth stack.
+> +
+> +More details about BlueZ for Android architecture and components can be found
+> +in android/hal-apc-api.txt file.
+> +
+> +===============================
+> +Building and running on Android
+> +===============================
+> +
+> +Build requirements
+> +==================
+> +
+> +- GLib - Android 4.2 or later don't provide GLib and one must provide it in
+> +'external/bluetooth/glib' folder of Android tree. Sample Android GLib port
+> +is available at https://code.google.com/p/android-bluez.glib/
+> +
+> +- Bionic support - BlueZ requires signalfd and timerfd APIs to be provided
+> +by libc library. Currently only 'master' branch available at
+> +https://android.googlesource.com/platform/bionic provides all required
+> +functionality and running BlueZ on older branch requires backporting missing
+> +features. Sample Bionic for Android on Intel Architecture (Android-IA) with all
+> +required features backported is available at
+> +https://code.google.com/p/android-bluez.bionic/
+> +
+> +Runtime requirements
+> +====================
+> +
+> +BlueZ HAL library requires 'bluetoothd' service to be available on Android
+> +system. This can be done by defining service in init.rc file of targeted board:
+> +
+> +service bluetoothd logwrapper /system/bin/bluetoothd
 
-On 29 October 2013 13:36, Andrei Emeltchenko
-<andrei.emeltchenko.news@gmail.com> wrote:
-> Hi Jakub,
->
-> On Tue, Oct 29, 2013 at 01:16:55PM +0100, Jakub Tyszkowski wrote:
->> This is used to report property change of already reported remote
->> device.
->>
->> ---
->>  android/hal-bluetooth.c | 26 ++++++++++++++++++++++++++
->>  1 file changed, 26 insertions(+)
->>
->> diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
->> index 261ae85..0fef680 100644
->> --- a/android/hal-bluetooth.c
->> +++ b/android/hal-bluetooth.c
->> @@ -114,6 +114,29 @@ static void handle_device_found(void *buf)
->>       bt_hal_cbacks->device_found_cb(ev->num_props, send_props);
->>  }
->>
->> +static void handle_device_state_changed(void *buf)
->> +{
->> +     uint8_t i;
->
-> I've got comment myself that first we put variables with assignments.
->
->> +     struct hal_ev_remote_device_props *ev = buf;
->> +     bt_property_t send_props[ev->num_props];
->> +     struct hal_property *prop = ev->props;
->> +
->> +     if (!bt_hal_cbacks->remote_device_properties_cb)
->> +             return;
->> +
->> +     /* repack props */
->> +     for (i = 0; i < ev->num_props; ++i) {
->> +             send_props[i].type = prop->type;
->> +             send_props[i].len = prop->len;
->> +             send_props[i].val = prop->val;
->> +
->> +             prop = (void *) prop + (sizeof(*prop) + prop->len);
->> +     }
->
-> I would put empty line here. This looks a bit more readable then
-> handle_adapter_props_changed. Do you think those 2 might have reused code?
->
-> Best regards
-> Andrei Emeltchenko
->
->
->> +     bt_hal_cbacks->remote_device_properties_cb(ev->status,
->> +                                             (bt_bdaddr_t *)ev->bdaddr,
->> +                                             ev->num_props, send_props);
->> +}
->> +
->>  /* will be called from notification thread context */
->>  void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len)
->>  {
->> @@ -133,6 +156,9 @@ void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len)
->>       case HAL_EV_DEVICE_FOUND:
->>               handle_device_found(buf);
->>               break;
->> +     case HAL_EV_REMOTE_DEVICE_PROPS:
->> +             handle_device_state_changed(buf);
->> +             break;
->>       default:
->>               DBG("Unhandled callback opcode=0x%x", opcode);
->>               break;
->> --
->> 1.8.4.1
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+logwrapper cannot be found without the full path:
+
+service bluetoothd /system/bin/logwrapper /system/bin/bluetoothd
+
+> +  class main
+> +  group bluetooth net_bt_stack
+
+net_bt_stack seems to be bluedroid specific, currently we use
+
+group bluetooth net_admin
+
+otherwise looks good
+
+Best regards 
+Andrei Emeltchenko 
+
+> +  disabled
+> +  oneshot
+> +
+> +It is required that bluetooth user could start and stop bluetoothd service by
+> +setting 'ctl.start' or 'ctl.stop' property.
+> +
+> +Required Android init system modifications can be found at
+> +https://code.google.com/p/android-bluez.system-core/
+> +
+> +Downloading and building
+> +========================
+> +
+> +Building for Android requires full Android AOSP source tree. Sample Android-IA
+> +tree with all required components present is available at
+> +http://code.google.com/p/android-bluez/
+> +
+> +Downloading:
+> +repo init -u https://code.google.com/p/android-bluez.manifest/ -m topics/bluez
+> +repo sync
+> +
+> +Build for Intel ultrabook:
+> +'source build/envsetup.sh'
+> +'lunch core_mesa-eng'
+> +'make allimages -j8'
+> +
+> +After full build is done it is possible to rebuild only BlueZ:
+> +'cd external/bluetooth/bluez/android/'
+> +'mm' (or 'mm -B' to force rebuilding of all files)
+> +'adb sync' to update target device.
+> +
+> +=============================
+> +Building and running on Linux
+> +=============================
+> +It is possible to build and test BlueZ for Android daemon on Linux (eg. PC).
+> +Simply follow instructions available at README file in BlueZ top directory.
+> +Android daemon binary is located at android/bluetoothd.
+> +
+> +=======
+> +Testing
+> +=======
+> +
+> +BT HAL test tools located in android/haltest is provided for HAL level testing
+> +of both Android daemon and HAL library. Start it and type 'adapter init' in
+> +prompt to initialize HAL library. On Android required bluetoothd service will
+> +be started automatically. On Linux it is required to start android/bluetoothd
+> +manually before init command timeout. To deinitialize HAL library and stop
+> +daemon type 'adapter cleanup'. Type 'help' for more information. Tab completion
+> +is also supported.
+> \ No newline at end of file
+> -- 
+> 1.8.4.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
