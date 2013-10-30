@@ -1,45 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Subject: [PATCH] android: Fix compiler flags with Android version
-Date: Wed, 30 Oct 2013 15:22:38 +0100
-Message-ID: <1383142958-27510-1-git-send-email-jerzy.kasenberg@tieto.com>
+Message-ID: <527114A4.5010207@ahsoftware.de>
+Date: Wed, 30 Oct 2013 15:16:04 +0100
+From: Alexander Holler <holler@ahsoftware.de>
 MIME-Version: 1.0
-Content-Type: text/plain
+To: Tim Tisdall <tim.tisdall@flemingcollege.ca>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: l2cap sockets not properly multiplexed on ARM
+References: <D9B9EB3A112B8F489DFFA00A6D5C0FE20324078F@AD-BR-EX-2.adroot.flemingc.local> <5270EC62.6070705@ahsoftware.de>,<5270F19A.4030408@ahsoftware.de> <D9B9EB3A112B8F489DFFA00A6D5C0FE2032408B0@AD-BR-EX-2.adroot.flemingc.local>
+In-Reply-To: <D9B9EB3A112B8F489DFFA00A6D5C0FE2032408B0@AD-BR-EX-2.adroot.flemingc.local>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fixes commit that removed PLATFORM_SDK_VERSION when building
-haltest. Now all android targets get this define.
----
- android/Android.mk |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Am 30.10.2013 14:15, schrieb Tim Tisdall:
 
-diff --git a/android/Android.mk b/android/Android.mk
-index fc1b276..ae6d332 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -7,7 +7,8 @@ BLUEZ_VERSION := $(shell grep ^AC_INIT $(LOCAL_PATH)/../configure.ac | cpp -P -D
- pathmap_INCL += glib:external/bluetooth/glib
- 
- # Specify common compiler flags
--BLUEZ_COMMON_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
-+BLUEZ_COMMON_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\" \
-+	-DPLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
- 
- # Disable warnings enabled by Android but not enabled in autotools build
- BLUEZ_COMMON_CFLAGS += -Wno-pointer-arith
-@@ -45,8 +46,7 @@ LOCAL_C_INCLUDES += \
- 	$(LOCAL_PATH)/../src \
- 	$(LOCAL_PATH)/../lib \
- 
--LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS) \
--	-DPLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
-+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
- 
- LOCAL_SHARED_LIBRARIES := \
- 	libglib \
--- 
-1.7.9.5
+> The problem exists on the other end of the socket; the kernel side.
+
+Do you have tried using gattool to verify that?
+
+Regards,
+
+Alexander Holler
 
