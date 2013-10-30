@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 3/8] android/hal: Print full property in debug
-Date: Wed, 30 Oct 2013 14:16:41 +0200
-Message-Id: <1383135406-23658-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 8/8] android: Use thread-safe helpers
+Date: Wed, 30 Oct 2013 14:16:46 +0200
+Message-Id: <1383135406-23658-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1383135406-23658-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1383051459-29495-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1383135406-23658-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,25 +12,63 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Instead of printing property type print type and value. Use exported
-function from hal test tool.
+Make use of thread-safe helpers.
 ---
- android/hal-bluetooth.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/client/textconv.c |   15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 2237063..89535ed 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -321,7 +321,7 @@ static int set_adapter_property(const bt_property_t *property)
- 	char buf[sizeof(struct hal_cmd_set_adapter_prop) + property->len];
- 	struct hal_cmd_set_adapter_prop *cmd = (void *) buf;
+diff --git a/android/client/textconv.c b/android/client/textconv.c
+index 1dc6ad0..effd1b3 100644
+--- a/android/client/textconv.c
++++ b/android/client/textconv.c
+@@ -19,6 +19,8 @@
+ #include <stdio.h>
+ #include <hardware/bluetooth.h>
  
--	DBG("prop: %s", bt_property_type_t2str(property->type));
-+	DBG("prop: %s", btproperty2str(property));
++#include "../pthread-local.h"
++
+ #include "textconv.h"
  
- 	if (!interface_ready())
- 		return BT_STATUS_NOT_READY;
+ /*
+@@ -227,11 +229,12 @@ const char *enum_one_string(void *v, int i)
+ 	return (i == 0) && (m[0] != 0) ? m : NULL;
+ }
+ 
++GLOBAL_INIT_THREAD_LOCAL_BUFFER(bdaddr);
+ char *bdaddr2str(const bt_bdaddr_t *bd_addr)
+ {
+-	static char buf[MAX_ADDR_STR_LEN];
++	LOCAL_INIT_THREAD_LOCAL_BUFFER(char*, bdaddr, MAX_ADDR_STR_LEN);
+ 
+-	return bt_bdaddr_t2str(bd_addr, buf);
++	return bt_bdaddr_t2str(bd_addr, bdaddr_tls_buffer);
+ }
+ 
+ static char *btuuid2str(const bt_uuid_t *uuid)
+@@ -241,12 +244,14 @@ static char *btuuid2str(const bt_uuid_t *uuid)
+ 	return bt_uuid_t2str(uuid, buf);
+ }
+ 
++GLOBAL_INIT_THREAD_LOCAL_BUFFER(property);
+ char *btproperty2str(const bt_property_t *property)
+ {
+-	static char buf[4096];
+ 	char *p;
++	LOCAL_INIT_THREAD_LOCAL_BUFFER(char*, property, 4096);
+ 
+-	p = buf + sprintf(buf, "type=%s len=%d val=",
++	p = property_tls_buffer + sprintf(property_tls_buffer,
++					"type=%s len=%d val=",
+ 					bt_property_type_t2str(property->type),
+ 					property->len);
+ 
+@@ -334,5 +339,5 @@ char *btproperty2str(const bt_property_t *property)
+ 		sprintf(p, "%p", property->val);
+ 	}
+ 
+-	return buf;
++	return property_tls_buffer;
+ }
 -- 
 1.7.10.4
 
