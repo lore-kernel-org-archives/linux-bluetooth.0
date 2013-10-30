@@ -1,74 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 8/8] android: Use thread-safe helpers
-Date: Wed, 30 Oct 2013 14:16:46 +0200
-Message-Id: <1383135406-23658-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1383135406-23658-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 0/8] Improve logging for Android
+Date: Wed, 30 Oct 2013 14:16:38 +0200
+Message-Id: <1383135406-23658-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1383051459-29495-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1383051459-29495-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1383135406-23658-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Make use of thread-safe helpers.
----
- android/client/textconv.c |   15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+Logging on Android is really important since we do not have specification
+how and in which order hal functions are called, sometimes the only way is
+to examine logs or read Java Bluetooth code.
 
-diff --git a/android/client/textconv.c b/android/client/textconv.c
-index 1dc6ad0..effd1b3 100644
---- a/android/client/textconv.c
-+++ b/android/client/textconv.c
-@@ -19,6 +19,8 @@
- #include <stdio.h>
- #include <hardware/bluetooth.h>
- 
-+#include "../pthread-local.h"
-+
- #include "textconv.h"
- 
- /*
-@@ -227,11 +229,12 @@ const char *enum_one_string(void *v, int i)
- 	return (i == 0) && (m[0] != 0) ? m : NULL;
- }
- 
-+GLOBAL_INIT_THREAD_LOCAL_BUFFER(bdaddr);
- char *bdaddr2str(const bt_bdaddr_t *bd_addr)
- {
--	static char buf[MAX_ADDR_STR_LEN];
-+	LOCAL_INIT_THREAD_LOCAL_BUFFER(char*, bdaddr, MAX_ADDR_STR_LEN);
- 
--	return bt_bdaddr_t2str(bd_addr, buf);
-+	return bt_bdaddr_t2str(bd_addr, bdaddr_tls_buffer);
- }
- 
- static char *btuuid2str(const bt_uuid_t *uuid)
-@@ -241,12 +244,14 @@ static char *btuuid2str(const bt_uuid_t *uuid)
- 	return bt_uuid_t2str(uuid, buf);
- }
- 
-+GLOBAL_INIT_THREAD_LOCAL_BUFFER(property);
- char *btproperty2str(const bt_property_t *property)
- {
--	static char buf[4096];
- 	char *p;
-+	LOCAL_INIT_THREAD_LOCAL_BUFFER(char*, property, 4096);
- 
--	p = buf + sprintf(buf, "type=%s len=%d val=",
-+	p = property_tls_buffer + sprintf(property_tls_buffer,
-+					"type=%s len=%d val=",
- 					bt_property_type_t2str(property->type),
- 					property->len);
- 
-@@ -334,5 +339,5 @@ char *btproperty2str(const bt_property_t *property)
- 		sprintf(p, "%p", property->val);
- 	}
- 
--	return buf;
-+	return property_tls_buffer;
- }
+Changes:
+	* v4: Rebased against latest upstream
+	* v3: Merged first two patches.
+	* v2: Added thread-safe helpers for printing properties, bdaddr, etc
+	after comments that simple printing is not thread-safe. The idea is to
+	use TLS (thread local storage) like bionic is doing for strerror for
+	example. More info can be found on manpage for pthread_key_create.
+
+This patch series uses debug functions defined already for haltest and
+allows to print very helpful logs on Android target like shown below:
+
+...
+hal-bluetooth.c:set_adapter_property() prop: type=BT_PROPERTY_ADAPTER_SCAN_MODE len=4 val=BT_SCAN_MODE_NONE
+...
+
+Andrei Emeltchenko (8):
+  android/haltest: Export print property
+  android/haltest: Use pointer as parameter for debug
+  android/hal: Print full property in debug
+  android/hal: Add extra logs
+  android/hal: Print adapter state
+  android/hal: Print adapter property in callback
+  android: Add thread-safe helpers
+  android: Use thread-safe helpers
+
+ android/client/if-bt.c    |  112 +------------------------------------------
+ android/client/textconv.c |  115 +++++++++++++++++++++++++++++++++++++++++++++
+ android/client/textconv.h |    3 ++
+ android/hal-bluetooth.c   |   28 ++++++-----
+ android/pthread-local.h   |   58 +++++++++++++++++++++++
+ 5 files changed, 194 insertions(+), 122 deletions(-)
+ create mode 100644 android/pthread-local.h
+
 -- 
 1.7.10.4
 
