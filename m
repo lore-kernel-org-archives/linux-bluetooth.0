@@ -1,51 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] android/hid: Fix not cleanup properly after disconnect
-Date: Wed, 30 Oct 2013 15:50:26 +0200
-Message-Id: <1383141026-19961-1-git-send-email-luiz.dentz@gmail.com>
+From: Tim Tisdall <tim.tisdall@flemingcollege.ca>
+To: Alexander Holler <holler@ahsoftware.de>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: l2cap sockets not properly multiplexed on ARM
+Date: Wed, 30 Oct 2013 13:15:41 +0000
+Message-ID: <D9B9EB3A112B8F489DFFA00A6D5C0FE2032408B0@AD-BR-EX-2.adroot.flemingc.local>
+References: <D9B9EB3A112B8F489DFFA00A6D5C0FE20324078F@AD-BR-EX-2.adroot.flemingc.local>
+ <5270EC62.6070705@ahsoftware.de>,<5270F19A.4030408@ahsoftware.de>
+In-Reply-To: <5270F19A.4030408@ahsoftware.de>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+I knew someone would bring that up.  :)  I can't because python only supports sending 2 arguments to bind for that type of socket, and the result is what i want.  I'm using multiple dongles and need to specify which dongle to use for the connection.  However, before I even put that bind statement in there I still had the very same problem, so you can effectively remove that statement and the underlying system will just bind to whichever dongle it pleases and the same problem exists.  Everything works fine on x86 systems and on the ARM architectures the multiplexing goes south.
 
-If the device is disconnected it should be removed from the list of
-connected devices and free its data.
----
- android/hid.c | 13 ++-----------
- 1 file changed, 2 insertions(+), 11 deletions(-)
+Also, I'm checking the return codes of everything and there's no errors occurring.  You can even see with the btmon log that the ACL packets are being addressed to the right connection handles but the data is coming out the wrong sockets.  The problem exists on the other end of the socket; the kernel side.
 
-diff --git a/android/hid.c b/android/hid.c
-index d6ca4b9..b198713 100644
---- a/android/hid.c
-+++ b/android/hid.c
-@@ -149,15 +149,7 @@ static gboolean ctrl_watch_cb(GIOChannel *chan, GIOCondition cond,
- 	if ((cond & (G_IO_HUP | G_IO_ERR)) && hdev->intr_watch)
- 		g_io_channel_shutdown(chan, TRUE, NULL);
- 
--	hdev->ctrl_watch = 0;
--
--	if (hdev->ctrl_io) {
--		g_io_channel_unref(hdev->ctrl_io);
--		hdev->ctrl_io = NULL;
--	}
--
--	if (hdev->intr_io && !(cond & G_IO_NVAL))
--		g_io_channel_shutdown(hdev->intr_io, TRUE, NULL);
-+	hid_device_free(hdev);
- 
- 	return FALSE;
- }
-@@ -230,8 +222,7 @@ static void control_connect_cb(GIOChannel *chan, GError *conn_err,
- 	return;
- 
- failed:
--	g_io_channel_unref(hdev->ctrl_io);
--	hdev->ctrl_io = NULL;
-+	hid_device_free(hdev);
- }
- 
- static uint8_t bt_hid_connect(struct hal_cmd_hid_connect *cmd, uint16_t len)
--- 
-1.8.3.1
+-Tim
+________________________________________
+From: Alexander Holler [holler@ahsoftware.de]
+Sent: October 30, 2013 7:46 AM
+To: Tim Tisdall
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: l2cap sockets not properly multiplexed on ARM
+
+Am 30.10.2013 12:24, schrieb Alexander Holler:
+> Am 29.10.2013 21:44, schrieb Tim Tisdall:
+>
+>> L2CAP sockets
+>> -------------
+>>
+>> socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP)
+>> bind(bdaddr, 0)  // bind to bluetooth address and PSM 0 (Python
+>> doesn't support LE directly,
+>>                   // but this is enough for binding to the right device
+>
+> That looks wrong. Try to bind to ATT_CID (4).
+>
+
+And don't forget to check the return code of bind (as well as of
+setsockopt and other calls).
+
+Regards,
+
+Alexander Holler
 
