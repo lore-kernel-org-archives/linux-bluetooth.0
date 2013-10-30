@@ -1,53 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 0/8] Improve logging for Android
-Date: Wed, 30 Oct 2013 14:16:38 +0200
-Message-Id: <1383135406-23658-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1383051459-29495-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1383051459-29495-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
+Subject: Re: [RFC v2 4/7] Bluetooth: Enable 6LoWPAN support for BT LE devices
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1383123661-15087-5-git-send-email-jukka.rissanen@linux.intel.com>
+Date: Wed, 30 Oct 2013 13:11:56 +0100
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <4BAC5202-A8F6-4A36-8024-FA97E3FC3554@holtmann.org>
+References: <1383123661-15087-1-git-send-email-jukka.rissanen@linux.intel.com> <1383123661-15087-5-git-send-email-jukka.rissanen@linux.intel.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Jukka,
 
-Logging on Android is really important since we do not have specification
-how and in which order hal functions are called, sometimes the only way is
-to examine logs or read Java Bluetooth code.
+> Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+> ---
+> net/bluetooth/6lowpan.c | 1128 ++++++++++++++++++++++++++++++++++++++++++++++-
+> 1 file changed, 1127 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+> index aff478b..1cba7fd 100644
+> --- a/net/bluetooth/6lowpan.c
+> +++ b/net/bluetooth/6lowpan.c
+> @@ -11,6 +11,20 @@
+>    GNU General Public License for more details.
+> */
+> 
+> +/*
+> + * The compression, uncompression and IPv6 packet fragmentation code
+> + * is from net/ieee802154/6lowpan.c with these copyrights
+> + *
+> + * Copyright 2011, Siemens AG
+> + * written by Alexander Smirnov <alex.bluesman.smirnov@gmail.com>
+> + *
+> + * Based on patches from Jon Smirl <jonsmirl@gmail.com>
+> + * Copyright (c) 2011 Jon Smirl <jonsmirl@gmail.com>
+> + *
+> + * Jon's code is based on 6lowpan implementation for Contiki which is:
+> + * Copyright (c) 2008, Swedish Institute of Computer Science.
+> + */
+> +
 
-Changes:
-	* v4: Rebased against latest upstream
-	* v3: Merged first two patches.
-	* v2: Added thread-safe helpers for printing properties, bdaddr, etc
-	after comments that simple printing is not thread-safe. The idea is to
-	use TLS (thread local storage) like bionic is doing for strerror for
-	example. More info can be found on manpage for pthread_key_create.
+I really think this should consolidated into either net/core/6lowpan.c or net/6lowpan/6lowpan.c.
 
-This patch series uses debug functions defined already for haltest and
-allows to print very helpful logs on Android target like shown below:
+Regards
 
-...
-hal-bluetooth.c:set_adapter_property() prop: type=BT_PROPERTY_ADAPTER_SCAN_MODE len=4 val=BT_SCAN_MODE_NONE
-...
-
-Andrei Emeltchenko (8):
-  android/haltest: Export print property
-  android/haltest: Use pointer as parameter for debug
-  android/hal: Print full property in debug
-  android/hal: Add extra logs
-  android/hal: Print adapter state
-  android/hal: Print adapter property in callback
-  android: Add thread-safe helpers
-  android: Use thread-safe helpers
-
- android/client/if-bt.c    |  112 +------------------------------------------
- android/client/textconv.c |  115 +++++++++++++++++++++++++++++++++++++++++++++
- android/client/textconv.h |    3 ++
- android/hal-bluetooth.c   |   28 ++++++-----
- android/pthread-local.h   |   58 +++++++++++++++++++++++
- 5 files changed, 194 insertions(+), 122 deletions(-)
- create mode 100644 android/pthread-local.h
-
--- 
-1.7.10.4
+Marcel
 
