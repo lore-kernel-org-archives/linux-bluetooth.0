@@ -1,55 +1,140 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] android: Suppress compiler warnings not used in autotools build
-Date: Wed, 30 Oct 2013 10:07:12 +0100
-Message-ID: <6724295.lKoBtA2rXb@uw000953>
-In-Reply-To: <1664552.rzmdhg2vR5@uw000953>
-References: <1383060218-25693-1-git-send-email-szymon.janc@tieto.com> <20131030081914.GH27517@aemeltch-MOBL1> <1664552.rzmdhg2vR5@uw000953>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v4] android: Add README file with instructions
+Date: Wed, 30 Oct 2013 10:05:16 +0100
+Message-ID: <1383123916-20721-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wednesday 30 of October 2013 09:25:03 Szymon Janc wrote:
-> Hi Andrei,
-> 
-> On Wednesday 30 of October 2013 10:19:15 Andrei Emeltchenko wrote:
-> > Hi Szymon,
-> > 
-> > On Tue, Oct 29, 2013 at 04:23:38PM +0100, Szymon Janc wrote:
-> > > Android build system is enabling some additional warnings that are not
-> > > enabled when building with autotools. This avoids spurious warnings
-> > > while building on Android.
-> > > ---
-> > >  android/Android.mk | 3 +++
-> > >  1 file changed, 3 insertions(+)
-> > > 
-> > > diff --git a/android/Android.mk b/android/Android.mk
-> > > index c88b27e..fc1b276 100644
-> > > --- a/android/Android.mk
-> > > +++ b/android/Android.mk
-> > > @@ -9,6 +9,9 @@ pathmap_INCL += glib:external/bluetooth/glib
-> > >  # Specify common compiler flags
-> > >  BLUEZ_COMMON_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
-> > >  
-> > > +# Disable warnings enabled by Android but not enabled in autotools build
-> > > +BLUEZ_COMMON_CFLAGS += -Wno-pointer-arith
-> > 
-> > I wouldn't put this to BLUEZ_COMMON_CFLAGS, maybe only bluetoothd target
-> > CFLAGS, the issue withing HAL might be easily fixed. We use void pointer
-> > in math operations.
-> 
-> This is done on purpose as using void* to operation is simply convenient as
-> there is no need for char* casting (and sizeof(void *) == 1 is documented GCC
+This file cotains help on how BlueZ for Android should be build, run
+and test. Some hints and examples on how BlueZ can be intergrated into
+Android are present as well.
+---
+v4:
+ - workarounded issue with leftover conflicting markers
+  
+  for the record: it appears that double appearance of lines with
+  =======
+  (7 equality marks) confuses git that there is unresolved conflict.
 
-sizeof(void) == 1   that is.
+ android/Makefile.am |  2 +-
+ android/README      | 90 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 91 insertions(+), 1 deletion(-)
+ create mode 100644 android/README
 
-> feature). Further more I think it will be easier for developers if we can have
-> same code guidelines and warnings while building on host and android for all
-> components.
-> 
-> 
-
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 22002be..5690e93 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -96,7 +96,7 @@ EXTRA_DIST += android/client/terminal.c \
+ 		android/client/history.h \
+ 		android/client/terminal.h
+ 
+-EXTRA_DIST += android/hal-ipc-api.txt
++EXTRA_DIST += android/hal-ipc-api.txt android/README
+ 
+ EXTRA_DIST += android/hardware/bluetooth.h \
+ 		android/hardware/bt_av.h \
+diff --git a/android/README b/android/README
+new file mode 100644
+index 0000000..6c2c53f
+--- /dev/null
++++ b/android/README
+@@ -0,0 +1,90 @@
++BlueZ for Android
++*****************
++
++Since Android 4.2 there exists a well standardized HAL interface that the
++Bluetooth stack is expected to provide and which enables the easy replacement
++of the stack of choice on Android. Android BlueZ is intended as a drop-in
++replacement to Android provided Bluetooth stack.
++
++More details about BlueZ for Android architecture and components can be found
++in android/hal-apc-api.txt file.
++
++===============================
++Building and running on Android
++===============================
++
++Build requirements
++==================
++
++- GLib - Android 4.2 or later don't provide GLib and one must provide it in
++'external/bluetooth/glib' folder of Android tree. Sample Android GLib port
++is available at https://code.google.com/p/android-bluez.glib/
++
++- Bionic support - BlueZ requires signalfd and timerfd APIs to be provided
++by libc library. Currently only 'master' branch available at
++https://android.googlesource.com/platform/bionic provides all required
++functionality and running BlueZ on older branch requires backporting missing
++features. Sample Bionic for Android on Intel Architecture (Android-IA) with all
++required features backported is available at
++https://code.google.com/p/android-bluez.bionic/
++
++Runtime requirements
++====================
++
++BlueZ HAL library requires 'bluetoothd' service to be available on Android
++system. This can be done by defining service in init.rc file of targeted board:
++
++service bluetoothd /system/bin/logwrapper /system/bin/bluetoothd
++  class main
++  group bluetooth net_admin
++  disabled
++  oneshot
++
++It is required that bluetooth user could start and stop bluetoothd service by
++setting 'ctl.start' or 'ctl.stop' property. This can be achieved by
++whitelisting bluetooth user and bluetoothd service in init source code.
++
++Required Android init system modifications can be found at
++https://code.google.com/p/android-bluez.system-core/
++
++Downloading and building
++========================
++
++Building for Android requires full Android AOSP source tree. Sample Android-IA
++tree with all required components present is available at
++http://code.google.com/p/android-bluez/
++
++Downloading:
++repo init -u https://code.google.com/p/android-bluez.manifest/ -m topics/bluez
++repo sync
++
++Build for Intel ultrabook:
++'source build/envsetup.sh'
++'lunch core_mesa-eng'
++'make allimages -j8'
++
++After full build is done it is possible to rebuild only BlueZ:
++'cd external/bluetooth/bluez/android/'
++'mm' (or 'mm -B' to force rebuilding of all files)
++'adb sync' to update target device.
++
++=============================
++Building and running on Linux
++=============================
++
++It is possible to build and test BlueZ for Android daemon on Linux (eg. PC).
++Simply follow instructions available at README file in BlueZ top directory.
++Android daemon binary is located at android/bluetoothd. See next section on
++how to test Android daemon on Linux.
++
++============
++Testing tool
++============
++
++BT HAL test tools located in android/haltest is provided for HAL level testing
++of both Android daemon and HAL library. Start it and type 'adapter init' in
++prompt to initialize HAL library. On Android required bluetoothd service will
++be started automatically. On Linux it is required to start android/bluetoothd
++manually before init command timeout. To deinitialize HAL library and stop
++daemon type 'adapter cleanup'. Type 'help' for more information. Tab completion
++is also supported.
+-- 
+1.8.4.1
 
