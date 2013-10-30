@@ -1,32 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 6/6] android: Add missing discovery state definitions to IPC header
-Date: Wed, 30 Oct 2013 11:00:32 +0100
-Message-Id: <1383127232-25147-7-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH v2 5/6] android/hal: Add device state changed event handler
+Date: Wed, 30 Oct 2013 11:00:31 +0100
+Message-Id: <1383127232-25147-6-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1383127232-25147-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1383127232-25147-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/hal-msg.h | 3 +++
- 1 file changed, 3 insertions(+)
+This is used to report property change of already reported remote
+device.
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 80b47d6..d2a0e2a 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -348,6 +348,9 @@ struct hal_ev_device_found {
- 	struct hal_property props[0];
- } __attribute__((packed));
+---
+ android/hal-bluetooth.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index 3f9df96..2237063 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -145,6 +145,21 @@ static void handle_device_found(void *buf, uint16_t len)
+ 	bt_hal_cbacks->device_found_cb(ev->num_props, props);
+ }
  
-+#define HAL_DISCOVERY_STATE_STOPPED	0x00
-+#define HAL_DISCOVERY_STATE_STARTED	0x01
++static void handle_device_state_changed(void *buf, uint16_t len)
++{
++	struct hal_ev_remote_device_props *ev = buf;
++	bt_property_t props[ev->num_props];
 +
- #define HAL_EV_DISCOVERY_STATE_CHANGED	0x85
- struct hal_ev_discovery_state_changed {
- 	uint8_t state;
++	if (!bt_hal_cbacks->remote_device_properties_cb)
++		return;
++
++	repack_properties(props, ev->props, ev->num_props, buf + len);
++
++	bt_hal_cbacks->remote_device_properties_cb(ev->status,
++						(bt_bdaddr_t *)ev->bdaddr,
++						ev->num_props, props);
++}
++
+ /* will be called from notification thread context */
+ void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len)
+ {
+@@ -164,6 +179,9 @@ void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len)
+ 	case HAL_EV_DEVICE_FOUND:
+ 		handle_device_found(buf, len);
+ 		break;
++	case HAL_EV_REMOTE_DEVICE_PROPS:
++		handle_device_state_changed(buf, len);
++		break;
+ 	case HAL_EV_BOND_STATE_CHANGED:
+ 		handle_bond_state_change(buf);
+ 		break;
 -- 
 1.8.4.1
 
