@@ -2,71 +2,106 @@ Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: [PATCH 1/2] android: Add initial sdp implementation
-Date: Wed, 30 Oct 2013 16:18:33 +0100
-Message-ID: <1383146314-13456-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 2/2] android: Initial implementation of socket interface
+Date: Wed, 30 Oct 2013 16:16:33 +0100
+Message-ID: <1383146193-13240-2-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1383146193-13240-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1383146193-13240-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add and remove records to sdp server. This api will
-be used in android's profiles implementations.
+Add stub implementation of socket interace on daemon side.
 ---
- android/adapter.c | 11 +++++++++++
- android/adapter.h |  4 ++++
- 2 files changed, 15 insertions(+)
+ android/main.c   |  4 ++++
+ android/socket.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ android/socket.h |  3 +++
+ 3 files changed, 49 insertions(+)
 
-diff --git a/android/adapter.c b/android/adapter.c
-index 15b65e5..325d0f0 100644
---- a/android/adapter.c
-+++ b/android/adapter.c
-@@ -26,6 +26,7 @@
- #include <glib.h>
+diff --git a/android/main.c b/android/main.c
+index 6ff30a9..2b40621 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -213,6 +213,10 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
+ 		bt_hid_handle_cmd(hal_cmd_io, msg->opcode, msg->payload,
+ 								msg->len);
+ 		break;
++	case HAL_SERVICE_ID_SOCK:
++		bt_sock_handle_cmd(hal_cmd_io, msg->opcode, msg->payload,
++								msg->len);
++		break;
+ 	default:
+ 		ipc_send_rsp(hal_cmd_io, msg->service_id, HAL_STATUS_FAILED);
+ 		break;
+diff --git a/android/socket.c b/android/socket.c
+index 22d2acb..39709cd 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -26,8 +26,50 @@
  
  #include "lib/bluetooth.h"
-+#include "src/sdpd.h"
- #include "src/shared/mgmt.h"
- #include "lib/mgmt.h"
  #include "log.h"
-@@ -528,6 +529,16 @@ error:
- 	ipc_send_rsp(io, HAL_SERVICE_ID_BLUETOOTH, status);
- }
++#include "hal-msg.h"
++#include "hal-ipc.h"
++#include "ipc.h"
+ #include "socket.h"
  
-+int bt_adapter_service_add(sdp_record_t *rec)
++
++static int handle_listen(void *buf)
 +{
-+	return add_record_to_server(&adapter->bdaddr, rec);
++	return -1;
 +}
 +
-+void bt_adapter_service_remove(uint32_t handle)
++static int handle_connect(void *buf)
 +{
-+	remove_record_from_server(handle);
++	return -1;
 +}
 +
- const bdaddr_t *bt_adapter_get_address(void)
++void bt_sock_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
++							uint16_t len)
++{
++	int fd;
++
++	switch (opcode) {
++	case HAL_OP_SOCK_LISTEN:
++		fd = handle_listen(buf);
++		if (fd < 0)
++			break;
++
++		ipc_send(io, HAL_SERVICE_ID_SOCK, opcode, 0, NULL, fd);
++		return;
++	case HAL_OP_SOCK_CONNECT:
++		fd = handle_connect(buf);
++		if (fd < 0)
++			break;
++
++		ipc_send(io, HAL_SERVICE_ID_SOCK, opcode, 0, NULL, fd);
++		return;
++	default:
++		DBG("Unhandled command, opcode 0x%x", opcode);
++		break;
++	}
++
++	ipc_send_rsp(io, HAL_SERVICE_ID_SOCK, HAL_STATUS_FAILED);
++}
++
+ bool bt_socket_register(GIOChannel *io, const bdaddr_t *addr)
  {
- 	return &adapter->bdaddr;
-diff --git a/android/adapter.h b/android/adapter.h
-index 2afc67a..c5ba76b 100644
---- a/android/adapter.h
-+++ b/android/adapter.h
-@@ -27,6 +27,7 @@
- #include <glib.h>
+ 	DBG("");
+diff --git a/android/socket.h b/android/socket.h
+index b13e84c..2b3b940 100644
+--- a/android/socket.h
++++ b/android/socket.h
+@@ -21,5 +21,8 @@
+  *
+  */
  
- #include "lib/bluetooth.h"
-+#include "lib/sdp.h"
- 
- typedef void (*bt_adapter_ready)(int err);
- 
-@@ -38,5 +39,8 @@ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
- 
- const bdaddr_t *bt_adapter_get_address(void);
- 
-+int bt_adapter_service_add(sdp_record_t *rec);
-+void bt_adapter_service_remove(uint32_t handle);
++void bt_sock_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
++						uint16_t len);
 +
- bool bt_adapter_register(GIOChannel *io);
- void bt_adapter_unregister(void);
+ bool bt_socket_register(GIOChannel *io, const bdaddr_t *addr);
+ void bt_socket_unregister(void);
 -- 
 1.8.4.1
 
