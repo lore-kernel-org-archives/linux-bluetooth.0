@@ -1,36 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android: Disable format warnings in Android
-Date: Wed, 30 Oct 2013 12:30:43 +0200
-Message-Id: <1383129043-30582-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 30 Oct 2013 12:13:22 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 0/6] Initial HAL support for device discovery
+Message-ID: <20131030101322.GA21059@x220.p-661hnu-f1>
+References: <1383127232-25147-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1383127232-25147-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Jakub,
 
-Android's bionic library has bug defining ssize_t (which is fixed in
-Android 4.3). This seems to be the most appropriate solution until
-we move to Android 4.3.
----
- android/Android.mk |    4 ++++
- 1 file changed, 4 insertions(+)
+On Wed, Oct 30, 2013, Jakub Tyszkowski wrote:
+> v2 Changes:
+> 	* fixed coding style issues pointed by jhe and niko1
+> 	* extracted property repacking code for reuse
+> 
+> Jakub Tyszkowski (6):
+>   android/hal: Add support for start/cancel device discovery commands
+>   android/hal: Add support for handling discovery state change event
+>   android/hal: Extract bt property repacking code for further reuse
+>   android/hal: Add device found event handler
+>   android/hal: Add device state changed event handler
+>   android: Add missing discovery state definitions to IPC header
+> 
+>  android/hal-bluetooth.c | 92 +++++++++++++++++++++++++++++++++++++++----------
+>  android/hal-msg.h       |  3 ++
+>  2 files changed, 76 insertions(+), 19 deletions(-)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index fc1b276..db55d37 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -12,6 +12,10 @@ BLUEZ_COMMON_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
- # Disable warnings enabled by Android but not enabled in autotools build
- BLUEZ_COMMON_CFLAGS += -Wno-pointer-arith
- 
-+# Disable warning: format '%zd' expects argument of type 'signed size_t',
-+# but argument 4 has type 'ssize_t'
-+BLUEZ_COMMON_CFLAGS += -Wno-format
-+
- #
- # Android BlueZ daemon (bluetoothd)
- #
--- 
-1.7.10.4
+All patches have been applied. Thanks.
 
+Johan
