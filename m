@@ -1,67 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android: Fix sending scan mode property
-Date: Wed, 30 Oct 2013 12:23:04 +0100
-Message-ID: <1383132184-31087-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android: Disable format warnings in Android
+Date: Wed, 30 Oct 2013 12:30:43 +0200
+Message-Id: <1383129043-30582-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fix setting adapter discoverable from Android UI.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This type is enum on HAL side and we need to pass right number of
-bytes. Otherwise will get exceptions from Java TLV handling code.
-
-This patch makes assumption that size of enum is 4 bytes.
+Android's bionic library has bug defining ssize_t (which is fixed in
+Android 4.3). This seems to be the most appropriate solution until
+we move to Android 4.3.
 ---
- android/adapter.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ android/Android.mk |    4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/android/adapter.c b/android/adapter.c
-index 15b65e5..16db4dd 100644
---- a/android/adapter.c
-+++ b/android/adapter.c
-@@ -87,7 +87,7 @@ static void powered_changed(void)
- 			HAL_EV_ADAPTER_STATE_CHANGED, sizeof(ev), &ev, -1);
- }
+diff --git a/android/Android.mk b/android/Android.mk
+index fc1b276..db55d37 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -12,6 +12,10 @@ BLUEZ_COMMON_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
+ # Disable warnings enabled by Android but not enabled in autotools build
+ BLUEZ_COMMON_CFLAGS += -Wno-pointer-arith
  
--static uint8_t settings2scan_mode(void)
-+static uint32_t settings2scan_mode(void)
- {
- 	bool connectable, discoverable;
- 
-@@ -106,9 +106,9 @@ static uint8_t settings2scan_mode(void)
- static void scan_mode_changed(void)
- {
- 	struct hal_ev_adapter_props_changed *ev;
--	uint8_t *mode;
-+	uint32_t mode;
- 	int len;
--	len = sizeof(*ev) + sizeof(struct hal_property) + 1;
-+	len = sizeof(*ev) + sizeof(struct hal_property) + sizeof(mode);
- 
- 	ev = g_malloc(len);
- 
-@@ -116,12 +116,12 @@ static void scan_mode_changed(void)
- 	ev->status = HAL_STATUS_SUCCESS;
- 
- 	ev->props[0].type = HAL_PROP_ADAPTER_SCAN_MODE;
--	ev->props[0].len = 1;
-+	ev->props[0].len = sizeof(mode);
- 
--	mode = ev->props[0].val;
--	*mode = settings2scan_mode();
-+	mode = settings2scan_mode();
-+	memcpy(ev->props[0].val, &mode, sizeof(mode));
- 
--	DBG("mode %u", *mode);
-+	DBG("mode %u", mode);
- 
- 	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
- 				HAL_EV_ADAPTER_PROPS_CHANGED, len, ev, -1);
++# Disable warning: format '%zd' expects argument of type 'signed size_t',
++# but argument 4 has type 'ssize_t'
++BLUEZ_COMMON_CFLAGS += -Wno-format
++
+ #
+ # Android BlueZ daemon (bluetoothd)
+ #
 -- 
-1.8.4.1
+1.7.10.4
 
