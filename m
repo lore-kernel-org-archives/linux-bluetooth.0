@@ -1,33 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 30 Oct 2013 09:39:57 +0200
+Date: Wed, 30 Oct 2013 09:34:45 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] audio/AVRCP: Always assign a player to TG role
-Message-ID: <20131030073957.GB1710@x220.p-661hnu-f1>
-References: <1383055634-11953-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH] Bluetooth: Set default own address type only during
+ controller setup
+Message-ID: <20131030073445.GA1710@x220.p-661hnu-f1>
+References: <1383074811-6623-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383055634-11953-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1383074811-6623-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Marcel,
 
-On Tue, Oct 29, 2013, Luiz Augusto von Dentz wrote:
-> Currently the code does not assign a player if version is bellow 1.3,
-> but sometimes the version may not be initialized correctly e.g: record
-> could not be fetch.
+On Tue, Oct 29, 2013, Marcel Holtmann wrote:
+> The default own address type is currently set at every power on of
+> a controller. This overwrites the value set via debugfs. To avoid
+> this issue, set the default own address type only during controller
+> setup.
 > 
-> Futhermore by assigning a player for 1.0 CT it won't break backward
-> compatibility as no commands will be sent but adds the possibility to
-> respond properly in case the CT is sending commands above its own
-> version which is a violation of the spec but unfortunately there exists
-> such stacks on the market.
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  profiles/audio/avrcp.c | 3 ---
->  1 file changed, 3 deletions(-)
+>  net/bluetooth/hci_core.c | 20 +++++++++++---------
+>  1 file changed, 11 insertions(+), 9 deletions(-)
 
-Applied. Thanks.
+Applied to bluetooth-next. Thanks.
 
 Johan
