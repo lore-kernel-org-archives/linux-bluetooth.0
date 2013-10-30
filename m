@@ -1,30 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5270EC62.6070705@ahsoftware.de>
-Date: Wed, 30 Oct 2013 12:24:18 +0100
-From: Alexander Holler <holler@ahsoftware.de>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] android: Fix sending scan mode property
+Date: Wed, 30 Oct 2013 12:23:04 +0100
+Message-ID: <1383132184-31087-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-To: Tim Tisdall <tim.tisdall@flemingcollege.ca>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: l2cap sockets not properly multiplexed on ARM
-References: <D9B9EB3A112B8F489DFFA00A6D5C0FE20324078F@AD-BR-EX-2.adroot.flemingc.local>
-In-Reply-To: <D9B9EB3A112B8F489DFFA00A6D5C0FE20324078F@AD-BR-EX-2.adroot.flemingc.local>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am 29.10.2013 21:44, schrieb Tim Tisdall:
+This fix setting adapter discoverable from Android UI.
 
-> L2CAP sockets
-> -------------
->
-> socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP)
-> bind(bdaddr, 0)  // bind to bluetooth address and PSM 0 (Python doesn't support LE directly,
->                   // but this is enough for binding to the right device
+This type is enum on HAL side and we need to pass right number of
+bytes. Otherwise will get exceptions from Java TLV handling code.
 
-That looks wrong. Try to bind to ATT_CID (4).
+This patch makes assumption that size of enum is 4 bytes.
+---
+ android/adapter.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-Regards,
-
-Alexander Holler
-
+diff --git a/android/adapter.c b/android/adapter.c
+index 15b65e5..16db4dd 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -87,7 +87,7 @@ static void powered_changed(void)
+ 			HAL_EV_ADAPTER_STATE_CHANGED, sizeof(ev), &ev, -1);
+ }
+ 
+-static uint8_t settings2scan_mode(void)
++static uint32_t settings2scan_mode(void)
+ {
+ 	bool connectable, discoverable;
+ 
+@@ -106,9 +106,9 @@ static uint8_t settings2scan_mode(void)
+ static void scan_mode_changed(void)
+ {
+ 	struct hal_ev_adapter_props_changed *ev;
+-	uint8_t *mode;
++	uint32_t mode;
+ 	int len;
+-	len = sizeof(*ev) + sizeof(struct hal_property) + 1;
++	len = sizeof(*ev) + sizeof(struct hal_property) + sizeof(mode);
+ 
+ 	ev = g_malloc(len);
+ 
+@@ -116,12 +116,12 @@ static void scan_mode_changed(void)
+ 	ev->status = HAL_STATUS_SUCCESS;
+ 
+ 	ev->props[0].type = HAL_PROP_ADAPTER_SCAN_MODE;
+-	ev->props[0].len = 1;
++	ev->props[0].len = sizeof(mode);
+ 
+-	mode = ev->props[0].val;
+-	*mode = settings2scan_mode();
++	mode = settings2scan_mode();
++	memcpy(ev->props[0].val, &mode, sizeof(mode));
+ 
+-	DBG("mode %u", *mode);
++	DBG("mode %u", mode);
+ 
+ 	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
+ 				HAL_EV_ADAPTER_PROPS_CHANGED, len, ev, -1);
+-- 
+1.8.4.1
 
