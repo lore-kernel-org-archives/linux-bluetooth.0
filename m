@@ -3,51 +3,16 @@ From: Tim Tisdall <tim.tisdall@flemingcollege.ca>
 To: Alexander Holler <holler@ahsoftware.de>
 CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Subject: RE: l2cap sockets not properly multiplexed on ARM
-Date: Wed, 30 Oct 2013 15:16:27 +0000
-Message-ID: <D9B9EB3A112B8F489DFFA00A6D5C0FE2032419D0@AD-BR-EX-2.adroot.flemingc.local>
+Date: Wed, 30 Oct 2013 15:10:53 +0000
+Message-ID: <D9B9EB3A112B8F489DFFA00A6D5C0FE2032419C0@AD-BR-EX-2.adroot.flemingc.local>
 References: <D9B9EB3A112B8F489DFFA00A6D5C0FE20324078F@AD-BR-EX-2.adroot.flemingc.local>
  <5270EC62.6070705@ahsoftware.de>,<5270F19A.4030408@ahsoftware.de>
- <D9B9EB3A112B8F489DFFA00A6D5C0FE2032408B0@AD-BR-EX-2.adroot.flemingc.local>,<527114A4.5010207@ahsoftware.de>,<D9B9EB3A112B8F489DFFA00A6D5C0FE2032419A8@AD-BR-EX-2.adroot.flemingc.local>,<D9B9EB3A112B8F489DFFA00A6D5C0FE2032419C0@AD-BR-EX-2.adroot.flemingc.local>
-In-Reply-To: <D9B9EB3A112B8F489DFFA00A6D5C0FE2032419C0@AD-BR-EX-2.adroot.flemingc.local>
+ <D9B9EB3A112B8F489DFFA00A6D5C0FE2032408B0@AD-BR-EX-2.adroot.flemingc.local>,<527114A4.5010207@ahsoftware.de>,<D9B9EB3A112B8F489DFFA00A6D5C0FE2032419A8@AD-BR-EX-2.adroot.flemingc.local>
+In-Reply-To: <D9B9EB3A112B8F489DFFA00A6D5C0FE2032419A8@AD-BR-EX-2.adroot.flemingc.local>
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-Before someone asks...
-
-root@linaro-server:~# cat /proc/cpuinfo
-Processor	: ARMv7 Processor rev 2 (v7l)
-BogoMIPS	: 59.90
-Features	: swp half thumb fastmult vfp edsp neon vfpv3 tls 
-CPU implementer	: 0x41
-CPU architecture: 7
-CPU variant	: 0x3
-CPU part	: 0xc08
-CPU revision	: 2
-
-Hardware	: sun4i
-Revision	: 0000
-Serial		: 0000000000000000
-root@linaro-server:~# lscpu
-Architecture:          armv7l
-Byte Order:            Little Endian
-CPU(s):                1
-On-line CPU(s) list:   0
-Thread(s) per core:    1
-Core(s) per socket:    1
-Socket(s):             1
-root@linaro-server:~# uname -a
-Linux linaro-server 3.4.43 #6 PREEMPT Mon Aug 19 16:40:34 EDT 2013 armv7l armv7l armv7l GNU/Linux
-
-But this isn't the only ARM machine or only kernel I've had this problem on...
-
-________________________________________
-From: linux-bluetooth-owner@vger.kernel.org [linux-bluetooth-owner@vger.kernel.org] on behalf of Tim Tisdall [tim.tisdall@flemingcollege.ca]
-Sent: October 30, 2013 11:10 AM
-To: Alexander Holler
-Cc: linux-bluetooth@vger.kernel.org
-Subject: RE: l2cap sockets not properly multiplexed on ARM
 
 Okay, I tried it again with the other notifications on the 2nd device shut off. (same result)  I noticed that if I shut off the 2nd gatttool the notification return back to the first running gatttool.
 ________________________________________
@@ -490,10 +455,6 @@ Regards,
 
 Alexander Holler
 
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
 --
 To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
 the body of a message to majordomo@vger.kernel.org
