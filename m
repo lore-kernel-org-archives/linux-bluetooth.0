@@ -1,65 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v2 0/7] Bluetooth LE 6LoWPAN
-Date: Wed, 30 Oct 2013 11:00:54 +0200
-Message-Id: <1383123661-15087-1-git-send-email-jukka.rissanen@linux.intel.com>
+Date: Wed, 30 Oct 2013 10:37:51 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] android: Suppress compiler warnings not used in
+ autotools build
+Message-ID: <20131030083604.GI27517@aemeltch-MOBL1>
+References: <1383060218-25693-1-git-send-email-szymon.janc@tieto.com>
+ <1383060218-25693-2-git-send-email-szymon.janc@tieto.com>
+ <20131030081914.GH27517@aemeltch-MOBL1>
+ <1664552.rzmdhg2vR5@uw000953>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1664552.rzmdhg2vR5@uw000953>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Szymon,
 
-this is 6LoWPAN code for BT LE as described in
-http://tools.ietf.org/html/draft-ietf-6lowpan-btle-12
+On Wed, Oct 30, 2013 at 09:25:03AM +0100, Szymon Janc wrote:
+> Hi Andrei,
+> 
+> On Wednesday 30 of October 2013 10:19:15 Andrei Emeltchenko wrote:
+> > Hi Szymon,
+> > 
+> > On Tue, Oct 29, 2013 at 04:23:38PM +0100, Szymon Janc wrote:
+> > > Android build system is enabling some additional warnings that are not
+> > > enabled when building with autotools. This avoids spurious warnings
+> > > while building on Android.
+> > > ---
+> > >  android/Android.mk | 3 +++
+> > >  1 file changed, 3 insertions(+)
+> > > 
+> > > diff --git a/android/Android.mk b/android/Android.mk
+> > > index c88b27e..fc1b276 100644
+> > > --- a/android/Android.mk
+> > > +++ b/android/Android.mk
+> > > @@ -9,6 +9,9 @@ pathmap_INCL += glib:external/bluetooth/glib
+> > >  # Specify common compiler flags
+> > >  BLUEZ_COMMON_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
+> > >  
+> > > +# Disable warnings enabled by Android but not enabled in autotools build
+> > > +BLUEZ_COMMON_CFLAGS += -Wno-pointer-arith
+> > 
+> > I wouldn't put this to BLUEZ_COMMON_CFLAGS, maybe only bluetoothd target
+> > CFLAGS, the issue withing HAL might be easily fixed. We use void pointer
+> > in math operations.
+> 
+> This is done on purpose as using void* to operation is simply convenient as
+> there is no need for char* casting (and sizeof(void *) == 1 is documented GCC
+> feature). Further more I think it will be easier for developers if we can have
+> same code guidelines and warnings while building on host and android for all
+> components.
 
-v2:
-- Change ARPHRD_IEEE802154 to ARPHRD_RAWIP. The generic code
-  in patches 1 and 2 is also sent to netdev mailing list.
-- Sending route exporting patch 5 to netdev ml
-- Check private/public BT address and toggle universal/local bit
-  accordingly in patch 3.
-- The virtual interface template name is now shorter (bt%d)
-- Various function name renames
-- devtype of the interface set to "bluetooth"
+I just sent patch with some fix proposal. I know there are discussions
+about this issue, let's maintainers decide on this.
 
+PS: I personally think that casting when assigning 2 pointers is good in a
+way it shows you that you cast to a different structure.
 
-v1:
-- initial release
-
-
-TODO:
-- Discovery of 6LoWPAN service needs be automatic.
-- Refactor compression and fragmentation code after these are fixed
-  in net/ieee802154/6lowpan.c. Bluetooth 6LoWPAN should be able to share
-  that part of the code.
-
-
-Cheers,
-Jukka
-
-
-Jukka Rissanen (7):
-  net: if_arp: add ARPHRD_RAWIP type
-  ipv6: Add checks for RAWIP ARP type
-  Bluetooth: Initial skeleton code for BT 6LoWPAN
-  Bluetooth: Enable 6LoWPAN support for BT LE devices
-  route: Exporting ip6_route_add() so that Bluetooth 6LoWPAN can use it
-  Bluetooth: Set route to peer for 6LoWPAN
-  Bluetooth: Manually enable or disable 6LoWPAN between devices
-
- include/net/bluetooth/l2cap.h |    1 +
- include/uapi/linux/if_arp.h   |    1 +
- net/bluetooth/6lowpan.c       | 1722 +++++++++++++++++++++++++++++++++++++++++
- net/bluetooth/6lowpan.h       |   28 +
- net/bluetooth/Makefile        |    2 +-
- net/bluetooth/hci_core.c      |    4 +
- net/bluetooth/l2cap_core.c    |   20 +-
- net/ipv6/addrconf.c           |   14 +-
- net/ipv6/route.c              |    1 +
- 9 files changed, 1790 insertions(+), 3 deletions(-)
- create mode 100644 net/bluetooth/6lowpan.c
- create mode 100644 net/bluetooth/6lowpan.h
-
--- 
-1.7.11.7
-
+Best regards 
+Andrei Emeltchenko 
