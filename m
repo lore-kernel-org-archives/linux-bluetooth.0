@@ -1,197 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC] android/hal: Add support for repacking received IPC data to HAL data
-Date: Wed, 30 Oct 2013 16:30:54 +0100
-Message-ID: <1383147054-16528-1-git-send-email-szymon.janc@tieto.com>
+CC: Marcin Kraglak <marcin.kraglak@tieto.com>
+Subject: [PATCH 2/2] android: Add supported uuids when adapter initialized
+Date: Wed, 30 Oct 2013 16:18:34 +0100
+Message-ID: <1383146314-13456-2-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1383146314-13456-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1383146314-13456-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some HAL defined types that are passed as type-len-value in properties
-callback needs to be repacked at runtime to match defined types.
-
-This is due to HAL using data types without strict refined sizes like
-enums or unpacked structures. This is needed only if data is passed as
-TLV. With data passed to callbacks as parameters compiler will handle
-types convertion.
-
-Currently only enum types are supported.
+It will set class of device with proper service hints.
+We set it statically because we don't want to change
+class of device while adding/removing sdp services.
 ---
+ android/adapter.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
 
-This is only for received events. Same needs to be done when sending props
-from HAL lib to daemon.
-
- android/hal-bluetooth.c | 104 ++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 96 insertions(+), 8 deletions(-)
-
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 2237063..a6228d7 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -29,6 +29,13 @@
+diff --git a/android/adapter.c b/android/adapter.c
+index 325d0f0..e54264d 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -37,6 +37,24 @@
  
- static const bt_callbacks_t *bt_hal_cbacks = NULL;
+ static GIOChannel *notification_io = NULL;
  
-+#define create_enum_prop(prop, hal_prop, type) do { \
-+	type *pe = malloc(sizeof(type)); \
-+	prop.val = pe; \
-+	prop.len = sizeof(*pe); \
-+	*pe = *((uint8_t *) (hal_prop->val)); \
-+} while (0)
++/*
++ * This is an array of supported uuids and service hints. We add them via mgmt
++ * interface when adapter is initialized. Uuids are in reverse orded.
++ */
++static const struct mgmt_cp_add_uuid sup_uuids[] = {
++	/* OBEX */
++	{{0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00,
++	0x10, 0x00, 0x00, 0x05, 0x11, 0x00, 0x00}, 0x10},
++	/* TELEPHONY */
++	{{0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00,
++	0x10, 0x00, 0x00, 0x1f, 0x11, 0x00, 0x00}, 0x40},
++	/* CAPTURING */
++	{{0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00,
++	0x10, 0x00, 0x00, 0x0d, 0x11, 0x00, 0x00}, 0x08},
++	/* NETWORKING */
++	{{0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00,
++	0x10, 0x00, 0x00, 0x15, 0x11, 0x00, 0x00}, 0x02} };
 +
- static void handle_adapter_state_changed(void *buf)
- {
- 	struct hal_ev_adapter_state_changed *ev = buf;
-@@ -37,10 +44,58 @@ static void handle_adapter_state_changed(void *buf)
- 		bt_hal_cbacks->adapter_state_changed_cb(ev->state);
+ struct bt_adapter {
+ 	uint16_t index;
+ 	struct mgmt *mgmt;
+@@ -252,6 +270,38 @@ static void load_link_keys(GSList *keys)
+ 	g_free(cp);
  }
  
--static void repack_properties(bt_property_t *send_props,
-+static void adapter_props_to_hal(bt_property_t *send_props,
-+					struct hal_property *hal_prop,
-+					uint8_t num_props, void *buff_end)
++static void add_uuid_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
 +{
-+	void *p = hal_prop;
-+	uint8_t i;
-+
-+	for (i = 0; i < num_props; i++) {
-+		if (p + sizeof(*hal_prop) + hal_prop->len > buff_end) {
-+			error("invalid adapter properties event, aborting");
-+			exit(EXIT_FAILURE);
-+		}
-+
-+		send_props[i].type = hal_prop->type;
-+
-+		switch (hal_prop->type) {
-+		case HAL_PROP_ADAPTER_TYPE:
-+			create_enum_prop(send_props[i], hal_prop,
-+							bt_device_type_t);
-+			break;
-+		case HAL_PROP_ADAPTER_SCAN_MODE:
-+			create_enum_prop(send_props[i], hal_prop,
-+							bt_scan_mode_t);
-+			break;
-+		case HAL_PROP_ADAPTER_SERVICE_REC:
-+		default:
-+			send_props[i].len = hal_prop->len;
-+			send_props[i].val = hal_prop->val;
-+			break;
-+		}
++	if (status != MGMT_STATUS_SUCCESS) {
++		error("Failed to add UUID: %s (0x%02x)",
++						mgmt_errstr(status), status);
++		return;
 +	}
++
++	mgmt_dev_class_changed_event(adapter->index, length, param, NULL);
 +}
 +
-+static void adapter_hal_props_cleanup(bt_property_t *props, uint8_t num)
++static void add_uuids(void)
 +{
-+	uint8_t i;
++	unsigned int i;
 +
-+	for (i = 0; i < num; i++) {
-+		switch (props[i].type) {
-+		case HAL_PROP_ADAPTER_TYPE:
-+		case HAL_PROP_ADAPTER_SCAN_MODE:
-+			free(props[i].val);
-+			break;
-+		default:
-+			break;
-+		}
-+	}
++	for (i = 0; i < sizeof(sup_uuids) / sizeof(sup_uuids[0]); i++)
++		mgmt_send(adapter->mgmt, MGMT_OP_ADD_UUID, adapter->index,
++				sizeof(sup_uuids[i]), &sup_uuids[i],
++				add_uuid_complete, NULL, NULL);
 +}
 +
-+static void device_props_to_hal(bt_property_t *send_props,
- 					struct hal_property *hal_prop,
--					uint8_t num_props,
--					void *buff_end)
-+					uint8_t num_props, void *buff_end)
- {
- 	void *p = hal_prop;
- 	uint8_t i;
-@@ -52,14 +107,41 @@ static void repack_properties(bt_property_t *send_props,
- 		}
- 
- 		send_props[i].type = hal_prop->type;
--		send_props[i].len = hal_prop->len;
--		send_props[i].val = hal_prop->val;
-+
-+		switch (hal_prop->type) {
-+		case HAL_PROP_DEVICE_TYPE:
-+			create_enum_prop(send_props[i], hal_prop,
-+							bt_device_type_t);
-+			break;
-+		case HAL_PROP_DEVICE_SERVICE_REC:
-+		case HAL_PROP_DEVICE_VERSION_INFO:
-+		default:
-+			send_props[i].len = hal_prop->len;
-+			send_props[i].val = hal_prop->val;
-+			break;
-+		}
- 
- 		p += sizeof(*hal_prop) + hal_prop->len;
- 		hal_prop = p;
- 	}
- }
- 
-+
-+static void device_hal_props_cleanup(bt_property_t *props, uint8_t num)
++static void clear_uuids(void)
 +{
-+	uint8_t i;
++	struct mgmt_cp_remove_uuid cp;
 +
-+	for (i = 0; i < num; i++) {
-+		switch (props[i].type) {
-+		case HAL_PROP_DEVICE_TYPE:
-+			free(props[i].val);
-+			break;
-+		default:
-+			break;
-+		}
-+	}
++	memset(&cp, 0, sizeof(cp));
++
++	mgmt_send(adapter->mgmt, MGMT_OP_REMOVE_UUID, adapter->index,
++			sizeof(cp), &cp, NULL, NULL, NULL);
 +}
 +
- static void handle_adapter_props_changed(void *buf, uint16_t len)
+ static void set_mode_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
  {
- 	struct hal_ev_adapter_props_changed *ev = buf;
-@@ -68,9 +150,11 @@ static void handle_adapter_props_changed(void *buf, uint16_t len)
- 	if (!bt_hal_cbacks->adapter_properties_cb)
- 		return;
+@@ -330,6 +380,9 @@ static void read_info_complete(uint8_t status, uint16_t length, const void *para
  
--	repack_properties(props, ev->props, ev->num_props, buf + len);
-+	adapter_props_to_hal(props, ev->props, ev->num_props, buf + len);
+ 	set_mode(MGMT_OP_SET_PAIRABLE, 0x01);
  
- 	bt_hal_cbacks->adapter_properties_cb(ev->status, ev->num_props, props);
++	clear_uuids();
++	add_uuids();
 +
-+	adapter_hal_props_cleanup(props, ev->num_props);
- }
+ 	return;
  
- static void handle_bond_state_change(void *buf)
-@@ -140,9 +224,11 @@ static void handle_device_found(void *buf, uint16_t len)
- 	if (!bt_hal_cbacks->device_found_cb)
- 		return;
- 
--	repack_properties(props, ev->props, ev->num_props, buf + len);
-+	device_props_to_hal(props, ev->props, ev->num_props, buf + len);
- 
- 	bt_hal_cbacks->device_found_cb(ev->num_props, props);
-+
-+	device_hal_props_cleanup(props, ev->num_props);
- }
- 
- static void handle_device_state_changed(void *buf, uint16_t len)
-@@ -153,11 +239,13 @@ static void handle_device_state_changed(void *buf, uint16_t len)
- 	if (!bt_hal_cbacks->remote_device_properties_cb)
- 		return;
- 
--	repack_properties(props, ev->props, ev->num_props, buf + len);
-+	device_props_to_hal(props, ev->props, ev->num_props, buf + len);
- 
- 	bt_hal_cbacks->remote_device_properties_cb(ev->status,
- 						(bt_bdaddr_t *)ev->bdaddr,
- 						ev->num_props, props);
-+
-+	device_hal_props_cleanup(props, ev->num_props);
- }
- 
- /* will be called from notification thread context */
+ failed:
 -- 
 1.8.4.1
 
