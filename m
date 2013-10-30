@@ -1,140 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v4] android: Add README file with instructions
-Date: Wed, 30 Oct 2013 10:05:16 +0100
-Message-ID: <1383123916-20721-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC v2 6/7] Bluetooth: Set route to peer for 6LoWPAN
+Date: Wed, 30 Oct 2013 11:01:00 +0200
+Message-Id: <1383123661-15087-7-git-send-email-jukka.rissanen@linux.intel.com>
+In-Reply-To: <1383123661-15087-1-git-send-email-jukka.rissanen@linux.intel.com>
+References: <1383123661-15087-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This file cotains help on how BlueZ for Android should be build, run
-and test. Some hints and examples on how BlueZ can be intergrated into
-Android are present as well.
+Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 ---
-v4:
- - workarounded issue with leftover conflicting markers
-  
-  for the record: it appears that double appearance of lines with
-  =======
-  (7 equality marks) confuses git that there is unresolved conflict.
+ net/bluetooth/6lowpan.c | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
- android/Makefile.am |  2 +-
- android/README      | 90 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 91 insertions(+), 1 deletion(-)
- create mode 100644 android/README
-
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 22002be..5690e93 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -96,7 +96,7 @@ EXTRA_DIST += android/client/terminal.c \
- 		android/client/history.h \
- 		android/client/terminal.h
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 1cba7fd..4ec3813 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -1372,6 +1372,39 @@ static void set_dev_addr(struct net_device *net, bdaddr_t *addr,
+ 	net->dev_addr[0] ^= 2;
+ }
  
--EXTRA_DIST += android/hal-ipc-api.txt
-+EXTRA_DIST += android/hal-ipc-api.txt android/README
++static int add_peer_route(struct lowpan_info *dev, struct net_device *net,
++			bdaddr_t *addr, u8 addr_type)
++{
++	struct in6_addr peer;
++	struct fib6_config cfg = {
++		.fc_table	= RT6_TABLE_MAIN,
++		.fc_metric	= IP6_RT_PRIO_ADDRCONF,
++		.fc_ifindex	= net->ifindex,
++		.fc_dst_len	= 128,
++		.fc_flags	= RTF_ADDRCONF | RTF_UP |
++					RTF_PREF(ICMPV6_ROUTER_PREF_MEDIUM),
++		.fc_nlinfo.portid = 0,
++		.fc_nlinfo.nlh = NULL,
++		.fc_nlinfo.nl_net = dev_net(net),
++	};
++
++	memset(&peer, 0, sizeof(struct in6_addr));
++
++	/* RFC 2464 ch. 5 */
++	peer.s6_addr[0] = 0xFE;
++	peer.s6_addr[1] = 0x80;
++	set_addr((u8 *)&peer.s6_addr + 8, addr->b, addr_type);
++
++	memcpy(&dev->ieee802154_addr, (u8 *)&peer.s6_addr + 8,
++						IEEE802154_ADDR_LEN);
++
++	BT_DBG("peer address %pI6c", (u8 *)&peer.s6_addr);
++
++	cfg.fc_dst = dev->peer = peer;
++
++	return ip6_route_add(&cfg);
++}
++
+ static void ifup(struct net_device *net)
+ {
+ 	int status;
+@@ -1448,6 +1481,10 @@ int bt_6lowpan_add_conn(struct l2cap_conn *conn)
  
- EXTRA_DIST += android/hardware/bluetooth.h \
- 		android/hardware/bt_av.h \
-diff --git a/android/README b/android/README
-new file mode 100644
-index 0000000..6c2c53f
---- /dev/null
-+++ b/android/README
-@@ -0,0 +1,90 @@
-+BlueZ for Android
-+*****************
+ 	ifup(net);
+ 
++	if ((status = add_peer_route(dev, net, &dev->addr,
++						conn->hcon->dst_type)) < 0)
++		BT_INFO("Setting route failed %d", status);
 +
-+Since Android 4.2 there exists a well standardized HAL interface that the
-+Bluetooth stack is expected to provide and which enables the easy replacement
-+of the stack of choice on Android. Android BlueZ is intended as a drop-in
-+replacement to Android provided Bluetooth stack.
-+
-+More details about BlueZ for Android architecture and components can be found
-+in android/hal-apc-api.txt file.
-+
-+===============================
-+Building and running on Android
-+===============================
-+
-+Build requirements
-+==================
-+
-+- GLib - Android 4.2 or later don't provide GLib and one must provide it in
-+'external/bluetooth/glib' folder of Android tree. Sample Android GLib port
-+is available at https://code.google.com/p/android-bluez.glib/
-+
-+- Bionic support - BlueZ requires signalfd and timerfd APIs to be provided
-+by libc library. Currently only 'master' branch available at
-+https://android.googlesource.com/platform/bionic provides all required
-+functionality and running BlueZ on older branch requires backporting missing
-+features. Sample Bionic for Android on Intel Architecture (Android-IA) with all
-+required features backported is available at
-+https://code.google.com/p/android-bluez.bionic/
-+
-+Runtime requirements
-+====================
-+
-+BlueZ HAL library requires 'bluetoothd' service to be available on Android
-+system. This can be done by defining service in init.rc file of targeted board:
-+
-+service bluetoothd /system/bin/logwrapper /system/bin/bluetoothd
-+  class main
-+  group bluetooth net_admin
-+  disabled
-+  oneshot
-+
-+It is required that bluetooth user could start and stop bluetoothd service by
-+setting 'ctl.start' or 'ctl.stop' property. This can be achieved by
-+whitelisting bluetooth user and bluetoothd service in init source code.
-+
-+Required Android init system modifications can be found at
-+https://code.google.com/p/android-bluez.system-core/
-+
-+Downloading and building
-+========================
-+
-+Building for Android requires full Android AOSP source tree. Sample Android-IA
-+tree with all required components present is available at
-+http://code.google.com/p/android-bluez/
-+
-+Downloading:
-+repo init -u https://code.google.com/p/android-bluez.manifest/ -m topics/bluez
-+repo sync
-+
-+Build for Intel ultrabook:
-+'source build/envsetup.sh'
-+'lunch core_mesa-eng'
-+'make allimages -j8'
-+
-+After full build is done it is possible to rebuild only BlueZ:
-+'cd external/bluetooth/bluez/android/'
-+'mm' (or 'mm -B' to force rebuilding of all files)
-+'adb sync' to update target device.
-+
-+=============================
-+Building and running on Linux
-+=============================
-+
-+It is possible to build and test BlueZ for Android daemon on Linux (eg. PC).
-+Simply follow instructions available at README file in BlueZ top directory.
-+Android daemon binary is located at android/bluetoothd. See next section on
-+how to test Android daemon on Linux.
-+
-+============
-+Testing tool
-+============
-+
-+BT HAL test tools located in android/haltest is provided for HAL level testing
-+of both Android daemon and HAL library. Start it and type 'adapter init' in
-+prompt to initialize HAL library. On Android required bluetoothd service will
-+be started automatically. On Linux it is required to start android/bluetoothd
-+manually before init command timeout. To deinitialize HAL library and stop
-+daemon type 'adapter cleanup'. Type 'help' for more information. Tab completion
-+is also supported.
+ 	return 0;
+ }
+ 
 -- 
-1.8.4.1
+1.7.11.7
 
