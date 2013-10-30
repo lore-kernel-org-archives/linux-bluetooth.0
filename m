@@ -1,30 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 30 Oct 2013 09:34:45 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Set default own address type only during
- controller setup
-Message-ID: <20131030073445.GA1710@x220.p-661hnu-f1>
-References: <1383074811-6623-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383074811-6623-1-git-send-email-marcel@holtmann.org>
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
+Subject: Re: [PATCH] btusb: add realtek 8723 in the blacklist
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <527090CF.9080606@canonical.com>
+Date: Wed, 30 Oct 2013 08:21:36 +0100
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <8D4C32FC-1B76-4962-BF54-A8CCAFAE5578@holtmann.org>
+References: <527090CF.9080606@canonical.com>
+To: "Bruce.Ma" <bruce.ma@canonical.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Bruce,
 
-On Tue, Oct 29, 2013, Marcel Holtmann wrote:
-> The default own address type is currently set at every power on of
-> a controller. This overwrites the value set via debugfs. To avoid
-> this issue, set the default own address type only during controller
-> setup.
+> From: Bruce Ma <bruce.ma@canonical.com>
+> Date: Tue, 22 Oct 2013 11:21:20 +0800
+> Subject: [PATCH] btusb: add realtek 8723 in the blacklist
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> The vendor realtek provides an off-tree driver for realtek 8723, so we
+> add realtek 8723 in the in-tree driver's blacklist.
+
+we do not care about out-of-tree drivers. Get the Realtek driver merged upstream.
+
+> Signed-off-by: Bruce Ma <bruce.ma@canonical.com>
 > ---
->  net/bluetooth/hci_core.c | 20 +++++++++++---------
->  1 file changed, 11 insertions(+), 9 deletions(-)
+> drivers/bluetooth/btusb.c | 3 +++
+> 1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index eae58a1..3097ac8 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -138,6 +138,9 @@ static struct usb_device_id blacklist_table[] = {
+>     { USB_DEVICE(0x0489, 0xe03d), .driver_info = BTUSB_IGNORE },
+>     { USB_DEVICE(0x0489, 0xe027), .driver_info = BTUSB_IGNORE },
+> 
+> +    /* Realtek 8723 Bluetooth */
+> +    { USB_DEVICE(0x0bda, 0xb728), .driver_info = BTUSB_IGNORE },
+> +
+>     /* Atheros AR9285 Malbec with sflash firmware */
+>     { USB_DEVICE(0x03f0, 0x311d), .driver_info = BTUSB_IGNORE },
 
-Applied to bluetooth-next. Thanks.
+And as an extra advice, using proper tabs vs spaces is important.
 
-Johan
+Regards
+
+Marcel
+
