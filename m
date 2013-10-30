@@ -1,26 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 30 Oct 2013 16:32:51 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android: Fix compiler flags with Android version
-Message-ID: <20131030143251.GA3493@x220.p-661hnu-f1>
-References: <1383142958-27510-1-git-send-email-jerzy.kasenberg@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383142958-27510-1-git-send-email-jerzy.kasenberg@tieto.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 BlueZ] android/hid: Fix not cleanup properly after disconnect
+Date: Wed, 30 Oct 2013 16:24:54 +0200
+Message-Id: <1383143094-21262-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jerzy,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Oct 30, 2013, Jerzy Kasenberg wrote:
-> This fixes commit that removed PLATFORM_SDK_VERSION when building
-> haltest. Now all android targets get this define.
-> ---
->  android/Android.mk |    6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+If the device is disconnected it should be removed from the list of
+connected devices and free its data.
+---
+v2: Keep call to g_io_channel_shutdown
 
-Applied. Thanks.
+ android/hid.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-Johan
+diff --git a/android/hid.c b/android/hid.c
+index d6ca4b9..49e9c52 100644
+--- a/android/hid.c
++++ b/android/hid.c
+@@ -149,16 +149,11 @@ static gboolean ctrl_watch_cb(GIOChannel *chan, GIOCondition cond,
+ 	if ((cond & (G_IO_HUP | G_IO_ERR)) && hdev->intr_watch)
+ 		g_io_channel_shutdown(chan, TRUE, NULL);
+ 
+-	hdev->ctrl_watch = 0;
+-
+-	if (hdev->ctrl_io) {
+-		g_io_channel_unref(hdev->ctrl_io);
+-		hdev->ctrl_io = NULL;
+-	}
+-
+ 	if (hdev->intr_io && !(cond & G_IO_NVAL))
+ 		g_io_channel_shutdown(hdev->intr_io, TRUE, NULL);
+ 
++	hid_device_free(hdev);
++
+ 	return FALSE;
+ }
+ 
+@@ -230,8 +225,7 @@ static void control_connect_cb(GIOChannel *chan, GError *conn_err,
+ 	return;
+ 
+ failed:
+-	g_io_channel_unref(hdev->ctrl_io);
+-	hdev->ctrl_io = NULL;
++	hid_device_free(hdev);
+ }
+ 
+ static uint8_t bt_hid_connect(struct hal_cmd_hid_connect *cmd, uint16_t len)
+-- 
+1.8.3.1
+
