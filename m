@@ -1,33 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
-Subject: Re: l2cap sockets not properly multiplexed on ARM
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <D9B9EB3A112B8F489DFFA00A6D5C0FE2032419A8@AD-BR-EX-2.adroot.flemingc.local>
-Date: Wed, 30 Oct 2013 20:40:52 +0100
-Cc: Alexander Holler <holler@ahsoftware.de>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <4A213FF7-48BA-4906-8868-7C3A227EF954@holtmann.org>
-References: <D9B9EB3A112B8F489DFFA00A6D5C0FE20324078F@AD-BR-EX-2.adroot.flemingc.local> <5270EC62.6070705@ahsoftware.de>,<5270F19A.4030408@ahsoftware.de> <D9B9EB3A112B8F489DFFA00A6D5C0FE2032408B0@AD-BR-EX-2.adroot.flemingc.local>,<527114A4.5010207@ahsoftware.de> <D9B9EB3A112B8F489DFFA00A6D5C0FE2032419A8@AD-BR-EX-2.adroot.flemingc.local>
-To: Tim Tisdall <tim.tisdall@flemingcollege.ca>
+Date: Wed, 30 Oct 2013 17:38:42 -0200
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth 2013-10-30
+Message-ID: <20131030193842.GA2271@joana>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="OXfL5xGRrasGEqWY"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tim,
 
-> Yes, confirmed with gatttool.  I used 3 terminals with one running btmon and the other 2 gatttool.  I started btmon then ran gatttool on one terminal starting the notifications.  Then I started another gatttool in another terminal and that new one then showed the results of both devices while the first gatttool stopped displaying any new notifications.  You can see in the btmon that the values are coming from 2 different connection handles but the results are all coming through the 2nd gatttool.  Here's the outputs using 3 terminals connected to the device (first listing was connected first):
-> 
-> So it's perfectly clear:  This all works fine on an x86 machine, but is an issue on ARM
+--OXfL5xGRrasGEqWY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-you must be hitting some non obvious race condition. My first guess is that we have some sort of unaligned access somewhere that ends up that we put the data into the wrong L2CAP channel.
+Hi John,
 
-Can you have a look at Documentation/dynamic-debug-howto.txt and enable the debug section for the bluetooth.ko kernel module. I wonder if we see something fishy in there.
+A last fix to the 3.12. I ended forgetting to send it before, I hope we can
+still make the way to 3.12. It is a revert and it fixes an issue with bluetooth
+suspend/hibernate that had many bug reports. Please pull or let me know of any
+problems. Thanks!
 
-In the end we have to trace the whole flow of the packets and figure out at which point this ended up being send to the wrong channel.
+	Gustavo
+--
+The following changes since commit c7515d2365a6b8a018950198ebe1f5be793cd4bb:
 
-Do you have the chance to run bluetooth-next tree for testing purposes? I rather debug this against the latest tree. I have no ARM platform lying around. So you have to be my test subject ;)
+  brcmsmac: call bcma_core_pci_power_save() from non-atomic context (2013-09-26 14:02:34 -0400)
 
-Regards
+are available in the git repository at:
 
-Marcel
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
 
+for you to fetch changes up to b1a8014471b01dd862de9f91bbbff1296afac42d:
+
+  Bluetooth: revert: "Bluetooth: Add missing reset_resume dev_pm_ops" (2013-10-02 16:01:49 -0300)
+
+----------------------------------------------------------------
+Hans de Goede (1):
+      Bluetooth: revert: "Bluetooth: Add missing reset_resume dev_pm_ops"
+
+ drivers/bluetooth/btusb.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+--OXfL5xGRrasGEqWY
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.15 (GNU/Linux)
+
+iQIcBAEBAgAGBQJScWBCAAoJEPs3PUX4s20oDBsQAIjdUJQumpltijAtqnZuISmC
+UTg27CgfrnTZQnNnJN/tMrdfRqZqPg9UqlBDl1z0Icm/HDQOvzRWfntq0WUPa52L
+Q0Nu53oXYIO0gn3CjomzOFAXk52ptiBkqCDI+GmXG+LBQ0XwbxwDk6BPISGC30xO
+d0NFiZ75dR2IbxfghBbnXLM72MeXBpI4SmQvVjN1C59NXuZH55FyjHXDTb0DkPx2
+EtYfWMV0B9PyL7Btg5A7d/0NJUffBFpj8lr3NhHm7+Cxtl9a6Rnqdbl3Sjw+YYI7
+im/FWjajybbG2xAuJtiWcLwMW/4VkO9rHM2w9803UT33G3Wx1OxRSueWCGRyyFQt
+xEx5IqJ2LSayHTHoyLIeA2dw9ZQmk+7rU/KsvkwNmWiq6LTPJJcSrkvyk0BxEUvU
+p6Q4yhKjc4Wd8ecjNtE+w4nAXcLybfT2iBvRq19cxz5Nu9BHQT165VLwvGkQqVCm
+4IDCHJy0YlnIMSQJRPdSFupXMIukR3qB7NCnts8KiEPxop6wjR5wpcN7U+tVjkbZ
+uBv6mrWr4pMgJrhqWKyzYKrdnJ/+8qEO28Pv3GgG6XCtG36KNeQxGwwXr/CC6Lkh
+oY6mKNdj6okpWPnbT7r2RCaT7LgF9ZU1qFM9iWEeGSxQzWCP7ZhqRHGYc6tRnyzb
+XcZcIilxg88g3aW/kpKl
+=rOI1
+-----END PGP SIGNATURE-----
+
+--OXfL5xGRrasGEqWY--
