@@ -2,101 +2,71 @@ Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: [PATCH 2/2] android: Add supported uuids when adapter initialized
-Date: Wed, 30 Oct 2013 16:18:34 +0100
-Message-ID: <1383146314-13456-2-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1383146314-13456-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1383146314-13456-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 1/2] android: Add initial sdp implementation
+Date: Wed, 30 Oct 2013 16:18:33 +0100
+Message-ID: <1383146314-13456-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It will set class of device with proper service hints.
-We set it statically because we don't want to change
-class of device while adding/removing sdp services.
+Add and remove records to sdp server. This api will
+be used in android's profiles implementations.
 ---
- android/adapter.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+ android/adapter.c | 11 +++++++++++
+ android/adapter.h |  4 ++++
+ 2 files changed, 15 insertions(+)
 
 diff --git a/android/adapter.c b/android/adapter.c
-index 325d0f0..e54264d 100644
+index 15b65e5..325d0f0 100644
 --- a/android/adapter.c
 +++ b/android/adapter.c
-@@ -37,6 +37,24 @@
+@@ -26,6 +26,7 @@
+ #include <glib.h>
  
- static GIOChannel *notification_io = NULL;
- 
-+/*
-+ * This is an array of supported uuids and service hints. We add them via mgmt
-+ * interface when adapter is initialized. Uuids are in reverse orded.
-+ */
-+static const struct mgmt_cp_add_uuid sup_uuids[] = {
-+	/* OBEX */
-+	{{0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00,
-+	0x10, 0x00, 0x00, 0x05, 0x11, 0x00, 0x00}, 0x10},
-+	/* TELEPHONY */
-+	{{0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00,
-+	0x10, 0x00, 0x00, 0x1f, 0x11, 0x00, 0x00}, 0x40},
-+	/* CAPTURING */
-+	{{0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00,
-+	0x10, 0x00, 0x00, 0x0d, 0x11, 0x00, 0x00}, 0x08},
-+	/* NETWORKING */
-+	{{0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00,
-+	0x10, 0x00, 0x00, 0x15, 0x11, 0x00, 0x00}, 0x02} };
-+
- struct bt_adapter {
- 	uint16_t index;
- 	struct mgmt *mgmt;
-@@ -252,6 +270,38 @@ static void load_link_keys(GSList *keys)
- 	g_free(cp);
+ #include "lib/bluetooth.h"
++#include "src/sdpd.h"
+ #include "src/shared/mgmt.h"
+ #include "lib/mgmt.h"
+ #include "log.h"
+@@ -528,6 +529,16 @@ error:
+ 	ipc_send_rsp(io, HAL_SERVICE_ID_BLUETOOTH, status);
  }
  
-+static void add_uuid_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
++int bt_adapter_service_add(sdp_record_t *rec)
 +{
-+	if (status != MGMT_STATUS_SUCCESS) {
-+		error("Failed to add UUID: %s (0x%02x)",
-+						mgmt_errstr(status), status);
-+		return;
-+	}
-+
-+	mgmt_dev_class_changed_event(adapter->index, length, param, NULL);
++	return add_record_to_server(&adapter->bdaddr, rec);
 +}
 +
-+static void add_uuids(void)
++void bt_adapter_service_remove(uint32_t handle)
 +{
-+	unsigned int i;
-+
-+	for (i = 0; i < sizeof(sup_uuids) / sizeof(sup_uuids[0]); i++)
-+		mgmt_send(adapter->mgmt, MGMT_OP_ADD_UUID, adapter->index,
-+				sizeof(sup_uuids[i]), &sup_uuids[i],
-+				add_uuid_complete, NULL, NULL);
++	remove_record_from_server(handle);
 +}
 +
-+static void clear_uuids(void)
-+{
-+	struct mgmt_cp_remove_uuid cp;
-+
-+	memset(&cp, 0, sizeof(cp));
-+
-+	mgmt_send(adapter->mgmt, MGMT_OP_REMOVE_UUID, adapter->index,
-+			sizeof(cp), &cp, NULL, NULL, NULL);
-+}
-+
- static void set_mode_complete(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
+ const bdaddr_t *bt_adapter_get_address(void)
  {
-@@ -330,6 +380,9 @@ static void read_info_complete(uint8_t status, uint16_t length, const void *para
+ 	return &adapter->bdaddr;
+diff --git a/android/adapter.h b/android/adapter.h
+index 2afc67a..c5ba76b 100644
+--- a/android/adapter.h
++++ b/android/adapter.h
+@@ -27,6 +27,7 @@
+ #include <glib.h>
  
- 	set_mode(MGMT_OP_SET_PAIRABLE, 0x01);
+ #include "lib/bluetooth.h"
++#include "lib/sdp.h"
  
-+	clear_uuids();
-+	add_uuids();
+ typedef void (*bt_adapter_ready)(int err);
+ 
+@@ -38,5 +39,8 @@ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
+ 
+ const bdaddr_t *bt_adapter_get_address(void);
+ 
++int bt_adapter_service_add(sdp_record_t *rec);
++void bt_adapter_service_remove(uint32_t handle);
 +
- 	return;
- 
- failed:
+ bool bt_adapter_register(GIOChannel *io);
+ void bt_adapter_unregister(void);
 -- 
 1.8.4.1
 
