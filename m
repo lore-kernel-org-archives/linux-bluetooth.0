@@ -1,48 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 00/14] android: Initial support for pairing
-Date: Thu, 31 Oct 2013 02:55:40 +0000
-Message-Id: <1383188154-22905-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <527190DA.6000805@ahsoftware.de>
+Date: Thu, 31 Oct 2013 00:06:02 +0100
+From: Alexander Holler <holler@ahsoftware.de>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Tim Tisdall <tim.tisdall@flemingcollege.ca>,
+ "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: l2cap sockets not properly multiplexed on ARM
+References: <D9B9EB3A112B8F489DFFA00A6D5C0FE20324078F@AD-BR-EX-2.adroot.flemingc.local> <5270EC62.6070705@ahsoftware.de>,<5270F19A.4030408@ahsoftware.de> <D9B9EB3A112B8F489DFFA00A6D5C0FE2032408B0@AD-BR-EX-2.adroot.flemingc.local>,<527114A4.5010207@ahsoftware.de> <D9B9EB3A112B8F489DFFA00A6D5C0FE2032419A8@AD-BR-EX-2.adroot.flemingc.local> <4A213FF7-48BA-4906-8868-7C3A227EF954@holtmann.org>
+In-Reply-To: <4A213FF7-48BA-4906-8868-7C3A227EF954@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Am 30.10.2013 20:40, schrieb Marcel Holtmann:
 
-Following patches add support for pairing with remote device. Currently
-link keys are not yet stored on fs.
+...
+>> So it's perfectly clear:  This all works fine on an x86 machine, but is an issue on ARM
+...
+> Do you have the chance to run bluetooth-next tree for testing purposes?
 
-This was tested for ssp and legacy pairing with haltest on PC only.
-Still need to test those on Android. Some debugs logs from that code
-could probably be also improved.
+As Anderson Lizardo already mentioned, maybe first verify that the x86
+kernel 3.4 doesn't have the same problem and that it's really a problem
+of the ARM kernel. Up to now he didn't say what kernel version he uses
+on x86.
 
-Comments are welcome.
+Regards.
 
-BR
-Szymon Janc
-
-Szymon Janc (14):
-  android: Add missing bonding state definitions to IPC specification
-  android: Add missing bond state definition to IPC header
-  android: Add support for handling new link key mgmt event
-  android: Make load_link_keys function load keys
-  android: Set default IO capability on daemon start
-  android: Add support for handling create bond command
-  android: Add support for handling cancel bond command
-  android: Add support for handling remove bond command
-  android: Add support for sending pin code request
-  android: Add initial support for sending SSP request event
-  android: Add support for entry variant in SSP request event
-  android: Add support for notify variant in SSP request event
-  android: Add support for handling pin reply command
-  android: Add support for handling SSP reply command
-
- android/adapter.c       | 468 +++++++++++++++++++++++++++++++++++++++++++++++-
- android/hal-ipc-api.txt |   4 +
- android/hal-msg.h       |   4 +
- 3 files changed, 467 insertions(+), 9 deletions(-)
-
--- 
-1.8.4.rc3
-
+Alexander Holler
