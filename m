@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 7/8] android: Add thread-safe helpers
-Date: Wed, 30 Oct 2013 14:16:45 +0200
-Message-Id: <1383135406-23658-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 1/8] android/haltest: Export print property
+Date: Wed, 30 Oct 2013 14:16:39 +0200
+Message-Id: <1383135406-23658-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1383135406-23658-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1383051459-29495-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1383135406-23658-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,78 +12,273 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add thread safe helpers to make HAL debug printing thread-safe. The code
-is inherited from Android bionic and it is used for strerror, strsignal,
-etc.
+Export property printing debug function.
 ---
- android/pthread-local.h |   58 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 58 insertions(+)
- create mode 100644 android/pthread-local.h
+ android/client/if-bt.c    |  110 ---------------------------------------------
+ android/client/textconv.c |  110 +++++++++++++++++++++++++++++++++++++++++++++
+ android/client/textconv.h |    3 ++
+ 3 files changed, 113 insertions(+), 110 deletions(-)
 
-diff --git a/android/pthread-local.h b/android/pthread-local.h
-new file mode 100644
-index 0000000..bc3c0b3
---- /dev/null
-+++ b/android/pthread-local.h
-@@ -0,0 +1,58 @@
-+/*
-+ * Copyright (C) 2012 The Android Open Source Project
-+ * Copyright (C) 2013 Intel Corp.
-+ *
-+ * All rights reserved.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ *  * Redistributions of source code must retain the above copyright
-+ *    notice, this list of conditions and the following disclaimer.
-+ *  * Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in
-+ *    the documentation and/or other materials provided with the
-+ *    distribution.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-+ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
-+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
-+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-+ * SUCH DAMAGE.
-+ */
+diff --git a/android/client/if-bt.c b/android/client/if-bt.c
+index a20a7c6..e9edec5 100644
+--- a/android/client/if-bt.c
++++ b/android/client/if-bt.c
+@@ -29,20 +29,6 @@ const bt_interface_t *if_bluetooth;
+ 		} \
+ 	} while (0)
+ 
+-static char *bdaddr2str(const bt_bdaddr_t *bd_addr)
+-{
+-	static char buf[MAX_ADDR_STR_LEN];
+-
+-	return bt_bdaddr_t2str(bd_addr, buf);
+-}
+-
+-static char *btuuid2str(const bt_uuid_t *uuid)
+-{
+-	static char buf[MAX_UUID_STR_LEN];
+-
+-	return bt_uuid_t2str(uuid, buf);
+-}
+-
+ static bt_scan_mode_t str2btscanmode(const char *str)
+ {
+ 	bt_scan_mode_t v = str2bt_scan_mode_t(str);
+@@ -76,102 +62,6 @@ static bt_property_type_t str2btpropertytype(const char *str)
+ 	return (bt_property_type_t) atoi(str);
+ }
+ 
+-static char *btproperty2str(bt_property_t property)
+-{
+-	static char buf[4096];
+-	char *p;
+-
+-	p = buf + sprintf(buf, "type=%s len=%d val=",
+-					bt_property_type_t2str(property.type),
+-					property.len);
+-
+-	switch (property.type) {
+-	case BT_PROPERTY_BDNAME:
+-	case BT_PROPERTY_REMOTE_FRIENDLY_NAME:
+-		sprintf(p, "%*s", property.len,
+-					((bt_bdname_t *) property.val)->name);
+-		break;
+-
+-	case BT_PROPERTY_BDADDR:
+-		sprintf(p, "%s", bdaddr2str((bt_bdaddr_t *) property.val));
+-		break;
+-
+-	case BT_PROPERTY_CLASS_OF_DEVICE:
+-		sprintf(p, "%06x", *((int *) property.val));
+-		break;
+-
+-	case BT_PROPERTY_TYPE_OF_DEVICE:
+-		sprintf(p, "%s", bt_device_type_t2str(
+-					*((bt_device_type_t *) property.val)));
+-		break;
+-
+-	case BT_PROPERTY_REMOTE_RSSI:
+-		sprintf(p, "%d", *((char *) property.val));
+-		break;
+-
+-	case BT_PROPERTY_ADAPTER_SCAN_MODE:
+-		sprintf(p, "%s",
+-			bt_scan_mode_t2str(*((bt_scan_mode_t *) property.val)));
+-		break;
+-
+-	case BT_PROPERTY_ADAPTER_DISCOVERY_TIMEOUT:
+-		sprintf(p, "%d", *((int *) property.val));
+-		break;
+-
+-	case BT_PROPERTY_ADAPTER_BONDED_DEVICES:
+-		{
+-			int count = property.len / sizeof(bt_bdaddr_t);
+-			char *ptr = property.val;
+-
+-			strcat(p, "{");
+-
+-			while (count--) {
+-				strcat(p, bdaddr2str((bt_bdaddr_t *) ptr));
+-				if (count)
+-					strcat(p, ", ");
+-				ptr += sizeof(bt_bdaddr_t);
+-			}
+-
+-			strcat(p, "}");
+-
+-		}
+-		break;
+-
+-	case BT_PROPERTY_UUIDS:
+-		{
+-			int count = property.len / sizeof(bt_uuid_t);
+-			char *ptr = property.val;
+-
+-			strcat(p, "{");
+-
+-			while (count--) {
+-				strcat(p, btuuid2str((bt_uuid_t *) ptr));
+-				if (count)
+-					strcat(p, ", ");
+-				ptr += sizeof(bt_uuid_t);
+-			}
+-
+-			strcat(p, "}");
+-
+-		}
+-		break;
+-
+-	case BT_PROPERTY_SERVICE_RECORD:
+-		{
+-			bt_service_record_t *rec = property.val;
+-
+-			sprintf(p, "{%s, %d, %s}", btuuid2str(&rec->uuid),
+-						rec->channel, rec->name);
+-		}
+-		break;
+-
+-	default:
+-		sprintf(p, "%p", property.val);
+-	}
+-
+-	return buf;
+-}
+-
+ static void dump_properties(int num_properties, bt_property_t *properties)
+ {
+ 	int i;
+diff --git a/android/client/textconv.c b/android/client/textconv.c
+index 32b1cab..8f27948 100644
+--- a/android/client/textconv.c
++++ b/android/client/textconv.c
+@@ -226,3 +226,113 @@ const char *enum_one_string(void *v, int i)
+ 
+ 	return (i == 0) && (m[0] != 0) ? m : NULL;
+ }
 +
-+#include <pthread.h>
-+#include <stdlib.h>
++char *bdaddr2str(const bt_bdaddr_t *bd_addr)
++{
++	static char buf[MAX_ADDR_STR_LEN];
 +
-+#define GLOBAL_INIT_THREAD_LOCAL_BUFFER(name) \
-+	static pthread_key_t __tls_ ## name ## _key; \
-+	static void __tls_ ## name ## _key_destroy(void *buffer) \
-+	{ \
-+		free(buffer); \
-+	} \
-+	static void __attribute__((constructor)) __tls_ ## name ## _key_init() \
-+	{ \
-+		pthread_key_create(&__tls_ ## name ## _key, \
-+					__tls_ ## name ## _key_destroy); \
++	return bt_bdaddr_t2str(bd_addr, buf);
++}
++
++static char *btuuid2str(const bt_uuid_t *uuid)
++{
++	static char buf[MAX_UUID_STR_LEN];
++
++	return bt_uuid_t2str(uuid, buf);
++}
++
++char *btproperty2str(bt_property_t property)
++{
++	static char buf[4096];
++	char *p;
++
++	p = buf + sprintf(buf, "type=%s len=%d val=",
++					bt_property_type_t2str(property.type),
++					property.len);
++
++	switch (property.type) {
++	case BT_PROPERTY_BDNAME:
++	case BT_PROPERTY_REMOTE_FRIENDLY_NAME:
++		sprintf(p, "%*s", property.len,
++					((bt_bdname_t *) property.val)->name);
++		break;
++
++	case BT_PROPERTY_BDADDR:
++		sprintf(p, "%s", bdaddr2str((bt_bdaddr_t *) property.val));
++		break;
++
++	case BT_PROPERTY_CLASS_OF_DEVICE:
++		sprintf(p, "%06x", *((int *) property.val));
++		break;
++
++	case BT_PROPERTY_TYPE_OF_DEVICE:
++		sprintf(p, "%s", bt_device_type_t2str(
++					*((bt_device_type_t *) property.val)));
++		break;
++
++	case BT_PROPERTY_REMOTE_RSSI:
++		sprintf(p, "%d", *((char *) property.val));
++		break;
++
++	case BT_PROPERTY_ADAPTER_SCAN_MODE:
++		sprintf(p, "%s",
++			bt_scan_mode_t2str(*((bt_scan_mode_t *) property.val)));
++		break;
++
++	case BT_PROPERTY_ADAPTER_DISCOVERY_TIMEOUT:
++		sprintf(p, "%d", *((int *) property.val));
++		break;
++
++	case BT_PROPERTY_ADAPTER_BONDED_DEVICES:
++		{
++			int count = property.len / sizeof(bt_bdaddr_t);
++			char *ptr = property.val;
++
++			strcat(p, "{");
++
++			while (count--) {
++				strcat(p, bdaddr2str((bt_bdaddr_t *) ptr));
++				if (count)
++					strcat(p, ", ");
++				ptr += sizeof(bt_bdaddr_t);
++			}
++
++			strcat(p, "}");
++
++		}
++		break;
++
++	case BT_PROPERTY_UUIDS:
++		{
++			int count = property.len / sizeof(bt_uuid_t);
++			char *ptr = property.val;
++
++			strcat(p, "{");
++
++			while (count--) {
++				strcat(p, btuuid2str((bt_uuid_t *) ptr));
++				if (count)
++					strcat(p, ", ");
++				ptr += sizeof(bt_uuid_t);
++			}
++
++			strcat(p, "}");
++
++		}
++		break;
++
++	case BT_PROPERTY_SERVICE_RECORD:
++		{
++			bt_service_record_t *rec = property.val;
++
++			sprintf(p, "{%s, %d, %s}", btuuid2str(&rec->uuid),
++						rec->channel, rec->name);
++		}
++		break;
++
++	default:
++		sprintf(p, "%p", property.val);
 +	}
 +
-+/*
-+ * Leaves "name_tls_buffer" and "name_tls_buffer_size" defined and initialized.
-+ */
-+#define LOCAL_INIT_THREAD_LOCAL_BUFFER(type, name, byte_count) \
-+	const size_t name ## _tls_buffer_size \
-+					__attribute__((unused)) = byte_count; \
-+	type name ## _tls_buffer = \
-+		(pthread_getspecific(__tls_ ## name ## _key)); \
-+	if (name ## _tls_buffer == NULL) { \
-+		name ## _tls_buffer = (calloc(1, byte_count)); \
-+		pthread_setspecific(__tls_ ## name ## _key, \
-+							name ## _tls_buffer); \
-+	}
++	return buf;
++}
+diff --git a/android/client/textconv.h b/android/client/textconv.h
+index 085b141..89b29c6 100644
+--- a/android/client/textconv.h
++++ b/android/client/textconv.h
+@@ -107,6 +107,9 @@ void str2bt_bdaddr_t(const char *str, bt_bdaddr_t *bd_addr);
+ char *bt_uuid_t2str(const bt_uuid_t *uuid, char *buf);
+ void str2bt_uuid_t(const char *str, bt_uuid_t *uuid);
+ 
++char *btproperty2str(bt_property_t property);
++char *bdaddr2str(const bt_bdaddr_t *bd_addr);
++
+ DECINTMAP(bt_status_t);
+ DECINTMAP(bt_state_t);
+ DECINTMAP(bt_device_type_t);
 -- 
 1.7.10.4
 
