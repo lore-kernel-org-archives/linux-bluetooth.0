@@ -1,63 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 30 Oct 2013 10:37:51 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] android: Suppress compiler warnings not used in
- autotools build
-Message-ID: <20131030083604.GI27517@aemeltch-MOBL1>
-References: <1383060218-25693-1-git-send-email-szymon.janc@tieto.com>
- <1383060218-25693-2-git-send-email-szymon.janc@tieto.com>
- <20131030081914.GH27517@aemeltch-MOBL1>
- <1664552.rzmdhg2vR5@uw000953>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1664552.rzmdhg2vR5@uw000953>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/hal: Fix using void pointer in math operations
+Date: Wed, 30 Oct 2013 10:27:54 +0200
+Message-Id: <1383121674-24244-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Wed, Oct 30, 2013 at 09:25:03AM +0100, Szymon Janc wrote:
-> Hi Andrei,
-> 
-> On Wednesday 30 of October 2013 10:19:15 Andrei Emeltchenko wrote:
-> > Hi Szymon,
-> > 
-> > On Tue, Oct 29, 2013 at 04:23:38PM +0100, Szymon Janc wrote:
-> > > Android build system is enabling some additional warnings that are not
-> > > enabled when building with autotools. This avoids spurious warnings
-> > > while building on Android.
-> > > ---
-> > >  android/Android.mk | 3 +++
-> > >  1 file changed, 3 insertions(+)
-> > > 
-> > > diff --git a/android/Android.mk b/android/Android.mk
-> > > index c88b27e..fc1b276 100644
-> > > --- a/android/Android.mk
-> > > +++ b/android/Android.mk
-> > > @@ -9,6 +9,9 @@ pathmap_INCL += glib:external/bluetooth/glib
-> > >  # Specify common compiler flags
-> > >  BLUEZ_COMMON_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\"
-> > >  
-> > > +# Disable warnings enabled by Android but not enabled in autotools build
-> > > +BLUEZ_COMMON_CFLAGS += -Wno-pointer-arith
-> > 
-> > I wouldn't put this to BLUEZ_COMMON_CFLAGS, maybe only bluetoothd target
-> > CFLAGS, the issue withing HAL might be easily fixed. We use void pointer
-> > in math operations.
-> 
-> This is done on purpose as using void* to operation is simply convenient as
-> there is no need for char* casting (and sizeof(void *) == 1 is documented GCC
-> feature). Further more I think it will be easier for developers if we can have
-> same code guidelines and warnings while building on host and android for all
-> components.
+Fixes following compiler warnings:
+...
+hal-bluetooth.c: In function 'handle_adapter_props_changed':
+hal-bluetooth.c:57:9: warning: pointer of type 'void *' used in arithmetic [-Wpointer-arith]
+hal-bluetooth.c:57:29: warning: pointer of type 'void *' used in arithmetic [-Wpointer-arith]
+hal-bluetooth.c:57:51: warning: pointer of type 'void *' used in arithmetic [-Wpointer-arith]
+hal-bluetooth.c:66:5: warning: pointer of type 'void *' used in arithmetic [-Wpointer-arith]
+...
+---
+ android/hal-bluetooth.c |    9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-I just sent patch with some fix proposal. I know there are discussions
-about this issue, let's maintainers decide on this.
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index fc60d72..0c083de 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -44,17 +44,18 @@ static void handle_adapter_props_changed(void *buf, uint16_t len)
+ 	struct hal_ev_adapter_props_changed *ev = buf;
+ 	bt_property_t props[ev->num_props];
+ 	struct hal_property *hal_prop;
+-	void *p;
++	uint8_t *p;
+ 	int i;
+ 
+ 	if (!bt_hal_cbacks->adapter_properties_cb)
+ 		return;
+ 
+ 	hal_prop = ev->props;
+-	p = ev->props;
++	p = (uint8_t *) ev->props;
+ 
+ 	for (i = 0; i < ev->num_props; i++) {
+-		if (p + sizeof(*hal_prop) + hal_prop->len > buf + len) {
++		if (p + sizeof(*hal_prop) + hal_prop->len >
++							(uint8_t *) buf + len) {
+ 			error("invalid adapter properties event, aborting");
+ 			exit(EXIT_FAILURE);
+ 		}
+@@ -64,7 +65,7 @@ static void handle_adapter_props_changed(void *buf, uint16_t len)
+ 		props[i].val = hal_prop->val;
+ 
+ 		p += sizeof(*hal_prop) + hal_prop->len;
+-		hal_prop = p;
++		hal_prop = (struct hal_property *) p;
+ 
+ 		DBG("prop[%d]: %s", i, btproperty2str(&props[i]));
+ 	}
+-- 
+1.7.10.4
 
-PS: I personally think that casting when assigning 2 pointers is good in a
-way it shows you that you cast to a different structure.
-
-Best regards 
-Andrei Emeltchenko 
