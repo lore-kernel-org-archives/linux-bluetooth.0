@@ -1,31 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 30 Oct 2013 12:07:18 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] android/client: Fix crash in tab completion
-Message-ID: <20131030100718.GA19488@x220.p-661hnu-f1>
-References: <1383125472-6813-1-git-send-email-jerzy.kasenberg@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383125472-6813-1-git-send-email-jerzy.kasenberg@tieto.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 6/6] android: Add missing discovery state definitions to IPC header
+Date: Wed, 30 Oct 2013 11:00:32 +0100
+Message-Id: <1383127232-25147-7-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1383127232-25147-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1383127232-25147-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jerzy,
+---
+ android/hal-msg.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-On Wed, Oct 30, 2013, Jerzy Kasenberg wrote:
-> When user pressed tab on third or later argument when
-> first two did not make sense tool crashed.
-> Now method is checked for NULL before accessing help field.
-> ---
-> First version was doing to much (crash was gone but so was
-> completion when completion function was not provided, just help
-> string)
-> 
->  android/client/tabcompletion.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 80b47d6..d2a0e2a 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -348,6 +348,9 @@ struct hal_ev_device_found {
+ 	struct hal_property props[0];
+ } __attribute__((packed));
+ 
++#define HAL_DISCOVERY_STATE_STOPPED	0x00
++#define HAL_DISCOVERY_STATE_STARTED	0x01
++
+ #define HAL_EV_DISCOVERY_STATE_CHANGED	0x85
+ struct hal_ev_discovery_state_changed {
+ 	uint8_t state;
+-- 
+1.8.4.1
 
-Applied. Thanks.
-
-Johan
