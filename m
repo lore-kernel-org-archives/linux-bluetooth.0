@@ -1,26 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 30 Oct 2013 12:10:07 +0200
+Date: Wed, 30 Oct 2013 12:07:18 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+To: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android: Add common place for adding compiler flags
- in Android.mk
-Message-ID: <20131030101007.GB19488@x220.p-661hnu-f1>
-References: <1383060218-25693-1-git-send-email-szymon.janc@tieto.com>
+Subject: Re: [PATCH v2] android/client: Fix crash in tab completion
+Message-ID: <20131030100718.GA19488@x220.p-661hnu-f1>
+References: <1383125472-6813-1-git-send-email-jerzy.kasenberg@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383060218-25693-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1383125472-6813-1-git-send-email-jerzy.kasenberg@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Jerzy,
 
-On Tue, Oct 29, 2013, Szymon Janc wrote:
-> This will contain CFLAGS common for all BlueZ code.
+On Wed, Oct 30, 2013, Jerzy Kasenberg wrote:
+> When user pressed tab on third or later argument when
+> first two did not make sense tool crashed.
+> Now method is checked for NULL before accessing help field.
 > ---
->  android/Android.mk | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
+> First version was doing to much (crash was gone but so was
+> completion when completion function was not provided, just help
+> string)
+> 
+>  android/client/tabcompletion.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Both patches have been applied. Thanks.
+Applied. Thanks.
 
 Johan
