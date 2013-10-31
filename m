@@ -9,106 +9,276 @@ CC: Marcel Holtmann <marcel@holtmann.org>,
  Frysinger <vapier@chromium.org>,
         Amitkumar Karwar <akarwar@marvell.com>, Bing
  Zhao <bzhao@marvell.com>
-Subject: [PATCH 2/3] Bluetooth: btmrvl: remove cal-data byte swapping and redundant mem copy
-Date: Thu, 31 Oct 2013 15:08:30 -0700
-Message-ID: <1383257311-1430-2-git-send-email-bzhao@marvell.com>
-In-Reply-To: <1383257311-1430-1-git-send-email-bzhao@marvell.com>
-References: <1383257311-1430-1-git-send-email-bzhao@marvell.com>
+Subject: [PATCH 1/3] Bluetooth: btmrvl: use cal-data from device-tree instead of conf file
+Date: Thu, 31 Oct 2013 15:08:29 -0700
+Message-ID: <1383257311-1430-1-git-send-email-bzhao@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The device tree property can define the cal-data in proper order.
-There is no need to swap the bytes in driver.
-Also remove the redundant cal-data memory copy after removing the
-byte swapping.
+The cal-data is platform dependent. It's simpler and more feasible
+to use device tree based cal-data instead of configuration file
+based cal-data.
+
+This patch remove configuration file based cal-data downloading
+and replace it using cal-data from device tree.
 
 Cc: Mike Frysinger <vapier@chromium.org>
 Cc: Amitkumar Karwar <akarwar@marvell.com>
 Signed-off-by: Bing Zhao <bzhao@marvell.com>
 Signed-off-by: Hyuckjoo Lee <hyuckjoo.lee@samsung.com>
 ---
- drivers/bluetooth/btmrvl_drv.h  |  2 +-
- drivers/bluetooth/btmrvl_main.c | 27 ++++++++++-----------------
- 2 files changed, 11 insertions(+), 18 deletions(-)
+ drivers/bluetooth/btmrvl_drv.h  |  4 --
+ drivers/bluetooth/btmrvl_main.c | 92 ++++++++---------------------------------
+ drivers/bluetooth/btmrvl_sdio.c |  9 +---
+ drivers/bluetooth/btmrvl_sdio.h |  2 -
+ 4 files changed, 18 insertions(+), 89 deletions(-)
 
 diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
-index be76851..ffac0e4 100644
+index f9d1833..be76851 100644
 --- a/drivers/bluetooth/btmrvl_drv.h
 +++ b/drivers/bluetooth/btmrvl_drv.h
-@@ -117,7 +117,7 @@ struct btmrvl_private {
- #define PS_SLEEP			0x01
- #define PS_AWAKE			0x00
+@@ -23,8 +23,6 @@
+ #include <linux/bitops.h>
+ #include <linux/slab.h>
+ #include <net/bluetooth/bluetooth.h>
+-#include <linux/ctype.h>
+-#include <linux/firmware.h>
  
--#define BT_CMD_DATA_SIZE		32
-+#define BT_CAL_HDR_LEN			4
- #define BT_CAL_DATA_SIZE		28
+ #define BTM_HEADER_LEN			4
+ #define BTM_UPLD_SIZE			2312
+@@ -43,8 +41,6 @@ struct btmrvl_thread {
+ struct btmrvl_device {
+ 	void *card;
+ 	struct hci_dev *hcidev;
+-	struct device *dev;
+-	const char *cal_data;
  
- struct btmrvl_event {
+ 	u8 dev_type;
+ 
 diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index a17812d..f13bef8 100644
+index 5cf31c4..a17812d 100644
 --- a/drivers/bluetooth/btmrvl_main.c
 +++ b/drivers/bluetooth/btmrvl_main.c
-@@ -418,28 +418,20 @@ static int btmrvl_open(struct hci_dev *hdev)
+@@ -19,7 +19,7 @@
+  **/
+ 
+ #include <linux/module.h>
+-
++#include <linux/of.h>
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ 
+@@ -417,52 +417,8 @@ static int btmrvl_open(struct hci_dev *hdev)
+ 	return 0;
  }
  
- static int btmrvl_download_cal_data(struct btmrvl_private *priv,
--				    u8 *config_data)
-+				    u8 *data, int len)
- {
--	int i, ret;
--	u8 data[BT_CMD_DATA_SIZE];
-+	int ret;
- 
- 	data[0] = 0x00;
- 	data[1] = 0x00;
- 	data[2] = 0x00;
--	data[3] = BT_CMD_DATA_SIZE - 4;
+-/*
+- * This function parses provided calibration data input. It should contain
+- * hex bytes separated by space or new line character. Here is an example.
+- * 00 1C 01 37 FF FF FF FF 02 04 7F 01
+- * CE BA 00 00 00 2D C6 C0 00 00 00 00
+- * 00 F0 00 00
+- */
+-static int btmrvl_parse_cal_cfg(const u8 *src, u32 len, u8 *dst, u32 dst_size)
+-{
+-	const u8 *s = src;
+-	u8 *d = dst;
+-	int ret;
+-	u8 tmp[3];
 -
--	/* Swap cal-data bytes. Each four bytes are swapped. Considering 4
--	 * byte SDIO header offset, mapping of input and output bytes will be
--	 * {3, 2, 1, 0} -> {0+4, 1+4, 2+4, 3+4},
--	 * {7, 6, 5, 4} -> {4+4, 5+4, 6+4, 7+4} */
--	for (i = 4; i < BT_CMD_DATA_SIZE; i++)
--		data[i] = config_data[(i / 4) * 8 - 1 - i];
-+	data[3] = len;
- 
- 	print_hex_dump_bytes("Calibration data: ",
--			     DUMP_PREFIX_OFFSET, data, BT_CMD_DATA_SIZE);
-+			     DUMP_PREFIX_OFFSET, data, BT_CAL_HDR_LEN + len);
- 
- 	ret = btmrvl_send_sync_cmd(priv, BT_CMD_LOAD_CONFIG_DATA, data,
--				   BT_CMD_DATA_SIZE);
-+				   BT_CAL_HDR_LEN + len);
- 	if (ret)
- 		BT_ERR("Failed to download caibration data\n");
- 
-@@ -449,7 +441,7 @@ static int btmrvl_download_cal_data(struct btmrvl_private *priv,
- static int btmrvl_cal_data_dt(struct btmrvl_private *priv)
+-	tmp[2] = '\0';
+-	while ((s - src) <= len - 2) {
+-		if (isspace(*s)) {
+-			s++;
+-			continue;
+-		}
+-
+-		if (isxdigit(*s)) {
+-			if ((d - dst) >= dst_size) {
+-				BT_ERR("calibration data file too big!!!");
+-				return -EINVAL;
+-			}
+-
+-			memcpy(tmp, s, 2);
+-
+-			ret = kstrtou8(tmp, 16, d++);
+-			if (ret < 0)
+-				return ret;
+-
+-			s += 2;
+-		} else {
+-			return -EINVAL;
+-		}
+-	}
+-	if (d == dst)
+-		return -EINVAL;
+-
+-	return 0;
+-}
+-
+-static int btmrvl_load_cal_data(struct btmrvl_private *priv,
+-				u8 *config_data)
++static int btmrvl_download_cal_data(struct btmrvl_private *priv,
++				    u8 *config_data)
  {
- 	struct device_node *dt_node;
--	u8 cal_data[BT_CAL_DATA_SIZE];
-+	u8 cal_data[BT_CAL_HDR_LEN + BT_CAL_DATA_SIZE];
- 	const char name[] = "btmrvl_caldata";
- 	const char property[] = "btmrvl,caldata";
- 	int ret;
-@@ -458,13 +450,14 @@ static int btmrvl_cal_data_dt(struct btmrvl_private *priv)
- 	if (!dt_node)
- 		return -ENODEV;
+ 	int i, ret;
+ 	u8 data[BT_CMD_DATA_SIZE];
+@@ -490,54 +446,40 @@ static int btmrvl_load_cal_data(struct btmrvl_private *priv,
+ 	return 0;
+ }
  
--	ret = of_property_read_u8_array(dt_node, property, cal_data,
--					sizeof(cal_data));
-+	ret = of_property_read_u8_array(dt_node, property,
-+					cal_data + BT_CAL_HDR_LEN,
-+					BT_CAL_DATA_SIZE);
+-static int
+-btmrvl_process_cal_cfg(struct btmrvl_private *priv, u8 *data, u32 size)
++static int btmrvl_cal_data_dt(struct btmrvl_private *priv)
+ {
++	struct device_node *dt_node;
+ 	u8 cal_data[BT_CAL_DATA_SIZE];
++	const char name[] = "btmrvl_caldata";
++	const char property[] = "btmrvl,caldata";
+ 	int ret;
+ 
+-	ret = btmrvl_parse_cal_cfg(data, size, cal_data, sizeof(cal_data));
++	dt_node = of_find_node_by_name(NULL, name);
++	if (!dt_node)
++		return -ENODEV;
++
++	ret = of_property_read_u8_array(dt_node, property, cal_data,
++					sizeof(cal_data));
  	if (ret)
  		return ret;
  
- 	BT_DBG("Use cal data from device tree");
--	ret = btmrvl_download_cal_data(priv, cal_data);
-+	ret = btmrvl_download_cal_data(priv, cal_data, BT_CAL_DATA_SIZE);
+-	ret = btmrvl_load_cal_data(priv, cal_data);
++	BT_DBG("Use cal data from device tree");
++	ret = btmrvl_download_cal_data(priv, cal_data);
  	if (ret) {
- 		BT_ERR("Fail to download calibrate data");
+-		BT_ERR("Fail to load calibrate data");
++		BT_ERR("Fail to download calibrate data");
  		return ret;
+ 	}
+ 
+ 	return 0;
+ }
+ 
+-static int btmrvl_cal_data_config(struct btmrvl_private *priv)
+-{
+-	const struct firmware *cfg;
+-	int ret;
+-	const char *cal_data = priv->btmrvl_dev.cal_data;
+-
+-	if (!cal_data)
+-		return 0;
+-
+-	ret = request_firmware(&cfg, cal_data, priv->btmrvl_dev.dev);
+-	if (ret < 0) {
+-		BT_DBG("Failed to get %s file, skipping cal data download",
+-		       cal_data);
+-		return 0;
+-	}
+-
+-	ret = btmrvl_process_cal_cfg(priv, (u8 *)cfg->data, cfg->size);
+-	release_firmware(cfg);
+-	return ret;
+-}
+-
+ static int btmrvl_setup(struct hci_dev *hdev)
+ {
+ 	struct btmrvl_private *priv = hci_get_drvdata(hdev);
+ 
+ 	btmrvl_send_module_cfg_cmd(priv, MODULE_BRINGUP_REQ);
+ 
+-	if (btmrvl_cal_data_config(priv))
+-		BT_ERR("Set cal data failed");
++	btmrvl_cal_data_dt(priv);
+ 
+ 	priv->btmrvl_dev.psmode = 1;
+ 	btmrvl_enable_ps(priv);
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index fabcf5b..1b52c9f 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -18,6 +18,7 @@
+  * this warranty disclaimer.
+  **/
+ 
++#include <linux/firmware.h>
+ #include <linux/slab.h>
+ 
+ #include <linux/mmc/sdio_ids.h>
+@@ -101,7 +102,6 @@ static const struct btmrvl_sdio_card_reg btmrvl_reg_88xx = {
+ static const struct btmrvl_sdio_device btmrvl_sdio_sd8688 = {
+ 	.helper		= "mrvl/sd8688_helper.bin",
+ 	.firmware	= "mrvl/sd8688.bin",
+-	.cal_data	= NULL,
+ 	.reg		= &btmrvl_reg_8688,
+ 	.sd_blksz_fw_dl	= 64,
+ };
+@@ -109,7 +109,6 @@ static const struct btmrvl_sdio_device btmrvl_sdio_sd8688 = {
+ static const struct btmrvl_sdio_device btmrvl_sdio_sd8787 = {
+ 	.helper		= NULL,
+ 	.firmware	= "mrvl/sd8787_uapsta.bin",
+-	.cal_data	= NULL,
+ 	.reg		= &btmrvl_reg_87xx,
+ 	.sd_blksz_fw_dl	= 256,
+ };
+@@ -117,7 +116,6 @@ static const struct btmrvl_sdio_device btmrvl_sdio_sd8787 = {
+ static const struct btmrvl_sdio_device btmrvl_sdio_sd8797 = {
+ 	.helper		= NULL,
+ 	.firmware	= "mrvl/sd8797_uapsta.bin",
+-	.cal_data	= "mrvl/sd8797_caldata.conf",
+ 	.reg		= &btmrvl_reg_87xx,
+ 	.sd_blksz_fw_dl	= 256,
+ };
+@@ -125,7 +123,6 @@ static const struct btmrvl_sdio_device btmrvl_sdio_sd8797 = {
+ static const struct btmrvl_sdio_device btmrvl_sdio_sd8897 = {
+ 	.helper		= NULL,
+ 	.firmware	= "mrvl/sd8897_uapsta.bin",
+-	.cal_data	= NULL,
+ 	.reg		= &btmrvl_reg_88xx,
+ 	.sd_blksz_fw_dl	= 256,
+ };
+@@ -1007,7 +1004,6 @@ static int btmrvl_sdio_probe(struct sdio_func *func,
+ 		struct btmrvl_sdio_device *data = (void *) id->driver_data;
+ 		card->helper = data->helper;
+ 		card->firmware = data->firmware;
+-		card->cal_data = data->cal_data;
+ 		card->reg = data->reg;
+ 		card->sd_blksz_fw_dl = data->sd_blksz_fw_dl;
+ 	}
+@@ -1036,8 +1032,6 @@ static int btmrvl_sdio_probe(struct sdio_func *func,
+ 	}
+ 
+ 	card->priv = priv;
+-	priv->btmrvl_dev.dev = &card->func->dev;
+-	priv->btmrvl_dev.cal_data = card->cal_data;
+ 
+ 	/* Initialize the interface specific function pointers */
+ 	priv->hw_host_to_card = btmrvl_sdio_host_to_card;
+@@ -1220,5 +1214,4 @@ MODULE_FIRMWARE("mrvl/sd8688_helper.bin");
+ MODULE_FIRMWARE("mrvl/sd8688.bin");
+ MODULE_FIRMWARE("mrvl/sd8787_uapsta.bin");
+ MODULE_FIRMWARE("mrvl/sd8797_uapsta.bin");
+-MODULE_FIRMWARE("mrvl/sd8797_caldata.conf");
+ MODULE_FIRMWARE("mrvl/sd8897_uapsta.bin");
+diff --git a/drivers/bluetooth/btmrvl_sdio.h b/drivers/bluetooth/btmrvl_sdio.h
+index 6872d9e..43d35a6 100644
+--- a/drivers/bluetooth/btmrvl_sdio.h
++++ b/drivers/bluetooth/btmrvl_sdio.h
+@@ -85,7 +85,6 @@ struct btmrvl_sdio_card {
+ 	u32 ioport;
+ 	const char *helper;
+ 	const char *firmware;
+-	const char *cal_data;
+ 	const struct btmrvl_sdio_card_reg *reg;
+ 	u16 sd_blksz_fw_dl;
+ 	u8 rx_unit;
+@@ -95,7 +94,6 @@ struct btmrvl_sdio_card {
+ struct btmrvl_sdio_device {
+ 	const char *helper;
+ 	const char *firmware;
+-	const char *cal_data;
+ 	const struct btmrvl_sdio_card_reg *reg;
+ 	u16 sd_blksz_fw_dl;
+ };
 -- 
 1.8.0
