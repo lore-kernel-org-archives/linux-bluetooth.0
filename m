@@ -1,52 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 31 Oct 2013 16:04:58 +0200
+Date: Thu, 31 Oct 2013 16:03:11 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/hidhost: Fix not unregistering HID
-Message-ID: <20131031140458.GB27325@x220.p-661hnu-f1>
-References: <1383227514-22944-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH 00/10] Add GATT support to haltest
+Message-ID: <20131031140311.GA27325@x220.p-661hnu-f1>
+References: <1383216315-30627-1-git-send-email-jerzy.kasenberg@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383227514-22944-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1383216315-30627-1-git-send-email-jerzy.kasenberg@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Jerzy,
 
-On Thu, Oct 31, 2013, Andrei Emeltchenko wrote:
-> If HID is not unregistered it cannot be registered again and we get
-> following error:
-> ...
-> E/BluetoothHidServiceJni( 2849): Failed to initialize Bluetooth HID, status: 1
-> ...
-> ---
->  android/hal-hidhost.c |    5 +++++
->  1 file changed, 5 insertions(+)
+On Thu, Oct 31, 2013, Jerzy Kasenberg wrote:
+> This patachset adds code to call GATT hal methods.
+> Compiles on Android 4.3 and host.
+> On 4.2 it's source code is not included.
 > 
-> diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
-> index a72410b..a81fea5 100644
-> --- a/android/hal-hidhost.c
-> +++ b/android/hal-hidhost.c
-> @@ -301,12 +301,17 @@ static bt_status_t hh_init(bthh_callbacks_t *callbacks)
->  
->  static void hh_cleanup(void)
->  {
-> +	struct hal_cmd_unregister_module cmd;
-> +
->  	DBG("");
->  
->  	if (!interface_ready())
->  		return;
->  
->  	bt_hh_cbacks = NULL;
-> +
-> +	hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_UNREGISTER_MODULE,
-> +					sizeof(cmd), &cmd, 0, NULL, NULL);
->  }
+> Status that is used in callbacks is currently printed as number.
+> This number corresponds to series of defines from file:
+> external/bluedroid/stack/include/gatt_api.h
+> This file looks like implementation detail for bluedroid.
+> It's to be decided it defines should be copied to bluez source code.
+> Until that status is printed as numbers.
+> Same applies to tGATT_WRITE_TYPE which is used as argument in
+> write_characteristic and write_descriptor.
+> 
+> Jerzy Kasenberg (10):
+>   android/client: Add skeleton for GATT interface
+>   android/client: Add GATT client callbacks code
+>   android/client: Add complex GATT type formating
+>   android/client: Add init/cleanup for GATT
+>   android/client: Add helper macros to verify args
+>   android/client: Add GATT client method calls
+>   android/client: Add GATT complex type parsing
+>   android/client: Add tab completion to GATT client
+>   android/client: Add GATT server callbacks code
+>   android/client: Add GATT server methods
+> 
+>  android/Android.mk       |    7 +
+>  android/Makefile.am      |    2 +
+>  android/client/haltest.c |    5 +
+>  android/client/if-bt.c   |    2 +
+>  android/client/if-gatt.c | 1733 ++++++++++++++++++++++++++++++++++++++++++++++
+>  android/client/if-main.h |   14 +
+>  6 files changed, 1763 insertions(+)
+>  create mode 100644 android/client/if-gatt.c
 
-Did you test this at all? It looks completely broken to me since you
-pass an uninitialized variable to hal_ipc_cmd. You should be at least
-setting the right service id for HID in the cmd struct.
+All patches have been applied. Thanks.
 
 Johan
