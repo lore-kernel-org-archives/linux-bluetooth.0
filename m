@@ -1,54 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 31 Oct 2013 16:03:11 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 00/10] Add GATT support to haltest
-Message-ID: <20131031140311.GA27325@x220.p-661hnu-f1>
-References: <1383216315-30627-1-git-send-email-jerzy.kasenberg@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383216315-30627-1-git-send-email-jerzy.kasenberg@tieto.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android: Add support for setting adapters name
+Date: Thu, 31 Oct 2013 15:00:38 +0100
+Message-Id: <1383228038-4306-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jerzy,
+---
+ android/adapter.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/hal-msg.h |  2 ++
+ 2 files changed, 55 insertions(+)
 
-On Thu, Oct 31, 2013, Jerzy Kasenberg wrote:
-> This patachset adds code to call GATT hal methods.
-> Compiles on Android 4.3 and host.
-> On 4.2 it's source code is not included.
-> 
-> Status that is used in callbacks is currently printed as number.
-> This number corresponds to series of defines from file:
-> external/bluedroid/stack/include/gatt_api.h
-> This file looks like implementation detail for bluedroid.
-> It's to be decided it defines should be copied to bluez source code.
-> Until that status is printed as numbers.
-> Same applies to tGATT_WRITE_TYPE which is used as argument in
-> write_characteristic and write_descriptor.
-> 
-> Jerzy Kasenberg (10):
->   android/client: Add skeleton for GATT interface
->   android/client: Add GATT client callbacks code
->   android/client: Add complex GATT type formating
->   android/client: Add init/cleanup for GATT
->   android/client: Add helper macros to verify args
->   android/client: Add GATT client method calls
->   android/client: Add GATT complex type parsing
->   android/client: Add tab completion to GATT client
->   android/client: Add GATT server callbacks code
->   android/client: Add GATT server methods
-> 
->  android/Android.mk       |    7 +
->  android/Makefile.am      |    2 +
->  android/client/haltest.c |    5 +
->  android/client/if-bt.c   |    2 +
->  android/client/if-gatt.c | 1733 ++++++++++++++++++++++++++++++++++++++++++++++
->  android/client/if-main.h |   14 +
->  6 files changed, 1763 insertions(+)
->  create mode 100644 android/client/if-gatt.c
+diff --git a/android/adapter.c b/android/adapter.c
+index 15b65e5..5dadc2e 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -129,6 +129,27 @@ static void scan_mode_changed(void)
+ 	g_free(ev);
+ }
+ 
++static void adapter_name_changed(const uint8_t *name)
++{
++	struct hal_ev_adapter_props_changed *ev;
++	uint8_t buf[sizeof(*ev) + sizeof(struct hal_property) +
++							HAL_MAX_NAME_LENGTH];
++
++	memset(buf, 0, sizeof(buf));
++	ev = (void *) buf;
++
++	ev->num_props = 1;
++	ev->status = HAL_STATUS_SUCCESS;
++	ev->props[0].type = HAL_PROP_ADAPTER_NAME;
++	ev->props[0].len = HAL_MAX_NAME_LENGTH;
++	memcpy(ev->props->val, name, HAL_MAX_NAME_LENGTH);
++
++	DBG("Adapter name changed to: %s", ev->props->val);
++
++	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
++			HAL_EV_ADAPTER_PROPS_CHANGED, sizeof(buf), ev, -1);
++}
++
+ static void settings_changed(uint32_t settings)
+ {
+ 	uint32_t changed_mask;
+@@ -286,6 +307,37 @@ static bool set_mode(uint16_t opcode, uint8_t mode)
+ 	return false;
+ }
+ 
++static void set_adapter_name_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	const struct mgmt_cp_set_local_name *rp = param;
++
++	if (status != MGMT_STATUS_SUCCESS) {
++		error("Failed to set name: %s (0x%02x)",
++						mgmt_errstr(status), status);
++		return;
++	}
++
++	adapter_name_changed(rp->name);
++}
++
++static bool set_adapter_name(uint8_t *name, uint16_t len)
++{
++	struct mgmt_cp_set_local_name cp;
++
++	memset(&cp, 0, sizeof(cp));
++	memcpy(cp.name, name, len);
++
++	if (mgmt_send(adapter->mgmt, MGMT_OP_SET_LOCAL_NAME, adapter->index,
++			sizeof(cp), &cp, set_adapter_name_complete, NULL,
++								NULL) > 0)
++		return true;
++
++	error("Failed to set name");
++
++	return false;
++}
++
+ static void read_info_complete(uint8_t status, uint16_t length, const void *param,
+ 							void *user_data)
+ {
+@@ -472,6 +524,7 @@ static uint8_t set_property(void *buf, uint16_t len)
+ 	case HAL_PROP_ADAPTER_SCAN_MODE:
+ 		return set_scan_mode(cmd->val, cmd->len);
+ 	case HAL_PROP_ADAPTER_NAME:
++		return set_adapter_name(cmd->val, cmd->len);
+ 	case HAL_PROP_ADAPTER_DISC_TIMEOUT:
+ 	default:
+ 		DBG("Unhandled property type 0x%x", cmd->type);
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 80b47d6..506d10c 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -89,6 +89,8 @@ struct hal_cmd_get_adapter_prop {
+ 	uint8_t type;
+ } __attribute__((packed));
+ 
++#define HAL_MAX_NAME_LENGTH		249
++
+ #define HAL_PROP_ADAPTER_NAME			0x01
+ #define HAL_PROP_ADAPTER_ADDR			0x02
+ #define HAL_PROP_ADAPTER_UUIDS			0x03
+-- 
+1.8.4.1
 
-All patches have been applied. Thanks.
-
-Johan
