@@ -1,38 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 31 Oct 2013 10:42:35 +0200
+Date: Thu, 31 Oct 2013 10:41:46 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android: Use Android headers instead of local ones
-Message-ID: <20131031084235.GD1271@x220.p-661hnu-f1>
-References: <1383148285-20937-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH 2/2] android: Add supported uuids when adapter initialized
+Message-ID: <20131031084146.GC1271@x220.p-661hnu-f1>
+References: <1383146314-13456-1-git-send-email-marcin.kraglak@tieto.com>
+ <1383146314-13456-2-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383148285-20937-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1383146314-13456-2-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Marcin,
 
-On Wed, Oct 30, 2013, Andrei Emeltchenko wrote:
-> Add path to Android libhardware library headers
-> ---
->  android/Android.mk |    1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/android/Android.mk b/android/Android.mk
-> index fc1b276..88dff4b 100644
-> --- a/android/Android.mk
-> +++ b/android/Android.mk
-> @@ -86,6 +86,7 @@ LOCAL_SRC_FILES := \
->  
->  LOCAL_C_INCLUDES += \
->  	$(call include-path-for, system-core) \
-> +	$(call include-path-for, libhardware) \
->  
->  LOCAL_SHARED_LIBRARIES := \
->  	libcutils \
+On Wed, Oct 30, 2013, Marcin Kraglak wrote:
+> +/*
+> + * This is an array of supported uuids and service hints. We add them via mgmt
+> + * interface when adapter is initialized. Uuids are in reverse orded.
+> + */
+> +static const struct mgmt_cp_add_uuid sup_uuids[] = {
+> +	/* OBEX */
+> +	{{0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00,
+> +	0x10, 0x00, 0x00, 0x05, 0x11, 0x00, 0x00}, 0x10},
+> +	/* TELEPHONY */
+> +	{{0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00,
+> +	0x10, 0x00, 0x00, 0x1f, 0x11, 0x00, 0x00}, 0x40},
+> +	/* CAPTURING */
+> +	{{0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00,
+> +	0x10, 0x00, 0x00, 0x0d, 0x11, 0x00, 0x00}, 0x08},
+> +	/* NETWORKING */
+> +	{{0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80, 0x00,
+> +	0x10, 0x00, 0x00, 0x15, 0x11, 0x00, 0x00}, 0x02} };
 
-Applied. Thanks.
+I think you should at least mention here exactly which UUIDs you're
+adding. It looks like it's OPP, HFP AG, Advanced Audio and PANU but it'd
+be nicer to be clear about this in the code comment.
+
+The table would also be more readable if you did something like
+
+static const struct mgmt_cp_add_uuid uuids[] = {
+	{ .uuid = ...,
+	  .svc_hint = ... },
+	{ .uuid = ...,
+	  .svc_hint = ... },
+};
+
+Note that our coding style puts a space after { and before }.
 
 Johan
