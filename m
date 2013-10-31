@@ -2,130 +2,63 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 14/14] android: Add support for handling SSP reply command
-Date: Thu, 31 Oct 2013 02:55:54 +0000
-Message-Id: <1383188154-22905-15-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 09/14] android: Add support for sending pin code request
+Date: Thu, 31 Oct 2013 02:55:49 +0000
+Message-Id: <1383188154-22905-10-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1383188154-22905-1-git-send-email-szymon.janc@tieto.com>
 References: <1383188154-22905-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/adapter.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 94 insertions(+)
+ android/adapter.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
 diff --git a/android/adapter.c b/android/adapter.c
-index a6382dd..9e12879 100644
+index 0a91149..0c5ae8b 100644
 --- a/android/adapter.c
 +++ b/android/adapter.c
-@@ -814,6 +814,94 @@ static uint8_t pin_reply(void *buf, uint16_t len)
- 	return HAL_STATUS_SUCCESS;
+@@ -252,6 +252,30 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
+ 							HAL_BOND_STATE_BONDED);
  }
  
-+static uint8_t user_confirm_reply(const bdaddr_t *bdaddr, bool accept)
++static void pin_code_request_callback(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
 +{
-+	struct mgmt_addr_info cp;
-+	uint16_t opcode;
++	const struct mgmt_ev_pin_code_request *ev = param;
++	struct hal_ev_pin_request hal_ev;
++	char dst[18];
 +
-+	if (accept)
-+		opcode = MGMT_OP_USER_CONFIRM_REPLY;
-+	else
-+		opcode = MGMT_OP_USER_CONFIRM_NEG_REPLY;
-+
-+	bacpy(&cp.bdaddr, bdaddr);
-+	cp.type = BDADDR_BREDR;
-+
-+	if (mgmt_reply(adapter->mgmt, opcode, adapter->index, sizeof(cp), &cp,
-+							NULL, NULL, NULL) > 0)
-+		return HAL_STATUS_SUCCESS;
-+
-+	return HAL_STATUS_FAILED;
-+}
-+
-+static uint8_t user_passkey_reply(const bdaddr_t *bdaddr, bool accept,
-+							uint32_t passkey)
-+{
-+	unsigned int id;
-+
-+	if (accept) {
-+		struct mgmt_cp_user_passkey_reply cp;
-+
-+		memset(&cp, 0, sizeof(cp));
-+		bacpy(&cp.addr.bdaddr, bdaddr);
-+		cp.addr.type = BDADDR_BREDR;
-+		cp.passkey = htobl(passkey);
-+
-+		id = mgmt_reply(adapter->mgmt, MGMT_OP_USER_PASSKEY_REPLY,
-+					adapter->index, sizeof(cp), &cp,
-+					NULL, NULL, NULL);
-+	} else {
-+		struct mgmt_cp_user_passkey_neg_reply cp;
-+
-+		memset(&cp, 0, sizeof(cp));
-+		bacpy(&cp.addr.bdaddr, bdaddr);
-+		cp.addr.type = BDADDR_BREDR;
-+
-+		id = mgmt_reply(adapter->mgmt, MGMT_OP_USER_PASSKEY_NEG_REPLY,
-+					adapter->index, sizeof(cp), &cp,
-+					NULL, NULL, NULL);
++	if (length < sizeof(*ev)) {
++		error("Too small PIN code request event");
++		return;
 +	}
 +
-+	if (id == 0)
-+		return HAL_STATUS_FAILED;
++	ba2str(&ev->addr.bdaddr, dst);
 +
-+	return HAL_STATUS_SUCCESS;
++	DBG("%s type %u secure %u", dst, ev->addr.type, ev->secure);
++
++	/* TODO name and CoD of remote devices should probably be cached */
++	memset(&hal_ev, 0, sizeof(hal_ev));
++	bdaddr2android(&ev->addr.bdaddr, hal_ev.bdaddr);
++
++	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH, HAL_EV_PIN_REQUEST,
++						sizeof(hal_ev), &hal_ev, -1);
 +}
 +
-+static uint8_t ssp_reply(void *buf, uint16_t len)
-+{
-+	struct hal_cmd_ssp_reply *cmd = buf;
-+	uint8_t status;
-+	bdaddr_t bdaddr;
-+	char addr[18];
-+
-+	/* TODO should parameters sanity be verified here? */
-+
-+	android2bdaddr(cmd->bdaddr, &bdaddr);
-+	ba2str(&bdaddr, addr);
-+
-+	DBG("%s variant %u accept %u", addr, cmd->ssp_variant, cmd->accept);
-+
-+	switch (cmd->ssp_variant) {
-+	case HAL_SSP_VARIANT_CONFIRM:
-+	case HAL_SSP_VARIANT_CONSENT:
-+		status = user_confirm_reply(&bdaddr, cmd->accept);
-+		break;
-+	case HAL_SSP_VARIANT_ENTRY:
-+		status = user_passkey_reply(&bdaddr, cmd->accept,
-+								cmd->passkey);
-+		break;
-+	case HAL_SSP_VARIANT_NOTIF:
-+		status = HAL_STATUS_SUCCESS;
-+		break;
-+	default:
-+		status = HAL_STATUS_INVALID;
-+		break;
-+	}
-+
-+	return status;
-+}
-+
- void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
- 								uint16_t len)
+ static void register_mgmt_handlers(void)
  {
-@@ -872,6 +960,12 @@ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
- 			goto error;
+ 	mgmt_register(adapter->mgmt, MGMT_EV_NEW_SETTINGS, adapter->index,
+@@ -267,6 +291,9 @@ static void register_mgmt_handlers(void)
  
- 		break;
-+	case HAL_OP_SSP_REPLY:
-+		status = ssp_reply(buf, len);
-+		if (status != HAL_STATUS_SUCCESS)
-+			goto error;
+ 	mgmt_register(adapter->mgmt, MGMT_EV_NEW_LINK_KEY, adapter->index,
+ 					new_link_key_callback, NULL, NULL);
 +
-+		break;
- 	default:
- 		DBG("Unhandled command, opcode 0x%x", opcode);
- 		goto error;
++	mgmt_register(adapter->mgmt, MGMT_EV_PIN_CODE_REQUEST, adapter->index,
++					pin_code_request_callback, NULL, NULL);
+ }
+ 
+ static void load_link_keys_complete(uint8_t status, uint16_t length,
 -- 
 1.8.4.rc3
 
