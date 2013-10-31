@@ -1,94 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android: Add support for setting adapters name
-Date: Thu, 31 Oct 2013 16:26:22 +0100
-Message-Id: <1383233182-7188-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Marcin Kraglak <marcin.kraglak@tieto.com>
+Subject: [PATCH 3/5] android: Add stub for handling get_remote_services command
+Date: Thu, 31 Oct 2013 16:25:50 +0100
+Message-ID: <1383233152-15040-3-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1383233152-15040-1-git-send-email-szymon.janc@tieto.com>
+References: <1383233152-15040-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+
+Change-Id: I3a88c104a496fa3c3391b11dc85b6607861158f3
 ---
- android/adapter.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+ android/adapter.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/android/adapter.c b/android/adapter.c
-index 15b65e5..5dadc2e 100644
+index 10d4a8e..6ee4a21 100644
 --- a/android/adapter.c
 +++ b/android/adapter.c
-@@ -129,6 +129,27 @@ static void scan_mode_changed(void)
- 	g_free(ev);
+@@ -1215,6 +1215,11 @@ static uint8_t ssp_reply(void *buf, uint16_t len)
+ 	return status;
  }
  
-+static void adapter_name_changed(const uint8_t *name)
++static uint8_t get_remote_services(void *buf, uint16_t len)
 +{
-+	struct hal_ev_adapter_props_changed *ev;
-+	uint8_t buf[sizeof(*ev) + sizeof(struct hal_property) +
-+							HAL_MAX_NAME_LENGTH];
-+
-+	memset(buf, 0, sizeof(buf));
-+	ev = (void *) buf;
-+
-+	ev->num_props = 1;
-+	ev->status = HAL_STATUS_SUCCESS;
-+	ev->props[0].type = HAL_PROP_ADAPTER_NAME;
-+	ev->props[0].len = HAL_MAX_NAME_LENGTH;
-+	memcpy(ev->props->val, name, HAL_MAX_NAME_LENGTH);
-+
-+	DBG("Adapter name changed to: %s", ev->props->val);
-+
-+	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_EV_ADAPTER_PROPS_CHANGED, sizeof(buf), ev, -1);
++	return HAL_STATUS_UNSUPPORTED;
 +}
 +
- static void settings_changed(uint32_t settings)
+ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
+ 								uint16_t len)
  {
- 	uint32_t changed_mask;
-@@ -286,6 +307,37 @@ static bool set_mode(uint16_t opcode, uint8_t mode)
- 	return false;
- }
+@@ -1308,6 +1313,11 @@ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
+ 			goto error;
  
-+static void set_adapter_name_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	const struct mgmt_cp_set_local_name *rp = param;
-+
-+	if (status != MGMT_STATUS_SUCCESS) {
-+		error("Failed to set name: %s (0x%02x)",
-+						mgmt_errstr(status), status);
-+		return;
-+	}
-+
-+	adapter_name_changed(rp->name);
-+}
-+
-+static bool set_adapter_name(uint8_t *name, uint16_t len)
-+{
-+	struct mgmt_cp_set_local_name cp;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	memcpy(cp.name, name, len);
-+
-+	if (mgmt_send(adapter->mgmt, MGMT_OP_SET_LOCAL_NAME, adapter->index,
-+			sizeof(cp), &cp, set_adapter_name_complete, NULL,
-+								NULL) > 0)
-+		return true;
-+
-+	error("Failed to set name");
-+
-+	return false;
-+}
-+
- static void read_info_complete(uint8_t status, uint16_t length, const void *param,
- 							void *user_data)
- {
-@@ -472,6 +524,7 @@ static uint8_t set_property(void *buf, uint16_t len)
- 	case HAL_PROP_ADAPTER_SCAN_MODE:
- 		return set_scan_mode(cmd->val, cmd->len);
- 	case HAL_PROP_ADAPTER_NAME:
-+		return set_adapter_name(cmd->val, cmd->len);
- 	case HAL_PROP_ADAPTER_DISC_TIMEOUT:
+ 		break;
++	case HAL_OP_GET_REMOTE_SERVICES:
++		status = get_remote_services(buf, len);
++		if (status != HAL_STATUS_SUCCESS)
++			goto error;
++		break;
  	default:
- 		DBG("Unhandled property type 0x%x", cmd->type);
+ 		DBG("Unhandled command, opcode 0x%x", opcode);
+ 		goto error;
 -- 
 1.8.4.1
 
