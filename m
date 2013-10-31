@@ -1,121 +1,137 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/3] android/hal-hidhost: Add implementation of .connection_state_cb
-Date: Thu, 31 Oct 2013 14:19:47 +0200
-Message-Id: <1383221988-1601-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1383221988-1601-1-git-send-email-luiz.dentz@gmail.com>
-References: <1383221988-1601-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/3] android/hid: Add handling of incoming connections
+Date: Thu, 31 Oct 2013 14:19:46 +0200
+Message-Id: <1383221988-1601-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/hal-hidhost.c   | 25 +++++++++++++++++++++++++
- android/hal-ipc-api.txt |  1 +
- android/hal-ipc.c       |  3 +++
- android/hal-msg.h       | 14 ++++++++++++++
- android/hal.h           |  1 +
- 5 files changed, 44 insertions(+)
+ android/hid.c | 90 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 90 insertions(+)
 
-diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
-index 032e961..9354b95 100644
---- a/android/hal-hidhost.c
-+++ b/android/hal-hidhost.c
-@@ -31,6 +31,31 @@ static bool interface_ready(void)
- 	return bt_hh_cbacks != NULL;
+diff --git a/android/hid.c b/android/hid.c
+index 49e9c52..92efd72 100644
+--- a/android/hid.c
++++ b/android/hid.c
+@@ -45,6 +45,8 @@
+ #define MAX_READ_BUFFER		4096
+ 
+ static GIOChannel *notification_io = NULL;
++static GIOChannel *ctrl_io = NULL;
++static GIOChannel *intr_io = NULL;
+ static GSList *devices = NULL;
+ 
+ struct hid_device {
+@@ -313,12 +315,94 @@ void bt_hid_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf, uint16_t len)
+ 	ipc_send_rsp(io, HAL_SERVICE_ID_HIDHOST, status);
  }
  
-+static void handle_conn_state(void *buf)
++static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
 +{
-+	struct hal_ev_hid_conn_state *ev = buf;
++	struct hid_device *hdev;
++	bdaddr_t dst;
++	char address[18];
++	uint16_t psm;
++	GError *gerr = NULL;
++	GSList *l;
 +
-+	if (bt_hh_cbacks->connection_state_cb)
-+		bt_hh_cbacks->connection_state_cb((bt_bdaddr_t *) (ev->bdaddr),
-+								ev->state);
-+}
-+
-+/* will be called from notification thread context */
-+void bt_notify_hh(uint16_t opcode, void *buf, uint16_t len)
-+{
-+	if (!interface_ready())
++	if (err) {
++		error("%s", err->message);
 +		return;
++	}
 +
-+	switch (opcode) {
-+	case HAL_EV_HID_CONN_STATE:
-+		handle_conn_state(buf);
++	bt_io_get(chan, &err,
++			BT_IO_OPT_DEST_BDADDR, &dst,
++			BT_IO_OPT_PSM, &psm,
++			BT_IO_OPT_INVALID);
++	if (err) {
++		error("%s", gerr->message);
++		g_io_channel_shutdown(chan, TRUE, NULL);
++		return;
++	}
++
++	ba2str(&dst, address);
++	DBG("Incoming connection from %s on PSM %d", address, psm);
++
++	switch (psm) {
++	case L2CAP_PSM_HIDP_CTRL:
++		l = g_slist_find_custom(devices, &dst, device_cmp);
++		if (l)
++			return;
++
++		hdev = g_new0(struct hid_device, 1);
++		bacpy(&hdev->dst, &dst);
++		hdev->ctrl_io = g_io_channel_ref(chan);
++
++		devices = g_slist_append(devices, hdev);
++
++		hdev->ctrl_watch = g_io_add_watch(hdev->ctrl_io,
++					G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++					ctrl_watch_cb, hdev);
++
 +		break;
-+	default:
-+		DBG("Unhandled callback opcode=0x%x", opcode);
++
++	case L2CAP_PSM_HIDP_INTR:
++		l = g_slist_find_custom(devices, &dst, device_cmp);
++		if (!l)
++			return;
++
++		hdev = l->data;
++		hdev->intr_io = g_io_channel_ref(chan);
++		hdev->intr_watch = g_io_add_watch(hdev->intr_io,
++				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++				intr_watch_cb, hdev);
 +		break;
 +	}
 +}
 +
- static bt_status_t hh_connect(bt_bdaddr_t *bd_addr)
+ bool bt_hid_register(GIOChannel *io, const bdaddr_t *addr)
  {
- 	struct hal_cmd_hid_connect cmd;
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index a5d1980..6b11684 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -574,6 +574,7 @@ Notifications:
- 	Opcode 0x81 - Connection State notification
- 
- 		Notification parameters: Remote address (6 octets)
-+		                         Connection State (1 octets)
- 
- 		Valid connection states: 0x00 = Connected
- 		                         0x01 = Connecting
-diff --git a/android/hal-ipc.c b/android/hal-ipc.c
-index f68e789..14be69b 100644
---- a/android/hal-ipc.c
-+++ b/android/hal-ipc.c
-@@ -49,6 +49,9 @@ static void notification_dispatch(struct hal_hdr *msg, int fd)
- 	case HAL_SERVICE_ID_BLUETOOTH:
- 		bt_notify_adapter(msg->opcode, msg->payload, msg->len);
- 		break;
-+	case HAL_SERVICE_ID_HIDHOST:
-+		bt_notify_hh(msg->opcode, msg->payload, msg->len);
-+		break;
- 	case HAL_SERVICE_ID_A2DP:
- 		bt_notify_av(msg->opcode, msg->payload, msg->len);
- 		break;
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index dfe73cc..b792411 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -423,6 +423,20 @@ struct hal_ev_le_test_mode {
- 	uint16_t num_packets;
- } __attribute__((packed));
- 
-+#define HAL_HID_STATE_CONNECTED		0x00
-+#define HAL_HID_STATE_CONNECTING	0x01
-+#define HAL_HID_STATE_DISCONNECTED	0x02
-+#define HAL_HID_STATE_DISCONNECTING	0x03
-+#define HAL_HID_STATE_NO_HID		0x07
-+#define HAL_HID_STATE_FAILED		0x08
-+#define HAL_HID_STATE_UNKNOWN		0x09
++	GError *err = NULL;
 +
-+#define HAL_EV_HID_CONN_STATE		0x81
-+struct hal_ev_hid_conn_state {
-+	uint8_t bdaddr[6];
-+	uint8_t state;
-+} __attribute__((packed));
+ 	DBG("");
+ 
+ 	notification_io = g_io_channel_ref(io);
+ 
++	ctrl_io = bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
++				BT_IO_OPT_PSM, L2CAP_PSM_HIDP_CTRL,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
++				BT_IO_OPT_INVALID);
++	if (!ctrl_io) {
++		error("Failed to listen on control channel");
++		g_error_free(err);
++		return false;
++	}
 +
- #define HAL_EV_AV_CONNECTION_STATE	0x81
- struct hal_ev_av_connection_state {
- 	uint8_t state;
-diff --git a/android/hal.h b/android/hal.h
-index a377649..5d6a93e 100644
---- a/android/hal.h
-+++ b/android/hal.h
-@@ -29,4 +29,5 @@ btav_interface_t *bt_get_av_interface(void);
- void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len);
- void bt_thread_associate(void);
- void bt_thread_disassociate(void);
-+void bt_notify_hh(uint16_t opcode, void *buf, uint16_t len);
- void bt_notify_av(uint16_t opcode, void *buf, uint16_t len);
++	intr_io = bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
++				BT_IO_OPT_PSM, L2CAP_PSM_HIDP_INTR,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
++				BT_IO_OPT_INVALID);
++	if (!intr_io) {
++		error("Failed to listen on interrupt channel");
++		g_io_channel_unref(ctrl_io);
++		g_error_free(err);
++		return false;
++	}
++
+ 	return true;
+ }
+ 
+@@ -328,4 +412,10 @@ void bt_hid_unregister(void)
+ 
+ 	g_io_channel_unref(notification_io);
+ 	notification_io = NULL;
++
++	g_io_channel_unref(ctrl_io);
++	ctrl_io = NULL;
++
++	g_io_channel_unref(intr_io);
++	intr_io = NULL;
+ }
 -- 
 1.8.3.1
 
