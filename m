@@ -2,54 +2,57 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 07/14] android: Add support for handling cancel bond command
-Date: Thu, 31 Oct 2013 02:55:47 +0000
-Message-Id: <1383188154-22905-8-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 11/14] android: Add support for entry variant in SSP request event
+Date: Thu, 31 Oct 2013 02:55:51 +0000
+Message-Id: <1383188154-22905-12-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1383188154-22905-1-git-send-email-szymon.janc@tieto.com>
 References: <1383188154-22905-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/adapter.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ android/adapter.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/android/adapter.c b/android/adapter.c
-index 8c5482b..0f174a6 100644
+index b99c860..1be0fb3 100644
 --- a/android/adapter.c
 +++ b/android/adapter.c
-@@ -626,6 +626,19 @@ static bool create_bond(void *buf, uint16_t len)
- 	return true;
+@@ -312,6 +312,23 @@ static void user_confirm_request_callback(uint16_t index, uint16_t length,
+ 								ev->value);
  }
  
-+static bool cancel_bond(void *buf, uint16_t len)
++static void user_passkey_request_callback(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
 +{
-+	struct hal_cmd_cancel_bond *cmd = buf;
-+	struct mgmt_addr_info cp;
++	const struct mgmt_ev_user_passkey_request *ev = param;
++	char dst[18];
 +
-+	cp.type = BDADDR_BREDR;
-+	android2bdaddr(cmd->bdaddr, &cp.bdaddr);
++	if (length < sizeof(*ev)) {
++		error("Too small passkey request event");
++		return;
++	}
 +
-+	return mgmt_reply(adapter->mgmt, MGMT_OP_CANCEL_PAIR_DEVICE,
-+				adapter->index, sizeof(cp), &cp, NULL, NULL,
-+				NULL) > 0;
++	ba2str(&ev->addr.bdaddr, dst);
++	DBG("%s", dst);
++
++	send_ssp_request(&ev->addr.bdaddr, HAL_SSP_VARIANT_ENTRY, 0);
 +}
 +
- void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
- 								uint16_t len)
+ static void register_mgmt_handlers(void)
  {
-@@ -668,6 +681,11 @@ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
- 			goto error;
- 
- 		break;
-+	case HAL_OP_CANCEL_BOND:
-+		if (!cancel_bond(buf, len))
-+			goto error;
+ 	mgmt_register(adapter->mgmt, MGMT_EV_NEW_SETTINGS, adapter->index,
+@@ -334,6 +351,10 @@ static void register_mgmt_handlers(void)
+ 	mgmt_register(adapter->mgmt, MGMT_EV_USER_CONFIRM_REQUEST,
+ 				adapter->index, user_confirm_request_callback,
+ 				NULL, NULL);
 +
-+		break;
- 	default:
- 		DBG("Unhandled command, opcode 0x%x", opcode);
- 		goto error;
++	mgmt_register(adapter->mgmt, MGMT_EV_USER_PASSKEY_REQUEST,
++				adapter->index, user_passkey_request_callback,
++				NULL, NULL);
+ }
+ 
+ static void load_link_keys_complete(uint8_t status, uint16_t length,
 -- 
 1.8.4.rc3
 
