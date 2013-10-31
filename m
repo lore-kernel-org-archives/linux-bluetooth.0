@@ -1,49 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Subject: [PATCH 00/10] Add GATT support to haltest
-Date: Thu, 31 Oct 2013 11:45:05 +0100
-Message-ID: <1383216315-30627-1-git-send-email-jerzy.kasenberg@tieto.com>
+Date: Thu, 31 Oct 2013 12:33:00 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Szymon Janc <szymon.janc@gmail.com>
+Subject: Re: [PATCH v2] android: Add support for handling remove bond command
+Message-ID: <20131031103300.GA10701@x220.p-661hnu-f1>
+References: <1383215013-24490-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1383215013-24490-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patachset adds code to call GATT hal methods.
-Compiles on Android 4.3 and host.
-On 4.2 it's source code is not included.
+Hi Szymon,
 
-Status that is used in callbacks is currently printed as number.
-This number corresponds to series of defines from file:
-external/bluedroid/stack/include/gatt_api.h
-This file looks like implementation detail for bluedroid.
-It's to be decided it defines should be copied to bluez source code.
-Until that status is printed as numbers.
-Same applies to tGATT_WRITE_TYPE which is used as argument in
-write_characteristic and write_descriptor.
+On Thu, Oct 31, 2013, Szymon Janc wrote:
+> Bond state change is send when command complete for unpair device is
+> received and status was success.
+> ---
+>  android/adapter.c | 33 +++++++++++++++++++++++++++++++++
+>  1 file changed, 33 insertions(+)
 
-Jerzy Kasenberg (10):
-  android/client: Add skeleton for GATT interface
-  android/client: Add GATT client callbacks code
-  android/client: Add complex GATT type formating
-  android/client: Add init/cleanup for GATT
-  android/client: Add helper macros to verify args
-  android/client: Add GATT client method calls
-  android/client: Add GATT complex type parsing
-  android/client: Add tab completion to GATT client
-  android/client: Add GATT server callbacks code
-  android/client: Add GATT server methods
+Applied. Thanks.
 
- android/Android.mk       |    7 +
- android/Makefile.am      |    2 +
- android/client/haltest.c |    5 +
- android/client/if-bt.c   |    2 +
- android/client/if-gatt.c | 1733 ++++++++++++++++++++++++++++++++++++++++++++++
- android/client/if-main.h |   14 +
- 6 files changed, 1763 insertions(+)
- create mode 100644 android/client/if-gatt.c
-
--- 
-1.7.9.5
-
+Johan
