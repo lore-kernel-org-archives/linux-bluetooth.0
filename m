@@ -1,126 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 31 Oct 2013 16:21:40 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android: Add support for setting adapters name
-Message-ID: <20131031142138.GM27517@aemeltch-MOBL1>
-References: <1383228038-4306-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383228038-4306-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
+Subject: Re: l2cap sockets not properly multiplexed on ARM
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <D9B9EB3A112B8F489DFFA00A6D5C0FE203241BE2@AD-BR-EX-2.adroot.flemingc.local>
+Date: Thu, 31 Oct 2013 15:20:18 +0100
+Cc: Alexander Holler <holler@ahsoftware.de>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <F9B30CD6-4DCB-4F58-9322-E18969867664@holtmann.org>
+References: <D9B9EB3A112B8F489DFFA00A6D5C0FE20324078F@AD-BR-EX-2.adroot.flemingc.local> <5270EC62.6070705@ahsoftware.de>,<5270F19A.4030408@ahsoftware.de> <D9B9EB3A112B8F489DFFA00A6D5C0FE2032408B0@AD-BR-EX-2.adroot.flemingc.local>,<527114A4.5010207@ahsoftware.de> <D9B9EB3A112B8F489DFFA00A6D5C0FE2032419A8@AD-BR-EX-2.adroot.flemingc.local> <4A213FF7-48BA-4906-8868-7C3A227EF954@holtmann.org>,<527190DA.6000805@ahsoftware.de> <D9B9EB3A112B8F489DFFA00A6D5C0FE203241BE2@AD-BR-EX-2.adroot.flemingc.local>
+To: Tim Tisdall <tim.tisdall@flemingcollege.ca>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Tim,
 
-On Thu, Oct 31, 2013 at 03:00:38PM +0100, Grzegorz Kolodziejczyk wrote:
-> ---
->  android/adapter.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  android/hal-msg.h |  2 ++
->  2 files changed, 55 insertions(+)
+>> As Anderson Lizardo already mentioned, maybe first verify that the x86
+>> kernel 3.4 doesn't have the same problem and that it's really a problem
+>> of the ARM kernel. Up to now he didn't say what kernel version he uses
+>> on x86.
 > 
-> diff --git a/android/adapter.c b/android/adapter.c
-> index 15b65e5..5dadc2e 100644
-> --- a/android/adapter.c
-> +++ b/android/adapter.c
-> @@ -129,6 +129,27 @@ static void scan_mode_changed(void)
->  	g_free(ev);
->  }
->  
-> +static void adapter_name_changed(const uint8_t *name)
-> +{
-> +	struct hal_ev_adapter_props_changed *ev;
-> +	uint8_t buf[sizeof(*ev) + sizeof(struct hal_property) +
-> +							HAL_MAX_NAME_LENGTH];
-> +
-> +	memset(buf, 0, sizeof(buf));
-> +	ev = (void *) buf;
-> +
-> +	ev->num_props = 1;
-> +	ev->status = HAL_STATUS_SUCCESS;
-> +	ev->props[0].type = HAL_PROP_ADAPTER_NAME;
-> +	ev->props[0].len = HAL_MAX_NAME_LENGTH;
-
-Do we need to pass always HAL_MAX_NAME_LENGTH ?
-
-Best regards 
-Andrei Emeltchenko 
-
-> +	memcpy(ev->props->val, name, HAL_MAX_NAME_LENGTH);
-> +
-> +	DBG("Adapter name changed to: %s", ev->props->val);
-> +
-> +	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
-> +			HAL_EV_ADAPTER_PROPS_CHANGED, sizeof(buf), ev, -1);
-> +}
-> +
->  static void settings_changed(uint32_t settings)
->  {
->  	uint32_t changed_mask;
-> @@ -286,6 +307,37 @@ static bool set_mode(uint16_t opcode, uint8_t mode)
->  	return false;
->  }
->  
-> +static void set_adapter_name_complete(uint8_t status, uint16_t length,
-> +					const void *param, void *user_data)
-> +{
-> +	const struct mgmt_cp_set_local_name *rp = param;
-> +
-> +	if (status != MGMT_STATUS_SUCCESS) {
-> +		error("Failed to set name: %s (0x%02x)",
-> +						mgmt_errstr(status), status);
-> +		return;
-> +	}
-> +
-> +	adapter_name_changed(rp->name);
-> +}
-> +
-> +static bool set_adapter_name(uint8_t *name, uint16_t len)
-> +{
-> +	struct mgmt_cp_set_local_name cp;
-> +
-> +	memset(&cp, 0, sizeof(cp));
-> +	memcpy(cp.name, name, len);
-> +
-> +	if (mgmt_send(adapter->mgmt, MGMT_OP_SET_LOCAL_NAME, adapter->index,
-> +			sizeof(cp), &cp, set_adapter_name_complete, NULL,
-> +								NULL) > 0)
-> +		return true;
-> +
-> +	error("Failed to set name");
-> +
-> +	return false;
-> +}
-> +
->  static void read_info_complete(uint8_t status, uint16_t length, const void *param,
->  							void *user_data)
->  {
-> @@ -472,6 +524,7 @@ static uint8_t set_property(void *buf, uint16_t len)
->  	case HAL_PROP_ADAPTER_SCAN_MODE:
->  		return set_scan_mode(cmd->val, cmd->len);
->  	case HAL_PROP_ADAPTER_NAME:
-> +		return set_adapter_name(cmd->val, cmd->len);
->  	case HAL_PROP_ADAPTER_DISC_TIMEOUT:
->  	default:
->  		DBG("Unhandled property type 0x%x", cmd->type);
-> diff --git a/android/hal-msg.h b/android/hal-msg.h
-> index 80b47d6..506d10c 100644
-> --- a/android/hal-msg.h
-> +++ b/android/hal-msg.h
-> @@ -89,6 +89,8 @@ struct hal_cmd_get_adapter_prop {
->  	uint8_t type;
->  } __attribute__((packed));
->  
-> +#define HAL_MAX_NAME_LENGTH		249
-> +
->  #define HAL_PROP_ADAPTER_NAME			0x01
->  #define HAL_PROP_ADAPTER_ADDR			0x02
->  #define HAL_PROP_ADAPTER_UUIDS			0x03
-> -- 
-> 1.8.4.1
+> here's my desktop version:
+> $ uname -a
+> Linux tzing 3.8.0-32-generic #47-Ubuntu SMP Tue Oct 1 22:35:23 UTC 2013 x86_64 x86_64 x86_64 GNU/Linux
 > 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> I'm trying to get an older version of the kernel running on another machine and then I'll report back
+
+I actually need to know if bluetooth-next tree still has this issue. That is first and foremost the one thing that needs to be checked.
+
+Regards
+
+Marcel
+
