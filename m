@@ -2,63 +2,99 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 05/14] android: Set default IO capability on daemon start
-Date: Thu, 31 Oct 2013 02:55:45 +0000
-Message-Id: <1383188154-22905-6-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 06/14] android: Add support for handling create bond command
+Date: Thu, 31 Oct 2013 02:55:46 +0000
+Message-Id: <1383188154-22905-7-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1383188154-22905-1-git-send-email-szymon.janc@tieto.com>
 References: <1383188154-22905-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is no HAL function for setting IO capabilities so this is
-hardcoded to DisplayYesNo as Android devices usually have screen
-and input.
 ---
- android/adapter.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ android/adapter.c | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 63 insertions(+)
 
 diff --git a/android/adapter.c b/android/adapter.c
-index d55a070..d730dde 100644
+index d730dde..8c5482b 100644
 --- a/android/adapter.c
 +++ b/android/adapter.c
-@@ -34,6 +34,9 @@
- #include "utils.h"
- #include "adapter.h"
- 
-+/* Default to DisplayYesNo */
-+#define DEFAULT_IO_CAPABILITY 0x01
-+
- static GIOChannel *notification_io = NULL;
- 
- struct bt_adapter {
-@@ -358,6 +361,19 @@ static bool set_mode(uint16_t opcode, uint8_t mode)
- 	return false;
+@@ -568,6 +568,64 @@ static uint8_t set_property(void *buf, uint16_t len)
+ 	}
  }
  
-+static void set_io_capability(void)
++static uint8_t status_mgmt2hal(uint8_t mgmt)
 +{
-+	struct mgmt_cp_set_io_capability cp;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.io_capability = DEFAULT_IO_CAPABILITY;
-+
-+	if (mgmt_send(adapter->mgmt, MGMT_OP_SET_IO_CAPABILITY,
-+				adapter->index, sizeof(cp), &cp,
-+				NULL, NULL, NULL) == 0)
-+		error("Failed to set IO capability");
++	switch (mgmt) {
++	case MGMT_STATUS_SUCCESS:
++		return HAL_STATUS_SUCCESS;
++	case MGMT_STATUS_NO_RESOURCES:
++		return HAL_STATUS_NOMEM;
++	case MGMT_STATUS_BUSY:
++		return HAL_STATUS_BUSY;
++	case MGMT_STATUS_NOT_SUPPORTED:
++		return HAL_STATUS_UNSUPPORTED;
++	case MGMT_STATUS_INVALID_PARAMS:
++		return HAL_STATUS_INVALID;
++	case MGMT_STATUS_AUTH_FAILED:
++		return HAL_STATUS_AUTH_FAILURE;
++	case MGMT_STATUS_NOT_CONNECTED:
++		return HAL_STATUS_REMOTE_DEVICE_DOWN;
++	default:
++		return HAL_STATUS_FAILED;
++	}
 +}
 +
- static void read_info_complete(uint8_t status, uint16_t length, const void *param,
- 							void *user_data)
++static void pair_device_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	const struct mgmt_rp_pair_device *rp = param;
++
++	DBG("status %u", status);
++
++	/* On success bond state change will be send when new link key event
++	 * is received */
++	if (status == MGMT_STATUS_SUCCESS)
++		return;
++
++	send_bond_state_change(&rp->addr.bdaddr, status_mgmt2hal(status),
++							HAL_BOND_STATE_NONE);
++}
++
++static bool create_bond(void *buf, uint16_t len)
++{
++	struct hal_cmd_create_bond *cmd = buf;
++	struct mgmt_cp_pair_device cp;
++
++	cp.io_cap = DEFAULT_IO_CAPABILITY;
++	cp.addr.type = BDADDR_BREDR;
++	android2bdaddr(cmd->bdaddr, &cp.addr.bdaddr);
++
++	if (mgmt_send(adapter->mgmt, MGMT_OP_PAIR_DEVICE, adapter->index,
++				sizeof(cp), &cp, pair_device_complete, NULL,
++				NULL) == 0)
++		return false;
++
++	send_bond_state_change(&cp.addr.bdaddr, HAL_STATUS_SUCCESS,
++						HAL_BOND_STATE_BONDING);
++
++	return true;
++}
++
+ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
+ 								uint16_t len)
  {
-@@ -399,6 +415,7 @@ static void read_info_complete(uint8_t status, uint16_t length, const void *para
+@@ -605,6 +663,11 @@ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
+ 			goto error;
  
- 	load_link_keys(NULL);
- 
-+	set_io_capability();
- 	set_mode(MGMT_OP_SET_PAIRABLE, 0x01);
- 
- 	return;
+ 		break;
++	case HAL_OP_CREATE_BOND:
++		if (!create_bond(buf, len))
++			goto error;
++
++		break;
+ 	default:
+ 		DBG("Unhandled command, opcode 0x%x", opcode);
+ 		goto error;
 -- 
 1.8.4.rc3
 
