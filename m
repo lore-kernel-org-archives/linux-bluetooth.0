@@ -1,46 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
-Subject: Re: [PATCH] android: Always enable SSP if supported by controller
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1383216631-28187-1-git-send-email-szymon.janc@tieto.com>
-Date: Thu, 31 Oct 2013 12:35:13 +0100
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <370BDED4-A87A-4EAC-BFAC-1ADB1075021D@holtmann.org>
-References: <1383216631-28187-1-git-send-email-szymon.janc@tieto.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+Subject: [PATCH] android/client: Fix crash in get_profile_interface
+Date: Thu, 31 Oct 2013 11:56:26 +0100
+Message-ID: <1383216986-302-1-git-send-email-jerzy.kasenberg@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+This fixes crash due to uncheck input from user.
+---
+ android/client/if-bt.c |    7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-> There is no HAL function to enable/disable SSP so always enable it if
-> supported by controller.
-> ---
-> android/adapter.c | 5 +++++
-> 1 file changed, 5 insertions(+)
-> 
-> diff --git a/android/adapter.c b/android/adapter.c
-> index a3f9aa6..9f2e019 100644
-> --- a/android/adapter.c
-> +++ b/android/adapter.c
-> @@ -528,6 +528,11 @@ static void read_info_complete(uint8_t status, uint16_t length, const void *para
-> 	load_link_keys(NULL);
-> 
-> 	set_io_capability();
-> +
-> +	if ((adapter->supported_settings & MGMT_SETTING_SSP) &&
-> +			!(adapter->current_settings & MGMT_SETTING_SSP))
-> +		set_mode(MGMT_OP_SET_SSP, 0x01);
-> +
-
-	missing_settings = current_settings ^ supported_settings;
-
-	if (missing_setting & MGMT_SETTING_SSP)
-		..
-
-Regards
-
-Marcel
+diff --git a/android/client/if-bt.c b/android/client/if-bt.c
+index a3d6286..9e01d65 100644
+--- a/android/client/if-bt.c
++++ b/android/client/if-bt.c
+@@ -804,11 +804,16 @@ static void get_profile_interface_c(int argc, const char **argv,
+ 
+ static void get_profile_interface_p(int argc, const char **argv)
+ {
+-	const char *id = argv[2];
++	const char *id;
+ 	const void **pif = NULL;
+ 	const void *dummy = NULL;
+ 
+ 	RETURN_IF_NULL(if_bluetooth);
++	if (argc <= 2) {
++		haltest_error("No interface specified\n");
++		return;
++	}
++	id = argv[2];
+ 
+ 	if (strcmp(BT_PROFILE_HANDSFREE_ID, id) == 0)
+ 		pif = (const void **) &if_hf;
+-- 
+1.7.9.5
 
