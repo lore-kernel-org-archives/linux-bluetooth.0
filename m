@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Subject: [PATCH 06/10] android/client: Add GATT client method calls
-Date: Thu, 31 Oct 2013 11:45:11 +0100
-Message-ID: <1383216315-30627-7-git-send-email-jerzy.kasenberg@tieto.com>
+Subject: [PATCH 02/10] android/client: Add GATT client callbacks code
+Date: Thu, 31 Oct 2013 11:45:07 +0100
+Message-ID: <1383216315-30627-3-git-send-email-jerzy.kasenberg@tieto.com>
 In-Reply-To: <1383216315-30627-1-git-send-email-jerzy.kasenberg@tieto.com>
 References: <1383216315-30627-1-git-send-email-jerzy.kasenberg@tieto.com>
 MIME-Version: 1.0
@@ -12,474 +12,250 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds code for all GATT client methods.
+This adds callbacks code, mostly printing.
+Complex formating function not implemented yet.
 ---
- android/client/if-gatt.c |  317 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 317 insertions(+)
+ android/client/if-gatt.c |  122 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 122 insertions(+)
 
 diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-index 60b1ec5..70dbb24 100644
+index 09e2a49..8f3dc3c 100644
 --- a/android/client/if-gatt.c
 +++ b/android/client/if-gatt.c
-@@ -130,6 +130,18 @@ static char *gatt_uuid_t2str(const bt_uuid_t *uuid, char *buf)
- 	return buf;
- }
+@@ -21,29 +21,84 @@
  
-+/*
-+ * Tries to convert hex string of given size into out buffer.
-+ * Output buffer is little endian.
-+ */
-+static void scan_field(const char *str, int len, uint8_t *out, int out_size)
+ const btgatt_interface_t *if_gatt = NULL;
+ 
++#define MAX_CHAR_ID_STR_LEN (MAX_UUID_STR_LEN + 3 + 11)
++#define MAX_SRVC_ID_STR_LEN (MAX_UUID_STR_LEN + 3 + 11 + 1 + 11)
++/* How man characters print from binary objects (arbitrary) */
++#define MAX_HEX_VAL_STR_LEN 100
++#define MAX_NOTIFY_PARAMS_STR_LEN (MAX_SRVC_ID_STR_LEN + MAX_CHAR_ID_STR_LEN \
++		+ MAX_ADDR_STR_LEN + MAX_HEX_VAL_STR_LEN + 60)
++#define MAX_READ_PARAMS_STR_LEN (MAX_SRVC_ID_STR_LEN + MAX_CHAR_ID_STR_LEN \
++		+ MAX_UUID_STR_LEN + MAX_HEX_VAL_STR_LEN + 80)
++
++static char *gatt_uuid_t2str(const bt_uuid_t *uuid, char *buf)
 +{
++	return buf;
 +}
 +
-+static void gatt_str2bt_uuid_t(const char *str, int len, bt_uuid_t *uuid)
++static char *btgatt_char_id_t2str(const btgatt_char_id_t *char_id, char *buf)
 +{
++	return buf;
 +}
 +
- /* char_id formating function */
- static char *btgatt_char_id_t2str(const btgatt_char_id_t *char_id, char *buf)
- {
-@@ -140,6 +152,11 @@ static char *btgatt_char_id_t2str(const btgatt_char_id_t *char_id, char *buf)
- 	return buf;
- }
- 
-+/* Parse btgatt_char_id_t */
-+static void str2btgatt_char_id_t(const char *buf, btgatt_char_id_t *char_id)
++static char *btgatt_srvc_id_t2str(const btgatt_srvc_id_t *srvc_id, char *buf)
 +{
++	return buf;
 +}
 +
- /* service_id formating function */
- static char *btgatt_srvc_id_t2str(const btgatt_srvc_id_t *srvc_id, char *buf)
- {
-@@ -150,6 +167,11 @@ static char *btgatt_srvc_id_t2str(const btgatt_srvc_id_t *srvc_id, char *buf)
- 	return buf;
- }
- 
-+/* Parse btgatt_srvc_id_t */
-+static void str2btgatt_srvc_id_t(const char *buf, btgatt_srvc_id_t *srvc_id)
++static char *btgatt_notify_params_t2str(const btgatt_notify_params_t *data,
++								char *buf)
 +{
++	return buf;
 +}
 +
- /* Converts array of uint8_t to string representation */
- static char *array2str(const uint8_t *v, int size, char *buf, int out_size)
- {
-@@ -584,120 +606,415 @@ const struct interface gatt_if = {
++static char *btgatt_read_params_t2str(const btgatt_read_params_t *data,
++								char *buf)
++{
++	return buf;
++}
++
+ /* BT-GATT Client callbacks. */
  
- static void register_client_p(int argc, const char **argv)
+ /* Callback invoked in response to register_client */
+ static void gattc_register_client_cb(int status, int client_if,
+ 							bt_uuid_t *app_uuid)
  {
-+	bt_uuid_t uuid;
++	char buf[MAX_UUID_STR_LEN];
 +
-+	RETURN_IF_NULL(if_gatt);
-+
-+	/* uuid */
-+	if (argc <= 2)
-+		gatt_str2bt_uuid_t("babe4bed", -1, &uuid);
-+	else
-+		gatt_str2bt_uuid_t(argv[2], -1, &uuid);
-+
-+	EXEC(if_gatt->client->register_client, &uuid);
++	haltest_info("%s: status=%d client_if=%d app_uuid=%s\n", __func__,
++						status, client_if,
++						gatt_uuid_t2str(app_uuid, buf));
  }
  
- /* unregister_client */
- 
- static void unregister_client_p(int argc, const char **argv)
+ /* Callback for scan results */
+ static void gattc_scan_result_cb(bt_bdaddr_t *bda, int rssi, uint8_t *adv_data)
  {
-+	int client_if;
++	char buf[MAX_ADDR_STR_LEN];
 +
-+	RETURN_IF_NULL(if_gatt);
-+	VERIFY_CLIENT_IF(2, client_if);
-+
-+	EXEC(if_gatt->client->unregister_client, client_if);
++	haltest_info("%s: bda=%s rssi=%d adv_data=%p\n", __func__,
++				bt_bdaddr_t2str(bda, buf), rssi, adv_data);
  }
  
- /* scan */
- 
- static void scan_p(int argc, const char **argv)
+ /* GATT open callback invoked in response to open */
+ static void gattc_connect_cb(int conn_id, int status, int client_if,
+ 							bt_bdaddr_t *bda)
  {
-+	int client_if;
-+	int start = 1;
++	char buf[MAX_ADDR_STR_LEN];
 +
-+	RETURN_IF_NULL(if_gatt);
-+
-+	VERIFY_CLIENT_IF(2, client_if);
-+
-+	/* start */
-+	if (argc >= 3)
-+		start = atoi(argv[3]);
-+
-+	EXEC(if_gatt->client->scan, client_if, start);
++	haltest_info("%s: conn_id=%d status=%d, client_if=%d bda=%s\n",
++					__func__, conn_id, status, client_if,
++					bt_bdaddr_t2str(bda, buf));
  }
  
- /* connect */
- 
- static void connect_p(int argc, const char **argv)
+ /* Callback invoked in response to close */
+ static void gattc_disconnect_cb(int conn_id, int status, int client_if,
+ 							bt_bdaddr_t *bda)
  {
-+	int client_if;
-+	bt_bdaddr_t bd_addr;
-+	int is_direct = 1;
++	char buf[MAX_ADDR_STR_LEN];
 +
-+	RETURN_IF_NULL(if_gatt);
-+	VERIFY_CLIENT_IF(2, client_if);
-+	VERIFY_ADDR_ARG(3, &bd_addr);
-+
-+	/* is_direct */
-+	if (argc > 4)
-+		is_direct = atoi(argv[4]);
-+
-+	EXEC(if_gatt->client->connect, client_if, &bd_addr, is_direct);
++	haltest_info("%s: conn_id=%d status=%d, client_if=%d bda=%s\n",
++					__func__, conn_id, status, client_if,
++					bt_bdaddr_t2str(bda, buf));
  }
  
- /* disconnect */
- 
- static void disconnect_p(int argc, const char **argv)
+ /*
+@@ -52,11 +107,16 @@ static void gattc_disconnect_cb(int conn_id, int status, int client_if,
+  */
+ static void gattc_search_complete_cb(int conn_id, int status)
  {
-+	int client_if;
-+	bt_bdaddr_t bd_addr;
-+	int conn_id;
-+
-+	RETURN_IF_NULL(if_gatt);
-+	VERIFY_CLIENT_IF(2, client_if);
-+	VERIFY_ADDR_ARG(3, &bd_addr);
-+	VERIFY_CONN_ID(4, conn_id);
-+
-+	EXEC(if_gatt->client->disconnect, client_if, &bd_addr, conn_id);
++	haltest_info("%s: conn_id=%d status=%s\n", __func__, conn_id, status);
  }
  
- /* refresh */
- 
- static void refresh_p(int argc, const char **argv)
+ /* Reports GATT services on a remote device */
+ static void gattc_search_result_cb(int conn_id, btgatt_srvc_id_t *srvc_id)
  {
-+	int client_if;
-+	bt_bdaddr_t bd_addr;
++	char srvc_id_buf[MAX_SRVC_ID_STR_LEN];
 +
-+	RETURN_IF_NULL(if_gatt);
-+	VERIFY_CLIENT_IF(2, client_if);
-+	VERIFY_ADDR_ARG(3, &bd_addr);
-+
-+	EXEC(if_gatt->client->refresh, client_if, &bd_addr);
++	haltest_info("%s: conn_id=%d srvc_id=%s\n", __func__, conn_id,
++				btgatt_srvc_id_t2str(srvc_id, srvc_id_buf));
  }
  
- /* search_service */
- 
- static void search_service_p(int argc, const char **argv)
+ /* GATT characteristic enumeration result callback */
+@@ -65,6 +125,18 @@ static void gattc_get_characteristic_cb(int conn_id, int status,
+ 					btgatt_char_id_t *char_id,
+ 					int char_prop)
  {
-+	int conn_id;
-+	bt_uuid_t filter_uuid;
++	char srvc_id_buf[MAX_SRVC_ID_STR_LEN];
++	char char_id_buf[MAX_CHAR_ID_STR_LEN];
 +
-+	RETURN_IF_NULL(if_gatt);
++	haltest_info("%s: conn_id=%d status=%d srvc_id=%s char_id=%s, char_prop=%x\n",
++			__func__, conn_id, status,
++			btgatt_srvc_id_t2str(srvc_id, srvc_id_buf),
++			btgatt_char_id_t2str(char_id, char_id_buf), char_prop);
 +
-+	VERIFY_CONN_ID(2, conn_id);
-+
-+	/* uuid */
-+	if (argc <= 3)
-+		memset(&filter_uuid, 0, sizeof(bt_uuid_t));
-+	else
-+		gatt_str2bt_uuid_t(argv[3], -1, &filter_uuid);
-+
-+	EXEC(if_gatt->client->search_service, conn_id, &filter_uuid);
++	/* enumerate next characteristic */
++	if (status == 0)
++		EXEC(if_gatt->client->get_characteristic, conn_id, srvc_id,
++								char_id);
  }
  
- /* get_included_service */
- 
- static void get_included_service_p(int argc, const char **argv)
+ /* GATT descriptor enumeration result callback */
+@@ -72,6 +144,19 @@ static void gattc_get_descriptor_cb(int conn_id, int status,
+ 		btgatt_srvc_id_t *srvc_id, btgatt_char_id_t *char_id,
+ 		bt_uuid_t *descr_id)
  {
-+	int conn_id;
-+	btgatt_srvc_id_t srvc_id;
++	char buf[MAX_UUID_STR_LEN];
++	char srvc_id_buf[MAX_SRVC_ID_STR_LEN];
++	char char_id_buf[MAX_CHAR_ID_STR_LEN];
 +
-+	RETURN_IF_NULL(if_gatt);
-+	VERIFY_CONN_ID(2, conn_id);
-+	VERIFY_SRVC_ID(3, &srvc_id);
++	haltest_info("%s: conn_id=%d status=%d srvc_id=%s char_id=%s, descr_id=%s\n",
++				__func__, conn_id, status,
++				btgatt_srvc_id_t2str(srvc_id, srvc_id_buf),
++				btgatt_char_id_t2str(char_id, char_id_buf),
++				gatt_uuid_t2str(descr_id, buf));
 +
-+	EXEC(if_gatt->client->get_included_service, conn_id, &srvc_id, NULL);
++	if (status == 0)
++		EXEC(if_gatt->client->get_descriptor, conn_id, srvc_id, char_id,
++								descr_id);
  }
  
- /* get_characteristic */
- 
- static void get_characteristic_p(int argc, const char **argv)
+ /* GATT included service enumeration result callback */
+@@ -79,6 +164,17 @@ static void gattc_get_included_service_cb(int conn_id, int status,
+ 						btgatt_srvc_id_t *srvc_id,
+ 						btgatt_srvc_id_t *incl_srvc_id)
  {
-+	int conn_id;
-+	btgatt_srvc_id_t srvc_id;
++	char srvc_id_buf[MAX_SRVC_ID_STR_LEN];
++	char incl_srvc_id_buf[MAX_SRVC_ID_STR_LEN];
 +
-+	RETURN_IF_NULL(if_gatt);
-+	VERIFY_CONN_ID(2, conn_id);
-+	VERIFY_SRVC_ID(3, &srvc_id);
++	haltest_info("%s: conn_id=%d status=%d srvc_id=%s incl_srvc_id=%s)\n",
++			__func__, conn_id, status,
++			btgatt_srvc_id_t2str(srvc_id, srvc_id_buf),
++			btgatt_srvc_id_t2str(incl_srvc_id, incl_srvc_id_buf));
 +
-+	EXEC(if_gatt->client->get_characteristic, conn_id, &srvc_id, NULL);
++	if (status == 0)
++		EXEC(if_gatt->client->get_included_service, conn_id, srvc_id,
++								incl_srvc_id);
  }
  
- /* get_descriptor */
- 
- static void get_descriptor_p(int argc, const char **argv)
+ /* Callback invoked in response to [de]register_for_notification */
+@@ -87,6 +183,13 @@ static void gattc_register_for_notification_cb(int conn_id, int registered,
+ 						btgatt_srvc_id_t *srvc_id,
+ 						btgatt_char_id_t *char_id)
  {
-+	int conn_id;
-+	btgatt_srvc_id_t srvc_id;
-+	btgatt_char_id_t char_id;
++	char srvc_id_buf[MAX_SRVC_ID_STR_LEN];
++	char char_id_buf[MAX_CHAR_ID_STR_LEN];
 +
-+	RETURN_IF_NULL(if_gatt);
-+	VERIFY_CONN_ID(2, conn_id);
-+	VERIFY_SRVC_ID(3, &srvc_id);
-+	VERIFY_CHAR_ID(4, &char_id);
-+
-+	EXEC(if_gatt->client->get_descriptor, conn_id, &srvc_id, &char_id,
-+									NULL);
++	haltest_info("%s: conn_id=%d registered=%d status=%d srvc_id=%s char_id=%s\n",
++				__func__, conn_id, registered, status,
++				btgatt_srvc_id_t2str(srvc_id, srvc_id_buf),
++				btgatt_char_id_t2str(char_id, char_id_buf));
  }
  
- /* read_characteristic */
- 
- static void read_characteristic_p(int argc, const char **argv)
+ /*
+@@ -95,41 +198,60 @@ static void gattc_register_for_notification_cb(int conn_id, int registered,
+  */
+ static void gattc_notify_cb(int conn_id, btgatt_notify_params_t *p_data)
  {
-+	int conn_id;
-+	btgatt_srvc_id_t srvc_id;
-+	btgatt_char_id_t char_id;
-+	int auth_req = 0;
++	char buf[MAX_NOTIFY_PARAMS_STR_LEN];
 +
-+	RETURN_IF_NULL(if_gatt);
-+	VERIFY_CONN_ID(2, conn_id);
-+	VERIFY_SRVC_ID(3, &srvc_id);
-+	VERIFY_CHAR_ID(4, &char_id);
-+
-+	/* auth_req */
-+	if (argc > 5)
-+		auth_req = atoi(argv[5]);
-+
-+	EXEC(if_gatt->client->read_characteristic, conn_id, &srvc_id, &char_id,
-+								auth_req);
++	haltest_info("%s: conn_id=%d data=%s\n", __func__, conn_id,
++				btgatt_notify_params_t2str(p_data, buf));
  }
  
- /* write_characteristic */
- 
- static void write_characteristic_p(int argc, const char **argv)
+ /* Reports result of a GATT read operation */
+ static void gattc_read_characteristic_cb(int conn_id, int status,
+ 						btgatt_read_params_t *p_data)
  {
-+	int conn_id;
-+	btgatt_srvc_id_t srvc_id;
-+	btgatt_char_id_t char_id;
-+	int write_type;
-+	int len;
-+	int auth_req = 0;
-+	uint8_t value[100];
++	char buf[MAX_READ_PARAMS_STR_LEN];
 +
-+	RETURN_IF_NULL(if_gatt);
-+	VERIFY_CONN_ID(2, conn_id);
-+	VERIFY_SRVC_ID(3, &srvc_id);
-+	VERIFY_CHAR_ID(4, &char_id);
-+
-+	/* write type */
-+	if (argc <= 5) {
-+		haltest_error("No write type specified\n");
-+		return;
-+	}
-+	write_type = atoi(argv[5]);
-+
-+	/* value */
-+	if (argc <= 6) {
-+		haltest_error("No value specified\n");
-+		return;
-+	}
-+
-+	/* len in chars */
-+	len = strlen(argv[6]);
-+	scan_field(argv[6], len, value, sizeof(value));
-+	/* len in bytes converted from ascii chars */
-+	len = (len + 1) / 2;
-+
-+	/* auth_req */
-+	if (argc > 7)
-+		auth_req = atoi(argv[7]);
-+
-+	EXEC(if_gatt->client->write_characteristic, conn_id, &srvc_id, &char_id,
-+				write_type, len, auth_req, (char *) value);
++	haltest_info("%s: conn_id=%d status=%d data=%s\n", __func__, conn_id,
++				status, btgatt_read_params_t2str(p_data, buf));
  }
  
- /* read_descriptor */
- 
- static void read_descriptor_p(int argc, const char **argv)
+ /* GATT write characteristic operation callback */
+ static void gattc_write_characteristic_cb(int conn_id, int status,
+ 						btgatt_write_params_t *p_data)
  {
-+	int conn_id;
-+	btgatt_srvc_id_t srvc_id;
-+	btgatt_char_id_t char_id;
-+	bt_uuid_t descr_id;
-+	int auth_req = 0;
-+
-+	RETURN_IF_NULL(if_gatt);
-+	VERIFY_CONN_ID(2, conn_id);
-+	VERIFY_SRVC_ID(3, &srvc_id);
-+	VERIFY_CHAR_ID(4, &char_id);
-+	VERIFY_UUID(5, &descr_id);
-+
-+	/* auth_req */
-+	if (argc > 6)
-+		auth_req = atoi(argv[6]);
-+
-+	EXEC(if_gatt->client->read_descriptor, conn_id, &srvc_id, &char_id,
-+							&descr_id, auth_req);
++	haltest_info("%s: conn_id=%d status=%d\n", __func__, conn_id, status);
  }
  
- /* write_descriptor */
- 
- static void write_descriptor_p(int argc, const char **argv)
+ /* GATT execute prepared write callback */
+ static void gattc_execute_write_cb(int conn_id, int status)
  {
-+	int conn_id;
-+	btgatt_srvc_id_t srvc_id;
-+	btgatt_char_id_t char_id;
-+	bt_uuid_t descr_id;
-+	int write_type;
-+	int len;
-+	int auth_req = 0;
-+	uint8_t value[200] = {0};
-+
-+	RETURN_IF_NULL(if_gatt);
-+	VERIFY_CONN_ID(2, conn_id);
-+	VERIFY_SRVC_ID(3, &srvc_id);
-+	VERIFY_CHAR_ID(4, &char_id);
-+	VERIFY_UUID(5, &descr_id);
-+
-+	/* write type */
-+	if (argc <= 6) {
-+		haltest_error("No write type specified\n");
-+		return;
-+	}
-+	write_type = atoi(argv[6]);
-+
-+	/* value */
-+	if (argc <= 7) {
-+		haltest_error("No value specified\n");
-+		return;
-+	}
-+
-+	/* len in chars */
-+	len = strlen(argv[7]);
-+	scan_field(argv[7], len, value, sizeof(value));
-+	/* len in bytes converted from ascii chars */
-+	len = (len + 1) / 2;
-+
-+	/* auth_req */
-+	if (argc > 8)
-+		auth_req = atoi(argv[8]);
-+
-+	EXEC(if_gatt->client->write_descriptor, conn_id, &srvc_id, &char_id,
-+			&descr_id, write_type, len, auth_req, (char *) value);
++	haltest_info("%s: conn_id=%d status=%d\n", __func__, conn_id, status);
  }
  
- /* execute_write */
- 
- static void execute_write_p(int argc, const char **argv)
+ /* Callback invoked in response to read_descriptor */
+ static void gattc_read_descriptor_cb(int conn_id, int status,
+ 						btgatt_read_params_t *p_data)
  {
-+	int conn_id;
-+	int execute;
++	char buf[MAX_READ_PARAMS_STR_LEN];
 +
-+	RETURN_IF_NULL(if_gatt);
-+	VERIFY_CONN_ID(2, conn_id);
-+
-+	/* execute */
-+	if (argc <= 3) {
-+		haltest_error("No execute specified\n");
-+		return;
-+	}
-+	execute = atoi(argv[3]);
-+
-+	EXEC(if_gatt->client->execute_write, conn_id, execute);
++	haltest_info("%s: conn_id=%d status=%d data=%s\n", __func__, conn_id,
++				status, btgatt_read_params_t2str(p_data, buf));
  }
  
- /* register_for_notification */
- 
- static void register_for_notification_p(int argc, const char **argv)
+ /* Callback invoked in response to write_descriptor */
+ static void gattc_write_descriptor_cb(int conn_id, int status,
+ 						btgatt_write_params_t *p_data)
  {
-+	int client_if;
-+	bt_bdaddr_t bd_addr;
-+	btgatt_srvc_id_t srvc_id;
-+	btgatt_char_id_t char_id;
-+
-+	RETURN_IF_NULL(if_gatt);
-+	VERIFY_CLIENT_IF(2, client_if);
-+	VERIFY_ADDR_ARG(3, &bd_addr);
-+	VERIFY_SRVC_ID(4, &srvc_id);
-+	VERIFY_CHAR_ID(5, &char_id);
-+
-+	EXEC(if_gatt->client->register_for_notification, client_if, &bd_addr,
-+							&srvc_id, &char_id);
++	haltest_info("%s: conn_id=%d status=%d\n", __func__, conn_id, status);
  }
  
- /* deregister_for_notification */
- 
- static void deregister_for_notification_p(int argc, const char **argv)
+ /* Callback triggered in response to read_remote_rssi */
+ static void gattc_read_remote_rssi_cb(int client_if, bt_bdaddr_t *bda, int rssi,
+ 								int status)
  {
-+	int client_if;
-+	bt_bdaddr_t bd_addr;
-+	btgatt_srvc_id_t srvc_id;
-+	btgatt_char_id_t char_id;
++	char buf[MAX_ADDR_STR_LEN];
 +
-+	RETURN_IF_NULL(if_gatt);
-+	VERIFY_CLIENT_IF(2, client_if);
-+	VERIFY_ADDR_ARG(3, &bd_addr);
-+	VERIFY_SRVC_ID(4, &srvc_id);
-+	VERIFY_CHAR_ID(5, &char_id);
-+
-+	EXEC(if_gatt->client->deregister_for_notification, client_if, &bd_addr,
-+							&srvc_id, &char_id);
++	haltest_info("%s: client_if=%d bda=%s rssi=%d satus=%d\n", __func__,
++			client_if, bt_bdaddr_t2str(bda, buf), rssi, status);
  }
  
- /* read_remote_rssi */
- 
- static void read_remote_rssi_p(int argc, const char **argv)
- {
-+	int client_if;
-+	bt_bdaddr_t bd_addr;
-+
-+	RETURN_IF_NULL(if_gatt);
-+	VERIFY_CLIENT_IF(2, client_if);
-+	VERIFY_ADDR_ARG(3, &bd_addr);
-+
-+	EXEC(if_gatt->client->read_remote_rssi, client_if, &bd_addr);
- }
- 
- /* get_device_type */
- 
- static void get_device_type_p(int argc, const char **argv)
- {
-+	bt_bdaddr_t bd_addr;
-+	int dev_type;
-+
-+	RETURN_IF_NULL(if_gatt);
-+	VERIFY_ADDR_ARG(2, &bd_addr);
-+
-+	dev_type = if_gatt->client->get_device_type(&bd_addr);
-+	haltest_info("%s: %d\n", "get_device_type", dev_type);
- }
- 
- /* test_command */
- 
- static void test_command_p(int argc, const char **argv)
- {
-+	int command;
-+	int i;
-+	bt_bdaddr_t bd_addr;
-+	bt_uuid_t uuid;
-+	btgatt_test_params_t params = {
-+		.bda1 = &bd_addr,
-+		.uuid1 = &uuid
-+	};
-+	uint16_t *u = &params.u1;
-+
-+	RETURN_IF_NULL(if_gatt);
-+
-+	/* command */
-+	if (argc <= 2) {
-+		haltest_error("No command specified\n");
-+		return;
-+	}
-+	command = atoi(argv[2]);
-+
-+	VERIFY_ADDR_ARG(3, &bd_addr);
-+	VERIFY_UUID(4, &uuid);
-+
-+	for (i = 5; i < argc; i++)
-+		*u++ = atoi(argv[i]);
-+
-+	EXEC(if_gatt->client->test_command, command, &params);
- }
- 
- static struct method client_methods[] = {
+ static const btgatt_client_callbacks_t btgatt_client_callbacks = {
 -- 
 1.7.9.5
 
