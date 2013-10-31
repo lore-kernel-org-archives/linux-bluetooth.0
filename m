@@ -2,85 +2,60 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 13/14] android: Add support for handling pin reply command
-Date: Thu, 31 Oct 2013 02:55:53 +0000
-Message-Id: <1383188154-22905-14-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 12/14] android: Add support for notify variant in SSP request event
+Date: Thu, 31 Oct 2013 02:55:52 +0000
+Message-Id: <1383188154-22905-13-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1383188154-22905-1-git-send-email-szymon.janc@tieto.com>
 References: <1383188154-22905-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/adapter.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 49 insertions(+)
+ android/adapter.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
 diff --git a/android/adapter.c b/android/adapter.c
-index 00766eb..a6382dd 100644
+index 1be0fb3..00766eb 100644
 --- a/android/adapter.c
 +++ b/android/adapter.c
-@@ -771,6 +771,49 @@ static bool remove_bond(void *buf, uint16_t len)
- 	return true;
+@@ -329,6 +329,26 @@ static void user_passkey_request_callback(uint16_t index, uint16_t length,
+ 	send_ssp_request(&ev->addr.bdaddr, HAL_SSP_VARIANT_ENTRY, 0);
  }
  
-+static uint8_t pin_reply(void *buf, uint16_t len)
++static void user_passkey_notify_callback(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
 +{
-+	struct hal_cmd_pin_reply *cmd = buf;
-+	bdaddr_t bdaddr;
-+	char addr[18];
++	const struct mgmt_ev_passkey_notify *ev = param;
++	char dst[18];
 +
-+	android2bdaddr(cmd->bdaddr, &bdaddr);
-+	ba2str(&bdaddr, addr);
-+
-+	DBG("%s accept %u pin_len %u", addr, cmd->accept, cmd->pin_len);
-+
-+	if (!cmd->accept && cmd->pin_len)
-+		return HAL_STATUS_INVALID;
-+
-+	if (cmd->accept) {
-+		struct mgmt_cp_pin_code_reply rp;
-+
-+		memset(&rp, 0, sizeof(rp));
-+
-+		bacpy(&rp.addr.bdaddr, &bdaddr);
-+		rp.addr.type = BDADDR_BREDR;
-+		rp.pin_len = cmd->pin_len;
-+		memcpy(rp.pin_code, cmd->pin_code, rp.pin_len);
-+
-+		if (mgmt_reply(adapter->mgmt, MGMT_OP_PIN_CODE_REPLY,
-+					adapter->index, sizeof(rp), &rp,
-+					NULL, NULL, NULL) == 0)
-+			return HAL_STATUS_FAILED;
-+	} else {
-+		struct mgmt_cp_pin_code_neg_reply rp;
-+
-+		bacpy(&rp.addr.bdaddr, &bdaddr);
-+		rp.addr.type = BDADDR_BREDR;
-+
-+		if (mgmt_reply(adapter->mgmt, MGMT_OP_PIN_CODE_NEG_REPLY,
-+					adapter->index, sizeof(rp), &rp,
-+					NULL, NULL, NULL) == 0)
-+			return HAL_STATUS_FAILED;
++	if (length < sizeof(*ev)) {
++		error("Too small passkey notify event");
++		return;
 +	}
 +
-+	return HAL_STATUS_SUCCESS;
++	ba2str(&ev->addr.bdaddr, dst);
++	DBG("%s entered %u", dst, ev->entered);
++
++	/* HAL seems to not support entered characters */
++	if (!ev->entered)
++		send_ssp_request(&ev->addr.bdaddr, HAL_SSP_VARIANT_NOTIF,
++								ev->passkey);
 +}
 +
- void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
- 								uint16_t len)
+ static void register_mgmt_handlers(void)
  {
-@@ -823,6 +866,12 @@ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
- 			goto error;
- 
- 		break;
-+	case HAL_OP_PIN_REPLY:
-+		status = pin_reply(buf, len);
-+		if (status != HAL_STATUS_SUCCESS)
-+			goto error;
+ 	mgmt_register(adapter->mgmt, MGMT_EV_NEW_SETTINGS, adapter->index,
+@@ -355,6 +375,10 @@ static void register_mgmt_handlers(void)
+ 	mgmt_register(adapter->mgmt, MGMT_EV_USER_PASSKEY_REQUEST,
+ 				adapter->index, user_passkey_request_callback,
+ 				NULL, NULL);
 +
-+		break;
- 	default:
- 		DBG("Unhandled command, opcode 0x%x", opcode);
- 		goto error;
++	mgmt_register(adapter->mgmt, MGMT_EV_PASSKEY_NOTIFY, adapter->index,
++				user_passkey_notify_callback, NULL, NULL);
++
+ }
+ 
+ static void load_link_keys_complete(uint8_t status, uint16_t length,
 -- 
 1.8.4.rc3
 
