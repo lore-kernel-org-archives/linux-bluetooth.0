@@ -1,31 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 31 Oct 2013 15:47:55 +0200
+Date: Thu, 31 Oct 2013 15:46:17 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] android: Always enable SSP if supported by
- controller
-Message-ID: <20131031134755.GC21600@x220.p-661hnu-f1>
-References: <1383225309-7260-1-git-send-email-szymon.janc@tieto.com>
+Subject: Re: [RFC] android/daemon: Fix not reporting scan mode to Java
+Message-ID: <20131031134617.GB21600@x220.p-661hnu-f1>
+References: <1383223355-4628-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383225309-7260-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1383223355-4628-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Andrei,
 
-On Thu, Oct 31, 2013, Szymon Janc wrote:
-> There is no HAL function to enable/disable SSP so always enable it if
-> supported by controller.
+On Thu, Oct 31, 2013, Andrei Emeltchenko wrote:
+> After set_adapter_property() higher layer expects callback to be returned
+> even if property is not changes. Otherwise Java timeouts and reset Bluetooth
+> enetring to the loop.
+> ...
+> BluetoothAdapterState( 2850): Timeout will setting scan mode..
+>   Continuing with disable...
+> ...
 > ---
-> 
-> v2:
->   use missing_settings mask for checking if setting is enabled
-> 
->  android/adapter.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
+>  android/adapter.c |   12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
 
-Both patches have been applied. Thanks.
+Applied. Thanks.
 
 Johan
