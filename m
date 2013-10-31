@@ -1,47 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] hidhost: Shutdown HID L2CAP sockets on unregister
-Date: Thu, 31 Oct 2013 17:30:18 +0200
-Message-Id: <1383233418-14757-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] android: Add support for setting adapters name
+Date: Thu, 31 Oct 2013 16:26:22 +0100
+Message-Id: <1383233182-7188-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-Fixes address already in use issue if we reenable HID.
-...
-bluetoothd[2894]: Failed to listen on ctrl channel:
-	l2cap_bind: Address already in use (98)
-...
 ---
- android/hid.c |   14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ android/adapter.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
 
-diff --git a/android/hid.c b/android/hid.c
-index 4075ecb..2bc8c06 100644
---- a/android/hid.c
-+++ b/android/hid.c
-@@ -445,9 +445,15 @@ void bt_hid_unregister(void)
- 	g_io_channel_unref(notification_io);
- 	notification_io = NULL;
- 
--	g_io_channel_unref(ctrl_io);
--	ctrl_io = NULL;
-+	if (ctrl_io) {
-+		g_io_channel_shutdown(ctrl_io, TRUE, NULL);
-+		g_io_channel_unref(ctrl_io);
-+		ctrl_io = NULL;
-+	}
- 
--	g_io_channel_unref(intr_io);
--	intr_io = NULL;
-+	if (intr_io) {
-+		g_io_channel_shutdown(intr_io, TRUE, NULL);
-+		g_io_channel_unref(intr_io);
-+		intr_io = NULL;
-+	}
+diff --git a/android/adapter.c b/android/adapter.c
+index 15b65e5..5dadc2e 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -129,6 +129,27 @@ static void scan_mode_changed(void)
+ 	g_free(ev);
  }
+ 
++static void adapter_name_changed(const uint8_t *name)
++{
++	struct hal_ev_adapter_props_changed *ev;
++	uint8_t buf[sizeof(*ev) + sizeof(struct hal_property) +
++							HAL_MAX_NAME_LENGTH];
++
++	memset(buf, 0, sizeof(buf));
++	ev = (void *) buf;
++
++	ev->num_props = 1;
++	ev->status = HAL_STATUS_SUCCESS;
++	ev->props[0].type = HAL_PROP_ADAPTER_NAME;
++	ev->props[0].len = HAL_MAX_NAME_LENGTH;
++	memcpy(ev->props->val, name, HAL_MAX_NAME_LENGTH);
++
++	DBG("Adapter name changed to: %s", ev->props->val);
++
++	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
++			HAL_EV_ADAPTER_PROPS_CHANGED, sizeof(buf), ev, -1);
++}
++
+ static void settings_changed(uint32_t settings)
+ {
+ 	uint32_t changed_mask;
+@@ -286,6 +307,37 @@ static bool set_mode(uint16_t opcode, uint8_t mode)
+ 	return false;
+ }
+ 
++static void set_adapter_name_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	const struct mgmt_cp_set_local_name *rp = param;
++
++	if (status != MGMT_STATUS_SUCCESS) {
++		error("Failed to set name: %s (0x%02x)",
++						mgmt_errstr(status), status);
++		return;
++	}
++
++	adapter_name_changed(rp->name);
++}
++
++static bool set_adapter_name(uint8_t *name, uint16_t len)
++{
++	struct mgmt_cp_set_local_name cp;
++
++	memset(&cp, 0, sizeof(cp));
++	memcpy(cp.name, name, len);
++
++	if (mgmt_send(adapter->mgmt, MGMT_OP_SET_LOCAL_NAME, adapter->index,
++			sizeof(cp), &cp, set_adapter_name_complete, NULL,
++								NULL) > 0)
++		return true;
++
++	error("Failed to set name");
++
++	return false;
++}
++
+ static void read_info_complete(uint8_t status, uint16_t length, const void *param,
+ 							void *user_data)
+ {
+@@ -472,6 +524,7 @@ static uint8_t set_property(void *buf, uint16_t len)
+ 	case HAL_PROP_ADAPTER_SCAN_MODE:
+ 		return set_scan_mode(cmd->val, cmd->len);
+ 	case HAL_PROP_ADAPTER_NAME:
++		return set_adapter_name(cmd->val, cmd->len);
+ 	case HAL_PROP_ADAPTER_DISC_TIMEOUT:
+ 	default:
+ 		DBG("Unhandled property type 0x%x", cmd->type);
 -- 
-1.7.10.4
+1.8.4.1
 
