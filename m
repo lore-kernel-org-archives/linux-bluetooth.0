@@ -9,151 +9,106 @@ CC: Marcel Holtmann <marcel@holtmann.org>,
  Frysinger <vapier@chromium.org>,
         Amitkumar Karwar <akarwar@marvell.com>, Bing
  Zhao <bzhao@marvell.com>
-Subject: [PATCH 3/3] Bluetooth: btmrvl: operate on 16-bit opcodes instead of ogf/ocf
-Date: Thu, 31 Oct 2013 15:08:31 -0700
-Message-ID: <1383257311-1430-3-git-send-email-bzhao@marvell.com>
+Subject: [PATCH 2/3] Bluetooth: btmrvl: remove cal-data byte swapping and redundant mem copy
+Date: Thu, 31 Oct 2013 15:08:30 -0700
+Message-ID: <1383257311-1430-2-git-send-email-bzhao@marvell.com>
 In-Reply-To: <1383257311-1430-1-git-send-email-bzhao@marvell.com>
 References: <1383257311-1430-1-git-send-email-bzhao@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Replace ogf/ocf and its packing with 16-bit opcodes.
+The device tree property can define the cal-data in proper order.
+There is no need to swap the bytes in driver.
+Also remove the redundant cal-data memory copy after removing the
+byte swapping.
 
+Cc: Mike Frysinger <vapier@chromium.org>
+Cc: Amitkumar Karwar <akarwar@marvell.com>
 Signed-off-by: Bing Zhao <bzhao@marvell.com>
-Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+Signed-off-by: Hyuckjoo Lee <hyuckjoo.lee@samsung.com>
 ---
- drivers/bluetooth/btmrvl_drv.h  | 19 +++++++++++--------
- drivers/bluetooth/btmrvl_main.c | 21 +++++++++------------
- 2 files changed, 20 insertions(+), 20 deletions(-)
+ drivers/bluetooth/btmrvl_drv.h  |  2 +-
+ drivers/bluetooth/btmrvl_main.c | 27 ++++++++++-----------------
+ 2 files changed, 11 insertions(+), 18 deletions(-)
 
 diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
-index ffac0e4..7399303 100644
+index be76851..ffac0e4 100644
 --- a/drivers/bluetooth/btmrvl_drv.h
 +++ b/drivers/bluetooth/btmrvl_drv.h
-@@ -86,12 +86,12 @@ struct btmrvl_private {
+@@ -117,7 +117,7 @@ struct btmrvl_private {
+ #define PS_SLEEP			0x01
+ #define PS_AWAKE			0x00
  
- #define MRVL_VENDOR_PKT			0xFE
+-#define BT_CMD_DATA_SIZE		32
++#define BT_CAL_HDR_LEN			4
+ #define BT_CAL_DATA_SIZE		28
  
--/* Bluetooth commands  */
--#define BT_CMD_AUTO_SLEEP_MODE		0x23
--#define BT_CMD_HOST_SLEEP_CONFIG	0x59
--#define BT_CMD_HOST_SLEEP_ENABLE	0x5A
--#define BT_CMD_MODULE_CFG_REQ		0x5B
--#define BT_CMD_LOAD_CONFIG_DATA		0x61
-+/* Vendor specific Bluetooth commands */
-+#define BT_CMD_AUTO_SLEEP_MODE		0xFC23
-+#define BT_CMD_HOST_SLEEP_CONFIG	0xFC59
-+#define BT_CMD_HOST_SLEEP_ENABLE	0xFC5A
-+#define BT_CMD_MODULE_CFG_REQ		0xFC5B
-+#define BT_CMD_LOAD_CONFIG_DATA		0xFC61
- 
- /* Sub-commands: Module Bringup/Shutdown Request/Response */
- #define MODULE_BRINGUP_REQ		0xF1
-@@ -100,6 +100,11 @@ struct btmrvl_private {
- 
- #define MODULE_SHUTDOWN_REQ		0xF2
- 
-+/* Vendor specific Bluetooth events */
-+#define BT_EVENT_AUTO_SLEEP_MODE	0x23
-+#define BT_EVENT_HOST_SLEEP_CONFIG	0x59
-+#define BT_EVENT_HOST_SLEEP_ENABLE	0x5A
-+#define BT_EVENT_MODULE_CFG_REQ		0x5B
- #define BT_EVENT_POWER_STATE		0x20
- 
- /* Bluetooth Power States */
-@@ -107,8 +112,6 @@ struct btmrvl_private {
- #define BT_PS_DISABLE			0x03
- #define BT_PS_SLEEP			0x01
- 
--#define OGF				0x3F
--
- /* Host Sleep states */
- #define HS_ACTIVATED			0x01
- #define HS_DEACTIVATED			0x00
+ struct btmrvl_event {
 diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index f13bef8..1e0320a 100644
+index a17812d..f13bef8 100644
 --- a/drivers/bluetooth/btmrvl_main.c
 +++ b/drivers/bluetooth/btmrvl_main.c
-@@ -50,12 +50,10 @@ bool btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb)
- 
- 	if (hdr->evt == HCI_EV_CMD_COMPLETE) {
- 		struct hci_ev_cmd_complete *ec;
--		u16 opcode, ocf, ogf;
-+		u16 opcode;
- 
- 		ec = (void *) (skb->data + HCI_EVENT_HDR_SIZE);
- 		opcode = __le16_to_cpu(ec->opcode);
--		ocf = hci_opcode_ocf(opcode);
--		ogf = hci_opcode_ogf(opcode);
- 
- 		if (priv->btmrvl_dev.sendcmdflag) {
- 			priv->btmrvl_dev.sendcmdflag = false;
-@@ -63,9 +61,8 @@ bool btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb)
- 			wake_up_interruptible(&priv->adapter->cmd_wait_q);
- 		}
- 
--		if (ogf == OGF) {
--			BT_DBG("vendor event skipped: ogf 0x%4.4x ocf 0x%4.4x",
--			       ogf, ocf);
-+		if (hci_opcode_ogf(opcode) == 0x3F) {
-+			BT_DBG("vendor event skipped: opcode=%#4.4x", opcode);
- 			kfree_skb(skb);
- 			return false;
- 		}
-@@ -89,7 +86,7 @@ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb)
- 	}
- 
- 	switch (event->data[0]) {
--	case BT_CMD_AUTO_SLEEP_MODE:
-+	case BT_EVENT_AUTO_SLEEP_MODE:
- 		if (!event->data[2]) {
- 			if (event->data[1] == BT_PS_ENABLE)
- 				adapter->psmode = 1;
-@@ -102,7 +99,7 @@ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb)
- 		}
- 		break;
- 
--	case BT_CMD_HOST_SLEEP_CONFIG:
-+	case BT_EVENT_HOST_SLEEP_CONFIG:
- 		if (!event->data[3])
- 			BT_DBG("gpio=%x, gap=%x", event->data[1],
- 							event->data[2]);
-@@ -110,7 +107,7 @@ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb)
- 			BT_DBG("HSCFG command failed");
- 		break;
- 
--	case BT_CMD_HOST_SLEEP_ENABLE:
-+	case BT_EVENT_HOST_SLEEP_ENABLE:
- 		if (!event->data[1]) {
- 			adapter->hs_state = HS_ACTIVATED;
- 			if (adapter->psmode)
-@@ -121,7 +118,7 @@ int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb)
- 		}
- 		break;
- 
--	case BT_CMD_MODULE_CFG_REQ:
-+	case BT_EVENT_MODULE_CFG_REQ:
- 		if (priv->btmrvl_dev.sendcmdflag &&
- 				event->data[1] == MODULE_BRINGUP_REQ) {
- 			BT_DBG("EVENT:%s",
-@@ -166,7 +163,7 @@ exit:
+@@ -418,28 +418,20 @@ static int btmrvl_open(struct hci_dev *hdev)
  }
- EXPORT_SYMBOL_GPL(btmrvl_process_event);
  
--static int btmrvl_send_sync_cmd(struct btmrvl_private *priv, u16 cmd_no,
-+static int btmrvl_send_sync_cmd(struct btmrvl_private *priv, u16 opcode,
- 				const void *param, u8 len)
+ static int btmrvl_download_cal_data(struct btmrvl_private *priv,
+-				    u8 *config_data)
++				    u8 *data, int len)
  {
- 	struct sk_buff *skb;
-@@ -179,7 +176,7 @@ static int btmrvl_send_sync_cmd(struct btmrvl_private *priv, u16 cmd_no,
- 	}
+-	int i, ret;
+-	u8 data[BT_CMD_DATA_SIZE];
++	int ret;
  
- 	hdr = (struct hci_command_hdr *)skb_put(skb, HCI_COMMAND_HDR_SIZE);
--	hdr->opcode = cpu_to_le16(hci_opcode_pack(OGF, cmd_no));
-+	hdr->opcode = cpu_to_le16(opcode);
- 	hdr->plen = len;
+ 	data[0] = 0x00;
+ 	data[1] = 0x00;
+ 	data[2] = 0x00;
+-	data[3] = BT_CMD_DATA_SIZE - 4;
+-
+-	/* Swap cal-data bytes. Each four bytes are swapped. Considering 4
+-	 * byte SDIO header offset, mapping of input and output bytes will be
+-	 * {3, 2, 1, 0} -> {0+4, 1+4, 2+4, 3+4},
+-	 * {7, 6, 5, 4} -> {4+4, 5+4, 6+4, 7+4} */
+-	for (i = 4; i < BT_CMD_DATA_SIZE; i++)
+-		data[i] = config_data[(i / 4) * 8 - 1 - i];
++	data[3] = len;
  
- 	if (len)
+ 	print_hex_dump_bytes("Calibration data: ",
+-			     DUMP_PREFIX_OFFSET, data, BT_CMD_DATA_SIZE);
++			     DUMP_PREFIX_OFFSET, data, BT_CAL_HDR_LEN + len);
+ 
+ 	ret = btmrvl_send_sync_cmd(priv, BT_CMD_LOAD_CONFIG_DATA, data,
+-				   BT_CMD_DATA_SIZE);
++				   BT_CAL_HDR_LEN + len);
+ 	if (ret)
+ 		BT_ERR("Failed to download caibration data\n");
+ 
+@@ -449,7 +441,7 @@ static int btmrvl_download_cal_data(struct btmrvl_private *priv,
+ static int btmrvl_cal_data_dt(struct btmrvl_private *priv)
+ {
+ 	struct device_node *dt_node;
+-	u8 cal_data[BT_CAL_DATA_SIZE];
++	u8 cal_data[BT_CAL_HDR_LEN + BT_CAL_DATA_SIZE];
+ 	const char name[] = "btmrvl_caldata";
+ 	const char property[] = "btmrvl,caldata";
+ 	int ret;
+@@ -458,13 +450,14 @@ static int btmrvl_cal_data_dt(struct btmrvl_private *priv)
+ 	if (!dt_node)
+ 		return -ENODEV;
+ 
+-	ret = of_property_read_u8_array(dt_node, property, cal_data,
+-					sizeof(cal_data));
++	ret = of_property_read_u8_array(dt_node, property,
++					cal_data + BT_CAL_HDR_LEN,
++					BT_CAL_DATA_SIZE);
+ 	if (ret)
+ 		return ret;
+ 
+ 	BT_DBG("Use cal data from device tree");
+-	ret = btmrvl_download_cal_data(priv, cal_data);
++	ret = btmrvl_download_cal_data(priv, cal_data, BT_CAL_DATA_SIZE);
+ 	if (ret) {
+ 		BT_ERR("Fail to download calibrate data");
+ 		return ret;
 -- 
 1.8.0
