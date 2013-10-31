@@ -1,37 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: [PATCH 1/5] android: Fix typo in get_remote_services command
-Date: Thu, 31 Oct 2013 16:25:48 +0100
-Message-ID: <1383233152-15040-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20131031142138.GM27517@aemeltch-MOBL1>
+References: <1383228038-4306-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+	<20131031142138.GM27517@aemeltch-MOBL1>
+Date: Thu, 31 Oct 2013 16:16:36 +0100
+Message-ID: <CAMv5GbeKqnr=aWUTbJXGaSgaO4LfHBdtRZuw2fD9nuaCPBJ5Vg@mail.gmail.com>
+Subject: Re: [PATCH] android: Add support for setting adapters name
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+Hi Andrei,
 
-Change-Id: Ia38b82b4b7fdbd6e52389b34e1cdbbcfd098958c
----
- android/hal-msg.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On 31 October 2013 15:21, Andrei Emeltchenko
+<andrei.emeltchenko.news@gmail.com> wrote:
+>
+> Hi Grzegorz,
+>
+> On Thu, Oct 31, 2013 at 03:00:38PM +0100, Grzegorz Kolodziejczyk wrote:
+> > ---
+> >  android/adapter.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  android/hal-msg.h |  2 ++
+> >  2 files changed, 55 insertions(+)
+> >
+> > diff --git a/android/adapter.c b/android/adapter.c
+> > index 15b65e5..5dadc2e 100644
+> > --- a/android/adapter.c
+> > +++ b/android/adapter.c
+> > @@ -129,6 +129,27 @@ static void scan_mode_changed(void)
+> >       g_free(ev);
+> >  }
+> >
+> > +static void adapter_name_changed(const uint8_t *name)
+> > +{
+> > +     struct hal_ev_adapter_props_changed *ev;
+> > +     uint8_t buf[sizeof(*ev) + sizeof(struct hal_property) +
+> > +                                                     HAL_MAX_NAME_LENGTH];
+> > +
+> > +     memset(buf, 0, sizeof(buf));
+> > +     ev = (void *) buf;
+> > +
+> > +     ev->num_props = 1;
+> > +     ev->status = HAL_STATUS_SUCCESS;
+> > +     ev->props[0].type = HAL_PROP_ADAPTER_NAME;
+> > +     ev->props[0].len = HAL_MAX_NAME_LENGTH;
+>
+> Do we need to pass always HAL_MAX_NAME_LENGTH ?
+>
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 8a344d8..c0af083 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -148,8 +148,8 @@ struct hal_cmd_get_remote_service_rec {
- 	uint8_t uuid[16];
- } __attribute__((packed));
- 
--#define HAL_OP_GET_REMOTE_SERVICE	0x0a
--struct hal_cmd_get_remote_service {
-+#define HAL_OP_GET_REMOTE_SERVICES	0x0a
-+struct hal_cmd_get_remote_services {
- 	uint8_t bdaddr[6];
- } __attribute__((packed));
- 
--- 
-1.8.4.1
+Yes, HAL expect 249 byte size array. IPC should map to HAL calls,
+where name is expected to have 249 bytes.
 
+Best regards,
+Grzegorz Kołodziejczyk
