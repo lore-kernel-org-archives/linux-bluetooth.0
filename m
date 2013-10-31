@@ -2,99 +2,70 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 06/14] android: Add support for handling create bond command
-Date: Thu, 31 Oct 2013 02:55:46 +0000
-Message-Id: <1383188154-22905-7-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 04/14] android: Make load_link_keys function load keys
+Date: Thu, 31 Oct 2013 02:55:44 +0000
+Message-Id: <1383188154-22905-5-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1383188154-22905-1-git-send-email-szymon.janc@tieto.com>
 References: <1383188154-22905-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+GSlist passed is expected to hold mgmt_link_key_info structures.
 ---
- android/adapter.c | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 63 insertions(+)
+ android/adapter.c | 33 ++++++++++++++++++++++++---------
+ 1 file changed, 24 insertions(+), 9 deletions(-)
 
 diff --git a/android/adapter.c b/android/adapter.c
-index d730dde..8c5482b 100644
+index 4b4905b..d55a070 100644
 --- a/android/adapter.c
 +++ b/android/adapter.c
-@@ -568,6 +568,64 @@ static uint8_t set_property(void *buf, uint16_t len)
- 	}
+@@ -290,22 +290,37 @@ failed:
+ static void load_link_keys(GSList *keys)
+ {
+ 	struct mgmt_cp_load_link_keys *cp;
+-	size_t key_len = g_slist_length(keys);
+ 	struct mgmt_link_key_info *key;
+-	size_t len;
++	size_t key_count, cp_size;
++	unsigned int id;
+ 
+-	DBG("");
++	key_count = g_slist_length(keys);
++
++	DBG("keys %zu ", key_count);
++
++	cp_size = sizeof(*cp) + (key_count * sizeof(*key));
++
++	cp = g_malloc0(cp_size);
+ 
+-	len = sizeof(*cp) + key_len * sizeof(*key);
+-	cp = g_malloc0(len);
++	/*
++	 * Even if the list of stored keys is empty, it is important to
++	 * load an empty list into the kernel. That way it is ensured
++	 * that no old keys from a previous daemon are present.
++	 */
++	cp->key_count = htobs(key_count);
+ 
+-	cp->debug_keys = 0;
+-	cp->key_count = htobs(key_len);
++	for (key = cp->keys; keys != NULL; keys = g_slist_next(keys), key++)
++		memcpy(key, keys->data, sizeof(*key));
+ 
+-	mgmt_send(adapter->mgmt, MGMT_OP_LOAD_LINK_KEYS, adapter->index, len,
+-				cp, load_link_keys_complete, NULL, NULL);
++	id = mgmt_send(adapter->mgmt, MGMT_OP_LOAD_LINK_KEYS, adapter->index,
++			cp_size, cp, load_link_keys_complete, NULL, NULL);
+ 
+ 	g_free(cp);
++
++	if (id == 0) {
++		error("Failed to load link keys");
++		adapter->ready(-EIO);
++	}
  }
  
-+static uint8_t status_mgmt2hal(uint8_t mgmt)
-+{
-+	switch (mgmt) {
-+	case MGMT_STATUS_SUCCESS:
-+		return HAL_STATUS_SUCCESS;
-+	case MGMT_STATUS_NO_RESOURCES:
-+		return HAL_STATUS_NOMEM;
-+	case MGMT_STATUS_BUSY:
-+		return HAL_STATUS_BUSY;
-+	case MGMT_STATUS_NOT_SUPPORTED:
-+		return HAL_STATUS_UNSUPPORTED;
-+	case MGMT_STATUS_INVALID_PARAMS:
-+		return HAL_STATUS_INVALID;
-+	case MGMT_STATUS_AUTH_FAILED:
-+		return HAL_STATUS_AUTH_FAILURE;
-+	case MGMT_STATUS_NOT_CONNECTED:
-+		return HAL_STATUS_REMOTE_DEVICE_DOWN;
-+	default:
-+		return HAL_STATUS_FAILED;
-+	}
-+}
-+
-+static void pair_device_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	const struct mgmt_rp_pair_device *rp = param;
-+
-+	DBG("status %u", status);
-+
-+	/* On success bond state change will be send when new link key event
-+	 * is received */
-+	if (status == MGMT_STATUS_SUCCESS)
-+		return;
-+
-+	send_bond_state_change(&rp->addr.bdaddr, status_mgmt2hal(status),
-+							HAL_BOND_STATE_NONE);
-+}
-+
-+static bool create_bond(void *buf, uint16_t len)
-+{
-+	struct hal_cmd_create_bond *cmd = buf;
-+	struct mgmt_cp_pair_device cp;
-+
-+	cp.io_cap = DEFAULT_IO_CAPABILITY;
-+	cp.addr.type = BDADDR_BREDR;
-+	android2bdaddr(cmd->bdaddr, &cp.addr.bdaddr);
-+
-+	if (mgmt_send(adapter->mgmt, MGMT_OP_PAIR_DEVICE, adapter->index,
-+				sizeof(cp), &cp, pair_device_complete, NULL,
-+				NULL) == 0)
-+		return false;
-+
-+	send_bond_state_change(&cp.addr.bdaddr, HAL_STATUS_SUCCESS,
-+						HAL_BOND_STATE_BONDING);
-+
-+	return true;
-+}
-+
- void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
- 								uint16_t len)
- {
-@@ -605,6 +663,11 @@ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
- 			goto error;
- 
- 		break;
-+	case HAL_OP_CREATE_BOND:
-+		if (!create_bond(buf, len))
-+			goto error;
-+
-+		break;
- 	default:
- 		DBG("Unhandled command, opcode 0x%x", opcode);
- 		goto error;
+ static void set_mode_complete(uint8_t status, uint16_t length,
 -- 
 1.8.4.rc3
 
