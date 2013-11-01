@@ -1,124 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] android/adapter: Log not implemented properties
-Date: Fri,  1 Nov 2013 15:52:43 +0200
-Message-Id: <1383313965-30182-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCHv1 1/8] android/haltest: Fix print device name
+Date: Fri,  1 Nov 2013 15:41:38 +0200
+Message-Id: <1383313305-9442-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This makes it easier to stop which functions the HAL is calling.
 ---
- android/adapter.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 80 insertions(+)
+ android/client/textconv.c |    3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/android/adapter.c b/android/adapter.c
-index f986020..0bf627f 100644
---- a/android/adapter.c
-+++ b/android/adapter.c
-@@ -940,6 +940,78 @@ static void send_adapter_address(void)
- 	g_free(ev);
- }
+diff --git a/android/client/textconv.c b/android/client/textconv.c
+index effd1b3..8e6bdb9 100644
+--- a/android/client/textconv.c
++++ b/android/client/textconv.c
+@@ -258,8 +258,7 @@ char *btproperty2str(const bt_property_t *property)
+ 	switch (property->type) {
+ 	case BT_PROPERTY_BDNAME:
+ 	case BT_PROPERTY_REMOTE_FRIENDLY_NAME:
+-		sprintf(p, "%*s", property->len,
+-					((bt_bdname_t *) property->val)->name);
++		sprintf(p, "%s", ((bt_bdname_t *) property->val)->name);
+ 		break;
  
-+static bool get_name(void)
-+{
-+	DBG("Not implemented");
-+
-+	/* TODO: Add implementation */
-+
-+	return false;
-+}
-+
-+static bool get_uuids(void)
-+{
-+	DBG("Not implemented");
-+
-+	/* TODO: Add implementation */
-+
-+	return false;
-+}
-+
-+static bool get_class(void)
-+{
-+	DBG("Not implemented");
-+
-+	/* TODO: Add implementation */
-+
-+	return false;
-+}
-+
-+static bool get_type(void)
-+{
-+	DBG("Not implemented");
-+
-+	/* TODO: Add implementation */
-+
-+	return false;
-+}
-+
-+static bool get_service(void)
-+{
-+	DBG("Not implemented");
-+
-+	/* TODO: Add implementation */
-+
-+	return false;
-+}
-+
-+static bool get_scan_mode(void)
-+{
-+	DBG("Not implemented");
-+
-+	/* TODO: Add implementation */
-+
-+	return false;
-+}
-+
-+static bool get_devices(void)
-+{
-+	DBG("Not implemented");
-+
-+	/* TODO: Add implementation */
-+
-+	return false;
-+}
-+
-+static bool get_disc_timeout(void)
-+{
-+	DBG("Not implemented");
-+
-+	/* TODO: Add implementation */
-+
-+	return false;
-+}
-+
- static bool get_property(void *buf, uint16_t len)
- {
- 	struct hal_cmd_get_adapter_prop *cmd = buf;
-@@ -949,13 +1021,21 @@ static bool get_property(void *buf, uint16_t len)
- 		send_adapter_address();
- 		return true;
- 	case HAL_PROP_ADAPTER_NAME:
-+		return get_name();
- 	case HAL_PROP_ADAPTER_UUIDS:
-+		return get_uuids();
- 	case HAL_PROP_ADAPTER_CLASS:
-+		return get_class();
- 	case HAL_PROP_ADAPTER_TYPE:
-+		return get_type();
- 	case HAL_PROP_ADAPTER_SERVICE_REC:
-+		return get_service();
- 	case HAL_PROP_ADAPTER_SCAN_MODE:
-+		return get_scan_mode();
- 	case HAL_PROP_ADAPTER_BONDED_DEVICES:
-+		return get_devices();
- 	case HAL_PROP_ADAPTER_DISC_TIMEOUT:
-+		return get_disc_timeout();
- 	default:
- 		return false;
- 	}
+ 	case BT_PROPERTY_BDADDR:
 -- 
-1.8.3.1
+1.7.10.4
 
