@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 5/6] android/hal: Add debug prints for every HAL callback
-Date: Fri,  1 Nov 2013 13:30:17 +0200
-Message-Id: <1383305418-13619-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFC 4/6] android/daemon: Add handlers for auth_failed and connect_failed evt
+Date: Fri,  1 Nov 2013 13:30:16 +0200
+Message-Id: <1383305418-13619-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1383305418-13619-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1383305418-13619-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,78 +11,47 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This allows us to trace callbacks to Java.
+Add debug prints in a case connection is failing
 ---
- android/hal-bluetooth.c |   14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ android/adapter.c |   18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 91c5f97..7334d24 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -153,6 +153,8 @@ static void handle_adapter_props_changed(void *buf, uint16_t len)
- 	struct hal_ev_adapter_props_changed *ev = buf;
- 	bt_property_t props[ev->num_props];
- 
-+	DBG("");
-+
- 	if (!bt_hal_cbacks->adapter_properties_cb)
- 		return;
- 
-@@ -168,6 +170,8 @@ static void handle_bond_state_change(void *buf)
- 	struct hal_ev_bond_state_changed *ev = buf;
- 	bt_bdaddr_t *addr = (bt_bdaddr_t *) ev->bdaddr;
- 
-+	DBG("state %u", ev->state);
-+
- 	if (bt_hal_cbacks->bond_state_changed_cb)
- 		bt_hal_cbacks->bond_state_changed_cb(ev->status, addr,
- 								ev->state);
-@@ -180,6 +184,8 @@ static void handle_pin_request(void *buf)
- 	bt_bdaddr_t *addr = (bt_bdaddr_t *) ev->bdaddr;
- 	bt_bdname_t *name = (bt_bdname_t *) ev->name;
- 
-+	DBG("");
-+
- 	if (bt_hal_cbacks->pin_request_cb)
- 		bt_hal_cbacks->pin_request_cb(addr, name, ev->class_of_dev);
+diff --git a/android/adapter.c b/android/adapter.c
+index df56452..bc4492b 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -643,6 +643,18 @@ static void mgmt_device_connected_event(uint16_t index, uint16_t length,
+ 			HAL_EV_ACL_STATE_CHANGED, sizeof(hal_ev), &hal_ev, -1);
  }
-@@ -191,6 +197,8 @@ static void handle_ssp_request(void *buf)
- 	bt_bdaddr_t *addr = (bt_bdaddr_t *) ev->bdaddr;
- 	bt_bdname_t *name = (bt_bdname_t *) ev->name;
  
++static void mgmt_connect_failed_event(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
++{
 +	DBG("");
++}
 +
- 	if (bt_hal_cbacks->ssp_request_cb)
- 		bt_hal_cbacks->ssp_request_cb(addr, name, ev->class_of_dev,
- 							ev->pairing_variant,
-@@ -218,6 +226,8 @@ static void handle_discovery_state_changed(void *buf)
++static void mgmt_auth_failed_event(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
++{
++	DBG("");
++}
++
+ static void register_mgmt_handlers(void)
  {
- 	struct hal_ev_discovery_state_changed *ev = buf;
+ 	mgmt_register(adapter->mgmt, MGMT_EV_NEW_SETTINGS, adapter->index,
+@@ -683,6 +695,12 @@ static void register_mgmt_handlers(void)
  
-+	DBG("");
+ 	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_CONNECTED, adapter->index,
+ 				mgmt_device_connected_event, NULL, NULL);
 +
- 	if (bt_hal_cbacks->discovery_state_changed_cb)
- 		bt_hal_cbacks->discovery_state_changed_cb(ev->state);
++	mgmt_register(adapter->mgmt, MGMT_EV_CONNECT_FAILED, adapter->index,
++				mgmt_connect_failed_event, NULL, NULL);
++
++	mgmt_register(adapter->mgmt, MGMT_EV_AUTH_FAILED, adapter->index,
++				mgmt_auth_failed_event, NULL, NULL);
  }
-@@ -227,6 +237,8 @@ static void handle_device_found(void *buf, uint16_t len)
- 	struct hal_ev_device_found *ev = buf;
- 	bt_property_t props[ev->num_props];
  
-+	DBG("");
-+
- 	if (!bt_hal_cbacks->device_found_cb)
- 		return;
- 
-@@ -242,6 +254,8 @@ static void handle_device_state_changed(void *buf, uint16_t len)
- 	struct hal_ev_remote_device_props *ev = buf;
- 	bt_property_t props[ev->num_props];
- 
-+	DBG("");
-+
- 	if (!bt_hal_cbacks->remote_device_properties_cb)
- 		return;
- 
+ static void load_link_keys_complete(uint8_t status, uint16_t length,
 -- 
 1.7.10.4
 
