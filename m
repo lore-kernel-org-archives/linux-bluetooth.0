@@ -1,114 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/3] android/hid: Log not implemented HAL functions
-Date: Fri,  1 Nov 2013 15:52:44 +0200
-Message-Id: <1383313965-30182-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1383313965-30182-1-git-send-email-luiz.dentz@gmail.com>
-References: <1383313965-30182-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/3] android/adapter: Log not implemented properties
+Date: Fri,  1 Nov 2013 15:52:43 +0200
+Message-Id: <1383313965-30182-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes it easier to spot which functions the HAL is calling.
+This makes it easier to stop which functions the HAL is calling.
 ---
- android/hid.c | 75 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 75 insertions(+)
+ android/adapter.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 80 insertions(+)
 
-diff --git a/android/hid.c b/android/hid.c
-index 6e6f606..e660552 100644
---- a/android/hid.c
-+++ b/android/hid.c
-@@ -564,6 +564,60 @@ static uint8_t bt_hid_disconnect(struct hal_cmd_hid_disconnect *cmd,
- 	return HAL_STATUS_SUCCESS;
+diff --git a/android/adapter.c b/android/adapter.c
+index f986020..0bf627f 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -940,6 +940,78 @@ static void send_adapter_address(void)
+ 	g_free(ev);
  }
  
-+static uint8_t bt_hid_virtual_unplug(struct hal_cmd_hid_vp *cmd, uint16_t len)
++static bool get_name(void)
 +{
-+	DBG("Not Implemented");
++	DBG("Not implemented");
 +
-+	return HAL_STATUS_FAILED;
++	/* TODO: Add implementation */
++
++	return false;
 +}
 +
-+static uint8_t bt_hid_info(struct hal_cmd_hid_set_info *cmd, uint16_t len)
++static bool get_uuids(void)
 +{
-+	DBG("Not Implemented");
++	DBG("Not implemented");
 +
-+	return HAL_STATUS_FAILED;
++	/* TODO: Add implementation */
++
++	return false;
 +}
 +
-+static uint8_t bt_hid_get_protocol(struct hal_cmd_hid_get_protocol *cmd,
-+								uint16_t len)
++static bool get_class(void)
 +{
-+	DBG("Not Implemented");
++	DBG("Not implemented");
 +
-+	return HAL_STATUS_FAILED;
++	/* TODO: Add implementation */
++
++	return false;
 +}
 +
-+static uint8_t bt_hid_set_protocol(struct hal_cmd_hid_set_protocol *cmd,
-+								uint16_t len)
++static bool get_type(void)
 +{
-+	DBG("Not Implemented");
++	DBG("Not implemented");
 +
-+	return HAL_STATUS_FAILED;
++	/* TODO: Add implementation */
++
++	return false;
 +}
 +
-+static uint8_t bt_hid_get_report(struct hal_cmd_hid_get_report *cmd,
-+								uint16_t len)
++static bool get_service(void)
 +{
-+	DBG("Not Implemented");
++	DBG("Not implemented");
 +
-+	return HAL_STATUS_FAILED;
++	/* TODO: Add implementation */
++
++	return false;
 +}
 +
-+static uint8_t bt_hid_set_report(struct hal_cmd_hid_set_report *cmd,
-+								uint16_t len)
++static bool get_scan_mode(void)
 +{
-+	DBG("Not Implemented");
++	DBG("Not implemented");
 +
-+	return HAL_STATUS_FAILED;
++	/* TODO: Add implementation */
++
++	return false;
 +}
 +
-+static uint8_t bt_hid_send_data(struct hal_cmd_hid_send_data *cmd,
-+								uint16_t len)
++static bool get_devices(void)
 +{
-+	DBG("Not Implemented");
++	DBG("Not implemented");
 +
-+	return HAL_STATUS_FAILED;
++	/* TODO: Add implementation */
++
++	return false;
 +}
 +
- void bt_hid_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf, uint16_t len)
++static bool get_disc_timeout(void)
++{
++	DBG("Not implemented");
++
++	/* TODO: Add implementation */
++
++	return false;
++}
++
+ static bool get_property(void *buf, uint16_t len)
  {
- 	uint8_t status = HAL_STATUS_FAILED;
-@@ -575,6 +629,27 @@ void bt_hid_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf, uint16_t len)
- 	case HAL_OP_HID_DISCONNECT:
- 		status = bt_hid_disconnect(buf, len);
- 		break;
-+	case HAL_OP_HID_VP:
-+		status = bt_hid_virtual_unplug(buf, len);
-+		break;
-+	case HAL_OP_HID_SET_INFO:
-+		status = bt_hid_info(buf, len);
-+		break;
-+	case HAL_OP_HID_GET_PROTOCOL:
-+		status = bt_hid_get_protocol(buf, len);
-+		break;
-+	case HAL_OP_HID_SET_PROTOCOL:
-+		status = bt_hid_set_protocol(buf, len);
-+		break;
-+	case HAL_OP_HID_GET_REPORT:
-+		status = bt_hid_get_report(buf, len);
-+		break;
-+	case HAL_OP_HID_SET_REPORT:
-+		status = bt_hid_set_report(buf, len);
-+		break;
-+	case HAL_OP_HID_SEND_DATA:
-+		status = bt_hid_send_data(buf, len);
-+		break;
+ 	struct hal_cmd_get_adapter_prop *cmd = buf;
+@@ -949,13 +1021,21 @@ static bool get_property(void *buf, uint16_t len)
+ 		send_adapter_address();
+ 		return true;
+ 	case HAL_PROP_ADAPTER_NAME:
++		return get_name();
+ 	case HAL_PROP_ADAPTER_UUIDS:
++		return get_uuids();
+ 	case HAL_PROP_ADAPTER_CLASS:
++		return get_class();
+ 	case HAL_PROP_ADAPTER_TYPE:
++		return get_type();
+ 	case HAL_PROP_ADAPTER_SERVICE_REC:
++		return get_service();
+ 	case HAL_PROP_ADAPTER_SCAN_MODE:
++		return get_scan_mode();
+ 	case HAL_PROP_ADAPTER_BONDED_DEVICES:
++		return get_devices();
+ 	case HAL_PROP_ADAPTER_DISC_TIMEOUT:
++		return get_disc_timeout();
  	default:
- 		DBG("Unhandled command, opcode 0x%x", opcode);
- 		break;
+ 		return false;
+ 	}
 -- 
 1.8.3.1
 
