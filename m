@@ -1,63 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 1/6] android/daemon: Implement mgmt device connected event
-Date: Fri,  1 Nov 2013 13:30:13 +0200
-Message-Id: <1383305418-13619-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFC 3/6] android/hal: Handle acl_state_changed event
+Date: Fri,  1 Nov 2013 13:30:15 +0200
+Message-Id: <1383305418-13619-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1383305418-13619-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1383305418-13619-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Send HAL_EV_ACL_STATE_CHANGED event to HAL through IPC.
 ---
- android/adapter.c |   26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ android/hal-bluetooth.c |   15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/android/adapter.c b/android/adapter.c
-index 4ddd68b..df56452 100644
---- a/android/adapter.c
-+++ b/android/adapter.c
-@@ -620,6 +620,29 @@ static void mgmt_device_found_event(uint16_t index, uint16_t length,
- 						confirm_name, eir, eir_len);
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index a0ee844..91c5f97 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -254,6 +254,18 @@ static void handle_device_state_changed(void *buf, uint16_t len)
+ 	device_hal_props_cleanup(props, ev->num_props);
  }
  
-+static void mgmt_device_connected_event(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
++static void handle_acl_state_changed(void *buf)
 +{
-+	const struct mgmt_ev_device_connected *ev = param;
-+	struct hal_ev_acl_state_changed hal_ev;
++	struct hal_ev_acl_state_changed *ev = buf;
++	bt_bdaddr_t *addr = (bt_bdaddr_t *) ev->bdaddr;
 +
-+	if (length < sizeof(*ev)) {
-+		error("Too short %s (%u bytes)", __func__, length);
-+		return;
-+	}
++	DBG("state %u", ev->state);
 +
-+	/* TODO: Update device */
-+
-+	/* TODO: Check Set bonding state */
-+
-+	hal_ev.status = HAL_STATUS_SUCCESS;
-+	hal_ev.state = HAL_ACL_STATE_CONNECTED;
-+	bdaddr2android(&ev->addr.bdaddr, &hal_ev.bdaddr);
-+
-+	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_EV_ACL_STATE_CHANGED, sizeof(hal_ev), &hal_ev, -1);
++	if (bt_hal_cbacks->acl_state_changed_cb)
++		bt_hal_cbacks->acl_state_changed_cb(ev->status, addr,
++								ev->state);
 +}
 +
- static void register_mgmt_handlers(void)
+ /* will be called from notification thread context */
+ void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len)
  {
- 	mgmt_register(adapter->mgmt, MGMT_EV_NEW_SETTINGS, adapter->index,
-@@ -657,6 +680,9 @@ static void register_mgmt_handlers(void)
- 	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_FOUND,
- 					adapter->index, mgmt_device_found_event,
- 					NULL, NULL);
-+
-+	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_CONNECTED, adapter->index,
-+				mgmt_device_connected_event, NULL, NULL);
- }
- 
- static void load_link_keys_complete(uint8_t status, uint16_t length,
+@@ -287,6 +299,9 @@ void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len)
+ 	case HAL_EV_SSP_REQUEST:
+ 		handle_ssp_request(buf);
+ 		break;
++	case HAL_EV_ACL_STATE_CHANGED:
++		handle_acl_state_changed(buf);
++		break;
+ 	default:
+ 		DBG("Unhandled callback opcode=0x%x", opcode);
+ 		break;
 -- 
 1.7.10.4
 
