@@ -1,25 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Nov 2013 16:41:22 +0200
+Date: Fri, 1 Nov 2013 16:40:29 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/3] android/adapter: Log not implemented properties
-Message-ID: <20131101144122.GB4773@x220.p-661hnu-f1>
-References: <1383313965-30182-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCHv1 8/8] android/daemon: Refactor sending acl state
+Message-ID: <20131101144029.GA4773@x220.p-661hnu-f1>
+References: <1383313305-9442-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1383313305-9442-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383313965-30182-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1383313305-9442-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Andrei,
 
-On Fri, Nov 01, 2013, Luiz Augusto von Dentz wrote:
-> This makes it easier to stop which functions the HAL is calling.
+On Fri, Nov 01, 2013, Andrei Emeltchenko wrote:
+> Sending ACL state change might be refactored.
 > ---
->  android/adapter.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 80 insertions(+)
+>  android/adapter.c |   32 ++++++++++++++++++--------------
+>  1 file changed, 18 insertions(+), 14 deletions(-)
 
-All three patches have been applied. Thanks.
+Patches 2-7 have been applied. 1/8 didn't apply and this last one is
+quite unnecessary since there will never be more than two users and
+you're actually adding more lines than you're removing.
 
 Johan
