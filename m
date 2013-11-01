@@ -1,54 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 1 Nov 2013 15:11:41 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/client: Fix pin reply call when pin argument
- missing in cmd
-Message-ID: <20131101131141.GA30191@x220.p-661hnu-f1>
-References: <1383308405-17782-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383308405-17782-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 4/4] android/hid: Add handling of HAL_EV_HID_INFO
+Date: Fri,  1 Nov 2013 15:08:41 +0200
+Message-Id: <1383311321-28429-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1383311321-28429-1-git-send-email-luiz.dentz@gmail.com>
+References: <1383311321-28429-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Nov 01, 2013, Ravi kumar Veeramally wrote:
-> If condition checks number of arguments properly but still executes
-> EXEC command. It should display error message and return.
-> ---
->  android/client/if-bt.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
-> 
-> diff --git a/android/client/if-bt.c b/android/client/if-bt.c
-> index 3d97458..2c3cc4a 100644
-> --- a/android/client/if-bt.c
-> +++ b/android/client/if-bt.c
-> @@ -719,12 +719,15 @@ static void pin_reply_p(int argc, const char **argv)
->  	RETURN_IF_NULL(if_bluetooth);
->  	VERIFY_ADDR_ARG(2, &addr);
->  
-> -	if (argc > 3) {
-> -		accept = 1;
-> -		pin_len = strlen(argv[3]);
-> -		memcpy(pin.pin, argv[3], pin_len);
-> +	if (argc != 4) {
-> +		haltest_error("Usage <address> <pin>\n");
-> +		return;
->  	}
->  
-> +	accept = 1;
-> +	pin_len = strlen(argv[3]);
-> +	memcpy(pin.pin, argv[3], pin_len);
-> +
->  	EXEC(if_bluetooth->pin_reply, &addr, accept, pin_len, &pin);
+---
+ android/hid.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-It seems to me that the original code might have been trying to do (if
-it hadn't been broken like it now is) a negative pin reply in the case
-that no parameter was given. At least I don't see any other code trying
-to call if_bluetooth->pin_reply with accept=1 in haltest. So I'd
-consider fixing that instead.
+diff --git a/android/hid.c b/android/hid.c
+index 57ad5e4..6e6f606 100644
+--- a/android/hid.c
++++ b/android/hid.c
+@@ -58,6 +58,7 @@ static GSList *devices = NULL;
+ struct hid_device {
+ 	bdaddr_t	dst;
+ 	uint8_t		state;
++	uint8_t		subclass;
+ 	uint16_t	vendor;
+ 	uint16_t	product;
+ 	uint16_t	version;
+@@ -260,6 +261,28 @@ static gboolean ctrl_watch_cb(GIOChannel *chan, GIOCondition cond,
+ 	return FALSE;
+ }
+ 
++static void bt_hid_set_info(struct hid_device *dev)
++{
++	struct hal_ev_hid_info ev;
++
++	DBG("");
++
++	bdaddr2android(&dev->dst, ev.bdaddr);
++	ev.attr = 0; /* TODO: Check what is this field */
++	ev.subclass = dev->subclass;
++	ev.app_id = 0; /* TODO: Check what is this field */
++	ev.vendor = dev->vendor;
++	ev.product = dev->product;
++	ev.version = dev->version;
++	ev.country = dev->country;
++	ev.descr_len = dev->rd_size;
++	memset(ev.descr, 0, sizeof(ev.descr));
++	memcpy(ev.descr, dev->rd_data, ev.descr_len);
++
++	ipc_send(notification_io, HAL_SERVICE_ID_HIDHOST, HAL_EV_HID_INFO,
++							sizeof(ev), &ev, -1);
++}
++
+ static int uhid_create(struct hid_device *dev)
+ {
+ 	GIOCondition cond = G_IO_IN | G_IO_ERR | G_IO_NVAL;
+@@ -295,6 +318,8 @@ static int uhid_create(struct hid_device *dev)
+ 	dev->uhid_watch_id = g_io_add_watch(io, cond, uhid_event_cb, dev);
+ 	g_io_channel_unref(io);
+ 
++	bt_hid_set_info(dev);
++
+ 	return 0;
+ }
+ 
+@@ -412,6 +437,10 @@ static void hid_sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ 		if (data)
+ 			dev->country = data->val.uint8;
+ 
++		data = sdp_data_get(rec, SDP_ATTR_HID_DEVICE_SUBCLASS);
++		if (data)
++			dev->subclass = data->val.uint8;
++
+ 		data = sdp_data_get(rec, SDP_ATTR_HID_DESCRIPTOR_LIST);
+ 		if (data) {
+ 			if (!SDP_IS_SEQ(data->dtd))
+-- 
+1.8.3.1
 
-Johan
