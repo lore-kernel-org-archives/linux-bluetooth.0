@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 4/8] android/hal: Handle acl_state_changed event
-Date: Fri,  1 Nov 2013 15:41:41 +0200
-Message-Id: <1383313305-9442-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 5/8] android/daemon: Add debug handlers for unhandled mgmt event
+Date: Fri,  1 Nov 2013 15:41:42 +0200
+Message-Id: <1383313305-9442-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1383313305-9442-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1383313305-9442-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,43 +11,56 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Add debug prints to some mgmt events.
 ---
- android/hal-bluetooth.c |   15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ android/adapter.c |   27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index a0ee844..91c5f97 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -254,6 +254,18 @@ static void handle_device_state_changed(void *buf, uint16_t len)
- 	device_hal_props_cleanup(props, ev->num_props);
+diff --git a/android/adapter.c b/android/adapter.c
+index 5a5fa2e..299a025 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -651,6 +651,24 @@ static void mgmt_device_connected_event(uint16_t index, uint16_t length,
+ 			HAL_EV_ACL_STATE_CHANGED, sizeof(hal_ev), &hal_ev, -1);
  }
  
-+static void handle_acl_state_changed(void *buf)
++static void mgmt_connect_failed_event(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
 +{
-+	struct hal_ev_acl_state_changed *ev = buf;
-+	bt_bdaddr_t *addr = (bt_bdaddr_t *) ev->bdaddr;
-+
-+	DBG("state %u", ev->state);
-+
-+	if (bt_hal_cbacks->acl_state_changed_cb)
-+		bt_hal_cbacks->acl_state_changed_cb(ev->status, addr,
-+								ev->state);
++	DBG("");
 +}
 +
- /* will be called from notification thread context */
- void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len)
++static void mgmt_auth_failed_event(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
++{
++	DBG("");
++}
++
++static void mgmt_device_unpaired_event(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
++{
++	DBG("");
++}
++
+ static void register_mgmt_handlers(void)
  {
-@@ -287,6 +299,9 @@ void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len)
- 	case HAL_EV_SSP_REQUEST:
- 		handle_ssp_request(buf);
- 		break;
-+	case HAL_EV_ACL_STATE_CHANGED:
-+		handle_acl_state_changed(buf);
-+		break;
- 	default:
- 		DBG("Unhandled callback opcode=0x%x", opcode);
- 		break;
+ 	mgmt_register(adapter->mgmt, MGMT_EV_NEW_SETTINGS, adapter->index,
+@@ -691,6 +709,15 @@ static void register_mgmt_handlers(void)
+ 
+ 	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_CONNECTED, adapter->index,
+ 				mgmt_device_connected_event, NULL, NULL);
++
++	mgmt_register(adapter->mgmt, MGMT_EV_CONNECT_FAILED, adapter->index,
++				mgmt_connect_failed_event, NULL, NULL);
++
++	mgmt_register(adapter->mgmt, MGMT_EV_AUTH_FAILED, adapter->index,
++				mgmt_auth_failed_event, NULL, NULL);
++
++	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_UNPAIRED, adapter->index,
++				mgmt_device_unpaired_event, NULL, NULL);
+ }
+ 
+ static void load_link_keys_complete(uint8_t status, uint16_t length,
 -- 
 1.7.10.4
 
