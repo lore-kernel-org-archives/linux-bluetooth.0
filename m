@@ -1,33 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 6/6] android/daemon: Add handler for device disconnected
-Date: Fri,  1 Nov 2013 13:30:18 +0200
-Message-Id: <1383305418-13619-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1383305418-13619-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1383305418-13619-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFC 1/6] android/daemon: Implement mgmt device connected event
+Date: Fri,  1 Nov 2013 13:30:13 +0200
+Message-Id: <1383305418-13619-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Send event to callback thread which shall call acl state change callback.
+Send HAL_EV_ACL_STATE_CHANGED event to HAL through IPC.
 ---
- android/adapter.c |   27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ android/adapter.c |   26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
 diff --git a/android/adapter.c b/android/adapter.c
-index bc4492b..39389ee 100644
+index 4ddd68b..df56452 100644
 --- a/android/adapter.c
 +++ b/android/adapter.c
-@@ -643,6 +643,29 @@ static void mgmt_device_connected_event(uint16_t index, uint16_t length,
- 			HAL_EV_ACL_STATE_CHANGED, sizeof(hal_ev), &hal_ev, -1);
+@@ -620,6 +620,29 @@ static void mgmt_device_found_event(uint16_t index, uint16_t length,
+ 						confirm_name, eir, eir_len);
  }
  
-+static void mgmt_device_disconnected_event(uint16_t index, uint16_t length,
++static void mgmt_device_connected_event(uint16_t index, uint16_t length,
 +					const void *param, void *user_data)
 +{
-+	const struct mgmt_ev_device_disconnected *ev = param;
++	const struct mgmt_ev_device_connected *ev = param;
 +	struct hal_ev_acl_state_changed hal_ev;
 +
 +	if (length < sizeof(*ev)) {
@@ -40,27 +38,26 @@ index bc4492b..39389ee 100644
 +	/* TODO: Check Set bonding state */
 +
 +	hal_ev.status = HAL_STATUS_SUCCESS;
-+	hal_ev.state = HAL_ACL_STATE_DISCONNECTED;
++	hal_ev.state = HAL_ACL_STATE_CONNECTED;
 +	bdaddr2android(&ev->addr.bdaddr, &hal_ev.bdaddr);
 +
 +	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
 +			HAL_EV_ACL_STATE_CHANGED, sizeof(hal_ev), &hal_ev, -1);
 +}
 +
- static void mgmt_connect_failed_event(uint16_t index, uint16_t length,
- 					const void *param, void *user_data)
+ static void register_mgmt_handlers(void)
  {
-@@ -696,6 +719,10 @@ static void register_mgmt_handlers(void)
- 	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_CONNECTED, adapter->index,
- 				mgmt_device_connected_event, NULL, NULL);
- 
-+	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_DISCONNECTED,
-+				adapter->index, mgmt_device_disconnected_event,
-+				NULL, NULL);
+ 	mgmt_register(adapter->mgmt, MGMT_EV_NEW_SETTINGS, adapter->index,
+@@ -657,6 +680,9 @@ static void register_mgmt_handlers(void)
+ 	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_FOUND,
+ 					adapter->index, mgmt_device_found_event,
+ 					NULL, NULL);
 +
- 	mgmt_register(adapter->mgmt, MGMT_EV_CONNECT_FAILED, adapter->index,
- 				mgmt_connect_failed_event, NULL, NULL);
++	mgmt_register(adapter->mgmt, MGMT_EV_DEVICE_CONNECTED, adapter->index,
++				mgmt_device_connected_event, NULL, NULL);
+ }
  
+ static void load_link_keys_complete(uint8_t status, uint16_t length,
 -- 
 1.7.10.4
 
