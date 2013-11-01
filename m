@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/4] android/hid: Add handling of HAL_EV_HID_INFO
-Date: Fri,  1 Nov 2013 15:08:41 +0200
-Message-Id: <1383311321-28429-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/4] android/hal-hidhost: Add implemention of .hid_info_cb
+Date: Fri,  1 Nov 2013 15:08:40 +0200
+Message-Id: <1383311321-28429-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1383311321-28429-1-git-send-email-luiz.dentz@gmail.com>
 References: <1383311321-28429-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,70 +12,75 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/hid.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ android/hal-hidhost.c | 22 ++++++++++++++++++++++
+ android/hal-msg.h     | 14 ++++++++++++++
+ 2 files changed, 36 insertions(+)
 
-diff --git a/android/hid.c b/android/hid.c
-index 57ad5e4..6e6f606 100644
---- a/android/hid.c
-+++ b/android/hid.c
-@@ -58,6 +58,7 @@ static GSList *devices = NULL;
- struct hid_device {
- 	bdaddr_t	dst;
- 	uint8_t		state;
-+	uint8_t		subclass;
- 	uint16_t	vendor;
- 	uint16_t	product;
- 	uint16_t	version;
-@@ -260,6 +261,28 @@ static gboolean ctrl_watch_cb(GIOChannel *chan, GIOCondition cond,
- 	return FALSE;
+diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
+index e148dc2..c20c785 100644
+--- a/android/hal-hidhost.c
++++ b/android/hal-hidhost.c
+@@ -40,6 +40,25 @@ static void handle_conn_state(void *buf)
+ 								ev->state);
  }
  
-+static void bt_hid_set_info(struct hid_device *dev)
++static void handle_info(void *buf)
 +{
-+	struct hal_ev_hid_info ev;
++	struct hal_ev_hid_info *ev = buf;
++	bthh_hid_info_t info;
 +
-+	DBG("");
++	info.attr_mask = ev->attr;
++	info.sub_class = ev->subclass;
++	info.app_id = ev->app_id;
++	info.vendor_id = ev->vendor;
++	info.product_id = ev->product;
++	info.version = ev->version;
++	info.ctry_code = ev->country;
++	info.dl_len = ev->descr_len;
++	memcpy(info.dsc_list, ev->descr, info.dl_len);
 +
-+	bdaddr2android(&dev->dst, ev.bdaddr);
-+	ev.attr = 0; /* TODO: Check what is this field */
-+	ev.subclass = dev->subclass;
-+	ev.app_id = 0; /* TODO: Check what is this field */
-+	ev.vendor = dev->vendor;
-+	ev.product = dev->product;
-+	ev.version = dev->version;
-+	ev.country = dev->country;
-+	ev.descr_len = dev->rd_size;
-+	memset(ev.descr, 0, sizeof(ev.descr));
-+	memcpy(ev.descr, dev->rd_data, ev.descr_len);
-+
-+	ipc_send(notification_io, HAL_SERVICE_ID_HIDHOST, HAL_EV_HID_INFO,
-+							sizeof(ev), &ev, -1);
++	if (bt_hh_cbacks->hid_info_cb)
++		bt_hh_cbacks->hid_info_cb((bt_bdaddr_t *) ev->bdaddr, info);
 +}
 +
- static int uhid_create(struct hid_device *dev)
+ /* will be called from notification thread context */
+ void bt_notify_hh(uint16_t opcode, void *buf, uint16_t len)
  {
- 	GIOCondition cond = G_IO_IN | G_IO_ERR | G_IO_NVAL;
-@@ -295,6 +318,8 @@ static int uhid_create(struct hid_device *dev)
- 	dev->uhid_watch_id = g_io_add_watch(io, cond, uhid_event_cb, dev);
- 	g_io_channel_unref(io);
+@@ -50,6 +69,9 @@ void bt_notify_hh(uint16_t opcode, void *buf, uint16_t len)
+ 	case HAL_EV_HID_CONN_STATE:
+ 		handle_conn_state(buf);
+ 		break;
++	case HAL_EV_HID_INFO:
++		handle_info(buf);
++		break;
+ 	default:
+ 		DBG("Unhandled callback opcode=0x%x", opcode);
+ 		break;
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 8a344d8..9276a2f 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -439,6 +439,20 @@ struct hal_ev_hid_conn_state {
+ 	uint8_t state;
+ } __attribute__((packed));
  
-+	bt_hid_set_info(dev);
++#define HAL_EV_HID_INFO			0x82
++struct hal_ev_hid_info {
++	uint8_t bdaddr[6];
++	uint8_t attr;
++	uint8_t subclass;
++	uint8_t app_id;
++	uint16_t vendor;
++	uint16_t product;
++	uint16_t version;
++	uint8_t country;
++	uint16_t descr_len;
++	uint8_t descr[884];
++} __attribute__((packed));
 +
- 	return 0;
- }
- 
-@@ -412,6 +437,10 @@ static void hid_sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
- 		if (data)
- 			dev->country = data->val.uint8;
- 
-+		data = sdp_data_get(rec, SDP_ATTR_HID_DEVICE_SUBCLASS);
-+		if (data)
-+			dev->subclass = data->val.uint8;
-+
- 		data = sdp_data_get(rec, SDP_ATTR_HID_DESCRIPTOR_LIST);
- 		if (data) {
- 			if (!SDP_IS_SEQ(data->dtd))
+ #define HAL_EV_AV_CONNECTION_STATE	0x81
+ struct hal_ev_av_connection_state {
+ 	uint8_t state;
 -- 
 1.8.3.1
 
