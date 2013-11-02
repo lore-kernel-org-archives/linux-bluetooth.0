@@ -1,41 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
-Subject: Re: [RFC 0/5] Disconnect complete refactoring
+Subject: Re: [RFC 4/5] Bluetooth: Remove unneeded check in hci_disconn_complete_evt()
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1383170504-16602-1-git-send-email-andre.guedes@openbossa.org>
-Date: Sat, 2 Nov 2013 19:17:11 +0100
+In-Reply-To: <1383170504-16602-5-git-send-email-andre.guedes@openbossa.org>
+Date: Sat, 2 Nov 2013 19:14:06 +0100
 Cc: "linux-bluetooth@vger.kernel.org development"
 	<linux-bluetooth@vger.kernel.org>
-Message-Id: <8BF10002-95E2-4ECE-8F17-6684A9424FBB@holtmann.org>
-References: <1383170504-16602-1-git-send-email-andre.guedes@openbossa.org>
+Message-Id: <4794090B-F1E7-4B60-860A-3BD42CE6CA93@holtmann.org>
+References: <1383170504-16602-1-git-send-email-andre.guedes@openbossa.org> <1383170504-16602-5-git-send-email-andre.guedes@openbossa.org>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-> This patch set does some code refactoring in disconnect complete event handler
-> and related functions from Mgmt layer.
+> According to b644ba336 (patch that introduced HCI_CONN_MGMT_CONNECTED
+> flag), the HCI_CONN_MGMT_CONNECTED flag tracks when mgmt has been
+> notified about the connection.
 > 
-> This refactoring used to be one patch from LE auto connection patch set, but
-> since Marcel asked me to do more changes, I put all these refactoring patches
-> in its own patch set.
+> That being said, there is no point in checking this flag in hci_
+> disconn_complete_evt() since neither mgmt_disconnect_failed() nor
+> mgmt_device_disconnected() depend on it. Below follows more details:
+>  * mgmt_disconnect_failed() removes pending MGMT_OP_DISCONNECT
+>    commands, it doesn't matter if that connection was notified or not.
+>  * mgmt_device_disconnected() sends the mgmt event only if the link
+>    type is ACL_LINK or LE_LINK. For those connection type, the flag is
+>    always set.
 > 
-> Regards,
+> So this patch removes the HCI_CONN_MGMT_CONNECTED check.
 > 
-> Andre Guedes (5):
->  Bluetooth: Check address in mgmt_disconnect_failed()
->  Bluetooth: Add an extra check in mgmt_device_disconnected()
->  Bluetooth: Remove link type check in hci_disconn_complete_evt()
->  Bluetooth: Remove unneeded check in hci_disconn_complete_evt()
->  Bluetooth: Refactor hci_disconn_complete_evt
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+> net/bluetooth/hci_event.c | 16 +++++++---------
+> 1 file changed, 7 insertions(+), 9 deletions(-)
 > 
-> net/bluetooth/hci_event.c | 61 ++++++++++++++++++++++-------------------------
-> net/bluetooth/mgmt.c      | 15 +++++++++++-
-> 2 files changed, 43 insertions(+), 33 deletions(-)
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 4673cfb..9225a9c 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -1795,16 +1795,14 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> 	if (ev->status == 0)
+> 		conn->state = BT_CLOSED;
+> 
+> -	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags)) {
+> -		if (ev->status) {
+> -			mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
+> -					       conn->dst_type, ev->status);
+> -		} else {
+> -			u8 reason = hci_to_mgmt_reason(ev->reason);
+> +	if (ev->status) {
+> +		mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
+> +				conn->dst_type, ev->status);
 
-I applied the first 3 patches of this series to bluetooth-next tree. You need to fix up patch 4 and resend the rest.
+something went wrong with the coding style here.
+
+> +	} else {
+> +		u8 reason = hci_to_mgmt_reason(ev->reason);
+> 
+> -			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
+> -						 conn->dst_type, reason);
+> -		}
+> +		mgmt_device_disconnected(hdev, &conn->dst, conn->type,
+> +				conn->dst_type, reason);
+
+And here.
+
+> 	}
+> 
+> 	if (ev->status == 0) {
 
 Regards
 
