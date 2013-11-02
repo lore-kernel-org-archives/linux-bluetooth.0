@@ -1,76 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
-Subject: Re: [RFC 4/5] Bluetooth: Remove unneeded check in hci_disconn_complete_evt()
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1383170504-16602-5-git-send-email-andre.guedes@openbossa.org>
-Date: Sat, 2 Nov 2013 19:14:06 +0100
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <4794090B-F1E7-4B60-860A-3BD42CE6CA93@holtmann.org>
-References: <1383170504-16602-1-git-send-email-andre.guedes@openbossa.org> <1383170504-16602-5-git-send-email-andre.guedes@openbossa.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1150558629.1978061383393978285.JavaMail.defaultUser@defaultHost>
+Date: Sat, 2 Nov 2013 13:06:18 +0100 (CET)
+From: Fabio Rossi <rossi.f@inwind.it>
+Reply-To: Fabio Rossi <rossi.f@inwind.it>
+To: <marcel@holtmann.org>
+Subject: Re: BUG in rfcomm_sock_getsockopt+0x128/0x200
+Cc: "linux-wireless@vger.kernel.org Wireless" <linux-wireless@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain;charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Marcel,
 
-> According to b644ba336 (patch that introduced HCI_CONN_MGMT_CONNECTED
-> flag), the HCI_CONN_MGMT_CONNECTED flag tracks when mgmt has been
-> notified about the connection.
+>I finally managed to reproduce it. It does not always happen. And strangely 
+enough I can only trigger it when enabling experimental features of bluetoothd 
+with -E command line switch.
+>
+>But I have no idea why your bisecting points to that specific commit. And 
+more important it used to work just fine (see below). However I can tell you 
+what makes the code crash.
+>
+>0x1313 is in rfcomm_sock_getsockopt (net/bluetooth/rfcomm/sock.c:743).
+>738	
+>739	static int rfcomm_sock_getsockopt_old(struct socket *sock, int optname, 
+char __user *optval, int __user *optlen)
+>740	{
+>741		struct sock *sk = sock->sk;
+>742		struct rfcomm_conninfo cinfo;
+>743		struct l2cap_conn *conn = l2cap_pi(sk)->chan->conn;
+>744		int len, err = 0;
+>745		u32 opt;
+>746	
+>747		BT_DBG("sk %p", sk);
+>
+>The l2cap_pi(sk) is fully broken. That is an rfcomm_pi(sk). The commit that 
+broke this is actually from an earlier time. I have this one:
+>
+>commit 8c1d787be4b62d2d1b6f04953eca4bcf7c839d44
+>Author: Gustavo F. Padovan <padovan@profusion.mobi>
+>Date:   Wed Apr 13 20:23:55 2011 -0300
+>
+>    Bluetooth: Move conn to struct l2cap_chan
+>
+>diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+>index 66cc1f0c3df8..386cfaffd4b7 100644
+>--- a/net/bluetooth/rfcomm/sock.c
+>+++ b/net/bluetooth/rfcomm/sock.c
+>@@ -743,6 +743,7 @@ static int rfcomm_sock_getsockopt_old(struct socket 
+*sock, int optname, char __u
+>        struct sock *sk = sock->sk;
+>        struct sock *l2cap_sk;
+>        struct rfcomm_conninfo cinfo;
+>+       struct l2cap_conn *conn = l2cap_pi(sk)->chan->conn;
+>        int len, err = 0;
+>        u32 opt;
 > 
-> That being said, there is no point in checking this flag in hci_
-> disconn_complete_evt() since neither mgmt_disconnect_failed() nor
-> mgmt_device_disconnected() depend on it. Below follows more details:
->  * mgmt_disconnect_failed() removes pending MGMT_OP_DISCONNECT
->    commands, it doesn't matter if that connection was notified or not.
->  * mgmt_device_disconnected() sends the mgmt event only if the link
->    type is ACL_LINK or LE_LINK. For those connection type, the flag is
->    always set.
+>@@ -787,8 +788,8 @@ static int rfcomm_sock_getsockopt_old(struct socket 
+*sock, int optname, char __u
 > 
-> So this patch removes the HCI_CONN_MGMT_CONNECTED check.
+>                l2cap_sk = rfcomm_pi(sk)->dlc->session->sock->sk;
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
-> net/bluetooth/hci_event.c | 16 +++++++---------
-> 1 file changed, 7 insertions(+), 9 deletions(-)
+>-               cinfo.hci_handle = l2cap_pi(l2cap_sk)->conn->hcon->handle;
+>-               memcpy(cinfo.dev_class, l2cap_pi(l2cap_sk)->conn->hcon-
+>dev_class, 3);
+>+               cinfo.hci_handle = conn->hcon->handle;
+>+               memcpy(cinfo.dev_class, conn->hcon->dev_class, 3);
+>
+>The conversion is clearly wrong since we used to have a l2cap_sk that was 
+pointing to the right socket.
+>
+>This should have blown up month ago and not just with the latest changes we 
+have done to the L2CAP layer. Anyhow, you can try this small change and see if 
+it fixes things for you.
+>
+>diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+>index c4d3d423f89b..0be7619c5e5e 100644
+>--- a/net/bluetooth/rfcomm/sock.c
+>+++ b/net/bluetooth/rfcomm/sock.c
+>@@ -739,8 +739,9 @@ static int rfcomm_sock_setsockopt(struct socket *sock, 
+int level, int optname, c
+> static int rfcomm_sock_getsockopt_old(struct socket *sock, int optname, char 
+__user *optval, int __user *optlen)
+> {
+>        struct sock *sk = sock->sk;
+>+       struct sock *l2cap_sk;
+>+       struct l2cap_conn *conn;
+>        struct rfcomm_conninfo cinfo;
+>-       struct l2cap_conn *conn = l2cap_pi(sk)->chan->conn;
+>        int len, err = 0;
+>        u32 opt;
 > 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 4673cfb..9225a9c 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -1795,16 +1795,14 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> 	if (ev->status == 0)
-> 		conn->state = BT_CLOSED;
+>@@ -783,6 +784,9 @@ static int rfcomm_sock_getsockopt_old(struct socket 
+*sock, int optname, char __u
+>                        break;
+>                }
 > 
-> -	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags)) {
-> -		if (ev->status) {
-> -			mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
-> -					       conn->dst_type, ev->status);
-> -		} else {
-> -			u8 reason = hci_to_mgmt_reason(ev->reason);
-> +	if (ev->status) {
-> +		mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
-> +				conn->dst_type, ev->status);
+>+               l2cap_sk = rfcomm_pi(sk)->dlc->session->sock->sk;
+>+               conn = l2cap_pi(l2cap_sk)->chan->conn;
+>+
+>                memset(&cinfo, 0, sizeof(cinfo));
+>                cinfo.hci_handle = conn->hcon->handle;
+>                memcpy(cinfo.dev_class, conn->hcon->dev_class, 3);
+>
+>Regards
 
-something went wrong with the coding style here.
+This patch solves the issue, I don't see the crash anymore.
 
-> +	} else {
-> +		u8 reason = hci_to_mgmt_reason(ev->reason);
-> 
-> -			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
-> -						 conn->dst_type, reason);
-> -		}
-> +		mgmt_device_disconnected(hdev, &conn->dst, conn->type,
-> +				conn->dst_type, reason);
-
-And here.
-
-> 	}
-> 
-> 	if (ev->status == 0) {
-
-Regards
-
-Marcel
-
+Thanks,
+Fabio
