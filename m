@@ -1,34 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Subject: [PATCH] android: Bump PLATFORM_SDK_VERSION to KitKat
-Date: Mon, 4 Nov 2013 11:06:13 +0100
-Message-ID: <1383559573-19508-1-git-send-email-jerzy.kasenberg@tieto.com>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] android: Fix not sending scan mode change notification
+Date: Mon, 4 Nov 2013 10:59:59 +0100
+Message-ID: <1383559199-22843-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This updates PLATFORM_SDK_VERSION to 19 since
-bluetooth headers were updated already.
+Check for current settings instead of changed setting mask when
+sending notification. Otherwise scan mode change would be communicated
+only if power state changed at the same time.
 ---
- android/Makefile.am |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/adapter.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 5eb8f01..acbc0f5 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -71,7 +71,7 @@ android_haltest_SOURCES = android/client/haltest.c \
- android_haltest_LDADD = android/libhal-internal.la
+diff --git a/android/adapter.c b/android/adapter.c
+index af62b11..efe3e8b 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -174,19 +174,20 @@ static void settings_changed(uint32_t settings)
  
- android_haltest_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android \
--				-DPLATFORM_SDK_VERSION=18
-+				-DPLATFORM_SDK_VERSION=19
+ 	DBG("0x%08x", changed_mask);
  
- android_haltest_LDFLAGS = -pthread
+-	if (changed_mask & MGMT_SETTING_POWERED) {
++	if (changed_mask & MGMT_SETTING_POWERED)
+ 		powered_changed();
  
+-		/*
+-		 * Only when powered, the connectable and discoverable
+-		 * state changes should be communicated.
+-		 */
+-		scan_mode_mask = MGMT_SETTING_CONNECTABLE |
+-						MGMT_SETTING_DISCOVERABLE;
+ 
++	scan_mode_mask = MGMT_SETTING_CONNECTABLE |
++					MGMT_SETTING_DISCOVERABLE;
++
++	/*
++	 * Only when powered, the connectable and discoverable
++	 * state changes should be communicated.
++	 */
++	if (adapter->current_settings & MGMT_SETTING_POWERED)
+ 		if (changed_mask & scan_mode_mask)
+ 			scan_mode_changed();
+-	}
+ }
+ 
+ static void new_settings_callback(uint16_t index, uint16_t length,
 -- 
-1.7.9.5
+1.8.4.1
 
