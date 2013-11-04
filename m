@@ -1,25 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <5277D614.5050907@openbossa.org>
+Date: Mon, 04 Nov 2013 14:15:00 -0300
 From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/2] Disconnect complete refactoring
-Date: Mon,  4 Nov 2013 14:57:25 -0300
-Message-Id: <1383587847-16523-1-git-send-email-andre.guedes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC 4/5] Bluetooth: Remove unneeded check in hci_disconn_complete_evt()
+References: <1383170504-16602-1-git-send-email-andre.guedes@openbossa.org> <1383170504-16602-5-git-send-email-andre.guedes@openbossa.org> <4794090B-F1E7-4B60-860A-3BD42CE6CA93@holtmann.org>
+In-Reply-To: <4794090B-F1E7-4B60-860A-3BD42CE6CA93@holtmann.org>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Marcel,
 
-This small patch set contains the remaining patches from "[RFC] Disconnect
-complete refactoring" patch set which weren't applied due to coding style
-issues.
+On 02/11/13 15:14, Marcel Holtmann wrote:
+> Hi Andre,
+>
+>> According to b644ba336 (patch that introduced HCI_CONN_MGMT_CONNECTED
+>> flag), the HCI_CONN_MGMT_CONNECTED flag tracks when mgmt has been
+>> notified about the connection.
+>>
+>> That being said, there is no point in checking this flag in hci_
+>> disconn_complete_evt() since neither mgmt_disconnect_failed() nor
+>> mgmt_device_disconnected() depend on it. Below follows more details:
+>>   * mgmt_disconnect_failed() removes pending MGMT_OP_DISCONNECT
+>>     commands, it doesn't matter if that connection was notified or not.
+>>   * mgmt_device_disconnected() sends the mgmt event only if the link
+>>     type is ACL_LINK or LE_LINK. For those connection type, the flag is
+>>     always set.
+>>
+>> So this patch removes the HCI_CONN_MGMT_CONNECTED check.
+>>
+>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>> ---
+>> net/bluetooth/hci_event.c | 16 +++++++---------
+>> 1 file changed, 7 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>> index 4673cfb..9225a9c 100644
+>> --- a/net/bluetooth/hci_event.c
+>> +++ b/net/bluetooth/hci_event.c
+>> @@ -1795,16 +1795,14 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>> 	if (ev->status == 0)
+>> 		conn->state = BT_CLOSED;
+>>
+>> -	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags)) {
+>> -		if (ev->status) {
+>> -			mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
+>> -					       conn->dst_type, ev->status);
+>> -		} else {
+>> -			u8 reason = hci_to_mgmt_reason(ev->reason);
+>> +	if (ev->status) {
+>> +		mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
+>> +				conn->dst_type, ev->status);
+>
+> something went wrong with the coding style here.
+>
+>> +	} else {
+>> +		u8 reason = hci_to_mgmt_reason(ev->reason);
+>>
+>> -			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
+>> -						 conn->dst_type, reason);
+>> -		}
+>> +		mgmt_device_disconnected(hdev, &conn->dst, conn->type,
+>> +				conn->dst_type, reason);
+>
+> And here.
 
-Andre Guedes (2):
-  Bluetooth: Remove unneeded check in hci_disconn_complete_evt()
-  Bluetooth: Refactor hci_disconn_complete_evt
+I'm fixing it.
 
- net/bluetooth/hci_event.c | 59 ++++++++++++++++++++++-------------------------
- 1 file changed, 28 insertions(+), 31 deletions(-)
+Thanks,
 
--- 
-1.8.4
-
+Andre
