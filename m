@@ -1,100 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/4] android/a2dp: Add initial code for handling commands
-Date: Mon,  4 Nov 2013 12:56:55 +0200
-Message-Id: <1383562617-9029-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1383562617-9029-1-git-send-email-luiz.dentz@gmail.com>
-References: <1383562617-9029-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCHv2 2/2] android/daemon: Fix setting adapter name
+Date: Mon,  4 Nov 2013 12:49:40 +0200
+Message-Id: <1383562180-21646-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1383562180-21646-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1383562180-21646-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Android use the full string returned even if we terminate it with '\0'.
 ---
- android/a2dp.c | 36 ++++++++++++++++++++++++++++++++++++
- android/a2dp.h |  3 +++
- android/main.c |  4 ++++
- 3 files changed, 43 insertions(+)
+ android/adapter.c |   11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index 64e5278..28ab4b1 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -35,9 +35,45 @@
- #include "lib/bluetooth.h"
- #include "log.h"
- #include "a2dp.h"
-+#include "hal-msg.h"
-+#include "ipc.h"
- 
- static GIOChannel *notification_io = NULL;
- 
-+static uint8_t bt_a2dp_connect(struct hal_cmd_av_connect *cmd, uint16_t len)
-+{
-+	DBG("Not Implemented");
-+
-+	return HAL_STATUS_FAILED;
-+}
-+
-+static uint8_t bt_a2dp_disconnect(struct hal_cmd_av_connect *cmd, uint16_t len)
-+{
-+	DBG("Not Implemented");
-+
-+	return HAL_STATUS_FAILED;
-+}
-+
-+void bt_a2dp_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
-+								uint16_t len)
-+{
-+	uint8_t status = HAL_STATUS_FAILED;
-+
-+	switch (opcode) {
-+	case HAL_OP_AV_CONNECT:
-+		status = bt_a2dp_connect(buf, len);
-+		break;
-+	case HAL_OP_AV_DISCONNECT:
-+		status = bt_a2dp_disconnect(buf, len);
-+		break;
-+	default:
-+		DBG("Unhandled command, opcode 0x%x", opcode);
-+		break;
-+	}
-+
-+	ipc_send_rsp(io, HAL_SERVICE_ID_A2DP, status);
-+}
-+
- bool bt_a2dp_register(GIOChannel *io, const bdaddr_t *addr)
+diff --git a/android/adapter.c b/android/adapter.c
+index fdac82e..1b84956 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -145,8 +145,8 @@ static void scan_mode_changed(void)
+ static void adapter_name_changed(const uint8_t *name)
  {
- 	DBG("");
-diff --git a/android/a2dp.h b/android/a2dp.h
-index b8b14bb..a5ac53e 100644
---- a/android/a2dp.h
-+++ b/android/a2dp.h
-@@ -21,5 +21,8 @@
-  *
-  */
+ 	struct hal_ev_adapter_props_changed *ev;
+-	uint8_t buf[sizeof(*ev) + sizeof(struct hal_property) +
+-							HAL_MAX_NAME_LENGTH];
++	size_t len = strlen((const char *) name);
++	uint8_t buf[sizeof(*ev) + sizeof(struct hal_property) + len];
  
-+void bt_a2dp_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
-+								uint16_t len);
-+
- bool bt_a2dp_register(GIOChannel *io, const bdaddr_t *addr);
- void bt_a2dp_unregister(void);
-diff --git a/android/main.c b/android/main.c
-index efa8c37..75ed4bb 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -259,6 +259,10 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
- 		bt_sock_handle_cmd(hal_cmd_io, msg->opcode, msg->payload,
- 								msg->len);
- 		break;
-+	case HAL_SERVICE_ID_A2DP:
-+		bt_a2dp_handle_cmd(hal_cmd_io, msg->opcode, msg->payload,
-+								msg->len);
-+		break;
- 	default:
- 		ipc_send_rsp(hal_cmd_io, msg->service_id, HAL_STATUS_FAILED);
- 		break;
+ 	memset(buf, 0, sizeof(buf));
+ 	ev = (void *) buf;
+@@ -154,10 +154,11 @@ static void adapter_name_changed(const uint8_t *name)
+ 	ev->num_props = 1;
+ 	ev->status = HAL_STATUS_SUCCESS;
+ 	ev->props[0].type = HAL_PROP_ADAPTER_NAME;
+-	ev->props[0].len = HAL_MAX_NAME_LENGTH;
+-	memcpy(ev->props->val, name, HAL_MAX_NAME_LENGTH);
++	/* Android expects value without NULL terminator */
++	ev->props[0].len = len;
++	memcpy(ev->props->val, name, len);
+ 
+-	DBG("Adapter name changed to: %s", ev->props->val);
++	DBG("Adapter name changed to: %s", name);
+ 
+ 	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
+ 			HAL_EV_ADAPTER_PROPS_CHANGED, sizeof(buf), ev, -1);
 -- 
-1.8.3.1
+1.7.10.4
 
