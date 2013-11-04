@@ -1,63 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv3 4/4] android: Pass found uuids to remote_device_properties_cb
+Date: Mon, 04 Nov 2013 09:32:07 +0100
+Message-ID: <8190776.PXI2XqkyCW@uw000953>
+In-Reply-To: <1383552410-2220-4-git-send-email-marcin.kraglak@tieto.com>
+References: <1383552410-2220-1-git-send-email-marcin.kraglak@tieto.com> <1383552410-2220-4-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <20131101131141.GA30191@x220.p-661hnu-f1>
-References: <1383308405-17782-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-	<20131101131141.GA30191@x220.p-661hnu-f1>
-Date: Mon, 4 Nov 2013 09:40:41 +0100
-Message-ID: <CAHCYCowJsBgYL-ivZfR2FdAWK5Ji4n1dyAyH+zBxuv401wNCVg@mail.gmail.com>
-Subject: Re: [PATCH] android/client: Fix pin reply call when pin argument
- missing in cmd
-From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="ISO-8859-1"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Marcin,
 
-On 1 November 2013 14:11, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Ravi,
->
-> On Fri, Nov 01, 2013, Ravi kumar Veeramally wrote:
->> If condition checks number of arguments properly but still executes
->> EXEC command. It should display error message and return.
->> ---
->>  android/client/if-bt.c | 11 +++++++----
->>  1 file changed, 7 insertions(+), 4 deletions(-)
->>
->> diff --git a/android/client/if-bt.c b/android/client/if-bt.c
->> index 3d97458..2c3cc4a 100644
->> --- a/android/client/if-bt.c
->> +++ b/android/client/if-bt.c
->> @@ -719,12 +719,15 @@ static void pin_reply_p(int argc, const char **argv)
->>       RETURN_IF_NULL(if_bluetooth);
->>       VERIFY_ADDR_ARG(2, &addr);
->>
->> -     if (argc > 3) {
->> -             accept = 1;
->> -             pin_len = strlen(argv[3]);
->> -             memcpy(pin.pin, argv[3], pin_len);
->> +     if (argc != 4) {
->> +             haltest_error("Usage <address> <pin>\n");
->> +             return;
->>       }
->>
->> +     accept = 1;
->> +     pin_len = strlen(argv[3]);
->> +     memcpy(pin.pin, argv[3], pin_len);
->> +
->>       EXEC(if_bluetooth->pin_reply, &addr, accept, pin_len, &pin);
->
-> It seems to me that the original code might have been trying to do (if
-> it hadn't been broken like it now is) a negative pin reply in the case
-> that no parameter was given. At least I don't see any other code trying
-> to call if_bluetooth->pin_reply with accept=1 in haltest. So I'd
-> consider fixing that instead.
+> diff --git a/android/adapter.c b/android/adapter.c
+> index 0470522..9fe7d7d 100644
+> --- a/android/adapter.c
+> +++ b/android/adapter.c
+> @@ -1486,9 +1486,87 @@ static void browse_req_free(struct browse_req *req)
+>  	g_free(req);
+>  }
+>  
+> +static void fill_uuids(GSList *list, void *buf)
+> +{
+> +	for (; list; list = (GSList *)g_list_next(list)) {
 
-Idea here was: no pin given set accept to 0, so user would not need to
-type accept argument at all.
-What is missing though, is initialization of accept to 0.
+This should use g_slist_next(). 
+
+> +		memcpy(buf, list->data, sizeof(uint128_t));
+> +		buf += sizeof(uint128_t);
+> +	}
+> +}
+> +
+> +static void remote_uuids_callback(struct browse_req *req)
+> +{
+> +	struct hal_ev_remote_device_props *ev;
+> +	int len;
+> +
+> +	len = sizeof(*ev) + sizeof(struct hal_property) + (sizeof(uint128_t) *
+> +						g_slist_length(req->uuids));
+> +	ev = g_malloc(len);
+> +
+> +	ev->status = HAL_STATUS_SUCCESS;
+> +	bdaddr2android(req->bdaddr, &ev->bdaddr);
+> +	ev->num_props = 1;
+> +	ev->props[0].type = HAL_PROP_DEVICE_UUIDS;
+> +	ev->props[0].len = sizeof(uint128_t) * g_slist_length(req->uuids);
+> +	fill_uuids(req->uuids, ev->props[0].val);
+> +
+> +	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
+> +				HAL_EV_REMOTE_DEVICE_PROPS, len, ev, -1);
+> +
+> +	g_free(ev);
+> +}
+> +
+> +static int uuid_128_cmp(gconstpointer a, gconstpointer b)
+> +{
+> +	return memcmp(a, b, sizeof(uint128_t));
+> +}
+> +
+>  static void update_records(struct browse_req *req, sdp_list_t *recs)
+>  {
+> -	/* TODO cache found uuids */
+> +	for (; recs; recs = recs->next) {
+> +		sdp_record_t *rec = (sdp_record_t *) recs->data;
+> +		sdp_list_t *svcclass = NULL;
+> +		uuid_t uuid128;
+> +		uuid_t *temp;
+> +		uint8_t *u;
+> +
+> +		if (!rec)
+> +			break;
+> +
+> +		if (sdp_get_service_classes(rec, &svcclass) < 0)
+> +			continue;
+> +
+> +		if (svcclass == NULL)
+> +			continue;
+> +
+> +		temp = svcclass->data;
+> +
+> +		switch (temp->type) {
+> +		case SDP_UUID16:
+> +			sdp_uuid16_to_uuid128(&uuid128, temp);
+> +			break;
+> +		case SDP_UUID32:
+> +			sdp_uuid32_to_uuid128(&uuid128, temp);
+> +			break;
+> +		case SDP_UUID128:
+> +			memcpy(&uuid128, temp, sizeof(uuid_t));
+> +			break;
+> +		default:
+> +			continue;
+> +		}
+> +
+> +		u = g_malloc(16);/* size of 128 bit uuid */
+> +		memcpy(u, &uuid128.value.uuid128,
+> +				sizeof(uuid128.value.uuid128));
+> +
+> +		/* Check if uuid is already added */
+> +		if (g_slist_find_custom(req->uuids, u, uuid_128_cmp))
+> +			g_free(u);
+> +		else
+> +			req->uuids = g_slist_append(req->uuids, u);
+> +
+> +		sdp_list_free(svcclass, free);
+> +	}
+>  }
+>  
+>  static void browse_cb(sdp_list_t *recs, int err, gpointer user_data)
+> @@ -1518,6 +1596,7 @@ static void browse_cb(sdp_list_t *recs, int err, gpointer user_data)
+>  	}
+>  
+>  done:
+> +	remote_uuids_callback(req);
+>  	sdp_req_list = g_list_remove(sdp_req_list, req->bdaddr);
+>  	browse_req_free(req);
+>  }
+> 
 
 -- 
-Jerzy
+BR
+Szymon Janc
+
