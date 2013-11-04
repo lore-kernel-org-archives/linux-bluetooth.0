@@ -1,60 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 Nov 2013 09:34:26 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv5 0/7] Improve logging for Android
-Message-ID: <20131104073426.GA22579@x220.p-661hnu-f1>
-References: <1383051459-29495-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1383319159-13060-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Marcin Kraglak <marcin.kraglak@tieto.com>
+Subject: [PATCHv2 3/5] android: Add stub of get_remote_services command
+Date: Mon, 4 Nov 2013 08:30:32 +0100
+Message-ID: <1383550234-14790-3-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1383550234-14790-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1383550234-14790-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383319159-13060-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+diff --git a/android/adapter.c b/android/adapter.c
+index 0797aa0..8df59e6 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -1459,6 +1459,11 @@ static uint8_t ssp_reply(void *buf, uint16_t len)
+ 	return status;
+ }
+ 
++static uint8_t get_remote_services(void *buf, uint16_t len)
++{
++	return HAL_STATUS_UNSUPPORTED;
++}
++
+ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
+ 								uint16_t len)
+ {
+@@ -1563,6 +1568,11 @@ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
+ 			goto error;
+ 
+ 		break;
++	case HAL_OP_GET_REMOTE_SERVICES:
++		status = get_remote_services(buf, len);
++		if (status != HAL_STATUS_SUCCESS)
++			goto error;
++		break;
+ 	default:
+ 		DBG("Unhandled command, opcode 0x%x", opcode);
+ 		goto error;
+-- 
+1.8.4.1
 
-On Fri, Nov 01, 2013, Andrei Emeltchenko wrote:
-> Logging on Android is really important since we do not have specification
-> how and in which order hal functions are called, sometimes the only way is
-> to examine logs or read Java Bluetooth code.
-> 
-> Changes:
-> 	* v5: Rebased against latest upstream and merged some patches, added several logs.
-> 	* v4: Rebased against latest upstream
-> 	* v3: Merged first two patches.
-> 	* v2: Added thread-safe helpers for printing properties, bdaddr, etc
-> 	after comments that simple printing is not thread-safe. The idea is to
-> 	use TLS (thread local storage) like bionic is doing for strerror for
-> 	example. More info can be found on manpage for pthread_key_create.
-> 
-> This patch series uses debug functions defined already for haltest and
-> allows to print very helpful logs on Android target like shown below:
-> 
-> ...
-> hal-bluetooth.c:set_adapter_property() prop: type=BT_PROPERTY_ADAPTER_SCAN_MODE len=4 val=BT_SCAN_MODE_NONE
-> ...
-> 
-> Andrei Emeltchenko (7):
->   android/haltest: Export print property
->   android/haltest: Use pointer as parameter for debug
->   android/haltest: Fix print device name
->   android/hal: Add extra logs to HAL
->   android: Add thread-safe helpers
->   android: Use thread-safe helpers
->   android/daemon: Add logs to trace failed cmd
-> 
->  android/adapter.c         |    2 +
->  android/client/if-bt.c    |  111 +------------------------------------------
->  android/client/textconv.c |  114 +++++++++++++++++++++++++++++++++++++++++++++
->  android/client/textconv.h |    3 ++
->  android/hal-bluetooth.c   |   34 +++++++++-----
->  android/pthread-local.h   |   58 +++++++++++++++++++++++
->  6 files changed, 200 insertions(+), 122 deletions(-)
->  create mode 100644 android/pthread-local.h
-
-Patches 1-4 and patch 7 (with a minor modification) have been applied.
-Thanks.
-
-Johan
