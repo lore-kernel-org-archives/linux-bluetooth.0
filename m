@@ -1,43 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1383582221.3373.15.camel@nuvo>
+Date: Mon, 4 Nov 2013 14:18:05 -0200
+From: Vinicius Costa Gomes <vcgomes@gmail.com>
+To: Matthew Monaco <dgbaley27@0x01b.net>
+Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: [PATCH] tools/hci2hid: properly format device path
-From: Bastien Nocera <hadess@hadess.net>
-To: Vinicius Costa Gomes <vcgomes@gmail.com>
-Cc: Matthew Monaco <dgbaley27@0x01b.net>,
-	linux-bluetooth@vger.kernel.org
-Date: Mon, 04 Nov 2013 17:23:41 +0100
-In-Reply-To: <20131104161805.GA32089@molly.amr.corp.intel.com>
+Message-ID: <20131104161805.GA32089@molly.amr.corp.intel.com>
 References: <963b569308352e0b0fc18a0a17e2b0c0fe721d72.1383529026.git.matthew.monaco@0x01b.net>
-	 <20131104161805.GA32089@molly.amr.corp.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <963b569308352e0b0fc18a0a17e2b0c0fe721d72.1383529026.git.matthew.monaco@0x01b.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2013-11-04 at 14:18 -0200, Vinicius Costa Gomes wrote:
-> Hi Matthew,
-> 
-> On 18:46 Sun 03 Nov, Matthew Monaco wrote:
-> > From: Matthew Monaco <matthew.monaco@0x01b.net>
-> > 
-> > ---
-> > Hello! I hope this is the correct place to send a bugfix for bluez.
-> >  tools/hid2hci.c | 15 +++++++++------
-> >  1 file changed, 9 insertions(+), 6 deletions(-)
-> 
-> The patch itself looks good.
-> 
-> What I think is missing is a better description of the problem it solves, I
-> would suggest including in the commit message the values of 'path' for before
-> and after the patch, for a situation that the current implementation doesn't
-> work.
-> 
-> Changing the subject line to something like: "tools: Fix wrong paths for
-> adapters" would make it easier to tell that this patch is indeed a bug fix.
+Hi Matthew,
 
-Isn't this the same patch Giovanni sent a couple of weeks ago?
+On 18:46 Sun 03 Nov, Matthew Monaco wrote:
+> From: Matthew Monaco <matthew.monaco@0x01b.net>
+> 
+> ---
+> Hello! I hope this is the correct place to send a bugfix for bluez.
+>  tools/hid2hci.c | 15 +++++++++------
+>  1 file changed, 9 insertions(+), 6 deletions(-)
 
-http://thread.gmane.org/gmane.linux.bluez.kernel/38329
+The patch itself looks good.
 
-Cheers
+What I think is missing is a better description of the problem it solves, I
+would suggest including in the commit message the values of 'path' for before
+and after the patch, for a situation that the current implementation doesn't
+work.
 
+Changing the subject line to something like: "tools: Fix wrong paths for
+adapters" would make it easier to tell that this patch is indeed a bug fix.
+
+> 
+> diff --git a/tools/hid2hci.c b/tools/hid2hci.c
+> index bb8a521..8f22047 100644
+> --- a/tools/hid2hci.c
+> +++ b/tools/hid2hci.c
+> @@ -221,18 +221,21 @@ static int usb_switch_dell(int fd, enum mode mode)
+>  static int find_device(struct udev_device *udev_dev)
+>  {
+>  	char path[PATH_MAX];
+> -	const char *busnum, *devnum;
+> +	const char *str;
+> +	long int busnum, devnum;
+>  	int fd;
+>  
+> -	busnum = udev_device_get_sysattr_value(udev_dev, "busnum");
+> -	if (!busnum)
+> +	str = udev_device_get_sysattr_value(udev_dev, "busnum");
+> +	if (!str)
+>  		return -1;
+> +	busnum = strtol(str, NULL, 0);
+>  
+> -	devnum = udev_device_get_sysattr_value(udev_dev, "devnum");
+> -	if (!devnum)
+> +	str = udev_device_get_sysattr_value(udev_dev, "devnum");
+> +	if (!str)
+>  		return -1;
+> +	devnum = strtol(str, NULL, 0);
+>  
+> -	snprintf(path, sizeof(path), "/dev/bus/usb/%s/%s", busnum, devnum);
+> +	snprintf(path, sizeof(path), "/dev/bus/usb/%03d/%03d", busnum, devnum);
+>  
+>  	fd = open(path, O_RDWR, O_CLOEXEC);
+>  	if (fd < 0) {
+> -- 
+> 1.8.4.2
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+Cheers,
+-- 
+Vinicius
