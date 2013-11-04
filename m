@@ -1,35 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Subject: [PATCH] android/client: Fix uninitialized variable
-Date: Mon, 4 Nov 2013 10:55:40 +0100
-Message-ID: <1383558940-18520-1-git-send-email-jerzy.kasenberg@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/daemon: Implement get adapter name
+Date: Mon,  4 Nov 2013 11:39:12 +0200
+Message-Id: <1383557952-9302-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1383556934-5481-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1383556934-5481-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Pin accept variable was intended to be set to 1
-only when pin was typed by user. If no pin was given
-accept should be set to 0. This patch fixes this.
----
- android/client/if-bt.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/android/client/if-bt.c b/android/client/if-bt.c
-index 43e8788..fb1b3f3 100644
---- a/android/client/if-bt.c
-+++ b/android/client/if-bt.c
-@@ -605,7 +605,7 @@ static void pin_reply_p(int argc, const char **argv)
- 	bt_bdaddr_t addr;
- 	bt_pin_code_t pin;
- 	int pin_len = 0;
--	int accept;
-+	int accept = 0;
+---
+ android/adapter.c |   13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/android/adapter.c b/android/adapter.c
+index cb92f2f..55c495c 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -71,6 +71,8 @@ static void mgmt_local_name_changed_event(uint16_t index, uint16_t length,
+ {
+ 	const struct mgmt_cp_set_local_name *rp = param;
  
- 	RETURN_IF_NULL(if_bluetooth);
- 	VERIFY_ADDR_ARG(2, &addr);
++	DBG("");
++
+ 	if (length < sizeof(*rp)) {
+ 		error("Wrong size of local name changed parameters");
+ 		return;
+@@ -1016,13 +1018,14 @@ static void send_adapter_address(void)
+ 	g_free(ev);
+ }
+ 
+-static bool get_name(void)
++static bool send_adapter_name(void)
+ {
+-	DBG("Not implemented");
++	if (!adapter->name)
++		return false;
+ 
+-	/* TODO: Add implementation */
++	adapter_name_changed(adapter->name);
+ 
+-	return false;
++	return true;
+ }
+ 
+ static bool get_uuids(void)
+@@ -1097,7 +1100,7 @@ static bool get_property(void *buf, uint16_t len)
+ 		send_adapter_address();
+ 		return true;
+ 	case HAL_PROP_ADAPTER_NAME:
+-		return get_name();
++		return send_adapter_name();
+ 	case HAL_PROP_ADAPTER_UUIDS:
+ 		return get_uuids();
+ 	case HAL_PROP_ADAPTER_CLASS:
 -- 
-1.7.9.5
+1.7.10.4
 
