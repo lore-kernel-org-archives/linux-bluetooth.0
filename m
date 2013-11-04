@@ -2,146 +2,59 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 06/11] android/hid: Implement hid get report in daemon
-Date: Tue,  5 Nov 2013 00:20:10 +0200
-Message-Id: <1383603615-9953-7-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 07/11] android/hid: Implement hid set report in daemon
+Date: Tue,  5 Nov 2013 00:20:11 +0200
+Message-Id: <1383603615-9953-8-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1383603615-9953-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1383603615-9953-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch requests hid device report and reads reply
-message and sends notification to hal.
+This patch requests hid device to set report.
 ---
- android/hal-hidhost.c |   1 +
- android/hal-msg.h     |   8 ++++
- android/hid.c         | 104 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 111 insertions(+), 2 deletions(-)
+ android/hal-hidhost.c |  1 +
+ android/hal-msg.h     |  1 +
+ android/hid.c         | 40 ++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 40 insertions(+), 2 deletions(-)
 
 diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
-index a287e40..027e3b8 100644
+index 027e3b8..040d517 100644
 --- a/android/hal-hidhost.c
 +++ b/android/hal-hidhost.c
-@@ -251,6 +251,7 @@ static bt_status_t hh_get_report(bt_bdaddr_t *bd_addr,
+@@ -284,6 +284,7 @@ static bt_status_t hh_set_report(bt_bdaddr_t *bd_addr,
+ 		return BT_STATUS_PARM_INVALID;
  
  	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
- 	cmd.id = reportId;
-+	cmd.buf = bufferSize;
++	cmd.report = report;
  
  	switch (reportType) {
  	case BTHH_INPUT_REPORT:
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 214daa9..eaa5c9c 100644
+index eaa5c9c..e1fd027 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -465,6 +465,14 @@ struct hal_ev_hid_protocol {
- 	uint8_t mode;
+@@ -292,6 +292,7 @@ struct hal_cmd_hid_get_report {
+ struct hal_cmd_hid_set_report {
+ 	uint8_t bdaddr[6];
+ 	uint8_t type;
++	char *report;
  } __attribute__((packed));
  
-+#define HAL_EV_HID_GET_REPORT		0x84
-+struct hal_ev_hid_get_report {
-+	uint8_t bdaddr[6];
-+	uint8_t status;
-+	uint16_t len;
-+	uint8_t data[0];
-+} __attribute__((packed));
-+
- #define HAL_EV_AV_CONNECTION_STATE	0x81
- struct hal_ev_av_connection_state {
- 	uint8_t state;
+ #define HAL_OP_HID_SEND_DATA		0x09
 diff --git a/android/hid.c b/android/hid.c
-index 115a1c5..6cb9604 100644
+index 6cb9604..2682b21e6 100644
 --- a/android/hid.c
 +++ b/android/hid.c
-@@ -55,14 +55,23 @@
- #define UHID_DEVICE_FILE	"/dev/uhid"
+@@ -56,6 +56,7 @@
  
  /* HID message types */
-+#define HID_MSG_GET_REPORT	0x40
+ #define HID_MSG_GET_REPORT	0x40
++#define HID_MSG_SET_REPORT	0x50
  #define HID_MSG_GET_PROTOCOL	0x60
  #define HID_MSG_SET_PROTOCOL	0x70
  #define HID_MSG_DATA		0xa0
- 
-+/* HID data types */
-+#define HID_DATA_TYPE_INPUT	0x01
-+#define HID_DATA_TYPE_OUTPUT	0x02
-+#define HID_DATA_TYPE_FEATURE	0x03
-+
- /* HID protocol header parameters */
- #define HID_PROTO_BOOT		0x00
- #define HID_PROTO_REPORT	0x01
- 
-+/* HID GET REPORT Size Field */
-+#define HID_GET_REPORT_SIZE_FIELD	0x08
-+
- static GIOChannel *notification_io = NULL;
- static GIOChannel *ctrl_io = NULL;
- static GIOChannel *intr_io = NULL;
-@@ -283,6 +292,52 @@ static void bt_hid_notify_protocol_mode(struct hid_device *dev, uint8_t *buf,
- 				HAL_EV_HID_PROTO_MODE, sizeof(ev), &ev, -1);
- }
- 
-+static void bt_hid_notify_get_report(struct hid_device *dev, uint8_t *buf,
-+									int len)
-+{
-+	struct hal_ev_hid_get_report *ev;
-+	int ev_len;
-+	char address[18];
-+
-+	ba2str(&dev->dst, address);
-+	DBG("device %s", address);
-+
-+	ev_len = sizeof(*ev) + sizeof(struct hal_ev_hid_get_report) + 1;
-+
-+	if (!((buf[0] == (HID_MSG_DATA | HID_DATA_TYPE_INPUT)) ||
-+			(buf[0] == (HID_MSG_DATA | HID_DATA_TYPE_OUTPUT)) ||
-+			(buf[0]	== (HID_MSG_DATA | HID_DATA_TYPE_FEATURE)))) {
-+		ev = g_malloc(len);
-+		memset(ev, 0, ev_len);
-+		ev->status = buf[0];
-+		bdaddr2android(&dev->dst, ev->bdaddr);
-+		goto send;
-+	}
-+
-+	/* Report porotocol mode reply contains id after hdr, in boot
-+	 * protocol mode id doesn't exist */
-+	ev_len += (dev->boot_dev) ? (len - 1) : (len - 2);
-+	ev = g_malloc(ev_len);
-+	memset(ev, 0, ev_len);
-+	ev->status = HAL_HID_STATUS_OK;
-+	bdaddr2android(&dev->dst, ev->bdaddr);
-+
-+	/* Report porotocol mode reply contains id after hdr, in boot
-+	 * protocol mode id doesn't exist */
-+	if (dev->boot_dev) {
-+		ev->len = len - 1;
-+		memcpy(ev->data, buf + 1, ev->len);
-+	} else {
-+		ev->len = len - 2;
-+		memcpy(ev->data, buf + 2, ev->len);
-+	}
-+
-+send:
-+	ipc_send(notification_io, HAL_SERVICE_ID_HIDHOST, HAL_EV_HID_GET_REPORT,
-+						ev_len, ev, -1);
-+	g_free(ev);
-+}
-+
- static gboolean ctrl_io_watch_cb(GIOChannel *chan, gpointer data)
- {
- 	struct hid_device *dev = data;
-@@ -303,6 +358,9 @@ static gboolean ctrl_io_watch_cb(GIOChannel *chan, gpointer data)
- 	case HID_MSG_SET_PROTOCOL:
- 		bt_hid_notify_protocol_mode(dev, buf, bread);
- 		break;
-+	case HID_MSG_GET_REPORT:
-+		bt_hid_notify_get_report(dev, buf, bread);
-+		break;
- 	default:
- 		DBG("unhandled hid msg type 0x%02x", dev->hid_msg);
- 	}
-@@ -738,9 +796,51 @@ static uint8_t bt_hid_set_protocol(struct hal_cmd_hid_set_protocol *cmd,
- static uint8_t bt_hid_get_report(struct hal_cmd_hid_get_report *cmd,
+@@ -846,9 +847,44 @@ static uint8_t bt_hid_get_report(struct hal_cmd_hid_get_report *cmd,
+ static uint8_t bt_hid_set_report(struct hal_cmd_hid_set_report *cmd,
  								uint16_t len)
  {
 -	DBG("Not Implemented");
@@ -165,21 +78,14 @@ index 115a1c5..6cb9604 100644
 +		return HAL_STATUS_FAILED;
 +
 +	dev = l->data;
-+	dev->hid_msg = HID_MSG_GET_REPORT;
-+	req_size = (cmd->buf > 0) ? 4 : 2;
++	dev->hid_msg = HID_MSG_SET_REPORT;
++	req_size = 1 + strlen(cmd->report);
 +	req = g_try_malloc0(req_size);
 +	if (!req)
 +		return HAL_STATUS_NOMEM;
 +
-+	req[0] = HID_MSG_GET_REPORT | cmd->type;
-+
-+	if (cmd->buf > 0)
-+		req[0] = req[0] | HID_GET_REPORT_SIZE_FIELD;
-+
-+	req[1] = cmd->id;
-+
-+	if (cmd->buf > 0)
-+		bt_put_le16(cmd->buf, (req + 2));
++	req[0] = HID_MSG_SET_REPORT | cmd->type;
++	memcpy(req + 1, cmd->report, req_size - 1);
 +
 +	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
 +
@@ -193,7 +99,7 @@ index 115a1c5..6cb9604 100644
 +	return HAL_STATUS_SUCCESS;
  }
  
- static uint8_t bt_hid_set_report(struct hal_cmd_hid_set_report *cmd,
+ static uint8_t bt_hid_send_data(struct hal_cmd_hid_send_data *cmd,
 -- 
 1.8.1.2
 
