@@ -1,50 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 1/2] android/daemon: Implement get adapter name
-Date: Mon,  4 Nov 2013 12:49:39 +0200
-Message-Id: <1383562180-21646-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 4 Nov 2013 12:16:08 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android: Bump PLATFORM_SDK_VERSION to KitKat
+Message-ID: <20131104101608.GF2752@x220.p-661hnu-f1>
+References: <1383559573-19508-1-git-send-email-jerzy.kasenberg@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1383559573-19508-1-git-send-email-jerzy.kasenberg@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Jerzy,
 
----
- android/adapter.c |   11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+On Mon, Nov 04, 2013, Jerzy Kasenberg wrote:
+> This updates PLATFORM_SDK_VERSION to 19 since
+> bluetooth headers were updated already.
+> ---
+>  android/Makefile.am |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/android/adapter.c b/android/adapter.c
-index af461b8..fdac82e 100644
---- a/android/adapter.c
-+++ b/android/adapter.c
-@@ -1017,13 +1017,14 @@ static void send_adapter_address(void)
- 	g_free(ev);
- }
- 
--static bool get_name(void)
-+static bool send_adapter_name(void)
- {
--	DBG("Not implemented");
-+	if (!adapter->name)
-+		return false;
- 
--	/* TODO: Add implementation */
-+	adapter_name_changed((uint8_t *) adapter->name);
- 
--	return false;
-+	return true;
- }
- 
- static bool get_uuids(void)
-@@ -1098,7 +1099,7 @@ static bool get_property(void *buf, uint16_t len)
- 		send_adapter_address();
- 		return true;
- 	case HAL_PROP_ADAPTER_NAME:
--		return get_name();
-+		return send_adapter_name();
- 	case HAL_PROP_ADAPTER_UUIDS:
- 		return get_uuids();
- 	case HAL_PROP_ADAPTER_CLASS:
--- 
-1.7.10.4
+Applied. Thanks.
 
+Johan
