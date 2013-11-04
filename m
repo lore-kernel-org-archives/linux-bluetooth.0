@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: [PATCHv2 3/5] android: Add stub of get_remote_services command
-Date: Mon, 4 Nov 2013 08:30:32 +0100
-Message-ID: <1383550234-14790-3-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2 2/5] android/hal: Send get_remote_services cmd
+Date: Mon, 4 Nov 2013 08:30:31 +0100
+Message-ID: <1383550234-14790-2-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1383550234-14790-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1383550234-14790-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
@@ -12,34 +12,30 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-diff --git a/android/adapter.c b/android/adapter.c
-index 0797aa0..8df59e6 100644
---- a/android/adapter.c
-+++ b/android/adapter.c
-@@ -1459,6 +1459,11 @@ static uint8_t ssp_reply(void *buf, uint16_t len)
- 	return status;
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index 5fb8846..9022fc2 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -505,12 +505,18 @@ static int get_remote_service_record(bt_bdaddr_t *remote_addr, bt_uuid_t *uuid)
+ 
+ static int get_remote_services(bt_bdaddr_t *remote_addr)
+ {
++	struct hal_cmd_get_remote_services cmd;
++
+ 	DBG("");
+ 
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+ 
+-	return BT_STATUS_UNSUPPORTED;
++	memcpy(cmd.bdaddr, remote_addr, sizeof(cmd.bdaddr));
++
++	return hal_ipc_cmd(HAL_SERVICE_ID_BLUETOOTH,
++				HAL_OP_GET_REMOTE_SERVICES, sizeof(cmd),
++						&cmd, 0, NULL, NULL);
  }
  
-+static uint8_t get_remote_services(void *buf, uint16_t len)
-+{
-+	return HAL_STATUS_UNSUPPORTED;
-+}
-+
- void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
- 								uint16_t len)
- {
-@@ -1563,6 +1568,11 @@ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
- 			goto error;
- 
- 		break;
-+	case HAL_OP_GET_REMOTE_SERVICES:
-+		status = get_remote_services(buf, len);
-+		if (status != HAL_STATUS_SUCCESS)
-+			goto error;
-+		break;
- 	default:
- 		DBG("Unhandled command, opcode 0x%x", opcode);
- 		goto error;
+ static int start_discovery(void)
 -- 
 1.8.4.1
 
