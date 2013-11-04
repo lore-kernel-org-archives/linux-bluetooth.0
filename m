@@ -1,74 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5277D614.5050907@openbossa.org>
-Date: Mon, 04 Nov 2013 14:15:00 -0300
-From: Andre Guedes <andre.guedes@openbossa.org>
+Message-ID: <5277D0CE.8080205@0x01b.net>
+Date: Mon, 04 Nov 2013 09:52:30 -0700
+From: Matthew Monaco <dgbaley27@0x01b.net>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC 4/5] Bluetooth: Remove unneeded check in hci_disconn_complete_evt()
-References: <1383170504-16602-1-git-send-email-andre.guedes@openbossa.org> <1383170504-16602-5-git-send-email-andre.guedes@openbossa.org> <4794090B-F1E7-4B60-860A-3BD42CE6CA93@holtmann.org>
-In-Reply-To: <4794090B-F1E7-4B60-860A-3BD42CE6CA93@holtmann.org>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+To: Vinicius Costa Gomes <vcgomes@gmail.com>,
+	Bastien Nocera <hadess@hadess.net>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] tools/hci2hid: properly format device path
+References: <963b569308352e0b0fc18a0a17e2b0c0fe721d72.1383529026.git.matthew.monaco@0x01b.net> <20131104161805.GA32089@molly.amr.corp.intel.com> <1383582221.3373.15.camel@nuvo> <20131104164206.GB31305@molly.amr.corp.intel.com>
+In-Reply-To: <20131104164206.GB31305@molly.amr.corp.intel.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Ah, didn't see it in git. Sorry about the noise.
 
-On 02/11/13 15:14, Marcel Holtmann wrote:
-> Hi Andre,
->
->> According to b644ba336 (patch that introduced HCI_CONN_MGMT_CONNECTED
->> flag), the HCI_CONN_MGMT_CONNECTED flag tracks when mgmt has been
->> notified about the connection.
+On 11/04/2013 09:42 AM, Vinicius Costa Gomes wrote:
+> Hi Bastien,
+> 
+> On 17:23 Mon 04 Nov, Bastien Nocera wrote:
+>> On Mon, 2013-11-04 at 14:18 -0200, Vinicius Costa Gomes wrote:
+>>> Hi Matthew,
+>>>
+>>> On 18:46 Sun 03 Nov, Matthew Monaco wrote:
+>>>> From: Matthew Monaco <matthew.monaco@0x01b.net>
+>>>>
+>>>> ---
+>>>> Hello! I hope this is the correct place to send a bugfix for bluez.
+>>>>  tools/hid2hci.c | 15 +++++++++------
+>>>>  1 file changed, 9 insertions(+), 6 deletions(-)
+>>>
+>>> The patch itself looks good.
+>>>
+>>> What I think is missing is a better description of the problem it solves, I
+>>> would suggest including in the commit message the values of 'path' for before
+>>> and after the patch, for a situation that the current implementation doesn't
+>>> work.
+>>>
+>>> Changing the subject line to something like: "tools: Fix wrong paths for
+>>> adapters" would make it easier to tell that this patch is indeed a bug fix.
 >>
->> That being said, there is no point in checking this flag in hci_
->> disconn_complete_evt() since neither mgmt_disconnect_failed() nor
->> mgmt_device_disconnected() depend on it. Below follows more details:
->>   * mgmt_disconnect_failed() removes pending MGMT_OP_DISCONNECT
->>     commands, it doesn't matter if that connection was notified or not.
->>   * mgmt_device_disconnected() sends the mgmt event only if the link
->>     type is ACL_LINK or LE_LINK. For those connection type, the flag is
->>     always set.
+>> Isn't this the same patch Giovanni sent a couple of weeks ago?
 >>
->> So this patch removes the HCI_CONN_MGMT_CONNECTED check.
+>> http://thread.gmane.org/gmane.linux.bluez.kernel/38329
+> 
+> Yeah, same fix. Thanks for noticing.
+> 
 >>
->> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->> ---
->> net/bluetooth/hci_event.c | 16 +++++++---------
->> 1 file changed, 7 insertions(+), 9 deletions(-)
+>> Cheers
 >>
->> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->> index 4673cfb..9225a9c 100644
->> --- a/net/bluetooth/hci_event.c
->> +++ b/net/bluetooth/hci_event.c
->> @@ -1795,16 +1795,14 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
->> 	if (ev->status == 0)
->> 		conn->state = BT_CLOSED;
->>
->> -	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags)) {
->> -		if (ev->status) {
->> -			mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
->> -					       conn->dst_type, ev->status);
->> -		} else {
->> -			u8 reason = hci_to_mgmt_reason(ev->reason);
->> +	if (ev->status) {
->> +		mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
->> +				conn->dst_type, ev->status);
->
-> something went wrong with the coding style here.
->
->> +	} else {
->> +		u8 reason = hci_to_mgmt_reason(ev->reason);
->>
->> -			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
->> -						 conn->dst_type, reason);
->> -		}
->> +		mgmt_device_disconnected(hdev, &conn->dst, conn->type,
->> +				conn->dst_type, reason);
->
-> And here.
-
-I'm fixing it.
-
-Thanks,
-
-Andre
+> 
+> 
+> Cheers,
+> 
