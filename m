@@ -1,68 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] android/daemon: Implement get adapter name
-Date: Mon,  4 Nov 2013 11:22:13 +0200
-Message-Id: <1383556934-5481-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20131101131141.GA30191@x220.p-661hnu-f1>
+References: <1383308405-17782-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+	<20131101131141.GA30191@x220.p-661hnu-f1>
+Date: Mon, 4 Nov 2013 09:40:41 +0100
+Message-ID: <CAHCYCowJsBgYL-ivZfR2FdAWK5Ji4n1dyAyH+zBxuv401wNCVg@mail.gmail.com>
+Subject: Re: [PATCH] android/client: Fix pin reply call when pin argument
+ missing in cmd
+From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Ravi,
 
----
- android/adapter.c |   29 ++++++++++++++++++++++++-----
- 1 file changed, 24 insertions(+), 5 deletions(-)
+On 1 November 2013 14:11, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Ravi,
+>
+> On Fri, Nov 01, 2013, Ravi kumar Veeramally wrote:
+>> If condition checks number of arguments properly but still executes
+>> EXEC command. It should display error message and return.
+>> ---
+>>  android/client/if-bt.c | 11 +++++++----
+>>  1 file changed, 7 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/android/client/if-bt.c b/android/client/if-bt.c
+>> index 3d97458..2c3cc4a 100644
+>> --- a/android/client/if-bt.c
+>> +++ b/android/client/if-bt.c
+>> @@ -719,12 +719,15 @@ static void pin_reply_p(int argc, const char **argv)
+>>       RETURN_IF_NULL(if_bluetooth);
+>>       VERIFY_ADDR_ARG(2, &addr);
+>>
+>> -     if (argc > 3) {
+>> -             accept = 1;
+>> -             pin_len = strlen(argv[3]);
+>> -             memcpy(pin.pin, argv[3], pin_len);
+>> +     if (argc != 4) {
+>> +             haltest_error("Usage <address> <pin>\n");
+>> +             return;
+>>       }
+>>
+>> +     accept = 1;
+>> +     pin_len = strlen(argv[3]);
+>> +     memcpy(pin.pin, argv[3], pin_len);
+>> +
+>>       EXEC(if_bluetooth->pin_reply, &addr, accept, pin_len, &pin);
+>
+> It seems to me that the original code might have been trying to do (if
+> it hadn't been broken like it now is) a negative pin reply in the case
+> that no parameter was given. At least I don't see any other code trying
+> to call if_bluetooth->pin_reply with accept=1 in haltest. So I'd
+> consider fixing that instead.
 
-diff --git a/android/adapter.c b/android/adapter.c
-index cb92f2f..8210d1a 100644
---- a/android/adapter.c
-+++ b/android/adapter.c
-@@ -1016,13 +1016,32 @@ static void send_adapter_address(void)
- 	g_free(ev);
- }
- 
--static bool get_name(void)
-+static bool send_adapter_name(void)
- {
--	DBG("Not implemented");
-+	struct hal_ev_adapter_props_changed *ev;
-+	size_t len;
- 
--	/* TODO: Add implementation */
-+	if (!adapter->name)
-+		return false;
- 
--	return false;
-+	len = sizeof(*ev) + sizeof(struct hal_property) +
-+						strlen(adapter->name) + 1;
-+
-+	ev = g_malloc0(len);
-+
-+	ev->num_props = 1;
-+	ev->status = HAL_STATUS_SUCCESS;
-+
-+	ev->props[0].type = HAL_PROP_ADAPTER_NAME;
-+	ev->props[0].len = strlen(adapter->name) + 1;
-+	memcpy(&ev->props[0].val, adapter->name, strlen(adapter->name));
-+
-+	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
-+				HAL_EV_ADAPTER_PROPS_CHANGED, len, ev, -1);
-+
-+	g_free(ev);
-+
-+	return true;
- }
- 
- static bool get_uuids(void)
-@@ -1097,7 +1116,7 @@ static bool get_property(void *buf, uint16_t len)
- 		send_adapter_address();
- 		return true;
- 	case HAL_PROP_ADAPTER_NAME:
--		return get_name();
-+		return send_adapter_name();
- 	case HAL_PROP_ADAPTER_UUIDS:
- 		return get_uuids();
- 	case HAL_PROP_ADAPTER_CLASS:
+Idea here was: no pin given set accept to 0, so user would not need to
+type accept argument at all.
+What is missing though, is initialization of accept to 0.
+
 -- 
-1.7.10.4
-
+Jerzy
