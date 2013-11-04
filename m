@@ -1,48 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 Nov 2013 12:08:51 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix incorrect result type in set_adapter_name
-Message-ID: <20131104100851.GA2752@x220.p-661hnu-f1>
-References: <1383557498-7971-1-git-send-email-marcin.kraglak@tieto.com>
+From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+Subject: [PATCH] android: Bump PLATFORM_SDK_VERSION to KitKat
+Date: Mon, 4 Nov 2013 11:06:13 +0100
+Message-ID: <1383559573-19508-1-git-send-email-jerzy.kasenberg@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383557498-7971-1-git-send-email-marcin.kraglak@tieto.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+This updates PLATFORM_SDK_VERSION to 19 since
+bluetooth headers were updated already.
+---
+ android/Makefile.am |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Mon, Nov 04, 2013, Marcin Kraglak wrote:
-> diff --git a/android/adapter.c b/android/adapter.c
-> index af62b11..38dec9d 100644
-> --- a/android/adapter.c
-> +++ b/android/adapter.c
-> @@ -880,7 +880,7 @@ static void set_adapter_name_complete(uint8_t status, uint16_t length,
->  	adapter_name_changed(rp->name);
->  }
->  
-> -static bool set_adapter_name(uint8_t *name, uint16_t len)
-> +static uint8_t set_adapter_name(uint8_t *name, uint16_t len)
->  {
->  	struct mgmt_cp_set_local_name cp;
->  
-> @@ -890,11 +890,11 @@ static bool set_adapter_name(uint8_t *name, uint16_t len)
->  	if (mgmt_send(adapter->mgmt, MGMT_OP_SET_LOCAL_NAME, adapter->index,
->  			sizeof(cp), &cp, set_adapter_name_complete, NULL,
->  								NULL) > 0)
-> -		return true;
-> +		return HAL_STATUS_SUCCESS;
->  
->  	error("Failed to set name");
->  
-> -	return false;
-> +	return HAL_STATUS_FAILED;
->  }
->  
->  static void read_info_complete(uint8_t status, uint16_t length, const void *param,
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 5eb8f01..acbc0f5 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -71,7 +71,7 @@ android_haltest_SOURCES = android/client/haltest.c \
+ android_haltest_LDADD = android/libhal-internal.la
+ 
+ android_haltest_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android \
+-				-DPLATFORM_SDK_VERSION=18
++				-DPLATFORM_SDK_VERSION=19
+ 
+ android_haltest_LDFLAGS = -pthread
+ 
+-- 
+1.7.9.5
 
-Applied. Thanks.
-
-Johan
