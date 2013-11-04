@@ -1,79 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 Nov 2013 14:18:05 -0200
-From: Vinicius Costa Gomes <vcgomes@gmail.com>
-To: Matthew Monaco <dgbaley27@0x01b.net>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] tools/hci2hid: properly format device path
-Message-ID: <20131104161805.GA32089@molly.amr.corp.intel.com>
-References: <963b569308352e0b0fc18a0a17e2b0c0fe721d72.1383529026.git.matthew.monaco@0x01b.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <963b569308352e0b0fc18a0a17e2b0c0fe721d72.1383529026.git.matthew.monaco@0x01b.net>
+From: Sujith Manoharan <sujith@msujith.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: gustavo@padovan.org
+Subject: [PATCH] Bluetooth: ath3k: Add support for a new AR3012 device
+Date: Mon,  4 Nov 2013 21:38:23 +0530
+Message-Id: <1383581303-1081-1-git-send-email-sujith@msujith.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Matthew,
+T:  Bus=02 Lev=01 Prnt=01 Port=04 Cnt=01 Dev#=  9 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0489 ProdID=e05f Rev= 0.02
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-On 18:46 Sun 03 Nov, Matthew Monaco wrote:
-> From: Matthew Monaco <matthew.monaco@0x01b.net>
-> 
-> ---
-> Hello! I hope this is the correct place to send a bugfix for bluez.
->  tools/hid2hci.c | 15 +++++++++------
->  1 file changed, 9 insertions(+), 6 deletions(-)
+Reported-by: Joshua Richenhagen <richenhagen@gmail.com>
+Signed-off-by: Sujith Manoharan <sujith@msujith.org>
+---
+ drivers/bluetooth/ath3k.c | 2 ++
+ drivers/bluetooth/btusb.c | 1 +
+ 2 files changed, 3 insertions(+)
 
-The patch itself looks good.
-
-What I think is missing is a better description of the problem it solves, I
-would suggest including in the commit message the values of 'path' for before
-and after the patch, for a situation that the current implementation doesn't
-work.
-
-Changing the subject line to something like: "tools: Fix wrong paths for
-adapters" would make it easier to tell that this patch is indeed a bug fix.
-
-> 
-> diff --git a/tools/hid2hci.c b/tools/hid2hci.c
-> index bb8a521..8f22047 100644
-> --- a/tools/hid2hci.c
-> +++ b/tools/hid2hci.c
-> @@ -221,18 +221,21 @@ static int usb_switch_dell(int fd, enum mode mode)
->  static int find_device(struct udev_device *udev_dev)
->  {
->  	char path[PATH_MAX];
-> -	const char *busnum, *devnum;
-> +	const char *str;
-> +	long int busnum, devnum;
->  	int fd;
->  
-> -	busnum = udev_device_get_sysattr_value(udev_dev, "busnum");
-> -	if (!busnum)
-> +	str = udev_device_get_sysattr_value(udev_dev, "busnum");
-> +	if (!str)
->  		return -1;
-> +	busnum = strtol(str, NULL, 0);
->  
-> -	devnum = udev_device_get_sysattr_value(udev_dev, "devnum");
-> -	if (!devnum)
-> +	str = udev_device_get_sysattr_value(udev_dev, "devnum");
-> +	if (!str)
->  		return -1;
-> +	devnum = strtol(str, NULL, 0);
->  
-> -	snprintf(path, sizeof(path), "/dev/bus/usb/%s/%s", busnum, devnum);
-> +	snprintf(path, sizeof(path), "/dev/bus/usb/%03d/%03d", busnum, devnum);
->  
->  	fd = open(path, O_RDWR, O_CLOEXEC);
->  	if (fd < 0) {
-> -- 
-> 1.8.4.2
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Cheers,
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 6bfc1bb..32582ec 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -96,6 +96,7 @@ static const struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3402) },
+ 	{ USB_DEVICE(0x0cf3, 0x3121) },
+ 	{ USB_DEVICE(0x0cf3, 0xe003) },
++	{ USB_DEVICE(0x0489, 0xe05f) },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE02C) },
+@@ -138,6 +139,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3402), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x3121), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0xe003), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0489, 0xe05f), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU22 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xE03C), .driver_info = BTUSB_ATH3012 },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 30868fa..9ce82ef 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -163,6 +163,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3402), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x3121), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0xe003), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0489, 0xe05f), .driver_info = BTUSB_ATH3012 },
+ 
+ 	/* Atheros AR5BBU12 with sflash firmware */
+ 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
 -- 
-Vinicius
+1.8.4.2
+
