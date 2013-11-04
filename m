@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/4] android/pan: Add initial code for handling commands
-Date: Mon,  4 Nov 2013 12:56:57 +0200
-Message-Id: <1383562617-9029-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/4] android: Add initial skeleton for pan in the daemon
+Date: Mon,  4 Nov 2013 12:56:56 +0200
+Message-Id: <1383562617-9029-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1383562617-9029-1-git-send-email-luiz.dentz@gmail.com>
 References: <1383562617-9029-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,108 +12,163 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/main.c |  4 ++++
- android/pan.c  | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- android/pan.h  |  2 ++
- 3 files changed, 62 insertions(+)
+ android/Android.mk  |  1 +
+ android/Makefile.am |  1 +
+ android/main.c      |  9 +++++++++
+ android/pan.c       | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/pan.h       | 25 +++++++++++++++++++++++++
+ 5 files changed, 89 insertions(+)
+ create mode 100644 android/pan.c
+ create mode 100644 android/pan.h
 
+diff --git a/android/Android.mk b/android/Android.mk
+index 6f537ea..77fd5a0 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -26,6 +26,7 @@ LOCAL_SRC_FILES := \
+ 	socket.c \
+ 	ipc.c ipc.h \
+ 	a2dp.c \
++	pan.c \
+ 	../src/log.c \
+ 	../src/shared/mgmt.c \
+ 	../src/shared/util.c \
+diff --git a/android/Makefile.am b/android/Makefile.am
+index df7f8ec..3c51390 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -21,6 +21,7 @@ android_bluetoothd_SOURCES = android/main.c \
+ 				android/ipc.h android/ipc.c \
+ 				android/a2dp.h android/a2dp.c \
+ 				android/socket.h android/socket.c \
++				android/pan.h android/pan.c \
+ 				btio/btio.h btio/btio.c \
+ 				src/sdp-client.h src/sdp-client.c
+ 
 diff --git a/android/main.c b/android/main.c
-index 29b3882..7d36976 100644
+index 75ed4bb..29b3882 100644
 --- a/android/main.c
 +++ b/android/main.c
-@@ -272,6 +272,10 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
- 		bt_a2dp_handle_cmd(hal_cmd_io, msg->opcode, msg->payload,
- 								msg->len);
+@@ -54,6 +54,7 @@
+ #include "hal-msg.h"
+ #include "ipc.h"
+ #include "a2dp.h"
++#include "pan.h"
+ 
+ /* TODO: Consider to remove PLATFORM_SDKVERSION check if requirement
+ *  for minimal Android platform version increases. */
+@@ -107,6 +108,11 @@ static void service_register(void *buf, uint16_t len)
+ 			goto error;
+ 
  		break;
 +	case HAL_SERVICE_ID_PAN:
-+		bt_pan_handle_cmd(hal_cmd_io, msg->opcode, msg->payload,
-+								msg->len);
++		if (!bt_a2dp_register(hal_notif_io, adapter_bdaddr))
++			goto error;
++
 +		break;
  	default:
- 		ipc_send_rsp(hal_cmd_io, msg->service_id, HAL_STATUS_FAILED);
+ 		DBG("service %u not supported", m->service_id);
+ 		goto error;
+@@ -143,6 +149,9 @@ static void service_unregister(void *buf, uint16_t len)
+ 	case HAL_SERVICE_ID_A2DP:
+ 		bt_a2dp_unregister();
  		break;
++	case HAL_SERVICE_ID_PAN:
++		bt_pan_unregister();
++		break;
+ 	default:
+ 		/* This would indicate bug in HAL, as unregister should not be
+ 		 * called in init failed */
 diff --git a/android/pan.c b/android/pan.c
-index 4b988ac..0cc3590 100644
---- a/android/pan.c
+new file mode 100644
+index 0000000..4b988ac
+--- /dev/null
 +++ b/android/pan.c
-@@ -32,9 +32,65 @@
- #include "lib/bluetooth.h"
- #include "log.h"
- #include "pan.h"
-+#include "hal-msg.h"
-+#include "ipc.h"
- 
- static GIOChannel *notification_io = NULL;
- 
-+static uint8_t bt_pan_enable(struct hal_cmd_pan_enable *cmd, uint16_t len)
-+{
-+	DBG("Not Implemented");
+@@ -0,0 +1,53 @@
++/*
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+	return HAL_STATUS_FAILED;
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdint.h>
++#include <stdbool.h>
++#include <errno.h>
++#include <unistd.h>
++#include <fcntl.h>
++#include <glib.h>
++
++#include "lib/bluetooth.h"
++#include "log.h"
++#include "pan.h"
++
++static GIOChannel *notification_io = NULL;
++
++bool bt_pan_register(GIOChannel *io, const bdaddr_t *addr)
++{
++	DBG("");
++
++	notification_io = g_io_channel_ref(io);
++
++	return true;
 +}
 +
-+static uint8_t bt_pan_get_role(void *cmd, uint16_t len)
++void bt_pan_unregister(void)
 +{
-+	DBG("Not Implemented");
++	DBG("");
 +
-+	return HAL_STATUS_FAILED;
++	g_io_channel_unref(notification_io);
++	notification_io = NULL;
 +}
-+
-+static uint8_t bt_pan_connect(struct hal_cmd_pan_connect *cmd, uint16_t len)
-+{
-+	DBG("Not Implemented");
-+
-+	return HAL_STATUS_FAILED;
-+}
-+
-+static uint8_t bt_pan_disconnect(struct hal_cmd_pan_connect *cmd, uint16_t len)
-+{
-+	DBG("Not Implemented");
-+
-+	return HAL_STATUS_FAILED;
-+}
-+
-+void bt_pan_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
-+								uint16_t len)
-+{
-+	uint8_t status = HAL_STATUS_FAILED;
-+
-+	switch (opcode) {
-+	case HAL_OP_PAN_ENABLE:
-+		status = bt_pan_enable(buf, len);
-+		break;
-+	case HAL_OP_PAN_GET_ROLE:
-+		status = bt_pan_get_role(buf, len);
-+		break;
-+	case HAL_OP_PAN_CONNECT:
-+		status = bt_pan_connect(buf, len);
-+		break;
-+	case HAL_OP_PAN_DISCONNECT:
-+		status = bt_pan_disconnect(buf, len);
-+		break;
-+	default:
-+		DBG("Unhandled command, opcode 0x%x", opcode);
-+		break;
-+	}
-+
-+	ipc_send_rsp(io, HAL_SERVICE_ID_A2DP, status);
-+}
-+
- bool bt_pan_register(GIOChannel *io, const bdaddr_t *addr)
- {
- 	DBG("");
 diff --git a/android/pan.h b/android/pan.h
-index 318f318..1ffba9d 100644
---- a/android/pan.h
+new file mode 100644
+index 0000000..318f318
+--- /dev/null
 +++ b/android/pan.h
-@@ -21,5 +21,7 @@
-  *
-  */
- 
-+void bt_pan_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf, uint16_t len);
+@@ -0,0 +1,25 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
- bool bt_pan_register(GIOChannel *io, const bdaddr_t *addr);
- void bt_pan_unregister(void);
++bool bt_pan_register(GIOChannel *io, const bdaddr_t *addr);
++void bt_pan_unregister(void);
 -- 
 1.8.3.1
 
