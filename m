@@ -1,59 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sujith Manoharan <sujith@msujith.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: gustavo@padovan.org
-Subject: [PATCH] Bluetooth: ath3k: Add support for a new AR3012 device
-Date: Mon,  4 Nov 2013 21:38:23 +0530
-Message-Id: <1383581303-1081-1-git-send-email-sujith@msujith.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 3/3] android: Send current state of all properties while powering adapter
+Date: Mon, 4 Nov 2013 16:34:25 +0100
+Message-ID: <1383579265-24614-3-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1383579265-24614-1-git-send-email-szymon.janc@tieto.com>
+References: <1383579265-24614-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-T:  Bus=02 Lev=01 Prnt=01 Port=04 Cnt=01 Dev#=  9 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e05f Rev= 0.02
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-
-Reported-by: Joshua Richenhagen <richenhagen@gmail.com>
-Signed-off-by: Sujith Manoharan <sujith@msujith.org>
+When adapter is powered on it is expected to emit all properties so
+that framework could synchronize its state machine with current
+state of HAL. There is no need to set scan mode to none on startup
+as framework will set scan mode if current mode is different than
+desired one.
 ---
- drivers/bluetooth/ath3k.c | 2 ++
- drivers/bluetooth/btusb.c | 1 +
- 2 files changed, 3 insertions(+)
+ android/adapter.c | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 6bfc1bb..32582ec 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -96,6 +96,7 @@ static const struct usb_device_id ath3k_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3402) },
- 	{ USB_DEVICE(0x0cf3, 0x3121) },
- 	{ USB_DEVICE(0x0cf3, 0xe003) },
-+	{ USB_DEVICE(0x0489, 0xe05f) },
+diff --git a/android/adapter.c b/android/adapter.c
+index 54aed40..17ea72b 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -1485,16 +1485,9 @@ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
  
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE02C) },
-@@ -138,6 +139,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
- 	{ USB_DEVICE(0x13d3, 0x3402), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0x3121), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe003), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0489, 0xe05f), .driver_info = BTUSB_ATH3012 },
+ 	switch (opcode) {
+ 	case HAL_OP_ENABLE:
+-		/*
+-		 * In case the controller has connectable and discoverable
+-		 * enabled, make sure to disable it first.
+-		 *
+-		 * It is enough to just clear the connectable setting since
+-		 * at the same time it will automatically clear discoverable
+-		 * setting.
+-		 */
+-		if (adapter->current_settings & MGMT_SETTING_CONNECTABLE)
+-			set_mode(MGMT_OP_SET_CONNECTABLE, 0x00);
++		/* Framework expects all properties to be emitted while
++		 * enabling adapter */
++		get_properties();
  
- 	/* Atheros AR5BBU22 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xE03C), .driver_info = BTUSB_ATH3012 },
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 30868fa..9ce82ef 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -163,6 +163,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3402), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0x3121), .driver_info = BTUSB_ATH3012 },
- 	{ USB_DEVICE(0x0cf3, 0xe003), .driver_info = BTUSB_ATH3012 },
-+	{ USB_DEVICE(0x0489, 0xe05f), .driver_info = BTUSB_ATH3012 },
- 
- 	/* Atheros AR5BBU12 with sflash firmware */
- 	{ USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+ 		if (adapter->current_settings & MGMT_SETTING_POWERED) {
+ 			status = HAL_STATUS_DONE;
 -- 
-1.8.4.2
+1.8.4.1
 
