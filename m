@@ -1,36 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 00/11] Implemented hid interfaces in daemon and hal
-Date: Tue,  5 Nov 2013 00:20:04 +0200
-Message-Id: <1383603615-9953-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Date: Mon, 4 Nov 2013 21:32:35 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] android: Add support for handling get properties
+ commands
+Message-ID: <20131104193235.GA17981@x220.p-661hnu-f1>
+References: <1383579265-24614-1-git-send-email-szymon.janc@tieto.com>
+ <20131104191918.GE13837@x220.p-661hnu-f1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20131104191918.GE13837@x220.p-661hnu-f1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set implements get/set protocol and get/set report
-interfaces and supported functionality in daemon. Sending notifications
-and notification handling in hal. Few naming fixes and error handling.
-And last handling of few uHID events.
+Hi,
 
-Ravi kumar Veeramally (11):
-  android/hid: Rename function name set_state to notify_state
-  android/hid: Retrieve BOOT_DEVICE attribute from SDP and cache it
-  android/hid: Implement hid get protocol in daemon
-  android/hid: Implement hid set protocol in daemon
-  android/hid: Handle protocol mode notification in hal
-  android/hid: Implement hid get report in daemon
-  android/hid: Implement hid set report in daemon
-  android/hid: Handle get report notification in hal
-  android/hid: Replace header checking magic number with defines
-  android/hid: Handle invalid parameters in hal
-  android/hid: Handle uhid events
+On Mon, Nov 04, 2013, Johan Hedberg wrote:
+> Hi Szymon,
+> 
+> On Mon, Nov 04, 2013, Szymon Janc wrote:
+> > When this commands is received all properties shall be reported to HAL.
+> > ---
+> >  android/adapter.c | 17 +++++++++++++++++
+> >  1 file changed, 17 insertions(+)
+> 
+> This patch doesn't compile:
+> 
+>   CC       android/adapter.o
+> android/adapter.c: In function ‘get_properties’:
+> android/adapter.c:1125:2: error: implicit declaration of function ‘send_adapter_address’ [-Werror=implicit-function-declaration]
+>   send_adapter_address();
+>   ^
+> cc1: all warnings being treated as errors
+> make[1]: *** [android/adapter.o] Error 1
 
- android/hal-hidhost.c |  40 +++++-
- android/hal-msg.h     |  18 +++
- android/hid.c         | 353 +++++++++++++++++++++++++++++++++++++++++++++++---
- 3 files changed, 384 insertions(+), 27 deletions(-)
+Since this was a rather trivial thing introduced by a rename patch from
+Andrei E, I went ahead and fixed it myself and applied all three
+patches.
 
--- 
-1.8.1.2
-
+Johan
