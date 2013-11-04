@@ -1,43 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <527737C7.40208@canonical.com>
-Date: Mon, 04 Nov 2013 13:59:35 +0800
-From: Hui Wang <hui.wang@canonical.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Tedd An <tedd.an@intel.com>, Johan Hedberg <johan.hedberg@intel.com>,
- xiong.y.zhang@intel.com,
- "Gustavo F. Padovan" <gustavo.padovan@collabora.co.uk>,
- "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
- Kun Yang <kun.yang@canonical.com>,
- Anthony Wong <anthony.wong@canonical.com>
-Subject: Re: Intel 7260 bluetooth malfunction when it is connected to EHCI
- bus
-References: <526F8804.9060906@canonical.com> <A07820C9-C272-4AD4-AE16-49F81956C2D7@holtmann.org> <52707428.9070908@canonical.com> <6091DDC7-7B00-4457-82A0-F8CC9B4EE9DD@holtmann.org> <5271EAA2.1030705@canonical.com> <D0B840E3-36C4-4751-A757-1ADDAC0707B9@holtmann.org> <5273147E.4040004@canonical.com> <C3BBD7E9-6D91-430E-96DF-2D4885F89DCC@holtmann.org> <527371D4.1010305@canonical.com> <9DFD9618-158E-41C4-8183-134A3FC4E61F@holtmann.org>
-In-Reply-To: <9DFD9618-158E-41C4-8183-134A3FC4E61F@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+From: Matthew Monaco <dgbaley27@0x01b.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] tools/hci2hid: properly format device path
+Date: Sun,  3 Nov 2013 18:46:53 -0700
+Message-Id: <963b569308352e0b0fc18a0a17e2b0c0fe721d72.1383529026.git.matthew.monaco@0x01b.net>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 11/03/2013 03:05 AM, Marcel Holtmann wrote:
-> Hi Hui,
->
-<snip>
->>
->> The attachment lenovo-k4450-btmon-v1.log is the log of intel 7260 init procedure + scan headset + connect headset + play sound.
-> I looked through the logs and the controller init is just fine. So in theory this should route the SCO audio frames over HCI. For some reason it does not and I have no idea why not.
->
-> That it makes a different between EHCI and XHCI is strange. I can not explain this. Maybe Tedd can help you since I have no further insights in our chips at this moment.
+From: Matthew Monaco <matthew.monaco@0x01b.net>
 
-Thanks Marcel for your kind help and analysis.
+---
+Hello! I hope this is the correct place to send a bugfix for bluez.
+ tools/hid2hci.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-Tedd, did you reproduce this issue on the machines with intel 7260 BT 
-module connected to the EHCI bus? Did you have any idea on this issue?
+diff --git a/tools/hid2hci.c b/tools/hid2hci.c
+index bb8a521..8f22047 100644
+--- a/tools/hid2hci.c
++++ b/tools/hid2hci.c
+@@ -221,18 +221,21 @@ static int usb_switch_dell(int fd, enum mode mode)
+ static int find_device(struct udev_device *udev_dev)
+ {
+ 	char path[PATH_MAX];
+-	const char *busnum, *devnum;
++	const char *str;
++	long int busnum, devnum;
+ 	int fd;
+ 
+-	busnum = udev_device_get_sysattr_value(udev_dev, "busnum");
+-	if (!busnum)
++	str = udev_device_get_sysattr_value(udev_dev, "busnum");
++	if (!str)
+ 		return -1;
++	busnum = strtol(str, NULL, 0);
+ 
+-	devnum = udev_device_get_sysattr_value(udev_dev, "devnum");
+-	if (!devnum)
++	str = udev_device_get_sysattr_value(udev_dev, "devnum");
++	if (!str)
+ 		return -1;
++	devnum = strtol(str, NULL, 0);
+ 
+-	snprintf(path, sizeof(path), "/dev/bus/usb/%s/%s", busnum, devnum);
++	snprintf(path, sizeof(path), "/dev/bus/usb/%03d/%03d", busnum, devnum);
+ 
+ 	fd = open(path, O_RDWR, O_CLOEXEC);
+ 	if (fd < 0) {
+-- 
+1.8.4.2
 
-Thanks,
-Hui.
-
->
-> Regards
->
-> Marcel
->
->
