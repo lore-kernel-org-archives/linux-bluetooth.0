@@ -1,33 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 Nov 2013 21:13:49 +0200
+Date: Mon, 4 Nov 2013 20:11:48 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Giovanni Campagna <scampa.giovanni@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/4] android: Add initial skeleton for a2dp in the
- daemon
-Message-ID: <20131104191349.GA13837@x220.p-661hnu-f1>
-References: <1383562617-9029-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH v2] hid2hci: fix regression in /dev format after moving
+ away from libusb
+Message-ID: <20131104181148.GA11186@x220.p-661hnu-f1>
+References: <1380798229-4319-1-git-send-email-scampa.giovanni@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383562617-9029-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1380798229-4319-1-git-send-email-scampa.giovanni@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Giovanni,
 
-On Mon, Nov 04, 2013, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
+On Thu, Oct 03, 2013, Giovanni Campagna wrote:
+> The paths under /dev, in the default udev configuration, are formatted
+> with two leading zeros, but the number obtained from sysfs don't have
+> them, so we must convert them to integers and reformat them.
 > ---
->  android/Android.mk  |  1 +
->  android/Makefile.am |  1 +
->  android/a2dp.c      | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  android/a2dp.h      | 25 ++++++++++++++++++++++++
->  android/main.c      |  9 +++++++++
->  5 files changed, 92 insertions(+)
->  create mode 100644 android/a2dp.c
->  create mode 100644 android/a2dp.h
+>  tools/hid2hci.c | 15 +++++++++------
+>  1 file changed, 9 insertions(+), 6 deletions(-)
 
-All four patches have been applied. Thanks.
+Applied. Thanks.
 
 Johan
