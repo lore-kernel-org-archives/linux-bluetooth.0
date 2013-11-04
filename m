@@ -1,76 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 4 Nov 2013 11:34:59 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] android/hid: Use BT_IO_OPT_SOURCE_BDADDR whenever possible
-Date: Mon,  4 Nov 2013 11:34:57 +0200
-Message-Id: <1383557698-4475-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [RFC] android/daemon: Implement get adapter name
+Message-ID: <20131104093452.GA18874@aemeltch-MOBL1>
+References: <1383556934-5481-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1383556934-5481-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Mon, Nov 04, 2013 at 11:22:13AM +0200, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
----
- android/hid.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+Sorry, there is similar function exist, I will reuse it.
 
-diff --git a/android/hid.c b/android/hid.c
-index e660552..59fc90b 100644
---- a/android/hid.c
-+++ b/android/hid.c
-@@ -661,12 +661,11 @@ void bt_hid_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf, uint16_t len)
- static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- {
- 	struct hid_device *dev;
--	bdaddr_t dst;
-+	bdaddr_t src, dst;
- 	char address[18];
- 	uint16_t psm;
- 	GError *gerr = NULL;
- 	GSList *l;
--	const bdaddr_t *src = bt_adapter_get_address();
- 	uuid_t uuid;
- 
- 	if (err) {
-@@ -675,6 +674,7 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- 	}
- 
- 	bt_io_get(chan, &err,
-+			BT_IO_OPT_SOURCE_BDADDR, &src,
- 			BT_IO_OPT_DEST_BDADDR, &dst,
- 			BT_IO_OPT_PSM, &psm,
- 			BT_IO_OPT_INVALID);
-@@ -699,7 +699,7 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- 		dev->uhid_fd = -1;
- 
- 		bt_string2uuid(&uuid, HID_UUID);
--		if (bt_search_service(src, &dev->dst, &uuid,
-+		if (bt_search_service(&src, &dev->dst, &uuid,
- 					hid_sdp_search_cb, dev, NULL) < 0) {
- 			error("failed to search sdp details");
- 			hid_device_free(dev);
-@@ -732,12 +732,14 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- bool bt_hid_register(GIOChannel *io, const bdaddr_t *addr)
- {
- 	GError *err = NULL;
-+	const bdaddr_t *src = bt_adapter_get_address();
- 
- 	DBG("");
- 
- 	notification_io = g_io_channel_ref(io);
- 
- 	ctrl_io = bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
-+				BT_IO_OPT_SOURCE_BDADDR, &src,
- 				BT_IO_OPT_PSM, L2CAP_PSM_HIDP_CTRL,
- 				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
- 				BT_IO_OPT_INVALID);
-@@ -748,6 +750,7 @@ bool bt_hid_register(GIOChannel *io, const bdaddr_t *addr)
- 	}
- 
- 	intr_io = bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
-+				BT_IO_OPT_SOURCE_BDADDR, &src,
- 				BT_IO_OPT_PSM, L2CAP_PSM_HIDP_INTR,
- 				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
- 				BT_IO_OPT_INVALID);
--- 
-1.8.3.1
+Best regards 
+Andrei Emeltchenko 
 
+> 
+> ---
+>  android/adapter.c |   29 ++++++++++++++++++++++++-----
+>  1 file changed, 24 insertions(+), 5 deletions(-)
+> 
+> diff --git a/android/adapter.c b/android/adapter.c
+> index cb92f2f..8210d1a 100644
+> --- a/android/adapter.c
+> +++ b/android/adapter.c
+> @@ -1016,13 +1016,32 @@ static void send_adapter_address(void)
+>  	g_free(ev);
+>  }
+>  
+> -static bool get_name(void)
+> +static bool send_adapter_name(void)
+>  {
+> -	DBG("Not implemented");
+> +	struct hal_ev_adapter_props_changed *ev;
+> +	size_t len;
+>  
+> -	/* TODO: Add implementation */
+> +	if (!adapter->name)
+> +		return false;
+>  
+> -	return false;
+> +	len = sizeof(*ev) + sizeof(struct hal_property) +
+> +						strlen(adapter->name) + 1;
+> +
+> +	ev = g_malloc0(len);
+> +
+> +	ev->num_props = 1;
+> +	ev->status = HAL_STATUS_SUCCESS;
+> +
+> +	ev->props[0].type = HAL_PROP_ADAPTER_NAME;
+> +	ev->props[0].len = strlen(adapter->name) + 1;
+> +	memcpy(&ev->props[0].val, adapter->name, strlen(adapter->name));
+> +
+> +	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
+> +				HAL_EV_ADAPTER_PROPS_CHANGED, len, ev, -1);
+> +
+> +	g_free(ev);
+> +
+> +	return true;
+>  }
+>  
+>  static bool get_uuids(void)
+> @@ -1097,7 +1116,7 @@ static bool get_property(void *buf, uint16_t len)
+>  		send_adapter_address();
+>  		return true;
+>  	case HAL_PROP_ADAPTER_NAME:
+> -		return get_name();
+> +		return send_adapter_name();
+>  	case HAL_PROP_ADAPTER_UUIDS:
+>  		return get_uuids();
+>  	case HAL_PROP_ADAPTER_CLASS:
+> -- 
+> 1.7.10.4
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
