@@ -1,55 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android: Fix not sending scan mode change notification
-Date: Mon, 4 Nov 2013 10:59:59 +0100
-Message-ID: <1383559199-22843-1-git-send-email-szymon.janc@tieto.com>
+CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+Subject: [PATCH] android/client: Fix uninitialized variable
+Date: Mon, 4 Nov 2013 10:55:40 +0100
+Message-ID: <1383558940-18520-1-git-send-email-jerzy.kasenberg@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Check for current settings instead of changed setting mask when
-sending notification. Otherwise scan mode change would be communicated
-only if power state changed at the same time.
+Pin accept variable was intended to be set to 1
+only when pin was typed by user. If no pin was given
+accept should be set to 0. This patch fixes this.
 ---
- android/adapter.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ android/client/if-bt.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/android/adapter.c b/android/adapter.c
-index af62b11..efe3e8b 100644
---- a/android/adapter.c
-+++ b/android/adapter.c
-@@ -174,19 +174,20 @@ static void settings_changed(uint32_t settings)
+diff --git a/android/client/if-bt.c b/android/client/if-bt.c
+index 43e8788..fb1b3f3 100644
+--- a/android/client/if-bt.c
++++ b/android/client/if-bt.c
+@@ -605,7 +605,7 @@ static void pin_reply_p(int argc, const char **argv)
+ 	bt_bdaddr_t addr;
+ 	bt_pin_code_t pin;
+ 	int pin_len = 0;
+-	int accept;
++	int accept = 0;
  
- 	DBG("0x%08x", changed_mask);
- 
--	if (changed_mask & MGMT_SETTING_POWERED) {
-+	if (changed_mask & MGMT_SETTING_POWERED)
- 		powered_changed();
- 
--		/*
--		 * Only when powered, the connectable and discoverable
--		 * state changes should be communicated.
--		 */
--		scan_mode_mask = MGMT_SETTING_CONNECTABLE |
--						MGMT_SETTING_DISCOVERABLE;
- 
-+	scan_mode_mask = MGMT_SETTING_CONNECTABLE |
-+					MGMT_SETTING_DISCOVERABLE;
-+
-+	/*
-+	 * Only when powered, the connectable and discoverable
-+	 * state changes should be communicated.
-+	 */
-+	if (adapter->current_settings & MGMT_SETTING_POWERED)
- 		if (changed_mask & scan_mode_mask)
- 			scan_mode_changed();
--	}
- }
- 
- static void new_settings_callback(uint16_t index, uint16_t length,
+ 	RETURN_IF_NULL(if_bluetooth);
+ 	VERIFY_ADDR_ARG(2, &addr);
 -- 
-1.8.4.1
+1.7.9.5
 
