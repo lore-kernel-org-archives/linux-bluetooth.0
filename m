@@ -1,63 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 Nov 2013 14:15:39 +0100
-From: Stevie Trujillo <stevie.trujillo@gmail.com>
-To: Hui Wang <hui.wang@canonical.com>, marcel@holtmann.org,
- tedd.an@intel.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Intel 7260 bluetooth malfunction when it is connected to EHCI
- bus
-Message-ID: <20131104141539.772e1636@localhost>
-In-Reply-To: <527737C7.40208@canonical.com>
-References: <526F8804.9060906@canonical.com>
-	<A07820C9-C272-4AD4-AE16-49F81956C2D7@holtmann.org>
-	<52707428.9070908@canonical.com>
-	<6091DDC7-7B00-4457-82A0-F8CC9B4EE9DD@holtmann.org>
-	<5271EAA2.1030705@canonical.com>
-	<D0B840E3-36C4-4751-A757-1ADDAC0707B9@holtmann.org>
-	<5273147E.4040004@canonical.com>
-	<C3BBD7E9-6D91-430E-96DF-2D4885F89DCC@holtmann.org>
-	<527371D4.1010305@canonical.com>
-	<9DFD9618-158E-41C4-8183-134A3FC4E61F@holtmann.org>
-	<527737C7.40208@canonical.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Date: Mon, 4 Nov 2013 14:51:17 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCHv2 1/2] android/daemon: Implement get adapter name
+Message-ID: <20131104125115.GB18874@aemeltch-MOBL1>
+References: <1383562180-21646-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CABBYNZLUUPkLM_b2DDb=mxc5-QqLrwN9in7XmZGpV+xQ-DpzzQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CABBYNZLUUPkLM_b2DDb=mxc5-QqLrwN9in7XmZGpV+xQ-DpzzQ@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello, I've been trying to use my computer as "handsfree" with
-"Hands-Free Profile" using "Intel Corporation Centrino Wireless-N
-1030". I accept() the BTPROTO_SCO socket, but never recv() any
-data. Your post looked similar!
+Hi Luiz,
 
-When googling I found this:
-
-http://www.netbsd.org/docs/guide/en/chap-bluetooth.html#chap-bluetooth-audio
-   SCO Audio will not work with ehci(4) USB controllers, since support
-   for Isochronous data over EHCI is missing in NetBSD. 
-
-Does Linux support this? (I have no idea what it means)
-
-I'm sorry if this mail is somewhat broken. I could only find your email
-on "gmane" and it had encrypted all your email addresses!
-
-On Mon, 04 Nov 2013 13:59:35 +0800
-Hui Wang <hui.wang-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org> wrote:
-
-> On 11/03/2013 03:05 AM, Marcel Holtmann wrote:
-> > Hi Hui,
-> >
-> <snip>
-> >>
-> >> The attachment lenovo-k4450-btmon-v1.log is the log of intel 7260
-> >> init procedure + scan headset + connect headset + play sound.
-> > I looked through the logs and the controller init is just fine. So
-> > in theory this should route the SCO audio frames over HCI. For some
-> > reason it does not and I have no idea why not.
-> >
-> > That it makes a different between EHCI and XHCI is strange. I can
-> > not explain this. Maybe Tedd can help you since I have no further
-> > insights in our chips at this moment.
+On Mon, Nov 04, 2013 at 01:17:35PM +0200, Luiz Augusto von Dentz wrote:
+> Hi Andrei,
 > 
-> Thanks Marcel for your kind help and analysis.
+> On Mon, Nov 4, 2013 at 12:49 PM, Andrei Emeltchenko
+> <Andrei.Emeltchenko.news@gmail.com> wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> >
+> > ---
+> >  android/adapter.c |   11 ++++++-----
+> >  1 file changed, 6 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/android/adapter.c b/android/adapter.c
+> > index af461b8..fdac82e 100644
+> > --- a/android/adapter.c
+> > +++ b/android/adapter.c
+> > @@ -1017,13 +1017,14 @@ static void send_adapter_address(void)
+> >         g_free(ev);
+> >  }
+> >
+> > -static bool get_name(void)
+> > +static bool send_adapter_name(void)
+> >  {
+> > -       DBG("Not implemented");
+> > +       if (!adapter->name)
+> > +               return false;
+> >
+> > -       /* TODO: Add implementation */
+> > +       adapter_name_changed((uint8_t *) adapter->name);
+> >
+> > -       return false;
+> > +       return true;
+> >  }
+> >
+> >  static bool get_uuids(void)
+> > @@ -1098,7 +1099,7 @@ static bool get_property(void *buf, uint16_t len)
+> >                 send_adapter_address();
+> >                 return true;
+> >         case HAL_PROP_ADAPTER_NAME:
+> > -               return get_name();
+> > +               return send_adapter_name();
 > 
-> Tedd, did you reproduce this issue on the machines with intel 7260 BT 
-> module connected to the EHCI bus? Did you have any idea on this issue?
+> Not sure why you are changing the name here, all the other properties
+> is using the same format as get_<name of property>.
+
+I am following style, look at previous function: send_adapter_address. So
+shall I change that one also in a separate patch?
+
+Best regards 
+Andrei Emeltchenko 
+
