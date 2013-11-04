@@ -1,52 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 3/4] android/daemon: Fix setting adapter name
-Date: Mon,  4 Nov 2013 15:22:37 +0200
-Message-Id: <1383571358-4942-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1383571358-4942-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 1/4] android/daemon: Implement get adapter name
+Date: Mon,  4 Nov 2013 15:22:35 +0200
+Message-Id: <1383571358-4942-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <CABBYNZLUUPkLM_b2DDb=mxc5-QqLrwN9in7XmZGpV+xQ-DpzzQ@mail.gmail.com>
 References: <CABBYNZLUUPkLM_b2DDb=mxc5-QqLrwN9in7XmZGpV+xQ-DpzzQ@mail.gmail.com>
- <1383571358-4942-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Android use the full string returned even if we terminate it with '\0'.
+Use adapter_name_changed for get_property call.
 ---
- android/adapter.c |   11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ android/adapter.c |    7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/android/adapter.c b/android/adapter.c
-index c2a6bf3..45b2d4a 100644
+index af461b8..3e43d44 100644
 --- a/android/adapter.c
 +++ b/android/adapter.c
-@@ -145,8 +145,8 @@ static void scan_mode_changed(void)
- static void adapter_name_changed(const uint8_t *name)
+@@ -1019,11 +1019,12 @@ static void send_adapter_address(void)
+ 
+ static bool get_name(void)
  {
- 	struct hal_ev_adapter_props_changed *ev;
--	uint8_t buf[sizeof(*ev) + sizeof(struct hal_property) +
--							HAL_MAX_NAME_LENGTH];
-+	size_t len = strlen((const char *) name);
-+	uint8_t buf[sizeof(*ev) + sizeof(struct hal_property) + len];
+-	DBG("Not implemented");
++	if (!adapter->name)
++		return false;
  
- 	memset(buf, 0, sizeof(buf));
- 	ev = (void *) buf;
-@@ -154,10 +154,11 @@ static void adapter_name_changed(const uint8_t *name)
- 	ev->num_props = 1;
- 	ev->status = HAL_STATUS_SUCCESS;
- 	ev->props[0].type = HAL_PROP_ADAPTER_NAME;
--	ev->props[0].len = HAL_MAX_NAME_LENGTH;
--	memcpy(ev->props->val, name, HAL_MAX_NAME_LENGTH);
-+	/* Android expects value without NULL terminator */
-+	ev->props[0].len = len;
-+	memcpy(ev->props->val, name, len);
+-	/* TODO: Add implementation */
++	adapter_name_changed((uint8_t *) adapter->name);
  
--	DBG("Adapter name changed to: %s", ev->props->val);
-+	DBG("Adapter name changed to: %s", name);
+-	return false;
++	return true;
+ }
  
- 	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
- 			HAL_EV_ADAPTER_PROPS_CHANGED, sizeof(buf), ev, -1);
+ static bool get_uuids(void)
 -- 
 1.7.10.4
 
