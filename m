@@ -1,62 +1,199 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <527858A5.2080801@canonical.com>
-Date: Tue, 05 Nov 2013 10:32:05 +0800
-From: Hui Wang <hui.wang@canonical.com>
-MIME-Version: 1.0
-To: Stevie Trujillo <stevie.trujillo@gmail.com>
-CC: marcel@holtmann.org, tedd.an@intel.com,
- linux-bluetooth@vger.kernel.org
-Subject: Re: Intel 7260 bluetooth malfunction when it is connected to EHCI
- bus
-References: <526F8804.9060906@canonical.com> <A07820C9-C272-4AD4-AE16-49F81956C2D7@holtmann.org> <52707428.9070908@canonical.com> <6091DDC7-7B00-4457-82A0-F8CC9B4EE9DD@holtmann.org> <5271EAA2.1030705@canonical.com> <D0B840E3-36C4-4751-A757-1ADDAC0707B9@holtmann.org> <5273147E.4040004@canonical.com> <C3BBD7E9-6D91-430E-96DF-2D4885F89DCC@holtmann.org> <527371D4.1010305@canonical.com> <9DFD9618-158E-41C4-8183-134A3FC4E61F@holtmann.org> <527737C7.40208@canonical.com> <20131104141539.772e1636@localhost>
-In-Reply-To: <20131104141539.772e1636@localhost>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 06/11] android/hid: Implement hid get report in daemon
+Date: Tue,  5 Nov 2013 00:20:10 +0200
+Message-Id: <1383603615-9953-7-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1383603615-9953-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1383603615-9953-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 11/04/2013 09:15 PM, Stevie Trujillo wrote:
-> Hello, I've been trying to use my computer as "handsfree" with
-> "Hands-Free Profile" using "Intel Corporation Centrino Wireless-N
-> 1030". I accept() the BTPROTO_SCO socket, but never recv() any
-> data. Your post looked similar!
->
-> When googling I found this:
->
-> http://www.netbsd.org/docs/guide/en/chap-bluetooth.html#chap-bluetooth-audio
->     SCO Audio will not work with ehci(4) USB controllers, since support
->     for Isochronous data over EHCI is missing in NetBSD.
->
-> Does Linux support this? (I have no idea what it means)
+This patch requests hid device report and reads reply
+message and sends notification to hal.
+---
+ android/hal-hidhost.c |   1 +
+ android/hal-msg.h     |   8 ++++
+ android/hid.c         | 104 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 111 insertions(+), 2 deletions(-)
 
-Hi Stevie,
+diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
+index a287e40..027e3b8 100644
+--- a/android/hal-hidhost.c
++++ b/android/hal-hidhost.c
+@@ -251,6 +251,7 @@ static bt_status_t hh_get_report(bt_bdaddr_t *bd_addr,
+ 
+ 	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
+ 	cmd.id = reportId;
++	cmd.buf = bufferSize;
+ 
+ 	switch (reportType) {
+ 	case BTHH_INPUT_REPORT:
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 214daa9..eaa5c9c 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -465,6 +465,14 @@ struct hal_ev_hid_protocol {
+ 	uint8_t mode;
+ } __attribute__((packed));
+ 
++#define HAL_EV_HID_GET_REPORT		0x84
++struct hal_ev_hid_get_report {
++	uint8_t bdaddr[6];
++	uint8_t status;
++	uint16_t len;
++	uint8_t data[0];
++} __attribute__((packed));
++
+ #define HAL_EV_AV_CONNECTION_STATE	0x81
+ struct hal_ev_av_connection_state {
+ 	uint8_t state;
+diff --git a/android/hid.c b/android/hid.c
+index 115a1c5..6cb9604 100644
+--- a/android/hid.c
++++ b/android/hid.c
+@@ -55,14 +55,23 @@
+ #define UHID_DEVICE_FILE	"/dev/uhid"
+ 
+ /* HID message types */
++#define HID_MSG_GET_REPORT	0x40
+ #define HID_MSG_GET_PROTOCOL	0x60
+ #define HID_MSG_SET_PROTOCOL	0x70
+ #define HID_MSG_DATA		0xa0
+ 
++/* HID data types */
++#define HID_DATA_TYPE_INPUT	0x01
++#define HID_DATA_TYPE_OUTPUT	0x02
++#define HID_DATA_TYPE_FEATURE	0x03
++
+ /* HID protocol header parameters */
+ #define HID_PROTO_BOOT		0x00
+ #define HID_PROTO_REPORT	0x01
+ 
++/* HID GET REPORT Size Field */
++#define HID_GET_REPORT_SIZE_FIELD	0x08
++
+ static GIOChannel *notification_io = NULL;
+ static GIOChannel *ctrl_io = NULL;
+ static GIOChannel *intr_io = NULL;
+@@ -283,6 +292,52 @@ static void bt_hid_notify_protocol_mode(struct hid_device *dev, uint8_t *buf,
+ 				HAL_EV_HID_PROTO_MODE, sizeof(ev), &ev, -1);
+ }
+ 
++static void bt_hid_notify_get_report(struct hid_device *dev, uint8_t *buf,
++									int len)
++{
++	struct hal_ev_hid_get_report *ev;
++	int ev_len;
++	char address[18];
++
++	ba2str(&dev->dst, address);
++	DBG("device %s", address);
++
++	ev_len = sizeof(*ev) + sizeof(struct hal_ev_hid_get_report) + 1;
++
++	if (!((buf[0] == (HID_MSG_DATA | HID_DATA_TYPE_INPUT)) ||
++			(buf[0] == (HID_MSG_DATA | HID_DATA_TYPE_OUTPUT)) ||
++			(buf[0]	== (HID_MSG_DATA | HID_DATA_TYPE_FEATURE)))) {
++		ev = g_malloc(len);
++		memset(ev, 0, ev_len);
++		ev->status = buf[0];
++		bdaddr2android(&dev->dst, ev->bdaddr);
++		goto send;
++	}
++
++	/* Report porotocol mode reply contains id after hdr, in boot
++	 * protocol mode id doesn't exist */
++	ev_len += (dev->boot_dev) ? (len - 1) : (len - 2);
++	ev = g_malloc(ev_len);
++	memset(ev, 0, ev_len);
++	ev->status = HAL_HID_STATUS_OK;
++	bdaddr2android(&dev->dst, ev->bdaddr);
++
++	/* Report porotocol mode reply contains id after hdr, in boot
++	 * protocol mode id doesn't exist */
++	if (dev->boot_dev) {
++		ev->len = len - 1;
++		memcpy(ev->data, buf + 1, ev->len);
++	} else {
++		ev->len = len - 2;
++		memcpy(ev->data, buf + 2, ev->len);
++	}
++
++send:
++	ipc_send(notification_io, HAL_SERVICE_ID_HIDHOST, HAL_EV_HID_GET_REPORT,
++						ev_len, ev, -1);
++	g_free(ev);
++}
++
+ static gboolean ctrl_io_watch_cb(GIOChannel *chan, gpointer data)
+ {
+ 	struct hid_device *dev = data;
+@@ -303,6 +358,9 @@ static gboolean ctrl_io_watch_cb(GIOChannel *chan, gpointer data)
+ 	case HID_MSG_SET_PROTOCOL:
+ 		bt_hid_notify_protocol_mode(dev, buf, bread);
+ 		break;
++	case HID_MSG_GET_REPORT:
++		bt_hid_notify_get_report(dev, buf, bread);
++		break;
+ 	default:
+ 		DBG("unhandled hid msg type 0x%02x", dev->hid_msg);
+ 	}
+@@ -738,9 +796,51 @@ static uint8_t bt_hid_set_protocol(struct hal_cmd_hid_set_protocol *cmd,
+ static uint8_t bt_hid_get_report(struct hal_cmd_hid_get_report *cmd,
+ 								uint16_t len)
+ {
+-	DBG("Not Implemented");
++	struct hid_device *dev;
++	GSList *l;
++	bdaddr_t dst;
++	int fd;
++	uint8_t *req;
++	uint8_t req_size;
+ 
+-	return HAL_STATUS_FAILED;
++	DBG("");
++
++	if (len < sizeof(*cmd))
++		return HAL_STATUS_INVALID;
++
++	android2bdaddr(&cmd->bdaddr, &dst);
++
++	l = g_slist_find_custom(devices, &dst, device_cmp);
++	if (!l)
++		return HAL_STATUS_FAILED;
++
++	dev = l->data;
++	dev->hid_msg = HID_MSG_GET_REPORT;
++	req_size = (cmd->buf > 0) ? 4 : 2;
++	req = g_try_malloc0(req_size);
++	if (!req)
++		return HAL_STATUS_NOMEM;
++
++	req[0] = HID_MSG_GET_REPORT | cmd->type;
++
++	if (cmd->buf > 0)
++		req[0] = req[0] | HID_GET_REPORT_SIZE_FIELD;
++
++	req[1] = cmd->id;
++
++	if (cmd->buf > 0)
++		bt_put_le16(cmd->buf, (req + 2));
++
++	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
++
++	if (write(fd, req, req_size) < 0) {
++		error("error while querying device protocol");
++		g_free(req);
++		return HAL_STATUS_FAILED;
++	}
++
++	g_free(req);
++	return HAL_STATUS_SUCCESS;
+ }
+ 
+ static uint8_t bt_hid_set_report(struct hal_cmd_hid_set_report *cmd,
+-- 
+1.8.1.2
 
-Thanks for your input, I don't know the answer of your question, but at 
-least the camera works well on the EHCI bus, and camera transfers the 
-ISO packets over EHCI bus.
-
-Regards,
-Hui.
->
-> I'm sorry if this mail is somewhat broken. I could only find your email
-> on "gmane" and it had encrypted all your email addresses!
->
-> On Mon, 04 Nov 2013 13:59:35 +0800
-> Hui Wang <hui.wang-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org> wrote:
->
->> On 11/03/2013 03:05 AM, Marcel Holtmann wrote:
->>> Hi Hui,
->>>
->> <snip>
->>>> The attachment lenovo-k4450-btmon-v1.log is the log of intel 7260
->>>> init procedure + scan headset + connect headset + play sound.
->>> I looked through the logs and the controller init is just fine. So
->>> in theory this should route the SCO audio frames over HCI. For some
->>> reason it does not and I have no idea why not.
->>>
->>> That it makes a different between EHCI and XHCI is strange. I can
->>> not explain this. Maybe Tedd can help you since I have no further
->>> insights in our chips at this moment.
->> Thanks Marcel for your kind help and analysis.
->>
->> Tedd, did you reproduce this issue on the machines with intel 7260 BT
->> module connected to the EHCI bus? Did you have any idea on this issue?
->
