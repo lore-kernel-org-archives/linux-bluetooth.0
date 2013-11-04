@@ -1,60 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1383562180-21646-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1383562180-21646-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Mon, 4 Nov 2013 13:17:35 +0200
-Message-ID: <CABBYNZLUUPkLM_b2DDb=mxc5-QqLrwN9in7XmZGpV+xQ-DpzzQ@mail.gmail.com>
-Subject: Re: [PATCHv2 1/2] android/daemon: Implement get adapter name
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 4/4] android/pan: Add initial code for handling commands
+Date: Mon,  4 Nov 2013 12:56:57 +0200
+Message-Id: <1383562617-9029-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1383562617-9029-1-git-send-email-luiz.dentz@gmail.com>
+References: <1383562617-9029-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Nov 4, 2013 at 12:49 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> ---
->  android/adapter.c |   11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
->
-> diff --git a/android/adapter.c b/android/adapter.c
-> index af461b8..fdac82e 100644
-> --- a/android/adapter.c
-> +++ b/android/adapter.c
-> @@ -1017,13 +1017,14 @@ static void send_adapter_address(void)
->         g_free(ev);
->  }
->
-> -static bool get_name(void)
-> +static bool send_adapter_name(void)
->  {
-> -       DBG("Not implemented");
-> +       if (!adapter->name)
-> +               return false;
->
-> -       /* TODO: Add implementation */
-> +       adapter_name_changed((uint8_t *) adapter->name);
->
-> -       return false;
-> +       return true;
->  }
->
->  static bool get_uuids(void)
-> @@ -1098,7 +1099,7 @@ static bool get_property(void *buf, uint16_t len)
->                 send_adapter_address();
->                 return true;
->         case HAL_PROP_ADAPTER_NAME:
-> -               return get_name();
-> +               return send_adapter_name();
+---
+ android/main.c |  4 ++++
+ android/pan.c  | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/pan.h  |  2 ++
+ 3 files changed, 62 insertions(+)
 
-Not sure why you are changing the name here, all the other properties
-is using the same format as get_<name of property>.
-
-
+diff --git a/android/main.c b/android/main.c
+index 29b3882..7d36976 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -272,6 +272,10 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
+ 		bt_a2dp_handle_cmd(hal_cmd_io, msg->opcode, msg->payload,
+ 								msg->len);
+ 		break;
++	case HAL_SERVICE_ID_PAN:
++		bt_pan_handle_cmd(hal_cmd_io, msg->opcode, msg->payload,
++								msg->len);
++		break;
+ 	default:
+ 		ipc_send_rsp(hal_cmd_io, msg->service_id, HAL_STATUS_FAILED);
+ 		break;
+diff --git a/android/pan.c b/android/pan.c
+index 4b988ac..0cc3590 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -32,9 +32,65 @@
+ #include "lib/bluetooth.h"
+ #include "log.h"
+ #include "pan.h"
++#include "hal-msg.h"
++#include "ipc.h"
+ 
+ static GIOChannel *notification_io = NULL;
+ 
++static uint8_t bt_pan_enable(struct hal_cmd_pan_enable *cmd, uint16_t len)
++{
++	DBG("Not Implemented");
++
++	return HAL_STATUS_FAILED;
++}
++
++static uint8_t bt_pan_get_role(void *cmd, uint16_t len)
++{
++	DBG("Not Implemented");
++
++	return HAL_STATUS_FAILED;
++}
++
++static uint8_t bt_pan_connect(struct hal_cmd_pan_connect *cmd, uint16_t len)
++{
++	DBG("Not Implemented");
++
++	return HAL_STATUS_FAILED;
++}
++
++static uint8_t bt_pan_disconnect(struct hal_cmd_pan_connect *cmd, uint16_t len)
++{
++	DBG("Not Implemented");
++
++	return HAL_STATUS_FAILED;
++}
++
++void bt_pan_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
++								uint16_t len)
++{
++	uint8_t status = HAL_STATUS_FAILED;
++
++	switch (opcode) {
++	case HAL_OP_PAN_ENABLE:
++		status = bt_pan_enable(buf, len);
++		break;
++	case HAL_OP_PAN_GET_ROLE:
++		status = bt_pan_get_role(buf, len);
++		break;
++	case HAL_OP_PAN_CONNECT:
++		status = bt_pan_connect(buf, len);
++		break;
++	case HAL_OP_PAN_DISCONNECT:
++		status = bt_pan_disconnect(buf, len);
++		break;
++	default:
++		DBG("Unhandled command, opcode 0x%x", opcode);
++		break;
++	}
++
++	ipc_send_rsp(io, HAL_SERVICE_ID_A2DP, status);
++}
++
+ bool bt_pan_register(GIOChannel *io, const bdaddr_t *addr)
+ {
+ 	DBG("");
+diff --git a/android/pan.h b/android/pan.h
+index 318f318..1ffba9d 100644
+--- a/android/pan.h
++++ b/android/pan.h
+@@ -21,5 +21,7 @@
+  *
+  */
+ 
++void bt_pan_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf, uint16_t len);
++
+ bool bt_pan_register(GIOChannel *io, const bdaddr_t *addr);
+ void bt_pan_unregister(void);
 -- 
-Luiz Augusto von Dentz
+1.8.3.1
+
