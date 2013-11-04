@@ -1,53 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 4 Nov 2013 14:42:06 -0200
+Date: Mon, 4 Nov 2013 14:37:38 -0200
 From: Vinicius Costa Gomes <vcgomes@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: Matthew Monaco <dgbaley27@0x01b.net>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] tools/hci2hid: properly format device path
-Message-ID: <20131104164206.GB31305@molly.amr.corp.intel.com>
-References: <963b569308352e0b0fc18a0a17e2b0c0fe721d72.1383529026.git.matthew.monaco@0x01b.net>
- <20131104161805.GA32089@molly.amr.corp.intel.com>
- <1383582221.3373.15.camel@nuvo>
+To: Giovanni Campagna <scampa.giovanni@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] hid2hci: fix regression in /dev format after moving
+ away from libusb
+Message-ID: <20131104163738.GA31305@molly.amr.corp.intel.com>
+References: <1380798229-4319-1-git-send-email-scampa.giovanni@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383582221.3373.15.camel@nuvo>
+In-Reply-To: <1380798229-4319-1-git-send-email-scampa.giovanni@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi,
 
-On 17:23 Mon 04 Nov, Bastien Nocera wrote:
-> On Mon, 2013-11-04 at 14:18 -0200, Vinicius Costa Gomes wrote:
-> > Hi Matthew,
-> > 
-> > On 18:46 Sun 03 Nov, Matthew Monaco wrote:
-> > > From: Matthew Monaco <matthew.monaco@0x01b.net>
-> > > 
-> > > ---
-> > > Hello! I hope this is the correct place to send a bugfix for bluez.
-> > >  tools/hid2hci.c | 15 +++++++++------
-> > >  1 file changed, 9 insertions(+), 6 deletions(-)
-> > 
-> > The patch itself looks good.
-> > 
-> > What I think is missing is a better description of the problem it solves, I
-> > would suggest including in the commit message the values of 'path' for before
-> > and after the patch, for a situation that the current implementation doesn't
-> > work.
-> > 
-> > Changing the subject line to something like: "tools: Fix wrong paths for
-> > adapters" would make it easier to tell that this patch is indeed a bug fix.
+On 13:03 Thu 03 Oct, Giovanni Campagna wrote:
+> From: Giovanni Campagna <gcampagna@src.gnome.org>
 > 
-> Isn't this the same patch Giovanni sent a couple of weeks ago?
-> 
-> http://thread.gmane.org/gmane.linux.bluez.kernel/38329
+> The paths under /dev, in the default udev configuration, are formatted
+> with two leading zeros, but the number obtained from sysfs don't have
+> them, so we must convert them to integers and reformat them.
+> ---
+>  tools/hid2hci.c | 15 +++++++++------
+>  1 file changed, 9 insertions(+), 6 deletions(-)
 
-Yeah, same fix. Thanks for noticing.
-
-> 
-> Cheers
-> 
+Ack.
 
 
 Cheers,
