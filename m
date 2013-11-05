@@ -1,53 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Seung-Woo Kim <sw0312.kim@samsung.com>
-To: linux-bluetooth@vger.kernel.org, marcel@holtmann.org, gustavo@padovan.org,
- johan.hedberg@gmail.com
-Cc: sw0312.kim@samsung.com, s.syam@samsung.com
-Subject: [PATCH] Bluetooth: Fix RFCOMM bind fail for L2CAP sock
-Date: Tue, 05 Nov 2013 16:02:24 +0900
-Message-id: <1383634944-4141-1-git-send-email-sw0312.kim@samsung.com>
+Message-ID: <527858A5.2080801@canonical.com>
+Date: Tue, 05 Nov 2013 10:32:05 +0800
+From: Hui Wang <hui.wang@canonical.com>
+MIME-Version: 1.0
+To: Stevie Trujillo <stevie.trujillo@gmail.com>
+CC: marcel@holtmann.org, tedd.an@intel.com,
+ linux-bluetooth@vger.kernel.org
+Subject: Re: Intel 7260 bluetooth malfunction when it is connected to EHCI
+ bus
+References: <526F8804.9060906@canonical.com> <A07820C9-C272-4AD4-AE16-49F81956C2D7@holtmann.org> <52707428.9070908@canonical.com> <6091DDC7-7B00-4457-82A0-F8CC9B4EE9DD@holtmann.org> <5271EAA2.1030705@canonical.com> <D0B840E3-36C4-4751-A757-1ADDAC0707B9@holtmann.org> <5273147E.4040004@canonical.com> <C3BBD7E9-6D91-430E-96DF-2D4885F89DCC@holtmann.org> <527371D4.1010305@canonical.com> <9DFD9618-158E-41C4-8183-134A3FC4E61F@holtmann.org> <527737C7.40208@canonical.com> <20131104141539.772e1636@localhost>
+In-Reply-To: <20131104141539.772e1636@localhost>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-L2CAP socket bind checks its bdaddr type but RFCOMM kernel thread
-does not assign proper bdaddr type for L2CAP sock. This can cause
-that RFCOMM failure.
+On 11/04/2013 09:15 PM, Stevie Trujillo wrote:
+> Hello, I've been trying to use my computer as "handsfree" with
+> "Hands-Free Profile" using "Intel Corporation Centrino Wireless-N
+> 1030". I accept() the BTPROTO_SCO socket, but never recv() any
+> data. Your post looked similar!
+>
+> When googling I found this:
+>
+> http://www.netbsd.org/docs/guide/en/chap-bluetooth.html#chap-bluetooth-audio
+>     SCO Audio will not work with ehci(4) USB controllers, since support
+>     for Isochronous data over EHCI is missing in NetBSD.
+>
+> Does Linux support this? (I have no idea what it means)
 
-Signed-off-by: Seung-Woo Kim <sw0312.kim@samsung.com>
----
-The issue is came from following commit, but it is only in bluetooth-next tree,
-so this patch is not needed for stable tree.
+Hi Stevie,
 
-commit 80c1a2e76dbb36588facb265ab364b1302f7ef8c
-Author: Johan Hedberg <johan.hedberg@intel.com>
-Date:   Mon Oct 14 21:17:52 2013 +0300
+Thanks for your input, I don't know the answer of your question, but at 
+least the camera works well on the EHCI bus, and camera transfers the 
+ISO packets over EHCI bus.
 
-    Bluetooth: Reject invalid bdaddr types for sockets
-
-This patch is based on commit cca34b785a21d220176038c45071ffe842e99fd3 of
-bluetooth-next tree.
----
- net/bluetooth/rfcomm/core.c |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
-
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 94d06cb..ca55ea1 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -694,6 +694,7 @@ static struct rfcomm_session *rfcomm_session_create(bdaddr_t *src,
- 	addr.l2_family = AF_BLUETOOTH;
- 	addr.l2_psm    = 0;
- 	addr.l2_cid    = 0;
-+	addr.l2_bdaddr_type = BDADDR_BREDR;
- 	*err = kernel_bind(sock, (struct sockaddr *) &addr, sizeof(addr));
- 	if (*err < 0)
- 		goto failed;
-@@ -1983,6 +1984,7 @@ static int rfcomm_add_listener(bdaddr_t *ba)
- 	addr.l2_family = AF_BLUETOOTH;
- 	addr.l2_psm    = __constant_cpu_to_le16(RFCOMM_PSM);
- 	addr.l2_cid    = 0;
-+	addr.l2_bdaddr_type = BDADDR_BREDR;
- 	err = kernel_bind(sock, (struct sockaddr *) &addr, sizeof(addr));
- 	if (err < 0) {
- 		BT_ERR("Bind failed %d", err);
--- 
-1.7.4.1
+Regards,
+Hui.
+>
+> I'm sorry if this mail is somewhat broken. I could only find your email
+> on "gmane" and it had encrypted all your email addresses!
+>
+> On Mon, 04 Nov 2013 13:59:35 +0800
+> Hui Wang <hui.wang-Z7WLFzj8eWMS+FvcfC7Uqw@public.gmane.org> wrote:
+>
+>> On 11/03/2013 03:05 AM, Marcel Holtmann wrote:
+>>> Hi Hui,
+>>>
+>> <snip>
+>>>> The attachment lenovo-k4450-btmon-v1.log is the log of intel 7260
+>>>> init procedure + scan headset + connect headset + play sound.
+>>> I looked through the logs and the controller init is just fine. So
+>>> in theory this should route the SCO audio frames over HCI. For some
+>>> reason it does not and I have no idea why not.
+>>>
+>>> That it makes a different between EHCI and XHCI is strange. I can
+>>> not explain this. Maybe Tedd can help you since I have no further
+>>> insights in our chips at this moment.
+>> Thanks Marcel for your kind help and analysis.
+>>
+>> Tedd, did you reproduce this issue on the machines with intel 7260 BT
+>> module connected to the EHCI bus? Did you have any idea on this issue?
+>
