@@ -1,36 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 5 Nov 2013 14:56:07 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/client: Fix build for android 4.3
-Message-ID: <20131105125607.GA14086@x220.p-661hnu-f1>
-References: <1383652121-4121-1-git-send-email-jerzy.kasenberg@tieto.com>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383652121-4121-1-git-send-email-jerzy.kasenberg@tieto.com>
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
+Subject: Re: [PATCH] Bluetooth: Fix rejecting SMP security request in slave role
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1383643839-2788-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 5 Nov 2013 13:33:14 +0100
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <69E6DCE0-C93B-4095-B420-056E00E31FED@holtmann.org>
+References: <1383643839-2788-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jerzy,
+Hi Johan,
 
-On Tue, Nov 05, 2013, Jerzy Kasenberg wrote:
-> Chagnes in HAL interface from 4.3 to 4.4 result in build failure:
+> The SMP security request is for a slave role device to request the
+> master role device to initiate a pairing request. If we receive this
+> command while we're in the slave role we should reject it appropriately.
 > 
-> target thumb C: haltest <=
->     external/bluetooth/bluez/android/client/if-gatt.c
-> external/bluetooth/bluez/android/client/if-gatt.c:225:1:
->     error: unknown type name 'btgatt_gatt_id_t'
-> 
-> This patch allows to build GATT for Android 4.3 (api level 18).
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> 
-> I sent this patch to the mailing list primarily to allow people
-> who work on android 4.3 to be able to build GATT.
-> 
->  android/client/if-gatt.c |   27 +++++++++++++++++++++------
->  1 file changed, 21 insertions(+), 6 deletions(-)
+> net/bluetooth/smp.c | 3 +++
+> 1 file changed, 3 insertions(+)
 
-Applied. Thanks.
+patch has been applied to bluetooth-next tree.
 
-Johan
+Regards
+
+Marcel
+
