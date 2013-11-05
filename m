@@ -2,77 +2,180 @@ Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: [PATCH 6/6] android: Add support for getting adapter uuids
-Date: Tue, 5 Nov 2013 11:33:33 +0100
-Message-ID: <1383647613-14951-6-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1383647613-14951-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1383647613-14951-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 1/6] android: Initial implementation of get_remote_services
+Date: Tue, 5 Nov 2013 11:33:28 +0100
+Message-ID: <1383647613-14951-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implement get adapter uuids command. It will pack supported
-uuids to structure and send it via notification socket
+This patch implements method to retrieve remote device sdp records.
+Caching struct is implemented for adding fetched uuids to list.
+sdp_req_list will contain list of devices which are asked for records.
+Function get_remote_services will check if device is on list, and will
+start sdp procedure.
 ---
- android/adapter.c | 40 +++++++++++++++++++++++++++++++++++++---
- 1 file changed, 37 insertions(+), 3 deletions(-)
+ android/adapter.c | 111 +++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 102 insertions(+), 9 deletions(-)
 
 diff --git a/android/adapter.c b/android/adapter.c
-index 523209e..483bb1c 100644
+index 929e8cb..027af25 100644
 --- a/android/adapter.c
 +++ b/android/adapter.c
-@@ -1278,13 +1278,47 @@ static bool get_name(void)
- 	return true;
+@@ -35,6 +35,10 @@
+ #include "src/shared/mgmt.h"
+ #include "src/glib-helper.h"
+ #include "src/eir.h"
++#include "lib/sdp.h"
++#include "lib/sdp_lib.h"
++#include "lib/uuid.h"
++#include "src/sdp-client.h"
+ #include "log.h"
+ #include "hal-msg.h"
+ #include "ipc.h"
+@@ -45,6 +49,8 @@
+ #define DEFAULT_IO_CAPABILITY 0x01
+ 
+ static GIOChannel *notification_io = NULL;
++/* This list contains addresses which are asked for records */
++static GSList *sdp_req_list;
+ 
+ struct bt_adapter {
+ 	uint16_t index;
+@@ -63,6 +69,20 @@ struct bt_adapter {
+ 	bool discovering;
+ };
+ 
++struct browse_req {
++	bdaddr_t bdaddr;
++	GSList *uuids;
++	int search_uuid;
++	int reconnect_attempt;
++};
++
++static const uint16_t uuid_list[] = {
++	L2CAP_UUID,
++	PNP_INFO_SVCLASS_ID,
++	PUBLIC_BROWSE_GROUP,
++	0
++};
++
+ static struct bt_adapter *adapter;
+ static GSList *found_devices = NULL;
+ 
+@@ -257,6 +277,79 @@ static void send_bond_state_change(const bdaddr_t *addr, uint8_t status,
+ 			HAL_EV_BOND_STATE_CHANGED, sizeof(ev), &ev, -1);
  }
  
-+static void swap_uuid(const uint8_t *src, uint8_t *dst)
++static void browse_req_free(struct browse_req *req)
 +{
-+	int i;
-+
-+	for (i = 0; i < 16; i++)
-+		dst[15 - i] = src[i];
++	g_slist_free_full(req->uuids, g_free);
++	g_free(req);
 +}
 +
- static bool get_uuids(void)
- {
--	DBG("Not implemented");
-+	struct hal_ev_adapter_props_changed *ev;
-+	unsigned int i;
-+	int len;
-+	uint8_t *p;
- 
--	/* TODO: Add implementation */
-+	len = sizeof(*ev) + sizeof(struct hal_property) +
-+			NELEM(supported_services) * sizeof(uint128_t);
- 
--	return false;
-+	ev = g_malloc(len);
++static void update_records(struct browse_req *req, sdp_list_t *recs)
++{
++	/* TODO cache found uuids */
++}
 +
-+	ev->num_props = 1;
-+	ev->status = HAL_STATUS_SUCCESS;
++static void browse_cb(sdp_list_t *recs, int err, gpointer user_data)
++{
++	struct browse_req *req = user_data;
++	uuid_t uuid;
 +
-+	ev->props[0].type = HAL_PROP_ADAPTER_UUIDS;
-+	ev->props[0].len = sizeof(uint128_t) * NELEM(supported_services);
-+	p = ev->props->val;
-+
-+	for (i = 0; i < NELEM(supported_services); i++) {
-+		/* we have to swap supported uuids
-+		 * because hal expects them in reversed order
-+		 * than mgmt intrface */
-+		swap_uuid(supported_services[i].uuid, p);
-+		p += sizeof(uint128_t);
++	/* If we have a valid response and req->search_uuid == 2, then L2CAP
++	 * UUID & PNP searching was successful -- we are done */
++	if (err < 0 || req->search_uuid == 2) {
++		if (err == -ECONNRESET && req->reconnect_attempt < 1) {
++			req->search_uuid--;
++			req->reconnect_attempt++;
++		} else {
++			goto done;
++		}
 +	}
 +
-+	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
-+				HAL_EV_ADAPTER_PROPS_CHANGED, len, ev, -1);
++	update_records(req, recs);
 +
-+	g_free(ev);
++	/* Search for mandatory uuids */
++	if (uuid_list[req->search_uuid]) {
++		sdp_uuid16_create(&uuid, uuid_list[req->search_uuid++]);
++		bt_search_service(&adapter->bdaddr, &req->bdaddr, &uuid,
++						browse_cb, user_data, NULL);
++		return;
++	}
++
++done:
++	sdp_req_list = g_slist_remove(sdp_req_list, &req->bdaddr);
++	browse_req_free(req);
++}
++
++static int bdaddr_cmp(gconstpointer a, gconstpointer b)
++{
++	const bdaddr_t *bda = a;
++	const bdaddr_t *bdb = b;
++
++	return bacmp(bdb, bda);
++}
++
++static bool fetch_remote_uuids(const bdaddr_t *addr)
++{
++	struct browse_req *req;
++	uuid_t uuid;
++
++	if (g_slist_find_custom(sdp_req_list, addr, bdaddr_cmp))
++		return false;
++
++	req = g_new0(struct browse_req, 1);
++	bacpy(&req->bdaddr, addr);
++	sdp_req_list = g_slist_append(sdp_req_list, &req->bdaddr);
++	sdp_uuid16_create(&uuid, uuid_list[req->search_uuid++]);
++
++	if (bt_search_service(&adapter->bdaddr,
++			&req->bdaddr, &uuid, browse_cb, req, NULL) < 0) {
++		sdp_req_list = g_slist_remove(sdp_req_list, &req->bdaddr);
++		browse_req_free(req);
++		return false;
++	}
 +
 +	return true;
++}
++
+ static void new_link_key_callback(uint16_t index, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+@@ -445,14 +538,6 @@ static void confirm_device_name(const bdaddr_t *addr, uint8_t addr_type)
+ 		error("Failed to send confirm name request");
  }
  
- static bool get_class(void)
+-static int bdaddr_cmp(gconstpointer a, gconstpointer b)
+-{
+-	const bdaddr_t *bda = a;
+-	const bdaddr_t *bdb = b;
+-
+-	return bacmp(bdb, bda);
+-}
+-
+ static int fill_device_props(struct hal_property *prop, bdaddr_t *addr,
+ 					uint32_t cod, int8_t rssi, char *name)
+ {
+@@ -1477,7 +1562,15 @@ static uint8_t ssp_reply(void *buf, uint16_t len)
+ 
+ static uint8_t get_remote_services(void *buf, uint16_t len)
+ {
+-	return HAL_STATUS_UNSUPPORTED;
++	struct hal_cmd_get_remote_services *cmd = buf;
++	bool ret;
++	bdaddr_t addr;
++
++	android2bdaddr(&cmd->bdaddr, &addr);
++
++	ret = fetch_remote_uuids(&addr);
++
++	return ret ? HAL_STATUS_SUCCESS : HAL_STATUS_FAILED;
+ }
+ 
+ void bt_adapter_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf,
 -- 
 1.8.4.1
 
