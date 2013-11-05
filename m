@@ -1,93 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <62354.10.252.42.55.1383672518.squirrel@linux.intel.com>
-In-Reply-To: <20131105155821.GA19994@x220.p-661hnu-f1>
-References: <1383654126-19237-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-    <20131105131050.GA15228@x220.p-661hnu-f1>
-    <5278F248.9080605@linux.intel.com>
-    <20131105155821.GA19994@x220.p-661hnu-f1>
-Date: Tue, 5 Nov 2013 19:28:38 +0200 (EET)
-Subject: Re: [PATCH_v3 01/04] android/hid: Implement hid get protocol in
-     daemon
-From: ravikumar.veeramally@linux.intel.com
+From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2 1/5] adapter: Move MGMT_VERSION macro to mgmt.h
+Date: Tue,  5 Nov 2013 18:22:59 +0000
+Message-Id: <1383675779-4757-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1383661128-25029-1-git-send-email-szymon.janc@tieto.com>
+References: <1383661128-25029-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+This will be also used in Android daemon.
+---
 
-> Hi Ravi,
->
-> On Tue, Nov 05, 2013, Ravi Kumar Veeramally wrote:
->> >On Tue, Nov 05, 2013, Ravi kumar Veeramally wrote:
->> >>+static gboolean ctrl_io_watch_cb(GIOChannel *chan, gpointer data)
->> >>+{
->> >>+	struct hid_device *dev = data;
->> >>+	int fd, bread;
->> >>+	uint8_t buf[UHID_DATA_MAX];
->> >>+
->> >>+	DBG("");
->> >>+
->> >>+	fd = g_io_channel_unix_get_fd(chan);
->> >>+	bread = read(fd, buf, sizeof(buf));
->> >>+	if (bread < 0) {
->> >>+		error("read: %s(%d)", strerror(errno), -errno);
->> >>+		return TRUE;
->> >>+	}
->> >>+
->> >>+	switch (dev->last_hid_msg) {
->> >>+	case HID_MSG_GET_PROTOCOL:
->> >>+		bt_hid_notify_proto_mode(dev, buf, bread);
->> >>+		break;
->> >>+	default:
->> >>+		DBG("unhandled hid msg type 0x%02x", dev->last_hid_msg);
->> >>+	}
->> >This doesn't really make sense to me. If you only set last_hid_msg when
->> >you send a code that you do support, then why would the value of
->> >last_hid_msg ever contain a type that you do not support? (assuming you
->> >always add an entry to this switch statement in the same patch that you
->> >add a corresponding write for the type).
->> >
->> >Also, since you don't seem to be using last_hid_msg for anything else
->> >than printing this debug message, I'm wondering is there really any
->> >value for it? Previously (based on our IRC) discussion I understood
->> that
->> >it had some actual functional value that helped determine what to send
->> >to the HAL, but now I'm not seeing it anywhere in the patch. I might
->> >have missed it though (in which case please enlighten me :)
->>  I don't know if I understand you correctly, but at the end of all
->> patches
->>  it looks like this.
->>          switch (dev->last_hid_msg) {
->>         case HID_MSG_GET_PROTOCOL:
->>         case HID_MSG_SET_PROTOCOL:
->>                 bt_hid_notify_proto_mode(dev, buf, bread);
->>                 break;
->>         case HID_MSG_GET_REPORT:
->>                 bt_hid_notify_get_report(dev, buf, bread);
->>                 break;
->>         default:
->>                 DBG("unhandled hid msg type 0x%02x", dev->last_hid_msg);
->>         }
->>
->> based on last_hid_msg switch case, it will call respective function,
->> default statement is for debug purpose if we miss something from hid
->> device.
->
-> I only saw the first two case statements and didn't look deeper into the
-> patch set, sorry. In this case I do see the point of the variable and
-> you may keep it as is.
-Ok, np.
+v2: fixed missing brackets around 'v' as suggested by Marcel
 
->
-> My earlier comment about the debug statement still holds though, i.e. if
-> the default entry gets triggered last_hid_msg will not contain the
-> unknown msg type. In this case this will simply be an unexpected message
-> whose type we do not know (and if there's a debug log that's what it
-> should say).
+ src/adapter.c     | 1 -
+ src/shared/mgmt.h | 2 ++
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-I will remove the debug statement which doesn't help much.
+diff --git a/src/adapter.c b/src/adapter.c
+index 30bcc4d..d904a56 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -99,7 +99,6 @@ static GSList *adapters = NULL;
+ 
+ static struct mgmt *mgmt_master = NULL;
+ 
+-#define MGMT_VERSION(v, r) ((v << 16) + (r))
+ static uint8_t mgmt_version = 0;
+ static uint8_t mgmt_revision = 0;
+ 
+diff --git a/src/shared/mgmt.h b/src/shared/mgmt.h
+index 60a2128..e23cc7d 100644
+--- a/src/shared/mgmt.h
++++ b/src/shared/mgmt.h
+@@ -24,6 +24,8 @@
+ #include <stdbool.h>
+ #include <stdint.h>
+ 
++#define MGMT_VERSION(v, r) (((v) << 16) + (r))
++
+ typedef void (*mgmt_destroy_func_t)(void *user_data);
+ 
+ struct mgmt;
+-- 
+1.8.4.2
 
-Thanks,
-Ravi.
