@@ -1,82 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v3 02/04] android/hid: Implement hid set protocol in daemon
-Date: Tue,  5 Nov 2013 14:22:04 +0200
-Message-Id: <1383654126-19237-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1383654126-19237-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1383654126-19237-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
+Subject: Re: [PATCH] Bluetooth: Fix to set proper bdaddr_type for RFCOMM connect
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1383639342-9972-1-git-send-email-sw0312.kim@samsung.com>
+Date: Tue, 5 Nov 2013 13:07:43 +0100
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Syam Sidhardhan <s.syam@samsung.com>
+Message-Id: <B6D77945-548E-48FA-992A-02260BD3F427@holtmann.org>
+References: <FF845DCC-A87F-4B35-A9A4-0F031DC7CE0B@holtmann.org> <1383639342-9972-1-git-send-email-sw0312.kim@samsung.com>
+To: Seung-Woo Kim <sw0312.kim@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch requests hid device to set protocol mode and reads
-reply message and sends notification to hal.
----
- android/hid.c | 35 +++++++++++++++++++++++++++++++++--
- 1 file changed, 33 insertions(+), 2 deletions(-)
+Hi Seung-Woo,
 
-diff --git a/android/hid.c b/android/hid.c
-index 97835d9..d387d6d 100644
---- a/android/hid.c
-+++ b/android/hid.c
-@@ -56,6 +56,7 @@
- 
- /* HID message types */
- #define HID_MSG_GET_PROTOCOL	0x60
-+#define HID_MSG_SET_PROTOCOL	0x70
- #define HID_MSG_DATA		0xa0
- 
- /* HID protocol header parameters */
-@@ -299,6 +300,7 @@ static gboolean ctrl_io_watch_cb(GIOChannel *chan, gpointer data)
- 
- 	switch (dev->last_hid_msg) {
- 	case HID_MSG_GET_PROTOCOL:
-+	case HID_MSG_SET_PROTOCOL:
- 		bt_hid_notify_proto_mode(dev, buf, bread);
- 		break;
- 	default:
-@@ -699,9 +701,38 @@ static uint8_t bt_hid_get_protocol(struct hal_cmd_hid_get_protocol *cmd,
- static uint8_t bt_hid_set_protocol(struct hal_cmd_hid_set_protocol *cmd,
- 								uint16_t len)
- {
--	DBG("Not Implemented");
-+	struct hid_device *dev;
-+	GSList *l;
-+	bdaddr_t dst;
-+	int fd;
-+	uint8_t hdr[1];
- 
--	return HAL_STATUS_FAILED;
-+	DBG("");
-+
-+	if (len < sizeof(*cmd))
-+		return HAL_STATUS_INVALID;
-+
-+	android2bdaddr(&cmd->bdaddr, &dst);
-+
-+	l = g_slist_find_custom(devices, &dst, device_cmp);
-+	if (!l)
-+		return HAL_STATUS_FAILED;
-+
-+	dev = l->data;
-+
-+	if (dev->boot_dev)
-+		return HAL_STATUS_UNSUPPORTED;
-+
-+	hdr[0] = HID_MSG_SET_PROTOCOL | cmd->mode;
-+	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
-+
-+	if (write(fd, hdr, sizeof(hdr)) < 0) {
-+		error("error while setting device protocol");
-+		return HAL_STATUS_FAILED;
-+	}
-+
-+	dev->last_hid_msg = HID_MSG_SET_PROTOCOL;
-+	return HAL_STATUS_SUCCESS;
- }
- 
- static uint8_t bt_hid_get_report(struct hal_cmd_hid_get_report *cmd,
--- 
-1.8.1.2
+> L2CAP socket validates proper bdaddr_type for connect, so this
+> patch fixes to set explictly bdaddr_type for RFCOMM connect.
+> 
+> Signed-off-by: Seung-Woo Kim <sw0312.kim@samsung.com>
+> ---
+> net/bluetooth/rfcomm/core.c |    1 +
+> 1 files changed, 1 insertions(+), 0 deletions(-)
+
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
