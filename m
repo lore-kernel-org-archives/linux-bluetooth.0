@@ -1,37 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/5] android: Require at least 1.3 version of mgmt interface
-Date: Tue, 5 Nov 2013 15:18:45 +0100
-Message-ID: <1383661128-25029-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1383661128-25029-1-git-send-email-szymon.janc@tieto.com>
-References: <1383661128-25029-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2] android/debug: Export print uuid function
+Date: Tue,  5 Nov 2013 16:06:17 +0200
+Message-Id: <1383660378-23198-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Android daemon is not providing old kernels compatibility features.
----
- android/main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/android/main.c b/android/main.c
-index 7d36976..7ee47fc 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -608,8 +608,8 @@ static void read_version_complete(uint8_t status, uint16_t length,
- 	info("Bluetooth management interface %u.%u initialized",
- 						mgmt_version, mgmt_revision);
+The function will be reused in socket HAL.
+---
+ android/client/textconv.c |    2 +-
+ android/client/textconv.h |    1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/android/client/textconv.c b/android/client/textconv.c
+index 9a2f7e6..e6f327f 100644
+--- a/android/client/textconv.c
++++ b/android/client/textconv.c
+@@ -237,7 +237,7 @@ char *bdaddr2str(const bt_bdaddr_t *bd_addr)
+ 	return bt_bdaddr_t2str(bd_addr, bdaddr_tls_buffer);
+ }
  
--	if (mgmt_version < 1) {
--		error("Version 1.0 or later of management interface required");
-+	if (MGMT_VERSION(mgmt_version, mgmt_revision) < MGMT_VERSION(1, 3)) {
-+		error("Version 1.3 or later of management interface required");
- 		return;
- 	}
+-static char *btuuid2str(const bt_uuid_t *uuid)
++char *btuuid2str(const bt_uuid_t *uuid)
+ {
+ 	static char buf[MAX_UUID_STR_LEN];
  
+diff --git a/android/client/textconv.h b/android/client/textconv.h
+index 1c848ef..7520b04 100644
+--- a/android/client/textconv.h
++++ b/android/client/textconv.h
+@@ -109,6 +109,7 @@ void str2bt_uuid_t(const char *str, bt_uuid_t *uuid);
+ 
+ char *btproperty2str(const bt_property_t *property);
+ char *bdaddr2str(const bt_bdaddr_t *bd_addr);
++char *btuuid2str(const bt_uuid_t *uuid);
+ 
+ DECINTMAP(bt_status_t);
+ DECINTMAP(bt_state_t);
 -- 
-1.8.4.2
+1.7.10.4
 
