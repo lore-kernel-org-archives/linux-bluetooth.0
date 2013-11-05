@@ -1,108 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: [PATCHv2 4/6] android: Add supported uuids when adapter is initialized
-Date: Tue, 5 Nov 2013 14:21:38 +0100
-Message-ID: <1383657700-22313-5-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1383657700-22313-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1383657700-22313-1-git-send-email-marcin.kraglak@tieto.com>
+Message-ID: <5278F248.9080605@linux.intel.com>
+Date: Tue, 05 Nov 2013 15:27:36 +0200
+From: Ravi Kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+To: linux-bluetooth@vger.kernel.org,
+	"johan.hedberg@gmail.com >> Johan Hedberg" <johan.hedberg@gmail.com>
+Subject: Re: [PATCH_v3 01/04] android/hid: Implement hid get protocol in daemon
+References: <1383654126-19237-1-git-send-email-ravikumar.veeramally@linux.intel.com> <20131105131050.GA15228@x220.p-661hnu-f1>
+In-Reply-To: <20131105131050.GA15228@x220.p-661hnu-f1>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It will set class of device with proper service hints.
-We set it statically because we want to keep code simple.
+Hi Johan,
 
----
- android/adapter.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
+On 11/05/2013 03:10 PM, Johan Hedberg wrote:
+> Hi Ravi,
+>
+> On Tue, Nov 05, 2013, Ravi kumar Veeramally wrote:
+>> +static gboolean ctrl_io_watch_cb(GIOChannel *chan, gpointer data)
+>> +{
+>> +	struct hid_device *dev = data;
+>> +	int fd, bread;
+>> +	uint8_t buf[UHID_DATA_MAX];
+>> +
+>> +	DBG("");
+>> +
+>> +	fd = g_io_channel_unix_get_fd(chan);
+>> +	bread = read(fd, buf, sizeof(buf));
+>> +	if (bread < 0) {
+>> +		error("read: %s(%d)", strerror(errno), -errno);
+>> +		return TRUE;
+>> +	}
+>> +
+>> +	switch (dev->last_hid_msg) {
+>> +	case HID_MSG_GET_PROTOCOL:
+>> +		bt_hid_notify_proto_mode(dev, buf, bread);
+>> +		break;
+>> +	default:
+>> +		DBG("unhandled hid msg type 0x%02x", dev->last_hid_msg);
+>> +	}
+> This doesn't really make sense to me. If you only set last_hid_msg when
+> you send a code that you do support, then why would the value of
+> last_hid_msg ever contain a type that you do not support? (assuming you
+> always add an entry to this switch statement in the same patch that you
+> add a corresponding write for the type).
+>
+> Also, since you don't seem to be using last_hid_msg for anything else
+> than printing this debug message, I'm wondering is there really any
+> value for it? Previously (based on our IRC) discussion I understood that
+> it had some actual functional value that helped determine what to send
+> to the HAL, but now I'm not seeing it anywhere in the patch. I might
+> have missed it though (in which case please enlighten me :)
+  I don't know if I understand you correctly, but at the end of all patches
+  it looks like this.
+          switch (dev->last_hid_msg) {
+         case HID_MSG_GET_PROTOCOL:
+         case HID_MSG_SET_PROTOCOL:
+                 bt_hid_notify_proto_mode(dev, buf, bread);
+                 break;
+         case HID_MSG_GET_REPORT:
+                 bt_hid_notify_get_report(dev, buf, bread);
+                 break;
+         default:
+                 DBG("unhandled hid msg type 0x%02x", dev->last_hid_msg);
+         }
 
-diff --git a/android/adapter.c b/android/adapter.c
-index 0f24cac..70b9265 100644
---- a/android/adapter.c
-+++ b/android/adapter.c
-@@ -52,6 +52,29 @@ static GIOChannel *notification_io = NULL;
- /* This list contains addresses which are asked for records */
- static GSList *browse_reqs;
- 
-+/*
-+ * This is an array of supported uuids and service hints. We add them via mgmt
-+ * interface when adapter is initialized. Uuids are in reverse orded.
-+ */
-+static const struct mgmt_cp_add_uuid supported_services[] = {
-+	/* OBEX_OPP_UUID */
-+	{ .uuid = { 0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
-+			0x00, 0x10, 0x00, 0x00, 0x05, 0x11, 0x00, 0x00 },
-+	.svc_hint = 0x10 },
-+	/* HFP_AG_UUID */
-+	{ .uuid = { 0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
-+			0x00, 0x10, 0x00, 0x00, 0x1f, 0x11, 0x00, 0x00 },
-+	.svc_hint = 0x40 },
-+	/* ADVANCED_AUDIO_UUID */
-+	{ .uuid = { 0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
-+			0x00, 0x10, 0x00, 0x00, 0x0d, 0x11, 0x00, 0x00 },
-+	.svc_hint = 0x08 },
-+	/* PANU_UUID */
-+	{ .uuid = { 0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
-+			0x00, 0x10, 0x00, 0x00, 0x15, 0x11, 0x00, 0x00 },
-+	.svc_hint = 0x02 }
-+};
-+
- struct bt_adapter {
- 	uint16_t index;
- 	struct mgmt *mgmt;
-@@ -980,6 +1003,39 @@ static void load_link_keys(GSList *keys)
- 	}
- }
- 
-+static void add_uuid_complete(uint8_t status, uint16_t length,
-+				const void *param, void *user_data)
-+{
-+	if (status != MGMT_STATUS_SUCCESS) {
-+		error("Failed to add UUID: %s (0x%02x)",
-+				mgmt_errstr(status), status);
-+		return;
-+	}
-+
-+	mgmt_dev_class_changed_event(adapter->index, length, param, NULL);
-+}
-+
-+static void add_uuids(void)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < NELEM(supported_services); i++)
-+		mgmt_send(adapter->mgmt, MGMT_OP_ADD_UUID, adapter->index,
-+				sizeof(supported_services[i]),
-+				&supported_services[i], add_uuid_complete,
-+				NULL, NULL);
-+}
-+
-+static void clear_uuids(void)
-+{
-+	struct mgmt_cp_remove_uuid cp;
-+
-+	memset(&cp, 0, sizeof(cp));
-+
-+	mgmt_send(adapter->mgmt, MGMT_OP_REMOVE_UUID, adapter->index,
-+					sizeof(cp), &cp, NULL, NULL, NULL);
-+}
-+
- static void set_mode_complete(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
-@@ -995,6 +1051,9 @@ static void set_mode_complete(uint8_t status, uint16_t length,
- 	 * event handling functions here.
- 	 */
- 	new_settings_callback(adapter->index, length, param, NULL);
-+
-+	clear_uuids();
-+	add_uuids();
- }
- 
- static bool set_mode(uint16_t opcode, uint8_t mode)
--- 
-1.8.4.1
+based on last_hid_msg switch case, it will call respective function,
+default statement is for debug purpose if we miss something from hid device.
 
+Thanks,
+Ravi.
