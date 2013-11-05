@@ -1,82 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v4 02/12] android/hid: Implement hid set protocol in daemon
-Date: Tue,  5 Nov 2013 23:09:08 +0200
-Message-Id: <1383685758-3900-3-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1383685758-3900-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1383685758-3900-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 5 Nov 2013 15:58:41 -0500
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth 2013-10-30
+Message-ID: <20131105205841.GI8264@tuxdriver.com>
+References: <20131030193842.GA2271@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20131030193842.GA2271@joana>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch requests hid device to set protocol mode and reads
-reply message and sends notification to HAL.
----
- android/hid.c | 35 +++++++++++++++++++++++++++++++++--
- 1 file changed, 33 insertions(+), 2 deletions(-)
+On Wed, Oct 30, 2013 at 05:38:42PM -0200, Gustavo Padovan wrote:
+> Hi John,
+> 
+> A last fix to the 3.12. I ended forgetting to send it before, I hope we can
+> still make the way to 3.12. It is a revert and it fixes an issue with bluetooth
+> suspend/hibernate that had many bug reports. Please pull or let me know of any
+> problems. Thanks!
+> 
+> 	Gustavo
+> --
+> The following changes since commit c7515d2365a6b8a018950198ebe1f5be793cd4bb:
+> 
+>   brcmsmac: call bcma_core_pci_power_save() from non-atomic context (2013-09-26 14:02:34 -0400)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
+> 
+> for you to fetch changes up to b1a8014471b01dd862de9f91bbbff1296afac42d:
+> 
+>   Bluetooth: revert: "Bluetooth: Add missing reset_resume dev_pm_ops" (2013-10-02 16:01:49 -0300)
 
-diff --git a/android/hid.c b/android/hid.c
-index 9bfa018..dc44159 100644
---- a/android/hid.c
-+++ b/android/hid.c
-@@ -56,6 +56,7 @@
- 
- /* HID message types */
- #define HID_MSG_GET_PROTOCOL	0x60
-+#define HID_MSG_SET_PROTOCOL	0x70
- #define HID_MSG_DATA		0xa0
- 
- /* HID protocol header parameters */
-@@ -299,6 +300,7 @@ static gboolean ctrl_io_watch_cb(GIOChannel *chan, gpointer data)
- 
- 	switch (dev->last_hid_msg) {
- 	case HID_MSG_GET_PROTOCOL:
-+	case HID_MSG_SET_PROTOCOL:
- 		bt_hid_notify_proto_mode(dev, buf, bread);
- 		break;
- 	}
-@@ -697,9 +699,38 @@ static uint8_t bt_hid_get_protocol(struct hal_cmd_hid_get_protocol *cmd,
- static uint8_t bt_hid_set_protocol(struct hal_cmd_hid_set_protocol *cmd,
- 								uint16_t len)
- {
--	DBG("Not Implemented");
-+	struct hid_device *dev;
-+	GSList *l;
-+	bdaddr_t dst;
-+	int fd;
-+	uint8_t hdr;
- 
--	return HAL_STATUS_FAILED;
-+	DBG("");
-+
-+	if (len < sizeof(*cmd))
-+		return HAL_STATUS_INVALID;
-+
-+	android2bdaddr(&cmd->bdaddr, &dst);
-+
-+	l = g_slist_find_custom(devices, &dst, device_cmp);
-+	if (!l)
-+		return HAL_STATUS_FAILED;
-+
-+	dev = l->data;
-+
-+	if (dev->boot_dev)
-+		return HAL_STATUS_UNSUPPORTED;
-+
-+	hdr = HID_MSG_SET_PROTOCOL | cmd->mode;
-+	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
-+
-+	if (write(fd, &hdr, sizeof(hdr)) < 0) {
-+		error("error while setting device protocol");
-+		return HAL_STATUS_FAILED;
-+	}
-+
-+	dev->last_hid_msg = HID_MSG_SET_PROTOCOL;
-+	return HAL_STATUS_SUCCESS;
- }
- 
- static uint8_t bt_hid_get_report(struct hal_cmd_hid_get_report *cmd,
+Pulling now...
+
 -- 
-1.8.1.2
-
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
