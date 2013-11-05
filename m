@@ -2,37 +2,33 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 05/13] android/hid: Add hid event get report structure to hal msg headers
-Date: Tue,  5 Nov 2013 13:38:07 +0200
-Message-Id: <1383651495-12434-6-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 07/13] android/hid: Add missing set report parameters to ipc document
+Date: Tue,  5 Nov 2013 13:38:09 +0200
+Message-Id: <1383651495-12434-8-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1383651495-12434-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1383651495-12434-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-msg.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ android/hal-ipc-api.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 5faf852..bc7df6b 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -465,6 +465,14 @@ struct hal_ev_hid_proto_mode {
- 	uint8_t mode;
- } __attribute__((packed));
+diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+index 6b11684..48bcc45 100644
+--- a/android/hal-ipc-api.txt
++++ b/android/hal-ipc-api.txt
+@@ -552,7 +552,9 @@ Commands and responses:
  
-+#define HAL_EV_HID_GET_REPORT		0x85
-+struct hal_ev_hid_get_report {
-+	uint8_t  bdaddr[6];
-+	uint8_t  status;
-+	uint16_t len;
-+	uint8_t  data[0];
-+} __attribute__((packed));
+ 		Command parameters: Remote address (6 octets)
+ 		                    Report type (1 octet)
+-		                    ...
++		                    Report length (2 octet)
++		                    Report data (670 octet) L2CAP default MTU
 +
- #define HAL_EV_AV_CONNECTION_STATE	0x81
- struct hal_ev_av_connection_state {
- 	uint8_t state;
+ 		Response parameters: <none>
+ 
+ 		Valid report types: 0x01 = Input
 -- 
 1.8.1.2
 
