@@ -1,36 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: [PATCH 2/6] android: Fetch remote device uuids after pairing
-Date: Tue, 5 Nov 2013 11:33:29 +0100
-Message-ID: <1383647613-14951-2-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1383647613-14951-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1383647613-14951-1-git-send-email-marcin.kraglak@tieto.com>
+Date: Tue, 5 Nov 2013 12:33:31 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/daemon: Save adapter name on complete event
+Message-ID: <20131105103331.GC5001@x220.p-661hnu-f1>
+References: <1383646128-8077-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1383646128-8077-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Android framework expects list of bonded device's uuids.
-Start sdp query after setting bond state to BOND_STATE_BONBED.
----
- android/adapter.c | 2 ++
- 1 file changed, 2 insertions(+)
+Hi Andrei,
 
-diff --git a/android/adapter.c b/android/adapter.c
-index 027af25..692ffe4 100644
---- a/android/adapter.c
-+++ b/android/adapter.c
-@@ -382,6 +382,8 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
- 
- 	send_bond_state_change(&addr->bdaddr, HAL_STATUS_SUCCESS,
- 							HAL_BOND_STATE_BONDED);
-+
-+	fetch_remote_uuids(&addr->bdaddr);
- }
- 
- static void pin_code_request_callback(uint16_t index, uint16_t length,
--- 
-1.8.4.1
+On Tue, Nov 05, 2013, Andrei Emeltchenko wrote:
+> Saving adapter name was missing from set name complete event.
+> Refactor code to function and reuse it in both places where
+> name is changed.
+> ---
+>  android/adapter.c |   21 ++++++++++++++-------
+>  1 file changed, 14 insertions(+), 7 deletions(-)
 
+Applied. Thanks.
+
+Johan
