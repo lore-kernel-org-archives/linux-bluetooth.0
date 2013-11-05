@@ -1,67 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
+From: =?ks_c_5601-1987?B?sei9wr/s?= <sw0312.kim@samsung.com>
+To: 'Johan Hedberg' <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, s.syam@samsung.com,
+	sw0312.kim@samsung.com
+References: <526E5C98.8020407@samsung.com>
+ <20131101075718.GA13221@x220.p-661hnu-f1>
+In-reply-to: <20131101075718.GA13221@x220.p-661hnu-f1>
+Subject: RE: [BUG] Crash during disconnecting and removing bond from remote
+ device
+Date: Tue, 05 Nov 2013 16:29:00 +0900
+Message-id: <002c01ced9f8$b2372bc0$16a58340$%kim@samsung.com>
 MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
-Message-id: <5278A066.5020409@samsung.com>
-Date: Tue, 05 Nov 2013 16:38:14 +0900
-From: Seung-Woo Kim <sw0312.kim@samsung.com>
-Reply-to: sw0312.kim@samsung.com
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org development"
- <linux-bluetooth@vger.kernel.org>, "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, Syam Sidhardhan <s.syam@samsung.com>,
- Seung-Woo Kim <sw0312.kim@samsung.com>
-Subject: Re: [PATCH] Bluetooth: Fix RFCOMM bind fail for L2CAP sock
-References: <1383634944-4141-1-git-send-email-sw0312.kim@samsung.com>
- <CE0DCFC3-31E3-4693-9C7C-703CA43A0883@holtmann.org>
-In-reply-to: <CE0DCFC3-31E3-4693-9C7C-703CA43A0883@holtmann.org>
+Content-type: text/plain; charset=ks_c_5601-1987
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Marcel Holtmann,
+Hi Johan Hedberg,
 
-On 2013년 11월 05일 16:26, Marcel Holtmann wrote:
-> Hi Seung-Woo,
-> 
->> L2CAP socket bind checks its bdaddr type but RFCOMM kernel thread
->> does not assign proper bdaddr type for L2CAP sock. This can cause
->> that RFCOMM failure.
->>
->> Signed-off-by: Seung-Woo Kim <sw0312.kim@samsung.com>
->> ---
->> The issue is came from following commit, but it is only in bluetooth-next tree,
->> so this patch is not needed for stable tree.
->>
->> commit 80c1a2e76dbb36588facb265ab364b1302f7ef8c
->> Author: Johan Hedberg <johan.hedberg@intel.com>
->> Date:   Mon Oct 14 21:17:52 2013 +0300
->>
->>    Bluetooth: Reject invalid bdaddr types for sockets
->>
->> This patch is based on commit cca34b785a21d220176038c45071ffe842e99fd3 of
->> bluetooth-next tree.
->> ---
->> net/bluetooth/rfcomm/core.c |    2 ++
->> 1 files changed, 2 insertions(+), 0 deletions(-)
-> 
-> good catch. Patch has been applied to bluetooth-next tree.
-> 
-> You might also want to send a patch that adds the l2_bdaddr_type setting before the connect() call.
+Sorry for late response.
 
-Case of kernel_connect() in rfcomm_session_create(), it reuses
-l2_bdaddr_type used for kernel_bind(), so it works fine for me: I tested
-both incoming connection and outgoing connection cases of rfcomm.
-But if you prefer explicit setting for connect(), please let me know.
+> -----Original Message-----
+> From: Johan Hedberg [mailto:johan.hedberg@gmail.com]
+> Sent: Friday, November 01, 2013 4:57 PM
+> To: Seung-Woo Kim
+> Cc: linux-bluetooth@vger.kernel.org; s.syam@samsung.com
+> Subject: Re: [BUG] Crash during disconnecting and removing bond from
+> remote device
+> 
+> Hi Seung-Woo Kim,
+> 
+> On Mon, Oct 28, 2013, Seung-Woo Kim wrote:
+> > I used 3.10.14 with RFCOMM tty patches in 3.12-rc, and I tested
+> > disconnecting and removing a bond from remote device. and I got
+> > following crash.
+> 
+> This looks like a potentially valid issue, but you'd need to dress up the
+> fix as a proper patch (i.e. git format-patch + git send-email). It'd also
+> be good if you could confirm that the issue is reproducable with the
+> latest bluetooth-next kernel.
+
+I tried with bluetooth-next kernel and there is no issue I mentioned. But
+if you consider to apply the patch, then I will post the formatted patch.
+Please let me know if you want.
 
 Best Regards,
 - Seung-Woo Kim
 
 > 
-> Regards
-> 
-> Marcel
-> 
-> 
+> Johan
 
--- 
-Seung-Woo Kim
-Samsung Software R&D Center
---
