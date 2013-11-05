@@ -2,48 +2,31 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v4 08/12] android/hid: Handle get report notification in HAL
-Date: Tue,  5 Nov 2013 23:09:14 +0200
-Message-Id: <1383685758-3900-9-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v4 09/12] android/hid: Replace header checking magic number with defines
+Date: Tue,  5 Nov 2013 23:09:15 +0200
+Message-Id: <1383685758-3900-10-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1383685758-3900-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1383685758-3900-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-hidhost.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ android/hid.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
-index 29e3ee0..fe68fe7 100644
---- a/android/hal-hidhost.c
-+++ b/android/hal-hidhost.c
-@@ -68,6 +68,15 @@ static void handle_proto_mode(void *buf)
- 							ev->status, ev->mode);
- }
+diff --git a/android/hid.c b/android/hid.c
+index 5411922..999f5d6 100644
+--- a/android/hid.c
++++ b/android/hid.c
+@@ -200,7 +200,7 @@ static gboolean intr_io_watch_cb(GIOChannel *chan, gpointer data)
+ 	}
  
-+static void handle_get_report(void *buf)
-+{
-+	struct hal_ev_hid_get_report *ev = buf;
-+
-+	if (bt_hh_cbacks->get_report_cb)
-+		bt_hh_cbacks->get_report_cb((bt_bdaddr_t *) ev->bdaddr,
-+						ev->status, ev->data, ev->len);
-+}
-+
- /* will be called from notification thread context */
- void bt_notify_hh(uint16_t opcode, void *buf, uint16_t len)
- {
-@@ -84,6 +93,9 @@ void bt_notify_hh(uint16_t opcode, void *buf, uint16_t len)
- 	case HAL_EV_HID_PROTO_MODE:
- 		handle_proto_mode(buf);
- 		break;
-+	case HAL_EV_HID_GET_REPORT:
-+		handle_get_report(buf);
-+		break;
- 	default:
- 		DBG("Unhandled callback opcode=0x%x", opcode);
- 		break;
+ 	/* Discard non-data packets */
+-	if (bread == 0 || buf[0] != 0xA1)
++	if (bread == 0 || buf[0] != (HID_MSG_DATA | HID_DATA_TYPE_INPUT))
+ 		return TRUE;
+ 
+ 	/* send data to uHID device skipping HIDP header byte */
 -- 
 1.8.1.2
 
