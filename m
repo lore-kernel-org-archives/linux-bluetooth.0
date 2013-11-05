@@ -1,49 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
-Subject: Re: [PATCH 1/5] adapter: Move MGMT_VERSION macro to mgmt.h
+Subject: Re: [PATCH 1/2] android/debug: Export print uuid function
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1383661128-25029-1-git-send-email-szymon.janc@tieto.com>
-Date: Tue, 5 Nov 2013 17:57:18 +0100
+In-Reply-To: <1383660378-23198-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 5 Nov 2013 17:56:08 +0100
 Cc: "linux-bluetooth@vger.kernel.org development"
 	<linux-bluetooth@vger.kernel.org>
-Message-Id: <42B6D284-6653-4EB8-A133-BFB598DB5E64@holtmann.org>
-References: <1383661128-25029-1-git-send-email-szymon.janc@tieto.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+Message-Id: <C04753B6-1BA7-459F-830F-981D46C10AF3@holtmann.org>
+References: <1383660378-23198-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Andrei,
 
-> This will be also used in Android daemon.
+> The function will be reused in socket HAL.
 > ---
-> src/adapter.c     | 1 -
-> src/shared/mgmt.h | 2 ++
+> android/client/textconv.c |    2 +-
+> android/client/textconv.h |    1 +
 > 2 files changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 30bcc4d..d904a56 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -99,7 +99,6 @@ static GSList *adapters = NULL;
+> diff --git a/android/client/textconv.c b/android/client/textconv.c
+> index 9a2f7e6..e6f327f 100644
+> --- a/android/client/textconv.c
+> +++ b/android/client/textconv.c
+> @@ -237,7 +237,7 @@ char *bdaddr2str(const bt_bdaddr_t *bd_addr)
+> 	return bt_bdaddr_t2str(bd_addr, bdaddr_tls_buffer);
+> }
 > 
-> static struct mgmt *mgmt_master = NULL;
+> -static char *btuuid2str(const bt_uuid_t *uuid)
+> +char *btuuid2str(const bt_uuid_t *uuid)
+> {
+> 	static char buf[MAX_UUID_STR_LEN];
 > 
-> -#define MGMT_VERSION(v, r) ((v << 16) + (r))
-> static uint8_t mgmt_version = 0;
-> static uint8_t mgmt_revision = 0;
+> diff --git a/android/client/textconv.h b/android/client/textconv.h
+> index 1c848ef..7520b04 100644
+> --- a/android/client/textconv.h
+> +++ b/android/client/textconv.h
+> @@ -109,6 +109,7 @@ void str2bt_uuid_t(const char *str, bt_uuid_t *uuid);
 > 
-> diff --git a/src/shared/mgmt.h b/src/shared/mgmt.h
-> index 60a2128..99ea96f 100644
-> --- a/src/shared/mgmt.h
-> +++ b/src/shared/mgmt.h
-> @@ -24,6 +24,8 @@
-> #include <stdbool.h>
-> #include <stdint.h>
-> 
-> +#define MGMT_VERSION(v, r) ((v << 16) + (r))
+> char *btproperty2str(const bt_property_t *property);
+> char *bdaddr2str(const bt_bdaddr_t *bd_addr);
+> +char *btuuid2str(const bt_uuid_t *uuid);
 
-you also need (v) here.
+this is totally backwards then. The HAL should not depend on client code.
 
 Regards
 
