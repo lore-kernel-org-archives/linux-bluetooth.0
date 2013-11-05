@@ -1,45 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] android/debug: Export print uuid function
-Date: Tue,  5 Nov 2013 16:06:17 +0200
-Message-Id: <1383660378-23198-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/2] android/hal: Add UUID debug print in socket HAL
+Date: Tue,  5 Nov 2013 16:06:18 +0200
+Message-Id: <1383660378-23198-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1383660378-23198-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1383660378-23198-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-The function will be reused in socket HAL.
 ---
- android/client/textconv.c |    2 +-
- android/client/textconv.h |    1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ android/hal-sock.c |   18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/android/client/textconv.c b/android/client/textconv.c
-index 9a2f7e6..e6f327f 100644
---- a/android/client/textconv.c
-+++ b/android/client/textconv.c
-@@ -237,7 +237,7 @@ char *bdaddr2str(const bt_bdaddr_t *bd_addr)
- 	return bt_bdaddr_t2str(bd_addr, bdaddr_tls_buffer);
- }
+diff --git a/android/hal-sock.c b/android/hal-sock.c
+index 131877a..5e64409 100644
+--- a/android/hal-sock.c
++++ b/android/hal-sock.c
+@@ -25,6 +25,8 @@
+ #include "hal-msg.h"
+ #include "hal.h"
  
--static char *btuuid2str(const bt_uuid_t *uuid)
-+char *btuuid2str(const bt_uuid_t *uuid)
++#include "client/textconv.h"
++
+ static bt_status_t sock_listen_rfcomm(const char *service_name,
+ 					const uint8_t *uuid, int chan,
+ 					int *sock, int flags)
+@@ -49,13 +51,14 @@ static bt_status_t sock_listen(btsock_type_t type, const char *service_name,
+ 					int *sock, int flags)
  {
- 	static char buf[MAX_UUID_STR_LEN];
+ 	if ((!uuid && chan <= 0) || !sock) {
+-		error("%s: invalid params: uuid %p, chan %d, sock %p",
+-						__func__, uuid, chan, sock);
++		error("Invalid params: uuid %s, chan %d, sock %p",
++				btuuid2str((bt_uuid_t *) uuid), chan, sock);
+ 		return BT_STATUS_PARM_INVALID;
+ 	}
  
-diff --git a/android/client/textconv.h b/android/client/textconv.h
-index 1c848ef..7520b04 100644
---- a/android/client/textconv.h
-+++ b/android/client/textconv.h
-@@ -109,6 +109,7 @@ void str2bt_uuid_t(const char *str, bt_uuid_t *uuid);
+-	DBG("uuid %p chan %d sock %p type %d service_name %s",
+-					uuid, chan, sock, type, service_name);
++	DBG("uuid %s chan %d sock %p type %d service_name %s",
++				btuuid2str((bt_uuid_t *) uuid), chan,
++				sock, type, service_name);
  
- char *btproperty2str(const bt_property_t *property);
- char *bdaddr2str(const bt_bdaddr_t *bd_addr);
-+char *btuuid2str(const bt_uuid_t *uuid);
+ 	switch (type) {
+ 	case BTSOCK_RFCOMM:
+@@ -76,12 +79,13 @@ static bt_status_t sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
+ 	struct hal_op_sock_connect cmd;
  
- DECINTMAP(bt_status_t);
- DECINTMAP(bt_state_t);
+ 	if ((!uuid && chan <= 0) || !bdaddr || !sock) {
+-		error("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
+-					bdaddr, uuid, chan, sock);
++		error("Invalid params: bd_addr %p, uuid %s, chan %d, sock %p",
++			bdaddr, btuuid2str((bt_uuid_t *) uuid), chan, sock);
+ 		return BT_STATUS_PARM_INVALID;
+ 	}
+ 
+-	DBG("uuid %p chan %d sock %p type %d", uuid, chan, sock, type);
++	DBG("uuid %s chan %d sock %p type %d", btuuid2str((bt_uuid_t *) uuid),
++							chan, sock, type);
+ 
+ 	cmd.flags = flags;
+ 	cmd.type = type;
 -- 
 1.7.10.4
 
