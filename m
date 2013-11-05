@@ -1,48 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android: Suppress compiler warnings not enabled by autotools build
-Date: Tue, 5 Nov 2013 11:50:13 +0100
-Message-ID: <1383648613-21352-1-git-send-email-szymon.janc@tieto.com>
+CC: Marcin Kraglak <marcin.kraglak@tieto.com>
+Subject: [PATCH 3/6] android: Pass found uuids to remote_device_properties_cb
+Date: Tue, 5 Nov 2013 11:33:30 +0100
+Message-ID: <1383647613-14951-3-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1383647613-14951-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1383647613-14951-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-missing-field-initializers warning is not enabled on autotools build.
-Current code rely on implicit fields intializations resulting in flood
-of bogus compiler warnings while building for Android.
-
-monitor/packet.c:348:2: warning: missing initializer
-    [-Wmissing-field-initializers]
-monitor/packet.c:348:2: warning: (near initialization for
-    'error2str_table[64].error') [-Wmissing-field-initializers]
-monitor/packet.c:542:2: warning: missing initializer
-    [-Wmissing-field-initializers]
-monitor/packet.c:542:2: warning: (near initialization for
-    'svc_class_table[8].bit') [-Wmissing-field-initializers]
-monitor/packet.c:557:2: warning: missing initializer
-    [-Wmissing-field-initializers]
-monitor/packet.c:557:2: warning: (near initialization for
-    'major_class_computer_table[8].val') [-Wmissing-field-initializers]
+Send remote device's uuids in remote_device_properties_cb.
+This patch will pack found uuids to buffer containing property
+with list of uuids and send it to notification socket.
 ---
- android/Android.mk | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/adapter.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 81 insertions(+), 1 deletion(-)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 86af7b6..d76dfaf 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -11,7 +11,7 @@ BLUEZ_COMMON_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\" \
- 	-DPLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
+diff --git a/android/adapter.c b/android/adapter.c
+index 692ffe4..64f0192 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -283,9 +283,87 @@ static void browse_req_free(struct browse_req *req)
+ 	g_free(req);
+ }
  
- # Disable warnings enabled by Android but not enabled in autotools build
--BLUEZ_COMMON_CFLAGS += -Wno-pointer-arith
-+BLUEZ_COMMON_CFLAGS += -Wno-pointer-arith -Wno-missing-field-initializers
++static void fill_uuids(GSList *list, void *buf)
++{
++	for (; list; list = g_slist_next(list)) {
++		memcpy(buf, list->data, sizeof(uint128_t));
++		buf += sizeof(uint128_t);
++	}
++}
++
++static void remote_uuids_callback(struct browse_req *req)
++{
++	struct hal_ev_remote_device_props *ev;
++	int len;
++
++	len = sizeof(*ev) + sizeof(struct hal_property) + (sizeof(uint128_t) *
++						g_slist_length(req->uuids));
++	ev = g_malloc(len);
++
++	ev->status = HAL_STATUS_SUCCESS;
++	bdaddr2android(&req->bdaddr, &ev->bdaddr);
++	ev->num_props = 1;
++	ev->props[0].type = HAL_PROP_DEVICE_UUIDS;
++	ev->props[0].len = sizeof(uint128_t) * g_slist_length(req->uuids);
++	fill_uuids(req->uuids, ev->props[0].val);
++
++	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
++				HAL_EV_REMOTE_DEVICE_PROPS, len, ev, -1);
++
++	g_free(ev);
++}
++
++static int uuid_128_cmp(gconstpointer a, gconstpointer b)
++{
++	return memcmp(a, b, sizeof(uint128_t));
++}
++
+ static void update_records(struct browse_req *req, sdp_list_t *recs)
+ {
+-	/* TODO cache found uuids */
++	for (; recs; recs = recs->next) {
++		sdp_record_t *rec = (sdp_record_t *) recs->data;
++		sdp_list_t *svcclass = NULL;
++		uuid_t uuid128;
++		uuid_t *tmp;
++		uint8_t *new_uuid;
++
++		if (!rec)
++			break;
++
++		if (sdp_get_service_classes(rec, &svcclass) < 0)
++			continue;
++
++		if (!svcclass)
++			continue;
++
++		tmp = svcclass->data;
++
++		switch (tmp->type) {
++		case SDP_UUID16:
++			sdp_uuid16_to_uuid128(&uuid128, tmp);
++			break;
++		case SDP_UUID32:
++			sdp_uuid32_to_uuid128(&uuid128, tmp);
++			break;
++		case SDP_UUID128:
++			memcpy(&uuid128, tmp, sizeof(uuid_t));
++			break;
++		default:
++			continue;
++		}
++
++		new_uuid = g_malloc(16);/* size of 128 bit uuid */
++		memcpy(new_uuid, &uuid128.value.uuid128,
++				sizeof(uuid128.value.uuid128));
++
++		/* Check if uuid is already added */
++		if (g_slist_find_custom(req->uuids, new_uuid, uuid_128_cmp))
++			g_free(new_uuid);
++		else
++			req->uuids = g_slist_append(req->uuids, new_uuid);
++
++		sdp_list_free(svcclass, free);
++	}
+ }
  
- #
- # Android BlueZ daemon (bluetoothd)
+ static void browse_cb(sdp_list_t *recs, int err, gpointer user_data)
+@@ -315,6 +393,8 @@ static void browse_cb(sdp_list_t *recs, int err, gpointer user_data)
+ 	}
+ 
+ done:
++	remote_uuids_callback(req);
++
+ 	sdp_req_list = g_slist_remove(sdp_req_list, &req->bdaddr);
+ 	browse_req_free(req);
+ }
 -- 
 1.8.4.1
 
