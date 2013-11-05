@@ -1,82 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android: Add Android Makefile for btmon
-Date: Tue,  5 Nov 2013 11:46:52 +0200
-Message-Id: <1383644812-24537-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Seung-Woo Kim <sw0312.kim@samsung.com>
+To: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
+Cc: marcel@holtmann.org, gustavo@padovan.org, sw0312.kim@samsung.com,
+ s.syam@samsung.com
+Subject: [PATCH] net: bluetooth: fix crash in l2cap_chan_send after
+ l2cap_chan_del
+Date: Tue, 05 Nov 2013 18:46:33 +0900
+Message-id: <1383644793-30553-1-git-send-email-sw0312.kim@samsung.com>
+In-reply-to: <20131101075718.GA13221@x220.p-661hnu-f1>
+References: <20131101075718.GA13221@x220.p-661hnu-f1>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Removing a bond and disconnecting from a specific remote device
+can cause l2cap_chan_send() is called after l2cap_chan_del() is
+called. This causes following crash.
 
-Build btmon for Android image. btmon requires fresh bionic to build.
+[ 1384.972086] Unable to handle kernel NULL pointer dereference at virtual address 00000008
+[ 1384.972090] pgd = c0004000
+[ 1384.972125] [00000008] *pgd=00000000
+[ 1384.972137] Internal error: Oops: 17 [#1] PREEMPT SMP ARM
+[ 1384.972144] Modules linked in:
+[ 1384.972156] CPU: 0 PID: 841 Comm: krfcommd Not tainted 3.10.14-gdf22a71-dirty #435
+[ 1384.972162] task: df29a100 ti: df178000 task.ti: df178000
+[ 1384.972182] PC is at l2cap_create_basic_pdu+0x30/0x1ac
+[ 1384.972191] LR is at l2cap_chan_send+0x100/0x1d4
+[ 1384.972198] pc : [<c051d250>]    lr : [<c0521c78>]    psr: 40000113
+[ 1384.972198] sp : df179d40  ip : c083a010  fp : 00000008
+[ 1384.972202] r10: 00000004  r9 : 0000065a  r8 : 000003f5
+[ 1384.972206] r7 : 00000000  r6 : 00000000  r5 : df179e84  r4 : da557000
+[ 1384.972210] r3 : 00000000  r2 : 00000004  r1 : df179e84  r0 : 00000000
+[ 1384.972215] Flags: nZcv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment kernel
+[ 1384.972220] Control: 10c53c7d  Table: 5c8b004a  DAC: 00000015
+[ 1384.972224] Process krfcommd (pid: 841, stack limit = 0xdf178238)
+[ 1384.972229] Stack: (0xdf179d40 to 0xdf17a000)
+[ 1384.972238] 9d40: 00000000 da557000 00000004 df179e84 00000004 000003f5 0000065a 00000000
+[ 1384.972245] 9d60: 00000008 c0521c78 df179e84 da557000 00000004 da557204 de0c6800 df179e84
+[ 1384.972253] 9d80: da557000 00000004 da557204 c0526b7c 00000004 df724000 df179e84 00000004
+[ 1384.972260] 9da0: df179db0 df29a100 c083bc48 c045481c 00000001 00000000 00000000 00000000
+[ 1384.972267] 9dc0: 00000000 df29a100 00000000 00000000 00000000 00000000 df179e10 00000000
+[ 1384.972274] 9de0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+[ 1384.972281] 9e00: 00000000 00000000 00000000 00000000 df179e4c c000ec80 c0b538c0 00000004
+[ 1384.972288] 9e20: df724000 df178000 00000000 df179e84 c0b538c0 00000000 df178000 c07f4570
+[ 1384.972295] 9e40: dcad9c00 df179e74 c07f4394 df179e60 df178000 00000000 df179e84 de247010
+[ 1384.972303] 9e60: 00000043 c0454dec 00000001 00000004 df315c00 c0530598 00000004 df315c0c
+[ 1384.972310] 9e80: ffffc32c 00000000 00000000 df179ea0 00000001 00000000 00000000 00000000
+[ 1384.972317] 9ea0: df179ebc 00000004 df315c00 c05df838 00000000 c0530810 c07d08c0 d7017303
+[ 1384.972325] 9ec0: 6ec245b9 00000000 df315c00 c0531b04 c07f3fe0 c07f4018 da67a300 df315c00
+[ 1384.972332] 9ee0: 00000000 c05334e0 df315c00 df315b80 df315c00 de0c6800 da67a300 00000000
+[ 1384.972339] 9f00: de0c684c c0533674 df204100 df315c00 df315c00 df204100 df315c00 c082b138
+[ 1384.972347] 9f20: c053385c c0533754 a0000113 df178000 00000001 c083bc48 00000000 c053385c
+[ 1384.972354] 9f40: 00000000 00000000 00000000 c05338c4 00000000 df9f0000 df9f5ee4 df179f6c
+[ 1384.972360] 9f60: df178000 c0049db4 00000000 00000000 c07f3ff8 00000000 00000000 00000000
+[ 1384.972368] 9f80: df179f80 df179f80 00000000 00000000 df179f90 df179f90 df9f5ee4 c0049cfc
+[ 1384.972374] 9fa0: 00000000 00000000 00000000 c000f168 00000000 00000000 00000000 00000000
+[ 1384.972381] 9fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+[ 1384.972388] 9fe0: 00000000 00000000 00000000 00000000 00000013 00000000 00010000 00000600
+[ 1384.972411] [<c051d250>] (l2cap_create_basic_pdu+0x30/0x1ac) from [<c0521c78>] (l2cap_chan_send+0x100/0x1d4)
+[ 1384.972425] [<c0521c78>] (l2cap_chan_send+0x100/0x1d4) from [<c0526b7c>] (l2cap_sock_sendmsg+0xa8/0x104)
+[ 1384.972440] [<c0526b7c>] (l2cap_sock_sendmsg+0xa8/0x104) from [<c045481c>] (sock_sendmsg+0xac/0xcc)
+[ 1384.972453] [<c045481c>] (sock_sendmsg+0xac/0xcc) from [<c0454dec>] (kernel_sendmsg+0x2c/0x34)
+[ 1384.972469] [<c0454dec>] (kernel_sendmsg+0x2c/0x34) from [<c0530598>] (rfcomm_send_frame+0x58/0x7c)
+[ 1384.972481] [<c0530598>] (rfcomm_send_frame+0x58/0x7c) from [<c0530810>] (rfcomm_send_ua+0x98/0xbc)
+[ 1384.972494] [<c0530810>] (rfcomm_send_ua+0x98/0xbc) from [<c0531b04>] (rfcomm_recv_disc+0xac/0x100)
+[ 1384.972506] [<c0531b04>] (rfcomm_recv_disc+0xac/0x100) from [<c05334e0>] (rfcomm_recv_frame+0x144/0x264)
+[ 1384.972519] [<c05334e0>] (rfcomm_recv_frame+0x144/0x264) from [<c0533674>] (rfcomm_process_rx+0x74/0xfc)
+[ 1384.972531] [<c0533674>] (rfcomm_process_rx+0x74/0xfc) from [<c0533754>] (rfcomm_process_sessions+0x58/0x160)
+[ 1384.972543] [<c0533754>] (rfcomm_process_sessions+0x58/0x160) from [<c05338c4>] (rfcomm_run+0x68/0x110)
+[ 1384.972558] [<c05338c4>] (rfcomm_run+0x68/0x110) from [<c0049db4>] (kthread+0xb8/0xbc)
+[ 1384.972576] [<c0049db4>] (kthread+0xb8/0xbc) from [<c000f168>] (ret_from_fork+0x14/0x2c)
+[ 1384.972586] Code: e3100004 e1a07003 e5946000 1a000057 (e5969008)
+[ 1384.972614] ---[ end trace 6170b7ce00144e8c ]---
+
+Signed-off-by: Seung-Woo Kim <sw0312.kim@samsung.com>
 ---
- android/Android.mk |   55 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 55 insertions(+)
+I can reproduce this crash with bluetooth-next kernel merged onto my v3.10
+system. It is usually happens when the device is at sleep state and remote
+device disconnects and removes bonding.
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 77fd5a0..86af7b6 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -145,3 +145,58 @@ LOCAL_MODULE_TAGS := optional
- LOCAL_MODULE := haltest
+This patch is based on bluetooth-next tree.
+---
+ net/bluetooth/l2cap_core.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 0cef677..4af3821 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2439,6 +2439,9 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+ 	int err;
+ 	struct sk_buff_head seg_queue;
  
- include $(BUILD_EXECUTABLE)
++	if (!chan->conn)
++		return -ENOTCONN;
 +
-+#
-+# btmon
-+#
-+
-+include $(CLEAR_VARS)
-+
-+LOCAL_SRC_FILES := \
-+	../monitor/main.c \
-+	../monitor/bt.h \
-+	../monitor/mainloop.h \
-+	../monitor/mainloop.c \
-+	../monitor/display.h \
-+	../monitor/display.c \
-+	../monitor/hcidump.h \
-+	../monitor/hcidump.c \
-+	../monitor/btsnoop.h \
-+	../monitor/btsnoop.c \
-+	../monitor/control.h \
-+	../monitor/control.c \
-+	../monitor/packet.h \
-+	../monitor/packet.c \
-+	../monitor/l2cap.h \
-+	../monitor/l2cap.c \
-+	../monitor/uuid.h \
-+	../monitor/uuid.c \
-+	../monitor/sdp.h \
-+	../monitor/sdp.c \
-+	../monitor/vendor.h \
-+	../monitor/vendor.c \
-+	../monitor/lmp.h \
-+	../monitor/lmp.c \
-+	../monitor/crc.h \
-+	../monitor/crc.c \
-+	../monitor/ll.h \
-+	../monitor/ll.c \
-+	../lib/hci.c \
-+	../lib/bluetooth.c \
-+
-+LOCAL_C_INCLUDES := \
-+	$(LOCAL_PATH)/.. \
-+	$(LOCAL_PATH)/../lib \
-+	$(LOCAL_PATH)/../src/shared \
-+
-+LOCAL_C_INCLUDES += \
-+	$(call include-path-for, glib) \
-+	$(call include-path-for, glib)/glib \
-+
-+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
-+
-+LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
-+LOCAL_MODULE_TAGS := eng
-+LOCAL_MODULE := btmon
-+
-+include $(BUILD_EXECUTABLE)
+ 	/* Connectionless channel */
+ 	if (chan->chan_type == L2CAP_CHAN_CONN_LESS) {
+ 		skb = l2cap_create_connless_pdu(chan, msg, len, priority);
 -- 
-1.7.10.4
-
+1.7.4.1
