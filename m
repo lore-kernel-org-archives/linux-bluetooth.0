@@ -2,172 +2,45 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v4 01/12] android/hid: Implement hid get protocol in daemon
-Date: Tue,  5 Nov 2013 23:09:07 +0200
-Message-Id: <1383685758-3900-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1383685758-3900-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1383685758-3900-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v4 00/12] Implemented hid interfaces in daemon and HAL
+Date: Tue,  5 Nov 2013 23:09:06 +0200
+Message-Id: <1383685758-3900-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch requests hid device protocol mode and reads reply
-message and sends notification to HAL.
----
- android/hid.c | 106 +++++++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 102 insertions(+), 4 deletions(-)
+v4: Fixed Johan's comments (length issue and single byte array)
 
-diff --git a/android/hid.c b/android/hid.c
-index 8f5ba88..9bfa018 100644
---- a/android/hid.c
-+++ b/android/hid.c
-@@ -54,6 +54,14 @@
- #define L2CAP_PSM_HIDP_INTR	0x13
- #define UHID_DEVICE_FILE	"/dev/uhid"
- 
-+/* HID message types */
-+#define HID_MSG_GET_PROTOCOL	0x60
-+#define HID_MSG_DATA		0xa0
-+
-+/* HID protocol header parameters */
-+#define HID_PROTO_BOOT		0x00
-+#define HID_PROTO_REPORT	0x01
-+
- static GIOChannel *notification_io = NULL;
- static GIOChannel *ctrl_io = NULL;
- static GIOChannel *intr_io = NULL;
-@@ -76,6 +84,7 @@ struct hid_device {
- 	guint		intr_watch;
- 	int		uhid_fd;
- 	guint		uhid_watch_id;
-+	uint8_t		last_hid_msg;
- };
- 
- static int device_cmp(gconstpointer s, gconstpointer user_data)
-@@ -243,12 +252,72 @@ static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond,
- 	return FALSE;
- }
- 
-+static void bt_hid_notify_proto_mode(struct hid_device *dev, uint8_t *buf,
-+									int len)
-+{
-+	struct hal_ev_hid_proto_mode ev;
-+	char address[18];
-+
-+	ba2str(&dev->dst, address);
-+	DBG("device %s", address);
-+
-+	memset(&ev, 0, sizeof(ev));
-+	bdaddr2android(&dev->dst, ev.bdaddr);
-+
-+	if (buf[0] == HID_MSG_DATA) {
-+		ev.status = HAL_HID_STATUS_OK;
-+		if (buf[1] == HID_PROTO_REPORT)
-+			ev.mode = HAL_HID_REPORT_PROTOCOL;
-+		else if (buf[1] == HID_PROTO_BOOT)
-+			ev.mode = HAL_HID_BOOT_PROTOCOL;
-+		else
-+			ev.mode = HAL_HID_UNSUPPORTED_PROTOCOL;
-+
-+	} else {
-+		ev.status = buf[0];
-+		ev.mode = HAL_HID_UNSUPPORTED_PROTOCOL;
-+	}
-+
-+	ipc_send(notification_io, HAL_SERVICE_ID_HIDHOST,
-+				HAL_EV_HID_PROTO_MODE, sizeof(ev), &ev, -1);
-+}
-+
-+static gboolean ctrl_io_watch_cb(GIOChannel *chan, gpointer data)
-+{
-+	struct hid_device *dev = data;
-+	int fd, bread;
-+	uint8_t buf[UHID_DATA_MAX];
-+
-+	DBG("");
-+
-+	fd = g_io_channel_unix_get_fd(chan);
-+	bread = read(fd, buf, sizeof(buf));
-+	if (bread < 0) {
-+		error("read: %s(%d)", strerror(errno), -errno);
-+		return TRUE;
-+	}
-+
-+	switch (dev->last_hid_msg) {
-+	case HID_MSG_GET_PROTOCOL:
-+		bt_hid_notify_proto_mode(dev, buf, bread);
-+		break;
-+	}
-+
-+	/* reset msg type request */
-+	dev->last_hid_msg = 0;
-+
-+	return TRUE;
-+}
-+
- static gboolean ctrl_watch_cb(GIOChannel *chan, GIOCondition cond,
- 								gpointer data)
- {
- 	struct hid_device *dev = data;
- 	char address[18];
- 
-+	if (cond & G_IO_IN)
-+		return ctrl_io_watch_cb(chan, data);
-+
- 	ba2str(&dev->dst, address);
- 	bt_hid_notify_state(dev, HAL_HID_STATE_DISCONNECTED);
- 
-@@ -395,8 +464,8 @@ static void control_connect_cb(GIOChannel *chan, GError *conn_err,
- 	}
- 
- 	dev->ctrl_watch = g_io_add_watch(dev->ctrl_io,
--					G_IO_HUP | G_IO_ERR | G_IO_NVAL,
--					ctrl_watch_cb, dev);
-+				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+				ctrl_watch_cb, dev);
- 
- 	return;
- 
-@@ -591,9 +660,38 @@ static uint8_t bt_hid_info(struct hal_cmd_hid_set_info *cmd, uint16_t len)
- static uint8_t bt_hid_get_protocol(struct hal_cmd_hid_get_protocol *cmd,
- 								uint16_t len)
- {
--	DBG("Not Implemented");
-+	struct hid_device *dev;
-+	GSList *l;
-+	bdaddr_t dst;
-+	int fd;
-+	uint8_t hdr;
- 
--	return HAL_STATUS_FAILED;
-+	DBG("");
-+
-+	if (len < sizeof(*cmd))
-+		return HAL_STATUS_INVALID;
-+
-+	android2bdaddr(&cmd->bdaddr, &dst);
-+
-+	l = g_slist_find_custom(devices, &dst, device_cmp);
-+	if (!l)
-+		return HAL_STATUS_FAILED;
-+
-+	dev = l->data;
-+
-+	if (dev->boot_dev)
-+		return HAL_STATUS_UNSUPPORTED;
-+
-+	hdr = HID_MSG_GET_PROTOCOL | cmd->mode;
-+	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
-+
-+	if (write(fd, &hdr, sizeof(hdr)) < 0) {
-+		error("error while querying device protocol");
-+		return HAL_STATUS_FAILED;
-+	}
-+
-+	dev->last_hid_msg = HID_MSG_GET_PROTOCOL;
-+	return HAL_STATUS_SUCCESS;
- }
- 
- static uint8_t bt_hid_set_protocol(struct hal_cmd_hid_set_protocol *cmd,
+v3: Wrong order of patches
+
+v2: Fixed Johan's comments (splitting of patches, proper function and
+    struct names, update hal-msg.h and ipc document, alignment issues
+    removed pointer from ipc struct)
+
+v1: This patch set implements get/set protocol and get/set report
+    interfaces and supported functionality in daemon. Sending notifications
+    and notification handling in hal. Few naming fixes and error handling.
+    And last handling of few uHID events.
+
+Ravi kumar Veeramally (12):
+  android/hid: Implement hid get protocol in daemon
+  android/hid: Implement hid set protocol in daemon
+  android/hid: Handle protocol mode notification in HAL
+  android/hid: Add hid event get report structure to HAL msg headers
+  android/hid: Implement hid get report in daemon
+  android/hid: Add missing set report parameters to ipc document
+  android/hid: Implement hid set report in daemon
+  android/hid: Handle get report notification in HAL
+  android/hid: Replace header checking magic number with defines
+  android/hid: Handle invalid parameters in HAL
+  android/hid: Handle uhid events
+  android/hid: Align hal hid struct variables properly
+
+ android/hal-hidhost.c   |  41 +++++-
+ android/hal-ipc-api.txt |   4 +-
+ android/hal-msg.h       |  32 +++--
+ android/hid.c           | 325 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 4 files changed, 372 insertions(+), 30 deletions(-)
+
 -- 
 1.8.1.2
 
