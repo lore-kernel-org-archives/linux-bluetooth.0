@@ -1,69 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] android/hal: Add UUID debug print in socket HAL
-Date: Tue,  5 Nov 2013 16:06:18 +0200
-Message-Id: <1383660378-23198-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1383660378-23198-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1383660378-23198-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <5278F8C2.8070608@linux.intel.com>
+Date: Tue, 05 Nov 2013 15:55:14 +0200
+From: Ravi Kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH_v3 03/04] android/hid: Implement hid get report in daemon
+References: <1383654126-19237-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1383654126-19237-3-git-send-email-ravikumar.veeramally@linux.intel.com> <20131105131606.GC15228@x220.p-661hnu-f1>
+In-Reply-To: <20131105131606.GC15228@x220.p-661hnu-f1>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
----
- android/hal-sock.c |   18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+On 11/05/2013 03:16 PM, Johan Hedberg wrote:
+> Hi Ravi,
+>
+> On Tue, Nov 05, 2013, Ravi kumar Veeramally wrote:
+>> +	if (!((buf[0] == (HID_MSG_DATA | HID_DATA_TYPE_INPUT)) ||
+>> +			(buf[0] == (HID_MSG_DATA | HID_DATA_TYPE_OUTPUT)) ||
+>> +			(buf[0]	== (HID_MSG_DATA | HID_DATA_TYPE_FEATURE)))) {
+>> +		ev = g_malloc(len);
+>> +		memset(ev, 0, ev_len);
+> Is it intentional that you allocate a different length than what you
+> memset to 0 here? If they should be the same just use g_malloc0, and if
+> not a code comment might be in order (to explain what the actual
+> intention is).
+  Ok, type, it should be ev_len.
+>> +	ev = g_malloc(ev_len);
+>> +	memset(ev, 0, ev_len);
+> Here g_malloc0 makes more sense.
+>
+>> +	ev->status = HAL_HID_STATUS_OK;
+>> +	bdaddr2android(&dev->dst, ev->bdaddr);
+>> +
+>> +	/* Report porotocol mode reply contains id after hdr, in boot
+>> +	 * protocol mode id doesn't exist */
+>> +	if (dev->boot_dev) {
+>> +		ev->len = len - 1;
+>> +		memcpy(ev->data, buf + 1, ev->len);
+>> +	} else {
+>> +		ev->len = len - 2;
+>> +		memcpy(ev->data, buf + 2, ev->len);
+>> +	}
+>> +
+>> +send:
+>> +	ipc_send(notification_io, HAL_SERVICE_ID_HIDHOST, HAL_EV_HID_GET_REPORT,
+>> +						ev_len, ev, -1);
+> This doesn't look right for your first allocation (you claim that the
+> length of ev is ev_len, but in fact you allocated len amount of bytes.
+  Ok. I will fix it.
 
-diff --git a/android/hal-sock.c b/android/hal-sock.c
-index 131877a..5e64409 100644
---- a/android/hal-sock.c
-+++ b/android/hal-sock.c
-@@ -25,6 +25,8 @@
- #include "hal-msg.h"
- #include "hal.h"
- 
-+#include "client/textconv.h"
-+
- static bt_status_t sock_listen_rfcomm(const char *service_name,
- 					const uint8_t *uuid, int chan,
- 					int *sock, int flags)
-@@ -49,13 +51,14 @@ static bt_status_t sock_listen(btsock_type_t type, const char *service_name,
- 					int *sock, int flags)
- {
- 	if ((!uuid && chan <= 0) || !sock) {
--		error("%s: invalid params: uuid %p, chan %d, sock %p",
--						__func__, uuid, chan, sock);
-+		error("Invalid params: uuid %s, chan %d, sock %p",
-+				btuuid2str((bt_uuid_t *) uuid), chan, sock);
- 		return BT_STATUS_PARM_INVALID;
- 	}
- 
--	DBG("uuid %p chan %d sock %p type %d service_name %s",
--					uuid, chan, sock, type, service_name);
-+	DBG("uuid %s chan %d sock %p type %d service_name %s",
-+				btuuid2str((bt_uuid_t *) uuid), chan,
-+				sock, type, service_name);
- 
- 	switch (type) {
- 	case BTSOCK_RFCOMM:
-@@ -76,12 +79,13 @@ static bt_status_t sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
- 	struct hal_op_sock_connect cmd;
- 
- 	if ((!uuid && chan <= 0) || !bdaddr || !sock) {
--		error("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
--					bdaddr, uuid, chan, sock);
-+		error("Invalid params: bd_addr %p, uuid %s, chan %d, sock %p",
-+			bdaddr, btuuid2str((bt_uuid_t *) uuid), chan, sock);
- 		return BT_STATUS_PARM_INVALID;
- 	}
- 
--	DBG("uuid %p chan %d sock %p type %d", uuid, chan, sock, type);
-+	DBG("uuid %s chan %d sock %p type %d", btuuid2str((bt_uuid_t *) uuid),
-+							chan, sock, type);
- 
- 	cmd.flags = flags;
- 	cmd.type = type;
--- 
-1.7.10.4
-
+Thanks,
+Ravi.
