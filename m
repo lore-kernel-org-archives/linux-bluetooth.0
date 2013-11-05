@@ -2,126 +2,135 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v3 03/04] android/hid: Implement hid get report in daemon
-Date: Tue,  5 Nov 2013 14:22:05 +0200
-Message-Id: <1383654126-19237-3-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1383654126-19237-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1383654126-19237-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v3 01/04] android/hid: Implement hid get protocol in daemon
+Date: Tue,  5 Nov 2013 14:22:03 +0200
+Message-Id: <1383654126-19237-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch requests hid device report and reads reply
+This patch requests hid device protocol mode and reads reply
 message and sends notification to hal.
 ---
- android/hal-hidhost.c |   1 +
- android/hid.c         | 105 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 104 insertions(+), 2 deletions(-)
+v3: Changed hid_msg to last_hid_msg and variable type uint8_t type
+---
+ android/hid.c | 108 +++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 104 insertions(+), 4 deletions(-)
 
-diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
-index 13928e6..f554cb2 100644
---- a/android/hal-hidhost.c
-+++ b/android/hal-hidhost.c
-@@ -251,6 +251,7 @@ static bt_status_t hh_get_report(bt_bdaddr_t *bd_addr,
- 
- 	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
- 	cmd.id = reportId;
-+	cmd.buf = bufferSize;
- 
- 	switch (reportType) {
- 	case BTHH_INPUT_REPORT:
 diff --git a/android/hid.c b/android/hid.c
-index d387d6d..f1bf9e8 100644
+index c0c9aeb..97835d9 100644
 --- a/android/hid.c
 +++ b/android/hid.c
-@@ -55,14 +55,23 @@
+@@ -54,6 +54,14 @@
+ #define L2CAP_PSM_HIDP_INTR	0x13
  #define UHID_DEVICE_FILE	"/dev/uhid"
  
- /* HID message types */
-+#define HID_MSG_GET_REPORT	0x40
- #define HID_MSG_GET_PROTOCOL	0x60
- #define HID_MSG_SET_PROTOCOL	0x70
- #define HID_MSG_DATA		0xa0
- 
-+/* HID data types */
-+#define HID_DATA_TYPE_INPUT	0x01
-+#define HID_DATA_TYPE_OUTPUT	0x02
-+#define HID_DATA_TYPE_FEATURE	0x03
++/* HID message types */
++#define HID_MSG_GET_PROTOCOL	0x60
++#define HID_MSG_DATA		0xa0
 +
- /* HID protocol header parameters */
- #define HID_PROTO_BOOT		0x00
- #define HID_PROTO_REPORT	0x01
- 
-+/* HID GET REPORT Size Field */
-+#define HID_GET_REPORT_SIZE_FIELD	0x08
++/* HID protocol header parameters */
++#define HID_PROTO_BOOT		0x00
++#define HID_PROTO_REPORT	0x01
 +
  static GIOChannel *notification_io = NULL;
  static GIOChannel *ctrl_io = NULL;
  static GIOChannel *intr_io = NULL;
-@@ -283,6 +292,52 @@ static void bt_hid_notify_proto_mode(struct hid_device *dev, uint8_t *buf,
- 				HAL_EV_HID_PROTO_MODE, sizeof(ev), &ev, -1);
+@@ -76,6 +84,7 @@ struct hid_device {
+ 	guint		intr_watch;
+ 	int		uhid_fd;
+ 	guint		uhid_watch_id;
++	uint8_t		last_hid_msg;
+ };
+ 
+ static int device_cmp(gconstpointer s, gconstpointer user_data)
+@@ -243,12 +252,74 @@ static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond,
+ 	return FALSE;
  }
  
-+static void bt_hid_notify_get_report(struct hid_device *dev, uint8_t *buf,
++static void bt_hid_notify_proto_mode(struct hid_device *dev, uint8_t *buf,
 +									int len)
 +{
-+	struct hal_ev_hid_get_report *ev;
-+	int ev_len;
++	struct hal_ev_hid_proto_mode ev;
 +	char address[18];
 +
 +	ba2str(&dev->dst, address);
 +	DBG("device %s", address);
 +
-+	ev_len = sizeof(*ev) + sizeof(struct hal_ev_hid_get_report) + 1;
++	memset(&ev, 0, sizeof(ev));
++	bdaddr2android(&dev->dst, ev.bdaddr);
 +
-+	if (!((buf[0] == (HID_MSG_DATA | HID_DATA_TYPE_INPUT)) ||
-+			(buf[0] == (HID_MSG_DATA | HID_DATA_TYPE_OUTPUT)) ||
-+			(buf[0]	== (HID_MSG_DATA | HID_DATA_TYPE_FEATURE)))) {
-+		ev = g_malloc(len);
-+		memset(ev, 0, ev_len);
-+		ev->status = buf[0];
-+		bdaddr2android(&dev->dst, ev->bdaddr);
-+		goto send;
-+	}
++	if (buf[0] == HID_MSG_DATA) {
++		ev.status = HAL_HID_STATUS_OK;
++		if (buf[1] == HID_PROTO_REPORT)
++			ev.mode = HAL_HID_REPORT_PROTOCOL;
++		else if (buf[1] == HID_PROTO_BOOT)
++			ev.mode = HAL_HID_BOOT_PROTOCOL;
++		else
++			ev.mode = HAL_HID_UNSUPPORTED_PROTOCOL;
 +
-+	/* Report porotocol mode reply contains id after hdr, in boot
-+	 * protocol mode id doesn't exist */
-+	ev_len += (dev->boot_dev) ? (len - 1) : (len - 2);
-+	ev = g_malloc(ev_len);
-+	memset(ev, 0, ev_len);
-+	ev->status = HAL_HID_STATUS_OK;
-+	bdaddr2android(&dev->dst, ev->bdaddr);
-+
-+	/* Report porotocol mode reply contains id after hdr, in boot
-+	 * protocol mode id doesn't exist */
-+	if (dev->boot_dev) {
-+		ev->len = len - 1;
-+		memcpy(ev->data, buf + 1, ev->len);
 +	} else {
-+		ev->len = len - 2;
-+		memcpy(ev->data, buf + 2, ev->len);
++		ev.status = buf[0];
++		ev.mode = HAL_HID_UNSUPPORTED_PROTOCOL;
 +	}
 +
-+send:
-+	ipc_send(notification_io, HAL_SERVICE_ID_HIDHOST, HAL_EV_HID_GET_REPORT,
-+						ev_len, ev, -1);
-+	g_free(ev);
++	ipc_send(notification_io, HAL_SERVICE_ID_HIDHOST,
++				HAL_EV_HID_PROTO_MODE, sizeof(ev), &ev, -1);
 +}
 +
- static gboolean ctrl_io_watch_cb(GIOChannel *chan, gpointer data)
++static gboolean ctrl_io_watch_cb(GIOChannel *chan, gpointer data)
++{
++	struct hid_device *dev = data;
++	int fd, bread;
++	uint8_t buf[UHID_DATA_MAX];
++
++	DBG("");
++
++	fd = g_io_channel_unix_get_fd(chan);
++	bread = read(fd, buf, sizeof(buf));
++	if (bread < 0) {
++		error("read: %s(%d)", strerror(errno), -errno);
++		return TRUE;
++	}
++
++	switch (dev->last_hid_msg) {
++	case HID_MSG_GET_PROTOCOL:
++		bt_hid_notify_proto_mode(dev, buf, bread);
++		break;
++	default:
++		DBG("unhandled hid msg type 0x%02x", dev->last_hid_msg);
++	}
++
++	/* reset msg type request */
++	dev->last_hid_msg = 0;
++
++	return TRUE;
++}
++
+ static gboolean ctrl_watch_cb(GIOChannel *chan, GIOCondition cond,
+ 								gpointer data)
  {
  	struct hid_device *dev = data;
-@@ -303,6 +358,9 @@ static gboolean ctrl_io_watch_cb(GIOChannel *chan, gpointer data)
- 	case HID_MSG_SET_PROTOCOL:
- 		bt_hid_notify_proto_mode(dev, buf, bread);
- 		break;
-+	case HID_MSG_GET_REPORT:
-+		bt_hid_notify_get_report(dev, buf, bread);
-+		break;
- 	default:
- 		DBG("unhandled hid msg type 0x%02x", dev->last_hid_msg);
+ 	char address[18];
+ 
++	if (cond & G_IO_IN)
++		return ctrl_io_watch_cb(chan, data);
++
+ 	ba2str(&dev->dst, address);
+ 	bt_hid_notify_state(dev, HAL_HID_STATE_DISCONNECTED);
+ 
+@@ -395,8 +466,8 @@ static void control_connect_cb(GIOChannel *chan, GError *conn_err,
  	}
-@@ -738,9 +796,51 @@ static uint8_t bt_hid_set_protocol(struct hal_cmd_hid_set_protocol *cmd,
- static uint8_t bt_hid_get_report(struct hal_cmd_hid_get_report *cmd,
+ 
+ 	dev->ctrl_watch = g_io_add_watch(dev->ctrl_io,
+-					G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+-					ctrl_watch_cb, dev);
++				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++				ctrl_watch_cb, dev);
+ 
+ 	return;
+ 
+@@ -591,9 +662,38 @@ static uint8_t bt_hid_info(struct hal_cmd_hid_set_info *cmd, uint16_t len)
+ static uint8_t bt_hid_get_protocol(struct hal_cmd_hid_get_protocol *cmd,
  								uint16_t len)
  {
 -	DBG("Not Implemented");
@@ -129,8 +138,7 @@ index d387d6d..f1bf9e8 100644
 +	GSList *l;
 +	bdaddr_t dst;
 +	int fd;
-+	uint8_t *req;
-+	uint8_t req_size;
++	uint8_t hdr[1];
  
 -	return HAL_STATUS_FAILED;
 +	DBG("");
@@ -145,35 +153,23 @@ index d387d6d..f1bf9e8 100644
 +		return HAL_STATUS_FAILED;
 +
 +	dev = l->data;
-+	req_size = (cmd->buf > 0) ? 4 : 2;
-+	req = g_try_malloc0(req_size);
-+	if (!req)
-+		return HAL_STATUS_NOMEM;
 +
-+	req[0] = HID_MSG_GET_REPORT | cmd->type;
++	if (dev->boot_dev)
++		return HAL_STATUS_UNSUPPORTED;
 +
-+	if (cmd->buf > 0)
-+		req[0] = req[0] | HID_GET_REPORT_SIZE_FIELD;
-+
-+	req[1] = cmd->id;
-+
-+	if (cmd->buf > 0)
-+		bt_put_le16(cmd->buf, (req + 2));
-+
++	hdr[0] = HID_MSG_GET_PROTOCOL | cmd->mode;
 +	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
 +
-+	if (write(fd, req, req_size) < 0) {
++	if (write(fd, hdr, sizeof(hdr)) < 0) {
 +		error("error while querying device protocol");
-+		g_free(req);
 +		return HAL_STATUS_FAILED;
 +	}
 +
-+	dev->last_hid_msg = HID_MSG_GET_REPORT;
-+	g_free(req);
++	dev->last_hid_msg = HID_MSG_GET_PROTOCOL;
 +	return HAL_STATUS_SUCCESS;
  }
  
- static uint8_t bt_hid_set_report(struct hal_cmd_hid_set_report *cmd,
+ static uint8_t bt_hid_set_protocol(struct hal_cmd_hid_set_protocol *cmd,
 -- 
 1.8.1.2
 
