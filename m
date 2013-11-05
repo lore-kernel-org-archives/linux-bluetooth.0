@@ -1,73 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5278F248.9080605@linux.intel.com>
-Date: Tue, 05 Nov 2013 15:27:36 +0200
-From: Ravi Kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Marcin Kraglak <marcin.kraglak@tieto.com>
+Subject: [PATCHv2 5/6] android: Implement class of device property callback
+Date: Tue, 5 Nov 2013 14:21:39 +0100
+Message-ID: <1383657700-22313-6-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1383657700-22313-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1383657700-22313-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org,
-	"johan.hedberg@gmail.com >> Johan Hedberg" <johan.hedberg@gmail.com>
-Subject: Re: [PATCH_v3 01/04] android/hid: Implement hid get protocol in daemon
-References: <1383654126-19237-1-git-send-email-ravikumar.veeramally@linux.intel.com> <20131105131050.GA15228@x220.p-661hnu-f1>
-In-Reply-To: <20131105131050.GA15228@x220.p-661hnu-f1>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+This will send adapter property with class of device
+to notification socket.
 
-On 11/05/2013 03:10 PM, Johan Hedberg wrote:
-> Hi Ravi,
->
-> On Tue, Nov 05, 2013, Ravi kumar Veeramally wrote:
->> +static gboolean ctrl_io_watch_cb(GIOChannel *chan, gpointer data)
->> +{
->> +	struct hid_device *dev = data;
->> +	int fd, bread;
->> +	uint8_t buf[UHID_DATA_MAX];
->> +
->> +	DBG("");
->> +
->> +	fd = g_io_channel_unix_get_fd(chan);
->> +	bread = read(fd, buf, sizeof(buf));
->> +	if (bread < 0) {
->> +		error("read: %s(%d)", strerror(errno), -errno);
->> +		return TRUE;
->> +	}
->> +
->> +	switch (dev->last_hid_msg) {
->> +	case HID_MSG_GET_PROTOCOL:
->> +		bt_hid_notify_proto_mode(dev, buf, bread);
->> +		break;
->> +	default:
->> +		DBG("unhandled hid msg type 0x%02x", dev->last_hid_msg);
->> +	}
-> This doesn't really make sense to me. If you only set last_hid_msg when
-> you send a code that you do support, then why would the value of
-> last_hid_msg ever contain a type that you do not support? (assuming you
-> always add an entry to this switch statement in the same patch that you
-> add a corresponding write for the type).
->
-> Also, since you don't seem to be using last_hid_msg for anything else
-> than printing this debug message, I'm wondering is there really any
-> value for it? Previously (based on our IRC) discussion I understood that
-> it had some actual functional value that helped determine what to send
-> to the HAL, but now I'm not seeing it anywhere in the patch. I might
-> have missed it though (in which case please enlighten me :)
-  I don't know if I understand you correctly, but at the end of all patches
-  it looks like this.
-          switch (dev->last_hid_msg) {
-         case HID_MSG_GET_PROTOCOL:
-         case HID_MSG_SET_PROTOCOL:
-                 bt_hid_notify_proto_mode(dev, buf, bread);
-                 break;
-         case HID_MSG_GET_REPORT:
-                 bt_hid_notify_get_report(dev, buf, bread);
-                 break;
-         default:
-                 DBG("unhandled hid msg type 0x%02x", dev->last_hid_msg);
-         }
+---
+ android/adapter.c | 32 ++++++++++++++++++++++++++++----
+ 1 file changed, 28 insertions(+), 4 deletions(-)
 
-based on last_hid_msg switch case, it will call respective function,
-default statement is for debug purpose if we miss something from hid device.
+diff --git a/android/adapter.c b/android/adapter.c
+index 70b9265..89db078 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -212,6 +212,30 @@ static void scan_mode_changed(void)
+ 	g_free(ev);
+ }
+ 
++static void send_adapter_class(void)
++{
++	struct hal_ev_adapter_props_changed *ev;
++	int len;
++
++	len = sizeof(*ev) + sizeof(struct hal_property) + sizeof(uint32_t);
++
++	ev = g_malloc(len);
++
++	ev->num_props = 1;
++	ev->status = HAL_STATUS_SUCCESS;
++
++	ev->props[0].type = HAL_PROP_ADAPTER_CLASS;
++	ev->props[0].len = sizeof(uint32_t);
++	memcpy(ev->props->val, &adapter->dev_class, sizeof(uint32_t));
++
++	DBG("Adapter class %u", adapter->dev_class);
++
++	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
++				HAL_EV_ADAPTER_PROPS_CHANGED, len, ev, -1);
++
++	g_free(ev);
++}
++
+ static void settings_changed(uint32_t settings)
+ {
+ 	uint32_t changed_mask;
+@@ -280,7 +304,7 @@ static void mgmt_dev_class_changed_event(uint16_t index, uint16_t length,
+ 
+ 	adapter->dev_class = dev_class;
+ 
+-	/* TODO: Inform prop change: Class */
++	send_adapter_class();
+ 
+ 	/* TODO: Gatt attrib set*/
+ }
+@@ -1278,11 +1302,11 @@ static bool get_uuids(void)
+ 
+ static bool get_class(void)
+ {
+-	DBG("Not implemented");
++	DBG("");
+ 
+-	/* TODO: Add implementation */
++	send_adapter_class();
+ 
+-	return false;
++	return true;
+ }
+ 
+ static bool get_type(void)
+-- 
+1.8.4.1
 
-Thanks,
-Ravi.
