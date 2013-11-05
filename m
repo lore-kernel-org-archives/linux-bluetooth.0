@@ -2,48 +2,58 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 09/13] android/hid: Handle get report notification in hal
-Date: Tue,  5 Nov 2013 13:38:11 +0200
-Message-Id: <1383651495-12434-10-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 13/13] android/hid: Align hal hid struct variables properly
+Date: Tue,  5 Nov 2013 13:38:15 +0200
+Message-Id: <1383651495-12434-14-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1383651495-12434-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1383651495-12434-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-hidhost.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ android/hal-msg.h | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
-index 29e3ee0..fe68fe7 100644
---- a/android/hal-hidhost.c
-+++ b/android/hal-hidhost.c
-@@ -68,6 +68,15 @@ static void handle_proto_mode(void *buf)
- 							ev->status, ev->mode);
- }
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 2c3067f..41ba649 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -282,9 +282,9 @@ struct hal_cmd_hid_set_protocol {
  
-+static void handle_get_report(void *buf)
-+{
-+	struct hal_ev_hid_get_report *ev = buf;
-+
-+	if (bt_hh_cbacks->get_report_cb)
-+		bt_hh_cbacks->get_report_cb((bt_bdaddr_t *) ev->bdaddr,
-+						ev->status, ev->data, ev->len);
-+}
-+
- /* will be called from notification thread context */
- void bt_notify_hh(uint16_t opcode, void *buf, uint16_t len)
- {
-@@ -84,6 +93,9 @@ void bt_notify_hh(uint16_t opcode, void *buf, uint16_t len)
- 	case HAL_EV_HID_PROTO_MODE:
- 		handle_proto_mode(buf);
- 		break;
-+	case HAL_EV_HID_GET_REPORT:
-+		handle_get_report(buf);
-+		break;
- 	default:
- 		DBG("Unhandled callback opcode=0x%x", opcode);
- 		break;
+ #define HAL_OP_HID_GET_REPORT		0x07
+ struct hal_cmd_hid_get_report {
+-	uint8_t bdaddr[6];
+-	uint8_t type;
+-	uint8_t id;
++	uint8_t  bdaddr[6];
++	uint8_t  type;
++	uint8_t  id;
+ 	uint16_t buf;
+ } __attribute__((packed));
+ 
+@@ -448,16 +448,16 @@ struct hal_ev_hid_conn_state {
+ 
+ #define HAL_EV_HID_INFO			0x82
+ struct hal_ev_hid_info {
+-	uint8_t bdaddr[6];
+-	uint8_t attr;
+-	uint8_t subclass;
+-	uint8_t app_id;
++	uint8_t  bdaddr[6];
++	uint8_t  attr;
++	uint8_t  subclass;
++	uint8_t  app_id;
+ 	uint16_t vendor;
+ 	uint16_t product;
+ 	uint16_t version;
+-	uint8_t country;
++	uint8_t  country;
+ 	uint16_t descr_len;
+-	uint8_t descr[884];
++	uint8_t  descr[884];
+ } __attribute__((packed));
+ 
+ #define HAL_EV_HID_PROTO_MODE		0x83
 -- 
 1.8.1.2
 
