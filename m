@@ -1,41 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 5 Nov 2013 13:04:34 +0200
+Date: Tue, 5 Nov 2013 12:57:32 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android: Suppress compiler warnings not enabled by
- autotools build
-Message-ID: <20131105110434.GA9565@x220.p-661hnu-f1>
-References: <1383648613-21352-1-git-send-email-szymon.janc@tieto.com>
+Subject: Re: [PATCH 1/6] android: Initial implementation of
+ get_remote_services
+Message-ID: <20131105105732.GA8164@x220.p-661hnu-f1>
+References: <1383647613-14951-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383648613-21352-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1383647613-14951-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Marcin,
 
-On Tue, Nov 05, 2013, Szymon Janc wrote:
-> missing-field-initializers warning is not enabled on autotools build.
-> Current code rely on implicit fields intializations resulting in flood
-> of bogus compiler warnings while building for Android.
-> 
-> monitor/packet.c:348:2: warning: missing initializer
->     [-Wmissing-field-initializers]
-> monitor/packet.c:348:2: warning: (near initialization for
->     'error2str_table[64].error') [-Wmissing-field-initializers]
-> monitor/packet.c:542:2: warning: missing initializer
->     [-Wmissing-field-initializers]
-> monitor/packet.c:542:2: warning: (near initialization for
->     'svc_class_table[8].bit') [-Wmissing-field-initializers]
-> monitor/packet.c:557:2: warning: missing initializer
->     [-Wmissing-field-initializers]
-> monitor/packet.c:557:2: warning: (near initialization for
->     'major_class_computer_table[8].val') [-Wmissing-field-initializers]
-> ---
->  android/Android.mk | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Tue, Nov 05, 2013, Marcin Kraglak wrote:
+> +static int bdaddr_cmp(gconstpointer a, gconstpointer b)
+> +{
+> +	const bdaddr_t *bda = a;
+> +	const bdaddr_t *bdb = b;
+> +
+> +	return bacmp(bdb, bda);
+> +}
+> +
+> +static bool fetch_remote_uuids(const bdaddr_t *addr)
+> +{
+> +	struct browse_req *req;
+> +	uuid_t uuid;
+> +
+> +	if (g_slist_find_custom(sdp_req_list, addr, bdaddr_cmp))
+> +		return false;
+> +
+> +	req = g_new0(struct browse_req, 1);
+> +	bacpy(&req->bdaddr, addr);
+> +	sdp_req_list = g_slist_append(sdp_req_list, &req->bdaddr);
 
-Applied. Thanks.
+This is quite wild coding, having a list with pointers into the middle
+of a struct instead of the struct itself. To avoid having to twist ones
+brain around to figure out correctness, could you just store the request
+pointers in this list and then modify your bdaddr_cmp function to
+compare a struct browse_req against a bdaddr_t pointer instead of
+comparing two bdaddr pointers. You'll probably want to rename it to
+req_cmp or something similar then though.
+
+> +	sdp_uuid16_create(&uuid, uuid_list[req->search_uuid++]);
+> +
+> +	if (bt_search_service(&adapter->bdaddr,
+> +			&req->bdaddr, &uuid, browse_cb, req, NULL) < 0) {
+> +		sdp_req_list = g_slist_remove(sdp_req_list, &req->bdaddr);
+> +		browse_req_free(req);
+
+Instead of having to do an extra g_slist_remove here why not just add
+the entry to the sdp_req_list only after bt_search_service has been
+successful?
+
+Also, how about renaming sdp_req_list to browse_req_list to match the
+name you've chosen for the context struct? Or maybe even simpler as
+"browse_reqs"
+
+>  static uint8_t get_remote_services(void *buf, uint16_t len)
+>  {
+> -	return HAL_STATUS_UNSUPPORTED;
+> +	struct hal_cmd_get_remote_services *cmd = buf;
+> +	bool ret;
+> +	bdaddr_t addr;
+> +
+> +	android2bdaddr(&cmd->bdaddr, &addr);
+> +
+> +	ret = fetch_remote_uuids(&addr);
+> +
+> +	return ret ? HAL_STATUS_SUCCESS : HAL_STATUS_FAILED;
+>  }
+
+How about just making fetch_remote_uuids() return a proper HAL status
+directly instead of this mapping of bool to HAL status? You could also
+just consider merging the entire fetch_remote_uuids function (whose name
+I don't really like btw) into this get_remote_services function,
+especially if you don't foresee it having any other callers in the
+future.
 
 Johan
