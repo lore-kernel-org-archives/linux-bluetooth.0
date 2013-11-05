@@ -1,43 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5278F81B.6020009@linux.intel.com>
-Date: Tue, 05 Nov 2013 15:52:27 +0200
-From: Ravi Kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] monitor: Fallback to 80 columns terminal if not able to get real size
+Date: Tue, 5 Nov 2013 14:22:53 +0100
+Message-ID: <1383657773-13597-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: [PATCH_v3 02/04] android/hid: Implement hid set protocol in daemon
-References: <1383654126-19237-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1383654126-19237-2-git-send-email-ravikumar.veeramally@linux.intel.com> <20131105131232.GB15228@x220.p-661hnu-f1>
-In-Reply-To: <20131105131232.GB15228@x220.p-661hnu-f1>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+This makes num_columns always return valid number of columns, which is
+expected by print_packets function.
 
-On 11/05/2013 03:12 PM, Johan Hedberg wrote:
-> Hi Ravi,
->
-> On Tue, Nov 05, 2013, Ravi kumar Veeramally wrote:
->>   static uint8_t bt_hid_set_protocol(struct hal_cmd_hid_set_protocol *cmd,
->>   								uint16_t len)
->>   {
->> -	DBG("Not Implemented");
->> +	struct hid_device *dev;
->> +	GSList *l;
->> +	bdaddr_t dst;
->> +	int fd;
->> +	uint8_t hdr[1];
-> If it's just one element there's no need for an array. Just use
-> "uint8_t hdr;" instead.
->
->> +	hdr[0] = HID_MSG_SET_PROTOCOL | cmd->mode;
-> And then here hdr = ...;
->
->> +	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
->> +
->> +	if (write(fd, hdr, sizeof(hdr)) < 0) {
-> And here &hdr, sizeof(hdr)
-  Ok.
+This also fix garbage prints while using btmon via adb shell.
+---
+ monitor/display.c | 8 ++++----
+ monitor/display.h | 2 ++
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-Thanks,
-Ravi.
+diff --git a/monitor/display.c b/monitor/display.c
+index b8dce1f..af4171f 100644
+--- a/monitor/display.c
++++ b/monitor/display.c
+@@ -58,10 +58,10 @@ int num_columns(void)
+ 	if (__builtin_expect(!!(cached_num_columns < 0), 0)) {
+ 		struct winsize ws;
+ 
+-		if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) < 0)
+-			return -1;
+-
+-		if (ws.ws_col > 0)
++		if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) < 0 ||
++								ws.ws_col == 0)
++			cached_num_columns = FALLBACK_TERMINAL_WIDTH;
++		else
+ 			cached_num_columns = ws.ws_col;
+ 	}
+ 
+diff --git a/monitor/display.h b/monitor/display.h
+index 6139cc2..885eb34 100644
+--- a/monitor/display.h
++++ b/monitor/display.h
+@@ -40,6 +40,8 @@ bool use_color(void);
+ 
+ #define COLOR_ERROR	"\x1B[1;31m"
+ 
++#define FALLBACK_TERMINAL_WIDTH 80
++
+ #define print_indent(indent, color1, prefix, title, color2, fmt, args...) \
+ do { \
+ 	printf("%*c%s%s%s%s" fmt "%s\n", (indent), ' ', \
+-- 
+1.8.4.1
+
