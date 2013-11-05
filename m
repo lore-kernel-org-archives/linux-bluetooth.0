@@ -1,42 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 5 Nov 2013 19:44:31 +0100
-From: Stevie Trujillo <stevie.trujillo@gmail.com>
-To: Hui Wang <hui.wang@canonical.com>
-Cc: marcel@holtmann.org, tedd.an@intel.com, linux-bluetooth@vger.kernel.org
-Subject: Re: Intel 7260 bluetooth malfunction when it is connected to EHCI
- bus
-Message-ID: <20131105194431.54fba8fb@localhost>
-In-Reply-To: <527858A5.2080801@canonical.com>
-References: <526F8804.9060906@canonical.com>
-	<A07820C9-C272-4AD4-AE16-49F81956C2D7@holtmann.org>
-	<52707428.9070908@canonical.com>
-	<6091DDC7-7B00-4457-82A0-F8CC9B4EE9DD@holtmann.org>
-	<5271EAA2.1030705@canonical.com>
-	<D0B840E3-36C4-4751-A757-1ADDAC0707B9@holtmann.org>
-	<5273147E.4040004@canonical.com>
-	<C3BBD7E9-6D91-430E-96DF-2D4885F89DCC@holtmann.org>
-	<527371D4.1010305@canonical.com>
-	<9DFD9618-158E-41C4-8183-134A3FC4E61F@holtmann.org>
-	<527737C7.40208@canonical.com>
-	<20131104141539.772e1636@localhost>
-	<527858A5.2080801@canonical.com>
-Mime-Version: 1.0
+Message-ID: <62354.10.252.42.55.1383672518.squirrel@linux.intel.com>
+In-Reply-To: <20131105155821.GA19994@x220.p-661hnu-f1>
+References: <1383654126-19237-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+    <20131105131050.GA15228@x220.p-661hnu-f1>
+    <5278F248.9080605@linux.intel.com>
+    <20131105155821.GA19994@x220.p-661hnu-f1>
+Date: Tue, 5 Nov 2013 19:28:38 +0200 (EET)
+Subject: Re: [PATCH_v3 01/04] android/hid: Implement hid get protocol in
+     daemon
+From: ravikumar.veeramally@linux.intel.com
+To: linux-bluetooth@vger.kernel.org
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 05 Nov 2013 10:32:05 +0800
-Hui Wang <hui.wang@canonical.com> wrote:
+Hi Johan,
 
-> Thanks for your input, I don't know the answer of your question, but
-> at least the camera works well on the EHCI bus, and camera transfers
-> the ISO packets over EHCI bus.
+> Hi Ravi,
+>
+> On Tue, Nov 05, 2013, Ravi Kumar Veeramally wrote:
+>> >On Tue, Nov 05, 2013, Ravi kumar Veeramally wrote:
+>> >>+static gboolean ctrl_io_watch_cb(GIOChannel *chan, gpointer data)
+>> >>+{
+>> >>+	struct hid_device *dev = data;
+>> >>+	int fd, bread;
+>> >>+	uint8_t buf[UHID_DATA_MAX];
+>> >>+
+>> >>+	DBG("");
+>> >>+
+>> >>+	fd = g_io_channel_unix_get_fd(chan);
+>> >>+	bread = read(fd, buf, sizeof(buf));
+>> >>+	if (bread < 0) {
+>> >>+		error("read: %s(%d)", strerror(errno), -errno);
+>> >>+		return TRUE;
+>> >>+	}
+>> >>+
+>> >>+	switch (dev->last_hid_msg) {
+>> >>+	case HID_MSG_GET_PROTOCOL:
+>> >>+		bt_hid_notify_proto_mode(dev, buf, bread);
+>> >>+		break;
+>> >>+	default:
+>> >>+		DBG("unhandled hid msg type 0x%02x", dev->last_hid_msg);
+>> >>+	}
+>> >This doesn't really make sense to me. If you only set last_hid_msg when
+>> >you send a code that you do support, then why would the value of
+>> >last_hid_msg ever contain a type that you do not support? (assuming you
+>> >always add an entry to this switch statement in the same patch that you
+>> >add a corresponding write for the type).
+>> >
+>> >Also, since you don't seem to be using last_hid_msg for anything else
+>> >than printing this debug message, I'm wondering is there really any
+>> >value for it? Previously (based on our IRC) discussion I understood
+>> that
+>> >it had some actual functional value that helped determine what to send
+>> >to the HAL, but now I'm not seeing it anywhere in the patch. I might
+>> >have missed it though (in which case please enlighten me :)
+>>  I don't know if I understand you correctly, but at the end of all
+>> patches
+>>  it looks like this.
+>>          switch (dev->last_hid_msg) {
+>>         case HID_MSG_GET_PROTOCOL:
+>>         case HID_MSG_SET_PROTOCOL:
+>>                 bt_hid_notify_proto_mode(dev, buf, bread);
+>>                 break;
+>>         case HID_MSG_GET_REPORT:
+>>                 bt_hid_notify_get_report(dev, buf, bread);
+>>                 break;
+>>         default:
+>>                 DBG("unhandled hid msg type 0x%02x", dev->last_hid_msg);
+>>         }
+>>
+>> based on last_hid_msg switch case, it will call respective function,
+>> default statement is for debug purpose if we miss something from hid
+>> device.
+>
+> I only saw the first two case statements and didn't look deeper into the
+> patch set, sorry. In this case I do see the point of the variable and
+> you may keep it as is.
+Ok, np.
 
-Hello again! Have you tried comparing usbmon output (I used Wireshark)
-when running on EHCI and XHCI? My bluetooth card is inside the
-computer, so I'm only able to do EHCI.
+>
+> My earlier comment about the debug statement still holds though, i.e. if
+> the default entry gets triggered last_hid_msg will not contain the
+> unknown msg type. In this case this will simply be an unexpected message
+> whose type we do not know (and if there's a debug log that's what it
+> should say).
 
-I see 1 ISO come in right after the SCO thing opens. It has some
-error stuff inside (ENOSPC). No idea how it is supposed to behave,
-since I can't compare with a good one.
+I will remove the debug statement which doesn't help much.
 
-Sorry if this is a stupid idea :P
+Thanks,
+Ravi.
