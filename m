@@ -2,110 +2,78 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v4 07/12] android/hid: Implement hid set report in daemon
-Date: Tue,  5 Nov 2013 23:09:13 +0200
-Message-Id: <1383685758-3900-8-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v4 11/12] android/hid: Handle uhid events
+Date: Tue,  5 Nov 2013 23:09:17 +0200
+Message-Id: <1383685758-3900-12-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1383685758-3900-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1383685758-3900-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch requests hid device to set report.
+Handling few uhid events and described scenarios. OUTPUT and
+FEATURE events are not yet handled.
 ---
- android/hal-hidhost.c |  2 ++
- android/hal-msg.h     |  6 ++++--
- android/hid.c         | 40 ++++++++++++++++++++++++++++++++++++++--
- 3 files changed, 44 insertions(+), 4 deletions(-)
+ android/hid.c | 40 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 39 insertions(+), 1 deletion(-)
 
-diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
-index f554cb2..29e3ee0 100644
---- a/android/hal-hidhost.c
-+++ b/android/hal-hidhost.c
-@@ -284,6 +284,8 @@ static bt_status_t hh_set_report(bt_bdaddr_t *bd_addr,
- 		return BT_STATUS_PARM_INVALID;
- 
- 	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
-+	cmd.len = strlen(report);
-+	memcpy(cmd.data, report, cmd.len);
- 
- 	switch (reportType) {
- 	case BTHH_INPUT_REPORT:
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index bc7df6b..2c3067f 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -290,8 +290,10 @@ struct hal_cmd_hid_get_report {
- 
- #define HAL_OP_HID_SET_REPORT		0x08
- struct hal_cmd_hid_set_report {
--	uint8_t bdaddr[6];
--	uint8_t type;
-+	uint8_t  bdaddr[6];
-+	uint8_t  type;
-+	uint16_t len;
-+	uint8_t  data[670];
- } __attribute__((packed));
- 
- #define HAL_OP_HID_SEND_DATA		0x09
 diff --git a/android/hid.c b/android/hid.c
-index fd58e6f..5411922 100644
+index 999f5d6..172a945 100644
 --- a/android/hid.c
 +++ b/android/hid.c
-@@ -56,6 +56,7 @@
- 
- /* HID message types */
- #define HID_MSG_GET_REPORT	0x40
-+#define HID_MSG_SET_REPORT	0x50
- #define HID_MSG_GET_PROTOCOL	0x60
- #define HID_MSG_SET_PROTOCOL	0x70
- #define HID_MSG_DATA		0xa0
-@@ -842,9 +843,44 @@ static uint8_t bt_hid_get_report(struct hal_cmd_hid_get_report *cmd,
- static uint8_t bt_hid_set_report(struct hal_cmd_hid_set_report *cmd,
- 								uint16_t len)
- {
--	DBG("Not Implemented");
-+	struct hid_device *dev;
-+	GSList *l;
-+	bdaddr_t dst;
-+	int fd;
-+	uint8_t *req;
-+	uint8_t req_size;
- 
--	return HAL_STATUS_FAILED;
-+	DBG("");
-+
-+	if (len < sizeof(*cmd))
-+		return HAL_STATUS_INVALID;
-+
-+	android2bdaddr(&cmd->bdaddr, &dst);
-+
-+	l = g_slist_find_custom(devices, &dst, device_cmp);
-+	if (!l)
-+		return HAL_STATUS_FAILED;
-+
-+	dev = l->data;
-+	req_size = 1 + cmd->len;
-+	req = g_try_malloc0(req_size);
-+	if (!req)
-+		return HAL_STATUS_NOMEM;
-+
-+	req[0] = HID_MSG_SET_REPORT | cmd->type;
-+	memcpy(req + 1, cmd->data, req_size - 1);
-+
-+	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
-+
-+	if (write(fd, req, req_size) < 0) {
-+		error("error while querying device protocol");
-+		g_free(req);
-+		return HAL_STATUS_FAILED;
-+	}
-+
-+	dev->last_hid_msg = HID_MSG_SET_REPORT;
-+	g_free(req);
-+	return HAL_STATUS_SUCCESS;
+@@ -149,6 +149,11 @@ static void hid_device_free(struct hid_device *dev)
+ 	g_free(dev);
  }
  
- static uint8_t bt_hid_send_data(struct hal_cmd_hid_send_data *cmd,
++static void handle_uhid_event(struct hid_device *dev, struct uhid_event *ev)
++{
++	DBG("UHID_OUTPUT UHID_FEATURE unsupported");
++}
++
+ static gboolean uhid_event_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+@@ -172,7 +177,40 @@ static gboolean uhid_event_cb(GIOChannel *io, GIOCondition cond,
+ 	}
+ 
+ 	DBG("uHID event type %d received", ev.type);
+-	/* TODO Handle events */
++
++	switch (ev.type) {
++	case UHID_START:
++	case UHID_STOP:
++		/* These are called to start and stop the underlying hardware.
++		 * We open the channels before creating the device so the
++		 * hardware is always ready. No need to handle these.
++		 * The kernel never destroys a device itself! Only an explicit
++		 * UHID_DESTROY request can remove a device. */
++
++		break;
++	case UHID_OPEN:
++	case UHID_CLOSE:
++		/* OPEN/CLOSE are sent whenever user-space opens any interface
++		 * provided by the kernel HID device. Whenever the open-count
++		 * is non-zero we must be ready for I/O. As long as it is zero,
++		 * we can decide to drop all I/O and put the device
++		 * asleep This is optional, though. */
++		break;
++	case UHID_OUTPUT:
++	case UHID_FEATURE:
++		handle_uhid_event(dev, &ev);
++		break;
++	case UHID_OUTPUT_EV:
++		/* This is only sent by kernels prior to linux-3.11. It
++		 * requires us to parse HID-descriptors in user-space to
++		 * properly handle it. This is redundant as the kernel
++		 * does it already. That's why newer kernels assemble
++		 * the output-reports and send it to us via UHID_OUTPUT. */
++		DBG("UHID_OUTPUT_EV unsupported");
++		break;
++	default:
++		warn("unexpected uHID event");
++	}
+ 
+ 	return TRUE;
+ 
 -- 
 1.8.1.2
 
