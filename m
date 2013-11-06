@@ -2,35 +2,31 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 5/6] android/hid: Add hid event virtual unplug structure to HAL msg headers
-Date: Wed,  6 Nov 2013 13:48:47 +0200
-Message-Id: <1383738528-14550-6-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 3/6] android/hid: Fill send data structure variables in hal-hidhost
+Date: Wed,  6 Nov 2013 13:48:45 +0200
+Message-Id: <1383738528-14550-4-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1383738528-14550-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1383738528-14550-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-msg.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ android/hal-hidhost.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 59e4f78..740f2ab 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -477,6 +477,12 @@ struct hal_ev_hid_get_report {
- 	uint8_t  data[0];
- } __attribute__((packed));
+diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
+index f1a2223..22a5d15 100644
+--- a/android/hal-hidhost.c
++++ b/android/hal-hidhost.c
+@@ -330,6 +330,8 @@ static bt_status_t hh_send_data(bt_bdaddr_t *bd_addr, char *data)
+ 		return BT_STATUS_PARM_INVALID;
  
-+#define HAL_EV_HID_VIRTUAL_UNPLUG	0x86
-+struct hal_ev_hid_virtual_unplug {
-+	uint8_t  bdaddr[6];
-+	uint8_t  status;
-+} __attribute__((packed));
-+
- #define HAL_EV_AV_CONNECTION_STATE	0x81
- struct hal_ev_av_connection_state {
- 	uint8_t state;
+ 	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
++	cmd.len = strlen(data);
++	memcpy(cmd.data, data, cmd.len);
+ 
+ 	return hal_ipc_cmd(HAL_SERVICE_ID_HIDHOST, HAL_OP_HID_SEND_DATA,
+ 					sizeof(cmd), &cmd, 0, NULL, NULL);
 -- 
 1.8.1.2
 
