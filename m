@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 10/14] android: Remove not needed buf len from Hidhost service functions
-Date: Wed, 6 Nov 2013 15:09:26 +0100
-Message-ID: <1383746970-25906-11-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC 03/14] android: Add HAL IPC message response sanity checks
+Date: Wed, 6 Nov 2013 15:09:19 +0100
+Message-ID: <1383746970-25906-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1383746970-25906-1-git-send-email-szymon.janc@tieto.com>
 References: <1383746970-25906-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,237 +12,131 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Message correctness is verified upon reception and handling functions
-can simply make assumption that data in buffer is correct.
+This implements core, bluetooth, sock and hidhost services checks.
 ---
- android/hid.c  | 62 ++++++++++++++++++----------------------------------------
- android/hid.h  |  2 +-
- android/main.c |  3 +--
- 3 files changed, 21 insertions(+), 46 deletions(-)
+ android/hal-msg-check.c | 101 ++++++++++++++++++++++++++++++++++++++++++++++++
+ android/hal-msg.h       |   2 +
+ 2 files changed, 103 insertions(+)
 
-diff --git a/android/hid.c b/android/hid.c
-index c38c4c1..968dc29 100644
---- a/android/hid.c
-+++ b/android/hid.c
-@@ -667,7 +667,7 @@ fail:
- 	hid_device_free(dev);
+diff --git a/android/hal-msg-check.c b/android/hal-msg-check.c
+index 208d8a5..0c719ac 100644
+--- a/android/hal-msg-check.c
++++ b/android/hal-msg-check.c
+@@ -161,3 +161,104 @@ bool hal_cmd_check(const struct hal_hdr *msg, const void *payload, ssize_t len)
+ 		return false;
+ 	}
  }
++
++static bool check_rsp_core(uint8_t opcode, const void *payload, uint16_t len)
++{
++	switch (opcode) {
++	check_fix_p(HAL_OP_STATUS, hal_status);
++	check_no_p(HAL_OP_REGISTER_MODULE);
++	check_no_p(HAL_OP_UNREGISTER_MODULE);
++	default:
++		return false;
++	}
++}
++
++static bool check_rsp_bluetooth(uint8_t opcode, const void *payload,
++								uint16_t len)
++{
++	switch (opcode) {
++	check_fix_p(HAL_OP_STATUS, hal_status);
++	check_no_p(HAL_OP_ENABLE);
++	check_no_p(HAL_OP_DISABLE);
++	check_no_p(HAL_OP_GET_ADAPTER_PROPS);
++	check_no_p(HAL_OP_GET_ADAPTER_PROP);
++	check_no_p(HAL_OP_SET_ADAPTER_PROP);
++	check_no_p(HAL_OP_GET_REMOTE_DEVICE_PROPS);
++	check_no_p(HAL_OP_GET_REMOTE_DEVICE_PROP);
++	check_no_p(HAL_OP_SET_REMOTE_DEVICE_PROP);
++	check_no_p(HAL_OP_GET_REMOTE_SERVICE_REC);
++	check_no_p(HAL_OP_GET_REMOTE_SERVICES);
++	check_no_p(HAL_OP_START_DISCOVERY);
++	check_no_p(HAL_OP_CANCEL_DISCOVERY);
++	check_no_p(HAL_OP_CREATE_BOND);
++	check_no_p(HAL_OP_REMOVE_BOND);
++	check_no_p(HAL_OP_CANCEL_BOND)
++	check_no_p(HAL_OP_PIN_REPLY);
++	check_no_p(HAL_OP_SSP_REPLY)
++	check_no_p(HAL_OP_DUT_MODE_CONF);
++	check_no_p(HAL_OP_DUT_MODE_SEND);
++	check_no_p(HAL_OP_LE_TEST_MODE);
++	default:
++		return false;
++	}
++}
++
++static bool check_rsp_sock(uint8_t opcode, const void *payload, uint16_t len)
++{
++	switch (opcode) {
++	check_fix_p(HAL_OP_STATUS, hal_status);
++	check_no_p(HAL_OP_SOCK_LISTEN);
++	check_no_p(HAL_OP_SOCK_CONNECT);
++	default:
++		return false;
++	}
++}
++
++static bool check_rsp_hidhost(uint8_t opcode, const void *payload,
++								uint16_t len)
++{
++	switch (opcode) {
++	check_fix_p(HAL_OP_STATUS, hal_status);
++	check_no_p(HAL_OP_HID_CONNECT);
++	check_no_p(HAL_OP_HID_DISCONNECT);
++	check_no_p(HAL_OP_HID_VP);
++	check_no_p(HAL_OP_HID_SET_INFO);
++	check_no_p(HAL_OP_HID_GET_PROTOCOL);
++	check_no_p(HAL_OP_HID_SET_PROTOCOL);
++	check_no_p(HAL_OP_HID_GET_REPORT);
++	check_no_p(HAL_OP_HID_SET_REPORT);
++	check_no_p(HAL_OP_HID_SEND_DATA);
++	default:
++		return false;
++	}
++}
++
++bool hal_rsp_check(const struct hal_hdr *msg, const void *payload,
++								ssize_t len)
++{
++	if (len < (ssize_t) sizeof(*msg))
++		return false;
++
++	if (len != (ssize_t) (sizeof(*msg) + msg->len))
++		return false;
++
++	switch (msg->service_id) {
++	case HAL_SERVICE_ID_CORE:
++		return check_rsp_core(msg->opcode, payload, msg->len);
++	case HAL_SERVICE_ID_BLUETOOTH:
++		return check_rsp_bluetooth(msg->opcode, payload, msg->len);
++	case HAL_SERVICE_ID_SOCK:
++		return check_rsp_sock(msg->opcode, payload, msg->len);
++	case HAL_SERVICE_ID_HIDHOST:
++		return check_rsp_hidhost(msg->opcode, payload, msg->len);
++	case HAL_SERVICE_ID_PAN:
++	case HAL_SERVICE_ID_HANDSFREE:
++	case HAL_SERVICE_ID_A2DP:
++	case HAL_SERVICE_ID_HEALTH:
++	case HAL_SERVICE_ID_AVRCP:
++	case HAL_SERVICE_ID_GATT:
++		return true;
++	default:
++		return false;
++	}
++}
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index e7587bf..2d67ccf 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -489,3 +489,5 @@ struct hal_ev_av_audio_state {
  
--static uint8_t bt_hid_connect(struct hal_cmd_hid_connect *cmd, uint16_t len)
-+static uint8_t bt_hid_connect(struct hal_cmd_hid_connect *cmd)
- {
- 	struct hid_device *dev;
- 	char addr[18];
-@@ -678,9 +678,6 @@ static uint8_t bt_hid_connect(struct hal_cmd_hid_connect *cmd, uint16_t len)
- 
- 	DBG("");
- 
--	if (len < sizeof(*cmd))
--		return HAL_STATUS_INVALID;
--
- 	android2bdaddr(&cmd->bdaddr, &dst);
- 
- 	l = g_slist_find_custom(devices, &dst, device_cmp);
-@@ -708,8 +705,7 @@ static uint8_t bt_hid_connect(struct hal_cmd_hid_connect *cmd, uint16_t len)
- 	return HAL_STATUS_SUCCESS;
- }
- 
--static uint8_t bt_hid_disconnect(struct hal_cmd_hid_disconnect *cmd,
--								uint16_t len)
-+static uint8_t bt_hid_disconnect(struct hal_cmd_hid_disconnect *cmd)
- {
- 	struct hid_device *dev;
- 	GSList *l;
-@@ -717,9 +713,6 @@ static uint8_t bt_hid_disconnect(struct hal_cmd_hid_disconnect *cmd,
- 
- 	DBG("");
- 
--	if (len < sizeof(*cmd))
--		return HAL_STATUS_INVALID;
--
- 	android2bdaddr(&cmd->bdaddr, &dst);
- 
- 	l = g_slist_find_custom(devices, &dst, device_cmp);
-@@ -740,22 +733,21 @@ static uint8_t bt_hid_disconnect(struct hal_cmd_hid_disconnect *cmd,
- 	return HAL_STATUS_SUCCESS;
- }
- 
--static uint8_t bt_hid_virtual_unplug(struct hal_cmd_hid_vp *cmd, uint16_t len)
-+static uint8_t bt_hid_virtual_unplug(struct hal_cmd_hid_vp *cmd)
- {
- 	DBG("Not Implemented");
- 
- 	return HAL_STATUS_FAILED;
- }
- 
--static uint8_t bt_hid_info(struct hal_cmd_hid_set_info *cmd, uint16_t len)
-+static uint8_t bt_hid_info(struct hal_cmd_hid_set_info *cmd)
- {
- 	DBG("Not Implemented");
- 
- 	return HAL_STATUS_FAILED;
- }
- 
--static uint8_t bt_hid_get_protocol(struct hal_cmd_hid_get_protocol *cmd,
--								uint16_t len)
-+static uint8_t bt_hid_get_protocol(struct hal_cmd_hid_get_protocol *cmd)
- {
- 	struct hid_device *dev;
- 	GSList *l;
-@@ -765,9 +757,6 @@ static uint8_t bt_hid_get_protocol(struct hal_cmd_hid_get_protocol *cmd,
- 
- 	DBG("");
- 
--	if (len < sizeof(*cmd))
--		return HAL_STATUS_INVALID;
--
- 	android2bdaddr(&cmd->bdaddr, &dst);
- 
- 	l = g_slist_find_custom(devices, &dst, device_cmp);
-@@ -791,8 +780,7 @@ static uint8_t bt_hid_get_protocol(struct hal_cmd_hid_get_protocol *cmd,
- 	return HAL_STATUS_SUCCESS;
- }
- 
--static uint8_t bt_hid_set_protocol(struct hal_cmd_hid_set_protocol *cmd,
--								uint16_t len)
-+static uint8_t bt_hid_set_protocol(struct hal_cmd_hid_set_protocol *cmd)
- {
- 	struct hid_device *dev;
- 	GSList *l;
-@@ -802,9 +790,6 @@ static uint8_t bt_hid_set_protocol(struct hal_cmd_hid_set_protocol *cmd,
- 
- 	DBG("");
- 
--	if (len < sizeof(*cmd))
--		return HAL_STATUS_INVALID;
--
- 	android2bdaddr(&cmd->bdaddr, &dst);
- 
- 	l = g_slist_find_custom(devices, &dst, device_cmp);
-@@ -828,8 +813,7 @@ static uint8_t bt_hid_set_protocol(struct hal_cmd_hid_set_protocol *cmd,
- 	return HAL_STATUS_SUCCESS;
- }
- 
--static uint8_t bt_hid_get_report(struct hal_cmd_hid_get_report *cmd,
--								uint16_t len)
-+static uint8_t bt_hid_get_report(struct hal_cmd_hid_get_report *cmd)
- {
- 	struct hid_device *dev;
- 	GSList *l;
-@@ -840,9 +824,6 @@ static uint8_t bt_hid_get_report(struct hal_cmd_hid_get_report *cmd,
- 
- 	DBG("");
- 
--	if (len < sizeof(*cmd))
--		return HAL_STATUS_INVALID;
--
- 	android2bdaddr(&cmd->bdaddr, &dst);
- 
- 	l = g_slist_find_custom(devices, &dst, device_cmp);
-@@ -876,8 +857,7 @@ static uint8_t bt_hid_get_report(struct hal_cmd_hid_get_report *cmd,
- 	return HAL_STATUS_SUCCESS;
- }
- 
--static uint8_t bt_hid_set_report(struct hal_cmd_hid_set_report *cmd,
--								uint16_t len)
-+static uint8_t bt_hid_set_report(struct hal_cmd_hid_set_report *cmd)
- {
- 	struct hid_device *dev;
- 	GSList *l;
-@@ -888,9 +868,6 @@ static uint8_t bt_hid_set_report(struct hal_cmd_hid_set_report *cmd,
- 
- 	DBG("");
- 
--	if (len < sizeof(*cmd))
--		return HAL_STATUS_INVALID;
--
- 	android2bdaddr(&cmd->bdaddr, &dst);
- 
- 	l = g_slist_find_custom(devices, &dst, device_cmp);
-@@ -919,45 +896,44 @@ static uint8_t bt_hid_set_report(struct hal_cmd_hid_set_report *cmd,
- 	return HAL_STATUS_SUCCESS;
- }
- 
--static uint8_t bt_hid_send_data(struct hal_cmd_hid_send_data *cmd,
--								uint16_t len)
-+static uint8_t bt_hid_send_data(struct hal_cmd_hid_send_data *cmd)
- {
- 	DBG("Not Implemented");
- 
- 	return HAL_STATUS_FAILED;
- }
- 
--void bt_hid_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf, uint16_t len)
-+void bt_hid_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf)
- {
- 	uint8_t status = HAL_STATUS_FAILED;
- 
- 	switch (opcode) {
- 	case HAL_OP_HID_CONNECT:
--		status = bt_hid_connect(buf, len);
-+		status = bt_hid_connect(buf);
- 		break;
- 	case HAL_OP_HID_DISCONNECT:
--		status = bt_hid_disconnect(buf, len);
-+		status = bt_hid_disconnect(buf);
- 		break;
- 	case HAL_OP_HID_VP:
--		status = bt_hid_virtual_unplug(buf, len);
-+		status = bt_hid_virtual_unplug(buf);
- 		break;
- 	case HAL_OP_HID_SET_INFO:
--		status = bt_hid_info(buf, len);
-+		status = bt_hid_info(buf);
- 		break;
- 	case HAL_OP_HID_GET_PROTOCOL:
--		status = bt_hid_get_protocol(buf, len);
-+		status = bt_hid_get_protocol(buf);
- 		break;
- 	case HAL_OP_HID_SET_PROTOCOL:
--		status = bt_hid_set_protocol(buf, len);
-+		status = bt_hid_set_protocol(buf);
- 		break;
- 	case HAL_OP_HID_GET_REPORT:
--		status = bt_hid_get_report(buf, len);
-+		status = bt_hid_get_report(buf);
- 		break;
- 	case HAL_OP_HID_SET_REPORT:
--		status = bt_hid_set_report(buf, len);
-+		status = bt_hid_set_report(buf);
- 		break;
- 	case HAL_OP_HID_SEND_DATA:
--		status = bt_hid_send_data(buf, len);
-+		status = bt_hid_send_data(buf);
- 		break;
- 	default:
- 		DBG("Unhandled command, opcode 0x%x", opcode);
-diff --git a/android/hid.h b/android/hid.h
-index 674b35a..b92f4f1 100644
---- a/android/hid.h
-+++ b/android/hid.h
-@@ -21,7 +21,7 @@
-  *
-  */
- 
--void bt_hid_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf, uint16_t len);
-+void bt_hid_handle_cmd(GIOChannel *io, uint8_t opcode, void *buf);
- 
- bool bt_hid_register(GIOChannel *io, const bdaddr_t *addr);
- void bt_hid_unregister(void);
-diff --git a/android/main.c b/android/main.c
-index d309068..08bba4e 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -252,8 +252,7 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
- 		bt_adapter_handle_cmd(hal_cmd_io, msg->opcode, msg->payload);
- 		break;
- 	case HAL_SERVICE_ID_HIDHOST:
--		bt_hid_handle_cmd(hal_cmd_io, msg->opcode, msg->payload,
--								msg->len);
-+		bt_hid_handle_cmd(hal_cmd_io, msg->opcode, msg->payload);
- 		break;
- 	case HAL_SERVICE_ID_SOCK:
- 		bt_sock_handle_cmd(hal_cmd_io, msg->opcode, msg->payload,
+ bool hal_cmd_check(const struct hal_hdr *msg, const void *payload,
+ 								ssize_t len);
++bool hal_rsp_check(const struct hal_hdr *msg, const void *payload,
++								ssize_t len);
 -- 
 1.8.4.2
 
