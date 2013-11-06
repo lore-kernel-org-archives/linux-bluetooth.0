@@ -1,71 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 6 Nov 2013 10:37:29 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH_v4 00/12] Implemented hid interfaces in daemon and HAL
+Message-ID: <20131106083729.GF15573@x220.p-661hnu-f1>
+References: <1383685758-3900-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
-Subject: Re: [PATCHv2 4/6] android: Add supported uuids when adapter is initialized
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20131106080254.GA15573@x220.p-661hnu-f1>
-Date: Wed, 6 Nov 2013 09:41:52 +0100
-Cc: Marcin Kraglak <marcin.kraglak@tieto.com>,
-	"linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <FC8AC89E-747D-4005-9816-9A00734DC2B0@holtmann.org>
-References: <1383657700-22313-1-git-send-email-marcin.kraglak@tieto.com> <1383657700-22313-5-git-send-email-marcin.kraglak@tieto.com> <20131106080254.GA15573@x220.p-661hnu-f1>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+In-Reply-To: <1383685758-3900-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Ravi,
 
->> It will set class of device with proper service hints.
->> We set it statically because we want to keep code simple.
->> 
->> ---
->> android/adapter.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->> 1 file changed, 59 insertions(+)
+On Tue, Nov 05, 2013, Ravi kumar Veeramally wrote:
+> v4: Fixed Johan's comments (length issue and single byte array)
 > 
-> I've applied patches 1-3, but am a bit confused about this one.
+> v3: Wrong order of patches
 > 
->> diff --git a/android/adapter.c b/android/adapter.c
->> index 0f24cac..70b9265 100644
->> --- a/android/adapter.c
->> +++ b/android/adapter.c
->> @@ -52,6 +52,29 @@ static GIOChannel *notification_io = NULL;
->> /* This list contains addresses which are asked for records */
->> static GSList *browse_reqs;
->> 
->> +/*
->> + * This is an array of supported uuids and service hints. We add them via mgmt
->> + * interface when adapter is initialized. Uuids are in reverse orded.
->> + */
->> +static const struct mgmt_cp_add_uuid supported_services[] = {
->> +	/* OBEX_OPP_UUID */
->> +	{ .uuid = { 0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
->> +			0x00, 0x10, 0x00, 0x00, 0x05, 0x11, 0x00, 0x00 },
->> +	.svc_hint = 0x10 },
->> +	/* HFP_AG_UUID */
->> +	{ .uuid = { 0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
->> +			0x00, 0x10, 0x00, 0x00, 0x1f, 0x11, 0x00, 0x00 },
->> +	.svc_hint = 0x40 },
->> +	/* ADVANCED_AUDIO_UUID */
->> +	{ .uuid = { 0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
->> +			0x00, 0x10, 0x00, 0x00, 0x0d, 0x11, 0x00, 0x00 },
->> +	.svc_hint = 0x08 },
->> +	/* PANU_UUID */
->> +	{ .uuid = { 0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
->> +			0x00, 0x10, 0x00, 0x00, 0x15, 0x11, 0x00, 0x00 },
->> +	.svc_hint = 0x02 }
->> +};
+> v2: Fixed Johan's comments (splitting of patches, proper function and
+>     struct names, update hal-msg.h and ipc document, alignment issues
+>     removed pointer from ipc struct)
 > 
-> I seem to remember the discussion around this drifting back to doing the
-> registration dynamically. Do I remember wrong? Wasn't it so that at
-> least some UUIDs (such as PAN) with a bluedroid based system only appear
-> when you actually enable support for the profile in the UI?
+> v1: This patch set implements get/set protocol and get/set report
+>     interfaces and supported functionality in daemon. Sending notifications
+>     and notification handling in hal. Few naming fixes and error handling.
+>     And last handling of few uHID events.
+> 
+> Ravi kumar Veeramally (12):
+>   android/hid: Implement hid get protocol in daemon
+>   android/hid: Implement hid set protocol in daemon
+>   android/hid: Handle protocol mode notification in HAL
+>   android/hid: Add hid event get report structure to HAL msg headers
+>   android/hid: Implement hid get report in daemon
+>   android/hid: Add missing set report parameters to ipc document
+>   android/hid: Implement hid set report in daemon
+>   android/hid: Handle get report notification in HAL
+>   android/hid: Replace header checking magic number with defines
+>   android/hid: Handle invalid parameters in HAL
+>   android/hid: Handle uhid events
+>   android/hid: Align hal hid struct variables properly
+> 
+>  android/hal-hidhost.c   |  41 +++++-
+>  android/hal-ipc-api.txt |   4 +-
+>  android/hal-msg.h       |  32 +++--
+>  android/hid.c           | 325 ++++++++++++++++++++++++++++++++++++++++++++++--
+>  4 files changed, 372 insertions(+), 30 deletions(-)
 
-looking at a Nexus 4, the SDP database seems static. The PAN record is always present.
+I've applied all patches, but I also did some minor cleanups while
+applying (e.g. to the documentation patch) and some bigger ones as
+separate patches on top of this set.
 
-I think dynamic is on the level do we compile in support for the PAN HAL module or not. So the record and UUID list should come from the PAN module. So it is kinda dynamic in that sense, but ultimately static.
-
-Regards
-
-Marcel
-
+Johan
