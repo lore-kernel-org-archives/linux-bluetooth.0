@@ -1,40 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 6 Nov 2013 10:15:23 +0200
+Date: Wed, 6 Nov 2013 10:14:07 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: David Binderman <dcb314@hotmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: bluez-5.10/monitor/packet.c:4335: possible missing break ?
-Message-ID: <20131106081523.GE15573@x220.p-661hnu-f1>
-References: <DUB118-W372AC521B8229C59C076809CF10@phx.gbl>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android: Add option to specify controller index to use
+Message-ID: <20131106081407.GD15573@x220.p-661hnu-f1>
+References: <1383667658-31480-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <DUB118-W372AC521B8229C59C076809CF10@phx.gbl>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1383667658-31480-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Szymon,
 
-On Tue, Nov 05, 2013, David Binderman wrote:
-> Hello there,
+On Tue, Nov 05, 2013, Szymon Janc wrote:
+> This will be usefull while testing on Linux where more controllers
+> can be present.
+> ---
 > 
-> I just ran the static analysis checker "cppcheck" over the source code of bluez-5.10
+> This is on top of patchset starting with patch
+> "adapter: Move MGMT_VERSION macro to mgmt.h"
 > 
-> It said
-> 
-> [monitor/packet.c:4335] -> [monitor/packet.c:4338]: (warning) Variable 'str' is reassigned a value
->  before the old one has been used. 'break;' missing?
-> 
-> Source code is
-> 
->     case 0x03:
->         str = "Allow Scan Request from White List Only, "
->             "Allow Connect Request from White List Only";
->     default:
->         str = "Reserved";
->         break;
-> 
-> Suggest add a break statement to the 0x03 case.
+>  android/main.c | 39 +++++++++++++++++++++++++++++----------
+>  1 file changed, 29 insertions(+), 10 deletions(-)
 
-Yes, that looks like a bug. Do you want to send a proper patch for it?
+Applied. Thanks.
 
 Johan
