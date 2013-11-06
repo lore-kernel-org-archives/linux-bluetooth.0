@@ -2,48 +2,35 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 6/6] android/hid: Handle virtual unplug notification in hid hal
-Date: Wed,  6 Nov 2013 13:48:48 +0200
-Message-Id: <1383738528-14550-7-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 5/6] android/hid: Add hid event virtual unplug structure to HAL msg headers
+Date: Wed,  6 Nov 2013 13:48:47 +0200
+Message-Id: <1383738528-14550-6-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1383738528-14550-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1383738528-14550-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-hidhost.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ android/hal-msg.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
-index b24e74e..74a7fe7 100644
---- a/android/hal-hidhost.c
-+++ b/android/hal-hidhost.c
-@@ -77,6 +77,15 @@ static void handle_get_report(void *buf)
- 						ev->status, ev->data, ev->len);
- }
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 59e4f78..740f2ab 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -477,6 +477,12 @@ struct hal_ev_hid_get_report {
+ 	uint8_t  data[0];
+ } __attribute__((packed));
  
-+static void handle_virtual_unplug(void *buf)
-+{
-+	struct hal_ev_hid_virtual_unplug *ev = buf;
++#define HAL_EV_HID_VIRTUAL_UNPLUG	0x86
++struct hal_ev_hid_virtual_unplug {
++	uint8_t  bdaddr[6];
++	uint8_t  status;
++} __attribute__((packed));
 +
-+	if (bt_hh_cbacks->virtual_unplug_cb)
-+		bt_hh_cbacks->virtual_unplug_cb((bt_bdaddr_t *) ev->bdaddr,
-+								ev->status);
-+}
-+
- /* will be called from notification thread context */
- void bt_notify_hh(uint16_t opcode, void *buf, uint16_t len)
- {
-@@ -96,6 +105,9 @@ void bt_notify_hh(uint16_t opcode, void *buf, uint16_t len)
- 	case HAL_EV_HID_GET_REPORT:
- 		handle_get_report(buf);
- 		break;
-+	case HAL_EV_HID_VIRTUAL_UNPLUG:
-+		handle_virtual_unplug(buf);
-+		break;
- 	default:
- 		DBG("Unhandled callback opcode=0x%x", opcode);
- 		break;
+ #define HAL_EV_AV_CONNECTION_STATE	0x81
+ struct hal_ev_av_connection_state {
+ 	uint8_t state;
 -- 
 1.8.1.2
 
