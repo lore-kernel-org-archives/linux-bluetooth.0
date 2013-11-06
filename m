@@ -1,77 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 00/14] IPC sanity checks
-Date: Wed, 6 Nov 2013 15:09:16 +0100
-Message-ID: <1383746970-25906-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 2/2] android/hal: Add UUID debug print in socket HAL
+Date: Wed,  6 Nov 2013 16:07:09 +0200
+Message-Id: <1383746829-15167-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1383746829-15167-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <903E7C5D-33E0-4EDB-BD6D-02B183278514@holtmann.org>
+ <1383746829-15167-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Following patches are implementing verification of correctness of messages
-received over android IPC. The idea for keeping those checks in single
-place is that messages passed are quite similar in structure and can
-be group into 4 categories. This will also limit possible exit points both
-in daemon and HAL as IPC error should trigger disconnection and shutdown.
+---
+ android/hal-sock.c |   18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
-Another benefit would be that every new command/event implemented will first
-needs to have check implemented limiting possible problems with missing
-message verification.
-
-Checks are ensuring that message format is correct and don't verify content
-of message (which is for command/event handler). Only service id and opcode
-sanity is check in common place.
-
-Some addition ideas for future:
- - if exit due to IPC would return specific code, there could be 'unit' or
-   stress tests that would verify IPC behaviour with valid and invalid data
- - we could have sort of assert when sending data over ipc to quickly detect
-   problems in new code
- - provide hexdump function for dumping offending ipc message for easier
-   debugging
-
-Comments are welcome.
-
-Szymon Janc (14):
-  android: Add HAL IPC commands sanity check
-  android: Use IPC command sanity checks
-  android: Add HAL IPC message response sanity checks
-  android/hal: Use IPC command responses sanity checks
-  android: Add HAL IPC events sanity check
-  android/hal: Use IPC notifications sanity checks
-  android: Remove not needed HAL_MINIMUM_EVENT define
-  android: Remove not needed buf len from Core service functions
-  android: Remove not needed buf len from Bluetooth service functions
-  android: Remove not needed buf len from Hidhost service functions
-  android: Remove not needed buf len from Socket service functions
-  android/hal: Remove not neede buf len from bluetooth HAL
-  android/hal: Remove not neede buf len from hidhost HAL
-  android/hal: Remove not neede buf len from av HAL
-
- android/Android.mk      |   2 +
- android/Makefile.am     |   6 +-
- android/adapter.c       |  35 +++---
- android/adapter.h       |   3 +-
- android/hal-av.c        |   2 +-
- android/hal-bluetooth.c |  35 ++----
- android/hal-hidhost.c   |   2 +-
- android/hal-ipc.c       |  32 ++---
- android/hal-msg-check.c | 327 ++++++++++++++++++++++++++++++++++++++++++++++++
- android/hal-msg.h       |   9 +-
- android/hal.h           |   6 +-
- android/hid.c           |  62 +++------
- android/hid.h           |   2 +-
- android/ipc.c           |   1 +
- android/main.c          |  30 ++---
- android/socket.c        |   3 +-
- android/socket.h        |   3 +-
- 17 files changed, 416 insertions(+), 144 deletions(-)
- create mode 100644 android/hal-msg-check.c
-
+diff --git a/android/hal-sock.c b/android/hal-sock.c
+index 32c7939..750cf5b 100644
+--- a/android/hal-sock.c
++++ b/android/hal-sock.c
+@@ -25,6 +25,8 @@
+ #include "hal-msg.h"
+ #include "hal.h"
+ 
++#include "debug-utils.h"
++
+ static bt_status_t sock_listen_rfcomm(const char *service_name,
+ 					const uint8_t *uuid, int chan,
+ 					int *sock, int flags)
+@@ -49,13 +51,14 @@ static bt_status_t sock_listen(btsock_type_t type, const char *service_name,
+ 					int *sock, int flags)
+ {
+ 	if ((!uuid && chan <= 0) || !sock) {
+-		error("%s: invalid params: uuid %p, chan %d, sock %p",
+-						__func__, uuid, chan, sock);
++		error("Invalid params: uuid %s, chan %d, sock %p",
++				btuuid2str((bt_uuid_t *) uuid), chan, sock);
+ 		return BT_STATUS_PARM_INVALID;
+ 	}
+ 
+-	DBG("uuid %p chan %d sock %p type %d service_name %s",
+-					uuid, chan, sock, type, service_name);
++	DBG("uuid %s chan %d sock %p type %d service_name %s",
++				btuuid2str((bt_uuid_t *) uuid), chan,
++				sock, type, service_name);
+ 
+ 	switch (type) {
+ 	case BTSOCK_RFCOMM:
+@@ -76,12 +79,13 @@ static bt_status_t sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
+ 	struct hal_cmd_sock_connect cmd;
+ 
+ 	if ((!uuid && chan <= 0) || !bdaddr || !sock) {
+-		error("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
+-					bdaddr, uuid, chan, sock);
++		error("Invalid params: bd_addr %p, uuid %s, chan %d, sock %p",
++			bdaddr, btuuid2str((bt_uuid_t *) uuid), chan, sock);
+ 		return BT_STATUS_PARM_INVALID;
+ 	}
+ 
+-	DBG("uuid %p chan %d sock %p type %d", uuid, chan, sock, type);
++	DBG("uuid %s chan %d sock %p type %d", btuuid2str((bt_uuid_t *) uuid),
++							chan, sock, type);
+ 
+ 	if (type != BTSOCK_RFCOMM) {
+ 		error("Socket type %u not supported", type);
 -- 
-1.8.4.2
+1.7.10.4
 
