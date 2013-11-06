@@ -1,31 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 6 Nov 2013 10:13:42 +0200
+Date: Wed, 6 Nov 2013 10:03:38 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Szymon Janc <szymon.janc@tieto.com>
-Subject: Re: [PATCH v2 1/5] adapter: Move MGMT_VERSION macro to mgmt.h
-Message-ID: <20131106081342.GC15573@x220.p-661hnu-f1>
-References: <1383661128-25029-1-git-send-email-szymon.janc@tieto.com>
- <1383675779-4757-1-git-send-email-szymon.janc@tieto.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] monitor: Fallback to 80 columns terminal if not able to
+ get real size
+Message-ID: <20131106080338.GB15573@x220.p-661hnu-f1>
+References: <1383657773-13597-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383675779-4757-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1383657773-13597-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Szymon,
 
 On Tue, Nov 05, 2013, Szymon Janc wrote:
-> This will be also used in Android daemon.
+> This makes num_columns always return valid number of columns, which is
+> expected by print_packets function.
+> 
+> This also fix garbage prints while using btmon via adb shell.
 > ---
-> 
-> v2: fixed missing brackets around 'v' as suggested by Marcel
-> 
->  src/adapter.c     | 1 -
->  src/shared/mgmt.h | 2 ++
->  2 files changed, 2 insertions(+), 1 deletion(-)
+>  monitor/display.c | 8 ++++----
+>  monitor/display.h | 2 ++
+>  2 files changed, 6 insertions(+), 4 deletions(-)
 
-All five patches have been applied. Thanks.
+Applied. Thanks.
 
 Johan
