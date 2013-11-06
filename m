@@ -1,91 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Remove unnecessary 'send' parameter from smp_failure()
-Date: Wed,  6 Nov 2013 11:24:57 +0200
-Message-Id: <1383729897-28492-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
+Subject: Re: [PATCH 1/2] android/debug: Export print uuid function
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20131106083144.GD18874@aemeltch-MOBL1>
+Date: Wed, 6 Nov 2013 09:42:30 +0100
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <903E7C5D-33E0-4EDB-BD6D-02B183278514@holtmann.org>
+References: <1383660378-23198-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <C04753B6-1BA7-459F-830F-981D46C10AF3@holtmann.org> <20131106083144.GD18874@aemeltch-MOBL1>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Andrei,
 
-The send parameter has only been used for determining whether to send a
-Pairing Failed PDU or not. However, the function can equally well use
-the already existing reason parameter to make this choice and send the
-PDU whenever a non-zero value was passed.
+>>> The function will be reused in socket HAL.
+>>> ---
+>>> android/client/textconv.c |    2 +-
+>>> android/client/textconv.h |    1 +
+>>> 2 files changed, 2 insertions(+), 1 deletion(-)
+>>> 
+>>> diff --git a/android/client/textconv.c b/android/client/textconv.c
+>>> index 9a2f7e6..e6f327f 100644
+>>> --- a/android/client/textconv.c
+>>> +++ b/android/client/textconv.c
+>>> @@ -237,7 +237,7 @@ char *bdaddr2str(const bt_bdaddr_t *bd_addr)
+>>> 	return bt_bdaddr_t2str(bd_addr, bdaddr_tls_buffer);
+>>> }
+>>> 
+>>> -static char *btuuid2str(const bt_uuid_t *uuid)
+>>> +char *btuuid2str(const bt_uuid_t *uuid)
+>>> {
+>>> 	static char buf[MAX_UUID_STR_LEN];
+>>> 
+>>> diff --git a/android/client/textconv.h b/android/client/textconv.h
+>>> index 1c848ef..7520b04 100644
+>>> --- a/android/client/textconv.h
+>>> +++ b/android/client/textconv.h
+>>> @@ -109,6 +109,7 @@ void str2bt_uuid_t(const char *str, bt_uuid_t *uuid);
+>>> 
+>>> char *btproperty2str(const bt_property_t *property);
+>>> char *bdaddr2str(const bt_bdaddr_t *bd_addr);
+>>> +char *btuuid2str(const bt_uuid_t *uuid);
+>> 
+>> this is totally backwards then. The HAL should not depend on client code.
+>> 
+> 
+> So shall the function be moved to utils.c inside android or even better
+> src/shared?
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/smp.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+keep it inside android/ directory.
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 4b07acb8293c..f99352d1aa43 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -257,11 +257,11 @@ static u8 check_enc_key_size(struct l2cap_conn *conn, __u8 max_key_size)
- 	return 0;
- }
- 
--static void smp_failure(struct l2cap_conn *conn, u8 reason, u8 send)
-+static void smp_failure(struct l2cap_conn *conn, u8 reason)
- {
- 	struct hci_conn *hcon = conn->hcon;
- 
--	if (send)
-+	if (reason)
- 		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, sizeof(reason),
- 			     &reason);
- 
-@@ -406,7 +406,7 @@ static void confirm_work(struct work_struct *work)
- 	return;
- 
- error:
--	smp_failure(conn, reason, 1);
-+	smp_failure(conn, reason);
- }
- 
- static void random_work(struct work_struct *work)
-@@ -490,7 +490,7 @@ static void random_work(struct work_struct *work)
- 	return;
- 
- error:
--	smp_failure(conn, reason, 1);
-+	smp_failure(conn, reason);
- }
- 
- static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
-@@ -555,10 +555,10 @@ int smp_user_confirm_reply(struct hci_conn *hcon, u16 mgmt_op, __le32 passkey)
- 		break;
- 	case MGMT_OP_USER_PASSKEY_NEG_REPLY:
- 	case MGMT_OP_USER_CONFIRM_NEG_REPLY:
--		smp_failure(conn, SMP_PASSKEY_ENTRY_FAILED, 1);
-+		smp_failure(conn, SMP_PASSKEY_ENTRY_FAILED);
- 		return 0;
- 	default:
--		smp_failure(conn, SMP_PASSKEY_ENTRY_FAILED, 1);
-+		smp_failure(conn, SMP_PASSKEY_ENTRY_FAILED);
- 		return -EOPNOTSUPP;
- 	}
- 
-@@ -895,7 +895,7 @@ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
- 		break;
- 
- 	case SMP_CMD_PAIRING_FAIL:
--		smp_failure(conn, skb->data[0], 0);
-+		smp_failure(conn, 0);
- 		reason = 0;
- 		err = -EPERM;
- 		break;
-@@ -941,7 +941,7 @@ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
- 
- done:
- 	if (reason)
--		smp_failure(conn, reason, 1);
-+		smp_failure(conn, reason);
- 
- 	kfree_skb(skb);
- 	return err;
--- 
-1.8.3.1
+Regards
+
+Marcel
 
