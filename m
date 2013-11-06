@@ -1,70 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 2/2] android/hal: Add UUID debug print in socket HAL
-Date: Wed,  6 Nov 2013 17:10:43 +0200
-Message-Id: <1383750643-1139-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1383750643-1139-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <903E7C5D-33E0-4EDB-BD6D-02B183278514@holtmann.org>
- <1383750643-1139-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <johan.hedberg@gmail.com>, <szymon.janc@tieto.com>,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 1/2] android: Change name for get_disc_timeout
+Date: Wed, 6 Nov 2013 16:08:49 +0100
+Message-ID: <1383750530-18815-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
+Change name to get_discoverable_timeout. Previous name could be
+confusing with disconnection timeout.
 ---
- android/hal-sock.c |   18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ android/adapter.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/android/hal-sock.c b/android/hal-sock.c
-index 32c7939..1d198ac 100644
---- a/android/hal-sock.c
-+++ b/android/hal-sock.c
-@@ -25,6 +25,8 @@
- #include "hal-msg.h"
- #include "hal.h"
+diff --git a/android/adapter.c b/android/adapter.c
+index cf5edcd..1d462c8 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -1284,7 +1284,7 @@ static bool get_devices(void)
+ 	return false;
+ }
  
-+#include "hal-utils.h"
-+
- static bt_status_t sock_listen_rfcomm(const char *service_name,
- 					const uint8_t *uuid, int chan,
- 					int *sock, int flags)
-@@ -49,13 +51,14 @@ static bt_status_t sock_listen(btsock_type_t type, const char *service_name,
- 					int *sock, int flags)
+-static bool get_disc_timeout(void)
++static bool get_discoverable_timeout(void)
  {
- 	if ((!uuid && chan <= 0) || !sock) {
--		error("%s: invalid params: uuid %p, chan %d, sock %p",
--						__func__, uuid, chan, sock);
-+		error("Invalid params: uuid %s, chan %d, sock %p",
-+				btuuid2str((bt_uuid_t *) uuid), chan, sock);
- 		return BT_STATUS_PARM_INVALID;
+ 	DBG("Not implemented");
+ 
+@@ -1316,7 +1316,7 @@ static bool get_property(void *buf, uint16_t len)
+ 	case HAL_PROP_ADAPTER_BONDED_DEVICES:
+ 		return get_devices();
+ 	case HAL_PROP_ADAPTER_DISC_TIMEOUT:
+-		return get_disc_timeout();
++		return get_discoverable_timeout();
+ 	default:
+ 		return false;
  	}
+@@ -1332,7 +1332,7 @@ static void get_properties(void)
+ 	get_service();
+ 	get_scan_mode();
+ 	get_devices();
+-	get_disc_timeout();
++	get_discoverable_timeout();
+ }
  
--	DBG("uuid %p chan %d sock %p type %d service_name %s",
--					uuid, chan, sock, type, service_name);
-+	DBG("uuid %s chan %d sock %p type %d service_name %s",
-+				btuuid2str((bt_uuid_t *) uuid), chan,
-+				sock, type, service_name);
- 
- 	switch (type) {
- 	case BTSOCK_RFCOMM:
-@@ -76,12 +79,13 @@ static bt_status_t sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
- 	struct hal_cmd_sock_connect cmd;
- 
- 	if ((!uuid && chan <= 0) || !bdaddr || !sock) {
--		error("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
--					bdaddr, uuid, chan, sock);
-+		error("Invalid params: bd_addr %p, uuid %s, chan %d, sock %p",
-+			bdaddr, btuuid2str((bt_uuid_t *) uuid), chan, sock);
- 		return BT_STATUS_PARM_INVALID;
- 	}
- 
--	DBG("uuid %p chan %d sock %p type %d", uuid, chan, sock, type);
-+	DBG("uuid %s chan %d sock %p type %d", btuuid2str((bt_uuid_t *) uuid),
-+							chan, sock, type);
- 
- 	if (type != BTSOCK_RFCOMM) {
- 		error("Socket type %u not supported", type);
+ static bool start_discovery(void)
 -- 
-1.7.10.4
+1.8.4
 
