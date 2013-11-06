@@ -1,95 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 6 Nov 2013 09:43:40 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Seung-Woo Kim <sw0312.kim@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	gustavo@padovan.org, s.syam@samsung.com
-Subject: Re: [PATCH] net: bluetooth: fix crash in l2cap_chan_send after
- l2cap_chan_del
-Message-ID: <20131106074340.GA11057@x220.p-661hnu-f1>
-References: <1383644793-30553-1-git-send-email-sw0312.kim@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383644793-30553-1-git-send-email-sw0312.kim@samsung.com>
+From: Sujith Manoharan <sujith@msujith.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: gustavo@padovan.org
+Subject: [PATCH] Bluetooth: ath3k: Add support for another AR3012 card
+Date: Wed,  6 Nov 2013 10:56:00 +0530
+Message-Id: <1383715560-25328-1-git-send-email-sujith@msujith.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Seung-Woo Kim,
+T:  Bus=03 Lev=01 Prnt=01 Port=02 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=04ca ProdID=300b Rev= 0.01
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-On Tue, Nov 05, 2013, Seung-Woo Kim wrote:
-> Removing a bond and disconnecting from a specific remote device
-> can cause l2cap_chan_send() is called after l2cap_chan_del() is
-> called. This causes following crash.
-> 
-> [ 1384.972086] Unable to handle kernel NULL pointer dereference at virtual address 00000008
-> [ 1384.972090] pgd = c0004000
-> [ 1384.972125] [00000008] *pgd=00000000
-> [ 1384.972137] Internal error: Oops: 17 [#1] PREEMPT SMP ARM
-> [ 1384.972144] Modules linked in:
-> [ 1384.972156] CPU: 0 PID: 841 Comm: krfcommd Not tainted 3.10.14-gdf22a71-dirty #435
-> [ 1384.972162] task: df29a100 ti: df178000 task.ti: df178000
-> [ 1384.972182] PC is at l2cap_create_basic_pdu+0x30/0x1ac
-> [ 1384.972191] LR is at l2cap_chan_send+0x100/0x1d4
-> [ 1384.972198] pc : [<c051d250>]    lr : [<c0521c78>]    psr: 40000113
-> [ 1384.972198] sp : df179d40  ip : c083a010  fp : 00000008
-> [ 1384.972202] r10: 00000004  r9 : 0000065a  r8 : 000003f5
-> [ 1384.972206] r7 : 00000000  r6 : 00000000  r5 : df179e84  r4 : da557000
-> [ 1384.972210] r3 : 00000000  r2 : 00000004  r1 : df179e84  r0 : 00000000
-> [ 1384.972215] Flags: nZcv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment kernel
-> [ 1384.972220] Control: 10c53c7d  Table: 5c8b004a  DAC: 00000015
-> [ 1384.972224] Process krfcommd (pid: 841, stack limit = 0xdf178238)
-> [ 1384.972229] Stack: (0xdf179d40 to 0xdf17a000)
-> [ 1384.972238] 9d40: 00000000 da557000 00000004 df179e84 00000004 000003f5 0000065a 00000000
-> [ 1384.972245] 9d60: 00000008 c0521c78 df179e84 da557000 00000004 da557204 de0c6800 df179e84
-> [ 1384.972253] 9d80: da557000 00000004 da557204 c0526b7c 00000004 df724000 df179e84 00000004
-> [ 1384.972260] 9da0: df179db0 df29a100 c083bc48 c045481c 00000001 00000000 00000000 00000000
-> [ 1384.972267] 9dc0: 00000000 df29a100 00000000 00000000 00000000 00000000 df179e10 00000000
-> [ 1384.972274] 9de0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> [ 1384.972281] 9e00: 00000000 00000000 00000000 00000000 df179e4c c000ec80 c0b538c0 00000004
-> [ 1384.972288] 9e20: df724000 df178000 00000000 df179e84 c0b538c0 00000000 df178000 c07f4570
-> [ 1384.972295] 9e40: dcad9c00 df179e74 c07f4394 df179e60 df178000 00000000 df179e84 de247010
-> [ 1384.972303] 9e60: 00000043 c0454dec 00000001 00000004 df315c00 c0530598 00000004 df315c0c
-> [ 1384.972310] 9e80: ffffc32c 00000000 00000000 df179ea0 00000001 00000000 00000000 00000000
-> [ 1384.972317] 9ea0: df179ebc 00000004 df315c00 c05df838 00000000 c0530810 c07d08c0 d7017303
-> [ 1384.972325] 9ec0: 6ec245b9 00000000 df315c00 c0531b04 c07f3fe0 c07f4018 da67a300 df315c00
-> [ 1384.972332] 9ee0: 00000000 c05334e0 df315c00 df315b80 df315c00 de0c6800 da67a300 00000000
-> [ 1384.972339] 9f00: de0c684c c0533674 df204100 df315c00 df315c00 df204100 df315c00 c082b138
-> [ 1384.972347] 9f20: c053385c c0533754 a0000113 df178000 00000001 c083bc48 00000000 c053385c
-> [ 1384.972354] 9f40: 00000000 00000000 00000000 c05338c4 00000000 df9f0000 df9f5ee4 df179f6c
-> [ 1384.972360] 9f60: df178000 c0049db4 00000000 00000000 c07f3ff8 00000000 00000000 00000000
-> [ 1384.972368] 9f80: df179f80 df179f80 00000000 00000000 df179f90 df179f90 df9f5ee4 c0049cfc
-> [ 1384.972374] 9fa0: 00000000 00000000 00000000 c000f168 00000000 00000000 00000000 00000000
-> [ 1384.972381] 9fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> [ 1384.972388] 9fe0: 00000000 00000000 00000000 00000000 00000013 00000000 00010000 00000600
-> [ 1384.972411] [<c051d250>] (l2cap_create_basic_pdu+0x30/0x1ac) from [<c0521c78>] (l2cap_chan_send+0x100/0x1d4)
-> [ 1384.972425] [<c0521c78>] (l2cap_chan_send+0x100/0x1d4) from [<c0526b7c>] (l2cap_sock_sendmsg+0xa8/0x104)
-> [ 1384.972440] [<c0526b7c>] (l2cap_sock_sendmsg+0xa8/0x104) from [<c045481c>] (sock_sendmsg+0xac/0xcc)
-> [ 1384.972453] [<c045481c>] (sock_sendmsg+0xac/0xcc) from [<c0454dec>] (kernel_sendmsg+0x2c/0x34)
-> [ 1384.972469] [<c0454dec>] (kernel_sendmsg+0x2c/0x34) from [<c0530598>] (rfcomm_send_frame+0x58/0x7c)
-> [ 1384.972481] [<c0530598>] (rfcomm_send_frame+0x58/0x7c) from [<c0530810>] (rfcomm_send_ua+0x98/0xbc)
-> [ 1384.972494] [<c0530810>] (rfcomm_send_ua+0x98/0xbc) from [<c0531b04>] (rfcomm_recv_disc+0xac/0x100)
-> [ 1384.972506] [<c0531b04>] (rfcomm_recv_disc+0xac/0x100) from [<c05334e0>] (rfcomm_recv_frame+0x144/0x264)
-> [ 1384.972519] [<c05334e0>] (rfcomm_recv_frame+0x144/0x264) from [<c0533674>] (rfcomm_process_rx+0x74/0xfc)
-> [ 1384.972531] [<c0533674>] (rfcomm_process_rx+0x74/0xfc) from [<c0533754>] (rfcomm_process_sessions+0x58/0x160)
-> [ 1384.972543] [<c0533754>] (rfcomm_process_sessions+0x58/0x160) from [<c05338c4>] (rfcomm_run+0x68/0x110)
-> [ 1384.972558] [<c05338c4>] (rfcomm_run+0x68/0x110) from [<c0049db4>] (kthread+0xb8/0xbc)
-> [ 1384.972576] [<c0049db4>] (kthread+0xb8/0xbc) from [<c000f168>] (ret_from_fork+0x14/0x2c)
-> [ 1384.972586] Code: e3100004 e1a07003 e5946000 1a000057 (e5969008)
-> [ 1384.972614] ---[ end trace 6170b7ce00144e8c ]---
-> 
-> Signed-off-by: Seung-Woo Kim <sw0312.kim@samsung.com>
-> ---
-> I can reproduce this crash with bluetooth-next kernel merged onto my v3.10
-> system. It is usually happens when the device is at sleep state and remote
-> device disconnects and removes bonding.
-> 
-> This patch is based on bluetooth-next tree.
-> ---
->  net/bluetooth/l2cap_core.c |    3 +++
->  1 files changed, 3 insertions(+), 0 deletions(-)
+Reported-by:Face <falazemi@gmail.com>
+Signed-off-by: Sujith Manoharan <sujith@msujith.org>
+---
+ drivers/bluetooth/ath3k.c | 2 ++
+ drivers/bluetooth/btusb.c | 1 +
+ 2 files changed, 3 insertions(+)
 
-The patch has been applied to bluetooth-next. Thanks.
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 32582ec..d3fdc32 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -83,6 +83,7 @@ static const struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x04CA, 0x3005) },
+ 	{ USB_DEVICE(0x04CA, 0x3006) },
+ 	{ USB_DEVICE(0x04CA, 0x3008) },
++	{ USB_DEVICE(0x04CA, 0x300b) },
+ 	{ USB_DEVICE(0x13d3, 0x3362) },
+ 	{ USB_DEVICE(0x0CF3, 0xE004) },
+ 	{ USB_DEVICE(0x0CF3, 0xE005) },
+@@ -126,6 +127,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
+ 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3006), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3008), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x04ca, 0x300b), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0xe005), .driver_info = BTUSB_ATH3012 },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 711ca6f..3d04bce 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -150,6 +150,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x04ca, 0x3005), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3006), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x04ca, 0x3008), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x04ca, 0x300b), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0xe005), .driver_info = BTUSB_ATH3012 },
+-- 
+1.8.4.2
 
-I also fixed up the subject a bit to be consistent with the rest of the
-commits for the Bluetooth subsystem.
-
-Johan
