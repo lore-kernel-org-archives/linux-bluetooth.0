@@ -1,55 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 6 Nov 2013 10:37:29 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH_v4 00/12] Implemented hid interfaces in daemon and HAL
-Message-ID: <20131106083729.GF15573@x220.p-661hnu-f1>
-References: <1383685758-3900-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Date: Wed, 6 Nov 2013 10:32:23 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/2] android/debug: Export print uuid function
+Message-ID: <20131106083144.GD18874@aemeltch-MOBL1>
+References: <1383660378-23198-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <C04753B6-1BA7-459F-830F-981D46C10AF3@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383685758-3900-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <C04753B6-1BA7-459F-830F-981D46C10AF3@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Marcel,
 
-On Tue, Nov 05, 2013, Ravi kumar Veeramally wrote:
-> v4: Fixed Johan's comments (length issue and single byte array)
+On Tue, Nov 05, 2013 at 05:56:08PM +0100, Marcel Holtmann wrote:
+> Hi Andrei,
 > 
-> v3: Wrong order of patches
+> > The function will be reused in socket HAL.
+> > ---
+> > android/client/textconv.c |    2 +-
+> > android/client/textconv.h |    1 +
+> > 2 files changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/android/client/textconv.c b/android/client/textconv.c
+> > index 9a2f7e6..e6f327f 100644
+> > --- a/android/client/textconv.c
+> > +++ b/android/client/textconv.c
+> > @@ -237,7 +237,7 @@ char *bdaddr2str(const bt_bdaddr_t *bd_addr)
+> > 	return bt_bdaddr_t2str(bd_addr, bdaddr_tls_buffer);
+> > }
+> > 
+> > -static char *btuuid2str(const bt_uuid_t *uuid)
+> > +char *btuuid2str(const bt_uuid_t *uuid)
+> > {
+> > 	static char buf[MAX_UUID_STR_LEN];
+> > 
+> > diff --git a/android/client/textconv.h b/android/client/textconv.h
+> > index 1c848ef..7520b04 100644
+> > --- a/android/client/textconv.h
+> > +++ b/android/client/textconv.h
+> > @@ -109,6 +109,7 @@ void str2bt_uuid_t(const char *str, bt_uuid_t *uuid);
+> > 
+> > char *btproperty2str(const bt_property_t *property);
+> > char *bdaddr2str(const bt_bdaddr_t *bd_addr);
+> > +char *btuuid2str(const bt_uuid_t *uuid);
 > 
-> v2: Fixed Johan's comments (splitting of patches, proper function and
->     struct names, update hal-msg.h and ipc document, alignment issues
->     removed pointer from ipc struct)
+> this is totally backwards then. The HAL should not depend on client code.
 > 
-> v1: This patch set implements get/set protocol and get/set report
->     interfaces and supported functionality in daemon. Sending notifications
->     and notification handling in hal. Few naming fixes and error handling.
->     And last handling of few uHID events.
-> 
-> Ravi kumar Veeramally (12):
->   android/hid: Implement hid get protocol in daemon
->   android/hid: Implement hid set protocol in daemon
->   android/hid: Handle protocol mode notification in HAL
->   android/hid: Add hid event get report structure to HAL msg headers
->   android/hid: Implement hid get report in daemon
->   android/hid: Add missing set report parameters to ipc document
->   android/hid: Implement hid set report in daemon
->   android/hid: Handle get report notification in HAL
->   android/hid: Replace header checking magic number with defines
->   android/hid: Handle invalid parameters in HAL
->   android/hid: Handle uhid events
->   android/hid: Align hal hid struct variables properly
-> 
->  android/hal-hidhost.c   |  41 +++++-
->  android/hal-ipc-api.txt |   4 +-
->  android/hal-msg.h       |  32 +++--
->  android/hid.c           | 325 ++++++++++++++++++++++++++++++++++++++++++++++--
->  4 files changed, 372 insertions(+), 30 deletions(-)
 
-I've applied all patches, but I also did some minor cleanups while
-applying (e.g. to the documentation patch) and some bigger ones as
-separate patches on top of this set.
+So shall the function be moved to utils.c inside android or even better
+src/shared?
 
-Johan
+Best regards 
+Andrei Emeltchenko 
