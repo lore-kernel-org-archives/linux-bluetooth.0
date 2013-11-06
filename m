@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 14/14] android/hal: Remove not neede buf len from av HAL
-Date: Wed, 6 Nov 2013 15:09:30 +0100
-Message-ID: <1383746970-25906-15-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC 06/14] android/hal: Use IPC notifications sanity checks
+Date: Wed, 6 Nov 2013 15:09:22 +0100
+Message-ID: <1383746970-25906-7-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1383746970-25906-1-git-send-email-szymon.janc@tieto.com>
 References: <1383746970-25906-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
@@ -12,50 +12,39 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Message correctness is verified upon reception and handling functions
-can simply make assumption that data in buffer is correct.
+Make HAL library checks received IPC notifications for correctness.
 ---
- android/hal-av.c  | 2 +-
- android/hal-ipc.c | 2 +-
- android/hal.h     | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ android/hal-ipc.c | 17 ++---------------
+ 1 file changed, 2 insertions(+), 15 deletions(-)
 
-diff --git a/android/hal-av.c b/android/hal-av.c
-index 9e1b3df..3da79c4 100644
---- a/android/hal-av.c
-+++ b/android/hal-av.c
-@@ -49,7 +49,7 @@ static void handle_audio_state(void *buf)
- }
- 
- /* will be called from notification thread context */
--void bt_notify_av(uint16_t opcode, void *buf, uint16_t len)
-+void bt_notify_av(uint16_t opcode, void *buf)
- {
- 	if (!interface_ready())
- 		return;
 diff --git a/android/hal-ipc.c b/android/hal-ipc.c
-index 173229a..2de7c2f 100644
+index 293be87..13392c2 100644
 --- a/android/hal-ipc.c
 +++ b/android/hal-ipc.c
-@@ -53,7 +53,7 @@ static void notification_dispatch(struct hal_hdr *msg, int fd)
- 		bt_notify_hh(msg->opcode, msg->payload);
- 		break;
- 	case HAL_SERVICE_ID_A2DP:
--		bt_notify_av(msg->opcode, msg->payload, msg->len);
-+		bt_notify_av(msg->opcode, msg->payload);
- 		break;
- 	default:
- 		DBG("Unhandled notification service=%d opcode=0x%x",
-diff --git a/android/hal.h b/android/hal.h
-index 9f1ecec..bcd0861 100644
---- a/android/hal.h
-+++ b/android/hal.h
-@@ -30,4 +30,4 @@ void bt_notify_adapter(uint16_t opcode, void *buf);
- void bt_thread_associate(void);
- void bt_thread_disassociate(void);
- void bt_notify_hh(uint16_t opcode, void *buf);
--void bt_notify_av(uint16_t opcode, void *buf, uint16_t len);
-+void bt_notify_av(uint16_t opcode, void *buf);
+@@ -105,21 +105,8 @@ static void *notification_handler(void *data)
+ 			exit(EXIT_FAILURE);
+ 		}
+ 
+-		if (ret < (ssize_t) sizeof(*ev)) {
+-			error("Too small notification (%zd bytes), aborting",
+-									ret);
+-			exit(EXIT_FAILURE);
+-		}
+-
+-		if (ev->opcode < HAL_MINIMUM_EVENT) {
+-			error("Invalid notification (0x%x), aborting",
+-							ev->opcode);
+-			exit(EXIT_FAILURE);
+-		}
+-
+-		if (ret != (ssize_t) (sizeof(*ev) + ev->len)) {
+-			error("Malformed notification(%zd bytes), aborting",
+-									ret);
++		if (!hal_notif_check(ev, ev->payload, ret)) {
++			error("IPC protocol error in notification, aborting");
+ 			exit(EXIT_FAILURE);
+ 		}
+ 
 -- 
 1.8.4.2
 
