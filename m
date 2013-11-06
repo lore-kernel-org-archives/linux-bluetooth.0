@@ -1,33 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
-Subject: Re: [PATCH] Bluetooth: Remove unnecessary 'send' parameter from smp_failure()
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1383729897-28492-1-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 6 Nov 2013 21:17:40 +0100
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <61396A6F-CC67-4994-834E-1BF45F07BB5E@holtmann.org>
-References: <1383729897-28492-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Bing Zhao <bzhao@marvell.com>
+To: Ben Hutchings <ben@decadent.org.uk>
+CC: <linux-wireless@vger.kernel.org>,
+	<linux-bluetooth@vger.kernel.org>,
+	Frank Huang <frankh@marvell.com>, Bing Zhao <bzhao@marvell.com>
+Subject: linux-firmware: pull-request Marvell mwifiex-firmware 2013-11-06
+Date: Wed, 6 Nov 2013 11:25:13 -0800
+Message-ID: <1383765913-19716-1-git-send-email-bzhao@marvell.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+The following changes since commit 7d0c7a8cfd78388d90cc784a185b19dcbdbce824:
 
-> The send parameter has only been used for determining whether to send a
-> Pairing Failed PDU or not. However, the function can equally well use
-> the already existing reason parameter to make this choice and send the
-> PDU whenever a non-zero value was passed.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/smp.c | 16 ++++++++--------
-> 1 file changed, 8 insertions(+), 8 deletions(-)
+  Merge branch 'wilink4' of git://git.kernel.org/pub/scm/linux/kernel/git/balbi/linux-firmware (2013-10-13 21:11:46 +0100)
 
-patch has been applied to bluetooth-next tree.
+are available in the git repository at:
 
-Regards
 
-Marcel
+  git://git.marvell.com/mwifiex-firmware.git master
 
+for you to fetch changes up to b7c848634538ff87317acd802fb4645cfd2f9fb5:
+
+  linux-firmware: add Marvell SD8897-B0 firmware combo image (2013-11-04 16:03:34 -0800)
+
+----------------------------------------------------------------
+Bing Zhao (2):
+      linux-firmware: update Marvell PCIe/USB 8897-B0 firmware combo image
+      linux-firmware: add Marvell SD8897-B0 firmware combo image
+
+ WHENCE                   |   5 ++++-
+ mrvl/pcie8897_uapsta.bin | Bin 350244 -> 656896 bytes
+ mrvl/sd8897_uapsta.bin   | Bin 0 -> 639012 bytes
+ 3 files changed, 4 insertions(+), 1 deletion(-)
+ create mode 100644 mrvl/sd8897_uapsta.bin
+
+diff --git a/WHENCE b/WHENCE
+index 2d52804..3875e77 100644
+--- a/WHENCE
++++ b/WHENCE
+@@ -727,11 +727,14 @@ Version: 14.66.9.p96
+ File: mrvl/sd8797_uapsta.bin
+ Version: 14.66.11.p151
+ 
++File: mrvl/sd8897_uapsta.bin
++Version: 15.69.2.p11
++
+ File: mrvl/usb8797_uapsta.bin
+ Version: 14.69.11.p179
+ 
+ File: mrvl/pcie8897_uapsta.bin
+-Version: 15.69.201.p52
++Version: 15.69.2.p11
+ 
+ Licence: Redistributable. See LICENCE.Marvell for details.  Originates from
+ http://git.marvell.com/?p=mwifiex-firmware.git
+diff --git a/mrvl/pcie8897_uapsta.bin b/mrvl/pcie8897_uapsta.bin
+index b067689..858c100 100644
+Binary files a/mrvl/pcie8897_uapsta.bin and b/mrvl/pcie8897_uapsta.bin differ
+diff --git a/mrvl/sd8897_uapsta.bin b/mrvl/sd8897_uapsta.bin
+new file mode 100644
+index 0000000..70732a6
+Binary files /dev/null and b/mrvl/sd8897_uapsta.bin differ
