@@ -1,88 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <FC8AC89E-747D-4005-9816-9A00734DC2B0@holtmann.org>
-References: <1383657700-22313-1-git-send-email-marcin.kraglak@tieto.com>
-	<1383657700-22313-5-git-send-email-marcin.kraglak@tieto.com>
-	<20131106080254.GA15573@x220.p-661hnu-f1>
-	<FC8AC89E-747D-4005-9816-9A00734DC2B0@holtmann.org>
-Date: Wed, 6 Nov 2013 12:08:06 +0100
-Message-ID: <CABD6X-+vd=YEkD6BzmmnZS5zN2H7dOOg_TZs4XZ+NWCwNYx2cg@mail.gmail.com>
-Subject: Re: [PATCHv2 4/6] android: Add supported uuids when adapter is initialized
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	"linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: <linux-bluetooth@vger.kernel.org>
+CC: Marcin Kraglak <marcin.kraglak@tieto.com>
+Subject: [PATCHv3] android: Implement class of device property callback
+Date: Wed, 6 Nov 2013 11:59:22 +0100
+Message-ID: <1383735562-21777-1-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan, Marcel
+This will send adapter property with class of device
+to notification socket.
+---
+ android/adapter.c | 30 ++++++++++++++++++++++++++----
+ 1 file changed, 26 insertions(+), 4 deletions(-)
 
-On 6 November 2013 09:41, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Johan,
->
->>> It will set class of device with proper service hints.
->>> We set it statically because we want to keep code simple.
->>>
->>> ---
->>> android/adapter.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>> 1 file changed, 59 insertions(+)
->>
->> I've applied patches 1-3, but am a bit confused about this one.
->>
->>> diff --git a/android/adapter.c b/android/adapter.c
->>> index 0f24cac..70b9265 100644
->>> --- a/android/adapter.c
->>> +++ b/android/adapter.c
->>> @@ -52,6 +52,29 @@ static GIOChannel *notification_io = NULL;
->>> /* This list contains addresses which are asked for records */
->>> static GSList *browse_reqs;
->>>
->>> +/*
->>> + * This is an array of supported uuids and service hints. We add them via mgmt
->>> + * interface when adapter is initialized. Uuids are in reverse orded.
->>> + */
->>> +static const struct mgmt_cp_add_uuid supported_services[] = {
->>> +    /* OBEX_OPP_UUID */
->>> +    { .uuid = { 0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
->>> +                    0x00, 0x10, 0x00, 0x00, 0x05, 0x11, 0x00, 0x00 },
->>> +    .svc_hint = 0x10 },
->>> +    /* HFP_AG_UUID */
->>> +    { .uuid = { 0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
->>> +                    0x00, 0x10, 0x00, 0x00, 0x1f, 0x11, 0x00, 0x00 },
->>> +    .svc_hint = 0x40 },
->>> +    /* ADVANCED_AUDIO_UUID */
->>> +    { .uuid = { 0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
->>> +                    0x00, 0x10, 0x00, 0x00, 0x0d, 0x11, 0x00, 0x00 },
->>> +    .svc_hint = 0x08 },
->>> +    /* PANU_UUID */
->>> +    { .uuid = { 0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
->>> +                    0x00, 0x10, 0x00, 0x00, 0x15, 0x11, 0x00, 0x00 },
->>> +    .svc_hint = 0x02 }
->>> +};
->>
->> I seem to remember the discussion around this drifting back to doing the
->> registration dynamically. Do I remember wrong? Wasn't it so that at
->> least some UUIDs (such as PAN) with a bluedroid based system only appear
->> when you actually enable support for the profile in the UI?
->
-> looking at a Nexus 4, the SDP database seems static. The PAN record is always present.
->
-> I think dynamic is on the level do we compile in support for the PAN HAL module or not. So the record and UUID list should come from the PAN module. So it is kinda dynamic in that sense, but ultimately static.
->
-> Regards
->
-> Marcel
->
+diff --git a/android/adapter.c b/android/adapter.c
+index 0f24cac..cf5edcd 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -189,6 +189,28 @@ static void scan_mode_changed(void)
+ 	g_free(ev);
+ }
+ 
++static void adapter_class_changed(void)
++{
++	struct hal_ev_adapter_props_changed *ev;
++	int len;
++
++	len = sizeof(*ev) + sizeof(struct hal_property) + sizeof(uint32_t);
++
++	ev = g_malloc(len);
++
++	ev->num_props = 1;
++	ev->status = HAL_STATUS_SUCCESS;
++
++	ev->props[0].type = HAL_PROP_ADAPTER_CLASS;
++	ev->props[0].len = sizeof(uint32_t);
++	memcpy(ev->props->val, &adapter->dev_class, sizeof(uint32_t));
++
++	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
++				HAL_EV_ADAPTER_PROPS_CHANGED, len, ev, -1);
++
++	g_free(ev);
++}
++
+ static void settings_changed(uint32_t settings)
+ {
+ 	uint32_t changed_mask;
+@@ -257,7 +279,7 @@ static void mgmt_dev_class_changed_event(uint16_t index, uint16_t length,
+ 
+ 	adapter->dev_class = dev_class;
+ 
+-	/* TODO: Inform prop change: Class */
++	adapter_class_changed();
+ 
+ 	/* TODO: Gatt attrib set*/
+ }
+@@ -1219,11 +1241,11 @@ static bool get_uuids(void)
+ 
+ static bool get_class(void)
+ {
+-	DBG("Not implemented");
++	DBG("");
+ 
+-	/* TODO: Add implementation */
++	adapter_class_changed();
+ 
+-	return false;
++	return true;
+ }
+ 
+ static bool get_type(void)
+-- 
+1.8.4.1
 
-Could it look like this:
-we will hold that static array off uuids and svc hints and additional
-profile_id.
-Each profile will call generic method like
-adapter_register_profile(profile_id) (just example), and it will add
-sdp record to sdp server & uuid to mgmt interface. Profiles
-implemented out of stack (I mean opp, pbab etc) will have static sdp
-record and uuid which will be added once adapter is initialized. What
-is your opinion?
-
-Regards
-Marcin
