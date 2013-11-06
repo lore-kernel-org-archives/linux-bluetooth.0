@@ -1,78 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: [PATCHv3] android: Implement class of device property callback
-Date: Wed, 6 Nov 2013 11:59:22 +0100
-Message-ID: <1383735562-21777-1-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Remove unnecessary 'send' parameter from smp_failure()
+Date: Wed,  6 Nov 2013 11:24:57 +0200
+Message-Id: <1383729897-28492-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will send adapter property with class of device
-to notification socket.
----
- android/adapter.c | 30 ++++++++++++++++++++++++++----
- 1 file changed, 26 insertions(+), 4 deletions(-)
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-diff --git a/android/adapter.c b/android/adapter.c
-index 0f24cac..cf5edcd 100644
---- a/android/adapter.c
-+++ b/android/adapter.c
-@@ -189,6 +189,28 @@ static void scan_mode_changed(void)
- 	g_free(ev);
+The send parameter has only been used for determining whether to send a
+Pairing Failed PDU or not. However, the function can equally well use
+the already existing reason parameter to make this choice and send the
+PDU whenever a non-zero value was passed.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/smp.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 4b07acb8293c..f99352d1aa43 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -257,11 +257,11 @@ static u8 check_enc_key_size(struct l2cap_conn *conn, __u8 max_key_size)
+ 	return 0;
  }
  
-+static void adapter_class_changed(void)
-+{
-+	struct hal_ev_adapter_props_changed *ev;
-+	int len;
-+
-+	len = sizeof(*ev) + sizeof(struct hal_property) + sizeof(uint32_t);
-+
-+	ev = g_malloc(len);
-+
-+	ev->num_props = 1;
-+	ev->status = HAL_STATUS_SUCCESS;
-+
-+	ev->props[0].type = HAL_PROP_ADAPTER_CLASS;
-+	ev->props[0].len = sizeof(uint32_t);
-+	memcpy(ev->props->val, &adapter->dev_class, sizeof(uint32_t));
-+
-+	ipc_send(notification_io, HAL_SERVICE_ID_BLUETOOTH,
-+				HAL_EV_ADAPTER_PROPS_CHANGED, len, ev, -1);
-+
-+	g_free(ev);
-+}
-+
- static void settings_changed(uint32_t settings)
+-static void smp_failure(struct l2cap_conn *conn, u8 reason, u8 send)
++static void smp_failure(struct l2cap_conn *conn, u8 reason)
  {
- 	uint32_t changed_mask;
-@@ -257,7 +279,7 @@ static void mgmt_dev_class_changed_event(uint16_t index, uint16_t length,
+ 	struct hci_conn *hcon = conn->hcon;
  
- 	adapter->dev_class = dev_class;
+-	if (send)
++	if (reason)
+ 		smp_send_cmd(conn, SMP_CMD_PAIRING_FAIL, sizeof(reason),
+ 			     &reason);
  
--	/* TODO: Inform prop change: Class */
-+	adapter_class_changed();
+@@ -406,7 +406,7 @@ static void confirm_work(struct work_struct *work)
+ 	return;
  
- 	/* TODO: Gatt attrib set*/
- }
-@@ -1219,11 +1241,11 @@ static bool get_uuids(void)
- 
- static bool get_class(void)
- {
--	DBG("Not implemented");
-+	DBG("");
- 
--	/* TODO: Add implementation */
-+	adapter_class_changed();
- 
--	return false;
-+	return true;
+ error:
+-	smp_failure(conn, reason, 1);
++	smp_failure(conn, reason);
  }
  
- static bool get_type(void)
+ static void random_work(struct work_struct *work)
+@@ -490,7 +490,7 @@ static void random_work(struct work_struct *work)
+ 	return;
+ 
+ error:
+-	smp_failure(conn, reason, 1);
++	smp_failure(conn, reason);
+ }
+ 
+ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
+@@ -555,10 +555,10 @@ int smp_user_confirm_reply(struct hci_conn *hcon, u16 mgmt_op, __le32 passkey)
+ 		break;
+ 	case MGMT_OP_USER_PASSKEY_NEG_REPLY:
+ 	case MGMT_OP_USER_CONFIRM_NEG_REPLY:
+-		smp_failure(conn, SMP_PASSKEY_ENTRY_FAILED, 1);
++		smp_failure(conn, SMP_PASSKEY_ENTRY_FAILED);
+ 		return 0;
+ 	default:
+-		smp_failure(conn, SMP_PASSKEY_ENTRY_FAILED, 1);
++		smp_failure(conn, SMP_PASSKEY_ENTRY_FAILED);
+ 		return -EOPNOTSUPP;
+ 	}
+ 
+@@ -895,7 +895,7 @@ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		break;
+ 
+ 	case SMP_CMD_PAIRING_FAIL:
+-		smp_failure(conn, skb->data[0], 0);
++		smp_failure(conn, 0);
+ 		reason = 0;
+ 		err = -EPERM;
+ 		break;
+@@ -941,7 +941,7 @@ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ done:
+ 	if (reason)
+-		smp_failure(conn, reason, 1);
++		smp_failure(conn, reason);
+ 
+ 	kfree_skb(skb);
+ 	return err;
 -- 
-1.8.4.1
+1.8.3.1
 
