@@ -1,31 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 0/6] Add missing hid ipc doc and hal headers
-Date: Wed,  6 Nov 2013 13:48:42 +0200
-Message-Id: <1383738528-14550-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Date: Wed, 6 Nov 2013 13:32:38 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv3] android: Implement class of device property callback
+Message-ID: <20131106113238.GA322@x220.p-661hnu-f1>
+References: <1383735562-21777-1-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1383735562-21777-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds missing hid ipc documentation, hal headers,
-renaming and virtual unplug notification in hid HAL.
-Unsupported methods are virtual unplug and send data in daemon.
+Hi Marcin,
 
-Ravi kumar Veeramally (6):
-  android/hid: Add missing hid send data parameters in ipc document
-  android/hid: Add missing parameters in send data struct in HAL headers
-  android/hid: Fill send data structure variables in hal-hidhost
-  android/hid: Rename virtual unplug define and struct
-  android/hid: Add hid event virtual unplug structure to HAL msg headers
-  android/hid: Handle virtual unplug notification in hid hal
+On Wed, Nov 06, 2013, Marcin Kraglak wrote:
+> This will send adapter property with class of device
+> to notification socket.
+> ---
+>  android/adapter.c | 30 ++++++++++++++++++++++++++----
+>  1 file changed, 26 insertions(+), 4 deletions(-)
 
- android/hal-hidhost.c   | 18 ++++++++++++++++--
- android/hal-ipc-api.txt |  4 +++-
- android/hal-msg.h       | 14 +++++++++++---
- android/hid.c           |  5 +++--
- 4 files changed, 33 insertions(+), 8 deletions(-)
+Applied. Thanks.
 
--- 
-1.8.1.2
-
+Johan
