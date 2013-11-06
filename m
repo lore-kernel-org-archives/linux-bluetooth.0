@@ -1,66 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] android/hal: Rename hal_op_sock_listen to hal_cmd_sock_listen
-Date: Wed,  6 Nov 2013 16:03:33 +0200
-Message-Id: <1383746614-15077-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1383746614-15077-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1383746614-15077-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 6 Nov 2013 15:44:07 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: Remove unnecessary 'send' parameter from
+ smp_failure()
+Message-ID: <20131106134407.GA5925@x220.p-661hnu-f1>
+References: <1383729897-28492-1-git-send-email-johan.hedberg@gmail.com>
+ <CAJdJm_MGVDvH4h71PgD6YWavOBm=xpgnh1nMtFNtEpL7gEQQcw@mail.gmail.com>
+ <CAJdJm_Mj4AUHka3y5T1T=GEAATbuzwgsB20dLSMEzpdzi56jbA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAJdJm_Mj4AUHka3y5T1T=GEAATbuzwgsB20dLSMEzpdzi56jbA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Lizardo,
 
-This makes structures consistent with the rest of the code.
----
- android/hal-msg.h  |    4 ++--
- android/hal-sock.c |    4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+On Wed, Nov 06, 2013, Anderson Lizardo wrote:
+> On Wed, Nov 6, 2013 at 9:31 AM, Anderson Lizardo
+> <anderson.lizardo@openbossa.org> wrote:
+> > Hi Johan,
+> >
+> > On Wed, Nov 6, 2013 at 5:24 AM,  <johan.hedberg@gmail.com> wrote:
+> >
+> >> @@ -895,7 +895,7 @@ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
+> >>                 break;
+> >>
+> >>         case SMP_CMD_PAIRING_FAIL:
+> >> -               smp_failure(conn, skb->data[0], 0);
+> >> +               smp_failure(conn, 0);
+> >
+> > I think you meant "smp_failure(conn, skb->data[0]);" here.
+> 
+> My bad, I see now that the purpose is to not send an error in this case.
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index f0cc800..a5e5c76 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -215,7 +215,7 @@ struct hal_cmd_le_test_mode {
- /* Bluetooth Socket HAL api */
- 
- #define HAL_OP_SOCK_LISTEN		0x01
--struct hal_op_sock_listen {
-+struct hal_cmd_sock_listen {
- 	uint8_t  type;
- 	uint8_t  name[256];
- 	uint8_t  uuid[16];
-@@ -224,7 +224,7 @@ struct hal_op_sock_listen {
- } __attribute__((packed));
- 
- #define HAL_OP_SOCK_CONNECT		0x02
--struct hal_op_sock_connect {
-+struct hal_cmd_sock_connect {
- 	uint8_t  bdaddr[6];
- 	uint8_t  type;
- 	uint8_t  uuid[16];
-diff --git a/android/hal-sock.c b/android/hal-sock.c
-index cd85f1f..32c7939 100644
---- a/android/hal-sock.c
-+++ b/android/hal-sock.c
-@@ -29,7 +29,7 @@ static bt_status_t sock_listen_rfcomm(const char *service_name,
- 					const uint8_t *uuid, int chan,
- 					int *sock, int flags)
- {
--	struct hal_op_sock_listen cmd;
-+	struct hal_cmd_sock_listen cmd;
- 
- 	DBG("");
- 
-@@ -73,7 +73,7 @@ static bt_status_t sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
- 					const uint8_t *uuid, int chan,
- 					int *sock, int flags)
- {
--	struct hal_op_sock_connect cmd;
-+	struct hal_cmd_sock_connect cmd;
- 
- 	if ((!uuid && chan <= 0) || !bdaddr || !sock) {
- 		error("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
--- 
-1.7.10.4
+Exactly. Which is why the original code was misleading in that you might
+have thought it actually did something with skb->data[0].
 
+Johan
