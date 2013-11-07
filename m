@@ -2,33 +2,33 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 05/11] android/hid: Add missing parameters in send data struct in HAL headers
-Date: Fri,  8 Nov 2013 00:10:14 +0200
-Message-Id: <1383862220-29968-6-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 04/11] android/hid: Add missing hid send data parameters in ipc document
+Date: Fri,  8 Nov 2013 00:10:13 +0200
+Message-Id: <1383862220-29968-5-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1383862220-29968-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1383862220-29968-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-msg.h | 4 +++-
+ android/hal-ipc-api.txt | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 08a159e..05c9de0 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -298,7 +298,9 @@ struct hal_cmd_hidhost_set_report {
+diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+index 297f565..91ea280 100644
+--- a/android/hal-ipc-api.txt
++++ b/android/hal-ipc-api.txt
+@@ -566,7 +566,9 @@ Commands and responses:
+ 	Opcode 0x09 - Send Data command/response
  
- #define HAL_OP_HIDHOST_SEND_DATA		0x09
- struct hal_cmd_hidhost_send_data {
--	uint8_t bdaddr[6];
-+	uint8_t  bdaddr[6];
-+	uint16_t len;
-+	uint8_t  data[0];
- } __attribute__((packed));
+ 		Command parameters: Remote address (6 octets)
+-		                    ...
++		                    Data length (2 octets)
++		                    Data (Data length)
++
+ 		Response parameters: <none>
  
- /* a2dp HAL API */
+ 		In case of an error, the error response will be returned.
 -- 
 1.8.3.2
 
