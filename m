@@ -1,62 +1,137 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 7 Nov 2013 17:36:47 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
-Subject: Re: [PATCH v2] android: Add set/get for discovery timeout
-Message-ID: <20131107153647.GA26202@x220.p-661hnu-f1>
-References: <1383837979-4390-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2 3/3] android/hal: Use a2dp instead of av in a2dp HAL
+Date: Thu, 7 Nov 2013 16:32:07 +0100
+Message-ID: <1383838327-5971-3-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1383838327-5971-1-git-send-email-szymon.janc@tieto.com>
+References: <1383838327-5971-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383837979-4390-1-git-send-email-lukasz.rymanowski@tieto.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Match functions names to HAL name. Where not needed av prefix is
+removed.
+---
+ android/hal-a2dp.c      | 20 ++++++++++----------
+ android/hal-bluetooth.c |  2 +-
+ android/hal-ipc.c       |  2 +-
+ android/hal.h           |  4 ++--
+ 4 files changed, 14 insertions(+), 14 deletions(-)
 
-On Thu, Nov 07, 2013, Lukasz Rymanowski wrote:
-> @@ -1169,6 +1184,8 @@ void bt_adapter_init(uint16_t index, struct mgmt *mgmt, bt_adapter_ready cb)
->  	adapter->index = index;
->  	adapter->discovering = false;
->  	adapter->ready = cb;
-> +	/* TODO: Read it from some storage */
-> +	adapter->discoverable_timeout = DEFAULT_DISCOVERABLE_TIMEOUT;
->  
->  	if (mgmt_send(mgmt, MGMT_OP_READ_INFO, index, 0, NULL,
->  					read_info_complete, NULL, NULL) > 0)
-> @@ -1286,11 +1303,25 @@ static bool get_devices(void)
->  
->  static bool get_discoverable_timeout(void)
->  {
-> -	DBG("Not implemented");
-> +	struct hal_ev_adapter_props_changed *ev;
-> +	int len = sizeof(uint32_t);
-> +	uint8_t buf[BASELEN_PROP_CHANGED + len];
->  
-> -	/* TODO: Add implementation */
->  
-> -	return false;
-> +	memset(buf, 0, sizeof(buf));
+diff --git a/android/hal-a2dp.c b/android/hal-a2dp.c
+index 2ebf801..f0c301e 100644
+--- a/android/hal-a2dp.c
++++ b/android/hal-a2dp.c
+@@ -49,7 +49,7 @@ static void handle_audio_state(void *buf)
+ }
+ 
+ /* will be called from notification thread context */
+-void bt_notify_av(uint16_t opcode, void *buf, uint16_t len)
++void bt_notify_a2dp(uint16_t opcode, void *buf, uint16_t len)
+ {
+ 	if (!interface_ready())
+ 		return;
+@@ -67,7 +67,7 @@ void bt_notify_av(uint16_t opcode, void *buf, uint16_t len)
+ 	}
+ }
+ 
+-static bt_status_t av_connect(bt_bdaddr_t *bd_addr)
++static bt_status_t a2dp_connect(bt_bdaddr_t *bd_addr)
+ {
+ 	struct hal_cmd_a2dp_connect cmd;
+ 
+@@ -82,7 +82,7 @@ static bt_status_t av_connect(bt_bdaddr_t *bd_addr)
+ 					sizeof(cmd), &cmd, NULL, NULL, NULL);
+ }
+ 
+-static bt_status_t av_disconnect(bt_bdaddr_t *bd_addr)
++static bt_status_t disconnect(bt_bdaddr_t *bd_addr)
+ {
+ 	struct hal_cmd_a2dp_disconnect cmd;
+ 
+@@ -97,7 +97,7 @@ static bt_status_t av_disconnect(bt_bdaddr_t *bd_addr)
+ 					sizeof(cmd), &cmd, NULL, NULL, NULL);
+ }
+ 
+-static bt_status_t av_init(btav_callbacks_t *callbacks)
++static bt_status_t init(btav_callbacks_t *callbacks)
+ {
+ 	DBG("");
+ 
+@@ -108,7 +108,7 @@ static bt_status_t av_init(btav_callbacks_t *callbacks)
+ 	return BT_STATUS_SUCCESS;
+ }
+ 
+-static void av_cleanup()
++static void cleanup()
+ {
+ 	DBG("");
+ 
+@@ -122,13 +122,13 @@ static void av_cleanup()
+ 
+ static btav_interface_t iface = {
+ 	.size = sizeof(iface),
+-	.init = av_init,
+-	.connect = av_connect,
+-	.disconnect = av_disconnect,
+-	.cleanup = av_cleanup
++	.init = init,
++	.connect = a2dp_connect,
++	.disconnect = disconnect,
++	.cleanup = cleanup
+ };
+ 
+-btav_interface_t *bt_get_av_interface()
++btav_interface_t *bt_get_a2dp_interface()
+ {
+ 	return &iface;
+ }
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index 88c7b99..3e5d41f 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -654,7 +654,7 @@ static const void *get_profile_interface(const char *profile_id)
+ 		return bt_get_pan_interface();
+ 
+ 	if (!strcmp(profile_id, BT_PROFILE_ADVANCED_AUDIO_ID))
+-		return bt_get_av_interface();
++		return bt_get_a2dp_interface();
+ 
+ 	return NULL;
+ }
+diff --git a/android/hal-ipc.c b/android/hal-ipc.c
+index 14be69b..1d33374 100644
+--- a/android/hal-ipc.c
++++ b/android/hal-ipc.c
+@@ -53,7 +53,7 @@ static void notification_dispatch(struct hal_hdr *msg, int fd)
+ 		bt_notify_hh(msg->opcode, msg->payload, msg->len);
+ 		break;
+ 	case HAL_SERVICE_ID_A2DP:
+-		bt_notify_av(msg->opcode, msg->payload, msg->len);
++		bt_notify_a2dp(msg->opcode, msg->payload, msg->len);
+ 		break;
+ 	default:
+ 		DBG("Unhandled notification service=%d opcode=0x%x",
+diff --git a/android/hal.h b/android/hal.h
+index 5d6a93e..f47ec2a 100644
+--- a/android/hal.h
++++ b/android/hal.h
+@@ -24,10 +24,10 @@
+ btsock_interface_t *bt_get_sock_interface(void);
+ bthh_interface_t *bt_get_hidhost_interface(void);
+ btpan_interface_t *bt_get_pan_interface(void);
+-btav_interface_t *bt_get_av_interface(void);
++btav_interface_t *bt_get_a2dp_interface(void);
+ 
+ void bt_notify_adapter(uint16_t opcode, void *buf, uint16_t len);
+ void bt_thread_associate(void);
+ void bt_thread_disassociate(void);
+ void bt_notify_hh(uint16_t opcode, void *buf, uint16_t len);
+-void bt_notify_av(uint16_t opcode, void *buf, uint16_t len);
++void bt_notify_a2dp(uint16_t opcode, void *buf, uint16_t len);
+-- 
+1.8.4.2
 
-Looks like you're leaving two empty lines above? Please remove one.
-
-> +	ev = (void *) buf;
-> +
-> +	ev->num_props = 1;
-> +	ev->status = HAL_STATUS_SUCCESS;
-> +
-> +	ev->props[0].type = HAL_PROP_ADAPTER_DISC_TIMEOUT;
-> +	ev->props[0].len = len;
-
-The len variable seems quite unnecessary to me since you could just use
-sizeof(uint32_t) in the two places where you need it.
-
-> +	memcpy(&ev->props[0].val, &adapter->discoverable_timeout, sizeof(uint32_t));
-> +
-> +	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
-> +				HAL_EV_ADAPTER_PROPS_CHANGED, sizeof(buf), ev, -1);
-
-Please pay attention to your line lengths. You've got at least two lines
-above that are over 79 characters.
-
-Johan
