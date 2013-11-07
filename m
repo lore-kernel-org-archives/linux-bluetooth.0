@@ -1,29 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 7 Nov 2013 17:11:10 +0200
+Date: Thu, 7 Nov 2013 17:10:01 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] android: Rename a2dp HAL related IPC API to match
- service name
-Message-ID: <20131107151110.GD23283@x220.p-661hnu-f1>
-References: <1383820057-15728-1-git-send-email-szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
+Subject: Re: [PATCH 2/2] android: Add set/get for discovery timeout
+Message-ID: <20131107151001.GC23283@x220.p-661hnu-f1>
+References: <1383815991-18523-1-git-send-email-lukasz.rymanowski@tieto.com>
+ <1383815991-18523-2-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383820057-15728-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1383815991-18523-2-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Lukasz,
 
-On Thu, Nov 07, 2013, Szymon Janc wrote:
-> Use 'Android HAL name' string from IPC doc as base for names.
+On Thu, Nov 07, 2013, Lukasz Rymanowski wrote:
+> Android handles discoverable timeout in Settings app, however still
+> expects BT stack to maintain this value so we should do it as well.
+> Otherwise we will get some unexpected behaviour.
+> For now we keep discovery_timeout only during runtime, but we need to move
+> it to some local storage once we will have it.
+> 
+> Note: That since Android Settings up handles timer there is no reason to
+> use discovery timer we have in kernel.
 > ---
->  android/a2dp.c    | 10 ++++++----
->  android/hal-av.c  | 16 ++++++++--------
->  android/hal-msg.h | 18 ++++++++++--------
->  3 files changed, 24 insertions(+), 20 deletions(-)
+>  android/adapter.c | 38 +++++++++++++++++++++++++++++++++++---
+>  1 file changed, 35 insertions(+), 3 deletions(-)
 
-Seems like this one (maybe others in this set too) needs rebasing as it
-doesn't apply right now.
+You'll need to rebase this one due to the patches from Szymon that were
+recently applied (right now it applies but doesn't compile).
 
 Johan
