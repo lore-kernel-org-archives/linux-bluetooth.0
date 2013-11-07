@@ -1,37 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 7 Nov 2013 23:59:07 +0200
+Date: Thu, 7 Nov 2013 23:56:53 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] Bluetooth: Refactor hci_disconn_complete_evt
-Message-ID: <20131107215907.GB10164@x220.p-661hnu-f1>
+Subject: Re: [PATCH v2 1/2] Bluetooth: Remove unneeded check in
+ hci_disconn_complete_evt()
+Message-ID: <20131107215653.GA10164@x220.p-661hnu-f1>
 References: <1383856570-30480-1-git-send-email-andre.guedes@openbossa.org>
- <1383856570-30480-2-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383856570-30480-2-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1383856570-30480-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
 On Thu, Nov 07, 2013, Andre Guedes wrote:
-> hci_disconn_complete_evt() logic is more complicated than what it
-> should be, making it hard to follow and add new features.
+> According to b644ba336 (patch that introduced HCI_CONN_MGMT_CONNECTED
+> flag), the HCI_CONN_MGMT_CONNECTED flag tracks when mgmt has been
+> notified about the connection.
 > 
-> So this patch does some code refactoring by handling the error cases
-> in the beginning of the function and by moving the main flow into the
-> first level of function scope. No change is done in the event handling
-> logic itself.
+> That being said, there is no point in calling mgmt_disconnect_failed()
+> conditionally based on this flag. mgmt_disconnect_failed() removes
+> pending MGMT_OP_DISCONNECT commands, it doesn't matter if that
+> connection was notified or not.
 > 
-> Besides organizing this messy code, this patch makes easier to add
-> code for handling LE auto connection (which will be added in a further
-> patch).
+> Moreover, if the Disconnection Complete event has status then we have
+> nothing else to do but call mgmt_disconnect_failed() and return.
 > 
 > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
->  net/bluetooth/hci_event.c | 43 +++++++++++++++++++++----------------------
->  1 file changed, 21 insertions(+), 22 deletions(-)
+>  net/bluetooth/hci_event.c | 19 +++++++++----------
+>  1 file changed, 9 insertions(+), 10 deletions(-)
 
 Acked-by: Johan Hedberg <johan.hedberg@intel.com>
 
