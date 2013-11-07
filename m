@@ -1,34 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 7 Nov 2013 10:35:14 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Sujith Manoharan <sujith@msujith.org>
-Cc: linux-bluetooth@vger.kernel.org, gustavo@padovan.org
-Subject: Re: [PATCH] Bluetooth: ath3k: Add support for a new AR3012 device
-Message-ID: <20131107083514.GA18328@x220.p-661hnu-f1>
-References: <1383581303-1081-1-git-send-email-sujith@msujith.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383581303-1081-1-git-send-email-sujith@msujith.org>
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1816\))
+Subject: Re: [PATCH 2/2] android: Add set/get for discovery timeout
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20131107080758.GA7493@x220.p-661hnu-f1>
+Date: Thu, 7 Nov 2013 09:14:18 +0100
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
+	"linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>,
+	Szymon Janc <szymon.janc@tieto.com>
+Message-Id: <2A89EA95-1DDB-4C2F-8A37-A11372E1DF06@holtmann.org>
+References: <1383750530-18815-1-git-send-email-lukasz.rymanowski@tieto.com> <1383750530-18815-2-git-send-email-lukasz.rymanowski@tieto.com> <20131107080758.GA7493@x220.p-661hnu-f1>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sujith,
+Hi Johan,
 
-On Mon, Nov 04, 2013, Sujith Manoharan wrote:
-> T:  Bus=02 Lev=01 Prnt=01 Port=04 Cnt=01 Dev#=  9 Spd=12   MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0489 ProdID=e05f Rev= 0.02
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+>> static bool get_discoverable_timeout(void)
+>> {
+>> -	DBG("Not implemented");
+>> +	struct hal_ev_adapter_props_changed *ev;
+>> +	int len;
+>> 
+>> -	/* TODO: Add implementation */
+>> +	len = sizeof(*ev) + sizeof(struct hal_property) + sizeof(uint32_t);
+>> 
 > 
-> Reported-by: Joshua Richenhagen <richenhagen@gmail.com>
-> Signed-off-by: Sujith Manoharan <sujith@msujith.org>
-> ---
->  drivers/bluetooth/ath3k.c | 2 ++
->  drivers/bluetooth/btusb.c | 1 +
->  2 files changed, 3 insertions(+)
+> The dynamic memory allocation seems a bit overkill here since the size is
+> not very big and can be determined even at compile time. I'd consider
+> doing something like:
+> 
+> 	uint8_t buf[sizeof(struct hal_ev_adapter_props_changed) +
+> 			sizeof(struct hal_property) + sizeof(uint32_t)];
+> 	struct hal_ev_adapter_props_changed *ev = (void *) buf;
 
-Applied to bluetooth-next. Thanks.
+actually having some #define for the base len would be easier to read.
 
-Johan
+	uint8_t buf[BASELEN + sizeof(uint32_t));
+ 
+> 
+> 	...
+> 
+> 	ipc_send(..., sizeof(buf), buf, ...);
+
+Of course an alternative is to use alloca to just allocate on the stack. Then no free is actually needed.
+
+Regards
+
+Marcel
+
