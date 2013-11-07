@@ -1,38 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 7 Nov 2013 23:56:53 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] Bluetooth: Remove unneeded check in
- hci_disconn_complete_evt()
-Message-ID: <20131107215653.GA10164@x220.p-661hnu-f1>
-References: <1383856570-30480-1-git-send-email-andre.guedes@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 2/2] Bluetooth: Refactor hci_disconn_complete_evt
+Date: Thu,  7 Nov 2013 17:36:10 -0300
+Message-Id: <1383856570-30480-2-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1383856570-30480-1-git-send-email-andre.guedes@openbossa.org>
+References: <1383856570-30480-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+hci_disconn_complete_evt() logic is more complicated than what it
+should be, making it hard to follow and add new features.
 
-On Thu, Nov 07, 2013, Andre Guedes wrote:
-> According to b644ba336 (patch that introduced HCI_CONN_MGMT_CONNECTED
-> flag), the HCI_CONN_MGMT_CONNECTED flag tracks when mgmt has been
-> notified about the connection.
-> 
-> That being said, there is no point in calling mgmt_disconnect_failed()
-> conditionally based on this flag. mgmt_disconnect_failed() removes
-> pending MGMT_OP_DISCONNECT commands, it doesn't matter if that
-> connection was notified or not.
-> 
-> Moreover, if the Disconnection Complete event has status then we have
-> nothing else to do but call mgmt_disconnect_failed() and return.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
->  net/bluetooth/hci_event.c | 19 +++++++++----------
->  1 file changed, 9 insertions(+), 10 deletions(-)
+So this patch does some code refactoring by handling the error cases
+in the beginning of the function and by moving the main flow into the
+first level of function scope. No change is done in the event handling
+logic itself.
 
-Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+Besides organizing this messy code, this patch makes easier to add
+code for handling LE auto connection (which will be added in a further
+patch).
 
-Johan
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ net/bluetooth/hci_event.c | 43 +++++++++++++++++++++----------------------
+ 1 file changed, 21 insertions(+), 22 deletions(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index eb99a12..5fb3df6 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1781,6 +1781,7 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	struct hci_ev_disconn_complete *ev = (void *) skb->data;
+ 	u8 reason = hci_to_mgmt_reason(ev->reason);
+ 	struct hci_conn *conn;
++	u8 type;
+ 
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
+ 
+@@ -1790,40 +1791,38 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!conn)
+ 		goto unlock;
+ 
+-	if (ev->status == 0)
+-		conn->state = BT_CLOSED;
+-
+ 	if (ev->status) {
+ 		mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
+ 				       conn->dst_type, ev->status);
+ 		goto unlock;
+ 	}
+ 
++	conn->state = BT_CLOSED;
++
+ 	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
+ 		mgmt_device_disconnected(hdev, &conn->dst, conn->type,
+ 					 conn->dst_type, reason);
+ 
+-	if (ev->status == 0) {
+-		u8 type = conn->type;
++	if (conn->type == ACL_LINK && conn->flush_key)
++		hci_remove_link_key(hdev, &conn->dst);
+ 
+-		if (type == ACL_LINK && conn->flush_key)
+-			hci_remove_link_key(hdev, &conn->dst);
+-		hci_proto_disconn_cfm(conn, ev->reason);
+-		hci_conn_del(conn);
++	type = conn->type;
+ 
+-		/* Re-enable advertising if necessary, since it might
+-		 * have been disabled by the connection. From the
+-		 * HCI_LE_Set_Advertise_Enable command description in
+-		 * the core specification (v4.0):
+-		 * "The Controller shall continue advertising until the Host
+-		 * issues an LE_Set_Advertise_Enable command with
+-		 * Advertising_Enable set to 0x00 (Advertising is disabled)
+-		 * or until a connection is created or until the Advertising
+-		 * is timed out due to Directed Advertising."
+-		 */
+-		if (type == LE_LINK)
+-			mgmt_reenable_advertising(hdev);
+-	}
++	hci_proto_disconn_cfm(conn, ev->reason);
++	hci_conn_del(conn);
++
++	/* Re-enable advertising if necessary, since it might
++	 * have been disabled by the connection. From the
++	 * HCI_LE_Set_Advertise_Enable command description in
++	 * the core specification (v4.0):
++	 * "The Controller shall continue advertising until the Host
++	 * issues an LE_Set_Advertise_Enable command with
++	 * Advertising_Enable set to 0x00 (Advertising is disabled)
++	 * or until a connection is created or until the Advertising
++	 * is timed out due to Directed Advertising."
++	 */
++	if (type == LE_LINK)
++		mgmt_reenable_advertising(hdev);
+ 
+ unlock:
+ 	hci_dev_unlock(hdev);
+-- 
+1.8.4
+
