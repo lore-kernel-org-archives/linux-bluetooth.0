@@ -1,173 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 1/3] android: Rename a2dp HAL related IPC API to match service name
-Date: Thu, 7 Nov 2013 16:32:05 +0100
-Message-ID: <1383838327-5971-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/ipc: Fix crash when sending file descriptor
+Date: Thu,  7 Nov 2013 17:25:35 +0200
+Message-Id: <1383837935-31110-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <20131107151146.GE23283@x220.p-661hnu-f1>
+References: <20131107151146.GE23283@x220.p-661hnu-f1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use 'Android HAL name' string from IPC doc as base for names.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+
+Since CMSG_FIRSTHDR is defined as shown below:
+
+  ((size_t) (mhdr)->msg_controllen >= sizeof (struct cmsghdr) \
+   ? (struct cmsghdr *) (mhdr)->msg_control : (struct cmsghdr *) 0)
+
+it return NULL if msg_controllen is not defined. Accessing
+that pointer result in daemon crash.
 ---
-v2:
- - rebased
- - minor style fixes
+ android/ipc.c |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
- android/a2dp.c    |  9 +++++----
- android/hal-av.c  | 16 ++++++++--------
- android/hal-msg.h | 18 ++++++++++--------
- 3 files changed, 23 insertions(+), 20 deletions(-)
-
-diff --git a/android/a2dp.c b/android/a2dp.c
-index 0d3bfc5..052f4f3 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -40,14 +40,15 @@
+diff --git a/android/ipc.c b/android/ipc.c
+index 9a8657d..729f157 100644
+--- a/android/ipc.c
++++ b/android/ipc.c
+@@ -62,6 +62,9 @@ void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
+ 	msg.msg_iovlen = 2;
  
- static int notification_sk = -1;
- 
--static uint8_t bt_a2dp_connect(struct hal_cmd_av_connect *cmd, uint16_t len)
-+static uint8_t bt_a2dp_connect(struct hal_cmd_a2dp_connect *cmd, uint16_t len)
- {
- 	DBG("Not Implemented");
- 
- 	return HAL_STATUS_FAILED;
- }
- 
--static uint8_t bt_a2dp_disconnect(struct hal_cmd_av_connect *cmd, uint16_t len)
-+static uint8_t bt_a2dp_disconnect(struct hal_cmd_a2dp_connect *cmd,
-+								uint16_t len)
- {
- 	DBG("Not Implemented");
- 
-@@ -59,10 +60,10 @@ void bt_a2dp_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
- 	uint8_t status = HAL_STATUS_FAILED;
- 
- 	switch (opcode) {
--	case HAL_OP_AV_CONNECT:
-+	case HAL_OP_A2DP_CONNECT:
- 		status = bt_a2dp_connect(buf, len);
- 		break;
--	case HAL_OP_AV_DISCONNECT:
-+	case HAL_OP_A2DP_DISCONNECT:
- 		status = bt_a2dp_disconnect(buf, len);
- 		break;
- 	default:
-diff --git a/android/hal-av.c b/android/hal-av.c
-index 9e1b3df..2ebf801 100644
---- a/android/hal-av.c
-+++ b/android/hal-av.c
-@@ -33,7 +33,7 @@ static bool interface_ready(void)
- 
- static void handle_connection_state(void *buf)
- {
--	struct hal_ev_av_connection_state *ev = buf;
-+	struct hal_ev_a2dp_connection_state *ev = buf;
- 
- 	if (cbs->connection_state_cb)
- 		cbs->connection_state_cb(ev->state,
-@@ -42,7 +42,7 @@ static void handle_connection_state(void *buf)
- 
- static void handle_audio_state(void *buf)
- {
--	struct hal_ev_av_audio_state *ev = buf;
-+	struct hal_ev_a2dp_audio_state *ev = buf;
- 
- 	if (cbs->audio_state_cb)
- 		cbs->audio_state_cb(ev->state, (bt_bdaddr_t *)(ev->bdaddr));
-@@ -55,10 +55,10 @@ void bt_notify_av(uint16_t opcode, void *buf, uint16_t len)
- 		return;
- 
- 	switch (opcode) {
--	case HAL_EV_AV_CONNECTION_STATE:
-+	case HAL_EV_A2DP_CONNECTION_STATE:
- 		handle_connection_state(buf);
- 		break;
--	case HAL_EV_AV_AUDIO_STATE:
-+	case HAL_EV_A2DP_AUDIO_STATE:
- 		handle_audio_state(buf);
- 		break;
- 	default:
-@@ -69,7 +69,7 @@ void bt_notify_av(uint16_t opcode, void *buf, uint16_t len)
- 
- static bt_status_t av_connect(bt_bdaddr_t *bd_addr)
- {
--	struct hal_cmd_av_connect cmd;
-+	struct hal_cmd_a2dp_connect cmd;
- 
- 	DBG("");
- 
-@@ -78,13 +78,13 @@ static bt_status_t av_connect(bt_bdaddr_t *bd_addr)
- 
- 	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
- 
--	return hal_ipc_cmd(HAL_SERVICE_ID_A2DP, HAL_OP_AV_CONNECT,
-+	return hal_ipc_cmd(HAL_SERVICE_ID_A2DP, HAL_OP_A2DP_CONNECT,
- 					sizeof(cmd), &cmd, NULL, NULL, NULL);
- }
- 
- static bt_status_t av_disconnect(bt_bdaddr_t *bd_addr)
- {
--	struct hal_cmd_av_disconnect cmd;
-+	struct hal_cmd_a2dp_disconnect cmd;
- 
- 	DBG("");
- 
-@@ -93,7 +93,7 @@ static bt_status_t av_disconnect(bt_bdaddr_t *bd_addr)
- 
- 	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
- 
--	return hal_ipc_cmd(HAL_SERVICE_ID_A2DP, HAL_OP_AV_DISCONNECT,
-+	return hal_ipc_cmd(HAL_SERVICE_ID_A2DP, HAL_OP_A2DP_DISCONNECT,
- 					sizeof(cmd), &cmd, NULL, NULL, NULL);
- }
- 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index a5e5c76..e1feb19 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -301,13 +301,15 @@ struct hal_cmd_hid_send_data {
- 	uint8_t bdaddr[6];
- } __attribute__((packed));
- 
--#define HAL_OP_AV_CONNECT	0x01
--struct hal_cmd_av_connect {
-+/* a2dp HAL API */
+ 	if (fd >= 0) {
++		msg.msg_control = cmsgbuf;
++		msg.msg_controllen = sizeof(cmsgbuf);
 +
-+#define HAL_OP_A2DP_CONNECT	0x01
-+struct hal_cmd_a2dp_connect {
- 	uint8_t bdaddr[6];
- } __attribute__((packed));
+ 		cmsg = CMSG_FIRSTHDR(&msg);
+ 		cmsg->cmsg_level = SOL_SOCKET;
+ 		cmsg->cmsg_type = SCM_RIGHTS;
+@@ -69,9 +72,6 @@ void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
  
--#define HAL_OP_AV_DISCONNECT	0x02
--struct hal_cmd_av_disconnect {
-+#define HAL_OP_A2DP_DISCONNECT	0x02
-+struct hal_cmd_a2dp_disconnect {
- 	uint8_t bdaddr[6];
- } __attribute__((packed));
+ 		/* Initialize the payload */
+ 		memcpy(CMSG_DATA(cmsg), &fd, sizeof(int));
+-
+-		msg.msg_control = cmsgbuf;
+-		msg.msg_controllen = sizeof(cmsgbuf);
+ 	}
  
-@@ -475,14 +477,14 @@ struct hal_ev_hid_get_report {
- 	uint8_t  data[0];
- } __attribute__((packed));
- 
--#define HAL_EV_AV_CONNECTION_STATE	0x81
--struct hal_ev_av_connection_state {
-+#define HAL_EV_A2DP_CONNECTION_STATE	0x81
-+struct hal_ev_a2dp_connection_state {
- 	uint8_t state;
- 	uint8_t bdaddr[6];
- } __attribute__((packed));
- 
--#define HAL_EV_AV_AUDIO_STATE	0x82
--struct hal_ev_av_audio_state {
-+#define HAL_EV_A2DP_AUDIO_STATE	0x82
-+struct hal_ev_a2dp_audio_state {
- 	uint8_t state;
- 	uint8_t bdaddr[6];
- } __attribute__((packed));
+ 	if (sendmsg(sk, &msg, 0) < 0) {
 -- 
-1.8.4.2
+1.7.10.4
 
