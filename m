@@ -2,48 +2,69 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 09/11] android/hid: Handle virtual unplug notification in hid hal
-Date: Fri,  8 Nov 2013 00:10:18 +0200
-Message-Id: <1383862220-29968-10-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 11/11] android/hid: Add send data implemention in daemon
+Date: Fri,  8 Nov 2013 00:10:20 +0200
+Message-Id: <1383862220-29968-12-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1383862220-29968-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1383862220-29968-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Send data on interrupt channel on request from hid host.
 ---
- android/hal-hidhost.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ android/hidhost.c | 38 ++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 36 insertions(+), 2 deletions(-)
 
-diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
-index dbdf176..db95e3e 100644
---- a/android/hal-hidhost.c
-+++ b/android/hal-hidhost.c
-@@ -78,6 +78,15 @@ static void handle_get_report(void *buf)
- 							ev->data, ev->len);
+diff --git a/android/hidhost.c b/android/hidhost.c
+index 4fc8963..945a2dd 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -963,9 +963,43 @@ static uint8_t bt_hid_set_report(struct hal_cmd_hidhost_set_report *cmd,
+ static uint8_t bt_hid_send_data(struct hal_cmd_hidhost_send_data *cmd,
+ 								uint16_t len)
+ {
+-	DBG("Not Implemented");
++	struct hid_device *dev;
++	GSList *l;
++	bdaddr_t dst;
++	int fd;
++	uint8_t *req;
++	uint8_t req_size;
+ 
+-	return HAL_STATUS_FAILED;
++	DBG("");
++
++	if (len < sizeof(*cmd))
++		return HAL_STATUS_INVALID;
++
++	android2bdaddr(&cmd->bdaddr, &dst);
++
++	l = g_slist_find_custom(devices, &dst, device_cmp);
++	if (!l)
++		return HAL_STATUS_FAILED;
++
++	dev = l->data;
++	req_size = 1 + (cmd->len / 2);
++	req = g_try_malloc0(req_size);
++	if (!req)
++		return HAL_STATUS_NOMEM;
++
++	req[0] = HID_MSG_DATA | HID_DATA_TYPE_OUTPUT;
++	ascii2hex(cmd->data, cmd->len, (req + 1));
++
++	fd = g_io_channel_unix_get_fd(dev->intr_io);
++
++	if (write(fd, req, req_size) < 0) {
++		error("error while sending data to device");
++		g_free(req);
++		return HAL_STATUS_FAILED;
++	}
++
++	g_free(req);
++	return HAL_STATUS_SUCCESS;
  }
  
-+static void handle_virtual_unplug(void *buf)
-+{
-+	struct hal_ev_hidhost_virtual_unplug *ev = buf;
-+
-+	if (cbacks->virtual_unplug_cb)
-+		cbacks->virtual_unplug_cb((bt_bdaddr_t *) ev->bdaddr,
-+								ev->status);
-+}
-+
- /* will be called from notification thread context */
- void bt_notify_hidhost(uint16_t opcode, void *buf, uint16_t len)
- {
-@@ -97,6 +106,9 @@ void bt_notify_hidhost(uint16_t opcode, void *buf, uint16_t len)
- 	case HAL_EV_HIDHOST_GET_REPORT:
- 		handle_get_report(buf);
- 		break;
-+	case HAL_EV_HIDHOST_VIRTUAL_UNPLUG:
-+		handle_virtual_unplug(buf);
-+		break;
- 	default:
- 		DBG("Unhandled callback opcode=0x%x", opcode);
- 		break;
+ void bt_hid_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
 -- 
 1.8.3.2
 
