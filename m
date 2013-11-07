@@ -2,343 +2,172 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 2/3] android/hal: Rename hal-av.c to hal-a2dp.c
-Date: Thu, 7 Nov 2013 16:32:06 +0100
-Message-ID: <1383838327-5971-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1383838327-5971-1-git-send-email-szymon.janc@tieto.com>
-References: <1383838327-5971-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2 1/3] android: Rename a2dp HAL related IPC API to match service name
+Date: Thu, 7 Nov 2013 16:32:05 +0100
+Message-ID: <1383838327-5971-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Name of HAL implementation will match Android HAL name. This will make
-code navigation easier as daemon part and HAL library implementation
-will be in foo.c and hal-foo.c respectively.
+Use 'Android HAL name' string from IPC doc as base for names.
 ---
- android/Android.mk  |   2 +-
- android/Makefile.am |   4 +-
- android/hal-a2dp.c  | 134 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- android/hal-av.c    | 134 ----------------------------------------------------
- 4 files changed, 137 insertions(+), 137 deletions(-)
- create mode 100644 android/hal-a2dp.c
- delete mode 100644 android/hal-av.c
+v2:
+ - rebased
+ - minor style fixes
 
-diff --git a/android/Android.mk b/android/Android.mk
-index d76dfaf..f9bf070 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -86,7 +86,7 @@ LOCAL_SRC_FILES := \
- 	hal-sock.c \
- 	hal-hidhost.c \
- 	hal-pan.c \
--	hal-av.c \
-+	hal-a2dp.c \
- 	client/textconv.c \
+ android/a2dp.c    |  9 +++++----
+ android/hal-av.c  | 16 ++++++++--------
+ android/hal-msg.h | 18 ++++++++++--------
+ 3 files changed, 23 insertions(+), 20 deletions(-)
+
+diff --git a/android/a2dp.c b/android/a2dp.c
+index 0d3bfc5..052f4f3 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -40,14 +40,15 @@
  
- LOCAL_C_INCLUDES += \
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 8619641..6790f24 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -33,7 +33,7 @@ android_libhal_internal_la_SOURCES = android/hal.h android/hal-bluetooth.c \
- 					android/hal-sock.c \
- 					android/hal-hidhost.c \
- 					android/hal-pan.c \
--					android/hal-av.c \
-+					android/hal-a2dp.c \
- 					android/hardware/bluetooth.h \
- 					android/hardware/bt_av.h \
- 					android/hardware/bt_gatt.h \
-@@ -86,7 +86,7 @@ EXTRA_DIST += android/hal-bluetooth.c \
- 		android/hal-sock.c \
- 		android/hal-hidhost.c \
- 		android/hal-pan.c \
--		android/hal-av.c \
-+		android/hal-a2dp.c \
- 		android/hal-log.h
+ static int notification_sk = -1;
  
- EXTRA_DIST += android/client/terminal.c \
-diff --git a/android/hal-a2dp.c b/android/hal-a2dp.c
-new file mode 100644
-index 0000000..2ebf801
---- /dev/null
-+++ b/android/hal-a2dp.c
-@@ -0,0 +1,134 @@
-+/*
-+ * Copyright (C) 2013 Intel Corporation
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ *
-+ */
-+
-+#include <stdbool.h>
-+#include <stddef.h>
-+#include <string.h>
-+
-+#include "hal-log.h"
-+#include "hal.h"
-+#include "hal-msg.h"
-+#include "hal-ipc.h"
-+
-+static const btav_callbacks_t *cbs = NULL;
-+
-+static bool interface_ready(void)
-+{
-+	return cbs != NULL;
-+}
-+
-+static void handle_connection_state(void *buf)
-+{
-+	struct hal_ev_a2dp_connection_state *ev = buf;
-+
-+	if (cbs->connection_state_cb)
-+		cbs->connection_state_cb(ev->state,
-+						(bt_bdaddr_t *) (ev->bdaddr));
-+}
-+
-+static void handle_audio_state(void *buf)
-+{
-+	struct hal_ev_a2dp_audio_state *ev = buf;
-+
-+	if (cbs->audio_state_cb)
-+		cbs->audio_state_cb(ev->state, (bt_bdaddr_t *)(ev->bdaddr));
-+}
-+
-+/* will be called from notification thread context */
-+void bt_notify_av(uint16_t opcode, void *buf, uint16_t len)
-+{
-+	if (!interface_ready())
-+		return;
-+
-+	switch (opcode) {
-+	case HAL_EV_A2DP_CONNECTION_STATE:
-+		handle_connection_state(buf);
-+		break;
-+	case HAL_EV_A2DP_AUDIO_STATE:
-+		handle_audio_state(buf);
-+		break;
-+	default:
-+		DBG("Unhandled callback opcode=0x%x", opcode);
-+		break;
-+	}
-+}
-+
-+static bt_status_t av_connect(bt_bdaddr_t *bd_addr)
-+{
-+	struct hal_cmd_a2dp_connect cmd;
-+
-+	DBG("");
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
-+
-+	return hal_ipc_cmd(HAL_SERVICE_ID_A2DP, HAL_OP_A2DP_CONNECT,
-+					sizeof(cmd), &cmd, NULL, NULL, NULL);
-+}
-+
-+static bt_status_t av_disconnect(bt_bdaddr_t *bd_addr)
-+{
-+	struct hal_cmd_a2dp_disconnect cmd;
-+
-+	DBG("");
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
-+
-+	return hal_ipc_cmd(HAL_SERVICE_ID_A2DP, HAL_OP_A2DP_DISCONNECT,
-+					sizeof(cmd), &cmd, NULL, NULL, NULL);
-+}
-+
-+static bt_status_t av_init(btav_callbacks_t *callbacks)
-+{
-+	DBG("");
-+
-+	cbs = callbacks;
-+
-+	/* TODO: enable service */
-+
-+	return BT_STATUS_SUCCESS;
-+}
-+
-+static void av_cleanup()
-+{
-+	DBG("");
-+
-+	if (!interface_ready())
-+		return;
-+
-+	/* TODO: disable service */
-+
-+	cbs = NULL;
-+}
-+
-+static btav_interface_t iface = {
-+	.size = sizeof(iface),
-+	.init = av_init,
-+	.connect = av_connect,
-+	.disconnect = av_disconnect,
-+	.cleanup = av_cleanup
-+};
-+
-+btav_interface_t *bt_get_av_interface()
-+{
-+	return &iface;
-+}
+-static uint8_t bt_a2dp_connect(struct hal_cmd_av_connect *cmd, uint16_t len)
++static uint8_t bt_a2dp_connect(struct hal_cmd_a2dp_connect *cmd, uint16_t len)
+ {
+ 	DBG("Not Implemented");
+ 
+ 	return HAL_STATUS_FAILED;
+ }
+ 
+-static uint8_t bt_a2dp_disconnect(struct hal_cmd_av_connect *cmd, uint16_t len)
++static uint8_t bt_a2dp_disconnect(struct hal_cmd_a2dp_connect *cmd,
++								uint16_t len)
+ {
+ 	DBG("Not Implemented");
+ 
+@@ -59,10 +60,10 @@ void bt_a2dp_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+ 	uint8_t status = HAL_STATUS_FAILED;
+ 
+ 	switch (opcode) {
+-	case HAL_OP_AV_CONNECT:
++	case HAL_OP_A2DP_CONNECT:
+ 		status = bt_a2dp_connect(buf, len);
+ 		break;
+-	case HAL_OP_AV_DISCONNECT:
++	case HAL_OP_A2DP_DISCONNECT:
+ 		status = bt_a2dp_disconnect(buf, len);
+ 		break;
+ 	default:
 diff --git a/android/hal-av.c b/android/hal-av.c
-deleted file mode 100644
-index 2ebf801..0000000
+index 9e1b3df..2ebf801 100644
 --- a/android/hal-av.c
-+++ /dev/null
-@@ -1,134 +0,0 @@
--/*
-- * Copyright (C) 2013 Intel Corporation
-- *
-- * Licensed under the Apache License, Version 2.0 (the "License");
-- * you may not use this file except in compliance with the License.
-- * You may obtain a copy of the License at
-- *
-- *      http://www.apache.org/licenses/LICENSE-2.0
-- *
-- * Unless required by applicable law or agreed to in writing, software
-- * distributed under the License is distributed on an "AS IS" BASIS,
-- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-- * See the License for the specific language governing permissions and
-- * limitations under the License.
-- *
-- */
--
--#include <stdbool.h>
--#include <stddef.h>
--#include <string.h>
--
--#include "hal-log.h"
--#include "hal.h"
--#include "hal-msg.h"
--#include "hal-ipc.h"
--
--static const btav_callbacks_t *cbs = NULL;
--
--static bool interface_ready(void)
--{
--	return cbs != NULL;
--}
--
--static void handle_connection_state(void *buf)
--{
--	struct hal_ev_a2dp_connection_state *ev = buf;
--
--	if (cbs->connection_state_cb)
--		cbs->connection_state_cb(ev->state,
--						(bt_bdaddr_t *) (ev->bdaddr));
--}
--
--static void handle_audio_state(void *buf)
--{
--	struct hal_ev_a2dp_audio_state *ev = buf;
--
--	if (cbs->audio_state_cb)
--		cbs->audio_state_cb(ev->state, (bt_bdaddr_t *)(ev->bdaddr));
--}
--
--/* will be called from notification thread context */
--void bt_notify_av(uint16_t opcode, void *buf, uint16_t len)
--{
--	if (!interface_ready())
--		return;
--
--	switch (opcode) {
--	case HAL_EV_A2DP_CONNECTION_STATE:
--		handle_connection_state(buf);
--		break;
--	case HAL_EV_A2DP_AUDIO_STATE:
--		handle_audio_state(buf);
--		break;
--	default:
--		DBG("Unhandled callback opcode=0x%x", opcode);
--		break;
--	}
--}
--
--static bt_status_t av_connect(bt_bdaddr_t *bd_addr)
--{
--	struct hal_cmd_a2dp_connect cmd;
--
--	DBG("");
--
--	if (!interface_ready())
--		return BT_STATUS_NOT_READY;
--
--	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
--
--	return hal_ipc_cmd(HAL_SERVICE_ID_A2DP, HAL_OP_A2DP_CONNECT,
--					sizeof(cmd), &cmd, NULL, NULL, NULL);
--}
--
--static bt_status_t av_disconnect(bt_bdaddr_t *bd_addr)
--{
--	struct hal_cmd_a2dp_disconnect cmd;
--
--	DBG("");
--
--	if (!interface_ready())
--		return BT_STATUS_NOT_READY;
--
--	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
--
--	return hal_ipc_cmd(HAL_SERVICE_ID_A2DP, HAL_OP_A2DP_DISCONNECT,
--					sizeof(cmd), &cmd, NULL, NULL, NULL);
--}
--
--static bt_status_t av_init(btav_callbacks_t *callbacks)
--{
--	DBG("");
--
--	cbs = callbacks;
--
--	/* TODO: enable service */
--
--	return BT_STATUS_SUCCESS;
--}
--
--static void av_cleanup()
--{
--	DBG("");
--
--	if (!interface_ready())
--		return;
--
--	/* TODO: disable service */
--
--	cbs = NULL;
--}
--
--static btav_interface_t iface = {
--	.size = sizeof(iface),
--	.init = av_init,
--	.connect = av_connect,
--	.disconnect = av_disconnect,
--	.cleanup = av_cleanup
--};
--
--btav_interface_t *bt_get_av_interface()
--{
--	return &iface;
--}
++++ b/android/hal-av.c
+@@ -33,7 +33,7 @@ static bool interface_ready(void)
+ 
+ static void handle_connection_state(void *buf)
+ {
+-	struct hal_ev_av_connection_state *ev = buf;
++	struct hal_ev_a2dp_connection_state *ev = buf;
+ 
+ 	if (cbs->connection_state_cb)
+ 		cbs->connection_state_cb(ev->state,
+@@ -42,7 +42,7 @@ static void handle_connection_state(void *buf)
+ 
+ static void handle_audio_state(void *buf)
+ {
+-	struct hal_ev_av_audio_state *ev = buf;
++	struct hal_ev_a2dp_audio_state *ev = buf;
+ 
+ 	if (cbs->audio_state_cb)
+ 		cbs->audio_state_cb(ev->state, (bt_bdaddr_t *)(ev->bdaddr));
+@@ -55,10 +55,10 @@ void bt_notify_av(uint16_t opcode, void *buf, uint16_t len)
+ 		return;
+ 
+ 	switch (opcode) {
+-	case HAL_EV_AV_CONNECTION_STATE:
++	case HAL_EV_A2DP_CONNECTION_STATE:
+ 		handle_connection_state(buf);
+ 		break;
+-	case HAL_EV_AV_AUDIO_STATE:
++	case HAL_EV_A2DP_AUDIO_STATE:
+ 		handle_audio_state(buf);
+ 		break;
+ 	default:
+@@ -69,7 +69,7 @@ void bt_notify_av(uint16_t opcode, void *buf, uint16_t len)
+ 
+ static bt_status_t av_connect(bt_bdaddr_t *bd_addr)
+ {
+-	struct hal_cmd_av_connect cmd;
++	struct hal_cmd_a2dp_connect cmd;
+ 
+ 	DBG("");
+ 
+@@ -78,13 +78,13 @@ static bt_status_t av_connect(bt_bdaddr_t *bd_addr)
+ 
+ 	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
+ 
+-	return hal_ipc_cmd(HAL_SERVICE_ID_A2DP, HAL_OP_AV_CONNECT,
++	return hal_ipc_cmd(HAL_SERVICE_ID_A2DP, HAL_OP_A2DP_CONNECT,
+ 					sizeof(cmd), &cmd, NULL, NULL, NULL);
+ }
+ 
+ static bt_status_t av_disconnect(bt_bdaddr_t *bd_addr)
+ {
+-	struct hal_cmd_av_disconnect cmd;
++	struct hal_cmd_a2dp_disconnect cmd;
+ 
+ 	DBG("");
+ 
+@@ -93,7 +93,7 @@ static bt_status_t av_disconnect(bt_bdaddr_t *bd_addr)
+ 
+ 	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
+ 
+-	return hal_ipc_cmd(HAL_SERVICE_ID_A2DP, HAL_OP_AV_DISCONNECT,
++	return hal_ipc_cmd(HAL_SERVICE_ID_A2DP, HAL_OP_A2DP_DISCONNECT,
+ 					sizeof(cmd), &cmd, NULL, NULL, NULL);
+ }
+ 
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index a5e5c76..e1feb19 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -301,13 +301,15 @@ struct hal_cmd_hid_send_data {
+ 	uint8_t bdaddr[6];
+ } __attribute__((packed));
+ 
+-#define HAL_OP_AV_CONNECT	0x01
+-struct hal_cmd_av_connect {
++/* a2dp HAL API */
++
++#define HAL_OP_A2DP_CONNECT	0x01
++struct hal_cmd_a2dp_connect {
+ 	uint8_t bdaddr[6];
+ } __attribute__((packed));
+ 
+-#define HAL_OP_AV_DISCONNECT	0x02
+-struct hal_cmd_av_disconnect {
++#define HAL_OP_A2DP_DISCONNECT	0x02
++struct hal_cmd_a2dp_disconnect {
+ 	uint8_t bdaddr[6];
+ } __attribute__((packed));
+ 
+@@ -475,14 +477,14 @@ struct hal_ev_hid_get_report {
+ 	uint8_t  data[0];
+ } __attribute__((packed));
+ 
+-#define HAL_EV_AV_CONNECTION_STATE	0x81
+-struct hal_ev_av_connection_state {
++#define HAL_EV_A2DP_CONNECTION_STATE	0x81
++struct hal_ev_a2dp_connection_state {
+ 	uint8_t state;
+ 	uint8_t bdaddr[6];
+ } __attribute__((packed));
+ 
+-#define HAL_EV_AV_AUDIO_STATE	0x82
+-struct hal_ev_av_audio_state {
++#define HAL_EV_A2DP_AUDIO_STATE	0x82
++struct hal_ev_a2dp_audio_state {
+ 	uint8_t state;
+ 	uint8_t bdaddr[6];
+ } __attribute__((packed));
 -- 
 1.8.4.2
 
