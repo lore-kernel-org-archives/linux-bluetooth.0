@@ -1,51 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/ipc: Fix crash when sending file descriptor
-Date: Thu,  7 Nov 2013 17:25:35 +0200
-Message-Id: <1383837935-31110-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <20131107151146.GE23283@x220.p-661hnu-f1>
-References: <20131107151146.GE23283@x220.p-661hnu-f1>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <johan.hedberg@gmail.com>, <szymon.janc@tieto.com>,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2] android: Add set/get for discovery timeout
+Date: Thu, 7 Nov 2013 16:26:19 +0100
+Message-ID: <1383837979-4390-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Android handles discoverable timeout in Settings app, however still
+expects BT stack to maintain this value so we should do it as well.
+Otherwise we will get some unexpected behaviour.
+For now we keep discovery_timeout only during runtime, but we need to move
+it to some local storage once we will have it.
 
-Since CMSG_FIRSTHDR is defined as shown below:
-
-  ((size_t) (mhdr)->msg_controllen >= sizeof (struct cmsghdr) \
-   ? (struct cmsghdr *) (mhdr)->msg_control : (struct cmsghdr *) 0)
-
-it return NULL if msg_controllen is not defined. Accessing
-that pointer result in daemon crash.
+Note: That since Android Settings up handles timer there is no reason to
+use discovery timer we have in kernel.
 ---
- android/ipc.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ android/adapter.c | 38 +++++++++++++++++++++++++++++++++++---
+ 1 file changed, 35 insertions(+), 3 deletions(-)
 
-diff --git a/android/ipc.c b/android/ipc.c
-index 9a8657d..729f157 100644
---- a/android/ipc.c
-+++ b/android/ipc.c
-@@ -62,6 +62,9 @@ void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
- 	msg.msg_iovlen = 2;
+diff --git a/android/adapter.c b/android/adapter.c
+index 2e8d2df..d59778b 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -48,6 +48,9 @@
  
- 	if (fd >= 0) {
-+		msg.msg_control = cmsgbuf;
-+		msg.msg_controllen = sizeof(cmsgbuf);
+ /* Default to DisplayYesNo */
+ #define DEFAULT_IO_CAPABILITY 0x01
++/* Default discoverable timeout 120sec as in Android */
++#define DEFAULT_DISCOVERABLE_TIMEOUT 120
 +
- 		cmsg = CMSG_FIRSTHDR(&msg);
- 		cmsg->cmsg_level = SOL_SOCKET;
- 		cmsg->cmsg_type = SCM_RIGHTS;
-@@ -69,9 +72,6 @@ void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
+ #define BASELEN_PROP_CHANGED sizeof(struct hal_ev_adapter_props_changed) \
+ 				+ (sizeof(struct hal_property))
  
- 		/* Initialize the payload */
- 		memcpy(CMSG_DATA(cmsg), &fd, sizeof(int));
--
--		msg.msg_control = cmsgbuf;
--		msg.msg_controllen = sizeof(cmsgbuf);
- 	}
+@@ -70,6 +73,7 @@ struct bt_adapter {
+ 	uint32_t current_settings;
  
- 	if (sendmsg(sk, &msg, 0) < 0) {
+ 	bool discovering;
++	uint32_t discoverable_timeout;
+ };
+ 
+ struct browse_req {
+@@ -1101,6 +1105,17 @@ static uint8_t set_adapter_name(uint8_t *name, uint16_t len)
+ 	return HAL_STATUS_FAILED;
+ }
+ 
++static uint8_t set_discoverable_timeout(uint8_t *timeout)
++{
++	/* Android handles discoverable timeout in Settings app.
++	 * There is no need to use kernel feature for that.
++	 * Just need to store this value here */
++
++	/* TODO: This should be in some storage */
++	memcpy(&adapter->discoverable_timeout, timeout, sizeof(uint32_t));
++
++	return HAL_STATUS_SUCCESS;
++}
+ static void read_info_complete(uint8_t status, uint16_t length, const void *param,
+ 							void *user_data)
+ {
+@@ -1169,6 +1184,8 @@ void bt_adapter_init(uint16_t index, struct mgmt *mgmt, bt_adapter_ready cb)
+ 	adapter->index = index;
+ 	adapter->discovering = false;
+ 	adapter->ready = cb;
++	/* TODO: Read it from some storage */
++	adapter->discoverable_timeout = DEFAULT_DISCOVERABLE_TIMEOUT;
+ 
+ 	if (mgmt_send(mgmt, MGMT_OP_READ_INFO, index, 0, NULL,
+ 					read_info_complete, NULL, NULL) > 0)
+@@ -1286,11 +1303,25 @@ static bool get_devices(void)
+ 
+ static bool get_discoverable_timeout(void)
+ {
+-	DBG("Not implemented");
++	struct hal_ev_adapter_props_changed *ev;
++	int len = sizeof(uint32_t);
++	uint8_t buf[BASELEN_PROP_CHANGED + len];
+ 
+-	/* TODO: Add implementation */
+ 
+-	return false;
++	memset(buf, 0, sizeof(buf));
++	ev = (void *) buf;
++
++	ev->num_props = 1;
++	ev->status = HAL_STATUS_SUCCESS;
++
++	ev->props[0].type = HAL_PROP_ADAPTER_DISC_TIMEOUT;
++	ev->props[0].len = len;
++	memcpy(&ev->props[0].val, &adapter->discoverable_timeout, sizeof(uint32_t));
++
++	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
++				HAL_EV_ADAPTER_PROPS_CHANGED, sizeof(buf), ev, -1);
++
++	return true;
+ }
+ 
+ static bool get_property(void *buf, uint16_t len)
+@@ -1441,6 +1472,7 @@ static uint8_t set_property(void *buf, uint16_t len)
+ 	case HAL_PROP_ADAPTER_NAME:
+ 		return set_adapter_name(cmd->val, cmd->len);
+ 	case HAL_PROP_ADAPTER_DISC_TIMEOUT:
++		return set_discoverable_timeout(cmd->val);
+ 	default:
+ 		DBG("Unhandled property type 0x%x", cmd->type);
+ 		return HAL_STATUS_FAILED;
 -- 
-1.7.10.4
+1.8.4
 
