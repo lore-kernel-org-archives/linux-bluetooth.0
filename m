@@ -1,53 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 8 Nov 2013 14:15:31 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH_v4 1/5] android/hid: Fix set seport ipc cmd preparation
-Message-ID: <20131108121531.GA1371@x220.p-661hnu-f1>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v4 5/5] android/hid: Add virtual unplug implemention in daemon
+Date: Fri,  8 Nov 2013 14:08:51 +0200
+Message-Id: <1383912531-1306-6-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1383912531-1306-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1383912531-1306-1-git-send-email-ravikumar.veeramally@linux.intel.com>
- <1383912531-1306-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383912531-1306-2-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Send virtual unplug command to hid device and disconnect and remove
+hid device details.
+---
+ android/hidhost.c | 46 ++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 44 insertions(+), 2 deletions(-)
 
-On Fri, Nov 08, 2013, Ravi kumar Veeramally wrote:
-> -	memcpy(cmd.data, report, cmd.len);
-> +	memset(cmd, 0, sizeof(buf));
+diff --git a/android/hidhost.c b/android/hidhost.c
+index 250288c..46f992e 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -55,6 +55,7 @@
+ #define UHID_DEVICE_FILE	"/dev/uhid"
+ 
+ /* HID message types */
++#define HID_MSG_CONTROL		0x10
+ #define HID_MSG_GET_REPORT	0x40
+ #define HID_MSG_SET_REPORT	0x50
+ #define HID_MSG_GET_PROTOCOL	0x60
+@@ -73,6 +74,9 @@
+ /* HID GET REPORT Size Field */
+ #define HID_GET_REPORT_SIZE_FIELD	0x08
+ 
++/* HID Virtual Cable Unplug */
++#define HID_VIRTUAL_CABLE_UNPLUG	0x05
++
+ static int notification_sk = -1;
+ static GIOChannel *ctrl_io = NULL;
+ static GIOChannel *intr_io = NULL;
+@@ -744,9 +748,47 @@ static uint8_t bt_hid_disconnect(struct hal_cmd_hidhost_disconnect *cmd,
+ static uint8_t bt_hid_virtual_unplug(struct hal_cmd_hidhost_virtual_unplug *cmd,
+ 								uint16_t len)
+ {
+-	DBG("Not Implemented");
++	struct hid_device *dev;
++	GSList *l;
++	bdaddr_t dst;
++	uint8_t hdr;
++	int fd;
+ 
+-	return HAL_STATUS_FAILED;
++	DBG("");
++
++	if (len < sizeof(*cmd))
++		return HAL_STATUS_INVALID;
++
++	android2bdaddr(&cmd->bdaddr, &dst);
++
++	l = g_slist_find_custom(devices, &dst, device_cmp);
++	if (!l)
++		return HAL_STATUS_FAILED;
++
++	dev = l->data;
++
++	if (!(dev->ctrl_io))
++		return HAL_STATUS_FAILED;
++
++	hdr = HID_MSG_CONTROL | HID_VIRTUAL_CABLE_UNPLUG;
++
++	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
++
++	if (write(fd, &hdr, sizeof(hdr)) < 0) {
++		error("error while virtual unplug command");
++		return HAL_STATUS_FAILED;
++	}
++
++	/* Wait either channels to HUP */
++	if (dev->intr_io)
++		g_io_channel_shutdown(dev->intr_io, TRUE, NULL);
++
++	if (dev->ctrl_io)
++		g_io_channel_shutdown(dev->ctrl_io, TRUE, NULL);
++
++	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTING);
++
++	return HAL_STATUS_SUCCESS;
+ }
+ 
+ static uint8_t bt_hid_info(struct hal_cmd_hidhost_set_info *cmd, uint16_t len)
+-- 
+1.8.3.2
 
-How about memset(buf, 0, sizeof(buf)) to make this perfectly clear. Btw,
-why is the memset needed? I don't think the original code had it. Seems
-like this is an independent bug fix?
-
-> +	cmd->len = strlen(report);
-> +	memcpy(cmd->data, report, cmd->len);
->  
->  	switch (report_type) {
->  	case BTHH_INPUT_REPORT:
-> -		cmd.type = HAL_HIDHOST_INPUT_REPORT;
-> +		cmd->type = HAL_HIDHOST_INPUT_REPORT;
->  		break;
->  	case BTHH_OUTPUT_REPORT:
-> -		cmd.type = HAL_HIDHOST_OUTPUT_REPORT;
-> +		cmd->type = HAL_HIDHOST_OUTPUT_REPORT;
->  		break;
->  	case BTHH_FEATURE_REPORT:
-> -		cmd.type = HAL_HIDHOST_FEATURE_REPORT;
-> +		cmd->type = HAL_HIDHOST_FEATURE_REPORT;
->  		break;
->  	default:
->  		return BT_STATUS_PARM_INVALID;
->  	}
->  
->  	return hal_ipc_cmd(HAL_SERVICE_ID_HIDHOST, HAL_OP_HIDHOST_SET_REPORT,
-> -				sizeof(cmd), &cmd, 0, NULL, NULL);
-> +					sizeof(buf), buf, 0, NULL, NULL);
-
-This last call looks broken to me. Shouldn't you instead of sizeof(buf)
-be sending sizeof(*cmd) + cmd->len?
-
-Johan
