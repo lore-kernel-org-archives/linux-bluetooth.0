@@ -1,28 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 8 Nov 2013 12:46:46 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: Re: [PATCH] android: Fix pan service registration
-Message-ID: <20131108104646.GA28608@x220.p-661hnu-f1>
-References: <1383904308-15141-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383904308-15141-1-git-send-email-szymon.janc@tieto.com>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v3 5/5] android/hid: Add virtual unplug implemention in daemon
+Date: Fri,  8 Nov 2013 12:24:31 +0200
+Message-Id: <1383906271-23554-6-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1383906271-23554-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1383906271-23554-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon/Marcin,
+Send virtual unplug command to hid device and disconnect and remove
+hid device details.
+---
+ android/hidhost.c | 45 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 43 insertions(+), 2 deletions(-)
 
-On Fri, Nov 08, 2013, Szymon Janc wrote:
-> From: Marcin Kraglak <marcin.kraglak@tieto.com>
-> 
-> A2dp service was registered instead of pan.
-> ---
->  android/main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+diff --git a/android/hidhost.c b/android/hidhost.c
+index 612dff4..ac6a3b9 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -55,6 +55,7 @@
+ #define UHID_DEVICE_FILE	"/dev/uhid"
+ 
+ /* HID message types */
++#define HID_MSG_CONTROL		0x10
+ #define HID_MSG_GET_REPORT	0x40
+ #define HID_MSG_SET_REPORT	0x50
+ #define HID_MSG_GET_PROTOCOL	0x60
+@@ -73,6 +74,9 @@
+ /* HID GET REPORT Size Field */
+ #define HID_GET_REPORT_SIZE_FIELD	0x08
+ 
++/* HID Virtual Cable Unplug */
++#define HID_VIRTUAL_CABLE_UNPLUG	0x05
++
+ static int notification_sk = -1;
+ static GIOChannel *ctrl_io = NULL;
+ static GIOChannel *intr_io = NULL;
+@@ -752,9 +756,46 @@ static uint8_t bt_hid_disconnect(struct hal_cmd_hidhost_disconnect *cmd,
+ static uint8_t bt_hid_virtual_unplug(struct hal_cmd_hidhost_vp *cmd,
+ 								uint16_t len)
+ {
+-	DBG("Not Implemented");
++	struct hid_device *dev;
++	GSList *l;
++	bdaddr_t dst;
++	uint8_t hdr;
++	int fd;
+ 
+-	return HAL_STATUS_FAILED;
++	DBG("");
++
++	if (len < sizeof(*cmd))
++		return HAL_STATUS_INVALID;
++
++	android2bdaddr(&cmd->bdaddr, &dst);
++
++	l = g_slist_find_custom(devices, &dst, device_cmp);
++	if (!l)
++		return HAL_STATUS_FAILED;
++
++	dev = l->data;
++	hdr = HID_MSG_CONTROL | HID_VIRTUAL_CABLE_UNPLUG;
++
++	if (!(dev->ctrl_io))
++		return HAL_STATUS_FAILED;
++
++	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
++
++	if (write(fd, &hdr, sizeof(hdr)) < 0) {
++		error("error while virtual unplug command");
++		return HAL_STATUS_FAILED;
++	}
++
++	/* Wait either channels to HUP */
++	if (dev->intr_io)
++		g_io_channel_shutdown(dev->intr_io, TRUE, NULL);
++
++	if (dev->ctrl_io)
++		g_io_channel_shutdown(dev->ctrl_io, TRUE, NULL);
++
++	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTING);
++
++	return HAL_STATUS_SUCCESS;
+ }
+ 
+ static uint8_t bt_hid_info(struct hal_cmd_hidhost_set_info *cmd, uint16_t len)
+-- 
+1.8.3.2
 
-Applied. Thanks.
-
-Johan
