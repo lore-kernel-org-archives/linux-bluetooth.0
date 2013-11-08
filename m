@@ -2,91 +2,63 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v3 5/5] android/hid: Add virtual unplug implemention in daemon
-Date: Fri,  8 Nov 2013 12:24:31 +0200
-Message-Id: <1383906271-23554-6-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v3 2/5] android/hid: Fix set report data format in daemon
+Date: Fri,  8 Nov 2013 12:24:28 +0200
+Message-Id: <1383906271-23554-3-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1383906271-23554-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1383906271-23554-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Send virtual unplug command to hid device and disconnect and remove
-hid device details.
+Report data coming to HAL is in ascii format, HAL sends
+data in hex to daemon, so convert to binary.
 ---
- android/hidhost.c | 45 +++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 43 insertions(+), 2 deletions(-)
+ android/hidhost.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
 diff --git a/android/hidhost.c b/android/hidhost.c
-index 612dff4..ac6a3b9 100644
+index c7b4114..9b4bb15 100644
 --- a/android/hidhost.c
 +++ b/android/hidhost.c
-@@ -55,6 +55,7 @@
- #define UHID_DEVICE_FILE	"/dev/uhid"
+@@ -98,6 +98,14 @@ struct hid_device {
+ 	uint8_t		last_hid_msg;
+ };
  
- /* HID message types */
-+#define HID_MSG_CONTROL		0x10
- #define HID_MSG_GET_REPORT	0x40
- #define HID_MSG_SET_REPORT	0x50
- #define HID_MSG_GET_PROTOCOL	0x60
-@@ -73,6 +74,9 @@
- /* HID GET REPORT Size Field */
- #define HID_GET_REPORT_SIZE_FIELD	0x08
- 
-+/* HID Virtual Cable Unplug */
-+#define HID_VIRTUAL_CABLE_UNPLUG	0x05
++static void hex2bin(const uint8_t *ascii, int ascii_len, uint8_t *hex)
++{
++	int i;
 +
- static int notification_sk = -1;
- static GIOChannel *ctrl_io = NULL;
- static GIOChannel *intr_io = NULL;
-@@ -752,9 +756,46 @@ static uint8_t bt_hid_disconnect(struct hal_cmd_hidhost_disconnect *cmd,
- static uint8_t bt_hid_virtual_unplug(struct hal_cmd_hidhost_vp *cmd,
- 								uint16_t len)
++	for (i = 0; i < ascii_len / 2; i++)
++		sscanf((char *) &ascii[i * 2], "%hhx", &hex[i]);
++}
++
+ static int device_cmp(gconstpointer s, gconstpointer user_data)
  {
--	DBG("Not Implemented");
-+	struct hid_device *dev;
-+	GSList *l;
-+	bdaddr_t dst;
-+	uint8_t hdr;
-+	int fd;
+ 	const struct hid_device *dev = s;
+@@ -900,18 +908,20 @@ static uint8_t bt_hid_set_report(struct hal_cmd_hidhost_set_report *cmd,
+ 		return HAL_STATUS_FAILED;
  
--	return HAL_STATUS_FAILED;
-+	DBG("");
-+
-+	if (len < sizeof(*cmd))
-+		return HAL_STATUS_INVALID;
-+
-+	android2bdaddr(&cmd->bdaddr, &dst);
-+
-+	l = g_slist_find_custom(devices, &dst, device_cmp);
-+	if (!l)
-+		return HAL_STATUS_FAILED;
-+
-+	dev = l->data;
-+	hdr = HID_MSG_CONTROL | HID_VIRTUAL_CABLE_UNPLUG;
-+
-+	if (!(dev->ctrl_io))
-+		return HAL_STATUS_FAILED;
-+
-+	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
-+
-+	if (write(fd, &hdr, sizeof(hdr)) < 0) {
-+		error("error while virtual unplug command");
-+		return HAL_STATUS_FAILED;
-+	}
-+
-+	/* Wait either channels to HUP */
-+	if (dev->intr_io)
-+		g_io_channel_shutdown(dev->intr_io, TRUE, NULL);
-+
-+	if (dev->ctrl_io)
-+		g_io_channel_shutdown(dev->ctrl_io, TRUE, NULL);
-+
-+	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTING);
-+
-+	return HAL_STATUS_SUCCESS;
- }
+ 	dev = l->data;
+-	req_size = 1 + cmd->len;
++	/* Report data coming to HAL is in ascii format, HAL sends
++	 * data in hex to daemon, so convert to binary. */
++	req_size = 1 + (cmd->len / 2);
+ 	req = g_try_malloc0(req_size);
+ 	if (!req)
+ 		return HAL_STATUS_NOMEM;
  
- static uint8_t bt_hid_info(struct hal_cmd_hidhost_set_info *cmd, uint16_t len)
+ 	req[0] = HID_MSG_SET_REPORT | cmd->type;
+-	memcpy(req + 1, cmd->data, req_size - 1);
++	hex2bin(cmd->data, cmd->len, (req + 1));
+ 
+ 	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
+ 
+ 	if (write(fd, req, req_size) < 0) {
+-		error("error while querying device protocol");
++		error("error while sending report");
+ 		g_free(req);
+ 		return HAL_STATUS_FAILED;
+ 	}
 -- 
 1.8.3.2
 
