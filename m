@@ -1,31 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 8 Nov 2013 11:04:49 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/ipc: Fix crash when sending file descriptor
-Message-ID: <20131108090449.GA23960@x220.p-661hnu-f1>
-References: <1383837935-31110-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <527CA95D.8010305@linux.intel.com>
+Date: Fri, 08 Nov 2013 11:05:33 +0200
+From: Ravi Kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383837935-31110-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH_v2 02/11] android/hid: Add a ascii2hex utility
+References: <1383862220-29968-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1383862220-29968-3-git-send-email-ravikumar.veeramally@linux.intel.com> <20131108081018.GA14368@x220.p-661hnu-f1> <527CA596.6070602@linux.intel.com> <20131108084831.GA19729@x220.p-661hnu-f1>
+In-Reply-To: <20131108084831.GA19729@x220.p-661hnu-f1>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
 
-On Thu, Nov 07, 2013, Andrei Emeltchenko wrote:
-> Since CMSG_FIRSTHDR is defined as shown below:
-> 
->   ((size_t) (mhdr)->msg_controllen >= sizeof (struct cmsghdr) \
->    ? (struct cmsghdr *) (mhdr)->msg_control : (struct cmsghdr *) 0)
-> 
-> it return NULL if msg_controllen is not defined. Accessing
-> that pointer result in daemon crash.
-> ---
->  android/ipc.c |    6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+On 11/08/2013 10:48 AM, Johan Hedberg wrote:
+> Hi Ravi,
+>
+> On Fri, Nov 08, 2013, Ravi Kumar Veeramally wrote:
+>>>> +void ascii2hex(const uint8_t *ascii, int ascii_len, uint8_t *hex)
+>>>> +{
+>>>> +	int i;
+>>>> +
+>>>> +	if (!ascii || !hex)
+>>>> +		return;
+>>>> +
+>>>> +	for (i = 0; i < ascii_len / 2; i++)
+>>>> +		sscanf((char *) &ascii[i * 2], "%02x",
+>>>> +						(unsigned int *) &hex[i]);
+>>>> +
+>>>> +}
+>>> I'd just keep this static inside the HID HAL since that seems to be
+>>> the only user for it. Actually I'm not even convinced that it's worth
+>>> to have this as a separate function since you only have two users and
+>>> essentially the function is just two lines (the if-statement is
+>>> redundant).
+>> Ok, I will keep it as static. Do you want me to keep in HID HAL or HID
+>> daemon?
+> The daemon is where you were doing the conversion now as well, so no
+> need to change that (sorry about being unclear when I said "HID HAL").
+>
+>>> Also, the function name isn't quite right. You're converting from hex
+>>> to binary
+>>   We are converting to hex right? correct me If I am wrong.
+> No, we're converting from hex to binary.
+>
+>>> . Not from ascii to hex (hex notation is already using
+>>> the ascii character set). Also, do consider the point from Jerzy about
+>>> the format specifier.
+>>>
+>>   Ok, I will fix Jerzy's suggestion also.
+>>
+>> Apart from this patch, do you have any comments on rest of the
+>> patches?
+> Only the ones I already sent.
+>
+> Johan
+>
+  Ok, Patch_v2 6 & 7 are independent of ascii stuff, can be it possible to
+  apply if there are no comments? (just a request!!).
 
-Applied. Thanks.
-
-Johan
+  Thanks a lot,
+  Ravi.
