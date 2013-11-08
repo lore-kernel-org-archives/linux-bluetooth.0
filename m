@@ -1,45 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1384016577.3880.36.camel@nuvo>
-Subject: [PATCH 1/3] gdbus: Don't try to remove removed sources
+Message-ID: <1383938500.3880.23.camel@nuvo>
+Subject: obexd broken for absolute paths
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Date: Sat, 09 Nov 2013 18:02:57 +0100
+Date: Fri, 08 Nov 2013 20:21:40 +0100
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Heya,
 
-When we return FALSE from idle handlers, the source is removed.
-This will be causing warnings in glib 2.40.
+I was trying to test gnome-user-share's Bluetooth support for BlueZ 5,
+and was quite surprised it didn't work one bit, with transfers failing
+as soon as they were created.
 
-See https://bugzilla.gnome.org/show_bug.cgi?id=710724
----
- gdbus/object.c | 3 +++
- 1 file changed, 3 insertions(+)
+I made this simple change to test/simple-obex-agent so you could
+replicate the failure. Obviously, change the download path to exist on
+your system:
+-               return properties['Name']
++               return ("%s/%s" % ("/home/hadess/Downloads/", properties['Name']))
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 268fed5..b248cbb 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -1006,6 +1006,8 @@ static gboolean process_changes(gpointer user_data)
- 	if (data->removed != NULL)
- 		emit_interfaces_removed(data);
- 
-+	data->process_id = 0;
-+
- 	return FALSE;
- }
- 
-@@ -1019,6 +1021,7 @@ static void generic_unregister(DBusConnection *connection, void *user_data)
- 
- 	if (data->process_id > 0) {
- 		g_source_remove(data->process_id);
-+		data->process_id = 0;
- 		process_changes(data);
- 	}
- 
--- 
-1.8.4.2
+This will see OBEX Push transfers fail as soon as accepted.
 
+I must also mention the dreadful code in agent_reply() in obexd/src/manager.c:
+                const char *slash = strrchr(name, '/');
+                DBG("Agent replied with %s", name);
+                if (!slash) {
+                        agent->new_name = g_strdup(name);
+                        agent->new_folder = NULL;
+                } else {
+                        agent->new_name = g_strdup(slash + 1); 
+                        agent->new_folder = g_strndup(name, slash - name);
+                }
+
+Please use g_path_get_basename() and g_path_get_dirname(). This is even
+a security issue because I could pass relative paths and expect some
+system file to get overwritten.
+
+Cheers
 
