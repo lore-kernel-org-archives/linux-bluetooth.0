@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1383938500.3880.23.camel@nuvo>
-Subject: obexd broken for absolute paths
+Message-ID: <1383927109.3880.7.camel@nuvo>
+Subject: How do you do OBEX testing?
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Date: Fri, 08 Nov 2013 20:21:40 +0100
+Date: Fri, 08 Nov 2013 17:11:49 +0100
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,32 +11,28 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Heya,
 
-I was trying to test gnome-user-share's Bluetooth support for BlueZ 5,
-and was quite surprised it didn't work one bit, with transfers failing
-as soon as they were created.
+I've been testing and fixing OBEX client and server side bugs for a
+while, usually in GNOME, but I recently realised how outdated my testing
+techniques were, relying on what would be described as "legacy"
+phones[1].
 
-I made this simple change to test/simple-obex-agent so you could
-replicate the failure. Obviously, change the download path to exist on
-your system:
--               return properties['Name']
-+               return ("%s/%s" % ("/home/hadess/Downloads/", properties['Name']))
+I've asked this question on IRC, but I guess I might not be the only one
+that needs to test things like this.
 
-This will see OBEX Push transfers fail as soon as accepted.
+So, what do you use for testing ObexFTP, OBEX Push or related protocols
+like PBAP?
 
-I must also mention the dreadful code in agent_reply() in obexd/src/manager.c:
-                const char *slash = strrchr(name, '/');
-                DBG("Agent replied with %s", name);
-                if (!slash) {
-                        agent->new_name = g_strdup(name);
-                        agent->new_folder = NULL;
-                } else {
-                        agent->new_name = g_strdup(slash + 1); 
-                        agent->new_folder = g_strndup(name, slash - name);
-                }
+- Adding an additional dongle on your computer and assigning it to a VM?
+- Using software on a newer smartphone (seems Android has more of those
+than the badly rated iOS ones)?
+- Another computer? a dumb phone?
 
-Please use g_path_get_basename() and g_path_get_dirname(). This is even
-a security issue because I could pass relative paths and expect some
-system file to get overwritten.
+I'm looking for something that I could run on a laptop with minimal
+additional hardware, so any hints would be welcome.
 
 Cheers
+
+[1]: a Sony Ericsson one that refuses to get out of demo mode because
+the SIM slot is broken, and a 10-year candybar Nokia phone that can't
+hold charge.
 
