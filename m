@@ -1,70 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] androi/haltest: Make debug functions return const string
-Date: Fri,  8 Nov 2013 16:08:49 +0200
-Message-Id: <1383919730-13597-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/2] android/hal-utils: Make hal-utils functions return const string
+Date: Fri,  8 Nov 2013 16:08:50 +0200
+Message-Id: <1383919730-13597-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1383919730-13597-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1383919730-13597-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/client/textconv.c |    6 +++---
- android/client/textconv.h |    6 +++---
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ android/hal-utils.c |    4 ++--
+ android/hal-utils.h |    4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/android/client/textconv.c b/android/client/textconv.c
-index 60ac08a..dcbe53e 100644
---- a/android/client/textconv.c
-+++ b/android/client/textconv.c
-@@ -137,7 +137,7 @@ int int2str_findstr(const char *str, const struct int2str m[])
+diff --git a/android/hal-utils.c b/android/hal-utils.c
+index 96dc234..7ac5047 100644
+--- a/android/hal-utils.c
++++ b/android/hal-utils.c
+@@ -27,7 +27,7 @@
   *
-  * returns buf
+  * returns string representation of uuid
   */
--char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
-+const char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
+-char *bt_uuid_t2str(const uint8_t *uuid, char *buf)
++const char *bt_uuid_t2str(const uint8_t *uuid, char *buf)
  {
- 	const uint8_t *p = bd_addr->address;
- 
-@@ -196,14 +196,14 @@ const char *enum_one_string(void *v, int i)
- 	return (i == 0) && (m[0] != 0) ? m : NULL;
+ 	int shift = 0;
+ 	unsigned int i;
+@@ -49,7 +49,7 @@ char *bt_uuid_t2str(const uint8_t *uuid, char *buf)
+ 	return buf;
  }
  
--char *bdaddr2str(const bt_bdaddr_t *bd_addr)
-+const char *bdaddr2str(const bt_bdaddr_t *bd_addr)
+-char *btuuid2str(const uint8_t *uuid)
++const char *btuuid2str(const uint8_t *uuid)
  {
- 	static char buf[MAX_ADDR_STR_LEN];
+ 	static char buf[MAX_UUID_STR_LEN];
  
- 	return bt_bdaddr_t2str(bd_addr, buf);
- }
+diff --git a/android/hal-utils.h b/android/hal-utils.h
+index 5287180..8c74653 100644
+--- a/android/hal-utils.h
++++ b/android/hal-utils.h
+@@ -23,5 +23,5 @@ static const char BT_BASE_UUID[] = {
+ 	0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb
+ };
  
--char *btproperty2str(const bt_property_t *property)
-+const char *btproperty2str(const bt_property_t *property)
- {
- 	static char buf[4096];
- 	char *p;
-diff --git a/android/client/textconv.h b/android/client/textconv.h
-index 837eb4e..0a72805 100644
---- a/android/client/textconv.h
-+++ b/android/client/textconv.h
-@@ -100,13 +100,13 @@ static struct int2str __##type##2str[] = {
- /* End of mapping section */
- 
- #define MAX_ADDR_STR_LEN 18
--char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf);
-+const char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf);
- void str2bt_bdaddr_t(const char *str, bt_bdaddr_t *bd_addr);
- 
- void str2bt_uuid_t(const char *str, bt_uuid_t *uuid);
- 
--char *btproperty2str(const bt_property_t *property);
--char *bdaddr2str(const bt_bdaddr_t *bd_addr);
-+const char *btproperty2str(const bt_property_t *property);
-+const char *bdaddr2str(const bt_bdaddr_t *bd_addr);
- 
- DECINTMAP(bt_status_t);
- DECINTMAP(bt_state_t);
+-char *bt_uuid_t2str(const uint8_t *uuid, char *buf);
+-char *btuuid2str(const uint8_t *uuid);
++const char *bt_uuid_t2str(const uint8_t *uuid, char *buf);
++const char *btuuid2str(const uint8_t *uuid);
 -- 
 1.7.10.4
 
