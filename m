@@ -1,71 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 3/3] android/hal: Add UUID debug print in socket HAL
-Date: Fri,  8 Nov 2013 11:35:49 +0200
-Message-Id: <1383903349-17487-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1383903349-17487-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1383903349-17487-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <527CAF36.3050709@linux.intel.com>
+Date: Fri, 08 Nov 2013 11:30:30 +0200
+From: Ravi Kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH_v2 06/11] android/hid: Fill send data structure variables
+ in hal-hidhost
+References: <1383862220-29968-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1383862220-29968-7-git-send-email-ravikumar.veeramally@linux.intel.com> <20131108091715.GA24795@x220.p-661hnu-f1>
+In-Reply-To: <20131108091715.GA24795@x220.p-661hnu-f1>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Johan,
 
-Socket HAL uses uint8_t * strings which are of size bt_uuid_t.
----
- android/hal-sock.c |   19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
+On 11/08/2013 11:17 AM, Johan Hedberg wrote:
+> Hi Ravi,
+>
+> On Fri, Nov 08, 2013, Ravi kumar Veeramally wrote:
+>> ---
+>>   android/hal-hidhost.c | 18 ++++++++++++++----
+>>   1 file changed, 14 insertions(+), 4 deletions(-)
+> This doesn't compile:
+>
+>    CC       android/android_libhal_internal_la-hal-hidhost.lo
+> android/hal-hidhost.c: In function 'send_data':
+> android/hal-hidhost.c:356:2: error: implicit declaration of function 'free' [-Werror=implicit-function-declaration]
+>    free(cmd);
+>    ^
+> android/hal-hidhost.c:356:2: error: incompatible implicit declaration of built-in function 'free' [-Werror]
+> cc1: all warnings being treated as errors
+> make[1]: *** [android/android_libhal_internal_la-hal-hidhost.lo] Error 1
+>
+  Ok, I will send _v3 of this and rest.
 
-diff --git a/android/hal-sock.c b/android/hal-sock.c
-index 32c7939..74cadc1 100644
---- a/android/hal-sock.c
-+++ b/android/hal-sock.c
-@@ -25,6 +25,8 @@
- #include "hal-msg.h"
- #include "hal.h"
- 
-+#include "hal-utils.h"
-+
- static bt_status_t sock_listen_rfcomm(const char *service_name,
- 					const uint8_t *uuid, int chan,
- 					int *sock, int flags)
-@@ -49,13 +51,14 @@ static bt_status_t sock_listen(btsock_type_t type, const char *service_name,
- 					int *sock, int flags)
- {
- 	if ((!uuid && chan <= 0) || !sock) {
--		error("%s: invalid params: uuid %p, chan %d, sock %p",
--						__func__, uuid, chan, sock);
-+		error("Invalid params: uuid %s, chan %d, sock %p",
-+			btuuid2str(uuid, sizeof(bt_uuid_t)), chan, sock);
- 		return BT_STATUS_PARM_INVALID;
- 	}
- 
--	DBG("uuid %p chan %d sock %p type %d service_name %s",
--					uuid, chan, sock, type, service_name);
-+	DBG("uuid %s chan %d sock %p type %d service_name %s",
-+				btuuid2str(uuid, sizeof(bt_uuid_t)), chan,
-+				sock, type, service_name);
- 
- 	switch (type) {
- 	case BTSOCK_RFCOMM:
-@@ -76,12 +79,14 @@ static bt_status_t sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
- 	struct hal_cmd_sock_connect cmd;
- 
- 	if ((!uuid && chan <= 0) || !bdaddr || !sock) {
--		error("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
--					bdaddr, uuid, chan, sock);
-+		error("Invalid params: bd_addr %p, uuid %s, chan %d, sock %p",
-+				bdaddr, btuuid2str(uuid, sizeof(bt_uuid_t)),
-+				chan, sock);
- 		return BT_STATUS_PARM_INVALID;
- 	}
- 
--	DBG("uuid %p chan %d sock %p type %d", uuid, chan, sock, type);
-+	DBG("uuid %s chan %d sock %p type %d",
-+		btuuid2str(uuid, sizeof(bt_uuid_t)), chan, sock, type);
- 
- 	if (type != BTSOCK_RFCOMM) {
- 		error("Socket type %u not supported", type);
--- 
-1.7.10.4
-
+Thanks,
+Ravi.
