@@ -2,48 +2,56 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v4 3/5] android/hid: Fill send data command struct in hal-hidhost
-Date: Fri,  8 Nov 2013 14:08:49 +0200
-Message-Id: <1383912531-1306-4-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v4 2/5] android/hid: Fix set report data format in daemon
+Date: Fri,  8 Nov 2013 14:08:48 +0200
+Message-Id: <1383912531-1306-3-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1383912531-1306-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1383912531-1306-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Report data coming to HAL is in ascii format, HAL sends
+data in hex to daemon, so convert to binary.
 ---
- android/hal-hidhost.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ android/hidhost.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
-index a0df7ce..e4a15c0 100644
---- a/android/hal-hidhost.c
-+++ b/android/hal-hidhost.c
-@@ -335,7 +335,8 @@ static bt_status_t set_report(bt_bdaddr_t *bd_addr,
+diff --git a/android/hidhost.c b/android/hidhost.c
+index 242fcbc..0e6bae0 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -884,7 +884,7 @@ static uint8_t bt_hid_set_report(struct hal_cmd_hidhost_set_report *cmd,
+ 	struct hid_device *dev;
+ 	GSList *l;
+ 	bdaddr_t dst;
+-	int fd;
++	int i, fd;
+ 	uint8_t *req;
+ 	uint8_t req_size;
  
- static bt_status_t send_data(bt_bdaddr_t *bd_addr, char *data)
- {
--	struct hal_cmd_hidhost_send_data cmd;
-+	uint8_t buf[BLUEZ_HAL_MTU];
-+	struct hal_cmd_hidhost_send_data *cmd = (void *) buf;
+@@ -900,13 +900,20 @@ static uint8_t bt_hid_set_report(struct hal_cmd_hidhost_set_report *cmd,
+ 		return HAL_STATUS_FAILED;
  
- 	DBG("");
+ 	dev = l->data;
+-	req_size = 1 + cmd->len;
++
++	if (!(dev->ctrl_io))
++		return HAL_STATUS_FAILED;
++
++	req_size = 1 + (cmd->len / 2);
+ 	req = g_try_malloc0(req_size);
+ 	if (!req)
+ 		return HAL_STATUS_NOMEM;
  
-@@ -345,10 +346,13 @@ static bt_status_t send_data(bt_bdaddr_t *bd_addr, char *data)
- 	if (!bd_addr || !data)
- 		return BT_STATUS_PARM_INVALID;
+ 	req[0] = HID_MSG_SET_REPORT | cmd->type;
+-	memcpy(req + 1, cmd->data, req_size - 1);
++	/* Report data coming to HAL is in ascii format, HAL sends
++	 * data in hex to daemon, so convert to binary. */
++	for (i = 0; i < (req_size - 1); i++)
++		sscanf((char *) &(cmd->data)[i * 2], "%hhx", &(req + 1)[i]);
  
--	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
-+	memset(cmd, 0, sizeof(buf));
-+	memcpy(cmd->bdaddr, bd_addr, sizeof(cmd->bdaddr));
-+	cmd->len = strlen(data);
-+	memcpy(cmd->data, data, cmd->len);
+ 	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
  
- 	return hal_ipc_cmd(HAL_SERVICE_ID_HIDHOST, HAL_OP_HIDHOST_SEND_DATA,
--					sizeof(cmd), &cmd, 0, NULL, NULL);
-+					sizeof(buf), buf, 0, NULL, NULL);
- }
- 
- static bt_status_t init(bthh_callbacks_t *callbacks)
 -- 
 1.8.3.2
 
