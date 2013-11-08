@@ -1,38 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1383927109.3880.7.camel@nuvo>
-Subject: How do you do OBEX testing?
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Date: Fri, 08 Nov 2013 17:11:49 +0100
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <johan.hedberg@gmail.com>, <szymon.janc@tieto.com>,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 3/3] android: Change TODO with explaining comment
+Date: Fri, 8 Nov 2013 16:48:31 +0100
+Message-ID: <1383925711-26374-4-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1383925711-26374-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1383925711-26374-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Heya,
+---
+ android/adapter.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-I've been testing and fixing OBEX client and server side bugs for a
-while, usually in GNOME, but I recently realised how outdated my testing
-techniques were, relying on what would be described as "legacy"
-phones[1].
-
-I've asked this question on IRC, but I guess I might not be the only one
-that needs to test things like this.
-
-So, what do you use for testing ObexFTP, OBEX Push or related protocols
-like PBAP?
-
-- Adding an additional dongle on your computer and assigning it to a VM?
-- Using software on a newer smartphone (seems Android has more of those
-than the badly rated iOS ones)?
-- Another computer? a dumb phone?
-
-I'm looking for something that I could run on a laptop with minimal
-additional hardware, so any hints would be welcome.
-
-Cheers
-
-[1]: a Sony Ericsson one that refuses to get out of demo mode because
-the SIM slot is broken, and a 10-year candybar Nokia phone that can't
-hold charge.
+diff --git a/android/adapter.c b/android/adapter.c
+index cd820df..cb25954 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -509,7 +509,10 @@ static void pin_code_request_callback(uint16_t index, uint16_t length,
+ 
+ 	DBG("%s type %u secure %u", dst, ev->addr.type, ev->secure);
+ 
+-	/* TODO name and CoD of remote devices should probably be cached */
++	/* It is ok to have empty name and CoD of remote devices here since
++	* those information has been already provided on device_connected event
++	* or during device scaning. Android will use that instead.
++	*/
+ 	memset(&hal_ev, 0, sizeof(hal_ev));
+ 	bdaddr2android(&ev->addr.bdaddr, hal_ev.bdaddr);
+ 
+@@ -522,7 +525,10 @@ static void send_ssp_request(const bdaddr_t *addr, uint8_t variant,
+ {
+ 	struct hal_ev_ssp_request ev;
+ 
+-	/* TODO name and CoD of remote devices should probably be cached */
++	/* It is ok to have empty name and CoD of remote devices here since
++	* those information has been already provided on device_connected event
++	* or during device scaning. Android will use that instead.
++	*/
+ 	memset(&ev, 0, sizeof(ev));
+ 	bdaddr2android(addr, ev.bdaddr);
+ 	ev.pairing_variant = variant;
+-- 
+1.8.4
 
