@@ -1,55 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] android/hal-utils: Make hal-utils functions return const string
-Date: Fri,  8 Nov 2013 16:08:50 +0200
-Message-Id: <1383919730-13597-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1383919730-13597-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1383919730-13597-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [RFC] android/hid: Handle virtual unplug event from hid device
+Date: Fri,  8 Nov 2013 16:14:54 +0200
+Message-Id: <1383920094-20498-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
+If hid host receives the virtual unplug event from hid device
+recipient shall destroy or invalidate all bluetooth bonding and
+virtual cable information
 ---
- android/hal-utils.c |    4 ++--
- android/hal-utils.h |    4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ android/hal-msg.h |  1 +
+ android/hidhost.c | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 29 insertions(+)
 
-diff --git a/android/hal-utils.c b/android/hal-utils.c
-index 96dc234..7ac5047 100644
---- a/android/hal-utils.c
-+++ b/android/hal-utils.c
-@@ -27,7 +27,7 @@
-  *
-  * returns string representation of uuid
-  */
--char *bt_uuid_t2str(const uint8_t *uuid, char *buf)
-+const char *bt_uuid_t2str(const uint8_t *uuid, char *buf)
- {
- 	int shift = 0;
- 	unsigned int i;
-@@ -49,7 +49,7 @@ char *bt_uuid_t2str(const uint8_t *uuid, char *buf)
- 	return buf;
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 4c7d344..569c8ea 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -449,6 +449,7 @@ struct hal_ev_hidhost_conn_state {
+ } __attribute__((packed));
+ 
+ #define HAL_HIDHOST_STATUS_OK		0x00
++#define HAL_HIDHOST_GENERAL_ERROR	0x06
+ 
+ #define HAL_EV_HIDHOST_INFO			0x82
+ struct hal_ev_hidhost_info {
+diff --git a/android/hidhost.c b/android/hidhost.c
+index d36cb82..683938f 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -379,6 +379,31 @@ send:
+ 	g_free(ev);
  }
  
--char *btuuid2str(const uint8_t *uuid)
-+const char *btuuid2str(const uint8_t *uuid)
++static void bt_hid_notify_virtual_unplug(struct hid_device *dev,
++							uint8_t *buf, int len)
++{
++	struct hal_ev_hidhost_virtual_unplug ev;
++	char address[18];
++
++	ba2str(&dev->dst, address);
++	DBG("device %s", address);
++	bdaddr2android(&dev->dst, ev.bdaddr);
++
++	ev.status = HAL_HIDHOST_GENERAL_ERROR;
++
++	/* Wait either channels to HUP */
++	if (dev->intr_io && dev->ctrl_io) {
++		g_io_channel_shutdown(dev->intr_io, TRUE, NULL);
++		g_io_channel_shutdown(dev->ctrl_io, TRUE, NULL);
++		bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTING);
++		ev.status = HAL_HIDHOST_STATUS_OK;
++	}
++
++	ipc_send(notification_sk, HAL_SERVICE_ID_HIDHOST,
++			HAL_EV_HIDHOST_VIRTUAL_UNPLUG, sizeof(ev), &ev, -1);
++
++}
++
+ static gboolean ctrl_io_watch_cb(GIOChannel *chan, gpointer data)
  {
- 	static char buf[MAX_UUID_STR_LEN];
+ 	struct hid_device *dev = data;
+@@ -404,6 +429,9 @@ static gboolean ctrl_io_watch_cb(GIOChannel *chan, gpointer data)
+ 		break;
+ 	}
  
-diff --git a/android/hal-utils.h b/android/hal-utils.h
-index 5287180..8c74653 100644
---- a/android/hal-utils.h
-+++ b/android/hal-utils.h
-@@ -23,5 +23,5 @@ static const char BT_BASE_UUID[] = {
- 	0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb
- };
++	if (buf[0] == (HID_MSG_CONTROL | HID_VIRTUAL_CABLE_UNPLUG))
++		bt_hid_notify_virtual_unplug(dev, buf, bread);
++
+ 	/* reset msg type request */
+ 	dev->last_hid_msg = 0;
  
--char *bt_uuid_t2str(const uint8_t *uuid, char *buf);
--char *btuuid2str(const uint8_t *uuid);
-+const char *bt_uuid_t2str(const uint8_t *uuid, char *buf);
-+const char *btuuid2str(const uint8_t *uuid);
 -- 
-1.7.10.4
+1.8.3.2
 
