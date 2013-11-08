@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v3 2/8] ipv6: Add checks for RAWIP ARP type
-Date: Fri,  8 Nov 2013 17:23:09 +0200
-Message-Id: <1383924195-7936-3-git-send-email-jukka.rissanen@linux.intel.com>
+Subject: [RFC v3 6/8] route: Exporting ip6_route_add() so that Bluetooth 6LoWPAN can use it
+Date: Fri,  8 Nov 2013 17:23:13 +0200
+Message-Id: <1383924195-7936-7-git-send-email-jukka.rissanen@linux.intel.com>
 In-Reply-To: <1383924195-7936-1-git-send-email-jukka.rissanen@linux.intel.com>
 References: <1383924195-7936-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,31 +11,21 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 ---
- net/ipv6/addrconf.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ net/ipv6/route.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index d6ff126..cde1061 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -1797,6 +1797,7 @@ static int ipv6_generate_eui64(u8 *eui, struct net_device *dev)
- 		return addrconf_ifid_sit(eui, dev);
- 	case ARPHRD_IPGRE:
- 		return addrconf_ifid_gre(eui, dev);
-+	case ARPHRD_RAWIP:
- 	case ARPHRD_IEEE802154:
- 		return addrconf_ifid_eui64(eui, dev);
- 	case ARPHRD_IEEE1394:
-@@ -2681,7 +2682,8 @@ static void addrconf_dev_config(struct net_device *dev)
- 	    (dev->type != ARPHRD_INFINIBAND) &&
- 	    (dev->type != ARPHRD_IEEE802154) &&
- 	    (dev->type != ARPHRD_IEEE1394) &&
--	    (dev->type != ARPHRD_TUNNEL6)) {
-+	    (dev->type != ARPHRD_TUNNEL6) &&
-+	    (dev->type != ARPHRD_RAWIP)) {
- 		/* Alas, we support only Ethernet autoconfiguration. */
- 		return;
- 	}
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index c979dd9..d7c200f 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -1662,6 +1662,7 @@ out:
+ 		dst_free(&rt->dst);
+ 	return err;
+ }
++EXPORT_SYMBOL_GPL(ip6_route_add);
+ 
+ static int __ip6_del_rt(struct rt6_info *rt, struct nl_info *info)
+ {
 -- 
 1.8.3.1
 
