@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v3 7/8] Bluetooth: Set route to peer for 6LoWPAN
-Date: Fri,  8 Nov 2013 17:23:14 +0200
-Message-Id: <1383924195-7936-8-git-send-email-jukka.rissanen@linux.intel.com>
+Subject: [RFC v3 2/8] ipv6: Add checks for RAWIP ARP type
+Date: Fri,  8 Nov 2013 17:23:09 +0200
+Message-Id: <1383924195-7936-3-git-send-email-jukka.rissanen@linux.intel.com>
 In-Reply-To: <1383924195-7936-1-git-send-email-jukka.rissanen@linux.intel.com>
 References: <1383924195-7936-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,64 +11,31 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 ---
- net/bluetooth/6lowpan.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ net/ipv6/addrconf.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index d33a32e..e70302a 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -1395,6 +1395,38 @@ static void set_dev_addr(struct net_device *net, bdaddr_t *addr,
- 	net->dev_addr[0] ^= 2;
- }
- 
-+static int add_peer_route(struct peer *dev, struct net_device *net,
-+			bdaddr_t *addr, u8 addr_type)
-+{
-+	struct in6_addr peer_addr;
-+	struct fib6_config cfg = {
-+		.fc_table	= RT6_TABLE_MAIN,
-+		.fc_metric	= IP6_RT_PRIO_ADDRCONF,
-+		.fc_ifindex	= net->ifindex,
-+		.fc_dst_len	= 128,
-+		.fc_flags	= RTF_ADDRCONF | RTF_UP |
-+					RTF_PREF(ICMPV6_ROUTER_PREF_MEDIUM),
-+		.fc_nlinfo.portid = 0,
-+		.fc_nlinfo.nlh = NULL,
-+		.fc_nlinfo.nl_net = dev_net(net),
-+	};
-+
-+	memset(&peer_addr, 0, sizeof(struct in6_addr));
-+
-+	/* RFC 2464 ch. 5 */
-+	peer_addr.s6_addr[0] = 0xFE;
-+	peer_addr.s6_addr[1] = 0x80;
-+	set_addr((u8 *)&peer_addr.s6_addr + 8, addr->b, addr_type);
-+
-+	memcpy(&dev->eui64_addr, (u8 *)&peer_addr.s6_addr + 8, EUI64_ADDR_LEN);
-+
-+	BT_DBG("peer address %pI6c", (u8 *)&peer_addr.s6_addr);
-+
-+	cfg.fc_dst = dev->peer_addr = peer_addr;
-+
-+	return ip6_route_add(&cfg);
-+}
-+
- static void ifup(struct net_device *net)
- {
- 	int err;
-@@ -1492,6 +1524,11 @@ add_peer:
- 	peer_add(dev, peer);
- 	write_unlock(&devices_lock);
- 
-+	err = add_peer_route(peer, dev->net, &conn->hcon->dst,
-+						conn->hcon->dst_type);
-+	if (err < 0)
-+		BT_INFO("Setting route failed %d", err);
-+
- out:
- 	return err;
- }
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index d6ff126..cde1061 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -1797,6 +1797,7 @@ static int ipv6_generate_eui64(u8 *eui, struct net_device *dev)
+ 		return addrconf_ifid_sit(eui, dev);
+ 	case ARPHRD_IPGRE:
+ 		return addrconf_ifid_gre(eui, dev);
++	case ARPHRD_RAWIP:
+ 	case ARPHRD_IEEE802154:
+ 		return addrconf_ifid_eui64(eui, dev);
+ 	case ARPHRD_IEEE1394:
+@@ -2681,7 +2682,8 @@ static void addrconf_dev_config(struct net_device *dev)
+ 	    (dev->type != ARPHRD_INFINIBAND) &&
+ 	    (dev->type != ARPHRD_IEEE802154) &&
+ 	    (dev->type != ARPHRD_IEEE1394) &&
+-	    (dev->type != ARPHRD_TUNNEL6)) {
++	    (dev->type != ARPHRD_TUNNEL6) &&
++	    (dev->type != ARPHRD_RAWIP)) {
+ 		/* Alas, we support only Ethernet autoconfiguration. */
+ 		return;
+ 	}
 -- 
 1.8.3.1
 
