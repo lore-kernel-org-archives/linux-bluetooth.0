@@ -1,41 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v3 0/5] Fixed and implemented set report and send data ifaces
-Date: Fri,  8 Nov 2013 12:24:26 +0200
-Message-Id: <1383906271-23554-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Marcin Kraglak <marcin.kraglak@tieto.com>
+Subject: [PATCH] android: Fix pan service registration
+Date: Fri, 8 Nov 2013 10:51:48 +0100
+Message-ID: <1383904308-15141-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-v3: Fixed issues as per Johan's and Jerzy' comments and suggestions
-    Implemented hex2bin as a static funtion and split the patches.
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 
-v2: Fixed issues as per Johan's comments and suggestions.
-    This patch adds missing hid ipc documentation, hal headers,
-    renaming and virtual unplug notification in hid HAL.
-    Set report and send data interfaces are receiving data in ascii format
-    but it should be in hex format. Provided utility for this and fixed
-    set report data preparation. Implemented virtual unplug and send data
-    methods in daemon.
+A2dp service was registered instead of pan.
+---
+ android/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-v1: This patch adds missing hid ipc documentation, hal headers,
-    renaming and virtual unplug notification in hid HAL.
-    send RFC for ascii2hex utility.
-    Unsupported methods are virtual unplug and send data in daemon.
-
-Ravi kumar Veeramally (5):
-  android/hid: Fix set seport ipc cmd preparation
-  android/hid: Fix set report data format in daemon
-  android/hid: Fill send data command struct in hal-hidhost
-  android/hid: Add send data implemention in daemon
-  android/hid: Add virtual unplug implemention in daemon
-
- android/hal-hidhost.c | 47 +++++++++++++++++-------
- android/hal-msg.h     |  2 +-
- android/hidhost.c     | 99 +++++++++++++++++++++++++++++++++++++++++++++++----
- 3 files changed, 127 insertions(+), 21 deletions(-)
-
+diff --git a/android/main.c b/android/main.c
+index 057c2f7..93870d0 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -107,7 +107,7 @@ static void service_register(void *buf, uint16_t len)
+ 
+ 		break;
+ 	case HAL_SERVICE_ID_PAN:
+-		if (!bt_a2dp_register(sk, adapter_bdaddr))
++		if (!bt_pan_register(sk, adapter_bdaddr))
+ 			goto failed;
+ 
+ 		break;
 -- 
-1.8.3.2
+1.8.4.2
 
