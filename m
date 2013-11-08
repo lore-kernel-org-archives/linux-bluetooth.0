@@ -2,52 +2,34 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v4 5/5] android/hid: Add virtual unplug implemention in daemon
-Date: Fri,  8 Nov 2013 14:08:51 +0200
-Message-Id: <1383912531-1306-6-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v4 4/5] android/hid: Add send data implemention in daemon
+Date: Fri,  8 Nov 2013 14:08:50 +0200
+Message-Id: <1383912531-1306-5-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1383912531-1306-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1383912531-1306-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Send virtual unplug command to hid device and disconnect and remove
-hid device details.
+Send data on interrupt channel on request from hid host.
 ---
- android/hidhost.c | 46 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 44 insertions(+), 2 deletions(-)
+ android/hidhost.c | 45 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 43 insertions(+), 2 deletions(-)
 
 diff --git a/android/hidhost.c b/android/hidhost.c
-index 250288c..46f992e 100644
+index 0e6bae0..250288c 100644
 --- a/android/hidhost.c
 +++ b/android/hidhost.c
-@@ -55,6 +55,7 @@
- #define UHID_DEVICE_FILE	"/dev/uhid"
- 
- /* HID message types */
-+#define HID_MSG_CONTROL		0x10
- #define HID_MSG_GET_REPORT	0x40
- #define HID_MSG_SET_REPORT	0x50
- #define HID_MSG_GET_PROTOCOL	0x60
-@@ -73,6 +74,9 @@
- /* HID GET REPORT Size Field */
- #define HID_GET_REPORT_SIZE_FIELD	0x08
- 
-+/* HID Virtual Cable Unplug */
-+#define HID_VIRTUAL_CABLE_UNPLUG	0x05
-+
- static int notification_sk = -1;
- static GIOChannel *ctrl_io = NULL;
- static GIOChannel *intr_io = NULL;
-@@ -744,9 +748,47 @@ static uint8_t bt_hid_disconnect(struct hal_cmd_hidhost_disconnect *cmd,
- static uint8_t bt_hid_virtual_unplug(struct hal_cmd_hidhost_virtual_unplug *cmd,
+@@ -931,9 +931,50 @@ static uint8_t bt_hid_set_report(struct hal_cmd_hidhost_set_report *cmd,
+ static uint8_t bt_hid_send_data(struct hal_cmd_hidhost_send_data *cmd,
  								uint16_t len)
  {
 -	DBG("Not Implemented");
 +	struct hid_device *dev;
 +	GSList *l;
 +	bdaddr_t dst;
-+	uint8_t hdr;
-+	int fd;
++	int i, fd;
++	uint8_t *req;
++	uint8_t req_size;
  
 -	return HAL_STATUS_FAILED;
 +	DBG("");
@@ -63,31 +45,33 @@ index 250288c..46f992e 100644
 +
 +	dev = l->data;
 +
-+	if (!(dev->ctrl_io))
++	if (!(dev->intr_io))
 +		return HAL_STATUS_FAILED;
 +
-+	hdr = HID_MSG_CONTROL | HID_VIRTUAL_CABLE_UNPLUG;
++	req_size = 1 + (cmd->len / 2);
++	req = g_try_malloc0(req_size);
++	if (!req)
++		return HAL_STATUS_NOMEM;
 +
-+	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
++	req[0] = HID_MSG_DATA | HID_DATA_TYPE_OUTPUT;
++	/* Report data coming to HAL is in ascii format, HAL sends
++	 * data in hex to daemon, so convert to binary. */
++	for (i = 0; i < (req_size - 1); i++)
++		sscanf((char *) &(cmd->data)[i * 2], "%hhx", &(req + 1)[i]);
 +
-+	if (write(fd, &hdr, sizeof(hdr)) < 0) {
-+		error("error while virtual unplug command");
++	fd = g_io_channel_unix_get_fd(dev->intr_io);
++
++	if (write(fd, req, req_size) < 0) {
++		error("error while sending data to device");
++		g_free(req);
 +		return HAL_STATUS_FAILED;
 +	}
 +
-+	/* Wait either channels to HUP */
-+	if (dev->intr_io)
-+		g_io_channel_shutdown(dev->intr_io, TRUE, NULL);
-+
-+	if (dev->ctrl_io)
-+		g_io_channel_shutdown(dev->ctrl_io, TRUE, NULL);
-+
-+	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTING);
-+
++	g_free(req);
 +	return HAL_STATUS_SUCCESS;
  }
  
- static uint8_t bt_hid_info(struct hal_cmd_hidhost_set_info *cmd, uint16_t len)
+ void bt_hid_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
 -- 
 1.8.3.2
 
