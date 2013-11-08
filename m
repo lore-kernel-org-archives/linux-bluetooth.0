@@ -1,47 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Subject: [PATCH 0/8] Improve user experience
-Date: Fri, 8 Nov 2013 13:48:22 +0100
-Message-ID: <1383914910-2304-1-git-send-email-jerzy.kasenberg@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v5 3/5] android/hid: Fill send data command struct in hal-hidhost
+Date: Fri,  8 Nov 2013 14:32:12 +0200
+Message-Id: <1383913932-1719-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patchset works towards improving user interface.
-- Command line parsing (--help, --version, --no-init)
-- All interfaces are now initialized at start by default
-- --no-init allows to disable this initialization
-- pin_request_cb will now present prompt and send reply
-- ssp_request_cb will now present prompt and sent reply
+---
+ android/hal-hidhost.c | 9 +++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-As part of adding those features terminal.c was restructured.
-Big switch inside terminal_process_char was distributed between
-number of small functions. This work was necessary due to input
-handling of prompted data.
-
-Version print may need to be changed according to bluez culture. 
-
-Jerzy Kasenberg (8):
-  android/client: Export get_interface_method
-  android/client: Add NELEM macro for count elements
-  android/client: Initialize all interfaces at start
-  android/client: Add command line arguments
-  android/client: Split terminal_process_char
-  android/client: Add prompting for answer
-  android/client: Add pin handling for bind
-  android/client: Add ssp key confirmation helper
-
- android/client/haltest.c       |  102 ++++++-
- android/client/if-bt.c         |   46 +++
- android/client/if-main.h       |    4 +
- android/client/tabcompletion.c |    2 +-
- android/client/terminal.c      |  605 +++++++++++++++++++++++++++-------------
- android/client/terminal.h      |    5 +-
- 6 files changed, 567 insertions(+), 197 deletions(-)
-
+diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
+index a0df7ce..e4a15c0 100644
+--- a/android/hal-hidhost.c
++++ b/android/hal-hidhost.c
+@@ -335,7 +335,8 @@ static bt_status_t set_report(bt_bdaddr_t *bd_addr,
+ 
+ static bt_status_t send_data(bt_bdaddr_t *bd_addr, char *data)
+ {
+-	struct hal_cmd_hidhost_send_data cmd;
++	uint8_t buf[BLUEZ_HAL_MTU];
++	struct hal_cmd_hidhost_send_data *cmd = (void *) buf;
+ 
+ 	DBG("");
+ 
+@@ -345,10 +346,13 @@ static bt_status_t send_data(bt_bdaddr_t *bd_addr, char *data)
+ 	if (!bd_addr || !data)
+ 		return BT_STATUS_PARM_INVALID;
+ 
+-	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
++	memcpy(cmd->bdaddr, bd_addr, sizeof(cmd->bdaddr));
++	cmd->len = strlen(data);
++	memcpy(cmd->data, data, cmd->len);
+ 
+ 	return hal_ipc_cmd(HAL_SERVICE_ID_HIDHOST, HAL_OP_HIDHOST_SEND_DATA,
+-					sizeof(cmd), &cmd, 0, NULL, NULL);
++				sizeof(*cmd) + cmd->len, buf, 0, NULL, NULL);
+ }
+ 
+ static bt_status_t init(bthh_callbacks_t *callbacks)
 -- 
-1.7.9.5
+1.8.3.2
 
