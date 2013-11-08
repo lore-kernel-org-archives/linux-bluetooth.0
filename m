@@ -1,52 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 8 Nov 2013 15:16:37 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/8] Improve user experience
-Message-ID: <20131108131637.GA6383@x220.p-661hnu-f1>
+From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
+Subject: [PATCH 7/8] android/client: Add pin handling for bind
+Date: Fri, 8 Nov 2013 13:48:29 +0100
+Message-ID: <1383914910-2304-8-git-send-email-jerzy.kasenberg@tieto.com>
+In-Reply-To: <1383914910-2304-1-git-send-email-jerzy.kasenberg@tieto.com>
 References: <1383914910-2304-1-git-send-email-jerzy.kasenberg@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383914910-2304-1-git-send-email-jerzy.kasenberg@tieto.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jerzy,
+This patch ask user for ping in pin_request_cb, which does
+what otherwise would be required to manually type
+bluetooth pin_reply address pin.
+---
+ android/client/if-bt.c |   20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-On Fri, Nov 08, 2013, Jerzy Kasenberg wrote:
-> This patchset works towards improving user interface.
-> - Command line parsing (--help, --version, --no-init)
-> - All interfaces are now initialized at start by default
-> - --no-init allows to disable this initialization
-> - pin_request_cb will now present prompt and send reply
-> - ssp_request_cb will now present prompt and sent reply
-> 
-> As part of adding those features terminal.c was restructured.
-> Big switch inside terminal_process_char was distributed between
-> number of small functions. This work was necessary due to input
-> handling of prompted data.
-> 
-> Version print may need to be changed according to bluez culture. 
-> 
-> Jerzy Kasenberg (8):
->   android/client: Export get_interface_method
->   android/client: Add NELEM macro for count elements
->   android/client: Initialize all interfaces at start
->   android/client: Add command line arguments
->   android/client: Split terminal_process_char
->   android/client: Add prompting for answer
->   android/client: Add pin handling for bind
->   android/client: Add ssp key confirmation helper
-> 
->  android/client/haltest.c       |  102 ++++++-
->  android/client/if-bt.c         |   46 +++
->  android/client/if-main.h       |    4 +
->  android/client/tabcompletion.c |    2 +-
->  android/client/terminal.c      |  605 +++++++++++++++++++++++++++-------------
->  android/client/terminal.h      |    5 +-
->  6 files changed, 567 insertions(+), 197 deletions(-)
+diff --git a/android/client/if-bt.c b/android/client/if-bt.c
+index 4c501a5..0a580e1 100644
+--- a/android/client/if-bt.c
++++ b/android/client/if-bt.c
+@@ -16,6 +16,7 @@
+  */
+ 
+ #include "if-main.h"
++#include "terminal.h"
+ 
+ const bt_interface_t *if_bluetooth;
+ 
+@@ -209,14 +210,33 @@ static void discovery_state_changed_cb(bt_discovery_state_t state)
+ static char last_remote_addr[MAX_ADDR_STR_LEN];
+ static bt_ssp_variant_t last_ssp_variant = (bt_ssp_variant_t) -1;
+ 
++static bt_bdaddr_t pin_request_addr;
++static void pin_request_answer(char *reply)
++{
++	bt_pin_code_t pin;
++	int accept = 0;
++	int pin_len = strlen(reply);
++
++	if (pin_len > 0) {
++		accept = 1;
++		if (pin_len > 16)
++			pin_len = 16;
++		memcpy(&pin.pin, reply, pin_len);
++	}
++
++	EXEC(if_bluetooth->pin_reply, &pin_request_addr, accept, pin_len, &pin);
++}
++
+ static void pin_request_cb(bt_bdaddr_t *remote_bd_addr, bt_bdname_t *bd_name,
+ 								uint32_t cod)
+ {
+ 	/* Store for command completion */
+ 	bt_bdaddr_t2str(remote_bd_addr, last_remote_addr);
++	pin_request_addr = *remote_bd_addr;
+ 
+ 	haltest_info("%s: remote_bd_addr=%s bd_name=%s cod=%06x\n", __func__,
+ 					last_remote_addr, bd_name->name, cod);
++	terminal_prompt_for("Enter pin: ", pin_request_answer);
+ }
+ 
+ static void ssp_request_cb(bt_bdaddr_t *remote_bd_addr, bt_bdname_t *bd_name,
+-- 
+1.7.9.5
 
-All eight patches have been applied. Thanks.
-
-Johan
