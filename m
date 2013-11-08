@@ -1,60 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <527CD8C2.3030507@linux.intel.com>
-Date: Fri, 08 Nov 2013 14:27:46 +0200
-From: Ravi Kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Marcin Kraglak <marcin.kraglak@tieto.com>
+Subject: [PATCH 3/4] android: Add support for getting UUIDs property
+Date: Fri, 8 Nov 2013 13:21:23 +0100
+Message-ID: <1383913284-4032-4-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1383913284-4032-1-git-send-email-szymon.janc@tieto.com>
+References: <1383913284-4032-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: [PATCH_v4 1/5] android/hid: Fix set seport ipc cmd preparation
-References: <1383912531-1306-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1383912531-1306-2-git-send-email-ravikumar.veeramally@linux.intel.com> <20131108121531.GA1371@x220.p-661hnu-f1>
-In-Reply-To: <20131108121531.GA1371@x220.p-661hnu-f1>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 
-On 11/08/2013 02:15 PM, Johan Hedberg wrote:
-> Hi Ravi,
->
-> On Fri, Nov 08, 2013, Ravi kumar Veeramally wrote:
->> -	memcpy(cmd.data, report, cmd.len);
->> +	memset(cmd, 0, sizeof(buf));
-> How about memset(buf, 0, sizeof(buf)) to make this perfectly clear.
-   Ok.
->   Btw,
-> why is the memset needed? I don't think the original code had it. Seems
-> like this is an independent bug fix?
-   Not in original, but in between versions (v1~v4) :(.
->
->> +	cmd->len = strlen(report);
->> +	memcpy(cmd->data, report, cmd->len);
->>   
->>   	switch (report_type) {
->>   	case BTHH_INPUT_REPORT:
->> -		cmd.type = HAL_HIDHOST_INPUT_REPORT;
->> +		cmd->type = HAL_HIDHOST_INPUT_REPORT;
->>   		break;
->>   	case BTHH_OUTPUT_REPORT:
->> -		cmd.type = HAL_HIDHOST_OUTPUT_REPORT;
->> +		cmd->type = HAL_HIDHOST_OUTPUT_REPORT;
->>   		break;
->>   	case BTHH_FEATURE_REPORT:
->> -		cmd.type = HAL_HIDHOST_FEATURE_REPORT;
->> +		cmd->type = HAL_HIDHOST_FEATURE_REPORT;
->>   		break;
->>   	default:
->>   		return BT_STATUS_PARM_INVALID;
->>   	}
->>   
->>   	return hal_ipc_cmd(HAL_SERVICE_ID_HIDHOST, HAL_OP_HIDHOST_SET_REPORT,
->> -				sizeof(cmd), &cmd, 0, NULL, NULL);
->> +					sizeof(buf), buf, 0, NULL, NULL);
-> This last call looks broken to me. Shouldn't you instead of sizeof(buf)
-> be sending sizeof(*cmd) + cmd->len?
-   yes, should be "sizeof(*cmd) + cmd->len".
->
-> Johan
->
-Thanks,
-Ravi.
+This method will call adapter_properties_cb with uuids of
+adapter. Method is called also when uuid is added or removed.
+---
+ android/adapter.c | 55 ++++++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 46 insertions(+), 9 deletions(-)
+
+diff --git a/android/adapter.c b/android/adapter.c
+index 8ea104b..8c4fe76 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -988,6 +988,44 @@ static void load_link_keys(GSList *keys)
+ 	}
+ }
+ 
++static bool get_uuids(void)
++{
++	struct hal_ev_adapter_props_changed *ev;
++	GSList *list = adapter->uuids;
++	unsigned int uuid_count = g_slist_length(list);
++	int len = uuid_count * sizeof(uint128_t);
++	uint8_t buf[BASELEN_PROP_CHANGED + len];
++	bt_uuid_t *uuid;
++	uint8_t *p;
++	int i;
++
++	memset(buf, 0, sizeof(buf));
++	ev = (void *) buf;
++
++	ev->num_props = 1;
++	ev->status = HAL_STATUS_SUCCESS;
++
++	ev->props[0].type = HAL_PROP_ADAPTER_UUIDS;
++	ev->props[0].len = len;
++	p = ev->props->val;
++
++	for (; list; list = g_slist_next(list)) {
++		uuid = list->data;
++
++		/* uuids on list are in mgmt interface format and need to
++		 * be swapped before sending to HAL */
++		for (i = 0; i < 16; i++)
++			p[15 - i] = uuid->value.u128.data[i];
++
++		p += sizeof(uint128_t);
++	}
++
++	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
++			HAL_EV_ADAPTER_PROPS_CHANGED, sizeof(buf), ev, -1);
++
++	return true;
++}
++
+ static void remove_uuid_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+@@ -998,6 +1036,10 @@ static void remove_uuid_complete(uint8_t status, uint16_t length,
+ 	}
+ 
+ 	mgmt_dev_class_changed_event(adapter->index, length, param, NULL);
++
++	/* send notification only if bluetooth service is registered */
++	if (notification_sk >= 0)
++		get_uuids();
+ }
+ 
+ static void remove_uuid(const uint8_t *uuid)
+@@ -1006,7 +1048,6 @@ static void remove_uuid(const uint8_t *uuid)
+ 
+ 	memcpy(cp.uuid, uuid, sizeof(uint128_t));
+ 
+-
+ 	mgmt_send(adapter->mgmt, MGMT_OP_REMOVE_UUID,
+ 				adapter->index, sizeof(cp), &cp,
+ 				remove_uuid_complete, NULL, NULL);
+@@ -1022,6 +1063,10 @@ static void add_uuid_complete(uint8_t status, uint16_t length,
+ 	}
+ 
+ 	mgmt_dev_class_changed_event(adapter->index, length, param, NULL);
++
++	/* send notification only if bluetooth service is registered */
++	if (notification_sk >= 0)
++		get_uuids();
+ }
+ 
+ static void add_uuid(uint8_t svc_hint, const uint8_t *uuid)
+@@ -1335,14 +1380,6 @@ static bool get_name(void)
+ 	return true;
+ }
+ 
+-static bool get_uuids(void)
+-{
+-	DBG("Not implemented");
+-
+-	/* TODO: Add implementation */
+-
+-	return false;
+-}
+ 
+ static bool get_class(void)
+ {
+-- 
+1.8.4.2
+
