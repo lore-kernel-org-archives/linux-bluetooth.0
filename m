@@ -2,63 +2,55 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v3 2/5] android/hid: Fix set report data format in daemon
-Date: Fri,  8 Nov 2013 12:24:28 +0200
-Message-Id: <1383906271-23554-3-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v3 3/5] android/hid: Fill send data command struct in hal-hidhost
+Date: Fri,  8 Nov 2013 12:24:29 +0200
+Message-Id: <1383906271-23554-4-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1383906271-23554-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1383906271-23554-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Report data coming to HAL is in ascii format, HAL sends
-data in hex to daemon, so convert to binary.
 ---
- android/hidhost.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+ android/hal-hidhost.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index c7b4114..9b4bb15 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -98,6 +98,14 @@ struct hid_device {
- 	uint8_t		last_hid_msg;
- };
+diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
+index ce3dcd7..ec120ed 100644
+--- a/android/hal-hidhost.c
++++ b/android/hal-hidhost.c
+@@ -342,7 +342,8 @@ static bt_status_t set_report(bt_bdaddr_t *bd_addr,
  
-+static void hex2bin(const uint8_t *ascii, int ascii_len, uint8_t *hex)
-+{
-+	int i;
-+
-+	for (i = 0; i < ascii_len / 2; i++)
-+		sscanf((char *) &ascii[i * 2], "%hhx", &hex[i]);
-+}
-+
- static int device_cmp(gconstpointer s, gconstpointer user_data)
+ static bt_status_t send_data(bt_bdaddr_t *bd_addr, char *data)
  {
- 	const struct hid_device *dev = s;
-@@ -900,18 +908,20 @@ static uint8_t bt_hid_set_report(struct hal_cmd_hidhost_set_report *cmd,
- 		return HAL_STATUS_FAILED;
+-	struct hal_cmd_hidhost_send_data cmd;
++	struct hal_cmd_hidhost_send_data *cmd;
++	int cmd_len, status;
  
- 	dev = l->data;
--	req_size = 1 + cmd->len;
-+	/* Report data coming to HAL is in ascii format, HAL sends
-+	 * data in hex to daemon, so convert to binary. */
-+	req_size = 1 + (cmd->len / 2);
- 	req = g_try_malloc0(req_size);
- 	if (!req)
- 		return HAL_STATUS_NOMEM;
+ 	DBG("");
  
- 	req[0] = HID_MSG_SET_REPORT | cmd->type;
--	memcpy(req + 1, cmd->data, req_size - 1);
-+	hex2bin(cmd->data, cmd->len, (req + 1));
+@@ -352,10 +353,19 @@ static bt_status_t send_data(bt_bdaddr_t *bd_addr, char *data)
+ 	if (!bd_addr || !data)
+ 		return BT_STATUS_PARM_INVALID;
  
- 	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
+-	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
++	cmd_len = sizeof(*cmd) + sizeof(struct hal_cmd_hidhost_send_data)
++							+ 1 + strlen(data);
  
- 	if (write(fd, req, req_size) < 0) {
--		error("error while querying device protocol");
-+		error("error while sending report");
- 		g_free(req);
- 		return HAL_STATUS_FAILED;
- 	}
+-	return hal_ipc_cmd(HAL_SERVICE_ID_HIDHOST, HAL_OP_HIDHOST_SEND_DATA,
+-					sizeof(cmd), &cmd, 0, NULL, NULL);
++	cmd = malloc(cmd_len);
++	memset(cmd, 0, cmd_len);
++	memcpy(cmd->bdaddr, bd_addr, sizeof(cmd->bdaddr));
++	cmd->len = strlen(data);
++	memcpy(cmd->data, data, cmd->len);
++
++	status = hal_ipc_cmd(HAL_SERVICE_ID_HIDHOST, HAL_OP_HIDHOST_SEND_DATA,
++						cmd_len, cmd, 0, NULL, NULL);
++	free(cmd);
++	return status;
+ }
+ 
+ static bt_status_t init(bthh_callbacks_t *callbacks)
 -- 
 1.8.3.2
 
