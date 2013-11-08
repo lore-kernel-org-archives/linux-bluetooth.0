@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 2/3] android/debug: Convert uuid helper to use uint8_t buffer
-Date: Fri,  8 Nov 2013 15:16:00 +0200
-Message-Id: <1383916561-9719-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv5 3/3] android/hal-sock: Add UUID debug print in socket HAL
+Date: Fri,  8 Nov 2013 15:16:01 +0200
+Message-Id: <1383916561-9719-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1383916561-9719-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1383916561-9719-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,111 +11,59 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-At this moment Android uses uint8_t * and bt_uuid_t for representing
-UUID for different HALs. Convert debug helper to use uint8_t * string.
+Socket HAL uses uint8_t * strings which are of size bt_uuid_t.
 ---
- android/client/textconv.c |    7 +++++--
- android/hal-utils.c       |   15 +++++++--------
- android/hal-utils.h       |    7 ++++---
- 3 files changed, 16 insertions(+), 13 deletions(-)
+ android/hal-sock.c |   17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
-diff --git a/android/client/textconv.c b/android/client/textconv.c
-index 469b2c3..ebf6316 100644
---- a/android/client/textconv.c
-+++ b/android/client/textconv.c
-@@ -272,7 +272,9 @@ char *btproperty2str(const bt_property_t *property)
- 			strcat(p, "{");
+diff --git a/android/hal-sock.c b/android/hal-sock.c
+index 32c7939..d24276e 100644
+--- a/android/hal-sock.c
++++ b/android/hal-sock.c
+@@ -25,6 +25,8 @@
+ #include "hal-msg.h"
+ #include "hal.h"
  
- 			while (count--) {
--				strcat(p, btuuid2str((bt_uuid_t *) ptr));
-+				bt_uuid_t *uuid = (bt_uuid_t *) ptr;
++#include "hal-utils.h"
 +
-+				strcat(p, btuuid2str(uuid->uu));
- 				if (count)
- 					strcat(p, ", ");
- 				ptr += sizeof(bt_uuid_t);
-@@ -286,8 +288,9 @@ char *btproperty2str(const bt_property_t *property)
- 	case BT_PROPERTY_SERVICE_RECORD:
- 		{
- 			bt_service_record_t *rec = property->val;
-+			bt_uuid_t *uuid = &rec->uuid;
- 
--			sprintf(p, "{%s, %d, %s}", btuuid2str(&rec->uuid),
-+			sprintf(p, "{%s, %d, %s}", btuuid2str(uuid->uu),
- 						rec->channel, rec->name);
- 		}
- 		break;
-diff --git a/android/hal-utils.c b/android/hal-utils.c
-index 84cfad1..96dc234 100644
---- a/android/hal-utils.c
-+++ b/android/hal-utils.c
-@@ -17,8 +17,7 @@
- 
- #include <stdio.h>
- #include <string.h>
--
--#include <hardware/bluetooth.h>
-+#include <stdint.h>
- 
- #include "hal-utils.h"
- 
-@@ -28,15 +27,15 @@
-  *
-  * returns string representation of uuid
-  */
--char *bt_uuid_t2str(const bt_uuid_t *uuid, char *buf)
-+char *bt_uuid_t2str(const uint8_t *uuid, char *buf)
+ static bt_status_t sock_listen_rfcomm(const char *service_name,
+ 					const uint8_t *uuid, int chan,
+ 					int *sock, int flags)
+@@ -49,13 +51,13 @@ static bt_status_t sock_listen(btsock_type_t type, const char *service_name,
+ 					int *sock, int flags)
  {
- 	int shift = 0;
--	int i;
-+	unsigned int i;
- 	int is_bt;
- 
--	is_bt = !memcmp(&uuid->uu[4], &BT_BASE_UUID[4], sizeof(bt_uuid_t) - 4);
-+	is_bt = !memcmp(&uuid[4], &BT_BASE_UUID[4], HAL_UUID_LEN - 4);
- 
--	for (i = 0; i < (int) sizeof(bt_uuid_t); i++) {
-+	for (i = 0; i < HAL_UUID_LEN; i++) {
- 		if (i == 4 && is_bt)
- 			break;
- 
-@@ -44,13 +43,13 @@ char *bt_uuid_t2str(const bt_uuid_t *uuid, char *buf)
- 			buf[i * 2 + shift] = '-';
- 			shift++;
- 		}
--		sprintf(buf + i * 2 + shift, "%02x", uuid->uu[i]);
-+		sprintf(buf + i * 2 + shift, "%02x", uuid[i]);
+ 	if ((!uuid && chan <= 0) || !sock) {
+-		error("%s: invalid params: uuid %p, chan %d, sock %p",
+-						__func__, uuid, chan, sock);
++		error("Invalid params: uuid %s, chan %d, sock %p",
++						btuuid2str(uuid), chan, sock);
+ 		return BT_STATUS_PARM_INVALID;
  	}
  
- 	return buf;
- }
+-	DBG("uuid %p chan %d sock %p type %d service_name %s",
+-					uuid, chan, sock, type, service_name);
++	DBG("uuid %s chan %d sock %p type %d service_name %s",
++			btuuid2str(uuid), chan, sock, type, service_name);
  
--char *btuuid2str(const bt_uuid_t *uuid)
-+char *btuuid2str(const uint8_t *uuid)
- {
- 	static char buf[MAX_UUID_STR_LEN];
+ 	switch (type) {
+ 	case BTSOCK_RFCOMM:
+@@ -76,12 +78,13 @@ static bt_status_t sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
+ 	struct hal_cmd_sock_connect cmd;
  
-diff --git a/android/hal-utils.h b/android/hal-utils.h
-index d40b430..5287180 100644
---- a/android/hal-utils.h
-+++ b/android/hal-utils.h
-@@ -15,12 +15,13 @@
-  *
-  */
+ 	if ((!uuid && chan <= 0) || !bdaddr || !sock) {
+-		error("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
+-					bdaddr, uuid, chan, sock);
++		error("Invalid params: bd_addr %p, uuid %s, chan %d, sock %p",
++					bdaddr, btuuid2str(uuid), chan, sock);
+ 		return BT_STATUS_PARM_INVALID;
+ 	}
  
--#define MAX_UUID_STR_LEN 37
-+#define MAX_UUID_STR_LEN	37
-+#define HAL_UUID_LEN		16
+-	DBG("uuid %p chan %d sock %p type %d", uuid, chan, sock, type);
++	DBG("uuid %s chan %d sock %p type %d", btuuid2str(uuid), chan, sock,
++									type);
  
- static const char BT_BASE_UUID[] = {
- 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
- 	0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb
- };
- 
--char *btuuid2str(const bt_uuid_t *uuid);
--char *bt_uuid_t2str(const bt_uuid_t *uuid, char *buf);
-+char *bt_uuid_t2str(const uint8_t *uuid, char *buf);
-+char *btuuid2str(const uint8_t *uuid);
+ 	if (type != BTSOCK_RFCOMM) {
+ 		error("Socket type %u not supported", type);
 -- 
 1.7.10.4
 
