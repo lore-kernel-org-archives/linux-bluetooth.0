@@ -1,37 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 0/3] Reuse debug helpers for HAL client and HAL
-Date: Fri,  8 Nov 2013 11:35:46 +0200
-Message-Id: <1383903349-17487-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 3/3] android/hal: Add UUID debug print in socket HAL
+Date: Fri,  8 Nov 2013 11:35:49 +0200
+Message-Id: <1383903349-17487-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1383903349-17487-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1383903349-17487-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-The patch uses hal-utils.[ch] to keep debug functions for decoding
-HAL messages. They will be used in haltest and HALs.
+Socket HAL uses uint8_t * strings which are of size bt_uuid_t.
+---
+ android/hal-sock.c |   19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-Changes:
-	* v4: changed bt_uuid_t -> uint8_t * since they are both used.
-
-Andrei Emeltchenko (3):
-  android: Create debug hal-utils helpers
-  android/debug: Convert uuid helper to use uint8_t buffer
-  android/hal: Add UUID debug print in socket HAL
-
- android/Android.mk        |    2 ++
- android/Makefile.am       |    3 ++-
- android/client/if-gatt.c  |    1 +
- android/client/textconv.c |   50 +++++++--------------------------------
- android/client/textconv.h |    2 --
- android/hal-sock.c        |   19 +++++++++------
- android/hal-utils.c       |   57 +++++++++++++++++++++++++++++++++++++++++++++
- android/hal-utils.h       |   26 +++++++++++++++++++++
- 8 files changed, 108 insertions(+), 52 deletions(-)
- create mode 100644 android/hal-utils.c
- create mode 100644 android/hal-utils.h
-
+diff --git a/android/hal-sock.c b/android/hal-sock.c
+index 32c7939..74cadc1 100644
+--- a/android/hal-sock.c
++++ b/android/hal-sock.c
+@@ -25,6 +25,8 @@
+ #include "hal-msg.h"
+ #include "hal.h"
+ 
++#include "hal-utils.h"
++
+ static bt_status_t sock_listen_rfcomm(const char *service_name,
+ 					const uint8_t *uuid, int chan,
+ 					int *sock, int flags)
+@@ -49,13 +51,14 @@ static bt_status_t sock_listen(btsock_type_t type, const char *service_name,
+ 					int *sock, int flags)
+ {
+ 	if ((!uuid && chan <= 0) || !sock) {
+-		error("%s: invalid params: uuid %p, chan %d, sock %p",
+-						__func__, uuid, chan, sock);
++		error("Invalid params: uuid %s, chan %d, sock %p",
++			btuuid2str(uuid, sizeof(bt_uuid_t)), chan, sock);
+ 		return BT_STATUS_PARM_INVALID;
+ 	}
+ 
+-	DBG("uuid %p chan %d sock %p type %d service_name %s",
+-					uuid, chan, sock, type, service_name);
++	DBG("uuid %s chan %d sock %p type %d service_name %s",
++				btuuid2str(uuid, sizeof(bt_uuid_t)), chan,
++				sock, type, service_name);
+ 
+ 	switch (type) {
+ 	case BTSOCK_RFCOMM:
+@@ -76,12 +79,14 @@ static bt_status_t sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
+ 	struct hal_cmd_sock_connect cmd;
+ 
+ 	if ((!uuid && chan <= 0) || !bdaddr || !sock) {
+-		error("invalid params: bd_addr %p, uuid %p, chan %d, sock %p",
+-					bdaddr, uuid, chan, sock);
++		error("Invalid params: bd_addr %p, uuid %s, chan %d, sock %p",
++				bdaddr, btuuid2str(uuid, sizeof(bt_uuid_t)),
++				chan, sock);
+ 		return BT_STATUS_PARM_INVALID;
+ 	}
+ 
+-	DBG("uuid %p chan %d sock %p type %d", uuid, chan, sock, type);
++	DBG("uuid %s chan %d sock %p type %d",
++		btuuid2str(uuid, sizeof(bt_uuid_t)), chan, sock, type);
+ 
+ 	if (type != BTSOCK_RFCOMM) {
+ 		error("Socket type %u not supported", type);
 -- 
 1.7.10.4
 
