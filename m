@@ -1,48 +1,250 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v6 3/5] android/hid: Fill send data command struct in hal-hidhost
-Date: Fri,  8 Nov 2013 15:23:04 +0200
-Message-Id: <1383916984-11010-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1383916984-11010-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1383916984-11010-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCHv5 1/3] android: Create debug hal-utils helpers
+Date: Fri,  8 Nov 2013 15:15:59 +0200
+Message-Id: <1383916561-9719-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/hal-hidhost.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
-index e8570bc..97a1aa0 100644
---- a/android/hal-hidhost.c
-+++ b/android/hal-hidhost.c
-@@ -334,7 +334,8 @@ static bt_status_t set_report(bt_bdaddr_t *bd_addr,
+Create hal-utils helpers which helps to decode packets Android
+sends through HAL interface.
+---
+ android/Android.mk        |    2 ++
+ android/Makefile.am       |    3 ++-
+ android/client/if-gatt.c  |    1 +
+ android/client/textconv.c |   42 ++------------------------------
+ android/client/textconv.h |    2 --
+ android/hal-utils.c       |   58 +++++++++++++++++++++++++++++++++++++++++++++
+ android/hal-utils.h       |   26 ++++++++++++++++++++
+ 7 files changed, 91 insertions(+), 43 deletions(-)
+ create mode 100644 android/hal-utils.c
+ create mode 100644 android/hal-utils.h
+
+diff --git a/android/Android.mk b/android/Android.mk
+index 51037a7..0bc0e82 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -88,6 +88,7 @@ LOCAL_SRC_FILES := \
+ 	hal-pan.c \
+ 	hal-a2dp.c \
+ 	client/textconv.c \
++	hal-utils.c \
  
- static bt_status_t send_data(bt_bdaddr_t *bd_addr, char *data)
- {
--	struct hal_cmd_hidhost_send_data cmd;
-+	uint8_t buf[BLUEZ_HAL_MTU];
-+	struct hal_cmd_hidhost_send_data *cmd = (void *) buf;
+ LOCAL_C_INCLUDES += \
+ 	$(call include-path-for, system-core) \
+@@ -125,6 +126,7 @@ LOCAL_SRC_FILES := \
+ 	client/if-hh.c \
+ 	client/if-pan.c \
+ 	client/if-sock.c \
++	hal-utils.c \
  
- 	DBG("");
+ ANDROID_4_3_OR_ABOVE := $(shell echo 0 | awk -v v=$(PLATFORM_SDK_VERSION) 'END {print (v > 17) ? 1 : 0}')
  
-@@ -344,10 +345,12 @@ static bt_status_t send_data(bt_bdaddr_t *bd_addr, char *data)
- 	if (!bd_addr || !data)
- 		return BT_STATUS_PARM_INVALID;
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 073edc8..debe7c1 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -68,7 +68,8 @@ android_haltest_SOURCES = android/client/haltest.c \
+ 				android/client/if-hh.c \
+ 				android/client/if-pan.c \
+ 				android/client/if-sock.c \
+-				android/client/hwmodule.c
++				android/client/hwmodule.c \
++				android/hal-utils.h android/hal-utils.c
  
--	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
-+	memcpy(cmd->bdaddr, bd_addr, sizeof(cmd->bdaddr));
-+	cmd->len = strlen(data);
-+	memcpy(cmd->data, data, cmd->len);
+ android_haltest_LDADD = android/libhal-internal.la
  
- 	return hal_ipc_cmd(HAL_SERVICE_ID_HIDHOST, HAL_OP_HIDHOST_SEND_DATA,
--					sizeof(cmd), &cmd, 0, NULL, NULL);
-+				sizeof(*cmd) + cmd->len, buf, 0, NULL, NULL);
+diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
+index b2b20cb..bb53952 100644
+--- a/android/client/if-gatt.c
++++ b/android/client/if-gatt.c
+@@ -17,6 +17,7 @@
+ 
+ #include <hardware/bluetooth.h>
+ 
++#include "../hal-utils.h"
+ #include "if-main.h"
+ 
+ const btgatt_interface_t *if_gatt = NULL;
+diff --git a/android/client/textconv.c b/android/client/textconv.c
+index 4def3da..469b2c3 100644
+--- a/android/client/textconv.c
++++ b/android/client/textconv.c
+@@ -19,6 +19,8 @@
+ #include <stdio.h>
+ #include <hardware/bluetooth.h>
+ 
++#include "../hal-utils.h"
++
+ #include "textconv.h"
+ 
+ /*
+@@ -154,39 +156,6 @@ void str2bt_bdaddr_t(const char *str, bt_bdaddr_t *bd_addr)
+ 				&p[0], &p[1], &p[2], &p[3], &p[4], &p[5]);
  }
  
- static bt_status_t init(bthh_callbacks_t *callbacks)
+-static const char BT_BASE_UUID[] = {
+-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
+-	0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb
+-};
+-
+-/*
+- * converts uuid to string
+- * buf should be at least 39 bytes
+- *
+- * returns string representation of uuid
+- */
+-char *bt_uuid_t2str(const bt_uuid_t *uuid, char *buf)
+-{
+-	int shift = 0;
+-	int i;
+-	int is_bt;
+-
+-	is_bt = !memcmp(&uuid->uu[4], &BT_BASE_UUID[4], sizeof(bt_uuid_t) - 4);
+-
+-	for (i = 0; i < (int) sizeof(bt_uuid_t); i++) {
+-		if (i == 4 && is_bt)
+-			break;
+-
+-		if (i == 4 || i == 6 || i == 8 || i == 10) {
+-			buf[i * 2 + shift] = '-';
+-			shift++;
+-		}
+-		sprintf(buf + i * 2 + shift, "%02x", uuid->uu[i]);
+-	}
+-
+-	return buf;
+-}
+-
+ /* converts string to uuid */
+ void str2bt_uuid_t(const char *str, bt_uuid_t *uuid)
+ {
+@@ -234,13 +203,6 @@ char *bdaddr2str(const bt_bdaddr_t *bd_addr)
+ 	return bt_bdaddr_t2str(bd_addr, buf);
+ }
+ 
+-static char *btuuid2str(const bt_uuid_t *uuid)
+-{
+-	static char buf[MAX_UUID_STR_LEN];
+-
+-	return bt_uuid_t2str(uuid, buf);
+-}
+-
+ char *btproperty2str(const bt_property_t *property)
+ {
+ 	static char buf[4096];
+diff --git a/android/client/textconv.h b/android/client/textconv.h
+index 1c848ef..837eb4e 100644
+--- a/android/client/textconv.h
++++ b/android/client/textconv.h
+@@ -103,8 +103,6 @@ static struct int2str __##type##2str[] = {
+ char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf);
+ void str2bt_bdaddr_t(const char *str, bt_bdaddr_t *bd_addr);
+ 
+-#define MAX_UUID_STR_LEN 37
+-char *bt_uuid_t2str(const bt_uuid_t *uuid, char *buf);
+ void str2bt_uuid_t(const char *str, bt_uuid_t *uuid);
+ 
+ char *btproperty2str(const bt_property_t *property);
+diff --git a/android/hal-utils.c b/android/hal-utils.c
+new file mode 100644
+index 0000000..84cfad1
+--- /dev/null
++++ b/android/hal-utils.c
+@@ -0,0 +1,58 @@
++/*
++ * Copyright (C) 2013 Intel Corporation
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ *
++ */
++
++#include <stdio.h>
++#include <string.h>
++
++#include <hardware/bluetooth.h>
++
++#include "hal-utils.h"
++
++/*
++ * converts uuid to string
++ * buf should be at least 39 bytes
++ *
++ * returns string representation of uuid
++ */
++char *bt_uuid_t2str(const bt_uuid_t *uuid, char *buf)
++{
++	int shift = 0;
++	int i;
++	int is_bt;
++
++	is_bt = !memcmp(&uuid->uu[4], &BT_BASE_UUID[4], sizeof(bt_uuid_t) - 4);
++
++	for (i = 0; i < (int) sizeof(bt_uuid_t); i++) {
++		if (i == 4 && is_bt)
++			break;
++
++		if (i == 4 || i == 6 || i == 8 || i == 10) {
++			buf[i * 2 + shift] = '-';
++			shift++;
++		}
++		sprintf(buf + i * 2 + shift, "%02x", uuid->uu[i]);
++	}
++
++	return buf;
++}
++
++char *btuuid2str(const bt_uuid_t *uuid)
++{
++	static char buf[MAX_UUID_STR_LEN];
++
++	return bt_uuid_t2str(uuid, buf);
++}
+diff --git a/android/hal-utils.h b/android/hal-utils.h
+new file mode 100644
+index 0000000..d40b430
+--- /dev/null
++++ b/android/hal-utils.h
+@@ -0,0 +1,26 @@
++/*
++ * Copyright (C) 2013 Intel Corporation
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ *
++ */
++
++#define MAX_UUID_STR_LEN 37
++
++static const char BT_BASE_UUID[] = {
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
++	0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb
++};
++
++char *btuuid2str(const bt_uuid_t *uuid);
++char *bt_uuid_t2str(const bt_uuid_t *uuid, char *buf);
 -- 
-1.8.3.2
+1.7.10.4
 
