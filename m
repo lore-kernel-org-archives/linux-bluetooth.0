@@ -1,21 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 8 Nov 2013 10:10:18 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1383862220-29968-3-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1383862220-29968-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+	<1383862220-29968-3-git-send-email-ravikumar.veeramally@linux.intel.com>
+Date: Fri, 8 Nov 2013 07:44:06 +0100
+Message-ID: <CAHCYCox_Zk=3VHoc_hib8ytaF3EUWhoLDNW+17kaDqCtCMe+Yw@mail.gmail.com>
+Subject: Re: [PATCH_v2 02/11] android/hid: Add a ascii2hex utility
+From: Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
 To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH_v2 02/11] android/hid: Add a ascii2hex utility
-Message-ID: <20131108081018.GA14368@x220.p-661hnu-f1>
-References: <1383862220-29968-1-git-send-email-ravikumar.veeramally@linux.intel.com>
- <1383862220-29968-3-git-send-email-ravikumar.veeramally@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1383862220-29968-3-git-send-email-ravikumar.veeramally@linux.intel.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Ravi
 
-On Fri, Nov 08, 2013, Ravi kumar Veeramally wrote:
+On 7 November 2013 23:10, Ravi kumar Veeramally
+<ravikumar.veeramally@linux.intel.com> wrote:
+> Data from few interfaces on HAL is in ascii format but it should be
+> in hex format. This conversion utility does that job.
+> ---
+>  android/Android.mk  |  1 +
+>  android/Makefile.am |  2 +-
+>  android/utils.c     | 41 +++++++++++++++++++++++++++++++++++++++++
+>  android/utils.h     |  3 +++
+>  4 files changed, 46 insertions(+), 1 deletion(-)
+>  create mode 100644 android/utils.c
+>
+> diff --git a/android/Android.mk b/android/Android.mk
+> index 51037a7..628b2f9 100644
+> --- a/android/Android.mk
+> +++ b/android/Android.mk
+> @@ -27,6 +27,7 @@ LOCAL_SRC_FILES := \
+>         ipc.c ipc.h \
+>         a2dp.c \
+>         pan.c \
+> +       utils.c \
+>         ../src/log.c \
+>         ../src/shared/mgmt.c \
+>         ../src/shared/util.c \
+> diff --git a/android/Makefile.am b/android/Makefile.am
+> index 073edc8..6063a3a 100644
+> --- a/android/Makefile.am
+> +++ b/android/Makefile.am
+> @@ -9,7 +9,7 @@ noinst_PROGRAMS += android/bluetoothd
+>  android_bluetoothd_SOURCES = android/main.c \
+>                                 src/log.c \
+>                                 android/hal-msg.h \
+> -                               android/utils.h \
+> +                               android/utils.h android/utils.c \
+>                                 src/sdpd-database.c src/sdpd-server.c \
+>                                 src/sdpd-service.c src/sdpd-request.c \
+>                                 src/glib-helper.h src/glib-helper.c \
+> diff --git a/android/utils.c b/android/utils.c
+> new file mode 100644
+> index 0000000..48d6c38
+> --- /dev/null
 > +++ b/android/utils.c
 > @@ -0,0 +1,41 @@
 > +/*
@@ -49,24 +89,44 @@ On Fri, Nov 08, 2013, Ravi kumar Veeramally wrote:
 > +
 > +void ascii2hex(const uint8_t *ascii, int ascii_len, uint8_t *hex)
 > +{
-> +	int i;
+> +       int i;
 > +
-> +	if (!ascii || !hex)
-> +		return;
+> +       if (!ascii || !hex)
+> +               return;
 > +
-> +	for (i = 0; i < ascii_len / 2; i++)
-> +		sscanf((char *) &ascii[i * 2], "%02x",
-> +						(unsigned int *) &hex[i]);
+> +       for (i = 0; i < ascii_len / 2; i++)
+> +               sscanf((char *) &ascii[i * 2], "%02x",
+> +                                               (unsigned int *) &hex[i]);
+
+Use hh in format instead of cast.
+
 > +
 > +}
+> diff --git a/android/utils.h b/android/utils.h
+> index 5b009bc..d424968 100644
+> --- a/android/utils.h
+> +++ b/android/utils.h
+> @@ -21,6 +21,7 @@
+>   *
+>   */
+>
+> +#include "lib/bluetooth.h"
+>
+>  static inline void android2bdaddr(const void *buf, bdaddr_t *dst)
+>  {
+> @@ -31,3 +32,5 @@ static inline void bdaddr2android(const bdaddr_t *src, void *buf)
+>  {
+>         baswap(buf, src);
+>  }
+> +
+> +void ascii2hex(const uint8_t *ascii, int ascii_len, uint8_t *hex);
+> --
+> 1.8.3.2
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-I'd just keep this static inside the HID HAL since that seems to be the
-only user for it. Actually I'm not even convinced that it's worth to
-have this as a separate function since you only have two users and
-essentially the function is just two lines (the if-statement is
-redundant). Also, the function name isn't quite right. You're converting
-from hex to binary. Not from ascii to hex (hex notation is already using
-the ascii character set). Also, do consider the point from Jerzy about
-the format specifier.
-
-Johan
+-- 
+Jerzy
