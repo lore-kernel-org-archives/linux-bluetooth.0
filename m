@@ -1,46 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1384017487.3880.42.camel@nuvo>
-Subject: [PATCH] obex: Use GLib helper function to manipulate paths
+Message-ID: <1384017476.3880.40.camel@nuvo>
+Subject: Re: obexd broken for absolute paths
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Date: Sat, 09 Nov 2013 18:18:07 +0100
+Date: Sat, 09 Nov 2013 18:17:56 +0100
+In-Reply-To: <1383938500.3880.23.camel@nuvo>
+References: <1383938500.3880.23.camel@nuvo>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Fri, 2013-11-08 at 20:21 +0100, Bastien Nocera wrote:
+> Heya,
+> 
+> I was trying to test gnome-user-share's Bluetooth support for BlueZ 5,
+> and was quite surprised it didn't work one bit, with transfers failing
+> as soon as they were created.
+> 
+> I made this simple change to test/simple-obex-agent so you could
+> replicate the failure. Obviously, change the download path to exist on
+> your system:
+> -               return properties['Name']
+> +               return ("%s/%s" % ("/home/hadess/Downloads/", properties['Name']))
+> 
+> This will see OBEX Push transfers fail as soon as accepted.
 
-Instead of trying to do it by hand. This also makes sure that
-relative paths aren't used by the agent.
----
- obexd/src/manager.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Turns out this is a feature of filesystem plugin in obexd, and a bit of
+a problem as well:
+- There's no way to change the folder without changing the service file
+- It doesn't default to use the XDG_RUNTIME_DIR 
 
-diff --git a/obexd/src/manager.c b/obexd/src/manager.c
-index cec8a39..f18896e 100644
---- a/obexd/src/manager.c
-+++ b/obexd/src/manager.c
-@@ -651,14 +651,14 @@ static void agent_reply(DBusPendingCall *call, void *user_data)
- 				DBUS_TYPE_STRING, &name,
- 				DBUS_TYPE_INVALID)) {
- 		/* Splits folder and name */
--		const char *slash = strrchr(name, '/');
-+		gboolean is_relative = !g_path_is_absolute(name);
- 		DBG("Agent replied with %s", name);
--		if (!slash) {
--			agent->new_name = g_strdup(name);
-+		if (is_relative) {
-+			agent->new_name = g_path_get_basename(name);
- 			agent->new_folder = NULL;
- 		} else {
--			agent->new_name = g_strdup(slash + 1);
--			agent->new_folder = g_strndup(name, slash - name);
-+			agent->new_name = g_path_get_basename(name);
-+			agent->new_folder = g_path_get_dirname(name);
- 		}
- 	}
- 
--- 
-1.8.4.2
+> I must also mention the dreadful code in agent_reply() in obexd/src/manager.c:
+>                 const char *slash = strrchr(name, '/');
+>                 DBG("Agent replied with %s", name);
+>                 if (!slash) {
+>                         agent->new_name = g_strdup(name);
+>                         agent->new_folder = NULL;
+>                 } else {
+>                         agent->new_name = g_strdup(slash + 1); 
+>                         agent->new_folder = g_strndup(name, slash - name);
+>                 }
+> 
+> Please use g_path_get_basename() and g_path_get_dirname(). This is even
+> a security issue because I could pass relative paths and expect some
+> system file to get overwritten.
 
+I've sent a patch for this.
+
+Cheers
 
