@@ -1,62 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: =?ISO-8859-2?Q?Stanis=B3aw_Pitucha?= <viraptor@gmail.com>
-Date: Sat, 9 Nov 2013 22:33:38 +0000
-Message-ID: <CAFrYPTMT-tvL=HswUuqtOJ-Jr_O5eanVGfHp7Y=v_O6=hV0h+A@mail.gmail.com>
-Subject: Debugging broken audio stream
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Message-ID: <1384030812.3880.47.camel@nuvo>
+Subject: Re: obexd broken for absolute paths
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Sat, 09 Nov 2013 22:00:12 +0100
+In-Reply-To: <CABBYNZJtvdd0iDmcuUe7S9mi68U1nQOLTy577vu0T-kpa9wMBA@mail.gmail.com>
+References: <1383938500.3880.23.camel@nuvo> <1384017476.3880.40.camel@nuvo>
+	 <CABBYNZJtvdd0iDmcuUe7S9mi68U1nQOLTy577vu0T-kpa9wMBA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
-I'm having issues with using a remote audio sink device and I can't
-find any clear indications of a problem.
+On Sat, 2013-11-09 at 20:35 +0200, Luiz Augusto von Dentz wrote:
+> Hi Bastian,
+> 
+> On Sat, Nov 9, 2013 at 7:17 PM, Bastien Nocera <hadess@hadess.net> wrote:
+> > On Fri, 2013-11-08 at 20:21 +0100, Bastien Nocera wrote:
+> >> Heya,
+> >>
+> >> I was trying to test gnome-user-share's Bluetooth support for BlueZ 5,
+> >> and was quite surprised it didn't work one bit, with transfers failing
+> >> as soon as they were created.
+> >>
+> >> I made this simple change to test/simple-obex-agent so you could
+> >> replicate the failure. Obviously, change the download path to exist on
+> >> your system:
+> >> -               return properties['Name']
+> >> +               return ("%s/%s" % ("/home/hadess/Downloads/", properties['Name']))
+> >>
+> >> This will see OBEX Push transfers fail as soon as accepted.
+> >
+> > Turns out this is a feature of filesystem plugin in obexd, and a bit of
+> > a problem as well:
+> > - There's no way to change the folder without changing the service file
+> 
+> Yep, I remember discussing with Gustavo Padovan that this should
+> probably be set by the agent upon registration.
 
-My current config is:
-- kernel 3.11.6 (x86_64)
-- bluez 5.10
-- pulseaudio 4.0
-- ID 0a5c:21e6 Broadcom Corp. BCM20702 Bluetooth 4.0 [ThinkPad]  (btusb driver)
+I thought about that, but it's really a security issue. obexd might be
+running in a different context than the "application" telling it where
+to write. For example, my share application might be restricted to write
+new files in ~/Downloads, but could tell obexd to write to ~/.ssh/etc.
 
-The receiving device is Logitech's wireless audio adapter.
+> > - It doesn't default to use the XDG_RUNTIME_DIR
+> 
+> That is a good default considering we don't implement the change
+> above, otherwise for auto accept I believe tmp is usually a better
+> option.
 
-When sending data from android devices (4.1, 4.3) everything works
-without issues, so I think the receiver seems ok.
+This is what I intend to use in gnome-user-share. obexd would write
+files with unique filenames to /run/user/<id>/obexd and move it
+~/Downloads after uniquifying the name (eg. sending 2 files called
+"foo.jpg" should give me 2 files, not overwrite the first one as it does
+now).
 
-On the laptop side which is having problems, the initial connection /
-pairing works without issues, but the sound stream is very unstable
-(unusable really: 1 second of sound, 5 of silence, repeat...) and
-sometimes the connection drops / reconnects on its own. Sometimes it
-works for a couple of seconds before failing.
-Sometimes there's a stacktrace reported from the kernel (see
-https://bugs.archlinux.org/task/37697 ), but not always.
-The debug output from bluetoothd doesn't report any specific issues
-(as far as I can tell from the log) until it disconnects completely
-("Abort: Connection timed out (110)")
-A full session in debug mode (connect, try to play some music,
-connection times out, tries playing again, killing bluez) is available
-at http://pastebin.com/n7qfumYR
+Cheers
 
-Syslog contains pages of repeated messages like this (different
-time/sizes in each line, chosen smallest/biggest I can see):
-Nov 09 20:14:00 gumby pulseaudio[19585]: [bluetooth]
-module-bluez5-device.c: Skipping 116 us (= 20 bytes) in audio stream
-...
-Nov 09 20:14:03 gumby pulseaudio[19585]: [bluetooth]
-module-bluez5-device.c: Skipping 564192 us (= 99520 bytes) in audio
-stream
-I'm not sure how to prove the issue is definitely on either the bluez,
-or pulseaudio's side...
-
-What more can I do in this case? What other debugging options do I
-have? Would capturing the bluetooth packets be useful at all?
-I assume the bluetooth in laptop is not damaged/unsupported, because I
-can exchange files between it and the android devices.
-
-Any/all help appreciated.
-
--- 
-KTHXBYE,
-
-Stanisław Pitucha
