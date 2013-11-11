@@ -2,66 +2,70 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 1/3] android/hidhost: Handle uhid output and feature events
-Date: Mon, 11 Nov 2013 14:15:28 +0200
-Message-Id: <1384172130-29837-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 2/3] android/hidhost: Remove deprecated idle opcode from ipc document
+Date: Mon, 11 Nov 2013 14:15:29 +0200
+Message-Id: <1384172130-29837-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1384172130-29837-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1384172130-29837-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Data read on uhid events output and feature has to be send through
-SET_REPORT request to HID device.
+Idle time is deprecated in HID 1_1. So remove it from ipc document
+and update GET_REPORT and VIRTUAL_UNPLUG opcode values.
 ---
- android/hidhost.c | 37 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 36 insertions(+), 1 deletion(-)
+ android/hal-ipc-api.txt | 10 ++--------
+ android/hal-msg.h       |  4 ++--
+ 2 files changed, 4 insertions(+), 10 deletions(-)
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index 683938f..816fe3e 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -155,7 +155,42 @@ static void hid_device_free(struct hid_device *dev)
+diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+index 91ea280..57f4c13 100644
+--- a/android/hal-ipc-api.txt
++++ b/android/hal-ipc-api.txt
+@@ -614,20 +614,14 @@ Notifications:
+ 		                      0x01 = Boot
+ 		                      0xff = Unsupported
  
- static void handle_uhid_event(struct hid_device *dev, struct uhid_event *ev)
- {
--	DBG("UHID_OUTPUT UHID_FEATURE unsupported");
-+	int fd;
-+	uint8_t *req = NULL;
-+	uint8_t req_size = 0;
-+
-+	if (!(dev->ctrl_io))
-+		return;
-+
-+	switch (ev->type) {
-+	case UHID_OUTPUT:
-+		req_size = 1 + ev->u.output.size;
-+		req = g_try_malloc0(req_size);
-+		if (!req)
-+			return;
-+
-+		req[0] = HID_MSG_SET_REPORT | HID_DATA_TYPE_OUTPUT;
-+		memcpy(req + 1, ev->u.output.data, ev->u.output.size);
-+		break;
-+
-+	case UHID_FEATURE:
-+		req_size = sizeof(struct uhid_feature_req);
-+		req = g_try_malloc0(req_size);
-+		if (!req)
-+			return;
-+
-+		req[0] = HID_MSG_SET_REPORT | HID_DATA_TYPE_FEATURE;
-+		memcpy(req + 1, (ev + sizeof(ev->type)), req_size - 1);
-+		break;
-+	}
-+
-+	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
-+
-+	if (write(fd, req, req_size) < 0)
-+		error("error writing hid_set_report: %s (%d)",
-+						strerror(errno), errno);
-+
-+	g_free(req);
- }
+-	Opcode 0x84 - Idle Time notification
+-
+-		Notification parameters: Remote address (6 octets)
+-		                         Status (1 octet)
+-		                         Idle time (2 octets)
+-
+-	Opcode 0x85 - Get Report notification
++	Opcode 0x84 - Get Report notification
  
- static gboolean uhid_event_cb(GIOChannel *io, GIOCondition cond,
+ 		Notification parameters: Remote address (6 octets)
+ 		                         Status (1 octet)
+ 		                         Report length (2 octets)
+ 		                         Report data (variable)
+ 
+-	Opcode 0x86 - Virtual Unplug notification
++	Opcode 0x85 - Virtual Unplug notification
+ 
+ 		Notification parameters: Remote address (6 octets)
+ 		                         Status (1 octet)
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 569c8ea..1d20afd 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -472,7 +472,7 @@ struct hal_ev_hidhost_proto_mode {
+ 	uint8_t mode;
+ } __attribute__((packed));
+ 
+-#define HAL_EV_HIDHOST_GET_REPORT		0x85
++#define HAL_EV_HIDHOST_GET_REPORT		0x84
+ struct hal_ev_hidhost_get_report {
+ 	uint8_t  bdaddr[6];
+ 	uint8_t  status;
+@@ -480,7 +480,7 @@ struct hal_ev_hidhost_get_report {
+ 	uint8_t  data[0];
+ } __attribute__((packed));
+ 
+-#define HAL_EV_HIDHOST_VIRTUAL_UNPLUG		0x86
++#define HAL_EV_HIDHOST_VIRTUAL_UNPLUG		0x85
+ struct hal_ev_hidhost_virtual_unplug {
+ 	uint8_t  bdaddr[6];
+ 	uint8_t  status;
 -- 
 1.8.3.2
 
