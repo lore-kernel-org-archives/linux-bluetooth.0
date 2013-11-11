@@ -1,63 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1384173438-21708-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1384173438-21708-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1384173438-21708-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Mon, 11 Nov 2013 15:20:21 +0200
-Message-ID: <CABBYNZJMGQHVog9cPDqqLfe7ocdBy4UTrW+T9a6SjWWE=qd6=w@mail.gmail.com>
-Subject: Re: [RFCv1 2/9] android: Avoid unneeded includes
+In-Reply-To: <1384173342.1898.8.camel@nuvo>
+References: <1384016598.3880.38.camel@nuvo>
+	<1384091198.4593.6.camel@nuvo>
+	<CABBYNZK4m11-41ShyWO+LS3VqoUuqWbX8d2C9JssvGuKxJMiDA@mail.gmail.com>
+	<1384173342.1898.8.camel@nuvo>
+Date: Mon, 11 Nov 2013 15:01:32 +0200
+Message-ID: <CABBYNZLAbKnc_7vtpYXo+MV6z4Pxn9NdiNhV7z3sfT-sdoFGgg@mail.gmail.com>
+Subject: Re: [PATCH 3/3] obex: Use XDG_RUNTIME_DIR as a default root
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Bastien Nocera <hadess@hadess.net>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Bastien,
 
-On Mon, Nov 11, 2013 at 2:37 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Mon, Nov 11, 2013 at 2:35 PM, Bastien Nocera <hadess@hadess.net> wrote:
+> On Mon, 2013-11-11 at 11:00 +0200, Luiz Augusto von Dentz wrote:
+>> Hi Bastien,
+>>
+>> On Sun, Nov 10, 2013 at 3:46 PM, Bastien Nocera <hadess@hadess.net> wrote:
+>> > On Sat, 2013-11-09 at 18:03 +0100, Bastien Nocera wrote:
+>> >> It's per-user, so we won't try to overwrite somebody else's
+>> >> files in /tmp when that happens.
+>> >
+>> > There might be another useful directory instead. We could use
+>> > g_get_user_cache_dir() instead of the run-time dir. This would save
+>> > cross-partition moves by default, making the move to the Downloads dir
+>> > atomic (a single rename, which can fail, iterate until we find a "free"
+>> > filename).
+>> >
+>> > Is that better for you?
+>>
+>> Yep, it sounds better. Regarding renaming that is up the agent, if you
+>> really want to do that its probably fine but Im still not convinced
+>> this is absolutely necessary if obexd is running with the same user as
+>> the agent can just create the file while authorizing so you wouldn't
+>> need to move after completed, but again this is completely up to the
+>> agent to decide where the files should go.
 >
-> Declare struct mgmt in adapter.h. This avoids including mgmt.h in
-> every file using adapter functions like socket and hid.
-> ---
->  android/adapter.h |    2 ++
->  android/hidhost.c |    1 -
->  2 files changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/android/adapter.h b/android/adapter.h
-> index c62b859..3bda9d9 100644
-> --- a/android/adapter.h
-> +++ b/android/adapter.h
-> @@ -23,6 +23,8 @@
->
->  typedef void (*bt_adapter_ready)(int err);
->
-> +struct mgmt;
-> +
->  void bt_adapter_init(uint16_t index, struct mgmt *mgmt_if,
->                                                         bt_adapter_ready cb);
->
-> diff --git a/android/hidhost.c b/android/hidhost.c
-> index 683938f..8c3e9f6 100644
-> --- a/android/hidhost.c
-> +++ b/android/hidhost.c
-> @@ -38,7 +38,6 @@
->  #include "lib/sdp.h"
->  #include "lib/sdp_lib.h"
->  #include "lib/uuid.h"
-> -#include "src/shared/mgmt.h"
->  #include "src/sdp-client.h"
->  #include "src/glib-helper.h"
->  #include "profiles/input/uhid_copy.h"
-> --
-> 1.7.10.4
+> You seem to think that all the application/services running under one
+> user would have the same rights. That's currently the case, but won't be
+> in the future.
 
-Well it looks like we need to find a proper place for the mgmt
-interaction, or then perhaps pass the fd and use mgmt_new on adapter
-but that seems to require some work as it does create a different mgmt
-objects with different queues which I don't think is safe to use.
+Interesting that would cause some problems for sure...
+
+>> Btw, what about fd passing? In theory we can create a different
+>> version of the agent interface to enable passing fd directly, and in
+>> fact we were thinking about this already as for some services you
+>> wanted them to be dynamic so we were thinking on having this set by
+>> the agent when it registers.
+>
+> I'm fine with a file descriptor as well, but obex push server is
+> currently broken in GNOME 3.10. I'm happy doing the changes in GNOME
+> 3.12 (due in 6 months).
+>
+> Can we get the cache dir change in, and make the API change later on?
+
+Yep, lets use the cache dir and then think about the API change.
 
 
 -- 
