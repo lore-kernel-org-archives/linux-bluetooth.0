@@ -2,64 +2,45 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 4/4] android/pan: Handle connection and control state notifications
-Date: Mon, 11 Nov 2013 16:53:41 +0200
-Message-Id: <1384181621-8070-5-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 2/4] android/pan: Add PAN cleanup interface implementation
+Date: Mon, 11 Nov 2013 16:53:39 +0200
+Message-Id: <1384181621-8070-3-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1384181621-8070-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1384181621-8070-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-pan.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ android/hal-pan.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/android/hal-pan.c b/android/hal-pan.c
-index 76f5159..4173925 100644
+index cacc6c0..a560055 100644
 --- a/android/hal-pan.c
 +++ b/android/hal-pan.c
-@@ -31,10 +31,41 @@ static bool interface_ready(void)
- 	return cbs != NULL;
- }
+@@ -114,16 +114,18 @@ static bt_status_t pan_init(const btpan_callbacks_t *callbacks)
  
-+static void handle_conn_state(void *buf)
-+{
-+	struct hal_ev_pan_conn_state *ev = buf;
-+
-+	if (cbs->connection_state_cb)
-+		cbs->connection_state_cb(ev->state, ev->status,
-+					(bt_bdaddr_t *) ev->bdaddr,
-+					ev->local_role, ev->remote_role);
-+}
-+
-+static void handle_ctrl_state(void *buf)
-+{
-+	struct hal_ev_pan_ctrl_state *ev = buf;
-+
-+	if (cbs->control_state_cb)
-+		cbs->control_state_cb(ev->state, ev->status,
-+					ev->local_role, (char *)ev->name);
-+}
-+
- void bt_notify_pan(uint16_t opcode, void *buf, uint16_t len)
+ static void pan_cleanup()
  {
++	struct hal_cmd_register_module cmd;
++
+ 	DBG("");
+ 
  	if (!interface_ready())
  		return;
+ 
+-	/* TODO: disable service */
+-
+-	/* TODO: stop PAN thread */
+-
+ 	cbs = NULL;
++	cmd.service_id = HAL_SERVICE_ID_PAN;
 +
-+	switch (opcode) {
-+	case HAL_EV_PAN_CONN_STATE:
-+		handle_conn_state(buf);
-+		break;
-+	case HAL_EV_PAN_CTRL_STATE:
-+		handle_ctrl_state(buf);
-+		break;
-+	default:
-+		DBG("Unhandled callback opcode=0x%x", opcode);
-+		break;
-+	}
++	hal_ipc_cmd(HAL_SERVICE_ID_PAN, HAL_OP_UNREGISTER_MODULE,
++					sizeof(cmd), &cmd, 0, NULL, NULL);
  }
  
- static bt_status_t pan_enable(int local_role)
+ static btpan_interface_t pan_if = {
 -- 
 1.8.3.2
 
