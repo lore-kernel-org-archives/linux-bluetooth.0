@@ -1,44 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
-Subject: Re: [PATCH 2/3] android/hidhost: Remove deprecated idle opcode from ipc document
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1384172130-29837-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-Date: Tue, 12 Nov 2013 08:05:55 +0900
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <0C266DD4-7034-4D43-ADEB-E05BE0E54B32@holtmann.org>
-References: <1384172130-29837-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1384172130-29837-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+In-Reply-To: <20131111083735.GA4541@x220.p-661hnu-f1>
+References: <1383925711-26374-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1383925711-26374-2-git-send-email-lukasz.rymanowski@tieto.com>
+	<20131111083735.GA4541@x220.p-661hnu-f1>
+Date: Mon, 11 Nov 2013 23:23:27 +0100
+Message-ID: <CAN_7+Yb9smK8U+UeK8P-3YcBR0pC8spgsnVkw4f86jMO67A+FA@mail.gmail.com>
+Subject: Re: [PATCH 1/3] android: Update bond state on incoming bonding
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
+	linux-bluetooth@vger.kernel.org,
+	Szymon Janc <szymon.janc@tieto.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Johan,
 
-> Idle time is deprecated in HID 1_1. So remove it from ipc document
-> and update GET_REPORT and VIRTUAL_UNPLUG opcode values.
-> ---
-> android/hal-ipc-api.txt | 10 ++--------
-> android/hal-msg.h       |  4 ++--
-> 2 files changed, 4 insertions(+), 10 deletions(-)
-> 
-> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-> index 91ea280..57f4c13 100644
-> --- a/android/hal-ipc-api.txt
-> +++ b/android/hal-ipc-api.txt
-> @@ -614,20 +614,14 @@ Notifications:
-> 		                      0x01 = Boot
-> 		                      0xff = Unsupported
-> 
-> -	Opcode 0x84 - Idle Time notification
-> -
-> -		Notification parameters: Remote address (6 octets)
-> -		                         Status (1 octet)
-> -		                         Idle time (2 octets)
+On Mon, Nov 11, 2013 at 9:37 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Lukasz,
+>
+> On Fri, Nov 08, 2013, Lukasz Rymanowski wrote:
+>> Before sending any ssp request or pin code request up to HAL library we
+>> need to send bond state change with bonding state. Otherwise incoming
+>> bonding is impossible.
+>> ---
+>>  android/adapter.c | 21 ++++++++++++++++++---
+>>  1 file changed, 18 insertions(+), 3 deletions(-)
+>
+> Wont this cause HAL_BOND_STATE_BONDING to be sent twice if the pairing
+> was locally initiated through create_bond()?
 
-so what does HID_1.1 actually mean? I still see this notification in bt_hh.h.
+Well, of course we could try to keep track our local bond state and
+send HAL_BOND_STATE_BONDING in smarter way, but we don't need to. It
+is not a problem for Android to handle HAL_BOND_STATE_BONDING twice.
+Actually It works like this even now with current BT stack.
+And of course we need to send this event up as soon as we start
+bonding procedure, so it should stay in create_bond().
 
-Regards
+>
+> Johan
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Marcel
-
+\Łukasz
