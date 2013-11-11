@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 6/9] android/hal-sock: Implement Android RFCOMM stack events
-Date: Mon, 11 Nov 2013 16:03:44 +0200
-Message-Id: <1384178627-25991-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 3/9] android/ahl-sock: Add connect signal to socket
+Date: Mon, 11 Nov 2013 16:03:41 +0200
+Message-Id: <1384178627-25991-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384178627-25991-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384178627-25991-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,52 +11,44 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Handle events from Android framework. Write everything to real RFCOMM
-socket.
+Connect signal is used to pass information to framework that socket
+is accepted.
 ---
- android/socket.c |   29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ android/hal-msg.h |    2 ++
+ android/socket.h  |    7 +++++++
+ 2 files changed, 9 insertions(+)
 
-diff --git a/android/socket.c b/android/socket.c
-index 0ee53ba..dfad9da 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -94,6 +94,35 @@ static int get_rfcomm_chan(const uint8_t *uuid)
- static gboolean sock_stack_event_cb(GIOChannel *io, GIOCondition cond,
- 								gpointer data)
- {
-+	struct rfcomm_slot *rfslot = data;
-+	unsigned char buf[1024] = { 0 };
-+	int len;
-+
-+	DBG("rfslot: fd %d hal_fd %d real_sock %d chan %u sock %d",
-+		rfslot->fd, rfslot->hal_fd, rfslot->real_sock, rfslot->channel,
-+		g_io_channel_unix_get_fd(io));
-+
-+	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
-+		error("Socket error: sock %d cond %d",
-+					g_io_channel_unix_get_fd(io), cond);
-+		g_io_channel_shutdown(io, TRUE, NULL);
-+		return FALSE;
-+	}
-+
-+	/* FIXME check fd vs sock(io) */
-+	len = recv(rfslot->fd, buf, sizeof(buf), 0);
-+	if (len <= 0) {
-+		error("recv(): %s", strerror(errno));
-+		return FALSE;
-+	}
-+
-+	DBG("read %d bytes write to %d", len, rfslot->real_sock);
-+
-+	if (send(rfslot->real_sock, buf, len, 0) < 0) {
-+		error("send(): %s", strerror(errno));
-+		return FALSE;
-+	}
-+
- 	return TRUE;
- }
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 569c8ea..68cc8ed 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -232,6 +232,8 @@ struct hal_cmd_sock_connect {
+ 	uint8_t  flags;
+ } __attribute__((packed));
  
++/* Bluetooth Hidhost HAL api */
++
+ #define HAL_OP_HIDHOST_CONNECT		0x01
+ struct hal_cmd_hidhost_connect {
+ 	uint8_t bdaddr[6];
+diff --git a/android/socket.h b/android/socket.h
+index 7aa5574..ba56c9b 100644
+--- a/android/socket.h
++++ b/android/socket.h
+@@ -21,6 +21,13 @@
+  *
+  */
+ 
++struct hal_sock_connect_signal {
++	short   size;
++	uint8_t bdaddr[6];
++	int     channel;
++	int     status;
++} __attribute__((packed));
++
+ void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len);
+ 
+ bool bt_socket_register(int sk, const bdaddr_t *addr);
 -- 
 1.7.10.4
 
