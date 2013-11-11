@@ -1,42 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 0/9] Socket HAL
-Date: Mon, 11 Nov 2013 14:37:09 +0200
-Message-Id: <1384173438-21708-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 3/9] android/ahl-sock: Add connect signal to socket
+Date: Mon, 11 Nov 2013 14:37:12 +0200
+Message-Id: <1384173438-21708-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1384173438-21708-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1384173438-21708-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This is initial code implementing socket HAL. Receiving files
-through OPP currently working somehow.
+Connect signal is used to pass information to framework that socket
+is accepted.
+---
+ android/hal-msg.h |    2 ++
+ android/socket.h  |    7 +++++++
+ 2 files changed, 9 insertions(+)
 
-For tracking rfcomm sockets I use structure rfslot which has following
-fields:
- - real_sock - real RFCOMM socket
- - fd - fd to communicate with Android framework
- - hal_fd - fd passed to Android framework with CMSG
-
-Andrei Emeltchenko (9):
-  android/hal-sock: Add debug flag printing
-  android: Avoid unneeded includes
-  android/ahl-sock: Add connect signal to socket
-  android/hal-sock: Initial listen handle
-  android/hal-sock: Implement socket accepted event
-  android/hal-sock: Implement Android RFCOMM stack events
-  android/hal-sock: Implement RFCOMM events
-  android/hal-sock: Implement accept signal over Android fd
-  android/hal-sock: Write channel to Android fd
-
- android/adapter.h  |    2 +
- android/hal-msg.h  |    2 +
- android/hal-sock.c |    8 +-
- android/hidhost.c  |    1 -
- android/socket.c   |  264 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- android/socket.h   |    7 ++
- 6 files changed, 277 insertions(+), 7 deletions(-)
-
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 569c8ea..68cc8ed 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -232,6 +232,8 @@ struct hal_cmd_sock_connect {
+ 	uint8_t  flags;
+ } __attribute__((packed));
+ 
++/* Bluetooth Hidhost HAL api */
++
+ #define HAL_OP_HIDHOST_CONNECT		0x01
+ struct hal_cmd_hidhost_connect {
+ 	uint8_t bdaddr[6];
+diff --git a/android/socket.h b/android/socket.h
+index 7aa5574..ba56c9b 100644
+--- a/android/socket.h
++++ b/android/socket.h
+@@ -21,6 +21,13 @@
+  *
+  */
+ 
++struct hal_sock_connect_signal {
++	short   size;
++	uint8_t bdaddr[6];
++	int     channel;
++	int     status;
++} __attribute__((packed));
++
+ void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len);
+ 
+ bool bt_socket_register(int sk, const bdaddr_t *addr);
 -- 
 1.7.10.4
 
