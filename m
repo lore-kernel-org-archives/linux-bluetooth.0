@@ -1,65 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
-Subject: Re: pull request: bluetooth 2013-11-11
+Subject: Re: [RFCv1 7/9] android/hal-sock: Implement RFCOMM events
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20131111182738.GB5648@joana>
-Date: Tue, 12 Nov 2013 08:17:15 +0900
-Cc: "John W. Linville" <linville@tuxdriver.com>,
-	"linux-wireless@vger.kernel.org Wireless"
-	<linux-wireless@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org list" <linux-kernel@vger.kernel.org>
-Message-Id: <D2BE5A4D-1193-4E8A-AA03-47221248C736@holtmann.org>
-References: <20131111182738.GB5648@joana>
-To: "Gustavo F. Padovan" <gustavo@padovan.org>
+In-Reply-To: <1384173438-21708-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 12 Nov 2013 08:11:19 +0900
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <31537EE3-F035-4B78-9338-F5724686A315@holtmann.org>
+References: <1384173438-21708-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1384173438-21708-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Hi Andrei,
 
-> A few fixes for 3.13. There is 3 fixes to the RFCOMM protocol. One crash fix to
-> L2CAP. A simple fix to a bad behaviour in the SMP protocol, and last, an
-> revert, that I sent in the last pull request but doesn't seem to be in your
-> tree.
-> 
-> Please pull or let me know of any issues. Thanks!
-> 
-> 
-> 	Gustavo
-> 
+> Copy data from RFCOMM socket to Android framework.
 > ---
-> The following changes since commit 8ce9beac4661f576ea0d518b9f086bb52a171a37:
+> android/socket.c |   29 +++++++++++++++++++++++++++++
+> 1 file changed, 29 insertions(+)
 > 
->  drivers: net: wireless: b43: Fix possible NULL ptr dereference (2013-10-18 13:41:11 -0400)
-> 
-> are available in the git repository at:
-> 
->  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
-> 
-> for you to fetch changes up to 3244d4a55c95708b0fa6fd820a9009534ed08a5f:
-> 
->  Bluetooth: Fix rejecting SMP security request in slave role (2013-11-11 15:48:36 -0200)
-> 
-> ----------------------------------------------------------------
-> Hans de Goede (1):
->      Bluetooth: revert: "Bluetooth: Add missing reset_resume dev_pm_ops”
+> diff --git a/android/socket.c b/android/socket.c
+> index dfad9da..a962cdc 100644
+> --- a/android/socket.c
+> +++ b/android/socket.c
+> @@ -129,6 +129,35 @@ static gboolean sock_stack_event_cb(GIOChannel *io, GIOCondition cond,
+> static gboolean sock_rfcomm_event_cb(GIOChannel *io, GIOCondition cond,
+> 								gpointer data)
+> {
+> +	struct rfcomm_slot *rfslot = data;
+> +	unsigned char buf[1024] = { 0 };
+> +	int len;
+> +
+> +	DBG("rfslot: fd %d hal_fd %d real_sock %d chan %u sock %d",
+> +		rfslot->fd, rfslot->hal_fd, rfslot->real_sock, rfslot->channel,
+> +		g_io_channel_unix_get_fd(io));
+> +
+> +	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
+> +		error("Socket error: sock %d cond %d",
+> +					g_io_channel_unix_get_fd(io), cond);
+> +		g_io_channel_shutdown(io, TRUE, NULL);
+> +		return FALSE;
+> +	}
+> +
+> +	/* FIXME check real_sock vs sock(io) */
+> +	len = recv(rfslot->real_sock, buf, sizeof(buf), 0);
+> +	if (len <= 0) {
+> +		error("recv(): %s sock %d", strerror(errno), rfslot->real_sock);
+> +		return FALSE;
+> +	}
+> +
+> +	DBG("read %d bytes, write to fd %d", len, rfslot->fd);
+> +
+> +	if (send(rfslot->fd, buf, len, MSG_DONTWAIT) < 0) {
+> +		error("send(): %s sock %d", strerror(errno), rfslot->fd);
+> +		return FALSE;
+> +	}
+> +
 
-this one is already in net-next actually. John pushed bluetooth and bluetooth-next to Dave at the same time.
+since both sockets are SOCK_STREAM there is no guarantee that write() will write exactly the same amount of data that you just got via read(). Especially when using MSG_DONTWAIT. The kernel can decide to interrupt you here any time it wants to.
 
-> Johan Hedberg (1):
->      Bluetooth: Fix rejecting SMP security request in slave role
-> 
-> Marcel Holtmann (1):
->      Bluetooth: Fix issue with RFCOMM getsockopt operation
-> 
-> Seung-Woo Kim (3):
->      Bluetooth: Fix RFCOMM bind fail for L2CAP sock
->      Bluetooth: Fix to set proper bdaddr_type for RFCOMM connect
->      Bluetooth: Fix crash in l2cap_chan_send after l2cap_chan_del
-
-These 5 fixes are still needed.
+So you need proper error handling for the send() part in case you get truncated transfers.
 
 Regards
 
