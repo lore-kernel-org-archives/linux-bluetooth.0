@@ -1,48 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 11 Nov 2013 14:05:48 -0500
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth 2013-11-11
+Message-ID: <20131111190548.GA8107@tuxdriver.com>
+References: <20131111182738.GB5648@joana>
 MIME-Version: 1.0
-In-Reply-To: <20131111083735.GA4541@x220.p-661hnu-f1>
-References: <1383925711-26374-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1383925711-26374-2-git-send-email-lukasz.rymanowski@tieto.com>
-	<20131111083735.GA4541@x220.p-661hnu-f1>
-Date: Mon, 11 Nov 2013 23:23:27 +0100
-Message-ID: <CAN_7+Yb9smK8U+UeK8P-3YcBR0pC8spgsnVkw4f86jMO67A+FA@mail.gmail.com>
-Subject: Re: [PATCH 1/3] android: Update bond state on incoming bonding
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-	linux-bluetooth@vger.kernel.org,
-	Szymon Janc <szymon.janc@tieto.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20131111182738.GB5648@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+On Mon, Nov 11, 2013 at 04:27:38PM -0200, Gustavo Padovan wrote:
+> Hi John,
+> 
+> A few fixes for 3.13. There is 3 fixes to the RFCOMM protocol. One crash fix to
+> L2CAP. A simple fix to a bad behaviour in the SMP protocol, and last, an
+> revert, that I sent in the last pull request but doesn't seem to be in your
+> tree.
 
-On Mon, Nov 11, 2013 at 9:37 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Lukasz,
->
-> On Fri, Nov 08, 2013, Lukasz Rymanowski wrote:
->> Before sending any ssp request or pin code request up to HAL library we
->> need to send bond state change with bonding state. Otherwise incoming
->> bonding is impossible.
->> ---
->>  android/adapter.c | 21 ++++++++++++++++++---
->>  1 file changed, 18 insertions(+), 3 deletions(-)
->
-> Wont this cause HAL_BOND_STATE_BONDING to be sent twice if the pairing
-> was locally initiated through create_bond()?
+Are you looking in the wireless-next tree?  It seems to be there, no?
 
-Well, of course we could try to keep track our local bond state and
-send HAL_BOND_STATE_BONDING in smarter way, but we don't need to. It
-is not a problem for Android to handle HAL_BOND_STATE_BONDING twice.
-Actually It works like this even now with current BT stack.
-And of course we need to send this event up as soon as we start
-bonding procedure, so it should stay in create_bond().
+John
 
->
-> Johan
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> Please pull or let me know of any issues. Thanks!
+> 
+> 
+> 	Gustavo
+> 
+> ---
+> The following changes since commit 8ce9beac4661f576ea0d518b9f086bb52a171a37:
+> 
+>   drivers: net: wireless: b43: Fix possible NULL ptr dereference (2013-10-18 13:41:11 -0400)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth master
+> 
+> for you to fetch changes up to 3244d4a55c95708b0fa6fd820a9009534ed08a5f:
+> 
+>   Bluetooth: Fix rejecting SMP security request in slave role (2013-11-11 15:48:36 -0200)
+> 
+> ----------------------------------------------------------------
+> Hans de Goede (1):
+>       Bluetooth: revert: "Bluetooth: Add missing reset_resume dev_pm_ops"
+> 
+> Johan Hedberg (1):
+>       Bluetooth: Fix rejecting SMP security request in slave role
+> 
+> Marcel Holtmann (1):
+>       Bluetooth: Fix issue with RFCOMM getsockopt operation
+> 
+> Seung-Woo Kim (3):
+>       Bluetooth: Fix RFCOMM bind fail for L2CAP sock
+>       Bluetooth: Fix to set proper bdaddr_type for RFCOMM connect
+>       Bluetooth: Fix crash in l2cap_chan_send after l2cap_chan_del
+> 
+>  drivers/bluetooth/btusb.c   | 1 -
+>  net/bluetooth/l2cap_core.c  | 3 +++
+>  net/bluetooth/rfcomm/core.c | 3 +++
+>  net/bluetooth/rfcomm/sock.c | 6 +++++-
+>  net/bluetooth/smp.c         | 3 +++
+>  5 files changed, 14 insertions(+), 2 deletions(-)
+> 
 
-\Łukasz
+
+
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
