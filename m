@@ -1,46 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv1 1/9] android/hal-sock: Add debug flag printing
-Date: Mon, 11 Nov 2013 16:03:39 +0200
-Message-Id: <1384178627-25991-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1384178627-25991-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1384178627-25991-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv1 0/9] Socket HAL
+Date: Mon, 11 Nov 2013 16:03:38 +0200
+Message-Id: <1384178627-25991-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
----
- android/hal-sock.c |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+This is initial code implementing socket HAL. Receiving files
+through OPP currently working somehow.
 
-diff --git a/android/hal-sock.c b/android/hal-sock.c
-index b7bc88e..eafa451 100644
---- a/android/hal-sock.c
-+++ b/android/hal-sock.c
-@@ -55,8 +55,8 @@ static bt_status_t sock_listen(btsock_type_t type, const char *service_name,
- 		return BT_STATUS_PARM_INVALID;
- 	}
- 
--	DBG("uuid %s chan %d sock %p type %d service_name %s",
--			btuuid2str(uuid), chan, sock, type, service_name);
-+	DBG("uuid %s chan %d sock %p type %d service_name %s flags 0x%02x",
-+		btuuid2str(uuid), chan, sock, type, service_name, flags);
- 
- 	switch (type) {
- 	case BTSOCK_RFCOMM:
-@@ -82,8 +82,8 @@ static bt_status_t sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
- 		return BT_STATUS_PARM_INVALID;
- 	}
- 
--	DBG("uuid %s chan %d sock %p type %d", btuuid2str(uuid), chan, sock,
--									type);
-+	DBG("uuid %s chan %d sock %p type %d flags 0x%02x",
-+		btuuid2str(uuid), chan, sock, type, flags);
- 
- 	if (type != BTSOCK_RFCOMM) {
- 		error("Socket type %u not supported", type);
+For tracking rfcomm sockets I use structure rfslot which has following
+fields:
+ - real_sock - real RFCOMM socket
+ - fd - fd to communicate with Android framework
+ - hal_fd - fd passed to Android framework with CMSG
+
+Andrei Emeltchenko (9):
+  android/hal-sock: Add debug flag printing
+  android: Avoid unneeded includes
+  android/ahl-sock: Add connect signal to socket
+  android/hal-sock: Initial listen handle
+  android/hal-sock: Implement socket accepted event
+  android/hal-sock: Implement Android RFCOMM stack events
+  android/hal-sock: Implement RFCOMM events
+  android/hal-sock: Implement accept signal over Android fd
+  android/hal-sock: Write channel to Android fd
+
+ android/adapter.h  |    2 +
+ android/hal-msg.h  |    2 +
+ android/hal-sock.c |    8 +-
+ android/hidhost.c  |    1 -
+ android/socket.c   |  264 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ android/socket.h   |    7 ++
+ 6 files changed, 277 insertions(+), 7 deletions(-)
+
 -- 
 1.7.10.4
 
