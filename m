@@ -1,52 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 0/7] android: Some adapter and mgmt handling code cleanup
-Date: Tue, 12 Nov 2013 00:24:10 +0000
-Message-Id: <1384215857-19679-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
+Subject: Re: [PATCH 1/3] android: Update bond state on incoming bonding
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAN_7+Yb9smK8U+UeK8P-3YcBR0pC8spgsnVkw4f86jMO67A+FA@mail.gmail.com>
+Date: Tue, 12 Nov 2013 08:19:03 +0900
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
+	"linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>,
+	Szymon Janc <szymon.janc@tieto.com>
+Message-Id: <8B291258-C1EE-457D-808F-FF642AAB1688@holtmann.org>
+References: <1383925711-26374-1-git-send-email-lukasz.rymanowski@tieto.com> <1383925711-26374-2-git-send-email-lukasz.rymanowski@tieto.com> <20131111083735.GA4541@x220.p-661hnu-f1> <CAN_7+Yb9smK8U+UeK8P-3YcBR0pC8spgsnVkw4f86jMO67A+FA@mail.gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lukasz,
 
-This patchset moves mgmt initalization handling from main.c to adapter.c so
-now all mgmt handling is done from adaper.c. Adapter.c is also renamed to
-bluetooth.c to match service name implemented by it.
+>>> Before sending any ssp request or pin code request up to HAL library we
+>>> need to send bond state change with bonding state. Otherwise incoming
+>>> bonding is impossible.
+>>> ---
+>>> android/adapter.c | 21 ++++++++++++++++++---
+>>> 1 file changed, 18 insertions(+), 3 deletions(-)
+>> 
+>> Wont this cause HAL_BOND_STATE_BONDING to be sent twice if the pairing
+>> was locally initiated through create_bond()?
+> 
+> Well, of course we could try to keep track our local bond state and
+> send HAL_BOND_STATE_BONDING in smarter way, but we don't need to. It
+> is not a problem for Android to handle HAL_BOND_STATE_BONDING twice.
+> Actually It works like this even now with current BT stack.
+> And of course we need to send this event up as soon as we start
+> bonding procedure, so it should stay in create_bond().
 
-Startup and shutdown timeouts are still handled in main.c (mostly due to
-both resulting in mainloop shutdown so extra callback are avoided).
+I think we should keep track of our bond state internally. I get the feeling we will need that eventually anyway. For example we already know that we need to keep a mapping of BD_ADDR to address types to make LE work.
 
-IO handling and commands dispatch is still done in main.c
+Regards
 
--- 
-BR
-Szymon Janc
-
-
-Szymon Janc (7):
-  android: Remove bt_adapter structure
-  android: Move adapter initialization to adapter.c
-  android/hidhost: Use adapter address provided on register
-  android: Report adapter address in adapter_ready callback
-  android: Remove not needed bt_adapter_get_address function
-  android: Rename adapter.c to bluetooth.c
-  android: Rename bluetooth service functions to match service name
-
- android/Android.mk  |    2 +-
- android/Makefile.am |    4 +-
- android/adapter.c   | 1833 -----------------------------------------------
- android/adapter.h   |   34 -
- android/bluetooth.c | 1985 +++++++++++++++++++++++++++++++++++++++++++++++++++
- android/bluetooth.h |   35 +
- android/hidhost.c   |   21 +-
- android/main.c      |  314 ++------
- 8 files changed, 2092 insertions(+), 2136 deletions(-)
- delete mode 100644 android/adapter.c
- delete mode 100644 android/adapter.h
- create mode 100644 android/bluetooth.c
- create mode 100644 android/bluetooth.h
-
--- 
-1.8.4.2
+Marcel
 
