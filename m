@@ -1,46 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1384091198.4593.6.camel@nuvo>
-References: <1384016598.3880.38.camel@nuvo>
-	<1384091198.4593.6.camel@nuvo>
-Date: Mon, 11 Nov 2013 11:00:57 +0200
-Message-ID: <CABBYNZK4m11-41ShyWO+LS3VqoUuqWbX8d2C9JssvGuKxJMiDA@mail.gmail.com>
-Subject: Re: [PATCH 3/3] obex: Use XDG_RUNTIME_DIR as a default root
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 11 Nov 2013 10:39:21 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Bastien Nocera <hadess@hadess.net>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] gdbus: Don't try to remove removed sources
+Message-ID: <20131111083921.GB4541@x220.p-661hnu-f1>
+References: <1384016577.3880.36.camel@nuvo>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1384016577.3880.36.camel@nuvo>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Bastien,
 
-On Sun, Nov 10, 2013 at 3:46 PM, Bastien Nocera <hadess@hadess.net> wrote:
-> On Sat, 2013-11-09 at 18:03 +0100, Bastien Nocera wrote:
->> It's per-user, so we won't try to overwrite somebody else's
->> files in /tmp when that happens.
->
-> There might be another useful directory instead. We could use
-> g_get_user_cache_dir() instead of the run-time dir. This would save
-> cross-partition moves by default, making the move to the Downloads dir
-> atomic (a single rename, which can fail, iterate until we find a "free"
-> filename).
->
-> Is that better for you?
+On Sat, Nov 09, 2013, Bastien Nocera wrote:
+> When we return FALSE from idle handlers, the source is removed.
+> This will be causing warnings in glib 2.40.
+> 
+> See https://bugzilla.gnome.org/show_bug.cgi?id=710724
+> ---
+>  gdbus/object.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-Yep, it sounds better. Regarding renaming that is up the agent, if you
-really want to do that its probably fine but Im still not convinced
-this is absolutely necessary if obexd is running with the same user as
-the agent can just create the file while authorizing so you wouldn't
-need to move after completed, but again this is completely up to the
-agent to decide where the files should go.
+This patch has been applied. Thanks.
 
-Btw, what about fd passing? In theory we can create a different
-version of the agent interface to enable passing fd directly, and in
-fact we were thinking about this already as for some services you
-wanted them to be dynamic so we were thinking on having this set by
-the agent when it registers.
-
-
--- 
-Luiz Augusto von Dentz
+Johan
