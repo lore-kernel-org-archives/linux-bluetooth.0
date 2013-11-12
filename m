@@ -1,58 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 BlueZ] core: Do not attempt to connect if adapter is not powered
-Date: Tue, 12 Nov 2013 16:32:29 +0200
-Message-Id: <1384266749-309-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 4/4] android/pan: Handle connection and control state notifications
+Date: Tue, 12 Nov 2013 16:20:42 +0200
+Message-Id: <1384266042-6344-5-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1384266042-6344-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1384266042-6344-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-If the adapter is not yet powered do not attempt to connect, also
-abort any connection attempt in case of error -EHOSTUNREACH is returned
-by the kernel which also means the adapter is not up or in case of
--ECONNABORTED which means the adapter was powered down during the
-connection attempt.
 ---
-v2: Add better description, add comments what each error code means and
-treat -ECONNABORTED.
+ android/hal-pan.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
- src/device.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/src/device.c b/src/device.c
-index 60efd62..662ba26 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1156,8 +1156,15 @@ static void device_profile_connected(struct btd_device *dev,
- 	if (dev->pending == NULL)
+diff --git a/android/hal-pan.c b/android/hal-pan.c
+index 78d526c..595cde9 100644
+--- a/android/hal-pan.c
++++ b/android/hal-pan.c
+@@ -31,10 +31,41 @@ static bool interface_ready(void)
+ 	return cbs != NULL;
+ }
+ 
++static void handle_conn_state(void *buf)
++{
++	struct hal_ev_pan_conn_state *ev = buf;
++
++	if (cbs->connection_state_cb)
++		cbs->connection_state_cb(ev->state, ev->status,
++					(bt_bdaddr_t *) ev->bdaddr,
++					ev->local_role, ev->remote_role);
++}
++
++static void handle_ctrl_state(void *buf)
++{
++	struct hal_ev_pan_ctrl_state *ev = buf;
++
++	if (cbs->control_state_cb)
++		cbs->control_state_cb(ev->state, ev->status,
++					ev->local_role, (char *)ev->name);
++}
++
+ void bt_notify_pan(uint16_t opcode, void *buf, uint16_t len)
+ {
+ 	if (!interface_ready())
  		return;
- 
--	if (!dev->connected && err == -EHOSTDOWN)
--		goto done;
-+	if (!dev->connected) {
-+		switch (-err) {
-+		case EHOSTDOWN: /* page timeout */
-+		case EHOSTUNREACH: /* adapter not powered */
-+		case ECONNABORTED: /* adapter powered down */
-+			goto done;
-+		}
++
++	switch (opcode) {
++	case HAL_EV_PAN_CONN_STATE:
++		handle_conn_state(buf);
++		break;
++	case HAL_EV_PAN_CTRL_STATE:
++		handle_ctrl_state(buf);
++		break;
++	default:
++		DBG("Unhandled callback opcode=0x%x", opcode);
++		break;
 +	}
-+
+ }
  
- 	pending = dev->pending->data;
- 	l = find_service_with_profile(dev->pending, profile);
-@@ -1322,6 +1329,9 @@ static DBusMessage *connect_profiles(struct btd_device *dev, DBusMessage *msg,
- 	if (dev->pending || dev->connect || dev->browse)
- 		return btd_error_in_progress(msg);
- 
-+	if (!btd_adapter_get_powered(dev->adapter))
-+		return btd_error_not_ready(msg);
-+
- 	device_set_temporary(dev, FALSE);
- 
- 	if (!dev->svc_resolved)
+ static bt_status_t pan_enable(int local_role)
 -- 
-1.8.3.1
+1.8.3.2
 
