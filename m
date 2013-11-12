@@ -1,10 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 12 Nov 2013 13:16:41 -0800
+Date: Tue, 12 Nov 2013 13:14:02 -0800
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: don.fry@intel.com, marcel@holtmann.org, tedd.an@intel.com
+To: linux-bluetooth@vger.kernel.org <linux-bluetooth@vger.kernel.org>
+Cc: don.fry@intel.com <don.fry@intel.com>, marcel@holtmann.org
+ <marcel@holtmann.org>, tedd.an@intel.com <tedd.an@intel.com>
 Subject: [PATCH] Enable autosuspend for Intel Bluetooth device
-Message-ID: <20131112131641.76cd6c5f@han1-desk-dev>
+Message-ID: <20131112131402.5bdfcb34@han1-desk-dev>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
