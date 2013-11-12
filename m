@@ -1,30 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 0/4] Implement missing PAN interface and notifications
-Date: Tue, 12 Nov 2013 16:20:38 +0200
-Message-Id: <1384266042-6344-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <5282347D.1050701@linux.intel.com>
+Date: Tue, 12 Nov 2013 16:00:29 +0200
+From: Ravi Kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 2/3] android/hidhost: Remove deprecated idle opcode from
+ ipc document
+References: <1384172130-29837-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1384172130-29837-2-git-send-email-ravikumar.veeramally@linux.intel.com> <0C266DD4-7034-4D43-ADEB-E05BE0E54B32@holtmann.org> <5281F502.9080506@linux.intel.com>
+In-Reply-To: <5281F502.9080506@linux.intel.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-v2: Fixed wrong number of opcode values as per Johan's comments.
+Hi Marcel,
 
-v1: Patch set implements missing cleanup interface and adds event structs
-    to hal-msg.h and implements connection and control state notifications.
+Any comments on my reply?
 
-Ravi kumar Veeramally (4):
-  android/pan: Add PAN related defines and event struct to hsl-msg
-    header
-  android/pan: Add PAN cleanup interface implementation
-  android/pan: Add notify method to PAN notifications
-  android/pan: Handle connection and control state notifications
+Thanks,
+Ravi.
 
- android/hal-msg.h | 44 ++++++++++++++++++++++++++++++++++++++++++++
- android/hal-pan.c | 46 +++++++++++++++++++++++++++++++++++++++++++---
- android/hal.h     |  1 +
- 3 files changed, 88 insertions(+), 3 deletions(-)
-
--- 
-1.8.3.2
-
+On 11/12/2013 11:29 AM, Ravi Kumar Veeramally wrote:
+> Hi Marcel,
+>
+> On 11/12/2013 01:05 AM, Marcel Holtmann wrote:
+>> Hi Ravi,
+>>
+>>> Idle time is deprecated in HID 1_1. So remove it from ipc document
+>>> and update GET_REPORT and VIRTUAL_UNPLUG opcode values.
+>>> ---
+>>> android/hal-ipc-api.txt | 10 ++--------
+>>> android/hal-msg.h       |  4 ++--
+>>> 2 files changed, 4 insertions(+), 10 deletions(-)
+>>>
+>>> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+>>> index 91ea280..57f4c13 100644
+>>> --- a/android/hal-ipc-api.txt
+>>> +++ b/android/hal-ipc-api.txt
+>>> @@ -614,20 +614,14 @@ Notifications:
+>>>                               0x01 = Boot
+>>>                               0xff = Unsupported
+>>>
+>>> -    Opcode 0x84 - Idle Time notification
+>>> -
+>>> -        Notification parameters: Remote address (6 octets)
+>>> -                                 Status (1 octet)
+>>> -                                 Idle time (2 octets)
+>> so what does HID_1.1 actually mean? I still see this notification in 
+>> bt_hh.h.
+>>
+>> Regards
+>>
+>> Marcel
+>>
+> In  HID_SPEC_V11 (3.1) Get Idle and Set Idle are deprecated. And even 
+> in bt_hh.h
+> get_idle and set_idle interfaces are not available. Bluedroid had 
+> implementation
+> of those two in bluedroid/btif/src/btif_hh.c but in interface struct 
+> those are commented out.
+> I didn't find the call back call there. That's why I updated ipc-doc.
+>
+> Please let me know if I miss anything.
+>
+> Thanks,
+> Ravi.
+>
+> -- 
+> To unsubscribe from this list: send the line "unsubscribe 
+> linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
