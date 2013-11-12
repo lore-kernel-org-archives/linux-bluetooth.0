@@ -1,54 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
-Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
-Subject: Re: [PATCH 2/3] android/hidhost: Remove deprecated idle opcode from ipc document
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <5281F502.9080506@linux.intel.com>
-Date: Wed, 13 Nov 2013 00:57:43 +0900
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <CEAF8E5F-E4CE-4081-9870-4E4A802E9483@holtmann.org>
-References: <1384172130-29837-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1384172130-29837-2-git-send-email-ravikumar.veeramally@linux.intel.com> <0C266DD4-7034-4D43-ADEB-E05BE0E54B32@holtmann.org> <5281F502.9080506@linux.intel.com>
-To: Ravi Kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Marcin Kraglak <marcin.kraglak@tieto.com>
+Subject: [PATCH v3 4/5] android: Add support for getting UUIDs property
+Date: Tue, 12 Nov 2013 16:36:25 +0100
+Message-ID: <1384270586-9853-5-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1384270586-9853-1-git-send-email-szymon.janc@tieto.com>
+References: <1384270586-9853-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 
->>> Idle time is deprecated in HID 1_1. So remove it from ipc document
->>> and update GET_REPORT and VIRTUAL_UNPLUG opcode values.
->>> ---
->>> android/hal-ipc-api.txt | 10 ++--------
->>> android/hal-msg.h       |  4 ++--
->>> 2 files changed, 4 insertions(+), 10 deletions(-)
->>> 
->>> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
->>> index 91ea280..57f4c13 100644
->>> --- a/android/hal-ipc-api.txt
->>> +++ b/android/hal-ipc-api.txt
->>> @@ -614,20 +614,14 @@ Notifications:
->>> 		                      0x01 = Boot
->>> 		                      0xff = Unsupported
->>> 
->>> -	Opcode 0x84 - Idle Time notification
->>> -
->>> -		Notification parameters: Remote address (6 octets)
->>> -		                         Status (1 octet)
->>> -		                         Idle time (2 octets)
->> so what does HID_1.1 actually mean? I still see this notification in bt_hh.h.
->> 
->> Regards
->> 
->> Marcel
->> 
-> In  HID_SPEC_V11 (3.1) Get Idle and Set Idle are deprecated. And even in bt_hh.h
-> get_idle and set_idle interfaces are not available. Bluedroid had implementation
-> of those two in bluedroid/btif/src/btif_hh.c but in interface struct those are commented out.
-> I didn't find the call back call there. That's why I updated ipc-doc.
+This method will call adapter_properties_cb with uuids of
+adapter. Method is called also when uuid is added or removed.
+---
+ android/adapter.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 47 insertions(+), 8 deletions(-)
 
-if they are not using this notification in the Bluetooth service, then we do not need to implemented.
-
-Regards
-
-Marcel
+diff --git a/android/adapter.c b/android/adapter.c
+index a42cdcb..2c95e54 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -998,6 +998,45 @@ static void uuid16_to_uint128(uint16_t uuid, uint128_t *u128)
+ 	ntoh128(&uuid128.value.uuid128, u128);
+ }
+ 
++static bool get_uuids(void)
++{
++	struct hal_ev_adapter_props_changed *ev;
++	GSList *list = adapter->uuids;
++	unsigned int uuid_count = g_slist_length(list);
++	int len = uuid_count * sizeof(uint128_t);
++	uint8_t buf[BASELEN_PROP_CHANGED + len];
++	uint8_t *p;
++	int i;
++
++	memset(buf, 0, sizeof(buf));
++	ev = (void *) buf;
++
++	ev->num_props = 1;
++	ev->status = HAL_STATUS_SUCCESS;
++
++	ev->props[0].type = HAL_PROP_ADAPTER_UUIDS;
++	ev->props[0].len = len;
++	p = ev->props->val;
++
++	for (; list; list = g_slist_next(list)) {
++		uint16_t uuid = GPOINTER_TO_UINT(list->data);
++		uint128_t uint128;
++
++		uuid16_to_uint128(uuid, &uint128);
++
++		/* Android expects swapped bytes in uuid */
++		for (i = 0; i < 16; i++)
++			p[15 - i] = uint128.data[i];
++
++		p += sizeof(uint128_t);
++	}
++
++	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
++			HAL_EV_ADAPTER_PROPS_CHANGED, sizeof(buf), ev, -1);
++
++	return true;
++}
++
+ static void remove_uuid_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+@@ -1008,6 +1047,10 @@ static void remove_uuid_complete(uint8_t status, uint16_t length,
+ 	}
+ 
+ 	mgmt_dev_class_changed_event(adapter->index, length, param, NULL);
++
++	/* send notification only if bluetooth service is registered */
++	if (notification_sk >= 0)
++		get_uuids();
+ }
+ 
+ static void remove_uuid(uint16_t uuid)
+@@ -1033,6 +1076,10 @@ static void add_uuid_complete(uint8_t status, uint16_t length,
+ 	}
+ 
+ 	mgmt_dev_class_changed_event(adapter->index, length, param, NULL);
++
++	/* send notification only if bluetooth service is registered */
++	if (notification_sk >= 0)
++		get_uuids();
+ }
+ 
+ static void add_uuid(uint8_t svc_hint, uint16_t uuid)
+@@ -1346,14 +1393,6 @@ static bool get_name(void)
+ 	return true;
+ }
+ 
+-static bool get_uuids(void)
+-{
+-	DBG("Not implemented");
+-
+-	/* TODO: Add implementation */
+-
+-	return false;
+-}
+ 
+ static bool get_class(void)
+ {
+-- 
+1.8.4.2
 
