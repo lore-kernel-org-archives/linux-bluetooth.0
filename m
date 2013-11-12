@@ -1,48 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 0/5] Add support for registering local SDP records
-Date: Tue, 12 Nov 2013 13:06:20 +0100
-Message-ID: <1384257985-26319-1-git-send-email-szymon.janc@tieto.com>
+Message-ID: <5281FECB.9090304@linux.intel.com>
+Date: Tue, 12 Nov 2013 12:11:23 +0200
+From: Ravi Kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] android/hidhost: Handle uhid output and feature events
+References: <1384172130-29837-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1384172130-29837-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-V2:
- - don't use bt_uuid_t
- - few bugfixes
+Hi,
 
+This patch is buggy. Conversion needs to be done like set_report and
+send_data methods. I will send _v2 of this particular patch.
+Sorry for inconvenience.
 
-V1 cover:
-This adds support for manipulating local SDP database with
-bt_adapter_add_record and bt_adapter_remove_record functions. Those should
-be called when HAL service is registered or unregistered.
+Thanks,
+Ravi.
 
-This also adds DeviceID record as at least 1 local UUID is needed by Android to
-properly handle remote device profiles.
-
-Last but not least: With this serie it is possible to connect HID device from
-Android UI (Settings application).   \O/
-
--- 
-BR
-Szymon Janc
-
-Marcin Kraglak (3):
-  android: Add and remove sdp records and uuids
-  android: Clear adapter uuids during initialization
-  android: Add support for getting UUIDs property
-
-Szymon Janc (2):
-  android: Remove not needed include
-  android: Register DeviceID record when adapter is initialized
-
- android/adapter.c | 188 ++++++++++++++++++++++++++++++++++++++++++++++++++----
- android/adapter.h |   3 +
- 2 files changed, 178 insertions(+), 13 deletions(-)
-
--- 
-1.8.4.2
+On 11/11/2013 02:15 PM, Ravi kumar Veeramally wrote:
+> Data read on uhid events output and feature has to be send through
+> SET_REPORT request to HID device.
+> ---
+>   android/hidhost.c | 37 ++++++++++++++++++++++++++++++++++++-
+>   1 file changed, 36 insertions(+), 1 deletion(-)
+>
+> diff --git a/android/hidhost.c b/android/hidhost.c
+> index 683938f..816fe3e 100644
+> --- a/android/hidhost.c
+> +++ b/android/hidhost.c
+> @@ -155,7 +155,42 @@ static void hid_device_free(struct hid_device *dev)
+>   
+>   static void handle_uhid_event(struct hid_device *dev, struct uhid_event *ev)
+>   {
+> -	DBG("UHID_OUTPUT UHID_FEATURE unsupported");
+> +	int fd;
+> +	uint8_t *req = NULL;
+> +	uint8_t req_size = 0;
+> +
+> +	if (!(dev->ctrl_io))
+> +		return;
+> +
+> +	switch (ev->type) {
+> +	case UHID_OUTPUT:
+> +		req_size = 1 + ev->u.output.size;
+> +		req = g_try_malloc0(req_size);
+> +		if (!req)
+> +			return;
+> +
+> +		req[0] = HID_MSG_SET_REPORT | HID_DATA_TYPE_OUTPUT;
+> +		memcpy(req + 1, ev->u.output.data, ev->u.output.size);
+> +		break;
+> +
+> +	case UHID_FEATURE:
+> +		req_size = sizeof(struct uhid_feature_req);
+> +		req = g_try_malloc0(req_size);
+> +		if (!req)
+> +			return;
+> +
+> +		req[0] = HID_MSG_SET_REPORT | HID_DATA_TYPE_FEATURE;
+> +		memcpy(req + 1, (ev + sizeof(ev->type)), req_size - 1);
+> +		break;
+> +	}
+> +
+> +	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
+> +
+> +	if (write(fd, req, req_size) < 0)
+> +		error("error writing hid_set_report: %s (%d)",
+> +						strerror(errno), errno);
+> +
+> +	g_free(req);
+>   }
+>   
+>   static gboolean uhid_event_cb(GIOChannel *io, GIOCondition cond,
 
