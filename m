@@ -1,73 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5282347D.1050701@linux.intel.com>
-Date: Tue, 12 Nov 2013 16:00:29 +0200
-From: Ravi Kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Date: Tue, 12 Nov 2013 15:47:41 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Szymon Janc <szymon.janc@tieto.com>
+Subject: Re: [PATCH 1/7] android: Remove bt_adapter structure
+Message-ID: <20131112134741.GH22931@x220.p-661hnu-f1>
+References: <1384215857-19679-1-git-send-email-szymon.janc@tieto.com>
+ <1384215857-19679-2-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 2/3] android/hidhost: Remove deprecated idle opcode from
- ipc document
-References: <1384172130-29837-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1384172130-29837-2-git-send-email-ravikumar.veeramally@linux.intel.com> <0C266DD4-7034-4D43-ADEB-E05BE0E54B32@holtmann.org> <5281F502.9080506@linux.intel.com>
-In-Reply-To: <5281F502.9080506@linux.intel.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1384215857-19679-2-git-send-email-szymon.janc@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Szymon,
 
-Any comments on my reply?
+On Tue, Nov 12, 2013, Szymon Janc wrote:
+> Only one controller is used so there is no need to keep extra
+> abstraction for it.
+> ---
+>  android/adapter.c | 271 +++++++++++++++++++++++++-----------------------------
+>  1 file changed, 123 insertions(+), 148 deletions(-)
+> 
+> diff --git a/android/adapter.c b/android/adapter.c
+> index 65b3170..e161f9d 100644
+> --- a/android/adapter.c
+> +++ b/android/adapter.c
+> @@ -58,23 +58,17 @@ static int notification_sk = -1;
+>  /* This list contains addresses which are asked for records */
+>  static GSList *browse_reqs;
+>  
+> -struct bt_adapter {
+> -	uint16_t index;
+> -	struct mgmt *mgmt;
+> +static uint16_t adapter_index = MGMT_INDEX_NONE;
+> +static struct mgmt *mgmt_if = NULL;
+> +static bt_adapter_ready adapter_ready = NULL;
+> +static bdaddr_t adapter_bdaddr;
+> +static uint32_t adapter_dev_class = 0;
+> +static char *adapter_name = NULL;
+> +static uint32_t current_settings = 0;
 
-Thanks,
-Ravi.
+To be honest I'm not really liking this loss of some kind of
+organization/grouping of these variables. Even if we don't dynamically
+allocate a struct I'd rather have these collected up in their own static
+struct, something like:
 
-On 11/12/2013 11:29 AM, Ravi Kumar Veeramally wrote:
-> Hi Marcel,
->
-> On 11/12/2013 01:05 AM, Marcel Holtmann wrote:
->> Hi Ravi,
->>
->>> Idle time is deprecated in HID 1_1. So remove it from ipc document
->>> and update GET_REPORT and VIRTUAL_UNPLUG opcode values.
->>> ---
->>> android/hal-ipc-api.txt | 10 ++--------
->>> android/hal-msg.h       |  4 ++--
->>> 2 files changed, 4 insertions(+), 10 deletions(-)
->>>
->>> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
->>> index 91ea280..57f4c13 100644
->>> --- a/android/hal-ipc-api.txt
->>> +++ b/android/hal-ipc-api.txt
->>> @@ -614,20 +614,14 @@ Notifications:
->>>                               0x01 = Boot
->>>                               0xff = Unsupported
->>>
->>> -    Opcode 0x84 - Idle Time notification
->>> -
->>> -        Notification parameters: Remote address (6 octets)
->>> -                                 Status (1 octet)
->>> -                                 Idle time (2 octets)
->> so what does HID_1.1 actually mean? I still see this notification in 
->> bt_hh.h.
->>
->> Regards
->>
->> Marcel
->>
-> In  HID_SPEC_V11 (3.1) Get Idle and Set Idle are deprecated. And even 
-> in bt_hh.h
-> get_idle and set_idle interfaces are not available. Bluedroid had 
-> implementation
-> of those two in bluedroid/btif/src/btif_hh.c but in interface struct 
-> those are commented out.
-> I didn't find the call back call there. That's why I updated ipc-doc.
->
-> Please let me know if I miss anything.
->
-> Thanks,
-> Ravi.
->
-> -- 
-> To unsubscribe from this list: send the line "unsubscribe 
-> linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+static struct adapter {
+	uint16_t index;
+	...
+	...
+} adapter;
+
+and then later e.g.:
+
+{
+	if (adapter.index == MGMT_INDEX_NONE)
+		return;
+
+	...
+}
+
+This way you also get an automatic prefix for all the adapter variables
+and don't need to include it explicitly in each variable name.
+
+Things which are not directly tied together with the adapter (like
+struct mgmt) you can possibly leave outside of the struct as separate
+variables though.
+
+Johan
