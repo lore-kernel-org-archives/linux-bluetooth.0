@@ -1,43 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] core: Do not attempt to connect if adapter is not powered
-Date: Tue, 12 Nov 2013 15:26:34 +0200
-Message-Id: <1384262794-27381-1-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 12 Nov 2013 15:24:25 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Marcin Kraglak <marcin.kraglak@tieto.com>
+Subject: Re: [PATCH v2 1/5] android: Add and remove sdp records and uuids
+Message-ID: <20131112132425.GC22931@x220.p-661hnu-f1>
+References: <1384257985-26319-1-git-send-email-szymon.janc@tieto.com>
+ <1384257985-26319-2-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1384257985-26319-2-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi,
 
-If the adapter is not yet powered do not attempt to connect, the same
-applies if the error -EHOSTUNREACH is returned by the kernel.
----
- src/device.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+On Tue, Nov 12, 2013, Szymon Janc wrote:
+> +static void add_uuid(uint8_t svc_hint, uint128_t *uuid)
+> +{
+> +	struct mgmt_cp_add_uuid cp;
+> +
+> +	htob128(uuid, (uint128_t *) cp.uuid);
+> +	cp.svc_hint = svc_hint;
+> +
+> +	mgmt_send(adapter->mgmt, MGMT_OP_ADD_UUID,
+> +				adapter->index, sizeof(cp), &cp,
+> +				add_uuid_complete, NULL, NULL);
+> +}
+> +
+> +int bt_adapter_add_record(uint16_t uuid, sdp_record_t *rec, uint8_t svc_hint)
 
-diff --git a/src/device.c b/src/device.c
-index 60efd62..e58c16c 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1156,7 +1156,7 @@ static void device_profile_connected(struct btd_device *dev,
- 	if (dev->pending == NULL)
- 		return;
- 
--	if (!dev->connected && err == -EHOSTDOWN)
-+	if (!dev->connected && (err == -EHOSTDOWN || err == -EHOSTUNREACH))
- 		goto done;
- 
- 	pending = dev->pending->data;
-@@ -1322,6 +1322,9 @@ static DBusMessage *connect_profiles(struct btd_device *dev, DBusMessage *msg,
- 	if (dev->pending || dev->connect || dev->browse)
- 		return btd_error_in_progress(msg);
- 
-+	if (!btd_adapter_get_powered(dev->adapter))
-+		return btd_error_not_ready(msg);
-+
- 	device_set_temporary(dev, FALSE);
- 
- 	if (!dev->svc_resolved)
--- 
-1.8.3.1
+Is it really so that we can't infer the UUID by looking inside
+sdp_record_t? (e.g. just use rec->svclass).
 
+> +{
+> +	uint128_t uint128;
+> +
+> +	if (g_slist_find(adapter->uuids, GUINT_TO_POINTER(uuid))) {
+> +		DBG("UUID 0x%x already added", uuid);
+> +		return -1;
+> +	}
+
+Shouldn't this be return -EALREADY?
+
+> +	adapter->uuids = g_slist_prepend(adapter->uuids,
+> +						GUINT_TO_POINTER(uuid));
+> +
+> +	uuid16_to_uint128(uuid, &uint128);
+> +
+> +	add_uuid(svc_hint, &uint128);
+
+If we only support adding UUID-16, then how about just providing
+uint16_t to add/remove_uuid and do the conversion inside these
+functions?
+
+> +void bt_adapter_remove_record(uint16_t uuid, int handle)
+
+The type that sdp_record_t uses for the handle is uint32_t so the
+parameter here should reflect that.
+
+Johan
