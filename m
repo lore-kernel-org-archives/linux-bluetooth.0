@@ -1,67 +1,185 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <A43EED3E-8B1F-4C4C-B7A9-26065DE55928@holtmann.org>
-References: <CAOJw-HaHLZsbgCGi_e1ZspAf_16gKQuC6N7JM+5boWxQHCXWFQ@mail.gmail.com>
-	<A43EED3E-8B1F-4C4C-B7A9-26065DE55928@holtmann.org>
-Date: Tue, 12 Nov 2013 09:29:49 +0100
-Message-ID: <CAOJw-Hb7Fn7RpyvhYoMp2BgU2QXWE0+Nq8S92e9keX4A4CGBQQ@mail.gmail.com>
-Subject: Re: Problems with too many connections
-From: Markus Roppelt <markus.roppelt@peus-testing.de>
+From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 7/7] android: Rename bluetooth service functions to match service name
+Date: Tue, 12 Nov 2013 00:24:17 +0000
+Message-Id: <1384215857-19679-8-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1384215857-19679-1-git-send-email-szymon.janc@tieto.com>
+References: <1384215857-19679-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2013/9/27 Marcel Holtmann <marcel@holtmann.org>
->
-> Hi Markus,
->
-> > I want to write an application which repeats the following procedure
-> > for several (100+) bluetooth (low energy) devices:
-> >
-> > 1. connect
-> > 2. read register values
-> > 3. disconnect
-> >
-> > Therefore I modified the source code from /attrib/interactive.c.  For
-> > testing purposes I am only looping  over one device. See attached
-> > source code.
-> >
-> > The code works fine. It connects, reads the values and disconnects.
-> > However, after 1020 repetitions, the following error occurs:
-> > (process:10205): GLib-WARNING **: poll(2) failed due to: Invalid argument.
-> >
-> > I think the problem has to do with some sockets / file descriptors not
-> > being closed properly.
-> >
-> > Can someone help me to get this fixed?
->
-> have you considered trying to write this from scratch and not basing this off existing code.
->
-> And yes, this will be most likely an issues with GSource handling of the attribute IO channel, but since you hacked the code is extremely hard to debug. It was never designed for what you are doing.
->
-> Regards
->
-> Marcel
->
+Make public functions match service name.
+---
+ android/bluetooth.c | 16 ++++++++--------
+ android/bluetooth.h | 16 ++++++++--------
+ android/main.c      | 13 +++++++------
+ 3 files changed, 23 insertions(+), 22 deletions(-)
 
-I found a solution myself.  I quote from:
-https://github.com/webOS-ports/nyx-modules/commit/bbcbbd64000ba76f39215e43a5179408ff96e097
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index b3a6e20..9545ec4 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -61,7 +61,7 @@ static GSList *browse_reqs;
+ static uint16_t option_index = MGMT_INDEX_NONE;
+ static uint16_t adapter_index = MGMT_INDEX_NONE;
+ static struct mgmt *mgmt_if = NULL;
+-static bt_adapter_ready adapter_ready = NULL;
++static bt_bluetooth_ready adapter_ready = NULL;
+ static bdaddr_t adapter_bdaddr;
+ static uint32_t adapter_dev_class = 0;
+ static char *adapter_name = NULL;
+@@ -1272,7 +1272,7 @@ failed:
+ 	adapter_ready(-EIO, NULL);
+ }
+ 
+-bool bt_adapter_start(int index, bt_adapter_ready cb)
++bool bt_bluetooth_start(int index, bt_bluetooth_ready cb)
+ {
+ 	DBG("index %d", index);
+ 
+@@ -1303,7 +1303,7 @@ bool bt_adapter_start(int index, bt_adapter_ready cb)
+ static void shutdown_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+-	bt_adapter_stopped cb = user_data;
++	bt_bluetooth_stopped cb = user_data;
+ 
+ 	if (status != MGMT_STATUS_SUCCESS)
+ 		error("Clean controller shutdown failed");
+@@ -1311,7 +1311,7 @@ static void shutdown_complete(uint8_t status, uint16_t length,
+ 	cb();
+ }
+ 
+-bool bt_adapter_stop(bt_adapter_stopped cb)
++bool bt_bluetooth_stop(bt_bluetooth_stopped cb)
+ {
+ 	struct mgmt_mode cp;
+ 
+@@ -1327,7 +1327,7 @@ bool bt_adapter_stop(bt_adapter_stopped cb)
+ 				NULL) > 0;
+ }
+ 
+-void bt_adapter_cleanup(void)
++void bt_bluetooth_cleanup(void)
+ {
+ 	g_free(adapter_name);
+ 	adapter_name = NULL;
+@@ -1849,7 +1849,7 @@ static uint8_t get_remote_services(void *buf, uint16_t len)
+ 	return browse_remote_sdp(&addr);
+ }
+ 
+-void bt_adapter_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
++void bt_bluetooth_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+ {
+ 	uint8_t status = HAL_STATUS_FAILED;
+ 
+@@ -1968,7 +1968,7 @@ error:
+ 	ipc_send_rsp(sk, HAL_SERVICE_ID_BLUETOOTH, status);
+ }
+ 
+-bool bt_adapter_register(int sk)
++bool bt_bluetooth_register(int sk)
+ {
+ 	DBG("");
+ 
+@@ -1977,7 +1977,7 @@ bool bt_adapter_register(int sk)
+ 	return true;
+ }
+ 
+-void bt_adapter_unregister(void)
++void bt_bluetooth_unregister(void)
+ {
+ 	DBG("");
+ 
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index 94c97ac..88ec326 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -21,15 +21,15 @@
+  *
+  */
+ 
+-typedef void (*bt_adapter_ready)(int err, const bdaddr_t *addr);
+-bool bt_adapter_start(int index, bt_adapter_ready cb);
++typedef void (*bt_bluetooth_ready)(int err, const bdaddr_t *addr);
++bool bt_bluetooth_start(int index, bt_bluetooth_ready cb);
+ 
+-typedef void (*bt_adapter_stopped)(void);
+-bool bt_adapter_stop(bt_adapter_stopped cb);
++typedef void (*bt_bluetooth_stopped)(void);
++bool bt_bluetooth_stop(bt_bluetooth_stopped cb);
+ 
+-void bt_adapter_cleanup(void);
++void bt_bluetooth_cleanup(void);
+ 
+-void bt_adapter_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len);
++void bt_bluetooth_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len);
+ 
+-bool bt_adapter_register(int sk);
+-void bt_adapter_unregister(void);
++bool bt_bluetooth_register(int sk);
++void bt_bluetooth_unregister(void);
+diff --git a/android/main.c b/android/main.c
+index e4c93ec..cbbfc06 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -84,7 +84,7 @@ static void service_register(void *buf, uint16_t len)
+ 
+ 	switch (m->service_id) {
+ 	case HAL_SERVICE_ID_BLUETOOTH:
+-		if (!bt_adapter_register(sk))
++		if (!bt_bluetooth_register(sk))
+ 			goto failed;
+ 
+ 		break;
+@@ -134,7 +134,7 @@ static void service_unregister(void *buf, uint16_t len)
+ 
+ 	switch (m->service_id) {
+ 	case HAL_SERVICE_ID_BLUETOOTH:
+-		bt_adapter_unregister();
++		bt_bluetooth_unregister();
+ 		break;
+ 	case HAL_SERVICE_ID_SOCK:
+ 		bt_socket_unregister();
+@@ -203,7 +203,7 @@ static void stop_bluetooth(void)
+ 
+ 	__stop = true;
+ 
+-	if (!bt_adapter_stop(bluetooth_stopped)) {
++	if (!bt_bluetooth_stop(bluetooth_stopped)) {
+ 		g_main_loop_quit(event_loop);
+ 		return;
+ 	}
+@@ -251,7 +251,8 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
+ 		handle_service_core(msg->opcode, msg->payload, msg->len);
+ 		break;
+ 	case HAL_SERVICE_ID_BLUETOOTH:
+-		bt_adapter_handle_cmd(fd, msg->opcode, msg->payload, msg->len);
++		bt_bluetooth_handle_cmd(fd, msg->opcode, msg->payload,
++								msg->len);
+ 		break;
+ 	case HAL_SERVICE_ID_HIDHOST:
+ 		bt_hid_handle_cmd(fd, msg->opcode, msg->payload, msg->len);
+@@ -560,7 +561,7 @@ int main(int argc, char *argv[])
+ 		return EXIT_FAILURE;
+ 	}
+ 
+-	if (!bt_adapter_start(option_index, adapter_ready))
++	if (!bt_bluetooth_start(option_index, adapter_ready))
+ 		return EXIT_FAILURE;
+ 
+ 	/* Use params: mtu = 0, flags = 0 */
+@@ -574,7 +575,7 @@ int main(int argc, char *argv[])
+ 
+ 	cleanup_hal_connection();
+ 	stop_sdp_server();
+-	bt_adapter_cleanup();
++	bt_bluetooth_cleanup();
+ 	g_main_loop_unref(event_loop);
+ 
+ 	info("Exit");
+-- 
+1.8.4.2
 
-"When a watch is added to the
-glib mainloop it references internally a file descriptor to pass it
-later to the poll
-function (see poll(2)). Every watch gets an id which should be used by
-the user to refer
-to the watch whenever needed. When the io channel is destroyed the
-watch should be remove
-from the mainloop as well. If this isn't done probably by the user it
-will cause the
-internal list of fds which are passed to the poll function to exceed
-the maximum of 256.
-This finally results in poll returning EINVAL as error code."
-
-With the additions from there my code runs without problems.
-
-Greetings
- Markus
