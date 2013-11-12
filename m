@@ -1,77 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH] android/hidhost: Fix error handling issue incase of G_IO_HUP
-Date: Tue, 12 Nov 2013 15:05:15 +0200
-Message-Id: <1384261515-28725-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <johan.hedberg@gmail.com>, <szymon.janc@tieto.com>,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 3/3] android: Change TODO with explaining comment
+Date: Tue, 12 Nov 2013 13:51:40 +0100
+Message-ID: <1384260700-16621-4-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1384260700-16621-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1384260700-16621-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Incase of G_IO_HUP on GIOCondtion when hid device disconnected,
-GIOCondition is combination of G_IO_IN and G_IO_HUP. Current code
-tries to read as soon as it finds G_IO_IN in condition.
-Apparently there is no data to read and loop continues.
 ---
- android/hidhost.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+ android/adapter.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index 491eacd..cba80a6 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -282,26 +282,27 @@ static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond,
+diff --git a/android/adapter.c b/android/adapter.c
+index a59ab4e..ac1ebc2 100644
+--- a/android/adapter.c
++++ b/android/adapter.c
+@@ -515,7 +515,10 @@ static void pin_code_request_callback(uint16_t index, uint16_t length,
+ 
+ 	DBG("%s type %u secure %u", dst, ev->addr.type, ev->secure);
+ 
+-	/* TODO name and CoD of remote devices should probably be cached */
++	/* It is ok to have empty name and CoD of remote devices here since
++	* those information has been already provided on device_connected event
++	* or during device scaning. Android will use that instead.
++	*/
+ 	memset(&hal_ev, 0, sizeof(hal_ev));
+ 	bdaddr2android(&ev->addr.bdaddr, hal_ev.bdaddr);
+ 
+@@ -528,7 +531,10 @@ static void send_ssp_request(const bdaddr_t *addr, uint8_t variant,
  {
- 	struct hid_device *dev = data;
+ 	struct hal_ev_ssp_request ev;
  
-+	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
-+		goto error;
-+
- 	if (cond & G_IO_IN)
- 		return intr_io_watch_cb(chan, data);
- 
-+error:
-+	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTED);
-+
- 	/* Checking for ctrl_watch avoids a double g_io_channel_shutdown since
- 	 * it's likely that ctrl_watch_cb has been queued for dispatching in
- 	 * this mainloop iteration */
- 	if ((cond & (G_IO_HUP | G_IO_ERR)) && dev->ctrl_watch)
- 		g_io_channel_shutdown(chan, TRUE, NULL);
- 
--	dev->intr_watch = 0;
--
--	if (dev->intr_io) {
--		g_io_channel_unref(dev->intr_io);
--		dev->intr_io = NULL;
--	}
--
- 	/* Close control channel */
- 	if (dev->ctrl_io && !(cond & G_IO_NVAL))
- 		g_io_channel_shutdown(dev->ctrl_io, TRUE, NULL);
- 
-+	hid_device_free(dev);
-+
- 	return FALSE;
- }
- 
-@@ -442,12 +443,14 @@ static gboolean ctrl_watch_cb(GIOChannel *chan, GIOCondition cond,
- 								gpointer data)
- {
- 	struct hid_device *dev = data;
--	char address[18];
-+
-+	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
-+		goto error;
- 
- 	if (cond & G_IO_IN)
- 		return ctrl_io_watch_cb(chan, data);
- 
--	ba2str(&dev->dst, address);
-+error:
- 	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTED);
- 
- 	/* Checking for intr_watch avoids a double g_io_channel_shutdown since
+-	/* TODO name and CoD of remote devices should probably be cached */
++	/* It is ok to have empty name and CoD of remote devices here since
++	* those information has been already provided on device_connected event
++	* or during device scaning. Android will use that instead.
++	*/
+ 	memset(&ev, 0, sizeof(ev));
+ 	bdaddr2android(addr, ev.bdaddr);
+ 	ev.pairing_variant = variant;
 -- 
-1.8.3.2
+1.8.4
 
