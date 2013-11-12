@@ -1,62 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 0/8] android: Some adapter and mgmt handling code cleanup
-Date: Tue, 12 Nov 2013 23:48:12 +0000
-Message-Id: <1384300100-8941-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 12 Nov 2013 17:48:19 -0500
+From: Dave Jones <davej@redhat.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: netdev@vger.kernel.org,
+        "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
+Subject: Re: shutdown(3) and bluetooth.
+Message-ID: <20131112224819.GE9057@redhat.com>
+References: <20131112211125.GA2912@redhat.com>
+ <DF4C2B40-BD87-4E88-911D-E3E5F488CAE4@holtmann.org>
+ <20131112221038.GA6689@redhat.com>
+ <FC5CE013-B077-4EA5-81C1-A7D8B4A5EF85@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <FC5CE013-B077-4EA5-81C1-A7D8B4A5EF85@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Wed, Nov 13, 2013 at 07:32:09AM +0900, Marcel Holtmann wrote:
+ 
+ > > Here's the info I found in the logs, it looks like this was the only bluetooth socket.
+ > > 
+ > > fd[195] = domain:31 (PF_BLUETOOTH) type:0x5 protocol:2
+ > > Setsockopt(1 d 2134000 8) on fd 195
+ > 
+ > this is a bit confusing. Protocol 2 is actually SCO, but the stack trace shows RFCOMM.
+ 
+Sorry, mixed up two separate runs. In the log above, the stack trace is actually..
 
-v2:
- - addressed Johan comments about using static adapter structure instead of
-   bunch of static adapter_* variables
- - Added a patch for utilizing mgmt library for passing adapter ready callback
-   (patch 3)
-
-v1:
-  This patchset moves mgmt initalization handling from main.c to adapter.c so
-  now all mgmt handling is done from adaper.c. Adapter.c is also renamed to
-  bluetooth.c to match service name implemented by it.
-
-  Startup and shutdown timeouts are still handled in main.c (mostly due to
-  both resulting in mainloop shutdown so extra callback are avoided).
-
-  IO handling and commands dispatch is still done in main.c
+[<ffffffffa0492dca>] bt_sock_wait_state+0xda/0x240 [bluetooth]
+[<ffffffffa04c86d8>] sco_sock_release+0xb8/0xf0 [bluetooth]
+[<ffffffff815cb1ff>] sock_release+0x1f/0x90
+[<ffffffff815cb282>] sock_close+0x12/0x20
 
 
-Comments are welcome.
+ > > ./trinity -P PF_BLUETOOTH -l off -c setsockopt
+ > > 
+ > > let it run a few seconds, and then ctrl-c.  The main process will never exit.
+ > > 
+ > > 5814 pts/6    Ss     0:00              |       \_ bash
+ > > 5876 pts/6    S+     0:00              |       |   \_ ./trinity -P PF_BLUETOOTH -l off -c setsockopt
+ > > 5877 pts/6    Z+     0:00              |       |       \_ [trinity] <defunct>
+ > > 5878 pts/6    S+     0:01              |       |       \_ [trinity-main]
+ > > 
+ > > $ sudo cat /proc/5878/stack
+ > > [<ffffffffa04397a2>] bt_sock_wait_state+0xc2/0x190 [bluetooth]
+ > > [<ffffffffa0847a75>] rfcomm_sock_shutdown+0x85/0xb0 [rfcomm]
+ > > [<ffffffffa0847ad9>] rfcomm_sock_release+0x39/0xb0 [rfcomm]
 
--- 
-BR
-Szymon Janc
+So it seems it affects both SCO and RFCOMM.
 
-Szymon Janc (8):
-  android: Make adapter static
-  android: Move adapter initialization to adapter.c
-  android: Don't use static pointer for storing adapter_ready callback
-  android/hidhost: Use adapter address provided on register
-  android: Report adapter address in adapter_ready callback
-  android: Remove not needed bt_adapter_get_address function
-  android: Rename adapter.c to bluetooth.c
-  android: Rename bluetooth service functions to match service name
+ > What kernel did you run this against? It is a shot in the dark, but can you try linux-next quickly.
+ > There was a socket related fix for the socket options where we confused RFCOMM vs L2CAP struct sock.
 
- android/Android.mk  |    2 +-
- android/Makefile.am |    4 +-
- android/adapter.c   | 2008 -----------------------------------------------
- android/adapter.h   |   37 -
- android/bluetooth.c | 2177 +++++++++++++++++++++++++++++++++++++++++++++++++++
- android/bluetooth.h |   38 +
- android/hidhost.c   |   21 +-
- android/main.c      |  314 ++------
- 8 files changed, 2287 insertions(+), 2314 deletions(-)
- delete mode 100644 android/adapter.c
- delete mode 100644 android/adapter.h
- create mode 100644 android/bluetooth.c
- create mode 100644 android/bluetooth.h
+first noticed it on Linus' latest HEAD, and then reproduced it on 3.11.6
+I'll look at linux-next tomorrow.
 
--- 
-1.8.4.3
+thanks,
 
+	Dave
