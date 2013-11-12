@@ -1,55 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 12 Nov 2013 19:00:40 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 0/5] Add support for registering local SDP records
-Message-ID: <20131112170040.GA3834@x220.p-661hnu-f1>
-References: <1384270586-9853-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1384270586-9853-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
+Subject: Re: [PATCH 2/3] android/hidhost: Remove deprecated idle opcode from ipc document
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <5281F502.9080506@linux.intel.com>
+Date: Wed, 13 Nov 2013 00:57:43 +0900
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <CEAF8E5F-E4CE-4081-9870-4E4A802E9483@holtmann.org>
+References: <1384172130-29837-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1384172130-29837-2-git-send-email-ravikumar.veeramally@linux.intel.com> <0C266DD4-7034-4D43-ADEB-E05BE0E54B32@holtmann.org> <5281F502.9080506@linux.intel.com>
+To: Ravi Kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Ravi,
 
-On Tue, Nov 12, 2013, Szymon Janc wrote:
-> v3:
->  - fixed Johan comments
-> 
-> V2:
->  - don't use bt_uuid_t
->  - few bugfixes
-> 
-> V1 cover:
-> This adds support for manipulating local SDP database with
-> bt_adapter_add_record and bt_adapter_remove_record functions. Those should
-> be called when HAL service is registered or unregistered.
-> 
-> This also adds DeviceID record as at least 1 local UUID is needed by Android to
-> properly handle remote device profiles.
-> 
-> Last but not least: With this serie it is possible to connect HID device from
-> Android UI (Settings application).   \O/
-> 
-> -- 
-> BR
-> Szymon Janc
-> 
-> Marcin Kraglak (3):
->   android: Add and remove sdp records and uuids
->   android: Clear adapter uuids during initialization
->   android: Add support for getting UUIDs property
-> 
-> Szymon Janc (2):
->   android: Remove not needed include
->   android: Register DeviceID record when adapter is initialized
-> 
->  android/adapter.c | 202 ++++++++++++++++++++++++++++++++++++++++++++++++++----
->  android/adapter.h |   3 +
->  2 files changed, 192 insertions(+), 13 deletions(-)
+>>> Idle time is deprecated in HID 1_1. So remove it from ipc document
+>>> and update GET_REPORT and VIRTUAL_UNPLUG opcode values.
+>>> ---
+>>> android/hal-ipc-api.txt | 10 ++--------
+>>> android/hal-msg.h       |  4 ++--
+>>> 2 files changed, 4 insertions(+), 10 deletions(-)
+>>> 
+>>> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+>>> index 91ea280..57f4c13 100644
+>>> --- a/android/hal-ipc-api.txt
+>>> +++ b/android/hal-ipc-api.txt
+>>> @@ -614,20 +614,14 @@ Notifications:
+>>> 		                      0x01 = Boot
+>>> 		                      0xff = Unsupported
+>>> 
+>>> -	Opcode 0x84 - Idle Time notification
+>>> -
+>>> -		Notification parameters: Remote address (6 octets)
+>>> -		                         Status (1 octet)
+>>> -		                         Idle time (2 octets)
+>> so what does HID_1.1 actually mean? I still see this notification in bt_hh.h.
+>> 
+>> Regards
+>> 
+>> Marcel
+>> 
+> In  HID_SPEC_V11 (3.1) Get Idle and Set Idle are deprecated. And even in bt_hh.h
+> get_idle and set_idle interfaces are not available. Bluedroid had implementation
+> of those two in bluedroid/btif/src/btif_hh.c but in interface struct those are commented out.
+> I didn't find the call back call there. That's why I updated ipc-doc.
 
-All five patches have been applied. Thanks.
+if they are not using this notification in the Bluetooth service, then we do not need to implemented.
 
-Johan
+Regards
+
+Marcel
+
