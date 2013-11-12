@@ -1,63 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 12 Nov 2013 15:24:25 +0200
+Date: Tue, 12 Nov 2013 15:09:55 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: Re: [PATCH v2 1/5] android: Add and remove sdp records and uuids
-Message-ID: <20131112132425.GC22931@x220.p-661hnu-f1>
-References: <1384257985-26319-1-git-send-email-szymon.janc@tieto.com>
- <1384257985-26319-2-git-send-email-szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
+Subject: Re: [PATCH v2 3/3] android: Change TODO with explaining comment
+Message-ID: <20131112130955.GB22931@x220.p-661hnu-f1>
+References: <1384260700-16621-1-git-send-email-lukasz.rymanowski@tieto.com>
+ <1384260700-16621-4-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1384257985-26319-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1384260700-16621-4-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lukasz,
 
-On Tue, Nov 12, 2013, Szymon Janc wrote:
-> +static void add_uuid(uint8_t svc_hint, uint128_t *uuid)
-> +{
-> +	struct mgmt_cp_add_uuid cp;
-> +
-> +	htob128(uuid, (uint128_t *) cp.uuid);
-> +	cp.svc_hint = svc_hint;
-> +
-> +	mgmt_send(adapter->mgmt, MGMT_OP_ADD_UUID,
-> +				adapter->index, sizeof(cp), &cp,
-> +				add_uuid_complete, NULL, NULL);
-> +}
-> +
-> +int bt_adapter_add_record(uint16_t uuid, sdp_record_t *rec, uint8_t svc_hint)
+On Tue, Nov 12, 2013, Lukasz Rymanowski wrote:
+> ---
+>  android/adapter.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/android/adapter.c b/android/adapter.c
+> index a59ab4e..ac1ebc2 100644
+> --- a/android/adapter.c
+> +++ b/android/adapter.c
+> @@ -515,7 +515,10 @@ static void pin_code_request_callback(uint16_t index, uint16_t length,
+>  
+>  	DBG("%s type %u secure %u", dst, ev->addr.type, ev->secure);
+>  
+> -	/* TODO name and CoD of remote devices should probably be cached */
+> +	/* It is ok to have empty name and CoD of remote devices here since
+> +	* those information has been already provided on device_connected event
+> +	* or during device scaning. Android will use that instead.
+> +	*/
+>  	memset(&hal_ev, 0, sizeof(hal_ev));
+>  	bdaddr2android(&ev->addr.bdaddr, hal_ev.bdaddr);
 
-Is it really so that we can't infer the UUID by looking inside
-sdp_record_t? (e.g. just use rec->svclass).
-
-> +{
-> +	uint128_t uint128;
-> +
-> +	if (g_slist_find(adapter->uuids, GUINT_TO_POINTER(uuid))) {
-> +		DBG("UUID 0x%x already added", uuid);
-> +		return -1;
-> +	}
-
-Shouldn't this be return -EALREADY?
-
-> +	adapter->uuids = g_slist_prepend(adapter->uuids,
-> +						GUINT_TO_POINTER(uuid));
-> +
-> +	uuid16_to_uint128(uuid, &uint128);
-> +
-> +	add_uuid(svc_hint, &uint128);
-
-If we only support adding UUID-16, then how about just providing
-uint16_t to add/remove_uuid and do the conversion inside these
-functions?
-
-> +void bt_adapter_remove_record(uint16_t uuid, int handle)
-
-The type that sdp_record_t uses for the handle is uint32_t so the
-parameter here should reflect that.
+Have you considered security mode 3 devices? There you will get a pin
+code request before you get a device_connected. You can even try this
+yourself by doing "hciconfig hci0 auth" before attempting to pair. That
+said, I'm not sure if there is anything we can do better regarding such
+devices, but at least we should keep this use case in mind.
 
 Johan
