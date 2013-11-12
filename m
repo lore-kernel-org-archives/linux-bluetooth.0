@@ -1,66 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 12 Nov 2013 15:02:31 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
-Subject: Re: [PATCH v2 1/3] android: Update bond state on incoming bonding
-Message-ID: <20131112130231.GA22931@x220.p-661hnu-f1>
-References: <1384260700-16621-1-git-send-email-lukasz.rymanowski@tieto.com>
- <1384260700-16621-2-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1384260700-16621-2-git-send-email-lukasz.rymanowski@tieto.com>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH] android/hidhost: Fix error handling issue incase of G_IO_HUP
+Date: Tue, 12 Nov 2013 15:05:15 +0200
+Message-Id: <1384261515-28725-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Incase of G_IO_HUP on GIOCondtion when hid device disconnected,
+GIOCondition is combination of G_IO_IN and G_IO_HUP. Current code
+tries to read as soon as it finds G_IO_IN in condition.
+Apparently there is no data to read and loop continues.
+---
+ android/hidhost.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
 
-On Tue, Nov 12, 2013, Lukasz Rymanowski wrote:
-> Before sending any ssp request or pin code request up to HAL library we
-> need to send bond state change with bonding state. Otherwise incoming
-> bonding is impossible.
-> Add bonding tracking to adapter.
-> ---
->  android/adapter.c | 50 +++++++++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 45 insertions(+), 5 deletions(-)
-> 
-> diff --git a/android/adapter.c b/android/adapter.c
-> index 65b3170..f92301e 100644
-> --- a/android/adapter.c
-> +++ b/android/adapter.c
-> @@ -74,6 +74,8 @@ struct bt_adapter {
->  
->  	bool discovering;
->  	uint32_t discoverable_timeout;
-> +
-> +	bool bonding;
->  };
->  
->  struct browse_req {
-> @@ -486,6 +488,7 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
->  	send_bond_state_change(&addr->bdaddr, HAL_STATUS_SUCCESS,
->  							HAL_BOND_STATE_BONDED);
->  
-> +	adapter->bonding = false;
->  	browse_remote_sdp(&addr->bdaddr);
->  }
->  
-> @@ -501,6 +504,13 @@ static void pin_code_request_callback(uint16_t index, uint16_t length,
->  		return;
->  	}
->  
-> +	if (!adapter->bonding) {
-> +		adapter->bonding = true;
-> +		/* Update bonding state */
-> +		send_bond_state_change(&ev->addr.bdaddr, HAL_STATUS_SUCCESS,
-> +						HAL_BOND_STATE_BONDING);
-> +	}
+diff --git a/android/hidhost.c b/android/hidhost.c
+index 491eacd..cba80a6 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -282,26 +282,27 @@ static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond,
+ {
+ 	struct hid_device *dev = data;
+ 
++	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
++		goto error;
++
+ 	if (cond & G_IO_IN)
+ 		return intr_io_watch_cb(chan, data);
+ 
++error:
++	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTED);
++
+ 	/* Checking for ctrl_watch avoids a double g_io_channel_shutdown since
+ 	 * it's likely that ctrl_watch_cb has been queued for dispatching in
+ 	 * this mainloop iteration */
+ 	if ((cond & (G_IO_HUP | G_IO_ERR)) && dev->ctrl_watch)
+ 		g_io_channel_shutdown(chan, TRUE, NULL);
+ 
+-	dev->intr_watch = 0;
+-
+-	if (dev->intr_io) {
+-		g_io_channel_unref(dev->intr_io);
+-		dev->intr_io = NULL;
+-	}
+-
+ 	/* Close control channel */
+ 	if (dev->ctrl_io && !(cond & G_IO_NVAL))
+ 		g_io_channel_shutdown(dev->ctrl_io, TRUE, NULL);
+ 
++	hid_device_free(dev);
++
+ 	return FALSE;
+ }
+ 
+@@ -442,12 +443,14 @@ static gboolean ctrl_watch_cb(GIOChannel *chan, GIOCondition cond,
+ 								gpointer data)
+ {
+ 	struct hid_device *dev = data;
+-	char address[18];
++
++	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
++		goto error;
+ 
+ 	if (cond & G_IO_IN)
+ 		return ctrl_io_watch_cb(chan, data);
+ 
+-	ba2str(&dev->dst, address);
++error:
+ 	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTED);
+ 
+ 	/* Checking for intr_watch avoids a double g_io_channel_shutdown since
+-- 
+1.8.3.2
 
-Is there something explicitly blocking multiple parallel bonding
-attempts (to different remote devices) in Android? If not this should
-really be a list or hash-table with entries identifiable using the
-remote bdaddr. In fact since we need this anyway for our LE address type
-cache I don't see why it would hurt to have the infrastructure ready for
-it now.
-
-Johan
