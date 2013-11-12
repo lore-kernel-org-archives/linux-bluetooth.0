@@ -2,50 +2,119 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 5/7] android: Remove not needed bt_adapter_get_address function
-Date: Tue, 12 Nov 2013 00:24:15 +0000
-Message-Id: <1384215857-19679-6-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 3/7] android/hidhost: Use adapter address provided on register
+Date: Tue, 12 Nov 2013 00:24:13 +0000
+Message-Id: <1384215857-19679-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1384215857-19679-1-git-send-email-szymon.janc@tieto.com>
 References: <1384215857-19679-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-All services receive adapter address on init so there is no need for
-this function. Removing it will also help keeping services not depend
-on adapter service.
+There is no need to use bt_adapter_get_address every time local address
+is needed.
 ---
- android/adapter.c | 5 -----
- android/adapter.h | 2 --
- 2 files changed, 7 deletions(-)
+ android/hidhost.c | 21 ++++++++++-----------
+ 1 file changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/android/adapter.c b/android/adapter.c
-index f337b5e..e083131 100644
---- a/android/adapter.c
-+++ b/android/adapter.c
-@@ -1968,11 +1968,6 @@ error:
- 	ipc_send_rsp(sk, HAL_SERVICE_ID_BLUETOOTH, status);
- }
+diff --git a/android/hidhost.c b/android/hidhost.c
+index 683938f..cdc6776 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -47,7 +47,6 @@
+ #include "hal-msg.h"
+ #include "ipc.h"
+ #include "hidhost.h"
+-#include "adapter.h"
+ #include "utils.h"
  
--const bdaddr_t *bt_adapter_get_address(void)
--{
--	return &adapter_bdaddr;
--}
--
- bool bt_adapter_register(int sk)
+ #define L2CAP_PSM_HIDP_CTRL	0x11
+@@ -77,6 +76,8 @@
+ /* HID Virtual Cable Unplug */
+ #define HID_VIRTUAL_CABLE_UNPLUG	0x05
+ 
++static const bdaddr_t *adapter_addr = NULL;
++
+ static int notification_sk = -1;
+ static GIOChannel *ctrl_io = NULL;
+ static GIOChannel *intr_io = NULL;
+@@ -569,7 +570,6 @@ static void control_connect_cb(GIOChannel *chan, GError *conn_err,
  {
+ 	struct hid_device *dev = user_data;
+ 	GError *err = NULL;
+-	const bdaddr_t *src = bt_adapter_get_address();
+ 
  	DBG("");
-diff --git a/android/adapter.h b/android/adapter.h
-index 96136bb..94c97ac 100644
---- a/android/adapter.h
-+++ b/android/adapter.h
-@@ -31,7 +31,5 @@ void bt_adapter_cleanup(void);
  
- void bt_adapter_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len);
+@@ -581,7 +581,7 @@ static void control_connect_cb(GIOChannel *chan, GError *conn_err,
  
--const bdaddr_t *bt_adapter_get_address(void);
--
- bool bt_adapter_register(int sk);
- void bt_adapter_unregister(void);
+ 	/* Connect to the HID interrupt channel */
+ 	dev->intr_io = bt_io_connect(interrupt_connect_cb, dev, NULL, &err,
+-					BT_IO_OPT_SOURCE_BDADDR, src,
++					BT_IO_OPT_SOURCE_BDADDR, adapter_addr,
+ 					BT_IO_OPT_DEST_BDADDR, &dev->dst,
+ 					BT_IO_OPT_PSM, L2CAP_PSM_HIDP_INTR,
+ 					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+@@ -607,7 +607,6 @@ static void hid_sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ 	struct hid_device *dev = data;
+ 	sdp_list_t *list;
+ 	GError *gerr = NULL;
+-	const bdaddr_t *src = bt_adapter_get_address();
+ 
+ 	DBG("");
+ 
+@@ -681,7 +680,7 @@ static void hid_sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ 	}
+ 
+ 	dev->ctrl_io = bt_io_connect(control_connect_cb, dev, NULL, &gerr,
+-					BT_IO_OPT_SOURCE_BDADDR, src,
++					BT_IO_OPT_SOURCE_BDADDR, adapter_addr,
+ 					BT_IO_OPT_DEST_BDADDR, &dev->dst,
+ 					BT_IO_OPT_PSM, L2CAP_PSM_HIDP_CTRL,
+ 					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+@@ -706,7 +705,6 @@ static uint8_t bt_hid_connect(struct hal_cmd_hidhost_connect *cmd,
+ 	char addr[18];
+ 	bdaddr_t dst;
+ 	GSList *l;
+-	const bdaddr_t *src = bt_adapter_get_address();
+ 	uuid_t uuid;
+ 
+ 	DBG("");
+@@ -728,8 +726,8 @@ static uint8_t bt_hid_connect(struct hal_cmd_hidhost_connect *cmd,
+ 	DBG("connecting to %s", addr);
+ 
+ 	bt_string2uuid(&uuid, HID_UUID);
+-	if (bt_search_service(src, &dev->dst, &uuid, hid_sdp_search_cb, dev,
+-								NULL) < 0) {
++	if (bt_search_service(adapter_addr, &dev->dst, &uuid,
++					hid_sdp_search_cb, dev, NULL) < 0) {
+ 		error("Failed to search sdp details");
+ 		hid_device_free(dev);
+ 		return HAL_STATUS_FAILED;
+@@ -1167,12 +1165,13 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ bool bt_hid_register(int sk, const bdaddr_t *addr)
+ {
+ 	GError *err = NULL;
+-	const bdaddr_t *src = bt_adapter_get_address();
+ 
+ 	DBG("");
+ 
++	adapter_addr = addr;
++
+ 	ctrl_io = bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
+-				BT_IO_OPT_SOURCE_BDADDR, src,
++				BT_IO_OPT_SOURCE_BDADDR, adapter_addr,
+ 				BT_IO_OPT_PSM, L2CAP_PSM_HIDP_CTRL,
+ 				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+ 				BT_IO_OPT_INVALID);
+@@ -1183,7 +1182,7 @@ bool bt_hid_register(int sk, const bdaddr_t *addr)
+ 	}
+ 
+ 	intr_io = bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
+-				BT_IO_OPT_SOURCE_BDADDR, src,
++				BT_IO_OPT_SOURCE_BDADDR, adapter_addr,
+ 				BT_IO_OPT_PSM, L2CAP_PSM_HIDP_INTR,
+ 				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+ 				BT_IO_OPT_INVALID);
 -- 
 1.8.4.2
 
