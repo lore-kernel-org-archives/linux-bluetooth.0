@@ -1,28 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 12 Nov 2013 15:28:17 +0200
+Date: Tue, 12 Nov 2013 15:28:05 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/hidhost: Fix error handling issue incase of
- G_IO_HUP
-Message-ID: <20131112132817.GF22931@x220.p-661hnu-f1>
-References: <1384261515-28725-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: Re: [PATCH] android/hidhost: Fix uhid create failure case
+Message-ID: <20131112132805.GE22931@x220.p-661hnu-f1>
+References: <1384249639-10915-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1384261515-28725-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1384249639-10915-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Ravi,
 
 On Tue, Nov 12, 2013, Ravi kumar Veeramally wrote:
-> Incase of G_IO_HUP on GIOCondtion when hid device disconnected,
-> GIOCondition is combination of G_IO_IN and G_IO_HUP. Current code
-> tries to read as soon as it finds G_IO_IN in condition.
-> Apparently there is no data to read and loop continues.
+> If uhid open or create fails then notify state and free the device.
+> Otherwise it replies bogus success return value on connect request.
 > ---
->  android/hidhost.c | 21 ++++++++++++---------
->  1 file changed, 12 insertions(+), 9 deletions(-)
+>  android/hidhost.c | 19 +++++--------------
+>  1 file changed, 5 insertions(+), 14 deletions(-)
 
 Applied. Thanks.
 
