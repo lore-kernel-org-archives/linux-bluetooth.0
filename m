@@ -1,60 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5281F502.9080506@linux.intel.com>
-Date: Tue, 12 Nov 2013 11:29:38 +0200
-From: Ravi Kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 2/3] android/hidhost: Remove deprecated idle opcode from
- ipc document
-References: <1384172130-29837-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1384172130-29837-2-git-send-email-ravikumar.veeramally@linux.intel.com> <0C266DD4-7034-4D43-ADEB-E05BE0E54B32@holtmann.org>
-In-Reply-To: <0C266DD4-7034-4D43-ADEB-E05BE0E54B32@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <1384093460.4593.8.camel@nuvo>
+References: <1384093460.4593.8.camel@nuvo>
+Date: Tue, 12 Nov 2013 10:58:50 +0200
+Message-ID: <CABBYNZL3Hw0bQbV_yDm9H_tRnp_XXYUmu0Qi7Dk=efrBghkZmg@mail.gmail.com>
+Subject: Re: [PATCH] obex: Use user's cache dir as a default root
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Bastien,
 
-On 11/12/2013 01:05 AM, Marcel Holtmann wrote:
-> Hi Ravi,
+On Sun, Nov 10, 2013 at 4:24 PM, Bastien Nocera <hadess@hadess.net> wrote:
 >
->> Idle time is deprecated in HID 1_1. So remove it from ipc document
->> and update GET_REPORT and VIRTUAL_UNPLUG opcode values.
->> ---
->> android/hal-ipc-api.txt | 10 ++--------
->> android/hal-msg.h       |  4 ++--
->> 2 files changed, 4 insertions(+), 10 deletions(-)
->>
->> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
->> index 91ea280..57f4c13 100644
->> --- a/android/hal-ipc-api.txt
->> +++ b/android/hal-ipc-api.txt
->> @@ -614,20 +614,14 @@ Notifications:
->> 		                      0x01 = Boot
->> 		                      0xff = Unsupported
->>
->> -	Opcode 0x84 - Idle Time notification
->> -
->> -		Notification parameters: Remote address (6 octets)
->> -		                         Status (1 octet)
->> -		                         Idle time (2 octets)
-> so what does HID_1.1 actually mean? I still see this notification in bt_hh.h.
+> It's per-user, so we won't try to overwrite somebody else's
+> files in /tmp when that happens. It's also (unless we have a
+> particularly bizarre setup) on the same partition as the destination
+> folder which means we can atomically move the file to the destination
+> with a unique filename.
+> ---
+>  obexd/src/main.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 >
-> Regards
+> diff --git a/obexd/src/main.c b/obexd/src/main.c
+> index 61a06b2..2f7d723 100644
+> --- a/obexd/src/main.c
+> +++ b/obexd/src/main.c
+> @@ -50,8 +50,6 @@
+>  #include "obexd.h"
+>  #include "server.h"
 >
-> Marcel
+> -#define DEFAULT_ROOT_PATH "/tmp"
+> -
+>  #define DEFAULT_CAP_FILE CONFIGDIR "/capability.xml"
 >
-In  HID_SPEC_V11 (3.1) Get Idle and Set Idle are deprecated. And even in 
-bt_hh.h
-get_idle and set_idle interfaces are not available. Bluedroid had 
-implementation
-of those two in bluedroid/btif/src/btif_hh.c but in interface struct 
-those are commented out.
-I didn't find the call back call there. That's why I updated ipc-doc.
+>  static GMainLoop *main_loop = NULL;
+> @@ -285,8 +283,10 @@ int main(int argc, char *argv[])
+>                 exit(EXIT_FAILURE);
+>         }
+>
+> -       if (option_root == NULL)
+> -               option_root = g_strdup(DEFAULT_ROOT_PATH);
+> +       if (option_root == NULL) {
+> +               option_root = g_build_filename(g_get_user_cache_dir(), "obexd", NULL);
+> +               g_mkdir_with_parents(option_root, 0700);
+> +       }
+>
+>         if (option_root[0] != '/') {
+>                 char *old_root = option_root, *home = getenv("HOME");
+> --
+> 1.8.4.2
 
-Please let me know if I miss anything.
+Pushed, thanks.
 
-Thanks,
-Ravi.
 
+-- 
+Luiz Augusto von Dentz
