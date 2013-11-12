@@ -1,45 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 12 Nov 2013 15:09:55 +0200
+Date: Tue, 12 Nov 2013 15:02:31 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
-Subject: Re: [PATCH v2 3/3] android: Change TODO with explaining comment
-Message-ID: <20131112130955.GB22931@x220.p-661hnu-f1>
+Subject: Re: [PATCH v2 1/3] android: Update bond state on incoming bonding
+Message-ID: <20131112130231.GA22931@x220.p-661hnu-f1>
 References: <1384260700-16621-1-git-send-email-lukasz.rymanowski@tieto.com>
- <1384260700-16621-4-git-send-email-lukasz.rymanowski@tieto.com>
+ <1384260700-16621-2-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1384260700-16621-4-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1384260700-16621-2-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Lukasz,
 
 On Tue, Nov 12, 2013, Lukasz Rymanowski wrote:
+> Before sending any ssp request or pin code request up to HAL library we
+> need to send bond state change with bonding state. Otherwise incoming
+> bonding is impossible.
+> Add bonding tracking to adapter.
 > ---
->  android/adapter.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
+>  android/adapter.c | 50 +++++++++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 45 insertions(+), 5 deletions(-)
 > 
 > diff --git a/android/adapter.c b/android/adapter.c
-> index a59ab4e..ac1ebc2 100644
+> index 65b3170..f92301e 100644
 > --- a/android/adapter.c
 > +++ b/android/adapter.c
-> @@ -515,7 +515,10 @@ static void pin_code_request_callback(uint16_t index, uint16_t length,
+> @@ -74,6 +74,8 @@ struct bt_adapter {
 >  
->  	DBG("%s type %u secure %u", dst, ev->addr.type, ev->secure);
+>  	bool discovering;
+>  	uint32_t discoverable_timeout;
+> +
+> +	bool bonding;
+>  };
 >  
-> -	/* TODO name and CoD of remote devices should probably be cached */
-> +	/* It is ok to have empty name and CoD of remote devices here since
-> +	* those information has been already provided on device_connected event
-> +	* or during device scaning. Android will use that instead.
-> +	*/
->  	memset(&hal_ev, 0, sizeof(hal_ev));
->  	bdaddr2android(&ev->addr.bdaddr, hal_ev.bdaddr);
+>  struct browse_req {
+> @@ -486,6 +488,7 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
+>  	send_bond_state_change(&addr->bdaddr, HAL_STATUS_SUCCESS,
+>  							HAL_BOND_STATE_BONDED);
+>  
+> +	adapter->bonding = false;
+>  	browse_remote_sdp(&addr->bdaddr);
+>  }
+>  
+> @@ -501,6 +504,13 @@ static void pin_code_request_callback(uint16_t index, uint16_t length,
+>  		return;
+>  	}
+>  
+> +	if (!adapter->bonding) {
+> +		adapter->bonding = true;
+> +		/* Update bonding state */
+> +		send_bond_state_change(&ev->addr.bdaddr, HAL_STATUS_SUCCESS,
+> +						HAL_BOND_STATE_BONDING);
+> +	}
 
-Have you considered security mode 3 devices? There you will get a pin
-code request before you get a device_connected. You can even try this
-yourself by doing "hciconfig hci0 auth" before attempting to pair. That
-said, I'm not sure if there is anything we can do better regarding such
-devices, but at least we should keep this use case in mind.
+Is there something explicitly blocking multiple parallel bonding
+attempts (to different remote devices) in Android? If not this should
+really be a list or hash-table with entries identifiable using the
+remote bdaddr. In fact since we need this anyway for our LE address type
+cache I don't see why it would hurt to have the infrastructure ready for
+it now.
 
 Johan
