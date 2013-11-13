@@ -1,43 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 13 Nov 2013 15:56:22 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <1384350278.5071.6.camel@nuvo>
+Subject: Adapter name reset on suspend/resume
+From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv1 4/9] android/hal-sock: Initial listen handle
-Message-ID: <20131113135620.GH21468@aemeltch-MOBL1>
-References: <1384178627-25991-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1384178627-25991-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20131113121537.GA11291@x220.p-661hnu-f1>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20131113121537.GA11291@x220.p-661hnu-f1>
+Date: Wed, 13 Nov 2013 14:44:38 +0100
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Heya,
 
-On Wed, Nov 13, 2013 at 02:15:37PM +0200, Johan Hedberg wrote:
-> > +struct rfcomm_slot {
-> > +	int fd;
-> > +	int hal_fd;
-> > +	int real_sock;
-> > +	uint32_t channel;
-> > +};
-> 
-> You should really have comments here for what each struct member is used
-> for (you have this info in your cover letter but it should also be part
-> of the code). Why do you keep hal_fd here? Shouldn't we close it on our
-> side as soon as we've handed it over to the HAL?
+After suspending and resuming my laptop, hci0's name is reset to what
+looks like the factory name:
+$ hciconfig -a | grep Name
+	Name: 'BCM20702A'
 
-Basically hal_fd is needed until it is passed to the Android framework.
+This is the device in question:
+Bus 001 Device 004: ID 0a5c:21e6 Broadcom Corp. BCM20702 Bluetooth 4.0 [ThinkPad]
 
-Do you want it to be like this:
+And my laptop is a Lenovo X1 Carbon.
 
-int hal_fd;
-rfslot = create_rfslot(&hal_fd, int sock);
+Neither udevadm nor btmon show the device going away on suspend and
+coming back on resume.
 
-send(hal_fd);
-close(hal_fd);
-
-Best regards 
-Andrei Emeltchenko 
+Any ideas?
 
