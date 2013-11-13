@@ -1,28 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1384350278.5071.6.camel@nuvo>
-Subject: Adapter name reset on suspend/resume
-From: Bastien Nocera <hadess@hadess.net>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Date: Wed, 13 Nov 2013 14:44:38 +0100
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: [PATCH BlueZ] audio/A2DP: Return -ENOPROTOOPT if record doesn't exist
+Date: Wed, 13 Nov 2013 15:26:36 +0200
+Message-Id: <1384349196-18190-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Heya,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-After suspending and resuming my laptop, hci0's name is reset to what
-looks like the factory name:
-$ hciconfig -a | grep Name
-	Name: 'BCM20702A'
+In case record is not registered it means no endpoint is available so
+return -ENOPROTOOPT to indicate that it is currently not available.
+---
+ profiles/audio/a2dp.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-This is the device in question:
-Bus 001 Device 004: ID 0a5c:21e6 Broadcom Corp. BCM20702 Bluetooth 4.0 [ThinkPad]
-
-And my laptop is a Lenovo X1 Carbon.
-
-Neither udevadm nor btmon show the device going away on suspend and
-coming back on resume.
-
-Any ideas?
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 6b3d6b2..864cb18 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -1861,10 +1861,22 @@ static void a2dp_sink_remove(struct btd_service *service)
+ static int a2dp_source_connect(struct btd_service *service)
+ {
+ 	struct btd_device *dev = btd_service_get_device(service);
++	struct btd_adapter *adapter = device_get_adapter(dev);
++	struct a2dp_server *server;
+ 	const char *path = device_get_path(dev);
+ 
+ 	DBG("path %s", path);
+ 
++	server = find_server(servers, adapter);
++	if (!server || !server->sink_enabled) {
++		DBG("Unexpected error: cannot find server");
++		return -EPROTONOSUPPORT;
++	}
++
++	/* Return protocol not available if no record/endpoint exists */
++	if (server->sink_record_id == 0)
++		return -ENOPROTOOPT;
++
+ 	return source_connect(service);
+ }
+ 
+@@ -1881,10 +1893,22 @@ static int a2dp_source_disconnect(struct btd_service *service)
+ static int a2dp_sink_connect(struct btd_service *service)
+ {
+ 	struct btd_device *dev = btd_service_get_device(service);
++	struct btd_adapter *adapter = device_get_adapter(dev);
++	struct a2dp_server *server;
+ 	const char *path = device_get_path(dev);
+ 
+ 	DBG("path %s", path);
+ 
++	server = find_server(servers, adapter);
++	if (!server || !server->source_enabled) {
++		DBG("Unexpected error: cannot find server");
++		return -EPROTONOSUPPORT;
++	}
++
++	/* Return protocol not available if no record/endpoint exists */
++	if (server->source_record_id == 0)
++		return -ENOPROTOOPT;
++
+ 	return sink_connect(service);
+ }
+ 
+-- 
+1.8.3.1
 
