@@ -1,78 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Huang Shijie <b32955@freescale.com>
-To: <gregkh@linuxfoundation.org>
-CC: <linux-serial@vger.kernel.org>, <marcel@holtmann.org>,
-	<linux-bluetooth@vger.kernel.org>, Huang Shijie <b32955@freescale.com>
-Subject: [PATCH RFC] tty_ldisc: add more limits to the @write_wakeup
-Date: Wed, 13 Nov 2013 15:30:03 +0800
-Message-ID: <1384327803-5925-1-git-send-email-b32955@freescale.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
+Subject: Re: shutdown(3) and bluetooth.
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20131113002819.GB12615@redhat.com>
+Date: Wed, 13 Nov 2013 10:58:43 +0900
+Cc: netdev@vger.kernel.org,
+	"linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <78727581-9350-4E23-95C6-5E7510C24A72@holtmann.org>
+References: <20131112211125.GA2912@redhat.com> <DF4C2B40-BD87-4E88-911D-E3E5F488CAE4@holtmann.org> <20131112221038.GA6689@redhat.com> <FC5CE013-B077-4EA5-81C1-A7D8B4A5EF85@holtmann.org> <20131112224819.GE9057@redhat.com> <D8BE686E-E81D-48CD-8D67-2B138191E0CC@holtmann.org> <20131113002819.GB12615@redhat.com>
+To: Dave Jones <davej@redhat.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In the uart_handle_cts_change(), uart_write_wakeup() is called after
-we call @uart_port->ops->start_tx().
+Hi Dave,
 
-The Documentation/serial/driver tells us:
------------------------------------------------
-  start_tx(port)
-	Start transmitting characters.
+>>> So it seems it affects both SCO and RFCOMM.
+>>> 
+>>>> What kernel did you run this against? It is a shot in the dark, but can you try linux-next quickly.
+>>>> There was a socket related fix for the socket options where we confused RFCOMM vs L2CAP struct sock.
+>>> 
+>>> first noticed it on Linus' latest HEAD, and then reproduced it on 3.11.6
+>>> I'll look at linux-next tomorrow.
+>> 
+>> I looked through the code and only call bt_sock_wait_state when SOCK_LINGER and sk_lingertime is set. In that case we actually block until the socket state changes to BT_CLOSED.
+>> 
+>> The only way I see this could happen is if you have a huge linger timeout and confused the socket state before. What is actually the list of system calls that you are throwing at this socket.
+> 
+> Ah. I recently changed some code that's now doing this on every socket at shutdown..
+> (simplified cut-n-paste)
+> 
+>        struct linger ling = { .l_onoff = FALSE, };
+> 
+>        for (i = 0; i < nr_sockets; i++) {
+>                fd = shm->sockets[i].fd;
+>                shm->sockets[i].fd = 0;
+> 
+>                setsockopt(fd, SOL_SOCKET, SO_LINGER, &ling, sizeof(struct linger));
+>                shutdown(fd, SHUT_RDWR);
+>                close(fd);
+>        }
+> 
+> I could just rip out that linger code completely and just hope that sockets staying in
+> TIME_WAIT is good enough. iirc, I added it when after multiple runs, some of the
+> weirder protocols would fail to open a socket once a certain number of existing
+> sockets had opened, even if they were in SOCK_WAIT
+> 
+> two remaining questions though. That code is setting linger to false. Why would
+> that cause the sk_lingertime to be taken into consideration ?  And why is this
+> only a problem for bluetooth (apparently) ?
 
-	Locking: port->lock taken.
-	Interrupts: locally disabled.
------------------------------------------------
+we are not touching that part of setsockopt. That is handled by net/core/sock.c and we just check if SOCK_LINGER flag is set and if we have a positive sk_lingertime. So this is a bit suspicious on why this is happening, but I don’t think it is our mistake.
 
-So when the uart_write_wakeup() is called, the port->lock is taken by
-the upper. See the following callstack:
+Regards
 
-	|_ uart_write_wakeup
-	   |_ tty_wakeup
-	      |_ ld->ops->write_wakeup
+Marcel
 
-With the port->lock held, we call the @write_wakeup. Some implemetation of
-the @write_wakeup does not notice that the port->lock is held, and it still
-tries to send data with uart_write() which will try to grab the prot->lock.
-A dead lock occurs, see the following log caught in the Bluetooth by uart:
-
---------------------------------------------------------------------
-BUG: spinlock lockup suspected on CPU#0, swapper/0/0
- lock: 0xdc3f4410, .magic: dead4ead, .owner: swapper/0/0, .owner_cpu: 0
-CPU: 0 PID: 0 Comm: swapper/0 Tainted: G        W    3.10.17-16839-ge4a1bef #1320
-[<80014cbc>] (unwind_backtrace+0x0/0x138) from [<8001251c>] (show_stack+0x10/0x14)
-[<8001251c>] (show_stack+0x10/0x14) from [<802816ac>] (do_raw_spin_lock+0x108/0x184)
-[<802816ac>] (do_raw_spin_lock+0x108/0x184) from [<806a22b0>] (_raw_spin_lock_irqsave+0x54/0x60)
-[<806a22b0>] (_raw_spin_lock_irqsave+0x54/0x60) from [<802f5754>] (uart_write+0x38/0xe0)
-[<802f5754>] (uart_write+0x38/0xe0) from [<80455270>] (hci_uart_tx_wakeup+0xa4/0x168)
-[<80455270>] (hci_uart_tx_wakeup+0xa4/0x168) from [<802dab18>] (tty_wakeup+0x50/0x5c)
-[<802dab18>] (tty_wakeup+0x50/0x5c) from [<802f81a4>] (imx_rtsint+0x50/0x80)
-[<802f81a4>] (imx_rtsint+0x50/0x80) from [<802f88f4>] (imx_int+0x158/0x17c)
-[<802f88f4>] (imx_int+0x158/0x17c) from [<8007abe0>] (handle_irq_event_percpu+0x50/0x194)
-[<8007abe0>] (handle_irq_event_percpu+0x50/0x194) from [<8007ad60>] (handle_irq_event+0x3c/0x5c)
---------------------------------------------------------------------
-
-This patch adds more limits to the @write_wakeup, the one who wants to
-implemet the @write_wakeup should follow the limits which avoid the deadlock.
-
-Signed-off-by: Huang Shijie <b32955@freescale.com>
----
- include/linux/tty_ldisc.h |    5 ++++-
- 1 files changed, 4 insertions(+), 1 deletions(-)
-
-diff --git a/include/linux/tty_ldisc.h b/include/linux/tty_ldisc.h
-index f15c898..539ccc5 100644
---- a/include/linux/tty_ldisc.h
-+++ b/include/linux/tty_ldisc.h
-@@ -91,7 +91,10 @@
-  *	This function is called by the low-level tty driver to signal
-  *	that line discpline should try to send more characters to the
-  *	low-level driver for transmission.  If the line discpline does
-- *	not have any more data to send, it can just return.
-+ *	not have any more data to send, it can just return. If the line
-+ *	discipline does have some data to send, please arise a tasklet
-+ *	or workqueue to do the real data transfer. Do not send data in
-+ *	this hook, it may leads to a deadlock.
-  *
-  * int (*hangup)(struct tty_struct *)
-  *
--- 
-1.7.2.rc3
