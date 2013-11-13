@@ -1,41 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Oprisenescu, CatalinX" <catalinx.oprisenescu@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "Trandafir, IonutX" <ionutx.trandafir@intel.com>
-Subject: bluetoothd failure after a "malloc retun NULL" injection
-Date: Wed, 13 Nov 2013 14:05:02 +0000
-Message-ID: <6522C4F948C6F5419BA5943E1E79DD2A8ABB96@IRSMSX104.ger.corp.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+Date: Wed, 13 Nov 2013 15:56:22 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFCv1 4/9] android/hal-sock: Initial listen handle
+Message-ID: <20131113135620.GH21468@aemeltch-MOBL1>
+References: <1384178627-25991-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1384178627-25991-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20131113121537.GA11291@x220.p-661hnu-f1>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20131113121537.GA11291@x220.p-661hnu-f1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Johan,
 
-Following is a issue encountered and handled using bluez-5.10 on a 32bit Tizen 2.0 IVI based distribution.
+On Wed, Nov 13, 2013 at 02:15:37PM +0200, Johan Hedberg wrote:
+> > +struct rfcomm_slot {
+> > +	int fd;
+> > +	int hal_fd;
+> > +	int real_sock;
+> > +	uint32_t channel;
+> > +};
+> 
+> You should really have comments here for what each struct member is used
+> for (you have this info in your cover letter but it should also be part
+> of the code). Why do you keep hal_fd here? Shouldn't we close it on our
+> side as soon as we've handed it over to the HAL?
 
-If malloc returns a random NULL bluetoothd exits with core dumped.
-In this case we do the following:
-      -start bluetoothd,
-      -at a random malloc call from any library (*lib*.so*), a random NULL will be returned by bluetoothd with a ld_preloaded library.
+Basically hal_fd is needed until it is passed to the Android framework.
 
-~# LD_PRELOAD=/root/lib_wrapper.so /usr/libexec/bluetooth/bluetoothd -E
+Do you want it to be like this:
 
-Analizyng the dump, it points directly to a DBUS_ERROR_NO_MEMORY which, after handling, keeps bluetoothd from dumping and allowing it to return the fatal error occurred as exit status, thus failing gracefully.
+int hal_fd;
+rfslot = create_rfslot(&hal_fd, int sock);
 
-A fix proposal, handling the use-case is attached.
+send(hal_fd);
+close(hal_fd);
 
-
-Regards,
-Calin Oprisenescu.
-
---------------------------------------------------------------
-Intel Shannon Limited
-Registered in Ireland
-Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
-Registered Number: 308263
-Business address: Dromore House, East Park, Shannon, Co. Clare
-
-This e-mail and any attachments may contain confidential material for the sole use of the intended recipient(s). Any review or distribution by others is strictly prohibited. If you are not the intended recipient, please contact the sender and delete all copies.
-
+Best regards 
+Andrei Emeltchenko 
 
