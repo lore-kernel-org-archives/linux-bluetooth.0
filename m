@@ -1,38 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/2] android: Shutdown if IPC command for unregistered service is received
-Date: Wed, 13 Nov 2013 15:47:12 +0100
-Message-ID: <1384354033-21724-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] android/hidhost: Use correct error structure
+Date: Wed, 13 Nov 2013 16:29:34 +0200
+Message-Id: <1384352974-24036-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1384352974-24036-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1384352974-24036-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Sending commands to not registered services is violation of IPC spec
-and should result in daemon shutdown.
----
- android/main.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/android/main.c b/android/main.c
-index 36cc8aa..12284f7 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -252,6 +252,12 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
- 	DBG("service_id %u opcode %u len %u", msg->service_id, msg->opcode,
- 								msg->len);
+---
+ android/hidhost.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/android/hidhost.c b/android/hidhost.c
+index ff3eae0..3c1f074 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -1128,12 +1128,12 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 		return;
+ 	}
  
-+	if (msg->service_id > HAL_SERVICE_ID_MAX ||
-+						!services[msg->service_id]) {
-+		error("HAL command of not registered service, terminating");
-+		goto fail;
-+	}
-+
- 	switch (msg->service_id) {
- 	case HAL_SERVICE_ID_CORE:
- 		handle_service_core(msg->opcode, msg->payload, msg->len);
+-	bt_io_get(chan, &err,
++	bt_io_get(chan, &gerr,
+ 			BT_IO_OPT_SOURCE_BDADDR, &src,
+ 			BT_IO_OPT_DEST_BDADDR, &dst,
+ 			BT_IO_OPT_PSM, &psm,
+ 			BT_IO_OPT_INVALID);
+-	if (err) {
++	if (gerr) {
+ 		error("%s", gerr->message);
+ 		g_io_channel_shutdown(chan, TRUE, NULL);
+ 		g_error_free(gerr);
 -- 
-1.8.4.2
+1.7.10.4
 
