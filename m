@@ -1,30 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] android/hidhost: Fix memory leak
-Date: Wed, 13 Nov 2013 16:29:33 +0200
-Message-Id: <1384352974-24036-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 13 Nov 2013 09:02:40 -0500
+From: "John W. Linville" <linville@tuxdriver.com>
+To: David Miller <davem@davemloft.net>
+Cc: davej@redhat.com, netdev@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: Re: shutdown(3) and bluetooth.
+Message-ID: <20131113140239.GA2154@tuxdriver.com>
+References: <20131112211125.GA2912@redhat.com>
+ <20131112.161350.946584501122269943.davem@davemloft.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20131112.161350.946584501122269943.davem@davemloft.net>
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Tue, Nov 12, 2013 at 04:13:50PM -0500, David Miller wrote:
+> From: Dave Jones <davej@redhat.com>
+> Date: Tue, 12 Nov 2013 16:11:25 -0500
+> 
+> > Is shutdown() allowed to block indefinitely ? The man page doesn't say either way,
+> > and I've noticed that my fuzz tester occasionally hangs for days spinning in bt_sock_wait_state()
+> > 
+> > Is there something I should be doing to guarantee that this operation
+> > will either time out, or return instantly ?
+> > 
+> > In this specific case, I doubt anything is on the "sender" end of the socket, so
+> > it's going to be waiting forever for a state change that won't arrive.
+> 
+> Adding bluetooth and wireless lists.  Dave, please consult MAINTAINERS when
+> asking questions like this, thanks!
 
----
- android/hidhost.c |    1 +
- 1 file changed, 1 insertion(+)
+I don't have an authoritative answer.  I do, however, seem to recall
+that trying to shutdown a SunOS box with a hung NFS mount would seem
+to hang forever.  I don't think that is a great metric for how we
+should behave, of course...
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index 910014f..ff3eae0 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -1136,6 +1136,7 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- 	if (err) {
- 		error("%s", gerr->message);
- 		g_io_channel_shutdown(chan, TRUE, NULL);
-+		g_error_free(gerr);
- 		return;
- 	}
- 
+John
 -- 
-1.7.10.4
-
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
