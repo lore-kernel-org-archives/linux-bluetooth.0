@@ -1,40 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 13 Nov 2013 19:50:06 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] android: Shutdown if IPC command for unregistered
+ service is received
+Message-ID: <20131113175006.GA24681@x220.p-661hnu-f1>
+References: <1384354033-21724-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
-Subject: Re: Adapter name reset on suspend/resume
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1384350278.5071.6.camel@nuvo>
-Date: Thu, 14 Nov 2013 08:28:29 +0900
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <130CE89B-A508-4FB9-B7EA-35D500742EC1@holtmann.org>
-References: <1384350278.5071.6.camel@nuvo>
-To: Bastien Nocera <hadess@hadess.net>
+In-Reply-To: <1384354033-21724-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Szymon,
 
-> After suspending and resuming my laptop, hci0's name is reset to what
-> looks like the factory name:
-> $ hciconfig -a | grep Name
-> 	Name: 'BCM20702A'
-> 
-> This is the device in question:
-> Bus 001 Device 004: ID 0a5c:21e6 Broadcom Corp. BCM20702 Bluetooth 4.0 [ThinkPad]
-> 
-> And my laptop is a Lenovo X1 Carbon.
-> 
-> Neither udevadm nor btmon show the device going away on suspend and
-> coming back on resume.
+On Wed, Nov 13, 2013, Szymon Janc wrote:
+> Sending commands to not registered services is violation of IPC spec
+> and should result in daemon shutdown.
+> ---
+>  android/main.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 
-can you start btmon, call hciconfig hci0 name, then suspend, then resume, call hciconfig hci0 name again.
+Both patches have been applied (with some minor tweaks). Thanks.
 
-I am wondering if for some reason the suspend/resume actually does a HCI Reset without telling us. The name normally only gets reset to BCM20702A when doing a full reset.
-
-Another possibility is that we actually forgot to set it in the first place. I am pretty sure I have intensively tested and that should not happen, but you might just found a corner case.
-
-Regards
-
-Marcel
-
+Johan
