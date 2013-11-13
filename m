@@ -1,35 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ 3/3] input: Fix setting .local_uuid
-Date: Wed, 13 Nov 2013 10:53:33 +0200
-Message-Id: <1384332813-7891-4-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1384332813-7891-1-git-send-email-luiz.dentz@gmail.com>
-References: <1384332813-7891-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC BlueZ 0/3] Check if profile local_uuid is enabled
+Date: Wed, 13 Nov 2013 10:53:30 +0200
+Message-Id: <1384332813-7891-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-By setting .local_uuid it makes the core do a scrict check on uuids
-enabled for the adapter but HID host does not have a record so it
-does not require a .local_uuid to be set.
----
- profiles/input/manager.c | 1 -
- 1 file changed, 1 deletion(-)
+This attempts to solve a problem with certain APIs that are adapter bond
+such as Media interface and adapter_service_add as opposed to btd_profile
+that is valid for every adapter.
 
-diff --git a/profiles/input/manager.c b/profiles/input/manager.c
-index 689ccdd..b12b43e 100644
---- a/profiles/input/manager.c
-+++ b/profiles/input/manager.c
-@@ -57,7 +57,6 @@ static void hid_server_remove(struct btd_profile *p,
- 
- static struct btd_profile input_profile = {
- 	.name		= "input-hid",
--	.local_uuid	= HID_UUID,
- 	.remote_uuid	= HID_UUID,
- 
- 	.auto_connect	= true,
+Making Media API to be available on /org/bluez and perhaps tight btd_profile
+and adapter_service_add should solve the problem in the long term but since
+we cannot just break the API this is probably still necessary.
+
+Luiz Augusto von Dentz (3):
+  core/device: Only connect profiles which are enabled
+  audio/A2DP: Set profile .local_uuid properly
+  input: Fix setting .local_uuid
+
+ profiles/audio/a2dp.c    |  2 ++
+ profiles/input/manager.c |  1 -
+ src/device.c             | 35 ++++++++++++++++++++++++++++++-----
+ 3 files changed, 32 insertions(+), 6 deletions(-)
+
 -- 
 1.8.3.1
 
