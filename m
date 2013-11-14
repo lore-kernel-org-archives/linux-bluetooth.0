@@ -1,47 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] core: Do not change service state in btd_service_connect if it fails
-Date: Thu, 14 Nov 2013 14:27:51 +0200
-Message-Id: <1384432071-2703-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 14 Nov 2013 14:26:25 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/7] android/hal-a2dp: Use conn_state instead of
+ connection_state
+Message-ID: <20131114122625.GA22596@x220.p-661hnu-f1>
+References: <1384424301-31265-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1384424301-31265-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Luiz,
 
-If .connect fails and the service state changes it may re-enter
-connect_next, inverting the order and messing up the error of each
-connect request.
----
- src/service.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+On Thu, Nov 14, 2013, Luiz Augusto von Dentz wrote:
+> This is shorter and more consistent with other HAL such as HID.
+> ---
+>  android/hal-a2dp.c | 8 ++++----
+>  android/hal-msg.h  | 6 +++---
+>  2 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/src/service.c b/src/service.c
-index 52a8291..7a480d6 100644
---- a/src/service.c
-+++ b/src/service.c
-@@ -198,18 +198,16 @@ int btd_service_connect(struct btd_service *service)
- 		return -EBUSY;
- 	}
- 
--	change_state(service, BTD_SERVICE_STATE_CONNECTING, 0);
--
- 	err = profile->connect(service);
--	if (err == 0)
-+	if (err == 0) {
-+		change_state(service, BTD_SERVICE_STATE_CONNECTING, 0);
- 		return 0;
-+	}
- 
- 	ba2str(device_get_address(service->device), addr);
- 	error("%s profile connect failed for %s: %s", profile->name, addr,
- 								strerror(-err));
- 
--	btd_service_connecting_complete(service, err);
--
- 	return err;
- }
- 
--- 
-1.8.3.1
+Applied with the couple of tweaks that we discussed offline. Thanks.
 
+Johan
