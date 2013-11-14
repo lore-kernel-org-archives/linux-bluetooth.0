@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 03/16] android/hal-sock: Add connect signal to socket
-Date: Thu, 14 Nov 2013 17:11:42 +0200
-Message-Id: <1384441915-23966-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 16/16] android/hal-sock: Close file descriptor after sending
+Date: Thu, 14 Nov 2013 17:11:55 +0200
+Message-Id: <1384441915-23966-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384441915-23966-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384441915-23966-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,44 +11,30 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Connect signal is used to pass information to framework that socket
-is accepted.
 ---
- android/hal-msg.h |    2 ++
- android/socket.h  |    7 +++++++
- 2 files changed, 9 insertions(+)
+ android/socket.c |    2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 44fd5c8..9e3a81f 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -232,6 +232,8 @@ struct hal_cmd_sock_connect {
- 	uint8_t  flags;
- } __attribute__((packed));
+diff --git a/android/socket.c b/android/socket.c
+index 742c156..a2193cc 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -545,6 +545,7 @@ void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+ 			break;
  
-+/* Bluetooth Hidhost HAL api */
-+
- #define HAL_OP_HIDHOST_CONNECT		0x01
- struct hal_cmd_hidhost_connect {
- 	uint8_t bdaddr[6];
-diff --git a/android/socket.h b/android/socket.h
-index 7aa5574..ba56c9b 100644
---- a/android/socket.h
-+++ b/android/socket.h
-@@ -21,6 +21,13 @@
-  *
-  */
+ 		ipc_send(sk, HAL_SERVICE_ID_SOCK, opcode, 0, NULL, fd);
++		close(fd);
+ 		return;
+ 	case HAL_OP_SOCK_CONNECT:
+ 		fd = handle_connect(buf);
+@@ -552,6 +553,7 @@ void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+ 			break;
  
-+struct hal_sock_connect_signal {
-+	short   size;
-+	uint8_t bdaddr[6];
-+	int     channel;
-+	int     status;
-+} __attribute__((packed));
-+
- void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len);
- 
- bool bt_socket_register(int sk, const bdaddr_t *addr);
+ 		ipc_send(sk, HAL_SERVICE_ID_SOCK, opcode, 0, NULL, fd);
++		close(fd);
+ 		return;
+ 	default:
+ 		DBG("Unhandled command, opcode 0x%x", opcode);
 -- 
 1.7.10.4
 
