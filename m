@@ -1,58 +1,206 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 14 Nov 2013 10:19:37 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"Oprisenescu, CatalinX" <catalinx.oprisenescu@intel.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Trandafir, IonutX" <ionutx.trandafir@intel.com>
-Subject: Re: bluetoothd failure after a "malloc retun NULL" injection
- (attachment fix)
-Message-ID: <20131114081937.GA2019@x220.p-661hnu-f1>
-References: <6522C4F948C6F5419BA5943E1E79DD2A8ABBAE@IRSMSX104.ger.corp.intel.com>
- <CABBYNZJSdzsuuzEJctKo_UiKExX4_XXW+zzphhZcHzCuOoLBwg@mail.gmail.com>
- <E03FE70C-ECC4-4D7D-917E-6F3E92297C1C@holtmann.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <E03FE70C-ECC4-4D7D-917E-6F3E92297C1C@holtmann.org>
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
+Subject: Re: [RFC v4 6/6] Bluetooth: Manually enable or disable 6LoWPAN between devices
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1384337495-9043-7-git-send-email-jukka.rissanen@linux.intel.com>
+Date: Thu, 14 Nov 2013 17:07:38 +0900
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <99EA997B-6523-452E-BFA2-9B394B901ABA@holtmann.org>
+References: <1384337495-9043-1-git-send-email-jukka.rissanen@linux.intel.com> <1384337495-9043-7-git-send-email-jukka.rissanen@linux.intel.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Jukka,
 
-On Thu, Nov 14, 2013, Marcel Holtmann wrote:
-> >> Following is an issue encountered and handled using bluez-5.10 on a
-> >> 32bit Tizen 2.0 IVI based distribution.
-> >> 
-> >> If malloc returns a random NULL bluetoothd exits with core dumped.
-> >> In this case we do the following:
-> >>      -start bluetoothd,
-> >>      -at a random malloc call from any library (*lib*.so*), a random NULL will be returned by bluetoothd with a ld_preloaded library.
-> >> 
-> >> ~# LD_PRELOAD=/root/lib_wrapper.so /usr/libexec/bluetooth/bluetoothd -E
-> >> 
-> >> Analyzing the dump, it points directly to a DBUS_ERROR_NO_MEMORY
-> >> which, after handling, keeps bluetoothd from dumping and allowing
-> >> it to return the fatal error occurred as exit status, thus failing
-> >> gracefully.
-> >> 
-> >> A fix proposal, handling the use-case is attached.
-> > 
-> > Im afraid if we start treating all the out of memory cases we wont
-> > have time to do anything else, and quite frankly if this happens for
-> > real the least concern would be bluetoothd, so I believe we should
-> > just treat OOM cases as unrecoverable. Since this can happen with any
-> > dbus_error, I would probably suggest to wrap it perhaps we a
-> > g_dbus_error API that does assert in OOM.
+> This is a temporary patch where user can manually enable or
+> disable BT 6LoWPAN functionality between devices.
+> Eventually the connection is established automatically if
+> the devices are advertising suitable capability and this patch
+> can be removed.
 > 
-> I am fine with fixing obvious ones. However long-term these tiny sized
-> memory allocation must just abort the program if we run out of memory.
-> Since there is no recovery from it anyway.
+> Before connecting the devices do this
+> 
+> echo 1 > /sys/kernel/debug/bluetooth/hci0/6lowpan
+> 
+> This enables 6LoWPAN support and creates the bt0 interface
+> automatically when devices are finally connected.
+> 
+> Rebooting or unloading the bluetooth kernel module will also clear the
+> settings from the kernel.
+> 
+> Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+> ---
+> net/bluetooth/6lowpan.c  | 105 +++++++++++++++++++++++++++++++++++++++++++++++
+> net/bluetooth/6lowpan.h  |   1 +
+> net/bluetooth/hci_core.c |   4 ++
+> 3 files changed, 110 insertions(+)
+> 
+> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+> index 5f0489c..579a75f 100644
+> --- a/net/bluetooth/6lowpan.c
+> +++ b/net/bluetooth/6lowpan.c
+> @@ -26,6 +26,8 @@
+>  */
+> 
+> #include <linux/version.h>
+> +#include <linux/debugfs.h>
+> +#include <linux/string.h>
+> #include <linux/bitops.h>
+> #include <linux/if_arp.h>
+> #include <linux/netdevice.h>
+> @@ -1571,6 +1573,109 @@ static struct notifier_block bt_6lowpan_dev_notifier = {
+> 	.notifier_call = device_event,
+> };
+> 
+> +static LIST_HEAD(user_enabled);
+> +DEFINE_RWLOCK(enabled_lock);
 
-Did you actually take a look at the patch? It's not exactly fixing any
-missing error checks but only modifying the behavior if the error is OOM
-by not doing a g_printerr call in that case. However, the main()
-function still does an error() call when connect_dbus() returns failure
-(even if it's -ENOMEM) so I don't really see how this particular patch
-would fix any obvious OOM handling issue.
+make this one static as well.
 
-Johan
+> +
+> +struct lowpan_enabled {
+> +	__u8 dev_name[HCI_MAX_NAME_LENGTH];
+> +	bool enabled;
+> +	struct list_head list;
+> +};
+> +
+> +static int debugfs_show(struct seq_file *f, void *p)
+> +{
+> +	struct lowpan_enabled *entry, *tmp;
+> +	bool found = false;
+> +
+> +	write_lock(&enabled_lock);
+> +	list_for_each_entry_safe(entry, tmp, &user_enabled, list) {
+> +		seq_printf(f, "%d\n", entry->enabled);
+> +		found = true;
+> +	}
+> +	write_unlock(&enabled_lock);
+> +
+> +	if (!found)
+> +		seq_printf(f, "0\n");
+> +
+> +	return 0;
+> +}
+
+So I do not get this one. Why not just use the bit set in hci_dev. This looks like just wrong.
+
+> +
+> +static int debugfs_open(struct inode *inode, struct file *file)
+> +{
+> +	return single_open(file, debugfs_show, inode->i_private);
+> +}
+> +
+> +static ssize_t writer(struct file *fp, const char __user *user_buffer,
+> +		size_t count, loff_t *position)
+> +{
+> +	struct hci_dev *hdev = fp->f_inode->i_private;
+> +	struct lowpan_enabled *entry = NULL, *tmp;
+> +	bool new_value, old_value;
+> +	char buf[3] = { 0 };
+> +	ssize_t ret;
+> +
+> +	BT_DBG("dev %s count %zd", hdev->dev_name, count);
+> +
+> +        ret = simple_write_to_buffer(buf, 2, position, user_buffer, count);
+> +	if (ret <= 0)
+> +		return ret;
+> +
+> +	if (strtobool(buf, &new_value) < 0)
+> +		return -EINVAL;
+> +
+> +	ret = -ENOENT;
+> +
+> +	write_lock(&enabled_lock);
+> +	list_for_each_entry_safe(entry, tmp, &user_enabled, list) {
+> +		if (!strncmp(entry->dev_name, hdev->dev_name,
+> +						HCI_MAX_NAME_LENGTH)) {
+> +			old_value = entry->enabled;
+> +			entry->enabled = new_value;
+> +			ret = 0;
+> +			break;
+> +		}
+> +	}
+> +	write_unlock(&enabled_lock);
+> +
+> +	if (ret == 0 && old_value == new_value)
+> +		return count;
+> +
+> +	if (ret < 0) {
+> +		entry = kzalloc(sizeof(*entry), GFP_KERNEL);
+> +		if (!entry)
+> +			return -ENOMEM;
+> +
+> +		strncpy(entry->dev_name, hdev->dev_name, HCI_MAX_NAME_LENGTH);
+> +		entry->enabled = new_value;
+> +
+> +		write_lock(&enabled_lock);
+> +		INIT_LIST_HEAD(&entry->list);
+> +		list_add(&entry->list, &user_enabled);
+> +		write_unlock(&enabled_lock);
+> +	}
+> +
+> +	if (new_value == true)
+> +		set_bit(HCI_6LOWPAN_ENABLED, &hdev->dev_flags);
+> +	else
+> +		clear_bit(HCI_6LOWPAN_ENABLED, &hdev->dev_flags);
+> +
+> +	return count;
+> +}
+> +
+> +static const struct file_operations ble_6lowpan_debugfs_fops = {
+> +	.open		= debugfs_open,
+> +	.read		= seq_read,
+> +	.write		= writer,
+> +	.llseek		= seq_lseek,
+> +	.release	= single_release,
+> +};
+> +
+> +void bt_6lowpan_add_debugfs(struct hci_dev *hdev)
+> +{
+> +	debugfs_create_file("6lowpan", 0644, hdev->debugfs, hdev,
+> +			&ble_6lowpan_debugfs_fops);
+> +}
+> +
+> int bt_6lowpan_init(void)
+> {
+> 	return register_netdevice_notifier(&bt_6lowpan_dev_notifier);
+> diff --git a/net/bluetooth/6lowpan.h b/net/bluetooth/6lowpan.h
+> index 680eac8..5f60cf2 100644
+> --- a/net/bluetooth/6lowpan.h
+> +++ b/net/bluetooth/6lowpan.h
+> @@ -22,5 +22,6 @@ int bt_6lowpan_add_conn(struct l2cap_conn *conn);
+> int bt_6lowpan_del_conn(struct l2cap_conn *conn);
+> int bt_6lowpan_init(void);
+> void bt_6lowpan_cleanup(void);
+> +void bt_6lowpan_add_debugfs(struct hci_dev *hdev);
+> 
+> #endif /* __6LOWPAN_H */
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 03e8355..a229ce0 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -34,6 +34,8 @@
+> #include <net/bluetooth/bluetooth.h>
+> #include <net/bluetooth/hci_core.h>
+> 
+> +#include "6lowpan.h"
+> +
+> static void hci_rx_work(struct work_struct *work);
+> static void hci_cmd_work(struct work_struct *work);
+> static void hci_tx_work(struct work_struct *work);
+> @@ -1408,6 +1410,8 @@ static int __hci_init(struct hci_dev *hdev)
+> 				    hdev, &conn_max_interval_fops);
+> 	}
+> 
+> +	bt_6lowpan_add_debugfs(hdev);
+> +
+
+Since we only set the HCI_6LOWPAN_ENABLED bit, why not move this whole code into hci_core.c. It is just setting the bit, right?
+
+Regards
+
+Marcel
+
