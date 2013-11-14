@@ -1,63 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 14 Nov 2013 10:19:37 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"Oprisenescu, CatalinX" <catalinx.oprisenescu@intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Trandafir, IonutX" <ionutx.trandafir@intel.com>
+Subject: Re: bluetoothd failure after a "malloc retun NULL" injection
+ (attachment fix)
+Message-ID: <20131114081937.GA2019@x220.p-661hnu-f1>
+References: <6522C4F948C6F5419BA5943E1E79DD2A8ABBAE@IRSMSX104.ger.corp.intel.com>
+ <CABBYNZJSdzsuuzEJctKo_UiKExX4_XXW+zzphhZcHzCuOoLBwg@mail.gmail.com>
+ <E03FE70C-ECC4-4D7D-917E-6F3E92297C1C@holtmann.org>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
-Subject: Re: [PATCH] Enable autosuspend for Intel Bluetooth device
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20131112131641.76cd6c5f@han1-desk-dev>
-Date: Thu, 14 Nov 2013 17:19:51 +0900
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>, Don Fry <don.fry@intel.com>
-Message-Id: <A5E1C194-6EBD-43D9-8B93-C97077165229@holtmann.org>
-References: <20131112131641.76cd6c5f@han1-desk-dev>
-To: Tedd Ho-Jeong An <tedd.an@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <E03FE70C-ECC4-4D7D-917E-6F3E92297C1C@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tedd,
+Hi Marcel,
 
-> This patch enables autosuspend for Intel Bluetooth device.
+On Thu, Nov 14, 2013, Marcel Holtmann wrote:
+> >> Following is an issue encountered and handled using bluez-5.10 on a
+> >> 32bit Tizen 2.0 IVI based distribution.
+> >> 
+> >> If malloc returns a random NULL bluetoothd exits with core dumped.
+> >> In this case we do the following:
+> >>      -start bluetoothd,
+> >>      -at a random malloc call from any library (*lib*.so*), a random NULL will be returned by bluetoothd with a ld_preloaded library.
+> >> 
+> >> ~# LD_PRELOAD=/root/lib_wrapper.so /usr/libexec/bluetooth/bluetoothd -E
+> >> 
+> >> Analyzing the dump, it points directly to a DBUS_ERROR_NO_MEMORY
+> >> which, after handling, keeps bluetoothd from dumping and allowing
+> >> it to return the fatal error occurred as exit status, thus failing
+> >> gracefully.
+> >> 
+> >> A fix proposal, handling the use-case is attached.
+> > 
+> > Im afraid if we start treating all the out of memory cases we wont
+> > have time to do anything else, and quite frankly if this happens for
+> > real the least concern would be bluetoothd, so I believe we should
+> > just treat OOM cases as unrecoverable. Since this can happen with any
+> > dbus_error, I would probably suggest to wrap it perhaps we a
+> > g_dbus_error API that does assert in OOM.
 > 
-> After btusb is loaded for Intel Bluetooth device, the power/control
-> attribute contains "on" value by default which disables the autosuspend.
-> Based on the USB PM document(Documentation/usb/power-management.txt),
-> kernel disabled the autosuspend for all devices other than hub by default.
-> 
-> "The USB specification states that all USB devices must support power
-> management.  Nevertheless, the sad fact is that many devices do not
-> support it very well.  You can suspend them all right, but when you
-> try to resume them they disconnect themselves from the USB bus or
-> they stop working entirely.  This seems to be especially prevalent
-> among printers and scanners, but plenty of other types of device have
-> the same deficiency.
-> 
-> For this reason, by default the kernel disables autosuspend (the
-> power/control attribute is initialized to "on") for all devices other
-> than hubs.  Hubs, at least, appear to be reasonably well-behaved in
-> this regard."
-> 
-> This document also described how the driver can enables the autosuspend
-> by using an USB api.
-> 
-> "Drivers can enable autosuspend for their devices by calling
-> 
-> 	usb_enable_autosuspend(struct usb_device *udev);
-> 
-> in their probe() routine, if they know that the device is capable of
-> suspending and resuming correctly.  This is exactly equivalent to
-> writing "auto" to the device's power/control attribute."
-> 
-> For Intel Bluetooth device, the autosuspend needs to be enabled so the
-> device can transit to LPM(Low Power Mode) and ULPM(Ultra LPM) states after
-> receiving suspend message from the host.
-> 
-> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
-> ---
-> drivers/bluetooth/btusb.c |    4 +++-
-> 1 file changed, 3 insertions(+), 1 deletion(-)
+> I am fine with fixing obvious ones. However long-term these tiny sized
+> memory allocation must just abort the program if we run out of memory.
+> Since there is no recovery from it anyway.
 
-patch has been applied to bluetooth-next tree.
+Did you actually take a look at the patch? It's not exactly fixing any
+missing error checks but only modifying the behavior if the error is OOM
+by not doing a g_printerr call in that case. However, the main()
+function still does an error() call when connect_dbus() returns failure
+(even if it's -ENOMEM) so I don't really see how this particular patch
+would fix any obvious OOM handling issue.
 
-Regards
-
-Marcel
-
+Johan
