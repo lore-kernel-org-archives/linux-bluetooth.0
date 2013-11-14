@@ -1,60 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1384421473.2229.1.camel@nuvo>
-Subject: Re: Adapter name reset on suspend/resume
-From: Bastien Nocera <hadess@hadess.net>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org development"
-	 <linux-bluetooth@vger.kernel.org>
-Date: Thu, 14 Nov 2013 10:31:13 +0100
-In-Reply-To: <130CE89B-A508-4FB9-B7EA-35D500742EC1@holtmann.org>
-References: <1384350278.5071.6.camel@nuvo>
-	 <130CE89B-A508-4FB9-B7EA-35D500742EC1@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Date: Thu, 14 Nov 2013 11:05:26 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/debug: Move debug functions to hal-utils.c
+Message-ID: <20131114090526.GA7427@x220.p-661hnu-f1>
+References: <1384413276-29884-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1384413276-29884-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2013-11-14 at 08:28 +0900, Marcel Holtmann wrote:
-> Hi Bastien,
-> 
-> > After suspending and resuming my laptop, hci0's name is reset to what
-> > looks like the factory name:
-> > $ hciconfig -a | grep Name
-> > 	Name: 'BCM20702A'
-> > 
-> > This is the device in question:
-> > Bus 001 Device 004: ID 0a5c:21e6 Broadcom Corp. BCM20702 Bluetooth 4.0 [ThinkPad]
-> > 
-> > And my laptop is a Lenovo X1 Carbon.
-> > 
-> > Neither udevadm nor btmon show the device going away on suspend and
-> > coming back on resume.
-> 
-> can you start btmon, call hciconfig hci0 name, then suspend, then
-> resume, call hciconfig hci0 name again.
+Hi Andrei,
 
-Bluetooth monitor ver 5.10
-= New Index: F4:B7:E2:E8:99:E2 (BR/EDR,USB,hci0)                   [hci0] 0.176335
-< HCI Command: Read Local Name (0x03|0x0014) plen 0                [hci0] 9.797930
-> HCI Event: Command Complete (0x0e) plen 252                      [hci0] 9.813834
-      Read Local Name (0x03|0x0014) ncmd 1
-        Status: Success (0x00)
-        Name: nuvo
-< HCI Command: Read Local Name (0x03|0x0014) plen 0               [hci0] 33.109166
-> HCI Event: Command Complete (0x0e) plen 252                     [hci0] 33.125157
-      Read Local Name (0x03|0x0014) ncmd 1
-        Status: Success (0x00)
-        Name: BCM20702A
+On Thu, Nov 14, 2013, Andrei Emeltchenko wrote:
+> Debug functions will be used by HALs and haltest.
+> ---
+>  android/Android.mk        |    2 -
+>  android/Makefile.am       |    3 -
+>  android/client/if-av.c    |    1 +
+>  android/client/if-bt.c    |    1 +
+>  android/client/if-hf.c    |    1 +
+>  android/client/if-hh.c    |    1 +
+>  android/client/if-main.h  |    2 -
+>  android/client/if-pan.c   |    1 +
+>  android/client/if-sock.c  |    1 +
+>  android/client/textconv.c |  300 ---------------------------------------------
+>  android/client/textconv.h |  120 ------------------
+>  android/hal-bluetooth.c   |    3 +-
+>  android/hal-utils.c       |  269 ++++++++++++++++++++++++++++++++++++++++
+>  android/hal-utils.h       |  103 ++++++++++++++++
+>  14 files changed, 379 insertions(+), 429 deletions(-)
+>  delete mode 100644 android/client/textconv.c
+>  delete mode 100644 android/client/textconv.h
 
-> I am wondering if for some reason the suspend/resume actually does a
-> HCI Reset without telling us. The name normally only gets reset to
-> BCM20702A when doing a full reset.
+Applied. Thanks.
 
-Looks like that's what it's doing.
-
-> Another possibility is that we actually forgot to set it in the first
-> place. I am pretty sure I have intensively tested and that should not
-> happen, but you might just found a corner case.
-
-It's set on a normal boot, it seems to be reset only when suspending.
-
-Cheers
+Johan
