@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 01/16] android/hal-sock: Add debug flag printing
-Date: Thu, 14 Nov 2013 17:11:40 +0200
-Message-Id: <1384441915-23966-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 13/16] android/hal-sock: Implement HAL connect call
+Date: Thu, 14 Nov 2013 17:11:52 +0200
+Message-Id: <1384441915-23966-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384441915-23966-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384441915-23966-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,36 +11,66 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+HAL connect uses similar event handlers like listen call.
 ---
- android/hal-sock.c |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ android/socket.c |   43 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 42 insertions(+), 1 deletion(-)
 
-diff --git a/android/hal-sock.c b/android/hal-sock.c
-index b7bc88e..eafa451 100644
---- a/android/hal-sock.c
-+++ b/android/hal-sock.c
-@@ -55,8 +55,8 @@ static bt_status_t sock_listen(btsock_type_t type, const char *service_name,
- 		return BT_STATUS_PARM_INVALID;
- 	}
+diff --git a/android/socket.c b/android/socket.c
+index 73e86ba..3c4e2fc 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -362,8 +362,49 @@ static int handle_listen(void *buf)
+ 	return hal_fd;
+ }
  
--	DBG("uuid %s chan %d sock %p type %d service_name %s",
--			btuuid2str(uuid), chan, sock, type, service_name);
-+	DBG("uuid %s chan %d sock %p type %d service_name %s flags 0x%02x",
-+		btuuid2str(uuid), chan, sock, type, service_name, flags);
+-static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
++static void connect_cb(GIOChannel *io, GError *conn_err, gpointer user_data)
+ {
++	struct rfcomm_slot *rfslot = user_data;
++	GIOChannel *io_stack;
++	GError *io_err = NULL;
++	bdaddr_t dst;
++	char address[18];
++	int chan = -1;
++
++	bt_io_get(io, &io_err,
++			BT_IO_OPT_DEST_BDADDR, &dst,
++			BT_IO_OPT_INVALID);
++	if (io_err) {
++		error("%s", io_err->message);
++		g_error_free(io_err);
++		goto fail;
++	}
++
++	if (conn_err) {
++		error("%s", conn_err->message);
++		goto fail;
++	}
++
++	ba2str(&dst, address);
++	DBG("Connected to %s rfslot %p chan %d", address, rfslot, chan);
++
++	DBG("rfslot: fd %d real_sock %d chan %u sock %d",
++		rfslot->fd, rfslot->real_sock, rfslot->channel,
++		g_io_channel_unix_get_fd(io));
++
++	/* Handle events from Android */
++	io_stack = g_io_channel_unix_new(rfslot->fd);
++	g_io_add_watch(io_stack, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++						sock_stack_event_cb, rfslot);
++	g_io_channel_unref(io_stack);
++
++	/* Handle rfcomm events */
++	g_io_add_watch(io, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++				sock_rfcomm_event_cb, rfslot);
++
++	return;
++fail:
++	cleanup_rfslot(rfslot);
+ }
  
- 	switch (type) {
- 	case BTSOCK_RFCOMM:
-@@ -82,8 +82,8 @@ static bt_status_t sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
- 		return BT_STATUS_PARM_INVALID;
- 	}
- 
--	DBG("uuid %s chan %d sock %p type %d", btuuid2str(uuid), chan, sock,
--									type);
-+	DBG("uuid %s chan %d sock %p type %d flags 0x%02x",
-+		btuuid2str(uuid), chan, sock, type, flags);
- 
- 	if (type != BTSOCK_RFCOMM) {
- 		error("Socket type %u not supported", type);
+ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
 -- 
 1.7.10.4
 
