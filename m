@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 15/16] android/hal-sock: Send connect signal on connect
-Date: Thu, 14 Nov 2013 17:11:54 +0200
-Message-Id: <1384441915-23966-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 14/16] android/hal-sock: Send RFCOMM channel to framework
+Date: Thu, 14 Nov 2013 17:11:53 +0200
+Message-Id: <1384441915-23966-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384441915-23966-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384441915-23966-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,60 +11,27 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Android framework expects connect signal to be sent when
-remote device is connected.
+Framework expects channel to be send.
 ---
- android/socket.c |   30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ android/socket.c |    5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/android/socket.c b/android/socket.c
-index 905def2..742c156 100644
+index 3c4e2fc..905def2 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -362,6 +362,33 @@ static int handle_listen(void *buf)
- 	return hal_fd;
- }
+@@ -462,6 +462,11 @@ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ 		goto fail;
+ 	}
  
-+static ssize_t sock_send_connect(struct rfcomm_slot *rfslot, bdaddr_t *bdaddr)
-+{
-+	struct hal_sock_connect_signal cmd;
-+	ssize_t len;
-+
-+	DBG("");
-+
-+	memset(&cmd, 0, sizeof(cmd));
-+	cmd.size = sizeof(cmd);
-+	bdaddr2android(bdaddr, cmd.bdaddr);
-+	cmd.channel = rfslot->channel;
-+	cmd.status = 0;
-+
-+	len = write(rfslot->fd, &cmd, sizeof(cmd));
-+	if (len < 0) {
-+		error("%s", strerror(errno));
-+		return len;
-+	}
-+
-+	if (len != (ssize_t) sizeof(cmd)) {
-+		error("Error sending connect signal");
-+		return -1;
-+	}
-+
-+	return len;
-+}
-+
- static void connect_cb(GIOChannel *io, GError *conn_err, gpointer user_data)
- {
- 	struct rfcomm_slot *rfslot = user_data;
-@@ -392,6 +419,9 @@ static void connect_cb(GIOChannel *io, GError *conn_err, gpointer user_data)
- 		rfslot->fd, rfslot->real_sock, rfslot->channel,
- 		g_io_channel_unix_get_fd(io));
- 
-+	if (sock_send_connect(rfslot, &dst) < 0)
++	if (write(rfslot->fd, &chan, sizeof(chan)) != sizeof(chan)) {
++		error("Error sending RFCOMM channel");
 +		goto fail;
++	}
 +
- 	/* Handle events from Android */
- 	io_stack = g_io_channel_unix_new(rfslot->fd);
- 	g_io_add_watch(io_stack, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+ 	rfslot->real_sock = g_io_channel_unix_get_fd(io);
+ 	rfslot->channel = chan;
+ 	rfcomm_connected_list = g_list_append(rfcomm_connected_list, rfslot);
 -- 
 1.7.10.4
 
