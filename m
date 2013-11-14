@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 07/16] android/hal-sock: Implement Android RFCOMM stack events
-Date: Thu, 14 Nov 2013 17:11:46 +0200
-Message-Id: <1384441915-23966-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 11/16] android/hal-sock: Implement socket connect HAL method
+Date: Thu, 14 Nov 2013 17:11:50 +0200
+Message-Id: <1384441915-23966-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384441915-23966-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384441915-23966-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,65 +11,73 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Handle events from Android framework. Write everything to real RFCOMM
-socket.
+First step is to query remote device for RFCOMM channel.
 ---
- android/socket.c |   42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+ android/socket.c |   34 ++++++++++++++++++++++++++++++++--
+ 1 file changed, 32 insertions(+), 2 deletions(-)
 
 diff --git a/android/socket.c b/android/socket.c
-index c9ee32f..07743f6 100644
+index 3e0c9f1..256f9f0 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -118,6 +118,48 @@ static int get_rfcomm_default_chan(const uint8_t *uuid)
- static gboolean sock_stack_event_cb(GIOChannel *io, GIOCondition cond,
- 								gpointer data)
- {
-+	struct rfcomm_slot *rfslot = data;
-+	unsigned char buf[1024] = { 0 };
-+	int len, sent;
+@@ -33,6 +33,9 @@
+ #include "lib/bluetooth.h"
+ #include "btio/btio.h"
+ #include "lib/sdp.h"
++#include "lib/sdp_lib.h"
++#include "src/sdp-client.h"
 +
-+	DBG("rfslot: fd %d real_sock %d chan %u sock %d",
-+		rfslot->fd, rfslot->real_sock, rfslot->channel,
-+		g_io_channel_unix_get_fd(io));
-+
-+	if (!g_list_find(rfcomm_connected_list, rfslot)) {
-+		error("rfslot %p not found in the list", rfslot);
-+		return FALSE;
-+	}
-+
-+	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
-+		error("Socket error: sock %d cond %d",
-+					g_io_channel_unix_get_fd(io), cond);
-+		rfcomm_connected_list = g_list_remove(rfcomm_connected_list,
-+								rfslot);
-+		cleanup_rfslot(rfslot);
-+		return FALSE;
-+	}
-+
-+	/* FIXME check fd vs sock(io) */
-+	len = recv(rfslot->fd, buf, sizeof(buf), 0);
-+	if (len <= 0) {
-+		error("recv(): %s", strerror(errno));
-+		return FALSE;
-+	}
-+
-+	DBG("read %d bytes write to %d", len, rfslot->real_sock);
-+
-+	sent = send(rfslot->real_sock, buf, len, 0);
-+	if (sent < 0) {
-+		error("send(): %s", strerror(errno));
-+		return FALSE;
-+	}
-+
-+	if (sent != len) {
-+		error("send(): sent %d bytes out of %d", sent, len);
-+		return FALSE;
-+	}
-+
- 	return TRUE;
+ #include "log.h"
+ #include "hal-msg.h"
+ #include "hal-ipc.h"
+@@ -52,6 +55,7 @@ struct rfcomm_slot {
+ 	int fd;		/* descriptor for communication with Java framework */
+ 	int real_sock;	/* real RFCOMM socket */
+ 	int channel;	/* RFCOMM channel */
++	bdaddr_t dst;
+ };
+ 
+ static struct rfcomm_slot *create_rfslot(int sock, int *hal_fd)
+@@ -358,11 +362,37 @@ static int handle_listen(void *buf)
+ 	return hal_fd;
  }
  
++static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
++{
++	DBG("");
++}
++
+ static int handle_connect(void *buf)
+ {
+-	DBG("Not implemented");
++	struct hal_cmd_sock_connect *cmd = buf;
++	struct rfcomm_slot *rfslot;
++	bdaddr_t dst;
++	uuid_t uuid;
++	int hal_fd = -1;
+ 
+-	return -1;
++	DBG("");
++
++	android2bdaddr(cmd->bdaddr, &dst);
++	rfslot = create_rfslot(-1, &hal_fd);
++	bacpy(&rfslot->dst, &dst);
++
++	memset(&uuid, 0, sizeof(uuid));
++	uuid.type = SDP_UUID128;
++	memcpy(&uuid.value.uuid128, cmd->uuid, sizeof(uint128_t));
++
++	if (bt_search_service(&adapter_addr, &dst, &uuid, sdp_search_cb, rfslot,
++								NULL) < 0) {
++		error("Failed to search SDP records");
++		cleanup_rfslot(rfslot);
++		return -1;
++	}
++
++	return hal_fd;
+ }
+ 
+ void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
 -- 
 1.7.10.4
 
