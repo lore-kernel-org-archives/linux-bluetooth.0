@@ -1,40 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 14 Nov 2013 17:28:43 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 BlueZ] android/a2dp: Add implementation of SDP record
-Message-ID: <20131114152843.GA27181@x220.p-661hnu-f1>
-References: <1384441288-6490-1-git-send-email-luiz.dentz@gmail.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <johan.hedberg@gmail.com>, <szymon.janc@tieto.com>,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 3/3] android: Change TODO with explaining comment
+Date: Thu, 14 Nov 2013 16:24:20 +0100
+Message-ID: <1384442660-2730-4-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1384442660-2730-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1384442660-2730-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1384441288-6490-1-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+---
+ android/bluetooth.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-On Thu, Nov 14, 2013, Luiz Augusto von Dentz wrote:
-> This adds the following record:
-> 
-> Service Name: Audio Source
-> Service RecHandle: 0x10001
-> Service Class ID List:
->   "Audio Source" (0x110a)
-> Protocol Descriptor List:
->   "L2CAP" (0x0100)
->     PSM: 25
->   "AVDTP" (0x0019)
->     uint16: 0x103
-> Profile Descriptor List:
->   "Advanced Audio" (0x110d)
->     Version: 0x0103
-> ---
-> v2: Fix leaking record if bt_adapter_add_record fails
-> 
->  android/a2dp.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 82 insertions(+)
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index b4e74e5..dfeb54b 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -598,7 +598,10 @@ static void send_ssp_request(const bdaddr_t *addr, uint8_t variant,
+ {
+ 	struct hal_ev_ssp_request ev;
+ 
+-	/* TODO name and CoD of remote devices should probably be cached */
++	/* It is ok to have empty name and CoD of remote devices here since
++	* those information has been already provided on device_connected event
++	* or during device scaning. Android will use that instead.
++	*/
+ 	memset(&ev, 0, sizeof(ev));
+ 	bdaddr2android(addr, ev.bdaddr);
+ 	ev.pairing_variant = variant;
+-- 
+1.8.4
 
-Applied. Thanks.
-
-Johan
