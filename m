@@ -1,43 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/7] android/hal-a2dp: Add implemention of .init
-Date: Thu, 14 Nov 2013 12:18:16 +0200
-Message-Id: <1384424301-31265-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1384424301-31265-1-git-send-email-luiz.dentz@gmail.com>
-References: <1384424301-31265-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/7] android/hal-a2dp: Use conn_state instead of connection_state
+Date: Thu, 14 Nov 2013 12:18:15 +0200
+Message-Id: <1384424301-31265-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This is shorter and more consistent with other HAL such as HID.
 ---
- android/hal-a2dp.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ android/hal-a2dp.c | 8 ++++----
+ android/hal-msg.h  | 6 +++---
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/android/hal-a2dp.c b/android/hal-a2dp.c
-index cdb5229..50a36fb 100644
+index 4fe7c20..cdb5229 100644
 --- a/android/hal-a2dp.c
 +++ b/android/hal-a2dp.c
-@@ -99,13 +99,16 @@ static bt_status_t disconnect(bt_bdaddr_t *bd_addr)
- 
- static bt_status_t init(btav_callbacks_t *callbacks)
- {
-+	struct hal_cmd_register_module cmd;
-+
- 	DBG("");
- 
- 	cbs = callbacks;
- 
--	/* TODO: enable service */
-+	cmd.service_id = HAL_SERVICE_ID_A2DP;
- 
--	return BT_STATUS_SUCCESS;
-+	return hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
-+					sizeof(cmd), &cmd, 0, NULL, NULL);
+@@ -31,9 +31,9 @@ static bool interface_ready(void)
+ 	return cbs != NULL;
  }
  
- static void cleanup()
+-static void handle_connection_state(void *buf)
++static void handle_conn_state(void *buf)
+ {
+-	struct hal_ev_a2dp_connection_state *ev = buf;
++	struct hal_ev_a2dp_conn_state *ev = buf;
+ 
+ 	if (cbs->connection_state_cb)
+ 		cbs->connection_state_cb(ev->state,
+@@ -55,8 +55,8 @@ void bt_notify_a2dp(uint8_t opcode, void *buf, uint16_t len)
+ 		return;
+ 
+ 	switch (opcode) {
+-	case HAL_EV_A2DP_CONNECTION_STATE:
+-		handle_connection_state(buf);
++	case HAL_EV_A2DP_CONN_STATE:
++		handle_conn_state(buf);
+ 		break;
+ 	case HAL_EV_A2DP_AUDIO_STATE:
+ 		handle_audio_state(buf);
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 847cc1f..30fe624 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -530,13 +530,13 @@ struct hal_ev_pan_conn_state {
+ 	uint8_t  remote_role;
+ } __attribute__((packed));
+ 
+-#define HAL_EV_A2DP_CONNECTION_STATE	0x81
+-struct hal_ev_a2dp_connection_state {
++#define HAL_EV_A2DP_CONN_STATE			0x81
++struct hal_ev_a2dp_conn_state {
+ 	uint8_t state;
+ 	uint8_t bdaddr[6];
+ } __attribute__((packed));
+ 
+-#define HAL_EV_A2DP_AUDIO_STATE	0x82
++#define HAL_EV_A2DP_AUDIO_STATE			0x82
+ struct hal_ev_a2dp_audio_state {
+ 	uint8_t state;
+ 	uint8_t bdaddr[6];
 -- 
 1.8.3.1
 
