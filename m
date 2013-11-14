@@ -1,116 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20131114081937.GA2019@x220.p-661hnu-f1>
-References: <6522C4F948C6F5419BA5943E1E79DD2A8ABBAE@IRSMSX104.ger.corp.intel.com>
-	<CABBYNZJSdzsuuzEJctKo_UiKExX4_XXW+zzphhZcHzCuOoLBwg@mail.gmail.com>
-	<E03FE70C-ECC4-4D7D-917E-6F3E92297C1C@holtmann.org>
-	<20131114081937.GA2019@x220.p-661hnu-f1>
-Date: Thu, 14 Nov 2013 11:37:55 +0200
-Message-ID: <CABBYNZL_vGHZeGjDWMpUn0M_c57zR1arrjc10b01Vi1njeZjsA@mail.gmail.com>
-Subject: Re: bluetoothd failure after a "malloc retun NULL" injection
- (attachment fix)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"Oprisenescu, CatalinX" <catalinx.oprisenescu@intel.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Trandafir, IonutX" <ionutx.trandafir@intel.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <1384421473.2229.1.camel@nuvo>
+Subject: Re: Adapter name reset on suspend/resume
+From: Bastien Nocera <hadess@hadess.net>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org development"
+	 <linux-bluetooth@vger.kernel.org>
+Date: Thu, 14 Nov 2013 10:31:13 +0100
+In-Reply-To: <130CE89B-A508-4FB9-B7EA-35D500742EC1@holtmann.org>
+References: <1384350278.5071.6.camel@nuvo>
+	 <130CE89B-A508-4FB9-B7EA-35D500742EC1@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+On Thu, 2013-11-14 at 08:28 +0900, Marcel Holtmann wrote:
+> Hi Bastien,
+> 
+> > After suspending and resuming my laptop, hci0's name is reset to what
+> > looks like the factory name:
+> > $ hciconfig -a | grep Name
+> > 	Name: 'BCM20702A'
+> > 
+> > This is the device in question:
+> > Bus 001 Device 004: ID 0a5c:21e6 Broadcom Corp. BCM20702 Bluetooth 4.0 [ThinkPad]
+> > 
+> > And my laptop is a Lenovo X1 Carbon.
+> > 
+> > Neither udevadm nor btmon show the device going away on suspend and
+> > coming back on resume.
+> 
+> can you start btmon, call hciconfig hci0 name, then suspend, then
+> resume, call hciconfig hci0 name again.
 
-On Thu, Nov 14, 2013 at 10:19 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Marcel,
->
-> On Thu, Nov 14, 2013, Marcel Holtmann wrote:
->> >> Following is an issue encountered and handled using bluez-5.10 on a
->> >> 32bit Tizen 2.0 IVI based distribution.
->> >>
->> >> If malloc returns a random NULL bluetoothd exits with core dumped.
->> >> In this case we do the following:
->> >>      -start bluetoothd,
->> >>      -at a random malloc call from any library (*lib*.so*), a random NULL will be returned by bluetoothd with a ld_preloaded library.
->> >>
->> >> ~# LD_PRELOAD=/root/lib_wrapper.so /usr/libexec/bluetooth/bluetoothd -E
->> >>
->> >> Analyzing the dump, it points directly to a DBUS_ERROR_NO_MEMORY
->> >> which, after handling, keeps bluetoothd from dumping and allowing
->> >> it to return the fatal error occurred as exit status, thus failing
->> >> gracefully.
->> >>
->> >> A fix proposal, handling the use-case is attached.
->> >
->> > Im afraid if we start treating all the out of memory cases we wont
->> > have time to do anything else, and quite frankly if this happens for
->> > real the least concern would be bluetoothd, so I believe we should
->> > just treat OOM cases as unrecoverable. Since this can happen with any
->> > dbus_error, I would probably suggest to wrap it perhaps we a
->> > g_dbus_error API that does assert in OOM.
->>
->> I am fine with fixing obvious ones. However long-term these tiny sized
->> memory allocation must just abort the program if we run out of memory.
->> Since there is no recovery from it anyway.
->
-> Did you actually take a look at the patch? It's not exactly fixing any
-> missing error checks but only modifying the behavior if the error is OOM
-> by not doing a g_printerr call in that case. However, the main()
-> function still does an error() call when connect_dbus() returns failure
-> (even if it's -ENOMEM) so I don't really see how this particular patch
-> would fix any obvious OOM handling issue.
+Bluetooth monitor ver 5.10
+= New Index: F4:B7:E2:E8:99:E2 (BR/EDR,USB,hci0)                   [hci0] 0.176335
+< HCI Command: Read Local Name (0x03|0x0014) plen 0                [hci0] 9.797930
+> HCI Event: Command Complete (0x0e) plen 252                      [hci0] 9.813834
+      Read Local Name (0x03|0x0014) ncmd 1
+        Status: Success (0x00)
+        Name: nuvo
+< HCI Command: Read Local Name (0x03|0x0014) plen 0               [hci0] 33.109166
+> HCI Event: Command Complete (0x0e) plen 252                     [hci0] 33.125157
+      Read Local Name (0x03|0x0014) ncmd 1
+        Status: Success (0x00)
+        Name: BCM20702A
 
-Yep, I was thinking more in the following:
+> I am wondering if for some reason the suspend/resume actually does a
+> HCI Reset without telling us. The name normally only gets reset to
+> BCM20702A when doing a full reset.
 
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index 9542109..ced55d9 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -216,6 +216,7 @@ struct GDBusSecurityTable {
-        .flags = G_DBUS_SIGNAL_FLAG_EXPERIMENTAL
+Looks like that's what it's doing.
 
- void g_dbus_set_flags(int flags);
-+gboolean g_dbus_error_is_set(DBusError *err);
+> Another possibility is that we actually forgot to set it in the first
+> place. I am pretty sure I have intensively tested and that should not
+> happen, but you might just found a corner case.
 
- gboolean g_dbus_register_interface(DBusConnection *connection,
-                                        const char *path, const char *name,
-diff --git a/gdbus/object.c b/gdbus/object.c
-index b248cbb..699c7e2 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -27,6 +27,7 @@
+It's set on a normal boot, it seems to be reset only when suspending.
 
- #include <stdio.h>
- #include <string.h>
-+#include <assert.h>
-
- #include <glib.h>
- #include <dbus/dbus.h>
-@@ -1820,3 +1821,16 @@ void g_dbus_set_flags(int flags)
- {
-        global_flags = flags;
- }
-+
-+gboolean g_dbus_error_is_set(DBusError *err)
-+{
-+       dbus_bool_t ret;
-+
-+       ret = dbus_error_is_set(err);
-+       if (!ret)
-+               return FALSE;
-+
-+       assert(!dbus_error_has_name(err, DBUS_ERROR_NO_MEMORY));
-+
-+       return TRUE;
-+}
-
-But perhaps there is a way to set libdbus to not handle OOM cases and
-just assert/exit, the interesting part is that even in dbus code
-itself there are comments like this:
-
-     /* FIXME have less lame handling for OOM, we just silently fail to
-      * watch.  (In reality though, the whole OOM handling in dbus is
-      * stupid but we won't go into that in this comment =) )
-      */
-
-
--- 
-Luiz Augusto von Dentz
+Cheers
