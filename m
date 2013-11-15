@@ -1,36 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 15 Nov 2013 16:08:20 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, devel@driverdev.osuosl.org,
-        Johan Hedberg <johan.hedberg@intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Yu-Chen Cho <acho@suse.com>,
-        "linux-kernel@vger.kernel.org list" <linux-kernel@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Staging: btmtk_usb: Add hdev parameter to hdev->send
- driver callback
-Message-ID: <20131115130820.GS5302@mwanda>
-References: <1384517231-1605-1-git-send-email-geert@linux-m68k.org>
- <D32EAC93-D2DE-431C-9DCB-885C5AA10A3A@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <D32EAC93-D2DE-431C-9DCB-885C5AA10A3A@holtmann.org>
+In-Reply-To: <1384517807-14745-1-git-send-email-szymon.janc@tieto.com>
+References: <1384517807-14745-1-git-send-email-szymon.janc@tieto.com>
+Date: Fri, 15 Nov 2013 14:53:49 +0200
+Message-ID: <CABBYNZLaQeiC6v++H6XJNok49MZdX_PX1MkvVG+sfHHGVHGiZQ@mail.gmail.com>
+Subject: Re: [PATCH] android: Fix not storing adapter index in index added event
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Nov 15, 2013 at 09:30:04PM +0900, Marcel Holtmann wrote:
-> 
-> while this is patch is correct, I do not really care about staging drivers that actually bluntly violate my copyright.
-> 
+Hi Szymon,
 
-That's very cryptic.
+On Fri, Nov 15, 2013 at 2:16 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> If controller was addded after daemon start its index was not stored
+> resulting in mgmt commands to be always send to MGMT_INDEX_NONE index.
+> ---
+>  android/bluetooth.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index 39589fa..b7c05e7 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -1356,6 +1356,8 @@ static void mgmt_index_added_event(uint16_t index, uint16_t length,
+>                 return;
+>         }
+>
+> +       adapter.index = index;
+> +
+>         if (mgmt_send(mgmt_if, MGMT_OP_READ_INFO, index, 0, NULL,
+>                                 read_info_complete, cb, NULL) == 0) {
+>                 cb(-EIO, NULL);
+> --
+> 1.8.4.2
 
-What is going on here?  I googled it and I wasn't able to find what you
-are talking about.  Care to give us a hint and what you want us to do
-here?
+Applied, thanks.
 
-I have also added Johan Hedberg to the CC list because he also helped
-break the build.  Don't do that.
 
-regards,
-dan carpenter
+-- 
+Luiz Augusto von Dentz
