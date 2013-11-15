@@ -1,102 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 15 Nov 2013 13:15:54 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: "John W. Linville" <linville@tuxdriver.com>
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth 2013-11-11
-Message-ID: <20131115151554.GB1627@joana>
-References: <20131111182738.GB5648@joana>
- <20131111190548.GA8107@tuxdriver.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="0F1p//8PRICkK4MW"
-In-Reply-To: <20131111190548.GA8107@tuxdriver.com>
-Sender: linux-wireless-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
+Subject: Re: [PATCHv2 06/16] android/hal-sock: Implement Android RFCOMM stack events
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1384526278-26260-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 15 Nov 2013 23:53:34 +0900
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <3A09C5B1-AF1B-45EC-A9BF-14F4E0CF2E93@holtmann.org>
+References: <1384526278-26260-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1384526278-26260-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Andrei,
 
---0F1p//8PRICkK4MW
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Handle events from Android framework. Write everything to real RFCOMM
+> socket. Consider splice() in the future.
+> ---
+> android/socket.c |   57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 57 insertions(+)
+> 
+> diff --git a/android/socket.c b/android/socket.c
+> index c9ee32f..af14ef6 100644
+> --- a/android/socket.c
+> +++ b/android/socket.c
+> @@ -115,9 +115,66 @@ static int get_rfcomm_default_chan(const uint8_t *uuid)
+> 	return -1;
+> }
+> 
+> +static inline int write_n(int fd, unsigned char *buf, int len)
+> +{
+> +	int t = 0, w;
+> +
+> +	while (len > 0) {
+> +		if ((w = write(fd, buf, len)) < 0) {
 
-Hi John,
+this is not coding style we use.
 
-2013-11-11 John W. Linville <linville@tuxdriver.com>:
+Also we can limit the scope of w to the loop.
 
-> On Mon, Nov 11, 2013 at 04:27:38PM -0200, Gustavo Padovan wrote:
-> > Hi John,
-> >=20
-> > A few fixes for 3.13. There is 3 fixes to the RFCOMM protocol. One cras=
-h fix to
-> > L2CAP. A simple fix to a bad behaviour in the SMP protocol, and last, an
-> > revert, that I sent in the last pull request but doesn't seem to be in =
-your
-> > tree.
->=20
-> Are you looking in the wireless-next tree?  It seems to be there, no?
+I also do not really like these kind of one letter variables unless they are used as iterators. So you better use written here or sent in case you actually want to use send() and not write().
 
-Yes, it is there. I'm resending this pull request without it:
+> +			if (errno == EINTR || errno == EAGAIN)
+> +				continue;
+> +			return -1;
+> +		}
+> +
+> +		if (!w)
+> +			return 0;
+> +
+> +		len -= w; buf += w; t += w;
+> +	}
+> +
+> +	return t;
 
-Please pull or let me know of any problems! Thanks
+The variable name t is also unclear to me. What does it stand for.
 
-	Gustavo
+> +}
+> +
+> static gboolean sock_stack_event_cb(GIOChannel *io, GIOCondition cond,
+> 								gpointer data)
+> {
+> +	struct rfcomm_slot *rfslot = data;
+> +	unsigned char buf[1024];
+> +	int len, sent;
+> +
+> +	DBG("rfslot: fd %d real_sock %d chan %u sock %d",
+> +		rfslot->fd, rfslot->real_sock, rfslot->channel,
+> +		g_io_channel_unix_get_fd(io));
+> +
+> +	if (!g_list_find(rfcomm_connected_list, rfslot)) {
+> +		error("rfslot %p not found in the list", rfslot);
+> +		return FALSE;
+> +	}
+> +
+> +	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
+> +		error("Socket error: sock %d cond %d",
+> +					g_io_channel_unix_get_fd(io), cond);
+> +		rfcomm_connected_list = g_list_remove(rfcomm_connected_list,
+> +								rfslot);
+> +		cleanup_rfslot(rfslot);
+> +		return FALSE;
+> +	}
+> +
+> +	len = recv(rfslot->fd, buf, sizeof(buf), 0);
+> +	if (len <= 0) {
+> +		error("recv(): %s", strerror(errno));
+> +		return FALSE;
+> +	}
+> +
+> +	DBG("read %d bytes write to %d", len, rfslot->real_sock);
+> +
+> +	if ((sent = write_n(rfslot->real_sock, buf, len)) < 0) {
 
----
+We do not use this coding style.
 
-The following changes since commit 8ce9beac4661f576ea0d518b9f086bb52a171a37:
+> +		error("send(): %s", strerror(errno));
+> +		return FALSE;
+> +	}
+> +
+> +	DBG("Written %d bytes", sent);
+> +
+> 	return TRUE;
+> }
 
-  drivers: net: wireless: b43: Fix possible NULL ptr dereference (2013-10-1=
-8 13:41:11 -0400)
+Regards
 
-are available in the git repository at:
+Marcel
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth for-ups=
-tream
-
-for you to fetch changes up to 86ca9eac31d0d8c4fe61b5726e6d63197bc435a6:
-
-  Bluetooth: Fix rejecting SMP security request in slave role (2013-11-13 1=
-1:36:54 -0200)
-
-----------------------------------------------------------------
-Johan Hedberg (1):
-      Bluetooth: Fix rejecting SMP security request in slave role
-
-Marcel Holtmann (1):
-      Bluetooth: Fix issue with RFCOMM getsockopt operation
-
-Seung-Woo Kim (3):
-      Bluetooth: Fix RFCOMM bind fail for L2CAP sock
-      Bluetooth: Fix to set proper bdaddr_type for RFCOMM connect
-      Bluetooth: Fix crash in l2cap_chan_send after l2cap_chan_del
-
- net/bluetooth/l2cap_core.c  | 3 +++
- net/bluetooth/rfcomm/core.c | 3 +++
- net/bluetooth/rfcomm/sock.c | 6 +++++-
- net/bluetooth/smp.c         | 3 +++
- 4 files changed, 14 insertions(+), 1 deletion(-)
-
---0F1p//8PRICkK4MW
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.15 (GNU/Linux)
-
-iQIcBAEBAgAGBQJShjqqAAoJEPs3PUX4s20oeWMP/RwYDHgjGIfe95axt3gMGz2M
-TCWPaCeH64qpx+XljnvZOwg5hbos4Bq5oF9OZ2l7LA7PX8ROqfbFgnRBWEMXHz8j
-1Zg54Y3DN0YoMaWkLjobE7TIVvyzikwAcL96gyfW/caYM88pCe7NWQvTs3FwEVET
-jrLuOUAuMsXRNsZGwGqG0DMr8tVVam6el4hXLZ5Z58A9Ol3Kg7WbfijTsFH4PFjq
-IriOKR5cEA7tSQPNMpKce+YBWgkPakEmAcYF9wAd7cQmbvl1AW0i5P6mlb8t9paI
-2M/hD3mKncAD/8zh6E+hGRXIg+nEa81EryCIWYUNKV0C2sPCSI8ApX5P/H+fw/9p
-HQ9YOktj6Oc5kEFO3bxDiEmQ4oem7U1ctNR4ULxzDUrI0oti9jxfma1XAFr/JncO
-XfeXoLTD09vGbtjfAUk2+WlMXY9ltNx1lbNRmKPFtH0+Xxurtj9GScbdwKQ0gC4M
-xe9Fq5uJgfg1wE6o+bHXFPAeT/WUMdq6EjtEut2KMffZGgASd6CSMKaeSTA3dXFH
-ndPBrPSwOovm9kwzqO2UkrMoskmJc02QrB1yys2fn3scgMzTMyWWHMWq4kRRle5q
-TeNKFW4A+XnFa8w0B+upTt98Dm1A8VN1ztl4s8mQ5sP7E0yYwvJ9aDfD3VSHhJXt
-p9IMJxdPvOzF8PFYxPP2
-=rg0f
------END PGP SIGNATURE-----
-
---0F1p//8PRICkK4MW--
