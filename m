@@ -1,54 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
-Subject: Re: [PATCH] Staging: btmtk_usb: Add hdev parameter to hdev->send driver callback
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1384517231-1605-1-git-send-email-geert@linux-m68k.org>
-Date: Fri, 15 Nov 2013 21:30:04 +0900
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Yu-Chen Cho <acho@suse.com>, devel@driverdev.osuosl.org,
-	"linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org list" <linux-kernel@vger.kernel.org>
-Message-Id: <D32EAC93-D2DE-431C-9DCB-885C5AA10A3A@holtmann.org>
-References: <1384517231-1605-1-git-send-email-geert@linux-m68k.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
+MIME-Version: 1.0
+In-Reply-To: <1384441915-23966-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1384441915-23966-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1384441915-23966-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 15 Nov 2013 14:29:10 +0200
+Message-ID: <CABBYNZLPvDhx2ewJ0FtkzfYmufOQD6tspqx5Hzez6rig0-RnVQ@mail.gmail.com>
+Subject: Re: [PATCHv1 04/16] android/hal-sock: Define structures for socket HAL
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Geert,
+Hi Andrei,
 
-> drivers/staging/btmtk_usb/btmtk_usb.c: In function ‘btmtk_usb_probe’:
-> drivers/staging/btmtk_usb/btmtk_usb.c:1610: warning: assignment from incompatible pointer type
-> 
-> Add the new hdev parameter, cfr. commit
-> 7bd8f09f69f8a190f9b8334a07bb0a9237612314 ("Bluetooth: Add hdev parameter to
-> hdev->send driver callback").
-> 
-> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+On Thu, Nov 14, 2013 at 5:11 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> This defines structures for socket HAL. We need to emulate Android
+> sockets by sending connect/accept signals over file descriptor.
 > ---
-> drivers/staging/btmtk_usb/btmtk_usb.c |    3 +--
-> 1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/staging/btmtk_usb/btmtk_usb.c b/drivers/staging/btmtk_usb/btmtk_usb.c
-> index 7a9bf3b57810..9a5ebd6cc512 100644
-> --- a/drivers/staging/btmtk_usb/btmtk_usb.c
-> +++ b/drivers/staging/btmtk_usb/btmtk_usb.c
-> @@ -1284,9 +1284,8 @@ done:
-> 	kfree_skb(skb);
-> }
-> 
-> -static int btmtk_usb_send_frame(struct sk_buff *skb)
-> +static int btmtk_usb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
-> {
-> -	struct hci_dev *hdev = (struct hci_dev *)skb->dev;
-> 	struct btmtk_usb_data *data = hci_get_drvdata(hdev);
-> 	struct usb_ctrlrequest *dr;
-> 	struct urb *urb;
+>  android/socket.c |   12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+>
+> diff --git a/android/socket.c b/android/socket.c
+> index e580036..4699dce 100644
+> --- a/android/socket.c
+> +++ b/android/socket.c
+> @@ -37,6 +37,18 @@
+>
+>  static bdaddr_t adapter_addr;
+>
+> +/* Simple list of RFCOMM server sockets */
+> +GList *rfcomm_srv_list = NULL;
+> +
+> +/* Simple list of RFCOMM connected sockets */
+> +GList *rfcomm_connected_list = NULL;
+> +
+> +struct rfcomm_slot {
+> +       int fd;         /* descriptor for communication with Java framework */
+> +       int real_sock;  /* real RFCOMM socket */
+> +       int channel;    /* RFCOMM channel */
+> +};
 
-while this is patch is correct, I do not really care about staging drivers that actually bluntly violate my copyright.
+Here you don't really need to define channel as int do you? Also if in
+future we want to replace this with splice this should use a pipe to
+communicate with the HAL.
 
-Regards
+Btw, introducing lists and struct without any implementation is never
+very good to review, because I have no idea in what context they will
+be used.
 
-Marcel
 
+
+-- 
+Luiz Augusto von Dentz
