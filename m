@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 13/16] android/hal-sock: Send RFCOMM channel to framework
-Date: Fri, 15 Nov 2013 16:37:55 +0200
-Message-Id: <1384526278-26260-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 10/16] android/hal-sock: Implement socket connect HAL method
+Date: Fri, 15 Nov 2013 16:37:52 +0200
+Message-Id: <1384526278-26260-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384526278-26260-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384526278-26260-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,27 +11,73 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Framework expects channel to be send.
+First step is to query remote device for RFCOMM channel.
 ---
- android/socket.c |    5 +++++
- 1 file changed, 5 insertions(+)
+ android/socket.c |   34 ++++++++++++++++++++++++++++++++--
+ 1 file changed, 32 insertions(+), 2 deletions(-)
 
 diff --git a/android/socket.c b/android/socket.c
-index c3ce4f0..cc1bbb7 100644
+index a3915c3..b29d4af 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -472,6 +472,11 @@ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
- 		goto fail;
- 	}
+@@ -33,6 +33,9 @@
+ #include "lib/bluetooth.h"
+ #include "btio/btio.h"
+ #include "lib/sdp.h"
++#include "lib/sdp_lib.h"
++#include "src/sdp-client.h"
++
+ #include "log.h"
+ #include "hal-msg.h"
+ #include "hal-ipc.h"
+@@ -52,6 +55,7 @@ struct rfcomm_slot {
+ 	int fd;		/* descriptor for communication with Java framework */
+ 	int real_sock;	/* real RFCOMM socket */
+ 	int channel;	/* RFCOMM channel */
++	bdaddr_t dst;
+ };
  
-+	if (write(rfslot->fd, &chan, sizeof(chan)) != sizeof(chan)) {
-+		error("Error sending RFCOMM channel");
-+		goto fail;
+ static struct rfcomm_slot *create_rfslot(int sock, int *hal_fd)
+@@ -368,11 +372,37 @@ static int handle_listen(void *buf)
+ 	return hal_fd;
+ }
+ 
++static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
++{
++	DBG("");
++}
++
+ static int handle_connect(void *buf)
+ {
+-	DBG("Not implemented");
++	struct hal_cmd_sock_connect *cmd = buf;
++	struct rfcomm_slot *rfslot;
++	bdaddr_t dst;
++	uuid_t uuid;
++	int hal_fd = -1;
+ 
+-	return -1;
++	DBG("");
++
++	android2bdaddr(cmd->bdaddr, &dst);
++	rfslot = create_rfslot(-1, &hal_fd);
++	bacpy(&rfslot->dst, &dst);
++
++	memset(&uuid, 0, sizeof(uuid));
++	uuid.type = SDP_UUID128;
++	memcpy(&uuid.value.uuid128, cmd->uuid, sizeof(uint128_t));
++
++	if (bt_search_service(&adapter_addr, &dst, &uuid, sdp_search_cb, rfslot,
++								NULL) < 0) {
++		error("Failed to search SDP records");
++		cleanup_rfslot(rfslot);
++		return -1;
 +	}
 +
- 	rfslot->real_sock = g_io_channel_unix_get_fd(io);
- 	rfslot->channel = chan;
- 	rfcomm_connected_list = g_list_append(rfcomm_connected_list, rfslot);
++	return hal_fd;
+ }
+ 
+ void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
 -- 
 1.7.10.4
 
