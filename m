@@ -1,63 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 16 Nov 2013 06:29:36 +0900
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Dan Carpenter <dan.carpenter@oracle.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	devel@driverdev.osuosl.org,
-	Johan Hedberg <johan.hedberg@intel.com>,
-	Yu-Chen Cho <acho@suse.com>,
-	"linux-kernel@vger.kernel.org list" <linux-kernel@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Staging: btmtk_usb: Add hdev parameter to hdev->send
- driver callback
-Message-ID: <20131115212936.GC14897@kroah.com>
-References: <1384517231-1605-1-git-send-email-geert@linux-m68k.org>
- <D32EAC93-D2DE-431C-9DCB-885C5AA10A3A@holtmann.org>
- <20131115130820.GS5302@mwanda>
- <F615BA13-BEC1-457B-8002-BC6C149039EA@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <F615BA13-BEC1-457B-8002-BC6C149039EA@holtmann.org>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [RFC v3 5/5] android/hal-a2dp: Use generic IPC message handling for events
+Date: Fri, 15 Nov 2013 20:49:38 +0000
+Message-Id: <1384548578-18710-6-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1384548578-18710-1-git-send-email-szymon.janc@tieto.com>
+References: <1384548578-18710-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Nov 15, 2013 at 10:26:41PM +0900, Marcel Holtmann wrote:
-> Hi Dan,
-> 
-> >> while this is patch is correct, I do not really care about staging drivers that actually bluntly violate my copyright.
-> >> 
-> > 
-> > That's very cryptic.
-> > 
-> > What is going on here?  I googled it and I wasn't able to find what you
-> > are talking about.  Care to give us a hint and what you want us to do
-> > here?
-> 
-> the last time I checked, the majority of drivers/bluetooth/btusb.c has been written by myself. Now go and compare btusb.c to btmtk_usb.[ch].
-> 
-> > I have also added Johan Hedberg to the CC list because he also helped
-> > break the build.  Don't do that.
-> 
-> Yes, we are doing exactly that. It is a staging driver. I could not care less if a staging drivers breaks the build or not.
-> 
-> If anybody cares about this driver, then take the time to merge it upstream. It has never been submitted to linux-bluetooth mailing list.
-> 
-> There are drivers that should have never been merged into staging.
-> This is one of them. Look for yourself and explain to me why this
-> driver is part of staging in the first place.
+Register handlers on service init and unregister on cleanup.
+---
+ android/hal-a2dp.c | 40 ++++++++++++++++++++--------------------
+ android/hal.h      |  1 -
+ 2 files changed, 20 insertions(+), 21 deletions(-)
 
-Because it was sent to me by a developer?
+diff --git a/android/hal-a2dp.c b/android/hal-a2dp.c
+index e9fadb7..baa4b10 100644
+--- a/android/hal-a2dp.c
++++ b/android/hal-a2dp.c
+@@ -31,7 +31,7 @@ static bool interface_ready(void)
+ 	return cbs != NULL;
+ }
+ 
+-static void handle_conn_state(void *buf)
++static void handle_conn_state(void *buf, uint16_t len, int fd)
+ {
+ 	struct hal_ev_a2dp_conn_state *ev = buf;
+ 
+@@ -40,7 +40,7 @@ static void handle_conn_state(void *buf)
+ 						(bt_bdaddr_t *) (ev->bdaddr));
+ }
+ 
+-static void handle_audio_state(void *buf)
++static void handle_audio_state(void *buf, uint16_t len, int fd)
+ {
+ 	struct hal_ev_a2dp_audio_state *ev = buf;
+ 
+@@ -48,24 +48,19 @@ static void handle_audio_state(void *buf)
+ 		cbs->audio_state_cb(ev->state, (bt_bdaddr_t *)(ev->bdaddr));
+ }
+ 
+-/* will be called from notification thread context */
+-void bt_notify_a2dp(uint8_t opcode, void *buf, uint16_t len)
+-{
+-	if (!interface_ready())
+-		return;
+-
+-	switch (opcode) {
+-	case HAL_EV_A2DP_CONN_STATE:
+-		handle_conn_state(buf);
+-		break;
+-	case HAL_EV_A2DP_AUDIO_STATE:
+-		handle_audio_state(buf);
+-		break;
+-	default:
+-		DBG("Unhandled callback opcode=0x%x", opcode);
+-		break;
+-	}
+-}
++/* handlers will be called from notification thread context */
++static const struct hal_ipc_handler ev_handlers[] = {
++	{
++		.handler = handle_conn_state,
++		.var_len = false,
++		.data_len = sizeof(struct hal_ev_pan_conn_state),
++	},
++	{
++		.handler = handle_audio_state,
++		.var_len = false,
++		.data_len = sizeof(struct hal_ev_pan_ctrl_state),
++	},
++};
+ 
+ static bt_status_t a2dp_connect(bt_bdaddr_t *bd_addr)
+ {
+@@ -105,6 +100,9 @@ static bt_status_t init(btav_callbacks_t *callbacks)
+ 
+ 	cbs = callbacks;
+ 
++	hal_ipc_register(HAL_SERVICE_ID_A2DP, ev_handlers,
++				sizeof(ev_handlers)/sizeof(ev_handlers[0]));
++
+ 	cmd.service_id = HAL_SERVICE_ID_A2DP;
+ 
+ 	return hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
+@@ -126,6 +124,8 @@ static void cleanup()
+ 
+ 	hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_UNREGISTER_MODULE,
+ 					sizeof(cmd), &cmd, 0, NULL, NULL);
++
++	hal_ipc_unregister(HAL_SERVICE_ID_A2DP);
+ }
+ 
+ static btav_interface_t iface = {
+diff --git a/android/hal.h b/android/hal.h
+index 6bd4c5a..b475411 100644
+--- a/android/hal.h
++++ b/android/hal.h
+@@ -28,4 +28,3 @@ btav_interface_t *bt_get_a2dp_interface(void);
+ 
+ void bt_thread_associate(void);
+ void bt_thread_disassociate(void);
+-void bt_notify_a2dp(uint8_t opcode, void *buf, uint16_t len);
+-- 
+1.8.4.3
 
-Seriously, what's the issue here, I didn't notice it was a fork of your
-code, sorry, I didn't check.  I figured it would be eventually cleaned
-up properly and then it will be sent to linux-bluetooth for proper
-merging.
-
-Yu-Chen, what's the satus of getting this cleaned up "properly"?  You
-haven't really done anything on this since I took the driver in May.
-
-thanks,
-
-greg k-h
