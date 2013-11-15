@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 16/16] android/hal-sock: Add SDP record for OPP profile
-Date: Fri, 15 Nov 2013 16:37:58 +0200
-Message-Id: <1384526278-26260-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 14/16] android/hal-sock: Send connect signal on connect
+Date: Fri, 15 Nov 2013 16:37:56 +0200
+Message-Id: <1384526278-26260-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384526278-26260-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384526278-26260-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,163 +11,60 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This adds SDP record for OPP shown below:
-
-Service Name: OBEX Object Push
-Service RecHandle: 0x10002
-Service Class ID List:
-  "OBEX Object Push" (0x1105)
-Protocol Descriptor List:
-  "RFCOMM" (0x0003)
-    Channel: 9
-  "OBEX" (0x0008)
-Profile Descriptor List:
-  "OBEX Object Push" (0x1105)
-    Version: 0x0100
+Android framework expects connect signal to be sent when
+remote device is connected.
 ---
- android/socket.c |   94 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 94 insertions(+)
+ android/socket.c |   30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
 diff --git a/android/socket.c b/android/socket.c
-index 93b637b..a9722ea 100644
+index cc1bbb7..ecdefab 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -36,6 +36,7 @@
- #include "lib/sdp_lib.h"
- #include "src/sdp-client.h"
- 
-+#include "bluetooth.h"
- #include "log.h"
- #include "hal-msg.h"
- #include "hal-ipc.h"
-@@ -43,6 +44,9 @@
- #include "utils.h"
- #include "socket.h"
- 
-+/* Use Object Transfer for all services */
-+#define SVC_HINT_OBEX 0x10
-+
- static bdaddr_t adapter_addr;
- 
- /* Simple list of RFCOMM server sockets */
-@@ -56,6 +60,7 @@ struct rfcomm_slot {
- 	int real_sock;	/* real RFCOMM socket */
- 	int channel;	/* RFCOMM channel */
- 	bdaddr_t dst;
-+	uint32_t service_handle;
- };
- 
- static struct rfcomm_slot *create_rfslot(int sock, int *hal_fd)
-@@ -86,6 +91,9 @@ static void cleanup_rfslot(struct rfcomm_slot *rfslot)
- 	if (rfslot->real_sock > 0)
- 		close(rfslot->real_sock);
- 
-+	if (rfslot->service_handle)
-+		bt_adapter_remove_record(rfslot->service_handle);
-+
- 	g_free(rfslot);
+@@ -372,6 +372,33 @@ static int handle_listen(void *buf)
+ 	return hal_fd;
  }
  
-@@ -108,6 +116,90 @@ static struct {
- 	{ {0} }
- };
- 
-+static sdp_record_t *create_opp_record(uint8_t chan)
++static ssize_t sock_send_connect(struct rfcomm_slot *rfslot, bdaddr_t *bdaddr)
 +{
-+	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-+	uuid_t root_uuid, opush_uuid, rfcomm_uuid, obex_uuid;
-+	sdp_profile_desc_t profile[1];
-+	sdp_list_t *aproto, *proto[2];
-+	uint8_t formats[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0xff };
-+	void *dtds[sizeof(formats)], *values[sizeof(formats)];
-+	unsigned int i;
-+	uint8_t dtd = SDP_UINT8;
-+	sdp_data_t *sflist;
-+	sdp_data_t *channel;
-+	sdp_record_t *record;
++	struct hal_sock_connect_signal cmd;
++	ssize_t len;
 +
-+	record = sdp_record_alloc();
-+	if (!record)
-+		return NULL;
++	DBG("");
 +
-+	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
-+	root = sdp_list_append(0, &root_uuid);
-+	sdp_set_browse_groups(record, root);
++	memset(&cmd, 0, sizeof(cmd));
++	cmd.size = sizeof(cmd);
++	bdaddr2android(bdaddr, cmd.bdaddr);
++	cmd.channel = rfslot->channel;
++	cmd.status = 0;
 +
-+	sdp_uuid16_create(&opush_uuid, OBEX_OBJPUSH_SVCLASS_ID);
-+	svclass_id = sdp_list_append(0, &opush_uuid);
-+	sdp_set_service_classes(record, svclass_id);
-+
-+	sdp_uuid16_create(&profile[0].uuid, OBEX_OBJPUSH_PROFILE_ID);
-+	profile[0].version = 0x0100;
-+	pfseq = sdp_list_append(0, profile);
-+	sdp_set_profile_descs(record, pfseq);
-+
-+	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
-+	proto[0] = sdp_list_append(0, &rfcomm_uuid);
-+	channel = sdp_data_alloc(SDP_UINT8, &chan);
-+	proto[0] = sdp_list_append(proto[0], channel);
-+	apseq = sdp_list_append(apseq, proto[0]);
-+
-+	sdp_uuid16_create(&obex_uuid, OBEX_UUID);
-+	proto[1] = sdp_list_append(0, &obex_uuid);
-+	apseq = sdp_list_append(apseq, proto[1]);
-+
-+	aproto = sdp_list_append(0, apseq);
-+	sdp_set_access_protos(record, aproto);
-+
-+	for (i = 0; i < sizeof(formats); i++) {
-+		dtds[i] = &dtd;
-+		values[i] = &formats[i];
++	len = write(rfslot->fd, &cmd, sizeof(cmd));
++	if (len < 0) {
++		error("%s", strerror(errno));
++		return len;
 +	}
-+	sflist = sdp_seq_alloc(dtds, values, sizeof(formats));
-+	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FORMATS_LIST, sflist);
 +
-+	sdp_set_info_attr(record, "OBEX Object Push", 0, 0);
++	if (len != (ssize_t) sizeof(cmd)) {
++		error("Error sending connect signal");
++		return -1;
++	}
 +
-+	sdp_data_free(channel);
-+	sdp_list_free(proto[0], 0);
-+	sdp_list_free(proto[1], 0);
-+	sdp_list_free(apseq, 0);
-+	sdp_list_free(aproto, 0);
-+
-+	return record;
++	return len;
 +}
 +
-+static uint32_t sdp_service_register(uint8_t chan)
-+{
-+	sdp_record_t *record;
-+
-+	switch (chan) {
-+	case OPP_DEFAULT_CHANNEL:
-+		record = create_opp_record(chan);
-+		break;
-+	default:
-+		DBG("Not implemented");
-+		return 0;
-+	}
-+
-+	if (bt_adapter_add_record(record, SVC_HINT_OBEX) < 0) {
-+		error("Failed to register on SDP record");
-+		sdp_record_free(record);
-+		return 0;
-+	}
-+
-+	return record->handle;
-+}
-+
- static int bt_sock_send_fd(int sock_fd, const void *buf, int len, int send_fd)
+ static void connect_cb(GIOChannel *io, GError *conn_err, gpointer user_data)
  {
- 	ssize_t ret;
-@@ -366,6 +458,8 @@ static int handle_listen(void *buf)
- 		return -1;
- 	}
+ 	struct rfcomm_slot *rfslot = user_data;
+@@ -402,6 +429,9 @@ static void connect_cb(GIOChannel *io, GError *conn_err, gpointer user_data)
+ 		rfslot->fd, rfslot->real_sock, rfslot->channel,
+ 		g_io_channel_unix_get_fd(io));
  
-+	rfslot->service_handle = sdp_service_register(chan);
++	if (sock_send_connect(rfslot, &dst) < 0)
++		goto fail;
 +
- 	DBG("real_sock %d fd %d hal_fd %d",
- 				rfslot->real_sock, rfslot->fd, hal_fd);
- 
+ 	/* Handle events from Android */
+ 	io_stack = g_io_channel_unix_new(rfslot->fd);
+ 	g_io_add_watch(io_stack, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
 -- 
 1.7.10.4
 
