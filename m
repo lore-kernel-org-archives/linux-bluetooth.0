@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 10/16] android/hal-sock: Implement socket connect HAL method
-Date: Fri, 15 Nov 2013 16:37:52 +0200
-Message-Id: <1384526278-26260-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 05/16] android/hal-sock: Implement socket accepted event
+Date: Fri, 15 Nov 2013 16:37:47 +0200
+Message-Id: <1384526278-26260-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384526278-26260-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384526278-26260-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,73 +11,77 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-First step is to query remote device for RFCOMM channel.
+When we get accepted event we create rfcomm slot and start listening
+for events from Android framework and from RFCOMM real socket.
 ---
- android/socket.c |   34 ++++++++++++++++++++++++++++++++--
- 1 file changed, 32 insertions(+), 2 deletions(-)
+ android/socket.c |   52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
 
 diff --git a/android/socket.c b/android/socket.c
-index a3915c3..b29d4af 100644
+index 276c78c..c9ee32f 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -33,6 +33,9 @@
- #include "lib/bluetooth.h"
- #include "btio/btio.h"
- #include "lib/sdp.h"
-+#include "lib/sdp_lib.h"
-+#include "src/sdp-client.h"
-+
- #include "log.h"
- #include "hal-msg.h"
- #include "hal-ipc.h"
-@@ -52,6 +55,7 @@ struct rfcomm_slot {
- 	int fd;		/* descriptor for communication with Java framework */
- 	int real_sock;	/* real RFCOMM socket */
- 	int channel;	/* RFCOMM channel */
-+	bdaddr_t dst;
- };
- 
- static struct rfcomm_slot *create_rfslot(int sock, int *hal_fd)
-@@ -368,11 +372,37 @@ static int handle_listen(void *buf)
- 	return hal_fd;
+@@ -115,8 +115,60 @@ static int get_rfcomm_default_chan(const uint8_t *uuid)
+ 	return -1;
  }
  
-+static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
++static gboolean sock_stack_event_cb(GIOChannel *io, GIOCondition cond,
++								gpointer data)
 +{
-+	DBG("");
++	return TRUE;
 +}
 +
- static int handle_connect(void *buf)
++static gboolean sock_rfcomm_event_cb(GIOChannel *io, GIOCondition cond,
++								gpointer data)
++{
++	return TRUE;
++}
++
+ static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
  {
--	DBG("Not implemented");
-+	struct hal_cmd_sock_connect *cmd = buf;
-+	struct rfcomm_slot *rfslot;
++	struct rfcomm_slot *rfslot = user_data;
++	struct rfcomm_slot *rfslot_acc;
++	GIOChannel *io_stack;
 +	bdaddr_t dst;
-+	uuid_t uuid;
++	char address[18];
++	int sock_acc;
 +	int hal_fd = -1;
- 
--	return -1;
-+	DBG("");
 +
-+	android2bdaddr(cmd->bdaddr, &dst);
-+	rfslot = create_rfslot(-1, &hal_fd);
-+	bacpy(&rfslot->dst, &dst);
-+
-+	memset(&uuid, 0, sizeof(uuid));
-+	uuid.type = SDP_UUID128;
-+	memcpy(&uuid.value.uuid128, cmd->uuid, sizeof(uint128_t));
-+
-+	if (bt_search_service(&adapter_addr, &dst, &uuid, sdp_search_cb, rfslot,
-+								NULL) < 0) {
-+		error("Failed to search SDP records");
-+		cleanup_rfslot(rfslot);
-+		return -1;
++	bt_io_get(io, &err,
++			BT_IO_OPT_DEST_BDADDR, &dst,
++			BT_IO_OPT_INVALID);
++	if (err) {
++		error("%s", err->message);
++		g_io_channel_shutdown(io, TRUE, NULL);
++		return;
 +	}
 +
-+	return hal_fd;
++	ba2str(&dst, address);
++	DBG("Incoming connection from %s rfslot %p", address, rfslot);
++
++	DBG("rfslot: fd %d real_sock %d chan %u sock %d",
++		rfslot->fd, rfslot->real_sock, rfslot->channel,
++		g_io_channel_unix_get_fd(io));
++
++	sock_acc = g_io_channel_unix_get_fd(io);
++	rfslot_acc = create_rfslot(sock_acc, &hal_fd);
++	rfcomm_connected_list =
++			g_list_append(rfcomm_connected_list, rfslot_acc);
++
++	/* Handle events from Android */
++	io_stack = g_io_channel_unix_new(rfslot_acc->fd);
++	g_io_add_watch(io_stack, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++					sock_stack_event_cb, rfslot_acc);
++	g_io_channel_unref(io_stack);
++
++	/* Handle rfcomm events */
++	g_io_add_watch(io, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++				sock_rfcomm_event_cb, rfslot_acc);
++
++	DBG("rfslot %p rfslot_acc %p", rfslot, rfslot_acc);
  }
  
- void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+ static int handle_listen(void *buf)
 -- 
 1.7.10.4
 
