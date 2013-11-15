@@ -1,57 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 15 Nov 2013 14:19:13 -0500
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth 2013-11-11
-Message-ID: <20131115191912.GE7079@tuxdriver.com>
-References: <20131111182738.GB5648@joana>
- <20131111190548.GA8107@tuxdriver.com>
- <20131115151554.GB1627@joana>
+Date: Fri, 15 Nov 2013 20:24:56 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v5 0/4] Fixes for incoming connection and bonding
+Message-ID: <20131115182456.GA15452@x220.p-661hnu-f1>
+References: <1384538641-1873-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20131115151554.GB1627@joana>
-Sender: linux-wireless-owner@vger.kernel.org
+In-Reply-To: <1384538641-1873-1-git-send-email-lukasz.rymanowski@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Nov 15, 2013 at 01:15:54PM -0200, Gustavo Padovan wrote:
-> Hi John,
-> 
-> 2013-11-11 John W. Linville <linville@tuxdriver.com>:
-> 
-> > On Mon, Nov 11, 2013 at 04:27:38PM -0200, Gustavo Padovan wrote:
-> > > Hi John,
-> > > 
-> > > A few fixes for 3.13. There is 3 fixes to the RFCOMM protocol. One crash fix to
-> > > L2CAP. A simple fix to a bad behaviour in the SMP protocol, and last, an
-> > > revert, that I sent in the last pull request but doesn't seem to be in your
-> > > tree.
-> > 
-> > Are you looking in the wireless-next tree?  It seems to be there, no?
-> 
-> Yes, it is there. I'm resending this pull request without it:
-> 
-> Please pull or let me know of any problems! Thanks
-> 
-> 	Gustavo
-> 
-> ---
-> 
-> The following changes since commit 8ce9beac4661f576ea0d518b9f086bb52a171a37:
-> 
->   drivers: net: wireless: b43: Fix possible NULL ptr dereference (2013-10-18 13:41:11 -0400)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth for-upstream
-> 
-> for you to fetch changes up to 86ca9eac31d0d8c4fe61b5726e6d63197bc435a6:
-> 
->   Bluetooth: Fix rejecting SMP security request in slave role (2013-11-13 11:36:54 -0200)
+Hi Lukasz,
 
-Pulling now...
+On Fri, Nov 15, 2013, Lukasz Rymanowski wrote:
+> V5:
+> Fixes according to Johan comments
+> 
+> V4:
+> Added device name caching in device list
+> Changes according to Johan comments
+> 
+> V3:
+> Removed adapter bonding state
+> Added device list in order to track bonding state per device.
+> Fix for incoming legacy paring. We act here same as Bluedroid.
+> 
+> V2:
+> Bonding state added.
+> 
+> V1:
+> With those patches it is possible to bond from remote device and in addition
+> you will see the name of remote device on Android pairing request pop up.
+> 
+> 
+> Lukasz Rymanowski (4):
+>   android: Update bond state on incoming bonding
+>   android: Cache device name on device list.
+>   android: Update bond state on auth and connect failed
+>   android: Change TODO with explaining comment
+> 
+>  android/bluetooth.c | 212 ++++++++++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 173 insertions(+), 39 deletions(-)
 
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+All patches have been applied. Thanks.
+
+I did need to do some (minor) coding style tweaks for 2/4 though.
+
+Johan
