@@ -1,166 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 04/16] android/hal-sock: Define structs and implement listen
-Date: Fri, 15 Nov 2013 16:37:46 +0200
-Message-Id: <1384526278-26260-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1384526278-26260-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1384526278-26260-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 00/16] Socket HAL
+Date: Fri, 15 Nov 2013 16:37:42 +0200
+Message-Id: <1384526278-26260-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This defines structures for socket HAL. We need to emulate Android
-sockets by sending connect/accept signals over file descriptor.
-Handle HAL socket listen call. Create RFCOMM socket and wait for events.
----
- android/socket.c |  118 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 116 insertions(+), 2 deletions(-)
+This is initial code implementing socket HAL. OPP currently works with send/receive files. Probaly
+other profiles works as well, not tested yet.
 
-diff --git a/android/socket.c b/android/socket.c
-index e580036..276c78c 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -27,8 +27,12 @@
- 
- #include <glib.h>
- #include <stdbool.h>
-+#include <unistd.h>
-+#include <errno.h>
- 
- #include "lib/bluetooth.h"
-+#include "btio/btio.h"
-+#include "lib/sdp.h"
- #include "log.h"
- #include "hal-msg.h"
- #include "hal-ipc.h"
-@@ -37,13 +41,123 @@
- 
- static bdaddr_t adapter_addr;
- 
--static int handle_listen(void *buf)
-+/* Simple list of RFCOMM server sockets */
-+GList *rfcomm_srv_list = NULL;
-+
-+/* Simple list of RFCOMM connected sockets */
-+GList *rfcomm_connected_list = NULL;
-+
-+struct rfcomm_slot {
-+	int fd;		/* descriptor for communication with Java framework */
-+	int real_sock;	/* real RFCOMM socket */
-+	int channel;	/* RFCOMM channel */
-+};
-+
-+static struct rfcomm_slot *create_rfslot(int sock, int *hal_fd)
- {
--	DBG("Not implemented");
-+	int fds[2] = {-1, -1};
-+	struct rfcomm_slot *rfslot;
-+
-+	if (socketpair(AF_LOCAL, SOCK_STREAM, 0, fds) < 0) {
-+		error("socketpair(): %s", strerror(errno));
-+		return NULL;
-+	}
-+
-+	rfslot = g_malloc0(sizeof(*rfslot));
-+	rfslot->fd = fds[0];
-+	*hal_fd = fds[1];
-+	rfslot->real_sock = sock;
-+
-+	return rfslot;
-+}
-+
-+static void cleanup_rfslot(struct rfcomm_slot *rfslot)
-+{
-+	DBG("Cleanup: rfslot: %p fd %d real_sock %d chan %u",
-+		rfslot, rfslot->fd, rfslot->real_sock, rfslot->channel);
-+
-+	if (rfslot->fd > 0)
-+		close(rfslot->fd);
-+	if (rfslot->real_sock > 0)
-+		close(rfslot->real_sock);
-+
-+	g_free(rfslot);
-+}
-+
-+static struct {
-+	uint8_t uuid[16];
-+	uint8_t channel;
-+} uuid_to_chan[] = {
-+	{ .uuid = {
-+	0x00, 0x00, 0x11, 0x2F, 0x00, 0x00, 0x10, 0x00,
-+	0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
-+	},
-+#define PBAP_DEFAULT_CHANNEL	15
-+	.channel = PBAP_DEFAULT_CHANNEL },
-+	{ .uuid = {
-+	0x00, 0x00, 0x11, 0x05, 0x00, 0x00, 0x10, 0x00,
-+	0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
-+	},
-+#define OPP_DEFAULT_CHANNEL	9
-+	.channel = OPP_DEFAULT_CHANNEL },
-+	{ {0} }
-+};
-+
-+static int get_rfcomm_default_chan(const uint8_t *uuid)
-+{
-+	int i;
-+
-+	for (i = 0; uuid_to_chan[i].channel; i++) {
-+		if (!memcmp(uuid_to_chan[i].uuid, uuid, 16))
-+			return uuid_to_chan[i].channel;
-+	}
- 
- 	return -1;
- }
- 
-+static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
-+{
-+}
-+
-+static int handle_listen(void *buf)
-+{
-+	struct hal_cmd_sock_listen *cmd = buf;
-+	struct rfcomm_slot *rfslot;
-+	GIOChannel *io;
-+	GError *err = NULL;
-+	int hal_fd = -1;
-+	int chan;
-+
-+	DBG("");
-+
-+	chan = get_rfcomm_default_chan(cmd->uuid);
-+	if (chan < 0)
-+		return -1;
-+
-+	DBG("rfcomm channel %d", chan);
-+
-+	rfslot = create_rfslot(-1, &hal_fd);
-+
-+	io = bt_io_listen(accept_cb, NULL, rfslot, NULL, &err,
-+				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
-+				BT_IO_OPT_CHANNEL, chan,
-+				BT_IO_OPT_INVALID);
-+	if (!io) {
-+		error("Failed listen: %s", err->message);
-+		g_error_free(err);
-+		cleanup_rfslot(rfslot);
-+		return -1;
-+	}
-+
-+	rfslot->real_sock = g_io_channel_unix_get_fd(io);
-+	rfcomm_srv_list = g_list_append(rfcomm_srv_list, rfslot);
-+
-+	DBG("real_sock %d fd %d hal_fd %d",
-+				rfslot->real_sock, rfslot->fd, hal_fd);
-+
-+	return hal_fd;
-+}
-+
- static int handle_connect(void *buf)
- {
- 	DBG("Not implemented");
+Changes:
+	* v2: Following Marcel comments changed way copying between file descriptors works, added SDP record
+	for OPP and now it is possible to send files through GUI. Merged one patch with structures with actual user.
+	* v1: Rebased and use static src address, hal_fd removed from structure and closed after sent to framework,
+	added connect calls and SDP parsing, added cleanup_rfcomm function, minor fixes.
+	* RFC Initial
+
+TODO:
+	* Add SDP record for PBAP and other profiles
+	* Use splice() (requires bionic change first)
+
+For tracking rfcomm sockets I use structure rfslot which has following
+fields:
+ - real_sock - real RFCOMM socket
+ - fd - fd to communicate with Android framework
+
+create_rfslot sets hal_fd which is fd passed to Android framework with CMSG
+
+Andrei Emeltchenko (16):
+  android/hal-sock: Add debug flag printing
+  android/hal-sock: Use static local adapter address
+  android/hal-sock: Add connect signal to socket
+  android/hal-sock: Define structs and implement listen
+  android/hal-sock: Implement socket accepted event
+  android/hal-sock: Implement Android RFCOMM stack events
+  android/hal-sock: Implement RFCOMM events
+  android/hal-sock: Implement accept signal over Android fd
+  android/hal-sock: Write channel to Android fd
+  android/hal-sock: Implement socket connect HAL method
+  android/hal-sock: Parse SDP response and connect
+  android/hal-sock: Implement HAL connect call
+  android/hal-sock: Send RFCOMM channel to framework
+  android/hal-sock: Send connect signal on connect
+  android/hal-sock: Close file descriptor after sending
+  android/hal-sock: Add SDP record for OPP profile
+
+ android/hal-msg.h  |    2 +
+ android/hal-sock.c |    8 +-
+ android/socket.c   |  600 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ android/socket.h   |    7 +
+ 4 files changed, 609 insertions(+), 8 deletions(-)
+
 -- 
 1.7.10.4
 
