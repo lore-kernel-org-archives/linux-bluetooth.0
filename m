@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 06/16] android/hal-sock: Implement Android RFCOMM stack events
-Date: Fri, 15 Nov 2013 16:37:48 +0200
-Message-Id: <1384526278-26260-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 11/16] android/hal-sock: Parse SDP response and connect
+Date: Fri, 15 Nov 2013 16:37:53 +0200
+Message-Id: <1384526278-26260-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384526278-26260-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384526278-26260-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,83 +11,88 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Handle events from Android framework. Write everything to real RFCOMM
-socket. Consider splice() in the future.
+Parse SDP response, find RFCOMM channel and connect.
 ---
- android/socket.c |   57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
+ android/socket.c |   63 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 63 insertions(+)
 
 diff --git a/android/socket.c b/android/socket.c
-index c9ee32f..af14ef6 100644
+index b29d4af..6e6db4f 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -115,9 +115,66 @@ static int get_rfcomm_default_chan(const uint8_t *uuid)
- 	return -1;
+@@ -372,9 +372,72 @@ static int handle_listen(void *buf)
+ 	return hal_fd;
  }
  
-+static inline int write_n(int fd, unsigned char *buf, int len)
++static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
 +{
-+	int t = 0, w;
-+
-+	while (len > 0) {
-+		if ((w = write(fd, buf, len)) < 0) {
-+			if (errno == EINTR || errno == EAGAIN)
-+				continue;
-+			return -1;
-+		}
-+
-+		if (!w)
-+			return 0;
-+
-+		len -= w; buf += w; t += w;
-+	}
-+
-+	return t;
 +}
 +
- static gboolean sock_stack_event_cb(GIOChannel *io, GIOCondition cond,
- 								gpointer data)
+ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
  {
 +	struct rfcomm_slot *rfslot = data;
-+	unsigned char buf[1024];
-+	int len, sent;
++	GError *gerr = NULL;
++	sdp_list_t *list;
++	GIOChannel *io;
++	int chan;
 +
-+	DBG("rfslot: fd %d real_sock %d chan %u sock %d",
-+		rfslot->fd, rfslot->real_sock, rfslot->channel,
-+		g_io_channel_unix_get_fd(io));
+ 	DBG("");
 +
-+	if (!g_list_find(rfcomm_connected_list, rfslot)) {
-+		error("rfslot %p not found in the list", rfslot);
-+		return FALSE;
++	if (err < 0) {
++		error("Unable to get SDP record: %s", strerror(-err));
++		goto fail;
 +	}
 +
-+	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
-+		error("Socket error: sock %d cond %d",
-+					g_io_channel_unix_get_fd(io), cond);
-+		rfcomm_connected_list = g_list_remove(rfcomm_connected_list,
-+								rfslot);
-+		cleanup_rfslot(rfslot);
-+		return FALSE;
++	if (!recs || !recs->data) {
++		error("No SDP records found");
++		goto fail;
 +	}
 +
-+	len = recv(rfslot->fd, buf, sizeof(buf), 0);
-+	if (len <= 0) {
-+		error("recv(): %s", strerror(errno));
-+		return FALSE;
++	for (list = recs; list != NULL; list = list->next) {
++		sdp_record_t *rec = list->data;
++		sdp_list_t *protos;
++
++		if (sdp_get_access_protos(rec, &protos) < 0) {
++			error("Unable to get proto list");
++			goto fail;
++		}
++
++		chan = sdp_get_proto_port(protos, RFCOMM_UUID);
++
++		sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free,
++									NULL);
++		sdp_list_free(protos, NULL);
 +	}
 +
-+	DBG("read %d bytes write to %d", len, rfslot->real_sock);
-+
-+	if ((sent = write_n(rfslot->real_sock, buf, len)) < 0) {
-+		error("send(): %s", strerror(errno));
-+		return FALSE;
++	if (chan <= 0) {
++		error("Could not get RFCOMM channel %d", chan);
++		goto fail;
 +	}
 +
-+	DBG("Written %d bytes", sent);
++	DBG("Got RFCOMM channel %d", chan);
 +
- 	return TRUE;
++	io = bt_io_connect(connect_cb, rfslot, NULL, &gerr,
++				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
++				BT_IO_OPT_DEST_BDADDR, &rfslot->dst,
++				BT_IO_OPT_CHANNEL, chan,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
++				BT_IO_OPT_INVALID);
++	if (!io) {
++		error("Failed connect: %s", gerr->message);
++		g_error_free(gerr);
++		goto fail;
++	}
++
++	rfslot->real_sock = g_io_channel_unix_get_fd(io);
++	rfslot->channel = chan;
++	rfcomm_connected_list = g_list_append(rfcomm_connected_list, rfslot);
++	return;
++
++fail:
++	cleanup_rfslot(rfslot);
  }
  
+ static int handle_connect(void *buf)
 -- 
 1.7.10.4
 
