@@ -1,212 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android: Refactor update_found_device function
-Date: Fri, 15 Nov 2013 20:40:23 +0000
-Message-Id: <1384548023-17238-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 15 Nov 2013 14:19:13 -0500
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth 2013-11-11
+Message-ID: <20131115191912.GE7079@tuxdriver.com>
+References: <20131111182738.GB5648@joana>
+ <20131111190548.GA8107@tuxdriver.com>
+ <20131115151554.GB1627@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20131115151554.GB1627@joana>
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This makes function flow easier to follow and understand. Besides that
-it also fix issue with sending to many bytes if some prop were not
-present in EIR.
----
- android/bluetooth.c | 141 +++++++++++++++++++++-------------------------------
- 1 file changed, 57 insertions(+), 84 deletions(-)
+On Fri, Nov 15, 2013 at 01:15:54PM -0200, Gustavo Padovan wrote:
+> Hi John,
+> 
+> 2013-11-11 John W. Linville <linville@tuxdriver.com>:
+> 
+> > On Mon, Nov 11, 2013 at 04:27:38PM -0200, Gustavo Padovan wrote:
+> > > Hi John,
+> > > 
+> > > A few fixes for 3.13. There is 3 fixes to the RFCOMM protocol. One crash fix to
+> > > L2CAP. A simple fix to a bad behaviour in the SMP protocol, and last, an
+> > > revert, that I sent in the last pull request but doesn't seem to be in your
+> > > tree.
+> > 
+> > Are you looking in the wireless-next tree?  It seems to be there, no?
+> 
+> Yes, it is there. I'm resending this pull request without it:
+> 
+> Please pull or let me know of any problems! Thanks
+> 
+> 	Gustavo
+> 
+> ---
+> 
+> The following changes since commit 8ce9beac4661f576ea0d518b9f086bb52a171a37:
+> 
+>   drivers: net: wireless: b43: Fix possible NULL ptr dereference (2013-10-18 13:41:11 -0400)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth for-upstream
+> 
+> for you to fetch changes up to 86ca9eac31d0d8c4fe61b5726e6d63197bc435a6:
+> 
+>   Bluetooth: Fix rejecting SMP security request in slave role (2013-11-13 11:36:54 -0200)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 83f20e2..e3190d1 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -774,54 +774,32 @@ static void confirm_device_name(const bdaddr_t *addr, uint8_t addr_type)
- 		error("Failed to send confirm name request");
- }
- 
--static int fill_device_props(struct hal_property *prop, bdaddr_t *addr,
--					uint32_t cod, int8_t rssi, char *name)
--{
--	uint8_t num_props = 0;
--
--	/* fill Class of Device */
--	if (cod) {
--		prop->type = HAL_PROP_DEVICE_CLASS;
--		prop->len = sizeof(cod);
--		memcpy(prop->val, &cod, prop->len);
--		prop = ((void *) prop) + sizeof(*prop) + sizeof(cod);
--		num_props++;
--	}
- 
--	/* fill RSSI */
--	if (rssi) {
--		prop->type = HAL_PROP_DEVICE_RSSI;
--		prop->len = sizeof(rssi);
--		memcpy(prop->val, &rssi, prop->len);
--		prop = ((void *) prop) + sizeof(*prop) + sizeof(rssi);
--		num_props++;
--	}
-+static int fill_hal_prop(void *buf, uint8_t type, uint16_t len,
-+							const void *val)
-+{
-+	struct hal_property *prop = buf;
- 
--	/* fill name */
--	if (name) {
--		prop->type = HAL_PROP_DEVICE_NAME;
--		prop->len = strlen(name);
--		memcpy(prop->val, name, prop->len);
--		prop = ((void *) prop) + sizeof(*prop) + prop->len;
--		num_props++;
--	}
-+	prop->type = type;
-+	prop->len = len;
-+	memcpy(prop->val, val, len);
- 
--	return num_props;
-+	return sizeof(*prop) + len;
- }
- 
- static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 					int8_t rssi, bool confirm,
- 					const uint8_t *data, uint8_t data_len)
- {
--	bool is_new_dev = false;
--	size_t props_size = 0;
--	size_t buff_size = 0;
--	void *buf;
-+	uint8_t buf[BLUEZ_HAL_MTU];
-+	bool new_dev = false;
- 	struct eir_data eir;
--	GSList *l;
--	bdaddr_t *remote = NULL;
-+	uint8_t *num_prop;
-+	uint8_t opcode;
-+	int size = 0;
- 	int err;
- 
-+	memset(buf, 0, sizeof(buf));
- 	memset(&eir, 0, sizeof(eir));
- 
- 	err = eir_parse(&eir, data, data_len);
-@@ -830,75 +808,70 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 		return;
- 	}
- 
--	l = g_slist_find_custom(found_devices, bdaddr, bdaddr_cmp);
--	if (l)
--		remote = l->data;
--
--	if (!remote) {
-+	if (!g_slist_find_custom(found_devices, bdaddr, bdaddr_cmp)) {
-+		bdaddr_t *new_bdaddr;
- 		char addr[18];
- 
--		remote = g_new0(bdaddr_t, 1);
--		bacpy(remote, bdaddr);
-+		new_bdaddr = g_new0(bdaddr_t, 1);
-+		bacpy(new_bdaddr, bdaddr);
- 
--		found_devices = g_slist_prepend(found_devices, remote);
--		is_new_dev = true;
-+		found_devices = g_slist_prepend(found_devices, new_bdaddr);
- 
--		ba2str(remote, addr);
-+		ba2str(new_bdaddr, addr);
- 		DBG("New device found: %s", addr);
--	}
- 
--	props_size += sizeof(struct hal_property) + sizeof(eir.class);
--	props_size += sizeof(struct hal_property) + sizeof(rssi);
--
--	if (eir.name) {
--		props_size += sizeof(struct hal_property) + strlen(eir.name);
--		cache_device_name(remote, eir.name);
-+		new_dev = true;
- 	}
- 
--	if (is_new_dev) {
--		struct hal_ev_device_found *ev = NULL;
--		struct hal_property *prop = NULL;
--
--		/* with new device we also send bdaddr prop */
--		props_size += sizeof(struct hal_property) + sizeof(eir.addr);
-+	if (new_dev) {
-+		struct hal_ev_device_found *ev = (void *) buf;
-+		bdaddr_t android_bdaddr;
- 
--		buff_size = sizeof(struct hal_ev_device_found) + props_size;
--		buf = g_new0(char, buff_size);
--		ev = buf;
--		prop = ev->props;
-+		size += sizeof(*ev);
- 
--		/* fill first prop with bdaddr */
--		prop->type = HAL_PROP_DEVICE_ADDR;
--		prop->len = sizeof(bdaddr_t);
--		bdaddr2android(bdaddr, prop->val);
--		prop = ((void *) prop) + sizeof(*prop) + sizeof(bdaddr_t);
--		ev->num_props += 1;
-+		num_prop = &ev->num_props;
-+		opcode = HAL_EV_DEVICE_FOUND;
- 
--		/* fill eir, name, and cod props */
--		ev->num_props += fill_device_props(prop, remote, eir.class,
--								rssi, eir.name);
-+		bdaddr2android(bdaddr, &android_bdaddr);
- 
--		ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
--				HAL_EV_DEVICE_FOUND, buff_size, ev, -1);
--		g_free(buf);
-+		size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_ADDR,
-+				sizeof(android_bdaddr), &android_bdaddr);
-+		(*num_prop)++;
- 	} else {
--		struct hal_ev_remote_device_props *ev = NULL;
-+		struct hal_ev_remote_device_props *ev = (void *) buf;
- 
--		buff_size = sizeof(*ev) + props_size;
--		buf = g_new0(char, buff_size);
--		ev = buf;
-+		size += sizeof(*ev);
- 
--		ev->num_props = fill_device_props(ev->props, remote, eir.class,
--								rssi, eir.name);
-+		num_prop = &ev->num_props;
-+		opcode = HAL_EV_REMOTE_DEVICE_PROPS;
- 
- 		ev->status = HAL_STATUS_SUCCESS;
- 		bdaddr2android(bdaddr, ev->bdaddr);
-+	}
-+
-+	if (eir.class) {
-+		size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_CLASS,
-+						sizeof(eir.class), &eir.class);
-+		(*num_prop)++;
-+	}
- 
--		ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
--				HAL_EV_REMOTE_DEVICE_PROPS, buff_size, ev, -1);
--		g_free(buf);
-+	if (rssi) {
-+		size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_RSSI,
-+							sizeof(rssi), &rssi);
-+		(*num_prop)++;
-+	}
-+
-+	if (eir.name) {
-+		cache_device_name(bdaddr, eir.name);
-+
-+		size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_NAME,
-+						strlen(eir.name), eir.name);
-+		(*num_prop)++;
- 	}
- 
-+	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH, opcode, size, buf,
-+									-1);
-+
- 	if (confirm) {
- 		char addr[18];
- 
+Pulling now...
+
 -- 
-1.8.4.3
-
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
