@@ -2,167 +2,202 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC v3 3/5] android/hal-hidhost: Use generic IPC message handling for events
-Date: Fri, 15 Nov 2013 20:49:36 +0000
-Message-Id: <1384548578-18710-4-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC v3 1/5] android/hal: Add initial code for IPC message handlers
+Date: Fri, 15 Nov 2013 20:49:34 +0000
+Message-Id: <1384548578-18710-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1384548578-18710-1-git-send-email-szymon.janc@tieto.com>
 References: <1384548578-18710-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Register handlers on service init and unregister on cleanup.
+This will allow to register and unregister handlers for IPC messages
+Basic sanity check will be done in common code. Commands with variable
+length will be verified against minimum size only.
 ---
- android/hal-hidhost.c | 75 +++++++++++++++++++++++++++++----------------------
- android/hal.h         |  1 -
- 2 files changed, 43 insertions(+), 33 deletions(-)
+ android/hal-ipc.c | 115 ++++++++++++++++++++++++++++++++++++------------------
+ android/hal-ipc.h |  10 +++++
+ 2 files changed, 87 insertions(+), 38 deletions(-)
 
-diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
-index 2ce17a3..27ce492 100644
---- a/android/hal-hidhost.c
-+++ b/android/hal-hidhost.c
-@@ -32,7 +32,7 @@ static bool interface_ready(void)
- 	return cbacks != NULL;
- }
+diff --git a/android/hal-ipc.c b/android/hal-ipc.c
+index 026e245..53af897 100644
+--- a/android/hal-ipc.c
++++ b/android/hal-ipc.c
+@@ -43,26 +43,84 @@ static pthread_mutex_t cmd_sk_mutex = PTHREAD_MUTEX_INITIALIZER;
  
--static void handle_conn_state(void *buf)
-+static void handle_conn_state(void *buf, uint16_t len, int fd)
+ static pthread_t notif_th = 0;
+ 
+-static void notification_dispatch(struct hal_hdr *msg, int fd)
++struct service_handler {
++	const struct hal_ipc_handler *handler;
++	uint8_t size;
++};
++
++static struct service_handler services[HAL_SERVICE_ID_MAX + 1];
++
++void hal_ipc_register(uint8_t service, const struct hal_ipc_handler *handlers,
++								uint8_t size)
++{
++	services[service].handler = handlers;
++	services[service].size = size;
++}
++
++void hal_ipc_unregister(uint8_t service)
  {
- 	struct hal_ev_hidhost_conn_state *ev = buf;
- 
-@@ -41,7 +41,7 @@ static void handle_conn_state(void *buf)
- 								ev->state);
- }
- 
--static void handle_info(void *buf)
-+static void handle_info(void *buf, uint16_t len, int fd)
- {
- 	struct hal_ev_hidhost_info *ev = buf;
- 	bthh_hid_info_t info;
-@@ -60,7 +60,7 @@ static void handle_info(void *buf)
- 		cbacks->hid_info_cb((bt_bdaddr_t *) ev->bdaddr, info);
- }
- 
--static void handle_proto_mode(void *buf)
-+static void handle_proto_mode(void *buf, uint16_t len, int fd)
- {
- 	struct hal_ev_hidhost_proto_mode *ev = buf;
- 
-@@ -69,16 +69,21 @@ static void handle_proto_mode(void *buf)
- 							ev->status, ev->mode);
- }
- 
--static void handle_get_report(void *buf)
-+static void handle_get_report(void *buf, uint16_t len, int fd)
- {
- 	struct hal_ev_hidhost_get_report *ev = buf;
- 
-+	if (len != sizeof(*ev) + ev->len) {
-+		error("invalid get report event, aborting");
+-	switch (msg->service_id) {
+-	case HAL_SERVICE_ID_BLUETOOTH:
+-		bt_notify_adapter(msg->opcode, msg->payload, msg->len);
+-		break;
+-	case HAL_SERVICE_ID_HIDHOST:
+-		bt_notify_hidhost(msg->opcode, msg->payload, msg->len);
+-		break;
+-	case HAL_SERVICE_ID_A2DP:
+-		bt_notify_a2dp(msg->opcode, msg->payload, msg->len);
+-		break;
+-	case HAL_SERVICE_ID_PAN:
+-		bt_notify_pan(msg->opcode, msg->payload, msg->len);
+-		break;
+-	default:
+-		DBG("Unhandled notification service=%d opcode=0x%x",
++	services[service].handler = NULL;
++	services[service].size = 0;
++}
++
++static void handle_msg(void *buf, ssize_t len, int fd)
++{
++	struct hal_hdr *msg = buf;
++	const struct hal_ipc_handler *handler;
++	uint8_t opcode;
++
++	if (len < (ssize_t) sizeof(*msg)) {
++		error("IPC: message too small (%zd bytes), aborting", len);
 +		exit(EXIT_FAILURE);
 +	}
 +
- 	if (cbacks->get_report_cb)
- 		cbacks->get_report_cb((bt_bdaddr_t *) ev->bdaddr, ev->status,
- 							ev->data, ev->len);
++	if (len != (ssize_t) (sizeof(*msg) + msg->len)) {
++		error("IPC: message malformed (%zd bytes), aborting", len);
++		exit(EXIT_FAILURE);
++	}
++
++	/* if service is valid */
++	if (msg->service_id > HAL_SERVICE_ID_MAX) {
++		error("IPC: unknown service (0x%x), aborting",
++							msg->service_id);
++		exit(EXIT_FAILURE);
++	}
++
++	/* if service is registered */
++	if (!services[msg->service_id].handler) {
++		error("IPC: unregistered service (0x%x), aborting",
++							msg->service_id);
++		exit(EXIT_FAILURE);
++	}
++
++	/* if opcode fit valid range */
++	if (msg->opcode < HAL_MINIMUM_EVENT) {
++		error("IPC: invalid opcode for service 0x%x (0x%x), aborting",
+ 						msg->service_id, msg->opcode);
+-		break;
++		exit(EXIT_FAILURE);
++	}
++
++	opcode = msg->opcode - HAL_MINIMUM_EVENT;
++
++	/* if opcode is valid */
++	if (opcode >= services[msg->service_id].size) {
++		error("IPC: invalid opcode for service 0x%x (0x%x), aborting",
++						msg->service_id, msg->opcode);
++		exit(EXIT_FAILURE);
++	}
++
++	handler = &services[msg->service_id].handler[opcode];
++
++	/* if payload size is valid */
++	if ((handler->var_len && handler->data_len > msg->len) ||
++			(!handler->var_len && handler->data_len != msg->len)) {
++		error("IPC: message size invalid for service 0x%x opcode 0x%x "
++				"(%u bytes), aborting",
++				msg->service_id, msg->opcode, msg->len);
++		exit(EXIT_FAILURE);
+ 	}
++
++	handler->handler(msg->payload, msg->len, fd);
  }
  
--static void handle_virtual_unplug(void *buf)
-+static void handle_virtual_unplug(void *buf, uint16_t len, int fd)
- {
- 	struct hal_ev_hidhost_virtual_unplug *ev = buf;
+ static void *notification_handler(void *data)
+@@ -72,7 +130,6 @@ static void *notification_handler(void *data)
+ 	struct cmsghdr *cmsg;
+ 	char cmsgbuf[CMSG_SPACE(sizeof(int))];
+ 	char buf[BLUEZ_HAL_MTU];
+-	struct hal_hdr *ev = (void *) buf;
+ 	ssize_t ret;
+ 	int fd;
  
-@@ -87,33 +92,34 @@ static void handle_virtual_unplug(void *buf)
- 								ev->status);
- }
+@@ -83,7 +140,7 @@ static void *notification_handler(void *data)
+ 		memset(buf, 0, sizeof(buf));
+ 		memset(cmsgbuf, 0, sizeof(cmsgbuf));
  
--/* will be called from notification thread context */
--void bt_notify_hidhost(uint8_t opcode, void *buf, uint16_t len)
--{
--	if (!interface_ready())
--		return;
+-		iv.iov_base = ev;
++		iv.iov_base = buf;
+ 		iv.iov_len = sizeof(buf);
+ 
+ 		msg.msg_iov = &iv;
+@@ -108,24 +165,6 @@ static void *notification_handler(void *data)
+ 			exit(EXIT_FAILURE);
+ 		}
+ 
+-		if (ret < (ssize_t) sizeof(*ev)) {
+-			error("Too small notification (%zd bytes), aborting",
+-									ret);
+-			exit(EXIT_FAILURE);
+-		}
 -
--	switch (opcode) {
--	case HAL_EV_HIDHOST_CONN_STATE:
--		handle_conn_state(buf);
--		break;
--	case HAL_EV_HIDHOST_INFO:
--		handle_info(buf);
--		break;
--	case HAL_EV_HIDHOST_PROTO_MODE:
--		handle_proto_mode(buf);
--		break;
--	case HAL_EV_HIDHOST_GET_REPORT:
--		handle_get_report(buf);
--		break;
--	case HAL_EV_HIDHOST_VIRTUAL_UNPLUG:
--		handle_virtual_unplug(buf);
--		break;
--	default:
--		DBG("Unhandled callback opcode=0x%x", opcode);
--		break;
--	}
--}
-+/* handlers will be called from notification thread context */
-+static const struct hal_ipc_handler ev_handlers[] = {
-+	{
-+		.handler = handle_conn_state,
-+		.var_len = false,
-+		.data_len = sizeof(struct hal_ev_hidhost_conn_state)
-+	},
-+	{
-+		.handler = handle_info,
-+		.var_len = false,
-+		.data_len = sizeof(struct hal_ev_hidhost_info),
-+	},
-+	{
-+		.handler = handle_proto_mode,
-+		.var_len = false,
-+		.data_len = sizeof(struct hal_ev_hidhost_proto_mode),
-+	},
-+	{
-+		.handler = handle_get_report,
-+		.var_len = true,
-+		.data_len = sizeof(struct hal_ev_hidhost_get_report),
-+	},
-+	{
-+		.handler = handle_virtual_unplug,
-+		.var_len = false,
-+		.data_len = sizeof(struct hal_ev_hidhost_virtual_unplug),
-+	},
+-		if (ev->opcode < HAL_MINIMUM_EVENT) {
+-			error("Invalid notification (0x%x), aborting",
+-							ev->opcode);
+-			exit(EXIT_FAILURE);
+-		}
+-
+-		if (ret != (ssize_t) (sizeof(*ev) + ev->len)) {
+-			error("Malformed notification(%zd bytes), aborting",
+-									ret);
+-			exit(EXIT_FAILURE);
+-		}
+-
+ 		fd = -1;
+ 
+ 		/* Receive auxiliary data in msg */
+@@ -138,7 +177,7 @@ static void *notification_handler(void *data)
+ 			}
+ 		}
+ 
+-		notification_dispatch(ev, fd);
++		handle_msg(buf, ret, fd);
+ 	}
+ 
+ 	close(notif_sk);
+diff --git a/android/hal-ipc.h b/android/hal-ipc.h
+index ea53e1c..9f867f8 100644
+--- a/android/hal-ipc.h
++++ b/android/hal-ipc.h
+@@ -15,8 +15,18 @@
+  *
+  */
+ 
++struct hal_ipc_handler {
++	void (*handler) (void *buf, uint16_t len, int fd);
++	bool var_len;
++	size_t data_len;
 +};
- 
- static bt_status_t hidhost_connect(bt_bdaddr_t *bd_addr)
- {
-@@ -362,6 +368,9 @@ static bt_status_t init(bthh_callbacks_t *callbacks)
- 	/* store reference to user callbacks */
- 	cbacks = callbacks;
- 
-+	hal_ipc_register(HAL_SERVICE_ID_HIDHOST, ev_handlers,
-+				sizeof(ev_handlers)/sizeof(ev_handlers[0]));
 +
- 	cmd.service_id = HAL_SERVICE_ID_HIDHOST;
+ bool hal_ipc_init(void);
+ void hal_ipc_cleanup(void);
  
- 	return hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
-@@ -383,6 +392,8 @@ static void cleanup(void)
- 
- 	hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_UNREGISTER_MODULE,
- 					sizeof(cmd), &cmd, 0, NULL, NULL);
+ int hal_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len, void *param,
+ 					size_t *rsp_len, void *rsp, int *fd);
 +
-+	hal_ipc_unregister(HAL_SERVICE_ID_HIDHOST);
- }
- 
- static bthh_interface_t hidhost_if = {
-diff --git a/android/hal.h b/android/hal.h
-index 67dad5d..58426a9 100644
---- a/android/hal.h
-+++ b/android/hal.h
-@@ -28,6 +28,5 @@ btav_interface_t *bt_get_a2dp_interface(void);
- 
- void bt_thread_associate(void);
- void bt_thread_disassociate(void);
--void bt_notify_hidhost(uint8_t opcode, void *buf, uint16_t len);
- void bt_notify_a2dp(uint8_t opcode, void *buf, uint16_t len);
- void bt_notify_pan(uint8_t opcode, void *buf, uint16_t len);
++void hal_ipc_register(uint8_t service, const struct hal_ipc_handler *handlers,
++								uint8_t size);
++void hal_ipc_unregister(uint8_t service);
 -- 
 1.8.4.3
 
