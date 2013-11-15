@@ -1,30 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+In-Reply-To: <1384451935-4836-1-git-send-email-a.heider@gmail.com>
+References: <1384451935-4836-1-git-send-email-a.heider@gmail.com>
+Date: Fri, 15 Nov 2013 10:37:53 +0100
+Message-ID: <CAHsu+b9nHbrXt6rF5VahmXeoTEMwBgf-C3vOJQOQ3meDnpCQyA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] build: Fix out of tree builds
+From: Andre Heider <a.heider@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 1/2] android/pan: Fix wrong HAL service id
-Date: Fri, 15 Nov 2013 11:59:24 +0200
-Message-Id: <1384509565-27465-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pan.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Thu, Nov 14, 2013 at 6:58 PM, Andre Heider <a.heider@gmail.com> wrote:
+> Don't create bogus symlinks when passing an absolute path to --prefix.
 
-diff --git a/android/pan.c b/android/pan.c
-index 061e611..46b3700 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -87,7 +87,7 @@ void bt_pan_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
- 		break;
- 	}
- 
--	ipc_send_rsp(sk, HAL_SERVICE_ID_A2DP, status);
-+	ipc_send_rsp(sk, HAL_SERVICE_ID_PAN, status);
- }
- 
- bool bt_pan_register(int sk, const bdaddr_t *addr)
--- 
-1.8.3.2
+No idea how that happened, but I meant:
+Don't create bogus symlinks when calling the configure script via an
+absolute path.
 
+;)
+
+Regards,
+Andre
