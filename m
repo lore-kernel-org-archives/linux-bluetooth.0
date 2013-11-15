@@ -1,54 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+From: Bruno Bruzzano <brunano21@gmail.com>
+Date: Fri, 15 Nov 2013 09:13:30 -0500
+Message-ID: <CACA6DsW7vuODH=8hU_1FC8serzdAkSbcuQcfQRDBhSNVSEyttA@mail.gmail.com>
+Subject: Interacting with BlueZ5 and Neard...possible bug.
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 03/16] android/hal-sock: Add connect signal to socket
-Date: Fri, 15 Nov 2013 16:37:45 +0200
-Message-Id: <1384526278-26260-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1384526278-26260-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1384526278-26260-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi everyone!
+I resend this mail, because I forgot the subject. Sorry. The mail
+however is the same of the previous.
+As suggested by vcgomes (from IRC channel), I subscribed to this
+mailing list to report a
+possible bug. I hope I'll receive a feedback from you.
+I'm using Neard and BlueZ5 and my goal is to try the bluetooth
+handover. The steps I followed are: I run the Bluetooth daemon with
+experimental arg (-E), run the neard daemon, powered the NFC adapter
+and set it up in Polling mode; furthermore, I wrote the MiFare Classic
+1k tag with a record to do the pair. In particular, I used a Samsung
+S3 to write the tag, using the NXP WriteTag application. So, the last
+step (I think!) is to put the tag on the adapter to start the pairing.
+Unfortunally, something happens, that is, in my smartphone I receive a
+pairing request and I give the 'Ok', but watching the debug of
+Bluetooth daemon, I read always:
+"bluetoothd[22063]: src/agent.c:agent_unref() 0x89470c8: ref=-87222"
+"bluetoothd[22063]: src/adapter.c:btd_adapter_confirm_reply() hci0
+addr B0:C4:E7:BC:B9:4A success 0".
+This two lines are repeated continuisly, with the 'ref' that increases
+up to a certain point. After that the Bluetooth daemon crashes.
+Here you can find two pastebin, respectively for BlueZ daemon and Neard daemon.
+BlueZ: http://pastebin.com/Z4W0V5NZ
+Neard: http://pastebin.com/cNfQ7qi0
 
-Connect signal is used to pass information to framework that socket
-is accepted.
----
- android/hal-msg.h |    2 ++
- android/socket.h  |    7 +++++++
- 2 files changed, 9 insertions(+)
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 44fd5c8..9e3a81f 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -232,6 +232,8 @@ struct hal_cmd_sock_connect {
- 	uint8_t  flags;
- } __attribute__((packed));
- 
-+/* Bluetooth Hidhost HAL api */
-+
- #define HAL_OP_HIDHOST_CONNECT		0x01
- struct hal_cmd_hidhost_connect {
- 	uint8_t bdaddr[6];
-diff --git a/android/socket.h b/android/socket.h
-index 7aa5574..ba56c9b 100644
---- a/android/socket.h
-+++ b/android/socket.h
-@@ -21,6 +21,13 @@
-  *
-  */
- 
-+struct hal_sock_connect_signal {
-+	short   size;
-+	uint8_t bdaddr[6];
-+	int     channel;
-+	int     status;
-+} __attribute__((packed));
-+
- void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len);
- 
- bool bt_socket_register(int sk, const bdaddr_t *addr);
--- 
-1.7.10.4
-
+Best Regards
+Bruno Bruzzano (br1_21)
