@@ -1,48 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] android/hal: Merge bluetooth and sock register/unregister
-Date: Fri, 15 Nov 2013 12:13:53 +0200
-Message-Id: <1384510435-17497-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/3] android/hal: Remove unneeded code
+Date: Fri, 15 Nov 2013 12:13:54 +0200
+Message-Id: <1384510435-17497-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1384510435-17497-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1384510435-17497-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Bluetooth and Socket HAL are registered and unregistered at the
-same time.
+Socket HAL always registers with Bluetooth HAL and there is no sense
+to send 2 commands over IPC.
 ---
- android/main.c |    9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ android/hal-bluetooth.c |    9 ---------
+ 1 file changed, 9 deletions(-)
 
-diff --git a/android/main.c b/android/main.c
-index a4f5e84..f72004c 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -87,10 +87,11 @@ static void service_register(void *buf, uint16_t len)
- 		if (!bt_bluetooth_register(sk))
- 			goto failed;
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index 078d537..8cd4327 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -347,15 +347,6 @@ static int init(bt_callbacks_t *callbacks)
+ 		goto fail;
+ 	}
  
--		break;
--	case HAL_SERVICE_ID_SOCK:
--		if (!bt_socket_register(sk, &adapter_bdaddr))
-+		if (!bt_socket_register(sk, &adapter_bdaddr)) {
-+			bt_bluetooth_unregister();
- 			goto failed;
-+		}
-+		services[HAL_SERVICE_ID_SOCK] = true;
+-	cmd.service_id = HAL_SERVICE_ID_SOCK;
+-
+-	status = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
+-					sizeof(cmd), &cmd, NULL, NULL, NULL);
+-	if (status != BT_STATUS_SUCCESS) {
+-		error("Failed to register 'socket' service");
+-		goto fail;
+-	}
+-
+ 	return status;
  
- 		break;
- 	case HAL_SERVICE_ID_HIDHOST:
-@@ -135,8 +136,6 @@ static void service_unregister(void *buf, uint16_t len)
- 	switch (m->service_id) {
- 	case HAL_SERVICE_ID_BLUETOOTH:
- 		bt_bluetooth_unregister();
--		break;
--	case HAL_SERVICE_ID_SOCK:
- 		bt_socket_unregister();
- 		break;
- 	case HAL_SERVICE_ID_HIDHOST:
+ fail:
 -- 
 1.7.10.4
 
