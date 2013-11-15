@@ -1,121 +1,212 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAKT1EBc2d3VkiUF705aNY79YDmL5ZRX75fg=a4a_ZfTPt4zoDA@mail.gmail.com>
-References: <1381777790-28891-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1381862383-9866-1-git-send-email-claudio.takahasi@openbossa.org>
-	<CAHZ1yCmTdG_ynyfXj0CYhRsPWdM5MBeySvG1Wd5Xb+nEvCVH0A@mail.gmail.com>
-	<CAKT1EBc2d3VkiUF705aNY79YDmL5ZRX75fg=a4a_ZfTPt4zoDA@mail.gmail.com>
-Date: Fri, 15 Nov 2013 11:47:52 -0800
-Message-ID: <CAHZ1yCmKocpuqhZXA_-=sxR6SPmfB1UdcRYH93evneM_nCqU7Q@mail.gmail.com>
-Subject: Re: [RFC BlueZ v1] doc: Add GATT API
-From: Scott James Remnant <keybuk@google.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Szymon Janc <szymon.janc@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] android: Refactor update_found_device function
+Date: Fri, 15 Nov 2013 20:40:23 +0000
+Message-Id: <1384548023-17238-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Nov 12, 2013 at 10:49 AM, Claudio Takahasi
-<claudio.takahasi@openbossa.org> wrote:
+This makes function flow easier to follow and understand. Besides that
+it also fix issue with sending to many bytes if some prop were not
+present in EIR.
+---
+ android/bluetooth.c | 141 +++++++++++++++++++++-------------------------------
+ 1 file changed, 57 insertions(+), 84 deletions(-)
 
-> On Mon, Nov 11, 2013 at 3:56 PM, Scott James Remnant <keybuk@google.com> wrote:
->> How will service changed be handled? How will BlueZ track the set of
->> applications, and the set of services etc. defined by those
->> applications in a manner that keeps handles consistent? How will it
->> handle generating the Services Changed notification in the cases where
->> the set of applications and/or services change, or the handles change?
->
-> We implemented a hash of declarations. Using the "Id"  provided in the
-> options dictionary (see RegisterAgent) we are able to identity if the
-> external service changed its attributes.
-> However, I don' t think we will upstream this approach soon, Marcel
-> wants a simpler approach: always send ServiceChanged.
->
-
-While this is probably "spec sufficient", and probably sufficient for
-passing qualification, I'm not sure that this is necessarily the best
-approach since this means that BlueZ when acting as a GATT Server
-wouldn't be behaving quite the same as, say, a commodity BTLE device.
-
->>> +Characteristic hierarchy
->>> +========================
->>   :
->>> +Service                org.bluez
->>> +Interface      org.bluez.Characteristic1 [Experimental]
->>> +Object path    [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY
->>
->> This would also need a "Permissions" property akin to the one you have
->> for Descriptors - characteristics can be "not accessible", read-only,
->> write-only, read/write - and can also require authorization,
->> authentication, encryption and minimum encryption key sizes - as with
->> descriptors.
->
-> It is implemented already, there is an optional "Flags" property :
-> "array{string} Flags [read-only, optional]"
->
-
-Flags seemed to correspond to the Flags characteristic descriptor and
-not the simple permissions of the characteristic itself.
-
->>> +               array{byte} Value [read-write]
->>> +
->>> +                       Cached Value of the characteristic. If present, the
->>> +                       value will be cached by bluetoothd and updated when the
->>> +                       PropertiesChanged signal is emitted.
->>> +
->>> +                       External services must emit this signal when the
->>> +                       characteristic supports notification/indication, so
->>> +                       that clients can be notified of the new value.
->>
->> The PropertiesChanged signal explains how Notification will be handled
->> - but how will Indication? How will a service receive the Indication
->> Confirmation from the remote devices?
->
-> The bluetoothd core manages the Confirmation. In my opinion clients
-> listening for PropertiesChanged don' t need to know the difference
-> between notification and indication.
-> Allow an external client to manage the Confirmation will insert
-> additional complexity without giving real benefits.
->
-
-I'm thinking of the opposite way around - not the clients, but the services.
-
-If I implement a service over the D-Bus API, and a characteristic
-supports Indication, then is it not important that the service be
-informed when the clients confirm the Indication that is sent out?
-
-Otherwise it makes Indications identical to Notifications when
-implementing a service using the BlueZ D-Bus API, which may cause
-issues with implementing certain profiles.
-
-
->>> +Application Agent hierarchy
->>> +===========================
->>> +
->>> +Service                unique name
->>> +Interface      org.bluez.ApplicationAgent1 [Experimental]
->>> +Object path    freely definable
->>> +
->>
->> "Agent" seems unnnecessary here - if the object is an Application,
->> then org.bluez.Application1 would be a decent enough name. Thus an
->> "Application" consists of multiple Services, each of which consists of
->> multiple Characteristics, each of which has multiple Descriptors
->
-> IMO "Agent" gives a better association with its functionality, it
-> reminds me org.bluez.Agent1.
-> Let's wait the opinion of the others developers...
->
-
-I was more thinking that we have "AgentManager" -> "Agent",
-"ProfileManager" -> "Profile", "ServiceManager" -> "Service" ... all
-of those use the agent-style pattern, but only "Pairing" Agent is
-called Agent.
-
-But honestly, bike shedding ;-)  I'm only complaining because calling
-it "ApplicationAgent" would slightly screw up my naming convention
-inside Chromium
-
-Scott
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 83f20e2..e3190d1 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -774,54 +774,32 @@ static void confirm_device_name(const bdaddr_t *addr, uint8_t addr_type)
+ 		error("Failed to send confirm name request");
+ }
+ 
+-static int fill_device_props(struct hal_property *prop, bdaddr_t *addr,
+-					uint32_t cod, int8_t rssi, char *name)
+-{
+-	uint8_t num_props = 0;
+-
+-	/* fill Class of Device */
+-	if (cod) {
+-		prop->type = HAL_PROP_DEVICE_CLASS;
+-		prop->len = sizeof(cod);
+-		memcpy(prop->val, &cod, prop->len);
+-		prop = ((void *) prop) + sizeof(*prop) + sizeof(cod);
+-		num_props++;
+-	}
+ 
+-	/* fill RSSI */
+-	if (rssi) {
+-		prop->type = HAL_PROP_DEVICE_RSSI;
+-		prop->len = sizeof(rssi);
+-		memcpy(prop->val, &rssi, prop->len);
+-		prop = ((void *) prop) + sizeof(*prop) + sizeof(rssi);
+-		num_props++;
+-	}
++static int fill_hal_prop(void *buf, uint8_t type, uint16_t len,
++							const void *val)
++{
++	struct hal_property *prop = buf;
+ 
+-	/* fill name */
+-	if (name) {
+-		prop->type = HAL_PROP_DEVICE_NAME;
+-		prop->len = strlen(name);
+-		memcpy(prop->val, name, prop->len);
+-		prop = ((void *) prop) + sizeof(*prop) + prop->len;
+-		num_props++;
+-	}
++	prop->type = type;
++	prop->len = len;
++	memcpy(prop->val, val, len);
+ 
+-	return num_props;
++	return sizeof(*prop) + len;
+ }
+ 
+ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+ 					int8_t rssi, bool confirm,
+ 					const uint8_t *data, uint8_t data_len)
+ {
+-	bool is_new_dev = false;
+-	size_t props_size = 0;
+-	size_t buff_size = 0;
+-	void *buf;
++	uint8_t buf[BLUEZ_HAL_MTU];
++	bool new_dev = false;
+ 	struct eir_data eir;
+-	GSList *l;
+-	bdaddr_t *remote = NULL;
++	uint8_t *num_prop;
++	uint8_t opcode;
++	int size = 0;
+ 	int err;
+ 
++	memset(buf, 0, sizeof(buf));
+ 	memset(&eir, 0, sizeof(eir));
+ 
+ 	err = eir_parse(&eir, data, data_len);
+@@ -830,75 +808,70 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+ 		return;
+ 	}
+ 
+-	l = g_slist_find_custom(found_devices, bdaddr, bdaddr_cmp);
+-	if (l)
+-		remote = l->data;
+-
+-	if (!remote) {
++	if (!g_slist_find_custom(found_devices, bdaddr, bdaddr_cmp)) {
++		bdaddr_t *new_bdaddr;
+ 		char addr[18];
+ 
+-		remote = g_new0(bdaddr_t, 1);
+-		bacpy(remote, bdaddr);
++		new_bdaddr = g_new0(bdaddr_t, 1);
++		bacpy(new_bdaddr, bdaddr);
+ 
+-		found_devices = g_slist_prepend(found_devices, remote);
+-		is_new_dev = true;
++		found_devices = g_slist_prepend(found_devices, new_bdaddr);
+ 
+-		ba2str(remote, addr);
++		ba2str(new_bdaddr, addr);
+ 		DBG("New device found: %s", addr);
+-	}
+ 
+-	props_size += sizeof(struct hal_property) + sizeof(eir.class);
+-	props_size += sizeof(struct hal_property) + sizeof(rssi);
+-
+-	if (eir.name) {
+-		props_size += sizeof(struct hal_property) + strlen(eir.name);
+-		cache_device_name(remote, eir.name);
++		new_dev = true;
+ 	}
+ 
+-	if (is_new_dev) {
+-		struct hal_ev_device_found *ev = NULL;
+-		struct hal_property *prop = NULL;
+-
+-		/* with new device we also send bdaddr prop */
+-		props_size += sizeof(struct hal_property) + sizeof(eir.addr);
++	if (new_dev) {
++		struct hal_ev_device_found *ev = (void *) buf;
++		bdaddr_t android_bdaddr;
+ 
+-		buff_size = sizeof(struct hal_ev_device_found) + props_size;
+-		buf = g_new0(char, buff_size);
+-		ev = buf;
+-		prop = ev->props;
++		size += sizeof(*ev);
+ 
+-		/* fill first prop with bdaddr */
+-		prop->type = HAL_PROP_DEVICE_ADDR;
+-		prop->len = sizeof(bdaddr_t);
+-		bdaddr2android(bdaddr, prop->val);
+-		prop = ((void *) prop) + sizeof(*prop) + sizeof(bdaddr_t);
+-		ev->num_props += 1;
++		num_prop = &ev->num_props;
++		opcode = HAL_EV_DEVICE_FOUND;
+ 
+-		/* fill eir, name, and cod props */
+-		ev->num_props += fill_device_props(prop, remote, eir.class,
+-								rssi, eir.name);
++		bdaddr2android(bdaddr, &android_bdaddr);
+ 
+-		ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
+-				HAL_EV_DEVICE_FOUND, buff_size, ev, -1);
+-		g_free(buf);
++		size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_ADDR,
++				sizeof(android_bdaddr), &android_bdaddr);
++		(*num_prop)++;
+ 	} else {
+-		struct hal_ev_remote_device_props *ev = NULL;
++		struct hal_ev_remote_device_props *ev = (void *) buf;
+ 
+-		buff_size = sizeof(*ev) + props_size;
+-		buf = g_new0(char, buff_size);
+-		ev = buf;
++		size += sizeof(*ev);
+ 
+-		ev->num_props = fill_device_props(ev->props, remote, eir.class,
+-								rssi, eir.name);
++		num_prop = &ev->num_props;
++		opcode = HAL_EV_REMOTE_DEVICE_PROPS;
+ 
+ 		ev->status = HAL_STATUS_SUCCESS;
+ 		bdaddr2android(bdaddr, ev->bdaddr);
++	}
++
++	if (eir.class) {
++		size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_CLASS,
++						sizeof(eir.class), &eir.class);
++		(*num_prop)++;
++	}
+ 
+-		ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
+-				HAL_EV_REMOTE_DEVICE_PROPS, buff_size, ev, -1);
+-		g_free(buf);
++	if (rssi) {
++		size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_RSSI,
++							sizeof(rssi), &rssi);
++		(*num_prop)++;
++	}
++
++	if (eir.name) {
++		cache_device_name(bdaddr, eir.name);
++
++		size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_NAME,
++						strlen(eir.name), eir.name);
++		(*num_prop)++;
+ 	}
+ 
++	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH, opcode, size, buf,
++									-1);
++
+ 	if (confirm) {
+ 		char addr[18];
+ 
 -- 
-Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
+1.8.4.3
+
