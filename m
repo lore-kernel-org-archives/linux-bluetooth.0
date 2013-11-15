@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 11/16] android/hal-sock: Parse SDP response and connect
-Date: Fri, 15 Nov 2013 16:37:53 +0200
-Message-Id: <1384526278-26260-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 12/16] android/hal-sock: Implement HAL connect call
+Date: Fri, 15 Nov 2013 16:37:54 +0200
+Message-Id: <1384526278-26260-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384526278-26260-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384526278-26260-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,88 +11,66 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Parse SDP response, find RFCOMM channel and connect.
+HAL connect uses similar event handlers like listen call.
 ---
- android/socket.c |   63 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 63 insertions(+)
+ android/socket.c |   43 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 42 insertions(+), 1 deletion(-)
 
 diff --git a/android/socket.c b/android/socket.c
-index b29d4af..6e6db4f 100644
+index 6e6db4f..c3ce4f0 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -372,9 +372,72 @@ static int handle_listen(void *buf)
+@@ -372,8 +372,49 @@ static int handle_listen(void *buf)
  	return hal_fd;
  }
  
-+static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
-+{
-+}
-+
- static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+-static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
++static void connect_cb(GIOChannel *io, GError *conn_err, gpointer user_data)
  {
-+	struct rfcomm_slot *rfslot = data;
-+	GError *gerr = NULL;
-+	sdp_list_t *list;
-+	GIOChannel *io;
-+	int chan;
++	struct rfcomm_slot *rfslot = user_data;
++	GIOChannel *io_stack;
++	GError *io_err = NULL;
++	bdaddr_t dst;
++	char address[18];
++	int chan = -1;
 +
- 	DBG("");
-+
-+	if (err < 0) {
-+		error("Unable to get SDP record: %s", strerror(-err));
++	bt_io_get(io, &io_err,
++			BT_IO_OPT_DEST_BDADDR, &dst,
++			BT_IO_OPT_INVALID);
++	if (io_err) {
++		error("%s", io_err->message);
++		g_error_free(io_err);
 +		goto fail;
 +	}
 +
-+	if (!recs || !recs->data) {
-+		error("No SDP records found");
++	if (conn_err) {
++		error("%s", conn_err->message);
 +		goto fail;
 +	}
 +
-+	for (list = recs; list != NULL; list = list->next) {
-+		sdp_record_t *rec = list->data;
-+		sdp_list_t *protos;
++	ba2str(&dst, address);
++	DBG("Connected to %s rfslot %p chan %d", address, rfslot, chan);
 +
-+		if (sdp_get_access_protos(rec, &protos) < 0) {
-+			error("Unable to get proto list");
-+			goto fail;
-+		}
++	DBG("rfslot: fd %d real_sock %d chan %u sock %d",
++		rfslot->fd, rfslot->real_sock, rfslot->channel,
++		g_io_channel_unix_get_fd(io));
 +
-+		chan = sdp_get_proto_port(protos, RFCOMM_UUID);
++	/* Handle events from Android */
++	io_stack = g_io_channel_unix_new(rfslot->fd);
++	g_io_add_watch(io_stack, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++						sock_stack_event_cb, rfslot);
++	g_io_channel_unref(io_stack);
 +
-+		sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free,
-+									NULL);
-+		sdp_list_free(protos, NULL);
-+	}
++	/* Handle rfcomm events */
++	g_io_add_watch(io, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++				sock_rfcomm_event_cb, rfslot);
 +
-+	if (chan <= 0) {
-+		error("Could not get RFCOMM channel %d", chan);
-+		goto fail;
-+	}
-+
-+	DBG("Got RFCOMM channel %d", chan);
-+
-+	io = bt_io_connect(connect_cb, rfslot, NULL, &gerr,
-+				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
-+				BT_IO_OPT_DEST_BDADDR, &rfslot->dst,
-+				BT_IO_OPT_CHANNEL, chan,
-+				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-+				BT_IO_OPT_INVALID);
-+	if (!io) {
-+		error("Failed connect: %s", gerr->message);
-+		g_error_free(gerr);
-+		goto fail;
-+	}
-+
-+	rfslot->real_sock = g_io_channel_unix_get_fd(io);
-+	rfslot->channel = chan;
-+	rfcomm_connected_list = g_list_append(rfcomm_connected_list, rfslot);
 +	return;
-+
 +fail:
 +	cleanup_rfslot(rfslot);
  }
  
- static int handle_connect(void *buf)
+ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
 -- 
 1.7.10.4
 
