@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 5/5] android/hal-a2dp: Use generic IPC message handling for events
-Date: Sat, 16 Nov 2013 15:13:28 +0100
-Message-Id: <1384611208-18536-6-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 3/5] android/hal-hidhost: Use generic IPC message handling for events
+Date: Sat, 16 Nov 2013 15:13:26 +0100
+Message-Id: <1384611208-18536-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1384611208-18536-1-git-send-email-szymon.janc@tieto.com>
 References: <1384611208-18536-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,48 +12,90 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Register handlers on service init and unregister on cleanup.
 ---
- android/hal-a2dp.c | 40 ++++++++++++++++++++--------------------
- android/hal.h      |  1 -
- 2 files changed, 20 insertions(+), 21 deletions(-)
+ android/hal-hidhost.c | 75 +++++++++++++++++++++++++++++----------------------
+ android/hal.h         |  1 -
+ 2 files changed, 43 insertions(+), 33 deletions(-)
 
-diff --git a/android/hal-a2dp.c b/android/hal-a2dp.c
-index e9fadb7..baa4b10 100644
---- a/android/hal-a2dp.c
-+++ b/android/hal-a2dp.c
-@@ -31,7 +31,7 @@ static bool interface_ready(void)
- 	return cbs != NULL;
+diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
+index 2ce17a3..27ce492 100644
+--- a/android/hal-hidhost.c
++++ b/android/hal-hidhost.c
+@@ -32,7 +32,7 @@ static bool interface_ready(void)
+ 	return cbacks != NULL;
  }
  
 -static void handle_conn_state(void *buf)
 +static void handle_conn_state(void *buf, uint16_t len, int fd)
  {
- 	struct hal_ev_a2dp_conn_state *ev = buf;
+ 	struct hal_ev_hidhost_conn_state *ev = buf;
  
-@@ -40,7 +40,7 @@ static void handle_conn_state(void *buf)
- 						(bt_bdaddr_t *) (ev->bdaddr));
+@@ -41,7 +41,7 @@ static void handle_conn_state(void *buf)
+ 								ev->state);
  }
  
--static void handle_audio_state(void *buf)
-+static void handle_audio_state(void *buf, uint16_t len, int fd)
+-static void handle_info(void *buf)
++static void handle_info(void *buf, uint16_t len, int fd)
  {
- 	struct hal_ev_a2dp_audio_state *ev = buf;
+ 	struct hal_ev_hidhost_info *ev = buf;
+ 	bthh_hid_info_t info;
+@@ -60,7 +60,7 @@ static void handle_info(void *buf)
+ 		cbacks->hid_info_cb((bt_bdaddr_t *) ev->bdaddr, info);
+ }
  
-@@ -48,24 +48,19 @@ static void handle_audio_state(void *buf)
- 		cbs->audio_state_cb(ev->state, (bt_bdaddr_t *)(ev->bdaddr));
+-static void handle_proto_mode(void *buf)
++static void handle_proto_mode(void *buf, uint16_t len, int fd)
+ {
+ 	struct hal_ev_hidhost_proto_mode *ev = buf;
+ 
+@@ -69,16 +69,21 @@ static void handle_proto_mode(void *buf)
+ 							ev->status, ev->mode);
+ }
+ 
+-static void handle_get_report(void *buf)
++static void handle_get_report(void *buf, uint16_t len, int fd)
+ {
+ 	struct hal_ev_hidhost_get_report *ev = buf;
+ 
++	if (len != sizeof(*ev) + ev->len) {
++		error("invalid get report event, aborting");
++		exit(EXIT_FAILURE);
++	}
++
+ 	if (cbacks->get_report_cb)
+ 		cbacks->get_report_cb((bt_bdaddr_t *) ev->bdaddr, ev->status,
+ 							ev->data, ev->len);
+ }
+ 
+-static void handle_virtual_unplug(void *buf)
++static void handle_virtual_unplug(void *buf, uint16_t len, int fd)
+ {
+ 	struct hal_ev_hidhost_virtual_unplug *ev = buf;
+ 
+@@ -87,33 +92,34 @@ static void handle_virtual_unplug(void *buf)
+ 								ev->status);
  }
  
 -/* will be called from notification thread context */
--void bt_notify_a2dp(uint8_t opcode, void *buf, uint16_t len)
+-void bt_notify_hidhost(uint8_t opcode, void *buf, uint16_t len)
 -{
 -	if (!interface_ready())
 -		return;
 -
 -	switch (opcode) {
--	case HAL_EV_A2DP_CONN_STATE:
+-	case HAL_EV_HIDHOST_CONN_STATE:
 -		handle_conn_state(buf);
 -		break;
--	case HAL_EV_A2DP_AUDIO_STATE:
--		handle_audio_state(buf);
+-	case HAL_EV_HIDHOST_INFO:
+-		handle_info(buf);
+-		break;
+-	case HAL_EV_HIDHOST_PROTO_MODE:
+-		handle_proto_mode(buf);
+-		break;
+-	case HAL_EV_HIDHOST_GET_REPORT:
+-		handle_get_report(buf);
+-		break;
+-	case HAL_EV_HIDHOST_VIRTUAL_UNPLUG:
+-		handle_virtual_unplug(buf);
 -		break;
 -	default:
 -		DBG("Unhandled callback opcode=0x%x", opcode);
@@ -65,45 +107,62 @@ index e9fadb7..baa4b10 100644
 +	{
 +		.handler = handle_conn_state,
 +		.var_len = false,
-+		.data_len = sizeof(struct hal_ev_pan_conn_state),
++		.data_len = sizeof(struct hal_ev_hidhost_conn_state)
 +	},
 +	{
-+		.handler = handle_audio_state,
++		.handler = handle_info,
 +		.var_len = false,
-+		.data_len = sizeof(struct hal_ev_pan_ctrl_state),
++		.data_len = sizeof(struct hal_ev_hidhost_info),
++	},
++	{
++		.handler = handle_proto_mode,
++		.var_len = false,
++		.data_len = sizeof(struct hal_ev_hidhost_proto_mode),
++	},
++	{
++		.handler = handle_get_report,
++		.var_len = true,
++		.data_len = sizeof(struct hal_ev_hidhost_get_report),
++	},
++	{
++		.handler = handle_virtual_unplug,
++		.var_len = false,
++		.data_len = sizeof(struct hal_ev_hidhost_virtual_unplug),
 +	},
 +};
  
- static bt_status_t a2dp_connect(bt_bdaddr_t *bd_addr)
+ static bt_status_t hidhost_connect(bt_bdaddr_t *bd_addr)
  {
-@@ -105,6 +100,9 @@ static bt_status_t init(btav_callbacks_t *callbacks)
+@@ -362,6 +368,9 @@ static bt_status_t init(bthh_callbacks_t *callbacks)
+ 	/* store reference to user callbacks */
+ 	cbacks = callbacks;
  
- 	cbs = callbacks;
- 
-+	hal_ipc_register(HAL_SERVICE_ID_A2DP, ev_handlers,
++	hal_ipc_register(HAL_SERVICE_ID_HIDHOST, ev_handlers,
 +				sizeof(ev_handlers)/sizeof(ev_handlers[0]));
 +
- 	cmd.service_id = HAL_SERVICE_ID_A2DP;
+ 	cmd.service_id = HAL_SERVICE_ID_HIDHOST;
  
  	return hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
-@@ -126,6 +124,8 @@ static void cleanup()
+@@ -383,6 +392,8 @@ static void cleanup(void)
  
  	hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_UNREGISTER_MODULE,
  					sizeof(cmd), &cmd, 0, NULL, NULL);
 +
-+	hal_ipc_unregister(HAL_SERVICE_ID_A2DP);
++	hal_ipc_unregister(HAL_SERVICE_ID_HIDHOST);
  }
  
- static btav_interface_t iface = {
+ static bthh_interface_t hidhost_if = {
 diff --git a/android/hal.h b/android/hal.h
-index 6bd4c5a..b475411 100644
+index 67dad5d..58426a9 100644
 --- a/android/hal.h
 +++ b/android/hal.h
-@@ -28,4 +28,3 @@ btav_interface_t *bt_get_a2dp_interface(void);
+@@ -28,6 +28,5 @@ btav_interface_t *bt_get_a2dp_interface(void);
  
  void bt_thread_associate(void);
  void bt_thread_disassociate(void);
--void bt_notify_a2dp(uint8_t opcode, void *buf, uint16_t len);
+-void bt_notify_hidhost(uint8_t opcode, void *buf, uint16_t len);
+ void bt_notify_a2dp(uint8_t opcode, void *buf, uint16_t len);
+ void bt_notify_pan(uint8_t opcode, void *buf, uint16_t len);
 -- 
 1.8.4.2
 
