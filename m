@@ -1,166 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 04/16] android/socket: Define structs and implement listen
-Date: Mon, 18 Nov 2013 10:26:07 +0200
-Message-Id: <1384763179-2218-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1384763179-2218-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1384763179-2218-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: BUG: unable to handle kernel paging request at 00000015832a8e23 RIP  [<ffffffff81a57c30>] rfcomm_sock_getsockopt+0x140/0x240
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
+Content-Type: text/plain; charset=windows-1252
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <581763626.20131117204744@eikelenboom.it>
+Date: Mon, 18 Nov 2013 07:57:40 +0900
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	"linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <344AB0A2-9E39-4294-A119-887D2FAA2036@holtmann.org>
+References: <581763626.20131117204744@eikelenboom.it>
+To: Sander Eikelenboom <linux@eikelenboom.it>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Sander,
 
-This defines structures for socket HAL. We need to emulate Android
-sockets by sending connect/accept signals over file descriptor.
-Handle HAL socket listen call. Create RFCOMM socket and wait for events.
----
- android/socket.c |  118 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 116 insertions(+), 2 deletions(-)
+> This 3.13 merge window seems to have introduced the following bluetooth regression for me:
+> 
+> [   62.040810] BUG: unable to handle kernel paging request at 00000015832a8e23
+> [   62.049196] IP: [<ffffffff81a57c30>] rfcomm_sock_getsockopt+0x140/0x240
+> [   62.057800] PGD 0 
+> [   62.064574] Oops: 0000 [#1] PREEMPT SMP 
+> [   62.070653] Modules linked in:
+> [   62.076596] CPU: 4 PID: 5575 Comm: bluetoothd Not tainted 3.12.0-mw-20131117+ #1
+> [   62.082708] Hardware name: MSI MS-7640/890FXA-GD70 (MS-7640)  , BIOS V1.8B1 09/13/2010
+> [   62.088827] task: ffff88005863a180 ti: ffff880057688000 task.ti: ffff880057688000
+> [   62.095020] RIP: e030:[<ffffffff81a57c30>]  [<ffffffff81a57c30>] rfcomm_sock_getsockopt+0x140/0x240
+> [   62.101372] RSP: e02b:ffff880057689ec8  EFLAGS: 00010246
+> [   62.107668] RAX: 00000015832a8e23 RBX: 0000000000000003 RCX: 00007fff610ca0e8
+> [   62.113957] RDX: 0000000000000003 RSI: 0000000000000012 RDI: ffff8800572a9e00
+> [   62.120174] RBP: ffff880057689f18 R08: 00007fff610ca0ec R09: 00007fff610ca360
+> [   62.126481] R10: 00007fff610ca0e8 R11: 0000000000000202 R12: ffff8800569c3000
+> [   62.132872] R13: 00007fff610ca0e8 R14: 0000000000000000 R15: 00007fff610ca0ec
+> [   62.139187] FS:  00007f0d0b348720(0000) GS:ffff88005f700000(0000) knlGS:0000000000000000
+> [   62.145551] CS:  e033 DS: 0000 ES: 0000 CR0: 000000008005003b
+> [   62.151919] CR2: 00000015832a8e23 CR3: 0000000056f53000 CR4: 0000000000000660
+> [   62.158338] Stack:
+> [   62.164798]  ffff880057689f18 ffffffff81a5799f 0015832a8e23001f ffff880057689f40
+> [   62.171410]  ffff880057689f44 ffff8800572a9e00 0000000000000012 0000000000000003
+> [   62.178096]  0000000000000000 00007fff610ca0e8 ffff880057689f78 ffffffff81905bc2
+> [   62.184781] Call Trace:
+> [   62.191344]  [<ffffffff81a5799f>] ? rfcomm_sock_setsockopt+0x5f/0x1b0
+> [   62.197978]  [<ffffffff81905bc2>] SyS_getsockopt+0x62/0xb0
+> [   62.204645]  [<ffffffff81a8aa79>] system_call_fastpath+0x16/0x1b
+> [   62.211366] Code: 84 24 40 04 00 00 4c 89 e9 83 e0 01 e8 ea 0a 9d ff 85 c0 75 b5 45 31 f6 e9 42 ff ff ff 66 0f 1f 44 00 00 49 8b 84 24 50 04 00 00 <48> 8b 00 48 89 45 b8 e8 04 e7 6f ff 4c 89 f8 e8 2c fa 9c ff 85 
+> [   62.225815] RIP  [<ffffffff81a57c30>] rfcomm_sock_getsockopt+0x140/0x240
+> [   62.232986]  RSP <ffff880057689ec8>
+> [   62.240128] CR2: 00000015832a8e23
+> [   62.247221] ---[ end trace 88f75f0c791ac25b ]---
+> 
+> My bluetooth device is USB stick:
+> Bus 004 Device 002: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)
 
-diff --git a/android/socket.c b/android/socket.c
-index e580036..276c78c 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -27,8 +27,12 @@
- 
- #include <glib.h>
- #include <stdbool.h>
-+#include <unistd.h>
-+#include <errno.h>
- 
- #include "lib/bluetooth.h"
-+#include "btio/btio.h"
-+#include "lib/sdp.h"
- #include "log.h"
- #include "hal-msg.h"
- #include "hal-ipc.h"
-@@ -37,13 +41,123 @@
- 
- static bdaddr_t adapter_addr;
- 
--static int handle_listen(void *buf)
-+/* Simple list of RFCOMM server sockets */
-+GList *rfcomm_srv_list = NULL;
-+
-+/* Simple list of RFCOMM connected sockets */
-+GList *rfcomm_connected_list = NULL;
-+
-+struct rfcomm_slot {
-+	int fd;		/* descriptor for communication with Java framework */
-+	int real_sock;	/* real RFCOMM socket */
-+	int channel;	/* RFCOMM channel */
-+};
-+
-+static struct rfcomm_slot *create_rfslot(int sock, int *hal_fd)
- {
--	DBG("Not implemented");
-+	int fds[2] = {-1, -1};
-+	struct rfcomm_slot *rfslot;
-+
-+	if (socketpair(AF_LOCAL, SOCK_STREAM, 0, fds) < 0) {
-+		error("socketpair(): %s", strerror(errno));
-+		return NULL;
-+	}
-+
-+	rfslot = g_malloc0(sizeof(*rfslot));
-+	rfslot->fd = fds[0];
-+	*hal_fd = fds[1];
-+	rfslot->real_sock = sock;
-+
-+	return rfslot;
-+}
-+
-+static void cleanup_rfslot(struct rfcomm_slot *rfslot)
-+{
-+	DBG("Cleanup: rfslot: %p fd %d real_sock %d chan %u",
-+		rfslot, rfslot->fd, rfslot->real_sock, rfslot->channel);
-+
-+	if (rfslot->fd > 0)
-+		close(rfslot->fd);
-+	if (rfslot->real_sock > 0)
-+		close(rfslot->real_sock);
-+
-+	g_free(rfslot);
-+}
-+
-+static struct {
-+	uint8_t uuid[16];
-+	uint8_t channel;
-+} uuid_to_chan[] = {
-+	{ .uuid = {
-+	0x00, 0x00, 0x11, 0x2F, 0x00, 0x00, 0x10, 0x00,
-+	0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
-+	},
-+#define PBAP_DEFAULT_CHANNEL	15
-+	.channel = PBAP_DEFAULT_CHANNEL },
-+	{ .uuid = {
-+	0x00, 0x00, 0x11, 0x05, 0x00, 0x00, 0x10, 0x00,
-+	0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
-+	},
-+#define OPP_DEFAULT_CHANNEL	9
-+	.channel = OPP_DEFAULT_CHANNEL },
-+	{ {0} }
-+};
-+
-+static int get_rfcomm_default_chan(const uint8_t *uuid)
-+{
-+	int i;
-+
-+	for (i = 0; uuid_to_chan[i].channel; i++) {
-+		if (!memcmp(uuid_to_chan[i].uuid, uuid, 16))
-+			return uuid_to_chan[i].channel;
-+	}
- 
- 	return -1;
- }
- 
-+static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
-+{
-+}
-+
-+static int handle_listen(void *buf)
-+{
-+	struct hal_cmd_sock_listen *cmd = buf;
-+	struct rfcomm_slot *rfslot;
-+	GIOChannel *io;
-+	GError *err = NULL;
-+	int hal_fd = -1;
-+	int chan;
-+
-+	DBG("");
-+
-+	chan = get_rfcomm_default_chan(cmd->uuid);
-+	if (chan < 0)
-+		return -1;
-+
-+	DBG("rfcomm channel %d", chan);
-+
-+	rfslot = create_rfslot(-1, &hal_fd);
-+
-+	io = bt_io_listen(accept_cb, NULL, rfslot, NULL, &err,
-+				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
-+				BT_IO_OPT_CHANNEL, chan,
-+				BT_IO_OPT_INVALID);
-+	if (!io) {
-+		error("Failed listen: %s", err->message);
-+		g_error_free(err);
-+		cleanup_rfslot(rfslot);
-+		return -1;
-+	}
-+
-+	rfslot->real_sock = g_io_channel_unix_get_fd(io);
-+	rfcomm_srv_list = g_list_append(rfcomm_srv_list, rfslot);
-+
-+	DBG("real_sock %d fd %d hal_fd %d",
-+				rfslot->real_sock, rfslot->fd, hal_fd);
-+
-+	return hal_fd;
-+}
-+
- static int handle_connect(void *buf)
- {
- 	DBG("Not implemented");
--- 
-1.7.10.4
+I assume this is the same one we already fixed. Patch is on its way into Linus’ tree. You can check bluetooth.git tree since that has this patch included.
+
+Regards
+
+Marcel
 
