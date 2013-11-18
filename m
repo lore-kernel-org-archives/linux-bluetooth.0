@@ -1,133 +1,144 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 18 Nov 2013 11:28:42 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 16/16] android/socket: Add SDP record for OPP profile
-Message-ID: <20131118092840.GA21114@aemeltch-MOBL1>
+Date: Mon, 18 Nov 2013 10:55:35 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv3 04/16] android/socket: Define structs and implement
+ listen
+Message-ID: <20131118085535.GC30170@x220.p-661hnu-f1>
 References: <1384763179-2218-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1384763179-2218-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1384763179-2218-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1384763179-2218-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1384763179-2218-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrei,
 
-On Mon, Nov 18, 2013 at 10:26:19AM +0200, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> This adds SDP record for OPP shown below:
-> 
-> Service Name: OBEX Object Push
-> Service RecHandle: 0x10002
-> Service Class ID List:
->   "OBEX Object Push" (0x1105)
-> Protocol Descriptor List:
->   "RFCOMM" (0x0003)
->     Channel: 9
->   "OBEX" (0x0008)
-> Profile Descriptor List:
->   "OBEX Object Push" (0x1105)
->     Version: 0x0100
+On Mon, Nov 18, 2013, Andrei Emeltchenko wrote:
+> This defines structures for socket HAL. We need to emulate Android
+> sockets by sending connect/accept signals over file descriptor.
+> Handle HAL socket listen call. Create RFCOMM socket and wait for events.
 > ---
->  android/socket.c |   94 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 94 insertions(+)
+>  android/socket.c |  118 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 116 insertions(+), 2 deletions(-)
 > 
 > diff --git a/android/socket.c b/android/socket.c
-> index 6b50014..989b876 100644
+> index e580036..276c78c 100644
 > --- a/android/socket.c
 > +++ b/android/socket.c
-> @@ -36,6 +36,7 @@
->  #include "lib/sdp_lib.h"
->  #include "src/sdp-client.h"
+> @@ -27,8 +27,12 @@
 >  
-> +#include "bluetooth.h"
+>  #include <glib.h>
+>  #include <stdbool.h>
+> +#include <unistd.h>
+> +#include <errno.h>
+>  
+>  #include "lib/bluetooth.h"
+> +#include "btio/btio.h"
+> +#include "lib/sdp.h"
 >  #include "log.h"
 >  #include "hal-msg.h"
 >  #include "hal-ipc.h"
-> @@ -43,6 +44,9 @@
->  #include "utils.h"
->  #include "socket.h"
+> @@ -37,13 +41,123 @@
 >  
-> +/* Use Object Transfer for all services */
-> +#define SVC_HINT_OBEX 0x10
-> +
 >  static bdaddr_t adapter_addr;
 >  
->  /* Simple list of RFCOMM server sockets */
-> @@ -56,6 +60,7 @@ struct rfcomm_slot {
->  	int real_sock;	/* real RFCOMM socket */
->  	int channel;	/* RFCOMM channel */
->  	bdaddr_t dst;
-> +	uint32_t service_handle;
->  };
->  
->  static struct rfcomm_slot *create_rfslot(int sock, int *hal_fd)
-> @@ -86,6 +91,9 @@ static void cleanup_rfslot(struct rfcomm_slot *rfslot)
->  	if (rfslot->real_sock > 0)
->  		close(rfslot->real_sock);
->  
-> +	if (rfslot->service_handle)
-> +		bt_adapter_remove_record(rfslot->service_handle);
+> -static int handle_listen(void *buf)
+> +/* Simple list of RFCOMM server sockets */
+> +GList *rfcomm_srv_list = NULL;
 > +
->  	g_free(rfslot);
->  }
->  
-> @@ -108,6 +116,90 @@ static struct {
->  	{ {0} }
->  };
->  
-> +static sdp_record_t *create_opp_record(uint8_t chan)
+> +/* Simple list of RFCOMM connected sockets */
+> +GList *rfcomm_connected_list = NULL;
+
+Didn't I suggest "servers" and "connections" as names for these?
+
+> +struct rfcomm_slot {
+
+The term "slot" seems a bit confusing to me. You're using this struct as
+context for both server sockets and connected sockets. Would the name
+struct rfcomm_socket make more sense? Feel free to suggest something
+else too.
+
+> +
+> +	rfslot = g_malloc0(sizeof(*rfslot));
+
+rfslot = g_new0(struct rfcom_slot, 1);
+
+> +static void cleanup_rfslot(struct rfcomm_slot *rfslot)
 > +{
-> +	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-> +	uuid_t root_uuid, opush_uuid, rfcomm_uuid, obex_uuid;
-> +	sdp_profile_desc_t profile[1];
-> +	sdp_list_t *aproto, *proto[2];
-> +	uint8_t formats[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0xff };
-> +	void *dtds[sizeof(formats)], *values[sizeof(formats)];
-> +	unsigned int i;
-> +	uint8_t dtd = SDP_UINT8;
-> +	sdp_data_t *sflist;
-> +	sdp_data_t *channel;
-> +	sdp_record_t *record;
-> +
-> +	record = sdp_record_alloc();
-> +	if (!record)
-> +		return NULL;
-> +
-> +	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
-> +	root = sdp_list_append(0, &root_uuid);
-> +	sdp_set_browse_groups(record, root);
-> +
-> +	sdp_uuid16_create(&opush_uuid, OBEX_OBJPUSH_SVCLASS_ID);
-> +	svclass_id = sdp_list_append(0, &opush_uuid);
-> +	sdp_set_service_classes(record, svclass_id);
-> +
-> +	sdp_uuid16_create(&profile[0].uuid, OBEX_OBJPUSH_PROFILE_ID);
-> +	profile[0].version = 0x0100;
-> +	pfseq = sdp_list_append(0, profile);
-> +	sdp_set_profile_descs(record, pfseq);
-> +
-> +	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
-> +	proto[0] = sdp_list_append(0, &rfcomm_uuid);
-> +	channel = sdp_data_alloc(SDP_UINT8, &chan);
-> +	proto[0] = sdp_list_append(proto[0], channel);
-> +	apseq = sdp_list_append(apseq, proto[0]);
+> +	DBG("Cleanup: rfslot: %p fd %d real_sock %d chan %u",
+> +		rfslot, rfslot->fd, rfslot->real_sock, rfslot->channel);
 
-fixed myself to:
+Since DBG() will anyway print the function name having an explicit
+"Cleanup:" in the log message seems redundant.
 
-@@ -161,7 +161,7 @@ static sdp_record_t *create_opp_record(uint8_t chan)
-        proto[0] = sdp_list_append(0, &rfcomm_uuid);
-        channel = sdp_data_alloc(SDP_UINT8, &chan);
-        proto[0] = sdp_list_append(proto[0], channel);
--       apseq = sdp_list_append(apseq, proto[0]);
-+       apseq = sdp_list_append(0, proto[0]);
- 
-        sdp_uuid16_create(&obex_uuid, OBEX_UUID);
-        proto[1] = sdp_list_append(0, &obex_uuid);
+> +static struct {
+> +	uint8_t uuid[16];
+> +	uint8_t channel;
+> +} uuid_to_chan[] = {
+> +	{ .uuid = {
+> +	0x00, 0x00, 0x11, 0x2F, 0x00, 0x00, 0x10, 0x00,
+> +	0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
+> +	},
 
+Why doesn't this first entry have a channel? Please indent the stuff
+between { and } with an extra tab.
 
-Best regards 
-Andrei Emeltchenko 
+> +#define PBAP_DEFAULT_CHANNEL	15
 
+I'd rather have these default channel definitions in a separate place,
+probably in the beginning of the C-file where you can quickly see them.
+Having them inline like this doesn't really provide any value at all
+compared to just hard-coding them in the places where you have
+.channel = ...
+
+> +	{ .uuid = {
+> +	0x00, 0x00, 0x11, 0x05, 0x00, 0x00, 0x10, 0x00,
+> +	0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
+> +	},
+> +#define OPP_DEFAULT_CHANNEL	9
+> +	.channel = OPP_DEFAULT_CHANNEL },
+
+Is this the missing channel from the first entry? Looks misplaced to me.
+
+> +static int get_rfcomm_default_chan(const uint8_t *uuid)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; uuid_to_chan[i].channel; i++) {
+> +		if (!memcmp(uuid_to_chan[i].uuid, uuid, 16))
+> +			return uuid_to_chan[i].channel;
+> +	}
+>  
+>  	return -1;
+
+Maybe return -ENOENT?
+
+> +static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
+> +{
+> +}
+> +
+> +static int handle_listen(void *buf)
+> +{
+> +	struct hal_cmd_sock_listen *cmd = buf;
+> +	struct rfcomm_slot *rfslot;
+> +	GIOChannel *io;
+> +	GError *err = NULL;
+> +	int hal_fd = -1;
+
+Why do you need to pre-initialize hal_fd? If create_rfslot() can fail
+can won't you detect that?
+
+> +	int chan;
+> +
+> +	DBG("");
+> +
+> +	chan = get_rfcomm_default_chan(cmd->uuid);
+> +	if (chan < 0)
+> +		return -1;
+
+Maybe "return chan;"?
+
+Johan
