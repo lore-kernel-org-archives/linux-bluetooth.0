@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 03/16] android/socket: Add connect signal to socket
-Date: Mon, 18 Nov 2013 10:26:06 +0200
-Message-Id: <1384763179-2218-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 10/16] android/socket: Implement socket connect HAL method
+Date: Mon, 18 Nov 2013 10:26:13 +0200
+Message-Id: <1384763179-2218-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384763179-2218-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384763179-2218-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,44 +11,73 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Connect signal is used to pass information to framework that socket
-is accepted.
+First step is to query remote device for RFCOMM channel.
 ---
- android/hal-msg.h |    2 ++
- android/socket.h  |    7 +++++++
- 2 files changed, 9 insertions(+)
+ android/socket.c |   34 ++++++++++++++++++++++++++++++++--
+ 1 file changed, 32 insertions(+), 2 deletions(-)
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 44fd5c8..9e3a81f 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -232,6 +232,8 @@ struct hal_cmd_sock_connect {
- 	uint8_t  flags;
- } __attribute__((packed));
- 
-+/* Bluetooth Hidhost HAL api */
+diff --git a/android/socket.c b/android/socket.c
+index a800a77..c22e4ed 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -33,6 +33,9 @@
+ #include "lib/bluetooth.h"
+ #include "btio/btio.h"
+ #include "lib/sdp.h"
++#include "lib/sdp_lib.h"
++#include "src/sdp-client.h"
 +
- #define HAL_OP_HIDHOST_CONNECT		0x01
- struct hal_cmd_hidhost_connect {
- 	uint8_t bdaddr[6];
-diff --git a/android/socket.h b/android/socket.h
-index 7aa5574..ba56c9b 100644
---- a/android/socket.h
-+++ b/android/socket.h
-@@ -21,6 +21,13 @@
-  *
-  */
+ #include "log.h"
+ #include "hal-msg.h"
+ #include "hal-ipc.h"
+@@ -52,6 +55,7 @@ struct rfcomm_slot {
+ 	int fd;		/* descriptor for communication with Java framework */
+ 	int real_sock;	/* real RFCOMM socket */
+ 	int channel;	/* RFCOMM channel */
++	bdaddr_t dst;
+ };
  
-+struct hal_sock_connect_signal {
-+	short   size;
-+	uint8_t bdaddr[6];
-+	int     channel;
-+	int     status;
-+} __attribute__((packed));
+ static struct rfcomm_slot *create_rfslot(int sock, int *hal_fd)
+@@ -373,11 +377,37 @@ static int handle_listen(void *buf)
+ 	return hal_fd;
+ }
+ 
++static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
++{
++	DBG("");
++}
 +
- void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len);
+ static int handle_connect(void *buf)
+ {
+-	DBG("Not implemented");
++	struct hal_cmd_sock_connect *cmd = buf;
++	struct rfcomm_slot *rfslot;
++	bdaddr_t dst;
++	uuid_t uuid;
++	int hal_fd = -1;
  
- bool bt_socket_register(int sk, const bdaddr_t *addr);
+-	return -1;
++	DBG("");
++
++	android2bdaddr(cmd->bdaddr, &dst);
++	rfslot = create_rfslot(-1, &hal_fd);
++	bacpy(&rfslot->dst, &dst);
++
++	memset(&uuid, 0, sizeof(uuid));
++	uuid.type = SDP_UUID128;
++	memcpy(&uuid.value.uuid128, cmd->uuid, sizeof(uint128_t));
++
++	if (bt_search_service(&adapter_addr, &dst, &uuid, sdp_search_cb, rfslot,
++								NULL) < 0) {
++		error("Failed to search SDP records");
++		cleanup_rfslot(rfslot);
++		return -1;
++	}
++
++	return hal_fd;
+ }
+ 
+ void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
 -- 
 1.7.10.4
 
