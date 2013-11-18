@@ -1,37 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 18 Nov 2013 15:18:48 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] android: Improve IPC helper to not send invalid
- status response
-Message-ID: <20131118131848.GA11568@x220.p-661hnu-f1>
-References: <1384779520-2104-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2 2/2] android/hal: Verify command status response before processing
+Date: Mon, 18 Nov 2013 13:58:40 +0100
+Message-Id: <1384779520-2104-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1384779520-2104-1-git-send-email-szymon.janc@tieto.com>
+References: <1384779520-2104-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+This makes HAL IPC code verify error reply before processing it. It
+also verify if success status was reported according to IPC spec.
+---
+ android/hal-ipc.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-On Mon, Nov 18, 2013, Szymon Janc wrote:
-> This fix issue with sending invalid success response from several
-> places where ipc_send_rsp was used for reporting success. Instead of
-> using using ipc_send for success response, make helper handle that.
-> ---
-> V2: fixed hardcoded service id in ipc_send_rsp
-> 
->  android/a2dp.c      |  2 +-
->  android/bluetooth.c |  2 +-
->  android/hidhost.c   |  2 +-
->  android/ipc.c       |  7 ++++++-
->  android/ipc.h       |  2 +-
->  android/main.c      | 12 ++++++++----
->  android/pan.c       |  2 +-
->  android/socket.c    |  2 +-
->  8 files changed, 20 insertions(+), 11 deletions(-)
+diff --git a/android/hal-ipc.c b/android/hal-ipc.c
+index 026e245..5155e04 100644
+--- a/android/hal-ipc.c
++++ b/android/hal-ipc.c
+@@ -367,6 +367,17 @@ int hal_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len, void *param,
+ 
+ 	if (cmd.opcode == HAL_OP_STATUS) {
+ 		struct hal_status *s = rsp;
++
++		if (sizeof(*s) != cmd.len) {
++			error("Invalid status length, aborting");
++			exit(EXIT_FAILURE);
++		}
++
++		if (s->code == HAL_STATUS_SUCCESS) {
++			error("Invalid success status response, aborting");
++			exit(EXIT_FAILURE);
++		}
++
+ 		return s->code;
+ 	}
+ 
+-- 
+1.8.4.2
 
-Both patches have been applied. Thanks.
-
-Johan
