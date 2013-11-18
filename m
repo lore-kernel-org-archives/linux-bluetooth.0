@@ -1,43 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 0/6] android: IPC improvements
-Date: Mon, 18 Nov 2013 15:34:59 +0100
-Message-Id: <1384785305-17084-1-git-send-email-szymon.janc@tieto.com>
+Date: Mon, 18 Nov 2013 16:27:53 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] audio/AVCTP: Use A/V_RemoteControl UUID for
+ incoming connections
+Message-ID: <20131118142753.GA18742@x220.p-661hnu-f1>
+References: <1384782134-17118-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1384782134-17118-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-Changes since v1:
- - remove fd parameter from handler proptotype - this is only needed by one
-   callback in health HAL and getter function can be addded later on if needed
- - improve comments - each handler has comment with opcode define for easier
-   code reading
- - some bugfixes
+On Mon, Nov 18, 2013, Luiz Augusto von Dentz wrote:
+> By the time and incoming connection arrives it is not possible to
+> determine the role, so this changes the UUID to A/V_RemoteControl which
+> according to assigned number page bellow is the profile UUID for AVRCP:
+> 
+> https://www.bluetooth.org/en-us/specification/assigned-numbers/service-discovery
+> ---
+>  profiles/audio/avctp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
--- 
-BR
-Szymon Janc
+Applied. Thanks.
 
-Szymon Janc (6):
-  android/hal: Add initial code for IPC message handlers
-  android/hal-bluetooth: Register IPC message handlers
-  android/hal-hidhost: Use generic IPC message handling for events
-  android/hal-pan: Use generic IPC message handling for events
-  android/hal-a2dp: Use generic IPC message handling for events
-  android/hal: Check if command socket was shutdown by peer
-
- android/hal-a2dp.c      |  41 ++++-----
- android/hal-bluetooth.c | 218 +++++++++++++++++++++++++++++++-----------------
- android/hal-hidhost.c   |  76 ++++++++++-------
- android/hal-ipc.c       | 123 ++++++++++++++++++---------
- android/hal-ipc.h       |  10 +++
- android/hal-pan.c       |  40 ++++-----
- android/hal.h           |   4 -
- 7 files changed, 321 insertions(+), 191 deletions(-)
-
--- 
-1.8.4.2
-
+Johan
