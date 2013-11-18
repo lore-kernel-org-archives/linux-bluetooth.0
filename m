@@ -1,82 +1,167 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/a2dp: Use NULL for zero pointer
-Date: Mon, 18 Nov 2013 12:49:35 +0200
-Message-Id: <1384771775-18659-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] android: Improve IPC helper to not send invalid status response
+Date: Mon, 18 Nov 2013 11:44:47 +0100
+Message-Id: <1384771487-21662-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
+This fix issue with sending invalid success response from several
+places where ipc_send_rsp was used for reporting success. Instead of
+using using ipc_send for success response, make helper handle that.
 ---
- android/a2dp.c |   28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ android/a2dp.c      |  2 +-
+ android/bluetooth.c |  2 +-
+ android/hidhost.c   |  2 +-
+ android/ipc.c       |  7 ++++++-
+ android/ipc.h       |  2 +-
+ android/main.c      | 12 ++++++++----
+ android/pan.c       |  2 +-
+ android/socket.c    |  2 +-
+ 8 files changed, 20 insertions(+), 11 deletions(-)
 
 diff --git a/android/a2dp.c b/android/a2dp.c
-index 936c28e..4725e9e 100644
+index 936c28e..bb55e41 100644
 --- a/android/a2dp.c
 +++ b/android/a2dp.c
-@@ -280,31 +280,31 @@ static sdp_record_t *a2dp_record(void)
- 		return NULL;
+@@ -226,7 +226,7 @@ void bt_a2dp_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+ 		break;
+ 	}
  
- 	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
--	root = sdp_list_append(0, &root_uuid);
-+	root = sdp_list_append(NULL, &root_uuid);
- 	sdp_set_browse_groups(record, root);
- 
- 	sdp_uuid16_create(&a2dp_uuid, AUDIO_SOURCE_SVCLASS_ID);
--	svclass_id = sdp_list_append(0, &a2dp_uuid);
-+	svclass_id = sdp_list_append(NULL, &a2dp_uuid);
- 	sdp_set_service_classes(record, svclass_id);
- 
- 	sdp_uuid16_create(&profile[0].uuid, ADVANCED_AUDIO_PROFILE_ID);
- 	profile[0].version = a2dp_ver;
--	pfseq = sdp_list_append(0, &profile[0]);
-+	pfseq = sdp_list_append(NULL, &profile[0]);
- 	sdp_set_profile_descs(record, pfseq);
- 
- 	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
--	proto[0] = sdp_list_append(0, &l2cap_uuid);
-+	proto[0] = sdp_list_append(NULL, &l2cap_uuid);
- 	psm = sdp_data_alloc(SDP_UINT16, &lp);
- 	proto[0] = sdp_list_append(proto[0], psm);
--	apseq = sdp_list_append(0, proto[0]);
-+	apseq = sdp_list_append(NULL, proto[0]);
- 
- 	sdp_uuid16_create(&avdtp_uuid, AVDTP_UUID);
--	proto[1] = sdp_list_append(0, &avdtp_uuid);
-+	proto[1] = sdp_list_append(NULL, &avdtp_uuid);
- 	version = sdp_data_alloc(SDP_UINT16, &avdtp_ver);
- 	proto[1] = sdp_list_append(proto[1], version);
- 	apseq = sdp_list_append(apseq, proto[1]);
- 
--	aproto = sdp_list_append(0, apseq);
-+	aproto = sdp_list_append(NULL, apseq);
- 	sdp_set_access_protos(record, aproto);
- 
- 	features = sdp_data_alloc(SDP_UINT16, &feat);
-@@ -314,13 +314,13 @@ static sdp_record_t *a2dp_record(void)
- 
- 	free(psm);
- 	free(version);
--	sdp_list_free(proto[0], 0);
--	sdp_list_free(proto[1], 0);
--	sdp_list_free(apseq, 0);
--	sdp_list_free(pfseq, 0);
--	sdp_list_free(aproto, 0);
--	sdp_list_free(root, 0);
--	sdp_list_free(svclass_id, 0);
-+	sdp_list_free(proto[0], NULL);
-+	sdp_list_free(proto[1], NULL);
-+	sdp_list_free(apseq, NULL);
-+	sdp_list_free(pfseq, NULL);
-+	sdp_list_free(aproto, NULL);
-+	sdp_list_free(root, NULL);
-+	sdp_list_free(svclass_id, NULL);
- 
- 	return record;
+-	ipc_send_rsp(sk, HAL_SERVICE_ID_A2DP, status);
++	ipc_send_rsp(sk, HAL_SERVICE_ID_A2DP, opcode, status);
  }
+ 
+ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 5c5c61e..7dc2ec3 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -2268,7 +2268,7 @@ void bt_bluetooth_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+ error:
+ 	error("Error handling command 0x%02x status %u", opcode, status);
+ 
+-	ipc_send_rsp(sk, HAL_SERVICE_ID_BLUETOOTH, status);
++	ipc_send_rsp(sk, HAL_SERVICE_ID_BLUETOOTH, opcode, status);
+ }
+ 
+ bool bt_bluetooth_register(int sk)
+diff --git a/android/hidhost.c b/android/hidhost.c
+index f5a607c..842b8ad 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -1109,7 +1109,7 @@ void bt_hid_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+ 		break;
+ 	}
+ 
+-	ipc_send_rsp(sk, HAL_SERVICE_ID_HIDHOST, status);
++	ipc_send_rsp(sk, HAL_SERVICE_ID_HIDHOST, opcode, status);
+ }
+ 
+ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+diff --git a/android/ipc.c b/android/ipc.c
+index 729f157..34441d0 100644
+--- a/android/ipc.c
++++ b/android/ipc.c
+@@ -80,10 +80,15 @@ void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
+ 	}
+ }
+ 
+-void ipc_send_rsp(int sk, uint8_t service_id, uint8_t status)
++void ipc_send_rsp(int sk, uint8_t service_id, uint8_t opcode, uint8_t status)
+ {
+ 	struct hal_status s;
+ 
++	if (status == HAL_STATUS_SUCCESS) {
++		ipc_send(sk, HAL_SERVICE_ID_BLUETOOTH, opcode, 0, NULL, -1);
++		return;
++	}
++
+ 	s.code = status;
+ 
+ 	ipc_send(sk, service_id, HAL_OP_STATUS, sizeof(s), &s, -1);
+diff --git a/android/ipc.h b/android/ipc.h
+index cf0f3d6..ad4a2d2 100644
+--- a/android/ipc.h
++++ b/android/ipc.h
+@@ -23,4 +23,4 @@
+ 
+ void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
+ 							void *param, int fd);
+-void ipc_send_rsp(int sk, uint8_t service_id, uint8_t status);
++void ipc_send_rsp(int sk, uint8_t service_id, uint8_t opcode, uint8_t status);
+diff --git a/android/main.c b/android/main.c
+index a4f5e84..c9733f3 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -122,7 +122,8 @@ static void service_register(void *buf, uint16_t len)
+ 	return;
+ failed:
+ 	ipc_send_rsp(g_io_channel_unix_get_fd(hal_cmd_io),
+-				HAL_SERVICE_ID_CORE, HAL_STATUS_FAILED);
++				HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
++				HAL_STATUS_FAILED);
+ }
+ 
+ static void service_unregister(void *buf, uint16_t len)
+@@ -164,7 +165,8 @@ static void service_unregister(void *buf, uint16_t len)
+ 	return;
+ failed:
+ 	ipc_send_rsp(g_io_channel_unix_get_fd(hal_cmd_io),
+-				HAL_SERVICE_ID_CORE, HAL_STATUS_FAILED);
++				HAL_SERVICE_ID_CORE, HAL_OP_UNREGISTER_MODULE,
++				HAL_STATUS_FAILED);
+ }
+ 
+ static void handle_service_core(uint8_t opcode, void *buf, uint16_t len)
+@@ -178,7 +180,8 @@ static void handle_service_core(uint8_t opcode, void *buf, uint16_t len)
+ 		break;
+ 	default:
+ 		ipc_send_rsp(g_io_channel_unix_get_fd(hal_cmd_io),
+-				HAL_SERVICE_ID_CORE, HAL_STATUS_FAILED);
++						HAL_SERVICE_ID_CORE, opcode,
++						HAL_STATUS_FAILED);
+ 		break;
+ 	}
+ }
+@@ -274,7 +277,8 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
+ 		bt_pan_handle_cmd(fd, msg->opcode, msg->payload, msg->len);
+ 		break;
+ 	default:
+-		ipc_send_rsp(fd, msg->service_id, HAL_STATUS_FAILED);
++		ipc_send_rsp(fd, msg->service_id, msg->opcode,
++							HAL_STATUS_FAILED);
+ 		break;
+ 	}
+ 
+diff --git a/android/pan.c b/android/pan.c
+index 46b3700..2a11f46 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -87,7 +87,7 @@ void bt_pan_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+ 		break;
+ 	}
+ 
+-	ipc_send_rsp(sk, HAL_SERVICE_ID_PAN, status);
++	ipc_send_rsp(sk, HAL_SERVICE_ID_PAN, opcode, status);
+ }
+ 
+ bool bt_pan_register(int sk, const bdaddr_t *addr)
+diff --git a/android/socket.c b/android/socket.c
+index e580036..04bb7d1 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -75,7 +75,7 @@ void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+ 		break;
+ 	}
+ 
+-	ipc_send_rsp(sk, HAL_SERVICE_ID_SOCK, HAL_STATUS_FAILED);
++	ipc_send_rsp(sk, HAL_SERVICE_ID_SOCK, opcode, HAL_STATUS_FAILED);
+ }
+ 
+ bool bt_socket_register(int sk, const bdaddr_t *addr)
 -- 
-1.7.10.4
+1.8.4.2
 
