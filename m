@@ -1,33 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 02/17] android: trivial: Add comment making code consistent
-Date: Mon, 18 Nov 2013 15:20:39 +0200
-Message-Id: <1384780854-20970-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1384780854-20970-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1384780854-20970-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 18 Nov 2013 15:18:48 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] android: Improve IPC helper to not send invalid
+ status response
+Message-ID: <20131118131848.GA11568@x220.p-661hnu-f1>
+References: <1384779520-2104-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1384779520-2104-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Szymon,
 
----
- android/hal-msg.h |    2 ++
- 1 file changed, 2 insertions(+)
+On Mon, Nov 18, 2013, Szymon Janc wrote:
+> This fix issue with sending invalid success response from several
+> places where ipc_send_rsp was used for reporting success. Instead of
+> using using ipc_send for success response, make helper handle that.
+> ---
+> V2: fixed hardcoded service id in ipc_send_rsp
+> 
+>  android/a2dp.c      |  2 +-
+>  android/bluetooth.c |  2 +-
+>  android/hidhost.c   |  2 +-
+>  android/ipc.c       |  7 ++++++-
+>  android/ipc.h       |  2 +-
+>  android/main.c      | 12 ++++++++----
+>  android/pan.c       |  2 +-
+>  android/socket.c    |  2 +-
+>  8 files changed, 20 insertions(+), 11 deletions(-)
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 44fd5c8..9e3a81f 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -232,6 +232,8 @@ struct hal_cmd_sock_connect {
- 	uint8_t  flags;
- } __attribute__((packed));
- 
-+/* Bluetooth Hidhost HAL api */
-+
- #define HAL_OP_HIDHOST_CONNECT		0x01
- struct hal_cmd_hidhost_connect {
- 	uint8_t bdaddr[6];
--- 
-1.7.10.4
+Both patches have been applied. Thanks.
 
+Johan
