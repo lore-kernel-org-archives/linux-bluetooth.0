@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/5] audio/source: Remove shutdown parameter from source_disconnect
-Date: Mon, 18 Nov 2013 13:50:13 +0200
-Message-Id: <1384775415-10159-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/5] audio/AVDTP: Remove public function that are only used locally
+Date: Mon, 18 Nov 2013 13:50:12 +0200
+Message-Id: <1384775415-10159-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1384775415-10159-1-git-send-email-luiz.dentz@gmail.com>
 References: <1384775415-10159-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,58 +11,89 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This parameter is always false so it never do anything.
 ---
- profiles/audio/a2dp.c   | 2 +-
- profiles/audio/source.c | 5 +----
- profiles/audio/source.h | 2 +-
- 3 files changed, 3 insertions(+), 6 deletions(-)
+ profiles/audio/avdtp.c | 30 ++++++++++++------------------
+ profiles/audio/avdtp.h |  5 -----
+ 2 files changed, 12 insertions(+), 23 deletions(-)
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 864cb18..95ffa12 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -1887,7 +1887,7 @@ static int a2dp_source_disconnect(struct btd_service *service)
- 
- 	DBG("path %s", path);
- 
--	return source_disconnect(service, FALSE);
-+	return source_disconnect(service);
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index 25b7525..de31e12 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -3183,8 +3183,8 @@ struct avdtp_service_capability *avdtp_stream_get_codec(
+ 	return NULL;
  }
  
- static int a2dp_sink_connect(struct btd_service *service)
-diff --git a/profiles/audio/source.c b/profiles/audio/source.c
-index 24a4353..7b129b7 100644
---- a/profiles/audio/source.c
-+++ b/profiles/audio/source.c
-@@ -380,16 +380,13 @@ gboolean source_new_stream(struct btd_service *service, struct avdtp *session,
- 	return TRUE;
- }
- 
--int source_disconnect(struct btd_service *service, gboolean shutdown)
-+int source_disconnect(struct btd_service *service)
+-gboolean avdtp_stream_has_capability(struct avdtp_stream *stream,
+-				struct avdtp_service_capability *cap)
++static gboolean avdtp_stream_has_capability(struct avdtp_stream *stream,
++					struct avdtp_service_capability *cap)
  {
- 	struct source *source = btd_service_get_user_data(service);
+ 	GSList *l;
+ 	struct avdtp_service_capability *stream_cap;
+@@ -3219,7 +3219,16 @@ gboolean avdtp_stream_has_capabilities(struct avdtp_stream *stream,
+ struct avdtp_remote_sep *avdtp_stream_get_remote_sep(
+ 						struct avdtp_stream *stream)
+ {
+-	return avdtp_get_remote_sep(stream->session, stream->rseid);
++	GSList *l;
++
++	for (l = stream->session->seps; l; l = l->next) {
++		struct avdtp_remote_sep *sep = l->data;
++
++		if (sep->seid == stream->rseid)
++			return sep;
++	}
++
++	return NULL;
+ }
  
- 	if (!source->session)
- 		return -ENOTCONN;
+ gboolean avdtp_stream_get_transport(struct avdtp_stream *stream, int *sock,
+@@ -3268,21 +3277,6 @@ static int process_queue(struct avdtp *session)
+ 	return send_req(session, FALSE, req);
+ }
  
--	if (shutdown)
--		avdtp_set_device_disconnect(source->session, TRUE);
+-struct avdtp_remote_sep *avdtp_get_remote_sep(struct avdtp *session,
+-						uint8_t seid)
+-{
+-	GSList *l;
 -
- 	/* cancel pending connect */
- 	if (source->connect_id > 0) {
- 		a2dp_cancel(source->connect_id);
-diff --git a/profiles/audio/source.h b/profiles/audio/source.h
-index c16fb4b..a014c68 100644
---- a/profiles/audio/source.h
-+++ b/profiles/audio/source.h
-@@ -48,4 +48,4 @@ gboolean source_new_stream(struct btd_service *service, struct avdtp *session,
- 				struct avdtp_stream *stream);
- gboolean source_setup_stream(struct btd_service *service,
- 							struct avdtp *session);
--int source_disconnect(struct btd_service *service, gboolean shutdown);
-+int source_disconnect(struct btd_service *service);
+-	for (l = session->seps; l; l = l->next) {
+-		struct avdtp_remote_sep *sep = l->data;
+-
+-		if (sep->seid == seid)
+-			return sep;
+-	}
+-
+-	return NULL;
+-}
+-
+ struct avdtp_service_capability *avdtp_get_codec(struct avdtp_remote_sep *sep)
+ {
+ 	return sep->codec;
+diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
+index 30ade86..3c30d78 100644
+--- a/profiles/audio/avdtp.h
++++ b/profiles/audio/avdtp.h
+@@ -221,9 +221,6 @@ struct avdtp *avdtp_ref(struct avdtp *session);
+ struct avdtp_service_capability *avdtp_service_cap_new(uint8_t category,
+ 							void *data, int size);
+ 
+-struct avdtp_remote_sep *avdtp_get_remote_sep(struct avdtp *session,
+-						uint8_t seid);
+-
+ struct avdtp_service_capability *avdtp_get_codec(struct avdtp_remote_sep *sep);
+ 
+ int avdtp_discover(struct avdtp *session, avdtp_discover_cb_t cb,
+@@ -243,8 +240,6 @@ gboolean avdtp_stream_get_transport(struct avdtp_stream *stream, int *sock,
+ 					GSList **caps);
+ struct avdtp_service_capability *avdtp_stream_get_codec(
+ 						struct avdtp_stream *stream);
+-gboolean avdtp_stream_has_capability(struct avdtp_stream *stream,
+-				struct avdtp_service_capability *cap);
+ gboolean avdtp_stream_has_capabilities(struct avdtp_stream *stream,
+ 					GSList *caps);
+ struct avdtp_remote_sep *avdtp_stream_get_remote_sep(
 -- 
 1.8.3.1
 
