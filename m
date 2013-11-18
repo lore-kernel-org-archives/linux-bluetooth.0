@@ -1,167 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+Date: Mon, 18 Nov 2013 12:02:43 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android: Improve IPC helper to not send invalid status response
-Date: Mon, 18 Nov 2013 11:44:47 +0100
-Message-Id: <1384771487-21662-1-git-send-email-szymon.janc@tieto.com>
+Subject: Re: [PATCHv3 04/16] android/socket: Define structs and implement
+ listen
+Message-ID: <20131118100242.GB21114@aemeltch-MOBL1>
+References: <1384763179-2218-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1384763179-2218-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20131118085535.GC30170@x220.p-661hnu-f1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20131118085535.GC30170@x220.p-661hnu-f1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fix issue with sending invalid success response from several
-places where ipc_send_rsp was used for reporting success. Instead of
-using using ipc_send for success response, make helper handle that.
----
- android/a2dp.c      |  2 +-
- android/bluetooth.c |  2 +-
- android/hidhost.c   |  2 +-
- android/ipc.c       |  7 ++++++-
- android/ipc.h       |  2 +-
- android/main.c      | 12 ++++++++----
- android/pan.c       |  2 +-
- android/socket.c    |  2 +-
- 8 files changed, 20 insertions(+), 11 deletions(-)
+Hi Johan,
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index 936c28e..bb55e41 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -226,7 +226,7 @@ void bt_a2dp_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
- 		break;
- 	}
- 
--	ipc_send_rsp(sk, HAL_SERVICE_ID_A2DP, status);
-+	ipc_send_rsp(sk, HAL_SERVICE_ID_A2DP, opcode, status);
- }
- 
- static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 5c5c61e..7dc2ec3 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -2268,7 +2268,7 @@ void bt_bluetooth_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
- error:
- 	error("Error handling command 0x%02x status %u", opcode, status);
- 
--	ipc_send_rsp(sk, HAL_SERVICE_ID_BLUETOOTH, status);
-+	ipc_send_rsp(sk, HAL_SERVICE_ID_BLUETOOTH, opcode, status);
- }
- 
- bool bt_bluetooth_register(int sk)
-diff --git a/android/hidhost.c b/android/hidhost.c
-index f5a607c..842b8ad 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -1109,7 +1109,7 @@ void bt_hid_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
- 		break;
- 	}
- 
--	ipc_send_rsp(sk, HAL_SERVICE_ID_HIDHOST, status);
-+	ipc_send_rsp(sk, HAL_SERVICE_ID_HIDHOST, opcode, status);
- }
- 
- static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
-diff --git a/android/ipc.c b/android/ipc.c
-index 729f157..34441d0 100644
---- a/android/ipc.c
-+++ b/android/ipc.c
-@@ -80,10 +80,15 @@ void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
- 	}
- }
- 
--void ipc_send_rsp(int sk, uint8_t service_id, uint8_t status)
-+void ipc_send_rsp(int sk, uint8_t service_id, uint8_t opcode, uint8_t status)
- {
- 	struct hal_status s;
- 
-+	if (status == HAL_STATUS_SUCCESS) {
-+		ipc_send(sk, HAL_SERVICE_ID_BLUETOOTH, opcode, 0, NULL, -1);
-+		return;
-+	}
-+
- 	s.code = status;
- 
- 	ipc_send(sk, service_id, HAL_OP_STATUS, sizeof(s), &s, -1);
-diff --git a/android/ipc.h b/android/ipc.h
-index cf0f3d6..ad4a2d2 100644
---- a/android/ipc.h
-+++ b/android/ipc.h
-@@ -23,4 +23,4 @@
- 
- void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
- 							void *param, int fd);
--void ipc_send_rsp(int sk, uint8_t service_id, uint8_t status);
-+void ipc_send_rsp(int sk, uint8_t service_id, uint8_t opcode, uint8_t status);
-diff --git a/android/main.c b/android/main.c
-index a4f5e84..c9733f3 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -122,7 +122,8 @@ static void service_register(void *buf, uint16_t len)
- 	return;
- failed:
- 	ipc_send_rsp(g_io_channel_unix_get_fd(hal_cmd_io),
--				HAL_SERVICE_ID_CORE, HAL_STATUS_FAILED);
-+				HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
-+				HAL_STATUS_FAILED);
- }
- 
- static void service_unregister(void *buf, uint16_t len)
-@@ -164,7 +165,8 @@ static void service_unregister(void *buf, uint16_t len)
- 	return;
- failed:
- 	ipc_send_rsp(g_io_channel_unix_get_fd(hal_cmd_io),
--				HAL_SERVICE_ID_CORE, HAL_STATUS_FAILED);
-+				HAL_SERVICE_ID_CORE, HAL_OP_UNREGISTER_MODULE,
-+				HAL_STATUS_FAILED);
- }
- 
- static void handle_service_core(uint8_t opcode, void *buf, uint16_t len)
-@@ -178,7 +180,8 @@ static void handle_service_core(uint8_t opcode, void *buf, uint16_t len)
- 		break;
- 	default:
- 		ipc_send_rsp(g_io_channel_unix_get_fd(hal_cmd_io),
--				HAL_SERVICE_ID_CORE, HAL_STATUS_FAILED);
-+						HAL_SERVICE_ID_CORE, opcode,
-+						HAL_STATUS_FAILED);
- 		break;
- 	}
- }
-@@ -274,7 +277,8 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
- 		bt_pan_handle_cmd(fd, msg->opcode, msg->payload, msg->len);
- 		break;
- 	default:
--		ipc_send_rsp(fd, msg->service_id, HAL_STATUS_FAILED);
-+		ipc_send_rsp(fd, msg->service_id, msg->opcode,
-+							HAL_STATUS_FAILED);
- 		break;
- 	}
- 
-diff --git a/android/pan.c b/android/pan.c
-index 46b3700..2a11f46 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -87,7 +87,7 @@ void bt_pan_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
- 		break;
- 	}
- 
--	ipc_send_rsp(sk, HAL_SERVICE_ID_PAN, status);
-+	ipc_send_rsp(sk, HAL_SERVICE_ID_PAN, opcode, status);
- }
- 
- bool bt_pan_register(int sk, const bdaddr_t *addr)
-diff --git a/android/socket.c b/android/socket.c
-index e580036..04bb7d1 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -75,7 +75,7 @@ void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
- 		break;
- 	}
- 
--	ipc_send_rsp(sk, HAL_SERVICE_ID_SOCK, HAL_STATUS_FAILED);
-+	ipc_send_rsp(sk, HAL_SERVICE_ID_SOCK, opcode, HAL_STATUS_FAILED);
- }
- 
- bool bt_socket_register(int sk, const bdaddr_t *addr)
--- 
-1.8.4.2
+On Mon, Nov 18, 2013 at 10:55:35AM +0200, Johan Hedberg wrote:
+> Hi Andrei,
+> 
+> On Mon, Nov 18, 2013, Andrei Emeltchenko wrote:
+> > This defines structures for socket HAL. We need to emulate Android
+> > sockets by sending connect/accept signals over file descriptor.
+> > Handle HAL socket listen call. Create RFCOMM socket and wait for events.
+> > ---
+> >  android/socket.c |  118 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+> >  1 file changed, 116 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/android/socket.c b/android/socket.c
+> > index e580036..276c78c 100644
+> > --- a/android/socket.c
+> > +++ b/android/socket.c
+> > @@ -27,8 +27,12 @@
+> >  
+> >  #include <glib.h>
+> >  #include <stdbool.h>
+> > +#include <unistd.h>
+> > +#include <errno.h>
+> >  
+> >  #include "lib/bluetooth.h"
+> > +#include "btio/btio.h"
+> > +#include "lib/sdp.h"
+> >  #include "log.h"
+> >  #include "hal-msg.h"
+> >  #include "hal-ipc.h"
+> > @@ -37,13 +41,123 @@
+> >  
+> >  static bdaddr_t adapter_addr;
+> >  
+> > -static int handle_listen(void *buf)
+> > +/* Simple list of RFCOMM server sockets */
+> > +GList *rfcomm_srv_list = NULL;
+> > +
+> > +/* Simple list of RFCOMM connected sockets */
+> > +GList *rfcomm_connected_list = NULL;
+> 
+> Didn't I suggest "servers" and "connections" as names for these?
+> 
+> > +struct rfcomm_slot {
+> 
+> The term "slot" seems a bit confusing to me. You're using this struct as
+> context for both server sockets and connected sockets. Would the name
+> struct rfcomm_socket make more sense? Feel free to suggest something
+> else too.
+
+rfcomm_socket is ok, what is a good name instead of rfslot? rfsock?
+
+Best regards 
+Andrei Emeltchenko 
 
