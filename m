@@ -1,139 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <528A5F39.8010303@openbossa.org>
-Date: Mon, 18 Nov 2013 15:40:57 -0300
+Message-ID: <528A5F29.1080902@openbossa.org>
+Date: Mon, 18 Nov 2013 15:40:41 -0300
 From: Andre Guedes <andre.guedes@openbossa.org>
 MIME-Version: 1.0
 To: Marcel Holtmann <marcel@holtmann.org>
 CC: "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC v2 01/15] Bluetooth: Refactor hci_disconn_complete_evt
-References: <1383053160-10175-1-git-send-email-andre.guedes@openbossa.org> <1383053160-10175-2-git-send-email-andre.guedes@openbossa.org> <227F5D6B-6B76-428E-9893-37ED1562F833@holtmann.org>
-In-Reply-To: <227F5D6B-6B76-428E-9893-37ED1562F833@holtmann.org>
+Subject: Re: [RFC v2 10/15] Bluetooth: Temporarily stop background scanning
+ on discovery
+References: <1383053160-10175-1-git-send-email-andre.guedes@openbossa.org> <1383053160-10175-11-git-send-email-andre.guedes@openbossa.org> <8E33B37F-71D9-4516-8883-080DDEC81132@holtmann.org>
+In-Reply-To: <8E33B37F-71D9-4516-8883-080DDEC81132@holtmann.org>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On 10/29/2013 07:52 PM, Marcel Holtmann wrote:
+On 10/29/2013 08:19 PM, Marcel Holtmann wrote:
 > Hi Andre,
 >
->> hci_disconn_complete_evt() logic is more complicated than what it
->> should be, making it hard to follow and add new features.
->>
->> So this patch does some code refactoring by handling the error cases
->> in the beginning of the function and by moving the main flow into the
->> first level of function scope. No change is done in the event handling
->> logic itself.
->>
->> Besides organizing this messy code, this patch makes easier to add
->> code for handling LE auto connection (which will be added in a further
->> patch).
+>> If the user send a mgmt start discovery command while the background
+>> scanning is running, we should temporarily stop it. Once the discovery
+>> finishes, we start the background scanning again.
 >>
 >> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 >> ---
->> net/bluetooth/hci_event.c | 62 +++++++++++++++++++++++++----------------------
->> 1 file changed, 33 insertions(+), 29 deletions(-)
+>> net/bluetooth/hci_core.c |  5 +++++
+>> net/bluetooth/mgmt.c     | 12 ++++++++----
+>> 2 files changed, 13 insertions(+), 4 deletions(-)
 >>
->> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->> index 5935f74..8b7cd37 100644
->> --- a/net/bluetooth/hci_event.c
->> +++ b/net/bluetooth/hci_event.c
->> @@ -1783,6 +1783,8 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
->> {
->> 	struct hci_ev_disconn_complete *ev = (void *) skb->data;
->> 	struct hci_conn *conn;
->> +	u8 type;
->> +	bool send_mgmt_event = false;
+>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>> index 79debc3..44d3f99 100644
+>> --- a/net/bluetooth/hci_core.c
+>> +++ b/net/bluetooth/hci_core.c
+>> @@ -1496,6 +1496,11 @@ void hci_discovery_set_state(struct hci_dev *hdev, int state)
 >>
->> 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
->>
->> @@ -1792,44 +1794,46 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
->> 	if (!conn)
->> 		goto unlock;
->>
->> -	if (ev->status == 0)
->> -		conn->state = BT_CLOSED;
->> -
->> 	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags) &&
->> -	    (conn->type == ACL_LINK || conn->type == LE_LINK)) {
->> -		if (ev->status) {
->> +	    (conn->type == ACL_LINK || conn->type == LE_LINK))
->> +		send_mgmt_event = true;
+>> 	switch (state) {
+>> 	case DISCOVERY_STOPPED:
+>> +		/* Check the background scanning since it may have been
+>> +		 * temporarily stopped by the start discovery command.
+>> +		 */
+>> +		hci_check_background_scan(hdev);
 >> +
->> +	if (ev->status) {
->> +		if (send_mgmt_event)
->> 			mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
->> 					       conn->dst_type, ev->status);
->> -		} else {
->> -			u8 reason = hci_to_mgmt_reason(ev->reason);
->> -
->> -			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
->> -						 conn->dst_type, reason);
->> -		}
->> +		return;
->> 	}
 >
-> so I get the feeling that mgmt_disconnect_failed should check the link type all by itself. Since we are handing it over to the function anyway. And then this send_mgmt_event could be just removed.
+> I do not know what check here means. For me this is reenable_background_scan or trigger_background_scan or start_background_scan, but not some magic check.
 >
->> -	if (ev->status == 0) {
->> -		u8 type = conn->type;
->> +	conn->state = BT_CLOSED;
+>> 		if (hdev->discovery.state != DISCOVERY_STARTING)
+>> 			mgmt_discovering(hdev, 0);
+>> 		break;
+>> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+>> index 22cf547..0e329e5 100644
+>> --- a/net/bluetooth/mgmt.c
+>> +++ b/net/bluetooth/mgmt.c
+>> @@ -3280,11 +3280,15 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+>> 			goto failed;
+>> 		}
 >>
->> -		if (type == ACL_LINK && conn->flush_key)
->> -			hci_remove_link_key(hdev, &conn->dst);
->> -		hci_proto_disconn_cfm(conn, ev->reason);
->> -		hci_conn_del(conn);
->> +	if (send_mgmt_event) {
->> +		u8 reason = hci_to_mgmt_reason(ev->reason);
->>
->> -		/* Re-enable advertising if necessary, since it might
->> -		 * have been disabled by the connection. From the
->> -		 * HCI_LE_Set_Advertise_Enable command description in
->> -		 * the core specification (v4.0):
->> -		 * "The Controller shall continue advertising until the Host
->> -		 * issues an LE_Set_Advertise_Enable command with
->> -		 * Advertising_Enable set to 0x00 (Advertising is disabled)
->> -		 * or until a connection is created or until the Advertising
->> -		 * is timed out due to Directed Advertising."
->> -		 */
->> -		if (type == LE_LINK)
->> -			mgmt_reenable_advertising(hdev);
->> +		mgmt_device_disconnected(hdev, &conn->dst, conn->type,
->> +					 conn->dst_type, reason);
->> 	}
+>> +		/* If controller is scanning, it means the background scanning
+>> +		 * is running. Thus, we should temporarily stop it in order to
+>> +		 * set the discovery scanning parameters.
+>> +		 */
+>> 		if (test_bit(HCI_LE_SCAN, &hdev->dev_flags)) {
+>> -			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
+>> -					 MGMT_STATUS_BUSY);
+>> -			mgmt_pending_remove(cmd);
+>> -			goto failed;
+>> +			memset(&enable_cp, 0, sizeof(enable_cp));
+>> +			enable_cp.enable = LE_SCAN_DISABLE;
+>> +			hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE,
+>> +				    sizeof(enable_cp), &enable_cp);
+>> 		}
 >
-> Same here. Just make sure that mgmt_device_disconneted checks the link type by itself and call it unconditional.
->
->>
->> +	if (conn->type == ACL_LINK && conn->flush_key)
->> +		hci_remove_link_key(hdev, &conn->dst);
->> +
->> +	type = conn->type;
->> +	hci_proto_disconn_cfm(conn, ev->reason);
->> +	hci_conn_del(conn);
->> +
->> +	/* Re-enable advertising if necessary, since it might
->> +	 * have been disabled by the connection. From the
->> +	 * HCI_LE_Set_Advertise_Enable command description in
->> +	 * the core specification (v4.0):
->> +	 * "The Controller shall continue advertising until the Host
->> +	 * issues an LE_Set_Advertise_Enable command with
->> +	 * Advertising_Enable set to 0x00 (Advertising is disabled)
->> +	 * or until a connection is created or until the Advertising
->> +	 * is timed out due to Directed Advertising."
->> +	 */
->> +	if (type == LE_LINK)
->> +		mgmt_reenable_advertising(hdev);
->> +
->> unlock:
->> 	hci_dev_unlock(hdev);
->> }
+> I think we need a new hdev->dev_flags for HCI_LE_BG_SCAN. Magically assuming that it is a background scan is dangerous.
 
-These comments were implemented in the patch set "[RFC 0/5] Disconnect 
-complete refactoring". That patch set is already pushed upstream.
+A few lines above (the diff doesn't show it), we check if discovery is 
+running. Since discovery is not running and controller is scanning, we 
+assume that it is the background scanning. So, we might not want to 
+create the HCI_LE_BG_SCAN flag since it is not really necessary by now.
 
-I'm currently working on a new version of this patch set. All your other 
-comments will be addressed in v3.
-
-Thanks,
+Regards,
 
 Andre
