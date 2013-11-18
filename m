@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/5] audio/sink: Remove shutdown parameter from sink_disconnect
-Date: Mon, 18 Nov 2013 13:50:14 +0200
-Message-Id: <1384775415-10159-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/5] audio/source: Remove shutdown parameter from source_disconnect
+Date: Mon, 18 Nov 2013 13:50:13 +0200
+Message-Id: <1384775415-10159-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1384775415-10159-1-git-send-email-luiz.dentz@gmail.com>
 References: <1384775415-10159-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,56 +13,56 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 This parameter is always false so it never do anything.
 ---
- profiles/audio/a2dp.c | 2 +-
- profiles/audio/sink.c | 5 +----
- profiles/audio/sink.h | 2 +-
+ profiles/audio/a2dp.c   | 2 +-
+ profiles/audio/source.c | 5 +----
+ profiles/audio/source.h | 2 +-
  3 files changed, 3 insertions(+), 6 deletions(-)
 
 diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 95ffa12..29a1593 100644
+index 864cb18..95ffa12 100644
 --- a/profiles/audio/a2dp.c
 +++ b/profiles/audio/a2dp.c
-@@ -1919,7 +1919,7 @@ static int a2dp_sink_disconnect(struct btd_service *service)
+@@ -1887,7 +1887,7 @@ static int a2dp_source_disconnect(struct btd_service *service)
  
  	DBG("path %s", path);
  
--	return sink_disconnect(service, FALSE);
-+	return sink_disconnect(service);
+-	return source_disconnect(service, FALSE);
++	return source_disconnect(service);
  }
  
- static int a2dp_source_server_probe(struct btd_profile *p,
-diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
-index 400af06..4f39622 100644
---- a/profiles/audio/sink.c
-+++ b/profiles/audio/sink.c
-@@ -388,16 +388,13 @@ gboolean sink_new_stream(struct btd_service *service, struct avdtp *session,
+ static int a2dp_sink_connect(struct btd_service *service)
+diff --git a/profiles/audio/source.c b/profiles/audio/source.c
+index 24a4353..7b129b7 100644
+--- a/profiles/audio/source.c
++++ b/profiles/audio/source.c
+@@ -380,16 +380,13 @@ gboolean source_new_stream(struct btd_service *service, struct avdtp *session,
  	return TRUE;
  }
  
--int sink_disconnect(struct btd_service *service, gboolean shutdown)
-+int sink_disconnect(struct btd_service *service)
+-int source_disconnect(struct btd_service *service, gboolean shutdown)
++int source_disconnect(struct btd_service *service)
  {
- 	struct sink *sink = btd_service_get_user_data(service);
+ 	struct source *source = btd_service_get_user_data(service);
  
- 	if (!sink->session)
+ 	if (!source->session)
  		return -ENOTCONN;
  
 -	if (shutdown)
--		avdtp_set_device_disconnect(sink->session, TRUE);
+-		avdtp_set_device_disconnect(source->session, TRUE);
 -
  	/* cancel pending connect */
- 	if (sink->connect_id > 0) {
- 		a2dp_cancel(sink->connect_id);
-diff --git a/profiles/audio/sink.h b/profiles/audio/sink.h
-index 904a33d..93c62a2 100644
---- a/profiles/audio/sink.h
-+++ b/profiles/audio/sink.h
-@@ -47,4 +47,4 @@ int sink_connect(struct btd_service *service);
- gboolean sink_new_stream(struct btd_service *service, struct avdtp *session,
+ 	if (source->connect_id > 0) {
+ 		a2dp_cancel(source->connect_id);
+diff --git a/profiles/audio/source.h b/profiles/audio/source.h
+index c16fb4b..a014c68 100644
+--- a/profiles/audio/source.h
++++ b/profiles/audio/source.h
+@@ -48,4 +48,4 @@ gboolean source_new_stream(struct btd_service *service, struct avdtp *session,
  				struct avdtp_stream *stream);
- gboolean sink_setup_stream(struct btd_service *service, struct avdtp *session);
--int sink_disconnect(struct btd_service *service, gboolean shutdown);
-+int sink_disconnect(struct btd_service *service);
+ gboolean source_setup_stream(struct btd_service *service,
+ 							struct avdtp *session);
+-int source_disconnect(struct btd_service *service, gboolean shutdown);
++int source_disconnect(struct btd_service *service);
 -- 
 1.8.3.1
 
