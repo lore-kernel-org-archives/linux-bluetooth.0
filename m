@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 10/16] android/socket: Implement socket connect HAL method
-Date: Mon, 18 Nov 2013 10:26:13 +0200
-Message-Id: <1384763179-2218-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 04/16] android/socket: Define structs and implement listen
+Date: Mon, 18 Nov 2013 10:26:07 +0200
+Message-Id: <1384763179-2218-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384763179-2218-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384763179-2218-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,73 +11,156 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-First step is to query remote device for RFCOMM channel.
+This defines structures for socket HAL. We need to emulate Android
+sockets by sending connect/accept signals over file descriptor.
+Handle HAL socket listen call. Create RFCOMM socket and wait for events.
 ---
- android/socket.c |   34 ++++++++++++++++++++++++++++++++--
- 1 file changed, 32 insertions(+), 2 deletions(-)
+ android/socket.c |  118 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 116 insertions(+), 2 deletions(-)
 
 diff --git a/android/socket.c b/android/socket.c
-index a800a77..c22e4ed 100644
+index e580036..276c78c 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -33,6 +33,9 @@
+@@ -27,8 +27,12 @@
+ 
+ #include <glib.h>
+ #include <stdbool.h>
++#include <unistd.h>
++#include <errno.h>
+ 
  #include "lib/bluetooth.h"
- #include "btio/btio.h"
- #include "lib/sdp.h"
-+#include "lib/sdp_lib.h"
-+#include "src/sdp-client.h"
-+
++#include "btio/btio.h"
++#include "lib/sdp.h"
  #include "log.h"
  #include "hal-msg.h"
  #include "hal-ipc.h"
-@@ -52,6 +55,7 @@ struct rfcomm_slot {
- 	int fd;		/* descriptor for communication with Java framework */
- 	int real_sock;	/* real RFCOMM socket */
- 	int channel;	/* RFCOMM channel */
-+	bdaddr_t dst;
- };
+@@ -37,13 +41,123 @@
  
- static struct rfcomm_slot *create_rfslot(int sock, int *hal_fd)
-@@ -373,11 +377,37 @@ static int handle_listen(void *buf)
- 	return hal_fd;
- }
+ static bdaddr_t adapter_addr;
  
-+static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
-+{
-+	DBG("");
-+}
+-static int handle_listen(void *buf)
++/* Simple list of RFCOMM server sockets */
++GList *rfcomm_srv_list = NULL;
 +
- static int handle_connect(void *buf)
++/* Simple list of RFCOMM connected sockets */
++GList *rfcomm_connected_list = NULL;
++
++struct rfcomm_slot {
++	int fd;		/* descriptor for communication with Java framework */
++	int real_sock;	/* real RFCOMM socket */
++	int channel;	/* RFCOMM channel */
++};
++
++static struct rfcomm_slot *create_rfslot(int sock, int *hal_fd)
  {
 -	DBG("Not implemented");
-+	struct hal_cmd_sock_connect *cmd = buf;
++	int fds[2] = {-1, -1};
 +	struct rfcomm_slot *rfslot;
-+	bdaddr_t dst;
-+	uuid_t uuid;
-+	int hal_fd = -1;
++
++	if (socketpair(AF_LOCAL, SOCK_STREAM, 0, fds) < 0) {
++		error("socketpair(): %s", strerror(errno));
++		return NULL;
++	}
++
++	rfslot = g_malloc0(sizeof(*rfslot));
++	rfslot->fd = fds[0];
++	*hal_fd = fds[1];
++	rfslot->real_sock = sock;
++
++	return rfslot;
++}
++
++static void cleanup_rfslot(struct rfcomm_slot *rfslot)
++{
++	DBG("Cleanup: rfslot: %p fd %d real_sock %d chan %u",
++		rfslot, rfslot->fd, rfslot->real_sock, rfslot->channel);
++
++	if (rfslot->fd > 0)
++		close(rfslot->fd);
++	if (rfslot->real_sock > 0)
++		close(rfslot->real_sock);
++
++	g_free(rfslot);
++}
++
++static struct {
++	uint8_t uuid[16];
++	uint8_t channel;
++} uuid_to_chan[] = {
++	{ .uuid = {
++	0x00, 0x00, 0x11, 0x2F, 0x00, 0x00, 0x10, 0x00,
++	0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
++	},
++#define PBAP_DEFAULT_CHANNEL	15
++	.channel = PBAP_DEFAULT_CHANNEL },
++	{ .uuid = {
++	0x00, 0x00, 0x11, 0x05, 0x00, 0x00, 0x10, 0x00,
++	0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
++	},
++#define OPP_DEFAULT_CHANNEL	9
++	.channel = OPP_DEFAULT_CHANNEL },
++	{ {0} }
++};
++
++static int get_rfcomm_default_chan(const uint8_t *uuid)
++{
++	int i;
++
++	for (i = 0; uuid_to_chan[i].channel; i++) {
++		if (!memcmp(uuid_to_chan[i].uuid, uuid, 16))
++			return uuid_to_chan[i].channel;
++	}
  
--	return -1;
+ 	return -1;
+ }
+ 
++static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
++{
++}
++
++static int handle_listen(void *buf)
++{
++	struct hal_cmd_sock_listen *cmd = buf;
++	struct rfcomm_slot *rfslot;
++	GIOChannel *io;
++	GError *err = NULL;
++	int hal_fd = -1;
++	int chan;
++
 +	DBG("");
 +
-+	android2bdaddr(cmd->bdaddr, &dst);
++	chan = get_rfcomm_default_chan(cmd->uuid);
++	if (chan < 0)
++		return -1;
++
++	DBG("rfcomm channel %d", chan);
++
 +	rfslot = create_rfslot(-1, &hal_fd);
-+	bacpy(&rfslot->dst, &dst);
 +
-+	memset(&uuid, 0, sizeof(uuid));
-+	uuid.type = SDP_UUID128;
-+	memcpy(&uuid.value.uuid128, cmd->uuid, sizeof(uint128_t));
-+
-+	if (bt_search_service(&adapter_addr, &dst, &uuid, sdp_search_cb, rfslot,
-+								NULL) < 0) {
-+		error("Failed to search SDP records");
++	io = bt_io_listen(accept_cb, NULL, rfslot, NULL, &err,
++				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
++				BT_IO_OPT_CHANNEL, chan,
++				BT_IO_OPT_INVALID);
++	if (!io) {
++		error("Failed listen: %s", err->message);
++		g_error_free(err);
 +		cleanup_rfslot(rfslot);
 +		return -1;
 +	}
 +
++	rfslot->real_sock = g_io_channel_unix_get_fd(io);
++	rfcomm_srv_list = g_list_append(rfcomm_srv_list, rfslot);
++
++	DBG("real_sock %d fd %d hal_fd %d",
++				rfslot->real_sock, rfslot->fd, hal_fd);
++
 +	return hal_fd;
- }
- 
- void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
++}
++
+ static int handle_connect(void *buf)
+ {
+ 	DBG("Not implemented");
 -- 
 1.7.10.4
 
