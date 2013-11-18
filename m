@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 08/16] android/socket: Implement accept signal over Android fd
-Date: Mon, 18 Nov 2013 10:26:11 +0200
-Message-Id: <1384763179-2218-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 05/16] android/socket: Implement socket accepted event
+Date: Mon, 18 Nov 2013 10:26:08 +0200
+Message-Id: <1384763179-2218-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384763179-2218-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384763179-2218-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,101 +11,77 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Android expects to get accept signal over file descriptor which was
-set during listen HAL call.
+When we get accepted event we create rfcomm slot and start listening
+for events from Android framework and from RFCOMM real socket.
 ---
- android/socket.c |   57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
+ android/socket.c |   52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
 
 diff --git a/android/socket.c b/android/socket.c
-index eba50f6..4886158 100644
+index 276c78c..c9ee32f 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -37,6 +37,7 @@
- #include "hal-msg.h"
- #include "hal-ipc.h"
- #include "ipc.h"
-+#include "utils.h"
- #include "socket.h"
- 
- static bdaddr_t adapter_addr;
-@@ -103,6 +104,45 @@ static struct {
- 	{ {0} }
- };
- 
-+static int bt_sock_send_fd(int sock_fd, const void *buf, int len, int send_fd)
-+{
-+	ssize_t ret;
-+	struct msghdr msg;
-+	struct cmsghdr *cmsg;
-+	struct iovec iv;
-+	char msgbuf[CMSG_SPACE(1)];
-+
-+	DBG("len %d sock_fd %d send_fd %d", len, sock_fd, send_fd);
-+
-+	if (sock_fd == -1 || send_fd == -1)
-+		return -1;
-+
-+	memset(&msg, 0, sizeof(msg));
-+
-+	msg.msg_control = msgbuf;
-+	msg.msg_controllen = sizeof(msgbuf);
-+	cmsg = CMSG_FIRSTHDR(&msg);
-+	cmsg->cmsg_level = SOL_SOCKET;
-+	cmsg->cmsg_type = SCM_RIGHTS;
-+	cmsg->cmsg_len = CMSG_LEN(sizeof(send_fd));
-+	memcpy(CMSG_DATA(cmsg), &send_fd, sizeof(send_fd));
-+
-+	iv.iov_base = (unsigned char *) buf;
-+	iv.iov_len = len;
-+
-+	msg.msg_iov = &iv;
-+	msg.msg_iovlen = 1;
-+
-+	ret = sendmsg(sock_fd, &msg, MSG_NOSIGNAL);
-+	if (ret < 0) {
-+		error("sendmsg(): sock_fd %d send_fd %d: %s",
-+					sock_fd, send_fd, strerror(errno));
-+		return ret;
-+	}
-+
-+	return ret;
-+}
-+
- static int get_rfcomm_default_chan(const uint8_t *uuid)
- {
- 	int i;
-@@ -226,6 +266,21 @@ static gboolean sock_rfcomm_event_cb(GIOChannel *io, GIOCondition cond,
- 	return TRUE;
+@@ -115,8 +115,60 @@ static int get_rfcomm_default_chan(const uint8_t *uuid)
+ 	return -1;
  }
  
-+static void sock_send_accept(struct rfcomm_slot *rfslot, bdaddr_t *bdaddr,
-+							int fd_accepted)
++static gboolean sock_stack_event_cb(GIOChannel *io, GIOCondition cond,
++								gpointer data)
 +{
-+	struct hal_sock_connect_signal cmd;
++	return TRUE;
++}
 +
-+	DBG("");
-+
-+	cmd.size = sizeof(cmd);
-+	bdaddr2android(bdaddr, cmd.bdaddr);
-+	cmd.channel = rfslot->channel;
-+	cmd.status = 0;
-+
-+	bt_sock_send_fd(rfslot->fd, &cmd, sizeof(cmd), fd_accepted);
++static gboolean sock_rfcomm_event_cb(GIOChannel *io, GIOCondition cond,
++								gpointer data)
++{
++	return TRUE;
 +}
 +
  static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
  {
- 	struct rfcomm_slot *rfslot = user_data;
-@@ -257,6 +312,8 @@ static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
- 	rfcomm_connected_list =
- 			g_list_append(rfcomm_connected_list, rfslot_acc);
- 
-+	sock_send_accept(rfslot, &dst, hal_fd);
++	struct rfcomm_slot *rfslot = user_data;
++	struct rfcomm_slot *rfslot_acc;
++	GIOChannel *io_stack;
++	bdaddr_t dst;
++	char address[18];
++	int sock_acc;
++	int hal_fd = -1;
 +
- 	/* Handle events from Android */
- 	io_stack = g_io_channel_unix_new(rfslot_acc->fd);
- 	g_io_add_watch(io_stack, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++	bt_io_get(io, &err,
++			BT_IO_OPT_DEST_BDADDR, &dst,
++			BT_IO_OPT_INVALID);
++	if (err) {
++		error("%s", err->message);
++		g_io_channel_shutdown(io, TRUE, NULL);
++		return;
++	}
++
++	ba2str(&dst, address);
++	DBG("Incoming connection from %s rfslot %p", address, rfslot);
++
++	DBG("rfslot: fd %d real_sock %d chan %u sock %d",
++		rfslot->fd, rfslot->real_sock, rfslot->channel,
++		g_io_channel_unix_get_fd(io));
++
++	sock_acc = g_io_channel_unix_get_fd(io);
++	rfslot_acc = create_rfslot(sock_acc, &hal_fd);
++	rfcomm_connected_list =
++			g_list_append(rfcomm_connected_list, rfslot_acc);
++
++	/* Handle events from Android */
++	io_stack = g_io_channel_unix_new(rfslot_acc->fd);
++	g_io_add_watch(io_stack, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++					sock_stack_event_cb, rfslot_acc);
++	g_io_channel_unref(io_stack);
++
++	/* Handle rfcomm events */
++	g_io_add_watch(io, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++				sock_rfcomm_event_cb, rfslot_acc);
++
++	DBG("rfslot %p rfslot_acc %p", rfslot, rfslot_acc);
+ }
+ 
+ static int handle_listen(void *buf)
 -- 
 1.7.10.4
 
