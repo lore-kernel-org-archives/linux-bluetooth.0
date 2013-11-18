@@ -1,138 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 04/17] android/socket: Define structs and implement listen
-Date: Mon, 18 Nov 2013 15:20:41 +0200
-Message-Id: <1384780854-20970-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1384780854-20970-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1384780854-20970-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 00/17] Socket HAL
+Date: Mon, 18 Nov 2013 15:20:37 +0200
+Message-Id: <1384780854-20970-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This defines structures for socket HAL. We need to emulate Android
-sockets by sending connect/accept signals over file descriptor.
-Handle HAL socket listen call. Create RFCOMM socket and wait for events.
----
- android/socket.c |   79 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 79 insertions(+)
+This is initial code implementing socket HAL. OPP currently works with send/receive files. Probaly
+other profiles works as well, not tested yet.
 
-diff --git a/android/socket.c b/android/socket.c
-index 9c94c03..0731bd9 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -27,8 +27,12 @@
- 
- #include <glib.h>
- #include <stdbool.h>
-+#include <unistd.h>
-+#include <errno.h>
- 
- #include "lib/bluetooth.h"
-+#include "btio/btio.h"
-+#include "lib/sdp.h"
- #include "log.h"
- #include "hal-msg.h"
- #include "hal-ipc.h"
-@@ -40,6 +44,50 @@
- 
- static bdaddr_t adapter_addr;
- 
-+/* Simple list of RFCOMM server sockets */
-+GList *servers = NULL;
-+
-+/* Simple list of RFCOMM connected sockets */
-+GList *connections = NULL;
-+
-+struct rfcomm_sock {
-+	int fd;		/* descriptor for communication with Java framework */
-+	int real_sock;	/* real RFCOMM socket */
-+	int channel;	/* RFCOMM channel */
-+};
-+
-+static struct rfcomm_sock *create_rfsock(int sock, int *hal_fd)
-+{
-+	int fds[2] = {-1, -1};
-+	struct rfcomm_sock *rfsock;
-+
-+	if (socketpair(AF_LOCAL, SOCK_STREAM, 0, fds) < 0) {
-+		error("socketpair(): %s", strerror(errno));
-+		*hal_fd = -1;
-+		return NULL;
-+	}
-+
-+	rfsock = g_new0(struct rfcomm_sock, 1);
-+	rfsock->fd = fds[0];
-+	*hal_fd = fds[1];
-+	rfsock->real_sock = sock;
-+
-+	return rfsock;
-+}
-+
-+static void cleanup_rfsock(struct rfcomm_sock *rfsock)
-+{
-+	DBG("rfsock: %p fd %d real_sock %d chan %u",
-+		rfsock, rfsock->fd, rfsock->real_sock, rfsock->channel);
-+
-+	if (rfsock->fd > 0)
-+		close(rfsock->fd);
-+	if (rfsock->real_sock > 0)
-+		close(rfsock->real_sock);
-+
-+	g_free(rfsock);
-+}
-+
- static struct {
- 	uint8_t uuid[16];
- 	uint8_t channel;
-@@ -71,8 +119,16 @@ static int get_rfcomm_default_chan(const uint8_t *uuid)
- 	return -ENOENT;
- }
- 
-+static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
-+{
-+}
-+
- static int handle_listen(void *buf)
- {
-+	struct hal_cmd_sock_listen *cmd = buf;
-+	struct rfcomm_sock *rfsock;
-+	GIOChannel *io;
-+	GError *err = NULL;
- 	int hal_fd;
- 	int chan;
- 
-@@ -82,6 +138,29 @@ static int handle_listen(void *buf)
- 	if (chan < 0)
- 		return chan;
- 
-+	DBG("rfcomm channel %d", chan);
-+
-+	rfsock = create_rfsock(-1, &hal_fd);
-+	if (!rfsock)
-+		return -1;
-+
-+	io = bt_io_listen(accept_cb, NULL, rfsock, NULL, &err,
-+				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
-+				BT_IO_OPT_CHANNEL, chan,
-+				BT_IO_OPT_INVALID);
-+	if (!io) {
-+		error("Failed listen: %s", err->message);
-+		g_error_free(err);
-+		cleanup_rfsock(rfsock);
-+		return -1;
-+	}
-+
-+	rfsock->real_sock = g_io_channel_unix_get_fd(io);
-+	servers = g_list_append(servers, rfsock);
-+
-+	DBG("real_sock %d fd %d hal_fd %d",
-+				rfsock->real_sock, rfsock->fd, hal_fd);
-+
- 	return hal_fd;
- }
- 
+Changes:
+	* v4: Changed name rfslot -> rfsock following Johan's comment and other cosmetic changes, fixed one bug in SDP
+	record, use NULL instead of 0 for sdp functions.
+	* v3: Fixed coding style with write/send between file descriptors.
+	* v2: Following Marcel comments changed way copying between file descriptors works, added SDP record
+	for OPP and now it is possible to send files through GUI. Merged one patch with structures with actual user.
+	* v1: Rebased and use static src address, hal_fd removed from structure and closed after sent to framework,
+	added connect calls and SDP parsing, added cleanup_rfcomm function, minor fixes.
+	* RFC Initial
+
+TODO:
+	* Add SDP record for PBAP and other profiles
+	* Use splice() (requires bionic change first)
+
+For tracking rfcomm sockets I use structure rfslot which has following
+fields:
+ - real_sock - real RFCOMM socket
+ - fd - fd to communicate with Android framework
+
+create_rfslot sets hal_fd which is fd passed to Android framework with CMSG
+
+Andrei Emeltchenko (17):
+  android/socket: Add connect signal to socket
+  android: trivial: Add comment making code consistent
+  android/socket: Add get RFCOMM default channel
+  android/socket: Define structs and implement listen
+  android/socket: Implement socket accepted event
+  android/socket: Implement Android RFCOMM stack events
+  android/socket: Implement RFCOMM events
+  android/socket: Implement accept signal over Android fd
+  android/socket: Write channel to Android fd
+  android/socket: Implement socket connect HAL method
+  android/socket: Parse SDP response and connect
+  android/socket: Implement HAL connect call
+  android/socket: Send RFCOMM channel to framework
+  android/socket: Send connect signal on connect
+  android/socket: Close file descriptor after sending
+  android/socket: Add SDP record for OPP profile
+  android/socket: Add MAS uuid to channel mapping
+
+ android/hal-msg.h |    2 +
+ android/socket.c  |  612 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ android/socket.h  |    7 +
+ 3 files changed, 617 insertions(+), 4 deletions(-)
+
 -- 
 1.7.10.4
 
