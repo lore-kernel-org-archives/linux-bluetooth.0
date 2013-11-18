@@ -1,101 +1,139 @@
 Return-Path: <cyrus@holtmann.org>
-From: wu.zheng@intel.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Wu zheng <wu.zheng@intel.com>
-Subject: [PATCH] Don't care about power status and adapter power on after rfkill unblock
-Date: Tue, 19 Nov 2013 14:55:46 +0800
-Message-Id: <1384844146-12800-1-git-send-email-wu.zheng@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <528A5F39.8010303@openbossa.org>
+Date: Mon, 18 Nov 2013 15:40:57 -0300
+From: Andre Guedes <andre.guedes@openbossa.org>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC v2 01/15] Bluetooth: Refactor hci_disconn_complete_evt
+References: <1383053160-10175-1-git-send-email-andre.guedes@openbossa.org> <1383053160-10175-2-git-send-email-andre.guedes@openbossa.org> <227F5D6B-6B76-428E-9893-37ED1562F833@holtmann.org>
+In-Reply-To: <227F5D6B-6B76-428E-9893-37ED1562F833@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Wu zheng <wu.zheng@intel.com>
+Hi Marcel,
 
-Don't care about the power status of BT adapter before rfkill block.
-(BT adapter is power on or off)
+On 10/29/2013 07:52 PM, Marcel Holtmann wrote:
+> Hi Andre,
+>
+>> hci_disconn_complete_evt() logic is more complicated than what it
+>> should be, making it hard to follow and add new features.
+>>
+>> So this patch does some code refactoring by handling the error cases
+>> in the beginning of the function and by moving the main flow into the
+>> first level of function scope. No change is done in the event handling
+>> logic itself.
+>>
+>> Besides organizing this messy code, this patch makes easier to add
+>> code for handling LE auto connection (which will be added in a further
+>> patch).
+>>
+>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>> ---
+>> net/bluetooth/hci_event.c | 62 +++++++++++++++++++++++++----------------------
+>> 1 file changed, 33 insertions(+), 29 deletions(-)
+>>
+>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>> index 5935f74..8b7cd37 100644
+>> --- a/net/bluetooth/hci_event.c
+>> +++ b/net/bluetooth/hci_event.c
+>> @@ -1783,6 +1783,8 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>> {
+>> 	struct hci_ev_disconn_complete *ev = (void *) skb->data;
+>> 	struct hci_conn *conn;
+>> +	u8 type;
+>> +	bool send_mgmt_event = false;
+>>
+>> 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
+>>
+>> @@ -1792,44 +1794,46 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>> 	if (!conn)
+>> 		goto unlock;
+>>
+>> -	if (ev->status == 0)
+>> -		conn->state = BT_CLOSED;
+>> -
+>> 	if (test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags) &&
+>> -	    (conn->type == ACL_LINK || conn->type == LE_LINK)) {
+>> -		if (ev->status) {
+>> +	    (conn->type == ACL_LINK || conn->type == LE_LINK))
+>> +		send_mgmt_event = true;
+>> +
+>> +	if (ev->status) {
+>> +		if (send_mgmt_event)
+>> 			mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
+>> 					       conn->dst_type, ev->status);
+>> -		} else {
+>> -			u8 reason = hci_to_mgmt_reason(ev->reason);
+>> -
+>> -			mgmt_device_disconnected(hdev, &conn->dst, conn->type,
+>> -						 conn->dst_type, reason);
+>> -		}
+>> +		return;
+>> 	}
+>
+> so I get the feeling that mgmt_disconnect_failed should check the link type all by itself. Since we are handing it over to the function anyway. And then this send_mgmt_event could be just removed.
+>
+>> -	if (ev->status == 0) {
+>> -		u8 type = conn->type;
+>> +	conn->state = BT_CLOSED;
+>>
+>> -		if (type == ACL_LINK && conn->flush_key)
+>> -			hci_remove_link_key(hdev, &conn->dst);
+>> -		hci_proto_disconn_cfm(conn, ev->reason);
+>> -		hci_conn_del(conn);
+>> +	if (send_mgmt_event) {
+>> +		u8 reason = hci_to_mgmt_reason(ev->reason);
+>>
+>> -		/* Re-enable advertising if necessary, since it might
+>> -		 * have been disabled by the connection. From the
+>> -		 * HCI_LE_Set_Advertise_Enable command description in
+>> -		 * the core specification (v4.0):
+>> -		 * "The Controller shall continue advertising until the Host
+>> -		 * issues an LE_Set_Advertise_Enable command with
+>> -		 * Advertising_Enable set to 0x00 (Advertising is disabled)
+>> -		 * or until a connection is created or until the Advertising
+>> -		 * is timed out due to Directed Advertising."
+>> -		 */
+>> -		if (type == LE_LINK)
+>> -			mgmt_reenable_advertising(hdev);
+>> +		mgmt_device_disconnected(hdev, &conn->dst, conn->type,
+>> +					 conn->dst_type, reason);
+>> 	}
+>
+> Same here. Just make sure that mgmt_device_disconneted checks the link type by itself and call it unconditional.
+>
+>>
+>> +	if (conn->type == ACL_LINK && conn->flush_key)
+>> +		hci_remove_link_key(hdev, &conn->dst);
+>> +
+>> +	type = conn->type;
+>> +	hci_proto_disconn_cfm(conn, ev->reason);
+>> +	hci_conn_del(conn);
+>> +
+>> +	/* Re-enable advertising if necessary, since it might
+>> +	 * have been disabled by the connection. From the
+>> +	 * HCI_LE_Set_Advertise_Enable command description in
+>> +	 * the core specification (v4.0):
+>> +	 * "The Controller shall continue advertising until the Host
+>> +	 * issues an LE_Set_Advertise_Enable command with
+>> +	 * Advertising_Enable set to 0x00 (Advertising is disabled)
+>> +	 * or until a connection is created or until the Advertising
+>> +	 * is timed out due to Directed Advertising."
+>> +	 */
+>> +	if (type == LE_LINK)
+>> +		mgmt_reenable_advertising(hdev);
+>> +
+>> unlock:
+>> 	hci_dev_unlock(hdev);
+>> }
 
-When rfkill unblock, BT will set the adapter power on.
+These comments were implemented in the patch set "[RFC 0/5] Disconnect 
+complete refactoring". That patch set is already pushed upstream.
 
-It results in the following issue.
+I'm currently working on a new version of this patch set. All your other 
+comments will be addressed in v3.
 
-Connman can't control BT adapter power on/off rightly.
+Thanks,
 
-When using connman down BT, connman will send the dbus command
-of power off and set rfkill block BT.
-
-Power off BT: adapter power off -> rfkill blcok BT.
-
-When using connman up BT, connman will set rfkill unblock BT
-and send the dbus command of power on.
-
-Power on BT: rfkill unblock adapter power on -> adapter power on.
-
-When connman enable BT, BT adapter will power on after rfkill unblock.
-
-After then, connman will receive the message of adapter property change.
-The message is received before connman finish the message BT up to Bluez.
-
-Thefore, the BT power status of connman is different with BT power status
-in the message of adapter property change.
-
-It will result in that connman send the dbus message of power off
-to Bluez and power down BT adapter again.
-
----
- src/adapter.c |   13 +++++++++++++
- 1 files changed, 13 insertions(+), 0 deletions(-)
-
-diff --git a/src/adapter.c b/src/adapter.c
-index d904a56..bed195b 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -138,6 +138,7 @@ struct btd_adapter {
- 	char *short_name;		/* controller short name */
- 	uint32_t supported_settings;	/* controller supported settings */
- 	uint32_t current_settings;	/* current controller settings */
-+	gboolean current_powered;       /* current power status */
- 
- 	char *path;			/* adapter object path */
- 	uint8_t major_class;		/* configured major class */
-@@ -1845,6 +1846,7 @@ static void property_set_mode_complete(uint8_t status, uint16_t length,
- {
- 	struct property_set_data *data = user_data;
- 	struct btd_adapter *adapter = data->adapter;
-+	uint32_t settings;
- 
- 	DBG("%s (0x%02x)", mgmt_errstr(status), status);
- 
-@@ -1866,6 +1868,13 @@ static void property_set_mode_complete(uint8_t status, uint16_t length,
- 
- 	g_dbus_pending_property_success(data->id);
- 
-+	settings = bt_get_le32(param);
-+
-+	if (settings & MGMT_SETTING_POWERED)
-+		adapter->current_powered = TRUE;
-+	else
-+		adapter->current_powered = FALSE;
-+
- 	/*
- 	 * The parameters are identical and also the task that is
- 	 * required in both cases. So it is safe to just call the
-@@ -4527,6 +4536,9 @@ int btd_adapter_restore_powered(struct btd_adapter *adapter)
- 	if (adapter->current_settings & MGMT_SETTING_POWERED)
- 		return 0;
- 
-+	if (adapter->current_powered == FALSE)
-+		return 0;
-+
- 	set_mode(adapter, MGMT_OP_SET_POWERED, 0x01);
- 
- 	return 0;
-@@ -5637,6 +5649,7 @@ static int adapter_register(struct btd_adapter *adapter)
- 		load_connections(adapter);
- 
- 	adapter->initialized = TRUE;
-+	adapter->current_powered = FALSE;
- 
- 	if (main_opts.did_source) {
- 		/* DeviceID record is added by sdpd-server before any other
--- 
-1.7.7
-
+Andre
