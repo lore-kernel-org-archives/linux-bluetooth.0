@@ -1,169 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 1/2] android: Improve IPC helper to not send invalid status response
-Date: Mon, 18 Nov 2013 13:58:39 +0100
-Message-Id: <1384779520-2104-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 18 Nov 2013 13:32:44 +0100
+From: Sander Eikelenboom <linux@eikelenboom.it>
+Message-ID: <217092369.20131118133244@eikelenboom.it>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	"linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
+Subject: Re: BUG: unable to handle kernel paging request at 00000015832a8e23 RIP  [<ffffffff81a57c30>] rfcomm_sock_getsockopt+0x140/0x240
+In-Reply-To: <344AB0A2-9E39-4294-A119-887D2FAA2036@holtmann.org>
+References: <581763626.20131117204744@eikelenboom.it> <344AB0A2-9E39-4294-A119-887D2FAA2036@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fix issue with sending invalid success response from several
-places where ipc_send_rsp was used for reporting success. Instead of
-using using ipc_send for success response, make helper handle that.
----
-V2: fixed hardcoded service id in ipc_send_rsp
+=0D=0ASunday, November 17, 2013, 11:57:40 PM, you wrote:
 
- android/a2dp.c      |  2 +-
- android/bluetooth.c |  2 +-
- android/hidhost.c   |  2 +-
- android/ipc.c       |  7 ++++++-
- android/ipc.h       |  2 +-
- android/main.c      | 12 ++++++++----
- android/pan.c       |  2 +-
- android/socket.c    |  2 +-
- 8 files changed, 20 insertions(+), 11 deletions(-)
+> Hi Sander,
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index 936c28e..bb55e41 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -226,7 +226,7 @@ void bt_a2dp_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
- 		break;
- 	}
- 
--	ipc_send_rsp(sk, HAL_SERVICE_ID_A2DP, status);
-+	ipc_send_rsp(sk, HAL_SERVICE_ID_A2DP, opcode, status);
- }
- 
- static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 5c5c61e..7dc2ec3 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -2268,7 +2268,7 @@ void bt_bluetooth_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
- error:
- 	error("Error handling command 0x%02x status %u", opcode, status);
- 
--	ipc_send_rsp(sk, HAL_SERVICE_ID_BLUETOOTH, status);
-+	ipc_send_rsp(sk, HAL_SERVICE_ID_BLUETOOTH, opcode, status);
- }
- 
- bool bt_bluetooth_register(int sk)
-diff --git a/android/hidhost.c b/android/hidhost.c
-index f5a607c..842b8ad 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -1109,7 +1109,7 @@ void bt_hid_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
- 		break;
- 	}
- 
--	ipc_send_rsp(sk, HAL_SERVICE_ID_HIDHOST, status);
-+	ipc_send_rsp(sk, HAL_SERVICE_ID_HIDHOST, opcode, status);
- }
- 
- static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
-diff --git a/android/ipc.c b/android/ipc.c
-index 729f157..8467b28 100644
---- a/android/ipc.c
-+++ b/android/ipc.c
-@@ -80,10 +80,15 @@ void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
- 	}
- }
- 
--void ipc_send_rsp(int sk, uint8_t service_id, uint8_t status)
-+void ipc_send_rsp(int sk, uint8_t service_id, uint8_t opcode, uint8_t status)
- {
- 	struct hal_status s;
- 
-+	if (status == HAL_STATUS_SUCCESS) {
-+		ipc_send(sk, service_id, opcode, 0, NULL, -1);
-+		return;
-+	}
-+
- 	s.code = status;
- 
- 	ipc_send(sk, service_id, HAL_OP_STATUS, sizeof(s), &s, -1);
-diff --git a/android/ipc.h b/android/ipc.h
-index cf0f3d6..ad4a2d2 100644
---- a/android/ipc.h
-+++ b/android/ipc.h
-@@ -23,4 +23,4 @@
- 
- void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
- 							void *param, int fd);
--void ipc_send_rsp(int sk, uint8_t service_id, uint8_t status);
-+void ipc_send_rsp(int sk, uint8_t service_id, uint8_t opcode, uint8_t status);
-diff --git a/android/main.c b/android/main.c
-index a4f5e84..c9733f3 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -122,7 +122,8 @@ static void service_register(void *buf, uint16_t len)
- 	return;
- failed:
- 	ipc_send_rsp(g_io_channel_unix_get_fd(hal_cmd_io),
--				HAL_SERVICE_ID_CORE, HAL_STATUS_FAILED);
-+				HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
-+				HAL_STATUS_FAILED);
- }
- 
- static void service_unregister(void *buf, uint16_t len)
-@@ -164,7 +165,8 @@ static void service_unregister(void *buf, uint16_t len)
- 	return;
- failed:
- 	ipc_send_rsp(g_io_channel_unix_get_fd(hal_cmd_io),
--				HAL_SERVICE_ID_CORE, HAL_STATUS_FAILED);
-+				HAL_SERVICE_ID_CORE, HAL_OP_UNREGISTER_MODULE,
-+				HAL_STATUS_FAILED);
- }
- 
- static void handle_service_core(uint8_t opcode, void *buf, uint16_t len)
-@@ -178,7 +180,8 @@ static void handle_service_core(uint8_t opcode, void *buf, uint16_t len)
- 		break;
- 	default:
- 		ipc_send_rsp(g_io_channel_unix_get_fd(hal_cmd_io),
--				HAL_SERVICE_ID_CORE, HAL_STATUS_FAILED);
-+						HAL_SERVICE_ID_CORE, opcode,
-+						HAL_STATUS_FAILED);
- 		break;
- 	}
- }
-@@ -274,7 +277,8 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
- 		bt_pan_handle_cmd(fd, msg->opcode, msg->payload, msg->len);
- 		break;
- 	default:
--		ipc_send_rsp(fd, msg->service_id, HAL_STATUS_FAILED);
-+		ipc_send_rsp(fd, msg->service_id, msg->opcode,
-+							HAL_STATUS_FAILED);
- 		break;
- 	}
- 
-diff --git a/android/pan.c b/android/pan.c
-index 46b3700..2a11f46 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -87,7 +87,7 @@ void bt_pan_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
- 		break;
- 	}
- 
--	ipc_send_rsp(sk, HAL_SERVICE_ID_PAN, status);
-+	ipc_send_rsp(sk, HAL_SERVICE_ID_PAN, opcode, status);
- }
- 
- bool bt_pan_register(int sk, const bdaddr_t *addr)
-diff --git a/android/socket.c b/android/socket.c
-index e580036..04bb7d1 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -75,7 +75,7 @@ void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
- 		break;
- 	}
- 
--	ipc_send_rsp(sk, HAL_SERVICE_ID_SOCK, HAL_STATUS_FAILED);
-+	ipc_send_rsp(sk, HAL_SERVICE_ID_SOCK, opcode, HAL_STATUS_FAILED);
- }
- 
- bool bt_socket_register(int sk, const bdaddr_t *addr)
--- 
-1.8.4.2
+>> This 3.13 merge window seems to have introduced the following bluetooth =
+regression for me:
+>>=20
+>> [   62.040810] BUG: unable to handle kernel paging request at 0000001583=
+2a8e23
+>> [   62.049196] IP: [<ffffffff81a57c30>] rfcomm_sock_getsockopt+0x140/0x2=
+40
+>> [   62.057800] PGD 0=20
+>> [   62.064574] Oops: 0000 [#1] PREEMPT SMP=20
+>> [   62.070653] Modules linked in:
+>> [   62.076596] CPU: 4 PID: 5575 Comm: bluetoothd Not tainted 3.12.0-mw-2=
+0131117+ #1
+>> [   62.082708] Hardware name: MSI MS-7640/890FXA-GD70 (MS-7640)  , BIOS =
+V1.8B1 09/13/2010
+>> [   62.088827] task: ffff88005863a180 ti: ffff880057688000 task.ti: ffff=
+880057688000
+>> [   62.095020] RIP: e030:[<ffffffff81a57c30>]  [<ffffffff81a57c30>] rfco=
+mm_sock_getsockopt+0x140/0x240
+>> [   62.101372] RSP: e02b:ffff880057689ec8  EFLAGS: 00010246
+>> [   62.107668] RAX: 00000015832a8e23 RBX: 0000000000000003 RCX: 00007fff=
+610ca0e8
+>> [   62.113957] RDX: 0000000000000003 RSI: 0000000000000012 RDI: ffff8800=
+572a9e00
+>> [   62.120174] RBP: ffff880057689f18 R08: 00007fff610ca0ec R09: 00007fff=
+610ca360
+>> [   62.126481] R10: 00007fff610ca0e8 R11: 0000000000000202 R12: ffff8800=
+569c3000
+>> [   62.132872] R13: 00007fff610ca0e8 R14: 0000000000000000 R15: 00007fff=
+610ca0ec
+>> [   62.139187] FS:  00007f0d0b348720(0000) GS:ffff88005f700000(0000) knl=
+GS:0000000000000000
+>> [   62.145551] CS:  e033 DS: 0000 ES: 0000 CR0: 000000008005003b
+>> [   62.151919] CR2: 00000015832a8e23 CR3: 0000000056f53000 CR4: 00000000=
+00000660
+>> [   62.158338] Stack:
+>> [   62.164798]  ffff880057689f18 ffffffff81a5799f 0015832a8e23001f ffff8=
+80057689f40
+>> [   62.171410]  ffff880057689f44 ffff8800572a9e00 0000000000000012 00000=
+00000000003
+>> [   62.178096]  0000000000000000 00007fff610ca0e8 ffff880057689f78 fffff=
+fff81905bc2
+>> [   62.184781] Call Trace:
+>> [   62.191344]  [<ffffffff81a5799f>] ? rfcomm_sock_setsockopt+0x5f/0x1b0
+>> [   62.197978]  [<ffffffff81905bc2>] SyS_getsockopt+0x62/0xb0
+>> [   62.204645]  [<ffffffff81a8aa79>] system_call_fastpath+0x16/0x1b
+>> [   62.211366] Code: 84 24 40 04 00 00 4c 89 e9 83 e0 01 e8 ea 0a 9d ff =
+85 c0 75 b5 45 31 f6 e9 42 ff ff ff 66 0f 1f 44 00 00 49 8b 84 24 50 04 00 =
+00 <48> 8b 00 48 89 45 b8 e8 04 e7 6f ff 4c 89 f8 e8 2c fa 9c ff 85=20
+>> [   62.225815] RIP  [<ffffffff81a57c30>] rfcomm_sock_getsockopt+0x140/0x=
+240
+>> [   62.232986]  RSP <ffff880057689ec8>
+>> [   62.240128] CR2: 00000015832a8e23
+>> [   62.247221] ---[ end trace 88f75f0c791ac25b ]---
+>>=20
+>> My bluetooth device is USB stick:
+>> Bus 004 Device 002: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth =
+Dongle (HCI mode)
 
+> I assume this is the same one we already fixed. Patch is on its way into =
+Linus=92 tree. You can check bluetooth.git tree since that has this patch i=
+ncluded.
+
+Yes you are right !
+Thx and sorry for the noise ..
+
+--
+Sander
+
+
+
+> Regards
+
+> Marcel
