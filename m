@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 14/17] android/socket: Send connect signal on connect
-Date: Mon, 18 Nov 2013 15:20:51 +0200
-Message-Id: <1384780854-20970-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 06/17] android/socket: Implement Android RFCOMM stack events
+Date: Mon, 18 Nov 2013 15:20:43 +0200
+Message-Id: <1384780854-20970-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384780854-20970-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384780854-20970-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,60 +11,86 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Android framework expects connect signal to be sent when
-remote device is connected.
+Handle events from Android framework. Write everything to real RFCOMM
+socket. Consider splice() in the future.
 ---
- android/socket.c |   30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ android/socket.c |   60 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 60 insertions(+)
 
 diff --git a/android/socket.c b/android/socket.c
-index bd8b9a2..03276a8 100644
+index 12c3687..3be8ff6 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -380,6 +380,33 @@ static int handle_listen(void *buf)
- 	return hal_fd;
+@@ -119,9 +119,69 @@ static int get_rfcomm_default_chan(const uint8_t *uuid)
+ 	return -ENOENT;
  }
  
-+static ssize_t sock_send_connect(struct rfcomm_sock *rfsock, bdaddr_t *bdaddr)
++static int try_write_all(int fd, unsigned char *buf, int len)
 +{
-+	struct hal_sock_connect_signal cmd;
-+	ssize_t len;
++	int sent = 0;
 +
-+	DBG("");
++	while (len > 0) {
++		int written;
 +
-+	memset(&cmd, 0, sizeof(cmd));
-+	cmd.size = sizeof(cmd);
-+	bdaddr2android(bdaddr, cmd.bdaddr);
-+	cmd.channel = rfsock->channel;
-+	cmd.status = 0;
++		written = write(fd, buf, len);
++		if (written < 0) {
++			if (errno == EINTR || errno == EAGAIN)
++				continue;
++			return -1;
++		}
 +
-+	len = write(rfsock->fd, &cmd, sizeof(cmd));
-+	if (len < 0) {
-+		error("%s", strerror(errno));
-+		return len;
++		if (!written)
++			return 0;
++
++		len -= written; buf += written; sent += written;
 +	}
 +
-+	if (len != (ssize_t) sizeof(cmd)) {
-+		error("Error sending connect signal");
-+		return -1;
-+	}
-+
-+	return len;
++	return sent;
 +}
 +
- static void connect_cb(GIOChannel *io, GError *conn_err, gpointer user_data)
+ static gboolean sock_stack_event_cb(GIOChannel *io, GIOCondition cond,
+ 								gpointer data)
  {
- 	struct rfcomm_sock *rfsock = user_data;
-@@ -410,6 +437,9 @@ static void connect_cb(GIOChannel *io, GError *conn_err, gpointer user_data)
- 		rfsock->fd, rfsock->real_sock, rfsock->channel,
- 		g_io_channel_unix_get_fd(io));
- 
-+	if (sock_send_connect(rfsock, &dst) < 0)
-+		goto fail;
++	struct rfcomm_sock *rfsock = data;
++	unsigned char buf[1024];
++	int len, sent;
 +
- 	/* Handle events from Android */
- 	io_stack = g_io_channel_unix_new(rfsock->fd);
- 	g_io_add_watch(io_stack, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++	DBG("rfsock: fd %d real_sock %d chan %u sock %d",
++		rfsock->fd, rfsock->real_sock, rfsock->channel,
++		g_io_channel_unix_get_fd(io));
++
++	if (!g_list_find(connections, rfsock)) {
++		error("rfsock %p not found in the list", rfsock);
++		return FALSE;
++	}
++
++	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
++		error("Socket error: sock %d cond %d",
++					g_io_channel_unix_get_fd(io), cond);
++		connections = g_list_remove(connections, rfsock);
++		cleanup_rfsock(rfsock);
++		return FALSE;
++	}
++
++	len = read(rfsock->fd, buf, sizeof(buf));
++	if (len <= 0) {
++		error("read(): %s", strerror(errno));
++		return FALSE;
++	}
++
++	DBG("read %d bytes write to %d", len, rfsock->real_sock);
++
++	sent = try_write_all(rfsock->real_sock, buf, len);
++	if (sent < 0) {
++		error("write(): %s", strerror(errno));
++		return FALSE;
++	}
++
++	DBG("Written %d bytes", sent);
++
+ 	return TRUE;
+ }
+ 
 -- 
 1.7.10.4
 
