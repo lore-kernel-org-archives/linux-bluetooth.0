@@ -2,47 +2,30 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 2/5] android/hal-pan: Return error in case of unsupported PAN roles
-Date: Tue, 19 Nov 2013 14:21:13 +0200
-Message-Id: <1384863676-12358-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1384863676-12358-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1384863676-12358-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 1/5] android/pan: Fix wrong struct parameter in disconnect function call
+Date: Tue, 19 Nov 2013 14:21:12 +0200
+Message-Id: <1384863676-12358-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-pan.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ android/pan.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/android/hal-pan.c b/android/hal-pan.c
-index 2bc560e..30facd4 100644
---- a/android/hal-pan.c
-+++ b/android/hal-pan.c
-@@ -77,6 +77,9 @@ static bt_status_t pan_enable(int local_role)
- 	if (!interface_ready())
- 		return BT_STATUS_NOT_READY;
+diff --git a/android/pan.c b/android/pan.c
+index 2a11f46..fba86b8 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -58,7 +58,8 @@ static uint8_t bt_pan_connect(struct hal_cmd_pan_connect *cmd, uint16_t len)
+ 	return HAL_STATUS_FAILED;
+ }
  
-+	if (!(local_role == BTPAN_ROLE_PANU || local_role == BTPAN_ROLE_PANNAP))
-+		return BT_STATUS_UNSUPPORTED;
-+
- 	cmd.local_role = local_role;
+-static uint8_t bt_pan_disconnect(struct hal_cmd_pan_connect *cmd, uint16_t len)
++static uint8_t bt_pan_disconnect(struct hal_cmd_pan_disconnect *cmd,
++								uint16_t len)
+ {
+ 	DBG("Not Implemented");
  
- 	return hal_ipc_cmd(HAL_SERVICE_ID_PAN, HAL_OP_PAN_ENABLE,
-@@ -112,6 +115,14 @@ static bt_status_t pan_connect(const bt_bdaddr_t *bd_addr, int local_role,
- 	if (!interface_ready())
- 		return BT_STATUS_NOT_READY;
- 
-+	if (!((local_role == BTPAN_ROLE_PANNAP &&
-+			remote_role == BTPAN_ROLE_PANU) ||
-+		(local_role == BTPAN_ROLE_PANU &&
-+			remote_role == BTPAN_ROLE_PANNAP) ||
-+		(local_role == BTPAN_ROLE_PANU &&
-+			remote_role == BTPAN_ROLE_PANU)))
-+		return BT_STATUS_UNSUPPORTED;
-+
- 	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
- 	cmd.local_role = local_role;
- 	cmd.remote_role = remote_role;
 -- 
 1.8.3.2
 
