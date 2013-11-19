@@ -2,51 +2,47 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 1/4] android/hal-pan: Return error in case of unsupported PAN roles
-Date: Tue, 19 Nov 2013 16:56:25 +0200
-Message-Id: <1384872988-19914-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 4/4] android/hidhost: Free all connected devices in profile cleanup call
+Date: Tue, 19 Nov 2013 16:56:28 +0200
+Message-Id: <1384872988-19914-4-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1384872988-19914-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1384872988-19914-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This can be easily verified with haltest tool.
 ---
- android/hal-pan.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ android/hidhost.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/android/hal-pan.c b/android/hal-pan.c
-index 2bc560e..a2e6060 100644
---- a/android/hal-pan.c
-+++ b/android/hal-pan.c
-@@ -77,6 +77,9 @@ static bt_status_t pan_enable(int local_role)
- 	if (!interface_ready())
- 		return BT_STATUS_NOT_READY;
+diff --git a/android/hidhost.c b/android/hidhost.c
+index 049dd6d..502b10b 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -1226,6 +1226,14 @@ bool bt_hid_register(int sk, const bdaddr_t *addr)
+ 	return true;
+ }
  
-+	if (!(local_role == BTPAN_ROLE_PANU || local_role == BTPAN_ROLE_PANNAP))
-+		return BT_STATUS_UNSUPPORTED;
++static void free_hid_devices(gpointer data, gpointer user_data)
++{
++	struct hid_device *dev = data;
 +
- 	cmd.local_role = local_role;
- 
- 	return hal_ipc_cmd(HAL_SERVICE_ID_PAN, HAL_OP_PAN_ENABLE,
-@@ -112,6 +115,20 @@ static bt_status_t pan_connect(const bt_bdaddr_t *bd_addr, int local_role,
- 	if (!interface_ready())
- 		return BT_STATUS_NOT_READY;
- 
-+	switch (local_role) {
-+	case BTPAN_ROLE_PANNAP:
-+		if (remote_role != BTPAN_ROLE_PANU)
-+			return BT_STATUS_UNSUPPORTED;
-+		break;
-+	case BTPAN_ROLE_PANU:
-+		if (remote_role != BTPAN_ROLE_PANNAP &&
-+						remote_role != BTPAN_ROLE_PANU)
-+			return BT_STATUS_UNSUPPORTED;
-+		break;
-+	default:
-+		return BT_STATUS_UNSUPPORTED;
-+	}
++	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTED);
++	hid_device_free(dev);
++}
 +
- 	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
- 	cmd.local_role = local_role;
- 	cmd.remote_role = remote_role;
+ void bt_hid_unregister(void)
+ {
+ 	DBG("");
+@@ -1233,6 +1241,8 @@ void bt_hid_unregister(void)
+ 	if (notification_sk < 0)
+ 		return;
+ 
++	g_slist_foreach(devices, free_hid_devices, NULL);
++	devices = NULL;
+ 	notification_sk = -1;
+ 
+ 	if (ctrl_io) {
 -- 
 1.8.3.2
 
