@@ -1,30 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 0/2] PICS for GAP and HID
-Date: Tue, 19 Nov 2013 15:36:13 +0100
-Message-Id: <1384871775-8348-1-git-send-email-jakub.tyszkowski@tieto.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v3 6/6] android/hal: Check if command socket was shutdown by peer
+Date: Tue, 19 Nov 2013 15:02:42 +0100
+Message-Id: <1384869762-3097-7-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1384869762-3097-1-git-send-email-szymon.janc@tieto.com>
+References: <1384869762-3097-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Please note that some PICS marked as mandatory for LE were not
-selected because of Android 4.4 not supporting some LE Roles.
+This will allow to print proper error before exiting.
+---
+ android/hal-ipc.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-v3: layout changed, added: mandatory/optional/conditional
-	markings and descriptions, # - not implemented mark
-v2: layout changed, each parameter description added
-v1: initial documents with PICS targeting Android 4.4
-
-Jakub Tyszkowski (2):
-  android: Add PTS PICS for GAP
-  android: Add PTS PICS for HID
-
- android/pics-gap.txt | 708 +++++++++++++++++++++++++++++++++++++++++++++++++++
- android/pics-hid.txt | 285 +++++++++++++++++++++
- 2 files changed, 993 insertions(+)
- create mode 100644 android/pics-gap.txt
- create mode 100644 android/pics-hid.txt
-
+diff --git a/android/hal-ipc.c b/android/hal-ipc.c
+index 5d622e1..b19704a 100644
+--- a/android/hal-ipc.c
++++ b/android/hal-ipc.c
+@@ -356,6 +356,12 @@ int hal_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len, void *param,
+ 		exit(EXIT_FAILURE);
+ 	}
+ 
++	/* socket was shutdown */
++	if (ret == 0) {
++		error("Command socket closed, aborting");
++		exit(EXIT_FAILURE);
++	}
++
+ 	memset(&msg, 0, sizeof(msg));
+ 	memset(&cmd, 0, sizeof(cmd));
+ 
 -- 
-1.8.4.1
+1.8.4.3
 
