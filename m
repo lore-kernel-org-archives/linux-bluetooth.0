@@ -1,31 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 1/5] android/pan: Fix wrong struct parameter in disconnect function call
-Date: Tue, 19 Nov 2013 14:21:12 +0200
-Message-Id: <1384863676-12358-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Date: Tue, 19 Nov 2013 12:17:02 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] android/a2sp: trivial: Use NULL for zero pointer
+Message-ID: <20131119101702.GB21597@x220.p-661hnu-f1>
+References: <1384853264-10924-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1384853264-10924-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pan.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Hi Andrei,
 
-diff --git a/android/pan.c b/android/pan.c
-index 2a11f46..fba86b8 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -58,7 +58,8 @@ static uint8_t bt_pan_connect(struct hal_cmd_pan_connect *cmd, uint16_t len)
- 	return HAL_STATUS_FAILED;
- }
- 
--static uint8_t bt_pan_disconnect(struct hal_cmd_pan_connect *cmd, uint16_t len)
-+static uint8_t bt_pan_disconnect(struct hal_cmd_pan_disconnect *cmd,
-+								uint16_t len)
- {
- 	DBG("Not Implemented");
- 
--- 
-1.8.3.2
+On Tue, Nov 19, 2013, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> ---
+>  android/a2dp.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
+Both patches have been applied (after fixing the obvious typo in the
+subject). Thanks.
+
+Johan
