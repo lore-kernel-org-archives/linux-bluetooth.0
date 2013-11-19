@@ -1,46 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 01/10] android/hal-bluetooth: Add support for get remote device property cmd
-Date: Tue, 19 Nov 2013 16:51:45 +0100
-Message-Id: <1384876314-31347-1-git-send-email-szymon.janc@tieto.com>
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 3/4] android/hidhost: Handle error case properly in interrupt_connect_cb
+Date: Tue, 19 Nov 2013 16:56:27 +0200
+Message-Id: <1384872988-19914-3-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1384872988-19914-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1384872988-19914-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This command is used to get remote device property of specifided type.
+In case of conn_err in interrupt_connect_cb, device is freed but
+connection status is not notified. Declared a local variable and
+handled error case properly in case of conn_err and uhid failures.
+Now connection status notified before freeing device.
 ---
- android/hal-bluetooth.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ android/hidhost.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 69c304a..4a09a5c 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -531,13 +531,22 @@ static int get_remote_device_properties(bt_bdaddr_t *remote_addr)
- static int get_remote_device_property(bt_bdaddr_t *remote_addr,
- 						bt_property_type_t type)
+diff --git a/android/hidhost.c b/android/hidhost.c
+index df21f81..049dd6d 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -522,7 +522,6 @@ static int uhid_create(struct hid_device *dev)
+ 	dev->uhid_fd = open(UHID_DEVICE_FILE, O_RDWR | O_CLOEXEC);
+ 	if (dev->uhid_fd < 0) {
+ 		error("Failed to open uHID device: %s", strerror(errno));
+-		bt_hid_notify_state(dev, HAL_HIDHOST_STATE_NO_HID);
+ 		return -errno;
+ 	}
+ 
+@@ -541,7 +540,6 @@ static int uhid_create(struct hid_device *dev)
+ 		error("Failed to create uHID device: %s", strerror(errno));
+ 		close(dev->uhid_fd);
+ 		dev->uhid_fd = -1;
+-		bt_hid_notify_state(dev, HAL_HIDHOST_STATE_NO_HID);
+ 		return -errno;
+ 	}
+ 
+@@ -559,16 +557,20 @@ static void interrupt_connect_cb(GIOChannel *chan, GError *conn_err,
+ 							gpointer user_data)
  {
-+	struct hal_cmd_get_remote_device_prop cmd;
-+
- 	DBG("bdaddr: %s prop: %s", bdaddr2str(remote_addr),
- 						bt_property_type_t2str(type));
+ 	struct hid_device *dev = user_data;
++	uint8_t state;
  
- 	if (!interface_ready())
- 		return BT_STATUS_NOT_READY;
+ 	DBG("");
  
--	return BT_STATUS_UNSUPPORTED;
-+	memcpy(cmd.bdaddr, remote_addr, sizeof(cmd.bdaddr));
-+
-+	/* type match IPC type */
-+	cmd.type = type;
-+
-+	return hal_ipc_cmd(HAL_SERVICE_ID_BLUETOOTH,
-+					HAL_OP_GET_REMOTE_DEVICE_PROP,
-+					sizeof(cmd), &cmd, 0, NULL, NULL);
+ 	if (conn_err) {
+ 		error("%s", conn_err->message);
++		state = HAL_HIDHOST_STATE_FAILED;
+ 		goto failed;
+ 	}
+ 
+-	if (uhid_create(dev) < 0)
++	if (uhid_create(dev) < 0) {
++		state = HAL_HIDHOST_STATE_NO_HID;
+ 		goto failed;
++	}
+ 
+ 	dev->intr_watch = g_io_add_watch(dev->intr_io,
+ 				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+@@ -579,6 +581,7 @@ static void interrupt_connect_cb(GIOChannel *chan, GError *conn_err,
+ 	return;
+ 
+ failed:
++	bt_hid_notify_state(dev, state);
+ 	hid_device_free(dev);
  }
  
- static int set_remote_device_property(bt_bdaddr_t *remote_addr,
 -- 
-1.8.4.3
+1.8.3.2
 
