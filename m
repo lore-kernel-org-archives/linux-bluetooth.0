@@ -1,12 +1,14 @@
 Return-Path: <cyrus@holtmann.org>
-From: Wu zheng <wu.zheng@intel.com>
+From: wu.zheng@intel.com
 To: linux-bluetooth@vger.kernel.org
 Cc: Wu zheng <wu.zheng@intel.com>
 Subject: [PATCH] Don't care about power status and adapter power on after rfkill unblock
-Date: Tue, 19 Nov 2013 15:01:06 +0800
-Message-Id: <1384844466-12902-1-git-send-email-wu.zheng@intel.com>
+Date: Tue, 19 Nov 2013 14:55:46 +0800
+Message-Id: <1384844146-12800-1-git-send-email-wu.zheng@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
+
+From: Wu zheng <wu.zheng@intel.com>
 
 Don't care about the power status of BT adapter before rfkill block.
 (BT adapter is power on or off)
@@ -20,7 +22,7 @@ Connman can't control BT adapter power on/off rightly.
 When using connman down BT, connman will send the dbus command
 of power off and set rfkill block BT.
 
-Power off BT: adapter power off -> rfkill block BT.
+Power off BT: adapter power off -> rfkill blcok BT.
 
 When using connman up BT, connman will set rfkill unblock BT
 and send the dbus command of power on.
