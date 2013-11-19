@@ -1,27 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 19 Nov 2013 12:17:02 +0200
+Date: Tue, 19 Nov 2013 12:15:02 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/a2sp: trivial: Use NULL for zero pointer
-Message-ID: <20131119101702.GB21597@x220.p-661hnu-f1>
-References: <1384853264-10924-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH] profile: Add missing browse group to MAS, MNS and SYNC
+ records
+Message-ID: <20131119101502.GA21597@x220.p-661hnu-f1>
+References: <1384854391-13274-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1384853264-10924-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1384854391-13274-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Szymon,
 
-On Tue, Nov 19, 2013, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
+On Tue, Nov 19, 2013, Szymon Janc wrote:
+> This fix not updating UUIDs when those services are registered.
 > ---
->  android/a2dp.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  src/profile.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
 
-Both patches have been applied (after fixing the obvious typo in the
-subject). Thanks.
+Applied. Thanks.
 
 Johan
