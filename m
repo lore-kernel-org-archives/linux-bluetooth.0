@@ -2,72 +2,51 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 3/4] android/hidhost: Handle error case properly in interrupt_connect_cb
-Date: Tue, 19 Nov 2013 16:56:27 +0200
-Message-Id: <1384872988-19914-3-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1384872988-19914-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1384872988-19914-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 1/4] android/hal-pan: Return error in case of unsupported PAN roles
+Date: Tue, 19 Nov 2013 16:56:25 +0200
+Message-Id: <1384872988-19914-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In case of conn_err in interrupt_connect_cb, device is freed but
-connection status is not notified. Declared a local variable and
-handled error case properly in case of conn_err and uhid failures.
-Now connection status notified before freeing device.
 ---
- android/hidhost.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ android/hal-pan.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index df21f81..049dd6d 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -522,7 +522,6 @@ static int uhid_create(struct hid_device *dev)
- 	dev->uhid_fd = open(UHID_DEVICE_FILE, O_RDWR | O_CLOEXEC);
- 	if (dev->uhid_fd < 0) {
- 		error("Failed to open uHID device: %s", strerror(errno));
--		bt_hid_notify_state(dev, HAL_HIDHOST_STATE_NO_HID);
- 		return -errno;
- 	}
+diff --git a/android/hal-pan.c b/android/hal-pan.c
+index 2bc560e..a2e6060 100644
+--- a/android/hal-pan.c
++++ b/android/hal-pan.c
+@@ -77,6 +77,9 @@ static bt_status_t pan_enable(int local_role)
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
  
-@@ -541,7 +540,6 @@ static int uhid_create(struct hid_device *dev)
- 		error("Failed to create uHID device: %s", strerror(errno));
- 		close(dev->uhid_fd);
- 		dev->uhid_fd = -1;
--		bt_hid_notify_state(dev, HAL_HIDHOST_STATE_NO_HID);
- 		return -errno;
- 	}
++	if (!(local_role == BTPAN_ROLE_PANU || local_role == BTPAN_ROLE_PANNAP))
++		return BT_STATUS_UNSUPPORTED;
++
+ 	cmd.local_role = local_role;
  
-@@ -559,16 +557,20 @@ static void interrupt_connect_cb(GIOChannel *chan, GError *conn_err,
- 							gpointer user_data)
- {
- 	struct hid_device *dev = user_data;
-+	uint8_t state;
+ 	return hal_ipc_cmd(HAL_SERVICE_ID_PAN, HAL_OP_PAN_ENABLE,
+@@ -112,6 +115,20 @@ static bt_status_t pan_connect(const bt_bdaddr_t *bd_addr, int local_role,
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
  
- 	DBG("");
- 
- 	if (conn_err) {
- 		error("%s", conn_err->message);
-+		state = HAL_HIDHOST_STATE_FAILED;
- 		goto failed;
- 	}
- 
--	if (uhid_create(dev) < 0)
-+	if (uhid_create(dev) < 0) {
-+		state = HAL_HIDHOST_STATE_NO_HID;
- 		goto failed;
++	switch (local_role) {
++	case BTPAN_ROLE_PANNAP:
++		if (remote_role != BTPAN_ROLE_PANU)
++			return BT_STATUS_UNSUPPORTED;
++		break;
++	case BTPAN_ROLE_PANU:
++		if (remote_role != BTPAN_ROLE_PANNAP &&
++						remote_role != BTPAN_ROLE_PANU)
++			return BT_STATUS_UNSUPPORTED;
++		break;
++	default:
++		return BT_STATUS_UNSUPPORTED;
 +	}
- 
- 	dev->intr_watch = g_io_add_watch(dev->intr_io,
- 				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-@@ -579,6 +581,7 @@ static void interrupt_connect_cb(GIOChannel *chan, GError *conn_err,
- 	return;
- 
- failed:
-+	bt_hid_notify_state(dev, state);
- 	hid_device_free(dev);
- }
- 
++
+ 	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
+ 	cmd.local_role = local_role;
+ 	cmd.remote_role = remote_role;
 -- 
 1.8.3.2
 
