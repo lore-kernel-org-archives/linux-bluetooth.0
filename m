@@ -1,117 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 2/4] android: Handle multiple init(register) and cleanup(unregister) calls properly
-Date: Tue, 19 Nov 2013 16:56:26 +0200
-Message-Id: <1384872988-19914-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1384872988-19914-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1384872988-19914-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+In-Reply-To: <1384869762-3097-1-git-send-email-szymon.janc@tieto.com>
+References: <1384869762-3097-1-git-send-email-szymon.janc@tieto.com>
+Date: Tue, 19 Nov 2013 16:44:13 +0200
+Message-ID: <CABBYNZKoTeqriJREFFk-x+cUbS395M8P-M204Y47YVuEY=wFNQ@mail.gmail.com>
+Subject: Re: [PATCH v3 0/6] android: IPC improvements
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This can be tested with haltest.
----
- android/a2dp.c      | 6 ++++++
- android/bluetooth.c | 6 ++++++
- android/hidhost.c   | 6 ++++++
- android/pan.c       | 6 ++++++
- 4 files changed, 24 insertions(+)
+Hi Szymon,
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index 74d0082..a9e7c65 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -332,6 +332,9 @@ bool bt_a2dp_register(int sk, const bdaddr_t *addr)
- 
- 	DBG("");
- 
-+	if (notification_sk >= 0)
-+		return false;
-+
- 	bacpy(&adapter_addr, addr);
- 
- 	server = bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
-@@ -365,6 +368,9 @@ void bt_a2dp_unregister(void)
- {
- 	DBG("");
- 
-+	if (notification_sk < 0)
-+		return;
-+
- 	notification_sk = -1;
- 
- 	bt_adapter_remove_record(record_id);
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 7dc2ec3..11b9d76 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -2275,6 +2275,9 @@ bool bt_bluetooth_register(int sk)
- {
- 	DBG("");
- 
-+	if (notification_sk >= 0)
-+		return false;
-+
- 	notification_sk = sk;
- 
- 	return true;
-@@ -2284,5 +2287,8 @@ void bt_bluetooth_unregister(void)
- {
- 	DBG("");
- 
-+	if (notification_sk < 0)
-+		return;
-+
- 	notification_sk = -1;
- }
-diff --git a/android/hidhost.c b/android/hidhost.c
-index 842b8ad..df21f81 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -1190,6 +1190,9 @@ bool bt_hid_register(int sk, const bdaddr_t *addr)
- 
- 	DBG("");
- 
-+	if (notification_sk >= 0)
-+		return false;
-+
- 	bacpy(&adapter_addr, addr);
- 
- 	ctrl_io = bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
-@@ -1224,6 +1227,9 @@ void bt_hid_unregister(void)
- {
- 	DBG("");
- 
-+	if (notification_sk < 0)
-+		return;
-+
- 	notification_sk = -1;
- 
- 	if (ctrl_io) {
-diff --git a/android/pan.c b/android/pan.c
-index fba86b8..ada458a 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -95,6 +95,9 @@ bool bt_pan_register(int sk, const bdaddr_t *addr)
- {
- 	DBG("");
- 
-+	if (notification_sk >= 0)
-+		return false;
-+
- 	notification_sk = sk;
- 
- 	return true;
-@@ -104,5 +107,8 @@ void bt_pan_unregister(void)
- {
- 	DBG("");
- 
-+	if (notification_sk < 0)
-+		return;
-+
- 	notification_sk = -1;
- }
+On Tue, Nov 19, 2013 at 4:02 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> v3:
+>  - fixed compilation on android 4.2
+>
+> Szymon Janc (6):
+>   android/hal: Add initial code for IPC message handlers
+>   android/hal-bluetooth: Register IPC message handlers
+>   android/hal-hidhost: Use generic IPC message handling for events
+>   android/hal-pan: Use generic IPC message handling for events
+>   android/hal-a2dp: Use generic IPC message handling for events
+>   android/hal: Check if command socket was shutdown by peer
+>
+>  android/hal-a2dp.c      |  41 +++++-----
+>  android/hal-bluetooth.c | 208 ++++++++++++++++++++++++++++++------------------
+>  android/hal-hidhost.c   |  76 ++++++++++--------
+>  android/hal-ipc.c       | 123 +++++++++++++++++++---------
+>  android/hal-ipc.h       |  10 +++
+>  android/hal-pan.c       |  40 +++++-----
+>  android/hal.h           |   4 -
+>  7 files changed, 310 insertions(+), 192 deletions(-)
+>
+> --
+> 1.8.4.3
+
+Pushed, thanks.
+
+
 -- 
-1.8.3.2
-
+Luiz Augusto von Dentz
