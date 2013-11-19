@@ -1,39 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 08/19] android/socket: Write channel to Android fd
-Date: Tue, 19 Nov 2013 15:29:58 +0200
-Message-Id: <1384867809-18135-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1384867809-18135-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1384867809-18135-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv5 00/19] Socket HAL
+Date: Tue, 19 Nov 2013 15:29:50 +0200
+Message-Id: <1384867809-18135-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Android framework expects to receive channel number as int.
----
- android/socket.c |    7 +++++++
- 1 file changed, 7 insertions(+)
+This is initial code implementing socket HAL. OPP currently works with send/receive files. Probaly
+other profiles works as well, not tested yet.
 
-diff --git a/android/socket.c b/android/socket.c
-index 936b70e..e4479e5 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -376,6 +376,13 @@ static int handle_listen(void *buf)
- 	rfsock->real_sock = g_io_channel_unix_get_fd(io);
- 	servers = g_list_append(servers, rfsock);
- 
-+	/* TODO: Check this */
-+	if (write(rfsock->fd, &chan, sizeof(chan)) != sizeof(chan)) {
-+		error("Error sending RFCOMM channel");
-+		cleanup_rfsock(rfsock);
-+		return -1;
-+	}
-+
- 	DBG("real_sock %d fd %d hal_fd %d",
- 				rfsock->real_sock, rfsock->fd, hal_fd);
- 
+Changes:
+	* v5: Changed uuid_to_chan table to profile table keeping information about profile like: channel, create_record,
+	svc_hint and sec_level.
+	* v4: Changed name rfslot -> rfsock following Johan's comment and other cosmetic changes, fixed one bug in SDP
+	record, use NULL instead of 0 for sdp functions.
+	* v3: Fixed coding style with write/send between file descriptors.
+	* v2: Following Marcel comments changed way copying between file descriptors works, added SDP record
+	for OPP and now it is possible to send files through GUI. Merged one patch with structures with actual user.
+	* v1: Rebased and use static src address, hal_fd removed from structure and closed after sent to framework,
+	added connect calls and SDP parsing, added cleanup_rfcomm function, minor fixes.
+	* RFC Initial
+
+TODO:
+	* Use sec_level / check what to do with Android supplied security flags.
+	* Use splice() (requires bionic change first)
+
+For tracking rfcomm sockets I use structure rfslot which has following
+fields:
+ - real_sock - real RFCOMM socket
+ - fd - fd to communicate with Android framework
+
+create_rfslot sets hal_fd which is fd passed to Android framework with CMSG
+
+Andrei Emeltchenko (19):
+  android/hal-sock: Print bdaddr string instead of pointer
+  android/socket: Add get RFCOMM default channel
+  android/socket: Define structs and implement listen
+  android/socket: Implement socket accepted event
+  android/socket: Implement Android RFCOMM stack events
+  android/socket: Implement RFCOMM events
+  android/socket: Send accept signal to Android through hal_fd
+  android/socket: Write channel to Android fd
+  android/socket: Implement socket connect HAL method
+  android/socket: Parse SDP response and connect
+  android/socket: Implement HAL connect call
+  android/socket: Send RFCOMM channel to framework
+  android/socket: Send connect signal on connect
+  android/socket: Close file descriptor after sending
+  android/socket: Add SDP record for OPP profile
+  android/socket: Add MAS uuid to profile table
+  android/socket: Add SPP uuid to profile table
+  android/socket: Add PBAP SDP record
+  android/socket: Add SPP SDP record
+
+ android/hal-sock.c |    4 +-
+ android/socket.c   |  760 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 758 insertions(+), 6 deletions(-)
+
 -- 
 1.7.10.4
 
