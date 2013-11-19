@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 09/19] android/socket: Implement socket connect HAL method
-Date: Tue, 19 Nov 2013 15:29:59 +0200
-Message-Id: <1384867809-18135-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv5 11/19] android/socket: Implement HAL connect call
+Date: Tue, 19 Nov 2013 15:30:01 +0200
+Message-Id: <1384867809-18135-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384867809-18135-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384867809-18135-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,73 +11,63 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-First step is to query remote device for RFCOMM channel.
+HAL connect uses similar event handlers like listen call.
 ---
- android/socket.c |   34 ++++++++++++++++++++++++++++++++--
- 1 file changed, 32 insertions(+), 2 deletions(-)
+ android/socket.c |   41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
 diff --git a/android/socket.c b/android/socket.c
-index e4479e5..843fba8 100644
+index 6d9c69e..ad09a2c 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -33,6 +33,9 @@
- #include "lib/bluetooth.h"
- #include "btio/btio.h"
- #include "lib/sdp.h"
-+#include "lib/sdp_lib.h"
-+#include "src/sdp-client.h"
-+
- #include "log.h"
- #include "hal-msg.h"
- #include "hal-ipc.h"
-@@ -55,6 +58,7 @@ struct rfcomm_sock {
- 	int fd;		/* descriptor for communication with Java framework */
- 	int real_sock;	/* real RFCOMM socket */
- 	int channel;	/* RFCOMM channel */
-+	bdaddr_t dst;
- };
+@@ -395,6 +395,47 @@ static int handle_listen(void *buf)
  
- static struct rfcomm_sock *create_rfsock(int sock, int *hal_fd)
-@@ -389,11 +393,37 @@ static int handle_listen(void *buf)
- 	return hal_fd;
- }
- 
-+static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
-+{
-+	DBG("");
-+}
-+
- static int handle_connect(void *buf)
+ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
  {
--	DBG("Not implemented");
-+	struct hal_cmd_sock_connect *cmd = buf;
-+	struct rfcomm_sock *rfsock;
++	struct rfcomm_sock *rfsock = user_data;
++	GIOChannel *io_stack;
++	GError *gerr = NULL;
 +	bdaddr_t dst;
-+	uuid_t uuid;
-+	int hal_fd = -1;
++	char address[18];
++	int chan = -1;
 +
-+	DBG("");
-+
-+	android2bdaddr(cmd->bdaddr, &dst);
-+	rfsock = create_rfsock(-1, &hal_fd);
-+	bacpy(&rfsock->dst, &dst);
- 
--	return -1;
-+	memset(&uuid, 0, sizeof(uuid));
-+	uuid.type = SDP_UUID128;
-+	memcpy(&uuid.value.uuid128, cmd->uuid, sizeof(uint128_t));
-+
-+	if (bt_search_service(&adapter_addr, &dst, &uuid, sdp_search_cb, rfsock,
-+								NULL) < 0) {
-+		error("Failed to search SDP records");
-+		cleanup_rfsock(rfsock);
-+		return -1;
++	if (err) {
++		error("%s", err->message);
++		goto fail;
 +	}
 +
-+	return hal_fd;
++	bt_io_get(io, &gerr,
++			BT_IO_OPT_DEST_BDADDR, &dst,
++			BT_IO_OPT_INVALID);
++	if (gerr) {
++		error("%s", gerr->message);
++		g_error_free(gerr);
++		goto fail;
++	}
++
++	ba2str(&dst, address);
++	DBG("Connected to %s rfsock %p chan %d", address, rfsock, chan);
++
++	DBG("rfsock: fd %d real_sock %d chan %u sock %d",
++		rfsock->fd, rfsock->real_sock, rfsock->channel,
++		g_io_channel_unix_get_fd(io));
++
++	/* Handle events from Android */
++	io_stack = g_io_channel_unix_new(rfsock->fd);
++	g_io_add_watch(io_stack, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++						sock_stack_event_cb, rfsock);
++	g_io_channel_unref(io_stack);
++
++	/* Handle rfcomm events */
++	g_io_add_watch(io, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++				sock_rfcomm_event_cb, rfsock);
++
++	return;
++fail:
++	cleanup_rfsock(rfsock);
  }
  
- void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
 -- 
 1.7.10.4
 
