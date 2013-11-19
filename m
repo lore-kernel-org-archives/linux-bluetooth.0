@@ -2,116 +2,47 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 3/5] android: Handle multiple init(register) and cleanup(unregister) calls properly
-Date: Tue, 19 Nov 2013 14:21:14 +0200
-Message-Id: <1384863676-12358-3-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 2/5] android/hal-pan: Return error in case of unsupported PAN roles
+Date: Tue, 19 Nov 2013 14:21:13 +0200
+Message-Id: <1384863676-12358-2-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1384863676-12358-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1384863676-12358-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This can be tested with haltest.
 ---
- android/a2dp.c      | 6 ++++++
- android/bluetooth.c | 6 ++++++
- android/hidhost.c   | 6 ++++++
- android/pan.c       | 6 ++++++
- 4 files changed, 24 insertions(+)
+ android/hal-pan.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index 74d0082..28a1250 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -332,6 +332,9 @@ bool bt_a2dp_register(int sk, const bdaddr_t *addr)
+diff --git a/android/hal-pan.c b/android/hal-pan.c
+index 2bc560e..30facd4 100644
+--- a/android/hal-pan.c
++++ b/android/hal-pan.c
+@@ -77,6 +77,9 @@ static bt_status_t pan_enable(int local_role)
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
  
- 	DBG("");
- 
-+	if (notification_sk > 0)
-+		return false;
++	if (!(local_role == BTPAN_ROLE_PANU || local_role == BTPAN_ROLE_PANNAP))
++		return BT_STATUS_UNSUPPORTED;
 +
- 	bacpy(&adapter_addr, addr);
+ 	cmd.local_role = local_role;
  
- 	server = bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
-@@ -365,6 +368,9 @@ void bt_a2dp_unregister(void)
- {
- 	DBG("");
+ 	return hal_ipc_cmd(HAL_SERVICE_ID_PAN, HAL_OP_PAN_ENABLE,
+@@ -112,6 +115,14 @@ static bt_status_t pan_connect(const bt_bdaddr_t *bd_addr, int local_role,
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
  
-+	if (notification_sk < 0)
-+		return;
++	if (!((local_role == BTPAN_ROLE_PANNAP &&
++			remote_role == BTPAN_ROLE_PANU) ||
++		(local_role == BTPAN_ROLE_PANU &&
++			remote_role == BTPAN_ROLE_PANNAP) ||
++		(local_role == BTPAN_ROLE_PANU &&
++			remote_role == BTPAN_ROLE_PANU)))
++		return BT_STATUS_UNSUPPORTED;
 +
- 	notification_sk = -1;
- 
- 	bt_adapter_remove_record(record_id);
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 7dc2ec3..7805d42 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -2275,6 +2275,9 @@ bool bt_bluetooth_register(int sk)
- {
- 	DBG("");
- 
-+	if (notification_sk > 0)
-+		return false;
-+
- 	notification_sk = sk;
- 
- 	return true;
-@@ -2284,5 +2287,8 @@ void bt_bluetooth_unregister(void)
- {
- 	DBG("");
- 
-+	if (notification_sk < 0)
-+		return;
-+
- 	notification_sk = -1;
- }
-diff --git a/android/hidhost.c b/android/hidhost.c
-index 842b8ad..a929a94 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -1190,6 +1190,9 @@ bool bt_hid_register(int sk, const bdaddr_t *addr)
- 
- 	DBG("");
- 
-+	if (notification_sk > 0)
-+		return false;
-+
- 	bacpy(&adapter_addr, addr);
- 
- 	ctrl_io = bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
-@@ -1224,6 +1227,9 @@ void bt_hid_unregister(void)
- {
- 	DBG("");
- 
-+	if (notification_sk < 0)
-+		return;
-+
- 	notification_sk = -1;
- 
- 	if (ctrl_io) {
-diff --git a/android/pan.c b/android/pan.c
-index fba86b8..970a8a7 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -95,6 +95,9 @@ bool bt_pan_register(int sk, const bdaddr_t *addr)
- {
- 	DBG("");
- 
-+	if (notification_sk > 0)
-+		return false;
-+
- 	notification_sk = sk;
- 
- 	return true;
-@@ -104,5 +107,8 @@ void bt_pan_unregister(void)
- {
- 	DBG("");
- 
-+	if (notification_sk < 0)
-+		return;
-+
- 	notification_sk = -1;
- }
+ 	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
+ 	cmd.local_role = local_role;
+ 	cmd.remote_role = remote_role;
 -- 
 1.8.3.2
 
