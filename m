@@ -1,28 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 2/2] android: Add PTS PICS for HID
-Date: Tue, 19 Nov 2013 15:36:15 +0100
-Message-Id: <1384871775-8348-3-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv3 1/2] android: Add PTS PICS for GAP
+Date: Tue, 19 Nov 2013 15:36:14 +0100
+Message-Id: <1384871775-8348-2-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1384871775-8348-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1384871775-8348-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PTS PICS for HID, targeting Android 4.4.
+PTS PICS for GAP, targeting Android 4.4.
 
 ---
- android/pics-hid.txt | 285 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 285 insertions(+)
- create mode 100644 android/pics-hid.txt
+ android/pics-gap.txt | 708 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 708 insertions(+)
+ create mode 100644 android/pics-gap.txt
 
-diff --git a/android/pics-hid.txt b/android/pics-hid.txt
+diff --git a/android/pics-gap.txt b/android/pics-gap.txt
 new file mode 100644
-index 0000000..b0b7d52
+index 0000000..2343975
 --- /dev/null
-+++ b/android/pics-hid.txt
-@@ -0,0 +1,285 @@
-+HID PICS for the PTS tool.
++++ b/android/pics-gap.txt
+@@ -0,0 +1,708 @@
++GAP PICS for the PTS tool.
 +
 +* - different than PTS defaults
 +# - not yet implemented/supported
@@ -30,282 +32,705 @@ index 0000000..b0b7d52
 +M - mandatory
 +O - optional
 +
-+		Roles
++		Device Configuration
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HID_1_1	True (*)	Role: Host, Report protocol (O.1)
-+TSPC_HID_1_2	False		Role: HID Role (O.1)
-+TSPC_HID_1_3	False		Role: Host, Boot protocol (O.1)
++TSPC_GAP_0_1	False		BR/EDR (C.1)
++TSPC_GAP_0_2	False		LE (C.2)
++TSPC_GAP_0_3	True (*)	BR/EDR/LE (C.3)
 +-------------------------------------------------------------------------------
-+O.1: It is Mandatory to support One of these roles.
++C.1: Mandatory if ('End Product' or 'Host Subsystem') and ('BR Host' or
++	'BR/HS Host') are Supported ('End Product' or 'Host Subsystem' with 'BR'
++	or 'BR/HS Host' CC), otherwise excluded. Optional for
++	'Component (Tested)' or 'Component (Non-Tested)'.
++C.2: Mandatory if ('End Product' or 'Host Subsystem') and ('LE Host') are Supported
++	(End Product or Host Subsystem with LE Host CC), otherwise excluded.
++	Optional for 'Component (Tested)' or 'Component (Non-Tested)'.
++C.3: Mandatory if ('End Product' or 'Host Subsystem') and ('BR/LE Host' or
++	'BR/HS/LE Host') are Supported (End Product or Host Subsystem with
++	BR/LE or BR/HS/LE Host CC), otherwise excluded.
++	Optional for 'Component (Tested)' or 'Component (Non-tested)'.
++Note - Only one transport shall be supported.
 +-------------------------------------------------------------------------------
 +
 +
-+		Application Procedures
++		Version Configuration
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HID_2_1	True		Host: Establish HID connection (M.1)
-+TSPC_HID_2_2	True		Host: Accept HID connection (M.1)
-+TSPC_HID_2_3	True		Host: Terminate HID connection (M.1)
-+TSPC_HID_2_4	True		Host: Accept termination of HID connection (M.1)
-+TSPC_HID_2_5	True		Host: Support for virtual cables (M.1)
-+TSPC_HID_2_6	True		Host: HID initiated connection (M.1)
-+TSPC_HID_2_7	True		Host: Host initiated connection (M.1)
-+TSPC_HID_2_8	True		Host: Host data transfer to HID (C.1)
-+TSPC_HID_2_9	True		Host: HID data transfer to Host (C.1)
-+TSPC_HID_2_10	False		Host: Boot mode data transfer to Host (C.2)
-+TSPC_HID_2_11	False		Host : Boot mode data transfer to HID (C.2)
-+TSPC_HID_2_12	False		Host : Support for Application to send
-+					GET_Report (O)
-+TSPC_HID_2_13	False		Host : Support for Application to send
-+					SET_REPORT (O)
-+TSPC_HID_2_14	False		Host : Support for sending HCI_CONTROL with
-+					VIRTUAL_CABLE_UNPLUG (C.3)
-+TSPC_HID_2_15	False		Host : Support for receiving HCI_CONTROL with
-+					VIRTUAL_CABLE_UNPLUG (C.2)
++TSPC_GAP_0A_1	False		Core Specification Addendum 3 (CSA3),
++					GAP Connection Parameters Changes,
++					Authentication and Lost Bond Changes,
++					Private Addressing Changes,
++					Dual Mode Addressing Changes,
++					Adopted 24 July 2012 (C.1)
 +-------------------------------------------------------------------------------
-+M.1: Mandatory to support IF (TSPC_HID_1_1) supported.
-+C.1: Optional for Boot Mode Only Hosts (TSPC_HID_1_3); otherwise Mandatory
-+	for Host Role (TSPC_HID_1_1).
-+C.2: Mandatory for Boot Mode Only Hosts (TSPC_HID_1_3); otherwise Optional.
-+C.3: Optional IF (TSPC_HID_2_5) supported, otherwise excluded.
++C.1: Mandatory if 'CSA3 Adopted 24 July 2012' is supported, otherwise Excluded.
 +-------------------------------------------------------------------------------
 +
 +
-+		Device to Host Transfers
++		Modes
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HID_3_1	False		Host : Data reports larger than host MTU on
-+					Control channel (O)
-+TSPC_HID_3_2	True (*)	Host : Data reports larger than host MTU on
-+					Interrupt channel (C.1)
-+TSPC_HID_3_3	True (*)	Host : Data reports to host (C.1)
-+TSPC_HID_3_4	False		Host : Boot mode reports to host (C.2)
++TSPC_GAP_1_1	True (*)	Non-discoverable mode (C.1)
++TSPC_GAP_1_2	False		Limited-discoverable Mode (O)
++TSPC_GAP_1_3	True (*)	General-discoverable mode (O)
++TSPC_GAP_1_4	True (*)	Non-connectable mode (O)
++TSPC_GAP_1_5	True		Connectable mode (M)
++TSPC_GAP_1_6	False		Non-bondable mode (O)
++TSPC_GAP_1_7	True (*)	Bondable mode (C.2)
 +-------------------------------------------------------------------------------
-+C.1: Excluded for Boot Mode Only Hosts (TSPC_HID_1_3); otherwise Mandatory if
-+	(TSPC_HID_2_12), otherwise Optional.
-+C.2: Mandatory for Boot Mode Only Hosts (TSPC_HID_1_3); otherwise Optional.
++C.1: Mandatory if TSPC_GAP_0_2 is supported, otherwise Optional.
++C.2: Mandatory if TSPC_GAP_3_5 is supported, otherwise Optional.
 +-------------------------------------------------------------------------------
 +
 +
-+		Host to Device Transfers
++		Security Aspects
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HID_4_1	False		Host : Data reports larger than device MTU on
-+					Control channel (C.1)
-+TSPC_HID_4_2	False		Host : Data reports larger than device MTU on
-+					Interrupt channel (C.1)
-+TSPC_HID_4_3	True (*)	Host : Data reports to device (C.2)
-+TSPC_HID_4_4	False		Host : Boot mode reports to device (O)
++TSPC_GAP_2_1	True (*)	Authentication procedure (C.1)
++TSPC_GAP_2_2	True (*)	Support of LMP-Authentication (M)
++TSPC_GAP_2_3	True (*)	Initiate LMP-Authentication (C.5)
++TSPC_GAP_2_4	False		Security mode 1 (C.2)
++TSPC_GAP_2_5	True (*)	Security mode 2 (O)
++TSPC_GAP_2_6	False		Security mode 3 (C.7)
++TSPC_GAP_2_7	True (*)	Security mode 4 (C.4)
++TSPC_GAP_2_8	True (*)	Support of Authenticated link key (C.6)
++TSPC_GAP_2_9	True (*)	Support of Unauthenticated link key (C.6)
++TSPC_GAP_2_10	False		No security (C.6)
 +-------------------------------------------------------------------------------
-+C.1: Excluded for Boot Mode Only Hosts (TSPC_HID_1_3); otherwise Optional
-+C.2: Excluded for Boot Mode Only Hosts (TSPC_HID_1_3); otherwise Mandatory for
-+	Host Role (TSPC_HID_1_1).
++C.1: Mandatory If (TSPC_GAP_2_5 or TSPC_GAP_2_6) is supported, otherwise
++	Optional.
++Note 1: The Authentication Procedure in item GAP, TSPC_GAP_2_1 is the one
++	described in Fig. 5.1 on page 198 in the GAP Profile Specification and
++	not the LMP-Authenticaion.
++C.2: Excluded if TSPC_GAP_2_7 is supported, otherwise Optional.
++C.5: Mandatory If (TSPC_GAP_2_5 or TSPC_GAP_2_6 or TSPC_GAP_2_7) is supported,
++	otherwise Optional.
++C.4: Mandatory if (Core Spec 2.1 or later) is supported, otherwise Excluded.
++Note 2. If a Core 2.0 and earlier design claims to support secure communcation
++	it should support either Security mode 2 or 3.
++Note 3. A Core 2.1 or later device shall always support secure communication
++	in Security Mode 4, and shall use that mode to connect with another
++	Core 2.1 or later device. It shall use Security Mode 2 only for
++	backward compatibility purposes with Core 2.0 and earlier devices.
++	Security Mode 1 is excluded for Core 2.1 or later devices based on
++	condition C.2.
++C.6: If TSPC_GAP_2_7 is supported then at least one of (TSPC_GAP_2_8 or
++	TSPC_GAP_2_9 or TSPC_GAP_2_10) is Mandatory, otherwise Excluded.
++C.7: Excluded if TSPC_GAP_2_7 is supported, otherwise Optional.
 +-------------------------------------------------------------------------------
 +
 +
-+		HID Control Commands
++		Idle Mode Procedures
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HID_5_1	False		Host : Set_Protocol command (C.1)
-+TSPC_HID_5_2	False		Host : Get_Protocol command (C.1)
-+TSPC_HID_5_3	False		Host : Set_Idle command (O)
-+TSPC_HID_5_4	False		Host : Get_Idle command (O)
-+TSPC_HID_5_5	False (*)	Host : Set_Report command (M.1)
-+TSPC_HID_5_6	False (*)	Host : Get_Report command (M.2)
++TSPC_GAP_3_1	True (*)	Initiation of general inquiry (C.1)
++TSPC_GAP_3_2	False		Initiation of limited inquiry (C.1)
++TSPC_GAP_3_3	True (*)	Initiation of name discover (O)
++TSPC_GAP_3_4	True (*)	Initiation of device discovery (O)
++TSPC_GAP_3_5	True (*)	Initiation of general bonding (O)
++TSPC_GAP_3_6	True (*)	Initiation of dedicated bonding (O)
 +-------------------------------------------------------------------------------
-+M.1: Mandatory IF (TSPC_HID_1_1) supported AND (TSPC_HID_2_13) supported.
-+C.1: Mandatory for Boot Mode Only Hosts (TSPC_HID_1_3); otherwise Optional.
-+	If either Set_Protocol or Get_Protocol supported, both are Mandatory.
-+M.2: Mandatory IF (TSPC_HID_1_1) Supported AND (TSPC_HID_2_12) Supported
++C.1: Mandatory to support at least one of TSPC_GAP_3_1 or TSPC_GAP_3_2 if
++	TSPC_GAP_3_5 is supported, otherwise Optional.
 +-------------------------------------------------------------------------------
 +
 +
-+		Host Link Manager Procedures
++		Establishment Procedures
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HID_6_1	False		Host : Initiate Authentication before
-+					connection completed (C.1)
-+TSPC_HID_6_2	False		Host : Initiate Authentication after connection
-+					completed (C.1)
-+TSPC_HID_6_3	False		Host : Initiate pairing before connection
-+					completed (C.2)
-+TSPC_HID_6_4	False		Host : Initiate pairing after connection
-+					completed (C.2)
-+TSPC_HID_6_5	False		Host : Encryption (O)
-+TSPC_HID_6_6	False		Host : Initiate encryption (C.3)
-+TSPC_HID_6_7	False		Host : Accept encryption requests (C.3)
-+TSPC_HID_6_8	True		Host : Role switch (Master/Slave) (M.1)
-+TSPC_HID_6_9	True		Host : Request Master Slave switch (M.1)
-+TSPC_HID_6_10	True		Host : Accept Master Slave switch requests (M.1)
-+TSPC_HID_6_11	False		Host : Hold mode (O)
-+TSPC_HID_6_12	True		Host : Sniff mode (M.1)
-+TSPC_HID_6_13	False		Host : Park mode (O)
-+-------------------------------------------------------------------------------
-+C.1: If Host Authentication supported, both (TSPC_HID_6_1) AND (TSPC_HID_6_2)
-+	must be supported.
-+C.2: If Pairing supported both (TSPC_HID_6_3) AND (TSPC_HID_6_4) must
-+	be supported.
-+M.1: Mandatory IF (TSPC_HID_1_1) supported.
-+C.3: Mandatory IF (TSPC_HID_6_5) encryption supported.
++TSPC_GAP_4_1	True		Support link establishment as initiator (M)
++TSPC_GAP_4_2	True		Support link establishment as acceptor (M)
++TSPC_GAP_4_3	True (*)	Support channel establishment as initiator (O)
++TSPC_GAP_4_4	True		Support channel establishment as acceptor (M)
++TSPC_GAP_4_5	True (*)	Support connection establishment as initiator
++					(O)
++TSPC_GAP_4_6	True (*)	Support connection establishment as acceptor
++					(O)
 +-------------------------------------------------------------------------------
 +
 +
-+		Host Link Control Requirements
++		LE Roles
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HID_7_1	True		Host : Supports inquiry, 79 channel (M.1)
-+TSPC_HID_7_2	False (*)	Host : Supports inquiry scan, 79 channel (X)
++TSPC_GAP_5_1	False (*)	Broadcaster (C.1)
++TSPC_GAP_5_2	False		Observer (C.1)
++TSPC_GAP_5_3	False (*)	Peripheral (C.1)
++TSPC_GAP_5_4	True (*#)	Central (C.1)
 +-------------------------------------------------------------------------------
-+M.1: Mandatory to support IF (TSPC_HID_1_1) supported.
-+X: Feature should not be used by a Host, but can be supported in LM.
++C.1: It is mandatory to support at least one of the defined roles.
++Note: 'LE Roles' is applicable for LE-only configurations, but it appears that
++	PTS is checking this precondition also in some BR/EDR/LE tests.
 +-------------------------------------------------------------------------------
 +
 +
-+		HID Device Roles
++		Broadcaster Physical Layer
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HID_8_1	False		Hid : Pointing HID (O.1)
-+TSPC_HID_8_2	False		Hid : Keyboard HID (O.1)
-+TSPC_HID_8_3	False		Hid : Identification HID (O.1)
-+TSPC_HID_8_4	False		Hid : Other HID (O.1)
-+-------------------------------------------------------------------------------
-+O.1: It is Mandatory to support One of these roles IF (TSPC_HID_1_2)
-+	is selected
++TSPC_GAP_6_1	False (*)	Broadcaster: Transmitter (M)
++TSPC_GAP_6_2	False		Broadcaster: Receiver (O)
 +-------------------------------------------------------------------------------
 +
 +
-+		HID Application Procedures
++		Broadcaster Link Layer States
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HID_9_1	False		Hid : Establish HID connection (O)
-+TSPC_HID_9_2	False (*)	Hid : Accept HID connection (M.1)
-+TSPC_HID_9_3	False		Hid : Terminate HID connection (O)
-+TSPC_HID_9_4	False (*)	Hid : Accept Termination of HID connection (M.1)
-+TSPC_HID_9_5	False		Hid : Support for virtual cables (O)
-+TSPC_HID_9_6	False		Hid : HID initiated reconnection (C.1)
-+TSPC_HID_9_7	False		Hid : Host initiated reconnection (C.1)
-+TSPC_HID_9_8	False		Hid : Host data transfer to HID (C.2)
-+TSPC_HID_9_9	False		Hid : HID data transfer to Host (C.2)
-+TSPC_HID_9_10	False		Hid : HID Boot mode data transfer to Host (C.3)
-+TSPC_HID_9_11	False		Hid : Host Boot mode data transfer to HID (C.4)
-+TSPC_HID_9_12	False		Hid : Output reports declared (C.4)
-+TSPC_HID_9_13	False		Hid : Input reports declared (C.3)
-+TSPC_HID_9_14	False		Hid : Feature reports declared (O)
-+TSPC_HID_9_15	False		Hid : Support for sending HCI_CONTROL with
-+					VIRTUAL_CABLE_UNPLUG (C.5)
-+TSPC_HID_9_16	False		Hid : Support for receiving HCI_CONTROL with
-+					VIRTUAL_CABLE_UNPLUG (C.5)
-+-------------------------------------------------------------------------------
-+M.1: Mandatory IF (TSPC_HID_1_2) supported.
-+C.1: One of these is Mandatory IF (TSPC_HID_9_5) is supported
-+	(SDP attribute 0x204=True)
-+C.2: One of these is Mandatory.
-+C.3: Mandatory IF (TSPC_HID_8_1) OR (TSPC_HID_8_2) is selected
-+C.4: Mandatory IF (TSPC_HID_8_2) is supported (for status indicators)
-+C.5: Optional IF (TSPC_HID_9_2) supported, otherwise excluded.
++TSPC_GAP_7_1	False (*)	Broadcaster: Standby (M)
++TSPC_GAP_7_2	False (*)	Broadcaster: Advertising (M)
 +-------------------------------------------------------------------------------
 +
 +
-+		Device to Host Transfers
++		Broadcaster Link Layer Advertising Event Types
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HID_10_1	False		Hid : Data reports larger than host MTU on
-+					Control channel (O)
-+TSPC_HID_10_2	False		Hid : Data reports larger than host MTU on
-+					Interrupt channel (O)
-+TSPC_HID_10_3	False		Hid : Data reports to host (O)
-+TSPC_HID_10_4	False		Hid : Boot mode reports to host (C.1)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory IF (TSPC_HID_8_1) OR (TSPC_HID_8_2) is supported.
-+	Optional for other HIDs.
++TSPC_GAP_8_1	False (*)	Broadcaster: Non-Connectable Undirected Event
++					(M)
++TSPC_GAP_8_2	False		Broadcaster: Scannable Undirected Event (O)
 +-------------------------------------------------------------------------------
 +
 +
-+		Host to Device Transfers
++		Broadcaster Link Layer Advertising Data Types
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HID_11_1	False		Hid : Data reports larger than device MTU on
-+					Control channel (O)
-+TSPC_HID_11_2	False		Hid : Data reports larger than device MTU on
-+					Interrupt channel (O)
-+TSPC_HID_11_3	False		Hid : Data reports to device (O)
-+TSPC_HID_11_4	False		Hid : Boot mode reports to device (C.1)
++TSPC_GAP_8A_1	False		AD Type-Service UUID (O)
++TSPC_GAP_8A_2	False		AD Type-Local Name (O)
++TSPC_GAP_8A_3	False (*)	AD Type-Flags (M)
++TSPC_GAP_8A_4	False		AD Type-Manufacturer Specific Data (O)
++TSPC_GAP_8A_5	False		AD Type-TX Power Level (O)
++TSPC_GAP_8A_6	False		AD Type-Security Manager Out of Band (OOB) (C.1)
++TSPC_GAP_8A_7	False		AD Type-Security manager TK Value (O)
++TSPC_GAP_8A_8	False		AD Type-Slave Connection Interval Range (O)
++TSPC_GAP_8A_9	False		AD Type-Service Solicitation (O)
++TSPC_GAP_8A_10	False		AD Type-Service Data (O)
 +-------------------------------------------------------------------------------
-+C.1: Mandatory IF (TSPC_HID_8_2) is supported. Optional for other HIDs.
++C.1: Optional if TSPC_SM_2_4 (OOB supported) is supported, otherwise Excluded.
 +-------------------------------------------------------------------------------
 +
 +
-+		HID Control Commands
++		Broadcaster Connection Modes and Procedures
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HID_12_1	False		Hid : Set_Protocol command (C.1)
-+TSPC_HID_12_2	False		Hid : Get_Protocol command (C.1)
-+TSPC_HID_12_3	False		Hid : Set_Idle command (C.2)
-+TSPC_HID_12_4	False		Hid : Get_Idle command (C.2)
-+TSPC_HID_12_5	False		Hid : Set_Report command (C.3)
-+TSPC_HID_12_6	False		Hid : Get_Report command (C.4)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory IF (TSPC_HID_8_1) OR (TSPC_HID_8_2) is supported.
-+	Optional for other HIDs. If either Set_Protocol or Get_Protocol
-+	supported, both are Mandatory.
-+C.2: Mandatory IF (TSPC_HID_8_2) Keyboard is selected. Optional for other HIDs.
-+C.3: Mandatory IF (TSPC_HID_9_12) or (TSPC_HID_9_14) supported.
-+C.4: Mandatory IF (TSPC_HID_9_13) or (TSPC_HID_9_14) supported
++TSPC_GAP_9_1	False (*)	Broadcaster: Non-Connectable Mode
 +-------------------------------------------------------------------------------
 +
 +
-+		HID Link Manager Procedures
++		Broadcaster Broadcasting and Observing Features
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HID_13_1	False		Hid : Host initiated Authentication before
-+					connection completed (C.1)
-+TSPC_HID_13_2	False		Hid : Host initiated Authentication after
-+					connection completed (C.1)
-+TSPC_HID_13_3	False		Hid : Initiate pairing before connection
-+					completed (X)
-+TSPC_HID_13_4	False		Hid : Initiate pairing after connection
-+					completed (X)
-+TSPC_HID_13_5	False		Hid : Encryption (C.1)
-+TSPC_HID_13_6	False		Hid : Initiate encryption (O)
-+TSPC_HID_13_7	False		Hid : Accept encryption requests (C.2)
-+TSPC_HID_13_8	False		Hid : Role switch (Master/Slave) (C.3)
-+TSPC_HID_13_9	False		Hid : Request Master Slave switch (O)
-+TSPC_HID_13_10	False		Hid : Accept Master Slave switch requests (C.3)
-+TSPC_HID_13_11	False		Hid : Hold mode (O)
-+TSPC_HID_13_12	False		Hid : Sniff mode (O)
-+TSPC_HID_13_13	False		Hid : Park mode (O)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory IF (TSPC_HID_8_2) OR (TSPC_HID_8_3) is selected. Optional
-+	for other HIDs.
-+C.2: Mandatory IF (TSPC_HID_13_5) supported.
-+C.3: Mandatory IF (TSPC_HID_9_6) is supported.
-+X: Feature should not be used by a HID device, but can be supported in LM.
++TSPC_GAP_10_1	False (*)	Broadcaster: Broadcast Mode
++TSPC_GAP_11_1	False		Broadcaster: Privacy Feature
++TSPC_GAP_11_2	False		Broadcaster: Resolvable Private Address
++					Generation Procedure
 +-------------------------------------------------------------------------------
 +
 +
-+		HID Link Control Requirements
++		Observer Physical Layer
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HID_14_1	False		Hid : Supports inquiry, 79 channel (O)
-+TSPC_HID_14_2	False (*)	Hid : Supports inquiry scan, 79 channel (M.1)
-+TSPC_ALL	False		Enables all test cases when set to true.
++TSPC_GAP_12_1	True (#)	Observer: Receiver
++TSPC_GAP_12_2	False		Observer: Transmitter
 +-------------------------------------------------------------------------------
-+M.1: Mandatory IF (TSPC_HID_1_2) is supported.
++
++
++		Observer Link Layer States
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_13_1	True (#)	Observer: Standby
++TSPC_GAP_13_2	True (#)	Observer: Scanning
++-------------------------------------------------------------------------------
++
++
++		Observer Link Layer Scanning Types
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_14_1	True (#)	Observer: Passive Scanning
++TSPC_GAP_14_2	False		Observer: Active Scanning
++-------------------------------------------------------------------------------
++
++
++		Observer Connection Modes and Procedures
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_15_1	True (#)	Observer: Non-Connectable Mode
++-------------------------------------------------------------------------------
++
++
++		Observer Broadcasting and Observing Features
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_16_1	True (#)	Observer: Observation Procedure
++-------------------------------------------------------------------------------
++
++
++		Observer Privacy Feature
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_17_1	False		Observer: Privacy Feature (O)
++TSPC_GAP_17_2	False		Observer: Non-Resolvable Private Address
++					Generation Procedure (C.1)
++TSPC_GAP_17_3	False		Observer: Resolvable Private Address Resolution
++					Procedure (C.2)
++TSPC_GAP_17_4	False		Observer: Resolvable Private Address Generation
++					Procedure (C.3)
++-------------------------------------------------------------------------------
++C.1: Mandatory if TSPC_GAP_17_1 and TSPC_GAP_14_2 (Active Scanning) are
++	supported and TSPC_GAP_17_4 (Resolvable Private Address Generation
++	Procedure) is Not Supported; Optional if CSA3 or later and
++	TSPC_GAP_17_4 are supported, otherwise Excluded.
++C.2: Optional if TSPC_GAP_17_1 is supported, otherwise Excluded.
++C.3: Mandatory if CSA3 or later and TSPC_GAP_17_1 and TSPC_GAP_14_2
++	(Active Scanning) are supported and TSPC_GAP_17_2 (Non-Resolvable
++	Private	Address Generation Procedure) is not supported; Optional if
++	CSA3 or later and TSPC_GAP_17_2 (Non-Resolvable Private Address
++	Generation Procedure) are supported, otherwise Excluded.
++-------------------------------------------------------------------------------
++
++
++		Peripheral Physical Layer
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_18_1	False		Peripheral: Transmitter
++TSPC_GAP_18_2	False		Peripheral: Receiver
++-------------------------------------------------------------------------------
++
++
++		Peripheral Link Layer States
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_19_1	False		Peripheral: Standby
++TSPC_GAP_19_2	False		Peripheral: Advertising
++TSPC_GAP_19_3	False		Peripheral: Connection, Slave Role
++-------------------------------------------------------------------------------
++
++
++		Peripheral Link Layer Advertising Event Types
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_20_1	False		Peripheral: Connectable Undirected Event
++TSPC_GAP_20_2	False		Peripheral: Connectable Directed Event
++TSPC_GAP_20_3	False		Peripheral: Non-Connectable Undirected Event
++TSPC_GAP_20_4	False		Peripheral: Scannable Undirected Event
++-------------------------------------------------------------------------------
++
++
++		Peripheral Link Layer Advertising Data Types
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_20A_1	False		AD Type-Service UUID (C.1)
++TSPC_GAP_20A_2	False		AD Type-Local Name (C.1)
++TSPC_GAP_20A_3	False		AD Type-Flags (C.2)
++TSPC_GAP_20A_4	False		AD Type-Manufacturer Specific Data (C.1)
++TSPC_GAP_20A_5	False		AD Type-TX Power Level (C.1)
++TSPC_GAP_20A_6	False		AD Type-Security Manager Out of Band (OOB) (C.3)
++TSPC_GAP_20A_7	False		AD Type-Security manager TK Value (C.1)
++TSPC_GAP_20A_8	False		AD Type-Slave Connection Interval Range (C.1)
++TSPC_GAP_20A_9	False		AD Type-Service Solicitation (C.1)
++TSPC_GAP_20A_10	False		AD Type-Service Data (C.1)
++-------------------------------------------------------------------------------
++C.1: Optional if (TSPC_GAP_20_1 or TSPC_GAP_20_3 or TSPC_GAP_20_4) is
++	supported, otherwise Excluded.
++C.2: Mandatory if TSPC_GAP_22_2 (Limited Discoverable Mode) or TSPC_GAP_22_3
++	(General Discoverable Mode) is supported, otherwise Optional.
++C.3: Optional if (TSPC_GAP_20_1 (Connectable Undirected Event) or TSPC_GAP_20_3
++	(Non-Connectable Undirected Event) or TSPC_GAP_20_4
++	(Scannable Undirected Event)) and TSPC_SM_2_4 (OOB supported) are
++	supported, otherwise Excluded.
++-------------------------------------------------------------------------------
++
++
++		Peripheral Link Layer Control Procedures
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_21_1	False (*)	Peripheral: Connection Update Procedure (M)
++TSPC_GAP_21_2	False (*)	Peripheral: Channel Map Update Procedure (M)
++TSPC_GAP_21_3	False		Peripheral: Encryption Procedure (O)
++TSPC_GAP_21_4	False (*)	Peripheral: Feature Exchange Procedure (M)
++TSPC_GAP_21_5	False (*)	Peripheral: Version Exchange Procedure (M)
++TSPC_GAP_21_6	False (*)	Peripheral: Termination Procedure (M)
++-------------------------------------------------------------------------------
++
++
++		Peripheral Discovery Modes and Procedures
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_22_1	False		Peripheral: Non-Discoverable Mode (C.2)
++TSPC_GAP_22_2	False		Peripheral: Limited Discoverable Mode (C.1)
++TSPC_GAP_22_3	False		Peripheral: General Discoverable Mode (C.1)
++TSPC_GAP_22_4	False		Peripheral: Name Discovery Procedure (C.3)
++-------------------------------------------------------------------------------
++C.1: Optional if (TSPC_GAP_5_3 OR TSPC_GAP_42_2), otherwise Excluded.
++C.2: Mandatory if (TSPC_GAP_5_3 or TSPC_GAP_42_1) is supported,
++	otherwise Excluded.
++C.3: Optional if TSPC_GAP_5_3 is supported, otherwise Excluded.
++-------------------------------------------------------------------------------
++
++
++		Peripheral Connection Modes and Procedures
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_23_1	False		Peripheral: Non-Connectable Mode (C.1)
++TSPC_GAP_23_2	False		Peripheral: Directed Connectable Mode (O)
++TSPC_GAP_23_3	False		Peripheral: Undirected Connectable Mode (M)
++TSPC_GAP_23_4	False		Peripheral: Connection Parameter Update
++					Procedure (O)
++TSPC_GAP_23_5	False		Peripheral: Terminate Connection Procedure (M)
++-------------------------------------------------------------------------------
++C.1: Mandatory if TSPC_GAP_5_3 (LE Only – Peripheral role) OR TSPC_GAP_42_3
++	(BR/EDR/LE – Non-Connectable Mode) OR TSPC_GAP_42_4
++	(BR/EDR/LE – Connectable Mode) is supported, otherwise Excluded.
++-------------------------------------------------------------------------------
++
++
++		Peripheral Bonding Modes and Procedures
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_24_1	False		Peripheral: Non-Bondable Mode (M)
++TSPC_GAP_24_2	False		Peripheral: Bondable Mode (C.1)
++TSPC_GAP_24_3	False		Peripheral: Bonding Procedure  (C.2)
++TSPC_GAP_24_4	False		Peripheral: Multiple Bonds (C.3)
++-------------------------------------------------------------------------------
++C.1: Optional if TSPC_GAP_5_3 (LE Only – Peripheral role) OR (TSPC_GAP_38_3
++	(BR/EDR/LE – Peripheral role) AND NOT TSPC_GAP_42_6 (BR.EDR/LE -
++	Bondable Mode)) is supported, Mandatory if TSPC_GAP_42_6
++	(BR/EDR/LE – Bondable Mode) is supported, otherwise Excluded.
++C.2: Optional if TSPC_GAP_24_2 (Bondable Mode) is supported, otherwise Excluded
++-------------------------------------------------------------------------------
++
++
++		Peripheral Security Aspects Features
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_25_1	False		Peripheral: Security Mode (O)
++TSPC_GAP_25_2	False		Peripheral: Security Mode 2 (O)
++TSPC_GAP_25_3	False		Peripheral: Authentication Procedure (C.2)
++TSPC_GAP_25_4	False		Peripheral: Authorization Procedure (O)
++TSPC_GAP_25_5	False		Peripheral: Connection Data Signing Procedure
++					(O)
++TSPC_GAP_25_6	False		Peripheral: Authenticate Signed Data Procedure
++					(O)
++TSPC_GAP_25_7	False		Peripheral: Authenticated Pairing
++					(LE security mode 1 level 3) (C.1)
++TSPC_GAP_25_8	False		Peripheral: Unauthenticated Pairing
++					(LE security mode 1 level 2) (C.1)
++-------------------------------------------------------------------------------
++C.1: Optional if TSPC_GAP_25_1 is supported, otherwise Excluded.
++C.2: Mandatory if TSPC_GAP_0A_1 and TSPC_GAP_27_4 are supported,
++	otherwise Optional.
++-------------------------------------------------------------------------------
++
++
++		Peripheral Privacy Feature
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_26_1	False		Peripheral: Privacy Feature (O)
++TSPC_GAP_26_2	False		Peripheral: Non-Resolvable Private Address
++					Generation Procedure (C.1)
++TSPC_GAP_26_3	False		Peripheral: Resolvable Private Address
++					Generation Procedure (C.2)
++-------------------------------------------------------------------------------
++C.1: Optional if TSPC_GAP_26_1 is supported, otherwise Excluded.
++C.2: Mandatory if TSPC_GAP_26_1 is supported, otherwise Excluded.
++-------------------------------------------------------------------------------
++
++
++		Peripheral GAP Characteristics
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_27_1	False (*)	Peripheral: Device Name (M)
++TSPC_GAP_27_2	False (*)	Peripheral: Appearance (M)
++TSPC_GAP_27_3	False		Peripheral: Peripheral Privacy Flag (C.1)
++TSPC_GAP_27_4	False		Peripheral: Reconnection Address (C.2)
++TSPC_GAP_27_5	False		Peripheral: Peripheral Preferred Connection
++					Parameters (O)
++TSPC_GAP_27_6	False		Peripheral: Writeable Device Name (O)
++TSPC_GAP_27_7	False		Peripheral: Writeable Appearance (O)
++TSPC_GAP_27_8	False		Peripheral: Writeable Peripheral Privacy Flag
++				(O)
++-------------------------------------------------------------------------------
++C.1: Mandatory if TSPC_GAP_26_1 is supported, otherwise Excluded.
++C.2: Optional if TSPC_GAP_26_1 and TSPC_GAP_27_3 are supported,
++	otherwise Excluded.
++-------------------------------------------------------------------------------
++
++
++		Central Physical Layer
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_28_1	True (*#)	Central: Transmitter (M)
++TSPC_GAP_28_2	True (*#)	Central: Receiver (M)
++-------------------------------------------------------------------------------
++
++
++		Central Link Layer States
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_29_1	True (*#)	Central: Standby (M)
++TSPC_GAP_29_2	True (*#)	Central: Scanning (M)
++TSPC_GAP_29_3	True (*#)	Central: Initiating (M)
++TSPC_GAP_29_4	True (*#)	Central: Connection, Master Role (M)
++-------------------------------------------------------------------------------
++
++
++		Central Link Layer Scanning Types
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_30_1	True (*#)	Central: Passive Scanning (O)
++TSPC_GAP_30_2	True (*#)	Central: Active Scanning (C.1)
++-------------------------------------------------------------------------------
++C.1: Mandatory if (TSPC_GAP_5_4 or TSPC_GAP_38_4) is supported.
++	Optional if TSPC_GAP_30_1 and (TSPC_GAP_5_4 OR TSPC_GAP_38_4)
++	is supported, otherwise Excluded.
++-------------------------------------------------------------------------------
++
++
++		Central Link Layer Control Procedures
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_31_1	True (*#)	Central: Connection Update Procedure (M)
++TSPC_GAP_31_2	True (*#)	Central: Channel Map Update Procedure (M)
++TSPC_GAP_31_3	True (*#)	Central: Encryption Procedure (O)
++TSPC_GAP_31_4	True (*#)	Central: Feature Exchange Procedure (M)
++TSPC_GAP_31_5	True (*#)	Central: Version Exchange Procedure (M)
++TSPC_GAP_31_6	True (*#)	Central: Termination Procedure (M)
++-------------------------------------------------------------------------------
++
++
++		Central Discovery Modes and Procedures
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_32_1	False		Central: Limited Discovery Procedure (C.2)
++TSPC_GAP_32_2	True (*#)	Central: General Discovery Procedure (C.1)
++TSPC_GAP_32_3	True (*#)	Central: Name Discovery Procedure (C.3)
++-------------------------------------------------------------------------------
++C.1: Mandatory if (TSPC_GAP_5_4 or TSPC_GAP_40_1) is supported, else Excluded.
++C.2: Optional if (TSPC_GAP_5_4 or TSPC_GAP_40_2) is supported,
++	otherwise Excluded.
++C.3: Optional if (TSPC_GAP_5_4 or TSPC_GAP_40_4) is supported,
++	otherwise Excluded.
++-------------------------------------------------------------------------------
++
++
++		Central Connection Modes and Procedures
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_33_1	True (*#)	Central: Auto Connection Establishment
++					Procedure (C.3)
++TSPC_GAP_33_2	True (*#)	Central: General Connection Establishment
++					Procedure (C.1)
++TSPC_GAP_33_3	True (*#)	Central: Selective Connection Establishment
++					Procedure (C.3)
++TSPC_GAP_33_4	True (*#)	Central: Direct Connectin Establishment
++					Procedure (C.2)
++TSPC_GAP_33_5	True (*#)	Central: Connection Parameter Update Procedure
++					(C.2)
++TSPC_GAP_33_6	True (*#)	Central: Terminate Connection Procedure
++					(C.2)
++-------------------------------------------------------------------------------
++C.1: Mandatory if (TSPC_GAP_5_4 or TSPC_GAP_40_5) and TSPC_GAP_36_1 is
++	supported, otherwise Optional.
++C.2: Mandatory if (TSPC_GAP_5_4 or TSPC_GAP_40_5) is supported,
++	otherwise Excluded.
++C.3: Optional if (TSPC_GAP_5_4 or TSPC_GAP_40_5) is supported,
++	otherwise Excluded.
++-------------------------------------------------------------------------------
++
++
++		Central Bonding Modes and Procedures
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_34_1	False		Central: Non-Bondable Mode (C.1)
++TSPC_GAP_34_2	True (*#)	Central: Bondable Mode (C.2)
++TSPC_GAP_34_3	True (*#)	Central: Bonding Procedure (O)
++-------------------------------------------------------------------------------
++C.1: Mandatory if (TSPC_GAP_5_4 or 39/5) is supported, otherwise Excluded.
++C.2: Optional if (TSPC_GAP_5_4 or 39/6) is supported, otherwise Excluded.
++-------------------------------------------------------------------------------
++
++
++		Central Security Features
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_35_1	True (*#)	Central: Security Mode 1 (O)
++TSPC_GAP_35_2	True (*#)	Central: Security Mode 2 (O)
++TSPC_GAP_35_3	True (*#)	Central: Authentication Procedure (O)
++TSPC_GAP_35_4	True (*#)	Central: Authorization Procedure (O)
++TSPC_GAP_35_5	True (*#)	Central: Connection Data Signing Procedure (O)
++TSPC_GAP_35_6	True (*#)	Central: Authenticate Signed Data Procedure (O)
++TSPC_GAP_35_7	False		Central: Authenticated Pairing
++					(LE security mode 1 level 3) (C.1)
++TSPC_GAP_35_8	False		Central: Unauthenticated Pairing
++					(LE security mode 1 level 2) (C.1)
++-------------------------------------------------------------------------------
++C.1: Optional if TSPC_GAP_35_1 is supported, otherwise Excluded.
++-------------------------------------------------------------------------------
++
++
++		Central Privacy Feature
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_36_1	False		Central: Privacy Feature (C.3)
++TSPC_GAP_36_2	False		Central: Non-Resolvable Private Address
++					Generation Procedure (C.1)
++TSPC_GAP_36_3	False		Central: Resolvable Private Address Resolution
++					Procedure (C.2)
++TSPC_GAP_36_4	False		Central: Write to Privacy Characteristic
++					(Enable/Disable Privacy) (O)
++-------------------------------------------------------------------------------
++C.1: Mandatory if TSPC_GAP_36_1 and TSPC_GAP_30_2 are supported,
++	otherwise Excluded.
++C.2: Mandatory if TSPC_GAP_36_1 is supported, otherwise Excluded.
++-------------------------------------------------------------------------------
++
++
++		Central GAP Characteristics
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_37_1	True (*#)	Central: Device Name (M)
++TSPC_GAP_37_2	True (*#)	Central: Appearance (M)
++-------------------------------------------------------------------------------
++
++
++		BR/EDR/LE Roles
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_38_1	False		BR/EDR/LE: Broadcaster (C.1)
++TSPC_GAP_38_2	True (*#)	BR/EDR/LE: Observer (C.1)
++TSPC_GAP_38_3	False		BR/EDR/LE: Peripheral (C.1)
++TSPC_GAP_38_4	True (*#)	BR/EDR/LE: Central (C.1)
++-------------------------------------------------------------------------------
++C.1: It is mandatory to support at least one of the defined roles.
++This table is applicable for BR/EDR/LE configurations. For LE-only
++configurations, see 'LE Roles' table for role declarations.
++-------------------------------------------------------------------------------
++
++
++		Central BR/EDR/LE Modes
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_39_1	True (*#)	Central BR/EDR/LE: Non-Discoverable Mode (C.1)
++TSPC_GAP_39_2	True (*#)	Central BR/EDR/LE: Discoverable Mode (C.2)
++TSPC_GAP_39_3	True (*#)	Central BR/EDR/LE: Non-Connectable Mode (C.3)
++TSPC_GAP_39_4	True (#)	Central BR/EDR/LE: Connectable Mode (M)
++TSPC_GAP_39_5	False		Central BR/EDR/LE: Non-Bondable Mode (C.4)
++TSPC_GAP_39_6	True (*#)	Central BR/EDR/LE: Bondable Mode (C.5)
++-------------------------------------------------------------------------------
++C.1: Mandatory if TSPC_GAP_1_1 is supported over BR/EDR, otherwise Excluded.
++C.2: Mandatory if (TSPC_GAP_1_2 or TSPC_GAP_1_3) is supported over BR/EDR,
++	otherwise Excluded.
++C.3: Mandatory if TSPC_GAP_1_4 is supported over BR/EDR, otherwise Excluded.
++C.4: Mandatory if TSPC_GAP_1_6 is supported over BR/EDR, otherwise Excluded.
++C.5: Mandatory if TSPC_GAP_1_7 is supported over BR/EDR, otherwise Excluded.
++-------------------------------------------------------------------------------
++
++
++		Central BR/EDR/LE Idle Mode Procedures
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_40_1	True (*#)	Central BR/EDR/LE: General Discovery (C.1)
++TSPC_GAP_40_2	False		Central BR/EDR/LE: Limited Discovery (C.2)
++TSPC_GAP_40_3	True (*#)	Central BR/EDR/LE: Device Type Discovery (C.3)
++TSPC_GAP_40_4	True (*#)	Central BR/EDR/LE: Name Discovery (C.4)
++TSPC_GAP_40_5	True (*#)	Central BR/EDR/LE: Link Establishment (C.5)
++-------------------------------------------------------------------------------
++C.1: Mandatory if TSPC_GAP_3_1 is supported over BR/EDR, otherwise Excluded.
++C.2: Mandatory if TSPC_GAP_3_2 is supported over BR/EDR, otherwise Excluded.
++C.3: Mandatory if (TSPC_GAP_3_1 or TSPC_GAP_3_2) is supported over BR/EDR,
++	otherwise Excluded.
++C.4: Mandatory if TSPC_GAP_3_3 is supported over BR/EDR, otherwise Excluded.
++C.5: Mandatory if (TSPC_GAP_4_1 or TSPC_GAP_4_2) is supported over BR/EDR,
++	otherwise Excluded.
++-------------------------------------------------------------------------------
++
++
++		Central BR/EDR/LE Security Aspects
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_41_1	True (#)	Central BR/EDR/LE: Security Aspects (M)
++-------------------------------------------------------------------------------
++
++
++		Peripheral BR/EDR/LE Modes
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_42_1	False		Peripheral BR/EDR/LE: Non-Discoverable Mode
++				(C.1)
++TSPC_GAP_42_2	False		Peripheral BR/EDR/LE: Discoverable Mode
++				(C.2)
++TSPC_GAP_42_3	False		Peripheral BR/EDR/LE: Non-Connectable Mode
++				(C.3)
++TSPC_GAP_42_4	False (*)	Peripheral BR/EDR/LE: Connectable Mode  (M)
++TSPC_GAP_42_5	False		Peripheral BR/EDR/LE: Non-Bondable Mode (C.4)
++TSPC_GAP_42_6	False		Peripheral BR/EDR/LE: Bondable Mode (C.5)
++-------------------------------------------------------------------------------
++C.1: Mandatory if TSPC_GAP_1_1 is supported over BR/EDR, otherwise Excluded.
++C.2: Mandatory if (TSPC_GAP_1_2 or TSPC_GAP_1_3) is supported over BR/EDR,
++	otherwise Excluded.
++C.3: Mandatory if TSPC_GAP_1_4 is supported over BR/EDR, otherwise Excluded.
++C.4: Mandatory if TSPC_GAP_1_6 is supported over BR/EDR, otherwise Excluded.
++C.5: Mandatory if TSPC_GAP_1_7 is supported over BR/EDR, otherwise Excluded.
++-------------------------------------------------------------------------------
++
++
++		Peripheral BR/EDR/LE Security Aspects
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_43_1	False (*)	Peripheral BR/EDR/LE: Security Aspects (M)
++-------------------------------------------------------------------------------
++
++
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_SM_1_1	False		Master Role (Initiator)
++TSPC_SM_1_2	False		Slave Role (Responder)
++TSPC_SM_2_4	False		OOB supported (O)
++TSPC_ALL	False		Turns on all
 +-------------------------------------------------------------------------------
 -- 
 1.8.4.1
