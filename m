@@ -2,68 +2,116 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 4/5] android/hidhost: Handle error case properly in interrupt_connect_cb
-Date: Tue, 19 Nov 2013 14:21:15 +0200
-Message-Id: <1384863676-12358-4-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 3/5] android: Handle multiple init(register) and cleanup(unregister) calls properly
+Date: Tue, 19 Nov 2013 14:21:14 +0200
+Message-Id: <1384863676-12358-3-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1384863676-12358-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1384863676-12358-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This can be tested with haltest.
 ---
- android/hidhost.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ android/a2dp.c      | 6 ++++++
+ android/bluetooth.c | 6 ++++++
+ android/hidhost.c   | 6 ++++++
+ android/pan.c       | 6 ++++++
+ 4 files changed, 24 insertions(+)
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index a929a94..05a3fe4 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -522,7 +522,6 @@ static int uhid_create(struct hid_device *dev)
- 	dev->uhid_fd = open(UHID_DEVICE_FILE, O_RDWR | O_CLOEXEC);
- 	if (dev->uhid_fd < 0) {
- 		error("Failed to open uHID device: %s", strerror(errno));
--		bt_hid_notify_state(dev, HAL_HIDHOST_STATE_NO_HID);
- 		return -errno;
- 	}
- 
-@@ -541,7 +540,6 @@ static int uhid_create(struct hid_device *dev)
- 		error("Failed to create uHID device: %s", strerror(errno));
- 		close(dev->uhid_fd);
- 		dev->uhid_fd = -1;
--		bt_hid_notify_state(dev, HAL_HIDHOST_STATE_NO_HID);
- 		return -errno;
- 	}
- 
-@@ -559,16 +557,20 @@ static void interrupt_connect_cb(GIOChannel *chan, GError *conn_err,
- 							gpointer user_data)
- {
- 	struct hid_device *dev = user_data;
-+	uint8_t state;
+diff --git a/android/a2dp.c b/android/a2dp.c
+index 74d0082..28a1250 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -332,6 +332,9 @@ bool bt_a2dp_register(int sk, const bdaddr_t *addr)
  
  	DBG("");
  
- 	if (conn_err) {
- 		error("%s", conn_err->message);
-+		state = HAL_HIDHOST_STATE_FAILED;
- 		goto failed;
- 	}
++	if (notification_sk > 0)
++		return false;
++
+ 	bacpy(&adapter_addr, addr);
  
--	if (uhid_create(dev) < 0)
-+	if (uhid_create(dev) < 0) {
-+		state = HAL_HIDHOST_STATE_NO_HID;
- 		goto failed;
-+	}
+ 	server = bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
+@@ -365,6 +368,9 @@ void bt_a2dp_unregister(void)
+ {
+ 	DBG("");
  
- 	dev->intr_watch = g_io_add_watch(dev->intr_io,
- 				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-@@ -579,6 +581,7 @@ static void interrupt_connect_cb(GIOChannel *chan, GError *conn_err,
- 	return;
++	if (notification_sk < 0)
++		return;
++
+ 	notification_sk = -1;
  
- failed:
-+	bt_hid_notify_state(dev, state);
- 	hid_device_free(dev);
+ 	bt_adapter_remove_record(record_id);
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 7dc2ec3..7805d42 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -2275,6 +2275,9 @@ bool bt_bluetooth_register(int sk)
+ {
+ 	DBG("");
+ 
++	if (notification_sk > 0)
++		return false;
++
+ 	notification_sk = sk;
+ 
+ 	return true;
+@@ -2284,5 +2287,8 @@ void bt_bluetooth_unregister(void)
+ {
+ 	DBG("");
+ 
++	if (notification_sk < 0)
++		return;
++
+ 	notification_sk = -1;
  }
+diff --git a/android/hidhost.c b/android/hidhost.c
+index 842b8ad..a929a94 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -1190,6 +1190,9 @@ bool bt_hid_register(int sk, const bdaddr_t *addr)
  
+ 	DBG("");
+ 
++	if (notification_sk > 0)
++		return false;
++
+ 	bacpy(&adapter_addr, addr);
+ 
+ 	ctrl_io = bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
+@@ -1224,6 +1227,9 @@ void bt_hid_unregister(void)
+ {
+ 	DBG("");
+ 
++	if (notification_sk < 0)
++		return;
++
+ 	notification_sk = -1;
+ 
+ 	if (ctrl_io) {
+diff --git a/android/pan.c b/android/pan.c
+index fba86b8..970a8a7 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -95,6 +95,9 @@ bool bt_pan_register(int sk, const bdaddr_t *addr)
+ {
+ 	DBG("");
+ 
++	if (notification_sk > 0)
++		return false;
++
+ 	notification_sk = sk;
+ 
+ 	return true;
+@@ -104,5 +107,8 @@ void bt_pan_unregister(void)
+ {
+ 	DBG("");
+ 
++	if (notification_sk < 0)
++		return;
++
+ 	notification_sk = -1;
+ }
 -- 
 1.8.3.2
 
