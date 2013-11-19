@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 18/19] android/socket: Add PBAP SDP record
-Date: Tue, 19 Nov 2013 15:30:08 +0200
-Message-Id: <1384867809-18135-19-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv5 09/19] android/socket: Implement socket connect HAL method
+Date: Tue, 19 Nov 2013 15:29:59 +0200
+Message-Id: <1384867809-18135-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384867809-18135-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384867809-18135-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,106 +11,73 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This adds SDP service record like shown below:
-
-Service Name: OBEX Phonebook Access Server
-Service RecHandle: 0x10002
-Service Class ID List:
-  "Phonebook Access - PSE" (0x112f)
-Protocol Descriptor List:
-  "RFCOMM" (0x0003)
-    Channel: 15
-  "OBEX" (0x0008)
-Profile Descriptor List:
-  "Phonebook Access" (0x1130)
-    Version: 0x0100
+First step is to query remote device for RFCOMM channel.
 ---
- android/socket.c |   65 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 64 insertions(+), 1 deletion(-)
+ android/socket.c |   34 ++++++++++++++++++++++++++++++++--
+ 1 file changed, 32 insertions(+), 2 deletions(-)
 
 diff --git a/android/socket.c b/android/socket.c
-index 9358d4a..0c71297 100644
+index e4479e5..843fba8 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -171,6 +171,67 @@ static sdp_record_t *create_opp_record(uint8_t chan)
- 	return record;
+@@ -33,6 +33,9 @@
+ #include "lib/bluetooth.h"
+ #include "btio/btio.h"
+ #include "lib/sdp.h"
++#include "lib/sdp_lib.h"
++#include "src/sdp-client.h"
++
+ #include "log.h"
+ #include "hal-msg.h"
+ #include "hal-ipc.h"
+@@ -55,6 +58,7 @@ struct rfcomm_sock {
+ 	int fd;		/* descriptor for communication with Java framework */
+ 	int real_sock;	/* real RFCOMM socket */
+ 	int channel;	/* RFCOMM channel */
++	bdaddr_t dst;
+ };
+ 
+ static struct rfcomm_sock *create_rfsock(int sock, int *hal_fd)
+@@ -389,11 +393,37 @@ static int handle_listen(void *buf)
+ 	return hal_fd;
  }
  
-+static sdp_record_t *create_pbap_record(uint8_t chan)
++static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
 +{
-+	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-+	uuid_t root_uuid, pbap_uuid, rfcomm_uuid, obex_uuid;
-+	sdp_profile_desc_t profile[1];
-+	sdp_list_t *aproto, *proto[2];
-+	sdp_data_t *channel;
-+	uint8_t formats[] = { 0x01 };
-+	uint8_t dtd = SDP_UINT8;
-+	sdp_data_t *sflist;
-+	sdp_record_t *record;
-+
-+	record = sdp_record_alloc();
-+	if (!record)
-+		return NULL;
-+
-+	record->handle =  sdp_next_handle();
-+
-+	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
-+	root = sdp_list_append(NULL, &root_uuid);
-+	sdp_set_browse_groups(record, root);
-+
-+	sdp_uuid16_create(&pbap_uuid, PBAP_PSE_SVCLASS_ID);
-+	svclass_id = sdp_list_append(NULL, &pbap_uuid);
-+	sdp_set_service_classes(record, svclass_id);
-+
-+	sdp_uuid16_create(&profile[0].uuid, PBAP_PROFILE_ID);
-+	profile[0].version = 0x0100;
-+	pfseq = sdp_list_append(NULL, profile);
-+	sdp_set_profile_descs(record, pfseq);
-+
-+	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
-+	proto[0] = sdp_list_append(NULL, &rfcomm_uuid);
-+	channel = sdp_data_alloc(SDP_UINT8, &chan);
-+	proto[0] = sdp_list_append(proto[0], channel);
-+	apseq = sdp_list_append(NULL, proto[0]);
-+
-+	sdp_uuid16_create(&obex_uuid, OBEX_UUID);
-+	proto[1] = sdp_list_append(NULL, &obex_uuid);
-+	apseq = sdp_list_append(apseq, proto[1]);
-+
-+	aproto = sdp_list_append(NULL, apseq);
-+	sdp_set_access_protos(record, aproto);
-+
-+	sflist = sdp_data_alloc(dtd, formats);
-+	sdp_attr_add(record, SDP_ATTR_SUPPORTED_REPOSITORIES, sflist);
-+
-+	sdp_set_info_attr(record, "OBEX Phonebook Access Server", NULL, NULL);
-+
-+	sdp_data_free(channel);
-+	sdp_list_free(proto[0], NULL);
-+	sdp_list_free(proto[1], NULL);
-+	sdp_list_free(apseq, NULL);
-+	sdp_list_free(pfseq, NULL);
-+	sdp_list_free(root, NULL);
-+	sdp_list_free(svclass_id, NULL);
-+	sdp_list_free(aproto, NULL);
-+
-+	return record;
++	DBG("");
 +}
 +
- static struct profile_info {
- 	uint8_t		uuid[16];
- 	uint8_t		channel;
-@@ -183,7 +244,9 @@ static struct profile_info {
- 			0x00, 0x00, 0x11, 0x2F, 0x00, 0x00, 0x10, 0x00,
- 			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
- 		},
--		.channel = PBAP_DEFAULT_CHANNEL
-+		.channel = PBAP_DEFAULT_CHANNEL,
-+		.svc_hint = SVC_HINT_OBEX,
-+		.create_record = create_pbap_record
- 	}, {
- 		.uuid = {
- 			0x00, 0x00, 0x11, 0x05, 0x00, 0x00, 0x10, 0x00,
+ static int handle_connect(void *buf)
+ {
+-	DBG("Not implemented");
++	struct hal_cmd_sock_connect *cmd = buf;
++	struct rfcomm_sock *rfsock;
++	bdaddr_t dst;
++	uuid_t uuid;
++	int hal_fd = -1;
++
++	DBG("");
++
++	android2bdaddr(cmd->bdaddr, &dst);
++	rfsock = create_rfsock(-1, &hal_fd);
++	bacpy(&rfsock->dst, &dst);
+ 
+-	return -1;
++	memset(&uuid, 0, sizeof(uuid));
++	uuid.type = SDP_UUID128;
++	memcpy(&uuid.value.uuid128, cmd->uuid, sizeof(uint128_t));
++
++	if (bt_search_service(&adapter_addr, &dst, &uuid, sdp_search_cb, rfsock,
++								NULL) < 0) {
++		error("Failed to search SDP records");
++		cleanup_rfsock(rfsock);
++		return -1;
++	}
++
++	return hal_fd;
+ }
+ 
+ void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
 -- 
 1.7.10.4
 
