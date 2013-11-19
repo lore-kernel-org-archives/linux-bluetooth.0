@@ -2,43 +2,43 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 05/10] android/hal-bluetooth: Add support for dut mode configure command
-Date: Tue, 19 Nov 2013 16:51:49 +0100
-Message-Id: <1384876314-31347-5-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 04/10] android/hal-bluetooth: Add support for get remote service record cmd
+Date: Tue, 19 Nov 2013 16:51:48 +0100
+Message-Id: <1384876314-31347-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1384876314-31347-1-git-send-email-szymon.janc@tieto.com>
 References: <1384876314-31347-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This command is used to enter or exit DUT mode.
 ---
- android/hal-bluetooth.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ android/hal-bluetooth.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index c74a9b3..bd7d257 100644
+index b496995..c74a9b3 100644
 --- a/android/hal-bluetooth.c
 +++ b/android/hal-bluetooth.c
-@@ -746,12 +746,17 @@ static const void *get_profile_interface(const char *profile_id)
+@@ -583,12 +583,19 @@ static int set_remote_device_property(bt_bdaddr_t *remote_addr,
  
- static int dut_mode_configure(uint8_t enable)
+ static int get_remote_service_record(bt_bdaddr_t *remote_addr, bt_uuid_t *uuid)
  {
--	DBG("");
-+	struct hal_cmd_dut_mode_conf cmd;
++	struct hal_cmd_get_remote_service_rec cmd;
 +
-+	DBG("enable %u", enable);
+ 	DBG("bdaddr: %s", bdaddr2str(remote_addr));
  
  	if (!interface_ready())
  		return BT_STATUS_NOT_READY;
  
 -	return BT_STATUS_UNSUPPORTED;
-+	cmd.enable = enable;
++	memcpy(cmd.bdaddr, remote_addr, sizeof(cmd.bdaddr));
++	memcpy(cmd.uuid, uuid, sizeof(cmd.uuid));
 +
-+	return hal_ipc_cmd(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_DUT_MODE_CONF,
++	return hal_ipc_cmd(HAL_SERVICE_ID_BLUETOOTH,
++					HAL_OP_GET_REMOTE_SERVICE_REC,
 +					sizeof(cmd), &cmd, 0, NULL, NULL);
  }
  
- static int dut_mode_send(uint16_t opcode, uint8_t *buf, uint8_t len)
+ static int get_remote_services(bt_bdaddr_t *remote_addr)
 -- 
 1.8.4.3
 
