@@ -1,36 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH] android/hal-a2dp: Fix expected size of hal_ev_a2dp conn_state and audio_state
-Date: Tue, 19 Nov 2013 22:59:23 +0200
-Message-Id: <1384894763-3925-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Date: Tue, 19 Nov 2013 18:35:27 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv3 0/2] PICS for GAP and HID
+Message-ID: <20131119163527.GA12402@x220.p-661hnu-f1>
+References: <1384871775-8348-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1384871775-8348-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/hal-a2dp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hi Jakub,
 
-diff --git a/android/hal-a2dp.c b/android/hal-a2dp.c
-index 7d91151..cf39ba2 100644
---- a/android/hal-a2dp.c
-+++ b/android/hal-a2dp.c
-@@ -54,12 +54,12 @@ static const struct hal_ipc_handler ev_handlers[] = {
- 	{	/* HAL_EV_A2DP_CONN_STATE */
- 		.handler = handle_conn_state,
- 		.var_len = false,
--		.data_len = sizeof(struct hal_ev_pan_conn_state),
-+		.data_len = sizeof(struct hal_ev_a2dp_conn_state),
- 	},
- 	{	/* HAL_EV_A2DP_AUDIO_STATE */
- 		.handler = handle_audio_state,
- 		.var_len = false,
--		.data_len = sizeof(struct hal_ev_pan_ctrl_state),
-+		.data_len = sizeof(struct hal_ev_a2dp_audio_state),
- 	},
- };
- 
--- 
-1.8.3.2
+On Tue, Nov 19, 2013, Jakub Tyszkowski wrote:
+> Please note that some PICS marked as mandatory for LE were not
+> selected because of Android 4.4 not supporting some LE Roles.
+> 
+> v3: layout changed, added: mandatory/optional/conditional
+> 	markings and descriptions, # - not implemented mark
+> v2: layout changed, each parameter description added
+> v1: initial documents with PICS targeting Android 4.4
+> 
+> Jakub Tyszkowski (2):
+>   android: Add PTS PICS for GAP
+>   android: Add PTS PICS for HID
+> 
+>  android/pics-gap.txt | 708 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  android/pics-hid.txt | 285 +++++++++++++++++++++
+>  2 files changed, 993 insertions(+)
+>  create mode 100644 android/pics-gap.txt
+>  create mode 100644 android/pics-hid.txt
 
+Both patches have been applied. Thanks.
+
+I did need to push an extra patch on top of these though since you
+forgot to add the files to EXTRA_DIST in android/Makefile.am.
+
+Johan
