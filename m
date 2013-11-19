@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 05/19] android/socket: Implement Android RFCOMM stack events
-Date: Tue, 19 Nov 2013 15:29:55 +0200
-Message-Id: <1384867809-18135-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv5 01/19] android/hal-sock: Print bdaddr string instead of pointer
+Date: Tue, 19 Nov 2013 15:29:51 +0200
+Message-Id: <1384867809-18135-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384867809-18135-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384867809-18135-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,85 +11,24 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Handle events from Android framework. Write everything to real RFCOMM
-socket. Consider splice() in the future.
 ---
- android/socket.c |   60 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+ android/hal-sock.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/android/socket.c b/android/socket.c
-index 04f0a7b..45f6e5c 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -122,9 +122,69 @@ static struct profile_info *get_profile_by_uuid(const uint8_t *uuid)
- 	return NULL;
- }
+diff --git a/android/hal-sock.c b/android/hal-sock.c
+index eafa451..bd88ad8 100644
+--- a/android/hal-sock.c
++++ b/android/hal-sock.c
+@@ -77,8 +77,8 @@ static bt_status_t sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
+ 	struct hal_cmd_sock_connect cmd;
  
-+static int try_write_all(int fd, unsigned char *buf, int len)
-+{
-+	int sent = 0;
-+
-+	while (len > 0) {
-+		int written;
-+
-+		written = write(fd, buf, len);
-+		if (written < 0) {
-+			if (errno == EINTR || errno == EAGAIN)
-+				continue;
-+			return -1;
-+		}
-+
-+		if (!written)
-+			return 0;
-+
-+		len -= written; buf += written; sent += written;
-+	}
-+
-+	return sent;
-+}
-+
- static gboolean sock_stack_event_cb(GIOChannel *io, GIOCondition cond,
- 								gpointer data)
- {
-+	struct rfcomm_sock *rfsock = data;
-+	unsigned char buf[1024];
-+	int len, sent;
-+
-+	DBG("rfsock: fd %d real_sock %d chan %u sock %d",
-+		rfsock->fd, rfsock->real_sock, rfsock->channel,
-+		g_io_channel_unix_get_fd(io));
-+
-+	if (!g_list_find(connections, rfsock)) {
-+		error("rfsock %p not found in the list", rfsock);
-+		return FALSE;
-+	}
-+
-+	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
-+		error("Socket error: sock %d cond %d",
-+					g_io_channel_unix_get_fd(io), cond);
-+		connections = g_list_remove(connections, rfsock);
-+		cleanup_rfsock(rfsock);
-+		return FALSE;
-+	}
-+
-+	len = read(rfsock->fd, buf, sizeof(buf));
-+	if (len <= 0) {
-+		error("read(): %s", strerror(errno));
-+		return FALSE;
-+	}
-+
-+	DBG("read %d bytes write to %d", len, rfsock->real_sock);
-+
-+	sent = try_write_all(rfsock->real_sock, buf, len);
-+	if (sent < 0) {
-+		error("write(): %s", strerror(errno));
-+		return FALSE;
-+	}
-+
-+	DBG("Written %d bytes", sent);
-+
- 	return TRUE;
- }
+ 	if ((!uuid && chan <= 0) || !bdaddr || !sock) {
+-		error("Invalid params: bd_addr %p, uuid %s, chan %d, sock %p",
+-					bdaddr, btuuid2str(uuid), chan, sock);
++		error("Invalid params: bd_addr %s, uuid %s, chan %d, sock %p",
++			bdaddr2str(bdaddr), btuuid2str(uuid), chan, sock);
+ 		return BT_STATUS_PARM_INVALID;
+ 	}
  
 -- 
 1.7.10.4
