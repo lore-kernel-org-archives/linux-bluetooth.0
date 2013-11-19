@@ -2,108 +2,399 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 4/6] android/hal-pan: Use generic IPC message handling for events
-Date: Tue, 19 Nov 2013 15:02:40 +0100
-Message-Id: <1384869762-3097-5-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v3 2/6] android/hal-bluetooth: Register IPC message handlers
+Date: Tue, 19 Nov 2013 15:02:38 +0100
+Message-Id: <1384869762-3097-3-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1384869762-3097-1-git-send-email-szymon.janc@tieto.com>
 References: <1384869762-3097-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Register handlers on service init and unregister on cleanup.
+Register handlers on service init. Since this requires all handlers to
+be registered (unknown opcode is considered IPC error) missing handlers
+stubs are provided.
 ---
- android/hal-pan.c | 40 +++++++++++++++++++++-------------------
- android/hal.h     |  1 -
- 2 files changed, 21 insertions(+), 20 deletions(-)
+ android/hal-bluetooth.c | 208 ++++++++++++++++++++++++++++++------------------
+ android/hal.h           |   1 -
+ 2 files changed, 129 insertions(+), 80 deletions(-)
 
-diff --git a/android/hal-pan.c b/android/hal-pan.c
-index 2bc560e..0ca9e12 100644
---- a/android/hal-pan.c
-+++ b/android/hal-pan.c
-@@ -31,7 +31,7 @@ static bool interface_ready(void)
- 	return cbs != NULL;
- }
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index 078d537..69c304a 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -35,7 +35,7 @@ static const bt_callbacks_t *bt_hal_cbacks = NULL;
+ 	*pe = *((uint8_t *) (hal_prop->val)); \
+ } while (0)
  
--static void handle_conn_state(void *buf)
-+static void handle_conn_state(void *buf, uint16_t len)
+-static void handle_adapter_state_changed(void *buf)
++static void handle_adapter_state_changed(void *buf, uint16_t len)
  {
- 	struct hal_ev_pan_conn_state *ev = buf;
+ 	struct hal_ev_adapter_state_changed *ev = buf;
  
-@@ -41,7 +41,7 @@ static void handle_conn_state(void *buf)
- 					ev->local_role, ev->remote_role);
+@@ -45,38 +45,35 @@ static void handle_adapter_state_changed(void *buf)
+ 		bt_hal_cbacks->adapter_state_changed_cb(ev->state);
  }
  
--static void handle_ctrl_state(void *buf)
-+static void handle_ctrl_state(void *buf, uint16_t len)
+-static void adapter_props_to_hal(bt_property_t *send_props,
+-					struct hal_property *hal_prop,
+-					uint8_t num_props, void *buff_end)
++static void adapter_props_to_hal(bt_property_t *send_props, void *buf,
++							uint8_t num_props)
  {
- 	struct hal_ev_pan_ctrl_state *ev = buf;
+-	void *p = hal_prop;
++	struct hal_property *prop = buf;
+ 	uint8_t i;
  
-@@ -50,23 +50,20 @@ static void handle_ctrl_state(void *buf)
- 					ev->local_role, (char *)ev->name);
+ 	for (i = 0; i < num_props; i++) {
+-		if (p + sizeof(*hal_prop) + hal_prop->len > buff_end) {
+-			error("invalid adapter properties event, aborting");
+-			exit(EXIT_FAILURE);
+-		}
+-
+-		send_props[i].type = hal_prop->type;
++		send_props[i].type = prop->type;
+ 
+-		switch (hal_prop->type) {
++		switch (prop->type) {
+ 		case HAL_PROP_ADAPTER_TYPE:
+-			create_enum_prop(send_props[i], hal_prop,
++			create_enum_prop(send_props[i], prop,
+ 							bt_device_type_t);
+ 			break;
+ 		case HAL_PROP_ADAPTER_SCAN_MODE:
+-			create_enum_prop(send_props[i], hal_prop,
++			create_enum_prop(send_props[i], prop,
+ 							bt_scan_mode_t);
+ 			break;
+ 		case HAL_PROP_ADAPTER_SERVICE_REC:
+ 		default:
+-			send_props[i].len = hal_prop->len;
+-			send_props[i].val = hal_prop->val;
++			send_props[i].len = prop->len;
++			send_props[i].val = prop->val;
+ 			break;
+ 		}
+ 
+ 		DBG("prop[%d]: %s", i, btproperty2str(&send_props[i]));
++
++		buf += sizeof(*prop) + prop->len;
++		prop = buf;
+ 	}
  }
  
--void bt_notify_pan(uint8_t opcode, void *buf, uint16_t len)
--{
+@@ -96,36 +93,30 @@ static void adapter_hal_props_cleanup(bt_property_t *props, uint8_t num)
+ 	}
+ }
+ 
+-static void device_props_to_hal(bt_property_t *send_props,
+-					struct hal_property *hal_prop,
+-					uint8_t num_props, void *buff_end)
++static void device_props_to_hal(bt_property_t *send_props, void *buf,
++							uint8_t num_props)
+ {
+-	void *p = hal_prop;
++	struct hal_property *prop = buf;
+ 	uint8_t i;
+ 
+ 	for (i = 0; i < num_props; i++) {
+-		if (p + sizeof(*hal_prop) + hal_prop->len > buff_end) {
+-			error("invalid adapter properties event, aborting");
+-			exit(EXIT_FAILURE);
+-		}
++		send_props[i].type = prop->type;
+ 
+-		send_props[i].type = hal_prop->type;
+-
+-		switch (hal_prop->type) {
++		switch (prop->type) {
+ 		case HAL_PROP_DEVICE_TYPE:
+-			create_enum_prop(send_props[i], hal_prop,
++			create_enum_prop(send_props[i], prop,
+ 							bt_device_type_t);
+ 			break;
+ 		case HAL_PROP_DEVICE_SERVICE_REC:
+ 		case HAL_PROP_DEVICE_VERSION_INFO:
+ 		default:
+-			send_props[i].len = hal_prop->len;
+-			send_props[i].val = hal_prop->val;
++			send_props[i].len = prop->len;
++			send_props[i].val = prop->val;
+ 			break;
+ 		}
+ 
+-		p += sizeof(*hal_prop) + hal_prop->len;
+-		hal_prop = p;
++		buf += sizeof(*prop) + prop->len;
++		prop = buf;
+ 
+ 		DBG("prop[%d]: %s", i, btproperty2str(&send_props[i]));
+ 	}
+@@ -147,6 +138,28 @@ static void device_hal_props_cleanup(bt_property_t *props, uint8_t num)
+ 	}
+ }
+ 
++static void check_props(int num, const struct hal_property *prop, uint16_t len)
++{
++	int i;
++
++	for (i = 0; i < num; i++) {
++		if (sizeof(*prop) + prop->len > len) {
++			error("invalid properties (%zu > %u), aborting",
++					sizeof(*prop) + prop->len, len);
++			exit(EXIT_FAILURE);
++		}
++
++		len -= sizeof(*prop) + prop->len;
++		prop = ((void *) prop) + sizeof(*prop) + prop->len;
++	}
++
++	if (!len)
++		return;
++
++	error("invalid properties length (%u bytes left), aborting", len);
++	exit(EXIT_FAILURE);
++}
++
+ static void handle_adapter_props_changed(void *buf, uint16_t len)
+ {
+ 	struct hal_ev_adapter_props_changed *ev = buf;
+@@ -154,17 +167,19 @@ static void handle_adapter_props_changed(void *buf, uint16_t len)
+ 
+ 	DBG("");
+ 
++	check_props(ev->num_props, ev->props, len - sizeof(*ev));
++
+ 	if (!bt_hal_cbacks->adapter_properties_cb)
+ 		return;
+ 
+-	adapter_props_to_hal(props, ev->props, ev->num_props, buf + len);
++	adapter_props_to_hal(props, ev->props, ev->num_props);
+ 
+ 	bt_hal_cbacks->adapter_properties_cb(ev->status, ev->num_props, props);
+ 
+ 	adapter_hal_props_cleanup(props, ev->num_props);
+ }
+ 
+-static void handle_bond_state_change(void *buf)
++static void handle_bond_state_change(void *buf, uint16_t len)
+ {
+ 	struct hal_ev_bond_state_changed *ev = buf;
+ 	bt_bdaddr_t *addr = (bt_bdaddr_t *) ev->bdaddr;
+@@ -176,7 +191,7 @@ static void handle_bond_state_change(void *buf)
+ 								ev->state);
+ }
+ 
+-static void handle_pin_request(void *buf)
++static void handle_pin_request(void *buf, uint16_t len)
+ {
+ 	struct hal_ev_pin_request *ev = buf;
+ 	/* Those are declared as packed, so it's safe to assign pointers */
+@@ -189,7 +204,7 @@ static void handle_pin_request(void *buf)
+ 		bt_hal_cbacks->pin_request_cb(addr, name, ev->class_of_dev);
+ }
+ 
+-static void handle_ssp_request(void *buf)
++static void handle_ssp_request(void *buf, uint16_t len)
+ {
+ 	struct hal_ev_ssp_request *ev = buf;
+ 	/* Those are declared as packed, so it's safe to assign pointers */
+@@ -221,7 +236,7 @@ static bool interface_ready(void)
+ 	return bt_hal_cbacks != NULL;
+ }
+ 
+-static void handle_discovery_state_changed(void *buf)
++static void handle_discovery_state_changed(void *buf, uint16_t len)
+ {
+ 	struct hal_ev_discovery_state_changed *ev = buf;
+ 
+@@ -238,10 +253,12 @@ static void handle_device_found(void *buf, uint16_t len)
+ 
+ 	DBG("");
+ 
++	check_props(ev->num_props, ev->props, len - sizeof(*ev));
++
+ 	if (!bt_hal_cbacks->device_found_cb)
+ 		return;
+ 
+-	device_props_to_hal(props, ev->props, ev->num_props, buf + len);
++	device_props_to_hal(props, ev->props, ev->num_props);
+ 
+ 	bt_hal_cbacks->device_found_cb(ev->num_props, props);
+ 
+@@ -255,10 +272,12 @@ static void handle_device_state_changed(void *buf, uint16_t len)
+ 
+ 	DBG("");
+ 
++	check_props(ev->num_props, ev->props, len - sizeof(*ev));
++
+ 	if (!bt_hal_cbacks->remote_device_properties_cb)
+ 		return;
+ 
+-	device_props_to_hal(props, ev->props, ev->num_props, buf + len);
++	device_props_to_hal(props, ev->props, ev->num_props);
+ 
+ 	bt_hal_cbacks->remote_device_properties_cb(ev->status,
+ 						(bt_bdaddr_t *)ev->bdaddr,
+@@ -267,7 +286,7 @@ static void handle_device_state_changed(void *buf, uint16_t len)
+ 	device_hal_props_cleanup(props, ev->num_props);
+ }
+ 
+-static void handle_acl_state_changed(void *buf)
++static void handle_acl_state_changed(void *buf, uint16_t len)
+ {
+ 	struct hal_ev_acl_state_changed *ev = buf;
+ 	bt_bdaddr_t *addr = (bt_bdaddr_t *) ev->bdaddr;
+@@ -279,47 +298,70 @@ static void handle_acl_state_changed(void *buf)
+ 								ev->state);
+ }
+ 
+-/* will be called from notification thread context */
+-void bt_notify_adapter(uint8_t opcode, void *buf, uint16_t len)
++static void handle_dut_mode_receive(void *buf, uint16_t len)
+ {
 -	if (!interface_ready())
 -		return;
 -
+-	DBG("opcode 0x%x", opcode);
++	DBG("");
+ 
 -	switch (opcode) {
--	case HAL_EV_PAN_CONN_STATE:
--		handle_conn_state(buf);
+-	case HAL_EV_ADAPTER_STATE_CHANGED:
+-		handle_adapter_state_changed(buf);
 -		break;
--	case HAL_EV_PAN_CTRL_STATE:
--		handle_ctrl_state(buf);
+-	case HAL_EV_ADAPTER_PROPS_CHANGED:
+-		handle_adapter_props_changed(buf, len);
+-		break;
+-	case HAL_EV_DISCOVERY_STATE_CHANGED:
+-		handle_discovery_state_changed(buf);
+-		break;
+-	case HAL_EV_DEVICE_FOUND:
+-		handle_device_found(buf, len);
+-		break;
+-	case HAL_EV_REMOTE_DEVICE_PROPS:
+-		handle_device_state_changed(buf, len);
+-		break;
+-	case HAL_EV_BOND_STATE_CHANGED:
+-		handle_bond_state_change(buf);
+-		break;
+-	case HAL_EV_PIN_REQUEST:
+-		handle_pin_request(buf);
+-		break;
+-	case HAL_EV_SSP_REQUEST:
+-		handle_ssp_request(buf);
+-		break;
+-	case HAL_EV_ACL_STATE_CHANGED:
+-		handle_acl_state_changed(buf);
 -		break;
 -	default:
 -		DBG("Unhandled callback opcode=0x%x", opcode);
 -		break;
 -	}
 -}
++	/* TODO */
++}
++
 +/* handlers will be called from notification thread context,
 + * index in table equals to 'opcode - HAL_MINIMUM_EVENT' */
 +static const struct hal_ipc_handler ev_handlers[] = {
-+	{	/* HAL_EV_PAN_CTRL_STATE */
-+		.handler = handle_conn_state,
++	{	/* HAL_EV_ADAPTER_STATE_CHANGED */
++		.handler = handle_adapter_state_changed,
 +		.var_len = false,
-+		.data_len = sizeof(struct hal_ev_pan_conn_state),
++		.data_len = sizeof(struct hal_ev_adapter_state_changed)
 +	},
-+	{	/* HAL_EV_PAN_CONN_STATE */
-+		.handler = handle_ctrl_state,
++	{	/* HAL_EV_ADAPTER_PROPS_CHANGED */
++		.handler = handle_adapter_props_changed,
++		.var_len = true,
++		.data_len = sizeof(struct hal_ev_adapter_props_changed) +
++						sizeof(struct hal_property),
++	},
++	{	/* HAL_EV_REMOTE_DEVICE_PROPS */
++		.handler = handle_device_state_changed,
++		.var_len = true,
++		.data_len = sizeof(struct hal_ev_remote_device_props) +
++						sizeof(struct hal_property),
++	},
++	{	/* HAL_EV_DEVICE_FOUND */
++		.handler = handle_device_found,
++		.var_len = true,
++		.data_len = sizeof(struct hal_ev_device_found) +
++						sizeof(struct hal_property),
++	},
++	{	/* HAL_EV_DISCOVERY_STATE_CHANGED */
++		.handler = handle_discovery_state_changed,
 +		.var_len = false,
-+		.data_len = sizeof(struct hal_ev_pan_ctrl_state),
++		.data_len = sizeof(struct hal_ev_discovery_state_changed),
++	},
++	{	/* HAL_EV_PIN_REQUEST */
++		.handler = handle_pin_request,
++		.var_len = false,
++		.data_len = sizeof(struct hal_ev_pin_request),
++	},
++	{	/* HAL_EV_SSP_REQUEST */
++		.handler = handle_ssp_request,
++		.var_len = false,
++		.data_len = sizeof(handle_ssp_request),
++	},
++	{	/* HAL_EV_BOND_STATE_CHANGED */
++		.handler = handle_bond_state_change,
++		.var_len = false,
++		.data_len = sizeof(struct hal_ev_bond_state_changed),
++	},
++	{	/* HAL_EV_ACL_STATE_CHANGED */
++		.handler = handle_acl_state_changed,
++		.var_len = false,
++		.data_len = sizeof(struct hal_ev_acl_state_changed),
++	},
++	{	/* HAL_EV_DUT_MODE_RECEIVE */
++		.handler = handle_dut_mode_receive,
++		.var_len = true,
++		.data_len = sizeof(struct hal_ev_dut_mode_receive),
 +	},
 +};
  
- static bt_status_t pan_enable(int local_role)
+ static int init(bt_callbacks_t *callbacks)
  {
-@@ -143,6 +140,9 @@ static bt_status_t pan_init(const btpan_callbacks_t *callbacks)
+@@ -333,6 +375,9 @@ static int init(bt_callbacks_t *callbacks)
  
- 	cbs = callbacks;
+ 	bt_hal_cbacks = callbacks;
  
-+	hal_ipc_register(HAL_SERVICE_ID_PAN, ev_handlers,
++	hal_ipc_register(HAL_SERVICE_ID_BLUETOOTH, ev_handlers,
 +				sizeof(ev_handlers)/sizeof(ev_handlers[0]));
 +
- 	cmd.service_id = HAL_SERVICE_ID_PAN;
- 
- 	return hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
-@@ -164,6 +164,8 @@ static void pan_cleanup()
- 
- 	hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_UNREGISTER_MODULE,
- 					sizeof(cmd), &cmd, 0, NULL, NULL);
+ 	if (!hal_ipc_init()) {
+ 		bt_hal_cbacks = NULL;
+ 		return BT_STATUS_FAIL;
+@@ -361,6 +406,9 @@ static int init(bt_callbacks_t *callbacks)
+ fail:
+ 	hal_ipc_cleanup();
+ 	bt_hal_cbacks = NULL;
 +
-+	hal_ipc_unregister(HAL_SERVICE_ID_PAN);
++	hal_ipc_unregister(HAL_SERVICE_ID_BLUETOOTH);
++
+ 	return status;
  }
  
- static btpan_interface_t pan_if = {
+@@ -396,6 +444,8 @@ static void cleanup(void)
+ 	hal_ipc_cleanup();
+ 
+ 	bt_hal_cbacks = NULL;
++
++	hal_ipc_unregister(HAL_SERVICE_ID_BLUETOOTH);
+ }
+ 
+ static int get_adapter_properties(void)
 diff --git a/android/hal.h b/android/hal.h
-index 58426a9..6bd4c5a 100644
+index 72090fe..67dad5d 100644
 --- a/android/hal.h
 +++ b/android/hal.h
-@@ -29,4 +29,3 @@ btav_interface_t *bt_get_a2dp_interface(void);
+@@ -26,7 +26,6 @@ bthh_interface_t *bt_get_hidhost_interface(void);
+ btpan_interface_t *bt_get_pan_interface(void);
+ btav_interface_t *bt_get_a2dp_interface(void);
+ 
+-void bt_notify_adapter(uint8_t opcode, void *buf, uint16_t len);
  void bt_thread_associate(void);
  void bt_thread_disassociate(void);
- void bt_notify_a2dp(uint8_t opcode, void *buf, uint16_t len);
--void bt_notify_pan(uint8_t opcode, void *buf, uint16_t len);
+ void bt_notify_hidhost(uint8_t opcode, void *buf, uint16_t len);
 -- 
 1.8.4.3
 
