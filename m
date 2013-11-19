@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 19/19] android/socket: Add SPP SDP record
-Date: Tue, 19 Nov 2013 15:30:09 +0200
-Message-Id: <1384867809-18135-20-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv5 07/19] android/socket: Send accept signal to Android through hal_fd
+Date: Tue, 19 Nov 2013 15:29:57 +0200
+Message-Id: <1384867809-18135-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384867809-18135-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384867809-18135-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,95 +11,101 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Android expects to get accept signal over file descriptor which was
+set during listen HAL call.
 ---
- android/socket.c |   64 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 63 insertions(+), 1 deletion(-)
+ android/socket.c |   57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
 
 diff --git a/android/socket.c b/android/socket.c
-index 0c71297..dc73dd1 100644
+index 5e77c66..936b70e 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -225,9 +225,69 @@ static sdp_record_t *create_pbap_record(uint8_t chan)
- 	sdp_list_free(proto[1], NULL);
- 	sdp_list_free(apseq, NULL);
- 	sdp_list_free(pfseq, NULL);
-+	sdp_list_free(aproto, NULL);
- 	sdp_list_free(root, NULL);
- 	sdp_list_free(svclass_id, NULL);
-+
-+	return record;
-+}
-+
-+static sdp_record_t *create_spp_record(uint8_t chan)
-+{
-+	sdp_list_t *svclass_id, *apseq, *profiles, *root;
-+	uuid_t root_uuid, sp_uuid, rfcomm;
-+	sdp_profile_desc_t profile;
-+	sdp_list_t *aproto, *proto[1];
-+	sdp_data_t *channel;
-+	sdp_record_t *record;
-+
-+	record = sdp_record_alloc();
-+	if (!record)
-+		return NULL;
-+
-+	record->handle =  sdp_next_handle();
-+
-+	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
-+	root = sdp_list_append(NULL, &root_uuid);
-+	sdp_set_browse_groups(record, root);
-+
-+	sdp_uuid16_create(&sp_uuid, SERIAL_PORT_SVCLASS_ID);
-+	svclass_id = sdp_list_append(NULL, &sp_uuid);
-+	sdp_set_service_classes(record, svclass_id);
-+
-+	sdp_uuid16_create(&profile.uuid, SERIAL_PORT_PROFILE_ID);
-+	profile.version = 0x0100;
-+	profiles = sdp_list_append(NULL, &profile);
-+	sdp_set_profile_descs(record, profiles);
-+
-+	sdp_uuid16_create(&rfcomm, RFCOMM_UUID);
-+	proto[0] = sdp_list_append(NULL, &rfcomm);
-+	channel = sdp_data_alloc(SDP_UINT8, &chan);
-+	proto[0] = sdp_list_append(proto[0], channel);
-+	apseq = sdp_list_append(NULL, proto[0]);
-+
-+	aproto = sdp_list_append(NULL, apseq);
-+	sdp_set_access_protos(record, aproto);
-+
-+	sdp_add_lang_attr(record);
-+
-+	sdp_set_info_attr(record, "Serial Port", "BlueZ", "COM Port");
-+
-+	sdp_set_url_attr(record, "http://www.bluez.org/",
-+			"http://www.bluez.org/", "http://www.bluez.org/");
-+
-+	sdp_set_service_id(record, sp_uuid);
-+	sdp_set_service_ttl(record, 0xffff);
-+	sdp_set_service_avail(record, 0xff);
-+	sdp_set_record_state(record, 0x00001234);
-+
-+	sdp_data_free(channel);
-+	sdp_list_free(proto[0], NULL);
-+	sdp_list_free(apseq, NULL);
- 	sdp_list_free(aproto, NULL);
-+	sdp_list_free(root, NULL);
-+	sdp_list_free(svclass_id, NULL);
-+	sdp_list_free(profiles, NULL);
+@@ -37,6 +37,7 @@
+ #include "hal-msg.h"
+ #include "hal-ipc.h"
+ #include "ipc.h"
++#include "utils.h"
+ #include "socket.h"
  
- 	return record;
- }
-@@ -266,7 +326,9 @@ static struct profile_info {
- 			0x00, 0x00, 0x11, 0x01, 0x00, 0x00, 0x10, 0x00,
- 			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
- 		},
--		.channel = SPP_DEFAULT_CHANNEL
-+		.channel = SPP_DEFAULT_CHANNEL,
-+		.svc_hint = 0,
-+		.create_record = create_spp_record
- 	},
+ #define OPP_DEFAULT_CHANNEL	9
+@@ -110,6 +111,45 @@ static struct profile_info {
+ 	}
  };
  
++static int bt_sock_send_fd(int sock_fd, const void *buf, int len, int send_fd)
++{
++	ssize_t ret;
++	struct msghdr msg;
++	struct cmsghdr *cmsg;
++	struct iovec iv;
++	char msgbuf[CMSG_SPACE(1)];
++
++	DBG("len %d sock_fd %d send_fd %d", len, sock_fd, send_fd);
++
++	if (sock_fd == -1 || send_fd == -1)
++		return -1;
++
++	memset(&msg, 0, sizeof(msg));
++
++	msg.msg_control = msgbuf;
++	msg.msg_controllen = sizeof(msgbuf);
++	cmsg = CMSG_FIRSTHDR(&msg);
++	cmsg->cmsg_level = SOL_SOCKET;
++	cmsg->cmsg_type = SCM_RIGHTS;
++	cmsg->cmsg_len = CMSG_LEN(sizeof(send_fd));
++	memcpy(CMSG_DATA(cmsg), &send_fd, sizeof(send_fd));
++
++	iv.iov_base = (unsigned char *) buf;
++	iv.iov_len = len;
++
++	msg.msg_iov = &iv;
++	msg.msg_iovlen = 1;
++
++	ret = sendmsg(sock_fd, &msg, MSG_NOSIGNAL);
++	if (ret < 0) {
++		error("sendmsg(): sock_fd %d send_fd %d: %s",
++					sock_fd, send_fd, strerror(errno));
++		return ret;
++	}
++
++	return ret;
++}
++
+ static struct profile_info *get_profile_by_uuid(const uint8_t *uuid)
+ {
+ 	unsigned int i;
+@@ -231,6 +271,21 @@ static gboolean sock_rfcomm_event_cb(GIOChannel *io, GIOCondition cond,
+ 	return TRUE;
+ }
+ 
++static void sock_send_accept(struct rfcomm_sock *rfsock, bdaddr_t *bdaddr,
++							int fd_accepted)
++{
++	struct hal_sock_connect_signal cmd;
++
++	DBG("");
++
++	cmd.size = sizeof(cmd);
++	bdaddr2android(bdaddr, cmd.bdaddr);
++	cmd.channel = rfsock->channel;
++	cmd.status = 0;
++
++	bt_sock_send_fd(rfsock->fd, &cmd, sizeof(cmd), fd_accepted);
++}
++
+ static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
+ {
+ 	struct rfcomm_sock *rfsock = user_data;
+@@ -268,6 +323,8 @@ static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
+ 		rfsock->fd, rfsock->real_sock, rfsock->channel,
+ 		sock_acc);
+ 
++	sock_send_accept(rfsock, &dst, hal_fd);
++
+ 	/* Handle events from Android */
+ 	io_stack = g_io_channel_unix_new(rfsock_acc->fd);
+ 	g_io_add_watch(io_stack, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
 -- 
 1.7.10.4
 
