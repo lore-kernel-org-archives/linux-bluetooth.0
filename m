@@ -1,51 +1,145 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v3 08/12] Bluetooth: Re-enable background scan in case of error
-Date: Wed, 20 Nov 2013 19:08:56 -0300
-Message-Id: <1384985340-2902-9-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v3 06/12] Bluetooth: Introduce hdev->pend_le_conn list
+Date: Wed, 20 Nov 2013 19:08:54 -0300
+Message-Id: <1384985340-2902-7-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1384985340-2902-1-git-send-email-andre.guedes@openbossa.org>
 References: <1384985340-2902-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since we temporarily stop the background scanning in favor of
-connection, we should re-enable it in case something goes wrong
-with connection establishment. So this patch adds a hci_update_
-background_scan() call in create_le_conn_complete() and hci_le_
-conn_complete_evt() error flow.
+This patch introduces the hdev->pend_le_conn list which holds the
+device addresses the kernel should autonomously connect. It also
+introduces some helper functions to manipulate the list.
+
+The list and helper functions will be used by the next patch which
+implements the LE auto connection infrastructure.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_conn.c  | 2 ++
- net/bluetooth/hci_event.c | 1 +
- 2 files changed, 3 insertions(+)
+ include/net/bluetooth/hci_core.h |  7 +++++
+ net/bluetooth/hci_core.c         | 68 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 75 insertions(+)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 750a39d..2ca34fa 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -548,6 +548,8 @@ static void create_le_conn_complete(struct hci_dev *hdev, u8 status)
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index bdda971..490eae2 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -268,6 +268,7 @@ struct hci_dev {
+ 	struct list_head	long_term_keys;
+ 	struct list_head	remote_oob_data;
+ 	struct list_head	le_conn_params;
++	struct list_head	pend_le_conns;
  
- 	hci_conn_del(conn);
+ 	struct hci_dev_stats	stat;
  
-+	hci_update_background_scan(hdev);
+@@ -765,6 +766,12 @@ void hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
+ void hci_conn_params_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
+ void hci_conn_params_clear(struct hci_dev *hdev);
+ 
++struct bdaddr_list *hci_pend_le_conn_lookup(struct hci_dev *hdev,
++					    bdaddr_t *addr, u8 addr_type);
++void hci_pend_le_conn_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
++void hci_pend_le_conn_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
++void hci_pend_le_conns_clear(struct hci_dev *hdev);
 +
- done:
- 	hci_dev_unlock(hdev);
- }
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 60ca708..e4f288a 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3522,6 +3522,7 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_proto_connect_cfm(conn, ev->status);
- 		conn->state = BT_CLOSED;
- 		hci_conn_del(conn);
-+		hci_update_background_scan(hdev);
- 		goto unlock;
- 	}
+ int hci_uuids_clear(struct hci_dev *hdev);
  
+ int hci_link_keys_clear(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index dd9a25c..05e6073 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2851,6 +2851,72 @@ void hci_conn_params_clear(struct hci_dev *hdev)
+ 	BT_DBG("All LE connection parameters were removed");
+ }
+ 
++/* This function requires the caller holds hdev->lock */
++struct bdaddr_list *hci_pend_le_conn_lookup(struct hci_dev *hdev,
++					    bdaddr_t *addr, u8 addr_type)
++{
++	struct bdaddr_list *entry;
++
++	list_for_each_entry(entry, &hdev->pend_le_conns, list) {
++		if (bacmp(&entry->bdaddr, addr) == 0 &&
++		    entry->bdaddr_type == addr_type)
++			return entry;
++	}
++
++	return NULL;
++}
++
++/* This function requires the caller holds hdev->lock */
++void hci_pend_le_conn_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
++{
++	struct bdaddr_list *entry;
++
++	entry = hci_pend_le_conn_lookup(hdev, addr, addr_type);
++	if (entry)
++		return;
++
++	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
++	if (!entry) {
++		BT_ERR("Out of memory");
++		return;
++	}
++
++	bacpy(&entry->bdaddr, addr);
++	entry->bdaddr_type = addr_type;
++
++	list_add(&entry->list, &hdev->pend_le_conns);
++
++	BT_DBG("addr %pMR (type %u)", addr, addr_type);
++}
++
++/* This function requires the caller holds hdev->lock */
++void hci_pend_le_conn_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
++{
++	struct bdaddr_list *entry;
++
++	entry = hci_pend_le_conn_lookup(hdev, addr, addr_type);
++	if (!entry)
++		return;
++
++	list_del(&entry->list);
++	kfree(entry);
++
++	BT_DBG("addr %pMR (type %u)", addr, addr_type);
++}
++
++/* This function requires the caller holds hdev->lock */
++void hci_pend_le_conns_clear(struct hci_dev *hdev)
++{
++	struct bdaddr_list *entry, *tmp;
++
++	list_for_each_entry_safe(entry, tmp, &hdev->pend_le_conns, list) {
++		list_del(&entry->list);
++		kfree(entry);
++	}
++
++	BT_DBG("All LE pending connections cleared");
++}
++
+ static void inquiry_complete(struct hci_dev *hdev, u8 status)
+ {
+ 	if (status) {
+@@ -2962,6 +3028,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 	INIT_LIST_HEAD(&hdev->long_term_keys);
+ 	INIT_LIST_HEAD(&hdev->remote_oob_data);
+ 	INIT_LIST_HEAD(&hdev->le_conn_params);
++	INIT_LIST_HEAD(&hdev->pend_le_conns);
+ 	INIT_LIST_HEAD(&hdev->conn_hash.list);
+ 
+ 	INIT_WORK(&hdev->rx_work, hci_rx_work);
+@@ -3148,6 +3215,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	hci_smp_ltks_clear(hdev);
+ 	hci_remote_oob_data_clear(hdev);
+ 	hci_conn_params_clear(hdev);
++	hci_pend_le_conns_clear(hdev);
+ 	hci_dev_unlock(hdev);
+ 
+ 	hci_dev_put(hdev);
 -- 
 1.8.4
 
