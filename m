@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 10/19] android/socket: Parse SDP response and connect
-Date: Wed, 20 Nov 2013 12:24:28 +0200
-Message-Id: <1384943077-5366-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv6 05/19] android/socket: Implement Android RFCOMM stack events
+Date: Wed, 20 Nov 2013 12:24:23 +0200
+Message-Id: <1384943077-5366-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384943077-5366-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384943077-5366-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,88 +11,86 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Parse SDP response, find RFCOMM channel and connect.
+Handle events from Android framework. Write everything to real RFCOMM
+socket. Consider splice() in the future.
 ---
- android/socket.c |   63 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 63 insertions(+)
+ android/socket.c |   59 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 59 insertions(+)
 
 diff --git a/android/socket.c b/android/socket.c
-index 1815367..a5b28b7 100644
+index 48afd4b..49b7413 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -424,9 +424,72 @@ static int handle_listen(void *buf)
- 	return hal_fd;
+@@ -133,10 +133,69 @@ static struct profile_info *get_profile_by_uuid(const uint8_t *uuid)
+ 	return NULL;
  }
  
-+static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
++static int try_write_all(int fd, unsigned char *buf, int len)
 +{
-+}
++	int sent = 0;
 +
- static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
- {
-+	struct rfcomm_sock *rfsock = data;
-+	GError *gerr = NULL;
-+	sdp_list_t *list;
-+	GIOChannel *io;
-+	int chan;
++	while (len > 0) {
++		int written;
 +
- 	DBG("");
-+
-+	if (err < 0) {
-+		error("Unable to get SDP record: %s", strerror(-err));
-+		goto fail;
-+	}
-+
-+	if (!recs || !recs->data) {
-+		error("No SDP records found");
-+		goto fail;
-+	}
-+
-+	for (list = recs; list != NULL; list = list->next) {
-+		sdp_record_t *rec = list->data;
-+		sdp_list_t *protos;
-+
-+		if (sdp_get_access_protos(rec, &protos) < 0) {
-+			error("Unable to get proto list");
-+			goto fail;
++		written = write(fd, buf, len);
++		if (written < 0) {
++			if (errno == EINTR || errno == EAGAIN)
++				continue;
++			return -1;
 +		}
 +
-+		chan = sdp_get_proto_port(protos, RFCOMM_UUID);
++		if (!written)
++			return 0;
 +
-+		sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free,
-+									NULL);
-+		sdp_list_free(protos, NULL);
++		len -= written; buf += written; sent += written;
 +	}
 +
-+	if (chan <= 0) {
-+		error("Could not get RFCOMM channel %d", chan);
++	return sent;
++}
++
+ static gboolean sock_stack_event_cb(GIOChannel *io, GIOCondition cond,
+ 								gpointer data)
+ {
++	struct rfcomm_sock *rfsock = data;
++	unsigned char buf[1024];
++	int len, sent;
++
++	DBG("rfsock: fd %d real_sock %d chan %u sock %d",
++		rfsock->fd, rfsock->real_sock, rfsock->channel,
++		g_io_channel_unix_get_fd(io));
++
++	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
++		error("Socket error: sock %d cond %d",
++					g_io_channel_unix_get_fd(io), cond);
 +		goto fail;
 +	}
 +
-+	DBG("Got RFCOMM channel %d", chan);
++	len = read(rfsock->fd, buf, sizeof(buf));
++	if (len <= 0) {
++		error("read(): %s", strerror(errno));
++		/* Read again */
++		return TRUE;
++	}
 +
-+	io = bt_io_connect(connect_cb, rfsock, NULL, &gerr,
-+				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
-+				BT_IO_OPT_DEST_BDADDR, &rfsock->dst,
-+				BT_IO_OPT_CHANNEL, chan,
-+				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-+				BT_IO_OPT_INVALID);
-+	if (!io) {
-+		error("Failed connect: %s", gerr->message);
-+		g_error_free(gerr);
++	DBG("read %d bytes write to %d", len, rfsock->real_sock);
++
++	sent = try_write_all(rfsock->real_sock, buf, len);
++	if (sent < 0) {
++		error("write(): %s", strerror(errno));
 +		goto fail;
 +	}
 +
-+	rfsock->real_sock = g_io_channel_unix_get_fd(io);
-+	rfsock->channel = chan;
-+	connections = g_list_append(connections, rfsock);
-+	return;
++	DBG("Written %d bytes", sent);
 +
+ 	return TRUE;
 +fail:
++	connections = g_list_remove(connections, rfsock);
 +	cleanup_rfsock(rfsock);
++
++	return FALSE;
  }
  
- static int handle_connect(void *buf)
+ static gboolean sock_rfcomm_event_cb(GIOChannel *io, GIOCondition cond,
 -- 
 1.7.10.4
 
