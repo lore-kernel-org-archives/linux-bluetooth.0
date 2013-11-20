@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 04/19] android/socket: Implement socket accepted event
-Date: Wed, 20 Nov 2013 12:24:22 +0200
-Message-Id: <1384943077-5366-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv6 06/19] android/socket: Implement RFCOMM events
+Date: Wed, 20 Nov 2013 12:24:24 +0200
+Message-Id: <1384943077-5366-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384943077-5366-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384943077-5366-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,91 +11,60 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When we get accepted event we create rfcomm slot and start listening
-for events from Android framework and from RFCOMM real socket.
+Copy data from RFCOMM socket to Android framework. Consider splice
+in the future.
 ---
- android/socket.c |   66 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 66 insertions(+)
+ android/socket.c |   36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
 diff --git a/android/socket.c b/android/socket.c
-index b8d96f9..48afd4b 100644
+index 49b7413..3e738a4 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -133,8 +133,74 @@ static struct profile_info *get_profile_by_uuid(const uint8_t *uuid)
- 	return NULL;
- }
- 
-+static gboolean sock_stack_event_cb(GIOChannel *io, GIOCondition cond,
-+								gpointer data)
-+{
-+	return TRUE;
-+}
-+
-+static gboolean sock_rfcomm_event_cb(GIOChannel *io, GIOCondition cond,
-+								gpointer data)
-+{
-+	return TRUE;
-+}
-+
- static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
+@@ -201,7 +201,43 @@ fail:
+ static gboolean sock_rfcomm_event_cb(GIOChannel *io, GIOCondition cond,
+ 								gpointer data)
  {
-+	struct rfcomm_sock *rfsock = user_data;
-+	struct rfcomm_sock *rfsock_acc;
-+	GIOChannel *io_stack;
-+	GError *gerr = NULL;
-+	bdaddr_t dst;
-+	char address[18];
-+	int sock_acc;
-+	int hal_fd;
-+	guint id;
-+	GIOCondition cond;
-+
-+	if (err) {
-+		error("%s", err->message);
-+		return;
-+	}
-+
-+	bt_io_get(io, &gerr,
-+			BT_IO_OPT_DEST_BDADDR, &dst,
-+			BT_IO_OPT_INVALID);
-+	if (gerr) {
-+		error("%s", gerr->message);
-+		g_error_free(gerr);
-+		g_io_channel_shutdown(io, TRUE, NULL);
-+		return;
-+	}
-+
-+	ba2str(&dst, address);
-+	DBG("Incoming connection from %s rfsock %p", address, rfsock);
-+
-+	sock_acc = g_io_channel_unix_get_fd(io);
-+	rfsock_acc = create_rfsock(sock_acc, &hal_fd);
-+	connections = g_list_append(connections, rfsock_acc);
++	struct rfcomm_sock *rfsock = data;
++	unsigned char buf[1024];
++	int len, sent;
 +
 +	DBG("rfsock: fd %d real_sock %d chan %u sock %d",
 +		rfsock->fd, rfsock->real_sock, rfsock->channel,
-+		sock_acc);
++		g_io_channel_unix_get_fd(io));
 +
-+	/* Handle events from Android */
-+	cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
-+	io_stack = g_io_channel_unix_new(rfsock_acc->fd);
-+	id = g_io_add_watch(io_stack, cond, sock_stack_event_cb, rfsock_acc);
-+	g_io_channel_unref(io_stack);
++	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
++		error("Socket error: sock %d cond %d",
++					g_io_channel_unix_get_fd(io), cond);
++		goto fail;
++	}
 +
-+	rfsock_acc->stack_watch = id;
++	len = read(rfsock->real_sock, buf, sizeof(buf));
++	if (len <= 0) {
++		error("read(): %s", strerror(errno));
++		/* Read again */
++		return TRUE;
++	}
 +
-+	/* Handle rfcomm events */
-+	cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
-+	id = g_io_add_watch(io, cond, sock_rfcomm_event_cb, rfsock_acc);
++	DBG("read %d bytes, write to fd %d", len, rfsock->fd);
 +
-+	rfsock_acc->rfcomm_watch = id;
++	sent = try_write_all(rfsock->fd, buf, len);
++	if (sent < 0) {
++		error("write(): %s", strerror(errno));
++		goto fail;
++	}
 +
-+	DBG("rfsock %p rfsock_acc %p stack_watch %d rfcomm_watch %d",
-+		rfsock, rfsock_acc, rfsock_acc->stack_watch,
-+		rfsock_acc->rfcomm_watch);
++	DBG("Written %d bytes", sent);
++
+ 	return TRUE;
++fail:
++	connections = g_list_remove(connections, rfsock);
++	cleanup_rfsock(rfsock);
++
++	return FALSE;
  }
  
- static int handle_listen(void *buf)
+ static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
 -- 
 1.7.10.4
 
