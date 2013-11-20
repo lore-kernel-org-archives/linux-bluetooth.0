@@ -1,25 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 21 Nov 2013 10:16:58 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] android/a2dp: Cleanup devices on unregister
-Message-ID: <20131121081658.GA12724@x220.p-661hnu-f1>
-References: <1384940394-24668-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1384940394-24668-1-git-send-email-luiz.dentz@gmail.com>
+From: Bruno Bruzzano <brunano21@gmail.com>
+Date: Wed, 20 Nov 2013 17:18:19 -0500
+Message-ID: <CACA6DsU+5gp_diykBarJhmJ_WTLwVZc==CbPOVRKfkHdEtBY0w@mail.gmail.com>
+Subject: BUG??
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi all,
 
-On Wed, Nov 20, 2013, Luiz Augusto von Dentz wrote:
-> This cleanup any existing devices in bt_a2dp_unregister
-> ---
->  android/a2dp.c | 18 +++++++++++++++---
->  1 file changed, 15 insertions(+), 3 deletions(-)
+Maybe I encountered a bug. I'm using git version of Bluez5 on Fedora
+20 beta and all crash when I try to connect to a generic profile. In
+particular, the steps to reproduce it are the following:
+- start bluetooth daemon (with -ndE args)
+- using bluetoothctl (in client folder):
+-- agent on
+-- scan on
+-- wait to discovery my android device
+-- scan off
+-- pair maddr -> pair complete!
 
-Applied. Thanks.
+After that I try to connect using AVRCP profile. It works.
+The problem appears when a tap on my smartphone's player. Bluetoothd crashes!!
 
-Johan
+Here, you can find some pastebins.
+bluetoothd -> http://pastebin.com/ZSER2Df6
+bluetoothctl -> http://pastebin.com/rexVrruB
+
+I hope someone can give me a feedback or a
+tip!
+
+
+Thanks in advance
