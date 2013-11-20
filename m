@@ -1,105 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v5 0/5] Bluetooth LE 6LoWPAN
-Date: Wed, 20 Nov 2013 14:07:18 +0200
-Message-Id: <1384949243-829-1-git-send-email-jukka.rissanen@linux.intel.com>
+Subject: [RFC v5 2/5] net: if_arp: add ARPHRD_RAWIP type
+Date: Wed, 20 Nov 2013 14:07:20 +0200
+Message-Id: <1384949243-829-3-git-send-email-jukka.rissanen@linux.intel.com>
+In-Reply-To: <1384949243-829-1-git-send-email-jukka.rissanen@linux.intel.com>
+References: <1384949243-829-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This is used when there is no L2 header before IP header.
+Example of this is Bluetooth 6LoWPAN network.
 
-this is 6LoWPAN code for BT LE as described in
-http://tools.ietf.org/html/draft-ietf-6lo-btle-00
+The RAWIP header type value is already used in some Android kernels
+so same value is used here in order not to break userspace.
 
-v5:
-- Moved the header compression functionality to net/core/6lowpan.c
-  and rebased both BT and IEEE 802154 code to use it in patch 1.
-  I will send a separate patch to net-next for comments.
-- locking fixes
-- debugfs handling moved to hci_core.c
-- misc changes according to Marcel's comments
+Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+---
+ include/uapi/linux/if_arp.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-
-v4:
-- removed the route setting code, neighbour discovery
-  should allow the devices to discover each other
-- fix the uncompression of Traffic Class in IPv6 header,
-  this makes ssh to work between devices over a BT 6lowpan link
-- removed setting of /proc conf options, they were useless
-  and not to be done in kernel module anyway
-
-
-v3:
-- misc changes according to Marcel's comments
-- supports multiple connections / interface
-- removed unused fragmentation code
-- setup 6lowpan connection automatically if enabled via debugfs
-
-The automatic 6lowpan enabling is done by setting
-
-echo 1 > /sys/kernel/debug/bluetooth/hci0/6lowpan
-
-before devices are connected.
-
-
-v2:
-- Change ARPHRD_IEEE802154 to ARPHRD_RAWIP. The generic code
-  in patches 1 and 2 is also sent to netdev mailing list.
-- Sending route exporting patch 5 to netdev ml
-- Check private/public BT address and toggle universal/local bit
-  accordingly in patch 3.
-- The virtual interface template name is now shorter (bt%d)
-- Various function name renames
-- devtype of the interface set to "bluetooth"
-
-
-v1:
-- initial release
-
-
-TODO:
-- Discovery of 6LoWPAN service needs be automatic (UUID support)
-- Enable/disable header compression for easier debugging
-
-Known issues:
-- no UUID handling yet
-
-
-Cheers,
-Jukka
-
-
-Jukka Rissanen (5):
-  6lowpan: Moving generic parts into net/core/6lowpan.c
-  net: if_arp: add ARPHRD_RAWIP type
-  ipv6: Add checks for RAWIP ARP type
-  Bluetooth: Enable 6LoWPAN support for BT LE devices
-  Bluetooth: Manually enable or disable 6LoWPAN between devices
-
- include/net/bluetooth/hci.h      |   1 +
- include/net/bluetooth/hci_core.h |   1 +
- include/net/bluetooth/l2cap.h    |   1 +
- include/uapi/linux/if_arp.h      |   1 +
- net/bluetooth/6lowpan.c          | 880 +++++++++++++++++++++++++++++++++++++++
- net/bluetooth/6lowpan.h          |  26 ++
- net/bluetooth/Makefile           |   2 +-
- net/bluetooth/hci_core.c         |  93 +++++
- net/bluetooth/hci_event.c        |   3 +
- net/bluetooth/l2cap_core.c       |  14 +-
- net/core/6lowpan.c               | 812 ++++++++++++++++++++++++++++++++++++
- net/core/6lowpan.h               | 279 +++++++++++++
- net/core/Makefile                |   8 +
- net/ieee802154/6lowpan.c         | 708 +------------------------------
- net/ieee802154/6lowpan.h         | 247 -----------
- net/ipv6/addrconf.c              |   4 +-
- 16 files changed, 2135 insertions(+), 945 deletions(-)
- create mode 100644 net/bluetooth/6lowpan.c
- create mode 100644 net/bluetooth/6lowpan.h
- create mode 100644 net/core/6lowpan.c
- create mode 100644 net/core/6lowpan.h
- delete mode 100644 net/ieee802154/6lowpan.h
-
+diff --git a/include/uapi/linux/if_arp.h b/include/uapi/linux/if_arp.h
+index d7fea34..06fc69f 100644
+--- a/include/uapi/linux/if_arp.h
++++ b/include/uapi/linux/if_arp.h
+@@ -59,6 +59,7 @@
+ #define ARPHRD_LAPB	516		/* LAPB				*/
+ #define ARPHRD_DDCMP    517		/* Digital's DDCMP protocol     */
+ #define ARPHRD_RAWHDLC	518		/* Raw HDLC			*/
++#define ARPHRD_RAWIP	530	        /* Raw IP                       */
+ 
+ #define ARPHRD_TUNNEL	768		/* IPIP tunnel			*/
+ #define ARPHRD_TUNNEL6	769		/* IP6IP6 tunnel       		*/
 -- 
 1.8.3.1
 
