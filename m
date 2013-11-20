@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 05/19] android/socket: Implement Android RFCOMM stack events
-Date: Wed, 20 Nov 2013 12:24:23 +0200
-Message-Id: <1384943077-5366-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv6 01/19] android/socket: Add get RFCOMM default channel
+Date: Wed, 20 Nov 2013 12:24:19 +0200
+Message-Id: <1384943077-5366-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1384943077-5366-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1384943077-5366-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,86 +11,89 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Handle events from Android framework. Write everything to real RFCOMM
-socket. Consider splice() in the future.
+RFCOMM default channel is the same like in other BlueZ code, it is
+defined in src/profile.c
 ---
- android/socket.c |   59 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
+ android/socket.c |   54 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 53 insertions(+), 1 deletion(-)
 
 diff --git a/android/socket.c b/android/socket.c
-index 48afd4b..49b7413 100644
+index 04bb7d1..d4c7674 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -133,10 +133,69 @@ static struct profile_info *get_profile_by_uuid(const uint8_t *uuid)
- 	return NULL;
- }
+@@ -27,19 +27,71 @@
  
-+static int try_write_all(int fd, unsigned char *buf, int len)
+ #include <glib.h>
+ #include <stdbool.h>
++#include <errno.h>
+ 
+ #include "lib/bluetooth.h"
++#include "btio/btio.h"
++#include "lib/sdp.h"
+ #include "log.h"
+ #include "hal-msg.h"
+ #include "hal-ipc.h"
+ #include "ipc.h"
+ #include "socket.h"
+ 
++#define OPP_DEFAULT_CHANNEL	9
++#define PBAP_DEFAULT_CHANNEL	15
++
+ static bdaddr_t adapter_addr;
+ 
++static struct profile_info {
++	uint8_t		uuid[16];
++	uint8_t		channel;
++	uint8_t		svc_hint;
++	BtIOSecLevel	sec_level;
++	sdp_record_t *	(*create_record)(uint8_t chan);
++} profiles[] = {
++	{
++		.uuid = {
++			0x00, 0x00, 0x11, 0x2F, 0x00, 0x00, 0x10, 0x00,
++			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
++		},
++		.channel = PBAP_DEFAULT_CHANNEL
++	}, {
++		.uuid = {
++			0x00, 0x00, 0x11, 0x05, 0x00, 0x00, 0x10, 0x00,
++			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
++		  },
++		.channel = OPP_DEFAULT_CHANNEL
++	}
++};
++
++static struct profile_info *get_profile_by_uuid(const uint8_t *uuid)
 +{
-+	int sent = 0;
++	unsigned int i;
 +
-+	while (len > 0) {
-+		int written;
-+
-+		written = write(fd, buf, len);
-+		if (written < 0) {
-+			if (errno == EINTR || errno == EAGAIN)
-+				continue;
-+			return -1;
-+		}
-+
-+		if (!written)
-+			return 0;
-+
-+		len -= written; buf += written; sent += written;
++	for (i = 0; i < G_N_ELEMENTS(profiles); i++) {
++		if (!memcmp(profiles[i].uuid, uuid, 16))
++			return &profiles[i];
 +	}
 +
-+	return sent;
++	return NULL;
 +}
 +
- static gboolean sock_stack_event_cb(GIOChannel *io, GIOCondition cond,
- 								gpointer data)
+ static int handle_listen(void *buf)
  {
-+	struct rfcomm_sock *rfsock = data;
-+	unsigned char buf[1024];
-+	int len, sent;
+-	DBG("Not implemented");
++	struct hal_cmd_sock_listen *cmd = buf;
++	struct profile_info *profile;
++	int chan;
 +
-+	DBG("rfsock: fd %d real_sock %d chan %u sock %d",
-+		rfsock->fd, rfsock->real_sock, rfsock->channel,
-+		g_io_channel_unix_get_fd(io));
++	DBG("");
 +
-+	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
-+		error("Socket error: sock %d cond %d",
-+					g_io_channel_unix_get_fd(io), cond);
-+		goto fail;
-+	}
++	profile = get_profile_by_uuid(cmd->uuid);
++	if (!profile)
++		return -1;
 +
-+	len = read(rfsock->fd, buf, sizeof(buf));
-+	if (len <= 0) {
-+		error("read(): %s", strerror(errno));
-+		/* Read again */
-+		return TRUE;
-+	}
++	chan = profile->channel;
 +
-+	DBG("read %d bytes write to %d", len, rfsock->real_sock);
-+
-+	sent = try_write_all(rfsock->real_sock, buf, len);
-+	if (sent < 0) {
-+		error("write(): %s", strerror(errno));
-+		goto fail;
-+	}
-+
-+	DBG("Written %d bytes", sent);
-+
- 	return TRUE;
-+fail:
-+	connections = g_list_remove(connections, rfsock);
-+	cleanup_rfsock(rfsock);
-+
-+	return FALSE;
- }
++	DBG("rfcomm channel %d", chan);
  
- static gboolean sock_rfcomm_event_cb(GIOChannel *io, GIOCondition cond,
+ 	return -1;
+ }
 -- 
 1.7.10.4
 
