@@ -1,70 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 06/19] android/socket: Implement RFCOMM events
-Date: Wed, 20 Nov 2013 12:24:24 +0200
-Message-Id: <1384943077-5366-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1384943077-5366-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1384943077-5366-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH BlueZ] android/a2dp: Cleanup devices on unregister
+Date: Wed, 20 Nov 2013 11:39:54 +0200
+Message-Id: <1384940394-24668-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Copy data from RFCOMM socket to Android framework. Consider splice
-in the future.
+This cleanup any existing devices in bt_a2dp_unregister
 ---
- android/socket.c |   36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ android/a2dp.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/android/socket.c b/android/socket.c
-index 49b7413..3e738a4 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -201,7 +201,43 @@ fail:
- static gboolean sock_rfcomm_event_cb(GIOChannel *io, GIOCondition cond,
- 								gpointer data)
- {
-+	struct rfcomm_sock *rfsock = data;
-+	unsigned char buf[1024];
-+	int len, sent;
+diff --git a/android/a2dp.c b/android/a2dp.c
+index a9e7c65..55a433e 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -109,6 +109,11 @@ static void bt_a2dp_notify_state(struct a2dp_device *dev, uint8_t state)
+ 
+ 	ipc_send(notification_sk, HAL_SERVICE_ID_A2DP,
+ 			HAL_EV_A2DP_CONN_STATE, sizeof(ev), &ev, -1);
 +
-+	DBG("rfsock: fd %d real_sock %d chan %u sock %d",
-+		rfsock->fd, rfsock->real_sock, rfsock->channel,
-+		g_io_channel_unix_get_fd(io));
++	if (state != HAL_A2DP_STATE_DISCONNECTED)
++		return;
 +
-+	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
-+		error("Socket error: sock %d cond %d",
-+					g_io_channel_unix_get_fd(io), cond);
-+		goto fail;
-+	}
-+
-+	len = read(rfsock->real_sock, buf, sizeof(buf));
-+	if (len <= 0) {
-+		error("read(): %s", strerror(errno));
-+		/* Read again */
-+		return TRUE;
-+	}
-+
-+	DBG("read %d bytes, write to fd %d", len, rfsock->fd);
-+
-+	sent = try_write_all(rfsock->fd, buf, len);
-+	if (sent < 0) {
-+		error("write(): %s", strerror(errno));
-+		goto fail;
-+	}
-+
-+	DBG("Written %d bytes", sent);
-+
- 	return TRUE;
-+fail:
-+	connections = g_list_remove(connections, rfsock);
-+	cleanup_rfsock(rfsock);
-+
-+	return FALSE;
++	a2dp_device_free(dev);
  }
  
- static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
+ static gboolean watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
+@@ -117,8 +122,6 @@ static gboolean watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
+ 
+ 	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
+ 
+-	a2dp_device_free(dev);
+-
+ 	return FALSE;
+ }
+ 
+@@ -130,7 +133,6 @@ static void signaling_connect_cb(GIOChannel *chan, GError *err,
+ 	if (err) {
+ 		bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
+ 		error("%s", err->message);
+-		a2dp_device_free(dev);
+ 		return;
+ 	}
+ 
+@@ -364,6 +366,13 @@ bool bt_a2dp_register(int sk, const bdaddr_t *addr)
+ 	return true;
+ }
+ 
++static void a2dp_device_disconnected(gpointer data, gpointer user_data)
++{
++	struct a2dp_device *dev = data;
++
++	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
++}
++
+ void bt_a2dp_unregister(void)
+ {
+ 	DBG("");
+@@ -371,6 +380,9 @@ void bt_a2dp_unregister(void)
+ 	if (notification_sk < 0)
+ 		return;
+ 
++	g_slist_foreach(devices, a2dp_device_disconnected, NULL);
++	devices = NULL;
++
+ 	notification_sk = -1;
+ 
+ 	bt_adapter_remove_record(record_id);
 -- 
-1.7.10.4
+1.8.3.1
 
