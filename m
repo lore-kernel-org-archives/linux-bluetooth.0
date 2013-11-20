@@ -1,76 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CAOR4+gJGyU2Fh1bRq85kaJcdD5Ranc1uEutSmbtDBZvF4uo_7w@mail.gmail.com>
+References: <1384872988-19914-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+	<1384872988-19914-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+	<CAOR4+gJGyU2Fh1bRq85kaJcdD5Ranc1uEutSmbtDBZvF4uo_7w@mail.gmail.com>
+Date: Wed, 20 Nov 2013 11:09:00 +0200
+Message-ID: <CABBYNZKcfw7eAvfEGt=jVoJ7XHGkDYtGwE4bC1tbApe_BasfAw@mail.gmail.com>
+Subject: Re: [PATCH_v2 2/4] android: Handle multiple init(register) and
+ cleanup(unregister) calls properly
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] android/a2dp: Cleanup devices on unregister
-Date: Wed, 20 Nov 2013 11:39:54 +0200
-Message-Id: <1384940394-24668-1-git-send-email-luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Szymon,
 
-This cleanup any existing devices in bt_a2dp_unregister
----
- android/a2dp.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+On Wed, Nov 20, 2013 at 9:02 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> Hi Ravi,
+>
+> On Tue, Nov 19, 2013 at 3:56 PM, Ravi kumar Veeramally
+> <ravikumar.veeramally@linux.intel.com> wrote:
+>> This can be tested with haltest.
+>
+> I think this should be already handled by Core service. Were you able
+> to get success response from daemon on multiple sequent init or
+> cleanup calls?
+>
+> btw: I think we should fix this on hal side as well, currently only
+> bluetooth hal is handling error from daemon correctly. There is also
+> question if we should return success on second init call...
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index a9e7c65..55a433e 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -109,6 +109,11 @@ static void bt_a2dp_notify_state(struct a2dp_device *dev, uint8_t state)
- 
- 	ipc_send(notification_sk, HAL_SERVICE_ID_A2DP,
- 			HAL_EV_A2DP_CONN_STATE, sizeof(ev), &ev, -1);
-+
-+	if (state != HAL_A2DP_STATE_DISCONNECTED)
-+		return;
-+
-+	a2dp_device_free(dev);
- }
- 
- static gboolean watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
-@@ -117,8 +122,6 @@ static gboolean watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
- 
- 	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
- 
--	a2dp_device_free(dev);
--
- 	return FALSE;
- }
- 
-@@ -130,7 +133,6 @@ static void signaling_connect_cb(GIOChannel *chan, GError *err,
- 	if (err) {
- 		bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
- 		error("%s", err->message);
--		a2dp_device_free(dev);
- 		return;
- 	}
- 
-@@ -364,6 +366,13 @@ bool bt_a2dp_register(int sk, const bdaddr_t *addr)
- 	return true;
- }
- 
-+static void a2dp_device_disconnected(gpointer data, gpointer user_data)
-+{
-+	struct a2dp_device *dev = data;
-+
-+	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
-+}
-+
- void bt_a2dp_unregister(void)
- {
- 	DBG("");
-@@ -371,6 +380,9 @@ void bt_a2dp_unregister(void)
- 	if (notification_sk < 0)
- 		return;
- 
-+	g_slist_foreach(devices, a2dp_device_disconnected, NULL);
-+	devices = NULL;
-+
- 	notification_sk = -1;
- 
- 	bt_adapter_remove_record(record_id);
+I would just return success if init was already called and should
+probably be done in a central place, perhaps in the HAL side.
+
+
 -- 
-1.8.3.1
-
+Luiz Augusto von Dentz
