@@ -1,79 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
+From: Sebastian <sebastianchlad@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v3 00/12] LE auto connection and connection parameters
-Date: Wed, 20 Nov 2013 19:08:48 -0300
-Message-Id: <1384985340-2902-1-git-send-email-andre.guedes@openbossa.org>
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] Adding paired-devices cmd to the bluetoothctl
+Date: Wed, 20 Nov 2013 21:21:52 +0100
+Message-Id: <1384978912-27461-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
 
-The main changes from the previous version are:
-  * Debugfs interface to add auto connect address instead of new mgmt
-    commands.
-  * We always stop LE scanning in favor of connection establishment even if
-    the controller supports scanning and connection at the same time.
-  * Background scanning is now controlled in one single place (hci_update_
-    background_scan function).
-  * RCU was replaced by hdev->lock to protect hdev->le_conn_params list. After
-    all the changes since the original version of this patch set, I realized
-    we always operate on hdev->le_conn_params with hdev->lock held so there is
-    no point in use RCU to protect this list.
+Paired-devices command lists only paired devices
+---
+ client/main.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-In order to test the LE auto connection mechanism please follow the
-instructions below.
-
-To add a new auto connection address we write on le_auto_conn file following
-the format <address> <address type> <auto_connect>.
-
-The <address type> values are:
-  * 0 for public address
-  * 1 for random address
-
-The <auto_connect> values are (for more details see struct hci_conn_params):
-  * 0 for disabled
-  * 1 for always
-  * 2 for link loss
-
-So for instance, if you want the kernel autonomously establishes connections
-with device AA:BB:CC:DD:EE:FF (public address) every time the device enters in
-connectable mode (starts advertising), you should run the command:
-$ echo "AA:BB:CC:DD:EE:FF 0 1" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
-
-To get the list of connection parameters configured in kernel, read the
-le_auto_conn file:
-$ cat /sys/kernel/debug/bluetooth/hci0/le_auto_conn
-
-Finally, to clear the connection parameters list, write an empty string:
-$ echo "" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
-
-Regards,
-
-Andre Guedes
-
-
-Andre Guedes (12):
-  Bluetooth: Save connection interval parameters in hci_conn
-  Bluetooth: Group list_head fields from strcut hci_dev together
-  Bluetooth: Introduce connection parameters list
-  Bluetooth: Use connection parameters if any
-  Bluetooth: Stop scanning on LE connection
-  Bluetooth: Introduce hdev->pend_le_conn list
-  Bluetooth: Introduce LE auto connection infrastructure
-  Bluetooth: Re-enable background scan in case of error
-  Bluetooth: Temporarily stop background scanning on discovery
-  Bluetooth: Auto connection and power on
-  Bleutooth: Add support for auto connect options
-  Bluetooth: Add le_auto_conn file on debugfs
-
- include/net/bluetooth/hci_core.h |  43 +++++-
- net/bluetooth/hci_conn.c         |  39 ++++-
- net/bluetooth/hci_core.c         | 318 +++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c        |  60 ++++++++
- net/bluetooth/mgmt.c             |  25 ++-
- 5 files changed, 473 insertions(+), 12 deletions(-)
-
+diff --git a/client/main.c b/client/main.c
+index 0dd1510..c39ebf8 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -538,6 +538,26 @@ static void cmd_devices(const char *arg)
+ 	}
+ }
+ 
++static void cmd_devices_paired(const char *arg)
++{
++	GList *list;
++
++	for (list = g_list_first(dev_list); list; list = g_list_next(list)) {
++		DBusMessageIter iter;
++		GDBusProxy *proxy = list->data;
++		dbus_bool_t paired;
++
++		if (g_dbus_proxy_get_property(proxy, "Paired", &iter) == FALSE)
++			return;
++		dbus_message_iter_get_basic(&iter, &paired);
++
++		if (!paired)
++			break;
++
++		print_device(proxy, NULL);
++	}
++}
++
+ static void generic_callback(const DBusError *error, void *user_data)
+ {
+ 	char *str = user_data;
+@@ -1047,6 +1067,8 @@ static const struct {
+ 	{ "select",       "<ctrl>",   cmd_select, "Select default controller",
+ 							ctrl_generator },
+ 	{ "devices",      NULL,       cmd_devices, "List available devices" },
++	{ "paired-devices", NULL,     cmd_devices_paired,
++					"List paired devices"},
+ 	{ "system-alias", "<name>",   cmd_system_alias },
+ 	{ "reset-alias",  NULL,       cmd_reset_alias },
+ 	{ "power",        "<on/off>", cmd_power, "Set controller power" },
 -- 
-1.8.4
+1.8.1.2
 
