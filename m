@@ -1,37 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v5 2/5] net: if_arp: add ARPHRD_RAWIP type
-Date: Wed, 20 Nov 2013 14:07:20 +0200
-Message-Id: <1384949243-829-3-git-send-email-jukka.rissanen@linux.intel.com>
-In-Reply-To: <1384949243-829-1-git-send-email-jukka.rissanen@linux.intel.com>
-References: <1384949243-829-1-git-send-email-jukka.rissanen@linux.intel.com>
+Subject: [PATCHv6 16/19] android/socket: Add MAS uuid to profile table
+Date: Wed, 20 Nov 2013 12:24:34 +0200
+Message-Id: <1384943077-5366-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1384943077-5366-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1384943077-5366-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is used when there is no L2 header before IP header.
-Example of this is Bluetooth 6LoWPAN network.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-The RAWIP header type value is already used in some Android kernels
-so same value is used here in order not to break userspace.
-
-Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 ---
- include/uapi/linux/if_arp.h | 1 +
- 1 file changed, 1 insertion(+)
+ android/socket.c |    7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/include/uapi/linux/if_arp.h b/include/uapi/linux/if_arp.h
-index d7fea34..06fc69f 100644
---- a/include/uapi/linux/if_arp.h
-+++ b/include/uapi/linux/if_arp.h
-@@ -59,6 +59,7 @@
- #define ARPHRD_LAPB	516		/* LAPB				*/
- #define ARPHRD_DDCMP    517		/* Digital's DDCMP protocol     */
- #define ARPHRD_RAWHDLC	518		/* Raw HDLC			*/
-+#define ARPHRD_RAWIP	530	        /* Raw IP                       */
+diff --git a/android/socket.c b/android/socket.c
+index 06b2906..07588d5 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -47,6 +47,7 @@
  
- #define ARPHRD_TUNNEL	768		/* IPIP tunnel			*/
- #define ARPHRD_TUNNEL6	769		/* IP6IP6 tunnel       		*/
+ #define OPP_DEFAULT_CHANNEL	9
+ #define PBAP_DEFAULT_CHANNEL	15
++#define MAS_DEFAULT_CHANNEL	16
+ 
+ /* Use Object Transfer for all services */
+ #define SVC_HINT_OBEX 0x10
+@@ -202,6 +203,12 @@ static struct profile_info {
+ 		.channel = OPP_DEFAULT_CHANNEL,
+ 		.svc_hint = SVC_HINT_OBEX,
+ 		.create_record = create_opp_record
++	}, {
++		.uuid = {
++			0x00, 0x00, 0x11, 0x32, 0x00, 0x00, 0x10, 0x00,
++			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
++		},
++		.channel = MAS_DEFAULT_CHANNEL
+ 	}
+ };
+ 
 -- 
-1.8.3.1
+1.7.10.4
 
