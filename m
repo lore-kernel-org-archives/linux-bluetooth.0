@@ -1,70 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv7 04/14] android/socket: Send connect signal to Android framework
-Date: Fri, 22 Nov 2013 10:34:45 +0200
-Message-Id: <1385109295-11445-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1385109295-11445-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1385109295-11445-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 21 Nov 2013 16:44:13 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] android/ipc: Zero initialize cmsg buffer
+Message-ID: <20131121144413.GA31496@x220.p-661hnu-f1>
+References: <1385043811-21842-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1385043811-21842-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Andrei,
 
-Android framework expects connect signal to be sent when
-remote device is connected.
----
- android/socket.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+On Thu, Nov 21, 2013, Andrei Emeltchenko wrote:
+> This fixes valgrind warnings:
+> ...
+> Syscall param sendmsg(msg.msg_control) points to uninitialised byte(s)
+> ...
+> ---
+>  android/ipc.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-diff --git a/android/socket.c b/android/socket.c
-index ab8d78b..1691749 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -424,6 +424,33 @@ static int handle_listen(void *buf)
- 	return hal_fd;
- }
- 
-+static bool sock_send_connect(struct rfcomm_sock *rfsock, bdaddr_t *bdaddr)
-+{
-+	struct hal_sock_connect_signal cmd;
-+	int len;
-+
-+	DBG("");
-+
-+	memset(&cmd, 0, sizeof(cmd));
-+	cmd.size = sizeof(cmd);
-+	bdaddr2android(bdaddr, cmd.bdaddr);
-+	cmd.channel = rfsock->channel;
-+	cmd.status = 0;
-+
-+	len = write(rfsock->fd, &cmd, sizeof(cmd));
-+	if (len < 0) {
-+		error("%s", strerror(errno));
-+		return false;
-+	}
-+
-+	if (len != sizeof(cmd)) {
-+		error("Error sending connect signal");
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
- static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
- {
- 	struct rfcomm_sock *rfsock = user_data;
-@@ -445,6 +472,9 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
- 		rfsock->fd, rfsock->real_sock, rfsock->channel,
- 		g_io_channel_unix_get_fd(io));
- 
-+	if (!sock_send_connect(rfsock, dst))
-+		goto fail;
-+
- 	/* Handle events from Android */
- 	cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
- 	io_stack = g_io_channel_unix_new(rfsock->fd);
--- 
-1.8.3.2
+Both patches have been applied. Thanks.
 
+Johan
