@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv7 05/14] android/socket: Close file descriptor after sending
-Date: Fri, 22 Nov 2013 10:34:46 +0200
-Message-Id: <1385109295-11445-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv7 13/14] android/hal-sock: Print bdaddr on connect
+Date: Fri, 22 Nov 2013 10:34:54 +0200
+Message-Id: <1385109295-11445-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1385109295-11445-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1385109295-11445-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,29 +12,24 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/socket.c | 2 ++
- 1 file changed, 2 insertions(+)
+ android/hal-sock.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/android/socket.c b/android/socket.c
-index 1691749..156a424 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -604,6 +604,7 @@ void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
- 			break;
+diff --git a/android/hal-sock.c b/android/hal-sock.c
+index bd88ad8..e02a49a 100644
+--- a/android/hal-sock.c
++++ b/android/hal-sock.c
+@@ -82,8 +82,8 @@ static bt_status_t sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
+ 		return BT_STATUS_PARM_INVALID;
+ 	}
  
- 		ipc_send(sk, HAL_SERVICE_ID_SOCK, opcode, 0, NULL, fd);
-+		close(fd);
- 		return;
- 	case HAL_OP_SOCK_CONNECT:
- 		fd = handle_connect(buf);
-@@ -611,6 +612,7 @@ void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
- 			break;
+-	DBG("uuid %s chan %d sock %p type %d flags 0x%02x",
+-		btuuid2str(uuid), chan, sock, type, flags);
++	DBG("bdaddr %s uuid %s chan %d sock %p type %d flags 0x%02x",
++		bdaddr2str(bdaddr), btuuid2str(uuid), chan, sock, type, flags);
  
- 		ipc_send(sk, HAL_SERVICE_ID_SOCK, opcode, 0, NULL, fd);
-+		close(fd);
- 		return;
- 	default:
- 		DBG("Unhandled command, opcode 0x%x", opcode);
+ 	if (type != BTSOCK_RFCOMM) {
+ 		error("Socket type %u not supported", type);
 -- 
 1.8.3.2
 
