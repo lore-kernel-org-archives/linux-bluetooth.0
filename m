@@ -1,171 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] android/pics: Add PTS PICS for PAN
-Date: Fri, 22 Nov 2013 11:47:38 +0100
-Message-Id: <1385117261-25270-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv7 11/14] android/socket: Add SPP SDP record
+Date: Fri, 22 Nov 2013 10:34:52 +0200
+Message-Id: <1385109295-11445-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1385109295-11445-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1385109295-11445-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PTS PICS for PAN, targeting Android 4.4.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/pics-pan.txt | 146 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 146 insertions(+)
- create mode 100644 android/pics-pan.txt
+ android/socket.c | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 67 insertions(+), 1 deletion(-)
 
-diff --git a/android/pics-pan.txt b/android/pics-pan.txt
-new file mode 100644
-index 0000000..7576d2d
---- /dev/null
-+++ b/android/pics-pan.txt
-@@ -0,0 +1,146 @@
-+PAN PICS for the PTS tool.
+diff --git a/android/socket.c b/android/socket.c
+index 5af0bf6..80afba5 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -251,6 +251,70 @@ static sdp_record_t *create_pbap_record(uint8_t chan, const char *svc_name)
+ 	return record;
+ }
+ 
++static sdp_record_t *create_spp_record(uint8_t chan, const char *svc_name)
++{
++	const char *service_name = "Serial Port";
++	sdp_list_t *svclass_id, *apseq, *profiles, *root;
++	uuid_t root_uuid, sp_uuid, rfcomm;
++	sdp_profile_desc_t profile;
++	sdp_list_t *aproto, *proto[1];
++	sdp_data_t *channel;
++	sdp_record_t *record;
 +
-+* - different than PTS defaults
-+# - not yet implemented/supported
++	record = sdp_record_alloc();
++	if (!record)
++		return NULL;
 +
-+M - mandatory
-+O - optional
++	record->handle =  sdp_next_handle();
 +
-+		Roles
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_PAN_1_1	True (*#)	Role: Network Access Point (O.1)
-+TSPC_PAN_1_2	False		Role: Group Ad-hoc Network (O.1)
-+TSPC_PAN_1_3	True (*#)	Role: PAN User (O.1)
-+TSPC_PAN_1a_1	True (#)	BNEP: BNEP Connection Setup (M)
-+TSPC_PAN_1a_2	True (#)	BNEP: BNEP Data Packet Reception (M)
-+TSPC_PAN_1a_3	True (#)	BNEP: BNEP Data Packet Transmission (M)
-+TSPC_PAN_1a_4	True (#)	BNEP: BNEP Control Message Processing (M)
-+TSPC_PAN_1a_5	True (#)	BNEP: BNEP Extension Header Processing (M)
-+TSPC_PAN_1a_6	False		BNEP: Network Protocol Filter Message
-+					Transmission (O)
-+TSPC_PAN_1a_7	False		BNEP: Multicast Address Filter Message
-+					Transmission (O)
-+-------------------------------------------------------------------------------
-+O.1: It is mandatory to support at least one of the defined roles.
-+-------------------------------------------------------------------------------
++	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
++	root = sdp_list_append(NULL, &root_uuid);
++	sdp_set_browse_groups(record, root);
 +
++	sdp_uuid16_create(&sp_uuid, SERIAL_PORT_SVCLASS_ID);
++	svclass_id = sdp_list_append(NULL, &sp_uuid);
++	sdp_set_service_classes(record, svclass_id);
 +
-+		Network Access Point Application Features
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_PAN_2_1	True (#)	NAP: Support BNEP (M)
-+TSPC_PAN_2_2	True (#)	NAP: Support BNEP Forwarding (M)
-+TSPC_PAN_2_3	False		NAP: Support Layer 2-Bridging between PAN and
-+					External Network (C.1)
-+TSPC_PAN_2_4	True (*#)	NAP: Support IP forwarding between PAN and
-+					External Network (C.1)
-+TSPC_PAN_2_5	False		NAP: Support BNEP Packet Filtering (O)
-+TSPC_PAN_2_6	True (*#)	NAP: Support IPv4 (C.2)
-+TSPC_PAN_2_6a	True (*#)	NAP: Supports operable routable IPv4 address (O)
-+TSPC_PAN_2_6b	False		NAP: Support link-local address configuration
-+					for IPv4 (C.4)
-+TSPC_PAN_2_7	False		NAP: Support ping client for IPv4 (O)
-+TSPC_PAN_2_8	False		NAP: Support DHCP Client for IPv4 (O)
-+TSPC_PAN_2_9	False		NAP: Support DNS/LLMNR Resolver for IPv4 (O)
-+TSPC_PAN_2_9a	True (#)	NAP: Support LLMNR Sender for IPv4 (C.5)
-+TSPC_PAN_2_9b	False		NAP: Support LLMNR Responder for IPv4 (O)
-+TSPC_PAN_2_10	False		NAP: Support HTTP Client for IPv4 (O)
-+TSPC_PAN_2_11	False		NAP: Support WAP Client for IPv4 (O)
-+TSPC_PAN_2_12	False		NAP: Support IPv6 (C.3)
-+TSPC_PAN_2_13	False		NAP: Support ping client for IPv6 (O)
-+TSPC_PAN_2_14	False		NAP: Support DNS/LLMNR Resolver for IPv6 (O)
-+TSPC_PAN_2_14a	False (*)	NAP: Support LLMNR Sender for IPv6 (C.6)
-+TSPC_PAN_2_14b	False		NAP: Support LLMNR Responder for IPv6 (O)
-+TSPC_PAN_2_15	False		NAP: Support HTTP Client for IPv6 (O)
-+TSPC_PAN_2_16	False		NAP: Support WAP Client for IPv6 (O)
-+TSPC_PAN_2_17	True (#)	NAP: Supports Connectable Mode (M)
-+TSPC_PAN_2_18	True (#)	NAP: NAP Service Record (M)
-+TSPC_PAN_2_19	False		NAP: Support at least three PANUs (O)
-+TSPC_PAN_2_20	False		NAP: Support at least two PANUs (O)
-+-------------------------------------------------------------------------------
-+Note that support for IP-related features only applies to the PAN interface of
-+	the NAP (i.e. If the IP stack is accessible by PANUs).
-+C.1: Network Access Point devices MUST support either (TSPC_PAN_2_3)
-+	OR (TSPC_PAN_2_4).
-+C.2: Mandatory to support IF any IPv4-based transport protocol OR
-+	(TSPC_PAN_2_7-11) is supported, ELSE Optional.
-+C.3: Mandatory to support IF any IPv6-based transport protocol OR
-+	(TSPC_PAN_2_13-16) is supported, ELSE Optional.
-+C.4: Mandatory if TSPC_PAN_2_6 is supported and TSPC_PAN_2_6a is not supported,
-+	otherwise optional.
-+C.5: Mandatory if item (TSPC_PAN_2_6) or item supported.
-+C.6: Mandatory if item (TSPC_PAN_2_12) supported
-+-------------------------------------------------------------------------------
++	sdp_uuid16_create(&profile.uuid, SERIAL_PORT_PROFILE_ID);
++	profile.version = 0x0100;
++	profiles = sdp_list_append(NULL, &profile);
++	sdp_set_profile_descs(record, profiles);
 +
++	sdp_uuid16_create(&rfcomm, RFCOMM_UUID);
++	proto[0] = sdp_list_append(NULL, &rfcomm);
++	channel = sdp_data_alloc(SDP_UINT8, &chan);
++	proto[0] = sdp_list_append(proto[0], channel);
++	apseq = sdp_list_append(NULL, proto[0]);
 +
-+		Group Ad-hoc Network Application Features
-+			(GN Application Features)
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_PAN_3_1	False (*)	GN: Support BNEP (M)
-+TSPC_PAN_3_2	False (*)	GN: Support BNEP Forwarding (M)
-+TSPC_PAN_3_3	False		GN: Support BNEP Packet Filtering (O)
-+TSPC_PAN_3_4	False		GN: Support IPv4 (C.1)
-+TSPC_PAN_3_5	False		GN: Support ping client for IPv4 (O)
-+TSPC_PAN_3_6	False		GN: Support DHCP Client for IPv4 (O)
-+TSPC_PAN_3_7	False		GN: Support DNS/LLMNR Resolver for IPv4 (O)
-+TSPC_PAN_3_7a	False (*)	GN: Support LLMNR Sender for IPv4 (C.3)
-+TSPC_PAN_3_7b	False		GN: Support LLMNR Responder for IPv4 (O)
-+TSPC_PAN_3_8	False		GN: Support HTTP Client for IPv4 (O)
-+TSPC_PAN_3_9	False		GN: Support WAP Client for IPv4 (O)
-+TSPC_PAN_3_10	False		GN: Support IPv6 (C.2)
-+TSPC_PAN_3_11	False		GN: Support ping client for IPv6 (O)
-+TSPC_PAN_3_12	False		GN: Support DNS/LLMNR Resolver for IPv6 (O)
-+TSPC_PAN_3_12a	False (*)	GN: Support LLMNR Sender for IPv6 (C.4)
-+TSPC_PAN_3_12b	False		GN: Support LLMNR Responder for IPv6 (O)
-+TSPC_PAN_3_13	False		GN: Support HTTP Client for IPv6 (O)
-+TSPC_PAN_3_14	False		GN: Support WAP Client for IPv6 (O)
-+TSPC_PAN_3_15	False (*)	GN: Supports Connectable Mode (M)
-+TSPC_PAN_3_16	False (*)	GN: GN Service Record (M)
-+TSPC_PAN_3_17	False		GN: Support at least three PANUs (O)
-+TSPC_PAN_3_18	False		GN: Support at least two PANUs (O)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory to support IF any IPv4-based transport protocol OR
-+	(TSPC_PAN_3_5-9) is supported, ELSE Optional.
-+C.2: Mandatory to support IF any IPv6-based transport protocol OR
-+	(TSPC_PAN_3_11-14) is supported, ELSE Optional.
-+C.3: Mandatory to support IF (TSPC_PAN_3_4) is supported.
-+C.4: Mandatory to support if (TSPC_PAN_3_10) is supported.
-+-------------------------------------------------------------------------------
++	aproto = sdp_list_append(NULL, apseq);
++	sdp_set_access_protos(record, aproto);
 +
++	sdp_add_lang_attr(record);
 +
-+		PAN User Application Features
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_PAN_4_1	True (#)	PANU: Support BNEP (M)
-+TSPC_PAN_4_2	True (*#)	PANU: Support IPv4 (C.1)
-+TSPC_PAN_4_3	True (*#)	PANU: Support ping client for IPv4 (O)
-+TSPC_PAN_4_4	True (*#)	PANU: Support DHCP client for  IPv4 (O)
-+TSPC_PAN_4_5	False		PANU: Support DNS/LLMNR Resolver for IPv4 (O)
-+TSPC_PAN_4_5a	True (#)	PANU: Support LLMNR Sender for IPv4 (C.2)
-+TSPC_PAN_4_5b	False		PANU: Support LLMNR Responder for IPv4 (O)
-+TSPC_PAN_4_6	False		PANU: Support HTTP Client for IPv4 (O)
-+TSPC_PAN_4_7	False		PANU: Support WAP Client for IPv4 (O)
-+TSPC_PAN_4_8	False		PANU: Support IPv6 (C.1)
-+TSPC_PAN_4_9	False		PANU: Support ping client for IPv6 (O)
-+TSPC_PAN_4_10	False		PANU: Support DNS/LLMNR Resolver for IPv6 (O)
-+TSPC_PAN_4_10a	False (*)	PANU: Support LLMNR Sender for IPv6 (C.3)
-+TSPC_PAN_4_10b	False		PANU: Support LLMNR Responder for IPv6 (O)
-+TSPC_PAN_4_11	False		PANU: Support HTTP Client for IPv6 (O)
-+TSPC_PAN_4_12	False		PANU: Support WAP Client for IPv6 (O)
-+TSPC_PAN_4_13	False		PANU: Support connections to multi-user
-+					NAPs/GNs (O)
-+TSPC_PAN_4_14	False		PANU: Supports Connectable Mode (O)
-+TSPC_PAN_4_15	False		PANU: PANU Service Record (O)
-+TSPC_ALL	False		Turns on all the test cases
-+-------------------------------------------------------------------------------
-+C.1: PAN User devices must support at least One of items (TSPC_PAN_4_2) or
-+	(TSPC_PAN_4_8).
-+C.2: Mandatory to support if (TSPC_PAN_4_2) is supported.
-+C.3: Mandatory to support if (TSPC_PAN_4_8) is supported.
-+-------------------------------------------------------------------------------
++	if (svc_name)
++		service_name = svc_name;
++
++	sdp_set_info_attr(record, service_name, "BlueZ", "COM Port");
++
++	sdp_set_url_attr(record, "http://www.bluez.org/",
++			"http://www.bluez.org/", "http://www.bluez.org/");
++
++	sdp_set_service_id(record, sp_uuid);
++	sdp_set_service_ttl(record, 0xffff);
++	sdp_set_service_avail(record, 0xff);
++	sdp_set_record_state(record, 0x00001234);
++
++	sdp_data_free(channel);
++	sdp_list_free(proto[0], NULL);
++	sdp_list_free(apseq, NULL);
++	sdp_list_free(aproto, NULL);
++	sdp_list_free(root, NULL);
++	sdp_list_free(svclass_id, NULL);
++	sdp_list_free(profiles, NULL);
++
++	return record;
++}
++
+ static struct profile_info {
+ 	uint8_t		uuid[16];
+ 	uint8_t		channel;
+@@ -285,7 +349,9 @@ static struct profile_info {
+ 			0x00, 0x00, 0x11, 0x01, 0x00, 0x00, 0x10, 0x00,
+ 			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
+ 		},
+-		.channel = SPP_DEFAULT_CHANNEL
++		.channel = SPP_DEFAULT_CHANNEL,
++		.svc_hint = 0,
++		.create_record = create_spp_record
+ 	},
+ };
+ 
 -- 
-1.8.4.1
+1.8.3.2
 
