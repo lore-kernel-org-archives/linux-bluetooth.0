@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv7 06/14] android/socket: Add general service create/remove function
-Date: Fri, 22 Nov 2013 10:34:47 +0200
-Message-Id: <1385109295-11445-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv7 07/14] android/socket: Add OPP SDP record
+Date: Fri, 22 Nov 2013 10:34:48 +0200
+Message-Id: <1385109295-11445-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1385109295-11445-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1385109295-11445-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,95 +11,124 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-create_record function from profile is used to create SDP service record.
-The record is removed from rfsock cleanup function.
+This adds SDP record for OPP shown below:
+
+Service Name: OBEX Object Push
+Service RecHandle: 0x10002
+Service Class ID List:
+  "OBEX Object Push" (0x1105)
+Protocol Descriptor List:
+  "RFCOMM" (0x0003)
+    Channel: 9
+  "OBEX" (0x0008)
+Profile Descriptor List:
+  "OBEX Object Push" (0x1105)
+    Version: 0x0100
 ---
- android/socket.c | 30 ++++++++++++++++++++++++++++--
- 1 file changed, 28 insertions(+), 2 deletions(-)
+ android/socket.c | 77 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 76 insertions(+), 1 deletion(-)
 
 diff --git a/android/socket.c b/android/socket.c
-index 156a424..0c3964f 100644
+index 0c3964f..a652a11 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -35,7 +35,9 @@
- #include "lib/sdp.h"
- #include "lib/sdp_lib.h"
- #include "src/sdp-client.h"
-+#include "src/sdpd.h"
+@@ -48,6 +48,8 @@
+ #define OPP_DEFAULT_CHANNEL	9
+ #define PBAP_DEFAULT_CHANNEL	15
  
-+#include "bluetooth.h"
- #include "log.h"
- #include "hal-msg.h"
- #include "hal-ipc.h"
-@@ -63,6 +65,7 @@ struct rfcomm_sock {
- 	guint stack_watch;
- 
- 	bdaddr_t dst;
-+	uint32_t service_handle;
- };
- 
- static struct rfcomm_sock *create_rfsock(int sock, int *hal_fd)
-@@ -102,6 +105,9 @@ static void cleanup_rfsock(struct rfcomm_sock *rfsock)
- 		if (!g_source_remove(rfsock->stack_watch))
- 			error("stack_watch source was not found");
- 
-+	if (rfsock->service_handle)
-+		bt_adapter_remove_record(rfsock->service_handle);
++#define SVC_HINT_OBEX 0x10
 +
+ static bdaddr_t adapter_addr;
+ 
+ /* Simple list of RFCOMM server sockets */
+@@ -111,6 +113,77 @@ static void cleanup_rfsock(struct rfcomm_sock *rfsock)
  	g_free(rfsock);
  }
  
-@@ -110,7 +116,7 @@ static struct profile_info {
- 	uint8_t		channel;
- 	uint8_t		svc_hint;
- 	BtIOSecLevel	sec_level;
--	sdp_record_t *	(*create_record)(uint8_t chan);
-+	sdp_record_t *	(*create_record)(uint8_t chan, const char *svc_name);
- } profiles[] = {
- 	{
- 		.uuid = {
-@@ -127,6 +133,24 @@ static struct profile_info {
- 	}
- };
- 
-+static uint32_t sdp_service_register(struct profile_info *profile,
-+							const void *svc_name)
++static sdp_record_t *create_opp_record(uint8_t chan, const char *svc_name)
 +{
++	const char *service_name = "OBEX Object Push";
++	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
++	uuid_t root_uuid, opush_uuid, rfcomm_uuid, obex_uuid;
++	sdp_profile_desc_t profile[1];
++	sdp_list_t *aproto, *proto[2];
++	uint8_t formats[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0xff };
++	void *dtds[sizeof(formats)], *values[sizeof(formats)];
++	unsigned int i;
++	uint8_t dtd = SDP_UINT8;
++	sdp_data_t *sflist;
++	sdp_data_t *channel;
 +	sdp_record_t *record;
 +
-+	record = profile->create_record(profile->channel, svc_name);
++	record = sdp_record_alloc();
 +	if (!record)
-+		return 0;
++		return NULL;
 +
-+	if (bt_adapter_add_record(record, profile->svc_hint) < 0) {
-+		error("Failed to register on SDP record");
-+		sdp_record_free(record);
-+		return 0;
++	record->handle =  sdp_next_handle();
++
++	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
++	root = sdp_list_append(NULL, &root_uuid);
++	sdp_set_browse_groups(record, root);
++
++	sdp_uuid16_create(&opush_uuid, OBEX_OBJPUSH_SVCLASS_ID);
++	svclass_id = sdp_list_append(NULL, &opush_uuid);
++	sdp_set_service_classes(record, svclass_id);
++
++	sdp_uuid16_create(&profile[0].uuid, OBEX_OBJPUSH_PROFILE_ID);
++	profile[0].version = 0x0100;
++	pfseq = sdp_list_append(NULL, profile);
++	sdp_set_profile_descs(record, pfseq);
++
++	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
++	proto[0] = sdp_list_append(NULL, &rfcomm_uuid);
++	channel = sdp_data_alloc(SDP_UINT8, &chan);
++	proto[0] = sdp_list_append(proto[0], channel);
++	apseq = sdp_list_append(NULL, proto[0]);
++
++	sdp_uuid16_create(&obex_uuid, OBEX_UUID);
++	proto[1] = sdp_list_append(NULL, &obex_uuid);
++	apseq = sdp_list_append(apseq, proto[1]);
++
++	aproto = sdp_list_append(NULL, apseq);
++	sdp_set_access_protos(record, aproto);
++
++	for (i = 0; i < sizeof(formats); i++) {
++		dtds[i] = &dtd;
++		values[i] = &formats[i];
 +	}
++	sflist = sdp_seq_alloc(dtds, values, sizeof(formats));
++	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FORMATS_LIST, sflist);
 +
-+	return record->handle;
++	if (svc_name)
++		service_name = svc_name;
++
++	sdp_set_info_attr(record, service_name, NULL, NULL);
++
++	sdp_data_free(channel);
++	sdp_list_free(proto[0], NULL);
++	sdp_list_free(proto[1], NULL);
++	sdp_list_free(apseq, NULL);
++	sdp_list_free(pfseq, NULL);
++	sdp_list_free(aproto, NULL);
++	sdp_list_free(root, NULL);
++	sdp_list_free(svclass_id, NULL);
++
++	return record;
 +}
 +
- static int bt_sock_send_fd(int sock_fd, const void *buf, int len, int send_fd)
- {
- 	ssize_t ret;
-@@ -388,7 +412,7 @@ static int handle_listen(void *buf)
- 
- 	chan = profile->channel;
- 
--	DBG("rfcomm channel %d", chan);
-+	DBG("rfcomm channel %d svc_name %s", chan, cmd->name);
- 
- 	rfsock = create_rfsock(-1, &hal_fd);
- 	if (!rfsock)
-@@ -421,6 +445,8 @@ static int handle_listen(void *buf)
- 		return -1;
+ static struct profile_info {
+ 	uint8_t		uuid[16];
+ 	uint8_t		channel;
+@@ -129,7 +202,9 @@ static struct profile_info {
+ 			0x00, 0x00, 0x11, 0x05, 0x00, 0x00, 0x10, 0x00,
+ 			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
+ 		  },
+-		.channel = OPP_DEFAULT_CHANNEL
++		.channel = OPP_DEFAULT_CHANNEL,
++		.svc_hint = SVC_HINT_OBEX,
++		.create_record = create_opp_record
  	}
- 
-+	rfsock->service_handle = sdp_service_register(profile, cmd->name);
-+
- 	return hal_fd;
- }
+ };
  
 -- 
 1.8.3.2
