@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv7 08/14] android/socket: Add MAS uuid to profile table
-Date: Fri, 22 Nov 2013 10:34:49 +0200
-Message-Id: <1385109295-11445-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv7 14/14] android/socket: Refactor socket send_fd function
+Date: Fri, 22 Nov 2013 10:34:55 +0200
+Message-Id: <1385109295-11445-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1385109295-11445-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1385109295-11445-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,35 +11,43 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Make code cleaner and initialize local cmsg buffer to zeroes.
 ---
- android/socket.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ android/socket.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/android/socket.c b/android/socket.c
-index a652a11..fa1aa3c 100644
+index dbd2012..daf4370 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -47,6 +47,7 @@
+@@ -379,7 +379,7 @@ static int bt_sock_send_fd(int sock_fd, const void *buf, int len, int send_fd)
+ 	struct msghdr msg;
+ 	struct cmsghdr *cmsg;
+ 	struct iovec iv;
+-	char msgbuf[CMSG_SPACE(1)];
++	char cmsgbuf[CMSG_SPACE(sizeof(int))];
  
- #define OPP_DEFAULT_CHANNEL	9
- #define PBAP_DEFAULT_CHANNEL	15
-+#define MAS_DEFAULT_CHANNEL	16
+ 	DBG("len %d sock_fd %d send_fd %d", len, sock_fd, send_fd);
  
- #define SVC_HINT_OBEX 0x10
+@@ -387,13 +387,16 @@ static int bt_sock_send_fd(int sock_fd, const void *buf, int len, int send_fd)
+ 		return -1;
  
-@@ -205,6 +206,12 @@ static struct profile_info {
- 		.channel = OPP_DEFAULT_CHANNEL,
- 		.svc_hint = SVC_HINT_OBEX,
- 		.create_record = create_opp_record
-+	}, {
-+		.uuid = {
-+			0x00, 0x00, 0x11, 0x32, 0x00, 0x00, 0x10, 0x00,
-+			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
-+		},
-+		.channel = MAS_DEFAULT_CHANNEL
- 	}
- };
+ 	memset(&msg, 0, sizeof(msg));
++	memset(cmsgbuf, 0, sizeof(cmsgbuf));
++
++	msg.msg_control = cmsgbuf;
++	msg.msg_controllen = sizeof(cmsgbuf);
  
+-	msg.msg_control = msgbuf;
+-	msg.msg_controllen = sizeof(msgbuf);
+ 	cmsg = CMSG_FIRSTHDR(&msg);
+ 	cmsg->cmsg_level = SOL_SOCKET;
+ 	cmsg->cmsg_type = SCM_RIGHTS;
+ 	cmsg->cmsg_len = CMSG_LEN(sizeof(send_fd));
++
+ 	memcpy(CMSG_DATA(cmsg), &send_fd, sizeof(send_fd));
+ 
+ 	iv.iov_base = (unsigned char *) buf;
 -- 
 1.8.3.2
 
