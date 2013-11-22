@@ -1,63 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv7 00/14] Socket HAL
-Date: Fri, 22 Nov 2013 10:34:41 +0200
-Message-Id: <1385109295-11445-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv7 01/14] android/socket: Parse SDP response and connect
+Date: Fri, 22 Nov 2013 10:34:42 +0200
+Message-Id: <1385109295-11445-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1385109295-11445-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1385109295-11445-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This is initial code implementing socket HAL. OPP currently works with send/receive files. Probaly
-other profiles works as well, not tested yet.
+Parse SDP response, find RFCOMM channel and connect.
+---
+ android/socket.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
 
-Changes:
-	* v7: Rebase and fixing missing unref. All needed SDP records for supported profiles are created.
-	Support listen() with specified channel like in bluedroid.
-	* v6: Use watch_id to remove source and general cleanup
-	* v5: Changed uuid_to_chan table to profile table keeping information about profile like: channel, create_record,
-	svc_hint and sec_level.
-	* v4: Changed name rfslot -> rfsock following Johan's comment and other cosmetic changes, fixed one bug in SDP
-	record, use NULL instead of 0 for sdp functions.
-	* v3: Fixed coding style with write/send between file descriptors.
-	* v2: Following Marcel comments changed way copying between file descriptors works, added SDP record
-	for OPP and now it is possible to send files through GUI. Merged one patch with structures with actual user.
-	* v1: Rebased and use static src address, hal_fd removed from structure and closed after sent to framework,
-	added connect calls and SDP parsing, added cleanup_rfcomm function, minor fixes.
-	* RFC Initial
-
-TODO:
-	* Use sec_level / check what to do with Android supplied security flags.
-	* Use splice() (requires bionic change first)
-
-For tracking rfcomm sockets I use structure rfslot which has following
-fields:
- - real_sock - real RFCOMM socket
- - fd - fd to communicate with Android framework
-
-create_rfslot sets hal_fd which is fd passed to Android framework with CMSG
-
-Andrei Emeltchenko (14):
-  android/socket: Parse SDP response and connect
-  android/socket: Implement HAL connect call
-  android/socket: Send RFCOMM channel to framework
-  android/socket: Send connect signal to Android framework
-  android/socket: Close file descriptor after sending
-  android/socket: Add general service create/remove function
-  android/socket: Add OPP SDP record
-  android/socket: Add MAS uuid to profile table
-  android/socket: Add SPP uuid to profile table
-  android/socket: Add PBAP SDP record
-  android/socket: Add SPP SDP record
-  android/socket: Support listen() with supplied chan number
-  android/hal-sock: Print bdaddr on connect
-  android/socket: Refactor socket send_fd function
-
- android/hal-sock.c |   4 +-
- android/socket.c   | 418 +++++++++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 408 insertions(+), 14 deletions(-)
-
+diff --git a/android/socket.c b/android/socket.c
+index 1815367..59cba67 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -424,9 +424,74 @@ static int handle_listen(void *buf)
+ 	return hal_fd;
+ }
+ 
++static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
++{
++}
++
+ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ {
++	struct rfcomm_sock *rfsock = data;
++	GError *gerr = NULL;
++	sdp_list_t *list;
++	GIOChannel *io;
++	int chan;
++
+ 	DBG("");
++
++	if (err < 0) {
++		error("Unable to get SDP record: %s", strerror(-err));
++		goto fail;
++	}
++
++	if (!recs || !recs->data) {
++		error("No SDP records found");
++		goto fail;
++	}
++
++	for (list = recs; list != NULL; list = list->next) {
++		sdp_record_t *rec = list->data;
++		sdp_list_t *protos;
++
++		if (sdp_get_access_protos(rec, &protos) < 0) {
++			error("Unable to get proto list");
++			goto fail;
++		}
++
++		chan = sdp_get_proto_port(protos, RFCOMM_UUID);
++
++		sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free,
++									NULL);
++		sdp_list_free(protos, NULL);
++	}
++
++	if (chan <= 0) {
++		error("Could not get RFCOMM channel %d", chan);
++		goto fail;
++	}
++
++	DBG("Got RFCOMM channel %d", chan);
++
++	io = bt_io_connect(connect_cb, rfsock, NULL, &gerr,
++				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
++				BT_IO_OPT_DEST_BDADDR, &rfsock->dst,
++				BT_IO_OPT_CHANNEL, chan,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
++				BT_IO_OPT_INVALID);
++	if (!io) {
++		error("Failed connect: %s", gerr->message);
++		g_error_free(gerr);
++		goto fail;
++	}
++
++	rfsock->real_sock = g_io_channel_unix_get_fd(io);
++	rfsock->channel = chan;
++	connections = g_list_append(connections, rfsock);
++
++	g_io_channel_unref(io);
++
++	return;
++fail:
++	cleanup_rfsock(rfsock);
+ }
+ 
+ static int handle_connect(void *buf)
 -- 
 1.8.3.2
 
