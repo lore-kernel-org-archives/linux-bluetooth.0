@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv8 13/15] android/hal-sock: Print bdaddr on connect
-Date: Mon, 25 Nov 2013 11:44:56 +0200
-Message-Id: <1385372698-16212-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv8 14/15] android/socket: Refactor socket send_fd function
+Date: Mon, 25 Nov 2013 11:44:57 +0200
+Message-Id: <1385372698-16212-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1385372698-16212-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1385372698-16212-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,25 +11,43 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Make code cleaner and initialize local cmsg buffer to zeroes.
 ---
- android/hal-sock.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ android/socket.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/android/hal-sock.c b/android/hal-sock.c
-index bd88ad8..e02a49a 100644
---- a/android/hal-sock.c
-+++ b/android/hal-sock.c
-@@ -82,8 +82,8 @@ static bt_status_t sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
- 		return BT_STATUS_PARM_INVALID;
- 	}
+diff --git a/android/socket.c b/android/socket.c
+index 5f89f2c..22472b9 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -394,7 +394,7 @@ static int bt_sock_send_fd(int sock_fd, const void *buf, int len, int send_fd)
+ 	struct msghdr msg;
+ 	struct cmsghdr *cmsg;
+ 	struct iovec iv;
+-	char msgbuf[CMSG_SPACE(1)];
++	char cmsgbuf[CMSG_SPACE(sizeof(int))];
  
--	DBG("uuid %s chan %d sock %p type %d flags 0x%02x",
--		btuuid2str(uuid), chan, sock, type, flags);
-+	DBG("bdaddr %s uuid %s chan %d sock %p type %d flags 0x%02x",
-+		bdaddr2str(bdaddr), btuuid2str(uuid), chan, sock, type, flags);
+ 	DBG("len %d sock_fd %d send_fd %d", len, sock_fd, send_fd);
  
- 	if (type != BTSOCK_RFCOMM) {
- 		error("Socket type %u not supported", type);
+@@ -402,13 +402,16 @@ static int bt_sock_send_fd(int sock_fd, const void *buf, int len, int send_fd)
+ 		return -1;
+ 
+ 	memset(&msg, 0, sizeof(msg));
++	memset(cmsgbuf, 0, sizeof(cmsgbuf));
++
++	msg.msg_control = cmsgbuf;
++	msg.msg_controllen = sizeof(cmsgbuf);
+ 
+-	msg.msg_control = msgbuf;
+-	msg.msg_controllen = sizeof(msgbuf);
+ 	cmsg = CMSG_FIRSTHDR(&msg);
+ 	cmsg->cmsg_level = SOL_SOCKET;
+ 	cmsg->cmsg_type = SCM_RIGHTS;
+ 	cmsg->cmsg_len = CMSG_LEN(sizeof(send_fd));
++
+ 	memcpy(CMSG_DATA(cmsg), &send_fd, sizeof(send_fd));
+ 
+ 	iv.iov_base = (unsigned char *) buf;
 -- 
 1.8.3.2
 
