@@ -1,35 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] sdptool: Fix memory leaks creating PBAP record
-Date: Mon, 25 Nov 2013 15:14:44 +0200
-Message-Id: <1385385285-30592-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1385385285-30592-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1385385285-30592-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH BlueZ 00/19] Initial AVDTP for Android
+Date: Mon, 25 Nov 2013 15:10:51 +0200
+Message-Id: <1385385070-21010-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
----
- tools/sdptool.c | 3 +++
- 1 file changed, 3 insertions(+)
+The code is based on the current implementation available in
+profiles/audio/avdtp.{c,h} but it is transport agnostic and does not
+contain any external dependency except glib for IO handling.
 
-diff --git a/tools/sdptool.c b/tools/sdptool.c
-index 78dc281..6682612 100644
---- a/tools/sdptool.c
-+++ b/tools/sdptool.c
-@@ -1888,7 +1888,10 @@ end:
- 	sdp_list_free(proto[1], 0);
- 	sdp_list_free(proto[2], 0);
- 	sdp_list_free(apseq, 0);
-+	sdp_list_free(pfseq, 0);
- 	sdp_list_free(aproto, 0);
-+	sdp_list_free(root, 0);
-+	sdp_list_free(svclass_id, 0);
- 
- 	return ret;
- }
+Both the signaling and the transport connection has to be handled by
+the upper layer, that is why it is not modified in place to avoid
+breaking current implemention until this work is considered stable.
+
+Two new function are added:
+
+  - avdtp_new: Creates AVDTP session and attach signaling transport
+  - avdtp_stream_set_transport: Set stream transport
+
+Both receives a fd as parameter so in future it should be possible to
+replace the IO handling.
+
+This set also includes a initial test set based on the current AVDTP
+test specification, once merged more tests will be added as well,
+then the intent is to make this used by audio plugin.
+
+Luiz Augusto von Dentz (19):
+  android: Add initial AVDTP code
+  unit/AVDTP: Add /TP/SIG/SMG/BV-05-C test
+  unit/AVDTP: Add /TP/SIG/SMG/BV-06-C test
+  unit/AVDTP: Add /TP/SIG/SMG/BV-07-C test
+  unit/AVDTP: Add /TP/SIG/SMG/BV-08-C test
+  unit/AVDTP: Add /TP/SIG/SMG/BV-09-C test
+  unit/AVDTP: Add /TP/SIG/SMG/BV-10-C test
+  unit/AVDTP: Add /TP/SIG/SMG/BV-11-C test
+  unit/AVDTP: Add /TP/SIG/SMG/BV-12-C test
+  unit/AVDTP: Add /TP/SIG/SMG/BV-15-C test
+  unit/AVDTP: Add /TP/SIG/SMG/BV-16-C test
+  unit/AVDTP: Add /TP/SIG/SMG/BV-17-C test
+  unit/AVDTP: Add /TP/SIG/SMG/BV-18-C test
+  unit/AVDTP: Add /TP/SIG/SMG/BV-19-C test
+  unit/AVDTP: Add /TP/SIG/SMG/BV-20-C test
+  unit/AVDTP: Add /TP/SIG/SMG/BV-21-C test
+  unit/AVDTP: Add /TP/SIG/SMG/BV-22-C test
+  unit/AVDTP: Add /TP/SIG/SMG/BV-23-C test
+  unit/AVDTP: Add /TP/SIG/SMG/BV-24-C test
+
+ Makefile.am         |    8 +
+ android/Makefile.am |    1 +
+ android/a2dp.c      |   21 +
+ android/avdtp.c     | 3257 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/avdtp.h     |  276 +++++
+ unit/test-avdtp.c   |  616 ++++++++++
+ 6 files changed, 4179 insertions(+)
+ create mode 100644 android/avdtp.c
+ create mode 100644 android/avdtp.h
+ create mode 100644 unit/test-avdtp.c
+
 -- 
-1.8.3.2
+1.8.3.1
 
