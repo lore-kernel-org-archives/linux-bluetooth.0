@@ -1,66 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 00/19] Initial AVDTP for Android
-Date: Mon, 25 Nov 2013 15:10:51 +0200
-Message-Id: <1385385070-21010-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 19/19] unit/AVDTP: Add /TP/SIG/SMG/BV-24-C test
+Date: Mon, 25 Nov 2013 15:11:10 +0200
+Message-Id: <1385385070-21010-20-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1385385070-21010-1-git-send-email-luiz.dentz@gmail.com>
+References: <1385385070-21010-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The code is based on the current implementation available in
-profiles/audio/avdtp.{c,h} but it is transport agnostic and does not
-contain any external dependency except glib for IO handling.
+Verify that the IUT (ACP) is able to accept a command to abort a stream.
+---
+ unit/test-avdtp.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-Both the signaling and the transport connection has to be handled by
-the upper layer, that is why it is not modified in place to avoid
-breaking current implemention until this work is considered stable.
-
-Two new function are added:
-
-  - avdtp_new: Creates AVDTP session and attach signaling transport
-  - avdtp_stream_set_transport: Set stream transport
-
-Both receives a fd as parameter so in future it should be possible to
-replace the IO handling.
-
-This set also includes a initial test set based on the current AVDTP
-test specification, once merged more tests will be added as well,
-then the intent is to make this used by audio plugin.
-
-Luiz Augusto von Dentz (19):
-  android: Add initial AVDTP code
-  unit/AVDTP: Add /TP/SIG/SMG/BV-05-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-06-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-07-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-08-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-09-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-10-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-11-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-12-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-15-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-16-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-17-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-18-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-19-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-20-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-21-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-22-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-23-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-24-C test
-
- Makefile.am         |    8 +
- android/Makefile.am |    1 +
- android/a2dp.c      |   21 +
- android/avdtp.c     | 3257 +++++++++++++++++++++++++++++++++++++++++++++++++++
- android/avdtp.h     |  276 +++++
- unit/test-avdtp.c   |  616 ++++++++++
- 6 files changed, 4179 insertions(+)
- create mode 100644 android/avdtp.c
- create mode 100644 android/avdtp.h
- create mode 100644 unit/test-avdtp.c
-
+diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
+index 949d998..065dc07 100644
+--- a/unit/test-avdtp.c
++++ b/unit/test-avdtp.c
+@@ -596,6 +596,17 @@ int main(int argc, char *argv[])
+ 				0x00, 0x00, 0x21, 0x02, 0x02, 0x20),
+ 			raw_pdu(0x12, 0x03),
+ 			raw_pdu(0x20, 0x0a, 0x04));
++	define_test("/TP/SIG/SMG/BV-24-C", test_server,
++			raw_pdu(0x00, 0x01),
++			raw_pdu(0x02, 0x01, 0x04, 0x00),
++			raw_pdu(0x10, 0x02, 0x04),
++			raw_pdu(0x12, 0x02, 0x01, 0x00, 0x07, 0x06, 0x00, 0x00,
++				0xff, 0xff, 0x02, 0x40),
++			raw_pdu(0x20, 0x03, 0x04, 0x04, 0x01, 0x00, 0x07, 0x06,
++				0x00, 0x00, 0x21, 0x02, 0x02, 0x20),
++			raw_pdu(0x22, 0x03),
++			raw_pdu(0x30, 0x0a, 0x04),
++			raw_pdu(0x32, 0x0a));
+ 
+ 	return g_test_run();
+ }
 -- 
 1.8.3.1
 
