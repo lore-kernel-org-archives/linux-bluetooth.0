@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv9 14/21] android/socket: Refactor socket send_fd function
-Date: Mon, 25 Nov 2013 15:08:50 +0200
-Message-Id: <1385384937-29858-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv9 06/21] android/socket: Add general service create/remove function
+Date: Mon, 25 Nov 2013 15:08:42 +0200
+Message-Id: <1385384937-29858-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1385384937-29858-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1385384937-29858-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,43 +11,99 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Make code cleaner and initialize local cmsg buffer to zeroes.
+create_record function from profile is used to create SDP service record.
+The record is removed from rfsock cleanup function.
 ---
- android/socket.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ android/socket.c | 33 +++++++++++++++++++++++++++++++--
+ 1 file changed, 31 insertions(+), 2 deletions(-)
 
 diff --git a/android/socket.c b/android/socket.c
-index 9ed8ea6..0fbf0f0 100644
+index 9f8c535..740907b 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -397,7 +397,7 @@ static int bt_sock_send_fd(int sock_fd, const void *buf, int len, int send_fd)
- 	struct msghdr msg;
- 	struct cmsghdr *cmsg;
- 	struct iovec iv;
--	char msgbuf[CMSG_SPACE(1)];
-+	char cmsgbuf[CMSG_SPACE(sizeof(int))];
+@@ -35,7 +35,9 @@
+ #include "lib/sdp.h"
+ #include "lib/sdp_lib.h"
+ #include "src/sdp-client.h"
++#include "src/sdpd.h"
  
- 	DBG("len %d sock_fd %d send_fd %d", len, sock_fd, send_fd);
++#include "bluetooth.h"
+ #include "log.h"
+ #include "hal-msg.h"
+ #include "hal-ipc.h"
+@@ -63,6 +65,7 @@ struct rfcomm_sock {
+ 	guint stack_watch;
  
-@@ -405,13 +405,16 @@ static int bt_sock_send_fd(int sock_fd, const void *buf, int len, int send_fd)
+ 	bdaddr_t dst;
++	uint32_t service_handle;
+ };
+ 
+ static struct rfcomm_sock *create_rfsock(int sock, int *hal_fd)
+@@ -102,6 +105,9 @@ static void cleanup_rfsock(struct rfcomm_sock *rfsock)
+ 		if (!g_source_remove(rfsock->stack_watch))
+ 			error("stack_watch source was not found");
+ 
++	if (rfsock->service_handle)
++		bt_adapter_remove_record(rfsock->service_handle);
++
+ 	g_free(rfsock);
+ }
+ 
+@@ -110,7 +116,7 @@ static struct profile_info {
+ 	uint8_t		channel;
+ 	uint8_t		svc_hint;
+ 	BtIOSecLevel	sec_level;
+-	sdp_record_t *	(*create_record)(uint8_t chan);
++	sdp_record_t *	(*create_record)(uint8_t chan, const char *svc_name);
+ } profiles[] = {
+ 	{
+ 		.uuid = {
+@@ -127,6 +133,27 @@ static struct profile_info {
+ 	}
+ };
+ 
++static uint32_t sdp_service_register(struct profile_info *profile,
++							const void *svc_name)
++{
++	sdp_record_t *record;
++
++	if (!profile || !profile->create_record)
++		return 0;
++
++	record = profile->create_record(profile->channel, svc_name);
++	if (!record)
++		return 0;
++
++	if (bt_adapter_add_record(record, profile->svc_hint) < 0) {
++		error("Failed to register on SDP record");
++		sdp_record_free(record);
++		return 0;
++	}
++
++	return record->handle;
++}
++
+ static int bt_sock_send_fd(int sock_fd, const void *buf, int len, int send_fd)
+ {
+ 	ssize_t ret;
+@@ -388,7 +415,7 @@ static int handle_listen(void *buf)
+ 
+ 	chan = profile->channel;
+ 
+-	DBG("rfcomm channel %d", chan);
++	DBG("rfcomm channel %d svc_name %s", chan, cmd->name);
+ 
+ 	rfsock = create_rfsock(-1, &hal_fd);
+ 	if (!rfsock)
+@@ -421,6 +448,8 @@ static int handle_listen(void *buf)
  		return -1;
+ 	}
  
- 	memset(&msg, 0, sizeof(msg));
-+	memset(cmsgbuf, 0, sizeof(cmsgbuf));
++	rfsock->service_handle = sdp_service_register(profile, cmd->name);
 +
-+	msg.msg_control = cmsgbuf;
-+	msg.msg_controllen = sizeof(cmsgbuf);
+ 	return hal_fd;
+ }
  
--	msg.msg_control = msgbuf;
--	msg.msg_controllen = sizeof(msgbuf);
- 	cmsg = CMSG_FIRSTHDR(&msg);
- 	cmsg->cmsg_level = SOL_SOCKET;
- 	cmsg->cmsg_type = SCM_RIGHTS;
- 	cmsg->cmsg_len = CMSG_LEN(sizeof(send_fd));
-+
- 	memcpy(CMSG_DATA(cmsg), &send_fd, sizeof(send_fd));
- 
- 	iv.iov_base = (unsigned char *) buf;
 -- 
 1.8.3.2
 
