@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv9 01/21] android/socket: Parse SDP response and connect
-Date: Mon, 25 Nov 2013 15:08:37 +0200
-Message-Id: <1385384937-29858-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv9 07/21] android/socket: Add OPP SDP record
+Date: Mon, 25 Nov 2013 15:08:43 +0200
+Message-Id: <1385384937-29858-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1385384937-29858-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1385384937-29858-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,93 +11,130 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Parse SDP response, find RFCOMM channel and connect.
+This adds SDP record for OPP shown below:
+
+Service Name: OBEX Object Push
+Service RecHandle: 0x10002
+Service Class ID List:
+  "OBEX Object Push" (0x1105)
+Protocol Descriptor List:
+  "RFCOMM" (0x0003)
+    Channel: 9
+  "OBEX" (0x0008)
+Profile Descriptor List:
+  "OBEX Object Push" (0x1105)
+    Version: 0x0100
 ---
- android/socket.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 68 insertions(+)
+ android/socket.c | 82 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 81 insertions(+), 1 deletion(-)
 
 diff --git a/android/socket.c b/android/socket.c
-index 1815367..cd958d9 100644
+index 740907b..64f54e4 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -424,9 +424,77 @@ static int handle_listen(void *buf)
- 	return hal_fd;
+@@ -48,6 +48,8 @@
+ #define OPP_DEFAULT_CHANNEL	9
+ #define PBAP_DEFAULT_CHANNEL	15
+ 
++#define SVC_HINT_OBEX 0x10
++
+ static bdaddr_t adapter_addr;
+ 
+ /* Simple list of RFCOMM server sockets */
+@@ -111,6 +113,82 @@ static void cleanup_rfsock(struct rfcomm_sock *rfsock)
+ 	g_free(rfsock);
  }
  
-+static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
++static sdp_record_t *create_opp_record(uint8_t chan, const char *svc_name)
 +{
++	const char *service_name = "OBEX Object Push";
++	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
++	uuid_t root_uuid, opush_uuid, l2cap_uuid, rfcomm_uuid, obex_uuid;
++	sdp_profile_desc_t profile[1];
++	sdp_list_t *aproto, *proto[3];
++	uint8_t formats[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0xff };
++	void *dtds[sizeof(formats)], *values[sizeof(formats)];
++	unsigned int i;
++	uint8_t dtd = SDP_UINT8;
++	sdp_data_t *sflist;
++	sdp_data_t *channel;
++	sdp_record_t *record;
++
++	record = sdp_record_alloc();
++	if (!record)
++		return NULL;
++
++	record->handle =  sdp_next_handle();
++
++	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
++	root = sdp_list_append(NULL, &root_uuid);
++	sdp_set_browse_groups(record, root);
++
++	sdp_uuid16_create(&opush_uuid, OBEX_OBJPUSH_SVCLASS_ID);
++	svclass_id = sdp_list_append(NULL, &opush_uuid);
++	sdp_set_service_classes(record, svclass_id);
++
++	sdp_uuid16_create(&profile[0].uuid, OBEX_OBJPUSH_PROFILE_ID);
++	profile[0].version = 0x0100;
++	pfseq = sdp_list_append(NULL, profile);
++	sdp_set_profile_descs(record, pfseq);
++
++	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
++	proto[0] = sdp_list_append(NULL, &l2cap_uuid);
++	apseq = sdp_list_append(NULL, proto[0]);
++
++	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
++	proto[1] = sdp_list_append(NULL, &rfcomm_uuid);
++	channel = sdp_data_alloc(SDP_UINT8, &chan);
++	proto[1] = sdp_list_append(proto[1], channel);
++	apseq = sdp_list_append(apseq, proto[1]);
++
++	sdp_uuid16_create(&obex_uuid, OBEX_UUID);
++	proto[2] = sdp_list_append(NULL, &obex_uuid);
++	apseq = sdp_list_append(apseq, proto[2]);
++
++	aproto = sdp_list_append(NULL, apseq);
++	sdp_set_access_protos(record, aproto);
++
++	for (i = 0; i < sizeof(formats); i++) {
++		dtds[i] = &dtd;
++		values[i] = &formats[i];
++	}
++	sflist = sdp_seq_alloc(dtds, values, sizeof(formats));
++	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FORMATS_LIST, sflist);
++
++	if (svc_name)
++		service_name = svc_name;
++
++	sdp_set_info_attr(record, service_name, NULL, NULL);
++
++	sdp_data_free(channel);
++	sdp_list_free(proto[0], NULL);
++	sdp_list_free(proto[1], NULL);
++	sdp_list_free(proto[2], NULL);
++	sdp_list_free(apseq, NULL);
++	sdp_list_free(pfseq, NULL);
++	sdp_list_free(aproto, NULL);
++	sdp_list_free(root, NULL);
++	sdp_list_free(svclass_id, NULL);
++
++	return record;
 +}
 +
- static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
- {
-+	struct rfcomm_sock *rfsock = data;
-+	GError *gerr = NULL;
-+	sdp_list_t *list;
-+	GIOChannel *io;
-+	int chan;
-+
- 	DBG("");
-+
-+	if (err < 0) {
-+		error("Unable to get SDP record: %s", strerror(-err));
-+		goto fail;
-+	}
-+
-+	if (!recs || !recs->data) {
-+		error("No SDP records found");
-+		goto fail;
-+	}
-+
-+	for (list = recs; list != NULL; list = list->next) {
-+		sdp_record_t *rec = list->data;
-+		sdp_list_t *protos;
-+
-+		if (sdp_get_access_protos(rec, &protos) < 0) {
-+			error("Unable to get proto list");
-+			goto fail;
-+		}
-+
-+		chan = sdp_get_proto_port(protos, RFCOMM_UUID);
-+
-+		sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free,
-+									NULL);
-+		sdp_list_free(protos, NULL);
-+
-+		if (chan)
-+			break;
-+	}
-+
-+	if (chan <= 0) {
-+		error("Could not get RFCOMM channel %d", chan);
-+		goto fail;
-+	}
-+
-+	DBG("Got RFCOMM channel %d", chan);
-+
-+	io = bt_io_connect(connect_cb, rfsock, NULL, &gerr,
-+				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
-+				BT_IO_OPT_DEST_BDADDR, &rfsock->dst,
-+				BT_IO_OPT_CHANNEL, chan,
-+				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-+				BT_IO_OPT_INVALID);
-+	if (!io) {
-+		error("Failed connect: %s", gerr->message);
-+		g_error_free(gerr);
-+		goto fail;
-+	}
-+
-+	rfsock->real_sock = g_io_channel_unix_get_fd(io);
-+	rfsock->channel = chan;
-+	connections = g_list_append(connections, rfsock);
-+
-+	g_io_channel_unref(io);
-+
-+	return;
-+fail:
-+	cleanup_rfsock(rfsock);
- }
+ static struct profile_info {
+ 	uint8_t		uuid[16];
+ 	uint8_t		channel;
+@@ -129,7 +207,9 @@ static struct profile_info {
+ 			0x00, 0x00, 0x11, 0x05, 0x00, 0x00, 0x10, 0x00,
+ 			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
+ 		  },
+-		.channel = OPP_DEFAULT_CHANNEL
++		.channel = OPP_DEFAULT_CHANNEL,
++		.svc_hint = SVC_HINT_OBEX,
++		.create_record = create_opp_record
+ 	}
+ };
  
- static int handle_connect(void *buf)
 -- 
 1.8.3.2
 
