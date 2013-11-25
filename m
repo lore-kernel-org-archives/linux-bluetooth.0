@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 06/19] unit/AVDTP: Add /TP/SIG/SMG/BV-09-C test
-Date: Mon, 25 Nov 2013 15:10:57 +0200
-Message-Id: <1385385070-21010-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 12/19] unit/AVDTP: Add /TP/SIG/SMG/BV-17-C test
+Date: Mon, 25 Nov 2013 15:11:03 +0200
+Message-Id: <1385385070-21010-13-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1385385070-21010-1-git-send-email-luiz.dentz@gmail.com>
 References: <1385385070-21010-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,75 +11,58 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Verify that the IUT (INT) is able to issue a valid set configuration
-command for remote SEP and reports the replied confirmation.
+Verify that the IUT (INT) is able to start a streaming procedure after
+the stream establishment is complete, by issuing the AVDTP_START_CMD,
+reporting the replied confirmation and streaming packets.
 ---
- unit/test-avdtp.c | 68 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 68 insertions(+)
+ unit/test-avdtp.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 54 insertions(+)
 
 diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
-index 0b92489..b0991d9 100644
+index 2bf782c..7d2c7bc 100644
 --- a/unit/test-avdtp.c
 +++ b/unit/test-avdtp.c
-@@ -71,6 +71,7 @@ struct test_data {
- struct context {
- 	GMainLoop *main_loop;
- 	struct avdtp *session;
-+	struct avdtp_local_sep *sep;
- 	guint source;
- 	int fd;
- 	int mtu;
-@@ -252,7 +253,45 @@ static void test_server(gconstpointer data)
- static void discover_cb(struct avdtp *session, GSList *seps,
- 				struct avdtp_error *err, void *user_data)
- {
-+	struct context *context = user_data;
-+	struct avdtp_stream *stream;
-+	struct avdtp_remote_sep *rsep;
-+	struct avdtp_service_capability *media_transport, *media_codec;
-+	struct avdtp_media_codec_capability *cap;
-+	GSList *caps;
-+	uint8_t data[4] = { 0x21, 0x02, 2, 32 };
-+	int ret;
-+
-+	if (!context)
-+		return;
-+
-+	g_assert(err == NULL);
-+	g_assert_cmpint(g_slist_length(seps), !=, 0);
-+
-+	rsep = avdtp_find_remote_sep(session, context->sep);
-+	g_assert(rsep != NULL);
-+
-+	media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
-+						NULL, 0);
-+
-+	caps = g_slist_append(NULL, media_transport);
-+
-+	cap = g_malloc0(sizeof(*cap) + sizeof(data));
-+	cap->media_type = AVDTP_MEDIA_TYPE_AUDIO;
-+	cap->media_codec_type = 0x00;
-+	memcpy(cap->data, data, sizeof(data));
+@@ -30,6 +30,7 @@
+ #include <stdbool.h>
+ #include <inttypes.h>
+ #include <string.h>
++#include <fcntl.h>
+ #include <sys/socket.h>
  
-+	media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, cap,
-+						sizeof(*cap) + sizeof(data));
-+
-+	caps = g_slist_append(caps, media_codec);
-+	g_free(cap);
-+
-+	ret = avdtp_set_configuration(session, rsep, context->sep, caps,
-+								&stream);
-+	g_assert_cmpint(ret, ==, 0);
-+
-+	g_slist_free_full(caps, g_free);
+ #include <glib.h>
+@@ -262,8 +263,27 @@ static void sep_setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+ 	g_assert_cmpint(ret, ==, 0);
  }
  
- static void test_discover(gconstpointer data)
-@@ -283,6 +322,27 @@ static void test_get_capabilities(gconstpointer data)
++static void sep_open_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++			struct avdtp_stream *stream, struct avdtp_error *err,
++			void *user_data)
++{
++	int ret;
++
++	g_assert(err == NULL);
++
++	ret = open("/dev/null", O_RDWR, 0);
++	if (ret < 0)
++		g_assert_not_reached();
++
++	avdtp_stream_set_transport(stream, ret, 672, 672);
++
++	ret = avdtp_start(session, stream);
++	g_assert_cmpint(ret, ==, 0);
++}
++
+ static struct avdtp_sep_cfm sep_cfm = {
+ 	.set_configuration	= sep_setconf_cfm,
++	.open			= sep_open_cfm,
+ };
+ 
+ static void test_server(gconstpointer data)
+@@ -423,6 +443,28 @@ static void test_open(gconstpointer data)
  	g_free(test->pdu_list);
  }
  
-+static void test_set_configuration(gconstpointer data)
++static void test_start(gconstpointer data)
 +{
 +	const struct test_data *test = data;
 +	struct context *context = create_context(0x0100);
@@ -88,7 +71,8 @@ index 0b92489..b0991d9 100644
 +	context->pdu_list = test->pdu_list;
 +
 +	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK, AVDTP_MEDIA_TYPE_AUDIO,
-+					0x00, FALSE, NULL, NULL, NULL);
++					0x00, FALSE, NULL, &sep_cfm,
++					context);
 +	context->sep = sep;
 +
 +	avdtp_discover(context->session, discover_cb, context);
@@ -103,18 +87,22 @@ index 0b92489..b0991d9 100644
  int main(int argc, char *argv[])
  {
  	g_test_init(&argc, &argv, NULL);
-@@ -311,6 +371,14 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x10, 0x02, 0x04),
- 			raw_pdu(0x12, 0x02, 0x01, 0x00, 0x07, 0x06, 0x00, 0x00,
- 				0xff, 0xff, 0x02, 0x40));
-+	define_test("/TP/SIG/SMG/BV-09-C", test_set_configuration,
-+			raw_pdu(0x30, 0x01),
-+			raw_pdu(0x32, 0x01, 0x04, 0x00),
-+			raw_pdu(0x40, 0x02, 0x04),
-+			raw_pdu(0x42, 0x02, 0x01, 0x00, 0x07, 0x06, 0x00, 0x00,
+@@ -511,6 +553,18 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x22, 0x03),
+ 			raw_pdu(0x30, 0x06, 0x04),
+ 			raw_pdu(0x32, 0x06));
++	define_test("/TP/SIG/SMG/BV-17-C", test_start,
++			raw_pdu(0xe0, 0x01),
++			raw_pdu(0xe2, 0x01, 0x04, 0x00),
++			raw_pdu(0xf0, 0x02, 0x04),
++			raw_pdu(0xf2, 0x02, 0x01, 0x00, 0x07, 0x06, 0x00, 0x00,
 +				0xff, 0xff, 0x02, 0x40),
-+			raw_pdu(0x50, 0x03, 0x04, 0x04, 0x01, 0x00, 0x07, 0x06,
-+				0x00, 0x00, 0x21, 0x02, 0x02, 0x20));
++			raw_pdu(0x00, 0x03, 0x04, 0x04, 0x01, 0x00, 0x07, 0x06,
++				0x00, 0x00, 0x21, 0x02, 0x02, 0x20),
++			raw_pdu(0x02, 0x03),
++			raw_pdu(0x10, 0x06, 0x04),
++			raw_pdu(0x12, 0x06),
++			raw_pdu(0x20, 0x07, 0x04));
  
  	return g_test_run();
  }
