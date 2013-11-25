@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv9 18/21] android/socket: Use security level for connect
-Date: Mon, 25 Nov 2013 15:08:54 +0200
-Message-Id: <1385384937-29858-19-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv9 20/21] android/socket: Handle Android events for server socket
+Date: Mon, 25 Nov 2013 15:08:56 +0200
+Message-Id: <1385384937-29858-21-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1385384937-29858-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1385384937-29858-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,68 +11,63 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Use low security level for connections without profile and default
-sec_level for others. rfsock now has pointer to profile info for
-outcoming connections.
+Add watch for tracking events from Android framework for server socket.
 ---
- android/socket.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ android/socket.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
 
 diff --git a/android/socket.c b/android/socket.c
-index db47667..6f2c498 100644
+index 93b3d48..03b6d6d 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -60,6 +60,8 @@ GList *servers = NULL;
- /* Simple list of RFCOMM connected sockets */
- GList *connections = NULL;
+@@ -596,6 +596,24 @@ static bool sock_send_accept(struct rfcomm_sock *rfsock, bdaddr_t *bdaddr,
+ 	return true;
+ }
  
-+struct profile_info;
++static gboolean sock_server_stack_event_cb(GIOChannel *io, GIOCondition cond,
++								gpointer data)
++{
++	struct rfcomm_sock *rfsock = data;
 +
- struct rfcomm_sock {
- 	int fd;		/* descriptor for communication with Java framework */
- 	int real_sock;	/* real RFCOMM socket */
-@@ -70,6 +72,8 @@ struct rfcomm_sock {
- 
- 	bdaddr_t dst;
- 	uint32_t service_handle;
++	DBG("");
 +
-+	struct profile_info *profile;
- };
- 
- static struct rfcomm_sock *create_rfsock(int sock, int *hal_fd)
-@@ -786,6 +790,7 @@ fail:
- static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
++	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
++		error("Socket error: sock %d cond %d",
++					g_io_channel_unix_get_fd(io), cond);
++		cleanup_rfsock(rfsock);
++
++		return FALSE;
++	}
++
++	return TRUE;
++}
++
+ static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
  {
- 	struct rfcomm_sock *rfsock = data;
-+	BtIOSecLevel sec_level = BT_IO_SEC_LOW;
- 	GError *gerr = NULL;
- 	sdp_list_t *list;
- 	GIOChannel *io;
-@@ -829,11 +834,14 @@ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ 	struct rfcomm_sock *rfsock = user_data;
+@@ -665,7 +683,8 @@ static int handle_listen(void *buf)
+ 	struct profile_info *profile;
+ 	struct rfcomm_sock *rfsock;
+ 	BtIOSecLevel sec_level;
+-	GIOChannel *io;
++	GIOChannel *io, *io_stack;
++	GIOCondition cond;
+ 	GError *err = NULL;
+ 	int hal_fd;
+ 	int chan;
+@@ -708,6 +727,12 @@ static int handle_listen(void *buf)
  
- 	DBG("Got RFCOMM channel %d", chan);
+ 	rfsock->srv_io = io;
  
-+	if (rfsock->profile)
-+		sec_level = rfsock->profile->sec_level;
++	/* Handle events from Android */
++	cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
++	io_stack = g_io_channel_unix_new(rfsock->fd);
++	g_io_add_watch(io_stack, cond, sock_server_stack_event_cb, rfsock);
++	g_io_channel_unref(io_stack);
 +
- 	io = bt_io_connect(connect_cb, rfsock, NULL, &gerr,
- 				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
- 				BT_IO_OPT_DEST_BDADDR, &rfsock->dst,
- 				BT_IO_OPT_CHANNEL, chan,
--				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-+				BT_IO_OPT_SEC_LEVEL, sec_level,
- 				BT_IO_OPT_INVALID);
- 	if (!io) {
- 		error("Failed connect: %s", gerr->message);
-@@ -875,6 +883,8 @@ static int handle_connect(void *buf)
- 	uuid.type = SDP_UUID128;
- 	memcpy(&uuid.value.uuid128, cmd->uuid, sizeof(uint128_t));
+ 	DBG("real_sock %d fd %d hal_fd %d", rfsock->real_sock, rfsock->fd,
+ 								hal_fd);
  
-+	rfsock->profile = get_profile_by_uuid(cmd->uuid);
-+
- 	if (bt_search_service(&adapter_addr, &dst, &uuid, sdp_search_cb, rfsock,
- 								NULL) < 0) {
- 		error("Failed to search SDP records");
 -- 
 1.8.3.2
 
