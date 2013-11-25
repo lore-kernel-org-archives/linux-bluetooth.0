@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv8 01/15] android/socket: Parse SDP response and connect
-Date: Mon, 25 Nov 2013 11:44:44 +0200
-Message-Id: <1385372698-16212-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv8 02/15] android/socket: Implement HAL connect call
+Date: Mon, 25 Nov 2013 11:44:45 +0200
+Message-Id: <1385372698-16212-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1385372698-16212-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1385372698-16212-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,93 +11,58 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Parse SDP response, find RFCOMM channel and connect.
+HAL connect uses similar event handlers like listen call.
 ---
- android/socket.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 68 insertions(+)
+ android/socket.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
 diff --git a/android/socket.c b/android/socket.c
-index 1815367..cd958d9 100644
+index cd958d9..00231a3 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -424,9 +424,77 @@ static int handle_listen(void *buf)
- 	return hal_fd;
- }
+@@ -426,6 +426,42 @@ static int handle_listen(void *buf)
  
-+static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
-+{
-+}
-+
- static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
  {
-+	struct rfcomm_sock *rfsock = data;
-+	GError *gerr = NULL;
-+	sdp_list_t *list;
-+	GIOChannel *io;
-+	int chan;
++	struct rfcomm_sock *rfsock = user_data;
++	bdaddr_t *dst = &rfsock->dst;
++	GIOChannel *io_stack;
++	char address[18];
++	guint id;
++	GIOCondition cond;
 +
- 	DBG("");
-+
-+	if (err < 0) {
-+		error("Unable to get SDP record: %s", strerror(-err));
++	if (err) {
++		error("%s", err->message);
 +		goto fail;
 +	}
 +
-+	if (!recs || !recs->data) {
-+		error("No SDP records found");
-+		goto fail;
-+	}
++	ba2str(dst, address);
++	DBG("Connected to %s", address);
 +
-+	for (list = recs; list != NULL; list = list->next) {
-+		sdp_record_t *rec = list->data;
-+		sdp_list_t *protos;
++	DBG("rfsock: fd %d real_sock %d chan %u sock %d",
++		rfsock->fd, rfsock->real_sock, rfsock->channel,
++		g_io_channel_unix_get_fd(io));
 +
-+		if (sdp_get_access_protos(rec, &protos) < 0) {
-+			error("Unable to get proto list");
-+			goto fail;
-+		}
++	/* Handle events from Android */
++	cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
++	io_stack = g_io_channel_unix_new(rfsock->fd);
++	id = g_io_add_watch(io_stack, cond, sock_stack_event_cb, rfsock);
++	g_io_channel_unref(io_stack);
 +
-+		chan = sdp_get_proto_port(protos, RFCOMM_UUID);
++	rfsock->stack_watch = id;
 +
-+		sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free,
-+									NULL);
-+		sdp_list_free(protos, NULL);
++	/* Handle rfcomm events */
++	cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
++	id = g_io_add_watch(io, cond, sock_rfcomm_event_cb, rfsock);
 +
-+		if (chan)
-+			break;
-+	}
-+
-+	if (chan <= 0) {
-+		error("Could not get RFCOMM channel %d", chan);
-+		goto fail;
-+	}
-+
-+	DBG("Got RFCOMM channel %d", chan);
-+
-+	io = bt_io_connect(connect_cb, rfsock, NULL, &gerr,
-+				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
-+				BT_IO_OPT_DEST_BDADDR, &rfsock->dst,
-+				BT_IO_OPT_CHANNEL, chan,
-+				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
-+				BT_IO_OPT_INVALID);
-+	if (!io) {
-+		error("Failed connect: %s", gerr->message);
-+		g_error_free(gerr);
-+		goto fail;
-+	}
-+
-+	rfsock->real_sock = g_io_channel_unix_get_fd(io);
-+	rfsock->channel = chan;
-+	connections = g_list_append(connections, rfsock);
-+
-+	g_io_channel_unref(io);
++	rfsock->rfcomm_watch = id;
 +
 +	return;
 +fail:
 +	cleanup_rfsock(rfsock);
  }
  
- static int handle_connect(void *buf)
+ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
 -- 
 1.8.3.2
 
