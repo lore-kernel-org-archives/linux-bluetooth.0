@@ -1,140 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv8 07/15] android/socket: Add OPP SDP record
-Date: Mon, 25 Nov 2013 11:44:50 +0200
-Message-Id: <1385372698-16212-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1385372698-16212-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1385372698-16212-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv8 00/15] Socket HAL
+Date: Mon, 25 Nov 2013 11:44:43 +0200
+Message-Id: <1385372698-16212-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This adds SDP record for OPP shown below:
+This is initial code implementing socket HAL. OPP currently works with send/receive files. Probaly
+other profiles works as well, not tested yet.
 
-Service Name: OBEX Object Push
-Service RecHandle: 0x10002
-Service Class ID List:
-  "OBEX Object Push" (0x1105)
-Protocol Descriptor List:
-  "RFCOMM" (0x0003)
-    Channel: 9
-  "OBEX" (0x0008)
-Profile Descriptor List:
-  "OBEX Object Push" (0x1105)
-    Version: 0x0100
----
- android/socket.c | 82 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 81 insertions(+), 1 deletion(-)
+Changes:
+	* v8: Fixes Szymon's comment: added missing L2CAP Protocol ID in SDP Protocol Descriptor
+	List, fixes getting channel number.
+	* v7: Rebase and fixing missing unref. All needed SDP records for supported profiles are created.
+	Support listen() with specified channel like in bluedroid.
+	* v6: Use watch_id to remove source and general cleanup
+	* v5: Changed uuid_to_chan table to profile table keeping information about profile like: channel, create_record,
+	svc_hint and sec_level.
+	* v4: Changed name rfslot -> rfsock following Johan's comment and other cosmetic changes, fixed one bug in SDP
+	record, use NULL instead of 0 for sdp functions.
+	* v3: Fixed coding style with write/send between file descriptors.
+	* v2: Following Marcel comments changed way copying between file descriptors works, added SDP record
+	for OPP and now it is possible to send files through GUI. Merged one patch with structures with actual user.
+	* v1: Rebased and use static src address, hal_fd removed from structure and closed after sent to framework,
+	added connect calls and SDP parsing, added cleanup_rfcomm function, minor fixes.
+	* RFC Initial
 
-diff --git a/android/socket.c b/android/socket.c
-index 71dcf4a..a15268d 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -48,6 +48,8 @@
- #define OPP_DEFAULT_CHANNEL	9
- #define PBAP_DEFAULT_CHANNEL	15
- 
-+#define SVC_HINT_OBEX 0x10
-+
- static bdaddr_t adapter_addr;
- 
- /* Simple list of RFCOMM server sockets */
-@@ -111,6 +113,82 @@ static void cleanup_rfsock(struct rfcomm_sock *rfsock)
- 	g_free(rfsock);
- }
- 
-+static sdp_record_t *create_opp_record(uint8_t chan, const char *svc_name)
-+{
-+	const char *service_name = "OBEX Object Push";
-+	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-+	uuid_t root_uuid, opush_uuid, l2cap_uuid, rfcomm_uuid, obex_uuid;
-+	sdp_profile_desc_t profile[1];
-+	sdp_list_t *aproto, *proto[3];
-+	uint8_t formats[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0xff };
-+	void *dtds[sizeof(formats)], *values[sizeof(formats)];
-+	unsigned int i;
-+	uint8_t dtd = SDP_UINT8;
-+	sdp_data_t *sflist;
-+	sdp_data_t *channel;
-+	sdp_record_t *record;
-+
-+	record = sdp_record_alloc();
-+	if (!record)
-+		return NULL;
-+
-+	record->handle =  sdp_next_handle();
-+
-+	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
-+	root = sdp_list_append(NULL, &root_uuid);
-+	sdp_set_browse_groups(record, root);
-+
-+	sdp_uuid16_create(&opush_uuid, OBEX_OBJPUSH_SVCLASS_ID);
-+	svclass_id = sdp_list_append(NULL, &opush_uuid);
-+	sdp_set_service_classes(record, svclass_id);
-+
-+	sdp_uuid16_create(&profile[0].uuid, OBEX_OBJPUSH_PROFILE_ID);
-+	profile[0].version = 0x0100;
-+	pfseq = sdp_list_append(NULL, profile);
-+	sdp_set_profile_descs(record, pfseq);
-+
-+	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
-+	proto[0] = sdp_list_append(NULL, &l2cap_uuid);
-+	apseq = sdp_list_append(NULL, proto[0]);
-+
-+	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
-+	proto[1] = sdp_list_append(NULL, &rfcomm_uuid);
-+	channel = sdp_data_alloc(SDP_UINT8, &chan);
-+	proto[1] = sdp_list_append(proto[1], channel);
-+	apseq = sdp_list_append(apseq, proto[1]);
-+
-+	sdp_uuid16_create(&obex_uuid, OBEX_UUID);
-+	proto[2] = sdp_list_append(NULL, &obex_uuid);
-+	apseq = sdp_list_append(apseq, proto[2]);
-+
-+	aproto = sdp_list_append(NULL, apseq);
-+	sdp_set_access_protos(record, aproto);
-+
-+	for (i = 0; i < sizeof(formats); i++) {
-+		dtds[i] = &dtd;
-+		values[i] = &formats[i];
-+	}
-+	sflist = sdp_seq_alloc(dtds, values, sizeof(formats));
-+	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FORMATS_LIST, sflist);
-+
-+	if (svc_name)
-+		service_name = svc_name;
-+
-+	sdp_set_info_attr(record, service_name, NULL, NULL);
-+
-+	sdp_data_free(channel);
-+	sdp_list_free(proto[0], NULL);
-+	sdp_list_free(proto[1], NULL);
-+	sdp_list_free(proto[2], NULL);
-+	sdp_list_free(apseq, NULL);
-+	sdp_list_free(pfseq, NULL);
-+	sdp_list_free(aproto, NULL);
-+	sdp_list_free(root, NULL);
-+	sdp_list_free(svclass_id, NULL);
-+
-+	return record;
-+}
-+
- static struct profile_info {
- 	uint8_t		uuid[16];
- 	uint8_t		channel;
-@@ -129,7 +207,9 @@ static struct profile_info {
- 			0x00, 0x00, 0x11, 0x05, 0x00, 0x00, 0x10, 0x00,
- 			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
- 		  },
--		.channel = OPP_DEFAULT_CHANNEL
-+		.channel = OPP_DEFAULT_CHANNEL,
-+		.svc_hint = SVC_HINT_OBEX,
-+		.create_record = create_opp_record
- 	}
- };
- 
+TODO:
+	* Use sec_level / check what to do with Android supplied security flags.
+	* Use splice() (requires bionic change first)
+
+For tracking rfcomm sockets I use structure rfslot which has following
+fields:
+ - real_sock - real RFCOMM socket
+ - fd - fd to communicate with Android framework
+
+create_rfslot sets hal_fd which is fd passed to Android framework with CMSG
+
+Andrei Emeltchenko (15):
+  android/socket: Parse SDP response and connect
+  android/socket: Implement HAL connect call
+  android/socket: Send RFCOMM channel to framework
+  android/socket: Send connect signal to Android framework
+  android/socket: Close file descriptor after sending
+  android/socket: Add general service create/remove function
+  android/socket: Add OPP SDP record
+  android/socket: Add MAS uuid to profile table
+  android/socket: Add SPP uuid to profile table
+  android/socket: Add PBAP SDP record
+  android/socket: Add SPP SDP record
+  android/socket: Support listen() with supplied chan number
+  android/hal-sock: Print bdaddr on connect
+  android/socket: Refactor socket send_fd function
+  android/hal-utils: Fix possible NULL pointer dereference
+
+ android/hal-sock.c  |   4 +-
+ android/hal-utils.c |   6 +
+ android/socket.c    | 436 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 432 insertions(+), 14 deletions(-)
+
 -- 
 1.8.3.2
 
