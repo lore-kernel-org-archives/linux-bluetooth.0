@@ -1,68 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv9 02/21] android/socket: Implement HAL connect call
-Date: Mon, 25 Nov 2013 15:08:38 +0200
-Message-Id: <1385384937-29858-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1385384937-29858-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1385384937-29858-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Sebastian <sebastianchlad@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: Re: [PATCH] Adding paired-devices cmd to the bluetoothctl
+Date: Mon, 25 Nov 2013 14:08:07 +0100
+Message-ID: <7144304.2MX7gdvi4Y@uw000953>
+In-Reply-To: <1384978912-27461-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1384978912-27461-1-git-send-email-sebastian.chlad@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="ISO-8859-1"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi,
 
-HAL connect uses similar event handlers like listen call.
----
- android/socket.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+> From: Sebastian Chlad <sebastian.chlad@tieto.com>
+> 
+> Paired-devices command lists only paired devices
+> ---
+>  client/main.c | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
+> 
+> diff --git a/client/main.c b/client/main.c
+> index 0dd1510..c39ebf8 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -538,6 +538,26 @@ static void cmd_devices(const char *arg)
+>  	}
+>  }
+>  
+> +static void cmd_devices_paired(const char *arg)
+> +{
+> +	GList *list;
+> +
+> +	for (list = g_list_first(dev_list); list; list = g_list_next(list)) {
+> +		DBusMessageIter iter;
+> +		GDBusProxy *proxy = list->data;
+> +		dbus_bool_t paired;
+> +
+> +		if (g_dbus_proxy_get_property(proxy, "Paired", &iter) == FALSE)
+> +			return;
+> +		dbus_message_iter_get_basic(&iter, &paired);
+> +
+> +		if (!paired)
+> +			break;
 
-diff --git a/android/socket.c b/android/socket.c
-index cd958d9..00231a3 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -426,6 +426,42 @@ static int handle_listen(void *buf)
- 
- static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
- {
-+	struct rfcomm_sock *rfsock = user_data;
-+	bdaddr_t *dst = &rfsock->dst;
-+	GIOChannel *io_stack;
-+	char address[18];
-+	guint id;
-+	GIOCondition cond;
-+
-+	if (err) {
-+		error("%s", err->message);
-+		goto fail;
-+	}
-+
-+	ba2str(dst, address);
-+	DBG("Connected to %s", address);
-+
-+	DBG("rfsock: fd %d real_sock %d chan %u sock %d",
-+		rfsock->fd, rfsock->real_sock, rfsock->channel,
-+		g_io_channel_unix_get_fd(io));
-+
-+	/* Handle events from Android */
-+	cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
-+	io_stack = g_io_channel_unix_new(rfsock->fd);
-+	id = g_io_add_watch(io_stack, cond, sock_stack_event_cb, rfsock);
-+	g_io_channel_unref(io_stack);
-+
-+	rfsock->stack_watch = id;
-+
-+	/* Handle rfcomm events */
-+	cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
-+	id = g_io_add_watch(io, cond, sock_rfcomm_event_cb, rfsock);
-+
-+	rfsock->rfcomm_watch = id;
-+
-+	return;
-+fail:
-+	cleanup_rfsock(rfsock);
- }
- 
- static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+Shouldn't this be
+  if (!paired)
+      continue;
+
+? Or paired devices are guaranteed to be first on list?
+
+> +
+> +		print_device(proxy, NULL);
+> +	}
+> +}
+> +
+>  static void generic_callback(const DBusError *error, void *user_data)
+>  {
+>  	char *str = user_data;
+> @@ -1047,6 +1067,8 @@ static const struct {
+>  	{ "select",       "<ctrl>",   cmd_select, "Select default controller",
+>  							ctrl_generator },
+>  	{ "devices",      NULL,       cmd_devices, "List available devices" },
+> +	{ "paired-devices", NULL,     cmd_devices_paired,
+> +					"List paired devices"},
+>  	{ "system-alias", "<name>",   cmd_system_alias },
+>  	{ "reset-alias",  NULL,       cmd_reset_alias },
+>  	{ "power",        "<on/off>", cmd_power, "Set controller power" },
+> 
+
 -- 
-1.8.3.2
+BR
+Szymon Janc
 
