@@ -1,28 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 25 Nov 2013 14:51:02 +0200
+Date: Mon, 25 Nov 2013 14:47:05 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/4] android/pics: Add PTS PICS for PAN
-Message-ID: <20131125125102.GB5559@x220.p-661hnu-f1>
-References: <1385117261-25270-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: Re: [PATCH] android/hal-bluetooth: Use static memory for enum
+ convertion
+Message-ID: <20131125124705.GA5559@x220.p-661hnu-f1>
+References: <1385379120-10142-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1385117261-25270-1-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1385379120-10142-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Szymon,
 
-On Fri, Nov 22, 2013, Jakub Tyszkowski wrote:
-> PTS PICS for PAN, targeting Android 4.4.
-> 
+On Mon, Nov 25, 2013, Szymon Janc wrote:
+> There is no need to use dynamic allocation for enum properties
+> convertion. Each property type can be present only once in properties
+> callback so using static allocation is safe. This also remove need
+> for cleanup properties after HAL callback is called making code
+> simpler.
 > ---
->  android/pics-pan.txt | 146 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 146 insertions(+)
->  create mode 100644 android/pics-pan.txt
+>  android/hal-bluetooth.c | 109 ++++++++++++++++--------------------------------
+>  1 file changed, 37 insertions(+), 72 deletions(-)
 
-All four patches have been applied, though I merged the Makefile.am
-changes to the two main patches that add the txt files.
+Applied. Thanks.
 
 Johan
