@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv9 13/21] android/hal-sock: Print bdaddr on connect
-Date: Mon, 25 Nov 2013 15:08:49 +0200
-Message-Id: <1385384937-29858-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv9 19/21] android/socket: Keep server iochannel reference
+Date: Mon, 25 Nov 2013 15:08:55 +0200
+Message-Id: <1385384937-29858-20-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1385384937-29858-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1385384937-29858-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,25 +11,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+server io channel reference will be stored in rfsock structure
+and might be deleted when Android end closes connection or when
+HAL makes cleanup() call.
 ---
- android/hal-sock.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ android/socket.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/android/hal-sock.c b/android/hal-sock.c
-index bd88ad8..e02a49a 100644
---- a/android/hal-sock.c
-+++ b/android/hal-sock.c
-@@ -82,8 +82,8 @@ static bt_status_t sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
- 		return BT_STATUS_PARM_INVALID;
- 	}
+diff --git a/android/socket.c b/android/socket.c
+index 6f2c498..93b3d48 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -70,6 +70,8 @@ struct rfcomm_sock {
+ 	guint rfcomm_watch;
+ 	guint stack_watch;
  
--	DBG("uuid %s chan %d sock %p type %d flags 0x%02x",
--		btuuid2str(uuid), chan, sock, type, flags);
-+	DBG("bdaddr %s uuid %s chan %d sock %p type %d flags 0x%02x",
-+		bdaddr2str(bdaddr), btuuid2str(uuid), chan, sock, type, flags);
++	GIOChannel *srv_io;
++
+ 	bdaddr_t dst;
+ 	uint32_t service_handle;
  
- 	if (type != BTSOCK_RFCOMM) {
- 		error("Socket type %u not supported", type);
+@@ -121,6 +123,11 @@ static void cleanup_rfsock(struct rfcomm_sock *rfsock)
+ 	if (rfsock->service_handle)
+ 		bt_adapter_remove_record(rfsock->service_handle);
+ 
++	if (rfsock->srv_io) {
++		g_io_channel_shutdown(rfsock->srv_io, TRUE, NULL);
++		g_io_channel_unref(rfsock->srv_io);
++	}
++
+ 	g_free(rfsock);
+ }
+ 
+@@ -699,9 +706,7 @@ static int handle_listen(void *buf)
+ 	rfsock->real_sock = g_io_channel_unix_get_fd(io);
+ 	servers = g_list_append(servers, rfsock);
+ 
+-	/* TODO: Add server watch */
+-	g_io_channel_set_close_on_unref(io, TRUE);
+-	g_io_channel_unref(io);
++	rfsock->srv_io = io;
+ 
+ 	DBG("real_sock %d fd %d hal_fd %d", rfsock->real_sock, rfsock->fd,
+ 								hal_fd);
 -- 
 1.8.3.2
 
