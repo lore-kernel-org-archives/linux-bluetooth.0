@@ -1,72 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 00/20] Initial AVDTP for Android
-Date: Mon, 25 Nov 2013 16:54:23 +0200
-Message-Id: <1385391283-10962-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 25 Nov 2013 16:25:32 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/4] android: Add CAP_NET_RAW capability
+Message-ID: <20131125142532.GA26309@x220.p-661hnu-f1>
+References: <1385387369-3015-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+ <1385387369-3015-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+ <20131125140154.GA24659@x220.p-661hnu-f1>
+ <52935B51.403@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <52935B51.403@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Ravi,
 
-The code is based on the current implementation available in
-profiles/audio/avdtp.{c,h} but it is transport agnostic and does not
-contain any external dependency except glib for IO handling.
+On Mon, Nov 25, 2013, Ravi kumar Veeramally wrote:
+> On 25.11.2013 16:01, Johan Hedberg wrote:
+> >Hi Ravi,
+> >
+> >On Mon, Nov 25, 2013, Ravi kumar Veeramally wrote:
+> >>CAP_NET_RAW capability is required to up the bnep interfaces
+> >>in android environment.
+> >>---
+> >>  android/main.c | 1 +
+> >>  1 file changed, 1 insertion(+)
+> >>
+> >>diff --git a/android/main.c b/android/main.c
+> >>index c9733f3..bfd2a87 100644
+> >>--- a/android/main.c
+> >>+++ b/android/main.c
+> >>@@ -506,6 +506,7 @@ static bool set_capabilities(void)
+> >>  	header.pid = 0;
+> >>  	cap.effective = cap.permitted =
+> >>+		CAP_TO_MASK(CAP_NET_RAW) |
+> >>  		CAP_TO_MASK(CAP_NET_ADMIN) |
+> >>  		CAP_TO_MASK(CAP_NET_BIND_SERVICE);
+> >>  	cap.inheritable = 0;
+> >Would you then say that commit 9bda7e8c2130de9a3340ebd0e6cc1dedc2eae338
+> >is incorrect? A quick grep doesn't show any instances of checking this
+> >capability in the BNEP code of the kernel. Exactly which system call is
+> >it that needs it?
+>    bnep_if_up from profiles/network/common.c
+>  ---
+>         ifr.ifr_flags |= IFF_UP;
+>         ifr.ifr_flags |= IFF_MULTICAST;
+> 
+>         err = ioctl(sk, SIOCSIFFLAGS, (caddr_t) &ifr);
+> ---
+>  requires this capability in android environment only.
+>  this code is under android macro.
 
-Both the signaling and the transport connection has to be handled by
-the upper layer, that is why it is not modified in place to avoid
-breaking current implemention until this work is considered stable.
+So you've verified that under "normal" Linux this ioctl does not require
+the NET_RAW capability?
 
-Two new function are added:
+> >If you answered positively to my first question, please send a patch for
+> >that as well.
+>  I didn't understand this, sorry.
 
-  - avdtp_new: Creates AVDTP session and attach signaling transport
-  - avdtp_stream_set_transport: Set stream transport
+My first question was: "Would you then say that
+commit 9bda7e8c2130de9a3340ebd0e6cc1dedc2eae338 is incorrect?". Do you
+not understand that question or what I asked you to do in case the
+answer is "yes"?
 
-Both receives a fd as parameter so in future it should be possible to
-replace the IO handling.
-
-This set also includes a initial test set based on the current AVDTP
-test specification, once merged more tests will be added as well,
-then the intent is to make this used by audio plugin.
-
-Note: It is possible to track back to the original code by doing:
-git log --follow or git blame -C -C.
-
-v2: Add a separate commit to copy existing AVDTP files
-
-Luiz Augusto von Dentz (20):
-  android: Add copy of current AVDTP implemention
-  android/AVDTP: Strip dependencies
-  unit/AVDTP: Add /TP/SIG/SMG/BV-05-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-06-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-07-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-08-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-09-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-10-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-11-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-12-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-15-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-16-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-17-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-18-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-19-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-20-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-21-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-22-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-23-C test
-  unit/AVDTP: Add /TP/SIG/SMG/BV-24-C test
-
- Makefile.am         |    8 +
- android/Makefile.am |    1 +
- android/a2dp.c      |   23 +
- android/avdtp.c     | 3256 +++++++++++++++++++++++++++++++++++++++++++++++++++
- android/avdtp.h     |  275 +++++
- unit/test-avdtp.c   |  612 ++++++++++
- 6 files changed, 4175 insertions(+)
- create mode 100644 android/avdtp.c
- create mode 100644 android/avdtp.h
- create mode 100644 unit/test-avdtp.c
-
--- 
-1.8.3.1
-
+Johan
