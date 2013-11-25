@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv8 10/15] android/socket: Add PBAP SDP record
-Date: Mon, 25 Nov 2013 11:44:53 +0200
-Message-Id: <1385372698-16212-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv8 04/15] android/socket: Send connect signal to Android framework
+Date: Mon, 25 Nov 2013 11:44:47 +0200
+Message-Id: <1385372698-16212-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1385372698-16212-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1385372698-16212-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,115 +11,60 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This adds SDP service record like shown below:
-
-Service Name: OBEX Phonebook Access Server
-Service RecHandle: 0x10002
-Service Class ID List:
-  "Phonebook Access - PSE" (0x112f)
-Protocol Descriptor List:
-  "RFCOMM" (0x0003)
-    Channel: 15
-  "OBEX" (0x0008)
-Profile Descriptor List:
-  "Phonebook Access" (0x1130)
-    Version: 0x0100
+Android framework expects connect signal to be sent when
+remote device is connected.
 ---
- android/socket.c | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 73 insertions(+), 1 deletion(-)
+ android/socket.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
 diff --git a/android/socket.c b/android/socket.c
-index 94add6f..619d5e9 100644
+index 4722cf8..f9a6587 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -191,6 +191,76 @@ static sdp_record_t *create_opp_record(uint8_t chan, const char *svc_name)
- 	return record;
+@@ -424,6 +424,33 @@ static int handle_listen(void *buf)
+ 	return hal_fd;
  }
  
-+static sdp_record_t *create_pbap_record(uint8_t chan, const char *svc_name)
++static bool sock_send_connect(struct rfcomm_sock *rfsock, bdaddr_t *bdaddr)
 +{
-+	const char *service_name = "OBEX Phonebook Access Server";
-+	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-+	uuid_t root_uuid, pbap_uuid, l2cap_uuid, rfcomm_uuid, obex_uuid;
-+	sdp_profile_desc_t profile[1];
-+	sdp_list_t *aproto, *proto[3];
-+	sdp_data_t *channel;
-+	uint8_t formats[] = { 0x01 };
-+	uint8_t dtd = SDP_UINT8;
-+	sdp_data_t *sflist;
-+	sdp_record_t *record;
++	struct hal_sock_connect_signal cmd;
++	int len;
 +
-+	record = sdp_record_alloc();
-+	if (!record)
-+		return NULL;
++	DBG("");
 +
-+	record->handle =  sdp_next_handle();
++	memset(&cmd, 0, sizeof(cmd));
++	cmd.size = sizeof(cmd);
++	bdaddr2android(bdaddr, cmd.bdaddr);
++	cmd.channel = rfsock->channel;
++	cmd.status = 0;
 +
-+	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
-+	root = sdp_list_append(NULL, &root_uuid);
-+	sdp_set_browse_groups(record, root);
++	len = write(rfsock->fd, &cmd, sizeof(cmd));
++	if (len < 0) {
++		error("%s", strerror(errno));
++		return false;
++	}
 +
-+	sdp_uuid16_create(&pbap_uuid, PBAP_PSE_SVCLASS_ID);
-+	svclass_id = sdp_list_append(NULL, &pbap_uuid);
-+	sdp_set_service_classes(record, svclass_id);
++	if (len != sizeof(cmd)) {
++		error("Error sending connect signal");
++		return false;
++	}
 +
-+	sdp_uuid16_create(&profile[0].uuid, PBAP_PROFILE_ID);
-+	profile[0].version = 0x0100;
-+	pfseq = sdp_list_append(NULL, profile);
-+	sdp_set_profile_descs(record, pfseq);
-+
-+	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
-+	proto[0] = sdp_list_append(NULL, &l2cap_uuid);
-+	apseq = sdp_list_append(NULL, proto[0]);
-+
-+	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
-+	proto[1] = sdp_list_append(NULL, &rfcomm_uuid);
-+	channel = sdp_data_alloc(SDP_UINT8, &chan);
-+	proto[1] = sdp_list_append(proto[1], channel);
-+	apseq = sdp_list_append(apseq, proto[1]);
-+
-+	sdp_uuid16_create(&obex_uuid, OBEX_UUID);
-+	proto[2] = sdp_list_append(NULL, &obex_uuid);
-+	apseq = sdp_list_append(apseq, proto[2]);
-+
-+	aproto = sdp_list_append(NULL, apseq);
-+	sdp_set_access_protos(record, aproto);
-+
-+	sflist = sdp_data_alloc(dtd, formats);
-+	sdp_attr_add(record, SDP_ATTR_SUPPORTED_REPOSITORIES, sflist);
-+
-+	if (svc_name)
-+		service_name = svc_name;
-+
-+	sdp_set_info_attr(record, service_name, NULL, NULL);
-+
-+	sdp_data_free(channel);
-+	sdp_list_free(proto[0], NULL);
-+	sdp_list_free(proto[1], NULL);
-+	sdp_list_free(proto[2], NULL);
-+	sdp_list_free(apseq, NULL);
-+	sdp_list_free(pfseq, NULL);
-+	sdp_list_free(aproto, NULL);
-+	sdp_list_free(root, NULL);
-+	sdp_list_free(svclass_id, NULL);
-+
-+	return record;
++	return true;
 +}
 +
- static struct profile_info {
- 	uint8_t		uuid[16];
- 	uint8_t		channel;
-@@ -203,7 +273,9 @@ static struct profile_info {
- 			0x00, 0x00, 0x11, 0x2F, 0x00, 0x00, 0x10, 0x00,
- 			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
- 		},
--		.channel = PBAP_DEFAULT_CHANNEL
-+		.channel = PBAP_DEFAULT_CHANNEL,
-+		.svc_hint = SVC_HINT_OBEX,
-+		.create_record = create_pbap_record
- 	}, {
- 		.uuid = {
- 			0x00, 0x00, 0x11, 0x05, 0x00, 0x00, 0x10, 0x00,
+ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+ {
+ 	struct rfcomm_sock *rfsock = user_data;
+@@ -445,6 +472,9 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+ 		rfsock->fd, rfsock->real_sock, rfsock->channel,
+ 		g_io_channel_unix_get_fd(io));
+ 
++	if (!sock_send_connect(rfsock, dst))
++		goto fail;
++
+ 	/* Handle events from Android */
+ 	cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
+ 	io_stack = g_io_channel_unix_new(rfsock->fd);
 -- 
 1.8.3.2
 
