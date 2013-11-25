@@ -1,51 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv10 4/4] android/socket: Check create_rfsock returns valid structure
-Date: Mon, 25 Nov 2013 16:10:25 +0200
-Message-Id: <1385388625-3156-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1385388625-3156-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv10 1/4] android/socket: Use security level for connect / listen
+Date: Mon, 25 Nov 2013 16:10:22 +0200
+Message-Id: <1385388625-3156-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <20131125134005.GB19445@x220.p-661hnu-f1>
 References: <20131125134005.GB19445@x220.p-661hnu-f1>
- <1385388625-3156-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Use MEDIUM security level for connections without profile and default
+sec_level for others. rfsock now has pointer to profile info.
 ---
- android/socket.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ android/socket.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
 diff --git a/android/socket.c b/android/socket.c
-index 0817b5c..66b240d 100644
+index 83e6996..e31e391 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -647,6 +647,12 @@ static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
+@@ -60,6 +60,8 @@ GList *servers = NULL;
+ /* Simple list of RFCOMM connected sockets */
+ GList *connections = NULL;
  
- 	sock_acc = g_io_channel_unix_get_fd(io);
- 	rfsock_acc = create_rfsock(sock_acc, &hal_fd);
-+	if (!rfsock_acc) {
-+		g_io_channel_shutdown(io, TRUE, NULL);
-+		g_io_channel_unref(io);
-+		return;
-+	}
++struct profile_info;
 +
- 	connections = g_list_append(connections, rfsock_acc);
+ struct rfcomm_sock {
+ 	int fd;		/* descriptor for communication with Java framework */
+ 	int real_sock;	/* real RFCOMM socket */
+@@ -70,6 +72,8 @@ struct rfcomm_sock {
  
- 	DBG("rfsock: fd %d real_sock %d chan %u sock %d",
-@@ -905,8 +911,11 @@ static int handle_connect(void *buf)
- 
- 	DBG("");
- 
--	android2bdaddr(cmd->bdaddr, &dst);
- 	rfsock = create_rfsock(-1, &hal_fd);
-+	if (!rfsock)
-+		return -1;
+ 	bdaddr_t dst;
+ 	uint32_t service_handle;
 +
-+	android2bdaddr(cmd->bdaddr, &dst);
- 	bacpy(&rfsock->dst, &dst);
++	struct profile_info *profile;
+ };
  
- 	memset(&uuid, 0, sizeof(uuid));
+ static struct rfcomm_sock *create_rfsock(int sock, int *hal_fd)
+@@ -667,7 +671,7 @@ static int handle_listen(void *buf)
+ 			return -1;
+ 		else {
+ 			chan = cmd->channel;
+-			sec_level = BT_IO_SEC_LOW;
++			sec_level = BT_IO_SEC_MEDIUM;
+ 		}
+ 	} else {
+ 		chan = profile->channel;
+@@ -786,6 +790,7 @@ fail:
+ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ {
+ 	struct rfcomm_sock *rfsock = data;
++	BtIOSecLevel sec_level = BT_IO_SEC_MEDIUM;
+ 	GError *gerr = NULL;
+ 	sdp_list_t *list;
+ 	GIOChannel *io;
+@@ -829,11 +834,14 @@ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ 
+ 	DBG("Got RFCOMM channel %d", chan);
+ 
++	if (rfsock->profile)
++		sec_level = rfsock->profile->sec_level;
++
+ 	io = bt_io_connect(connect_cb, rfsock, NULL, &gerr,
+ 				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
+ 				BT_IO_OPT_DEST_BDADDR, &rfsock->dst,
+ 				BT_IO_OPT_CHANNEL, chan,
+-				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
++				BT_IO_OPT_SEC_LEVEL, sec_level,
+ 				BT_IO_OPT_INVALID);
+ 	if (!io) {
+ 		error("Failed connect: %s", gerr->message);
+@@ -875,6 +883,8 @@ static int handle_connect(void *buf)
+ 	uuid.type = SDP_UUID128;
+ 	memcpy(&uuid.value.uuid128, cmd->uuid, sizeof(uint128_t));
+ 
++	rfsock->profile = get_profile_by_uuid(cmd->uuid);
++
+ 	if (bt_search_service(&adapter_addr, &dst, &uuid, sdp_search_cb, rfsock,
+ 								NULL) < 0) {
+ 		error("Failed to search SDP records");
 -- 
 1.8.3.2
 
