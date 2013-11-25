@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv9 06/21] android/socket: Add general service create/remove function
-Date: Mon, 25 Nov 2013 15:08:42 +0200
-Message-Id: <1385384937-29858-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv9 08/21] android/socket: Add MAS uuid to profile table
+Date: Mon, 25 Nov 2013 15:08:44 +0200
+Message-Id: <1385384937-29858-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1385384937-29858-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1385384937-29858-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,98 +11,34 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-create_record function from profile is used to create SDP service record.
-The record is removed from rfsock cleanup function.
 ---
- android/socket.c | 33 +++++++++++++++++++++++++++++++--
- 1 file changed, 31 insertions(+), 2 deletions(-)
+ android/socket.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/android/socket.c b/android/socket.c
-index 9f8c535..740907b 100644
+index 64f54e4..43324d0 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -35,7 +35,9 @@
- #include "lib/sdp.h"
- #include "lib/sdp_lib.h"
- #include "src/sdp-client.h"
-+#include "src/sdpd.h"
+@@ -47,6 +47,7 @@
  
-+#include "bluetooth.h"
- #include "log.h"
- #include "hal-msg.h"
- #include "hal-ipc.h"
-@@ -63,6 +65,7 @@ struct rfcomm_sock {
- 	guint stack_watch;
+ #define OPP_DEFAULT_CHANNEL	9
+ #define PBAP_DEFAULT_CHANNEL	15
++#define MAS_DEFAULT_CHANNEL	16
  
- 	bdaddr_t dst;
-+	uint32_t service_handle;
- };
+ #define SVC_HINT_OBEX 0x10
  
- static struct rfcomm_sock *create_rfsock(int sock, int *hal_fd)
-@@ -102,6 +105,9 @@ static void cleanup_rfsock(struct rfcomm_sock *rfsock)
- 		if (!g_source_remove(rfsock->stack_watch))
- 			error("stack_watch source was not found");
- 
-+	if (rfsock->service_handle)
-+		bt_adapter_remove_record(rfsock->service_handle);
-+
- 	g_free(rfsock);
- }
- 
-@@ -110,7 +116,7 @@ static struct profile_info {
- 	uint8_t		channel;
- 	uint8_t		svc_hint;
- 	BtIOSecLevel	sec_level;
--	sdp_record_t *	(*create_record)(uint8_t chan);
-+	sdp_record_t *	(*create_record)(uint8_t chan, const char *svc_name);
- } profiles[] = {
- 	{
- 		.uuid = {
-@@ -127,6 +133,27 @@ static struct profile_info {
+@@ -210,6 +211,12 @@ static struct profile_info {
+ 		.channel = OPP_DEFAULT_CHANNEL,
+ 		.svc_hint = SVC_HINT_OBEX,
+ 		.create_record = create_opp_record
++	}, {
++		.uuid = {
++			0x00, 0x00, 0x11, 0x32, 0x00, 0x00, 0x10, 0x00,
++			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
++		},
++		.channel = MAS_DEFAULT_CHANNEL
  	}
  };
- 
-+static uint32_t sdp_service_register(struct profile_info *profile,
-+							const void *svc_name)
-+{
-+	sdp_record_t *record;
-+
-+	if (!profile || !profile->create_record)
-+		return 0;
-+
-+	record = profile->create_record(profile->channel, svc_name);
-+	if (!record)
-+		return 0;
-+
-+	if (bt_adapter_add_record(record, profile->svc_hint) < 0) {
-+		error("Failed to register on SDP record");
-+		sdp_record_free(record);
-+		return 0;
-+	}
-+
-+	return record->handle;
-+}
-+
- static int bt_sock_send_fd(int sock_fd, const void *buf, int len, int send_fd)
- {
- 	ssize_t ret;
-@@ -388,7 +415,7 @@ static int handle_listen(void *buf)
- 
- 	chan = profile->channel;
- 
--	DBG("rfcomm channel %d", chan);
-+	DBG("rfcomm channel %d svc_name %s", chan, cmd->name);
- 
- 	rfsock = create_rfsock(-1, &hal_fd);
- 	if (!rfsock)
-@@ -421,6 +448,8 @@ static int handle_listen(void *buf)
- 		return -1;
- 	}
- 
-+	rfsock->service_handle = sdp_service_register(profile, cmd->name);
-+
- 	return hal_fd;
- }
  
 -- 
 1.8.3.2
