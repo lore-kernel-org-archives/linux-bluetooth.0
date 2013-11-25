@@ -1,74 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv10 3/4] android/socket: Handle Android events for server socket
-Date: Mon, 25 Nov 2013 16:10:24 +0200
-Message-Id: <1385388625-3156-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1385388625-3156-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <20131125134005.GB19445@x220.p-661hnu-f1>
- <1385388625-3156-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <52935B51.403@linux.intel.com>
+Date: Mon, 25 Nov 2013 16:14:41 +0200
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
+Subject: Re: [PATCH 1/4] android: Add CAP_NET_RAW capability
+References: <1385387369-3015-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1385387369-3015-2-git-send-email-ravikumar.veeramally@linux.intel.com> <20131125140154.GA24659@x220.p-661hnu-f1>
+In-Reply-To: <20131125140154.GA24659@x220.p-661hnu-f1>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Johan,
 
-Add watch for tracking events from Android framework for server socket.
+On 25.11.2013 16:01, Johan Hedberg wrote:
+> Hi Ravi,
+>
+> On Mon, Nov 25, 2013, Ravi kumar Veeramally wrote:
+>> CAP_NET_RAW capability is required to up the bnep interfaces
+>> in android environment.
+>> ---
+>>   android/main.c | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/android/main.c b/android/main.c
+>> index c9733f3..bfd2a87 100644
+>> --- a/android/main.c
+>> +++ b/android/main.c
+>> @@ -506,6 +506,7 @@ static bool set_capabilities(void)
+>>   	header.pid = 0;
+>>   
+>>   	cap.effective = cap.permitted =
+>> +		CAP_TO_MASK(CAP_NET_RAW) |
+>>   		CAP_TO_MASK(CAP_NET_ADMIN) |
+>>   		CAP_TO_MASK(CAP_NET_BIND_SERVICE);
+>>   	cap.inheritable = 0;
+> Would you then say that commit 9bda7e8c2130de9a3340ebd0e6cc1dedc2eae338
+> is incorrect? A quick grep doesn't show any instances of checking this
+> capability in the BNEP code of the kernel. Exactly which system call is
+> it that needs it?
+    bnep_if_up from profiles/network/common.c
+  ---
+         ifr.ifr_flags |= IFF_UP;
+         ifr.ifr_flags |= IFF_MULTICAST;
+
+         err = ioctl(sk, SIOCSIFFLAGS, (caddr_t) &ifr);
 ---
- android/socket.c | 27 ++++++++++++++++++++++++++-
- 1 file changed, 26 insertions(+), 1 deletion(-)
+  requires this capability in android environment only.
+  this code is under android macro.
+> If you answered positively to my first question, please send a patch for
+> that as well.
+  I didn't understand this, sorry.
 
-diff --git a/android/socket.c b/android/socket.c
-index 447e0f1..0817b5c 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -596,6 +596,24 @@ static bool sock_send_accept(struct rfcomm_sock *rfsock, bdaddr_t *bdaddr,
- 	return true;
- }
- 
-+static gboolean sock_server_stack_event_cb(GIOChannel *io, GIOCondition cond,
-+								gpointer data)
-+{
-+	struct rfcomm_sock *rfsock = data;
-+
-+	DBG("");
-+
-+	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
-+		error("Socket error: sock %d cond %d",
-+					g_io_channel_unix_get_fd(io), cond);
-+		cleanup_rfsock(rfsock);
-+
-+		return FALSE;
-+	}
-+
-+	return TRUE;
-+}
-+
- static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
- {
- 	struct rfcomm_sock *rfsock = user_data;
-@@ -665,7 +683,8 @@ static int handle_listen(void *buf)
- 	struct profile_info *profile;
- 	struct rfcomm_sock *rfsock;
- 	BtIOSecLevel sec_level;
--	GIOChannel *io;
-+	GIOChannel *io, *io_stack;
-+	GIOCondition cond;
- 	GError *err = NULL;
- 	int hal_fd;
- 	int chan;
-@@ -708,6 +727,12 @@ static int handle_listen(void *buf)
- 
- 	rfsock->srv_io = io;
- 
-+	/* Handle events from Android */
-+	cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
-+	io_stack = g_io_channel_unix_new(rfsock->fd);
-+	g_io_add_watch(io_stack, cond, sock_server_stack_event_cb, rfsock);
-+	g_io_channel_unref(io_stack);
-+
- 	DBG("real_sock %d fd %d hal_fd %d", rfsock->real_sock, rfsock->fd,
- 								hal_fd);
- 
--- 
-1.8.3.2
-
+  Thanks,
+  Ravi.
