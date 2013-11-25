@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 2/7] android/socket: Use default sec_level for listen
-Date: Mon, 25 Nov 2013 13:22:52 +0200
-Message-Id: <1385378577-20503-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv2 5/7] android/socket: Keep server iochannel reference
+Date: Mon, 25 Nov 2013 13:22:55 +0200
+Message-Id: <1385378577-20503-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1385378577-20503-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1385378577-20503-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,84 +11,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Set default security level low for OPP and SPP and medium for PBAP and MAS.
-Default security level would be low for listening without profile.
+server io channel reference will be stored in rfsock structure
+and might be deleted when Android end closes connection or when
+HAL makes cleanup() call.
 ---
- android/socket.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+ android/socket.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/android/socket.c b/android/socket.c
-index 63587ee..0885fa2 100644
+index 24503c5..93ace07 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -344,6 +344,7 @@ static struct profile_info {
- 		},
- 		.channel = PBAP_DEFAULT_CHANNEL,
- 		.svc_hint = SVC_HINT_OBEX,
-+		.sec_level = BT_IO_SEC_MEDIUM,
- 		.create_record = create_pbap_record
- 	}, {
- 		.uuid = {
-@@ -352,13 +353,17 @@ static struct profile_info {
- 		  },
- 		.channel = OPP_DEFAULT_CHANNEL,
- 		.svc_hint = SVC_HINT_OBEX,
-+		.sec_level = BT_IO_SEC_LOW,
- 		.create_record = create_opp_record
- 	}, {
- 		.uuid = {
- 			0x00, 0x00, 0x11, 0x32, 0x00, 0x00, 0x10, 0x00,
- 			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
- 		},
--		.channel = MAS_DEFAULT_CHANNEL
-+		.channel = MAS_DEFAULT_CHANNEL,
-+		.svc_hint = 0,
-+		.sec_level = BT_IO_SEC_MEDIUM,
-+		.create_record = NULL
- 	}, {
- 		.uuid = {
- 			0x00, 0x00, 0x11, 0x01, 0x00, 0x00, 0x10, 0x00,
-@@ -366,6 +371,7 @@ static struct profile_info {
- 		},
- 		.channel = SPP_DEFAULT_CHANNEL,
- 		.svc_hint = 0,
-+		.sec_level = BT_IO_SEC_LOW,
- 		.create_record = create_spp_record
- 	},
- };
-@@ -639,6 +645,7 @@ static int handle_listen(void *buf)
- 	struct hal_cmd_sock_listen *cmd = buf;
- 	struct profile_info *profile;
- 	struct rfcomm_sock *rfsock;
-+	BtIOSecLevel sec_level;
- 	GIOChannel *io;
- 	GError *err = NULL;
- 	int hal_fd;
-@@ -650,10 +657,14 @@ static int handle_listen(void *buf)
- 	if (!profile) {
- 		if (!cmd->channel)
- 			return -1;
--		else
-+		else {
- 			chan = cmd->channel;
--	} else
-+			sec_level = BT_IO_SEC_LOW;
-+		}
-+	} else {
- 		chan = profile->channel;
-+		sec_level = profile->sec_level;
+@@ -70,6 +70,8 @@ struct rfcomm_sock {
+ 	guint rfcomm_watch;
+ 	guint stack_watch;
+ 
++	GIOChannel *srv_io;
++
+ 	bdaddr_t dst;
+ 	uint32_t service_handle;
+ 
+@@ -121,6 +123,11 @@ static void cleanup_rfsock(struct rfcomm_sock *rfsock)
+ 	if (rfsock->service_handle)
+ 		bt_adapter_remove_record(rfsock->service_handle);
+ 
++	if (rfsock->srv_io) {
++		g_io_channel_shutdown(rfsock->srv_io, TRUE, NULL);
++		g_io_channel_unref(rfsock->srv_io);
 +	}
++
+ 	g_free(rfsock);
+ }
  
- 	DBG("rfcomm channel %d svc_name %s", chan, cmd->name);
+@@ -696,9 +703,7 @@ static int handle_listen(void *buf)
+ 	rfsock->real_sock = g_io_channel_unix_get_fd(io);
+ 	servers = g_list_append(servers, rfsock);
  
-@@ -664,6 +675,7 @@ static int handle_listen(void *buf)
- 	io = bt_io_listen(accept_cb, NULL, rfsock, NULL, &err,
- 				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
- 				BT_IO_OPT_CHANNEL, chan,
-+				BT_IO_OPT_SEC_LEVEL, sec_level,
- 				BT_IO_OPT_INVALID);
- 	if (!io) {
- 		error("Failed listen: %s", err->message);
+-	/* TODO: Add server watch */
+-	g_io_channel_set_close_on_unref(io, TRUE);
+-	g_io_channel_unref(io);
++	rfsock->srv_io = io;
+ 
+ 	DBG("real_sock %d fd %d hal_fd %d", rfsock->real_sock, rfsock->fd,
+ 								hal_fd);
 -- 
 1.8.3.2
 
