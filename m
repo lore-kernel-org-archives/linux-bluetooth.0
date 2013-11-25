@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv9 09/21] android/socket: Add SPP uuid to profile table
-Date: Mon, 25 Nov 2013 15:08:45 +0200
-Message-Id: <1385384937-29858-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv9 04/21] android/socket: Send connect signal to Android framework
+Date: Mon, 25 Nov 2013 15:08:40 +0200
+Message-Id: <1385384937-29858-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1385384937-29858-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1385384937-29858-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,37 +11,60 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Android framework expects connect signal to be sent when
+remote device is connected.
 ---
- android/socket.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ android/socket.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
 diff --git a/android/socket.c b/android/socket.c
-index 43324d0..a03c34f 100644
+index 4722cf8..f9a6587 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -45,6 +45,7 @@
- #include "utils.h"
- #include "socket.h"
+@@ -424,6 +424,33 @@ static int handle_listen(void *buf)
+ 	return hal_fd;
+ }
  
-+#define SPP_DEFAULT_CHANNEL	3
- #define OPP_DEFAULT_CHANNEL	9
- #define PBAP_DEFAULT_CHANNEL	15
- #define MAS_DEFAULT_CHANNEL	16
-@@ -217,7 +218,13 @@ static struct profile_info {
- 			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
- 		},
- 		.channel = MAS_DEFAULT_CHANNEL
--	}
-+	}, {
-+		.uuid = {
-+			0x00, 0x00, 0x11, 0x01, 0x00, 0x00, 0x10, 0x00,
-+			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
-+		},
-+		.channel = SPP_DEFAULT_CHANNEL
-+	},
- };
++static bool sock_send_connect(struct rfcomm_sock *rfsock, bdaddr_t *bdaddr)
++{
++	struct hal_sock_connect_signal cmd;
++	int len;
++
++	DBG("");
++
++	memset(&cmd, 0, sizeof(cmd));
++	cmd.size = sizeof(cmd);
++	bdaddr2android(bdaddr, cmd.bdaddr);
++	cmd.channel = rfsock->channel;
++	cmd.status = 0;
++
++	len = write(rfsock->fd, &cmd, sizeof(cmd));
++	if (len < 0) {
++		error("%s", strerror(errno));
++		return false;
++	}
++
++	if (len != sizeof(cmd)) {
++		error("Error sending connect signal");
++		return false;
++	}
++
++	return true;
++}
++
+ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+ {
+ 	struct rfcomm_sock *rfsock = user_data;
+@@ -445,6 +472,9 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
+ 		rfsock->fd, rfsock->real_sock, rfsock->channel,
+ 		g_io_channel_unix_get_fd(io));
  
- static uint32_t sdp_service_register(struct profile_info *profile,
++	if (!sock_send_connect(rfsock, dst))
++		goto fail;
++
+ 	/* Handle events from Android */
+ 	cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
+ 	io_stack = g_io_channel_unix_new(rfsock->fd);
 -- 
 1.8.3.2
 
