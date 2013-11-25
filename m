@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 11/20] unit/AVDTP: Add /TP/SIG/SMG/BV-15-C test
-Date: Mon, 25 Nov 2013 16:54:34 +0200
-Message-Id: <1385391283-10962-12-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH v2 09/20] unit/AVDTP: Add /TP/SIG/SMG/BV-11-C test
+Date: Mon, 25 Nov 2013 16:54:32 +0200
+Message-Id: <1385391283-10962-10-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1385391283-10962-1-git-send-email-luiz.dentz@gmail.com>
 References: <1385391283-10962-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,64 +11,44 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Verify that the IUT (INT) is able to establish a stream connection to a
-previously configured remote SEP by establishing one L2CAP channel
-(AVDTP_OPEN_CMD), and reports the related confirmation.
+Verify that the IUT (INT) is able to issue a valid get configuration
+command for remote SEP and report the replied configuration.
 ---
- unit/test-avdtp.c | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 54 insertions(+), 2 deletions(-)
+ unit/test-avdtp.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
 diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
-index a266819..4e46987 100644
+index e39ed24..1f43c08 100644
 --- a/unit/test-avdtp.c
 +++ b/unit/test-avdtp.c
-@@ -40,7 +40,7 @@
- 
- struct test_pdu {
- 	bool valid;
--	const void *data;
-+	const uint8_t *data;
- 	size_t size;
+@@ -230,6 +230,22 @@ static struct avdtp_sep_ind sep_ind = {
+ 	.get_capability		= sep_getcap_ind,
  };
  
-@@ -234,11 +234,31 @@ static void sep_setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 				struct avdtp_stream *stream,
- 				struct avdtp_error *err, void *user_data)
++static void sep_setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++				struct avdtp_stream *stream,
++				struct avdtp_error *err, void *user_data)
++{
++	int ret;
++
++	g_assert(err == NULL);
++
++	ret = avdtp_get_configuration(session, stream);
++	g_assert_cmpint(ret, ==, 0);
++}
++
++static struct avdtp_sep_cfm sep_cfm = {
++	.set_configuration	= sep_setconf_cfm,
++};
++
+ static void test_server(gconstpointer data)
  {
-+	struct context *context = user_data;
-+	const struct test_pdu *pdu;
- 	int ret;
- 
- 	g_assert(err == NULL);
- 
--	ret = avdtp_get_configuration(session, stream);
-+	if (!context)
-+		return;
-+
-+	pdu = &context->pdu_list[context->pdu_offset];
-+
-+	if (pdu->size < 2)
-+		return;
-+
-+	switch (pdu->data[1]) {
-+	case 0x04:
-+		ret = avdtp_get_configuration(session, stream);
-+		break;
-+	case 0x06:
-+		ret = avdtp_open(session, stream);
-+		break;
-+	default:
-+		g_assert_not_reached();
-+	}
-+
- 	g_assert_cmpint(ret, ==, 0);
- }
- 
-@@ -381,6 +401,28 @@ static void test_get_configuration(gconstpointer data)
+ 	const struct test_data *test = data;
+@@ -343,6 +359,27 @@ static void test_set_configuration(gconstpointer data)
  	g_free(test->pdu_list);
  }
  
-+static void test_open(gconstpointer data)
++static void test_get_configuration(gconstpointer data)
 +{
 +	const struct test_data *test = data;
 +	struct context *context = create_context(0x0100);
@@ -77,8 +57,7 @@ index a266819..4e46987 100644
 +	context->pdu_list = test->pdu_list;
 +
 +	sep = avdtp_register_sep(AVDTP_SEP_TYPE_SINK, AVDTP_MEDIA_TYPE_AUDIO,
-+					0x00, FALSE, NULL, &sep_cfm,
-+					context);
++					0x00, FALSE, &sep_ind, &sep_cfm, NULL);
 +	context->sep = sep;
 +
 +	avdtp_discover(context->session, discover_cb, context);
@@ -93,20 +72,20 @@ index a266819..4e46987 100644
  int main(int argc, char *argv[])
  {
  	g_test_init(&argc, &argv, NULL);
-@@ -448,6 +490,16 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x30, 0x04, 0x04),
- 			raw_pdu(0x32, 0x04, 0x01, 0x00, 0x07, 0x06, 0x00, 0x00,
- 				0x21, 0x02, 0x02, 0x20));
-+	define_test("/TP/SIG/SMG/BV-15-C", test_open,
-+			raw_pdu(0xa0, 0x01),
-+			raw_pdu(0xa2, 0x01, 0x04, 0x00),
-+			raw_pdu(0xb0, 0x02, 0x04),
-+			raw_pdu(0xb2, 0x02, 0x01, 0x00, 0x07, 0x06, 0x00, 0x00,
+@@ -388,6 +425,16 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x20, 0x03, 0x04, 0x04, 0x01, 0x00, 0x07, 0x06,
+ 				0x00, 0x00, 0x21, 0x02, 0x02, 0x20),
+ 			raw_pdu(0x22, 0x03));
++	define_test("/TP/SIG/SMG/BV-11-C", test_get_configuration,
++			raw_pdu(0x60, 0x01),
++			raw_pdu(0x62, 0x01, 0x04, 0x00),
++			raw_pdu(0x70, 0x02, 0x04),
++			raw_pdu(0x72, 0x02, 0x01, 0x00, 0x07, 0x06, 0x00, 0x00,
 +				0xff, 0xff, 0x02, 0x40),
-+			raw_pdu(0xc0, 0x03, 0x04, 0x04, 0x01, 0x00, 0x07, 0x06,
++			raw_pdu(0x80, 0x03, 0x04, 0x04, 0x01, 0x00, 0x07, 0x06,
 +				0x00, 0x00, 0x21, 0x02, 0x02, 0x20),
-+			raw_pdu(0xc2, 0x03),
-+			raw_pdu(0xd0, 0x06, 0x04));
++			raw_pdu(0x82, 0x03),
++			raw_pdu(0x90, 0x04, 0x04));
  
  	return g_test_run();
  }
