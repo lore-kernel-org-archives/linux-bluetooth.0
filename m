@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv10 2/4] android/socket: Keep server iochannel reference
-Date: Mon, 25 Nov 2013 16:10:23 +0200
-Message-Id: <1385388625-3156-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv10 3/4] android/socket: Handle Android events for server socket
+Date: Mon, 25 Nov 2013 16:10:24 +0200
+Message-Id: <1385388625-3156-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1385388625-3156-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <20131125134005.GB19445@x220.p-661hnu-f1>
  <1385388625-3156-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,49 +12,63 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-server io channel reference will be stored in rfsock structure
-and might be deleted when Android end closes connection or when
-HAL makes cleanup() call.
+Add watch for tracking events from Android framework for server socket.
 ---
- android/socket.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ android/socket.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
 
 diff --git a/android/socket.c b/android/socket.c
-index e31e391..447e0f1 100644
+index 447e0f1..0817b5c 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -70,6 +70,8 @@ struct rfcomm_sock {
- 	guint rfcomm_watch;
- 	guint stack_watch;
- 
-+	GIOChannel *srv_io;
-+
- 	bdaddr_t dst;
- 	uint32_t service_handle;
- 
-@@ -121,6 +123,11 @@ static void cleanup_rfsock(struct rfcomm_sock *rfsock)
- 	if (rfsock->service_handle)
- 		bt_adapter_remove_record(rfsock->service_handle);
- 
-+	if (rfsock->srv_io) {
-+		g_io_channel_shutdown(rfsock->srv_io, TRUE, NULL);
-+		g_io_channel_unref(rfsock->srv_io);
-+	}
-+
- 	g_free(rfsock);
+@@ -596,6 +596,24 @@ static bool sock_send_accept(struct rfcomm_sock *rfsock, bdaddr_t *bdaddr,
+ 	return true;
  }
  
-@@ -699,9 +706,7 @@ static int handle_listen(void *buf)
- 	rfsock->real_sock = g_io_channel_unix_get_fd(io);
- 	servers = g_list_append(servers, rfsock);
++static gboolean sock_server_stack_event_cb(GIOChannel *io, GIOCondition cond,
++								gpointer data)
++{
++	struct rfcomm_sock *rfsock = data;
++
++	DBG("");
++
++	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
++		error("Socket error: sock %d cond %d",
++					g_io_channel_unix_get_fd(io), cond);
++		cleanup_rfsock(rfsock);
++
++		return FALSE;
++	}
++
++	return TRUE;
++}
++
+ static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
+ {
+ 	struct rfcomm_sock *rfsock = user_data;
+@@ -665,7 +683,8 @@ static int handle_listen(void *buf)
+ 	struct profile_info *profile;
+ 	struct rfcomm_sock *rfsock;
+ 	BtIOSecLevel sec_level;
+-	GIOChannel *io;
++	GIOChannel *io, *io_stack;
++	GIOCondition cond;
+ 	GError *err = NULL;
+ 	int hal_fd;
+ 	int chan;
+@@ -708,6 +727,12 @@ static int handle_listen(void *buf)
  
--	/* TODO: Add server watch */
--	g_io_channel_set_close_on_unref(io, TRUE);
--	g_io_channel_unref(io);
-+	rfsock->srv_io = io;
+ 	rfsock->srv_io = io;
  
++	/* Handle events from Android */
++	cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
++	io_stack = g_io_channel_unix_new(rfsock->fd);
++	g_io_add_watch(io_stack, cond, sock_server_stack_event_cb, rfsock);
++	g_io_channel_unref(io_stack);
++
  	DBG("real_sock %d fd %d hal_fd %d", rfsock->real_sock, rfsock->fd,
  								hal_fd);
+ 
 -- 
 1.8.3.2
 
