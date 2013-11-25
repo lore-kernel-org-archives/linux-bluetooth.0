@@ -1,42 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1385398409.3423.25.camel@nuvo>
-Subject: Crasher during remote initiated pairing
-From: Bastien Nocera <hadess@hadess.net>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Date: Mon, 25 Nov 2013 17:53:29 +0100
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: [PATCH v2 18/20] unit/AVDTP: Add /TP/SIG/SMG/BV-22-C test
+Date: Mon, 25 Nov 2013 16:54:41 +0200
+Message-Id: <1385391283-10962-19-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1385391283-10962-1-git-send-email-luiz.dentz@gmail.com>
+References: <1385391283-10962-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Heya,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-I have a particularly stubborn device, the TomTom Go Remote that tries
-to connect to my computer as soon as it's turned on, even when I've
-removed the pairing on the computer side.
+Verify that the IUT (ACP) is able to accept an AVDTP_SUSPEND_CMD, after
+the streaming procedure has been started, by reporting the suspension
+and replying the returned confirmation.
+---
+ unit/test-avdtp.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-With GNOME's Bluetooth wizard open, I receive an out of the blue request
-for pairing, I pass it the expected PIN code (0000), I then find that
-the wizard doesn't work as I expected and turn it off. bluetoothd
-promptly crashes:
-
-Program received signal SIGSEGV, Segmentation fault.
-0x00007f0cf9ffde24 in agent_auth_cb (agent=<optimized out>, derr=0x7fffab655920, user_data=0x7f0cfb2e0020) at src/adapter.c:4370
-4370		struct service_auth *auth = adapter->auths->head->data;
-(gdb) p adapter
-$1 = (struct btd_adapter *) 0x7f0cfb2e0020
-(gdb) p adapter->auths
-$2 = (GQueue *) 0x7f0cfb2d1240
-(gdb) p adapter->auths->head
-$3 = 0x0
-
-Some missing NULL checks?
-
-I imagine that this should be reproduceable using simple-agent and
-making it exit after replying to RequestPinCode.
-
-This happens with 5.10 and 5.11:
-https://retrace.fedoraproject.org/faf/problems/1353319/
-
-Cheers
+diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
+index 804fdf5..88c2b01 100644
+--- a/unit/test-avdtp.c
++++ b/unit/test-avdtp.c
+@@ -569,6 +569,21 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0xd0, 0x07, 0x04),
+ 			raw_pdu(0xd2, 0x07),
+ 			raw_pdu(0xe0, 0x09, 0x04));
++	define_test("/TP/SIG/SMG/BV-22-C", test_server,
++			raw_pdu(0x00, 0x01),
++			raw_pdu(0x02, 0x01, 0x04, 0x00),
++			raw_pdu(0x10, 0x02, 0x04),
++			raw_pdu(0x12, 0x02, 0x01, 0x00, 0x07, 0x06, 0x00, 0x00,
++				0xff, 0xff, 0x02, 0x40),
++			raw_pdu(0x20, 0x03, 0x04, 0x04, 0x01, 0x00, 0x07, 0x06,
++				0x00, 0x00, 0x21, 0x02, 0x02, 0x20),
++			raw_pdu(0x22, 0x03),
++			raw_pdu(0x30, 0x06, 0x04),
++			raw_pdu(0x32, 0x06),
++			raw_pdu(0x40, 0x07, 0x04),
++			raw_pdu(0x42, 0x07),
++			raw_pdu(0x50, 0x09, 0x04),
++			raw_pdu(0x52, 0x09));
+ 
+ 	return g_test_run();
+ }
+-- 
+1.8.3.1
 
