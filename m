@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv8 02/15] android/socket: Implement HAL connect call
-Date: Mon, 25 Nov 2013 11:44:45 +0200
-Message-Id: <1385372698-16212-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv8 15/15] android/hal-utils: Fix possible NULL pointer dereference
+Date: Mon, 25 Nov 2013 11:44:58 +0200
+Message-Id: <1385372698-16212-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1385372698-16212-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1385372698-16212-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,58 +11,34 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-HAL connect uses similar event handlers like listen call.
 ---
- android/socket.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ android/hal-utils.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/android/socket.c b/android/socket.c
-index cd958d9..00231a3 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -426,6 +426,42 @@ static int handle_listen(void *buf)
+diff --git a/android/hal-utils.c b/android/hal-utils.c
+index 4f44d98..e3c0c60 100644
+--- a/android/hal-utils.c
++++ b/android/hal-utils.c
+@@ -33,6 +33,9 @@ const char *bt_uuid_t2str(const uint8_t *uuid, char *buf)
+ 	unsigned int i;
+ 	int is_bt;
  
- static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
++	if (!uuid)
++		return strcpy(buf, "NULL");
++
+ 	is_bt = !memcmp(&uuid[4], &BT_BASE_UUID[4], HAL_UUID_LEN - 4);
+ 
+ 	for (i = 0; i < HAL_UUID_LEN; i++) {
+@@ -167,6 +170,9 @@ const char *bt_bdaddr_t2str(const bt_bdaddr_t *bd_addr, char *buf)
  {
-+	struct rfcomm_sock *rfsock = user_data;
-+	bdaddr_t *dst = &rfsock->dst;
-+	GIOChannel *io_stack;
-+	char address[18];
-+	guint id;
-+	GIOCondition cond;
-+
-+	if (err) {
-+		error("%s", err->message);
-+		goto fail;
-+	}
-+
-+	ba2str(dst, address);
-+	DBG("Connected to %s", address);
-+
-+	DBG("rfsock: fd %d real_sock %d chan %u sock %d",
-+		rfsock->fd, rfsock->real_sock, rfsock->channel,
-+		g_io_channel_unix_get_fd(io));
-+
-+	/* Handle events from Android */
-+	cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
-+	io_stack = g_io_channel_unix_new(rfsock->fd);
-+	id = g_io_add_watch(io_stack, cond, sock_stack_event_cb, rfsock);
-+	g_io_channel_unref(io_stack);
-+
-+	rfsock->stack_watch = id;
-+
-+	/* Handle rfcomm events */
-+	cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
-+	id = g_io_add_watch(io, cond, sock_rfcomm_event_cb, rfsock);
-+
-+	rfsock->rfcomm_watch = id;
-+
-+	return;
-+fail:
-+	cleanup_rfsock(rfsock);
- }
+ 	const uint8_t *p = bd_addr->address;
  
- static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
++	if (!bd_addr)
++		return strcpy(buf, "NULL");
++
+ 	snprintf(buf, MAX_ADDR_STR_LEN, "%02x:%02x:%02x:%02x:%02x:%02x",
+ 					p[0], p[1], p[2], p[3], p[4], p[5]);
+ 
 -- 
 1.8.3.2
 
