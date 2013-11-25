@@ -1,31 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 0/4] Adds pan connect disconnect and get role methods
-Date: Mon, 25 Nov 2013 15:49:25 +0200
-Message-Id: <1385387369-3015-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Date: Mon, 25 Nov 2013 15:42:34 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] sdptool: Fix memory leaks creating OPP record
+Message-ID: <20131125134234.GC19445@x220.p-661hnu-f1>
+References: <1385385285-30592-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1385385285-30592-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set supports PANU role with a minor fix in android. Added
-CAP_NET_RAW capability for bnep services. Creates bnep connection and
-up the inreface on connect call and free the device on disconnect call.
-Interface name(bnepX) will be notified on control state cb. Android
-environment will create IP address with dhcp calls.
+Hi Andrei,
 
-Ravi kumar Veeramally (4):
-  android: Add CAP_NET_RAW capability
-  android/pan: Implement pan connect method in daemon
-  android/pan: Implement pan disconnect method in daemon
-  android/pan: Implement the get local role method in daemon
+On Mon, Nov 25, 2013, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> ---
+>  tools/sdptool.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
- android/Android.mk  |   2 +
- android/Makefile.am |   3 +-
- android/main.c      |   1 +
- android/pan.c       | 340 ++++++++++++++++++++++++++++++++++++++++++++++++++--
- 4 files changed, 336 insertions(+), 10 deletions(-)
+All three patches have been applied, however don't hesitate to also send
+patches to fix using 0 instead of NULL for pointers.
 
--- 
-1.8.3.2
-
+Johan
