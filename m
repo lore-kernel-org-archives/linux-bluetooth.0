@@ -2,61 +2,223 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 12/13] device: Add device_discover_services function
-Date: Mon, 25 Nov 2013 22:15:51 +0000
-Message-Id: <1385417752-25664-13-git-send-email-szymon.janc@gmail.com>
+Subject: [PATCH 11/13] plugins/sixaxis: Add support for configuring new controllers
+Date: Mon, 25 Nov 2013 22:15:50 +0000
+Message-Id: <1385417752-25664-12-git-send-email-szymon.janc@gmail.com>
 In-Reply-To: <1385417752-25664-1-git-send-email-szymon.janc@gmail.com>
 References: <1385417752-25664-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will allow to query remote services from plugins for not yet
-discovered devices.
+When new PS3 controller is detected provide it with default adapter
+address. Also create new btd_device with proper PNP info if it wasn't
+existing yet.
 ---
- src/device.c | 17 +++++++++++++++++
- src/device.h |  2 ++
- 2 files changed, 19 insertions(+)
+ plugins/sixaxis.c | 179 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 178 insertions(+), 1 deletion(-)
 
-diff --git a/src/device.c b/src/device.c
-index 4e952c5..847ffad 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -3524,6 +3524,23 @@ static int device_browse_sdp(struct btd_device *device, DBusMessage *msg)
- 	return err;
- }
+diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+index 7a5c6c2..86cfe82 100644
+--- a/plugins/sixaxis.c
++++ b/plugins/sixaxis.c
+@@ -29,19 +29,196 @@
  
-+int device_discover_services(struct btd_device *device)
+ #include <stddef.h>
+ #include <errno.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <sys/ioctl.h>
++#include <linux/hidraw.h>
++#include <linux/input.h>
+ #include <glib.h>
+ #include <libudev.h>
+ 
++#include "lib/bluetooth.h"
++#include "uuid.h"
++#include "adapter.h"
++#include "device.h"
+ #include "plugin.h"
+ #include "log.h"
+ 
++static const struct {
++	const char *name;
++	uint16_t source;
++	uint16_t vid;
++	uint16_t pid;
++	uint16_t version;
++} devices[] = {
++	{
++		.name = "PLAYSTATION(R)3 Controller",
++		.source = 0x0002,
++		.vid = 0x054c,
++		.pid = 0x0268,
++		.version = 0x0000,
++	},
++};
++
+ static struct udev *ctx = NULL;
+ static struct udev_monitor *monitor = NULL;
+ static guint watch_id = 0;
+ 
++static int get_device_bdaddr(int fd, bdaddr_t *bdaddr)
 +{
-+	int err;
++	uint8_t buf[18];
++	int ret;
 +
-+	if (device_is_bredr(device))
-+		err = device_browse_sdp(device, NULL);
-+	else
-+		err = device_browse_primary(device, NULL);
++	memset(buf, 0, sizeof(buf));
 +
-+	if (err == 0 && device->discov_timer) {
-+		g_source_remove(device->discov_timer);
-+		device->discov_timer = 0;
++	buf[0] = 0xf2;
++
++	ret = ioctl(fd, HIDIOCGFEATURE(sizeof(buf)), buf);
++	if (ret < 0) {
++		error("sixaxis: failed to read device address (%s)",
++							strerror(errno));
++		return ret;
 +	}
 +
-+	return err;
++	baswap(bdaddr, (bdaddr_t *) (buf + 4));
++
++	return 0;
 +}
 +
- struct btd_adapter *device_get_adapter(struct btd_device *device)
- {
- 	if (!device)
-diff --git a/src/device.h b/src/device.h
-index a0d25fe..c3fea4a 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -131,5 +131,7 @@ bool device_remove_svc_complete_callback(struct btd_device *dev,
- struct btd_service *btd_device_get_service(struct btd_device *dev,
- 						const char *remote_uuid);
- 
-+int device_discover_services(struct btd_device *device);
++static int get_master_bdaddr(int fd, bdaddr_t *bdaddr)
++{
++	uint8_t buf[8];
++	int ret;
 +
- void btd_device_init(void);
- void btd_device_cleanup(void);
++	memset(buf, 0, sizeof(buf));
++
++	buf[0] = 0xf5;
++
++	ret = ioctl(fd, HIDIOCGFEATURE(sizeof(buf)), buf);
++	if (ret < 0) {
++		error("sixaxis: failed to read master address (%s)",
++							strerror(errno));
++		return ret;
++	}
++
++	baswap(bdaddr, (bdaddr_t *) (buf + 2));
++
++	return 0;
++}
++
++static int set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
++{
++	uint8_t buf[8];
++	int ret;
++
++	buf[0] = 0xf5;
++	buf[1] = 0x01;
++
++	baswap((bdaddr_t *) (buf + 2), bdaddr);
++
++	ret = ioctl(fd, HIDIOCSFEATURE(sizeof(buf)), buf);
++	if (ret < 0)
++		error("sixaxis: failed to write master address (%s)",
++							strerror(errno));
++
++	return ret;
++}
++
++static void setup_device(int fd, int index, struct btd_adapter *adapter)
++{
++	char device_addr[18], master_addr[18], adapter_addr[18];
++	bdaddr_t device_bdaddr, master_bdaddr;
++	const bdaddr_t *adapter_bdaddr;
++	struct btd_device *device;
++
++	if (get_device_bdaddr(fd, &device_bdaddr) < 0)
++		return;
++
++	if (get_master_bdaddr(fd, &master_bdaddr) < 0)
++		return;
++
++	adapter_bdaddr = btd_adapter_get_address(adapter);
++
++	if (bacmp(adapter_bdaddr, &master_bdaddr)) {
++		if (set_master_bdaddr(fd, adapter_bdaddr) < 0)
++			return;
++	}
++
++	ba2str(&device_bdaddr, device_addr);
++	ba2str(&master_bdaddr, master_addr);
++	ba2str(adapter_bdaddr, adapter_addr);
++	DBG("remote %s old_master %s new_master %s",
++				device_addr, master_addr, adapter_addr);
++
++	device = btd_adapter_get_device(adapter, &device_bdaddr, BDADDR_BREDR);
++
++	if (g_slist_find_custom(btd_device_get_uuids(device), HID_UUID,
++						(GCompareFunc)strcasecmp)) {
++		DBG("device %s already known, skipping", device_addr);
++		return;
++	}
++
++	info("sixaxis: setting up new device");
++
++	btd_device_device_set_name(device, devices[index].name);
++	btd_device_set_pnpid(device, devices[index].source, devices[index].vid,
++				devices[index].pid, devices[index].version);
++	btd_device_set_temporary(device, FALSE);
++	btd_device_set_trusted(device, TRUE);
++}
++
++static int get_supported_device(struct udev_device *udevice, uint16_t *bus)
++{
++	struct udev_device *hid_parent;
++	uint16_t vid, pid;
++	const char *hid_id;
++	int i;
++
++	hid_parent = udev_device_get_parent_with_subsystem_devtype(udevice,
++								"hid", NULL);
++	if (!hid_parent)
++		return -1;
++
++	hid_id = udev_device_get_property_value(hid_parent, "HID_ID");
++
++	if (sscanf(hid_id, "%hx:%hx:%hx", bus, &vid, &pid) != 3)
++		return -1;
++
++	for (i = 0; G_N_ELEMENTS(devices); i++) {
++		if (devices[i].vid == vid && devices[i].pid == pid)
++			return i;
++	}
++
++	return -1;
++}
++
+ static void device_added(struct udev_device *udevice)
+ {
+-	DBG("");
++	struct btd_adapter *adapter;
++	uint16_t bus;
++	int index;
++	int fd;
++
++	adapter = btd_adapter_get_default();
++	if (!adapter)
++		return;
++
++	index = get_supported_device(udevice, &bus);
++	if (index < 0)
++		return;
++
++	info("sixaxis: compatible device connected: %s (%04X:%04X)",
++				devices[index].name, devices[index].vid,
++				devices[index].pid);
++
++	fd = open(udev_device_get_devnode(udevice), O_RDWR);
++	if (fd < 0)
++		return;
++
++	if (bus == BUS_USB)
++		setup_device(fd, index, adapter);
++
++	close(fd);
+ }
+ 
+ static gboolean monitor_watch(GIOChannel *source, GIOCondition condition,
 -- 
 1.8.4.4
 
