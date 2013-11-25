@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv9 17/21] android/socket: Add error printing possible close() failure
-Date: Mon, 25 Nov 2013 15:08:53 +0200
-Message-Id: <1385384937-29858-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv9 18/21] android/socket: Use security level for connect
+Date: Mon, 25 Nov 2013 15:08:54 +0200
+Message-Id: <1385384937-29858-19-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1385384937-29858-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1385384937-29858-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,58 +11,68 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Use low security level for connections without profile and default
+sec_level for others. rfsock now has pointer to profile info for
+outcoming connections.
 ---
- android/socket.c | 23 +++++++++++++++++------
- 1 file changed, 17 insertions(+), 6 deletions(-)
+ android/socket.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/android/socket.c b/android/socket.c
-index 11358e3..db47667 100644
+index db47667..6f2c498 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -96,10 +96,15 @@ static void cleanup_rfsock(struct rfcomm_sock *rfsock)
- 	DBG("rfsock: %p fd %d real_sock %d chan %u",
- 		rfsock, rfsock->fd, rfsock->real_sock, rfsock->channel);
+@@ -60,6 +60,8 @@ GList *servers = NULL;
+ /* Simple list of RFCOMM connected sockets */
+ GList *connections = NULL;
  
--	if (rfsock->fd > 0)
--		close(rfsock->fd);
--	if (rfsock->real_sock > 0)
--		close(rfsock->real_sock);
-+	if (rfsock->fd >= 0)
-+		if (close(rfsock->fd) < 0)
-+			error("close() fd %d failed: %s", rfsock->fd,
-+							strerror(errno));
++struct profile_info;
 +
-+	if (rfsock->real_sock >= 0)
-+		if (close(rfsock->real_sock) < 0)
-+			error("close() fd %d: failed: %s", rfsock->real_sock,
-+							strerror(errno));
+ struct rfcomm_sock {
+ 	int fd;		/* descriptor for communication with Java framework */
+ 	int real_sock;	/* real RFCOMM socket */
+@@ -70,6 +72,8 @@ struct rfcomm_sock {
  
- 	if (rfsock->rfcomm_watch > 0)
- 		if (!g_source_remove(rfsock->rfcomm_watch))
-@@ -891,7 +896,10 @@ void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
- 			break;
+ 	bdaddr_t dst;
+ 	uint32_t service_handle;
++
++	struct profile_info *profile;
+ };
  
- 		ipc_send(sk, HAL_SERVICE_ID_SOCK, opcode, 0, NULL, fd);
--		close(fd);
-+
-+		if (close(fd) < 0)
-+			error("close() fd %d failed: %s", fd, strerror(errno));
-+
- 		return;
- 	case HAL_OP_SOCK_CONNECT:
- 		fd = handle_connect(buf);
-@@ -899,7 +907,10 @@ void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
- 			break;
+ static struct rfcomm_sock *create_rfsock(int sock, int *hal_fd)
+@@ -786,6 +790,7 @@ fail:
+ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ {
+ 	struct rfcomm_sock *rfsock = data;
++	BtIOSecLevel sec_level = BT_IO_SEC_LOW;
+ 	GError *gerr = NULL;
+ 	sdp_list_t *list;
+ 	GIOChannel *io;
+@@ -829,11 +834,14 @@ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
  
- 		ipc_send(sk, HAL_SERVICE_ID_SOCK, opcode, 0, NULL, fd);
--		close(fd);
+ 	DBG("Got RFCOMM channel %d", chan);
+ 
++	if (rfsock->profile)
++		sec_level = rfsock->profile->sec_level;
 +
-+		if (close(fd) < 0)
-+			error("close() fd %d failed: %s", fd, strerror(errno));
+ 	io = bt_io_connect(connect_cb, rfsock, NULL, &gerr,
+ 				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
+ 				BT_IO_OPT_DEST_BDADDR, &rfsock->dst,
+ 				BT_IO_OPT_CHANNEL, chan,
+-				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
++				BT_IO_OPT_SEC_LEVEL, sec_level,
+ 				BT_IO_OPT_INVALID);
+ 	if (!io) {
+ 		error("Failed connect: %s", gerr->message);
+@@ -875,6 +883,8 @@ static int handle_connect(void *buf)
+ 	uuid.type = SDP_UUID128;
+ 	memcpy(&uuid.value.uuid128, cmd->uuid, sizeof(uint128_t));
+ 
++	rfsock->profile = get_profile_by_uuid(cmd->uuid);
 +
- 		return;
- 	default:
- 		DBG("Unhandled command, opcode 0x%x", opcode);
+ 	if (bt_search_service(&adapter_addr, &dst, &uuid, sdp_search_cb, rfsock,
+ 								NULL) < 0) {
+ 		error("Failed to search SDP records");
 -- 
 1.8.3.2
 
