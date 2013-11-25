@@ -1,68 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 25 Nov 2013 16:25:32 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/4] android: Add CAP_NET_RAW capability
-Message-ID: <20131125142532.GA26309@x220.p-661hnu-f1>
-References: <1385387369-3015-1-git-send-email-ravikumar.veeramally@linux.intel.com>
- <1385387369-3015-2-git-send-email-ravikumar.veeramally@linux.intel.com>
- <20131125140154.GA24659@x220.p-661hnu-f1>
- <52935B51.403@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <52935B51.403@linux.intel.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv10 4/4] android/socket: Check create_rfsock returns valid structure
+Date: Mon, 25 Nov 2013 16:10:25 +0200
+Message-Id: <1385388625-3156-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1385388625-3156-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <20131125134005.GB19445@x220.p-661hnu-f1>
+ <1385388625-3156-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Mon, Nov 25, 2013, Ravi kumar Veeramally wrote:
-> On 25.11.2013 16:01, Johan Hedberg wrote:
-> >Hi Ravi,
-> >
-> >On Mon, Nov 25, 2013, Ravi kumar Veeramally wrote:
-> >>CAP_NET_RAW capability is required to up the bnep interfaces
-> >>in android environment.
-> >>---
-> >>  android/main.c | 1 +
-> >>  1 file changed, 1 insertion(+)
-> >>
-> >>diff --git a/android/main.c b/android/main.c
-> >>index c9733f3..bfd2a87 100644
-> >>--- a/android/main.c
-> >>+++ b/android/main.c
-> >>@@ -506,6 +506,7 @@ static bool set_capabilities(void)
-> >>  	header.pid = 0;
-> >>  	cap.effective = cap.permitted =
-> >>+		CAP_TO_MASK(CAP_NET_RAW) |
-> >>  		CAP_TO_MASK(CAP_NET_ADMIN) |
-> >>  		CAP_TO_MASK(CAP_NET_BIND_SERVICE);
-> >>  	cap.inheritable = 0;
-> >Would you then say that commit 9bda7e8c2130de9a3340ebd0e6cc1dedc2eae338
-> >is incorrect? A quick grep doesn't show any instances of checking this
-> >capability in the BNEP code of the kernel. Exactly which system call is
-> >it that needs it?
->    bnep_if_up from profiles/network/common.c
->  ---
->         ifr.ifr_flags |= IFF_UP;
->         ifr.ifr_flags |= IFF_MULTICAST;
-> 
->         err = ioctl(sk, SIOCSIFFLAGS, (caddr_t) &ifr);
-> ---
->  requires this capability in android environment only.
->  this code is under android macro.
+---
+ android/socket.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-So you've verified that under "normal" Linux this ioctl does not require
-the NET_RAW capability?
+diff --git a/android/socket.c b/android/socket.c
+index 0817b5c..66b240d 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -647,6 +647,12 @@ static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
+ 
+ 	sock_acc = g_io_channel_unix_get_fd(io);
+ 	rfsock_acc = create_rfsock(sock_acc, &hal_fd);
++	if (!rfsock_acc) {
++		g_io_channel_shutdown(io, TRUE, NULL);
++		g_io_channel_unref(io);
++		return;
++	}
++
+ 	connections = g_list_append(connections, rfsock_acc);
+ 
+ 	DBG("rfsock: fd %d real_sock %d chan %u sock %d",
+@@ -905,8 +911,11 @@ static int handle_connect(void *buf)
+ 
+ 	DBG("");
+ 
+-	android2bdaddr(cmd->bdaddr, &dst);
+ 	rfsock = create_rfsock(-1, &hal_fd);
++	if (!rfsock)
++		return -1;
++
++	android2bdaddr(cmd->bdaddr, &dst);
+ 	bacpy(&rfsock->dst, &dst);
+ 
+ 	memset(&uuid, 0, sizeof(uuid));
+-- 
+1.8.3.2
 
-> >If you answered positively to my first question, please send a patch for
-> >that as well.
->  I didn't understand this, sorry.
-
-My first question was: "Would you then say that
-commit 9bda7e8c2130de9a3340ebd0e6cc1dedc2eae338 is incorrect?". Do you
-not understand that question or what I asked you to do in case the
-answer is "yes"?
-
-Johan
