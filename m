@@ -1,37 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Wed, 27 Nov 2013 11:40:02 +0800
-Message-ID: <CAFv23QmyQL1QTy8=HkYVpb94kFzNuULfdByqYcyCAQa__dg9Nw@mail.gmail.com>
-Subject: Loading ath3k firmware failed
-From: AceLan Kao <acelan.kao@canonical.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
-	Chen Chong <chongc@qca.qualcomm.com>, Peng Chen <pengchen@qca.qualcomm.com>
-Cc: Anthony Wong <anthony.wong@canonical.com>, YK <yk@canonical.com>
+From: Bruno Bruzzano <brunano21@gmail.com>
+Date: Tue, 26 Nov 2013 17:26:08 -0500
+Message-ID: <CACA6DsUuDH+YLo-UopvrAj8+-yV6P32a2bGmYeoYuAAT58n_zw@mail.gmail.com>
+Subject: BT Handover Issue
+To: sameo@linux.intel.com,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	linux-nfc@lists.01.org
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Samuel,
 
-Sorry to spam you guys.
-I recently encountered a issue that I can't figure out how to fix it,
-so I write to you and hope some of you can give me hints.
+When I try to send the BT Handover Message to pair my smartphone
+(Nexus5), I encounter an issue.
+My background is bluez upstream, neard upstream.
+I did the following steps:
+-run bluetooth -ndE
+-run neard -nd '*'
+-run ./simple-agent (with NoInputNoOutput capability)
+-set power and poll the NFC Adapter
+-put my device on top of the adapter ( -> neard recognizes the device,
+creating the right deviceX interface)
+-./test-device push /org/neard/nfc0/device0 Handover bluetooth
 
-The issue is ath3k easily fails to load its firmware when the USB port
-is switchable(EHCI -> XHCI).
-   ath3k: probe of 2-7:1.0 failed with error -110
-Sometimes it fails to load the firmware when boot up, sometimes it
-fails when resume from S3.
+The procedure starts, but it stopped itself before to send the message
+to the device.
+Here, I made a pastebin of neard.
+http://pastebin.com/XEqeucER
+In addiction, here you can find other 2 pastbins about the messages I
+receive when I do the push (typing './test-device push
+/org/neard/nfc0/device0 .....')
+http://pastebin.com/faai51ed
+http://pastebin.com/N0jWnyXG
 
-I try to set the D0 register to 0 to force it use EHCI, then it works well.
-Disable the USB 3.0 function from BIOS, it also works well.
-And another workaround is to delay loading the ath3k module around 30
-seconds, it can load the firmware without problems.
+Another question: do you think it is possibile send the Handover
+Message using the MIME type? I mean, typing: ./test-device push
+/org/neard/nfc0/device3 MIME raw application/vnd.bluetooth.ep.oob
+'lenghtOOB + device mac_address'
 
-It's not only happened on a certain Atheros chip, we've encountered
-this issue on many Atheros chips.
-To get rid of this issue, please give me some hints, I can help to
-verify your ideas.
+Please give me a feedback.
+Thanks!
 
-Best regards,
-AceLan Kao.
+Bruno aka br1_21
