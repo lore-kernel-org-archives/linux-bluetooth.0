@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/6] android/hal-sock: Check uuid before dereference
-Date: Tue, 26 Nov 2013 16:05:49 +0200
-Message-Id: <1385474750-18331-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/6] android/socket: Use security level for connect / listen
+Date: Tue, 26 Nov 2013 16:05:46 +0200
+Message-Id: <1385474750-18331-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1385474750-18331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1385474750-18331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,54 +11,67 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-uuid might be NULL and channel might be specified which makes it
-valid case for Android. This adds check for uuid and service name.
+Use MEDIUM security level for connections without profile and default
+sec_level for others. rfsock now has pointer to profile info.
 ---
- android/hal-sock.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ android/socket.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/android/hal-sock.c b/android/hal-sock.c
-index e02a49a..f45be30 100644
---- a/android/hal-sock.c
-+++ b/android/hal-sock.c
-@@ -34,12 +34,17 @@ static bt_status_t sock_listen_rfcomm(const char *service_name,
+diff --git a/android/socket.c b/android/socket.c
+index 184deae..20dbc5e 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -70,6 +70,8 @@ struct rfcomm_sock {
  
- 	DBG("");
+ 	bdaddr_t dst;
+ 	uint32_t service_handle;
++
++	const struct profile_info *profile;
+ };
  
-+	memset(&cmd, 0, sizeof(cmd));
-+
- 	cmd.flags = flags;
- 	cmd.type = BTSOCK_RFCOMM;
- 	cmd.channel = chan;
--	memcpy(cmd.uuid, uuid, sizeof(cmd.uuid));
--	memset(cmd.name, 0, sizeof(cmd.name));
--	memcpy(cmd.name, service_name, strlen(service_name));
-+
-+	if (uuid)
-+		memcpy(cmd.uuid, uuid, sizeof(cmd.uuid));
-+
-+	if (service_name)
-+		memcpy(cmd.name, service_name, strlen(service_name));
+ static struct rfcomm_sock *create_rfsock(int sock, int *hal_fd)
+@@ -667,7 +669,7 @@ static int handle_listen(void *buf)
+ 			return -1;
+ 		else {
+ 			chan = cmd->channel;
+-			sec_level = BT_IO_SEC_LOW;
++			sec_level = BT_IO_SEC_MEDIUM;
+ 		}
+ 	} else {
+ 		chan = profile->channel;
+@@ -786,6 +788,7 @@ fail:
+ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ {
+ 	struct rfcomm_sock *rfsock = data;
++	BtIOSecLevel sec_level = BT_IO_SEC_MEDIUM;
+ 	GError *gerr = NULL;
+ 	sdp_list_t *list;
+ 	GIOChannel *io;
+@@ -829,11 +832,14 @@ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
  
- 	return hal_ipc_cmd(HAL_SERVICE_ID_SOCK, HAL_OP_SOCK_LISTEN,
- 				sizeof(cmd), &cmd, NULL, NULL, sock);
-@@ -90,10 +95,15 @@ static bt_status_t sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
- 		return BT_STATUS_UNSUPPORTED;
- 	}
+ 	DBG("Got RFCOMM channel %d", chan);
  
-+	memset(&cmd, 0, sizeof(cmd));
++	if (rfsock->profile)
++		sec_level = rfsock->profile->sec_level;
 +
- 	cmd.flags = flags;
- 	cmd.type = type;
- 	cmd.channel = chan;
--	memcpy(cmd.uuid, uuid, sizeof(cmd.uuid));
-+
-+	if (uuid)
-+		memcpy(cmd.uuid, uuid, sizeof(cmd.uuid));
-+
- 	memcpy(cmd.bdaddr, bdaddr, sizeof(cmd.bdaddr));
+ 	io = bt_io_connect(connect_cb, rfsock, NULL, &gerr,
+ 				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
+ 				BT_IO_OPT_DEST_BDADDR, &rfsock->dst,
+ 				BT_IO_OPT_CHANNEL, chan,
+-				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
++				BT_IO_OPT_SEC_LEVEL, sec_level,
+ 				BT_IO_OPT_INVALID);
+ 	if (!io) {
+ 		error("Failed connect: %s", gerr->message);
+@@ -875,6 +881,8 @@ static int handle_connect(void *buf)
+ 	uuid.type = SDP_UUID128;
+ 	memcpy(&uuid.value.uuid128, cmd->uuid, sizeof(uint128_t));
  
- 	return hal_ipc_cmd(HAL_SERVICE_ID_SOCK, HAL_OP_SOCK_CONNECT,
++	rfsock->profile = get_profile_by_uuid(cmd->uuid);
++
+ 	if (bt_search_service(&adapter_addr, &dst, &uuid, sdp_search_cb, rfsock,
+ 								NULL) < 0) {
+ 		error("Failed to search SDP records");
 -- 
 1.8.3.2
 
