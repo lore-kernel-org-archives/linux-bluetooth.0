@@ -1,199 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] client: Add 'auto' parameter to agent command
-Date: Tue, 26 Nov 2013 17:05:08 +0200
-Message-Id: <1385478310-22520-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 3/6] android/socket: Handle Android events for server socket
+Date: Tue, 26 Nov 2013 16:05:47 +0200
+Message-Id: <1385474750-18331-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1385474750-18331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1385474750-18331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This adds 'auto' parameter to agent command which auto accepts requests
-whenever possible.
+Add watch for tracking events from Android framework for server socket.
 ---
- client/agent.c | 14 +++++++++++++-
- client/agent.h |  2 +-
- client/main.c  | 30 ++++++++++++++++++------------
- 3 files changed, 32 insertions(+), 14 deletions(-)
+ android/socket.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/client/agent.c b/client/agent.c
-index 2d9dffd..81526a1 100644
---- a/client/agent.c
-+++ b/client/agent.c
-@@ -27,6 +27,7 @@
- 
- #include <stdio.h>
- #include <stdlib.h>
-+#include <stdbool.h>
- #include <readline/readline.h>
- #include <gdbus.h>
- 
-@@ -40,6 +41,7 @@
- 
- static gboolean agent_registered = FALSE;
- static const char *agent_capability = NULL;
-+static bool agent_auto_accept = false;
- static DBusMessage *pending_message = NULL;
- static char *agent_saved_prompt = NULL;
- static int agent_saved_point = 0;
-@@ -259,6 +261,9 @@ static DBusMessage *request_confirmation(DBusConnection *conn,
- 	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
- 				DBUS_TYPE_UINT32, &passkey, DBUS_TYPE_INVALID);
- 
-+	if (agent_auto_accept)
-+		return dbus_message_new_method_return(msg);
-+
- 	str = g_strdup_printf("Confirm passkey %06u (yes/no): ", passkey);
- 	agent_prompt(str);
- 	g_free(str);
-@@ -278,6 +283,9 @@ static DBusMessage *request_authorization(DBusConnection *conn,
- 	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
- 							DBUS_TYPE_INVALID);
- 
-+	if (agent_auto_accept)
-+		return dbus_message_new_method_return(msg);
-+
- 	agent_prompt("Accept pairing (yes/no): ");
- 
- 	pending_message = dbus_message_ref(msg);
-@@ -296,6 +304,9 @@ static DBusMessage *authorize_service(DBusConnection *conn,
- 	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
- 				DBUS_TYPE_STRING, &uuid, DBUS_TYPE_INVALID);
- 
-+	if (agent_auto_accept)
-+		return dbus_message_new_method_return(msg);
-+
- 	str = g_strdup_printf("Authorize service %s (yes/no): ", uuid);
- 	agent_prompt(str);
- 	g_free(str);
-@@ -375,7 +386,7 @@ static void register_agent_reply(DBusMessage *message, void *user_data)
+diff --git a/android/socket.c b/android/socket.c
+index 20dbc5e..c4f14ab 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -587,6 +587,24 @@ static bool sock_send_accept(struct rfcomm_sock *rfsock, bdaddr_t *bdaddr,
+ 	return true;
  }
  
- void agent_register(DBusConnection *conn, GDBusProxy *manager,
--						const char *capability)
-+				const char *capability, bool auto_accept)
- 
++static gboolean sock_server_stack_event_cb(GIOChannel *io, GIOCondition cond,
++								gpointer data)
++{
++	struct rfcomm_sock *rfsock = data;
++
++	DBG("");
++
++	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
++		error("Socket error: sock %d cond %d",
++					g_io_channel_unix_get_fd(io), cond);
++		cleanup_rfsock(rfsock);
++
++		return FALSE;
++	}
++
++	return TRUE;
++}
++
+ static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
  {
- 	if (agent_registered == TRUE) {
-@@ -401,6 +412,7 @@ void agent_register(DBusConnection *conn, GDBusProxy *manager,
- 	}
+ 	struct rfcomm_sock *rfsock = user_data;
+@@ -656,7 +674,8 @@ static int handle_listen(void *buf)
+ 	const struct profile_info *profile;
+ 	struct rfcomm_sock *rfsock;
+ 	BtIOSecLevel sec_level;
+-	GIOChannel *io;
++	GIOChannel *io, *io_stack;
++	GIOCondition cond;
+ 	GError *err = NULL;
+ 	int hal_fd;
+ 	int chan;
+@@ -701,6 +720,12 @@ static int handle_listen(void *buf)
+ 	g_io_channel_set_close_on_unref(io, TRUE);
+ 	g_io_channel_unref(io);
  
- 	agent_capability = NULL;
-+	agent_auto_accept = auto_accept;
- }
++	/* Handle events from Android */
++	cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
++	io_stack = g_io_channel_unix_new(rfsock->fd);
++	g_io_add_watch(io_stack, cond, sock_server_stack_event_cb, rfsock);
++	g_io_channel_unref(io_stack);
++
+ 	DBG("real_sock %d fd %d hal_fd %d", rfsock->real_sock, rfsock->fd,
+ 								hal_fd);
  
- static void unregister_agent_setup(DBusMessageIter *iter, void *user_data)
-diff --git a/client/agent.h b/client/agent.h
-index 0fbe8e5..467afb0 100644
---- a/client/agent.h
-+++ b/client/agent.h
-@@ -22,7 +22,7 @@
-  */
- 
- void agent_register(DBusConnection *conn, GDBusProxy *manager,
--						const char *capability);
-+				const char *capability, bool auto_accept);
- void agent_unregister(DBusConnection *conn, GDBusProxy *manager);
- void agent_default(DBusConnection *conn, GDBusProxy *manager);
- 
-diff --git a/client/main.c b/client/main.c
-index ebc85c6..5639f0e 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -29,6 +29,7 @@
- #include <errno.h>
- #include <unistd.h>
- #include <stdlib.h>
-+#include <stdbool.h>
- #include <signal.h>
- #include <sys/signalfd.h>
- 
-@@ -53,13 +54,15 @@ static GMainLoop *main_loop;
- static DBusConnection *dbus_conn;
- 
- static GDBusProxy *agent_manager;
--static char *auto_register_agent = NULL;
-+static char *agent_capability = NULL;
-+static bool agent_auto_accept = false;
- 
- static GDBusProxy *default_ctrl;
- static GList *ctrl_list;
- static GList *dev_list;
- 
- static const char * const agent_arguments[] = {
-+	"auto",
- 	"on",
- 	"off",
- 	"DisplayOnly",
-@@ -284,9 +287,10 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
- 		if (!agent_manager) {
- 			agent_manager = proxy;
- 
--			if (auto_register_agent)
-+			if (agent_capability)
- 				agent_register(dbus_conn, agent_manager,
--							auto_register_agent);
-+							agent_capability,
-+							agent_auto_accept);
- 		}
- 	}
- }
-@@ -434,7 +438,8 @@ static gboolean parse_argument_agent(const char *arg, dbus_bool_t *value,
- 		return FALSE;
- 	}
- 
--	if (strcmp(arg, "on") == 0 || strcmp(arg, "yes") == 0) {
-+	if (strcmp(arg, "on") == 0 || strcmp(arg, "yes") == 0 ||
-+						strcmp(arg, "auto") == 0) {
- 		*value = TRUE;
- 		*capability = "";
- 		return TRUE;
-@@ -680,17 +685,18 @@ static void cmd_agent(const char *arg)
- 		return;
- 
- 	if (enable == TRUE) {
--		g_free(auto_register_agent);
--		auto_register_agent = g_strdup(capability);
-+		g_free(agent_capability);
-+		agent_capability = g_strdup(capability);
-+		agent_auto_accept = strcmp(arg, "auto") == 0 ? true : false;
- 
- 		if (agent_manager)
- 			agent_register(dbus_conn, agent_manager,
--						auto_register_agent);
-+					agent_capability, agent_auto_accept);
- 		else
- 			rl_printf("Agent registration enabled\n");
- 	} else {
--		g_free(auto_register_agent);
--		auto_register_agent = NULL;
-+		g_free(agent_capability);
-+		agent_capability = NULL;
- 
- 		if (agent_manager)
- 			agent_unregister(dbus_conn, agent_manager);
-@@ -1331,9 +1337,9 @@ static gboolean parse_agent(const char *key, const char *value,
- 					gpointer user_data, GError **error)
- {
- 	if (value)
--		auto_register_agent = g_strdup(value);
-+		agent_capability = g_strdup(value);
- 	else
--		auto_register_agent = g_strdup("");
-+		agent_capability = g_strdup("");
- 
- 	return TRUE;
- }
-@@ -1410,7 +1416,7 @@ int main(int argc, char *argv[])
- 	g_list_free_full(ctrl_list, proxy_leak);
- 	g_list_free_full(dev_list, proxy_leak);
- 
--	g_free(auto_register_agent);
-+	g_free(agent_capability);
- 
- 	return 0;
- }
 -- 
-1.8.3.1
+1.8.3.2
 
