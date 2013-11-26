@@ -1,46 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 26 Nov 2013 17:43:14 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] android/haltest: trivial: Fix typo channle -> channel
+Message-ID: <20131126154314.GA25005@x220.p-661hnu-f1>
+References: <1385473625-14266-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-From: Bruno Bruzzano <brunano21@gmail.com>
-Date: Tue, 26 Nov 2013 17:26:08 -0500
-Message-ID: <CACA6DsUuDH+YLo-UopvrAj8+-yV6P32a2bGmYeoYuAAT58n_zw@mail.gmail.com>
-Subject: BT Handover Issue
-To: sameo@linux.intel.com,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	linux-nfc@lists.01.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1385473625-14266-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Samuel,
+Hi Andrei,
 
-When I try to send the BT Handover Message to pair my smartphone
-(Nexus5), I encounter an issue.
-My background is bluez upstream, neard upstream.
-I did the following steps:
--run bluetooth -ndE
--run neard -nd '*'
--run ./simple-agent (with NoInputNoOutput capability)
--set power and poll the NFC Adapter
--put my device on top of the adapter ( -> neard recognizes the device,
-creating the right deviceX interface)
--./test-device push /org/neard/nfc0/device0 Handover bluetooth
+On Tue, Nov 26, 2013, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> ---
+>  android/client/if-sock.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-The procedure starts, but it stopped itself before to send the message
-to the device.
-Here, I made a pastebin of neard.
-http://pastebin.com/XEqeucER
-In addiction, here you can find other 2 pastbins about the messages I
-receive when I do the push (typing './test-device push
-/org/neard/nfc0/device0 .....')
-http://pastebin.com/faai51ed
-http://pastebin.com/N0jWnyXG
+Both patches have been applied. Thanks.
 
-Another question: do you think it is possibile send the Handover
-Message using the MIME type? I mean, typing: ./test-device push
-/org/neard/nfc0/device3 MIME raw application/vnd.bluetooth.ep.oob
-'lenghtOOB + device mac_address'
-
-Please give me a feedback.
-Thanks!
-
-Bruno aka br1_21
+Johan
