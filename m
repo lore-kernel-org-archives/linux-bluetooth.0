@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/6] android/socket: Check create_rfsock returns valid structure
-Date: Tue, 26 Nov 2013 16:05:48 +0200
-Message-Id: <1385474750-18331-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 6/6] android: Do not dereference possible NULL pointer
+Date: Tue, 26 Nov 2013 16:05:50 +0200
+Message-Id: <1385474750-18331-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1385474750-18331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1385474750-18331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,39 +11,27 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+eir might be NULL, do not derefernce it in debug and print instead
+pointer.
 ---
- android/socket.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ android/bluetooth.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/android/socket.c b/android/socket.c
-index c4f14ab..772afaa 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -638,6 +638,11 @@ static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index aa684bd..77ce519 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -916,8 +916,8 @@ static void mgmt_device_found_event(uint16_t index, uint16_t length,
+ 	flags = btohl(ev->flags);
  
- 	sock_acc = g_io_channel_unix_get_fd(io);
- 	rfsock_acc = create_rfsock(sock_acc, &hal_fd);
-+	if (!rfsock_acc) {
-+		g_io_channel_shutdown(io, TRUE, NULL);
-+		return;
-+	}
-+
- 	connections = g_list_append(connections, rfsock_acc);
+ 	ba2str(&ev->addr.bdaddr, addr);
+-	DBG("hci%u addr %s, rssi %d flags 0x%04x eir_len %u eir %u",
+-				index, addr, ev->rssi, flags, eir_len, *eir);
++	DBG("hci%u addr %s, rssi %d flags 0x%04x eir_len %u eir %p",
++				index, addr, ev->rssi, flags, eir_len, eir);
  
- 	DBG("rfsock: fd %d real_sock %d chan %u sock %d",
-@@ -898,8 +903,11 @@ static int handle_connect(void *buf)
+ 	confirm_name = flags & MGMT_DEV_FOUND_CONFIRM_NAME;
  
- 	DBG("");
- 
--	android2bdaddr(cmd->bdaddr, &dst);
- 	rfsock = create_rfsock(-1, &hal_fd);
-+	if (!rfsock)
-+		return -1;
-+
-+	android2bdaddr(cmd->bdaddr, &dst);
- 	bacpy(&rfsock->dst, &dst);
- 
- 	memset(&uuid, 0, sizeof(uuid));
 -- 
 1.8.3.2
 
