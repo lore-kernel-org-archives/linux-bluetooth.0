@@ -1,85 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 26 Nov 2013 15:43:08 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bastien Nocera <hadess@hadess.net>, linux-bluetooth@vger.kernel.org
+Subject: Re: Crasher during remote initiated pairing
+Message-ID: <20131126134308.GA20389@x220.p-661hnu-f1>
+References: <1385398409.3423.25.camel@nuvo>
+ <20131126133427.GA19614@x220.p-661hnu-f1>
 MIME-Version: 1.0
-In-Reply-To: <1385391283-10962-1-git-send-email-luiz.dentz@gmail.com>
-References: <1385391283-10962-1-git-send-email-luiz.dentz@gmail.com>
-Date: Tue, 26 Nov 2013 15:46:47 +0200
-Message-ID: <CABBYNZL-T4z2A99+dUw=DP5W5G286FSmf3wAewz+jaS2p1Krhg@mail.gmail.com>
-Subject: Re: [PATCH v2 00/20] Initial AVDTP for Android
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20131126133427.GA19614@x220.p-661hnu-f1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Bastien,
 
-On Mon, Nov 25, 2013 at 4:54 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> The code is based on the current implementation available in
-> profiles/audio/avdtp.{c,h} but it is transport agnostic and does not
-> contain any external dependency except glib for IO handling.
->
-> Both the signaling and the transport connection has to be handled by
-> the upper layer, that is why it is not modified in place to avoid
-> breaking current implemention until this work is considered stable.
->
-> Two new function are added:
->
->   - avdtp_new: Creates AVDTP session and attach signaling transport
->   - avdtp_stream_set_transport: Set stream transport
->
-> Both receives a fd as parameter so in future it should be possible to
-> replace the IO handling.
->
-> This set also includes a initial test set based on the current AVDTP
-> test specification, once merged more tests will be added as well,
-> then the intent is to make this used by audio plugin.
->
-> Note: It is possible to track back to the original code by doing:
-> git log --follow or git blame -C -C.
->
-> v2: Add a separate commit to copy existing AVDTP files
->
-> Luiz Augusto von Dentz (20):
->   android: Add copy of current AVDTP implemention
->   android/AVDTP: Strip dependencies
->   unit/AVDTP: Add /TP/SIG/SMG/BV-05-C test
->   unit/AVDTP: Add /TP/SIG/SMG/BV-06-C test
->   unit/AVDTP: Add /TP/SIG/SMG/BV-07-C test
->   unit/AVDTP: Add /TP/SIG/SMG/BV-08-C test
->   unit/AVDTP: Add /TP/SIG/SMG/BV-09-C test
->   unit/AVDTP: Add /TP/SIG/SMG/BV-10-C test
->   unit/AVDTP: Add /TP/SIG/SMG/BV-11-C test
->   unit/AVDTP: Add /TP/SIG/SMG/BV-12-C test
->   unit/AVDTP: Add /TP/SIG/SMG/BV-15-C test
->   unit/AVDTP: Add /TP/SIG/SMG/BV-16-C test
->   unit/AVDTP: Add /TP/SIG/SMG/BV-17-C test
->   unit/AVDTP: Add /TP/SIG/SMG/BV-18-C test
->   unit/AVDTP: Add /TP/SIG/SMG/BV-19-C test
->   unit/AVDTP: Add /TP/SIG/SMG/BV-20-C test
->   unit/AVDTP: Add /TP/SIG/SMG/BV-21-C test
->   unit/AVDTP: Add /TP/SIG/SMG/BV-22-C test
->   unit/AVDTP: Add /TP/SIG/SMG/BV-23-C test
->   unit/AVDTP: Add /TP/SIG/SMG/BV-24-C test
->
->  Makefile.am         |    8 +
->  android/Makefile.am |    1 +
->  android/a2dp.c      |   23 +
->  android/avdtp.c     | 3256 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  android/avdtp.h     |  275 +++++
->  unit/test-avdtp.c   |  612 ++++++++++
->  6 files changed, 4175 insertions(+)
->  create mode 100644 android/avdtp.c
->  create mode 100644 android/avdtp.h
->  create mode 100644 unit/test-avdtp.c
->
-> --
-> 1.8.3.1
+On Tue, Nov 26, 2013, Johan Hedberg wrote:
+> On Mon, Nov 25, 2013, Bastien Nocera wrote:
+> > Heya,
+> > 
+> > I have a particularly stubborn device, the TomTom Go Remote that tries
+> > to connect to my computer as soon as it's turned on, even when I've
+> > removed the pairing on the computer side.
+> > 
+> > With GNOME's Bluetooth wizard open, I receive an out of the blue request
+> > for pairing, I pass it the expected PIN code (0000), I then find that
+> > the wizard doesn't work as I expected and turn it off. bluetoothd
+> > promptly crashes:
+> > 
+> > Program received signal SIGSEGV, Segmentation fault.
+> > 0x00007f0cf9ffde24 in agent_auth_cb (agent=<optimized out>, derr=0x7fffab655920, user_data=0x7f0cfb2e0020) at src/adapter.c:4370
+> > 4370		struct service_auth *auth = adapter->auths->head->data;
+> > (gdb) p adapter
+> > $1 = (struct btd_adapter *) 0x7f0cfb2e0020
+> > (gdb) p adapter->auths
+> > $2 = (GQueue *) 0x7f0cfb2d1240
+> > (gdb) p adapter->auths->head
+> > $3 = 0x0
+> > 
+> > Some missing NULL checks?
+> 
+> Not sure. The GQueue internals should not be of our concern, meaning if
+> we have a non-NULL GQueue pointer I'd expect it to be safe to call
+> g_queue_is_empty on that pointer. I wonder if this is some kind of
+> freed memory access or similar. valgrind might show this.
 
-This set is now upstream.
+Just ignore the above, I was following the exact line number in the
+trace (4370) which landed me in process_auth_queue() instead of
+agent_auth_cb(), i.e. I was looking at the wrong piece of code and
+making the wrong conclusions.
 
-
--- 
-Luiz Augusto von Dentz
+Johan
