@@ -1,104 +1,199 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/3] client: Fix not releasing agent if bluetoothd exit without calling Release
-Date: Tue, 26 Nov 2013 17:05:09 +0200
-Message-Id: <1385478310-22520-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1385478310-22520-1-git-send-email-luiz.dentz@gmail.com>
-References: <1385478310-22520-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/3] client: Add 'auto' parameter to agent command
+Date: Tue, 26 Nov 2013 17:05:08 +0200
+Message-Id: <1385478310-22520-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If AgentManager1 disappear the agent should auto release itself
-otherwise next time AgentManager1 appears bluetoothctl wont register
-the agent again.
+This adds 'auto' parameter to agent command which auto accepts requests
+whenever possible.
 ---
- client/agent.c | 26 ++++++++++++++++----------
- client/main.c  |  5 ++++-
- 2 files changed, 20 insertions(+), 11 deletions(-)
+ client/agent.c | 14 +++++++++++++-
+ client/agent.h |  2 +-
+ client/main.c  | 30 ++++++++++++++++++------------
+ 3 files changed, 32 insertions(+), 14 deletions(-)
 
 diff --git a/client/agent.c b/client/agent.c
-index 81526a1..f074d82 100644
+index 2d9dffd..81526a1 100644
 --- a/client/agent.c
 +++ b/client/agent.c
-@@ -156,14 +156,11 @@ dbus_bool_t agent_input(DBusConnection *conn, const char *input)
- 	return TRUE;
+@@ -27,6 +27,7 @@
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <stdbool.h>
+ #include <readline/readline.h>
+ #include <gdbus.h>
+ 
+@@ -40,6 +41,7 @@
+ 
+ static gboolean agent_registered = FALSE;
+ static const char *agent_capability = NULL;
++static bool agent_auto_accept = false;
+ static DBusMessage *pending_message = NULL;
+ static char *agent_saved_prompt = NULL;
+ static int agent_saved_point = 0;
+@@ -259,6 +261,9 @@ static DBusMessage *request_confirmation(DBusConnection *conn,
+ 	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
+ 				DBUS_TYPE_UINT32, &passkey, DBUS_TYPE_INVALID);
+ 
++	if (agent_auto_accept)
++		return dbus_message_new_method_return(msg);
++
+ 	str = g_strdup_printf("Confirm passkey %06u (yes/no): ", passkey);
+ 	agent_prompt(str);
+ 	g_free(str);
+@@ -278,6 +283,9 @@ static DBusMessage *request_authorization(DBusConnection *conn,
+ 	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
+ 							DBUS_TYPE_INVALID);
+ 
++	if (agent_auto_accept)
++		return dbus_message_new_method_return(msg);
++
+ 	agent_prompt("Accept pairing (yes/no): ");
+ 
+ 	pending_message = dbus_message_ref(msg);
+@@ -296,6 +304,9 @@ static DBusMessage *authorize_service(DBusConnection *conn,
+ 	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
+ 				DBUS_TYPE_STRING, &uuid, DBUS_TYPE_INVALID);
+ 
++	if (agent_auto_accept)
++		return dbus_message_new_method_return(msg);
++
+ 	str = g_strdup_printf("Authorize service %s (yes/no): ", uuid);
+ 	agent_prompt(str);
+ 	g_free(str);
+@@ -375,7 +386,7 @@ static void register_agent_reply(DBusMessage *message, void *user_data)
  }
  
--static DBusMessage *release_agent(DBusConnection *conn,
--					DBusMessage *msg, void *user_data)
-+static void agent_release(DBusConnection *conn)
+ void agent_register(DBusConnection *conn, GDBusProxy *manager,
+-						const char *capability)
++				const char *capability, bool auto_accept)
+ 
  {
- 	agent_registered = FALSE;
- 	agent_capability = NULL;
- 
--	rl_printf("Agent released\n");
--
- 	if (pending_message) {
- 		dbus_message_unref(pending_message);
- 		pending_message = NULL;
-@@ -172,6 +169,14 @@ static DBusMessage *release_agent(DBusConnection *conn,
- 	agent_release_prompt();
- 
- 	g_dbus_unregister_interface(conn, AGENT_PATH, AGENT_INTERFACE);
-+}
-+
-+static DBusMessage *release_agent(DBusConnection *conn,
-+					DBusMessage *msg, void *user_data)
-+{
-+	rl_printf("Agent released\n");
-+
-+	agent_release(conn);
- 
- 	return dbus_message_new_method_return(msg);
- }
-@@ -430,13 +435,8 @@ static void unregister_agent_reply(DBusMessage *message, void *user_data)
- 	dbus_error_init(&error);
- 
- 	if (dbus_set_error_from_message(&error, message) == FALSE) {
--		agent_registered = FALSE;
--		agent_capability = NULL;
- 		rl_printf("Agent unregistered\n");
--
--		if (g_dbus_unregister_interface(conn, AGENT_PATH,
--						AGENT_INTERFACE) == FALSE)
--			rl_printf("Failed to unregister agent object\n");
-+		agent_release(conn);
- 	} else {
- 		rl_printf("Failed to unregister agent: %s\n", error.name);
- 		dbus_error_free(&error);
-@@ -450,6 +450,12 @@ void agent_unregister(DBusConnection *conn, GDBusProxy *manager)
- 		return;
+ 	if (agent_registered == TRUE) {
+@@ -401,6 +412,7 @@ void agent_register(DBusConnection *conn, GDBusProxy *manager,
  	}
  
-+	if (!manager) {
-+		rl_printf("Agent unregistered\n");
-+		agent_release(conn);
-+		return;
-+	}
-+
- 	if (g_dbus_proxy_method_call(manager, "UnregisterAgent",
- 						unregister_agent_setup,
- 						unregister_agent_reply,
+ 	agent_capability = NULL;
++	agent_auto_accept = auto_accept;
+ }
+ 
+ static void unregister_agent_setup(DBusMessageIter *iter, void *user_data)
+diff --git a/client/agent.h b/client/agent.h
+index 0fbe8e5..467afb0 100644
+--- a/client/agent.h
++++ b/client/agent.h
+@@ -22,7 +22,7 @@
+  */
+ 
+ void agent_register(DBusConnection *conn, GDBusProxy *manager,
+-						const char *capability);
++				const char *capability, bool auto_accept);
+ void agent_unregister(DBusConnection *conn, GDBusProxy *manager);
+ void agent_default(DBusConnection *conn, GDBusProxy *manager);
+ 
 diff --git a/client/main.c b/client/main.c
-index 5639f0e..fe5f290 100644
+index ebc85c6..5639f0e 100644
 --- a/client/main.c
 +++ b/client/main.c
-@@ -319,8 +319,11 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
- 			dev_list = NULL;
- 		}
- 	} else if (!strcmp(interface, "org.bluez.AgentManager1")) {
--		if (agent_manager == proxy)
-+		if (agent_manager == proxy) {
- 			agent_manager = NULL;
+@@ -29,6 +29,7 @@
+ #include <errno.h>
+ #include <unistd.h>
+ #include <stdlib.h>
++#include <stdbool.h>
+ #include <signal.h>
+ #include <sys/signalfd.h>
+ 
+@@ -53,13 +54,15 @@ static GMainLoop *main_loop;
+ static DBusConnection *dbus_conn;
+ 
+ static GDBusProxy *agent_manager;
+-static char *auto_register_agent = NULL;
++static char *agent_capability = NULL;
++static bool agent_auto_accept = false;
+ 
+ static GDBusProxy *default_ctrl;
+ static GList *ctrl_list;
+ static GList *dev_list;
+ 
+ static const char * const agent_arguments[] = {
++	"auto",
+ 	"on",
+ 	"off",
+ 	"DisplayOnly",
+@@ -284,9 +287,10 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
+ 		if (!agent_manager) {
+ 			agent_manager = proxy;
+ 
+-			if (auto_register_agent)
 +			if (agent_capability)
-+				agent_unregister(dbus_conn, NULL);
-+		}
+ 				agent_register(dbus_conn, agent_manager,
+-							auto_register_agent);
++							agent_capability,
++							agent_auto_accept);
+ 		}
  	}
  }
+@@ -434,7 +438,8 @@ static gboolean parse_argument_agent(const char *arg, dbus_bool_t *value,
+ 		return FALSE;
+ 	}
  
+-	if (strcmp(arg, "on") == 0 || strcmp(arg, "yes") == 0) {
++	if (strcmp(arg, "on") == 0 || strcmp(arg, "yes") == 0 ||
++						strcmp(arg, "auto") == 0) {
+ 		*value = TRUE;
+ 		*capability = "";
+ 		return TRUE;
+@@ -680,17 +685,18 @@ static void cmd_agent(const char *arg)
+ 		return;
+ 
+ 	if (enable == TRUE) {
+-		g_free(auto_register_agent);
+-		auto_register_agent = g_strdup(capability);
++		g_free(agent_capability);
++		agent_capability = g_strdup(capability);
++		agent_auto_accept = strcmp(arg, "auto") == 0 ? true : false;
+ 
+ 		if (agent_manager)
+ 			agent_register(dbus_conn, agent_manager,
+-						auto_register_agent);
++					agent_capability, agent_auto_accept);
+ 		else
+ 			rl_printf("Agent registration enabled\n");
+ 	} else {
+-		g_free(auto_register_agent);
+-		auto_register_agent = NULL;
++		g_free(agent_capability);
++		agent_capability = NULL;
+ 
+ 		if (agent_manager)
+ 			agent_unregister(dbus_conn, agent_manager);
+@@ -1331,9 +1337,9 @@ static gboolean parse_agent(const char *key, const char *value,
+ 					gpointer user_data, GError **error)
+ {
+ 	if (value)
+-		auto_register_agent = g_strdup(value);
++		agent_capability = g_strdup(value);
+ 	else
+-		auto_register_agent = g_strdup("");
++		agent_capability = g_strdup("");
+ 
+ 	return TRUE;
+ }
+@@ -1410,7 +1416,7 @@ int main(int argc, char *argv[])
+ 	g_list_free_full(ctrl_list, proxy_leak);
+ 	g_list_free_full(dev_list, proxy_leak);
+ 
+-	g_free(auto_register_agent);
++	g_free(agent_capability);
+ 
+ 	return 0;
+ }
 -- 
 1.8.3.1
 
