@@ -1,174 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [RFC BlueZ v2] doc: Add GATT API
-Date: Wed, 27 Nov 2013 17:27:58 -0300
-Message-Id: <1385584078-1432-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <CAKT1EBdB7cvhmnqf2FV-F=RWwdnvhpUuc3AENHaYCao_dNyH_w@mail.gmail.com>
-References: <CAKT1EBdB7cvhmnqf2FV-F=RWwdnvhpUuc3AENHaYCao_dNyH_w@mail.gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1385569154-11579-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1385569154-11579-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1385569154-11579-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 27 Nov 2013 22:25:37 +0200
+Message-ID: <CAMXE1-qwE-hv96x1e3VB+R+4x+G6PhVMpMgH+KB-Wvmt9fYYiQ@mail.gmail.com>
+Subject: Re: [PATCH 3/5] android/main: Remove signal source on exit
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Bluetooth Linux <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch proposes an unified GATT API for local and remote services.
----
- v2: API similar to Profile1 and ProfileManager1
+Hi,
 
- doc/gatt-api.txt | 145 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 145 insertions(+)
- create mode 100644 doc/gatt-api.txt
+On Wed, Nov 27, 2013 at 6:19 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> Remove signal source on exit and move check capability function in order
+> to avoid extra check.
+> ---
+>  android/main.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+>
+> diff --git a/android/main.c b/android/main.c
+> index dd5c622..e408c21 100644
+> --- a/android/main.c
+> +++ b/android/main.c
+> @@ -536,6 +536,9 @@ int main(int argc, char *argv[])
+>         GError *err = NULL;
+>         guint signal;
+>
+> +       if (!set_capabilities())
+> +               return EXIT_FAILURE;
+> +
 
-diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-new file mode 100644
-index 0000000..d2545b2
---- /dev/null
-+++ b/doc/gatt-api.txt
-@@ -0,0 +1,145 @@
-+BlueZ D-Bus GATT API description
-+********************************
-+
-+GATT local and remote services share the same high-level D-Bus API. Local
-+refers to GATT based service exported by a BlueZ plugin or an external
-+application. Remote refers to GATT services exported by the peer.
-+
-+BlueZ acts as a proxy, translating ATT operations to D-Bus method calls and
-+Properties (or the opposite). Support for D-Bus Object Manager is mandatory for
-+external services to allow seamless GATT declarations (Service, Characteristic
-+and Descriptors) discovery.
-+
-+Service hierarchy
-+=================
-+
-+GATT remote and local service representation. Object path for local services
-+is freely definable.
-+
-+External applications implementing local services must register the services
-+using ServiceManager1 registration method and must implement the methods and
-+properties defined in Service1 interface.
-+
-+Service		org.bluez
-+Interface	org.bluez.Service1 [Experimental]
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX
-+
-+Methods		void Release()
-+
-+			Release this service. At this point, it will not be
-+			used by BlueZ anymore and can be destroyed by the
-+			owner. Method applicable to external GATT services
-+			implementations only (GATT servers).
-+
-+Properties	string UUID [read-only]
-+
-+			128-bit service UUID.
-+
-+		array{object} Includes [read-only]: Not implemented
-+
-+			Array of object paths representing the included
-+			services of this service.
-+
-+
-+Characteristic hierarchy
-+========================
-+
-+For local GATT defined services, the object paths need to follow the service
-+path hierarchy and are freely definable.
-+
-+Service		org.bluez
-+Interface	org.bluez.Characteristic1 [Experimental]
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY
-+
-+Properties	string UUID [read-only]
-+
-+			128-bit characteristic UUID.
-+
-+		object Service [read-only]
-+
-+			Object path of the GATT service the characteristc
-+			belongs to.
-+
-+		array{byte} Value [read-write]
-+
-+			Value read from the remote Bluetooth device or from
-+			the external application implementing GATT services.
-+
-+		array{string} Flags [read-only, optional]
-+
-+			Defines how the characteristic value can be used. See
-+			Core spec page 1898, "Table 3.5: Characteristic
-+			Properties bit field" and page 1900, "Table 3.8:
-+			Characteristic Extended Properties bit field". Allowed
-+			values: "broadcast", "read", "write-without-response",
-+			"write", "notify", "indicate",
-+			"authenticated-signed-writes", "reliable-write", and
-+			"writable-auxiliaries".
-+
-+
-+Characteristic Descriptors hierarchy
-+====================================
-+
-+Local or remote GATT characteristic descriptors hierarchy.
-+
-+Service		org.bluez
-+Interface	org.bluez.Descriptor1 [Experimental]
-+Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY/descriptorZZZ
-+
-+Properties	string UUID [read-only]
-+
-+			128-bit descriptor UUID.
-+
-+		object Characteristic [read-only]
-+
-+			Object path of the GATT characteristc the descriptor
-+			belongs to.
-+
-+		array{byte} Value [read-write]
-+
-+			Raw characteristic descriptor value read from the
-+			remote Bluetooth device or from the external
-+			application implementing GATT services.
-+
-+		string Permissions [read-only]: To be defined
-+
-+			Defines read/write authentication and authorization
-+			requirements.
-+
-+Service Manager hierarchy
-+=============================
-+
-+Service Manager allows external applications to register GATT based
-+services. Services must follow the API for Service and Characteristic
-+described above.
-+
-+Local GATT services, characteristics and characteristic descriptors are
-+discovered automatically using the D-Bus Object Manager interface.
-+
-+Service		org.bluez
-+Interface	org.bluez.ServiceManager1 [Experimental]
-+Object path	/org/bluez
-+
-+Methods		RegisterService(object service, dict options)
-+
-+			Registers remote application service exported under
-+			the interface Service1. Characteristic objects must
-+			be hierarchical to their service and must use the
-+			interface Characteristic1. D-Bus Object Manager is
-+			used to fetch the exported objects.
-+
-+			"service" object path together with the D-Bus system
-+			bus connection ID define the identification of the
-+			application registering a GATT based service.
-+
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.AlreadyExists
-+
-+		UnregisterService(object service)
-+
-+			This unregisters the service that has been
-+			previously registered. The object path parameter
-+			must match the same value that has been used
-+			on registration.
-+
-+			Possible errors: org.bluez.Error.DoesNotExist
--- 
-1.8.3.1
+Please disregard this patch, debug needs to be initialized first.
 
+>         /* Core Service (ID=0) should always be considered registered */
+>         services[0] = true;
+>
+> @@ -565,18 +568,17 @@ int main(int argc, char *argv[])
+>
+>         __btd_log_init("*", 0);
+>
+> -       if (!set_capabilities())
+> -               return EXIT_FAILURE;
+> -
+>         bluetooth_start_timeout = g_timeout_add_seconds(STARTUP_GRACE_SECONDS,
+>                                                         quit_eventloop, NULL);
+>         if (bluetooth_start_timeout == 0) {
+>                 error("Failed to init startup timeout");
+> +               g_source_remove(signal);
+>                 return EXIT_FAILURE;
+>         }
+>
+>         if (!bt_bluetooth_start(option_index, adapter_ready)) {
+>                 g_source_remove(bluetooth_start_timeout);
+> +               g_source_remove(signal);
+>                 return EXIT_FAILURE;
+>         }
+>
+> --
+> 1.8.3.2
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
