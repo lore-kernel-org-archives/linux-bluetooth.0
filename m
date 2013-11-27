@@ -1,59 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 27 Nov 2013 10:00:52 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/6] android/socket: Handle Android events for server
- socket
-Message-ID: <20131127080051.GC3149@aemeltch-MOBL1>
-References: <1385474750-18331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1385474750-18331-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20131126154602.GB25005@x220.p-661hnu-f1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20131126154602.GB25005@x220.p-661hnu-f1>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 27 Nov 2013 11:40:02 +0800
+Message-ID: <CAFv23QmyQL1QTy8=HkYVpb94kFzNuULfdByqYcyCAQa__dg9Nw@mail.gmail.com>
+Subject: Loading ath3k firmware failed
+From: AceLan Kao <acelan.kao@canonical.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
+	Chen Chong <chongc@qca.qualcomm.com>, Peng Chen <pengchen@qca.qualcomm.com>
+Cc: Anthony Wong <anthony.wong@canonical.com>, YK <yk@canonical.com>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi all,
 
-On Tue, Nov 26, 2013 at 05:46:02PM +0200, Johan Hedberg wrote:
-> Hi Andrei,
-> 
-> On Tue, Nov 26, 2013, Andrei Emeltchenko wrote:
-> > Add watch for tracking events from Android framework for server socket.
-> > ---
-> >  android/socket.c | 27 ++++++++++++++++++++++++++-
-> >  1 file changed, 26 insertions(+), 1 deletion(-)
-> 
-> I've applied the first two patches, but wanted to ask about this one:
-> 
-> > +static gboolean sock_server_stack_event_cb(GIOChannel *io, GIOCondition cond,
-> > +								gpointer data)
-> > +{
-> > +	struct rfcomm_sock *rfsock = data;
-> > +
-> > +	DBG("");
-> > +
-> > +	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
-> > +		error("Socket error: sock %d cond %d",
-> > +					g_io_channel_unix_get_fd(io), cond);
-> > +		cleanup_rfsock(rfsock);
-> > +
-> > +		return FALSE;
-> > +	}
-> > +
-> > +	return TRUE;
-> > +}
-> 
-> I don't see where (in which patch) you'd add code to handle G_IO_IN on
-> this socket. Aren't you supposed to read data from this socket and write
-> it to the RFCOMM one?
+Sorry to spam you guys.
+I recently encountered a issue that I can't figure out how to fix it,
+so I write to you and hope some of you can give me hints.
 
-At this moment I do not know which data might come from this socket. I
-have debug statement to know that something is coming.
+The issue is ath3k easily fails to load its firmware when the USB port
+is switchable(EHCI -> XHCI).
+   ath3k: probe of 2-7:1.0 failed with error -110
+Sometimes it fails to load the firmware when boot up, sometimes it
+fails when resume from S3.
 
-I assume this would be primary used to clean up socket structure if
-Android decides to stop listen().
+I try to set the D0 register to 0 to force it use EHCI, then it works well.
+Disable the USB 3.0 function from BIOS, it also works well.
+And another workaround is to delay loading the ath3k module around 30
+seconds, it can load the firmware without problems.
 
-Best regards 
-Andrei Emeltchenko 
+It's not only happened on a certain Atheros chip, we've encountered
+this issue on many Atheros chips.
+To get rid of this issue, please give me some hints, I can help to
+verify your ideas.
+
+Best regards,
+AceLan Kao.
