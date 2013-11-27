@@ -1,146 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Alvaro Silva <alvaro.silva@openbossa.org>
-Subject: [RFC BlueZ v0 01/17] gatt: Add stub for gatt file
-Date: Wed, 27 Nov 2013 17:50:41 -0300
-Message-Id: <1385585457-26951-2-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1385585457-26951-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1385585457-26951-1-git-send-email-claudio.takahasi@openbossa.org>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [RFC BlueZ v0 00/17] GATT API: External Services
+Date: Wed, 27 Nov 2013 17:50:40 -0300
+Message-Id: <1385585457-26951-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Alvaro Silva <alvaro.silva@openbossa.org>
+This patchset implements the minimal support for managing local
+services declarations. Based on "[RFC BlueZ v2] doc: Add GATT API"
 
-This file intend to implement functions to manipulate ATT transactions,
-and expose functions to allow other entities to manage GATT based
-services.
----
- Makefile.am |  1 +
- src/gatt.c  | 38 ++++++++++++++++++++++++++++++++++++++
- src/gatt.h  | 26 ++++++++++++++++++++++++++
- src/main.c  |  4 ++++
- 4 files changed, 69 insertions(+)
+Features:
+* API for internal and external services declaration
+* Unix socket for testing purpose: services are exported
+through unix sockets to avoid breaking the current attribute
+server.
+
+How to test:
+Replace bluetooth.conf and reload DBus settings
+$gatttool -L --primary (or interactive mode)
+
+Upstreaming plan (steps):
+* GATT Server: External Services
+* GATT Server: External Characteristics (Server)
+* GATT Server: External Descriptors (Server)
+* Remove ATTIO and automatic connection mechanism from userspace
+* Replace attribute server
+* Fix all GATT internal plugins
+* GATT Client: Remote Services
+* ...
+
+Alvaro Silva (7):
+  gatt: Add stub for gatt file
+  gatt: Register Manager D-Bus Interface
+  gatt: Add registering external service
+  gatt: Add external services tracking
+  gatt: Implement UnregisterService
+  gatt: Register ATT command/event handler
+  gatt: Add Discover All Primary Services
+
+Andre Guedes (1):
+  gatt: Add helper for creating GATT services
+
+Claudio Takahasi (9):
+  lib: Add GATT Primary Service UUID
+  gatt: Add server unix socket
+  gattrib: Use default ATT LE MTU for non-standard sockets
+  test: Add external service GATT skeleton
+  test: Add signal handling for gatt-service
+  test: Add registering external service
+  gatttool: Add unix socket connect
+  gatttool: Add unix socket support for interactive mode
+  bluetooth.conf: Add ObjectManager interface
+
+ Makefile.am          |   2 +
+ Makefile.tools       |   5 +
+ attrib/gattrib.c     |  16 +--
+ attrib/gatttool.c    |  27 +++-
+ attrib/gatttool.h    |   1 +
+ attrib/interactive.c |  18 +--
+ attrib/utils.c       |  54 ++++++++
+ lib/uuid.c           |  14 ++
+ lib/uuid.h           |   5 +
+ src/bluetooth.conf   |   1 +
+ src/gatt-dbus.c      | 296 ++++++++++++++++++++++++++++++++++++++++
+ src/gatt-dbus.h      |  25 ++++
+ src/gatt.c           | 371 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/gatt.h           |  36 +++++
+ src/main.c           |   4 +
+ test/gatt-service.c  | 254 +++++++++++++++++++++++++++++++++++
+ 16 files changed, 1106 insertions(+), 23 deletions(-)
+ create mode 100644 src/gatt-dbus.c
+ create mode 100644 src/gatt-dbus.h
  create mode 100644 src/gatt.c
  create mode 100644 src/gatt.h
+ create mode 100644 test/gatt-service.c
 
-diff --git a/Makefile.am b/Makefile.am
-index 2bb2eb5..395f23e 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -146,6 +146,7 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
- 			src/adapter.h src/adapter.c \
- 			src/profile.h src/profile.c \
- 			src/service.h src/service.c \
-+			src/gatt.h src/gatt.c \
- 			src/device.h src/device.c src/attio.h \
- 			src/dbus-common.c src/dbus-common.h \
- 			src/eir.h src/eir.c \
-diff --git a/src/gatt.c b/src/gatt.c
-new file mode 100644
-index 0000000..1ada2ed
---- /dev/null
-+++ b/src/gatt.c
-@@ -0,0 +1,38 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Instituto Nokia de Tecnologia - INdT
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include "gatt.h"
-+
-+void gatt_init(void)
-+{
-+
-+}
-+
-+void gatt_cleanup(void)
-+{
-+
-+}
-diff --git a/src/gatt.h b/src/gatt.h
-new file mode 100644
-index 0000000..03a68a1
---- /dev/null
-+++ b/src/gatt.h
-@@ -0,0 +1,26 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Instituto Nokia de Tecnologia - INdT
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+void gatt_init(void);
-+
-+void gatt_cleanup(void);
-diff --git a/src/main.c b/src/main.c
-index 91d90b4..fccc838 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -55,6 +55,7 @@
- #include "dbus-common.h"
- #include "agent.h"
- #include "profile.h"
-+#include "gatt.h"
- #include "systemd.h"
- 
- #define BLUEZ_NAME "org.bluez"
-@@ -545,6 +546,8 @@ int main(int argc, char *argv[])
- 
- 	g_dbus_set_flags(gdbus_flags);
- 
-+	gatt_init();
-+
- 	if (option_compat == TRUE)
- 		sdp_flags |= SDP_SERVER_COMPAT;
- 
-@@ -595,6 +598,7 @@ int main(int argc, char *argv[])
- 	btd_profile_cleanup();
- 	btd_agent_cleanup();
- 	btd_device_cleanup();
-+	gatt_cleanup();
- 
- 	adapter_cleanup();
- 
 -- 
 1.8.3.1
 
