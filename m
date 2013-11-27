@@ -1,33 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 27 Nov 2013 13:12:03 +0200
+Date: Wed, 27 Nov 2013 12:58:04 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/4] android/pan: Implement pan connect method in daemon
-Message-ID: <20131127111203.GA17921@x220.p-661hnu-f1>
-References: <1385387369-3015-1-git-send-email-ravikumar.veeramally@linux.intel.com>
- <1385387369-3015-3-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: Re: [PATCH] android/bluetooth: Change discoverable mode only if
+ connectable
+Message-ID: <20131127105804.GD16389@x220.p-661hnu-f1>
+References: <1385467227-11832-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1385387369-3015-3-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1385467227-11832-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Szymon,
 
-On Mon, Nov 25, 2013, Ravi kumar Veeramally wrote:
-> Implements the PAN connect method in android daemon with PANU role
-> only. Setting up the bnep environment, adds connection and makes
-> bnep interface up. Notifies bnep interface on control state call back
-> and connection status on connection state call back.
+On Tue, Nov 26, 2013, Szymon Janc wrote:
+> There is no need to sending set_discoverable command if new settings
+> are not connectable as clearing connectable also clear discoverable.
+> Sending set_discoverable when not connectable result in 'rejected'
+> mgmt response.
 > ---
->  android/Android.mk  |   2 +
->  android/Makefile.am |   3 +-
->  android/pan.c       | 289 +++++++++++++++++++++++++++++++++++++++++++++++++++-
->  3 files changed, 291 insertions(+), 3 deletions(-)
+>  android/bluetooth.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-I've applied the first patch in this set, however I'll wait for a new
-revision of the rest including the refactoring of
-profiles/network/common.c and profiles/network/connection.c.
+Applied. Thanks.
 
 Johan
