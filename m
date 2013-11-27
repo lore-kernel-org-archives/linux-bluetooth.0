@@ -1,42 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android: Avoid memory leak warnings for event_loop
-Date: Wed, 27 Nov 2013 17:17:44 +0200
-Message-Id: <1385565464-3539-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] android/main: Remove signal source on exit
+Date: Wed, 27 Nov 2013 16:54:16 +0200
+Message-Id: <1385564056-2289-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Move creation of event_loop closer to g_main_loop_run. This avoids
-calling g_main_loop_unref too many times in initialization error paths.
-This is safe since g_main_loop_quit eval to NOOP if parameter == NULL.
+Remove signal source on exit and move check capability function in order
+to avoid extra check.
 ---
- android/main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ android/main.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/android/main.c b/android/main.c
-index c9733f3..9eaef7f 100644
+index 79e17fe..0f478c7 100644
 --- a/android/main.c
 +++ b/android/main.c
-@@ -558,7 +558,6 @@ int main(int argc, char *argv[])
- 		exit(EXIT_SUCCESS);
+@@ -535,6 +535,9 @@ int main(int argc, char *argv[])
+ 	GError *err = NULL;
+ 	guint signal;
+ 
++	if (!set_capabilities())
++		return EXIT_FAILURE;
++
+ 	/* Core Service (ID=0) should always be considered registered */
+ 	services[0] = true;
+ 
+@@ -564,18 +567,17 @@ int main(int argc, char *argv[])
+ 
+ 	__btd_log_init("*", 0);
+ 
+-	if (!set_capabilities())
+-		return EXIT_FAILURE;
+-
+ 	bluetooth_start_timeout = g_timeout_add_seconds(STARTUP_GRACE_SECONDS,
+ 							quit_eventloop, NULL);
+ 	if (bluetooth_start_timeout == 0) {
+ 		error("Failed to init startup timeout");
++		g_source_remove(signal);
+ 		return EXIT_FAILURE;
  	}
  
--	event_loop = g_main_loop_new(NULL, FALSE);
- 	signal = setup_signalfd();
- 	if (!signal)
+ 	if (!bt_bluetooth_start(option_index, adapter_ready)) {
+ 		g_source_remove(bluetooth_start_timeout);
++		g_source_remove(signal);
  		return EXIT_FAILURE;
-@@ -583,6 +582,8 @@ int main(int argc, char *argv[])
+ 	}
  
- 	DBG("Entering main loop");
- 
-+	event_loop = g_main_loop_new(NULL, FALSE);
-+
- 	g_main_loop_run(event_loop);
- 
- 	g_source_remove(signal);
 -- 
 1.8.3.2
 
