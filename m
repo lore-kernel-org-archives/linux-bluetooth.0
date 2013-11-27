@@ -1,57 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/5] android/main: Remove signal source on exit
-Date: Wed, 27 Nov 2013 18:19:12 +0200
-Message-Id: <1385569154-11579-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1385569154-11579-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1385569154-11579-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [RFC] build: Force GLib version check while building in maintainer mode
+Date: Wed, 27 Nov 2013 16:44:56 +0100
+Message-Id: <1385567096-27261-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-Remove signal source on exit and move check capability function in order
-to avoid extra check.
+This will allow to catch up build errors introduced by using GLib API
+introduced in newer GLib than minimal required even if building with
+newer version.
 ---
- android/main.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ acinclude.m4 | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/android/main.c b/android/main.c
-index dd5c622..e408c21 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -536,6 +536,9 @@ int main(int argc, char *argv[])
- 	GError *err = NULL;
- 	guint signal;
- 
-+	if (!set_capabilities())
-+		return EXIT_FAILURE;
-+
- 	/* Core Service (ID=0) should always be considered registered */
- 	services[0] = true;
- 
-@@ -565,18 +568,17 @@ int main(int argc, char *argv[])
- 
- 	__btd_log_init("*", 0);
- 
--	if (!set_capabilities())
--		return EXIT_FAILURE;
--
- 	bluetooth_start_timeout = g_timeout_add_seconds(STARTUP_GRACE_SECONDS,
- 							quit_eventloop, NULL);
- 	if (bluetooth_start_timeout == 0) {
- 		error("Failed to init startup timeout");
-+		g_source_remove(signal);
- 		return EXIT_FAILURE;
- 	}
- 
- 	if (!bt_bluetooth_start(option_index, adapter_ready)) {
- 		g_source_remove(bluetooth_start_timeout);
-+		g_source_remove(signal);
- 		return EXIT_FAILURE;
- 	}
- 
+diff --git a/acinclude.m4 b/acinclude.m4
+index 5bfa29d..2065852 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -21,6 +21,8 @@ AC_DEFUN([COMPILER_FLAGS], [
+ 		with_cflags="$with_cflags -Wredundant-decls"
+ 		with_cflags="$with_cflags -Wcast-align"
+ 		with_cflags="$with_cflags -DG_DISABLE_DEPRECATED"
++		with_cflags="$with_cflags -DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_28"
++		with_cflags="$with_cflags -DGLIB_VERSION_MAX_ALLOWED=GLIB_VERSION_2_28"
+ 	fi
+ 	AC_SUBST([WARNING_CFLAGS], $with_cflags)
+ ])
 -- 
 1.8.3.2
 
