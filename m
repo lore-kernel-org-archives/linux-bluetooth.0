@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 11/13] android/socket: Use generic IPC message handling for commands
-Date: Wed, 27 Nov 2013 12:55:03 +0100
-Message-Id: <1385553305-5807-12-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 10/13] android/a2dp: Use generic IPC message handling for commands
+Date: Wed, 27 Nov 2013 12:55:02 +0100
+Message-Id: <1385553305-5807-11-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1385553305-5807-1-git-send-email-szymon.janc@tieto.com>
 References: <1385553305-5807-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,206 +13,167 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Handlers are registered on service register and unregistered on
 unregister.
 ---
- android/socket.c | 111 +++++++++++++++++++++++++++++--------------------------
- 1 file changed, 59 insertions(+), 52 deletions(-)
+ android/a2dp.c | 73 +++++++++++++++++++++++++++++++---------------------------
+ android/a2dp.h |  2 --
+ 2 files changed, 39 insertions(+), 36 deletions(-)
 
-diff --git a/android/socket.c b/android/socket.c
-index 47338e7..ba97d8a 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -52,6 +52,7 @@
- 
- #define SVC_HINT_OBEX 0x10
- 
-+static int command_sk = -1;
- static bdaddr_t adapter_addr;
- 
- /* Simple list of RFCOMM server sockets */
-@@ -655,15 +656,15 @@ static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
- 		rfsock_acc->rfcomm_watch);
+diff --git a/android/a2dp.c b/android/a2dp.c
+index 87b1abb..6f79cc5 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -166,9 +166,11 @@ static void signaling_connect_cb(GIOChannel *chan, GError *err,
+ 	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_CONNECTED);
  }
  
--static int handle_listen(void *buf)
-+static void handle_listen(const void *buf, uint16_t len)
+-static uint8_t bt_a2dp_connect(struct hal_cmd_a2dp_connect *cmd, uint16_t len)
++static void bt_a2dp_connect(const void *buf, uint16_t len)
  {
--	struct hal_cmd_sock_listen *cmd = buf;
-+	const struct hal_cmd_sock_listen *cmd = buf;
- 	const struct profile_info *profile;
--	struct rfcomm_sock *rfsock;
-+	struct rfcomm_sock *rfsock = NULL;
- 	BtIOSecLevel sec_level;
- 	GIOChannel *io;
- 	GError *err = NULL;
--	int hal_fd;
-+	int hal_fd = -1;
- 	int chan;
++	const struct hal_cmd_a2dp_connect *cmd = buf;
+ 	struct a2dp_device *dev;
++	uint8_t status = HAL_STATUS_SUCCESS;
+ 	char addr[18];
+ 	bdaddr_t dst;
+ 	GSList *l;
+@@ -176,14 +178,13 @@ static uint8_t bt_a2dp_connect(struct hal_cmd_a2dp_connect *cmd, uint16_t len)
  
  	DBG("");
-@@ -671,11 +672,10 @@ static int handle_listen(void *buf)
- 	profile = get_profile_by_uuid(cmd->uuid);
- 	if (!profile) {
- 		if (!cmd->channel)
--			return -1;
--		else {
--			chan = cmd->channel;
--			sec_level = BT_IO_SEC_MEDIUM;
--		}
-+			goto fail;
-+
-+		chan = cmd->channel;
-+		sec_level = BT_IO_SEC_MEDIUM;
- 	} else {
- 		chan = profile->channel;
- 		sec_level = profile->sec_level;
-@@ -685,7 +685,7 @@ static int handle_listen(void *buf)
  
- 	rfsock = create_rfsock(-1, &hal_fd);
- 	if (!rfsock)
--		return -1;
-+		goto fail;
- 
- 	io = bt_io_listen(accept_cb, NULL, rfsock, NULL, &err,
- 				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
-@@ -695,8 +695,7 @@ static int handle_listen(void *buf)
- 	if (!io) {
- 		error("Failed listen: %s", err->message);
- 		g_error_free(err);
--		cleanup_rfsock(rfsock);
--		return -1;
-+		goto fail;
- 	}
- 
- 	rfsock->real_sock = g_io_channel_unix_get_fd(io);
-@@ -711,13 +710,25 @@ static int handle_listen(void *buf)
- 
- 	if (write(rfsock->fd, &chan, sizeof(chan)) != sizeof(chan)) {
- 		error("Error sending RFCOMM channel");
--		cleanup_rfsock(rfsock);
--		return -1;
-+		goto fail;
- 	}
- 
- 	rfsock->service_handle = sdp_service_register(profile, cmd->name);
- 
--	return hal_fd;
-+	ipc_send(command_sk, HAL_SERVICE_ID_SOCK, HAL_OP_SOCK_LISTEN, 0, NULL,
-+								hal_fd);
-+	close(hal_fd);
-+	return;
-+
-+fail:
-+	ipc_send_rsp(command_sk, HAL_SERVICE_ID_SOCK, HAL_OP_SOCK_LISTEN,
-+							HAL_STATUS_FAILED);
-+
-+	if (rfsock)
-+		cleanup_rfsock(rfsock);
-+
-+	if (hal_fd >= 0)
-+		close(hal_fd);
- }
- 
- static bool sock_send_connect(struct rfcomm_sock *rfsock, bdaddr_t *bdaddr)
-@@ -868,9 +879,9 @@ fail:
- 	cleanup_rfsock(rfsock);
- }
- 
--static int handle_connect(void *buf)
-+static void handle_connect(const void *buf, uint16_t len)
- {
--	struct hal_cmd_sock_connect *cmd = buf;
-+	const struct hal_cmd_sock_connect *cmd = buf;
- 	struct rfcomm_sock *rfsock;
- 	uuid_t uuid;
- 	int hal_fd = -1;
-@@ -893,57 +904,53 @@ static int handle_connect(void *buf)
- 					sdp_search_cb, rfsock, NULL) < 0) {
- 		error("Failed to search SDP records");
- 		cleanup_rfsock(rfsock);
--		return -1;
-+		goto fail;
- 	}
- 
--	return hal_fd;
--}
+-	if (len < sizeof(*cmd))
+-		return HAL_STATUS_INVALID;
 -
--void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+ 	android2bdaddr(&cmd->bdaddr, &dst);
+ 
+ 	l = g_slist_find_custom(devices, &dst, device_cmp);
+-	if (l)
+-		return HAL_STATUS_FAILED;
++	if (l) {
++		status = HAL_STATUS_FAILED;
++		goto fail;
++	}
+ 
+ 	dev = a2dp_device_new(&dst);
+ 	dev->io = bt_io_connect(signaling_connect_cb, dev, NULL, &err,
+@@ -196,7 +197,8 @@ static uint8_t bt_a2dp_connect(struct hal_cmd_a2dp_connect *cmd, uint16_t len)
+ 		error("%s", err->message);
+ 		g_error_free(err);
+ 		a2dp_device_free(dev);
+-		return HAL_STATUS_FAILED;
++		status = HAL_STATUS_FAILED;
++		goto fail;
+ 	}
+ 
+ 	ba2str(&dev->dst, addr);
+@@ -204,26 +206,28 @@ static uint8_t bt_a2dp_connect(struct hal_cmd_a2dp_connect *cmd, uint16_t len)
+ 
+ 	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_CONNECTING);
+ 
+-	return HAL_STATUS_SUCCESS;
++fail:
++	ipc_send_rsp(command_sk, HAL_SERVICE_ID_A2DP, HAL_OP_A2DP_CONNECT,
++								status);
+ }
+ 
+-static uint8_t bt_a2dp_disconnect(struct hal_cmd_a2dp_connect *cmd,
+-								uint16_t len)
++static void bt_a2dp_disconnect(const void *buf, uint16_t len)
+ {
++	const struct hal_cmd_a2dp_connect *cmd = buf;
++	uint8_t status = HAL_STATUS_SUCCESS;
+ 	struct a2dp_device *dev;
+ 	GSList *l;
+ 	bdaddr_t dst;
+ 
+ 	DBG("");
+ 
+-	if (len < sizeof(*cmd))
+-		return HAL_STATUS_INVALID;
+-
+ 	android2bdaddr(&cmd->bdaddr, &dst);
+ 
+ 	l = g_slist_find_custom(devices, &dst, device_cmp);
+-	if (!l)
+-		return HAL_STATUS_FAILED;
++	if (!l) {
++		status = HAL_STATUS_FAILED;
++		goto fail;
++	}
+ 
+ 	dev = l->data;
+ 
+@@ -233,27 +237,23 @@ static uint8_t bt_a2dp_disconnect(struct hal_cmd_a2dp_connect *cmd,
+ 
+ 	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTING);
+ 
+-	return HAL_STATUS_SUCCESS;
++fail:
++	ipc_send_rsp(command_sk, HAL_SERVICE_ID_A2DP, HAL_OP_A2DP_DISCONNECT,
++								status);
+ }
+ 
+-void bt_a2dp_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
 -{
--	int fd;
+-	uint8_t status = HAL_STATUS_FAILED;
 -
 -	switch (opcode) {
--	case HAL_OP_SOCK_LISTEN:
--		fd = handle_listen(buf);
--		if (fd < 0)
--			break;
--
--		ipc_send(sk, HAL_SERVICE_ID_SOCK, opcode, 0, NULL, fd);
--
--		if (close(fd) < 0)
--			error("close() fd %d failed: %s", fd, strerror(errno));
--
--		return;
--	case HAL_OP_SOCK_CONNECT:
--		fd = handle_connect(buf);
--		if (fd < 0)
--			break;
--
--		ipc_send(sk, HAL_SERVICE_ID_SOCK, opcode, 0, NULL, fd);
--
--		if (close(fd) < 0)
--			error("close() fd %d failed: %s", fd, strerror(errno));
-+	ipc_send(command_sk, HAL_SERVICE_ID_SOCK, HAL_OP_SOCK_CONNECT, 0, NULL,
-+								hal_fd);
-+	close(hal_fd);
-+	return;
- 
--		return;
+-	case HAL_OP_A2DP_CONNECT:
+-		status = bt_a2dp_connect(buf, len);
+-		break;
+-	case HAL_OP_A2DP_DISCONNECT:
+-		status = bt_a2dp_disconnect(buf, len);
+-		break;
 -	default:
 -		DBG("Unhandled command, opcode 0x%x", opcode);
 -		break;
 -	}
-+fail:
-+	ipc_send_rsp(command_sk, HAL_SERVICE_ID_SOCK, HAL_OP_SOCK_CONNECT,
-+							HAL_STATUS_FAILED);
- 
--	ipc_send_rsp(sk, HAL_SERVICE_ID_SOCK, opcode, HAL_STATUS_FAILED);
-+	if (hal_fd >= 0)
-+		close(hal_fd);
- }
- 
+-
+-	ipc_send_rsp(sk, HAL_SERVICE_ID_A2DP, opcode, status);
+-}
 +static const struct ipc_handler cmd_handlers[] = {
-+	{	/* HAL_OP_SOCK_LISTEN */
-+		.handler = handle_listen,
++	{	/* HAL_OP_A2DP_CONNECT */
++		.handler = bt_a2dp_connect,
 +		.var_len = false,
-+		.data_len = sizeof(struct hal_cmd_sock_listen)
++		.data_len = sizeof(struct hal_cmd_a2dp_connect)
 +	},
-+	{	/* HAL_OP_SOCK_CONNECT */
-+		.handler = handle_connect,
++	{	/* HAL_OP_A2DP_DISCONNECT */
++		.handler = bt_a2dp_disconnect,
 +		.var_len = false,
-+		.data_len = sizeof(struct hal_cmd_sock_connect)
++		.data_len = sizeof(struct hal_cmd_a2dp_disconnect)
 +	},
 +};
-+
- bool bt_socket_register(int cmd_sk, int notif_sk, const bdaddr_t *addr)
+ 
+ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
  {
- 	DBG("");
+@@ -388,6 +388,9 @@ bool bt_a2dp_register(int cmd_sk, int notif_sk, const bdaddr_t *addr)
+ 	notification_sk = notif_sk;
+ 	command_sk = cmd_sk;
  
-+	command_sk = cmd_sk;
- 	bacpy(&adapter_addr, addr);
- 
-+	ipc_register(HAL_SERVICE_ID_SOCK, cmd_handlers,
++	ipc_register(HAL_SERVICE_ID_A2DP, cmd_handlers,
 +				sizeof(cmd_handlers)/sizeof(cmd_handlers[0]));
 +
  	return true;
  }
  
- void bt_socket_unregister(void)
- {
- 	DBG("");
+@@ -411,6 +414,8 @@ void bt_a2dp_unregister(void)
+ 	notification_sk = -1;
+ 	command_sk = -1;
+ 
++	ipc_unregister(HAL_SERVICE_ID_A2DP);
 +
-+	command_sk = -1;
-+
-+	ipc_unregister(HAL_SERVICE_ID_SOCK);
- }
+ 	bt_adapter_remove_record(record_id);
+ 	record_id = 0;
+ 
+diff --git a/android/a2dp.h b/android/a2dp.h
+index 720b681..e23fe3a 100644
+--- a/android/a2dp.h
++++ b/android/a2dp.h
+@@ -21,7 +21,5 @@
+  *
+  */
+ 
+-void bt_a2dp_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len);
+-
+ bool bt_a2dp_register(int cmd_sk, int notif_sk, const bdaddr_t *addr);
+ void bt_a2dp_unregister(void);
 -- 
 1.8.3.2
 
