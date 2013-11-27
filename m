@@ -2,81 +2,173 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [RFC BlueZ v0 00/17] GATT API: External Services
-Date: Wed, 27 Nov 2013 17:50:40 -0300
-Message-Id: <1385585457-26951-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [RFC BlueZ v2] doc: Add GATT API
+Date: Wed, 27 Nov 2013 17:27:58 -0300
+Message-Id: <1385584078-1432-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <CAKT1EBdB7cvhmnqf2FV-F=RWwdnvhpUuc3AENHaYCao_dNyH_w@mail.gmail.com>
+References: <CAKT1EBdB7cvhmnqf2FV-F=RWwdnvhpUuc3AENHaYCao_dNyH_w@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patchset implements the minimal support for managing local
-services declarations. Based on "[RFC BlueZ v2] doc: Add GATT API"
+This patch proposes an unified GATT API for local and remote services.
+---
+ v2: API similar to Profile1 and ProfileManager1
 
-Features:
-* API for internal and external services declaration
-* Unix socket for testing purpose: services are exported
-through unix sockets to avoid breaking the current attribute
-server.
+ doc/gatt-api.txt | 145 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 145 insertions(+)
+ create mode 100644 doc/gatt-api.txt
 
-How to test:
-Replace bluetooth.conf and reload DBus settings
-$gatttool -L --primary (or interactive mode)
-
-Upstreaming plan (steps):
-* GATT Server: External Services
-* GATT Server: External Characteristics (Server)
-* GATT Server: External Descriptors (Server)
-* Remove ATTIO and automatic connection mechanism from userspace
-* Replace attribute server
-* Fix all GATT internal plugins
-* GATT Client: Remote Services
-* ...
-
-Alvaro Silva (7):
-  gatt: Add stub for gatt file
-  gatt: Register Manager D-Bus Interface
-  gatt: Add registering external service
-  gatt: Add external services tracking
-  gatt: Implement UnregisterService
-  gatt: Register ATT command/event handler
-  gatt: Add Discover All Primary Services
-
-Andre Guedes (1):
-  gatt: Add helper for creating GATT services
-
-Claudio Takahasi (9):
-  lib: Add GATT Primary Service UUID
-  gatt: Add server unix socket
-  gattrib: Use default ATT LE MTU for non-standard sockets
-  test: Add external service GATT skeleton
-  test: Add signal handling for gatt-service
-  test: Add registering external service
-  gatttool: Add unix socket connect
-  gatttool: Add unix socket support for interactive mode
-  bluetooth.conf: Add ObjectManager interface
-
- Makefile.am          |   2 +
- Makefile.tools       |   5 +
- attrib/gattrib.c     |  16 +--
- attrib/gatttool.c    |  27 +++-
- attrib/gatttool.h    |   1 +
- attrib/interactive.c |  18 +--
- attrib/utils.c       |  54 ++++++++
- lib/uuid.c           |  14 ++
- lib/uuid.h           |   5 +
- src/bluetooth.conf   |   1 +
- src/gatt-dbus.c      | 296 ++++++++++++++++++++++++++++++++++++++++
- src/gatt-dbus.h      |  25 ++++
- src/gatt.c           | 371 +++++++++++++++++++++++++++++++++++++++++++++++++++
- src/gatt.h           |  36 +++++
- src/main.c           |   4 +
- test/gatt-service.c  | 254 +++++++++++++++++++++++++++++++++++
- 16 files changed, 1106 insertions(+), 23 deletions(-)
- create mode 100644 src/gatt-dbus.c
- create mode 100644 src/gatt-dbus.h
- create mode 100644 src/gatt.c
- create mode 100644 src/gatt.h
- create mode 100644 test/gatt-service.c
-
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+new file mode 100644
+index 0000000..d2545b2
+--- /dev/null
++++ b/doc/gatt-api.txt
+@@ -0,0 +1,145 @@
++BlueZ D-Bus GATT API description
++********************************
++
++GATT local and remote services share the same high-level D-Bus API. Local
++refers to GATT based service exported by a BlueZ plugin or an external
++application. Remote refers to GATT services exported by the peer.
++
++BlueZ acts as a proxy, translating ATT operations to D-Bus method calls and
++Properties (or the opposite). Support for D-Bus Object Manager is mandatory for
++external services to allow seamless GATT declarations (Service, Characteristic
++and Descriptors) discovery.
++
++Service hierarchy
++=================
++
++GATT remote and local service representation. Object path for local services
++is freely definable.
++
++External applications implementing local services must register the services
++using ServiceManager1 registration method and must implement the methods and
++properties defined in Service1 interface.
++
++Service		org.bluez
++Interface	org.bluez.Service1 [Experimental]
++Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX
++
++Methods		void Release()
++
++			Release this service. At this point, it will not be
++			used by BlueZ anymore and can be destroyed by the
++			owner. Method applicable to external GATT services
++			implementations only (GATT servers).
++
++Properties	string UUID [read-only]
++
++			128-bit service UUID.
++
++		array{object} Includes [read-only]: Not implemented
++
++			Array of object paths representing the included
++			services of this service.
++
++
++Characteristic hierarchy
++========================
++
++For local GATT defined services, the object paths need to follow the service
++path hierarchy and are freely definable.
++
++Service		org.bluez
++Interface	org.bluez.Characteristic1 [Experimental]
++Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY
++
++Properties	string UUID [read-only]
++
++			128-bit characteristic UUID.
++
++		object Service [read-only]
++
++			Object path of the GATT service the characteristc
++			belongs to.
++
++		array{byte} Value [read-write]
++
++			Value read from the remote Bluetooth device or from
++			the external application implementing GATT services.
++
++		array{string} Flags [read-only, optional]
++
++			Defines how the characteristic value can be used. See
++			Core spec page 1898, "Table 3.5: Characteristic
++			Properties bit field" and page 1900, "Table 3.8:
++			Characteristic Extended Properties bit field". Allowed
++			values: "broadcast", "read", "write-without-response",
++			"write", "notify", "indicate",
++			"authenticated-signed-writes", "reliable-write", and
++			"writable-auxiliaries".
++
++
++Characteristic Descriptors hierarchy
++====================================
++
++Local or remote GATT characteristic descriptors hierarchy.
++
++Service		org.bluez
++Interface	org.bluez.Descriptor1 [Experimental]
++Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY/descriptorZZZ
++
++Properties	string UUID [read-only]
++
++			128-bit descriptor UUID.
++
++		object Characteristic [read-only]
++
++			Object path of the GATT characteristc the descriptor
++			belongs to.
++
++		array{byte} Value [read-write]
++
++			Raw characteristic descriptor value read from the
++			remote Bluetooth device or from the external
++			application implementing GATT services.
++
++		string Permissions [read-only]: To be defined
++
++			Defines read/write authentication and authorization
++			requirements.
++
++Service Manager hierarchy
++=============================
++
++Service Manager allows external applications to register GATT based
++services. Services must follow the API for Service and Characteristic
++described above.
++
++Local GATT services, characteristics and characteristic descriptors are
++discovered automatically using the D-Bus Object Manager interface.
++
++Service		org.bluez
++Interface	org.bluez.ServiceManager1 [Experimental]
++Object path	/org/bluez
++
++Methods		RegisterService(object service, dict options)
++
++			Registers remote application service exported under
++			the interface Service1. Characteristic objects must
++			be hierarchical to their service and must use the
++			interface Characteristic1. D-Bus Object Manager is
++			used to fetch the exported objects.
++
++			"service" object path together with the D-Bus system
++			bus connection ID define the identification of the
++			application registering a GATT based service.
++
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.AlreadyExists
++
++		UnregisterService(object service)
++
++			This unregisters the service that has been
++			previously registered. The object path parameter
++			must match the same value that has been used
++			on registration.
++
++			Possible errors: org.bluez.Error.DoesNotExist
 -- 
 1.8.3.1
 
