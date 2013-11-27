@@ -1,42 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/5] android: Avoid memory leak warnings for event_loop
-Date: Wed, 27 Nov 2013 18:19:10 +0200
-Message-Id: <1385569154-11579-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 4/5] android/socket: Cleanup sockets on unregister
+Date: Wed, 27 Nov 2013 18:19:13 +0200
+Message-Id: <1385569154-11579-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1385569154-11579-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1385569154-11579-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Move creation of event_loop closer to g_main_loop_run. This avoids
-calling g_main_loop_unref too many times in initialization error paths.
-This is safe since g_main_loop_quit eval to NOOP if parameter == NULL.
+This cleans up rfsock structures closing all sockets and making general cleanup
+for servers and for connections. This will be called form socket unregister.
 ---
- android/main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ android/socket.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/android/main.c b/android/main.c
-index bfd2a87..830eef2 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -559,7 +559,6 @@ int main(int argc, char *argv[])
- 		exit(EXIT_SUCCESS);
- 	}
+diff --git a/android/socket.c b/android/socket.c
+index 1fb154d..d55db54 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -943,7 +943,27 @@ bool bt_socket_register(int sk, const bdaddr_t *addr)
+ 	return true;
+ }
  
--	event_loop = g_main_loop_new(NULL, FALSE);
- 	signal = setup_signalfd();
- 	if (!signal)
- 		return EXIT_FAILURE;
-@@ -584,6 +583,8 @@ int main(int argc, char *argv[])
- 
- 	DBG("Entering main loop");
- 
-+	event_loop = g_main_loop_new(NULL, FALSE);
++static void free_connection(gpointer data, gpointer user_data)
++{
++	struct rfcomm_sock *rfsock = data;
 +
- 	g_main_loop_run(event_loop);
- 
- 	g_source_remove(signal);
++	connections = g_list_remove(connections, rfsock);
++	cleanup_rfsock(rfsock);
++}
++
++static void free_server(gpointer data, gpointer user_data)
++{
++	struct rfcomm_sock *rfsock = data;
++
++	servers = g_list_remove(servers, rfsock);
++	cleanup_rfsock(rfsock);
++}
++
+ void bt_socket_unregister(void)
+ {
+ 	DBG("");
++
++	g_list_foreach(connections, free_connection, NULL);
++
++	g_list_foreach(servers, free_server, NULL);
+ }
 -- 
 1.8.3.2
 
