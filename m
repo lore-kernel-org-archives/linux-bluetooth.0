@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 07/13] android/hidhost: Use generic IPC message handling for commands
-Date: Wed, 27 Nov 2013 12:54:59 +0100
-Message-Id: <1385553305-5807-8-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 05/13] android/bluetooth: Use generic IPC msg handling for commands
+Date: Wed, 27 Nov 2013 12:54:57 +0100
+Message-Id: <1385553305-5807-6-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1385553305-5807-1-git-send-email-szymon.janc@tieto.com>
 References: <1385553305-5807-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,589 +13,684 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Handlers are registered on service register and unregistered on
 unregister.
 ---
- android/hidhost.c | 317 +++++++++++++++++++++++++++++++++---------------------
- android/hidhost.h |   2 -
- 2 files changed, 193 insertions(+), 126 deletions(-)
+ android/bluetooth.c | 478 ++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 335 insertions(+), 143 deletions(-)
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index d97af03..5b98152 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -723,9 +723,10 @@ fail:
- 	hid_device_free(dev);
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 700e5ce..c7ec19b 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1369,7 +1369,7 @@ static void set_adapter_name_complete(uint8_t status, uint16_t length,
+ 	adapter_set_name(rp->name);
  }
  
--static uint8_t bt_hid_connect(struct hal_cmd_hidhost_connect *cmd,
--								uint16_t len)
-+static void bt_hid_connect(const void *buf, uint16_t len)
+-static uint8_t set_adapter_name(uint8_t *name, uint16_t len)
++static uint8_t set_adapter_name(const uint8_t *name, uint16_t len)
  {
-+	const struct hal_cmd_hidhost_connect *cmd = buf;
-+	uint8_t status = HAL_STATUS_SUCCESS;
- 	struct hid_device *dev;
- 	char addr[18];
- 	bdaddr_t dst;
-@@ -734,14 +735,13 @@ static uint8_t bt_hid_connect(struct hal_cmd_hidhost_connect *cmd,
+ 	struct mgmt_cp_set_local_name cp;
  
- 	DBG("");
- 
--	if (len < sizeof(*cmd))
--		return HAL_STATUS_INVALID;
--
- 	android2bdaddr(&cmd->bdaddr, &dst);
- 
- 	l = g_slist_find_custom(devices, &dst, device_cmp);
--	if (l)
--		return HAL_STATUS_FAILED;
-+	if (l) {
-+		status = HAL_STATUS_FAILED;
-+		goto fail;
-+	}
- 
- 	dev = g_new0(struct hid_device, 1);
- 	bacpy(&dev->dst, &dst);
-@@ -755,32 +755,35 @@ static uint8_t bt_hid_connect(struct hal_cmd_hidhost_connect *cmd,
- 					hid_sdp_search_cb, dev, NULL) < 0) {
- 		error("Failed to search sdp details");
- 		hid_device_free(dev);
--		return HAL_STATUS_FAILED;
-+		status = HAL_STATUS_FAILED;
-+		goto fail;
- 	}
- 
- 	devices = g_slist_append(devices, dev);
- 	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTING);
- 
--	return HAL_STATUS_SUCCESS;
-+fail:
-+	ipc_send_rsp(command_sk, HAL_SERVICE_ID_HIDHOST,
-+					HAL_OP_HIDHOST_CONNECT, status);
+@@ -1386,8 +1386,17 @@ static uint8_t set_adapter_name(uint8_t *name, uint16_t len)
+ 	return HAL_STATUS_FAILED;
  }
  
--static uint8_t bt_hid_disconnect(struct hal_cmd_hidhost_disconnect *cmd,
--								uint16_t len)
-+static void bt_hid_disconnect(const void *buf, uint16_t len)
+-static uint8_t set_discoverable_timeout(uint8_t *timeout)
++static uint8_t set_discoverable_timeout(const void *buf, uint16_t len)
  {
-+	const struct hal_cmd_hidhost_disconnect *cmd = buf;
-+	uint8_t status = HAL_STATUS_SUCCESS;
- 	struct hid_device *dev;
- 	GSList *l;
- 	bdaddr_t dst;
- 
- 	DBG("");
- 
--	if (len < sizeof(*cmd))
--		return HAL_STATUS_INVALID;
--
- 	android2bdaddr(&cmd->bdaddr, &dst);
- 
- 	l = g_slist_find_custom(devices, &dst, device_cmp);
--	if (!l)
--		return HAL_STATUS_FAILED;
-+	if (!l) {
-+		status = HAL_STATUS_FAILED;
-+		goto fail;
-+	}
- 
- 	dev = l->data;
- 
-@@ -793,12 +796,15 @@ static uint8_t bt_hid_disconnect(struct hal_cmd_hidhost_disconnect *cmd,
- 
- 	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTING);
- 
--	return HAL_STATUS_SUCCESS;
-+fail:
-+	ipc_send_rsp(command_sk, HAL_SERVICE_ID_HIDHOST,
-+					HAL_OP_HIDHOST_DISCONNECT, status);
- }
- 
--static uint8_t bt_hid_virtual_unplug(struct hal_cmd_hidhost_virtual_unplug *cmd,
--								uint16_t len)
-+static void bt_hid_virtual_unplug(const void *buf, uint16_t len)
- {
-+	const struct hal_cmd_hidhost_virtual_unplug *cmd = buf;
-+	uint8_t status = HAL_STATUS_FAILED;
- 	struct hid_device *dev;
- 	GSList *l;
- 	bdaddr_t dst;
-@@ -807,19 +813,16 @@ static uint8_t bt_hid_virtual_unplug(struct hal_cmd_hidhost_virtual_unplug *cmd,
- 
- 	DBG("");
- 
--	if (len < sizeof(*cmd))
--		return HAL_STATUS_INVALID;
--
- 	android2bdaddr(&cmd->bdaddr, &dst);
- 
- 	l = g_slist_find_custom(devices, &dst, device_cmp);
- 	if (!l)
--		return HAL_STATUS_FAILED;
-+		goto fail;
- 
- 	dev = l->data;
- 
- 	if (!(dev->ctrl_io))
--		return HAL_STATUS_FAILED;
-+		goto fail;
- 
- 	hdr = HID_MSG_CONTROL | HID_VIRTUAL_CABLE_UNPLUG;
- 
-@@ -828,7 +831,7 @@ static uint8_t bt_hid_virtual_unplug(struct hal_cmd_hidhost_virtual_unplug *cmd,
- 	if (write(fd, &hdr, sizeof(hdr)) < 0) {
- 		error("error writing virtual unplug command: %s (%d)",
- 						strerror(errno), errno);
--		return HAL_STATUS_FAILED;
-+		goto fail;
- 	}
- 
- 	/* Wait either channels to HUP */
-@@ -840,10 +843,14 @@ static uint8_t bt_hid_virtual_unplug(struct hal_cmd_hidhost_virtual_unplug *cmd,
- 
- 	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTING);
- 
--	return HAL_STATUS_SUCCESS;
-+	status = HAL_STATUS_SUCCESS;
++	const uint32_t *timeout = buf;
 +
-+fail:
-+	ipc_send_rsp(command_sk, HAL_SERVICE_ID_HIDHOST,
-+					HAL_OP_HIDHOST_VIRTUAL_UNPLUG, status);
- }
- 
--static uint8_t bt_hid_info(struct hal_cmd_hidhost_set_info *cmd, uint16_t len)
-+static void bt_hid_info(const void *buf, uint16_t len)
- {
- 	/* Data from hal_cmd_hidhost_set_info is usefull only when we create
- 	 * UHID device. Once device is created all the transactions will be
-@@ -851,12 +858,14 @@ static uint8_t bt_hid_info(struct hal_cmd_hidhost_set_info *cmd, uint16_t len)
- 	 * once device is created with HID internals. */
- 	DBG("Not supported");
- 
--	return HAL_STATUS_UNSUPPORTED;
-+	ipc_send_rsp(command_sk, HAL_SERVICE_ID_HIDHOST,
-+			HAL_OP_HIDHOST_SET_INFO, HAL_STATUS_UNSUPPORTED);
- }
- 
--static uint8_t bt_hid_get_protocol(struct hal_cmd_hidhost_get_protocol *cmd,
--								uint16_t len)
-+static void bt_hid_get_protocol(const void *buf, uint16_t len)
- {
-+	const struct hal_cmd_hidhost_get_protocol *cmd = buf;
-+	uint8_t status = HAL_STATUS_SUCCESS;
- 	struct hid_device *dev;
- 	GSList *l;
- 	bdaddr_t dst;
-@@ -865,19 +874,20 @@ static uint8_t bt_hid_get_protocol(struct hal_cmd_hidhost_get_protocol *cmd,
- 
- 	DBG("");
- 
--	if (len < sizeof(*cmd))
--		return HAL_STATUS_INVALID;
--
- 	android2bdaddr(&cmd->bdaddr, &dst);
- 
- 	l = g_slist_find_custom(devices, &dst, device_cmp);
--	if (!l)
--		return HAL_STATUS_FAILED;
-+	if (!l) {
-+		status = HAL_STATUS_FAILED;
-+		goto fail;
-+	}
- 
- 	dev = l->data;
- 
--	if (dev->boot_dev)
--		return HAL_STATUS_UNSUPPORTED;
-+	if (dev->boot_dev) {
-+		status = HAL_STATUS_UNSUPPORTED;
-+		goto fail;
-+	}
- 
- 	hdr = HID_MSG_GET_PROTOCOL | cmd->mode;
- 	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
-@@ -885,16 +895,21 @@ static uint8_t bt_hid_get_protocol(struct hal_cmd_hidhost_get_protocol *cmd,
- 	if (write(fd, &hdr, sizeof(hdr)) < 0) {
- 		error("error writing device_get_protocol: %s (%d)",
- 						strerror(errno), errno);
--		return HAL_STATUS_FAILED;
-+		status = HAL_STATUS_FAILED;
-+		goto fail;
- 	}
- 
- 	dev->last_hid_msg = HID_MSG_GET_PROTOCOL;
--	return HAL_STATUS_SUCCESS;
-+
-+fail:
-+	ipc_send_rsp(command_sk, HAL_SERVICE_ID_HIDHOST,
-+					HAL_OP_HIDHOST_GET_PROTOCOL, status);
- }
- 
--static uint8_t bt_hid_set_protocol(struct hal_cmd_hidhost_set_protocol *cmd,
--								uint16_t len)
-+static void bt_hid_set_protocol(const void *buf, uint16_t len)
- {
-+	const struct hal_cmd_hidhost_set_protocol *cmd = buf;
-+	uint8_t status = HAL_STATUS_SUCCESS;
- 	struct hid_device *dev;
- 	GSList *l;
- 	bdaddr_t dst;
-@@ -903,19 +918,20 @@ static uint8_t bt_hid_set_protocol(struct hal_cmd_hidhost_set_protocol *cmd,
- 
- 	DBG("");
- 
--	if (len < sizeof(*cmd))
--		return HAL_STATUS_INVALID;
--
- 	android2bdaddr(&cmd->bdaddr, &dst);
- 
- 	l = g_slist_find_custom(devices, &dst, device_cmp);
--	if (!l)
--		return HAL_STATUS_FAILED;
-+	if (!l) {
-+		status = HAL_STATUS_FAILED;
-+		goto fail;
-+	}
- 
- 	dev = l->data;
- 
--	if (dev->boot_dev)
--		return HAL_STATUS_UNSUPPORTED;
-+	if (dev->boot_dev) {
-+		status = HAL_STATUS_UNSUPPORTED;
-+		goto fail;
-+	}
- 
- 	hdr = HID_MSG_SET_PROTOCOL | cmd->mode;
- 	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
-@@ -923,16 +939,21 @@ static uint8_t bt_hid_set_protocol(struct hal_cmd_hidhost_set_protocol *cmd,
- 	if (write(fd, &hdr, sizeof(hdr)) < 0) {
- 		error("error writing device_set_protocol: %s (%d)",
- 						strerror(errno), errno);
--		return HAL_STATUS_FAILED;
-+		status = HAL_STATUS_FAILED;
-+		goto fail;
- 	}
- 
- 	dev->last_hid_msg = HID_MSG_SET_PROTOCOL;
--	return HAL_STATUS_SUCCESS;
-+
-+fail:
-+	ipc_send_rsp(command_sk, HAL_SERVICE_ID_HIDHOST,
-+					HAL_OP_HIDHOST_SET_PROTOCOL, status);
- }
- 
--static uint8_t bt_hid_get_report(struct hal_cmd_hidhost_get_report *cmd,
--								uint16_t len)
-+static void bt_hid_get_report(const void *buf, uint16_t len)
- {
-+	const struct hal_cmd_hidhost_get_report *cmd = buf;
-+	uint8_t status = HAL_STATUS_SUCCESS;
- 	struct hid_device *dev;
- 	GSList *l;
- 	bdaddr_t dst;
-@@ -942,20 +963,21 @@ static uint8_t bt_hid_get_report(struct hal_cmd_hidhost_get_report *cmd,
- 
- 	DBG("");
- 
--	if (len < sizeof(*cmd))
--		return HAL_STATUS_INVALID;
--
- 	android2bdaddr(&cmd->bdaddr, &dst);
- 
- 	l = g_slist_find_custom(devices, &dst, device_cmp);
--	if (!l)
--		return HAL_STATUS_FAILED;
-+	if (!l) {
-+		status = HAL_STATUS_FAILED;
-+		goto fail;
-+	}
- 
- 	dev = l->data;
- 	req_size = (cmd->buf_size > 0) ? 4 : 2;
- 	req = g_try_malloc0(req_size);
--	if (!req)
--		return HAL_STATUS_NOMEM;
-+	if (!req) {
-+		status = HAL_STATUS_NOMEM;
-+		goto fail;
-+	}
- 
- 	req[0] = HID_MSG_GET_REPORT | cmd->type;
- 	req[1] = cmd->id;
-@@ -971,17 +993,22 @@ static uint8_t bt_hid_get_report(struct hal_cmd_hidhost_get_report *cmd,
- 		error("error writing hid_get_report: %s (%d)",
- 						strerror(errno), errno);
- 		g_free(req);
--		return HAL_STATUS_FAILED;
-+		status = HAL_STATUS_FAILED;
-+		goto fail;
- 	}
- 
- 	dev->last_hid_msg = HID_MSG_GET_REPORT;
- 	g_free(req);
--	return HAL_STATUS_SUCCESS;
-+
-+fail:
-+	ipc_send_rsp(command_sk, HAL_SERVICE_ID_HIDHOST,
-+					HAL_OP_HIDHOST_GET_REPORT, status);
- }
- 
--static uint8_t bt_hid_set_report(struct hal_cmd_hidhost_set_report *cmd,
--								uint16_t len)
-+static void bt_hid_set_report(const void *buf, uint16_t len)
- {
-+	const struct hal_cmd_hidhost_set_report *cmd = buf;
-+	uint8_t status = HAL_STATUS_SUCCESS;
- 	struct hid_device *dev;
- 	GSList *l;
- 	bdaddr_t dst;
-@@ -991,24 +1018,34 @@ static uint8_t bt_hid_set_report(struct hal_cmd_hidhost_set_report *cmd,
- 
- 	DBG("");
- 
--	if (len < sizeof(*cmd))
--		return HAL_STATUS_INVALID;
-+	if (len != sizeof(*cmd) + cmd->len) {
-+		error("Invalid hid set report size (%u bytes), terminating",
-+									len);
++	if (len != sizeof(*timeout)) {
++		error("Invalid set discoverable timeout size (%u bytes), "
++							"terminating", len);
 +		raise(SIGTERM);
-+		return;
++		return HAL_STATUS_FAILED;
 +	}
- 
- 	android2bdaddr(&cmd->bdaddr, &dst);
- 
- 	l = g_slist_find_custom(devices, &dst, device_cmp);
--	if (!l)
--		return HAL_STATUS_FAILED;
-+	if (!l) {
-+		status = HAL_STATUS_FAILED;
-+		goto fail;
-+	}
- 
- 	dev = l->data;
- 
--	if (!(dev->ctrl_io))
--		return HAL_STATUS_FAILED;
-+	if (!(dev->ctrl_io)) {
-+		status = HAL_STATUS_FAILED;
-+		goto fail;
-+	}
- 
- 	req_size = 1 + (cmd->len / 2);
- 	req = g_try_malloc0(req_size);
--	if (!req)
--		return HAL_STATUS_NOMEM;
-+	if (!req) {
-+		status = HAL_STATUS_NOMEM;
-+		goto fail;
-+	}
- 
- 	req[0] = HID_MSG_SET_REPORT | cmd->type;
- 	/* Report data coming to HAL is in ascii format, HAL sends
-@@ -1022,17 +1059,22 @@ static uint8_t bt_hid_set_report(struct hal_cmd_hidhost_set_report *cmd,
- 		error("error writing hid_set_report: %s (%d)",
- 						strerror(errno), errno);
- 		g_free(req);
--		return HAL_STATUS_FAILED;
-+		status = HAL_STATUS_FAILED;
-+		goto fail;
- 	}
- 
- 	dev->last_hid_msg = HID_MSG_SET_REPORT;
- 	g_free(req);
--	return HAL_STATUS_SUCCESS;
 +
-+fail:
-+	ipc_send_rsp(command_sk, HAL_SERVICE_ID_HIDHOST,
-+					HAL_OP_HIDHOST_SET_REPORT, status);
- }
- 
--static uint8_t bt_hid_send_data(struct hal_cmd_hidhost_send_data *cmd,
--								uint16_t len)
-+static void bt_hid_send_data(const void *buf, uint16_t len)
- {
-+	const struct hal_cmd_hidhost_send_data *cmd = buf;
-+	uint8_t status = HAL_STATUS_SUCCESS;
- 	struct hid_device *dev;
- 	GSList *l;
- 	bdaddr_t dst;
-@@ -1042,24 +1084,34 @@ static uint8_t bt_hid_send_data(struct hal_cmd_hidhost_send_data *cmd,
- 
- 	DBG("");
- 
--	if (len < sizeof(*cmd))
--		return HAL_STATUS_INVALID;
-+	if (len != sizeof(*cmd) + cmd->len) {
-+		error("Invalid hid send data size (%u bytes), terminating",
-+									len);
-+		raise(SIGTERM);
-+		return;
-+	}
- 
- 	android2bdaddr(&cmd->bdaddr, &dst);
- 
- 	l = g_slist_find_custom(devices, &dst, device_cmp);
--	if (!l)
--		return HAL_STATUS_FAILED;
-+	if (!l) {
-+		status = HAL_STATUS_FAILED;
-+		goto fail;
-+	}
- 
- 	dev = l->data;
- 
--	if (!(dev->intr_io))
--		return HAL_STATUS_FAILED;
-+	if (!(dev->intr_io)) {
-+		status = HAL_STATUS_FAILED;
-+		goto fail;
-+	}
- 
- 	req_size = 1 + (cmd->len / 2);
- 	req = g_try_malloc0(req_size);
--	if (!req)
--		return HAL_STATUS_NOMEM;
-+	if (!req) {
-+		status = HAL_STATUS_NOMEM;
-+		goto fail;
-+	}
- 
- 	req[0] = HID_MSG_DATA | HID_DATA_TYPE_OUTPUT;
- 	/* Report data coming to HAL is in ascii format, HAL sends
-@@ -1073,53 +1125,65 @@ static uint8_t bt_hid_send_data(struct hal_cmd_hidhost_send_data *cmd,
- 		error("error writing data to HID device: %s (%d)",
- 						strerror(errno), errno);
- 		g_free(req);
--		return HAL_STATUS_FAILED;
-+		status = HAL_STATUS_FAILED;
-+		goto fail;
- 	}
- 
- 	g_free(req);
--	return HAL_STATUS_SUCCESS;
--}
--
--void bt_hid_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
--{
--	uint8_t status = HAL_STATUS_FAILED;
- 
--	switch (opcode) {
--	case HAL_OP_HIDHOST_CONNECT:
--		status = bt_hid_connect(buf, len);
--		break;
--	case HAL_OP_HIDHOST_DISCONNECT:
--		status = bt_hid_disconnect(buf, len);
--		break;
--	case HAL_OP_HIDHOST_VIRTUAL_UNPLUG:
--		status = bt_hid_virtual_unplug(buf, len);
--		break;
--	case HAL_OP_HIDHOST_SET_INFO:
--		status = bt_hid_info(buf, len);
--		break;
--	case HAL_OP_HIDHOST_GET_PROTOCOL:
--		status = bt_hid_get_protocol(buf, len);
--		break;
--	case HAL_OP_HIDHOST_SET_PROTOCOL:
--		status = bt_hid_set_protocol(buf, len);
--		break;
--	case HAL_OP_HIDHOST_GET_REPORT:
--		status = bt_hid_get_report(buf, len);
--		break;
--	case HAL_OP_HIDHOST_SET_REPORT:
--		status = bt_hid_set_report(buf, len);
--		break;
--	case HAL_OP_HIDHOST_SEND_DATA:
--		status = bt_hid_send_data(buf, len);
--		break;
--	default:
--		DBG("Unhandled command, opcode 0x%x", opcode);
--		break;
--	}
--
--	ipc_send_rsp(sk, HAL_SERVICE_ID_HIDHOST, opcode, status);
-+fail:
-+	ipc_send_rsp(command_sk, HAL_SERVICE_ID_HIDHOST,
-+					HAL_OP_HIDHOST_SEND_DATA, status);
- }
- 
-+static const struct ipc_handler cmd_handlers[] = {
-+	{	/* HAL_OP_HIDHOST_CONNECT */
-+		.handler = bt_hid_connect,
-+		.var_len = false,
-+		.data_len = sizeof(struct hal_cmd_hidhost_connect)
-+	},
-+	{	/* HAL_OP_HIDHOST_DISCONNECT */
-+		.handler = bt_hid_disconnect,
-+		.var_len = false,
-+		.data_len = sizeof(struct hal_cmd_hidhost_disconnect)
-+	},
-+	{	/* HAL_OP_HIDHOST_VIRTUAL_UNPLUG */
-+		.handler = bt_hid_virtual_unplug,
-+		.var_len = false,
-+		.data_len = sizeof(struct hal_cmd_hidhost_virtual_unplug)
-+	},
-+	{	/* HAL_OP_HIDHOST_SET_INFO */
-+		.handler = bt_hid_info,
-+		.var_len = true,
-+		.data_len = sizeof(struct hal_cmd_hidhost_set_info)
-+	},
-+	{	/* HAL_OP_HIDHOST_GET_PROTOCOL */
-+		.handler = bt_hid_get_protocol,
-+		.var_len = false,
-+		.data_len = sizeof(struct hal_cmd_hidhost_get_protocol)
-+	},
-+	{	/* HAL_OP_HIDHOST_SET_PROTOCOL */
-+		.handler = bt_hid_set_protocol,
-+		.var_len = false,
-+		.data_len = sizeof(struct hal_cmd_hidhost_get_protocol)
-+	},
-+	{	/* HAL_OP_HIDHOST_GET_REPORT */
-+		.handler = bt_hid_get_report,
-+		.var_len = false,
-+		.data_len = sizeof(struct hal_cmd_hidhost_get_report)
-+	},
-+	{	/* HAL_OP_HIDHOST_SET_REPORT */
-+		.handler = bt_hid_set_report,
-+		.var_len = true,
-+		.data_len = sizeof(struct hal_cmd_hidhost_set_report)
-+	},
-+	{	/* HAL_OP_HIDHOST_SEND_DATA */
-+		.handler = bt_hid_send_data,
-+		.var_len = true,
-+		.data_len = sizeof(struct hal_cmd_hidhost_send_data)
-+	},
-+};
-+
- static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- {
- 	struct hid_device *dev;
-@@ -1229,6 +1293,9 @@ bool bt_hid_register(int cmd_sk, int notif_sk, const bdaddr_t *addr)
- 	command_sk = cmd_sk;
- 	notification_sk = notif_sk;
- 
-+	ipc_register(HAL_SERVICE_ID_HIDHOST, cmd_handlers,
-+				sizeof(cmd_handlers)/sizeof(cmd_handlers[0]));
-+
+ 	/* Android handles discoverable timeout in Settings app.
+ 	 * There is no need to use kernel feature for that.
+ 	 * Just need to store this value here */
+@@ -1784,33 +1793,54 @@ static bool get_discoverable_timeout(void)
  	return true;
  }
  
-@@ -1263,4 +1330,6 @@ void bt_hid_unregister(void)
- 		g_io_channel_unref(intr_io);
- 		intr_io = NULL;
+-static bool get_property(void *buf, uint16_t len)
++static void handle_get_adapter_prop_cmd(const void *buf, uint16_t len)
+ {
+-	struct hal_cmd_get_adapter_prop *cmd = buf;
++	const struct hal_cmd_get_adapter_prop *cmd = buf;
++	uint8_t status = HAL_STATUS_SUCCESS;
+ 
+ 	switch (cmd->type) {
+ 	case HAL_PROP_ADAPTER_ADDR:
+ 		get_address();
+-		return true;
++		break;
+ 	case HAL_PROP_ADAPTER_NAME:
+-		return get_name();
++		if (!get_name())
++			status = HAL_STATUS_FAILED;
++		break;
+ 	case HAL_PROP_ADAPTER_UUIDS:
+-		return get_uuids();
++		if (!get_uuids())
++			status = HAL_STATUS_FAILED;
++		break;
+ 	case HAL_PROP_ADAPTER_CLASS:
+-		return get_class();
++		if (!get_class())
++			status = HAL_STATUS_FAILED;
++		break;
+ 	case HAL_PROP_ADAPTER_TYPE:
+-		return get_type();
++		if (!get_type())
++			status = HAL_STATUS_FAILED;
++		break;
+ 	case HAL_PROP_ADAPTER_SERVICE_REC:
+-		return get_service();
++		if (!get_service())
++			status = HAL_STATUS_FAILED;
++		break;
+ 	case HAL_PROP_ADAPTER_SCAN_MODE:
+-		return get_scan_mode();
++		if (!get_scan_mode())
++			status = HAL_STATUS_FAILED;
++		break;
+ 	case HAL_PROP_ADAPTER_BONDED_DEVICES:
+-		return get_devices();
++		if (!get_devices())
++			status = HAL_STATUS_FAILED;
++		break;
+ 	case HAL_PROP_ADAPTER_DISC_TIMEOUT:
+-		return get_discoverable_timeout();
++		if (!get_discoverable_timeout())
++			status = HAL_STATUS_FAILED;
++		break;
+ 	default:
+-		return false;
++		status = HAL_STATUS_FAILED;
++		break;
  	}
 +
-+	ipc_unregister(HAL_SERVICE_ID_HIDHOST);
++	ipc_send_rsp(command_sk, HAL_SERVICE_ID_BLUETOOTH,
++					HAL_OP_GET_ADAPTER_PROP, status);
  }
-diff --git a/android/hidhost.h b/android/hidhost.h
-index 4486ee9..9738ea5 100644
---- a/android/hidhost.h
-+++ b/android/hidhost.h
-@@ -21,7 +21,5 @@
-  *
-  */
  
--void bt_hid_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len);
+ static void get_properties(void)
+@@ -1866,11 +1896,18 @@ static bool stop_discovery(void)
+ 	return false;
+ }
+ 
+-static uint8_t set_scan_mode(void *buf, uint16_t len)
++static uint8_t set_scan_mode(const void *buf, uint16_t len)
+ {
+-	uint8_t *mode = buf;
++	const uint8_t *mode = buf;
+ 	bool conn, disc, cur_conn, cur_disc;
+ 
++	if (len != sizeof(*mode)) {
++		error("Invalid set scan mode size (%u bytes), terminating",
++								len);
++		raise(SIGTERM);
++		return HAL_STATUS_FAILED;
++	}
++
+ 	cur_conn = adapter.current_settings & MGMT_SETTING_CONNECTABLE;
+ 	cur_disc = adapter.current_settings & MGMT_SETTING_DISCOVERABLE;
+ 
+@@ -1922,21 +1959,36 @@ done:
+ 	return HAL_STATUS_DONE;
+ }
+ 
+-static uint8_t set_property(void *buf, uint16_t len)
++static void handle_set_adapter_prop_cmd(const void *buf, uint16_t len)
+ {
+-	struct hal_cmd_set_adapter_prop *cmd = buf;
++	const struct hal_cmd_set_adapter_prop *cmd = buf;
++	uint8_t status;
++
++	if (len != sizeof(*cmd) + cmd->len ) {
++		error("Invalid set adapter prop cmd (0x%x), terminating",
++								cmd->type);
++		raise(SIGTERM);
++		return;
++	}
+ 
+ 	switch (cmd->type) {
+ 	case HAL_PROP_ADAPTER_SCAN_MODE:
+-		return set_scan_mode(cmd->val, cmd->len);
++		status = set_scan_mode(cmd->val, cmd->len);
++		break;
+ 	case HAL_PROP_ADAPTER_NAME:
+-		return set_adapter_name(cmd->val, cmd->len);
++		status = set_adapter_name(cmd->val, cmd->len);
++		break;
+ 	case HAL_PROP_ADAPTER_DISC_TIMEOUT:
+-		return set_discoverable_timeout(cmd->val);
++		status = set_discoverable_timeout(cmd->val, cmd->len);
++		break;
+ 	default:
+ 		DBG("Unhandled property type 0x%x", cmd->type);
+-		return HAL_STATUS_FAILED;
++		status = HAL_STATUS_FAILED;
++		break;
+ 	}
++
++	ipc_send_rsp(command_sk, HAL_SERVICE_ID_BLUETOOTH,
++					HAL_OP_SET_ADAPTER_PROP, status);
+ }
+ 
+ static void pair_device_complete(uint8_t status, uint16_t length,
+@@ -1955,9 +2007,10 @@ static void pair_device_complete(uint8_t status, uint16_t length,
+ 							HAL_BOND_STATE_NONE);
+ }
+ 
+-static bool create_bond(void *buf, uint16_t len)
++static void handle_create_bond_cmd(const void *buf, uint16_t len)
+ {
+-	struct hal_cmd_create_bond *cmd = buf;
++	const struct hal_cmd_create_bond *cmd = buf;
++	uint8_t status = HAL_STATUS_SUCCESS;
+ 	struct mgmt_cp_pair_device cp;
+ 
+ 	cp.io_cap = DEFAULT_IO_CAPABILITY;
+@@ -1965,25 +2018,36 @@ static bool create_bond(void *buf, uint16_t len)
+ 	android2bdaddr(cmd->bdaddr, &cp.addr.bdaddr);
+ 
+ 	if (mgmt_send(mgmt_if, MGMT_OP_PAIR_DEVICE, adapter.index, sizeof(cp),
+-				&cp, pair_device_complete, NULL, NULL) == 0)
+-		return false;
++				&cp, pair_device_complete, NULL, NULL) == 0) {
++		status = HAL_STATUS_FAILED;
++		goto fail;
++	}
+ 
+ 	set_device_bond_state(&cp.addr.bdaddr, HAL_STATUS_SUCCESS,
+ 						HAL_BOND_STATE_BONDING);
+ 
+-	return true;
++fail:
++	ipc_send_rsp(command_sk, HAL_SERVICE_ID_BLUETOOTH, HAL_OP_CREATE_BOND,
++								status);
+ }
+ 
+-static bool cancel_bond(void *buf, uint16_t len)
++static void handle_cancel_bond_cmd(const void *buf, uint16_t len)
+ {
+-	struct hal_cmd_cancel_bond *cmd = buf;
++	const struct hal_cmd_cancel_bond *cmd = buf;
+ 	struct mgmt_addr_info cp;
++	uint8_t status;
+ 
+ 	cp.type = BDADDR_BREDR;
+ 	android2bdaddr(cmd->bdaddr, &cp.bdaddr);
+ 
+-	return mgmt_reply(mgmt_if, MGMT_OP_CANCEL_PAIR_DEVICE, adapter.index,
+-					sizeof(cp), &cp, NULL, NULL, NULL) > 0;
++	if (mgmt_reply(mgmt_if, MGMT_OP_CANCEL_PAIR_DEVICE, adapter.index,
++					sizeof(cp), &cp, NULL, NULL, NULL) > 0)
++		status = HAL_STATUS_SUCCESS;
++	else
++		status = HAL_STATUS_FAILED;
++
++	ipc_send_rsp(command_sk, HAL_SERVICE_ID_BLUETOOTH, HAL_OP_CANCEL_BOND,
++								status);
+ }
+ 
+ static void unpair_device_complete(uint8_t status, uint16_t length,
+@@ -2000,23 +2064,31 @@ static void unpair_device_complete(uint8_t status, uint16_t length,
+ 							HAL_BOND_STATE_NONE);
+ }
+ 
+-static bool remove_bond(void *buf, uint16_t len)
++static void handle_remove_bond_cmd(const void *buf, uint16_t len)
+ {
+-	struct hal_cmd_remove_bond *cmd = buf;
++	const struct hal_cmd_remove_bond *cmd = buf;
+ 	struct mgmt_cp_unpair_device cp;
++	uint8_t status;
+ 
+ 	cp.disconnect = 1;
+ 	cp.addr.type = BDADDR_BREDR;
+ 	android2bdaddr(cmd->bdaddr, &cp.addr.bdaddr);
+ 
+-	return mgmt_send(mgmt_if, MGMT_OP_UNPAIR_DEVICE, adapter.index,
++	if (mgmt_send(mgmt_if, MGMT_OP_UNPAIR_DEVICE, adapter.index,
+ 				sizeof(cp), &cp, unpair_device_complete,
+-				NULL, NULL) > 0;
++				NULL, NULL) > 0)
++		status = HAL_STATUS_SUCCESS;
++	else
++		status = HAL_STATUS_FAILED;
++
++	ipc_send_rsp(command_sk, HAL_SERVICE_ID_BLUETOOTH, HAL_OP_REMOVE_BOND,
++								status);
+ }
+ 
+-static uint8_t pin_reply(void *buf, uint16_t len)
++static void handle_pin_reply_cmd(const void *buf, uint16_t len)
+ {
+-	struct hal_cmd_pin_reply *cmd = buf;
++	const struct hal_cmd_pin_reply *cmd = buf;
++	uint8_t status = HAL_STATUS_SUCCESS;
+ 	bdaddr_t bdaddr;
+ 	char addr[18];
+ 
+@@ -2025,8 +2097,10 @@ static uint8_t pin_reply(void *buf, uint16_t len)
+ 
+ 	DBG("%s accept %u pin_len %u", addr, cmd->accept, cmd->pin_len);
+ 
+-	if (!cmd->accept && cmd->pin_len)
+-		return HAL_STATUS_INVALID;
++	if (!cmd->accept && cmd->pin_len) {
++		status = HAL_STATUS_INVALID;
++		goto fail;
++	}
+ 
+ 	if (cmd->accept) {
+ 		struct mgmt_cp_pin_code_reply rp;
+@@ -2040,7 +2114,7 @@ static uint8_t pin_reply(void *buf, uint16_t len)
+ 
+ 		if (mgmt_reply(mgmt_if, MGMT_OP_PIN_CODE_REPLY, adapter.index,
+ 				sizeof(rp), &rp, NULL, NULL, NULL) == 0)
+-			return HAL_STATUS_FAILED;
++			status = HAL_STATUS_FAILED;
+ 	} else {
+ 		struct mgmt_cp_pin_code_neg_reply rp;
+ 
+@@ -2050,10 +2124,12 @@ static uint8_t pin_reply(void *buf, uint16_t len)
+ 		if (mgmt_reply(mgmt_if, MGMT_OP_PIN_CODE_NEG_REPLY,
+ 						adapter.index, sizeof(rp), &rp,
+ 						NULL, NULL, NULL) == 0)
+-			return HAL_STATUS_FAILED;
++			status = HAL_STATUS_FAILED;
+ 	}
+ 
+-	return HAL_STATUS_SUCCESS;
++fail:
++	ipc_send_rsp(command_sk, HAL_SERVICE_ID_BLUETOOTH, HAL_OP_PIN_REPLY,
++								status);
+ }
+ 
+ static uint8_t user_confirm_reply(const bdaddr_t *bdaddr, bool accept)
+@@ -2110,11 +2186,11 @@ static uint8_t user_passkey_reply(const bdaddr_t *bdaddr, bool accept,
+ 	return HAL_STATUS_SUCCESS;
+ }
+ 
+-static uint8_t ssp_reply(void *buf, uint16_t len)
++static void handle_ssp_reply_cmd(const void *buf, uint16_t len)
+ {
+-	struct hal_cmd_ssp_reply *cmd = buf;
+-	uint8_t status;
++	const struct hal_cmd_ssp_reply *cmd = buf;
+ 	bdaddr_t bdaddr;
++	uint8_t status;
+ 	char addr[18];
+ 
+ 	/* TODO should parameters sanity be verified here? */
+@@ -2141,138 +2217,250 @@ static uint8_t ssp_reply(void *buf, uint16_t len)
+ 		break;
+ 	}
+ 
+-	return status;
++	ipc_send_rsp(command_sk, HAL_SERVICE_ID_BLUETOOTH, HAL_OP_SSP_REPLY,
++								status);
+ }
+ 
+-static uint8_t get_remote_services(void *buf, uint16_t len)
++static void handle_get_remote_services_cmd(const void *buf, uint16_t len)
+ {
+-	struct hal_cmd_get_remote_services *cmd = buf;
++	const struct hal_cmd_get_remote_services *cmd = buf;
++	uint8_t status;
+ 	bdaddr_t addr;
+ 
+ 	android2bdaddr(&cmd->bdaddr, &addr);
+ 
+-	return browse_remote_sdp(&addr);
++	status = browse_remote_sdp(&addr);
++
++	ipc_send_rsp(command_sk, HAL_SERVICE_ID_BLUETOOTH,
++					HAL_OP_GET_REMOTE_SERVICES, status);
+ }
+ 
+-void bt_bluetooth_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
++static void handle_enable_cmd(const void *buf, uint16_t len)
+ {
+-	uint8_t status = HAL_STATUS_FAILED;
 -
- bool bt_hid_register(int cmd_sk, int notif_sk, const bdaddr_t *addr);
- void bt_hid_unregister(void);
+-	switch (opcode) {
+-	case HAL_OP_ENABLE:
+-		/* Framework expects all properties to be emitted while
+-		 * enabling adapter */
+-		get_properties();
+-
+-		if (adapter.current_settings & MGMT_SETTING_POWERED) {
+-			status = HAL_STATUS_DONE;
+-			goto error;
+-		}
++	uint8_t status = HAL_STATUS_SUCCESS;
+ 
+-		if (!set_mode(MGMT_OP_SET_POWERED, 0x01))
+-			goto error;
++	/* Framework expects all properties to be emitted while
++	 * enabling adapter */
++	get_properties();
+ 
+-		break;
+-	case HAL_OP_DISABLE:
+-		if (!(adapter.current_settings & MGMT_SETTING_POWERED)) {
+-			status = HAL_STATUS_DONE;
+-			goto error;
+-		}
++	if (adapter.current_settings & MGMT_SETTING_POWERED) {
++		status = HAL_STATUS_DONE;
++		goto done;
++	}
+ 
+-		if (!set_mode(MGMT_OP_SET_POWERED, 0x00))
+-			goto error;
++	if (!set_mode(MGMT_OP_SET_POWERED, 0x01))
++		status = HAL_STATUS_FAILED;
+ 
+-		break;
+-	case HAL_OP_GET_ADAPTER_PROPS:
+-		get_properties();
++done:
++	ipc_send_rsp(command_sk, HAL_SERVICE_ID_BLUETOOTH, HAL_OP_ENABLE,
++								status);
++}
+ 
+-		break;
+-	case HAL_OP_GET_ADAPTER_PROP:
+-		if (!get_property(buf, len))
+-			goto error;
++static void handle_disable_cmd(const void *buf, uint16_t len)
++{
++	uint8_t status = HAL_STATUS_SUCCESS;
+ 
+-		break;
+-	case HAL_OP_SET_ADAPTER_PROP:
+-		status = set_property(buf, len);
+-		if (status != HAL_STATUS_SUCCESS && status != HAL_STATUS_DONE)
+-			goto error;
++	if (!(adapter.current_settings & MGMT_SETTING_POWERED)) {
++		status = HAL_STATUS_DONE;
++		goto done;
++	}
+ 
+-		break;
+-	case HAL_OP_CREATE_BOND:
+-		if (!create_bond(buf, len))
+-			goto error;
++	if (!set_mode(MGMT_OP_SET_POWERED, 0x00))
++		status = HAL_STATUS_FAILED;
++done:
++	ipc_send_rsp(command_sk, HAL_SERVICE_ID_BLUETOOTH, HAL_OP_DISABLE,
++									status);
++}
+ 
+-		break;
+-	case HAL_OP_CANCEL_BOND:
+-		if (!cancel_bond(buf, len))
+-			goto error;
++static void handle_get_adapter_props_cmd(const void *buf, uint16_t len)
++{
++	get_properties();
+ 
+-		break;
+-	case HAL_OP_REMOVE_BOND:
+-		if (!remove_bond(buf, len))
+-			goto error;
++	ipc_send_rsp(command_sk, HAL_SERVICE_ID_BLUETOOTH,
++				HAL_OP_GET_ADAPTER_PROPS, HAL_STATUS_SUCCESS);
++}
+ 
+-		break;
+-	case HAL_OP_PIN_REPLY:
+-		status = pin_reply(buf, len);
+-		if (status != HAL_STATUS_SUCCESS)
+-			goto error;
++static void handle_get_remote_device_props_cmd(const void *buf, uint16_t len)
++{
++	/* TODO */
+ 
+-		break;
+-	case HAL_OP_SSP_REPLY:
+-		status = ssp_reply(buf, len);
+-		if (status != HAL_STATUS_SUCCESS)
+-			goto error;
+-		break;
+-	case HAL_OP_START_DISCOVERY:
+-		if (adapter.discovering) {
+-			status = HAL_STATUS_DONE;
+-			goto error;
+-		}
++	ipc_send_rsp(command_sk, HAL_SERVICE_ID_BLUETOOTH,
++			HAL_OP_GET_REMOTE_DEVICE_PROPS, HAL_STATUS_FAILED);
++}
+ 
+-		if (!(adapter.current_settings & MGMT_SETTING_POWERED)) {
+-			status = HAL_STATUS_NOT_READY;
+-			goto error;
+-		}
++static void handle_get_remote_device_prop_cmd(const void *buf, uint16_t len)
++{
++	/* TODO */
+ 
+-		if (!start_discovery())
+-			goto error;
++	ipc_send_rsp(command_sk, HAL_SERVICE_ID_BLUETOOTH,
++			HAL_OP_GET_REMOTE_DEVICE_PROP, HAL_STATUS_FAILED);
++}
+ 
+-		break;
+-	case HAL_OP_CANCEL_DISCOVERY:
+-		if (!adapter.discovering) {
+-			status = HAL_STATUS_DONE;
+-			goto error;
+-		}
++static void handle_set_remote_device_prop_cmd(const void *buf, uint16_t len)
++{
++	const struct hal_cmd_set_remote_device_prop *cmd = buf;
++	uint8_t status;
+ 
+-		if (!(adapter.current_settings & MGMT_SETTING_POWERED)) {
+-			status = HAL_STATUS_NOT_READY;
+-			goto error;
+-		}
++	if (len != sizeof(*cmd) + cmd->len ) {
++		error("Invalid set remote device prop cmd (0x%x), terminating",
++								cmd->type);
++		raise(SIGTERM);
++		return;
++	}
+ 
+-		if (!stop_discovery())
+-			goto error;
++	/* TODO */
+ 
+-		break;
+-	case HAL_OP_GET_REMOTE_SERVICES:
+-		status = get_remote_services(buf, len);
+-		if (status != HAL_STATUS_SUCCESS)
+-			goto error;
+-		break;
++	switch (cmd->type) {
+ 	default:
+-		DBG("Unhandled command, opcode 0x%x", opcode);
+-		goto error;
++		DBG("Unhandled property type 0x%x", cmd->type);
++		status = HAL_STATUS_FAILED;
++		break;
+ 	}
+ 
+-	ipc_send(sk, HAL_SERVICE_ID_BLUETOOTH, opcode, 0, NULL, -1);
+-	return;
++	ipc_send_rsp(command_sk, HAL_SERVICE_ID_BLUETOOTH,
++					HAL_OP_SET_REMOTE_DEVICE_PROP, status);
++}
+ 
+-error:
+-	error("Error handling command 0x%02x status %u", opcode, status);
++static void handle_get_remote_service_rec_cmd(const void *buf, uint16_t len)
++{
++	/* TODO */
+ 
+-	ipc_send_rsp(sk, HAL_SERVICE_ID_BLUETOOTH, opcode, status);
++	ipc_send_rsp(command_sk, HAL_SERVICE_ID_BLUETOOTH,
++			HAL_OP_GET_REMOTE_SERVICE_REC, HAL_STATUS_FAILED);
+ }
+ 
++static void handle_start_discovery_cmd(const void *buf, uint16_t len)
++{
++	uint8_t status = HAL_STATUS_SUCCESS;
++
++	if (adapter.discovering) {
++		status = HAL_STATUS_DONE;
++		goto fail;
++	}
++
++	if (!(adapter.current_settings & MGMT_SETTING_POWERED)) {
++		status = HAL_STATUS_NOT_READY;
++		goto fail;
++	}
++
++	if (!start_discovery())
++		status = HAL_STATUS_FAILED;
++
++fail:
++	ipc_send_rsp(command_sk, HAL_SERVICE_ID_BLUETOOTH,
++					HAL_OP_START_DISCOVERY, status);
++}
++
++static void handle_cancel_discovery_cmd(const void *buf, uint16_t len)
++{
++	uint8_t status = HAL_STATUS_SUCCESS;
++
++	if (!adapter.discovering) {
++		status = HAL_STATUS_DONE;
++		goto fail;
++	}
++
++	if (!(adapter.current_settings & MGMT_SETTING_POWERED)) {
++		status = HAL_STATUS_NOT_READY;
++		goto fail;
++	}
++
++	if (!stop_discovery())
++		status = HAL_STATUS_FAILED;
++
++fail:
++	ipc_send_rsp(command_sk, HAL_SERVICE_ID_BLUETOOTH,
++					HAL_OP_CANCEL_DISCOVERY, status);
++}
++
++static const struct ipc_handler cmd_handlers[] = {
++	{	/* HAL_OP_ENABLE */
++		.handler = handle_enable_cmd,
++		.var_len = false,
++		.data_len = 0
++	},
++	{	/* HAL_OP_DISABLE */
++		.handler = handle_disable_cmd,
++		.var_len = false,
++		.data_len = 0
++	},
++	{	/* HAL_OP_GET_ADAPTER_PROPS */
++		.handler = handle_get_adapter_props_cmd,
++		.var_len = false,
++		.data_len = 0
++	},
++	{	/* HAL_OP_GET_ADAPTER_PROP */
++		.handler = handle_get_adapter_prop_cmd,
++		.var_len = false,
++		.data_len = sizeof(struct hal_cmd_get_adapter_prop)
++	},
++	{	/* HAL_OP_SET_ADAPTER_PROP */
++		.handler = handle_set_adapter_prop_cmd,
++		.var_len = true,
++		.data_len = sizeof(struct hal_cmd_set_adapter_prop)
++	},
++	{	/* HAL_OP_GET_REMOTE_DEVICE_PROPS */
++		.handler = handle_get_remote_device_props_cmd,
++		.var_len = false,
++		.data_len = sizeof(struct hal_cmd_get_remote_device_props)
++	},
++	{	/* HAL_OP_GET_REMOTE_DEVICE_PROP */
++		.handler = handle_get_remote_device_prop_cmd,
++		.var_len = false,
++		.data_len = sizeof(struct hal_cmd_get_remote_device_prop)
++	},
++	{	/* HAL_OP_SET_REMOTE_DEVICE_PROP */
++		.handler = handle_set_remote_device_prop_cmd,
++		.var_len = true,
++		.data_len = sizeof(struct hal_cmd_set_remote_device_prop)
++	},
++	{	/* HAL_OP_GET_REMOTE_SERVICE_REC */
++		.handler = handle_get_remote_service_rec_cmd,
++		.var_len = false,
++		.data_len = sizeof(struct hal_cmd_get_remote_service_rec)
++	},
++	{	/* HAL_OP_GET_REMOTE_SERVICES */
++		.handler = handle_get_remote_services_cmd,
++		.var_len = false,
++		.data_len = sizeof(struct hal_cmd_get_remote_services)
++	},
++	{	/* HAL_OP_START_DISCOVERY */
++		.handler = handle_start_discovery_cmd,
++		.var_len = false,
++		.data_len = 0
++	},
++	{	/* HAL_OP_CANCEL_DISCOVERY */
++		.handler = handle_cancel_discovery_cmd,
++		.var_len = false,
++		.data_len = 0
++	},
++	{	/* HAL_OP_CREATE_BOND */
++		.handler = handle_create_bond_cmd,
++		.var_len = false,
++		.data_len = sizeof(struct hal_cmd_create_bond)
++	},
++	{	/* HAL_OP_REMOVE_BOND */
++		.handler = handle_remove_bond_cmd,
++		.var_len = false,
++		.data_len = sizeof(struct hal_cmd_remove_bond)
++	},
++	{	/* HAL_OP_CANCEL_BOND */
++		.handler = handle_cancel_bond_cmd,
++		.var_len = false,
++		.data_len = sizeof(struct hal_cmd_cancel_bond)
++	},
++	{	/* HAL_OP_PIN_REPLY */
++		.handler = handle_pin_reply_cmd,
++		.var_len = false,
++		.data_len = sizeof(struct hal_cmd_pin_reply)
++	},
++	{	/* HAL_OP_SSP_REPLY */
++		.handler = handle_ssp_reply_cmd,
++		.var_len = false,
++		.data_len = sizeof(struct hal_cmd_ssp_reply)
++	},
++};
++
+ bool bt_bluetooth_register(int cmd_sk, int notif_sk)
+ {
+ 	DBG("");
+@@ -2283,6 +2471,8 @@ bool bt_bluetooth_register(int cmd_sk, int notif_sk)
+ 	command_sk = cmd_sk;
+ 	notification_sk = notif_sk;
+ 
++	ipc_register(HAL_SERVICE_ID_BLUETOOTH, cmd_handlers,
++				sizeof(cmd_handlers)/sizeof(cmd_handlers[0]));
+ 
+ 	return true;
+ }
+@@ -2296,4 +2486,6 @@ void bt_bluetooth_unregister(void)
+ 
+ 	command_sk = -1;
+ 	notification_sk = -1;
++
++	ipc_unregister(HAL_SERVICE_ID_CORE);
+ }
 -- 
 1.8.3.2
 
