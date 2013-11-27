@@ -1,44 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/main: Remove timeout source on exit
-Date: Wed, 27 Nov 2013 16:51:01 +0200
-Message-Id: <1385563861-2136-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <1385560701.17991.4.camel@nuvo>
+Subject: Re: Crasher during remote initiated pairing
+From: Bastien Nocera <hadess@hadess.net>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Wed, 27 Nov 2013 14:58:21 +0100
+In-Reply-To: <20131127090605.GA28918@x220.p-661hnu-f1>
+References: <1385398409.3423.25.camel@nuvo>
+	 <20131127090605.GA28918@x220.p-661hnu-f1>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Wed, 2013-11-27 at 11:06 +0200, Johan Hedberg wrote:
+<snip>
+> The agent_auth_cb is actually not used for pairing but for
+> authorization, so whether it's RequestPinCode or RequestPasskey wont
+> matter for the above backtrace. Anyway, I was never able to reproduce
+> the exact same issue as you had, but I did find two places needing some
+> extra checks (one in adapter.c and another in agent.c). So it'd be good
+> if you could give the latest git a spin and see if you can still
+> reproduce the crash.
 
----
- android/main.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/android/main.c b/android/main.c
-index 9eaef7f..79e17fe 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -574,8 +574,10 @@ int main(int argc, char *argv[])
- 		return EXIT_FAILURE;
- 	}
- 
--	if (!bt_bluetooth_start(option_index, adapter_ready))
-+	if (!bt_bluetooth_start(option_index, adapter_ready)) {
-+		g_source_remove(bluetooth_start_timeout);
- 		return EXIT_FAILURE;
-+	}
- 
- 	/* Use params: mtu = 0, flags = 0 */
- 	start_sdp_server(0, 0);
-@@ -588,6 +590,9 @@ int main(int argc, char *argv[])
- 
- 	g_source_remove(signal);
- 
-+	if (bluetooth_start_timeout)
-+		g_source_remove(bluetooth_start_timeout);
-+
- 	cleanup_hal_connection();
- 	stop_sdp_server();
- 	bt_bluetooth_cleanup();
--- 
-1.8.3.2
+That seems to work fine, thanks.
 
