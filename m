@@ -1,50 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 27 Nov 2013 11:06:05 +0200
+Date: Wed, 27 Nov 2013 11:03:06 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Crasher during remote initiated pairing
-Message-ID: <20131127090605.GA28918@x220.p-661hnu-f1>
-References: <1385398409.3423.25.camel@nuvo>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/6] android/socket: Handle Android events for server
+ socket
+Message-ID: <20131127090306.GA28690@x220.p-661hnu-f1>
+References: <1385474750-18331-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1385474750-18331-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20131126154602.GB25005@x220.p-661hnu-f1>
+ <20131127080051.GC3149@aemeltch-MOBL1>
+ <20131127082128.GA23732@x220.p-661hnu-f1>
+ <20131127082942.GD3149@aemeltch-MOBL1>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1385398409.3423.25.camel@nuvo>
+In-Reply-To: <20131127082942.GD3149@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+Hi Andrei,
 
-On Mon, Nov 25, 2013, Bastien Nocera wrote:
-> I have a particularly stubborn device, the TomTom Go Remote that tries
-> to connect to my computer as soon as it's turned on, even when I've
-> removed the pairing on the computer side.
+On Wed, Nov 27, 2013, Andrei Emeltchenko wrote:
+> > > I assume this would be primary used to clean up socket structure if
+> > > Android decides to stop listen().
+> > 
+> > Which HAL method would "stop listen()" be done with? I don't see such a
+> > method in the HAL (please correct me if I'm wrong though). If there's no
+> > such method it's not possible to stop the listening socket, and hence
+> > you're just adding dead code here.
 > 
-> With GNOME's Bluetooth wizard open, I receive an out of the blue request
-> for pairing, I pass it the expected PIN code (0000), I then find that
-> the wizard doesn't work as I expected and turn it off. bluetoothd
-> promptly crashes:
-> 
-> Program received signal SIGSEGV, Segmentation fault.
-> 0x00007f0cf9ffde24 in agent_auth_cb (agent=<optimized out>, derr=0x7fffab655920, user_data=0x7f0cfb2e0020) at src/adapter.c:4370
-> 4370		struct service_auth *auth = adapter->auths->head->data;
-> (gdb) p adapter
-> $1 = (struct btd_adapter *) 0x7f0cfb2e0020
-> (gdb) p adapter->auths
-> $2 = (GQueue *) 0x7f0cfb2d1240
-> (gdb) p adapter->auths->head
-> $3 = 0x0
-> 
-> Some missing NULL checks?
-> 
-> I imagine that this should be reproduceable using simple-agent and
-> making it exit after replying to RequestPinCode.
+> This is listening on socketpair descriptor, the other end was sent to
+> Android framework. So we might get some signal or socket close.
 
-The agent_auth_cb is actually not used for pairing but for
-authorization, so whether it's RequestPinCode or RequestPasskey wont
-matter for the above backtrace. Anyway, I was never able to reproduce
-the exact same issue as you had, but I did find two places needing some
-extra checks (one in adapter.c and another in agent.c). So it'd be good
-if you could give the latest git a spin and see if you can still
-reproduce the crash.
+You'll need to explain in more detail how this could happen. We should
+already have other places looking for the HAL-side going a way (e.g. if
+it crashes) and then calling the necessary cleanup functions.
 
 Johan
