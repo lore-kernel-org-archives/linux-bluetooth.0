@@ -1,296 +1,226 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 5/6] android: Add basic test and handle mgmt notifications, hal cb
-Date: Thu, 28 Nov 2013 10:42:49 +0100
-Message-Id: <1385631770-3858-6-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Cc: Marcin Kraglak <marcin.kraglak@tieto.com>
+Subject: [PATCH v2 2/6] android: Add pre-setup and post-teardown routines
+Date: Thu, 28 Nov 2013 10:42:46 +0100
+Message-Id: <1385631770-3858-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1385631770-3858-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1385631770-3858-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds basic enable test case. Mgmt notifications and HAL callbacks
-are now handled.
----
- android/android-tester.c | 230 +++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 224 insertions(+), 6 deletions(-)
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 
+This will add hciemu initialization and cleanup. These functions
+will be called to create hci emulator and cleanup it.
+---
+ android/Makefile.am      |  10 ++-
+ android/android-tester.c | 171 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 179 insertions(+), 2 deletions(-)
+
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 9390422..905032d 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -84,7 +84,15 @@ android_haltest_LDFLAGS = -pthread
+ 
+ noinst_PROGRAMS += android/android-tester
+ 
+-android_android_tester_SOURCES = android/android-tester.c
++android_android_tester_SOURCES = emulator/btdev.h emulator/btdev.c \
++				emulator/bthost.h emulator/bthost.c \
++				src/shared/util.h src/shared/util.c \
++				src/shared/mgmt.h src/shared/mgmt.c \
++				src/shared/hciemu.h src/shared/hciemu.c \
++				src/shared/tester.h src/shared/tester.c \
++				android/android-tester.c
++
++android_android_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+ 
+ endif
+ 
 diff --git a/android/android-tester.c b/android/android-tester.c
-index 5e5afe0..5c24dc4 100644
+index f5c42b0..48e408d 100644
 --- a/android/android-tester.c
 +++ b/android/android-tester.c
-@@ -40,16 +40,126 @@
- static pthread_cond_t emulator_cond = PTHREAD_COND_INITIALIZER;
- static pthread_mutex_t emulator_mutex = PTHREAD_MUTEX_INITIALIZER;
+@@ -15,7 +15,176 @@
+  *
+  */
  
-+/*
-+ * those are assigned to HAL methods and callbacks, we use ID later
-+ * on mapped in switch-case due to different functions prototypes.
-+ */
++#include <unistd.h>
 +
-+enum hal_bluetooth_callbacks_id {
-+	adapter_test_end,
-+	adapter_state_changed_on,
-+	adapter_state_changed_off,
-+	adapter_prop_bdaddr,
-+	adapter_prop_bdname,
-+	adapter_prop_uuids,
-+	adapter_prop_cod,
-+	adapter_prop_scan_mode,
-+	adapter_prop_disc_timeout,
-+	adapter_prop_service_record,
-+	adapter_prop_bonded_devices
++#include <glib.h>
++
++#include "lib/bluetooth.h"
++#include "lib/mgmt.h"
++
++#include "src/shared/tester.h"
++#include "src/shared/mgmt.h"
++#include "src/shared/hciemu.h"
++
++struct test_data {
++	struct mgmt *mgmt;
++	uint16_t mgmt_index;
++	struct hciemu *hciemu;
++	enum hciemu_type hciemu_type;
++	void *test_data;
 +};
 +
-+struct generic_data {
-+	uint32_t expect_settings_set;
-+	uint8_t expected_hal_callbacks[];
-+};
-+
- struct test_data {
- 	struct mgmt *mgmt;
- 	uint16_t mgmt_index;
-+	unsigned int mgmt_settings_id;
- 	struct hciemu *hciemu;
- 	enum hciemu_type hciemu_type;
--	void *test_data;
-+	const struct generic_data *test_data;
- 	pthread_t emulator_thread;
- 	const bt_interface_t *if_bluetooth;
-+
-+	bool mgmt_settings_set;
-+	bool hal_cb_called;
-+
-+	GSList *expected_callbacks;
- };
- 
-+static void test_update_state(void)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	if (data->mgmt_settings_set && data->hal_cb_called)
-+		tester_test_passed();
-+}
-+
-+static void test_mgmt_settings_set(struct test_data *data)
-+{
-+	data->mgmt_settings_set = true;
-+
-+	test_update_state();
-+}
-+
-+static void command_generic_new_settings(uint16_t index, uint16_t length,
++static void read_info_callback(uint8_t status, uint16_t length,
 +					const void *param, void *user_data)
 +{
 +	struct test_data *data = tester_get_data();
-+	uint32_t settings;
++	const struct mgmt_rp_read_info *rp = param;
++	char addr[18];
++	uint16_t manufacturer;
++	uint32_t supported_settings, current_settings;
 +
-+	if (length != 4) {
-+		tester_warn("Invalid parameter size for new settings event");
-+		tester_test_failed();
++	tester_print("Read Info callback");
++	tester_print("  Status: 0x%02x", status);
++
++	if (status || !param) {
++		tester_pre_setup_failed();
 +		return;
 +	}
 +
-+	settings = bt_get_le32(param);
++	ba2str(&rp->bdaddr, addr);
++	manufacturer = btohs(rp->manufacturer);
++	supported_settings = btohl(rp->supported_settings);
++	current_settings = btohl(rp->current_settings);
 +
-+	if ((settings & data->test_data->expect_settings_set) !=
-+					data->test_data->expect_settings_set)
++	tester_print("  Address: %s", addr);
++	tester_print("  Version: 0x%02x", rp->version);
++	tester_print("  Manufacturer: 0x%04x", manufacturer);
++	tester_print("  Supported settings: 0x%08x", supported_settings);
++	tester_print("  Current settings: 0x%08x", current_settings);
++	tester_print("  Class: 0x%02x%02x%02x",
++			rp->dev_class[2], rp->dev_class[1], rp->dev_class[0]);
++	tester_print("  Name: %s", rp->name);
++	tester_print("  Short name: %s", rp->short_name);
++
++	if (strcmp(hciemu_get_address(data->hciemu), addr)) {
++		tester_pre_setup_failed();
++		return;
++	}
++
++	tester_pre_setup_complete();
++}
++
++static void index_added_callback(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
++{
++	struct test_data *data = tester_get_data();
++
++	tester_print("Index Added callback");
++	tester_print("  Index: 0x%04x", index);
++
++	data->mgmt_index = index;
++
++	mgmt_send(data->mgmt, MGMT_OP_READ_INFO, data->mgmt_index, 0, NULL,
++					read_info_callback, NULL, NULL);
++}
++
++static void index_removed_callback(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
++{
++	struct test_data *data = tester_get_data();
++
++	tester_print("Index Removed callback");
++	tester_print("  Index: 0x%04x", index);
++
++	if (index != data->mgmt_index)
 +		return;
 +
-+	test_mgmt_settings_set(data);
-+	mgmt_unregister(data->mgmt, data->mgmt_settings_id);
++	mgmt_unregister_index(data->mgmt, data->mgmt_index);
++
++	mgmt_unref(data->mgmt);
++	data->mgmt = NULL;
++
++	tester_post_teardown_complete();
 +}
 +
-+static void hal_cb_init(void)
++static void read_index_list_callback(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
 +{
 +	struct test_data *data = tester_get_data();
-+	unsigned int i = 0;
 +
-+	while (data->test_data->expected_hal_callbacks[i]) {
-+						data->expected_callbacks =
-+				g_slist_append(data->expected_callbacks,
-+		GINT_TO_POINTER(data->test_data->expected_hal_callbacks[i]));
-+		i++;
++	tester_print("Read Index List callback");
++	tester_print("  Status: 0x%02x", status);
++
++	if (status || !param) {
++		tester_pre_setup_failed();
++		return;
 +	}
-+}
 +
-+static void mgmt_cb_init(struct test_data *data)
-+{
-+	if (!data->test_data->expect_settings_set)
-+		test_mgmt_settings_set(data);
-+	else
-+		data->mgmt_settings_id = mgmt_register(data->mgmt,
-+					MGMT_EV_NEW_SETTINGS, data->mgmt_index,
-+				command_generic_new_settings, NULL, NULL);
-+}
++	mgmt_register(data->mgmt, MGMT_EV_INDEX_ADDED, MGMT_INDEX_NONE,
++					index_added_callback, NULL, NULL);
 +
-+static int get_expected_hal_cb(void)
-+{
-+	struct test_data *data = tester_get_data();
++	mgmt_register(data->mgmt, MGMT_EV_INDEX_REMOVED, MGMT_INDEX_NONE,
++					index_removed_callback, NULL, NULL);
 +
-+	return GPOINTER_TO_INT(data->expected_callbacks->data);
-+}
-+
-+static void remove_expected_hal_cb(void)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	data->expected_callbacks = g_slist_remove(data->expected_callbacks,
-+						data->expected_callbacks->data);
-+
-+	if (!data->expected_callbacks)
-+		data->hal_cb_called = true;
-+
-+	test_update_state();
-+}
-+
- static void read_info_callback(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
-@@ -257,10 +367,109 @@ static void *emulator(void *user_data)
- 	return NULL;
- }
- 
-+static void adapter_state_changed_cb(bt_state_t state)
-+{
-+	switch (get_expected_hal_cb()) {
-+	case adapter_state_changed_on:
-+		if (state == BT_STATE_ON)
-+			remove_expected_hal_cb();
-+		else
-+			tester_test_failed();
-+		break;
-+	default:
-+		break;
++	data->hciemu = hciemu_new(data->hciemu_type);
++	if (!data->hciemu) {
++		tester_warn("Failed to setup HCI emulation");
++		tester_pre_setup_failed();
++		return;
 +	}
++
++	tester_print("New hciemu instance created");
 +}
 +
-+static void adapter_properties_cb(bt_status_t status, int num_properties,
-+						bt_property_t *properties)
++static void test_pre_setup(const void *test_data)
 +{
-+	enum hal_bluetooth_callbacks_id hal_cb;
-+	int i;
-+
-+	for (i = 0; i < num_properties; i++) {
-+		hal_cb = get_expected_hal_cb();
-+		switch (properties[i].type) {
-+		case BT_PROPERTY_BDADDR:
-+			if (hal_cb != adapter_prop_bdaddr) {
-+				tester_test_failed();
-+				return;
-+			}
-+			remove_expected_hal_cb();
-+			break;
-+		case BT_PROPERTY_BDNAME:
-+			if (hal_cb != adapter_prop_bdname) {
-+				tester_test_failed();
-+				return;
-+			}
-+			remove_expected_hal_cb();
-+			break;
-+		case BT_PROPERTY_UUIDS:
-+			if (hal_cb != adapter_prop_uuids) {
-+				tester_test_failed();
-+				return;
-+			}
-+			remove_expected_hal_cb();
-+			break;
-+		case BT_PROPERTY_CLASS_OF_DEVICE:
-+			if (hal_cb != adapter_prop_cod) {
-+				tester_test_failed();
-+				return;
-+			}
-+			remove_expected_hal_cb();
-+			break;
-+		case BT_PROPERTY_TYPE_OF_DEVICE:
-+			if (hal_cb != adapter_prop_bdaddr) {
-+				tester_test_failed();
-+				return;
-+			}
-+			remove_expected_hal_cb();
-+			break;
-+		case BT_PROPERTY_SERVICE_RECORD:
-+			if (hal_cb != adapter_prop_service_record) {
-+				tester_test_failed();
-+				return;
-+			}
-+			remove_expected_hal_cb();
-+			break;
-+		case BT_PROPERTY_ADAPTER_SCAN_MODE:
-+			if (hal_cb != adapter_prop_scan_mode) {
-+				tester_test_failed();
-+				return;
-+			}
-+			remove_expected_hal_cb();
-+			break;
-+		case BT_PROPERTY_ADAPTER_BONDED_DEVICES:
-+			if (hal_cb != adapter_prop_bonded_devices) {
-+				tester_test_failed();
-+				return;
-+			}
-+			remove_expected_hal_cb();
-+			break;
-+		case BT_PROPERTY_ADAPTER_DISCOVERY_TIMEOUT:
-+			if (hal_cb != adapter_prop_disc_timeout) {
-+				tester_test_failed();
-+				return;
-+			}
-+			remove_expected_hal_cb();
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+}
-+
-+static const struct generic_data bluetooth_enable_success_test = {
-+	.expected_hal_callbacks = {adapter_prop_bdaddr, adapter_prop_bdname,
-+			adapter_prop_uuids, adapter_prop_cod,
-+			adapter_prop_scan_mode, adapter_prop_disc_timeout,
-+			adapter_state_changed_on, adapter_test_end}
-+};
-+
- static bt_callbacks_t bt_callbacks = {
- 	.size = sizeof(bt_callbacks),
--	.adapter_state_changed_cb = NULL,
--	.adapter_properties_cb = NULL,
-+	.adapter_state_changed_cb = adapter_state_changed_cb,
-+	.adapter_properties_cb = adapter_properties_cb,
- 	.remote_device_properties_cb = NULL,
- 	.device_found_cb = NULL,
- 	.discovery_state_changed_cb = NULL,
-@@ -343,12 +552,20 @@ static void teardown(const void *test_data)
- 		data->emulator_thread = 0;
- 	}
- 
-+	if (data->expected_callbacks)
-+		g_slist_free(data->expected_callbacks);
-+
- 	tester_teardown_complete();
- }
- 
--static void pass_test(const void *test_data)
-+static void test_enable(const void *test_data)
- {
--	tester_test_passed();
 +	struct test_data *data = tester_get_data();
 +
-+	hal_cb_init();
-+	mgmt_cb_init(data);
++	if (!tester_use_debug())
++		fclose(stderr);
 +
-+	data->if_bluetooth->enable();
- }
- 
- #define test_bredrle(name, data, test_setup, test, test_teardown) \
-@@ -368,7 +585,8 @@ int main(int argc, char *argv[])
++	data->mgmt = mgmt_new_default();
++	if (!data->mgmt) {
++		tester_warn("Failed to setup management interface");
++		tester_pre_setup_failed();
++		return;
++	}
++
++	mgmt_send(data->mgmt, MGMT_OP_READ_INDEX_LIST, MGMT_INDEX_NONE, 0,
++				NULL, read_index_list_callback, NULL, NULL);
++}
++
++static void test_post_teardown(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++
++	hciemu_unref(data->hciemu);
++	data->hciemu = NULL;
++}
++
++static void pass_test(const void *test_data)
++{
++	tester_test_passed();
++}
++
++#define test_bredrle(name, data, test_setup, test, test_teardown) \
++	do { \
++		struct test_data *user; \
++		user = g_malloc0(sizeof(struct test_data)); \
++		if (!user) \
++			break; \
++		user->hciemu_type = HCIEMU_TYPE_BREDRLE; \
++		user->test_data = data; \
++		tester_add_full(name, data, test_pre_setup, test_setup, \
++				test, test_teardown, test_post_teardown, \
++							3, user, g_free); \
++	} while (0)
++
+ int main(int argc, char *argv[])
  {
- 	tester_init(&argc, &argv);
- 
--	test_bredrle("test", NULL, setup, pass_test, teardown);
-+	test_bredrle("Test Enable - Success", &bluetooth_enable_success_test,
-+						setup, test_enable, teardown);
- 
- 	return tester_run();
+-	return 0;
++	tester_init(&argc, &argv);
++
++	test_bredrle("test", NULL, NULL, pass_test, NULL);
++
++	return tester_run();
  }
 -- 
 1.8.4.2
