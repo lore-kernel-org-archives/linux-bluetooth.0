@@ -1,77 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52979FB5.6060401@linux.intel.com>
-Date: Thu, 28 Nov 2013 21:55:33 +0200
+Message-ID: <52979F05.3040803@linux.intel.com>
+Date: Thu, 28 Nov 2013 21:52:37 +0200
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH_v2 1/7] profiles/network: Remove redundant code for bnep
- interface name
-References: <1385649955-29276-1-git-send-email-ravikumar.veeramally@linux.intel.com>	<1385649955-29276-2-git-send-email-ravikumar.veeramally@linux.intel.com> <CAJdJm_Marb2+Q4e=zLeHq9Qf4a=o4z3-Q55mpL0bDWq3h1-s_Q@mail.gmail.com>
-In-Reply-To: <CAJdJm_Marb2+Q4e=zLeHq9Qf4a=o4z3-Q55mpL0bDWq3h1-s_Q@mail.gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH_v2 3/7] profiles/network: Rename common.c|h to bnep.c|h
+References: <1385649955-29276-1-git-send-email-ravikumar.veeramally@linux.intel.com>	<1385649955-29276-4-git-send-email-ravikumar.veeramally@linux.intel.com> <CABBYNZJVZUjsTpgbAWx7J+gg4OYd4SkzvH+2nLAqaMnH-rm49Q@mail.gmail.com>
+In-Reply-To: <CABBYNZJVZUjsTpgbAWx7J+gg4OYd4SkzvH+2nLAqaMnH-rm49Q@mail.gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-On 28.11.2013 17:52, Anderson Lizardo wrote:
+On 28.11.2013 18:19, Luiz Augusto von Dentz wrote:
 > Hi Ravi,
 >
-> On Thu, Nov 28, 2013 at 10:45 AM, Ravi kumar Veeramally
+> On Thu, Nov 28, 2013 at 4:45 PM, Ravi kumar Veeramally
 > <ravikumar.veeramally@linux.intel.com> wrote:
->> Remove redundant code for copying bnepX interface name from connection
->> and server files. It is better to place on actual function call.
+>> Files common.c|h contains only bnep related code, it makes
+>> more sence with bnep.c|h.
 >> ---
->>   profiles/network/common.c     | 3 +--
->>   profiles/network/connection.c | 2 --
->>   profiles/network/server.c     | 3 ---
->>   3 files changed, 1 insertion(+), 7 deletions(-)
->>
->> diff --git a/profiles/network/common.c b/profiles/network/common.c
->> index 0b291bd..b94b3a5 100644
->> --- a/profiles/network/common.c
->> +++ b/profiles/network/common.c
->> @@ -150,8 +150,7 @@ int bnep_connadd(int sk, uint16_t role, char *dev)
->>          struct bnep_connadd_req req;
->>
->>          memset(&req, 0, sizeof(req));
->> -       strncpy(req.device, dev, 16);
->> -       req.device[15] = '\0';
->> +       strcpy(req.device, "bnep%d");
->>          req.sock = sk;
->>          req.role = role;
->>          if (ioctl(ctl, BNEPCONNADD, &req) < 0) {
->> diff --git a/profiles/network/connection.c b/profiles/network/connection.c
->> index 5966268..301f66d 100644
->> --- a/profiles/network/connection.c
->> +++ b/profiles/network/connection.c
->> @@ -692,8 +692,6 @@ int connection_register(struct btd_service *service)
->>
->>          nc = g_new0(struct network_conn, 1);
->>          nc->id = id;
->> -       memset(nc->dev, 0, sizeof(nc->dev));
->> -       strcpy(nc->dev, "bnep%d");
->>          nc->service = btd_service_ref(service);
->>          nc->state = DISCONNECTED;
->>          nc->peer = peer;
->> diff --git a/profiles/network/server.c b/profiles/network/server.c
->> index 0050b30..3a7e52a 100644
->> --- a/profiles/network/server.c
->> +++ b/profiles/network/server.c
->> @@ -269,9 +269,6 @@ static int server_connadd(struct network_server *ns,
->>          char devname[16];
->>          int err, nsk;
->>
->> -       memset(devname, 0, sizeof(devname));
->> -       strcpy(devname, "bnep%d");
->> -
->>          nsk = g_io_channel_unix_get_fd(session->io);
->>          err = bnep_connadd(nsk, dst_role, devname);
-> You are still passing a (now uninitialized) devname pointer to
-> bnep_connadd(). Is this still necessary?
-  You are right, it is missing in server.c but in connection.c struct is
-created with g_new0.
+>>   Makefile.plugins              |   2 +-
+>>   profiles/network/bnep.c       | 453 ++++++++++++++++++++++++++++++++++++++++++
+>>   profiles/network/bnep.h       |  42 ++++
+>>   profiles/network/common.c     | 453 ------------------------------------------
+>>   profiles/network/common.h     |  42 ----
+>>   profiles/network/connection.c |   2 +-
+>>   profiles/network/manager.c    |   2 +-
+>>   profiles/network/server.c     |   2 +-
+>>   8 files changed, 499 insertions(+), 499 deletions(-)
+>>   create mode 100644 profiles/network/bnep.c
+>>   create mode 100644 profiles/network/bnep.h
+>>   delete mode 100644 profiles/network/common.c
+>>   delete mode 100644 profiles/network/common.h
+> Did you use git mv? I would expect something like the following if did:
+  Yes, I did git mv.
+   reason might be bnep.c has it's own include file bnep.h.
+   So bnpe.c is 99% bnep.h 100%.
+
+> ---
+>   profiles/network/{common.c => bnep.c} | 0
+>   profiles/network/{common.h => bnep.h} | 0
+>   2 files changed, 0 insertions(+), 0 deletions(-)
+>   rename profiles/network/{common.c => bnep.c} (100%)
+>   rename profiles/network/{common.h => bnep.h} (100%)
+>
+> diff --git a/profiles/network/common.c b/profiles/network/bnep.c
+> similarity index 100%
+> rename from profiles/network/common.c
+> rename to profiles/network/bnep.c
+> diff --git a/profiles/network/common.h b/profiles/network/bnep.h
+> similarity index 100%
+> rename from profiles/network/common.h
+> rename to profiles/network/bnep.h
+> --
+  Have you tried to compile after it?
 
 Thanks,
 Ravi.
