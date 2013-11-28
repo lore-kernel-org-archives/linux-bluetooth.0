@@ -2,273 +2,174 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 05/10] android: Use ipc_send_notif for sending notifications
-Date: Thu, 28 Nov 2013 15:15:25 +0100
-Message-Id: <1385648130-12808-5-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 02/10] android: Remove socket parameter from ipc_send_rsp
+Date: Thu, 28 Nov 2013 15:15:22 +0100
+Message-Id: <1385648130-12808-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1385648130-12808-1-git-send-email-szymon.janc@tieto.com>
 References: <1385648130-12808-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Use command socket provided to IPC on init.
 ---
- android/a2dp.c      |  4 ++--
- android/bluetooth.c | 63 ++++++++++++++++++++++++++---------------------------
- android/hidhost.c   | 20 ++++++++---------
- 3 files changed, 43 insertions(+), 44 deletions(-)
+ android/a2dp.c      |  2 +-
+ android/bluetooth.c |  2 +-
+ android/hidhost.c   |  2 +-
+ android/ipc.c       |  6 +++---
+ android/ipc.h       |  2 +-
+ android/main.c      | 17 ++++++-----------
+ android/pan.c       |  2 +-
+ android/socket.c    |  2 +-
+ 8 files changed, 15 insertions(+), 20 deletions(-)
 
 diff --git a/android/a2dp.c b/android/a2dp.c
-index 14f34ad..92c359e 100644
+index 2251001..14f34ad 100644
 --- a/android/a2dp.c
 +++ b/android/a2dp.c
-@@ -112,8 +112,8 @@ static void bt_a2dp_notify_state(struct a2dp_device *dev, uint8_t state)
- 	bdaddr2android(&dev->dst, ev.bdaddr);
- 	ev.state = state;
+@@ -251,7 +251,7 @@ void bt_a2dp_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+ 		break;
+ 	}
  
--	ipc_send(notification_sk, HAL_SERVICE_ID_A2DP,
--			HAL_EV_A2DP_CONN_STATE, sizeof(ev), &ev, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_A2DP, HAL_EV_A2DP_CONN_STATE, sizeof(ev),
-+									&ev);
+-	ipc_send_rsp(sk, HAL_SERVICE_ID_A2DP, opcode, status);
++	ipc_send_rsp(HAL_SERVICE_ID_A2DP, opcode, status);
+ }
  
- 	if (state != HAL_A2DP_STATE_DISCONNECTED)
- 		return;
+ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index b5fd644..68e26fa 100644
+index 0e45131..716c0eb 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -132,8 +132,8 @@ static void adapter_name_changed(const uint8_t *name)
- 	ev->props[0].len = len;
- 	memcpy(ev->props->val, name, len);
+@@ -2269,7 +2269,7 @@ void bt_bluetooth_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+ error:
+ 	error("Error handling command 0x%02x status %u", opcode, status);
  
--	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
--			HAL_EV_ADAPTER_PROPS_CHANGED, sizeof(buf), ev, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_ADAPTER_PROPS_CHANGED,
-+							sizeof(buf), ev);
+-	ipc_send_rsp(sk, HAL_SERVICE_ID_BLUETOOTH, opcode, status);
++	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, opcode, status);
  }
  
- static void adapter_set_name(const uint8_t *name)
-@@ -173,8 +173,8 @@ static void powered_changed(void)
- 
- 	DBG("%u", ev.state);
- 
--	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
--			HAL_EV_ADAPTER_STATE_CHANGED, sizeof(ev), &ev, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_ADAPTER_STATE_CHANGED,
-+							sizeof(ev), &ev);
- }
- 
- static uint8_t settings2scan_mode(void)
-@@ -210,8 +210,8 @@ static void scan_mode_changed(void)
- 
- 	DBG("mode %u", *mode);
- 
--	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
--			HAL_EV_ADAPTER_PROPS_CHANGED, sizeof(buf), buf, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_ADAPTER_PROPS_CHANGED,
-+							sizeof(buf), buf);
- }
- 
- static void adapter_class_changed(void)
-@@ -226,8 +226,8 @@ static void adapter_class_changed(void)
- 	ev->props[0].len = sizeof(uint32_t);
- 	memcpy(ev->props->val, &adapter.dev_class, sizeof(uint32_t));
- 
--	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
--			HAL_EV_ADAPTER_PROPS_CHANGED, sizeof(buf), buf, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_ADAPTER_PROPS_CHANGED,
-+							sizeof(buf), buf);
- }
- 
- static void settings_changed(uint32_t settings)
-@@ -327,8 +327,8 @@ static void send_bond_state_change(const bdaddr_t *addr, uint8_t status,
- 	ev.state = state;
- 	bdaddr2android(addr, ev.bdaddr);
- 
--	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
--			HAL_EV_BOND_STATE_CHANGED, sizeof(ev), &ev, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_BOND_STATE_CHANGED,
-+							sizeof(ev), &ev);
- }
- 
- static void cache_device_name(const bdaddr_t *addr, const char *name)
-@@ -408,8 +408,8 @@ static void remote_uuids_callback(struct browse_req *req)
- 	ev->props[0].len = sizeof(uint128_t) * g_slist_length(req->uuids);
- 	fill_uuids(req->uuids, ev->props[0].val);
- 
--	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
--				HAL_EV_REMOTE_DEVICE_PROPS, len, ev, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_REMOTE_DEVICE_PROPS,
-+								len, ev);
- 
- 	g_free(ev);
- }
-@@ -605,8 +605,8 @@ static void send_remote_device_name_prop(const bdaddr_t *bdaddr)
- 	ev->props[0].len = strlen(name);
- 	memcpy(&ev->props[0].val, name, strlen(name));
- 
--	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
--			HAL_EV_REMOTE_DEVICE_PROPS, ev_len, ev, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_REMOTE_DEVICE_PROPS,
-+								ev_len, ev);
- 
- 	g_free(ev);
- }
-@@ -639,8 +639,8 @@ static void pin_code_request_callback(uint16_t index, uint16_t length,
- 	memset(&hal_ev, 0, sizeof(hal_ev));
- 	bdaddr2android(&ev->addr.bdaddr, hal_ev.bdaddr);
- 
--	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH, HAL_EV_PIN_REQUEST,
--						sizeof(hal_ev), &hal_ev, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_PIN_REQUEST,
-+						sizeof(hal_ev), &hal_ev);
- }
- 
- static void send_ssp_request(const bdaddr_t *addr, uint8_t variant,
-@@ -657,8 +657,8 @@ static void send_ssp_request(const bdaddr_t *addr, uint8_t variant,
- 	ev.pairing_variant = variant;
- 	ev.passkey = passkey;
- 
--	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH, HAL_EV_SSP_REQUEST,
--							sizeof(ev), &ev, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_SSP_REQUEST,
-+							sizeof(ev), &ev);
- }
- 
- static void user_confirm_request_callback(uint16_t index, uint16_t length,
-@@ -760,8 +760,8 @@ static void mgmt_discovering_event(uint16_t index, uint16_t length,
- 		cp.state = HAL_DISCOVERY_STATE_STOPPED;
- 	}
- 
--	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
--			HAL_EV_DISCOVERY_STATE_CHANGED, sizeof(cp), &cp, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH,
-+			HAL_EV_DISCOVERY_STATE_CHANGED, sizeof(cp), &cp);
- }
- 
- static void confirm_device_name(const bdaddr_t *addr, uint8_t addr_type)
-@@ -872,8 +872,7 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 		(*num_prop)++;
- 	}
- 
--	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH, opcode, size, buf,
--									-1);
-+	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, opcode, size, buf);
- 
- 	if (confirm) {
- 		char addr[18];
-@@ -943,8 +942,8 @@ static void mgmt_device_connected_event(uint16_t index, uint16_t length,
- 	hal_ev.state = HAL_ACL_STATE_CONNECTED;
- 	bdaddr2android(&ev->addr.bdaddr, hal_ev.bdaddr);
- 
--	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
--			HAL_EV_ACL_STATE_CHANGED, sizeof(hal_ev), &hal_ev, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_ACL_STATE_CHANGED,
-+						sizeof(hal_ev), &hal_ev);
- }
- 
- static void mgmt_device_disconnected_event(uint16_t index, uint16_t length,
-@@ -962,8 +961,8 @@ static void mgmt_device_disconnected_event(uint16_t index, uint16_t length,
- 	hal_ev.state = HAL_ACL_STATE_DISCONNECTED;
- 	bdaddr2android(&ev->addr.bdaddr, hal_ev.bdaddr);
- 
--	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
--			HAL_EV_ACL_STATE_CHANGED, sizeof(hal_ev), &hal_ev, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_ACL_STATE_CHANGED,
-+						sizeof(hal_ev), &hal_ev);
- }
- 
- static uint8_t status_mgmt2hal(uint8_t mgmt)
-@@ -1169,8 +1168,8 @@ static bool get_uuids(void)
- 		p += sizeof(uint128_t);
- 	}
- 
--	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
--			HAL_EV_ADAPTER_PROPS_CHANGED, sizeof(buf), ev, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_ADAPTER_PROPS_CHANGED,
-+							sizeof(buf), ev);
- 
- 	return true;
- }
-@@ -1701,8 +1700,8 @@ static void get_address(void)
- 	ev->props[0].len = sizeof(bdaddr_t);
- 	bdaddr2android(&adapter.bdaddr, ev->props[0].val);
- 
--	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
--			HAL_EV_ADAPTER_PROPS_CHANGED, sizeof(buf), buf, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_ADAPTER_PROPS_CHANGED,
-+							sizeof(buf), buf);
- }
- 
- static bool get_name(void)
-@@ -1777,8 +1776,8 @@ static bool get_discoverable_timeout(void)
- 	memcpy(&ev->props[0].val, &adapter.discoverable_timeout,
- 							sizeof(uint32_t));
- 
--	ipc_send(notification_sk, HAL_SERVICE_ID_BLUETOOTH,
--			HAL_EV_ADAPTER_PROPS_CHANGED, sizeof(buf), ev, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_ADAPTER_PROPS_CHANGED,
-+							sizeof(buf), ev);
- 
- 	return true;
- }
+ bool bt_bluetooth_register(int sk)
 diff --git a/android/hidhost.c b/android/hidhost.c
-index 80957e8..09c71f4 100644
+index d50c5b8..80957e8 100644
 --- a/android/hidhost.c
 +++ b/android/hidhost.c
-@@ -297,8 +297,8 @@ static void bt_hid_notify_state(struct hid_device *dev, uint8_t state)
- 	bdaddr2android(&dev->dst, ev.bdaddr);
- 	ev.state = state;
- 
--	ipc_send(notification_sk, HAL_SERVICE_ID_HIDHOST,
--			HAL_EV_HIDHOST_CONN_STATE, sizeof(ev), &ev, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_HIDHOST, HAL_EV_HIDHOST_CONN_STATE,
-+							sizeof(ev), &ev);
- }
- 
- static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond,
-@@ -356,8 +356,8 @@ static void bt_hid_notify_proto_mode(struct hid_device *dev, uint8_t *buf,
- 		ev.mode = HAL_HIDHOST_UNSUPPORTED_PROTOCOL;
+@@ -1115,7 +1115,7 @@ void bt_hid_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+ 		break;
  	}
  
--	ipc_send(notification_sk, HAL_SERVICE_ID_HIDHOST,
--			HAL_EV_HIDHOST_PROTO_MODE, sizeof(ev), &ev, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_HIDHOST, HAL_EV_HIDHOST_PROTO_MODE,
-+							sizeof(ev), &ev);
+-	ipc_send_rsp(sk, HAL_SERVICE_ID_HIDHOST, opcode, status);
++	ipc_send_rsp(HAL_SERVICE_ID_HIDHOST, opcode, status);
  }
  
- static void bt_hid_notify_get_report(struct hid_device *dev, uint8_t *buf,
-@@ -399,8 +399,8 @@ static void bt_hid_notify_get_report(struct hid_device *dev, uint8_t *buf,
+ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+diff --git a/android/ipc.c b/android/ipc.c
+index 028d4ad..51734e3 100644
+--- a/android/ipc.c
++++ b/android/ipc.c
+@@ -96,16 +96,16 @@ void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
+ 	}
+ }
+ 
+-void ipc_send_rsp(int sk, uint8_t service_id, uint8_t opcode, uint8_t status)
++void ipc_send_rsp(uint8_t service_id, uint8_t opcode, uint8_t status)
+ {
+ 	struct hal_status s;
+ 
+ 	if (status == HAL_STATUS_SUCCESS) {
+-		ipc_send(sk, service_id, opcode, 0, NULL, -1);
++		ipc_send(cmd_sk, service_id, opcode, 0, NULL, -1);
+ 		return;
  	}
  
- send:
--	ipc_send(notification_sk, HAL_SERVICE_ID_HIDHOST,
--				HAL_EV_HIDHOST_GET_REPORT, ev_len, ev, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_HIDHOST, HAL_EV_HIDHOST_GET_REPORT,
-+								ev_len, ev);
- 	g_free(ev);
+ 	s.code = status;
+ 
+-	ipc_send(sk, service_id, HAL_OP_STATUS, sizeof(s), &s, -1);
++	ipc_send(cmd_sk, service_id, HAL_OP_STATUS, sizeof(s), &s, -1);
+ }
+diff --git a/android/ipc.h b/android/ipc.h
+index 5786d2d..873f715 100644
+--- a/android/ipc.h
++++ b/android/ipc.h
+@@ -26,4 +26,4 @@ void ipc_cleanup(void);
+ 
+ void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
+ 							void *param, int fd);
+-void ipc_send_rsp(int sk, uint8_t service_id, uint8_t opcode, uint8_t status);
++void ipc_send_rsp(uint8_t service_id, uint8_t opcode, uint8_t status);
+diff --git a/android/main.c b/android/main.c
+index 4e6ad38..6fe0d1c 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -121,9 +121,8 @@ static void service_register(void *buf, uint16_t len)
+ 	info("Service ID=%u registered", m->service_id);
+ 	return;
+ failed:
+-	ipc_send_rsp(g_io_channel_unix_get_fd(hal_cmd_io),
+-				HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
+-				HAL_STATUS_FAILED);
++	ipc_send_rsp(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
++							HAL_STATUS_FAILED);
  }
  
-@@ -424,8 +424,8 @@ static void bt_hid_notify_virtual_unplug(struct hid_device *dev,
- 		ev.status = HAL_HIDHOST_STATUS_OK;
+ static void service_unregister(void *buf, uint16_t len)
+@@ -164,9 +163,8 @@ static void service_unregister(void *buf, uint16_t len)
+ 	info("Service ID=%u unregistered", m->service_id);
+ 	return;
+ failed:
+-	ipc_send_rsp(g_io_channel_unix_get_fd(hal_cmd_io),
+-				HAL_SERVICE_ID_CORE, HAL_OP_UNREGISTER_MODULE,
+-				HAL_STATUS_FAILED);
++	ipc_send_rsp(HAL_SERVICE_ID_CORE, HAL_OP_UNREGISTER_MODULE,
++							HAL_STATUS_FAILED);
+ }
+ 
+ static void handle_service_core(uint8_t opcode, void *buf, uint16_t len)
+@@ -179,9 +177,7 @@ static void handle_service_core(uint8_t opcode, void *buf, uint16_t len)
+ 		service_unregister(buf, len);
+ 		break;
+ 	default:
+-		ipc_send_rsp(g_io_channel_unix_get_fd(hal_cmd_io),
+-						HAL_SERVICE_ID_CORE, opcode,
+-						HAL_STATUS_FAILED);
++		ipc_send_rsp(HAL_SERVICE_ID_CORE, opcode, HAL_STATUS_FAILED);
+ 		break;
+ 	}
+ }
+@@ -277,8 +273,7 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
+ 		bt_pan_handle_cmd(fd, msg->opcode, msg->payload, msg->len);
+ 		break;
+ 	default:
+-		ipc_send_rsp(fd, msg->service_id, msg->opcode,
+-							HAL_STATUS_FAILED);
++		ipc_send_rsp(msg->service_id, msg->opcode, HAL_STATUS_FAILED);
+ 		break;
  	}
  
--	ipc_send(notification_sk, HAL_SERVICE_ID_HIDHOST,
--			HAL_EV_HIDHOST_VIRTUAL_UNPLUG, sizeof(ev), &ev, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_HIDHOST, HAL_EV_HIDHOST_VIRTUAL_UNPLUG,
-+							sizeof(ev), &ev);
+diff --git a/android/pan.c b/android/pan.c
+index ada458a..29f1007 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -88,7 +88,7 @@ void bt_pan_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+ 		break;
+ 	}
  
+-	ipc_send_rsp(sk, HAL_SERVICE_ID_PAN, opcode, status);
++	ipc_send_rsp(HAL_SERVICE_ID_PAN, opcode, status);
  }
  
-@@ -509,8 +509,8 @@ static void bt_hid_set_info(struct hid_device *dev)
- 	memset(ev.descr, 0, sizeof(ev.descr));
- 	memcpy(ev.descr, dev->rd_data, ev.descr_len);
+ bool bt_pan_register(int sk, const bdaddr_t *addr)
+diff --git a/android/socket.c b/android/socket.c
+index 1fb154d..c2212d9 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -931,7 +931,7 @@ void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+ 		break;
+ 	}
  
--	ipc_send(notification_sk, HAL_SERVICE_ID_HIDHOST, HAL_EV_HIDHOST_INFO,
--							sizeof(ev), &ev, -1);
-+	ipc_send_notif(HAL_SERVICE_ID_HIDHOST, HAL_EV_HIDHOST_INFO, sizeof(ev),
-+									&ev);
+-	ipc_send_rsp(sk, HAL_SERVICE_ID_SOCK, opcode, HAL_STATUS_FAILED);
++	ipc_send_rsp(HAL_SERVICE_ID_SOCK, opcode, HAL_STATUS_FAILED);
  }
  
- static int uhid_create(struct hid_device *dev)
+ bool bt_socket_register(int sk, const bdaddr_t *addr)
 -- 
 1.8.3.2
 
