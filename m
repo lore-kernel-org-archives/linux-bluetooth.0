@@ -2,49 +2,59 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 06/10] android: Add ipc_send_rsp_full IPC helper
-Date: Thu, 28 Nov 2013 15:15:26 +0100
-Message-Id: <1385648130-12808-6-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 03/10] android: Use ipc_send_rsp helper for replying success
+Date: Thu, 28 Nov 2013 15:15:23 +0100
+Message-Id: <1385648130-12808-3-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1385648130-12808-1-git-send-email-szymon.janc@tieto.com>
 References: <1385648130-12808-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will be used to send non-empty reply using command socket.
+Where applicable use helper as this make code easier to understand.
 ---
- android/ipc.c | 6 ++++++
- android/ipc.h | 2 ++
- 2 files changed, 8 insertions(+)
+ android/bluetooth.c | 2 +-
+ android/main.c      | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/android/ipc.c b/android/ipc.c
-index d1a59d7..83c2221 100644
---- a/android/ipc.c
-+++ b/android/ipc.c
-@@ -110,6 +110,12 @@ void ipc_send_rsp(uint8_t service_id, uint8_t opcode, uint8_t status)
- 	ipc_send(cmd_sk, service_id, HAL_OP_STATUS, sizeof(s), &s, -1);
- }
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 716c0eb..b5fd644 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -2263,7 +2263,7 @@ void bt_bluetooth_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+ 		goto error;
+ 	}
  
-+void ipc_send_rsp_full(uint8_t service_id, uint8_t opcode, uint16_t len,
-+							void *param, int fd)
-+{
-+	ipc_send(cmd_sk, service_id, opcode, len, param, fd);
-+}
-+
- void ipc_send_notif(uint8_t service_id, uint8_t opcode,  uint16_t len,
- 								void *param)
- {
-diff --git a/android/ipc.h b/android/ipc.h
-index 1233bec..ce0e0b1 100644
---- a/android/ipc.h
-+++ b/android/ipc.h
-@@ -27,5 +27,7 @@ void ipc_cleanup(void);
- void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
- 							void *param, int fd);
- void ipc_send_rsp(uint8_t service_id, uint8_t opcode, uint8_t status);
-+void ipc_send_rsp_full(uint8_t service_id, uint8_t opcode, uint16_t len,
-+							void *param, int fd);
- void ipc_send_notif(uint8_t service_id, uint8_t opcode,  uint16_t len,
- 								void *param);
+-	ipc_send(sk, HAL_SERVICE_ID_BLUETOOTH, opcode, 0, NULL, -1);
++	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, opcode, HAL_STATUS_SUCCESS);
+ 	return;
+ 
+ error:
+diff --git a/android/main.c b/android/main.c
+index 6fe0d1c..211503b 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -115,8 +115,8 @@ static void service_register(void *buf, uint16_t len)
+ 
+ 	services[m->service_id] = true;
+ 
+-	ipc_send(g_io_channel_unix_get_fd(hal_cmd_io), HAL_SERVICE_ID_CORE,
+-					HAL_OP_REGISTER_MODULE, 0, NULL, -1);
++	ipc_send_rsp(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
++							HAL_STATUS_SUCCESS);
+ 
+ 	info("Service ID=%u registered", m->service_id);
+ 	return;
+@@ -157,8 +157,8 @@ static void service_unregister(void *buf, uint16_t len)
+ 
+ 	services[m->service_id] = false;
+ 
+-	ipc_send(g_io_channel_unix_get_fd(hal_cmd_io), HAL_SERVICE_ID_CORE,
+-					HAL_OP_UNREGISTER_MODULE, 0, NULL, -1);
++	ipc_send_rsp(HAL_SERVICE_ID_CORE, HAL_OP_UNREGISTER_MODULE,
++							HAL_STATUS_SUCCESS);
+ 
+ 	info("Service ID=%u unregistered", m->service_id);
+ 	return;
 -- 
 1.8.3.2
 
