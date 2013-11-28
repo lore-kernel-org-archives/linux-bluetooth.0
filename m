@@ -1,36 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Fix eir parsing function.
-Date: Fri, 29 Nov 2013 10:00:49 +0200
-Message-Id: <1385712049-24635-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <52979FB5.6060401@linux.intel.com>
+Date: Thu, 28 Nov 2013 21:55:33 +0200
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+CC: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH_v2 1/7] profiles/network: Remove redundant code for bnep
+ interface name
+References: <1385649955-29276-1-git-send-email-ravikumar.veeramally@linux.intel.com>	<1385649955-29276-2-git-send-email-ravikumar.veeramally@linux.intel.com> <CAJdJm_Marb2+Q4e=zLeHq9Qf4a=o4z3-Q55mpL0bDWq3h1-s_Q@mail.gmail.com>
+In-Reply-To: <CAJdJm_Marb2+Q4e=zLeHq9Qf4a=o4z3-Q55mpL0bDWq3h1-s_Q@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi,
 
-Currently eir_parse always return 0 but it is checked throughout the
-code (in android/bluetooth code as well in src/adapteri, etc) for
-return value (err < 0) which never happens. Return -1 if there is
-nothing to parse. Send as RFC as I do not know how current code supposed
-to be working.
----
- src/eir.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 28.11.2013 17:52, Anderson Lizardo wrote:
+> Hi Ravi,
+>
+> On Thu, Nov 28, 2013 at 10:45 AM, Ravi kumar Veeramally
+> <ravikumar.veeramally@linux.intel.com> wrote:
+>> Remove redundant code for copying bnepX interface name from connection
+>> and server files. It is better to place on actual function call.
+>> ---
+>>   profiles/network/common.c     | 3 +--
+>>   profiles/network/connection.c | 2 --
+>>   profiles/network/server.c     | 3 ---
+>>   3 files changed, 1 insertion(+), 7 deletions(-)
+>>
+>> diff --git a/profiles/network/common.c b/profiles/network/common.c
+>> index 0b291bd..b94b3a5 100644
+>> --- a/profiles/network/common.c
+>> +++ b/profiles/network/common.c
+>> @@ -150,8 +150,7 @@ int bnep_connadd(int sk, uint16_t role, char *dev)
+>>          struct bnep_connadd_req req;
+>>
+>>          memset(&req, 0, sizeof(req));
+>> -       strncpy(req.device, dev, 16);
+>> -       req.device[15] = '\0';
+>> +       strcpy(req.device, "bnep%d");
+>>          req.sock = sk;
+>>          req.role = role;
+>>          if (ioctl(ctl, BNEPCONNADD, &req) < 0) {
+>> diff --git a/profiles/network/connection.c b/profiles/network/connection.c
+>> index 5966268..301f66d 100644
+>> --- a/profiles/network/connection.c
+>> +++ b/profiles/network/connection.c
+>> @@ -692,8 +692,6 @@ int connection_register(struct btd_service *service)
+>>
+>>          nc = g_new0(struct network_conn, 1);
+>>          nc->id = id;
+>> -       memset(nc->dev, 0, sizeof(nc->dev));
+>> -       strcpy(nc->dev, "bnep%d");
+>>          nc->service = btd_service_ref(service);
+>>          nc->state = DISCONNECTED;
+>>          nc->peer = peer;
+>> diff --git a/profiles/network/server.c b/profiles/network/server.c
+>> index 0050b30..3a7e52a 100644
+>> --- a/profiles/network/server.c
+>> +++ b/profiles/network/server.c
+>> @@ -269,9 +269,6 @@ static int server_connadd(struct network_server *ns,
+>>          char devname[16];
+>>          int err, nsk;
+>>
+>> -       memset(devname, 0, sizeof(devname));
+>> -       strcpy(devname, "bnep%d");
+>> -
+>>          nsk = g_io_channel_unix_get_fd(session->io);
+>>          err = bnep_connadd(nsk, dst_role, devname);
+> You are still passing a (now uninitialized) devname pointer to
+> bnep_connadd(). Is this still necessary?
+  You are right, it is missing in server.c but in connection.c struct is
+created with g_new0.
 
-diff --git a/src/eir.c b/src/eir.c
-index 084884e..f7450c9 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -138,7 +138,7 @@ int eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
- 
- 	/* No EIR data to parse */
- 	if (eir_data == NULL)
--		return 0;
-+		return -1;
- 
- 	while (len < eir_len - 1) {
- 		uint8_t field_len = eir_data[0];
--- 
-1.8.3.2
-
+Thanks,
+Ravi.
