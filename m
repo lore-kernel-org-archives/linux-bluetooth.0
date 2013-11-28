@@ -1,67 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: [PATCH v2 1/6] android: Add android-tester
-Date: Thu, 28 Nov 2013 10:42:45 +0100
-Message-Id: <1385631770-3858-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1385631770-3858-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1385631770-3858-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v2 0/6] android: initial code for automated tests
+Date: Thu, 28 Nov 2013 10:42:44 +0100
+Message-Id: <1385631770-3858-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+V2:
+ - change-id removed
+ - bogus patch removed from serie
 
-This commit add android-tester.c to tree and Makefile.am.
-This will contain set of unit tests for testing android daemon.
----
- android/Makefile.am      |  4 ++++
- android/android-tester.c | 21 +++++++++++++++++++++
- 2 files changed, 25 insertions(+)
+from V1:
+
+This serie adds initial code for automated android deamon and HAL library
+tests. Skeleton and one initial test case is added.
+
+-- 
+Best regards,
+Grzegorz
+
+Grzegorz Kolodziejczyk (1):
+  android: Add basic test and handle mgmt notifications, hal cb
+
+Marcin Kraglak (4):
+  android: Add android-tester
+  android: Add pre-setup and post-teardown routines
+  android: Start emulator in separate thread
+  android: Add stack initialization of stack in setup
+
+Szymon Janc (1):
+  android: Make HAL logging wrapper print to stderr instead of stdout
+
+ android/Makefile.am      |  18 ++
+ android/android-tester.c | 592 +++++++++++++++++++++++++++++++++++++++++++++++
+ android/hal-log.h        |   2 +-
+ 3 files changed, 611 insertions(+), 1 deletion(-)
  create mode 100644 android/android-tester.c
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 94d231f..9390422 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -82,6 +82,10 @@ android_haltest_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android \
- 
- android_haltest_LDFLAGS = -pthread
- 
-+noinst_PROGRAMS += android/android-tester
-+
-+android_android_tester_SOURCES = android/android-tester.c
-+
- endif
- 
- EXTRA_DIST += android/Android.mk android/hal-ipc-api.txt android/README \
-diff --git a/android/android-tester.c b/android/android-tester.c
-new file mode 100644
-index 0000000..f5c42b0
---- /dev/null
-+++ b/android/android-tester.c
-@@ -0,0 +1,21 @@
-+/*
-+ * Copyright (C) 2013 Intel Corporation
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ *
-+ */
-+
-+int main(int argc, char *argv[])
-+{
-+	return 0;
-+}
 -- 
 1.8.4.2
 
