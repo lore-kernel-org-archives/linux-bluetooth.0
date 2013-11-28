@@ -1,79 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 28 Nov 2013 14:59:16 -0200
-From: Vinicius Costa Gomes <vcgomes@gmail.com>
-To: Scott James Remnant <keybuk@google.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Holtmann, Marcel" <marcel.holtmann@intel.com>,
-	Johan Hedberg <johan.hedberg@intel.com>,
-	Brian Gix <bgix@codeaurora.org>
-Subject: Re: SM: is BlueZ the Master/Initiator or Slave/Responder?
-Message-ID: <20131128165916.GA21429@molly.amr.corp.intel.com>
-References: <CAHZ1yC=Tx=4zRL_rV0-b-sqhQCO=AmXzCy93Q5jnb2=z2Kr6KQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAHZ1yC=Tx=4zRL_rV0-b-sqhQCO=AmXzCy93Q5jnb2=z2Kr6KQ@mail.gmail.com>
+In-Reply-To: <1385649955-29276-4-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1385649955-29276-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+	<1385649955-29276-4-git-send-email-ravikumar.veeramally@linux.intel.com>
+Date: Thu, 28 Nov 2013 18:19:20 +0200
+Message-ID: <CABBYNZJVZUjsTpgbAWx7J+gg4OYd4SkzvH+2nLAqaMnH-rm49Q@mail.gmail.com>
+Subject: Re: [PATCH_v2 3/7] profiles/network: Rename common.c|h to bnep.c|h
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Scott,
+Hi Ravi,
 
-On 13:17 Mon 25 Nov, Scott James Remnant wrote:
-> We are able to pass all qualification tests with BlueZ as the Master except one:
-> 
->   TP/KDU/BV-06-C - Master Key Distribution - Encryption Key bit
-> 
-> This test requires that BlueZ initiates pairing with the
-> SMP_DIST_ENC_KEY bit set in the init_key_dist member of struct
-> smp_cmd_pairing - however this member is always initialized to zero
-> and never changed.
+On Thu, Nov 28, 2013 at 4:45 PM, Ravi kumar Veeramally
+<ravikumar.veeramally@linux.intel.com> wrote:
+> Files common.c|h contains only bnep related code, it makes
+> more sence with bnep.c|h.
+> ---
+>  Makefile.plugins              |   2 +-
+>  profiles/network/bnep.c       | 453 ++++++++++++++++++++++++++++++++++++++++++
+>  profiles/network/bnep.h       |  42 ++++
+>  profiles/network/common.c     | 453 ------------------------------------------
+>  profiles/network/common.h     |  42 ----
+>  profiles/network/connection.c |   2 +-
+>  profiles/network/manager.c    |   2 +-
+>  profiles/network/server.c     |   2 +-
+>  8 files changed, 499 insertions(+), 499 deletions(-)
+>  create mode 100644 profiles/network/bnep.c
+>  create mode 100644 profiles/network/bnep.h
+>  delete mode 100644 profiles/network/common.c
+>  delete mode 100644 profiles/network/common.h
 
-This test is in theory correct, but it doesn't test anything that does make
-sense at this point. Let me try to explain, setting the Encryption Key bit in
-the initiator key distribution field in the Pairing Request means that the
-Initiator wants to send its Encryption Key to the Responder.
+Did you use git mv? I would expect something like the following if did:
 
-This is only useful in cases that both devices expect the roles to be reversed
-in future connections (The Master of this connection would become the Slave in
-future connections). And IIRC we weren't able to test this role reversal and
-it even offends the current GAP spec for Dual mode devices.
+---
+ profiles/network/{common.c => bnep.c} | 0
+ profiles/network/{common.h => bnep.h} | 0
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+ rename profiles/network/{common.c => bnep.c} (100%)
+ rename profiles/network/{common.h => bnep.h} (100%)
 
-> 
-> This seems to have changed at some point in the past, 2b64d153 added
-> MITM mechanism and changed the init_key_dist member initialization
-> from dist_keys to 0
-> 
-> 
-> So two questions:
-> 
->  1) should BlueZ be able to behave as Master? It passes the majority
-> of the tests except this one.
-
-BlueZ should be able to bahave as Master, if not, it is a bug.
-
-> 
->  2) given the above, is this a bug that init_key_dist is 0 or is it a
-> test plan error that it requires this?
-
-I think it is a bit of both, for the current situation the Master distributing
-its keys doesn't make much sense and we should be able to change this value to
-be able to test the key distribution parts.
-
-What I suggest is adding a debugfs entry to change the value of init_key_dist
-for Pairing Requests, and keep the default being 0.
-
-(disclaimer: I am follwing development from the sidelines for some time, so
-feel free to correct me.)
-
-> 
-> Scott
-> -- 
-> Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Cheers,
--- 
-Vinicius
+diff --git a/profiles/network/common.c b/profiles/network/bnep.c
+similarity index 100%
+rename from profiles/network/common.c
+rename to profiles/network/bnep.c
+diff --git a/profiles/network/common.h b/profiles/network/bnep.h
+similarity index 100%
+rename from profiles/network/common.h
+rename to profiles/network/bnep.h
