@@ -1,77 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Whitespace characters
-Date: Thu, 28 Nov 2013 10:34:51 +0100
-Message-Id: <1385631296-2856-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Cc: Marcin Kraglak <marcin.kraglak@tieto.com>
+Subject: [PATCH 1/6] android: Add android-tester
+Date: Thu, 28 Nov 2013 10:34:50 +0100
+Message-Id: <1385631296-2856-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1385631296-2856-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1385631296-2856-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/bt-hal-tester.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 
-diff --git a/android/bt-hal-tester.c b/android/bt-hal-tester.c
-index 8bcb901..fab987b 100644
---- a/android/bt-hal-tester.c
-+++ b/android/bt-hal-tester.c
-@@ -86,7 +86,7 @@ static void read_info_callback(uint8_t status, uint16_t length,
- 		tester_pre_setup_failed();
- 		return;
- 	}
--	
-+
- 	tester_pre_setup_complete();
- }
+This commit add android-tester.c to tree and Makefile.am.
+This will contain set of unit tests for testing android daemon.
+
+Change-Id: I0acf021aa33a0d7531f1e9faae8cd0b68d6b0438
+---
+ android/Makefile.am      |  4 ++++
+ android/android-tester.c | 21 +++++++++++++++++++++
+ 2 files changed, 25 insertions(+)
+ create mode 100644 android/android-tester.c
+
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 94d231f..9390422 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -82,6 +82,10 @@ android_haltest_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android \
  
-@@ -275,24 +275,24 @@ static void setup(const void *test_data)
- 	bt_status_t status;
- 	const hw_module_t *module;
- 	hw_device_t *device;
--	
-+
- 	clock_gettime(CLOCK_REALTIME, &ts);
- 	ts.tv_sec += WAIT_FOR_CONDITION_TIME;
+ android_haltest_LDFLAGS = -pthread
  
- 	pthread_mutex_lock(&emulator_mutex);
--	
++noinst_PROGRAMS += android/android-tester
 +
- 	if (pthread_create(&data->emulator_thread, NULL, emulator, NULL)) {
- 		tester_setup_failed();
- 		return;
- 	}
- 	if (pthread_cond_timedwait(&emulator_started_cond, &emulator_mutex, &ts)
--																	< 0) {
-+									< 0) {
- 		tester_setup_failed();
- 		return;
- 	} else {
- 		data->emulator_started = true;
- 	}
--	
++android_android_tester_SOURCES = android/android-tester.c
 +
- 	pthread_mutex_unlock(&emulator_mutex);
+ endif
  
- 	err = hw_get_module(BT_HARDWARE_MODULE_ID, &module);
-@@ -320,14 +320,14 @@ static void setup(const void *test_data)
- 		data->if_bluetooth = NULL;
- 		tester_setup_failed();
- 	}
--	
+ EXTRA_DIST += android/Android.mk android/hal-ipc-api.txt android/README \
+diff --git a/android/android-tester.c b/android/android-tester.c
+new file mode 100644
+index 0000000..f5c42b0
+--- /dev/null
++++ b/android/android-tester.c
+@@ -0,0 +1,21 @@
++/*
++ * Copyright (C) 2013 Intel Corporation
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ *
++ */
 +
- 	tester_setup_complete();
- }
- 
- static void teardown(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
--	
-+
- 	if (data->if_bluetooth)
- 		data->if_bluetooth->cleanup();
- 
++int main(int argc, char *argv[])
++{
++	return 0;
++}
 -- 
 1.8.4.2
 
