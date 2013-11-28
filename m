@@ -1,84 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAJdJm_Marb2+Q4e=zLeHq9Qf4a=o4z3-Q55mpL0bDWq3h1-s_Q@mail.gmail.com>
-References: <1385649955-29276-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-	<1385649955-29276-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-	<CAJdJm_Marb2+Q4e=zLeHq9Qf4a=o4z3-Q55mpL0bDWq3h1-s_Q@mail.gmail.com>
-Date: Thu, 28 Nov 2013 18:12:19 +0200
-Message-ID: <CABBYNZLVS6FCHScxPMSTN2v2YP6bo-jy1HZ1wqbotJHR0SjQgQ@mail.gmail.com>
-Subject: Re: [PATCH_v2 1/7] profiles/network: Remove redundant code for bnep
- interface name
+In-Reply-To: <1385648130-12808-1-git-send-email-szymon.janc@tieto.com>
+References: <1385648130-12808-1-git-send-email-szymon.janc@tieto.com>
+Date: Thu, 28 Nov 2013 18:06:49 +0200
+Message-ID: <CABBYNZLcyiRG5mSDrL5wOJxc4dLBjZ4zAR13DyJ2SWAQTRXsig@mail.gmail.com>
+Subject: Re: [PATCH 01/10] android: Initialize IPC with command and
+ notification sockets
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Szymon,
 
-On Thu, Nov 28, 2013 at 5:52 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Ravi,
+On Thu, Nov 28, 2013 at 4:15 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> Pass sockets after succesfully connected to HAL. This will allow
+> to improve IPC helpers API.
+> ---
+>  android/ipc.c  | 15 +++++++++++++++
+>  android/ipc.h  |  3 +++
+>  android/main.c |  5 +++++
+>  3 files changed, 23 insertions(+)
 >
-> On Thu, Nov 28, 2013 at 10:45 AM, Ravi kumar Veeramally
-> <ravikumar.veeramally@linux.intel.com> wrote:
->> Remove redundant code for copying bnepX interface name from connection
->> and server files. It is better to place on actual function call.
->> ---
->>  profiles/network/common.c     | 3 +--
->>  profiles/network/connection.c | 2 --
->>  profiles/network/server.c     | 3 ---
->>  3 files changed, 1 insertion(+), 7 deletions(-)
->>
->> diff --git a/profiles/network/common.c b/profiles/network/common.c
->> index 0b291bd..b94b3a5 100644
->> --- a/profiles/network/common.c
->> +++ b/profiles/network/common.c
->> @@ -150,8 +150,7 @@ int bnep_connadd(int sk, uint16_t role, char *dev)
->>         struct bnep_connadd_req req;
->>
->>         memset(&req, 0, sizeof(req));
->> -       strncpy(req.device, dev, 16);
->> -       req.device[15] = '\0';
->> +       strcpy(req.device, "bnep%d");
->>         req.sock = sk;
->>         req.role = role;
->>         if (ioctl(ctl, BNEPCONNADD, &req) < 0) {
->> diff --git a/profiles/network/connection.c b/profiles/network/connection.c
->> index 5966268..301f66d 100644
->> --- a/profiles/network/connection.c
->> +++ b/profiles/network/connection.c
->> @@ -692,8 +692,6 @@ int connection_register(struct btd_service *service)
->>
->>         nc = g_new0(struct network_conn, 1);
->>         nc->id = id;
->> -       memset(nc->dev, 0, sizeof(nc->dev));
->> -       strcpy(nc->dev, "bnep%d");
->>         nc->service = btd_service_ref(service);
->>         nc->state = DISCONNECTED;
->>         nc->peer = peer;
->> diff --git a/profiles/network/server.c b/profiles/network/server.c
->> index 0050b30..3a7e52a 100644
->> --- a/profiles/network/server.c
->> +++ b/profiles/network/server.c
->> @@ -269,9 +269,6 @@ static int server_connadd(struct network_server *ns,
->>         char devname[16];
->>         int err, nsk;
->>
->> -       memset(devname, 0, sizeof(devname));
->> -       strcpy(devname, "bnep%d");
->> -
->>         nsk = g_io_channel_unix_get_fd(session->io);
->>         err = bnep_connadd(nsk, dst_role, devname);
+> diff --git a/android/ipc.c b/android/ipc.c
+> index 25c36fd..028d4ad 100644
+> --- a/android/ipc.c
+> +++ b/android/ipc.c
+> @@ -36,6 +36,21 @@
+>  #include "ipc.h"
+>  #include "log.h"
 >
-> You are still passing a (now uninitialized) devname pointer to
-> bnep_connadd(). Is this still necessary?
+> +static int cmd_sk = -1;
+> +static int notif_sk = -1;
+> +
+> +void ipc_init(int command_sk, int notification_sk)
+> +{
+> +       cmd_sk = command_sk;
+> +       notif_sk = notification_sk;
+> +}
+> +
+> +void ipc_cleanup(void)
+> +{
+> +       cmd_sk = -1;
+> +       notif_sk = -1;
+> +}
+> +
+>  void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
+>                                                         void *param, int fd)
+>  {
+> diff --git a/android/ipc.h b/android/ipc.h
+> index ad4a2d2..5786d2d 100644
+> --- a/android/ipc.h
+> +++ b/android/ipc.h
+> @@ -21,6 +21,9 @@
+>   *
+>   */
+>
+> +void ipc_init(int command_sk, int notification_sk);
+> +void ipc_cleanup(void);
+> +
+>  void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
+>                                                         void *param, int fd);
+>  void ipc_send_rsp(int sk, uint8_t service_id, uint8_t opcode, uint8_t status);
+> diff --git a/android/main.c b/android/main.c
+> index bfd2a87..4e6ad38 100644
+> --- a/android/main.c
+> +++ b/android/main.c
+> @@ -354,6 +354,9 @@ static gboolean notif_connect_cb(GIOChannel *io, GIOCondition cond,
+>
+>         g_io_add_watch(hal_cmd_io, cond, cmd_watch_cb, NULL);
+>
+> +       ipc_init(g_io_channel_unix_get_fd(hal_cmd_io),
+> +                               g_io_channel_unix_get_fd(hal_notif_io));
+> +
+>         info("Successfully connected to HAL");
+>
+>         return FALSE;
+> @@ -494,6 +497,8 @@ static void cleanup_hal_connection(void)
+>                 g_io_channel_unref(hal_notif_io);
+>                 hal_notif_io = NULL;
+>         }
+> +
+> +       ipc_cleanup();
+>  }
+>
+>  static bool set_capabilities(void)
+> --
+> 1.8.3.2
 
-Well either bnep_connadd has to return the interface name or we should
-pass as reference so it get initialized inside bnep_connadd in case of
-success.
+Applied, thanks.
 
 
 -- 
