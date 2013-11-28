@@ -1,31 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/2] gitignore: Add tools/avdtp-tester
-Date: Thu, 28 Nov 2013 12:10:56 +0100
-Message-Id: <1385637056-561-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1385637056-561-1-git-send-email-szymon.janc@tieto.com>
-References: <1385637056-561-1-git-send-email-szymon.janc@tieto.com>
+Date: Thu, 28 Nov 2013 11:45:43 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pics: Add PTS PICS for OPP
+Message-ID: <20131128094543.GA10040@x220.p-661hnu-f1>
+References: <1385625873-8603-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1385625873-8603-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- .gitignore | 1 +
- 1 file changed, 1 insertion(+)
+Hi Jakub,
 
-diff --git a/.gitignore b/.gitignore
-index d567d26..2d3435a 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -100,6 +100,7 @@ unit/test-gobex-apparam
- unit/test-gobex-header
- unit/test-gobex-packet
- unit/test-gobex-transfer
-+unit/test-avdtp
- unit/test-*.log
- unit/test-*.trs
- 
--- 
-1.8.3.2
+On Thu, Nov 28, 2013, Jakub Tyszkowski wrote:
+> PTS PICS for OPP, targeting Android 4.4.
+> 
+> ---
+>  android/Makefile.am  |   3 +-
+>  android/pics-opp.txt | 184 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 186 insertions(+), 1 deletion(-)
+>  create mode 100644 android/pics-opp.txt
 
+Applied. Thanks.
+
+Johan
