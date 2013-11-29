@@ -2,175 +2,217 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 8/9] android/a2dp: Use generic IPC message handling for commands
-Date: Fri, 29 Nov 2013 12:08:50 +0100
-Message-Id: <1385723331-15603-9-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2 5/9] android/bluetooth: Make property handling function return HAL status
+Date: Fri, 29 Nov 2013 12:08:47 +0100
+Message-Id: <1385723331-15603-6-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1385723331-15603-1-git-send-email-szymon.janc@tieto.com>
 References: <1385723331-15603-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Handlers are registered on service register and unregistered on
-unregister.
+This makes funtions follow have similar style and makes properties
+dispatch function much simpler.
 ---
- android/a2dp.c | 69 +++++++++++++++++++++++++++++-----------------------------
- android/a2dp.h |  2 --
- 2 files changed, 35 insertions(+), 36 deletions(-)
+ android/bluetooth.c | 85 +++++++++++++++++++----------------------------------
+ 1 file changed, 30 insertions(+), 55 deletions(-)
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index 99aa14d..98c138e 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -164,9 +164,11 @@ static void signaling_connect_cb(GIOChannel *chan, GError *err,
- 	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_CONNECTED);
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index eb8dbc5..a39e7bf 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1133,7 +1133,7 @@ static void uuid16_to_uint128(uint16_t uuid, uint128_t *u128)
+ 	ntoh128(&uuid128.value.uuid128, u128);
  }
  
--static uint8_t bt_a2dp_connect(struct hal_cmd_a2dp_connect *cmd, uint16_t len)
-+static void bt_a2dp_connect(const void *buf, uint16_t len)
+-static bool get_uuids(void)
++static uint8_t get_uuids(void)
  {
-+	const struct hal_cmd_a2dp_connect *cmd = buf;
- 	struct a2dp_device *dev;
-+	uint8_t status;
- 	char addr[18];
- 	bdaddr_t dst;
- 	GSList *l;
-@@ -174,14 +176,13 @@ static uint8_t bt_a2dp_connect(struct hal_cmd_a2dp_connect *cmd, uint16_t len)
+ 	struct hal_ev_adapter_props_changed *ev;
+ 	GSList *list = adapter.uuids;
+@@ -1169,7 +1169,7 @@ static bool get_uuids(void)
+ 	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_ADAPTER_PROPS_CHANGED,
+ 							sizeof(buf), ev);
  
+-	return true;
++	return HAL_STATUS_SUCCESS;
+ }
+ 
+ static void remove_uuid_complete(uint8_t status, uint16_t length,
+@@ -1691,7 +1691,7 @@ static bool set_discoverable(uint8_t mode, uint16_t timeout)
+ 	return false;
+ }
+ 
+-static void get_address(void)
++static uint8_t get_address(void)
+ {
+ 	uint8_t buf[BASELEN_PROP_CHANGED + sizeof(bdaddr_t)];
+ 	struct hal_ev_adapter_props_changed *ev = (void *) buf;
+@@ -1705,65 +1705,67 @@ static void get_address(void)
+ 
+ 	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_ADAPTER_PROPS_CHANGED,
+ 							sizeof(buf), buf);
++
++	return HAL_STATUS_SUCCESS;
+ }
+ 
+-static bool get_name(void)
++static uint8_t get_name(void)
+ {
+ 	if (!adapter.name)
+-		return false;
++		return HAL_STATUS_FAILED;
+ 
+ 	adapter_name_changed((uint8_t *) adapter.name);
+ 
+-	return true;
++	return HAL_STATUS_SUCCESS;
+ }
+ 
+ 
+-static bool get_class(void)
++static uint8_t get_class(void)
+ {
  	DBG("");
  
--	if (len < sizeof(*cmd))
--		return HAL_STATUS_INVALID;
--
- 	android2bdaddr(&cmd->bdaddr, &dst);
+ 	adapter_class_changed();
  
- 	l = g_slist_find_custom(devices, &dst, device_cmp);
--	if (l)
--		return HAL_STATUS_FAILED;
-+	if (l) {
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
- 
- 	dev = a2dp_device_new(&dst);
- 	dev->io = bt_io_connect(signaling_connect_cb, dev, NULL, &err,
-@@ -194,7 +195,8 @@ static uint8_t bt_a2dp_connect(struct hal_cmd_a2dp_connect *cmd, uint16_t len)
- 		error("%s", err->message);
- 		g_error_free(err);
- 		a2dp_device_free(dev);
--		return HAL_STATUS_FAILED;
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
- 	}
- 
- 	ba2str(&dev->dst, addr);
-@@ -202,26 +204,29 @@ static uint8_t bt_a2dp_connect(struct hal_cmd_a2dp_connect *cmd, uint16_t len)
- 
- 	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_CONNECTING);
- 
--	return HAL_STATUS_SUCCESS;
-+	status = HAL_STATUS_SUCCESS;
-+
-+failed:
-+	ipc_send_rsp(HAL_SERVICE_ID_A2DP, HAL_OP_A2DP_CONNECT, status);
+-	return true;
++	return HAL_STATUS_SUCCESS;
  }
  
--static uint8_t bt_a2dp_disconnect(struct hal_cmd_a2dp_connect *cmd,
--								uint16_t len)
-+static void bt_a2dp_disconnect(const void *buf, uint16_t len)
+-static bool get_type(void)
++static uint8_t get_type(void)
  {
-+	const struct hal_cmd_a2dp_connect *cmd = buf;
-+	uint8_t status;
- 	struct a2dp_device *dev;
- 	GSList *l;
- 	bdaddr_t dst;
+ 	DBG("Not implemented");
  
+ 	/* TODO: Add implementation */
+ 
+-	return false;
++	return HAL_STATUS_FAILED;
+ }
+ 
+-static bool get_service(void)
++static uint8_t get_service(void)
+ {
+ 	DBG("Not implemented");
+ 
+ 	/* TODO: Add implementation */
+ 
+-	return false;
++	return HAL_STATUS_FAILED;
+ }
+ 
+-static bool get_scan_mode(void)
++static uint8_t get_scan_mode(void)
+ {
  	DBG("");
  
--	if (len < sizeof(*cmd))
--		return HAL_STATUS_INVALID;
--
- 	android2bdaddr(&cmd->bdaddr, &dst);
+ 	scan_mode_changed();
  
- 	l = g_slist_find_custom(devices, &dst, device_cmp);
--	if (!l)
--		return HAL_STATUS_FAILED;
-+	if (!l) {
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
- 
- 	dev = l->data;
- 
-@@ -231,28 +236,19 @@ static uint8_t bt_a2dp_disconnect(struct hal_cmd_a2dp_connect *cmd,
- 
- 	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTING);
- 
--	return HAL_STATUS_SUCCESS;
--}
--
--void bt_a2dp_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
--{
--	uint8_t status = HAL_STATUS_FAILED;
--
--	switch (opcode) {
--	case HAL_OP_A2DP_CONNECT:
--		status = bt_a2dp_connect(buf, len);
--		break;
--	case HAL_OP_A2DP_DISCONNECT:
--		status = bt_a2dp_disconnect(buf, len);
--		break;
--	default:
--		DBG("Unhandled command, opcode 0x%x", opcode);
--		break;
--	}
-+	status = HAL_STATUS_SUCCESS;
- 
--	ipc_send_rsp(HAL_SERVICE_ID_A2DP, opcode, status);
-+failed:
-+	ipc_send_rsp(HAL_SERVICE_ID_A2DP, HAL_OP_A2DP_DISCONNECT, status);
+-	return true;
++	return HAL_STATUS_SUCCESS;
  }
  
-+static const struct ipc_handler cmd_handlers[] = {
-+	/* HAL_OP_A2DP_CONNECT */
-+	{ bt_a2dp_connect, false, sizeof(struct hal_cmd_a2dp_connect) },
-+	/* HAL_OP_A2DP_DISCONNECT */
-+	{ bt_a2dp_disconnect, false, sizeof(struct hal_cmd_a2dp_disconnect) },
-+};
-+
- static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+-static bool get_devices(void)
++static uint8_t get_devices(void)
  {
- 	struct a2dp_device *dev;
-@@ -380,6 +376,9 @@ bool bt_a2dp_register(const bdaddr_t *addr)
- 	}
- 	record_id = rec->handle;
+ 	DBG("Not implemented");
  
-+	ipc_register(HAL_SERVICE_ID_A2DP, cmd_handlers,
-+				sizeof(cmd_handlers)/sizeof(cmd_handlers[0]));
-+
- 	return true;
+ 	/* TODO: Add implementation */
+ 
+-	return false;
++	return HAL_STATUS_FAILED;
  }
  
-@@ -397,6 +396,8 @@ void bt_a2dp_unregister(void)
- 	g_slist_foreach(devices, a2dp_device_disconnected, NULL);
- 	devices = NULL;
+-static bool get_discoverable_timeout(void)
++static uint8_t get_discoverable_timeout(void)
+ {
+ 	struct hal_ev_adapter_props_changed *ev;
+ 	uint8_t buf[BASELEN_PROP_CHANGED + sizeof(uint32_t)];
+@@ -1782,7 +1784,7 @@ static bool get_discoverable_timeout(void)
+ 	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_ADAPTER_PROPS_CHANGED,
+ 							sizeof(buf), ev);
  
-+
-+	ipc_unregister(HAL_SERVICE_ID_A2DP);
- 	bt_adapter_remove_record(record_id);
- 	record_id = 0;
+-	return true;
++	return HAL_STATUS_SUCCESS;
+ }
  
-diff --git a/android/a2dp.h b/android/a2dp.h
-index 2a1eb3c..7e9b2f6 100644
---- a/android/a2dp.h
-+++ b/android/a2dp.h
-@@ -21,7 +21,5 @@
-  *
-  */
+ static void handle_get_adapter_prop_cmd(const void *buf, uint16_t len)
+@@ -1792,64 +1794,37 @@ static void handle_get_adapter_prop_cmd(const void *buf, uint16_t len)
  
--void bt_a2dp_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len);
+ 	switch (cmd->type) {
+ 	case HAL_PROP_ADAPTER_ADDR:
+-		get_address();
++		status = get_address();
+ 		break;
+ 	case HAL_PROP_ADAPTER_NAME:
+-		if (!get_name()) {
+-			status = HAL_STATUS_FAILED;
+-			goto failed;
+-		}
++		status = get_name();
+ 		break;
+ 	case HAL_PROP_ADAPTER_UUIDS:
+-		if (!get_uuids()) {
+-			status = HAL_STATUS_FAILED;
+-			goto failed;
+-		}
++		status = get_uuids();
+ 		break;
+ 	case HAL_PROP_ADAPTER_CLASS:
+-		if (!get_class()) {
+-			status = HAL_STATUS_FAILED;
+-			goto failed;
+-		}
++		status = get_class();
+ 		break;
+ 	case HAL_PROP_ADAPTER_TYPE:
+-		if (!get_type()) {
+-			status = HAL_STATUS_FAILED;
+-			goto failed;
+-		}
++		status = get_type();
+ 		break;
+ 	case HAL_PROP_ADAPTER_SERVICE_REC:
+-		if (!get_service()) {
+-			status = HAL_STATUS_FAILED;
+-			goto failed;
+-		}
++		status = get_service();
+ 		break;
+ 	case HAL_PROP_ADAPTER_SCAN_MODE:
+-		if (!get_scan_mode()) {
+-			status = HAL_STATUS_FAILED;
+-			goto failed;
+-		}
++		status = get_scan_mode();
+ 		break;
+ 	case HAL_PROP_ADAPTER_BONDED_DEVICES:
+-		if (!get_devices()) {
+-			status = HAL_STATUS_FAILED;
+-			goto failed;
+-		}
++		status = get_devices();
+ 		break;
+ 	case HAL_PROP_ADAPTER_DISC_TIMEOUT:
+-		if (!get_discoverable_timeout()) {
+-			status = HAL_STATUS_FAILED;
+-			goto failed;
+-		}
++		status = get_discoverable_timeout();
+ 		break;
+ 	default:
+ 		status = HAL_STATUS_FAILED;
+-		goto failed;
++		break;
+ 	}
+ 
+-	status = HAL_STATUS_SUCCESS;
 -
- bool bt_a2dp_register(const bdaddr_t *addr);
- void bt_a2dp_unregister(void);
+-failed:
+ 	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_GET_ADAPTER_PROP, status);
+ }
+ 
 -- 
 1.8.3.2
 
