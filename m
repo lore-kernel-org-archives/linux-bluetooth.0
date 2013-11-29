@@ -2,217 +2,208 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 5/9] android/bluetooth: Make property handling function return HAL status
-Date: Fri, 29 Nov 2013 12:08:47 +0100
-Message-Id: <1385723331-15603-6-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2 9/9] android/socket: Use generic IPC message handling for commands
+Date: Fri, 29 Nov 2013 12:08:51 +0100
+Message-Id: <1385723331-15603-10-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1385723331-15603-1-git-send-email-szymon.janc@tieto.com>
 References: <1385723331-15603-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This makes funtions follow have similar style and makes properties
-dispatch function much simpler.
+Handlers are registered on service register and unregistered on
+unregister.
 ---
- android/bluetooth.c | 85 +++++++++++++++++++----------------------------------
- 1 file changed, 30 insertions(+), 55 deletions(-)
+ android/socket.c | 102 ++++++++++++++++++++++++++-----------------------------
+ 1 file changed, 49 insertions(+), 53 deletions(-)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index eb8dbc5..a39e7bf 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -1133,7 +1133,7 @@ static void uuid16_to_uint128(uint16_t uuid, uint128_t *u128)
- 	ntoh128(&uuid128.value.uuid128, u128);
+diff --git a/android/socket.c b/android/socket.c
+index 4f47861..76b40c8 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -650,15 +650,15 @@ static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
+ 		rfsock_acc->rfcomm_watch);
  }
  
--static bool get_uuids(void)
-+static uint8_t get_uuids(void)
+-static int handle_listen(void *buf)
++static void handle_listen(const void *buf, uint16_t len)
  {
- 	struct hal_ev_adapter_props_changed *ev;
- 	GSList *list = adapter.uuids;
-@@ -1169,7 +1169,7 @@ static bool get_uuids(void)
- 	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_ADAPTER_PROPS_CHANGED,
- 							sizeof(buf), ev);
+-	struct hal_cmd_sock_listen *cmd = buf;
++	const struct hal_cmd_sock_listen *cmd = buf;
+ 	const struct profile_info *profile;
+-	struct rfcomm_sock *rfsock;
++	struct rfcomm_sock *rfsock = NULL;
+ 	BtIOSecLevel sec_level;
+ 	GIOChannel *io;
+ 	GError *err = NULL;
+-	int hal_fd;
++	int hal_fd = -1;
+ 	int chan;
  
--	return true;
-+	return HAL_STATUS_SUCCESS;
- }
- 
- static void remove_uuid_complete(uint8_t status, uint16_t length,
-@@ -1691,7 +1691,7 @@ static bool set_discoverable(uint8_t mode, uint16_t timeout)
- 	return false;
- }
- 
--static void get_address(void)
-+static uint8_t get_address(void)
- {
- 	uint8_t buf[BASELEN_PROP_CHANGED + sizeof(bdaddr_t)];
- 	struct hal_ev_adapter_props_changed *ev = (void *) buf;
-@@ -1705,65 +1705,67 @@ static void get_address(void)
- 
- 	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_ADAPTER_PROPS_CHANGED,
- 							sizeof(buf), buf);
+ 	DBG("");
+@@ -666,11 +666,10 @@ static int handle_listen(void *buf)
+ 	profile = get_profile_by_uuid(cmd->uuid);
+ 	if (!profile) {
+ 		if (!cmd->channel)
+-			return -1;
+-		else {
+-			chan = cmd->channel;
+-			sec_level = BT_IO_SEC_MEDIUM;
+-		}
++			goto failed;
 +
-+	return HAL_STATUS_SUCCESS;
- }
++		chan = cmd->channel;
++		sec_level = BT_IO_SEC_MEDIUM;
+ 	} else {
+ 		chan = profile->channel;
+ 		sec_level = profile->sec_level;
+@@ -680,7 +679,7 @@ static int handle_listen(void *buf)
  
--static bool get_name(void)
-+static uint8_t get_name(void)
- {
- 	if (!adapter.name)
--		return false;
-+		return HAL_STATUS_FAILED;
+ 	rfsock = create_rfsock(-1, &hal_fd);
+ 	if (!rfsock)
+-		return -1;
++		goto failed;
  
- 	adapter_name_changed((uint8_t *) adapter.name);
- 
--	return true;
-+	return HAL_STATUS_SUCCESS;
- }
- 
- 
--static bool get_class(void)
-+static uint8_t get_class(void)
- {
- 	DBG("");
- 
- 	adapter_class_changed();
- 
--	return true;
-+	return HAL_STATUS_SUCCESS;
- }
- 
--static bool get_type(void)
-+static uint8_t get_type(void)
- {
- 	DBG("Not implemented");
- 
- 	/* TODO: Add implementation */
- 
--	return false;
-+	return HAL_STATUS_FAILED;
- }
- 
--static bool get_service(void)
-+static uint8_t get_service(void)
- {
- 	DBG("Not implemented");
- 
- 	/* TODO: Add implementation */
- 
--	return false;
-+	return HAL_STATUS_FAILED;
- }
- 
--static bool get_scan_mode(void)
-+static uint8_t get_scan_mode(void)
- {
- 	DBG("");
- 
- 	scan_mode_changed();
- 
--	return true;
-+	return HAL_STATUS_SUCCESS;
- }
- 
--static bool get_devices(void)
-+static uint8_t get_devices(void)
- {
- 	DBG("Not implemented");
- 
- 	/* TODO: Add implementation */
- 
--	return false;
-+	return HAL_STATUS_FAILED;
- }
- 
--static bool get_discoverable_timeout(void)
-+static uint8_t get_discoverable_timeout(void)
- {
- 	struct hal_ev_adapter_props_changed *ev;
- 	uint8_t buf[BASELEN_PROP_CHANGED + sizeof(uint32_t)];
-@@ -1782,7 +1784,7 @@ static bool get_discoverable_timeout(void)
- 	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_ADAPTER_PROPS_CHANGED,
- 							sizeof(buf), ev);
- 
--	return true;
-+	return HAL_STATUS_SUCCESS;
- }
- 
- static void handle_get_adapter_prop_cmd(const void *buf, uint16_t len)
-@@ -1792,64 +1794,37 @@ static void handle_get_adapter_prop_cmd(const void *buf, uint16_t len)
- 
- 	switch (cmd->type) {
- 	case HAL_PROP_ADAPTER_ADDR:
--		get_address();
-+		status = get_address();
- 		break;
- 	case HAL_PROP_ADAPTER_NAME:
--		if (!get_name()) {
--			status = HAL_STATUS_FAILED;
--			goto failed;
--		}
-+		status = get_name();
- 		break;
- 	case HAL_PROP_ADAPTER_UUIDS:
--		if (!get_uuids()) {
--			status = HAL_STATUS_FAILED;
--			goto failed;
--		}
-+		status = get_uuids();
- 		break;
- 	case HAL_PROP_ADAPTER_CLASS:
--		if (!get_class()) {
--			status = HAL_STATUS_FAILED;
--			goto failed;
--		}
-+		status = get_class();
- 		break;
- 	case HAL_PROP_ADAPTER_TYPE:
--		if (!get_type()) {
--			status = HAL_STATUS_FAILED;
--			goto failed;
--		}
-+		status = get_type();
- 		break;
- 	case HAL_PROP_ADAPTER_SERVICE_REC:
--		if (!get_service()) {
--			status = HAL_STATUS_FAILED;
--			goto failed;
--		}
-+		status = get_service();
- 		break;
- 	case HAL_PROP_ADAPTER_SCAN_MODE:
--		if (!get_scan_mode()) {
--			status = HAL_STATUS_FAILED;
--			goto failed;
--		}
-+		status = get_scan_mode();
- 		break;
- 	case HAL_PROP_ADAPTER_BONDED_DEVICES:
--		if (!get_devices()) {
--			status = HAL_STATUS_FAILED;
--			goto failed;
--		}
-+		status = get_devices();
- 		break;
- 	case HAL_PROP_ADAPTER_DISC_TIMEOUT:
--		if (!get_discoverable_timeout()) {
--			status = HAL_STATUS_FAILED;
--			goto failed;
--		}
-+		status = get_discoverable_timeout();
- 		break;
- 	default:
- 		status = HAL_STATUS_FAILED;
--		goto failed;
-+		break;
+ 	io = bt_io_listen(accept_cb, NULL, rfsock, NULL, &err,
+ 				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
+@@ -690,8 +689,7 @@ static int handle_listen(void *buf)
+ 	if (!io) {
+ 		error("Failed listen: %s", err->message);
+ 		g_error_free(err);
+-		cleanup_rfsock(rfsock);
+-		return -1;
++		goto failed;
  	}
  
--	status = HAL_STATUS_SUCCESS;
--
--failed:
- 	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_GET_ADAPTER_PROP, status);
+ 	rfsock->real_sock = g_io_channel_unix_get_fd(io);
+@@ -703,15 +701,27 @@ static int handle_listen(void *buf)
+ 
+ 	if (write(rfsock->fd, &chan, sizeof(chan)) != sizeof(chan)) {
+ 		error("Error sending RFCOMM channel");
+-		cleanup_rfsock(rfsock);
+-		return -1;
++		goto failed;
+ 	}
+ 
+ 	rfsock->service_handle = sdp_service_register(profile, cmd->name);
+ 
+ 	servers = g_list_append(servers, rfsock);
+ 
+-	return hal_fd;
++	ipc_send_rsp_full(HAL_SERVICE_ID_SOCK, HAL_OP_SOCK_LISTEN, 0, NULL,
++									hal_fd);
++	close(hal_fd);
++	return;
++
++failed:
++	ipc_send_rsp(HAL_SERVICE_ID_SOCK, HAL_OP_SOCK_LISTEN,
++							HAL_STATUS_FAILED);
++
++	if (rfsock)
++		cleanup_rfsock(rfsock);
++
++	if (hal_fd >= 0)
++		close(hal_fd);
  }
  
+ static bool sock_send_connect(struct rfcomm_sock *rfsock, bdaddr_t *bdaddr)
+@@ -865,9 +875,9 @@ fail:
+ 	cleanup_rfsock(rfsock);
+ }
+ 
+-static int handle_connect(void *buf)
++static void handle_connect(const void *buf, uint16_t len)
+ {
+-	struct hal_cmd_sock_connect *cmd = buf;
++	const struct hal_cmd_sock_connect *cmd = buf;
+ 	struct rfcomm_sock *rfsock;
+ 	uuid_t uuid;
+ 	int hal_fd = -1;
+@@ -876,7 +886,7 @@ static int handle_connect(void *buf)
+ 
+ 	rfsock = create_rfsock(-1, &hal_fd);
+ 	if (!rfsock)
+-		return -1;
++		goto failed;
+ 
+ 	android2bdaddr(cmd->bdaddr, &rfsock->dst);
+ 
+@@ -890,55 +900,41 @@ static int handle_connect(void *buf)
+ 					sdp_search_cb, rfsock, NULL) < 0) {
+ 		error("Failed to search SDP records");
+ 		cleanup_rfsock(rfsock);
+-		return -1;
++		goto failed;
+ 	}
+ 
+-	return hal_fd;
+-}
+-
+-void bt_sock_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+-{
+-	int fd;
+-
+-	switch (opcode) {
+-	case HAL_OP_SOCK_LISTEN:
+-		fd = handle_listen(buf);
+-		if (fd < 0)
+-			break;
+-
+-		ipc_send_rsp_full(HAL_SERVICE_ID_SOCK, opcode, 0, NULL, fd);
+-
+-		if (close(fd) < 0)
+-			error("close() fd %d failed: %s", fd, strerror(errno));
+-
+-		return;
+-	case HAL_OP_SOCK_CONNECT:
+-		fd = handle_connect(buf);
+-		if (fd < 0)
+-			break;
+-
+-		ipc_send_rsp_full(HAL_SERVICE_ID_SOCK, opcode, 0, NULL, fd);
++	ipc_send_rsp_full(HAL_SERVICE_ID_SOCK, HAL_OP_SOCK_CONNECT, 0, NULL,
++									hal_fd);
++	close(hal_fd);
++	return;
+ 
+-		if (close(fd) < 0)
+-			error("close() fd %d failed: %s", fd, strerror(errno));
++failed:
++	ipc_send_rsp(HAL_SERVICE_ID_SOCK, HAL_OP_SOCK_CONNECT,
++							HAL_STATUS_FAILED);
+ 
+-		return;
+-	default:
+-		DBG("Unhandled command, opcode 0x%x", opcode);
+-		break;
+-	}
+-
+-	ipc_send_rsp(HAL_SERVICE_ID_SOCK, opcode, HAL_STATUS_FAILED);
++	if (hal_fd >= 0)
++		close(hal_fd);
+ }
+ 
++static const struct ipc_handler cmd_handlers[] = {
++	/* HAL_OP_SOCK_LISTEN */
++	{ handle_listen, false, sizeof(struct hal_cmd_sock_listen) },
++	/* HAL_OP_SOCK_CONNECT */
++	{ handle_connect, false, sizeof(struct hal_cmd_sock_connect) },
++};
++
+ void bt_socket_register(const bdaddr_t *addr)
+ {
+ 	DBG("");
+ 
+ 	bacpy(&adapter_addr, addr);
++	ipc_register(HAL_SERVICE_ID_SOCK, cmd_handlers,
++				sizeof(cmd_handlers)/sizeof(cmd_handlers[0]));
+ }
+ 
+ void bt_socket_unregister(void)
+ {
+ 	DBG("");
++
++	ipc_unregister(HAL_SERVICE_ID_SOCK);
+ }
 -- 
 1.8.3.2
 
