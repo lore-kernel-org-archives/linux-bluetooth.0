@@ -1,87 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/2] android/hal-bluetooth: Fix sending invalid adapter property
-Date: Fri, 29 Nov 2013 09:05:58 +0100
-Message-Id: <1385712358-8121-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1385712358-8121-1-git-send-email-szymon.janc@tieto.com>
-References: <1385712358-8121-1-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC] Fix eir parsing function.
+Date: Fri, 29 Nov 2013 10:00:49 +0200
+Message-Id: <1385712049-24635-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If property to be set is of enum type it should be first converted to
-byte value as size of enum might varry depending on architecture.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-To keep code simple command buffer uses len received from framework
-as this is more or equal to HAL property size.
+Currently eir_parse always return 0 but it is checked throughout the
+code (in android/bluetooth code as well in src/adapteri, etc) for
+return value (err < 0) which never happens. Return -1 if there is
+nothing to parse. Send as RFC as I do not know how current code supposed
+to be working.
 ---
- android/hal-bluetooth.c | 36 +++++++++++++++++++++++++++++++-----
- 1 file changed, 31 insertions(+), 5 deletions(-)
+ src/eir.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index f232afd..87d6fc7 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -35,6 +35,18 @@ static const bt_callbacks_t *bt_hal_cbacks = NULL;
- 	e = *((uint8_t *) (hal_prop->val)); \
- } while (0)
+diff --git a/src/eir.c b/src/eir.c
+index 084884e..f7450c9 100644
+--- a/src/eir.c
++++ b/src/eir.c
+@@ -138,7 +138,7 @@ int eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
  
-+#define enum_prop_from_hal(prop, hal_len, hal_val, enum_type) do { \
-+	enum_type e; \
-+	if (prop->len != sizeof(e)) { \
-+		error("invalid HAL property %u (%u vs %zu), aborting ", \
-+					prop->type, prop->len, sizeof(e)); \
-+		exit(EXIT_FAILURE); \
-+	} \
-+	memcpy(&e, prop->val, sizeof(e)); \
-+	*((uint8_t *) hal_val) = e; /* enums are mapped to 1 byte */ \
-+	*hal_len = 1; \
-+} while (0)
-+
- static void handle_adapter_state_changed(void *buf, uint16_t len)
- {
- 	struct hal_ev_adapter_state_changed *ev = buf;
-@@ -91,6 +103,23 @@ static void adapter_props_to_hal(bt_property_t *send_props,
- 	exit(EXIT_FAILURE);
- }
+ 	/* No EIR data to parse */
+ 	if (eir_data == NULL)
+-		return 0;
++		return -1;
  
-+static void adapter_prop_from_hal(const bt_property_t *property, uint8_t *type,
-+						uint16_t *len, void *val)
-+{
-+	/* type match IPC type */
-+	*type = property->type;
-+
-+	switch(property->type) {
-+	case HAL_PROP_ADAPTER_SCAN_MODE:
-+		enum_prop_from_hal(property, len, val, bt_scan_mode_t);
-+		break;
-+	default:
-+		*len = property->len;
-+		memcpy(val, property->val, property->len);
-+		break;
-+	}
-+}
-+
- static void device_props_to_hal(bt_property_t *send_props,
- 				struct hal_property *prop, uint8_t num_props,
- 				uint16_t len)
-@@ -458,13 +487,10 @@ static int set_adapter_property(const bt_property_t *property)
- 	if (!interface_ready())
- 		return BT_STATUS_NOT_READY;
- 
--	/* type match IPC type */
--	cmd->type = property->type;
--	cmd->len = property->len;
--	memcpy(cmd->val, property->val, property->len);
-+	adapter_prop_from_hal(property, &cmd->type, &cmd->len, cmd->val);
- 
- 	return hal_ipc_cmd(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_SET_ADAPTER_PROP,
--					sizeof(buf), cmd, 0, NULL, NULL);
-+				sizeof(*cmd) + cmd->len, cmd, 0, NULL, NULL);
- }
- 
- static int get_remote_device_properties(bt_bdaddr_t *remote_addr)
+ 	while (len < eir_len - 1) {
+ 		uint8_t field_len = eir_data[0];
 -- 
 1.8.3.2
 
