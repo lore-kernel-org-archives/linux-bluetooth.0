@@ -1,49 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v3 0/7] Refactor bnep code and implement pan methods
-Date: Fri, 29 Nov 2013 11:53:59 +0200
-Message-Id: <1385718846-19070-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCHv2] android/socket: Cleanup sockets on unregister
+Date: Fri, 29 Nov 2013 11:33:29 +0200
+Message-Id: <1385717609-29219-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-v3: Fixed Anderson and Luiz comments and solved rebased conflicts.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-v2: Refactored profiles/network/common.* as per Johan's comments
-    (renaming common.c|h to bnep.c|h and moving bnep related code to
-     bnep.c ro reduce redundancy in profiles/netowrk/connection.c and
-     android/pan.c)
+This cleans up rfsock structures closing all sockets and making general cleanup
+for servers and for connections. This will be called form socket unregister.
+---
+ android/socket.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-v1: This patch set supports PANU role with a minor fix in android. Added
-    CAP_NET_RAW capability for bnep services. Creates bnep connection and
-    up the inreface on connect call and free the device on disconnect call.
-    Interface name(bnepX) will be notified on control state cb. Android
-    environment will create IP address with dhcp calls.
-
-Ravi kumar Veeramally (7):
-  profiles/network: Remove redundant code for bnep interface name
-  profiles/network: Refactor bnep connection setup functionality
-  profiles/network: Rename common.c|h to bnep.c|h
-  android/pan: Implement pan connect method in daemon
-  android/pan: Implement pan disconnect method in daemon
-  android/pan: Implement the get local role method in daemon
-  android: Add reasons for adding capabilites to process
-
- Makefile.plugins                      |   2 +-
- android/Android.mk                    |   2 +
- android/Makefile.am                   |   3 +-
- android/main.c                        |   3 +
- android/pan.c                         | 252 ++++++++++++++++++++++++++++++++--
- profiles/network/{common.c => bnep.c} | 184 ++++++++++++++++++++++++-
- profiles/network/{common.h => bnep.h} |   5 +
- profiles/network/connection.c         | 171 ++---------------------
- profiles/network/manager.c            |   2 +-
- profiles/network/server.c             |   5 +-
- 10 files changed, 452 insertions(+), 177 deletions(-)
- rename profiles/network/{common.c => bnep.c} (59%)
- rename profiles/network/{common.h => bnep.h} (87%)
-
+diff --git a/android/socket.c b/android/socket.c
+index 4f47861..7d41756 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -93,8 +93,10 @@ static struct rfcomm_sock *create_rfsock(int sock, int *hal_fd)
+ 	return rfsock;
+ }
+ 
+-static void cleanup_rfsock(struct rfcomm_sock *rfsock)
++static void cleanup_rfsock(gpointer data)
+ {
++	struct rfcomm_sock *rfsock = data;
++
+ 	DBG("rfsock: %p fd %d real_sock %d chan %u",
+ 		rfsock, rfsock->fd, rfsock->real_sock, rfsock->channel);
+ 
+@@ -941,4 +943,7 @@ void bt_socket_register(const bdaddr_t *addr)
+ void bt_socket_unregister(void)
+ {
+ 	DBG("");
++
++	g_list_free_full(connections, cleanup_rfsock);
++	g_list_free_full(servers, cleanup_rfsock);
+ }
 -- 
 1.8.3.2
 
