@@ -1,68 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1385843856.12122.5.camel@pc.interlinx.bc.ca>
-Subject: have to re-pair mouse every few hours
-From: "Brian J. Murrell" <brian@interlinx.bc.ca>
-To: linux-bluetooth@vger.kernel.org
-Date: Sat, 30 Nov 2013 15:37:36 -0500
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature";
-	boundary="=-hWb1VxoENTLZWtuKAV6A"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1385734845-9725-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1385734845-9725-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Date: Fri, 29 Nov 2013 17:16:42 +0200
+Message-ID: <CABBYNZKv=nQUgGPaPhQupGSSRcOXKUaTMFh4LU5sdX0SqkQTnQ@mail.gmail.com>
+Subject: Re: [PATCH_v5 0/6] Refactor bnep code and implement pan methods
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Ravi,
 
---=-hWb1VxoENTLZWtuKAV6A
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Fri, Nov 29, 2013 at 4:20 PM, Ravi kumar Veeramally
+<ravikumar.veeramally@linux.intel.com> wrote:
+> v5: Renamed strcut network_peer to pan_device as per Luiz comments.
+>
+> v4: Fixed Luiz comments (discussed in irc). Merge patch 1 and 2.
+>     Pass fd in bnep_connect instead of GIOChannel.
+>
+> v3: Fixed Anderson and Luiz comments and solved rebased conflicts.
+>
+> v2: Refactored profiles/network/common.* as per Johan's comments
+>     (renaming common.c|h to bnep.c|h and moving bnep related code to
+>      bnep.c ro reduce redundancy in profiles/netowrk/connection.c and
+>      android/pan.c)
+>
+> v1: This patch set supports PANU role with a minor fix in android. Added
+>     CAP_NET_RAW capability for bnep services. Creates bnep connection and
+>     up the inreface on connect call and free the device on disconnect call.
+>     Interface name(bnepX) will be notified on control state cb. Android
+>     environment will create IP address with dhcp calls.
+>
+> Ravi kumar Veeramally (6):
+>   profiles/network: Refactor bnep connection setup functionality
+>   profiles/network: Rename common.c|h to bnep.c|h
+>   android/pan: Implement pan connect method in daemon
+>   android/pan: Implement pan disconnect method in daemon
+>   android/pan: Implement the get local role method in daemon
+>   android: Add reasons for adding capabilites to process
+>
+>  Makefile.plugins                      |   2 +-
+>  android/Android.mk                    |   2 +
+>  android/Makefile.am                   |   3 +-
+>  android/main.c                        |   3 +
+>  android/pan.c                         | 253 ++++++++++++++++++++++++++++++++--
+>  profiles/network/{common.c => bnep.c} | 197 +++++++++++++++++++++++++-
+>  profiles/network/{common.h => bnep.h} |   5 +
+>  profiles/network/connection.c         | 174 ++---------------------
+>  profiles/network/manager.c            |   2 +-
+>  profiles/network/server.c             |   5 +-
+>  10 files changed, 468 insertions(+), 178 deletions(-)
+>  rename profiles/network/{common.c => bnep.c} (58%)
+>  rename profiles/network/{common.h => bnep.h} (87%)
+>
+> --
+> 1.8.3.2
 
-Hi,
-
-I'm using a Microsoft Sculpt Touch Mouse on a Fedora 19 machine
-(kernel-3.11.9-200.fc19.x86_64 and bluez-4.101-9.fc19.x86_64) with a:
-
-Bus 002 Device 019: ID 0a5c:2148 Broadcom Corp. BCM92046DG-CL1ROM Bluetooth=
- 2.1 Adapter
-
-bluetooth adapter.  This exact same configuration worked for months just
-fine with a Logitech bluetooth mouse.  But sadly that mouse was crap
-(second one to fail within the warranty period of one of them) so
-replaced it with this MS one.
-
-The problem with this MS mouse is that it just goes AWOL and needs to be
-delete and re-paired with the machine every few hours.  Typically it's
-after I have gotten up from the computer and have come back to it.  But
-I have also had it just happen while using it.
-
-When this happens, the messages log reports messages such as:
-
-Nov 30 12:42:03 pc kernel: [2500032.028982] Bluetooth: Unexpected continuat=
-ion frame (len 0)
-Nov 30 12:42:03 pc kernel: [2500032.115027] Bluetooth: Unexpected continuat=
-ion frame (len 0)
-
-Any ideas what the problem might be here?
-
-Cheers,
-b.
+Applied, please have a look as I renamed a few other things and I
+found that we were sending uninitialized data while testing.
 
 
-
---=-hWb1VxoENTLZWtuKAV6A
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.15 (GNU/Linux)
-
-iQEcBAABAgAGBQJSmkyQAAoJENrB0DQWy8igbfAH/0ora1tRmonO3qxuHnrpOyno
-U6m3GCOK8UPGqlMhHdrD8dMv6OK0Ne/xaEdMvlf5w973zR9MmzqDpETZ95cxQ47W
-FdNMa/Vfg7JLIwwT37o1q5YzUmc6p+5VwSRRZ0wnx2VfXcgbXL2PJ/g9Q5MsFgPR
-YpxUgQGWesTjQpM5ezIJhXr1fSVl+KzSh0z+NdPL/JP2NG2Ot/Hd4juvNnlAEDlk
-Mc499I1e350SMaFaH4bJ8lLTE/nlFD900Or9vqxEBBAuPKJTMu2S8nOyde9Ea3xO
-2RR+6r3VE7aBLsxcVegFtdncS4aZz3mRW2e6SSUn+/nKPJQ2eEwJfGUN7tngjN8=
-=f7Em
------END PGP SIGNATURE-----
-
---=-hWb1VxoENTLZWtuKAV6A--
-
+-- 
+Luiz Augusto von Dentz
