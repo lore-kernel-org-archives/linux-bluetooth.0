@@ -2,41 +2,35 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v4 5/6] android/pan: Implement the get local role method in daemon
-Date: Fri, 29 Nov 2013 15:12:35 +0200
-Message-Id: <1385730756-32400-6-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v4 6/6] android: Add reasons for adding capabilites to process
+Date: Fri, 29 Nov 2013 15:12:36 +0200
+Message-Id: <1385730756-32400-7-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1385730756-32400-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1385730756-32400-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Returns local role of the device (NONE, PANU or NAP).
+CAP_NET_ADMIN: Allow use of MGMT interface
+CAP_NET_BIND_SERVICE: Allow use of privileged PSM
+CAP_NET_RAW: Allow use of bnep ioctl calls
 ---
- android/pan.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ android/main.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/android/pan.c b/android/pan.c
-index 34bbbd0..88f96d4 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -278,9 +278,15 @@ static uint8_t bt_pan_enable(struct hal_cmd_pan_enable *cmd, uint16_t len)
+diff --git a/android/main.c b/android/main.c
+index 3a14af5..eedca58 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -534,6 +534,9 @@ static bool set_capabilities(void)
+ 	header.version = _LINUX_CAPABILITY_VERSION;
+ 	header.pid = 0;
  
- static uint8_t bt_pan_get_role(void *cmd, uint16_t len)
- {
--	DBG("Not Implemented");
-+	struct hal_rsp_pan_get_role rsp;
- 
--	return HAL_STATUS_FAILED;
-+	DBG("");
-+
-+	rsp.local_role = local_role;
-+	ipc_send_rsp_full(HAL_SERVICE_ID_PAN, HAL_OP_PAN_GET_ROLE, sizeof(rsp),
-+								&rsp, -1);
-+
-+	return HAL_STATUS_SUCCESS;
- }
- 
- void bt_pan_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
++	/* CAP_NET_ADMIN: Allow use of MGMT interface
++	 * CAP_NET_BIND_SERVICE: Allow use of privileged PSM
++	 * CAP_NET_RAW: Allow use of bnep ioctl calls */
+ 	cap.effective = cap.permitted =
+ 		CAP_TO_MASK(CAP_NET_RAW) |
+ 		CAP_TO_MASK(CAP_NET_ADMIN) |
 -- 
 1.8.3.2
 
