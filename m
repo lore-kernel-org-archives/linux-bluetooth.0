@@ -1,87 +1,325 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] android/doc: Add socket-api.txt document
-Date: Fri, 29 Nov 2013 15:28:29 +0200
-Message-Id: <1385731709-8248-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v4 3/6] android/pan: Implement pan connect method in daemon
+Date: Fri, 29 Nov 2013 15:12:33 +0200
+Message-Id: <1385730756-32400-4-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1385730756-32400-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1385730756-32400-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-Document describes how socket HAL is working.
+Implements the PAN connect method in android daemon with PANU role
+only. Setting up the bnep environment, adds connection and makes
+bnep interface up are part of bnep_connect call. Notifies bnep
+interface on control state call back and connection status on
+connection state call back.
 ---
- android/socket-api.txt | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
- create mode 100644 android/socket-api.txt
+ android/Android.mk  |   2 +
+ android/Makefile.am |   3 +-
+ android/pan.c       | 219 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 216 insertions(+), 8 deletions(-)
 
-diff --git a/android/socket-api.txt b/android/socket-api.txt
-new file mode 100644
-index 0000000..9f622f9
---- /dev/null
-+++ b/android/socket-api.txt
-@@ -0,0 +1,61 @@
-+Android Socket protocol for Bluetooth
-+=====================================
+diff --git a/android/Android.mk b/android/Android.mk
+index c4d722d..549613c 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -42,6 +42,7 @@ LOCAL_SRC_FILES := \
+ 	../lib/hci.c \
+ 	../btio/btio.c \
+ 	../src/sdp-client.c \
++	../profiles/network/bnep.c \
+ 
+ LOCAL_C_INCLUDES := \
+ 	$(call include-path-for, glib) \
+@@ -66,6 +67,7 @@ lib_headers := \
+ 	sdp.h \
+ 	rfcomm.h \
+ 	sco.h \
++	bnep.h \
+ 
+ $(shell mkdir -p $(LOCAL_PATH)/../lib/bluetooth)
+ 
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 15ecf35..df04762 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -24,7 +24,8 @@ android_bluetoothd_SOURCES = android/main.c \
+ 				android/socket.h android/socket.c \
+ 				android/pan.h android/pan.c \
+ 				btio/btio.h btio/btio.c \
+-				src/sdp-client.h src/sdp-client.c
++				src/sdp-client.h src/sdp-client.c \
++				profiles/network/bnep.h profiles/network/bnep.c
+ 
+ android_bluetoothd_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+ 
+diff --git a/android/pan.c b/android/pan.c
+index ea15637..5bd1b0d 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -29,35 +29,228 @@
+ #include <fcntl.h>
+ #include <glib.h>
+ 
++#include "btio/btio.h"
+ #include "lib/bluetooth.h"
++#include "lib/bnep.h"
++#include "lib/sdp.h"
++#include "lib/sdp_lib.h"
++#include "src/glib-helper.h"
++#include "profiles/network/bnep.h"
 +
-+Since Android switched from BlueZ (where sockets where nicely implemented) to
-+Bluedroid user space stack there is a need to emulate bluetooth sockets.
+ #include "log.h"
+ #include "pan.h"
+ #include "hal-msg.h"
+ #include "ipc.h"
++#include "utils.h"
++#include "bluetooth.h"
+ 
+-static uint8_t bt_pan_enable(struct hal_cmd_pan_enable *cmd, uint16_t len)
++static bdaddr_t adapter_addr;
++GSList *peers = NULL;
++uint8_t local_role = HAL_PAN_ROLE_NONE;
 +
-+Android Bluetooth Socket Hardware Abstraction Layer (HAL) bt_sock.h has
-+only 2 functions:
-+
-+static btsock_interface_t sock_if = {
-+	sizeof(sock_if),
-+	sock_listen,
-+	sock_connect
++struct network_peer {
++	char		dev[16];
++	bdaddr_t	dst;
++	uint8_t		conn_state;
++	uint8_t		role;
++	GIOChannel	*io;
++	guint		watch;
 +};
 +
-+with following parameters:
++static int peer_cmp(gconstpointer s, gconstpointer user_data)
+ {
+-	DBG("Not Implemented");
++	const struct network_peer *np = s;
++	const bdaddr_t *dst = user_data;
+ 
+-	return HAL_STATUS_FAILED;
++	return bacmp(&np->dst, dst);
+ }
+ 
+-static uint8_t bt_pan_get_role(void *cmd, uint16_t len)
++static void network_peer_free(struct network_peer *np)
++{
++	local_role = HAL_PAN_ROLE_NONE;
 +
-+sock_listen(btsock_type_t type, const char *service_name,
-+		const uint8_t *uuid, int chan, int *sock_fd, int flags)
-+sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
-+		const uint8_t *uuid, int chan, int *sock_fd, int flags)
++	if (np->watch > 0) {
++		g_source_remove(np->watch);
++		np->watch = 0;
++	}
 +
-+socket type RFCOMM is only supported at the moment. uuid and channel used
-+to decide where to connect.
++	if (np->io) {
++		g_io_channel_unref(np->io);
++		np->io = NULL;
++	}
 +
-+sockfd is used to return socket fd to Android framework. It is used to inform
-+framework when remote device is connected.
++	peers = g_slist_remove(peers, np);
++	g_free(np);
++	np = NULL;
++}
 +
-+listen()
-+========
++static void bt_pan_notify_conn_state(struct network_peer *np, uint8_t state)
++{
++	struct hal_ev_pan_conn_state ev;
++	char addr[18];
 +
-+Listens on RFCOMM socket, socket channel is either found based on uuid or
-+channel parameter used directly. Returns sock_fd to Android framework.
++	if (np->conn_state == state)
++		return;
 +
-+Through this sock_fd channel number as (int) needs to be written right after
-+listen() succeeds.
++	np->conn_state = state;
++	ba2str(&np->dst, addr);
++	DBG("device %s state %u", addr, state);
 +
-+When remote device is connected to this socket we shall send accept signal
-+through sock_fd
++	bdaddr2android(&np->dst, ev.bdaddr);
++	ev.state = state;
++	ev.local_role = local_role;
++	ev.remote_role = np->role;
++	ev.status = HAL_STATUS_SUCCESS;
 +
-+connect()
-+=========
++	ipc_send_notif(HAL_SERVICE_ID_PAN, HAL_EV_PAN_CONN_STATE, sizeof(ev),
++									&ev);
++}
 +
-+Connects to remote device specified in bd_addr parameter. Socket channel is
-+found by SDP search of remote device by supplied uuid. Returns sock_fd to
-+Android framework.
++static void bt_pan_notify_ctrl_state(struct network_peer *np, uint8_t state)
++{
++	struct hal_ev_pan_ctrl_state ev;
 +
-+Through this sock_fd channel number as (int) needs to be written right after
-+connects() succeeds.
++	DBG("");
 +
-+When remote device is connected to this socket we shall send connect signal
-+through sock_fd
++	ev.state = state;
++	ev.local_role = local_role;
++	ev.status = HAL_STATUS_SUCCESS;
++	memcpy(ev.name, np->dev, sizeof(np->dev));
 +
-+The format of connect/accept signal is shown below:
++	ipc_send_notif(HAL_SERVICE_ID_PAN, HAL_EV_PAN_CTRL_STATE, sizeof(ev),
++									&ev);
++}
 +
-+struct hal_sock_connect_signal {
-+	short   size;
-+	uint8_t bdaddr[6];
-+	int     channel;
-+	int     status;
-+} __attribute__((packed));
++static gboolean bnep_watchdog_cb(GIOChannel *chan, GIOCondition cond,
++								gpointer data)
++{
++	struct network_peer *np = data;
++
++	DBG("%s disconnected", np->dev);
++
++	bt_pan_notify_conn_state(np, HAL_PAN_STATE_DISCONNECTED);
++	network_peer_free(np);
++
++	return FALSE;
++}
++
++static void bnep_conn_cb(GIOChannel *chan, char *iface, int err, void *data)
++{
++	struct network_peer *np = data;
++
++	DBG("");
++
++	if (err < 0) {
++		error("bnep connect req failed: %s", strerror(-err));
++		bt_pan_notify_conn_state(np, HAL_PAN_STATE_DISCONNECTED);
++		network_peer_free(np);
++		return;
++	}
++
++	memcpy(np->dev, iface, sizeof(np->dev));
++
++	DBG("%s connected", np->dev);
++
++	bt_pan_notify_ctrl_state(np, HAL_PAN_CTRL_ENABLED);
++	bt_pan_notify_conn_state(np, HAL_PAN_STATE_CONNECTED);
++
++	np->watch = g_io_add_watch(chan, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++							bnep_watchdog_cb, np);
++	g_io_channel_unref(np->io);
++	np->io = NULL;
++}
++
++static void connect_cb(GIOChannel *chan, GError *err, gpointer data)
++{
++	struct network_peer *np = data;
++	uint16_t src, dst;
++	int perr, sk;
++
++	DBG("");
++
++	if (err) {
++		error("%s", err->message);
++		bt_pan_notify_conn_state(np, HAL_PAN_STATE_DISCONNECTED);
++		network_peer_free(np);
++	}
++
++	src = (local_role == HAL_PAN_ROLE_NAP) ? BNEP_SVC_NAP : BNEP_SVC_PANU;
++	dst = (np->role == HAL_PAN_ROLE_NAP) ? BNEP_SVC_NAP : BNEP_SVC_PANU;
++	sk = g_io_channel_unix_get_fd(np->io);
++
++	perr = bnep_connect(sk, src, dst, bnep_conn_cb, np);
++	if (perr < 0) {
++		error("bnep connect req failed: %s", strerror(-perr));
++		bt_pan_notify_conn_state(np, HAL_PAN_STATE_DISCONNECTED);
++		network_peer_free(np);
++		return;
++	}
++}
++
++static uint8_t bt_pan_connect(struct hal_cmd_pan_connect *cmd, uint16_t len)
++{
++	struct network_peer *np;
++	bdaddr_t dst;
++	char addr[18];
++	GSList *l;
++	GError *gerr = NULL;
++
++	DBG("");
++
++	if (len < sizeof(*cmd))
++		return HAL_STATUS_INVALID;
++
++	android2bdaddr(&cmd->bdaddr, &dst);
++
++	l = g_slist_find_custom(peers, &dst, peer_cmp);
++	if (l)
++		return HAL_STATUS_FAILED;
++
++	np = g_new0(struct network_peer, 1);
++	bacpy(&np->dst, &dst);
++	local_role = cmd->local_role;
++	np->role = cmd->remote_role;
++
++	ba2str(&np->dst, addr);
++	DBG("connecting to %s %s", addr, np->dev);
++
++	np->io = bt_io_connect(connect_cb, np, NULL, &gerr,
++					BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
++					BT_IO_OPT_DEST_BDADDR, &np->dst,
++					BT_IO_OPT_PSM, BNEP_PSM,
++					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
++					BT_IO_OPT_OMTU, BNEP_MTU,
++					BT_IO_OPT_IMTU, BNEP_MTU,
++					BT_IO_OPT_INVALID);
++	if (!np->io) {
++		error("%s", gerr->message);
++		g_error_free(gerr);
++		g_free(np);
++		return HAL_STATUS_FAILED;
++	}
++
++	peers = g_slist_append(peers, np);
++	bt_pan_notify_conn_state(np, HAL_PAN_STATE_CONNECTING);
++
++	return HAL_STATUS_SUCCESS;
++}
++
++static uint8_t bt_pan_disconnect(struct hal_cmd_pan_disconnect *cmd,
++								uint16_t len)
+ {
+ 	DBG("Not Implemented");
+ 
+ 	return HAL_STATUS_FAILED;
+ }
+ 
+-static uint8_t bt_pan_connect(struct hal_cmd_pan_connect *cmd, uint16_t len)
++static uint8_t bt_pan_enable(struct hal_cmd_pan_enable *cmd, uint16_t len)
+ {
+ 	DBG("Not Implemented");
+ 
+ 	return HAL_STATUS_FAILED;
+ }
+ 
+-static uint8_t bt_pan_disconnect(struct hal_cmd_pan_disconnect *cmd,
+-								uint16_t len)
++static uint8_t bt_pan_get_role(void *cmd, uint16_t len)
+ {
+ 	DBG("Not Implemented");
+ 
+@@ -91,12 +284,24 @@ void bt_pan_handle_cmd(int sk, uint8_t opcode, void *buf, uint16_t len)
+ 
+ bool bt_pan_register(const bdaddr_t *addr)
+ {
++	int err;
++
+ 	DBG("");
+ 
++	bacpy(&adapter_addr, addr);
++
++	err = bnep_init();
++	if (err) {
++		error("bnep init failed");
++		return false;
++	}
++
+ 	return true;
+ }
+ 
+ void bt_pan_unregister(void)
+ {
+ 	DBG("");
++
++	bnep_cleanup();
+ }
 -- 
 1.8.3.2
 
