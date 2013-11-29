@@ -1,70 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/main: Call unregister for all registered services on exit
-Date: Fri, 29 Nov 2013 10:08:49 +0200
-Message-Id: <1385712529-24757-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 1/2] android/hal-bluetooth: Rename create_enum_prop to enum_prop_to_hal
+Date: Fri, 29 Nov 2013 09:05:57 +0100
+Message-Id: <1385712358-8121-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
+This better describes purpose of this macro.
 ---
- android/main.c | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ android/hal-bluetooth.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/android/main.c b/android/main.c
-index 2879bbf..2a9348b 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -493,6 +493,38 @@ static void cleanup_hal_connection(void)
- 	ipc_cleanup();
- }
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index a879583..f232afd 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -28,7 +28,7 @@
  
-+static void cleanup_services(void)
-+{
-+	int i;
-+
-+	DBG("");
-+
-+	for (i=HAL_SERVICE_ID_BLUETOOTH; i < HAL_SERVICE_ID_MAX; i++) {
-+		if (!services[i])
-+			continue;
-+
-+		switch (i) {
-+		case HAL_SERVICE_ID_BLUETOOTH:
-+			bt_bluetooth_unregister();
-+			break;
-+		case HAL_SERVICE_ID_SOCK:
-+			bt_socket_unregister();
-+			break;
-+		case HAL_SERVICE_ID_HIDHOST:
-+			bt_hid_unregister();
-+			break;
-+		case HAL_SERVICE_ID_A2DP:
-+			bt_a2dp_unregister();
-+			break;
-+		case HAL_SERVICE_ID_PAN:
-+			bt_pan_unregister();
-+			break;
-+		}
-+
-+		services[i] = false;
-+	}
-+}
-+
- static bool set_capabilities(void)
- {
- #if defined(ANDROID)
-@@ -598,6 +630,8 @@ int main(int argc, char *argv[])
- 	if (bluetooth_start_timeout > 0)
- 		g_source_remove(bluetooth_start_timeout);
+ static const bt_callbacks_t *bt_hal_cbacks = NULL;
  
-+	cleanup_services();
-+
- 	cleanup_hal_connection();
- 	stop_sdp_server();
- 	bt_bluetooth_cleanup();
+-#define create_enum_prop(prop, hal_prop, type) do { \
++#define enum_prop_to_hal(prop, hal_prop, type) do { \
+ 	static type e; \
+ 	prop.val = &e; \
+ 	prop.len = sizeof(e); \
+@@ -63,11 +63,11 @@ static void adapter_props_to_hal(bt_property_t *send_props,
+ 
+ 		switch (prop->type) {
+ 		case HAL_PROP_ADAPTER_TYPE:
+-			create_enum_prop(send_props[i], prop,
++			enum_prop_to_hal(send_props[i], prop,
+ 							bt_device_type_t);
+ 			break;
+ 		case HAL_PROP_ADAPTER_SCAN_MODE:
+-			create_enum_prop(send_props[i], prop,
++			enum_prop_to_hal(send_props[i], prop,
+ 							bt_scan_mode_t);
+ 			break;
+ 		case HAL_PROP_ADAPTER_SERVICE_REC:
+@@ -109,7 +109,7 @@ static void device_props_to_hal(bt_property_t *send_props,
+ 
+ 		switch (prop->type) {
+ 		case HAL_PROP_DEVICE_TYPE:
+-			create_enum_prop(send_props[i], prop,
++			enum_prop_to_hal(send_props[i], prop,
+ 							bt_device_type_t);
+ 			break;
+ 		case HAL_PROP_DEVICE_SERVICE_REC:
 -- 
 1.8.3.2
 
