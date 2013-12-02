@@ -1,50 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/socket Use 4K buffer for socket handling
-Date: Mon,  2 Dec 2013 18:06:02 +0200
-Message-Id: <1386000362-3298-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/4] android/a2dp: Fix possible NULL dereference
+Date: Mon,  2 Dec 2013 17:46:26 +0200
+Message-Id: <1385999188-1546-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1385999188-1546-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1385999188-1546-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Make SOCKET_BUFFER define and use 4K instead of 1K.
+Since a2dp_record may return NULL, check return value. This
+silences static analysers tools.
 ---
- android/socket.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ android/a2dp.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/android/socket.c b/android/socket.c
-index 4502e90..98ec3ec 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -52,6 +52,8 @@
+diff --git a/android/a2dp.c b/android/a2dp.c
+index 98c138e..324a211 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -366,9 +366,10 @@ bool bt_a2dp_register(const bdaddr_t *addr)
+ 	}
  
- #define SVC_HINT_OBEX 0x10
- 
-+#define SOCKET_BUFFER 4096
-+
- static bdaddr_t adapter_addr;
- 
- /* Simple list of RFCOMM server sockets */
-@@ -487,7 +489,7 @@ static gboolean sock_stack_event_cb(GIOChannel *io, GIOCondition cond,
- 								gpointer data)
- {
- 	struct rfcomm_sock *rfsock = data;
--	unsigned char buf[1024];
-+	unsigned char buf[SOCKET_BUFFER];
- 	int len, sent;
- 
- 	if (cond & G_IO_HUP) {
-@@ -526,7 +528,7 @@ static gboolean sock_rfcomm_event_cb(GIOChannel *io, GIOCondition cond,
- 								gpointer data)
- {
- 	struct rfcomm_sock *rfsock = data;
--	unsigned char buf[1024];
-+	unsigned char buf[SOCKET_BUFFER];
- 	int len, sent;
- 
- 	if (cond & G_IO_HUP) {
+ 	rec = a2dp_record();
+-	if (bt_adapter_add_record(rec, SVC_HINT_CAPTURING) < 0) {
++	if (!rec || bt_adapter_add_record(rec, SVC_HINT_CAPTURING) < 0) {
+ 		error("Failed to register on A2DP record");
+-		sdp_record_free(rec);
++		if (rec)
++			sdp_record_free(rec);
+ 		g_io_channel_shutdown(server, TRUE, NULL);
+ 		g_io_channel_unref(server);
+ 		server = NULL;
 -- 
 1.8.3.2
 
