@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Remove dead code from SMP encryption function
-Date: Mon,  2 Dec 2013 10:49:04 +0200
-Message-Id: <1385974144-8836-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/2] Bluetooth: Remove useless smp_rand function
+Date: Mon,  2 Dec 2013 10:49:03 +0200
+Message-Id: <1385974144-8836-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1385974144-8836-1-git-send-email-johan.hedberg@gmail.com>
 References: <1385974144-8836-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,43 +11,55 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The AES cipher is used in ECB mode by SMP and therefore doesn't use an
-IV (crypto_blkcipher_ivsize returns 0) so the code trying to set the IV
-was never getting called. Simply remove this code to avoid anyone from
-thinking it actually makes some difference.
+This function was always just making a single get_random_bytes() call
+and always returning the value 0. It's simpler to just call
+get_random_bytes() directly where needed.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+ net/bluetooth/smp.c | 15 ++-------------
+ 1 file changed, 2 insertions(+), 13 deletions(-)
 
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 3bcb765b6a92..e61e74a1aabb 100644
+index f99352d1aa43..3bcb765b6a92 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -53,8 +53,7 @@ static int smp_e(struct crypto_blkcipher *tfm, const u8 *k, u8 *r)
- {
- 	struct blkcipher_desc desc;
- 	struct scatterlist sg;
--	int err, iv_len;
--	unsigned char iv[128];
-+	int err;
+@@ -143,13 +143,6 @@ static int smp_s1(struct crypto_blkcipher *tfm, u8 k[16], u8 r1[16],
+ 	return err;
+ }
  
- 	if (tfm == NULL) {
- 		BT_ERR("tfm %p", tfm);
-@@ -72,12 +71,6 @@ static int smp_e(struct crypto_blkcipher *tfm, const u8 *k, u8 *r)
- 
- 	sg_init_one(&sg, r, 16);
- 
--	iv_len = crypto_blkcipher_ivsize(tfm);
--	if (iv_len) {
--		memset(&iv, 0xff, iv_len);
--		crypto_blkcipher_set_iv(tfm, iv, iv_len);
--	}
+-static int smp_rand(u8 *buf)
+-{
+-	get_random_bytes(buf, 16);
 -
- 	err = crypto_blkcipher_encrypt(&desc, &sg, &sg, 16);
- 	if (err)
- 		BT_ERR("Encrypt data error %d", err);
+-	return 0;
+-}
+-
+ static struct sk_buff *smp_build_cmd(struct l2cap_conn *conn, u8 code,
+ 				     u16 dlen, void *data)
+ {
+@@ -606,9 +599,7 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (check_enc_key_size(conn, key_size))
+ 		return SMP_ENC_KEY_SIZE;
+ 
+-	ret = smp_rand(smp->prnd);
+-	if (ret)
+-		return SMP_UNSPECIFIED;
++	get_random_bytes(smp->prnd, sizeof(smp->prnd));
+ 
+ 	smp->prsp[0] = SMP_CMD_PAIRING_RSP;
+ 	memcpy(&smp->prsp[1], &rsp, sizeof(rsp));
+@@ -644,9 +635,7 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (check_enc_key_size(conn, key_size))
+ 		return SMP_ENC_KEY_SIZE;
+ 
+-	ret = smp_rand(smp->prnd);
+-	if (ret)
+-		return SMP_UNSPECIFIED;
++	get_random_bytes(smp->prnd, sizeof(smp->prnd));
+ 
+ 	smp->prsp[0] = SMP_CMD_PAIRING_RSP;
+ 	memcpy(&smp->prsp[1], rsp, sizeof(*rsp));
 -- 
 1.8.4.2
 
