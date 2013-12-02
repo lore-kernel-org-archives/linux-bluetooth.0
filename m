@@ -2,164 +2,146 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 2/9] android/main: Use generic IPC message handling for core service
-Date: Mon,  2 Dec 2013 13:20:41 +0100
-Message-Id: <1385986848-8023-3-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v3 1/9] android: Add initial code for IPC message handlers
+Date: Mon,  2 Dec 2013 13:20:40 +0100
+Message-Id: <1385986848-8023-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1385986848-8023-1-git-send-email-szymon.janc@tieto.com>
 References: <1385986848-8023-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Handlers are registered on daemon start and unregistered on shutdown.
+This will allow to register and unregister handlers for IPC messages
+Basic sanity check will be done in common code. Commands with variable
+length will be verified against minimum size only.
 ---
- android/main.c | 83 +++++++++++-----------------------------------------------
- 1 file changed, 16 insertions(+), 67 deletions(-)
+ android/ipc.c | 78 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/ipc.h | 10 ++++++++
+ 2 files changed, 88 insertions(+)
 
-diff --git a/android/main.c b/android/main.c
-index eedca58..0816ec7 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -74,9 +74,9 @@ static GIOChannel *hal_notif_io = NULL;
+diff --git a/android/ipc.c b/android/ipc.c
+index 64b0db5..56f328b 100644
+--- a/android/ipc.c
++++ b/android/ipc.c
+@@ -30,12 +30,20 @@
+ #include <stdint.h>
+ #include <string.h>
+ #include <signal.h>
++#include <stdbool.h>
+ #include <sys/socket.h>
  
- static bool services[HAL_SERVICE_ID_MAX + 1] = { false };
+ #include "hal-msg.h"
+ #include "ipc.h"
+ #include "log.h"
  
--static void service_register(void *buf, uint16_t len)
-+static void service_register(const void *buf, uint16_t len)
- {
--	struct hal_cmd_register_module *m = buf;
-+	const struct hal_cmd_register_module *m = buf;
- 
- 	if (m->service_id > HAL_SERVICE_ID_MAX || services[m->service_id])
- 		goto failed;
-@@ -122,9 +122,9 @@ failed:
- 							HAL_STATUS_FAILED);
- }
- 
--static void service_unregister(void *buf, uint16_t len)
-+static void service_unregister(const void *buf, uint16_t len)
- {
--	struct hal_cmd_unregister_module *m = buf;
-+	const struct hal_cmd_unregister_module *m = buf;
- 
- 	if (m->service_id > HAL_SERVICE_ID_MAX || !services[m->service_id])
- 		goto failed;
-@@ -164,20 +164,12 @@ failed:
- 							HAL_STATUS_FAILED);
- }
- 
--static void handle_service_core(uint8_t opcode, void *buf, uint16_t len)
--{
--	switch (opcode) {
--	case HAL_OP_REGISTER_MODULE:
--		service_register(buf, len);
--		break;
--	case HAL_OP_UNREGISTER_MODULE:
--		service_unregister(buf, len);
--		break;
--	default:
--		ipc_send_rsp(HAL_SERVICE_ID_CORE, opcode, HAL_STATUS_FAILED);
--		break;
--	}
--}
-+static const struct ipc_handler cmd_handlers[] = {
-+	/* HAL_OP_REGISTER_MODULE */
-+	{ service_register, false, sizeof(struct hal_cmd_register_module) },
-+	/* HAL_OP_UNREGISTER_MODULE */
-+	{ service_unregister, false, sizeof(struct hal_cmd_unregister_module) },
++struct service_handler {
++	const struct ipc_handler *handler;
++	uint8_t size;
 +};
- 
- static void bluetooth_stopped(void)
- {
-@@ -211,7 +203,6 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
- 							gpointer user_data)
- {
- 	char buf[BLUEZ_HAL_MTU];
--	struct hal_hdr *msg = (void *) buf;
- 	ssize_t ret;
- 	int fd;
- 
-@@ -229,51 +220,7 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
- 		goto fail;
- 	}
- 
--	if (ret < (ssize_t) sizeof(*msg)) {
--		error("HAL command too small, terminating (%zd)", ret);
--		goto fail;
--	}
--
--	if (ret != (ssize_t) (sizeof(*msg) + msg->len)) {
--		error("Malformed HAL command (%zd bytes), terminating", ret);
--		goto fail;
--	}
--
--	DBG("service_id %u opcode %u len %u", msg->service_id, msg->opcode,
--								msg->len);
--
--	if (msg->service_id > HAL_SERVICE_ID_MAX ||
--						!services[msg->service_id]) {
--		error("HAL command for unregistered service %u, terminating",
--							msg->service_id);
--		goto fail;
--	}
--
--	switch (msg->service_id) {
--	case HAL_SERVICE_ID_CORE:
--		handle_service_core(msg->opcode, msg->payload, msg->len);
--		break;
--	case HAL_SERVICE_ID_BLUETOOTH:
--		bt_bluetooth_handle_cmd(fd, msg->opcode, msg->payload,
--								msg->len);
--		break;
--	case HAL_SERVICE_ID_HIDHOST:
--		bt_hid_handle_cmd(fd, msg->opcode, msg->payload, msg->len);
--		break;
--	case HAL_SERVICE_ID_SOCK:
--		bt_sock_handle_cmd(fd, msg->opcode, msg->payload, msg->len);
--		break;
--	case HAL_SERVICE_ID_A2DP:
--		bt_a2dp_handle_cmd(fd, msg->opcode, msg->payload, msg->len);
--		break;
--	case HAL_SERVICE_ID_PAN:
--		bt_pan_handle_cmd(fd, msg->opcode, msg->payload, msg->len);
--		break;
--	default:
--		ipc_send_rsp(msg->service_id, msg->opcode, HAL_STATUS_FAILED);
--		break;
--	}
--
-+	ipc_handle_msg(buf, ret);
- 	return TRUE;
- 
- fail:
-@@ -568,9 +515,6 @@ int main(int argc, char *argv[])
- 	GError *err = NULL;
- 	guint signal;
- 
--	/* Core Service (ID=0) should always be considered registered */
--	services[0] = true;
--
- 	context = g_option_context_new(NULL);
- 	g_option_context_add_main_entries(context, options, NULL);
- 
-@@ -622,6 +566,9 @@ int main(int argc, char *argv[])
- 	/* Use params: mtu = 0, flags = 0 */
- 	start_sdp_server(0, 0);
- 
-+	ipc_register(HAL_SERVICE_ID_CORE, cmd_handlers,
-+				sizeof(cmd_handlers)/sizeof(cmd_handlers[0]));
 +
- 	DBG("Entering main loop");
- 
- 	event_loop = g_main_loop_new(NULL, FALSE);
-@@ -640,6 +587,8 @@ int main(int argc, char *argv[])
- 	bt_bluetooth_cleanup();
- 	g_main_loop_unref(event_loop);
- 
-+	ipc_unregister(HAL_SERVICE_ID_CORE);
++static struct service_handler services[HAL_SERVICE_ID_MAX + 1];
 +
- 	info("Exit");
+ static int cmd_sk = -1;
+ static int notif_sk = -1;
  
- 	__btd_log_cleanup();
+@@ -124,3 +132,73 @@ void ipc_send_notif(uint8_t service_id, uint8_t opcode,  uint16_t len,
+ 
+ 	ipc_send(notif_sk, service_id, opcode, len, param, -1);
+ }
++
++void ipc_register(uint8_t service, const struct ipc_handler *handlers,
++								uint8_t size)
++{
++	services[service].handler = handlers;
++	services[service].size = size;
++}
++
++void ipc_unregister(uint8_t service)
++{
++	services[service].handler = NULL;
++	services[service].size = 0;
++}
++
++void ipc_handle_msg(const void *buf, ssize_t len)
++{
++	const struct hal_hdr *msg = buf;
++	const struct ipc_handler *handler;
++
++	if (len < (ssize_t) sizeof(*msg)) {
++		error("IPC: message too small (%zd bytes), terminating", len);
++		raise(SIGTERM);
++		return;
++	}
++
++	if (len != (ssize_t) (sizeof(*msg) + msg->len)) {
++		error("IPC: message malformed (%zd bytes), terminating", len);
++		raise(SIGTERM);
++		return;
++	}
++
++	/* if service is valid */
++	if (msg->service_id > HAL_SERVICE_ID_MAX) {
++		error("IPC: unknown service (0x%x), terminating",
++							msg->service_id);
++		raise(SIGTERM);
++		return;
++	}
++
++	/* if service is registered */
++	if (!services[msg->service_id].handler) {
++		error("IPC: unregistered service (0x%x), terminating",
++							msg->service_id);
++		raise(SIGTERM);
++		return;
++	}
++
++	/* if opcode is valid */
++	if (msg->opcode == HAL_OP_STATUS ||
++			msg->opcode > services[msg->service_id].size) {
++		error("IPC: invalid opcode 0x%x for service 0x%x, terminating",
++						msg->opcode, msg->service_id);
++		raise(SIGTERM);
++		return;
++	}
++
++	/* opcode is table offset + 1 */
++	handler = &services[msg->service_id].handler[msg->opcode - 1];
++
++	/* if payload size is valid */
++	if ((handler->var_len && handler->data_len > msg->len) ||
++			(!handler->var_len && handler->data_len != msg->len)) {
++		error("IPC: size invalid opcode 0x%x service 0x%x, terminating",
++						msg->service_id, msg->opcode);
++		raise(SIGTERM);
++		return;
++	}
++
++	handler->handler(msg->payload, msg->len);
++}
+diff --git a/android/ipc.h b/android/ipc.h
+index f66c9e0..9d0c5e1 100644
+--- a/android/ipc.h
++++ b/android/ipc.h
+@@ -21,6 +21,11 @@
+  *
+  */
+ 
++struct ipc_handler {
++	void (*handler) (const void *buf, uint16_t len);
++	bool var_len;
++	size_t data_len;
++};
+ void ipc_init(int command_sk, int notification_sk);
+ void ipc_cleanup(void);
+ 
+@@ -29,3 +34,8 @@ void ipc_send_rsp_full(uint8_t service_id, uint8_t opcode, uint16_t len,
+ 							void *param, int fd);
+ void ipc_send_notif(uint8_t service_id, uint8_t opcode,  uint16_t len,
+ 								void *param);
++void ipc_register(uint8_t service, const struct ipc_handler *handlers,
++								uint8_t size);
++void ipc_unregister(uint8_t service);
++
++void ipc_handle_msg(const void *buf, ssize_t len);
 -- 
 1.8.3.2
 
