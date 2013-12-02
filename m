@@ -1,68 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1386023748.28265.0.camel@pc.interlinx.bc.ca>
-Subject: Re: have to re-pair mouse every few hours
-From: "Brian J. Murrell" <brian@interlinx.bc.ca>
+MIME-Version: 1.0
+Date: Mon, 2 Dec 2013 19:03:31 +0100
+Message-ID: <CALzzRXk2F_3DKysS2SphGw-2WPqK-karYv+YqRiOC75=UJCHhw@mail.gmail.com>
+Subject: Help for USB Dongle Asus USB-BT400 with Raspberry Pi and Bluez
+From: Alessandro Nicolosi <alenico84@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>
-Date: Mon, 02 Dec 2013 17:35:48 -0500
-In-Reply-To: <1385936884.5405.3.camel@nuvo>
-References: <1385843856.12122.5.camel@pc.interlinx.bc.ca>
-	 <1385936884.5405.3.camel@nuvo>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature";
-	boundary="=-a6Zun7N96xbpf/3wkJ9I"
-Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi guys,
 
---=-a6Zun7N96xbpf/3wkJ9I
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I hope this can be the right place where to find help for my problems.
 
-On Sun, 2013-12-01 at 23:28 +0100, Bastien Nocera wrote:=20
->=20
-> Upstream developers don't work on BlueZ 4.x anymore. Any chance for you
-> to test using Fedora 20? It uses BlueZ 5.x which has a lot of fixes and
-> architectural changes compared to 4.x.
+I need to use the dongle Asus USB-BT400 to provide Bluetooth support
+for my Raspberry Pi in which I installed the Raspbian distribution.
+I have to work with Raspberry Pi and a BLE device called SensorTag
+from Texas Instruments. So I have to use the gatttool command from
+Bluez.
+I followed the instructions from this site to set up Bluez in my
+Raspberry Pi with Raspbian.
 
-So, assuming I'm supposed to use something like bluetooth-wizard to
-start the pairing, that doesn't even see my mouse when I have the mouse
-in pairing mode.  It does see a headset if I put it into pairing mode
-though, so basic bluetooth functionality is at least working.  It's just
-not seeing my mouse.
+ http://mike.saunby.net/2013/04/raspberry-pi-and-ti-cc2541-sensortag.html
 
-Unfortunately though F20 is a bit of a nightmare at the moment for me to
-keep it up and running on the workstation where this mouse is having
-problems so being able to test will be difficult as it will mean having
-to switch back and forth between F19 to get work done and F20 where too
-much stuff crashes for it to be usable.  It doesn't help that abrt
-doesn't seem to be even able to install debuginfos so I can't even
-report these crashes.  But I digress.
+I downloaded and installed the last version of Bluez 5.11.
+I plugged in my BLE USB dongle in my Raspberry Pi but I think there
+are some problems.
+When I type in the command "hciconfig" I have no output results.
+And also when I type in "hcitool dev" no devices is listed.
+But when I type in "lsusb" the output is:
 
-I will try to leave this F20 system up for the next little while in case
-there is any debugging you want me to try.
+Bus 001 Device 002: ID 0424:9512 Standard Microsystems Corp.
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 001 Device 003: ID 0424:ec00 Standard Microsystems Corp.
+Bus 001 Device 004: ID 0b05:17cb ASUSTek Computer, Inc.
 
-Cheers,
-b.
+The last one is my USB dongle, so I think the hardware is correctly recognized.
+Which could be my problem?
 
+I also tried the dongle Asus USB-BT400 in my notebook with Xubuntu
+13.10 and it worked very well (hciconfig sees the bluetooth
+interface).
 
+I also read something about my dongle by googling and I found the
+message linked below from this mailing list, so I thought you can help
+me or give me a way forward.
 
---=-a6Zun7N96xbpf/3wkJ9I
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
+http://marc.info/?l=linux-bluetooth&m=137812308709357&w=2
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.15 (GNU/Linux)
+Maybe I can edit some source files to add the device ID? If yes, which
+changes I have to do?
 
-iQEcBAABAgAGBQJSnQtEAAoJENrB0DQWy8igaVIIAI+49zoqVyDSyxLikhqhADBy
-C+xq6ndn+N3QHuD/ObzfTsKuf47PaQvWEF/Dt84IAW1LXunqYtnqS4S4ZH9pgRw/
-D+6iTPZnwEtGaVtBYSmkKxlXu/bBDIWTpoin3mS5gR4F2T9abWS0bWktt5yTyKHR
-Knok7UMd42vUEl5NCkDiee8IPyMvSH6ohw7kmDk/Ox77Mo3FoS2X5Dlh0dhWWqD9
-anyza2+ODOeHvUMf6c+qxCKOfNnH9LkKctpVgKuQ0z0NGOEssvv7GmJ6XKhVJiIJ
-UG68qSqbfTMiSIHMrMPjr/mBLLJmIz+/A2Z8LNPIxG9gKJpofgRIGKB5lxSb8Ec=
-=MAVV
------END PGP SIGNATURE-----
+Thanks in advance for your help
+Regards
 
---=-a6Zun7N96xbpf/3wkJ9I--
-
+-- 
+Alessandro Nicolosi
