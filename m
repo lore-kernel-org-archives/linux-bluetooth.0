@@ -1,52 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 0/9] android: IPC improvements - daemon part
-Date: Mon,  2 Dec 2013 13:20:39 +0100
-Message-Id: <1385986848-8023-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
+Subject: Re: [PATCH 0/2] Bluetooth: A couple of SMP fixes
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1385974144-8836-1-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 2 Dec 2013 13:23:49 +0200
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <633E61D1-DBDF-4003-8CE2-98BFAC324FC1@holtmann.org>
+References: <1385974144-8836-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-v3:
- - rebased againt latest pan changes
+Hi Johan,
 
-v2:
- - rebased against latest IPC helpers improvements
- - more compact command handlers table format
- - error handling path in command handlers improved according to Johan comments
- - randmon small fixes
- - patches not directly related to refactor removed from serie, will
-   be send after this is merged
+> Here are a couple of small tweaks to the SMP code that I've found while
+> browsing through and testing it (with the user space smp-tester).
+> 
+> Johan
+> 
+> Johan Hedberg (2):
+>  Bluetooth: Remove useless smp_rand function
+>  Bluetooth: Remove dead code from SMP encryption function
+> 
+> net/bluetooth/smp.c | 24 +++---------------------
+> 1 file changed, 3 insertions(+), 21 deletions(-)
 
-v1:
-This serie implements IPC message handling iprovments in daemon similar
-to what is already done in HAL part.
+both patches have been applied to bluetooth-next.
 
-Szymon Janc (9):
-  android: Add initial code for IPC message handlers
-  android/main: Use generic IPC message handling for core service
-  android/main: Use common exit path in core service functions
-  android/bluetooth: Use generic IPC msg handling for commands
-  android/bluetooth: Make property handling function return HAL status
-  android/hidhost: Use generic IPC message handling for commands
-  android/pan: Use generic IPC message handling for commands
-  android/a2dp: Use generic IPC message handling for commands
-  android/socket: Use generic IPC message handling for commands
+Regards
 
- android/a2dp.c      |  69 ++++----
- android/a2dp.h      |   2 -
- android/bluetooth.c | 477 ++++++++++++++++++++++++++++++++++------------------
- android/hidhost.c   | 309 ++++++++++++++++++++--------------
- android/hidhost.h   |   2 -
- android/ipc.c       |  78 +++++++++
- android/ipc.h       |  10 ++
- android/main.c      | 123 +++++---------
- android/pan.c       |  87 +++++-----
- android/pan.h       |   2 -
- android/socket.c    | 102 ++++++-----
- 11 files changed, 754 insertions(+), 507 deletions(-)
-
--- 
-1.8.3.2
+Marcel
 
