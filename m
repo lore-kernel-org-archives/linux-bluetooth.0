@@ -1,33 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/4] android/pan: Fix no return on error path
-Date: Mon,  2 Dec 2013 17:46:28 +0200
-Message-Id: <1385999188-1546-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1385999188-1546-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1385999188-1546-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] android: Use G_N_ELEMENTS macro for table elements calculation
+Date: Mon,  2 Dec 2013 16:17:58 +0100
+Message-Id: <1385997478-18883-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-This fixes possible crash in case connect fails.
+It is more common in codebase to use this macro instead of opencoded
+(sizeof(foo)/sizeof(foo[0])).
 ---
- android/pan.c | 1 +
- 1 file changed, 1 insertion(+)
+ android/a2dp.c      | 2 +-
+ android/bluetooth.c | 2 +-
+ android/hidhost.c   | 2 +-
+ android/main.c      | 2 +-
+ android/pan.c       | 2 +-
+ android/socket.c    | 2 +-
+ 6 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/android/pan.c b/android/pan.c
-index 8e719b2..1c1015a 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -172,6 +172,7 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer data)
- 		error("%s", err->message);
- 		bt_pan_notify_conn_state(dev, HAL_PAN_STATE_DISCONNECTED);
- 		pan_device_free(dev);
-+		return;
+diff --git a/android/a2dp.c b/android/a2dp.c
+index 98c138e..cee4bfa 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -377,7 +377,7 @@ bool bt_a2dp_register(const bdaddr_t *addr)
+ 	record_id = rec->handle;
+ 
+ 	ipc_register(HAL_SERVICE_ID_A2DP, cmd_handlers,
+-				sizeof(cmd_handlers)/sizeof(cmd_handlers[0]));
++						G_N_ELEMENTS(cmd_handlers));
+ 
+ 	return true;
+ }
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index a39e7bf..6174b1f 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -2418,7 +2418,7 @@ void bt_bluetooth_register(void)
+ 	DBG("");
+ 
+ 	ipc_register(HAL_SERVICE_ID_BLUETOOTH, cmd_handlers,
+-				sizeof(cmd_handlers)/sizeof(cmd_handlers[0]));
++						G_N_ELEMENTS(cmd_handlers));
+ }
+ 
+ void bt_bluetooth_unregister(void)
+diff --git a/android/hidhost.c b/android/hidhost.c
+index 38194d0..8bfdfed 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -1279,7 +1279,7 @@ bool bt_hid_register(const bdaddr_t *addr)
  	}
  
- 	src = (local_role == HAL_PAN_ROLE_NAP) ? BNEP_SVC_NAP : BNEP_SVC_PANU;
+ 	ipc_register(HAL_SERVICE_ID_HIDHOST, cmd_handlers,
+-				sizeof(cmd_handlers)/sizeof(cmd_handlers[0]));
++						G_N_ELEMENTS(cmd_handlers));
+ 
+ 	return true;
+ }
+diff --git a/android/main.c b/android/main.c
+index b9655c5..5210b4b 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -430,7 +430,7 @@ int main(int argc, char *argv[])
+ 	start_sdp_server(0, 0);
+ 
+ 	ipc_register(HAL_SERVICE_ID_CORE, cmd_handlers,
+-				sizeof(cmd_handlers)/sizeof(cmd_handlers[0]));
++						G_N_ELEMENTS(cmd_handlers));
+ 
+ 	DBG("Entering main loop");
+ 
+diff --git a/android/pan.c b/android/pan.c
+index 3270aa4..fe6ee26 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -322,7 +322,7 @@ bool bt_pan_register(const bdaddr_t *addr)
+ 	}
+ 
+ 	ipc_register(HAL_SERVICE_ID_PAN, cmd_handlers,
+-				sizeof(cmd_handlers)/sizeof(cmd_handlers[0]));
++						G_N_ELEMENTS(cmd_handlers));
+ 
+ 	return true;
+ }
+diff --git a/android/socket.c b/android/socket.c
+index 76b40c8..c9eca44 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -929,7 +929,7 @@ void bt_socket_register(const bdaddr_t *addr)
+ 
+ 	bacpy(&adapter_addr, addr);
+ 	ipc_register(HAL_SERVICE_ID_SOCK, cmd_handlers,
+-				sizeof(cmd_handlers)/sizeof(cmd_handlers[0]));
++						G_N_ELEMENTS(cmd_handlers));
+ }
+ 
+ void bt_socket_unregister(void)
 -- 
 1.8.3.2
 
