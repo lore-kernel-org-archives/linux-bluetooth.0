@@ -1,45 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] android/socket: Cleanup sockets on unregister
-Date: Mon,  2 Dec 2013 17:46:25 +0200
-Message-Id: <1385999188-1546-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 3/4] android/pan: Remove unneeded NULL assignment
+Date: Mon,  2 Dec 2013 17:46:27 +0200
+Message-Id: <1385999188-1546-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1385999188-1546-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1385999188-1546-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This cleans up rfsock structures closing all sockets and making general cleanup
-for servers and for connections. This will be called form socket unregister.
 ---
- android/socket.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ android/pan.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/android/socket.c b/android/socket.c
-index 76b40c8..4502e90 100644
---- a/android/socket.c
-+++ b/android/socket.c
-@@ -93,8 +93,10 @@ static struct rfcomm_sock *create_rfsock(int sock, int *hal_fd)
- 	return rfsock;
+diff --git a/android/pan.c b/android/pan.c
+index 3270aa4..8e719b2 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -81,7 +81,6 @@ static void pan_device_free(struct pan_device *dev)
+ 
+ 	devices = g_slist_remove(devices, dev);
+ 	g_free(dev);
+-	dev = NULL;
  }
  
--static void cleanup_rfsock(struct rfcomm_sock *rfsock)
-+static void cleanup_rfsock(gpointer data)
- {
-+	struct rfcomm_sock *rfsock = data;
-+
- 	DBG("rfsock: %p fd %d real_sock %d chan %u",
- 		rfsock, rfsock->fd, rfsock->real_sock, rfsock->channel);
- 
-@@ -936,5 +938,8 @@ void bt_socket_unregister(void)
- {
- 	DBG("");
- 
-+	g_list_free_full(connections, cleanup_rfsock);
-+	g_list_free_full(servers, cleanup_rfsock);
-+
- 	ipc_unregister(HAL_SERVICE_ID_SOCK);
- }
+ static void bt_pan_notify_conn_state(struct pan_device *dev, uint8_t state)
 -- 
 1.8.3.2
 
