@@ -1,32 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] obex: Fix checking incorrect error code
-Date: Tue,  3 Dec 2013 18:04:54 +0200
-Message-Id: <1386086694-22682-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 5/6] sdp: Remove dead code
+Date: Tue,  3 Dec 2013 17:53:12 +0200
+Message-Id: <1386085993-22055-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1386085993-22055-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1386085993-22055-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-chdir return -1 if error and 0 in success. Checking for > 0 is pointless.
+sdp_next_handle always returns value >= 0x10000.
 ---
- tools/obex-server-tool.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/sdpd-service.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/tools/obex-server-tool.c b/tools/obex-server-tool.c
-index e37c56f..86c2271 100644
---- a/tools/obex-server-tool.c
-+++ b/tools/obex-server-tool.c
-@@ -427,7 +427,7 @@ int main(int argc, char *argv[])
- 		exit(EXIT_FAILURE);
- 	}
+diff --git a/src/sdpd-service.c b/src/sdpd-service.c
+index 38bf808..448c76b 100644
+--- a/src/sdpd-service.c
++++ b/src/sdpd-service.c
+@@ -424,10 +424,6 @@ int service_register_req(sdp_req_t *req, sdp_buf_t *rsp)
  
--	if (option_root && chdir(option_root) > 0) {
-+	if (option_root && chdir(option_root) < 0) {
- 		perror("chdir:");
- 		exit(EXIT_FAILURE);
- 	}
+ 	if (rec->handle == 0xffffffff) {
+ 		rec->handle = sdp_next_handle();
+-		if (rec->handle < 0x10000) {
+-			sdp_record_free(rec);
+-			goto invalid;
+-		}
+ 	} else {
+ 		if (sdp_record_find(rec->handle)) {
+ 			/* extract_pdu_server will add the record handle
 -- 
 1.8.3.2
 
