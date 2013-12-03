@@ -2,12 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Timo Mueller <mail@timomueller.eu>
 To: linux-bluetooth@vger.kernel.org
 Cc: Timo Mueller <timo.mueller@bmw-carit.de>
-Subject: [PATCHv1 2/2] adapter: Introduce default adapter property
-Date: Tue,  3 Dec 2013 16:21:46 +0100
-Message-Id: <66f9ec183ae6d6cdc417e9f659a0963b9310ca65.1386078490.git.timo.mueller@bmw-carit.de>
-In-Reply-To: <1dc8c4e895c1511d82feaf65e33fdf2c93161e5d.1386078490.git.timo.mueller@bmw-carit.de>
+Subject: [PATCHv1 1/2] doc: Introduce default adapter property
+Date: Tue,  3 Dec 2013 16:21:45 +0100
+Message-Id: <1dc8c4e895c1511d82feaf65e33fdf2c93161e5d.1386078490.git.timo.mueller@bmw-carit.de>
+In-Reply-To: <cover.1386078490.git.timo.mueller@bmw-carit.de>
 References: <cover.1386078490.git.timo.mueller@bmw-carit.de>
- <1dc8c4e895c1511d82feaf65e33fdf2c93161e5d.1386078490.git.timo.mueller@bmw-carit.de>
 In-Reply-To: <cover.1386078490.git.timo.mueller@bmw-carit.de>
 References: <cover.1386078490.git.timo.mueller@bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -24,49 +23,26 @@ adapter has been specified. This allows them to change the properties
 of the adapter beforehand, e.g. powering the adapter before oob data
 is sent.
 ---
- src/adapter.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ doc/adapter-api.txt | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 41f7bd6..46174d6 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2126,6 +2126,17 @@ static gboolean property_get_modalias(const GDBusPropertyTable *property,
- 	return TRUE;
- }
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 74d235a..9990432 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -153,3 +153,12 @@ Properties	string Address [readonly]
  
-+static gboolean property_get_default(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
-+{
-+	struct btd_adapter *adapter = user_data;
-+	dbus_bool_t is_default = btd_adapter_is_default(adapter);
+ 			Local Device ID information in modalias format
+ 			used by the kernel and udev.
 +
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &is_default);
++		boolean Default [readonly]
 +
-+	return TRUE;
-+}
++			Indicates that the adapter is the default adapter. The
++			default adapter is used when multiple adapters exist and
++			no specific adapter has been selected.
 +
- static int device_path_cmp(gconstpointer a, gconstpointer b)
- {
- 	const struct btd_device *device = a;
-@@ -2193,6 +2204,7 @@ static const GDBusPropertyTable adapter_properties[] = {
- 	{ "UUIDs", "as", property_get_uuids },
- 	{ "Modalias", "s", property_get_modalias, NULL,
- 					property_exists_modalias },
-+	{ "Default", "b", property_get_default },
- 	{ }
- };
- 
-@@ -5673,6 +5685,9 @@ static int adapter_unregister(struct btd_adapter *adapter)
- 			new_default = adapters->data;
- 
- 		new_default->is_default = true;
-+
-+		g_dbus_emit_property_changed(dbus_conn, new_default->path,
-+				ADAPTER_INTERFACE, "Default");
- 	}
- 
- 	adapter_list = g_list_remove(adapter_list, adapter);
++			In case the default adapter is removed, one of the
++			remaining adapters will become the new default adapter.
 -- 
 1.8.3.1
 
