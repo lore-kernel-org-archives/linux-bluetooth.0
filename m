@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/6] android/pan: Remove unneeded NULL assignment
-Date: Tue,  3 Dec 2013 17:53:09 +0200
-Message-Id: <1386085993-22055-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 6/6] avdtp: Remove unneeded local variable
+Date: Tue,  3 Dec 2013 17:53:13 +0200
+Message-Id: <1386085993-22055-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1386085993-22055-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1386085993-22055-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,21 +12,41 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/pan.c | 1 -
- 1 file changed, 1 deletion(-)
+ profiles/audio/avdtp.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/android/pan.c b/android/pan.c
-index fe6ee26..87fa4e8 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -81,7 +81,6 @@ static void pan_device_free(struct pan_device *dev)
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index f866b39..e12ad9d 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -773,10 +773,9 @@ static int get_send_buffer_size(int sk)
+ 	socklen_t optlen = sizeof(size);
  
- 	devices = g_slist_remove(devices, dev);
- 	g_free(dev);
--	dev = NULL;
- }
+ 	if (getsockopt(sk, SOL_SOCKET, SO_SNDBUF, &size, &optlen) < 0) {
+-		int err = -errno;
+-		error("getsockopt(SO_SNDBUF) failed: %s (%d)", strerror(-err),
+-									-err);
+-		return err;
++		error("getsockopt(SO_SNDBUF) failed: %s (%d)", strerror(errno),
++									errno);
++		return -errno;
+ 	}
  
- static void bt_pan_notify_conn_state(struct pan_device *dev, uint8_t state)
+ 	/*
+@@ -792,10 +791,9 @@ static int set_send_buffer_size(int sk, int size)
+ 	socklen_t optlen = sizeof(size);
+ 
+ 	if (setsockopt(sk, SOL_SOCKET, SO_SNDBUF, &size, optlen) < 0) {
+-		int err = -errno;
+-		error("setsockopt(SO_SNDBUF) failed: %s (%d)", strerror(-err),
+-									-err);
+-		return err;
++		error("setsockopt(SO_SNDBUF) failed: %s (%d)", strerror(errno),
++									errno);
++		return -errno;
+ 	}
+ 
+ 	return 0;
 -- 
 1.8.3.2
 
