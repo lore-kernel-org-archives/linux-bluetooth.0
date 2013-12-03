@@ -1,25 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Timo Mueller <mail@timomueller.eu>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 0/4] Socket optimization
-Date: Tue,  3 Dec 2013 17:51:09 +0200
-Message-Id: <1386085873-21715-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Timo Mueller <timo.mueller@bmw-carit.de>
+Subject: [PATCHv1 0/2] Introduce default adapter property
+Date: Tue,  3 Dec 2013 16:21:44 +0100
+Message-Id: <cover.1386078490.git.timo.mueller@bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Timo Mueller <timo.mueller@bmw-carit.de>
 
-These patches add socket optimization wrt to buffer size.
+Hi,
 
-Andrei Emeltchenko (4):
-  android/socket: Cleanup sockets on unregister
-  android/socket Use 64K buffer for socket handling
-  android/socket: Use heap instead of stack
-  android/socket: Setup socket buffer sizes
+the information about the default adapter is currently not available
+through the D-Bus API of BlueZ. But as plugins can use this
+information to choose the adapter they act upon it would be helpful
+for users to be able to retrieve this information as well.
 
- android/socket.c | 37 ++++++++++++++++++++++++++++++-------
- 1 file changed, 30 insertions(+), 7 deletions(-)
+For example the neard plugin uses this information to decide for which
+adapter oob data is generated. Users could use the same information to
+power the adapter before actually sending the oob data.
+
+Best regards,
+Timo
+
+Timo Mueller (2):
+  doc: Introduce default adapter property
+  adapter: Introduce default adapter property
+
+ doc/adapter-api.txt |  9 +++++++++
+ src/adapter.c       | 15 +++++++++++++++
+ 2 files changed, 24 insertions(+)
 
 -- 
-1.8.3.2
+1.8.3.1
 
