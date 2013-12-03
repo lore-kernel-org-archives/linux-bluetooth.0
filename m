@@ -1,64 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJvw0v8-xJkbh5_92EszcUeU23L4FDnEd6BQJ01GD2-aw@mail.gmail.com>
-References: <1386063385-31263-1-git-send-email-luiz.dentz@gmail.com>
-	<CAJdJm_M5nf5L-efYVtY-4UYT2S4JRypGKYgu7PoVOz9DFxBS6g@mail.gmail.com>
-	<CABBYNZJvw0v8-xJkbh5_92EszcUeU23L4FDnEd6BQJ01GD2-aw@mail.gmail.com>
-Date: Tue, 3 Dec 2013 08:22:59 -0400
-Message-ID: <CAJdJm_Nj+V2oFAg6SoyN2Tqu95rg0K=e2m5VUG61yF43BnaF2g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] audio/AVCTP: Fix crash
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1385997478-18883-1-git-send-email-szymon.janc@tieto.com>
+References: <1385997478-18883-1-git-send-email-szymon.janc@tieto.com>
+Date: Tue, 3 Dec 2013 14:10:15 +0200
+Message-ID: <CABBYNZLDSE0Ef9--XNdgKEtvDBQGPaqieuDgiiQyKpmFtDKi3A@mail.gmail.com>
+Subject: Re: [PATCH] android: Use G_N_ELEMENTS macro for table elements calculation
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Szymon,
 
-On Tue, Dec 3, 2013 at 7:40 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Anderson,
+On Mon, Dec 2, 2013 at 5:17 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> It is more common in codebase to use this macro instead of opencoded
+> (sizeof(foo)/sizeof(foo[0])).
+> ---
+>  android/a2dp.c      | 2 +-
+>  android/bluetooth.c | 2 +-
+>  android/hidhost.c   | 2 +-
+>  android/main.c      | 2 +-
+>  android/pan.c       | 2 +-
+>  android/socket.c    | 2 +-
+>  6 files changed, 6 insertions(+), 6 deletions(-)
 >
-> On Tue, Dec 3, 2013 at 1:24 PM, Anderson Lizardo
-> <anderson.lizardo@openbossa.org> wrote:
->> Hi Luiz,
->>
->> On Tue, Dec 3, 2013 at 5:36 AM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> --- a/profiles/audio/avctp.c
->>> +++ b/profiles/audio/avctp.c
->>> @@ -1488,7 +1488,7 @@ static struct avctp_pending_req *pending_create(struct avctp_channel *chan,
->>>         tmp = g_slist_copy(chan->processed);
->>>
->>>         /* Find first unused transaction id */
->>> -       for (l = tmp; l; l = l->next) {
->>> +       for (l = tmp; l; l = g_slist_next(l)) {
->>
->> Are you sure this fixes the problem? AFAIK g_list_next() will still
->> access invalid memory unless the "next" pointer is saved *before* the
->> current entry is freed. See e.g. remove_temp_devices() in
->> src/adapter.c.
+> diff --git a/android/a2dp.c b/android/a2dp.c
+> index 98c138e..cee4bfa 100644
+> --- a/android/a2dp.c
+> +++ b/android/a2dp.c
+> @@ -377,7 +377,7 @@ bool bt_a2dp_register(const bdaddr_t *addr)
+>         record_id = rec->handle;
 >
-> Yep, I tested and it fixes the problem. The problem is not actually
-> removing the item, but reassigning tmp to the head of the list which
-> can be NULL so doing l = l->next before deleting the node doesn't help
-> in this case. Anyway this is now applied but we will be changing the
-> logic how to check the available transaction to use bitmask operations
-> so we find the next transaction without looping in a list.
+>         ipc_register(HAL_SERVICE_ID_A2DP, cmd_handlers,
+> -                               sizeof(cmd_handlers)/sizeof(cmd_handlers[0]));
+> +                                               G_N_ELEMENTS(cmd_handlers));
+>
+>         return true;
+>  }
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index a39e7bf..6174b1f 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -2418,7 +2418,7 @@ void bt_bluetooth_register(void)
+>         DBG("");
+>
+>         ipc_register(HAL_SERVICE_ID_BLUETOOTH, cmd_handlers,
+> -                               sizeof(cmd_handlers)/sizeof(cmd_handlers[0]));
+> +                                               G_N_ELEMENTS(cmd_handlers));
+>  }
+>
+>  void bt_bluetooth_unregister(void)
+> diff --git a/android/hidhost.c b/android/hidhost.c
+> index 38194d0..8bfdfed 100644
+> --- a/android/hidhost.c
+> +++ b/android/hidhost.c
+> @@ -1279,7 +1279,7 @@ bool bt_hid_register(const bdaddr_t *addr)
+>         }
+>
+>         ipc_register(HAL_SERVICE_ID_HIDHOST, cmd_handlers,
+> -                               sizeof(cmd_handlers)/sizeof(cmd_handlers[0]));
+> +                                               G_N_ELEMENTS(cmd_handlers));
+>
+>         return true;
+>  }
+> diff --git a/android/main.c b/android/main.c
+> index b9655c5..5210b4b 100644
+> --- a/android/main.c
+> +++ b/android/main.c
+> @@ -430,7 +430,7 @@ int main(int argc, char *argv[])
+>         start_sdp_server(0, 0);
+>
+>         ipc_register(HAL_SERVICE_ID_CORE, cmd_handlers,
+> -                               sizeof(cmd_handlers)/sizeof(cmd_handlers[0]));
+> +                                               G_N_ELEMENTS(cmd_handlers));
+>
+>         DBG("Entering main loop");
+>
+> diff --git a/android/pan.c b/android/pan.c
+> index 3270aa4..fe6ee26 100644
+> --- a/android/pan.c
+> +++ b/android/pan.c
+> @@ -322,7 +322,7 @@ bool bt_pan_register(const bdaddr_t *addr)
+>         }
+>
+>         ipc_register(HAL_SERVICE_ID_PAN, cmd_handlers,
+> -                               sizeof(cmd_handlers)/sizeof(cmd_handlers[0]));
+> +                                               G_N_ELEMENTS(cmd_handlers));
+>
+>         return true;
+>  }
+> diff --git a/android/socket.c b/android/socket.c
+> index 76b40c8..c9eca44 100644
+> --- a/android/socket.c
+> +++ b/android/socket.c
+> @@ -929,7 +929,7 @@ void bt_socket_register(const bdaddr_t *addr)
+>
+>         bacpy(&adapter_addr, addr);
+>         ipc_register(HAL_SERVICE_ID_SOCK, cmd_handlers,
+> -                               sizeof(cmd_handlers)/sizeof(cmd_handlers[0]));
+> +                                               G_N_ELEMENTS(cmd_handlers));
+>  }
+>
+>  void bt_socket_unregister(void)
+> --
+> 1.8.3.2
 
-In this case I agree that it is not the same situation as I described.
-I was looking only at the patch itself, not the original code :/ In
-any case, good to know you are going to simplify it.
+Applied, thanks.
 
-BTW, I noticed that the "chan->transaction %= 16;"  in that same
-function (in two places) is unnecessary, because chan->transaction is
-"uint8_t transaction:4" (4-bit bitfield) so the post increment
-operation before this statement will always overflow "transaction" and
-it will go back to 0 once it reaches 15.
-
-Best Regards,
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Luiz Augusto von Dentz
