@@ -1,60 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <529E18ED.3040701@laurendeau.net>
+Date: Tue, 03 Dec 2013 18:46:21 +0100
+From: Mathieu Laurendeau <mathieu@laurendeau.net>
 MIME-Version: 1.0
-In-Reply-To: <1386085993-22055-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1386085993-22055-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Tue, 3 Dec 2013 21:53:43 +0200
-Message-ID: <CABBYNZKRWtCvq_yg7dT+2iJFL5rvPauiOkqYP3diCc_6TN_SkA@mail.gmail.com>
-Subject: Re: [PATCH 1/6] android/a2dp: Fix possible NULL dereference
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: Missing BT_POWER option for l2cap sockets in bluetooth.h?
+References: <529CEC22.60107@laurendeau.net> <20131203092228.GA9498@x220.p-661hnu-f1>
+In-Reply-To: <20131203092228.GA9498@x220.p-661hnu-f1>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+On Tue, Dec 03, 2013, Johan Hedberg wrote:
+> What are you planning to use this for?
+I'm working on a software [1] that can make a PC take the identity of a 
+Sixaxis and control a PS3 over bluetooth. It worked fine until kernel 
+3.1 from which there was a connection issue (a variable latency of at 
+least 4s). I tried tweaking the flush timeout, but it was not 
+concluding. Lately I took a look at the kernel source code and saw the 
+BT_POWER option was introduced in kernel 3.1. I turned it off and the 
+latency disappeared.
 
-On Tue, Dec 3, 2013 at 5:53 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Since a2dp_record may return NULL, check return value. This
-> silences static analysers tools.
-> ---
->  android/a2dp.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/android/a2dp.c b/android/a2dp.c
-> index cee4bfa..36a0714 100644
-> --- a/android/a2dp.c
-> +++ b/android/a2dp.c
-> @@ -366,9 +366,10 @@ bool bt_a2dp_register(const bdaddr_t *addr)
->         }
->
->         rec = a2dp_record();
-> -       if (bt_adapter_add_record(rec, SVC_HINT_CAPTURING) < 0) {
-> +       if (!rec || bt_adapter_add_record(rec, SVC_HINT_CAPTURING) < 0) {
+Thanks for the patch,
 
-Usually we check the return individually, that means you do if (rec)
-and perhaps handle the error path with goto, but first make sure that
-a2dp_record can actually fail otherwise this is pointless.
+Mathieu
 
->                 error("Failed to register on A2DP record");
-> -               sdp_record_free(rec);
-> +               if (rec)
-> +                       sdp_record_free(rec);
->                 g_io_channel_shutdown(server, TRUE, NULL);
->                 g_io_channel_unref(server);
->                 server = NULL;
-> --
-> 1.8.3.2
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Luiz Augusto von Dentz
+[1] https://github.com/matlo/GIMX
