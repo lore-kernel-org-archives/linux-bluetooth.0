@@ -1,41 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1386063385-31263-1-git-send-email-luiz.dentz@gmail.com>
-References: <1386063385-31263-1-git-send-email-luiz.dentz@gmail.com>
-Date: Tue, 3 Dec 2013 07:24:11 -0400
-Message-ID: <CAJdJm_M5nf5L-efYVtY-4UYT2S4JRypGKYgu7PoVOz9DFxBS6g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] audio/AVCTP: Fix crash
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/socket Use 64K buffer for socket handling
+Date: Tue,  3 Dec 2013 12:17:36 +0200
+Message-Id: <1386065856-24911-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Tue, Dec 3, 2013 at 5:36 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> --- a/profiles/audio/avctp.c
-> +++ b/profiles/audio/avctp.c
-> @@ -1488,7 +1488,7 @@ static struct avctp_pending_req *pending_create(struct avctp_channel *chan,
->         tmp = g_slist_copy(chan->processed);
->
->         /* Find first unused transaction id */
-> -       for (l = tmp; l; l = l->next) {
-> +       for (l = tmp; l; l = g_slist_next(l)) {
+Make SOCKET_BUFFER define and use 64K instead of 1K.
+---
+ android/socket.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-Are you sure this fixes the problem? AFAIK g_list_next() will still
-access invalid memory unless the "next" pointer is saved *before* the
-current entry is freed. See e.g. remove_temp_devices() in
-src/adapter.c.
-
->                 struct avctp_pending_req *req = l->data;
->
->                 if (req->transaction == chan->transaction) {
-
-Best Regards,
+diff --git a/android/socket.c b/android/socket.c
+index 4502e90..598d248 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -52,6 +52,8 @@
+ 
+ #define SVC_HINT_OBEX 0x10
+ 
++#define SOCKET_BUFFER 65536
++
+ static bdaddr_t adapter_addr;
+ 
+ /* Simple list of RFCOMM server sockets */
+@@ -487,7 +489,7 @@ static gboolean sock_stack_event_cb(GIOChannel *io, GIOCondition cond,
+ 								gpointer data)
+ {
+ 	struct rfcomm_sock *rfsock = data;
+-	unsigned char buf[1024];
++	unsigned char buf[SOCKET_BUFFER];
+ 	int len, sent;
+ 
+ 	if (cond & G_IO_HUP) {
+@@ -526,7 +528,7 @@ static gboolean sock_rfcomm_event_cb(GIOChannel *io, GIOCondition cond,
+ 								gpointer data)
+ {
+ 	struct rfcomm_sock *rfsock = data;
+-	unsigned char buf[1024];
++	unsigned char buf[SOCKET_BUFFER];
+ 	int len, sent;
+ 
+ 	if (cond & G_IO_HUP) {
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.8.3.2
+
