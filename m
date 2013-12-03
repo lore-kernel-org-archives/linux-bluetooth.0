@@ -1,45 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] audio/AVCTP: Fix crash
-Date: Tue,  3 Dec 2013 11:36:25 +0200
-Message-Id: <1386063385-31263-1-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 3 Dec 2013 11:22:28 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Mathieu Laurendeau <mathieu@laurendeau.net>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Missing BT_POWER option for l2cap sockets in bluetooth.h?
+Message-ID: <20131203092228.GA9498@x220.p-661hnu-f1>
+References: <529CEC22.60107@laurendeau.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <529CEC22.60107@laurendeau.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Mathieu,
 
-The following crash happens because the list l is modified within the
-loop so it is no longer safe to call l->next directly:
+On Mon, Dec 02, 2013, Mathieu Laurendeau wrote:
+> I believe the following defines are missing in the bluetooth.h file:
+> 
+> #define BT_POWER        9
+> struct bt_power {
+>         uint8_t force_active;
+> };
+> #define BT_POWER_FORCE_ACTIVE_OFF 0
+> #define BT_POWER_FORCE_ACTIVE_ON 1
 
-Invalid read of size 8
-   at 0x41F276: pending_create (avctp.c:1491)
-   by 0x41F7C0: avctp_send_req.isra.6 (avctp.c:1539)
-   by 0x41F887: avctp_passthrough_release (avctp.c:1643)
-   by 0x41F9DF: avctp_passthrough_rsp (avctp.c:1698)
-   by 0x41E9AC: session_cb (avctp.c:782)
-   by 0x31D1647DF5: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.3600.3)
-   by 0x31D1648147: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
-   by 0x31D1648549: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.3600.3)
-   by 0x40A49F: main (main.c:587)
- Address 0x8 is not stack'd, malloc'd or (recently) free'd
----
- profiles/audio/avctp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I think the only user of this has been pre-4.2 Android versions
+(considering that the feature came from Android developers), which is
+probably why this never made it to bluez.git. Anyway, I just pushed a
+patch to add it there.
 
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 4de981c..6669ddc 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -1488,7 +1488,7 @@ static struct avctp_pending_req *pending_create(struct avctp_channel *chan,
- 	tmp = g_slist_copy(chan->processed);
- 
- 	/* Find first unused transaction id */
--	for (l = tmp; l; l = l->next) {
-+	for (l = tmp; l; l = g_slist_next(l)) {
- 		struct avctp_pending_req *req = l->data;
- 
- 		if (req->transaction == chan->transaction) {
--- 
-1.8.3.1
+What are you planning to use this for? Do you have a patch to contribute
+to our A2DP implementation?
 
+Johan
