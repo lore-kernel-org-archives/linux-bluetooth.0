@@ -1,67 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Tue, 3 Dec 2013 14:38:17 -0800
-Message-ID: <CAEsx0Y9WEbK=dDdonn016SLA9vGRMc99qPasntEtRZq-+QkVpQ@mail.gmail.com>
-Subject: cross compiling bluez 4.101
-From: Daniel Schultze <kinglag@gmail.com>
+Message-ID: <1386107032.8730.22.camel@pc.interlinx.bc.ca>
+Subject: Re: have to re-pair mouse every few hours (update: mouse needs
+ periodic authorization?)
+From: "Brian J. Murrell" <brian@interlinx.bc.ca>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Date: Tue, 03 Dec 2013 16:43:52 -0500
+In-Reply-To: <1385843856.12122.5.camel@pc.interlinx.bc.ca>
+References: <1385843856.12122.5.camel@pc.interlinx.bc.ca>
+Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature";
+	boundary="=-uigWSC4d8dfvLscFbgM5"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Developers,
 
-I'm having a bit of trouble cross compiling bluez 4.101 with an older
-kernel 2.6.31. I'm using:
+--=-uigWSC4d8dfvLscFbgM5
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-me@buildmachine:~/tmp/bluez-4.101$ arm-none-linux-gnueabi-gcc --version
-arm-none-linux-gnueabi-gcc (GCC) 4.1.2
-Copyright (C) 2006 Free Software Foundation, Inc.
-This is free software; see the source for copying conditions.  There is NO
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+On Sat, 2013-11-30 at 15:37 -0500, Brian J. Murrell wrote:=20
+> Hi,
+>=20
+> I'm using a Microsoft Sculpt Touch Mouse on a Fedora 19 machine
+> (kernel-3.11.9-200.fc19.x86_64 and bluez-4.101-9.fc19.x86_64) with a:
+>=20
+> Bus 002 Device 019: ID 0a5c:2148 Broadcom Corp. BCM92046DG-CL1ROM Bluetoo=
+th 2.1 Adapter
+>=20
+> bluetooth adapter.  This exact same configuration worked for months just
+> fine with a Logitech bluetooth mouse.  But sadly that mouse was crap
+> (second one to fail within the warranty period of one of them) so
+> replaced it with this MS one.
+>=20
+> The problem with this MS mouse is that it just goes AWOL and needs to be
+> delete and re-paired with the machine every few hours.  Typically it's
+> after I have gotten up from the computer and have come back to it.  But
+> I have also had it just happen while using it.
+>=20
+> When this happens, the messages log reports messages such as:
+>=20
+> Nov 30 12:42:03 pc kernel: [2500032.028982] Bluetooth: Unexpected continu=
+ation frame (len 0)
+> Nov 30 12:42:03 pc kernel: [2500032.115027] Bluetooth: Unexpected continu=
+ation frame (len 0)
+>=20
+> Any ideas what the problem might be here?
 
-I'll admit its a bit old but, its what I have to work with. In
-addition I have built glibc 2.10.1, glib 2.28.8, and dbus 1.4.26
-successfully to fulfill bluez's prerequisites.
+So an interesting development in this is that after a reboot, I am now
+starting to see notification bubbles pop up when the mouse goes AWOL
+that say:
 
-This is error I'm getting:
+Authorization request from 'Microsoft Sculpt Touch Mouse' with a "Check
+authorization" button it.  When I click that I get a dialog popping up
+that says:
 
-  CCLD   src/bluetoothd
-attrib/bluetoothd-gatt.o: In function `read_long_destroy':
-gatt.c:(.text+0xfec): undefined reference to `__sync_fetch_and_sub_4'
-attrib/bluetoothd-gatt.o: In function `read_blob_helper':
-gatt.c:(.text+0x121c): undefined reference to `__sync_fetch_and_add_4'
-attrib/bluetoothd-gatt.o: In function `read_char_helper':
-gatt.c:(.text+0x13e8): undefined reference to `__sync_fetch_and_add_4'
-attrib/bluetoothd-gatt.o: In function `gatt_read_char':
-gatt.c:(.text+0x15d8): undefined reference to `__sync_fetch_and_add_4'
-attrib/bluetoothd-gattrib.o: In function `g_attrib_ref':
-gattrib.c:(.text+0x1fc): undefined reference to `__sync_fetch_and_add_4'
-attrib/bluetoothd-gattrib.o: In function `g_attrib_unref':
-gattrib.c:(.text+0x528): undefined reference to `__sync_fetch_and_sub_4'
-collect2: ld returned 1 exit status
-make[1]: *** [src/bluetoothd] Error 1
-make: *** [all] Error 2
+Grant access to '<uuid>'
 
-and I have configured using this line (for building outside of ltib):
+Device 'Microsoft Sculpt Touch Mouse' (<MAC address>) wants access to
+the service '<uuid>'.
 
-./configure CFLAGS="--sysroot=/home/me/ltib_me/rootfs -march=armv5te"
---prefix=/usr --build=$MACHTYPE --host=arm-none-linux-gnueabi
---disable-alsa --disable-audio --enable-gatt --disable-pcmcia
---disable-gstreamer
+With both a Reject and a Grant button as well as an "Always grant
+access" checkbox.
 
-and the build machine is:
+Clicking Grant restores the functionality of the mouse and clearly I
+could click the Always grant access checkbox to have this automatic.
 
-me@buildmachine:~/tmp/bluez-4.101$ echo $MACHTYPE
-i686-pc-linux-gnu
-me@buildmachine:~/tmp/bluez-4.101$ uname -a
-Linux buildmachine 3.0.0-12-generic-pae #20-Ubuntu SMP Fri Oct 7
-16:37:17 UTC 2011 i686 i686 i386 GNU/Linux
-me@buildmachine:~/tmp/bluez-4.101$ lsb_release -a
-No LSB modules are available.
-Distributor ID: Ubuntu
-Description: Ubuntu 11.10
-Release: 11.10
-Codename: oneiric
+I just wonder what this functionality is.  I never had it with my
+previous Logitech bluetooth mouse.
 
-Any help on resolving this error would be appreciated.
+Cheers,
+b.
+
+
+--=-uigWSC4d8dfvLscFbgM5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.15 (GNU/Linux)
+
+iQEcBAABAgAGBQJSnlCYAAoJENrB0DQWy8ig56AIAJPW+4Q52aFqw3uM7SNGDsgc
+o9S7vN196eegIwE9U0ofK4Gm4k17nYqdwT8tswFy2vHL39cosOdBJviuwNLzoxKu
+f+Jre2kxsXS9xu2uYqrGTMNndBSgU8Cb954TxPLJJUO0Y6HkfqJT5fLHlJqpq5YR
+5ekJC1NgMerVYeUGthAzLy7ltJo5dMB6MYF1SbtcvOEAbD8m2jjdEQNeGWtJIUBy
+gV6w9lZXAtaW/2AUrLfqFfcMRUXHY9OopXpMm1X5tTdMaMQDhkJX3Do8/awZ1M+O
+iWxNAX5btKufpIibc6zNGgBaa6aNVhZt7uCtWcWwAVc/0XMrfHPISa3lJnHpFC4=
+=4PV8
+-----END PGP SIGNATURE-----
+
+--=-uigWSC4d8dfvLscFbgM5--
+
