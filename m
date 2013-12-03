@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 4/4] android/socket: Setup socket buffer sizes
-Date: Tue,  3 Dec 2013 17:51:13 +0200
-Message-Id: <1386085873-21715-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 3/4] android/socket: Use heap instead of stack
+Date: Tue,  3 Dec 2013 17:51:12 +0200
+Message-Id: <1386085873-21715-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1386085873-21715-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1386085873-21715-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,42 +11,92 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Set socket buffer sizes for socketpair's end and real RFCOMM socket
-equal to SOCKET_BUFFER.
+Keep buffer used in socket copy in heap instead of stack.
 ---
- android/socket.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ android/socket.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
 diff --git a/android/socket.c b/android/socket.c
-index 6293b59..3898767 100644
+index 9ff9019..6293b59 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -82,6 +82,9 @@ static struct rfcomm_sock *create_rfsock(int sock, int *hal_fd)
- {
- 	int fds[2] = {-1, -1};
- 	struct rfcomm_sock *rfsock;
-+	socklen_t len = sizeof(int);
-+	int size = SOCKET_BUFFER;
-+	int i;
+@@ -73,6 +73,8 @@ struct rfcomm_sock {
+ 	bdaddr_t dst;
+ 	uint32_t service_handle;
  
- 	if (socketpair(AF_LOCAL, SOCK_STREAM, 0, fds) < 0) {
- 		error("socketpair(): %s", strerror(errno));
-@@ -94,6 +97,15 @@ static struct rfcomm_sock *create_rfsock(int sock, int *hal_fd)
++	unsigned char *buf;
++
+ 	const struct profile_info *profile;
+ };
+ 
+@@ -92,6 +94,8 @@ static struct rfcomm_sock *create_rfsock(int sock, int *hal_fd)
  	*hal_fd = fds[1];
  	rfsock->real_sock = sock;
  
-+	for (i = 0; i < 2; i++) {
-+		if (setsockopt(fds[i], SOL_SOCKET, SO_SNDBUF, &size, len) < 0)
-+			warn("setsockopt() SO_SNDBUF fd: %d %s", fds[i],
-+							strerror(errno));
-+		if (setsockopt(fds[i], SOL_SOCKET, SO_RCVBUF, &size, len) < 0)
-+			warn("setsockopt() SO_RCVBUF fd: %d %s", fds[i],
-+							strerror(errno));
-+	}
++	rfsock->buf = g_malloc(SOCKET_BUFFER);
 +
- 	rfsock->buf = g_malloc(SOCKET_BUFFER);
- 
  	return rfsock;
+ }
+ 
+@@ -123,6 +127,8 @@ static void cleanup_rfsock(gpointer data)
+ 	if (rfsock->service_handle)
+ 		bt_adapter_remove_record(rfsock->service_handle);
+ 
++	g_free(rfsock->buf);
++
+ 	g_free(rfsock);
+ }
+ 
+@@ -489,7 +495,6 @@ static gboolean sock_stack_event_cb(GIOChannel *io, GIOCondition cond,
+ 								gpointer data)
+ {
+ 	struct rfcomm_sock *rfsock = data;
+-	unsigned char buf[SOCKET_BUFFER];
+ 	int len, sent;
+ 
+ 	if (cond & G_IO_HUP) {
+@@ -503,14 +508,14 @@ static gboolean sock_stack_event_cb(GIOChannel *io, GIOCondition cond,
+ 		goto fail;
+ 	}
+ 
+-	len = read(rfsock->fd, buf, sizeof(buf));
++	len = read(rfsock->fd, rfsock->buf, SOCKET_BUFFER);
+ 	if (len <= 0) {
+ 		error("read(): %s", strerror(errno));
+ 		/* Read again */
+ 		return TRUE;
+ 	}
+ 
+-	sent = try_write_all(rfsock->real_sock, buf, len);
++	sent = try_write_all(rfsock->real_sock, rfsock->buf, len);
+ 	if (sent < 0) {
+ 		error("write(): %s", strerror(errno));
+ 		goto fail;
+@@ -528,7 +533,6 @@ static gboolean sock_rfcomm_event_cb(GIOChannel *io, GIOCondition cond,
+ 								gpointer data)
+ {
+ 	struct rfcomm_sock *rfsock = data;
+-	unsigned char buf[SOCKET_BUFFER];
+ 	int len, sent;
+ 
+ 	if (cond & G_IO_HUP) {
+@@ -542,14 +546,14 @@ static gboolean sock_rfcomm_event_cb(GIOChannel *io, GIOCondition cond,
+ 		goto fail;
+ 	}
+ 
+-	len = read(rfsock->real_sock, buf, sizeof(buf));
++	len = read(rfsock->real_sock, rfsock->buf, SOCKET_BUFFER);
+ 	if (len <= 0) {
+ 		error("read(): %s", strerror(errno));
+ 		/* Read again */
+ 		return TRUE;
+ 	}
+ 
+-	sent = try_write_all(rfsock->fd, buf, len);
++	sent = try_write_all(rfsock->fd, rfsock->buf, len);
+ 	if (sent < 0) {
+ 		error("write(): %s", strerror(errno));
+ 		goto fail;
 -- 
 1.8.3.2
 
