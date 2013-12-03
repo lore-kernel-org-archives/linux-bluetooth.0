@@ -1,48 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Timo Mueller <mail@timomueller.eu>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Timo Mueller <timo.mueller@bmw-carit.de>
-Subject: [PATCHv1 1/2] doc: Introduce default adapter property
-Date: Tue,  3 Dec 2013 16:21:45 +0100
-Message-Id: <1dc8c4e895c1511d82feaf65e33fdf2c93161e5d.1386078490.git.timo.mueller@bmw-carit.de>
-In-Reply-To: <cover.1386078490.git.timo.mueller@bmw-carit.de>
-References: <cover.1386078490.git.timo.mueller@bmw-carit.de>
-In-Reply-To: <cover.1386078490.git.timo.mueller@bmw-carit.de>
-References: <cover.1386078490.git.timo.mueller@bmw-carit.de>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] android: Fix missing failure check in ipc_init
+Date: Tue,  3 Dec 2013 13:42:08 +0100
+Message-Id: <1386074528-8020-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Timo Mueller <timo.mueller@bmw-carit.de>
-
-Some plugins choose a default adapter when no specific adapter has
-been selected. This information was not exposed in the adapters D-Bus
-properties.
-
-With the new property users can find out which adapter is used if no
-adapter has been specified. This allows them to change the properties
-of the adapter beforehand, e.g. powering the adapter before oob data
-is sent.
+If connecting command socket failed daemon should be terminated.
 ---
- doc/adapter-api.txt | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ android/ipc.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index 74d235a..9990432 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -153,3 +153,12 @@ Properties	string Address [readonly]
+diff --git a/android/ipc.c b/android/ipc.c
+index 1d369a8..6f940cd 100644
+--- a/android/ipc.c
++++ b/android/ipc.c
+@@ -229,6 +229,8 @@ static gboolean cmd_connect_cb(GIOChannel *io, GIOCondition cond,
+ void ipc_init(void)
+ {
+ 	cmd_io = connect_hal(cmd_connect_cb);
++	if (!cmd_io)
++		raise(SIGTERM);
+ }
  
- 			Local Device ID information in modalias format
- 			used by the kernel and udev.
-+
-+		boolean Default [readonly]
-+
-+			Indicates that the adapter is the default adapter. The
-+			default adapter is used when multiple adapters exist and
-+			no specific adapter has been selected.
-+
-+			In case the default adapter is removed, one of the
-+			remaining adapters will become the new default adapter.
+ void ipc_cleanup(void)
 -- 
-1.8.3.1
+1.8.3.2
 
