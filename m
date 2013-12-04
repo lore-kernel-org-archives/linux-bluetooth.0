@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 10/31] Bluetooth: Refactor L2CAP connect rejection to its own function
-Date: Wed,  4 Dec 2013 16:11:06 +0200
-Message-Id: <1386166287-13693-11-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 07/31] Bluetooth: Add definitions for LE connection oriented channels
+Date: Wed,  4 Dec 2013 16:11:03 +0200
+Message-Id: <1386166287-13693-8-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1386166287-13693-1-git-send-email-johan.hedberg@gmail.com>
 References: <1386166287-13693-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,75 +11,70 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-We'll need to have a separate code patch for LE based connection
-rejection so it's cleaner to move out the response construction code
-into its own function (and later a second one for LE).
+This patch adds the necessary defines and structs for LE connection
+oriented channels.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 42 ++++++++++++++++++++++++------------------
- 1 file changed, 24 insertions(+), 18 deletions(-)
+ include/net/bluetooth/l2cap.h | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 256662578f89..5f9287fd86df 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -617,6 +617,27 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 	return;
- }
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 94645d56fea7..b9e3240edf02 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -112,6 +112,9 @@ struct l2cap_conninfo {
+ #define L2CAP_MOVE_CHAN_CFM_RSP	0x11
+ #define L2CAP_CONN_PARAM_UPDATE_REQ	0x12
+ #define L2CAP_CONN_PARAM_UPDATE_RSP	0x13
++#define L2CAP_LE_CONN_REQ	0x14
++#define L2CAP_LE_CONN_RSP	0x15
++#define L2CAP_LE_CREDITS	0x16
  
-+static void l2cap_chan_connect_reject(struct l2cap_chan *chan)
-+{
-+	struct l2cap_conn *conn = chan->conn;
-+	struct l2cap_conn_rsp rsp;
-+	u16 result;
-+
-+	if (test_bit(FLAG_DEFER_SETUP, &chan->flags))
-+		result = L2CAP_CR_SEC_BLOCK;
-+	else
-+		result = L2CAP_CR_BAD_PSM;
-+
-+	l2cap_state_change(chan, BT_DISCONN);
-+
-+	rsp.scid   = cpu_to_le16(chan->dcid);
-+	rsp.dcid   = cpu_to_le16(chan->scid);
-+	rsp.result = cpu_to_le16(result);
-+	rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
-+
-+	l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP, sizeof(rsp), &rsp);
-+}
-+
- void l2cap_chan_close(struct l2cap_chan *chan, int reason)
- {
- 	struct l2cap_conn *conn = chan->conn;
-@@ -639,24 +660,9 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
- 		break;
+ /* L2CAP extended feature mask */
+ #define L2CAP_FEAT_FLOWCTL	0x00000001
+@@ -257,6 +260,10 @@ struct l2cap_conn_rsp {
+ #define L2CAP_CR_SEC_BLOCK	0x0003
+ #define L2CAP_CR_NO_MEM		0x0004
+ #define L2CAP_CR_BAD_AMP	0x0005
++#define L2CAP_CR_AUTHENTICATION	0x0005
++#define L2CAP_CR_AUTHORIZATION	0x0006
++#define L2CAP_CR_BAD_KEY_SIZE	0x0007
++#define L2CAP_CR_ENCRYPTION	0x0008
  
- 	case BT_CONNECT2:
--		if (chan->chan_type == L2CAP_CHAN_CONN_ORIENTED &&
--		    conn->hcon->type == ACL_LINK) {
--			struct l2cap_conn_rsp rsp;
--			__u16 result;
--
--			if (test_bit(FLAG_DEFER_SETUP, &chan->flags))
--				result = L2CAP_CR_SEC_BLOCK;
--			else
--				result = L2CAP_CR_BAD_PSM;
--
--			l2cap_state_change(chan, BT_DISCONN);
--
--			rsp.scid   = cpu_to_le16(chan->dcid);
--			rsp.dcid   = cpu_to_le16(chan->scid);
--			rsp.result = cpu_to_le16(result);
--			rsp.status = __constant_cpu_to_le16(L2CAP_CS_NO_INFO);
--			l2cap_send_cmd(conn, chan->ident, L2CAP_CONN_RSP,
--				       sizeof(rsp), &rsp);
-+		if (chan->chan_type == L2CAP_CHAN_CONN_ORIENTED) {
-+			if (conn->hcon->type == ACL_LINK)
-+				l2cap_chan_connect_reject(chan);
- 		}
+ /* connect/create channel status */
+ #define L2CAP_CS_NO_INFO	0x0000
+@@ -423,6 +430,30 @@ struct l2cap_conn_param_update_rsp {
+ #define L2CAP_CONN_PARAM_ACCEPTED	0x0000
+ #define L2CAP_CONN_PARAM_REJECTED	0x0001
  
- 		l2cap_chan_del(chan, reason);
++#define L2CAP_LE_MAX_CREDITS		10
++#define L2CAP_LE_DEFAULT_MPS		5400
++
++struct l2cap_le_conn_req {
++	__le16     psm;
++	__le16     scid;
++	__le16     mtu;
++	__le16     mps;
++	__le16     credits;
++} __packed;
++
++struct l2cap_le_conn_rsp {
++	__le16     dcid;
++	__le16     mtu;
++	__le16     mps;
++	__le16     credits;
++	__le16     result;
++} __packed;
++
++struct l2cap_le_credits {
++	__le16     cid;
++	__le16     credits;
++} __packed;
++
+ /* ----- L2CAP channels and connections ----- */
+ struct l2cap_seq_list {
+ 	__u16	head;
 -- 
 1.8.4.2
 
