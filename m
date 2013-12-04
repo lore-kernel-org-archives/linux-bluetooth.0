@@ -1,74 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <529F4CB6.6010008@timomueller.eu>
-Date: Wed, 04 Dec 2013 16:39:34 +0100
-From: =?ISO-8859-1?Q?Timo_M=FCller?= <mail@timomueller.eu>
 MIME-Version: 1.0
-To: Szymon Janc <szymon.janc@tieto.com>
-CC: linux-bluetooth@vger.kernel.org,
-	Timo Mueller <timo.mueller@bmw-carit.de>
-Subject: Re: [PATCHv1 0/2] Introduce default adapter property
-References: <cover.1386078490.git.timo.mueller@bmw-carit.de> <3146259.c398076Ovj@uw000953>
-In-Reply-To: <3146259.c398076Ovj@uw000953>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <1384985340-2902-1-git-send-email-andre.guedes@openbossa.org>
+References: <1384985340-2902-1-git-send-email-andre.guedes@openbossa.org>
+From: Andre Guedes <andre.guedes@openbossa.org>
+Date: Wed, 4 Dec 2013 12:35:09 -0200
+Message-ID: <CACJA=fWLf7wAmgooAkmbH3e2R+AE9dbfutvbjTewkp+5bJkmeQ@mail.gmail.com>
+Subject: Re: [RFC v3 00/12] LE auto connection and connection parameters
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Ping.
 
-Szymon Janc wrote, On 04.12.2013 09:32:
-> Hi Timo,
+On Wed, Nov 20, 2013 at 7:08 PM, Andre Guedes
+<andre.guedes@openbossa.org> wrote:
+> Hi all,
 >
->> From: Timo Mueller <timo.mueller@bmw-carit.de>
->>
->> Hi,
->>
->> the information about the default adapter is currently not available
->> through the D-Bus API of BlueZ. But as plugins can use this
->> information to choose the adapter they act upon it would be helpful
->> for users to be able to retrieve this information as well.
->>
->> For example the neard plugin uses this information to decide for which
->> adapter oob data is generated. Users could use the same information to
->> power the adapter before actually sending the oob data.
+> The main changes from the previous version are:
+>   * Debugfs interface to add auto connect address instead of new mgmt
+>     commands.
+>   * We always stop LE scanning in favor of connection establishment even if
+>     the controller supports scanning and connection at the same time.
+>   * Background scanning is now controlled in one single place (hci_update_
+>     background_scan function).
+>   * RCU was replaced by hdev->lock to protect hdev->le_conn_params list. After
+>     all the changes since the original version of this patch set, I realized
+>     we always operate on hdev->le_conn_params with hdev->lock held so there is
+>     no point in use RCU to protect this list.
 >
-> I think this property is bluetoothd internal detail and should not be needed
-> to be exported to user.
-
-Alright. Is the default information needed at all? I might be missing 
-something but the default information seems to only be used by the 
-hostname, sixaxis and neard plugins. I don't know about sixaxis, but the 
-hostname plugin could also do without this information. If the neard 
-plugin would handle multiple adapters, then the default adapter property 
-could be dropped completely.
-
-> If reason for this is scenario where multiple BT and
-> NFC adapters are present and you need to match them in pairs, then proper
-> solution would probably require extending neard agent interface. Neard plugin
-> could be also made 'smarter' about multiple adapters eg. try to choose other
-> controller if default one is not powered etc. Regarding changing power state
-> of bt controller, I think this could be done by neard plugin itself (possible
-> based on some static configuration or even runtime dbus setting...). It is on
-> my 'TODO when have some spare time' list :)
-
-Automatic powering, if enabled by 'configuration', sounds good to me. 
-Regarding the adapter selection, how about a runtime dbus setting to set 
-the adapter that the neard plugin is using? It could then behave as 
-bluetoothctl does right now. Choosing the first adapter on start and use 
-the selected adapter afterwards.
-
+> In order to test the LE auto connection mechanism please follow the
+> instructions below.
 >
-> It would be good if you could outline usecases you are trying to address with
-> this change.
-
-The use case was to only send the oob data when the device has not yet 
-been paired with the adapter that is used. On Android this wouldn't 
-interrupt the regular Android Beam behaviour (when sending an URL from 
-the browser for example). Of course this requires a unique ID that could 
-be requested via NFC and mapped to a BD_ADDR. Unfortunately this ID, as 
-just discussed in IRC, does not exist. So, admittedly this use case is 
-broken.
-
-Best regards,
-Timo
-
-
+> To add a new auto connection address we write on le_auto_conn file following
+> the format <address> <address type> <auto_connect>.
+>
+> The <address type> values are:
+>   * 0 for public address
+>   * 1 for random address
+>
+> The <auto_connect> values are (for more details see struct hci_conn_params):
+>   * 0 for disabled
+>   * 1 for always
+>   * 2 for link loss
+>
+> So for instance, if you want the kernel autonomously establishes connections
+> with device AA:BB:CC:DD:EE:FF (public address) every time the device enters in
+> connectable mode (starts advertising), you should run the command:
+> $ echo "AA:BB:CC:DD:EE:FF 0 1" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
+>
+> To get the list of connection parameters configured in kernel, read the
+> le_auto_conn file:
+> $ cat /sys/kernel/debug/bluetooth/hci0/le_auto_conn
+>
+> Finally, to clear the connection parameters list, write an empty string:
+> $ echo "" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
+>
+> Regards,
+>
+> Andre Guedes
+>
+>
+> Andre Guedes (12):
+>   Bluetooth: Save connection interval parameters in hci_conn
+>   Bluetooth: Group list_head fields from strcut hci_dev together
+>   Bluetooth: Introduce connection parameters list
+>   Bluetooth: Use connection parameters if any
+>   Bluetooth: Stop scanning on LE connection
+>   Bluetooth: Introduce hdev->pend_le_conn list
+>   Bluetooth: Introduce LE auto connection infrastructure
+>   Bluetooth: Re-enable background scan in case of error
+>   Bluetooth: Temporarily stop background scanning on discovery
+>   Bluetooth: Auto connection and power on
+>   Bleutooth: Add support for auto connect options
+>   Bluetooth: Add le_auto_conn file on debugfs
+>
+>  include/net/bluetooth/hci_core.h |  43 +++++-
+>  net/bluetooth/hci_conn.c         |  39 ++++-
+>  net/bluetooth/hci_core.c         | 318 +++++++++++++++++++++++++++++++++++++++
+>  net/bluetooth/hci_event.c        |  60 ++++++++
+>  net/bluetooth/mgmt.c             |  25 ++-
+>  5 files changed, 473 insertions(+), 12 deletions(-)
+>
+> --
+> 1.8.4
+>
