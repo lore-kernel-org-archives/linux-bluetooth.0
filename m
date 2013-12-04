@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 30/31] Bluetooth: Fix validating LE PSM values
-Date: Wed,  4 Dec 2013 16:11:26 +0200
-Message-Id: <1386166287-13693-31-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 27/31] Bluetooth: Limit LE MPS to the MTU value
+Date: Wed,  4 Dec 2013 16:11:23 +0200
+Message-Id: <1386166287-13693-28-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1386166287-13693-1-git-send-email-johan.hedberg@gmail.com>
 References: <1386166287-13693-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,110 +11,82 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-LE PSM values have different ranges than those for BR/EDR. The valid
-ranges for fixed, SIG assigned values is 0x0001-0x007f and for dynamic
-PSM values 0x0080-0x00ff. We need to ensure that bind() and connect()
-calls conform to these ranges when operating on LE CoC sockets.
+It doesn't make sense to have an MPS value greater than the configured
+MTU value since we will then not be able to fill up the packets to their
+full possible size. We need to set the MPS both in flowctl_init()
+as well as flowctl_start() since the imtu may change after init() but
+start() is only called after we've sent the LE Connection Request PDU
+which depends on having a valid MPS value.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 15 +++++++++++++--
- net/bluetooth/l2cap_sock.c | 40 +++++++++++++++++++++++++++++++---------
- 2 files changed, 44 insertions(+), 11 deletions(-)
+ net/bluetooth/l2cap_core.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index a1143127414a..ccfee0194a2b 100644
+index 20b8dcf05edd..58fbb78a703f 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1861,6 +1861,18 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
- 	return c1;
+@@ -497,6 +497,11 @@ void l2cap_le_flowctl_init(struct l2cap_chan *chan)
+ 	chan->mode = L2CAP_MODE_LE_FLOWCTL;
+ 	chan->tx_credits = 0;
+ 	chan->rx_credits = L2CAP_LE_MAX_CREDITS;
++
++	if (chan->imtu < L2CAP_LE_DEFAULT_MPS)
++		chan->mps = chan->imtu;
++	else
++		chan->mps = L2CAP_LE_DEFAULT_MPS;
  }
  
-+static bool is_valid_psm(u16 psm, u8 dst_type)
-+{
-+	if (!psm)
-+		return false;
-+
-+	if (bdaddr_type_is_le(dst_type))
-+		return (psm < 0x00ff);
-+
-+	/* PSM must be odd and lsb of upper byte must be 0 */
-+	return ((psm & 0x0101) == 0x0001);
-+}
-+
- int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 		       bdaddr_t *dst, u8 dst_type)
- {
-@@ -1881,8 +1893,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+@@ -645,7 +650,7 @@ static void l2cap_chan_le_connect_reject(struct l2cap_chan *chan)
  
- 	l2cap_chan_lock(chan);
+ 	rsp.dcid    = cpu_to_le16(chan->scid);
+ 	rsp.mtu     = cpu_to_le16(chan->imtu);
+-	rsp.mps     = __constant_cpu_to_le16(L2CAP_LE_DEFAULT_MPS);
++	rsp.mps     = cpu_to_le16(chan->mps);
+ 	rsp.credits = cpu_to_le16(chan->rx_credits);
+ 	rsp.result  = cpu_to_le16(result);
  
--	/* PSM must be odd and lsb of upper byte must be 0 */
--	if ((__le16_to_cpu(psm) & 0x0101) != 0x0001 && !cid &&
-+	if (!is_valid_psm(__le16_to_cpu(psm), dst_type) && !cid &&
- 	    chan->chan_type != L2CAP_CHAN_RAW) {
- 		err = -EINVAL;
- 		goto done;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index c2424782c245..f4471fd6e99e 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -53,6 +53,32 @@ bool l2cap_is_socket(struct socket *sock)
- }
- EXPORT_SYMBOL(l2cap_is_socket);
+@@ -1201,6 +1206,11 @@ static void l2cap_le_flowctl_start(struct l2cap_chan *chan)
+ 	chan->sdu_last_frag = NULL;
+ 	chan->sdu_len = 0;
  
-+static int l2cap_validate_bredr_psm(u16 psm)
-+{
-+	/* PSM must be odd and lsb of upper byte must be 0 */
-+	if ((psm & 0x0101) != 0x0001)
-+		return -EINVAL;
++	if (chan->imtu < L2CAP_LE_DEFAULT_MPS)
++		chan->mps = chan->imtu;
++	else
++		chan->mps = L2CAP_LE_DEFAULT_MPS;
 +
-+	/* Restrict usage of well-known PSMs */
-+	if (psm < 0x1001 && !capable(CAP_NET_BIND_SERVICE))
-+		return -EACCES;
-+
-+	return 0;
-+}
-+
-+static int l2cap_validate_le_psm(u16 psm)
-+{
-+	/* Valid LE_PSM ranges are defined only until 0x00ff */
-+	if (psm > 0x00ff)
-+		return -EINVAL;
-+
-+	/* Restrict fixed, SIG assigned PSM values to CAP_NET_BIND_SERVICE */
-+	if (psm <= 0x007f && !capable(CAP_NET_BIND_SERVICE))
-+		return -EACCES;
-+
-+	return 0;
-+}
-+
- static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- {
- 	struct sock *sk = sock->sk;
-@@ -94,17 +120,13 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 	if (la.l2_psm) {
- 		__u16 psm = __le16_to_cpu(la.l2_psm);
+ 	skb_queue_head_init(&chan->tx_q);
  
--		/* PSM must be odd and lsb of upper byte must be 0 */
--		if ((psm & 0x0101) != 0x0001) {
--			err = -EINVAL;
--			goto done;
--		}
-+		if (la.l2_bdaddr_type == BDADDR_BREDR)
-+			err = l2cap_validate_bredr_psm(psm);
-+		else
-+			err = l2cap_validate_le_psm(psm);
+ 	if (!chan->tx_credits)
+@@ -1232,7 +1242,7 @@ static void l2cap_le_connect(struct l2cap_chan *chan)
+ 	req.psm     = chan->psm;
+ 	req.scid    = cpu_to_le16(chan->scid);
+ 	req.mtu     = cpu_to_le16(chan->imtu);
+-	req.mps     = __constant_cpu_to_le16(L2CAP_LE_DEFAULT_MPS);
++	req.mps     = cpu_to_le16(chan->mps);
+ 	req.credits = cpu_to_le16(chan->rx_credits);
  
--		/* Restrict usage of well-known PSMs */
--		if (psm < 0x1001 && !capable(CAP_NET_BIND_SERVICE)) {
--			err = -EACCES;
-+		if (err)
- 			goto done;
--		}
- 	}
+ 	chan->ident = l2cap_get_ident(conn);
+@@ -3826,7 +3836,7 @@ void __l2cap_le_connect_rsp_defer(struct l2cap_chan *chan)
  
- 	if (la.l2_cid)
+ 	rsp.dcid    = cpu_to_le16(chan->scid);
+ 	rsp.mtu     = cpu_to_le16(chan->imtu);
+-	rsp.mps     = __constant_cpu_to_le16(L2CAP_LE_DEFAULT_MPS);
++	rsp.mps     = cpu_to_le16(chan->mps);
+ 	rsp.credits = cpu_to_le16(chan->rx_credits);
+ 	rsp.result  = __constant_cpu_to_le16(L2CAP_CR_SUCCESS);
+ 
+@@ -5669,7 +5679,7 @@ response_unlock:
+ response:
+ 	if (chan) {
+ 		rsp.mtu = cpu_to_le16(chan->imtu);
+-		rsp.mps = __constant_cpu_to_le16(L2CAP_LE_DEFAULT_MPS);
++		rsp.mps = cpu_to_le16(chan->mps);
+ 	} else {
+ 		rsp.mtu = 0;
+ 		rsp.mps = 0;
 -- 
 1.8.4.2
 
