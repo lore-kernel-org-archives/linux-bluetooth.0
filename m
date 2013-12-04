@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 03/31] Bluetooth: Update l2cap_global_chan_by_psm() to take a link type
-Date: Wed,  4 Dec 2013 16:10:59 +0200
-Message-Id: <1386166287-13693-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 02/31] Bluetooth: Add module parameter to enable LE CoC support
+Date: Wed,  4 Dec 2013 16:10:58 +0200
+Message-Id: <1386166287-13693-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1386166287-13693-1-git-send-email-johan.hedberg@gmail.com>
 References: <1386166287-13693-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,63 +11,88 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Once connection oriented L2CAP channels become possible for LE we need
-to be able to specify the link type we're interested in when looking up
-L2CAP channels. Therefore, add a link_type parameter to the
-l2cap_global_chan_by_psm() function which gets compared to the address
-type associated with each l2cap_chan.
+Along with the L2CAP Connection Oriented Channels features it is now
+allowed to use both custom fixed CIDs as well as PSM based (connection
+oriented connections). Since the support for this (with the subsequent
+patches) is still on an experimental stage, add a module parameter to
+enable it.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ include/net/bluetooth/l2cap.h |  1 +
+ net/bluetooth/l2cap_sock.c    | 18 ++++++++++++------
+ 2 files changed, 13 insertions(+), 6 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 70be2eb8ed03..03b641c2f39d 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1703,7 +1703,8 @@ EXPORT_SYMBOL(l2cap_conn_put);
-  */
- static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
- 						   bdaddr_t *src,
--						   bdaddr_t *dst)
-+						   bdaddr_t *dst,
-+						   u8 link_type)
- {
- 	struct l2cap_chan *c, *c1 = NULL;
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index c853b16de4ef..94645d56fea7 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -809,6 +809,7 @@ static inline long l2cap_chan_no_get_sndtimeo(struct l2cap_chan *chan)
+ }
  
-@@ -1713,6 +1714,12 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
- 		if (state && c->state != state)
- 			continue;
+ extern bool disable_ertm;
++extern bool enable_lecoc;
  
-+		if (link_type == ACL_LINK && c->src_type != BDADDR_BREDR)
-+			continue;
+ int l2cap_init_sockets(void);
+ void l2cap_cleanup_sockets(void);
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 7cc24d263caa..5a1d0cb0b8d5 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -27,6 +27,7 @@
+ 
+ /* Bluetooth L2CAP sockets. */
+ 
++#include <linux/module.h>
+ #include <linux/export.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+@@ -35,6 +36,8 @@
+ 
+ #include "smp.h"
+ 
++bool enable_lecoc;
 +
-+		if (link_type == LE_LINK && c->src_type == BDADDR_BREDR)
-+			continue;
+ static struct bt_sock_list l2cap_sk_list = {
+ 	.lock = __RW_LOCK_UNLOCKED(l2cap_sk_list.lock)
+ };
+@@ -73,11 +76,11 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
+ 		return -EINVAL;
+ 
+ 	if (bdaddr_type_is_le(la.l2_bdaddr_type)) {
+-		/* Connection oriented channels are not supported on LE */
+-		if (la.l2_psm)
++		if (!enable_lecoc && la.l2_psm)
+ 			return -EINVAL;
+ 		/* We only allow ATT user space socket */
+-		if (la.l2_cid != __constant_cpu_to_le16(L2CAP_CID_ATT))
++		if (la.l2_cid &&
++		    la.l2_cid != __constant_cpu_to_le16(L2CAP_CID_ATT))
+ 			return -EINVAL;
+ 	}
+ 
+@@ -189,11 +192,11 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
+ 		return -EINVAL;
+ 
+ 	if (bdaddr_type_is_le(la.l2_bdaddr_type)) {
+-		/* Connection oriented channels are not supported on LE */
+-		if (la.l2_psm)
++		if (!enable_lecoc && la.l2_psm)
+ 			return -EINVAL;
+ 		/* We only allow ATT user space socket */
+-		if (la.l2_cid != __constant_cpu_to_le16(L2CAP_CID_ATT))
++		if (la.l2_cid &&
++		    la.l2_cid != __constant_cpu_to_le16(L2CAP_CID_ATT))
+ 			return -EINVAL;
+ 	}
+ 
+@@ -1469,3 +1472,6 @@ void l2cap_cleanup_sockets(void)
+ 	bt_sock_unregister(BTPROTO_L2CAP);
+ 	proto_unregister(&l2cap_proto);
+ }
 +
- 		if (c->psm == psm) {
- 			int src_match, dst_match;
- 			int src_any, dst_any;
-@@ -3713,7 +3720,7 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
- 
- 	/* Check if we have socket listening on psm */
- 	pchan = l2cap_global_chan_by_psm(BT_LISTEN, psm, &conn->hcon->src,
--					 &conn->hcon->dst);
-+					 &conn->hcon->dst, ACL_LINK);
- 	if (!pchan) {
- 		result = L2CAP_CR_BAD_PSM;
- 		goto sendresp;
-@@ -6380,7 +6387,8 @@ static void l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm,
- 	if (hcon->type != ACL_LINK)
- 		goto drop;
- 
--	chan = l2cap_global_chan_by_psm(0, psm, &hcon->src, &hcon->dst);
-+	chan = l2cap_global_chan_by_psm(0, psm, &hcon->src, &hcon->dst,
-+					ACL_LINK);
- 	if (!chan)
- 		goto drop;
- 
++module_param(enable_lecoc, bool, 0644);
++MODULE_PARM_DESC(enable_lecoc, "Enable support for LE CoC");
 -- 
 1.8.4.2
 
