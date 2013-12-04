@@ -1,42 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 01/31] Bluetooth: Remove unnecessary braces from one-line if-statement
-Date: Wed,  4 Dec 2013 16:10:57 +0200
-Message-Id: <1386166287-13693-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1386166287-13693-1-git-send-email-johan.hedberg@gmail.com>
-References: <1386166287-13693-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 00/31] Bluetooth: LE CoC support
+Date: Wed,  4 Dec 2013 16:10:56 +0200
+Message-Id: <1386166287-13693-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-This patch is just a trivial coding style fix to remove unnecessary
-braces from a one-line if-statement.
+This patch set implements support for LE Connection oriented Channels
+(PSM based connections over LE with credit based flow control).
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/l2cap_core.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Johan
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 4af3821df880..70be2eb8ed03 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -6612,11 +6612,10 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
- 		}
- 
- 		if (chan->state == BT_CONNECT) {
--			if (!status) {
-+			if (!status)
- 				l2cap_start_connection(chan);
--			} else {
-+			else
- 				__set_chan_timer(chan, L2CAP_DISC_TIMEOUT);
--			}
- 		} else if (chan->state == BT_CONNECT2) {
- 			struct l2cap_conn_rsp rsp;
- 			__u16 res, stat;
--- 
-1.8.4.2
+----------------------------------------------------------------
+Johan Hedberg (31):
+      Bluetooth: Remove unnecessary braces from one-line if-statement
+      Bluetooth: Add module parameter to enable LE CoC support
+      Bluetooth: Update l2cap_global_chan_by_psm() to take a link type
+      Bluetooth: Allow l2cap_chan_check_security() to be used for LE links.
+      Bluetooth: Pass command length to LE signaling channel handlers
+      Bluetooth: Move LE L2CAP initiator procedure to its own function
+      Bluetooth: Add definitions for LE connection oriented channels
+      Bluetooth: Add initial code for LE L2CAP Connect Request
+      Bluetooth: Add smp_sufficient_security helper function
+      Bluetooth: Refactor L2CAP connect rejection to its own function
+      Bluetooth: Add basic LE L2CAP connect request receiving support
+      Bluetooth: Fix L2CAP channel closing for LE connections
+      Bluetooth: Add L2CAP Disconnect suppport for LE
+      Bluetooth: Make l2cap_le_sig_cmd logic consistent
+      Bluetooth: Add LE L2CAP flow control mode
+      Bluetooth: Track LE L2CAP credits in l2cap_chan
+      Bluetooth: Limit L2CAP_OPTIONS socket option usage with LE
+      Bluetooth: Add new BT_SNDMTU and BT_RCVMTU socket options
+      Bluetooth: Implement returning of LE L2CAP credits
+      Bluetooth: Add LE flow control discipline
+      Bluetooth: Reject LE CoC commands when the feature is not enabled
+      Bluetooth: Introduce L2CAP channel callback for suspending
+      Bluetooth: Add LE L2CAP segmentation support for outgoing data
+      Bluetooth: Implement LE L2CAP reassembly
+      Bluetooth: Fix LE L2CAP Connect Request handling together with SMP
+      Bluetooth: Fix suspending the L2CAP socket if we start with 0 credits
+      Bluetooth: Limit LE MPS to the MTU value
+      Bluetooth: Fix clearing of chan->omtu for LE CoC channels
+      Bluetooth: Fix CID ranges for LE CoC CID allocations
+      Bluetooth: Fix validating LE PSM values
+      Bluetooth: Add debugfs controls for LE CoC MPS and Credits
+
+ include/net/bluetooth/bluetooth.h |   3 +
+ include/net/bluetooth/l2cap.h     |  46 +++
+ net/bluetooth/l2cap_core.c        | 731 +++++++++++++++++++++++++++++++++---
+ net/bluetooth/l2cap_sock.c        | 157 +++++++-
+ net/bluetooth/smp.c               |  16 +-
+ net/bluetooth/smp.h               |   1 +
+ 6 files changed, 885 insertions(+), 69 deletions(-)
 
