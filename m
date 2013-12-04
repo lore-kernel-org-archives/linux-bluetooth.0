@@ -1,48 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Timo Mueller <mail@timomueller.eu>
-Cc: linux-bluetooth@vger.kernel.org,
-	Timo Mueller <timo.mueller@bmw-carit.de>
-Subject: Re: [PATCHv1 0/2] Introduce default adapter property
-Date: Wed, 04 Dec 2013 09:32:51 +0100
-Message-ID: <3146259.c398076Ovj@uw000953>
-In-Reply-To: <cover.1386078490.git.timo.mueller@bmw-carit.de>
-References: <cover.1386078490.git.timo.mueller@bmw-carit.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
+Message-ID: <1386115613.8730.25.camel@pc.interlinx.bc.ca>
+Subject: Re: have to re-pair mouse every few hours (update: mouse needs
+ periodic authorization?)
+From: "Brian J. Murrell" <brian@interlinx.bc.ca>
+To: linux-bluetooth@vger.kernel.org
+Date: Tue, 03 Dec 2013 19:06:53 -0500
+In-Reply-To: <1386112361.5405.37.camel@nuvo>
+References: <1385843856.12122.5.camel@pc.interlinx.bc.ca>
+	 <1386107032.8730.22.camel@pc.interlinx.bc.ca>
+	 <1386112361.5405.37.camel@nuvo>
+Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature";
+	boundary="=-2FDYf1N0rNZTZ0v8cMfX"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Timo,
 
-> From: Timo Mueller <timo.mueller@bmw-carit.de>
-> 
-> Hi,
-> 
-> the information about the default adapter is currently not available
-> through the D-Bus API of BlueZ. But as plugins can use this
-> information to choose the adapter they act upon it would be helpful
-> for users to be able to retrieve this information as well.
->
-> For example the neard plugin uses this information to decide for which
-> adapter oob data is generated. Users could use the same information to
-> power the adapter before actually sending the oob data.
+--=-2FDYf1N0rNZTZ0v8cMfX
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I think this property is bluetoothd internal detail and should not be needed
-to be exported to user. If reason for this is scenario where multiple BT and
-NFC adapters are present and you need to match them in pairs, then proper
-solution would probably require extending neard agent interface. Neard plugin
-could be also made 'smarter' about multiple adapters eg. try to choose other
-controller if default one is not powered etc. Regarding changing power state
-of bt controller, I think this could be done by neard plugin itself (possible
-based on some static configuration or even runtime dbus setting...). It is on
-my 'TODO when have some spare time' list :)
+On Wed, 2013-12-04 at 00:12 +0100, Bastien Nocera wrote:=20
+>=20
+> Just how did you pair your mouse?
 
-It would be good if you could outline usecases you are trying to address with
-this change.
+With mate[gnome]-bluetooth-properties.
 
--- 
-BR
-Szymon Janc
+Cheers,
+b.
 
+
+
+
+--=-2FDYf1N0rNZTZ0v8cMfX
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.15 (GNU/Linux)
+
+iQEcBAABAgAGBQJSnnIdAAoJENrB0DQWy8igi1EH/2Hxuj8qmDBcbyspNhO7C0uA
+GYbMZ7Hyo1E/RSmtCMec2TD0qy/Gxazf4wslBgcTs9EbgBcRS1vWVjdBM2WfM6OY
+6rm9jC4Nr2Pblz3LdIYGbXqatjCU4RwV4p/RHnVNnxDR+oU7PPQBwTb7/LczHKp/
+0IM/X3+wLhLWdySqKrYGl5xeaNDYTTldEw5aumet6lXUZTJSnauh5gF0PYOn9RMa
+IsedVuePijKooD47yqppzoIlqe3yKSIwgjpGFjMfClsfOIpR87KumNDp1swXwjI8
+1/Z207Yo09GFziARevRhPWMvSdOcoAkI4x3w7eRdQkXlyGu/08mqQArasc0ubxY=
+=jqVx
+-----END PGP SIGNATURE-----
+
+--=-2FDYf1N0rNZTZ0v8cMfX--
 
