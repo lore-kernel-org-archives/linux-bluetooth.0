@@ -1,37 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 4 Dec 2013 11:12:27 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Marco Piazza <mpiazza@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Add support for Toshiba Bluetooth device
- [0930:0220]
-Message-ID: <20131204131227.GC1608@joana>
-References: <1385594125-7964-1-git-send-email-mpiazza@gmail.com>
+Date: Wed, 4 Dec 2013 10:36:25 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/6] android/a2dp: Fix possible NULL dereference
+Message-ID: <20131204083622.GA18198@aemeltch-MOBL1>
+References: <1386085993-22055-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CABBYNZKRWtCvq_yg7dT+2iJFL5rvPauiOkqYP3diCc_6TN_SkA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1385594125-7964-1-git-send-email-mpiazza@gmail.com>
+In-Reply-To: <CABBYNZKRWtCvq_yg7dT+2iJFL5rvPauiOkqYP3diCc_6TN_SkA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marco,
+Hi Luiz,
 
-2013-11-28 Marco Piazza <mpiazza@gmail.com>:
-
-> This patch adds support for new Toshiba Bluetooth device.
+On Tue, Dec 03, 2013 at 09:53:43PM +0200, Luiz Augusto von Dentz wrote:
+> Hi Andrei,
 > 
-> T:  Bus=05 Lev=01 Prnt=01 Port=02 Cnt=02 Dev#=  4 Spd=12  MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0930 ProdID=0220 Rev=00.02
-> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> On Tue, Dec 3, 2013 at 5:53 PM, Andrei Emeltchenko
+> <Andrei.Emeltchenko.news@gmail.com> wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> >
+> > Since a2dp_record may return NULL, check return value. This
+> > silences static analysers tools.
+> > ---
+> >  android/a2dp.c | 5 +++--
+> >  1 file changed, 3 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/android/a2dp.c b/android/a2dp.c
+> > index cee4bfa..36a0714 100644
+> > --- a/android/a2dp.c
+> > +++ b/android/a2dp.c
+> > @@ -366,9 +366,10 @@ bool bt_a2dp_register(const bdaddr_t *addr)
+> >         }
+> >
+> >         rec = a2dp_record();
+> > -       if (bt_adapter_add_record(rec, SVC_HINT_CAPTURING) < 0) {
+> > +       if (!rec || bt_adapter_add_record(rec, SVC_HINT_CAPTURING) < 0) {
 > 
-> Signed-off-by: Marco Piazza <mpiazza@gmail.com>
-> ---
->  drivers/bluetooth/ath3k.c | 2 ++
->  drivers/bluetooth/btusb.c | 1 +
->  2 files changed, 3 insertions(+)
+> Usually we check the return individually, that means you do if (rec)
+> and perhaps handle the error path with goto, but first make sure that
+> a2dp_record can actually fail otherwise this is pointless.
 
-Patch has been applied to bluetooth.git. Thanks.
+It might return NULL if malloc fails, do you think that we need to change
+malloc to g_malloc in sdp code. Otherwise every tools warns about NULL
+dereference.
 
-	Gustavo
+Best regards 
+Andrei Emeltchenko 
+
+>
+> >                 error("Failed to register on A2DP record");
+> > -               sdp_record_free(rec);
+> > +               if (rec)
+> > +                       sdp_record_free(rec);
+> >                 g_io_channel_shutdown(server, TRUE, NULL);
+> >                 g_io_channel_unref(server);
+> >                 server = NULL;
+> > --
+> > 1.8.3.2
+> >
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> > the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> 
+> 
+> -- 
+> Luiz Augusto von Dentz
