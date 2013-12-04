@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 12/31] Bluetooth: Fix L2CAP channel closing for LE connections
-Date: Wed,  4 Dec 2013 16:11:08 +0200
-Message-Id: <1386166287-13693-13-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 11/31] Bluetooth: Add basic LE L2CAP connect request receiving support
+Date: Wed,  4 Dec 2013 16:11:07 +0200
+Message-Id: <1386166287-13693-12-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1386166287-13693-1-git-send-email-johan.hedberg@gmail.com>
 References: <1386166287-13693-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,33 +11,217 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Sending of the L2CAP Disconnect request should also be performed for LE
-based channels. The proper thing to do is therefore to look at whether
-there's a PSM specified for the channel instead of looking at the link
-type.
+This patch adds the necessary boiler plate code to handle receiving
+L2CAP connect requests over LE and respond to them with a proper connect
+response.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ include/net/bluetooth/l2cap.h |   1 +
+ net/bluetooth/l2cap_core.c    | 150 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 151 insertions(+)
 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index b9e3240edf02..b622ccc0ab64 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -846,6 +846,7 @@ int l2cap_init_sockets(void);
+ void l2cap_cleanup_sockets(void);
+ bool l2cap_is_socket(struct socket *sock);
+ 
++void __l2cap_le_connect_rsp_defer(struct l2cap_chan *chan);
+ void __l2cap_connect_rsp_defer(struct l2cap_chan *chan);
+ 
+ int l2cap_add_psm(struct l2cap_chan *chan, bdaddr_t *src, __le16 psm);
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 891995f845f6..333031fde67e 100644
+index 5f9287fd86df..891995f845f6 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -674,8 +674,10 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
+@@ -617,6 +617,29 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 	return;
+ }
  
- 	case BT_CONNECTED:
- 	case BT_CONFIG:
--		if (chan->chan_type == L2CAP_CHAN_CONN_ORIENTED &&
--		    conn->hcon->type == ACL_LINK) {
-+		/* ATT uses L2CAP_CHAN_CONN_ORIENTED so we must also
-+		 * check for chan->psm.
-+		 */
-+		if (chan->chan_type == L2CAP_CHAN_CONN_ORIENTED && chan->psm) {
- 			__set_chan_timer(chan, chan->ops->get_sndtimeo(chan));
- 			l2cap_send_disconn_req(chan, reason);
- 		} else
++static void l2cap_chan_le_connect_reject(struct l2cap_chan *chan)
++{
++	struct l2cap_conn *conn = chan->conn;
++	struct l2cap_le_conn_rsp rsp;
++	u16 result;
++
++	if (test_bit(FLAG_DEFER_SETUP, &chan->flags))
++		result = L2CAP_CR_AUTHORIZATION;
++	else
++		result = L2CAP_CR_BAD_PSM;
++
++	l2cap_state_change(chan, BT_DISCONN);
++
++	rsp.dcid    = cpu_to_le16(chan->scid);
++	rsp.mtu     = cpu_to_le16(chan->imtu);
++	rsp.mps     = __constant_cpu_to_le16(L2CAP_LE_DEFAULT_MPS);
++	rsp.credits = __constant_cpu_to_le16(L2CAP_LE_MAX_CREDITS);
++	rsp.result  = cpu_to_le16(result);
++
++	l2cap_send_cmd(conn, chan->ident, L2CAP_LE_CONN_RSP, sizeof(rsp),
++		       &rsp);
++}
++
+ static void l2cap_chan_connect_reject(struct l2cap_chan *chan)
+ {
+ 	struct l2cap_conn *conn = chan->conn;
+@@ -663,6 +686,8 @@ void l2cap_chan_close(struct l2cap_chan *chan, int reason)
+ 		if (chan->chan_type == L2CAP_CHAN_CONN_ORIENTED) {
+ 			if (conn->hcon->type == ACL_LINK)
+ 				l2cap_chan_connect_reject(chan);
++			else if (conn->hcon->type == LE_LINK)
++				l2cap_chan_le_connect_reject(chan);
+ 		}
+ 
+ 		l2cap_chan_del(chan, reason);
+@@ -3641,6 +3666,23 @@ static int l2cap_build_conf_rsp(struct l2cap_chan *chan, void *data,
+ 	return ptr - data;
+ }
+ 
++void __l2cap_le_connect_rsp_defer(struct l2cap_chan *chan)
++{
++	struct l2cap_le_conn_rsp rsp;
++	struct l2cap_conn *conn = chan->conn;
++
++	BT_DBG("chan %p", chan);
++
++	rsp.dcid    = cpu_to_le16(chan->scid);
++	rsp.mtu     = cpu_to_le16(chan->imtu);
++	rsp.mps     = __constant_cpu_to_le16(L2CAP_LE_DEFAULT_MPS);
++	rsp.credits = __constant_cpu_to_le16(L2CAP_LE_MAX_CREDITS);
++	rsp.result  = __constant_cpu_to_le16(L2CAP_CR_SUCCESS);
++
++	l2cap_send_cmd(conn, chan->ident, L2CAP_LE_CONN_RSP, sizeof(rsp),
++		       &rsp);
++}
++
+ void __l2cap_connect_rsp_defer(struct l2cap_chan *chan)
+ {
+ 	struct l2cap_conn_rsp rsp;
+@@ -5382,6 +5424,111 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
+ 	return err;
+ }
+ 
++static int l2cap_le_connect_req(struct l2cap_conn *conn,
++				struct l2cap_cmd_hdr *cmd, u16 cmd_len,
++				u8 *data)
++{
++	struct l2cap_le_conn_req *req = (struct l2cap_le_conn_req *) data;
++	struct l2cap_le_conn_rsp rsp;
++	struct l2cap_chan *chan, *pchan;
++	u16 dcid, scid, mtu, mps;
++	__le16 psm;
++	u8 result;
++
++	if (cmd_len != sizeof(*req))
++		return -EPROTO;
++
++	scid = __le16_to_cpu(req->scid);
++	mtu  = __le16_to_cpu(req->mtu);
++	mps  = __le16_to_cpu(req->mps);
++	psm  = req->psm;
++	dcid = 0;
++
++	if (mtu < 23 || mps < 23)
++		return -EPROTO;
++
++	BT_DBG("psm 0x%2.2x scid 0x%4.4x mtu %u mps %u", __le16_to_cpu(psm),
++	       scid, mtu, mps);
++
++	/* Check if we have socket listening on psm */
++	pchan = l2cap_global_chan_by_psm(BT_LISTEN, psm, &conn->hcon->src,
++					 &conn->hcon->dst, LE_LINK);
++	if (!pchan) {
++		result = L2CAP_CR_BAD_PSM;
++		chan = NULL;
++		goto response;
++	}
++
++	mutex_lock(&conn->chan_lock);
++	l2cap_chan_lock(pchan);
++
++	if (!smp_sufficient_security(conn->hcon, pchan->sec_level)) {
++		result = L2CAP_CR_AUTHENTICATION;
++		goto response_unlock;
++	}
++
++	/* Check if we already have channel with that dcid */
++	if (__l2cap_get_chan_by_dcid(conn, scid)) {
++		result = L2CAP_CR_NO_MEM;
++		goto response_unlock;
++	}
++
++	chan = pchan->ops->new_connection(pchan);
++	if (!chan) {
++		result = L2CAP_CR_NO_MEM;
++		goto response_unlock;
++	}
++
++	bacpy(&chan->src, &conn->hcon->src);
++	bacpy(&chan->dst, &conn->hcon->dst);
++	chan->src_type = bdaddr_type(conn->hcon, conn->hcon->src_type);
++	chan->dst_type = bdaddr_type(conn->hcon, conn->hcon->dst_type);
++	chan->psm  = psm;
++	chan->dcid = scid;
++	chan->omtu = mtu;
++	chan->remote_mps = mps;
++
++	__l2cap_chan_add(conn, chan);
++	dcid = chan->scid;
++
++	__set_chan_timer(chan, chan->ops->get_sndtimeo(chan));
++
++	chan->ident = cmd->ident;
++
++	if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
++		l2cap_state_change(chan, BT_CONNECT2);
++		result = L2CAP_CR_PEND;
++		chan->ops->defer(chan);
++	} else {
++		l2cap_chan_ready(chan);
++		result = L2CAP_CR_SUCCESS;
++	}
++
++response_unlock:
++	l2cap_chan_unlock(pchan);
++	mutex_unlock(&conn->chan_lock);
++
++	if (result == L2CAP_CR_PEND)
++		return 0;
++
++response:
++	if (chan) {
++		rsp.mtu = cpu_to_le16(chan->imtu);
++		rsp.mps = __constant_cpu_to_le16(L2CAP_LE_DEFAULT_MPS);
++	} else {
++		rsp.mtu = 0;
++		rsp.mps = 0;
++	}
++
++	rsp.dcid    = cpu_to_le16(dcid);
++	rsp.credits = __constant_cpu_to_le16(L2CAP_LE_MAX_CREDITS);
++	rsp.result  = cpu_to_le16(result);
++
++	l2cap_send_cmd(conn, cmd->ident, L2CAP_LE_CONN_RSP, sizeof(rsp), &rsp);
++
++	return 0;
++}
++
+ static inline int l2cap_le_sig_cmd(struct l2cap_conn *conn,
+ 				   struct l2cap_cmd_hdr *cmd, u16 cmd_len,
+ 				   u8 *data)
+@@ -5400,6 +5547,9 @@ static inline int l2cap_le_sig_cmd(struct l2cap_conn *conn,
+ 		l2cap_le_connect_rsp(conn, cmd, cmd_len, data);
+ 		return 0;
+ 
++	case L2CAP_LE_CONN_REQ:
++		return l2cap_le_connect_req(conn, cmd, cmd_len, data);
++
+ 	default:
+ 		BT_ERR("Unknown LE signaling command 0x%2.2x", cmd->code);
+ 		return -EINVAL;
 -- 
 1.8.4.2
 
