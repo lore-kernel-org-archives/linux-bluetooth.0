@@ -1,87 +1,194 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1384985340-2902-1-git-send-email-andre.guedes@openbossa.org>
-References: <1384985340-2902-1-git-send-email-andre.guedes@openbossa.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-Date: Wed, 4 Dec 2013 12:35:09 -0200
-Message-ID: <CACJA=fWLf7wAmgooAkmbH3e2R+AE9dbfutvbjTewkp+5bJkmeQ@mail.gmail.com>
-Subject: Re: [RFC v3 00/12] LE auto connection and connection parameters
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 23/31] Bluetooth: Add LE L2CAP segmentation support for outgoing data
+Date: Wed,  4 Dec 2013 16:11:19 +0200
+Message-Id: <1386166287-13693-24-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1386166287-13693-1-git-send-email-johan.hedberg@gmail.com>
+References: <1386166287-13693-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ping.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Wed, Nov 20, 2013 at 7:08 PM, Andre Guedes
-<andre.guedes@openbossa.org> wrote:
-> Hi all,
->
-> The main changes from the previous version are:
->   * Debugfs interface to add auto connect address instead of new mgmt
->     commands.
->   * We always stop LE scanning in favor of connection establishment even if
->     the controller supports scanning and connection at the same time.
->   * Background scanning is now controlled in one single place (hci_update_
->     background_scan function).
->   * RCU was replaced by hdev->lock to protect hdev->le_conn_params list. After
->     all the changes since the original version of this patch set, I realized
->     we always operate on hdev->le_conn_params with hdev->lock held so there is
->     no point in use RCU to protect this list.
->
-> In order to test the LE auto connection mechanism please follow the
-> instructions below.
->
-> To add a new auto connection address we write on le_auto_conn file following
-> the format <address> <address type> <auto_connect>.
->
-> The <address type> values are:
->   * 0 for public address
->   * 1 for random address
->
-> The <auto_connect> values are (for more details see struct hci_conn_params):
->   * 0 for disabled
->   * 1 for always
->   * 2 for link loss
->
-> So for instance, if you want the kernel autonomously establishes connections
-> with device AA:BB:CC:DD:EE:FF (public address) every time the device enters in
-> connectable mode (starts advertising), you should run the command:
-> $ echo "AA:BB:CC:DD:EE:FF 0 1" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
->
-> To get the list of connection parameters configured in kernel, read the
-> le_auto_conn file:
-> $ cat /sys/kernel/debug/bluetooth/hci0/le_auto_conn
->
-> Finally, to clear the connection parameters list, write an empty string:
-> $ echo "" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
->
-> Regards,
->
-> Andre Guedes
->
->
-> Andre Guedes (12):
->   Bluetooth: Save connection interval parameters in hci_conn
->   Bluetooth: Group list_head fields from strcut hci_dev together
->   Bluetooth: Introduce connection parameters list
->   Bluetooth: Use connection parameters if any
->   Bluetooth: Stop scanning on LE connection
->   Bluetooth: Introduce hdev->pend_le_conn list
->   Bluetooth: Introduce LE auto connection infrastructure
->   Bluetooth: Re-enable background scan in case of error
->   Bluetooth: Temporarily stop background scanning on discovery
->   Bluetooth: Auto connection and power on
->   Bleutooth: Add support for auto connect options
->   Bluetooth: Add le_auto_conn file on debugfs
->
->  include/net/bluetooth/hci_core.h |  43 +++++-
->  net/bluetooth/hci_conn.c         |  39 ++++-
->  net/bluetooth/hci_core.c         | 318 +++++++++++++++++++++++++++++++++++++++
->  net/bluetooth/hci_event.c        |  60 ++++++++
->  net/bluetooth/mgmt.c             |  25 ++-
->  5 files changed, 473 insertions(+), 12 deletions(-)
->
-> --
-> 1.8.4
->
+This patch adds segmentation support for outgoing data packets. Packets
+are segmented based on the MTU and MPS values. The l2cap_chan struct
+already contains many helpful variables from BR/EDR Enhanced L2CAP which
+can be used for this.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/l2cap_core.c | 127 ++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 126 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index b0287f57d534..2c591afccb51 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -607,6 +607,7 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 		break;
+ 
+ 	case L2CAP_MODE_LE_FLOWCTL:
++		skb_queue_purge(&chan->tx_q);
+ 		break;
+ 
+ 	case L2CAP_MODE_ERTM:
+@@ -1194,12 +1195,24 @@ static void l2cap_move_done(struct l2cap_chan *chan)
+ 	}
+ }
+ 
++static void l2cap_le_flowctl_start(struct l2cap_chan *chan)
++{
++	chan->sdu = NULL;
++	chan->sdu_last_frag = NULL;
++	chan->sdu_len = 0;
++
++	skb_queue_head_init(&chan->tx_q);
++}
++
+ static void l2cap_chan_ready(struct l2cap_chan *chan)
+ {
+ 	/* This clears all conf flags, including CONF_NOT_COMPLETE */
+ 	chan->conf_state = 0;
+ 	__clear_chan_timer(chan);
+ 
++	if (chan->mode == L2CAP_MODE_LE_FLOWCTL)
++		l2cap_le_flowctl_start(chan);
++
+ 	chan->state = BT_CONNECTED;
+ 
+ 	chan->ops->ready(chan);
+@@ -2521,6 +2534,89 @@ static int l2cap_segment_sdu(struct l2cap_chan *chan,
+ 	return 0;
+ }
+ 
++static struct sk_buff *l2cap_create_le_flowctl_pdu(struct l2cap_chan *chan,
++						   struct msghdr *msg,
++						   size_t len, u16 sdulen)
++{
++	struct l2cap_conn *conn = chan->conn;
++	struct sk_buff *skb;
++	int err, count, hlen;
++	struct l2cap_hdr *lh;
++
++	BT_DBG("chan %p len %zu", chan, len);
++
++	if (!conn)
++		return ERR_PTR(-ENOTCONN);
++
++	hlen = L2CAP_HDR_SIZE;
++
++	if (sdulen)
++		hlen += L2CAP_SDULEN_SIZE;
++
++	count = min_t(unsigned int, (conn->mtu - hlen), len);
++
++	skb = chan->ops->alloc_skb(chan, count + hlen,
++				   msg->msg_flags & MSG_DONTWAIT);
++	if (IS_ERR(skb))
++		return skb;
++
++	/* Create L2CAP header */
++	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
++	lh->cid = cpu_to_le16(chan->dcid);
++	lh->len = cpu_to_le16(len + (hlen - L2CAP_HDR_SIZE));
++
++	if (sdulen)
++		put_unaligned_le16(sdulen, skb_put(skb, L2CAP_SDULEN_SIZE));
++
++	err = l2cap_skbuff_fromiovec(chan, msg, len, count, skb);
++	if (unlikely(err < 0)) {
++		kfree_skb(skb);
++		return ERR_PTR(err);
++	}
++
++	return skb;
++}
++
++static int l2cap_segment_le_sdu(struct l2cap_chan *chan,
++				struct sk_buff_head *seg_queue,
++				struct msghdr *msg, size_t len)
++{
++	struct sk_buff *skb;
++	size_t pdu_len;
++	u16 sdu_len;
++
++	BT_DBG("chan %p, msg %p, len %zu", chan, msg, len);
++
++	pdu_len = chan->conn->mtu - L2CAP_HDR_SIZE;
++
++	pdu_len = min_t(size_t, pdu_len, chan->remote_mps);
++
++	sdu_len = len;
++	pdu_len -= L2CAP_SDULEN_SIZE;
++
++	while (len > 0) {
++		if (len <= pdu_len)
++			pdu_len = len;
++
++		skb = l2cap_create_le_flowctl_pdu(chan, msg, pdu_len, sdu_len);
++		if (IS_ERR(skb)) {
++			__skb_queue_purge(seg_queue);
++			return PTR_ERR(skb);
++		}
++
++		__skb_queue_tail(seg_queue, skb);
++
++		len -= pdu_len;
++
++		if (sdu_len) {
++			sdu_len = 0;
++			pdu_len += L2CAP_SDULEN_SIZE;
++		}
++	}
++
++	return 0;
++}
++
+ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+ 		    u32 priority)
+ {
+@@ -2543,10 +2639,39 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+ 
+ 	switch (chan->mode) {
+ 	case L2CAP_MODE_LE_FLOWCTL:
++		/* Check outgoing MTU */
++		if (len > chan->omtu)
++			return -EMSGSIZE;
++
+ 		if (!chan->tx_credits)
+ 			return -EAGAIN;
+ 
+-		/* fall through */
++		__skb_queue_head_init(&seg_queue);
++
++		err = l2cap_segment_le_sdu(chan, &seg_queue, msg, len);
++
++		if (chan->state != BT_CONNECTED) {
++			__skb_queue_purge(&seg_queue);
++			err = -ENOTCONN;
++		}
++
++		if (err)
++			return err;
++
++		skb_queue_splice_tail_init(&seg_queue, &chan->tx_q);
++
++		while (chan->tx_credits && !skb_queue_empty(&chan->tx_q)) {
++			l2cap_do_send(chan, skb_dequeue(&chan->tx_q));
++			chan->tx_credits--;
++		}
++
++		if (!chan->tx_credits)
++			chan->ops->suspend(chan);
++
++		err = len;
++
++		break;
++
+ 	case L2CAP_MODE_BASIC:
+ 		/* Check outgoing MTU */
+ 		if (len > chan->omtu)
+-- 
+1.8.4.2
+
