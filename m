@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 16/31] Bluetooth: Track LE L2CAP credits in l2cap_chan
-Date: Wed,  4 Dec 2013 16:11:12 +0200
-Message-Id: <1386166287-13693-17-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 15/31] Bluetooth: Add LE L2CAP flow control mode
+Date: Wed,  4 Dec 2013 16:11:11 +0200
+Message-Id: <1386166287-13693-16-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1386166287-13693-1-git-send-email-johan.hedberg@gmail.com>
 References: <1386166287-13693-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,130 +11,155 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch adds tracking of L2CAP connection oriented channel local and
-remote credits to struct l2cap_chan and ensures that connect requests
-and responses contain the right values.
+The LE connection oriented channels have their own mode with its own
+data transfer rules. In order to implement this properly we need to
+distinguish L2CAP channels operating in this mode from other modes.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/l2cap.h |  3 +++
- net/bluetooth/l2cap_core.c    | 16 +++++++++++-----
- net/bluetooth/l2cap_sock.c    |  2 ++
- 3 files changed, 16 insertions(+), 5 deletions(-)
+ include/net/bluetooth/l2cap.h |  7 +++++++
+ net/bluetooth/l2cap_core.c    | 13 +++++++++++++
+ net/bluetooth/l2cap_sock.c    | 21 ++++++++++++++++++---
+ 3 files changed, 38 insertions(+), 3 deletions(-)
 
 diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index c60498907180..8c59ed17ee90 100644
+index b622ccc0ab64..c60498907180 100644
 --- a/include/net/bluetooth/l2cap.h
 +++ b/include/net/bluetooth/l2cap.h
-@@ -514,6 +514,9 @@ struct l2cap_chan {
- 	__u16		monitor_timeout;
- 	__u16		mps;
+@@ -328,6 +328,12 @@ struct l2cap_conf_rfc {
+ #define L2CAP_MODE_ERTM		0x03
+ #define L2CAP_MODE_STREAMING	0x04
  
-+	__u16		tx_credits;
-+	__u16		rx_credits;
++/* Unlike the above this one doesn't actually map to anything that would
++ * ever be sent over the air. Therefore, use a value that's unlikely to
++ * ever be used in the BR/EDR configuration phase.
++ */
++#define L2CAP_MODE_LE_FLOWCTL	0x80
 +
- 	__u8		tx_state;
- 	__u8		rx_state;
- 
+ struct l2cap_conf_efs {
+ 	__u8	id;
+ 	__u8	stype;
+@@ -861,6 +867,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+ void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
+ int l2cap_chan_check_security(struct l2cap_chan *chan);
+ void l2cap_chan_set_defaults(struct l2cap_chan *chan);
++void l2cap_le_flowctl_init(struct l2cap_chan *chan);
+ int l2cap_ertm_init(struct l2cap_chan *chan);
+ void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 4ca6fbc777f0..8a1c528908fb 100644
+index cc7421568c68..4ca6fbc777f0 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -495,6 +495,8 @@ void l2cap_le_flowctl_init(struct l2cap_chan *chan)
- 	chan->imtu = L2CAP_DEFAULT_MTU;
- 	chan->omtu = L2CAP_LE_MIN_MTU;
- 	chan->mode = L2CAP_MODE_LE_FLOWCTL;
-+	chan->tx_credits = 0;
-+	chan->rx_credits = L2CAP_LE_MAX_CREDITS;
+@@ -490,6 +490,13 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan)
+ 	set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
  }
  
++void l2cap_le_flowctl_init(struct l2cap_chan *chan)
++{
++	chan->imtu = L2CAP_DEFAULT_MTU;
++	chan->omtu = L2CAP_LE_MIN_MTU;
++	chan->mode = L2CAP_MODE_LE_FLOWCTL;
++}
++
  void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
-@@ -643,7 +645,7 @@ static void l2cap_chan_le_connect_reject(struct l2cap_chan *chan)
- 	rsp.dcid    = cpu_to_le16(chan->scid);
- 	rsp.mtu     = cpu_to_le16(chan->imtu);
- 	rsp.mps     = __constant_cpu_to_le16(L2CAP_LE_DEFAULT_MPS);
--	rsp.credits = __constant_cpu_to_le16(L2CAP_LE_MAX_CREDITS);
-+	rsp.credits = cpu_to_le16(chan->rx_credits);
- 	rsp.result  = cpu_to_le16(result);
- 
- 	l2cap_send_cmd(conn, chan->ident, L2CAP_LE_CONN_RSP, sizeof(rsp),
-@@ -1212,7 +1214,7 @@ static void l2cap_le_connect(struct l2cap_chan *chan)
- 	req.scid    = cpu_to_le16(chan->scid);
- 	req.mtu     = cpu_to_le16(chan->imtu);
- 	req.mps     = __constant_cpu_to_le16(L2CAP_LE_DEFAULT_MPS);
--	req.credits = __constant_cpu_to_le16(L2CAP_LE_MAX_CREDITS);
-+	req.credits = cpu_to_le16(chan->rx_credits);
- 
- 	chan->ident = l2cap_get_ident(conn);
- 
-@@ -3690,7 +3692,7 @@ void __l2cap_le_connect_rsp_defer(struct l2cap_chan *chan)
- 	rsp.dcid    = cpu_to_le16(chan->scid);
- 	rsp.mtu     = cpu_to_le16(chan->imtu);
- 	rsp.mps     = __constant_cpu_to_le16(L2CAP_LE_DEFAULT_MPS);
--	rsp.credits = __constant_cpu_to_le16(L2CAP_LE_MAX_CREDITS);
-+	rsp.credits = cpu_to_le16(chan->rx_credits);
- 	rsp.result  = __constant_cpu_to_le16(L2CAP_CR_SUCCESS);
- 
- 	l2cap_send_cmd(conn, chan->ident, L2CAP_LE_CONN_RSP, sizeof(rsp),
-@@ -5342,6 +5344,7 @@ static int l2cap_le_connect_rsp(struct l2cap_conn *conn,
- 		chan->dcid = dcid;
- 		chan->omtu = mtu;
- 		chan->remote_mps = mps;
-+		chan->tx_credits = credits;
- 		l2cap_chan_ready(chan);
+ {
+ 	BT_DBG("conn %p, psm 0x%2.2x, dcid 0x%4.4x", conn,
+@@ -597,6 +604,9 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 	case L2CAP_MODE_BASIC:
  		break;
  
-@@ -5445,7 +5448,7 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
- 	struct l2cap_le_conn_req *req = (struct l2cap_le_conn_req *) data;
- 	struct l2cap_le_conn_rsp rsp;
- 	struct l2cap_chan *chan, *pchan;
--	u16 dcid, scid, mtu, mps;
-+	u16 dcid, scid, credits, mtu, mps;
- 	__le16 psm;
- 	u8 result;
++	case L2CAP_MODE_LE_FLOWCTL:
++		break;
++
+ 	case L2CAP_MODE_ERTM:
+ 		__clear_retrans_timer(chan);
+ 		__clear_monitor_timer(chan);
+@@ -1849,6 +1859,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
  
-@@ -5457,6 +5460,7 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
- 	mps  = __le16_to_cpu(req->mps);
- 	psm  = req->psm;
- 	dcid = 0;
-+	credits = 0;
+ 	switch (chan->mode) {
+ 	case L2CAP_MODE_BASIC:
++	case L2CAP_MODE_LE_FLOWCTL:
+ 		break;
+ 	case L2CAP_MODE_ERTM:
+ 	case L2CAP_MODE_STREAMING:
+@@ -2530,6 +2541,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
  
- 	if (mtu < 23 || mps < 23)
- 		return -EPROTO;
-@@ -5501,9 +5505,11 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
- 	chan->dcid = scid;
- 	chan->omtu = mtu;
- 	chan->remote_mps = mps;
-+	chan->tx_credits = __le16_to_cpu(req->credits);
+ 	switch (chan->mode) {
+ 	case L2CAP_MODE_BASIC:
++	case L2CAP_MODE_LE_FLOWCTL:
+ 		/* Check outgoing MTU */
+ 		if (len > chan->omtu)
+ 			return -EMSGSIZE;
+@@ -6619,6 +6631,7 @@ static void l2cap_data_channel(struct l2cap_conn *conn, u16 cid,
+ 		goto drop;
  
- 	__l2cap_chan_add(conn, chan);
- 	dcid = chan->scid;
-+	credits = chan->rx_credits;
- 
- 	__set_chan_timer(chan, chan->ops->get_sndtimeo(chan));
- 
-@@ -5535,7 +5541,7 @@ response:
- 	}
- 
- 	rsp.dcid    = cpu_to_le16(dcid);
--	rsp.credits = __constant_cpu_to_le16(L2CAP_LE_MAX_CREDITS);
-+	rsp.credits = cpu_to_le16(credits);
- 	rsp.result  = cpu_to_le16(result);
- 
- 	l2cap_send_cmd(conn, cmd->ident, L2CAP_LE_CONN_RSP, sizeof(rsp), &rsp);
+ 	switch (chan->mode) {
++	case L2CAP_MODE_LE_FLOWCTL:
+ 	case L2CAP_MODE_BASIC:
+ 		/* If socket recv buffers overflows we drop data here
+ 		 * which is *bad* because L2CAP has to be reliable.
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 485ca349fed5..61e25bafdf43 100644
+index 5a1d0cb0b8d5..485ca349fed5 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -1321,6 +1321,8 @@ static void l2cap_sock_init(struct sock *sk, struct sock *parent)
- 		chan->tx_win_max = pchan->tx_win_max;
- 		chan->sec_level = pchan->sec_level;
- 		chan->flags = pchan->flags;
-+		chan->tx_credits = pchan->tx_credits;
-+		chan->rx_credits = pchan->rx_credits;
+@@ -130,6 +130,9 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
+ 	bacpy(&chan->src, &la.l2_bdaddr);
+ 	chan->src_type = la.l2_bdaddr_type;
  
- 		security_sk_clone(parent, sk);
- 	} else {
++	if (chan->psm && bdaddr_type_is_le(chan->src_type))
++		l2cap_le_flowctl_init(chan);
++
+ 	chan->state = BT_BOUND;
+ 	sk->sk_state = BT_BOUND;
+ 
+@@ -200,6 +203,9 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
+ 			return -EINVAL;
+ 	}
+ 
++	if (chan->psm && bdaddr_type_is_le(chan->src_type))
++		l2cap_le_flowctl_init(chan);
++
+ 	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
+ 				 &la.l2_bdaddr, la.l2_bdaddr_type);
+ 	if (err)
+@@ -237,6 +243,7 @@ static int l2cap_sock_listen(struct socket *sock, int backlog)
+ 
+ 	switch (chan->mode) {
+ 	case L2CAP_MODE_BASIC:
++	case L2CAP_MODE_LE_FLOWCTL:
+ 		break;
+ 	case L2CAP_MODE_ERTM:
+ 	case L2CAP_MODE_STREAMING:
+@@ -588,6 +595,8 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname,
+ 
+ 		chan->mode = opts.mode;
+ 		switch (chan->mode) {
++		case L2CAP_MODE_LE_FLOWCTL:
++			break;
+ 		case L2CAP_MODE_BASIC:
+ 			clear_bit(CONF_STATE2_DEVICE, &chan->conf_state);
+ 			break;
+@@ -862,10 +871,16 @@ static int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
+ 
+ 	if (sk->sk_state == BT_CONNECT2 && test_bit(BT_SK_DEFER_SETUP,
+ 						    &bt_sk(sk)->flags)) {
+-		sk->sk_state = BT_CONFIG;
+-		pi->chan->state = BT_CONFIG;
++		if (bdaddr_type_is_le(pi->chan->src_type)) {
++			sk->sk_state = BT_CONNECTED;
++			pi->chan->state = BT_CONNECTED;
++			__l2cap_le_connect_rsp_defer(pi->chan);
++		} else {
++			sk->sk_state = BT_CONFIG;
++			pi->chan->state = BT_CONFIG;
++			__l2cap_connect_rsp_defer(pi->chan);
++		}
+ 
+-		__l2cap_connect_rsp_defer(pi->chan);
+ 		err = 0;
+ 		goto done;
+ 	}
 -- 
 1.8.4.2
 
