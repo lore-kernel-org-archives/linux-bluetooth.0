@@ -1,98 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 02/32] Bluetooth: Add module parameter to enable LE CoC support
-Date: Thu,  5 Dec 2013 15:11:00 +0200
-Message-Id: <1386249090-10236-3-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
-References: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 00/32] Bluetooth: LE CoC support
+Date: Thu,  5 Dec 2013 15:10:58 +0200
+Message-Id: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-Along with the L2CAP Connection Oriented Channels features it is now
-allowed to use both custom fixed CIDs as well as PSM based (connection
-oriented connections). Since the support for this (with the subsequent
-patches) is still on an experimental stage, add a module parameter to
-enable it.
+Here's v2 of the patches with all comments taken into account.
+Additionally I've fixed the permissions of the debugfs files, fixed the
+credits calculation for max_credits == 1, and added a cleanup patch at
+the end of the set for simplifying l2cap_chan initialization for LE CoC.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/l2cap.h |  1 +
- net/bluetooth/l2cap_sock.c    | 18 ++++++++++++------
- 2 files changed, 13 insertions(+), 6 deletions(-)
+I've also updated user space l2test now to support the new BT_SNDMTU and
+BT_RCVMTU socket options, i.e. the LE CoC functionality can now be
+tested using upstream l2test.
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index c853b16de4ef..94645d56fea7 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -809,6 +809,7 @@ static inline long l2cap_chan_no_get_sndtimeo(struct l2cap_chan *chan)
- }
- 
- extern bool disable_ertm;
-+extern bool enable_lecoc;
- 
- int l2cap_init_sockets(void);
- void l2cap_cleanup_sockets(void);
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 7cc24d263caa..5a1d0cb0b8d5 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -27,6 +27,7 @@
- 
- /* Bluetooth L2CAP sockets. */
- 
-+#include <linux/module.h>
- #include <linux/export.h>
- 
- #include <net/bluetooth/bluetooth.h>
-@@ -35,6 +36,8 @@
- 
- #include "smp.h"
- 
-+bool enable_lecoc;
-+
- static struct bt_sock_list l2cap_sk_list = {
- 	.lock = __RW_LOCK_UNLOCKED(l2cap_sk_list.lock)
- };
-@@ -73,11 +76,11 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 		return -EINVAL;
- 
- 	if (bdaddr_type_is_le(la.l2_bdaddr_type)) {
--		/* Connection oriented channels are not supported on LE */
--		if (la.l2_psm)
-+		if (!enable_lecoc && la.l2_psm)
- 			return -EINVAL;
- 		/* We only allow ATT user space socket */
--		if (la.l2_cid != __constant_cpu_to_le16(L2CAP_CID_ATT))
-+		if (la.l2_cid &&
-+		    la.l2_cid != __constant_cpu_to_le16(L2CAP_CID_ATT))
- 			return -EINVAL;
- 	}
- 
-@@ -189,11 +192,11 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
- 		return -EINVAL;
- 
- 	if (bdaddr_type_is_le(la.l2_bdaddr_type)) {
--		/* Connection oriented channels are not supported on LE */
--		if (la.l2_psm)
-+		if (!enable_lecoc && la.l2_psm)
- 			return -EINVAL;
- 		/* We only allow ATT user space socket */
--		if (la.l2_cid != __constant_cpu_to_le16(L2CAP_CID_ATT))
-+		if (la.l2_cid &&
-+		    la.l2_cid != __constant_cpu_to_le16(L2CAP_CID_ATT))
- 			return -EINVAL;
- 	}
- 
-@@ -1469,3 +1472,6 @@ void l2cap_cleanup_sockets(void)
- 	bt_sock_unregister(BTPROTO_L2CAP);
- 	proto_unregister(&l2cap_proto);
- }
-+
-+module_param(enable_lecoc, bool, 0644);
-+MODULE_PARM_DESC(enable_lecoc, "Enable support for LE CoC");
--- 
-1.8.4.2
+Johan
+
+----------------------------------------------------------------
+Johan Hedberg (32):
+      Bluetooth: Remove unnecessary braces from one-line if-statement
+      Bluetooth: Add module parameter to enable LE CoC support
+      Bluetooth: Update l2cap_global_chan_by_psm() to take a link type
+      Bluetooth: Allow l2cap_chan_check_security() to be used for LE links.
+      Bluetooth: Pass command length to LE signaling channel handlers
+      Bluetooth: Move LE L2CAP initiator procedure to its own function
+      Bluetooth: Add definitions for LE connection oriented channels
+      Bluetooth: Add initial code for LE L2CAP Connect Request
+      Bluetooth: Add smp_sufficient_security helper function
+      Bluetooth: Refactor L2CAP connect rejection to its own function
+      Bluetooth: Add basic LE L2CAP connect request receiving support
+      Bluetooth: Fix L2CAP channel closing for LE connections
+      Bluetooth: Add L2CAP Disconnect suppport for LE
+      Bluetooth: Make l2cap_le_sig_cmd logic consistent
+      Bluetooth: Add LE L2CAP flow control mode
+      Bluetooth: Track LE L2CAP credits in l2cap_chan
+      Bluetooth: Limit L2CAP_OPTIONS socket option usage with LE
+      Bluetooth: Add new BT_SNDMTU and BT_RCVMTU socket options
+      Bluetooth: Implement returning of LE L2CAP credits
+      Bluetooth: Add LE flow control discipline
+      Bluetooth: Reject LE CoC commands when the feature is not enabled
+      Bluetooth: Introduce L2CAP channel callback for suspending
+      Bluetooth: Add LE L2CAP segmentation support for outgoing data
+      Bluetooth: Implement LE L2CAP reassembly
+      Bluetooth: Fix LE L2CAP Connect Request handling together with SMP
+      Bluetooth: Fix suspending the L2CAP socket if we start with 0 credits
+      Bluetooth: Limit LE MPS to the MTU value
+      Bluetooth: Fix clearing of chan->omtu for LE CoC channels
+      Bluetooth: Fix CID ranges for LE CoC CID allocations
+      Bluetooth: Fix validating LE PSM values
+      Bluetooth: Add debugfs controls for LE CoC MPS and Credits
+      Bluetooth: Simplify l2cap_chan initialization for LE CoC
+
+ include/net/bluetooth/bluetooth.h |   3 +
+ include/net/bluetooth/l2cap.h     |  45 +++
+ net/bluetooth/l2cap_core.c        | 720 ++++++++++++++++++++++++++++++++++---
+ net/bluetooth/l2cap_sock.c        | 157 +++++++-
+ net/bluetooth/smp.c               |  16 +-
+ net/bluetooth/smp.h               |   1 +
+ 6 files changed, 873 insertions(+), 69 deletions(-)
 
