@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 15/32] Bluetooth: Add LE L2CAP flow control mode
-Date: Thu,  5 Dec 2013 15:11:13 +0200
-Message-Id: <1386249090-10236-16-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 14/32] Bluetooth: Make l2cap_le_sig_cmd logic consistent
+Date: Thu,  5 Dec 2013 15:11:12 +0200
+Message-Id: <1386249090-10236-15-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
 References: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,155 +11,69 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The LE connection oriented channels have their own mode with its own
-data transfer rules. In order to implement this properly we need to
-distinguish L2CAP channels operating in this mode from other modes.
+This patch makes the error handling and return logic of l2cap_le_sig_cmd
+consistent with its BR/EDR counterpart.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/l2cap.h |  7 +++++++
- net/bluetooth/l2cap_core.c    | 13 +++++++++++++
- net/bluetooth/l2cap_sock.c    | 21 ++++++++++++++++++---
- 3 files changed, 38 insertions(+), 3 deletions(-)
+ net/bluetooth/l2cap_core.c | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index b622ccc0ab64..c60498907180 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -328,6 +328,12 @@ struct l2cap_conf_rfc {
- #define L2CAP_MODE_ERTM		0x03
- #define L2CAP_MODE_STREAMING	0x04
- 
-+/* Unlike the above this one doesn't actually map to anything that would
-+ * ever be sent over the air. Therefore, use a value that's unlikely to
-+ * ever be used in the BR/EDR configuration phase.
-+ */
-+#define L2CAP_MODE_LE_FLOWCTL	0x80
-+
- struct l2cap_conf_efs {
- 	__u8	id;
- 	__u8	stype;
-@@ -861,6 +867,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
- void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
- int l2cap_chan_check_security(struct l2cap_chan *chan);
- void l2cap_chan_set_defaults(struct l2cap_chan *chan);
-+void l2cap_le_flowctl_init(struct l2cap_chan *chan);
- int l2cap_ertm_init(struct l2cap_chan *chan);
- void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
- void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index cc7421568c68..4ca6fbc777f0 100644
+index d6921a4222e9..cc7421568c68 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -490,6 +490,13 @@ void l2cap_chan_set_defaults(struct l2cap_chan *chan)
- 	set_bit(FLAG_FORCE_ACTIVE, &chan->flags);
+@@ -5535,34 +5535,42 @@ static inline int l2cap_le_sig_cmd(struct l2cap_conn *conn,
+ 				   struct l2cap_cmd_hdr *cmd, u16 cmd_len,
+ 				   u8 *data)
+ {
++	int err = 0;
++
+ 	switch (cmd->code) {
+ 	case L2CAP_COMMAND_REJ:
+-		return 0;
++		break;
+ 
+ 	case L2CAP_CONN_PARAM_UPDATE_REQ:
+-		return l2cap_conn_param_update_req(conn, cmd, cmd_len, data);
++		err = l2cap_conn_param_update_req(conn, cmd, cmd_len, data);
++		break;
+ 
+ 	case L2CAP_CONN_PARAM_UPDATE_RSP:
+-		return 0;
++		break;
+ 
+ 	case L2CAP_LE_CONN_RSP:
+ 		l2cap_le_connect_rsp(conn, cmd, cmd_len, data);
+-		return 0;
++		break;
+ 
+ 	case L2CAP_LE_CONN_REQ:
+-		return l2cap_le_connect_req(conn, cmd, cmd_len, data);
++		err = l2cap_le_connect_req(conn, cmd, cmd_len, data);
++		break;
+ 
+ 	case L2CAP_DISCONN_REQ:
+-		return l2cap_disconnect_req(conn, cmd, cmd_len, data);
++		err = l2cap_disconnect_req(conn, cmd, cmd_len, data);
++		break;
+ 
+ 	case L2CAP_DISCONN_RSP:
+ 		l2cap_disconnect_rsp(conn, cmd, cmd_len, data);
+-		return 0;
++		break;
+ 
+ 	default:
+ 		BT_ERR("Unknown LE signaling command 0x%2.2x", cmd->code);
+-		return -EINVAL;
++		err = -EINVAL;
++		break;
+ 	}
++
++	return err;
  }
  
-+void l2cap_le_flowctl_init(struct l2cap_chan *chan)
-+{
-+	chan->imtu = L2CAP_DEFAULT_MTU;
-+	chan->omtu = L2CAP_LE_MIN_MTU;
-+	chan->mode = L2CAP_MODE_LE_FLOWCTL;
-+}
-+
- void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- {
- 	BT_DBG("conn %p, psm 0x%2.2x, dcid 0x%4.4x", conn,
-@@ -597,6 +604,9 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 	case L2CAP_MODE_BASIC:
- 		break;
- 
-+	case L2CAP_MODE_LE_FLOWCTL:
-+		break;
-+
- 	case L2CAP_MODE_ERTM:
- 		__clear_retrans_timer(chan);
- 		__clear_monitor_timer(chan);
-@@ -1849,6 +1859,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 
- 	switch (chan->mode) {
- 	case L2CAP_MODE_BASIC:
-+	case L2CAP_MODE_LE_FLOWCTL:
- 		break;
- 	case L2CAP_MODE_ERTM:
- 	case L2CAP_MODE_STREAMING:
-@@ -2530,6 +2541,7 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
- 
- 	switch (chan->mode) {
- 	case L2CAP_MODE_BASIC:
-+	case L2CAP_MODE_LE_FLOWCTL:
- 		/* Check outgoing MTU */
- 		if (len > chan->omtu)
- 			return -EMSGSIZE;
-@@ -6619,6 +6631,7 @@ static void l2cap_data_channel(struct l2cap_conn *conn, u16 cid,
- 		goto drop;
- 
- 	switch (chan->mode) {
-+	case L2CAP_MODE_LE_FLOWCTL:
- 	case L2CAP_MODE_BASIC:
- 		/* If socket recv buffers overflows we drop data here
- 		 * which is *bad* because L2CAP has to be reliable.
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 5a1d0cb0b8d5..485ca349fed5 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -130,6 +130,9 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 	bacpy(&chan->src, &la.l2_bdaddr);
- 	chan->src_type = la.l2_bdaddr_type;
- 
-+	if (chan->psm && bdaddr_type_is_le(chan->src_type))
-+		l2cap_le_flowctl_init(chan);
-+
- 	chan->state = BT_BOUND;
- 	sk->sk_state = BT_BOUND;
- 
-@@ -200,6 +203,9 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
- 			return -EINVAL;
- 	}
- 
-+	if (chan->psm && bdaddr_type_is_le(chan->src_type))
-+		l2cap_le_flowctl_init(chan);
-+
- 	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
- 				 &la.l2_bdaddr, la.l2_bdaddr_type);
- 	if (err)
-@@ -237,6 +243,7 @@ static int l2cap_sock_listen(struct socket *sock, int backlog)
- 
- 	switch (chan->mode) {
- 	case L2CAP_MODE_BASIC:
-+	case L2CAP_MODE_LE_FLOWCTL:
- 		break;
- 	case L2CAP_MODE_ERTM:
- 	case L2CAP_MODE_STREAMING:
-@@ -588,6 +595,8 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname,
- 
- 		chan->mode = opts.mode;
- 		switch (chan->mode) {
-+		case L2CAP_MODE_LE_FLOWCTL:
-+			break;
- 		case L2CAP_MODE_BASIC:
- 			clear_bit(CONF_STATE2_DEVICE, &chan->conf_state);
- 			break;
-@@ -862,10 +871,16 @@ static int l2cap_sock_recvmsg(struct kiocb *iocb, struct socket *sock,
- 
- 	if (sk->sk_state == BT_CONNECT2 && test_bit(BT_SK_DEFER_SETUP,
- 						    &bt_sk(sk)->flags)) {
--		sk->sk_state = BT_CONFIG;
--		pi->chan->state = BT_CONFIG;
-+		if (bdaddr_type_is_le(pi->chan->src_type)) {
-+			sk->sk_state = BT_CONNECTED;
-+			pi->chan->state = BT_CONNECTED;
-+			__l2cap_le_connect_rsp_defer(pi->chan);
-+		} else {
-+			sk->sk_state = BT_CONFIG;
-+			pi->chan->state = BT_CONFIG;
-+			__l2cap_connect_rsp_defer(pi->chan);
-+		}
- 
--		__l2cap_connect_rsp_defer(pi->chan);
- 		err = 0;
- 		goto done;
- 	}
+ static inline void l2cap_le_sig_channel(struct l2cap_conn *conn,
 -- 
 1.8.4.2
 
