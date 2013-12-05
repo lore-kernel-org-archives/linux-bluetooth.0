@@ -1,36 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/8] android: Fix sending status on bluetooth init if already initialized
-Date: Thu,  5 Dec 2013 11:37:12 +0100
-Message-Id: <1386239837-4102-3-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 2/8] android: Update haltest tool entry in README
+Date: Thu,  5 Dec 2013 11:37:11 +0100
+Message-Id: <1386239837-4102-2-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1386239837-4102-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1386239837-4102-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We should be sending BT_STATUS_DONE when calling init on already
-initialized interface like Bluedroid does. This indicates that previosly
-registered callbacks are still registered, not those passed with second
-init call.
+Update informations about 'adapter' interface being renamed to 'bluetooth' and
+init being called on haltest startup by default.
 
 ---
- android/hal-bluetooth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/README | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 87d6fc7..7cac15c 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -373,7 +373,7 @@ static int init(bt_callbacks_t *callbacks)
- 	DBG("");
+diff --git a/android/README b/android/README
+index 6c2c53f..68c3e9f 100644
+--- a/android/README
++++ b/android/README
+@@ -82,9 +82,12 @@ Testing tool
+ ============
  
- 	if (interface_ready())
--		return BT_STATUS_SUCCESS;
-+		return BT_STATUS_DONE;
- 
- 	bt_hal_cbacks = callbacks;
- 
+ BT HAL test tools located in android/haltest is provided for HAL level testing
+-of both Android daemon and HAL library. Start it and type 'adapter init' in
+-prompt to initialize HAL library. On Android required bluetoothd service will
+-be started automatically. On Linux it is required to start android/bluetoothd
+-manually before init command timeout. To deinitialize HAL library and stop
+-daemon type 'adapter cleanup'. Type 'help' for more information. Tab completion
+-is also supported.
++of both Android daemon and HAL library. Start it with '-n' parameter and type
++'bluetooth init' in prompt to initialize HAL library. Running without parameter
++will make haltest try to initialize all services after start. On Android
++required bluetoothd service will be started automatically. On Linux it is
++required to start android/bluetoothd manually before init command timeout or
++use provided android/system-emulator, which takes care of launching daemon
++automatically on HAL library initialization. To deinitialize HAL library and
++stop daemon type 'bluetooth cleanup'. Type 'help' for more information. Tab
++completion is also supported.
 -- 
 1.8.5
 
