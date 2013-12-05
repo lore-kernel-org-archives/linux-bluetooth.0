@@ -1,49 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1385631770-3858-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1385631770-3858-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-	<1385631770-3858-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-Date: Thu, 5 Dec 2013 17:00:23 +0200
-Message-ID: <CABBYNZK++FwBxfH2Hya8GVwXhMSMmbC+mwvzA+_fLKa6+V6jzw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/6] android: Add android-tester
+In-Reply-To: <1386085873-21715-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1386085873-21715-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1386085873-21715-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 5 Dec 2013 16:51:25 +0200
+Message-ID: <CABBYNZJDK=fdyHGDojdMkSgD4qQT_=bzLArOv4ObXEeeN-cuSw@mail.gmail.com>
+Subject: Re: [PATCHv2 1/4] android/socket: Cleanup sockets on unregister
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Andrei,
 
-On Thu, Nov 28, 2013 at 11:42 AM, Grzegorz Kolodziejczyk
-<grzegorz.kolodziejczyk@tieto.com> wrote:
-> From: Marcin Kraglak <marcin.kraglak@tieto.com>
+On Tue, Dec 3, 2013 at 5:51 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
-> This commit add android-tester.c to tree and Makefile.am.
-> This will contain set of unit tests for testing android daemon.
+> This cleans up rfsock structures closing all sockets and making general cleanup
+> for servers and for connections. This will be called form socket unregister.
 > ---
->  android/Makefile.am      |  4 ++++
->  android/android-tester.c | 21 +++++++++++++++++++++
->  2 files changed, 25 insertions(+)
->  create mode 100644 android/android-tester.c
+>  android/socket.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 >
-> diff --git a/android/Makefile.am b/android/Makefile.am
-> index 94d231f..9390422 100644
-> --- a/android/Makefile.am
-> +++ b/android/Makefile.am
-> @@ -82,6 +82,10 @@ android_haltest_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android \
+> diff --git a/android/socket.c b/android/socket.c
+> index c9eca44..9020874 100644
+> --- a/android/socket.c
+> +++ b/android/socket.c
+> @@ -93,8 +93,10 @@ static struct rfcomm_sock *create_rfsock(int sock, int *hal_fd)
+>         return rfsock;
+>  }
 >
->  android_haltest_LDFLAGS = -pthread
->
-> +noinst_PROGRAMS += android/android-tester
+> -static void cleanup_rfsock(struct rfcomm_sock *rfsock)
+> +static void cleanup_rfsock(gpointer data)
+>  {
+> +       struct rfcomm_sock *rfsock = data;
 > +
-> +android_android_tester_SOURCES = android/android-tester.c
+>         DBG("rfsock: %p fd %d real_sock %d chan %u",
+>                 rfsock, rfsock->fd, rfsock->real_sock, rfsock->channel);
+>
+> @@ -936,5 +938,8 @@ void bt_socket_unregister(void)
+>  {
+>         DBG("");
+>
+> +       g_list_free_full(connections, cleanup_rfsock);
+> +       g_list_free_full(servers, cleanup_rfsock);
 > +
->  endif
+>         ipc_unregister(HAL_SERVICE_ID_SOCK);
+>  }
+> --
+> 1.8.3.2
 
-You should probably add it to .gitignore as well. Also is this suppose
-to be run in the host only or do we want to run in Android as well?
+This one is now applied, please rebase make the changes we discussed
+for the last 3.
+
 
 -- 
 Luiz Augusto von Dentz
