@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 09/32] Bluetooth: Add smp_sufficient_security helper function
-Date: Thu,  5 Dec 2013 15:11:07 +0200
-Message-Id: <1386249090-10236-10-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 07/32] Bluetooth: Add definitions for LE connection oriented channels
+Date: Thu,  5 Dec 2013 15:11:05 +0200
+Message-Id: <1386249090-10236-8-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
 References: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,62 +11,70 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This function is needed both by the smp_conn_security function as well
-as upcoming code to check for the security requirements when receiving
-an L2CAP connect request over LE.
+This patch adds the necessary defines and structs for LE connection
+oriented channels.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 16 ++++++++++++----
- net/bluetooth/smp.h |  1 +
- 2 files changed, 13 insertions(+), 4 deletions(-)
+ include/net/bluetooth/l2cap.h | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index e61e74a1aabb..45007362683b 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -750,6 +750,17 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 	return 0;
- }
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 94645d56fea7..b9e3240edf02 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -112,6 +112,9 @@ struct l2cap_conninfo {
+ #define L2CAP_MOVE_CHAN_CFM_RSP	0x11
+ #define L2CAP_CONN_PARAM_UPDATE_REQ	0x12
+ #define L2CAP_CONN_PARAM_UPDATE_RSP	0x13
++#define L2CAP_LE_CONN_REQ	0x14
++#define L2CAP_LE_CONN_RSP	0x15
++#define L2CAP_LE_CREDITS	0x16
  
-+bool smp_sufficient_security(struct hci_conn *hcon, u8 sec_level)
-+{
-+	if (sec_level == BT_SECURITY_LOW)
-+		return true;
+ /* L2CAP extended feature mask */
+ #define L2CAP_FEAT_FLOWCTL	0x00000001
+@@ -257,6 +260,10 @@ struct l2cap_conn_rsp {
+ #define L2CAP_CR_SEC_BLOCK	0x0003
+ #define L2CAP_CR_NO_MEM		0x0004
+ #define L2CAP_CR_BAD_AMP	0x0005
++#define L2CAP_CR_AUTHENTICATION	0x0005
++#define L2CAP_CR_AUTHORIZATION	0x0006
++#define L2CAP_CR_BAD_KEY_SIZE	0x0007
++#define L2CAP_CR_ENCRYPTION	0x0008
+ 
+ /* connect/create channel status */
+ #define L2CAP_CS_NO_INFO	0x0000
+@@ -423,6 +430,30 @@ struct l2cap_conn_param_update_rsp {
+ #define L2CAP_CONN_PARAM_ACCEPTED	0x0000
+ #define L2CAP_CONN_PARAM_REJECTED	0x0001
+ 
++#define L2CAP_LE_MAX_CREDITS		10
++#define L2CAP_LE_DEFAULT_MPS		5400
 +
-+	if (hcon->sec_level >= sec_level)
-+		return true;
++struct l2cap_le_conn_req {
++	__le16     psm;
++	__le16     scid;
++	__le16     mtu;
++	__le16     mps;
++	__le16     credits;
++} __packed;
 +
-+	return false;
-+}
++struct l2cap_le_conn_rsp {
++	__le16     dcid;
++	__le16     mtu;
++	__le16     mps;
++	__le16     credits;
++	__le16     result;
++} __packed;
 +
- int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
- {
- 	struct l2cap_conn *conn = hcon->l2cap_data;
-@@ -761,10 +772,7 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
- 	if (!test_bit(HCI_LE_ENABLED, &hcon->hdev->dev_flags))
- 		return 1;
- 
--	if (sec_level == BT_SECURITY_LOW)
--		return 1;
--
--	if (hcon->sec_level >= sec_level)
-+	if (smp_sufficient_security(hcon, sec_level))
- 		return 1;
- 
- 	if (hcon->link_mode & HCI_LM_MASTER)
-diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
-index f8ba07f3e5fa..a700bcb490d7 100644
---- a/net/bluetooth/smp.h
-+++ b/net/bluetooth/smp.h
-@@ -136,6 +136,7 @@ struct smp_chan {
- };
- 
- /* SMP Commands */
-+bool smp_sufficient_security(struct hci_conn *hcon, u8 sec_level);
- int smp_conn_security(struct hci_conn *hcon, __u8 sec_level);
- int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb);
- int smp_distribute_keys(struct l2cap_conn *conn, __u8 force);
++struct l2cap_le_credits {
++	__le16     cid;
++	__le16     credits;
++} __packed;
++
+ /* ----- L2CAP channels and connections ----- */
+ struct l2cap_seq_list {
+ 	__u16	head;
 -- 
 1.8.4.2
 
