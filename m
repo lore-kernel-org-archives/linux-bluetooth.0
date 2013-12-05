@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 24/32] Bluetooth: Implement LE L2CAP reassembly
-Date: Thu,  5 Dec 2013 15:11:22 +0200
-Message-Id: <1386249090-10236-25-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 25/32] Bluetooth: Fix LE L2CAP Connect Request handling together with SMP
+Date: Thu,  5 Dec 2013 15:11:23 +0200
+Message-Id: <1386249090-10236-26-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
 References: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,116 +11,43 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-When receiving fragments over an LE Connection oriented Channel they
-need to be collected up and eventually merged into a single SDU. This
-patch adds the necessary code for collecting up the fragment skbs to the
-channel context and passing them to the recv() callback when the entire
-SDU has been received.
+Unlike BR/EDR, for LE when we're in the BT_CONNECT state we may or may
+not have already have sent the Connect Request. This means that we need
+some extra tracking of the request. This patch adds an extra channel
+flag to prevent the request from being sent a second time.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 79 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 76 insertions(+), 3 deletions(-)
+ include/net/bluetooth/l2cap.h | 1 +
+ net/bluetooth/l2cap_core.c    | 3 +++
+ 2 files changed, 4 insertions(+)
 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index c6c86d0e39c5..a4616eeeb8b5 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -695,6 +695,7 @@ enum {
+ 	FLAG_EXT_CTRL,
+ 	FLAG_EFS_ENABLE,
+ 	FLAG_DEFER_SETUP,
++	FLAG_LE_CONN_REQ_SENT,
+ };
+ 
+ enum {
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 9869faa2904d..ae90dd284c87 100644
+index ae90dd284c87..ddb61564fe6a 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -6816,18 +6816,91 @@ static void l2cap_chan_le_send_credits(struct l2cap_chan *chan)
+@@ -1223,6 +1223,9 @@ static void l2cap_le_connect(struct l2cap_chan *chan)
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct l2cap_le_conn_req req;
  
- static int l2cap_le_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
- {
--	if (!chan->rx_credits)
-+	int err;
++	if (test_and_set_bit(FLAG_LE_CONN_REQ_SENT, &chan->flags))
++		return;
 +
-+	if (!chan->rx_credits) {
-+		BT_ERR("No credits to receive LE L2CAP data");
- 		return -ENOBUFS;
-+	}
- 
--	if (chan->imtu < skb->len)
-+	if (chan->imtu < skb->len) {
-+		BT_ERR("Too big LE L2CAP PDU");
- 		return -ENOBUFS;
-+	}
- 
- 	chan->rx_credits--;
- 	BT_DBG("rx_credits %u -> %u", chan->rx_credits + 1, chan->rx_credits);
- 
- 	l2cap_chan_le_send_credits(chan);
- 
--	return chan->ops->recv(chan, skb);
-+	err = 0;
-+
-+	if (!chan->sdu) {
-+		u16 sdu_len;
-+
-+		sdu_len = get_unaligned_le16(skb->data);
-+		skb_pull(skb, L2CAP_SDULEN_SIZE);
-+
-+		BT_DBG("Start of new SDU. sdu_len %u skb->len %u imtu %u",
-+		       sdu_len, skb->len, chan->imtu);
-+
-+		if (sdu_len > chan->imtu) {
-+			BT_ERR("Too big LE L2CAP SDU length received");
-+			err = -EMSGSIZE;
-+			goto failed;
-+		}
-+
-+		if (skb->len > sdu_len) {
-+			BT_ERR("Too much LE L2CAP data received");
-+			err = -EINVAL;
-+			goto failed;
-+		}
-+
-+		if (skb->len == sdu_len)
-+			return chan->ops->recv(chan, skb);
-+
-+		chan->sdu = skb;
-+		chan->sdu_len = sdu_len;
-+		chan->sdu_last_frag = skb;
-+
-+		return 0;
-+	}
-+
-+	BT_DBG("SDU fragment. chan->sdu->len %u skb->len %u chan->sdu_len %u",
-+	       chan->sdu->len, skb->len, chan->sdu_len);
-+
-+	if (chan->sdu->len + skb->len > chan->sdu_len) {
-+		BT_ERR("Too much LE L2CAP data received");
-+		err = -EINVAL;
-+		goto failed;
-+	}
-+
-+	append_skb_frag(chan->sdu, skb, &chan->sdu_last_frag);
-+	skb = NULL;
-+
-+	if (chan->sdu->len == chan->sdu_len) {
-+		err = chan->ops->recv(chan, chan->sdu);
-+		if (!err) {
-+			chan->sdu = NULL;
-+			chan->sdu_last_frag = NULL;
-+			chan->sdu_len = 0;
-+		}
-+	}
-+
-+failed:
-+	if (err) {
-+		kfree_skb(skb);
-+		kfree_skb(chan->sdu);
-+		chan->sdu = NULL;
-+		chan->sdu_last_frag = NULL;
-+		chan->sdu_len = 0;
-+	}
-+
-+	/* We can't return an error here since we took care of the skb
-+	 * freeing internally. An error return would cause the caller to
-+	 * do a double-free of the skb.
-+	 */
-+	return 0;
- }
- 
- static void l2cap_data_channel(struct l2cap_conn *conn, u16 cid,
+ 	req.psm     = chan->psm;
+ 	req.scid    = cpu_to_le16(chan->scid);
+ 	req.mtu     = cpu_to_le16(chan->imtu);
 -- 
 1.8.4.2
 
