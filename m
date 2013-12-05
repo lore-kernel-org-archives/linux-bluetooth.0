@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 19/32] Bluetooth: Implement returning of LE L2CAP credits
-Date: Thu,  5 Dec 2013 15:11:17 +0200
-Message-Id: <1386249090-10236-20-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 18/32] Bluetooth: Add new BT_SNDMTU and BT_RCVMTU socket options
+Date: Thu,  5 Dec 2013 15:11:16 +0200
+Message-Id: <1386249090-10236-19-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
 References: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,51 +11,102 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-We should return credits to the remote side whenever they fall below a
-certain level (in our case under half of the initially given amount).
+This patch adds new socket options for LE sockets since the existing
+L2CAP_OPTIONS socket option is not usable for LE. For now, the new
+socket options also require LE CoC support to be explicitly enabled to
+leave some playroom in case something needs to be changed in a backwards
+incompatible way.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ include/net/bluetooth/bluetooth.h |  3 +++
+ net/bluetooth/l2cap_sock.c        | 52 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 55 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 8a1c528908fb..4857c182a3be 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -6608,6 +6608,32 @@ drop:
- 	return 0;
- }
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 2a628b28249f..f4f9ee466791 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -115,6 +115,9 @@ struct bt_voice {
+ #define BT_VOICE_TRANSPARENT			0x0003
+ #define BT_VOICE_CVSD_16BIT			0x0060
  
-+static void l2cap_chan_le_send_credits(struct l2cap_chan *chan)
-+{
-+	struct l2cap_conn *conn = chan->conn;
-+	struct l2cap_le_credits pkt;
-+	u16 return_credits;
++#define BT_SNDMTU		12
++#define BT_RCVMTU		13
 +
-+	/* We return more credits to the sender only after the amount of
-+	 * credits falls below half of the initial amount.
-+	 */
-+	if (chan->rx_credits >= (L2CAP_LE_MAX_CREDITS + 1) / 2)
-+		return;
+ __printf(1, 2)
+ int bt_info(const char *fmt, ...);
+ __printf(1, 2)
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index a20fcc3ddcd9..9007def8c619 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -534,6 +534,31 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
+ 			err = -EFAULT;
+ 		break;
+ 
++	case BT_SNDMTU:
++		if (sk->sk_state != BT_CONNECTED) {
++			err = -ENOTCONN;
++			break;
++		}
 +
-+	return_credits = L2CAP_LE_MAX_CREDITS - chan->rx_credits;
++		if (!enable_lecoc || !bdaddr_type_is_le(chan->src_type)) {
++			err = -EINVAL;
++			break;
++		}
 +
-+	BT_DBG("chan %p returning %u credits to sender", chan, return_credits);
++		if (put_user(chan->omtu, (u16 __user *) optval))
++			err = -EFAULT;
++		break;
 +
-+	chan->rx_credits += return_credits;
++	case BT_RCVMTU:
++		if (!enable_lecoc || !bdaddr_type_is_le(chan->src_type)) {
++			err = -EINVAL;
++			break;
++		}
 +
-+	pkt.cid     = cpu_to_le16(chan->scid);
-+	pkt.credits = cpu_to_le16(return_credits);
++		if (put_user(chan->imtu, (u16 __user *) optval))
++			err = -EFAULT;
++		break;
 +
-+	chan->ident = l2cap_get_ident(conn);
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
+@@ -834,6 +859,33 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
+ 
+ 		break;
+ 
++	case BT_SNDMTU:
++		/* Setting is not supported as it's the remote side that
++		 * decides this.
++		 */
++		err = -EINVAL;
++		break;
 +
-+	l2cap_send_cmd(conn, chan->ident, L2CAP_LE_CREDITS, sizeof(pkt), &pkt);
-+}
++	case BT_RCVMTU:
++		if (sk->sk_state == BT_CONNECTED) {
++			err = -EISCONN;
++			break;
++		}
 +
- static void l2cap_data_channel(struct l2cap_conn *conn, u16 cid,
- 			       struct sk_buff *skb)
- {
++		if (!enable_lecoc || !bdaddr_type_is_le(chan->src_type)) {
++			err = -EINVAL;
++			break;
++		}
++
++		if (get_user(opt, (u32 __user *) optval)) {
++			err = -EFAULT;
++			break;
++		}
++
++		chan->imtu = opt;
++
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
 -- 
 1.8.4.2
 
