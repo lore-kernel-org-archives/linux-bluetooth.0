@@ -1,65 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+Message-ID: <52A07953.4030804@tieto.com>
+Date: Thu, 05 Dec 2013 14:02:11 +0100
+From: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 00/32] Bluetooth: LE CoC support
-Date: Thu,  5 Dec 2013 15:10:58 +0200
-Message-Id: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
+Subject: Re: [PATCH 1/8] android: Fix turning BT off during pairing
+References: <1386239837-4102-1-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1386239837-4102-1-git-send-email-jakub.tyszkowski@tieto.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On 12/05/2013 11:37 AM, Jakub Tyszkowski wrote:
+> Not turning BT off in time due to actions queued in mgmt makes Android
+> unstable and locks Bluetooth UI controlls. This patch fixes this issue
+> by cancelling queued actions.
+>
+> ---
+>   android/bluetooth.c | 22 +++++++++++++++++++++-
+>   1 file changed, 21 insertions(+), 1 deletion(-)
+>
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index 6174b1f..e67864a 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -1982,6 +1982,9 @@ static void pair_device_complete(uint8_t status, uint16_t length,
+>
+>   	DBG("status %u", status);
+>
+> +	/*Data used for bond cancelling can be freed now*/
+> +	g_free(user_data);
+> +
+>   	/* On success bond state change will be send when new link key event
+>   	 * is received */
+>   	if (status == MGMT_STATUS_SUCCESS)
+> @@ -1991,19 +1994,34 @@ static void pair_device_complete(uint8_t status, uint16_t length,
+>   							HAL_BOND_STATE_NONE);
+>   }
+>
+> +static void pair_device_cancelled(void *data)
+> +{
+> +	bdaddr_t *addr = data;
+> +
+> +	set_device_bond_state(addr, HAL_STATUS_FAILED, HAL_BOND_STATE_NONE);
+> +
+> +	g_free(data);
+> +}
+> +
+>   static void handle_create_bond_cmd(const void *buf, uint16_t len)
+>   {
+>   	const struct hal_cmd_create_bond *cmd = buf;
+>   	uint8_t status;
+>   	struct mgmt_cp_pair_device cp;
+> +	bdaddr_t *addr;
+>
+>   	cp.io_cap = DEFAULT_IO_CAPABILITY;
+>   	cp.addr.type = BDADDR_BREDR;
+>   	android2bdaddr(cmd->bdaddr, &cp.addr.bdaddr);
+>
+> +	addr = g_new(bdaddr_t, 1);
+> +	bacpy(addr, &cp.addr.bdaddr);
+> +
+>   	if (mgmt_send(mgmt_if, MGMT_OP_PAIR_DEVICE, adapter.index, sizeof(cp),
+> -				&cp, pair_device_complete, NULL, NULL) == 0) {
+> +				&cp, pair_device_complete,
+> +				addr, pair_device_cancelled) == 0) {
+>   		status = HAL_STATUS_FAILED;
+> +		g_free(addr);
+>   		goto fail;
+>   	}
+>
+> @@ -2253,6 +2271,8 @@ static void handle_disable_cmd(const void *buf, uint16_t len)
+>   		goto failed;
+>   	}
+>
+> +	mgmt_cancel_index(mgmt_if, adapter.index);
+> +
+>   	if (!set_mode(MGMT_OP_SET_POWERED, 0x00)) {
+>   		status = HAL_STATUS_FAILED;
+>   		goto failed;
+>
+
 Hi,
 
-Here's v2 of the patches with all comments taken into account.
-Additionally I've fixed the permissions of the debugfs files, fixed the
-credits calculation for max_credits == 1, and added a cleanup patch at
-the end of the set for simplifying l2cap_chan initialization for LE CoC.
+Please ignore this one patch as it makes user_data being freed twice.
 
-I've also updated user space l2test now to support the new BT_SNDMTU and
-BT_RCVMTU socket options, i.e. the LE CoC functionality can now be
-tested using upstream l2test.
-
-Johan
-
-----------------------------------------------------------------
-Johan Hedberg (32):
-      Bluetooth: Remove unnecessary braces from one-line if-statement
-      Bluetooth: Add module parameter to enable LE CoC support
-      Bluetooth: Update l2cap_global_chan_by_psm() to take a link type
-      Bluetooth: Allow l2cap_chan_check_security() to be used for LE links.
-      Bluetooth: Pass command length to LE signaling channel handlers
-      Bluetooth: Move LE L2CAP initiator procedure to its own function
-      Bluetooth: Add definitions for LE connection oriented channels
-      Bluetooth: Add initial code for LE L2CAP Connect Request
-      Bluetooth: Add smp_sufficient_security helper function
-      Bluetooth: Refactor L2CAP connect rejection to its own function
-      Bluetooth: Add basic LE L2CAP connect request receiving support
-      Bluetooth: Fix L2CAP channel closing for LE connections
-      Bluetooth: Add L2CAP Disconnect suppport for LE
-      Bluetooth: Make l2cap_le_sig_cmd logic consistent
-      Bluetooth: Add LE L2CAP flow control mode
-      Bluetooth: Track LE L2CAP credits in l2cap_chan
-      Bluetooth: Limit L2CAP_OPTIONS socket option usage with LE
-      Bluetooth: Add new BT_SNDMTU and BT_RCVMTU socket options
-      Bluetooth: Implement returning of LE L2CAP credits
-      Bluetooth: Add LE flow control discipline
-      Bluetooth: Reject LE CoC commands when the feature is not enabled
-      Bluetooth: Introduce L2CAP channel callback for suspending
-      Bluetooth: Add LE L2CAP segmentation support for outgoing data
-      Bluetooth: Implement LE L2CAP reassembly
-      Bluetooth: Fix LE L2CAP Connect Request handling together with SMP
-      Bluetooth: Fix suspending the L2CAP socket if we start with 0 credits
-      Bluetooth: Limit LE MPS to the MTU value
-      Bluetooth: Fix clearing of chan->omtu for LE CoC channels
-      Bluetooth: Fix CID ranges for LE CoC CID allocations
-      Bluetooth: Fix validating LE PSM values
-      Bluetooth: Add debugfs controls for LE CoC MPS and Credits
-      Bluetooth: Simplify l2cap_chan initialization for LE CoC
-
- include/net/bluetooth/bluetooth.h |   3 +
- include/net/bluetooth/l2cap.h     |  45 +++
- net/bluetooth/l2cap_core.c        | 720 ++++++++++++++++++++++++++++++++++---
- net/bluetooth/l2cap_sock.c        | 157 +++++++-
- net/bluetooth/smp.c               |  16 +-
- net/bluetooth/smp.h               |   1 +
- 6 files changed, 873 insertions(+), 69 deletions(-)
-
+BR,
+Jakub Tyszkowski
