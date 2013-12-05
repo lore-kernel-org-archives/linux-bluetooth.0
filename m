@@ -1,77 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
-Subject: Re: [PATCH v2 00/32] Bluetooth: LE CoC support
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 5 Dec 2013 17:06:55 +0200
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <9C4D9768-B10C-43C3-AB61-199971BDBB34@holtmann.org>
-References: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1385631770-3858-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1385631770-3858-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+	<1385631770-3858-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Date: Thu, 5 Dec 2013 17:00:23 +0200
+Message-ID: <CABBYNZK++FwBxfH2Hya8GVwXhMSMmbC+mwvzA+_fLKa6+V6jzw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/6] android: Add android-tester
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Marcin Kraglak <marcin.kraglak@tieto.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Grzegorz,
 
-> Here's v2 of the patches with all comments taken into account.
-> Additionally I've fixed the permissions of the debugfs files, fixed the
-> credits calculation for max_credits == 1, and added a cleanup patch at
-> the end of the set for simplifying l2cap_chan initialization for LE CoC.
-> 
-> I've also updated user space l2test now to support the new BT_SNDMTU and
-> BT_RCVMTU socket options, i.e. the LE CoC functionality can now be
-> tested using upstream l2test.
-> 
-> Johan
-> 
-> ----------------------------------------------------------------
-> Johan Hedberg (32):
->      Bluetooth: Remove unnecessary braces from one-line if-statement
->      Bluetooth: Add module parameter to enable LE CoC support
->      Bluetooth: Update l2cap_global_chan_by_psm() to take a link type
->      Bluetooth: Allow l2cap_chan_check_security() to be used for LE links.
->      Bluetooth: Pass command length to LE signaling channel handlers
->      Bluetooth: Move LE L2CAP initiator procedure to its own function
->      Bluetooth: Add definitions for LE connection oriented channels
->      Bluetooth: Add initial code for LE L2CAP Connect Request
->      Bluetooth: Add smp_sufficient_security helper function
->      Bluetooth: Refactor L2CAP connect rejection to its own function
->      Bluetooth: Add basic LE L2CAP connect request receiving support
->      Bluetooth: Fix L2CAP channel closing for LE connections
->      Bluetooth: Add L2CAP Disconnect suppport for LE
->      Bluetooth: Make l2cap_le_sig_cmd logic consistent
->      Bluetooth: Add LE L2CAP flow control mode
->      Bluetooth: Track LE L2CAP credits in l2cap_chan
->      Bluetooth: Limit L2CAP_OPTIONS socket option usage with LE
->      Bluetooth: Add new BT_SNDMTU and BT_RCVMTU socket options
->      Bluetooth: Implement returning of LE L2CAP credits
->      Bluetooth: Add LE flow control discipline
->      Bluetooth: Reject LE CoC commands when the feature is not enabled
->      Bluetooth: Introduce L2CAP channel callback for suspending
->      Bluetooth: Add LE L2CAP segmentation support for outgoing data
->      Bluetooth: Implement LE L2CAP reassembly
->      Bluetooth: Fix LE L2CAP Connect Request handling together with SMP
->      Bluetooth: Fix suspending the L2CAP socket if we start with 0 credits
->      Bluetooth: Limit LE MPS to the MTU value
->      Bluetooth: Fix clearing of chan->omtu for LE CoC channels
->      Bluetooth: Fix CID ranges for LE CoC CID allocations
->      Bluetooth: Fix validating LE PSM values
->      Bluetooth: Add debugfs controls for LE CoC MPS and Credits
->      Bluetooth: Simplify l2cap_chan initialization for LE CoC
-> 
-> include/net/bluetooth/bluetooth.h |   3 +
-> include/net/bluetooth/l2cap.h     |  45 +++
-> net/bluetooth/l2cap_core.c        | 720 ++++++++++++++++++++++++++++++++++---
-> net/bluetooth/l2cap_sock.c        | 157 +++++++-
-> net/bluetooth/smp.c               |  16 +-
-> net/bluetooth/smp.h               |   1 +
-> 6 files changed, 873 insertions(+), 69 deletions(-)
+On Thu, Nov 28, 2013 at 11:42 AM, Grzegorz Kolodziejczyk
+<grzegorz.kolodziejczyk@tieto.com> wrote:
+> From: Marcin Kraglak <marcin.kraglak@tieto.com>
+>
+> This commit add android-tester.c to tree and Makefile.am.
+> This will contain set of unit tests for testing android daemon.
+> ---
+>  android/Makefile.am      |  4 ++++
+>  android/android-tester.c | 21 +++++++++++++++++++++
+>  2 files changed, 25 insertions(+)
+>  create mode 100644 android/android-tester.c
+>
+> diff --git a/android/Makefile.am b/android/Makefile.am
+> index 94d231f..9390422 100644
+> --- a/android/Makefile.am
+> +++ b/android/Makefile.am
+> @@ -82,6 +82,10 @@ android_haltest_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android \
+>
+>  android_haltest_LDFLAGS = -pthread
+>
+> +noinst_PROGRAMS += android/android-tester
+> +
+> +android_android_tester_SOURCES = android/android-tester.c
+> +
+>  endif
 
-all patches (including minor fixups) have been applied to bluetooth-next tree.
+You should probably add it to .gitignore as well. Also is this suppose
+to be run in the host only or do we want to run in Android as well?
 
-Regards
-
-Marcel
-
+-- 
+Luiz Augusto von Dentz
