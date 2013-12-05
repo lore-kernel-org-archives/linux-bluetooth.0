@@ -1,89 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52A07953.4030804@tieto.com>
-Date: Thu, 05 Dec 2013 14:02:11 +0100
-From: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/8] android: Fix turning BT off during pairing
-References: <1386239837-4102-1-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1386239837-4102-1-git-send-email-jakub.tyszkowski@tieto.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <1386085873-21715-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1386085873-21715-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1386085873-21715-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 5 Dec 2013 14:43:10 +0200
+Message-ID: <CABBYNZLzirtMJresKRYi9D-rJ8d0sJEXXDoP4X8ep=sUJv+ozQ@mail.gmail.com>
+Subject: Re: [PATCHv2 2/4] android/socket Use 64K buffer for socket handling
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 12/05/2013 11:37 AM, Jakub Tyszkowski wrote:
-> Not turning BT off in time due to actions queued in mgmt makes Android
-> unstable and locks Bluetooth UI controlls. This patch fixes this issue
-> by cancelling queued actions.
+Hi Andrei,
+
+On Tue, Dec 3, 2013 at 5:51 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
+> Make SOCKET_BUFFER define and use 0xFFFE instead of 1K.
+> The value 0XFFFE is what Android sends in OBEX Connect packet in
+> Maximum Packet Length field. Though OBEX specify meximum packet
+> length as 64K - 1 which is 0xFFFF.
 > ---
->   android/bluetooth.c | 22 +++++++++++++++++++++-
->   1 file changed, 21 insertions(+), 1 deletion(-)
+>  android/socket.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 >
-> diff --git a/android/bluetooth.c b/android/bluetooth.c
-> index 6174b1f..e67864a 100644
-> --- a/android/bluetooth.c
-> +++ b/android/bluetooth.c
-> @@ -1982,6 +1982,9 @@ static void pair_device_complete(uint8_t status, uint16_t length,
+> diff --git a/android/socket.c b/android/socket.c
+> index 9020874..9ff9019 100644
+> --- a/android/socket.c
+> +++ b/android/socket.c
+> @@ -52,6 +52,8 @@
 >
->   	DBG("status %u", status);
+>  #define SVC_HINT_OBEX 0x10
 >
-> +	/*Data used for bond cancelling can be freed now*/
-> +	g_free(user_data);
+> +#define SOCKET_BUFFER 0xFFFE
 > +
->   	/* On success bond state change will be send when new link key event
->   	 * is received */
->   	if (status == MGMT_STATUS_SUCCESS)
-> @@ -1991,19 +1994,34 @@ static void pair_device_complete(uint8_t status, uint16_t length,
->   							HAL_BOND_STATE_NONE);
->   }
+>  static bdaddr_t adapter_addr;
 >
-> +static void pair_device_cancelled(void *data)
-> +{
-> +	bdaddr_t *addr = data;
-> +
-> +	set_device_bond_state(addr, HAL_STATUS_FAILED, HAL_BOND_STATE_NONE);
-> +
-> +	g_free(data);
-> +}
-> +
->   static void handle_create_bond_cmd(const void *buf, uint16_t len)
->   {
->   	const struct hal_cmd_create_bond *cmd = buf;
->   	uint8_t status;
->   	struct mgmt_cp_pair_device cp;
-> +	bdaddr_t *addr;
+>  /* Simple list of RFCOMM server sockets */
+> @@ -487,7 +489,7 @@ static gboolean sock_stack_event_cb(GIOChannel *io, GIOCondition cond,
+>                                                                 gpointer data)
+>  {
+>         struct rfcomm_sock *rfsock = data;
+> -       unsigned char buf[1024];
+> +       unsigned char buf[SOCKET_BUFFER];
+>         int len, sent;
 >
->   	cp.io_cap = DEFAULT_IO_CAPABILITY;
->   	cp.addr.type = BDADDR_BREDR;
->   	android2bdaddr(cmd->bdaddr, &cp.addr.bdaddr);
+>         if (cond & G_IO_HUP) {
+> @@ -526,7 +528,7 @@ static gboolean sock_rfcomm_event_cb(GIOChannel *io, GIOCondition cond,
+>                                                                 gpointer data)
+>  {
+>         struct rfcomm_sock *rfsock = data;
+> -       unsigned char buf[1024];
+> +       unsigned char buf[SOCKET_BUFFER];
+>         int len, sent;
 >
-> +	addr = g_new(bdaddr_t, 1);
-> +	bacpy(addr, &cp.addr.bdaddr);
-> +
->   	if (mgmt_send(mgmt_if, MGMT_OP_PAIR_DEVICE, adapter.index, sizeof(cp),
-> -				&cp, pair_device_complete, NULL, NULL) == 0) {
-> +				&cp, pair_device_complete,
-> +				addr, pair_device_cancelled) == 0) {
->   		status = HAL_STATUS_FAILED;
-> +		g_free(addr);
->   		goto fail;
->   	}
->
-> @@ -2253,6 +2271,8 @@ static void handle_disable_cmd(const void *buf, uint16_t len)
->   		goto failed;
->   	}
->
-> +	mgmt_cancel_index(mgmt_if, adapter.index);
-> +
->   	if (!set_mode(MGMT_OP_SET_POWERED, 0x00)) {
->   		status = HAL_STATUS_FAILED;
->   		goto failed;
->
+>         if (cond & G_IO_HUP) {
+> --
+> 1.8.3.2
 
-Hi,
+We need to be a bit more generic here, the socket HAL is not
+restricted to OBEX only, also it doesn't seems you are adjusting the
+buffer level of the sockets, the buffer itself is just to copy between
+the sockets so we have to follow how much the sockets can
+transmit/receive not the other way around.
 
-Please ignore this one patch as it makes user_data being freed twice.
+So it seems to me that we should either set the maximum MTU size we
+could use with RFCOMM (UINT16_MAX?) or read the MTU once connected
+(not sure if makes sense since it is SOCK_STREAM) and then allocate
+the same amount as buffer in a field in struct rfcomm_sock, also this
+needs then to be set back to socketpair with
+setsocketopt(SO_RCVBUF/SO_SNDBUF) so we minimize context switches and
+wakeups.
 
-BR,
-Jakub Tyszkowski
+
+-- 
+Luiz Augusto von Dentz
