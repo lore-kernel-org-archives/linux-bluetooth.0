@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 27/32] Bluetooth: Limit LE MPS to the MTU value
-Date: Thu,  5 Dec 2013 15:11:25 +0200
-Message-Id: <1386249090-10236-28-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 26/32] Bluetooth: Fix suspending the L2CAP socket if we start with 0 credits
+Date: Thu,  5 Dec 2013 15:11:24 +0200
+Message-Id: <1386249090-10236-27-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
 References: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,82 +11,29 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-It doesn't make sense to have an MPS value greater than the configured
-MTU value since we will then not be able to fill up the packets to their
-full possible size. We need to set the MPS both in flowctl_init()
-as well as flowctl_start() since the imtu may change after init() but
-start() is only called after we've sent the LE Connection Request PDU
-which depends on having a valid MPS value.
+If the peer gives us zero credits in its connection request or response
+we must call the suspend channel callback so the BT_SK_SUSPEND flag gets
+set and user space is blocked from sending data to the socket.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ net/bluetooth/l2cap_core.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b6dc613febd5..ce34f1518f96 100644
+index ddb61564fe6a..b6dc613febd5 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -497,6 +497,11 @@ void l2cap_le_flowctl_init(struct l2cap_chan *chan)
- 	chan->mode = L2CAP_MODE_LE_FLOWCTL;
- 	chan->tx_credits = 0;
- 	chan->rx_credits = L2CAP_LE_MAX_CREDITS;
-+
-+	if (chan->imtu < L2CAP_LE_DEFAULT_MPS)
-+		chan->mps = chan->imtu;
-+	else
-+		chan->mps = L2CAP_LE_DEFAULT_MPS;
- }
- 
- void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
-@@ -645,7 +650,7 @@ static void l2cap_chan_le_connect_reject(struct l2cap_chan *chan)
- 
- 	rsp.dcid    = cpu_to_le16(chan->scid);
- 	rsp.mtu     = cpu_to_le16(chan->imtu);
--	rsp.mps     = __constant_cpu_to_le16(L2CAP_LE_DEFAULT_MPS);
-+	rsp.mps     = cpu_to_le16(chan->mps);
- 	rsp.credits = cpu_to_le16(chan->rx_credits);
- 	rsp.result  = cpu_to_le16(result);
- 
-@@ -1201,6 +1206,11 @@ static void l2cap_le_flowctl_start(struct l2cap_chan *chan)
- 	chan->sdu_last_frag = NULL;
+@@ -1202,6 +1202,9 @@ static void l2cap_le_flowctl_start(struct l2cap_chan *chan)
  	chan->sdu_len = 0;
  
-+	if (chan->imtu < L2CAP_LE_DEFAULT_MPS)
-+		chan->mps = chan->imtu;
-+	else
-+		chan->mps = L2CAP_LE_DEFAULT_MPS;
-+
  	skb_queue_head_init(&chan->tx_q);
++
++	if (!chan->tx_credits)
++		chan->ops->suspend(chan);
+ }
  
- 	if (!chan->tx_credits)
-@@ -1232,7 +1242,7 @@ static void l2cap_le_connect(struct l2cap_chan *chan)
- 	req.psm     = chan->psm;
- 	req.scid    = cpu_to_le16(chan->scid);
- 	req.mtu     = cpu_to_le16(chan->imtu);
--	req.mps     = __constant_cpu_to_le16(L2CAP_LE_DEFAULT_MPS);
-+	req.mps     = cpu_to_le16(chan->mps);
- 	req.credits = cpu_to_le16(chan->rx_credits);
- 
- 	chan->ident = l2cap_get_ident(conn);
-@@ -3826,7 +3836,7 @@ void __l2cap_le_connect_rsp_defer(struct l2cap_chan *chan)
- 
- 	rsp.dcid    = cpu_to_le16(chan->scid);
- 	rsp.mtu     = cpu_to_le16(chan->imtu);
--	rsp.mps     = __constant_cpu_to_le16(L2CAP_LE_DEFAULT_MPS);
-+	rsp.mps     = cpu_to_le16(chan->mps);
- 	rsp.credits = cpu_to_le16(chan->rx_credits);
- 	rsp.result  = __constant_cpu_to_le16(L2CAP_CR_SUCCESS);
- 
-@@ -5669,7 +5679,7 @@ response_unlock:
- response:
- 	if (chan) {
- 		rsp.mtu = cpu_to_le16(chan->imtu);
--		rsp.mps = __constant_cpu_to_le16(L2CAP_LE_DEFAULT_MPS);
-+		rsp.mps = cpu_to_le16(chan->mps);
- 	} else {
- 		rsp.mtu = 0;
- 		rsp.mps = 0;
+ static void l2cap_chan_ready(struct l2cap_chan *chan)
 -- 
 1.8.4.2
 
