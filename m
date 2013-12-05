@@ -1,42 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1386249090-10236-31-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
+Subject: Re: [PATCH v2 00/32] Bluetooth: LE CoC support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 5 Dec 2013 17:06:55 +0200
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <9C4D9768-B10C-43C3-AB61-199971BDBB34@holtmann.org>
 References: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
-	<1386249090-10236-31-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 5 Dec 2013 20:02:04 -0400
-Message-ID: <CAJdJm_Pvc97a8i3vcO4NO0sDJFzUyJ3JOkGuwOyYL8Bi8RjE5A@mail.gmail.com>
-Subject: Re: [PATCH v2 30/32] Bluetooth: Fix validating LE PSM values
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-On Thu, Dec 5, 2013 at 9:11 AM,  <johan.hedberg@gmail.com> wrote:
-> +static bool is_valid_psm(u16 psm, u8 dst_type)
-> +{
-> +       if (!psm)
-> +               return false;
-> +
-> +       if (bdaddr_type_is_le(dst_type))
-> +               return (psm < 0x00ff);
+> Here's v2 of the patches with all comments taken into account.
+> Additionally I've fixed the permissions of the debugfs files, fixed the
+> credits calculation for max_credits == 1, and added a cleanup patch at
+> the end of the set for simplifying l2cap_chan initialization for LE CoC.
+> 
+> I've also updated user space l2test now to support the new BT_SNDMTU and
+> BT_RCVMTU socket options, i.e. the LE CoC functionality can now be
+> tested using upstream l2test.
+> 
+> Johan
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (32):
+>      Bluetooth: Remove unnecessary braces from one-line if-statement
+>      Bluetooth: Add module parameter to enable LE CoC support
+>      Bluetooth: Update l2cap_global_chan_by_psm() to take a link type
+>      Bluetooth: Allow l2cap_chan_check_security() to be used for LE links.
+>      Bluetooth: Pass command length to LE signaling channel handlers
+>      Bluetooth: Move LE L2CAP initiator procedure to its own function
+>      Bluetooth: Add definitions for LE connection oriented channels
+>      Bluetooth: Add initial code for LE L2CAP Connect Request
+>      Bluetooth: Add smp_sufficient_security helper function
+>      Bluetooth: Refactor L2CAP connect rejection to its own function
+>      Bluetooth: Add basic LE L2CAP connect request receiving support
+>      Bluetooth: Fix L2CAP channel closing for LE connections
+>      Bluetooth: Add L2CAP Disconnect suppport for LE
+>      Bluetooth: Make l2cap_le_sig_cmd logic consistent
+>      Bluetooth: Add LE L2CAP flow control mode
+>      Bluetooth: Track LE L2CAP credits in l2cap_chan
+>      Bluetooth: Limit L2CAP_OPTIONS socket option usage with LE
+>      Bluetooth: Add new BT_SNDMTU and BT_RCVMTU socket options
+>      Bluetooth: Implement returning of LE L2CAP credits
+>      Bluetooth: Add LE flow control discipline
+>      Bluetooth: Reject LE CoC commands when the feature is not enabled
+>      Bluetooth: Introduce L2CAP channel callback for suspending
+>      Bluetooth: Add LE L2CAP segmentation support for outgoing data
+>      Bluetooth: Implement LE L2CAP reassembly
+>      Bluetooth: Fix LE L2CAP Connect Request handling together with SMP
+>      Bluetooth: Fix suspending the L2CAP socket if we start with 0 credits
+>      Bluetooth: Limit LE MPS to the MTU value
+>      Bluetooth: Fix clearing of chan->omtu for LE CoC channels
+>      Bluetooth: Fix CID ranges for LE CoC CID allocations
+>      Bluetooth: Fix validating LE PSM values
+>      Bluetooth: Add debugfs controls for LE CoC MPS and Credits
+>      Bluetooth: Simplify l2cap_chan initialization for LE CoC
+> 
+> include/net/bluetooth/bluetooth.h |   3 +
+> include/net/bluetooth/l2cap.h     |  45 +++
+> net/bluetooth/l2cap_core.c        | 720 ++++++++++++++++++++++++++++++++++---
+> net/bluetooth/l2cap_sock.c        | 157 +++++++-
+> net/bluetooth/smp.c               |  16 +-
+> net/bluetooth/smp.h               |   1 +
+> 6 files changed, 873 insertions(+), 69 deletions(-)
 
-Shouldn't be "psm <= 0x00ff" here?
+all patches (including minor fixups) have been applied to bluetooth-next tree.
 
-> +
-> +       /* PSM must be odd and lsb of upper byte must be 0 */
-> +       return ((psm & 0x0101) == 0x0001);
-> +}
-> +
->  int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
->                        bdaddr_t *dst, u8 dst_type)
->  {
+Regards
 
-Best Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Marcel
+
