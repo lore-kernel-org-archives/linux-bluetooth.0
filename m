@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 26/32] Bluetooth: Fix suspending the L2CAP socket if we start with 0 credits
-Date: Thu,  5 Dec 2013 15:11:24 +0200
-Message-Id: <1386249090-10236-27-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 24/32] Bluetooth: Implement LE L2CAP reassembly
+Date: Thu,  5 Dec 2013 15:11:22 +0200
+Message-Id: <1386249090-10236-25-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
 References: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,29 +11,116 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-If the peer gives us zero credits in its connection request or response
-we must call the suspend channel callback so the BT_SK_SUSPEND flag gets
-set and user space is blocked from sending data to the socket.
+When receiving fragments over an LE Connection oriented Channel they
+need to be collected up and eventually merged into a single SDU. This
+patch adds the necessary code for collecting up the fragment skbs to the
+channel context and passing them to the recv() callback when the entire
+SDU has been received.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 3 +++
- 1 file changed, 3 insertions(+)
+ net/bluetooth/l2cap_core.c | 79 ++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 76 insertions(+), 3 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index ddb61564fe6a..b6dc613febd5 100644
+index 9869faa2904d..ae90dd284c87 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1202,6 +1202,9 @@ static void l2cap_le_flowctl_start(struct l2cap_chan *chan)
- 	chan->sdu_len = 0;
+@@ -6816,18 +6816,91 @@ static void l2cap_chan_le_send_credits(struct l2cap_chan *chan)
  
- 	skb_queue_head_init(&chan->tx_q);
+ static int l2cap_le_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
+ {
+-	if (!chan->rx_credits)
++	int err;
 +
-+	if (!chan->tx_credits)
-+		chan->ops->suspend(chan);
++	if (!chan->rx_credits) {
++		BT_ERR("No credits to receive LE L2CAP data");
+ 		return -ENOBUFS;
++	}
+ 
+-	if (chan->imtu < skb->len)
++	if (chan->imtu < skb->len) {
++		BT_ERR("Too big LE L2CAP PDU");
+ 		return -ENOBUFS;
++	}
+ 
+ 	chan->rx_credits--;
+ 	BT_DBG("rx_credits %u -> %u", chan->rx_credits + 1, chan->rx_credits);
+ 
+ 	l2cap_chan_le_send_credits(chan);
+ 
+-	return chan->ops->recv(chan, skb);
++	err = 0;
++
++	if (!chan->sdu) {
++		u16 sdu_len;
++
++		sdu_len = get_unaligned_le16(skb->data);
++		skb_pull(skb, L2CAP_SDULEN_SIZE);
++
++		BT_DBG("Start of new SDU. sdu_len %u skb->len %u imtu %u",
++		       sdu_len, skb->len, chan->imtu);
++
++		if (sdu_len > chan->imtu) {
++			BT_ERR("Too big LE L2CAP SDU length received");
++			err = -EMSGSIZE;
++			goto failed;
++		}
++
++		if (skb->len > sdu_len) {
++			BT_ERR("Too much LE L2CAP data received");
++			err = -EINVAL;
++			goto failed;
++		}
++
++		if (skb->len == sdu_len)
++			return chan->ops->recv(chan, skb);
++
++		chan->sdu = skb;
++		chan->sdu_len = sdu_len;
++		chan->sdu_last_frag = skb;
++
++		return 0;
++	}
++
++	BT_DBG("SDU fragment. chan->sdu->len %u skb->len %u chan->sdu_len %u",
++	       chan->sdu->len, skb->len, chan->sdu_len);
++
++	if (chan->sdu->len + skb->len > chan->sdu_len) {
++		BT_ERR("Too much LE L2CAP data received");
++		err = -EINVAL;
++		goto failed;
++	}
++
++	append_skb_frag(chan->sdu, skb, &chan->sdu_last_frag);
++	skb = NULL;
++
++	if (chan->sdu->len == chan->sdu_len) {
++		err = chan->ops->recv(chan, chan->sdu);
++		if (!err) {
++			chan->sdu = NULL;
++			chan->sdu_last_frag = NULL;
++			chan->sdu_len = 0;
++		}
++	}
++
++failed:
++	if (err) {
++		kfree_skb(skb);
++		kfree_skb(chan->sdu);
++		chan->sdu = NULL;
++		chan->sdu_last_frag = NULL;
++		chan->sdu_len = 0;
++	}
++
++	/* We can't return an error here since we took care of the skb
++	 * freeing internally. An error return would cause the caller to
++	 * do a double-free of the skb.
++	 */
++	return 0;
  }
  
- static void l2cap_chan_ready(struct l2cap_chan *chan)
+ static void l2cap_data_channel(struct l2cap_conn *conn, u16 cid,
 -- 
 1.8.4.2
 
