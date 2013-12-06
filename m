@@ -1,73 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1386420104.32408.9.camel@nuvo>
-Subject: Missing properties during pairing, refcounting bug?
-From: Bastien Nocera <hadess@hadess.net>
+From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Date: Sat, 07 Dec 2013 13:41:44 +0100
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: [RFC v4 10/12] Bluetooth: Auto connection and power on
+Date: Fri,  6 Dec 2013 19:05:47 -0300
+Message-Id: <1386367549-29136-11-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1386367549-29136-1-git-send-email-andre.guedes@openbossa.org>
+References: <1386367549-29136-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey,
+When hdev is closed (e.g. Mgmt power off command, RFKILL or controller
+is reset), the ongoing active connections are silently dropped by the
+controller (no Disconnection Complete Event is sent to host). For that
+reason, the devices that require HCI_AUTO_CONN_ALWAYS are not added to
+hdev->pend_le_conns list and they won't auto connect.
 
-Johan was blaming my "slow" Bluetooth adapter for the missing Class
-property when pairing was remote initiated, but it seems that there is
-another reason for the trouble. Here's an annotated bluetoothd log, with
-what my (uninformed) analysis.
+So to fix this issue, during hdev closing, we remove all pending LE
+connections. After adapter is powered on, we add a pending LE connection
+for each HCI_AUTO_CONN_ALWAYS address.
 
-I've used an old Sony Ericsson phone, as can be seen from the name in
-the logs, instead of a much harder to control "keyboard". I've also made
-sure that the phone wasn't visible so as to avoid properties being
-gathered from the discovery process.
+This way, the auto connection mechanism works propely after a power
+off and power on sequence as well as RFKILL block/unblock.
 
-# I select my computer for pairing on the phone
-bluetoothd[31569]: src/adapter.c:connected_callback() hci0 device 00:1E:45:AD:F1:96 connected eir_len 5
-bluetoothd[31569]: src/device.c:device_create() dst 00:1E:45:AD:F1:96
-bluetoothd[31569]: src/device.c:device_new() address 00:1E:45:AD:F1:96
-bluetoothd[31569]: src/device.c:device_new() Creating device /org/bluez/hci0/dev_00_1E_45_AD_F1_96
-bluetoothd[31569]: src/device.c:btd_device_set_temporary() temporary 1
-bluetoothd[31569]: src/adapter.c:adapter_connect_list_remove() device /org/bluez/hci0/dev_00_1E_45_AD_F1_96 is not on the list, ignoring
-** Message: calling device_set_class in connected_callback
-bluetoothd[31569]: src/device.c:device_set_class() /org/bluez/hci0/dev_00_1E_45_AD_F1_96 0x5A0204
-** Message: calling set_class 0x5A0204 for Bastien's K850i
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ net/bluetooth/hci_core.c |  1 +
+ net/bluetooth/mgmt.c     | 13 +++++++++++++
+ 2 files changed, 14 insertions(+)
 
-# At this point, the device is connected because we're doing a SDP search on the connecting device
-bluetoothd[31569]: src/adapter.c:dev_disconnected() Device 00:1E:45:AD:F1:96 disconnected, reason 3
-
-# We're done with poking at the remote device, so we disconnect
-bluetoothd[31569]: src/adapter.c:adapter_remove_connection() 
-bluetoothd[31569]: src/adapter.c:adapter_remove_connection() Removing temporary device /org/bluez/hci0/dev_00_1E_45_AD_F1_96
-bluetoothd[31569]: src/device.c:device_remove() Removing device /org/bluez/hci0/dev_00_1E_45_AD_F1_96
-bluetoothd[31569]: src/device.c:btd_device_unref() Freeing device /org/bluez/hci0/dev_00_1E_45_AD_F1_96
-
-# We remove the device we just created?!
-** Message: Actually sending process_properties_from_interface for data 0x2095d70
-bluetoothd[31569]: src/device.c:device_free() 0x20967b0
-bluetoothd[31569]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr 00:1E:45:AD:F1:96 type 0 status 0xe
-bluetoothd[31569]: src/adapter.c:resume_discovery() 
-bluetoothd[31569]: src/adapter.c:trigger_start_discovery() 
-bluetoothd[31569]: src/adapter.c:cancel_passive_scanning() 
-bluetoothd[31569]: src/adapter.c:start_discovery_timeout() 
-bluetoothd[31569]: src/adapter.c:start_discovery_complete() status 0x00
-
-# Now I've actually entered the PIN on the phone, for me to enter on the computer
-# The data we got from the EIR above has been lost because we freed the device
-bluetoothd[31569]: src/adapter.c:discovering_callback() hci0 type 7 discovering 1
-bluetoothd[31569]: src/adapter.c:pin_code_request_callback() hci0 00:1E:45:AD:F1:96
-bluetoothd[31569]: src/device.c:device_create() dst 00:1E:45:AD:F1:96
-bluetoothd[31569]: src/device.c:device_new() address 00:1E:45:AD:F1:96
-bluetoothd[31569]: src/device.c:device_new() Creating device /org/bluez/hci0/dev_00_1E_45_AD_F1_96
-bluetoothd[31569]: src/device.c:btd_device_set_temporary() temporary 1
-bluetoothd[31569]: src/adapter.c:adapter_connect_list_remove() device /org/bluez/hci0/dev_00_1E_45_AD_F1_96 is not on the list, ignoring
-bluetoothd[31569]: src/device.c:new_auth() Requesting agent authentication for 00:1E:45:AD:F1:96
-bluetoothd[31569]: src/agent.c:agent_ref() 0x2081e80: ref=2
-** Message: sending message in pincode_request_new()
-
-Does that sound correct? That would certainly explain why I get nothing
-from the remote device apart from the name and address.
-
-Ideas?
-
-Cheers
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 5bb73cf..beb51ce 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1969,6 +1969,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 	hci_dev_lock(hdev);
+ 	hci_inquiry_cache_flush(hdev);
+ 	hci_conn_hash_flush(hdev);
++	hci_pend_le_conns_clear(hdev);
+ 	hci_dev_unlock(hdev);
+ 
+ 	hci_notify(hdev, HCI_DEV_DOWN);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 81b8cfa..3fccb52 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4247,6 +4247,17 @@ void mgmt_index_removed(struct hci_dev *hdev)
+ 	mgmt_event(MGMT_EV_INDEX_REMOVED, hdev, NULL, 0, NULL);
+ }
+ 
++/* This function requires the caller holds hdev->lock */
++static void restart_le_auto_conns(struct hci_dev *hdev)
++{
++	struct hci_conn_params *p;
++
++	list_for_each_entry(p, &hdev->le_conn_params, list) {
++		if (p->auto_connect == HCI_AUTO_CONN_ALWAYS)
++			hci_pend_le_conn_add(hdev, &p->addr, p->addr_type);
++	}
++}
++
+ static void powered_complete(struct hci_dev *hdev, u8 status)
+ {
+ 	struct cmd_lookup match = { NULL, hdev };
+@@ -4255,6 +4266,8 @@ static void powered_complete(struct hci_dev *hdev, u8 status)
+ 
+ 	hci_dev_lock(hdev);
+ 
++	restart_le_auto_conns(hdev);
++
+ 	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
+ 
+ 	new_settings(hdev, match.sk);
+-- 
+1.8.4.2
 
