@@ -1,37 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 2/2] Bluetooth: Fix valid LE PSM check
-Date: Fri,  6 Dec 2013 07:54:53 +0200
-Message-Id: <1386309293-4708-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1386309293-4708-1-git-send-email-johan.hedberg@gmail.com>
-References: <1386309293-4708-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v3 1/2] Bluetooth: Use min_t for calculating chan->mps
+Date: Fri,  6 Dec 2013 07:54:52 +0200
+Message-Id: <1386309293-4708-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The range of valid LE PSMs is 0x0001-0x00ff so the check should be for
-"less than or equal to" instead of "less than".
+Since there's a nice convenient helper for calculating the minimum of
+two values, let's use that one.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/l2cap_core.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 35feb9d6c322..ae0054ccee5b 100644
+index 6e6f308af036..35feb9d6c322 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -1851,7 +1851,7 @@ static bool is_valid_psm(u16 psm, u8 dst_type)
- 		return false;
+@@ -505,11 +505,7 @@ static void l2cap_le_flowctl_init(struct l2cap_chan *chan)
+ 	chan->sdu_len = 0;
+ 	chan->tx_credits = 0;
+ 	chan->rx_credits = le_max_credits;
+-
+-	if (chan->imtu < L2CAP_LE_DEFAULT_MPS)
+-		chan->mps = chan->imtu;
+-	else
+-		chan->mps = L2CAP_LE_DEFAULT_MPS;
++	chan->mps = min_t(u16, chan->imtu, L2CAP_LE_DEFAULT_MPS);
  
- 	if (bdaddr_type_is_le(dst_type))
--		return (psm < 0x00ff);
-+		return (psm <= 0x00ff);
- 
- 	/* PSM must be odd and lsb of upper byte must be 0 */
- 	return ((psm & 0x0101) == 0x0001);
+ 	skb_queue_head_init(&chan->tx_q);
+ }
 -- 
 1.8.4.2
 
