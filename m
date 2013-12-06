@@ -1,72 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v4 11/12] Bleutooth: Add support for auto connect options
-Date: Fri,  6 Dec 2013 19:05:48 -0300
-Message-Id: <1386367549-29136-12-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v4 09/12] Bluetooth: Temporarily stop background scanning on discovery
+Date: Fri,  6 Dec 2013 19:05:46 -0300
+Message-Id: <1386367549-29136-10-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1386367549-29136-1-git-send-email-andre.guedes@openbossa.org>
 References: <1386367549-29136-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for the HCI_AUTO_CONN_ALWAYS and HCI_AUTO_
-CONN_LINK_LOSS options from struct hci_conn_params.
-
-The HCI_AUTO_CONN_ALWAYS option configures the kernel to always re-
-establish the connection, no matter the reason the connection was
-terminated. This feature is required by some LE profiles such as
-HID over GATT, Health Thermometer and Blood Pressure. These profiles
-require the host autonomously connect to the device as soon as it
-enters in connectable mode (start advertising) so the device is able
-to delivery notifications or indications.
-
-The BT_AUTO_CONN_LINK_LOSS option configures the kernel to re-
-establish the connection in case the connection was terminated due
-to a link loss. This feature is required by the majority of LE
-profiles such as Proximity, Find Me, Cycling Speed and Cadence and
-Time.
+If the user send a mgmt start discovery command while the background
+scanning is running, we should temporarily stop it. Once the discovery
+finishes, we start the background scanning again.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_event.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ net/bluetooth/hci_core.c |  2 ++
+ net/bluetooth/mgmt.c     | 12 ++++++++----
+ 2 files changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index e4f288a..a4ce922 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1780,6 +1780,7 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_disconn_complete *ev = (void *) skb->data;
- 	u8 reason = hci_to_mgmt_reason(ev->reason);
-+	struct hci_conn_params *params;
- 	struct hci_conn *conn;
- 	u8 type;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 47d31bd..5bb73cf 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1498,6 +1498,8 @@ void hci_discovery_set_state(struct hci_dev *hdev, int state)
  
-@@ -1806,6 +1807,23 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (conn->type == ACL_LINK && conn->flush_key)
- 		hci_remove_link_key(hdev, &conn->dst);
+ 	switch (state) {
+ 	case DISCOVERY_STOPPED:
++		hci_update_background_scan(hdev);
++
+ 		if (hdev->discovery.state != DISCOVERY_STARTING)
+ 			mgmt_discovering(hdev, 0);
+ 		break;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index a03ca3c..81b8cfa 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3280,11 +3280,15 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 			goto failed;
+ 		}
  
-+	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
-+	if (params) {
-+		switch (params->auto_connect) {
-+		case HCI_AUTO_CONN_LINK_LOSS:
-+			if (ev->reason != HCI_ERROR_CONNECTION_TIMEOUT)
-+				break;
-+			/* Fall through */
-+
-+		case HCI_AUTO_CONN_ALWAYS:
-+			hci_pend_le_conn_add(hdev, &conn->dst, conn->dst_type);
-+			break;
-+
-+		default:
-+			break;
-+		}
-+	}
-+
- 	type = conn->type;
++		/* If controller is scanning, it means the background scanning
++		 * is running. Thus, we should temporarily stop it in order to
++		 * set the discovery scanning parameters.
++		 */
+ 		if (test_bit(HCI_LE_SCAN, &hdev->dev_flags)) {
+-			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
+-					 MGMT_STATUS_BUSY);
+-			mgmt_pending_remove(cmd);
+-			goto failed;
++			memset(&enable_cp, 0, sizeof(enable_cp));
++			enable_cp.enable = LE_SCAN_DISABLE;
++			hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE,
++				    sizeof(enable_cp), &enable_cp);
+ 		}
  
- 	hci_proto_disconn_cfm(conn, ev->reason);
+ 		memset(&param_cp, 0, sizeof(param_cp));
 -- 
 1.8.4.2
 
