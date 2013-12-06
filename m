@@ -1,36 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
-Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
-Subject: Re: [RFC v3 00/12] LE auto connection and connection parameters
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CACJA=fWLf7wAmgooAkmbH3e2R+AE9dbfutvbjTewkp+5bJkmeQ@mail.gmail.com>
-Date: Fri, 6 Dec 2013 06:40:32 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <4993FF9F-65A6-4FB8-8065-A0F01CA21B1E@holtmann.org>
-References: <1384985340-2902-1-git-send-email-andre.guedes@openbossa.org> <CACJA=fWLf7wAmgooAkmbH3e2R+AE9dbfutvbjTewkp+5bJkmeQ@mail.gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1386249090-10236-31-git-send-email-johan.hedberg@gmail.com>
+References: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
+	<1386249090-10236-31-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 5 Dec 2013 20:02:04 -0400
+Message-ID: <CAJdJm_Pvc97a8i3vcO4NO0sDJFzUyJ3JOkGuwOyYL8Bi8RjE5A@mail.gmail.com>
+Subject: Re: [PATCH v2 30/32] Bluetooth: Fix validating LE PSM values
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Johan,
 
-> Ping.
-> 
->> The main changes from the previous version are:
->>  * Debugfs interface to add auto connect address instead of new mgmt
->>    commands.
->>  * We always stop LE scanning in favor of connection establishment even if
->>    the controller supports scanning and connection at the same time.
->>  * Background scanning is now controlled in one single place (hci_update_
->>    background_scan function).
->>  * RCU was replaced by hdev->lock to protect hdev->le_conn_params list. After
->>    all the changes since the original version of this patch set, I realized
->>    we always operate on hdev->le_conn_params with hdev->lock held so there is
->>    no point in use RCU to protect this list.
+On Thu, Dec 5, 2013 at 9:11 AM,  <johan.hedberg@gmail.com> wrote:
+> +static bool is_valid_psm(u16 psm, u8 dst_type)
+> +{
+> +       if (!psm)
+> +               return false;
+> +
+> +       if (bdaddr_type_is_le(dst_type))
+> +               return (psm < 0x00ff);
 
-can you send a re-based v4 against the latest bluetooth-next tree please.
+Shouldn't be "psm <= 0x00ff" here?
 
-Regards
+> +
+> +       /* PSM must be odd and lsb of upper byte must be 0 */
+> +       return ((psm & 0x0101) == 0x0001);
+> +}
+> +
+>  int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+>                        bdaddr_t *dst, u8 dst_type)
+>  {
 
-Marcel
-
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
