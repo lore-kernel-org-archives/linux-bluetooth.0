@@ -1,99 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <52A1F8BF.5030204@hurleysoftware.com>
+Date: Fri, 06 Dec 2013 11:18:07 -0500
+From: Peter Hurley <peter@hurleysoftware.com>
 MIME-Version: 1.0
-In-Reply-To: <20131128165916.GA21429@molly.amr.corp.intel.com>
-References: <CAHZ1yC=Tx=4zRL_rV0-b-sqhQCO=AmXzCy93Q5jnb2=z2Kr6KQ@mail.gmail.com>
-	<20131128165916.GA21429@molly.amr.corp.intel.com>
-Date: Fri, 6 Dec 2013 11:47:25 -0800
-Message-ID: <CAHZ1yCmSBbdEtuDOHcB21MdHxVd=jjE51C15SJAaUE9Q6xGBTQ@mail.gmail.com>
-Subject: Re: SM: is BlueZ the Master/Initiator or Slave/Responder?
-From: Scott James Remnant <keybuk@google.com>
-To: Vinicius Costa Gomes <vcgomes@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Holtmann, Marcel" <marcel.holtmann@intel.com>,
-	Johan Hedberg <johan.hedberg@intel.com>,
-	Brian Gix <bgix@codeaurora.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Huang Shijie <b32955@freescale.com>
+CC: gregkh@linuxfoundation.org, linux-serial@vger.kernel.org,
+ marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH RFC] tty_ldisc: add more limits to the @write_wakeup
+References: <1384327803-5925-1-git-send-email-b32955@freescale.com> <52A1A84B.80409@freescale.com>
+In-Reply-To: <52A1A84B.80409@freescale.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Great, sounds like I came to the right conclusion myself - after
-reading the spec and examining the test case, we couldn't find a
-reason to set this bit unless BlueZ can also behave as the Slave,
-which is not only something we didn't expect it to do, but also not
-something we had claimed in the PICS.
+On 12/06/2013 05:34 AM, Huang Shijie wrote:
+> 于 2013年11月13日 15:30, Huang Shijie 写道:
+>> In the uart_handle_cts_change(), uart_write_wakeup() is called after
+>> we call @uart_port->ops->start_tx().
+>>
+>> The Documentation/serial/driver tells us:
+>> -----------------------------------------------
+>>    start_tx(port)
+>> 	Start transmitting characters.
+>>
+>> 	Locking: port->lock taken.
+>> 	Interrupts: locally disabled.
+>> -----------------------------------------------
+>>
+>> So when the uart_write_wakeup() is called, the port->lock is taken by
+>> the upper. See the following callstack:
+>>
+>> 	|_ uart_write_wakeup
+>> 	   |_ tty_wakeup
+>> 	      |_ ld->ops->write_wakeup
+>>
+>> With the port->lock held, we call the @write_wakeup. Some implemetation of
+>> the @write_wakeup does not notice that the port->lock is held, and it still
+>> tries to send data with uart_write() which will try to grab the prot->lock.
+>> A dead lock occurs, see the following log caught in the Bluetooth by uart:
+>>
+>> --------------------------------------------------------------------
+>> BUG: spinlock lockup suspected on CPU#0, swapper/0/0
+>>   lock: 0xdc3f4410, .magic: dead4ead, .owner: swapper/0/0, .owner_cpu: 0
+>> CPU: 0 PID: 0 Comm: swapper/0 Tainted: G        W    3.10.17-16839-ge4a1bef #1320
+>> [<80014cbc>] (unwind_backtrace+0x0/0x138) from [<8001251c>] (show_stack+0x10/0x14)
+>> [<8001251c>] (show_stack+0x10/0x14) from [<802816ac>] (do_raw_spin_lock+0x108/0x184)
+>> [<802816ac>] (do_raw_spin_lock+0x108/0x184) from [<806a22b0>] (_raw_spin_lock_irqsave+0x54/0x60)
+>> [<806a22b0>] (_raw_spin_lock_irqsave+0x54/0x60) from [<802f5754>] (uart_write+0x38/0xe0)
+>> [<802f5754>] (uart_write+0x38/0xe0) from [<80455270>] (hci_uart_tx_wakeup+0xa4/0x168)
+>> [<80455270>] (hci_uart_tx_wakeup+0xa4/0x168) from [<802dab18>] (tty_wakeup+0x50/0x5c)
+>> [<802dab18>] (tty_wakeup+0x50/0x5c) from [<802f81a4>] (imx_rtsint+0x50/0x80)
+>> [<802f81a4>] (imx_rtsint+0x50/0x80) from [<802f88f4>] (imx_int+0x158/0x17c)
+>> [<802f88f4>] (imx_int+0x158/0x17c) from [<8007abe0>] (handle_irq_event_percpu+0x50/0x194)
+>> [<8007abe0>] (handle_irq_event_percpu+0x50/0x194) from [<8007ad60>] (handle_irq_event+0x3c/0x5c)
+>> --------------------------------------------------------------------
+>>
+>> This patch adds more limits to the @write_wakeup, the one who wants to
+>> implemet the @write_wakeup should follow the limits which avoid the deadlock.
+>>
+>> Signed-off-by: Huang Shijie <b32955@freescale.com>
+>> ---
+>>   include/linux/tty_ldisc.h |    5 ++++-
+>>   1 files changed, 4 insertions(+), 1 deletions(-)
+>>
+>> diff --git a/include/linux/tty_ldisc.h b/include/linux/tty_ldisc.h
+>> index f15c898..539ccc5 100644
+>> --- a/include/linux/tty_ldisc.h
+>> +++ b/include/linux/tty_ldisc.h
+>> @@ -91,7 +91,10 @@
+>>    *	This function is called by the low-level tty driver to signal
+>>    *	that line discpline should try to send more characters to the
+>>    *	low-level driver for transmission.  If the line discpline does
+>> - *	not have any more data to send, it can just return.
+>> + *	not have any more data to send, it can just return. If the line
+>> + *	discipline does have some data to send, please arise a tasklet
+>> + *	or workqueue to do the real data transfer. Do not send data in
+>> + *	this hook, it may leads to a deadlock.
+>>    *
+>>    * int (*hangup)(struct tty_struct *)
+>>    *
+> just a ping.
+>
+> In actually, this is a BUG in the tty code or BT code.
 
-I filed a TSE with the SIG on 11/25 and it looks like they agree too,
-and that this test should only be used when a IUT specifies that it
-supports both the Master and Slave role, so looks like the TSE will be
-approved along with the matching TCW.
+hci_uart_tx_wakeup() should perform the actual tx in a work item.
 
-Scott
-
-On Thu, Nov 28, 2013 at 8:59 AM, Vinicius Costa Gomes <vcgomes@gmail.com> wrote:
-> Hi Scott,
->
-> On 13:17 Mon 25 Nov, Scott James Remnant wrote:
->> We are able to pass all qualification tests with BlueZ as the Master except one:
->>
->>   TP/KDU/BV-06-C - Master Key Distribution - Encryption Key bit
->>
->> This test requires that BlueZ initiates pairing with the
->> SMP_DIST_ENC_KEY bit set in the init_key_dist member of struct
->> smp_cmd_pairing - however this member is always initialized to zero
->> and never changed.
->
-> This test is in theory correct, but it doesn't test anything that does make
-> sense at this point. Let me try to explain, setting the Encryption Key bit in
-> the initiator key distribution field in the Pairing Request means that the
-> Initiator wants to send its Encryption Key to the Responder.
->
-> This is only useful in cases that both devices expect the roles to be reversed
-> in future connections (The Master of this connection would become the Slave in
-> future connections). And IIRC we weren't able to test this role reversal and
-> it even offends the current GAP spec for Dual mode devices.
->
->>
->> This seems to have changed at some point in the past, 2b64d153 added
->> MITM mechanism and changed the init_key_dist member initialization
->> from dist_keys to 0
->>
->>
->> So two questions:
->>
->>  1) should BlueZ be able to behave as Master? It passes the majority
->> of the tests except this one.
->
-> BlueZ should be able to bahave as Master, if not, it is a bug.
->
->>
->>  2) given the above, is this a bug that init_key_dist is 0 or is it a
->> test plan error that it requires this?
->
-> I think it is a bit of both, for the current situation the Master distributing
-> its keys doesn't make much sense and we should be able to change this value to
-> be able to test the key distribution parts.
->
-> What I suggest is adding a debugfs entry to change the value of init_key_dist
-> for Pairing Requests, and keep the default being 0.
->
-> (disclaimer: I am follwing development from the sidelines for some time, so
-> feel free to correct me.)
->
->>
->> Scott
->> --
->> Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
-> Cheers,
-> --
-> Vinicius
-
-
-
--- 
-Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
+Regards,
+Peter Hurley
