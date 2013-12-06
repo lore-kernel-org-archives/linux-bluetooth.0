@@ -1,88 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52A1F8BF.5030204@hurleysoftware.com>
-Date: Fri, 06 Dec 2013 11:18:07 -0500
-From: Peter Hurley <peter@hurleysoftware.com>
-MIME-Version: 1.0
-To: Huang Shijie <b32955@freescale.com>
-CC: gregkh@linuxfoundation.org, linux-serial@vger.kernel.org,
- marcel@holtmann.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH RFC] tty_ldisc: add more limits to the @write_wakeup
-References: <1384327803-5925-1-git-send-email-b32955@freescale.com> <52A1A84B.80409@freescale.com>
-In-Reply-To: <52A1A84B.80409@freescale.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2] android: Fix delayed adapter turn off
+Date: Fri,  6 Dec 2013 16:30:54 +0100
+Message-Id: <1386343854-1529-1-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1386239837-4102-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1386239837-4102-1-git-send-email-jakub.tyszkowski@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 12/06/2013 05:34 AM, Huang Shijie wrote:
-> 于 2013年11月13日 15:30, Huang Shijie 写道:
->> In the uart_handle_cts_change(), uart_write_wakeup() is called after
->> we call @uart_port->ops->start_tx().
->>
->> The Documentation/serial/driver tells us:
->> -----------------------------------------------
->>    start_tx(port)
->> 	Start transmitting characters.
->>
->> 	Locking: port->lock taken.
->> 	Interrupts: locally disabled.
->> -----------------------------------------------
->>
->> So when the uart_write_wakeup() is called, the port->lock is taken by
->> the upper. See the following callstack:
->>
->> 	|_ uart_write_wakeup
->> 	   |_ tty_wakeup
->> 	      |_ ld->ops->write_wakeup
->>
->> With the port->lock held, we call the @write_wakeup. Some implemetation of
->> the @write_wakeup does not notice that the port->lock is held, and it still
->> tries to send data with uart_write() which will try to grab the prot->lock.
->> A dead lock occurs, see the following log caught in the Bluetooth by uart:
->>
->> --------------------------------------------------------------------
->> BUG: spinlock lockup suspected on CPU#0, swapper/0/0
->>   lock: 0xdc3f4410, .magic: dead4ead, .owner: swapper/0/0, .owner_cpu: 0
->> CPU: 0 PID: 0 Comm: swapper/0 Tainted: G        W    3.10.17-16839-ge4a1bef #1320
->> [<80014cbc>] (unwind_backtrace+0x0/0x138) from [<8001251c>] (show_stack+0x10/0x14)
->> [<8001251c>] (show_stack+0x10/0x14) from [<802816ac>] (do_raw_spin_lock+0x108/0x184)
->> [<802816ac>] (do_raw_spin_lock+0x108/0x184) from [<806a22b0>] (_raw_spin_lock_irqsave+0x54/0x60)
->> [<806a22b0>] (_raw_spin_lock_irqsave+0x54/0x60) from [<802f5754>] (uart_write+0x38/0xe0)
->> [<802f5754>] (uart_write+0x38/0xe0) from [<80455270>] (hci_uart_tx_wakeup+0xa4/0x168)
->> [<80455270>] (hci_uart_tx_wakeup+0xa4/0x168) from [<802dab18>] (tty_wakeup+0x50/0x5c)
->> [<802dab18>] (tty_wakeup+0x50/0x5c) from [<802f81a4>] (imx_rtsint+0x50/0x80)
->> [<802f81a4>] (imx_rtsint+0x50/0x80) from [<802f88f4>] (imx_int+0x158/0x17c)
->> [<802f88f4>] (imx_int+0x158/0x17c) from [<8007abe0>] (handle_irq_event_percpu+0x50/0x194)
->> [<8007abe0>] (handle_irq_event_percpu+0x50/0x194) from [<8007ad60>] (handle_irq_event+0x3c/0x5c)
->> --------------------------------------------------------------------
->>
->> This patch adds more limits to the @write_wakeup, the one who wants to
->> implemet the @write_wakeup should follow the limits which avoid the deadlock.
->>
->> Signed-off-by: Huang Shijie <b32955@freescale.com>
->> ---
->>   include/linux/tty_ldisc.h |    5 ++++-
->>   1 files changed, 4 insertions(+), 1 deletions(-)
->>
->> diff --git a/include/linux/tty_ldisc.h b/include/linux/tty_ldisc.h
->> index f15c898..539ccc5 100644
->> --- a/include/linux/tty_ldisc.h
->> +++ b/include/linux/tty_ldisc.h
->> @@ -91,7 +91,10 @@
->>    *	This function is called by the low-level tty driver to signal
->>    *	that line discpline should try to send more characters to the
->>    *	low-level driver for transmission.  If the line discpline does
->> - *	not have any more data to send, it can just return.
->> + *	not have any more data to send, it can just return. If the line
->> + *	discipline does have some data to send, please arise a tasklet
->> + *	or workqueue to do the real data transfer. Do not send data in
->> + *	this hook, it may leads to a deadlock.
->>    *
->>    * int (*hangup)(struct tty_struct *)
->>    *
-> just a ping.
->
-> In actually, this is a BUG in the tty code or BT code.
+We shouldn't care about pending actions being completed as we want to
+turn BT off. This fixes Android UI controlls being locked when BT off
+action waits in queue for to long.
 
-hci_uart_tx_wakeup() should perform the actual tx in a work item.
+---
+ android/bluetooth.c | 28 ++++++++++++++++++++--------
+ 1 file changed, 20 insertions(+), 8 deletions(-)
 
-Regards,
-Peter Hurley
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 6174b1f..e5d8b7a 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1290,17 +1290,24 @@ static void set_mode_complete(uint8_t status, uint16_t length,
+ 	new_settings_callback(adapter.index, length, param, NULL);
+ }
+ 
+-static bool set_mode(uint16_t opcode, uint8_t mode)
++static bool set_mode(uint16_t opcode, uint8_t mode, bool unqueued)
+ {
+ 	struct mgmt_mode cp;
++	unsigned int mgmt_result;
+ 
+ 	memset(&cp, 0, sizeof(cp));
+ 	cp.val = mode;
+ 
+ 	DBG("opcode=0x%x mode=0x%x", opcode, mode);
+ 
+-	if (mgmt_send(mgmt_if, opcode, adapter.index, sizeof(cp), &cp,
+-					set_mode_complete, NULL, NULL) > 0)
++	if (unqueued)
++		mgmt_result = mgmt_reply(mgmt_if, opcode, adapter.index,
++				sizeof(cp), &cp, set_mode_complete, NULL, NULL);
++	else
++		mgmt_result = mgmt_send(mgmt_if, opcode, adapter.index,
++				sizeof(cp), &cp, set_mode_complete, NULL, NULL);
++
++	if (mgmt_result > 0)
+ 		return true;
+ 
+ 	error("Failed to set mode");
+@@ -1462,10 +1469,10 @@ static void read_info_complete(uint8_t status, uint16_t length,
+ 	missing_settings = adapter.current_settings ^ supported_settings;
+ 
+ 	if (missing_settings & MGMT_SETTING_SSP)
+-		set_mode(MGMT_OP_SET_SSP, 0x01);
++		set_mode(MGMT_OP_SET_SSP, 0x01, false);
+ 
+ 	if (missing_settings & MGMT_SETTING_PAIRABLE)
+-		set_mode(MGMT_OP_SET_PAIRABLE, 0x01);
++		set_mode(MGMT_OP_SET_PAIRABLE, 0x01, false);
+ 
+ 	return;
+ 
+@@ -1926,7 +1933,8 @@ static uint8_t set_scan_mode(const void *buf, uint16_t len)
+ 	}
+ 
+ 	if (cur_conn != conn) {
+-		if (!set_mode(MGMT_OP_SET_CONNECTABLE, conn ? 0x01 : 0x00))
++		if (!set_mode(MGMT_OP_SET_CONNECTABLE, conn ? 0x01 : 0x00,
++									false))
+ 			return HAL_STATUS_FAILED;
+ 	}
+ 
+@@ -2234,7 +2242,7 @@ static void handle_enable_cmd(const void *buf, uint16_t len)
+ 		goto failed;
+ 	}
+ 
+-	if (!set_mode(MGMT_OP_SET_POWERED, 0x01)) {
++	if (!set_mode(MGMT_OP_SET_POWERED, 0x01, false)) {
+ 		status = HAL_STATUS_FAILED;
+ 		goto failed;
+ 	}
+@@ -2253,7 +2261,11 @@ static void handle_disable_cmd(const void *buf, uint16_t len)
+ 		goto failed;
+ 	}
+ 
+-	if (!set_mode(MGMT_OP_SET_POWERED, 0x00)) {
++	/*
++	 * Prioritize BT turn off as not doing it in time makes Android
++	 * unstable and locks Bluetooth UI controlls.
++	 */
++	if (!set_mode(MGMT_OP_SET_POWERED, 0x00, true)) {
+ 		status = HAL_STATUS_FAILED;
+ 		goto failed;
+ 	}
+-- 
+1.8.5
+
