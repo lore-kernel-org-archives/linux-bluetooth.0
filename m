@@ -2,8 +2,8 @@ Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
 Subject: [PATCH v3 1/2] Bluetooth: Use min_t for calculating chan->mps
-Date: Fri,  6 Dec 2013 07:54:52 +0200
-Message-Id: <1386309293-4708-1-git-send-email-johan.hedberg@gmail.com>
+Date: Fri,  6 Dec 2013 07:53:15 +0200
+Message-Id: <1386309196-4507-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
