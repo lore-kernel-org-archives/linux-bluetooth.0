@@ -1,43 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 6 Dec 2013 07:07:09 +0200
+Date: Fri, 6 Dec 2013 07:05:19 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Use min_t for calculating chan->imtu
-Message-ID: <20131206050709.GA30989@x220.p-661hnu-f1>
-References: <1386306115-30686-1-git-send-email-johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v2 30/32] Bluetooth: Fix validating LE PSM values
+Message-ID: <20131206050519.GA30747@x220.p-661hnu-f1>
+References: <1386249090-10236-1-git-send-email-johan.hedberg@gmail.com>
+ <1386249090-10236-31-git-send-email-johan.hedberg@gmail.com>
+ <CAJdJm_Pvc97a8i3vcO4NO0sDJFzUyJ3JOkGuwOyYL8Bi8RjE5A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1386306115-30686-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <CAJdJm_Pvc97a8i3vcO4NO0sDJFzUyJ3JOkGuwOyYL8Bi8RjE5A@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Lizardo,
 
-On Fri, Dec 06, 2013, johan.hedberg@gmail.com wrote:
-> Since there's a nice convenient helper for calculating the minimum of
-> two values, let's use that one.
+On Thu, Dec 05, 2013, Anderson Lizardo wrote:
+> On Thu, Dec 5, 2013 at 9:11 AM,  <johan.hedberg@gmail.com> wrote:
+> > +static bool is_valid_psm(u16 psm, u8 dst_type)
+> > +{
+> > +       if (!psm)
+> > +               return false;
+> > +
+> > +       if (bdaddr_type_is_le(dst_type))
+> > +               return (psm < 0x00ff);
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  net/bluetooth/l2cap_core.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 6e6f308af036..8f42cae96dc3 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -505,11 +505,7 @@ static void l2cap_le_flowctl_init(struct l2cap_chan *chan)
->  	chan->sdu_len = 0;
->  	chan->tx_credits = 0;
->  	chan->rx_credits = le_max_credits;
-> -
-> -	if (chan->imtu < L2CAP_LE_DEFAULT_MPS)
-> -		chan->mps = chan->imtu;
-> -	else
-> -		chan->mps = L2CAP_LE_DEFAULT_MPS;
-> +	chan->imtu = min_t(u16, chan->imtu, L2CAP_LE_DEFAULT_MPS);
+> Shouldn't be "psm <= 0x00ff" here?
 
-Ignore this one. It should obviously be assigning to chan->mps and not
-chan->imtu.
+Yes, it should. I just sent two fix-up patches based on your feedback.
+Thanks.
 
 Johan
