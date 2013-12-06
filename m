@@ -1,37 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Fix valid LE PSM check
-Date: Fri,  6 Dec 2013 07:01:55 +0200
-Message-Id: <1386306115-30686-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1386306115-30686-1-git-send-email-johan.hedberg@gmail.com>
-References: <1386306115-30686-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
+Subject: Re: [RFC v3 00/12] LE auto connection and connection parameters
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CACJA=fWLf7wAmgooAkmbH3e2R+AE9dbfutvbjTewkp+5bJkmeQ@mail.gmail.com>
+Date: Fri, 6 Dec 2013 06:40:32 +0200
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <4993FF9F-65A6-4FB8-8065-A0F01CA21B1E@holtmann.org>
+References: <1384985340-2902-1-git-send-email-andre.guedes@openbossa.org> <CACJA=fWLf7wAmgooAkmbH3e2R+AE9dbfutvbjTewkp+5bJkmeQ@mail.gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Andre,
 
-The range of valid LE PSMs is 0x0001-0x00ff so the check should be for
-"less than or equal to" instead of "less than".
+> Ping.
+> 
+>> The main changes from the previous version are:
+>>  * Debugfs interface to add auto connect address instead of new mgmt
+>>    commands.
+>>  * We always stop LE scanning in favor of connection establishment even if
+>>    the controller supports scanning and connection at the same time.
+>>  * Background scanning is now controlled in one single place (hci_update_
+>>    background_scan function).
+>>  * RCU was replaced by hdev->lock to protect hdev->le_conn_params list. After
+>>    all the changes since the original version of this patch set, I realized
+>>    we always operate on hdev->le_conn_params with hdev->lock held so there is
+>>    no point in use RCU to protect this list.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/l2cap_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+can you send a re-based v4 against the latest bluetooth-next tree please.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 8f42cae96dc3..23c57b4cdbcb 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1851,7 +1851,7 @@ static bool is_valid_psm(u16 psm, u8 dst_type)
- 		return false;
- 
- 	if (bdaddr_type_is_le(dst_type))
--		return (psm < 0x00ff);
-+		return (psm <= 0x00ff);
- 
- 	/* PSM must be odd and lsb of upper byte must be 0 */
- 	return ((psm & 0x0101) == 0x0001);
--- 
-1.8.4.2
+Regards
+
+Marcel
 
