@@ -1,84 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v4 00/12] LE auto connection and connection parameters
-Date: Fri,  6 Dec 2013 19:05:37 -0300
-Message-Id: <1386367549-29136-1-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <20131128165916.GA21429@molly.amr.corp.intel.com>
+References: <CAHZ1yC=Tx=4zRL_rV0-b-sqhQCO=AmXzCy93Q5jnb2=z2Kr6KQ@mail.gmail.com>
+	<20131128165916.GA21429@molly.amr.corp.intel.com>
+Date: Fri, 6 Dec 2013 11:47:25 -0800
+Message-ID: <CAHZ1yCmSBbdEtuDOHcB21MdHxVd=jjE51C15SJAaUE9Q6xGBTQ@mail.gmail.com>
+Subject: Re: SM: is BlueZ the Master/Initiator or Slave/Responder?
+From: Scott James Remnant <keybuk@google.com>
+To: Vinicius Costa Gomes <vcgomes@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Holtmann, Marcel" <marcel.holtmann@intel.com>,
+	Johan Hedberg <johan.hedberg@intel.com>,
+	Brian Gix <bgix@codeaurora.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Great, sounds like I came to the right conclusion myself - after
+reading the spec and examining the test case, we couldn't find a
+reason to set this bit unless BlueZ can also behave as the Slave,
+which is not only something we didn't expect it to do, but also not
+something we had claimed in the PICS.
 
-This v4 is the same patch set from v3 but rebased on top of current
-bluetooth-next tree.
+I filed a TSE with the SIG on 11/25 and it looks like they agree too,
+and that this test should only be used when a IUT specifies that it
+supports both the Master and Slave role, so looks like the TSE will be
+approved along with the matching TCW.
 
-Below follows v3 cover letter:
+Scott
 
-The main changes from the previous version are:
-  * Debugfs interface to add auto connect address instead of new mgmt
-    commands.
-  * We always stop LE scanning in favor of connection establishment even if
-    the controller supports scanning and connection at the same time.
-  * Background scanning is now controlled in one single place (hci_update_
-    background_scan function).
-  * RCU was replaced by hdev->lock to protect hdev->le_conn_params list. After
-    all the changes since the original version of this patch set, I realized
-    we always operate on hdev->le_conn_params with hdev->lock held so there is
-    no point in use RCU to protect this list.
+On Thu, Nov 28, 2013 at 8:59 AM, Vinicius Costa Gomes <vcgomes@gmail.com> wrote:
+> Hi Scott,
+>
+> On 13:17 Mon 25 Nov, Scott James Remnant wrote:
+>> We are able to pass all qualification tests with BlueZ as the Master except one:
+>>
+>>   TP/KDU/BV-06-C - Master Key Distribution - Encryption Key bit
+>>
+>> This test requires that BlueZ initiates pairing with the
+>> SMP_DIST_ENC_KEY bit set in the init_key_dist member of struct
+>> smp_cmd_pairing - however this member is always initialized to zero
+>> and never changed.
+>
+> This test is in theory correct, but it doesn't test anything that does make
+> sense at this point. Let me try to explain, setting the Encryption Key bit in
+> the initiator key distribution field in the Pairing Request means that the
+> Initiator wants to send its Encryption Key to the Responder.
+>
+> This is only useful in cases that both devices expect the roles to be reversed
+> in future connections (The Master of this connection would become the Slave in
+> future connections). And IIRC we weren't able to test this role reversal and
+> it even offends the current GAP spec for Dual mode devices.
+>
+>>
+>> This seems to have changed at some point in the past, 2b64d153 added
+>> MITM mechanism and changed the init_key_dist member initialization
+>> from dist_keys to 0
+>>
+>>
+>> So two questions:
+>>
+>>  1) should BlueZ be able to behave as Master? It passes the majority
+>> of the tests except this one.
+>
+> BlueZ should be able to bahave as Master, if not, it is a bug.
+>
+>>
+>>  2) given the above, is this a bug that init_key_dist is 0 or is it a
+>> test plan error that it requires this?
+>
+> I think it is a bit of both, for the current situation the Master distributing
+> its keys doesn't make much sense and we should be able to change this value to
+> be able to test the key distribution parts.
+>
+> What I suggest is adding a debugfs entry to change the value of init_key_dist
+> for Pairing Requests, and keep the default being 0.
+>
+> (disclaimer: I am follwing development from the sidelines for some time, so
+> feel free to correct me.)
+>
+>>
+>> Scott
+>> --
+>> Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+> Cheers,
+> --
+> Vinicius
 
-In order to test the LE auto connection mechanism please follow the
-instructions below.
 
-To add a new auto connection address we write on le_auto_conn file following
-the format <address> <address type> <auto_connect>.
-
-The <address type> values are:
-  * 0 for public address
-  * 1 for random address
-
-The <auto_connect> values are (for more details see struct hci_conn_params):
-  * 0 for disabled
-  * 1 for always
-  * 2 for link loss
-
-So for instance, if you want the kernel autonomously establishes connections
-with device AA:BB:CC:DD:EE:FF (public address) every time the device enters in
-connectable mode (starts advertising), you should run the command:
-$ echo "AA:BB:CC:DD:EE:FF 0 1" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
-
-To get the list of connection parameters configured in kernel, read the
-le_auto_conn file:
-$ cat /sys/kernel/debug/bluetooth/hci0/le_auto_conn
-
-Finally, to clear the connection parameters list, write an empty string:
-$ echo "" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
-
-BR,
-
-Andre
-
-
-Andre Guedes (12):
-  Bluetooth: Save connection interval parameters in hci_conn
-  Bluetooth: Group list_head fields from strcut hci_dev together
-  Bluetooth: Introduce connection parameters list
-  Bluetooth: Use connection parameters if any
-  Bluetooth: Stop scanning on LE connection
-  Bluetooth: Introduce hdev->pend_le_conn list
-  Bluetooth: Introduce LE auto connection infrastructure
-  Bluetooth: Re-enable background scan in case of error
-  Bluetooth: Temporarily stop background scanning on discovery
-  Bluetooth: Auto connection and power on
-  Bleutooth: Add support for auto connect options
-  Bluetooth: Add le_auto_conn file on debugfs
-
- include/net/bluetooth/hci_core.h |  43 +++++-
- net/bluetooth/hci_conn.c         |  39 ++++-
- net/bluetooth/hci_core.c         | 318 +++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c        |  60 ++++++++
- net/bluetooth/mgmt.c             |  25 ++-
- 5 files changed, 473 insertions(+), 12 deletions(-)
 
 -- 
-1.8.4.2
-
+Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
