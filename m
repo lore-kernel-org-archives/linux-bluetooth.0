@@ -1,36 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1386428021.32408.13.camel@nuvo>
-Subject: [PATCH 2/2] input: Fix crash when SDP record isn't available
+Message-ID: <1386428014.32408.12.camel@nuvo>
+Subject: [PATCH 1/2] device: When the Class changes, Icon might too
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Date: Sat, 07 Dec 2013 15:53:41 +0100
+Date: Sat, 07 Dec 2013 15:53:34 +0100
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
-On startup, if the SDP cache has been removed but the pairing
-information is still present, we'd crash trying to access inside a
-NULL record struct.
----
- profiles/input/device.c | 3 +++
- 1 file changed, 3 insertions(+)
+Send out a PropertyChanged signal when the Class changes for
+Icon also changing, as it's likely that the Icon needs to be
+refetched.
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index 521aca8..62f6dbb 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -811,6 +811,9 @@ static struct input_device *input_device_new(struct btd_service *service)
- 	struct input_device *idev;
- 	char name[HCI_MAX_NAME_LENGTH + 1];
+Tested with the PS3 Sixaxis controller connecting the first time
+around, as it would not budge from not having any icons until the
+client was restarted.
+---
+ src/device.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/device.c b/src/device.c
+index 5380c1a..d7a00ec 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2285,6 +2285,8 @@ void device_set_class(struct btd_device *device, uint32_t class)
  
-+	if (!rec)
-+		return NULL;
-+
- 	idev = g_new0(struct input_device, 1);
- 	bacpy(&idev->src, btd_adapter_get_address(adapter));
- 	bacpy(&idev->dst, device_get_address(device));
+ 	g_dbus_emit_property_changed(dbus_conn, device->path,
+ 						DEVICE_INTERFACE, "Class");
++	g_dbus_emit_property_changed(dbus_conn, device->path,
++						DEVICE_INTERFACE, "Icon");
+ }
+ 
+ uint32_t btd_device_get_class(struct btd_device *device)
 -- 
 1.8.4.2
 
