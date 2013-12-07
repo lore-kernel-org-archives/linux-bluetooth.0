@@ -1,37 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+Message-ID: <1386428021.32408.13.camel@nuvo>
+Subject: [PATCH 2/2] input: Fix crash when SDP record isn't available
+From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Increase minor version of core module
-Date: Sat,  7 Dec 2013 09:06:24 -0800
-Message-Id: <1386435984-35260-1-git-send-email-marcel@holtmann.org>
+Date: Sat, 07 Dec 2013 15:53:41 +0100
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With the addition of L2CAP Connection Oriented Channels for Bluetooth
-Low Energy connections, it makes sense to increase the minor version
-of the Bluetooth core module.
 
-The module version is not used anywhere, but it gives a nice extra
-hint for debugging purposes.
-
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+On startup, if the SDP cache has been removed but the pairing
+information is still present, we'd crash trying to access inside a
+NULL record struct.
 ---
- net/bluetooth/af_bluetooth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ profiles/input/device.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 56ca494621c6..0c5866bb49b6 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -31,7 +31,7 @@
- #include <net/bluetooth/bluetooth.h>
- #include <linux/proc_fs.h>
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index 521aca8..62f6dbb 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -811,6 +811,9 @@ static struct input_device *input_device_new(struct btd_service *service)
+ 	struct input_device *idev;
+ 	char name[HCI_MAX_NAME_LENGTH + 1];
  
--#define VERSION "2.17"
-+#define VERSION "2.18"
- 
- /* Bluetooth sockets */
- #define BT_MAX_PROTO	8
++	if (!rec)
++		return NULL;
++
+ 	idev = g_new0(struct input_device, 1);
+ 	bacpy(&idev->src, btd_adapter_get_address(adapter));
+ 	bacpy(&idev->dst, device_get_address(device));
 -- 
-1.8.3.1
+1.8.4.2
+
 
