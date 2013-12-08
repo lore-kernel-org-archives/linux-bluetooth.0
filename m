@@ -1,43 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 9 Dec 2013 10:03:11 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] obex: Fix checking incorrect error code
-Message-ID: <20131209080310.GC6506@aemeltch-MOBL1>
-References: <1386086694-22682-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 9 Dec 2013 00:03:53 +0400
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Use macros for connectionless slave broadcast
+ features
+Message-ID: <20131208200353.GA5869@x220.p-661hnu-f1>
+References: <1386532533-48770-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1386086694-22682-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1386532533-48770-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-ping
+Hi Marcel,
 
-On Tue, Dec 03, 2013 at 06:04:54PM +0200, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Sun, Dec 08, 2013, Marcel Holtmann wrote:
+> Add the LMP feature constants for connectionless slave broadcast
+> and use them for capability testing.
 > 
-> chdir return -1 if error and 0 in success. Checking for > 0 is pointless.
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  tools/obex-server-tool.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/obex-server-tool.c b/tools/obex-server-tool.c
-> index e37c56f..86c2271 100644
-> --- a/tools/obex-server-tool.c
-> +++ b/tools/obex-server-tool.c
-> @@ -427,7 +427,7 @@ int main(int argc, char *argv[])
->  		exit(EXIT_FAILURE);
->  	}
->  
-> -	if (option_root && chdir(option_root) > 0) {
-> +	if (option_root && chdir(option_root) < 0) {
->  		perror("chdir:");
->  		exit(EXIT_FAILURE);
->  	}
-> -- 
-> 1.8.3.2
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>  include/net/bluetooth/hci.h      | 6 ++++++
+>  include/net/bluetooth/hci_core.h | 6 ++++++
+>  net/bluetooth/hci_core.c         | 6 +++---
+>  3 files changed, 15 insertions(+), 3 deletions(-)
+
+Applied to bluetooth-next. Thanks.
+
+Johan
