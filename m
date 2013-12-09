@@ -1,61 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
+Message-ID: <1386608891.5021.1.camel@nuvo>
+Subject: [PATCH] autopair: Don't handle the iCade
+From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH] core: Fix crash due to agent callback freeing the agent
-Date: Mon,  9 Dec 2013 20:20:55 +0100
-Message-Id: <1386616856-16140-1-git-send-email-szymon.janc@gmail.com>
+Date: Mon, 09 Dec 2013 18:08:11 +0100
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Similar fix was provided for simple_agent_reply in a2f5d438 but missed
-pincode_reply case.
 
-Fix following:
+We can't easily enter digits other than 1 through 4 (inclusive)
+so leave it up to the agent to figure out a good passcode
+for the iCade.
 
-src/agent.c:agent_disconnect() Agent :1.48 disconnected
-src/agent.c:set_default_agent() Default agent cleared
-src/agent.c:agent_destroy() agent :1.48
-src/agent.c:agent_unref() 0x4701c68: ref=1
-Agent /org/bluez/agent replied with an error:
-    org.freedesktop.DBus.Error.NoReply, Message did not receive a reply
-    (timeout by message bus)
-src/adapter.c:btd_adapter_pincode_reply() hci0 addr 6C:0E:0D:DB:D1:16
-    pinlen 0
-src/agent.c:agent_unref() 0x4701c68: ref=0
-src/adapter.c:btd_adapter_pincode_reply() hci0 addr 6C:0E:0D:DB:D1:16
-    pinlen 0
-src/agent.c:agent_unref() 0x4701c68: ref=-1
-src/adapter.c:btd_adapter_pincode_reply() hci0 addr 6C:0E:0D:DB:D1:16
-    pinlen 0
-src/agent.c:agent_unref() 0x4701c68: ref=-2
-...
+Note that we can not use the VID/PID of the device, as it is not
+yet known at that point.
 ---
- src/agent.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ plugins/autopair.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/src/agent.c b/src/agent.c
-index bcba969..4c63cb9 100644
---- a/src/agent.c
-+++ b/src/agent.c
-@@ -426,6 +426,9 @@ static void pincode_reply(DBusPendingCall *call, void *user_data)
- 	 * is only called after a reply has been received */
- 	message = dbus_pending_call_steal_reply(call);
+diff --git a/plugins/autopair.c b/plugins/autopair.c
+index 8c98c12..5d2f6f7 100644
+--- a/plugins/autopair.c
++++ b/plugins/autopair.c
+@@ -57,13 +57,23 @@ static ssize_t autopair_pincb(struct btd_adapter *adapter,
+ {
+ 	char addr[18];
+ 	char pinstr[7];
++	char name[25];
+ 	uint32_t class;
  
-+	/* Protect from the callback freeing the agent */
-+	agent_ref(agent);
+ 	ba2str(device_get_address(device), addr);
+ 
+ 	class = btd_device_get_class(device);
+ 
+-	DBG("device %s 0x%x", addr, class);
++	device_get_name(device, name, sizeof(name));
++	name[sizeof(name) - 1] = 0;
 +
- 	dbus_error_init(&err);
- 	if (dbus_set_error_from_message(&err, message)) {
- 		error("Agent %s replied with an error: %s, %s",
-@@ -465,6 +468,7 @@ done:
- 	dbus_pending_call_cancel(req->call);
- 	agent->request = NULL;
- 	agent_request_free(req, TRUE);
-+	agent_unref(agent);
- }
++	DBG("device %s (%s) 0x%x", addr, name, class);
++
++	g_message ("vendor 0x%X product: 0x%X", btd_device_get_vendor (device), btd_device_get_product (device));
++
++	/* The iCade shouldn't use random PINs like normal keyboards */
++	if (name != NULL && strstr(name, "iCade") != NULL)
++		return 0;
  
- static int pincode_request_new(struct agent_request *req, const char *device_path,
+ 	/* This is a class-based pincode guesser. Ignore devices with an
+ 	 * unknown class.
 -- 
-1.8.5.1
+1.8.4.2
+
 
