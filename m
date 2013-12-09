@@ -1,49 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20131209080310.GC6506@aemeltch-MOBL1>
-References: <1386086694-22682-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<20131209080310.GC6506@aemeltch-MOBL1>
-Date: Mon, 9 Dec 2013 11:56:30 +0200
-Message-ID: <CABBYNZJHT3V7NEKPHZiXOKCzOiTPnfvH5w-WuCcL1GyCC-tnNg@mail.gmail.com>
-Subject: Re: [PATCH] obex: Fix checking incorrect error code
+In-Reply-To: <3479757.7T9GkbTkhq@uw000953>
+References: <1386074528-8020-1-git-send-email-szymon.janc@tieto.com>
+	<3479757.7T9GkbTkhq@uw000953>
+Date: Mon, 9 Dec 2013 11:34:56 +0200
+Message-ID: <CABBYNZKHfLk+aBJ1_+L+E1fDRYZpuw5-tqdiMLUVX5BKvx7fnw@mail.gmail.com>
+Subject: Re: [PATCH] android: Fix missing failure check in ipc_init
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Szymon,
 
-On Mon, Dec 9, 2013 at 10:03 AM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> ping
+On Mon, Dec 9, 2013 at 10:55 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
 >
-> On Tue, Dec 03, 2013 at 06:04:54PM +0200, Andrei Emeltchenko wrote:
->> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->>
->> chdir return -1 if error and 0 in success. Checking for > 0 is pointless.
+>> If connecting command socket failed daemon should be terminated.
 >> ---
->>  tools/obex-server-tool.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>  android/ipc.c | 2 ++
+>>  1 file changed, 2 insertions(+)
 >>
->> diff --git a/tools/obex-server-tool.c b/tools/obex-server-tool.c
->> index e37c56f..86c2271 100644
->> --- a/tools/obex-server-tool.c
->> +++ b/tools/obex-server-tool.c
->> @@ -427,7 +427,7 @@ int main(int argc, char *argv[])
->>               exit(EXIT_FAILURE);
->>       }
+>> diff --git a/android/ipc.c b/android/ipc.c
+>> index 1d369a8..6f940cd 100644
+>> --- a/android/ipc.c
+>> +++ b/android/ipc.c
+>> @@ -229,6 +229,8 @@ static gboolean cmd_connect_cb(GIOChannel *io, GIOCondition cond,
+>>  void ipc_init(void)
+>>  {
+>>       cmd_io = connect_hal(cmd_connect_cb);
+>> +     if (!cmd_io)
+>> +             raise(SIGTERM);
+>>  }
 >>
->> -     if (option_root && chdir(option_root) > 0) {
->> +     if (option_root && chdir(option_root) < 0) {
->>               perror("chdir:");
->>               exit(EXIT_FAILURE);
->>       }
->> --
->> 1.8.3.2
+>>  void ipc_cleanup(void)
+>>
 
-Pushed, thanks.
+Applied, thanks.
 
 
 -- 
