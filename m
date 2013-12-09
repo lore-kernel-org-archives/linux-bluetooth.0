@@ -1,45 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 9 Dec 2013 15:32:21 -0500
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2013-12-04
-Message-ID: <20131209203221.GD3359@tuxdriver.com>
-References: <20131204132527.GD1608@joana>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20131204132527.GD1608@joana>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Szymon Janc <szymon.janc@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@gmail.com>
+Subject: [PATCH] core: Fix crash due to agent callback freeing the agent
+Date: Mon,  9 Dec 2013 20:20:55 +0100
+Message-Id: <1386616856-16140-1-git-send-email-szymon.janc@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Dec 04, 2013 at 11:25:27AM -0200, Gustavo Padovan wrote:
-> Hi John,
-> 
-> This is the first batch of patches intended for 3.14. There is nothing big here.
-> Most of the code are refactors, clean up, small fixes, plus some new device id
-> support.
-> 
-> Please pull or let me know of any problems! Thanks.
-> 
-> 	Gustavo
-> 
-> ---
-> The following changes since commit 4b074b07625f603d40d4d04937f8874a00415dc4:
-> 
->   Merge branch 'for-john' of git://git.kernel.org/pub/scm/linux/kernel/git/jberg/mac80211-next (2013-12-02 14:25:38 -0500)
-> 
-> are available in the git repository at:
-> 
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-> 
-> for you to fetch changes up to 201a5929c8c788f9ef53b010065c9ce70c9c06f0:
-> 
->   Bluetooth: Remove dead code from SMP encryption function (2013-12-04 11:09:05 -0200)
+Similar fix was provided for simple_agent_reply in a2f5d438 but missed
+pincode_reply case.
 
-Pulling now...
+Fix following:
 
+src/agent.c:agent_disconnect() Agent :1.48 disconnected
+src/agent.c:set_default_agent() Default agent cleared
+src/agent.c:agent_destroy() agent :1.48
+src/agent.c:agent_unref() 0x4701c68: ref=1
+Agent /org/bluez/agent replied with an error:
+    org.freedesktop.DBus.Error.NoReply, Message did not receive a reply
+    (timeout by message bus)
+src/adapter.c:btd_adapter_pincode_reply() hci0 addr 6C:0E:0D:DB:D1:16
+    pinlen 0
+src/agent.c:agent_unref() 0x4701c68: ref=0
+src/adapter.c:btd_adapter_pincode_reply() hci0 addr 6C:0E:0D:DB:D1:16
+    pinlen 0
+src/agent.c:agent_unref() 0x4701c68: ref=-1
+src/adapter.c:btd_adapter_pincode_reply() hci0 addr 6C:0E:0D:DB:D1:16
+    pinlen 0
+src/agent.c:agent_unref() 0x4701c68: ref=-2
+...
+---
+ src/agent.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/agent.c b/src/agent.c
+index bcba969..4c63cb9 100644
+--- a/src/agent.c
++++ b/src/agent.c
+@@ -426,6 +426,9 @@ static void pincode_reply(DBusPendingCall *call, void *user_data)
+ 	 * is only called after a reply has been received */
+ 	message = dbus_pending_call_steal_reply(call);
+ 
++	/* Protect from the callback freeing the agent */
++	agent_ref(agent);
++
+ 	dbus_error_init(&err);
+ 	if (dbus_set_error_from_message(&err, message)) {
+ 		error("Agent %s replied with an error: %s, %s",
+@@ -465,6 +468,7 @@ done:
+ 	dbus_pending_call_cancel(req->call);
+ 	agent->request = NULL;
+ 	agent_request_free(req, TRUE);
++	agent_unref(agent);
+ }
+ 
+ static int pincode_request_new(struct agent_request *req, const char *device_path,
 -- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+1.8.5.1
+
