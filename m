@@ -1,35 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android: Fix missing failure check in ipc_init
-Date: Mon, 09 Dec 2013 09:55:30 +0100
-Message-ID: <3479757.7T9GkbTkhq@uw000953>
-In-Reply-To: <1386074528-8020-1-git-send-email-szymon.janc@tieto.com>
-References: <1386074528-8020-1-git-send-email-szymon.janc@tieto.com>
+Date: Mon, 9 Dec 2013 10:01:32 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/6] android/a2dp: Fix possible NULL dereference
+Message-ID: <20131209080131.GB6506@aemeltch-MOBL1>
+References: <1386085993-22055-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CABBYNZKRWtCvq_yg7dT+2iJFL5rvPauiOkqYP3diCc_6TN_SkA@mail.gmail.com>
+ <20131204083622.GA18198@aemeltch-MOBL1>
+ <CABBYNZ+pmDkN0EHuycjtSxaAfW0ZT94OtN7TRK1+pBo99ydM+g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CABBYNZ+pmDkN0EHuycjtSxaAfW0ZT94OtN7TRK1+pBo99ydM+g@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Luiz,
 
-> If connecting command socket failed daemon should be terminated.
-> ---
->  android/ipc.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/android/ipc.c b/android/ipc.c
-> index 1d369a8..6f940cd 100644
-> --- a/android/ipc.c
-> +++ b/android/ipc.c
-> @@ -229,6 +229,8 @@ static gboolean cmd_connect_cb(GIOChannel *io, GIOCondition cond,
->  void ipc_init(void)
->  {
->  	cmd_io = connect_hal(cmd_connect_cb);
-> +	if (!cmd_io)
-> +		raise(SIGTERM);
->  }
->  
->  void ipc_cleanup(void)
-> 
+On Sun, Dec 08, 2013 at 05:39:37PM +0200, Luiz Augusto von Dentz wrote:
+> I fixed this myself and applied 1-4, patch 5 is actually wrong since
+> sdp_next_handle may return values bellow 0x10000 if we run out of
 
-ping
+OK
+
+> handles and patch 6 is not necessary since what is in android/avdtp.c
+> is what we will be using in the future.
+
+How are we going to use those local vars? If they would be global it probably
+make some (little) sense ...
+
+
+@@ -773,10 +773,9 @@ static int get_send_buffer_size(int sk)
+ 	socklen_t optlen = sizeof(size);
+ 
+ 	if (getsockopt(sk, SOL_SOCKET, SO_SNDBUF, &size, &optlen) < 0) {
+-		int err = -errno;
+-		error("getsockopt(SO_SNDBUF) failed: %s (%d)", strerror(-err),
+-									-err);
+-		return err;
++		error("getsockopt(SO_SNDBUF) failed: %s (%d)", strerror(errno),
++									errno);
++		return -errno;
+ 	}
+ 
+ 	/*
+
+
+Regards,
+Andrei
