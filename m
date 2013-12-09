@@ -1,23 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1386634100.5021.2.camel@nuvo>
-Subject: Re: [PATCH] core: Fix crash due to agent callback freeing the agent
-From: Bastien Nocera <hadess@hadess.net>
-To: Szymon Janc <szymon.janc@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 10 Dec 2013 01:08:20 +0100
-In-Reply-To: <1386616856-16140-1-git-send-email-szymon.janc@gmail.com>
-References: <1386616856-16140-1-git-send-email-szymon.janc@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 9 Dec 2013 15:32:21 -0500
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2013-12-04
+Message-ID: <20131209203221.GD3359@tuxdriver.com>
+References: <20131204132527.GD1608@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20131204132527.GD1608@joana>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2013-12-09 at 20:20 +0100, Szymon Janc wrote:
-> Similar fix was provided for simple_agent_reply in a2f5d438 but missed
-> pincode_reply case.
+On Wed, Dec 04, 2013 at 11:25:27AM -0200, Gustavo Padovan wrote:
+> Hi John,
+> 
+> This is the first batch of patches intended for 3.14. There is nothing big here.
+> Most of the code are refactors, clean up, small fixes, plus some new device id
+> support.
+> 
+> Please pull or let me know of any problems! Thanks.
+> 
+> 	Gustavo
+> 
+> ---
+> The following changes since commit 4b074b07625f603d40d4d04937f8874a00415dc4:
+> 
+>   Merge branch 'for-john' of git://git.kernel.org/pub/scm/linux/kernel/git/jberg/mac80211-next (2013-12-02 14:25:38 -0500)
+> 
+> are available in the git repository at:
+> 
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+> 
+> for you to fetch changes up to 201a5929c8c788f9ef53b010065c9ce70c9c06f0:
+> 
+>   Bluetooth: Remove dead code from SMP encryption function (2013-12-04 11:09:05 -0200)
 
-That fixes the bug I reported in:
-http://thread.gmane.org/gmane.linux.bluez.kernel/41496
+Pulling now...
 
-Cheers
-
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
