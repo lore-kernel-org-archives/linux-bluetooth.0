@@ -1,190 +1,154 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 3/7] android/tester: Start emulator in new process
-Date: Tue, 10 Dec 2013 15:00:47 +0100
-Message-Id: <1386684051-31748-3-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH v3 4/7] android/tester: Add stack initialization of stack in setup
+Date: Tue, 10 Dec 2013 15:00:48 +0100
+Message-Id: <1386684051-31748-4-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1386684051-31748-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1386684051-31748-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is needed because bluetooth->init call is blocking,
-and we have to emulate normal behaviour of android environment.
-That process will exit if it won't receive any message in 2 sec
-or when bluetoothd will exit. Main tester thread will wait for
-this process in teardown method.
+This add stack initialization and cleanup in setup/teardown.
 ---
- android/android-tester.c | 127 ++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 126 insertions(+), 1 deletion(-)
+ android/Makefile.am      | 10 ++++++--
+ android/android-tester.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 68 insertions(+), 2 deletions(-)
 
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 5364c2e..f3e77c3 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -91,9 +91,15 @@ android_android_tester_SOURCES = emulator/btdev.h emulator/btdev.c \
+ 				src/shared/mgmt.h src/shared/mgmt.c \
+ 				src/shared/hciemu.h src/shared/hciemu.c \
+ 				src/shared/tester.h src/shared/tester.c \
+-				android/android-tester.c
++				android/hal-utils.h android/hal-utils.c \
++				android/client/hwmodule.c android/android-tester.c
+ 
+-android_android_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
++android_android_tester_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
++
++android_android_tester_LDADD = lib/libbluetooth-internal.la \
++				android/libhal-internal.la @GLIB_LIBS@
++
++android_android_tester_LDFLAGS = -pthread
+ 
+ endif
+ 
 diff --git a/android/android-tester.c b/android/android-tester.c
-index 498da22..301b96a 100644
+index 301b96a..ace7427 100644
 --- a/android/android-tester.c
 +++ b/android/android-tester.c
-@@ -15,9 +15,14 @@
-  *
-  */
+@@ -31,6 +31,12 @@
+ #include "src/shared/mgmt.h"
+ #include "src/shared/hciemu.h"
  
-+#include <stdlib.h>
- #include <unistd.h>
- 
- #include <glib.h>
-+#include <sys/socket.h>
-+#include <sys/types.h>
-+#include <sys/wait.h>
-+#include <sys/un.h>
- 
- #include "lib/bluetooth.h"
- #include "lib/mgmt.h"
-@@ -29,12 +34,16 @@
- struct generic_data {
- };
- 
++#include <hardware/hardware.h>
++#include <hardware/bluetooth.h>
++
 +#define WAIT_FOR_SIGNAL_TIME 2 /* in seconds */
 +#define EMULATOR_SIGNAL "emulator_started"
 +
- struct test_data {
- 	struct mgmt *mgmt;
- 	uint16_t mgmt_index;
- 	struct hciemu *hciemu;
+ struct generic_data {
+ };
+ 
+@@ -44,6 +50,7 @@ struct test_data {
  	enum hciemu_type hciemu_type;
  	const struct generic_data *test_data;
-+	pid_t bluetoothd_pid;
+ 	pid_t bluetoothd_pid;
++	const bt_interface_t *if_bluetooth;
  };
  
  static void read_info_callback(uint8_t status, uint16_t length,
-@@ -165,13 +174,129 @@ static void test_post_teardown(const void *test_data)
- 	data->hciemu = NULL;
+@@ -240,12 +247,32 @@ failed:
+ 	close(fd);
  }
  
-+static void bluetoothd_start(int hci_index)
-+{
-+	char prg_name[PATH_MAX + 1];
-+	char index[8];
-+	char *prg_argv[4];
++static bt_callbacks_t bt_callbacks = {
++	.size = sizeof(bt_callbacks),
++	.adapter_state_changed_cb = NULL,
++	.adapter_properties_cb = NULL,
++	.remote_device_properties_cb = NULL,
++	.device_found_cb = NULL,
++	.discovery_state_changed_cb = NULL,
++	.pin_request_cb = NULL,
++	.ssp_request_cb = NULL,
++	.bond_state_changed_cb = NULL,
++	.acl_state_changed_cb = NULL,
++	.thread_evt_cb = NULL,
++	.dut_mode_recv_cb = NULL,
++	.le_test_mode_cb = NULL
++};
 +
-+	snprintf(prg_name, sizeof(prg_name), "%s/%s", "android", "bluetoothd");
-+	snprintf(index, sizeof(index), "%d", hci_index);
+ static void setup(struct test_data *data)
+ {
++	const hw_module_t *module;
++	hw_device_t *device;
++	bt_status_t status;
+ 	int signal_fd[2];
+ 	char buf[1024];
+ 	pid_t pid;
+ 	int len;
++	int err;
+ 
+ 	if (pipe(signal_fd)) {
+ 		tester_setup_failed();
+@@ -279,6 +306,33 @@ static void setup(struct test_data *data)
+ 		tester_setup_failed();
+ 		return;
+ 	}
 +
-+	prg_argv[0] = prg_name;
-+	prg_argv[1] = "-i";
-+	prg_argv[2] = index;
-+	prg_argv[3] = NULL;
++	close(signal_fd[0]);
 +
-+	if (!tester_use_debug())
-+		fclose(stderr);
-+
-+	execve(prg_argv[0], prg_argv, NULL);
-+}
-+
-+static void emulator(int pipe, int hci_index)
-+{
-+	static const char SYSTEM_SOCKET_PATH[] = "\0android_system";
-+	char buf[1024];
-+	struct sockaddr_un addr;
-+	struct timeval tv;
-+	int fd;
-+	ssize_t len;
-+
-+	fd = socket(PF_LOCAL, SOCK_DGRAM | SOCK_CLOEXEC, 0);
-+	if (fd < 0)
-+		goto failed;
-+
-+	tv.tv_sec = WAIT_FOR_SIGNAL_TIME;
-+	tv.tv_usec = 0;
-+	setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(tv));
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.sun_family = AF_UNIX;
-+	memcpy(addr.sun_path, SYSTEM_SOCKET_PATH, sizeof(SYSTEM_SOCKET_PATH));
-+
-+	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-+		perror("Failed to bind system socket");
-+		goto failed;
-+	}
-+
-+	len = write(pipe, EMULATOR_SIGNAL, sizeof(EMULATOR_SIGNAL));
-+
-+	if (len != sizeof(EMULATOR_SIGNAL))
-+		goto failed;
-+
-+	memset(buf, 0, sizeof(buf));
-+
-+	len = read(fd, buf, sizeof(buf));
-+	if (len <= 0 || (strcmp(buf, "ctl.start=bluetoothd")))
-+		goto failed;
-+
-+	close(pipe);
-+	close(fd);
-+	bluetoothd_start(hci_index);
-+
-+failed:
-+	close(pipe);
-+	close(fd);
-+}
-+
-+static void setup(struct test_data *data)
-+{
-+	int signal_fd[2];
-+	char buf[1024];
-+	pid_t pid;
-+	int len;
-+
-+	if (pipe(signal_fd)) {
++	err = hw_get_module(BT_HARDWARE_MODULE_ID, &module);
++	if (err) {
 +		tester_setup_failed();
 +		return;
 +	}
 +
-+	pid = fork();
-+
-+	if (pid < 0) {
-+		close(signal_fd[0]);
-+		close(signal_fd[1]);
++	err = module->methods->open(module, BT_HARDWARE_MODULE_ID, &device);
++	if (err) {
 +		tester_setup_failed();
 +		return;
 +	}
 +
-+	if (pid == 0) {
-+		if (!tester_use_debug())
-+			fclose(stderr);
-+
-+		close(signal_fd[0]);
-+		emulator(signal_fd[1], data->mgmt_index);
-+		exit(0);
-+	}
-+
-+	close(signal_fd[1]);
-+	data->bluetoothd_pid = pid;
-+
-+	len = read(signal_fd[0], buf, sizeof(buf));
-+	if (len <= 0 || (strcmp(buf, EMULATOR_SIGNAL))) {
-+		close(signal_fd[0]);
++	data->if_bluetooth = ((bluetooth_device_t *)
++					device)->get_bluetooth_interface();
++	if (!data->if_bluetooth) {
 +		tester_setup_failed();
 +		return;
 +	}
-+}
 +
++	status = data->if_bluetooth->init(&bt_callbacks);
++	if (status != BT_STATUS_SUCCESS) {
++		data->if_bluetooth = NULL;
++		tester_setup_failed();
++	}
+ }
+ 
  static void setup_base(const void *test_data)
+@@ -294,6 +348,11 @@ static void teardown(const void *test_data)
  {
--	tester_setup_failed();
-+	struct test_data *data = tester_get_data();
+ 	struct test_data *data = tester_get_data();
+ 
++	if (data->if_bluetooth) {
++		data->if_bluetooth->cleanup();
++		data->if_bluetooth = NULL;
++	}
 +
-+	setup(data);
-+
-+	tester_setup_complete();
+ 	if (data->bluetoothd_pid)
+ 		waitpid(data->bluetoothd_pid, NULL, 0);
+ 
+@@ -302,6 +361,7 @@ static void teardown(const void *test_data)
+ 
+ static void controller_setup(const void *test_data)
+ {
++	tester_test_passed();
  }
  
- static void teardown(const void *test_data)
- {
-+	struct test_data *data = tester_get_data();
-+
-+	if (data->bluetoothd_pid)
-+		waitpid(data->bluetoothd_pid, NULL, 0);
-+
- 	tester_teardown_complete();
- }
- 
+ #define test_bredrle(name, data, test_setup, test, test_teardown) \
 -- 
 1.8.3.1
 
