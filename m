@@ -1,59 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 10 Dec 2013 11:08:14 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] input: Fix crash when SDP record isn't available
-Message-ID: <20131210090814.GA9360@x220.p-661hnu-f1>
-References: <1386428021.32408.13.camel@nuvo>
- <20131207175226.GB29280@x220.p-661hnu-f1>
- <1386452701.32408.25.camel@nuvo>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1386452701.32408.25.camel@nuvo>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix handling of L2CAP Command Reject over LE
+Date: Tue, 10 Dec 2013 10:52:48 +0200
+Message-Id: <1386665568-7801-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bastien,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Sat, Dec 07, 2013, Bastien Nocera wrote:
-> On Sat, 2013-12-07 at 21:52 +0400, Johan Hedberg wrote:
-> > Hi Bastien,
-> > 
-> > On Sat, Dec 07, 2013, Bastien Nocera wrote:
-> > > On startup, if the SDP cache has been removed but the pairing
-> > > information is still present, we'd crash trying to access inside a
-> > > NULL record struct.
-> > > ---
-> > >  profiles/input/device.c | 3 +++
-> > >  1 file changed, 3 insertions(+)
-> > > 
-> > > diff --git a/profiles/input/device.c b/profiles/input/device.c
-> > > index 521aca8..62f6dbb 100644
-> > > --- a/profiles/input/device.c
-> > > +++ b/profiles/input/device.c
-> > > @@ -811,6 +811,9 @@ static struct input_device *input_device_new(struct btd_service *service)
-> > >  	struct input_device *idev;
-> > >  	char name[HCI_MAX_NAME_LENGTH + 1];
-> > >  
-> > > +	if (!rec)
-> > > +		return NULL;
-> > > +
-> > >  	idev = g_new0(struct input_device, 1);
-> > >  	bacpy(&idev->src, btd_adapter_get_address(adapter));
-> > >  	bacpy(&idev->dst, device_get_address(device));
-> > 
-> > I've applied your first patch, but I'd like to understand a bit better
-> > how you'd end up in this situation. Is this accomplishable through BlueZ
-> > APIs or only if one goes and messes with the storage directly? Either
-> > way, is this the best approach or should we consider still creating the
-> > input device but just ignore the bits that depend on the SDP record?
-> 
-> I rm'ed the file in the cache/ directory. I'm not too fussed about what
-> the end result actually is, it just shouldn't crash. The same patch with
-> a warning that you shouldn't fiddle with the cache directory would be
-> fine as well ;)
+If we receive an L2CAP command reject message over LE we should take
+appropriate action on the corresponding channel. This is particularly
+important when trying to interact with a remote pre-4.1 system using LE
+CoC signaling messages. If we don't react to the command reject the
+corresponding socket would not be notified until a connection timeout
+occurs.
 
-Fair enough. I've applied the patch now. Thanks.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/l2cap_core.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-Johan
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index ae0054ccee5b..b6bca64b320d 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -5736,6 +5736,31 @@ static inline int l2cap_le_credits(struct l2cap_conn *conn,
+ 	return 0;
+ }
+ 
++static inline int l2cap_le_command_rej(struct l2cap_conn *conn,
++				       struct l2cap_cmd_hdr *cmd, u16 cmd_len,
++				       u8 *data)
++{
++	struct l2cap_cmd_rej_unk *rej = (struct l2cap_cmd_rej_unk *) data;
++	struct l2cap_chan *chan;
++
++	if (cmd_len < sizeof(*rej))
++		return -EPROTO;
++
++	mutex_lock(&conn->chan_lock);
++
++	chan = __l2cap_get_chan_by_ident(conn, cmd->ident);
++	if (!chan)
++		goto done;
++
++	l2cap_chan_lock(chan);
++	l2cap_chan_del(chan, ECONNREFUSED);
++	l2cap_chan_unlock(chan);
++
++done:
++	mutex_unlock(&conn->chan_lock);
++	return 0;
++}
++
+ static inline int l2cap_le_sig_cmd(struct l2cap_conn *conn,
+ 				   struct l2cap_cmd_hdr *cmd, u16 cmd_len,
+ 				   u8 *data)
+@@ -5755,6 +5780,7 @@ static inline int l2cap_le_sig_cmd(struct l2cap_conn *conn,
+ 
+ 	switch (cmd->code) {
+ 	case L2CAP_COMMAND_REJ:
++		l2cap_le_command_rej(conn, cmd, cmd_len, data);
+ 		break;
+ 
+ 	case L2CAP_CONN_PARAM_UPDATE_REQ:
+-- 
+1.8.4.2
+
