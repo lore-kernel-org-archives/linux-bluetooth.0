@@ -2,160 +2,66 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 5/8] android/bluetooth: Add stubs for get device properties command
-Date: Tue, 10 Dec 2013 16:06:19 +0100
-Message-Id: <1386687982-1799-5-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2 4/8] android/bluetooth: Refactor send_remote_device_name_prop
+Date: Tue, 10 Dec 2013 16:06:18 +0100
+Message-Id: <1386687982-1799-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1386687982-1799-1-git-send-email-szymon.janc@tieto.com>
 References: <1386687982-1799-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds per property stubs.
+Rename send_remote_device_name_prop to get_device_name and make it
+accept struct device as parameter. Also return HAL status code.
+This will allow to use this function also in get device property
+command handler.
 ---
- android/bluetooth.c | 121 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 119 insertions(+), 2 deletions(-)
+ android/bluetooth.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 326f6d2..f46238a 100644
+index 5494dcb..326f6d2 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -2240,6 +2240,78 @@ static void handle_get_adapter_props_cmd(const void *buf, uint16_t len)
- 							HAL_STATUS_SUCCESS);
+@@ -575,19 +575,16 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
+ 	browse_remote_sdp(&addr->bdaddr);
  }
  
-+static uint8_t get_device_uuids(struct device *dev)
-+{
-+	DBG("Not implemented");
-+
-+	/* TODO */
-+
-+	return HAL_STATUS_FAILED;
-+}
-+
-+static uint8_t get_device_class(struct device *dev)
-+{
-+	DBG("Not implemented");
-+
-+	/* TODO */
-+
-+	return HAL_STATUS_FAILED;
-+}
-+
-+static uint8_t get_device_type(struct device *dev)
-+{
-+	DBG("Not implemented");
-+
-+	/* TODO */
-+
-+	return HAL_STATUS_FAILED;
-+}
-+
-+static uint8_t get_device_service_rec(struct device *dev)
-+{
-+	DBG("Not implemented");
-+
-+	/* TODO */
-+
-+	return HAL_STATUS_FAILED;
-+}
-+
-+static uint8_t get_device_friendly_name(struct device *dev)
-+{
-+	DBG("Not implemented");
-+
-+	/* TODO */
-+
-+	return HAL_STATUS_FAILED;
-+}
-+
-+static uint8_t get_device_rssi(struct device *dev)
-+{
-+	DBG("Not implemented");
-+
-+	/* TODO */
-+
-+	return HAL_STATUS_FAILED;
-+}
-+
-+static uint8_t get_device_version_info(struct device *dev)
-+{
-+	DBG("Not implemented");
-+
-+	/* TODO */
-+
-+	return HAL_STATUS_FAILED;
-+}
-+
-+static uint8_t get_device_timestamp(struct device *dev)
-+{
-+	DBG("Not implemented");
-+
-+	/* TODO */
-+
-+	return HAL_STATUS_FAILED;
-+}
-+
- static void handle_get_remote_device_props_cmd(const void *buf, uint16_t len)
+-static void send_remote_device_name_prop(const bdaddr_t *bdaddr)
++static uint8_t get_device_name(struct device *dev)
  {
- 	/* TODO */
-@@ -2250,10 +2322,55 @@ static void handle_get_remote_device_props_cmd(const void *buf, uint16_t len)
+ 	struct hal_ev_remote_device_props *ev;
+-	struct device *dev;
+ 	size_t ev_len;
  
- static void handle_get_remote_device_prop_cmd(const void *buf, uint16_t len)
- {
--	/* TODO */
-+	const struct hal_cmd_get_remote_device_prop *cmd = buf;
-+	uint8_t status;
-+	bdaddr_t addr;
-+	GSList *l;
+-	dev = get_device(bdaddr);
+-
+ 	ev_len = BASELEN_REMOTE_DEV_PROP + strlen(dev->name);
+ 	ev = g_malloc0(ev_len);
  
-+	android2bdaddr(cmd->bdaddr, &addr);
+ 	ev->status = HAL_STATUS_SUCCESS;
+-	bdaddr2android(bdaddr, ev->bdaddr);
++	bdaddr2android(&dev->bdaddr, ev->bdaddr);
+ 	ev->num_props = 1;
+ 	ev->props[0].type = HAL_PROP_DEVICE_NAME;
+ 	ev->props[0].len = strlen(dev->name);
+@@ -597,6 +594,8 @@ static void send_remote_device_name_prop(const bdaddr_t *bdaddr)
+ 								ev_len, ev);
+ 
+ 	g_free(ev);
 +
-+	l = g_slist_find_custom(devices, &addr, bdaddr_cmp);
-+	if (!l) {
-+		status = HAL_STATUS_INVALID;
-+		goto failed;
-+	}
-+
-+	switch (cmd->type) {
-+	case HAL_PROP_DEVICE_NAME:
-+		status = get_device_name(l->data);
-+		break;
-+	case HAL_PROP_DEVICE_UUIDS:
-+		status = get_device_uuids(l->data);
-+		break;
-+	case HAL_PROP_DEVICE_CLASS:
-+		status = get_device_class(l->data);
-+		break;
-+	case HAL_PROP_DEVICE_TYPE:
-+		status = get_device_type(l->data);
-+		break;
-+	case HAL_PROP_DEVICE_SERVICE_REC:
-+		status = get_device_service_rec(l->data);
-+		break;
-+	case HAL_PROP_DEVICE_FRIENDLY_NAME:
-+		status = get_device_friendly_name(l->data);
-+		break;
-+	case HAL_PROP_DEVICE_RSSI:
-+		status = get_device_rssi(l->data);
-+		break;
-+	case HAL_PROP_DEVICE_VERSION_INFO:
-+		status = get_device_version_info(l->data);
-+		break;
-+	case HAL_PROP_DEVICE_TIMESTAMP:
-+		status = get_device_timestamp(l->data);
-+		break;
-+	default:
-+		status = HAL_STATUS_FAILED;
-+		break;
-+	}
-+
-+failed:
- 	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_GET_REMOTE_DEVICE_PROP,
--							HAL_STATUS_FAILED);
-+								status);
++	return HAL_STATUS_SUCCESS;
  }
  
- static void handle_set_remote_device_prop_cmd(const void *buf, uint16_t len)
+ static void pin_code_request_callback(uint16_t index, uint16_t length,
+@@ -615,7 +614,7 @@ static void pin_code_request_callback(uint16_t index, uint16_t length,
+ 
+ 	/* Workaround for Android Bluetooth.apk issue: send remote
+ 	 * device property */
+-	send_remote_device_name_prop(&ev->addr.bdaddr);
++	get_device_name(get_device(&ev->addr.bdaddr));
+ 
+ 	set_device_bond_state(&ev->addr.bdaddr, HAL_STATUS_SUCCESS,
+ 						HAL_BOND_STATE_BONDING);
 -- 
 1.8.3.2
 
