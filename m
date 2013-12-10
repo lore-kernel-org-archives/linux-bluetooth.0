@@ -1,116 +1,227 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v7 0/5] Bluetooth LE 6LoWPAN
-Date: Tue, 10 Dec 2013 13:37:32 +0200
-Message-Id: <1386675457-26024-1-git-send-email-jukka.rissanen@linux.intel.com>
+Cc: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v2 7/7] android/tester: Add status check and adapter enable, disable test cases
+Date: Tue, 10 Dec 2013 11:45:44 +0100
+Message-Id: <1386672344-13438-7-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1386672344-13438-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1386672344-13438-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 
-this is 6LoWPAN code for BT LE as described in
-http://tools.ietf.org/html/draft-ietf-6lo-btle-00
+This adds handling of status check, enabled adapter setup method,
+disable and enable fail test case.
 
-v7:
-- rebased on top of current bluetooth
-- David Miller acked the patches 2 and 3 so adding Acked-by
-  to those two patches
+---
+ android/android-tester.c | 109 ++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 104 insertions(+), 5 deletions(-)
 
-
-v6:
-- Common IP header compression code for IEEE 802154 and Bluetooth
-  moved to net/ieee802154/6lowpan_iphc.c. This is in patch 1 which
-  is also sent separately to netdev ml.
-- New ARPHRD type in patches 2 and 3 are also sent to netdev ml.
-- fixes when counting number of 6lowpan peers (was not atomic)
-
-
-v5:
-- Moved the header compression functionality to net/core/6lowpan.c
-  and rebased both BT and IEEE 802154 code to use it in patch 1.
-  I will send a separate patch to net-next for comments.
-- locking fixes
-- debugfs handling moved to hci_core.c
-- misc changes according to Marcel's comments
-
-
-v4:
-- removed the route setting code, neighbour discovery
-  should allow the devices to discover each other
-- fix the uncompression of Traffic Class in IPv6 header,
-  this makes ssh to work between devices over a BT 6lowpan link
-- removed setting of /proc conf options, they were useless
-  and not to be done in kernel module anyway
-
-
-v3:
-- misc changes according to Marcel's comments
-- supports multiple connections / interface
-- removed unused fragmentation code
-- setup 6lowpan connection automatically if enabled via debugfs
-
-The automatic 6lowpan enabling is done by setting
-
-echo 1 > /sys/kernel/debug/bluetooth/hci0/6lowpan
-
-before devices are connected.
-
-
-v2:
-- Change ARPHRD_IEEE802154 to ARPHRD_RAWIP. The generic code
-  in patches 1 and 2 is also sent to netdev mailing list.
-- Sending route exporting patch 5 to netdev ml
-- Check private/public BT address and toggle universal/local bit
-  accordingly in patch 3.
-- The virtual interface template name is now shorter (bt%d)
-- Various function name renames
-- devtype of the interface set to "bluetooth"
-
-
-v1:
-- initial release
-
-
-TODO:
-- Discovery of 6LoWPAN service needs be automatic (UUID support)
-- Enable/disable header compression for easier debugging
-
-Known issues:
-- no UUID handling yet
-
-
-Cheers,
-Jukka
-
-
-Jukka Rissanen (5):
-  6lowpan: Moving generic compression code into 6lowpan_iphc.c
-  net: if_arp: add ARPHRD_6LOWPAN type
-  ipv6: Add checks for 6LOWPAN ARP type
-  Bluetooth: Enable 6LoWPAN support for BT LE devices
-  Bluetooth: Manually enable or disable 6LoWPAN between devices
-
- include/net/bluetooth/hci.h      |   1 +
- include/net/bluetooth/hci_core.h |   1 +
- include/net/bluetooth/l2cap.h    |   1 +
- include/uapi/linux/if_arp.h      |   1 +
- net/bluetooth/6lowpan.c          | 881 +++++++++++++++++++++++++++++++++++++++
- net/bluetooth/6lowpan.h          |  26 ++
- net/bluetooth/Makefile           |   6 +-
- net/bluetooth/hci_core.c         |  93 +++++
- net/bluetooth/hci_event.c        |   3 +
- net/bluetooth/l2cap_core.c       |  14 +-
- net/ieee802154/6lowpan.c         | 753 ++-------------------------------
- net/ieee802154/6lowpan.h         |  32 ++
- net/ieee802154/6lowpan_iphc.c    | 807 +++++++++++++++++++++++++++++++++++
- net/ieee802154/Makefile          |   2 +-
- net/ipv6/addrconf.c              |   4 +-
- 15 files changed, 1903 insertions(+), 722 deletions(-)
- create mode 100644 net/bluetooth/6lowpan.c
- create mode 100644 net/bluetooth/6lowpan.h
- create mode 100644 net/ieee802154/6lowpan_iphc.c
-
+diff --git a/android/android-tester.c b/android/android-tester.c
+index 6cde3cf..8285431 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -48,6 +48,7 @@
+ 
+ enum hal_bluetooth_callbacks_id {
+ 	adapter_test_end,
++	adapter_test_setup_mode,
+ 	adapter_state_changed_on,
+ 	adapter_state_changed_off,
+ 	adapter_prop_bdaddr,
+@@ -61,6 +62,7 @@ enum hal_bluetooth_callbacks_id {
+ };
+ 
+ struct generic_data {
++	uint8_t expected_adapter_status;
+ 	uint32_t expect_settings_set;
+ 	uint8_t expected_hal_callbacks[];
+ };
+@@ -77,6 +79,7 @@ struct test_data {
+ 
+ 	bool mgmt_settings_set;
+ 	bool hal_cb_called;
++	bool status_checked;
+ 
+ 	GSList *expected_callbacks;
+ };
+@@ -85,8 +88,13 @@ static void test_update_state(void)
+ {
+ 	struct test_data *data = tester_get_data();
+ 
+-	if (data->mgmt_settings_set && data->hal_cb_called)
+-		tester_test_passed();
++	if (!(data->mgmt_settings_set))
++		return;
++	if (!(data->hal_cb_called))
++		return;
++	if (!(data->status_checked))
++		return;
++	tester_test_passed();
+ }
+ 
+ static void test_mgmt_settings_set(struct test_data *data)
+@@ -140,10 +148,38 @@ static void mgmt_cb_init(struct test_data *data)
+ 				command_generic_new_settings, NULL, NULL);
+ }
+ 
++static void expected_status_init(struct test_data *data)
++{
++	if (!(data->test_data->expected_adapter_status))
++		data->status_checked = true;
++}
++
++static void init_test_conditions(struct test_data *data)
++{
++	hal_cb_init(data);
++	mgmt_cb_init(data);
++	expected_status_init(data);
++}
++
++static void check_expected_status(uint8_t status)
++{
++	struct test_data *data = tester_get_data();
++
++	if (data->test_data->expected_adapter_status == status)
++		data->status_checked = true;
++	else
++		tester_test_failed();
++
++	test_update_state();
++}
++
+ static int get_expected_hal_cb(void)
+ {
+ 	struct test_data *data = tester_get_data();
+ 
++	if (!(g_slist_length(data->expected_callbacks)))
++		return adapter_test_setup_mode;
++
+ 	return GPOINTER_TO_INT(data->expected_callbacks->data);
+ }
+ 
+@@ -356,13 +392,29 @@ failed:
+ 
+ static void adapter_state_changed_cb(bt_state_t state)
+ {
+-	switch (get_expected_hal_cb()) {
++
++	enum hal_bluetooth_callbacks_id hal_cb;
++
++	hal_cb = get_expected_hal_cb();
++
++	switch (hal_cb) {
+ 	case adapter_state_changed_on:
+ 		if (state == BT_STATE_ON)
+ 			remove_expected_hal_cb();
+ 		else
+ 			tester_test_failed();
+ 		break;
++	case adapter_state_changed_off:
++		if (state == BT_STATE_OFF)
++			remove_expected_hal_cb();
++		else
++			tester_test_failed();
++		break;
++	case adapter_test_setup_mode:
++		if (state == BT_STATE_ON)
++			tester_setup_complete();
++		else
++			tester_setup_failed();
+ 	default:
+ 		break;
+ 	}
+@@ -376,6 +428,10 @@ static void adapter_properties_cb(bt_status_t status, int num_properties,
+ 
+ 	for (i = 0; i < num_properties; i++) {
+ 		hal_cb = get_expected_hal_cb();
++
++		if (hal_cb == adapter_test_setup_mode)
++			break;
++
+ 		switch (properties[i].type) {
+ 		case BT_PROPERTY_BDADDR:
+ 			if (hal_cb != adapter_prop_bdaddr) {
+@@ -451,6 +507,15 @@ static const struct generic_data bluetooth_enable_success_test = {
+ 							adapter_test_end}
+ };
+ 
++static const struct generic_data bluetooth_enable_done_test = {
++	.expected_hal_callbacks = {adapter_props, adapter_test_end},
++	.expected_adapter_status = BT_STATUS_DONE
++};
++
++static const struct generic_data bluetooth_disable_success_test = {
++	.expected_hal_callbacks = {adapter_state_changed_off, adapter_test_end}
++};
++
+ static bt_callbacks_t bt_callbacks = {
+ 	.size = sizeof(bt_callbacks),
+ 	.adapter_state_changed_cb = adapter_state_changed_cb,
+@@ -548,6 +613,15 @@ static void setup_base(const void *test_data)
+ 	tester_setup_complete();
+ }
+ 
++static void setup_enabled_adapter(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++
++	setup(data);
++
++	data->if_bluetooth->enable();
++}
++
+ static void teardown(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+@@ -570,12 +644,31 @@ static void test_enable(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+ 
+-	hal_cb_init(data);
+-	mgmt_cb_init(data);
++	init_test_conditions(data);
+ 
+ 	data->if_bluetooth->enable();
+ }
+ 
++static void test_enable_done(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	bt_status_t adapter_status;
++
++	init_test_conditions(data);
++
++	adapter_status = data->if_bluetooth->enable();
++	check_expected_status(adapter_status);
++}
++
++static void test_disable(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++
++	init_test_conditions(data);
++
++	data->if_bluetooth->disable();
++}
++
+ static void controller_setup(const void *test_data)
+ {
+ 	tester_test_passed();
+@@ -604,5 +697,11 @@ int main(int argc, char *argv[])
+ 	test_bredrle("Test Enable - Success", &bluetooth_enable_success_test,
+ 					setup_base, test_enable, teardown);
+ 
++	test_bredrle("Test Enable - Done", &bluetooth_enable_done_test,
++			setup_enabled_adapter, test_enable_done, teardown);
++
++	test_bredrle("Test Disable - Success", &bluetooth_disable_success_test,
++			setup_enabled_adapter, test_disable, teardown);
++
+ 	return tester_run();
+ }
 -- 
 1.8.3.1
 
