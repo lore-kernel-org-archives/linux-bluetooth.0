@@ -1,59 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 11 Dec 2013 14:02:20 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/tester: Fix closing invalid fd
-Message-ID: <20131211120218.GE18372@aemeltch-MOBL1>
-References: <1386762298-31678-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1386762298-31678-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
+Subject: Re: [PATCH BlueZ] build: Add coverage support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1386759341-14346-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 11 Dec 2013 13:00:59 +0100
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <4818FD30-C986-47E0-8441-E58938077D45@holtmann.org>
+References: <1386759341-14346-1-git-send-email-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Dec 11, 2013 at 01:44:58PM +0200, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Luiz,
+
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> This fixes possible closing invalid fd in a case socket() fails
 > ---
->  android/android-tester.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+> Makefile.am         | 18 ++++++++++++++++++
+> acinclude.m4        |  9 +++++++++
+> bootstrap-configure |  1 +
+> configure.ac        |  2 ++
+> 4 files changed, 30 insertions(+)
 > 
-> diff --git a/android/android-tester.c b/android/android-tester.c
-> index 09c76c9..12d7613 100644
-> --- a/android/android-tester.c
-> +++ b/android/android-tester.c
-> @@ -357,8 +357,10 @@ static void emulator(int pipe, int hci_index)
->  	ssize_t len;
->  
->  	fd = socket(PF_LOCAL, SOCK_DGRAM | SOCK_CLOEXEC, 0);
-> -	if (fd < 0)
-> -		goto failed;
-> +	if (fd < 0) {
-> +		close(pipe)
-
-sorry did not check this missing ;, just apply patches from marcin
-
-Best regards 
-Andrei Emeltchenko 
-
-> +		return;
-> +	}
->  
->  	tv.tv_sec = WAIT_FOR_SIGNAL_TIME;
->  	tv.tv_usec = 0;
-> @@ -374,7 +376,6 @@ static void emulator(int pipe, int hci_index)
->  	}
->  
->  	len = write(pipe, EMULATOR_SIGNAL, sizeof(EMULATOR_SIGNAL));
-> -
->  	if (len != sizeof(EMULATOR_SIGNAL))
->  		goto failed;
->  
-> -- 
-> 1.8.3.2
+> diff --git a/Makefile.am b/Makefile.am
+> index 15cc149..1a59532 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -331,5 +331,23 @@ lib/bluetooth/%.h: lib/%.h
+> 	$(AM_V_at)$(MKDIR_P) lib/bluetooth
+> 	$(AM_V_GEN)$(LN_S) -f "$(abs_top_builddir)"/$< $@
 > 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> +if COVERAGE
+
+maybe we should just make this depend on maintainer-mode.
+
+> +clean-coverage:
+> +	$(RM) -r coverage
+> +	@find . -name "*.gcda" -exec $(RM) {} \;
+> +	$(LCOV) --directory . --zerocounters
+> +
+> +check-coverage:
+> +	@make check
+> +	$(AM_V_at)$(MKDIR_P) -p coverage
+> +	$(LCOV) --compat-libtool --directory . --capture --output-file \
+> +							coverage/check.info
+> +	@genhtml -o coverage/ coverage/check.info
+> +
+> clean-local:
+> +	@make clean-coverage
+> 	$(RM) -r lib/bluetooth
+> +else
+> +clean-local:
+> +	$(RM) -r lib/bluetooth
+> +endif
+> diff --git a/acinclude.m4 b/acinclude.m4
+> index 2065852..e5eb481 100644
+> --- a/acinclude.m4
+> +++ b/acinclude.m4
+> @@ -51,6 +51,15 @@ AC_DEFUN([MISC_FLAGS], [
+> 			misc_ldflags="$misc_ldflags -pie"
+> 		fi
+> 	])
+> +	AC_ARG_ENABLE(coverage, AC_HELP_STRING([--enable-coverage],
+> +			[enable coverage flags]), [
+> +		AC_PATH_PROG([LCOV], [lcov])
+> +		if (test "$LCOV" && test "${enableval}" = "yes"); then
+> +			misc_cflags="$misc_cflags -ftest-coverage"
+> +			misc_cflags="$misc_cflags -fprofile-arcs"
+> +			misc_ldflags="$misc_ldflags -gcov"
+> +		fi
+> +	])
+> 	AC_SUBST([MISC_CFLAGS], $misc_cflags)
+> 	AC_SUBST([MISC_LDFLAGS], $misc_ldflags)
+> ])
+> diff --git a/bootstrap-configure b/bootstrap-configure
+> index c7f08ed..35aa98b 100755
+> --- a/bootstrap-configure
+> +++ b/bootstrap-configure
+> @@ -14,4 +14,5 @@ fi
+> 		--enable-experimental \
+> 		--enable-android \
+> 		--enable-sixaxis \
+> +		--enable-coverage \
+> 		--disable-datafiles $*
+> diff --git a/configure.ac b/configure.ac
+> index 18d0b55..c55924f 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -252,4 +252,6 @@ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
+> 					[enable_android=${enableval}])
+> AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
+> 
+> +AM_CONDITIONAL([COVERAGE], [test "$LCOV”])
+
+I do not like this one. The test should check enable_xxx variables. I rather have configure abort with error if some programs or dependencies are not found.
+
+Regards
+
+Marcel
+
