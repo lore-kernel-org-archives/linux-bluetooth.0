@@ -2,141 +2,183 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 8/9] android/bluetooth: Add support for remote device type property
-Date: Wed, 11 Dec 2013 11:31:26 +0100
-Message-Id: <1386757887-29018-8-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 9/9] android/bluetooth: Code style and whitespace cleanup
+Date: Wed, 11 Dec 2013 11:31:27 +0100
+Message-Id: <1386757887-29018-9-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1386757887-29018-1-git-send-email-szymon.janc@tieto.com>
 References: <1386757887-29018-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This makes daemon store remote device address type to be able to handle
-remote device type property.
+This fix some random style or whitespace damages. Also moves statics
+after last type definition.
 ---
- android/bluetooth.c | 37 ++++++++++++++++++++++++++++---------
- 1 file changed, 28 insertions(+), 9 deletions(-)
+ android/bluetooth.c | 63 ++++++++++++++++++++++++++++-------------------------
+ 1 file changed, 33 insertions(+), 30 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index ffe1120..b139ff7 100644
+index b139ff7..4bb2c92 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -93,6 +93,7 @@ static struct {
+@@ -52,20 +52,37 @@
  
- struct device {
- 	bdaddr_t bdaddr;
+ /* Default to DisplayYesNo */
+ #define DEFAULT_IO_CAPABILITY 0x01
++
+ /* Default discoverable timeout 120sec as in Android */
+ #define DEFAULT_DISCOVERABLE_TIMEOUT 120
+ 
+ #define BASELEN_PROP_CHANGED (sizeof(struct hal_ev_adapter_props_changed) \
+-				+ (sizeof(struct hal_property)))
++					+ (sizeof(struct hal_property)))
+ 
+ static uint16_t option_index = MGMT_INDEX_NONE;
+ 
+ #define BASELEN_REMOTE_DEV_PROP (sizeof(struct hal_ev_remote_device_props) \
+ 					+ sizeof(struct hal_property))
+-/* This list contains addresses which are asked for records */
+-static GSList *browse_reqs;
+ 
+-static struct mgmt *mgmt_if = NULL;
++struct device {
++	bdaddr_t bdaddr;
 +	uint8_t bdaddr_type;
- 	int bond_state;
- 	char *name;
- 	char *friendly_name;
-@@ -135,7 +136,7 @@ static struct device *find_device(const bdaddr_t *bdaddr)
- 	return NULL;
- }
- 
--static struct device *create_device(const bdaddr_t *bdaddr)
-+static struct device *create_device(const bdaddr_t *bdaddr, uint8_t type)
- {
- 	struct device *dev;
- 	char addr[18];
-@@ -146,6 +147,7 @@ static struct device *create_device(const bdaddr_t *bdaddr)
- 	dev = g_new0(struct device, 1);
- 
- 	bacpy(&dev->bdaddr, bdaddr);
-+	dev->bdaddr_type = type;
- 	dev->bond_state = HAL_BOND_STATE_NONE;
- 
- 	/* use address for name, will be change if one is present
-@@ -163,7 +165,7 @@ static void free_device(struct device *dev)
- 	g_free(dev);
- }
- 
--static struct device *get_device(const bdaddr_t *bdaddr)
-+static struct device *get_device(const bdaddr_t *bdaddr, uint8_t type)
- {
- 	struct device *dev;
- 
-@@ -171,7 +173,7 @@ static struct device *get_device(const bdaddr_t *bdaddr)
- 	if (dev)
- 		return dev;
- 
--	return create_device(bdaddr);
-+	return create_device(bdaddr, type);
- }
- 
- static  void send_adapter_property(uint8_t type, uint16_t len, const void *val)
-@@ -369,7 +371,9 @@ static void set_device_bond_state(const bdaddr_t *addr, uint8_t status,
- 
- 	struct device *dev;
- 
--	dev = get_device(addr);
-+	dev = find_device(addr);
-+	if (!dev)
-+		return;
- 
- 	if (dev->bond_state != state) {
- 		dev->bond_state = state;
-@@ -606,7 +610,7 @@ static void pin_code_request_callback(uint16_t index, uint16_t length,
- 
- 	ba2str(&ev->addr.bdaddr, dst);
- 
--	dev = get_device(&ev->addr.bdaddr);
-+	dev = get_device(&ev->addr.bdaddr, BDADDR_BREDR);
- 
- 	/* Workaround for Android Bluetooth.apk issue: send remote
- 	 * device property */
-@@ -769,6 +773,14 @@ static int fill_hal_prop(void *buf, uint8_t type, uint16_t len,
- 	return sizeof(*prop) + len;
- }
- 
-+static uint8_t bdaddr_type2android(uint8_t type)
-+{
-+	if (type == BDADDR_BREDR)
-+		return HAL_TYPE_BREDR;
 +
-+	return HAL_TYPE_LE;
-+}
++	int bond_state;
 +
- static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 					int8_t rssi, bool confirm,
- 					const uint8_t *data, uint8_t data_len)
-@@ -789,8 +801,9 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 	if (!dev) {
- 		struct hal_ev_device_found *ev = (void *) buf;
- 		bdaddr_t android_bdaddr;
-+		uint8_t android_type;
++	char *name;
++	char *friendly_name;
++
++	uint32_t class;
++	int32_t rssi;
++};
++
++struct browse_req {
++	bdaddr_t bdaddr;
++	GSList *uuids;
++	int search_uuid;
++	int reconnect_attempt;
++};
  
--		dev = create_device(bdaddr);
-+		dev = create_device(bdaddr, bdaddr_type);
+ static struct {
+ 	uint16_t index;
+@@ -91,23 +108,6 @@ static struct {
+ 	.uuids = NULL,
+ };
  
- 		size += sizeof(*ev);
+-struct device {
+-	bdaddr_t bdaddr;
+-	uint8_t bdaddr_type;
+-	int bond_state;
+-	char *name;
+-	char *friendly_name;
+-	uint32_t class;
+-	int32_t rssi;
+-};
+-
+-struct browse_req {
+-	bdaddr_t bdaddr;
+-	GSList *uuids;
+-	int search_uuid;
+-	int reconnect_attempt;
+-};
+-
+ static const uint16_t uuid_list[] = {
+ 	L2CAP_UUID,
+ 	PNP_INFO_SVCLASS_ID,
+@@ -115,8 +115,12 @@ static const uint16_t uuid_list[] = {
+ 	0
+ };
  
-@@ -802,6 +815,11 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
++static struct mgmt *mgmt_if = NULL;
+ static GSList *devices = NULL;
+ 
++/* This list contains addresses which are asked for records */
++static GSList *browse_reqs;
++
+ static int bdaddr_cmp(gconstpointer a, gconstpointer b)
+ {
+ 	const bdaddr_t *bda = a;
+@@ -349,7 +353,6 @@ static void store_link_key(const bdaddr_t *dst, const uint8_t *key,
+ 					uint8_t type, uint8_t pin_length)
+ {
+ 	/* TODO store link key */
+-
+ }
+ 
+ static void send_bond_state_change(const bdaddr_t *addr, uint8_t status,
+@@ -368,7 +371,6 @@ static void send_bond_state_change(const bdaddr_t *addr, uint8_t status,
+ static void set_device_bond_state(const bdaddr_t *addr, uint8_t status,
+ 								int state)
+ {
+-
+ 	struct device *dev;
+ 
+ 	dev = find_device(addr);
+@@ -570,6 +572,7 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
+ 
+ 	browse_remote_sdp(&addr->bdaddr);
+ }
++
+ static  void send_device_property(const bdaddr_t *bdaddr, uint8_t type,
+ 						uint16_t len, const void *val)
+ {
+@@ -693,7 +696,8 @@ static void user_passkey_request_callback(uint16_t index, uint16_t length,
+ }
+ 
+ static void user_passkey_notify_callback(uint16_t index, uint16_t length,
+-					const void *param, void *user_data)
++							const void *param,
++							void *user_data)
+ {
+ 	const struct mgmt_ev_passkey_notify *ev = param;
+ 	char dst[18];
+@@ -713,8 +717,7 @@ static void user_passkey_notify_callback(uint16_t index, uint16_t length,
+ 	set_device_bond_state(&ev->addr.bdaddr, HAL_STATUS_SUCCESS,
+ 						HAL_BOND_STATE_BONDING);
+ 
+-	send_ssp_request(&ev->addr.bdaddr, HAL_SSP_VARIANT_NOTIF,
+-								ev->passkey);
++	send_ssp_request(&ev->addr.bdaddr, HAL_SSP_VARIANT_NOTIF, ev->passkey);
+ }
+ 
+ static void mgmt_discovering_event(uint16_t index, uint16_t length,
+@@ -760,7 +763,6 @@ static void confirm_device_name(const bdaddr_t *addr, uint8_t addr_type)
+ 		error("Failed to send confirm name request");
+ }
+ 
+-
+ static int fill_hal_prop(void *buf, uint8_t type, uint16_t len,
+ 							const void *val)
+ {
+@@ -813,7 +815,8 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+ 		bdaddr2android(bdaddr, &android_bdaddr);
+ 
  		size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_ADDR,
- 				sizeof(android_bdaddr), &android_bdaddr);
+-				sizeof(android_bdaddr), &android_bdaddr);
++							sizeof(android_bdaddr),
++							&android_bdaddr);
  		(*num_prop)++;
-+
-+		android_type = bdaddr_type2android(dev->bdaddr_type);
-+		size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_TYPE,
-+					sizeof(android_type), &android_type);
-+		(*num_prop)++;
- 	} else {
- 		struct hal_ev_remote_device_props *ev = (void *) buf;
  
-@@ -2280,11 +2298,12 @@ static uint8_t get_device_class(struct device *dev)
- 
- static uint8_t get_device_type(struct device *dev)
- {
--	DBG("Not implemented");
-+	uint8_t type = bdaddr_type2android(dev->bdaddr_type);
- 
--	/* TODO */
-+	send_device_property(&dev->bdaddr, HAL_PROP_DEVICE_TYPE,
-+							sizeof(type), &type);
- 
--	return HAL_STATUS_FAILED;
-+	return HAL_STATUS_SUCCESS;
+ 		android_type = bdaddr_type2android(dev->bdaddr_type);
+@@ -932,7 +935,8 @@ static void mgmt_device_connected_event(uint16_t index, uint16_t length,
  }
  
- static uint8_t get_device_service_rec(struct device *dev)
+ static void mgmt_device_disconnected_event(uint16_t index, uint16_t length,
+-					const void *param, void *user_data)
++							const void *param,
++							void *user_data)
+ {
+ 	const struct mgmt_ev_device_disconnected *ev = param;
+ 	struct hal_ev_acl_state_changed hal_ev;
+@@ -1699,7 +1703,6 @@ static uint8_t get_adapter_name(void)
+ 	return HAL_STATUS_SUCCESS;
+ }
+ 
+-
+ static uint8_t get_adapter_class(void)
+ {
+ 	DBG("");
 -- 
 1.8.3.2
 
