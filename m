@@ -1,236 +1,204 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 2/7] android/tester: Add pre-setup and post-teardown routines
-Date: Wed, 11 Dec 2013 11:46:32 +0100
-Message-Id: <1386758797-1809-2-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH v4 3/7] android/tester: Start emulator in new process
+Date: Wed, 11 Dec 2013 11:46:33 +0100
+Message-Id: <1386758797-1809-3-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1386758797-1809-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1386758797-1809-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will add hciemu initialization and cleanup. These functions
-will be called to create hci emulator and cleanup it.
+This is needed because bluetooth->init call is blocking,
+and we have to emulate normal behaviour of android environment.
+That process will exit if it won't receive any message in 2 sec
+or when bluetoothd will exit. Main tester thread will wait for
+this process in teardown method.
 ---
- android/Makefile.am      |  10 ++-
- android/android-tester.c | 183 ++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 191 insertions(+), 2 deletions(-)
+ android/android-tester.c | 132 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 131 insertions(+), 1 deletion(-)
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 0768985..5364c2e 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -85,7 +85,15 @@ android_haltest_LDFLAGS = -pthread
- 
- noinst_PROGRAMS += android/android-tester
- 
--android_android_tester_SOURCES = android/android-tester.c
-+android_android_tester_SOURCES = emulator/btdev.h emulator/btdev.c \
-+				emulator/bthost.h emulator/bthost.c \
-+				src/shared/util.h src/shared/util.c \
-+				src/shared/mgmt.h src/shared/mgmt.c \
-+				src/shared/hciemu.h src/shared/hciemu.c \
-+				src/shared/tester.h src/shared/tester.c \
-+				android/android-tester.c
-+
-+android_android_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
- 
- endif
- 
 diff --git a/android/android-tester.c b/android/android-tester.c
-index f5c42b0..498da22 100644
+index 498da22..ad7aa39 100644
 --- a/android/android-tester.c
 +++ b/android/android-tester.c
-@@ -15,7 +15,188 @@
+@@ -15,9 +15,15 @@
   *
   */
  
-+#include <unistd.h>
++#include <stdlib.h>
+ #include <unistd.h>
+ 
+ #include <glib.h>
++#include <sys/socket.h>
++#include <sys/types.h>
++#include <sys/wait.h>
++#include <sys/un.h>
++#include <libgen.h>
+ 
+ #include "lib/bluetooth.h"
+ #include "lib/mgmt.h"
+@@ -29,14 +35,20 @@
+ struct generic_data {
+ };
+ 
++#define WAIT_FOR_SIGNAL_TIME 2 /* in seconds */
++#define EMULATOR_SIGNAL "emulator_started"
 +
-+#include <glib.h>
+ struct test_data {
+ 	struct mgmt *mgmt;
+ 	uint16_t mgmt_index;
+ 	struct hciemu *hciemu;
+ 	enum hciemu_type hciemu_type;
+ 	const struct generic_data *test_data;
++	pid_t bluetoothd_pid;
+ };
+ 
++static char exec_dir[PATH_MAX + 1];
 +
-+#include "lib/bluetooth.h"
-+#include "lib/mgmt.h"
-+
-+#include "src/shared/tester.h"
-+#include "src/shared/mgmt.h"
-+#include "src/shared/hciemu.h"
-+
-+struct generic_data {
-+};
-+
-+struct test_data {
-+	struct mgmt *mgmt;
-+	uint16_t mgmt_index;
-+	struct hciemu *hciemu;
-+	enum hciemu_type hciemu_type;
-+	const struct generic_data *test_data;
-+};
-+
-+static void read_info_callback(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
+ static void read_info_callback(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+@@ -165,13 +177,129 @@ static void test_post_teardown(const void *test_data)
+ 	data->hciemu = NULL;
+ }
+ 
++static void bluetoothd_start(int hci_index)
 +{
-+	struct test_data *data = tester_get_data();
-+	const struct mgmt_rp_read_info *rp = param;
-+	char addr[18];
-+	uint16_t manufacturer;
-+	uint32_t supported_settings, current_settings;
++	char prg_name[PATH_MAX + 1];
++	char index[8];
++	char *prg_argv[4];
 +
-+	tester_print("Read Info callback");
-+	tester_print("  Status: 0x%02x", status);
++	snprintf(prg_name, sizeof(prg_name), "%s/%s", exec_dir, "bluetoothd");
++	snprintf(index, sizeof(index), "%d", hci_index);
 +
-+	if (status || !param) {
-+		tester_pre_setup_failed();
-+		return;
-+	}
-+
-+	ba2str(&rp->bdaddr, addr);
-+	manufacturer = btohs(rp->manufacturer);
-+	supported_settings = btohl(rp->supported_settings);
-+	current_settings = btohl(rp->current_settings);
-+
-+	tester_print("  Address: %s", addr);
-+	tester_print("  Version: 0x%02x", rp->version);
-+	tester_print("  Manufacturer: 0x%04x", manufacturer);
-+	tester_print("  Supported settings: 0x%08x", supported_settings);
-+	tester_print("  Current settings: 0x%08x", current_settings);
-+	tester_print("  Class: 0x%02x%02x%02x",
-+			rp->dev_class[2], rp->dev_class[1], rp->dev_class[0]);
-+	tester_print("  Name: %s", rp->name);
-+	tester_print("  Short name: %s", rp->short_name);
-+
-+	if (strcmp(hciemu_get_address(data->hciemu), addr)) {
-+		tester_pre_setup_failed();
-+		return;
-+	}
-+
-+	tester_pre_setup_complete();
-+}
-+
-+static void index_added_callback(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	tester_print("Index Added callback");
-+	tester_print("  Index: 0x%04x", index);
-+
-+	data->mgmt_index = index;
-+
-+	mgmt_send(data->mgmt, MGMT_OP_READ_INFO, data->mgmt_index, 0, NULL,
-+					read_info_callback, NULL, NULL);
-+}
-+
-+static void index_removed_callback(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	tester_print("Index Removed callback");
-+	tester_print("  Index: 0x%04x", index);
-+
-+	if (index != data->mgmt_index)
-+		return;
-+
-+	mgmt_unregister_index(data->mgmt, data->mgmt_index);
-+
-+	mgmt_unref(data->mgmt);
-+	data->mgmt = NULL;
-+
-+	tester_post_teardown_complete();
-+}
-+
-+static void read_index_list_callback(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	tester_print("Read Index List callback");
-+	tester_print("  Status: 0x%02x", status);
-+
-+	if (status || !param) {
-+		tester_pre_setup_failed();
-+		return;
-+	}
-+
-+	mgmt_register(data->mgmt, MGMT_EV_INDEX_ADDED, MGMT_INDEX_NONE,
-+					index_added_callback, NULL, NULL);
-+
-+	mgmt_register(data->mgmt, MGMT_EV_INDEX_REMOVED, MGMT_INDEX_NONE,
-+					index_removed_callback, NULL, NULL);
-+
-+	data->hciemu = hciemu_new(data->hciemu_type);
-+	if (!data->hciemu) {
-+		tester_warn("Failed to setup HCI emulation");
-+		tester_pre_setup_failed();
-+		return;
-+	}
-+
-+	tester_print("New hciemu instance created");
-+}
-+
-+static void test_pre_setup(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
++	prg_argv[0] = prg_name;
++	prg_argv[1] = "-i";
++	prg_argv[2] = index;
++	prg_argv[3] = NULL;
 +
 +	if (!tester_use_debug())
 +		fclose(stderr);
 +
-+	data->mgmt = mgmt_new_default();
-+	if (!data->mgmt) {
-+		tester_warn("Failed to setup management interface");
-+		tester_pre_setup_failed();
++	execve(prg_argv[0], prg_argv, NULL);
++}
++
++static void emulator(int pipe, int hci_index)
++{
++	static const char SYSTEM_SOCKET_PATH[] = "\0android_system";
++	char buf[1024];
++	struct sockaddr_un addr;
++	struct timeval tv;
++	int fd;
++	ssize_t len;
++
++	fd = socket(PF_LOCAL, SOCK_DGRAM | SOCK_CLOEXEC, 0);
++	if (fd < 0)
++		goto failed;
++
++	tv.tv_sec = WAIT_FOR_SIGNAL_TIME;
++	tv.tv_usec = 0;
++	setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(tv));
++
++	memset(&addr, 0, sizeof(addr));
++	addr.sun_family = AF_UNIX;
++	memcpy(addr.sun_path, SYSTEM_SOCKET_PATH, sizeof(SYSTEM_SOCKET_PATH));
++
++	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
++		perror("Failed to bind system socket");
++		goto failed;
++	}
++
++	len = write(pipe, EMULATOR_SIGNAL, sizeof(EMULATOR_SIGNAL));
++
++	if (len != sizeof(EMULATOR_SIGNAL))
++		goto failed;
++
++	memset(buf, 0, sizeof(buf));
++
++	len = read(fd, buf, sizeof(buf));
++	if (len <= 0 || (strcmp(buf, "ctl.start=bluetoothd")))
++		goto failed;
++
++	close(pipe);
++	close(fd);
++	bluetoothd_start(hci_index);
++
++failed:
++	close(pipe);
++	close(fd);
++}
++
++static void setup(struct test_data *data)
++{
++	int signal_fd[2];
++	char buf[1024];
++	pid_t pid;
++	int len;
++
++	if (pipe(signal_fd)) {
++		tester_setup_failed();
 +		return;
 +	}
 +
-+	mgmt_send(data->mgmt, MGMT_OP_READ_INDEX_LIST, MGMT_INDEX_NONE, 0,
-+				NULL, read_index_list_callback, NULL, NULL);
++	pid = fork();
++
++	if (pid < 0) {
++		close(signal_fd[0]);
++		close(signal_fd[1]);
++		tester_setup_failed();
++		return;
++	}
++
++	if (pid == 0) {
++		if (!tester_use_debug())
++			fclose(stderr);
++
++		close(signal_fd[0]);
++		emulator(signal_fd[1], data->mgmt_index);
++		exit(0);
++	}
++
++	close(signal_fd[1]);
++	data->bluetoothd_pid = pid;
++
++	len = read(signal_fd[0], buf, sizeof(buf));
++	if (len <= 0 || (strcmp(buf, EMULATOR_SIGNAL))) {
++		close(signal_fd[0]);
++		tester_setup_failed();
++		return;
++	}
 +}
 +
-+static void test_post_teardown(const void *test_data)
-+{
+ static void setup_base(const void *test_data)
+ {
+-	tester_setup_failed();
 +	struct test_data *data = tester_get_data();
 +
-+	hciemu_unref(data->hciemu);
-+	data->hciemu = NULL;
-+}
++	setup(data);
 +
-+static void setup_base(const void *test_data)
-+{
-+	tester_setup_failed();
-+}
++	tester_setup_complete();
+ }
+ 
+ static void teardown(const void *test_data)
+ {
++	struct test_data *data = tester_get_data();
 +
-+static void teardown(const void *test_data)
-+{
-+	tester_teardown_complete();
-+}
++	if (data->bluetoothd_pid)
++		waitpid(data->bluetoothd_pid, NULL, 0);
 +
-+static void controller_setup(const void *test_data)
-+{
-+}
-+
-+#define test_bredrle(name, data, test_setup, test, test_teardown) \
-+	do { \
-+		struct test_data *user; \
-+		user = g_malloc0(sizeof(struct test_data)); \
-+		if (!user) \
-+			break; \
-+		user->hciemu_type = HCIEMU_TYPE_BREDRLE; \
-+		user->test_data = data; \
-+		tester_add_full(name, data, test_pre_setup, test_setup, \
-+				test, test_teardown, test_post_teardown, \
-+							3, user, g_free); \
-+	} while (0)
-+
+ 	tester_teardown_complete();
+ }
+ 
+@@ -194,6 +322,8 @@ static void controller_setup(const void *test_data)
+ 
  int main(int argc, char *argv[])
  {
--	return 0;
-+	tester_init(&argc, &argv);
++	snprintf(exec_dir, sizeof(exec_dir), "%s", dirname(argv[0]));
 +
-+	test_bredrle("Test Init", NULL, setup_base, controller_setup, teardown);
-+
-+	return tester_run();
- }
+ 	tester_init(&argc, &argv);
+ 
+ 	test_bredrle("Test Init", NULL, setup_base, controller_setup, teardown);
 -- 
 1.8.3.1
 
