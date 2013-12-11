@@ -1,81 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1386792806.3586.6.camel@bmurrell-mobl.amr.corp.intel.com>
-Subject: Re: mouse not found with bluez5 but was fine with bluez4
-From: "Brian J. Murrell" <brian@interlinx.bc.ca>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Wed, 11 Dec 2013 21:25:23 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: "Brian J. Murrell" <brian@interlinx.bc.ca>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Wed, 11 Dec 2013 15:13:26 -0500
-In-Reply-To: <20131211192523.GA17953@x220.p-661hnu-f1>
+Subject: Re: mouse not found with bluez5 but was fine with bluez4
+Message-ID: <20131211192523.GA17953@x220.p-661hnu-f1>
 References: <1386680927.11483.6.camel@pc.interlinx.bc.ca>
-	 <20131211092135.GA16525@x220.p-661hnu-f1>
-	 <1386776083.31076.60.camel@bmurrell-mobl.amr.corp.intel.com>
-	 <20131211192523.GA17953@x220.p-661hnu-f1>
-Content-Type: text/plain; charset="ISO-8859-15"
-Mime-Version: 1.0
+ <20131211092135.GA16525@x220.p-661hnu-f1>
+ <1386776083.31076.60.camel@bmurrell-mobl.amr.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1386776083.31076.60.camel@bmurrell-mobl.amr.corp.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2013-12-11 at 21:25 +0200, Johan Hedberg wrote:
-> Hi Brian,
+Hi Brian,
 
-Hi Johan,
+On Wed, Dec 11, 2013, Brian J. Murrell wrote:
+> [ 1472.102375] usb 2-1: USB disconnect, device number 2
+> [ 1472.102386] usb 2-1.1: USB disconnect, device number 9
+> [ 1472.127401] usb 2-1.2: USB disconnect, device number 10
+> [ 1472.141932] usb 2-1.3: USB disconnect, device number 11
+> [ 1479.644058] usb 2-1: new full-speed USB device number 12 using ohci-pci
+> [ 1479.844081] usb 2-1: New USB device found, idVendor=0a5c, idProduct=4500
+> [ 1479.844093] usb 2-1: New USB device strings: Mfr=1, Product=2, SerialNumber=0
+> [ 1479.844099] usb 2-1: Product: BCM2046B1
+> [ 1479.844104] usb 2-1: Manufacturer: Broadcom
+> [ 1479.847670] hub 2-1:1.0: USB hub found
+> [ 1479.850082] hub 2-1:1.0: 3 ports detected
+> [ 1480.151074] usb 2-1.1: new full-speed USB device number 13 using ohci-pci
+> [ 1480.250070] usb 2-1.1: New USB device found, idVendor=0a5c, idProduct=4502
+> [ 1480.250077] usb 2-1.1: New USB device strings: Mfr=0, Product=0, SerialNumber
+> [ 1480.260236] input: HID 0a5c:4502 as /devices/pci0000:00/0000:00:02.0/usb2/2-1
+> [ 1480.261860] hid-generic 0003:0A5C:4502.0004: input,hidraw1: USB HID v1.11 Key
+> [ 1480.330068] usb 2-1.2: new full-speed USB device number 14 using ohci-pci
+> [ 1480.430070] usb 2-1.2: New USB device found, idVendor=0a5c, idProduct=4503
+> [ 1480.430079] usb 2-1.2: New USB device strings: Mfr=0, Product=0, SerialNumber
+> [ 1480.441241] input: HID 0a5c:4503 as /devices/pci0000:00/0000:00:02.0/usb2/2-1
+> [ 1480.442349] hid-generic 0003:0A5C:4503.0005: input,hidraw2: USB HID v1.11 Mou
+> [ 1480.513076] usb 2-1.3: new full-speed USB device number 15 using ohci-pci
+> [ 1480.626069] usb 2-1.3: New USB device found, idVendor=0a5c, idProduct=2148
+> [ 1480.626081] usb 2-1.3: New USB device strings: Mfr=1, Product=2, SerialNumber
+> [ 1480.626088] usb 2-1.3: Product: BCM92046DG-CL1ROM
+> [ 1480.626093] usb 2-1.3: Manufacturer: Broadcom Corp
+> [ 1480.626098] usb 2-1.3: SerialNumber: XXXXXXXXXXXXXXX
 
-> I'm not sure if I'm interpreting this right, but it seems the device is
-> in HID mode and not HCI (normal Bluetooth) mode?
+I'm not sure if I'm interpreting this right, but it seems the device is
+in HID mode and not HCI (normal Bluetooth) mode? Have you tried running
+the hid2hci tool (part of BlueZ)? Maybe that was somehow auto-run with
+your previous installation?
 
-I dunno.  I'm just the user.  :-)
-
-> Have you tried running
-> the hid2hci tool (part of BlueZ)?
-
-Not yet.  It wasn't installed by default on F20.  When I did though,
-things went much better:
-
-$ bluetoothctl 
-[NEW] Controller 00:02:72:1E:E0:12 pc.interlinx.bc.ca-0 [default]
-[NEW] Device 00:0D:E6:68:B4:6F Samsung WEP850
-[NEW] Device 70:F3:95:3E:92:34 brian-laptop
-[NEW] Device 7C:1E:52:6E:59:D2 Microsoft Sculpt Touch Mouse
-[bluetooth]# agent on
-Agent registered
-[bluetooth]# power on
-Changing power on succeeded
-[bluetooth]# scan on
-Discovery started
-[CHG] Controller 00:02:72:1E:E0:12 Discovering: yes
-[CHG] Device 7C:1E:52:6E:59:D2 RSSI: -59
-[bluetooth]# scan off
-[CHG] Device 7C:1E:52:6E:59:D2 RSSI is nil
-Discovery stopped
-[CHG] Controller 00:02:72:1E:E0:12 Discovering: no
-[bluetooth]# pair 7C:1E:52:6E:59:D2
-Attempting to pair with 7C:1E:52:6E:59:D2
-[CHG] Device 7C:1E:52:6E:59:D2 Connected: yes
-[CHG] Device 7C:1E:52:6E:59:D2 Paired: yes
-Pairing successful
-[CHG] Device 7C:1E:52:6E:59:D2 Connected: no
-[bluetooth]# connect 7C:1E:52:6E:59:D2
-Attempting to connect to 7C:1E:52:6E:59:D2
-[CHG] Device 7C:1E:52:6E:59:D2 Connected: yes
-Connection successful
-[CHG] Device 7C:1E:52:6E:59:D2 Modalias: usb:v045Ep077Cd011E
-[CHG] Device 7C:1E:52:6E:59:D2 Modalias: usb:v045Ep077Cd011E
-[bluetooth]# trust 7C:1E:52:6E:59:D2
-Changing 7C:1E:52:6E:59:D2 trust succeeded
-[bluetooth]# quit
-[DEL] Controller 00:02:72:1E:E0:12 pc.interlinx.bc.ca-0 [default]
-
-So it looks like it's a gnome bluetooth-wizard problem.  I will raise
-some tickets.
-
-> Maybe that was somehow auto-run with
-> your previous installation?
-
-I don't really know.  It was F19.  And that means bluez4.  So I guess
-this is going to be a transition issue/bug I need to raise on F20.
-
-Cheers and thanks so much!
-
-b.
-
-
+Johan
