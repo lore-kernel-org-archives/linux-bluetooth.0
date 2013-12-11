@@ -2,89 +2,60 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 5/9] android/bluetooth: Add support for remote device class
-Date: Wed, 11 Dec 2013 11:31:23 +0100
-Message-Id: <1386757887-29018-5-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 7/9] android/bluetooth: Add support for get remote device properties command
+Date: Wed, 11 Dec 2013 11:31:25 +0100
+Message-Id: <1386757887-29018-7-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1386757887-29018-1-git-send-email-szymon.janc@tieto.com>
 References: <1386757887-29018-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to cache remote device CoD and get it with get property
-command.
+This allows to get all properties of specified remote device.
 ---
- android/bluetooth.c | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
+ android/bluetooth.c | 28 ++++++++++++++++++++++++++--
+ 1 file changed, 26 insertions(+), 2 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index d6cefb7..0515468 100644
+index 254ccb4..ffe1120 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -96,6 +96,7 @@ struct device {
- 	int bond_state;
- 	char *name;
- 	char *friendly_name;
-+	uint32_t class;
- };
+@@ -2338,10 +2338,34 @@ static uint8_t get_device_timestamp(struct device *dev)
  
- struct browse_req {
-@@ -594,6 +595,7 @@ static void pin_code_request_callback(uint16_t index, uint16_t length,
+ static void handle_get_remote_device_props_cmd(const void *buf, uint16_t len)
  {
- 	const struct mgmt_ev_pin_code_request *ev = param;
- 	struct hal_ev_pin_request hal_ev;
-+	struct device *dev;
- 	char dst[18];
- 
- 	if (length < sizeof(*ev)) {
-@@ -603,19 +605,21 @@ static void pin_code_request_callback(uint16_t index, uint16_t length,
- 
- 	ba2str(&ev->addr.bdaddr, dst);
- 
-+	dev = get_device(&ev->addr.bdaddr);
-+
- 	/* Workaround for Android Bluetooth.apk issue: send remote
- 	 * device property */
--	get_device_name(get_device(&ev->addr.bdaddr));
-+	get_device_name(dev);
- 
- 	set_device_bond_state(&ev->addr.bdaddr, HAL_STATUS_SUCCESS,
- 						HAL_BOND_STATE_BONDING);
- 
- 	DBG("%s type %u secure %u", dst, ev->addr.type, ev->secure);
- 
--	/* TODO CoD of remote devices should probably be cached
--	 * Name we already send in remote device prop */
-+	/* Name already sent in remote device prop */
- 	memset(&hal_ev, 0, sizeof(hal_ev));
- 	bdaddr2android(&ev->addr.bdaddr, hal_ev.bdaddr);
-+	hal_ev.class_of_dev = dev->class;
- 
- 	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, HAL_EV_PIN_REQUEST,
- 						sizeof(hal_ev), &hal_ev);
-@@ -810,6 +814,8 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 	}
- 
- 	if (eir.class) {
-+		dev->class = eir.class;
-+
- 		size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_CLASS,
- 						sizeof(eir.class), &eir.class);
- 		(*num_prop)++;
-@@ -2263,11 +2269,10 @@ static uint8_t get_device_uuids(struct device *dev)
- 
- static uint8_t get_device_class(struct device *dev)
- {
--	DBG("Not implemented");
-+	send_device_property(&dev->bdaddr, HAL_PROP_DEVICE_CLASS,
-+					sizeof(dev->class), &dev->class);
- 
 -	/* TODO */
--
--	return HAL_STATUS_FAILED;
-+	return HAL_STATUS_SUCCESS;
++	const struct hal_cmd_get_remote_device_props *cmd = buf;
++	uint8_t status;
++	bdaddr_t addr;
++	GSList *l;
++
++	android2bdaddr(cmd->bdaddr, &addr);
++
++	l = g_slist_find_custom(devices, &addr, bdaddr_cmp);
++	if (!l) {
++		status = HAL_STATUS_INVALID;
++		goto failed;
++	}
+ 
++	get_device_name(l->data);
++	get_device_uuids(l->data);
++	get_device_class(l->data);
++	get_device_type(l->data);
++	get_device_service_rec(l->data);
++	get_device_friendly_name(l->data);
++	get_device_rssi(l->data);
++	get_device_version_info(l->data);
++	get_device_timestamp(l->data);
++
++	status = HAL_STATUS_SUCCESS;
++
++failed:
+ 	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_GET_REMOTE_DEVICE_PROPS,
+-							HAL_STATUS_FAILED);
++									status);
  }
  
- static uint8_t get_device_type(struct device *dev)
+ static void handle_get_remote_device_prop_cmd(const void *buf, uint16_t len)
 -- 
 1.8.3.2
 
