@@ -1,151 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 4/7] android/tester: Add stack initialization of stack in setup
-Date: Wed, 11 Dec 2013 11:46:34 +0100
-Message-Id: <1386758797-1809-4-git-send-email-marcin.kraglak@tieto.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v4 5/7] android/tester: Make HAL logging wrapper print to stderr instead of stdout
+Date: Wed, 11 Dec 2013 11:46:35 +0100
+Message-Id: <1386758797-1809-5-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1386758797-1809-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1386758797-1809-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This add stack initialization and cleanup in setup/teardown.
----
- android/Makefile.am      | 10 +++++++--
- android/android-tester.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 65 insertions(+), 2 deletions(-)
+From: Szymon Janc <szymon.janc@tieto.com>
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 5364c2e..f3e77c3 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -91,9 +91,15 @@ android_android_tester_SOURCES = emulator/btdev.h emulator/btdev.c \
- 				src/shared/mgmt.h src/shared/mgmt.c \
- 				src/shared/hciemu.h src/shared/hciemu.c \
- 				src/shared/tester.h src/shared/tester.c \
--				android/android-tester.c
-+				android/hal-utils.h android/hal-utils.c \
-+				android/client/hwmodule.c android/android-tester.c
+This is used for testing and for user it makes no difference. This
+will allow to switch on/off verbose logging from automated android
+tester.
+
+---
+ android/hal-log.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/android/hal-log.h b/android/hal-log.h
+index 9bd024d..63ff61b 100644
+--- a/android/hal-log.h
++++ b/android/hal-log.h
+@@ -25,7 +25,7 @@
+ #define LOG_WARN " W"
+ #define LOG_ERROR " E"
+ #define LOG_DEBUG " D"
+-#define ALOG(pri, tag, fmt, arg...) printf(tag pri": " fmt"\n", ##arg)
++#define ALOG(pri, tag, fmt, arg...) fprintf(stderr, tag pri": " fmt"\n", ##arg)
+ #endif
  
--android_android_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
-+android_android_tester_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
-+
-+android_android_tester_LDADD = lib/libbluetooth-internal.la \
-+				android/libhal-internal.la @GLIB_LIBS@
-+
-+android_android_tester_LDFLAGS = -pthread
- 
- endif
- 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index ad7aa39..15f8c61 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -32,6 +32,9 @@
- #include "src/shared/mgmt.h"
- #include "src/shared/hciemu.h"
- 
-+#include <hardware/hardware.h>
-+#include <hardware/bluetooth.h>
-+
- struct generic_data {
- };
- 
-@@ -45,6 +48,7 @@ struct test_data {
- 	enum hciemu_type hciemu_type;
- 	const struct generic_data *test_data;
- 	pid_t bluetoothd_pid;
-+	const bt_interface_t *if_bluetooth;
- };
- 
- static char exec_dir[PATH_MAX + 1];
-@@ -243,12 +247,32 @@ failed:
- 	close(fd);
- }
- 
-+static bt_callbacks_t bt_callbacks = {
-+	.size = sizeof(bt_callbacks),
-+	.adapter_state_changed_cb = NULL,
-+	.adapter_properties_cb = NULL,
-+	.remote_device_properties_cb = NULL,
-+	.device_found_cb = NULL,
-+	.discovery_state_changed_cb = NULL,
-+	.pin_request_cb = NULL,
-+	.ssp_request_cb = NULL,
-+	.bond_state_changed_cb = NULL,
-+	.acl_state_changed_cb = NULL,
-+	.thread_evt_cb = NULL,
-+	.dut_mode_recv_cb = NULL,
-+	.le_test_mode_cb = NULL
-+};
-+
- static void setup(struct test_data *data)
- {
-+	const hw_module_t *module;
-+	hw_device_t *device;
-+	bt_status_t status;
- 	int signal_fd[2];
- 	char buf[1024];
- 	pid_t pid;
- 	int len;
-+	int err;
- 
- 	if (pipe(signal_fd)) {
- 		tester_setup_failed();
-@@ -282,6 +306,33 @@ static void setup(struct test_data *data)
- 		tester_setup_failed();
- 		return;
- 	}
-+
-+	close(signal_fd[0]);
-+
-+	err = hw_get_module(BT_HARDWARE_MODULE_ID, &module);
-+	if (err) {
-+		tester_setup_failed();
-+		return;
-+	}
-+
-+	err = module->methods->open(module, BT_HARDWARE_MODULE_ID, &device);
-+	if (err) {
-+		tester_setup_failed();
-+		return;
-+	}
-+
-+	data->if_bluetooth = ((bluetooth_device_t *)
-+					device)->get_bluetooth_interface();
-+	if (!data->if_bluetooth) {
-+		tester_setup_failed();
-+		return;
-+	}
-+
-+	status = data->if_bluetooth->init(&bt_callbacks);
-+	if (status != BT_STATUS_SUCCESS) {
-+		data->if_bluetooth = NULL;
-+		tester_setup_failed();
-+	}
- }
- 
- static void setup_base(const void *test_data)
-@@ -297,6 +348,11 @@ static void teardown(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
- 
-+	if (data->if_bluetooth) {
-+		data->if_bluetooth->cleanup();
-+		data->if_bluetooth = NULL;
-+	}
-+
- 	if (data->bluetoothd_pid)
- 		waitpid(data->bluetoothd_pid, NULL, 0);
- 
-@@ -305,6 +361,7 @@ static void teardown(const void *test_data)
- 
- static void controller_setup(const void *test_data)
- {
-+	tester_test_passed();
- }
- 
- #define test_bredrle(name, data, test_setup, test, test_teardown) \
+ #define info(fmt, arg...) ALOG(LOG_INFO, LOG_TAG, fmt, ##arg)
 -- 
 1.8.3.1
 
