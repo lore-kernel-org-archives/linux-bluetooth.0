@@ -2,44 +2,47 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 3/3] android/pts: Add PTS test results for DID
-Date: Wed, 11 Dec 2013 13:49:39 +0100
-Message-Id: <1386766179-8812-3-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 2/3] android/pts: Add PTS PIXIT for DID
+Date: Wed, 11 Dec 2013 13:49:38 +0100
+Message-Id: <1386766179-8812-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1386766179-8812-1-git-send-email-szymon.janc@tieto.com>
 References: <1386766179-8812-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will allow for better tracking of current state of implementation.
+This complements PTS PICS configuration.
 ---
- android/pts-did.txt | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
- create mode 100644 android/pts-did.txt
+ android/pixit-did.txt | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+ create mode 100644 android/pixit-did.txt
 
-diff --git a/android/pts-did.txt b/android/pts-did.txt
+diff --git a/android/pixit-did.txt b/android/pixit-did.txt
 new file mode 100644
-index 0000000..c44f56c
+index 0000000..2527845
 --- /dev/null
-+++ b/android/pts-did.txt
-@@ -0,0 +1,19 @@
-+PTS test results for DID
++++ b/android/pixit-did.txt
+@@ -0,0 +1,22 @@
++DID PIXIT for the PTS tool.
 +
-+PTS version: 5.0
-+Tested: 11.12.2013
++* - different than PTS defaults
++& - should be set to IUT Bluetooth address
 +
-+Results:
-+PASS	test passed
-+FAIL	test failed
-+INC	test is inconclusive
-+N/A	test is disabled due to PICS setup
-+
++		Required PIXIT settings
 +-------------------------------------------------------------------------------
-+Test Name	Result	Notes
++Parameter Name						Value
 +-------------------------------------------------------------------------------
-+TC_SDI_BV_1_I	PASS	IUT must be discoverable
-+TC_SDI_BV_2_I	PASS	IUT must be discoverable
-+TC_SDI_BV_3_I	PASS	IUT must be discoverable
-+TC_SDI_BV_4_I	PASS	IUT must be discoverable
++TSPX_security_enabled					False
++TSPX_ClientExecutableURL				False (*)
++TSPX_ServiceDescription					False (*)
++TSPX_DocumentationURL					False (*)
++TSPX_bd_addr_iut					112233445566 (*&)
++TSPX_class_of_device_pts				200404
++TSPX_device_search_time					30
++TSPX_delete_link_key					False
++TSPX_pin_code						0000
++TSPX_time_guard						200000
++TSPX_use_implicit_send					True
++TSPX_secure_simple_pairing_pass_key_confirmation	False
 +-------------------------------------------------------------------------------
 -- 
 1.8.3.2
