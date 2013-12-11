@@ -1,26 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
-Subject: Re: [PATCH v10 0/5] Bluetooth LE 6LoWPAN
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1386774338-2093-1-git-send-email-jukka.rissanen@linux.intel.com>
-Date: Wed, 11 Dec 2013 21:59:37 +0100
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <E2BE6D71-1B94-44D7-BD37-EB365F0FEBE1@holtmann.org>
-References: <1386774338-2093-1-git-send-email-jukka.rissanen@linux.intel.com>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+MIME-Version: 1.0
+Date: Wed, 11 Dec 2013 15:36:48 -0500
+Message-ID: <CAGGtaNZeTa5f360_a_dnML0dTY7HkE1zMu1xpokiA2Ltjvcc8w@mail.gmail.com>
+Subject: Doc for Qualcomm AR3001 HCI
+From: Frank Zhao <frank.zhao.main@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jukka,
+I am doing some hacking on a PlayStation 4's DualShock 4 controller,
+inside is a Qualcomm Atheros AR3002 connected to a microcontroller
+using UART HCI. I have a logic analyzer connected to the UART signals
+and I have captured a lot of data. But a lot of the HCI commands have
+OGF of 0xFC which means that the commands are "vendor defined", and
+thus they are not in the HCI functional specifications documentation.
 
-> this is 6LoWPAN code for BT LE as described in
-> http://tools.ietf.org/html/draft-ietf-6lo-btle-00
+I can't find any helpful technical documentation at all from
+Qualcomm's website and they probably won't help some hobbyist anyways.
+I've searched Google and found your website. You guys have written a
+driver for this chip already, so you must have some documentation on
+Qualcomm's own HCI commands. Can you please share this documentation
+with me?
 
-all 5 patches have been applied to bluetooth-next tree.
+Thank you
 
-Regards
+Frank Zhao
 
-Marcel
-
+PS: I originally wrote this email to linux-wireless but they told me
+to try linux-bluetooth instead
