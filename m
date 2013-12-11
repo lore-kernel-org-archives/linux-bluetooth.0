@@ -2,47 +2,53 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 4/9] android/bluetooth: Free devices on service unregister
-Date: Wed, 11 Dec 2013 11:31:22 +0100
-Message-Id: <1386757887-29018-4-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 2/9] android/bluetooth: Add support for adapter bonded devices property
+Date: Wed, 11 Dec 2013 11:31:20 +0100
+Message-Id: <1386757887-29018-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1386757887-29018-1-git-send-email-szymon.janc@tieto.com>
 References: <1386757887-29018-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is no need to keep devices list in memory if service was
-unregistered.
+This allows to get property with list of bonded devices.
 ---
- android/bluetooth.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ android/bluetooth.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index e32ddd6..d6cefb7 100644
+index 82003fd..b6ef3e6 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -154,6 +154,13 @@ static struct device *create_device(const bdaddr_t *bdaddr)
- 	return dev;
+@@ -1729,11 +1729,26 @@ static uint8_t get_adapter_scan_mode(void)
+ 
+ static uint8_t get_adapter_bonded_devices(void)
+ {
+-	DBG("Not implemented");
++	uint8_t buf[sizeof(bdaddr_t) * g_slist_length(devices)];
++	int i = 0;
++	GSList *l;
+ 
+-	/* TODO: Add implementation */
++	DBG("");
+ 
+-	return HAL_STATUS_FAILED;
++	for (l = devices; l; l = g_slist_next(l)) {
++		struct device *dev = l->data;
++
++		if (dev->bond_state != HAL_BOND_STATE_BONDED)
++			continue;
++
++		bdaddr2android(&dev->bdaddr, buf + (i * sizeof(bdaddr_t)));
++		i++;
++	}
++
++	send_adapter_property(HAL_PROP_ADAPTER_BONDED_DEVICES,
++						i * sizeof(bdaddr_t), buf);
++
++	return HAL_STATUS_SUCCESS;
  }
  
-+static void free_device(struct device *dev)
-+{
-+	g_free(dev->name);
-+	g_free(dev->friendly_name);
-+	g_free(dev);
-+}
-+
- static struct device *get_device(const bdaddr_t *bdaddr)
- {
- 	struct device *dev;
-@@ -2557,5 +2564,8 @@ void bt_bluetooth_unregister(void)
- {
- 	DBG("");
- 
-+	g_slist_free_full(devices, (GDestroyNotify) free_device);
-+	devices = NULL;
-+
- 	ipc_unregister(HAL_SERVICE_ID_CORE);
- }
+ static uint8_t get_adapter_discoverable_timeout(void)
 -- 
 1.8.3.2
 
