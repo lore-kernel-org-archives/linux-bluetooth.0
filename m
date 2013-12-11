@@ -1,81 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/9] android/bluetooth: Add support for reporting adapter type property
-Date: Wed, 11 Dec 2013 11:31:19 +0100
-Message-Id: <1386757887-29018-1-git-send-email-szymon.janc@tieto.com>
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 10/10] android/pan: Add PAN NAP sdp record fo server role
+Date: Wed, 11 Dec 2013 12:13:45 +0200
+Message-Id: <1386756825-934-11-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1386756825-934-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1386756825-934-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to get property with adapter type.
+Adding PAN profile NAP SDP record on profile register call and
+remove on unregister call.
 ---
- android/bluetooth.c | 32 +++++++++++++++++++++++++++++---
- android/hal-msg.h   |  4 ++++
- 2 files changed, 33 insertions(+), 3 deletions(-)
+ android/pan.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index e456f3c..82003fd 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -1674,13 +1674,39 @@ static uint8_t get_adapter_class(void)
- 	return HAL_STATUS_SUCCESS;
- }
+diff --git a/android/pan.c b/android/pan.c
+index 29b0a54..a6a8e27 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -44,9 +44,12 @@
+ #include "utils.h"
+ #include "bluetooth.h"
  
-+static uint8_t settings2type(void)
-+{
-+	bool bredr, le;
++#define SVC_HINT_CAPTURING 0x08
 +
-+	bredr = adapter.current_settings & MGMT_SETTING_BREDR;
-+	le = adapter.current_settings & MGMT_SETTING_LE;
-+
-+	if (bredr && le)
-+		return HAL_TYPE_DUAL;
-+
-+	if (bredr && !le)
-+		return HAL_TYPE_BREDR;
-+
-+	if (!bredr && le)
-+		return HAL_TYPE_LE;
-+
-+	return 0;
-+}
-+
- static uint8_t get_adapter_type(void)
+ static bdaddr_t adapter_addr;
+ GSList *devices = NULL;
+ uint8_t local_role = HAL_PAN_ROLE_NONE;
++static uint32_t record_id = 0;
+ 
+ struct pan_device {
+ 	char		iface[16];
+@@ -343,6 +346,7 @@ static const struct ipc_handler cmd_handlers[] = {
+ 
+ bool bt_pan_register(const bdaddr_t *addr)
  {
--	DBG("Not implemented");
-+	uint8_t type;
++	sdp_record_t *rec = NULL;
+ 	int err;
  
--	/* TODO: Add implementation */
-+	DBG("");
+ 	DBG("");
+@@ -355,6 +359,21 @@ bool bt_pan_register(const bdaddr_t *addr)
+ 		return false;
+ 	}
  
--	return HAL_STATUS_FAILED;
-+	type = settings2type();
++	rec = pan_record("bnepnap", BNEP_SVC_NAP, TRUE);
++	if (!rec) {
++		bnep_cleanup();
++		return false;
++	}
 +
-+	if (!type)
-+		return HAL_STATUS_FAILED;
++	if (bt_adapter_add_record(rec, SVC_HINT_CAPTURING) < 0) {
++		error("Failed to register on PAN record");
++		sdp_record_free(rec);
++		bnep_cleanup();
++		return false;
++	}
 +
-+	send_adapter_property(HAL_PROP_ADAPTER_TYPE, sizeof(type), &type);
++	record_id = rec->handle;
 +
-+	return HAL_STATUS_SUCCESS;
- }
+ 	ipc_register(HAL_SERVICE_ID_PAN, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
  
- static uint8_t get_adapter_service_rec(void)
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 80c4a25..3be91aa 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -116,6 +116,10 @@ struct hal_cmd_get_adapter_prop {
- #define HAL_ADAPTER_SCAN_MODE_CONN		0x01
- #define HAL_ADAPTER_SCAN_MODE_CONN_DISC	0x02
+@@ -373,6 +392,8 @@ void bt_pan_unregister(void)
+ {
+ 	DBG("");
  
-+#define HAL_TYPE_BREDR				0x01
-+#define HAL_TYPE_LE				0x02
-+#define HAL_TYPE_DUAL				0x03
++	bt_adapter_remove_record(record_id);
 +
- #define HAL_OP_SET_ADAPTER_PROP		0x05
- struct hal_cmd_set_adapter_prop {
- 	uint8_t  type;
+ 	g_slist_foreach(devices, free_pan_devices, NULL);
+ 	devices = NULL;
+ 	bnep_cleanup();
 -- 
 1.8.3.2
 
