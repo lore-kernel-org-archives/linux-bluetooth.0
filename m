@@ -1,90 +1,236 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] build: Add coverage support
-Date: Wed, 11 Dec 2013 12:55:41 +0200
-Message-Id: <1386759341-14346-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH v4 2/7] android/tester: Add pre-setup and post-teardown routines
+Date: Wed, 11 Dec 2013 11:46:32 +0100
+Message-Id: <1386758797-1809-2-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1386758797-1809-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1386758797-1809-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
+This will add hciemu initialization and cleanup. These functions
+will be called to create hci emulator and cleanup it.
 ---
- Makefile.am         | 18 ++++++++++++++++++
- acinclude.m4        |  9 +++++++++
- bootstrap-configure |  1 +
- configure.ac        |  2 ++
- 4 files changed, 30 insertions(+)
+ android/Makefile.am      |  10 ++-
+ android/android-tester.c | 183 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 191 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 15cc149..1a59532 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -331,5 +331,23 @@ lib/bluetooth/%.h: lib/%.h
- 	$(AM_V_at)$(MKDIR_P) lib/bluetooth
- 	$(AM_V_GEN)$(LN_S) -f "$(abs_top_builddir)"/$< $@
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 0768985..5364c2e 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -85,7 +85,15 @@ android_haltest_LDFLAGS = -pthread
  
-+if COVERAGE
-+clean-coverage:
-+	$(RM) -r coverage
-+	@find . -name "*.gcda" -exec $(RM) {} \;
-+	$(LCOV) --directory . --zerocounters
-+
-+check-coverage:
-+	@make check
-+	$(AM_V_at)$(MKDIR_P) -p coverage
-+	$(LCOV) --compat-libtool --directory . --capture --output-file \
-+							coverage/check.info
-+	@genhtml -o coverage/ coverage/check.info
-+
- clean-local:
-+	@make clean-coverage
- 	$(RM) -r lib/bluetooth
-+else
-+clean-local:
-+	$(RM) -r lib/bluetooth
-+endif
-diff --git a/acinclude.m4 b/acinclude.m4
-index 2065852..e5eb481 100644
---- a/acinclude.m4
-+++ b/acinclude.m4
-@@ -51,6 +51,15 @@ AC_DEFUN([MISC_FLAGS], [
- 			misc_ldflags="$misc_ldflags -pie"
- 		fi
- 	])
-+	AC_ARG_ENABLE(coverage, AC_HELP_STRING([--enable-coverage],
-+			[enable coverage flags]), [
-+		AC_PATH_PROG([LCOV], [lcov])
-+		if (test "$LCOV" && test "${enableval}" = "yes"); then
-+			misc_cflags="$misc_cflags -ftest-coverage"
-+			misc_cflags="$misc_cflags -fprofile-arcs"
-+			misc_ldflags="$misc_ldflags -gcov"
-+		fi
-+	])
- 	AC_SUBST([MISC_CFLAGS], $misc_cflags)
- 	AC_SUBST([MISC_LDFLAGS], $misc_ldflags)
- ])
-diff --git a/bootstrap-configure b/bootstrap-configure
-index c7f08ed..35aa98b 100755
---- a/bootstrap-configure
-+++ b/bootstrap-configure
-@@ -14,4 +14,5 @@ fi
- 		--enable-experimental \
- 		--enable-android \
- 		--enable-sixaxis \
-+		--enable-coverage \
- 		--disable-datafiles $*
-diff --git a/configure.ac b/configure.ac
-index 18d0b55..c55924f 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -252,4 +252,6 @@ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
- 					[enable_android=${enableval}])
- AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
+ noinst_PROGRAMS += android/android-tester
  
-+AM_CONDITIONAL([COVERAGE], [test "$LCOV"])
+-android_android_tester_SOURCES = android/android-tester.c
++android_android_tester_SOURCES = emulator/btdev.h emulator/btdev.c \
++				emulator/bthost.h emulator/bthost.c \
++				src/shared/util.h src/shared/util.c \
++				src/shared/mgmt.h src/shared/mgmt.c \
++				src/shared/hciemu.h src/shared/hciemu.c \
++				src/shared/tester.h src/shared/tester.c \
++				android/android-tester.c
 +
- AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
++android_android_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+ 
+ endif
+ 
+diff --git a/android/android-tester.c b/android/android-tester.c
+index f5c42b0..498da22 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -15,7 +15,188 @@
+  *
+  */
+ 
++#include <unistd.h>
++
++#include <glib.h>
++
++#include "lib/bluetooth.h"
++#include "lib/mgmt.h"
++
++#include "src/shared/tester.h"
++#include "src/shared/mgmt.h"
++#include "src/shared/hciemu.h"
++
++struct generic_data {
++};
++
++struct test_data {
++	struct mgmt *mgmt;
++	uint16_t mgmt_index;
++	struct hciemu *hciemu;
++	enum hciemu_type hciemu_type;
++	const struct generic_data *test_data;
++};
++
++static void read_info_callback(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct mgmt_rp_read_info *rp = param;
++	char addr[18];
++	uint16_t manufacturer;
++	uint32_t supported_settings, current_settings;
++
++	tester_print("Read Info callback");
++	tester_print("  Status: 0x%02x", status);
++
++	if (status || !param) {
++		tester_pre_setup_failed();
++		return;
++	}
++
++	ba2str(&rp->bdaddr, addr);
++	manufacturer = btohs(rp->manufacturer);
++	supported_settings = btohl(rp->supported_settings);
++	current_settings = btohl(rp->current_settings);
++
++	tester_print("  Address: %s", addr);
++	tester_print("  Version: 0x%02x", rp->version);
++	tester_print("  Manufacturer: 0x%04x", manufacturer);
++	tester_print("  Supported settings: 0x%08x", supported_settings);
++	tester_print("  Current settings: 0x%08x", current_settings);
++	tester_print("  Class: 0x%02x%02x%02x",
++			rp->dev_class[2], rp->dev_class[1], rp->dev_class[0]);
++	tester_print("  Name: %s", rp->name);
++	tester_print("  Short name: %s", rp->short_name);
++
++	if (strcmp(hciemu_get_address(data->hciemu), addr)) {
++		tester_pre_setup_failed();
++		return;
++	}
++
++	tester_pre_setup_complete();
++}
++
++static void index_added_callback(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
++{
++	struct test_data *data = tester_get_data();
++
++	tester_print("Index Added callback");
++	tester_print("  Index: 0x%04x", index);
++
++	data->mgmt_index = index;
++
++	mgmt_send(data->mgmt, MGMT_OP_READ_INFO, data->mgmt_index, 0, NULL,
++					read_info_callback, NULL, NULL);
++}
++
++static void index_removed_callback(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
++{
++	struct test_data *data = tester_get_data();
++
++	tester_print("Index Removed callback");
++	tester_print("  Index: 0x%04x", index);
++
++	if (index != data->mgmt_index)
++		return;
++
++	mgmt_unregister_index(data->mgmt, data->mgmt_index);
++
++	mgmt_unref(data->mgmt);
++	data->mgmt = NULL;
++
++	tester_post_teardown_complete();
++}
++
++static void read_index_list_callback(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	struct test_data *data = tester_get_data();
++
++	tester_print("Read Index List callback");
++	tester_print("  Status: 0x%02x", status);
++
++	if (status || !param) {
++		tester_pre_setup_failed();
++		return;
++	}
++
++	mgmt_register(data->mgmt, MGMT_EV_INDEX_ADDED, MGMT_INDEX_NONE,
++					index_added_callback, NULL, NULL);
++
++	mgmt_register(data->mgmt, MGMT_EV_INDEX_REMOVED, MGMT_INDEX_NONE,
++					index_removed_callback, NULL, NULL);
++
++	data->hciemu = hciemu_new(data->hciemu_type);
++	if (!data->hciemu) {
++		tester_warn("Failed to setup HCI emulation");
++		tester_pre_setup_failed();
++		return;
++	}
++
++	tester_print("New hciemu instance created");
++}
++
++static void test_pre_setup(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++
++	if (!tester_use_debug())
++		fclose(stderr);
++
++	data->mgmt = mgmt_new_default();
++	if (!data->mgmt) {
++		tester_warn("Failed to setup management interface");
++		tester_pre_setup_failed();
++		return;
++	}
++
++	mgmt_send(data->mgmt, MGMT_OP_READ_INDEX_LIST, MGMT_INDEX_NONE, 0,
++				NULL, read_index_list_callback, NULL, NULL);
++}
++
++static void test_post_teardown(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++
++	hciemu_unref(data->hciemu);
++	data->hciemu = NULL;
++}
++
++static void setup_base(const void *test_data)
++{
++	tester_setup_failed();
++}
++
++static void teardown(const void *test_data)
++{
++	tester_teardown_complete();
++}
++
++static void controller_setup(const void *test_data)
++{
++}
++
++#define test_bredrle(name, data, test_setup, test, test_teardown) \
++	do { \
++		struct test_data *user; \
++		user = g_malloc0(sizeof(struct test_data)); \
++		if (!user) \
++			break; \
++		user->hciemu_type = HCIEMU_TYPE_BREDRLE; \
++		user->test_data = data; \
++		tester_add_full(name, data, test_pre_setup, test_setup, \
++				test, test_teardown, test_post_teardown, \
++							3, user, g_free); \
++	} while (0)
++
+ int main(int argc, char *argv[])
+ {
+-	return 0;
++	tester_init(&argc, &argv);
++
++	test_bredrle("Test Init", NULL, setup_base, controller_setup, teardown);
++
++	return tester_run();
+ }
 -- 
 1.8.3.1
 
