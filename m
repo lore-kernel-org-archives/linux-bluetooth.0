@@ -1,985 +1,245 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v10 1/5] 6lowpan: Moving generic compression code into 6lowpan_iphc.c
-Date: Wed, 11 Dec 2013 17:05:34 +0200
-Message-Id: <1386774338-2093-2-git-send-email-jukka.rissanen@linux.intel.com>
+Subject: [PATCH v10 4/5] Bluetooth: Enable 6LoWPAN support for BT LE devices
+Date: Wed, 11 Dec 2013 17:05:37 +0200
+Message-Id: <1386774338-2093-5-git-send-email-jukka.rissanen@linux.intel.com>
 In-Reply-To: <1386774338-2093-1-git-send-email-jukka.rissanen@linux.intel.com>
 References: <1386774338-2093-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Because the IEEE 802154 and Bluetooth share the IP header compression
-and uncompression code, the common code is moved to 6lowpan_iphc.c
+This is initial version of
+http://tools.ietf.org/html/draft-ietf-6lo-btle-00
+
+By default the 6LoWPAN support is not activated and user
+needs to tweak /sys/kernel/debug/bluetooth/hci0/6lowpan
 file.
 
-Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Acked-by: Alexander Aring <alex.aring@gmail.com>
----
- net/ieee802154/6lowpan.c      | 753 ++-------------------------------------
- net/ieee802154/6lowpan.h      |  32 ++
- net/ieee802154/6lowpan_iphc.c | 807 ++++++++++++++++++++++++++++++++++++++++++
- net/ieee802154/Makefile       |   2 +-
- 4 files changed, 875 insertions(+), 719 deletions(-)
- create mode 100644 net/ieee802154/6lowpan_iphc.c
+The kernel needs IPv6 support before 6LoWPAN is usable.
 
-diff --git a/net/ieee802154/6lowpan.c b/net/ieee802154/6lowpan.c
-index 459e200..53d0bd5 100644
---- a/net/ieee802154/6lowpan.c
-+++ b/net/ieee802154/6lowpan.c
-@@ -62,9 +62,6 @@
+Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+---
+ include/net/bluetooth/hci.h      |   1 +
+ include/net/bluetooth/hci_core.h |   1 +
+ include/net/bluetooth/l2cap.h    |   1 +
+ net/bluetooth/6lowpan.c          | 886 +++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/6lowpan.h          |  26 ++
+ net/bluetooth/Makefile           |   6 +-
+ net/bluetooth/hci_event.c        |   3 +
+ net/bluetooth/l2cap_core.c       |  12 +
+ 8 files changed, 935 insertions(+), 1 deletion(-)
+ create mode 100644 net/bluetooth/6lowpan.c
+ create mode 100644 net/bluetooth/6lowpan.h
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index cc2da73..5dc3d90 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -131,6 +131,7 @@ enum {
+ 	HCI_PERIODIC_INQ,
+ 	HCI_FAST_CONNECTABLE,
+ 	HCI_BREDR_ENABLED,
++	HCI_6LOWPAN_ENABLED,
+ };
  
- #include "6lowpan.h"
+ /* A mask for the flags that are supposed to remain when a reset happens
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index b796161..f2f0cf5 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -448,6 +448,7 @@ enum {
+ 	HCI_CONN_SSP_ENABLED,
+ 	HCI_CONN_POWER_SAVE,
+ 	HCI_CONN_REMOTE_OOB,
++	HCI_CONN_6LOWPAN,
+ };
  
--/* TTL uncompression values */
--static const u8 lowpan_ttl_values[] = {0, 1, 64, 255};
--
- static LIST_HEAD(lowpan_devices);
+ static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index e149e99..dbc4a89 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -136,6 +136,7 @@ struct l2cap_conninfo {
+ #define L2CAP_FC_L2CAP		0x02
+ #define L2CAP_FC_CONNLESS	0x04
+ #define L2CAP_FC_A2MP		0x08
++#define L2CAP_FC_6LOWPAN        0x3e /* reserved and temporary value */
  
- /* private device info */
-@@ -135,347 +132,14 @@ static inline void lowpan_raw_dump_table(const char *caller, char *msg,
- #endif /* DEBUG */
- }
- 
--static u8
--lowpan_compress_addr_64(u8 **hc06_ptr, u8 shift, const struct in6_addr *ipaddr,
--		 const unsigned char *lladdr)
--{
--	u8 val = 0;
--
--	if (is_addr_mac_addr_based(ipaddr, lladdr))
--		val = 3; /* 0-bits */
--	else if (lowpan_is_iid_16_bit_compressable(ipaddr)) {
--		/* compress IID to 16 bits xxxx::XXXX */
--		memcpy(*hc06_ptr, &ipaddr->s6_addr16[7], 2);
--		*hc06_ptr += 2;
--		val = 2; /* 16-bits */
--	} else {
--		/* do not compress IID => xxxx::IID */
--		memcpy(*hc06_ptr, &ipaddr->s6_addr16[4], 8);
--		*hc06_ptr += 8;
--		val = 1; /* 64-bits */
--	}
--
--	return rol8(val, shift);
--}
--
--/*
-- * Uncompress address function for source and
-- * destination address(non-multicast).
-- *
-- * address_mode is sam value or dam value.
-- */
--static int
--lowpan_uncompress_addr(struct sk_buff *skb,
--		struct in6_addr *ipaddr,
--		const u8 address_mode,
--		const struct ieee802154_addr *lladdr)
--{
--	bool fail;
--
--	switch (address_mode) {
--	case LOWPAN_IPHC_ADDR_00:
--		/* for global link addresses */
--		fail = lowpan_fetch_skb(skb, ipaddr->s6_addr, 16);
--		break;
--	case LOWPAN_IPHC_ADDR_01:
--		/* fe:80::XXXX:XXXX:XXXX:XXXX */
--		ipaddr->s6_addr[0] = 0xFE;
--		ipaddr->s6_addr[1] = 0x80;
--		fail = lowpan_fetch_skb(skb, &ipaddr->s6_addr[8], 8);
--		break;
--	case LOWPAN_IPHC_ADDR_02:
--		/* fe:80::ff:fe00:XXXX */
--		ipaddr->s6_addr[0] = 0xFE;
--		ipaddr->s6_addr[1] = 0x80;
--		ipaddr->s6_addr[11] = 0xFF;
--		ipaddr->s6_addr[12] = 0xFE;
--		fail = lowpan_fetch_skb(skb, &ipaddr->s6_addr[14], 2);
--		break;
--	case LOWPAN_IPHC_ADDR_03:
--		fail = false;
--		switch (lladdr->addr_type) {
--		case IEEE802154_ADDR_LONG:
--			/* fe:80::XXXX:XXXX:XXXX:XXXX
--			 *        \_________________/
--			 *              hwaddr
--			 */
--			ipaddr->s6_addr[0] = 0xFE;
--			ipaddr->s6_addr[1] = 0x80;
--			memcpy(&ipaddr->s6_addr[8], lladdr->hwaddr,
--					IEEE802154_ADDR_LEN);
--			/* second bit-flip (Universe/Local)
--			 * is done according RFC2464
--			 */
--			ipaddr->s6_addr[8] ^= 0x02;
--			break;
--		case IEEE802154_ADDR_SHORT:
--			/* fe:80::ff:fe00:XXXX
--			 *		  \__/
--			 *	       short_addr
--			 *
--			 * Universe/Local bit is zero.
--			 */
--			ipaddr->s6_addr[0] = 0xFE;
--			ipaddr->s6_addr[1] = 0x80;
--			ipaddr->s6_addr[11] = 0xFF;
--			ipaddr->s6_addr[12] = 0xFE;
--			ipaddr->s6_addr16[7] = htons(lladdr->short_addr);
--			break;
--		default:
--			pr_debug("Invalid addr_type set\n");
--			return -EINVAL;
--		}
--		break;
--	default:
--		pr_debug("Invalid address mode value: 0x%x\n", address_mode);
--		return -EINVAL;
--	}
--
--	if (fail) {
--		pr_debug("Failed to fetch skb data\n");
--		return -EIO;
--	}
--
--	lowpan_raw_dump_inline(NULL, "Reconstructed ipv6 addr is:\n",
--			ipaddr->s6_addr, 16);
--
--	return 0;
--}
--
--/* Uncompress address function for source context
-- * based address(non-multicast).
-- */
--static int
--lowpan_uncompress_context_based_src_addr(struct sk_buff *skb,
--		struct in6_addr *ipaddr,
--		const u8 sam)
--{
--	switch (sam) {
--	case LOWPAN_IPHC_ADDR_00:
--		/* unspec address ::
--		 * Do nothing, address is already ::
--		 */
--		break;
--	case LOWPAN_IPHC_ADDR_01:
--		/* TODO */
--	case LOWPAN_IPHC_ADDR_02:
--		/* TODO */
--	case LOWPAN_IPHC_ADDR_03:
--		/* TODO */
--		netdev_warn(skb->dev, "SAM value 0x%x not supported\n", sam);
--		return -EINVAL;
--	default:
--		pr_debug("Invalid sam value: 0x%x\n", sam);
--		return -EINVAL;
--	}
--
--	lowpan_raw_dump_inline(NULL,
--			"Reconstructed context based ipv6 src addr is:\n",
--			ipaddr->s6_addr, 16);
--
--	return 0;
--}
--
--/* Uncompress function for multicast destination address,
-- * when M bit is set.
-- */
--static int
--lowpan_uncompress_multicast_daddr(struct sk_buff *skb,
--		struct in6_addr *ipaddr,
--		const u8 dam)
--{
--	bool fail;
--
--	switch (dam) {
--	case LOWPAN_IPHC_DAM_00:
--		/* 00:  128 bits.  The full address
--		 * is carried in-line.
--		 */
--		fail = lowpan_fetch_skb(skb, ipaddr->s6_addr, 16);
--		break;
--	case LOWPAN_IPHC_DAM_01:
--		/* 01:  48 bits.  The address takes
--		 * the form ffXX::00XX:XXXX:XXXX.
--		 */
--		ipaddr->s6_addr[0] = 0xFF;
--		fail = lowpan_fetch_skb(skb, &ipaddr->s6_addr[1], 1);
--		fail |= lowpan_fetch_skb(skb, &ipaddr->s6_addr[11], 5);
--		break;
--	case LOWPAN_IPHC_DAM_10:
--		/* 10:  32 bits.  The address takes
--		 * the form ffXX::00XX:XXXX.
--		 */
--		ipaddr->s6_addr[0] = 0xFF;
--		fail = lowpan_fetch_skb(skb, &ipaddr->s6_addr[1], 1);
--		fail |= lowpan_fetch_skb(skb, &ipaddr->s6_addr[13], 3);
--		break;
--	case LOWPAN_IPHC_DAM_11:
--		/* 11:  8 bits.  The address takes
--		 * the form ff02::00XX.
--		 */
--		ipaddr->s6_addr[0] = 0xFF;
--		ipaddr->s6_addr[1] = 0x02;
--		fail = lowpan_fetch_skb(skb, &ipaddr->s6_addr[15], 1);
--		break;
--	default:
--		pr_debug("DAM value has a wrong value: 0x%x\n", dam);
--		return -EINVAL;
--	}
--
--	if (fail) {
--		pr_debug("Failed to fetch skb data\n");
--		return -EIO;
--	}
--
--	lowpan_raw_dump_inline(NULL, "Reconstructed ipv6 multicast addr is:\n",
--			ipaddr->s6_addr, 16);
--
--	return 0;
--}
--
--static void
--lowpan_compress_udp_header(u8 **hc06_ptr, struct sk_buff *skb)
--{
--	struct udphdr *uh = udp_hdr(skb);
--
--	if (((uh->source & LOWPAN_NHC_UDP_4BIT_MASK) ==
--				LOWPAN_NHC_UDP_4BIT_PORT) &&
--	    ((uh->dest & LOWPAN_NHC_UDP_4BIT_MASK) ==
--				LOWPAN_NHC_UDP_4BIT_PORT)) {
--		pr_debug("UDP header: both ports compression to 4 bits\n");
--		**hc06_ptr = LOWPAN_NHC_UDP_CS_P_11;
--		**(hc06_ptr + 1) = /* subtraction is faster */
--		   (u8)((uh->dest - LOWPAN_NHC_UDP_4BIT_PORT) +
--		       ((uh->source & LOWPAN_NHC_UDP_4BIT_PORT) << 4));
--		*hc06_ptr += 2;
--	} else if ((uh->dest & LOWPAN_NHC_UDP_8BIT_MASK) ==
--			LOWPAN_NHC_UDP_8BIT_PORT) {
--		pr_debug("UDP header: remove 8 bits of dest\n");
--		**hc06_ptr = LOWPAN_NHC_UDP_CS_P_01;
--		memcpy(*hc06_ptr + 1, &uh->source, 2);
--		**(hc06_ptr + 3) = (u8)(uh->dest - LOWPAN_NHC_UDP_8BIT_PORT);
--		*hc06_ptr += 4;
--	} else if ((uh->source & LOWPAN_NHC_UDP_8BIT_MASK) ==
--			LOWPAN_NHC_UDP_8BIT_PORT) {
--		pr_debug("UDP header: remove 8 bits of source\n");
--		**hc06_ptr = LOWPAN_NHC_UDP_CS_P_10;
--		memcpy(*hc06_ptr + 1, &uh->dest, 2);
--		**(hc06_ptr + 3) = (u8)(uh->source - LOWPAN_NHC_UDP_8BIT_PORT);
--		*hc06_ptr += 4;
--	} else {
--		pr_debug("UDP header: can't compress\n");
--		**hc06_ptr = LOWPAN_NHC_UDP_CS_P_00;
--		memcpy(*hc06_ptr + 1, &uh->source, 2);
--		memcpy(*hc06_ptr + 3, &uh->dest, 2);
--		*hc06_ptr += 5;
--	}
--
--	/* checksum is always inline */
--	memcpy(*hc06_ptr, &uh->check, 2);
--	*hc06_ptr += 2;
--
--	/* skip the UDP header */
--	skb_pull(skb, sizeof(struct udphdr));
--}
--
--static inline int lowpan_fetch_skb_u8(struct sk_buff *skb, u8 *val)
--{
--	if (unlikely(!pskb_may_pull(skb, 1)))
--		return -EINVAL;
--
--	*val = skb->data[0];
--	skb_pull(skb, 1);
--
--	return 0;
--}
--
--static inline int lowpan_fetch_skb_u16(struct sk_buff *skb, u16 *val)
--{
--	if (unlikely(!pskb_may_pull(skb, 2)))
--		return -EINVAL;
--
--	*val = (skb->data[0] << 8) | skb->data[1];
--	skb_pull(skb, 2);
--
--	return 0;
--}
--
--static int
--lowpan_uncompress_udp_header(struct sk_buff *skb, struct udphdr *uh)
--{
--	u8 tmp;
--
--	if (!uh)
--		goto err;
--
--	if (lowpan_fetch_skb_u8(skb, &tmp))
--		goto err;
--
--	if ((tmp & LOWPAN_NHC_UDP_MASK) == LOWPAN_NHC_UDP_ID) {
--		pr_debug("UDP header uncompression\n");
--		switch (tmp & LOWPAN_NHC_UDP_CS_P_11) {
--		case LOWPAN_NHC_UDP_CS_P_00:
--			memcpy(&uh->source, &skb->data[0], 2);
--			memcpy(&uh->dest, &skb->data[2], 2);
--			skb_pull(skb, 4);
--			break;
--		case LOWPAN_NHC_UDP_CS_P_01:
--			memcpy(&uh->source, &skb->data[0], 2);
--			uh->dest =
--			   skb->data[2] + LOWPAN_NHC_UDP_8BIT_PORT;
--			skb_pull(skb, 3);
--			break;
--		case LOWPAN_NHC_UDP_CS_P_10:
--			uh->source = skb->data[0] + LOWPAN_NHC_UDP_8BIT_PORT;
--			memcpy(&uh->dest, &skb->data[1], 2);
--			skb_pull(skb, 3);
--			break;
--		case LOWPAN_NHC_UDP_CS_P_11:
--			uh->source =
--			   LOWPAN_NHC_UDP_4BIT_PORT + (skb->data[0] >> 4);
--			uh->dest =
--			   LOWPAN_NHC_UDP_4BIT_PORT + (skb->data[0] & 0x0f);
--			skb_pull(skb, 1);
--			break;
--		default:
--			pr_debug("ERROR: unknown UDP format\n");
--			goto err;
--		}
--
--		pr_debug("uncompressed UDP ports: src = %d, dst = %d\n",
--			 uh->source, uh->dest);
--
--		/* copy checksum */
--		memcpy(&uh->check, &skb->data[0], 2);
--		skb_pull(skb, 2);
--
--		/*
--		 * UDP lenght needs to be infered from the lower layers
--		 * here, we obtain the hint from the remaining size of the
--		 * frame
--		 */
--		uh->len = htons(skb->len + sizeof(struct udphdr));
--		pr_debug("uncompressed UDP length: src = %d", uh->len);
--	} else {
--		pr_debug("ERROR: unsupported NH format\n");
--		goto err;
--	}
--
--	return 0;
--err:
--	return -EINVAL;
--}
--
- static int lowpan_header_create(struct sk_buff *skb,
- 			   struct net_device *dev,
- 			   unsigned short type, const void *_daddr,
- 			   const void *_saddr, unsigned int len)
- {
--	u8 tmp, iphc0, iphc1, *hc06_ptr;
- 	struct ipv6hdr *hdr;
- 	const u8 *saddr = _saddr;
- 	const u8 *daddr = _daddr;
--	u8 head[100];
- 	struct ieee802154_addr sa, da;
- 
- 	/* TODO:
-@@ -485,181 +149,14 @@ static int lowpan_header_create(struct sk_buff *skb,
- 		return 0;
- 
- 	hdr = ipv6_hdr(skb);
--	hc06_ptr = head + 2;
--
--	pr_debug("IPv6 header dump:\n\tversion = %d\n\tlength  = %d\n"
--		 "\tnexthdr = 0x%02x\n\thop_lim = %d\n", hdr->version,
--		 ntohs(hdr->payload_len), hdr->nexthdr, hdr->hop_limit);
--
--	lowpan_raw_dump_table(__func__, "raw skb network header dump",
--		skb_network_header(skb), sizeof(struct ipv6hdr));
- 
- 	if (!saddr)
- 		saddr = dev->dev_addr;
- 
- 	lowpan_raw_dump_inline(__func__, "saddr", (unsigned char *)saddr, 8);
--
--	/*
--	 * As we copy some bit-length fields, in the IPHC encoding bytes,
--	 * we sometimes use |=
--	 * If the field is 0, and the current bit value in memory is 1,
--	 * this does not work. We therefore reset the IPHC encoding here
--	 */
--	iphc0 = LOWPAN_DISPATCH_IPHC;
--	iphc1 = 0;
--
--	/* TODO: context lookup */
--
- 	lowpan_raw_dump_inline(__func__, "daddr", (unsigned char *)daddr, 8);
- 
--	/*
--	 * Traffic class, flow label
--	 * If flow label is 0, compress it. If traffic class is 0, compress it
--	 * We have to process both in the same time as the offset of traffic
--	 * class depends on the presence of version and flow label
--	 */
--
--	/* hc06 format of TC is ECN | DSCP , original one is DSCP | ECN */
--	tmp = (hdr->priority << 4) | (hdr->flow_lbl[0] >> 4);
--	tmp = ((tmp & 0x03) << 6) | (tmp >> 2);
--
--	if (((hdr->flow_lbl[0] & 0x0F) == 0) &&
--	     (hdr->flow_lbl[1] == 0) && (hdr->flow_lbl[2] == 0)) {
--		/* flow label can be compressed */
--		iphc0 |= LOWPAN_IPHC_FL_C;
--		if ((hdr->priority == 0) &&
--		   ((hdr->flow_lbl[0] & 0xF0) == 0)) {
--			/* compress (elide) all */
--			iphc0 |= LOWPAN_IPHC_TC_C;
--		} else {
--			/* compress only the flow label */
--			*hc06_ptr = tmp;
--			hc06_ptr += 1;
--		}
--	} else {
--		/* Flow label cannot be compressed */
--		if ((hdr->priority == 0) &&
--		   ((hdr->flow_lbl[0] & 0xF0) == 0)) {
--			/* compress only traffic class */
--			iphc0 |= LOWPAN_IPHC_TC_C;
--			*hc06_ptr = (tmp & 0xc0) | (hdr->flow_lbl[0] & 0x0F);
--			memcpy(hc06_ptr + 1, &hdr->flow_lbl[1], 2);
--			hc06_ptr += 3;
--		} else {
--			/* compress nothing */
--			memcpy(hc06_ptr, &hdr, 4);
--			/* replace the top byte with new ECN | DSCP format */
--			*hc06_ptr = tmp;
--			hc06_ptr += 4;
--		}
--	}
--
--	/* NOTE: payload length is always compressed */
--
--	/* Next Header is compress if UDP */
--	if (hdr->nexthdr == UIP_PROTO_UDP)
--		iphc0 |= LOWPAN_IPHC_NH_C;
--
--	if ((iphc0 & LOWPAN_IPHC_NH_C) == 0) {
--		*hc06_ptr = hdr->nexthdr;
--		hc06_ptr += 1;
--	}
--
--	/*
--	 * Hop limit
--	 * if 1:   compress, encoding is 01
--	 * if 64:  compress, encoding is 10
--	 * if 255: compress, encoding is 11
--	 * else do not compress
--	 */
--	switch (hdr->hop_limit) {
--	case 1:
--		iphc0 |= LOWPAN_IPHC_TTL_1;
--		break;
--	case 64:
--		iphc0 |= LOWPAN_IPHC_TTL_64;
--		break;
--	case 255:
--		iphc0 |= LOWPAN_IPHC_TTL_255;
--		break;
--	default:
--		*hc06_ptr = hdr->hop_limit;
--		hc06_ptr += 1;
--		break;
--	}
--
--	/* source address compression */
--	if (is_addr_unspecified(&hdr->saddr)) {
--		pr_debug("source address is unspecified, setting SAC\n");
--		iphc1 |= LOWPAN_IPHC_SAC;
--	/* TODO: context lookup */
--	} else if (is_addr_link_local(&hdr->saddr)) {
--		pr_debug("source address is link-local\n");
--		iphc1 |= lowpan_compress_addr_64(&hc06_ptr,
--				LOWPAN_IPHC_SAM_BIT, &hdr->saddr, saddr);
--	} else {
--		pr_debug("send the full source address\n");
--		memcpy(hc06_ptr, &hdr->saddr.s6_addr16[0], 16);
--		hc06_ptr += 16;
--	}
--
--	/* destination address compression */
--	if (is_addr_mcast(&hdr->daddr)) {
--		pr_debug("destination address is multicast: ");
--		iphc1 |= LOWPAN_IPHC_M;
--		if (lowpan_is_mcast_addr_compressable8(&hdr->daddr)) {
--			pr_debug("compressed to 1 octet\n");
--			iphc1 |= LOWPAN_IPHC_DAM_11;
--			/* use last byte */
--			*hc06_ptr = hdr->daddr.s6_addr[15];
--			hc06_ptr += 1;
--		} else if (lowpan_is_mcast_addr_compressable32(&hdr->daddr)) {
--			pr_debug("compressed to 4 octets\n");
--			iphc1 |= LOWPAN_IPHC_DAM_10;
--			/* second byte + the last three */
--			*hc06_ptr = hdr->daddr.s6_addr[1];
--			memcpy(hc06_ptr + 1, &hdr->daddr.s6_addr[13], 3);
--			hc06_ptr += 4;
--		} else if (lowpan_is_mcast_addr_compressable48(&hdr->daddr)) {
--			pr_debug("compressed to 6 octets\n");
--			iphc1 |= LOWPAN_IPHC_DAM_01;
--			/* second byte + the last five */
--			*hc06_ptr = hdr->daddr.s6_addr[1];
--			memcpy(hc06_ptr + 1, &hdr->daddr.s6_addr[11], 5);
--			hc06_ptr += 6;
--		} else {
--			pr_debug("using full address\n");
--			iphc1 |= LOWPAN_IPHC_DAM_00;
--			memcpy(hc06_ptr, &hdr->daddr.s6_addr[0], 16);
--			hc06_ptr += 16;
--		}
--	} else {
--		/* TODO: context lookup */
--		if (is_addr_link_local(&hdr->daddr)) {
--			pr_debug("dest address is unicast and link-local\n");
--			iphc1 |= lowpan_compress_addr_64(&hc06_ptr,
--				LOWPAN_IPHC_DAM_BIT, &hdr->daddr, daddr);
--		} else {
--			pr_debug("dest address is unicast: using full one\n");
--			memcpy(hc06_ptr, &hdr->daddr.s6_addr16[0], 16);
--			hc06_ptr += 16;
--		}
--	}
--
--	/* UDP header compression */
--	if (hdr->nexthdr == UIP_PROTO_UDP)
--		lowpan_compress_udp_header(&hc06_ptr, skb);
--
--	head[0] = iphc0;
--	head[1] = iphc1;
--
--	skb_pull(skb, sizeof(struct ipv6hdr));
--	skb_reset_transport_header(skb);
--	memcpy(skb_push(skb, hc06_ptr - head), head, hc06_ptr - head);
--	skb_reset_network_header(skb);
--
--	lowpan_raw_dump_table(__func__, "raw skb data dump", skb->data,
--				skb->len);
-+	lowpan_header_compress(skb, dev, type, daddr, saddr, len);
- 
- 	/*
- 	 * NOTE1: I'm still unsure about the fact that compression and WPAN
-@@ -671,39 +168,38 @@ static int lowpan_header_create(struct sk_buff *skb,
- 	 * from MAC subif of the 'dev' and 'real_dev' network devices, but
- 	 * this isn't implemented in mainline yet, so currently we assign 0xff
- 	 */
--	{
--		mac_cb(skb)->flags = IEEE802154_FC_TYPE_DATA;
--		mac_cb(skb)->seq = ieee802154_mlme_ops(dev)->get_dsn(dev);
-+	mac_cb(skb)->flags = IEEE802154_FC_TYPE_DATA;
-+	mac_cb(skb)->seq = ieee802154_mlme_ops(dev)->get_dsn(dev);
- 
--		/* prepare wpan address data */
--		sa.addr_type = IEEE802154_ADDR_LONG;
--		sa.pan_id = ieee802154_mlme_ops(dev)->get_pan_id(dev);
-+	/* prepare wpan address data */
-+	sa.addr_type = IEEE802154_ADDR_LONG;
-+	sa.pan_id = ieee802154_mlme_ops(dev)->get_pan_id(dev);
- 
--		memcpy(&(sa.hwaddr), saddr, 8);
--		/* intra-PAN communications */
--		da.pan_id = ieee802154_mlme_ops(dev)->get_pan_id(dev);
-+	memcpy(&(sa.hwaddr), saddr, 8);
-+	/* intra-PAN communications */
-+	da.pan_id = ieee802154_mlme_ops(dev)->get_pan_id(dev);
- 
--		/*
--		 * if the destination address is the broadcast address, use the
--		 * corresponding short address
--		 */
--		if (lowpan_is_addr_broadcast(daddr)) {
--			da.addr_type = IEEE802154_ADDR_SHORT;
--			da.short_addr = IEEE802154_ADDR_BROADCAST;
--		} else {
--			da.addr_type = IEEE802154_ADDR_LONG;
--			memcpy(&(da.hwaddr), daddr, IEEE802154_ADDR_LEN);
--
--			/* request acknowledgment */
--			mac_cb(skb)->flags |= MAC_CB_FLAG_ACKREQ;
--		}
-+	/*
-+	 * if the destination address is the broadcast address, use the
-+	 * corresponding short address
-+	 */
-+	if (lowpan_is_addr_broadcast(daddr)) {
-+		da.addr_type = IEEE802154_ADDR_SHORT;
-+		da.short_addr = IEEE802154_ADDR_BROADCAST;
-+	} else {
-+		da.addr_type = IEEE802154_ADDR_LONG;
-+		memcpy(&(da.hwaddr), daddr, IEEE802154_ADDR_LEN);
- 
--		return dev_hard_header(skb, lowpan_dev_info(dev)->real_dev,
--				type, (void *)&da, (void *)&sa, skb->len);
-+		/* request acknowledgment */
-+		mac_cb(skb)->flags |= MAC_CB_FLAG_ACKREQ;
- 	}
-+
-+	return dev_hard_header(skb, lowpan_dev_info(dev)->real_dev,
-+			type, (void *)&da, (void *)&sa, skb->len);
- }
- 
--static int lowpan_give_skb_to_devices(struct sk_buff *skb)
-+static int lowpan_give_skb_to_devices(struct sk_buff *skb,
-+					struct net_device *dev)
- {
- 	struct lowpan_dev_record *entry;
- 	struct sk_buff *skb_cp;
-@@ -726,31 +222,6 @@ static int lowpan_give_skb_to_devices(struct sk_buff *skb)
- 	return stat;
- }
- 
--static int lowpan_skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr)
--{
--	struct sk_buff *new;
--	int stat = NET_RX_SUCCESS;
--
--	new = skb_copy_expand(skb, sizeof(struct ipv6hdr), skb_tailroom(skb),
--								GFP_ATOMIC);
--	kfree_skb(skb);
--
--	if (!new)
--		return -ENOMEM;
--
--	skb_push(new, sizeof(struct ipv6hdr));
--	skb_copy_to_linear_data(new, hdr, sizeof(struct ipv6hdr));
--
--	new->protocol = htons(ETH_P_IPV6);
--	new->pkt_type = PACKET_HOST;
--
--	stat = lowpan_give_skb_to_devices(new);
--
--	kfree_skb(new);
--
--	return stat;
--}
--
- static void lowpan_fragment_timer_expired(unsigned long entry_addr)
- {
- 	struct lowpan_fragment *entry = (struct lowpan_fragment *)entry_addr;
-@@ -814,13 +285,10 @@ frame_err:
- 	return NULL;
- }
- 
--static int
--lowpan_process_data(struct sk_buff *skb)
-+static int process_data(struct sk_buff *skb)
- {
--	struct ipv6hdr hdr = {};
--	u8 tmp, iphc0, iphc1, num_context = 0;
-+	u8 iphc0, iphc1;
- 	const struct ieee802154_addr *_saddr, *_daddr;
--	int err;
- 
- 	lowpan_raw_dump_table(__func__, "raw skb data dump", skb->data,
- 				skb->len);
-@@ -925,162 +393,11 @@ lowpan_process_data(struct sk_buff *skb)
- 	_saddr = &mac_cb(skb)->sa;
- 	_daddr = &mac_cb(skb)->da;
- 
--	pr_debug("iphc0 = %02x, iphc1 = %02x\n", iphc0, iphc1);
--
--	/* another if the CID flag is set */
--	if (iphc1 & LOWPAN_IPHC_CID) {
--		pr_debug("CID flag is set, increase header with one\n");
--		if (lowpan_fetch_skb_u8(skb, &num_context))
--			goto drop;
--	}
--
--	hdr.version = 6;
--
--	/* Traffic Class and Flow Label */
--	switch ((iphc0 & LOWPAN_IPHC_TF) >> 3) {
--	/*
--	 * Traffic Class and FLow Label carried in-line
--	 * ECN + DSCP + 4-bit Pad + Flow Label (4 bytes)
--	 */
--	case 0: /* 00b */
--		if (lowpan_fetch_skb_u8(skb, &tmp))
--			goto drop;
--
--		memcpy(&hdr.flow_lbl, &skb->data[0], 3);
--		skb_pull(skb, 3);
--		hdr.priority = ((tmp >> 2) & 0x0f);
--		hdr.flow_lbl[0] = ((tmp >> 2) & 0x30) | (tmp << 6) |
--					(hdr.flow_lbl[0] & 0x0f);
--		break;
--	/*
--	 * Traffic class carried in-line
--	 * ECN + DSCP (1 byte), Flow Label is elided
--	 */
--	case 2: /* 10b */
--		if (lowpan_fetch_skb_u8(skb, &tmp))
--			goto drop;
--
--		hdr.priority = ((tmp >> 2) & 0x0f);
--		hdr.flow_lbl[0] = ((tmp << 6) & 0xC0) | ((tmp >> 2) & 0x30);
--		break;
--	/*
--	 * Flow Label carried in-line
--	 * ECN + 2-bit Pad + Flow Label (3 bytes), DSCP is elided
--	 */
--	case 1: /* 01b */
--		if (lowpan_fetch_skb_u8(skb, &tmp))
--			goto drop;
--
--		hdr.flow_lbl[0] = (skb->data[0] & 0x0F) | ((tmp >> 2) & 0x30);
--		memcpy(&hdr.flow_lbl[1], &skb->data[0], 2);
--		skb_pull(skb, 2);
--		break;
--	/* Traffic Class and Flow Label are elided */
--	case 3: /* 11b */
--		break;
--	default:
--		break;
--	}
--
--	/* Next Header */
--	if ((iphc0 & LOWPAN_IPHC_NH_C) == 0) {
--		/* Next header is carried inline */
--		if (lowpan_fetch_skb_u8(skb, &(hdr.nexthdr)))
--			goto drop;
--
--		pr_debug("NH flag is set, next header carried inline: %02x\n",
--			 hdr.nexthdr);
--	}
--
--	/* Hop Limit */
--	if ((iphc0 & 0x03) != LOWPAN_IPHC_TTL_I)
--		hdr.hop_limit = lowpan_ttl_values[iphc0 & 0x03];
--	else {
--		if (lowpan_fetch_skb_u8(skb, &(hdr.hop_limit)))
--			goto drop;
--	}
--
--	/* Extract SAM to the tmp variable */
--	tmp = ((iphc1 & LOWPAN_IPHC_SAM) >> LOWPAN_IPHC_SAM_BIT) & 0x03;
--
--	if (iphc1 & LOWPAN_IPHC_SAC) {
--		/* Source address context based uncompression */
--		pr_debug("SAC bit is set. Handle context based source address.\n");
--		err = lowpan_uncompress_context_based_src_addr(
--				skb, &hdr.saddr, tmp);
--	} else {
--		/* Source address uncompression */
--		pr_debug("source address stateless compression\n");
--		err = lowpan_uncompress_addr(skb, &hdr.saddr, tmp, _saddr);
--	}
--
--	/* Check on error of previous branch */
--	if (err)
--		goto drop;
--
--	/* Extract DAM to the tmp variable */
--	tmp = ((iphc1 & LOWPAN_IPHC_DAM_11) >> LOWPAN_IPHC_DAM_BIT) & 0x03;
--
--	/* check for Multicast Compression */
--	if (iphc1 & LOWPAN_IPHC_M) {
--		if (iphc1 & LOWPAN_IPHC_DAC) {
--			pr_debug("dest: context-based mcast compression\n");
--			/* TODO: implement this */
--		} else {
--			err = lowpan_uncompress_multicast_daddr(
--					skb, &hdr.daddr, tmp);
--			if (err)
--				goto drop;
--		}
--	} else {
--		pr_debug("dest: stateless compression\n");
--		err = lowpan_uncompress_addr(skb, &hdr.daddr, tmp, _daddr);
--		if (err)
--			goto drop;
--	}
--
--	/* UDP data uncompression */
--	if (iphc0 & LOWPAN_IPHC_NH_C) {
--		struct udphdr uh;
--		struct sk_buff *new;
--		if (lowpan_uncompress_udp_header(skb, &uh))
--			goto drop;
--
--		/*
--		 * replace the compressed UDP head by the uncompressed UDP
--		 * header
--		 */
--		new = skb_copy_expand(skb, sizeof(struct udphdr),
--				      skb_tailroom(skb), GFP_ATOMIC);
--		kfree_skb(skb);
--
--		if (!new)
--			return -ENOMEM;
--
--		skb = new;
--
--		skb_push(skb, sizeof(struct udphdr));
--		skb_copy_to_linear_data(skb, &uh, sizeof(struct udphdr));
--
--		lowpan_raw_dump_table(__func__, "raw UDP header dump",
--				      (u8 *)&uh, sizeof(uh));
--
--		hdr.nexthdr = UIP_PROTO_UDP;
--	}
--
--	/* Not fragmented package */
--	hdr.payload_len = htons(skb->len);
--
--	pr_debug("skb headroom size = %d, data length = %d\n",
--		 skb_headroom(skb), skb->len);
--
--	pr_debug("IPv6 header dump:\n\tversion = %d\n\tlength  = %d\n\t"
--		 "nexthdr = 0x%02x\n\thop_lim = %d\n", hdr.version,
--		 ntohs(hdr.payload_len), hdr.nexthdr, hdr.hop_limit);
--
--	lowpan_raw_dump_table(__func__, "raw header dump", (u8 *)&hdr,
--							sizeof(hdr));
--	return lowpan_skb_deliver(skb, &hdr);
-+	return lowpan_process_data(skb, skb->dev, (u8 *)_saddr->hwaddr,
-+				_saddr->addr_type, IEEE802154_ADDR_LEN,
-+				(u8 *)_daddr->hwaddr, _daddr->addr_type,
-+				IEEE802154_ADDR_LEN, iphc0, iphc1,
-+				lowpan_give_skb_to_devices);
- 
- unlock_and_drop:
- 	spin_unlock_bh(&flist_lock);
-@@ -1316,7 +633,7 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
- 		/* Pull off the 1-byte of 6lowpan header. */
- 		skb_pull(local_skb, 1);
- 
--		lowpan_give_skb_to_devices(local_skb);
-+		lowpan_give_skb_to_devices(local_skb, NULL);
- 
- 		kfree_skb(local_skb);
- 		kfree_skb(skb);
-@@ -1328,7 +645,7 @@ static int lowpan_rcv(struct sk_buff *skb, struct net_device *dev,
- 			local_skb = skb_clone(skb, GFP_ATOMIC);
- 			if (!local_skb)
- 				goto drop;
--			lowpan_process_data(local_skb);
-+			process_data(local_skb);
- 
- 			kfree_skb(skb);
- 			break;
-diff --git a/net/ieee802154/6lowpan.h b/net/ieee802154/6lowpan.h
-index 2869c05..535606d 100644
---- a/net/ieee802154/6lowpan.h
-+++ b/net/ieee802154/6lowpan.h
-@@ -232,6 +232,28 @@
- 					dest = 16 bit inline */
- #define LOWPAN_NHC_UDP_CS_P_11	0xF3 /* source & dest = 0xF0B + 4bit inline */
- 
-+static inline int lowpan_fetch_skb_u8(struct sk_buff *skb, u8 *val)
-+{
-+	if (unlikely(!pskb_may_pull(skb, 1)))
-+		return -EINVAL;
-+
-+	*val = skb->data[0];
-+	skb_pull(skb, 1);
-+
-+	return 0;
-+}
-+
-+static inline int lowpan_fetch_skb_u16(struct sk_buff *skb, u16 *val)
-+{
-+	if (unlikely(!pskb_may_pull(skb, 2)))
-+		return -EINVAL;
-+
-+	*val = (skb->data[0] << 8) | skb->data[1];
-+	skb_pull(skb, 2);
-+
-+	return 0;
-+}
-+
- static inline bool lowpan_fetch_skb(struct sk_buff *skb,
- 		void *data, const unsigned int len)
- {
-@@ -244,4 +266,14 @@ static inline bool lowpan_fetch_skb(struct sk_buff *skb,
- 	return false;
- }
- 
-+typedef int (*skb_delivery_cb)(struct sk_buff *skb, struct net_device *dev);
-+
-+int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
-+		const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
-+		const u8 *daddr, const u8 daddr_type, const u8 daddr_len,
-+		u8 iphc0, u8 iphc1, skb_delivery_cb skb_deliver);
-+int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
-+			unsigned short type, const void *_daddr,
-+			const void *_saddr, unsigned int len);
-+
- #endif /* __6LOWPAN_H__ */
-diff --git a/net/ieee802154/6lowpan_iphc.c b/net/ieee802154/6lowpan_iphc.c
+ /* L2CAP Control Field bit masks */
+ #define L2CAP_CTRL_SAR			0xC000
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
 new file mode 100644
-index 0000000..57c0b7a
+index 0000000..ba840fe
 --- /dev/null
-+++ b/net/ieee802154/6lowpan_iphc.c
-@@ -0,0 +1,807 @@
++++ b/net/bluetooth/6lowpan.c
+@@ -0,0 +1,886 @@
 +/*
-+ * Copyright 2011, Siemens AG
-+ * written by Alexander Smirnov <alex.bluesman.smirnov@gmail.com>
-+ */
++   Copyright (c) 2013 Intel Corp.
 +
-+/*
-+ * Based on patches from Jon Smirl <jonsmirl@gmail.com>
-+ * Copyright (c) 2011 Jon Smirl <jonsmirl@gmail.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2
-+ * as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, write to the Free Software Foundation, Inc.,
-+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-+ */
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License version 2 and
++   only version 2 as published by the Free Software Foundation.
 +
-+/* Jon's code is based on 6lowpan implementation for Contiki which is:
-+ * Copyright (c) 2008, Swedish Institute of Computer Science.
-+ * All rights reserved.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ * 1. Redistributions of source code must retain the above copyright
-+ *    notice, this list of conditions and the following disclaimer.
-+ * 2. Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in the
-+ *    documentation and/or other materials provided with the distribution.
-+ * 3. Neither the name of the Institute nor the names of its contributors
-+ *    may be used to endorse or promote products derived from this software
-+ *    without specific prior written permission.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
-+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
-+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-+ * SUCH DAMAGE.
-+ */
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++*/
 +
-+#include <linux/bitops.h>
++#include <linux/version.h>
 +#include <linux/if_arp.h>
 +#include <linux/netdevice.h>
-+#include <net/ipv6.h>
-+#include <net/af_ieee802154.h>
++#include <linux/etherdevice.h>
 +
-+#include "6lowpan.h"
++#include <net/ipv6.h>
++#include <net/ip6_route.h>
++#include <net/addrconf.h>
++
++#include <net/af_ieee802154.h> /* to get the address type */
++
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++#include <net/bluetooth/l2cap.h>
++
++#include "../ieee802154/6lowpan.h" /* for the compression support */
++
++#define IFACE_NAME_TEMPLATE "bt%d"
++#define EUI64_ADDR_LEN 8
++
++struct skb_cb {
++	struct in6_addr addr;
++	struct l2cap_conn *conn;
++};
++#define lowpan_cb(skb) ((struct skb_cb *)((skb)->cb))
++
++/* The devices list contains those devices that we are acting
++ * as a proxy. The BT 6LoWPAN device is a virtual device that
++ * connects to the Bluetooth LE device. The real connection to
++ * BT device is done via l2cap layer. There exists one
++ * virtual device / one BT 6LoWPAN network (=hciX device).
++ * The list contains struct lowpan_dev elements.
++ */
++static LIST_HEAD(bt_6lowpan_devices);
++static DEFINE_RWLOCK(devices_lock);
++
++struct lowpan_peer {
++	struct list_head list;
++	struct l2cap_conn *conn;
++
++	/* peer addresses in various formats */
++	unsigned char eui64_addr[EUI64_ADDR_LEN];
++	struct in6_addr peer_addr;
++};
++
++struct lowpan_dev {
++	struct list_head list;
++
++	struct hci_dev *hdev;
++	struct net_device *netdev;
++	struct list_head peers;
++	atomic_t peer_count; /* number of items in peers list */
++
++	struct work_struct delete_netdev;
++	struct delayed_work notify_peers;
++};
++
++static inline struct lowpan_dev *lowpan_dev(const struct net_device *netdev)
++{
++	return netdev_priv(netdev);
++}
++
++static inline void peer_add(struct lowpan_dev *dev, struct lowpan_peer *peer)
++{
++	list_add(&peer->list, &dev->peers);
++	atomic_inc(&dev->peer_count);
++}
++
++static inline bool peer_del(struct lowpan_dev *dev, struct lowpan_peer *peer)
++{
++	list_del(&peer->list);
++
++	if (atomic_dec_and_test(&dev->peer_count)) {
++		BT_DBG("last peer");
++		return true;
++	}
++
++	return false;
++}
++
++static inline struct lowpan_peer *peer_lookup_ba(struct lowpan_dev *dev,
++						 bdaddr_t *ba, __u8 type)
++{
++	struct lowpan_peer *peer, *tmp;
++
++	BT_DBG("peers %d addr %pMR type %d", atomic_read(&dev->peer_count),
++	       ba, type);
++
++	list_for_each_entry_safe(peer, tmp, &dev->peers, list) {
++		BT_DBG("addr %pMR type %d",
++		       &peer->conn->hcon->dst, peer->conn->hcon->dst_type);
++
++		if (bacmp(&peer->conn->hcon->dst, ba))
++			continue;
++
++		if (type == peer->conn->hcon->dst_type)
++			return peer;
++	}
++
++	return NULL;
++}
++
++static inline struct lowpan_peer *peer_lookup_conn(struct lowpan_dev *dev,
++						   struct l2cap_conn *conn)
++{
++	struct lowpan_peer *peer, *tmp;
++
++	list_for_each_entry_safe(peer, tmp, &dev->peers, list) {
++		if (peer->conn == conn)
++			return peer;
++	}
++
++	return NULL;
++}
++
++static struct lowpan_peer *lookup_peer(struct l2cap_conn *conn)
++{
++	struct lowpan_dev *entry, *tmp;
++	struct lowpan_peer *peer = NULL;
++	unsigned long flags;
++
++	read_lock_irqsave(&devices_lock, flags);
++
++	list_for_each_entry_safe(entry, tmp, &bt_6lowpan_devices, list) {
++		peer = peer_lookup_conn(entry, conn);
++		if (peer)
++			break;
++	}
++
++	read_unlock_irqrestore(&devices_lock, flags);
++
++	return peer;
++}
++
++static struct lowpan_dev *lookup_dev(struct l2cap_conn *conn)
++{
++	struct lowpan_dev *entry, *tmp;
++	struct lowpan_dev *dev = NULL;
++	unsigned long flags;
++
++	read_lock_irqsave(&devices_lock, flags);
++
++	list_for_each_entry_safe(entry, tmp, &bt_6lowpan_devices, list) {
++		if (conn->hcon->hdev == entry->hdev) {
++			dev = entry;
++			break;
++		}
++	}
++
++	read_unlock_irqrestore(&devices_lock, flags);
++
++	return dev;
++}
 +
 +/* print data in line */
 +static inline void raw_dump_inline(const char *caller, char *msg,
@@ -987,758 +247,837 @@ index 0000000..57c0b7a
 +{
 +	if (msg)
 +		pr_debug("%s():%s: ", caller, msg);
++
 +	print_hex_dump_debug("", DUMP_PREFIX_NONE,
-+		       16, 1, buf, len, false);
++			     16, 1, buf, len, false);
 +}
 +
-+/*
-+ * print data in a table format:
++/* print data in a table format:
 + *
 + * addr: xx xx xx xx xx xx
 + * addr: xx xx xx xx xx xx
 + * ...
 + */
 +static inline void raw_dump_table(const char *caller, char *msg,
-+				unsigned char *buf, int len)
++				  unsigned char *buf, int len)
 +{
 +	if (msg)
 +		pr_debug("%s():%s:\n", caller, msg);
++
 +	print_hex_dump_debug("\t", DUMP_PREFIX_OFFSET,
-+		       16, 1, buf, len, false);
++			     16, 1, buf, len, false);
 +}
 +
-+/*
-+ * Uncompress address function for source and
-+ * destination address(non-multicast).
-+ *
-+ * address_mode is sam value or dam value.
-+ */
-+static int uncompress_addr(struct sk_buff *skb,
-+				struct in6_addr *ipaddr, const u8 address_mode,
-+				const u8 *lladdr, const u8 addr_type,
-+				const u8 addr_len)
++static int give_skb_to_upper(struct sk_buff *skb, struct net_device *dev)
 +{
-+	bool fail;
++	struct sk_buff *skb_cp;
++	int ret;
 +
-+	switch (address_mode) {
-+	case LOWPAN_IPHC_ADDR_00:
-+		/* for global link addresses */
-+		fail = lowpan_fetch_skb(skb, ipaddr->s6_addr, 16);
-+		break;
-+	case LOWPAN_IPHC_ADDR_01:
-+		/* fe:80::XXXX:XXXX:XXXX:XXXX */
-+		ipaddr->s6_addr[0] = 0xFE;
-+		ipaddr->s6_addr[1] = 0x80;
-+		fail = lowpan_fetch_skb(skb, &ipaddr->s6_addr[8], 8);
-+		break;
-+	case LOWPAN_IPHC_ADDR_02:
-+		/* fe:80::ff:fe00:XXXX */
-+		ipaddr->s6_addr[0] = 0xFE;
-+		ipaddr->s6_addr[1] = 0x80;
-+		ipaddr->s6_addr[11] = 0xFF;
-+		ipaddr->s6_addr[12] = 0xFE;
-+		fail = lowpan_fetch_skb(skb, &ipaddr->s6_addr[14], 2);
-+		break;
-+	case LOWPAN_IPHC_ADDR_03:
-+		fail = false;
-+		switch (addr_type) {
-+		case IEEE802154_ADDR_LONG:
-+			/* fe:80::XXXX:XXXX:XXXX:XXXX
-+			 *        \_________________/
-+			 *              hwaddr
-+			 */
-+			ipaddr->s6_addr[0] = 0xFE;
-+			ipaddr->s6_addr[1] = 0x80;
-+			memcpy(&ipaddr->s6_addr[8], lladdr, addr_len);
-+			/* second bit-flip (Universe/Local)
-+			 * is done according RFC2464
-+			 */
-+			ipaddr->s6_addr[8] ^= 0x02;
-+			break;
-+		case IEEE802154_ADDR_SHORT:
-+			/* fe:80::ff:fe00:XXXX
-+			 *		  \__/
-+			 *	       short_addr
-+			 *
-+			 * Universe/Local bit is zero.
-+			 */
-+			ipaddr->s6_addr[0] = 0xFE;
-+			ipaddr->s6_addr[1] = 0x80;
-+			ipaddr->s6_addr[11] = 0xFF;
-+			ipaddr->s6_addr[12] = 0xFE;
-+			ipaddr->s6_addr16[7] = htons(*((u16 *)lladdr));
-+			break;
-+		default:
-+			pr_debug("Invalid addr_type set\n");
-+			return -EINVAL;
-+		}
-+		break;
-+	default:
-+		pr_debug("Invalid address mode value: 0x%x\n", address_mode);
-+		return -EINVAL;
-+	}
-+
-+	if (fail) {
-+		pr_debug("Failed to fetch skb data\n");
-+		return -EIO;
-+	}
-+
-+	raw_dump_inline(NULL, "Reconstructed ipv6 addr is",
-+			ipaddr->s6_addr, 16);
-+
-+	return 0;
-+}
-+
-+/*
-+ * Uncompress address function for source context
-+ * based address(non-multicast).
-+ */
-+static int uncompress_context_based_src_addr(struct sk_buff *skb,
-+						struct in6_addr *ipaddr,
-+						const u8 sam)
-+{
-+	switch (sam) {
-+	case LOWPAN_IPHC_ADDR_00:
-+		/* unspec address ::
-+		 * Do nothing, address is already ::
-+		 */
-+		break;
-+	case LOWPAN_IPHC_ADDR_01:
-+		/* TODO */
-+	case LOWPAN_IPHC_ADDR_02:
-+		/* TODO */
-+	case LOWPAN_IPHC_ADDR_03:
-+		/* TODO */
-+		netdev_warn(skb->dev, "SAM value 0x%x not supported\n", sam);
-+		return -EINVAL;
-+	default:
-+		pr_debug("Invalid sam value: 0x%x\n", sam);
-+		return -EINVAL;
-+	}
-+
-+	raw_dump_inline(NULL,
-+			"Reconstructed context based ipv6 src addr is",
-+			ipaddr->s6_addr, 16);
-+
-+	return 0;
-+}
-+
-+static int skb_deliver(struct sk_buff *skb, struct ipv6hdr *hdr,
-+		struct net_device *dev, skb_delivery_cb deliver_skb)
-+{
-+	struct sk_buff *new;
-+	int stat;
-+
-+	new = skb_copy_expand(skb, sizeof(struct ipv6hdr), skb_tailroom(skb),
-+								GFP_ATOMIC);
-+	kfree_skb(skb);
-+
-+	if (!new)
++	skb_cp = skb_copy(skb, GFP_ATOMIC);
++	if (!skb_cp)
 +		return -ENOMEM;
 +
-+	skb_push(new, sizeof(struct ipv6hdr));
-+	skb_reset_network_header(new);
-+	skb_copy_to_linear_data(new, hdr, sizeof(struct ipv6hdr));
++	ret = netif_rx(skb_cp);
 +
-+	new->protocol = htons(ETH_P_IPV6);
-+	new->pkt_type = PACKET_HOST;
-+	new->dev = dev;
++	BT_DBG("receive skb %d", ret);
++	if (ret < 0)
++		return NET_RX_DROP;
 +
-+	raw_dump_table(__func__, "raw skb data dump before receiving",
-+			new->data, new->len);
-+
-+	stat = deliver_skb(new, dev);
-+
-+	kfree_skb(new);
-+
-+	return stat;
++	return ret;
 +}
 +
-+/* Uncompress function for multicast destination address,
-+ * when M bit is set.
-+ */
-+static int
-+lowpan_uncompress_multicast_daddr(struct sk_buff *skb,
-+		struct in6_addr *ipaddr,
-+		const u8 dam)
++static int process_data(struct sk_buff *skb, struct net_device *netdev,
++			struct l2cap_conn *conn)
 +{
-+	bool fail;
++	const u8 *saddr, *daddr;
++	u8 iphc0, iphc1;
++	struct lowpan_dev *dev;
++	struct lowpan_peer *peer;
++	unsigned long flags;
 +
-+	switch (dam) {
-+	case LOWPAN_IPHC_DAM_00:
-+		/* 00:  128 bits.  The full address
-+		 * is carried in-line.
-+		 */
-+		fail = lowpan_fetch_skb(skb, ipaddr->s6_addr, 16);
-+		break;
-+	case LOWPAN_IPHC_DAM_01:
-+		/* 01:  48 bits.  The address takes
-+		 * the form ffXX::00XX:XXXX:XXXX.
-+		 */
-+		ipaddr->s6_addr[0] = 0xFF;
-+		fail = lowpan_fetch_skb(skb, &ipaddr->s6_addr[1], 1);
-+		fail |= lowpan_fetch_skb(skb, &ipaddr->s6_addr[11], 5);
-+		break;
-+	case LOWPAN_IPHC_DAM_10:
-+		/* 10:  32 bits.  The address takes
-+		 * the form ffXX::00XX:XXXX.
-+		 */
-+		ipaddr->s6_addr[0] = 0xFF;
-+		fail = lowpan_fetch_skb(skb, &ipaddr->s6_addr[1], 1);
-+		fail |= lowpan_fetch_skb(skb, &ipaddr->s6_addr[13], 3);
-+		break;
-+	case LOWPAN_IPHC_DAM_11:
-+		/* 11:  8 bits.  The address takes
-+		 * the form ff02::00XX.
-+		 */
-+		ipaddr->s6_addr[0] = 0xFF;
-+		ipaddr->s6_addr[1] = 0x02;
-+		fail = lowpan_fetch_skb(skb, &ipaddr->s6_addr[15], 1);
-+		break;
-+	default:
-+		pr_debug("DAM value has a wrong value: 0x%x\n", dam);
-+		return -EINVAL;
-+	}
++	dev = lowpan_dev(netdev);
 +
-+	if (fail) {
-+		pr_debug("Failed to fetch skb data\n");
-+		return -EIO;
-+	}
-+
-+	raw_dump_inline(NULL, "Reconstructed ipv6 multicast addr is",
-+				ipaddr->s6_addr, 16);
-+
-+	return 0;
-+}
-+
-+static int
-+uncompress_udp_header(struct sk_buff *skb, struct udphdr *uh)
-+{
-+	u8 tmp;
-+
-+	if (!uh)
-+		goto err;
-+
-+	if (lowpan_fetch_skb_u8(skb, &tmp))
-+		goto err;
-+
-+	if ((tmp & LOWPAN_NHC_UDP_MASK) == LOWPAN_NHC_UDP_ID) {
-+		pr_debug("UDP header uncompression\n");
-+		switch (tmp & LOWPAN_NHC_UDP_CS_P_11) {
-+		case LOWPAN_NHC_UDP_CS_P_00:
-+			memcpy(&uh->source, &skb->data[0], 2);
-+			memcpy(&uh->dest, &skb->data[2], 2);
-+			skb_pull(skb, 4);
-+			break;
-+		case LOWPAN_NHC_UDP_CS_P_01:
-+			memcpy(&uh->source, &skb->data[0], 2);
-+			uh->dest =
-+			   skb->data[2] + LOWPAN_NHC_UDP_8BIT_PORT;
-+			skb_pull(skb, 3);
-+			break;
-+		case LOWPAN_NHC_UDP_CS_P_10:
-+			uh->source = skb->data[0] + LOWPAN_NHC_UDP_8BIT_PORT;
-+			memcpy(&uh->dest, &skb->data[1], 2);
-+			skb_pull(skb, 3);
-+			break;
-+		case LOWPAN_NHC_UDP_CS_P_11:
-+			uh->source =
-+			   LOWPAN_NHC_UDP_4BIT_PORT + (skb->data[0] >> 4);
-+			uh->dest =
-+			   LOWPAN_NHC_UDP_4BIT_PORT + (skb->data[0] & 0x0f);
-+			skb_pull(skb, 1);
-+			break;
-+		default:
-+			pr_debug("ERROR: unknown UDP format\n");
-+			goto err;
-+			break;
-+		}
-+
-+		pr_debug("uncompressed UDP ports: src = %d, dst = %d\n",
-+			 uh->source, uh->dest);
-+
-+		/* copy checksum */
-+		memcpy(&uh->check, &skb->data[0], 2);
-+		skb_pull(skb, 2);
-+
-+		/*
-+		 * UDP lenght needs to be infered from the lower layers
-+		 * here, we obtain the hint from the remaining size of the
-+		 * frame
-+		 */
-+		uh->len = htons(skb->len + sizeof(struct udphdr));
-+		pr_debug("uncompressed UDP length: src = %d", uh->len);
-+	} else {
-+		pr_debug("ERROR: unsupported NH format\n");
-+		goto err;
-+	}
-+
-+	return 0;
-+err:
-+	return -EINVAL;
-+}
-+
-+/* TTL uncompression values */
-+static const u8 lowpan_ttl_values[] = { 0, 1, 64, 255 };
-+
-+int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
-+		const u8 *saddr, const u8 saddr_type, const u8 saddr_len,
-+		const u8 *daddr, const u8 daddr_type, const u8 daddr_len,
-+		u8 iphc0, u8 iphc1, skb_delivery_cb deliver_skb)
-+{
-+	struct ipv6hdr hdr = {};
-+	u8 tmp, num_context = 0;
-+	int err;
-+
-+	raw_dump_table(__func__, "raw skb data dump uncompressed",
-+				skb->data, skb->len);
-+
-+	/* another if the CID flag is set */
-+	if (iphc1 & LOWPAN_IPHC_CID) {
-+		pr_debug("CID flag is set, increase header with one\n");
-+		if (lowpan_fetch_skb_u8(skb, &num_context))
-+			goto drop;
-+	}
-+
-+	hdr.version = 6;
-+
-+	/* Traffic Class and Flow Label */
-+	switch ((iphc0 & LOWPAN_IPHC_TF) >> 3) {
-+	/*
-+	 * Traffic Class and FLow Label carried in-line
-+	 * ECN + DSCP + 4-bit Pad + Flow Label (4 bytes)
-+	 */
-+	case 0: /* 00b */
-+		if (lowpan_fetch_skb_u8(skb, &tmp))
-+			goto drop;
-+
-+		memcpy(&hdr.flow_lbl, &skb->data[0], 3);
-+		skb_pull(skb, 3);
-+		hdr.priority = ((tmp >> 2) & 0x0f);
-+		hdr.flow_lbl[0] = ((tmp >> 2) & 0x30) | (tmp << 6) |
-+					(hdr.flow_lbl[0] & 0x0f);
-+		break;
-+	/*
-+	 * Traffic class carried in-line
-+	 * ECN + DSCP (1 byte), Flow Label is elided
-+	 */
-+	case 2: /* 10b */
-+		if (lowpan_fetch_skb_u8(skb, &tmp))
-+			goto drop;
-+
-+		hdr.priority = ((tmp >> 2) & 0x0f);
-+		hdr.flow_lbl[0] = ((tmp << 6) & 0xC0) | ((tmp >> 2) & 0x30);
-+		break;
-+	/*
-+	 * Flow Label carried in-line
-+	 * ECN + 2-bit Pad + Flow Label (3 bytes), DSCP is elided
-+	 */
-+	case 1: /* 01b */
-+		if (lowpan_fetch_skb_u8(skb, &tmp))
-+			goto drop;
-+
-+		hdr.flow_lbl[0] = (skb->data[0] & 0x0F) | ((tmp >> 2) & 0x30);
-+		memcpy(&hdr.flow_lbl[1], &skb->data[0], 2);
-+		skb_pull(skb, 2);
-+		break;
-+	/* Traffic Class and Flow Label are elided */
-+	case 3: /* 11b */
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	/* Next Header */
-+	if ((iphc0 & LOWPAN_IPHC_NH_C) == 0) {
-+		/* Next header is carried inline */
-+		if (lowpan_fetch_skb_u8(skb, &(hdr.nexthdr)))
-+			goto drop;
-+
-+		pr_debug("NH flag is set, next header carried inline: %02x\n",
-+			 hdr.nexthdr);
-+	}
-+
-+	/* Hop Limit */
-+	if ((iphc0 & 0x03) != LOWPAN_IPHC_TTL_I)
-+		hdr.hop_limit = lowpan_ttl_values[iphc0 & 0x03];
-+	else {
-+		if (lowpan_fetch_skb_u8(skb, &(hdr.hop_limit)))
-+			goto drop;
-+	}
-+
-+	/* Extract SAM to the tmp variable */
-+	tmp = ((iphc1 & LOWPAN_IPHC_SAM) >> LOWPAN_IPHC_SAM_BIT) & 0x03;
-+
-+	if (iphc1 & LOWPAN_IPHC_SAC) {
-+		/* Source address context based uncompression */
-+		pr_debug("SAC bit is set. Handle context based source address.\n");
-+		err = uncompress_context_based_src_addr(
-+				skb, &hdr.saddr, tmp);
-+	} else {
-+		/* Source address uncompression */
-+		pr_debug("source address stateless compression\n");
-+		err = uncompress_addr(skb, &hdr.saddr, tmp, saddr,
-+					saddr_type, saddr_len);
-+	}
-+
-+	/* Check on error of previous branch */
-+	if (err)
++	read_lock_irqsave(&devices_lock, flags);
++	peer = peer_lookup_conn(dev, conn);
++	read_unlock_irqrestore(&devices_lock, flags);
++	if (!peer)
 +		goto drop;
 +
-+	/* Extract DAM to the tmp variable */
-+	tmp = ((iphc1 & LOWPAN_IPHC_DAM_11) >> LOWPAN_IPHC_DAM_BIT) & 0x03;
++	saddr = peer->eui64_addr;
++	daddr = dev->netdev->dev_addr;
 +
-+	/* check for Multicast Compression */
-+	if (iphc1 & LOWPAN_IPHC_M) {
-+		if (iphc1 & LOWPAN_IPHC_DAC) {
-+			pr_debug("dest: context-based mcast compression\n");
-+			/* TODO: implement this */
-+		} else {
-+			err = lowpan_uncompress_multicast_daddr(
-+						skb, &hdr.daddr, tmp);
-+			if (err)
-+				goto drop;
-+		}
-+	} else {
-+		err = uncompress_addr(skb, &hdr.daddr, tmp, daddr,
-+					daddr_type, daddr_len);
-+		pr_debug("dest: stateless compression mode %d dest %pI6c\n",
-+			tmp, &hdr.daddr);
-+		if (err)
-+			goto drop;
-+	}
++	/* at least two bytes will be used for the encoding */
++	if (skb->len < 2)
++		goto drop;
 +
-+	/* UDP data uncompression */
-+	if (iphc0 & LOWPAN_IPHC_NH_C) {
-+		struct udphdr uh;
-+		struct sk_buff *new;
-+		if (uncompress_udp_header(skb, &uh))
-+			goto drop;
++	if (lowpan_fetch_skb_u8(skb, &iphc0))
++		goto drop;
 +
-+		/*
-+		 * replace the compressed UDP head by the uncompressed UDP
-+		 * header
-+		 */
-+		new = skb_copy_expand(skb, sizeof(struct udphdr),
-+				      skb_tailroom(skb), GFP_ATOMIC);
-+		kfree_skb(skb);
++	if (lowpan_fetch_skb_u8(skb, &iphc1))
++		goto drop;
 +
-+		if (!new)
-+			return -ENOMEM;
-+
-+		skb = new;
-+
-+		skb_push(skb, sizeof(struct udphdr));
-+		skb_reset_transport_header(skb);
-+		skb_copy_to_linear_data(skb, &uh, sizeof(struct udphdr));
-+
-+		raw_dump_table(__func__, "raw UDP header dump",
-+				      (u8 *)&uh, sizeof(uh));
-+
-+		hdr.nexthdr = UIP_PROTO_UDP;
-+	}
-+
-+	hdr.payload_len = htons(skb->len);
-+
-+	pr_debug("skb headroom size = %d, data length = %d\n",
-+		 skb_headroom(skb), skb->len);
-+
-+	pr_debug("IPv6 header dump:\n\tversion = %d\n\tlength  = %d\n\t"
-+		 "nexthdr = 0x%02x\n\thop_lim = %d\n\tdest    = %pI6c\n",
-+		hdr.version, ntohs(hdr.payload_len), hdr.nexthdr,
-+		hdr.hop_limit, &hdr.daddr);
-+
-+	raw_dump_table(__func__, "raw header dump", (u8 *)&hdr,
-+							sizeof(hdr));
-+
-+	return skb_deliver(skb, &hdr, dev, deliver_skb);
++	return lowpan_process_data(skb, netdev,
++				   saddr, IEEE802154_ADDR_LONG, EUI64_ADDR_LEN,
++				   daddr, IEEE802154_ADDR_LONG, EUI64_ADDR_LEN,
++				   iphc0, iphc1, give_skb_to_upper);
 +
 +drop:
 +	kfree_skb(skb);
 +	return -EINVAL;
 +}
-+EXPORT_SYMBOL_GPL(lowpan_process_data);
 +
-+static u8 lowpan_compress_addr_64(u8 **hc06_ptr, u8 shift,
-+				const struct in6_addr *ipaddr,
-+				const unsigned char *lladdr)
++static int recv_pkt(struct sk_buff *skb, struct net_device *dev,
++		    struct l2cap_conn *conn)
 +{
-+	u8 val = 0;
++	struct sk_buff *local_skb;
++	int ret;
 +
-+	if (is_addr_mac_addr_based(ipaddr, lladdr)) {
-+		val = 3; /* 0-bits */
-+		pr_debug("address compression 0 bits\n");
-+	} else if (lowpan_is_iid_16_bit_compressable(ipaddr)) {
-+		/* compress IID to 16 bits xxxx::XXXX */
-+		memcpy(*hc06_ptr, &ipaddr->s6_addr16[7], 2);
-+		*hc06_ptr += 2;
-+		val = 2; /* 16-bits */
-+		raw_dump_inline(NULL, "Compressed ipv6 addr is (16 bits)",
-+			*hc06_ptr - 2, 2);
++	if (!netif_running(dev))
++		goto drop;
++
++	if (dev->type != ARPHRD_6LOWPAN)
++		goto drop;
++
++	/* check that it's our buffer */
++	if (skb->data[0] == LOWPAN_DISPATCH_IPV6) {
++		/* Copy the packet so that the IPv6 header is
++		 * properly aligned.
++		 */
++		local_skb = skb_copy_expand(skb, NET_SKB_PAD - 1,
++					    skb_tailroom(skb), GFP_ATOMIC);
++		if (!local_skb)
++			goto drop;
++
++		local_skb->protocol = htons(ETH_P_IPV6);
++		local_skb->pkt_type = PACKET_HOST;
++
++		skb_reset_network_header(local_skb);
++		skb_set_transport_header(local_skb, sizeof(struct ipv6hdr));
++
++		if (give_skb_to_upper(local_skb, dev) != NET_RX_SUCCESS) {
++			kfree_skb(local_skb);
++			goto drop;
++		}
++
++		dev->stats.rx_bytes += skb->len;
++		dev->stats.rx_packets++;
++
++		kfree_skb(local_skb);
++		kfree_skb(skb);
 +	} else {
-+		/* do not compress IID => xxxx::IID */
-+		memcpy(*hc06_ptr, &ipaddr->s6_addr16[4], 8);
-+		*hc06_ptr += 8;
-+		val = 1; /* 64-bits */
-+		raw_dump_inline(NULL, "Compressed ipv6 addr is (64 bits)",
-+			*hc06_ptr - 8, 8);
++		switch (skb->data[0] & 0xe0) {
++		case LOWPAN_DISPATCH_IPHC:	/* ipv6 datagram */
++			local_skb = skb_clone(skb, GFP_ATOMIC);
++			if (!local_skb)
++				goto drop;
++
++			ret = process_data(local_skb, dev, conn);
++			if (ret != NET_RX_SUCCESS)
++				goto drop;
++
++			dev->stats.rx_bytes += skb->len;
++			dev->stats.rx_packets++;
++
++			kfree_skb(skb);
++			break;
++		default:
++			break;
++		}
 +	}
 +
-+	return rol8(val, shift);
++	return NET_RX_SUCCESS;
++
++drop:
++	kfree_skb(skb);
++	return NET_RX_DROP;
 +}
 +
-+static void compress_udp_header(u8 **hc06_ptr, struct sk_buff *skb)
++/* Packet from BT LE device */
++int bt_6lowpan_recv(struct l2cap_conn *conn, struct sk_buff *skb)
 +{
-+	struct udphdr *uh = udp_hdr(skb);
++	struct lowpan_dev *dev;
++	struct lowpan_peer *peer;
++	int err;
 +
-+	if (((uh->source & LOWPAN_NHC_UDP_4BIT_MASK) ==
-+				LOWPAN_NHC_UDP_4BIT_PORT) &&
-+	    ((uh->dest & LOWPAN_NHC_UDP_4BIT_MASK) ==
-+				LOWPAN_NHC_UDP_4BIT_PORT)) {
-+		pr_debug("UDP header: both ports compression to 4 bits\n");
-+		**hc06_ptr = LOWPAN_NHC_UDP_CS_P_11;
-+		**(hc06_ptr + 1) = /* subtraction is faster */
-+		   (u8)((uh->dest - LOWPAN_NHC_UDP_4BIT_PORT) +
-+		       ((uh->source & LOWPAN_NHC_UDP_4BIT_PORT) << 4));
-+		*hc06_ptr += 2;
-+	} else if ((uh->dest & LOWPAN_NHC_UDP_8BIT_MASK) ==
-+			LOWPAN_NHC_UDP_8BIT_PORT) {
-+		pr_debug("UDP header: remove 8 bits of dest\n");
-+		**hc06_ptr = LOWPAN_NHC_UDP_CS_P_01;
-+		memcpy(*hc06_ptr + 1, &uh->source, 2);
-+		**(hc06_ptr + 3) = (u8)(uh->dest - LOWPAN_NHC_UDP_8BIT_PORT);
-+		*hc06_ptr += 4;
-+	} else if ((uh->source & LOWPAN_NHC_UDP_8BIT_MASK) ==
-+			LOWPAN_NHC_UDP_8BIT_PORT) {
-+		pr_debug("UDP header: remove 8 bits of source\n");
-+		**hc06_ptr = LOWPAN_NHC_UDP_CS_P_10;
-+		memcpy(*hc06_ptr + 1, &uh->dest, 2);
-+		**(hc06_ptr + 3) = (u8)(uh->source - LOWPAN_NHC_UDP_8BIT_PORT);
-+		*hc06_ptr += 4;
-+	} else {
-+		pr_debug("UDP header: can't compress\n");
-+		**hc06_ptr = LOWPAN_NHC_UDP_CS_P_00;
-+		memcpy(*hc06_ptr + 1, &uh->source, 2);
-+		memcpy(*hc06_ptr + 3, &uh->dest, 2);
-+		*hc06_ptr += 5;
++	peer = lookup_peer(conn);
++	if (!peer)
++		return -ENOENT;
++
++	dev = lookup_dev(conn);
++	if (dev && !dev->netdev)
++		return -ENOENT;
++
++	err = recv_pkt(skb, dev->netdev, conn);
++	BT_DBG("recv pkt %d", err);
++
++	return err;
++}
++
++static inline int skbuff_copy(void *msg, int len, int count, int mtu,
++			      struct sk_buff *skb, struct net_device *dev)
++{
++	struct sk_buff **frag;
++	int sent = 0;
++
++	memcpy(skb_put(skb, count), msg, count);
++
++	sent += count;
++	msg  += count;
++	len  -= count;
++
++	dev->stats.tx_bytes += count;
++	dev->stats.tx_packets++;
++
++	raw_dump_table(__func__, "Sending", skb->data, skb->len);
++
++	/* Continuation fragments (no L2CAP header) */
++	frag = &skb_shinfo(skb)->frag_list;
++	while (len > 0) {
++		struct sk_buff *tmp;
++
++		count = min_t(unsigned int, mtu, len);
++
++		tmp = bt_skb_alloc(count, GFP_ATOMIC);
++		if (IS_ERR(tmp))
++			return PTR_ERR(tmp);
++
++		*frag = tmp;
++
++		memcpy(skb_put(*frag, count), msg, count);
++
++		raw_dump_table(__func__, "Sending fragment",
++			       (*frag)->data, count);
++
++		(*frag)->priority = skb->priority;
++
++		sent += count;
++		msg  += count;
++		len  -= count;
++
++		skb->len += (*frag)->len;
++		skb->data_len += (*frag)->len;
++
++		frag = &(*frag)->next;
++
++		dev->stats.tx_bytes += count;
++		dev->stats.tx_packets++;
 +	}
 +
-+	/* checksum is always inline */
-+	memcpy(*hc06_ptr, &uh->check, 2);
-+	*hc06_ptr += 2;
-+
-+	/* skip the UDP header */
-+	skb_pull(skb, sizeof(struct udphdr));
++	return sent;
 +}
 +
-+int lowpan_header_compress(struct sk_buff *skb, struct net_device *dev,
-+			unsigned short type, const void *_daddr,
-+			const void *_saddr, unsigned int len)
++static struct sk_buff *create_pdu(struct l2cap_conn *conn, void *msg,
++				  size_t len, u32 priority,
++				  struct net_device *dev)
 +{
-+	u8 tmp, iphc0, iphc1, *hc06_ptr;
++	struct sk_buff *skb;
++	int err, count;
++	struct l2cap_hdr *lh;
++
++	/* FIXME: This mtu check should be not needed and atm is only used for
++	 * testing purposes
++	 */
++	if (conn->mtu > (L2CAP_LE_MIN_MTU + L2CAP_HDR_SIZE))
++		conn->mtu = L2CAP_LE_MIN_MTU + L2CAP_HDR_SIZE;
++
++	count = min_t(unsigned int, (conn->mtu - L2CAP_HDR_SIZE), len);
++
++	BT_DBG("conn %p len %zu mtu %d count %d", conn, len, conn->mtu, count);
++
++	skb = bt_skb_alloc(count + L2CAP_HDR_SIZE, GFP_ATOMIC);
++	if (IS_ERR(skb))
++		return skb;
++
++	skb->priority = priority;
++
++	lh = (struct l2cap_hdr *)skb_put(skb, L2CAP_HDR_SIZE);
++	lh->cid = cpu_to_le16(L2CAP_FC_6LOWPAN);
++	lh->len = cpu_to_le16(len);
++
++	err = skbuff_copy(msg, len, count, conn->mtu, skb, dev);
++	if (unlikely(err < 0)) {
++		kfree_skb(skb);
++		BT_DBG("skbuff copy %d failed", err);
++		return ERR_PTR(err);
++	}
++
++	return skb;
++}
++
++static int conn_send(struct l2cap_conn *conn,
++		     void *msg, size_t len, u32 priority,
++		     struct net_device *dev)
++{
++	struct sk_buff *skb;
++
++	skb = create_pdu(conn, msg, len, priority, dev);
++	if (IS_ERR(skb))
++		return -EINVAL;
++
++	BT_DBG("conn %p skb %p len %d priority %u", conn, skb, skb->len,
++	       skb->priority);
++
++	hci_send_acl(conn->hchan, skb, ACL_START);
++
++	return 0;
++}
++
++static void get_dest_bdaddr(struct in6_addr *ip6_daddr,
++			    bdaddr_t *addr, u8 *addr_type)
++{
++	u8 *eui64;
++
++	eui64 = ip6_daddr->s6_addr + 8;
++
++	addr->b[0] = eui64[7];
++	addr->b[1] = eui64[6];
++	addr->b[2] = eui64[5];
++	addr->b[3] = eui64[2];
++	addr->b[4] = eui64[1];
++	addr->b[5] = eui64[0];
++
++	addr->b[5] ^= 2;
++
++	/* Set universal/local bit to 0 */
++	if (addr->b[5] & 1) {
++		addr->b[5] &= ~1;
++		*addr_type = BDADDR_LE_PUBLIC;
++	} else {
++		*addr_type = BDADDR_LE_RANDOM;
++	}
++}
++
++static int header_create(struct sk_buff *skb, struct net_device *netdev,
++		         unsigned short type, const void *_daddr,
++		         const void *_saddr, unsigned int len)
++{
 +	struct ipv6hdr *hdr;
-+	u8 head[100] = {};
++	struct lowpan_dev *dev;
++	struct lowpan_peer *peer;
++	bdaddr_t addr, *any = BDADDR_ANY;
++	u8 *saddr, *daddr = any->b;
++	u8 addr_type;
 +
 +	if (type != ETH_P_IPV6)
 +		return -EINVAL;
 +
 +	hdr = ipv6_hdr(skb);
-+	hc06_ptr = head + 2;
 +
-+	pr_debug("IPv6 header dump:\n\tversion = %d\n\tlength  = %d\n"
-+		 "\tnexthdr = 0x%02x\n\thop_lim = %d\n\tdest    = %pI6c\n",
-+		hdr->version, ntohs(hdr->payload_len), hdr->nexthdr,
-+		hdr->hop_limit, &hdr->daddr);
++	dev = lowpan_dev(netdev);
 +
-+	raw_dump_table(__func__, "raw skb network header dump",
-+		skb_network_header(skb), sizeof(struct ipv6hdr));
-+
-+	/*
-+	 * As we copy some bit-length fields, in the IPHC encoding bytes,
-+	 * we sometimes use |=
-+	 * If the field is 0, and the current bit value in memory is 1,
-+	 * this does not work. We therefore reset the IPHC encoding here
-+	 */
-+	iphc0 = LOWPAN_DISPATCH_IPHC;
-+	iphc1 = 0;
-+
-+	/* TODO: context lookup */
-+
-+	raw_dump_inline(__func__, "saddr",
-+			(unsigned char *)_saddr, IEEE802154_ADDR_LEN);
-+	raw_dump_inline(__func__, "daddr",
-+			(unsigned char *)_daddr, IEEE802154_ADDR_LEN);
-+
-+	raw_dump_table(__func__,
-+			"sending raw skb network uncompressed packet",
-+			skb->data, skb->len);
-+
-+	/*
-+	 * Traffic class, flow label
-+	 * If flow label is 0, compress it. If traffic class is 0, compress it
-+	 * We have to process both in the same time as the offset of traffic
-+	 * class depends on the presence of version and flow label
-+	 */
-+
-+	/* hc06 format of TC is ECN | DSCP , original one is DSCP | ECN */
-+	tmp = (hdr->priority << 4) | (hdr->flow_lbl[0] >> 4);
-+	tmp = ((tmp & 0x03) << 6) | (tmp >> 2);
-+
-+	if (((hdr->flow_lbl[0] & 0x0F) == 0) &&
-+	     (hdr->flow_lbl[1] == 0) && (hdr->flow_lbl[2] == 0)) {
-+		/* flow label can be compressed */
-+		iphc0 |= LOWPAN_IPHC_FL_C;
-+		if ((hdr->priority == 0) &&
-+		   ((hdr->flow_lbl[0] & 0xF0) == 0)) {
-+			/* compress (elide) all */
-+			iphc0 |= LOWPAN_IPHC_TC_C;
-+		} else {
-+			/* compress only the flow label */
-+			*hc06_ptr = tmp;
-+			hc06_ptr += 1;
-+		}
++	if (ipv6_addr_is_multicast(&hdr->daddr)) {
++		memcpy(&lowpan_cb(skb)->addr, &hdr->daddr,
++		       sizeof(struct in6_addr));
++		lowpan_cb(skb)->conn = NULL;
 +	} else {
-+		/* Flow label cannot be compressed */
-+		if ((hdr->priority == 0) &&
-+		   ((hdr->flow_lbl[0] & 0xF0) == 0)) {
-+			/* compress only traffic class */
-+			iphc0 |= LOWPAN_IPHC_TC_C;
-+			*hc06_ptr = (tmp & 0xc0) | (hdr->flow_lbl[0] & 0x0F);
-+			memcpy(hc06_ptr + 1, &hdr->flow_lbl[1], 2);
-+			hc06_ptr += 3;
-+		} else {
-+			/* compress nothing */
-+			memcpy(hc06_ptr, &hdr, 4);
-+			/* replace the top byte with new ECN | DSCP format */
-+			*hc06_ptr = tmp;
-+			hc06_ptr += 4;
++		unsigned long flags;
++
++		/* Get destination BT device from skb.
++		 * If there is no such peer then discard the packet.
++		 */
++		get_dest_bdaddr(&hdr->daddr, &addr, &addr_type);
++
++		BT_DBG("dest addr %pMR type %d", &addr, addr_type);
++
++		read_lock_irqsave(&devices_lock, flags);
++		peer = peer_lookup_ba(dev, &addr, addr_type);
++		read_unlock_irqrestore(&devices_lock, flags);
++
++		if (!peer) {
++			BT_DBG("no such peer %pMR found", &addr);
++			return -ENOENT;
++		}
++
++		daddr = peer->eui64_addr;
++
++		memcpy(&lowpan_cb(skb)->addr, &hdr->daddr,
++		       sizeof(struct in6_addr));
++		lowpan_cb(skb)->conn = peer->conn;
++	}
++
++	saddr = dev->netdev->dev_addr;
++
++	return lowpan_header_compress(skb, netdev, type, daddr, saddr, len);
++}
++
++/* Packet to BT LE device */
++static int send_pkt(struct l2cap_conn *conn, const void *saddr,
++		    const void *daddr, struct sk_buff *skb,
++		    struct net_device *netdev)
++{
++	raw_dump_table(__func__, "raw skb data dump before fragmentation",
++		       skb->data, skb->len);
++
++	return conn_send(conn, skb->data, skb->len, 0, netdev);
++}
++
++static void send_mcast_pkt(struct sk_buff *skb, struct net_device *netdev)
++{
++	struct sk_buff *local_skb;
++	struct lowpan_dev *entry, *tmp;
++	unsigned long flags;
++
++	read_lock_irqsave(&devices_lock, flags);
++
++	list_for_each_entry_safe(entry, tmp, &bt_6lowpan_devices, list) {
++		struct lowpan_peer *pentry, *ptmp;
++		struct lowpan_dev *dev;
++
++		if (entry->netdev != netdev)
++			continue;
++
++		dev = lowpan_dev(entry->netdev);
++
++		list_for_each_entry_safe(pentry, ptmp, &dev->peers, list) {
++			local_skb = skb_clone(skb, GFP_ATOMIC);
++
++			send_pkt(pentry->conn, netdev->dev_addr,
++				 pentry->eui64_addr, local_skb, netdev);
++
++			kfree_skb(local_skb);
 +		}
 +	}
 +
-+	/* NOTE: payload length is always compressed */
++	read_unlock_irqrestore(&devices_lock, flags);
++}
 +
-+	/* Next Header is compress if UDP */
-+	if (hdr->nexthdr == UIP_PROTO_UDP)
-+		iphc0 |= LOWPAN_IPHC_NH_C;
++static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
++{
++	int err = 0;
++	unsigned char *eui64_addr;
++	struct lowpan_dev *dev;
++	struct lowpan_peer *peer;
++	bdaddr_t addr;
++	u8 addr_type;
 +
-+	if ((iphc0 & LOWPAN_IPHC_NH_C) == 0) {
-+		*hc06_ptr = hdr->nexthdr;
-+		hc06_ptr += 1;
-+	}
-+
-+	/*
-+	 * Hop limit
-+	 * if 1:   compress, encoding is 01
-+	 * if 64:  compress, encoding is 10
-+	 * if 255: compress, encoding is 11
-+	 * else do not compress
-+	 */
-+	switch (hdr->hop_limit) {
-+	case 1:
-+		iphc0 |= LOWPAN_IPHC_TTL_1;
-+		break;
-+	case 64:
-+		iphc0 |= LOWPAN_IPHC_TTL_64;
-+		break;
-+	case 255:
-+		iphc0 |= LOWPAN_IPHC_TTL_255;
-+		break;
-+	default:
-+		*hc06_ptr = hdr->hop_limit;
-+		hc06_ptr += 1;
-+		break;
-+	}
-+
-+	/* source address compression */
-+	if (is_addr_unspecified(&hdr->saddr)) {
-+		pr_debug("source address is unspecified, setting SAC\n");
-+		iphc1 |= LOWPAN_IPHC_SAC;
-+	/* TODO: context lookup */
-+	} else if (is_addr_link_local(&hdr->saddr)) {
-+		iphc1 |= lowpan_compress_addr_64(&hc06_ptr,
-+				LOWPAN_IPHC_SAM_BIT, &hdr->saddr, _saddr);
-+		pr_debug("source address unicast link-local %pI6c "
-+			"iphc1 0x%02x\n", &hdr->saddr, iphc1);
++	if (ipv6_addr_is_multicast(&lowpan_cb(skb)->addr)) {
++		/* We need to send the packet to every device
++		 * behind this interface.
++		 */
++		send_mcast_pkt(skb, netdev);
 +	} else {
-+		pr_debug("send the full source address\n");
-+		memcpy(hc06_ptr, &hdr->saddr.s6_addr16[0], 16);
-+		hc06_ptr += 16;
++		unsigned long flags;
++
++		get_dest_bdaddr(&lowpan_cb(skb)->addr, &addr, &addr_type);
++		eui64_addr = lowpan_cb(skb)->addr.s6_addr + 8;
++		dev = lowpan_dev(netdev);
++
++		read_lock_irqsave(&devices_lock, flags);
++		peer = peer_lookup_ba(dev, &addr, addr_type);
++		read_unlock_irqrestore(&devices_lock, flags);
++
++		BT_DBG("xmit from %s to %pMR (%pI6c) peer %p", netdev->name,
++		       &addr, &lowpan_cb(skb)->addr, peer);
++
++		if (peer && peer->conn)
++			err = send_pkt(peer->conn, netdev->dev_addr,
++				       eui64_addr, skb, netdev);
 +	}
++	dev_kfree_skb(skb);
 +
-+	/* destination address compression */
-+	if (is_addr_mcast(&hdr->daddr)) {
-+		pr_debug("destination address is multicast: ");
-+		iphc1 |= LOWPAN_IPHC_M;
-+		if (lowpan_is_mcast_addr_compressable8(&hdr->daddr)) {
-+			pr_debug("compressed to 1 octet\n");
-+			iphc1 |= LOWPAN_IPHC_DAM_11;
-+			/* use last byte */
-+			*hc06_ptr = hdr->daddr.s6_addr[15];
-+			hc06_ptr += 1;
-+		} else if (lowpan_is_mcast_addr_compressable32(&hdr->daddr)) {
-+			pr_debug("compressed to 4 octets\n");
-+			iphc1 |= LOWPAN_IPHC_DAM_10;
-+			/* second byte + the last three */
-+			*hc06_ptr = hdr->daddr.s6_addr[1];
-+			memcpy(hc06_ptr + 1, &hdr->daddr.s6_addr[13], 3);
-+			hc06_ptr += 4;
-+		} else if (lowpan_is_mcast_addr_compressable48(&hdr->daddr)) {
-+			pr_debug("compressed to 6 octets\n");
-+			iphc1 |= LOWPAN_IPHC_DAM_01;
-+			/* second byte + the last five */
-+			*hc06_ptr = hdr->daddr.s6_addr[1];
-+			memcpy(hc06_ptr + 1, &hdr->daddr.s6_addr[11], 5);
-+			hc06_ptr += 6;
-+		} else {
-+			pr_debug("using full address\n");
-+			iphc1 |= LOWPAN_IPHC_DAM_00;
-+			memcpy(hc06_ptr, &hdr->daddr.s6_addr[0], 16);
-+			hc06_ptr += 16;
-+		}
-+	} else {
-+		/* TODO: context lookup */
-+		if (is_addr_link_local(&hdr->daddr)) {
-+			iphc1 |= lowpan_compress_addr_64(&hc06_ptr,
-+				LOWPAN_IPHC_DAM_BIT, &hdr->daddr, _daddr);
-+			pr_debug("dest address unicast link-local %pI6c "
-+				"iphc1 0x%02x\n", &hdr->daddr, iphc1);
-+		} else {
-+			pr_debug("dest address unicast %pI6c\n", &hdr->daddr);
-+			memcpy(hc06_ptr, &hdr->daddr.s6_addr16[0], 16);
-+			hc06_ptr += 16;
-+		}
-+	}
++	if (err)
++		BT_DBG("ERROR: xmit failed (%d)", err);
 +
-+	/* UDP header compression */
-+	if (hdr->nexthdr == UIP_PROTO_UDP)
-+		compress_udp_header(&hc06_ptr, skb);
++	return (err < 0) ? NET_XMIT_DROP : err;
++}
 +
-+	head[0] = iphc0;
-+	head[1] = iphc1;
++static const struct net_device_ops netdev_ops = {
++	.ndo_start_xmit		= bt_xmit,
++};
 +
-+	skb_pull(skb, sizeof(struct ipv6hdr));
-+	skb_reset_transport_header(skb);
-+	memcpy(skb_push(skb, hc06_ptr - head), head, hc06_ptr - head);
-+	skb_reset_network_header(skb);
++static struct header_ops header_ops = {
++	.create	= header_create,
++};
 +
-+	pr_debug("header len %d skb %u\n", (int)(hc06_ptr - head), skb->len);
++static void netdev_setup(struct net_device *dev)
++{
++	dev->addr_len		= EUI64_ADDR_LEN;
++	dev->type		= ARPHRD_6LOWPAN;
 +
-+	raw_dump_table(__func__, "raw skb data dump compressed",
-+				skb->data, skb->len);
++	dev->hard_header_len	= 0;
++	dev->needed_tailroom	= 0;
++	dev->mtu		= IPV6_MIN_MTU;
++	dev->tx_queue_len	= 0;
++	dev->flags		= IFF_RUNNING | IFF_POINTOPOINT;
++	dev->watchdog_timeo	= 0;
++
++	dev->netdev_ops		= &netdev_ops;
++	dev->header_ops		= &header_ops;
++	dev->destructor		= free_netdev;
++}
++
++static struct device_type bt_type = {
++	.name	= "bluetooth",
++};
++
++static void set_addr(u8 *eui, u8 *addr, u8 addr_type)
++{
++	/* addr is the BT address in little-endian format */
++	eui[0] = addr[5];
++	eui[1] = addr[4];
++	eui[2] = addr[3];
++	eui[3] = 0xFF;
++	eui[4] = 0xFE;
++	eui[5] = addr[2];
++	eui[6] = addr[1];
++	eui[7] = addr[0];
++
++	eui[0] ^= 2;
++
++	/* Universal/local bit set, RFC 4291 */
++	if (addr_type == BDADDR_LE_PUBLIC)
++		eui[0] |= 1;
++	else
++		eui[0] &= ~1;
++}
++
++static void set_dev_addr(struct net_device *netdev, bdaddr_t *addr,
++		         u8 addr_type)
++{
++	netdev->addr_assign_type = NET_ADDR_PERM;
++	set_addr(netdev->dev_addr, addr->b, addr_type);
++	netdev->dev_addr[0] ^= 2;
++}
++
++static void ifup(struct net_device *netdev)
++{
++	int err;
++
++	rtnl_lock();
++	err = dev_open(netdev);
++	if (err < 0)
++		BT_INFO("iface %s cannot be opened (%d)", netdev->name, err);
++	rtnl_unlock();
++}
++
++static void do_notify_peers(struct work_struct *work)
++{
++	struct lowpan_dev *dev = container_of(work, struct lowpan_dev,
++					      notify_peers.work);
++
++	netdev_notify_peers(dev->netdev); /* send neighbour adv at startup */
++}
++
++static bool is_bt_6lowpan(struct hci_conn *hcon)
++{
++	if (hcon->type != LE_LINK)
++		return false;
++
++	return test_bit(HCI_CONN_6LOWPAN, &hcon->flags);
++}
++
++static int add_peer_conn(struct l2cap_conn *conn, struct lowpan_dev *dev)
++{
++	struct lowpan_peer *peer;
++	unsigned long flags;
++
++	peer = kzalloc(sizeof(*peer), GFP_ATOMIC);
++	if (!peer)
++		return -ENOMEM;
++
++	peer->conn = conn;
++	memset(&peer->peer_addr, 0, sizeof(struct in6_addr));
++
++	/* RFC 2464 ch. 5 */
++	peer->peer_addr.s6_addr[0] = 0xFE;
++	peer->peer_addr.s6_addr[1] = 0x80;
++	set_addr((u8 *)&peer->peer_addr.s6_addr + 8, conn->hcon->dst.b,
++	         conn->hcon->dst_type);
++
++	memcpy(&peer->eui64_addr, (u8 *)&peer->peer_addr.s6_addr + 8,
++	       EUI64_ADDR_LEN);
++	peer->eui64_addr[0] ^= 2; /* second bit-flip (Universe/Local)
++				   * is done according RFC2464
++				   */
++
++	raw_dump_inline(__func__, "peer IPv6 address",
++			(unsigned char *)&peer->peer_addr, 16);
++	raw_dump_inline(__func__, "peer EUI64 address", peer->eui64_addr, 8);
++
++	write_lock_irqsave(&devices_lock, flags);
++	INIT_LIST_HEAD(&peer->list);
++	peer_add(dev, peer);
++	write_unlock_irqrestore(&devices_lock, flags);
++
++	/* Notifying peers about us needs to be done without locks held */
++	INIT_DELAYED_WORK(&dev->notify_peers, do_notify_peers);
++	schedule_delayed_work(&dev->notify_peers, msecs_to_jiffies(100));
++
 +	return 0;
 +}
-+EXPORT_SYMBOL_GPL(lowpan_header_compress);
-diff --git a/net/ieee802154/Makefile b/net/ieee802154/Makefile
-index d7716d6..951a83e 100644
---- a/net/ieee802154/Makefile
-+++ b/net/ieee802154/Makefile
-@@ -1,5 +1,5 @@
- obj-$(CONFIG_IEEE802154) += ieee802154.o af_802154.o
--obj-$(CONFIG_IEEE802154_6LOWPAN) += 6lowpan.o
-+obj-$(CONFIG_IEEE802154_6LOWPAN) += 6lowpan.o 6lowpan_iphc.o
++
++/* This gets called when BT LE 6LoWPAN device is connected. We then
++ * create network device that acts as a proxy between BT LE device
++ * and kernel network stack.
++ */
++int bt_6lowpan_add_conn(struct l2cap_conn *conn)
++{
++	struct lowpan_peer *peer = NULL;
++	struct lowpan_dev *dev;
++	struct net_device *netdev;
++	int err = 0;
++	unsigned long flags;
++
++	if (!is_bt_6lowpan(conn->hcon))
++		return 0;
++
++	peer = lookup_peer(conn);
++	if (peer)
++		return -EEXIST;
++
++	dev = lookup_dev(conn);
++	if (dev)
++		return add_peer_conn(conn, dev);
++
++	netdev = alloc_netdev(sizeof(*dev), IFACE_NAME_TEMPLATE, netdev_setup);
++	if (!netdev)
++		return -ENOMEM;
++
++	set_dev_addr(netdev, &conn->hcon->src, conn->hcon->src_type);
++
++	netdev->netdev_ops = &netdev_ops;
++	SET_NETDEV_DEV(netdev, &conn->hcon->dev);
++	SET_NETDEV_DEVTYPE(netdev, &bt_type);
++
++	err = register_netdev(netdev);
++	if (err < 0) {
++		BT_INFO("register_netdev failed %d", err);
++		free_netdev(netdev);
++		goto out;
++	}
++
++	BT_DBG("ifindex %d peer bdaddr %pMR my addr %pMR",
++	       netdev->ifindex, &conn->hcon->dst, &conn->hcon->src);
++	set_bit(__LINK_STATE_PRESENT, &netdev->state);
++
++	dev = netdev_priv(netdev);
++	dev->netdev = netdev;
++	dev->hdev = conn->hcon->hdev;
++	INIT_LIST_HEAD(&dev->peers);
++
++	write_lock_irqsave(&devices_lock, flags);
++	INIT_LIST_HEAD(&dev->list);
++	list_add(&dev->list, &bt_6lowpan_devices);
++	write_unlock_irqrestore(&devices_lock, flags);
++
++	ifup(netdev);
++
++	return add_peer_conn(conn, dev);
++
++out:
++	return err;
++}
++
++static void delete_netdev(struct work_struct *work)
++{
++	struct lowpan_dev *entry = container_of(work, struct lowpan_dev,
++						delete_netdev);
++
++	unregister_netdev(entry->netdev);
++
++	/* The entry pointer is deleted in device_event() */
++}
++
++int bt_6lowpan_del_conn(struct l2cap_conn *conn)
++{
++	struct lowpan_dev *entry, *tmp;
++	struct lowpan_dev *dev = NULL;
++	struct lowpan_peer *peer;
++	int err = -ENOENT;
++	unsigned long flags;
++	bool last = false;
++
++	if (!is_bt_6lowpan(conn->hcon))
++		return 0;
++
++	write_lock_irqsave(&devices_lock, flags);
++
++	list_for_each_entry_safe(entry, tmp, &bt_6lowpan_devices, list) {
++		dev = lowpan_dev(entry->netdev);
++		peer = peer_lookup_conn(dev, conn);
++		if (peer) {
++			last = peer_del(dev, peer);
++			err = 0;
++			break;
++		}
++	}
++
++	if (!err && last && dev && !atomic_read(&dev->peer_count)) {
++		write_unlock_irqrestore(&devices_lock, flags);
++
++		cancel_delayed_work_sync(&dev->notify_peers);
++
++		/* bt_6lowpan_del_conn() is called with hci dev lock held which
++		 * means that we must delete the netdevice in worker thread.
++		 */
++		INIT_WORK(&entry->delete_netdev, delete_netdev);
++		schedule_work(&entry->delete_netdev);
++	} else {
++		write_unlock_irqrestore(&devices_lock, flags);
++	}
++
++	return err;
++}
++
++static int device_event(struct notifier_block *unused,
++			unsigned long event, void *ptr)
++{
++	struct net_device *netdev = netdev_notifier_info_to_dev(ptr);
++	struct lowpan_dev *entry, *tmp;
++	unsigned long flags;
++
++	if (netdev->type != ARPHRD_6LOWPAN)
++		return NOTIFY_DONE;
++
++	switch (event) {
++	case NETDEV_UNREGISTER:
++		write_lock_irqsave(&devices_lock, flags);
++		list_for_each_entry_safe(entry, tmp, &bt_6lowpan_devices,
++					 list) {
++			if (entry->netdev == netdev) {
++				list_del(&entry->list);
++				kfree(entry);
++				break;
++			}
++		}
++		write_unlock_irqrestore(&devices_lock, flags);
++		break;
++	}
++
++	return NOTIFY_DONE;
++}
++
++static struct notifier_block bt_6lowpan_dev_notifier = {
++	.notifier_call = device_event,
++};
++
++int bt_6lowpan_init(void)
++{
++	return register_netdevice_notifier(&bt_6lowpan_dev_notifier);
++}
++
++void bt_6lowpan_cleanup(void)
++{
++	unregister_netdevice_notifier(&bt_6lowpan_dev_notifier);
++}
+diff --git a/net/bluetooth/6lowpan.h b/net/bluetooth/6lowpan.h
+new file mode 100644
+index 0000000..680eac8
+--- /dev/null
++++ b/net/bluetooth/6lowpan.h
+@@ -0,0 +1,26 @@
++/*
++   Copyright (c) 2013 Intel Corp.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License version 2 and
++   only version 2 as published by the Free Software Foundation.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++*/
++
++#ifndef __6LOWPAN_H
++#define __6LOWPAN_H
++
++#include <linux/skbuff.h>
++#include <net/bluetooth/l2cap.h>
++
++int bt_6lowpan_recv(struct l2cap_conn *conn, struct sk_buff *skb);
++int bt_6lowpan_add_conn(struct l2cap_conn *conn);
++int bt_6lowpan_del_conn(struct l2cap_conn *conn);
++int bt_6lowpan_init(void);
++void bt_6lowpan_cleanup(void);
++
++#endif /* __6LOWPAN_H */
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index 6a791e7..cc6827e 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -10,6 +10,10 @@ obj-$(CONFIG_BT_HIDP)	+= hidp/
  
- ieee802154-y := netlink.o nl-mac.o nl-phy.o nl_policy.o wpan-class.o
- af_802154-y := af_ieee802154.o raw.o dgram.o
+ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+ 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
+-	a2mp.o amp.o
++	a2mp.o amp.o 6lowpan.o
++
++ifeq ($(CONFIG_IEEE802154_6LOWPAN),)
++  bluetooth-y +=  ../ieee802154/6lowpan_iphc.o
++endif
+ 
+ subdir-ccflags-y += -D__CHECK_ENDIAN__
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 5fb3df6..5f81245 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3533,6 +3533,9 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	conn->handle = __le16_to_cpu(ev->handle);
+ 	conn->state = BT_CONNECTED;
+ 
++	if (test_bit(HCI_6LOWPAN_ENABLED, &hdev->dev_flags))
++		set_bit(HCI_CONN_6LOWPAN, &conn->flags);
++
+ 	hci_conn_add_sysfs(conn);
+ 
+ 	hci_proto_connect_cfm(conn, ev->status);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index ae0054c..e97248d 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -40,6 +40,7 @@
+ #include "smp.h"
+ #include "a2mp.h"
+ #include "amp.h"
++#include "6lowpan.h"
+ 
+ bool disable_ertm;
+ 
+@@ -1468,6 +1469,8 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 
+ 	BT_DBG("");
+ 
++	bt_6lowpan_add_conn(conn);
++
+ 	/* Check if we have socket listening on cid */
+ 	pchan = l2cap_global_chan_by_scid(BT_LISTEN, L2CAP_CID_ATT,
+ 					  &hcon->src, &hcon->dst);
+@@ -7093,6 +7096,10 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+ 			l2cap_conn_del(conn->hcon, EACCES);
+ 		break;
+ 
++	case L2CAP_FC_6LOWPAN:
++		bt_6lowpan_recv(conn, skb);
++		break;
++
+ 	default:
+ 		l2cap_data_channel(conn, cid, skb);
+ 		break;
+@@ -7160,6 +7167,8 @@ void l2cap_disconn_cfm(struct hci_conn *hcon, u8 reason)
+ {
+ 	BT_DBG("hcon %p reason %d", hcon, reason);
+ 
++	bt_6lowpan_del_conn(hcon->l2cap_data);
++
+ 	l2cap_conn_del(hcon, bt_to_errno(reason));
+ }
+ 
+@@ -7441,11 +7450,14 @@ int __init l2cap_init(void)
+ 	debugfs_create_u16("l2cap_le_default_mps", 0466, bt_debugfs,
+ 			   &le_default_mps);
+ 
++	bt_6lowpan_init();
++
+ 	return 0;
+ }
+ 
+ void l2cap_exit(void)
+ {
++	bt_6lowpan_cleanup();
+ 	debugfs_remove(l2cap_debugfs);
+ 	l2cap_cleanup_sockets();
+ }
 -- 
 1.8.3.1
 
