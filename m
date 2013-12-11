@@ -1,103 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
-Subject: Re: [PATCH BlueZ] build: Add coverage support
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1386759341-14346-1-git-send-email-luiz.dentz@gmail.com>
-Date: Wed, 11 Dec 2013 13:00:59 +0100
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <4818FD30-C986-47E0-8441-E58938077D45@holtmann.org>
-References: <1386759341-14346-1-git-send-email-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <52A850BF.1000408@hurleysoftware.com>
+Date: Wed, 11 Dec 2013 06:47:11 -0500
+From: Peter Hurley <peter@hurleysoftware.com>
+MIME-Version: 1.0
+To: Huang Shijie <b32955@freescale.com>
+CC: gregkh@linuxfoundation.org, linux-serial@vger.kernel.org,
+ marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH RFC] tty_ldisc: add more limits to the @write_wakeup
+References: <1384327803-5925-1-git-send-email-b32955@freescale.com> <52A1A84B.80409@freescale.com> <52A1F8BF.5030204@hurleysoftware.com> <52A809BC.2040909@freescale.com>
+In-Reply-To: <52A809BC.2040909@freescale.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+On 12/11/2013 01:44 AM, Huang Shijie wrote:
+> 于 2013年12月07日 00:18, Peter Hurley 写道:
+>> hci_uart_tx_wakeup() should perform the actual tx in a work item.
+> Does the "work item" mean a workqueue or a tasklet?
+> This patch is used to tell the line discipline writers to send the data in the workqueue or a tasklet.
 
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> ---
-> Makefile.am         | 18 ++++++++++++++++++
-> acinclude.m4        |  9 +++++++++
-> bootstrap-configure |  1 +
-> configure.ac        |  2 ++
-> 4 files changed, 30 insertions(+)
-> 
-> diff --git a/Makefile.am b/Makefile.am
-> index 15cc149..1a59532 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -331,5 +331,23 @@ lib/bluetooth/%.h: lib/%.h
-> 	$(AM_V_at)$(MKDIR_P) lib/bluetooth
-> 	$(AM_V_GEN)$(LN_S) -f "$(abs_top_builddir)"/$< $@
-> 
-> +if COVERAGE
+Yes, "work item" means struct work_struct.
 
-maybe we should just make this depend on maintainer-mode.
-
-> +clean-coverage:
-> +	$(RM) -r coverage
-> +	@find . -name "*.gcda" -exec $(RM) {} \;
-> +	$(LCOV) --directory . --zerocounters
-> +
-> +check-coverage:
-> +	@make check
-> +	$(AM_V_at)$(MKDIR_P) -p coverage
-> +	$(LCOV) --compat-libtool --directory . --capture --output-file \
-> +							coverage/check.info
-> +	@genhtml -o coverage/ coverage/check.info
-> +
-> clean-local:
-> +	@make clean-coverage
-> 	$(RM) -r lib/bluetooth
-> +else
-> +clean-local:
-> +	$(RM) -r lib/bluetooth
-> +endif
-> diff --git a/acinclude.m4 b/acinclude.m4
-> index 2065852..e5eb481 100644
-> --- a/acinclude.m4
-> +++ b/acinclude.m4
-> @@ -51,6 +51,15 @@ AC_DEFUN([MISC_FLAGS], [
-> 			misc_ldflags="$misc_ldflags -pie"
-> 		fi
-> 	])
-> +	AC_ARG_ENABLE(coverage, AC_HELP_STRING([--enable-coverage],
-> +			[enable coverage flags]), [
-> +		AC_PATH_PROG([LCOV], [lcov])
-> +		if (test "$LCOV" && test "${enableval}" = "yes"); then
-> +			misc_cflags="$misc_cflags -ftest-coverage"
-> +			misc_cflags="$misc_cflags -fprofile-arcs"
-> +			misc_ldflags="$misc_ldflags -gcov"
-> +		fi
-> +	])
-> 	AC_SUBST([MISC_CFLAGS], $misc_cflags)
-> 	AC_SUBST([MISC_LDFLAGS], $misc_ldflags)
-> ])
-> diff --git a/bootstrap-configure b/bootstrap-configure
-> index c7f08ed..35aa98b 100755
-> --- a/bootstrap-configure
-> +++ b/bootstrap-configure
-> @@ -14,4 +14,5 @@ fi
-> 		--enable-experimental \
-> 		--enable-android \
-> 		--enable-sixaxis \
-> +		--enable-coverage \
-> 		--disable-datafiles $*
-> diff --git a/configure.ac b/configure.ac
-> index 18d0b55..c55924f 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -252,4 +252,6 @@ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
-> 					[enable_android=${enableval}])
-> AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
-> 
-> +AM_CONDITIONAL([COVERAGE], [test "$LCOV�])
-
-I do not like this one. The test should check enable_xxx variables. I rather have configure abort with error if some programs or dependencies are not found.
-
-Regards
-
-Marcel
-
+Regards,
+Peter Hurley
