@@ -1,38 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 00/10] Refactoring bnep code to reduce redundancy
-Date: Wed, 11 Dec 2013 12:13:35 +0200
-Message-Id: <1386756825-934-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH] hciemu: Print error in case hci_vhci is not loaded
+Date: Wed, 11 Dec 2013 11:36:05 +0200
+Message-Id: <1386754565-1286-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set contains refactoring of bnep functionality, minor
-fixes in android/pan and adding PAN profile NAP sdp record to
-android.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Ravi kumar Veeramally (10):
-  bnep: Rename bnep_kill_connection to bnep_conndel
-  bnep: Rename send ctrl_rsp and make it global
-  bnep: Move bnep related calls to bnep.h|c
-  profiles/network/server: Delete function which does nothing
-  profiles/network: Move pan sdp record function bnep and make it global
-  android/pan: Remove channel unref which causing disconnection
-  android/pan: Fix missing cleanup calls
-  android/pan: Fix minor white space
-  android/pan: Free connected pan devices on profile unregister call
-  android/pan: Add PAN NAP sdp record fo server role
+Error message should indicate that module is not loaded:
+Opening /dev/vhci failed: No such file or directory
+---
+ src/shared/hciemu.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
- android/pan.c                 |  40 +++++++-
- profiles/network/bnep.c       | 209 ++++++++++++++++++++++++++++++++++++++++-
- profiles/network/bnep.h       |  10 +-
- profiles/network/connection.c |   2 +-
- profiles/network/manager.c    |   2 -
- profiles/network/server.c     | 213 +-----------------------------------------
- profiles/network/server.h     |   1 -
- 7 files changed, 256 insertions(+), 221 deletions(-)
-
+diff --git a/src/shared/hciemu.c b/src/shared/hciemu.c
+index c2b4748..9f4bfaf 100644
+--- a/src/shared/hciemu.c
++++ b/src/shared/hciemu.c
+@@ -31,6 +31,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <stdbool.h>
++#include <errno.h>
+ #include <sys/socket.h>
+ 
+ #include <glib.h>
+@@ -216,6 +217,7 @@ static bool create_vhci(struct hciemu *hciemu)
+ 
+ 	fd = open("/dev/vhci", O_RDWR | O_NONBLOCK | O_CLOEXEC);
+ 	if (fd < 0) {
++		perror("Opening /dev/vhci failed");
+ 		btdev_destroy(btdev);
+ 		return false;
+ 	}
 -- 
 1.8.3.2
 
