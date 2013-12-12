@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/8] android/tester: Check that fd is valid for Success case
-Date: Thu, 12 Dec 2013 17:17:48 +0200
-Message-Id: <1386861474-29524-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 5/8] android/socket: Do not close fd on unref
+Date: Thu, 12 Dec 2013 17:17:51 +0200
+Message-Id: <1386861474-29524-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1386861474-29524-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1386861474-29524-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,37 +11,25 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-For the successful test case check that file descriptor is valid through
-fcntl which is cheap way.
+We close file descriptors in cleanup_rfsock() and leaving the default
+value gives us glib warnings if we close fd already and got G_IO_NVAL in
+server_cb from bt_io.
 ---
- android/android-tester.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ android/socket.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index 3f763d8..2bb7d73 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -17,6 +17,7 @@
+diff --git a/android/socket.c b/android/socket.c
+index 5e8f8e5..9d759be 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -736,6 +736,7 @@ static void handle_listen(const void *buf, uint16_t len)
+ 	rfsock->real_sock = g_io_channel_unix_get_fd(io);
  
- #include <stdlib.h>
- #include <unistd.h>
-+#include <fcntl.h>
+ 	g_io_channel_unref(io);
++	g_io_channel_set_close_on_unref(io, FALSE);
  
- #include <glib.h>
- #include <sys/socket.h>
-@@ -757,6 +758,12 @@ static void test_generic_listen(const void *test_data)
- 		goto clean;
- 	}
- 
-+	/* Check that file descriptor is valid */
-+	if (status == BT_STATUS_SUCCESS && fcntl(sock_fd, F_GETFD) == -1) {
-+		tester_test_failed();
-+		return;
-+	}
-+
- 	tester_test_passed();
- 
- clean:
+ 	DBG("real_sock %d fd %d hal_fd %d", rfsock->real_sock, rfsock->fd,
+ 								hal_fd);
 -- 
 1.8.3.2
 
