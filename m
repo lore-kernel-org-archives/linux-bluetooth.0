@@ -1,73 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/tester: Test Socket Init
-Date: Thu, 12 Dec 2013 11:00:20 +0200
-Message-Id: <1386838820-12458-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 6/9] android/bluetooth: Add support for remote device RSSI
+Date: Thu, 12 Dec 2013 09:58:40 +0100
+Message-ID: <3353914.oihVPgriBc@uw000953>
+In-Reply-To: <CAJdJm_N2aABBteKtWyRXh_-a8Oy722BMbZSrH_koNYbY8F5hpA@mail.gmail.com>
+References: <1386757887-29018-1-git-send-email-szymon.janc@tieto.com> <1386757887-29018-6-git-send-email-szymon.janc@tieto.com> <CAJdJm_N2aABBteKtWyRXh_-a8Oy722BMbZSrH_koNYbY8F5hpA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="ISO-8859-1"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Anderson,
 
-The first test for testing socket init (get socket interface)
----
- android/android-tester.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+> Hi Szymon,
+> 
+> On Wed, Dec 11, 2013 at 7:31 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> \> @@ -2306,11 +2309,13 @@ static uint8_t
+> get_device_friendly_name(struct device *dev)
+> >
+> >  static uint8_t get_device_rssi(struct device *dev)
+> >  {
+> > -       DBG("Not implemented");
+> > +       if (!dev->rssi)
+> > +               return HAL_STATUS_FAILED;
+> 
+> 0 dBm is a valid RSSI value, so I suppose this code needs some other
+> way to identify an uninitialized value (e.g. a second boolean field.)
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index a36c10a..b864483 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -34,6 +34,7 @@
- 
- #include <hardware/hardware.h>
- #include <hardware/bluetooth.h>
-+#include <hardware/bt_sock.h>
- 
- #define adapter_props adapter_prop_bdaddr, adapter_prop_bdname, \
- 			adapter_prop_uuids, adapter_prop_cod, \
-@@ -76,7 +77,9 @@ struct test_data {
- 	enum hciemu_type hciemu_type;
- 	const struct generic_data *test_data;
- 	pid_t bluetoothd_pid;
-+
- 	const bt_interface_t *if_bluetooth;
-+	const btsock_interface_t *if_sock;
- 
- 	bool mgmt_settings_set;
- 	bool hal_cb_called;
-@@ -625,6 +628,22 @@ static void setup_enabled_adapter(const void *test_data)
- 	data->if_bluetooth->enable();
- }
- 
-+static void setup_socket_interface(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	const void *sock;
-+
-+	setup(data);
-+
-+	sock = data->if_bluetooth->get_profile_interface(BT_PROFILE_SOCKETS_ID);
-+	if (!sock)
-+		tester_setup_failed();
-+
-+	data->if_sock = sock;
-+
-+	tester_setup_complete();
-+}
-+
- static void teardown(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
-@@ -707,5 +726,8 @@ int main(int argc, char *argv[])
- 	test_bredrle("Test Disable - Success", &bluetooth_disable_success_test,
- 			setup_enabled_adapter, test_disable, teardown);
- 
-+	test_bredrle("Test Socket Init", NULL, setup_socket_interface,
-+						controller_setup, teardown);
-+
- 	return tester_run();
- }
+Kernel sends rssi==0 if rssi info was not present on inquiry so I used this
+value, but maybe it should use 127 for that.. ? (yet, this might cause trouble
+as linux bluetoothd is checking 0 as well)
+
 -- 
-1.8.3.2
+BR
+Szymon Janc
+
 
