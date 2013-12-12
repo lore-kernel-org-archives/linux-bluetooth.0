@@ -1,172 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Message-ID: <1386864988.1982.45.camel@nuvo>
+Subject: [PATCH] sixaxis: Fix device detection
+From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/5] android/tester: Add property check and bdname set success test case
-Date: Thu, 12 Dec 2013 18:14:31 +0100
-Message-Id: <1386868475-9610-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Date: Thu, 12 Dec 2013 17:16:28 +0100
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds handling of property check, bdname set property success.
----
- android/android-tester.c | 75 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 75 insertions(+)
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index a50ed7b..dcc0e33 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -63,6 +63,7 @@ enum hal_bluetooth_callbacks_id {
- struct generic_data {
- 	uint8_t expected_adapter_status;
- 	uint32_t expect_settings_set;
-+	bt_property_t expected_property;
- 	uint8_t expected_hal_callbacks[];
- };
+After searching past the end of the structure, the loop sometimes
+found matches in the daemon's address space...
+
+This fixes the loop to end after the elements have been exhausted.
+---
+ plugins/sixaxis.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+index 45fa170..1154c15 100644
+--- a/plugins/sixaxis.c
++++ b/plugins/sixaxis.c
+@@ -301,7 +301,7 @@ static int get_supported_device(struct udev_device *udevice, uint16_t *bus)
+ 	struct udev_device *hid_parent;
+ 	uint16_t vid, pid;
+ 	const char *hid_id;
+-	int i;
++	guint i;
  
-@@ -93,7 +94,9 @@ struct test_data {
- 	bool mgmt_settings_set;
- 	bool hal_cb_called;
- 	bool status_checked;
-+	bool property_checked;
+ 	hid_parent = udev_device_get_parent_with_subsystem_devtype(udevice,
+ 								"hid", NULL);
+@@ -313,7 +313,7 @@ static int get_supported_device(struct udev_device *udevice, uint16_t *bus)
+ 	if (sscanf(hid_id, "%hx:%hx:%hx", bus, &vid, &pid) != 3)
+ 		return -1;
  
-+	bt_property_t test_property;
- 	GSList *expected_callbacks;
- };
- 
-@@ -109,6 +112,8 @@ static void test_update_state(void)
- 		return;
- 	if (!(data->status_checked))
- 		return;
-+	if (!(data->property_checked))
-+		return;
- 	tester_test_passed();
- }
- 
-@@ -175,11 +180,20 @@ static void expected_status_init(struct test_data *data)
- 		data->status_checked = true;
- }
- 
-+static void test_property_init(struct test_data *data)
-+{
-+	const struct generic_data *test_data = data->test_data;
-+
-+	if (!(test_data->expected_property.type))
-+		data->property_checked = true;
-+}
-+
- static void init_test_conditions(struct test_data *data)
- {
- 	hal_cb_init(data);
- 	mgmt_cb_init(data);
- 	expected_status_init(data);
-+	test_property_init(data);
- }
- 
- static void check_expected_status(uint8_t status)
-@@ -195,6 +209,33 @@ static void check_expected_status(uint8_t status)
- 	test_update_state();
- }
- 
-+static void check_test_property(void)
-+{
-+	struct test_data *data = tester_get_data();
-+	bt_property_t expected_prop = data->test_property;
-+	const struct generic_data *test_data = data->test_data;
-+	bt_property_t test_prop = test_data->expected_property;
-+
-+	if (test_prop.type && (expected_prop.type != test_prop.type)) {
-+		tester_test_failed();
-+		return;
-+	}
-+
-+	if (test_prop.len && (expected_prop.len != test_prop.len)) {
-+		tester_test_failed();
-+		return;
-+	}
-+
-+	if (test_prop.val && memcmp(expected_prop.val, test_prop.val,
-+							expected_prop.len)) {
-+		tester_test_failed();
-+		return;
-+	}
-+
-+	data->property_checked = true;
-+	test_update_state();
-+}
-+
- static int get_expected_hal_cb(void)
- {
- 	struct test_data *data = tester_get_data();
-@@ -446,6 +487,7 @@ static void adapter_properties_cb(bt_status_t status, int num_properties,
- 						bt_property_t *properties)
- {
- 	enum hal_bluetooth_callbacks_id hal_cb;
-+	struct test_data *data = tester_get_data();
- 	int i;
- 
- 	for (i = 0; i < num_properties; i++) {
-@@ -454,6 +496,12 @@ static void adapter_properties_cb(bt_status_t status, int num_properties,
- 		if (hal_cb == adapter_test_setup_mode)
- 			break;
- 
-+		data->test_property = *properties;
-+
-+		if (g_slist_next(data->expected_callbacks) ==
-+							adapter_test_end)
-+			check_test_property();
-+
- 		switch (properties[i].type) {
- 		case BT_PROPERTY_BDADDR:
- 			if (hal_cb != adapter_prop_bdaddr) {
-@@ -538,6 +586,14 @@ static const struct generic_data bluetooth_disable_success_test = {
- 	.expected_hal_callbacks = {adapter_state_changed_off, adapter_test_end}
- };
- 
-+static const struct generic_data bluetooth_setprop_bdname_success_test = {
-+	.expected_hal_callbacks = {adapter_prop_bdname, adapter_test_end},
-+	.expected_adapter_status = BT_STATUS_SUCCESS,
-+	.expected_property.type = BT_PROPERTY_BDNAME,
-+	.expected_property.val = "test_bdname",
-+	.expected_property.len = 11
-+};
-+
- static bt_callbacks_t bt_callbacks = {
- 	.size = sizeof(bt_callbacks),
- 	.adapter_state_changed_cb = adapter_state_changed_cb,
-@@ -754,6 +810,20 @@ clean:
- 		close(sock_fd);
- }
- 
-+static void test_setprop_bdname_success(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	const struct generic_data *test = data->test_data;
-+	const bt_property_t *prop = &test->expected_property;
-+	bt_status_t adapter_status;
-+
-+	init_test_conditions(data);
-+
-+	adapter_status = data->if_bluetooth->set_adapter_property(prop);
-+
-+	check_expected_status(adapter_status);
-+}
-+
- #define test_bredrle(name, data, test_setup, test, test_teardown) \
- 	do { \
- 		struct test_data *user; \
-@@ -784,6 +854,11 @@ int main(int argc, char *argv[])
- 	test_bredrle("Test Disable - Success", &bluetooth_disable_success_test,
- 			setup_enabled_adapter, test_disable, teardown);
- 
-+	test_bredrle("Test Set BDNAME - Success",
-+					&bluetooth_setprop_bdname_success_test,
-+					setup_enabled_adapter,
-+					test_setprop_bdname_success, teardown);
-+
- 	test_bredrle("Test Socket Init", NULL, setup_socket_interface,
- 						test_dummy, teardown);
- 
+-	for (i = 0; G_N_ELEMENTS(devices); i++) {
++	for (i = 0; i < G_N_ELEMENTS(devices); i++) {
+ 		if (devices[i].vid == vid && devices[i].pid == pid)
+ 			return i;
+ 	}
 -- 
 1.8.4.2
+
 
