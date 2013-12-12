@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/4] android/tester: Add Socket data to generic test data struct
-Date: Thu, 12 Dec 2013 12:49:09 +0200
-Message-Id: <1386845350-13982-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/4] android/tester: Add basic Socket Init test
+Date: Thu, 12 Dec 2013 12:49:08 +0200
+Message-Id: <1386845350-13982-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1386845350-13982-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1386845350-13982-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,30 +11,67 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Socket data will be used in generic Socket HAL tests
+Test get_socket_interface() and basic setup
 ---
- android/android-tester.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ android/android-tester.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
 diff --git a/android/android-tester.c b/android/android-tester.c
-index 185f57b..15fd29e 100644
+index 7ecc80d..185f57b 100644
 --- a/android/android-tester.c
 +++ b/android/android-tester.c
-@@ -61,6 +61,14 @@ enum hal_bluetooth_callbacks_id {
- };
+@@ -34,6 +34,7 @@
  
- struct generic_data {
-+	/* Socket data */
-+	btsock_type_t sock_type;
-+	const char *service_name;
-+	const uint8_t *service_uuid;
-+	int channel;
-+	int flags;
-+	bt_status_t expected_status;
+ #include <hardware/hardware.h>
+ #include <hardware/bluetooth.h>
++#include <hardware/bt_sock.h>
+ 
+ #define adapter_props adapter_prop_bdaddr, adapter_prop_bdname, \
+ 			adapter_prop_uuids, adapter_prop_cod, \
+@@ -76,7 +77,9 @@ struct test_data {
+ 	enum hciemu_type hciemu_type;
+ 	const struct generic_data *test_data;
+ 	pid_t bluetoothd_pid;
 +
- 	uint8_t expected_adapter_status;
- 	uint32_t expect_settings_set;
- 	uint8_t expected_hal_callbacks[];
+ 	const bt_interface_t *if_bluetooth;
++	const btsock_interface_t *if_sock;
+ 
+ 	bool mgmt_settings_set;
+ 	bool hal_cb_called;
+@@ -677,6 +680,24 @@ static void test_dummy(const void *test_data)
+ 	tester_test_passed();
+ }
+ 
++/* Test Socket HAL */
++
++static void setup_socket_interface(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	const void *sock;
++
++	setup(data);
++
++	sock = data->if_bluetooth->get_profile_interface(BT_PROFILE_SOCKETS_ID);
++	if (!sock)
++		tester_setup_failed();
++
++	data->if_sock = sock;
++
++	tester_setup_complete();
++}
++
+ #define test_bredrle(name, data, test_setup, test, test_teardown) \
+ 	do { \
+ 		struct test_data *user; \
+@@ -707,5 +728,8 @@ int main(int argc, char *argv[])
+ 	test_bredrle("Test Disable - Success", &bluetooth_disable_success_test,
+ 			setup_enabled_adapter, test_disable, teardown);
+ 
++	test_bredrle("Test Socket Init", NULL, setup_socket_interface,
++						test_dummy, teardown);
++
+ 	return tester_run();
+ }
 -- 
 1.8.3.2
 
