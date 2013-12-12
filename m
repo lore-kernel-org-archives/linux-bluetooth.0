@@ -1,51 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <luiz.dentz@gmail.com>,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 2/2] android/tester: Update expected adapter properties
-Date: Fri, 13 Dec 2013 09:05:05 +0100
-Message-ID: <1386921905-28047-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1386921905-28047-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1386921905-28047-1-git-send-email-lukasz.rymanowski@tieto.com>
+Message-ID: <52AA483E.4080706@ahsoftware.de>
+Date: Fri, 13 Dec 2013 00:35:26 +0100
+From: Alexander Holler <holler@ahsoftware.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Peter Hurley <peter@hurleysoftware.com>
+CC: Gustavo Padovan <gustavo@padovan.org>,
+ Gianluca Anzolin <gianluca@sottospazio.it>,
+ marcel@holtmann.org, linux-bluetooth@vger.kernel.org,
+ gregkh@linuxfoundation.org, jslaby@suse.cz,
+ linux-kernel@vger.kernel.org
+Subject: Re: [REGRESSION] rfcomm (userland) broken by commit 29cd718b
+References: <1377620926-23370-1-git-send-email-gianluca@sottospazio.it> <20130919162413.GG4006@joana> <52AA1854.500@ahsoftware.de> <52AA1E62.1030109@hurleysoftware.com>
+In-Reply-To: <52AA1E62.1030109@hurleysoftware.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Bluetooth daemon supports now BT_PROPERTY_ADAPTER_BONDED_DEVICES and
-BT_PROPERTY_TYPE_OF_DEVICE. Android tester needs to be updated with this
-expected properties. Test result with this patch:
+Am 12.12.2013 21:36, schrieb Peter Hurley:
 
-Test Summary
-------------
-Test Init                                     Passed       0.026 seconds
-Test Enable - Success                         Passed       0.027 seconds
-Test Enable - Done                            Passed       0.030 seconds
-Test Disable - Success                        Passed       0.036 seconds
-Test Socket Init                              Passed       0.020 seconds
-Test Socket Listen - Invalid sock type        Passed       0.088 seconds
-Test Socket Listen - Invalid: L2CAP           Passed       0.025 seconds
+>> What currently happens is that when one kills rfcomm (and any other
+>> terminal which might use that tty), the entry in /dev doesn't
+>> disappear. That means the same call to refcomm with the same device
+>> (e.g. [/dev/]rfcomm1 doesn't work.
+> 
+> Thanks for the report, Alexander.
+> 
+> Point 4 above details a different situation; something else is
+> happening.
+> 
+> Would you please detail the necessary steps to reproduce this regression?
+> (How do you 'kill' rfcomm? etc.  Shell command lines would be best.)
 
-Total: 7, Passed: 7 (100.0%), Failed: 0, Not Run: 0
----
- android/android-tester.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Just call
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index 16ddcc4..fbcbb27 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -38,7 +38,8 @@
- 
- #define adapter_props adapter_prop_bdaddr, adapter_prop_bdname, \
- 			adapter_prop_uuids, adapter_prop_cod, \
--			adapter_prop_scan_mode, adapter_prop_disc_timeout
-+			adapter_prop_tod, adapter_prop_scan_mode, \
-+			adapter_prop_bonded_devices, adapter_prop_disc_timeout
- 
- /*
-  * those are assigned to HAL methods and callbacks, we use ID later
--- 
-1.8.4
+rfcomm connect rfcomm9 01:23:45:67:89:ab
 
+wait until the connection happened  (a message will appear) and then
+press ctrl-c. This still terminates the bluetooth connection, but the
+device in /dev is now left.
+
+Regards,
+
+Alexander Holler
