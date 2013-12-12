@@ -1,54 +1,144 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/5] android/tester: Add scan mode set prop success test case
-Date: Thu, 12 Dec 2013 18:14:32 +0100
-Message-Id: <1386868475-9610-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1386868475-9610-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1386868475-9610-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 1/5] android/tester: Add property check and bdname set success test case
+Date: Thu, 12 Dec 2013 18:14:31 +0100
+Message-Id: <1386868475-9610-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds scan mode set property success test case.
+This adds handling of property check, bdname set property success.
 ---
- android/android-tester.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ android/android-tester.c | 75 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 75 insertions(+)
 
 diff --git a/android/android-tester.c b/android/android-tester.c
-index dcc0e33..d2c0e2f 100644
+index a50ed7b..dcc0e33 100644
 --- a/android/android-tester.c
 +++ b/android/android-tester.c
-@@ -40,6 +40,9 @@
- 			adapter_prop_uuids, adapter_prop_cod, \
- 			adapter_prop_scan_mode, adapter_prop_disc_timeout
- 
-+static bt_scan_mode_t test_setprop_scanmode_val =
-+					BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE;
-+
- /*
-  * those are assigned to HAL methods and callbacks, we use ID later
-  * on mapped in switch-case due to different functions prototypes.
-@@ -594,6 +597,15 @@ static const struct generic_data bluetooth_setprop_bdname_success_test = {
- 	.expected_property.len = 11
+@@ -63,6 +63,7 @@ enum hal_bluetooth_callbacks_id {
+ struct generic_data {
+ 	uint8_t expected_adapter_status;
+ 	uint32_t expect_settings_set;
++	bt_property_t expected_property;
+ 	uint8_t expected_hal_callbacks[];
  };
  
-+static const struct generic_data bluetooth_setprop_scanmode_success_test = {
-+	.expected_hal_callbacks = {adapter_prop_scan_mode,
-+				adapter_prop_scan_mode, adapter_test_end},
+@@ -93,7 +94,9 @@ struct test_data {
+ 	bool mgmt_settings_set;
+ 	bool hal_cb_called;
+ 	bool status_checked;
++	bool property_checked;
+ 
++	bt_property_t test_property;
+ 	GSList *expected_callbacks;
+ };
+ 
+@@ -109,6 +112,8 @@ static void test_update_state(void)
+ 		return;
+ 	if (!(data->status_checked))
+ 		return;
++	if (!(data->property_checked))
++		return;
+ 	tester_test_passed();
+ }
+ 
+@@ -175,11 +180,20 @@ static void expected_status_init(struct test_data *data)
+ 		data->status_checked = true;
+ }
+ 
++static void test_property_init(struct test_data *data)
++{
++	const struct generic_data *test_data = data->test_data;
++
++	if (!(test_data->expected_property.type))
++		data->property_checked = true;
++}
++
+ static void init_test_conditions(struct test_data *data)
+ {
+ 	hal_cb_init(data);
+ 	mgmt_cb_init(data);
+ 	expected_status_init(data);
++	test_property_init(data);
+ }
+ 
+ static void check_expected_status(uint8_t status)
+@@ -195,6 +209,33 @@ static void check_expected_status(uint8_t status)
+ 	test_update_state();
+ }
+ 
++static void check_test_property(void)
++{
++	struct test_data *data = tester_get_data();
++	bt_property_t expected_prop = data->test_property;
++	const struct generic_data *test_data = data->test_data;
++	bt_property_t test_prop = test_data->expected_property;
++
++	if (test_prop.type && (expected_prop.type != test_prop.type)) {
++		tester_test_failed();
++		return;
++	}
++
++	if (test_prop.len && (expected_prop.len != test_prop.len)) {
++		tester_test_failed();
++		return;
++	}
++
++	if (test_prop.val && memcmp(expected_prop.val, test_prop.val,
++							expected_prop.len)) {
++		tester_test_failed();
++		return;
++	}
++
++	data->property_checked = true;
++	test_update_state();
++}
++
+ static int get_expected_hal_cb(void)
+ {
+ 	struct test_data *data = tester_get_data();
+@@ -446,6 +487,7 @@ static void adapter_properties_cb(bt_status_t status, int num_properties,
+ 						bt_property_t *properties)
+ {
+ 	enum hal_bluetooth_callbacks_id hal_cb;
++	struct test_data *data = tester_get_data();
+ 	int i;
+ 
+ 	for (i = 0; i < num_properties; i++) {
+@@ -454,6 +496,12 @@ static void adapter_properties_cb(bt_status_t status, int num_properties,
+ 		if (hal_cb == adapter_test_setup_mode)
+ 			break;
+ 
++		data->test_property = *properties;
++
++		if (g_slist_next(data->expected_callbacks) ==
++							adapter_test_end)
++			check_test_property();
++
+ 		switch (properties[i].type) {
+ 		case BT_PROPERTY_BDADDR:
+ 			if (hal_cb != adapter_prop_bdaddr) {
+@@ -538,6 +586,14 @@ static const struct generic_data bluetooth_disable_success_test = {
+ 	.expected_hal_callbacks = {adapter_state_changed_off, adapter_test_end}
+ };
+ 
++static const struct generic_data bluetooth_setprop_bdname_success_test = {
++	.expected_hal_callbacks = {adapter_prop_bdname, adapter_test_end},
 +	.expected_adapter_status = BT_STATUS_SUCCESS,
-+	.expected_property.type = BT_PROPERTY_ADAPTER_SCAN_MODE,
-+	.expected_property.val = &test_setprop_scanmode_val,
-+	.expected_property.len = sizeof(bt_scan_mode_t)
++	.expected_property.type = BT_PROPERTY_BDNAME,
++	.expected_property.val = "test_bdname",
++	.expected_property.len = 11
 +};
 +
  static bt_callbacks_t bt_callbacks = {
  	.size = sizeof(bt_callbacks),
  	.adapter_state_changed_cb = adapter_state_changed_cb,
-@@ -824,6 +836,19 @@ static void test_setprop_bdname_success(const void *test_data)
- 	check_expected_status(adapter_status);
+@@ -754,6 +810,20 @@ clean:
+ 		close(sock_fd);
  }
  
-+static void test_setprop_scanmode_succes(const void *test_data)
++static void test_setprop_bdname_success(const void *test_data)
 +{
 +	struct test_data *data = tester_get_data();
 +	const struct generic_data *test = data->test_data;
@@ -58,20 +148,21 @@ index dcc0e33..d2c0e2f 100644
 +	init_test_conditions(data);
 +
 +	adapter_status = data->if_bluetooth->set_adapter_property(prop);
++
 +	check_expected_status(adapter_status);
 +}
 +
  #define test_bredrle(name, data, test_setup, test, test_teardown) \
  	do { \
  		struct test_data *user; \
-@@ -859,6 +884,11 @@ int main(int argc, char *argv[])
- 					setup_enabled_adapter,
- 					test_setprop_bdname_success, teardown);
+@@ -784,6 +854,11 @@ int main(int argc, char *argv[])
+ 	test_bredrle("Test Disable - Success", &bluetooth_disable_success_test,
+ 			setup_enabled_adapter, test_disable, teardown);
  
-+	test_bredrle("Test Set SCAN_MODE - Success",
-+				&bluetooth_setprop_scanmode_success_test,
-+				setup_enabled_adapter,
-+				test_setprop_scanmode_succes, teardown);
++	test_bredrle("Test Set BDNAME - Success",
++					&bluetooth_setprop_bdname_success_test,
++					setup_enabled_adapter,
++					test_setprop_bdname_success, teardown);
 +
  	test_bredrle("Test Socket Init", NULL, setup_socket_interface,
  						test_dummy, teardown);
