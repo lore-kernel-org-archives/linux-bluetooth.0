@@ -1,41 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1386808303.1982.36.camel@nuvo>
-Subject: Re: openSUSE 13.1:  bt headsets lose connection
-From: Bastien Nocera <hadess@hadess.net>
-To: colbec@start.ca
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 12 Dec 2013 01:31:43 +0100
-In-Reply-To: <1385236029.2236.7.camel@linux-3kti>
-References: <1385236029.2236.7.camel@linux-3kti>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1386757887-29018-6-git-send-email-szymon.janc@tieto.com>
+References: <1386757887-29018-1-git-send-email-szymon.janc@tieto.com>
+	<1386757887-29018-6-git-send-email-szymon.janc@tieto.com>
+Date: Wed, 11 Dec 2013 22:04:32 -0200
+Message-ID: <CAJdJm_N2aABBteKtWyRXh_-a8Oy722BMbZSrH_koNYbY8F5hpA@mail.gmail.com>
+Subject: Re: [PATCH 6/9] android/bluetooth: Add support for remote device RSSI
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, 2013-11-23 at 14:47 -0500, Colin Beckingham wrote:
-> In openSUSE 12.3 bluetooth operations were mostly ok. In the last few
-> days I have upgraded from 12.3 to 13.1 and now none of my bt headsets
-> can remain connected. Pairing is not a problem, but then they
-> immediately disconnect.
-> 
-> I have posted a bug at gnome-bluetooth, but it seems that a previous
-> similar bug has been tested and found that gnome-bluetooth may be
-> excluded. Here is the bug report:
-> 
-> https://bugzilla.gnome.org/show_bug.cgi?id=712379
-> 
-> I have run a test connection using bluetoothd (5.11) in debug mode, and
-> have attached the output in file bluedump.txt.
-> 
-> Also I have tried running bluetoothd with the -E option and no change.
-> 
-> I understand that it is possible this may already be known, and that
-> pulseaudio may be involved. But since I have the debug output I thought
-> I would check with the linux-bluetooth community first.
+Hi Szymon,
 
-If your headset only has support for HFP/Hansfree, it likely won't work
-with PulseAudio yet/anymore. PulseAudio is currently adding support for
-this.
+On Wed, Dec 11, 2013 at 7:31 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
+\> @@ -2306,11 +2309,13 @@ static uint8_t
+get_device_friendly_name(struct device *dev)
+>
+>  static uint8_t get_device_rssi(struct device *dev)
+>  {
+> -       DBG("Not implemented");
+> +       if (!dev->rssi)
+> +               return HAL_STATUS_FAILED;
 
-Cheers
+0 dBm is a valid RSSI value, so I suppose this code needs some other
+way to identify an uninitialized value (e.g. a second boolean field.)
 
+>
+> -       /* TODO */
+> +       send_device_property(&dev->bdaddr, HAL_PROP_DEVICE_RSSI,
+> +                                               sizeof(dev->rssi), &dev->rssi);
+>
+> -       return HAL_STATUS_FAILED;
+> +       return HAL_STATUS_SUCCESS;
+>  }
+
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
