@@ -1,131 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/2] android/pts: Add PTS test results for OPP
-Date: Thu, 12 Dec 2013 16:38:56 +0100
-Message-Id: <1386862737-30606-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 6/8] android/tester: Add Socket test connect() invalid sock_type
+Date: Thu, 12 Dec 2013 17:17:52 +0200
+Message-Id: <1386861474-29524-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1386861474-29524-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1386861474-29524-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will allow for better tracking of current state of implementation.
----
- android/Makefile.am |  3 +-
- android/pts-opp.txt | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 96 insertions(+), 1 deletion(-)
- create mode 100644 android/pts-opp.txt
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 1dde8c1..bcd9f2b 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -110,4 +110,5 @@ EXTRA_DIST += android/Android.mk android/hal-ipc-api.txt android/README \
- 		android/pixit-did.txt android/pts-did.txt \
- 		android/pixit-gap.txt android/pixit-hid.txt \
- 		android/pixit-opp.txt android/pixit-pan.txt \
--		android/pixit-pbap.txt android/pts-gap.txt android/pts-hid.txt
-+		android/pixit-pbap.txt android/pts-gap.txt android/pts-hid.txt \
-+		android/pts-opp.txt
-diff --git a/android/pts-opp.txt b/android/pts-opp.txt
-new file mode 100644
-index 0000000..b9329b9
---- /dev/null
-+++ b/android/pts-opp.txt
-@@ -0,0 +1,94 @@
-+PTS test results for OPP
+---
+ android/android-tester.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
+
+diff --git a/android/android-tester.c b/android/android-tester.c
+index 4a96fb8..a6fbcb5 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -71,6 +71,7 @@ struct socket_data {
+ 	btsock_type_t sock_type;
+ 	const char *service_name;
+ 	const uint8_t *service_uuid;
++	const bt_bdaddr_t *bdaddr;
+ 	int channel;
+ 	int flags;
+ 	bt_status_t expected_status;
+@@ -699,7 +700,12 @@ static void test_dummy(const void *test_data)
+ 
+ /* Test Socket HAL */
+ 
++const bt_bdaddr_t bdaddr_dummy = {
++	.address = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55}
++};
 +
-+PTS version: 4.9
-+Tested: 14.11.2013
+ static const struct socket_data btsock_inv_param_socktype = {
++	.bdaddr = &bdaddr_dummy,
+ 	.sock_type = 0,
+ 	.channel = 1,
+ 	.service_uuid = NULL,
+@@ -780,6 +786,34 @@ clean:
+ 		close(sock_fd);
+ }
+ 
++static void test_generic_connect(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct socket_data *test = data->test_data;
++	bt_status_t status;
++	int sock_fd = -1;
 +
-+Results:
-+PASS	test passed
-+FAIL	test failed
-+INC	test is inconclusive
-+N/A	test is disabled due to PICS setup
++	status = data->if_sock->connect(test->bdaddr, test->sock_type,
++					test->service_uuid, test->channel,
++					&sock_fd, test->flags);
++	if (status != test->expected_status) {
++		tester_test_failed();
++		goto clean;
++	}
 +
-+-------------------------------------------------------------------------------
-+Test Name		Result	Notes
-+-------------------------------------------------------------------------------
-+TC_CLIENT_OPH_BV_01_I	PASS
-+TC_CLIENT_OPH_BV_02_I	N/A
-+TC_CLIENT_OPH_BV_03_I	PASS
-+TC_CLIENT_OPH_BV_04_I	N/A
-+TC_CLIENT_OPH_BV_05_I	PASS
-+TC_CLIENT_OPH_BV_07_I	N/A
-+TC_CLIENT_OPH_BV_08_I	N/A
-+TC_CLIENT_OPH_BV_09_I	N/A
-+TC_CLIENT_OPH_BV_10_I	N/A
-+TC_CLIENT_OPH_BV_11_I	N/A
-+TC_CLIENT_OPH_BV_12_I	N/A
-+TC_CLIENT_OPH_BV_13_I	N/A
-+TC_CLIENT_OPH_BV_14_I	N/A
-+TC_CLIENT_OPH_BV_15_I	N/A
-+TC_CLIENT_OPH_BV_16_I	N/A
-+TC_CLIENT_OPH_BV_17_I	N/A
-+TC_CLIENT_OPH_BV_18_I	N/A
-+TC_CLIENT_OPH_BV_19_I	PASS
-+TC_CLIENT_OPH_BV_20_I	PASS
-+TC_CLIENT_OPH_BV_22_I	PASS
-+TC_CLIENT_OPH_BV_23_I	PASS
-+TC_CLIENT_OPH_BV_24_I	N/A
-+TC_CLIENT_OPH_BV_25_I	N/A
-+TC_CLIENT_OPH_BV_26_I	N/A
-+TC_CLIENT_OPH_BV_34_I	PASS
-+TC_CLIENT_OPH_BI_01_C	PASS
-+TC_CLIENT_BCP_BV_01_I	N/A
-+TC_CLIENT_BCP_BV_02_I	N/A
-+TC_CLIENT_BCP_BV_03_I	N/A
-+TC_CLIENT_BCP_BV_04_I	N/A
-+TC_CLIENT_BCP_BV_05_I	N/A
-+TC_CLIENT_BCE_BV_01_I	N/A
-+TC_CLIENT_BCE_BV_03_I	N/A
-+TC_CLIENT_BCE_BV_04_I	N/A
-+TC_CLIENT_BCE_BV_05_I	N/A
-+TC_CLIENT_BCE_BV_06_I	N/A
-+TC_CLIENT_BCE_BV_07_I	N/A
-+TC_SERVER_OPH_BV_01_I	PASS
-+TC_SERVER_OPH_BV_02_I	PASS
-+TC_SERVER_OPH_BV_03_I	PASS
-+TC_SERVER_OPH_BV_04_I	PASS
-+TC_SERVER_OPH_BV_05_I	PASS
-+TC_SERVER_OPH_BV_07_I	N/A
-+TC_SERVER_OPH_BV_08_I	N/A
-+TC_SERVER_OPH_BV_09_I	N/A
-+TC_SERVER_OPH_BV_10_I	PASS
-+TC_SERVER_OPH_BV_11_I	N/A
-+TC_SERVER_OPH_BV_12_I	N/A
-+TC_SERVER_OPH_BV_13_I	N/A
-+TC_SERVER_OPH_BV_14_I	PASS
-+TC_SERVER_OPH_BV_15_I	N/A
-+TC_SERVER_OPH_BV_16_I	N/A
-+TC_SERVER_OPH_BV_17_I	N/A
-+TC_SERVER_OPH_BV_18_I	PASS
-+TC_SERVER_OPH_BV_19_I	PASS
-+TC_SERVER_OPH_BV_21_I	N/A
-+TC_SERVER_OPH_BV_22_I	PASS
-+TC_SERVER_OPH_BV_23_I	PASS
-+TC_SERVER_OPH_BV_24_I	N/A
-+TC_SERVER_OPH_BV_25_I	N/A
-+TC_SERVER_OPH_BV_26_I	N/A
-+TC_SERVER_OPH_BV_34_I	PASS
-+TC_SERVER_BCP_BV_01_I	N/A
-+TC_SERVER_BCP_BV_02_I	PASS
-+TC_SERVER_BCP_BV_03_I	N/A
-+TC_SERVER_BCP_BV_04_I	N/A
-+TC_SERVER_BCP_BV_05_I	N/A
-+TC_SERVER_BCE_BV_01_I	N/A
-+TC_SERVER_BCE_BV_03_I	N/A
-+TC_SERVER_BCE_BV_04_I	N/A
-+TC_SERVER_BCE_BV_05_I	N/A
-+TC_SERVER_BCE_BV_06_I	N/A
-+TC_SERVER_BCE_BV_07_I	N/A
-+TC_CLIENT_OPH_BV_27_I	N/A
-+TC_SERVER_OPH_BV_27_I	N/A
-+TC_SERVER_OPH_BV_30_I	N/A
-+TC_SERVER_OPH_BV_31_I	N/A
-+TC_SERVER_OPH_BV_32_I	N/A
-+TC_SERVER_OPH_BV_33_I	N/A
-+-------------------------------------------------------------------------------
++	/* Check that file descriptor is valid */
++	if (status == BT_STATUS_SUCCESS && fcntl(sock_fd, F_GETFD) == -1) {
++		tester_test_failed();
++		return;
++	}
++
++	tester_test_passed();
++
++clean:
++	if (sock_fd >= 0)
++		close(sock_fd);
++}
++
+ #define test_bredrle(name, data, test_setup, test, test_teardown) \
+ 	do { \
+ 		struct test_data *user; \
+@@ -829,5 +863,9 @@ int main(int argc, char *argv[])
+ 			&btsock_sucess,
+ 			setup_socket_interface, test_generic_listen, teardown);
+ 
++	test_bredrle("Test Socket Connect - Invalid: sock_type 0",
++			&btsock_inv_param_socktype, setup_socket_interface,
++			test_generic_connect, teardown);
++
+ 	return tester_run();
+ }
 -- 
 1.8.3.2
 
