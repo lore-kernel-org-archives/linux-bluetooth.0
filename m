@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 2/7] android/tester: Make generic_data structure const void pointer
-Date: Thu, 12 Dec 2013 14:48:29 +0200
-Message-Id: <1386852514-17270-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 5/7] android/tester: Add Socket listen() invalid sock type
+Date: Thu, 12 Dec 2013 14:48:32 +0200
+Message-Id: <1386852514-17270-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1386852514-17270-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1386852514-17270-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,97 +11,70 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This allows us to have different types of generic data, like socket
-data, bluetooth data, etc.
+Test invalid socket type during listen()
 ---
- android/android-tester.c | 29 ++++++++++++++++++-----------
- 1 file changed, 18 insertions(+), 11 deletions(-)
+ android/android-tester.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
 diff --git a/android/android-tester.c b/android/android-tester.c
-index 7ecc80d..800c14d 100644
+index 11c3639..f5df0df 100644
 --- a/android/android-tester.c
 +++ b/android/android-tester.c
-@@ -74,7 +74,7 @@ struct test_data {
- 	unsigned int mgmt_settings_id;
- 	struct hciemu *hciemu;
- 	enum hciemu_type hciemu_type;
--	const struct generic_data *test_data;
-+	const void *test_data;
- 	pid_t bluetoothd_pid;
- 	const bt_interface_t *if_bluetooth;
+@@ -698,6 +698,15 @@ static void test_dummy(const void *test_data)
  
-@@ -111,6 +111,7 @@ static void command_generic_new_settings(uint16_t index, uint16_t length,
- 					const void *param, void *user_data)
+ /* Test Socket HAL */
+ 
++static const struct socket_data btsock_inv_param_socktype = {
++	.sock_type = 0,
++	.channel = 1,
++	.service_uuid = NULL,
++	.service_name = "Test service",
++	.flags = 0,
++	.expected_status = BT_STATUS_PARM_INVALID,
++};
++
+ static void setup_socket_interface(const void *test_data)
  {
  	struct test_data *data = tester_get_data();
-+	const struct generic_data *test_data = data->test_data;
- 	uint32_t settings;
- 
- 	if (length != 4) {
-@@ -121,8 +122,8 @@ static void command_generic_new_settings(uint16_t index, uint16_t length,
- 
- 	settings = bt_get_le32(param);
- 
--	if ((settings & data->test_data->expect_settings_set) !=
--					data->test_data->expect_settings_set)
-+	if ((settings & test_data->expect_settings_set) !=
-+					test_data->expect_settings_set)
- 		return;
- 
- 	test_mgmt_settings_set(data);
-@@ -131,29 +132,34 @@ static void command_generic_new_settings(uint16_t index, uint16_t length,
- 
- static void hal_cb_init(struct test_data *data)
- {
-+	const struct generic_data *test_data = data->test_data;
- 	unsigned int i = 0;
- 
--	while (data->test_data->expected_hal_callbacks[i]) {
--						data->expected_callbacks =
--				g_slist_append(data->expected_callbacks,
--		GINT_TO_POINTER(data->test_data->expected_hal_callbacks[i]));
-+	while (test_data->expected_hal_callbacks[i]) {
-+		data->expected_callbacks =
-+			g_slist_append(data->expected_callbacks,
-+		GINT_TO_POINTER(test_data->expected_hal_callbacks[i]));
- 		i++;
- 	}
+@@ -714,6 +723,28 @@ static void setup_socket_interface(const void *test_data)
+ 	tester_setup_complete();
  }
  
- static void mgmt_cb_init(struct test_data *data)
- {
--	if (!data->test_data->expect_settings_set)
-+	const struct generic_data *test_data = data->test_data;
++static void test_generic_listen(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct socket_data *test = data->test_data;
++	bt_status_t status;
++	int sock_fd = -1;
 +
-+	if (!test_data->expect_settings_set)
- 		test_mgmt_settings_set(data);
- 	else
- 		data->mgmt_settings_id = mgmt_register(data->mgmt,
--					MGMT_EV_NEW_SETTINGS, data->mgmt_index,
-+				MGMT_EV_NEW_SETTINGS, data->mgmt_index,
- 				command_generic_new_settings, NULL, NULL);
- }
- 
- static void expected_status_init(struct test_data *data)
- {
--	if (!(data->test_data->expected_adapter_status))
-+	const struct generic_data *test_data = data->test_data;
++	status = data->if_sock->listen(test->sock_type,
++					test->service_name, test->service_uuid,
++					test->channel, &sock_fd, test->flags);
++	if (status != test->expected_status) {
++		tester_test_failed();
++		goto clean;
++	}
 +
-+	if (!(test_data->expected_adapter_status))
- 		data->status_checked = true;
++	tester_test_passed();
++
++clean:
++	if (sock_fd >= 0)
++		close(sock_fd);
++}
++
+ #define test_bredrle(name, data, test_setup, test, test_teardown) \
+ 	do { \
+ 		struct test_data *user; \
+@@ -747,5 +778,9 @@ int main(int argc, char *argv[])
+ 	test_bredrle("Test Socket Init", NULL, setup_socket_interface,
+ 						test_dummy, teardown);
+ 
++	test_bredrle("Test Socket Listen - Invalid sock type",
++			&btsock_inv_param_socktype, setup_socket_interface,
++			test_generic_listen, teardown);
++
+ 	return tester_run();
  }
- 
-@@ -167,8 +173,9 @@ static void init_test_conditions(struct test_data *data)
- static void check_expected_status(uint8_t status)
- {
- 	struct test_data *data = tester_get_data();
-+	const struct generic_data *test_data = data->test_data;
- 
--	if (data->test_data->expected_adapter_status == status)
-+	if (test_data->expected_adapter_status == status)
- 		data->status_checked = true;
- 	else
- 		tester_test_failed();
 -- 
 1.8.3.2
 
