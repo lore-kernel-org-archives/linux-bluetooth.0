@@ -1,39 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
-Subject: Re: [PATCH bluetooth-next] 6lowpan: fix/move/cleanup debug functions
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1386875725-4436-1-git-send-email-alex.aring@gmail.com>
-Date: Thu, 12 Dec 2013 21:16:46 +0100
-Cc: linux-zigbee-devel@lists.sourceforge.net, werner@almesberger.net,
-	"linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <977F4F36-7A08-4D53-8E64-B56413EA5D96@holtmann.org>
-References: <1386875725-4436-1-git-send-email-alex.aring@gmail.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <52AA1854.500@ahsoftware.de>
+Date: Thu, 12 Dec 2013 21:11:00 +0100
+From: Alexander Holler <holler@ahsoftware.de>
+MIME-Version: 1.0
+To: Gustavo Padovan <gustavo@padovan.org>,
+ Gianluca Anzolin <gianluca@sottospazio.it>,
+ peter@hurleysoftware.com, marcel@holtmann.org,
+ linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org,
+ jslaby@suse.cz, linux-kernel@vger.kernel.org
+Subject: [REGRESSION] rfcomm (userland) broken by commit 29cd718b
+References: <1377620926-23370-1-git-send-email-gianluca@sottospazio.it> <20130919162413.GG4006@joana>
+In-Reply-To: <20130919162413.GG4006@joana>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hello,
 
-> There are several issues on current debug behaviour.
-> This patch fix the following issues:
-> 
-> - Fix debug printout only if DEBUG is defined.
-> - Move debug functions of 6LoWPAN code into 6lowpan header.
-> - Cleanup codestyle of debug functions.
-> 
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
-> net/bluetooth/6lowpan.c       | 27 ---------------------------
-> net/ieee802154/6lowpan.c      | 43 +++++--------------------------------------
-> net/ieee802154/6lowpan.h      | 32 ++++++++++++++++++++++++++++++++
-> net/ieee802154/6lowpan_iphc.c | 26 --------------------------
-> 4 files changed, 37 insertions(+), 91 deletions(-)
+since commit 29cd718beba999bda4bdbbf59b5a4d25c07e1547 "rfcomm: don't 
+release the port in rfcomm_dev_state_change()" the userland utility 
+rfcomm (both from bluez 4.101 and 5.12) is broken.
 
-patch has been applied to bluetooth-next tree.
+In detail the following note in the patch
 
-Regards
+Am 19.09.2013 18:24, schrieb Gustavo Padovan:
+> Hi Gianluca,
+>
+> 2013-08-27 Gianluca Anzolin <gianluca@sottospazio.it>:
+>
+>> When the dlc is closed, rfcomm_dev_state_change() tries to release the
+>> port in the case it cannot get a reference to the tty. However this is
+>> racy and not even needed.
+>>
+>> Infact as Peter Hurley points out:
 
-Marcel
+(...)
 
+>> 4. After releasing the dlc lock in rfcomm_dev_add(),
+>>     rfcomm_dev_state_change() will 'see' an incomplete rfcomm_dev if a
+>>     tty reference could not be obtained. Again, the best thing to do here
+>>     is nothing. Any future attempted open() will block on
+>>     rfcomm_dev_carrier_raised(). The unconnected device will exist until
+>>     released by ioctl(RFCOMMRELEASEDEV).
+>>
+>> The patch removes the aforementioned code and uses the
+>> tty_port_tty_hangup() helper to hangup the tty.
+
+reads like the usage of that ioctl now necessary.
+
+What currently happens is that when one kills rfcomm (and any other 
+terminal which might use that tty), the entry in /dev doesn't disappear. 
+That means the same call to refcomm with the same device (e.g. 
+[/dev/]rfcomm1 doesn't work.
+
+My current solution is to just revert that commit.
+I haven't tested if modifying (the userland utility) rfcomm (adding that 
+ioctl) will help, but that looks only like a longterm solution.
+
+Regards,
+
+Alexander Holler
