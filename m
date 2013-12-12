@@ -1,49 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <3353914.oihVPgriBc@uw000953>
-References: <1386757887-29018-1-git-send-email-szymon.janc@tieto.com>
-	<1386757887-29018-6-git-send-email-szymon.janc@tieto.com>
-	<CAJdJm_N2aABBteKtWyRXh_-a8Oy722BMbZSrH_koNYbY8F5hpA@mail.gmail.com>
-	<3353914.oihVPgriBc@uw000953>
-Date: Thu, 12 Dec 2013 09:03:29 -0200
-Message-ID: <CAJdJm_P9Y2XU=X98c-hBTDz40HPXLtu3Q-8U9uQdQT2KXXrLXw@mail.gmail.com>
-Subject: Re: [PATCH 6/9] android/bluetooth: Add support for remote device RSSI
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/hal-sock: Fix returning unsupported instead of invalid
+Date: Thu, 12 Dec 2013 12:58:13 +0200
+Message-Id: <1386845893-14304-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Thu, Dec 12, 2013 at 5:58 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
->> On Wed, Dec 11, 2013 at 7:31 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
->> \> @@ -2306,11 +2309,13 @@ static uint8_t
->> get_device_friendly_name(struct device *dev)
->> >
->> >  static uint8_t get_device_rssi(struct device *dev)
->> >  {
->> > -       DBG("Not implemented");
->> > +       if (!dev->rssi)
->> > +               return HAL_STATUS_FAILED;
->>
->> 0 dBm is a valid RSSI value, so I suppose this code needs some other
->> way to identify an uninitialized value (e.g. a second boolean field.)
->
-> Kernel sends rssi==0 if rssi info was not present on inquiry so I used this
-> value, but maybe it should use 127 for that.. ? (yet, this might cause trouble
-> as linux bluetoothd is checking 0 as well)
+For socket type 0 we shall return BT_STATUS_PARM_INVALID,
+BT_STATUS_UNSUPPORTED shall be returned for unsupported socket types
+like L2CAP.
+---
+ android/hal-sock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I remember commenting on this when mgmt API (it was for TX Power,
-which is more common to be 0 dBm, but I can't remember what was the
-result of the discussion). In any case, I think handling this way will
-make devices that use TX Power higher than 0 dBm (and thus can make a
-0dBm RSSI possible) not report their RSSI. It is not common IMHO, but
-it is possible.
-
-Best Regards,
+diff --git a/android/hal-sock.c b/android/hal-sock.c
+index f45be30..301c77f 100644
+--- a/android/hal-sock.c
++++ b/android/hal-sock.c
+@@ -54,7 +54,7 @@ static bt_status_t sock_listen(btsock_type_t type, const char *service_name,
+ 					const uint8_t *uuid, int chan,
+ 					int *sock, int flags)
+ {
+-	if ((!uuid && chan <= 0) || !sock) {
++	if ((!uuid && chan <= 0) || !sock || !type) {
+ 		error("Invalid params: uuid %s, chan %d, sock %p",
+ 						btuuid2str(uuid), chan, sock);
+ 		return BT_STATUS_PARM_INVALID;
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.8.3.2
+
