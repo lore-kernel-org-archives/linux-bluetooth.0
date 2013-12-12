@@ -1,41 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Add missing 6lowpan.h include
-Date: Thu, 12 Dec 2013 09:53:20 +0200
-Message-Id: <1386834801-1635-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH] l2cap-tester: Close sk in error path
+Date: Thu, 12 Dec 2013 09:48:28 +0200
+Message-Id: <1386834508-9929-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-The 6lowpan.c file was missing an #include statement for 6lowpan.h.
-Without it we get the following type of warnings:
-
-net/bluetooth/6lowpan.c:320:5: warning: symbol 'bt_6lowpan_recv' was not declared. Should it be static?
-net/bluetooth/6lowpan.c:737:5: warning: symbol 'bt_6lowpan_add_conn' was not declared. Should it be static?
-net/bluetooth/6lowpan.c:805:5: warning: symbol 'bt_6lowpan_del_conn' was not declared. Should it be static?
-net/bluetooth/6lowpan.c:878:5: warning: symbol 'bt_6lowpan_init' was not declared. Should it be static?
-net/bluetooth/6lowpan.c:883:6: warning: symbol 'bt_6lowpan_cleanup' was not declared. Should it be static?
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+This fixes resource leak warnings.
 ---
- net/bluetooth/6lowpan.c | 2 ++
+ tools/l2cap-tester.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index ba840fe2c555..3cbb1d14c304 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -26,6 +26,8 @@
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/l2cap.h>
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index 505ac79..e4dade2 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -503,6 +503,7 @@ static int create_l2cap_sock(struct test_data *data, uint16_t psm)
+ 	master_bdaddr = hciemu_get_master_bdaddr(data->hciemu);
+ 	if (!master_bdaddr) {
+ 		tester_warn("No master bdaddr");
++		close(sk);
+ 		return -ENODEV;
+ 	}
  
-+#include "6lowpan.h"
-+
- #include "../ieee802154/6lowpan.h" /* for the compression support */
+@@ -701,6 +702,7 @@ static void test_server(const void *test_data)
+ 			tester_warn("listening on socket failed: %s (%u)",
+ 					strerror(errno), errno);
+ 			tester_test_failed();
++			close(sk);
+ 			return;
+ 		}
  
- #define IFACE_NAME_TEMPLATE "bt%d"
 -- 
-1.8.4.2
+1.8.3.2
 
