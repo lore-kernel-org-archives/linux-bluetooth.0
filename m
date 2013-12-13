@@ -1,32 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 13 Dec 2013 16:49:22 +0200
+Date: Fri, 13 Dec 2013 16:46:48 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] android: Add initial Android Bluetooth Audio
- protocol API doc
-Message-ID: <20131213144922.GE30037@x220.p-661hnu-f1>
-References: <1386938480-12049-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH] android/bluetooth: Fix missing property change
+ notification
+Message-ID: <20131213144648.GD30037@x220.p-661hnu-f1>
+References: <1386938291-26279-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1386938480-12049-1-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1386938291-26279-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Szymon,
 
-On Fri, Dec 13, 2013, Luiz Augusto von Dentz wrote:
-> This IPC is used to communicate Android BlueZ daemon and AudioFlinger
-> plugin.
+On Fri, Dec 13, 2013, Szymon Janc wrote:
+> After setting new discoverable timeout property change notification
+> with new value should be send.
 > ---
->  android/audio-ipc-api.txt | 50 +++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 50 insertions(+)
->  create mode 100644 android/audio-ipc-api.txt
+>  android/bluetooth.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 
-This seems to be missing an addition to EXTRA_DIST. Once you've fixed
-that feel free to push this yourself.
-
-Also, I assume you've got missing bits, like those for suspending and
-resuming streams planned for later patches?
+Applied. Thanks.
 
 Johan
