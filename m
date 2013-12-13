@@ -1,26 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 13 Dec 2013 16:54:38 +0200
+Date: Fri, 13 Dec 2013 16:53:22 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/bluetooth: Add support for getting remote device
- UUIDs property
-Message-ID: <20131213145438.GG30037@x220.p-661hnu-f1>
-References: <1386944441-785-1-git-send-email-szymon.janc@tieto.com>
+Subject: Re: [PATCH v2 1/5] android/tester: Add property check and bdname set
+ success test case
+Message-ID: <20131213145322.GF30037@x220.p-661hnu-f1>
+References: <1386938665-7179-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1386944441-785-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1386938665-7179-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Grzegorz,
 
-On Fri, Dec 13, 2013, Szymon Janc wrote:
-> This allows to query for remote device UUIDs property.
+On Fri, Dec 13, 2013, Grzegorz Kolodziejczyk wrote:
+> This adds handling of property check, bdname set property success.
 > ---
->  android/bluetooth.c | 91 ++++++++++++++++++++++++++---------------------------
->  1 file changed, 45 insertions(+), 46 deletions(-)
+>  android/android-tester.c | 75 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 75 insertions(+)
 
-Applied. Thanks.
+All five patches have been applied. Thanks.
 
 Johan
