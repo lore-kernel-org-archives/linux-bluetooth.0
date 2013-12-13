@@ -1,77 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/5] android/tester: Add scan mode set prop success test case
-Date: Fri, 13 Dec 2013 13:44:22 +0100
-Message-Id: <1386938665-7179-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v2 4/5] android/tester: Add bdaddr get prop success test case
+Date: Fri, 13 Dec 2013 13:44:24 +0100
+Message-Id: <1386938665-7179-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1386938665-7179-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1386938665-7179-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds scan mode set property success test case.
+This adds bdaddr set property success test case.
 ---
- android/android-tester.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ android/android-tester.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
 diff --git a/android/android-tester.c b/android/android-tester.c
-index 0a31b53..fc521a4 100644
+index 369af31..f347edf 100644
 --- a/android/android-tester.c
 +++ b/android/android-tester.c
-@@ -41,6 +41,9 @@
- 			adapter_prop_type, adapter_prop_scan_mode, \
- 			adapter_prop_bonded_devices, adapter_prop_disc_timeout
- 
-+static bt_scan_mode_t test_setprop_scanmode_val =
-+					BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE;
-+
- /*
-  * those are assigned to HAL methods and callbacks, we use ID later
-  * on mapped in switch-case due to different functions prototypes.
-@@ -577,6 +580,15 @@ static const struct generic_data bluetooth_setprop_bdname_success_test = {
- 	.expected_property.len = 11
+@@ -598,6 +598,14 @@ static const struct generic_data bluetooth_setprop_disctimeout_success_test = {
+ 	.expected_property.len = sizeof(test_setprop_disctimeout_val)
  };
  
-+static const struct generic_data bluetooth_setprop_scanmode_success_test = {
-+	.expected_hal_callbacks = {adapter_prop_scan_mode,
-+				adapter_prop_scan_mode, adapter_test_end},
++static const struct generic_data bluetooth_getprop_bdaddr_success_test = {
++	.expected_hal_callbacks = {adapter_prop_bdaddr, adapter_test_end},
 +	.expected_adapter_status = BT_STATUS_SUCCESS,
-+	.expected_property.type = BT_PROPERTY_ADAPTER_SCAN_MODE,
-+	.expected_property.val = &test_setprop_scanmode_val,
-+	.expected_property.len = sizeof(bt_scan_mode_t)
++	.expected_property.type = BT_PROPERTY_BDADDR,
++	.expected_property.val = NULL,
++	.expected_property.len = sizeof(bt_bdaddr_t)
 +};
 +
  static bt_callbacks_t bt_callbacks = {
  	.size = sizeof(bt_callbacks),
  	.adapter_state_changed_cb = adapter_state_changed_cb,
-@@ -807,6 +819,19 @@ static void test_setprop_bdname_success(const void *test_data)
+@@ -854,6 +862,19 @@ static void test_setprop_disctimeout_succes(const void *test_data)
  	check_expected_status(adapter_status);
  }
  
-+static void test_setprop_scanmode_succes(const void *test_data)
++static void test_getprop_bdaddr_success(const void *test_data)
 +{
 +	struct test_data *data = tester_get_data();
 +	const struct generic_data *test = data->test_data;
-+	const bt_property_t *prop = &test->expected_property;
++	const bt_property_t prop = test->expected_property;
 +	bt_status_t adapter_status;
 +
 +	init_test_conditions(data);
 +
-+	adapter_status = data->if_bluetooth->set_adapter_property(prop);
++	adapter_status = data->if_bluetooth->get_adapter_property(prop.type);
 +	check_expected_status(adapter_status);
 +}
 +
  #define test_bredrle(name, data, test_setup, test, test_teardown) \
  	do { \
  		struct test_data *user; \
-@@ -842,6 +867,11 @@ int main(int argc, char *argv[])
- 					setup_enabled_adapter,
- 					test_setprop_bdname_success, teardown);
+@@ -899,6 +920,11 @@ int main(int argc, char *argv[])
+ 				setup_enabled_adapter,
+ 				test_setprop_disctimeout_succes, teardown);
  
-+	test_bredrle("Test Set SCAN_MODE - Success",
-+				&bluetooth_setprop_scanmode_success_test,
-+				setup_enabled_adapter,
-+				test_setprop_scanmode_succes, teardown);
++	test_bredrle("Test Get BDADDR - Success",
++					&bluetooth_getprop_bdaddr_success_test,
++					setup_enabled_adapter,
++					test_getprop_bdaddr_success, teardown);
 +
  	test_bredrle("Test Socket Init", NULL, setup_socket_interface,
  						test_dummy, teardown);
