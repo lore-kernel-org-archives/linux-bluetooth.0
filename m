@@ -1,37 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 13 Dec 2013 14:51:18 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Sebastian <sebastianchlad@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Sebastian <sebastianx.chlad@intel.com>
+Subject: Re: [PATCH] Adding missing test scripts to Makefile.tools
+Message-ID: <20131213125118.GA25866@x220.p-661hnu-f1>
+References: <1386880421-19461-1-git-send-email-sebastianx.chlad@intel.com>
+ <1386880421-19461-2-git-send-email-sebastianx.chlad@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1386874657-26642-1-git-send-email-luiz.dentz@gmail.com>
-References: <1386874657-26642-1-git-send-email-luiz.dentz@gmail.com>
-Date: Fri, 13 Dec 2013 11:23:13 -0200
-Message-ID: <CAJdJm_OLnBVBR_qNxjTYE3G+RG8KRhobGjWXcfTom9xZu0c=-g@mail.gmail.com>
-Subject: Re: [RFC v2 BlueZ] build: Add coverage support
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1386880421-19461-2-git-send-email-sebastianx.chlad@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Sebastian,
 
-On Thu, Dec 12, 2013 at 4:57 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> +clean-local: clean-coverage
-> +       @find $(top_builddir) -name "*.gcda" -exec $(RM) {} \;
-> +       @find $(top_builddir) -name "*.gcno" -exec $(RM) {} \;
+On Thu, Dec 12, 2013, Sebastian wrote:
+> ---
+>  Makefile.tools | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Makefile.tools b/Makefile.tools
+> index 78034f5..b306c34 100644
+> --- a/Makefile.tools
+> +++ b/Makefile.tools
+> @@ -289,6 +289,7 @@ test_scripts += test/sap_client.py test/bluezutils.py \
+>  		test/test-thermometer test/test-profile test/test-health \
+>  		test/test-health-sink test/service-record.dtd \
+>  		test/service-did.xml test/service-spp.xml test/service-opp.xml \
+> -		test/service-ftp.xml test/simple-player test/test-nap \
+> +		test/opp-client test/service-ftp.xml test/ftp-client \
+> +		test/simple-player test/test-nap \
+>  		test/test-heartrate test/test-alert test/test-hfp \
+> -		test/test-cyclingspeed
+> +		test/test-cyclingspeed test/pbap-client test/map-client
 
-Another simplification suggestion:  Replace " -exec $(RM) {} \;" with
-"-delete", e.g.:
+Looks otherwise fine, but you'll need to fix your git author information
+and resend. We're not going to have an entry in the git history simply
+from someone called "Sebastian". It should also contain a last name.
 
-@find $(top_builddir) -name "*.gcda" -delete
-
-BTW if the deletion fails (e.g. file was created as root but cleanup
-is done as non-root), the find command will fail. If it is desirable
-that the cleanup never fail, you may need to add a "-" before the
-command (or use "|| true", whatever is the convention in BlueZ).
-
-Best Regards,
--- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+Johan
