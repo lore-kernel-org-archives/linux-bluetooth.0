@@ -1,77 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] android: Add initial Android Bluetooth Audio protocol API doc
-Date: Fri, 13 Dec 2013 14:41:20 +0200
-Message-Id: <1386938480-12049-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] android/bluetooth: Fix missing property change notification
+Date: Fri, 13 Dec 2013 13:38:11 +0100
+Message-Id: <1386938291-26279-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This IPC is used to communicate Android BlueZ daemon and AudioFlinger
-plugin.
+After setting new discoverable timeout property change notification
+with new value should be send.
 ---
- android/audio-ipc-api.txt | 50 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
- create mode 100644 android/audio-ipc-api.txt
+ android/bluetooth.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/android/audio-ipc-api.txt b/android/audio-ipc-api.txt
-new file mode 100644
-index 0000000..e2b85ab
---- /dev/null
-+++ b/android/audio-ipc-api.txt
-@@ -0,0 +1,50 @@
-+Bluetooth Audio Plugin
-+======================
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 4bb2c92..c60c9a2 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1387,6 +1387,10 @@ static uint8_t set_adapter_discoverable_timeout(const void *buf, uint16_t len)
+ 	/* TODO: This should be in some storage */
+ 	memcpy(&adapter.discoverable_timeout, timeout, sizeof(uint32_t));
+ 
++	send_adapter_property(HAL_PROP_ADAPTER_DISC_TIMEOUT,
++					sizeof(adapter.discoverable_timeout),
++					&adapter.discoverable_timeout);
 +
-+The audio plugin happen to be in a different socket but all the rules for
-+HAL socket apply here as well, the abstract socket name is
-+"\0bluez_audio_socket" (tentative):
-+
-+	.--Android--.                             .---Audio---.
-+	|  daemon   |                             |   Plugin  |
-+	|           |          Command            |           |
-+	|           | <-------------------------- |           |
-+	|           |                             |           |
-+	|           | --------------------------> |           |
-+	|           |          Response           |           |
-+	|           |                             |           |
-+	|           |                             |           |
-+	|           |        Notification         |           |
-+	|           | --------------------------> |           |
-+	|           |                             |           |
-+	'-----------'                             '-----------'
-+
-+
-+Identifier: "audio" (BT_AUDIO_ID)
-+
-+	Opcode 0x00 - Error response
-+
-+		Response parameters: Status (1 octet)
-+
-+	Opcode 0x01 - Register Audio Endpoint commmand
-+
-+		Command parameters: Service UUID (16 octets)
-+				    Codec ID (1 octets)
-+				    Codec capabilities length (1 octets)
-+				    Codec capabilities (variable)
-+				    Number of codec presets (1 octets)
-+				    Codec preset # length (1 octets)
-+				    Codec preset # configuration (variable)
-+				    ...
-+		Response parameters: Endpoint ID (1 octets)
-+
-+	Opcode 0x02 - Unregister Audio Endpoint command
-+
-+		Command parameters: Endpoint ID (1 octets)
-+		Response parameters: <none>
-+
-+	Opcode 0x81 - New Audio Connection notification
-+
-+		Notification parameters: Endpoint ID (1 octets)
-+					 Codec preset # (1 octets)
-+					 File descriptor (inline)
+ 	return HAL_STATUS_SUCCESS;
+ }
+ 
 -- 
-1.8.3.1
+1.8.3.2
 
