@@ -1,26 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 13 Dec 2013 16:53:22 +0200
+Date: Fri, 13 Dec 2013 16:49:22 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/5] android/tester: Add property check and bdname set
- success test case
-Message-ID: <20131213145322.GF30037@x220.p-661hnu-f1>
-References: <1386938665-7179-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: Re: [PATCH BlueZ] android: Add initial Android Bluetooth Audio
+ protocol API doc
+Message-ID: <20131213144922.GE30037@x220.p-661hnu-f1>
+References: <1386938480-12049-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1386938665-7179-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1386938480-12049-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Luiz,
 
-On Fri, Dec 13, 2013, Grzegorz Kolodziejczyk wrote:
-> This adds handling of property check, bdname set property success.
+On Fri, Dec 13, 2013, Luiz Augusto von Dentz wrote:
+> This IPC is used to communicate Android BlueZ daemon and AudioFlinger
+> plugin.
 > ---
->  android/android-tester.c | 75 ++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 75 insertions(+)
+>  android/audio-ipc-api.txt | 50 +++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 50 insertions(+)
+>  create mode 100644 android/audio-ipc-api.txt
 
-All five patches have been applied. Thanks.
+This seems to be missing an addition to EXTRA_DIST. Once you've fixed
+that feel free to push this yourself.
+
+Also, I assume you've got missing bits, like those for suspending and
+resuming streams planned for later patches?
 
 Johan
