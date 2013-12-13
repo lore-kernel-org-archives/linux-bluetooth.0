@@ -1,43 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 13 Dec 2013 14:51:18 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Sebastian <sebastianchlad@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Sebastian <sebastianx.chlad@intel.com>
-Subject: Re: [PATCH] Adding missing test scripts to Makefile.tools
-Message-ID: <20131213125118.GA25866@x220.p-661hnu-f1>
-References: <1386880421-19461-1-git-send-email-sebastianx.chlad@intel.com>
- <1386880421-19461-2-git-send-email-sebastianx.chlad@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1386880421-19461-2-git-send-email-sebastianx.chlad@intel.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 5/5] android/tester: Add bdname get prop success test case
+Date: Fri, 13 Dec 2013 13:44:25 +0100
+Message-Id: <1386938665-7179-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1386938665-7179-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1386938665-7179-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+This adds bdname set property success test case. First bdname is set and
+then is read.
+---
+ android/android-tester.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
-On Thu, Dec 12, 2013, Sebastian wrote:
-> ---
->  Makefile.tools | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Makefile.tools b/Makefile.tools
-> index 78034f5..b306c34 100644
-> --- a/Makefile.tools
-> +++ b/Makefile.tools
-> @@ -289,6 +289,7 @@ test_scripts += test/sap_client.py test/bluezutils.py \
->  		test/test-thermometer test/test-profile test/test-health \
->  		test/test-health-sink test/service-record.dtd \
->  		test/service-did.xml test/service-spp.xml test/service-opp.xml \
-> -		test/service-ftp.xml test/simple-player test/test-nap \
-> +		test/opp-client test/service-ftp.xml test/ftp-client \
-> +		test/simple-player test/test-nap \
->  		test/test-heartrate test/test-alert test/test-hfp \
-> -		test/test-cyclingspeed
-> +		test/test-cyclingspeed test/pbap-client test/map-client
+diff --git a/android/android-tester.c b/android/android-tester.c
+index f347edf..36266e7 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -606,6 +606,15 @@ static const struct generic_data bluetooth_getprop_bdaddr_success_test = {
+ 	.expected_property.len = sizeof(bt_bdaddr_t)
+ };
+ 
++static const struct generic_data bluetooth_getprop_bdname_success_test = {
++	.expected_hal_callbacks = {adapter_prop_bdname, adapter_prop_bdname,
++							adapter_test_end},
++	.expected_adapter_status = BT_STATUS_SUCCESS,
++	.expected_property.type = BT_PROPERTY_BDNAME,
++	.expected_property.val = "test_bdname_setget",
++	.expected_property.len = 17
++};
++
+ static bt_callbacks_t bt_callbacks = {
+ 	.size = sizeof(bt_callbacks),
+ 	.adapter_state_changed_cb = adapter_state_changed_cb,
+@@ -875,6 +884,22 @@ static void test_getprop_bdaddr_success(const void *test_data)
+ 	check_expected_status(adapter_status);
+ }
+ 
++static void test_getprop_bdname_success(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct generic_data *test = data->test_data;
++	const bt_property_t *prop = &test->expected_property;
++	bt_status_t adapter_status;
++
++	init_test_conditions(data);
++
++	adapter_status = data->if_bluetooth->set_adapter_property(prop);
++	check_expected_status(adapter_status);
++
++	adapter_status = data->if_bluetooth->get_adapter_property((*prop).type);
++	check_expected_status(adapter_status);
++}
++
+ #define test_bredrle(name, data, test_setup, test, test_teardown) \
+ 	do { \
+ 		struct test_data *user; \
+@@ -925,6 +950,11 @@ int main(int argc, char *argv[])
+ 					setup_enabled_adapter,
+ 					test_getprop_bdaddr_success, teardown);
+ 
++	test_bredrle("Test Get BDNAME - Success",
++					&bluetooth_getprop_bdname_success_test,
++					setup_enabled_adapter,
++					test_getprop_bdname_success, teardown);
++
+ 	test_bredrle("Test Socket Init", NULL, setup_socket_interface,
+ 						test_dummy, teardown);
+ 
+-- 
+1.8.4.2
 
-Looks otherwise fine, but you'll need to fix your git author information
-and resend. We're not going to have an entry in the git history simply
-from someone called "Sebastian". It should also contain a last name.
-
-Johan
