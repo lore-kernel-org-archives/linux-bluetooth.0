@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1386862737-30606-1-git-send-email-szymon.janc@tieto.com>
-References: <1386862737-30606-1-git-send-email-szymon.janc@tieto.com>
-Date: Fri, 13 Dec 2013 11:24:41 +0200
-Message-ID: <CABBYNZJjUfAsJJODh_uBBjSaQtC6DLVMAoQKCc6+ozWQvPChFg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] android/pts: Add PTS test results for OPP
+In-Reply-To: <1386855340-22911-1-git-send-email-szymon.janc@tieto.com>
+References: <1386855340-22911-1-git-send-email-szymon.janc@tieto.com>
+Date: Fri, 13 Dec 2013 11:24:14 +0200
+Message-ID: <CABBYNZLm6=SLYVmjkE+Kd=qQyjN1Z_6ByBC6rs4qqSSNWnFPqg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] android/pts: Add PTS test results for GAP
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Szymon Janc <szymon.janc@tieto.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -14,32 +14,31 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Szymon,
 
-On Thu, Dec 12, 2013 at 5:38 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+On Thu, Dec 12, 2013 at 3:35 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
 > This will allow for better tracking of current state of implementation.
 > ---
->  android/Makefile.am |  3 +-
->  android/pts-opp.txt | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 96 insertions(+), 1 deletion(-)
->  create mode 100644 android/pts-opp.txt
+>  android/Makefile.am |   2 +-
+>  android/pts-gap.txt | 155 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 156 insertions(+), 1 deletion(-)
+>  create mode 100644 android/pts-gap.txt
 >
 > diff --git a/android/Makefile.am b/android/Makefile.am
-> index 1dde8c1..bcd9f2b 100644
+> index 0bcab2f..7db0616 100644
 > --- a/android/Makefile.am
 > +++ b/android/Makefile.am
-> @@ -110,4 +110,5 @@ EXTRA_DIST += android/Android.mk android/hal-ipc-api.txt android/README \
+> @@ -110,4 +110,4 @@ EXTRA_DIST += android/Android.mk android/hal-ipc-api.txt android/README \
 >                 android/pixit-did.txt android/pts-did.txt \
 >                 android/pixit-gap.txt android/pixit-hid.txt \
 >                 android/pixit-opp.txt android/pixit-pan.txt \
-> -               android/pixit-pbap.txt android/pts-gap.txt android/pts-hid.txt
-> +               android/pixit-pbap.txt android/pts-gap.txt android/pts-hid.txt \
-> +               android/pts-opp.txt
-> diff --git a/android/pts-opp.txt b/android/pts-opp.txt
+> -               android/pixit-pbap.txt
+> +               android/pixit-pbap.txt android/pts-gap.txt
+> diff --git a/android/pts-gap.txt b/android/pts-gap.txt
 > new file mode 100644
-> index 0000000..b9329b9
+> index 0000000..0ea5539
 > --- /dev/null
-> +++ b/android/pts-opp.txt
-> @@ -0,0 +1,94 @@
-> +PTS test results for OPP
+> +++ b/android/pts-gap.txt
+> @@ -0,0 +1,155 @@
+> +PTS test results for GAP
 > +
 > +PTS version: 4.9
 > +Tested: 14.11.2013
@@ -53,85 +52,146 @@ On Thu, Dec 12, 2013 at 5:38 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
 > +-------------------------------------------------------------------------------
 > +Test Name              Result  Notes
 > +-------------------------------------------------------------------------------
-> +TC_CLIENT_OPH_BV_01_I  PASS
-> +TC_CLIENT_OPH_BV_02_I  N/A
-> +TC_CLIENT_OPH_BV_03_I  PASS
-> +TC_CLIENT_OPH_BV_04_I  N/A
-> +TC_CLIENT_OPH_BV_05_I  PASS
-> +TC_CLIENT_OPH_BV_07_I  N/A
-> +TC_CLIENT_OPH_BV_08_I  N/A
-> +TC_CLIENT_OPH_BV_09_I  N/A
-> +TC_CLIENT_OPH_BV_10_I  N/A
-> +TC_CLIENT_OPH_BV_11_I  N/A
-> +TC_CLIENT_OPH_BV_12_I  N/A
-> +TC_CLIENT_OPH_BV_13_I  N/A
-> +TC_CLIENT_OPH_BV_14_I  N/A
-> +TC_CLIENT_OPH_BV_15_I  N/A
-> +TC_CLIENT_OPH_BV_16_I  N/A
-> +TC_CLIENT_OPH_BV_17_I  N/A
-> +TC_CLIENT_OPH_BV_18_I  N/A
-> +TC_CLIENT_OPH_BV_19_I  PASS
-> +TC_CLIENT_OPH_BV_20_I  PASS
-> +TC_CLIENT_OPH_BV_22_I  PASS
-> +TC_CLIENT_OPH_BV_23_I  PASS
-> +TC_CLIENT_OPH_BV_24_I  N/A
-> +TC_CLIENT_OPH_BV_25_I  N/A
-> +TC_CLIENT_OPH_BV_26_I  N/A
-> +TC_CLIENT_OPH_BV_34_I  PASS
-> +TC_CLIENT_OPH_BI_01_C  PASS
-> +TC_CLIENT_BCP_BV_01_I  N/A
-> +TC_CLIENT_BCP_BV_02_I  N/A
-> +TC_CLIENT_BCP_BV_03_I  N/A
-> +TC_CLIENT_BCP_BV_04_I  N/A
-> +TC_CLIENT_BCP_BV_05_I  N/A
-> +TC_CLIENT_BCE_BV_01_I  N/A
-> +TC_CLIENT_BCE_BV_03_I  N/A
-> +TC_CLIENT_BCE_BV_04_I  N/A
-> +TC_CLIENT_BCE_BV_05_I  N/A
-> +TC_CLIENT_BCE_BV_06_I  N/A
-> +TC_CLIENT_BCE_BV_07_I  N/A
-> +TC_SERVER_OPH_BV_01_I  PASS
-> +TC_SERVER_OPH_BV_02_I  PASS
-> +TC_SERVER_OPH_BV_03_I  PASS
-> +TC_SERVER_OPH_BV_04_I  PASS
-> +TC_SERVER_OPH_BV_05_I  PASS
-> +TC_SERVER_OPH_BV_07_I  N/A
-> +TC_SERVER_OPH_BV_08_I  N/A
-> +TC_SERVER_OPH_BV_09_I  N/A
-> +TC_SERVER_OPH_BV_10_I  PASS
-> +TC_SERVER_OPH_BV_11_I  N/A
-> +TC_SERVER_OPH_BV_12_I  N/A
-> +TC_SERVER_OPH_BV_13_I  N/A
-> +TC_SERVER_OPH_BV_14_I  PASS
-> +TC_SERVER_OPH_BV_15_I  N/A
-> +TC_SERVER_OPH_BV_16_I  N/A
-> +TC_SERVER_OPH_BV_17_I  N/A
-> +TC_SERVER_OPH_BV_18_I  PASS
-> +TC_SERVER_OPH_BV_19_I  PASS
-> +TC_SERVER_OPH_BV_21_I  N/A
-> +TC_SERVER_OPH_BV_22_I  PASS
-> +TC_SERVER_OPH_BV_23_I  PASS
-> +TC_SERVER_OPH_BV_24_I  N/A
-> +TC_SERVER_OPH_BV_25_I  N/A
-> +TC_SERVER_OPH_BV_26_I  N/A
-> +TC_SERVER_OPH_BV_34_I  PASS
-> +TC_SERVER_BCP_BV_01_I  N/A
-> +TC_SERVER_BCP_BV_02_I  PASS
-> +TC_SERVER_BCP_BV_03_I  N/A
-> +TC_SERVER_BCP_BV_04_I  N/A
-> +TC_SERVER_BCP_BV_05_I  N/A
-> +TC_SERVER_BCE_BV_01_I  N/A
-> +TC_SERVER_BCE_BV_03_I  N/A
-> +TC_SERVER_BCE_BV_04_I  N/A
-> +TC_SERVER_BCE_BV_05_I  N/A
-> +TC_SERVER_BCE_BV_06_I  N/A
-> +TC_SERVER_BCE_BV_07_I  N/A
-> +TC_CLIENT_OPH_BV_27_I  N/A
-> +TC_SERVER_OPH_BV_27_I  N/A
-> +TC_SERVER_OPH_BV_30_I  N/A
-> +TC_SERVER_OPH_BV_31_I  N/A
-> +TC_SERVER_OPH_BV_32_I  N/A
-> +TC_SERVER_OPH_BV_33_I  N/A
+> +TC_MOD_NDIS_BV_01_C    PASS
+> +TC_MOD_LDIS_BV_01_C    N/A
+> +TC_MOD_LDIS_BV_02_C    N/A
+> +TC_MOD_LDIS_BV_03_C    N/A
+> +TC_MOD_GDIS_BV_01_C    PASS
+> +TC_MOD_GDIS_BV_02_C    PASS
+> +TC_MOD_NCON_BV_01_C    PASS
+> +TC_MOD_CON_BV_01_C     PASS
+> +TC_BROB_BCST_BV_01_C   N/A
+> +TC_BROB_BCST_BV_02_C   N/A
+> +TC_BROB_BCST_BV_03_C   N/A
+> +TC_BROB_OBSV_BV_01_C   N/A
+> +TC_BROB_OBSV_BV_02_C   N/A
+> +TC_BROB_OBSV_BV_03_C   N/A
+> +TC_BROB_OBSV_BV_04_C   N/A
+> +TC_BROB_OBSV_BV_05_C   N/A
+> +TC_DISC_NONM_BV_01_C   N/A
+> +TC_DISC_NONM_BV_02_C   N/A
+> +TC_DISC_LIMM_BV_01_C   N/A
+> +TC_DISC_LIMM_BV_02_C   N/A
+> +TC_DISC_LIMM_BV_03_C   N/A
+> +TC_DISC_LIMM_BV_04_C   N/A
+> +TC_DISC_GENM_BV_01_C   N/A
+> +TC_DISC_GENM_BV_02_C   N/A
+> +TC_DISC_GENM_BV_03_C   N/A
+> +TC_DISC_GENM_BV_04_C   N/A
+> +TC_DISC_LIMP_BV_01_C   N/A
+> +TC_DISC_LIMP_BV_02_C   N/A
+> +TC_DISC_LIMP_BV_03_C   N/A
+> +TC_DISC_LIMP_BV_04_C   N/A
+> +TC_DISC_LIMP_BV_05_C   N/A
+> +TC_DISC_GENP_BV_01_C   INC     LE not supported yet
+> +TC_DISC_GENP_BV_02_C   INC     LE not supported yet
+> +TC_DISC_GENP_BV_03_C   INC     LE not supported yet
+> +TC_DISC_GENP_BV_04_C   INC     LE not supported yet
+> +TC_DISC_GENP_BV_05_C   INC     LE not supported yet
+> +TC_IDLE_GIN_BV_01_C    PASS
+> +TC_IDLE_LIN_BV_01_C    N/A
+> +TC_IDLE_NAMP_BV_01_C   INC     LE not supported yet
+> +TC_IDLE_NAMP_BV_02_C   INC     LE not supported yet
+> +TC_CONN_NCON_BV_01_C   N/A
+> +TC_CONN_NCON_BV_02_C   N/A
+> +TC_CONN_NCON_BV_03_C   N/A
+> +TC_CONN_DCON_BV_01_C   N/A
+> +TC_CONN_DCON_BV_02_C   N/A
+> +TC_CONN_DCON_BV_03_C   N/A
+> +TC_CONN_UCON_BV_01_C   N/A
+> +TC_CONN_UCON_BV_02_C   N/A
+> +TC_CONN_UCON_BV_03_C   N/A
+> +TC_CONN_UCON_BV_04_C   N/A
+> +TC_CONN_UCON_BV_05_C   N/A
+> +TC_CONN_ACEP_BV_01_C   INC     LE not supported yet
+> +TC_CONN_ACEP_BV_02_C   N/A
+> +TC_CONN_GCEP_BV_01_C   INC     LE not supported yet
+> +TC_CONN_GCEP_BV_02_C   INC     LE not supported yet
+> +TC_CONN_GCEP_BV_03_C   N/A
+> +TC_CONN_GCEP_BV_04_C   N/A
+> +TC_CONN_SCEP_BV_01_C   INC     LE not supported yet
+> +TC_CONN_SCEP_BV_02_C   N/A
+> +TC_CONN_DCEP_BV_01_C   INC     LE not supported yet
+> +TC_CONN_DCEP_BV_02_C   N/A
+> +TC_CONN_DCEP_BV_03_C   INC     LE not supported yet
+> +TC_CONN_DCEP_BV_04_C   N/A
+> +TC_CONN_CPUP_BV_01_C   N/A
+> +TC_CONN_CPUP_BV_02_C   N/A
+> +TC_CONN_CPUP_BV_03_C   N/A
+> +TC_CONN_CPUP_BV_04_C   INC     LE not supported yet
+> +TC_CONN_CPUP_BV_05_C   INC     LE not supported yet
+> +TC_CONN_CPUP_BV_06_C   INC     LE not supported yet
+> +TC_CONN_TERM_BV_01_C   INC     LE not supported yet
+> +TC_CONN_PRDA_BV_01_C   N/A
+> +TC_CONN_PRDA_BV_02_C   INC     LE not supported yet
+> +TC_BOND_NBON_BV_01_C   N/A
+> +TC_BOND_NBON_BV_02_C   N/A
+> +TC_BOND_NBON_BV_03_C   N/A
+> +TC_BOND_BON_BV_01_C    N/A
+> +TC_BOND_BON_BV_02_C    INC     LE not supported yet
+> +TC_BOND_BON_BV_03_C    N/A
+> +TC_BOND_BON_BV_04_C    INC     LE not supported yet
+> +TC_SEC_AUT_BV_11_C     N/A
+> +TC_SEC_AUT_BV_12_C     INC     LE not supported yet
+> +TC_SEC_AUT_BV_13_C     N/A
+> +TC_SEC_AUT_BV_14_C     N/A
+> +TC_SEC_AUT_BV_15_C     N/A
+> +TC_SEC_AUT_BV_16_C     INC     LE not supported yet
+> +TC_SEC_AUT_BV_17_C     N/A
+> +TC_SEC_AUT_BV_18_C     N/A
+> +TC_SEC_AUT_BV_19_C     N/A
+> +TC_SEC_AUT_BV_20_C     N/A
+> +TC_SEC_AUT_BV_21_C     N/A
+> +TC_SEC_AUT_BV_22_C     N/A
+> +TC_SEC_AUT_BV_23_C     N/A
+> +TC_SEC_AUT_BV_24_C     N/A
+> +TC_SEC_CSIGN_BV_01_C   INC     LE not supported yet
+> +TC_SEC_CSIGN_BV_02_C   INC     LE not supported yet
+> +TC_SEC_CSIGN_BI_01_C   INC     LE not supported yet
+> +TC_SEC_CSIGN_BI_02_C   INC     LE not supported yet
+> +TC_SEC_CSIGN_BI_03_C   INC     LE not supported yet
+> +TC_SEC_CSIGN_BI_04_C   INC     LE not supported yet
+> +TC_PRIV_CONN_BV_01_C   N/A
+> +TC_PRIV_CONN_BV_02_C   N/A
+> +TC_PRIV_CONN_BV_03_C   N/A
+> +TC_PRIV_CONN_BV_04_C   N/A
+> +TC_PRIV_CONN_BV_05_C   N/A
+> +TC_PRIV_CONN_BV_06_C   N/A
+> +TC_PRIV_CONN_BV_07_C   N/A
+> +TC_PRIV_CONN_BV_08_C   N/A
+> +TC_PRIV_CONN_BV_09_C   N/A
+> +TC_ADV_BV_01_C         N/A
+> +TC_ADV_BV_02_C         N/A
+> +TC_ADV_BV_03_C         N/A
+> +TC_ADV_BV_04_C         N/A
+> +TC_ADV_BV_05_C         N/A
+> +TC_ADV_BV_06_C         N/A
+> +TC_ADV_BV_07_C         N/A
+> +TC_ADV_BV_08_C         N/A
+> +TC_ADV_BV_09_C         N/A
+> +TC_ADV_BV_10_C         N/A
+> +TC_GAT_BV_01_C         INC     LE not supported yet
+> +TC_GAT_BV_02_C         N/A
+> +TC_GAT_BV_03_C         N/A
+> +TC_GAT_BV_04_C         N/A
+> +TC_GAT_BV_05_C         N/A
+> +TC_GAT_BV_06_C         N/A
+> +TC_GAT_BV_07_C         N/A
+> +TC_GAT_BV_08_C         N/A
+> +TC_DM_NCON_BV_01_C     N/A
+> +TC_DM_CON_BV_01_C      N/A
+> +TC_DM_NBON_BV_01_C     N/A
+> +TC_DM_BON_BV_01_C      INC     LE not supported yet
+> +TC_DM_GIN_BV_01_C      INC     LE not supported yet
+> +TC_DM_LIN_BV_01_C      N/A
+> +TC_DM_NAD_BV_01_C      PASS
+> +TC_DM_NAD_BV_02_C      INC     LE not supported yet
+> +TC_DM_LEP_BV_01_C      N/A
+> +TC_DM_LEP_BV_02_C      N/A
+> +TC_DM_LEP_BV_03_C      N/A
+> +TC_DM_LEP_BV_04_C      N/A
+> +TC_DM_LEP_BV_05_C      N/A
+> +TC_DM_LEP_BV_06_C      INC     LE not supported yet
 > +-------------------------------------------------------------------------------
 > --
 > 1.8.3.2
