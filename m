@@ -1,48 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Sat, 14 Dec 2013 15:36:25 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Alexander Holler <holler@ahsoftware.de>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Shouldn't bluez serialize connection/authorization attempts?
+Message-ID: <20131214133625.GA27187@x220.p-661hnu-f1>
+References: <52AC4425.7080109@ahsoftware.de>
 MIME-Version: 1.0
-Date: Sat, 14 Dec 2013 21:55:22 +0800
-Message-ID: <CAPgLHd-RYQ14ZoEKZGm0iO5JVkPmr5s1k+H6nh4OR=Wr=r8EfQ@mail.gmail.com>
-Subject: [PATCH -next v2] Bluetooth: fix return value check
-From: Wei Yongjun <weiyj.lk@gmail.com>
-To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com
-Cc: yongjun_wei@trendmicro.com.cn, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <52AC4425.7080109@ahsoftware.de>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+Hi Alexander,
 
-In case of error, the function bt_skb_alloc() returns NULL pointer
-not ERR_PTR(). The IS_ERR() test in the return value check should
-be replaced with NULL test.
+On Sat, Dec 14, 2013, Alexander Holler wrote:
+> So besides the first connection attempt, all others do die somewhere
+> where userspace has no control over.
+> 
+> What happens is likely that connection attempts are refused by the
+> remote side, because an ongoing connection or authorization attempt
+> isn't finished while a new one arrives.
 
-Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
----
- net/bluetooth/6lowpan.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+>From the HCI logs you showed on IRC it was quite clear that the (remote
+side) authorization phase for each connect attempt was finished before
+the next connect attempt started, i.e. there was an L2CAP Connect
+Response with an error status before the next L2CAP Connect Request. So
+from this perspective there didn't seem to be any lack of serialization.
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 37239db..fb38c78 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -337,8 +337,8 @@ static inline int skbuff_copy(void *msg, int len, int count, int mtu,
- 		count = min_t(unsigned int, mtu, len);
- 
- 		tmp = bt_skb_alloc(count, GFP_ATOMIC);
--		if (IS_ERR(tmp))
--			return PTR_ERR(tmp);
-+		if (!tmp)
-+			return -ENOMEM;
- 
- 		*frag = tmp;
- 
-@@ -384,8 +384,8 @@ static struct sk_buff *create_pdu(struct l2cap_conn *conn, void *msg,
- 	BT_DBG("conn %p len %zu mtu %d count %d", conn, len, conn->mtu, count);
- 
- 	skb = bt_skb_alloc(count + L2CAP_HDR_SIZE, GFP_ATOMIC);
--	if (IS_ERR(skb))
--		return skb;
-+	if (!skb)
-+		return ERR_PTR(-ENOMEM);
- 
- 	skb->priority = priority;
- 
+Johan
