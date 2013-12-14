@@ -1,57 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 15 Dec 2013 12:24:13 +0100
-From: Gianluca Anzolin <gianluca@sottospazio.it>
-To: Alexander Holler <holler@ahsoftware.de>
-Cc: Peter Hurley <peter@hurleysoftware.com>,
-	Gustavo Padovan <gustavo@padovan.org>, marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org,
-	jslaby@suse.cz, linux-kernel@vger.kernel.org
-Subject: Re: [REGRESSION] rfcomm (userland) broken by commit 29cd718b
-Message-ID: <20131215112413.GA8980@sottospazio.it>
-References: <1377620926-23370-1-git-send-email-gianluca@sottospazio.it>
- <20130919162413.GG4006@joana>
- <52AA1854.500@ahsoftware.de>
- <52AA1E62.1030109@hurleysoftware.com>
- <52AA483E.4080706@ahsoftware.de>
+Message-ID: <52AC7DD5.1030402@ahsoftware.de>
+Date: Sat, 14 Dec 2013 16:48:37 +0100
+From: Alexander Holler <holler@ahsoftware.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <52AA483E.4080706@ahsoftware.de>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: Shouldn't bluez serialize connection/authorization attempts?
+References: <52AC4425.7080109@ahsoftware.de> <20131214133625.GA27187@x220.p-661hnu-f1> <52AC7237.10306@ahsoftware.de>
+In-Reply-To: <52AC7237.10306@ahsoftware.de>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Dec 13, 2013 at 12:35:26AM +0100, Alexander Holler wrote:
-> Am 12.12.2013 21:36, schrieb Peter Hurley:
-> 
-> >> What currently happens is that when one kills rfcomm (and any other
-> >> terminal which might use that tty), the entry in /dev doesn't
-> >> disappear. That means the same call to refcomm with the same device
-> >> (e.g. [/dev/]rfcomm1 doesn't work.
-> > 
-> > Thanks for the report, Alexander.
-> > 
-> > Point 4 above details a different situation; something else is
-> > happening.
-> > 
-> > Would you please detail the necessary steps to reproduce this regression?
-> > (How do you 'kill' rfcomm? etc.  Shell command lines would be best.)
-> 
-> Just call
-> 
-> rfcomm connect rfcomm9 01:23:45:67:89:ab
-> 
-> wait until the connection happened  (a message will appear) and then
-> press ctrl-c. This still terminates the bluetooth connection, but the
-> device in /dev is now left.
+Am 14.12.2013 15:59, schrieb Alexander Holler:
+> Am 14.12.2013 14:36, schrieb Johan Hedberg:
+>> Hi Alexander,
+>>
+>> On Sat, Dec 14, 2013, Alexander Holler wrote:
+>>> So besides the first connection attempt, all others do die somewhere
+>>> where userspace has no control over.
+>>>
+>>> What happens is likely that connection attempts are refused by the
+>>> remote side, because an ongoing connection or authorization attempt
+>>> isn't finished while a new one arrives.
+>>
+>>  From the HCI logs you showed on IRC it was quite clear that the (remote
+>> side) authorization phase for each connect attempt was finished before
+>> the next connect attempt started, i.e. there was an L2CAP Connect
+>> Response with an error status before the next L2CAP Connect Request. So
+>> from this perspective there didn't seem to be any lack of serialization.
+>
+> That wasn't so clear for me as I've seen different responses from the
+> remote device, but still nothing ended up at the local agent afer the
+> first connection attempt failed (regardless how many retries).
+>
+> So there is no solution to this problem and one local user can easily
+> DOS all local bluetooth communicaton?
 
-Yes I'm able to reproduce the regression which is indeed caused by that
-commit.
+Ok, that might be the wrong question. But I see two problems here:
 
-However I'm puzzled. Surely there is a fifth case I didn't cover because
-when rfcomm_dev_state_change() is called, the tty_port is there but the tty is
-not, and therefore I cannot get a reference to it and send the HUP.
+First, an application can't be sure why a connection attempt failed. 
+Second, how should an application behave if a connection attempt failed 
+because of unknown reasons? Just retrying doesn't seem work.
 
-I'll let you know when I have something working.
+Regards,
 
-> 
-> Regards,
-> 
-> Alexander Holler
+Alexander Holler
+
