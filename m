@@ -1,112 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1387129650.12172.90.camel@deadeye.wl.decadent.org.uk>
-Subject: Re: linux-firmware: pull-request Marvell mwifiex-firmware 2013-11-06
-From: Ben Hutchings <ben@decadent.org.uk>
-To: Bing Zhao <bzhao@marvell.com>
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Frank Huang <frankh@marvell.com>
-Date: Sun, 15 Dec 2013 17:47:30 +0000
-In-Reply-To: <1383765913-19716-1-git-send-email-bzhao@marvell.com>
-References: <1383765913-19716-1-git-send-email-bzhao@marvell.com>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-4YQP/PeUxXa9Huv2Pnlr"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sun, 15 Dec 2013 16:08:47 +0100
+From: Gianluca Anzolin <gianluca@sottospazio.it>
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: Alexander Holler <holler@ahsoftware.de>, marcel@holtmann.org,
+	Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org,
+	jslaby@suse.cz, linux-kernel@vger.kernel.org
+Subject: Re: [REGRESSION] rfcomm (userland) broken by commit 29cd718b
+Message-ID: <20131215150847.GA10288@sottospazio.it>
+References: <1377620926-23370-1-git-send-email-gianluca@sottospazio.it>
+ <20130919162413.GG4006@joana>
+ <52AA1854.500@ahsoftware.de>
+ <52AA1E62.1030109@hurleysoftware.com>
+ <52AA483E.4080706@ahsoftware.de>
+ <20131215112413.GA8980@sottospazio.it>
+ <52ADB6B7.5010503@hurleysoftware.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="azLHFNyN32YCQGCU"
+In-Reply-To: <52ADB6B7.5010503@hurleysoftware.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---=-4YQP/PeUxXa9Huv2Pnlr
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+--azLHFNyN32YCQGCU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Wed, 2013-11-06 at 11:25 -0800, Bing Zhao wrote:
-> The following changes since commit 7d0c7a8cfd78388d90cc784a185b19dcbdbce8=
-24:
->=20
->   Merge branch 'wilink4' of git://git.kernel.org/pub/scm/linux/kernel/git=
-/balbi/linux-firmware (2013-10-13 21:11:46 +0100)
->=20
-> are available in the git repository at:
->=20
->=20
->   git://git.marvell.com/mwifiex-firmware.git master
->=20
-> for you to fetch changes up to b7c848634538ff87317acd802fb4645cfd2f9fb5:
->=20
->   linux-firmware: add Marvell SD8897-B0 firmware combo image (2013-11-04 =
-16:03:34 -0800)
+On Sun, Dec 15, 2013 at 09:03:35AM -0500, Peter Hurley wrote:
+> On 12/15/2013 06:24 AM, Gianluca Anzolin wrote:
+> >On Fri, Dec 13, 2013 at 12:35:26AM +0100, Alexander Holler wrote:
+> >>Am 12.12.2013 21:36, schrieb Peter Hurley:
+> >>
+> >>>>What currently happens is that when one kills rfcomm (and any other
+> >>>>terminal which might use that tty), the entry in /dev doesn't
+> >>>>disappear. That means the same call to refcomm with the same device
+> >>>>(e.g. [/dev/]rfcomm1 doesn't work.
+> >>>
+> >>>Thanks for the report, Alexander.
+> >>>
+> >>>Point 4 above details a different situation; something else is
+> >>>happening.
+> >>>
+> >>>Would you please detail the necessary steps to reproduce this regression?
+> >>>(How do you 'kill' rfcomm? etc.  Shell command lines would be best.)
+> >>
+> >>Just call
+> >>
+> >>rfcomm connect rfcomm9 01:23:45:67:89:ab
+> >>
+> >>wait until the connection happened  (a message will appear) and then
+> >>press ctrl-c. This still terminates the bluetooth connection, but the
+> >>device in /dev is now left.
+> >
+> >Yes I'm able to reproduce the regression which is indeed caused by that
+> >commit.
+> >
+> >However I'm puzzled. Surely there is a fifth case I didn't cover because
+> >when rfcomm_dev_state_change() is called, the tty_port is there but the tty is
+> >not, and therefore I cannot get a reference to it and send the HUP.
+> 
+> There is a fifth case, but it's crazy.
+> 
+> The tty has been properly shutdown and destroyed because the tty file handle
+> was closed, not hungup. The rfcomm device reference was properly put
+> when the tty was released.
+> 
+> But when the remote hangs up (and sends disc), then rfcomm_dev_state_change()
+> is called -- to kill the port reference (thus the rfcomm device) that was
+> instantiated locally! Ridiculous. Doubly ridiculous because it's the local
+> port shutdown that closes the dlc locally that sends the disconnect (and sets
+> the local dlc state) that triggers the received rfcomm_dev_state_change()!
+> 
+> If this behavior is desirable (or necessary because it's been exposed to
+> userspace), then why was the design ever reference-counted to begin with?
+> 
+> Regards,
+> Peter Hurley
 
-Sorry for the delay.  Done.
+The attached patch fixes the regression by releasing the tty_port in the
+shutdown method(). This way we can avoid strange games in the dlc callback
+where we are constrained by the dlc lock.
 
-Ben.
+If this kind of approach is acceptable I will submit the patch for inclusion in
+a separate email.
 
-> ----------------------------------------------------------------
-> Bing Zhao (2):
->       linux-firmware: update Marvell PCIe/USB 8897-B0 firmware combo imag=
-e
->       linux-firmware: add Marvell SD8897-B0 firmware combo image
->=20
->  WHENCE                   |   5 ++++-
->  mrvl/pcie8897_uapsta.bin | Bin 350244 -> 656896 bytes
->  mrvl/sd8897_uapsta.bin   | Bin 0 -> 639012 bytes
->  3 files changed, 4 insertions(+), 1 deletion(-)
->  create mode 100644 mrvl/sd8897_uapsta.bin
->=20
-> diff --git a/WHENCE b/WHENCE
-> index 2d52804..3875e77 100644
-> --- a/WHENCE
-> +++ b/WHENCE
-> @@ -727,11 +727,14 @@ Version: 14.66.9.p96
->  File: mrvl/sd8797_uapsta.bin
->  Version: 14.66.11.p151
-> =20
-> +File: mrvl/sd8897_uapsta.bin
-> +Version: 15.69.2.p11
-> +
->  File: mrvl/usb8797_uapsta.bin
->  Version: 14.69.11.p179
-> =20
->  File: mrvl/pcie8897_uapsta.bin
-> -Version: 15.69.201.p52
-> +Version: 15.69.2.p11
-> =20
->  Licence: Redistributable. See LICENCE.Marvell for details.  Originates f=
-rom
->  http://git.marvell.com/?p=3Dmwifiex-firmware.git
-> diff --git a/mrvl/pcie8897_uapsta.bin b/mrvl/pcie8897_uapsta.bin
-> index b067689..858c100 100644
-> Binary files a/mrvl/pcie8897_uapsta.bin and b/mrvl/pcie8897_uapsta.bin di=
-ffer
-> diff --git a/mrvl/sd8897_uapsta.bin b/mrvl/sd8897_uapsta.bin
-> new file mode 100644
-> index 0000000..70732a6
-> Binary files /dev/null and b/mrvl/sd8897_uapsta.bin differ
+Thanks,
+Gianluca
 
---=20
-Ben Hutchings
-Q.  Which is the greater problem in the world today, ignorance or apathy?
-A.  I don't know and I couldn't care less.
+--azLHFNyN32YCQGCU
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment; filename="rfc.patch"
 
---=-4YQP/PeUxXa9Huv2Pnlr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index 84fcf9f..917b441 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -129,6 +129,11 @@ static void rfcomm_dev_shutdown(struct tty_port *port)
+ 
+ 	/* close the dlc */
+ 	rfcomm_dlc_close(dev->dlc, 0);
++
++	/* release the port if it was created with the flag RELEASE_ONHUP */
++	if (test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags) &&
++	    !test_and_set_bit(RFCOMM_TTY_RELEASED, &dev->flags))
++		tty_port_put(&dev->port);
+ }
+ 
+ static const struct tty_port_operations rfcomm_port_ops = {
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.15 (GNU/Linux)
-
-iQIVAwUAUq3rMue/yOyVhhEJAQpHDw/+KQ5wXMKH8UTDrDWYzw+hhTeQuIf/3R59
-85ioLjsi38ocKHkBoGGz8CFViZe6AEz4x5697QyAdY1SQDeovScWqo08yuFJsLyA
-MSikk43m7z+zmSJiRdYieyy4HibHtHTQBRMe/ArPxoKMXCI/Jzph5wNoDMoJarpr
-rqCRxuahM9Q/hF7j7lnhCVvuHBY4tYO830c/pdvjVYX/75uuBPVdvkreuhEI9o8A
-rGc6g0yg/uNZBOfrmIIOOXZrqsx/6MESaExj8mdNfF+BzxH5k8jcLC6XqmInX6Vy
-TUa49WWMdOgJXlZj2AAN6w9OEBlFtrDba3Iv7wzjgoQM4J4zTxTmUu2k12ZRsyhz
-/8oHujE6NXaV3VRBJ11tkbleyNtt6Uqpm591hrAHOQxTnJqRGsxuhh4ctjPIUl4s
-vJoZvKsZlHZmbfjBk38zx4rZoMn927xephhoAxyDXbt0YA50FHMgP5bbL1PSqbLY
-idz6pKOzKLx3HaWX5ysHYEpQL9AZi2jPNZUvpCWQfbBcv7t6UqMBwYNFr5pvUrGY
-TjBgMoqLD0u/LFVdcd931T6tGZ4j81s2HnytTy8pwVvSj8bj5LCPpHtTAGbtoMYv
-nYyNsXsYOByEW6AOT18cjKRXBamV+T+NkMwgbtp2bqn/GsavxRjViudOORJEFTtA
-lTGcZOhh+eY=
-=F7+i
------END PGP SIGNATURE-----
-
---=-4YQP/PeUxXa9Huv2Pnlr--
+--azLHFNyN32YCQGCU--
