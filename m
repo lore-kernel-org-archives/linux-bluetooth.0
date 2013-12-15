@@ -1,31 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastianchlad@gmail.com>
-To: johan.hedberg@intel.com
-Cc: linux-bluetooth@vger.kernel.org,
-	Sebastian Chlad <sebastianx.chlad@intel.com>
-Subject: [PATCH] Adding missing test scripts to Makefile.tools
-Date: Sun, 15 Dec 2013 12:47:49 +0100
-Message-Id: <1387108069-9616-1-git-send-email-sebastianx.chlad@intel.com>
-In-Reply-To: <1386880421-19461-2-git-send-email-sebastianx.chlad@intel.com>
-References: <1386880421-19461-2-git-send-email-sebastianx.chlad@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sun, 15 Dec 2013 12:24:13 +0100
+From: Gianluca Anzolin <gianluca@sottospazio.it>
+To: Alexander Holler <holler@ahsoftware.de>
+Cc: Peter Hurley <peter@hurleysoftware.com>,
+	Gustavo Padovan <gustavo@padovan.org>, marcel@holtmann.org,
+	linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org,
+	jslaby@suse.cz, linux-kernel@vger.kernel.org
+Subject: Re: [REGRESSION] rfcomm (userland) broken by commit 29cd718b
+Message-ID: <20131215112413.GA8980@sottospazio.it>
+References: <1377620926-23370-1-git-send-email-gianluca@sottospazio.it>
+ <20130919162413.GG4006@joana>
+ <52AA1854.500@ahsoftware.de>
+ <52AA1E62.1030109@hurleysoftware.com>
+ <52AA483E.4080706@ahsoftware.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <52AA483E.4080706@ahsoftware.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- Makefile.tools | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On Fri, Dec 13, 2013 at 12:35:26AM +0100, Alexander Holler wrote:
+> Am 12.12.2013 21:36, schrieb Peter Hurley:
+> 
+> >> What currently happens is that when one kills rfcomm (and any other
+> >> terminal which might use that tty), the entry in /dev doesn't
+> >> disappear. That means the same call to refcomm with the same device
+> >> (e.g. [/dev/]rfcomm1 doesn't work.
+> > 
+> > Thanks for the report, Alexander.
+> > 
+> > Point 4 above details a different situation; something else is
+> > happening.
+> > 
+> > Would you please detail the necessary steps to reproduce this regression?
+> > (How do you 'kill' rfcomm? etc.  Shell command lines would be best.)
+> 
+> Just call
+> 
+> rfcomm connect rfcomm9 01:23:45:67:89:ab
+> 
+> wait until the connection happened  (a message will appear) and then
+> press ctrl-c. This still terminates the bluetooth connection, but the
+> device in /dev is now left.
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 78034f5..78bdf80 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -291,4 +291,5 @@ test_scripts += test/sap_client.py test/bluezutils.py \
- 		test/service-did.xml test/service-spp.xml test/service-opp.xml \
- 		test/service-ftp.xml test/simple-player test/test-nap \
- 		test/test-heartrate test/test-alert test/test-hfp \
--		test/test-cyclingspeed
-+		test/test-cyclingspeed test/opp-client test/ftp-client \
-+		test/pbap-client test/map-client
--- 
-1.8.1.2
+Yes I'm able to reproduce the regression which is indeed caused by that
+commit.
 
+However I'm puzzled. Surely there is a fifth case I didn't cover because
+when rfcomm_dev_state_change() is called, the tty_port is there but the tty is
+not, and therefore I cannot get a reference to it and send the HUP.
+
+I'll let you know when I have something working.
+
+> 
+> Regards,
+> 
+> Alexander Holler
