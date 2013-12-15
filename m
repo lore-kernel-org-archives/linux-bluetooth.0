@@ -1,41 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH] emulator/bthost: Fix use after free in bthost_destroy
-Date: Sun, 15 Dec 2013 20:55:48 +0100
-Message-Id: <1387137348-5377-1-git-send-email-szymon.janc@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <52ADECDC.8000907@ahsoftware.de>
+Date: Sun, 15 Dec 2013 18:54:36 +0100
+From: Alexander Holler <holler@ahsoftware.de>
+MIME-Version: 1.0
+To: Gianluca Anzolin <gianluca@sottospazio.it>,
+ Peter Hurley <peter@hurleysoftware.com>
+CC: marcel@holtmann.org, Gustavo Padovan <gustavo@padovan.org>,
+ linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org,
+ jslaby@suse.cz, linux-kernel@vger.kernel.org
+Subject: Re: [REGRESSION] rfcomm (userland) broken by commit 29cd718b
+References: <1377620926-23370-1-git-send-email-gianluca@sottospazio.it> <20130919162413.GG4006@joana> <52AA1854.500@ahsoftware.de> <52AA1E62.1030109@hurleysoftware.com> <52AA483E.4080706@ahsoftware.de> <20131215112413.GA8980@sottospazio.it> <52ADB6B7.5010503@hurleysoftware.com> <20131215150847.GA10288@sottospazio.it>
+In-Reply-To: <20131215150847.GA10288@sottospazio.it>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-cmd was dereferenced after free. Use temp pointer for freeing.
----
- emulator/bthost.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+Am 15.12.2013 16:08, schrieb Gianluca Anzolin:
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 10e7a05..b05072a 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -186,13 +186,15 @@ static struct l2conn *btconn_find_l2cap_conn_by_scid(struct btconn *conn,
- 
- void bthost_destroy(struct bthost *bthost)
- {
--	struct cmd *cmd;
--
- 	if (!bthost)
- 		return;
- 
--	for (cmd = bthost->cmd_q.tail; cmd != NULL; cmd = cmd->next)
-+	while (bthost->cmd_q.tail) {
-+		struct cmd *cmd = bthost->cmd_q.tail;
-+
-+		bthost->cmd_q.tail = cmd->next;
- 		free(cmd);
-+	}
- 
- 	while (bthost->conns) {
- 		struct btconn *conn = bthost->conns;
--- 
-1.8.5.1
+> The attached patch fixes the regression by releasing the tty_port in the
+> shutdown method(). This way we can avoid strange games in the dlc callback
+> where we are constrained by the dlc lock.
 
+Yes, it fixes the problem here too.
+
+> If this kind of approach is acceptable I will submit the patch for inclusion in
+> a separate email.
+
+If you do so, please add a Cc: stable@vger.kernel.org so that at least 
+3.12 will have a working rfcomm. You might also add a Reported-by: 
+and/or Tested-by: <holler@ahsoftware.de> if that makes someone happy ;)
+
+I've missed this patch previously, because it came late and I was happy 
+with the series of patches you've already had done.
+
+Thanks a lot (for the previous series too).
+
+Regards,
+
+Alexander Holler
