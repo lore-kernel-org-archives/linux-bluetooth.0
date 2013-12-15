@@ -1,75 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1387130038.12172.93.camel@deadeye.wl.decadent.org.uk>
-Subject: Re: [PATCH] linux-firmware: Update Intel Bluetooth devices firmware
- patch files
+Message-ID: <1387129650.12172.90.camel@deadeye.wl.decadent.org.uk>
+Subject: Re: linux-firmware: pull-request Marvell mwifiex-firmware 2013-11-06
 From: Ben Hutchings <ben@decadent.org.uk>
-To: Tedd Ho-Jeong An <tedd.an@intel.com>
-Cc: dwmw2@infradead.org, don.try@intel.com,
-	linux-bluetooth@vger.kernel.org
-Date: Sun, 15 Dec 2013 17:53:58 +0000
-In-Reply-To: <20131113172123.5702c78d@han1-desk-dev>
-References: <20131113172123.5702c78d@han1-desk-dev>
+To: Bing Zhao <bzhao@marvell.com>
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Frank Huang <frankh@marvell.com>
+Date: Sun, 15 Dec 2013 17:47:30 +0000
+In-Reply-To: <1383765913-19716-1-git-send-email-bzhao@marvell.com>
+References: <1383765913-19716-1-git-send-email-bzhao@marvell.com>
 Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-cQ43TGC1bbplVmhUEg+8"
+	protocol="application/pgp-signature"; boundary="=-4YQP/PeUxXa9Huv2Pnlr"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---=-cQ43TGC1bbplVmhUEg+8
+--=-4YQP/PeUxXa9Huv2Pnlr
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2013-11-13 at 17:21 -0800, Tedd Ho-Jeong An wrote:
-> From: Tedd Ho-Jeong An <tedd.an@intel.com>
+On Wed, 2013-11-06 at 11:25 -0800, Bing Zhao wrote:
+> The following changes since commit 7d0c7a8cfd78388d90cc784a185b19dcbdbce8=
+24:
 >=20
-> This patch updates firmware patch files for following Intel Bluetooth dev=
-ices:
-> - Intel Wireless Bluetooth 7260
-> - Intel Wireless Bluetooth 3160
+>   Merge branch 'wilink4' of git://git.kernel.org/pub/scm/linux/kernel/git=
+/balbi/linux-firmware (2013-10-13 21:11:46 +0100)
 >=20
-> This patch fixes
-> - sometimes device doesn't response to HCI_reset after multiple reboot
-> - issue with HCI stress testing
-> - issue with some multi profile cases
+> are available in the git repository at:
 >=20
-> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
-> ---
->  WHENCE                                  |   4 ++--
->  intel/ibt-hw-37.7.10-fw-1.0.2.3.d.bseq  | Bin 16761 -> 18145 bytes
->  intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq | Bin 16516 -> 17917 bytes
->  3 files changed, 2 insertions(+), 2 deletions(-)
-[...]
+>=20
+>   git://git.marvell.com/mwifiex-firmware.git master
+>=20
+> for you to fetch changes up to b7c848634538ff87317acd802fb4645cfd2f9fb5:
+>=20
+>   linux-firmware: add Marvell SD8897-B0 firmware combo image (2013-11-04 =
+16:03:34 -0800)
 
-Applied, thanks.  Sorry for the delay.
+Sorry for the delay.  Done.
 
 Ben.
+
+> ----------------------------------------------------------------
+> Bing Zhao (2):
+>       linux-firmware: update Marvell PCIe/USB 8897-B0 firmware combo imag=
+e
+>       linux-firmware: add Marvell SD8897-B0 firmware combo image
+>=20
+>  WHENCE                   |   5 ++++-
+>  mrvl/pcie8897_uapsta.bin | Bin 350244 -> 656896 bytes
+>  mrvl/sd8897_uapsta.bin   | Bin 0 -> 639012 bytes
+>  3 files changed, 4 insertions(+), 1 deletion(-)
+>  create mode 100644 mrvl/sd8897_uapsta.bin
+>=20
+> diff --git a/WHENCE b/WHENCE
+> index 2d52804..3875e77 100644
+> --- a/WHENCE
+> +++ b/WHENCE
+> @@ -727,11 +727,14 @@ Version: 14.66.9.p96
+>  File: mrvl/sd8797_uapsta.bin
+>  Version: 14.66.11.p151
+> =20
+> +File: mrvl/sd8897_uapsta.bin
+> +Version: 15.69.2.p11
+> +
+>  File: mrvl/usb8797_uapsta.bin
+>  Version: 14.69.11.p179
+> =20
+>  File: mrvl/pcie8897_uapsta.bin
+> -Version: 15.69.201.p52
+> +Version: 15.69.2.p11
+> =20
+>  Licence: Redistributable. See LICENCE.Marvell for details.  Originates f=
+rom
+>  http://git.marvell.com/?p=3Dmwifiex-firmware.git
+> diff --git a/mrvl/pcie8897_uapsta.bin b/mrvl/pcie8897_uapsta.bin
+> index b067689..858c100 100644
+> Binary files a/mrvl/pcie8897_uapsta.bin and b/mrvl/pcie8897_uapsta.bin di=
+ffer
+> diff --git a/mrvl/sd8897_uapsta.bin b/mrvl/sd8897_uapsta.bin
+> new file mode 100644
+> index 0000000..70732a6
+> Binary files /dev/null and b/mrvl/sd8897_uapsta.bin differ
 
 --=20
 Ben Hutchings
 Q.  Which is the greater problem in the world today, ignorance or apathy?
 A.  I don't know and I couldn't care less.
 
---=-cQ43TGC1bbplVmhUEg+8
+--=-4YQP/PeUxXa9Huv2Pnlr
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: This is a digitally signed message part
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.15 (GNU/Linux)
 
-iQIVAwUAUq3stue/yOyVhhEJAQqqKRAAgKgGWy66EPQW6ig6KADUKH9VAnLwVSZ1
-3TDQr/votYYB+5HUJldF+EVbXxWJB5stJUS4cWdpI0RDYaZ7mxtnhQKzQgu0RN63
-FKuVlHHEV1vMXpHaSxgTQoaPKRrHdpvKV0d/pXmYm+Z25I3Yv+uEdjlcKEPCghhn
-CpkOlcvY0xlVxBRAvBFB6aTQpp6l5pAE9cgsZulHfHVRvIGE3AHDGlI7xcLjV1Jb
-kaI1MsRbnNijCGeW56B6HKKQuAMJa0csSHQISeZYLxatcVqv7O7wRYPkgt9iM98B
-IrdcWFSSmf+BJKnA+n8npUzAp0yYbYtn2StKW3qG6fPSDv2l5ef/Oj7I/XXdLjPu
-eYDViCLoEwTB3WRP/3+hWDeHY+x2DY6utORjTB2OLSu/x6nbpUktRubPvkP5XXIB
-t+FQyta6i3B7WPrE7MTJyaN6DQrsVTVMg1r1mbCDh7vjLdMvLUQhGuZGkNOi3VR/
-WDuHwao7htkejyRQwqCUEqUVwUglpjz+dGxNtJ+8hmtGKEC4XgU/ZxfryYY4lDSG
-nB6VwErIST2XUqTaXhUGEJMAAOvmt44TJZBDDg13wCRuwT99yt/SF3h4wc1+ztVu
-Yjk/upyjzooPNLw4JHh3PZoJ0GqIZ/UJGJnGwtDzOuSmThMpQMOsX6ywgJ0dLC7u
-8Nyg5EN76XE=
-=kd11
+iQIVAwUAUq3rMue/yOyVhhEJAQpHDw/+KQ5wXMKH8UTDrDWYzw+hhTeQuIf/3R59
+85ioLjsi38ocKHkBoGGz8CFViZe6AEz4x5697QyAdY1SQDeovScWqo08yuFJsLyA
+MSikk43m7z+zmSJiRdYieyy4HibHtHTQBRMe/ArPxoKMXCI/Jzph5wNoDMoJarpr
+rqCRxuahM9Q/hF7j7lnhCVvuHBY4tYO830c/pdvjVYX/75uuBPVdvkreuhEI9o8A
+rGc6g0yg/uNZBOfrmIIOOXZrqsx/6MESaExj8mdNfF+BzxH5k8jcLC6XqmInX6Vy
+TUa49WWMdOgJXlZj2AAN6w9OEBlFtrDba3Iv7wzjgoQM4J4zTxTmUu2k12ZRsyhz
+/8oHujE6NXaV3VRBJ11tkbleyNtt6Uqpm591hrAHOQxTnJqRGsxuhh4ctjPIUl4s
+vJoZvKsZlHZmbfjBk38zx4rZoMn927xephhoAxyDXbt0YA50FHMgP5bbL1PSqbLY
+idz6pKOzKLx3HaWX5ysHYEpQL9AZi2jPNZUvpCWQfbBcv7t6UqMBwYNFr5pvUrGY
+TjBgMoqLD0u/LFVdcd931T6tGZ4j81s2HnytTy8pwVvSj8bj5LCPpHtTAGbtoMYv
+nYyNsXsYOByEW6AOT18cjKRXBamV+T+NkMwgbtp2bqn/GsavxRjViudOORJEFTtA
+lTGcZOhh+eY=
+=F7+i
 -----END PGP SIGNATURE-----
 
---=-cQ43TGC1bbplVmhUEg+8--
+--=-4YQP/PeUxXa9Huv2Pnlr--
