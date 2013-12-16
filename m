@@ -1,30 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/5] btmgmt: Remove unneeded code
-Date: Mon, 16 Dec 2013 10:57:38 +0200
-Message-Id: <1387184262-21439-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/5] avdtp: Remove unneeded local variable
+Date: Mon, 16 Dec 2013 10:57:39 +0200
+Message-Id: <1387184262-21439-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1387184262-21439-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1387184262-21439-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- tools/btmgmt.c | 1 -
- 1 file changed, 1 deletion(-)
+ profiles/audio/avdtp.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index 1d71d74..f31d8b1 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -555,7 +555,6 @@ static void user_confirm(uint16_t index, uint16_t len, const void *param,
- 	rsp_len = strlen(rsp);
- 	if (rsp[rsp_len - 1] == '\n') {
- 		rsp[rsp_len - 1] = '\0';
--		rsp_len--;
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index f866b39..e12ad9d 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -773,10 +773,9 @@ static int get_send_buffer_size(int sk)
+ 	socklen_t optlen = sizeof(size);
+ 
+ 	if (getsockopt(sk, SOL_SOCKET, SO_SNDBUF, &size, &optlen) < 0) {
+-		int err = -errno;
+-		error("getsockopt(SO_SNDBUF) failed: %s (%d)", strerror(-err),
+-									-err);
+-		return err;
++		error("getsockopt(SO_SNDBUF) failed: %s (%d)", strerror(errno),
++									errno);
++		return -errno;
  	}
  
- 	if (rsp[0] == 'y' || rsp[0] == 'Y')
+ 	/*
+@@ -792,10 +791,9 @@ static int set_send_buffer_size(int sk, int size)
+ 	socklen_t optlen = sizeof(size);
+ 
+ 	if (setsockopt(sk, SOL_SOCKET, SO_SNDBUF, &size, optlen) < 0) {
+-		int err = -errno;
+-		error("setsockopt(SO_SNDBUF) failed: %s (%d)", strerror(-err),
+-									-err);
+-		return err;
++		error("setsockopt(SO_SNDBUF) failed: %s (%d)", strerror(errno),
++									errno);
++		return -errno;
+ 	}
+ 
+ 	return 0;
 -- 
 1.8.3.2
 
