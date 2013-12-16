@@ -1,64 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/2] bluetooth/hidhost: Fix using feature event as output event
-Date: Mon, 16 Dec 2013 15:37:31 +0100
-Message-Id: <1387204652-14850-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2 BlueZ] android: Add initial Android Bluetooth Audio protocol API doc
+Date: Mon, 16 Dec 2013 15:08:37 +0200
+Message-Id: <1387199317-27438-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Rename handle_uhid_event to handle_uhid_output and make it handle only
-output events.
----
- android/hidhost.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index 8bfdfed..0e0391a 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -153,7 +153,8 @@ static void hid_device_free(struct hid_device *dev)
- 	g_free(dev);
- }
- 
--static void handle_uhid_event(struct hid_device *dev, struct uhid_event *ev)
-+static void handle_uhid_output(struct hid_device *dev,
-+						struct uhid_output_req *output)
- {
- 	int fd, i;
- 	uint8_t *req = NULL;
-@@ -162,15 +163,14 @@ static void handle_uhid_event(struct hid_device *dev, struct uhid_event *ev)
- 	if (!(dev->ctrl_io))
- 		return;
- 
--	req_size = 1 + (ev->u.output.size / 2);
-+	req_size = 1 + (output->size / 2);
- 	req = g_try_malloc0(req_size);
- 	if (!req)
- 		return;
- 
--	req[0] = HID_MSG_SET_REPORT | ev->u.output.rtype;
-+	req[0] = HID_MSG_SET_REPORT | output->rtype;
- 	for (i = 0; i < (req_size - 1); i++)
--		sscanf((char *) &(ev->u.output.data)[i * 2],
--							"%hhx", &req[1 + i]);
-+		sscanf((char *) &(output->data)[i * 2], "%hhx", &req[1 + i]);
- 
- 	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
- 
-@@ -224,8 +224,10 @@ static gboolean uhid_event_cb(GIOChannel *io, GIOCondition cond,
- 		 * asleep This is optional, though. */
- 		break;
- 	case UHID_OUTPUT:
-+		handle_uhid_output(dev, &ev.u.output);
-+		break;
- 	case UHID_FEATURE:
--		handle_uhid_event(dev, &ev);
-+		/* TODO */
- 		break;
- 	case UHID_OUTPUT_EV:
- 		/* This is only sent by kernels prior to linux-3.11. It
+This IPC is used to communicate Android BlueZ daemon and AudioFlinger
+plugin.
+---
+v2: Rework IPC commands to match Android Audio HAL
+
+ android/Makefile.am       |  3 +-
+ android/audio-ipc-api.txt | 85 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 87 insertions(+), 1 deletion(-)
+ create mode 100644 android/audio-ipc-api.txt
+
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 79f30d7..ac00bb2 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -111,4 +111,5 @@ EXTRA_DIST += android/Android.mk android/hal-ipc-api.txt android/README \
+ 		android/pixit-gap.txt android/pixit-hid.txt \
+ 		android/pixit-opp.txt android/pixit-pan.txt \
+ 		android/pixit-pbap.txt android/pts-gap.txt android/pts-hid.txt \
+-		android/pts-opp.txt android/pts-pbap.txt
++		android/pts-opp.txt android/pts-pbap.txt \
++		android/audio-ipc-api.txt
+diff --git a/android/audio-ipc-api.txt b/android/audio-ipc-api.txt
+new file mode 100644
+index 0000000..e9a2136
+--- /dev/null
++++ b/android/audio-ipc-api.txt
+@@ -0,0 +1,85 @@
++Bluetooth Audio Plugin
++======================
++
++The audio plugin happen to be in a different socket but all the rules for
++HAL socket apply here as well, the abstract socket name is
++"\0bluez_audio_socket" (tentative):
++
++	.--Android--.                             .---Audio---.
++	|  daemon   |                             |   Plugin  |
++	|           |          Command            |           |
++	|           | <-------------------------- |           |
++	|           |                             |           |
++	|           | --------------------------> |           |
++	|           |          Response           |           |
++	|           |                             |           |
++	|           |                             |           |
++	|           |                             |           |
++	'-----------'                             '-----------'
++
++
++	Audio HAL                               Daemon
++	----------------------------------------------------
++
++	call dev->open()                    --> command 0x01
++	return dev->open()                  <-- response 0x01
++
++	call dev->open_output_stream()      --> command 0x03
++	return dev->open_output_stream()    <-- response 0x03
++
++	call stream_in->read()              --> command 0x05
++	return stream_in->read()            <-- response 0x05
++
++	call stream_in->common.standby()    --> command 0x06
++	return  stream_in->common.standby() <-- response 0x06
++
++	call dev->close_output_stream()     --> command 0x04
++	return dev->close_output_stream()   <-- response 0x04
++
++	call dev->close()                   --> command 0x02
++	return dev->close()                 <-- response 0x02
++
++Identifier: "audio" (BT_AUDIO_ID)
++
++	Opcode 0x00 - Error response
++
++		Response parameters: Status (1 octet)
++
++	Opcode 0x01 - Open Audio Endpoint commmand
++
++		Command parameters: Service UUID (16 octets)
++				    Codec ID (1 octets)
++				    Codec capabilities length (1 octets)
++				    Codec capabilities (variable)
++				    Number of codec presets (1 octets)
++				    Codec preset # length (1 octets)
++				    Codec preset # configuration (variable)
++				    ...
++		Response parameters: Endpoint ID (1 octets)
++
++	Opcode 0x02 - Close Audio Endpoint command
++
++		Command parameters: Endpoint ID (1 octets)
++		Response parameters: <none>
++
++	Opcode 0x03 - Open Stream command
++
++		Command parameters: Endpoint ID (1 octets)
++		Response parameters: Codec configuration length (1 octets)
++				     Codec configuration (1 octets)
++				     File descriptor (inline)
++
++	Opcode 0x04 - Close Stream command
++
++		Command parameters: Endpoint ID (1 octets)
++		Response parameters: <none>
++
++	Opcode 0x05 - Resume Stream command
++
++		Command parameters: Endpoint ID (1 octets)
++		Response parameters: <none>
++
++	Opcode 0x06 - Suspend Stream command
++
++		Command parameters: Endpoint ID (1 octets)
++		Response parameters: <none>
 -- 
-1.8.3.2
+1.8.3.1
 
