@@ -1,89 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 16 Dec 2013 23:28:58 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Gustavo Padovan <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: [patch] Bluetooth: fix ->alloc_skb() error checking
-Message-ID: <20131216202857.GB19601@elgon.mountain>
+Date: Mon, 16 Dec 2013 21:27:20 +0100
+From: Gianluca Anzolin <gianluca@sottospazio.it>
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: Alexander Holler <holler@ahsoftware.de>, marcel@holtmann.org,
+	Gustavo Padovan <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org,
+	jslaby@suse.cz, linux-kernel@vger.kernel.org
+Subject: Re: [REGRESSION] rfcomm (userland) broken by commit 29cd718b
+Message-ID: <20131216202720.GB19746@sottospazio.it>
+References: <1377620926-23370-1-git-send-email-gianluca@sottospazio.it>
+ <20130919162413.GG4006@joana>
+ <52AA1854.500@ahsoftware.de>
+ <52AA1E62.1030109@hurleysoftware.com>
+ <52AA483E.4080706@ahsoftware.de>
+ <20131215112413.GA8980@sottospazio.it>
+ <52ADB6B7.5010503@hurleysoftware.com>
+ <20131215150847.GA10288@sottospazio.it>
+ <52AF55B4.6000303@hurleysoftware.com>
+ <20131216202044.GA19746@sottospazio.it>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20131216202044.GA19746@sottospazio.it>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There are two functions that implement ->alloc_skb().
+On Mon, Dec 16, 2013 at 09:20:44PM +0100, Gianluca Anzolin wrote:
+> On Mon, Dec 16, 2013 at 02:34:12PM -0500, Peter Hurley wrote:
+> > 
+> > This solution is acceptable to me, but I think the comment should briefly
+> > explain why this fix is necessary, and the changelog should explain why in detail.
+> > 
+> > Perhaps with a fixme comment that rfcomm_tty_install() should just take over
+> > the port reference (instead of adding one) and rfcomm_tty_cleanup() should
+> > conditionally release on RFCOMM_RELEASE_ONHUP.
+> > 
+> > Because then:
+> > 1) this fix would not be necessary.
+> > 2) the release in rfcomm_tty_hangup() would not be necessary
+> > 3) the second release in rfcomm_release_dev would not be necessary
+> > 4) the RFCOMM_TTY_RELEASED bit could be removed
+> > 
+> > 
+> > Regards,
+> > Peter Hurley
+> 
+> Taking over the refcount in the install method would certainly look better. I'm
+> going to test it ASAP :D
+> 
+> But why getting rid of the release in in rfcomm_tty_hangup()?
+> We could lose the bluetooth connection at any time and the dlc callback
+> would have to hangup the tty (and release the port if necessary).
+> 
+> Also the RFCOMM_TTY_RELEASED bit should still be necessary if the port is
+> created without the RFCOMM_RELEASE_ONHUP flag.
+> 
+> Besides any process could release the port behind us (with the command rfcomm
+> release rfcomm1 for example).
+> 
+> Gianluca
 
-a2mp_cahan_alloc_skb_cb() returns NULL.
-l2cap_sock_alloc_skb_cb() returns an ERR_PTR.
-
-The callers all check for ERR_PTRs and don't check for NULL.  On the
-other hand bt_skb_alloc() and the core net alloc_skb() return NULL so
-returning an error pointer is inconsistent.  This confusion between some
-alloc_skb() functions returning ERR_PTR and some returning NULL has been
-a source of bugs such as 787949039fcd ('Bluetooth: fix return value
-check').  This patch makes ->alloc_skb() return NULL and changes the
-callers to match.
-
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b0ad2c752d73..84c3ce04cb35 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2341,8 +2341,8 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
- 
- 		tmp = chan->ops->alloc_skb(chan, count,
- 					   msg->msg_flags & MSG_DONTWAIT);
--		if (IS_ERR(tmp))
--			return PTR_ERR(tmp);
-+		if (!tmp)
-+			return -ENOMEM;
- 
- 		*frag = tmp;
- 
-@@ -2379,8 +2379,8 @@ static struct sk_buff *l2cap_create_connless_pdu(struct l2cap_chan *chan,
- 
- 	skb = chan->ops->alloc_skb(chan, count + hlen,
- 				   msg->msg_flags & MSG_DONTWAIT);
--	if (IS_ERR(skb))
--		return skb;
-+	if (!skb)
-+		return ERR_PTR(-ENOMEM);
- 
- 	skb->priority = priority;
- 
-@@ -2413,8 +2413,8 @@ static struct sk_buff *l2cap_create_basic_pdu(struct l2cap_chan *chan,
- 
- 	skb = chan->ops->alloc_skb(chan, count + L2CAP_HDR_SIZE,
- 				   msg->msg_flags & MSG_DONTWAIT);
--	if (IS_ERR(skb))
--		return skb;
-+	if (skb)
-+		return ERR_PTR(-ENOMEM);
- 
- 	skb->priority = priority;
- 
-@@ -2457,8 +2457,8 @@ static struct sk_buff *l2cap_create_iframe_pdu(struct l2cap_chan *chan,
- 
- 	skb = chan->ops->alloc_skb(chan, count + hlen,
- 				   msg->msg_flags & MSG_DONTWAIT);
--	if (IS_ERR(skb))
--		return skb;
-+	if (!skb)
-+		return ERR_PTR(-ENOMEM);
- 
- 	/* Create L2CAP header */
- 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
-@@ -2578,8 +2578,8 @@ static struct sk_buff *l2cap_create_le_flowctl_pdu(struct l2cap_chan *chan,
- 
- 	skb = chan->ops->alloc_skb(chan, count + hlen,
- 				   msg->msg_flags & MSG_DONTWAIT);
--	if (IS_ERR(skb))
--		return skb;
-+	if (!skb)
-+		return ERR_PTR(-ENOMEM);
- 
- 	/* Create L2CAP header */
- 	lh = (struct l2cap_hdr *) skb_put(skb, L2CAP_HDR_SIZE);
+Nevermind I figured it out the reason...
