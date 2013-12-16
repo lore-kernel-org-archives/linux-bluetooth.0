@@ -1,79 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] android/tester: Add Socket test read channel number after listen
-Date: Mon, 16 Dec 2013 10:38:55 +0200
-Message-Id: <1387183137-19439-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 16 Dec 2013 10:17:36 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Sebastian Chlad <sebastianchlad@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Sebastian Chlad <sebastianx.chlad@intel.com>
+Subject: Re: [PATCH] Add PICS, PIXITs and PTS test results for L2CAP
+Message-ID: <20131216081736.GA8323@x220.p-661hnu-f1>
+References: <1387147192-19246-1-git-send-email-sebastianx.chlad@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1387147192-19246-1-git-send-email-sebastianx.chlad@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Sebastian,
 
-After listen() call Bluedroid sends channel number as (int) through file
-descriptor.
----
- android/android-tester.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+On Sun, Dec 15, 2013, Sebastian Chlad wrote:
+> +* - different than PTS defaults
+> +# - not yet implemented/supported
+> +
+> +M - mandatory
+> +O - optional
+> +
+> +		Roles
+> +-------------------------------------------------------------------------------
+> +Parameter Name	Selected	Description
+> +-------------------------------------------------------------------------------
+> +TSPC_L2CAP_1_1	True		Data Channel Initiator (C.1)
+> +TSPC_L2CAP_1_2	True		Data Channel Acceptor (C.1)
+> +TSPC_L2CAP_1_3	False (#)	LE Master (C.2)
+> +TSPC_L2CAP_1_4	False (#)	LE Slave (C.2)
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index a58104d..9b56616 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -82,6 +82,7 @@ struct socket_data {
- 	int channel;
- 	int flags;
- 	bt_status_t expected_status;
-+	bool test_channel;
- };
- 
- #define WAIT_FOR_SIGNAL_TIME 2 /* in seconds */
-@@ -820,6 +821,16 @@ static const struct socket_data btsock_success = {
- 	.expected_status = BT_STATUS_SUCCESS,
- };
- 
-+static const struct socket_data btsock_success_check_chan = {
-+	.sock_type = BTSOCK_RFCOMM,
-+	.channel = 1,
-+	.service_uuid = NULL,
-+	.service_name = "Test service",
-+	.flags = 0,
-+	.expected_status = BT_STATUS_SUCCESS,
-+	.test_channel = true,
-+};
-+
- static void setup_socket_interface(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
-@@ -857,6 +868,18 @@ static void test_generic_listen(const void *test_data)
- 		return;
- 	}
- 
-+	if (status == BT_STATUS_SUCCESS && test->test_channel) {
-+		int channel, len;
-+
-+		len = read(sock_fd, &channel, sizeof(channel));
-+		if (len != sizeof(channel) || channel != test->channel) {
-+			tester_test_failed();
-+			goto clean;
-+		}
-+
-+		tester_print("read correct channel: %d", channel);
-+	}
-+
- 	tester_test_passed();
- 
- clean:
-@@ -1035,6 +1058,10 @@ int main(int argc, char *argv[])
- 			&btsock_success,
- 			setup_socket_interface, test_generic_listen, teardown);
- 
-+	test_bredrle("Socket Listen - Check returned channel",
-+			&btsock_success_check_chan,
-+			setup_socket_interface, test_generic_listen, teardown);
-+
- 	test_bredrle("Socket Connect - Invalid: sock_type 0",
- 			&btsock_inv_param_socktype, setup_socket_interface,
- 			test_generic_connect, teardown);
--- 
-1.8.3.2
+I thought the idea of the '#' notation was that we could mark entries as
+True if they eventually will be supported but are not yet implemented.
+Wouldn't these last two entries fall under this category.
 
+> +-------------------------------------------------------------------------------
+> +Test Name              Result  Notes
+> +-------------------------------------------------------------------------------
+> +TC_COS_CED_BV_01_C     INC     IUT should introduce testing tools
+> +TC_COS_CED_BV_03_C     INC     IUT should introduce testing tools
+
+What does the note here mean. l2test? If so wouldn't it be more helpful
+to list the exact l2test command that's needs to be run?
+
+Johan
