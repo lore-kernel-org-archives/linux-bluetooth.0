@@ -1,56 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/5] l2cap-tester: Remove unneeded variable
-Date: Mon, 16 Dec 2013 10:57:41 +0200
-Message-Id: <1387184262-21439-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1387184262-21439-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1387184262-21439-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 3/3] android/tester: Add Socket test invalid bdaddr
+Date: Mon, 16 Dec 2013 10:38:57 +0200
+Message-Id: <1387183137-19439-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1387183137-19439-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1387183137-19439-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-err is only used to assign -errno before return.
+Test for zero bluetooth address in connect().
 ---
- tools/l2cap-tester.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ android/android-tester.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index e4dade2..4b1e5e2 100644
---- a/tools/l2cap-tester.c
-+++ b/tools/l2cap-tester.c
-@@ -489,15 +489,14 @@ static int create_l2cap_sock(struct test_data *data, uint16_t psm)
+diff --git a/android/android-tester.c b/android/android-tester.c
+index 9acc79d..eb938d0 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -832,6 +832,16 @@ static const struct socket_data btsock_success_check_chan = {
+ 	.test_channel = true,
+ };
+ 
++static const struct socket_data btsock_inv_param_bdaddr = {
++	.bdaddr = NULL,
++	.sock_type = BTSOCK_RFCOMM,
++	.channel = 1,
++	.service_uuid = NULL,
++	.service_name = "Test service",
++	.flags = 0,
++	.expected_status = BT_STATUS_PARM_INVALID,
++};
++
+ static void setup_socket_interface(const void *test_data)
  {
- 	const uint8_t *master_bdaddr;
- 	struct sockaddr_l2 addr;
--	int sk, err;
-+	int sk;
+ 	struct test_data *data = tester_get_data();
+@@ -1075,5 +1085,9 @@ int main(int argc, char *argv[])
+ 			&btsock_inv_params_chan_uuid,
+ 			setup_socket_interface, test_generic_connect, teardown);
  
- 	sk = socket(PF_BLUETOOTH, SOCK_SEQPACKET | SOCK_NONBLOCK,
- 							BTPROTO_L2CAP);
- 	if (sk < 0) {
--		err = -errno;
- 		tester_warn("Can't create socket: %s (%d)", strerror(errno),
- 									errno);
--		return err;
-+		return -errno;
- 	}
- 
- 	master_bdaddr = hciemu_get_master_bdaddr(data->hciemu);
-@@ -517,11 +516,10 @@ static int create_l2cap_sock(struct test_data *data, uint16_t psm)
- 		addr.l2_bdaddr_type = BDADDR_BREDR;
- 
- 	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
--		err = -errno;
- 		tester_warn("Can't bind socket: %s (%d)", strerror(errno),
- 									errno);
- 		close(sk);
--		return err;
-+		return -errno;
- 	}
- 
- 	return sk;
++	test_bredrle("Socket Connect - Invalid: bdaddr",
++			&btsock_inv_param_bdaddr,
++			setup_socket_interface, test_generic_connect, teardown);
++
+ 	return tester_run();
+ }
 -- 
 1.8.3.2
 
