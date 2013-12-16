@@ -1,91 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52AF55B4.6000303@hurleysoftware.com>
-Date: Mon, 16 Dec 2013 14:34:12 -0500
-From: Peter Hurley <peter@hurleysoftware.com>
 MIME-Version: 1.0
-To: Gianluca Anzolin <gianluca@sottospazio.it>
-CC: Alexander Holler <holler@ahsoftware.de>, marcel@holtmann.org,
- Gustavo Padovan <gustavo@padovan.org>,
- linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org,
- jslaby@suse.cz, linux-kernel@vger.kernel.org
-Subject: Re: [REGRESSION] rfcomm (userland) broken by commit 29cd718b
-References: <1377620926-23370-1-git-send-email-gianluca@sottospazio.it> <20130919162413.GG4006@joana> <52AA1854.500@ahsoftware.de> <52AA1E62.1030109@hurleysoftware.com> <52AA483E.4080706@ahsoftware.de> <20131215112413.GA8980@sottospazio.it> <52ADB6B7.5010503@hurleysoftware.com> <20131215150847.GA10288@sottospazio.it>
-In-Reply-To: <20131215150847.GA10288@sottospazio.it>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <CAN_7+YaOQLno_kZoi7sAk2f8Ky_natHGa1Zi-J9vErfZ5WW8ug@mail.gmail.com>
+References: <1387199317-27438-1-git-send-email-luiz.dentz@gmail.com>
+	<CAN_7+YaOQLno_kZoi7sAk2f8Ky_natHGa1Zi-J9vErfZ5WW8ug@mail.gmail.com>
+Date: Mon, 16 Dec 2013 20:31:29 +0200
+Message-ID: <CABBYNZ+d6c1ohwkj4Bqoa_=fN+aCT34LwJR1eE53xix_woPYow@mail.gmail.com>
+Subject: Re: [PATCH v2 BlueZ] android: Add initial Android Bluetooth Audio
+ protocol API doc
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 12/15/2013 10:08 AM, Gianluca Anzolin wrote:
-> On Sun, Dec 15, 2013 at 09:03:35AM -0500, Peter Hurley wrote:
->> On 12/15/2013 06:24 AM, Gianluca Anzolin wrote:
->>> On Fri, Dec 13, 2013 at 12:35:26AM +0100, Alexander Holler wrote:
->>>> Am 12.12.2013 21:36, schrieb Peter Hurley:
->>>>
->>>>>> What currently happens is that when one kills rfcomm (and any other
->>>>>> terminal which might use that tty), the entry in /dev doesn't
->>>>>> disappear. That means the same call to refcomm with the same device
->>>>>> (e.g. [/dev/]rfcomm1 doesn't work.
->>>>>
->>>>> Thanks for the report, Alexander.
->>>>>
->>>>> Point 4 above details a different situation; something else is
->>>>> happening.
->>>>>
->>>>> Would you please detail the necessary steps to reproduce this regression?
->>>>> (How do you 'kill' rfcomm? etc.  Shell command lines would be best.)
->>>>
->>>> Just call
->>>>
->>>> rfcomm connect rfcomm9 01:23:45:67:89:ab
->>>>
->>>> wait until the connection happened  (a message will appear) and then
->>>> press ctrl-c. This still terminates the bluetooth connection, but the
->>>> device in /dev is now left.
->>>
->>> Yes I'm able to reproduce the regression which is indeed caused by that
->>> commit.
->>>
->>> However I'm puzzled. Surely there is a fifth case I didn't cover because
->>> when rfcomm_dev_state_change() is called, the tty_port is there but the tty is
->>> not, and therefore I cannot get a reference to it and send the HUP.
->>
->> There is a fifth case, but it's crazy.
->>
->> The tty has been properly shutdown and destroyed because the tty file handle
->> was closed, not hungup. The rfcomm device reference was properly put
->> when the tty was released.
->>
->> But when the remote hangs up (and sends disc), then rfcomm_dev_state_change()
->> is called -- to kill the port reference (thus the rfcomm device) that was
->> instantiated locally! Ridiculous. Doubly ridiculous because it's the local
->> port shutdown that closes the dlc locally that sends the disconnect (and sets
->> the local dlc state) that triggers the received rfcomm_dev_state_change()!
->>
->> If this behavior is desirable (or necessary because it's been exposed to
->> userspace), then why was the design ever reference-counted to begin with?
->>
->> Regards,
->> Peter Hurley
+Hi Lukasz,
+
+On Mon, Dec 16, 2013 at 6:27 PM, Lukasz Rymanowski
+<lukasz.rymanowski@gmail.com> wrote:
+> Hi Luiz,
 >
-> The attached patch fixes the regression by releasing the tty_port in the
-> shutdown method(). This way we can avoid strange games in the dlc callback
-> where we are constrained by the dlc lock.
 >
-> If this kind of approach is acceptable I will submit the patch for inclusion in
-> a separate email.
+> On Mon, Dec 16, 2013 at 2:08 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> This IPC is used to communicate Android BlueZ daemon and AudioFlinger
+>> plugin.
+>> ---
+>> v2: Rework IPC commands to match Android Audio HAL
+>>
+>>  android/Makefile.am       |  3 +-
+>>  android/audio-ipc-api.txt | 85 +++++++++++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 87 insertions(+), 1 deletion(-)
+>>  create mode 100644 android/audio-ipc-api.txt
+>>
+>> diff --git a/android/Makefile.am b/android/Makefile.am
+>> index 79f30d7..ac00bb2 100644
+>> --- a/android/Makefile.am
+>> +++ b/android/Makefile.am
+>> @@ -111,4 +111,5 @@ EXTRA_DIST += android/Android.mk android/hal-ipc-api.txt android/README \
+>>                 android/pixit-gap.txt android/pixit-hid.txt \
+>>                 android/pixit-opp.txt android/pixit-pan.txt \
+>>                 android/pixit-pbap.txt android/pts-gap.txt android/pts-hid.txt \
+>> -               android/pts-opp.txt android/pts-pbap.txt
+>> +               android/pts-opp.txt android/pts-pbap.txt \
+>> +               android/audio-ipc-api.txt
+>> diff --git a/android/audio-ipc-api.txt b/android/audio-ipc-api.txt
+>> new file mode 100644
+>> index 0000000..e9a2136
+>> --- /dev/null
+>> +++ b/android/audio-ipc-api.txt
+>> @@ -0,0 +1,85 @@
+>> +Bluetooth Audio Plugin
+>> +======================
+>> +
+>> +The audio plugin happen to be in a different socket but all the rules for
+>> +HAL socket apply here as well, the abstract socket name is
+>> +"\0bluez_audio_socket" (tentative):
+>> +
+>> +       .--Android--.                             .---Audio---.
+>> +       |  daemon   |                             |   Plugin  |
+>> +       |           |          Command            |           |
+>> +       |           | <-------------------------- |           |
+>> +       |           |                             |           |
+>> +       |           | --------------------------> |           |
+>> +       |           |          Response           |           |
+>> +       |           |                             |           |
+>> +       |           |                             |           |
+>> +       |           |                             |           |
+>> +       '-----------'                             '-----------'
+>> +
+>> +
+>> +       Audio HAL                               Daemon
+>> +       ----------------------------------------------------
+>> +
+>> +       call dev->open()                    --> command 0x01
+>> +       return dev->open()                  <-- response 0x01
+>> +
+>> +       call dev->open_output_stream()      --> command 0x03
+>> +       return dev->open_output_stream()    <-- response 0x03
+>> +
+>> +       call stream_in->read()              --> command 0x05
+>> +       return stream_in->read()            <-- response 0x05
+>> +
+> I think it should be stream_out->write() here.
+>
+>> +       call stream_in->common.standby()    --> command 0x06
+>> +       return  stream_in->common.standby() <-- response 0x06
+>> +
+> Also here: stream_out->common.standby()
 
-This solution is acceptable to me, but I think the comment should briefly
-explain why this fix is necessary, and the changelog should explain why in detail.
+I guess it should work both ways, but perhaps Android is never meant
+to sink role nevertheless I would not limit the IPC to just source as
+it could be useful and it doesn't need that much to work.
 
-Perhaps with a fixme comment that rfcomm_tty_install() should just take over
-the port reference (instead of adding one) and rfcomm_tty_cleanup() should
-conditionally release on RFCOMM_RELEASE_ONHUP.
-
-Because then:
-1) this fix would not be necessary.
-2) the release in rfcomm_tty_hangup() would not be necessary
-3) the second release in rfcomm_release_dev would not be necessary
-4) the RFCOMM_TTY_RELEASED bit could be removed
-
-
-Regards,
-Peter Hurley
+-- 
+Luiz Augusto von Dentz
