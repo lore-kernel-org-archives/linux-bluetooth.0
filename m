@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/5] avdtp: Remove unneeded local variable
-Date: Mon, 16 Dec 2013 10:57:39 +0200
-Message-Id: <1387184262-21439-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 5/5] hciemu: Print error in case hci_vhci is not loaded
+Date: Mon, 16 Dec 2013 10:57:42 +0200
+Message-Id: <1387184262-21439-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1387184262-21439-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1387184262-21439-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,42 +11,32 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Error message should indicate that module is not loaded:
+Opening /dev/vhci failed: No such file or directory
 ---
- profiles/audio/avdtp.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+ src/shared/hciemu.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index f866b39..e12ad9d 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -773,10 +773,9 @@ static int get_send_buffer_size(int sk)
- 	socklen_t optlen = sizeof(size);
+diff --git a/src/shared/hciemu.c b/src/shared/hciemu.c
+index c2b4748..9f4bfaf 100644
+--- a/src/shared/hciemu.c
++++ b/src/shared/hciemu.c
+@@ -31,6 +31,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <stdbool.h>
++#include <errno.h>
+ #include <sys/socket.h>
  
- 	if (getsockopt(sk, SOL_SOCKET, SO_SNDBUF, &size, &optlen) < 0) {
--		int err = -errno;
--		error("getsockopt(SO_SNDBUF) failed: %s (%d)", strerror(-err),
--									-err);
--		return err;
-+		error("getsockopt(SO_SNDBUF) failed: %s (%d)", strerror(errno),
-+									errno);
-+		return -errno;
+ #include <glib.h>
+@@ -216,6 +217,7 @@ static bool create_vhci(struct hciemu *hciemu)
+ 
+ 	fd = open("/dev/vhci", O_RDWR | O_NONBLOCK | O_CLOEXEC);
+ 	if (fd < 0) {
++		perror("Opening /dev/vhci failed");
+ 		btdev_destroy(btdev);
+ 		return false;
  	}
- 
- 	/*
-@@ -792,10 +791,9 @@ static int set_send_buffer_size(int sk, int size)
- 	socklen_t optlen = sizeof(size);
- 
- 	if (setsockopt(sk, SOL_SOCKET, SO_SNDBUF, &size, optlen) < 0) {
--		int err = -errno;
--		error("setsockopt(SO_SNDBUF) failed: %s (%d)", strerror(-err),
--									-err);
--		return err;
-+		error("setsockopt(SO_SNDBUF) failed: %s (%d)", strerror(errno),
-+									errno);
-+		return -errno;
- 	}
- 
- 	return 0;
 -- 
 1.8.3.2
 
