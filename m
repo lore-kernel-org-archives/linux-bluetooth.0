@@ -1,46 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/7] android/tester: Add COD set prop fail test case
-Date: Tue, 17 Dec 2013 13:37:51 +0100
-Message-Id: <1387283874-29721-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 5/7] android/tester: Add TOD set prop fail test case
+Date: Tue, 17 Dec 2013 13:37:52 +0100
+Message-Id: <1387283874-29721-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1387283874-29721-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1387283874-29721-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds CLASS_OF_DEVICE set property fail test case due to only
+This adds TYPE_OF_DEVICE set property fail test case due to only
 get possibility.
 ---
  android/android-tester.c | 28 ++++++++++++++++++++++++++++
  1 file changed, 28 insertions(+)
 
 diff --git a/android/android-tester.c b/android/android-tester.c
-index 4fe0033..a6f66c2 100644
+index a6f66c2..4923a6c 100644
 --- a/android/android-tester.c
 +++ b/android/android-tester.c
-@@ -608,6 +608,16 @@ static const struct generic_data bluetooth_setprop_uuid_invalid_test = {
- 	.expected_property.len = 17
+@@ -618,6 +618,16 @@ static const struct generic_data bluetooth_setprop_cod_invalid_test = {
+ 	.expected_property.len = sizeof(uint32_t)
  };
  
-+static uint32_t setprop_class_of_device = 0;
++static bt_device_type_t setprop_type_of_device = BT_DEVICE_DEVTYPE_BREDR;
 +
-+static const struct generic_data bluetooth_setprop_cod_invalid_test = {
++static const struct generic_data bluetooth_setprop_tod_invalid_test = {
 +	.expected_hal_callbacks = {ADAPTER_TEST_END},
 +	.expected_adapter_status = BT_STATUS_FAIL,
-+	.expected_property.type = BT_PROPERTY_CLASS_OF_DEVICE,
-+	.expected_property.val = &setprop_class_of_device,
-+	.expected_property.len = sizeof(uint32_t)
++	.expected_property.type = BT_PROPERTY_TYPE_OF_DEVICE,
++	.expected_property.val = &setprop_type_of_device,
++	.expected_property.len = sizeof(bt_device_type_t)
 +};
 +
  static bt_callbacks_t bt_callbacks = {
  	.size = sizeof(bt_callbacks),
  	.adapter_state_changed_cb = adapter_state_changed_cb,
-@@ -998,6 +1008,19 @@ static void test_setprop_uuid_invalid(const void *test_data)
+@@ -1021,6 +1031,19 @@ static void test_setprop_cod_invalid(const void *test_data)
  	check_expected_status(adapter_status);
  }
  
-+static void test_setprop_cod_invalid(const void *test_data)
++static void test_setprop_tod_invalid(const void *test_data)
 +{
 +	struct test_data *data = tester_get_data();
 +	const struct generic_data *test = data->test_data;
@@ -56,14 +56,14 @@ index 4fe0033..a6f66c2 100644
  #define test_bredrle(name, data, test_setup, test, test_teardown) \
  	do { \
  		struct test_data *user; \
-@@ -1058,6 +1081,11 @@ int main(int argc, char *argv[])
+@@ -1086,6 +1109,11 @@ int main(int argc, char *argv[])
  					setup_enabled_adapter,
- 					test_setprop_uuid_invalid, teardown);
+ 					test_setprop_cod_invalid, teardown);
  
-+	test_bredrle("Set CLASS_OF_DEVICE - Invalid",
-+					&bluetooth_setprop_cod_invalid_test,
++	test_bredrle("Set TYPE_OF_DEVICE - Invalid",
++					&bluetooth_setprop_tod_invalid_test,
 +					setup_enabled_adapter,
-+					test_setprop_cod_invalid, teardown);
++					test_setprop_tod_invalid, teardown);
 +
  	test_bredrle("Socket Init", NULL, setup_socket_interface,
  						test_dummy, teardown);
