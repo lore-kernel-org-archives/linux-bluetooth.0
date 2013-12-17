@@ -1,74 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix HCI User Channel permission check in hci_sock_sendmsg
-Date: Tue, 17 Dec 2013 03:21:25 -0800
-Message-Id: <1387279285-60237-1-git-send-email-marcel@holtmann.org>
+Date: Tue, 17 Dec 2013 12:06:02 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-zigbee-devel@lists.sourceforge.net, werner@almesberger.net,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v2 bluetooth-next 1/7] 6lowpan: fix udp nullpointer
+ dereferencing
+Message-ID: <20131217110601.GA21663@omega>
+References: <1387276373-23882-1-git-send-email-alex.aring@gmail.com>
+ <1387276373-23882-2-git-send-email-alex.aring@gmail.com>
+ <CAJdJm_MC7DOYZ_nf-Sv6c61s0X-i2yY-7chgd5gA9ScFvVkRBg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAJdJm_MC7DOYZ_nf-Sv6c61s0X-i2yY-7chgd5gA9ScFvVkRBg@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The HCI User Channel is an admin operation which enforces CAP_NET_ADMIN
-when binding the socket. Problem now is that it then requires also
-CAP_NET_RAW when calling into hci_sock_sendmsg. This is not intended
-and just an oversight since general HCI sockets (which do not require
-special permission to bind) and HCI User Channel share the same code
-path here.
+On Tue, Dec 17, 2013 at 06:58:12AM -0400, Anderson Lizardo wrote:
+> Hi Alexander,
+> 
+> On Tue, Dec 17, 2013 at 6:32 AM, Alexander Aring <alex.aring@gmail.com> wrote:
+> > Sometimes a nullpointer dereferencing occurs because of using a wrong
+> > pointer arithmetic in udp_uncompression.
+> >
+> > This patch changes "**(hc06_ptr + 3)" to the right one "*(*hc06_ptr +
+> > 3)". Dereferencing like "**(hc06_ptr + 3)" works in a random case only.
+> 
+> And why not use hc06_ptr[0][3] ? IMHO it is more readable and the
+> arithmetic is the same (as far as I know).
+>
 
-Remove the extra CAP_NET_RAW check for HCI User Channel write operation
-since the permission check has already been enforced when binding the
-socket. This also makes it possible to open HCI User Channel from a
-privileged process and then hand the file descriptor to an unprivilged
-process.
+mhh maybe we change it to *hc06_ptr[3] ? Otherwise we have always
+something like [0][#] for access.
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_sock.c | 26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
-
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 6a6c8bb4fd72..7552f9e3089c 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -940,8 +940,22 @@ static int hci_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
- 	bt_cb(skb)->pkt_type = *((unsigned char *) skb->data);
- 	skb_pull(skb, 1);
- 
--	if (hci_pi(sk)->channel == HCI_CHANNEL_RAW &&
--	    bt_cb(skb)->pkt_type == HCI_COMMAND_PKT) {
-+	if (hci_pi(sk)->channel == HCI_CHANNEL_USER) {
-+		/* No permission check is needed for user channel
-+		 * since that gets enforced when binding the socket.
-+		 *
-+		 * However check that the packet type is valid.
-+		 */
-+		if (bt_cb(skb)->pkt_type != HCI_COMMAND_PKT &&
-+		    bt_cb(skb)->pkt_type != HCI_ACLDATA_PKT &&
-+		    bt_cb(skb)->pkt_type != HCI_SCODATA_PKT) {
-+			err = -EINVAL;
-+			goto drop;
-+		}
-+
-+		skb_queue_tail(&hdev->raw_q, skb);
-+		queue_work(hdev->workqueue, &hdev->tx_work);
-+	} else if (bt_cb(skb)->pkt_type == HCI_COMMAND_PKT) {
- 		u16 opcode = get_unaligned_le16(skb->data);
- 		u16 ogf = hci_opcode_ogf(opcode);
- 		u16 ocf = hci_opcode_ocf(opcode);
-@@ -972,14 +986,6 @@ static int hci_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
- 			goto drop;
- 		}
- 
--		if (hci_pi(sk)->channel == HCI_CHANNEL_USER &&
--		    bt_cb(skb)->pkt_type != HCI_COMMAND_PKT &&
--		    bt_cb(skb)->pkt_type != HCI_ACLDATA_PKT &&
--		    bt_cb(skb)->pkt_type != HCI_SCODATA_PKT) {
--			err = -EINVAL;
--			goto drop;
--		}
--
- 		skb_queue_tail(&hdev->raw_q, skb);
- 		queue_work(hdev->workqueue, &hdev->tx_work);
- 	}
--- 
-1.8.3.1
-
+- Alex
