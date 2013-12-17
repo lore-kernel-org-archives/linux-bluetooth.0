@@ -3,75 +3,61 @@ From: Alexander Aring <alex.aring@gmail.com>
 To: linux-zigbee-devel@lists.sourceforge.net
 Cc: werner@almesberger.net, linux-bluetooth@vger.kernel.org,
 	Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH v3 bluetooth-next 8/8] 6lowpan: cleanup udp compress function
-Date: Tue, 17 Dec 2013 14:21:28 +0100
-Message-Id: <1387286488-29382-9-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH v3 bluetooth-next 5/8] 6lowpan: add udp warning for elided checksum
+Date: Tue, 17 Dec 2013 14:21:25 +0100
+Message-Id: <1387286488-29382-6-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1387286488-29382-1-git-send-email-alex.aring@gmail.com>
 References: <1387286488-29382-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch remove unnecessary casts and brackets in compress_udp_header
-function.
+Bit 5 of "UDP LOWPAN_NHC Format" indicate that the checksum can be
+elided.
+The host need to calculate the udp checksum afterwards but this isn't
+supported right now.
 
+See:
+http://tools.ietf.org/html/rfc6282#section-4.3.3
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/ieee802154/6lowpan_iphc.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ net/ieee802154/6lowpan.h      |  1 +
+ net/ieee802154/6lowpan_iphc.c | 11 ++++++++---
+ 2 files changed, 9 insertions(+), 3 deletions(-)
 
+diff --git a/net/ieee802154/6lowpan.h b/net/ieee802154/6lowpan.h
+index 4981bf8..2b835db 100644
+--- a/net/ieee802154/6lowpan.h
++++ b/net/ieee802154/6lowpan.h
+@@ -231,6 +231,7 @@
+ #define LOWPAN_NHC_UDP_CS_P_10	0xF2 /* source = 0xF0 + 8bit inline,
+ 					dest = 16 bit inline */
+ #define LOWPAN_NHC_UDP_CS_P_11	0xF3 /* source & dest = 0xF0B + 4bit inline */
++#define LOWPAN_NHC_UDP_CS_C	0x04 /* checksum elided */
+ 
+ #ifdef DEBUG
+ /* print data in line */
 diff --git a/net/ieee802154/6lowpan_iphc.c b/net/ieee802154/6lowpan_iphc.c
-index b298bfc..11840f9 100644
+index 02bf74d..a70fa66 100644
 --- a/net/ieee802154/6lowpan_iphc.c
 +++ b/net/ieee802154/6lowpan_iphc.c
-@@ -553,33 +553,43 @@ static void compress_udp_header(u8 **hc06_ptr, struct sk_buff *skb)
- 	    ((ntohs(uh->dest) & LOWPAN_NHC_UDP_4BIT_MASK) ==
- 	     LOWPAN_NHC_UDP_4BIT_PORT)) {
- 		pr_debug("UDP header: both ports compression to 4 bits\n");
-+		/* compression value */
- 		tmp = LOWPAN_NHC_UDP_CS_P_11;
- 		lowpan_push_hc_data(hc06_ptr, &tmp, sizeof(tmp));
--		tmp = /* subtraction is faster */
--		   (u8)((ntohs(uh->dest) - LOWPAN_NHC_UDP_4BIT_PORT) +
--		       ((ntohs(uh->source) - LOWPAN_NHC_UDP_4BIT_PORT) << 4));
-+		/* source and destination port */
-+		tmp = ntohs(uh->dest) - LOWPAN_NHC_UDP_4BIT_PORT +
-+		      ((ntohs(uh->source) - LOWPAN_NHC_UDP_4BIT_PORT) << 4);
- 		lowpan_push_hc_data(hc06_ptr, &tmp, sizeof(tmp));
- 	} else if ((ntohs(uh->dest) & LOWPAN_NHC_UDP_8BIT_MASK) ==
- 			LOWPAN_NHC_UDP_8BIT_PORT) {
- 		pr_debug("UDP header: remove 8 bits of dest\n");
-+		/* compression value */
- 		tmp = LOWPAN_NHC_UDP_CS_P_01;
- 		lowpan_push_hc_data(hc06_ptr, &tmp, sizeof(tmp));
-+		/* source port */
- 		lowpan_push_hc_data(hc06_ptr, &uh->source, sizeof(uh->source));
--		tmp = (u8)(ntohs(uh->dest) - LOWPAN_NHC_UDP_8BIT_PORT);
-+		/* destination port */
-+		tmp = ntohs(uh->dest) - LOWPAN_NHC_UDP_8BIT_PORT;
- 		lowpan_push_hc_data(hc06_ptr, &tmp, sizeof(tmp));
- 	} else if ((ntohs(uh->source) & LOWPAN_NHC_UDP_8BIT_MASK) ==
- 			LOWPAN_NHC_UDP_8BIT_PORT) {
- 		pr_debug("UDP header: remove 8 bits of source\n");
-+		/* compression value */
- 		tmp = LOWPAN_NHC_UDP_CS_P_10;
- 		lowpan_push_hc_data(hc06_ptr, &tmp, sizeof(tmp));
--		tmp = (u8)(ntohs(uh->source) - LOWPAN_NHC_UDP_8BIT_PORT);
-+		/* source port */
-+		tmp = ntohs(uh->source) - LOWPAN_NHC_UDP_8BIT_PORT;
- 		lowpan_push_hc_data(hc06_ptr, &tmp, sizeof(tmp));
-+		/* destination port */
- 		lowpan_push_hc_data(hc06_ptr, &uh->dest, sizeof(uh->dest));
- 	} else {
- 		pr_debug("UDP header: can't compress\n");
-+		/* compression value */
- 		tmp = LOWPAN_NHC_UDP_CS_P_00;
- 		lowpan_push_hc_data(hc06_ptr, &tmp, sizeof(tmp));
-+		/* source port */
- 		lowpan_push_hc_data(hc06_ptr, &uh->source, sizeof(uh->source));
-+		/* destination port */
- 		lowpan_push_hc_data(hc06_ptr, &uh->dest, sizeof(uh->dest));
- 	}
+@@ -309,9 +309,14 @@ uncompress_udp_header(struct sk_buff *skb, struct udphdr *uh)
+ 		pr_debug("uncompressed UDP ports: src = %d, dst = %d\n",
+ 			 ntohs(uh->source), ntohs(uh->dest));
  
+-		/* copy checksum */
+-		memcpy(&uh->check, &skb->data[0], 2);
+-		skb_pull(skb, 2);
++		/* checksum */
++		if (tmp & LOWPAN_NHC_UDP_CS_C) {
++			pr_debug_ratelimited("checksum elided currently not supported\n");
++			goto err;
++		} else {
++			memcpy(&uh->check, &skb->data[0], 2);
++			skb_pull(skb, 2);
++		}
+ 
+ 		/*
+ 		 * UDP lenght needs to be infered from the lower layers
 -- 
 1.8.5.1
 
