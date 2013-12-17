@@ -1,57 +1,209 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.0 \(1822\))
-Subject: Re: [PATCH v3 bluetooth-next 0/8] 6lowpan: udp compression/uncompression fix
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1387286488-29382-1-git-send-email-alex.aring@gmail.com>
-Date: Tue, 17 Dec 2013 15:18:01 +0100
-Cc: linux-zigbee-devel@lists.sourceforge.net, werner@almesberger.net,
-	"linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <87DBCEFE-FB53-43B2-9F17-FF30BE4123CC@holtmann.org>
-References: <1387286488-29382-1-git-send-email-alex.aring@gmail.com>
-To: Alexander Aring <alex.aring@gmail.com>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v3 4/5] bnep: Refactored bnep server apis for bridge addition and deletion
+Date: Tue, 17 Dec 2013 16:17:51 +0200
+Message-Id: <1387289872-23408-4-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1387289872-23408-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1387289872-23408-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+To simplify bnep server realted bridge creation and deletion calls
+provided extra apis and moved related apis to static.
+---
+ profiles/network/bnep.c   | 50 +++++++++++++++++++++++++++++++++++++++++------
+ profiles/network/bnep.h   | 10 ++++------
+ profiles/network/server.c | 37 +++--------------------------------
+ 3 files changed, 51 insertions(+), 46 deletions(-)
 
-> The current 6LoWPAN udp compression/uncompression is completely broken.
-> This patch series fix a lot of udp compression/uncompression issues and
-> add support parsing with lowpan_fetch_skb/lowpan_push_hc_data functions.
-> 
-> I tested it in all cases of compressions in wireshark and a contiki
-> sensornode.
-> 
-> Changes since v3:
-> - add patch to introduce lowpan_push_hc_data helper function.
-> - remove patch to fix nullpointer dereferencing and replace it with
->   a patch which use the lowpan_push_hc_data function in compress_udp_header
->   function. This fixes the nullpointer dereferencing problem also and is more
->   readable.
-> - add missing newline in pr_debug_ratelimited.
-> 
-> Changes since v2:
-> - remove unnecessary casts and brackes, suggested by Werner Almesberger.
-> - use pr_debug_ratelimited instead of pr_debug on patch 4/7.
-> 
-> Alexander Aring (8):
->  6lowpan: introduce lowpan_push_hc_data function
->  6lowpan: udp use lowpan_push_hc_data function
->  6lowpan: fix udp compress ordering
->  6lowpan: fix udp byte ordering
->  6lowpan: add udp warning for elided checksum
->  6lowpan: udp use lowpan_fetch_skb function
->  6lowpan: udp use subtraction on both conditions
->  6lowpan: cleanup udp compress function
-> 
-> net/ieee802154/6lowpan.h      |   8 +++
-> net/ieee802154/6lowpan_iphc.c | 114 ++++++++++++++++++++++++------------------
-> 2 files changed, 74 insertions(+), 48 deletions(-)
-
-all 8 patches have been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+index 6416535..dd69851 100644
+--- a/profiles/network/bnep.c
++++ b/profiles/network/bnep.c
+@@ -152,7 +152,7 @@ int bnep_cleanup(void)
+ 	return 0;
+ }
+ 
+-int bnep_conndel(const bdaddr_t *dst)
++static int bnep_conndel(const bdaddr_t *dst)
+ {
+ 	struct bnep_conndel_req req;
+ 
+@@ -168,7 +168,7 @@ int bnep_conndel(const bdaddr_t *dst)
+ 	return 0;
+ }
+ 
+-int bnep_connadd(int sk, uint16_t role, char *dev)
++static int bnep_connadd(int sk, uint16_t role, char *dev)
+ {
+ 	struct bnep_connadd_req req;
+ 
+@@ -188,7 +188,7 @@ int bnep_connadd(int sk, uint16_t role, char *dev)
+ 	return 0;
+ }
+ 
+-int bnep_if_up(const char *devname)
++static int bnep_if_up(const char *devname)
+ {
+ 	struct ifreq ifr;
+ 	int sk, err;
+@@ -213,7 +213,7 @@ int bnep_if_up(const char *devname)
+ 	return 0;
+ }
+ 
+-int bnep_if_down(const char *devname)
++static int bnep_if_down(const char *devname)
+ {
+ 	struct ifreq ifr;
+ 	int sk, err;
+@@ -458,7 +458,7 @@ void bnep_disconnect(struct bnep_conn *bc)
+ 	bnep_conndel(&bc->dst_addr);
+ }
+ 
+-int bnep_add_to_bridge(const char *devname, const char *bridge)
++static int bnep_add_to_bridge(const char *devname, const char *bridge)
+ {
+ 	int ifindex;
+ 	struct ifreq ifr;
+@@ -489,7 +489,7 @@ int bnep_add_to_bridge(const char *devname, const char *bridge)
+ 	return 0;
+ }
+ 
+-int bnep_del_from_bridge(const char *devname, const char *bridge)
++static int bnep_del_from_bridge(const char *devname, const char *bridge)
+ {
+ 	int ifindex = if_nametoindex(devname);
+ 	struct ifreq ifr;
+@@ -518,6 +518,44 @@ int bnep_del_from_bridge(const char *devname, const char *bridge)
+ 	return 0;
+ }
+ 
++int bnep_server_add(int sk, uint16_t dst, char *bridge, char *iface,
++						const bdaddr_t *addr)
++{
++	if (!bridge || !bridge || !iface || !addr)
++		return -EINVAL;
++
++	if (bnep_connadd(sk, dst, iface) < 0) {
++		error("Can't add connection to the bridge %s: %s(%d)",
++						bridge, strerror(errno), errno);
++		return -errno;
++	}
++
++	if (bnep_add_to_bridge(iface, bridge) < 0) {
++		error("Can't add %s to the bridge %s: %s(%d)",
++					iface, bridge, strerror(errno), errno);
++		bnep_conndel(addr);
++		return -errno;
++	}
++
++	if (bnep_if_up(iface) < 0) {
++		error("Can't up the interface %s: %s(%d)",
++						iface, strerror(errno), errno);
++		return -errno;
++	}
++
++	return 0;
++}
++
++void bnep_server_delete(char *bridge, char *iface, const bdaddr_t *addr)
++{
++	if (!bridge || !iface || !addr)
++		return;
++
++	bnep_del_from_bridge(iface, bridge);
++	bnep_if_down(iface);
++	bnep_conndel(addr);
++}
++
+ ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl, uint16_t resp)
+ {
+ 	struct bnep_control_rsp rsp;
+diff --git a/profiles/network/bnep.h b/profiles/network/bnep.h
+index 6e385e4..d177ea0 100644
+--- a/profiles/network/bnep.h
++++ b/profiles/network/bnep.h
+@@ -37,12 +37,10 @@ typedef void (*bnep_disconnect_cb) (void *data);
+ int bnep_connect(struct bnep_conn *bnep, int sk, bnep_connect_cb conn_cb,
+ 				bnep_disconnect_cb disconn_cb, void *data);
+ void bnep_disconnect(struct bnep_conn *bnep);
+-int bnep_connadd(int sk, uint16_t role, char *dev);
+-int bnep_conndel(const bdaddr_t *dst);
+-int bnep_if_up(const char *devname);
+-int bnep_if_down(const char *devname);
+-int bnep_add_to_bridge(const char *devname, const char *bridge);
+-int bnep_del_from_bridge(const char *devname, const char *bridge);
++
++int bnep_server_add(int sk, uint16_t dst, char *bridge, char *iface,
++							const bdaddr_t *addr);
++void bnep_server_delete(char *bridge, char *iface, const bdaddr_t *addr);
+ 
+ ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl, uint16_t resp);
+ uint16_t bnep_setup_chk(uint16_t dst_role, uint16_t src_role);
+diff --git a/profiles/network/server.c b/profiles/network/server.c
+index 73741ec..7cb5a1e 100644
+--- a/profiles/network/server.c
++++ b/profiles/network/server.c
+@@ -251,35 +251,6 @@ static sdp_record_t *server_record_new(const char *name, uint16_t id)
+ 	return record;
+ }
+ 
+-static int server_connadd(struct network_server *ns,
+-				struct network_session *session,
+-				uint16_t dst_role)
+-{
+-	char devname[16];
+-	int err, nsk;
+-
+-	nsk = g_io_channel_unix_get_fd(session->io);
+-	err = bnep_connadd(nsk, dst_role, devname);
+-	if (err < 0)
+-		return err;
+-
+-	info("Added new connection: %s", devname);
+-
+-	if (bnep_add_to_bridge(devname, ns->bridge) < 0) {
+-		error("Can't add %s to the bridge %s: %s(%d)",
+-				devname, ns->bridge, strerror(errno), errno);
+-		return -EPERM;
+-	}
+-
+-	bnep_if_up(devname);
+-
+-	strncpy(session->dev, devname, sizeof(devname));
+-
+-	ns->sessions = g_slist_append(ns->sessions, session);
+-
+-	return 0;
+-}
+-
+ static void session_free(void *data)
+ {
+ 	struct network_session *session = data;
+@@ -377,7 +348,8 @@ static gboolean bnep_setup(GIOChannel *chan,
+ 		goto reply;
+ 	}
+ 
+-	if (server_connadd(ns, na->setup, dst_role) < 0)
++	if (bnep_server_add(sk, dst_role, ns->bridge, na->setup->dev,
++							&na->setup->dst) < 0)
+ 		goto reply;
+ 
+ 	na->setup = NULL;
+@@ -524,10 +496,7 @@ static void server_remove_sessions(struct network_server *ns)
+ 		if (*session->dev == '\0')
+ 			continue;
+ 
+-		bnep_del_from_bridge(session->dev, ns->bridge);
+-		bnep_if_down(session->dev);
+-
+-		bnep_conndel(&session->dst);
++		bnep_server_delete(ns->bridge, session->dev, &session->dst);
+ 	}
+ 
+ 	g_slist_free_full(ns->sessions, session_free);
+-- 
+1.8.3.2
 
