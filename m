@@ -1,117 +1,131 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v3 1/5] android/pan: Rename pan_device_free to destroy_pan_device
-Date: Tue, 17 Dec 2013 16:17:48 +0200
-Message-Id: <1387289872-23408-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Message-ID: <1387289112.1231.21.camel@bali>
+Subject: Re: [RFC v4 05/12] Bluetooth: Stop scanning on LE connection
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 17 Dec 2013 11:05:12 -0300
+In-Reply-To: <20131210132131.GA10392@x220.p-661hnu-f1>
+References: <1386367549-29136-1-git-send-email-andre.guedes@openbossa.org>
+	 <1386367549-29136-6-git-send-email-andre.guedes@openbossa.org>
+	 <20131210132131.GA10392@x220.p-661hnu-f1>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Renaming function name because it does more than freeing memory.
-Also moving disconnect notification call to destory_pan_device
-reduce redundancy.
----
- android/pan.c | 51 +++++++++++++++++++++++----------------------------
- 1 file changed, 23 insertions(+), 28 deletions(-)
+Hi Johan,
 
-diff --git a/android/pan.c b/android/pan.c
-index e410f54..ec589cf 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -65,24 +65,6 @@ static int device_cmp(gconstpointer s, gconstpointer user_data)
- 	return bacmp(&dev->dst, dst);
- }
- 
--static void pan_device_free(struct pan_device *dev)
--{
--	local_role = HAL_PAN_ROLE_NONE;
--
--	if (dev->watch > 0) {
--		g_source_remove(dev->watch);
--		dev->watch = 0;
--	}
--
--	if (dev->io) {
--		g_io_channel_unref(dev->io);
--		dev->io = NULL;
--	}
--
--	devices = g_slist_remove(devices, dev);
--	g_free(dev);
--}
--
- static void bt_pan_notify_conn_state(struct pan_device *dev, uint8_t state)
- {
- 	struct hal_ev_pan_conn_state ev;
-@@ -121,6 +103,25 @@ static void bt_pan_notify_ctrl_state(struct pan_device *dev, uint8_t state)
- 									&ev);
- }
- 
-+static void destroy_pan_device(struct pan_device *dev)
-+{
-+	local_role = HAL_PAN_ROLE_NONE;
-+
-+	if (dev->watch > 0) {
-+		g_source_remove(dev->watch);
-+		dev->watch = 0;
-+	}
-+
-+	if (dev->io) {
-+		g_io_channel_unref(dev->io);
-+		dev->io = NULL;
-+	}
-+
-+	bt_pan_notify_conn_state(dev, HAL_PAN_STATE_DISCONNECTED);
-+	devices = g_slist_remove(devices, dev);
-+	g_free(dev);
-+}
-+
- static gboolean bnep_watchdog_cb(GIOChannel *chan, GIOCondition cond,
- 								gpointer data)
- {
-@@ -130,8 +131,7 @@ static gboolean bnep_watchdog_cb(GIOChannel *chan, GIOCondition cond,
- 
- 	bnep_if_down(dev->iface);
- 	bnep_conndel(&dev->dst);
--	bt_pan_notify_conn_state(dev, HAL_PAN_STATE_DISCONNECTED);
--	pan_device_free(dev);
-+	destroy_pan_device(dev);
- 
- 	return FALSE;
- }
-@@ -145,8 +145,7 @@ static void bnep_conn_cb(GIOChannel *chan, char *iface, int err, void *data)
- 	if (err < 0) {
- 		error("bnep connect req failed: %s", strerror(-err));
- 		bnep_conndel(&dev->dst);
--		bt_pan_notify_conn_state(dev, HAL_PAN_STATE_DISCONNECTED);
--		pan_device_free(dev);
-+		destroy_pan_device(dev);
- 		return;
- 	}
- 
-@@ -189,8 +188,7 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer data)
- 	return;
- 
- fail:
--	bt_pan_notify_conn_state(dev, HAL_PAN_STATE_DISCONNECTED);
--	pan_device_free(dev);
-+	destroy_pan_device(dev);
- }
- 
- static void bt_pan_connect(const void *buf, uint16_t len)
-@@ -292,10 +290,7 @@ static void bt_pan_disconnect(const void *buf, uint16_t len)
- 
- 	bnep_if_down(dev->iface);
- 	bnep_conndel(&dst);
--
--	bt_pan_notify_conn_state(dev, HAL_PAN_STATE_DISCONNECTED);
--	pan_device_free(dev);
--
-+	destroy_pan_device(dev);
- 	status = HAL_STATUS_SUCCESS;
- 
- failed:
--- 
-1.8.3.2
+Sorry the delay to reply, I was out of the office last week.
+
+On Tue, 2013-12-10 at 15:21 +0200, Johan Hedberg wrote:
+> Hi Andre,
+> 
+> On Fri, Dec 06, 2013, Andre Guedes wrote:
+> > Some LE controllers don't support scanning and creating a connection
+> > at the same time. So we should always stop scanning in order to
+> > establish the connection.
+> > 
+> > Since we may prematurely stop the discovery procedure in favor of
+> > the connection establishment, we should also cancel hdev->le_scan_
+> > disable delayed work and set the discovery state to DISCOVERY_STOPPED.
+> > 
+> > This change does a small improvement since it is not mandatory the
+> > user stops scanning before connecting anymore. Moreover, this change
+> > is required by upcoming LE auto connection mechanism in order to work
+> > properly with controllers that don't support background scanning and
+> > connection establishment at the same time.
+> > 
+> > In future, we might want to do a small optimization by checking if
+> > controller is able to scan and connect at the same time. For now,
+> > we want the simplest approach so we always stop scanning (even if
+> > the controller is able to carry out both operations).
+> > 
+> > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> > ---
+> >  net/bluetooth/hci_conn.c | 23 ++++++++++++++++++++++-
+> >  1 file changed, 22 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> > index b5c3ebff..750a39d 100644
+> > --- a/net/bluetooth/hci_conn.c
+> > +++ b/net/bluetooth/hci_conn.c
+> > @@ -518,8 +518,17 @@ static void create_le_conn_complete(struct hci_dev *hdev, u8 status)
+> >  {
+> >  	struct hci_conn *conn;
+> >  
+> > -	if (status == 0)
+> > +	if (status == 0) {
+> > +		/* If the discovery procedure was running, we prematurely
+> > +		 * stopped it. So we have to change the discovery state.
+> > +		 */
+> > +		if (hdev->discovery.state == DISCOVERY_FINDING) {
+> > +			cancel_delayed_work(&hdev->le_scan_disable);
+> > +			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+> > +		}
+> > +
+> >  		return;
+> > +	}
+> >  
+> >  	BT_ERR("HCI request failed to create LE connection: status 0x%2.2x",
+> >  	       status);
+> > @@ -552,6 +561,18 @@ static int hci_create_le_conn(struct hci_conn *conn)
+> >  
+> >  	hci_req_init(&req, hdev);
+> >  
+> > +	/* If controller is scanning, we stop it since some controllers are
+> > +	 * not able to scan and connect at the same time.
+> > +	 */
+> > +	if (test_bit(HCI_LE_SCAN, &hdev->dev_flags)) {
+> > +		struct hci_cp_le_set_scan_enable enable_cp;
+> > +
+> > +		memset(&enable_cp, 0, sizeof(enable_cp));
+> > +		enable_cp.enable = LE_SCAN_DISABLE;
+> > +		hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
+> > +			    &enable_cp);
+> > +	}
+> > +
+> >  	memset(&cp, 0, sizeof(cp));
+> >  	cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
+> >  	cp.scan_window = cpu_to_le16(hdev->le_scan_window);
+> 
+> The way this all hangs together with a discovery process started through
+> mgmt_start_discovery feels a bit flimsy to me. Particularly, have you
+> ensured that everything is fine if you've got inquiry ongoing when you
+> do hci_discovery_set_state(hdev, DISCOVERY_STOPPED). Also, are there any
+> risks of race conditions here, e.g. is it fine to let the
+> cancel_delayed_work() call be in create_le_conn_complete() instead of
+> doing it in hci_create_le_conn()?
+
+Yes, I did lots of testing, including the inquiry test you mentioned,
+and I didn't find any issues.
+
+I failed to see any race conditons since cancel_delayed_work() does not
+block. So it is fine to call cancel_delayed_work() in
+create_le_conn_complete() as well as in hci_create_le_conn().
+
+> What also makes this hard to track is that the condition you're testing
+> for first is the HCI_LE_SCAN bit, but then later you look at
+> discovery.state == DISCOVERY_FINDING. For the casual reader there's no
+> direct indication of how these two are releated for the various types of
+> discovery that are possible (LE-only, BR/EDR-only and interleaved).
+
+Yes, I see your point. However, we can't check HCI_LE_SCAN in
+create_le_conn_complete() because the flag was already cleared in
+hci_cc_le_set_scan_enable().
+
+> I don't mean to say that this is a nack for the patch, but I'd like to
+> know that you've considered and tested this kind of cases. I had to
+> spend quite some time looking through the existing code and this patch
+> and still couldn't arrive at absolute confidence of its correctness,
+> meaning there should hopefully be some room for simplification.
+
+So I think we can do some simplification by moving this discovery
+handling from create_le_conn_complete() to hci_create_le_conn(), at
+least I think this code will become a bit easier to follow. What do you
+think?
+
+Regards,
+
+Andre
 
