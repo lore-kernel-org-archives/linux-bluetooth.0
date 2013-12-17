@@ -1,74 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52B01C98.2050905@linux.intel.com>
-Date: Tue, 17 Dec 2013 11:42:48 +0200
+Message-ID: <52B01BA3.3000707@linux.intel.com>
+Date: Tue, 17 Dec 2013 11:38:43 +0200
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH_v2 3/6] bnep: Add bnep_new and bnep_free api's
-References: <1387231516-4127-1-git-send-email-ravikumar.veeramally@linux.intel.com>	<1387231516-4127-3-git-send-email-ravikumar.veeramally@linux.intel.com> <CABBYNZKMECuAd2WBQ8-FE5OO9Qtp0g=iKTBA3zV8JOa6cxAN9w@mail.gmail.com>
-In-Reply-To: <CABBYNZKMECuAd2WBQ8-FE5OO9Qtp0g=iKTBA3zV8JOa6cxAN9w@mail.gmail.com>
+To: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
+Subject: Re: [PATCH_v2 2/6] android/pan: Rename connect_cb to bt_io_connect_cb
+References: <1387231516-4127-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1387231516-4127-2-git-send-email-ravikumar.veeramally@linux.intel.com> <20131217092750.GA26363@x220.p-661hnu-f1>
+In-Reply-To: <20131217092750.GA26363@x220.p-661hnu-f1>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Johan,
 
-On 17.12.2013 11:19, Luiz Augusto von Dentz wrote:
+On 17.12.2013 11:27, Johan Hedberg wrote:
 > Hi Ravi,
 >
-> On Tue, Dec 17, 2013 at 12:05 AM, Ravi kumar Veeramally
-> <ravikumar.veeramally@linux.intel.com> wrote:
->> Refacoring connect and disconnect mechanisms. It would be more
->> convinient for caller to maintain just bnep connection reference
->> and delete whenever it is not required.
+> On Tue, Dec 17, 2013, Ravi kumar Veeramally wrote:
+>> Renaming for easy readability.
 >> ---
->>   profiles/network/bnep.c | 37 +++++++++++++++++++++++++++++++++++++
->>   profiles/network/bnep.h |  5 +++++
->>   2 files changed, 42 insertions(+)
+>>   android/pan.c | 4 ++--
+>>   1 file changed, 2 insertions(+), 2 deletions(-)
 >>
->> diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
->> index 08037e6..d7d8832 100644
->> --- a/profiles/network/bnep.c
->> +++ b/profiles/network/bnep.c
->> @@ -71,6 +71,7 @@ struct bnep_conn {
->>          GIOChannel      *io;
->>          uint16_t        src;
->>          uint16_t        dst;
->> +       bdaddr_t        dst_addr;
->>          guint   attempts;
->>          guint   setup_to;
->>          void    *data;
->> @@ -246,6 +247,42 @@ int bnep_if_down(const char *devname)
->>          return 0;
+>> diff --git a/android/pan.c b/android/pan.c
+>> index ec589cf..03db350 100644
+>> --- a/android/pan.c
+>> +++ b/android/pan.c
+>> @@ -162,7 +162,7 @@ static void bnep_conn_cb(GIOChannel *chan, char *iface, int err, void *data)
+>>   	dev->io = NULL;
 >>   }
->>
->> +struct bnep_conn *bnep_new(uint16_t src, uint16_t dst,
->> +                                               const bdaddr_t *dst_addr)
-> I would change the order of the parameters, also do not use bdaddr_t
-> otherwise you wont be able to do unit tests with it, something like
-> bnep_new(int fd, uint16_t local_role, uint16_t remote_role) looks
-> better, but perhaps you gonna need the MTU as well.
-   bdaddr_t is required incase if it unable to up the interface, connection
-  needs to be deleted and it is difficult to track on which error we have to
-  delete the connection. And one more thing I am moving many of these
-  apis to local to the bnep.c.
-  Regarding MTU at least now it is not required by connection.c or 
-android/pan.c.
->> +{
->> +       struct bnep_conn *bc;
->> +
->> +       DBG("");
->> +
->> +       if (!dst_addr)
->> +               return NULL;
->> +
->> +       bc = g_new0(struct bnep_conn, 1);
->> +       if (!bc)
->> +               return NULL;
-> No need to check the return of g_new0, if it fails it will exit so
-> this code will never be triggered.
-Ok.
+>>   
+>> -static void connect_cb(GIOChannel *chan, GError *err, gpointer data)
+>> +static void bt_io_connect_cb(GIOChannel *chan, GError *err, gpointer data)
+>>   {
+>>   	struct pan_device *dev = data;
+>>   	uint16_t src, dst;
+>> @@ -238,7 +238,7 @@ static void bt_pan_connect(const void *buf, uint16_t len)
+>>   	ba2str(&dev->dst, addr);
+>>   	DBG("connecting to %s %s", addr, dev->iface);
+>>   
+>> -	dev->io = bt_io_connect(connect_cb, dev, NULL, &gerr,
+>> +	dev->io = bt_io_connect(bt_io_connect_cb, dev, NULL, &gerr,
+>>   					BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
+>>   					BT_IO_OPT_DEST_BDADDR, &dev->dst,
+>>   					BT_IO_OPT_PSM, BNEP_PSM,
+> This might actually cause more confusion since the assumption is that
+> bt_io_* prefixed symbols are part of the btio code. The current naming doesn't
+> bother me, but if you wanna suggest something else like pan_connected
+> I'm fine with that too).
+  Ok, ignore this patch, let the same cb name continue.
 
-Thanks,
 Ravi.
