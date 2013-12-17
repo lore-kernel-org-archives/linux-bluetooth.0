@@ -2,196 +2,116 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v3 5/5] bnep: Refactor bnep setup response validation functionality
-Date: Tue, 17 Dec 2013 16:17:52 +0200
-Message-Id: <1387289872-23408-5-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1387289872-23408-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1387289872-23408-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v3 1/5] android/pan: Rename pan_device_free to destroy_pan_device
+Date: Tue, 17 Dec 2013 16:17:48 +0200
+Message-Id: <1387289872-23408-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Providing single api to validate bnep setup resp and hide
-other functions.
+Renaming function name because it does more than freeing memory.
+Also moving disconnect notification call to destory_pan_device
+reduce redundancy.
 ---
- profiles/network/bnep.c   | 49 ++++++++++++++++++++++++++++++++++++++++++-----
- profiles/network/bnep.h   |  4 +---
- profiles/network/server.c | 45 +++++++++----------------------------------
- 3 files changed, 54 insertions(+), 44 deletions(-)
+ android/pan.c | 51 +++++++++++++++++++++++----------------------------
+ 1 file changed, 23 insertions(+), 28 deletions(-)
 
-diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index dd69851..1fd20f7 100644
---- a/profiles/network/bnep.c
-+++ b/profiles/network/bnep.c
-@@ -567,19 +567,19 @@ ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl, uint16_t resp)
- 	return send(sk, &rsp, sizeof(rsp), 0);
+diff --git a/android/pan.c b/android/pan.c
+index e410f54..ec589cf 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -65,24 +65,6 @@ static int device_cmp(gconstpointer s, gconstpointer user_data)
+ 	return bacmp(&dev->dst, dst);
  }
  
--uint16_t bnep_setup_chk(uint16_t dst, uint16_t src)
-+static uint16_t bnep_setup_chk(uint16_t dst, uint16_t src)
+-static void pan_device_free(struct pan_device *dev)
+-{
+-	local_role = HAL_PAN_ROLE_NONE;
+-
+-	if (dev->watch > 0) {
+-		g_source_remove(dev->watch);
+-		dev->watch = 0;
+-	}
+-
+-	if (dev->io) {
+-		g_io_channel_unref(dev->io);
+-		dev->io = NULL;
+-	}
+-
+-	devices = g_slist_remove(devices, dev);
+-	g_free(dev);
+-}
+-
+ static void bt_pan_notify_conn_state(struct pan_device *dev, uint8_t state)
  {
- 	/* Allowed PAN Profile scenarios */
- 	switch (dst) {
- 	case BNEP_SVC_NAP:
- 	case BNEP_SVC_GN:
- 		if (src == BNEP_SVC_PANU)
--			return 0;
-+			return BNEP_SUCCESS;
- 		return BNEP_CONN_INVALID_SRC;
- 	case BNEP_SVC_PANU:
- 		if (src == BNEP_SVC_PANU ||  src == BNEP_SVC_GN ||
- 							src == BNEP_SVC_NAP)
--			return 0;
-+			return BNEP_SUCCESS;
- 
- 		return BNEP_CONN_INVALID_SRC;
- 	}
-@@ -587,8 +587,8 @@ uint16_t bnep_setup_chk(uint16_t dst, uint16_t src)
- 	return BNEP_CONN_INVALID_DST;
+ 	struct hal_ev_pan_conn_state ev;
+@@ -121,6 +103,25 @@ static void bt_pan_notify_ctrl_state(struct pan_device *dev, uint8_t state)
+ 									&ev);
  }
  
--uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req, uint16_t *dst,
--								uint16_t *src)
-+static uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req,
-+						uint16_t *dst, uint16_t *src)
- {
- 	const uint8_t bt_base[] = { 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
- 					0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB };
-@@ -633,3 +633,42 @@ uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req, uint16_t *dst,
- 
- 	return BNEP_SUCCESS;
- }
-+
-+int bnep_validate_setup_rsp(int sk, uint16_t *dst)
++static void destroy_pan_device(struct pan_device *dev)
 +{
-+	uint8_t packet[BNEP_MTU];
-+	struct bnep_setup_conn_req *req = (void *) packet;
-+	uint16_t src;
-+	uint8_t pkt[3];
-+	int n, rsp = BNEP_CONN_NOT_ALLOWED;
++	local_role = HAL_PAN_ROLE_NONE;
 +
-+	/* Reading BNEP_SETUP_CONNECTION_REQUEST_MSG */
-+	n = read(sk, packet, sizeof(packet));
-+	if (n < 0) {
-+		error("read(): %s(%d)", strerror(errno), errno);
-+		return n;
++	if (dev->watch > 0) {
++		g_source_remove(dev->watch);
++		dev->watch = 0;
 +	}
 +
-+	/* Highest known Control command ID
-+	 * is BNEP_FILTER_MULT_ADDR_RSP = 0x06 */
-+	if (req->type == BNEP_CONTROL &&
-+				req->ctrl > BNEP_FILTER_MULT_ADDR_RSP) {
-+		pkt[0] = BNEP_CONTROL;
-+		pkt[1] = BNEP_CMD_NOT_UNDERSTOOD;
-+		pkt[2] = req->ctrl;
-+
-+		send(sk, pkt, sizeof(pkt), 0);
-+		return -EINVAL;
++	if (dev->io) {
++		g_io_channel_unref(dev->io);
++		dev->io = NULL;
 +	}
 +
-+	if (req->type != BNEP_CONTROL || req->ctrl != BNEP_SETUP_CONN_REQ)
-+		return -EINVAL;
-+
-+	rsp = bnep_setup_decode(req, dst, &src);
-+	if (rsp)
-+		return rsp;
-+
-+	rsp = bnep_setup_chk(*dst, src);
-+
-+	return rsp;
++	bt_pan_notify_conn_state(dev, HAL_PAN_STATE_DISCONNECTED);
++	devices = g_slist_remove(devices, dev);
++	g_free(dev);
 +}
-diff --git a/profiles/network/bnep.h b/profiles/network/bnep.h
-index d177ea0..97e19f6 100644
---- a/profiles/network/bnep.h
-+++ b/profiles/network/bnep.h
-@@ -42,7 +42,5 @@ int bnep_server_add(int sk, uint16_t dst, char *bridge, char *iface,
- 							const bdaddr_t *addr);
- void bnep_server_delete(char *bridge, char *iface, const bdaddr_t *addr);
- 
-+int bnep_validate_setup_rsp(int sk, uint16_t *dst);
- ssize_t bnep_send_ctrl_rsp(int sk, uint8_t type, uint8_t ctrl, uint16_t resp);
--uint16_t bnep_setup_chk(uint16_t dst_role, uint16_t src_role);
--uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req, uint16_t *dst,
--								uint16_t *src);
-diff --git a/profiles/network/server.c b/profiles/network/server.c
-index 7cb5a1e..ac0c653 100644
---- a/profiles/network/server.c
-+++ b/profiles/network/server.c
-@@ -282,10 +282,8 @@ static gboolean bnep_setup(GIOChannel *chan,
++
+ static gboolean bnep_watchdog_cb(GIOChannel *chan, GIOCondition cond,
+ 								gpointer data)
  {
- 	struct network_adapter *na = user_data;
- 	struct network_server *ns;
--	uint8_t packet[BNEP_MTU];
--	struct bnep_setup_conn_req *req = (void *) packet;
--	uint16_t src_role, dst_role, rsp = BNEP_CONN_NOT_ALLOWED;
--	int n, sk;
-+	uint16_t dst;
-+	int sk, rsp = BNEP_CONN_NOT_ALLOWED;
+@@ -130,8 +131,7 @@ static gboolean bnep_watchdog_cb(GIOChannel *chan, GIOCondition cond,
  
- 	if (cond & G_IO_NVAL)
- 		return FALSE;
-@@ -297,44 +295,18 @@ static gboolean bnep_setup(GIOChannel *chan,
+ 	bnep_if_down(dev->iface);
+ 	bnep_conndel(&dev->dst);
+-	bt_pan_notify_conn_state(dev, HAL_PAN_STATE_DISCONNECTED);
+-	pan_device_free(dev);
++	destroy_pan_device(dev);
  
- 	sk = g_io_channel_unix_get_fd(chan);
- 
--	/* Reading BNEP_SETUP_CONNECTION_REQUEST_MSG */
--	n = read(sk, packet, sizeof(packet));
--	if (n < 0) {
--		error("read(): %s(%d)", strerror(errno), errno);
-+	rsp = bnep_validate_setup_rsp(sk, &dst);
-+	if (rsp < 0)
- 		return FALSE;
--	}
--
--	/* Highest known Control command ID
--	 * is BNEP_FILTER_MULT_ADDR_RSP = 0x06 */
--	if (req->type == BNEP_CONTROL &&
--				req->ctrl > BNEP_FILTER_MULT_ADDR_RSP) {
--		uint8_t pkt[3];
--
--		pkt[0] = BNEP_CONTROL;
--		pkt[1] = BNEP_CMD_NOT_UNDERSTOOD;
--		pkt[2] = req->ctrl;
--
--		send(sk, pkt, sizeof(pkt), 0);
--
--		return FALSE;
--	}
--
--	if (req->type != BNEP_CONTROL || req->ctrl != BNEP_SETUP_CONN_REQ)
--		return FALSE;
--
--	rsp = bnep_setup_decode(req, &dst_role, &src_role);
--	if (rsp)
--		goto reply;
- 
--	rsp = bnep_setup_chk(dst_role, src_role);
--	if (rsp)
-+	if (rsp > 0)
- 		goto reply;
- 
- 	rsp = BNEP_CONN_NOT_ALLOWED;
- 
--	ns = find_server(na->servers, dst_role);
-+	ns = find_server(na->servers, dst);
- 	if (!ns) {
--		error("Server unavailable: (0x%x)", dst_role);
-+		error("Server unavailable: (0x%x)", dst);
- 		goto reply;
+ 	return FALSE;
+ }
+@@ -145,8 +145,7 @@ static void bnep_conn_cb(GIOChannel *chan, char *iface, int err, void *data)
+ 	if (err < 0) {
+ 		error("bnep connect req failed: %s", strerror(-err));
+ 		bnep_conndel(&dev->dst);
+-		bt_pan_notify_conn_state(dev, HAL_PAN_STATE_DISCONNECTED);
+-		pan_device_free(dev);
++		destroy_pan_device(dev);
+ 		return;
  	}
  
-@@ -348,10 +320,11 @@ static gboolean bnep_setup(GIOChannel *chan,
- 		goto reply;
- 	}
+@@ -189,8 +188,7 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer data)
+ 	return;
  
--	if (bnep_server_add(sk, dst_role, ns->bridge, na->setup->dev,
-+	if (bnep_server_add(sk, dst, ns->bridge, na->setup->dev,
- 							&na->setup->dst) < 0)
- 		goto reply;
+ fail:
+-	bt_pan_notify_conn_state(dev, HAL_PAN_STATE_DISCONNECTED);
+-	pan_device_free(dev);
++	destroy_pan_device(dev);
+ }
  
-+	ns->sessions = g_slist_append(ns->sessions, na->setup);
- 	na->setup = NULL;
+ static void bt_pan_connect(const void *buf, uint16_t len)
+@@ -292,10 +290,7 @@ static void bt_pan_disconnect(const void *buf, uint16_t len)
  
- 	rsp = BNEP_SUCCESS;
+ 	bnep_if_down(dev->iface);
+ 	bnep_conndel(&dst);
+-
+-	bt_pan_notify_conn_state(dev, HAL_PAN_STATE_DISCONNECTED);
+-	pan_device_free(dev);
+-
++	destroy_pan_device(dev);
+ 	status = HAL_STATUS_SUCCESS;
+ 
+ failed:
 -- 
 1.8.3.2
 
