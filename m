@@ -1,131 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1387289112.1231.21.camel@bali>
-Subject: Re: [RFC v4 05/12] Bluetooth: Stop scanning on LE connection
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 17 Dec 2013 11:05:12 -0300
-In-Reply-To: <20131210132131.GA10392@x220.p-661hnu-f1>
-References: <1386367549-29136-1-git-send-email-andre.guedes@openbossa.org>
-	 <1386367549-29136-6-git-send-email-andre.guedes@openbossa.org>
-	 <20131210132131.GA10392@x220.p-661hnu-f1>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <1387283874-29721-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1387283874-29721-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Date: Tue, 17 Dec 2013 15:34:36 +0200
+Message-ID: <CABBYNZLCgpqR+hsR7vcadV52Y+x2jdRSWGQWfsSr3PhyPKCNTQ@mail.gmail.com>
+Subject: Re: [PATCH 1/7] android/tester: Fix enum and define coding style
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Grzegorz,
 
-Sorry the delay to reply, I was out of the office last week.
+On Tue, Dec 17, 2013 at 2:37 PM, Grzegorz Kolodziejczyk
+<grzegorz.kolodziejczyk@tieto.com> wrote:
+> This changes all enums values and defines to uppercase instead of
+> lowercase according to coding style.
+> ---
+>  android/android-tester.c | 86 ++++++++++++++++++++++++------------------------
+>  1 file changed, 43 insertions(+), 43 deletions(-)
+>
+> diff --git a/android/android-tester.c b/android/android-tester.c
+> index eb938d0..4eb265b 100644
+> --- a/android/android-tester.c
+> +++ b/android/android-tester.c
+> @@ -37,10 +37,10 @@
+>  #include <hardware/bluetooth.h>
+>  #include <hardware/bt_sock.h>
+>
+> -#define adapter_props adapter_prop_bdaddr, adapter_prop_bdname, \
+> -                       adapter_prop_uuids, adapter_prop_cod, \
+> -                       adapter_prop_type, adapter_prop_scan_mode, \
+> -                       adapter_prop_bonded_devices, adapter_prop_disc_timeout
+> +#define ADAPTER_PROPS ADAPTER_PROP_BDADDR, ADAPTER_PROP_BDNAME, \
+> +                       ADAPTER_PROP_UUIDS, ADAPTER_PROP_COD, \
+> +                       ADAPTER_PROP_TYPE, ADAPTER_PROP_SCAN_MODE, \
+> +                       ADAPTER_PROP_BONDED_DEVICES, ADAPTER_PROP_DISC_TIMEOUT
+>
+>  static bt_scan_mode_t test_setprop_scanmode_val =
+>                                         BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE;
+> @@ -52,19 +52,19 @@ static uint32_t test_setprop_disctimeout_val = 120;
+>   */
+>
+>  enum hal_bluetooth_callbacks_id {
+> -       adapter_test_end,
+> -       adapter_test_setup_mode,
+> -       adapter_state_changed_on,
+> -       adapter_state_changed_off,
+> -       adapter_prop_bdaddr,
+> -       adapter_prop_bdname,
+> -       adapter_prop_uuids,
+> -       adapter_prop_cod,
+> -       adapter_prop_type,
+> -       adapter_prop_scan_mode,
+> -       adapter_prop_disc_timeout,
+> -       adapter_prop_service_record,
+> -       adapter_prop_bonded_devices
+> +       ADAPTER_TEST_END,
+> +       ADAPTER_TEST_SETUP_MODE,
+> +       ADAPTER_STATE_CHANGED_ON,
+> +       ADAPTER_STATE_CHANGED_OFF,
+> +       ADAPTER_PROP_BDADDR,
+> +       ADAPTER_PROP_BDNAME,
+> +       ADAPTER_PROP_UUIDS,
+> +       ADAPTER_PROP_COD,
+> +       ADAPTER_PROP_TYPE,
+> +       ADAPTER_PROP_SCAN_MODE,
+> +       ADAPTER_PROP_DISC_TIMEOUT,
+> +       ADAPTER_PROP_SERVICE_RECORD,
+> +       ADAPTER_PROP_BONDED_DEVICES
+>  };
 
-On Tue, 2013-12-10 at 15:21 +0200, Johan Hedberg wrote:
-> Hi Andre,
-> 
-> On Fri, Dec 06, 2013, Andre Guedes wrote:
-> > Some LE controllers don't support scanning and creating a connection
-> > at the same time. So we should always stop scanning in order to
-> > establish the connection.
-> > 
-> > Since we may prematurely stop the discovery procedure in favor of
-> > the connection establishment, we should also cancel hdev->le_scan_
-> > disable delayed work and set the discovery state to DISCOVERY_STOPPED.
-> > 
-> > This change does a small improvement since it is not mandatory the
-> > user stops scanning before connecting anymore. Moreover, this change
-> > is required by upcoming LE auto connection mechanism in order to work
-> > properly with controllers that don't support background scanning and
-> > connection establishment at the same time.
-> > 
-> > In future, we might want to do a small optimization by checking if
-> > controller is able to scan and connect at the same time. For now,
-> > we want the simplest approach so we always stop scanning (even if
-> > the controller is able to carry out both operations).
-> > 
-> > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> > ---
-> >  net/bluetooth/hci_conn.c | 23 ++++++++++++++++++++++-
-> >  1 file changed, 22 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> > index b5c3ebff..750a39d 100644
-> > --- a/net/bluetooth/hci_conn.c
-> > +++ b/net/bluetooth/hci_conn.c
-> > @@ -518,8 +518,17 @@ static void create_le_conn_complete(struct hci_dev *hdev, u8 status)
-> >  {
-> >  	struct hci_conn *conn;
-> >  
-> > -	if (status == 0)
-> > +	if (status == 0) {
-> > +		/* If the discovery procedure was running, we prematurely
-> > +		 * stopped it. So we have to change the discovery state.
-> > +		 */
-> > +		if (hdev->discovery.state == DISCOVERY_FINDING) {
-> > +			cancel_delayed_work(&hdev->le_scan_disable);
-> > +			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-> > +		}
-> > +
-> >  		return;
-> > +	}
-> >  
-> >  	BT_ERR("HCI request failed to create LE connection: status 0x%2.2x",
-> >  	       status);
-> > @@ -552,6 +561,18 @@ static int hci_create_le_conn(struct hci_conn *conn)
-> >  
-> >  	hci_req_init(&req, hdev);
-> >  
-> > +	/* If controller is scanning, we stop it since some controllers are
-> > +	 * not able to scan and connect at the same time.
-> > +	 */
-> > +	if (test_bit(HCI_LE_SCAN, &hdev->dev_flags)) {
-> > +		struct hci_cp_le_set_scan_enable enable_cp;
-> > +
-> > +		memset(&enable_cp, 0, sizeof(enable_cp));
-> > +		enable_cp.enable = LE_SCAN_DISABLE;
-> > +		hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
-> > +			    &enable_cp);
-> > +	}
-> > +
-> >  	memset(&cp, 0, sizeof(cp));
-> >  	cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
-> >  	cp.scan_window = cpu_to_le16(hdev->le_scan_window);
-> 
-> The way this all hangs together with a discovery process started through
-> mgmt_start_discovery feels a bit flimsy to me. Particularly, have you
-> ensured that everything is fine if you've got inquiry ongoing when you
-> do hci_discovery_set_state(hdev, DISCOVERY_STOPPED). Also, are there any
-> risks of race conditions here, e.g. is it fine to let the
-> cancel_delayed_work() call be in create_le_conn_complete() instead of
-> doing it in hci_create_le_conn()?
+This is something I dislike right now, why are defining these and not
+using directly the values defined in hal-msg.h? We should probably
+have a struct with expected opcode and value e.g:
+.{HAL_EV_ADAPTER_PROPS_CHANGED, BT_STATE_ON} and don't try to invent
+another ID for each of those.
 
-Yes, I did lots of testing, including the inquiry test you mentioned,
-and I didn't find any issues.
-
-I failed to see any race conditons since cancel_delayed_work() does not
-block. So it is fine to call cancel_delayed_work() in
-create_le_conn_complete() as well as in hci_create_le_conn().
-
-> What also makes this hard to track is that the condition you're testing
-> for first is the HCI_LE_SCAN bit, but then later you look at
-> discovery.state == DISCOVERY_FINDING. For the casual reader there's no
-> direct indication of how these two are releated for the various types of
-> discovery that are possible (LE-only, BR/EDR-only and interleaved).
-
-Yes, I see your point. However, we can't check HCI_LE_SCAN in
-create_le_conn_complete() because the flag was already cleared in
-hci_cc_le_set_scan_enable().
-
-> I don't mean to say that this is a nack for the patch, but I'd like to
-> know that you've considered and tested this kind of cases. I had to
-> spend quite some time looking through the existing code and this patch
-> and still couldn't arrive at absolute confidence of its correctness,
-> meaning there should hopefully be some room for simplification.
-
-So I think we can do some simplification by moving this discovery
-handling from create_le_conn_complete() to hci_create_le_conn(), at
-least I think this code will become a bit easier to follow. What do you
-think?
-
-Regards,
-
-Andre
-
+Luiz Augusto von Dentz
