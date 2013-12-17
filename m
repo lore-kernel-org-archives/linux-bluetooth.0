@@ -1,46 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alexander Aring <alex.aring@gmail.com>
-To: linux-zigbee-devel@lists.sourceforge.net
-Cc: werner@almesberger.net, linux-bluetooth@vger.kernel.org,
-	Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH v3 bluetooth-next 1/8] 6lowpan: introduce lowpan_push_hc_data function
-Date: Tue, 17 Dec 2013 14:21:21 +0100
-Message-Id: <1387286488-29382-2-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1387286488-29382-1-git-send-email-alex.aring@gmail.com>
-References: <1387286488-29382-1-git-send-email-alex.aring@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1387283107-4356-1-git-send-email-luiz.dentz@gmail.com>
+References: <1387283107-4356-1-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 17 Dec 2013 09:07:13 -0400
+Message-ID: <CAJdJm_MT5oKUhWQ+KqdQHv0wt54o=12vtDWPYVA1=jtLfUFZrA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] build: Add coverage support
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch introduce the lowpan_push_hc_data function to set data in
-the iphc buffer.
+Hi Luiz,
 
-It's a common case to set data and increase the buffer pointer. This
-helper function can be used many times in header_compress function to
-generate the iphc header.
+On Tue, Dec 17, 2013 at 8:25 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> diff --git a/Makefile.am b/Makefile.am
+> index 15cc149..337d849 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -331,5 +331,23 @@ lib/bluetooth/%.h: lib/%.h
+>         $(AM_V_at)$(MKDIR_P) lib/bluetooth
+>         $(AM_V_GEN)$(LN_S) -f "$(abs_top_builddir)"/$< $@
+>
+> +if MAINTAINER_MODE
+> +clean-coverage:
+> +       -find $(top_builddir) -name "*.gcda" -delete
+> +       @lcov --directory $(top_builddir) --zerocounters
+> +       $(RM) -r coverage
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- net/ieee802154/6lowpan.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+You may want to remove coverage.info as well.
 
-diff --git a/net/ieee802154/6lowpan.h b/net/ieee802154/6lowpan.h
-index 10909e5..4981bf8 100644
---- a/net/ieee802154/6lowpan.h
-+++ b/net/ieee802154/6lowpan.h
-@@ -298,6 +298,13 @@ static inline bool lowpan_fetch_skb(struct sk_buff *skb,
- 	return false;
- }
- 
-+static inline void lowpan_push_hc_data(u8 **hc_ptr, const void *data,
-+				       const size_t len)
-+{
-+	memcpy(*hc_ptr, data, len);
-+	*hc_ptr += len;
-+}
-+
- typedef int (*skb_delivery_cb)(struct sk_buff *skb, struct net_device *dev);
- 
- int lowpan_process_data(struct sk_buff *skb, struct net_device *dev,
+> +
+> +coverage: clean-coverage check
+> +       @lcov --compat-libtool --directory $(top_builddir) --capture \
+> +                               --output-file $(top_builddir)/coverage.info
+> +       $(AM_V_at)$(MKDIR_P) -p coverage
+
+MKDIR_P already includes the "-p" option, so it should be
+"$(AM_V_at)$(MKDIR_P) coverage" above.
+
+> +       @genhtml -o coverage/ $(top_builddir)/coverage.info
+> +
+> +clean-local: clean-coverage
+> +       -find $(top_builddir) -name "*.gcno" -delete
+> +       $(RM) -r lib/bluetooth
+> +
+> +else
+>  clean-local:
+>         $(RM) -r lib/bluetooth
+> +endif
+
+Best Regards,
 -- 
-1.8.5.1
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
