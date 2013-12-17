@@ -3,101 +3,45 @@ From: Alexander Aring <alex.aring@gmail.com>
 To: linux-zigbee-devel@lists.sourceforge.net
 Cc: werner@almesberger.net, linux-bluetooth@vger.kernel.org,
 	Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH v3 bluetooth-next 6/8] 6lowpan: udp use lowpan_fetch_skb function
-Date: Tue, 17 Dec 2013 14:21:26 +0100
-Message-Id: <1387286488-29382-7-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1387286488-29382-1-git-send-email-alex.aring@gmail.com>
-References: <1387286488-29382-1-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH v3 bluetooth-next 0/8] 6lowpan: udp compression/uncompression fix
+Date: Tue, 17 Dec 2013 14:21:20 +0100
+Message-Id: <1387286488-29382-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Cleanup the lowpan_uncompress_udp_header function to use the
-lowpan_fetch_skb function.
+The current 6LoWPAN udp compression/uncompression is completely broken.
+This patch series fix a lot of udp compression/uncompression issues and
+add support parsing with lowpan_fetch_skb/lowpan_push_hc_data functions.
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
----
- net/ieee802154/6lowpan_iphc.c | 37 ++++++++++++++++++-------------------
- 1 file changed, 18 insertions(+), 19 deletions(-)
+I tested it in all cases of compressions in wireshark and a contiki
+sensornode.
 
-diff --git a/net/ieee802154/6lowpan_iphc.c b/net/ieee802154/6lowpan_iphc.c
-index a70fa66..8857285 100644
---- a/net/ieee802154/6lowpan_iphc.c
-+++ b/net/ieee802154/6lowpan_iphc.c
-@@ -265,40 +265,37 @@ lowpan_uncompress_multicast_daddr(struct sk_buff *skb,
- static int
- uncompress_udp_header(struct sk_buff *skb, struct udphdr *uh)
- {
--	u8 tmp;
-+	bool fail;
-+	u8 tmp = 0, val = 0;
- 
- 	if (!uh)
- 		goto err;
- 
--	if (lowpan_fetch_skb_u8(skb, &tmp))
--		goto err;
-+	fail = lowpan_fetch_skb(skb, &tmp, 1);
- 
- 	if ((tmp & LOWPAN_NHC_UDP_MASK) == LOWPAN_NHC_UDP_ID) {
- 		pr_debug("UDP header uncompression\n");
- 		switch (tmp & LOWPAN_NHC_UDP_CS_P_11) {
- 		case LOWPAN_NHC_UDP_CS_P_00:
--			memcpy(&uh->source, &skb->data[0], 2);
--			memcpy(&uh->dest, &skb->data[2], 2);
--			skb_pull(skb, 4);
-+			fail |= lowpan_fetch_skb(skb, &uh->source, 2);
-+			fail |= lowpan_fetch_skb(skb, &uh->dest, 2);
- 			break;
- 		case LOWPAN_NHC_UDP_CS_P_01:
--			memcpy(&uh->source, &skb->data[0], 2);
--			uh->dest = htons(skb->data[2] +
--					 LOWPAN_NHC_UDP_8BIT_PORT);
--			skb_pull(skb, 3);
-+			fail |= lowpan_fetch_skb(skb, &uh->source, 2);
-+			fail |= lowpan_fetch_skb(skb, &val, 1);
-+			uh->dest = htons(val + LOWPAN_NHC_UDP_8BIT_PORT);
- 			break;
- 		case LOWPAN_NHC_UDP_CS_P_10:
--			uh->source = htons(skb->data[0] +
--					   LOWPAN_NHC_UDP_8BIT_PORT);
--			memcpy(&uh->dest, &skb->data[1], 2);
--			skb_pull(skb, 3);
-+			fail |= lowpan_fetch_skb(skb, &val, 1);
-+			uh->source = htons(val + LOWPAN_NHC_UDP_8BIT_PORT);
-+			fail |= lowpan_fetch_skb(skb, &uh->dest, 2);
- 			break;
- 		case LOWPAN_NHC_UDP_CS_P_11:
-+			fail |= lowpan_fetch_skb(skb, &val, 1);
- 			uh->source = htons(LOWPAN_NHC_UDP_4BIT_PORT +
--					   (skb->data[0] >> 4));
-+					   (val >> 4));
- 			uh->dest = htons(LOWPAN_NHC_UDP_4BIT_PORT +
--					 (skb->data[0] & 0x0f));
--			skb_pull(skb, 1);
-+					 (val & 0x0f));
- 			break;
- 		default:
- 			pr_debug("ERROR: unknown UDP format\n");
-@@ -314,8 +311,7 @@ uncompress_udp_header(struct sk_buff *skb, struct udphdr *uh)
- 			pr_debug_ratelimited("checksum elided currently not supported\n");
- 			goto err;
- 		} else {
--			memcpy(&uh->check, &skb->data[0], 2);
--			skb_pull(skb, 2);
-+			fail |= lowpan_fetch_skb(skb, &uh->check, 2);
- 		}
- 
- 		/*
-@@ -330,6 +326,9 @@ uncompress_udp_header(struct sk_buff *skb, struct udphdr *uh)
- 		goto err;
- 	}
- 
-+	if (fail)
-+		goto err;
-+
- 	return 0;
- err:
- 	return -EINVAL;
+Changes since v3:
+ - add patch to introduce lowpan_push_hc_data helper function.
+ - remove patch to fix nullpointer dereferencing and replace it with
+   a patch which use the lowpan_push_hc_data function in compress_udp_header
+   function. This fixes the nullpointer dereferencing problem also and is more
+   readable.
+ - add missing newline in pr_debug_ratelimited.
+
+Changes since v2:
+ - remove unnecessary casts and brackes, suggested by Werner Almesberger.
+ - use pr_debug_ratelimited instead of pr_debug on patch 4/7.
+
+Alexander Aring (8):
+  6lowpan: introduce lowpan_push_hc_data function
+  6lowpan: udp use lowpan_push_hc_data function
+  6lowpan: fix udp compress ordering
+  6lowpan: fix udp byte ordering
+  6lowpan: add udp warning for elided checksum
+  6lowpan: udp use lowpan_fetch_skb function
+  6lowpan: udp use subtraction on both conditions
+  6lowpan: cleanup udp compress function
+
+ net/ieee802154/6lowpan.h      |   8 +++
+ net/ieee802154/6lowpan_iphc.c | 114 ++++++++++++++++++++++++------------------
+ 2 files changed, 74 insertions(+), 48 deletions(-)
+
 -- 
 1.8.5.1
 
