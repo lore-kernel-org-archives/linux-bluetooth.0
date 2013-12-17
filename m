@@ -3,61 +3,56 @@ From: Alexander Aring <alex.aring@gmail.com>
 To: linux-zigbee-devel@lists.sourceforge.net
 Cc: werner@almesberger.net, linux-bluetooth@vger.kernel.org,
 	Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH v2 bluetooth-next 4/7] 6lowpan: add udp warning for elided checksum
-Date: Tue, 17 Dec 2013 11:32:50 +0100
-Message-Id: <1387276373-23882-5-git-send-email-alex.aring@gmail.com>
+Subject: [PATCH v2 bluetooth-next 7/7] 6lowpan: cleanup udp compress function
+Date: Tue, 17 Dec 2013 11:32:53 +0100
+Message-Id: <1387276373-23882-8-git-send-email-alex.aring@gmail.com>
 In-Reply-To: <1387276373-23882-1-git-send-email-alex.aring@gmail.com>
 References: <1387276373-23882-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Bit 5 of "UDP LOWPAN_NHC Format" indicate that the checksum can be
-elided.
-The host need to calculate the udp checksum afterwards but this isn't
-supported right now.
+This patch remove unnecessary casts and brackets in compress_udp_header
+function.
 
-See:
-http://tools.ietf.org/html/rfc6282#section-4.3.3
 Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 ---
- net/ieee802154/6lowpan.h      |  1 +
- net/ieee802154/6lowpan_iphc.c | 11 ++++++++---
- 2 files changed, 9 insertions(+), 3 deletions(-)
+ net/ieee802154/6lowpan_iphc.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/net/ieee802154/6lowpan.h b/net/ieee802154/6lowpan.h
-index 10909e5..4942c5d 100644
---- a/net/ieee802154/6lowpan.h
-+++ b/net/ieee802154/6lowpan.h
-@@ -231,6 +231,7 @@
- #define LOWPAN_NHC_UDP_CS_P_10	0xF2 /* source = 0xF0 + 8bit inline,
- 					dest = 16 bit inline */
- #define LOWPAN_NHC_UDP_CS_P_11	0xF3 /* source & dest = 0xF0B + 4bit inline */
-+#define LOWPAN_NHC_UDP_CS_C	0x04 /* checksum elided */
- 
- #ifdef DEBUG
- /* print data in line */
 diff --git a/net/ieee802154/6lowpan_iphc.c b/net/ieee802154/6lowpan_iphc.c
-index a7ae340..8303c93 100644
+index d49cc1b..78bbb76 100644
 --- a/net/ieee802154/6lowpan_iphc.c
 +++ b/net/ieee802154/6lowpan_iphc.c
-@@ -309,9 +309,14 @@ uncompress_udp_header(struct sk_buff *skb, struct udphdr *uh)
- 		pr_debug("uncompressed UDP ports: src = %d, dst = %d\n",
- 			 ntohs(uh->source), ntohs(uh->dest));
- 
--		/* copy checksum */
--		memcpy(&uh->check, &skb->data[0], 2);
--		skb_pull(skb, 2);
-+		/* checksum */
-+		if (tmp & LOWPAN_NHC_UDP_CS_C) {
-+			pr_debug_ratelimited("checksum elided currently not supported");
-+			goto err;
-+		} else {
-+			memcpy(&uh->check, &skb->data[0], 2);
-+			skb_pull(skb, 2);
-+		}
- 
- 		/*
- 		 * UDP lenght needs to be infered from the lower layers
+@@ -553,24 +553,22 @@ static void compress_udp_header(u8 **hc06_ptr, struct sk_buff *skb)
+ 	     LOWPAN_NHC_UDP_4BIT_PORT)) {
+ 		pr_debug("UDP header: both ports compression to 4 bits\n");
+ 		**hc06_ptr = LOWPAN_NHC_UDP_CS_P_11;
+-		*(*hc06_ptr + 1) = /* subtraction is faster */
+-		   (u8)((ntohs(uh->dest) - LOWPAN_NHC_UDP_4BIT_PORT) +
+-		       ((ntohs(uh->source) - LOWPAN_NHC_UDP_4BIT_PORT) << 4));
++		*(*hc06_ptr + 1) = ntohs(uh->dest) - LOWPAN_NHC_UDP_4BIT_PORT +
++				   ((ntohs(uh->source) -
++				     LOWPAN_NHC_UDP_4BIT_PORT) << 4);
+ 		*hc06_ptr += 2;
+ 	} else if ((ntohs(uh->dest) & LOWPAN_NHC_UDP_8BIT_MASK) ==
+ 		   LOWPAN_NHC_UDP_8BIT_PORT) {
+ 		pr_debug("UDP header: remove 8 bits of dest\n");
+ 		**hc06_ptr = LOWPAN_NHC_UDP_CS_P_01;
+ 		memcpy(*hc06_ptr + 1, &uh->source, 2);
+-		*(*hc06_ptr + 3) = (u8)(ntohs(uh->dest) -
+-					LOWPAN_NHC_UDP_8BIT_PORT);
++		*(*hc06_ptr + 3) = ntohs(uh->dest) - LOWPAN_NHC_UDP_8BIT_PORT;
+ 		*hc06_ptr += 4;
+ 	} else if ((ntohs(uh->source) & LOWPAN_NHC_UDP_8BIT_MASK) ==
+ 		   LOWPAN_NHC_UDP_8BIT_PORT) {
+ 		pr_debug("UDP header: remove 8 bits of source\n");
+ 		**hc06_ptr = LOWPAN_NHC_UDP_CS_P_10;
+-		*(*hc06_ptr + 1) = (u8)(ntohs(uh->source) -
+-					LOWPAN_NHC_UDP_8BIT_PORT);
++		*(*hc06_ptr + 1) = ntohs(uh->source) - LOWPAN_NHC_UDP_8BIT_PORT;
+ 		memcpy(*hc06_ptr + 2, &uh->dest, 2);
+ 		*hc06_ptr += 4;
+ 	} else {
 -- 
 1.8.5.1
 
