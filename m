@@ -1,82 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1387283874-29721-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1387283874-29721-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-Date: Tue, 17 Dec 2013 15:34:36 +0200
-Message-ID: <CABBYNZLCgpqR+hsR7vcadV52Y+x2jdRSWGQWfsSr3PhyPKCNTQ@mail.gmail.com>
-Subject: Re: [PATCH 1/7] android/tester: Fix enum and define coding style
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Alexander Aring <alex.aring@gmail.com>
+To: linux-zigbee-devel@lists.sourceforge.net
+Cc: werner@almesberger.net, linux-bluetooth@vger.kernel.org,
+	Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH v3 bluetooth-next 8/8] 6lowpan: cleanup udp compress function
+Date: Tue, 17 Dec 2013 14:21:28 +0100
+Message-Id: <1387286488-29382-9-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1387286488-29382-1-git-send-email-alex.aring@gmail.com>
+References: <1387286488-29382-1-git-send-email-alex.aring@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+This patch remove unnecessary casts and brackets in compress_udp_header
+function.
 
-On Tue, Dec 17, 2013 at 2:37 PM, Grzegorz Kolodziejczyk
-<grzegorz.kolodziejczyk@tieto.com> wrote:
-> This changes all enums values and defines to uppercase instead of
-> lowercase according to coding style.
-> ---
->  android/android-tester.c | 86 ++++++++++++++++++++++++------------------------
->  1 file changed, 43 insertions(+), 43 deletions(-)
->
-> diff --git a/android/android-tester.c b/android/android-tester.c
-> index eb938d0..4eb265b 100644
-> --- a/android/android-tester.c
-> +++ b/android/android-tester.c
-> @@ -37,10 +37,10 @@
->  #include <hardware/bluetooth.h>
->  #include <hardware/bt_sock.h>
->
-> -#define adapter_props adapter_prop_bdaddr, adapter_prop_bdname, \
-> -                       adapter_prop_uuids, adapter_prop_cod, \
-> -                       adapter_prop_type, adapter_prop_scan_mode, \
-> -                       adapter_prop_bonded_devices, adapter_prop_disc_timeout
-> +#define ADAPTER_PROPS ADAPTER_PROP_BDADDR, ADAPTER_PROP_BDNAME, \
-> +                       ADAPTER_PROP_UUIDS, ADAPTER_PROP_COD, \
-> +                       ADAPTER_PROP_TYPE, ADAPTER_PROP_SCAN_MODE, \
-> +                       ADAPTER_PROP_BONDED_DEVICES, ADAPTER_PROP_DISC_TIMEOUT
->
->  static bt_scan_mode_t test_setprop_scanmode_val =
->                                         BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE;
-> @@ -52,19 +52,19 @@ static uint32_t test_setprop_disctimeout_val = 120;
->   */
->
->  enum hal_bluetooth_callbacks_id {
-> -       adapter_test_end,
-> -       adapter_test_setup_mode,
-> -       adapter_state_changed_on,
-> -       adapter_state_changed_off,
-> -       adapter_prop_bdaddr,
-> -       adapter_prop_bdname,
-> -       adapter_prop_uuids,
-> -       adapter_prop_cod,
-> -       adapter_prop_type,
-> -       adapter_prop_scan_mode,
-> -       adapter_prop_disc_timeout,
-> -       adapter_prop_service_record,
-> -       adapter_prop_bonded_devices
-> +       ADAPTER_TEST_END,
-> +       ADAPTER_TEST_SETUP_MODE,
-> +       ADAPTER_STATE_CHANGED_ON,
-> +       ADAPTER_STATE_CHANGED_OFF,
-> +       ADAPTER_PROP_BDADDR,
-> +       ADAPTER_PROP_BDNAME,
-> +       ADAPTER_PROP_UUIDS,
-> +       ADAPTER_PROP_COD,
-> +       ADAPTER_PROP_TYPE,
-> +       ADAPTER_PROP_SCAN_MODE,
-> +       ADAPTER_PROP_DISC_TIMEOUT,
-> +       ADAPTER_PROP_SERVICE_RECORD,
-> +       ADAPTER_PROP_BONDED_DEVICES
->  };
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/ieee802154/6lowpan_iphc.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-This is something I dislike right now, why are defining these and not
-using directly the values defined in hal-msg.h? We should probably
-have a struct with expected opcode and value e.g:
-.{HAL_EV_ADAPTER_PROPS_CHANGED, BT_STATE_ON} and don't try to invent
-another ID for each of those.
+diff --git a/net/ieee802154/6lowpan_iphc.c b/net/ieee802154/6lowpan_iphc.c
+index b298bfc..11840f9 100644
+--- a/net/ieee802154/6lowpan_iphc.c
++++ b/net/ieee802154/6lowpan_iphc.c
+@@ -553,33 +553,43 @@ static void compress_udp_header(u8 **hc06_ptr, struct sk_buff *skb)
+ 	    ((ntohs(uh->dest) & LOWPAN_NHC_UDP_4BIT_MASK) ==
+ 	     LOWPAN_NHC_UDP_4BIT_PORT)) {
+ 		pr_debug("UDP header: both ports compression to 4 bits\n");
++		/* compression value */
+ 		tmp = LOWPAN_NHC_UDP_CS_P_11;
+ 		lowpan_push_hc_data(hc06_ptr, &tmp, sizeof(tmp));
+-		tmp = /* subtraction is faster */
+-		   (u8)((ntohs(uh->dest) - LOWPAN_NHC_UDP_4BIT_PORT) +
+-		       ((ntohs(uh->source) - LOWPAN_NHC_UDP_4BIT_PORT) << 4));
++		/* source and destination port */
++		tmp = ntohs(uh->dest) - LOWPAN_NHC_UDP_4BIT_PORT +
++		      ((ntohs(uh->source) - LOWPAN_NHC_UDP_4BIT_PORT) << 4);
+ 		lowpan_push_hc_data(hc06_ptr, &tmp, sizeof(tmp));
+ 	} else if ((ntohs(uh->dest) & LOWPAN_NHC_UDP_8BIT_MASK) ==
+ 			LOWPAN_NHC_UDP_8BIT_PORT) {
+ 		pr_debug("UDP header: remove 8 bits of dest\n");
++		/* compression value */
+ 		tmp = LOWPAN_NHC_UDP_CS_P_01;
+ 		lowpan_push_hc_data(hc06_ptr, &tmp, sizeof(tmp));
++		/* source port */
+ 		lowpan_push_hc_data(hc06_ptr, &uh->source, sizeof(uh->source));
+-		tmp = (u8)(ntohs(uh->dest) - LOWPAN_NHC_UDP_8BIT_PORT);
++		/* destination port */
++		tmp = ntohs(uh->dest) - LOWPAN_NHC_UDP_8BIT_PORT;
+ 		lowpan_push_hc_data(hc06_ptr, &tmp, sizeof(tmp));
+ 	} else if ((ntohs(uh->source) & LOWPAN_NHC_UDP_8BIT_MASK) ==
+ 			LOWPAN_NHC_UDP_8BIT_PORT) {
+ 		pr_debug("UDP header: remove 8 bits of source\n");
++		/* compression value */
+ 		tmp = LOWPAN_NHC_UDP_CS_P_10;
+ 		lowpan_push_hc_data(hc06_ptr, &tmp, sizeof(tmp));
+-		tmp = (u8)(ntohs(uh->source) - LOWPAN_NHC_UDP_8BIT_PORT);
++		/* source port */
++		tmp = ntohs(uh->source) - LOWPAN_NHC_UDP_8BIT_PORT;
+ 		lowpan_push_hc_data(hc06_ptr, &tmp, sizeof(tmp));
++		/* destination port */
+ 		lowpan_push_hc_data(hc06_ptr, &uh->dest, sizeof(uh->dest));
+ 	} else {
+ 		pr_debug("UDP header: can't compress\n");
++		/* compression value */
+ 		tmp = LOWPAN_NHC_UDP_CS_P_00;
+ 		lowpan_push_hc_data(hc06_ptr, &tmp, sizeof(tmp));
++		/* source port */
+ 		lowpan_push_hc_data(hc06_ptr, &uh->source, sizeof(uh->source));
++		/* destination port */
+ 		lowpan_push_hc_data(hc06_ptr, &uh->dest, sizeof(uh->dest));
+ 	}
+ 
+-- 
+1.8.5.1
 
-Luiz Augusto von Dentz
