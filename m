@@ -1,107 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin <marcin.kraglak@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: [PATCH 1/4] emulator: Add psm handling to bthost
-Date: Tue, 17 Dec 2013 15:49:36 +0100
-Message-Id: <1387291779-14960-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH] android/tester: Fix not returning in failure
+Date: Tue, 17 Dec 2013 16:17:33 +0200
+Message-Id: <1387289853-8942-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Store psm of l2cap connections. We retrieve psm from
-connection request frame.
 ---
- emulator/bthost.c | 29 +++++++++++++++++++++++------
- 1 file changed, 23 insertions(+), 6 deletions(-)
+ android/android-tester.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index b05072a..32d46b0 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -79,6 +79,7 @@ struct btconn {
- struct l2conn {
- 	uint16_t scid;
- 	uint16_t dcid;
-+	uint16_t psm;
- 	struct l2conn *next;
- };
+diff --git a/android/android-tester.c b/android/android-tester.c
+index 2a8c8d0..c193921 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -851,8 +851,10 @@ static void setup_socket_interface(const void *test_data)
+ 	setup(data);
  
-@@ -154,7 +155,8 @@ static struct btconn *bthost_find_conn(struct bthost *bthost, uint16_t handle)
- }
- 
- static void bthost_add_l2cap_conn(struct bthost *bthost, struct btconn *conn,
--						uint16_t scid, uint16_t dcid)
-+						uint16_t scid, uint16_t dcid,
-+						uint16_t psm)
- {
- 	struct l2conn *l2conn;
- 
-@@ -164,6 +166,7 @@ static void bthost_add_l2cap_conn(struct bthost *bthost, struct btconn *conn,
- 
- 	memset(l2conn, 0, sizeof(*l2conn));
- 
-+	l2conn->psm = psm;
- 	l2conn->scid = scid;
- 	l2conn->dcid = dcid;
- 
-@@ -376,6 +379,15 @@ bool bthost_l2cap_req(struct bthost *bthost, uint16_t handle, uint8_t code,
- 	if (!conn)
- 		return false;
- 
-+	if (code == BT_L2CAP_PDU_CONN_REQ &&
-+			len == sizeof(struct bt_l2cap_pdu_conn_req)) {
-+		const struct bt_l2cap_pdu_conn_req *req = data;
-+
-+		bthost_add_l2cap_conn(bthost, conn, le16_to_cpu(req->scid),
-+							le16_to_cpu(req->scid),
-+							le16_to_cpu(req->psm));
+ 	sock = data->if_bluetooth->get_profile_interface(BT_PROFILE_SOCKETS_ID);
+-	if (!sock)
++	if (!sock) {
+ 		tester_setup_failed();
++		return;
 +	}
-+
- 	ident = l2cap_sig_send(bthost, conn, code, 0, data, len);
- 	if (!ident)
- 		return false;
-@@ -737,7 +749,8 @@ static bool l2cap_conn_req(struct bthost *bthost, struct btconn *conn,
- 		struct bt_l2cap_pdu_config_req conf_req;
  
- 		bthost_add_l2cap_conn(bthost, conn, le16_to_cpu(rsp.dcid),
--							le16_to_cpu(rsp.scid));
-+							le16_to_cpu(rsp.scid),
-+							le16_to_cpu(psm));
+ 	data->if_sock = sock;
  
- 		memset(&conf_req, 0, sizeof(conf_req));
- 		conf_req.dcid = rsp.dcid;
-@@ -753,12 +766,16 @@ static bool l2cap_conn_rsp(struct bthost *bthost, struct btconn *conn,
- 				uint8_t ident, const void *data, uint16_t len)
- {
- 	const struct bt_l2cap_pdu_conn_rsp *rsp = data;
-+	struct l2conn *l2conn;
- 
- 	if (len < sizeof(*rsp))
- 		return false;
- 
--	bthost_add_l2cap_conn(bthost, conn, le16_to_cpu(rsp->scid),
--						le16_to_cpu(rsp->dcid));
-+	l2conn = btconn_find_l2cap_conn_by_scid(conn, le16_to_cpu(rsp->scid));
-+	if (l2conn)
-+		l2conn->dcid = le16_to_cpu(rsp->dcid);
-+	else
-+		return false;
- 
- 	if (le16_to_cpu(rsp->result) == 0x0001) {
- 		struct bt_l2cap_pdu_config_req req;
-@@ -1013,8 +1030,8 @@ static bool l2cap_le_conn_rsp(struct bthost *bthost, struct btconn *conn,
- 
- 	if (len < sizeof(*rsp))
- 		return false;
--
--	bthost_add_l2cap_conn(bthost, conn, 0, le16_to_cpu(rsp->dcid));
-+	/* TODO add l2cap connection with proper psm when sending conn req*/
-+	bthost_add_l2cap_conn(bthost, conn, 0, le16_to_cpu(rsp->dcid), 0);
- 
- 	return true;
- }
 -- 
-1.8.3.1
+1.8.3.2
 
