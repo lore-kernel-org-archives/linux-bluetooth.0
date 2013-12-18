@@ -1,45 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 18 Dec 2013 14:23:30 -0500
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth 2013-12-18
-Message-ID: <20131218192330.GC3096@tuxdriver.com>
-References: <20131218125236.GA1376@joana>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20131218125236.GA1376@joana>
-Sender: linux-wireless-owner@vger.kernel.org
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2] android/tester: Add Socket test close and listen
+Date: Wed, 18 Dec 2013 17:15:16 +0200
+Message-Id: <1387379717-1457-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Dec 18, 2013 at 10:52:36AM -0200, Gustavo Padovan wrote:
-> Hi John,
-> 
-> Two patches in this pull request. An important fix from Marcel in the
-> permission check for HCI User Channels, there was a extra check for
-> CAP_NET_RAW, and it was now removed. These channels should only require
-> CAP_NET_ADMIN. The other patch is a device id addition.
-> 
-> Please pull or let me know of any problems! Thanks.
-> 
->         Gustavo
-> 
-> ---
-> The following changes since commit eafbdde9c5629bea58df07275c5917eb42afbbe7:
-> 
->   rtlwifi: rtl8192cu: Fix more pointer arithmetic errors (2013-11-15 14:29:33 -0500)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
-> 
-> for you to fetch changes up to 1bc5ad168f441f6f8bfd944288a5f7b4963ac1f6:
-> 
->   Bluetooth: Fix HCI User Channel permission check in hci_sock_sendmsg (2013-12-17 13:47:27 +0200)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Pulling now...
+This test the situation when Android close file descriptor we passed to
+it and try to listen() again.
+---
+ android/android-tester.c | 55 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
 
+diff --git a/android/android-tester.c b/android/android-tester.c
+index 8a2861e..cb8fb4e 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -1141,6 +1141,57 @@ clean:
+ 		close(sock_fd);
+ }
+ 
++static void test_listen_close(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct socket_data *test = data->test_data;
++	bt_status_t status;
++	int sock_fd = -1;
++
++	status = data->if_sock->listen(test->sock_type,
++					test->service_name, test->service_uuid,
++					test->channel, &sock_fd, test->flags);
++	if (status != test->expected_status) {
++		tester_test_failed();
++		goto clean;
++	}
++
++	/* Check that file descriptor is valid */
++	if (status == BT_STATUS_SUCCESS && fcntl(sock_fd, F_GETFD) == -1) {
++		tester_test_failed();
++		return;
++	}
++
++	tester_print("sock_fd: %d", sock_fd);
++
++	/* Now close sock_fd */
++	close(sock_fd);
++
++	/* Try to listen again */
++	status = data->if_sock->listen(test->sock_type,
++					test->service_name, test->service_uuid,
++					test->channel, &sock_fd, test->flags);
++	if (status != test->expected_status) {
++		tester_test_failed();
++		goto clean;
++	}
++
++	/* Check that file descriptor is valid */
++	if (status == BT_STATUS_SUCCESS && fcntl(sock_fd, F_GETFD) == -1) {
++		tester_test_failed();
++		return;
++	}
++
++	tester_print("sock_fd: %d", sock_fd);
++
++	tester_test_passed();
++
++clean:
++	if (sock_fd >= 0)
++		close(sock_fd);
++
++}
++
+ static void test_generic_connect(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+@@ -1363,6 +1414,10 @@ int main(int argc, char *argv[])
+ 			&btsock_success_check_chan,
+ 			setup_socket_interface, test_generic_listen, teardown);
+ 
++	test_bredrle("Socket Listen - Close and Listen again",
++			&btsock_success_check_chan,
++			setup_socket_interface, test_listen_close, teardown);
++
+ 	test_bredrle("Socket Connect - Invalid: sock_type 0",
+ 			&btsock_inv_param_socktype, setup_socket_interface,
+ 			test_generic_connect, teardown);
 -- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+1.8.3.2
+
