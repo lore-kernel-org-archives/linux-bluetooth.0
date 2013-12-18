@@ -2,80 +2,41 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v4 5/7] bnep: Add bnep_new and bnep_free api's
-Date: Wed, 18 Dec 2013 16:53:14 +0200
-Message-Id: <1387378396-6259-5-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v4 2/7] android/pan: Change local_role to NONE only when device list is empty
+Date: Wed, 18 Dec 2013 16:53:11 +0200
+Message-Id: <1387378396-6259-2-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1387378396-6259-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1387378396-6259-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Refacoring connect and disconnect mechanisms. It would be more
-convinient for caller to maintain just bnep connection reference
-and delete whenever it is not required.
 ---
- profiles/network/bnep.c | 25 +++++++++++++++++++++++++
- profiles/network/bnep.h |  4 ++++
- 2 files changed, 29 insertions(+)
+ android/pan.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index 02e2647..f3ed63b 100644
---- a/profiles/network/bnep.c
-+++ b/profiles/network/bnep.c
-@@ -246,6 +246,31 @@ int bnep_if_down(const char *devname)
- 	return 0;
+diff --git a/android/pan.c b/android/pan.c
+index 2bbba9e..b83f534 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -67,8 +67,6 @@ static int device_cmp(gconstpointer s, gconstpointer user_data)
+ 
+ static void pan_device_free(struct pan_device *dev)
+ {
+-	local_role = HAL_PAN_ROLE_NONE;
+-
+ 	if (dev->watch > 0) {
+ 		g_source_remove(dev->watch);
+ 		dev->watch = 0;
+@@ -81,6 +79,9 @@ static void pan_device_free(struct pan_device *dev)
+ 
+ 	devices = g_slist_remove(devices, dev);
+ 	g_free(dev);
++
++	if (g_slist_length(devices) == 0)
++		local_role = HAL_PAN_ROLE_NONE;
  }
  
-+struct bnep *bnep_new(int sk, uint16_t local_role, uint16_t remote_role)
-+{
-+	struct bnep *b;
-+
-+	b = g_new0(struct bnep, 1);
-+	b->io = g_io_channel_unix_new(sk);
-+	b->src = local_role;
-+	b->dst = remote_role;
-+
-+	return b;
-+}
-+
-+void bnep_free(struct bnep *b)
-+{
-+	if (!b)
-+		return;
-+
-+	if (b->io) {
-+		g_io_channel_unref(b->io);
-+		b->io = NULL;
-+	}
-+
-+	g_free(b);
-+}
-+
- static gboolean bnep_setup_cb(GIOChannel *chan, GIOCondition cond,
- 								gpointer data)
- {
-diff --git a/profiles/network/bnep.h b/profiles/network/bnep.h
-index dd22c40..091a7f2 100644
---- a/profiles/network/bnep.h
-+++ b/profiles/network/bnep.h
-@@ -21,6 +21,8 @@
-  *
-  */
- 
-+struct bnep;
-+
- int bnep_init(void);
- int bnep_cleanup(void);
- 
-@@ -28,6 +30,8 @@ uint16_t bnep_service_id(const char *svc);
- const char *bnep_uuid(uint16_t id);
- const char *bnep_name(uint16_t id);
- 
-+struct bnep *bnep_new(int sk, uint16_t local_role, uint16_t remote_role);
-+void bnep_free(struct bnep *b);
- int bnep_connadd(int sk, uint16_t role, char *dev);
- int bnep_conndel(const bdaddr_t *dst);
- int bnep_if_up(const char *devname);
+ static void bt_pan_notify_conn_state(struct pan_device *dev, uint8_t state)
 -- 
 1.8.3.2
 
