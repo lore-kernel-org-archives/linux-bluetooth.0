@@ -1,50 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 18 Dec 2013 14:31:13 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC 0/4] android: Permanent storage support
-Message-ID: <20131218123111.GE26311@aemeltch-MOBL1>
-References: <1387365660-25281-1-git-send-email-szymon.janc@tieto.com>
- <3D8D935B-BE1E-4158-B2F5-8F49851A718C@holtmann.org>
- <1743761.bXhrtg3e4W@uw000953>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1743761.bXhrtg3e4W@uw000953>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] android/AVDTP: Fix not removing start_timer source
+Date: Wed, 18 Dec 2013 14:29:43 +0200
+Message-Id: <1387369783-28164-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Dec 18, 2013 at 01:23:40PM +0100, Szymon Janc wrote:
-> Hi Marcel,
-> 
-> > Hi Szymon,
-> > 
-> > > This is first RFC for storage format for Android daemon.
-> > > 
-> > > Some highlights:
-> > > - storage is much simple in format than Linux daemon (no addresses in paths
-> > >  or filenames, only 1 adapter support etc)
-> > > - only info that requires persistency  over daemon lifetime from Framework
-> > >  perspective is stored
-> > > - settings file for adapter config
-> > > - devices file for remote device info (groups are remote devices addresses)
-> > > - Android storage path is /data/misc/bluez (I've decided to not use
-> > >  /data/misc/bluetooth to avoid any clashes as there still seems to be
-> > >  leftovers available in Android tree eg. there are still references to that
-> > >  directory in CTS testcases and init files of Android 4.4)
-> > 
-> > I would use /data/misc/bluetooth actually. Especially since the daemon is also called bluetoothd and not bluezd.
-> > 
-> > What is the impact on just using /data/misc/bluetooth and see if anything really breaks.
-> 
-> OK, this will require proper chown in device init.rc (as it is set to system/system
-> in system/core/rootdir/init.rc), but that would be needed for /data/misc/bluez path
-> anyway...
+It is possible that stream->start_timer can be set on stream_free which
+should then should take care of remove it properly otherwise it can
+trigger which would very likely cause a crash.
 
-I wonder can we find place without need to add extra chown... like using
-Bluedroid configuration location?
+Thanks to Hannu Mallat <hannu.mallat@jolla.com> for reporting it.
+---
+ android/avdtp.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Best regards 
-Andrei Emeltchenko 
+diff --git a/android/avdtp.c b/android/avdtp.c
+index 5ae3afc..3a3380a 100644
+--- a/android/avdtp.c
++++ b/android/avdtp.c
+@@ -670,6 +670,9 @@ static void stream_free(void *data)
+ 	if (stream->timer)
+ 		g_source_remove(stream->timer);
+ 
++	if (stream->start_timer > 0)
++		g_source_remove(stream->start_timer);
++
+ 	if (stream->io)
+ 		close_stream(stream);
+ 
+-- 
+1.8.3.1
+
