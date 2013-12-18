@@ -1,83 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 0/4] android: Permanent storage support
-Date: Wed, 18 Dec 2013 12:20:56 +0100
-Message-Id: <1387365660-25281-1-git-send-email-szymon.janc@tieto.com>
+Date: Wed, 18 Dec 2013 13:11:16 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC v4 05/12] Bluetooth: Stop scanning on LE connection
+Message-ID: <20131218111116.GA25848@x220.p-661hnu-f1>
+References: <1386367549-29136-1-git-send-email-andre.guedes@openbossa.org>
+ <1386367549-29136-6-git-send-email-andre.guedes@openbossa.org>
+ <20131210132131.GA10392@x220.p-661hnu-f1>
+ <1387289112.1231.21.camel@bali>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1387289112.1231.21.camel@bali>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Hi Andre,
 
-This is first RFC for storage format for Android daemon.
+On Tue, Dec 17, 2013, Andre Guedes wrote:
+> > > @@ -518,8 +518,17 @@ static void create_le_conn_complete(struct hci_dev *hdev, u8 status)
+> > >  {
+> > >  	struct hci_conn *conn;
+> > >  
+> > > -	if (status == 0)
+> > > +	if (status == 0) {
+> > > +		/* If the discovery procedure was running, we prematurely
+> > > +		 * stopped it. So we have to change the discovery state.
+> > > +		 */
+> > > +		if (hdev->discovery.state == DISCOVERY_FINDING) {
+> > > +			cancel_delayed_work(&hdev->le_scan_disable);
+> > > +			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+> > > +		}
+> > > +
+> > >  		return;
+> > > +	}
+> > >  
+> > >  	BT_ERR("HCI request failed to create LE connection: status 0x%2.2x",
+> > >  	       status);
+> > > @@ -552,6 +561,18 @@ static int hci_create_le_conn(struct hci_conn *conn)
+> > >  
+> > >  	hci_req_init(&req, hdev);
+> > >  
+> > > +	/* If controller is scanning, we stop it since some controllers are
+> > > +	 * not able to scan and connect at the same time.
+> > > +	 */
+> > > +	if (test_bit(HCI_LE_SCAN, &hdev->dev_flags)) {
+> > > +		struct hci_cp_le_set_scan_enable enable_cp;
+> > > +
+> > > +		memset(&enable_cp, 0, sizeof(enable_cp));
+> > > +		enable_cp.enable = LE_SCAN_DISABLE;
+> > > +		hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
+> > > +			    &enable_cp);
+> > > +	}
+> > > +
+> > >  	memset(&cp, 0, sizeof(cp));
+> > >  	cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
+> > >  	cp.scan_window = cpu_to_le16(hdev->le_scan_window);
+> > 
+> > The way this all hangs together with a discovery process started through
+> > mgmt_start_discovery feels a bit flimsy to me. Particularly, have you
+> > ensured that everything is fine if you've got inquiry ongoing when you
+> > do hci_discovery_set_state(hdev, DISCOVERY_STOPPED). Also, are there any
+> > risks of race conditions here, e.g. is it fine to let the
+> > cancel_delayed_work() call be in create_le_conn_complete() instead of
+> > doing it in hci_create_le_conn()?
+> 
+> Yes, I did lots of testing, including the inquiry test you mentioned,
+> and I didn't find any issues.
+> 
+> I failed to see any race conditons since cancel_delayed_work() does not
+> block. So it is fine to call cancel_delayed_work() in
+> create_le_conn_complete() as well as in hci_create_le_conn().
 
-Some highlights:
-- storage is much simple in format than Linux daemon (no addresses in paths
-  or filenames, only 1 adapter support etc)
-- only info that requires persistency  over daemon lifetime from Framework
-  perspective is stored
-- settings file for adapter config
-- devices file for remote device info (groups are remote devices addresses)
-- Android storage path is /data/misc/bluez (I've decided to not use
-  /data/misc/bluetooth to avoid any clashes as there still seems to be
-  leftovers available in Android tree eg. there are still references to that
-  directory in CTS testcases and init files of Android 4.4)
+I presume you'd want to prevent the delayed work from getting called as
+soon as you've entered the if (test_bit(HCI_LE_SCAN)) section in
+hci_create_le_conn? In theory it might get called before
+create_le_conn_complete. In such a scenario
+le_scan_disable_work_complete could e.g. trigger inquiry before
+create_le_conn_complete is called, couldn't it?
 
-I'm not sure how to handle storage on Linux host so for now it is set to
-STORAGEDIR/android/ directory (if directory is missing it is not created
-by daemon).
+> > What also makes this hard to track is that the condition you're testing
+> > for first is the HCI_LE_SCAN bit, but then later you look at
+> > discovery.state == DISCOVERY_FINDING. For the casual reader there's no
+> > direct indication of how these two are releated for the various types of
+> > discovery that are possible (LE-only, BR/EDR-only and interleaved).
+> 
+> Yes, I see your point. However, we can't check HCI_LE_SCAN in
+> create_le_conn_complete() because the flag was already cleared in
+> hci_cc_le_set_scan_enable().
 
-Storage format is as following sample:
+Understood.
 
-settings file:
-[General]
-Address=20:68:9D:3A:52:5E
-Name=BlueZ Android
-DiscoverableTimeout=0
+> > I don't mean to say that this is a nack for the patch, but I'd like to
+> > know that you've considered and tested this kind of cases. I had to
+> > spend quite some time looking through the existing code and this patch
+> > and still couldn't arrive at absolute confidence of its correctness,
+> > meaning there should hopefully be some room for simplification.
+> 
+> So I think we can do some simplification by moving this discovery
+> handling from create_le_conn_complete() to hci_create_le_conn(), at
+> least I think this code will become a bit easier to follow. What do you
+> think?
 
-devices file:
-[00:0D:3C:B1:C4:AC]
-Type=0
-Name=Nokia BH-503
-Class=2360324
-LinkKey=0x306A400930B0AE36D7AC45D8DC50F1A0
-LinkKeyType=0
-LinkKeyPINLength=4
-Services=0x0000110B00001000800000805F9B34FB;0x0000110C00001000800000805F9B34FB;0x0000110E00001000800000805F9B34FB;0x0000111E00001000800000805F9B34FB;0x0000110800001000800000805F9B34FB;
+I think it would at least close the potential race I described above,
+i.e. the delayed work getting triggered before create_le_conn_complete.
 
-[00:1F:20:17:87:D7]
-Type=0
-Name=Bluetooth Laser Travel Mouse
-Class=9600
-LinkKey=0x3725CC552EAB8AB82D843BFEB14D2E47
-LinkKeyType=0
-LinkKeyPINLength=4
-Services=0x0000112400001000800000805F9B34FB;0x0000120000001000800000805F9B34FB;
-
-[40:B0:FA:39:FF:B8]
-Type=0
-Name=Nexus 4
-Class=5898764
-LinkKey=0x1E201EE8E82E1E50682622077D372F20
-LinkKeyType=5
-LinkKeyPINLength=0
-Services=0x0000180100001000800000805F9B34FB;0x0000180000001000800000805F9B34FB;0x0000111200001000800000805F9B34FB;0x0000111F00001000800000805F9B34FB;0x0000110C00001000800000805F9B34FB;0x0000110A00001000800000805F9B34FB;0x0000110E00001000800000805F9B34FB;0x0000111600001000800000805F9B34FB;0x0000111500001000800000805F9B34FB;0x0000113200001000800000805F9B34FB;0x0000112F00001000800000805F9B34FB;0x0000110500001000800000805F9B34FB;
-
-
-Comments are welcome.
-
-Szymon Janc (4):
-  android/bluetooth: Add initial support for permanent storage
-  android/bluetooth: Add initial support for storing device info
-  android/bluetooth: Add support for storing link keys
-  android/bluetooth: Add support for restoring devices from storage
-
- android/Android.mk  |   3 +-
- android/bluetooth.c | 317 ++++++++++++++++++++++++++++++++++++++++++++++++++--
- configure.ac        |   3 +
- 3 files changed, 311 insertions(+), 12 deletions(-)
-
--- 
-1.8.3.2
-
+Johan
