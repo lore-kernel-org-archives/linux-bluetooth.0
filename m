@@ -2,151 +2,81 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 4/4] android/bluetooth: Add support for restoring devices from storage
-Date: Wed, 18 Dec 2013 15:05:58 +0100
-Message-Id: <1387375558-17976-5-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 3/4] android/bluetooth: Add support for storing link keys
+Date: Wed, 18 Dec 2013 15:05:57 +0100
+Message-Id: <1387375558-17976-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1387375558-17976-1-git-send-email-szymon.janc@tieto.com>
 References: <1387375558-17976-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds support to restore bonded devices from storage (including
-linkkeys).
+When new linkkey event is received store linkkey in devices info file.
+Stored info includes linkkey, linkkey type and pin length.
 ---
- android/bluetooth.c | 113 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 112 insertions(+), 1 deletion(-)
+ android/bluetooth.c | 36 ++++++++++++++++++++++++++++++++----
+ 1 file changed, 32 insertions(+), 4 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index dd16a54..c7fb95f 100644
+index b8f078f..dd16a54 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -1576,6 +1576,117 @@ static void clear_uuids(void)
- 					sizeof(cp), &cp, NULL, NULL, NULL);
- }
- 
-+static void create_device_from_info(GKeyFile *key_file, const char *peer)
-+{
-+	struct device *dev;
-+	uint8_t type;
-+	bdaddr_t bdaddr;
-+	char **uuids;
-+	char *str;
-+
-+	DBG("%s", peer);
-+
-+	type = g_key_file_get_integer(key_file, peer, "Type", NULL);
-+
-+	str2ba(peer, &bdaddr);
-+	dev = create_device(&bdaddr, type);
-+
-+	dev->bond_state = HAL_BOND_STATE_BONDED;
-+
-+	str = g_key_file_get_string(key_file, peer, "Name", NULL);
-+	if (str) {
-+		g_free(dev->name);
-+		dev->name = str;
-+	}
-+
-+	str = g_key_file_get_string(key_file, peer, "FriendlyName", NULL);
-+	if (str) {
-+		g_free(dev->friendly_name);
-+		dev->friendly_name = str;
-+	}
-+
-+	dev->class = g_key_file_get_integer(key_file, peer, "Class", NULL);
-+
-+	uuids = g_key_file_get_string_list(key_file, peer, "Services", NULL,
-+									NULL);
-+	if (uuids) {
-+		char **uuid;
-+
-+		for (uuid = uuids; *uuid; uuid++) {
-+			uint8_t *u = g_malloc0(16);
-+			int i;
-+
-+			for (i = 0; i < 16; i++)
-+				sscanf((*uuid) + (i * 2), "%02hhX", &u[i]);
-+
-+			dev->uuids = g_slist_append(dev->uuids, u);
-+		}
-+
-+		g_strfreev(uuids);
-+	}
-+}
-+
-+static struct mgmt_link_key_info *get_key_info(GKeyFile *key_file, const char *peer)
-+{
-+	struct mgmt_link_key_info *info = NULL;
-+	char *str;
-+	unsigned int i;
-+
-+	str = g_key_file_get_string(key_file, peer, "LinkKey", NULL);
-+	if (!str || strlen(str) != 32)
-+		goto failed;
-+
-+	info = g_new0(struct mgmt_link_key_info, 1);
-+
-+	str2ba(peer, &info->addr.bdaddr);
-+
-+	info->addr.type = g_key_file_get_integer(key_file, peer, "Type", NULL);
-+
-+	for (i = 0; i < sizeof(info->val); i++)
-+		sscanf(str + (i * 2), "%02hhX", &info->val[i]);
-+
-+	info->type = g_key_file_get_integer(key_file, peer, "LinkKeyType",
-+									NULL);
-+	info->pin_len = g_key_file_get_integer(key_file, peer,
-+						"LinkKeyPINLength", NULL);
-+
-+failed:
-+	g_free(str);
-+
-+	return info;
-+}
-+
-+static void load_devices_info(bt_bluetooth_ready cb)
-+{
+@@ -493,7 +493,35 @@ static void mgmt_dev_class_changed_event(uint16_t index, uint16_t length,
+ static void store_link_key(const bdaddr_t *dst, const uint8_t *key,
+ 					uint8_t type, uint8_t pin_length)
+ {
+-	/* TODO store link key */
 +	GKeyFile *key_file;
-+	gchar **devs;
-+	gsize len = 0;
-+	unsigned int i;
-+	GSList *keys = NULL;
++	char key_str[33];
++	gsize length = 0;
++	char addr[18];
++	char *data;
++	int i;
 +
 +	key_file = g_key_file_new();
 +
-+	g_key_file_load_from_file(key_file, ANDROID_STORAGEDIR"/devices", 0,
-+									NULL);
++	if (!g_key_file_load_from_file(key_file, ANDROID_STORAGEDIR"/devices",
++								0, NULL))
++		return;
 +
-+	devs = g_key_file_get_groups(key_file, &len);
++	ba2str(dst, addr);
 +
-+	for (i = 0; i < len; i++) {
-+		struct mgmt_link_key_info *key_info;
++	DBG("%s type %u pin_len %u", addr, type, pin_length);
 +
-+		create_device_from_info(key_file, devs[i]);
++	for (i = 0; i < 16; i++)
++		sprintf(key_str + (i * 2), "%2.2X", key[i]);
 +
-+		key_info = get_key_info(key_file, devs[i]);
-+		if (key_info)
-+			keys = g_slist_prepend(keys, key_info);
++	g_key_file_set_string(key_file, addr, "LinkKey", key_str);
++	g_key_file_set_integer(key_file, addr, "LinkKeyType", type);
++	g_key_file_set_integer(key_file, addr, "LinkKeyPINLength", pin_length);
 +
-+		/* TODO ltk */
-+	}
++	data = g_key_file_to_data(key_file, &length, NULL);
++	g_file_set_contents(ANDROID_STORAGEDIR"/devices", data, length, NULL);
++	g_free(data);
 +
-+	load_link_keys(keys, cb);
-+	g_slist_free_full(keys, g_free);
-+}
-+
- static void read_info_complete(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
-@@ -1630,7 +1741,7 @@ static void read_info_complete(uint8_t status, uint16_t length,
++	g_key_file_free(key_file);
+ }
  
- 	clear_uuids();
+ static void send_bond_state_change(const bdaddr_t *addr, uint8_t status,
+@@ -720,6 +748,9 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
+ 		return;
+ 	}
  
--	load_link_keys(NULL, cb);
-+	load_devices_info(cb);
++	set_device_bond_state(&addr->bdaddr, HAL_STATUS_SUCCESS,
++							HAL_BOND_STATE_BONDED);
++
+ 	if (ev->store_hint) {
+ 		const struct mgmt_link_key_info *key = &ev->key;
  
- 	set_io_capability();
- 	set_device_id();
+@@ -727,9 +758,6 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
+ 								key->pin_len);
+ 	}
+ 
+-	set_device_bond_state(&addr->bdaddr, HAL_STATUS_SUCCESS,
+-							HAL_BOND_STATE_BONDED);
+-
+ 	browse_remote_sdp(&addr->bdaddr);
+ }
+ 
 -- 
 1.8.3.2
 
