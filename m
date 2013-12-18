@@ -1,70 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH] avctp: Move avctp.c|h from profiles/audio to protocol/
-Date: Wed, 18 Dec 2013 13:24:21 +0200
-Message-Id: <1387365861-23356-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [RFC 3/4] android/bluetooth: Add support for storing link keys
+Date: Wed, 18 Dec 2013 12:20:59 +0100
+Message-Id: <1387365660-25281-4-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1387365660-25281-1-git-send-email-szymon.janc@tieto.com>
+References: <1387365660-25281-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an initial patch for decoupling avctp.c|h from profiles/audio.
-Goal is to remove external dependency (glib is enough) and reusable
-to android/* sources.
+When new linkkey event is received store linkkey in devices info file.
+Stored info includes linkkey, linkkey type and pin length.
 ---
- Makefile.plugins                     | 2 +-
- {profiles/audio => protocol}/avctp.c | 7 +------
- {profiles/audio => protocol}/avctp.h | 0
- 3 files changed, 2 insertions(+), 7 deletions(-)
- rename {profiles/audio => protocol}/avctp.c (99%)
- rename {profiles/audio => protocol}/avctp.h (100%)
+ android/bluetooth.c | 38 ++++++++++++++++++++++++++++++++++----
+ 1 file changed, 34 insertions(+), 4 deletions(-)
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index 6a1ddbf..a64d4f5 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -41,7 +41,7 @@ builtin_sources += profiles/audio/source.h profiles/audio/source.c \
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 69412dd..0ef6191 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -496,7 +496,37 @@ static void mgmt_dev_class_changed_event(uint16_t index, uint16_t length,
+ static void store_link_key(const bdaddr_t *dst, const uint8_t *key,
+ 					uint8_t type, uint8_t pin_length)
+ {
+-	/* TODO store link key */
++	GKeyFile *key_file;
++	char key_str[35];
++	gsize length = 0;
++	char addr[18];
++	char *data;
++	int i;
++
++	key_file = g_key_file_new();
++
++	if (!g_key_file_load_from_file(key_file, ANDROID_STORAGEDIR"/devices",
++								0, NULL))
++		return;
++
++	ba2str(dst, addr);
++
++	DBG("%s type %u pin_len %u", addr, type, pin_length);
++
++	key_str[0] = '0';
++	key_str[1] = 'x';
++	for (i = 0; i < 16; i++)
++		sprintf(key_str + 2 + (i * 2), "%2.2X", key[i]);
++
++	g_key_file_set_string(key_file, addr, "LinkKey", key_str);
++	g_key_file_set_integer(key_file, addr, "LinkKeyType", type);
++	g_key_file_set_integer(key_file, addr, "LinkKeyPINLength", pin_length);
++
++	data = g_key_file_to_data(key_file, &length, NULL);
++	g_file_set_contents(ANDROID_STORAGEDIR"/devices", data, length, NULL);
++	g_free(data);
++
++	g_key_file_free(key_file);
+ }
  
- builtin_modules += avrcp
- builtin_sources += profiles/audio/control.h profiles/audio/control.c \
--			profiles/audio/avctp.h profiles/audio/avctp.c \
-+			protocol/avctp.h protocol/avctp.c \
- 			profiles/audio/avrcp.h profiles/audio/avrcp.c \
- 			profiles/audio/player.h profiles/audio/player.c
+ static void send_bond_state_change(const bdaddr_t *addr, uint8_t status,
+@@ -723,6 +753,9 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
+ 		return;
+ 	}
  
-diff --git a/profiles/audio/avctp.c b/protocol/avctp.c
-similarity index 99%
-rename from profiles/audio/avctp.c
-rename to protocol/avctp.c
-index 6669ddc..a09cd93 100644
---- a/profiles/audio/avctp.c
-+++ b/protocol/avctp.c
-@@ -32,12 +32,7 @@
- #include <stdbool.h>
- #include <errno.h>
- #include <unistd.h>
--#include <assert.h>
--#include <signal.h>
--#include <sys/types.h>
--#include <sys/stat.h>
- #include <fcntl.h>
--#include <netinet/in.h>
++	set_device_bond_state(&addr->bdaddr, HAL_STATUS_SUCCESS,
++							HAL_BOND_STATE_BONDED);
++
+ 	if (ev->store_hint) {
+ 		const struct mgmt_link_key_info *key = &ev->key;
  
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/sdp.h>
-@@ -54,7 +49,7 @@
- #include "error.h"
- #include "uinput.h"
- #include "avctp.h"
--#include "avrcp.h"
-+#include <profiles/audio/avrcp.h>
+@@ -730,9 +763,6 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
+ 								key->pin_len);
+ 	}
  
- /* AV/C Panel 1.23, page 76:
-  * command with the pressed value is valid for two seconds
-diff --git a/profiles/audio/avctp.h b/protocol/avctp.h
-similarity index 100%
-rename from profiles/audio/avctp.h
-rename to protocol/avctp.h
+-	set_device_bond_state(&addr->bdaddr, HAL_STATUS_SUCCESS,
+-							HAL_BOND_STATE_BONDED);
+-
+ 	browse_remote_sdp(&addr->bdaddr);
+ }
+ 
 -- 
 1.8.3.2
 
