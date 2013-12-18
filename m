@@ -1,56 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 18 Dec 2013 10:03:23 +0200
+Date: Wed, 18 Dec 2013 10:00:10 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Szymon Janc <szymon.janc@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 2/2] android/hidhost: Simplify handle_uhid_output
-Message-ID: <20131218080323.GF12649@x220.p-661hnu-f1>
-References: <1387204652-14850-1-git-send-email-szymon.janc@tieto.com>
- <1387204652-14850-2-git-send-email-szymon.janc@tieto.com>
- <CABBYNZLu11494VB7WKMj-nxaXr1GfzNt_unYezPcU==e_7HweQ@mail.gmail.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 5/7] android/tester: Add TOD set prop fail test case
+Message-ID: <20131218080010.GC12649@x220.p-661hnu-f1>
+References: <1387283874-29721-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+ <1387283874-29721-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CABBYNZLu11494VB7WKMj-nxaXr1GfzNt_unYezPcU==e_7HweQ@mail.gmail.com>
+In-Reply-To: <1387283874-29721-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz & Szymon,
+Hi Grzegorz,
 
-On Mon, Dec 16, 2013, Luiz Augusto von Dentz wrote:
-> On Mon, Dec 16, 2013 at 4:37 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> > Make it use VLA for req buffer. This makes function simpler and also
-> > fix cutting req to 255 bytes (req_len was uint8_t)
-> > ---
-> >  android/hidhost.c | 17 +++++------------
-> >  1 file changed, 5 insertions(+), 12 deletions(-)
-> >
-> > diff --git a/android/hidhost.c b/android/hidhost.c
-> > index 0e0391a..76322af 100644
-> > --- a/android/hidhost.c
-> > +++ b/android/hidhost.c
-> > @@ -156,29 +156,22 @@ static void hid_device_free(struct hid_device *dev)
-> >  static void handle_uhid_output(struct hid_device *dev,
-> >                                                 struct uhid_output_req *output)
-> >  {
-> > -       int fd, i;
-> > -       uint8_t *req = NULL;
-> > -       uint8_t req_size = 0;
-> > +       int fd;
-> > +       unsigned int i;
-> > +       uint8_t req[1 + (output->size / 2)];
+On Tue, Dec 17, 2013, Grzegorz Kolodziejczyk wrote:
+> This adds TYPE_OF_DEVICE set property fail test case due to only
+> get possibility.
+> ---
+>  android/android-tester.c | 28 ++++++++++++++++++++++++++++
+>  1 file changed, 28 insertions(+)
 > 
-> Im not a fan of VLA and Ive seem even some static analyzer that would
-> warn about its use without first checking > 0 and have a check of
-> upper bond limit, so perhaps just having it set to UHID_DATA_MAX or
-> dynamically allocate a buffer to match the output MTU size of the
-> control channel would better imo.
+> diff --git a/android/android-tester.c b/android/android-tester.c
+> index a6f66c2..4923a6c 100644
+> --- a/android/android-tester.c
+> +++ b/android/android-tester.c
+> @@ -618,6 +618,16 @@ static const struct generic_data bluetooth_setprop_cod_invalid_test = {
+>  	.expected_property.len = sizeof(uint32_t)
+>  };
+>  
+> +static bt_device_type_t setprop_type_of_device = BT_DEVICE_DEVTYPE_BREDR;
+> +
+> +static const struct generic_data bluetooth_setprop_tod_invalid_test = {
+> +	.expected_hal_callbacks = {ADAPTER_TEST_END},
+> +	.expected_adapter_status = BT_STATUS_FAIL,
+> +	.expected_property.type = BT_PROPERTY_TYPE_OF_DEVICE,
+> +	.expected_property.val = &setprop_type_of_device,
+> +	.expected_property.len = sizeof(bt_device_type_t)
 
-I've applied the first patch in this set, but was there some conclusion
-on how to proceed here?
-
-If output->size was an uint8_t this would be a non-issue, but as it's
-uint16_t I'm a bit uncomfortable with the idea of potentially having a
-huge variable on the stack.
+sizeof(setprop_type_of_device)
 
 Johan
