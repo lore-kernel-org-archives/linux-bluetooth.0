@@ -1,187 +1,402 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Sebastian Chlad <sebastianchlad@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 1/5] android/bluetooth: Add initial support for permanent storage
-Date: Thu, 19 Dec 2013 13:38:29 +0100
-Message-Id: <1387456713-12794-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1387456713-12794-1-git-send-email-szymon.janc@tieto.com>
-References: <1387456713-12794-1-git-send-email-szymon.janc@tieto.com>
+Cc: Sebastian Chlad <sebastianx.chlad@intel.com>
+Subject: [PATCH] android/pts: Add PICS, PIXITs and PTS for L2CAP
+Date: Thu, 19 Dec 2013 13:26:41 +0100
+Message-Id: <1387456001-6792-1-git-send-email-sebastianx.chlad@intel.com>
+In-Reply-To: <2115852EF878384FA984E6B76A9F379E164297@IRSMSX104.ger.corp.intel.com>
+References: <2115852EF878384FA984E6B76A9F379E164297@IRSMSX104.ger.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds initial support for storing adapter configuration.
-Currently stored data is address, name and discoverable timeout.
-
-Since Android daemon storage format is to be simpler than Linux check
-if correct adapter is used before going operational. This is
-a precaution to avoid e.g. using linkkeys generated for different
-controller.
+This allows better tracking of the current state of implementation
 ---
- android/Android.mk  |  3 +-
- android/bluetooth.c | 85 +++++++++++++++++++++++++++++++++++++++++++++++++----
- configure.ac        |  3 ++
- 3 files changed, 85 insertions(+), 6 deletions(-)
+ android/Makefile.am     |   4 +-
+ android/pics-l2cap.txt  | 157 ++++++++++++++++++++++++++++++++++++++++++++++++
+ android/pixit-l2cap.txt |  39 ++++++++++++
+ android/pts-l2cap.txt   | 148 +++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 347 insertions(+), 1 deletion(-)
+ create mode 100644 android/pics-l2cap.txt
+ create mode 100644 android/pixit-l2cap.txt
+ create mode 100644 android/pts-l2cap.txt
 
-diff --git a/android/Android.mk b/android/Android.mk
-index ebc3219..2953a6e 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -8,7 +8,8 @@ pathmap_INCL += glib:external/bluetooth/glib
- 
- # Specify common compiler flags
- BLUEZ_COMMON_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\" \
--	-DPLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
-+	-DPLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION) \
-+	-DANDROID_STORAGEDIR=\"/data/misc/bluetooth\" \
- 
- # Disable warnings enabled by Android but not enabled in autotools build
- BLUEZ_COMMON_CFLAGS += -Wno-pointer-arith -Wno-missing-field-initializers
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 97d4aae..ae136e4 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -27,6 +27,10 @@
- 
- #include <errno.h>
- #include <stdlib.h>
-+#include <unistd.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
- 
- #include <glib.h>
- 
-@@ -123,6 +127,65 @@ static GSList *devices = NULL;
- /* This list contains addresses which are asked for records */
- static GSList *browse_reqs;
- 
-+static void store_adapter_config(void)
-+{
-+	GKeyFile *key_file;
-+	gsize length = 0;
-+	char addr[18];
-+	char *data;
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 909846e..a5533de 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -123,4 +123,6 @@ EXTRA_DIST += android/Android.mk android/hal-ipc-api.txt android/README \
+ 		android/pixit-pbap.txt android/pts-gap.txt android/pts-hid.txt \
+ 		android/pts-opp.txt android/pts-pbap.txt \
+ 		android/audio-ipc-api.txt android/pics-map.txt \
+-		android/pixit-map.txt android/pts-map.txt
++		android/pixit-map.txt android/pts-map.txt \
++		android/pics-l2cap.txt android/pixit-l2cap.txt \
++		android/pts-l2cap.txt
+diff --git a/android/pics-l2cap.txt b/android/pics-l2cap.txt
+new file mode 100644
+index 0000000..ef25133
+--- /dev/null
++++ b/android/pics-l2cap.txt
+@@ -0,0 +1,157 @@
++L2CAP PICS for the PTS tool.
 +
-+	key_file = g_key_file_new();
++* - different than PTS defaults
++# - not yet implemented/supported
 +
-+	g_key_file_load_from_file(key_file, ANDROID_STORAGEDIR"/settings", 0,
-+									NULL);
++M - mandatory
++O - optional
 +
-+	ba2str(&adapter.bdaddr, addr);
++		Roles
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_L2CAP_1_1	True		Data Channel Initiator (C.1)
++TSPC_L2CAP_1_2	True		Data Channel Acceptor (C.1)
++TSPC_L2CAP_1_3	True (#)	LE Master (C.2)
++TSPC_L2CAP_1_4	True (#)	LE Slave (C.2)
++-------------------------------------------------------------------------------
++C.1: Mandatory IF BR/EDR or BR/EDR/LE is claimed, ELSE Excluded.
++C.2: Mandatory to support (at least one of TSPC_L2CAP_1_3 or TSPC_L2CAP_1_4)
++	IF LE or BR/EDR/LE claimed, ELSE Excluded.
++-------------------------------------------------------------------------------
 +
-+	g_key_file_set_string(key_file, "General", "Address", addr);
-+	g_key_file_set_string(key_file, "General", "Name", adapter.name);
-+	g_key_file_set_integer(key_file, "General", "DiscoverableTimeout",
-+						adapter.discoverable_timeout);
 +
-+	data = g_key_file_to_data(key_file, &length, NULL);
++		General Operation
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_L2CAP_2_1	True		Support of L2CAP signaling channel (C.20)
++TSPC_L2CAP_2_2	True		Support of configuration process (C.20)
++TSPC_L2CAP_2_4	True		Support of command echo request (C.21)
++TSPC_L2CAP_2_3  True            Support of connection oriented data
++                                        channel (C.20)
++TSPC_L2CAP_2_5	True		Support of command echo response (C.20)
++TSPC_L2CAP_2_6	True (*)	Support of command information request (C.21)
++TSPC_L2CAP_2_7	True		Support of command information response (C.20)
++TSPC_L2CAP_2_8	False		Support of a channel group (C.21)
++TSPC_L2CAP_2_9	False		Support of packet for connectionless
++					channel (C.21)
++TSPC_L2CAP_2_10	False		Support retransmission mode (C.21)
++TSPC_L2CAP_2_11	False		Support flow control mode(C.21)
++TSPC_L2CAP_2_12	True (*)	Enhanced Retransmission Mode (C.1, C.13)
++TSPC_L2CAP_2_13	True (*)	Streaming Mode (C.1, C.14)
++TSPC_L2CAP_2_14	True (*)	FCS Option (C.2)
++TSPC_L2CAP_2_15	True (*)	Generate Local Busy Condition (C.3)
++TSPC_L2CAP_2_16	True (*)	Send Reject (C.3)
++TSPC_L2CAP_2_17	True (*)	Send Selective Reject (C.3)
++TSPC_L2CAP_2_18	True (*)	Mandatory use of ERTM (C.4)
++TSPC_L2CAP_2_19	True (*)	Mandatory use of Streaming Mode (C.5)
++TSPC_L2CAP_2_20	True (*)	Optional use of ERTM (C.4)
++TSPC_L2CAP_2_21	True (*)	Optional use of Streaming Mode (C.5)
++TSPC_L2CAP_2_22	True (*)	Send data using SAR in ERTM (C.6)
++TSPC_L2CAP_2_23	True (*)	Send data using SAR in Streaming Mode (C.7)
++TSPC_L2CAP_2_24	True (*)	Actively request Basic Mode for a PSM that
++					supports the use of ERTM or Streaming
++					Mode (C.8)
++TSPC_L2CAP_2_25	True (*)	Supports performing L2CAP channel mode
++					configuration fallback from SM
++					 to ERTM (C.9)
++TSPC_L2CAP_2_26	True (*)	Supports sending more than one unacknowledged
++					I-Frame when operating in ERTM (C.10)
++TSPC_L2CAP_2_27	True (*)	Supports sending more than three unacknowledged
++					I-Frame when operating in ERTM (C.10)
++TSPC_L2CAP_2_28	True (*)	Supports configuring the peer TxWindow
++					greater than 1 (C.11)
++TSPC_L2CAP_2_29	False		AMP Support (C.12)
++TSPC_L2CAP_2_30	True (*)	Fixed Channel Support (C.12)
++TSPC_L2CAP_2_31	False		AMP Manager Support (C.12)
++TSPC_L2CAP_2_32	False		ERTM over AMP (C.12)
++TSPC_L2CAP_2_33	False		Streaming Mode Source over AMP Support (C.15)
++TSPC_L2CAP_2_34	False		Streaming Mode Sink over AMP Support (C.15)
++TSPC_L2CAP_2_35	False		Unicast Connectionless Data, Reception (C.1, C.16)
++TSPC_L2CAP_2_36	False		Ability to transmit an unencrypted packet over
++					a Unicast connectionless L2CAP
++					channel (C.16)
++TSPC_L2CAP_2_37	False		Ability to transmit an encrypted packet over
++					a Unicast connectionless L2CAP
++					channel (C.16)
++TSPC_L2CAP_2_38	False		Extended Flow Specification for BR/EDR (C.8)
++TSPC_L2CAP_2_39	False		Extended Window Size (C.8)
++TSPC_L2CAP_2_40	True (*)	Support of Low Energy signaling channel (C.17)
++TSPC_L2CAP_2_41	True (*)	Support of command reject (C.17)
++TSPC_L2CAP_2_42	True (*)	Send Connection Parameter Update Request (C.18)
++TSPC_L2CAP_2_43	True (*)	Send Connection Parameter Update Response (C.19)
++TSPC_L2CAP_2_44	False		Extended Flow Specification for AMP (C.22)
++TSPC_L2CAP_2_45	False		Send disconnect request command (O)
++-------------------------------------------------------------------------------
++C.1: Mandatory to support at least one of TSPC_L2CAP_2_12 OR TSPC_L2CAP_2_13 OR
++	TSPC_L2CAP_2_35 IF BR/EDR BR/EDR/LE AND SUM_ICS 31/7 (CSA1) OR
++	SUM_ICS 31/8 (3.0) OR SUM_ICS 31/9 (3.0+HS) OR SUM_ICS 31/10 (4.0))
++	is supported, ELSE Excluded
++C.2: Optional IF TSPC_L2CAP_2_12 OR TSPC_L2CAP_2_13 is claimed, ELSE Excluded.
++C.3: Optional IF TSPC_L2CAP_2_12 AND TSPC_L2CAP_2_28 is claimed, ELSE Excluded.
++C.4: IF TSPC_L2CAP_2_12 is claimed THEN either TSPC_L2CAP_2_18
++	OR TSPC_L2CAP_2_20 are Mandatory, ELSE Excluded.
++C.5: IF TSPC_L2CAP_2_13 is claimed THEN either TSPC_L2CAP_2_19
++	OR TSPC_L2CAP_2_21 are Mandatory, ELSE Excluded.
++C.6: Optional IF TSPC_L2CAP_2_12 is claimed, ELSE Excluded.
++C.7: Optional IF TSPC_L2CAP_2_13 is claimed, ELSE Excluded.
++C.8: Optional IF TSPC_L2CAP_2_12 OR TSPC_L2CAP_2_13 is claimed, ELSE Excluded.
++C.9: Mandatory IF TSPC_L2CAP_2_12 AND TSPC_L2CAP_2_13 AND TSPC_L2CAP_2_21
++       is claimed, ELSE Excluded.
++C.10: Optional IF TSPC_L2CAP_2_12 is claimed, ELSE Excluded.
++C.11: Optional IF TSPC_L2CAP_2_12 is claimed, ELSE Excluded.
++C.12: Mandatory IF SUM_ICS 31/9 (3.0 + HS) is claimed, ELSE Optional.
++C.13: Mandatory IF SUM_ICS 31/9 (3.0 + HS) is claimed, ELSE Optional.
++C.14: Optional IF SUM_ICS 31/8 OR 31/9 OR 31/10 OR 31/11 is claimed, ELSE Excluded.
++C.15: Optional IF TSPC_L2CAP_2_29 is claimed, ELSE Excluded.
++C.16: Optional IF (SUM_ICS 31/8 OR SUM_ICS 31/9 OR 31/10 OR 31/11) is claimed,
++       ELSE Excluded.
++C.17: Mandatory IF LE OR BR/EDR/LE is claimed, ELSE Excluded.
++C.18: Optional IF (SUM_ICS 31/10 AND 1/4) is claimed, ELSE Excluded.
++C.19: Mandatory IF (SUM_ICS 31/10 AND 1/3) is claimed, ELSE Excluded.
++C.20: Mandatory IF LE OR BR/EDR/LE, is claimed, ELSE Excluded
++C.21: Optional IF LE OR BR/EDR/LE, is claimed, ELSE Excluded
++C.22: Mandatory IF TSPC_L2CAP_2_29 is claimed, ELSE Excluded.
++-------------------------------------------------------------------------------
 +
-+	g_file_set_contents(ANDROID_STORAGEDIR"/settings", data, length, NULL);
 +
-+	g_free(data);
-+	g_key_file_free(key_file);
-+}
++		Configurable Parameters
++-------------------------------------------------------------------------------
++Parameter	Name Selected	Description
++-------------------------------------------------------------------------------
++TSPC_L2CAP_3_1	True		Support of RTX timer (M)
++TSPC_L2CAP_3_2	True		Support of ERTX timer (C.4)
++TSPC_L2CAP_3_3	True		Support minimum MTU size 48 octets (C.4)
++TSPC_L2CAP_3_4	True (*)	Support MTU size larger than 48 octets (C.5)
++TSPC_L2CAP_3_5	True		Support of flush timeout value for reliable
++					channel (C.4)
++TSPC_L2CAP_3_6	False		Support of flush timeout value for unreliable
++					channel (C.5)
++TSPC_L2CAP_3_7	False		Support of bi-directional quality of service
++					(QoS) option field (C.1)
++TSPC_L2CAP_3_8	False		Negotiate QoS service type (C.5)
++TSPC_L2CAP_3_9	False		Negotiate and support service type ‘No
++					traffic’ (C.2)
++TSPC_L2CAP_3_10	False		Negotiate and support service type ‘Best
++					effort’ (C.3)
++TSPC_L2CAP_3_11	False		Negotiate and support service type
++					‘Guaranteed’ (C.2)
++TSPC_L2CAP_3_12	True (*)	Support minimum MTU size 23 octets (C.6)
++TSPC_L2CAP_3_13	False		Negotiate and support service type ‘No traffic’
++					for Extended Flow Specification (C.7)
++TSPC_L2CAP_3_14	False		Negotiate and support service type ‘Best Effort'
++					for Extended Flow Specification (C.8)
++TSPC_L2CAP_3_15	False		Negotiate and support service type ‘Guaranteed’
++					for Extended Flow Specification (C.9)
++-------------------------------------------------------------------------------
++C.1: Mandatory if TSPC_L2CAP_3_8 is supported, ELSE Optional.
++C.2: Optional if TSPC_L2CAP_3_8 is supported, ELSE Excluded.
++C.3: Mandatory if TSPC_L2CAP_3_8 is supported, ELSE Excluded.
++C.4: Mandatory IF BR/EDR OR BR/EDR/LE is claimed, ELSE Excluded.
++C.5: Optional IF BR/EDR OR BR/EDR/LE is claimed, ELSE Excluded.
++C.6: Mandatory IF LE OR BR/EDR/LE is claimed, ELSE Excluded.
++C.7: Optional if TSPC_L2CAP_2_44 OR TSPC_L2CAP_2_38 is supported, ELSE Excluded.
++C.8: Mandatory if TSPC_L2CAP_2_44 OR TSPC_L2CAP_2_38 is supported, ELSE Excluded.
++C.9: Optional if TSPC_L2CAP_2_44 OR TSPC_L2CAP_2_38 is supported, ELSE Excluded.
++-------------------------------------------------------------------------------
+diff --git a/android/pixit-l2cap.txt b/android/pixit-l2cap.txt
+new file mode 100644
+index 0000000..7de6638
+--- /dev/null
++++ b/android/pixit-l2cap.txt
+@@ -0,0 +1,39 @@
++L2CAP PIXIT for the PTS tool.
 +
-+static void load_adapter_config(void)
-+{
-+	GError *gerr = NULL;
-+	GKeyFile *key_file;
-+	char *str;
++* - different than PTS defaults
++& - should be set to IUT Bluetooth address
 +
-+	key_file = g_key_file_new();
-+	g_key_file_load_from_file(key_file, ANDROID_STORAGEDIR"/settings", 0,
-+									NULL);
++               Required PIXIT settings
++-------------------------------------------------------------------------------
++Parameter Name                                         Value
++-------------------------------------------------------------------------------
++TSPX_bd_addr_iut                                       112233445566 (*&)
++TSPX_client_class_of_device                            100104
++TSPX_server_class_of_device                            100104
++TSPX_security_enabled                                  FALSE
++TSPX_delete_link_key                                   FALSE
++TSPX_pin_code                                          0000
++TSPX_flushto                                           FFFF
++TSPX_inmtu                                             02A0
++TSPX_no_fail_verditcs                                  FALSE
++TSPX_oumtu                                             02A0
++TSPX_iut_role_initiator                                FALSE
++TSPX_psm                                               1011 (*)
++TSPX_time_guard                                        180000
++TSPX_timer_ertx                                        120000
++TSPX_timer_ertx_max                                    300000
++TSPX_timer_ertx_min                                    60000
++TSPX_timer_rtx                                         10000
++TSPX_timer_rtx_max                                     60000
++TSPX_timer_rtx_min                                     1000
++TSPX_rfc_mode_tx_window_size                           08
++TSPX_rfc_mode_max_transmit                             03
++TSPX_rfc_mode_retransmission_timeout                   07D0
++TSPX_rfc_mode_monitor_timeout                          2EE0
++TSPX_rfc_mode_maximum_pdu_size                         02A0
++TSPX_extended_window_size                              0012
++TSPX_use_implicit_send                                 TRUE
++TSPX_use_dynamic_pin                                   FALSE
++TSPX_iut_SDU_size_in_bytes                             144
++TSPX_secure_simple_pairing_pass_key_confirmation       FALSE
++-------------------------------------------------------------------------------
+diff --git a/android/pts-l2cap.txt b/android/pts-l2cap.txt
+new file mode 100644
+index 0000000..d293046
+--- /dev/null
++++ b/android/pts-l2cap.txt
+@@ -0,0 +1,148 @@
++PTS test results for L2CAP
 +
-+	str = g_key_file_get_string(key_file, "General", "Address", NULL);
-+	if (!str) {
-+		g_key_file_free(key_file);
-+		return;
-+	}
++PTS version: 5.0
++Tested: 18.12.2013
 +
-+	str2ba(str, &adapter.bdaddr);
-+	g_free(str);
++Results:
++PASS   test passed
++FAIL   test failed
++INC    test is inconclusive
++N/A    test is disabled due to PICS setup
 +
-+	adapter.name = g_key_file_get_string(key_file, "General", "Name", NULL);
-+
-+	adapter.discoverable_timeout = g_key_file_get_integer(key_file,
-+				"General", "DiscoverableTimeout", &gerr);
-+	if (gerr) {
-+		adapter.discoverable_timeout = DEFAULT_DISCOVERABLE_TIMEOUT;
-+		g_error_free(gerr);
-+		gerr = NULL;
-+	}
-+
-+	g_key_file_free(key_file);
-+}
-+
- static int bdaddr_cmp(gconstpointer a, gconstpointer b)
- {
- 	const bdaddr_t *bda = a;
-@@ -215,6 +278,8 @@ static void adapter_set_name(const uint8_t *name)
- 	g_free(adapter.name);
- 	adapter.name = g_strdup((const char *) name);
- 
-+	store_adapter_config();
-+
- 	adapter_name_changed(name);
- }
- 
-@@ -1385,9 +1450,10 @@ static uint8_t set_adapter_discoverable_timeout(const void *buf, uint16_t len)
- 	 * There is no need to use kernel feature for that.
- 	 * Just need to store this value here */
- 
--	/* TODO: This should be in some storage */
- 	memcpy(&adapter.discoverable_timeout, timeout, sizeof(uint32_t));
- 
-+	store_adapter_config();
-+
- 	send_adapter_property(HAL_PROP_ADAPTER_DISC_TIMEOUT,
- 					sizeof(adapter.discoverable_timeout),
- 					&adapter.discoverable_timeout);
-@@ -1434,17 +1500,26 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 		goto failed;
- 	}
- 
-+	load_adapter_config();
-+
-+	if (!bacmp(&adapter.bdaddr, BDADDR_ANY)) {
-+		bacpy(&adapter.bdaddr, &rp->bdaddr);
-+		adapter.name = g_strdup((const char *) rp->name);
-+		store_adapter_config();
-+		set_adapter_name(rp->name, strlen((char *)rp->name));
-+	} else if (bacmp(&adapter.bdaddr, &rp->bdaddr)) {
-+		error("Bluetooth address mismatch");
-+		err = -ENODEV;
-+		goto failed;
-+	}
-+
- 	/* Store adapter information */
--	bacpy(&adapter.bdaddr, &rp->bdaddr);
- 	adapter.dev_class = rp->dev_class[0] | (rp->dev_class[1] << 8) |
- 						(rp->dev_class[2] << 16);
--	adapter.name = g_strdup((const char *) rp->name);
- 
- 	supported_settings = btohs(rp->supported_settings);
- 	adapter.current_settings = btohs(rp->current_settings);
- 
--	/* TODO: Read discoverable timeout from storage here */
--
- 	/* TODO: Register all event notification handlers */
- 	register_mgmt_handlers();
- 
-diff --git a/configure.ac b/configure.ac
-index 18d0b55..5171c38 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -252,4 +252,7 @@ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
- 					[enable_android=${enableval}])
- AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
- 
-+AC_DEFINE_UNQUOTED(ANDROID_STORAGEDIR, "${storagedir}/android",
-+			[Directory for the Android daemon storage files])
-+
- AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
++-------------------------------------------------------------------------------
++Test Name              Result  Notes
++-------------------------------------------------------------------------------
++TC_COS_CED_BV_01_C     PASS
++TC_COS_CED_BV_03_C     PASS
++TC_COS_CED_BV_04_C     N/A
++TC_COS_CED_BV_05_C     PASS
++TC_COS_CED_BV_07_C     PASS
++TC_COS_CED_BV_08_C     PASS
++TC_COS_CED_BV_09_C     INC
++TC_COS_CED_BV_10_C     N/A
++TC_COS_CED_BV_11_C     PASS
++TC_COS_CED_BI_01_C     PASS
++TC_COS_CFD_BV_01_C     PASS
++TC_COS_CFD_BV_02_C     PASS
++TC_COS_CFD_BV_03_C     PASS
++TC_COS_CFD_BV_08_C     INC
++TC_COS_CFD_BV_09_C     INC
++TC_COS_CFD_BV_10_C     N/A
++TC_COS_CFD_BI_11_C     PASS
++TC_COS_CFD_BV_12_C     PASS
++TC_COS_CFD_BV_13_C     N/A
++TC_COS_IEX_BV_01_C     PASS
++TC_COS_IEX_BV_02_C     PASS
++TC_COS_ECH_BV_01_C     PASS
++TC_COS_ECH_BV_02_C     INC
++TC_CLS_CLR_BV_01_C     N/A
++TC_CLS_UCD_BV_01_C     N/A
++TC_CLS_UCD_BV_02_C     N/A
++TC_CLS_UCD_BV_03_C     N/A
++TC_EXF_BV_01_C         PASS
++TC_EXF_BV_02_C         PASS
++TC_EXF_BV_03_C         PASS
++TC_EXF_BV_04_C         N/A
++TC_EXF_BV_05_C         PASS
++TC_EXF_BV_06_C         N/A
++TC_CMC_BV_01_C         INC
++TC_CMC_BV_02_C         INC
++TC_CMC_BV_03_C         INC
++TC_CMC_BV_04_C         INC
++TC_CMC_BV_05_C         INC
++TC_CMC_BV_06_C         INC
++TC_CMC_BV_07_C         INC
++TC_CMC_BV_08_C         INC
++TC_CMC_BV_09_C         INC
++TC_CMC_BV_10_C         INC
++TC_CMC_BV_11_C         INC
++TC_CMC_BV_12_C         INC
++TC_CMC_BV_13_C         INC
++TC_CMC_BV_14_C         INC
++TC_CMC_BV_15_C         INC
++TC_CMC_BI_01_C         INC
++TC_CMC_BI_02_C         INC
++TC_CMC_BI_03_C         INC
++TC_CMC_BI_04_C         INC
++TC_CMC_BI_05_C         INC
++TC_CMC_BI_06_C         INC
++TC_FOC_BV_01_C         INC
++TC_FOC_BV_02_C         INC
++TC_FOC_BV_03_C         INC
++TC_FOC_BV_04_C         INC
++TC_OFS_BV_01_C         INC
++TC_OFS_BV_02_C         INC
++TC_OFS_BV_03_C         INC
++TC_OFS_BV_04_C         INC
++TC_OFS_BV_05_C         INC
++TC_OFS_BV_06_C         INC
++TC_OFS_BV_07_C         INC
++TC_OFS_BV_08_C         INC
++TC_ERM_BV_01_C         INC
++TC_ERM_BV_02_C         INC
++TC_ERM_BV_03_C         INC
++TC_ERM_BV_04_C         INC
++TC_ERM_BV_05_C         INC
++TC_ERM_BV_06_C         INC
++TC_ERM_BV_07_C         INC
++TC_ERM_BV_08_C         INC
++TC_ERM_BV_09_C         INC
++TC_ERM_BV_10_C         INC
++TC_ERM_BV_11_C         INC
++TC_ERM_BV_12_C         INC
++TC_ERM_BV_13_C         INC
++TC_ERM_BV_14_C         INC
++TC_ERM_BV_15_C         INC
++TC_ERM_BV_16_C         INC
++TC_ERM_BV_17_C         INC
++TC_ERM_BV_18_C         INC
++TC_ERM_BV_19_C         INC
++TC_ERM_BV_20_C         INC
++TC_ERM_BV_21_C         INC
++TC_ERM_BV_22_C         INC
++TC_ERM_BV_23_C         INC
++TC_ERM_BI_01_C         INC
++TC_ERM_BI_02_C         INC
++TC_ERM_BI_03_C         INC
++TC_ERM_BI_04_C         INC
++TC_ERM_BI_05_C         INC
++TC_STM_BV_01_C         INC
++TC_STM_BV_02_C         INC
++TC_STM_BV_03_C         INC
++TC_STM_BV_11_C         N/A
++TC_STM_BV_12_C         N/A
++TC_STM_BV_13_C         N/A
++TC_FIX_BV_01_C         PASS
++TC_FIX_BV_02_C         PASS
++TC_EWC_BV_01_C         N/A
++TC_EWC_BV_02_C         N/A
++TC_EWC_BV_03_C         N/A
++TC_LSC_BV_01_C         N/A
++TC_LSC_BV_02_C         N/A
++TC_LSC_BV_03_C         N/A
++TC_LSC_BI_04_C         N/A
++TC_LSC_BI_05_C         N/A
++TC_LSC_BV_06_C         N/A
++TC_LSC_BV_07_C         N/A
++TC_LSC_BV_08_C         N/A
++TC_LSC_BV_09_C         N/A
++TC_LSC_BI_10_C         N/A
++TC_LSC_BI_11_C         N/A
++TC_LSC_BV_12_C         N/A
++TC_CCH_BV_01_C         N/A
++TC_CCH_BV_02_C         N/A
++TC_CCH_BV_03_C         N/A
++TC_CCH_BV_04_C         N/A
++TC_ECF_BV_01_C         N/A
++TC_ECF_BV_02_C         N/A
++TC_ECF_BV_03_C         N/A
++TC_ECF_BV_04_C         N/A
++TC_ECF_BV_05_C         N/A
++TC_ECF_BV_06_C         N/A
++TC_ECF_BV_07_C         N/A
++TC_ECF_BV_08_C         N/A
++TC_LE_CPU_BV_01_C      N/A
++TC_LE_CPU_BV_02_C      N/A
++TC_LE_CPU_BI_01_C      N/A
++TC_LE_CPU_BI_02_C      N/A
++TC_LE_REJ_BV_01_C      N/A
 -- 
-1.8.3.2
+1.8.1.2
 
