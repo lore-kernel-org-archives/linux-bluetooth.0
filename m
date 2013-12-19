@@ -1,50 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/6] android/tester: Fix for not checking for BT_STATUS_SUCCESS
-Date: Thu, 19 Dec 2013 13:42:21 +0100
-Message-Id: <1387456946-9743-1-git-send-email-jakub.tyszkowski@tieto.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2 5/5] android: Set umask in system-emulator
+Date: Thu, 19 Dec 2013 13:38:33 +0100
+Message-Id: <1387456713-12794-6-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1387456713-12794-1-git-send-email-szymon.janc@tieto.com>
+References: <1387456713-12794-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For BT_STATUS_SUCCESS no checks were done as it is 0 in bt_status_t
-enum. Valid status for no status expected should be STATUS_NOT_EXPECTED.
-
+This will make sure files are created with proper permissions so
+Android daemon doesn't have to handle that. On Android umask is
+set by init.
 ---
- android/android-tester.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ android/system-emulator.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index c24f5a6..5549dcb 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -72,7 +72,7 @@ enum hal_bluetooth_callbacks_id {
- };
+diff --git a/android/system-emulator.c b/android/system-emulator.c
+index 24f2741..299de0f 100644
+--- a/android/system-emulator.c
++++ b/android/system-emulator.c
+@@ -37,6 +37,8 @@
+ #include <sys/param.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
++#include <sys/types.h>
++#include <sys/stat.h>
  
- struct generic_data {
--	uint8_t expected_adapter_status;
-+	int expected_adapter_status;
- 	uint32_t expect_settings_set;
- 	bt_property_t expected_property;
- 	uint8_t expected_hal_callbacks[];
-@@ -92,6 +92,8 @@ struct socket_data {
- #define WAIT_FOR_SIGNAL_TIME 2 /* in seconds */
- #define EMULATOR_SIGNAL "emulator_started"
+ #include "monitor/mainloop.h"
  
-+#define BT_STATUS_NOT_EXPECTED	-1
+@@ -169,5 +171,7 @@ int main(int argc, char *argv[])
+ 
+ 	mainloop_add_fd(fd, EPOLLIN, system_socket_callback, NULL, NULL);
+ 
++	umask(0177);
 +
- struct test_data {
- 	struct mgmt *mgmt;
- 	uint16_t mgmt_index;
-@@ -199,7 +201,7 @@ static void expected_status_init(struct test_data *data)
- {
- 	const struct generic_data *test_data = data->test_data;
- 
--	if (!(test_data->expected_adapter_status))
-+	if (test_data->expected_adapter_status == BT_STATUS_NOT_EXPECTED)
- 		data->status_checked = true;
+ 	return mainloop_run();
  }
- 
 -- 
-1.8.5
+1.8.3.2
 
