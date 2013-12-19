@@ -1,71 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/4] android/A2DP: Use avdtp_add_disconnect_cb to cleanup on disconnect
-Date: Thu, 19 Dec 2013 17:15:54 +0200
-Message-Id: <1387466156-14100-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1387466156-14100-1-git-send-email-luiz.dentz@gmail.com>
-References: <1387466156-14100-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 19 Dec 2013 16:42:22 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/6] android/tester: Fix for not checking for
+ BT_STATUS_SUCCESS
+Message-ID: <20131219144222.GA11811@x220.p-661hnu-f1>
+References: <1387456946-9743-1-git-send-email-jakub.tyszkowski@tieto.com>
+ <20131219134224.GA23417@x220.p-661hnu-f1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20131219134224.GA23417@x220.p-661hnu-f1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi,
 
-This replaces the use of g_io_add_watch with avdtp_add_disconnect_cb so
-connection tracking stay within AVDTP code.
----
- android/a2dp.c | 14 +++-----------
- 1 file changed, 3 insertions(+), 11 deletions(-)
+On Thu, Dec 19, 2013, Johan Hedberg wrote:
+> On Thu, Dec 19, 2013, Jakub Tyszkowski wrote:
+> > For BT_STATUS_SUCCESS no checks were done as it is 0 in bt_status_t
+> > enum. Valid status for no status expected should be STATUS_NOT_EXPECTED.
+> > 
+> > ---
+> >  android/android-tester.c | 6 ++++--
+> >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/android/android-tester.c b/android/android-tester.c
+> > index c24f5a6..5549dcb 100644
+> > --- a/android/android-tester.c
+> > +++ b/android/android-tester.c
+> > @@ -72,7 +72,7 @@ enum hal_bluetooth_callbacks_id {
+> >  };
+> >  
+> >  struct generic_data {
+> > -	uint8_t expected_adapter_status;
+> > +	int expected_adapter_status;
+> >  	uint32_t expect_settings_set;
+> >  	bt_property_t expected_property;
+> >  	uint8_t expected_hal_callbacks[];
+> > @@ -92,6 +92,8 @@ struct socket_data {
+> >  #define WAIT_FOR_SIGNAL_TIME 2 /* in seconds */
+> >  #define EMULATOR_SIGNAL "emulator_started"
+> >  
+> > +#define BT_STATUS_NOT_EXPECTED	-1
+> > +
+> >  struct test_data {
+> >  	struct mgmt *mgmt;
+> >  	uint16_t mgmt_index;
+> > @@ -199,7 +201,7 @@ static void expected_status_init(struct test_data *data)
+> >  {
+> >  	const struct generic_data *test_data = data->test_data;
+> >  
+> > -	if (!(test_data->expected_adapter_status))
+> > +	if (test_data->expected_adapter_status == BT_STATUS_NOT_EXPECTED)
+> >  		data->status_checked = true;
+> >  }
+> 
+> I suppose it does make sense to have such a special value, but I can't
+> see you use it anywhere in your patch set. So I'd postpone this patch
+> until you've got some actual code that needs it.
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index 107cbb8..2de2f66 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -57,7 +57,6 @@ struct a2dp_device {
- 	bdaddr_t	dst;
- 	uint8_t		state;
- 	GIOChannel	*io;
--	guint		watch;
- 	struct avdtp	*session;
- };
- 
-@@ -74,9 +73,6 @@ static void a2dp_device_free(struct a2dp_device *dev)
- 	if (dev->session)
- 		avdtp_unref(dev->session);
- 
--	if (dev->watch > 0)
--		g_source_remove(dev->watch);
--
- 	if (dev->io)
- 		g_io_channel_unref(dev->io);
- 
-@@ -120,13 +116,11 @@ static void bt_a2dp_notify_state(struct a2dp_device *dev, uint8_t state)
- 	a2dp_device_free(dev);
- }
- 
--static gboolean watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
-+static void disconnect_cb(void *user_data)
- {
--	struct a2dp_device *dev = data;
-+	struct a2dp_device *dev = user_data;
- 
- 	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
--
--	return FALSE;
- }
- 
- static void signaling_connect_cb(GIOChannel *chan, GError *err,
-@@ -157,9 +151,7 @@ static void signaling_connect_cb(GIOChannel *chan, GError *err,
- 	/* FIXME: Add proper version */
- 	fd = g_io_channel_unix_get_fd(chan);
- 	dev->session = avdtp_new(fd, imtu, omtu, 0x0100);
--
--	dev->watch = g_io_add_watch(dev->io, G_IO_HUP | G_IO_ERR | G_IO_NVAL,
--								watch_cb, dev);
-+	avdtp_add_disconnect_cb(dev->session, disconnect_cb, dev);
- 
- 	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_CONNECTED);
- }
--- 
-1.8.3.1
+Nevermind. I now see that even though you don't add any tests that would
+use this new value the change of the if-statement that this patch
+introduces is already enough of a justification.
 
+All patches in the set have now been applied.
+
+Johan
