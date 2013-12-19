@@ -1,148 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/6] tools/l2cap_tester: Add read client test case
-Date: Thu, 19 Dec 2013 10:30:03 +0100
-Message-Id: <1387445406-20324-3-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1387445406-20324-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1387445406-20324-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 1/6] emulator: Add psm handling to bthost
+Date: Thu, 19 Dec 2013 10:30:01 +0100
+Message-Id: <1387445406-20324-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This test case send data from remote device to client.
-It verifies if data is passed corerctly through l2cap socket.
+Store psm of l2cap connections. We retrieve psm from
+connection request frame.
 ---
- tools/l2cap-tester.c | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 68 insertions(+), 1 deletion(-)
+ emulator/bthost.c | 29 +++++++++++++++++++++++------
+ 1 file changed, 23 insertions(+), 6 deletions(-)
 
-diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index 9161953..1d00c93 100644
---- a/tools/l2cap-tester.c
-+++ b/tools/l2cap-tester.c
-@@ -50,12 +50,18 @@ struct test_data {
- 	struct hciemu *hciemu;
- 	enum hciemu_type hciemu_type;
- 	unsigned int io_id;
-+	uint16_t handle;
-+	uint16_t scid;
-+	uint16_t dcid;
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index b05072a..430108e 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -79,6 +79,7 @@ struct btconn {
+ struct l2conn {
+ 	uint16_t scid;
+ 	uint16_t dcid;
++	uint16_t psm;
+ 	struct l2conn *next;
  };
  
- struct l2cap_client_data {
- 	uint16_t client_psm;
- 	uint16_t server_psm;
- 	int expect_err;
-+	uint16_t data_len;
-+	const void *read_data;
-+	const void *write_data;
- };
- 
- struct l2cap_server_data {
-@@ -247,6 +253,15 @@ static const struct l2cap_client_data client_connect_success_test = {
- 	.server_psm = 0x1001,
- };
- 
-+static uint8_t l2_data[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
-+
-+static const struct  l2cap_client_data client_connect_read_success_test = {
-+	.client_psm = 0x1001,
-+	.server_psm = 0x1001,
-+	.read_data = l2_data,
-+	.data_len = sizeof(l2_data),
-+};
-+
- static const struct l2cap_client_data client_connect_nval_psm_test = {
- 	.client_psm = 0x1001,
- 	.expect_err = ECONNREFUSED,
-@@ -455,6 +470,25 @@ static void test_basic(const void *test_data)
- 	tester_test_passed();
+@@ -154,7 +155,8 @@ static struct btconn *bthost_find_conn(struct bthost *bthost, uint16_t handle)
  }
  
-+static gboolean client_received_data(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	const struct l2cap_client_data *l2data = data->test_data;
-+	char buf[1024];
-+	int sk;
-+
-+	sk = g_io_channel_unix_get_fd(io);
-+	read(sk, buf, l2data->data_len);
-+
-+	if (memcmp(buf, l2data->read_data, l2data->data_len))
-+		tester_test_failed();
-+	else
-+		tester_test_passed();
-+
-+	return FALSE;
-+}
-+
- static gboolean l2cap_connect_cb(GIOChannel *io, GIOCondition cond,
- 							gpointer user_data)
+ static void bthost_add_l2cap_conn(struct bthost *bthost, struct btconn *conn,
+-						uint16_t scid, uint16_t dcid)
++						uint16_t scid, uint16_t dcid,
++						uint16_t psm)
  {
-@@ -477,6 +511,18 @@ static gboolean l2cap_connect_cb(GIOChannel *io, GIOCondition cond,
- 	else
- 		tester_print("Successfully connected");
+ 	struct l2conn *l2conn;
  
-+	if (l2data->read_data) {
-+		struct bthost *bthost;
+@@ -164,6 +166,7 @@ static void bthost_add_l2cap_conn(struct bthost *bthost, struct btconn *conn,
+ 
+ 	memset(l2conn, 0, sizeof(*l2conn));
+ 
++	l2conn->psm = psm;
+ 	l2conn->scid = scid;
+ 	l2conn->dcid = dcid;
+ 
+@@ -376,6 +379,15 @@ bool bthost_l2cap_req(struct bthost *bthost, uint16_t handle, uint8_t code,
+ 	if (!conn)
+ 		return false;
+ 
++	if (code == BT_L2CAP_PDU_CONN_REQ &&
++			len == sizeof(struct bt_l2cap_pdu_conn_req)) {
++		const struct bt_l2cap_pdu_conn_req *req = data;
 +
-+		bthost = hciemu_client_get_host(data->hciemu);
-+		g_io_add_watch(io, G_IO_IN, client_received_data, NULL);
-+
-+		bthost_send_cid(bthost, data->handle, data->dcid,
-+					l2data->read_data, l2data->data_len);
-+
-+		return FALSE;
++		bthost_add_l2cap_conn(bthost, conn, le16_to_cpu(req->scid),
++							le16_to_cpu(req->scid),
++							le16_to_cpu(req->psm));
 +	}
 +
- 	if (-err != l2data->expect_err)
- 		tester_test_failed();
- 	else
-@@ -559,6 +605,15 @@ static int connect_l2cap_sock(struct test_data *data, int sk, uint16_t psm)
- 	return 0;
- }
+ 	ident = l2cap_sig_send(bthost, conn, code, 0, data, len);
+ 	if (!ident)
+ 		return false;
+@@ -737,7 +749,8 @@ static bool l2cap_conn_req(struct bthost *bthost, struct btconn *conn,
+ 		struct bt_l2cap_pdu_config_req conf_req;
  
-+static void client_l2cap_connect_cb(uint16_t handle, uint16_t cid,
-+							void *user_data)
-+{
-+	struct test_data *data = user_data;
-+
-+	data->dcid = cid;
-+	data->handle = handle;
-+}
-+
- static void test_connect(const void *test_data)
+ 		bthost_add_l2cap_conn(bthost, conn, le16_to_cpu(rsp.dcid),
+-							le16_to_cpu(rsp.scid));
++							le16_to_cpu(rsp.scid),
++							le16_to_cpu(psm));
+ 
+ 		memset(&conf_req, 0, sizeof(conf_req));
+ 		conf_req.dcid = rsp.dcid;
+@@ -753,12 +766,16 @@ static bool l2cap_conn_rsp(struct bthost *bthost, struct btconn *conn,
+ 				uint8_t ident, const void *data, uint16_t len)
  {
- 	struct test_data *data = tester_get_data();
-@@ -568,7 +623,14 @@ static void test_connect(const void *test_data)
+ 	const struct bt_l2cap_pdu_conn_rsp *rsp = data;
++	struct l2conn *l2conn;
  
- 	if (l2data->server_psm) {
- 		struct bthost *bthost = hciemu_client_get_host(data->hciemu);
--		bthost_set_server_psm(bthost, l2data->server_psm, NULL, NULL);
-+		bthost_l2cap_connect_cb cb;
-+
-+		if (l2data->data_len)
-+			cb = client_l2cap_connect_cb;
-+		else
-+			cb = NULL;
-+
-+		bthost_set_server_psm(bthost, l2data->server_psm, cb, data);
- 	}
+ 	if (len < sizeof(*rsp))
+ 		return false;
  
- 	sk = create_l2cap_sock(data, 0);
-@@ -744,6 +806,11 @@ int main(int argc, char *argv[])
- 	test_l2cap_bredr("L2CAP BR/EDR Client - Success",
- 					&client_connect_success_test,
- 					setup_powered_client, test_connect);
-+
-+	test_l2cap_bredr("L2CAP BR/EDR Client - Read Success",
-+					&client_connect_read_success_test,
-+					setup_powered_client, test_connect);
-+
- 	test_l2cap_bredr("L2CAP BR/EDR Client - Invalid PSM",
- 					&client_connect_nval_psm_test,
- 					setup_powered_client, test_connect);
+-	bthost_add_l2cap_conn(bthost, conn, le16_to_cpu(rsp->scid),
+-						le16_to_cpu(rsp->dcid));
++	l2conn = btconn_find_l2cap_conn_by_scid(conn, le16_to_cpu(rsp->scid));
++	if (l2conn)
++		l2conn->dcid = le16_to_cpu(rsp->dcid);
++	else
++		return false;
+ 
+ 	if (le16_to_cpu(rsp->result) == 0x0001) {
+ 		struct bt_l2cap_pdu_config_req req;
+@@ -1013,8 +1030,8 @@ static bool l2cap_le_conn_rsp(struct bthost *bthost, struct btconn *conn,
+ 
+ 	if (len < sizeof(*rsp))
+ 		return false;
+-
+-	bthost_add_l2cap_conn(bthost, conn, 0, le16_to_cpu(rsp->dcid));
++	/* TODO add l2cap connection before with proper psm */
++	bthost_add_l2cap_conn(bthost, conn, 0, le16_to_cpu(rsp->dcid), 0);
+ 
+ 	return true;
+ }
 -- 
 1.8.3.1
 
