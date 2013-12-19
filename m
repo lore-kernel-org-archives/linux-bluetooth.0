@@ -1,68 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastianchlad@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Sebastian Chlad <sebastianx.chlad@intel.com>
-Subject: Re: [PATCH] android/build: Adding l2test to Android.mk
-Date: Thu, 19 Dec 2013 10:33:06 +0100
-Message-ID: <5160812.6KPT4f6KdQ@uw000953>
-In-Reply-To: <1387443982-1017-1-git-send-email-sebastianx.chlad@intel.com>
-References: <1387443982-1017-1-git-send-email-sebastianx.chlad@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 6/6] tools/l2cap_tester: Add write server test case
+Date: Thu, 19 Dec 2013 10:30:06 +0100
+Message-Id: <1387445406-20324-6-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1387445406-20324-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1387445406-20324-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+These test case send data from local server to remote client.
+---
+ tools/l2cap-tester.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-> Enabling l2test tool for the android target
-> ---
->  android/Android.mk | 28 ++++++++++++++++++++++++++++
->  1 file changed, 28 insertions(+)
-> 
-> diff --git a/android/Android.mk b/android/Android.mk
-> index ebc3219..c59df7a 100644
-> --- a/android/Android.mk
-> +++ b/android/Android.mk
-> @@ -226,3 +226,31 @@ LOCAL_MODULE_TAGS := optional
->  LOCAL_MODULE := audio.a2dp.default
->  
->  include $(BUILD_SHARED_LIBRARY)
-> +
-> +#
-> +# l2cap-test
-> +#
-> +
-> +include $(CLEAR_VARS)
-> +
-> +LOCAL_SRC_FILES := \
-> +	../tools/l2test.c \
-> +	../lib/bluetooth.c \
-> +	../lib/hci.c \
-> +
-> +lib_headers := \
-> +	../lib/bluetooth.h \
-> +	../lib/l2cap.h \
-
-This lib_header is not needed, please remove it.
-
-> +
-> +LOCAL_C_INCLUDES := \
-> +	$(LOCAL_PATH)/.. \
-> +	$(LOCAL_PATH)/../lib \
-> +	$(LOCAL_PATH)/../src/shared \
-> +
-> +LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
-> +
-> +LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
-> +LOCAL_MODULE_TAGS := eng
-> +LOCAL_MODULE := l2test
-> +
-> +include $(BUILD_EXECUTABLE)
-> 
-
-Also please don't use gerund form in commit message ie. Adding -> Add.
-
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index ebf2191..b0f3ad2 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -297,6 +297,16 @@ static const struct l2cap_server_data l2cap_server_read_success_test = {
+ 	.data_len = sizeof(l2_data),
+ };
+ 
++static const struct l2cap_server_data l2cap_server_write_success_test = {
++	.server_psm = 0x1001,
++	.send_req_code = BT_L2CAP_PDU_CONN_REQ,
++	.send_req = l2cap_connect_req,
++	.send_req_len = sizeof(l2cap_connect_req),
++	.expect_rsp_code = BT_L2CAP_PDU_CONN_RSP,
++	.write_data = l2_data,
++	.data_len = sizeof(l2_data),
++};
++
+ static const uint8_t l2cap_nval_psm_rsp[] = {	0x00, 0x00,	/* dcid */
+ 						0x41, 0x00,	/* scid */
+ 						0x02, 0x00,	/* nval PSM */
+@@ -547,6 +557,23 @@ static void bthost_received_data(const void *buf, uint16_t len,
+ 		tester_test_passed();
+ }
+ 
++static void server_bthost_received_data(const void *buf, uint16_t len,
++							void *user_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct l2cap_server_data *l2data = data->test_data;
++
++	if (len != l2data->data_len) {
++		tester_test_failed();
++		return;
++	}
++
++	if (memcmp(buf, l2data->write_data, l2data->data_len))
++		tester_test_failed();
++	else
++		tester_test_passed();
++}
++
+ static gboolean l2cap_connect_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+@@ -753,6 +780,17 @@ static gboolean l2cap_listen_cb(GIOChannel *io, GIOCondition cond,
+ 					l2data->read_data, l2data->data_len);
+ 
+ 		return FALSE;
++	} else if (l2data->write_data) {
++		struct bthost *bthost;
++
++		bthost = hciemu_client_get_host(data->hciemu);
++		bthost_add_cid_hook(bthost, data->handle, data->scid,
++					server_bthost_received_data, NULL);
++
++		write(new_sk, l2data->write_data, l2data->data_len);
++		close(new_sk);
++
++		return FALSE;
+ 	}
+ 
+ 	tester_print("Successfully connected");
+@@ -925,6 +963,10 @@ int main(int argc, char *argv[])
+ 					&l2cap_server_read_success_test,
+ 					setup_powered_server, test_server);
+ 
++	test_l2cap_bredr("L2CAP BR/EDR Server - Write Success",
++					&l2cap_server_write_success_test,
++					setup_powered_server, test_server);
++
+ 	test_l2cap_bredr("L2CAP BR/EDR Server - Invalid PSM",
+ 					&l2cap_server_nval_psm_test,
+ 					setup_powered_server, test_server);
 -- 
-BR
-Szymon Janc
+1.8.3.1
+
