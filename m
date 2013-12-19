@@ -1,74 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
 From: Timo Mueller <mail@timomueller.eu>
 To: linux-bluetooth@vger.kernel.org
-Cc: Timo Mueller <timo.mueller@bmw-carit.de>
-Subject: [RFCv4 0/5] SSP MITM protection
-Date: Thu, 19 Dec 2013 14:08:13 +0100
-Message-Id: <cover.1387450435.git.timo.mueller@bmw-carit.de>
+Cc: Timo Mueller <timo.mueller@bmw-carit.de>,
+	Mikel Astiz <mikel.astiz@bmw-carit.de>
+Subject: [RFCv4 3/5] Bluetooth: Use MITM Protection when IO caps allow it
+Date: Thu, 19 Dec 2013 14:08:16 +0100
+Message-Id: <60907bf145b53d5bf72ebf8307ee546b707cc4ae.1387450436.git.timo.mueller@bmw-carit.de>
+In-Reply-To: <e95862fa0cf2deb0a55144702941359ea52dda5d.1387450436.git.timo.mueller@bmw-carit.de>
+References: <cover.1387450435.git.timo.mueller@bmw-carit.de>
+ <f8e5fc8f70fc013f80c95245a94f6c31c2dfb8f2.1387450436.git.timo.mueller@bmw-carit.de>
+ <e95862fa0cf2deb0a55144702941359ea52dda5d.1387450436.git.timo.mueller@bmw-carit.de>
+In-Reply-To: <cover.1387450435.git.timo.mueller@bmw-carit.de>
+References: <cover.1387450435.git.timo.mueller@bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Timo Mueller <timo.mueller@bmw-carit.de>
 
-Hi,
+When responding to a remotely-initiated pairing procedure, a MITM
+protected SSP associaton model can be used for pairing if both local
+and remote IO capabilities are set to something other than
+NoInputNoOutput, regardless of the bonding type (Dedicated or
+General).
 
-this is a rebased version of the rfc v3. I've successfully tested
-these changes in the last couple of months at the UPF #46 in Vienna,
-with the CE4A golden device and the bluetooth PTS (where applicable).
+This was already done for Dedicated Bonding but this patch proposes to
+use the same policy for General Bonding as well.
 
-At the UPF I've tested remotely initiated pairing with different io
-capabilities, as well locally initiated pairing. Regardless of the
-bonding mode, the protocol chosen in ssp has been consistent when
-being responder and also when being initiator. Pairing tests have been
-successful in all 22 test sessions.
+The GAP Specification gives the flexibility to decide whether MITM
+Protection is used ot not (Bluetooth Core Specification v4.0 Volume 3,
+part C, section 6.5.3).
 
-The configuration I used for testing was as follows:
-bluez: 5.9-154-gf7773c7
-kernel: v3.12-rc3-65-gf927318
-with the remaining patches from [RFC BlueZ v3 0/8] SSP MITM protection
+Note however that the recommendation is *not* to set this flag "unless
+the security policy of an available local service requires MITM
+Protection" (for both Dedicated and General Bonding). However, the
+kernel doesn't necessarily have this information and therefore the
+safest choice is to always use MITM Protection, also for General
+Bonding.
 
-I used the same configuration to test the patches with the CE4A golden
-device. Pairing here has been working as expected with all
-combinations of io capabilities, bonding mode and intiator role.
+Signed-off-by: Timo Mueller <timo.mueller@bmw-carit.de>
+Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
+---
+ net/bluetooth/hci_event.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-Lastly I've successfully ran the applicable GAP tests with the
-bluetooth PTS on this rebased version and the current head of
-bluez. Unfortunately the interesting bonding test cases are not yet
-implemented with the test suite. So I could only make sure general
-functionality is preserved.
-
-from the original cover letter:
-The way the kernel handles MITM Protection during pairing is
-inconsistent: General Bonding and Dedicated Bonding are not treated
-equally.
-<snip>
-Therefore, the safest choice is to always request MITM Protection,
-also for General Bonding [1]. The proposal here is to do this for both
-incoming (patch 6/8) and outgoing (patch 7/8) procedures, as it was
-previously done for Dedicated Bonding. This "conservative" approach is
-smart enough to fall back to not using MITM Protection if the IO
-capabilities don't allow it (this policy already existed before for
-Dedicated Bonding, see patch 5/8).
-<snip>
-
-Best regards
-Timo
-
-Mikel Astiz (3):
-  Bluetooth: Refactor hci_get_auth_req()
-  Bluetooth: Refactor code for outgoing dedicated bonding
-  Bluetooth: Request MITM Protection when initiator
-
-Timo Mueller (2):
-  Bluetooth: Use MITM Protection when IO caps allow it
-  Bluetooth: Add management command to relax MITM Protection
-
- include/net/bluetooth/hci.h  |  3 ++-
- include/net/bluetooth/mgmt.h |  3 +++
- net/bluetooth/hci_event.c    | 57 ++++++++++++++++++++++++++++----------------
- net/bluetooth/mgmt.c         | 50 ++++++++++++++++++++++++++++++++++----
- 4 files changed, 87 insertions(+), 26 deletions(-)
-
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 1cbec8f..882e569 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3042,11 +3042,6 @@ static u8 hci_get_auth_req(struct hci_conn *conn)
+ 	    conn->remote_auth == HCI_AT_NO_BONDING_MITM)
+ 		return conn->remote_auth | (conn->auth_type & 0x01);
+ 
+-	/* For general bonding, use the given auth_type */
+-	if (conn->remote_auth == HCI_AT_GENERAL_BONDING ||
+-	    conn->remote_auth == HCI_AT_GENERAL_BONDING_MITM)
+-		return conn->auth_type;
+-
+ 	/* If both remote and local have enough IO capabilities, require
+ 	 * MITM protection
+ 	 */
+@@ -3054,8 +3049,8 @@ static u8 hci_get_auth_req(struct hci_conn *conn)
+ 	    conn->io_capability != HCI_IO_NO_INPUT_OUTPUT)
+ 		return conn->remote_auth | 0x01;
+ 
+-	/* No MITM protection possible so remove requirement */
+-	return conn->remote_auth & ~0x01;
++	/* No MITM protection possible so ignore remote requirement */
++	return (conn->remote_auth & ~0x01) | (conn->auth_type & 0x01);
+ }
+ 
+ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
 -- 
 1.8.3.1
 
