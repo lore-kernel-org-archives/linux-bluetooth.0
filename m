@@ -1,61 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 Dec 2013 15:42:24 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/6] android/tester: Fix for not checking for
- BT_STATUS_SUCCESS
-Message-ID: <20131219134224.GA23417@x220.p-661hnu-f1>
-References: <1387456946-9743-1-git-send-email-jakub.tyszkowski@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Sebastian Chlad <sebastianchlad@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Sebastian Chlad <sebastianx.chlad@intel.com>
+Subject: Re: [PATCH] android/build: Adding l2test to Android.mk
+Date: Thu, 19 Dec 2013 14:33:08 +0100
+Message-ID: <1816695.PCLkSfLpb1@uw000953>
+In-Reply-To: <1387457595-8020-1-git-send-email-sebastianx.chlad@intel.com>
+References: <1387457595-8020-1-git-send-email-sebastianx.chlad@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1387456946-9743-1-git-send-email-jakub.tyszkowski@tieto.com>
+Content-Type: text/plain; charset="ISO-8859-1"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Sebastian,
 
-On Thu, Dec 19, 2013, Jakub Tyszkowski wrote:
-> For BT_STATUS_SUCCESS no checks were done as it is 0 in bt_status_t
-> enum. Valid status for no status expected should be STATUS_NOT_EXPECTED.
-> 
+> Enabling l2test tool for the android target
 > ---
->  android/android-tester.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+>  android/Android.mk | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
 > 
-> diff --git a/android/android-tester.c b/android/android-tester.c
-> index c24f5a6..5549dcb 100644
-> --- a/android/android-tester.c
-> +++ b/android/android-tester.c
-> @@ -72,7 +72,7 @@ enum hal_bluetooth_callbacks_id {
->  };
+> diff --git a/android/Android.mk b/android/Android.mk
+> index ebc3219..fee2f6c 100644
+> --- a/android/Android.mk
+> +++ b/android/Android.mk
+> @@ -226,3 +226,27 @@ LOCAL_MODULE_TAGS := optional
+>  LOCAL_MODULE := audio.a2dp.default
 >  
->  struct generic_data {
-> -	uint8_t expected_adapter_status;
-> +	int expected_adapter_status;
->  	uint32_t expect_settings_set;
->  	bt_property_t expected_property;
->  	uint8_t expected_hal_callbacks[];
-> @@ -92,6 +92,8 @@ struct socket_data {
->  #define WAIT_FOR_SIGNAL_TIME 2 /* in seconds */
->  #define EMULATOR_SIGNAL "emulator_started"
->  
-> +#define BT_STATUS_NOT_EXPECTED	-1
+>  include $(BUILD_SHARED_LIBRARY)
 > +
->  struct test_data {
->  	struct mgmt *mgmt;
->  	uint16_t mgmt_index;
-> @@ -199,7 +201,7 @@ static void expected_status_init(struct test_data *data)
->  {
->  	const struct generic_data *test_data = data->test_data;
->  
-> -	if (!(test_data->expected_adapter_status))
-> +	if (test_data->expected_adapter_status == BT_STATUS_NOT_EXPECTED)
->  		data->status_checked = true;
->  }
+> +#
+> +# l2cap-test
+> +#
+> +
+> +include $(CLEAR_VARS)
+> +
+> +LOCAL_SRC_FILES := \
+> +	../tools/l2test.c \
+> +	../lib/bluetooth.c \
+> +	../lib/hci.c \
+> +
+> +LOCAL_C_INCLUDES := \
+> +	$(LOCAL_PATH)/.. \
+> +	$(LOCAL_PATH)/../lib \
+> +	$(LOCAL_PATH)/../src/shared \
+> +
+> +LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
+> +
+> +LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
+> +LOCAL_MODULE_TAGS := eng
+> +LOCAL_MODULE := l2test
+> +
+> +include $(BUILD_EXECUTABLE)
+> 
 
-I suppose it does make sense to have such a special value, but I can't
-see you use it anywhere in your patch set. So I'd postpone this patch
-until you've got some actual code that needs it.
+Applied (after fixing commit message), thanks.
 
-Johan
+-- 
+BR
+Szymon Janc
+
+
