@@ -1,109 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: David Herrmann <dh.herrmann@gmail.com>
-To: linux-input@vger.kernel.org
-Cc: Jiri Kosina <jkosina@suse.cz>,
-	<linux-bluetooth@vger.kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	David Herrmann <dh.herrmann@gmail.com>
-Subject: [PATCH] Bluetooth: hidp: make sure input buffers are big enough
-Date: Thu, 19 Dec 2013 12:09:32 +0100
-Message-Id: <1387451372-6881-1-git-send-email-dh.herrmann@gmail.com>
+From: "Chlad, SebastianX" <sebastianx.chlad@intel.com>
+To: Szymon Janc <szymon.janc@tieto.com>,
+	Sebastian Chlad <sebastianchlad@gmail.com>
+CC: "Hedberg, Johan" <johan.hedberg@intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH] android/pts: Add PICS, PIXITs and PTS for L2CAP
+Date: Thu, 19 Dec 2013 09:45:31 +0000
+Message-ID: <2115852EF878384FA984E6B76A9F379E164467@IRSMSX104.ger.corp.intel.com>
+References: <2115852EF878384FA984E6B76A9F379E164297@IRSMSX104.ger.corp.intel.com>
+ <1387444450-1511-1-git-send-email-sebastianx.chlad@intel.com>,<16520238.3ybnibyTNs@uw000953>
+In-Reply-To: <16520238.3ybnibyTNs@uw000953>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HID core expects the input buffers to be at least of size 4096
-(HID_MAX_BUFFER_SIZE). Other sizes will result in buffer-overflows if an
-input-report is smaller than advertised. We could, like i2c, compute the
-biggest report-size instead of using HID_MAX_BUFFER_SIZE, but this will
-blow up if report-descriptors are changed after ->start() has been called.
-So lets be safe and just use the biggest buffer we have.
 
-Note that this adds an additional copy to the HIDP input path. If there is
-a way to make sure the skb-buf is big enough, we should use that instead.
+________________________________________
+From: Szymon Janc [szymon.janc@tieto.com]
+Sent: Thursday, December 19, 2013 11:42 AM
+To: Sebastian Chlad
+Cc: Hedberg, Johan; linux-bluetooth@vger.kernel.org; Chlad, SebastianX
+Subject: Re: [PATCH] android/pts: Add PICS, PIXITs and PTS for L2CAP
 
-The best way would be to make hid-core honor the @size argument, though,
-that sounds easier than it is. So lets just fix the buffer-overflows for
-now and afterwards look for a faster way for all transport drivers.
+Hi Sebastian,
 
-Signed-off-by: David Herrmann <dh.herrmann@gmail.com>
----
-Hi
+> This allows better tracking of the current state of implementation
+> ---
+>  android/Makefile.am     |   4 +-
+>  android/pics-l2cap.txt  | 157 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  android/pixit-l2cap.txt |  39 ++++++++++++
+>  android/pts-l2cap.txt   | 149 +++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 348 insertions(+), 1 deletion(-)
+>  create mode 100644 android/pics-l2cap.txt
+>  create mode 100644 android/pixit-l2cap.txt
+>  create mode 100644 android/pts-l2cap.txt
+>
 
-Any ideas how to improve this patch? I'd like to avoid the extra copy but I have
-no clue how the skb stuff works exactly.
+This one doesn't apply:
 
-I also haven't figured out a nice way to make HID-core honor the "size"
-parameter. hid-input depends on getting the whole input-report.
+yes, indeed. I'll correct that. 
 
-Comments welcome!
-David
+Seb
 
- net/bluetooth/hidp/core.c | 16 ++++++++++++++--
- net/bluetooth/hidp/hidp.h |  4 ++++
- 2 files changed, 18 insertions(+), 2 deletions(-)
+Applying: android/pts: Add PICS, PIXITs and PTS for L2CAP
+error: patch failed: android/Makefile.am:111
+error: android/Makefile.am: patch does not apply
+/home/janccszy/devel/bluez/.git/rebase-apply/patch:385: new blank line at EOF.
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index 292e619..d9fb934 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -430,6 +430,16 @@ static void hidp_del_timer(struct hidp_session *session)
- 		del_timer(&session->timer);
- }
- 
-+static void hidp_process_report(struct hidp_session *session,
-+				int type, const u8 *data, int len, int intr)
-+{
-+	if (len > HID_MAX_BUFFER_SIZE)
-+		len = HID_MAX_BUFFER_SIZE;
-+
-+	memcpy(session->input_buf, data, len);
-+	hid_input_report(session->hid, type, session->input_buf, len, intr);
-+}
-+
- static void hidp_process_handshake(struct hidp_session *session,
- 					unsigned char param)
- {
-@@ -502,7 +512,8 @@ static int hidp_process_data(struct hidp_session *session, struct sk_buff *skb,
- 			hidp_input_report(session, skb);
- 
- 		if (session->hid)
--			hid_input_report(session->hid, HID_INPUT_REPORT, skb->data, skb->len, 0);
-+			hidp_process_report(session, HID_INPUT_REPORT,
-+					    skb->data, skb->len, 0);
- 		break;
- 
- 	case HIDP_DATA_RTYPE_OTHER:
-@@ -584,7 +595,8 @@ static void hidp_recv_intr_frame(struct hidp_session *session,
- 			hidp_input_report(session, skb);
- 
- 		if (session->hid) {
--			hid_input_report(session->hid, HID_INPUT_REPORT, skb->data, skb->len, 1);
-+			hidp_process_report(session, HID_INPUT_REPORT,
-+					    skb->data, skb->len, 1);
- 			BT_DBG("report len %d", skb->len);
- 		}
- 	} else {
-diff --git a/net/bluetooth/hidp/hidp.h b/net/bluetooth/hidp/hidp.h
-index ab52414..8798492 100644
---- a/net/bluetooth/hidp/hidp.h
-+++ b/net/bluetooth/hidp/hidp.h
-@@ -24,6 +24,7 @@
- #define __HIDP_H
- 
- #include <linux/types.h>
-+#include <linux/hid.h>
- #include <linux/kref.h>
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/l2cap.h>
-@@ -179,6 +180,9 @@ struct hidp_session {
- 
- 	/* Used in hidp_output_raw_report() */
- 	int output_report_success; /* boolean */
-+
-+	/* temporary input buffer */
-+	u8 input_buf[HID_MAX_BUFFER_SIZE];
- };
- 
- /* HIDP init defines */
--- 
-1.8.5.1
+--
+BR
+Szymon Janc
+---------------------------------------------------------------------
+Intel Finland Oy
+Registered Address: PL 281, 00181 Helsinki 
+Business Identity Code: 0357606 - 4 
+Domiciled in Helsinki 
+
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
+
