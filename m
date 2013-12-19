@@ -1,66 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 Dec 2013 10:18:48 +0200
+Date: Thu, 19 Dec 2013 10:14:52 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/tester: Add Socket test close and listen
-Message-ID: <20131219081848.GC31549@x220.p-661hnu-f1>
-References: <1387379717-1457-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH_v4 3/7] android/pan: shutdown io channel on disconnect
+ call
+Message-ID: <20131219081452.GB31549@x220.p-661hnu-f1>
+References: <1387378396-6259-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+ <1387378396-6259-3-git-send-email-ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1387379717-1457-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1387378396-6259-3-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Ravi,
 
-On Wed, Dec 18, 2013, Andrei Emeltchenko wrote:
-> This test the situation when Android close file descriptor we passed to
-> it and try to listen() again.
+On Wed, Dec 18, 2013, Ravi kumar Veeramally wrote:
+> Shutdown io channel and send DISCONNECTING notification and send
+> DISCONNECTED notification and free the device on callback.
 > ---
->  android/android-tester.c | 55 ++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 55 insertions(+)
-> 
-> diff --git a/android/android-tester.c b/android/android-tester.c
-> index 8a2861e..cb8fb4e 100644
-> --- a/android/android-tester.c
-> +++ b/android/android-tester.c
-> @@ -1141,6 +1141,57 @@ clean:
->  		close(sock_fd);
->  }
+>  android/pan.c | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
+
+I've applied the first two patches, but one thing with this one:
+
+> diff --git a/android/pan.c b/android/pan.c
+> index b83f534..f64b09a 100644
+> --- a/android/pan.c
+> +++ b/android/pan.c
+> @@ -269,7 +269,7 @@ static void bt_pan_disconnect(const void *buf, uint16_t len)
+>  {
+>  	const struct hal_cmd_pan_disconnect *cmd = buf;
+>  	struct pan_device *dev;
+> -	uint8_t status;
+> +	uint8_t status = HAL_STATUS_FAILED;
+>  	GSList *l;
+>  	bdaddr_t dst;
 >  
-> +static void test_listen_close(const void *test_data)
-> +{
-> +	struct test_data *data = tester_get_data();
-> +	const struct socket_data *test = data->test_data;
-> +	bt_status_t status;
-> +	int sock_fd = -1;
-> +
-> +	status = data->if_sock->listen(test->sock_type,
-> +					test->service_name, test->service_uuid,
-> +					test->channel, &sock_fd, test->flags);
-> +	if (status != test->expected_status) {
-> +		tester_test_failed();
-> +		goto clean;
-> +	}
-> +
-> +	/* Check that file descriptor is valid */
-> +	if (status == BT_STATUS_SUCCESS && fcntl(sock_fd, F_GETFD) == -1) {
+> @@ -278,20 +278,20 @@ static void bt_pan_disconnect(const void *buf, uint16_t len)
+>  	android2bdaddr(&cmd->bdaddr, &dst);
+>  
+>  	l = g_slist_find_custom(devices, &dst, device_cmp);
+> -	if (!l) {
+> -		status = HAL_STATUS_FAILED;
+> +	if (!l)
+>  		goto failed;
 
-We usually check for failures like this with < 0 instead of == -1.
-
-> +	status = data->if_sock->listen(test->sock_type,
-> +					test->service_name, test->service_uuid,
-> +					test->channel, &sock_fd, test->flags);
-> +	if (status != test->expected_status) {
-> +		tester_test_failed();
-> +		goto clean;
-> +	}
-
-You've got many different conditions that can trigger
-tester_test_failed but no tester_warn() logs for each one to make
-debugging easy if these new tests start failing. Please add those.
-Otherwise once there's a regression it's going to be a real pain for you
-to track down exactly what's broken.
+Since we in general try to avoid initializations upon declaration I'd
+keep the status = HAL_STATUS_FAILED here. Even if it would be ok to move
+it it shouldn't be in this patch since it's unrelated.
 
 Johan
