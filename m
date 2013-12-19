@@ -1,29 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 19 Dec 2013 11:08:51 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 1/3] android/socket: Refactor connect to allow directly
- connect to rfcomm
-Message-ID: <20131219090851.GA6199@x220.p-661hnu-f1>
-References: <1387376336-17092-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1387442960-4584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1387442960-4584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Sebastian Chlad <sebastianchlad@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastianx.chlad@intel.com>
+Subject: [PATCH] android/build: Adding l2test to Android.mk
+Date: Thu, 19 Dec 2013 10:06:22 +0100
+Message-Id: <1387443982-1017-1-git-send-email-sebastianx.chlad@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Enabling l2test tool for the android target
+---
+ android/Android.mk | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-On Thu, Dec 19, 2013, Andrei Emeltchenko wrote:
-> Since Socket HAL allows us to specify RFCOMM channel number and directly
-> connect refactor send function to allow connect directly is uuid is zero
-> and channel number is specified.
-> ---
->  android/socket.c | 71 +++++++++++++++++++++++++++++++-------------------------
->  1 file changed, 39 insertions(+), 32 deletions(-)
+diff --git a/android/Android.mk b/android/Android.mk
+index ebc3219..c59df7a 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -226,3 +226,31 @@ LOCAL_MODULE_TAGS := optional
+ LOCAL_MODULE := audio.a2dp.default
+ 
+ include $(BUILD_SHARED_LIBRARY)
++
++#
++# l2cap-test
++#
++
++include $(CLEAR_VARS)
++
++LOCAL_SRC_FILES := \
++	../tools/l2test.c \
++	../lib/bluetooth.c \
++	../lib/hci.c \
++
++lib_headers := \
++	../lib/bluetooth.h \
++	../lib/l2cap.h \
++
++LOCAL_C_INCLUDES := \
++	$(LOCAL_PATH)/.. \
++	$(LOCAL_PATH)/../lib \
++	$(LOCAL_PATH)/../src/shared \
++
++LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
++
++LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
++LOCAL_MODULE_TAGS := eng
++LOCAL_MODULE := l2test
++
++include $(BUILD_EXECUTABLE)
+-- 
+1.8.1.2
 
-All three patches have been applied. Thanks.
-
-Johan
