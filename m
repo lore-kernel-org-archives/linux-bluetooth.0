@@ -1,79 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 6/6] emulator: Remove not necessary bthost_set_server_psm
-Date: Thu, 19 Dec 2013 15:29:05 +0100
-Message-Id: <1387463345-26406-6-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2 3/6] tools/l2cap_tester: Add write client test case
+Date: Thu, 19 Dec 2013 15:29:02 +0100
+Message-Id: <1387463345-26406-3-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1387463345-26406-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1387463345-26406-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Remove not necessary function and replace all uses with new one,
-bthost_add_l2cap_server().
+This test case write data from client to remote server.
 ---
- android/android-tester.c | 2 +-
- emulator/bthost.c        | 5 -----
- emulator/bthost.h        | 2 --
- tools/l2cap-tester.c     | 3 ++-
- 4 files changed, 3 insertions(+), 9 deletions(-)
+ tools/l2cap-tester.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index c24f5a6..2d78646 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -1279,7 +1279,7 @@ static void test_socket_real_connect(const void *test_data)
- 
- 	bdaddr2android((bdaddr_t *) client_bdaddr, &emu_bdaddr);
- 
--	bthost_set_server_psm(bthost, 0x0003);
-+	bthost_add_l2cap_server(bthost, 0x0003, NULL, NULL);
- 
- 	status = data->if_sock->connect(&emu_bdaddr, test->sock_type,
- 					test->service_uuid, test->channel,
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 7ccef9c..28d0591 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -1303,11 +1303,6 @@ void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
- 	bthost->new_l2cap_conn_data = data;
- }
- 
--void bthost_set_server_psm(struct bthost *bthost, uint16_t psm)
--{
--	bthost_add_l2cap_server(bthost, psm, NULL, NULL);
--}
--
- void bthost_start(struct bthost *bthost)
- {
- 	if (!bthost)
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index 2b8f212..97f011b 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -77,8 +77,6 @@ void bthost_le_start_encrypt(struct bthost *bthost, uint16_t handle,
- typedef void (*bthost_l2cap_connect_cb) (uint16_t handle, uint16_t cid,
- 							void *user_data);
- 
--void bthost_set_server_psm(struct bthost *bthost, uint16_t psm);
--
- void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
- 				bthost_l2cap_connect_cb func, void *user_data);
- 
 diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index 55e8ac9..2a7a394 100644
+index a8718d4..15b441b 100644
 --- a/tools/l2cap-tester.c
 +++ b/tools/l2cap-tester.c
-@@ -720,7 +720,8 @@ static void test_connect(const void *test_data)
- 		struct bthost *bthost = hciemu_client_get_host(data->hciemu);
+@@ -262,6 +262,13 @@ static const struct  l2cap_client_data client_connect_read_success_test = {
+ 	.data_len = sizeof(l2_data),
+ };
  
- 		if (!l2data->data_len)
--			bthost_set_server_psm(bthost, l2data->server_psm);
-+			bthost_add_l2cap_server(bthost, l2data->server_psm,
-+								NULL, NULL);
- 		else
- 			bthost_add_l2cap_server(bthost, l2data->server_psm,
- 						client_l2cap_connect_cb, data);
++static const struct  l2cap_client_data client_connect_write_success_test = {
++	.client_psm = 0x1001,
++	.server_psm = 0x1001,
++	.write_data = l2_data,
++	.data_len = sizeof(l2_data),
++};
++
+ static const struct l2cap_client_data client_connect_nval_psm_test = {
+ 	.client_psm = 0x1001,
+ 	.expect_err = ECONNREFUSED,
+@@ -489,6 +496,23 @@ static gboolean client_received_data(GIOChannel *io, GIOCondition cond,
+ 	return FALSE;
+ }
+ 
++static void bthost_received_data(const void *buf, uint16_t len,
++							void *user_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct l2cap_client_data *l2data = data->test_data;
++
++	if (len != l2data->data_len) {
++		tester_test_failed();
++		return;
++	}
++
++	if (memcmp(buf, l2data->write_data, l2data->data_len))
++		tester_test_failed();
++	else
++		tester_test_passed();
++}
++
+ static gboolean l2cap_connect_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+@@ -521,6 +545,16 @@ static gboolean l2cap_connect_cb(GIOChannel *io, GIOCondition cond,
+ 					l2data->read_data, l2data->data_len);
+ 
+ 		return FALSE;
++	} else if (l2data->write_data) {
++		struct bthost *bthost;
++
++		bthost = hciemu_client_get_host(data->hciemu);
++		bthost_add_cid_hook(bthost, data->handle, data->dcid,
++					bthost_received_data, NULL);
++
++		write(sk, l2data->write_data, l2data->data_len);
++
++		return FALSE;
+ 	}
+ 
+ 	if (-err != l2data->expect_err)
+@@ -809,6 +843,10 @@ int main(int argc, char *argv[])
+ 					&client_connect_read_success_test,
+ 					setup_powered_client, test_connect);
+ 
++	test_l2cap_bredr("L2CAP BR/EDR Client - Write Success",
++					&client_connect_write_success_test,
++					setup_powered_client, test_connect);
++
+ 	test_l2cap_bredr("L2CAP BR/EDR Client - Invalid PSM",
+ 					&client_connect_nval_psm_test,
+ 					setup_powered_client, test_connect);
 -- 
 1.8.3.1
 
