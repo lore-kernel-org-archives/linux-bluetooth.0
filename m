@@ -1,54 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastianchlad@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastianx.chlad@intel.com>
-Subject: [PATCH] android/build: Adding l2test to Android.mk
-Date: Thu, 19 Dec 2013 10:06:22 +0100
-Message-Id: <1387443982-1017-1-git-send-email-sebastianx.chlad@intel.com>
+Subject: [PATCHv2 1/2] android/tester: Add Socket test close and listen
+Date: Thu, 19 Dec 2013 10:51:39 +0200
+Message-Id: <1387443100-4768-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1387379717-1457-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1387379717-1457-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Enabling l2test tool for the android target
----
- android/Android.mk | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/android/Android.mk b/android/Android.mk
-index ebc3219..c59df7a 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -226,3 +226,31 @@ LOCAL_MODULE_TAGS := optional
- LOCAL_MODULE := audio.a2dp.default
+This test the situation when Android close file descriptor we passed to
+it and try to listen() again.
+---
+ android/android-tester.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 60 insertions(+)
+
+diff --git a/android/android-tester.c b/android/android-tester.c
+index 8a2861e..c24f5a6 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -1141,6 +1141,62 @@ clean:
+ 		close(sock_fd);
+ }
  
- include $(BUILD_SHARED_LIBRARY)
++static void test_listen_close(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct socket_data *test = data->test_data;
++	bt_status_t status;
++	int sock_fd = -1;
 +
-+#
-+# l2cap-test
-+#
++	status = data->if_sock->listen(test->sock_type,
++					test->service_name, test->service_uuid,
++					test->channel, &sock_fd, test->flags);
++	if (status != test->expected_status) {
++		tester_warn("sock->listen() failed");
++		tester_test_failed();
++		goto clean;
++	}
 +
-+include $(CLEAR_VARS)
++	/* Check that file descriptor is valid */
++	if (status == BT_STATUS_SUCCESS && fcntl(sock_fd, F_GETFD) < 0) {
++		tester_warn("sock_fd %d is not valid", sock_fd);
++		tester_test_failed();
++		return;
++	}
 +
-+LOCAL_SRC_FILES := \
-+	../tools/l2test.c \
-+	../lib/bluetooth.c \
-+	../lib/hci.c \
++	tester_print("Got valid sock_fd: %d", sock_fd);
 +
-+lib_headers := \
-+	../lib/bluetooth.h \
-+	../lib/l2cap.h \
++	/* Now close sock_fd */
++	close(sock_fd);
++	sock_fd = -1;
 +
-+LOCAL_C_INCLUDES := \
-+	$(LOCAL_PATH)/.. \
-+	$(LOCAL_PATH)/../lib \
-+	$(LOCAL_PATH)/../src/shared \
++	/* Try to listen again */
++	status = data->if_sock->listen(test->sock_type,
++					test->service_name, test->service_uuid,
++					test->channel, &sock_fd, test->flags);
++	if (status != test->expected_status) {
++		tester_warn("sock->listen() failed");
++		tester_test_failed();
++		goto clean;
++	}
 +
-+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
++	/* Check that file descriptor is valid */
++	if (status == BT_STATUS_SUCCESS && fcntl(sock_fd, F_GETFD) < 0) {
++		tester_warn("sock_fd %d is not valid", sock_fd);
++		tester_test_failed();
++		return;
++	}
 +
-+LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
-+LOCAL_MODULE_TAGS := eng
-+LOCAL_MODULE := l2test
++	tester_print("Got valid sock_fd: %d", sock_fd);
 +
-+include $(BUILD_EXECUTABLE)
++	tester_test_passed();
++
++clean:
++	if (sock_fd >= 0)
++		close(sock_fd);
++
++}
++
+ static void test_generic_connect(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+@@ -1363,6 +1419,10 @@ int main(int argc, char *argv[])
+ 			&btsock_success_check_chan,
+ 			setup_socket_interface, test_generic_listen, teardown);
+ 
++	test_bredrle("Socket Listen - Close and Listen again",
++			&btsock_success_check_chan,
++			setup_socket_interface, test_listen_close, teardown);
++
+ 	test_bredrle("Socket Connect - Invalid: sock_type 0",
+ 			&btsock_inv_param_socktype, setup_socket_interface,
+ 			test_generic_connect, teardown);
 -- 
-1.8.1.2
+1.8.3.2
 
