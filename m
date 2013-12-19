@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/4] android/A2DP: Fix disconnecting after AVDTP session creation
-Date: Thu, 19 Dec 2013 17:15:56 +0200
-Message-Id: <1387466156-14100-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/4] android/AVDTP: Add avdtp_shutdown
+Date: Thu, 19 Dec 2013 17:15:55 +0200
+Message-Id: <1387466156-14100-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1387466156-14100-1-git-send-email-luiz.dentz@gmail.com>
 References: <1387466156-14100-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,71 +11,56 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Once the connection is handover to AVDTP code the GIOChannel can be
-unref but it should not close the connection.
+avdtp_shutdown can be used to disconnect closing all existing stream
+properly.
 ---
- android/a2dp.c | 25 ++++++++++++++++++-------
- 1 file changed, 18 insertions(+), 7 deletions(-)
+ android/avdtp.c | 19 +++++++++++++++++++
+ android/avdtp.h |  2 ++
+ 2 files changed, 21 insertions(+)
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index 2de2f66..9087c62 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -73,8 +73,10 @@ static void a2dp_device_free(struct a2dp_device *dev)
- 	if (dev->session)
- 		avdtp_unref(dev->session);
- 
--	if (dev->io)
-+	if (dev->io) {
-+		g_io_channel_shutdown(dev->io, FALSE, NULL);
- 		g_io_channel_unref(dev->io);
-+	}
- 
- 	devices = g_slist_remove(devices, dev);
- 	g_free(dev);
-@@ -148,11 +150,18 @@ static void signaling_connect_cb(GIOChannel *chan, GError *err,
- 		return;
- 	}
- 
--	/* FIXME: Add proper version */
-+	g_io_channel_set_close_on_unref(chan, FALSE);
- 	fd = g_io_channel_unix_get_fd(chan);
-+
-+	/* FIXME: Add proper version */
- 	dev->session = avdtp_new(fd, imtu, omtu, 0x0100);
- 	avdtp_add_disconnect_cb(dev->session, disconnect_cb, dev);
- 
-+	if (dev->io) {
-+		g_io_channel_unref(dev->io);
-+		dev->io = NULL;
-+	}
-+
- 	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_CONNECTED);
+diff --git a/android/avdtp.c b/android/avdtp.c
+index b2d77a4..7d3cb18 100644
+--- a/android/avdtp.c
++++ b/android/avdtp.c
+@@ -2102,6 +2102,25 @@ gboolean avdtp_remove_disconnect_cb(struct avdtp *session, unsigned int id)
+ 	return FALSE;
  }
  
-@@ -221,15 +230,17 @@ static void bt_a2dp_disconnect(const void *buf, uint16_t len)
- 	}
- 
- 	dev = l->data;
-+	status = HAL_STATUS_SUCCESS;
- 
--	/* Wait signaling channel to HUP */
--	if (dev->io)
--		g_io_channel_shutdown(dev->io, TRUE, NULL);
-+	if (dev->io) {
-+		bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
-+		goto failed;
++void avdtp_shutdown(struct avdtp *session)
++{
++	GSList *l;
++	int sock;
++
++	if (!session->io)
++		return;
++
++	for (l = session->streams; l; l = g_slist_next(l)) {
++		struct avdtp_stream *stream = l->data;
++
++		avdtp_close(session, stream, TRUE);
 +	}
++
++	sock = g_io_channel_unix_get_fd(session->io);
++
++	shutdown(sock, SHUT_RDWR);
++}
++
+ static void queue_request(struct avdtp *session, struct pending_req *req,
+ 			gboolean priority)
+ {
+diff --git a/android/avdtp.h b/android/avdtp.h
+index 1619029..d371653 100644
+--- a/android/avdtp.h
++++ b/android/avdtp.h
+@@ -209,6 +209,8 @@ unsigned int avdtp_add_disconnect_cb(struct avdtp *session,
+ 						void *user_data);
+ gboolean avdtp_remove_disconnect_cb(struct avdtp *session, unsigned int id);
  
-+	/* Wait AVDTP session to shutdown */
-+	avdtp_shutdown(dev->session);
- 	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTING);
++void avdtp_shutdown(struct avdtp *session);
++
+ void avdtp_unref(struct avdtp *session);
+ struct avdtp *avdtp_ref(struct avdtp *session);
  
--	status = HAL_STATUS_SUCCESS;
--
- failed:
- 	ipc_send_rsp(HAL_SERVICE_ID_A2DP, HAL_OP_A2DP_DISCONNECT, status);
- }
 -- 
 1.8.3.1
 
