@@ -1,44 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 0/5] android: Update HAL to Android 4.4 API
-Date: Fri, 20 Dec 2013 11:25:35 +0100
-Message-Id: <1387535140-6223-1-git-send-email-szymon.janc@tieto.com>
+Date: Fri, 20 Dec 2013 12:20:36 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2] tools/l2cap-tester: Fix memory leak
+Message-ID: <20131220102036.GA21469@x220.p-661hnu-f1>
+References: <1387531829-31079-1-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1387531829-31079-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcin,
 
-It is important to fully implement bt_interface_t (at least with stubs/NULLs)
-since Android is not checking size field from HAL and just assume memory
-layout of BT HAL. This was causing crashes on 4.4 due to Android trying
-to call not existing methods.
+On Fri, Dec 20, 2013, Marcin Kraglak wrote:
+> Set close_on_unref on new created GIOChannel and don't close
+> its file descriptor.
+> 
+> 126 (120 direct, 6 indirect) bytes in 1 blocks aredefinitely
+> 	lost in loss record 24 of 28
+> at 0x4A06409: malloc (in/usr/lib64/valgrind/vgpreload_memcheck
+> 	-amd64-linux.so)
+> by 0x3C9564D88E: g_malloc (in /usr/lib64/libglib-2.0.so.0.3600.3)
+> by 0x3C956881F4: g_io_channel_unix_new (in/usr/lib64/libglib-
+> 	2.0.so.0.3600.3)
+> by 0x402A5A: l2cap_listen_cb (l2cap-tester.c:774)
+> by 0x3C95647DF5: g_main_context_dispatch (in/usr/lib64/
+> 	libglib-2.0.so.0.3600.3)
+> by 0x3C95648147: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
+> by 0x3C95648549: g_main_loop_run
+> 	(in/usr/lib64/libglib-2.0.so.0.3600.3)
+> by 0x40A67C: tester_run (tester.c:784)
+> by 0x4026A9: main (l2cap-tester.c:991)
+> ---
+>  tools/l2cap-tester.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 
-BT snoop logs enabling function is a bit special since it will be implemented
-only in HAL so no need to extend IPC with that (plan is to have dedicated
-service that will dump HCI traffic).
+Applied. Thanks.
 
-For now 4.2+ API is if-deffed in HAL library - this will be removed when
-minimal Android version required will be dropped.
-
--- 
-BR
-Szymon Janc
-
-Szymon Janc (5):
-  android/hal-bluetooth: Add support for sending LE_TEST_MODE command
-  android/hal-bluetooth: Add support for enabling HCI snoop dump
-  android/hal-bluetooth: Add support for remote version info property
-  android/hal-bluetooth: Add support for device service record property
-  android/bluetooth: Add stubs for missing commands
-
- android/bluetooth.c         |  56 ++++++++++++++++++++++++
- android/cutils/properties.h |   1 +
- android/hal-bluetooth.c     | 104 +++++++++++++++++++++++++++++++++++++++++++-
- android/hal-msg.h           |  13 ++++++
- 4 files changed, 172 insertions(+), 2 deletions(-)
-
--- 
-1.8.3.2
-
+Johan
