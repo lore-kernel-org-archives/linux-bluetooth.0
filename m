@@ -1,53 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v5 04/14] Bluetooth: Use connection parameters if any
-Date: Fri, 20 Dec 2013 08:57:45 -0300
-Message-Id: <1387540675-2466-5-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v5 13/14] Bleutooth: Add support for auto connect options
+Date: Fri, 20 Dec 2013 08:57:54 -0300
+Message-Id: <1387540675-2466-14-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1387540675-2466-1-git-send-email-andre.guedes@openbossa.org>
 References: <1387540675-2466-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch changes hci_connect_le() so it uses the connection
-parameters specified for the certain device. If no parameters
-were configured, we use the default values.
+This patch adds support for the HCI_AUTO_CONN_ALWAYS and HCI_AUTO_
+CONN_LINK_LOSS options from struct hci_conn_params.
+
+The HCI_AUTO_CONN_ALWAYS option configures the kernel to always re-
+establish the connection, no matter the reason the connection was
+terminated. This feature is required by some LE profiles such as
+HID over GATT, Health Thermometer and Blood Pressure. These profiles
+require the host autonomously connect to the device as soon as it
+enters in connectable mode (start advertising) so the device is able
+to delivery notifications or indications.
+
+The BT_AUTO_CONN_LINK_LOSS option configures the kernel to re-
+establish the connection in case the connection was terminated due
+to a link loss. This feature is required by the majority of LE
+profiles such as Proximity, Find Me, Cycling Speed and Cadence and
+Time.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_conn.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_event.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 15c689e..b5c3ebff 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -578,6 +578,7 @@ static int hci_create_le_conn(struct hci_conn *conn)
- static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 				    u8 dst_type, u8 sec_level, u8 auth_type)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index b75cea8..2839bab 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1780,6 +1780,7 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
  {
+ 	struct hci_ev_disconn_complete *ev = (void *) skb->data;
+ 	u8 reason = hci_to_mgmt_reason(ev->reason);
 +	struct hci_conn_params *params;
  	struct hci_conn *conn;
- 	int err;
+ 	u8 type;
  
-@@ -624,8 +625,15 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 	conn->sec_level = BT_SECURITY_LOW;
- 	conn->pending_sec_level = sec_level;
- 	conn->auth_type = auth_type;
--	conn->le_conn_min_interval = hdev->le_conn_min_interval;
--	conn->le_conn_max_interval = hdev->le_conn_max_interval;
-+
+@@ -1806,6 +1807,23 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (conn->type == ACL_LINK && conn->flush_key)
+ 		hci_remove_link_key(hdev, &conn->dst);
+ 
 +	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
 +	if (params) {
-+		conn->le_conn_min_interval = params->conn_min_interval;
-+		conn->le_conn_max_interval = params->conn_max_interval;
-+	} else {
-+		conn->le_conn_min_interval = hdev->le_conn_min_interval;
-+		conn->le_conn_max_interval = hdev->le_conn_max_interval;
++		switch (params->auto_connect) {
++		case HCI_AUTO_CONN_LINK_LOSS:
++			if (ev->reason != HCI_ERROR_CONNECTION_TIMEOUT)
++				break;
++			/* Fall through */
++
++		case HCI_AUTO_CONN_ALWAYS:
++			hci_pend_le_conn_add(hdev, &conn->dst, conn->dst_type);
++			break;
++
++		default:
++			break;
++		}
 +	}
++
+ 	type = conn->type;
  
- 	err = hci_create_le_conn(conn);
- 	if (err)
+ 	hci_proto_disconn_cfm(conn, ev->reason);
 -- 
 1.8.5.1
 
