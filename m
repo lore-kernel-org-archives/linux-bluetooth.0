@@ -1,64 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v5 07/14] Bluetooth: Remove unused function
-Date: Fri, 20 Dec 2013 08:57:48 -0300
-Message-Id: <1387540675-2466-8-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v5 05/14] Bluetooth: Introduce fail_conn_attempt() helper
+Date: Fri, 20 Dec 2013 08:57:46 -0300
+Message-Id: <1387540675-2466-6-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1387540675-2466-1-git-send-email-andre.guedes@openbossa.org>
 References: <1387540675-2466-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes hci_create_le_conn() since it is not used anymore.
+This patch moves connection attempt failure code to its own function
+so it can be reused in the next patch.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_conn.c | 32 --------------------------------
- 1 file changed, 32 deletions(-)
+ net/bluetooth/hci_conn.c | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
 
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b9725f8..7069bb9 100644
+index b5c3ebff..870bc31 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -551,38 +551,6 @@ done:
- 	hci_dev_unlock(hdev);
+@@ -514,6 +514,21 @@ struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src)
  }
+ EXPORT_SYMBOL(hci_get_route);
  
--static int hci_create_le_conn(struct hci_conn *conn)
--{
--	struct hci_dev *hdev = conn->hdev;
--	struct hci_cp_le_create_conn cp;
--	struct hci_request req;
--	int err;
--
--	hci_req_init(&req, hdev);
--
--	memset(&cp, 0, sizeof(cp));
--	cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
--	cp.scan_window = cpu_to_le16(hdev->le_scan_window);
--	bacpy(&cp.peer_addr, &conn->dst);
--	cp.peer_addr_type = conn->dst_type;
--	cp.own_address_type = conn->src_type;
--	cp.conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
--	cp.conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
--	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
--	cp.min_ce_len = __constant_cpu_to_le16(0x0000);
--	cp.max_ce_len = __constant_cpu_to_le16(0x0000);
--
--	hci_req_add(&req, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
--
--	err = hci_req_run(&req, create_le_conn_complete);
--	if (err) {
--		hci_conn_del(conn);
--		return err;
--	}
--
--	return 0;
--}
--
- static void stop_scan_complete(struct hci_dev *hdev, u8 status)
++/* This function requires the caller holds hdev->lock */
++static void fail_conn_attempt(struct hci_conn *conn, u8 status)
++{
++	struct hci_dev *hdev = conn->hdev;
++
++	conn->state = BT_CLOSED;
++
++	mgmt_connect_failed(hdev, &conn->dst, conn->type, conn->dst_type,
++			    status);
++
++	hci_proto_connect_cfm(conn, status);
++
++	hci_conn_del(conn);
++}
++
+ static void create_le_conn_complete(struct hci_dev *hdev, u8 status)
  {
- 	struct hci_cp_le_create_conn cp;
+ 	struct hci_conn *conn;
+@@ -530,14 +545,7 @@ static void create_le_conn_complete(struct hci_dev *hdev, u8 status)
+ 	if (!conn)
+ 		goto done;
+ 
+-	conn->state = BT_CLOSED;
+-
+-	mgmt_connect_failed(hdev, &conn->dst, conn->type, conn->dst_type,
+-			    status);
+-
+-	hci_proto_connect_cfm(conn, status);
+-
+-	hci_conn_del(conn);
++	fail_conn_attempt(conn, status);
+ 
+ done:
+ 	hci_dev_unlock(hdev);
 -- 
 1.8.5.1
 
