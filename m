@@ -1,154 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v5 14/14] Bluetooth: Add le_auto_conn file on debugfs
-Date: Fri, 20 Dec 2013 08:57:55 -0300
-Message-Id: <1387540675-2466-15-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v5 01/14] Bluetooth: Save connection interval parameters in hci_conn
+Date: Fri, 20 Dec 2013 08:57:42 -0300
+Message-Id: <1387540675-2466-2-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1387540675-2466-1-git-send-email-andre.guedes@openbossa.org>
 References: <1387540675-2466-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds to debugfs the le_auto_conn file. This file will be
-used to test LE auto connection infrastructure.
+This patch creates two new fields in struct hci_conn to save the
+minimum and maximum connection interval values used to establish
+the connection this object represents.
 
-To add a new auto connection address we write on le_auto_conn file
-following the format <address> <address type> <auto_connect>.
-
-The <address type> values are:
-  * 0 for public address
-  * 1 for random address
-
-The <auto_connect> values are (for more details see struct hci_
-conn_params):
-  * 0 for disabled
-  * 1 for always
-  * 2 for link loss
-
-So for instance, if you want the kernel autonomously establishes
-connections with device AA:BB:CC:DD:EE:FF (public address) every
-time the device enters in connectable mode (starts advertising),
-you should run the command:
-$ echo "AA:BB:CC:DD:EE:FF 0 1" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
-
-To get the list of connection parameters configured in kernel, read
-the le_auto_conn file:
-$ cat /sys/kernel/debug/bluetooth/hci0/le_auto_conn
-
-Finally, to clear the connection parameters list, write an empty
-string:
-$ echo "" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
-
-This file is created only if LE is enabled.
+This change is required in order to know what parameters the
+connection is currently using.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_core.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 85 insertions(+)
+ include/net/bluetooth/hci_core.h | 2 ++
+ net/bluetooth/hci_conn.c         | 6 ++++--
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index bb5724e..3a92e27 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -679,6 +679,89 @@ static const struct file_operations lowpan_debugfs_fops = {
- 	.llseek		= default_llseek,
- };
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index f2f0cf5..2ebe772 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -332,6 +332,8 @@ struct hci_conn {
+ 	__u8		passkey_entered;
+ 	__u16		disc_timeout;
+ 	__u16		setting;
++	__u16		le_conn_min_interval;
++	__u16		le_conn_max_interval;
+ 	unsigned long	flags;
  
-+static int le_auto_conn_show(struct seq_file *sf, void *ptr)
-+{
-+	struct hci_dev *hdev = sf->private;
-+	struct hci_conn_params *p;
-+
-+	hci_dev_lock(hdev);
-+
-+	list_for_each_entry(p, &hdev->le_conn_params, list) {
-+		seq_printf(sf, "%pMR %u %u\n", &p->addr, p->addr_type,
-+			   p->auto_connect);
-+	}
-+
-+	hci_dev_unlock(hdev);
-+
-+	return 0;
-+}
-+
-+static int le_auto_conn_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, le_auto_conn_show, inode->i_private);
-+}
-+
-+static ssize_t le_auto_conn_write(struct file *file, const char __user *data,
-+				  size_t count, loff_t *offset)
-+{
-+	struct seq_file *sf = file->private_data;
-+	struct hci_dev *hdev = sf->private;
-+	u8 auto_connect;
-+	bdaddr_t addr;
-+	u8 addr_type;
-+	char *buf;
-+	int n;
-+
-+	/* Don't allow partial write */
-+	if (*offset != 0)
-+		return -EINVAL;
-+
-+	/* If empty string, clear the connection parameters and pending LE
-+	 * connection list.
-+	 */
-+	if (count == 1) {
-+		hci_dev_lock(hdev);
-+		hci_conn_params_clear(hdev);
-+		hci_pend_le_conns_clear(hdev);
-+		hci_dev_unlock(hdev);
-+		return count;
-+	}
-+
-+	buf = kzalloc(count, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	if (copy_from_user(buf, data, count)) {
-+		kfree(buf);
-+		return -EFAULT;
-+	}
-+
-+	n = sscanf(buf, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx %hhu %hhu", &addr.b[5],
-+		   &addr.b[4], &addr.b[3], &addr.b[2], &addr.b[1], &addr.b[0],
-+		   &addr_type, &auto_connect);
-+	if (n != 8) {
-+		kfree(buf);
-+		return -EINVAL;
-+	}
-+
-+	hci_dev_lock(hdev);
-+	hci_conn_params_add(hdev, &addr, addr_type, auto_connect,
-+			    hdev->le_conn_min_interval,
-+			    hdev->le_conn_max_interval);
-+	hci_dev_unlock(hdev);
-+
-+	kfree(buf);
-+	return count;
-+}
-+
-+static const struct file_operations le_auto_conn_fops = {
-+	.open		= le_auto_conn_open,
-+	.read		= seq_read,
-+	.write		= le_auto_conn_write,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+};
-+
- /* ---- HCI requests ---- */
+ 	__u8		remote_cap;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index ba5366c..15c689e 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -558,8 +558,8 @@ static int hci_create_le_conn(struct hci_conn *conn)
+ 	bacpy(&cp.peer_addr, &conn->dst);
+ 	cp.peer_addr_type = conn->dst_type;
+ 	cp.own_address_type = conn->src_type;
+-	cp.conn_interval_min = cpu_to_le16(hdev->le_conn_min_interval);
+-	cp.conn_interval_max = cpu_to_le16(hdev->le_conn_max_interval);
++	cp.conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
++	cp.conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
+ 	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
+ 	cp.min_ce_len = __constant_cpu_to_le16(0x0000);
+ 	cp.max_ce_len = __constant_cpu_to_le16(0x0000);
+@@ -624,6 +624,8 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	conn->sec_level = BT_SECURITY_LOW;
+ 	conn->pending_sec_level = sec_level;
+ 	conn->auth_type = auth_type;
++	conn->le_conn_min_interval = hdev->le_conn_min_interval;
++	conn->le_conn_max_interval = hdev->le_conn_max_interval;
  
- static void hci_req_sync_complete(struct hci_dev *hdev, u8 result)
-@@ -1451,6 +1534,8 @@ static int __hci_init(struct hci_dev *hdev)
- 				    hdev, &conn_max_interval_fops);
- 		debugfs_create_file("6lowpan", 0644, hdev->debugfs, hdev,
- 				    &lowpan_debugfs_fops);
-+		debugfs_create_file("le_auto_conn", 0644, hdev->debugfs, hdev,
-+				    &le_auto_conn_fops);
- 	}
- 
- 	return 0;
+ 	err = hci_create_le_conn(conn);
+ 	if (err)
 -- 
 1.8.5.1
 
