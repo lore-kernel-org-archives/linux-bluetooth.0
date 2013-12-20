@@ -1,49 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 20 Dec 2013 12:58:48 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/5] android: Update HAL to Android 4.4 API
-Message-ID: <20131220105848.GA26227@x220.p-661hnu-f1>
-References: <1387535140-6223-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1387535140-6223-1-git-send-email-szymon.janc@tieto.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv3 3/3] emulator/bthost: Remove not used bthost_set_server_psm
+Date: Fri, 20 Dec 2013 11:53:47 +0100
+Message-Id: <1387536827-1590-3-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1387536827-1590-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1387536827-1590-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+This function is not needed and has been replaced with bthost_add_l2cap_server.
+---
+ emulator/bthost.c | 5 -----
+ emulator/bthost.h | 2 --
+ 2 files changed, 7 deletions(-)
 
-On Fri, Dec 20, 2013, Szymon Janc wrote:
-> It is important to fully implement bt_interface_t (at least with stubs/NULLs)
-> since Android is not checking size field from HAL and just assume memory
-> layout of BT HAL. This was causing crashes on 4.4 due to Android trying
-> to call not existing methods.
-> 
-> BT snoop logs enabling function is a bit special since it will be implemented
-> only in HAL so no need to extend IPC with that (plan is to have dedicated
-> service that will dump HCI traffic).
-> 
-> For now 4.2+ API is if-deffed in HAL library - this will be removed when
-> minimal Android version required will be dropped.
-> 
-> -- 
-> BR
-> Szymon Janc
-> 
-> Szymon Janc (5):
->   android/hal-bluetooth: Add support for sending LE_TEST_MODE command
->   android/hal-bluetooth: Add support for enabling HCI snoop dump
->   android/hal-bluetooth: Add support for remote version info property
->   android/hal-bluetooth: Add support for device service record property
->   android/bluetooth: Add stubs for missing commands
-> 
->  android/bluetooth.c         |  56 ++++++++++++++++++++++++
->  android/cutils/properties.h |   1 +
->  android/hal-bluetooth.c     | 104 +++++++++++++++++++++++++++++++++++++++++++-
->  android/hal-msg.h           |  13 ++++++
->  4 files changed, 172 insertions(+), 2 deletions(-)
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index 8e62d26..c627f8a 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -1304,11 +1304,6 @@ void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
+ 	bthost->new_l2cap_conn_data = data;
+ }
+ 
+-void bthost_set_server_psm(struct bthost *bthost, uint16_t psm)
+-{
+-	bthost_add_l2cap_server(bthost, psm, NULL, NULL);
+-}
+-
+ void bthost_start(struct bthost *bthost)
+ {
+ 	if (!bthost)
+diff --git a/emulator/bthost.h b/emulator/bthost.h
+index 2b8f212..97f011b 100644
+--- a/emulator/bthost.h
++++ b/emulator/bthost.h
+@@ -77,8 +77,6 @@ void bthost_le_start_encrypt(struct bthost *bthost, uint16_t handle,
+ typedef void (*bthost_l2cap_connect_cb) (uint16_t handle, uint16_t cid,
+ 							void *user_data);
+ 
+-void bthost_set_server_psm(struct bthost *bthost, uint16_t psm);
+-
+ void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
+ 				bthost_l2cap_connect_cb func, void *user_data);
+ 
+-- 
+1.8.3.1
 
-All patches in this set have been applied. Thanks.
-
-Johan
