@@ -1,34 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <6E8A8CD1-5CB6-4D65-9BD7-DF4CF23F274C@holtmann.org>
-References: <1387533387-6724-1-git-send-email-luiz.dentz@gmail.com>
-	<6E8A8CD1-5CB6-4D65-9BD7-DF4CF23F274C@holtmann.org>
-Date: Fri, 20 Dec 2013 15:44:17 +0200
-Message-ID: <CABBYNZKcsaSSEXLV+gQuxXMzu8ePCyiyU5cJcNQ8rTjzsP-PUg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] android/AVDTP: Duplicate fd passed to avdtp_new
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH 4/5] android/hal-bluetooth: Add support for device service record property
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <3121104.trYEc2PX04@uw000953>
+Date: Fri, 20 Dec 2013 05:43:21 -0800
 Cc: "linux-bluetooth@vger.kernel.org development"
 	<linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Message-Id: <FE09C777-868D-4FBB-99BF-739CA67C603E@holtmann.org>
+References: <1387535140-6223-1-git-send-email-szymon.janc@tieto.com> <1387535140-6223-5-git-send-email-szymon.janc@tieto.com> <D18535D5-351D-4C61-9D7E-6486E8558859@holtmann.org> <3121104.trYEc2PX04@uw000953>
+To: Szymon Janc <szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Szymon,
 
-On Fri, Dec 20, 2013 at 3:16 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Luiz,
->
->> This use dup to create a new fd to be used by AVDTP session leaving the
->> caller free to close the original fd. Note that even if the caller
->> decides to keep the original fd it will still be notified when
->> avdtp_shutdown is called since it uses shutdown.
->
-> I would be more curious on why this is needed.
+>>> This allows to correctly handle device service record property.
+>>> ---
+>>> android/hal-bluetooth.c | 15 +++++++++++++++
+>>> android/hal-msg.h       |  7 +++++++
+>>> 2 files changed, 22 insertions(+)
+>>> 
+>>> diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+>>> index d0c1c01..4ef2ebe 100644
+>>> --- a/android/hal-bluetooth.c
+>>> +++ b/android/hal-bluetooth.c
+>>> @@ -166,6 +166,21 @@ static void device_props_to_hal(bt_property_t *send_props,
+>>> 			break;
+>>> #endif
+>>> 		case HAL_PROP_DEVICE_SERVICE_REC:
+>>> +		{
+>>> +			static bt_service_record_t e;
+>> 
+>> why static here. Since we are essentially multi-threaded, this can be dangerous.
+> 
+> This is executed only in notification thread context, so not multi-threading here.
+> (yes, commit message could be better)
 
-It is basically to make the caller able to release any resources, such
-as GIOChannel managed by btio, without causing a disconnect.
+and what is wrong with having it on the stack.
 
+Regards
 
--- 
-Luiz Augusto von Dentz
+Marcel
+
