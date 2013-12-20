@@ -1,68 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] android/tester: Fix valgrind memory warnings
-Date: Fri, 20 Dec 2013 11:49:47 +0200
-Message-Id: <1387532987-30041-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2] tools/l2cap-tester: Fix memory leak
+Date: Fri, 20 Dec 2013 10:30:29 +0100
+Message-Id: <1387531829-31079-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Set close_on_unref on new created GIOChannel and don't close
+its file descriptor.
 
-Make device structure static, fixes valgrind memory leak warnings in
-android-tester and haltest.
-
-==26231== 80 bytes in 1 blocks are definitely lost in loss record 25 of
-31
-==26231==    at 0x4C2A2DB: malloc (in
-/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==26231==    by 0x40F153: open_bluetooth (hal-bluetooth.c:800)
-==26231==    by 0x40C8D8: setup (android-tester.c:835)
-==26231==    by 0x40CB20: setup_socket_interface_enabled
-(android-tester.c:1166)
-==26231==    by 0x409C15: setup_callback (tester.c:373)
-==26231==    by 0x4E7C3B5: g_main_context_dispatch (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
-==26231==    by 0x4E7C707: ??? (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
-==26231==    by 0x4E7CB09: g_main_loop_run (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
-==26231==    by 0x40A83C: tester_run (tester.c:784)
-==26231==    by 0x40362A: main (android-tester.c:1643)
+126 (120 direct, 6 indirect) bytes in 1 blocks aredefinitely
+	lost in loss record 24 of 28
+at 0x4A06409: malloc (in/usr/lib64/valgrind/vgpreload_memcheck
+	-amd64-linux.so)
+by 0x3C9564D88E: g_malloc (in /usr/lib64/libglib-2.0.so.0.3600.3)
+by 0x3C956881F4: g_io_channel_unix_new (in/usr/lib64/libglib-
+	2.0.so.0.3600.3)
+by 0x402A5A: l2cap_listen_cb (l2cap-tester.c:774)
+by 0x3C95647DF5: g_main_context_dispatch (in/usr/lib64/
+	libglib-2.0.so.0.3600.3)
+by 0x3C95648147: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
+by 0x3C95648549: g_main_loop_run
+	(in/usr/lib64/libglib-2.0.so.0.3600.3)
+by 0x40A67C: tester_run (tester.c:784)
+by 0x4026A9: main (l2cap-tester.c:991)
 ---
- android/hal-bluetooth.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ tools/l2cap-tester.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 7cac15c..738c189 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -797,18 +797,17 @@ static int close_bluetooth(struct hw_device_t *device)
- static int open_bluetooth(const struct hw_module_t *module, char const *name,
- 					struct hw_device_t **device)
- {
--	bluetooth_device_t *dev = malloc(sizeof(bluetooth_device_t));
-+	static bluetooth_device_t dev;
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index 7c50f26..a5028a3 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -535,7 +535,6 @@ static gboolean server_received_data(GIOChannel *io, GIOCondition cond,
+ 	if (read(sk, buf, l2data->data_len) != l2data->data_len) {
+ 		tester_warn("Unable to read %u bytes", l2data->data_len);
+ 		tester_test_failed();
+-		close(sk);
+ 		return FALSE;
+ 	}
  
- 	DBG("");
+@@ -544,8 +543,6 @@ static gboolean server_received_data(GIOChannel *io, GIOCondition cond,
+ 	else
+ 		tester_test_passed();
  
--	memset(dev, 0, sizeof(bluetooth_device_t));
--	dev->common.tag = HARDWARE_DEVICE_TAG;
--	dev->common.version = 0;
--	dev->common.module = (struct hw_module_t *) module;
--	dev->common.close = close_bluetooth;
--	dev->get_bluetooth_interface = get_bluetooth_interface;
-+	dev.common.tag = HARDWARE_DEVICE_TAG;
-+	dev.common.version = 0;
-+	dev.common.module = (struct hw_module_t *) module;
-+	dev.common.close = close_bluetooth;
-+	dev.get_bluetooth_interface = get_bluetooth_interface;
- 
--	*device = (struct hw_device_t *) dev;
-+	*device = (struct hw_device_t *) &dev;
- 
- 	return 0;
+-	close(sk);
+-
+ 	return FALSE;
  }
+ 
+@@ -785,12 +782,15 @@ static gboolean l2cap_listen_cb(GIOChannel *io, GIOCondition cond,
+ 		GIOChannel *new_io;
+ 
+ 		new_io = g_io_channel_unix_new(new_sk);
++		g_io_channel_set_close_on_unref(new_io, TRUE);
+ 
+ 		bthost = hciemu_client_get_host(data->hciemu);
+ 		g_io_add_watch(new_io, G_IO_IN, server_received_data, NULL);
+ 		bthost_send_cid(bthost, data->handle, data->dcid,
+ 					l2data->read_data, l2data->data_len);
+ 
++		g_io_channel_unref(new_io);
++
+ 		return FALSE;
+ 	} else if (l2data->write_data) {
+ 		struct bthost *bthost;
 -- 
-1.8.3.2
+1.8.3.1
 
