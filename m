@@ -1,26 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 20 Dec 2013 13:03:03 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 1/3] tools/l2cap-tester: Remove not necessary
- bthost_set_server_psm
-Message-ID: <20131220110303.GA27444@x220.p-661hnu-f1>
-References: <1387536827-1590-1-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1387536827-1590-1-git-send-email-marcin.kraglak@tieto.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 BlueZ] android/AVDTP: Duplicate fd passed to avdtp_new
+Date: Fri, 20 Dec 2013 12:59:26 +0200
+Message-Id: <1387537166-7703-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Dec 20, 2013, Marcin Kraglak wrote:
-> This function can be replaced with bthost_add_l2cap_server().
-> ---
->  tools/l2cap-tester.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+This use dup to create a new fd to be used by AVDTP session leaving the
+caller free to close the original fd. Note that even if the caller
+decides to keep the original fd it will still be notified when
+avdtp_shutdown is called since it uses shutdown.
+---
+ android/a2dp.c  | 6 +++++-
+ android/avdtp.c | 9 ++++++++-
+ 2 files changed, 13 insertions(+), 2 deletions(-)
 
-All three patches have been applied. Thanks.
+diff --git a/android/a2dp.c b/android/a2dp.c
+index 9087c62..581d094 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -150,11 +150,15 @@ static void signaling_connect_cb(GIOChannel *chan, GError *err,
+ 		return;
+ 	}
+ 
+-	g_io_channel_set_close_on_unref(chan, FALSE);
+ 	fd = g_io_channel_unix_get_fd(chan);
+ 
+ 	/* FIXME: Add proper version */
+ 	dev->session = avdtp_new(fd, imtu, omtu, 0x0100);
++	if (!dev->session) {
++		bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
++		return;
++	}
++
+ 	avdtp_add_disconnect_cb(dev->session, disconnect_cb, dev);
+ 
+ 	if (dev->io) {
+diff --git a/android/avdtp.c b/android/avdtp.c
+index 353316c..02ee920 100644
+--- a/android/avdtp.c
++++ b/android/avdtp.c
+@@ -2055,9 +2055,16 @@ struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
+ {
+ 	struct avdtp *session;
+ 	GIOCondition cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
++	int new_fd;
++
++	new_fd = dup(fd);
++	if (new_fd < 0) {
++		error("dup(): %s (%d)", strerror(errno), errno);
++		return NULL;
++	}
+ 
+ 	session = g_new0(struct avdtp, 1);
+-	session->io = g_io_channel_unix_new(fd);
++	session->io = g_io_channel_unix_new(new_fd);
+ 	session->version = version;
+ 	session->imtu = imtu;
+ 	session->omtu = omtu;
+-- 
+1.8.3.1
 
-Johan
