@@ -1,28 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH BlueZ] android/AVDTP: Duplicate fd passed to avdtp_new
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1387533387-6724-1-git-send-email-luiz.dentz@gmail.com>
-Date: Fri, 20 Dec 2013 05:16:26 -0800
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <6E8A8CD1-5CB6-4D65-9BD7-DF4CF23F274C@holtmann.org>
-References: <1387533387-6724-1-git-send-email-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android: Include btmon and l2test in userdebug builds
+Date: Fri, 20 Dec 2013 13:58:52 +0100
+Message-ID: <1835973.vvmJ6HyAvL@uw000953>
+In-Reply-To: <1387542919-16070-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1387542919-16070-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="ISO-8859-1"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Andrzej,
 
-> This use dup to create a new fd to be used by AVDTP session leaving the
-> caller free to close the original fd. Note that even if the caller
-> decides to keep the original fd it will still be notified when
-> avdtp_shutdown is called since it uses shutdown.
+> This patch changes btmon and l2test module tags from 'eng' to 'debug' so
+> they are automatically installed also for userdebug variant which is
+> default for AOSP devices.
+> 
+> ---
+>  android/Android.mk | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/android/Android.mk b/android/Android.mk
+> index 2865c08..d9bae40 100644
+> --- a/android/Android.mk
+> +++ b/android/Android.mk
+> @@ -200,7 +200,7 @@ LOCAL_C_INCLUDES += \
+>  LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
+>  
+>  LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
+> -LOCAL_MODULE_TAGS := eng
+> +LOCAL_MODULE_TAGS := debug
+>  LOCAL_MODULE := btmon
+>  
+>  include $(BUILD_EXECUTABLE)
+> @@ -247,7 +247,7 @@ LOCAL_C_INCLUDES := \
+>  LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
+>  
+>  LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
+> -LOCAL_MODULE_TAGS := eng
+> +LOCAL_MODULE_TAGS := debug
+>  LOCAL_MODULE := l2test
+>  
+>  include $(BUILD_EXECUTABLE)
+> 
 
-I would be more curious on why this is needed.
+Applied, thanks.
 
-Regards
-
-Marcel
-
+-- 
+BR
+Szymon Janc
