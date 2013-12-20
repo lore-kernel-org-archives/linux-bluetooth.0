@@ -1,62 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 20 Dec 2013 11:30:31 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: [PATCH] android/tester: Fix valgrind memory warnings
-Message-ID: <20131220093031.GA21086@x220.p-661hnu-f1>
+Date: Fri, 20 Dec 2013 10:12:57 +0100
+Message-ID: <2739769.kltLLfnETe@uw000953>
+In-Reply-To: <1387529782-26462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1387529782-26462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <2739769.kltLLfnETe@uw000953>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <2739769.kltLLfnETe@uw000953>
+Content-Type: text/plain; charset="ISO-8859-1"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Andrei,
 
-On Fri, Dec 20, 2013, Szymon Janc wrote:
-> > Free device structure allocated during open_bluetooth().
-> > ---
-> >  android/android-tester.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> > 
-> > diff --git a/android/android-tester.c b/android/android-tester.c
-> > index 7d7ed88..6007797 100644
-> > --- a/android/android-tester.c
-> > +++ b/android/android-tester.c
-> > @@ -109,6 +109,7 @@ struct test_data {
-> >  	const void *test_data;
-> >  	pid_t bluetoothd_pid;
-> >  
-> > +	hw_device_t *device;
-> >  	const bt_interface_t *if_bluetooth;
-> >  	const btsock_interface_t *if_sock;
-> >  
-> > @@ -838,6 +839,8 @@ static void setup(struct test_data *data)
-> >  		return;
-> >  	}
-> >  
-> > +	data->device = device;
-> > +
-> >  	data->if_bluetooth = ((bluetooth_device_t *)
-> >  					device)->get_bluetooth_interface();
-> >  	if (!data->if_bluetooth) {
-> > @@ -882,6 +885,9 @@ static void teardown(const void *test_data)
-> >  		data->if_bluetooth = NULL;
-> >  	}
-> >  
-> > +	if (data->device)
-> > +		free(data->device);
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> There is no need to check pointer before passing it to free().
+> Free device structure allocated during open_bluetooth().
+> ---
+>  android/android-tester.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/android/android-tester.c b/android/android-tester.c
+> index 7d7ed88..6007797 100644
+> --- a/android/android-tester.c
+> +++ b/android/android-tester.c
+> @@ -109,6 +109,7 @@ struct test_data {
+>  	const void *test_data;
+>  	pid_t bluetoothd_pid;
+>  
+> +	hw_device_t *device;
+>  	const bt_interface_t *if_bluetooth;
+>  	const btsock_interface_t *if_sock;
+>  
+> @@ -838,6 +839,8 @@ static void setup(struct test_data *data)
+>  		return;
+>  	}
+>  
+> +	data->device = device;
+> +
+>  	data->if_bluetooth = ((bluetooth_device_t *)
+>  					device)->get_bluetooth_interface();
+>  	if (!data->if_bluetooth) {
+> @@ -882,6 +885,9 @@ static void teardown(const void *test_data)
+>  		data->if_bluetooth = NULL;
+>  	}
+>  
+> +	if (data->device)
+> +		free(data->device);
 
-The bigger issue here is that the ->open() caller shouldn't know how the
-memory was allocated (or if it was allocated at all for that matter - it
-might just be a static variable).
+There is no need to check pointer before passing it to free().
 
-This is really a failure of the API since it doesn't provide a ->close()
-callback that could do the right thing.
+> +
+>  	if (data->bluetoothd_pid)
+>  		waitpid(data->bluetoothd_pid, NULL, 0);
+>  
+> 
 
-Johan
+-- 
+BR
+Szymon Janc
+
+
