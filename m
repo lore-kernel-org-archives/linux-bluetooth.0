@@ -1,41 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 20 Dec 2013 15:28:21 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/tester: Add remote device found success test case
-Message-ID: <20131220132821.GB1550@x220.p-661hnu-f1>
-References: <1387544266-3159-1-git-send-email-jakub.tyszkowski@tieto.com>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1387544266-3159-1-git-send-email-jakub.tyszkowski@tieto.com>
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH 4/5] android/hal-bluetooth: Add support for device service record property
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1387535140-6223-5-git-send-email-szymon.janc@tieto.com>
+Date: Fri, 20 Dec 2013 05:18:03 -0800
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <D18535D5-351D-4C61-9D7E-6486E8558859@holtmann.org>
+References: <1387535140-6223-1-git-send-email-szymon.janc@tieto.com> <1387535140-6223-5-git-send-email-szymon.janc@tieto.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Szymon,
 
-On Fri, Dec 20, 2013, Jakub Tyszkowski wrote:
-> Add checking for remote device being found.
-> 
+> This allows to correctly handle device service record property.
 > ---
->  android/android-tester.c | 102 ++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 100 insertions(+), 2 deletions(-)
+> android/hal-bluetooth.c | 15 +++++++++++++++
+> android/hal-msg.h       |  7 +++++++
+> 2 files changed, 22 insertions(+)
 > 
-> diff --git a/android/android-tester.c b/android/android-tester.c
-> index 3fbcb2f..9a5824c 100644
-> --- a/android/android-tester.c
-> +++ b/android/android-tester.c
-> @@ -70,7 +70,8 @@ enum hal_bluetooth_callbacks_id {
->  	ADAPTER_PROP_SERVICE_RECORD,
->  	ADAPTER_PROP_BONDED_DEVICES,
->  	ADAPTER_DISCOVERY_STATE_ON,
-> -	ADAPTER_DISCOVERY_STATE_OFF
-> +	ADAPTER_DISCOVERY_STATE_OFF,
-> +	REMOTE_DEVICE_FOUND
->  };
+> diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+> index d0c1c01..4ef2ebe 100644
+> --- a/android/hal-bluetooth.c
+> +++ b/android/hal-bluetooth.c
+> @@ -166,6 +166,21 @@ static void device_props_to_hal(bt_property_t *send_props,
+> 			break;
+> #endif
+> 		case HAL_PROP_DEVICE_SERVICE_REC:
+> +		{
+> +			static bt_service_record_t e;
 
-Just add the ',' even to the last entry so subsequent additions become
-more readable in patch form. I fixed this myself this time and applied
-the patch.
+why static here. Since we are essentially multi-threaded, this can be dangerous.
 
-Johan
+> +			const struct hal_prop_device_service_rec *p;
+> +
+> +			send_props[i].val = &e;
+> +			send_props[i].len = sizeof(e);
+> +
+> +			p = (struct hal_prop_device_service_rec *) prop->val;
+> +
+> +			memset(&e, 0, sizeof(e));
+> +			memcpy(&e.channel, &p->channel, sizeof(e.channel));
+> +			memcpy(e.uuid.uu, p->uuid, sizeof(e.uuid.uu));
+> +			memcpy(e.name, p->name, p->name_len);
+> +		}
+> +			break;
+> 		default:
+> 			send_props[i].len = prop->len;
+> 			send_props[i].val = prop->val;
+
+Regards
+
+Marcel
+
