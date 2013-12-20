@@ -1,32 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 2/3] android/android-tester: Remove not necessary bthost_set_server_psm
-Date: Fri, 20 Dec 2013 11:53:46 +0100
-Message-Id: <1387536827-1590-2-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1387536827-1590-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1387536827-1590-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv3 1/3] tools/l2cap-tester: Remove not necessary  bthost_set_server_psm
+Date: Fri, 20 Dec 2013 11:53:45 +0100
+Message-Id: <1387536827-1590-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Replace this function with bthost_add_l2cap_server().
+This function can be replaced with bthost_add_l2cap_server().
 ---
- android/android-tester.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/l2cap-tester.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index aa0c155..5e60397 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -1404,7 +1404,7 @@ static void test_socket_real_connect(const void *test_data)
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index a5028a3..d4a5041 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -731,7 +731,8 @@ static void test_connect(const void *test_data)
+ 		struct bthost *bthost = hciemu_client_get_host(data->hciemu);
  
- 	bdaddr2android((bdaddr_t *) client_bdaddr, &emu_bdaddr);
- 
--	bthost_set_server_psm(bthost, 0x0003);
-+	bthost_add_l2cap_server(bthost, 0x0003, NULL, NULL);
- 
- 	status = data->if_sock->connect(&emu_bdaddr, test->sock_type,
- 					test->service_uuid, test->channel,
+ 		if (!l2data->data_len)
+-			bthost_set_server_psm(bthost, l2data->server_psm);
++			bthost_add_l2cap_server(bthost, l2data->server_psm,
++						NULL, NULL);
+ 		else
+ 			bthost_add_l2cap_server(bthost, l2data->server_psm,
+ 						client_l2cap_connect_cb, data);
 -- 
 1.8.3.1
 
