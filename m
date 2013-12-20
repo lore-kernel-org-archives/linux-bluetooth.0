@@ -2,95 +2,82 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 3/4] android/bluetooth: Print error on unimplemented functions
-Date: Fri, 20 Dec 2013 19:30:09 +0100
-Message-Id: <1387564210-6102-3-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1387564210-6102-1-git-send-email-szymon.janc@tieto.com>
-References: <1387564210-6102-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 1/4] android/bluetooth: Add support for timestamp device property
+Date: Fri, 20 Dec 2013 19:30:07 +0100
+Message-Id: <1387564210-6102-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Functions or callbacks that are not implemented due to being bogus or
-not feasible now prints error messages instead of debugs.
+This allows to handle timestamp property request. Also this will be
+usefull for devices info cache (clearing old devices).
 ---
- android/bluetooth.c | 22 +++++++---------------
- 1 file changed, 7 insertions(+), 15 deletions(-)
+ android/bluetooth.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 59f0810..5598ad8 100644
+index e534fc1..2e75864 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -2059,9 +2059,7 @@ static uint8_t get_adapter_type(void)
+@@ -80,6 +80,8 @@ struct device {
+ 	uint32_t class;
+ 	int32_t rssi;
  
- static uint8_t get_adapter_service_rec(void)
- {
--	DBG("Not implemented");
--
--	/* TODO: Add implementation */
-+	error("get adapter BT_PROPERTY_SERVICE_RECORD not supported");
++	uint32_t timestamp;
++
+ 	GSList *uuids;
+ };
  
- 	return HAL_STATUS_FAILED;
- }
-@@ -2619,9 +2617,7 @@ static uint8_t get_device_type(struct device *dev)
+@@ -227,6 +229,8 @@ static void store_device_info(struct device *dev)
+ 	else
+ 		g_key_file_remove_key(key_file, addr, "Class", NULL);
  
- static uint8_t get_device_service_rec(struct device *dev)
- {
--	DBG("Not implemented");
--
--	/* TODO */
-+	error("get device BT_PROPERTY_SERVICE_RECORD not supported");
++	g_key_file_set_integer(key_file, addr, "Timestamp", dev->timestamp);
++
+ 	if (dev->uuids) {
+ 		GSList *l;
+ 		int i;
+@@ -291,6 +295,7 @@ static struct device *create_device(const bdaddr_t *bdaddr, uint8_t type)
+ 	bacpy(&dev->bdaddr, bdaddr);
+ 	dev->bdaddr_type = type;
+ 	dev->bond_state = HAL_BOND_STATE_NONE;
++	dev->timestamp = time(NULL);
  
- 	return HAL_STATUS_FAILED;
- }
-@@ -2650,9 +2646,7 @@ static uint8_t get_device_rssi(struct device *dev)
+ 	/* use address for name, will be change if one is present
+ 	 * eg. in EIR or set by set_property. */
+@@ -1004,6 +1009,8 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
  
- static uint8_t get_device_version_info(struct device *dev)
- {
--	DBG("Not implemented");
--
--	/* TODO */
-+	error("get device BT_PROPERTY_REMOTE_VERSION_INFO not supported");
- 
- 	return HAL_STATUS_FAILED;
- }
-@@ -2768,9 +2762,7 @@ static uint8_t set_device_friendly_name(struct device *dev, const uint8_t *val,
- 
- static uint8_t set_device_version_info(struct device *dev)
- {
--	DBG("Not implemented");
--
--	/* TODO */
-+	error("set device BT_PROPERTY_REMOTE_VERSION_INFO not supported");
- 
- 	return HAL_STATUS_FAILED;
- }
-@@ -2816,7 +2808,7 @@ failed:
- 
- static void handle_get_remote_service_rec_cmd(const void *buf, uint16_t len)
- {
--	/* TODO */
-+	error("get_remote_service_record not supported");
- 
- 	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_GET_REMOTE_SERVICE_REC,
- 							HAL_STATUS_FAILED);
-@@ -2914,7 +2906,7 @@ static void handle_dut_mode_send_cmd(const void *buf, uint16_t len)
- 		return;
+ 		ev->status = HAL_STATUS_SUCCESS;
+ 		bdaddr2android(bdaddr, ev->bdaddr);
++
++		dev->timestamp = time(NULL);
  	}
  
--	DBG("opcode %u", cmd->opcode);
-+	error("dut_mode_send not supported");
+ 	if (eir.class) {
+@@ -1607,6 +1614,9 @@ static void create_device_from_info(GKeyFile *key_file, const char *peer)
  
- 	/* TODO */
+ 	dev->class = g_key_file_get_integer(key_file, peer, "Class", NULL);
  
-@@ -2932,7 +2924,7 @@ static void handle_le_test_mode_cmd(const void *buf, uint16_t len)
- 		return;
- 	}
++	dev->timestamp = g_key_file_get_integer(key_file, peer, "Timestamp",
++									NULL);
++
+ 	uuids = g_key_file_get_string_list(key_file, peer, "Services", NULL,
+ 									NULL);
+ 	if (uuids) {
+@@ -2647,11 +2657,10 @@ static uint8_t get_device_version_info(struct device *dev)
  
--	DBG("opcode %u", cmd->opcode);
-+	error("le_test_mode not supported");
+ static uint8_t get_device_timestamp(struct device *dev)
+ {
+-	DBG("Not implemented");
+-
+-	/* TODO */
++	send_device_property(&dev->bdaddr, HAL_PROP_DEVICE_TIMESTAMP,
++				sizeof(dev->timestamp), &dev->timestamp);
  
- 	/* TODO */
+-	return HAL_STATUS_FAILED;
++	return HAL_STATUS_SUCCESS;
+ }
  
+ static void handle_get_remote_device_props_cmd(const void *buf, uint16_t len)
 -- 
 1.8.3.2
 
