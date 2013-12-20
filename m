@@ -1,49 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 3/3] emulator/bthost: Remove not used bthost_set_server_psm
-Date: Fri, 20 Dec 2013 11:53:47 +0100
-Message-Id: <1387536827-1590-3-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv3 2/3] android/android-tester: Remove not necessary bthost_set_server_psm
+Date: Fri, 20 Dec 2013 11:53:46 +0100
+Message-Id: <1387536827-1590-2-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1387536827-1590-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1387536827-1590-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This function is not needed and has been replaced with bthost_add_l2cap_server.
+Replace this function with bthost_add_l2cap_server().
 ---
- emulator/bthost.c | 5 -----
- emulator/bthost.h | 2 --
- 2 files changed, 7 deletions(-)
+ android/android-tester.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 8e62d26..c627f8a 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -1304,11 +1304,6 @@ void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
- 	bthost->new_l2cap_conn_data = data;
- }
+diff --git a/android/android-tester.c b/android/android-tester.c
+index aa0c155..5e60397 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -1404,7 +1404,7 @@ static void test_socket_real_connect(const void *test_data)
  
--void bthost_set_server_psm(struct bthost *bthost, uint16_t psm)
--{
--	bthost_add_l2cap_server(bthost, psm, NULL, NULL);
--}
--
- void bthost_start(struct bthost *bthost)
- {
- 	if (!bthost)
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index 2b8f212..97f011b 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -77,8 +77,6 @@ void bthost_le_start_encrypt(struct bthost *bthost, uint16_t handle,
- typedef void (*bthost_l2cap_connect_cb) (uint16_t handle, uint16_t cid,
- 							void *user_data);
+ 	bdaddr2android((bdaddr_t *) client_bdaddr, &emu_bdaddr);
  
--void bthost_set_server_psm(struct bthost *bthost, uint16_t psm);
--
- void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
- 				bthost_l2cap_connect_cb func, void *user_data);
+-	bthost_set_server_psm(bthost, 0x0003);
++	bthost_add_l2cap_server(bthost, 0x0003, NULL, NULL);
  
+ 	status = data->if_sock->connect(&emu_bdaddr, test->sock_type,
+ 					test->service_uuid, test->channel,
 -- 
 1.8.3.1
 
