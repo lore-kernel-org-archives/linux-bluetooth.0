@@ -1,50 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/tester: Fix valgrind memory warnings
-Date: Fri, 20 Dec 2013 10:56:22 +0200
-Message-Id: <1387529782-26462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 20 Dec 2013 09:44:28 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 6/6] emulator: Remove not necessary
+ bthost_set_server_psm
+Message-ID: <20131220074428.GC18981@x220.p-661hnu-f1>
+References: <1387463345-26406-1-git-send-email-marcin.kraglak@tieto.com>
+ <1387463345-26406-6-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1387463345-26406-6-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Marcin,
 
-Free device structure allocated during open_bluetooth().
----
- android/android-tester.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+On Thu, Dec 19, 2013, Marcin Kraglak wrote:
+> Remove not necessary function and replace all uses with new one,
+> bthost_add_l2cap_server().
+> ---
+>  android/android-tester.c | 2 +-
+>  emulator/bthost.c        | 5 -----
+>  emulator/bthost.h        | 2 --
+>  tools/l2cap-tester.c     | 3 ++-
+>  4 files changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index 7d7ed88..6007797 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -109,6 +109,7 @@ struct test_data {
- 	const void *test_data;
- 	pid_t bluetoothd_pid;
- 
-+	hw_device_t *device;
- 	const bt_interface_t *if_bluetooth;
- 	const btsock_interface_t *if_sock;
- 
-@@ -838,6 +839,8 @@ static void setup(struct test_data *data)
- 		return;
- 	}
- 
-+	data->device = device;
-+
- 	data->if_bluetooth = ((bluetooth_device_t *)
- 					device)->get_bluetooth_interface();
- 	if (!data->if_bluetooth) {
-@@ -882,6 +885,9 @@ static void teardown(const void *test_data)
- 		data->if_bluetooth = NULL;
- 	}
- 
-+	if (data->device)
-+		free(data->device);
-+
- 	if (data->bluetoothd_pid)
- 		waitpid(data->bluetoothd_pid, NULL, 0);
- 
--- 
-1.8.3.2
+Correction to my previous "all patches applied email": this patch hasn't
+been applied. Please split it into three separate ones. Two patches to
+convert the last users in l2cap-tester and android-tester and a third
+patch to remove the old function.
 
+Johan
