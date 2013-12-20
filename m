@@ -1,63 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] tools/l2cap-tester: Fix memory leak
-Date: Fri, 20 Dec 2013 10:10:33 +0100
-Message-Id: <1387530633-28837-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH] android/tester: Fix valgrind memory warnings
+Date: Fri, 20 Dec 2013 11:00:35 +0200
+Message-Id: <1387530035-26542-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1387529782-26462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1387529782-26462-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Set close_on_unref on new created GIOChannel and don't close
-its file descriptor.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-126 (120 direct, 6 indirect) bytes in 1 blocks aredefinitely
-	lost in loss record 24 of 28
-at 0x4A06409: malloc (in/usr/lib64/valgrind/vgpreload_memcheck
-	-amd64-linux.so)
-by 0x3C9564D88E: g_malloc (in /usr/lib64/libglib-2.0.so.0.3600.3)
-by 0x3C956881F4: g_io_channel_unix_new (in/usr/lib64/libglib-
-	2.0.so.0.3600.3)
-by 0x402A5A: l2cap_listen_cb (l2cap-tester.c:774)
-by 0x3C95647DF5: g_main_context_dispatch (in/usr/lib64/
-	libglib-2.0.so.0.3600.3)
-by 0x3C95648147: ??? (in /usr/lib64/libglib-2.0.so.0.3600.3)
-by 0x3C95648549: g_main_loop_run
-	(in/usr/lib64/libglib-2.0.so.0.3600.3)
-by 0x40A67C: tester_run (tester.c:784)
-by 0x4026A9: main (l2cap-tester.c:991)
+Free device structure allocated during open_bluetooth().
+
+==26231== 80 bytes in 1 blocks are definitely lost in loss record 25 of
+31
+==26231==    at 0x4C2A2DB: malloc (in
+/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==26231==    by 0x40F153: open_bluetooth (hal-bluetooth.c:800)
+==26231==    by 0x40C8D8: setup (android-tester.c:835)
+==26231==    by 0x40CB20: setup_socket_interface_enabled
+(android-tester.c:1166)
+==26231==    by 0x409C15: setup_callback (tester.c:373)
+==26231==    by 0x4E7C3B5: g_main_context_dispatch (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
+==26231==    by 0x4E7C707: ??? (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
+==26231==    by 0x4E7CB09: g_main_loop_run (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
+==26231==    by 0x40A83C: tester_run (tester.c:784)
+==26231==    by 0x40362A: main (android-tester.c:1643)
 ---
- tools/l2cap-tester.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ android/android-tester.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index 7c50f26..e4ebe7b 100644
---- a/tools/l2cap-tester.c
-+++ b/tools/l2cap-tester.c
-@@ -544,8 +544,6 @@ static gboolean server_received_data(GIOChannel *io, GIOCondition cond,
- 	else
- 		tester_test_passed();
+diff --git a/android/android-tester.c b/android/android-tester.c
+index 7d7ed88..6007797 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -109,6 +109,7 @@ struct test_data {
+ 	const void *test_data;
+ 	pid_t bluetoothd_pid;
  
--	close(sk);
--
- 	return FALSE;
- }
++	hw_device_t *device;
+ 	const bt_interface_t *if_bluetooth;
+ 	const btsock_interface_t *if_sock;
  
-@@ -785,12 +783,15 @@ static gboolean l2cap_listen_cb(GIOChannel *io, GIOCondition cond,
- 		GIOChannel *new_io;
+@@ -838,6 +839,8 @@ static void setup(struct test_data *data)
+ 		return;
+ 	}
  
- 		new_io = g_io_channel_unix_new(new_sk);
-+		g_io_channel_set_close_on_unref(new_io, TRUE);
- 
- 		bthost = hciemu_client_get_host(data->hciemu);
- 		g_io_add_watch(new_io, G_IO_IN, server_received_data, NULL);
- 		bthost_send_cid(bthost, data->handle, data->dcid,
- 					l2data->read_data, l2data->data_len);
- 
-+		g_io_channel_unref(new_io);
++	data->device = device;
 +
- 		return FALSE;
- 	} else if (l2data->write_data) {
- 		struct bthost *bthost;
+ 	data->if_bluetooth = ((bluetooth_device_t *)
+ 					device)->get_bluetooth_interface();
+ 	if (!data->if_bluetooth) {
+@@ -882,6 +885,9 @@ static void teardown(const void *test_data)
+ 		data->if_bluetooth = NULL;
+ 	}
+ 
++	if (data->device)
++		free(data->device);
++
+ 	if (data->bluetoothd_pid)
+ 		waitpid(data->bluetoothd_pid, NULL, 0);
+ 
 -- 
-1.8.3.1
+1.8.3.2
 
