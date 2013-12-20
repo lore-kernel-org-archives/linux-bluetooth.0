@@ -1,53 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1387535140-6223-4-git-send-email-szymon.janc@tieto.com>
-References: <1387535140-6223-1-git-send-email-szymon.janc@tieto.com>
-	<1387535140-6223-4-git-send-email-szymon.janc@tieto.com>
-Date: Fri, 20 Dec 2013 08:07:19 -0400
-Message-ID: <CAJdJm_NKdhrpie3x+6rndGhn5otJSdR+2AnRjid3yG3H=Xqf_Q@mail.gmail.com>
-Subject: Re: [PATCH 3/5] android/hal-bluetooth: Add support for remote version
- info property
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] android/tester: Fix memory leak using close()
+Date: Fri, 20 Dec 2013 14:03:15 +0200
+Message-Id: <1387540995-1509-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1387540995-1509-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1387540995-1509-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Fri, Dec 20, 2013 at 6:25 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> +#if PLATFORM_SDK_VERSION > 17
->                 case HAL_PROP_DEVICE_VERSION_INFO:
-> +               {
-> +                       static bt_remote_version_t e;
-> +                       const struct hal_prop_device_info *p;
-> +                       uint16_t tmp;
-> +
-> +                       send_props[i].val = &e;
-> +                       send_props[i].len = sizeof(e);
-> +
-> +                       p = (struct hal_prop_device_info *) prop->val;
-> +
-> +                       memcpy(&tmp, &p->manufacturer, sizeof(tmp));
-> +                       e.manufacturer = tmp;
-> +                       memcpy(&tmp, &p->sub_version, sizeof(tmp));
-> +                       e.sub_ver = tmp;
-> +                       e.version = p->version;
+Use device->close() to free device structure. This is the way other
+Android devices are closed. Fixes following warnings:
 
-I fail to see why you need the "tmp" variable above (p->manufacturer
-and p->sub_version are both uint16_t according to hal-msg.h).
+...
+==26231== 80 bytes in 1 blocks are definitely lost in loss record 25 of
+31
+==26231==    at 0x4C2A2DB: malloc (in
+/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==26231==    by 0x40F153: open_bluetooth (hal-bluetooth.c:800)
+==26231==    by 0x40C8D8: setup (android-tester.c:835)
+==26231==    by 0x40CB20: setup_socket_interface_enabled
+(android-tester.c:1166)
+==26231==    by 0x409C15: setup_callback (tester.c:373)
+==26231==    by 0x4E7C3B5: g_main_context_dispatch (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
+==26231==    by 0x4E7C707: ??? (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
+==26231==    by 0x4E7CB09: g_main_loop_run (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
+==26231==    by 0x40A83C: tester_run (tester.c:784)
+==26231==    by 0x40362A: main (android-tester.c:1643)
+...
+---
+ android/android-tester.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-> +               }
-> +                       break;
-> +#endif
-> +               case HAL_PROP_DEVICE_SERVICE_REC:
->                 default:
->                         send_props[i].len = prop->len;
->                         send_props[i].val = prop->val;
-
-Best Regards,
+diff --git a/android/android-tester.c b/android/android-tester.c
+index fa65416..688e33c 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -109,6 +109,7 @@ struct test_data {
+ 	const void *test_data;
+ 	pid_t bluetoothd_pid;
+ 
++	struct hw_device_t *device;
+ 	const bt_interface_t *if_bluetooth;
+ 	const btsock_interface_t *if_sock;
+ 
+@@ -838,6 +839,8 @@ static void setup(struct test_data *data)
+ 		return;
+ 	}
+ 
++	data->device = device;
++
+ 	data->if_bluetooth = ((bluetooth_device_t *)
+ 					device)->get_bluetooth_interface();
+ 	if (!data->if_bluetooth) {
+@@ -882,6 +885,8 @@ static void teardown(const void *test_data)
+ 		data->if_bluetooth = NULL;
+ 	}
+ 
++	data->device->close(data->device);
++
+ 	if (data->bluetoothd_pid)
+ 		waitpid(data->bluetoothd_pid, NULL, 0);
+ 
 -- 
-Anderson Lizardo
-Instituto Nokia de Tecnologia - INdT
-Manaus - Brazil
+1.8.3.2
+
