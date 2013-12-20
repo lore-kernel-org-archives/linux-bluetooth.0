@@ -1,66 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 BlueZ] android/AVDTP: Duplicate fd passed to avdtp_new
-Date: Fri, 20 Dec 2013 12:59:26 +0200
-Message-Id: <1387537166-7703-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 20 Dec 2013 12:58:48 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/5] android: Update HAL to Android 4.4 API
+Message-ID: <20131220105848.GA26227@x220.p-661hnu-f1>
+References: <1387535140-6223-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1387535140-6223-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Szymon,
 
-This use dup to create a new fd to be used by AVDTP session leaving the
-caller free to close the original fd. Note that even if the caller
-decides to keep the original fd it will still be notified when
-avdtp_shutdown is called since it uses shutdown.
----
- android/a2dp.c  | 6 +++++-
- android/avdtp.c | 9 ++++++++-
- 2 files changed, 13 insertions(+), 2 deletions(-)
+On Fri, Dec 20, 2013, Szymon Janc wrote:
+> It is important to fully implement bt_interface_t (at least with stubs/NULLs)
+> since Android is not checking size field from HAL and just assume memory
+> layout of BT HAL. This was causing crashes on 4.4 due to Android trying
+> to call not existing methods.
+> 
+> BT snoop logs enabling function is a bit special since it will be implemented
+> only in HAL so no need to extend IPC with that (plan is to have dedicated
+> service that will dump HCI traffic).
+> 
+> For now 4.2+ API is if-deffed in HAL library - this will be removed when
+> minimal Android version required will be dropped.
+> 
+> -- 
+> BR
+> Szymon Janc
+> 
+> Szymon Janc (5):
+>   android/hal-bluetooth: Add support for sending LE_TEST_MODE command
+>   android/hal-bluetooth: Add support for enabling HCI snoop dump
+>   android/hal-bluetooth: Add support for remote version info property
+>   android/hal-bluetooth: Add support for device service record property
+>   android/bluetooth: Add stubs for missing commands
+> 
+>  android/bluetooth.c         |  56 ++++++++++++++++++++++++
+>  android/cutils/properties.h |   1 +
+>  android/hal-bluetooth.c     | 104 +++++++++++++++++++++++++++++++++++++++++++-
+>  android/hal-msg.h           |  13 ++++++
+>  4 files changed, 172 insertions(+), 2 deletions(-)
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index 9087c62..581d094 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -150,11 +150,15 @@ static void signaling_connect_cb(GIOChannel *chan, GError *err,
- 		return;
- 	}
- 
--	g_io_channel_set_close_on_unref(chan, FALSE);
- 	fd = g_io_channel_unix_get_fd(chan);
- 
- 	/* FIXME: Add proper version */
- 	dev->session = avdtp_new(fd, imtu, omtu, 0x0100);
-+	if (!dev->session) {
-+		bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
-+		return;
-+	}
-+
- 	avdtp_add_disconnect_cb(dev->session, disconnect_cb, dev);
- 
- 	if (dev->io) {
-diff --git a/android/avdtp.c b/android/avdtp.c
-index 353316c..02ee920 100644
---- a/android/avdtp.c
-+++ b/android/avdtp.c
-@@ -2055,9 +2055,16 @@ struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
- {
- 	struct avdtp *session;
- 	GIOCondition cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
-+	int new_fd;
-+
-+	new_fd = dup(fd);
-+	if (new_fd < 0) {
-+		error("dup(): %s (%d)", strerror(errno), errno);
-+		return NULL;
-+	}
- 
- 	session = g_new0(struct avdtp, 1);
--	session->io = g_io_channel_unix_new(fd);
-+	session->io = g_io_channel_unix_new(new_fd);
- 	session->version = version;
- 	session->imtu = imtu;
- 	session->omtu = omtu;
--- 
-1.8.3.1
+All patches in this set have been applied. Thanks.
 
+Johan
