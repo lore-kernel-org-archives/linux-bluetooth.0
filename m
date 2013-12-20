@@ -1,82 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/tester: Fix memory leak
-Date: Fri, 20 Dec 2013 14:35:35 +0200
-Message-Id: <1387542935-15736-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 20 Dec 2013 13:30:01 +0100
+From: Stevie Trujillo <stevie.trujillo@gmail.com>
+To: Michal Labedzki <michal.labedzki@tieto.com>
+Cc: Hui Wang <hui.wang@canonical.com>, Marcel Holtmann
+ <marcel@holtmann.org>, tedd.an@intel.com, "linux-bluetooth@vger.kernel.org
+ development" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Intel 7260 bluetooth malfunction when it is connected to EHCI
+ bus
+Message-ID: <20131220133001.36d5e7aa@localhost>
+In-Reply-To: <CALkxMhFBoJO+_1PRQhS-a9g8qQW_Vc+7Ss6HG6P8i0DDoeZYmw@mail.gmail.com>
+References: <526F8804.9060906@canonical.com>
+	<A07820C9-C272-4AD4-AE16-49F81956C2D7@holtmann.org>
+	<52707428.9070908@canonical.com>
+	<6091DDC7-7B00-4457-82A0-F8CC9B4EE9DD@holtmann.org>
+	<5271EAA2.1030705@canonical.com>
+	<D0B840E3-36C4-4751-A757-1ADDAC0707B9@holtmann.org>
+	<5273147E.4040004@canonical.com>
+	<C3BBD7E9-6D91-430E-96DF-2D4885F89DCC@holtmann.org>
+	<527371D4.1010305@canonical.com>
+	<9DFD9618-158E-41C4-8183-134A3FC4E61F@holtmann.org>
+	<527737C7.40208@canonical.com>
+	<20131104141539.772e1636@localhost>
+	<527858A5.2080801@canonical.com>
+	<20131105194431.54fba8fb@localhost>
+	<527B0CF1.7010703@canonical.com>
+	<20131107110719.445e8e6f@localhost>
+	<527C41C5.8070209@canonical.com>
+	<CALkxMhEzw+mL5UtF=gZ8MQrWRM_2WEQQeq6jR1hvYiSZ=Mfi3g@mail.gmail.com>
+	<CALkxMhFBoJO+_1PRQhS-a9g8qQW_Vc+7Ss6HG6P8i0DDoeZYmw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Tue, 26 Nov 2013 10:11:47 +0100
+Michal Labedzki <michal.labedzki@tieto.com> wrote:
 
-Call del_hook() after add_hook(). This fixes valgrind warnings:
+> Bug is now fixed in "svn path=/trunk/; revision=53525". You can wait
+> for next development (1.11.3) or stable (1.12), however you can build
+> Wireshark from sources (should be easy - like BlueZ: git clone
+> http://code.wireshark.org/git/wireshark; ./autogen; ./configure; make;
+> ./wireshark) or via "private" sources like:
+> $ sudo add-apt-repository ppa:dreibh/ppa
+> $ sudo apt-get update
+> $ sudo apt-get install wireshark
 
-...
-==15303==
-==15303== HEAP SUMMARY:
-==15303==     in use at exit: 3,060 bytes in 27 blocks
-==15303==   total heap usage: 6,410 allocs, 6,383 frees, 332,477 bytes
-allocated
-==15303==
-==15303== 24 bytes in 1 blocks are definitely lost in loss record 9 of
-27
-==15303==    at 0x4C2A2DB: malloc (in
-/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==15303==    by 0x406E20: btdev_add_hook (btdev.c:2166)
-==15303==    by 0x40BFC2: test_discovery_start_done
-(android-tester.c:1401)
-==15303==    by 0x409C65: run_callback (tester.c:385)
-==15303==    by 0x4E7C3B5: g_main_context_dispatch (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
-==15303==    by 0x4E7C707: ??? (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
-==15303==    by 0x4E7CB09: g_main_loop_run (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
-==15303==    by 0x40A85C: tester_run (tester.c:784)
-==15303==    by 0x40368B: main (android-tester.c:1654)
-==15303==
-==15303== 24 bytes in 1 blocks are definitely lost in loss record 10 of
-27
-==15303==    at 0x4C2A2DB: malloc (in
-/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==15303==    by 0x406E20: btdev_add_hook (btdev.c:2166)
-==15303==    by 0x40BF12: test_discovery_stop_success
-(android-tester.c:1386)
-==15303==    by 0x409C65: run_callback (tester.c:385)
-==15303==    by 0x4E7C3B5: g_main_context_dispatch (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
-==15303==    by 0x4E7C707: ??? (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
-==15303==    by 0x4E7CB09: g_main_loop_run (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
-==15303==    by 0x40A85C: tester_run (tester.c:784)
-==15303==    by 0x40368B: main (android-tester.c:1654)
-==15303==
-...
----
- android/android-tester.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/android/android-tester.c b/android/android-tester.c
-index 688e33c..1ed6586 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -1368,9 +1368,14 @@ static void test_discovery_stop_done(const void *test_data)
- 	check_expected_status(status);
- }
- 
--static bool pre_inq_compl_hook(const void *data, uint16_t len, void *user_data)
-+static bool pre_inq_compl_hook(const void *dummy, uint16_t len, void *user_data)
- {
-+	struct test_data *data = tester_get_data();
-+
- 	/* Make sure Inquiry Command Complete is not called */
-+
-+	hciemu_del_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT, BT_HCI_CMD_INQUIRY);
-+
- 	return false;
- }
- 
--- 
-1.8.3.2
-
+Thank you! I was busy failing exams and I didn't get to filing the
+bug report.
+I will try it out after xmas. I bought an $1 Bluetooth USB which seems
+to do SCO fine, but it usually dies after a few minutes (with
+Bluetooth: hci0 command {0x1009,0x0419,etc} tx timeout).
+I took a quick look in wireshark, comparing this USB thing vs Intel,
+it seems like they set up SCO in a different way. I think the USB stick
+might be Bluetooth 2.0 (despite the decription saying Bluetooth 2.1).
