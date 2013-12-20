@@ -1,47 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v5 00/14] LE auto connection and connection parameters
-Date: Fri, 20 Dec 2013 08:57:41 -0300
-Message-Id: <1387540675-2466-1-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1387535140-6223-2-git-send-email-szymon.janc@tieto.com>
+References: <1387535140-6223-1-git-send-email-szymon.janc@tieto.com>
+	<1387535140-6223-2-git-send-email-szymon.janc@tieto.com>
+Date: Fri, 20 Dec 2013 07:57:21 -0400
+Message-ID: <CAJdJm_NTARex2tKHsobLJFPJ0=BhL9u6PFJQJR=Hs4F+ZpOjhQ@mail.gmail.com>
+Subject: Re: [PATCH 1/5] android/hal-bluetooth: Add support for sending
+ LE_TEST_MODE command
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Szymon,
 
-This patch set is pretty much the same of previous one, except it implements
-a different approach to handle discovery and LE connection (as discussed on
-"[RFC v4 05/12] Bluetooth: Stop scanning on LE connection").
+On Fri, Dec 20, 2013 at 6:25 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> +#if PLATFORM_SDK_VERSION > 17
+> +static int le_test_mode(uint16_t opcode, uint8_t *buf, uint8_t len)
+> +{
+> +       uint8_t cmd_buf[sizeof(struct hal_cmd_dut_mode_send) + len];
+> +       struct hal_cmd_le_test_mode *cmd = (void *) cmd_buf;
 
-Regards,
+You are using two different structs above (which happen to have the
+same fields).
 
-Andre
+> +
+> +       DBG("opcode %u len %u", opcode, len);
+> +
+> +       if (!interface_ready())
+> +               return BT_STATUS_NOT_READY;
+> +
+> +       cmd->opcode = opcode;
+> +       cmd->len = len;
+> +       memcpy(cmd->data, buf, cmd->len);
+> +
+> +       return hal_ipc_cmd(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_LE_TEST_MODE,
+> +                                       sizeof(cmd_buf), cmd, 0, NULL, NULL);
 
+Just to be consistent above, I would use "..., sizeof(cmd_buf),
+cmd_buf, ...", although I noticed other similar code already upstream.
 
-Andre Guedes (14):
-  Bluetooth: Save connection interval parameters in hci_conn
-  Bluetooth: Group list_head fields from strcut hci_dev together
-  Bluetooth: Introduce connection parameters list
-  Bluetooth: Use connection parameters if any
-  Bluetooth: Introduce fail_conn_attempt() helper
-  Bluetooth: Stop scanning on LE connection
-  Bluetooth: Remove unused function
-  Bluetooth: Introduce hdev->pend_le_conn list
-  Bluetooth: Introduce LE auto connection infrastructure
-  Bluetooth: Re-enable background scan in case of error
-  Bluetooth: Temporarily stop background scanning on discovery
-  Bluetooth: Auto connection and power on
-  Bleutooth: Add support for auto connect options
-  Bluetooth: Add le_auto_conn file on debugfs
-
- include/net/bluetooth/hci.h      |   1 +
- include/net/bluetooth/hci_core.h |  43 +++++-
- net/bluetooth/hci_conn.c         | 111 +++++++++++---
- net/bluetooth/hci_core.c         | 318 +++++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_event.c        |  60 ++++++++
- net/bluetooth/mgmt.c             |  25 ++-
- 6 files changed, 530 insertions(+), 28 deletions(-)
-
+Best Regards,
 -- 
-1.8.5.1
-
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
