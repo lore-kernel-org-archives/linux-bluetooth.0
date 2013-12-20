@@ -1,204 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Fri, 20 Dec 2013 16:43:17 +0100
-Message-ID: <CAPk--xzV9n5-RnAhPhbM2hCnftvJxeCm9E0Wgkj+zzdqNqseVQ@mail.gmail.com>
-Subject: Unable to use Sony Dualshock 4 game controller
-From: Christopher Rosell <chrippa@gmail.com>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <F4C8A536-4F92-42DF-8492-B81330118461@holtmann.org>
+References: <1387533387-6724-1-git-send-email-luiz.dentz@gmail.com>
+	<6E8A8CD1-5CB6-4D65-9BD7-DF4CF23F274C@holtmann.org>
+	<CABBYNZKcsaSSEXLV+gQuxXMzu8ePCyiyU5cJcNQ8rTjzsP-PUg@mail.gmail.com>
+	<68A01E8B-5BF3-41AD-AF79-0DF619566069@holtmann.org>
+	<CABBYNZLm6kvHuNJsCwN57CQraWs8pgmQviWP2_LySH2c=284Lg@mail.gmail.com>
+	<F4C8A536-4F92-42DF-8492-B81330118461@holtmann.org>
+Date: Fri, 20 Dec 2013 17:40:46 +0200
+Message-ID: <CABBYNZKWzxUd1_Pi86jx2fxLR9PjctVuMGTYiSGz2uiCEFy3WA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] android/AVDTP: Duplicate fd passed to avdtp_new
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello there,
+Hi Marcel,
 
-I'm attempting to use a Sony Dualshock 4 game controller with bluez,
-but have run into some problems. I'm running Linux kernel 3.12.4 on
-Arch Linux with bluez 5.12.
+On Fri, Dec 20, 2013 at 4:39 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Luiz,
+>
+>>>>>> This use dup to create a new fd to be used by AVDTP session leaving =
+the
+>>>>>> caller free to close the original fd. Note that even if the caller
+>>>>>> decides to keep the original fd it will still be notified when
+>>>>>> avdtp_shutdown is called since it uses shutdown.
+>>>>>
+>>>>> I would be more curious on why this is needed.
+>>>>
+>>>> It is basically to make the caller able to release any resources, such
+>>>> as GIOChannel managed by btio, without causing a disconnect.
+>>>
+>>> you do not have to set close_on_unref with the GIOChannel. You can just=
+ unset that one. Then GIOChannel will not touch it and will not call close =
+on it.
+>>
+>> That is what we used to do, but it is not very convenient since there
+>> it is still possible to call g_io_channel_shutdown which would cause a
+>> disconnect. Also dup turn out to be handful to check if the fd is
+>> valid and free the user to do whatever it pleases with the original
+>> fd, in the end what we are doing with the fd is very similar to what
+>> we would do to a GIOChannel as dup just creates another reference the
+>> underline socket is the same.
+>
+> if the original caller calls g_io_channel_shutdown it will still cause a =
+disconnect. No matter if you duped the fd or not. Not getting your point. I=
+f the caller is doing something stupid, then you have a problem not matter =
+what.
 
-The DS4 is a standard bluetooth device, unlike the DS3 and I was able
-to pair and use it without any problems in Windows 7, but in Linux I
-have not been able to get it working correctly. The controller can be
-started in two modes, a pairing mode by pressing the buttons Share and
-PS at the same time and a normal mode by pressing the PS button only.
+Nope, g_io_channel_shutdown does not call shutdown, it only does close
+and therefore do not affect in case of duped fd. The point is
+convenience, having same code path regardless if the fd has been hand
+over or not.
 
-The pairing appears to work correctly but once it connects I get these
-errors and then the connection is dropped:
+> This duped fd is different from everything else we have in src/shared/ in=
+ any of the projects. You hand over the fd and then it is owned by that par=
+t. After that you are not suppose to touch it anymore. That is the semantic=
+ that I want. And not another complicated concept of reference counting fd =
+in multiple levels of the code.
 
-Dec 20 16:08:01 locutus bluetoothd[17163]: Refusing input device
-connect: No such file or directory (2)
-Dec 20 16:08:01 locutus bluetoothd[17163]: Refusing connection from
-A4:15:66:73:03:F3: unknown device
-Dec 20 16:08:01 locutus bluetoothd[17163]: A4:15:66:73:03:F3: error
-updating services: Input/output error (5)
+Well I don't think we had defined any semantic for fd ownership,
+mgmt_new is the only one that actually have such a thing but it does
+not work with GIOChannel/btio handling the connection setup, and if
+you look at other examples like libdbus it does make use of dup when
+passing fds around (and no this is not necessary with SCM_RIGTHS since
+the kernel does take a reference while transferring the fd to another
+process).
 
+We could perhaps do the close_on_unref function similar to the mgmt,
+which perhaps was inspired in the GIOChannel that also take ownership
+and thus requires close_on_unref helper function to instrument how it
+should deal with the fd, imo dup is probably less code since you can
+always close on unref.
 
-I used bluetoothctl to do the pairing, here is the log:
-
-[root@locutus chrippa]# bluetoothctl -a
-[NEW] Controller 00:26:83:30:B7:CB locutus [default]
-Agent registered
-[bluetooth]# power on
-Changing power on succeeded
-[bluetooth]# scan on
-Discovery started
-[CHG] Controller 00:26:83:30:B7:CB Discovering: yes
-[NEW] Device 00:3C:7F:F0:F0:0A 00-3C-7F-F0-F0-0A
-[NEW] Device A4:15:66:73:03:F3 Wireless Controller
-[bluetooth]# pair A4:15:66:73:03:F3
-Attempting to pair with A4:15:66:73:03:F3
-[CHG] Device A4:15:66:73:03:F3 Connected: yes
-[CHG] Device A4:15:66:73:03:F3 Paired: yes
-Pairing successful
-[CHG] Device A4:15:66:73:03:F3 Connected: no
-
-
-Later, when attempting to start the controller in normal mode, I get
-the first two errors only:
-
-Dec 20 16:19:00 locutus bluetoothd[17163]: Refusing input device
-connect: No such file or directory (2)
-Dec 20 16:19:00 locutus bluetoothd[17163]: Refusing connection from
-A4:15:66:73:03:F3: unknown device
-
-
-
-Here is also the full debug log:
-
-
-Dec 20 16:31:36 locutus bluetoothd[24893]: src/agent.c:agent_ref()
-0x1d987a0: ref=1
-Dec 20 16:31:36 locutus bluetoothd[24893]:
-src/agent.c:register_agent() agent :1.33
-Dec 20 16:31:39 locutus bluetoothd[24893]:
-src/adapter.c:property_set_mode() sending Set Powered command for
-index 0
-Dec 20 16:31:40 locutus bluetoothd[24893]:
-src/adapter.c:dev_class_changed_callback() Class: 0x0c0104
-Dec 20 16:31:40 locutus bluetoothd[24893]:
-src/attrib-server.c:attrib_db_update() handle=0x0008
-Dec 20 16:31:40 locutus bluetoothd[24893]:
-src/adapter.c:property_set_mode_complete() Success (0x00)
-Dec 20 16:31:40 locutus bluetoothd[24893]:
-src/adapter.c:new_settings_callback() Settings: 0x000000d3
-Dec 20 16:31:40 locutus bluetoothd[24893]:
-src/adapter.c:settings_changed() Changed settings: 0x00000001
-Dec 20 16:31:40 locutus bluetoothd[24893]:
-src/adapter.c:adapter_start() adapter /org/bluez/hci0 has been enabled
-Dec 20 16:31:53 locutus bluetoothd[24893]:
-src/adapter.c:start_discovery() sender :1.33
-Dec 20 16:31:53 locutus bluetoothd[24893]:
-src/adapter.c:trigger_start_discovery()
-Dec 20 16:31:53 locutus bluetoothd[24893]:
-src/adapter.c:start_discovery_timeout()
-Dec 20 16:31:53 locutus bluetoothd[24893]:
-src/adapter.c:start_discovery_complete() status 0x00
-Dec 20 16:31:53 locutus bluetoothd[24893]:
-src/adapter.c:discovering_callback() hci0 type 1 discovering 1
-Dec 20 16:31:59 locutus bluetoothd[24893]:
-src/adapter.c:device_found_callback() hci0 addr A4:15:66:73:03:F3,
-rssi -75 flags 0x0000 eir_len 42
-Dec 20 16:31:59 locutus bluetoothd[24893]:
-src/device.c:device_create() dst A4:15:66:73:03:F3
-Dec 20 16:31:59 locutus bluetoothd[24893]: src/device.c:device_new()
-address A4:15:66:73:03:F3
-Dec 20 16:31:59 locutus bluetoothd[24893]: src/device.c:device_new()
-Creating device /org/bluez/hci0/dev_A4_15_66_73_03_F3
-Dec 20 16:31:59 locutus bluetoothd[24893]:
-src/device.c:btd_device_set_temporary() temporary 1
-Dec 20 16:31:59 locutus bluetoothd[24893]:
-src/adapter.c:adapter_connect_list_remove() device
-/org/bluez/hci0/dev_A4_15_66_73_03_F3 is not on the list, ignoring
-Dec 20 16:31:59 locutus bluetoothd[24893]:
-src/device.c:device_set_legacy() legacy 0
-Dec 20 16:31:59 locutus bluetoothd[24893]:
-src/device.c:device_set_rssi() rssi -75
-Dec 20 16:31:59 locutus bluetoothd[24893]:
-src/device.c:device_set_class() /org/bluez/hci0/dev_A4_15_66_73_03_F3
-0x002508
-Dec 20 16:32:03 locutus bluetoothd[24893]:
-src/adapter.c:device_found_callback() hci0 addr A4:15:66:73:03:F3,
-rssi -73 flags 0x0000 eir_len 42
-Dec 20 16:32:03 locutus bluetoothd[24893]:
-src/device.c:device_set_legacy() legacy 0
-Dec 20 16:32:03 locutus bluetoothd[24893]:
-src/adapter.c:discovering_callback() hci0 type 1 discovering 0
-Dec 20 16:32:03 locutus bluetoothd[24893]:
-src/adapter.c:trigger_start_discovery()
-Dec 20 16:32:07 locutus bluetoothd[24893]:
-src/device.c:btd_device_set_temporary() temporary 0
-Dec 20 16:32:07 locutus bluetoothd[24893]: src/agent.c:agent_ref()
-0x1d987a0: ref=2
-Dec 20 16:32:07 locutus bluetoothd[24893]:
-src/device.c:bonding_request_new() Requesting bonding for
-A4:15:66:73:03:F3
-Dec 20 16:32:07 locutus bluetoothd[24893]: src/agent.c:agent_ref()
-0x1d987a0: ref=3
-Dec 20 16:32:07 locutus bluetoothd[24893]: src/agent.c:agent_unref()
-0x1d987a0: ref=2
-Dec 20 16:32:07 locutus bluetoothd[24893]: src/adapter.c:suspend_discovery()
-Dec 20 16:32:07 locutus bluetoothd[24893]:
-src/adapter.c:adapter_bonding_attempt() hci0 bdaddr A4:15:66:73:03:F3
-type 0 io_cap 0x01
-Dec 20 16:32:07 locutus bluetoothd[24893]:
-src/adapter.c:connected_callback() hci0 device A4:15:66:73:03:F3
-connected eir_len 26
-Dec 20 16:32:10 locutus bluetoothd[24893]:
-src/adapter.c:new_link_key_callback() hci0 new key for
-A4:15:66:73:03:F3 type 5 pin_len 0
-Dec 20 16:32:10 locutus bluetoothd[24893]:
-src/device.c:device_set_bonded() bonded 1
-Dec 20 16:32:10 locutus bluetoothd[24893]:
-src/device.c:device_bonding_complete() bonding 0x1da0760 status 0x00
-Dec 20 16:32:10 locutus bluetoothd[24893]:
-src/device.c:device_bonding_complete() Proceeding with service
-discovery
-Dec 20 16:32:10 locutus bluetoothd[24893]: src/agent.c:agent_unref()
-0x1d987a0: ref=1
-Dec 20 16:32:10 locutus bluetoothd[24893]: src/adapter.c:resume_discovery()
-Dec 20 16:32:10 locutus bluetoothd[24893]:
-src/adapter.c:trigger_start_discovery()
-Dec 20 16:32:10 locutus bluetoothd[24893]:
-src/adapter.c:pair_device_complete() Success (0x00)
-Dec 20 16:32:10 locutus bluetoothd[24893]:
-src/adapter.c:bonding_attempt_complete() hci0 bdaddr A4:15:66:73:03:F3
-type 0 status 0x0
-Dec 20 16:32:10 locutus bluetoothd[24893]:
-src/device.c:device_bonding_complete() bonding (nil) status 0x00
-Dec 20 16:32:10 locutus bluetoothd[24893]: src/adapter.c:resume_discovery()
-Dec 20 16:32:10 locutus bluetoothd[24893]:
-src/adapter.c:trigger_start_discovery()
-Dec 20 16:32:13 locutus bluetoothd[24893]:
-profiles/input/server.c:connect_event_cb() Incoming connection from
-A4:15:66:73:03:F3 on PSM 17
-Dec 20 16:32:13 locutus bluetoothd[24893]:
-profiles/input/device.c:input_device_set_channel() idev (nil) psm 17
-Dec 20 16:32:13 locutus bluetoothd[24893]: Refusing input device
-connect: No such file or directory (2)
-Dec 20 16:32:13 locutus bluetoothd[24893]:
-profiles/input/server.c:confirm_event_cb()
-Dec 20 16:32:13 locutus bluetoothd[24893]: Refusing connection from
-A4:15:66:73:03:F3: unknown device
-Dec 20 16:32:13 locutus bluetoothd[24893]: A4:15:66:73:03:F3: error
-updating services: Input/output error (5)
-Dec 20 16:32:13 locutus bluetoothd[24893]:
-src/device.c:device_svc_resolved()
-/org/bluez/hci0/dev_A4_15_66_73_03_F3 err -5
-Dec 20 16:32:14 locutus bluetoothd[24893]:
-src/adapter.c:dev_disconnected() Device A4:15:66:73:03:F3
-disconnected, reason 3
-Dec 20 16:32:14 locutus bluetoothd[24893]:
-src/adapter.c:adapter_remove_connection()
-Dec 20 16:32:14 locutus bluetoothd[24893]:
-src/adapter.c:bonding_attempt_complete() hci0 bdaddr A4:15:66:73:03:F3
-type 0 status 0xe
-Dec 20 16:32:14 locutus bluetoothd[24893]:
-src/device.c:device_bonding_complete() bonding (nil) status 0x0e
-Dec 20 16:32:14 locutus bluetoothd[24893]:
-src/device.c:device_bonding_failed() status 14
-Dec 20 16:32:14 locutus bluetoothd[24893]: src/adapter.c:resume_discovery()
-Dec 20 16:32:14 locutus bluetoothd[24893]:
-src/adapter.c:trigger_start_discovery()
-
-
---
-Christopher Rosell
+--=20
+Luiz Augusto von Dentz
