@@ -1,31 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/2] android/bluetooth-hal: Fix using wrong struct for buffer size
-Date: Fri, 20 Dec 2013 13:50:41 +0100
-Message-Id: <1387543842-6489-1-git-send-email-szymon.janc@tieto.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH] android: Include btmon and l2test in userdebug builds
+Date: Fri, 20 Dec 2013 13:35:19 +0100
+Message-ID: <1387542919-16070-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Buffer is for hal_cmd_le_test_mode command.
----
- android/hal-bluetooth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This patch changes btmon and l2test module tags from 'eng' to 'debug' so
+they are automatically installed also for userdebug variant which is
+default for AOSP devices.
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 2232ebe..3dbc435 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -812,7 +812,7 @@ static int dut_mode_send(uint16_t opcode, uint8_t *buf, uint8_t len)
- #if PLATFORM_SDK_VERSION > 17
- static int le_test_mode(uint16_t opcode, uint8_t *buf, uint8_t len)
- {
--	uint8_t cmd_buf[sizeof(struct hal_cmd_dut_mode_send) + len];
-+	uint8_t cmd_buf[sizeof(struct hal_cmd_le_test_mode) + len];
- 	struct hal_cmd_le_test_mode *cmd = (void *) cmd_buf;
+---
+ android/Android.mk | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/android/Android.mk b/android/Android.mk
+index 2865c08..d9bae40 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -200,7 +200,7 @@ LOCAL_C_INCLUDES += \
+ LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
  
- 	DBG("opcode %u len %u", opcode, len);
+ LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
+-LOCAL_MODULE_TAGS := eng
++LOCAL_MODULE_TAGS := debug
+ LOCAL_MODULE := btmon
+ 
+ include $(BUILD_EXECUTABLE)
+@@ -247,7 +247,7 @@ LOCAL_C_INCLUDES := \
+ LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
+ 
+ LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
+-LOCAL_MODULE_TAGS := eng
++LOCAL_MODULE_TAGS := debug
+ LOCAL_MODULE := l2test
+ 
+ include $(BUILD_EXECUTABLE)
 -- 
-1.8.3.2
+1.8.5
 
