@@ -2,85 +2,30 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 1/2] client: Clean up agent if bluetoothd exited without releasing it
-Date: Sun, 22 Dec 2013 22:24:55 +0100
-Message-Id: <1387747496-20654-1-git-send-email-szymon.janc@gmail.com>
+Subject: [PATCH 2/2] client: Minor code style fix
+Date: Sun, 22 Dec 2013 22:24:56 +0100
+Message-Id: <1387747496-20654-2-git-send-email-szymon.janc@gmail.com>
+In-Reply-To: <1387747496-20654-1-git-send-email-szymon.janc@gmail.com>
+References: <1387747496-20654-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If bluetoothd exited without releasing agent (eg. due to crash) it was
-not possible to register client as agent after daemon was restarted.
 ---
- client/agent.c | 21 +++++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
+ client/agent.c | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/client/agent.c b/client/agent.c
-index 2d9dffd..b34ad77 100644
+index b34ad77..20787bc 100644
 --- a/client/agent.c
 +++ b/client/agent.c
-@@ -35,6 +35,7 @@
+@@ -390,7 +390,6 @@ static void register_agent_reply(DBusMessage *message, void *user_data)
  
- #define AGENT_PATH "/org/bluez/agent"
- #define AGENT_INTERFACE "org.bluez.Agent1"
-+#define BLUEZ_NAME "org.bluez"
- 
- #define AGENT_PROMPT	COLOR_RED "[agent]" COLOR_OFF " "
- 
-@@ -43,6 +44,7 @@ static const char *agent_capability = NULL;
- static DBusMessage *pending_message = NULL;
- static char *agent_saved_prompt = NULL;
- static int agent_saved_point = 0;
-+static guint watch_id = 0;
- 
- static void agent_prompt(const char *msg)
+ void agent_register(DBusConnection *conn, GDBusProxy *manager,
+ 						const char *capability)
+-
  {
-@@ -154,8 +156,7 @@ dbus_bool_t agent_input(DBusConnection *conn, const char *input)
- 	return TRUE;
- }
- 
--static DBusMessage *release_agent(DBusConnection *conn,
--					DBusMessage *msg, void *user_data)
-+static void clean_agent(DBusConnection *conn, void *user_data)
- {
- 	agent_registered = FALSE;
- 	agent_capability = NULL;
-@@ -171,6 +172,15 @@ static DBusMessage *release_agent(DBusConnection *conn,
- 
- 	g_dbus_unregister_interface(conn, AGENT_PATH, AGENT_INTERFACE);
- 
-+	g_dbus_remove_watch(conn, watch_id);
-+	watch_id = 0;
-+}
-+
-+static DBusMessage *release_agent(DBusConnection *conn, DBusMessage *msg,
-+								void *user_data)
-+{
-+	clean_agent(conn, NULL);
-+
- 	return dbus_message_new_method_return(msg);
- }
- 
-@@ -364,6 +374,10 @@ static void register_agent_reply(DBusMessage *message, void *user_data)
- 	if (dbus_set_error_from_message(&error, message) == FALSE) {
- 		agent_registered = TRUE;
- 		rl_printf("Agent registered\n");
-+
-+		watch_id = g_dbus_add_service_watch(conn, BLUEZ_NAME, NULL,
-+							clean_agent, NULL,
-+							NULL);
- 	} else {
- 		rl_printf("Failed to register agent: %s\n", error.name);
- 		dbus_error_free(&error);
-@@ -425,6 +439,9 @@ static void unregister_agent_reply(DBusMessage *message, void *user_data)
- 		if (g_dbus_unregister_interface(conn, AGENT_PATH,
- 						AGENT_INTERFACE) == FALSE)
- 			rl_printf("Failed to unregister agent object\n");
-+
-+		g_dbus_remove_watch(conn, watch_id);
-+		watch_id = 0;
- 	} else {
- 		rl_printf("Failed to unregister agent: %s\n", error.name);
- 		dbus_error_free(&error);
+ 	if (agent_registered == TRUE) {
+ 		rl_printf("Agent is already registered\n");
 -- 
 1.8.5.2
 
