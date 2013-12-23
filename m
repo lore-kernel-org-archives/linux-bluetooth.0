@@ -1,148 +1,224 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/6] android/tester: Seperate Socket HAL cbs from Bluetooth HAL cb
-Date: Mon, 23 Dec 2013 15:15:49 +0100
-Message-Id: <1387808154-21661-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v2 2/6] android/tester: Move BT discovery test cases before Socket Hal
+Date: Mon, 23 Dec 2013 15:15:50 +0100
+Message-Id: <1387808154-21661-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1387808154-21661-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1387808154-21661-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds seperate callbacks structure for socket HAL test cases.
-Is's needed beceause Socket HAL cb have other purpose than Bluetooth HAL
-cb. Callbacks are now initialized outside test setup function and
-cb struct depends on HAL type.
+This moves and organize test case data. BT discovery test cases to right
+place in code.
 ---
- android/android-tester.c | 63 ++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 56 insertions(+), 7 deletions(-)
+ android/android-tester.c | 160 +++++++++++++++++++++++------------------------
+ 1 file changed, 80 insertions(+), 80 deletions(-)
 
 diff --git a/android/android-tester.c b/android/android-tester.c
-index 0383115..f5ab14f 100644
+index f5ab14f..2078a40 100644
 --- a/android/android-tester.c
 +++ b/android/android-tester.c
-@@ -872,7 +872,6 @@ static void setup(struct test_data *data)
- {
- 	const hw_module_t *module;
- 	hw_device_t *device;
--	bt_status_t status;
- 	int signal_fd[2];
- 	char buf[1024];
- 	pid_t pid;
-@@ -935,19 +934,21 @@ static void setup(struct test_data *data)
+@@ -933,7 +933,6 @@ static void setup(struct test_data *data)
+ 		tester_setup_failed();
  		return;
  	}
- 
--	status = data->if_bluetooth->init(&bt_callbacks);
--	if (status != BT_STATUS_SUCCESS) {
--		data->if_bluetooth = NULL;
--		tester_setup_failed();
--	}
+-
  }
  
  static void setup_base(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
-+	bt_status_t status;
- 
- 	setup(data);
- 
-+	status = data->if_bluetooth->init(&bt_callbacks);
-+	if (status != BT_STATUS_SUCCESS) {
-+		data->if_bluetooth = NULL;
-+		tester_setup_failed();
-+	}
-+
- 	tester_setup_complete();
+@@ -1161,6 +1160,78 @@ static void test_setprop_service_record_invalid(const void *test_data)
+ 	check_expected_status(adapter_status);
  }
  
-@@ -958,6 +959,11 @@ static void setup_enabled_adapter(const void *test_data)
- 
- 	setup(data);
- 
-+	status = data->if_bluetooth->init(&bt_callbacks);
-+	if (status != BT_STATUS_SUCCESS) {
-+		data->if_bluetooth = NULL;
-+		tester_setup_failed();
-+	}
- 	status = data->if_bluetooth->enable();
- 	if (status != BT_STATUS_SUCCESS)
- 		tester_setup_failed();
-@@ -1157,6 +1163,20 @@ static void test_setprop_service_record_invalid(const void *test_data)
- 
- /* Test Socket HAL */
- 
-+static void adapter_socket_state_changed_cb(bt_state_t state)
++static void test_discovery_start_success(const void *test_data)
 +{
-+	switch (state) {
-+	case BT_STATE_ON:
-+		setup_powered_emulated_remote();
-+		break;
-+	case BT_STATE_OFF:
-+		tester_setup_failed();
-+		break;
-+	default:
-+		break;
-+	}
++	struct test_data *data = tester_get_data();
++	bt_status_t status;
++
++	init_test_conditions(data);
++
++	status = data->if_bluetooth->start_discovery();
++	check_expected_status(status);
 +}
 +
- const bt_bdaddr_t bdaddr_dummy = {
- 	.address = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55}
- };
-@@ -1233,13 +1253,36 @@ static const struct socket_data btsock_inv_listen_listen = {
- 	.test_channel = true,
- };
- 
-+static bt_callbacks_t bt_socket_callbacks = {
-+	.size = sizeof(bt_callbacks),
-+	.adapter_state_changed_cb = adapter_socket_state_changed_cb,
-+	.adapter_properties_cb = NULL,
-+	.remote_device_properties_cb = NULL,
-+	.device_found_cb = NULL,
-+	.discovery_state_changed_cb = NULL,
-+	.pin_request_cb = NULL,
-+	.ssp_request_cb = NULL,
-+	.bond_state_changed_cb = NULL,
-+	.acl_state_changed_cb = NULL,
-+	.thread_evt_cb = NULL,
-+	.dut_mode_recv_cb = NULL,
-+	.le_test_mode_cb = NULL
-+};
-+
- static void setup_socket_interface(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
++static void test_discovery_stop_done(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
 +	bt_status_t status;
- 	const void *sock;
- 
- 	setup(data);
- 
-+	status = data->if_bluetooth->init(&bt_socket_callbacks);
-+	if (status != BT_STATUS_SUCCESS) {
-+		data->if_bluetooth = NULL;
-+		tester_setup_failed();
-+	}
 +
- 	sock = data->if_bluetooth->get_profile_interface(BT_PROFILE_SOCKETS_ID);
- 	if (!sock) {
- 		tester_setup_failed();
-@@ -1254,11 +1297,17 @@ static void setup_socket_interface(const void *test_data)
- static void setup_socket_interface_enabled(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
--	const void *sock;
- 	bt_status_t status;
-+	const void *sock;
- 
- 	setup(data);
- 
-+	status = data->if_bluetooth->init(&bt_socket_callbacks);
-+	if (status != BT_STATUS_SUCCESS) {
-+		data->if_bluetooth = NULL;
-+		tester_setup_failed();
-+	}
++	init_test_conditions(data);
 +
- 	sock = data->if_bluetooth->get_profile_interface(BT_PROFILE_SOCKETS_ID);
- 	if (!sock) {
- 		tester_setup_failed();
++	status = data->if_bluetooth->cancel_discovery();
++	check_expected_status(status);
++}
++
++static bool pre_inq_compl_hook(const void *dummy, uint16_t len, void *user_data)
++{
++	struct test_data *data = tester_get_data();
++
++	/* Make sure Inquiry Command Complete is not called */
++
++	hciemu_del_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT, BT_HCI_CMD_INQUIRY);
++
++	return false;
++}
++
++static void test_discovery_stop_success(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	bt_status_t status;
++
++	data->userflag = DEVICE_DISCOVERY_CANCEL_ON_START;
++
++	init_test_conditions(data);
++
++	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT, BT_HCI_CMD_INQUIRY,
++					pre_inq_compl_hook, data);
++
++	status = data->if_bluetooth->start_discovery();
++	check_expected_status(status);
++}
++
++static void test_discovery_start_done(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++
++	data->userflag = DEVICE_DISCOVERY_START_ON_START;
++
++	init_test_conditions(data);
++
++	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT, BT_HCI_CMD_INQUIRY,
++					pre_inq_compl_hook, data);
++
++	data->if_bluetooth->start_discovery();
++}
++
++static void test_discovery_device_found(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++
++	init_test_conditions(data);
++
++	data->if_bluetooth->start_discovery();
++}
++
+ /* Test Socket HAL */
+ 
+ static void adapter_socket_state_changed_cb(bt_state_t state)
+@@ -1482,77 +1553,6 @@ clean:
+ 		close(sock_fd);
+ }
+ 
+-static void test_discovery_start_success(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-	bt_status_t status;
+-
+-	init_test_conditions(data);
+-
+-	status = data->if_bluetooth->start_discovery();
+-	check_expected_status(status);
+-}
+-
+-static void test_discovery_stop_done(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-	bt_status_t status;
+-
+-	init_test_conditions(data);
+-
+-	status = data->if_bluetooth->cancel_discovery();
+-	check_expected_status(status);
+-}
+-
+-static bool pre_inq_compl_hook(const void *dummy, uint16_t len, void *user_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	/* Make sure Inquiry Command Complete is not called */
+-
+-	hciemu_del_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT, BT_HCI_CMD_INQUIRY);
+-
+-	return false;
+-}
+-
+-static void test_discovery_stop_success(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-	bt_status_t status;
+-
+-	data->userflag = DEVICE_DISCOVERY_CANCEL_ON_START;
+-
+-	init_test_conditions(data);
+-
+-	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT, BT_HCI_CMD_INQUIRY,
+-					pre_inq_compl_hook, data);
+-
+-	status = data->if_bluetooth->start_discovery();
+-	check_expected_status(status);
+-}
+-
+-static void test_discovery_start_done(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	data->userflag = DEVICE_DISCOVERY_START_ON_START;
+-
+-	init_test_conditions(data);
+-
+-	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT, BT_HCI_CMD_INQUIRY,
+-					pre_inq_compl_hook, data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_discovery_device_found(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+ 
+ static gboolean socket_chan_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+@@ -1725,26 +1725,26 @@ int main(int argc, char *argv[])
+ 				setup_enabled_adapter,
+ 				test_setprop_service_record_invalid, teardown);
+ 
+-	test_bredrle("Bluetooth BREDR Discovery Start - Done",
+-				&bluetooth_discovery_start_done_test,
+-				setup_enabled_adapter,
+-				test_discovery_start_done, teardown);
+-
+ 	test_bredrle("Bluetooth BREDR Discovery Start - Success",
+ 				&bluetooth_discovery_start_success_test,
+ 				setup_enabled_adapter,
+ 				test_discovery_start_success, teardown);
+ 
+-	test_bredrle("Bluetooth BREDR Discovery Stop - Done",
+-				&bluetooth_discovery_stop_done_test,
++	test_bredrle("Bluetooth BREDR Discovery Start - Done",
++				&bluetooth_discovery_start_done_test,
+ 				setup_enabled_adapter,
+-				test_discovery_stop_done, teardown);
++				test_discovery_start_done, teardown);
+ 
+ 	test_bredrle("Bluetooth BREDR Discovery Stop - Success",
+ 				&bluetooth_discovery_stop_success_test,
+ 				setup_enabled_adapter,
+ 				test_discovery_stop_success, teardown);
+ 
++	test_bredrle("Bluetooth BREDR Discovery Stop - Done",
++				&bluetooth_discovery_stop_done_test,
++				setup_enabled_adapter,
++				test_discovery_stop_done, teardown);
++
+ 	test_bredrle("Bluetooth BREDR Discovery Device Found",
+ 				&bluetooth_discovery_device_found_test,
+ 				setup_enabled_adapter,
 -- 
 1.8.4.2
 
