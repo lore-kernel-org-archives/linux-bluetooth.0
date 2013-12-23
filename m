@@ -1,44 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2] btdev: Return Command Status for Authentication Requested
-Date: Mon, 23 Dec 2013 17:07:25 +0200
-Message-Id: <1387811245-21272-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] Bluetooth: Set HCI_QUIRK_RESET_ON_CLOSE for Socket SDIO cards
+Date: Mon, 23 Dec 2013 06:52:32 -0800
+Message-Id: <1387810352-48383-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+The Socket Bluetooth SDIO cards are branded versions of Toshiba SD-BT2
+and they do not support sending HCI_Reset as first command. To make
+this card work the HCI_QUIRK_RESET_ON_CLOSE quirk needs to be set
+before registering the controller.
 
-Add support for "Authentication Requested" command
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- emulator/btdev.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/bluetooth/btsdio.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index d0dff74..b1e804b 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -268,6 +268,7 @@ static void set_bredr_commands(struct btdev *btdev)
- 	btdev->commands[0]  |= 0x80;	/* Cancel Create Connection */
- 	btdev->commands[1]  |= 0x01;	/* Accept Connection Request */
- 	btdev->commands[1]  |= 0x02;	/* Reject Connection Request */
-+	btdev->commands[1]  |= 0x80;	/* Authentication Requested */
- 	btdev->commands[2]  |= 0x08;	/* Remote Name Request */
- 	btdev->commands[2]  |= 0x10;	/* Cancel Remote Name Request */
- 	btdev->commands[2]  |= 0x20;	/* Read Remote Supported Features */
-@@ -1191,6 +1192,12 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
- 		break;
+diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
+index b61440aaee65..1f6815825e61 100644
+--- a/drivers/bluetooth/btsdio.c
++++ b/drivers/bluetooth/btsdio.c
+@@ -333,6 +333,9 @@ static int btsdio_probe(struct sdio_func *func,
+ 	hdev->flush    = btsdio_flush;
+ 	hdev->send     = btsdio_send_frame;
  
-+	case BT_HCI_CMD_AUTH_REQUESTED:
-+		if (btdev->type == BTDEV_TYPE_LE)
-+			return;
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		break;
++	if (func->vendor == 0x0104 && func->device == 0x00c5)
++		set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
 +
- 	case BT_HCI_CMD_REMOTE_NAME_REQUEST:
- 		if (btdev->type == BTDEV_TYPE_LE)
- 			goto unsupported;
+ 	err = hci_register_dev(hdev);
+ 	if (err < 0) {
+ 		hci_free_dev(hdev);
 -- 
-1.8.3.2
+1.8.4.2
 
