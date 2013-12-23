@@ -2,95 +2,77 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 2/2] android/bluetooth: Print error on unimplemented functions
-Date: Mon, 23 Dec 2013 12:07:19 +0100
-Message-Id: <1387796839-8164-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1387796839-8164-1-git-send-email-szymon.janc@tieto.com>
-References: <1387796839-8164-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2 1/2] android/bluetooth: Add support for DUT mode configure command
+Date: Mon, 23 Dec 2013 12:07:18 +0100
+Message-Id: <1387796839-8164-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Functions, callbacks or properties that are not implemented due to
-being bogus or not feasible now prints error messages.
+This allows to enable and disable DUT mode. This is special mode so
+adding more info from related kernel commit:
+
+"The Device Under Test (DUT) mode is useful for doing certification
+testing and so expose this as debugfs option.
+
+This mode is actually special since you can only enter it. Restoring
+normal operation means that a HCI Reset is required. The current mode
+value gets tracked as a new device flag and when disabling it, the
+correct command to reset the controller is sent."
 ---
- android/bluetooth.c | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
+ android/bluetooth.c | 29 ++++++++++++++++++++++++++---
+ 1 file changed, 26 insertions(+), 3 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 59f0810..0700972 100644
+index 2e75864..59f0810 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -2146,6 +2146,10 @@ static void handle_get_adapter_prop_cmd(const void *buf, uint16_t len)
- 		break;
- 	}
+@@ -50,6 +50,8 @@
+ #include "utils.h"
+ #include "bluetooth.h"
  
-+	if (status != HAL_STATUS_SUCCESS && status != HAL_STATUS_DONE)
-+		error("Failed to get adapter property (type %u status %u)",
-+							cmd->type, status);
++#define DUT_MODE_FILE "/sys/kernel/debug/bluetooth/hci%u/dut_mode"
 +
- 	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_GET_ADAPTER_PROP, status);
- }
- 
-@@ -2293,6 +2297,10 @@ static void handle_set_adapter_prop_cmd(const void *buf, uint16_t len)
- 		break;
- 	}
- 
-+	if (status != HAL_STATUS_SUCCESS && status != HAL_STATUS_DONE)
-+		error("Failed to set adapter property (type %u status %u)",
-+							cmd->type, status);
-+
- 	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_SET_ADAPTER_PROP, status);
- }
- 
-@@ -2745,6 +2753,10 @@ static void handle_get_remote_device_prop_cmd(const void *buf, uint16_t len)
- 		break;
- 	}
- 
-+	if (status != HAL_STATUS_SUCCESS && status != HAL_STATUS_DONE)
-+		error("Failed to get device property (type %u status %u)",
-+							cmd->type, status);
-+
- failed:
- 	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_GET_REMOTE_DEVICE_PROP,
- 								status);
-@@ -2809,6 +2821,10 @@ static void handle_set_remote_device_prop_cmd(const void *buf, uint16_t len)
- 		break;
- 	}
- 
-+	if (status != HAL_STATUS_SUCCESS && status != HAL_STATUS_DONE)
-+		error("Failed to set device property (type %u status %u)",
-+							cmd->type, status);
-+
- failed:
- 	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_SET_REMOTE_DEVICE_PROP,
- 									status);
-@@ -2818,6 +2834,8 @@ static void handle_get_remote_service_rec_cmd(const void *buf, uint16_t len)
+ #define DEVICE_ID_SOURCE	0x0002	/* USB */
+ #define DEVICE_ID_VENDOR	0x1d6b	/* Linux Foundation */
+ #define DEVICE_ID_PRODUCT	0x0247	/* BlueZ for Android */
+@@ -2872,13 +2874,34 @@ failed:
+ static void handle_dut_mode_conf_cmd(const void *buf, uint16_t len)
  {
- 	/* TODO */
+ 	const struct hal_cmd_dut_mode_conf *cmd = buf;
++	char path[FILENAME_MAX];
++	uint8_t status;
++	int fd, ret;
  
-+	error("get_remote_service_record not supported");
+ 	DBG("enable %u", cmd->enable);
+ 
+-	/* TODO */
++	snprintf(path, sizeof(path), DUT_MODE_FILE, adapter.index);
+ 
+-	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_DUT_MODE_CONF,
+-							HAL_STATUS_FAILED);
++	fd = open(path, O_WRONLY);
++	if (fd < 0) {
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
 +
- 	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_GET_REMOTE_SERVICE_REC,
- 							HAL_STATUS_FAILED);
++	if (cmd->enable)
++		ret = write(fd, "1", sizeof("1"));
++	else
++		ret = write(fd, "0", sizeof("0"));
++
++	if (ret < 0)
++		status = HAL_STATUS_FAILED;
++	else
++		status = HAL_STATUS_SUCCESS;
++
++	close(fd);
++
++failed:
++	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_DUT_MODE_CONF, status);
  }
-@@ -2914,7 +2932,7 @@ static void handle_dut_mode_send_cmd(const void *buf, uint16_t len)
- 		return;
- 	}
  
--	DBG("opcode %u", cmd->opcode);
-+	error("dut_mode_send not supported");
- 
- 	/* TODO */
- 
-@@ -2932,7 +2950,7 @@ static void handle_le_test_mode_cmd(const void *buf, uint16_t len)
- 		return;
- 	}
- 
--	DBG("opcode %u", cmd->opcode);
-+	error("le_test_mode not supported");
- 
- 	/* TODO */
- 
+ static void handle_dut_mode_send_cmd(const void *buf, uint16_t len)
 -- 
 1.8.3.2
 
