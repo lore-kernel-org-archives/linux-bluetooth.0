@@ -1,44 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] btdev: Send Link Key Request on Authentication Requested
-Date: Mon, 23 Dec 2013 17:33:19 +0200
-Message-Id: <1387812799-21728-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/2] android/AVDTP: Remove get_all parameter for get_capability callback
+Date: Mon, 23 Dec 2013 16:31:18 +0100
+Message-ID: <1753101.HHB0DUsLOk@uw000953>
+In-Reply-To: <1387807690-31617-1-git-send-email-luiz.dentz@gmail.com>
+References: <1387807690-31617-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="ISO-8859-1"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Luiz,
 
-The Link Key Request event shall be generated when Simple Pairing Mode
-is enabled.
----
- emulator/btdev.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This is not necessary anymore since all delay reporting is now added
+> automatically whenever supported.
+> ---
+>  android/avdtp.c   | 4 ++--
+>  android/avdtp.h   | 1 -
+>  unit/test-avdtp.c | 8 ++++----
+>  3 files changed, 6 insertions(+), 7 deletions(-)
+> 
+> diff --git a/android/avdtp.c b/android/avdtp.c
+> index 02ee920..3cf390f 100644
+> --- a/android/avdtp.c
+> +++ b/android/avdtp.c
+> @@ -1192,8 +1192,8 @@ static gboolean avdtp_getcap_cmd(struct avdtp *session, uint8_t transaction,
+>  		goto failed;
+>  	}
+>  
+> -	if (!sep->ind->get_capability(session, sep, get_all, &caps,
+> -							&err, sep->user_data))
+> +	if (!sep->ind->get_capability(session, sep, &caps, &err,
+> +							sep->user_data))
+>  		goto failed;
+>  
+>  	for (l = caps, rsp_size = 0; l != NULL; l = g_slist_next(l)) {
+> diff --git a/android/avdtp.h b/android/avdtp.h
+> index d371653..e8d1907 100644
+> --- a/android/avdtp.h
+> +++ b/android/avdtp.h
+> @@ -161,7 +161,6 @@ struct avdtp_sep_cfm {
+>  struct avdtp_sep_ind {
+>  	gboolean (*get_capability) (struct avdtp *session,
+>  					struct avdtp_local_sep *sep,
+> -					gboolean get_all,
+>  					GSList **caps, uint8_t *err,
+>  					void *user_data);
+>  	gboolean (*set_configuration) (struct avdtp *session,
+> diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
+> index 458daa7..66c45f3 100644
+> --- a/unit/test-avdtp.c
+> +++ b/unit/test-avdtp.c
+> @@ -269,8 +269,8 @@ static void execute_context(struct context *context)
+>  
+>  static gboolean sep_getcap_ind(struct avdtp *session,
+>  					struct avdtp_local_sep *sep,
+> -					gboolean get_all, GSList **caps,
+> -					uint8_t *err, void *user_data)
+> +					GSList **caps, uint8_t *err,
+> +					void *user_data)
+>  {
+>  	struct avdtp_service_capability *media_transport, *media_codec;
+>  	struct avdtp_media_codec_capability *codec_caps;
+> @@ -550,8 +550,8 @@ static void test_server_0_sep(gconstpointer data)
+>  
+>  static gboolean sep_getcap_ind_frg(struct avdtp *session,
+>  					struct avdtp_local_sep *sep,
+> -					gboolean get_all, GSList **caps,
+> -					uint8_t *err, void *user_data)
+> +					GSList **caps, uint8_t *err,
+> +					void *user_data)
+>  {
+>  	struct avdtp_service_capability *media_transport, *media_codec;
+>  	struct avdtp_service_capability *content_protection;
+> 
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index b1e804b..c0cfdef 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -2005,6 +2005,19 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
- 		conn_complete(btdev, rcr->bdaddr, BT_HCI_ERR_UNKNOWN_CONN_ID);
- 		break;
- 
-+	case BT_HCI_CMD_AUTH_REQUESTED:
-+		if (btdev->type == BTDEV_TYPE_LE)
-+			return;
-+
-+		if (btdev->simple_pairing_mode) {
-+			struct bt_hci_evt_link_key_request lkr;
-+
-+			memcpy(lkr.bdaddr, btdev->conn->bdaddr, 6);
-+			send_event(btdev, BT_HCI_EVT_LINK_KEY_REQUEST, &lkr,
-+								sizeof(lkr));
-+		}
-+		break;
-+
- 	case BT_HCI_CMD_REMOTE_NAME_REQUEST:
- 		if (btdev->type == BTDEV_TYPE_LE)
- 			return;
+Both patches applied, thanks.
+
 -- 
-1.8.3.2
+BR
+Szymon Janc
+
 
