@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1387747496-20654-1-git-send-email-szymon.janc@gmail.com>
-References: <1387747496-20654-1-git-send-email-szymon.janc@gmail.com>
-Date: Mon, 23 Dec 2013 09:57:21 +0200
-Message-ID: <CABBYNZKQ8xjQZ_x-vHhWfPd0ACiMLL6eYU23Ch1k8eT7sjQeBQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] client: Clean up agent if bluetoothd exited without
- releasing it
+In-Reply-To: <1387564210-6102-1-git-send-email-szymon.janc@tieto.com>
+References: <1387564210-6102-1-git-send-email-szymon.janc@tieto.com>
+Date: Mon, 23 Dec 2013 09:53:18 +0200
+Message-ID: <CABBYNZJMAJbDwutWndn55nWQOdj310N2t85Qt4erMXu0sB5DKw@mail.gmail.com>
+Subject: Re: [PATCH 1/4] android/bluetooth: Add support for timestamp device property
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Szymon Janc <szymon.janc@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -15,88 +14,78 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Szymon,
 
-On Sun, Dec 22, 2013 at 11:24 PM, Szymon Janc <szymon.janc@gmail.com> wrote:
-> If bluetoothd exited without releasing agent (eg. due to crash) it was
-> not possible to register client as agent after daemon was restarted.
+On Fri, Dec 20, 2013 at 8:30 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> This allows to handle timestamp property request. Also this will be
+> usefull for devices info cache (clearing old devices).
 > ---
->  client/agent.c | 21 +++++++++++++++++++--
->  1 file changed, 19 insertions(+), 2 deletions(-)
+>  android/bluetooth.c | 17 +++++++++++++----
+>  1 file changed, 13 insertions(+), 4 deletions(-)
 >
-> diff --git a/client/agent.c b/client/agent.c
-> index 2d9dffd..b34ad77 100644
-> --- a/client/agent.c
-> +++ b/client/agent.c
-> @@ -35,6 +35,7 @@
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index e534fc1..2e75864 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -80,6 +80,8 @@ struct device {
+>         uint32_t class;
+>         int32_t rssi;
 >
->  #define AGENT_PATH "/org/bluez/agent"
->  #define AGENT_INTERFACE "org.bluez.Agent1"
-> +#define BLUEZ_NAME "org.bluez"
+> +       uint32_t timestamp;
+> +
+>         GSList *uuids;
+>  };
 >
->  #define AGENT_PROMPT   COLOR_RED "[agent]" COLOR_OFF " "
+> @@ -227,6 +229,8 @@ static void store_device_info(struct device *dev)
+>         else
+>                 g_key_file_remove_key(key_file, addr, "Class", NULL);
 >
-> @@ -43,6 +44,7 @@ static const char *agent_capability = NULL;
->  static DBusMessage *pending_message = NULL;
->  static char *agent_saved_prompt = NULL;
->  static int agent_saved_point = 0;
-> +static guint watch_id = 0;
+> +       g_key_file_set_integer(key_file, addr, "Timestamp", dev->timestamp);
+> +
+>         if (dev->uuids) {
+>                 GSList *l;
+>                 int i;
+> @@ -291,6 +295,7 @@ static struct device *create_device(const bdaddr_t *bdaddr, uint8_t type)
+>         bacpy(&dev->bdaddr, bdaddr);
+>         dev->bdaddr_type = type;
+>         dev->bond_state = HAL_BOND_STATE_NONE;
+> +       dev->timestamp = time(NULL);
 >
->  static void agent_prompt(const char *msg)
+>         /* use address for name, will be change if one is present
+>          * eg. in EIR or set by set_property. */
+> @@ -1004,6 +1009,8 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+>
+>                 ev->status = HAL_STATUS_SUCCESS;
+>                 bdaddr2android(bdaddr, ev->bdaddr);
+> +
+> +               dev->timestamp = time(NULL);
+>         }
+>
+>         if (eir.class) {
+> @@ -1607,6 +1614,9 @@ static void create_device_from_info(GKeyFile *key_file, const char *peer)
+>
+>         dev->class = g_key_file_get_integer(key_file, peer, "Class", NULL);
+>
+> +       dev->timestamp = g_key_file_get_integer(key_file, peer, "Timestamp",
+> +                                                                       NULL);
+> +
+>         uuids = g_key_file_get_string_list(key_file, peer, "Services", NULL,
+>                                                                         NULL);
+>         if (uuids) {
+> @@ -2647,11 +2657,10 @@ static uint8_t get_device_version_info(struct device *dev)
+>
+>  static uint8_t get_device_timestamp(struct device *dev)
 >  {
-> @@ -154,8 +156,7 @@ dbus_bool_t agent_input(DBusConnection *conn, const char *input)
->         return TRUE;
+> -       DBG("Not implemented");
+> -
+> -       /* TODO */
+> +       send_device_property(&dev->bdaddr, HAL_PROP_DEVICE_TIMESTAMP,
+> +                               sizeof(dev->timestamp), &dev->timestamp);
+>
+> -       return HAL_STATUS_FAILED;
+> +       return HAL_STATUS_SUCCESS;
 >  }
 >
-> -static DBusMessage *release_agent(DBusConnection *conn,
-> -                                       DBusMessage *msg, void *user_data)
-> +static void clean_agent(DBusConnection *conn, void *user_data)
->  {
->         agent_registered = FALSE;
->         agent_capability = NULL;
-> @@ -171,6 +172,15 @@ static DBusMessage *release_agent(DBusConnection *conn,
->
->         g_dbus_unregister_interface(conn, AGENT_PATH, AGENT_INTERFACE);
->
-> +       g_dbus_remove_watch(conn, watch_id);
-> +       watch_id = 0;
-> +}
-> +
-> +static DBusMessage *release_agent(DBusConnection *conn, DBusMessage *msg,
-> +                                                               void *user_data)
-> +{
-> +       clean_agent(conn, NULL);
-> +
->         return dbus_message_new_method_return(msg);
->  }
->
-> @@ -364,6 +374,10 @@ static void register_agent_reply(DBusMessage *message, void *user_data)
->         if (dbus_set_error_from_message(&error, message) == FALSE) {
->                 agent_registered = TRUE;
->                 rl_printf("Agent registered\n");
-> +
-> +               watch_id = g_dbus_add_service_watch(conn, BLUEZ_NAME, NULL,
-> +                                                       clean_agent, NULL,
-> +                                                       NULL);
->         } else {
->                 rl_printf("Failed to register agent: %s\n", error.name);
->                 dbus_error_free(&error);
-> @@ -425,6 +439,9 @@ static void unregister_agent_reply(DBusMessage *message, void *user_data)
->                 if (g_dbus_unregister_interface(conn, AGENT_PATH,
->                                                 AGENT_INTERFACE) == FALSE)
->                         rl_printf("Failed to unregister agent object\n");
-> +
-> +               g_dbus_remove_watch(conn, watch_id);
-> +               watch_id = 0;
->         } else {
->                 rl_printf("Failed to unregister agent: %s\n", error.name);
->                 dbus_error_free(&error);
-> --
-> 1.8.5.2
 
-Ive send a patch for it not long time ago, but instead of adding a new
-watch I just unregister the agent whenever org.bluez.AgentManager1
-proxy is removed which should treat the case where the daemon crash or
-exit without sending a proper unregister.
+I guess it probably make sense to update the timestamp also whenever a
+connection completes or does bluedroid ignores it?
 
-
--- 
 Luiz Augusto von Dentz
