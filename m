@@ -1,45 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/tester: Fix possible NULL dereference
-Date: Mon, 23 Dec 2013 10:28:51 +0200
-Message-Id: <1387787331-8405-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1387372162-7096-1-git-send-email-luiz.dentz@gmail.com>
+References: <1387372162-7096-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 23 Dec 2013 10:05:05 +0200
+Message-ID: <CABBYNZ+zw_yuUbp1GvMVkOVDQUr_4Xup+SUy4nhj=kb_QaKXUg@mail.gmail.com>
+Subject: Re: [PATCH v2 BlueZ] build: Add coverage support
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Marcel,
 
-value is checked for NULL and later is dereferenced if we do not return.
----
- android/android-tester.c | 3 +++
- 1 file changed, 3 insertions(+)
+On Wed, Dec 18, 2013 at 3:09 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> Coverage is enabled with --enable-maintainer-mode, 2 new targets are
+> added 'coverage' and 'clean-coverage', the first generate the reports
+> using lcov and depend on the second to cleanup previous generated
+> reports and .gcda files.
+> ---
+>  .gitignore   |  4 ++++
+>  Makefile.am  | 18 ++++++++++++++++++
+>  acinclude.m4 |  4 ++++
+>  configure.ac |  4 ++++
+>  4 files changed, 30 insertions(+)
+>
+> diff --git a/.gitignore b/.gitignore
+> index c570728..21dbe26 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -3,6 +3,8 @@
+>  *.lo
+>  *.la
+>  *.so
+> +*.gcno
+> +*.gcda
+>  .deps
+>  .libs
+>  .dirstamp
+> @@ -27,7 +29,9 @@ stamp-h1
+>  autom4te.cache
+>  test-driver
+>  test-suite.log
+> +coverage.info
+>
+> +coverage
+>  lib/bluez.pc
+>  lib/bluetooth
+>  src/builtin.h
+> diff --git a/Makefile.am b/Makefile.am
+> index 15cc149..7380e61 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -331,5 +331,23 @@ lib/bluetooth/%.h: lib/%.h
+>         $(AM_V_at)$(MKDIR_P) lib/bluetooth
+>         $(AM_V_GEN)$(LN_S) -f "$(abs_top_builddir)"/$< $@
+>
+> +if MAINTAINER_MODE
+> +clean-coverage:
+> +       -find $(top_builddir) -name "*.gcda" -delete
+> +       @lcov --directory $(top_builddir) --zerocounters
+> +       $(RM) -r coverage $(top_builddir)/coverage.info
+> +
+> +coverage: clean-coverage check
+> +       @lcov --compat-libtool --directory $(top_builddir) --capture \
+> +                               --output-file $(top_builddir)/coverage.info
+> +       $(AM_V_at)$(MKDIR_P) coverage
+> +       @genhtml -o coverage/ $(top_builddir)/coverage.info
+> +
+> +clean-local: clean-coverage
+> +       -find $(top_builddir) -name "*.gcno" -delete
+> +       $(RM) -r lib/bluetooth
+> +
+> +else
+>  clean-local:
+>         $(RM) -r lib/bluetooth
+> +endif
+> diff --git a/acinclude.m4 b/acinclude.m4
+> index 2065852..afc7c6d 100644
+> --- a/acinclude.m4
+> +++ b/acinclude.m4
+> @@ -51,6 +51,10 @@ AC_DEFUN([MISC_FLAGS], [
+>                         misc_ldflags="$misc_ldflags -pie"
+>                 fi
+>         ])
+> +       if (test "$USE_MAINTAINER_MODE" = "yes"); then
+> +               misc_cflags="$misc_cflags --coverage"
+> +               misc_ldflags="$misc_ldflags --coverage"
+> +       fi
+>         AC_SUBST([MISC_CFLAGS], $misc_cflags)
+>         AC_SUBST([MISC_LDFLAGS], $misc_ldflags)
+>  ])
+> diff --git a/configure.ac b/configure.ac
+> index 18d0b55..4f36355 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -252,4 +252,8 @@ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
+>                                         [enable_android=${enableval}])
+>  AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
+>
+> +if (test "$USE_MAINTAINER_MODE" = "yes"); then
+> +       AC_CHECK_PROG([LCOV], [lcov], [yes], AC_MSG_ERROR(lcov is required))
+> +fi
+> +
+>  AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
+> --
+> 1.8.3.1
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index 2d1ffde..0383115 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -148,18 +148,21 @@ static void test_device_property(bt_property_t *property,
- 	if (value == NULL) {
- 		tester_warn("NULL property passed");
- 		tester_test_failed();
-+		return;
- 	}
- 
- 	if (property->type != type) {
- 		tester_warn("Wrong remote property type %d, expected %d",
- 							type, property->type);
- 		tester_test_failed();
-+		return;
- 	}
- 
- 	if (property->len != len) {
- 		tester_warn("Wrong remote property len %d, expected %d",
- 							len, property->len);
- 		tester_test_failed();
-+		return;
- 	}
- 
- 	if (memcmp(property->val, value, len)) {
+Any feedback regarding this patch? It is now using maintainer mode as
+you suggested.
+
+
 -- 
-1.8.3.2
-
+Luiz Augusto von Dentz
