@@ -1,44 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52B98A4E.70509@ahsoftware.de>
-Date: Tue, 24 Dec 2013 14:21:18 +0100
-From: Alexander Holler <holler@ahsoftware.de>
+Date: Mon, 23 Dec 2013 19:06:51 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2] btdev: Return Command Status for Authentication
+ Requested
+Message-ID: <20131223170651.GA17118@x220.p-661hnu-f1>
+References: <1387811245-21272-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-To: Gianluca Anzolin <gianluca@sottospazio.it>,
- Peter Hurley <peter@hurleysoftware.com>
-CC: marcel@holtmann.org, Gustavo Padovan <gustavo@padovan.org>,
- linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org,
- jslaby@suse.cz, linux-kernel@vger.kernel.org
-Subject: Re: [REGRESSION] rfcomm (userland) broken by commit 29cd718b
-References: <52AA1854.500@ahsoftware.de> <52AA1E62.1030109@hurleysoftware.com> <52AA483E.4080706@ahsoftware.de> <20131215112413.GA8980@sottospazio.it> <52ADB6B7.5010503@hurleysoftware.com> <20131215150847.GA10288@sottospazio.it> <52AF55B4.6000303@hurleysoftware.com> <20131216202044.GA19746@sottospazio.it> <20131216202720.GB19746@sottospazio.it> <20131216205858.GA20119@sottospazio.it> <20131216211542.GA20419@sottospazio.it>
-In-Reply-To: <20131216211542.GA20419@sottospazio.it>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1387811245-21272-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Andrei,
 
-Am 16.12.2013 22:15, schrieb Gianluca Anzolin:
+On Mon, Dec 23, 2013, Andrei Emeltchenko wrote:
+> Add support for "Authentication Requested" command
+> ---
+>  emulator/btdev.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/emulator/btdev.c b/emulator/btdev.c
+> index d0dff74..b1e804b 100644
+> --- a/emulator/btdev.c
+> +++ b/emulator/btdev.c
+> @@ -268,6 +268,7 @@ static void set_bredr_commands(struct btdev *btdev)
+>  	btdev->commands[0]  |= 0x80;	/* Cancel Create Connection */
+>  	btdev->commands[1]  |= 0x01;	/* Accept Connection Request */
+>  	btdev->commands[1]  |= 0x02;	/* Reject Connection Request */
+> +	btdev->commands[1]  |= 0x80;	/* Authentication Requested */
+>  	btdev->commands[2]  |= 0x08;	/* Remote Name Request */
+>  	btdev->commands[2]  |= 0x10;	/* Cancel Remote Name Request */
+>  	btdev->commands[2]  |= 0x20;	/* Read Remote Supported Features */
+> @@ -1191,6 +1192,12 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+>  		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
+>  		break;
+>  
+> +	case BT_HCI_CMD_AUTH_REQUESTED:
+> +		if (btdev->type == BTDEV_TYPE_LE)
+> +			return;
 
-> This last patch does release the port in that situation.
->
-> Tested with:
-> # rfcomm bind 1 <addr>
-> # rfcomm release 1
->
-> and with
-> # rfcomm connect 1 <addr>
+I think this should be "goto unsupported;" instead of a direct return.
 
-I've just tested the patch rfc3.patch as attached to the mail I'm 
-replying to on top of 3.12.6, it works here too.
-
-I've tested 3 use cases:
-
-1. rfcomm connect then ctrl-c,
-2. rfcomm connect, screen /dev/rfcommN, ctrl-c for rfcomm then quit screen
-3. rfcomm connect, disappearing remote device (hard power down of the 
-remote device)
-
-Everything worked as expected.
-
-Thanks again, I wish everyone a merry christmas,
-
-Alexander Holler
+Johan
