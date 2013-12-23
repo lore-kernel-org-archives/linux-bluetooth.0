@@ -1,54 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/6] android/tester: Change test data variables placement
-Date: Mon, 23 Dec 2013 12:50:26 +0100
-Message-Id: <1387799429-6674-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1387799429-6674-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1387799429-6674-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2 2/2] android/bluetooth: Print error on unimplemented functions
+Date: Mon, 23 Dec 2013 12:07:19 +0100
+Message-Id: <1387796839-8164-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1387796839-8164-1-git-send-email-szymon.janc@tieto.com>
+References: <1387796839-8164-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch moves two test variables to proper place in code - before
-test case init structs.
+Functions, callbacks or properties that are not implemented due to
+being bogus or not feasible now prints error messages.
 ---
- android/android-tester.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ android/bluetooth.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index 0fe341b..2a9323f 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -47,10 +47,6 @@
- 			ADAPTER_PROP_TYPE, ADAPTER_PROP_SCAN_MODE, \
- 			ADAPTER_PROP_BONDED_DEVICES, ADAPTER_PROP_DISC_TIMEOUT
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 59f0810..0700972 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -2146,6 +2146,10 @@ static void handle_get_adapter_prop_cmd(const void *buf, uint16_t len)
+ 		break;
+ 	}
  
--static bt_scan_mode_t test_setprop_scanmode_val =
--					BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE;
--static uint32_t test_setprop_disctimeout_val = 120;
--
- /*
-  * those are assigned to HAL methods and callbacks, we use ID later
-  * on mapped in switch-case due to different functions prototypes.
-@@ -724,6 +720,9 @@ static const struct generic_data bluetooth_setprop_bdname_success_test = {
- 	.expected_property.len = 11
- };
- 
-+static bt_scan_mode_t test_setprop_scanmode_val =
-+					BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE;
++	if (status != HAL_STATUS_SUCCESS && status != HAL_STATUS_DONE)
++		error("Failed to get adapter property (type %u status %u)",
++							cmd->type, status);
 +
- static const struct generic_data bluetooth_setprop_scanmode_success_test = {
- 	.expected_hal_callbacks = { ADAPTER_PROP_SCAN_MODE,
- 						ADAPTER_PROP_SCAN_MODE,
-@@ -734,6 +733,8 @@ static const struct generic_data bluetooth_setprop_scanmode_success_test = {
- 	.expected_property.len = sizeof(bt_scan_mode_t)
- };
+ 	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_GET_ADAPTER_PROP, status);
+ }
  
-+static uint32_t test_setprop_disctimeout_val = 120;
+@@ -2293,6 +2297,10 @@ static void handle_set_adapter_prop_cmd(const void *buf, uint16_t len)
+ 		break;
+ 	}
+ 
++	if (status != HAL_STATUS_SUCCESS && status != HAL_STATUS_DONE)
++		error("Failed to set adapter property (type %u status %u)",
++							cmd->type, status);
 +
- static const struct generic_data bluetooth_setprop_disctimeout_success_test = {
- 	.expected_hal_callbacks = { ADAPTER_PROP_DISC_TIMEOUT, ADAPTER_TEST_END },
- 	.expected_adapter_status = BT_STATUS_SUCCESS,
+ 	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_SET_ADAPTER_PROP, status);
+ }
+ 
+@@ -2745,6 +2753,10 @@ static void handle_get_remote_device_prop_cmd(const void *buf, uint16_t len)
+ 		break;
+ 	}
+ 
++	if (status != HAL_STATUS_SUCCESS && status != HAL_STATUS_DONE)
++		error("Failed to get device property (type %u status %u)",
++							cmd->type, status);
++
+ failed:
+ 	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_GET_REMOTE_DEVICE_PROP,
+ 								status);
+@@ -2809,6 +2821,10 @@ static void handle_set_remote_device_prop_cmd(const void *buf, uint16_t len)
+ 		break;
+ 	}
+ 
++	if (status != HAL_STATUS_SUCCESS && status != HAL_STATUS_DONE)
++		error("Failed to set device property (type %u status %u)",
++							cmd->type, status);
++
+ failed:
+ 	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_SET_REMOTE_DEVICE_PROP,
+ 									status);
+@@ -2818,6 +2834,8 @@ static void handle_get_remote_service_rec_cmd(const void *buf, uint16_t len)
+ {
+ 	/* TODO */
+ 
++	error("get_remote_service_record not supported");
++
+ 	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_GET_REMOTE_SERVICE_REC,
+ 							HAL_STATUS_FAILED);
+ }
+@@ -2914,7 +2932,7 @@ static void handle_dut_mode_send_cmd(const void *buf, uint16_t len)
+ 		return;
+ 	}
+ 
+-	DBG("opcode %u", cmd->opcode);
++	error("dut_mode_send not supported");
+ 
+ 	/* TODO */
+ 
+@@ -2932,7 +2950,7 @@ static void handle_le_test_mode_cmd(const void *buf, uint16_t len)
+ 		return;
+ 	}
+ 
+-	DBG("opcode %u", cmd->opcode);
++	error("le_test_mode not supported");
+ 
+ 	/* TODO */
+ 
 -- 
-1.8.4.2
+1.8.3.2
 
