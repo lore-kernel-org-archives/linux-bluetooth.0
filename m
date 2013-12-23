@@ -1,42 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 5/6] android/tester: Correct bdname set test case struc conditions
-Date: Mon, 23 Dec 2013 15:15:53 +0100
-Message-Id: <1387808154-21661-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v2 3/6] android/tester: Change test data variables placement
+Date: Mon, 23 Dec 2013 15:15:51 +0100
+Message-Id: <1387808154-21661-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1387808154-21661-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1387808154-21661-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch correct struct elements initialization. Now test name is
-declared as variable before test case struct and its size is calculated
-using sizeof(), not by hard coded number.
+This patch moves two test variables to proper place in code - before
+test case init structs.
 ---
- android/android-tester.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ android/android-tester.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/android/android-tester.c b/android/android-tester.c
-index fc53465..5e5b951 100644
+index 2078a40..57f3fc9 100644
 --- a/android/android-tester.c
 +++ b/android/android-tester.c
-@@ -715,12 +715,14 @@ static const struct generic_data bluetooth_disable_success_test = {
- 	.expected_adapter_status = BT_STATUS_SUCCESS,
+@@ -47,10 +47,6 @@
+ 			ADAPTER_PROP_TYPE, ADAPTER_PROP_SCAN_MODE, \
+ 			ADAPTER_PROP_BONDED_DEVICES, ADAPTER_PROP_DISC_TIMEOUT
+ 
+-static bt_scan_mode_t test_setprop_scanmode_val =
+-					BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE;
+-static uint32_t test_setprop_disctimeout_val = 120;
+-
+ /*
+  * those are assigned to HAL methods and callbacks, we use ID later
+  * on mapped in switch-case due to different functions prototypes.
+@@ -727,6 +723,9 @@ static const struct generic_data bluetooth_setprop_bdname_success_test = {
+ 	.expected_property.len = 11
  };
  
-+static char test_set_bdname[] = "test_bdname_set";
++static bt_scan_mode_t test_setprop_scanmode_val =
++					BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE;
 +
- static const struct generic_data bluetooth_setprop_bdname_success_test = {
- 	.expected_hal_callbacks = { ADAPTER_PROP_BDNAME, ADAPTER_TEST_END },
- 	.expected_adapter_status = BT_STATUS_SUCCESS,
- 	.expected_property.type = BT_PROPERTY_BDNAME,
--	.expected_property.val = "test_bdname",
--	.expected_property.len = 11,
-+	.expected_property.val = test_set_bdname,
-+	.expected_property.len = sizeof(test_set_bdname) - 1,
+ static const struct generic_data bluetooth_setprop_scanmode_success_test = {
+ 	.expected_hal_callbacks = { ADAPTER_PROP_SCAN_MODE,
+ 						ADAPTER_PROP_SCAN_MODE,
+@@ -737,6 +736,8 @@ static const struct generic_data bluetooth_setprop_scanmode_success_test = {
+ 	.expected_property.len = sizeof(bt_scan_mode_t)
  };
  
- static bt_scan_mode_t test_setprop_scanmode_val =
++static uint32_t test_setprop_disctimeout_val = 120;
++
+ static const struct generic_data bluetooth_setprop_disctimeout_success_test = {
+ 	.expected_hal_callbacks = { ADAPTER_PROP_DISC_TIMEOUT, ADAPTER_TEST_END },
+ 	.expected_adapter_status = BT_STATUS_SUCCESS,
 -- 
 1.8.4.2
 
