@@ -1,75 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] android/AVDTP: Remove get_all parameter for get_capability callback
-Date: Mon, 23 Dec 2013 16:08:09 +0200
-Message-Id: <1387807690-31617-1-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH v2 BlueZ] build: Add coverage support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CABBYNZ+zw_yuUbp1GvMVkOVDQUr_4Xup+SUy4nhj=kb_QaKXUg@mail.gmail.com>
+Date: Mon, 23 Dec 2013 05:57:07 -0800
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <C2EB6265-CEEC-4D1A-8A11-42D0AC64B290@holtmann.org>
+References: <1387372162-7096-1-git-send-email-luiz.dentz@gmail.com> <CABBYNZ+zw_yuUbp1GvMVkOVDQUr_4Xup+SUy4nhj=kb_QaKXUg@mail.gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Luiz,
 
-This is not necessary anymore since all delay reporting is now added
-automatically whenever supported.
----
- android/avdtp.c   | 4 ++--
- android/avdtp.h   | 1 -
- unit/test-avdtp.c | 8 ++++----
- 3 files changed, 6 insertions(+), 7 deletions(-)
+>> Coverage is enabled with --enable-maintainer-mode, 2 new targets are
+>> added 'coverage' and 'clean-coverage', the first generate the reports
+>> using lcov and depend on the second to cleanup previous generated
+>> reports and .gcda files.
+>> ---
+>> .gitignore   |  4 ++++
+>> Makefile.am  | 18 ++++++++++++++++++
+>> acinclude.m4 |  4 ++++
+>> configure.ac |  4 ++++
+>> 4 files changed, 30 insertions(+)
+>> 
+>> diff --git a/.gitignore b/.gitignore
+>> index c570728..21dbe26 100644
+>> --- a/.gitignore
+>> +++ b/.gitignore
+>> @@ -3,6 +3,8 @@
+>> *.lo
+>> *.la
+>> *.so
+>> +*.gcno
+>> +*.gcda
+>> .deps
+>> .libs
+>> .dirstamp
+>> @@ -27,7 +29,9 @@ stamp-h1
+>> autom4te.cache
+>> test-driver
+>> test-suite.log
+>> +coverage.info
+>> 
+>> +coverage
+>> lib/bluez.pc
+>> lib/bluetooth
+>> src/builtin.h
+>> diff --git a/Makefile.am b/Makefile.am
+>> index 15cc149..7380e61 100644
+>> --- a/Makefile.am
+>> +++ b/Makefile.am
+>> @@ -331,5 +331,23 @@ lib/bluetooth/%.h: lib/%.h
+>>        $(AM_V_at)$(MKDIR_P) lib/bluetooth
+>>        $(AM_V_GEN)$(LN_S) -f "$(abs_top_builddir)"/$< $@
+>> 
+>> +if MAINTAINER_MODE
+>> +clean-coverage:
+>> +       -find $(top_builddir) -name "*.gcda" -delete
+>> +       @lcov --directory $(top_builddir) --zerocounters
+>> +       $(RM) -r coverage $(top_builddir)/coverage.info
+>> +
+>> +coverage: clean-coverage check
+>> +       @lcov --compat-libtool --directory $(top_builddir) --capture \
+>> +                               --output-file $(top_builddir)/coverage.info
+>> +       $(AM_V_at)$(MKDIR_P) coverage
+>> +       @genhtml -o coverage/ $(top_builddir)/coverage.info
+>> +
+>> +clean-local: clean-coverage
+>> +       -find $(top_builddir) -name "*.gcno" -delete
+>> +       $(RM) -r lib/bluetooth
+>> +
+>> +else
+>> clean-local:
+>>        $(RM) -r lib/bluetooth
+>> +endif
+>> diff --git a/acinclude.m4 b/acinclude.m4
+>> index 2065852..afc7c6d 100644
+>> --- a/acinclude.m4
+>> +++ b/acinclude.m4
+>> @@ -51,6 +51,10 @@ AC_DEFUN([MISC_FLAGS], [
+>>                        misc_ldflags="$misc_ldflags -pie"
+>>                fi
+>>        ])
+>> +       if (test "$USE_MAINTAINER_MODE" = "yes"); then
+>> +               misc_cflags="$misc_cflags --coverage"
+>> +               misc_ldflags="$misc_ldflags --coverage"
+>> +       fi
+>>        AC_SUBST([MISC_CFLAGS], $misc_cflags)
+>>        AC_SUBST([MISC_LDFLAGS], $misc_ldflags)
+>> ])
+>> diff --git a/configure.ac b/configure.ac
+>> index 18d0b55..4f36355 100644
+>> --- a/configure.ac
+>> +++ b/configure.ac
+>> @@ -252,4 +252,8 @@ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
+>>                                        [enable_android=${enableval}])
+>> AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
+>> 
+>> +if (test "$USE_MAINTAINER_MODE" = "yes"); then
+>> +       AC_CHECK_PROG([LCOV], [lcov], [yes], AC_MSG_ERROR(lcov is required))
+>> +fi
+>> +
+>> AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
+>> --
+>> 1.8.3.1
+> 
+> Any feedback regarding this patch? It is now using maintainer mode as
+> you suggested.
 
-diff --git a/android/avdtp.c b/android/avdtp.c
-index 02ee920..3cf390f 100644
---- a/android/avdtp.c
-+++ b/android/avdtp.c
-@@ -1192,8 +1192,8 @@ static gboolean avdtp_getcap_cmd(struct avdtp *session, uint8_t transaction,
- 		goto failed;
- 	}
- 
--	if (!sep->ind->get_capability(session, sep, get_all, &caps,
--							&err, sep->user_data))
-+	if (!sep->ind->get_capability(session, sep, &caps, &err,
-+							sep->user_data))
- 		goto failed;
- 
- 	for (l = caps, rsp_size = 0; l != NULL; l = g_slist_next(l)) {
-diff --git a/android/avdtp.h b/android/avdtp.h
-index d371653..e8d1907 100644
---- a/android/avdtp.h
-+++ b/android/avdtp.h
-@@ -161,7 +161,6 @@ struct avdtp_sep_cfm {
- struct avdtp_sep_ind {
- 	gboolean (*get_capability) (struct avdtp *session,
- 					struct avdtp_local_sep *sep,
--					gboolean get_all,
- 					GSList **caps, uint8_t *err,
- 					void *user_data);
- 	gboolean (*set_configuration) (struct avdtp *session,
-diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
-index 458daa7..66c45f3 100644
---- a/unit/test-avdtp.c
-+++ b/unit/test-avdtp.c
-@@ -269,8 +269,8 @@ static void execute_context(struct context *context)
- 
- static gboolean sep_getcap_ind(struct avdtp *session,
- 					struct avdtp_local_sep *sep,
--					gboolean get_all, GSList **caps,
--					uint8_t *err, void *user_data)
-+					GSList **caps, uint8_t *err,
-+					void *user_data)
- {
- 	struct avdtp_service_capability *media_transport, *media_codec;
- 	struct avdtp_media_codec_capability *codec_caps;
-@@ -550,8 +550,8 @@ static void test_server_0_sep(gconstpointer data)
- 
- static gboolean sep_getcap_ind_frg(struct avdtp *session,
- 					struct avdtp_local_sep *sep,
--					gboolean get_all, GSList **caps,
--					uint8_t *err, void *user_data)
-+					GSList **caps, uint8_t *err,
-+					void *user_data)
- {
- 	struct avdtp_service_capability *media_transport, *media_codec;
- 	struct avdtp_service_capability *content_protection;
--- 
-1.8.4.2
+I have not tested it yet. In general this looks just fine. However the if else with clean-local in each branches is still something that I think could be done a bit cleaner.
+
+Regards
+
+Marcel
 
