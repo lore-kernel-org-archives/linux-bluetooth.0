@@ -1,78 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 1/2] android/bluetooth: Add support for DUT mode configure command
-Date: Mon, 23 Dec 2013 12:07:18 +0100
-Message-Id: <1387796839-8164-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZJMAJbDwutWndn55nWQOdj310N2t85Qt4erMXu0sB5DKw@mail.gmail.com>
+References: <1387564210-6102-1-git-send-email-szymon.janc@tieto.com>
+	<CABBYNZJMAJbDwutWndn55nWQOdj310N2t85Qt4erMXu0sB5DKw@mail.gmail.com>
+Date: Mon, 23 Dec 2013 11:46:39 +0200
+Message-ID: <CABBYNZK-XO1dyET9kEELLdbmgQgZP3Y31LHkevuOtN3x7pVNNg@mail.gmail.com>
+Subject: Re: [PATCH 1/4] android/bluetooth: Add support for timestamp device property
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to enable and disable DUT mode. This is special mode so
-adding more info from related kernel commit:
+Hi Szymon,
 
-"The Device Under Test (DUT) mode is useful for doing certification
-testing and so expose this as debugfs option.
+On Mon, Dec 23, 2013 at 9:53 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Szymon,
+>
+> On Fri, Dec 20, 2013 at 8:30 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+>> This allows to handle timestamp property request. Also this will be
+>> usefull for devices info cache (clearing old devices).
+>> ---
+>>  android/bluetooth.c | 17 +++++++++++++----
+>>  1 file changed, 13 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/android/bluetooth.c b/android/bluetooth.c
+>> index e534fc1..2e75864 100644
+>> --- a/android/bluetooth.c
+>> +++ b/android/bluetooth.c
+>> @@ -80,6 +80,8 @@ struct device {
+>>         uint32_t class;
+>>         int32_t rssi;
+>>
+>> +       uint32_t timestamp;
+>> +
+>>         GSList *uuids;
+>>  };
+>>
+>> @@ -227,6 +229,8 @@ static void store_device_info(struct device *dev)
+>>         else
+>>                 g_key_file_remove_key(key_file, addr, "Class", NULL);
+>>
+>> +       g_key_file_set_integer(key_file, addr, "Timestamp", dev->timestamp);
+>> +
+>>         if (dev->uuids) {
+>>                 GSList *l;
+>>                 int i;
+>> @@ -291,6 +295,7 @@ static struct device *create_device(const bdaddr_t *bdaddr, uint8_t type)
+>>         bacpy(&dev->bdaddr, bdaddr);
+>>         dev->bdaddr_type = type;
+>>         dev->bond_state = HAL_BOND_STATE_NONE;
+>> +       dev->timestamp = time(NULL);
+>>
+>>         /* use address for name, will be change if one is present
+>>          * eg. in EIR or set by set_property. */
+>> @@ -1004,6 +1009,8 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+>>
+>>                 ev->status = HAL_STATUS_SUCCESS;
+>>                 bdaddr2android(bdaddr, ev->bdaddr);
+>> +
+>> +               dev->timestamp = time(NULL);
+>>         }
+>>
+>>         if (eir.class) {
+>> @@ -1607,6 +1614,9 @@ static void create_device_from_info(GKeyFile *key_file, const char *peer)
+>>
+>>         dev->class = g_key_file_get_integer(key_file, peer, "Class", NULL);
+>>
+>> +       dev->timestamp = g_key_file_get_integer(key_file, peer, "Timestamp",
+>> +                                                                       NULL);
+>> +
+>>         uuids = g_key_file_get_string_list(key_file, peer, "Services", NULL,
+>>                                                                         NULL);
+>>         if (uuids) {
+>> @@ -2647,11 +2657,10 @@ static uint8_t get_device_version_info(struct device *dev)
+>>
+>>  static uint8_t get_device_timestamp(struct device *dev)
+>>  {
+>> -       DBG("Not implemented");
+>> -
+>> -       /* TODO */
+>> +       send_device_property(&dev->bdaddr, HAL_PROP_DEVICE_TIMESTAMP,
+>> +                               sizeof(dev->timestamp), &dev->timestamp);
+>>
+>> -       return HAL_STATUS_FAILED;
+>> +       return HAL_STATUS_SUCCESS;
+>>  }
+>>
+>
+> I guess it probably make sense to update the timestamp also whenever a
+> connection completes or does bluedroid ignores it?
 
-This mode is actually special since you can only enter it. Restoring
-normal operation means that a HCI Reset is required. The current mode
-value gets tracked as a new device flag and when disabling it, the
-correct command to reset the controller is sent."
----
- android/bluetooth.c | 29 ++++++++++++++++++++++++++---
- 1 file changed, 26 insertions(+), 3 deletions(-)
+As discussed in irc this seems to be way HAL is defined, so Im
+applying this one and patch 4, patches 2 and 3 needs some changes so
+Im expecting a v2 soon.
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 2e75864..59f0810 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -50,6 +50,8 @@
- #include "utils.h"
- #include "bluetooth.h"
- 
-+#define DUT_MODE_FILE "/sys/kernel/debug/bluetooth/hci%u/dut_mode"
-+
- #define DEVICE_ID_SOURCE	0x0002	/* USB */
- #define DEVICE_ID_VENDOR	0x1d6b	/* Linux Foundation */
- #define DEVICE_ID_PRODUCT	0x0247	/* BlueZ for Android */
-@@ -2872,13 +2874,34 @@ failed:
- static void handle_dut_mode_conf_cmd(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_dut_mode_conf *cmd = buf;
-+	char path[FILENAME_MAX];
-+	uint8_t status;
-+	int fd, ret;
- 
- 	DBG("enable %u", cmd->enable);
- 
--	/* TODO */
-+	snprintf(path, sizeof(path), DUT_MODE_FILE, adapter.index);
- 
--	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_DUT_MODE_CONF,
--							HAL_STATUS_FAILED);
-+	fd = open(path, O_WRONLY);
-+	if (fd < 0) {
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	if (cmd->enable)
-+		ret = write(fd, "1", sizeof("1"));
-+	else
-+		ret = write(fd, "0", sizeof("0"));
-+
-+	if (ret < 0)
-+		status = HAL_STATUS_FAILED;
-+	else
-+		status = HAL_STATUS_SUCCESS;
-+
-+	close(fd);
-+
-+failed:
-+	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_DUT_MODE_CONF, status);
- }
- 
- static void handle_dut_mode_send_cmd(const void *buf, uint16_t len)
+
 -- 
-1.8.3.2
-
+Luiz Augusto von Dentz
