@@ -1,224 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/6] android/tester: Move BT discovery test cases before Socket Hal
-Date: Mon, 23 Dec 2013 15:15:50 +0100
-Message-Id: <1387808154-21661-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1387808154-21661-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1387808154-21661-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Date: Mon, 23 Dec 2013 16:14:33 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Szymon Janc <szymon.janc@tieto.com>,
+	"linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 2/4] android/bluetooth: Add support for DUT mode
+ configure command
+Message-ID: <20131223141430.GB19604@aemeltch-MOBL1>
+References: <1387564210-6102-1-git-send-email-szymon.janc@tieto.com>
+ <1387564210-6102-2-git-send-email-szymon.janc@tieto.com>
+ <20131223084607.GA19604@aemeltch-MOBL1>
+ <D2E91E85-2775-4DBF-B220-3F039DB5C320@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <D2E91E85-2775-4DBF-B220-3F039DB5C320@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This moves and organize test case data. BT discovery test cases to right
-place in code.
----
- android/android-tester.c | 160 +++++++++++++++++++++++------------------------
- 1 file changed, 80 insertions(+), 80 deletions(-)
+Hi Marcel,
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index f5ab14f..2078a40 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -933,7 +933,6 @@ static void setup(struct test_data *data)
- 		tester_setup_failed();
- 		return;
- 	}
--
- }
- 
- static void setup_base(const void *test_data)
-@@ -1161,6 +1160,78 @@ static void test_setprop_service_record_invalid(const void *test_data)
- 	check_expected_status(adapter_status);
- }
- 
-+static void test_discovery_start_success(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	bt_status_t status;
-+
-+	init_test_conditions(data);
-+
-+	status = data->if_bluetooth->start_discovery();
-+	check_expected_status(status);
-+}
-+
-+static void test_discovery_stop_done(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	bt_status_t status;
-+
-+	init_test_conditions(data);
-+
-+	status = data->if_bluetooth->cancel_discovery();
-+	check_expected_status(status);
-+}
-+
-+static bool pre_inq_compl_hook(const void *dummy, uint16_t len, void *user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	/* Make sure Inquiry Command Complete is not called */
-+
-+	hciemu_del_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT, BT_HCI_CMD_INQUIRY);
-+
-+	return false;
-+}
-+
-+static void test_discovery_stop_success(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	bt_status_t status;
-+
-+	data->userflag = DEVICE_DISCOVERY_CANCEL_ON_START;
-+
-+	init_test_conditions(data);
-+
-+	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT, BT_HCI_CMD_INQUIRY,
-+					pre_inq_compl_hook, data);
-+
-+	status = data->if_bluetooth->start_discovery();
-+	check_expected_status(status);
-+}
-+
-+static void test_discovery_start_done(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	data->userflag = DEVICE_DISCOVERY_START_ON_START;
-+
-+	init_test_conditions(data);
-+
-+	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT, BT_HCI_CMD_INQUIRY,
-+					pre_inq_compl_hook, data);
-+
-+	data->if_bluetooth->start_discovery();
-+}
-+
-+static void test_discovery_device_found(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	init_test_conditions(data);
-+
-+	data->if_bluetooth->start_discovery();
-+}
-+
- /* Test Socket HAL */
- 
- static void adapter_socket_state_changed_cb(bt_state_t state)
-@@ -1482,77 +1553,6 @@ clean:
- 		close(sock_fd);
- }
- 
--static void test_discovery_start_success(const void *test_data)
--{
--	struct test_data *data = tester_get_data();
--	bt_status_t status;
--
--	init_test_conditions(data);
--
--	status = data->if_bluetooth->start_discovery();
--	check_expected_status(status);
--}
--
--static void test_discovery_stop_done(const void *test_data)
--{
--	struct test_data *data = tester_get_data();
--	bt_status_t status;
--
--	init_test_conditions(data);
--
--	status = data->if_bluetooth->cancel_discovery();
--	check_expected_status(status);
--}
--
--static bool pre_inq_compl_hook(const void *dummy, uint16_t len, void *user_data)
--{
--	struct test_data *data = tester_get_data();
--
--	/* Make sure Inquiry Command Complete is not called */
--
--	hciemu_del_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT, BT_HCI_CMD_INQUIRY);
--
--	return false;
--}
--
--static void test_discovery_stop_success(const void *test_data)
--{
--	struct test_data *data = tester_get_data();
--	bt_status_t status;
--
--	data->userflag = DEVICE_DISCOVERY_CANCEL_ON_START;
--
--	init_test_conditions(data);
--
--	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT, BT_HCI_CMD_INQUIRY,
--					pre_inq_compl_hook, data);
--
--	status = data->if_bluetooth->start_discovery();
--	check_expected_status(status);
--}
--
--static void test_discovery_start_done(const void *test_data)
--{
--	struct test_data *data = tester_get_data();
--
--	data->userflag = DEVICE_DISCOVERY_START_ON_START;
--
--	init_test_conditions(data);
--
--	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT, BT_HCI_CMD_INQUIRY,
--					pre_inq_compl_hook, data);
--
--	data->if_bluetooth->start_discovery();
--}
--
--static void test_discovery_device_found(const void *test_data)
--{
--	struct test_data *data = tester_get_data();
--
--	init_test_conditions(data);
--
--	data->if_bluetooth->start_discovery();
--}
- 
- static gboolean socket_chan_cb(GIOChannel *io, GIOCondition cond,
- 							gpointer user_data)
-@@ -1725,26 +1725,26 @@ int main(int argc, char *argv[])
- 				setup_enabled_adapter,
- 				test_setprop_service_record_invalid, teardown);
- 
--	test_bredrle("Bluetooth BREDR Discovery Start - Done",
--				&bluetooth_discovery_start_done_test,
--				setup_enabled_adapter,
--				test_discovery_start_done, teardown);
--
- 	test_bredrle("Bluetooth BREDR Discovery Start - Success",
- 				&bluetooth_discovery_start_success_test,
- 				setup_enabled_adapter,
- 				test_discovery_start_success, teardown);
- 
--	test_bredrle("Bluetooth BREDR Discovery Stop - Done",
--				&bluetooth_discovery_stop_done_test,
-+	test_bredrle("Bluetooth BREDR Discovery Start - Done",
-+				&bluetooth_discovery_start_done_test,
- 				setup_enabled_adapter,
--				test_discovery_stop_done, teardown);
-+				test_discovery_start_done, teardown);
- 
- 	test_bredrle("Bluetooth BREDR Discovery Stop - Success",
- 				&bluetooth_discovery_stop_success_test,
- 				setup_enabled_adapter,
- 				test_discovery_stop_success, teardown);
- 
-+	test_bredrle("Bluetooth BREDR Discovery Stop - Done",
-+				&bluetooth_discovery_stop_done_test,
-+				setup_enabled_adapter,
-+				test_discovery_stop_done, teardown);
-+
- 	test_bredrle("Bluetooth BREDR Discovery Device Found",
- 				&bluetooth_discovery_device_found_test,
- 				setup_enabled_adapter,
--- 
-1.8.4.2
+On Mon, Dec 23, 2013 at 05:55:28AM -0800, Marcel Holtmann wrote:
+> Hi Andrei,
+> 
+> >> This allows to enable and disable DUT mode.
+> > 
+> > Hi Szymon, could you add some more info about the mode?
+> 
+> please refer to the Bluetooth Core specification that explain Device Under Test (DUT) mode. It is a commonly used term. There is really no need to go all out and explain it here.
+> 
 
+I was referring mostly to /sys/ entry in the kernel.
+
+Best regards 
+Andrei Emeltchenko 
