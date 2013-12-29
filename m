@@ -1,45 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <luiz.dentz@gmail.com>, <johan.hedberg@gmail.com>,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [RFC 3/6] android: Minor fix to Android Bluetooth Audio protocol API doc
-Date: Mon, 30 Dec 2013 11:17:24 +0100
-Message-ID: <1388398647-25420-4-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1388398647-25420-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1388398647-25420-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Sun, 29 Dec 2013 21:37:00 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Use MD SET register for changing SDIO Type-B
+ to Type-A
+Message-ID: <20131229193700.GC26228@x220.p-661hnu-f1>
+References: <1388297402-48660-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1388297402-48660-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Make picture consistent with example below it.
+Hi Marcel,
 
----
- android/audio-ipc-api.txt | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+On Sat, Dec 28, 2013, Marcel Holtmann wrote:
+> The register for setting the SDIO card mode of a Type-B Bluetooth card
+> is called MD SET. The MD STAT register is used for reading the current
+> mode back.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  drivers/bluetooth/btsdio.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/android/audio-ipc-api.txt b/android/audio-ipc-api.txt
-index 4983ad7..5140d77 100644
---- a/android/audio-ipc-api.txt
-+++ b/android/audio-ipc-api.txt
-@@ -5,12 +5,12 @@ The audio plugin happen to be in a different socket but all the rules for
- HAL socket apply here as well, the abstract socket name is
- "\0bluez_audio_socket" (tentative):
- 
--	.--Android--.                             .---Audio---.
--	|  daemon   |                             |   Plugin  |
-+	.---Audio---.                             .--Android--.
-+	|  Plugin   |                             |   Daemon  |
- 	|           |          Command            |           |
--	|           | <-------------------------- |           |
--	|           |                             |           |
- 	|           | --------------------------> |           |
-+	|           |                             |           |
-+	|           | <-------------------------- |           |
- 	|           |          Response           |           |
- 	|           |                             |           |
- 	|           |                             |           |
--- 
-1.8.4
+Applied to bluetooth-next. Thanks.
 
+Johan
