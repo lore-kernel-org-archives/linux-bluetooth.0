@@ -1,36 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 29 Dec 2013 21:23:38 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] btmon: Fix build for Android
-Message-ID: <20131229192338.GA26228@x220.p-661hnu-f1>
-References: <1388222555-22995-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1388222555-22995-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Use MD SET register for changing SDIO Type-B to Type-A
+Date: Sat, 28 Dec 2013 22:10:02 -0800
+Message-Id: <1388297402-48660-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+The register for setting the SDIO card mode of a Type-B Bluetooth card
+is called MD SET. The MD STAT register is used for reading the current
+mode back.
 
-On Sat, Dec 28, 2013, Andrei Emeltchenko wrote:
-> Android build was really broken with additions of functions hwdb_*
-> 
-> ...
-> external/bluetooth/bluez/android/../monitor/packet.c:406: error:
-> undefined reference to 'hwdb_get_company'
-> external/bluetooth/bluez/android/../monitor/packet.c:2487: error:
-> undefined reference to 'hwdb_get_vendor_model'
-> collect2: error: ld returned 1 exit status
-> ...
-> ---
->  android/Android.mk | 2 ++
->  1 file changed, 2 insertions(+)
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/btsdio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Applied. Thanks.
+diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
+index 1f6815825e61..83f6437dd91d 100644
+--- a/drivers/bluetooth/btsdio.c
++++ b/drivers/bluetooth/btsdio.c
+@@ -73,6 +73,7 @@ struct btsdio_data {
+ #define REG_CL_INTRD 0x13	/* Interrupt Clear */
+ #define REG_EN_INTRD 0x14	/* Interrupt Enable */
+ #define REG_MD_STAT  0x20	/* Bluetooth Mode Status */
++#define REG_MD_SET   0x20	/* Bluetooth Mode Set */
+ 
+ static int btsdio_tx_packet(struct btsdio_data *data, struct sk_buff *skb)
+ {
+@@ -212,7 +213,7 @@ static int btsdio_open(struct hci_dev *hdev)
+ 	}
+ 
+ 	if (data->func->class == SDIO_CLASS_BT_B)
+-		sdio_writeb(data->func, 0x00, REG_MD_STAT, NULL);
++		sdio_writeb(data->func, 0x00, REG_MD_SET, NULL);
+ 
+ 	sdio_writeb(data->func, 0x01, REG_EN_INTRD, NULL);
+ 
+-- 
+1.8.4.2
 
-It's unfortunate this didn't make it to the release since the tree has
-been broken this way since Monday.
-
-Johan
