@@ -1,334 +1,209 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 30 Dec 2013 13:13:50 +0100
-From: Pavel Machek <pavel@ucw.cz>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
-	=?utf-8?B?0JjQstCw0LnQu9C+INCU0LjQvNC40YLRgNC+0LI=?= <freemangordon@abv.bg>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
-	Ville Tervo <ville.tervo@nokia.com>,
-	Sebastian Reichel <sre@ring0.de>
-Subject: Re: [PATCH v2] Bluetooth: Add hci_h4p driver
-Message-ID: <20131230121350.GB31236@amd.pavel.ucw.cz>
-References: <1379703710-5757-1-git-send-email-pali.rohar@gmail.com>
- <1727897.LBX8128hIo@izba>
- <C8D1F470-7964-4EAC-82E0-D53CF54DE086@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <C8D1F470-7964-4EAC-82E0-D53CF54DE086@holtmann.org>
+In-Reply-To: <CAMudyAuUDd0DVC+42Xh72-MTr8at46Agbma1e-XPm2grWHb75w@mail.gmail.com>
+References: <1388398647-25420-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1388398647-25420-6-git-send-email-lukasz.rymanowski@tieto.com>
+	<CABBYNZKQiGs-nmGRV=rM5Ue=ezk3nETNPtuEqtF2jt7KO-=PNQ@mail.gmail.com>
+	<CAMudyAuUDd0DVC+42Xh72-MTr8at46Agbma1e-XPm2grWHb75w@mail.gmail.com>
+Date: Mon, 30 Dec 2013 14:04:48 +0200
+Message-ID: <CABBYNZK5rRnRnrvDCx7w9zsrG4wZyf8GpGBhLq57fi_o_kNVxA@mail.gmail.com>
+Subject: Re: [RFC 5/6] android/audio: Add wrapper struct for audio structures
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+Hi Lukasz,
 
-> > @@ -242,4 +242,14 @@ config BT_WILINK
-> > 
-> > 	  Say Y here to compile support for Texas Instrument's WiLink7 driver
-> > 	  into the kernel or say M to compile it as module.
-> > +
-> > +config BT_HCIH4P
-> > +	tristate "HCI driver with H4 Nokia extensions"
-> > +	depends on BT && ARCH_OMAP
-> 
-> Since then we moved away from doing hci_* prefix of drivers since that is misleading. See btusb.ko, btmrvl_sdio.ko etc.
-> 
-> So this might be better named BT_NOK_H4P or BT_NOKIA_H4P and the module named btnok_h4p.ko or btnokia_h4p.ko.
-> 
-
-Well, I can rename config option, but renaming the module would break
-existing userland, no?
-
->  Can we also make this just depend on some device tree information
-> and not on a specific architecture. I know that this driver is
-> pretty much OMAP specific, but if we want this upstream, we should
-> at least try to make it more generic.
-
-Nokia N900 is certainly moving towards device tree, but we are not
-ready, yet...
-
-
-> > @@ -0,0 +1,1357 @@
-> > +/*
-> > + * This file is part of hci_h4p bluetooth driver
-> > + *
-> > + * Copyright (C) 2005-2008 Nokia Corporation.
-> > + *
-> > + * Contact: Ville Tervo <ville.tervo@nokia.com>
-> 
-> I think you can just remove the contact names since I think nobody of the original authors is still working at Nokia and I bet this emails addresses just do not work anymore.
-> 
-
-I sent him an email with question. I guess we should move Ville to
-CREDITS?
-
-> > +#include <linux/bluetooth/hci_h4p.h>
-> > +
-> > +#include "hci_h4p.h”
-> > +
-> 
-> Please do not introduce public includes for a driver. This should be all confined to the driver itself or if it platform data, it should go into the place for platform data.
-> 
-
-(Could you insert newlines after 80 or so characters?)
-
-Where would you like platform_data definition to go? That indeed is
-for platform data, and quick grep shows drivers normally do public
-header files for that.
-
-> > +
-> > +	if (!wait_for_completion_interruptible_timeout(&info->init_completion,
-> > +				msecs_to_jiffies(1000)))
-> 
-> Please follow the net subsystem coding style.
-
-Could you elaborate? I see nothing too obviously wrong here.
-
-> > +{
-> > +	if (unlikely(!test_bit(HCI_RUNNING, &info->hdev->flags))) {
-> > +		if (bt_cb(skb)->pkt_type == H4_NEG_PKT) {
-> > +			hci_h4p_negotiation_packet(info, skb);
-> > +			info->rx_state = WAIT_FOR_PKT_TYPE;
-> > +			return;
-> > +		}
-> 
-> Use "else if” here or a switch statement.
-
-Ok.
-
-> > +/* hci callback functions */
-> > +static int hci_h4p_hci_flush(struct hci_dev *hdev)
-> > +{
-> > +	struct hci_h4p_info *info;
-> > +	info = hci_get_drvdata(hdev);
-> 
-> This can be directly assigned at variable declaration.
-
-Ok.
-
-> > +static ssize_t hci_h4p_show_bdaddr(struct device *dev,
-> > +				   struct device_attribute *attr, char *buf)
-> > +{
-> > +	struct hci_h4p_info *info = dev_get_drvdata(dev);
-> > +
-> > +	return sprintf(buf, "%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",
-> > +		       info->bd_addr[0], info->bd_addr[1], info->bd_addr[2],
-> > +		       info->bd_addr[3], info->bd_addr[4], info->bd_addr[5]);
-> 
-> We have printf modifier to print BD_ADDRs.
-
-%pMR. Ok.
-
-> > +	if (hci_register_dev(hdev) < 0) {
-> > +		dev_err(info->dev, "hci_register failed %s.\n", hdev->name);
-> > +		hci_h4p_sysfs_remove_files(info->dev);
-> > +		return -ENODEV;
-> > +	}
-> > +
-> 
-> Who is freeing hdev here in case of an error?
-
-Ok.
-
-> > +	if (!info->reset_gpio_shared)
-> > +		gpio_free(info->reset_gpio);
-> > +	gpio_free(info->bt_wakeup_gpio);
-> > +	gpio_free(info->host_wakeup_gpio);
-> > +
-> > +cleanup_setup:
-> > +
-> > +	kfree(info);
-> > +	return err;
-> > +
-> 
-> Avoid these extra empty lines at function end.
-
-Ok.
-
-> > +
-> > +	if (not_valid) {
-> > +		dev_info(info->dev, "Valid bluetooth address not found, setting some random\n");
-> > +		/* When address is not valid, use some random but Nokia MAC */
-> > +		memcpy(info->bd_addr, nokia_oui, 3);
-> > +		get_random_bytes(info->bd_addr + 3, 3);
-> > +	}
-> 
-> 
-> This behavior is extremely dangerous. I would rather have the device init or powering on the device fail instead of making up a number that might clash with a real Nokia device.
+On Mon, Dec 30, 2013 at 1:33 PM, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> Hi Luiz,
 >
+> On 30 December 2013 12:27, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>> Hi Lukasz,
+>>
+>> On Mon, Dec 30, 2013 at 12:17 PM, Lukasz Rymanowski
+>> <lukasz.rymanowski@tieto.com> wrote:
+>>> This patch add wrapping struct for audio_hw_dev and audio_stream_out.
+>>> We will need this to keep some more addition info related to a2dp stream
+>>> and also hal IPC later on
+>>>
+>>> ---
+>>>  android/Makefile.am |  1 +
+>>>  android/hal-audio.c | 97 +++++++++++++++++++++++++++++------------------------
+>>>  2 files changed, 55 insertions(+), 43 deletions(-)
+>>>
+>>> diff --git a/android/Makefile.am b/android/Makefile.am
+>>> index dec81ce..eaf39bd 100644
+>>> --- a/android/Makefile.am
+>>> +++ b/android/Makefile.am
+>>> @@ -104,6 +104,7 @@ android_android_tester_LDFLAGS = -pthread
+>>>  noinst_LTLIBRARIES += android/libaudio-internal.la
+>>>
+>>>  android_libaudio_internal_la_SOURCES = android/hal-audio.c \
+>>> +                                       android/hal-audio.h \
+>>>                                         android/hardware/audio.h \
+>>>                                         android/hardware/audio_effect.h \
+>>>                                         android/hardware/hardware.h \
+>>> diff --git a/android/hal-audio.c b/android/hal-audio.c
+>>> index 7f4a3f2..011a699 100644
+>>> --- a/android/hal-audio.c
+>>> +++ b/android/hal-audio.c
+>>> @@ -25,6 +25,15 @@
+>>>
+>>>  #include "hal-log.h"
+>>>
+>>> +struct a2dp_audio_dev {
+>>> +       struct audio_hw_device dev;
+>>> +       struct a2dp_stream_out *stream_out;
+>>> +};
+>>> +
+>>> +struct a2dp_stream_out {
+>>> +       struct audio_stream_out stream;
+>>> +};
+>>> +
+>>>  static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+>>>                                                                 size_t bytes)
+>>>  {
+>>> @@ -230,32 +239,34 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
+>>>                                         struct audio_stream_out **stream_out)
+>>>
+>>>  {
+>>> -       struct audio_stream_out *out;
+>>> +       struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *)dev;
+>>> +       struct a2dp_stream_out *a2dp_out;
+>>>
+>>> -       out = calloc(1, sizeof(struct audio_stream_out));
+>>> -       if (!out)
+>>> +       a2dp_out = calloc(1, sizeof(struct a2dp_stream_out));
+>>> +       if (!a2dp_out)
+>>>                 return -ENOMEM;
+>>>
+>>>         DBG("");
+>>>
+>>> -       out->common.get_sample_rate = out_get_sample_rate;
+>>> -       out->common.set_sample_rate = out_set_sample_rate;
+>>> -       out->common.get_buffer_size = out_get_buffer_size;
+>>> -       out->common.get_channels = out_get_channels;
+>>> -       out->common.get_format = out_get_format;
+>>> -       out->common.set_format = out_set_format;
+>>> -       out->common.standby = out_standby;
+>>> -       out->common.dump = out_dump;
+>>> -       out->common.set_parameters = out_set_parameters;
+>>> -       out->common.get_parameters = out_get_parameters;
+>>> -       out->common.add_audio_effect = out_add_audio_effect;
+>>> -       out->common.remove_audio_effect = out_remove_audio_effect;
+>>> -       out->get_latency = out_get_latency;
+>>> -       out->set_volume = out_set_volume;
+>>> -       out->write = out_write;
+>>> -       out->get_render_position = out_get_render_position;
+>>> +       a2dp_out->stream.common.get_sample_rate = out_get_sample_rate;
+>>> +       a2dp_out->stream.common.set_sample_rate = out_set_sample_rate;
+>>> +       a2dp_out->stream.common.get_buffer_size = out_get_buffer_size;
+>>> +       a2dp_out->stream.common.get_channels = out_get_channels;
+>>> +       a2dp_out->stream.common.get_format = out_get_format;
+>>> +       a2dp_out->stream.common.set_format = out_set_format;
+>>> +       a2dp_out->stream.common.standby = out_standby;
+>>> +       a2dp_out->stream.common.dump = out_dump;
+>>> +       a2dp_out->stream.common.set_parameters = out_set_parameters;
+>>> +       a2dp_out->stream.common.get_parameters = out_get_parameters;
+>>> +       a2dp_out->stream.common.add_audio_effect = out_add_audio_effect;
+>>> +       a2dp_out->stream.common.remove_audio_effect = out_remove_audio_effect;
+>>> +       a2dp_out->stream.get_latency = out_get_latency;
+>>> +       a2dp_out->stream.set_volume = out_set_volume;
+>>> +       a2dp_out->stream.write = out_write;
+>>> +       a2dp_out->stream.get_render_position = out_get_render_position;
+>>>
+>>> -       *stream_out = out;
+>>> +       *stream_out = &a2dp_out->stream;
+>>> +       a2dp_dev->stream_out = a2dp_out;
+>>>
+>>>         return 0;
+>>>  }
+>>> @@ -381,7 +392,7 @@ static int audio_close(hw_device_t *device)
+>>>  static int audio_open(const hw_module_t *module, const char *name,
+>>>                                                         hw_device_t **device)
+>>>  {
+>>> -       struct audio_hw_device *audio;
+>>> +       struct a2dp_audio_dev *a2dp_dev;
+>>>
+>>>         DBG("");
+>>>
+>>> @@ -391,30 +402,30 @@ static int audio_open(const hw_module_t *module, const char *name,
+>>>                 return -EINVAL;
+>>>         }
+>>>
+>>> -       audio = calloc(1, sizeof(struct audio_hw_device));
+>>> -       if (!audio)
+>>> +       a2dp_dev = calloc(1, sizeof(struct a2dp_audio_dev));
+>>> +       if (!a2dp_dev)
+>>>                 return -ENOMEM;
+>>>
+>>> -       audio->common.version = AUDIO_DEVICE_API_VERSION_CURRENT;
+>>> -       audio->common.module = (struct hw_module_t *) module;
+>>> -       audio->common.close = audio_close;
+>>> -
+>>> -       audio->init_check = audio_init_check;
+>>> -       audio->set_voice_volume = audio_set_voice_volume;
+>>> -       audio->set_master_volume = audio_set_master_volume;
+>>> -       audio->set_mode = audio_set_mode;
+>>> -       audio->set_mic_mute = audio_set_mic_mute;
+>>> -       audio->get_mic_mute = audio_get_mic_mute;
+>>> -       audio->set_parameters = audio_set_parameters;
+>>> -       audio->get_parameters = audio_get_parameters;
+>>> -       audio->get_input_buffer_size = audio_get_input_buffer_size;
+>>> -       audio->open_output_stream = audio_open_output_stream;
+>>> -       audio->close_output_stream = audio_close_output_stream;
+>>> -       audio->open_input_stream = audio_open_input_stream;
+>>> -       audio->close_input_stream = audio_close_input_stream;
+>>> -       audio->dump = audio_dump;
+>>> -
+>>> -       *device = &audio->common;
+>>> +       a2dp_dev->dev.common.version = AUDIO_DEVICE_API_VERSION_CURRENT;
+>>> +       a2dp_dev->dev.common.module = (struct hw_module_t *) module;
+>>> +       a2dp_dev->dev.common.close = audio_close;
+>>> +
+>>> +       a2dp_dev->dev.init_check = audio_init_check;
+>>> +       a2dp_dev->dev.set_voice_volume = audio_set_voice_volume;
+>>> +       a2dp_dev->dev.set_master_volume = audio_set_master_volume;
+>>> +       a2dp_dev->dev.set_mode = audio_set_mode;
+>>> +       a2dp_dev->dev.set_mic_mute = audio_set_mic_mute;
+>>> +       a2dp_dev->dev.get_mic_mute = audio_get_mic_mute;
+>>> +       a2dp_dev->dev.set_parameters = audio_set_parameters;
+>>> +       a2dp_dev->dev.get_parameters = audio_get_parameters;
+>>> +       a2dp_dev->dev.get_input_buffer_size = audio_get_input_buffer_size;
+>>> +       a2dp_dev->dev.open_output_stream = audio_open_output_stream;
+>>> +       a2dp_dev->dev.close_output_stream = audio_close_output_stream;
+>>> +       a2dp_dev->dev.open_input_stream = audio_open_input_stream;
+>>> +       a2dp_dev->dev.close_input_stream = audio_close_input_stream;
+>>> +       a2dp_dev->dev.dump = audio_dump;
+>>> +
+>>> +       *device = &a2dp_dev->dev.common;
+>>>
+>>>         return 0;
+>>>  }
+>>> --
+>>> 1.8.4
+>>
+>> How is this supposed to be accessed, are you planning on adding a
+>> global variable?
+>>
+>>
+> Have a look on audio_open_output_stream(). This is actually how they did so
+> far and it is fine for me.
+> I want to avoid globals here.
 
-Perhaps people can donate bt addresses from their no-longer-functional
-bluetooth devices and we can select from such pool here? ;-).
-
-Is there some experimental range we can allocate from?
-
-> > +int hci_h4p_reset_uart(struct hci_h4p_info *info)
-> > +{
-> > +	int count = 0;
-> > +
-> > +	/* Reset the  UART */
-> > +	hci_h4p_outb(info, UART_OMAP_SYSC, UART_SYSC_OMAP_RESET);
-> > +	while (!(hci_h4p_inb(info, UART_OMAP_SYSS) & UART_SYSS_RESETDONE)) {
-> > +		if (count++ > 100) {
-> > +			dev_err(info->dev, "hci_h4p: UART reset timeout\n");
-> > +			return -ENODEV;
-> > +		}
-> > +		udelay(1);
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +
-> 
-> No double empty lines please.
-
-Ok.
-
-Pali, here's first round of cleanups...
-
-Signed-off-by: Pavel Machek <pavel@ucw.cz>
-
-								Pavel
-
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 95155c3..9d46f23 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -243,7 +243,7 @@ config BT_WILINK
- 	  Say Y here to compile support for Texas Instrument's WiLink7 driver
- 	  into the kernel or say M to compile it as module.
- 
--config BT_HCIH4P
-+config BT_NOKIA_H4P
- 	tristate "HCI driver with H4 Nokia extensions"
- 	depends on BT && ARCH_OMAP
- 	help
-diff --git a/drivers/bluetooth/hci_h4p/Makefile b/drivers/bluetooth/hci_h4p/Makefile
-index f20bd9a..6f2ef85 100644
---- a/drivers/bluetooth/hci_h4p/Makefile
-+++ b/drivers/bluetooth/hci_h4p/Makefile
-@@ -2,6 +2,6 @@
- # Makefile for the Linux Bluetooth HCI device drivers.
- #
- 
--obj-$(CONFIG_BT_HCIH4P)		+= hci_h4p.o
-+obj-$(CONFIG_BT_NOKIA_H4P)		+= hci_h4p.o
- 
- hci_h4p-objs := core.o fw.o uart.o fw-csr.o fw-bcm.o fw-ti1273.o
-diff --git a/drivers/bluetooth/hci_h4p/core.c b/drivers/bluetooth/hci_h4p/core.c
-index 2f1f8d4..a91bd7b 100644
---- a/drivers/bluetooth/hci_h4p/core.c
-+++ b/drivers/bluetooth/hci_h4p/core.c
-@@ -436,12 +436,12 @@ static inline void hci_h4p_recv_frame(struct hci_h4p_info *info,
- 				      struct sk_buff *skb)
- {
- 	if (unlikely(!test_bit(HCI_RUNNING, &info->hdev->flags))) {
--		if (bt_cb(skb)->pkt_type == H4_NEG_PKT) {
-+		switch (bt_cb(skb)->pkt_type) {
-+		case H4_NEG_PKT:
- 			hci_h4p_negotiation_packet(info, skb);
- 			info->rx_state = WAIT_FOR_PKT_TYPE;
- 			return;
--		}
--		if (bt_cb(skb)->pkt_type == H4_ALIVE_PKT) {
-+		case H4_ALIVE_PKT:
- 			hci_h4p_alive_packet(info, skb);
- 			info->rx_state = WAIT_FOR_PKT_TYPE;
- 			return;
-@@ -843,9 +843,7 @@ static int hci_h4p_reset(struct hci_h4p_info *info)
- /* hci callback functions */
- static int hci_h4p_hci_flush(struct hci_dev *hdev)
- {
--	struct hci_h4p_info *info;
--	info = hci_get_drvdata(hdev);
--
-+	struct hci_h4p_info *info = hci_get_drvdata(hdev);
- 	skb_queue_purge(&info->txq);
- 
- 	return 0;
-@@ -853,7 +851,8 @@ static int hci_h4p_hci_flush(struct hci_dev *hdev)
- 
- static int hci_h4p_bt_wakeup_test(struct hci_h4p_info *info)
- {
--	/* Test Sequence:
-+	/*
-+	 * Test Sequence:
- 	 * Host de-asserts the BT_WAKE_UP line.
- 	 * Host polls the UART_CTS line, waiting for it to be de-asserted.
- 	 * Host asserts the BT_WAKE_UP line.
-@@ -1101,9 +1100,7 @@ static ssize_t hci_h4p_show_bdaddr(struct device *dev,
- {
- 	struct hci_h4p_info *info = dev_get_drvdata(dev);
- 
--	return sprintf(buf, "%.2x:%.2x:%.2x:%.2x:%.2x:%.2x\n",
--		       info->bd_addr[0], info->bd_addr[1], info->bd_addr[2],
--		       info->bd_addr[3], info->bd_addr[4], info->bd_addr[5]);
-+	return sprintf(buf, "%pMR\n", info->bd_addr);
- }
- 
- static DEVICE_ATTR(bdaddr, S_IRUGO | S_IWUSR, hci_h4p_show_bdaddr,
-@@ -1146,16 +1143,17 @@ static int hci_h4p_register_hdev(struct hci_h4p_info *info)
- 
- 	if (hci_h4p_sysfs_create_files(info->dev) < 0) {
- 		dev_err(info->dev, "failed to create sysfs files\n");
--		return -ENODEV;
-+		goto free;
- 	}
- 
--	if (hci_register_dev(hdev) < 0) {
--		dev_err(info->dev, "hci_register failed %s.\n", hdev->name);
--		hci_h4p_sysfs_remove_files(info->dev);
--		return -ENODEV;
--	}
-+	if (hci_register_dev(hdev) >= 0)
-+		return 0;
- 
--	return 0;
-+	dev_err(info->dev, "hci_register failed %s.\n", hdev->name);
-+	hci_h4p_sysfs_remove_files(info->dev);
-+free:
-+	hci_free_dev(info->hdev);
-+	return -ENODEV;
- }
- 
- static int hci_h4p_probe(struct platform_device *pdev)
-@@ -1296,12 +1294,9 @@ cleanup:
- 		gpio_free(info->reset_gpio);
- 	gpio_free(info->bt_wakeup_gpio);
- 	gpio_free(info->host_wakeup_gpio);
--
- cleanup_setup:
--
- 	kfree(info);
- 	return err;
--
- }
- 
- static int hci_h4p_remove(struct platform_device *pdev)
-diff --git a/drivers/bluetooth/hci_h4p/uart.c b/drivers/bluetooth/hci_h4p/uart.c
-index 7973c6c..8e0a93c 100644
---- a/drivers/bluetooth/hci_h4p/uart.c
-+++ b/drivers/bluetooth/hci_h4p/uart.c
-@@ -129,7 +129,7 @@ int hci_h4p_reset_uart(struct hci_h4p_info *info)
- {
- 	int count = 0;
- 
--	/* Reset the  UART */
-+	/* Reset the UART */
- 	hci_h4p_outb(info, UART_OMAP_SYSC, UART_SYSC_OMAP_RESET);
- 	while (!(hci_h4p_inb(info, UART_OMAP_SYSS) & UART_SYSS_RESETDONE)) {
- 		if (count++ > 100) {
-@@ -142,7 +142,6 @@ int hci_h4p_reset_uart(struct hci_h4p_info *info)
- 	return 0;
- }
- 
--
- void hci_h4p_store_regs(struct hci_h4p_info *info)
- {
- 	u16 lcr = 0;
+I can see that you allocate a different struct for a2dp_dev and
+a2dp_out, but then you return a member of the struct back to HAL but
+after that you wont access these structs anymore and the HAL only uses
+the members that you return so you probably gonna need to lookup for
+these structs to access any auxiliary data that we might want to add,
+also these structs never seems to be freed which I suppose can
+generate memory leaks.
 
 
 -- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+Luiz Augusto von Dentz
