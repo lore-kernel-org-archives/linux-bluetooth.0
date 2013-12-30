@@ -1,143 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1388398647-25420-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1388398647-25420-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Mon, 30 Dec 2013 14:29:22 +0200
+Message-ID: <CABBYNZ+c29eB6QbExFTJY9TyJJ6Y3DyC2QKwoiS9cHB=JrFqpw@mail.gmail.com>
+Subject: Re: [RFC 0/6] Audio HAL plugin concept
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ 1/9] android: Add initial code for audio IPC
-Date: Mon, 30 Dec 2013 14:34:07 +0200
-Message-Id: <1388406855-8809-1-git-send-email-luiz.dentz@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Lukasz,
 
-This add initial code for listen and accept connections on the abstract
-socket defined for the audio IPC.
----
- android/hal-msg.h |  1 +
- android/ipc.c     | 53 +++++++++++++++++++++++++++++++++++++++++++++++------
- android/ipc.h     |  3 +++
- 3 files changed, 51 insertions(+), 6 deletions(-)
+On Mon, Dec 30, 2013 at 12:17 PM, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> Here is the set od some startup patches for audio hal plugin plus some trivial
+> fixes which are not RFC actually.
+>
+> As we want audio plugin to register endpoint we need some special way to
+> handle it having in mind that audio device is open on the system startup
+> and closed on system down. We need to handle bluetooth daemon start/stop
+> in between.
+>
+> Need your comment on that. For me it does not look bad but we still have
+> time to consider having some fixed or configurable way (eg. some config file)
+> to register endpoints in bluetooth daemon instead.
+>
+> Lukasz Rymanowski (6):
+>   android/ipc: Remove not needed include
+>   android/audio: Fix Makefile.am for libaudio
+>   android: Minor fix to Android Bluetooth Audio protocol API doc
+>   android: Keep stream_out example in the API doc
+>   android/audio: Add wrapper stuct for audio structures
+>   android/audio: Add listener thread on the Audio HAL socket
+>
+>  android/Makefile.am       |   5 +-
+>  android/audio-ipc-api.txt |  18 ++--
+>  android/hal-audio.c       | 242 ++++++++++++++++++++++++++++++++++++++--------
+>  android/hal-audio.h       |  18 ++++
+>  android/ipc.c             |   1 -
+>  5 files changed, 231 insertions(+), 53 deletions(-)
+>  create mode 100644 android/hal-audio.h
+>
+> --
+> 1.8.4
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index c351501..b14eced 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -24,6 +24,7 @@
- #define BLUEZ_HAL_MTU 1024
- 
- static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
-+static const char BLUEZ_AUDIO_SK_PATH[] = "\0bluez_audio_socket";
- 
- struct hal_hdr {
- 	uint8_t  service_id;
-diff --git a/android/ipc.c b/android/ipc.c
-index 9e8ccc3..6cdbf60 100644
---- a/android/ipc.c
-+++ b/android/ipc.c
-@@ -49,6 +49,7 @@ static struct service_handler services[HAL_SERVICE_ID_MAX + 1];
- 
- static GIOChannel *cmd_io = NULL;
- static GIOChannel *notif_io = NULL;
-+static GIOChannel *audio_io = NULL;
- 
- static void ipc_handle_msg(const void *buf, ssize_t len)
- {
-@@ -145,7 +146,8 @@ static gboolean notif_watch_cb(GIOChannel *io, GIOCondition cond,
- 	return FALSE;
- }
- 
--static GIOChannel *connect_hal(GIOFunc connect_cb)
-+static GIOChannel *connect_hal(const char *path, size_t size,
-+							GIOFunc connect_cb)
- {
- 	struct sockaddr_un addr;
- 	GIOCondition cond;
-@@ -167,11 +169,11 @@ static GIOChannel *connect_hal(GIOFunc connect_cb)
- 	memset(&addr, 0, sizeof(addr));
- 	addr.sun_family = AF_UNIX;
- 
--	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
-+	memcpy(addr.sun_path, path, size);
- 
- 	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
--		error("IPC: failed to connect HAL socket: %d (%s)", errno,
--							strerror(errno));
-+		error("IPC: failed to connect HAL socket %s: %d (%s)", &path[1],
-+							errno, strerror(errno));
- 		g_io_channel_unref(io);
- 		return NULL;
- 	}
-@@ -218,7 +220,8 @@ static gboolean cmd_connect_cb(GIOChannel *io, GIOCondition cond,
- 		return FALSE;
- 	}
- 
--	notif_io = connect_hal(notif_connect_cb);
-+	notif_io = connect_hal(BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH),
-+							notif_connect_cb);
- 	if (!notif_io)
- 		raise(SIGTERM);
- 
-@@ -227,7 +230,8 @@ static gboolean cmd_connect_cb(GIOChannel *io, GIOCondition cond,
- 
- void ipc_init(void)
- {
--	cmd_io = connect_hal(cmd_connect_cb);
-+	cmd_io = connect_hal(BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH),
-+							cmd_connect_cb);
- 	if (!cmd_io)
- 		raise(SIGTERM);
- }
-@@ -338,3 +342,40 @@ void ipc_unregister(uint8_t service)
- 	services[service].handler = NULL;
- 	services[service].size = 0;
- }
-+
-+static gboolean audio_connect_cb(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	DBG("");
-+
-+	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
-+		error("Audio IPC: socket connect failed, terminating");
-+		audio_ipc_cleanup();
-+		return FALSE;
-+	}
-+
-+	cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
-+
-+	g_io_add_watch(audio_io, cond, cmd_watch_cb, NULL);
-+
-+	info("Audio IPC: successfully connected");
-+
-+	return FALSE;
-+}
-+
-+void audio_ipc_init(void)
-+{
-+	audio_io = connect_hal(BLUEZ_AUDIO_SK_PATH, sizeof(BLUEZ_AUDIO_SK_PATH),
-+							audio_connect_cb);
-+	if (!cmd_io)
-+		raise(SIGTERM);
-+}
-+
-+void audio_ipc_cleanup(void)
-+{
-+	if (audio_io) {
-+		g_io_channel_shutdown(audio_io, TRUE, NULL);
-+		g_io_channel_unref(audio_io);
-+		audio_io = NULL;
-+	}
-+}
-diff --git a/android/ipc.h b/android/ipc.h
-index 6cd102b..8e92811 100644
---- a/android/ipc.h
-+++ b/android/ipc.h
-@@ -37,3 +37,6 @@ void ipc_send_notif(uint8_t service_id, uint8_t opcode,  uint16_t len,
- void ipc_register(uint8_t service, const struct ipc_handler *handlers,
- 								uint8_t size);
- void ipc_unregister(uint8_t service);
-+
-+void audio_ipc_init(void);
-+void audio_ipc_cleanup(void);
+Patches 1--4 are now upstream, thanks. For patches 5 and 6 lets
+continue to discuss what is the best way to do the socket handling.
+
+
 -- 
-1.8.4.2
-
+Luiz Augusto von Dentz
