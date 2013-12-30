@@ -3,9 +3,9 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <luiz.dentz@gmail.com>, <johan.hedberg@gmail.com>,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [RFC 6/6] android/audio: Add listener thread on the Audio HAL socket
-Date: Mon, 30 Dec 2013 11:17:27 +0100
-Message-ID: <1388398647-25420-7-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [RFC 5/6] android/audio: Add wrapper struct for audio structures
+Date: Mon, 30 Dec 2013 11:17:26 +0100
+Message-ID: <1388398647-25420-6-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1388398647-25420-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1388398647-25420-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
@@ -13,246 +13,164 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch add thread which is reponsible for listen on audio HAL
-socket, register a2dp endpoint(s) and maintain socket.
-When bluetooth daemon goes down, HAL audio plugin starts to listen on Audio HAL
-socket again.
+This patch add wrapping struct for audio_hw_dev and audio_stream_out.
+We will need this to keep some more addition info related to a2dp stream
+and also hal IPC later on
 
 ---
- android/Makefile.am |   2 +
- android/hal-audio.c | 145 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- android/hal-audio.h |  18 +++++++
- 3 files changed, 165 insertions(+)
- create mode 100644 android/hal-audio.h
+ android/Makefile.am |  1 +
+ android/hal-audio.c | 97 +++++++++++++++++++++++++++++------------------------
+ 2 files changed, 55 insertions(+), 43 deletions(-)
 
 diff --git a/android/Makefile.am b/android/Makefile.am
-index eaf39bd..bd90c13 100644
+index dec81ce..eaf39bd 100644
 --- a/android/Makefile.am
 +++ b/android/Makefile.am
-@@ -112,6 +112,8 @@ android_libaudio_internal_la_SOURCES = android/hal-audio.c \
+@@ -104,6 +104,7 @@ android_android_tester_LDFLAGS = -pthread
+ noinst_LTLIBRARIES += android/libaudio-internal.la
  
- android_libaudio_internal_la_CFLAGS = -I$(srcdir)/android
- 
-+android_libaudio_internal_la_LDFLAGS = -pthread
-+
- endif
- 
- EXTRA_DIST += android/Android.mk android/hal-ipc-api.txt android/README \
+ android_libaudio_internal_la_SOURCES = android/hal-audio.c \
++					android/hal-audio.h \
+ 					android/hardware/audio.h \
+ 					android/hardware/audio_effect.h \
+ 					android/hardware/hardware.h \
 diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 011a699..0e3bc70 100644
+index 7f4a3f2..011a699 100644
 --- a/android/hal-audio.c
 +++ b/android/hal-audio.c
-@@ -16,18 +16,30 @@
-  */
+@@ -25,6 +25,15 @@
  
- #include <errno.h>
-+#include <pthread.h>
-+#include <poll.h>
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
-+#include <sys/socket.h>
-+#include <sys/un.h>
-+#include <unistd.h>
- 
- #include <hardware/audio.h>
- #include <hardware/hardware.h>
- 
-+#include "hal-audio.h"
  #include "hal-log.h"
  
- struct a2dp_audio_dev {
- 	struct audio_hw_device dev;
- 	struct a2dp_stream_out *stream_out;
++struct a2dp_audio_dev {
++	struct audio_hw_device dev;
++	struct a2dp_stream_out *stream_out;
++};
 +
-+	pthread_t bt_watcher;
-+	pthread_mutex_t hal_sk_mutex;
-+	pthread_cond_t bt_watcher_cond;
++struct a2dp_stream_out {
++	struct audio_stream_out stream;
++};
 +
-+	int hal_sk;
- };
- 
- struct a2dp_stream_out {
-@@ -384,15 +396,135 @@ static int audio_dump(const audio_hw_device_t *device, int fd)
- 
- static int audio_close(hw_device_t *device)
+ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+ 								size_t bytes)
  {
-+	struct audio_hw_device *dev = (struct audio_hw_device *)device;
+@@ -230,32 +239,34 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
+ 					struct audio_stream_out **stream_out)
+ 
+ {
+-	struct audio_stream_out *out;
 +	struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *)dev;
-+
++	struct a2dp_stream_out *a2dp_out;
+ 
+-	out = calloc(1, sizeof(struct audio_stream_out));
+-	if (!out)
++	a2dp_out = calloc(1, sizeof(struct a2dp_stream_out));
++	if (!a2dp_out)
+ 		return -ENOMEM;
+ 
  	DBG("");
-+
-+	if (a2dp_dev) {
-+		/* TODO: We could try to unregister Endpoint here */
-+		shutdown(a2dp_dev->hal_sk, 2);
-+
-+		pthread_mutex_lock(&a2dp_dev->hal_sk_mutex);
-+		pthread_cond_signal(&a2dp_dev->bt_watcher_cond);
-+		pthread_mutex_unlock(&a2dp_dev->hal_sk_mutex);
-+
-+		(void) pthread_join(a2dp_dev->bt_watcher, NULL);
-+		free(a2dp_dev);
-+	}
-+
- 	free(device);
+ 
+-	out->common.get_sample_rate = out_get_sample_rate;
+-	out->common.set_sample_rate = out_set_sample_rate;
+-	out->common.get_buffer_size = out_get_buffer_size;
+-	out->common.get_channels = out_get_channels;
+-	out->common.get_format = out_get_format;
+-	out->common.set_format = out_set_format;
+-	out->common.standby = out_standby;
+-	out->common.dump = out_dump;
+-	out->common.set_parameters = out_set_parameters;
+-	out->common.get_parameters = out_get_parameters;
+-	out->common.add_audio_effect = out_add_audio_effect;
+-	out->common.remove_audio_effect = out_remove_audio_effect;
+-	out->get_latency = out_get_latency;
+-	out->set_volume = out_set_volume;
+-	out->write = out_write;
+-	out->get_render_position = out_get_render_position;
++	a2dp_out->stream.common.get_sample_rate = out_get_sample_rate;
++	a2dp_out->stream.common.set_sample_rate = out_set_sample_rate;
++	a2dp_out->stream.common.get_buffer_size = out_get_buffer_size;
++	a2dp_out->stream.common.get_channels = out_get_channels;
++	a2dp_out->stream.common.get_format = out_get_format;
++	a2dp_out->stream.common.set_format = out_set_format;
++	a2dp_out->stream.common.standby = out_standby;
++	a2dp_out->stream.common.dump = out_dump;
++	a2dp_out->stream.common.set_parameters = out_set_parameters;
++	a2dp_out->stream.common.get_parameters = out_get_parameters;
++	a2dp_out->stream.common.add_audio_effect = out_add_audio_effect;
++	a2dp_out->stream.common.remove_audio_effect = out_remove_audio_effect;
++	a2dp_out->stream.get_latency = out_get_latency;
++	a2dp_out->stream.set_volume = out_set_volume;
++	a2dp_out->stream.write = out_write;
++	a2dp_out->stream.get_render_position = out_get_render_position;
+ 
+-	*stream_out = out;
++	*stream_out = &a2dp_out->stream;
++	a2dp_dev->stream_out = a2dp_out;
+ 
  	return 0;
  }
- 
-+static int wait_for_client(void)
-+{
-+	struct sockaddr_un addr;
-+	int err;
-+	int sk;
-+	int new_sk;
-+
-+	DBG("");
-+
-+	sk = socket(PF_LOCAL, SOCK_SEQPACKET, 0);
-+	if (sk < 0) {
-+		err = errno;
-+		error("Failed to create socket: %d (%s)", err, strerror(err));
-+		return -1;
-+	}
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.sun_family = AF_UNIX;
-+
-+	memcpy(addr.sun_path, BLUEZ_AUDIO_HAL_SK_PATH,
-+					sizeof(BLUEZ_AUDIO_HAL_SK_PATH));
-+
-+	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-+		err = errno;
-+		error("Failed to bind socket: %d (%s)", err, strerror(err));
-+		goto error;
-+	}
-+
-+	if (listen(sk, 1) < 0) {
-+		err = errno;
-+		error("Failed to bind socket: %d (%s)", err, strerror(err));
-+		goto error;
-+	}
-+
-+	new_sk = accept(sk, NULL, NULL);
-+	if (new_sk < 0) {
-+		err = errno;
-+		error("Failed to accept socket: %d (%s)", err, strerror(err));
-+		goto error;
-+	}
-+
-+	close(sk);
-+	return new_sk;
-+
-+error:
-+	close(sk);
-+	return -1;
-+}
-+
-+static void *bluetoothd_watcher(void *data)
-+{
-+	int err;
-+	struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *)data;
-+	struct pollfd pfd;
-+	struct timeval now;
-+	struct timespec timeout;
-+
-+	DBG("");
-+
-+	while (1) {
-+		a2dp_dev->hal_sk = wait_for_client();
-+		if (a2dp_dev->hal_sk < 0) {
-+			error("Failed to create listening socket");
-+			continue;
-+		}
-+
-+		DBG("Audio IPC: Connected");
-+
-+		/* TODO: Register ENDPOINT here */
-+
-+		memset(&pfd, 0, sizeof(pfd));
-+		pfd.fd = a2dp_dev->hal_sk;
-+		pfd.events = POLLHUP | POLLERR | POLLNVAL;
-+
-+		pthread_mutex_lock(&a2dp_dev->hal_sk_mutex);
-+
-+		/* Check if socket is still alive */
-+		err = poll(&pfd, 1, -1);
-+		if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL)) {
-+			info("Audio HAL: Socket closed");
-+			a2dp_dev->hal_sk = -1;
-+		}
-+
-+		/* Maybe audio system is closing and audio_close() has been called? */
-+		gettimeofday(&now, NULL);
-+		timeout.tv_sec = now.tv_sec;
-+		timeout.tv_nsec = now.tv_usec * 1000;
-+		timeout.tv_sec += 1;
-+
-+		err = pthread_cond_timedwait(&a2dp_dev->bt_watcher_cond,
-+					&a2dp_dev->hal_sk_mutex, &timeout);
-+
-+		pthread_mutex_unlock(&a2dp_dev->hal_sk_mutex);
-+		if (err != ETIMEDOUT)
-+			/* Seems that device has been closed */
-+			break;
-+	}
-+
-+	info("Closing bluetooth_watcher thread");
-+	pthread_exit(NULL);
-+	return NULL;
-+}
-+
+@@ -381,7 +392,7 @@ static int audio_close(hw_device_t *device)
  static int audio_open(const hw_module_t *module, const char *name,
  							hw_device_t **device)
  {
- 	struct a2dp_audio_dev *a2dp_dev;
-+	int err;
+-	struct audio_hw_device *audio;
++	struct a2dp_audio_dev *a2dp_dev;
  
  	DBG("");
  
-@@ -427,6 +559,19 @@ static int audio_open(const hw_module_t *module, const char *name,
+@@ -391,30 +402,30 @@ static int audio_open(const hw_module_t *module, const char *name,
+ 		return -EINVAL;
+ 	}
  
- 	*device = &a2dp_dev->dev.common;
+-	audio = calloc(1, sizeof(struct audio_hw_device));
+-	if (!audio)
++	a2dp_dev = calloc(1, sizeof(struct a2dp_audio_dev));
++	if (!a2dp_dev)
+ 		return -ENOMEM;
  
-+	a2dp_dev->hal_sk = -1;
+-	audio->common.version = AUDIO_DEVICE_API_VERSION_CURRENT;
+-	audio->common.module = (struct hw_module_t *) module;
+-	audio->common.close = audio_close;
+-
+-	audio->init_check = audio_init_check;
+-	audio->set_voice_volume = audio_set_voice_volume;
+-	audio->set_master_volume = audio_set_master_volume;
+-	audio->set_mode = audio_set_mode;
+-	audio->set_mic_mute = audio_set_mic_mute;
+-	audio->get_mic_mute = audio_get_mic_mute;
+-	audio->set_parameters = audio_set_parameters;
+-	audio->get_parameters = audio_get_parameters;
+-	audio->get_input_buffer_size = audio_get_input_buffer_size;
+-	audio->open_output_stream = audio_open_output_stream;
+-	audio->close_output_stream = audio_close_output_stream;
+-	audio->open_input_stream = audio_open_input_stream;
+-	audio->close_input_stream = audio_close_input_stream;
+-	audio->dump = audio_dump;
+-
+-	*device = &audio->common;
++	a2dp_dev->dev.common.version = AUDIO_DEVICE_API_VERSION_CURRENT;
++	a2dp_dev->dev.common.module = (struct hw_module_t *) module;
++	a2dp_dev->dev.common.close = audio_close;
 +
-+	pthread_mutex_init(&a2dp_dev->hal_sk_mutex, NULL);
-+	pthread_cond_init(&a2dp_dev->bt_watcher_cond, NULL);
++	a2dp_dev->dev.init_check = audio_init_check;
++	a2dp_dev->dev.set_voice_volume = audio_set_voice_volume;
++	a2dp_dev->dev.set_master_volume = audio_set_master_volume;
++	a2dp_dev->dev.set_mode = audio_set_mode;
++	a2dp_dev->dev.set_mic_mute = audio_set_mic_mute;
++	a2dp_dev->dev.get_mic_mute = audio_get_mic_mute;
++	a2dp_dev->dev.set_parameters = audio_set_parameters;
++	a2dp_dev->dev.get_parameters = audio_get_parameters;
++	a2dp_dev->dev.get_input_buffer_size = audio_get_input_buffer_size;
++	a2dp_dev->dev.open_output_stream = audio_open_output_stream;
++	a2dp_dev->dev.close_output_stream = audio_close_output_stream;
++	a2dp_dev->dev.open_input_stream = audio_open_input_stream;
++	a2dp_dev->dev.close_input_stream = audio_close_input_stream;
++	a2dp_dev->dev.dump = audio_dump;
 +
-+	err = pthread_create(&a2dp_dev->bt_watcher, NULL, bluetoothd_watcher, a2dp_dev);
-+	if (err < 0) {
-+		a2dp_dev->bt_watcher = 0;
-+		error("Failed to start bluetoothd watcher thread: %d (%s)", -err,
-+								strerror(-err));
-+		return (-err);
-+	}
-+
++	*device = &a2dp_dev->dev.common;
+ 
  	return 0;
  }
- 
-diff --git a/android/hal-audio.h b/android/hal-audio.h
-new file mode 100644
-index 0000000..93e49f6
---- /dev/null
-+++ b/android/hal-audio.h
-@@ -0,0 +1,18 @@
-+/*
-+ *
-+ * Copyright (C) 2013 Intel Corporation
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ *
-+ */
-+static const char BLUEZ_AUDIO_HAL_SK_PATH[] = "\0bluez_audio_socket";
 -- 
 1.8.4
 
