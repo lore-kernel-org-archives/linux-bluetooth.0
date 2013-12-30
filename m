@@ -1,161 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/5] android/tester: Add BDADDR set prop fail test case
+Date: Mon, 30 Dec 2013 16:30:43 +0100
+Message-ID: <3694279.3Ynmtzyg3t@athlon>
+In-Reply-To: <1388413509-31265-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1388413509-31265-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1388406855-8809-9-git-send-email-luiz.dentz@gmail.com>
-References: <1388406855-8809-1-git-send-email-luiz.dentz@gmail.com>
-	<1388406855-8809-9-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 30 Dec 2013 21:50:24 +0100
-Message-ID: <CAN_7+YanhdZW4XPaRVTiWeDwsEx8yfU9rs3TnuBqmCvXvA0Zng@mail.gmail.com>
-Subject: Re: [RFC BlueZ 9/9] android: Add hal_audio_ipc_init and hal_audio_ipc_cleanup
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Grzegorz,
 
-On Mon, Dec 30, 2013 at 1:34 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> These function initialize the audio IPC in the HAL side.
+On Monday 30 December 2013 15:25:05 Grzegorz Kolodziejczyk wrote:
+> This adds BDADDR set property fail test case due to only get
+> possibility.
 > ---
->  android/hal-audio.c |  9 +++++++++
->  android/hal-ipc.c   | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  android/hal-ipc.h   |  3 +++
->  3 files changed, 68 insertions(+)
->
-> diff --git a/android/hal-audio.c b/android/hal-audio.c
-> index 7f4a3f2..2e7dcca 100644
-> --- a/android/hal-audio.c
-> +++ b/android/hal-audio.c
-> @@ -24,6 +24,7 @@
->  #include <hardware/hardware.h>
->
->  #include "hal-log.h"
-> +#include "hal-ipc.h"
->
->  static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
->                                                                 size_t bytes)
-> @@ -374,6 +375,9 @@ static int audio_dump(const audio_hw_device_t *device, int fd)
->  static int audio_close(hw_device_t *device)
+>  android/android-tester.c | 29 +++++++++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
+> 
+> diff --git a/android/android-tester.c b/android/android-tester.c
+> index ee23fff..d7ebc02 100644
+> --- a/android/android-tester.c
+> +++ b/android/android-tester.c
+> @@ -798,6 +798,17 @@ static const struct generic_data
+>  	.set_property.len = sizeof(setprop_remote_service),
+>  };
+> 
+> +static bt_bdaddr_t setprop_bdaddr = {
+> +	.address = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+> +};
+> +
+> +static const struct generic_data bluetooth_setprop_bdaddr_invalid_test = {
+> +	.expected_adapter_status = BT_STATUS_FAIL,
+> +	.set_property.type = BT_PROPERTY_BDADDR,
+> +	.set_property.val = &setprop_bdaddr,
+> +	.set_property.len = sizeof(setprop_bdaddr),
+> +};
+> +
+>  static const struct generic_data bluetooth_discovery_start_success_test = {
+> .expected_hal_cb.discovery_state_changed_cb =
+>  						discovery_start_success_cb,
+> @@ -1134,6 +1145,19 @@ static void test_setprop_service_record_invalid(const
+> void *test_data) check_expected_status(adapter_status);
+>  }
+> 
+> +static void test_setprop_bdaddr_invalid(const void *test_data)
+> +{
+> +	struct test_data *data = tester_get_data();
+> +	const struct generic_data *test = data->test_data;
+> +	const bt_property_t *prop = &test->expected_property;
+> +	bt_status_t adapter_status;
+> +
+> +	init_test_conditions(data);
+> +
+> +	adapter_status = data->if_bluetooth->set_adapter_property(prop);
+> +	check_expected_status(adapter_status);
+> +}
+> +
+>  static void test_discovery_start_success(const void *test_data)
 >  {
->         DBG("");
+>  	struct test_data *data = tester_get_data();
+> @@ -1693,6 +1717,11 @@ int main(int argc, char *argv[])
+>  				setup_enabled_adapter,
+>  				test_setprop_service_record_invalid, teardown);
+> 
+> +	test_bredrle("Bluetooth Set BDADDR - Invalid",
+> +					&bluetooth_setprop_bdaddr_invalid_test,
+> +					setup_enabled_adapter,
+> +					test_setprop_bdaddr_invalid, teardown);
 > +
-> +       hal_audio_ipc_cleanup();
-> +
->         free(device);
->         return 0;
->  }
-> @@ -391,6 +395,11 @@ static int audio_open(const hw_module_t *module, const char *name,
->                 return -EINVAL;
->         }
->
-> +       if (!hal_audio_ipc_init()) {
-> +               error("Unable to initialize audio IPC");
-> +               return -ENOTCONN;
-> +       }
-> +
->         audio = calloc(1, sizeof(struct audio_hw_device));
->         if (!audio)
->                 return -ENOMEM;
-> diff --git a/android/hal-ipc.c b/android/hal-ipc.c
-> index b19704a..3a1fcc7 100644
-> --- a/android/hal-ipc.c
-> +++ b/android/hal-ipc.c
-> @@ -38,6 +38,7 @@
->
->  static int cmd_sk = -1;
->  static int notif_sk = -1;
-> +static int audio_sk = -1;
->
->  static pthread_mutex_t cmd_sk_mutex = PTHREAD_MUTEX_INITIALIZER;
->
-> @@ -449,3 +450,58 @@ int hal_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len, void *param,
->
->         return BT_STATUS_SUCCESS;
->  }
-> +
-> +bool hal_audio_ipc_init(void)
-> +{
-> +       struct sockaddr_un addr;
-> +       int sk;
-> +       int err;
-> +
-> +       sk = socket(AF_LOCAL, SOCK_SEQPACKET, 0);
-> +       if (sk < 0) {
-> +               err = errno;
-> +               error("Failed to create socket: %d (%s)", err,
-> +                                                       strerror(err));
-> +               return false;
-> +       }
-> +
-> +       memset(&addr, 0, sizeof(addr));
-> +       addr.sun_family = AF_UNIX;
-> +
-> +       memcpy(addr.sun_path, BLUEZ_AUDIO_SK_PATH, sizeof(BLUEZ_AUDIO_SK_PATH));
-> +
-> +       if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-> +               err = errno;
-> +               error("Failed to bind socket: %d (%s)", err, strerror(err));
-> +               close(sk);
-> +               return false;
-> +       }
-> +
-> +       if (listen(sk, 2) < 0) {
+>  	test_bredrle("Bluetooth BREDR Discovery Start - Success",
+>  				&bluetooth_discovery_start_success_test,
+>  				setup_enabled_adapter,
 
-Backlog = 1 should be enough here.
+All patches applied, thanks.
 
-> +               err = errno;
-> +               error("Failed to listen on socket: %d (%s)", err,
-> +                                                               strerror(err));
-> +               close(sk);
-> +               return false;
-> +       }
-> +
-> +       audio_sk = accept_connection(sk);
-
-We can not block audio_open(), so as we discussed on IRC and as I
-proposed in my patches, we need to call hal_audio_ipc_init in thread.
-
-> +       if (audio_sk < 0) {
-> +               close(sk);
-> +               return false;
-> +       }
-> +
-> +       info("audio connected");
-> +
-> +       close(sk);
-> +
-> +       return true;
-> +}
-> +
-> +void hal_audio_ipc_cleanup(void)
-> +{
-> +       close(audio_sk);
-> +       audio_sk = -1;
-> +
-> +       shutdown(audio_sk, SHUT_RD);
-> +}
-> diff --git a/android/hal-ipc.h b/android/hal-ipc.h
-> index 2fbf30f..bd1682d 100644
-> --- a/android/hal-ipc.h
-> +++ b/android/hal-ipc.h
-> @@ -30,3 +30,6 @@ int hal_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len, void *param,
->  void hal_ipc_register(uint8_t service, const struct hal_ipc_handler *handlers,
->                                                                 uint8_t size);
->  void hal_ipc_unregister(uint8_t service);
-> +
-> +bool hal_audio_ipc_init(void);
-> +void hal_audio_ipc_cleanup(void);
-> --
-> 1.8.4.2
->
-
-\Lukasz
-
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
