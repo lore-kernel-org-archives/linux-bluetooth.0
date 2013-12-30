@@ -1,63 +1,143 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ 7/9] android: Add stream resume command/response struct
-Date: Mon, 30 Dec 2013 14:34:13 +0200
-Message-Id: <1388406855-8809-7-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1388406855-8809-1-git-send-email-luiz.dentz@gmail.com>
-References: <1388406855-8809-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC BlueZ 1/9] android: Add initial code for audio IPC
+Date: Mon, 30 Dec 2013 14:34:07 +0200
+Message-Id: <1388406855-8809-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds the definitions to stream resume command and response.
+This add initial code for listen and accept connections on the abstract
+socket defined for the audio IPC.
 ---
- android/a2dp.c    | 10 ++++++++++
- android/hal-msg.h |  5 +++++
- 2 files changed, 15 insertions(+)
+ android/hal-msg.h |  1 +
+ android/ipc.c     | 53 +++++++++++++++++++++++++++++++++++++++++++++++------
+ android/ipc.h     |  3 +++
+ 3 files changed, 51 insertions(+), 6 deletions(-)
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index 2dba482..284d44d 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -382,6 +382,14 @@ static void bt_stream_close(const void *buf, uint16_t len)
- 							HAL_STATUS_FAILED);
- }
- 
-+static void bt_stream_resume(const void *buf, uint16_t len)
-+{
-+	DBG("Not Implemented");
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_AUDIO, AUDIO_OP_RESUME_STREAM,
-+							HAL_STATUS_FAILED);
-+}
-+
- static const struct ipc_handler audio_handlers[] = {
- 	/* AUDIO_OP_OPEN */
- 	{ bt_audio_open, true, sizeof(struct audio_cmd_open) },
-@@ -391,6 +399,8 @@ static const struct ipc_handler audio_handlers[] = {
- 	{ bt_stream_open, false, sizeof(struct audio_cmd_open_stream) },
- 	/* AUDIO_OP_CLOSE_STREAM */
- 	{ bt_stream_close, false, sizeof(struct audio_cmd_close_stream) },
-+	/* AUDIO_OP_RESUME_STREAM */
-+	{ bt_stream_resume, false, sizeof(struct audio_cmd_resume_stream) },
- };
- 
- bool bt_a2dp_register(const bdaddr_t *addr)
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 2816f6f..fe433d1 100644
+index c351501..b14eced 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -605,3 +605,8 @@ struct audio_rsp_open_stream {
- struct audio_cmd_close_stream {
- 	uint8_t id;
- } __attribute__((packed));
+@@ -24,6 +24,7 @@
+ #define BLUEZ_HAL_MTU 1024
+ 
+ static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
++static const char BLUEZ_AUDIO_SK_PATH[] = "\0bluez_audio_socket";
+ 
+ struct hal_hdr {
+ 	uint8_t  service_id;
+diff --git a/android/ipc.c b/android/ipc.c
+index 9e8ccc3..6cdbf60 100644
+--- a/android/ipc.c
++++ b/android/ipc.c
+@@ -49,6 +49,7 @@ static struct service_handler services[HAL_SERVICE_ID_MAX + 1];
+ 
+ static GIOChannel *cmd_io = NULL;
+ static GIOChannel *notif_io = NULL;
++static GIOChannel *audio_io = NULL;
+ 
+ static void ipc_handle_msg(const void *buf, ssize_t len)
+ {
+@@ -145,7 +146,8 @@ static gboolean notif_watch_cb(GIOChannel *io, GIOCondition cond,
+ 	return FALSE;
+ }
+ 
+-static GIOChannel *connect_hal(GIOFunc connect_cb)
++static GIOChannel *connect_hal(const char *path, size_t size,
++							GIOFunc connect_cb)
+ {
+ 	struct sockaddr_un addr;
+ 	GIOCondition cond;
+@@ -167,11 +169,11 @@ static GIOChannel *connect_hal(GIOFunc connect_cb)
+ 	memset(&addr, 0, sizeof(addr));
+ 	addr.sun_family = AF_UNIX;
+ 
+-	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
++	memcpy(addr.sun_path, path, size);
+ 
+ 	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+-		error("IPC: failed to connect HAL socket: %d (%s)", errno,
+-							strerror(errno));
++		error("IPC: failed to connect HAL socket %s: %d (%s)", &path[1],
++							errno, strerror(errno));
+ 		g_io_channel_unref(io);
+ 		return NULL;
+ 	}
+@@ -218,7 +220,8 @@ static gboolean cmd_connect_cb(GIOChannel *io, GIOCondition cond,
+ 		return FALSE;
+ 	}
+ 
+-	notif_io = connect_hal(notif_connect_cb);
++	notif_io = connect_hal(BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH),
++							notif_connect_cb);
+ 	if (!notif_io)
+ 		raise(SIGTERM);
+ 
+@@ -227,7 +230,8 @@ static gboolean cmd_connect_cb(GIOChannel *io, GIOCondition cond,
+ 
+ void ipc_init(void)
+ {
+-	cmd_io = connect_hal(cmd_connect_cb);
++	cmd_io = connect_hal(BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH),
++							cmd_connect_cb);
+ 	if (!cmd_io)
+ 		raise(SIGTERM);
+ }
+@@ -338,3 +342,40 @@ void ipc_unregister(uint8_t service)
+ 	services[service].handler = NULL;
+ 	services[service].size = 0;
+ }
 +
-+#define AUDIO_OP_RESUME_STREAM			0x05
-+struct audio_cmd_resume_stream {
-+	uint8_t id;
-+} __attribute__((packed));
++static gboolean audio_connect_cb(GIOChannel *io, GIOCondition cond,
++							gpointer user_data)
++{
++	DBG("");
++
++	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
++		error("Audio IPC: socket connect failed, terminating");
++		audio_ipc_cleanup();
++		return FALSE;
++	}
++
++	cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
++
++	g_io_add_watch(audio_io, cond, cmd_watch_cb, NULL);
++
++	info("Audio IPC: successfully connected");
++
++	return FALSE;
++}
++
++void audio_ipc_init(void)
++{
++	audio_io = connect_hal(BLUEZ_AUDIO_SK_PATH, sizeof(BLUEZ_AUDIO_SK_PATH),
++							audio_connect_cb);
++	if (!cmd_io)
++		raise(SIGTERM);
++}
++
++void audio_ipc_cleanup(void)
++{
++	if (audio_io) {
++		g_io_channel_shutdown(audio_io, TRUE, NULL);
++		g_io_channel_unref(audio_io);
++		audio_io = NULL;
++	}
++}
+diff --git a/android/ipc.h b/android/ipc.h
+index 6cd102b..8e92811 100644
+--- a/android/ipc.h
++++ b/android/ipc.h
+@@ -37,3 +37,6 @@ void ipc_send_notif(uint8_t service_id, uint8_t opcode,  uint16_t len,
+ void ipc_register(uint8_t service, const struct ipc_handler *handlers,
+ 								uint8_t size);
+ void ipc_unregister(uint8_t service);
++
++void audio_ipc_init(void);
++void audio_ipc_cleanup(void);
 -- 
 1.8.4.2
 
