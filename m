@@ -2,74 +2,114 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 6/7] android/haltest: Implement missing functions from bluetooth HAL
-Date: Mon, 30 Dec 2013 23:43:40 +0100
-Message-Id: <1388443421-6295-6-git-send-email-szymon.janc@gmail.com>
+Subject: [PATCH 3/7] android: Add support for bluetoothd-snoop service in system-emulator
+Date: Mon, 30 Dec 2013 23:43:37 +0100
+Message-Id: <1388443421-6295-3-git-send-email-szymon.janc@gmail.com>
 In-Reply-To: <1388443421-6295-1-git-send-email-szymon.janc@gmail.com>
 References: <1388443421-6295-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implement functions added in Android 4.3+ to Bluetooth HAL.
+This allows to test bluetoothd-snoop service on Linux host.
 ---
- android/client/if-bt.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ android/system-emulator.c | 61 +++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 56 insertions(+), 5 deletions(-)
 
-diff --git a/android/client/if-bt.c b/android/client/if-bt.c
-index 0cd43db..10b79f1 100644
---- a/android/client/if-bt.c
-+++ b/android/client/if-bt.c
-@@ -797,6 +797,36 @@ static void dut_mode_configure_p(int argc, const char **argv)
- 	EXEC(if_bluetooth->dut_mode_configure, mode);
+diff --git a/android/system-emulator.c b/android/system-emulator.c
+index 611e46e..2dc9ad8 100644
+--- a/android/system-emulator.c
++++ b/android/system-emulator.c
+@@ -45,6 +45,7 @@
+ static char exec_dir[PATH_MAX + 1];
+ 
+ static pid_t daemon_pid = -1;
++static pid_t snoop_pid = -1;
+ 
+ static void ctl_start(void)
+ {
+@@ -81,6 +82,47 @@ static void ctl_start(void)
+ 	daemon_pid = pid;
  }
  
-+static void dut_mode_send_p(int argc, const char **argv)
++static void snoop_start(void)
 +{
-+	haltest_error("not implemented\n");
-+}
++	char prg_name[PATH_MAX + 1];
++	char *prg_argv[3];
++	char *prg_envp[1];
++	pid_t pid;
 +
-+#if PLATFORM_SDK_VERSION > 17
-+static void le_test_mode_p(int argc, const char **argv)
-+{
-+	haltest_error("not implemented\n");
-+}
-+#endif
++	snprintf(prg_name, sizeof(prg_name), "%s/%s", exec_dir,
++							"bluetoothd-snoop");
 +
-+#if PLATFORM_SDK_VERSION > 18
-+static void config_hci_snoop_log_p(int argc, const char **argv)
-+{
-+	uint8_t mode;
++	prg_argv[0] = prg_name;
++	prg_argv[1] = "/tmp/btsnoop_hci.log";
++	prg_argv[2] = NULL;
 +
-+	RETURN_IF_NULL(if_bluetooth);
++	prg_envp[0] = NULL;
 +
-+	if (argc <= 2) {
-+		haltest_error("No mode specified\n");
++	printf("Starting %s\n", prg_name);
++
++	pid = fork();
++	if (pid < 0) {
++		perror("Failed to fork new process");
 +		return;
 +	}
 +
-+	mode = strtol(argv[2], NULL, 0);
++	if (pid == 0) {
++		execve(prg_argv[0], prg_argv, prg_envp);
++		exit(0);
++	}
 +
-+	EXEC(if_bluetooth->config_hci_snoop_log, mode);
++	printf("New process %d created\n", pid);
++
++	snoop_pid = pid;
 +}
-+#endif
 +
- static struct method methods[] = {
- 	STD_METHOD(init),
- 	STD_METHOD(cleanup),
-@@ -820,6 +850,13 @@ static struct method methods[] = {
- 	STD_METHODCH(ssp_reply, "<address> <ssp_veriant> 1|0 [<passkey>]"),
- 	STD_METHODCH(get_profile_interface, "<profile id>"),
- 	STD_METHODH(dut_mode_configure, "<dut mode>"),
-+	STD_METHOD(dut_mode_send),
-+#if PLATFORM_SDK_VERSION > 17
-+	STD_METHOD(le_test_mode),
-+#endif
-+#if PLATFORM_SDK_VERSION > 18
-+	STD_METHODH(config_hci_snoop_log, "<mode>"),
-+#endif
- 	END_METHOD
- };
++static void snoop_stop(void)
++{
++	printf("Stoping %s/%s\n", exec_dir, "bluetoothd-snoop");
++
++	kill(snoop_pid, SIGTERM);
++}
++
+ static void system_socket_callback(int fd, uint32_t events, void *user_data)
+ {
+ 	char buf[4096];
+@@ -97,13 +139,20 @@ static void system_socket_callback(int fd, uint32_t events, void *user_data)
  
+ 	printf("Received %s\n", buf);
+ 
+-	if (strcmp(buf, "ctl.start=bluetoothd"))
+-		return;
++	if (!strcmp(buf, "ctl.start=bluetoothd")) {
++		if (daemon_pid > 0)
++			return;
+ 
+-	if (daemon_pid > 0)
+-		return;
++		ctl_start();
++	} else if (!strcmp(buf, "ctl.start=bluetoothd-snoop")) {
++		if (snoop_pid > 0)
++			return;
+ 
+-	ctl_start();
++		snoop_start();
++	} else if (!strcmp(buf, "ctl.stop=bluetoothd-snoop")) {
++		if (snoop_pid > 0)
++			snoop_stop();
++	}
+ }
+ 
+ static void signal_callback(int signum, void *user_data)
+@@ -127,6 +176,8 @@ static void signal_callback(int signum, void *user_data)
+ 
+ 			if (pid == daemon_pid)
+ 				daemon_pid = -1;
++			else if (pid == snoop_pid)
++				snoop_pid = -1;
+ 		}
+ 		break;
+ 	}
 -- 
 1.8.5.2
 
