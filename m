@@ -2,306 +2,38 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 1/7] android: Add HCI snooping tool
-Date: Mon, 30 Dec 2013 23:43:35 +0100
-Message-Id: <1388443421-6295-1-git-send-email-szymon.janc@gmail.com>
+Subject: [PATCH 5/7] android/haltest: Improve EXEC macro robustness
+Date: Mon, 30 Dec 2013 23:43:39 +0100
+Message-Id: <1388443421-6295-5-git-send-email-szymon.janc@gmail.com>
+In-Reply-To: <1388443421-6295-1-git-send-email-szymon.janc@gmail.com>
+References: <1388443421-6295-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This tool is intended to be run as Android service. It supports
-writing HCI snoop data in old btsnoop format only. By default traffic
-is stored in /sdcard/btsnoop_hci.log file (can be overridded with
-option - mainly for testing on Linux host). Only index 0 is sniffed.
+Print info about method being NULL instead of crashing.
 ---
- .gitignore                 |   1 +
- android/Android.mk         |  23 +++++
- android/Makefile.am        |   6 ++
- android/bluetoothd-snoop.c | 219 +++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 249 insertions(+)
- create mode 100644 android/bluetoothd-snoop.c
+ android/client/if-main.h | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/.gitignore b/.gitignore
-index b97546e..1447c90 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -109,3 +109,4 @@ android/system-emulator
- android/bluetoothd
- android/haltest
- android/android-tester
-+android/bluetoothd-snoop
-diff --git a/android/Android.mk b/android/Android.mk
-index 7e29899..1720823 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -253,3 +253,26 @@ LOCAL_MODULE_TAGS := debug
- LOCAL_MODULE := l2test
+diff --git a/android/client/if-main.h b/android/client/if-main.h
+index a83f48b..4a5d4cc 100644
+--- a/android/client/if-main.h
++++ b/android/client/if-main.h
+@@ -147,8 +147,12 @@ const struct method *get_interface_method(const char *iname,
+ /* Helper macro for executing function on interface and printing BT_STATUS */
+ #define EXEC(f, ...) \
+ 	{ \
+-		int err = f(__VA_ARGS__); \
+-		haltest_info("%s: %s\n", #f, bt_status_t2str(err)); \
++		if (f) { \
++			int err = f(__VA_ARGS__); \
++			haltest_info("%s: %s\n", #f, bt_status_t2str(err)); \
++		} else { \
++			haltest_info("%s is NULL\n", #f); \
++		} \
+ 	}
  
- include $(BUILD_EXECUTABLE)
-+
-+#
-+# bluetoothd-snoop
-+#
-+
-+include $(CLEAR_VARS)
-+
-+LOCAL_SRC_FILES := \
-+	bluetoothd-snoop.c \
-+	../monitor/mainloop.c \
-+	../src/shared/btsnoop.c \
-+
-+LOCAL_C_INCLUDES := \
-+	$(LOCAL_PATH)/.. \
-+	$(LOCAL_PATH)/../lib \
-+
-+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
-+
-+LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
-+LOCAL_MODULE_TAGS := optional
-+LOCAL_MODULE := bluetoothd-snoop
-+
-+include $(BUILD_EXECUTABLE)
-diff --git a/android/Makefile.am b/android/Makefile.am
-index dec81ce..36210b9 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -4,6 +4,12 @@ noinst_PROGRAMS += android/system-emulator
- android_system_emulator_SOURCES = android/system-emulator.c \
- 					monitor/mainloop.h monitor/mainloop.c
- 
-+noinst_PROGRAMS += android/bluetoothd-snoop
-+
-+android_bluetoothd_snoop_SOURCES = android/bluetoothd-snoop.c \
-+				monitor/mainloop.h monitor/mainloop.c \
-+				src/shared/btsnoop.h src/shared/btsnoop.c
-+
- noinst_PROGRAMS += android/bluetoothd
- 
- android_bluetoothd_SOURCES = android/main.c \
-diff --git a/android/bluetoothd-snoop.c b/android/bluetoothd-snoop.c
-new file mode 100644
-index 0000000..02f44e9
---- /dev/null
-+++ b/android/bluetoothd-snoop.c
-@@ -0,0 +1,219 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <ctype.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+
-+#include "lib/bluetooth.h"
-+#include "lib/hci.h"
-+#include "lib/mgmt.h"
-+
-+#include "monitor/mainloop.h"
-+#include "src/shared/btsnoop.h"
-+
-+#define DEAULT_SNOOP_FILE "/sdcard/btsnoop_hci.log"
-+
-+#define MAX_PACKET_SIZE (1486 + 4)
-+
-+static struct btsnoop *snoop = NULL;
-+static uint8_t monitor_buf[MAX_PACKET_SIZE];
-+static int monitor_fd = -1;
-+
-+static void signal_callback(int signum, void *user_data)
-+{
-+	switch (signum) {
-+	case SIGINT:
-+	case SIGTERM:
-+		mainloop_quit();
-+		break;
-+	}
-+}
-+
-+static uint32_t get_flags_from_opcode(uint16_t opcode)
-+{
-+	switch (opcode) {
-+	case BTSNOOP_OPCODE_NEW_INDEX:
-+	case BTSNOOP_OPCODE_DEL_INDEX:
-+		break;
-+	case BTSNOOP_OPCODE_COMMAND_PKT:
-+		return 0x02;
-+	case BTSNOOP_OPCODE_EVENT_PKT:
-+		return 0x03;
-+	case BTSNOOP_OPCODE_ACL_TX_PKT:
-+		return 0x00;
-+	case BTSNOOP_OPCODE_ACL_RX_PKT:
-+		return 0x01;
-+	case BTSNOOP_OPCODE_SCO_TX_PKT:
-+	case BTSNOOP_OPCODE_SCO_RX_PKT:
-+		break;
-+	}
-+
-+	return 0xff;
-+}
-+
-+static void data_callback(int fd, uint32_t events, void *user_data)
-+{
-+	unsigned char control[32];
-+	struct mgmt_hdr hdr;
-+	struct msghdr msg;
-+	struct iovec iov[2];
-+
-+	if (events & (EPOLLERR | EPOLLHUP)) {
-+		mainloop_remove_fd(monitor_fd);
-+		return;
-+	}
-+
-+	iov[0].iov_base = &hdr;
-+	iov[0].iov_len = MGMT_HDR_SIZE;
-+	iov[1].iov_base = monitor_buf;
-+	iov[1].iov_len = sizeof(monitor_buf);
-+
-+	memset(&msg, 0, sizeof(msg));
-+	msg.msg_iov = iov;
-+	msg.msg_iovlen = 2;
-+	msg.msg_control = control;
-+	msg.msg_controllen = sizeof(control);
-+
-+	while (true) {
-+		struct cmsghdr *cmsg;
-+		struct timeval *tv = NULL;
-+		struct timeval ctv;
-+		uint16_t opcode, index, pktlen;
-+		uint32_t flags;
-+		ssize_t len;
-+
-+		len = recvmsg(monitor_fd, &msg, MSG_DONTWAIT);
-+		if (len < 0)
-+			break;
-+
-+		if (len < MGMT_HDR_SIZE)
-+			break;
-+
-+		for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL;
-+					cmsg = CMSG_NXTHDR(&msg, cmsg)) {
-+			if (cmsg->cmsg_level != SOL_SOCKET)
-+				continue;
-+
-+			if (cmsg->cmsg_type == SCM_TIMESTAMP) {
-+				memcpy(&ctv, CMSG_DATA(cmsg), sizeof(ctv));
-+				tv = &ctv;
-+			}
-+		}
-+
-+		opcode = btohs(hdr.opcode);
-+		index  = btohs(hdr.index);
-+		pktlen = btohs(hdr.len);
-+
-+		if (index)
-+			continue;
-+
-+		flags = get_flags_from_opcode(opcode);
-+		if (flags != 0xff)
-+			btsnoop_write(snoop, tv, flags, monitor_buf, pktlen);
-+	}
-+}
-+
-+static int open_monitor(const char *path)
-+{
-+	struct sockaddr_hci addr;
-+	int opt = 1;
-+
-+	snoop = btsnoop_create(path, BTSNOOP_TYPE_HCI);
-+	if (!snoop)
-+		return -1;
-+
-+	monitor_fd = socket(AF_BLUETOOTH, SOCK_RAW | SOCK_CLOEXEC, BTPROTO_HCI);
-+	if (monitor_fd < 0)
-+		goto failed;
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.hci_family = AF_BLUETOOTH;
-+	addr.hci_dev = HCI_DEV_NONE;
-+	addr.hci_channel = HCI_CHANNEL_MONITOR;
-+
-+	if (bind(monitor_fd, (struct sockaddr *) &addr, sizeof(addr)) < 0)
-+		goto failed_close;
-+
-+	if (setsockopt(monitor_fd, SOL_SOCKET, SO_TIMESTAMP, &opt, sizeof(opt))
-+									< 0)
-+		goto failed_close;
-+
-+	mainloop_add_fd(monitor_fd, EPOLLIN, data_callback, NULL, NULL);
-+
-+	return 0;
-+
-+failed_close:
-+	close(monitor_fd);
-+	monitor_fd = -1;
-+
-+failed:
-+	btsnoop_unref(snoop);
-+	snoop = NULL;
-+
-+	return -1;
-+}
-+
-+static void close_monitor(void)
-+{
-+	btsnoop_unref(snoop);
-+	snoop = NULL;
-+
-+	close(monitor_fd);
-+	monitor_fd = -1;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	const char *path;
-+	sigset_t mask;
-+
-+	if (argc > 1)
-+		path = argv[1];
-+	else
-+		path = DEAULT_SNOOP_FILE;
-+
-+	mainloop_init();
-+
-+	sigemptyset(&mask);
-+	sigaddset(&mask, SIGINT);
-+	sigaddset(&mask, SIGTERM);
-+
-+	mainloop_set_signal(&mask, signal_callback, NULL, NULL);
-+
-+	if (open_monitor(path) < 0) {
-+		printf("Failed to start bluetoothd_snoop\n");
-+		return EXIT_FAILURE;
-+	}
-+
-+	mainloop_run();
-+
-+	close_monitor();
-+
-+	return EXIT_SUCCESS;
-+}
+ /* Helper macro for executing void function on interface */
 -- 
 1.8.5.2
 
