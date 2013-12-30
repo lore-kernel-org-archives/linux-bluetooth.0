@@ -2,59 +2,53 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 4/4] android/hidhost: Move set_report parameter check to daemon
-Date: Mon, 30 Dec 2013 23:56:20 +0100
-Message-Id: <1388444180-13683-4-git-send-email-szymon.janc@gmail.com>
-In-Reply-To: <1388444180-13683-1-git-send-email-szymon.janc@gmail.com>
-References: <1388444180-13683-1-git-send-email-szymon.janc@gmail.com>
+Subject: [PATCH 1/4] android/hidhost: Move get_protocol parameter check to daemon
+Date: Mon, 30 Dec 2013 23:56:17 +0100
+Message-Id: <1388444180-13683-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 HAL library is to be as simple as possible and parameters values should
 be verified by daemon for robustness anyway. Move this check to daemon.
 ---
- android/hal-hidhost.c | 15 ++-------------
- android/hidhost.c     | 10 ++++++++++
- 2 files changed, 12 insertions(+), 13 deletions(-)
+ android/hal-hidhost.c | 12 ++----------
+ android/hidhost.c     |  9 +++++++++
+ 2 files changed, 11 insertions(+), 10 deletions(-)
 
 diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
-index 371250a..fd3ad2d 100644
+index 6a6b682..5d05f9b 100644
 --- a/android/hal-hidhost.c
 +++ b/android/hal-hidhost.c
-@@ -294,19 +294,8 @@ static bt_status_t set_report(bt_bdaddr_t *bd_addr,
- 	cmd->len = strlen(report);
- 	memcpy(cmd->data, report, cmd->len);
+@@ -218,16 +218,8 @@ static bt_status_t get_protocol(bt_bdaddr_t *bd_addr,
  
--	switch (report_type) {
--	case BTHH_INPUT_REPORT:
--		cmd->type = HAL_HIDHOST_INPUT_REPORT;
+ 	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
+ 
+-	switch (protocol_mode) {
+-	case BTHH_REPORT_MODE:
+-		cmd.mode = HAL_HIDHOST_REPORT_PROTOCOL;
 -		break;
--	case BTHH_OUTPUT_REPORT:
--		cmd->type = HAL_HIDHOST_OUTPUT_REPORT;
--		break;
--	case BTHH_FEATURE_REPORT:
--		cmd->type = HAL_HIDHOST_FEATURE_REPORT;
+-	case BTHH_BOOT_MODE:
+-		cmd.mode = HAL_HIDHOST_BOOT_PROTOCOL;
 -		break;
 -	default:
 -		return BT_STATUS_PARM_INVALID;
 -	}
 +	/* type match IPC type */
-+	cmd->type = report_type;
++	cmd.mode = protocol_mode;
  
- 	return hal_ipc_cmd(HAL_SERVICE_ID_HIDHOST, HAL_OP_HIDHOST_SET_REPORT,
- 				sizeof(*cmd) + cmd->len, buf, 0, NULL, NULL);
+ 	return hal_ipc_cmd(HAL_SERVICE_ID_HIDHOST,
+ 				HAL_OP_HIDHOST_GET_PROTOCOL,
 diff --git a/android/hidhost.c b/android/hidhost.c
-index 1cf85b1..aed9899 100644
+index 0e0391a..4635e53 100644
 --- a/android/hidhost.c
 +++ b/android/hidhost.c
-@@ -1064,6 +1064,16 @@ static void bt_hid_set_report(const void *buf, uint16_t len)
- 		return;
- 	}
+@@ -880,6 +880,15 @@ static void bt_hid_get_protocol(const void *buf, uint16_t len)
  
-+	switch (cmd->type) {
-+	case HAL_HIDHOST_INPUT_REPORT:
-+	case HAL_HIDHOST_OUTPUT_REPORT:
-+	case HAL_HIDHOST_FEATURE_REPORT:
+ 	DBG("");
+ 
++	switch (cmd->mode) {
++	case HAL_HIDHOST_REPORT_PROTOCOL:
++	case HAL_HIDHOST_BOOT_PROTOCOL:
 +		break;
 +	default:
 +		status = HAL_STATUS_INVALID;
