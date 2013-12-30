@@ -1,75 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-From: Pali =?utf-8?q?Roh=C3=A1r?= <pali.rohar@gmail.com>
-To: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [PATCH v2] Bluetooth: Add hci_h4p driver
-Date: Mon, 30 Dec 2013 14:54:47 +0100
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- =?utf-8?q?=D0=98=D0=B2=D0=B0=D0=B9=D0=BB=D0=BE?=
- =?utf-8?q?_=D0=94=D0=B8=D0=BC=D0=B8=D1=82=D1=80=D0=BE=D0=B2?= <freemangordon@abv.bg>,
- "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- "linux-kernel" <linux-kernel@vger.kernel.org>,
- "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
- Ville Tervo <ville.tervo@nokia.com>,
- Sebastian Reichel <sre@ring0.de>
-References: <1379703710-5757-1-git-send-email-pali.rohar@gmail.com> <C8D1F470-7964-4EAC-82E0-D53CF54DE086@holtmann.org> <20131230121350.GB31236@amd.pavel.ucw.cz>
-In-Reply-To: <20131230121350.GB31236@amd.pavel.ucw.cz>
 MIME-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart1836865.HXRv868oZn";
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1
-Message-Id: <201312301454.51096@pali>
+In-Reply-To: <1532451.hxPrzbXmr3@athlon>
+References: <1388406855-8809-1-git-send-email-luiz.dentz@gmail.com>
+	<1388406855-8809-3-git-send-email-luiz.dentz@gmail.com>
+	<1532451.hxPrzbXmr3@athlon>
+Date: Mon, 30 Dec 2013 15:36:37 +0200
+Message-ID: <CABBYNZ+SN7xxo=k2qTYcSvBmYPXx-pJN4gvEDdE0eAqp1CNzzw@mail.gmail.com>
+Subject: Re: [RFC BlueZ 3/9] android: Add audio open command/response struct
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---nextPart1836865.HXRv868oZn
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Hi Szymon,
 
-On Monday 30 December 2013 13:13:50 Pavel Machek wrote:
-> > > +
-> > > +	if (not_valid) {
-> > > +		dev_info(info->dev, "Valid bluetooth address not=20
-found,
-> > > setting some random\n"); +		/* When address is not valid,
-> > > use some random but Nokia MAC */ +		memcpy(info-
->bd_addr,
-> > > nokia_oui, 3);
-> > > +		get_random_bytes(info->bd_addr + 3, 3);
-> > > +	}
-> >=20
-> > This behavior is extremely dangerous. I would rather have
-> > the device init or powering on the device fail instead of
-> > making up a number that might clash with a real Nokia
-> > device.
->=20
-> Perhaps people can donate bt addresses from their
-> no-longer-functional bluetooth devices and we can select from
-> such pool here? ;-).
->=20
-> Is there some experimental range we can allocate from?
->=20
+On Mon, Dec 30, 2013 at 3:27 PM, Szymon Janc <szymon.janc@gmail.com> wrote:
+> Hi Luiz,
+>
+> On Monday 30 December 2013 14:34:09 Luiz Augusto von Dentz wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> This adds the definitions to audio open command and response.
+>> ---
+>>  android/a2dp.c            |  9 +++++++++
+>>  android/audio-ipc-api.txt |  2 +-
+>>  android/hal-msg.h         | 18 ++++++++++++++++++
+>>  android/ipc.c             |  5 ++++-
+>>  4 files changed, 32 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/android/a2dp.c b/android/a2dp.c
+>> index 63f1f58..5cb01f7 100644
+>> --- a/android/a2dp.c
+>> +++ b/android/a2dp.c
+>> @@ -352,7 +352,16 @@ static sdp_record_t *a2dp_record(void)
+>>       return record;
+>>  }
+>>
+>> +static void bt_audio_open(const void *buf, uint16_t len)
+>> +{
+>> +     DBG("Not Implemented");
+>> +
+>> +     ipc_send_rsp(HAL_SERVICE_ID_AUDIO, AUDIO_OP_OPEN, HAL_STATUS_FAILED);
+>> +}
+>> +
+>>  static const struct ipc_handler audio_handlers[] = {
+>> +     /* AUDIO_OP_OPEN */
+>> +     { bt_audio_open, true, sizeof(struct audio_cmd_open) },
+>>  };
+>>
+>>  bool bt_a2dp_register(const bdaddr_t *addr)
+>> diff --git a/android/audio-ipc-api.txt b/android/audio-ipc-api.txt
+>> index 1c42800..37a1569 100644
+>> --- a/android/audio-ipc-api.txt
+>> +++ b/android/audio-ipc-api.txt
+>> @@ -49,9 +49,9 @@ Identifier: "audio" (BT_AUDIO_ID)
+>>
+>>               Command parameters: Service UUID (16 octets)
+>>                                   Codec ID (1 octet)
+>> +                                 Number of codec presets (1 octet)
+>>                                   Codec capabilities length (1 octet)
+>>                                   Codec capabilities (variable)
+>> -                                 Number of codec presets (1 octet)
+>>                                   Codec preset # length (1 octet)
+>>                                   Codec preset # configuration (variable)
+>>                                   ...
+>> diff --git a/android/hal-msg.h b/android/hal-msg.h
+>> index 1afb1bc..4b52e5e 100644
+>> --- a/android/hal-msg.h
+>> +++ b/android/hal-msg.h
+>> @@ -567,3 +567,21 @@ struct hal_ev_a2dp_audio_state {
+>>       uint8_t state;
+>>       uint8_t bdaddr[6];
+>>  } __attribute__((packed));
+>> +
+>> +#define AUDIO_OP_OPEN                                0x01
+>> +struct audio_cmd_open {
+>> +     uint16_t uuid;
+>> +     uint8_t codec;
+>> +     uint8_t presets;
+>> +     uint8_t len;
+>> +     uint8_t data[0];
+>
+> Maybe this could be
+> struct audio_preset[0];
+> ? (if that would make code cleaner)
 
-Wifi driver wl1251 (it is already in mainline) is doing same:=20
-https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/driver=
-s/net/wireless/ti/wl1251/main.c#n1431
+Indeed, will fix it.
 
-=2D-=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
-
-
---nextPart1836865.HXRv868oZn
-Content-Type: application/pgp-signature; name=signature.asc 
-Content-Description: This is a digitally signed message part.
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iEYEABECAAYFAlLBeycACgkQi/DJPQPkQ1IlUACaAmpBaeylZYc0Zr3uMiTZOFQl
-gKcAnR/ETx1+3TLn8xM0o5z1v4aKRQJ6
-=hJZ3
------END PGP SIGNATURE-----
-
---nextPart1836865.HXRv868oZn--
+Luiz Augusto von Dentz
