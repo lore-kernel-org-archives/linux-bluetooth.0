@@ -1,75 +1,125 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 30 Dec 2013 23:18:06 +0100
-From: Pavel Machek <pavel@ucw.cz>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
-	=?utf-8?B?0JjQstCw0LnQu9C+INCU0LjQvNC40YLRgNC+0LI=?= <freemangordon@abv.bg>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
-	Ville Tervo <ville.tervo@nokia.com>,
-	Sebastian Reichel <sre@ring0.de>
-Subject: Re: [PATCH v2] Bluetooth: Add hci_h4p driver
-Message-ID: <20131230221806.GA32561@amd.pavel.ucw.cz>
-References: <1379703710-5757-1-git-send-email-pali.rohar@gmail.com>
- <1727897.LBX8128hIo@izba>
- <C8D1F470-7964-4EAC-82E0-D53CF54DE086@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <C8D1F470-7964-4EAC-82E0-D53CF54DE086@holtmann.org>
+Message-ID: <1388440779.28025.21.camel@g-VPCF13Z1E>
+Subject: PATCH hid2hci for CSR 8510 A10
+From: Gordon <kernel@gkr.i24.cc>
+To: linux-bluetooth@vger.kernel.org
+Date: Mon, 30 Dec 2013 22:59:39 +0100
+Content-Type: multipart/mixed; boundary="=-W7orPFRZi6Z1o9Tn8eF8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
 
-> > +config BT_HCIH4P
-> > +	tristate "HCI driver with H4 Nokia extensions"
-> > +	depends on BT && ARCH_OMAP
-> 
-> Since then we moved away from doing hci_* prefix of drivers since that is misleading. See btusb.ko, btmrvl_sdio.ko etc.
-> 
-> So this might be better named BT_NOK_H4P or BT_NOKIA_H4P and the module named btnok_h4p.ko or btnokia_h4p.ko.
-> 
+--=-W7orPFRZi6Z1o9Tn8eF8
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 
-Pali, please apply :-).
+Hi,
 
-							Pavel
+ich had a problem with the Sitecom CNT-524 as described by someone else
+here:
+http://blog.ruecker.fi/2013/10/06/adventures-in-bluetooth-4-0-part-i/
 
-commit b724166911dcdae2c43170ce4040427c00e834e3
-Author: Pavel <pavel@ucw.cz>
-Date:   Mon Dec 30 23:16:25 2013 +0100
+so i tried to fix that by introducing --mode csr2 for hid2hci
 
-    Rename nokia h4p driver object to btnokia_h4p.ko.
-    
-    Signed-off-by: Pavel Machek <pavel@ucw.cz>
+I neither know how to switch back to hid nor how to detect the EALREADY
+state, otherwise the patch is very small.
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 9d46f23..a53e8c7 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -251,5 +251,5 @@ config BT_NOKIA_H4P
- 	  support for H4+ Bluetooth chip with vendor-specific H4 extensions.
+I works on my machine in ubuntu 13.04 with bluez 4.101-0ubuntu8b1 and
+said sitecom usb dongle. the patch is against bluez commit
+fd00064e0bb2c81e53e9d0b7d22ce919b41dbe60
+
+Could someone please review.
+
+Cheers,
+
+Gordon
+
+
+
+--=-W7orPFRZi6Z1o9Tn8eF8
+Content-Disposition: attachment; filename="bluez_hid2hci.patch"
+Content-Type: text/x-patch; name="bluez_hid2hci.patch"; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+diff --git a/tools/hid2hci.1 b/tools/hid2hci.1
+index 8c5d520..c6876a3 100644
+--- a/tools/hid2hci.1
++++ b/tools/hid2hci.1
+@@ -32,7 +32,7 @@ mode and back.
+ .B --mode= [hid, hci]
+ Sets the mode to switch the device into
+ .TP
+-.B --method= [csr, logitech-hid, dell]
++.B --method= [csr, csr2, logitech-hid, dell]
+ Which vendor method to use for switching the device.
+ .TP
+ .B --devpath=
+diff --git a/tools/hid2hci.c b/tools/hid2hci.c
+index 95b4abf..514accc 100644
+--- a/tools/hid2hci.c
++++ b/tools/hid2hci.c
+@@ -118,6 +118,41 @@ static int usb_switch_csr(int fd, enum mode mode)
+ 	return err;
+ }
  
- 	  Say Y here to compile support for h4 extended devices into the kernel
--	  or say M to compile it as module (hci_h4p).
-+	  or say M to compile it as module (btnokia_h4p).
- endmenu
-diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-index c286dbe..a5ed271 100644
---- a/drivers/bluetooth/Makefile
-+++ b/drivers/bluetooth/Makefile
-@@ -31,7 +31,7 @@ hci_uart-$(CONFIG_BT_HCIUART_ATH3K)	+= hci_ath.o
- hci_uart-$(CONFIG_BT_HCIUART_3WIRE)	+= hci_h5.o
- hci_uart-objs				:= $(hci_uart-y)
++static int usb_switch_csr2(int fd, enum mode mode)
++{
++	int err = 0;
++	struct usbfs_disconnect disconnect;
++	char report[] = { 0x1 , 0x5 , 0x0 , 0x0 , 0x0 , 0x0 , 0x0 , 0x0 , 0x0 };
++	switch (mode) {
++	case HCI:
++		//send report as is
++		disconnect.interface = 0;
++		disconnect.flags = USBFS_DISCONNECT_EXCEPT_DRIVER;
++		strcpy(disconnect.driver, "usbfs");
++
++		if (ioctl(fd, USBFS_IOCTL_DISCONNECT, &disconnect) < 0) {
++			fprintf(stderr, "Can't claim interface: %s (%d)\n",
++						strerror(errno), errno);
++			return -1;
++		}
++
++		err = control_message(fd, USB_ENDPOINT_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE,
++					USB_REQ_SET_CONFIGURATION, //Set_Report Request
++					0x01 | (0x03 << 8), //report id: 0x01, report type: feature (0x03)
++					0, //interface
++					report, sizeof(report), 5000);
++		//unable to detect EALREADY
++		break;
++	case HID:
++		// currently unknown what to do here
++		fprintf(stderr, "csr2: Switching to hid mode is not implemented\n");
++		return -1;
++		break;
++	}
++
++	return err;
++}
++
+ static int hid_logitech_send_report(int fd, const char *buf, size_t size)
+ {
+ 	struct hiddev_report_info rinfo;
+@@ -257,7 +292,7 @@ static void usage(const char *error)
+ 	printf("Usage: hid2hci [options]\n"
+ 		"  --mode=       mode to switch to [hid|hci] (default hci)\n"
+ 		"  --devpath=    sys device path\n"
+-		"  --method=     method to use to switch [csr|logitech-hid|dell]\n"
++		"  --method=     method to use to switch [csr|csr2|logitech-hid|dell]\n"
+ 		"  --help\n\n");
+ }
  
--obj-$(CONFIG_BT_NOKIA_H4P)		+= hci_h4p.o
--hci_h4p-objs := nokia_core.o nokia_fw.o nokia_uart.o nokia_fw-csr.o \
-+obj-$(CONFIG_BT_NOKIA_H4P)		+= btnokia_h4p.o
-+btnokia_h4p-objs := nokia_core.o nokia_fw.o nokia_uart.o nokia_fw-csr.o \
- 		nokia_fw-bcm.o nokia_fw-ti1273.o
- 
+@@ -310,6 +345,9 @@ int main(int argc, char *argv[])
+ 			if (!strcmp(optarg, "csr")) {
+ 				method = METHOD_CSR;
+ 				usb_switch = usb_switch_csr;
++			} else if (!strcmp(optarg, "csr2")) {
++				method = METHOD_CSR;
++				usb_switch = usb_switch_csr2;
+ 			} else if (!strcmp(optarg, "logitech-hid")) {
+ 				method = METHOD_LOGITECH_HID;
+ 			} else if (!strcmp(optarg, "dell")) {
 
+--=-W7orPFRZi6Z1o9Tn8eF8--
 
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
