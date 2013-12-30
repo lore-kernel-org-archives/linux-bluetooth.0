@@ -1,167 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC BlueZ 1/9] android: Add initial code for audio IPC
-Date: Mon, 30 Dec 2013 14:26:40 +0100
-Message-ID: <1919373.99Va0DTt5V@athlon>
-In-Reply-To: <1388406855-8809-1-git-send-email-luiz.dentz@gmail.com>
-References: <1388406855-8809-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 30 Dec 2013 14:19:44 +0100
+From: Sebastian Reichel <sre@ring0.de>
+To: Pavel Machek <pavel@ucw.cz>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+        Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
+        =?utf-8?B?0JjQstCw0LnQu9C+INCU0LjQvNC40YLRgNC+0LI=?= <freemangordon@abv.bg>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
+        Ville Tervo <ville.tervo@nokia.com>
+Subject: Re: [PATCH v2] Bluetooth: Add hci_h4p driver
+Message-ID: <20131230131942.GA13816@earth.universe>
+References: <1379703710-5757-1-git-send-email-pali.rohar@gmail.com>
+ <1727897.LBX8128hIo@izba>
+ <C8D1F470-7964-4EAC-82E0-D53CF54DE086@holtmann.org>
+ <20131230121350.GB31236@amd.pavel.ucw.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="vtzGhvizbBRQ85DL"
+In-Reply-To: <20131230121350.GB31236@amd.pavel.ucw.cz>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
 
-On Monday 30 December 2013 14:34:07 Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This add initial code for listen and accept connections on the abstract
-> socket defined for the audio IPC.
-> ---
->  android/hal-msg.h |  1 +
->  android/ipc.c     | 53
-> +++++++++++++++++++++++++++++++++++++++++++++++------ android/ipc.h     | 
-> 3 +++
->  3 files changed, 51 insertions(+), 6 deletions(-)
-> 
-> diff --git a/android/hal-msg.h b/android/hal-msg.h
-> index c351501..b14eced 100644
-> --- a/android/hal-msg.h
-> +++ b/android/hal-msg.h
-> @@ -24,6 +24,7 @@
->  #define BLUEZ_HAL_MTU 1024
-> 
->  static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
-> +static const char BLUEZ_AUDIO_SK_PATH[] = "\0bluez_audio_socket";
-> 
->  struct hal_hdr {
->  	uint8_t  service_id;
-> diff --git a/android/ipc.c b/android/ipc.c
-> index 9e8ccc3..6cdbf60 100644
-> --- a/android/ipc.c
-> +++ b/android/ipc.c
-> @@ -49,6 +49,7 @@ static struct service_handler services[HAL_SERVICE_ID_MAX
-> + 1];
-> 
->  static GIOChannel *cmd_io = NULL;
->  static GIOChannel *notif_io = NULL;
-> +static GIOChannel *audio_io = NULL;
-> 
->  static void ipc_handle_msg(const void *buf, ssize_t len)
->  {
-> @@ -145,7 +146,8 @@ static gboolean notif_watch_cb(GIOChannel *io,
-> GIOCondition cond, return FALSE;
->  }
-> 
-> -static GIOChannel *connect_hal(GIOFunc connect_cb)
-> +static GIOChannel *connect_hal(const char *path, size_t size,
-> +							GIOFunc connect_cb)
->  {
->  	struct sockaddr_un addr;
->  	GIOCondition cond;
-> @@ -167,11 +169,11 @@ static GIOChannel *connect_hal(GIOFunc connect_cb)
->  	memset(&addr, 0, sizeof(addr));
->  	addr.sun_family = AF_UNIX;
-> 
-> -	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
-> +	memcpy(addr.sun_path, path, size);
-> 
->  	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-> -		error("IPC: failed to connect HAL socket: %d (%s)", errno,
-> -							strerror(errno));
-> +		error("IPC: failed to connect HAL socket %s: %d (%s)", &path[1],
-> +							errno, strerror(errno));
->  		g_io_channel_unref(io);
->  		return NULL;
->  	}
-> @@ -218,7 +220,8 @@ static gboolean cmd_connect_cb(GIOChannel *io,
-> GIOCondition cond, return FALSE;
->  	}
-> 
-> -	notif_io = connect_hal(notif_connect_cb);
-> +	notif_io = connect_hal(BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH),
-> +							notif_connect_cb);
->  	if (!notif_io)
->  		raise(SIGTERM);
-> 
-> @@ -227,7 +230,8 @@ static gboolean cmd_connect_cb(GIOChannel *io,
-> GIOCondition cond,
-> 
->  void ipc_init(void)
->  {
-> -	cmd_io = connect_hal(cmd_connect_cb);
-> +	cmd_io = connect_hal(BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH),
-> +							cmd_connect_cb);
->  	if (!cmd_io)
->  		raise(SIGTERM);
->  }
-> @@ -338,3 +342,40 @@ void ipc_unregister(uint8_t service)
->  	services[service].handler = NULL;
->  	services[service].size = 0;
->  }
-> +
-> +static gboolean audio_connect_cb(GIOChannel *io, GIOCondition cond,
-> +							gpointer user_data)
-> +{
-> +	DBG("");
-> +
-> +	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
-> +		error("Audio IPC: socket connect failed, terminating");
+--vtzGhvizbBRQ85DL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This message is misleading since we should raise(SIGTERM) to terminate.
+Hi,
 
-But I wonder if we should really terminate on audio IPC failure...
-That is failing on IPC error is OK (since that is a bug in our code anyway), 
-but on not being able to connect we could simply fail to register a2dp HAL.
-Same goes with socket being closed - in such case we could fail any request to
-a2dp HAL until connection is recovered.
+On Mon, Dec 30, 2013 at 01:13:50PM +0100, Pavel Machek wrote:
+> [...]
+>
+> Well, I can rename config option, but renaming the module would break
+> existing userland, no?
 
-> +		audio_ipc_cleanup();
-> +		return FALSE;
-> +	}
-> +
-> +	cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
-> +
-> +	g_io_add_watch(audio_io, cond, cmd_watch_cb, NULL);
-> +
-> +	info("Audio IPC: successfully connected");
-> +
-> +	return FALSE;
-> +}
-> +
-> +void audio_ipc_init(void)
-> +{
-> +	audio_io = connect_hal(BLUEZ_AUDIO_SK_PATH, sizeof(BLUEZ_AUDIO_SK_PATH),
-> +							audio_connect_cb);
-> +	if (!cmd_io)
+Why is the userland depending on the module name?
 
-audio_io here?
+> >  Can we also make this just depend on some device tree information
+> > and not on a specific architecture. I know that this driver is
+> > pretty much OMAP specific, but if we want this upstream, we should
+> > at least try to make it more generic.
+>=20
+> Nokia N900 is certainly moving towards device tree, but we are not
+> ready, yet...
 
-> +		raise(SIGTERM);
-> +}
-> +
-> +void audio_ipc_cleanup(void)
-> +{
-> +	if (audio_io) {
-> +		g_io_channel_shutdown(audio_io, TRUE, NULL);
-> +		g_io_channel_unref(audio_io);
-> +		audio_io = NULL;
-> +	}
-> +}
-> diff --git a/android/ipc.h b/android/ipc.h
-> index 6cd102b..8e92811 100644
-> --- a/android/ipc.h
-> +++ b/android/ipc.h
-> @@ -37,3 +37,6 @@ void ipc_send_notif(uint8_t service_id, uint8_t opcode, 
-> uint16_t len, void ipc_register(uint8_t service, const struct ipc_handler
-> *handlers, uint8_t size);
->  void ipc_unregister(uint8_t service);
-> +
-> +void audio_ipc_init(void);
-> +void audio_ipc_cleanup(void);
+Tony plans to remove OMAP3 boardcode (incl. omap3-rx51) in 3.14.
 
--- 
-Szymon K. Janc
-szymon.janc@gmail.com
+> > > [...]
+> > >
+> > Please do not introduce public includes for a driver. This
+> > should be all confined to the driver itself or if it platform
+> > data, it should go into the place for platform data.
+>=20
+> (Could you insert newlines after 80 or so characters?)
+>=20
+> Where would you like platform_data definition to go? That indeed is
+> for platform data, and quick grep shows drivers normally do public
+> header files for that.
+
+Probably it can simply be removed, because it's not useful in 3.14?
+
+> [...]
+
+-- Sebastian
+
+--vtzGhvizbBRQ85DL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.15 (GNU/Linux)
+
+iQIcBAEBCAAGBQJSwXLuAAoJENju1/PIO/qarfAQAJDXrQcdpTiJX9WaAKb9bnB/
+8iCCMk/+dgfBlu/vycLeJ/oNT2INZwVCE7BpOq8b9hJFbTcKTBLKUgBtJbit89D7
+PChXS3DUByEb6wxU6E5LxX/WW5BRzhhYA0GxiaJGA6gp743EEF7l6yU8w2kf97qF
+8cqw0ZNXMb0ewMZ9NHo6lU26hNKHT7mvzn3b6wL1F/aoyS4BX+HZrhLD/F4ki89x
+HXPDzYFnKC/7RYMSi1JsZMlSupB7jT16UXUHZXEM7wDnUJMTyrEA/t1CuRYJCHTZ
+dZTc+fNGrJJDkXjWHnEey/idt+qoRr8vB6h3Zmp+omUnBe//SF7cgvLq6CP20sFG
+j50Q81u9cTVUUwSI0jB4K9Ch3bTaIlevsVZszeg9VDosB6/8EGLJL/BuSamLxA7n
+2rm2wfAQJD4D/6a193SfCsAL270fYY0et5+HqcEsbywVxkrYKPiqgdN6QmHUoQfp
+fBKmiGSKYTVFUK1Bt6i9qf30LqOePXBfZJmRzYBrBT/+QqSzz+ONeFOTXiZ0bZ7s
+4XoE8bPzgZ+8GJmZ7CWhPjZJMPNfA6C3c+jHRb0ls+VGc6X2XuZhY7gldbUA8mZK
+wYj8fMC6y3tIlejUouvxKPM80/CzqCT2TRKijcy2NE+legGsIGVEq8dNWrqZ5FUi
+GFbCmlCLFte/1Y8iMtrc
+=5I6S
+-----END PGP SIGNATURE-----
+
+--vtzGhvizbBRQ85DL--
