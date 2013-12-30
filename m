@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ 6/9] android: Add stream close command/response struct
-Date: Mon, 30 Dec 2013 14:34:12 +0200
-Message-Id: <1388406855-8809-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC BlueZ 5/9] android: Add stream open command/response struct
+Date: Mon, 30 Dec 2013 14:34:11 +0200
+Message-Id: <1388406855-8809-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1388406855-8809-1-git-send-email-luiz.dentz@gmail.com>
 References: <1388406855-8809-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,52 +11,55 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds the definitions to stream close command and response.
+This adds the definitions to stream open command and response.
 ---
  android/a2dp.c    | 10 ++++++++++
- android/hal-msg.h |  5 +++++
- 2 files changed, 15 insertions(+)
+ android/hal-msg.h | 10 ++++++++++
+ 2 files changed, 20 insertions(+)
 
 diff --git a/android/a2dp.c b/android/a2dp.c
-index 104b950..2dba482 100644
+index 43590f0..104b950 100644
 --- a/android/a2dp.c
 +++ b/android/a2dp.c
-@@ -374,6 +374,14 @@ static void bt_stream_open(const void *buf, uint16_t len)
- 							HAL_STATUS_FAILED);
+@@ -366,11 +366,21 @@ static void bt_audio_close(const void *buf, uint16_t len)
+ 	ipc_send_rsp(HAL_SERVICE_ID_AUDIO, AUDIO_OP_CLOSE, HAL_STATUS_FAILED);
  }
  
-+static void bt_stream_close(const void *buf, uint16_t len)
++static void bt_stream_open(const void *buf, uint16_t len)
 +{
 +	DBG("Not Implemented");
 +
-+	ipc_send_rsp(HAL_SERVICE_ID_AUDIO, AUDIO_OP_CLOSE_STREAM,
++	ipc_send_rsp(HAL_SERVICE_ID_AUDIO, AUDIO_OP_OPEN_STREAM,
 +							HAL_STATUS_FAILED);
 +}
 +
  static const struct ipc_handler audio_handlers[] = {
  	/* AUDIO_OP_OPEN */
  	{ bt_audio_open, true, sizeof(struct audio_cmd_open) },
-@@ -381,6 +389,8 @@ static const struct ipc_handler audio_handlers[] = {
+ 	/* AUDIO_OP_CLOSE */
  	{ bt_audio_close, false, sizeof(struct audio_cmd_close) },
- 	/* AUDIO_OP_OPEN_STREAM */
- 	{ bt_stream_open, false, sizeof(struct audio_cmd_open_stream) },
-+	/* AUDIO_OP_CLOSE_STREAM */
-+	{ bt_stream_close, false, sizeof(struct audio_cmd_close_stream) },
++	/* AUDIO_OP_OPEN_STREAM */
++	{ bt_stream_open, false, sizeof(struct audio_cmd_open_stream) },
  };
  
  bool bt_a2dp_register(const bdaddr_t *addr)
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 62674fa..2816f6f 100644
+index f359952..62674fa 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -600,3 +600,8 @@ struct audio_rsp_open_stream {
- 	uint8_t len;
- 	uint8_t data[0];
+@@ -590,3 +590,13 @@ struct audio_rsp_open {
+ struct audio_cmd_close {
+ 	uint8_t id;
  } __attribute__((packed));
 +
-+#define AUDIO_OP_CLOSE_STREAM			0x04
-+struct audio_cmd_close_stream {
++#define AUDIO_OP_OPEN_STREAM			0x03
++struct audio_cmd_open_stream {
 +	uint8_t id;
++} __attribute__((packed));
++
++struct audio_rsp_open_stream {
++	uint8_t len;
++	uint8_t data[0];
 +} __attribute__((packed));
 -- 
 1.8.4.2
