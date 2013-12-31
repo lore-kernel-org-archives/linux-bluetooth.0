@@ -1,116 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 31 Dec 2013 23:12:02 +0100
-From: Pavel Machek <pavel@ucw.cz>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
-	=?utf-8?B?0JjQstCw0LnQu9C+INCU0LjQvNC40YLRgNC+0LI=?= <freemangordon@abv.bg>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
-	Ville Tervo <ville.tervo@nokia.com>,
-	Sebastian Reichel <sre@ring0.de>
-Subject: Re: [PATCH v2] Bluetooth: Add hci_h4p driver
-Message-ID: <20131231221202.GB25336@amd.pavel.ucw.cz>
-References: <1379703710-5757-1-git-send-email-pali.rohar@gmail.com>
- <1727897.LBX8128hIo@izba>
- <C8D1F470-7964-4EAC-82E0-D53CF54DE086@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <C8D1F470-7964-4EAC-82E0-D53CF54DE086@holtmann.org>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 4/5] android/tester: Add BONDED_DEVICES get prop success test case
+Date: Tue, 31 Dec 2013 15:46:30 +0100
+Message-Id: <1388501191-5377-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1388501191-5377-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1388501191-5377-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+This adds BONDED_DEVICES get property success test case.
 
-> > +static struct task_struct *h4p_thread;
-> 
-> Can’t this be done using a work queue. You are looking at a 3.14
-> kernel the earliest. We have way better primitives these days.
+At this time there are no bonded devices. Clear bonded devices list is
+expected.
+---
+ android/android-tester.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-I tried to convert it to work queue, but was not too
-succesfull. Workqueue is not really good match for what this is trying
-to do... Nokia code relies on sleeping, than timing those sleeps for
-signaling. I'm still trying to wrap my head around it.
-
-Ok, I guess I could convert it to one big workqueue task, and leave
-the logic alone. Was that what you wanted?
-
-In the meantime, while trying to untangle it:
-
-commit b02dc19d9269f22baa705d16d1019b86acf15758
-Author: Pavel <pavel@ucw.cz>
-Date:   Tue Dec 31 23:01:23 2013 +0100
-
-    De-obfuscate power management code. Someone please carefully review
-    this.
-    
-    Signed-off-by: Pavel Machek <pavel@ucw.cz>
-
-diff --git a/drivers/bluetooth/nokia_core.c b/drivers/bluetooth/nokia_core.c
-index 85dd106..07761a3 100644
---- a/drivers/bluetooth/nokia_core.c
-+++ b/drivers/bluetooth/nokia_core.c
-@@ -705,28 +705,22 @@ static irqreturn_t hci_h4p_wakeup_interrupt(int irq, void *dev_inst)
- static inline void hci_h4p_set_pm_limits(struct hci_h4p_info *info, bool set)
- {
- 	struct hci_h4p_platform_data *bt_plat_data = info->dev->platform_data;
-+	char *sset = set ? "set" : "clear";
+diff --git a/android/android-tester.c b/android/android-tester.c
+index ae6959b..5467aff 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -891,6 +891,15 @@ static const struct generic_data bluetooth_getprop_uuids_success_test = {
+ 	.expected_property.len = sizeof(getprop_uuids),
+ };
  
- 	if (unlikely(!bt_plat_data || !bt_plat_data->set_pm_limits))
- 		return;
- 
--	if (set && !test_bit(H4P_ACTIVE_MODE, &info->pm_flags)) {
-+	if (set != !!test_bit(H4P_ACTIVE_MODE, &info->pm_flags)) {
- 		bt_plat_data->set_pm_limits(info->dev, set);
--		set_bit(H4P_ACTIVE_MODE, &info->pm_flags);
--		BT_DBG("Change pm constraints to: %s", set ?
--				"set" : "clear");
-+		if (set)
-+			set_bit(H4P_ACTIVE_MODE, &info->pm_flags);
-+		else
-+			clear_bit(H4P_ACTIVE_MODE, &info->pm_flags);
-+		BT_DBG("Change pm constraints to: %s", sset);
- 		return;
- 	}
- 
--	if (!set && test_bit(H4P_ACTIVE_MODE, &info->pm_flags)) {
--		bt_plat_data->set_pm_limits(info->dev, set);
--		clear_bit(H4P_ACTIVE_MODE, &info->pm_flags);
--		BT_DBG("Change pm constraints to: %s",
--				set ? "set" : "clear");
--		return;
--	}
--
--	BT_DBG("pm constraints remains: %s",
--			set ? "set" : "clear");
-+	BT_DBG("pm constraints remains: %s", sset);
++static const struct generic_data bluetooth_getprop_bondeddev_success_test = {
++	.expected_hal_cb.adapter_properties_cb = getprop_success_cb,
++	.expected_cb_count = 1,
++	.expected_adapter_status = BT_STATUS_SUCCESS,
++	.expected_property.type = BT_PROPERTY_ADAPTER_BONDED_DEVICES,
++	.expected_property.val = NULL,
++	.expected_property.len = 0,
++};
++
+ static const struct generic_data bluetooth_discovery_start_success_test = {
+ 	.expected_hal_cb.discovery_state_changed_cb =
+ 						discovery_start_success_cb,
+@@ -1331,6 +1340,19 @@ static void test_getprop_uuids_success(const void *test_data)
+ 	check_expected_status(adapter_status);
  }
  
- static int h4p_run(void *data)
-@@ -762,16 +756,17 @@ static int h4p_run(void *data)
- 		BT_DBG("Timeout before calculation = %u",
- 				jiffies_to_msecs(timeout));
- 
--		/* Empiric analyzer  :-) */
- 		if (elapsed < TIMEOUT_MIN) {
- 			timeout <<= 1;
--			timeout = (timeout > TIMEOUT_MAX) ?
--				TIMEOUT_MAX : timeout;
- 		} else {
--			timeout = (elapsed > timeout - TIMEOUT_MIN) ?
--				TIMEOUT_MIN : timeout - elapsed;
-+			timeout -= elapsed;
- 		}
- 
-+		if (timeout > TIMEOUT_MAX)
-+			timeout = TIMEOUT_MAX;
-+		if (timeout < TIMEOUT_MIN)
-+			timeout = TIMEOUT_MIN;
++static void test_getprop_bondeddev_success(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct generic_data *test = data->test_data;
++	const bt_property_t prop = test->expected_property;
++	bt_status_t adapter_status;
 +
- 		BT_DBG("Timeout after calculation = %u",
- 				jiffies_to_msecs(timeout));
++	init_test_conditions(data);
++
++	adapter_status = data->if_bluetooth->get_adapter_property(prop.type);
++	check_expected_status(adapter_status);
++}
++
+ static void test_discovery_start_success(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+@@ -1930,6 +1952,11 @@ int main(int argc, char *argv[])
+ 					setup_enabled_adapter,
+ 					test_getprop_uuids_success, teardown);
  
-
++	test_bredrle("Bluetooth Get BONDED_DEVICES - Success",
++				&bluetooth_getprop_bondeddev_success_test,
++				setup_enabled_adapter,
++				test_getprop_bondeddev_success, teardown);
++
+ 	test_bredrle("Bluetooth BREDR Discovery Start - Success",
+ 				&bluetooth_discovery_start_success_test,
+ 				setup_enabled_adapter,
 -- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+1.8.5.2
+
