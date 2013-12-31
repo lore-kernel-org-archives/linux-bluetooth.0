@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 02/10] android/ipc: Add audio_ipc_register and audio_ipc_unregister
-Date: Tue, 31 Dec 2013 13:29:54 +0200
-Message-Id: <1388489402-8919-2-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 06/10] android/A2DP: Add audio close command/response struct
+Date: Tue, 31 Dec 2013 13:29:58 +0200
+Message-Id: <1388489402-8919-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1388489402-8919-1-git-send-email-luiz.dentz@gmail.com>
 References: <1388489402-8919-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,69 +11,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-These function can be used to register command handlers for audio IPC.
+This adds the definitions to audio close command and response.
 ---
- android/hal-msg.h |  4 ++++
- android/ipc.c     | 14 ++++++++++++++
- android/ipc.h     |  4 ++++
- 3 files changed, 22 insertions(+)
+ android/a2dp.c    | 10 ++++++++++
+ android/hal-msg.h |  5 +++++
+ 2 files changed, 15 insertions(+)
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index b14eced..267f9b2 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -48,6 +48,10 @@ struct hal_hdr {
+diff --git a/android/a2dp.c b/android/a2dp.c
+index 325c282..e3d58ca 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -360,9 +360,19 @@ static void bt_audio_open(const void *buf, uint16_t len)
+ 							HAL_STATUS_FAILED);
+ }
  
- #define HAL_SERVICE_ID_MAX HAL_SERVICE_ID_GATT
- 
-+#define AUDIO_SERVICE_ID_CORE		0
++static void bt_audio_close(const void *buf, uint16_t len)
++{
++	DBG("Not Implemented");
 +
-+#define AUDIO_SERVICE_ID_MAX AUDIO_SERVICE_ID_CORE
++	audio_ipc_send_rsp(AUDIO_SERVICE_ID_CORE, AUDIO_OP_CLOSE,
++							HAL_STATUS_FAILED);
++}
 +
- /* Core Service */
- 
- #define HAL_STATUS_SUCCESS		0x00
-diff --git a/android/ipc.c b/android/ipc.c
-index d062d95..751284f 100644
---- a/android/ipc.c
-+++ b/android/ipc.c
-@@ -46,6 +46,7 @@ struct service_handler {
+ static const struct ipc_handler audio_handlers[] = {
+ 	/* AUDIO_OP_OPEN */
+ 	{ bt_audio_open, true, sizeof(struct audio_cmd_open) },
++	/* AUDIO_OP_CLOSE */
++	{ bt_audio_close, false, sizeof(struct audio_cmd_close) },
  };
  
- static struct service_handler services[HAL_SERVICE_ID_MAX + 1];
-+static struct service_handler audio_services[AUDIO_SERVICE_ID_MAX + 1];
- 
- static GIOChannel *cmd_io = NULL;
- static GIOChannel *notif_io = NULL;
-@@ -379,3 +380,16 @@ void audio_ipc_cleanup(void)
- 		audio_io = NULL;
- 	}
- }
+ bool bt_a2dp_register(const bdaddr_t *addr)
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 1036988..d1135df 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -588,3 +588,8 @@ struct audio_cmd_open {
+ struct audio_rsp_open {
+ 	uint8_t id;
+ } __attribute__((packed));
 +
-+void audio_ipc_register(uint8_t service, const struct ipc_handler *handlers,
-+								uint8_t size)
-+{
-+	audio_services[service].handler = handlers;
-+	audio_services[service].size = size;
-+}
-+
-+void audio_ipc_unregister(uint8_t service)
-+{
-+	audio_services[service].handler = NULL;
-+	audio_services[service].size = 0;
-+}
-diff --git a/android/ipc.h b/android/ipc.h
-index 8e92811..44d5a5d 100644
---- a/android/ipc.h
-+++ b/android/ipc.h
-@@ -40,3 +40,7 @@ void ipc_unregister(uint8_t service);
- 
- void audio_ipc_init(void);
- void audio_ipc_cleanup(void);
-+
-+void audio_ipc_register(uint8_t service, const struct ipc_handler *handlers,
-+								uint8_t size);
-+void audio_ipc_unregister(uint8_t service);
++#define AUDIO_OP_CLOSE				0x02
++struct audio_cmd_close {
++	uint8_t id;
++} __attribute__((packed));
 -- 
 1.8.4.2
 
