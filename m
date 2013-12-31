@@ -1,198 +1,152 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 01/10] android/ipc: Add initial code for audio IPC
-Date: Tue, 31 Dec 2013 13:29:53 +0200
-Message-Id: <1388489402-8919-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2] android/pan: Add pan sdp record for NAP role
+Date: Tue, 31 Dec 2013 11:59:58 +0200
+Message-Id: <1388483998-31288-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This add initial code for listen and accept connections on the abstract
-socket defined for the audio IPC.
 ---
- android/hal-msg.h |  1 +
- android/ipc.c     | 65 +++++++++++++++++++++++++++++++++++++++++++++----------
- android/ipc.h     |  3 +++
- 3 files changed, 57 insertions(+), 12 deletions(-)
+ android/pan.c | 95 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 95 insertions(+)
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index c351501..b14eced 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -24,6 +24,7 @@
- #define BLUEZ_HAL_MTU 1024
+diff --git a/android/pan.c b/android/pan.c
+index 689c7ef..a4d8977 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -44,9 +44,12 @@
+ #include "utils.h"
+ #include "bluetooth.h"
  
- static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
-+static const char BLUEZ_AUDIO_SK_PATH[] = "\0bluez_audio_socket";
- 
- struct hal_hdr {
- 	uint8_t  service_id;
-diff --git a/android/ipc.c b/android/ipc.c
-index 9e8ccc3..d062d95 100644
---- a/android/ipc.c
-+++ b/android/ipc.c
-@@ -49,8 +49,10 @@ static struct service_handler services[HAL_SERVICE_ID_MAX + 1];
- 
- static GIOChannel *cmd_io = NULL;
- static GIOChannel *notif_io = NULL;
-+static GIOChannel *audio_io = NULL;
- 
--static void ipc_handle_msg(const void *buf, ssize_t len)
-+static void ipc_handle_msg(struct service_handler *handlers, const void *buf,
-+								ssize_t len)
- {
- 	const struct hal_hdr *msg = buf;
- 	const struct ipc_handler *handler;
-@@ -76,7 +78,7 @@ static void ipc_handle_msg(const void *buf, ssize_t len)
- 	}
- 
- 	/* if service is registered */
--	if (!services[msg->service_id].handler) {
-+	if (!handlers[msg->service_id].handler) {
- 		error("IPC: unregistered service (0x%x), terminating",
- 							msg->service_id);
- 		raise(SIGTERM);
-@@ -85,7 +87,7 @@ static void ipc_handle_msg(const void *buf, ssize_t len)
- 
- 	/* if opcode is valid */
- 	if (msg->opcode == HAL_OP_STATUS ||
--			msg->opcode > services[msg->service_id].size) {
-+			msg->opcode > handlers[msg->service_id].size) {
- 		error("IPC: invalid opcode 0x%x for service 0x%x, terminating",
- 						msg->opcode, msg->service_id);
- 		raise(SIGTERM);
-@@ -93,7 +95,7 @@ static void ipc_handle_msg(const void *buf, ssize_t len)
- 	}
- 
- 	/* opcode is table offset + 1 */
--	handler = &services[msg->service_id].handler[msg->opcode - 1];
-+	handler = &handlers[msg->service_id].handler[msg->opcode - 1];
- 
- 	/* if payload size is valid */
- 	if ((handler->var_len && handler->data_len > msg->len) ||
-@@ -110,6 +112,7 @@ static void ipc_handle_msg(const void *buf, ssize_t len)
- static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
- 							gpointer user_data)
- {
-+	struct service_handler *handlers = user_data;
- 	char buf[BLUEZ_HAL_MTU];
- 	ssize_t ret;
- 	int fd;
-@@ -128,7 +131,7 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
- 		goto fail;
- 	}
- 
--	ipc_handle_msg(buf, ret);
-+	ipc_handle_msg(handlers, buf, ret);
- 	return TRUE;
- 
- fail:
-@@ -145,7 +148,8 @@ static gboolean notif_watch_cb(GIOChannel *io, GIOCondition cond,
- 	return FALSE;
- }
- 
--static GIOChannel *connect_hal(GIOFunc connect_cb)
-+static GIOChannel *connect_hal(const char *path, size_t size,
-+							GIOFunc connect_cb)
- {
- 	struct sockaddr_un addr;
- 	GIOCondition cond;
-@@ -167,11 +171,11 @@ static GIOChannel *connect_hal(GIOFunc connect_cb)
- 	memset(&addr, 0, sizeof(addr));
- 	addr.sun_family = AF_UNIX;
- 
--	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
-+	memcpy(addr.sun_path, path, size);
- 
- 	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
--		error("IPC: failed to connect HAL socket: %d (%s)", errno,
--							strerror(errno));
-+		error("IPC: failed to connect HAL socket %s: %d (%s)", &path[1],
-+							errno, strerror(errno));
- 		g_io_channel_unref(io);
- 		return NULL;
- 	}
-@@ -200,7 +204,7 @@ static gboolean notif_connect_cb(GIOChannel *io, GIOCondition cond,
- 
- 	cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
- 
--	g_io_add_watch(cmd_io, cond, cmd_watch_cb, NULL);
-+	g_io_add_watch(cmd_io, cond, cmd_watch_cb, services);
- 
- 	info("IPC: successfully connected");
- 
-@@ -218,7 +222,8 @@ static gboolean cmd_connect_cb(GIOChannel *io, GIOCondition cond,
- 		return FALSE;
- 	}
- 
--	notif_io = connect_hal(notif_connect_cb);
-+	notif_io = connect_hal(BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH),
-+							notif_connect_cb);
- 	if (!notif_io)
- 		raise(SIGTERM);
- 
-@@ -227,7 +232,8 @@ static gboolean cmd_connect_cb(GIOChannel *io, GIOCondition cond,
- 
- void ipc_init(void)
- {
--	cmd_io = connect_hal(cmd_connect_cb);
-+	cmd_io = connect_hal(BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH),
-+							cmd_connect_cb);
- 	if (!cmd_io)
- 		raise(SIGTERM);
- }
-@@ -338,3 +344,38 @@ void ipc_unregister(uint8_t service)
- 	services[service].handler = NULL;
- 	services[service].size = 0;
- }
++#define SVC_HINT_NETWORKING 0x02
 +
-+static gboolean audio_connect_cb(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
+ static bdaddr_t adapter_addr;
+ GSList *devices = NULL;
+ uint8_t local_role = HAL_PAN_ROLE_NONE;
++static uint32_t record_id = 0;
+ 
+ struct pan_device {
+ 	char		iface[16];
+@@ -335,20 +338,110 @@ static const struct ipc_handler cmd_handlers[] = {
+ 	{ bt_pan_disconnect, false, sizeof(struct hal_cmd_pan_disconnect) },
+ };
+ 
++static sdp_record_t *pan_record(void)
 +{
-+	DBG("");
++	sdp_list_t *svclass, *pfseq, *apseq, *root, *aproto;
++	uuid_t root_uuid, pan, l2cap, bnep;
++	sdp_profile_desc_t profile[1];
++	sdp_list_t *proto[2];
++	sdp_data_t *v, *p;
++	uint16_t psm = BNEP_PSM, version = 0x0100;
++	uint16_t security = 0x0001, type = 0xfffe;
++	uint32_t rate = 0;
++	const char *desc = "Network service", *name = "bnep";
++	sdp_record_t *record;
++	uint16_t ptype[] = { 0x0800, /* IPv4 */ 0x0806,  /* ARP */ };
++	sdp_data_t *head, *pseq, *data;
 +
-+	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
-+		error("Audio IPC: socket connect failed");
-+		audio_ipc_cleanup();
-+		return FALSE;
++	record = sdp_record_alloc();
++	if (!record)
++		return NULL;
++
++	record->attrlist = NULL;
++	record->pattern = NULL;
++
++	sdp_uuid16_create(&pan, NAP_SVCLASS_ID);
++	svclass = sdp_list_append(NULL, &pan);
++	sdp_set_service_classes(record, svclass);
++
++	sdp_uuid16_create(&profile[0].uuid, NAP_PROFILE_ID);
++	profile[0].version = 0x0100;
++	pfseq = sdp_list_append(NULL, &profile[0]);
++	sdp_set_profile_descs(record, pfseq);
++	sdp_set_info_attr(record, name, NULL, desc);
++	sdp_attr_add_new(record, SDP_ATTR_NET_ACCESS_TYPE, SDP_UINT16, &type);
++	sdp_attr_add_new(record, SDP_ATTR_MAX_NET_ACCESSRATE,
++							SDP_UINT32, &rate);
++
++	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
++	root = sdp_list_append(NULL, &root_uuid);
++	sdp_set_browse_groups(record, root);
++
++	sdp_uuid16_create(&l2cap, L2CAP_UUID);
++	proto[0] = sdp_list_append(NULL, &l2cap);
++	p = sdp_data_alloc(SDP_UINT16, &psm);
++	proto[0] = sdp_list_append(proto[0], p);
++	apseq = sdp_list_append(NULL, proto[0]);
++
++	sdp_uuid16_create(&bnep, BNEP_UUID);
++	proto[1] = sdp_list_append(NULL, &bnep);
++	v = sdp_data_alloc(SDP_UINT16, &version);
++	proto[1] = sdp_list_append(proto[1], v);
++
++	head = sdp_data_alloc(SDP_UINT16, &ptype[0]);
++	data = sdp_data_alloc(SDP_UINT16, &ptype[1]);
++	sdp_seq_append(head, data);
++
++	pseq = sdp_data_alloc(SDP_SEQ16, head);
++	proto[1] = sdp_list_append(proto[1], pseq);
++	apseq = sdp_list_append(apseq, proto[1]);
++	aproto = sdp_list_append(NULL, apseq);
++	sdp_set_access_protos(record, aproto);
++	sdp_add_lang_attr(record);
++	sdp_attr_add_new(record, SDP_ATTR_SECURITY_DESC, SDP_UINT16, &security);
++
++	sdp_data_free(p);
++	sdp_data_free(v);
++	sdp_list_free(apseq, NULL);
++	sdp_list_free(root, NULL);
++	sdp_list_free(aproto, NULL);
++	sdp_list_free(proto[0], NULL);
++	sdp_list_free(proto[1], NULL);
++	sdp_list_free(svclass, NULL);
++	sdp_list_free(pfseq, NULL);
++
++	return record;
++}
++
+ bool bt_pan_register(const bdaddr_t *addr)
+ {
++	sdp_record_t *rec;
+ 	int err;
+ 
+ 	DBG("");
+ 
+ 	bacpy(&adapter_addr, addr);
+ 
++	rec = pan_record();
++	if (!rec) {
++		error("Failed to allocate PAN record");
++		return false;
 +	}
 +
-+	cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
-+
-+	g_io_add_watch(audio_io, cond, cmd_watch_cb, NULL);
-+
-+	info("Audio IPC: successfully connected");
-+
-+	return FALSE;
-+}
-+
-+void audio_ipc_init(void)
-+{
-+	audio_io = connect_hal(BLUEZ_AUDIO_SK_PATH, sizeof(BLUEZ_AUDIO_SK_PATH),
-+							audio_connect_cb);
-+}
-+
-+void audio_ipc_cleanup(void)
-+{
-+	if (audio_io) {
-+		g_io_channel_shutdown(audio_io, TRUE, NULL);
-+		g_io_channel_unref(audio_io);
-+		audio_io = NULL;
++	if (bt_adapter_add_record(rec, SVC_HINT_NETWORKING) < 0) {
++		error("Failed to register PAN record");
++		sdp_record_free(rec);
++		return false;
 +	}
-+}
-diff --git a/android/ipc.h b/android/ipc.h
-index 6cd102b..8e92811 100644
---- a/android/ipc.h
-+++ b/android/ipc.h
-@@ -37,3 +37,6 @@ void ipc_send_notif(uint8_t service_id, uint8_t opcode,  uint16_t len,
- void ipc_register(uint8_t service, const struct ipc_handler *handlers,
- 								uint8_t size);
- void ipc_unregister(uint8_t service);
 +
-+void audio_ipc_init(void);
-+void audio_ipc_cleanup(void);
+ 	err = bnep_init();
+ 	if (err) {
+ 		error("bnep init failed");
++		sdp_record_free(rec);
+ 		return false;
+ 	}
+ 
++	record_id = rec->handle;
+ 	ipc_register(HAL_SERVICE_ID_PAN, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
+ 
+@@ -362,4 +455,6 @@ void bt_pan_unregister(void)
+ 	bnep_cleanup();
+ 
+ 	ipc_unregister(HAL_SERVICE_ID_PAN);
++	bt_adapter_remove_record(record_id);
++	record_id = 0;
+ }
 -- 
-1.8.4.2
+1.8.3.2
 
