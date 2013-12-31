@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 03/10] android/ipc: Add audio_ipc_send_rsp and audio_ipc_send_rsp_full
-Date: Tue, 31 Dec 2013 13:29:55 +0200
-Message-Id: <1388489402-8919-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 04/10] android/A2DP: Add initial code to handle audio IPC commands
+Date: Tue, 31 Dec 2013 13:29:56 +0200
+Message-Id: <1388489402-8919-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1388489402-8919-1-git-send-email-luiz.dentz@gmail.com>
 References: <1388489402-8919-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,63 +11,62 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-These functions can be used to respond to commands recieved over audio
-IPC.
+This adds initial code to handle audio IPC commands.
 ---
- android/ipc.c | 24 ++++++++++++++++++++++++
- android/ipc.h |  4 ++++
- 2 files changed, 28 insertions(+)
+ android/a2dp.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/android/ipc.c b/android/ipc.c
-index 751284f..d6cb126 100644
---- a/android/ipc.c
-+++ b/android/ipc.c
-@@ -381,6 +381,30 @@ void audio_ipc_cleanup(void)
- 	}
+diff --git a/android/a2dp.c b/android/a2dp.c
+index 581d094..7550644 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -352,6 +352,9 @@ static sdp_record_t *a2dp_record(void)
+ 	return record;
  }
  
-+void audio_ipc_send_rsp(uint8_t service_id, uint8_t opcode, uint8_t status)
-+{
-+	struct hal_status s;
-+	int sk;
++static const struct ipc_handler audio_handlers[] = {
++};
 +
-+	sk = g_io_channel_unix_get_fd(audio_io);
-+
-+	if (status == HAL_STATUS_SUCCESS) {
-+		ipc_send(sk, service_id, opcode, 0, NULL, -1);
-+		return;
-+	}
-+
-+	s.code = status;
-+
-+	ipc_send(sk, service_id, HAL_OP_STATUS, sizeof(s), &s, -1);
-+}
-+
-+void audio_ipc_send_rsp_full(uint8_t service_id, uint8_t opcode, uint16_t len,
-+							void *param, int fd)
-+{
-+	ipc_send(g_io_channel_unix_get_fd(audio_io), service_id, opcode, len,
-+								param, fd);
-+}
-+
- void audio_ipc_register(uint8_t service, const struct ipc_handler *handlers,
- 								uint8_t size)
+ bool bt_a2dp_register(const bdaddr_t *addr)
  {
-diff --git a/android/ipc.h b/android/ipc.h
-index 44d5a5d..f224367 100644
---- a/android/ipc.h
-+++ b/android/ipc.h
-@@ -41,6 +41,10 @@ void ipc_unregister(uint8_t service);
- void audio_ipc_init(void);
- void audio_ipc_cleanup(void);
+ 	GError *err = NULL;
+@@ -359,6 +362,8 @@ bool bt_a2dp_register(const bdaddr_t *addr)
  
-+void audio_ipc_send_rsp(uint8_t service_id, uint8_t opcode, uint8_t status);
-+void audio_ipc_send_rsp_full(uint8_t service_id, uint8_t opcode, uint16_t len,
-+							void *param, int fd);
+ 	DBG("");
+ 
++	audio_ipc_init();
 +
- void audio_ipc_register(uint8_t service, const struct ipc_handler *handlers,
- 								uint8_t size);
- void audio_ipc_unregister(uint8_t service);
+ 	bacpy(&adapter_addr, addr);
+ 
+ 	server = bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
+@@ -388,6 +393,9 @@ bool bt_a2dp_register(const bdaddr_t *addr)
+ 	ipc_register(HAL_SERVICE_ID_A2DP, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
+ 
++	audio_ipc_register(AUDIO_SERVICE_ID_CORE, audio_handlers,
++						G_N_ELEMENTS(audio_handlers));
++
+ 	return true;
+ 
+ fail:
+@@ -411,8 +419,9 @@ void bt_a2dp_unregister(void)
+ 	g_slist_foreach(devices, a2dp_device_disconnected, NULL);
+ 	devices = NULL;
+ 
+-
+ 	ipc_unregister(HAL_SERVICE_ID_A2DP);
++	audio_ipc_unregister(AUDIO_SERVICE_ID_CORE);
++
+ 	bt_adapter_remove_record(record_id);
+ 	record_id = 0;
+ 
+@@ -421,4 +430,6 @@ void bt_a2dp_unregister(void)
+ 		g_io_channel_unref(server);
+ 		server = NULL;
+ 	}
++
++	audio_ipc_cleanup();
+ }
 -- 
 1.8.4.2
 
