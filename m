@@ -1,34 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <johan.hedberg@gmail.com>, <szymon.janc@tieto.com>,
-	<luiz.dentz@gmail.com>,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 1/2] sdp: Add MAP_PROFILE_ID
-Date: Thu, 2 Jan 2014 13:51:39 +0100
-Message-ID: <1388667100-28806-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 04/10] android/A2DP: Add initial code to handle audio IPC commands
+Date: Thu,  2 Jan 2014 13:58:28 +0200
+Message-Id: <1388663914-25003-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1388663914-25003-1-git-send-email-luiz.dentz@gmail.com>
+References: <1388663914-25003-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Change-Id: I3e9d4c591584e08babf979f8dc99827e12104644
----
- lib/sdp.h | 1 +
- 1 file changed, 1 insertion(+)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/lib/sdp.h b/lib/sdp.h
-index f2f2484..c6dfc27 100644
---- a/lib/sdp.h
-+++ b/lib/sdp.h
-@@ -207,6 +207,7 @@ extern "C" {
- #define PBAP_PCE_PROFILE_ID		PBAP_PCE_SVCLASS_ID
- #define PBAP_PSE_PROFILE_ID		PBAP_PSE_SVCLASS_ID
- #define PBAP_PROFILE_ID			PBAP_SVCLASS_ID
-+#define MAP_PROFILE_ID			MAP_SVCLASS_ID
- #define PNP_INFO_PROFILE_ID		PNP_INFO_SVCLASS_ID
- #define GENERIC_NETWORKING_PROFILE_ID	GENERIC_NETWORKING_SVCLASS_ID
- #define GENERIC_FILETRANS_PROFILE_ID	GENERIC_FILETRANS_SVCLASS_ID
+This adds initial code to handle audio IPC commands.
+---
+ android/a2dp.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/android/a2dp.c b/android/a2dp.c
+index 581d094..7550644 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -352,6 +352,9 @@ static sdp_record_t *a2dp_record(void)
+ 	return record;
+ }
+ 
++static const struct ipc_handler audio_handlers[] = {
++};
++
+ bool bt_a2dp_register(const bdaddr_t *addr)
+ {
+ 	GError *err = NULL;
+@@ -359,6 +362,8 @@ bool bt_a2dp_register(const bdaddr_t *addr)
+ 
+ 	DBG("");
+ 
++	audio_ipc_init();
++
+ 	bacpy(&adapter_addr, addr);
+ 
+ 	server = bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
+@@ -388,6 +393,9 @@ bool bt_a2dp_register(const bdaddr_t *addr)
+ 	ipc_register(HAL_SERVICE_ID_A2DP, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
+ 
++	audio_ipc_register(AUDIO_SERVICE_ID_CORE, audio_handlers,
++						G_N_ELEMENTS(audio_handlers));
++
+ 	return true;
+ 
+ fail:
+@@ -411,8 +419,9 @@ void bt_a2dp_unregister(void)
+ 	g_slist_foreach(devices, a2dp_device_disconnected, NULL);
+ 	devices = NULL;
+ 
+-
+ 	ipc_unregister(HAL_SERVICE_ID_A2DP);
++	audio_ipc_unregister(AUDIO_SERVICE_ID_CORE);
++
+ 	bt_adapter_remove_record(record_id);
+ 	record_id = 0;
+ 
+@@ -421,4 +430,6 @@ void bt_a2dp_unregister(void)
+ 		g_io_channel_unref(server);
+ 		server = NULL;
+ 	}
++
++	audio_ipc_cleanup();
+ }
 -- 
-1.8.4
+1.8.4.2
 
