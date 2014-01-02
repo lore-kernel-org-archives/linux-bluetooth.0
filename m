@@ -4,11 +4,11 @@ To: <linux-bluetooth@vger.kernel.org>
 CC: <johan.hedberg@gmail.com>, <szymon.janc@tieto.com>,
 	<luiz.dentz@gmail.com>,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 2/2] android/map: Add support for MAP/MAS
-Date: Thu, 2 Jan 2014 13:54:46 +0100
-Message-ID: <1388667286-28993-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1388667286-28993-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1388667286-28993-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 2/2] android/map: Add support for MAP/MAS
+Date: Thu, 2 Jan 2014 13:51:40 +0100
+Message-ID: <1388667100-28806-2-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1388667100-28806-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1388667100-28806-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -20,6 +20,7 @@ supported msg type and rfcomm channel are hardcoded in the stack.
 Unfortunatelly we need to do the same way and wait for new HAL API
 which is expected.
 
+Change-Id: Ie151e34db8eed1e07c73aeb400bdfd2e5bd79f0d
 ---
  android/socket.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
  1 file changed, 80 insertions(+), 2 deletions(-)
