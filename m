@@ -1,49 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <szymon.janc@tieto.com>, <johan.hedberg@gmail.com>,
-	<luiz.dentz@gmail.com>,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] shared: Fix build issue for Android
-Date: Thu, 2 Jan 2014 23:31:32 +0100
-Message-ID: <1388701892-13966-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=iso-8859-1
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH v3] Bluetooth: Add hci_h4p driver
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20140102161824.GA8204@amd.pavel.ucw.cz>
+Date: Thu, 2 Jan 2014 08:34:19 -0800
+Cc: =?iso-8859-1?Q?Pali_Roh=E1r?= <pali.rohar@gmail.com>,
+	=?utf-8?B?0JjQstCw0LnQu9C+INCU0LjQvNC40YLRgNC+0LI=?=
+	<freemangordon@abv.bg>, "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>,
+	Ville Tervo <ville.tervo@nokia.com>,
+	Sebastian Reichel <sre@ring0.de>
+Message-Id: <A5B72277-42D4-4A24-8A29-9BE18762E8C4@holtmann.org>
+References: <1379703710-5757-1-git-send-email-pali.rohar@gmail.com> <1727897.LBX8128hIo@izba> <20140102161824.GA8204@amd.pavel.ucw.cz>
+To: Pavel Machek <pavel@ucw.cz>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-target thumb C: bluetoothd-snoop <=
-external/bluetooth/bluez/android/../src/shared/btsnoop.c
-external/bluetooth/bluez/android/../src/shared/btsnoop.c: In function
-'btsnoop_create':
-external/bluetooth/bluez/android/../src/shared/btsnoop.c:126:6: error:
-'S_IRUSR' undeclared (first use in this function)
-external/bluetooth/bluez/android/../src/shared/btsnoop.c:126:6: note:
-each undeclared identifier is reported only once for each function it
-appears in
-external/bluetooth/bluez/android/../src/shared/btsnoop.c:126:16: error:
-'S_IWUSR' undeclared (first use in this function)
-external/bluetooth/bluez/android/../src/shared/btsnoop.c:126:26: error:
-'S_IRGRP' undeclared (first use in this function)
-external/bluetooth/bluez/android/../src/shared/btsnoop.c:126:36: error:
-'S_IROTH' undeclared (first use in this function)
+Hi Pavel,
 
----
- src/shared/btsnoop.c | 1 +
- 1 file changed, 1 insertion(+)
+> Add hci_h4p bluetooth driver to 3.12. This device is used for example
+> on Nokia N900 cell phone.
 
-diff --git a/src/shared/btsnoop.c b/src/shared/btsnoop.c
-index 58c9f1d..61f7bfc 100644
---- a/src/shared/btsnoop.c
-+++ b/src/shared/btsnoop.c
-@@ -30,6 +30,7 @@
- #include <stdlib.h>
- #include <string.h>
- #include <arpa/inet.h>
-+#include <sys/stat.h>
- 
- #include "btsnoop.h"
- 
--- 
-1.8.4
+I only care about patches against bluetooth-next btw.
+
+> Signed-off-by: Pali Rohár <pali.rohar@gmail.com>
+> Signed-off-by: Pavel Machek <pavel@ucw.cz>
+> 
+> ---
+> 
+> Changes from v2: Cleanups as suggested by Marcel. Platform data are
+> still used to communicate with board code; N900 is not quite ready
+> for device tree just yet. Power management thread was removed.
+
+And platform data goes into include/linux/platform_data/ as I mentioned before.
+
+Regards
+
+Marcel
 
