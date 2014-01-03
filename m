@@ -1,46 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2] btdev: Return Command Status for Authentication Requested
-Date: Fri,  3 Jan 2014 15:45:54 +0200
-Message-Id: <1388756754-30760-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <20131223170651.GA17118@x220.p-661hnu-f1>
-References: <20131223170651.GA17118@x220.p-661hnu-f1>
+Subject: [PATCH 3/3] btproxy: Fix closing invalid file descriptor
+Date: Fri,  3 Jan 2014 14:54:46 +0200
+Message-Id: <1388753686-29400-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1388753686-29400-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1388753686-29400-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add support for "Authentication Requested" command
+Instead of invalid file descriptor dst_fd close src_fd.
 ---
- emulator/btdev.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ tools/btproxy.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 93361cd..0349f8a 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -269,6 +269,7 @@ static void set_bredr_commands(struct btdev *btdev)
- 	btdev->commands[0]  |= 0x80;	/* Cancel Create Connection */
- 	btdev->commands[1]  |= 0x01;	/* Accept Connection Request */
- 	btdev->commands[1]  |= 0x02;	/* Reject Connection Request */
-+	btdev->commands[1]  |= 0x80;	/* Authentication Requested */
- 	btdev->commands[2]  |= 0x08;	/* Remote Name Request */
- 	btdev->commands[2]  |= 0x10;	/* Cancel Remote Name Request */
- 	btdev->commands[2]  |= 0x20;	/* Read Remote Supported Features */
-@@ -1202,6 +1203,12 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
- 		break;
+diff --git a/tools/btproxy.c b/tools/btproxy.c
+index 3c7c48f..1573587 100644
+--- a/tools/btproxy.c
++++ b/tools/btproxy.c
+@@ -659,7 +659,7 @@ int main(int argc, char *argv[])
  
-+	case BT_HCI_CMD_AUTH_REQUESTED:
-+		if (btdev->type == BTDEV_TYPE_LE)
-+			goto unsupported;
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
-+		break;
-+
- 	case BT_HCI_CMD_REMOTE_NAME_REQUEST:
- 		if (btdev->type == BTDEV_TYPE_LE)
- 			goto unsupported;
+ 		dst_fd = open_vhci(0x00);
+ 		if (dst_fd < 0) {
+-			close(dst_fd);
++			close(src_fd);
+ 			return EXIT_FAILURE;
+ 		}
+ 
 -- 
 1.8.3.2
 
