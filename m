@@ -1,5 +1,5 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 3 Jan 2014 02:36:41 +0100
+Date: Fri, 3 Jan 2014 02:05:21 +0100
 From: Sebastian Reichel <sre@ring0.de>
 To: Pavel Machek <pavel@ucw.cz>
 Cc: Marcel Holtmann <marcel@holtmann.org>,
@@ -11,7 +11,7 @@ Cc: Marcel Holtmann <marcel@holtmann.org>,
         "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
         Ville Tervo <ville.tervo@nokia.com>
 Subject: Re: [PATCH v4] Bluetooth: Add hci_h4p driver
-Message-ID: <20140103013640.GB27678@earth.universe>
+Message-ID: <20140103010519.GA27678@earth.universe>
 References: <1379703710-5757-1-git-send-email-pali.rohar@gmail.com>
  <1727897.LBX8128hIo@izba>
  <20140102161824.GA8204@amd.pavel.ucw.cz>
@@ -19,238 +19,108 @@ References: <1379703710-5757-1-git-send-email-pali.rohar@gmail.com>
  <20140103001753.GA21023@amd.pavel.ucw.cz>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="pvezYHf7grwyp3Bc"
+	protocol="application/pgp-signature"; boundary="UugvWAfsgieZRqgk"
 In-Reply-To: <20140103001753.GA21023@amd.pavel.ucw.cz>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---pvezYHf7grwyp3Bc
+--UugvWAfsgieZRqgk
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-Hi Pavel,
-
-Here are some cleanup suggestions for probe, removal & module
-initialization functions.
+Hi,
 
 On Fri, Jan 03, 2014 at 01:17:54AM +0100, Pavel Machek wrote:
-> +static int hci_h4p_probe(struct platform_device *pdev)
-> +{
-> +	struct hci_h4p_platform_data *bt_plat_data;
-> +	struct hci_h4p_info *info;
-> +	int err;
-> +
-> +	dev_info(&pdev->dev, "Registering HCI H4P device\n");
-> +	info =3D kzalloc(sizeof(struct hci_h4p_info), GFP_KERNEL);
+> Changes from v3: Moved platform data into
+> include/linux/platform_data/, something I missed before.
 
-info =3D devm_kzalloc(&pdev->dev, sizeof(struct hci_h4p_info), GFP_KERNEL);
+As I wrote before Tony plans to remove the boardcode for all
+OMAP boards including the Nokia N900 for 3.14, so you cannot
+boot without DT from 3.14 onwards.
 
-> +	if (!info)
-> +		return -ENOMEM;
-> +
-> +	info->dev =3D &pdev->dev;
-> +	info->tx_enabled =3D 1;
-> +	info->rx_enabled =3D 1;
-> +	spin_lock_init(&info->lock);
-> +	spin_lock_init(&info->clocks_lock);
-> +	skb_queue_head_init(&info->txq);
-> +
-> +	if (pdev->dev.platform_data =3D=3D NULL) {
-> +		dev_err(&pdev->dev, "Could not get Bluetooth config data\n");
-> +		kfree(info);
-> +		return -ENODATA;
-> +	}
-> +
-> +	bt_plat_data =3D pdev->dev.platform_data;
-> +	info->chip_type =3D bt_plat_data->chip_type;
-> +	info->bt_wakeup_gpio =3D bt_plat_data->bt_wakeup_gpio;
-> +	info->host_wakeup_gpio =3D bt_plat_data->host_wakeup_gpio;
-> +	info->reset_gpio =3D bt_plat_data->reset_gpio;
-> +	info->reset_gpio_shared =3D bt_plat_data->reset_gpio_shared;
-> +	info->bt_sysclk =3D bt_plat_data->bt_sysclk;
-> +
-> +	BT_DBG("RESET gpio: %d\n", info->reset_gpio);
-> +	BT_DBG("BTWU gpio: %d\n", info->bt_wakeup_gpio);
-> +	BT_DBG("HOSTWU gpio: %d\n", info->host_wakeup_gpio);
-> +	BT_DBG("sysclk: %d\n", info->bt_sysclk);
-> +
-> +	init_completion(&info->test_completion);
-> +	complete_all(&info->test_completion);
-> +
-> +	if (!info->reset_gpio_shared) {
-> +		err =3D gpio_request(info->reset_gpio, "bt_reset");
-
-err =3D devm_gpio_request_one(&pdev->dev, info->reset_gpio, GPIOF_OUT_INIT_=
-LOW, "bt_reset");
-
-> +		if (err < 0) {
-> +			dev_err(&pdev->dev, "Cannot get GPIO line %d\n",
-> +				info->reset_gpio);
-> +			goto cleanup_setup;
-> +		}
-> +	}
-> +
-> +	err =3D gpio_request(info->bt_wakeup_gpio, "bt_wakeup");
-
-err =3D devm_gpio_request_one(&pdev->dev, info->bt_wakeup_gpio, GPIOF_OUT_I=
-NIT_LOW, "bt_wakeup");
-
-> +	if (err < 0) {
-> +		dev_err(info->dev, "Cannot get GPIO line 0x%d",
-> +			info->bt_wakeup_gpio);
-> +		if (!info->reset_gpio_shared)
-> +			gpio_free(info->reset_gpio);
-> +		goto cleanup_setup;
-> +	}
-> +
-> +	err =3D gpio_request(info->host_wakeup_gpio, "host_wakeup");
-
-err =3D devm_gpio_request_one(&pdev->dev, info->host_wakeup_gpio, GPIOF_DIR=
-_IN, "host_wakeup");
-
-> +	if (err < 0) {
-> +		dev_err(info->dev, "Cannot get GPIO line %d",
-> +		       info->host_wakeup_gpio);
-> +		if (!info->reset_gpio_shared)
-> +			gpio_free(info->reset_gpio);
-> +		gpio_free(info->bt_wakeup_gpio);
-> +		goto cleanup_setup;
-> +	}
-> +
-> +	gpio_direction_output(info->reset_gpio, 0);
-> +	gpio_direction_output(info->bt_wakeup_gpio, 0);
-> +	gpio_direction_input(info->host_wakeup_gpio);
-
-You can remove these when you use the _request_one gpio_request
-methods.
-
-> +	info->irq =3D bt_plat_data->uart_irq;
-> +	info->uart_base =3D ioremap(bt_plat_data->uart_base, SZ_2K);
-
-info->uart_base =3D devm_ioremap(&pdev->dev, bt_plat_data->uart_base, SZ_2K=
-);
-
-> +	info->uart_iclk =3D clk_get(NULL, bt_plat_data->uart_iclk);
-> +	info->uart_fclk =3D clk_get(NULL, bt_plat_data->uart_fclk);
-
-devm_clk_get(...)
-
-> +	err =3D request_irq(info->irq, hci_h4p_interrupt, IRQF_DISABLED, "hci_h=
-4p",
-> +			  info);
-
-devm_request_irq(...)
-
-> +	if (err < 0) {
-> +		dev_err(info->dev, "hci_h4p: unable to get IRQ %d\n", info->irq);
-> +		goto cleanup;
-> +	}
-> +
-> +	err =3D request_irq(gpio_to_irq(info->host_wakeup_gpio),
-> +			  hci_h4p_wakeup_interrupt,  IRQF_TRIGGER_FALLING |
-> +			  IRQF_TRIGGER_RISING | IRQF_DISABLED,
-> +			  "hci_h4p_wkup", info);
-
-devm_request_irq(...)
-
-> +	if (err < 0) {
-> +		dev_err(info->dev, "hci_h4p: unable to get wakeup IRQ %d\n",
-> +			  gpio_to_irq(info->host_wakeup_gpio));
-> +		free_irq(info->irq, info);
-> +		goto cleanup;
-> +	}
-> +
-> +	err =3D irq_set_irq_wake(gpio_to_irq(info->host_wakeup_gpio), 1);
-> +	if (err < 0) {
-> +		dev_err(info->dev, "hci_h4p: unable to set wakeup for IRQ %d\n",
-> +				gpio_to_irq(info->host_wakeup_gpio));
-> +		free_irq(info->irq, info);
-> +		free_irq(gpio_to_irq(info->host_wakeup_gpio), info);
-> +		goto cleanup;
-> +	}
-> +
-> +	init_timer_deferrable(&info->lazy_release);
-> +	info->lazy_release.function =3D hci_h4p_lazy_clock_release;
-> +	info->lazy_release.data =3D (unsigned long)info;
-> +	hci_h4p_set_clk(info, &info->tx_clocks_en, 1);
-> +	err =3D hci_h4p_reset_uart(info);
-> +	if (err < 0)
-> +		goto cleanup_irq;
-> +	gpio_set_value(info->reset_gpio, 0);
-> +	hci_h4p_set_clk(info, &info->tx_clocks_en, 0);
-> +
-> +	platform_set_drvdata(pdev, info);
-> +
-> +	if (hci_h4p_register_hdev(info) < 0) {
-> +		dev_err(info->dev, "failed to register hci_h4p hci device\n");
-> +		goto cleanup_irq;
-> +	}
-> +
-> +	return 0;
-> +
-> +cleanup_irq:
-> +	free_irq(info->irq, (void *)info);
-> +	free_irq(gpio_to_irq(info->host_wakeup_gpio), info);
-> +cleanup:
-> +	gpio_set_value(info->reset_gpio, 0);
-> +	if (!info->reset_gpio_shared)
-> +		gpio_free(info->reset_gpio);
-> +	gpio_free(info->bt_wakeup_gpio);
-> +	gpio_free(info->host_wakeup_gpio);
-> +cleanup_setup:
-> +	kfree(info);
-> +	return err;
-> +}
-
-This can be removed after the conversion to devm_ methods.
+The drivers can still be initialized the old way using pdata quirks
+until all drivers are converted, but I think this driver can simply
+be prepared for DT directly:
 
 > [...]
->=20
-> +static int __init hci_h4p_init(void)
-> +{
-> +	int err =3D 0;
-> +
-> +	/* Register the driver with LDM */
-> +	err =3D platform_driver_register(&hci_h4p_driver);
-> +	if (err < 0)
-> +		printk(KERN_WARNING "failed to register hci_h4p driver\n");
-> +
-> +	return err;
-> +}
-> +
-> +static void __exit hci_h4p_exit(void)
-> +{
-> +	platform_driver_unregister(&hci_h4p_driver);
-> +}
->=20
-> +module_init(hci_h4p_init);
-> +module_exit(hci_h4p_exit);
+>
+> +struct hci_h4p_platform_data {
+> +	int chip_type;
 
-module_platform_driver(hci_h4p_driver);
+This can be "extracted" from the compatible string.
+
+> +	int bt_sysclk;
+
+This can be converted into a vendor property.
+
+> +	unsigned int bt_wakeup_gpio;
+> +	unsigned int host_wakeup_gpio;
+> +	unsigned int reset_gpio;
+
+These can easily be acquired via DT.
+
+> +	int reset_gpio_shared;
+
+This looks like a simple property in the DT structure.
+
+You should use a boolean type for this btw.
+
+> +	unsigned int uart_irq;
+
+This one can also simply be aquired via DT.
+
+> +	phys_addr_t uart_base;
+
+I see multiple ways for this one:
+
+ 1. Just put the memory address into the dts file.
+ 2. Make this a phandle to the UART node and get
+    the memory address from the referenced node.
+ 3. Make the bluetooth node a subnode of the UART
+    node and get the address from the parent node.
+
+IMHO solution 3 is the best solution, since the bluetooth
+chip is basically connected to the system via the UART.
+
+> +	const char *uart_iclk;
+> +	const char *uart_fclk;
+
+There is currently work going on to move OMAP's clock
+data into DT. When that work is done the clocks can
+be acquired via phandles. I think it's expected to
+be merged into 3.14.
+
+> +	void (*set_pm_limits)(struct device *dev, bool set);
+
+If I'm not mistaken set_pm_limits is only referenced by
+hci_h4p_set_pm_limits(). The hci_h4p_set_pm_limits()
+function is not referenced anywhere, thus both can be
+removed.
+
+> +};
 
 -- Sebastian
 
---pvezYHf7grwyp3Bc
+--UugvWAfsgieZRqgk
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: Digital signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.15 (GNU/Linux)
 
-iQIcBAEBCAAGBQJSxhQoAAoJENju1/PIO/qaV/AQAJCevchzqkz1yigFIM2uePdf
-rKr7BG17Z78yUAKhnZdFlckvZFfvXvc0eAqrtYHAeX9m/LfjHo87+/4yVDmEs7fb
-HwgEV8HM3YLBkrHK9jTpWKe9EUWsSsDnR9HDaQ07qb4BbIn/L9oEUfjjl368KR4K
-o6sViT74bVT5noOdS6sr9cxmT5EwDy6htnuFt6VJuLVnZi1iL9B7YPH6ePKHfgCO
-4rP6tJNyz7qB9530ouUrXMk/wE6y0d6PslfYiz8I1GV5Gg9RpTXSihsYok53v2SZ
-JaW1syuY6yjM1FG6EyinzkcdWoy32dOAPBDWkQPFUOPtWjAr+K29SP8fNKDsbxWY
-044PHwn5VxOtD0Ff76btO3jthRO5pfuVLNwFU6mn1f/1+e8XYtM7hpKK5Tp/fw8F
-4I+Nukq3WLP+TSy8i/gE8Im+wA8Gr0le0FnFvbWPBxkspyux2mRyLNq4Rw+HWVcM
-9KI59Db6mxm18mmpWUt2clDezWKbZWBq5RHdjjMp7nFmSgmDV6tGxy0qgwIrzqEH
-mExsbFNAiE4s/M8KKIgsVrgTikcMimaULIthFmTXKY8eZy3cMJXNDYfgPpsQOVWE
-qXEXnKvTrAj4Wg2lMYL87YEIINiHxWNMyUSG9I+CUAAtiO7H5wxWaZ93kSMgny+N
-VFd5YHHbsLPyEZ78wrkJ
-=ssFt
+iQIcBAEBCAAGBQJSxgzPAAoJENju1/PIO/qaw88P/jzPKXubPsIY2Ze8LVk4MTk2
+YssFeJluE+5/XHwXNwZxPATJFaSckgwUrT8UOtO9NDVyBLgZw/2uHBG4vBHFwIdM
+nNT8Y9hupK70zWLIUhx1/iqNjOOYdk3vsvIiBE+i1Srzvn44RLptVVWe+C8mMV6s
+i6CuI2mZatvw/P5DUjyv0ALca5CMfwvyhaWI1agyBVTYolX3gwx9gcIjaHkZlVd8
+pM1lc9l2vvMA7pTi2ZdiwWubl4lhr3gf220au1EO+/BG90j0FlYv/cby9cTe5gts
+wLOjJkXzfIjQUTRunmBvIEtzCOSefF5E51Vzad9jy/s0eybKMVsUoQ7lAGZ34pYx
+C1pkt5eZ333ubAsJnggQUki1jLZukjBNSeESfz/BwtZGfQ63k4BhB5jfF6AdbETi
++NqG0O3Jr1VuR//fxgPmeSvFUacZOEDSmwCIipxe+r50UbRmBazDzIBuw035BH/p
+muvrlpPTQWo7Radfspyr1lqkDghH5XpHod2Ppvy+axtrxBXho5kizcFf1JBGj3M3
+L0pXrIGLHPQhboe9A/NRGhqzs72tlY4cx1tUfFyCaL3X0xh87/FJUECAyjG8G5Gj
+3umuCHVF9DNZX9fezab8SKWGyW4xLNSBFT7gE/TgMVmcdFKqzSW6nfuEosSVBKUS
+3SSuYAIMYg5hSu0gG0IP
+=0PwV
 -----END PGP SIGNATURE-----
 
---pvezYHf7grwyp3Bc--
+--UugvWAfsgieZRqgk--
