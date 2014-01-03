@@ -1,125 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 01/12] tools: Fix strncat() usage in hciconfig/hcitool
-Date: Fri,  3 Jan 2014 21:55:17 -0400
-Message-Id: <1388800528-10699-2-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCHv2] btdev: Return Command Status for Authentication Requested
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20140103140046.GA12036@x220.p-661hnu-f1>
+Date: Fri, 3 Jan 2014 10:35:14 -0800
+Cc: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
+	"linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <59E50252-294A-4063-85A0-36CFB3BBC3AE@holtmann.org>
+References: <20131223170651.GA17118@x220.p-661hnu-f1> <1388756754-30760-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <20140103140046.GA12036@x220.p-661hnu-f1>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-According to strncat() manpage:
+Hi Johan,
 
-"If src contains n or more characters, strncat() writes n+1 characters
-to dest (n from src plus the terminating null byte).  Therefore, the
-size of dest must be at least strlen(dest)+n+1"
+>> Add support for "Authentication Requested" command
+>> ---
+>> emulator/btdev.c | 7 +++++++
+>> 1 file changed, 7 insertions(+)
+>> 
+>> diff --git a/emulator/btdev.c b/emulator/btdev.c
+>> index 93361cd..0349f8a 100644
+>> --- a/emulator/btdev.c
+>> +++ b/emulator/btdev.c
+>> @@ -269,6 +269,7 @@ static void set_bredr_commands(struct btdev *btdev)
+>> 	btdev->commands[0]  |= 0x80;	/* Cancel Create Connection */
+>> 	btdev->commands[1]  |= 0x01;	/* Accept Connection Request */
+>> 	btdev->commands[1]  |= 0x02;	/* Reject Connection Request */
+>> +	btdev->commands[1]  |= 0x80;	/* Authentication Requested */
+>> 	btdev->commands[2]  |= 0x08;	/* Remote Name Request */
+>> 	btdev->commands[2]  |= 0x10;	/* Cancel Remote Name Request */
+>> 	btdev->commands[2]  |= 0x20;	/* Read Remote Supported Features */
+>> @@ -1202,6 +1203,12 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+>> 		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
+>> 		break;
+>> 
+>> +	case BT_HCI_CMD_AUTH_REQUESTED:
+>> +		if (btdev->type == BTDEV_TYPE_LE)
+>> +			goto unsupported;
+>> +		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
+>> +		break;
+>> +
+>> 	case BT_HCI_CMD_REMOTE_NAME_REQUEST:
+>> 		if (btdev->type == BTDEV_TYPE_LE)
+>> 			goto unsupported;
+> 
+> I'd rather wait with this one until you've got a full set of patches
+> that also implement the link key request event and the rest of the
+> pairing procedure (if the link key request is followed by a negative
+> link key reply).
 
-While the current usage of strncat() cannot cause an overflow, if a
-bigger string is added to the switch()'s without increasing the static
-buffer, it would overflow by one byte due to the incorrect size
-calculation.
+since we do not install btvirt, I am fine if we even have incomplete functionality in it. However in this case we need to track if pairing is active. And also timeout the pairing. Otherwise everything will be blocked after one attempt.
 
-Fixes clang errors like:
+So at minimum we need to store the current auth request state + start a timeout to make it timeout and send the auth failed event.
 
-tools/hciconfig.c:827:33: error: the value of the size argument in
-'strncat' is too large, might lead to a buffer overflow
-[-Werror,-Wstrncat-size]
----
- tools/hciconfig.c | 21 ++++++++++++++-------
- tools/hcitool.c   | 23 +++++++++++++++--------
- 2 files changed, 29 insertions(+), 15 deletions(-)
+Regards
 
-diff --git a/tools/hciconfig.c b/tools/hciconfig.c
-index fe45167..6c7f8ed 100644
---- a/tools/hciconfig.c
-+++ b/tools/hciconfig.c
-@@ -824,25 +824,32 @@ static char *get_minor_device_name(int major, int minor)
- 		case 0:
- 			break;
- 		case 1:
--			strncat(cls_str, "Joystick", sizeof(cls_str) - strlen(cls_str));
-+			strncat(cls_str, "Joystick",
-+					sizeof(cls_str) - strlen(cls_str) - 1);
- 			break;
- 		case 2:
--			strncat(cls_str, "Gamepad", sizeof(cls_str) - strlen(cls_str));
-+			strncat(cls_str, "Gamepad",
-+					sizeof(cls_str) - strlen(cls_str) - 1);
- 			break;
- 		case 3:
--			strncat(cls_str, "Remote control", sizeof(cls_str) - strlen(cls_str));
-+			strncat(cls_str, "Remote control",
-+					sizeof(cls_str) - strlen(cls_str) - 1);
- 			break;
- 		case 4:
--			strncat(cls_str, "Sensing device", sizeof(cls_str) - strlen(cls_str));
-+			strncat(cls_str, "Sensing device",
-+					sizeof(cls_str) - strlen(cls_str) - 1);
- 			break;
- 		case 5:
--			strncat(cls_str, "Digitizer tablet", sizeof(cls_str) - strlen(cls_str));
-+			strncat(cls_str, "Digitizer tablet",
-+					sizeof(cls_str) - strlen(cls_str) - 1);
- 			break;
- 		case 6:
--			strncat(cls_str, "Card reader", sizeof(cls_str) - strlen(cls_str));
-+			strncat(cls_str, "Card reader",
-+					sizeof(cls_str) - strlen(cls_str) - 1);
- 			break;
- 		default:
--			strncat(cls_str, "(reserved)", sizeof(cls_str) - strlen(cls_str));
-+			strncat(cls_str, "(reserved)",
-+					sizeof(cls_str) - strlen(cls_str) - 1);
- 			break;
- 		}
- 		if (strlen(cls_str) > 0)
-diff --git a/tools/hcitool.c b/tools/hcitool.c
-index f2e4fa4..d85ece1 100644
---- a/tools/hcitool.c
-+++ b/tools/hcitool.c
-@@ -336,25 +336,32 @@ static char *get_minor_device_name(int major, int minor)
- 		case 0:
- 			break;
- 		case 1:
--			strncat(cls_str, "Joystick", sizeof(cls_str) - strlen(cls_str));
-+			strncat(cls_str, "Joystick",
-+					sizeof(cls_str) - strlen(cls_str) - 1);
- 			break;
- 		case 2:
--			strncat(cls_str, "Gamepad", sizeof(cls_str) - strlen(cls_str));
-+			strncat(cls_str, "Gamepad",
-+					sizeof(cls_str) - strlen(cls_str) - 1);
- 			break;
- 		case 3:
--			strncat(cls_str, "Remote control", sizeof(cls_str) - strlen(cls_str));
-+			strncat(cls_str, "Remote control",
-+					sizeof(cls_str) - strlen(cls_str) - 1);
- 			break;
- 		case 4:
--			strncat(cls_str, "Sensing device", sizeof(cls_str) - strlen(cls_str));
-+			strncat(cls_str, "Sensing device",
-+					sizeof(cls_str) - strlen(cls_str) - 1);
- 			break;
- 		case 5:
--			strncat(cls_str, "Digitizer tablet", sizeof(cls_str) - strlen(cls_str));
--		break;
-+			strncat(cls_str, "Digitizer tablet",
-+					sizeof(cls_str) - strlen(cls_str) - 1);
-+			break;
- 		case 6:
--			strncat(cls_str, "Card reader", sizeof(cls_str) - strlen(cls_str));
-+			strncat(cls_str, "Card reader",
-+					sizeof(cls_str) - strlen(cls_str) - 1);
- 			break;
- 		default:
--			strncat(cls_str, "(reserved)", sizeof(cls_str) - strlen(cls_str));
-+			strncat(cls_str, "(reserved)",
-+					sizeof(cls_str) - strlen(cls_str) - 1);
- 			break;
- 		}
- 		if (strlen(cls_str) > 0)
--- 
-1.8.3.2
+Marcel
 
