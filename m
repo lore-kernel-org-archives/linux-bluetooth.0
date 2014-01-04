@@ -2,35 +2,36 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 12/12] android/system-emulator: Remove useless "static" qualifier
-Date: Fri,  3 Jan 2014 21:55:28 -0400
-Message-Id: <1388800528-10699-13-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 04/12] attrib: Fix sprintf() format specification
+Date: Fri,  3 Jan 2014 21:55:20 -0400
+Message-Id: <1388800528-10699-5-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The value of SYSTEM_SOCKET_PATH is just copied to another memory
-location using memcpy() (on the same function), therefore the static
-qualifier is unnecessary.
----
- android/system-emulator.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Fixes clang error:
 
-diff --git a/android/system-emulator.c b/android/system-emulator.c
-index 2dc9ad8..f1c6622 100644
---- a/android/system-emulator.c
-+++ b/android/system-emulator.c
-@@ -185,8 +185,7 @@ static void signal_callback(int signum, void *user_data)
+src/attrib-server.c:916:26: error: format specifies type 'unsigned char'
+but the argument has type 'uint16_t' (aka 'unsigned short')
+[-Werror,-Wformat]
+---
+ src/attrib-server.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index a6f1066..a7ee55d 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -913,7 +913,7 @@ static uint16_t write_value(struct gatt_channel *channel, uint16_t handle,
+ 		g_key_file_load_from_file(key_file, filename, 0, NULL);
  
- int main(int argc, char *argv[])
- {
--	static const char SYSTEM_SOCKET_PATH[] = "\0android_system";
--
-+	const char SYSTEM_SOCKET_PATH[] = "\0android_system";
- 	sigset_t mask;
- 	struct sockaddr_un addr;
- 	int fd;
+ 		sprintf(group, "%hu", handle);
+-		sprintf(value, "%hhX", cccval);
++		sprintf(value, "%hX", cccval);
+ 		g_key_file_set_string(key_file, group, "Value", value);
+ 
+ 		data = g_key_file_to_data(key_file, &length, NULL);
 -- 
 1.8.3.2
 
