@@ -8,114 +8,86 @@ Cc: peter@hurleysoftware.com,
 	jslaby@suse.cz,
 	stable@vger.kernel.org,
 	Gianluca Anzolin <gianluca@sottospazio.it>
-Subject: [PATCH 2/2] rfcomm: move the device under its parent if already connected
-Date: Sat,  4 Jan 2014 17:30:38 +0100
-Message-Id: <1388853038-6917-3-git-send-email-gianluca@sottospazio.it>
+Subject: [PATCH 1/2] rfcomm: release the port when the last user closes the tty
+Date: Sat,  4 Jan 2014 17:30:37 +0100
+Message-Id: <1388853038-6917-2-git-send-email-gianluca@sottospazio.it>
 In-Reply-To: <1388853038-6917-1-git-send-email-gianluca@sottospazio.it>
 References: <1388853038-6917-1-git-send-email-gianluca@sottospazio.it>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes a userspace regression introduced with the conversion
-of the rfcomm tty code to a proper tty_port driver.
+This patch fixes a userspace regression introduced by the commit
+29cd718b.
 
-Currently the tty device is moved under the parent only when a
-successful BT connection is established.
+If the rfcomm device was created with the flag RFCOMM_RELEASE_ONHUP the
+user space expects that the tty_port is released as soon as the last
+process closes the tty.
 
-Unfortunately this doesn't take into account the situation in which the
-BT connection is already there, i.e. when the rfcomm device is created
-with the flag RFCOMM_REUSE_DLC: in this case the tty device is never
-moved under its parent.
+The current code attempts to release the port in the function
+rfcomm_dev_state_change(). However it won't get a reference to the
+relevant tty to send a HUP: at that point the tty is already destroyed
+and therefore NULL.
 
-This causes a regression with ModemManager which checks the parent
-device to determine if the tty is likely to be connected to a modem:
-it finds a NULL parent and skip the AT probe sequence.
+This patch fixes the regression by taking over the tty refcount in the
+tty install method(). This way the tty_port is automatically released as
+soon as the tty is destroyed.
 
-The patch fixes the regression by calling device_move() in the function
-rfcomm_dev_carrier_raised().
+As a consequence the check for RFCOMM_RELEASE_ONHUP flag in the hangup()
+method is now redundant. Instead we have to be careful with the reference
+counting in the rfcomm_release_dev() function.
 
 Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
-Reported-by: Beson Chow <blc+bluez@mail.vanade.com>
+Reported-by: Alexander Holler <holler@ahsoftware.de>
 ---
- net/bluetooth/rfcomm/tty.c | 47 ++++++++++++++++++++++++----------------------
- 1 file changed, 25 insertions(+), 22 deletions(-)
+ net/bluetooth/rfcomm/tty.c | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
 
 diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index a535ef1..9e217d7 100644
+index 84fcf9f..a535ef1 100644
 --- a/net/bluetooth/rfcomm/tty.c
 +++ b/net/bluetooth/rfcomm/tty.c
-@@ -111,12 +111,34 @@ static int rfcomm_dev_activate(struct tty_port *port, struct tty_struct *tty)
- 	return rfcomm_dlc_open(dev->dlc, &dev->src, &dev->dst, dev->channel);
- }
+@@ -437,7 +437,8 @@ static int rfcomm_release_dev(void __user *arg)
+ 		tty_kref_put(tty);
+ 	}
  
-+static struct device *rfcomm_get_device(struct rfcomm_dev *dev)
-+{
-+	struct hci_dev *hdev;
-+	struct hci_conn *conn;
-+
-+	hdev = hci_get_route(&dev->dst, &dev->src);
-+	if (!hdev)
-+		return NULL;
-+
-+	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &dev->dst);
-+
-+	hci_dev_put(hdev);
-+
-+	return conn ? &conn->dev : NULL;
-+}
-+
- /* we block the open until the dlc->state becomes BT_CONNECTED */
- static int rfcomm_dev_carrier_raised(struct tty_port *port)
- {
- 	struct rfcomm_dev *dev = container_of(port, struct rfcomm_dev, port);
+-	if (!test_and_set_bit(RFCOMM_TTY_RELEASED, &dev->flags))
++	if (!test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags) &&
++	    !test_and_set_bit(RFCOMM_TTY_RELEASED, &dev->flags))
+ 		tty_port_put(&dev->port);
  
--	return (dev->dlc->state == BT_CONNECTED);
-+	if (dev->dlc->state == BT_CONNECTED) {
-+		device_move(dev->tty_dev, rfcomm_get_device(dev),
-+			    DPM_ORDER_DEV_AFTER_PARENT);
-+		return 1;
+ 	tty_port_put(&dev->port);
+@@ -670,10 +671,20 @@ static int rfcomm_tty_install(struct tty_driver *driver, struct tty_struct *tty)
+ 
+ 	/* install the tty_port */
+ 	err = tty_port_install(&dev->port, driver, tty);
+-	if (err)
++	if (err) {
+ 		rfcomm_tty_cleanup(tty);
++		return err;
 +	}
+ 
+-	return err;
++	/* take over the tty_port reference if the port was created with the
++	 * flag RFCOMM_RELEASE_ONHUP. This will force the release of the port
++	 * when the last process closes the tty. The behaviour is expected by
++	 * userspace.
++	 */
++	if (test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags))
++		tty_port_put(&dev->port);
 +
 +	return 0;
  }
  
- /* device-specific cleanup: close the dlc */
-@@ -169,22 +191,6 @@ static struct rfcomm_dev *rfcomm_dev_get(int id)
- 	return dev;
+ static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
+@@ -1010,10 +1021,6 @@ static void rfcomm_tty_hangup(struct tty_struct *tty)
+ 	BT_DBG("tty %p dev %p", tty, dev);
+ 
+ 	tty_port_hangup(&dev->port);
+-
+-	if (test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags) &&
+-	    !test_and_set_bit(RFCOMM_TTY_RELEASED, &dev->flags))
+-		tty_port_put(&dev->port);
  }
  
--static struct device *rfcomm_get_device(struct rfcomm_dev *dev)
--{
--	struct hci_dev *hdev;
--	struct hci_conn *conn;
--
--	hdev = hci_get_route(&dev->dst, &dev->src);
--	if (!hdev)
--		return NULL;
--
--	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &dev->dst);
--
--	hci_dev_put(hdev);
--
--	return conn ? &conn->dev : NULL;
--}
--
- static ssize_t show_address(struct device *tty_dev, struct device_attribute *attr, char *buf)
- {
- 	struct rfcomm_dev *dev = dev_get_drvdata(tty_dev);
-@@ -576,12 +582,9 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
- 	BT_DBG("dlc %p dev %p err %d", dlc, dev, err);
- 
- 	dev->err = err;
--	if (dlc->state == BT_CONNECTED) {
--		device_move(dev->tty_dev, rfcomm_get_device(dev),
--			    DPM_ORDER_DEV_AFTER_PARENT);
--
-+	if (dlc->state == BT_CONNECTED)
- 		wake_up_interruptible(&dev->port.open_wait);
--	} else if (dlc->state == BT_CLOSED)
-+	else if (dlc->state == BT_CLOSED)
- 		tty_port_tty_hangup(&dev->port, false);
- }
- 
+ static int rfcomm_tty_tiocmget(struct tty_struct *tty)
 -- 
 1.8.5.2
