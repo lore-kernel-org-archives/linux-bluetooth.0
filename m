@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 09/12] android/client: Remove duplicate "const" specifier
-Date: Fri,  3 Jan 2014 21:55:25 -0400
-Message-Id: <1388800528-10699-10-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 06/12] tools: Fix unaligned memory access on smp-tester
+Date: Fri,  3 Jan 2014 21:55:22 -0400
+Message-Id: <1388800528-10699-7-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,101 +12,55 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Fixes clang errors like:
 
-android/client/if-hh.c:181:39: error: duplicate 'const' declaration
-specifier [-Werror,-Wduplicate-decl-specifier]
+tools/smp-tester.c:263:11: error: cast from 'uint8_t *' (aka 'unsigned
+char *') to 'u128 *' increases required alignment from 1 to 8
+[-Werror,-Wcast-align]
 ---
- android/client/if-hh.c  | 16 ++++++++--------
- android/client/if-pan.c |  8 ++++----
- 2 files changed, 12 insertions(+), 12 deletions(-)
+ tools/smp-tester.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/android/client/if-hh.c b/android/client/if-hh.c
-index b8ebc8e..56eb698 100644
---- a/android/client/if-hh.c
-+++ b/android/client/if-hh.c
-@@ -178,7 +178,7 @@ static void init_p(int argc, const char **argv)
+diff --git a/tools/smp-tester.c b/tools/smp-tester.c
+index 685d379..20429a9 100644
+--- a/tools/smp-tester.c
++++ b/tools/smp-tester.c
+@@ -233,10 +233,16 @@ typedef struct {
+ 	uint64_t a, b;
+ } u128;
  
- /* connect */
- 
--static void connect_c(int argc, const const char **argv, enum_func *enum_func,
-+static void connect_c(int argc, const char **argv, enum_func *enum_func,
- 								void **user)
+-static inline void u128_xor(u128 *r, const u128 *p, const u128 *q)
++static inline void u128_xor(void *r, const void *p, const void *q)
  {
- 	if (argc == 3) {
-@@ -243,8 +243,8 @@ static void set_info_p(int argc, const char **argv)
+-	r->a = p->a ^ q->a;
+-	r->b = p->b ^ q->b;
++	const u128 pp = bt_get_unaligned((const u128 *) p);
++	const u128 qq = bt_get_unaligned((const u128 *) q);
++	u128 rr;
++
++	rr.a = pp.a ^ qq.a;
++	rr.b = pp.b ^ qq.b;
++
++	bt_put_unaligned(rr, (u128 *) r);
+ }
  
- /* get_protocol */
+ static int smp_c1(uint8_t r[16], uint8_t res[16])
+@@ -260,7 +266,7 @@ static int smp_c1(uint8_t r[16], uint8_t res[16])
+ 	baswap((bdaddr_t *) (p2 + 10), (bdaddr_t *) data->ra);
  
--static void get_protocol_c(int argc, const const char **argv,
--					enum_func *enum_func, void **user)
-+static void get_protocol_c(int argc, const char **argv, enum_func *enum_func,
-+								void **user)
- {
- 	if (argc == 3) {
- 		*user = connected_device_addr;
-@@ -296,8 +296,8 @@ static void set_protocol_p(int argc, const char **argv)
+ 	/* res = r XOR p1 */
+-	u128_xor((u128 *) res, (u128 *) r, (u128 *) p1);
++	u128_xor(res, r, p1);
  
- /* get_report */
+ 	/* res = e(k, res) */
+ 	err = smp_e(data->smp_tk, res, res);
+@@ -268,7 +274,7 @@ static int smp_c1(uint8_t r[16], uint8_t res[16])
+ 		return err;
  
--static void get_report_c(int argc, const const char **argv,
--					enum_func *enum_func, void **user)
-+static void get_report_c(int argc, const char **argv, enum_func *enum_func,
-+								void **user)
- {
- 	if (argc == 3) {
- 		*user = connected_device_addr;
-@@ -341,8 +341,8 @@ static void get_report_p(int argc, const char **argv)
+ 	/* res = res XOR p2 */
+-	u128_xor((u128 *) res, (u128 *) res, (u128 *) p2);
++	u128_xor(res, res, p2);
  
- /* set_report */
- 
--static void set_report_c(int argc, const const char **argv,
--					enum_func *enum_func, void **user)
-+static void set_report_c(int argc, const char **argv, enum_func *enum_func,
-+								void **user)
- {
- 	if (argc == 3) {
- 		*user = connected_device_addr;
-@@ -377,7 +377,7 @@ static void set_report_p(int argc, const char **argv)
- 
- /* send_data */
- 
--static void send_data_c(int argc, const const char **argv, enum_func *enum_func,
-+static void send_data_c(int argc, const char **argv, enum_func *enum_func,
- 								void **user)
- {
- 	if (argc == 3) {
-diff --git a/android/client/if-pan.c b/android/client/if-pan.c
-index a11f2a3..bdb36cc 100644
---- a/android/client/if-pan.c
-+++ b/android/client/if-pan.c
-@@ -80,7 +80,7 @@ static void init_p(int argc, const char **argv)
- 
- /* enable */
- 
--static void enable_c(int argc, const const char **argv, enum_func *enum_func,
-+static void enable_c(int argc, const char **argv, enum_func *enum_func,
- 								void **user)
- {
- 	if (argc == 3) {
-@@ -121,7 +121,7 @@ static void get_local_role_p(int argc, const char **argv)
- 
- /* connect */
- 
--static void connect_c(int argc, const const char **argv, enum_func *enum_func,
-+static void connect_c(int argc, const char **argv, enum_func *enum_func,
- 								void **user)
- {
- 	if (argc == 3) {
-@@ -165,8 +165,8 @@ static void connect_p(int argc, const char **argv)
- 
- /* disconnect */
- 
--static void disconnect_c(int argc, const const char **argv,
--					enum_func *enum_func, void **user)
-+static void disconnect_c(int argc, const char **argv, enum_func *enum_func,
-+								void **user)
- {
- 	if (argc == 3) {
- 		*user = last_used_addr;
+ 	/* res = e(k, res) */
+ 	return smp_e(data->smp_tk, res, res);
 -- 
 1.8.3.2
 
