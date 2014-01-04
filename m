@@ -2,48 +2,39 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 07/12] tools: Fix possible uninitialized variable in obexctl
-Date: Fri,  3 Jan 2014 21:55:23 -0400
-Message-Id: <1388800528-10699-8-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 02/12] avrcp: Remove unnecessary "if (...)"
+Date: Fri,  3 Jan 2014 21:55:18 -0400
+Message-Id: <1388800528-10699-3-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On set_default_session(), if g_dbus_proxy_get_property() returns FALSE,
-desc will be uninitialized. Given that this function already checks for
-NULL proxy internally, it is enough to check whether it fails (and if
-so, set a default prompt without destination).
+There is already a "if (type != 0x03 && type != 0x02)" check earlier on
+the code, so a plain "if (...) else ..." is enough.
 
-Fixes this clang error:
+Fixes clang error:
 
-tools/obexctl.c:439:6: error: variable 'desc' is used uninitialized
-whenever 'if' condition is false [-Werror,-Wsometimes-uninitialized]
+profiles/audio/avrcp.c:2211:12: error: variable 'item' is used
+uninitialized whenever 'if' condition is false
+[-Werror,-Wsometimes-uninitialized]
 ---
- tools/obexctl.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ profiles/audio/avrcp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/obexctl.c b/tools/obexctl.c
-index 2e38298..f0d5438 100644
---- a/tools/obexctl.c
-+++ b/tools/obexctl.c
-@@ -431,14 +431,12 @@ static void set_default_session(GDBusProxy *proxy)
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 2eb2ad6..8d4309a 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -2208,7 +2208,7 @@ static gboolean avrcp_list_items_rsp(struct avctp *conn, uint8_t *operands,
  
- 	default_session = proxy;
+ 		if (type == 0x03)
+ 			item = parse_media_element(session, &operands[i], len);
+-		else if (type == 0x02)
++		else
+ 			item = parse_media_folder(session, &operands[i], len);
  
--	if (proxy == NULL) {
-+	if (!g_dbus_proxy_get_property(proxy, "Destination", &iter)) {
- 		desc = g_strdup(PROMPT_ON);
- 		goto done;
- 	}
- 
--	if (g_dbus_proxy_get_property(proxy, "Destination", &iter))
--		dbus_message_iter_get_basic(&iter, &desc);
--
-+	dbus_message_iter_get_basic(&iter, &desc);
- 	desc = g_strdup_printf(COLOR_BLUE "[%s]" COLOR_OFF "# ", desc);
- 
- done:
+ 		if (item) {
 -- 
 1.8.3.2
 
