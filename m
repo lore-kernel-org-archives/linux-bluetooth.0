@@ -2,65 +2,48 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 06/12] tools: Fix unaligned memory access on smp-tester
-Date: Fri,  3 Jan 2014 21:55:22 -0400
-Message-Id: <1388800528-10699-7-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 07/12] tools: Fix possible uninitialized variable in obexctl
+Date: Fri,  3 Jan 2014 21:55:23 -0400
+Message-Id: <1388800528-10699-8-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fixes clang errors like:
+On set_default_session(), if g_dbus_proxy_get_property() returns FALSE,
+desc will be uninitialized. Given that this function already checks for
+NULL proxy internally, it is enough to check whether it fails (and if
+so, set a default prompt without destination).
 
-tools/smp-tester.c:263:11: error: cast from 'uint8_t *' (aka 'unsigned
-char *') to 'u128 *' increases required alignment from 1 to 8
-[-Werror,-Wcast-align]
+Fixes this clang error:
+
+tools/obexctl.c:439:6: error: variable 'desc' is used uninitialized
+whenever 'if' condition is false [-Werror,-Wsometimes-uninitialized]
 ---
- tools/smp-tester.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ tools/obexctl.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/tools/smp-tester.c b/tools/smp-tester.c
-index 685d379..20429a9 100644
---- a/tools/smp-tester.c
-+++ b/tools/smp-tester.c
-@@ -233,10 +233,16 @@ typedef struct {
- 	uint64_t a, b;
- } u128;
+diff --git a/tools/obexctl.c b/tools/obexctl.c
+index 2e38298..f0d5438 100644
+--- a/tools/obexctl.c
++++ b/tools/obexctl.c
+@@ -431,14 +431,12 @@ static void set_default_session(GDBusProxy *proxy)
  
--static inline void u128_xor(u128 *r, const u128 *p, const u128 *q)
-+static inline void u128_xor(void *r, const void *p, const void *q)
- {
--	r->a = p->a ^ q->a;
--	r->b = p->b ^ q->b;
-+	const u128 pp = bt_get_unaligned((const u128 *) p);
-+	const u128 qq = bt_get_unaligned((const u128 *) q);
-+	u128 rr;
-+
-+	rr.a = pp.a ^ qq.a;
-+	rr.b = pp.b ^ qq.b;
-+
-+	bt_put_unaligned(rr, (u128 *) r);
- }
+ 	default_session = proxy;
  
- static int smp_c1(uint8_t r[16], uint8_t res[16])
-@@ -260,7 +266,7 @@ static int smp_c1(uint8_t r[16], uint8_t res[16])
- 	baswap((bdaddr_t *) (p2 + 10), (bdaddr_t *) data->ra);
+-	if (proxy == NULL) {
++	if (!g_dbus_proxy_get_property(proxy, "Destination", &iter)) {
+ 		desc = g_strdup(PROMPT_ON);
+ 		goto done;
+ 	}
  
- 	/* res = r XOR p1 */
--	u128_xor((u128 *) res, (u128 *) r, (u128 *) p1);
-+	u128_xor(res, r, p1);
+-	if (g_dbus_proxy_get_property(proxy, "Destination", &iter))
+-		dbus_message_iter_get_basic(&iter, &desc);
+-
++	dbus_message_iter_get_basic(&iter, &desc);
+ 	desc = g_strdup_printf(COLOR_BLUE "[%s]" COLOR_OFF "# ", desc);
  
- 	/* res = e(k, res) */
- 	err = smp_e(data->smp_tk, res, res);
-@@ -268,7 +274,7 @@ static int smp_c1(uint8_t r[16], uint8_t res[16])
- 		return err;
- 
- 	/* res = res XOR p2 */
--	u128_xor((u128 *) res, (u128 *) res, (u128 *) p2);
-+	u128_xor(res, res, p2);
- 
- 	/* res = e(k, res) */
- 	return smp_e(data->smp_tk, res, res);
+ done:
 -- 
 1.8.3.2
 
