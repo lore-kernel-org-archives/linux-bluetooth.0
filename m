@@ -1,47 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 5 Jan 2014 16:49:42 +0100
-From: Gianluca Anzolin <gianluca@sottospazio.it>
-To: andrey.vihrov@gmail.com
-Cc: peter@hurleysoftware.com, marcel@holtmann.org,
-	gregkh@linuxfoundation.org, jslaby@suse.cz,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: A problem with "rfcomm bind" and wvdial
-Message-ID: <20140105154942.GA12621@sottospazio.it>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Szymon Janc <szymon.janc@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@gmail.com>
+Subject: [PATCH 1/3] android/socket: Make channel int32_t in IPC specification
+Date: Sat,  4 Jan 2014 21:16:12 +0100
+Message-Id: <1388866574-20158-1-git-send-email-szymon.janc@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+This match IPC type with type in socket HAL API. This allows to pass
+data directly from HAL library and will allow to reduce logic in it.
+---
+ android/hal-msg.h | 20 ++++++++++----------
+ android/socket.c  |  2 +-
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
-I looked at your problem this afternoon and I think I know what's happening:
-wvdial is opening the port with the flag O_NONBLOCK. As expected the rfcomm
-code returns immediately instead of waiting for the BT connection to come
-up. Then wvdial sends the AT commands and the writes fail.
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index c351501..bbbb99c 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -233,20 +233,20 @@ struct hal_cmd_le_test_mode {
+ 
+ #define HAL_OP_SOCK_LISTEN		0x01
+ struct hal_cmd_sock_listen {
+-	uint8_t  type;
+-	uint8_t  name[256];
+-	uint8_t  uuid[16];
+-	uint16_t channel;
+-	uint8_t  flags;
++	uint8_t type;
++	uint8_t name[256];
++	uint8_t uuid[16];
++	int32_t channel;
++	uint8_t flags;
+ } __attribute__((packed));
+ 
+ #define HAL_OP_SOCK_CONNECT		0x02
+ struct hal_cmd_sock_connect {
+-	uint8_t  bdaddr[6];
+-	uint8_t  type;
+-	uint8_t  uuid[16];
+-	uint16_t channel;
+-	uint8_t  flags;
++	uint8_t bdaddr[6];
++	uint8_t type;
++	uint8_t uuid[16];
++	int32_t channel;
++	uint8_t flags;
+ } __attribute__((packed));
+ 
+ /* Bluetooth HID Host HAL API */
+diff --git a/android/socket.c b/android/socket.c
+index 11d64f8..f68fbf0 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -804,7 +804,7 @@ static void handle_listen(const void *buf, uint16_t len)
+ 
+ 	profile = get_profile_by_uuid(cmd->uuid);
+ 	if (!profile) {
+-		if (!cmd->channel)
++		if (cmd->channel <= 0)
+ 			goto failed;
+ 
+ 		chan = cmd->channel;
+-- 
+1.8.5.2
 
-In the past it worked because the carrier_raised() logic was open coded inside
-the rfcomm code: it always waited for a successful or failed connection even
-with a non-blocking tty.
-
-But now the code uses the tty_port methods and won't wait for a successful
-bluetooth connection on open().
-
-But there is more: when wvdial terminates, it will set the CLOCAL flag for the
-tty and this will result in the same behaviour described above, even without
-setting the O_NONBLOCK flag. This will affect other users of the tty.
-
-These two cases make clear that the use of carrier_raised() method was not that
-fair after all: while that allowed us to remove some code we now have to work
-around it to get the previous behaviour.
-
-For example we could mask off the O_NONBLOCK flag before opening the port and
-then restore it when the tty_port_open() is completed. We could do something
-similar for the CLOCAL flag: always remove it in rfcomm_tty_set_termios().
-
-The alternative is to remove the carrier_raised() method and wait for the BT
-connection in rfcomm_dev_activate() like the old code did.
-
-I'm CC-ing some people who know the code better than me to get a suggestion
-on how to proceed.
-
-Thank you,
-Gianluca
