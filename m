@@ -2,50 +2,52 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 11/12] android/client: Fix uninitialized "sock_fd" variable
-Date: Fri,  3 Jan 2014 21:55:27 -0400
-Message-Id: <1388800528-10699-12-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 10/12] android/client: Use memcpy() for getting CMSG_DATA()
+Date: Fri,  3 Jan 2014 21:55:26 -0400
+Message-Id: <1388800528-10699-11-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If EXEC() macro is called with the first pointer argument NULL, sock_fd
-will not be initialized. Given that the NULL check is not fatal, it is a
-good idea to initialize the variable to -1 so the code has defined
-behavior on this situation.
+This is how it is done in all other places in BlueZ. Also drop
+unnecessary "descs" local variable.
 
-Detected by clang:
+Fixes clang error:
 
-android/client/if-sock.c:251:7: error: variable 'sock_fd' is used
-uninitialized whenever 'if' condition is false
-[-Werror,-Wsometimes-uninitialized]
+android/client/if-sock.c:164:11: error: cast from 'unsigned char *' to
+'int *' increases required alignment from 1 to 4 [-Werror,-Wcast-align]
 ---
- android/client/if-sock.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ android/client/if-sock.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/android/client/if-sock.c b/android/client/if-sock.c
-index 050bc96..4c1af82 100644
+index 5394a5d..050bc96 100644
 --- a/android/client/if-sock.c
 +++ b/android/client/if-sock.c
-@@ -207,7 +207,7 @@ static void listen_p(int argc, const char **argv)
- 	const char *service_name;
- 	bt_uuid_t service_uuid;
- 	int channel;
--	int sock_fd;
-+	int sock_fd = -1;
- 	int flags;
+@@ -154,21 +154,19 @@ static void read_accepted(int fd)
  
- 	RETURN_IF_NULL(if_sock);
-@@ -281,7 +281,7 @@ static void connect_p(int argc, const char **argv)
- 	btsock_type_t type;
- 	bt_uuid_t uuid;
- 	int channel;
--	int sock_fd;
-+	int sock_fd = -1;
- 	int flags;
+ 	for (cmsgptr = CMSG_FIRSTHDR(&msg);
+ 		cmsgptr != NULL; cmsgptr = CMSG_NXTHDR(&msg, cmsgptr)) {
+-		int *descs;
+ 		int count;
  
- 	/* Address */
+ 		if (cmsgptr->cmsg_level != SOL_SOCKET ||
+ 			cmsgptr->cmsg_type != SCM_RIGHTS)
+ 			continue;
+ 
+-		descs = (int *) CMSG_DATA(cmsgptr);
++		memcpy(&accepted_fd, CMSG_DATA(cmsgptr), sizeof(accepted_fd));
+ 		count = ((cmsgptr->cmsg_len - CMSG_LEN(0)) / sizeof(int));
+ 
+ 		if (count != 1)
+ 			haltest_error("Failed to accept descriptors count=%d\n",
+ 									count);
+ 
+-		accepted_fd = descs[0];
+ 		break;
+ 	}
+ 
 -- 
 1.8.3.2
 
