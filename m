@@ -2,39 +2,62 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 02/12] avrcp: Remove unnecessary "if (...)"
-Date: Fri,  3 Jan 2014 21:55:18 -0400
-Message-Id: <1388800528-10699-3-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 00/12] Fixes detected by clang
+Date: Fri,  3 Jan 2014 21:55:16 -0400
+Message-Id: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is already a "if (type != 0x03 && type != 0x02)" check earlier on
-the code, so a plain "if (...) else ..." is enough.
+Hi,
 
-Fixes clang error:
+The patches on this set (except for the last patch) fix issues detected while
+building BlueZ with clang. Note that these fixes were only compile tested (I
+did run "make check" but it obviously does not cover code touched by these
+patches). For strncat/sprintf/sscanf related patches, I did some tests with
+sample code to make sure the changes worked as expected.
 
-profiles/audio/avrcp.c:2211:12: error: variable 'item' is used
-uninitialized whenever 'if' condition is false
-[-Werror,-Wsometimes-uninitialized]
----
- profiles/audio/avrcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The last patch is a fix that I think should be inoffensive (unless there is
+some clever hack going on there that I could not see.)
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 2eb2ad6..8d4309a 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -2208,7 +2208,7 @@ static gboolean avrcp_list_items_rsp(struct avctp *conn, uint8_t *operands,
- 
- 		if (type == 0x03)
- 			item = parse_media_element(session, &operands[i], len);
--		else if (type == 0x02)
-+		else
- 			item = parse_media_folder(session, &operands[i], len);
- 
- 		if (item) {
+BTW, I've been experimenting with Travis CI for automatically running
+build/unit tests for commits made on my personal development tree:
+https://travis-ci.org/lizardo/bluez-devel. Enabling builds with clang (along
+with gcc) was a one-line change to the configuration file. I plan in near
+future to also run functional tests (right now it just runs "make check" and
+"make distcheck")
+
+Best Regards,
+Anderson Lizardo
+
+Anderson Lizardo (12):
+  tools: Fix strncat() usage in hciconfig/hcitool
+  avrcp: Remove unnecessary "if (...)"
+  health: Fix struct mcap_csp "csp_req" field type
+  attrib: Fix sprintf() format specification
+  core: Fix sscanf() format specification
+  tools: Fix unaligned memory access on smp-tester
+  tools: Fix possible uninitialized variable in obexctl
+  android/client: Fix incorrect usage of bt_state_t2str()
+  android/client: Remove duplicate "const" specifier
+  android/client: Use memcpy() for getting CMSG_DATA()
+  android/client: Fix uninitialized "sock_fd" variable
+  android/system-emulator: Remove useless "static" qualifier
+
+ android/client/if-bt.c      |  2 +-
+ android/client/if-hh.c      | 16 ++++++++--------
+ android/client/if-pan.c     |  8 ++++----
+ android/client/if-sock.c    |  8 +++-----
+ android/system-emulator.c   |  3 +--
+ profiles/audio/avrcp.c      |  2 +-
+ profiles/health/mcap_sync.c |  2 +-
+ src/adapter.c               | 12 ++++++------
+ src/attrib-server.c         |  2 +-
+ tools/hciconfig.c           | 21 ++++++++++++++-------
+ tools/hcitool.c             | 23 +++++++++++++++--------
+ tools/obexctl.c             |  6 ++----
+ tools/smp-tester.c          | 16 +++++++++++-----
+ 13 files changed, 68 insertions(+), 53 deletions(-)
+
 -- 
 1.8.3.2
 
