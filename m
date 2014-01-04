@@ -2,62 +2,124 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 00/12] Fixes detected by clang
-Date: Fri,  3 Jan 2014 21:55:16 -0400
-Message-Id: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 01/12] tools: Fix strncat() usage in hciconfig/hcitool
+Date: Fri,  3 Jan 2014 21:55:17 -0400
+Message-Id: <1388800528-10699-2-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+According to strncat() manpage:
 
-The patches on this set (except for the last patch) fix issues detected while
-building BlueZ with clang. Note that these fixes were only compile tested (I
-did run "make check" but it obviously does not cover code touched by these
-patches). For strncat/sprintf/sscanf related patches, I did some tests with
-sample code to make sure the changes worked as expected.
+"If src contains n or more characters, strncat() writes n+1 characters
+to dest (n from src plus the terminating null byte).  Therefore, the
+size of dest must be at least strlen(dest)+n+1"
 
-The last patch is a fix that I think should be inoffensive (unless there is
-some clever hack going on there that I could not see.)
+While the current usage of strncat() cannot cause an overflow, if a
+bigger string is added to the switch()'s without increasing the static
+buffer, it would overflow by one byte due to the incorrect size
+calculation.
 
-BTW, I've been experimenting with Travis CI for automatically running
-build/unit tests for commits made on my personal development tree:
-https://travis-ci.org/lizardo/bluez-devel. Enabling builds with clang (along
-with gcc) was a one-line change to the configuration file. I plan in near
-future to also run functional tests (right now it just runs "make check" and
-"make distcheck")
+Fixes clang errors like:
 
-Best Regards,
-Anderson Lizardo
+tools/hciconfig.c:827:33: error: the value of the size argument in
+'strncat' is too large, might lead to a buffer overflow
+[-Werror,-Wstrncat-size]
+---
+ tools/hciconfig.c | 21 ++++++++++++++-------
+ tools/hcitool.c   | 23 +++++++++++++++--------
+ 2 files changed, 29 insertions(+), 15 deletions(-)
 
-Anderson Lizardo (12):
-  tools: Fix strncat() usage in hciconfig/hcitool
-  avrcp: Remove unnecessary "if (...)"
-  health: Fix struct mcap_csp "csp_req" field type
-  attrib: Fix sprintf() format specification
-  core: Fix sscanf() format specification
-  tools: Fix unaligned memory access on smp-tester
-  tools: Fix possible uninitialized variable in obexctl
-  android/client: Fix incorrect usage of bt_state_t2str()
-  android/client: Remove duplicate "const" specifier
-  android/client: Use memcpy() for getting CMSG_DATA()
-  android/client: Fix uninitialized "sock_fd" variable
-  android/system-emulator: Remove useless "static" qualifier
-
- android/client/if-bt.c      |  2 +-
- android/client/if-hh.c      | 16 ++++++++--------
- android/client/if-pan.c     |  8 ++++----
- android/client/if-sock.c    |  8 +++-----
- android/system-emulator.c   |  3 +--
- profiles/audio/avrcp.c      |  2 +-
- profiles/health/mcap_sync.c |  2 +-
- src/adapter.c               | 12 ++++++------
- src/attrib-server.c         |  2 +-
- tools/hciconfig.c           | 21 ++++++++++++++-------
- tools/hcitool.c             | 23 +++++++++++++++--------
- tools/obexctl.c             |  6 ++----
- tools/smp-tester.c          | 16 +++++++++++-----
- 13 files changed, 68 insertions(+), 53 deletions(-)
-
+diff --git a/tools/hciconfig.c b/tools/hciconfig.c
+index fe45167..6c7f8ed 100644
+--- a/tools/hciconfig.c
++++ b/tools/hciconfig.c
+@@ -824,25 +824,32 @@ static char *get_minor_device_name(int major, int minor)
+ 		case 0:
+ 			break;
+ 		case 1:
+-			strncat(cls_str, "Joystick", sizeof(cls_str) - strlen(cls_str));
++			strncat(cls_str, "Joystick",
++					sizeof(cls_str) - strlen(cls_str) - 1);
+ 			break;
+ 		case 2:
+-			strncat(cls_str, "Gamepad", sizeof(cls_str) - strlen(cls_str));
++			strncat(cls_str, "Gamepad",
++					sizeof(cls_str) - strlen(cls_str) - 1);
+ 			break;
+ 		case 3:
+-			strncat(cls_str, "Remote control", sizeof(cls_str) - strlen(cls_str));
++			strncat(cls_str, "Remote control",
++					sizeof(cls_str) - strlen(cls_str) - 1);
+ 			break;
+ 		case 4:
+-			strncat(cls_str, "Sensing device", sizeof(cls_str) - strlen(cls_str));
++			strncat(cls_str, "Sensing device",
++					sizeof(cls_str) - strlen(cls_str) - 1);
+ 			break;
+ 		case 5:
+-			strncat(cls_str, "Digitizer tablet", sizeof(cls_str) - strlen(cls_str));
++			strncat(cls_str, "Digitizer tablet",
++					sizeof(cls_str) - strlen(cls_str) - 1);
+ 			break;
+ 		case 6:
+-			strncat(cls_str, "Card reader", sizeof(cls_str) - strlen(cls_str));
++			strncat(cls_str, "Card reader",
++					sizeof(cls_str) - strlen(cls_str) - 1);
+ 			break;
+ 		default:
+-			strncat(cls_str, "(reserved)", sizeof(cls_str) - strlen(cls_str));
++			strncat(cls_str, "(reserved)",
++					sizeof(cls_str) - strlen(cls_str) - 1);
+ 			break;
+ 		}
+ 		if (strlen(cls_str) > 0)
+diff --git a/tools/hcitool.c b/tools/hcitool.c
+index f2e4fa4..d85ece1 100644
+--- a/tools/hcitool.c
++++ b/tools/hcitool.c
+@@ -336,25 +336,32 @@ static char *get_minor_device_name(int major, int minor)
+ 		case 0:
+ 			break;
+ 		case 1:
+-			strncat(cls_str, "Joystick", sizeof(cls_str) - strlen(cls_str));
++			strncat(cls_str, "Joystick",
++					sizeof(cls_str) - strlen(cls_str) - 1);
+ 			break;
+ 		case 2:
+-			strncat(cls_str, "Gamepad", sizeof(cls_str) - strlen(cls_str));
++			strncat(cls_str, "Gamepad",
++					sizeof(cls_str) - strlen(cls_str) - 1);
+ 			break;
+ 		case 3:
+-			strncat(cls_str, "Remote control", sizeof(cls_str) - strlen(cls_str));
++			strncat(cls_str, "Remote control",
++					sizeof(cls_str) - strlen(cls_str) - 1);
+ 			break;
+ 		case 4:
+-			strncat(cls_str, "Sensing device", sizeof(cls_str) - strlen(cls_str));
++			strncat(cls_str, "Sensing device",
++					sizeof(cls_str) - strlen(cls_str) - 1);
+ 			break;
+ 		case 5:
+-			strncat(cls_str, "Digitizer tablet", sizeof(cls_str) - strlen(cls_str));
+-		break;
++			strncat(cls_str, "Digitizer tablet",
++					sizeof(cls_str) - strlen(cls_str) - 1);
++			break;
+ 		case 6:
+-			strncat(cls_str, "Card reader", sizeof(cls_str) - strlen(cls_str));
++			strncat(cls_str, "Card reader",
++					sizeof(cls_str) - strlen(cls_str) - 1);
+ 			break;
+ 		default:
+-			strncat(cls_str, "(reserved)", sizeof(cls_str) - strlen(cls_str));
++			strncat(cls_str, "(reserved)",
++					sizeof(cls_str) - strlen(cls_str) - 1);
+ 			break;
+ 		}
+ 		if (strlen(cls_str) > 0)
 -- 
 1.8.3.2
 
