@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 3/3] android/socket: Move logic from HAL to daemon in connect
-Date: Sat,  4 Jan 2014 21:16:14 +0100
-Message-Id: <1388866574-20158-3-git-send-email-szymon.janc@gmail.com>
+Subject: [PATCH 2/3] android/socket: Move logic from HAL to daemon in listen
+Date: Sat,  4 Jan 2014 21:16:13 +0100
+Message-Id: <1388866574-20158-2-git-send-email-szymon.janc@gmail.com>
 In-Reply-To: <1388866574-20158-1-git-send-email-szymon.janc@gmail.com>
 References: <1388866574-20158-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,90 +16,145 @@ library will be needed to add different socket type support.
 Both bdaddr2str and btuuid2str handle NULL pointers so it is safe to
 print debug unconditionally.
 ---
- android/hal-sock.c | 16 ++++-------
- android/socket.c   | 81 ++++++++++++++++++++++++++++++++++++++----------------
- 2 files changed, 62 insertions(+), 35 deletions(-)
+ android/hal-msg.h  |  4 +++
+ android/hal-sock.c | 36 ++++++--------------------
+ android/socket.c   | 74 +++++++++++++++++++++++++++++++++++++-----------------
+ 3 files changed, 63 insertions(+), 51 deletions(-)
 
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index bbbb99c..ceaa3b2 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -231,6 +231,10 @@ struct hal_cmd_le_test_mode {
+ 
+ /* Bluetooth Socket HAL api */
+ 
++#define HAL_SOCK_RFCOMM		0x01
++#define HAL_SOCK_SCO		0x02
++#define HAL_SOCK_L2CAP		0x03
++
+ #define HAL_OP_SOCK_LISTEN		0x01
+ struct hal_cmd_sock_listen {
+ 	uint8_t type;
 diff --git a/android/hal-sock.c b/android/hal-sock.c
-index 47de63d..f62b7ef 100644
+index c39ca6a..47de63d 100644
 --- a/android/hal-sock.c
 +++ b/android/hal-sock.c
-@@ -61,30 +61,24 @@ static bt_status_t sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
+@@ -26,18 +26,23 @@
+ #include "hal-utils.h"
+ #include "hal.h"
+ 
+-static bt_status_t sock_listen_rfcomm(const char *service_name,
++static bt_status_t sock_listen(btsock_type_t type, const char *service_name,
+ 					const uint8_t *uuid, int chan,
+ 					int *sock, int flags)
  {
- 	struct hal_cmd_sock_connect cmd;
+ 	struct hal_cmd_sock_listen cmd;
  
--	if ((!uuid && chan <= 0) || !bdaddr || !sock || !type) {
--		error("Invalid params: bd_addr %s, uuid %s, chan %d, sock %p",
--			bdaddr2str(bdaddr), btuuid2str(uuid), chan, sock);
+-	DBG("");
 +	if (!sock)
- 		return BT_STATUS_PARM_INVALID;
--	}
++		return BT_STATUS_PARM_INVALID;
++
++	DBG("uuid %s chan %d sock %p type %d service_name %s flags 0x%02x",
++		btuuid2str(uuid), chan, sock, type, service_name, flags);
  
- 	DBG("bdaddr %s uuid %s chan %d sock %p type %d flags 0x%02x",
- 		bdaddr2str(bdaddr), btuuid2str(uuid), chan, sock, type, flags);
- 
--	if (type != BTSOCK_RFCOMM) {
--		error("Socket type %u not supported", type);
--		return BT_STATUS_UNSUPPORTED;
--	}
--
  	memset(&cmd, 0, sizeof(cmd));
  
--	cmd.flags = flags;
 +	/* type match IPC type */
- 	cmd.type = type;
-+	cmd.flags = flags;
++	cmd.type = type;
+ 	cmd.flags = flags;
+-	cmd.type = BTSOCK_RFCOMM;
  	cmd.channel = chan;
  
  	if (uuid)
- 		memcpy(cmd.uuid, uuid, sizeof(cmd.uuid));
+@@ -50,31 +55,6 @@ static bt_status_t sock_listen_rfcomm(const char *service_name,
+ 				sizeof(cmd), &cmd, NULL, NULL, sock);
+ }
  
--	memcpy(cmd.bdaddr, bdaddr, sizeof(cmd.bdaddr));
-+	if (bdaddr)
-+		memcpy(cmd.bdaddr, bdaddr, sizeof(cmd.bdaddr));
- 
- 	return hal_ipc_cmd(HAL_SERVICE_ID_SOCK, HAL_OP_SOCK_CONNECT,
- 					sizeof(cmd), &cmd, NULL, NULL, sock);
+-static bt_status_t sock_listen(btsock_type_t type, const char *service_name,
+-					const uint8_t *uuid, int chan,
+-					int *sock, int flags)
+-{
+-	if ((!uuid && chan <= 0) || !sock || !type) {
+-		error("Invalid params: uuid %s, chan %d, sock %p",
+-						btuuid2str(uuid), chan, sock);
+-		return BT_STATUS_PARM_INVALID;
+-	}
+-
+-	DBG("uuid %s chan %d sock %p type %d service_name %s flags 0x%02x",
+-		btuuid2str(uuid), chan, sock, type, service_name, flags);
+-
+-	switch (type) {
+-	case BTSOCK_RFCOMM:
+-		return sock_listen_rfcomm(service_name, uuid, chan, sock,
+-									flags);
+-	default:
+-		error("%s: Socket type %d not supported", __func__, type);
+-		break;
+-	}
+-
+-	return BT_STATUS_UNSUPPORTED;
+-}
+-
+ static bt_status_t sock_connect(const bt_bdaddr_t *bdaddr, btsock_type_t type,
+ 					const uint8_t *uuid, int chan,
+ 					int *sock, int flags)
 diff --git a/android/socket.c b/android/socket.c
-index 98862cb..69b39ee 100644
+index f68fbf0..98862cb 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -975,7 +975,7 @@ fail:
- 	cleanup_rfsock(rfsock);
+@@ -62,6 +62,8 @@
+ 
+ static bdaddr_t adapter_addr;
+ 
++static const uint8_t zero_uuid[16] = { 0 };
++
+ /* Simple list of RFCOMM server sockets */
+ GList *servers = NULL;
+ 
+@@ -787,38 +789,40 @@ static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
+ 		rfsock_acc->rfcomm_watch);
  }
  
--static bool do_connect(struct rfcomm_sock *rfsock, int chan)
-+static bool do_rfcomm_connect(struct rfcomm_sock *rfsock, int chan)
+-static void handle_listen(const void *buf, uint16_t len)
++static uint8_t rfcomm_listen(int chan, const uint8_t *name, const uint8_t *uuid,
++						uint8_t flags, int *hal_fd)
  {
- 	BtIOSecLevel sec_level = BT_IO_SEC_MEDIUM;
- 	GIOChannel *io;
-@@ -1056,58 +1056,91 @@ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
- 
- 	DBG("Got RFCOMM channel %d", chan);
- 
--	if (do_connect(rfsock, chan))
-+	if (do_rfcomm_connect(rfsock, chan))
- 		return;
- fail:
- 	cleanup_rfsock(rfsock);
- }
- 
--static void handle_connect(const void *buf, uint16_t len)
-+static uint8_t connect_rfcomm(const bdaddr_t *addr, int chan,
-+				const uint8_t *uuid, uint8_t flags, int *hal_fd)
- {
--	const struct hal_cmd_sock_connect *cmd = buf;
- 	struct rfcomm_sock *rfsock;
--	uuid_t uuid;
+-	const struct hal_cmd_sock_listen *cmd = buf;
+ 	const struct profile_info *profile;
+ 	struct rfcomm_sock *rfsock = NULL;
+ 	BtIOSecLevel sec_level;
+ 	GIOChannel *io, *io_stack;
+ 	GIOCondition cond;
+ 	GError *err = NULL;
 -	int hal_fd = -1;
-+	uuid_t uu;
+-	int chan;
+ 	guint id;
  
--	DBG("");
-+	if ((!memcmp(uuid, zero_uuid, sizeof(zero_uuid)) && chan <= 0) ||
-+						!bacmp(addr, BDADDR_ANY)) {
-+		error("Invalid rfcomm connect params");
+ 	DBG("");
+ 
+-	profile = get_profile_by_uuid(cmd->uuid);
++	if (!memcmp(uuid, zero_uuid, sizeof(zero_uuid)) && chan <= 0) {
++		error("Invalid rfcomm listen params");
 +		return HAL_STATUS_INVALID;
 +	}
++
++	profile = get_profile_by_uuid(uuid);
+ 	if (!profile) {
+-		if (cmd->channel <= 0)
+-			goto failed;
++		if (chan <= 0)
++			return HAL_STATUS_INVALID;
+ 
+-		chan = cmd->channel;
+ 		sec_level = BT_IO_SEC_MEDIUM;
+ 	} else {
+ 		chan = profile->channel;
+ 		sec_level = profile->sec_level;
+ 	}
+ 
+-	DBG("rfcomm channel %d svc_name %s", chan, cmd->name);
++	DBG("rfcomm channel %d svc_name %s", chan, name);
  
 -	rfsock = create_rfsock(-1, &hal_fd);
 +	rfsock = create_rfsock(-1, hal_fd);
@@ -107,55 +162,43 @@ index 98862cb..69b39ee 100644
 -		goto failed;
 +		return HAL_STATUS_FAILED;
  
--	android2bdaddr(cmd->bdaddr, &rfsock->dst);
-+	bacpy(&rfsock->dst, addr);
+ 	io = bt_io_listen(accept_cb, NULL, rfsock, NULL, &err,
+ 				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
+@@ -847,31 +851,56 @@ static void handle_listen(const void *buf, uint16_t len)
+ 	rfsock->stack_watch = id;
  
--	if (!memcmp(cmd->uuid, zero_uuid, sizeof(zero_uuid))) {
--		if (!do_connect(rfsock, cmd->channel))
-+	if (!memcmp(uuid, zero_uuid, sizeof(zero_uuid))) {
-+		if (!do_rfcomm_connect(rfsock, chan))
- 			goto failed;
- 	} else {
--		memset(&uuid, 0, sizeof(uuid));
--		uuid.type = SDP_UUID128;
--		memcpy(&uuid.value.uuid128, cmd->uuid, sizeof(uint128_t));
-+		memset(&uu, 0, sizeof(uu));
-+		uu.type = SDP_UUID128;
-+		memcpy(&uu.value.uuid128, uuid, sizeof(uint128_t));
+ 	DBG("real_sock %d fd %d hal_fd %d", rfsock->real_sock, rfsock->fd,
+-								hal_fd);
++								*hal_fd);
  
--		rfsock->profile = get_profile_by_uuid(cmd->uuid);
-+		rfsock->profile = get_profile_by_uuid(uuid);
- 
--		if (bt_search_service(&adapter_addr, &rfsock->dst, &uuid,
-+		if (bt_search_service(&adapter_addr, &rfsock->dst, &uu,
- 					sdp_search_cb, rfsock, NULL) < 0) {
- 			error("Failed to search SDP records");
- 			goto failed;
- 		}
+ 	if (write(rfsock->fd, &chan, sizeof(chan)) != sizeof(chan)) {
+ 		error("Error sending RFCOMM channel");
+ 		goto failed;
  	}
+ 
+-	rfsock->service_handle = sdp_service_register(profile, cmd->name);
++	rfsock->service_handle = sdp_service_register(profile, name);
+ 
+ 	servers = g_list_append(servers, rfsock);
  
 +	return HAL_STATUS_SUCCESS;
 +
 +failed:
++
 +	cleanup_rfsock(rfsock);
 +	close(*hal_fd);
 +	return HAL_STATUS_FAILED;
 +}
 +
-+static void handle_connect(const void *buf, uint16_t len)
++static void handle_listen(const void *buf, uint16_t len)
 +{
-+	const struct hal_cmd_sock_connect *cmd = buf;
-+	bdaddr_t bdaddr;
++	const struct hal_cmd_sock_listen *cmd = buf;
 +	uint8_t status;
 +	int hal_fd;
 +
-+	DBG("");
-+
-+	android2bdaddr(cmd->bdaddr, &bdaddr);
-+
 +	switch (cmd->type) {
 +	case HAL_SOCK_RFCOMM:
-+		status = connect_rfcomm(&bdaddr, cmd->channel, cmd->uuid,
++		status = rfcomm_listen(cmd->channel, cmd->name, cmd->uuid,
 +							cmd->flags, &hal_fd);
 +		break;
 +	case HAL_SOCK_SCO:
@@ -170,24 +213,33 @@ index 98862cb..69b39ee 100644
 +	if (status != HAL_STATUS_SUCCESS)
 +		goto failed;
 +
- 	ipc_send_rsp_full(HAL_SERVICE_ID_SOCK, HAL_OP_SOCK_CONNECT, 0, NULL,
+ 	ipc_send_rsp_full(HAL_SERVICE_ID_SOCK, HAL_OP_SOCK_LISTEN, 0, NULL,
  									hal_fd);
  	close(hal_fd);
- 	return;
+-	return;
++	return ;
  
  failed:
--	ipc_send_rsp(HAL_SERVICE_ID_SOCK, HAL_OP_SOCK_CONNECT,
+-	ipc_send_rsp(HAL_SERVICE_ID_SOCK, HAL_OP_SOCK_LISTEN,
 -							HAL_STATUS_FAILED);
 -
 -	if (rfsock)
 -		cleanup_rfsock(rfsock);
-+	ipc_send_rsp(HAL_SERVICE_ID_SOCK, HAL_OP_SOCK_CONNECT, status);
- 
+-
 -	if (hal_fd >= 0)
 -		close(hal_fd);
++	ipc_send_rsp(HAL_SERVICE_ID_SOCK, HAL_OP_SOCK_LISTEN, status);
  }
  
- static const struct ipc_handler cmd_handlers[] = {
+ static bool sock_send_connect(struct rfcomm_sock *rfsock, bdaddr_t *bdaddr)
+@@ -1036,7 +1065,6 @@ fail:
+ static void handle_connect(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_sock_connect *cmd = buf;
+-	static const uint8_t zero_uuid[16] = { 0 };
+ 	struct rfcomm_sock *rfsock;
+ 	uuid_t uuid;
+ 	int hal_fd = -1;
 -- 
 1.8.5.2
 
