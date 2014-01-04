@@ -2,69 +2,36 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 05/12] core: Fix sscanf() format specification
-Date: Fri,  3 Jan 2014 21:55:21 -0400
-Message-Id: <1388800528-10699-6-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 08/12] android/client: Fix incorrect usage of bt_state_t2str()
+Date: Fri,  3 Jan 2014 21:55:24 -0400
+Message-Id: <1388800528-10699-9-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1388800528-10699-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Also change the type of the "handle" variable so it is compatible with
-the "%hu" specification used for sprintf() on the same function.
-
 Fixes clang error:
 
-src/adapter.c:3550:24: error: format specifies type 'unsigned short' but
-the argument has type 'int' [-Werror,-Wformat]
+android/client/if-bt.c:313:54: error: implicit conversion from
+enumeration type 'bt_status_t' to different enumeration type
+'bt_state_t' [-Werror,-Wenum-conversion]
 ---
- src/adapter.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ android/client/if-bt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 9480103..230f3ce 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3515,16 +3515,16 @@ static void convert_ccc_entry(char *key, char *value, void *user_data)
- 	char *src_addr = user_data;
- 	char dst_addr[18];
- 	char type = BDADDR_BREDR;
--	int handle, ret;
-+	uint16_t handle;
-+	int ret, err;
- 	char filename[PATH_MAX + 1];
- 	GKeyFile *key_file;
- 	struct stat st;
--	int err;
- 	char group[6];
- 	char *data;
- 	gsize length = 0;
- 
--	ret = sscanf(key, "%17s#%hhu#%04X", dst_addr, &type, &handle);
-+	ret = sscanf(key, "%17s#%hhu#%04hX", dst_addr, &type, &handle);
- 	if (ret < 3)
- 		return;
- 
-@@ -3565,16 +3565,16 @@ static void convert_gatt_entry(char *key, char *value, void *user_data)
- 	char *src_addr = user_data;
- 	char dst_addr[18];
- 	char type = BDADDR_BREDR;
--	int handle, ret;
-+	uint16_t handle;
-+	int ret, err;
- 	char filename[PATH_MAX + 1];
- 	GKeyFile *key_file;
- 	struct stat st;
--	int err;
- 	char group[6];
- 	char *data;
- 	gsize length = 0;
- 
--	ret = sscanf(key, "%17s#%hhu#%04X", dst_addr, &type, &handle);
-+	ret = sscanf(key, "%17s#%hhu#%04hX", dst_addr, &type, &handle);
- 	if (ret < 3)
- 		return;
- 
+diff --git a/android/client/if-bt.c b/android/client/if-bt.c
+index 10b79f1..6771df4 100644
+--- a/android/client/if-bt.c
++++ b/android/client/if-bt.c
+@@ -310,7 +310,7 @@ static void dut_mode_recv_cb(uint16_t opcode, uint8_t *buf, uint8_t len)
+ #if PLATFORM_SDK_VERSION > 17
+ static void le_test_mode_cb(bt_status_t status, uint16_t num_packets)
+ {
+-	haltest_info("%s %s %d\n", __func__, bt_state_t2str(status),
++	haltest_info("%s %s %d\n", __func__, bt_status_t2str(status),
+ 								num_packets);
+ }
+ #endif
 -- 
 1.8.3.2
 
