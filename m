@@ -1,42 +1,121 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 4 Jan 2014 20:12:18 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Add quirk for disabling Delete Stored
- Link Key command
-Message-ID: <20140104181218.GA11461@x220.p-661hnu-f1>
-References: <1388746956-9944-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1388746956-9944-1-git-send-email-marcel@holtmann.org>
+From: Gianluca Anzolin <gianluca@sottospazio.it>
+To: gustavo@padovan.org
+Cc: peter@hurleysoftware.com,
+	marcel@holtmann.org,
+	linux-bluetooth@vger.kernel.org,
+	gregkh@linuxfoundation.org,
+	jslaby@suse.cz,
+	stable@vger.kernel.org,
+	Gianluca Anzolin <gianluca@sottospazio.it>
+Subject: [PATCH 2/2] rfcomm: move the device under its parent if already connected
+Date: Sat,  4 Jan 2014 17:30:38 +0100
+Message-Id: <1388853038-6917-3-git-send-email-gianluca@sottospazio.it>
+In-Reply-To: <1388853038-6917-1-git-send-email-gianluca@sottospazio.it>
+References: <1388853038-6917-1-git-send-email-gianluca@sottospazio.it>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+This patch fixes a userspace regression introduced with the conversion
+of the rfcomm tty code to a proper tty_port driver.
 
-On Fri, Jan 03, 2014, Marcel Holtmann wrote:
-> Some controller pretend they support the Delete Stored Link Key command,
-> but in reality they really don't support it.
-> 
->   < HCI Command: Delete Stored Link Key (0x03|0x0012) plen 7
->       bdaddr 00:00:00:00:00:00 all 1
->   > HCI Event: Command Complete (0x0e) plen 4
->       Delete Stored Link Key (0x03|0x0012) ncmd 1
->       status 0x11 deleted 0
->       Error: Unsupported Feature or Parameter Value
-> 
-> Not correctly supporting this command causes the controller setup to
-> fail and will make a device not work. However sending the command for
-> controller that handle stored link keys is important. This quirk
-> allows a driver to disable the command if it knows that this command
-> handling is broken.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/hci.h | 3 ++-
->  net/bluetooth/hci_core.c    | 7 ++++++-
->  2 files changed, 8 insertions(+), 2 deletions(-)
+Currently the tty device is moved under the parent only when a
+successful BT connection is established.
 
-Both patches have been applied to the bluetooth-next tree. Thanks.
+Unfortunately this doesn't take into account the situation in which the
+BT connection is already there, i.e. when the rfcomm device is created
+with the flag RFCOMM_REUSE_DLC: in this case the tty device is never
+moved under its parent.
 
-Johan
+This causes a regression with ModemManager which checks the parent
+device to determine if the tty is likely to be connected to a modem:
+it finds a NULL parent and skip the AT probe sequence.
+
+The patch fixes the regression by calling device_move() in the function
+rfcomm_dev_carrier_raised().
+
+Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
+Reported-by: Beson Chow <blc+bluez@mail.vanade.com>
+---
+ net/bluetooth/rfcomm/tty.c | 47 ++++++++++++++++++++++++----------------------
+ 1 file changed, 25 insertions(+), 22 deletions(-)
+
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index a535ef1..9e217d7 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -111,12 +111,34 @@ static int rfcomm_dev_activate(struct tty_port *port, struct tty_struct *tty)
+ 	return rfcomm_dlc_open(dev->dlc, &dev->src, &dev->dst, dev->channel);
+ }
+ 
++static struct device *rfcomm_get_device(struct rfcomm_dev *dev)
++{
++	struct hci_dev *hdev;
++	struct hci_conn *conn;
++
++	hdev = hci_get_route(&dev->dst, &dev->src);
++	if (!hdev)
++		return NULL;
++
++	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &dev->dst);
++
++	hci_dev_put(hdev);
++
++	return conn ? &conn->dev : NULL;
++}
++
+ /* we block the open until the dlc->state becomes BT_CONNECTED */
+ static int rfcomm_dev_carrier_raised(struct tty_port *port)
+ {
+ 	struct rfcomm_dev *dev = container_of(port, struct rfcomm_dev, port);
+ 
+-	return (dev->dlc->state == BT_CONNECTED);
++	if (dev->dlc->state == BT_CONNECTED) {
++		device_move(dev->tty_dev, rfcomm_get_device(dev),
++			    DPM_ORDER_DEV_AFTER_PARENT);
++		return 1;
++	}
++
++	return 0;
+ }
+ 
+ /* device-specific cleanup: close the dlc */
+@@ -169,22 +191,6 @@ static struct rfcomm_dev *rfcomm_dev_get(int id)
+ 	return dev;
+ }
+ 
+-static struct device *rfcomm_get_device(struct rfcomm_dev *dev)
+-{
+-	struct hci_dev *hdev;
+-	struct hci_conn *conn;
+-
+-	hdev = hci_get_route(&dev->dst, &dev->src);
+-	if (!hdev)
+-		return NULL;
+-
+-	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &dev->dst);
+-
+-	hci_dev_put(hdev);
+-
+-	return conn ? &conn->dev : NULL;
+-}
+-
+ static ssize_t show_address(struct device *tty_dev, struct device_attribute *attr, char *buf)
+ {
+ 	struct rfcomm_dev *dev = dev_get_drvdata(tty_dev);
+@@ -576,12 +582,9 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
+ 	BT_DBG("dlc %p dev %p err %d", dlc, dev, err);
+ 
+ 	dev->err = err;
+-	if (dlc->state == BT_CONNECTED) {
+-		device_move(dev->tty_dev, rfcomm_get_device(dev),
+-			    DPM_ORDER_DEV_AFTER_PARENT);
+-
++	if (dlc->state == BT_CONNECTED)
+ 		wake_up_interruptible(&dev->port.open_wait);
+-	} else if (dlc->state == BT_CLOSED)
++	else if (dlc->state == BT_CLOSED)
+ 		tty_port_tty_hangup(&dev->port, false);
+ }
+ 
+-- 
+1.8.5.2
