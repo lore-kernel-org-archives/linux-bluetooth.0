@@ -1,51 +1,187 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 5 Jan 2014 23:32:50 +0100
-From: Pavel Machek <pavel@ucw.cz>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
-	=?utf-8?B?0JjQstCw0LnQu9C+INCU0LjQvNC40YLRgNC+0LI=?= <freemangordon@abv.bg>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
-	Ville Tervo <ville.tervo@nokia.com>
-Subject: Re: [PATCH v4] Bluetooth: Add hci_h4p driver
-Message-ID: <20140105223250.GB27517@amd.pavel.ucw.cz>
-References: <1379703710-5757-1-git-send-email-pali.rohar@gmail.com>
- <1727897.LBX8128hIo@izba>
- <20140102161824.GA8204@amd.pavel.ucw.cz>
- <A5B72277-42D4-4A24-8A29-9BE18762E8C4@holtmann.org>
- <20140103001753.GA21023@amd.pavel.ucw.cz>
- <20140103010519.GA27678@earth.universe>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v2 01/10] android/ipc: Add initial code for audio IPC
+Date: Sun, 05 Jan 2014 18:43:19 +0100
+Message-ID: <2688157.rF2s9RrCYM@athlon>
+In-Reply-To: <1388663914-25003-1-git-send-email-luiz.dentz@gmail.com>
+References: <1388663914-25003-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140103010519.GA27678@earth.universe>
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+Hi Luiz,
 
-> > Changes from v3: Moved platform data into
-> > include/linux/platform_data/, something I missed before.
+On Thursday 02 January 2014 13:58:25 Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> As I wrote before Tony plans to remove the boardcode for all
-> OMAP boards including the Nokia N900 for 3.14, so you cannot
-> boot without DT from 3.14 onwards.
+> This add initial code for listen and accept connections on the abstract
+> socket defined for the audio IPC.
+> ---
+> v2: Split audio IPC services for HAL services and fix invalid messages or
+> disconnections causing the daemon to exit. The audio HAL is independent of
+> bluetooth and should only affect A2DP service.
 
-Well, I believe it was agreed that DT should work for at least one
-version before platform support is removed. 
+What seems to be missing is some way to recover from Audio IPC error.
 
-> The drivers can still be initialized the old way using pdata quirks
-> until all drivers are converted, but I think this driver can simply
-> be prepared for DT directly:
+> 
+>  android/hal-msg.h |  1 +
+>  android/ipc.c     | 78
+> ++++++++++++++++++++++++++++++++++++++++++++++++++----- android/ipc.h     |
+>  3 +++
+>  3 files changed, 76 insertions(+), 6 deletions(-)
+> 
+> diff --git a/android/hal-msg.h b/android/hal-msg.h
+> index c351501..b14eced 100644
+> --- a/android/hal-msg.h
+> +++ b/android/hal-msg.h
+> @@ -24,6 +24,7 @@
+>  #define BLUEZ_HAL_MTU 1024
+> 
+>  static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
+> +static const char BLUEZ_AUDIO_SK_PATH[] = "\0bluez_audio_socket";
+> 
+>  struct hal_hdr {
+>  	uint8_t  service_id;
+> diff --git a/android/ipc.c b/android/ipc.c
+> index 9e8ccc3..4c5a77e 100644
+> --- a/android/ipc.c
+> +++ b/android/ipc.c
+> @@ -49,6 +49,7 @@ static struct service_handler services[HAL_SERVICE_ID_MAX
+> + 1];
+> 
+>  static GIOChannel *cmd_io = NULL;
+>  static GIOChannel *notif_io = NULL;
+> +static GIOChannel *audio_io = NULL;
+> 
+>  static void ipc_handle_msg(const void *buf, ssize_t len)
+>  {
+> @@ -145,7 +146,8 @@ static gboolean notif_watch_cb(GIOChannel *io,
+> GIOCondition cond, return FALSE;
+>  }
+> 
+> -static GIOChannel *connect_hal(GIOFunc connect_cb)
+> +static GIOChannel *ipc_connect(const char *path, size_t size,
+> +							GIOFunc connect_cb)
+>  {
+>  	struct sockaddr_un addr;
+>  	GIOCondition cond;
+> @@ -167,11 +169,11 @@ static GIOChannel *connect_hal(GIOFunc connect_cb)
+>  	memset(&addr, 0, sizeof(addr));
+>  	addr.sun_family = AF_UNIX;
+> 
+> -	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
+> +	memcpy(addr.sun_path, path, size);
+> 
+>  	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+> -		error("IPC: failed to connect HAL socket: %d (%s)", errno,
+> -							strerror(errno));
+> +		error("IPC: failed to connect HAL socket %s: %d (%s)", &path[1],
+> +							errno, strerror(errno));
+>  		g_io_channel_unref(io);
+>  		return NULL;
+>  	}
+> @@ -218,7 +220,8 @@ static gboolean cmd_connect_cb(GIOChannel *io,
+> GIOCondition cond, return FALSE;
+>  	}
+> 
+> -	notif_io = connect_hal(notif_connect_cb);
+> +	notif_io = ipc_connect(BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH),
+> +							notif_connect_cb);
+>  	if (!notif_io)
+>  		raise(SIGTERM);
+> 
+> @@ -227,7 +230,8 @@ static gboolean cmd_connect_cb(GIOChannel *io,
+> GIOCondition cond,
+> 
+>  void ipc_init(void)
+>  {
+> -	cmd_io = connect_hal(cmd_connect_cb);
+> +	cmd_io = ipc_connect(BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH),
+> +							cmd_connect_cb);
+>  	if (!cmd_io)
+>  		raise(SIGTERM);
+>  }
+> @@ -338,3 +342,65 @@ void ipc_unregister(uint8_t service)
+>  	services[service].handler = NULL;
+>  	services[service].size = 0;
+>  }
+> +
+> +static gboolean audio_watch_cb(GIOChannel *io, GIOCondition cond,
+> +							gpointer user_data)
+> +{
+> +	char buf[BLUEZ_HAL_MTU];
+> +	ssize_t ret;
+> +	int fd;
+> +
+> +	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
+> +		info("Audio IPC: command socket closed");
+> +		goto fail;
+> +	}
+> +
+> +	fd = g_io_channel_unix_get_fd(io);
+> +
+> +	ret = read(fd, buf, sizeof(buf));
+> +	if (ret < 0) {
+> +		error("Audio IPC: command read failed (%s)", strerror(errno));
+> +		goto fail;
+> +	}
+> +
+> +	return TRUE;
+> +
+> +fail:
+> +	audio_ipc_cleanup();
+> +	return FALSE;
+> +}
+> +
+> +static gboolean audio_connect_cb(GIOChannel *io, GIOCondition cond,
+> +							gpointer user_data)
+> +{
+> +	DBG("");
+> +
+> +	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
+> +		error("Audio IPC: socket connect failed");
+> +		audio_ipc_cleanup();
+> +		return FALSE;
+> +	}
+> +
+> +	cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
+> +
+> +	g_io_add_watch(audio_io, cond, audio_watch_cb, NULL);
+> +
+> +	info("Audio IPC: successfully connected");
+> +
+> +	return FALSE;
+> +}
+> +
+> +void audio_ipc_init(void)
+> +{
+> +	audio_io = ipc_connect(BLUEZ_AUDIO_SK_PATH, sizeof(BLUEZ_AUDIO_SK_PATH),
+> +							audio_connect_cb);
+> +}
+> +
+> +void audio_ipc_cleanup(void)
+> +{
+> +	if (audio_io) {
+> +		g_io_channel_shutdown(audio_io, TRUE, NULL);
+> +		g_io_channel_unref(audio_io);
+> +		audio_io = NULL;
+> +	}
+> +}
+> diff --git a/android/ipc.h b/android/ipc.h
+> index 6cd102b..8e92811 100644
+> --- a/android/ipc.h
+> +++ b/android/ipc.h
+> @@ -37,3 +37,6 @@ void ipc_send_notif(uint8_t service_id, uint8_t opcode, 
+> uint16_t len, void ipc_register(uint8_t service, const struct ipc_handler
+> *handlers, uint8_t size);
+>  void ipc_unregister(uint8_t service);
+> +
+> +void audio_ipc_init(void);
+> +void audio_ipc_cleanup(void);
 
-Well, normally DT support means a bit of argumentation and bikeshed
-painting... I believe it would be better to get the driver in as-is
-and then work on adding DT support.
-
-And yes, obviously it needs to be done.
-
-Regards,
-								Pavel
 -- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+Szymon K. Janc
+szymon.janc@gmail.com
