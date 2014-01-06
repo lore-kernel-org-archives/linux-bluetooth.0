@@ -8,86 +8,42 @@ Cc: peter@hurleysoftware.com,
 	jslaby@suse.cz,
 	stable@vger.kernel.org,
 	Gianluca Anzolin <gianluca@sottospazio.it>
-Subject: [PATCH v3 1/4] rfcomm: release the port when the last user closes the tty
-Date: Mon,  6 Jan 2014 21:23:50 +0100
-Message-Id: <1389039834-24491-2-git-send-email-gianluca@sottospazio.it>
-In-Reply-To: <1389039834-24491-1-git-send-email-gianluca@sottospazio.it>
-References: <1389039834-24491-1-git-send-email-gianluca@sottospazio.it>
+Subject: [PATCH v3 0/4] Regression fixes for rfcomm/tty.c
+Date: Mon,  6 Jan 2014 21:23:49 +0100
+Message-Id: <1389039834-24491-1-git-send-email-gianluca@sottospazio.it>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes a userspace regression introduced by the commit
-29cd718b.
+The following patches fix three regressions introduced with the
+rfcomm tty_port conversion.
 
-If the rfcomm device was created with the flag RFCOMM_RELEASE_ONHUP the
-user space expects that the tty_port is released as soon as the last
-process closes the tty.
+The first patch restores the expected behaviour of the rfcomm port when
+it's created with the flag RFCOMM_RELEASE_ONHUP.
 
-The current code attempts to release the port in the function
-rfcomm_dev_state_change(). However it won't get a reference to the
-relevant tty to send a HUP: at that point the tty is already destroyed
-and therefore NULL.
+The second patch moves rfcomm_get_device() and is preparatory for the
+third patch.
 
-This patch fixes the regression by taking over the tty refcount in the
-tty install method(). This way the tty_port is automatically released as
-soon as the tty is destroyed.
+The third patch fixes two regressions:
+1) when the tty is opened with O_NONBLOCK or CLOCAL is set (fixes
+   wvdial)
+2) when the rfcomm device is created with the flag RFCOMM_REUSE_DLC
+   (fixes ModemManager)
 
-As a consequence the check for RFCOMM_RELEASE_ONHUP flag in the hangup()
-method is now redundant. Instead we have to be careful with the reference
-counting in the rfcomm_release_dev() function.
+The fourth patch removes rfcomm_dev_carrier_raised().
 
-Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
-Reported-by: Alexander Holler <holler@ahsoftware.de>
----
- net/bluetooth/rfcomm/tty.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+Changes from v2:
+  * Fix the style of if statements in rfcomm_dev_activate().
 
-diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index 84fcf9f..a535ef1 100644
---- a/net/bluetooth/rfcomm/tty.c
-+++ b/net/bluetooth/rfcomm/tty.c
-@@ -437,7 +437,8 @@ static int rfcomm_release_dev(void __user *arg)
- 		tty_kref_put(tty);
- 	}
- 
--	if (!test_and_set_bit(RFCOMM_TTY_RELEASED, &dev->flags))
-+	if (!test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags) &&
-+	    !test_and_set_bit(RFCOMM_TTY_RELEASED, &dev->flags))
- 		tty_port_put(&dev->port);
- 
- 	tty_port_put(&dev->port);
-@@ -670,10 +671,20 @@ static int rfcomm_tty_install(struct tty_driver *driver, struct tty_struct *tty)
- 
- 	/* install the tty_port */
- 	err = tty_port_install(&dev->port, driver, tty);
--	if (err)
-+	if (err) {
- 		rfcomm_tty_cleanup(tty);
-+		return err;
-+	}
- 
--	return err;
-+	/* take over the tty_port reference if the port was created with the
-+	 * flag RFCOMM_RELEASE_ONHUP. This will force the release of the port
-+	 * when the last process closes the tty. The behaviour is expected by
-+	 * userspace.
-+	 */
-+	if (test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags))
-+		tty_port_put(&dev->port);
-+
-+	return 0;
- }
- 
- static int rfcomm_tty_open(struct tty_struct *tty, struct file *filp)
-@@ -1010,10 +1021,6 @@ static void rfcomm_tty_hangup(struct tty_struct *tty)
- 	BT_DBG("tty %p dev %p", tty, dev);
- 
- 	tty_port_hangup(&dev->port);
--
--	if (test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags) &&
--	    !test_and_set_bit(RFCOMM_TTY_RELEASED, &dev->flags))
--		tty_port_put(&dev->port);
- }
- 
- static int rfcomm_tty_tiocmget(struct tty_struct *tty)
+Changes from v1:
+  * Removed the device_move() fix which is now incorporated in a new patch.
+
+Gianluca Anzolin (4):
+  rfcomm: release the port when the last user closes the tty
+  rfcomm: move rfcomm_get_device() before rfcomm_dev_activate()
+  rfcomm: always wait for a bt connection on open()
+  rfcomm: remove rfcomm_carrier_raised()
+
+ net/bluetooth/rfcomm/tty.c | 103 +++++++++++++++++++++++++++++----------------
+ 1 file changed, 66 insertions(+), 37 deletions(-)
+
 -- 
 1.8.5.2
