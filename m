@@ -1,61 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 6 Jan 2014 20:37:32 +0100
-From: Gianluca Anzolin <gianluca@sottospazio.it>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, peter@hurleysoftware.com,
-	"linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
-	Greg KH <gregkh@linuxfoundation.org>, jslaby@suse.cz,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2 3/4] rfcomm: always wait for a bt connection on open()
-Message-ID: <20140106193732.GA24137@sottospazio.it>
-References: <1389033795-23895-1-git-send-email-gianluca@sottospazio.it>
- <1389033795-23895-4-git-send-email-gianluca@sottospazio.it>
- <4321EF0E-97F4-4236-B763-0D0213BE97A8@holtmann.org>
+Date: Mon, 6 Jan 2014 21:28:24 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Colin Watson <cjwatson@ubuntu.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] unit: Fix test failures with glib 2.39.0
+Message-ID: <20140106192824.GB25443@x220.p-661hnu-f1>
+References: <20140106120700.GZ5883@riva.ucam.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <4321EF0E-97F4-4236-B763-0D0213BE97A8@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140106120700.GZ5883@riva.ucam.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jan 06, 2014 at 11:17:06AM -0800, Marcel Holtmann wrote:
-> don’t do an if-else-else if statement here. Just break.
-> 
-> 	if (dev->dlc->state == BT_CLOSED) {
-> 		..
-> 		break;	
-> 	}
-> 
-> 	if (dev->dlc->state == BT_CONNECTED)
-> 		break;
-> 
-> 	if (signal_pending(..)) {
-> 		..
-> 		break;
-> 	}
+Hi Colin,
 
-I'll change the code.
-
-> > -	rfcomm_tty_driver->init_termios.c_cflag	= B9600 | CS8 | CREAD | HUPCL;
-> > +	rfcomm_tty_driver->init_termios.c_cflag	= B9600 | CS8 | CREAD | HUPCL | CLOCAL;
+On Mon, Jan 06, 2014, Colin Watson wrote:
+> glib 2.39.0 made this change:
 > 
-> Is adding CLOCAL by default intentional?
-
-Yes, I removed it before because I relied on the carrier_raised() tty_port
-method. But it turned out it wasn't a good idea because some code (wvdial
-for example) set that flag on exit, leaving a non-working tty for subsequent
-open() calls.
-
-Now I restored the original flags, even if CLOCAL is actually ignored by the
-code.
-
-I will shortly send a third iteration with the fixed if statements.
-
-Thanks,
-Gianluca
-
-> > 	rfcomm_tty_driver->init_termios.c_lflag &= ~ICANON;
-> > 	tty_set_operations(rfcomm_tty_driver, &rfcomm_ops);
+>    - g_source_remove() will now throw a critical in the case that you
+>      try to remove a non-existent source.  We expect that there is some
+>      code in the wild that will fall afoul of this new critical but
+>      considering that we now reuse source IDs, this code is already
+>      broken and should probably be fixed.
 > 
-> Regards
-> 
-> Marcel
-> 
+> This patch fixes the test suite to keep better track of whether sources have
+> already been removed and avoid double-removals.
+> ---
+>  unit/test-avdtp.c          |  8 ++++++--
+>  unit/test-gobex-transfer.c |  6 ++++--
+>  unit/test-gobex.c          | 13 ++++++++-----
+>  unit/util.c                |  1 +
+>  unit/util.h                |  1 +
+>  5 files changed, 20 insertions(+), 9 deletions(-)
+
+Applied. Thanks.
+
+Johan
