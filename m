@@ -1,49 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 6 Jan 2014 20:37:32 +0100
 From: Gianluca Anzolin <gianluca@sottospazio.it>
-To: gustavo@padovan.org
-Cc: peter@hurleysoftware.com,
-	marcel@holtmann.org,
-	linux-bluetooth@vger.kernel.org,
-	gregkh@linuxfoundation.org,
-	jslaby@suse.cz,
-	stable@vger.kernel.org,
-	Gianluca Anzolin <gianluca@sottospazio.it>
-Subject: [PATCH v3 0/4] Regression fixes for rfcomm/tty.c
-Date: Mon,  6 Jan 2014 21:23:49 +0100
-Message-Id: <1389039834-24491-1-git-send-email-gianluca@sottospazio.it>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, peter@hurleysoftware.com,
+	"linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
+	Greg KH <gregkh@linuxfoundation.org>, jslaby@suse.cz,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v2 3/4] rfcomm: always wait for a bt connection on open()
+Message-ID: <20140106193732.GA24137@sottospazio.it>
+References: <1389033795-23895-1-git-send-email-gianluca@sottospazio.it>
+ <1389033795-23895-4-git-send-email-gianluca@sottospazio.it>
+ <4321EF0E-97F4-4236-B763-0D0213BE97A8@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <4321EF0E-97F4-4236-B763-0D0213BE97A8@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The following patches fix three regressions introduced with the
-rfcomm tty_port conversion.
+On Mon, Jan 06, 2014 at 11:17:06AM -0800, Marcel Holtmann wrote:
+> don’t do an if-else-else if statement here. Just break.
+> 
+> 	if (dev->dlc->state == BT_CLOSED) {
+> 		..
+> 		break;	
+> 	}
+> 
+> 	if (dev->dlc->state == BT_CONNECTED)
+> 		break;
+> 
+> 	if (signal_pending(..)) {
+> 		..
+> 		break;
+> 	}
 
-The first patch restores the expected behaviour of the rfcomm port when
-it's created with the flag RFCOMM_RELEASE_ONHUP.
+I'll change the code.
 
-The second patch moves rfcomm_get_device() and is preparatory for the
-third patch.
+> > -	rfcomm_tty_driver->init_termios.c_cflag	= B9600 | CS8 | CREAD | HUPCL;
+> > +	rfcomm_tty_driver->init_termios.c_cflag	= B9600 | CS8 | CREAD | HUPCL | CLOCAL;
+> 
+> Is adding CLOCAL by default intentional?
 
-The third patch fixes two regressions:
-1) when the tty is opened with O_NONBLOCK or CLOCAL is set (fixes
-   wvdial)
-2) when the rfcomm device is created with the flag RFCOMM_REUSE_DLC
-   (fixes ModemManager)
+Yes, I removed it before because I relied on the carrier_raised() tty_port
+method. But it turned out it wasn't a good idea because some code (wvdial
+for example) set that flag on exit, leaving a non-working tty for subsequent
+open() calls.
 
-The fourth patch removes rfcomm_dev_carrier_raised().
+Now I restored the original flags, even if CLOCAL is actually ignored by the
+code.
 
-Changes from v2:
-  * Fix the style of if statements in rfcomm_dev_activate().
+I will shortly send a third iteration with the fixed if statements.
 
-Changes from v1:
-  * Removed the device_move() fix which is now incorporated in a new patch.
+Thanks,
+Gianluca
 
-Gianluca Anzolin (4):
-  rfcomm: release the port when the last user closes the tty
-  rfcomm: move rfcomm_get_device() before rfcomm_dev_activate()
-  rfcomm: always wait for a bt connection on open()
-  rfcomm: remove rfcomm_carrier_raised()
-
- net/bluetooth/rfcomm/tty.c | 103 +++++++++++++++++++++++++++++----------------
- 1 file changed, 66 insertions(+), 37 deletions(-)
-
--- 
-1.8.5.2
+> > 	rfcomm_tty_driver->init_termios.c_lflag &= ~ICANON;
+> > 	tty_set_operations(rfcomm_tty_driver, &rfcomm_ops);
+> 
+> Regards
+> 
+> Marcel
+> 
