@@ -1,75 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH 1/2] Bluetooth: Fix NULL pointer dereference when disconnecting
-From: Marcel Holtmann <marcel@holtmann.org>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Default to no security with L2CAP RAW sockets
+Date: Mon,  6 Jan 2014 18:27:02 +0200
+Message-Id: <1389025622-13891-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1389025622-13891-1-git-send-email-johan.hedberg@gmail.com>
-Date: Mon, 6 Jan 2014 09:27:51 -0800
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <7781C692-7DF5-4AA3-B012-4D6D3AB53244@holtmann.org>
 References: <1389025622-13891-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> When disconnecting it is possible that the l2cap_conn pointer is already
-> NULL when bt_6lowpan_del_conn() is entered. Looking at l2cap_conn_del
-> also verifies this as there's a NULL check there too. This patch adds
-> the missing NULL check without which the following bug may occur:
-> 
-> BUG: unable to handle kernel NULL pointer dereference at   (null)
-> IP: [<c131e9c7>] bt_6lowpan_del_conn+0x19/0x12a
-> *pde = 00000000
-> Oops: 0000 [#1] SMP
-> CPU: 1 PID: 52 Comm: kworker/u5:1 Not tainted 3.12.0+ #196
-> Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-> Workqueue: hci0 hci_rx_work
-> task: f6259b00 ti: f48c0000 task.ti: f48c0000
-> EIP: 0060:[<c131e9c7>] EFLAGS: 00010282 CPU: 1
-> EIP is at bt_6lowpan_del_conn+0x19/0x12a
-> EAX: 00000000 EBX: ef094e10 ECX: 00000000 EDX: 00000016
-> ESI: 00000000 EDI: f48c1e60 EBP: f48c1e50 ESP: f48c1e34
-> DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
-> CR0: 8005003b CR2: 00000000 CR3: 30c65000 CR4: 00000690
-> Stack:
-> f4d38000 00000000 f4d38000 00000002 ef094e10 00000016 f48c1e60 f48c1e70
-> c1316bed f48c1e84 c1316bed 00000000 00000001 ef094e10 f48c1e84 f48c1ed0
-> c1303cc6 c1303c7b f31f331a c1303cc6 f6e7d1c0 f3f8ea16 f3f8f380 f4d38008
-> Call Trace:
-> [<c1316bed>] l2cap_disconn_cfm+0x3f/0x5b
-> [<c1316bed>] ? l2cap_disconn_cfm+0x3f/0x5b
-> [<c1303cc6>] hci_event_packet+0x645/0x2117
-> [<c1303c7b>] ? hci_event_packet+0x5fa/0x2117
-> [<c1303cc6>] ? hci_event_packet+0x645/0x2117
-> [<c12681bd>] ? __kfree_skb+0x65/0x68
-> [<c12681eb>] ? kfree_skb+0x2b/0x2e
-> [<c130d3fb>] ? hci_send_to_sock+0x18d/0x199
-> [<c12fa327>] hci_rx_work+0xf9/0x295
-> [<c12fa327>] ? hci_rx_work+0xf9/0x295
-> [<c1036d25>] process_one_work+0x128/0x1df
-> [<c1346a39>] ? _raw_spin_unlock_irq+0x8/0x12
-> [<c1036d25>] ? process_one_work+0x128/0x1df
-> [<c103713a>] worker_thread+0x127/0x1c4
-> [<c1037013>] ? rescuer_thread+0x216/0x216
-> [<c103aec6>] kthread+0x88/0x8d
-> [<c1040000>] ? task_rq_lock+0x37/0x6e
-> [<c13474b7>] ret_from_kernel_thread+0x1b/0x28
-> [<c103ae3e>] ? __kthread_parkme+0x50/0x50
-> Code: 05 b8 f4 ff ff ff 8d 65 f4 5b 5e 5f 5d 8d 67 f8 5f c3 57 8d 7c 24 08 83 e4 f8 ff 77 fc 55 89 e5 57 56f
-> EIP: [<c131e9c7>] bt_6lowpan_del_conn+0x19/0x12a SS:ESP 0068:f48c1e34
-> CR2: 0000000000000000
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/6lowpan.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+L2CAP RAW sockets can be used for things which do not involve
+establishing actual connection oriented L2CAP channels. One example of
+such usage is the l2ping tool. The default security level for L2CAP
+sockets is LOW, which implies that for SSP based connection
+authentication is still requested (although with no MITM requirement),
+which is not what we want (or need) for things like l2ping. Therefore,
+default to one lower level, i.e. BT_SECURITY_SDP, for L2CAP RAW sockets
+in order not to trigger unwanted authentication requests.
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/l2cap_sock.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Regards
-
-Marcel
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index e7806e6d282c..20ef748b2906 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -147,6 +147,9 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
+ 		    __le16_to_cpu(la.l2_psm) == L2CAP_PSM_RFCOMM)
+ 			chan->sec_level = BT_SECURITY_SDP;
+ 		break;
++	case L2CAP_CHAN_RAW:
++		chan->sec_level = BT_SECURITY_SDP;
++		break;
+ 	}
+ 
+ 	bacpy(&chan->src, &la.l2_bdaddr);
+-- 
+1.8.4.2
 
