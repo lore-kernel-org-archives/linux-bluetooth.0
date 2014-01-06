@@ -1,41 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH 0/2] Regression fixes for rfcomm/tty.c
+Subject: Re: [PATCH 2/2] Bluetooth: Default to no security with L2CAP RAW sockets
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1388853038-6917-1-git-send-email-gianluca@sottospazio.it>
-Date: Mon, 6 Jan 2014 09:35:18 -0800
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	peter@hurleysoftware.com,
-	"linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>,
-	Greg KH <gregkh@linuxfoundation.org>, jslaby@suse.cz,
-	stable@vger.kernel.org
-Message-Id: <D4D6DA93-0C44-4F35-AD45-9EDE4775B052@holtmann.org>
-References: <1388853038-6917-1-git-send-email-gianluca@sottospazio.it>
-To: Gianluca Anzolin <gianluca@sottospazio.it>
+In-Reply-To: <1389025622-13891-2-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 6 Jan 2014 09:28:20 -0800
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <87D02424-7FE7-4425-9029-109DECCDCCC5@holtmann.org>
+References: <1389025622-13891-1-git-send-email-johan.hedberg@gmail.com> <1389025622-13891-2-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gianluca,
+Hi Johan,
 
-> The following two patches fix a couple of regressions introduced with
-> the rfcomm tty_port conversion.
+> L2CAP RAW sockets can be used for things which do not involve
+> establishing actual connection oriented L2CAP channels. One example of
+> such usage is the l2ping tool. The default security level for L2CAP
+> sockets is LOW, which implies that for SSP based connection
+> authentication is still requested (although with no MITM requirement),
+> which is not what we want (or need) for things like l2ping. Therefore,
+> default to one lower level, i.e. BT_SECURITY_SDP, for L2CAP RAW sockets
+> in order not to trigger unwanted authentication requests.
 > 
-> The first patch restores the expected behaviour of the rfcomm port when
-> it's created with the flag RFCOMM_RELEASE_ONHUP.
-> 
-> The second patch fixes a bug that affect userspace (ModemManager) when
-> the port is created with the flag RFCOMM_REUSE_DLC.
-> 
-> Gianluca Anzolin (2):
->  rfcomm: release the port when the last user closes the tty
->  rfcomm: move the device under its parent if already connected
-> 
-> net/bluetooth/rfcomm/tty.c | 68 ++++++++++++++++++++++++++--------------------
-> 1 file changed, 39 insertions(+), 29 deletions(-)
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/l2cap_sock.c | 3 +++
+> 1 file changed, 3 insertions(+)
 
-I applied both patches to bluetooth-next to expose them wider testing. I like to have them go through bluetooth-next first before we push them back into -stable.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
