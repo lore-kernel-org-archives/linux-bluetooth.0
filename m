@@ -1,180 +1,314 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] emulator/bthost: Add initial rfcomm handling
-Date: Mon,  6 Jan 2014 19:42:40 +0100
-Message-Id: <1389033760-16764-3-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 2/3] tools/rfcomm-tester: Add basic rfcomm test case
+Date: Mon,  6 Jan 2014 19:42:39 +0100
+Message-Id: <1389033760-16764-2-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1389033760-16764-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1389033760-16764-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is initial rfcomm handling in bthost. It also adds
-rfcomm.h to monitor directory
+This test case verifies creating rfcomm socket.
 ---
- emulator/bthost.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- monitor/rfcomm.h  | 53 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 119 insertions(+), 1 deletion(-)
- create mode 100644 monitor/rfcomm.h
+ Makefile.tools        |   9 +-
+ tools/rfcomm-tester.c | 257 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 264 insertions(+), 2 deletions(-)
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 83bfdee..e142038 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -36,6 +36,7 @@
- #include "bluetooth/bluetooth.h"
+diff --git a/Makefile.tools b/Makefile.tools
+index ec3c71b..9a0841f 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -73,8 +73,13 @@ tools_l2cap_tester_SOURCES = tools/l2cap-tester.c monitor/bt.h \
+ 				src/shared/tester.h src/shared/tester.c
+ tools_l2cap_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
  
- #include "monitor/bt.h"
-+#include "monitor/rfcomm.h"
- #include "bthost.h"
+-tools_rfcomm_tester_SOURCES = tools/rfcomm-tester.c src/shared/tester.h \
+-				src/shared/tester.c
++tools_rfcomm_tester_SOURCES = tools/rfcomm-tester.c monitor/bt.h \
++				emulator/btdev.h emulator/btdev.c \
++				emulator/bthost.h emulator/bthost.c \
++				src/shared/util.h src/shared/util.c \
++				src/shared/mgmt.h src/shared/mgmt.c \
++				src/shared/hciemu.h src/shared/hciemu.c \
++				src/shared/tester.h src/shared/tester.c
+ tools_rfcomm_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
  
- /* ACL handle and flags pack/unpack */
-@@ -1173,6 +1174,64 @@ static struct cid_hook *find_cid_hook(struct btconn *conn, uint16_t cid)
- 	return NULL;
- }
+ tools_smp_tester_SOURCES = tools/smp-tester.c monitor/bt.h \
+diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
+index 194e2e6..af87f75 100644
+--- a/tools/rfcomm-tester.c
++++ b/tools/rfcomm-tester.c
+@@ -25,12 +25,269 @@
+ #include <config.h>
+ #endif
  
-+static void rfcomm_sabm_recv(struct bthost *bthost, struct btconn *conn,
-+				struct l2conn *l2conn, const void *data,
-+				uint16_t len)
++#include <stdlib.h>
++#include <stdint.h>
++#include <unistd.h>
++#include <errno.h>
++#include <stdbool.h>
++
+ #include <glib.h>
++
++#include "lib/bluetooth.h"
++#include "lib/mgmt.h"
++
++#include "monitor/bt.h"
++#include "emulator/bthost.h"
++
+ #include "src/shared/tester.h"
++#include "src/shared/mgmt.h"
++#include "src/shared/hciemu.h"
++
++struct test_data {
++	struct mgmt *mgmt;
++	uint16_t mgmt_index;
++	struct hciemu *hciemu;
++	enum hciemu_type hciemu_type;
++	const void *test_data;
++};
++
++static void mgmt_debug(const char *str, void *user_data)
 +{
++	const char *prefix = user_data;
++
++	tester_print("%s%s", prefix, str);
 +}
 +
-+static void rfcomm_disc_recv(struct bthost *bthost, struct btconn *conn,
-+				struct l2conn *l2conn, const void *data,
-+				uint16_t len)
++static void read_info_callback(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
 +{
++	struct test_data *data = tester_get_data();
++	const struct mgmt_rp_read_info *rp = param;
++	char addr[18];
++	uint16_t manufacturer;
++	uint32_t supported_settings, current_settings;
++
++	tester_print("Read Info callback");
++	tester_print("  Status: 0x%02x", status);
++
++	if (status || !param) {
++		tester_pre_setup_failed();
++		return;
++	}
++
++	ba2str(&rp->bdaddr, addr);
++	manufacturer = btohs(rp->manufacturer);
++	supported_settings = btohl(rp->supported_settings);
++	current_settings = btohl(rp->current_settings);
++
++	tester_print("  Address: %s", addr);
++	tester_print("  Version: 0x%02x", rp->version);
++	tester_print("  Manufacturer: 0x%04x", manufacturer);
++	tester_print("  Supported settings: 0x%08x", supported_settings);
++	tester_print("  Current settings: 0x%08x", current_settings);
++	tester_print("  Class: 0x%02x%02x%02x",
++			rp->dev_class[2], rp->dev_class[1], rp->dev_class[0]);
++	tester_print("  Name: %s", rp->name);
++	tester_print("  Short name: %s", rp->short_name);
++
++	if (strcmp(hciemu_get_address(data->hciemu), addr)) {
++		tester_pre_setup_failed();
++		return;
++	}
++
++	tester_pre_setup_complete();
 +}
 +
-+static void rfcomm_ua_recv(struct bthost *bthost, struct btconn *conn,
-+				struct l2conn *l2conn, const void *data,
-+				uint16_t len)
++static void index_added_callback(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
 +{
++	struct test_data *data = tester_get_data();
++
++	tester_print("Index Added callback");
++	tester_print("  Index: 0x%04x", index);
++
++	data->mgmt_index = index;
++
++	mgmt_send(data->mgmt, MGMT_OP_READ_INFO, data->mgmt_index, 0, NULL,
++					read_info_callback, NULL, NULL);
 +}
 +
-+static void rfcomm_dm_recv(struct bthost *bthost, struct btconn *conn,
-+				struct l2conn *l2conn, const void *data,
-+				uint16_t len)
++static void index_removed_callback(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
 +{
++	struct test_data *data = tester_get_data();
++
++	tester_print("Index Removed callback");
++	tester_print("  Index: 0x%04x", index);
++
++	if (index != data->mgmt_index)
++		return;
++
++	mgmt_unregister_index(data->mgmt, data->mgmt_index);
++
++	mgmt_unref(data->mgmt);
++	data->mgmt = NULL;
++
++	tester_post_teardown_complete();
 +}
 +
-+static void rfcomm_uih_recv(struct bthost *bthost, struct btconn *conn,
-+				struct l2conn *l2conn, const void *data,
-+				uint16_t len)
++static void read_index_list_callback(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
 +{
++	struct test_data *data = tester_get_data();
++
++	tester_print("Read Index List callback");
++	tester_print("  Status: 0x%02x", status);
++
++	if (status || !param) {
++		tester_pre_setup_failed();
++		return;
++	}
++
++	mgmt_register(data->mgmt, MGMT_EV_INDEX_ADDED, MGMT_INDEX_NONE,
++					index_added_callback, NULL, NULL);
++
++	mgmt_register(data->mgmt, MGMT_EV_INDEX_REMOVED, MGMT_INDEX_NONE,
++					index_removed_callback, NULL, NULL);
++
++	data->hciemu = hciemu_new(data->hciemu_type);
++	if (!data->hciemu) {
++		tester_warn("Failed to setup HCI emulation");
++		tester_pre_setup_failed();
++	}
++
++	tester_print("New hciemu instance created");
 +}
 +
-+static void process_rfcomm(struct bthost *bthost, struct btconn *conn,
-+				struct l2conn *l2conn, const void *data,
-+				uint16_t len)
++static void test_pre_setup(const void *test_data)
 +{
-+	const struct rfcomm_hdr *hdr = data;
++	struct test_data *data = tester_get_data();
 +
-+	switch (GET_TYPE(hdr->control)) {
-+	case RFCOMM_SABM:
-+		rfcomm_sabm_recv(bthost, conn, l2conn, data, len);
-+		break;
-+	case RFCOMM_DISC:
-+		rfcomm_disc_recv(bthost, conn, l2conn, data, len);
-+		break;
-+	case RFCOMM_UA:
-+		rfcomm_ua_recv(bthost, conn, l2conn, data, len);
-+		break;
-+	case RFCOMM_DM:
-+		rfcomm_dm_recv(bthost, conn, l2conn, data, len);
-+		break;
-+	case RFCOMM_UIH:
-+		rfcomm_uih_recv(bthost, conn, l2conn, data, len);
++	data->mgmt = mgmt_new_default();
++	if (!data->mgmt) {
++		tester_warn("Failed to setup management interface");
++		tester_pre_setup_failed();
++		return;
++	}
++
++	if (tester_use_debug())
++		mgmt_set_debug(data->mgmt, mgmt_debug, "mgmt: ", NULL);
++
++	mgmt_send(data->mgmt, MGMT_OP_READ_INDEX_LIST, MGMT_INDEX_NONE, 0, NULL,
++					read_index_list_callback, NULL, NULL);
++}
++
++static void test_post_teardown(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++
++	hciemu_unref(data->hciemu);
++	data->hciemu = NULL;
++}
++
++static void test_data_free(void *test_data)
++{
++	struct test_data *data = test_data;
++
++	free(data);
++}
++
++static void client_connectable_complete(uint16_t opcode, uint8_t status,
++					const void *param, uint8_t len,
++					void *user_data)
++{
++	switch (opcode) {
++	case BT_HCI_CMD_WRITE_SCAN_ENABLE:
++	case BT_HCI_CMD_LE_SET_ADV_ENABLE:
 +		break;
 +	default:
-+		printf("Unknown frame type\n");
-+		break;
++		return;
 +	}
++
++	tester_print("Client set connectable status 0x%02x", status);
++
++	if (status)
++		tester_setup_failed();
++	else
++		tester_setup_complete();
 +}
 +
- static void process_acl(struct bthost *bthost, const void *data, uint16_t len)
- {
- 	const struct bt_hci_acl_hdr *acl_hdr = data;
-@@ -1180,6 +1239,7 @@ static void process_acl(struct bthost *bthost, const void *data, uint16_t len)
- 	uint16_t handle, cid, acl_len, l2_len;
- 	struct cid_hook *hook;
- 	struct btconn *conn;
-+	struct l2conn *l2conn;
- 	const void *l2_data;
++static void setup_powered_client_callback(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	struct test_data *data = tester_get_data();
++	struct bthost *bthost;
++
++	if (status != MGMT_STATUS_SUCCESS) {
++		tester_setup_failed();
++		return;
++	}
++
++	tester_print("Controller powered on");
++
++	bthost = hciemu_client_get_host(data->hciemu);
++	bthost_set_cmd_complete_cb(bthost, client_connectable_complete, data);
++	if (data->hciemu_type == HCIEMU_TYPE_LE)
++		bthost_set_adv_enable(bthost, 0x01);
++	else
++		bthost_write_scan_enable(bthost, 0x03);
++}
++
++static void setup_powered_client(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	unsigned char param[] = { 0x01 };
++
++	tester_print("Powering on controller");
++
++	if (data->hciemu_type == HCIEMU_TYPE_BREDR)
++		mgmt_send(data->mgmt, MGMT_OP_SET_SSP, data->mgmt_index,
++				sizeof(param), param, NULL, NULL, NULL);
++	else
++		mgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,
++				sizeof(param), param, NULL, NULL, NULL);
++
++	mgmt_send(data->mgmt, MGMT_OP_SET_POWERED, data->mgmt_index,
++			sizeof(param), param, setup_powered_client_callback,
++			NULL, NULL);
++}
++
++static void test_basic(const void *test_data)
++{
++	int sk;
++
++	sk = socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
++	if (sk < 0) {
++		tester_warn("Can't create socket: %s (%d)", strerror(errno),
++									errno);
++		tester_test_failed();
++		return;
++	}
++
++	close(sk);
++
++	tester_test_passed();
++}
++
++#define test_rfcomm_bredr(name, data, setup, func) \
++	do { \
++		struct test_data *user; \
++		user = malloc(sizeof(struct test_data)); \
++		if (!user) \
++			break; \
++		user->hciemu_type = HCIEMU_TYPE_BREDR; \
++		user->test_data = data; \
++		tester_add_full(name, data, \
++				test_pre_setup, setup, func, NULL, \
++				test_post_teardown, 2, user, test_data_free); \
++	} while (0)
  
- 	if (len < sizeof(*acl_hdr) + sizeof(*l2_hdr))
-@@ -1218,7 +1278,12 @@ static void process_acl(struct bthost *bthost, const void *data, uint16_t len)
- 		l2cap_le_sig(bthost, conn, l2_data, l2_len);
- 		break;
- 	default:
--		printf("Packet for unknown CID 0x%04x (%u)\n", cid, cid);
-+		l2conn = btconn_find_l2cap_conn_by_scid(conn, cid);
-+		if (l2conn->psm == 0x0003)
-+			process_rfcomm(bthost, conn, l2conn, l2_data, l2_len);
-+		else
-+			printf("Packet for unknown CID 0x%04x (%u)\n", cid,
-+									cid);
- 		break;
- 	}
+ int main(int argc, char *argv[])
+ {
+ 	tester_init(&argc, &argv);
+ 
++	test_rfcomm_bredr("Basic RFCOMM Socket - Success", NULL,
++					setup_powered_client, test_basic);
++
+ 	return tester_run();
  }
-diff --git a/monitor/rfcomm.h b/monitor/rfcomm.h
-new file mode 100644
-index 0000000..a8266e7
---- /dev/null
-+++ b/monitor/rfcomm.h
-@@ -0,0 +1,53 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013 Intel Corporation
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#define RFCOMM_SABM    0x2f
-+#define RFCOMM_DISC    0x43
-+#define RFCOMM_UA      0x63
-+#define RFCOMM_DM      0x0f
-+#define RFCOMM_UIH     0xef
-+
-+#define GET_TYPE(control)      ((control & 0xef))
-+#define GET_DLCI(address)      ((address & 0xfc) >> 2)
-+#define GET_CHANNEL(address)   ((address & 0xf8) >> 3)
-+#define GET_DIR(address)       ((address & 0x04) >> 2)
-+
-+#define TEST_EA(length)      ((length & 0x01))
-+
-+#define ADDR(cr, dlci) (((dlci & 0x3f) << 2) | (cr << 1) | 0x01)
-+#define CTRL(type, pf) (((type & 0xef) | (pf << 4)))
-+#define LEN8(len)       (((len) << 1) | 1)
-+#define LEN16(len)      ((len) << 1)
-+
-+struct rfcomm_hdr {
-+	uint8_t address_field;
-+	uint8_t control;
-+	uint8_t length;
-+} __attribute__((packed));
-+
-+struct rfcomm_cmd {
-+	uint8_t address_field;
-+	uint8_t control;
-+	uint8_t length;
-+	uint8_t fcs;
-+} __attribute__((packed));
 -- 
 1.8.3.1
 
