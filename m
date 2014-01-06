@@ -1,199 +1,162 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
 Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH 3/3] emulator/bthost: Add initial rfcomm handling
+Subject: Re: [PATCH v2 3/4] rfcomm: always wait for a bt connection on open()
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1389033760-16764-3-git-send-email-marcin.kraglak@tieto.com>
-Date: Mon, 6 Jan 2014 11:20:11 -0800
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <47339427-F7AB-4CE4-AB56-1994E4837C20@holtmann.org>
-References: <1389033760-16764-1-git-send-email-marcin.kraglak@tieto.com> <1389033760-16764-3-git-send-email-marcin.kraglak@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+In-Reply-To: <1389033795-23895-4-git-send-email-gianluca@sottospazio.it>
+Date: Mon, 6 Jan 2014 11:17:06 -0800
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	peter@hurleysoftware.com,
+	"linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>,
+	Greg KH <gregkh@linuxfoundation.org>, jslaby@suse.cz,
+	stable@vger.kernel.org
+Message-Id: <4321EF0E-97F4-4236-B763-0D0213BE97A8@holtmann.org>
+References: <1389033795-23895-1-git-send-email-gianluca@sottospazio.it> <1389033795-23895-4-git-send-email-gianluca@sottospazio.it>
+To: Gianluca Anzolin <gianluca@sottospazio.it>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Gianluca,
 
-> This is initial rfcomm handling in bthost. It also adds
-> rfcomm.h to monitor directory
+> This patch fixes two regressions introduced with the recent rfcomm tty
+> rework.
+> 
+> The current code uses the carrier_raised() method to wait for the
+> bluetooth connection when a process opens the tty.
+> 
+> However processes may open the port with the O_NONBLOCK flag or set the
+> CLOCAL termios flag: in these cases the open() syscall returns
+> immediately without waiting for the bluetooth connection to
+> complete.
+> 
+> This behaviour confuses userspace which expects an established bluetooth
+> connection.
+> 
+> The patch restores the old behaviour by waiting for the connection in
+> rfcomm_dev_activate() and removes carrier_raised() from the tty_port ops.
+> 
+> As a side effect the new code also fixes the case in which the rfcomm
+> tty device is created with the flag RFCOMM_REUSE_DLC: the old code
+> didn't call device_move() and ModemManager skipped the detection
+> probe. Now device_move() is always called inside rfcomm_dev_activate().
+> 
+> Signed-off-by: Gianluca Anzolin <gianluca@sottospazio.it>
+> Reported-by: Andrey Vihrov <andrey.vihrov@gmail.com>
+> Reported-by: Beson Chow <blc+bluez@mail.vanade.com>
 > ---
-> emulator/bthost.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
-> monitor/rfcomm.h  | 53 +++++++++++++++++++++++++++++++++++++++++++
-> 2 files changed, 119 insertions(+), 1 deletion(-)
-> create mode 100644 monitor/rfcomm.h
-
-split this out. I rather not intermix them if not needed.
-
+> net/bluetooth/rfcomm/tty.c | 43 +++++++++++++++++++++++++++++++++++--------
+> 1 file changed, 35 insertions(+), 8 deletions(-)
 > 
-> diff --git a/emulator/bthost.c b/emulator/bthost.c
-> index 83bfdee..e142038 100644
-> --- a/emulator/bthost.c
-> +++ b/emulator/bthost.c
-> @@ -36,6 +36,7 @@
-> #include "bluetooth/bluetooth.h"
+> diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+> index 32ef9f9..65c0699 100644
+> --- a/net/bluetooth/rfcomm/tty.c
+> +++ b/net/bluetooth/rfcomm/tty.c
+> @@ -58,6 +58,7 @@ struct rfcomm_dev {
+> 	uint			modem_status;
 > 
-> #include "monitor/bt.h"
-> +#include "monitor/rfcomm.h"
-> #include "bthost.h"
+> 	struct rfcomm_dlc	*dlc;
+> +	wait_queue_head_t       conn_wait;
 > 
-> /* ACL handle and flags pack/unpack */
-> @@ -1173,6 +1174,64 @@ static struct cid_hook *find_cid_hook(struct btconn *conn, uint16_t cid)
-> 	return NULL;
-> }
+> 	struct device		*tty_dev;
 > 
-> +static void rfcomm_sabm_recv(struct bthost *bthost, struct btconn *conn,
-> +				struct l2conn *l2conn, const void *data,
-> +				uint16_t len)
-> +{
-> +}
-> +
-> +static void rfcomm_disc_recv(struct bthost *bthost, struct btconn *conn,
-> +				struct l2conn *l2conn, const void *data,
-> +				uint16_t len)
-> +{
-> +}
-> +
-> +static void rfcomm_ua_recv(struct bthost *bthost, struct btconn *conn,
-> +				struct l2conn *l2conn, const void *data,
-> +				uint16_t len)
-> +{
-> +}
-> +
-> +static void rfcomm_dm_recv(struct bthost *bthost, struct btconn *conn,
-> +				struct l2conn *l2conn, const void *data,
-> +				uint16_t len)
-> +{
-> +}
-> +
-> +static void rfcomm_uih_recv(struct bthost *bthost, struct btconn *conn,
-> +				struct l2conn *l2conn, const void *data,
-> +				uint16_t len)
-> +{
-> +}
-> +
-> +static void process_rfcomm(struct bthost *bthost, struct btconn *conn,
-> +				struct l2conn *l2conn, const void *data,
-> +				uint16_t len)
-> +{
-> +	const struct rfcomm_hdr *hdr = data;
-> +
-> +	switch (GET_TYPE(hdr->control)) {
-> +	case RFCOMM_SABM:
-> +		rfcomm_sabm_recv(bthost, conn, l2conn, data, len);
-> +		break;
-> +	case RFCOMM_DISC:
-> +		rfcomm_disc_recv(bthost, conn, l2conn, data, len);
-> +		break;
-> +	case RFCOMM_UA:
-> +		rfcomm_ua_recv(bthost, conn, l2conn, data, len);
-> +		break;
-> +	case RFCOMM_DM:
-> +		rfcomm_dm_recv(bthost, conn, l2conn, data, len);
-> +		break;
-> +	case RFCOMM_UIH:
-> +		rfcomm_uih_recv(bthost, conn, l2conn, data, len);
-> +		break;
-> +	default:
-> +		printf("Unknown frame type\n");
-> +		break;
-> +	}
-> +}
-> +
-> static void process_acl(struct bthost *bthost, const void *data, uint16_t len)
+> @@ -123,8 +124,37 @@ static struct device *rfcomm_get_device(struct rfcomm_dev *dev)
+> static int rfcomm_dev_activate(struct tty_port *port, struct tty_struct *tty)
 > {
-> 	const struct bt_hci_acl_hdr *acl_hdr = data;
-> @@ -1180,6 +1239,7 @@ static void process_acl(struct bthost *bthost, const void *data, uint16_t len)
-> 	uint16_t handle, cid, acl_len, l2_len;
-> 	struct cid_hook *hook;
-> 	struct btconn *conn;
-> +	struct l2conn *l2conn;
-> 	const void *l2_data;
+> 	struct rfcomm_dev *dev = container_of(port, struct rfcomm_dev, port);
+> +	DEFINE_WAIT(wait);
+> +	int err;
+> +
+> +	err = rfcomm_dlc_open(dev->dlc, &dev->src, &dev->dst, dev->channel);
+> +	if (err)
+> +		return err;
+> +
+> +	while (1) {
+> +		prepare_to_wait(&dev->conn_wait, &wait, TASK_INTERRUPTIBLE);
+> +
+> +		if (dev->dlc->state == BT_CLOSED) {
+> +			err = -dev->err;
+> +			break;
+> +		} else if (dev->dlc->state == BT_CONNECTED)
+> +			break;
+> +		else if (signal_pending(current)) {
+> +			err = -ERESTARTSYS;
+> +			break;
+> +		}
+
+don’t do an if-else-else if statement here. Just break.
+
+	if (dev->dlc->state == BT_CLOSED) {
+		..
+		break;	
+	}
+
+	if (dev->dlc->state == BT_CONNECTED)
+		break;
+
+	if (signal_pending(..)) {
+		..
+		break;
+	}
+
+> +
+> +		tty_unlock(tty);
+> +		schedule();
+> +		tty_lock(tty);
+> +	}
+> +	finish_wait(&dev->conn_wait, &wait);
 > 
-> 	if (len < sizeof(*acl_hdr) + sizeof(*l2_hdr))
-> @@ -1218,7 +1278,12 @@ static void process_acl(struct bthost *bthost, const void *data, uint16_t len)
-> 		l2cap_le_sig(bthost, conn, l2_data, l2_len);
-> 		break;
-> 	default:
-> -		printf("Packet for unknown CID 0x%04x (%u)\n", cid, cid);
-> +		l2conn = btconn_find_l2cap_conn_by_scid(conn, cid);
-> +		if (l2conn->psm == 0x0003)
-> +			process_rfcomm(bthost, conn, l2conn, l2_data, l2_len);
-> +		else
-> +			printf("Packet for unknown CID 0x%04x (%u)\n", cid,
-> +									cid);
-> 		break;
-> 	}
+> -	return rfcomm_dlc_open(dev->dlc, &dev->src, &dev->dst, dev->channel);
+> +	if (!err)
+> +		device_move(dev->tty_dev, rfcomm_get_device(dev),
+> +			    DPM_ORDER_DEV_AFTER_PARENT);
+> +
+> +	return err;
 > }
-> diff --git a/monitor/rfcomm.h b/monitor/rfcomm.h
-> new file mode 100644
-> index 0000000..a8266e7
-> --- /dev/null
-> +++ b/monitor/rfcomm.h
-> @@ -0,0 +1,53 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2013 Intel Corporation
-> + *
-> + *
-> + *  This library is free software; you can redistribute it and/or
-> + *  modify it under the terms of the GNU Lesser General Public
-> + *  License as published by the Free Software Foundation; either
-> + *  version 2.1 of the License, or (at your option) any later version.
-> + *
-> + *  This library is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + *  Lesser General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU Lesser General Public
-> + *  License along with this library; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> + *
-> + */
-> +
-> +#define RFCOMM_SABM    0x2f
-> +#define RFCOMM_DISC    0x43
-> +#define RFCOMM_UA      0x63
-> +#define RFCOMM_DM      0x0f
-> +#define RFCOMM_UIH     0xef
-> +
-> +#define GET_TYPE(control)      ((control & 0xef))
-> +#define GET_DLCI(address)      ((address & 0xfc) >> 2)
-> +#define GET_CHANNEL(address)   ((address & 0xf8) >> 3)
-> +#define GET_DIR(address)       ((address & 0x04) >> 2)
+> 
+> /* we block the open until the dlc->state becomes BT_CONNECTED */
+> @@ -151,7 +181,6 @@ static const struct tty_port_operations rfcomm_port_ops = {
+> 	.destruct = rfcomm_dev_destruct,
+> 	.activate = rfcomm_dev_activate,
+> 	.shutdown = rfcomm_dev_shutdown,
+> -	.carrier_raised = rfcomm_dev_carrier_raised,
+> };
+> 
+> static struct rfcomm_dev *__rfcomm_dev_get(int id)
+> @@ -258,6 +287,7 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
+> 
+> 	tty_port_init(&dev->port);
+> 	dev->port.ops = &rfcomm_port_ops;
+> +	init_waitqueue_head(&dev->conn_wait);
+> 
+> 	skb_queue_head_init(&dev->pending);
+> 
+> @@ -576,12 +606,9 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
+> 	BT_DBG("dlc %p dev %p err %d", dlc, dev, err);
+> 
+> 	dev->err = err;
+> -	if (dlc->state == BT_CONNECTED) {
+> -		device_move(dev->tty_dev, rfcomm_get_device(dev),
+> -			    DPM_ORDER_DEV_AFTER_PARENT);
+> +	wake_up_interruptible(&dev->conn_wait);
+> 
+> -		wake_up_interruptible(&dev->port.open_wait);
+> -	} else if (dlc->state == BT_CLOSED)
+> +	if (dlc->state == BT_CLOSED)
+> 		tty_port_tty_hangup(&dev->port, false);
+> }
+> 
+> @@ -1103,7 +1130,7 @@ int __init rfcomm_init_ttys(void)
+> 	rfcomm_tty_driver->subtype	= SERIAL_TYPE_NORMAL;
+> 	rfcomm_tty_driver->flags	= TTY_DRIVER_REAL_RAW | TTY_DRIVER_DYNAMIC_DEV;
+> 	rfcomm_tty_driver->init_termios	= tty_std_termios;
+> -	rfcomm_tty_driver->init_termios.c_cflag	= B9600 | CS8 | CREAD | HUPCL;
+> +	rfcomm_tty_driver->init_termios.c_cflag	= B9600 | CS8 | CREAD | HUPCL | CLOCAL;
 
-	((control) & 0xef)
+Is adding CLOCAL by default intentional?
 
-and so on ..
-
-You might also prefix these with RFCOMM_
-
-> +
-> +#define TEST_EA(length)      ((length & 0x01))
-> +
-> +#define ADDR(cr, dlci) (((dlci & 0x3f) << 2) | (cr << 1) | 0x01)
-> +#define CTRL(type, pf) (((type & 0xef) | (pf << 4)))
-> +#define LEN8(len)       (((len) << 1) | 1)
-> +#define LEN16(len)      ((len) << 1)
-> +
-> +struct rfcomm_hdr {
-> +	uint8_t address_field;
-
-Just call it address;
-
-> +	uint8_t control;
-> +	uint8_t length;
-> +} __attribute__((packed));
-> +
-> +struct rfcomm_cmd {
-> +	uint8_t address_field;
-> +	uint8_t control;
-> +	uint8_t length;
-> +	uint8_t fcs;
-> +} __attribute__((packed));
+> 	rfcomm_tty_driver->init_termios.c_lflag &= ~ICANON;
+> 	tty_set_operations(rfcomm_tty_driver, &rfcomm_ops);
 
 Regards
 
