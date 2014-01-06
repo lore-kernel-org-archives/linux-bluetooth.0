@@ -1,38 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 6 Jan 2014 21:28:24 +0200
+Date: Mon, 6 Jan 2014 21:26:58 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Colin Watson <cjwatson@ubuntu.com>
+To: Szymon Janc <szymon.janc@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] unit: Fix test failures with glib 2.39.0
-Message-ID: <20140106192824.GB25443@x220.p-661hnu-f1>
-References: <20140106120700.GZ5883@riva.ucam.org>
+Subject: Re: [PATCH 1/3] android/socket: Make channel int32_t in IPC
+ specification
+Message-ID: <20140106192658.GA25443@x220.p-661hnu-f1>
+References: <1388866574-20158-1-git-send-email-szymon.janc@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140106120700.GZ5883@riva.ucam.org>
+In-Reply-To: <1388866574-20158-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Colin,
+Hi Szymon,
 
-On Mon, Jan 06, 2014, Colin Watson wrote:
-> glib 2.39.0 made this change:
-> 
->    - g_source_remove() will now throw a critical in the case that you
->      try to remove a non-existent source.  We expect that there is some
->      code in the wild that will fall afoul of this new critical but
->      considering that we now reuse source IDs, this code is already
->      broken and should probably be fixed.
-> 
-> This patch fixes the test suite to keep better track of whether sources have
-> already been removed and avoid double-removals.
+On Sat, Jan 04, 2014, Szymon Janc wrote:
+> This match IPC type with type in socket HAL API. This allows to pass
+> data directly from HAL library and will allow to reduce logic in it.
 > ---
->  unit/test-avdtp.c          |  8 ++++++--
->  unit/test-gobex-transfer.c |  6 ++++--
->  unit/test-gobex.c          | 13 ++++++++-----
->  unit/util.c                |  1 +
->  unit/util.h                |  1 +
->  5 files changed, 20 insertions(+), 9 deletions(-)
+>  android/hal-msg.h | 20 ++++++++++----------
+>  android/socket.c  |  2 +-
+>  2 files changed, 11 insertions(+), 11 deletions(-)
 
-Applied. Thanks.
+All three patches have been applied. Thanks.
 
 Johan
