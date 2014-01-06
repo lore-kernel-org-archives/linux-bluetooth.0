@@ -1,40 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 6 Jan 2014 01:27:55 +0100
+From: Pavel Machek <pavel@ucw.cz>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
+	=?utf-8?B?0JjQstCw0LnQu9C+INCU0LjQvNC40YLRgNC+0LI=?= <freemangordon@abv.bg>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
+	Ville Tervo <ville.tervo@nokia.com>
+Subject: Re: [PATCH v4] Bluetooth: Add hci_h4p driver
+Message-ID: <20140106002755.GC27517@amd.pavel.ucw.cz>
+References: <1379703710-5757-1-git-send-email-pali.rohar@gmail.com>
+ <1727897.LBX8128hIo@izba>
+ <20140102161824.GA8204@amd.pavel.ucw.cz>
+ <A5B72277-42D4-4A24-8A29-9BE18762E8C4@holtmann.org>
+ <20140103001753.GA21023@amd.pavel.ucw.cz>
+ <20140103010519.GA27678@earth.universe>
+ <20140105223250.GB27517@amd.pavel.ucw.cz>
+ <20140105230155.GA2681@earth.universe>
 MIME-Version: 1.0
-In-Reply-To: <2688157.rF2s9RrCYM@athlon>
-References: <1388663914-25003-1-git-send-email-luiz.dentz@gmail.com>
-	<2688157.rF2s9RrCYM@athlon>
-Date: Mon, 6 Jan 2014 11:06:45 +0200
-Message-ID: <CABBYNZJBZdcuSbn_oFOM-5GRUsuk+W1MQ-xyw8YQKq=R2w9YoA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 01/10] android/ipc: Add initial code for audio IPC
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Szymon Janc <szymon.janc@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140105230155.GA2681@earth.universe>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
 
-On Sun, Jan 5, 2014 at 7:43 PM, Szymon Janc <szymon.janc@gmail.com> wrote:
-> Hi Luiz,
->
-> On Thursday 02 January 2014 13:58:25 Luiz Augusto von Dentz wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> This add initial code for listen and accept connections on the abstract
->> socket defined for the audio IPC.
->> ---
->> v2: Split audio IPC services for HAL services and fix invalid messages or
->> disconnections causing the daemon to exit. The audio HAL is independent of
->> bluetooth and should only affect A2DP service.
->
-> What seems to be missing is some way to recover from Audio IPC error.
+> > > The drivers can still be initialized the old way using pdata quirks
+> > > until all drivers are converted, but I think this driver can simply
+> > > be prepared for DT directly:
+> > 
+> > Well, normally DT support means a bit of argumentation and bikeshed
+> > painting... I believe it would be better to get the driver in as-is
+> > and then work on adding DT support.
+> 
+> Maybe. Especially the UART reference may result in some discussion.
+> But having the discussion early means its finished earlier :)
 
-This has been discussed already with Lukasz, Audio HAL is a little bit
-different than Bluetooth HAL because it does not seems to be able to
-restart the service from the UI so the Audio IPC disconnecting are
-probably due to crashes, we will indeed need a way to recover from
-Audio IPC errors but it is not really a feature but more a error
-recover which we can be done in a separate set.
+Well, merging the basic driver does not mean discussion can't start
+early. If it is going to be complex, that's a very good reason to do
+it in separate step. That is, have a working driver, then add device
+tree support.
 
-Luiz Augusto von Dentz
+Thanks,
+									Pavel
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
