@@ -1,67 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1389024405.2739.2.camel@tenshi>
-Subject: Re: A problem with "rfcomm bind" and wvdial
-From: Andrey Vihrov <andrey.vihrov@gmail.com>
-To: Gianluca Anzolin <gianluca@sottospazio.it>
-Cc: peter@hurleysoftware.com, marcel@holtmann.org,
- gregkh@linuxfoundation.org,  jslaby@suse.cz, linux-bluetooth@vger.kernel.org
-Date: Mon, 06 Jan 2014 18:06:45 +0200
-In-Reply-To: <20140106113353.GA21381@sottospazio.it>
-References: <20140105154942.GA12621@sottospazio.it>
-	 <20140106113353.GA21381@sottospazio.it>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature";
-	boundary="=-q1s74ohdL6VMMoGtTcWm"
+Message-ID: <1389014667.970.1.camel@bali>
+Subject: Re: [RFC v5 00/14] LE auto connection and connection parameters
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Date: Mon, 06 Jan 2014 10:24:27 -0300
+In-Reply-To: <1387540675-2466-1-git-send-email-andre.guedes@openbossa.org>
+References: <1387540675-2466-1-git-send-email-andre.guedes@openbossa.org>
+Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Ping.
 
---=-q1s74ohdL6VMMoGtTcWm
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Fri, 2013-12-20 at 08:57 -0300, Andre Guedes wrote:
+> Hi all,
+> 
+> This patch set is pretty much the same of previous one, except it implements
+> a different approach to handle discovery and LE connection (as discussed on
+> "[RFC v4 05/12] Bluetooth: Stop scanning on LE connection").
+> 
+> Regards,
+> 
+> Andre
+> 
+> 
+> Andre Guedes (14):
+>   Bluetooth: Save connection interval parameters in hci_conn
+>   Bluetooth: Group list_head fields from strcut hci_dev together
+>   Bluetooth: Introduce connection parameters list
+>   Bluetooth: Use connection parameters if any
+>   Bluetooth: Introduce fail_conn_attempt() helper
+>   Bluetooth: Stop scanning on LE connection
+>   Bluetooth: Remove unused function
+>   Bluetooth: Introduce hdev->pend_le_conn list
+>   Bluetooth: Introduce LE auto connection infrastructure
+>   Bluetooth: Re-enable background scan in case of error
+>   Bluetooth: Temporarily stop background scanning on discovery
+>   Bluetooth: Auto connection and power on
+>   Bleutooth: Add support for auto connect options
+>   Bluetooth: Add le_auto_conn file on debugfs
+> 
+>  include/net/bluetooth/hci.h      |   1 +
+>  include/net/bluetooth/hci_core.h |  43 +++++-
+>  net/bluetooth/hci_conn.c         | 111 +++++++++++---
+>  net/bluetooth/hci_core.c         | 318 +++++++++++++++++++++++++++++++++++++++
+>  net/bluetooth/hci_event.c        |  60 ++++++++
+>  net/bluetooth/mgmt.c             |  25 ++-
+>  6 files changed, 530 insertions(+), 28 deletions(-)
+> 
 
-Hello,
 
-Thanks for the update. I applied the patch to the bluetooth-next
-kernel and it seems to work as expected. I ran wvdial several times in a
-row, and it was able to connect every time.
-
-> On Sun, Jan 05, 2014 at 04:49:42PM +0100, Gianluca Anzolin wrote:
-> > Hello,
-> >=20
-> > I looked at your problem this afternoon and I think I know what's happe=
-ning:
-> > wvdial is opening the port with the flag O_NONBLOCK. As expected the rf=
-comm
-> > code returns immediately instead of waiting for the BT connection to co=
-me
-> > up. Then wvdial sends the AT commands and the writes fail.
->=20
-> Hi,
->=20
-> could you please test the attached patch?
->=20
-> If it works and people are ok with it I'll submit it along with the other=
- fixes
-> I already sent to the list.
->=20
-> Thank you,
-> Gianluca
-
---=20
-Andrey Vihrov <andrey.vihrov@gmail.com>
-
-
---=-q1s74ohdL6VMMoGtTcWm
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iEYEABECAAYFAlLK1JUACgkQ9lMsMEZuiz5CMgCfY4Trc17DunAjbMR27kxv05P2
-2G0AniyqTDDuBKZX1LAQjS7gVWnMspol
-=4JNY
------END PGP SIGNATURE-----
-
---=-q1s74ohdL6VMMoGtTcWm--
