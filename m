@@ -1,98 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 1/5] tools/rfcomm-tester: Initial version of rfcomm-tester
-Date: Tue,  7 Jan 2014 11:59:10 +0100
-Message-Id: <1389092354-32544-1-git-send-email-marcin.kraglak@tieto.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <szymon.janc@tieto.com>,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 2/2] android: Send remote devices properties on enable
+Date: Tue, 7 Jan 2014 11:53:25 +0100
+Message-ID: <1389092005-10302-2-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1389092005-10302-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1389092005-10302-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add rfcomm-tester to tree.
----
- .gitignore            |  1 +
- Makefile.tools        |  6 +++++-
- tools/rfcomm-tester.c | 36 ++++++++++++++++++++++++++++++++++++
- 3 files changed, 42 insertions(+), 1 deletion(-)
- create mode 100644 tools/rfcomm-tester.c
+If there is any bonded device stored then on bluetooth enable we
+should send notification with its properties.
 
-diff --git a/.gitignore b/.gitignore
-index 3e0641d..4ac216d 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -81,6 +81,7 @@ unit/test-mgmt
- tools/mgmt-tester
- tools/smp-tester
- tools/gap-tester
-+tools/rfcomm-tester
- tools/btattach
- tools/btmgmt
- tools/btsnoop
-diff --git a/Makefile.tools b/Makefile.tools
-index c78cc50..ef17305 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -39,7 +39,7 @@ if EXPERIMENTAL
- noinst_PROGRAMS += emulator/btvirt emulator/b1ee tools/3dsp \
- 					tools/mgmt-tester tools/gap-tester \
- 					tools/l2cap-tester tools/sco-tester \
--					tools/smp-tester
-+					tools/smp-tester tools/rfcomm-tester
+Change-Id: Ia14ae7379dd986d67e81161b86f3c02475540d7b
+---
+ android/bluetooth.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index e0673bb..9da988b 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -2636,6 +2636,18 @@ static void get_remote_device_props(struct device *dev)
+ 	get_device_timestamp(dev);
+ }
  
- emulator_btvirt_SOURCES = emulator/main.c monitor/bt.h \
- 					monitor/mainloop.h monitor/mainloop.c \
-@@ -76,6 +76,10 @@ tools_l2cap_tester_SOURCES = tools/l2cap-tester.c monitor/bt.h \
- 				src/shared/tester.h src/shared/tester.c
- tools_l2cap_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
- 
-+tools_rfcomm_tester_SOURCES = tools/rfcomm-tester.c src/shared/tester.h \
-+				src/shared/tester.c
-+tools_rfcomm_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
-+
- tools_smp_tester_SOURCES = tools/smp-tester.c monitor/bt.h \
- 				emulator/btdev.h emulator/btdev.c \
- 				emulator/bthost.h emulator/bthost.c \
-diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
-new file mode 100644
-index 0000000..194e2e6
---- /dev/null
-+++ b/tools/rfcomm-tester.c
-@@ -0,0 +1,36 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <glib.h>
-+#include "src/shared/tester.h"
-+
-+int main(int argc, char *argv[])
++static void send_bonded_devices_props(void)
 +{
-+	tester_init(&argc, &argv);
++	GSList *l;
 +
-+	return tester_run();
++	for (l = devices; l; l = g_slist_next(l)) {
++		struct device *dev = l->data;
++
++		if (dev->bond_state == HAL_BOND_STATE_BONDED)
++			get_remote_device_props(dev);
++	}
 +}
++
+ static void handle_enable_cmd(const void *buf, uint16_t len)
+ {
+ 	uint8_t status;
+@@ -2644,6 +2656,9 @@ static void handle_enable_cmd(const void *buf, uint16_t len)
+ 	 * enabling adapter */
+ 	get_adapter_properties();
+ 
++	/* Sent also properties of bonded devices */
++	send_bonded_devices_props();
++
+ 	if (adapter.current_settings & MGMT_SETTING_POWERED) {
+ 		status = HAL_STATUS_DONE;
+ 		goto failed;
 -- 
-1.8.3.1
+1.8.4
 
