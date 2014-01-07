@@ -1,169 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <szymon.janc@tieto.com>,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 1/2] android: Add wrapper function for get remote dev properties
-Date: Tue, 7 Jan 2014 11:53:24 +0100
-Message-ID: <1389092005-10302-1-git-send-email-lukasz.rymanowski@tieto.com>
+Message-ID: <52CBDB7A.3080901@linux.intel.com>
+Date: Tue, 07 Jan 2014 12:48:26 +0200
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+To: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
+Subject: Re: [PATCH 1/4] android/pan: Register Network Access Point
+References: <1389043592-5616-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1389043592-5616-2-git-send-email-ravikumar.veeramally@linux.intel.com> <20140107085930.GB9155@x220.p-661hnu-f1> <52CBCF93.7060604@linux.intel.com> <20140107101842.GA20861@x220.p-661hnu-f1>
+In-Reply-To: <20140107101842.GA20861@x220.p-661hnu-f1>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Change-Id: Iab584580562534e2489dc6c8213f6066bbd8bd46
----
- android/bluetooth.c | 123 +++++++++++++++++++++++++++-------------------------
- 1 file changed, 64 insertions(+), 59 deletions(-)
+Hi Johan,
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 3cbf68d..e0673bb 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -2550,56 +2550,6 @@ static void handle_get_remote_services_cmd(const void *buf, uint16_t len)
- 									status);
- }
- 
--static void handle_enable_cmd(const void *buf, uint16_t len)
--{
--	uint8_t status;
--
--	/* Framework expects all properties to be emitted while
--	 * enabling adapter */
--	get_adapter_properties();
--
--	if (adapter.current_settings & MGMT_SETTING_POWERED) {
--		status = HAL_STATUS_DONE;
--		goto failed;
--	}
--
--	if (!set_mode(MGMT_OP_SET_POWERED, 0x01)) {
--		status = HAL_STATUS_FAILED;
--		goto failed;
--	}
--
--	status = HAL_STATUS_SUCCESS;
--failed:
--	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_ENABLE, status);
--}
--
--static void handle_disable_cmd(const void *buf, uint16_t len)
--{
--	uint8_t status;
--
--	if (!(adapter.current_settings & MGMT_SETTING_POWERED)) {
--		status = HAL_STATUS_DONE;
--		goto failed;
--	}
--
--	if (!set_mode(MGMT_OP_SET_POWERED, 0x00)) {
--		status = HAL_STATUS_FAILED;
--		goto failed;
--	}
--
--	status = HAL_STATUS_SUCCESS;
--failed:
--	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_DISABLE, status);
--}
--
--static void handle_get_adapter_props_cmd(const void *buf, uint16_t len)
--{
--	get_adapter_properties();
--
--	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_GET_ADAPTER_PROPS,
--							HAL_STATUS_SUCCESS);
--}
--
- static uint8_t get_device_uuids(struct device *dev)
- {
- 	send_device_uuids_notif(dev);
-@@ -2673,6 +2623,69 @@ static uint8_t get_device_timestamp(struct device *dev)
- 	return HAL_STATUS_SUCCESS;
- }
- 
-+static void get_remote_device_props(struct device *dev)
-+{
-+	get_device_name(dev);
-+	get_device_uuids(dev);
-+	get_device_class(dev);
-+	get_device_type(dev);
-+	get_device_service_rec(dev);
-+	get_device_friendly_name(dev);
-+	get_device_rssi(dev);
-+	get_device_version_info(dev);
-+	get_device_timestamp(dev);
-+}
-+
-+static void handle_enable_cmd(const void *buf, uint16_t len)
-+{
-+	uint8_t status;
-+
-+	/* Framework expects all properties to be emitted while
-+	 * enabling adapter */
-+	get_adapter_properties();
-+
-+	if (adapter.current_settings & MGMT_SETTING_POWERED) {
-+		status = HAL_STATUS_DONE;
-+		goto failed;
-+	}
-+
-+	if (!set_mode(MGMT_OP_SET_POWERED, 0x01)) {
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	status = HAL_STATUS_SUCCESS;
-+failed:
-+	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_ENABLE, status);
-+}
-+
-+static void handle_disable_cmd(const void *buf, uint16_t len)
-+{
-+	uint8_t status;
-+
-+	if (!(adapter.current_settings & MGMT_SETTING_POWERED)) {
-+		status = HAL_STATUS_DONE;
-+		goto failed;
-+	}
-+
-+	if (!set_mode(MGMT_OP_SET_POWERED, 0x00)) {
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	status = HAL_STATUS_SUCCESS;
-+failed:
-+	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_DISABLE, status);
-+}
-+
-+static void handle_get_adapter_props_cmd(const void *buf, uint16_t len)
-+{
-+	get_adapter_properties();
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_BLUETOOTH, HAL_OP_GET_ADAPTER_PROPS,
-+							HAL_STATUS_SUCCESS);
-+}
-+
- static void handle_get_remote_device_props_cmd(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_get_remote_device_props *cmd = buf;
-@@ -2688,15 +2701,7 @@ static void handle_get_remote_device_props_cmd(const void *buf, uint16_t len)
- 		goto failed;
- 	}
- 
--	get_device_name(l->data);
--	get_device_uuids(l->data);
--	get_device_class(l->data);
--	get_device_type(l->data);
--	get_device_service_rec(l->data);
--	get_device_friendly_name(l->data);
--	get_device_rssi(l->data);
--	get_device_version_info(l->data);
--	get_device_timestamp(l->data);
-+	get_remote_device_props(l->data);
- 
- 	status = HAL_STATUS_SUCCESS;
- 
--- 
-1.8.4
+On 01/07/2014 12:18 PM, Johan Hedberg wrote:
+> Hi Ravi,
+>
+> On Tue, Jan 07, 2014, Ravi kumar Veeramally wrote:
+>>>> @@ -49,7 +54,7 @@
+>>>>   static bdaddr_t adapter_addr;
+>>>>   GSList *devices = NULL;
+>>>>   uint8_t local_role = HAL_PAN_ROLE_NONE;
+>>>> -static uint32_t record_id = 0;
+>>>> +char bridge[5] = "bnep\0";
+>>> This last line raises several questions. Firstly, C-strings have an
+>>> implicit nul-character at the end so no need to explicitly try to add
+>>> one there. You also don't need to have an explicit size between the
+>>> square brackets since this is automatically calculated if you do
+>>> initialization upon declaration. Why isn't this static? Why isn't it
+>>> const? Would a simple define make more sense instead of a dedicated
+>>> variable?
+>>   I tried these but there are some warnings.
+>>
+>> #define BNEP_BRIDGE   "bnep"
+>> static char bridge[] = "bnep";
+>> static char *bridge = "bnep";
+>>
+>> ==10198== Warning: noted but unhandled ioctl 0x89a1 with no
+>> size/direction hints
+>> ==10198==    This could cause spurious value errors to appear.
+>> ==10198==    See README_MISSING_SYSCALL_OR_IOCTL for guidance on
+>> writing a proper wrapper.
+> Is this from valgrind?
+    Yes.
+> If so, then I think it's fine to ignore it as it
+> simply doesn't know the details of all ioctls. We get this kind of
+> stuff for Bluetooth specific ioctls too. I.e. go with whatever is the
+> simplest (probably the define).
+  Ok, I will change to define and send you v2.
 
+Regards,
+Ravi.
