@@ -1,59 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 7 Jan 2014 13:55:39 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH_v2 1/4] android/pan: Register Network Access Point
-Message-ID: <20140107115539.GA2107@x220.p-661hnu-f1>
-References: <1389093533-13210-1-git-send-email-ravikumar.veeramally@linux.intel.com>
- <1389093533-13210-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1389093533-13210-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v3 08/10] android/A2DP: Add stream close command/response struct
+Date: Tue,  7 Jan 2014 13:53:21 +0200
+Message-Id: <1389095603-30504-8-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1389095603-30504-1-git-send-email-luiz.dentz@gmail.com>
+References: <1389095603-30504-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Jan 07, 2014, Ravi kumar Veeramally wrote:
-> +static int set_forward_delay(void)
-> +{
-> +	FILE *f;
-> +	char *path;
-> +
-> +	path = g_strdup_printf("/sys/class/net/%s/bridge/forward_delay",
-> +								BNEP_BRIDGE);
-> +	if (!path)
-> +		return -ENOMEM;
-> +
-> +	f = fopen(path, "r+");
-> +	g_free(path);
-> +	if (!f)
-> +		return -errno;
+This adds the definitions to stream close command and response.
+---
+ android/a2dp.c      | 9 +++++++++
+ android/audio-msg.h | 5 +++++
+ 2 files changed, 14 insertions(+)
 
-The above is not safe since g_free() might modify the value of errno.
+diff --git a/android/a2dp.c b/android/a2dp.c
+index 09a65e1..7c49bc9 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -375,6 +375,13 @@ static void bt_stream_open(const void *buf, uint16_t len)
+ 	audio_ipc_send_rsp(AUDIO_OP_OPEN_STREAM, AUDIO_STATUS_FAILED);
+ }
+ 
++static void bt_stream_close(const void *buf, uint16_t len)
++{
++	DBG("Not Implemented");
++
++	audio_ipc_send_rsp(AUDIO_OP_CLOSE_STREAM, AUDIO_STATUS_FAILED);
++}
++
+ static const struct ipc_handler audio_handlers[] = {
+ 	/* AUDIO_OP_OPEN */
+ 	{ bt_audio_open, true, sizeof(struct audio_cmd_open) },
+@@ -382,6 +389,8 @@ static const struct ipc_handler audio_handlers[] = {
+ 	{ bt_audio_close, false, sizeof(struct audio_cmd_close) },
+ 	/* AUDIO_OP_OPEN_STREAM */
+ 	{ bt_stream_open, false, sizeof(struct audio_cmd_open_stream) },
++	/* AUDIO_OP_CLOSE_STREAM */
++	{ bt_stream_close, false, sizeof(struct audio_cmd_close_stream) },
+ };
+ 
+ bool bt_a2dp_register(const bdaddr_t *addr)
+diff --git a/android/audio-msg.h b/android/audio-msg.h
+index 0f0309a..4dfa8cf 100644
+--- a/android/audio-msg.h
++++ b/android/audio-msg.h
+@@ -67,3 +67,8 @@ struct audio_rsp_open_stream {
+ 	uint8_t len;
+ 	uint8_t data[0];
+ } __attribute__((packed));
++
++#define AUDIO_OP_CLOSE_STREAM		0x04
++struct audio_cmd_close_stream {
++	uint8_t id;
++} __attribute__((packed));
+-- 
+1.8.4.2
 
-In general, we're not really in the habit of using the f* variants of
-file access functions. Could you convert the above to use a stack
-variable for path (there's a PATH_MAX variable you can use for its
-size) together with sprintf and use open + write instead of fopen +
-fprintf?
-
-> +static int nap_create_bridge(void)
-> +{
-> +	int sk, err;
-> +
-> +	DBG(" %s", BNEP_BRIDGE);
-
-Why the extra space before %s?
-
-
-> +	if (ioctl(sk, SIOCBRADDBR, BNEP_BRIDGE) == -1) {
-
-We usually check for this kind of errors with < 0 instead of == -1.
-
-> +	DBG(" %s", BNEP_BRIDGE);
-
-Same thing here with the seemingly unnecessary space.
-
-Johan
