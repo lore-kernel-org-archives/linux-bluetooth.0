@@ -1,285 +1,235 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 01/10] android/ipc: Add initial code for audio IPC
-Date: Tue,  7 Jan 2014 13:53:14 +0200
-Message-Id: <1389095603-30504-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 02/10] android/ipc: Add message handling for audio IPC
+Date: Tue,  7 Jan 2014 13:53:15 +0200
+Message-Id: <1389095603-30504-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1389095603-30504-1-git-send-email-luiz.dentz@gmail.com>
+References: <1389095603-30504-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This add initial code for listen and accept connections on the abstract
-socket defined for the audio IPC.
+This adds audio_ipc_register and audio_ipc_unregister and adapt
+ipc_handle_msg to be able to handle audio services messages.
 ---
-v2: Split audio IPC services for HAL services and fix invalid messages or
-disconnections causing the daemon to exit. The audio HAL is independent of
-bluetooth and should only affect A2DP service.
-v3: Split audio IPC related functions to separate files (audio-ipc.{c,h}),
-please disregard git thinking there is a copy of hdp code because they are
-similar.
+ android/audio-ipc.c | 23 +++++++++++++++++++-
+ android/audio-ipc.h |  3 +++
+ android/audio-msg.h |  2 ++
+ android/ipc.c       | 60 +++++++++++++++++++++++++----------------------------
+ android/ipc.h       |  8 +++++++
+ 5 files changed, 63 insertions(+), 33 deletions(-)
 
- android/Android.mk                                 |   1 +
- android/Makefile.am                                |   2 +
- android/audio-ipc.c                                | 104 +++++++++++++++++++++
- .../health/hdp_manager.h => android/audio-ipc.h    |   7 +-
- monitor/analyze.h => android/audio-msg.h           |   7 +-
- android/ipc.c                                      |  14 +--
- android/ipc.h                                      |   1 +
- 7 files changed, 124 insertions(+), 12 deletions(-)
- create mode 100644 android/audio-ipc.c
- copy profiles/health/hdp_manager.h => android/audio-ipc.h (86%)
- copy monitor/analyze.h => android/audio-msg.h (83%)
-
-diff --git a/android/Android.mk b/android/Android.mk
-index 7d9cc4f..27631cc 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -26,6 +26,7 @@ LOCAL_SRC_FILES := \
- 	hidhost.c \
- 	socket.c \
- 	ipc.c ipc.h \
-+	audio-ipc.c audio-ipc.h \
- 	avdtp.c \
- 	a2dp.c \
- 	pan.c \
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 7d9b580..8810369 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -15,6 +15,7 @@ noinst_PROGRAMS += android/bluetoothd
- android_bluetoothd_SOURCES = android/main.c \
- 				src/log.c \
- 				android/hal-msg.h \
-+				android/audio-msg.h \
- 				android/utils.h \
- 				src/sdpd-database.c src/sdpd-server.c \
- 				src/sdpd-service.c src/sdpd-request.c \
-@@ -25,6 +26,7 @@ android_bluetoothd_SOURCES = android/main.c \
- 				android/bluetooth.h android/bluetooth.c \
- 				android/hidhost.h android/hidhost.c \
- 				android/ipc.h android/ipc.c \
-+				android/audio-ipc.h android/audio-ipc.c \
- 				android/avdtp.h android/avdtp.c \
- 				android/a2dp.h android/a2dp.c \
- 				android/socket.h android/socket.c \
 diff --git a/android/audio-ipc.c b/android/audio-ipc.c
-new file mode 100644
-index 0000000..b537f21
---- /dev/null
+index b537f21..0c5433a 100644
+--- a/android/audio-ipc.c
 +++ b/android/audio-ipc.c
-@@ -0,0 +1,104 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
+@@ -41,12 +41,14 @@
+ 
+ static GIOChannel *audio_io = NULL;
+ 
++static struct service_handler service;
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stddef.h>
-+#include <errno.h>
-+#include <stdint.h>
-+#include <string.h>
-+#include <signal.h>
-+#include <stdbool.h>
-+#include <unistd.h>
-+#include <glib.h>
-+
-+#include "ipc.h"
-+#include "log.h"
-+#include "audio-msg.h"
-+#include "audio-ipc.h"
-+
-+static GIOChannel *audio_io = NULL;
-+
-+static gboolean audio_watch_cb(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	char buf[BLUEZ_AUDIO_MTU];
-+	ssize_t ret;
-+	int fd;
-+
-+	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
-+		info("Audio IPC: command socket closed");
+ static gboolean audio_watch_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+ 	char buf[BLUEZ_AUDIO_MTU];
+ 	ssize_t ret;
+-	int fd;
++	int fd, err;
+ 
+ 	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
+ 		info("Audio IPC: command socket closed");
+@@ -61,6 +63,13 @@ static gboolean audio_watch_cb(GIOChannel *io, GIOCondition cond,
+ 		goto fail;
+ 	}
+ 
++	err = ipc_handle_msg(&service, AUDIO_SERVICE_ID, buf, ret);
++	if (err < 0) {
++		error("Audio IPC: failed to handle message (%s)",
++							strerror(-err));
 +		goto fail;
 +	}
 +
-+	fd = g_io_channel_unix_get_fd(io);
+ 	return TRUE;
+ 
+ fail:
+@@ -102,3 +111,15 @@ void audio_ipc_cleanup(void)
+ 		audio_io = NULL;
+ 	}
+ }
 +
-+	ret = read(fd, buf, sizeof(buf));
-+	if (ret < 0) {
-+		error("Audio IPC: command read failed (%s)", strerror(errno));
-+		goto fail;
-+	}
-+
-+	return TRUE;
-+
-+fail:
-+	audio_ipc_cleanup();
-+	return FALSE;
-+}
-+
-+static gboolean audio_connect_cb(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
++void audio_ipc_register(const struct ipc_handler *handlers, uint8_t size)
 +{
-+	DBG("");
-+
-+	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
-+		error("Audio IPC: socket connect failed");
-+		audio_ipc_cleanup();
-+		return FALSE;
-+	}
-+
-+	cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
-+
-+	g_io_add_watch(audio_io, cond, audio_watch_cb, NULL);
-+
-+	info("Audio IPC: successfully connected");
-+
-+	return FALSE;
++	service.handler = handlers;
++	service.size = size;
 +}
 +
-+void audio_ipc_init(void)
++void audio_ipc_unregister(void)
 +{
-+	audio_io = ipc_connect(BLUEZ_AUDIO_SK_PATH, sizeof(BLUEZ_AUDIO_SK_PATH),
-+							audio_connect_cb);
++	service.handler = NULL;
++	service.size = 0;
 +}
-+
-+void audio_ipc_cleanup(void)
-+{
-+	if (audio_io) {
-+		g_io_channel_shutdown(audio_io, TRUE, NULL);
-+		g_io_channel_unref(audio_io);
-+		audio_io = NULL;
-+	}
-+}
-diff --git a/profiles/health/hdp_manager.h b/android/audio-ipc.h
-similarity index 86%
-copy from profiles/health/hdp_manager.h
-copy to android/audio-ipc.h
-index 1cab4d0..769bfd6 100644
---- a/profiles/health/hdp_manager.h
+diff --git a/android/audio-ipc.h b/android/audio-ipc.h
+index 769bfd6..1dfa245 100644
+--- a/android/audio-ipc.h
 +++ b/android/audio-ipc.h
-@@ -2,7 +2,8 @@
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-  *
-- *  Copyright (C) 2010 GSyC/LibreSoft, Universidad Rey Juan Carlos.
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-  *
-  *  This program is free software; you can redistribute it and/or modify
-  *  it under the terms of the GNU General Public License as published by
-@@ -20,5 +21,5 @@
-  *
-  */
+@@ -23,3 +23,6 @@
  
--int hdp_manager_init(void);
--void hdp_manager_exit(void);
-+void audio_ipc_init(void);
-+void audio_ipc_cleanup(void);
-diff --git a/monitor/analyze.h b/android/audio-msg.h
-similarity index 83%
-copy from monitor/analyze.h
-copy to android/audio-msg.h
-index 7cdda51..d5b4099 100644
---- a/monitor/analyze.h
-+++ b/android/audio-msg.h
-@@ -2,8 +2,7 @@
-  *
-  *  BlueZ - Bluetooth protocol stack for Linux
-  *
-- *  Copyright (C) 2011-2012  Intel Corporation
-- *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-  *
-  *
-  *  This library is free software; you can redistribute it and/or
-@@ -22,4 +21,6 @@
-  *
-  */
- 
--void analyze_trace(const char *path);
-+#define BLUEZ_AUDIO_MTU 1024
+ void audio_ipc_init(void);
+ void audio_ipc_cleanup(void);
 +
-+static const char BLUEZ_AUDIO_SK_PATH[] = "\0bluez_audio_socket";
++void audio_ipc_register(const struct ipc_handler *handlers, uint8_t size);
++void audio_ipc_unregister(void);
+diff --git a/android/audio-msg.h b/android/audio-msg.h
+index d5b4099..1ec2520 100644
+--- a/android/audio-msg.h
++++ b/android/audio-msg.h
+@@ -24,3 +24,5 @@
+ #define BLUEZ_AUDIO_MTU 1024
+ 
+ static const char BLUEZ_AUDIO_SK_PATH[] = "\0bluez_audio_socket";
++
++#define AUDIO_SERVICE_ID		0
 diff --git a/android/ipc.c b/android/ipc.c
-index 9e8ccc3..8a91248 100644
+index 8a91248..1499962 100644
 --- a/android/ipc.c
 +++ b/android/ipc.c
-@@ -145,7 +145,7 @@ static gboolean notif_watch_cb(GIOChannel *io, GIOCondition cond,
- 	return FALSE;
+@@ -40,56 +40,45 @@
+ #include "ipc.h"
+ #include "log.h"
+ 
+-struct service_handler {
+-	const struct ipc_handler *handler;
+-	uint8_t size;
+-};
+-
+ static struct service_handler services[HAL_SERVICE_ID_MAX + 1];
+ 
+ static GIOChannel *cmd_io = NULL;
+ static GIOChannel *notif_io = NULL;
+ 
+-static void ipc_handle_msg(const void *buf, ssize_t len)
++int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
++						const void *buf, ssize_t len)
+ {
+ 	const struct hal_hdr *msg = buf;
+ 	const struct ipc_handler *handler;
+ 
+ 	if (len < (ssize_t) sizeof(*msg)) {
+-		error("IPC: message too small (%zd bytes), terminating", len);
+-		raise(SIGTERM);
+-		return;
++		DBG("message too small (%zd bytes)", len);
++		return -EBADMSG;
+ 	}
+ 
+ 	if (len != (ssize_t) (sizeof(*msg) + msg->len)) {
+-		error("IPC: message malformed (%zd bytes), terminating", len);
+-		raise(SIGTERM);
+-		return;
++		DBG("message malformed (%zd bytes)", len);
++		return -EBADMSG;
+ 	}
+ 
+ 	/* if service is valid */
+-	if (msg->service_id > HAL_SERVICE_ID_MAX) {
+-		error("IPC: unknown service (0x%x), terminating",
+-							msg->service_id);
+-		raise(SIGTERM);
+-		return;
++	if (msg->service_id > max_index) {
++		DBG("unknown service (0x%x)", msg->service_id);
++		return -EOPNOTSUPP;
+ 	}
+ 
+ 	/* if service is registered */
+-	if (!services[msg->service_id].handler) {
+-		error("IPC: unregistered service (0x%x), terminating",
+-							msg->service_id);
+-		raise(SIGTERM);
+-		return;
++	if (!handlers[msg->service_id].handler) {
++		DBG("service not registered (0x%x)", msg->service_id);
++		return -EOPNOTSUPP;
+ 	}
+ 
+ 	/* if opcode is valid */
+ 	if (msg->opcode == HAL_OP_STATUS ||
+-			msg->opcode > services[msg->service_id].size) {
+-		error("IPC: invalid opcode 0x%x for service 0x%x, terminating",
+-						msg->opcode, msg->service_id);
+-		raise(SIGTERM);
+-		return;
++			msg->opcode > handlers[msg->service_id].size) {
++		DBG("invalid opcode 0x%x for service 0x%x", msg->opcode,
++							msg->service_id);
++		return -EOPNOTSUPP;
+ 	}
+ 
+ 	/* opcode is table offset + 1 */
+@@ -98,13 +87,14 @@ static void ipc_handle_msg(const void *buf, ssize_t len)
+ 	/* if payload size is valid */
+ 	if ((handler->var_len && handler->data_len > msg->len) ||
+ 			(!handler->var_len && handler->data_len != msg->len)) {
+-		error("IPC: size invalid opcode 0x%x service 0x%x, terminating",
++		DBG("invalid size for opcode 0x%x service 0x%x",
+ 						msg->service_id, msg->opcode);
+-		raise(SIGTERM);
+-		return;
++		return -EMSGSIZE;
+ 	}
+ 
+ 	handler->handler(msg->payload, msg->len);
++
++	return 0;
  }
  
--static GIOChannel *connect_hal(GIOFunc connect_cb)
-+GIOChannel *ipc_connect(const char *path, size_t size, GIOFunc connect_cb)
+ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
+@@ -112,7 +102,7 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
  {
- 	struct sockaddr_un addr;
- 	GIOCondition cond;
-@@ -167,11 +167,11 @@ static GIOChannel *connect_hal(GIOFunc connect_cb)
- 	memset(&addr, 0, sizeof(addr));
- 	addr.sun_family = AF_UNIX;
+ 	char buf[BLUEZ_HAL_MTU];
+ 	ssize_t ret;
+-	int fd;
++	int fd, err;
  
--	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
-+	memcpy(addr.sun_path, path, size);
- 
- 	if (connect(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
--		error("IPC: failed to connect HAL socket: %d (%s)", errno,
--							strerror(errno));
-+		error("IPC: failed to connect HAL socket %s: %d (%s)", &path[1],
-+							errno, strerror(errno));
- 		g_io_channel_unref(io);
- 		return NULL;
- 	}
-@@ -218,7 +218,8 @@ static gboolean cmd_connect_cb(GIOChannel *io, GIOCondition cond,
- 		return FALSE;
+ 	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
+ 		info("IPC: command socket closed, terminating");
+@@ -128,7 +118,13 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
+ 		goto fail;
  	}
  
--	notif_io = connect_hal(notif_connect_cb);
-+	notif_io = ipc_connect(BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH),
-+							notif_connect_cb);
- 	if (!notif_io)
- 		raise(SIGTERM);
+-	ipc_handle_msg(buf, ret);
++	err = ipc_handle_msg(services, HAL_SERVICE_ID_MAX, buf, ret);
++	if (err < 0) {
++		error("IPC: failed to handle message, terminating (%s)",
++							strerror(-err));
++		goto fail;
++	}
++
+ 	return TRUE;
  
-@@ -227,7 +228,8 @@ static gboolean cmd_connect_cb(GIOChannel *io, GIOCondition cond,
- 
- void ipc_init(void)
- {
--	cmd_io = connect_hal(cmd_connect_cb);
-+	cmd_io = ipc_connect(BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH),
-+							cmd_connect_cb);
- 	if (!cmd_io)
- 		raise(SIGTERM);
- }
+ fail:
 diff --git a/android/ipc.h b/android/ipc.h
-index 6cd102b..02ad6bb 100644
+index 02ad6bb..7b8bdeb 100644
 --- a/android/ipc.h
 +++ b/android/ipc.h
-@@ -28,6 +28,7 @@ struct ipc_handler {
+@@ -26,9 +26,17 @@ struct ipc_handler {
+ 	bool var_len;
+ 	size_t data_len;
  };
++
++struct service_handler {
++	const struct ipc_handler *handler;
++	uint8_t size;
++};
++
  void ipc_init(void);
  void ipc_cleanup(void);
-+GIOChannel *ipc_connect(const char *path, size_t size, GIOFunc connect_cb);
+ GIOChannel *ipc_connect(const char *path, size_t size, GIOFunc connect_cb);
++int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
++						const void *buf, ssize_t len);
  
  void ipc_send_rsp(uint8_t service_id, uint8_t opcode, uint8_t status);
  void ipc_send_rsp_full(uint8_t service_id, uint8_t opcode, uint16_t len,
