@@ -1,100 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 5/5] emulator/bthost: Add method to create rfcomm server
-Date: Tue,  7 Jan 2014 11:59:14 +0100
-Message-Id: <1389092354-32544-5-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2 4/5] emulator/bthost: Add initial rfcomm handling
+Date: Tue,  7 Jan 2014 11:59:13 +0100
+Message-Id: <1389092354-32544-4-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1389092354-32544-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1389092354-32544-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It allows user to create rfcomm server on bthost.
+This is initial rfcomm handling in bthost.
 ---
- emulator/bthost.c | 32 ++++++++++++++++++++++++++++++++
- emulator/bthost.h |  6 ++++++
- 2 files changed, 38 insertions(+)
+ emulator/bthost.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 66 insertions(+), 1 deletion(-)
 
 diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 8638f13..676c0ae 100644
+index 83bfdee..8638f13 100644
 --- a/emulator/bthost.c
 +++ b/emulator/bthost.c
-@@ -99,6 +99,13 @@ struct l2cap_conn_cb_data {
- 	struct l2cap_conn_cb_data *next;
- };
+@@ -36,6 +36,7 @@
+ #include "bluetooth/bluetooth.h"
  
-+struct rfcomm_conn_cb_data {
-+	uint8_t channel;
-+	bthost_rfcomm_connect_cb func;
-+	void *user_data;
-+	struct rfcomm_conn_cb_data *next;
-+};
-+
- struct bthost {
- 	uint8_t bdaddr[6];
- 	bthost_send_func send_handler;
-@@ -111,6 +118,7 @@ struct bthost {
- 	bthost_new_conn_cb new_conn_cb;
- 	void *new_conn_data;
- 	struct l2cap_conn_cb_data *new_l2cap_conn_data;
-+	struct rfcomm_conn_cb_data *new_rfcomm_conn_data;
- 	struct l2cap_pending_req *l2reqs;
- };
+ #include "monitor/bt.h"
++#include "monitor/rfcomm.h"
+ #include "bthost.h"
  
-@@ -246,6 +254,13 @@ void bthost_destroy(struct bthost *bthost)
- 		free(cb);
- 	}
- 
-+	while (bthost->new_rfcomm_conn_data) {
-+		struct rfcomm_conn_cb_data *cb = bthost->new_rfcomm_conn_data;
-+
-+		bthost->new_rfcomm_conn_data = cb->next;
-+		free(cb);
-+	}
-+
- 	free(bthost);
+ /* ACL handle and flags pack/unpack */
+@@ -1173,6 +1174,64 @@ static struct cid_hook *find_cid_hook(struct btconn *conn, uint16_t cid)
+ 	return NULL;
  }
  
-@@ -1392,6 +1407,23 @@ void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
- 	bthost->new_l2cap_conn_data = data;
- }
- 
-+void bthost_add_rfcomm_server(struct bthost *bthost, uint8_t channel,
-+				bthost_rfcomm_connect_cb func, void *user_data)
++static void rfcomm_sabm_recv(struct bthost *bthost, struct btconn *conn,
++				struct l2conn *l2conn, const void *data,
++				uint16_t len)
 +{
-+	struct rfcomm_conn_cb_data *data;
-+
-+	data = malloc(sizeof(struct rfcomm_conn_cb_data));
-+	if (!data)
-+		return;
-+
-+	data->channel = channel;
-+	data->user_data = user_data;
-+	data->func = func;
-+	data->next = bthost->new_rfcomm_conn_data;
-+
-+	bthost->new_rfcomm_conn_data = data;
 +}
 +
- void bthost_start(struct bthost *bthost)
++static void rfcomm_disc_recv(struct bthost *bthost, struct btconn *conn,
++				struct l2conn *l2conn, const void *data,
++				uint16_t len)
++{
++}
++
++static void rfcomm_ua_recv(struct bthost *bthost, struct btconn *conn,
++				struct l2conn *l2conn, const void *data,
++				uint16_t len)
++{
++}
++
++static void rfcomm_dm_recv(struct bthost *bthost, struct btconn *conn,
++				struct l2conn *l2conn, const void *data,
++				uint16_t len)
++{
++}
++
++static void rfcomm_uih_recv(struct bthost *bthost, struct btconn *conn,
++				struct l2conn *l2conn, const void *data,
++				uint16_t len)
++{
++}
++
++static void process_rfcomm(struct bthost *bthost, struct btconn *conn,
++				struct l2conn *l2conn, const void *data,
++				uint16_t len)
++{
++	const struct rfcomm_hdr *hdr = data;
++
++	switch (RFCOMM_GET_TYPE(hdr->control)) {
++	case RFCOMM_SABM:
++		rfcomm_sabm_recv(bthost, conn, l2conn, data, len);
++		break;
++	case RFCOMM_DISC:
++		rfcomm_disc_recv(bthost, conn, l2conn, data, len);
++		break;
++	case RFCOMM_UA:
++		rfcomm_ua_recv(bthost, conn, l2conn, data, len);
++		break;
++	case RFCOMM_DM:
++		rfcomm_dm_recv(bthost, conn, l2conn, data, len);
++		break;
++	case RFCOMM_UIH:
++		rfcomm_uih_recv(bthost, conn, l2conn, data, len);
++		break;
++	default:
++		printf("Unknown frame type\n");
++		break;
++	}
++}
++
+ static void process_acl(struct bthost *bthost, const void *data, uint16_t len)
  {
- 	if (!bthost)
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index 97f011b..7186aa0 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -80,5 +80,11 @@ typedef void (*bthost_l2cap_connect_cb) (uint16_t handle, uint16_t cid,
- void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
- 				bthost_l2cap_connect_cb func, void *user_data);
+ 	const struct bt_hci_acl_hdr *acl_hdr = data;
+@@ -1180,6 +1239,7 @@ static void process_acl(struct bthost *bthost, const void *data, uint16_t len)
+ 	uint16_t handle, cid, acl_len, l2_len;
+ 	struct cid_hook *hook;
+ 	struct btconn *conn;
++	struct l2conn *l2conn;
+ 	const void *l2_data;
  
-+typedef void (*bthost_rfcomm_connect_cb) (uint16_t handle, uint16_t cid,
-+					uint8_t channel, void *user_data);
-+
-+void bthost_add_rfcomm_server(struct bthost *bthost, uint8_t channel,
-+			bthost_rfcomm_connect_cb func, void *user_data);
-+
- void bthost_start(struct bthost *bthost);
- void bthost_stop(struct bthost *bthost);
+ 	if (len < sizeof(*acl_hdr) + sizeof(*l2_hdr))
+@@ -1218,7 +1278,12 @@ static void process_acl(struct bthost *bthost, const void *data, uint16_t len)
+ 		l2cap_le_sig(bthost, conn, l2_data, l2_len);
+ 		break;
+ 	default:
+-		printf("Packet for unknown CID 0x%04x (%u)\n", cid, cid);
++		l2conn = btconn_find_l2cap_conn_by_scid(conn, cid);
++		if (l2conn->psm == 0x0003)
++			process_rfcomm(bthost, conn, l2conn, l2_data, l2_len);
++		else
++			printf("Packet for unknown CID 0x%04x (%u)\n", cid,
++									cid);
+ 		break;
+ 	}
+ }
 -- 
 1.8.3.1
 
