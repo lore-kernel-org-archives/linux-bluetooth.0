@@ -1,33 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v3 0/4] Add support for NAP role
-Date: Tue,  7 Jan 2014 14:31:16 +0200
-Message-Id: <1389097880-14783-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 7 Jan 2014 13:11:03 +0100 (CET)
+From: Jiri Kosina <jkosina@suse.cz>
+To: David Herrmann <dh.herrmann@gmail.com>
+cc: Marcel Holtmann <marcel@holtmann.org>,
+    "open list:HID CORE LAYER" <linux-input@vger.kernel.org>,
+    "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
+    "Gustavo F. Padovan" <gustavo@padovan.org>
+Subject: Re: [PATCH] Bluetooth: hidp: make sure input buffers are big
+ enough
+In-Reply-To: <CANq1E4TOHvb3--H6SoRhB09sUwuYkrvSAXCNN2Y0PaVSOEte=w@mail.gmail.com>
+Message-ID: <alpine.LNX.2.00.1401071308020.4962@pobox.suse.cz>
+References: <1387451372-6881-1-git-send-email-dh.herrmann@gmail.com> <3109C2D8-E01C-4728-A593-1978BB3D202D@holtmann.org> <CANq1E4TOHvb3--H6SoRhB09sUwuYkrvSAXCNN2Y0PaVSOEte=w@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-v3: Fixed Johan's comments (removed fopen, fprintf and used open and write).
+On Fri, 27 Dec 2013, David Herrmann wrote:
 
-v2: Fixed Johan's comments.
+> >> I also haven't figured out a nice way to make HID-core honor the 
+> >> "size" parameter. hid-input depends on getting the whole 
+> >> input-report.
+> >
+> > I think this needs clearly fixing.
+> 
+> And we have a volunteer, yippie! ;)
+> 
+> I think hid_input_report() in hid-core.c is the only place that relies
+> on this. Maybe it really is easier to fix it. But I am not even
+> slightly familiar with that code. So if no-one of the HID core
+> developers steps up to fix it, we should take the transport-driver
+> fixes instead. As nearly all transport-drivers are affected by this,
+> maybe we should even move this buffer into hid_device and provide
+> hid_input_truncated_report() which does this.
+> 
+> Anyhow, waiting for Jiri's comments on this.
 
-v1: This patch set add support for NAP role. It register NAP server and create
-  bnep bridge and listen for incoming connections from client devices.
-  On incoming connection request it accepts connection, creates bnep interface
-  and notifies control state and connection state infromation. Removes device
-  on disconnect request. Android related changes are required to enable this
-  role. Patches sent to respective ML.
+Hmm, this is really unfortunate situation.
 
-Ravi kumar Veeramally (4):
-  android/pan: Register Network Access Point
-  android/pan: Listen for incoming connections and accept in NAP role
-  android/pan: Implement PAN enable HAL api at daemon side
-  android/pan: Remove connected PAN devices on profile unregister call
+I am now looking into making hid_input_report() honor 'size' properly, but 
+no matter how it'll be done in the end, it'll absolutely not be a simple 
+'fix'. So definitely can be done for 3.15 or so, but not as a fix for 
+current kernels.
 
- android/pan.c | 346 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 334 insertions(+), 12 deletions(-)
+So doing kzalloc(rsize, GFP_ATOMIC) in the HID-core for now, and copying 
+the buffer around, seems like only viable solution for now, with the 
+outlook of removing this ugliness once hid-core honors 'size' properly.
+
+I will keep looking into this and maybe some easy way how to hack this 
+together will materialize, but I don't currently see it.
+
+Hmm ...
 
 -- 
-1.8.3.2
-
+Jiri Kosina
+SUSE Labs
