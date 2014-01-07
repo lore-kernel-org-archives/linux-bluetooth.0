@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 04/10] android/A2DP: Add initial code to handle audio IPC commands
-Date: Tue,  7 Jan 2014 13:53:17 +0200
-Message-Id: <1389095603-30504-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 07/10] android/A2DP: Add stream open command/response struct
+Date: Tue,  7 Jan 2014 13:53:20 +0200
+Message-Id: <1389095603-30504-7-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1389095603-30504-1-git-send-email-luiz.dentz@gmail.com>
 References: <1389095603-30504-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,70 +11,55 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds initial code to handle audio IPC commands.
+This adds the definitions to stream open command and response.
 ---
- android/a2dp.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ android/a2dp.c      |  9 +++++++++
+ android/audio-msg.h | 10 ++++++++++
+ 2 files changed, 19 insertions(+)
 
 diff --git a/android/a2dp.c b/android/a2dp.c
-index 581d094..c12d8f1 100644
+index 97e2778..09a65e1 100644
 --- a/android/a2dp.c
 +++ b/android/a2dp.c
-@@ -44,6 +44,8 @@
- #include "utils.h"
- #include "bluetooth.h"
- #include "avdtp.h"
-+#include "audio-msg.h"
-+#include "audio-ipc.h"
- 
- #define L2CAP_PSM_AVDTP 0x19
- #define SVC_HINT_CAPTURING 0x08
-@@ -352,6 +354,9 @@ static sdp_record_t *a2dp_record(void)
- 	return record;
+@@ -368,11 +368,20 @@ static void bt_audio_close(const void *buf, uint16_t len)
+ 	audio_ipc_send_rsp(AUDIO_OP_CLOSE, HAL_STATUS_FAILED);
  }
  
-+static const struct ipc_handler audio_handlers[] = {
-+};
++static void bt_stream_open(const void *buf, uint16_t len)
++{
++	DBG("Not Implemented");
 +
++	audio_ipc_send_rsp(AUDIO_OP_OPEN_STREAM, AUDIO_STATUS_FAILED);
++}
++
+ static const struct ipc_handler audio_handlers[] = {
+ 	/* AUDIO_OP_OPEN */
+ 	{ bt_audio_open, true, sizeof(struct audio_cmd_open) },
+ 	/* AUDIO_OP_CLOSE */
+ 	{ bt_audio_close, false, sizeof(struct audio_cmd_close) },
++	/* AUDIO_OP_OPEN_STREAM */
++	{ bt_stream_open, false, sizeof(struct audio_cmd_open_stream) },
+ };
+ 
  bool bt_a2dp_register(const bdaddr_t *addr)
- {
- 	GError *err = NULL;
-@@ -359,6 +364,8 @@ bool bt_a2dp_register(const bdaddr_t *addr)
- 
- 	DBG("");
- 
-+	audio_ipc_init();
+diff --git a/android/audio-msg.h b/android/audio-msg.h
+index 6ac1fff..0f0309a 100644
+--- a/android/audio-msg.h
++++ b/android/audio-msg.h
+@@ -57,3 +57,13 @@ struct audio_rsp_open {
+ struct audio_cmd_close {
+ 	uint8_t id;
+ } __attribute__((packed));
 +
- 	bacpy(&adapter_addr, addr);
- 
- 	server = bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
-@@ -388,6 +395,8 @@ bool bt_a2dp_register(const bdaddr_t *addr)
- 	ipc_register(HAL_SERVICE_ID_A2DP, cmd_handlers,
- 						G_N_ELEMENTS(cmd_handlers));
- 
-+	audio_ipc_register(audio_handlers, G_N_ELEMENTS(audio_handlers));
++#define AUDIO_OP_OPEN_STREAM		0x03
++struct audio_cmd_open_stream {
++	uint8_t id;
++} __attribute__((packed));
 +
- 	return true;
- 
- fail:
-@@ -411,8 +420,9 @@ void bt_a2dp_unregister(void)
- 	g_slist_foreach(devices, a2dp_device_disconnected, NULL);
- 	devices = NULL;
- 
--
- 	ipc_unregister(HAL_SERVICE_ID_A2DP);
-+	audio_ipc_unregister();
-+
- 	bt_adapter_remove_record(record_id);
- 	record_id = 0;
- 
-@@ -421,4 +431,6 @@ void bt_a2dp_unregister(void)
- 		g_io_channel_unref(server);
- 		server = NULL;
- 	}
-+
-+	audio_ipc_cleanup();
- }
++struct audio_rsp_open_stream {
++	uint8_t len;
++	uint8_t data[0];
++} __attribute__((packed));
 -- 
 1.8.4.2
 
