@@ -1,23 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 7 Jan 2014 20:27:17 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 1/5] tools/rfcomm-tester: Initial version of
- rfcomm-tester
-Message-ID: <20140107182717.GA18725@x220.p-661hnu-f1>
-References: <1389092354-32544-1-git-send-email-marcin.kraglak@tieto.com>
+Date: Tue, 7 Jan 2014 18:13:24 +0100 (CET)
+From: Jiri Kosina <jkosina@suse.cz>
+To: David Herrmann <dh.herrmann@gmail.com>
+cc: Marcel Holtmann <marcel@holtmann.org>,
+    "open list:HID CORE LAYER" <linux-input@vger.kernel.org>,
+    "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
+    "Gustavo F. Padovan" <gustavo@padovan.org>
+Subject: Re: [PATCH] Bluetooth: hidp: make sure input buffers are big
+ enough
+In-Reply-To: <CANq1E4SxrDnbOCsohZXYoYL-HQjEc-xcOnXfAm=npHG2QfMS9A@mail.gmail.com>
+Message-ID: <alpine.LNX.2.00.1401071811530.4962@pobox.suse.cz>
+References: <1387451372-6881-1-git-send-email-dh.herrmann@gmail.com> <3109C2D8-E01C-4728-A593-1978BB3D202D@holtmann.org> <CANq1E4TOHvb3--H6SoRhB09sUwuYkrvSAXCNN2Y0PaVSOEte=w@mail.gmail.com> <alpine.LNX.2.00.1401071308020.4962@pobox.suse.cz>
+ <CANq1E4SxrDnbOCsohZXYoYL-HQjEc-xcOnXfAm=npHG2QfMS9A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1389092354-32544-1-git-send-email-marcin.kraglak@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+On Tue, 7 Jan 2014, David Herrmann wrote:
 
-On Tue, Jan 07, 2014, Marcin Kraglak wrote:
-> + *  Copyright (C) 2013  Intel Corporation. All rights reserved.
+> > So doing kzalloc(rsize, GFP_ATOMIC) in the HID-core for now, and copying
+> > the buffer around, seems like only viable solution for now, with the
+> > outlook of removing this ugliness once hid-core honors 'size' properly.
+> 
+> Should I resend the patches and move it to hid_input_report() for now?
+> Or are you getting something in yourself?
 
-I suppose this should be 2014 and not 2013?
+Due to various reasons I will not have access to any testing HW for the 
+upcoming 2-3 days, so if you can cook something up in that timeframe, it'd 
+be appreciated.
 
-Johan
+Otherwise I'll be working on it by the end of this week.
+
+> Given the amount of reports on the list and bugzilla, I think we should 
+> get this fix in asap. We can always fix it properly in -next.
+
+Agreed.
+
+Thanks,
+
+-- 
+Jiri Kosina
+SUSE Labs
