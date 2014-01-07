@@ -1,108 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH] android-tester: Add HIDHost initial interface setup test
-Date: Tue,  7 Jan 2014 16:18:11 +0200
-Message-Id: <1389104291-27210-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <johan.hedberg@gmail.com>, <szymon.janc@tieto.com>,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 3/3] android: Send remote devices properties on enable
+Date: Tue, 7 Jan 2014 15:13:50 +0100
+Message-ID: <1389104030-21314-3-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1389104030-21314-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1389104030-21314-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/android-tester.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+If there is any bonded device stored then on bluetooth enable we
+should send notification with its properties.
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index 9a161ad..e4837c6 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -39,6 +39,7 @@
- #include <hardware/hardware.h>
- #include <hardware/bluetooth.h>
- #include <hardware/bt_sock.h>
-+#include <hardware/bt_hh.h>
- 
- #include "utils.h"
- 
-@@ -79,6 +80,7 @@ struct test_data {
- 	struct hw_device_t *device;
- 	const bt_interface_t *if_bluetooth;
- 	const btsock_interface_t *if_sock;
-+	const bthh_interface_t *if_hid;
- 
- 	bool mgmt_settings_set;
- 	bool cb_count_checked;
-@@ -958,6 +960,16 @@ static bt_callbacks_t bt_callbacks = {
- 	.le_test_mode_cb = NULL
- };
- 
-+static bthh_callbacks_t bthh_callbacks = {
-+	.size = sizeof(bthh_callbacks),
-+	.connection_state_cb = NULL,
-+	.hid_info_cb = NULL,
-+	.protocol_mode_cb = NULL,
-+	.idle_time_cb = NULL,
-+	.get_report_cb = NULL,
-+	.virtual_unplug_cb = NULL
-+};
-+
- static void setup(struct test_data *data)
- {
- 	const hw_module_t *module;
-@@ -1069,6 +1081,11 @@ static void teardown(const void *test_data)
- 		data->if_bluetooth = NULL;
- 	}
- 
-+	if (data->if_hid) {
-+		data->if_hid->cleanup();
-+		data->if_hid = NULL;
-+	}
-+
- 	data->device->close(data->device);
- 
- 	if (data->bluetoothd_pid)
-@@ -1860,6 +1877,32 @@ clean:
- 		close(sock_fd);
+---
+ android/bluetooth.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index e0673bb..9da988b 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -2636,6 +2636,18 @@ static void get_remote_device_props(struct device *dev)
+ 	get_device_timestamp(dev);
  }
  
-+static void setup_hidhost_interface(const void *test_data)
++static void send_bonded_devices_props(void)
 +{
-+	struct test_data *data = tester_get_data();
-+	bt_status_t status;
-+	const void *hid;
++	GSList *l;
 +
-+	setup(data);
++	for (l = devices; l; l = g_slist_next(l)) {
++		struct device *dev = l->data;
 +
-+	status = data->if_hid->init(&bthh_callbacks);
-+	if (status != BT_STATUS_SUCCESS) {
-+		data->if_hid = NULL;
-+		tester_setup_failed();
-+		return;
++		if (dev->bond_state == HAL_BOND_STATE_BONDED)
++			get_remote_device_props(dev);
 +	}
-+
-+	hid = data->if_bluetooth->get_profile_interface(BT_PROFILE_HIDHOST_ID);
-+	if (!hid) {
-+		tester_setup_failed();
-+		return;
-+	}
-+
-+	data->if_hid = hid;
-+
-+	tester_setup_complete();
 +}
 +
- #define test_bredrle(name, data, test_setup, test, test_teardown) \
- 	do { \
- 		struct test_data *user; \
-@@ -2071,5 +2114,8 @@ int main(int argc, char *argv[])
- 			setup_socket_interface_enabled,
- 			test_socket_real_connect, teardown);
+ static void handle_enable_cmd(const void *buf, uint16_t len)
+ {
+ 	uint8_t status;
+@@ -2644,6 +2656,9 @@ static void handle_enable_cmd(const void *buf, uint16_t len)
+ 	 * enabling adapter */
+ 	get_adapter_properties();
  
-+	test_bredrle("HIDHost Init", NULL, setup_hidhost_interface,
-+						test_dummy, teardown);
++	/* Sent also properties of bonded devices */
++	send_bonded_devices_props();
 +
- 	return tester_run();
- }
+ 	if (adapter.current_settings & MGMT_SETTING_POWERED) {
+ 		status = HAL_STATUS_DONE;
+ 		goto failed;
 -- 
-1.8.3.2
+1.8.4
 
