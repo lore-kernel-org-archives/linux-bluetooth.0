@@ -1,33 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 7 Jan 2014 11:33:47 -0200
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: Fix 6loWPAN peer lookup
-Message-ID: <20140107133347.GA10662@joana>
-References: <1389096468-2917-1-git-send-email-claudio.takahasi@openbossa.org>
- <1389096468-2917-2-git-send-email-claudio.takahasi@openbossa.org>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <johan.hedberg@gmail.com>, <szymon.janc@tieto.com>,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 2/2] android: Send remote devices properties on enable
+Date: Tue, 7 Jan 2014 13:43:12 +0100
+Message-ID: <1389098592-14403-2-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1389098592-14403-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1389098592-14403-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1389096468-2917-2-git-send-email-claudio.takahasi@openbossa.org>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+If there is any bonded device stored then on bluetooth enable we
+should send notification with its properties.
 
-2014-01-07 Claudio Takahasi <claudio.takahasi@openbossa.org>:
+---
+ android/bluetooth.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-> This patch fixes peer address lookup for 6loWPAN over Bluetooth Low
-> Energy links.
-> 
-> ADDR_LE_DEV_PUBLIC, and ADDR_LE_DEV_RANDOM are the values allowed for
-> "dst_type" field in the hci_conn struct for LE links.
-> 
-> Signed-off-by: Claudio Takahasi <claudio.takahasi@openbossa.org>
-> ---
->  net/bluetooth/6lowpan.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index e0673bb..9da988b 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -2636,6 +2636,18 @@ static void get_remote_device_props(struct device *dev)
+ 	get_device_timestamp(dev);
+ }
+ 
++static void send_bonded_devices_props(void)
++{
++	GSList *l;
++
++	for (l = devices; l; l = g_slist_next(l)) {
++		struct device *dev = l->data;
++
++		if (dev->bond_state == HAL_BOND_STATE_BONDED)
++			get_remote_device_props(dev);
++	}
++}
++
+ static void handle_enable_cmd(const void *buf, uint16_t len)
+ {
+ 	uint8_t status;
+@@ -2644,6 +2656,9 @@ static void handle_enable_cmd(const void *buf, uint16_t len)
+ 	 * enabling adapter */
+ 	get_adapter_properties();
+ 
++	/* Sent also properties of bonded devices */
++	send_bonded_devices_props();
++
+ 	if (adapter.current_settings & MGMT_SETTING_POWERED) {
+ 		status = HAL_STATUS_DONE;
+ 		goto failed;
+-- 
+1.8.4
 
-Both patches have been applied to bluetooth-next. Thanks.
-
-	Gustavo
