@@ -1,56 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 7 Jan 2014 13:11:03 +0100 (CET)
-From: Jiri Kosina <jkosina@suse.cz>
-To: David Herrmann <dh.herrmann@gmail.com>
-cc: Marcel Holtmann <marcel@holtmann.org>,
-    "open list:HID CORE LAYER" <linux-input@vger.kernel.org>,
-    "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
-    "Gustavo F. Padovan" <gustavo@padovan.org>
-Subject: Re: [PATCH] Bluetooth: hidp: make sure input buffers are big
- enough
-In-Reply-To: <CANq1E4TOHvb3--H6SoRhB09sUwuYkrvSAXCNN2Y0PaVSOEte=w@mail.gmail.com>
-Message-ID: <alpine.LNX.2.00.1401071308020.4962@pobox.suse.cz>
-References: <1387451372-6881-1-git-send-email-dh.herrmann@gmail.com> <3109C2D8-E01C-4728-A593-1978BB3D202D@holtmann.org> <CANq1E4TOHvb3--H6SoRhB09sUwuYkrvSAXCNN2Y0PaVSOEte=w@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH 2/2] Bluetooth: Fix 6loWPAN peer lookup
+Date: Tue,  7 Jan 2014 09:07:48 -0300
+Message-Id: <1389096468-2917-2-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1389096468-2917-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1389096468-2917-1-git-send-email-claudio.takahasi@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 27 Dec 2013, David Herrmann wrote:
+This patch fixes peer address lookup for 6loWPAN over Bluetooth Low
+Energy links.
 
-> >> I also haven't figured out a nice way to make HID-core honor the 
-> >> "size" parameter. hid-input depends on getting the whole 
-> >> input-report.
-> >
-> > I think this needs clearly fixing.
-> 
-> And we have a volunteer, yippie! ;)
-> 
-> I think hid_input_report() in hid-core.c is the only place that relies
-> on this. Maybe it really is easier to fix it. But I am not even
-> slightly familiar with that code. So if no-one of the HID core
-> developers steps up to fix it, we should take the transport-driver
-> fixes instead. As nearly all transport-drivers are affected by this,
-> maybe we should even move this buffer into hid_device and provide
-> hid_input_truncated_report() which does this.
-> 
-> Anyhow, waiting for Jiri's comments on this.
+ADDR_LE_DEV_PUBLIC, and ADDR_LE_DEV_RANDOM are the values allowed for
+"dst_type" field in the hci_conn struct for LE links.
 
-Hmm, this is really unfortunate situation.
+Signed-off-by: Claudio Takahasi <claudio.takahasi@openbossa.org>
+---
+ net/bluetooth/6lowpan.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-I am now looking into making hid_input_report() honor 'size' properly, but 
-no matter how it'll be done in the end, it'll absolutely not be a simple 
-'fix'. So definitely can be done for 3.15 or so, but not as a fix for 
-current kernels.
-
-So doing kzalloc(rsize, GFP_ATOMIC) in the HID-core for now, and copying 
-the buffer around, seems like only viable solution for now, with the 
-outlook of removing this ugliness once hid-core honors 'size' properly.
-
-I will keep looking into this and maybe some easy way how to hack this 
-together will materialize, but I don't currently see it.
-
-Hmm ...
-
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index ab4e771..adb3ea0 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -439,9 +439,9 @@ static void get_dest_bdaddr(struct in6_addr *ip6_daddr,
+ 	/* Set universal/local bit to 0 */
+ 	if (addr->b[5] & 1) {
+ 		addr->b[5] &= ~1;
+-		*addr_type = BDADDR_LE_PUBLIC;
++		*addr_type = ADDR_LE_DEV_PUBLIC;
+ 	} else {
+-		*addr_type = BDADDR_LE_RANDOM;
++		*addr_type = ADDR_LE_DEV_RANDOM;
+ 	}
+ }
+ 
 -- 
-Jiri Kosina
-SUSE Labs
+1.8.3.1
+
