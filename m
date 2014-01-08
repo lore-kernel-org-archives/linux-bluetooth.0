@@ -1,67 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 9 Jan 2014 10:36:50 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Szymon Janc <szymon.janc@gmail.com>
-Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android: Fix bluetoothd installation path
-Message-ID: <20140109083513.GA9810@aemeltch-MOBL1>
-References: <1389199321-26623-1-git-send-email-andrzej.kaczmarek@tieto.com>
- <1482934.Q0UzPI5uvD@athlon>
+From: Pali =?utf-8?q?Roh=C3=A1r?= <pali.rohar@gmail.com>
+To: Sebastian Reichel <sre@ring0.de>
+Subject: Re: [PATCH v2] Bluetooth: Add hci_h4p driver
+Date: Wed, 8 Jan 2014 22:36:24 +0100
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ =?utf-8?q?=D0=98=D0=B2=D0=B0=D0=B9=D0=BB=D0=BE?=
+ =?utf-8?q?_=D0=94=D0=B8=D0=BC=D0=B8=D1=82=D1=80=D0=BE=D0=B2?= <freemangordon@abv.bg>,
+ "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Pavel Machek <pavel@ucw.cz>,
+ "linux-kernel" <linux-kernel@vger.kernel.org>,
+ "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
+References: <1379703710-5757-1-git-send-email-pali.rohar@gmail.com> <201312301531.29768@pali> <20131230145250.GA16904@earth.universe>
+In-Reply-To: <20131230145250.GA16904@earth.universe>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1482934.Q0UzPI5uvD@athlon>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: Text/Plain;
+  charset="utf-8"
+Message-Id: <201401082236.25135@pali>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+On Monday 30 December 2013 15:52:51 Sebastian Reichel wrote:
+> > > > +MODULE_DESCRIPTION("Bluetooth h4 driver with nokia
+> > > > extensions"); +MODULE_LICENSE("GPL");
+> > > > +MODULE_AUTHOR("Ville Tervo");
+> > > > +MODULE_FIRMWARE(FW_NAME_TI1271_PRELE);
+> > > > +MODULE_FIRMWARE(FW_NAME_TI1271_LE);
+> > > > +MODULE_FIRMWARE(FW_NAME_TI1271);
+> > > > +MODULE_FIRMWARE(FW_NAME_BCM2048);
+> > > > +MODULE_FIRMWARE(FW_NAME_CSR);
+> > >=20
+> > > Do we actually have all these firmware files still
+> > > available. If not, then focus on the ones we have.
+> >=20
+> > Firmware files are available for download from nemo project:
+> >=20
+> > https://api.merproject.org/public/source/nemo:devel:hw:ti:om
+> > ap3:n900/bcm-bt-firmware/bcm-bt-firmware-0.21rc3.tar.bz2
+> > https://api.merproject.org/public/source/nemo:devel:hw:ti:o
+> > map3:n950-n9/ti-wl1273-bt-firmware/bt-firmware-ti1273_0.23+0
+> > m6.tar.gz
+>=20
+> Would be nice to have them added to the linux-firmware.git.
+>=20
+> -- Sebastian
 
-On Wed, Jan 08, 2014 at 05:57:22PM +0100, Szymon Janc wrote:
-> Hi Andrzej,
-> 
-> On Wednesday 08 January 2014 17:42:01 Andrzej Kaczmarek wrote:
-> > This patch removes explicit LOCAL_MODULE_PATH definition for bluetoothd
-> > and bluetoothd-snoop modules which caused both binaries to be installed
-> > in /system/xbin instead of /system/bin folder.
-> > ---
-> >  android/Android.mk | 2 --
-> >  1 file changed, 2 deletions(-)
-> > 
-> > diff --git a/android/Android.mk b/android/Android.mk
-> > index 16339b1..8eb918e 100644
-> > --- a/android/Android.mk
-> > +++ b/android/Android.mk
-> > @@ -75,7 +75,6 @@ $(shell mkdir -p $(LOCAL_PATH)/../lib/bluetooth)
-> > 
-> >  $(foreach file,$(lib_headers), $(shell ln -sf ../$(file)
-> > $(LOCAL_PATH)/../lib/bluetooth/$(file)))
-> > 
-> > -LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
+Can somebody send firmware files for inclusion to linux-firmware?
 
-I would better change this to:
-
-LOCAL_MODULE_PATH := $(TARGET_OUT_EXECUTABLES)
-
-Best regards 
-Andrei Emeltchenko 
-
-> >  LOCAL_MODULE_TAGS := optional
-> >  LOCAL_MODULE := bluetoothd
-> > 
-> > @@ -264,7 +263,6 @@ LOCAL_C_INCLUDES := \
-> > 
-> >  LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
-> > 
-> > -LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
-> >  LOCAL_MODULE_TAGS := optional
-> >  LOCAL_MODULE := bluetoothd-snoop
-> 
-> Applied, thanks.
-> 
-> -- 
-> Szymon K. Janc
-> szymon.janc@gmail.com
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+=2D-=20
+Pali Roh=C3=A1r
+pali.rohar@gmail.com
