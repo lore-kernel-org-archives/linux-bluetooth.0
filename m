@@ -1,181 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Sebastian Chlad <sebastianx.chlad@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v4 1/4] android/pan: Register Network Access Point
-Date: Wed,  8 Jan 2014 13:46:30 +0200
-Message-Id: <1389181593-9683-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1389181593-9683-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1389181593-9683-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Cc: Sebastian Chlad <sebastianx.chlad@intel.com>
+Subject: [PATCH] android/pics: Update PICS to PTS 5.0
+Date: Wed,  8 Jan 2014 13:36:58 +0200
+Message-Id: <1389181018-30211-1-git-send-email-sebastianx.chlad@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Register NAP server and adds bnep bridge. Removes bridge
-on destroy call. Bridge mechanism is needed when device acting
-as a server and listen for incoming connections.
+Update PICS settings for HID, L2CAP, OPP, PAN and PBAP
 ---
- android/pan.c | 111 +++++++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 107 insertions(+), 4 deletions(-)
+ android/pics-hid.txt   | 2 ++
+ android/pics-l2cap.txt | 2 ++
+ android/pics-opp.txt   | 2 ++
+ android/pics-pan.txt   | 2 ++
+ android/pics-pbap.txt  | 5 +++--
+ 5 files changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/android/pan.c b/android/pan.c
-index 38e353d..9de2b40 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -28,6 +28,11 @@
- #include <unistd.h>
- #include <fcntl.h>
- #include <glib.h>
-+#include <sys/ioctl.h>
-+#include <sys/socket.h>
-+#include <sys/wait.h>
-+#include <net/if.h>
-+#include <linux/sockios.h>
+diff --git a/android/pics-hid.txt b/android/pics-hid.txt
+index b0b7d52..ac37e45 100644
+--- a/android/pics-hid.txt
++++ b/android/pics-hid.txt
+@@ -1,5 +1,7 @@
+ HID PICS for the PTS tool.
  
- #include "btio/btio.h"
- #include "lib/bluetooth.h"
-@@ -45,11 +50,11 @@
- #include "bluetooth.h"
++PTS version: 5.0
++
+ * - different than PTS defaults
+ # - not yet implemented/supported
  
- #define SVC_HINT_NETWORKING 0x02
-+#define BNEP_BRIDGE	"bnep"
+diff --git a/android/pics-l2cap.txt b/android/pics-l2cap.txt
+index ef25133..7b49627 100644
+--- a/android/pics-l2cap.txt
++++ b/android/pics-l2cap.txt
+@@ -1,5 +1,7 @@
+ L2CAP PICS for the PTS tool.
  
- static bdaddr_t adapter_addr;
- GSList *devices = NULL;
- uint8_t local_role = HAL_PAN_ROLE_NONE;
--static uint32_t record_id = 0;
++PTS version: 5.0
++
+ * - different than PTS defaults
+ # - not yet implemented/supported
  
- struct pan_device {
- 	char		iface[16];
-@@ -60,6 +65,12 @@ struct pan_device {
- 	struct bnep	*session;
- };
+diff --git a/android/pics-opp.txt b/android/pics-opp.txt
+index c0f2ad6..cd4acce 100644
+--- a/android/pics-opp.txt
++++ b/android/pics-opp.txt
+@@ -1,5 +1,7 @@
+ OPP PICS for the PTS tool.
  
-+static struct {
-+	uint32_t	record_id;
-+} nap_dev = {
-+	.record_id = 0,
-+};
++PTS version: 5.0
 +
- static int device_cmp(gconstpointer s, gconstpointer user_data)
- {
- 	const struct pan_device *dev = s;
-@@ -297,6 +308,89 @@ failed:
- 	ipc_send_rsp(HAL_SERVICE_ID_PAN, HAL_OP_PAN_DISCONNECT, status);
- }
+ * - different than PTS defaults
+ # - not yet implemented/supported
  
-+static int set_forward_delay(void)
-+{
-+	int fd, ret;
-+	char path[41];
-+
-+	sprintf(path, "/sys/class/net/%s/bridge/forward_delay", BNEP_BRIDGE);
-+
-+	fd = open(path, O_RDWR);
-+	if (fd < 0)
-+		return -errno;
-+
-+	ret = write(fd, "0", sizeof("0"));
-+	close(fd);
-+
-+	return ret;
-+}
-+
-+static int nap_create_bridge(void)
-+{
-+	int sk, err;
-+
-+	DBG("%s", BNEP_BRIDGE);
-+
-+	sk = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
-+	if (sk < 0)
-+		return -EOPNOTSUPP;
-+
-+	if (ioctl(sk, SIOCBRADDBR, BNEP_BRIDGE) < 0) {
-+		err = -errno;
-+		if (err != -EEXIST) {
-+			close(sk);
-+			return -EOPNOTSUPP;
-+		}
-+	}
-+
-+	err = set_forward_delay();
-+	if (err < 0)
-+		ioctl(sk, SIOCBRDELBR, BNEP_BRIDGE);
-+
-+	close(sk);
-+
-+	return err;
-+}
-+
-+static int nap_remove_bridge(void)
-+{
-+	int sk, err;
-+
-+	DBG("%s", BNEP_BRIDGE);
-+
-+	sk = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
-+	if (sk < 0)
-+		return -EOPNOTSUPP;
-+
-+	err = ioctl(sk, SIOCBRDELBR, BNEP_BRIDGE);
-+	close(sk);
-+
-+	if (err < 0)
-+		return -EOPNOTSUPP;
-+
-+	return 0;
-+}
-+
-+static void destroy_nap_device(void)
-+{
-+	DBG("");
-+
-+	nap_remove_bridge();
-+}
-+
-+static int register_nap_server(void)
-+{
-+	int err;
-+
-+	DBG("");
-+
-+	err = nap_create_bridge();
-+	if (err < 0)
-+		return err;
-+
-+	return 0;
-+}
-+
- static void bt_pan_enable(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_pan_enable *cmd = buf;
-@@ -441,7 +535,15 @@ bool bt_pan_register(const bdaddr_t *addr)
- 		return false;
- 	}
+diff --git a/android/pics-pan.txt b/android/pics-pan.txt
+index 7576d2d..16457bf 100644
+--- a/android/pics-pan.txt
++++ b/android/pics-pan.txt
+@@ -1,5 +1,7 @@
+ PAN PICS for the PTS tool.
  
--	record_id = rec->handle;
-+	err = register_nap_server();
-+	if (err < 0) {
-+		bt_adapter_remove_record(rec->handle);
-+		sdp_record_free(rec);
-+		bnep_cleanup();
-+		return false;
-+	}
++PTS version: 5.0
 +
-+	nap_dev.record_id = rec->handle;
- 	ipc_register(HAL_SERVICE_ID_PAN, cmd_handlers,
- 						G_N_ELEMENTS(cmd_handlers));
+ * - different than PTS defaults
+ # - not yet implemented/supported
  
-@@ -455,6 +557,7 @@ void bt_pan_unregister(void)
- 	bnep_cleanup();
+diff --git a/android/pics-pbap.txt b/android/pics-pbap.txt
+index 7b2d7d2..b6b6d8b 100644
+--- a/android/pics-pbap.txt
++++ b/android/pics-pbap.txt
+@@ -1,5 +1,7 @@
+ PBAP PICS for the PTS tool.
  
- 	ipc_unregister(HAL_SERVICE_ID_PAN);
--	bt_adapter_remove_record(record_id);
--	record_id = 0;
-+	bt_adapter_remove_record(nap_dev.record_id);
-+	nap_dev.record_id = 0;
-+	destroy_nap_device();
- }
++PTS version: 5.0
++
+ * - different than PTS defaults
+ # - not yet implemented/supported
+ 
+@@ -12,8 +14,7 @@ Parameter Name	Selected	Description
+ -------------------------------------------------------------------------------
+ TSPC_PBAP_0_1	False		Role: PBAP 1.0 (C.1)
+ TSPC_PBAP_0_2	True (*)	Role: PBAP 1.1 (C.1)
+-TSPC_PBAP_0_3	False		Role: Reserve
+-TSPC_PBAP_0_4	False (*)	Role: PBAP 1.2 (C.1)
++TSPC_PBAP_0_3	False (*)	Role: PBAP 1.2 (C.1)
+ -------------------------------------------------------------------------------
+ C.1: Mandatory to support one and only one major profile version.
+ -------------------------------------------------------------------------------
 -- 
 1.8.3.2
+
+---------------------------------------------------------------------
+Intel Finland Oy
+Registered Address: PL 281, 00181 Helsinki 
+Business Identity Code: 0357606 - 4 
+Domiciled in Helsinki 
+
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
 
