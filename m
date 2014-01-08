@@ -3,67 +3,33 @@ From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>,
 	Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 5/7] client: Add untrust command
-Date: Wed,  8 Jan 2014 01:02:26 +0100
-Message-Id: <1389139348-3552-6-git-send-email-szymon.janc@gmail.com>
+Subject: [PATCH 3/7] input: Fix check if device is sixaxis in auth_callback
+Date: Wed,  8 Jan 2014 01:02:24 +0100
+Message-Id: <1389139348-3552-4-git-send-email-szymon.janc@gmail.com>
 In-Reply-To: <1389139348-3552-1-git-send-email-szymon.janc@gmail.com>
 References: <1389139348-3552-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+We need to accept connection if idev is not present but device is sixaxis.
+This fix not doing so for sixaxis devices.
 ---
- client/main.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ profiles/input/server.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/client/main.c b/client/main.c
-index ebc85c6..a6e7906 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -851,6 +851,35 @@ static void cmd_trust(const char *arg)
- 	g_free(str);
- }
+diff --git a/profiles/input/server.c b/profiles/input/server.c
+index f2e5836..d85d6a9 100644
+--- a/profiles/input/server.c
++++ b/profiles/input/server.c
+@@ -204,7 +204,7 @@ static void auth_callback(DBusError *derr, void *user_data)
+ 		goto reject;
+ 	}
  
-+static void cmd_untrust(const char *arg)
-+{
-+	GDBusProxy *proxy;
-+	dbus_bool_t trusted;
-+	char *str;
-+
-+	if (!arg || !strlen(arg)) {
-+		rl_printf("Missing device address argument\n");
-+		return;
-+	}
-+
-+	proxy = find_proxy_by_address(dev_list, arg);
-+	if (!proxy) {
-+		rl_printf("Device %s not available\n", arg);
-+		return;
-+	}
-+
-+	trusted = FALSE;
-+
-+	str = g_strdup_printf("%s untrust", arg);
-+
-+	if (g_dbus_proxy_set_property_basic(proxy, "Trusted",
-+					DBUS_TYPE_BOOLEAN, &trusted,
-+					generic_callback, str, g_free) == TRUE)
-+		return;
-+
-+	g_free(str);
-+}
-+
- static void remove_device_reply(DBusMessage *message, void *user_data)
- {
- 	DBusError error;
-@@ -1088,6 +1117,8 @@ static const struct {
- 							dev_generator },
- 	{ "trust",        "<dev>",    cmd_trust, "Trust device",
- 							dev_generator },
-+	{ "untrust",      "<dev>",    cmd_untrust, "Untrust device",
-+							dev_generator },
- 	{ "remove",       "<dev>",    cmd_remove, "Remove device",
- 							dev_generator },
- 	{ "connect",      "<dev>",    cmd_connect, "Connect device",
+-	if (!input_device_exists(&src, &dst) && dev_is_sixaxis(&src, &dst))
++	if (!input_device_exists(&src, &dst) && !dev_is_sixaxis(&src, &dst))
+ 		return;
+ 
+ 	if (!bt_io_accept(server->confirm, connect_event_cb, server,
 -- 
 1.8.5.2
 
