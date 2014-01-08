@@ -1,115 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2] android-tester: Add HIDHost initial interface setup test
-Date: Wed,  8 Jan 2014 13:02:37 +0200
-Message-Id: <1389178957-8730-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: Re: [PATCH] android: Cleanup Android.mk
+Date: Wed, 08 Jan 2014 11:19:37 +0100
+Message-ID: <2163469.9FUdZW0SDW@uw000953>
+In-Reply-To: <1389108453-19758-1-git-send-email-szymon.janc@tieto.com>
+References: <1389108453-19758-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/android-tester.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+On Tuesday 07 of January 2014 16:27:33 Szymon Janc wrote:
+> Remove not needed headers file in source list (Android build handles
+> this), explicitly mark packages as optional and fix bluetooth.default
+> dependencies (it should not depend on haltest as it is optional debug
+> package and should not be installed in user build).
+> ---
+>  android/Android.mk | 30 +++++++-----------------------
+>  1 file changed, 7 insertions(+), 23 deletions(-)
+> 
+> diff --git a/android/Android.mk b/android/Android.mk
+> index 27631cc..16339b1 100644
+> --- a/android/Android.mk
+> +++ b/android/Android.mk
+> @@ -25,8 +25,8 @@ LOCAL_SRC_FILES := \
+>  	bluetooth.c \
+>  	hidhost.c \
+>  	socket.c \
+> -	ipc.c ipc.h \
+> -	audio-ipc.c audio-ipc.h \
+> +	ipc.c \
+> +	audio-ipc.c \
+>  	avdtp.c \
+>  	a2dp.c \
+>  	pan.c \
+> @@ -75,6 +75,8 @@ $(shell mkdir -p $(LOCAL_PATH)/../lib/bluetooth)
+>  
+>  $(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(LOCAL_PATH)/../lib/bluetooth/$(file)))
+>  
+> +LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
+> +LOCAL_MODULE_TAGS := optional
+>  LOCAL_MODULE := bluetoothd
+>  
+>  include $(BUILD_EXECUTABLE)
+> @@ -107,7 +109,7 @@ LOCAL_MODULE := bluetooth.default
+>  LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
+>  LOCAL_MODULE_TAGS := optional
+>  LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+> -LOCAL_REQUIRED_MODULES := haltest bluetoothd
+> +LOCAL_REQUIRED_MODULES := bluetoothd bluetoothd-snoop
+>  
+>  include $(BUILD_SHARED_LIBRARY)
+>  
+> @@ -146,7 +148,8 @@ LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
+>  
+>  LOCAL_SHARED_LIBRARIES := libhardware
+>  
+> -LOCAL_MODULE_TAGS := optional
+> +LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
+> +LOCAL_MODULE_TAGS := debug
+>  LOCAL_MODULE := haltest
+>  
+>  include $(BUILD_EXECUTABLE)
+> @@ -159,42 +162,23 @@ include $(CLEAR_VARS)
+>  
+>  LOCAL_SRC_FILES := \
+>  	../monitor/main.c \
+> -	../monitor/bt.h \
+> -	../monitor/mainloop.h \
+>  	../monitor/mainloop.c \
+> -	../monitor/display.h \
+>  	../monitor/display.c \
+> -	../monitor/hcidump.h \
+>  	../monitor/hcidump.c \
+> -	../monitor/btsnoop.h \
+>  	../monitor/btsnoop.c \
+> -	../monitor/control.h \
+>  	../monitor/control.c \
+> -	../monitor/packet.h \
+>  	../monitor/packet.c \
+> -	../monitor/l2cap.h \
+>  	../monitor/l2cap.c \
+> -	../monitor/uuid.h \
+>  	../monitor/uuid.c \
+> -	../monitor/sdp.h \
+>  	../monitor/sdp.c \
+> -	../monitor/vendor.h \
+>  	../monitor/vendor.c \
+> -	../monitor/lmp.h \
+>  	../monitor/lmp.c \
+> -	../monitor/crc.h \
+>  	../monitor/crc.c \
+> -	../monitor/ll.h \
+>  	../monitor/ll.c \
+> -	../monitor/hwdb.h \
+>  	../monitor/hwdb.c \
+> -	../monitor/ellisys.h \
+>  	../monitor/ellisys.c \
+> -	../monitor/analyze.h \
+>  	../monitor/analyze.c \
+> -	../src/shared/util.h \
+>  	../src/shared/util.c \
+> -	../src/shared/queue.h \
+>  	../src/shared/queue.c \
+>  	../lib/hci.c \
+>  	../lib/bluetooth.c \
+> 
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index 9a161ad..cbb827d 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -39,6 +39,7 @@
- #include <hardware/hardware.h>
- #include <hardware/bluetooth.h>
- #include <hardware/bt_sock.h>
-+#include <hardware/bt_hh.h>
- 
- #include "utils.h"
- 
-@@ -79,6 +80,7 @@ struct test_data {
- 	struct hw_device_t *device;
- 	const bt_interface_t *if_bluetooth;
- 	const btsock_interface_t *if_sock;
-+	const bthh_interface_t *if_hid;
- 
- 	bool mgmt_settings_set;
- 	bool cb_count_checked;
-@@ -958,6 +960,16 @@ static bt_callbacks_t bt_callbacks = {
- 	.le_test_mode_cb = NULL
- };
- 
-+static bthh_callbacks_t bthh_callbacks = {
-+	.size = sizeof(bthh_callbacks),
-+	.connection_state_cb = NULL,
-+	.hid_info_cb = NULL,
-+	.protocol_mode_cb = NULL,
-+	.idle_time_cb = NULL,
-+	.get_report_cb = NULL,
-+	.virtual_unplug_cb = NULL
-+};
-+
- static void setup(struct test_data *data)
- {
- 	const hw_module_t *module;
-@@ -1069,6 +1081,11 @@ static void teardown(const void *test_data)
- 		data->if_bluetooth = NULL;
- 	}
- 
-+	if (data->if_hid) {
-+		data->if_hid->cleanup();
-+		data->if_hid = NULL;
-+	}
-+
- 	data->device->close(data->device);
- 
- 	if (data->bluetoothd_pid)
-@@ -1860,6 +1877,39 @@ clean:
- 		close(sock_fd);
- }
- 
-+static void setup_hidhost_interface(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	bt_status_t status;
-+	const void *hid;
-+
-+	setup(data);
-+
-+	status = data->if_bluetooth->init(&bt_callbacks);
-+	if (status != BT_STATUS_SUCCESS) {
-+		data->if_bluetooth = NULL;
-+		tester_setup_failed();
-+		return;
-+	}
-+
-+	hid = data->if_bluetooth->get_profile_interface(BT_PROFILE_HIDHOST_ID);
-+	if (!hid) {
-+		tester_setup_failed();
-+		return;
-+	}
-+
-+	data->if_hid = hid;
-+
-+	status = data->if_hid->init(&bthh_callbacks);
-+	if (status != BT_STATUS_SUCCESS) {
-+		data->if_hid = NULL;
-+		tester_setup_failed();
-+		return;
-+	}
-+
-+	tester_setup_complete();
-+}
-+
- #define test_bredrle(name, data, test_setup, test, test_teardown) \
- 	do { \
- 		struct test_data *user; \
-@@ -2071,5 +2121,8 @@ int main(int argc, char *argv[])
- 			setup_socket_interface_enabled,
- 			test_socket_real_connect, teardown);
- 
-+	test_bredrle("HIDHost Init", NULL, setup_hidhost_interface,
-+						test_dummy, teardown);
-+
- 	return tester_run();
- }
+Pushed upstream.
+
 -- 
-1.8.3.2
+BR
+Szymon Janc
 
