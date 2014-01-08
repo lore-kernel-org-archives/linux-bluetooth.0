@@ -3,9 +3,9 @@ From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>,
 	Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 7/7] client: Add unblock command
-Date: Wed,  8 Jan 2014 01:02:28 +0100
-Message-Id: <1389139348-3552-8-git-send-email-szymon.janc@gmail.com>
+Subject: [PATCH 6/7] client: Add block command
+Date: Wed,  8 Jan 2014 01:02:27 +0100
+Message-Id: <1389139348-3552-7-git-send-email-szymon.janc@gmail.com>
 In-Reply-To: <1389139348-3552-1-git-send-email-szymon.janc@gmail.com>
 References: <1389139348-3552-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,14 +16,14 @@ List-ID: <linux-bluetooth.vger.kernel.org>
  1 file changed, 31 insertions(+)
 
 diff --git a/client/main.c b/client/main.c
-index 9f9231a..5791e95 100644
+index a6e7906..9f9231a 100644
 --- a/client/main.c
 +++ b/client/main.c
-@@ -909,6 +909,35 @@ static void cmd_block(const char *arg)
+@@ -880,6 +880,35 @@ static void cmd_untrust(const char *arg)
  	g_free(str);
  }
  
-+static void cmd_unblock(const char *arg)
++static void cmd_block(const char *arg)
 +{
 +	GDBusProxy *proxy;
 +	dbus_bool_t blocked;
@@ -40,9 +40,9 @@ index 9f9231a..5791e95 100644
 +		return;
 +	}
 +
-+	blocked = FALSE;
++	blocked = TRUE;
 +
-+	str = g_strdup_printf("%s unblock", arg);
++	str = g_strdup_printf("%s block", arg);
 +
 +	if (g_dbus_proxy_set_property_basic(proxy, "Blocked",
 +					DBUS_TYPE_BOOLEAN, &blocked,
@@ -55,11 +55,11 @@ index 9f9231a..5791e95 100644
  static void remove_device_reply(DBusMessage *message, void *user_data)
  {
  	DBusError error;
-@@ -1150,6 +1179,8 @@ static const struct {
+@@ -1119,6 +1148,8 @@ static const struct {
  							dev_generator },
- 	{ "block",        "<dev>",    cmd_block, "Block device",
- 								dev_generator },
-+	{ "unblock",      "<dev>",    cmd_unblock, "Unblock device",
+ 	{ "untrust",      "<dev>",    cmd_untrust, "Untrust device",
+ 							dev_generator },
++	{ "block",        "<dev>",    cmd_block, "Block device",
 +								dev_generator },
  	{ "remove",       "<dev>",    cmd_remove, "Remove device",
  							dev_generator },
