@@ -1,193 +1,136 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <52CD5E9E.9090503@linux.intel.com>
+Date: Wed, 08 Jan 2014 16:20:14 +0200
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1389188229-3977-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1389188229-3977-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Wed, 8 Jan 2014 16:38:50 +0200
-Message-ID: <CABBYNZKN-Vr+oQgz3KLag+ggwfVKv=o6-a-nfMU3FWHbe-TCOA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] android/audio: Add wrapper stuct for audio structures
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Szymon Janc <szymon.janc@tieto.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+To: Szymon Janc <szymon.janc@tieto.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH_v2] android-tester: Add HIDHost initial interface setup
+ test
+References: <1389178957-8730-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1581614.crLN0P0epW@uw000953>
+In-Reply-To: <1581614.crLN0P0epW@uw000953>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi,
 
-On Wed, Jan 8, 2014 at 3:37 PM, Lukasz Rymanowski
-<lukasz.rymanowski@tieto.com> wrote:
-> This patch add wrapping struct for audio_hw_dev and audio_stream_out.
-> We will need this to keep some more addition info related to a2dp stream
-> and also hal IPC.
+On 01/08/2014 04:02 PM, Szymon Janc wrote:
+> Hi Ravi,
 >
-> ---
->  android/hal-audio.c | 109 +++++++++++++++++++++++++++++++---------------------
->  1 file changed, 65 insertions(+), 44 deletions(-)
+> On Wednesday 08 of January 2014 13:02:37 Ravi kumar Veeramally wrote:
+>> ---
+>>   android/android-tester.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 53 insertions(+)
+>>
+>> diff --git a/android/android-tester.c b/android/android-tester.c
+>> index 9a161ad..cbb827d 100644
+>> --- a/android/android-tester.c
+>> +++ b/android/android-tester.c
+>> @@ -39,6 +39,7 @@
+>>   #include <hardware/hardware.h>
+>>   #include <hardware/bluetooth.h>
+>>   #include <hardware/bt_sock.h>
+>> +#include <hardware/bt_hh.h>
+>>   
+>>   #include "utils.h"
+>>   
+>> @@ -79,6 +80,7 @@ struct test_data {
+>>   	struct hw_device_t *device;
+>>   	const bt_interface_t *if_bluetooth;
+>>   	const btsock_interface_t *if_sock;
+>> +	const bthh_interface_t *if_hid;
+>>   
+>>   	bool mgmt_settings_set;
+>>   	bool cb_count_checked;
+>> @@ -958,6 +960,16 @@ static bt_callbacks_t bt_callbacks = {
+>>   	.le_test_mode_cb = NULL
+>>   };
+>>   
+>> +static bthh_callbacks_t bthh_callbacks = {
+>> +	.size = sizeof(bthh_callbacks),
+>> +	.connection_state_cb = NULL,
+>> +	.hid_info_cb = NULL,
+>> +	.protocol_mode_cb = NULL,
+>> +	.idle_time_cb = NULL,
+>> +	.get_report_cb = NULL,
+>> +	.virtual_unplug_cb = NULL
+>> +};
+>> +
+>>   static void setup(struct test_data *data)
+>>   {
+>>   	const hw_module_t *module;
+>> @@ -1069,6 +1081,11 @@ static void teardown(const void *test_data)
+>>   		data->if_bluetooth = NULL;
+>>   	}
+>>   
+>> +	if (data->if_hid) {
+>> +		data->if_hid->cleanup();
+>> +		data->if_hid = NULL;
+>> +	}
+>> +
+> This results in test being aborted due to IPC error. After bluetooth
+> service is closed daemon exits. I think hid cleanup should be called
+> before bluetooth cleanup.
 >
-> diff --git a/android/hal-audio.c b/android/hal-audio.c
-> index 7f4a3f2..bb68648 100644
-> --- a/android/hal-audio.c
-> +++ b/android/hal-audio.c
-> @@ -25,6 +25,15 @@
->
->  #include "hal-log.h"
->
-> +struct a2dp_stream_out {
-> +       struct audio_stream_out stream;
-> +};
-> +
-> +struct a2dp_audio_dev {
-> +       struct audio_hw_device dev;
-> +       struct a2dp_stream_out *stream_out;
-> +};
-> +
->  static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
->                                                                 size_t bytes)
->  {
-> @@ -230,32 +239,37 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
->                                         struct audio_stream_out **stream_out)
->
->  {
-> -       struct audio_stream_out *out;
-> +       struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *)dev;
-> +       struct a2dp_stream_out *a2dp_out;
->
-> -       out = calloc(1, sizeof(struct audio_stream_out));
-> -       if (!out)
-> +       a2dp_out = calloc(1, sizeof(struct a2dp_stream_out));
-> +       if (!a2dp_out)
->                 return -ENOMEM;
->
->         DBG("");
->
-> -       out->common.get_sample_rate = out_get_sample_rate;
-> -       out->common.set_sample_rate = out_set_sample_rate;
-> -       out->common.get_buffer_size = out_get_buffer_size;
-> -       out->common.get_channels = out_get_channels;
-> -       out->common.get_format = out_get_format;
-> -       out->common.set_format = out_set_format;
-> -       out->common.standby = out_standby;
-> -       out->common.dump = out_dump;
-> -       out->common.set_parameters = out_set_parameters;
-> -       out->common.get_parameters = out_get_parameters;
-> -       out->common.add_audio_effect = out_add_audio_effect;
-> -       out->common.remove_audio_effect = out_remove_audio_effect;
-> -       out->get_latency = out_get_latency;
-> -       out->set_volume = out_set_volume;
-> -       out->write = out_write;
-> -       out->get_render_position = out_get_render_position;
-> -
-> -       *stream_out = out;
-> +       a2dp_out->stream.common.get_sample_rate = out_get_sample_rate;
-> +       a2dp_out->stream.common.set_sample_rate = out_set_sample_rate;
-> +       a2dp_out->stream.common.get_buffer_size = out_get_buffer_size;
-> +       a2dp_out->stream.common.get_channels = out_get_channels;
-> +       a2dp_out->stream.common.get_format = out_get_format;
-> +       a2dp_out->stream.common.set_format = out_set_format;
-> +       a2dp_out->stream.common.standby = out_standby;
-> +       a2dp_out->stream.common.dump = out_dump;
-> +       a2dp_out->stream.common.set_parameters = out_set_parameters;
-> +       a2dp_out->stream.common.get_parameters = out_get_parameters;
-> +       a2dp_out->stream.common.add_audio_effect = out_add_audio_effect;
-> +       a2dp_out->stream.common.remove_audio_effect = out_remove_audio_effect;
-> +       a2dp_out->stream.get_latency = out_get_latency;
-> +       a2dp_out->stream.set_volume = out_set_volume;
-> +       a2dp_out->stream.write = out_write;
-> +       a2dp_out->stream.get_render_position = out_get_render_position;
-> +
-> +       /* Note that &a2dp_out->stream pointer is same as a2dp_out. This
-> +        * results from the structure of a2dp_stream_out struct. We rely on it
-> +        * later in the code */
-> +       *stream_out = &a2dp_out->stream;
-> +       a2dp_dev->stream_out = a2dp_out;
->
->         return 0;
->  }
-> @@ -264,6 +278,10 @@ static void audio_close_output_stream(struct audio_hw_device *dev,
->                                         struct audio_stream_out *stream)
->  {
->         DBG("");
-> +       struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *)dev;
-> +
-> +       free(stream);
-> +       a2dp_dev->stream_out = NULL;
->  }
->
->  static int audio_set_parameters(struct audio_hw_device *dev,
-> @@ -381,7 +399,7 @@ static int audio_close(hw_device_t *device)
->  static int audio_open(const hw_module_t *module, const char *name,
->                                                         hw_device_t **device)
->  {
-> -       struct audio_hw_device *audio;
-> +       struct a2dp_audio_dev *a2dp_dev;
->
->         DBG("");
->
-> @@ -391,30 +409,33 @@ static int audio_open(const hw_module_t *module, const char *name,
->                 return -EINVAL;
->         }
->
-> -       audio = calloc(1, sizeof(struct audio_hw_device));
-> -       if (!audio)
-> +       a2dp_dev = calloc(1, sizeof(struct a2dp_audio_dev));
-> +       if (!a2dp_dev)
->                 return -ENOMEM;
->
-> -       audio->common.version = AUDIO_DEVICE_API_VERSION_CURRENT;
-> -       audio->common.module = (struct hw_module_t *) module;
-> -       audio->common.close = audio_close;
-> -
-> -       audio->init_check = audio_init_check;
-> -       audio->set_voice_volume = audio_set_voice_volume;
-> -       audio->set_master_volume = audio_set_master_volume;
-> -       audio->set_mode = audio_set_mode;
-> -       audio->set_mic_mute = audio_set_mic_mute;
-> -       audio->get_mic_mute = audio_get_mic_mute;
-> -       audio->set_parameters = audio_set_parameters;
-> -       audio->get_parameters = audio_get_parameters;
-> -       audio->get_input_buffer_size = audio_get_input_buffer_size;
-> -       audio->open_output_stream = audio_open_output_stream;
-> -       audio->close_output_stream = audio_close_output_stream;
-> -       audio->open_input_stream = audio_open_input_stream;
-> -       audio->close_input_stream = audio_close_input_stream;
-> -       audio->dump = audio_dump;
-> -
-> -       *device = &audio->common;
-> +       a2dp_dev->dev.common.version = AUDIO_DEVICE_API_VERSION_CURRENT;
-> +       a2dp_dev->dev.common.module = (struct hw_module_t *) module;
-> +       a2dp_dev->dev.common.close = audio_close;
-> +
-> +       a2dp_dev->dev.init_check = audio_init_check;
-> +       a2dp_dev->dev.set_voice_volume = audio_set_voice_volume;
-> +       a2dp_dev->dev.set_master_volume = audio_set_master_volume;
-> +       a2dp_dev->dev.set_mode = audio_set_mode;
-> +       a2dp_dev->dev.set_mic_mute = audio_set_mic_mute;
-> +       a2dp_dev->dev.get_mic_mute = audio_get_mic_mute;
-> +       a2dp_dev->dev.set_parameters = audio_set_parameters;
-> +       a2dp_dev->dev.get_parameters = audio_get_parameters;
-> +       a2dp_dev->dev.get_input_buffer_size = audio_get_input_buffer_size;
-> +       a2dp_dev->dev.open_output_stream = audio_open_output_stream;
-> +       a2dp_dev->dev.close_output_stream = audio_close_output_stream;
-> +       a2dp_dev->dev.open_input_stream = audio_open_input_stream;
-> +       a2dp_dev->dev.close_input_stream = audio_close_input_stream;
-> +       a2dp_dev->dev.dump = audio_dump;
-> +
-> +       /* Note that &a2dp_dev->dev.common is the same pointer as a2dp_dev.
-> +        * This results from the structure of following structs:a2dp_audio_dev,
-> +        * audio_hw_device. We will rely on this later in the code.*/
-> +       *device = &a2dp_dev->dev.common;
->
->         return 0;
->  }
-> --
-> 1.8.4
+> In future also please pay attention to tester output while testing your patches
+> i.e. tests summary should be printed.
+   Sorry, updated and sent _v3.
 
-Ive pushed this one with some modifications, it doesn't seems
-necessary to create a wrapper for audio_stream_out so I prefer to
-introduce it later whenever it becomes necessary.
+  Thanks,
+  Ravi.
+>
+>>   	data->device->close(data->device);
+>>   
+>>   	if (data->bluetoothd_pid)
+>> @@ -1860,6 +1877,39 @@ clean:
+>>   		close(sock_fd);
+>>   }
+>>   
+>> +static void setup_hidhost_interface(const void *test_data)
+>> +{
+>> +	struct test_data *data = tester_get_data();
+>> +	bt_status_t status;
+>> +	const void *hid;
+>> +
+>> +	setup(data);
+>> +
+>> +	status = data->if_bluetooth->init(&bt_callbacks);
+>> +	if (status != BT_STATUS_SUCCESS) {
+>> +		data->if_bluetooth = NULL;
+>> +		tester_setup_failed();
+>> +		return;
+>> +	}
+>> +
+>> +	hid = data->if_bluetooth->get_profile_interface(BT_PROFILE_HIDHOST_ID);
+>> +	if (!hid) {
+>> +		tester_setup_failed();
+>> +		return;
+>> +	}
+>> +
+>> +	data->if_hid = hid;
+>> +
+>> +	status = data->if_hid->init(&bthh_callbacks);
+>> +	if (status != BT_STATUS_SUCCESS) {
+>> +		data->if_hid = NULL;
+>> +		tester_setup_failed();
+>> +		return;
+>> +	}
+>> +
+>> +	tester_setup_complete();
+>> +}
+>> +
+>>   #define test_bredrle(name, data, test_setup, test, test_teardown) \
+>>   	do { \
+>>   		struct test_data *user; \
+>> @@ -2071,5 +2121,8 @@ int main(int argc, char *argv[])
+>>   			setup_socket_interface_enabled,
+>>   			test_socket_real_connect, teardown);
+>>   
+>> +	test_bredrle("HIDHost Init", NULL, setup_hidhost_interface,
+>> +						test_dummy, teardown);
+>> +
+>>   	return tester_run();
+>>   }
+>>
 
-
--- 
-Luiz Augusto von Dentz
