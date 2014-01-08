@@ -1,103 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastianx.chlad@intel.com>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastianx.chlad@intel.com>
-Subject: [PATCH] android/pics: Update PICS to PTS 5.0
-Date: Wed,  8 Jan 2014 13:36:58 +0200
-Message-Id: <1389181018-30211-1-git-send-email-sebastianx.chlad@intel.com>
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2] android-tester: Add HIDHost initial interface setup test
+Date: Wed,  8 Jan 2014 13:02:37 +0200
+Message-Id: <1389178957-8730-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Update PICS settings for HID, L2CAP, OPP, PAN and PBAP
 ---
- android/pics-hid.txt   | 2 ++
- android/pics-l2cap.txt | 2 ++
- android/pics-opp.txt   | 2 ++
- android/pics-pan.txt   | 2 ++
- android/pics-pbap.txt  | 5 +++--
- 5 files changed, 11 insertions(+), 2 deletions(-)
+ android/android-tester.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 53 insertions(+)
 
-diff --git a/android/pics-hid.txt b/android/pics-hid.txt
-index b0b7d52..ac37e45 100644
---- a/android/pics-hid.txt
-+++ b/android/pics-hid.txt
-@@ -1,5 +1,7 @@
- HID PICS for the PTS tool.
+diff --git a/android/android-tester.c b/android/android-tester.c
+index 9a161ad..cbb827d 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -39,6 +39,7 @@
+ #include <hardware/hardware.h>
+ #include <hardware/bluetooth.h>
+ #include <hardware/bt_sock.h>
++#include <hardware/bt_hh.h>
  
-+PTS version: 5.0
+ #include "utils.h"
+ 
+@@ -79,6 +80,7 @@ struct test_data {
+ 	struct hw_device_t *device;
+ 	const bt_interface_t *if_bluetooth;
+ 	const btsock_interface_t *if_sock;
++	const bthh_interface_t *if_hid;
+ 
+ 	bool mgmt_settings_set;
+ 	bool cb_count_checked;
+@@ -958,6 +960,16 @@ static bt_callbacks_t bt_callbacks = {
+ 	.le_test_mode_cb = NULL
+ };
+ 
++static bthh_callbacks_t bthh_callbacks = {
++	.size = sizeof(bthh_callbacks),
++	.connection_state_cb = NULL,
++	.hid_info_cb = NULL,
++	.protocol_mode_cb = NULL,
++	.idle_time_cb = NULL,
++	.get_report_cb = NULL,
++	.virtual_unplug_cb = NULL
++};
 +
- * - different than PTS defaults
- # - not yet implemented/supported
+ static void setup(struct test_data *data)
+ {
+ 	const hw_module_t *module;
+@@ -1069,6 +1081,11 @@ static void teardown(const void *test_data)
+ 		data->if_bluetooth = NULL;
+ 	}
  
-diff --git a/android/pics-l2cap.txt b/android/pics-l2cap.txt
-index ef25133..7b49627 100644
---- a/android/pics-l2cap.txt
-+++ b/android/pics-l2cap.txt
-@@ -1,5 +1,7 @@
- L2CAP PICS for the PTS tool.
- 
-+PTS version: 5.0
++	if (data->if_hid) {
++		data->if_hid->cleanup();
++		data->if_hid = NULL;
++	}
 +
- * - different than PTS defaults
- # - not yet implemented/supported
+ 	data->device->close(data->device);
  
-diff --git a/android/pics-opp.txt b/android/pics-opp.txt
-index c0f2ad6..cd4acce 100644
---- a/android/pics-opp.txt
-+++ b/android/pics-opp.txt
-@@ -1,5 +1,7 @@
- OPP PICS for the PTS tool.
+ 	if (data->bluetoothd_pid)
+@@ -1860,6 +1877,39 @@ clean:
+ 		close(sock_fd);
+ }
  
-+PTS version: 5.0
++static void setup_hidhost_interface(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	bt_status_t status;
++	const void *hid;
 +
- * - different than PTS defaults
- # - not yet implemented/supported
- 
-diff --git a/android/pics-pan.txt b/android/pics-pan.txt
-index 7576d2d..16457bf 100644
---- a/android/pics-pan.txt
-+++ b/android/pics-pan.txt
-@@ -1,5 +1,7 @@
- PAN PICS for the PTS tool.
- 
-+PTS version: 5.0
++	setup(data);
 +
- * - different than PTS defaults
- # - not yet implemented/supported
- 
-diff --git a/android/pics-pbap.txt b/android/pics-pbap.txt
-index 7b2d7d2..b6b6d8b 100644
---- a/android/pics-pbap.txt
-+++ b/android/pics-pbap.txt
-@@ -1,5 +1,7 @@
- PBAP PICS for the PTS tool.
- 
-+PTS version: 5.0
++	status = data->if_bluetooth->init(&bt_callbacks);
++	if (status != BT_STATUS_SUCCESS) {
++		data->if_bluetooth = NULL;
++		tester_setup_failed();
++		return;
++	}
 +
- * - different than PTS defaults
- # - not yet implemented/supported
++	hid = data->if_bluetooth->get_profile_interface(BT_PROFILE_HIDHOST_ID);
++	if (!hid) {
++		tester_setup_failed();
++		return;
++	}
++
++	data->if_hid = hid;
++
++	status = data->if_hid->init(&bthh_callbacks);
++	if (status != BT_STATUS_SUCCESS) {
++		data->if_hid = NULL;
++		tester_setup_failed();
++		return;
++	}
++
++	tester_setup_complete();
++}
++
+ #define test_bredrle(name, data, test_setup, test, test_teardown) \
+ 	do { \
+ 		struct test_data *user; \
+@@ -2071,5 +2121,8 @@ int main(int argc, char *argv[])
+ 			setup_socket_interface_enabled,
+ 			test_socket_real_connect, teardown);
  
-@@ -12,8 +14,7 @@ Parameter Name	Selected	Description
- -------------------------------------------------------------------------------
- TSPC_PBAP_0_1	False		Role: PBAP 1.0 (C.1)
- TSPC_PBAP_0_2	True (*)	Role: PBAP 1.1 (C.1)
--TSPC_PBAP_0_3	False		Role: Reserve
--TSPC_PBAP_0_4	False (*)	Role: PBAP 1.2 (C.1)
-+TSPC_PBAP_0_3	False (*)	Role: PBAP 1.2 (C.1)
- -------------------------------------------------------------------------------
- C.1: Mandatory to support one and only one major profile version.
- -------------------------------------------------------------------------------
++	test_bredrle("HIDHost Init", NULL, setup_hidhost_interface,
++						test_dummy, teardown);
++
+ 	return tester_run();
+ }
 -- 
 1.8.3.2
-
----------------------------------------------------------------------
-Intel Finland Oy
-Registered Address: PL 281, 00181 Helsinki 
-Business Identity Code: 0357606 - 4 
-Domiciled in Helsinki 
-
-This e-mail and any attachments may contain confidential material for
-the sole use of the intended recipient(s). Any review or distribution
-by others is strictly prohibited. If you are not the intended
-recipient, please contact the sender and delete all copies.
 
