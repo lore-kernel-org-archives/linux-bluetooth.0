@@ -1,35 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 8 Jan 2014 14:24:37 +0530
-Message-ID: <CAMLKGW41ex0z6Xei6BDdX4upGFW1s2z29ru261xTbqiUiR7ZNg@mail.gmail.com>
-Subject: bluez Low Energy to RFCOMM data streaming and RFCOMM Server Just
- Works Pairing
-From: code jug <codejug.cj@gmail.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: [PATCH] android/pts: Update PTS results for MAP
+Date: Wed,  8 Jan 2014 09:52:53 +0100
+Message-Id: <1389171173-30512-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Everyone,
+Update MAP PTS results for BlueZ stack on Nexus4 (Android 4.4.2).
+---
+ android/pts-map.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-I have a requirement where I have to
-1.get data from bluetooth low energy peripheral.
-2.send data to bluetooth classic Device. ( by setting up rfcomm server )
-3.Use a single dongle to do both ( if possible ) I have IOgear GBU521
+diff --git a/android/pts-map.txt b/android/pts-map.txt
+index 26702af..9850fd4 100644
+--- a/android/pts-map.txt
++++ b/android/pts-map.txt
+@@ -1,7 +1,7 @@
+ PTS test results for MAP
+ 
+ PTS version: 5.0
+-Tested: 17.12.2013
++Tested: 07.01.2014
+ 
+ Results:
+ PASS	test passed
+@@ -70,7 +70,7 @@ TC_MSE_MMB_BV_14_I	PASS
+ TC_MSE_MMB_BV_15_I	PASS
+ TC_MSE_MMB_BV_16_I	INC	Mailbox MAS instance not available on IUT.
+ TC_MSE_MMD_BV_02_I	PASS
+-TC_MSE_MMU_BV_02_I	PASS
++TC_MSE_MMU_BV_02_I	INC	Passing randomly. (Reported PTS Issue ID: 11689)
+ TC_MSE_MMU_BV_03_I	PASS
+ TC_MSE_MMN_BV_02_I	PASS
+ TC_MSE_MMN_BV_04_I	N/A
+-- 
+1.8.5
 
-The whole setup needs to run on a raspberry pi "without any user
-intervention" for pairing etc.
-
-I have the means to get data from the peripheral..
-
-I want to set a default password (like "1234") so that any device can just
-connect to it and receive the data via rfcomm.
-
-Pairing always generates a key on my phone, and there is a prompt on the
-linux system. I want it to happen with a default password and not by
-prompting. something like pairing to a JYMCU from a phone.
-
-please help.
-
-Regards,
-cj
