@@ -1,125 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH_v3] android-tester: Add HIDHost initial interface setup test
-Date: Wed, 08 Jan 2014 15:58:10 +0100
-Message-ID: <19033032.Uyg98PIC33@uw000953>
-In-Reply-To: <1389190750-15156-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1389190750-15156-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+To: Sebastian Chlad <sebastianchlad@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Sebastian Chlad <sebastianx.chlad@intel.com>
+Subject: Re: [PATCH] android/pixit: Add PTS version to respective pixit
+Date: Wed, 08 Jan 2014 15:51:13 +0100
+Message-ID: <3016423.KQ2rzUoU3Y@uw000953>
+In-Reply-To: <1389133067-5157-1-git-send-email-sebastianx.chlad@intel.com>
+References: <1389133067-5157-1-git-send-email-sebastianx.chlad@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Sebastian,
 
-On Wednesday 08 of January 2014 16:19:10 Ravi kumar Veeramally wrote:
+On Tuesday 07 of January 2014 23:17:47 Sebastian Chlad wrote:
 > ---
->  android/android-tester.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 53 insertions(+)
+>  android/pixit-did.txt   | 2 ++
+>  android/pixit-gap.txt   | 2 ++
+>  android/pixit-hid.txt   | 2 ++
+>  android/pixit-l2cap.txt | 2 ++
+>  android/pixit-opp.txt   | 2 ++
+>  android/pixit-pan.txt   | 2 ++
+>  android/pixit-pbap.txt  | 2 ++
+>  7 files changed, 14 insertions(+)
 > 
-> diff --git a/android/android-tester.c b/android/android-tester.c
-> index 9a161ad..a448ab5 100644
-> --- a/android/android-tester.c
-> +++ b/android/android-tester.c
-> @@ -39,6 +39,7 @@
->  #include <hardware/hardware.h>
->  #include <hardware/bluetooth.h>
->  #include <hardware/bt_sock.h>
-> +#include <hardware/bt_hh.h>
+> diff --git a/android/pixit-did.txt b/android/pixit-did.txt
+> index 2527845..8c64d52 100644
+> --- a/android/pixit-did.txt
+> +++ b/android/pixit-did.txt
+> @@ -1,5 +1,7 @@
+>  DID PIXIT for the PTS tool.
 >  
->  #include "utils.h"
+> +PTS version: 5.0
+> +
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
 >  
-> @@ -79,6 +80,7 @@ struct test_data {
->  	struct hw_device_t *device;
->  	const bt_interface_t *if_bluetooth;
->  	const btsock_interface_t *if_sock;
-> +	const bthh_interface_t *if_hid;
+> diff --git a/android/pixit-gap.txt b/android/pixit-gap.txt
+> index 786c55e..f3c7726 100644
+> --- a/android/pixit-gap.txt
+> +++ b/android/pixit-gap.txt
+> @@ -1,5 +1,7 @@
+>  GAP PIXIT for the PTS tool.
 >  
->  	bool mgmt_settings_set;
->  	bool cb_count_checked;
-> @@ -958,6 +960,16 @@ static bt_callbacks_t bt_callbacks = {
->  	.le_test_mode_cb = NULL
->  };
+> +PTS version: 5.0
+> +
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
 >  
-> +static bthh_callbacks_t bthh_callbacks = {
-> +	.size = sizeof(bthh_callbacks),
-> +	.connection_state_cb = NULL,
-> +	.hid_info_cb = NULL,
-> +	.protocol_mode_cb = NULL,
-> +	.idle_time_cb = NULL,
-> +	.get_report_cb = NULL,
-> +	.virtual_unplug_cb = NULL
-> +};
-> +
->  static void setup(struct test_data *data)
->  {
->  	const hw_module_t *module;
-> @@ -1064,6 +1076,11 @@ static void teardown(const void *test_data)
->  {
->  	struct test_data *data = tester_get_data();
+> diff --git a/android/pixit-hid.txt b/android/pixit-hid.txt
+> index f306615..1d36c92 100644
+> --- a/android/pixit-hid.txt
+> +++ b/android/pixit-hid.txt
+> @@ -1,5 +1,7 @@
+>  HID PIXIT for the PTS tool.
 >  
-> +	if (data->if_hid) {
-> +		data->if_hid->cleanup();
-> +		data->if_hid = NULL;
-> +	}
+> +PTS version: 5.0
 > +
->  	if (data->if_bluetooth) {
->  		data->if_bluetooth->cleanup();
->  		data->if_bluetooth = NULL;
-> @@ -1860,6 +1877,39 @@ clean:
->  		close(sock_fd);
->  }
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
 >  
-> +static void setup_hidhost_interface(const void *test_data)
-> +{
-> +	struct test_data *data = tester_get_data();
-> +	bt_status_t status;
-> +	const void *hid;
-> +
-> +	setup(data);
-> +
-> +	status = data->if_bluetooth->init(&bt_callbacks);
-> +	if (status != BT_STATUS_SUCCESS) {
-> +		data->if_bluetooth = NULL;
-> +		tester_setup_failed();
-> +		return;
-> +	}
-> +
-> +	hid = data->if_bluetooth->get_profile_interface(BT_PROFILE_HIDHOST_ID);
-> +	if (!hid) {
-> +		tester_setup_failed();
-> +		return;
-> +	}
-> +
-> +	data->if_hid = hid;
-> +
-> +	status = data->if_hid->init(&bthh_callbacks);
-> +	if (status != BT_STATUS_SUCCESS) {
-> +		data->if_hid = NULL;
-> +		tester_setup_failed();
-> +		return;
-> +	}
-> +
-> +	tester_setup_complete();
-> +}
-> +
->  #define test_bredrle(name, data, test_setup, test, test_teardown) \
->  	do { \
->  		struct test_data *user; \
-> @@ -2071,5 +2121,8 @@ int main(int argc, char *argv[])
->  			setup_socket_interface_enabled,
->  			test_socket_real_connect, teardown);
+> diff --git a/android/pixit-l2cap.txt b/android/pixit-l2cap.txt
+> index 7de6638..a307625 100644
+> --- a/android/pixit-l2cap.txt
+> +++ b/android/pixit-l2cap.txt
+> @@ -1,5 +1,7 @@
+>  L2CAP PIXIT for the PTS tool.
 >  
-> +	test_bredrle("HIDHost Init", NULL, setup_hidhost_interface,
-> +						test_dummy, teardown);
+> +PTS version: 5.0
 > +
->  	return tester_run();
->  }
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
+>  
+> diff --git a/android/pixit-opp.txt b/android/pixit-opp.txt
+> index 1b1e834..93f6a29 100644
+> --- a/android/pixit-opp.txt
+> +++ b/android/pixit-opp.txt
+> @@ -1,5 +1,7 @@
+>  OPP PIXIT for the PTS tool.
+>  
+> +PTS version: 5.0
+> +
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
+>  
+> diff --git a/android/pixit-pan.txt b/android/pixit-pan.txt
+> index 2d180da..6544a9c 100644
+> --- a/android/pixit-pan.txt
+> +++ b/android/pixit-pan.txt
+> @@ -1,5 +1,7 @@
+>  PAN PIXIT for the PTS tool.
+>  
+> +PTS version: 5.0
+> +
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
+>  
+> diff --git a/android/pixit-pbap.txt b/android/pixit-pbap.txt
+> index 272cbc3..470f4c5 100644
+> --- a/android/pixit-pbap.txt
+> +++ b/android/pixit-pbap.txt
+> @@ -1,5 +1,7 @@
+>  PBAP PIXIT for the PTS tool.
+>  
+> +PTS version: 5.0
+> +
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
+>  
 > 
 
-Patch applied, thanks.
+Applied, thanks.
 
 -- 
 Best regards, 
