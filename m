@@ -1,95 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastianx.chlad@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastianx.chlad@intel.com>
-Subject: [PATCH] android/pics: Update PICS to PTS 5.0 for GAP
-Date: Wed,  8 Jan 2014 11:46:47 +0200
-Message-Id: <1389174407-28486-1-git-send-email-sebastianx.chlad@intel.com>
+Message-ID: <52CD1BA5.1060801@linux.intel.com>
+Date: Wed, 08 Jan 2014 11:34:29 +0200
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH_v3 2/4] android/pan: Listen for incoming connections and
+ accept in NAP role
+References: <1389097880-14783-1-git-send-email-ravikumar.veeramally@linux.intel.com>	<1389097880-14783-3-git-send-email-ravikumar.veeramally@linux.intel.com> <CABBYNZJHnUd9z6SRt84=OCXueBru9f5ae_m2SR06ujJzjQidBQ@mail.gmail.com>
+In-Reply-To: <CABBYNZJHnUd9z6SRt84=OCXueBru9f5ae_m2SR06ujJzjQidBQ@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add new PICS settings for the GAP profile in accordance with PTS 5.0
----
- android/pics-gap.txt | 44 +++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 37 insertions(+), 7 deletions(-)
+Hi Luiz,
 
-diff --git a/android/pics-gap.txt b/android/pics-gap.txt
-index e8ab2ab..56a33d5 100644
---- a/android/pics-gap.txt
-+++ b/android/pics-gap.txt
-@@ -1,5 +1,7 @@
- GAP PICS for the PTS tool.
- 
-+PTS version: 5.0
-+
- * - different than PTS defaults
- # - not yet implemented/supported
- 
-@@ -668,19 +670,33 @@ TSPC_GAP_41_1	True (#)	Central BR/EDR/LE: Security Aspects (M)
- -------------------------------------------------------------------------------
- 
- 
-+		Central Simultaneous BR/EDR and LE Transports
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_GAP_42_1	False		Simultaneous BR/EDR and LE Transports –	BR/EDR
-+					Slave to the same device (C.1)
-+TSPC_GAP_42_2	False		Simultaneous BR/EDR and LE Transports – BR/EDR
-+					Master to the same device (C.1)
-+-------------------------------------------------------------------------------
-+C.1: Optional if ((SUM ICS 31/14 (Core Spec Version 4.1) or SUM ICS 31/15
-+	(Core Spec Version 4.1+HS)) is supported, otherwise Excluded.
-+-------------------------------------------------------------------------------
-+
-+
- 		Peripheral BR/EDR/LE Modes
- -------------------------------------------------------------------------------
- Parameter Name	Selected	Description
- -------------------------------------------------------------------------------
--TSPC_GAP_42_1	False		Peripheral BR/EDR/LE: Non-Discoverable Mode
-+TSPC_GAP_43_1	False		Peripheral BR/EDR/LE: Non-Discoverable Mode
- 				(C.1)
--TSPC_GAP_42_2	False		Peripheral BR/EDR/LE: Discoverable Mode
-+TSPC_GAP_43_2	False		Peripheral BR/EDR/LE: Discoverable Mode
- 				(C.2)
--TSPC_GAP_42_3	False		Peripheral BR/EDR/LE: Non-Connectable Mode
-+TSPC_GAP_43_3	False		Peripheral BR/EDR/LE: Non-Connectable Mode
- 				(C.3)
--TSPC_GAP_42_4	False (*)	Peripheral BR/EDR/LE: Connectable Mode  (M)
--TSPC_GAP_42_5	False		Peripheral BR/EDR/LE: Non-Bondable Mode (C.4)
--TSPC_GAP_42_6	False		Peripheral BR/EDR/LE: Bondable Mode (C.5)
-+TSPC_GAP_43_4	False (*)	Peripheral BR/EDR/LE: Connectable Mode  (M)
-+TSPC_GAP_43_5	False		Peripheral BR/EDR/LE: Non-Bondable Mode (C.4)
-+TSPC_GAP_43_6	False		Peripheral BR/EDR/LE: Bondable Mode (C.5)
- -------------------------------------------------------------------------------
- C.1: Mandatory if TSPC_GAP_1_1 is supported over BR/EDR, otherwise Excluded.
- C.2: Mandatory if (TSPC_GAP_1_2 or TSPC_GAP_1_3) is supported over BR/EDR,
-@@ -695,7 +711,21 @@ C.5: Mandatory if TSPC_GAP_1_7 is supported over BR/EDR, otherwise Excluded.
- -------------------------------------------------------------------------------
- Parameter Name	Selected	Description
- -------------------------------------------------------------------------------
--TSPC_GAP_43_1	False (*)	Peripheral BR/EDR/LE: Security Aspects (M)
-+TSPC_GAP_44_1	False (*)	Peripheral BR/EDR/LE: Security Aspects (M)
-+-------------------------------------------------------------------------------
-+
-+
-+		Peripheral Simultaneous BR/EDR and LE Transports
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_GAP_45_1	False		Simultaneous BR/EDR and LE Transports – BR/EDR
-+					Slave to the same device (C.1)
-+TSPC_GAP_45_2	False		Simultaneous BR/EDR and LE Transports – BR/EDR
-+					Master to the same device (C.1)
-+-------------------------------------------------------------------------------
-+C.1: Optional if ((SUM ICS 31/14 (Core Spec Version 4.1) or SUM ICS 31/15
-+(Core Spec Version 4.1+HS)) is supported, otherwise Excluded.
- -------------------------------------------------------------------------------
- 
- 
--- 
-1.8.3.2
+On 01/08/2014 11:07 AM, Luiz Augusto von Dentz wrote:
+> Hi Ravi,
+>
+> On Tue, Jan 7, 2014 at 2:31 PM, Ravi kumar Veeramally
+> <ravikumar.veeramally@linux.intel.com> wrote:
+>> Listen for incoming connections and accept it. Create bnep interface
+>> add it to bridge and notify control and connection state information
+>> through HAL. Remove the device on disconnect request. If android
+>> settings UI does not have bluetooth tethering enabled it immediately
+>> sends disconnect signal.
+>> ---
+>>   android/pan.c | 192 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>   1 file changed, 190 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/android/pan.c b/android/pan.c
+>> index 93078ba..0eef284 100644
+>> --- a/android/pan.c
+>> +++ b/android/pan.c
+>> @@ -63,12 +63,17 @@ struct pan_device {
+>>          uint8_t         role;
+>>          GIOChannel      *io;
+>>          struct bnep     *session;
+>> +       guint           watch;
+>>   };
+>>
+>>   static struct {
+>>          uint32_t        record_id;
+>> +       guint           watch;
+>> +       GIOChannel      *io;
+>>   } nap_dev = {
+>>          .record_id = 0,
+>> +       .watch = 0,
+>> +       .io = NULL,
+>>   };
+>>
+>>   static int device_cmp(gconstpointer s, gconstpointer user_data)
+>> @@ -81,13 +86,21 @@ static int device_cmp(gconstpointer s, gconstpointer user_data)
+>>
+>>   static void pan_device_free(struct pan_device *dev)
+>>   {
+>> +       if (dev->watch > 0) {
+>> +               bnep_server_delete(BNEP_BRIDGE, dev->iface, &dev->dst);
+>> +               g_source_remove(dev->watch);
+>> +               dev->watch = 0;
+> Usually it is not necessary to assign anything to struct members when
+> you are freeing the whole struct since its memory gonna be freed
+> anyway.
 
+   Yes you are right. Profiles/network/connection.c keeps device data 
+after disconnecting,
+   it will remove only on device remove call. Assigning zero or NULL 
+make sense there.
+   But in bluez-android device struct t is removed from list on 
+disconnected state.
+   Here it won't make much sense. I will remove it in my next version.
+
+  Thanks,
+  Ravi.
