@@ -1,98 +1,190 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 1/5] tools/rfcomm-tester: Initial version of rfcomm-tester
-Date: Wed,  8 Jan 2014 10:23:46 +0100
-Message-Id: <1389173030-27970-1-git-send-email-marcin.kraglak@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH_v3 1/4] android/pan: Register Network Access Point
+Date: Wed, 08 Jan 2014 10:18:27 +0100
+Message-ID: <1697122.rgbbQeg154@uw000953>
+In-Reply-To: <1389097880-14783-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1389097880-14783-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1389097880-14783-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add rfcomm-tester to tree.
----
- .gitignore            |  1 +
- Makefile.tools        |  6 +++++-
- tools/rfcomm-tester.c | 36 ++++++++++++++++++++++++++++++++++++
- 3 files changed, 42 insertions(+), 1 deletion(-)
- create mode 100644 tools/rfcomm-tester.c
+Hi Ravi,
 
-diff --git a/.gitignore b/.gitignore
-index 3e0641d..4ac216d 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -81,6 +81,7 @@ unit/test-mgmt
- tools/mgmt-tester
- tools/smp-tester
- tools/gap-tester
-+tools/rfcomm-tester
- tools/btattach
- tools/btmgmt
- tools/btsnoop
-diff --git a/Makefile.tools b/Makefile.tools
-index c78cc50..ef17305 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -39,7 +39,7 @@ if EXPERIMENTAL
- noinst_PROGRAMS += emulator/btvirt emulator/b1ee tools/3dsp \
- 					tools/mgmt-tester tools/gap-tester \
- 					tools/l2cap-tester tools/sco-tester \
--					tools/smp-tester
-+					tools/smp-tester tools/rfcomm-tester
- 
- emulator_btvirt_SOURCES = emulator/main.c monitor/bt.h \
- 					monitor/mainloop.h monitor/mainloop.c \
-@@ -76,6 +76,10 @@ tools_l2cap_tester_SOURCES = tools/l2cap-tester.c monitor/bt.h \
- 				src/shared/tester.h src/shared/tester.c
- tools_l2cap_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
- 
-+tools_rfcomm_tester_SOURCES = tools/rfcomm-tester.c src/shared/tester.h \
-+				src/shared/tester.c
-+tools_rfcomm_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
-+
- tools_smp_tester_SOURCES = tools/smp-tester.c monitor/bt.h \
- 				emulator/btdev.h emulator/btdev.c \
- 				emulator/bthost.h emulator/bthost.c \
-diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
-new file mode 100644
-index 0000000..200d953
---- /dev/null
-+++ b/tools/rfcomm-tester.c
-@@ -0,0 +1,36 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <glib.h>
-+#include "src/shared/tester.h"
-+
-+int main(int argc, char *argv[])
-+{
-+	tester_init(&argc, &argv);
-+
-+	return tester_run();
-+}
+> Register NAP server and adds bnep bridge. Removes bridge
+> on destroy call. Bridge mechanism is needed when device acting
+> as a server and listen for incoming connections.
+> ---
+>  android/pan.c | 112 +++++++++++++++++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 108 insertions(+), 4 deletions(-)
+> 
+> diff --git a/android/pan.c b/android/pan.c
+> index 38e353d..93078ba 100644
+> --- a/android/pan.c
+> +++ b/android/pan.c
+> @@ -28,6 +28,11 @@
+>  #include <unistd.h>
+>  #include <fcntl.h>
+>  #include <glib.h>
+> +#include <sys/ioctl.h>
+> +#include <sys/socket.h>
+> +#include <sys/wait.h>
+> +#include <net/if.h>
+> +#include <linux/sockios.h>
+>  
+>  #include "btio/btio.h"
+>  #include "lib/bluetooth.h"
+> @@ -45,11 +50,11 @@
+>  #include "bluetooth.h"
+>  
+>  #define SVC_HINT_NETWORKING 0x02
+> +#define BNEP_BRIDGE	"bnep"
+>  
+>  static bdaddr_t adapter_addr;
+>  GSList *devices = NULL;
+>  uint8_t local_role = HAL_PAN_ROLE_NONE;
+> -static uint32_t record_id = 0;
+>  
+>  struct pan_device {
+>  	char		iface[16];
+> @@ -60,6 +65,12 @@ struct pan_device {
+>  	struct bnep	*session;
+>  };
+>  
+> +static struct {
+> +	uint32_t	record_id;
+> +} nap_dev = {
+> +	.record_id = 0,
+> +};
+> +
+>  static int device_cmp(gconstpointer s, gconstpointer user_data)
+>  {
+>  	const struct pan_device *dev = s;
+> @@ -297,6 +308,91 @@ failed:
+>  	ipc_send_rsp(HAL_SERVICE_ID_PAN, HAL_OP_PAN_DISCONNECT, status);
+>  }
+>  
+> +static int set_forward_delay(void)
+> +{
+> +	int fd, ret;
+> +	char path[41];
+> +
+> +	sprintf(path, "/sys/class/net/%s/bridge/forward_delay", BNEP_BRIDGE);
+> +
+> +	fd = open(path, O_RDWR);
+> +	if (fd < 0)
+> +		return -errno;
+> +
+> +	ret = write(fd, "0", sizeof("0"));
+> +	close(fd);
+> +
+> +	return ret;
+> +}
+> +
+> +static int nap_create_bridge(void)
+> +{
+> +	int sk, err;
+> +
+> +	DBG("%s", BNEP_BRIDGE);
+> +
+> +	sk = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
+> +	if (sk < 0)
+> +		return -EOPNOTSUPP;
+> +
+> +	if (ioctl(sk, SIOCBRADDBR, BNEP_BRIDGE) < 0) {
+> +		err = -errno;
+> +		if (err != -EEXIST) {
+> +			close(sk);
+> +			return -EOPNOTSUPP;
+> +		}
+> +	}
+> +
+> +	err = set_forward_delay();
+> +	if (err < 0)
+> +		ioctl(sk, SIOCBRDELBR, BNEP_BRIDGE);
+> +
+> +	close(sk);
+> +
+> +	return err;
+> +}
+> +
+> +static int nap_remove_bridge(void)
+> +{
+> +	int sk, err;
+> +
+> +	DBG("%s", BNEP_BRIDGE);
+> +
+> +	sk = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
+> +	if (sk < 0)
+> +		return -EOPNOTSUPP;
+> +
+> +	err = ioctl(sk, SIOCBRDELBR, BNEP_BRIDGE);
+> +	close(sk);
+> +
+> +	if (err < 0)
+> +		return -EOPNOTSUPP;
+> +
+> +	return 0;
+> +}
+> +
+> +static void destroy_nap_device(void)
+> +{
+> +	DBG("");
+> +
+> +	nap_remove_bridge();
+> +
+> +	nap_dev.record_id = 0;
+> +}
+> +
+> +static int register_nap_server(void)
+> +{
+> +	int err;
+> +
+> +	DBG("");
+> +
+> +	err = nap_create_bridge();
+> +	if (err < 0)
+> +		return err;
+> +
+> +	return 0;
+> +}
+> +
+>  static void bt_pan_enable(const void *buf, uint16_t len)
+>  {
+>  	const struct hal_cmd_pan_enable *cmd = buf;
+> @@ -441,7 +537,15 @@ bool bt_pan_register(const bdaddr_t *addr)
+>  		return false;
+>  	}
+>  
+> -	record_id = rec->handle;
+> +	err = register_nap_server();
+> +	if (err < 0) {
+> +		bt_adapter_remove_record(rec->handle);
+> +		sdp_record_free(rec);
+> +		bnep_cleanup();
+> +		return false;
+> +	}
+> +
+> +	nap_dev.record_id = rec->handle;
+>  	ipc_register(HAL_SERVICE_ID_PAN, cmd_handlers,
+>  						G_N_ELEMENTS(cmd_handlers));
+>  
+> @@ -455,6 +559,6 @@ void bt_pan_unregister(void)
+>  	bnep_cleanup();
+>  
+>  	ipc_unregister(HAL_SERVICE_ID_PAN);
+> -	bt_adapter_remove_record(record_id);
+> -	record_id = 0;
+> +	bt_adapter_remove_record(nap_dev.record_id);
+> +	destroy_nap_device();
+
+I would either zero nap_dev.record_id right after removing record or move
+removing record to destroy_nap_device().
+
 -- 
-1.8.3.1
+BR
+Szymon Janc
 
