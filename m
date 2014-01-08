@@ -1,218 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <luiz.dentz@gmail.com>, <szymon.janc@tieto.com>,
-	<johan.hedberg@gmail.com>,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2] android/audio: Add listener thread on the Audio HAL socket
-Date: Wed, 8 Jan 2014 16:19:31 +0100
-Message-ID: <1389194371-14595-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] emulator: Fix possible NULL dereference
+Date: Wed,  8 Jan 2014 17:10:54 +0200
+Message-Id: <1389193854-25769-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch add thread which is reponsible for listen on audio HAL
-socket, open a2dp endpoint(s) and maintain socket.
-When bluetooth daemon goes down, HAL audio plugin starts to listen on Audio HAL
-socket again.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Move test dereference after it is checked for NULL.
 ---
- android/Makefile.am |   5 ++-
- android/hal-audio.c | 126 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 129 insertions(+), 2 deletions(-)
+ tools/mgmt-tester.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 8810369..88ffa7f 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -112,7 +112,8 @@ android_android_tester_LDFLAGS = -pthread
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index c518e47..325def1 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -2646,6 +2646,14 @@ static void test_setup(const void *test_data)
+ 	const struct generic_data *test = data->test_data;
+ 	const uint16_t *cmd;
  
- noinst_LTLIBRARIES += android/libaudio-internal.la
- 
--android_libaudio_internal_la_SOURCES = android/hal-audio.c \
-+android_libaudio_internal_la_SOURCES = androdid/audio-msg.h \
-+					android/hal-audio.c \
- 					android/hardware/audio.h \
- 					android/hardware/audio_effect.h \
- 					android/hardware/hardware.h \
-@@ -120,6 +121,8 @@ android_libaudio_internal_la_SOURCES = android/hal-audio.c \
- 
- android_libaudio_internal_la_CFLAGS = -I$(srcdir)/android
- 
-+android_libaudio_internal_la_LDFLAGS = -pthread
-+
- endif
- 
- EXTRA_DIST += android/Android.mk android/hal-ipc-api.txt android/README \
-diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 1743b42..12d3e0d 100644
---- a/android/hal-audio.c
-+++ b/android/hal-audio.c
-@@ -16,15 +16,28 @@
-  */
- 
- #include <errno.h>
-+#include <pthread.h>
-+#include <poll.h>
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
-+#include <sys/socket.h>
-+#include <sys/un.h>
-+#include <unistd.h>
- 
- #include <hardware/audio.h>
- #include <hardware/hardware.h>
- 
-+#include "audio-msg.h"
- #include "hal-log.h"
- 
-+static int audio_sk = -1;
-+static bool close_thread = false;
-+
-+static pthread_t bt_watcher_th = 0;
-+static pthread_mutex_t sk_mutex = PTHREAD_MUTEX_INITIALIZER;
-+static pthread_mutex_t close_mutex = PTHREAD_MUTEX_INITIALIZER;
-+
- struct a2dp_audio_dev {
- 	struct audio_hw_device dev;
- 	struct audio_stream_out *out;
-@@ -384,15 +397,117 @@ static int audio_dump(const audio_hw_device_t *device, int fd)
- 
- static int audio_close(hw_device_t *device)
- {
-+	struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *)device;
-+
- 	DBG("");
--	free(device);
-+
-+	pthread_mutex_lock(&close_mutex);
-+	shutdown(audio_sk, SHUT_RDWR);
-+	close_thread = true;
-+	pthread_mutex_unlock(&close_mutex);
-+
-+	pthread_join(bt_watcher_th, NULL);
-+
-+	free(a2dp_dev);
- 	return 0;
- }
- 
-+static bool create_audio_ipc(void)
-+{
-+	struct sockaddr_un addr;
-+	int err;
-+	int sk;
-+
-+	DBG("");
-+
-+	sk = socket(PF_LOCAL, SOCK_SEQPACKET, 0);
-+	if (sk < 0) {
-+		err = errno;
-+		error("Failed to create socket: %d (%s)", err, strerror(err));
-+		return false;
++	if (!test || !test->setup_settings) {
++		if (data->test_setup)
++			data->test_setup(data);
++		else
++			tester_setup_complete();
++		return;
 +	}
 +
-+	memset(&addr, 0, sizeof(addr));
-+	addr.sun_family = AF_UNIX;
-+
-+	memcpy(addr.sun_path, BLUEZ_AUDIO_SK_PATH,
-+					sizeof(BLUEZ_AUDIO_SK_PATH));
-+
-+	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-+		err = errno;
-+		error("Failed to bind socket: %d (%s)", err, strerror(err));
-+		goto failed;
-+	}
-+
-+	if (listen(sk, 1) < 0) {
-+		err = errno;
-+		error("Failed to listen on the socket: %d (%s)", err,
-+								strerror(err));
-+		goto failed;
-+	}
-+
-+	audio_sk = accept(sk, NULL, NULL);
-+	if (audio_sk < 0) {
-+		err = errno;
-+		error("Failed to accept socket: %d (%s)", err, strerror(err));
-+		goto failed;
-+	}
-+
-+	close(sk);
-+	return true;
-+
-+failed:
-+	close(sk);
-+	return false;
-+}
-+
-+static void *bluetoothd_watcher_thread(void *data)
-+{
-+	bool done = false;
-+	struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *) data;
-+	struct pollfd pfd;
-+
-+	DBG("");
-+
-+	while (!done) {
-+		if(!create_audio_ipc()) {
-+			error("Failed to create listening socket");
-+			sleep(1);
-+			continue;
-+		}
-+
-+		DBG("Audio IPC: Connected");
-+
-+		/* TODO: Register ENDPOINT here */
-+
-+		memset(&pfd, 0, sizeof(pfd));
-+		pfd.fd = audio_sk;
-+		pfd.events = POLLHUP | POLLERR | POLLNVAL;
-+
-+		/* Check if socket is still alive. Empty while loop.*/
-+		while (poll(&pfd, 1, -1) < 0 && errno == EINTR);
-+
-+		if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL)) {
-+			info("Audio HAL: Socket closed");
-+			audio_sk = -1;
-+		}
-+
-+		/*Check if audio_dev is closed */
-+		pthread_mutex_lock(&close_mutex);
-+		done = close_thread;
-+		close_thread = false;
-+		pthread_mutex_unlock(&close_mutex);
-+	}
-+
-+	info("Closing bluetooth_watcher thread");
-+	return NULL;
-+}
-+
- static int audio_open(const hw_module_t *module, const char *name,
- 							hw_device_t **device)
- {
- 	struct a2dp_audio_dev *a2dp_dev;
-+	int err;
+ 	if (test->pin) {
+ 		struct bthost *bthost = hciemu_client_get_host(data->hciemu);
  
- 	DBG("");
+@@ -2655,14 +2663,6 @@ static void test_setup(const void *test_data)
+ 				data, NULL);
+ 	}
  
-@@ -430,6 +545,15 @@ static int audio_open(const hw_module_t *module, const char *name,
- 	 * audio_hw_device. We will rely on this later in the code.*/
- 	*device = &a2dp_dev->dev.common;
- 
-+	err = pthread_create(&bt_watcher_th, NULL, bluetoothd_watcher_thread,
-+									NULL);
-+	if (err < 0) {
-+		bt_watcher_th = 0;
-+		error("Failed to start bluetoothd watcher thread: %d (%s)",
-+							-err, strerror(-err));
-+		return (-err);
-+	}
-+
- 	return 0;
- }
- 
+-	if (!test || !test->setup_settings) {
+-		if (data->test_setup)
+-			data->test_setup(data);
+-		else
+-			tester_setup_complete();
+-		return;
+-	}
+-
+ 	for (cmd = test->setup_settings; *cmd; cmd++) {
+ 		unsigned char simple_param[] = { 0x01 };
+ 		unsigned char discov_param[] = { 0x01, 0x00, 0x00 };
 -- 
-1.8.4
+1.8.3.2
 
