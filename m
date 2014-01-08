@@ -1,53 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] emulator: Fix possible NULL dereference
-Date: Wed,  8 Jan 2014 17:10:54 +0200
-Message-Id: <1389193854-25769-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH_v3] android-tester: Add HIDHost initial interface setup test
+Date: Wed, 08 Jan 2014 15:58:10 +0100
+Message-ID: <19033032.Uyg98PIC33@uw000953>
+In-Reply-To: <1389190750-15156-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1389190750-15156-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Ravi,
 
-Move test dereference after it is checked for NULL.
----
- tools/mgmt-tester.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+On Wednesday 08 of January 2014 16:19:10 Ravi kumar Veeramally wrote:
+> ---
+>  android/android-tester.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 53 insertions(+)
+> 
+> diff --git a/android/android-tester.c b/android/android-tester.c
+> index 9a161ad..a448ab5 100644
+> --- a/android/android-tester.c
+> +++ b/android/android-tester.c
+> @@ -39,6 +39,7 @@
+>  #include <hardware/hardware.h>
+>  #include <hardware/bluetooth.h>
+>  #include <hardware/bt_sock.h>
+> +#include <hardware/bt_hh.h>
+>  
+>  #include "utils.h"
+>  
+> @@ -79,6 +80,7 @@ struct test_data {
+>  	struct hw_device_t *device;
+>  	const bt_interface_t *if_bluetooth;
+>  	const btsock_interface_t *if_sock;
+> +	const bthh_interface_t *if_hid;
+>  
+>  	bool mgmt_settings_set;
+>  	bool cb_count_checked;
+> @@ -958,6 +960,16 @@ static bt_callbacks_t bt_callbacks = {
+>  	.le_test_mode_cb = NULL
+>  };
+>  
+> +static bthh_callbacks_t bthh_callbacks = {
+> +	.size = sizeof(bthh_callbacks),
+> +	.connection_state_cb = NULL,
+> +	.hid_info_cb = NULL,
+> +	.protocol_mode_cb = NULL,
+> +	.idle_time_cb = NULL,
+> +	.get_report_cb = NULL,
+> +	.virtual_unplug_cb = NULL
+> +};
+> +
+>  static void setup(struct test_data *data)
+>  {
+>  	const hw_module_t *module;
+> @@ -1064,6 +1076,11 @@ static void teardown(const void *test_data)
+>  {
+>  	struct test_data *data = tester_get_data();
+>  
+> +	if (data->if_hid) {
+> +		data->if_hid->cleanup();
+> +		data->if_hid = NULL;
+> +	}
+> +
+>  	if (data->if_bluetooth) {
+>  		data->if_bluetooth->cleanup();
+>  		data->if_bluetooth = NULL;
+> @@ -1860,6 +1877,39 @@ clean:
+>  		close(sock_fd);
+>  }
+>  
+> +static void setup_hidhost_interface(const void *test_data)
+> +{
+> +	struct test_data *data = tester_get_data();
+> +	bt_status_t status;
+> +	const void *hid;
+> +
+> +	setup(data);
+> +
+> +	status = data->if_bluetooth->init(&bt_callbacks);
+> +	if (status != BT_STATUS_SUCCESS) {
+> +		data->if_bluetooth = NULL;
+> +		tester_setup_failed();
+> +		return;
+> +	}
+> +
+> +	hid = data->if_bluetooth->get_profile_interface(BT_PROFILE_HIDHOST_ID);
+> +	if (!hid) {
+> +		tester_setup_failed();
+> +		return;
+> +	}
+> +
+> +	data->if_hid = hid;
+> +
+> +	status = data->if_hid->init(&bthh_callbacks);
+> +	if (status != BT_STATUS_SUCCESS) {
+> +		data->if_hid = NULL;
+> +		tester_setup_failed();
+> +		return;
+> +	}
+> +
+> +	tester_setup_complete();
+> +}
+> +
+>  #define test_bredrle(name, data, test_setup, test, test_teardown) \
+>  	do { \
+>  		struct test_data *user; \
+> @@ -2071,5 +2121,8 @@ int main(int argc, char *argv[])
+>  			setup_socket_interface_enabled,
+>  			test_socket_real_connect, teardown);
+>  
+> +	test_bredrle("HIDHost Init", NULL, setup_hidhost_interface,
+> +						test_dummy, teardown);
+> +
+>  	return tester_run();
+>  }
+> 
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index c518e47..325def1 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -2646,6 +2646,14 @@ static void test_setup(const void *test_data)
- 	const struct generic_data *test = data->test_data;
- 	const uint16_t *cmd;
- 
-+	if (!test || !test->setup_settings) {
-+		if (data->test_setup)
-+			data->test_setup(data);
-+		else
-+			tester_setup_complete();
-+		return;
-+	}
-+
- 	if (test->pin) {
- 		struct bthost *bthost = hciemu_client_get_host(data->hciemu);
- 
-@@ -2655,14 +2663,6 @@ static void test_setup(const void *test_data)
- 				data, NULL);
- 	}
- 
--	if (!test || !test->setup_settings) {
--		if (data->test_setup)
--			data->test_setup(data);
--		else
--			tester_setup_complete();
--		return;
--	}
--
- 	for (cmd = test->setup_settings; *cmd; cmd++) {
- 		unsigned char simple_param[] = { 0x01 };
- 		unsigned char discov_param[] = { 0x01, 0x00, 0x00 };
+Patch applied, thanks.
+
 -- 
-1.8.3.2
-
+Best regards, 
+Szymon Janc
