@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Sebastian Chlad <sebastianx.chlad@intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pics: Update PICS to PTS 5.0
-Date: Wed, 08 Jan 2014 14:20:07 +0100
-Message-ID: <5346017.eqC3gyLkDH@uw000953>
-In-Reply-To: <1389181018-30211-1-git-send-email-sebastianx.chlad@intel.com>
-References: <1389181018-30211-1-git-send-email-sebastianx.chlad@intel.com>
+Subject: Re: [PATCH] android/pics: Update PICS to PTS 5.0 for GAP
+Date: Wed, 08 Jan 2014 14:19:29 +0100
+Message-ID: <4744243.WviYpXJz18@uw000953>
+In-Reply-To: <1389174407-28486-1-git-send-email-sebastianx.chlad@intel.com>
+References: <1389174407-28486-1-git-send-email-sebastianx.chlad@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,85 +14,86 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Sebastian,
 
-> Update PICS settings for HID, L2CAP, OPP, PAN and PBAP
+> Add new PICS settings for the GAP profile in accordance with PTS 5.0
 > ---
->  android/pics-hid.txt   | 2 ++
->  android/pics-l2cap.txt | 2 ++
->  android/pics-opp.txt   | 2 ++
->  android/pics-pan.txt   | 2 ++
->  android/pics-pbap.txt  | 5 +++--
->  5 files changed, 11 insertions(+), 2 deletions(-)
+>  android/pics-gap.txt | 44 +++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 37 insertions(+), 7 deletions(-)
 > 
-> diff --git a/android/pics-hid.txt b/android/pics-hid.txt
-> index b0b7d52..ac37e45 100644
-> --- a/android/pics-hid.txt
-> +++ b/android/pics-hid.txt
+> diff --git a/android/pics-gap.txt b/android/pics-gap.txt
+> index e8ab2ab..56a33d5 100644
+> --- a/android/pics-gap.txt
+> +++ b/android/pics-gap.txt
 > @@ -1,5 +1,7 @@
->  HID PICS for the PTS tool.
+>  GAP PICS for the PTS tool.
 >  
 > +PTS version: 5.0
 > +
 >  * - different than PTS defaults
 >  # - not yet implemented/supported
 >  
-> diff --git a/android/pics-l2cap.txt b/android/pics-l2cap.txt
-> index ef25133..7b49627 100644
-> --- a/android/pics-l2cap.txt
-> +++ b/android/pics-l2cap.txt
-> @@ -1,5 +1,7 @@
->  L2CAP PICS for the PTS tool.
->  
-> +PTS version: 5.0
-> +
->  * - different than PTS defaults
->  # - not yet implemented/supported
->  
-> diff --git a/android/pics-opp.txt b/android/pics-opp.txt
-> index c0f2ad6..cd4acce 100644
-> --- a/android/pics-opp.txt
-> +++ b/android/pics-opp.txt
-> @@ -1,5 +1,7 @@
->  OPP PICS for the PTS tool.
->  
-> +PTS version: 5.0
-> +
->  * - different than PTS defaults
->  # - not yet implemented/supported
->  
-> diff --git a/android/pics-pan.txt b/android/pics-pan.txt
-> index 7576d2d..16457bf 100644
-> --- a/android/pics-pan.txt
-> +++ b/android/pics-pan.txt
-> @@ -1,5 +1,7 @@
->  PAN PICS for the PTS tool.
->  
-> +PTS version: 5.0
-> +
->  * - different than PTS defaults
->  # - not yet implemented/supported
->  
-> diff --git a/android/pics-pbap.txt b/android/pics-pbap.txt
-> index 7b2d7d2..b6b6d8b 100644
-> --- a/android/pics-pbap.txt
-> +++ b/android/pics-pbap.txt
-> @@ -1,5 +1,7 @@
->  PBAP PICS for the PTS tool.
->  
-> +PTS version: 5.0
-> +
->  * - different than PTS defaults
->  # - not yet implemented/supported
->  
-> @@ -12,8 +14,7 @@ Parameter Name	Selected	Description
+> @@ -668,19 +670,33 @@ TSPC_GAP_41_1	True (#)	Central BR/EDR/LE: Security Aspects (M)
 >  -------------------------------------------------------------------------------
->  TSPC_PBAP_0_1	False		Role: PBAP 1.0 (C.1)
->  TSPC_PBAP_0_2	True (*)	Role: PBAP 1.1 (C.1)
-> -TSPC_PBAP_0_3	False		Role: Reserve
-> -TSPC_PBAP_0_4	False (*)	Role: PBAP 1.2 (C.1)
-> +TSPC_PBAP_0_3	False (*)	Role: PBAP 1.2 (C.1)
+>  
+>  
+> +		Central Simultaneous BR/EDR and LE Transports
+> +-------------------------------------------------------------------------------
+> +Parameter Name	Selected	Description
+> +-------------------------------------------------------------------------------
+> +TSPC_GAP_42_1	False		Simultaneous BR/EDR and LE Transports –	BR/EDR
+> +					Slave to the same device (C.1)
+> +TSPC_GAP_42_2	False		Simultaneous BR/EDR and LE Transports – BR/EDR
+> +					Master to the same device (C.1)
+> +-------------------------------------------------------------------------------
+> +C.1: Optional if ((SUM ICS 31/14 (Core Spec Version 4.1) or SUM ICS 31/15
+> +	(Core Spec Version 4.1+HS)) is supported, otherwise Excluded.
+> +-------------------------------------------------------------------------------
+> +
+> +
+>  		Peripheral BR/EDR/LE Modes
 >  -------------------------------------------------------------------------------
->  C.1: Mandatory to support one and only one major profile version.
+>  Parameter Name	Selected	Description
 >  -------------------------------------------------------------------------------
+> -TSPC_GAP_42_1	False		Peripheral BR/EDR/LE: Non-Discoverable Mode
+> +TSPC_GAP_43_1	False		Peripheral BR/EDR/LE: Non-Discoverable Mode
+>  				(C.1)
+> -TSPC_GAP_42_2	False		Peripheral BR/EDR/LE: Discoverable Mode
+> +TSPC_GAP_43_2	False		Peripheral BR/EDR/LE: Discoverable Mode
+>  				(C.2)
+> -TSPC_GAP_42_3	False		Peripheral BR/EDR/LE: Non-Connectable Mode
+> +TSPC_GAP_43_3	False		Peripheral BR/EDR/LE: Non-Connectable Mode
+>  				(C.3)
+> -TSPC_GAP_42_4	False (*)	Peripheral BR/EDR/LE: Connectable Mode  (M)
+> -TSPC_GAP_42_5	False		Peripheral BR/EDR/LE: Non-Bondable Mode (C.4)
+> -TSPC_GAP_42_6	False		Peripheral BR/EDR/LE: Bondable Mode (C.5)
+> +TSPC_GAP_43_4	False (*)	Peripheral BR/EDR/LE: Connectable Mode  (M)
+> +TSPC_GAP_43_5	False		Peripheral BR/EDR/LE: Non-Bondable Mode (C.4)
+> +TSPC_GAP_43_6	False		Peripheral BR/EDR/LE: Bondable Mode (C.5)
+>  -------------------------------------------------------------------------------
+>  C.1: Mandatory if TSPC_GAP_1_1 is supported over BR/EDR, otherwise Excluded.
+>  C.2: Mandatory if (TSPC_GAP_1_2 or TSPC_GAP_1_3) is supported over BR/EDR,
+> @@ -695,7 +711,21 @@ C.5: Mandatory if TSPC_GAP_1_7 is supported over BR/EDR, otherwise Excluded.
+>  -------------------------------------------------------------------------------
+>  Parameter Name	Selected	Description
+>  -------------------------------------------------------------------------------
+> -TSPC_GAP_43_1	False (*)	Peripheral BR/EDR/LE: Security Aspects (M)
+> +TSPC_GAP_44_1	False (*)	Peripheral BR/EDR/LE: Security Aspects (M)
+> +-------------------------------------------------------------------------------
+> +
+> +
+> +		Peripheral Simultaneous BR/EDR and LE Transports
+> +-------------------------------------------------------------------------------
+> +Parameter Name	Selected	Description
+> +-------------------------------------------------------------------------------
+> +TSPC_GAP_45_1	False		Simultaneous BR/EDR and LE Transports – BR/EDR
+> +					Slave to the same device (C.1)
+> +TSPC_GAP_45_2	False		Simultaneous BR/EDR and LE Transports – BR/EDR
+> +					Master to the same device (C.1)
+> +-------------------------------------------------------------------------------
+> +C.1: Optional if ((SUM ICS 31/14 (Core Spec Version 4.1) or SUM ICS 31/15
+> +(Core Spec Version 4.1+HS)) is supported, otherwise Excluded.
+>  -------------------------------------------------------------------------------
+>  
+>  
 > 
 
 Applied, thanks.
