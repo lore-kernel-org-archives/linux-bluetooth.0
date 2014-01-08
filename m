@@ -1,79 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH_v3 3/4] android/pan: Implement PAN enable HAL api at daemon side
-Date: Wed, 08 Jan 2014 10:24:56 +0100
-Message-ID: <7986762.b1HJLuCvE7@uw000953>
-In-Reply-To: <1389097880-14783-4-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1389097880-14783-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1389097880-14783-4-git-send-email-ravikumar.veeramally@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv3 5/5] emulator/bthost: Add method to create rfcomm server
+Date: Wed,  8 Jan 2014 10:23:50 +0100
+Message-Id: <1389173030-27970-5-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1389173030-27970-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1389173030-27970-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+It allows user to create rfcomm server on bthost.
+---
+ emulator/bthost.c | 32 ++++++++++++++++++++++++++++++++
+ emulator/bthost.h |  6 ++++++
+ 2 files changed, 38 insertions(+)
 
-> ---
->  android/pan.c | 32 ++++++++++++++++++++++++++------
->  1 file changed, 26 insertions(+), 6 deletions(-)
-> 
-> diff --git a/android/pan.c b/android/pan.c
-> index 0eef284..0e12245 100644
-> --- a/android/pan.c
-> +++ b/android/pan.c
-> @@ -585,18 +585,38 @@ static void bt_pan_enable(const void *buf, uint16_t len)
->  {
->  	const struct hal_cmd_pan_enable *cmd = buf;
->  	uint8_t status;
-> +	int err;
-> +
-> +	DBG("");
-> +
-> +	if (local_role == cmd->local_role) {
-> +		status = HAL_STATUS_SUCCESS;
-> +		goto reply;
-> +	}
-> +
-> +	/* destroy existing server */
-> +	destroy_nap_device();
->  
->  	switch (cmd->local_role) {
->  	case HAL_PAN_ROLE_PANU:
-> -	case HAL_PAN_ROLE_NAP:
-> -		DBG("Not Implemented");
-> -		status  = HAL_STATUS_FAILED;
-> -		break;
-> -	default:
->  		status = HAL_STATUS_UNSUPPORTED;
-> -		break;
-> +		goto reply;
-> +	case HAL_PAN_ROLE_NONE:
-> +		status = HAL_STATUS_SUCCESS;
-> +		goto reply;
-> +	}
-
-Why do you remove default here? Daemon should verify parameter correctness.
-
-> +
-> +	local_role = cmd->local_role;
-> +	err = register_nap_server();
-> +	if (err < 0) {
-> +		status = HAL_STATUS_FAILED;
-> +		destroy_nap_device();
-> +		goto reply;
->  	}
->  
-> +	status = HAL_STATUS_SUCCESS;
-> +
-> +reply:
->  	ipc_send_rsp(HAL_SERVICE_ID_PAN, HAL_OP_PAN_ENABLE, status);
->  }
->  
-> 
-
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index 5e13745..8d53923 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -99,6 +99,13 @@ struct l2cap_conn_cb_data {
+ 	struct l2cap_conn_cb_data *next;
+ };
+ 
++struct rfcomm_conn_cb_data {
++	uint8_t channel;
++	bthost_rfcomm_connect_cb func;
++	void *user_data;
++	struct rfcomm_conn_cb_data *next;
++};
++
+ struct bthost {
+ 	uint8_t bdaddr[6];
+ 	bthost_send_func send_handler;
+@@ -111,6 +118,7 @@ struct bthost {
+ 	bthost_new_conn_cb new_conn_cb;
+ 	void *new_conn_data;
+ 	struct l2cap_conn_cb_data *new_l2cap_conn_data;
++	struct rfcomm_conn_cb_data *new_rfcomm_conn_data;
+ 	struct l2cap_pending_req *l2reqs;
+ };
+ 
+@@ -246,6 +254,13 @@ void bthost_destroy(struct bthost *bthost)
+ 		free(cb);
+ 	}
+ 
++	while (bthost->new_rfcomm_conn_data) {
++		struct rfcomm_conn_cb_data *cb = bthost->new_rfcomm_conn_data;
++
++		bthost->new_rfcomm_conn_data = cb->next;
++		free(cb);
++	}
++
+ 	free(bthost);
+ }
+ 
+@@ -1392,6 +1407,23 @@ void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
+ 	bthost->new_l2cap_conn_data = data;
+ }
+ 
++void bthost_add_rfcomm_server(struct bthost *bthost, uint8_t channel,
++				bthost_rfcomm_connect_cb func, void *user_data)
++{
++	struct rfcomm_conn_cb_data *data;
++
++	data = malloc(sizeof(struct rfcomm_conn_cb_data));
++	if (!data)
++		return;
++
++	data->channel = channel;
++	data->user_data = user_data;
++	data->func = func;
++	data->next = bthost->new_rfcomm_conn_data;
++
++	bthost->new_rfcomm_conn_data = data;
++}
++
+ void bthost_start(struct bthost *bthost)
+ {
+ 	if (!bthost)
+diff --git a/emulator/bthost.h b/emulator/bthost.h
+index 97f011b..7186aa0 100644
+--- a/emulator/bthost.h
++++ b/emulator/bthost.h
+@@ -80,5 +80,11 @@ typedef void (*bthost_l2cap_connect_cb) (uint16_t handle, uint16_t cid,
+ void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
+ 				bthost_l2cap_connect_cb func, void *user_data);
+ 
++typedef void (*bthost_rfcomm_connect_cb) (uint16_t handle, uint16_t cid,
++					uint8_t channel, void *user_data);
++
++void bthost_add_rfcomm_server(struct bthost *bthost, uint8_t channel,
++			bthost_rfcomm_connect_cb func, void *user_data);
++
+ void bthost_start(struct bthost *bthost);
+ void bthost_stop(struct bthost *bthost);
 -- 
-BR
-Szymon Janc
-
+1.8.3.1
 
