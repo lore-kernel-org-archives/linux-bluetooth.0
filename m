@@ -1,120 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android-tester: Add HIDHost initial interface setup test
-Date: Wed, 08 Jan 2014 09:09:26 +0100
-Message-ID: <1816544.qZJOrILi6u@uw000953>
-In-Reply-To: <1389104291-27210-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1389104291-27210-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Date: Wed, 8 Jan 2014 13:13:50 +0530
+Message-ID: <CAMLKGW72A9Jx8eUOqEWB5VXTtV_54t10tscy=axQ92B39JOPfw@mail.gmail.com>
+Subject: RFCOMM help
+From: code jug <codejug.cj@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Everyone,
 
-> ---
->  android/android-tester.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 46 insertions(+)
+I have a requirement where I have to
+1.get data from bluetooth low energy peripheral.
+2.send data to bluetooth classic Device. ( by setting up rfcomm server )
+3.Use a single dongle to do both ( if possible ) I have IOgear GBU521
 
-This patch makes android-tester segfaults when running "HIDHost Init" test.
+The whole setup needs to run on a raspberry pi "without any user
+intervention" for pairing etc.
 
-> 
-> diff --git a/android/android-tester.c b/android/android-tester.c
-> index 9a161ad..e4837c6 100644
-> --- a/android/android-tester.c
-> +++ b/android/android-tester.c
-> @@ -39,6 +39,7 @@
->  #include <hardware/hardware.h>
->  #include <hardware/bluetooth.h>
->  #include <hardware/bt_sock.h>
-> +#include <hardware/bt_hh.h>
->  
->  #include "utils.h"
->  
-> @@ -79,6 +80,7 @@ struct test_data {
->  	struct hw_device_t *device;
->  	const bt_interface_t *if_bluetooth;
->  	const btsock_interface_t *if_sock;
-> +	const bthh_interface_t *if_hid;
->  
->  	bool mgmt_settings_set;
->  	bool cb_count_checked;
-> @@ -958,6 +960,16 @@ static bt_callbacks_t bt_callbacks = {
->  	.le_test_mode_cb = NULL
->  };
->  
-> +static bthh_callbacks_t bthh_callbacks = {
-> +	.size = sizeof(bthh_callbacks),
-> +	.connection_state_cb = NULL,
-> +	.hid_info_cb = NULL,
-> +	.protocol_mode_cb = NULL,
-> +	.idle_time_cb = NULL,
-> +	.get_report_cb = NULL,
-> +	.virtual_unplug_cb = NULL
-> +};
-> +
->  static void setup(struct test_data *data)
->  {
->  	const hw_module_t *module;
-> @@ -1069,6 +1081,11 @@ static void teardown(const void *test_data)
->  		data->if_bluetooth = NULL;
->  	}
->  
-> +	if (data->if_hid) {
-> +		data->if_hid->cleanup();
-> +		data->if_hid = NULL;
-> +	}
-> +
->  	data->device->close(data->device);
->  
->  	if (data->bluetoothd_pid)
-> @@ -1860,6 +1877,32 @@ clean:
->  		close(sock_fd);
->  }
->  
-> +static void setup_hidhost_interface(const void *test_data)
-> +{
-> +	struct test_data *data = tester_get_data();
-> +	bt_status_t status;
-> +	const void *hid;
-> +
-> +	setup(data);
-> +
-> +	status = data->if_hid->init(&bthh_callbacks);
-> +	if (status != BT_STATUS_SUCCESS) {
-> +		data->if_hid = NULL;
-> +		tester_setup_failed();
-> +		return;
-> +	}
-> +
-> +	hid = data->if_bluetooth->get_profile_interface(BT_PROFILE_HIDHOST_ID);
-> +	if (!hid) {
-> +		tester_setup_failed();
-> +		return;
-> +	}
-> +
-> +	data->if_hid = hid;
-> +
-> +	tester_setup_complete();
-> +}
-> +
->  #define test_bredrle(name, data, test_setup, test, test_teardown) \
->  	do { \
->  		struct test_data *user; \
-> @@ -2071,5 +2114,8 @@ int main(int argc, char *argv[])
->  			setup_socket_interface_enabled,
->  			test_socket_real_connect, teardown);
->  
-> +	test_bredrle("HIDHost Init", NULL, setup_hidhost_interface,
-> +						test_dummy, teardown);
-> +
->  	return tester_run();
->  }
-> 
+I have the means to get data from the peripheral..
 
--- 
-BR
-Szymon Janc
+I want to set a default password (like "1234") so that any device can just
+connect to it and receive the data via rfcomm.
 
+Pairing always generates a key on my phone, and there is a prompt on the
+linux system. I want it to happen with a default password and not by
+prompting. something like pairing to a JYMCU from a phone.
+
+please help.
+
+Regards,
+cj
