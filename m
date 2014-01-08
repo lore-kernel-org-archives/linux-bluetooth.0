@@ -1,57 +1,193 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix outgoing authentication requirement check
-Date: Wed,  8 Jan 2014 16:40:39 +0200
-Message-Id: <1389192039-29493-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1389188229-3977-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1389188229-3977-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Wed, 8 Jan 2014 16:38:50 +0200
+Message-ID: <CABBYNZKN-Vr+oQgz3KLag+ggwfVKv=o6-a-nfMU3FWHbe-TCOA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] android/audio: Add wrapper stuct for audio structures
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Szymon Janc <szymon.janc@tieto.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Lukasz,
 
-The check for HIGH security level dates back to pre-mgmt times when a
-raw L2CAP socket with HIGH security level was used to trigger dedicated
-bonding. For legacy pairing checking for the security level was the only
-way to catch the need to authenticate in all scenarios. With mgmt
-however, the pair_device command does not use HIGH security but MEDIUM
-security. Therefore, the existing code would never trigger
-authentication for a non-SSP connection without an MITM requirement
-(e.g. if user space provided a NoInputNoOutput IO capability). In such a
-scenario the mgmt_pair_device command would return success without
-actually triggering any kind of pairing.
+On Wed, Jan 8, 2014 at 3:37 PM, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> This patch add wrapping struct for audio_hw_dev and audio_stream_out.
+> We will need this to keep some more addition info related to a2dp stream
+> and also hal IPC.
+>
+> ---
+>  android/hal-audio.c | 109 +++++++++++++++++++++++++++++++---------------------
+>  1 file changed, 65 insertions(+), 44 deletions(-)
+>
+> diff --git a/android/hal-audio.c b/android/hal-audio.c
+> index 7f4a3f2..bb68648 100644
+> --- a/android/hal-audio.c
+> +++ b/android/hal-audio.c
+> @@ -25,6 +25,15 @@
+>
+>  #include "hal-log.h"
+>
+> +struct a2dp_stream_out {
+> +       struct audio_stream_out stream;
+> +};
+> +
+> +struct a2dp_audio_dev {
+> +       struct audio_hw_device dev;
+> +       struct a2dp_stream_out *stream_out;
+> +};
+> +
+>  static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+>                                                                 size_t bytes)
+>  {
+> @@ -230,32 +239,37 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
+>                                         struct audio_stream_out **stream_out)
+>
+>  {
+> -       struct audio_stream_out *out;
+> +       struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *)dev;
+> +       struct a2dp_stream_out *a2dp_out;
+>
+> -       out = calloc(1, sizeof(struct audio_stream_out));
+> -       if (!out)
+> +       a2dp_out = calloc(1, sizeof(struct a2dp_stream_out));
+> +       if (!a2dp_out)
+>                 return -ENOMEM;
+>
+>         DBG("");
+>
+> -       out->common.get_sample_rate = out_get_sample_rate;
+> -       out->common.set_sample_rate = out_set_sample_rate;
+> -       out->common.get_buffer_size = out_get_buffer_size;
+> -       out->common.get_channels = out_get_channels;
+> -       out->common.get_format = out_get_format;
+> -       out->common.set_format = out_set_format;
+> -       out->common.standby = out_standby;
+> -       out->common.dump = out_dump;
+> -       out->common.set_parameters = out_set_parameters;
+> -       out->common.get_parameters = out_get_parameters;
+> -       out->common.add_audio_effect = out_add_audio_effect;
+> -       out->common.remove_audio_effect = out_remove_audio_effect;
+> -       out->get_latency = out_get_latency;
+> -       out->set_volume = out_set_volume;
+> -       out->write = out_write;
+> -       out->get_render_position = out_get_render_position;
+> -
+> -       *stream_out = out;
+> +       a2dp_out->stream.common.get_sample_rate = out_get_sample_rate;
+> +       a2dp_out->stream.common.set_sample_rate = out_set_sample_rate;
+> +       a2dp_out->stream.common.get_buffer_size = out_get_buffer_size;
+> +       a2dp_out->stream.common.get_channels = out_get_channels;
+> +       a2dp_out->stream.common.get_format = out_get_format;
+> +       a2dp_out->stream.common.set_format = out_set_format;
+> +       a2dp_out->stream.common.standby = out_standby;
+> +       a2dp_out->stream.common.dump = out_dump;
+> +       a2dp_out->stream.common.set_parameters = out_set_parameters;
+> +       a2dp_out->stream.common.get_parameters = out_get_parameters;
+> +       a2dp_out->stream.common.add_audio_effect = out_add_audio_effect;
+> +       a2dp_out->stream.common.remove_audio_effect = out_remove_audio_effect;
+> +       a2dp_out->stream.get_latency = out_get_latency;
+> +       a2dp_out->stream.set_volume = out_set_volume;
+> +       a2dp_out->stream.write = out_write;
+> +       a2dp_out->stream.get_render_position = out_get_render_position;
+> +
+> +       /* Note that &a2dp_out->stream pointer is same as a2dp_out. This
+> +        * results from the structure of a2dp_stream_out struct. We rely on it
+> +        * later in the code */
+> +       *stream_out = &a2dp_out->stream;
+> +       a2dp_dev->stream_out = a2dp_out;
+>
+>         return 0;
+>  }
+> @@ -264,6 +278,10 @@ static void audio_close_output_stream(struct audio_hw_device *dev,
+>                                         struct audio_stream_out *stream)
+>  {
+>         DBG("");
+> +       struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *)dev;
+> +
+> +       free(stream);
+> +       a2dp_dev->stream_out = NULL;
+>  }
+>
+>  static int audio_set_parameters(struct audio_hw_device *dev,
+> @@ -381,7 +399,7 @@ static int audio_close(hw_device_t *device)
+>  static int audio_open(const hw_module_t *module, const char *name,
+>                                                         hw_device_t **device)
+>  {
+> -       struct audio_hw_device *audio;
+> +       struct a2dp_audio_dev *a2dp_dev;
+>
+>         DBG("");
+>
+> @@ -391,30 +409,33 @@ static int audio_open(const hw_module_t *module, const char *name,
+>                 return -EINVAL;
+>         }
+>
+> -       audio = calloc(1, sizeof(struct audio_hw_device));
+> -       if (!audio)
+> +       a2dp_dev = calloc(1, sizeof(struct a2dp_audio_dev));
+> +       if (!a2dp_dev)
+>                 return -ENOMEM;
+>
+> -       audio->common.version = AUDIO_DEVICE_API_VERSION_CURRENT;
+> -       audio->common.module = (struct hw_module_t *) module;
+> -       audio->common.close = audio_close;
+> -
+> -       audio->init_check = audio_init_check;
+> -       audio->set_voice_volume = audio_set_voice_volume;
+> -       audio->set_master_volume = audio_set_master_volume;
+> -       audio->set_mode = audio_set_mode;
+> -       audio->set_mic_mute = audio_set_mic_mute;
+> -       audio->get_mic_mute = audio_get_mic_mute;
+> -       audio->set_parameters = audio_set_parameters;
+> -       audio->get_parameters = audio_get_parameters;
+> -       audio->get_input_buffer_size = audio_get_input_buffer_size;
+> -       audio->open_output_stream = audio_open_output_stream;
+> -       audio->close_output_stream = audio_close_output_stream;
+> -       audio->open_input_stream = audio_open_input_stream;
+> -       audio->close_input_stream = audio_close_input_stream;
+> -       audio->dump = audio_dump;
+> -
+> -       *device = &audio->common;
+> +       a2dp_dev->dev.common.version = AUDIO_DEVICE_API_VERSION_CURRENT;
+> +       a2dp_dev->dev.common.module = (struct hw_module_t *) module;
+> +       a2dp_dev->dev.common.close = audio_close;
+> +
+> +       a2dp_dev->dev.init_check = audio_init_check;
+> +       a2dp_dev->dev.set_voice_volume = audio_set_voice_volume;
+> +       a2dp_dev->dev.set_master_volume = audio_set_master_volume;
+> +       a2dp_dev->dev.set_mode = audio_set_mode;
+> +       a2dp_dev->dev.set_mic_mute = audio_set_mic_mute;
+> +       a2dp_dev->dev.get_mic_mute = audio_get_mic_mute;
+> +       a2dp_dev->dev.set_parameters = audio_set_parameters;
+> +       a2dp_dev->dev.get_parameters = audio_get_parameters;
+> +       a2dp_dev->dev.get_input_buffer_size = audio_get_input_buffer_size;
+> +       a2dp_dev->dev.open_output_stream = audio_open_output_stream;
+> +       a2dp_dev->dev.close_output_stream = audio_close_output_stream;
+> +       a2dp_dev->dev.open_input_stream = audio_open_input_stream;
+> +       a2dp_dev->dev.close_input_stream = audio_close_input_stream;
+> +       a2dp_dev->dev.dump = audio_dump;
+> +
+> +       /* Note that &a2dp_dev->dev.common is the same pointer as a2dp_dev.
+> +        * This results from the structure of following structs:a2dp_audio_dev,
+> +        * audio_hw_device. We will rely on this later in the code.*/
+> +       *device = &a2dp_dev->dev.common;
+>
+>         return 0;
+>  }
+> --
+> 1.8.4
 
-This patch updates the authentication requirement check to also consider
-MEDIUM security level, and thereby ensures that mgmt_pair_device will
-always trigger authentication.
+Ive pushed this one with some modifications, it doesn't seems
+necessary to create a wrapper for audio_stream_out so I prefer to
+introduce it later whenever it becomes necessary.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
-This one should probably get a Cc: stable flag. It's also a
-pre-requisite for the first mgmt-tester pairing test case that was
-recently added to user space git.
 
- net/bluetooth/hci_event.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 5f812455a450..cfcce448957b 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1185,9 +1185,12 @@ static int hci_outgoing_auth_needed(struct hci_dev *hdev,
- 		return 0;
- 
- 	/* Only request authentication for SSP connections or non-SSP
--	 * devices with sec_level HIGH or if MITM protection is requested */
-+	 * devices with sec_level MEDIUM or HIGH or if MITM protection
-+	 * is requested.
-+	 */
- 	if (!hci_conn_ssp_enabled(conn) && !(conn->auth_type & 0x01) &&
--	    conn->pending_sec_level != BT_SECURITY_HIGH)
-+	    conn->pending_sec_level != BT_SECURITY_HIGH &&
-+	    conn->pending_sec_level != BT_SECURITY_MEDIUM)
- 		return 0;
- 
- 	return 1;
 -- 
-1.8.4.2
-
+Luiz Augusto von Dentz
