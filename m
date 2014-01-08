@@ -1,51 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Pali =?utf-8?q?Roh=C3=A1r?= <pali.rohar@gmail.com>
-To: Sebastian Reichel <sre@ring0.de>
-Subject: Re: [PATCH v2] Bluetooth: Add hci_h4p driver
-Date: Wed, 8 Jan 2014 22:36:24 +0100
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- =?utf-8?q?=D0=98=D0=B2=D0=B0=D0=B9=D0=BB=D0=BE?=
- =?utf-8?q?_=D0=94=D0=B8=D0=BC=D0=B8=D1=82=D1=80=D0=BE=D0=B2?= <freemangordon@abv.bg>,
- "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Pavel Machek <pavel@ucw.cz>,
- "linux-kernel" <linux-kernel@vger.kernel.org>,
- "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
-References: <1379703710-5757-1-git-send-email-pali.rohar@gmail.com> <201312301531.29768@pali> <20131230145250.GA16904@earth.universe>
-In-Reply-To: <20131230145250.GA16904@earth.universe>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Message-Id: <201401082236.25135@pali>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH] Bluetooth: Fix outgoing authentication requirement check
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1389192039-29493-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 8 Jan 2014 11:00:41 -0800
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <D661A382-BBED-4DDE-B245-48F194ECB427@holtmann.org>
+References: <1389192039-29493-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 30 December 2013 15:52:51 Sebastian Reichel wrote:
-> > > > +MODULE_DESCRIPTION("Bluetooth h4 driver with nokia
-> > > > extensions"); +MODULE_LICENSE("GPL");
-> > > > +MODULE_AUTHOR("Ville Tervo");
-> > > > +MODULE_FIRMWARE(FW_NAME_TI1271_PRELE);
-> > > > +MODULE_FIRMWARE(FW_NAME_TI1271_LE);
-> > > > +MODULE_FIRMWARE(FW_NAME_TI1271);
-> > > > +MODULE_FIRMWARE(FW_NAME_BCM2048);
-> > > > +MODULE_FIRMWARE(FW_NAME_CSR);
-> > >=20
-> > > Do we actually have all these firmware files still
-> > > available. If not, then focus on the ones we have.
-> >=20
-> > Firmware files are available for download from nemo project:
-> >=20
-> > https://api.merproject.org/public/source/nemo:devel:hw:ti:om
-> > ap3:n900/bcm-bt-firmware/bcm-bt-firmware-0.21rc3.tar.bz2
-> > https://api.merproject.org/public/source/nemo:devel:hw:ti:o
-> > map3:n950-n9/ti-wl1273-bt-firmware/bt-firmware-ti1273_0.23+0
-> > m6.tar.gz
->=20
-> Would be nice to have them added to the linux-firmware.git.
->=20
-> -- Sebastian
+Hi Johan,
 
-Can somebody send firmware files for inclusion to linux-firmware?
+> The check for HIGH security level dates back to pre-mgmt times when a
+> raw L2CAP socket with HIGH security level was used to trigger dedicated
+> bonding. For legacy pairing checking for the security level was the only
+> way to catch the need to authenticate in all scenarios. With mgmt
+> however, the pair_device command does not use HIGH security but MEDIUM
+> security. Therefore, the existing code would never trigger
+> authentication for a non-SSP connection without an MITM requirement
+> (e.g. if user space provided a NoInputNoOutput IO capability). In such a
+> scenario the mgmt_pair_device command would return success without
+> actually triggering any kind of pairing.
+> 
+> This patch updates the authentication requirement check to also consider
+> MEDIUM security level, and thereby ensures that mgmt_pair_device will
+> always trigger authentication.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> This one should probably get a Cc: stable flag. It's also a
+> pre-requisite for the first mgmt-tester pairing test case that was
+> recently added to user space git.
+> 
+> net/bluetooth/hci_event.c | 7 +++++--
+> 1 file changed, 5 insertions(+), 2 deletions(-)
 
-=2D-=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
+patch has been applied to bluetooth-next tree.
+
+I want to give this some time to get tested via bluetooth-next before we mark this as to be backported to stable.
+
+Regards
+
+Marcel
+
