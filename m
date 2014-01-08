@@ -1,104 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastianx.chlad@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pics: Update PICS to PTS 5.0 for GAP
-Date: Wed, 08 Jan 2014 14:19:29 +0100
-Message-ID: <4744243.WviYpXJz18@uw000953>
-In-Reply-To: <1389174407-28486-1-git-send-email-sebastianx.chlad@intel.com>
-References: <1389174407-28486-1-git-send-email-sebastianx.chlad@intel.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
+Subject: Re: [PATCH v3 1/3] android: Add wrapper function for get remote dev properties
+Date: Wed, 08 Jan 2014 13:19:15 +0100
+Message-ID: <6204735.JyjCCBb1Ih@uw000953>
+In-Reply-To: <1389104030-21314-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1389104030-21314-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Łukasz,
 
-> Add new PICS settings for the GAP profile in accordance with PTS 5.0
 > ---
->  android/pics-gap.txt | 44 +++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 37 insertions(+), 7 deletions(-)
+>  android/bluetooth.c | 23 ++++++++++++++---------
+>  1 file changed, 14 insertions(+), 9 deletions(-)
 > 
-> diff --git a/android/pics-gap.txt b/android/pics-gap.txt
-> index e8ab2ab..56a33d5 100644
-> --- a/android/pics-gap.txt
-> +++ b/android/pics-gap.txt
-> @@ -1,5 +1,7 @@
->  GAP PICS for the PTS tool.
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index 3cbf68d..f281fcf 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -2673,6 +2673,19 @@ static uint8_t get_device_timestamp(struct device *dev)
+>  	return HAL_STATUS_SUCCESS;
+>  }
 >  
-> +PTS version: 5.0
+> +static void get_remote_device_props(struct device *dev)
+> +{
+> +	get_device_name(dev);
+> +	get_device_uuids(dev);
+> +	get_device_class(dev);
+> +	get_device_type(dev);
+> +	get_device_service_rec(dev);
+> +	get_device_friendly_name(dev);
+> +	get_device_rssi(dev);
+> +	get_device_version_info(dev);
+> +	get_device_timestamp(dev);
+> +}
 > +
->  * - different than PTS defaults
->  # - not yet implemented/supported
+>  static void handle_get_remote_device_props_cmd(const void *buf, uint16_t len)
+>  {
+>  	const struct hal_cmd_get_remote_device_props *cmd = buf;
+> @@ -2688,15 +2701,7 @@ static void handle_get_remote_device_props_cmd(const void *buf, uint16_t len)
+>  		goto failed;
+>  	}
 >  
-> @@ -668,19 +670,33 @@ TSPC_GAP_41_1	True (#)	Central BR/EDR/LE: Security Aspects (M)
->  -------------------------------------------------------------------------------
+> -	get_device_name(l->data);
+> -	get_device_uuids(l->data);
+> -	get_device_class(l->data);
+> -	get_device_type(l->data);
+> -	get_device_service_rec(l->data);
+> -	get_device_friendly_name(l->data);
+> -	get_device_rssi(l->data);
+> -	get_device_version_info(l->data);
+> -	get_device_timestamp(l->data);
+> +	get_remote_device_props(l->data);
 >  
->  
-> +		Central Simultaneous BR/EDR and LE Transports
-> +-------------------------------------------------------------------------------
-> +Parameter Name	Selected	Description
-> +-------------------------------------------------------------------------------
-> +TSPC_GAP_42_1	False		Simultaneous BR/EDR and LE Transports –	BR/EDR
-> +					Slave to the same device (C.1)
-> +TSPC_GAP_42_2	False		Simultaneous BR/EDR and LE Transports – BR/EDR
-> +					Master to the same device (C.1)
-> +-------------------------------------------------------------------------------
-> +C.1: Optional if ((SUM ICS 31/14 (Core Spec Version 4.1) or SUM ICS 31/15
-> +	(Core Spec Version 4.1+HS)) is supported, otherwise Excluded.
-> +-------------------------------------------------------------------------------
-> +
-> +
->  		Peripheral BR/EDR/LE Modes
->  -------------------------------------------------------------------------------
->  Parameter Name	Selected	Description
->  -------------------------------------------------------------------------------
-> -TSPC_GAP_42_1	False		Peripheral BR/EDR/LE: Non-Discoverable Mode
-> +TSPC_GAP_43_1	False		Peripheral BR/EDR/LE: Non-Discoverable Mode
->  				(C.1)
-> -TSPC_GAP_42_2	False		Peripheral BR/EDR/LE: Discoverable Mode
-> +TSPC_GAP_43_2	False		Peripheral BR/EDR/LE: Discoverable Mode
->  				(C.2)
-> -TSPC_GAP_42_3	False		Peripheral BR/EDR/LE: Non-Connectable Mode
-> +TSPC_GAP_43_3	False		Peripheral BR/EDR/LE: Non-Connectable Mode
->  				(C.3)
-> -TSPC_GAP_42_4	False (*)	Peripheral BR/EDR/LE: Connectable Mode  (M)
-> -TSPC_GAP_42_5	False		Peripheral BR/EDR/LE: Non-Bondable Mode (C.4)
-> -TSPC_GAP_42_6	False		Peripheral BR/EDR/LE: Bondable Mode (C.5)
-> +TSPC_GAP_43_4	False (*)	Peripheral BR/EDR/LE: Connectable Mode  (M)
-> +TSPC_GAP_43_5	False		Peripheral BR/EDR/LE: Non-Bondable Mode (C.4)
-> +TSPC_GAP_43_6	False		Peripheral BR/EDR/LE: Bondable Mode (C.5)
->  -------------------------------------------------------------------------------
->  C.1: Mandatory if TSPC_GAP_1_1 is supported over BR/EDR, otherwise Excluded.
->  C.2: Mandatory if (TSPC_GAP_1_2 or TSPC_GAP_1_3) is supported over BR/EDR,
-> @@ -695,7 +711,21 @@ C.5: Mandatory if TSPC_GAP_1_7 is supported over BR/EDR, otherwise Excluded.
->  -------------------------------------------------------------------------------
->  Parameter Name	Selected	Description
->  -------------------------------------------------------------------------------
-> -TSPC_GAP_43_1	False (*)	Peripheral BR/EDR/LE: Security Aspects (M)
-> +TSPC_GAP_44_1	False (*)	Peripheral BR/EDR/LE: Security Aspects (M)
-> +-------------------------------------------------------------------------------
-> +
-> +
-> +		Peripheral Simultaneous BR/EDR and LE Transports
-> +-------------------------------------------------------------------------------
-> +Parameter Name	Selected	Description
-> +-------------------------------------------------------------------------------
-> +TSPC_GAP_45_1	False		Simultaneous BR/EDR and LE Transports – BR/EDR
-> +					Slave to the same device (C.1)
-> +TSPC_GAP_45_2	False		Simultaneous BR/EDR and LE Transports – BR/EDR
-> +					Master to the same device (C.1)
-> +-------------------------------------------------------------------------------
-> +C.1: Optional if ((SUM ICS 31/14 (Core Spec Version 4.1) or SUM ICS 31/15
-> +(Core Spec Version 4.1+HS)) is supported, otherwise Excluded.
->  -------------------------------------------------------------------------------
->  
+>  	status = HAL_STATUS_SUCCESS;
 >  
 > 
 
-Applied, thanks.
+Patches applied, thanks.
 
 -- 
 BR
 Szymon Janc
-
