@@ -1,75 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52CD1BA5.1060801@linux.intel.com>
-Date: Wed, 08 Jan 2014 11:34:29 +0200
+Message-ID: <52CD1A97.8090400@linux.intel.com>
+Date: Wed, 08 Jan 2014 11:29:59 +0200
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH_v3 2/4] android/pan: Listen for incoming connections and
- accept in NAP role
-References: <1389097880-14783-1-git-send-email-ravikumar.veeramally@linux.intel.com>	<1389097880-14783-3-git-send-email-ravikumar.veeramally@linux.intel.com> <CABBYNZJHnUd9z6SRt84=OCXueBru9f5ae_m2SR06ujJzjQidBQ@mail.gmail.com>
-In-Reply-To: <CABBYNZJHnUd9z6SRt84=OCXueBru9f5ae_m2SR06ujJzjQidBQ@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+To: Szymon Janc <szymon.janc@tieto.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH_v3 3/4] android/pan: Implement PAN enable HAL api at daemon
+ side
+References: <1389097880-14783-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1389097880-14783-4-git-send-email-ravikumar.veeramally@linux.intel.com> <7986762.b1HJLuCvE7@uw000953>
+In-Reply-To: <7986762.b1HJLuCvE7@uw000953>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Szymon,
 
-On 01/08/2014 11:07 AM, Luiz Augusto von Dentz wrote:
+On 01/08/2014 11:24 AM, Szymon Janc wrote:
 > Hi Ravi,
 >
-> On Tue, Jan 7, 2014 at 2:31 PM, Ravi kumar Veeramally
-> <ravikumar.veeramally@linux.intel.com> wrote:
->> Listen for incoming connections and accept it. Create bnep interface
->> add it to bridge and notify control and connection state information
->> through HAL. Remove the device on disconnect request. If android
->> settings UI does not have bluetooth tethering enabled it immediately
->> sends disconnect signal.
 >> ---
->>   android/pan.c | 192 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->>   1 file changed, 190 insertions(+), 2 deletions(-)
+>>   android/pan.c | 32 ++++++++++++++++++++++++++------
+>>   1 file changed, 26 insertions(+), 6 deletions(-)
 >>
 >> diff --git a/android/pan.c b/android/pan.c
->> index 93078ba..0eef284 100644
+>> index 0eef284..0e12245 100644
 >> --- a/android/pan.c
 >> +++ b/android/pan.c
->> @@ -63,12 +63,17 @@ struct pan_device {
->>          uint8_t         role;
->>          GIOChannel      *io;
->>          struct bnep     *session;
->> +       guint           watch;
->>   };
->>
->>   static struct {
->>          uint32_t        record_id;
->> +       guint           watch;
->> +       GIOChannel      *io;
->>   } nap_dev = {
->>          .record_id = 0,
->> +       .watch = 0,
->> +       .io = NULL,
->>   };
->>
->>   static int device_cmp(gconstpointer s, gconstpointer user_data)
->> @@ -81,13 +86,21 @@ static int device_cmp(gconstpointer s, gconstpointer user_data)
->>
->>   static void pan_device_free(struct pan_device *dev)
+>> @@ -585,18 +585,38 @@ static void bt_pan_enable(const void *buf, uint16_t len)
 >>   {
->> +       if (dev->watch > 0) {
->> +               bnep_server_delete(BNEP_BRIDGE, dev->iface, &dev->dst);
->> +               g_source_remove(dev->watch);
->> +               dev->watch = 0;
-> Usually it is not necessary to assign anything to struct members when
-> you are freeing the whole struct since its memory gonna be freed
-> anyway.
+>>   	const struct hal_cmd_pan_enable *cmd = buf;
+>>   	uint8_t status;
+>> +	int err;
+>> +
+>> +	DBG("");
+>> +
+>> +	if (local_role == cmd->local_role) {
+>> +		status = HAL_STATUS_SUCCESS;
+>> +		goto reply;
+>> +	}
+>> +
+>> +	/* destroy existing server */
+>> +	destroy_nap_device();
+>>   
+>>   	switch (cmd->local_role) {
+>>   	case HAL_PAN_ROLE_PANU:
+>> -	case HAL_PAN_ROLE_NAP:
+>> -		DBG("Not Implemented");
+>> -		status  = HAL_STATUS_FAILED;
+>> -		break;
+>> -	default:
+>>   		status = HAL_STATUS_UNSUPPORTED;
+>> -		break;
+>> +		goto reply;
+>> +	case HAL_PAN_ROLE_NONE:
+>> +		status = HAL_STATUS_SUCCESS;
+>> +		goto reply;
+>> +	}
+> Why do you remove default here? Daemon should verify parameter correctness.
 
-   Yes you are right. Profiles/network/connection.c keeps device data 
-after disconnecting,
-   it will remove only on device remove call. Assigning zero or NULL 
-make sense there.
-   But in bluez-android device struct t is removed from list on 
-disconnected state.
-   Here it won't make much sense. I will remove it in my next version.
+   Yes, default should be there, I think I was still in the impression of
+  HAL side parameter validation. I will correct it in next version.
 
   Thanks,
   Ravi.
+>
+>> +
+>> +	local_role = cmd->local_role;
+>> +	err = register_nap_server();
+>> +	if (err < 0) {
+>> +		status = HAL_STATUS_FAILED;
+>> +		destroy_nap_device();
+>> +		goto reply;
+>>   	}
+>>   
+>> +	status = HAL_STATUS_SUCCESS;
+>> +
+>> +reply:
+>>   	ipc_send_rsp(HAL_SERVICE_ID_PAN, HAL_OP_PAN_ENABLE, status);
+>>   }
+>>   
+>>
+
