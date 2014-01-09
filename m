@@ -1,73 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2] shared: Fix not calling destroy callback while clearing up handlers
-Date: Thu,  9 Jan 2014 17:56:13 +0100
-Message-Id: <1389286573-8986-1-git-send-email-szymon.janc@gmail.com>
+Cc: claudio.takahasi@gmail.com,
+	Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 18/18] bluetooth.conf: Add ObjectManager interface
+Date: Thu,  9 Jan 2014 13:38:23 -0300
+Message-Id: <1389285503-19348-19-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1389285503-19348-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1385585457-26951-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1389285503-19348-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Szymon Janc <szymon.janc@tieto.com>
-
-read/write_watch_destroy is be called after io_set_read/write_handler
-exits. This was resulting in io destroy callback being NULLem before
-destroy was called resulting in io destroy not being called at all.
-
-Fix this by assigning destroy callback only if setting non-NULL
-callback. destroy_watch will clean it when called.
-
-Fix following valgrind report:
-
-168 (120 direct, 48 indirect) bytes in 1 blocks are definitely lost in
-       loss record 34 of 36
-   at 0x4C2C494: calloc (in /usr/lib/valgrind/
-       vgpreload_memcheck-amd64-linux.so)
-   by 0x409BAE: mgmt_new (mgmt.c:372)
-   by 0x409D05: mgmt_new_default (mgmt.c:469)
-   by 0x40E100: test_pre_setup (android-tester.c:371)
-   by 0x40AD84: start_tester (tester.c:586)
-   by 0x4E7C3B5: g_main_context_dispatch (in /lib/x86_64-linux-gnu/
-       libglib-2.0.so.0.3800.1)
-   by 0x4E7C707: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
-   by 0x4E7CB09: g_main_loop_run (in /lib/x86_64-linux-gnu/
-       libglib-2.0.so.0.3800.1)
-   by 0x40B76C: tester_run (tester.c:784)
-   by 0x4034F4: main (android-tester.c:2127)
 ---
- src/shared/io-glib.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ src/bluetooth.conf | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/src/shared/io-glib.c b/src/shared/io-glib.c
-index 488b1a2..77ba19e 100644
---- a/src/shared/io-glib.c
-+++ b/src/shared/io-glib.c
-@@ -189,10 +189,10 @@ bool io_set_read_handler(struct io *io, io_callback_func_t callback,
- 	if (io->read_watch == 0)
- 		return false;
+diff --git a/src/bluetooth.conf b/src/bluetooth.conf
+index 0495200..ad8891a 100644
+--- a/src/bluetooth.conf
++++ b/src/bluetooth.conf
+@@ -18,6 +18,7 @@
+     <allow send_interface="org.bluez.Profile1"/>
+     <allow send_interface="org.bluez.HeartRateWatcher1"/>
+     <allow send_interface="org.bluez.CyclingSpeedWatcher1"/>
++    <allow send_interface="org.freedesktop.DBus.ObjectManager"/>
+   </policy>
  
--done:
--	io->read_callback = callback;
- 	io->read_destroy = destroy;
- 	io->read_data = user_data;
-+done:
-+	io->read_callback = callback;
- 
- 	return true;
- }
-@@ -250,10 +250,10 @@ bool io_set_write_handler(struct io *io, io_callback_func_t callback,
- 	if (io->write_watch == 0)
- 		return false;
- 
--done:
--	io->write_callback = callback;
- 	io->write_destroy = destroy;
- 	io->write_data = user_data;
-+done:
-+	io->write_callback = callback;
- 
- 	return true;
- }
+   <policy at_console="true">
 -- 
-1.8.5.2
+1.8.3.1
 
