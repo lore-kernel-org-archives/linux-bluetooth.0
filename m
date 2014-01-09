@@ -3,60 +3,107 @@ From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@gmail.com,
 	Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v0 17/18] gatttool: Add unix socket support for interactive mode
-Date: Thu,  9 Jan 2014 13:38:22 -0300
-Message-Id: <1389285503-19348-18-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 14/18] test: Add signal handling for gatt-service
+Date: Thu,  9 Jan 2014 13:38:19 -0300
+Message-Id: <1389285503-19348-15-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1389285503-19348-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1385585457-26951-1-git-send-email-claudio.takahasi@openbossa.org>
  <1389285503-19348-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch allows running GATT operations over unix socket on
-interactive mode.
+This patch implements signal handling to run cleanup tasks before
+exiting.
 ---
- attrib/interactive.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+ test/gatt-service.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
 
-diff --git a/attrib/interactive.c b/attrib/interactive.c
-index 5bd27af..1a588c2 100644
---- a/attrib/interactive.c
-+++ b/attrib/interactive.c
-@@ -84,7 +84,7 @@ static char *get_prompt(void)
- 	if (opt_dst)
- 		g_string_append_printf(prompt, "[%17s]", opt_dst);
- 	else
--		g_string_append_printf(prompt, "[%17s]", "");
-+		g_string_append_printf(prompt, "[LOCAL]");
+diff --git a/test/gatt-service.c b/test/gatt-service.c
+index 16e2cea..c076588 100644
+--- a/test/gatt-service.c
++++ b/test/gatt-service.c
+@@ -27,12 +27,14 @@
  
- 	if (conn_state == STATE_CONNECTED)
- 		g_string_append(prompt, COLOR_OFF);
-@@ -406,15 +406,18 @@ static void cmd_connect(int argcp, char **argvp)
- 			opt_dst_type = g_strdup("public");
- 	}
+ #include <errno.h>
+ #include <stdio.h>
++#include <sys/signalfd.h>
  
--	if (opt_dst == NULL) {
--		error("Remote Bluetooth address required\n");
--		return;
-+	if (opt_dst) {
+ #include <glib.h>
+ #include <dbus/dbus.h>
+ #include <gdbus/gdbus.h>
+ 
+ #define SERVICE_IFACE			"org.bluez.Service1"
++#define SERVICE_MGR_IFACE		"org.bluez.ServiceManager1"
+ 
+ /* Immediate Alert Service UUID */
+ #define IAS_UUID			"00001802-0000-1000-8000-00805f9b34fb"
+@@ -112,9 +114,57 @@ static void create_services(DBusConnection *conn)
+ 	printf("Registered service: %s\n", service_path);
+ }
+ 
++static gboolean signal_handler(GIOChannel *channel, GIOCondition condition,
++							gpointer user_data)
++{
++	g_main_loop_quit(main_loop);
 +
-+		rl_printf("Attempting to connect to %s\n", opt_dst);
-+		set_state(STATE_CONNECTING);
-+		iochannel = gatt_connect(opt_src, opt_dst, opt_dst_type,
-+					opt_sec_level, opt_psm, opt_mtu,
-+					connect_cb, &gerr);
-+	} else {
-+		rl_printf("Local connection\n");
-+		iochannel = unix_connect(connect_cb, &gerr);
- 	}
++	return FALSE;
++}
++
++static guint setup_signalfd(void)
++{
++	GIOChannel *channel;
++	guint source;
++	sigset_t mask;
++	int fd;
++
++	sigemptyset(&mask);
++	sigaddset(&mask, SIGINT);
++	sigaddset(&mask, SIGTERM);
++
++	if (sigprocmask(SIG_BLOCK, &mask, NULL) < 0) {
++		perror("Failed to set signal mask");
++		return 0;
++	}
++
++	fd = signalfd(-1, &mask, 0);
++	if (fd < 0) {
++		perror("Failed to create signal descriptor");
++		return 0;
++	}
++
++	channel = g_io_channel_unix_new(fd);
++
++	g_io_channel_set_close_on_unref(channel, TRUE);
++
++	source = g_io_add_watch(channel,
++				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++				signal_handler, NULL);
++
++	g_io_channel_unref(channel);
++
++	return source;
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	DBusConnection *dbus_conn;
++	guint signal;
++
++	signal = setup_signalfd();
++	if (signal == 0)
++		return -errno;
  
--	rl_printf("Attempting to connect to %s\n", opt_dst);
--	set_state(STATE_CONNECTING);
--	iochannel = gatt_connect(opt_src, opt_dst, opt_dst_type, opt_sec_level,
--					opt_psm, opt_mtu, connect_cb, &gerr);
- 	if (iochannel == NULL) {
- 		set_state(STATE_DISCONNECTED);
- 		error("%s\n", gerr->message);
+ 	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
+ 
+@@ -129,6 +179,8 @@ int main(int argc, char *argv[])
+ 
+ 	g_main_loop_run(main_loop);
+ 
++	g_source_remove(signal);
++
+ 	g_slist_free_full(services, g_free);
+ 	dbus_connection_unref(dbus_conn);
+ 
 -- 
 1.8.3.1
 
