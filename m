@@ -1,71 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] shared: Fix not calling destroy callback while clearing up handlers
-Date: Thu,  9 Jan 2014 16:26:00 +0100
-Message-Id: <1389281160-17452-1-git-send-email-szymon.janc@tieto.com>
+Date: Thu, 9 Jan 2014 16:32:19 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] shared: Fix memory leaks in mgmt_unref
+Message-ID: <20140109143219.GB16810@x220.p-661hnu-f1>
+References: <1389277030-2131-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1389277030-2131-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-read/write_watch_destroy is be called after io_set_read/write_handler
-exits. This was resulting in io destroy callback being NULLem before
-destroy was called resulting in io destroy not being called at all.
+Hi Szymon,
 
-Fix this by assigning destroy callback only if setting non-NULL
-callback. destroy_watch will clean it when called.
+On Thu, Jan 09, 2014, Szymon Janc wrote:
+> Destroy notify and pending lists on freeing mgmt. Those two lists
+> cannot be destroyed in same place as reply and request queues due
+> to being used in can_read_data().
+> 
+> Fix following valgrind reports:
+> 
+> 24 bytes in 1 blocks are definitely lost in loss record 70 of 212
+>    at 0x4C2C494: calloc (in /usr/lib/valgrind/
+>        vgpreload_memcheck-amd64-linux.so)
+>    by 0x46B5E2: queue_new (queue.c:46)
+>    by 0x46C3CA: mgmt_new (mgmt.c:407)
+>    by 0x46C4B5: mgmt_new_default (mgmt.c:466)
+>    by 0x45FB45: adapter_init (adapter.c:6237)
+>    by 0x40A4F1: main (main.c:534)
+> 
+> 24 bytes in 1 blocks are definitely lost in loss record 71 of 212
+>    at 0x4C2C494: calloc (in /usr/lib/
+>        valgrind/vgpreload_memcheck-amd64-linux.so)
+>    by 0x46B5E2: queue_new (queue.c:46)
+>    by 0x46C3D8: mgmt_new (mgmt.c:417)
+>    by 0x46C4B5: mgmt_new_default (mgmt.c:466)
+>    by 0x45FB45: adapter_init (adapter.c:6237)
+>    by 0x40A4F1: main (main.c:534)
+> ---
+>  src/shared/mgmt.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 
-Fix following valgrind report:
+Applied. Thanks.
 
-168 (120 direct, 48 indirect) bytes in 1 blocks are definitely lost in
-       loss record 34 of 36
-   at 0x4C2C494: calloc (in /usr/lib/valgrind/
-       vgpreload_memcheck-amd64-linux.so)
-   by 0x409BAE: mgmt_new (mgmt.c:372)
-   by 0x409D05: mgmt_new_default (mgmt.c:469)
-   by 0x40E100: test_pre_setup (android-tester.c:371)
-   by 0x40AD84: start_tester (tester.c:586)
-   by 0x4E7C3B5: g_main_context_dispatch (in /lib/x86_64-linux-gnu/
-       libglib-2.0.so.0.3800.1)
-   by 0x4E7C707: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
-   by 0x4E7CB09: g_main_loop_run (in /lib/x86_64-linux-gnu/
-       libglib-2.0.so.0.3800.1)
-   by 0x40B76C: tester_run (tester.c:784)
-   by 0x4034F4: main (android-tester.c:2127)
----
- src/shared/io-glib.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
-
-diff --git a/src/shared/io-glib.c b/src/shared/io-glib.c
-index 488b1a2..b7b3ff2 100644
---- a/src/shared/io-glib.c
-+++ b/src/shared/io-glib.c
-@@ -191,8 +191,10 @@ bool io_set_read_handler(struct io *io, io_callback_func_t callback,
- 
- done:
- 	io->read_callback = callback;
--	io->read_destroy = destroy;
--	io->read_data = user_data;
-+	if (callback) {
-+		io->read_destroy = destroy;
-+		io->read_data = user_data;
-+	}
- 
- 	return true;
- }
-@@ -252,8 +254,10 @@ bool io_set_write_handler(struct io *io, io_callback_func_t callback,
- 
- done:
- 	io->write_callback = callback;
--	io->write_destroy = destroy;
--	io->write_data = user_data;
-+	if (callback) {
-+		io->write_destroy = destroy;
-+		io->write_data = user_data;
-+	}
- 
- 	return true;
- }
--- 
-1.8.3.2
-
+Johan
