@@ -1,34 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] l2test: Fix using incorrect size of option
-Date: Thu,  9 Jan 2014 18:11:03 +0200
-Message-Id: <1389283864-15135-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1389283864-15135-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1389283864-15135-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 9 Jan 2014 17:57:03 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, Bastien Nocera <hadess@hadess.net>
+Subject: Re: [PATCH 0/7] sixaxis: Don't mark USB plugged device as trusted
+Message-ID: <20140109155703.GA20418@x220.p-661hnu-f1>
+References: <1389139348-3552-1-git-send-email-szymon.janc@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1389139348-3552-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Szymon,
 
-Use size of option instead of size of pointer
----
- tools/l2test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, Jan 08, 2014, Szymon Janc wrote:
+> This serie removes marking USB plugged sixaxis DS3 devices as trusted.
+> Now agent is asked for service authorization before device is connected
+> over BT. This is to address conserns about possibly crafted USB devices.
+> 
+> This is implemented in PATCH 1. Rest are fixes for bugs that were uncovered
+> due this change and client functionality that I've found missing while
+> testing this.
+> 
+> Comments and testing are welcome.
+> 
+> -- 
+> BR
+> Szymon Janc
+> 
+> 
+> Szymon Janc (7):
+>   sixaxis: Don't mark USB plugged device as trusted
+>   input: Fix crash on authorization reply with first sixaxis connection
+>   input: Fix check if device is sixaxis in auth_callback
+>   input: Fix connecting new trusted sixaxis device
+>   client: Add untrust command
+>   client: Add block command
+>   client: Add unblock command
+> 
+>  client/main.c           | 93 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  plugins/sixaxis.c       |  1 -
+>  profiles/input/server.c | 37 ++++----------------
+>  3 files changed, 99 insertions(+), 32 deletions(-)
 
-diff --git a/tools/l2test.c b/tools/l2test.c
-index 9a7c809..aaa1608 100644
---- a/tools/l2test.c
-+++ b/tools/l2test.c
-@@ -287,7 +287,7 @@ static int setopts(int sk, struct l2cap_options *opts)
- {
- 	if (bdaddr_type == BDADDR_BREDR || cid)
- 		return setsockopt(sk, SOL_L2CAP, L2CAP_OPTIONS, opts,
--								sizeof(opts));
-+								sizeof(*opts));
- 
- 	return setsockopt(sk, SOL_BLUETOOTH, BT_RCVMTU, &opts->imtu,
- 							sizeof(opts->imtu));
--- 
-1.8.3.2
+All patches have been applied. Thanks.
 
+Johan
