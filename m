@@ -1,36 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 06/10] Bluetooth: Enable Authenticated Payload Timeout Expired event
-Date: Thu,  9 Jan 2014 12:56:26 -0800
-Message-Id: <1389300990-20255-6-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 04/10] Bluetooth: Add definitions for new link key types
+Date: Thu,  9 Jan 2014 12:56:24 -0800
+Message-Id: <1389300990-20255-4-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With Secure Connections capable controllers, the authenticated payload
-timeout can trigger. Enable the event so the controller informs the
-host when this happens.
+With the introduction of Secure Connections, the list of link key types
+got extended by P-256 versions of authenticated and unauthenticated
+link keys.
+
+To avoid any confusion the previous authenticated and unauthenticated
+link key types got ammended with a P912 postfix. And the two new keys
+have a P256 postfix now. Existing code using the previous definitions
+has been adjusted.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_core.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/net/bluetooth/hci.h | 6 ++++--
+ net/bluetooth/hci_conn.c    | 4 ++--
+ net/bluetooth/hci_event.c   | 2 +-
+ 3 files changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 5e8663c194c1..52e398f37129 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1288,6 +1288,10 @@ static void hci_set_event_mask_page_2(struct hci_request *req)
- 		events[2] |= 0x08;	/* Truncated Page Complete */
- 	}
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 56327c646a49..238a5f3a0661 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -331,9 +331,11 @@ enum {
+ #define HCI_LK_LOCAL_UNIT		0x01
+ #define HCI_LK_REMOTE_UNIT		0x02
+ #define HCI_LK_DEBUG_COMBINATION	0x03
+-#define HCI_LK_UNAUTH_COMBINATION	0x04
+-#define HCI_LK_AUTH_COMBINATION		0x05
++#define HCI_LK_UNAUTH_COMBINATION_P192	0x04
++#define HCI_LK_AUTH_COMBINATION_P192	0x05
+ #define HCI_LK_CHANGED_COMBINATION	0x06
++#define HCI_LK_UNAUTH_COMBINATION_P256	0x07
++#define HCI_LK_AUTH_COMBINATION_P256	0x08
+ /* The spec doesn't define types for SMP keys, the _MASTER suffix is implied */
+ #define HCI_SMP_STK			0x80
+ #define HCI_SMP_STK_SLAVE		0x81
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index ba5366c320da..251f22e32fbf 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -802,12 +802,12 @@ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
  
-+	/* Enable Authenticated Payload Timeout Expired event if supported */
-+	if (lmp_ping_capable(hdev))
-+		events[2] |= 0x80;
-+
- 	hci_req_add(req, HCI_OP_SET_EVENT_MASK_PAGE_2, sizeof(events), events);
- }
+ 	/* An authenticated combination key has sufficient security for any
+ 	   security level. */
+-	if (conn->key_type == HCI_LK_AUTH_COMBINATION)
++	if (conn->key_type == HCI_LK_AUTH_COMBINATION_P192)
+ 		goto encrypt;
  
+ 	/* An unauthenticated combination key has sufficient security for
+ 	   security level 1 and 2. */
+-	if (conn->key_type == HCI_LK_UNAUTH_COMBINATION &&
++	if (conn->key_type == HCI_LK_UNAUTH_COMBINATION_P192 &&
+ 	    (sec_level == BT_SECURITY_MEDIUM || sec_level == BT_SECURITY_LOW))
+ 		goto encrypt;
+ 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index cfcce448957b..defa1252b534 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2633,7 +2633,7 @@ static void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
+ 	if (conn) {
+-		if (key->type == HCI_LK_UNAUTH_COMBINATION &&
++		if (key->type == HCI_LK_UNAUTH_COMBINATION_P192 &&
+ 		    conn->auth_type != 0xff && (conn->auth_type & 0x01)) {
+ 			BT_DBG("%s ignoring unauthenticated key", hdev->name);
+ 			goto not_found;
 -- 
 1.8.4.2
 
