@@ -3,178 +3,175 @@ From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@gmail.com,
 	Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v0 12/18] test: Add external service GATT skeleton
-Date: Thu,  9 Jan 2014 13:38:17 -0300
-Message-Id: <1389285503-19348-13-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 16/18] gatttool: Add unix socket connect
+Date: Thu,  9 Jan 2014 13:38:21 -0300
+Message-Id: <1389285503-19348-17-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1389285503-19348-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1385585457-26951-1-git-send-email-claudio.takahasi@openbossa.org>
  <1389285503-19348-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the initial code for an external GATT service example.
-It implements the API defined at doc/gatt-api.txt
+This patch adds the initial support for GATT procedures over unix
+socket transport on command line mode (one-shot command). Temporary
+solution to allow local GATT procedures testing.
 ---
- Makefile.tools      |   5 ++
- test/gatt-service.c | 136 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 141 insertions(+)
- create mode 100644 test/gatt-service.c
+ attrib/gatttool.c | 27 ++++++++++++++++++++-------
+ attrib/gatttool.h |  1 +
+ attrib/utils.c    | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 75 insertions(+), 7 deletions(-)
 
-diff --git a/Makefile.tools b/Makefile.tools
-index ec1499a..d2c3218 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -323,3 +323,8 @@ test_scripts += test/sap_client.py test/bluezutils.py \
- 		test/test-heartrate test/test-alert test/test-hfp \
- 		test/test-cyclingspeed test/opp-client test/ftp-client \
- 		test/pbap-client test/map-client
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index f211dcd..65fba19 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -29,7 +29,6 @@
+ #include <errno.h>
+ #include <glib.h>
+ #include <stdlib.h>
+-#include <unistd.h>
+ 
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/hci.h>
+@@ -53,6 +52,7 @@ static int opt_end = 0xffff;
+ static int opt_handle = -1;
+ static int opt_mtu = 0;
+ static int opt_psm = 0;
++static gboolean opt_local = FALSE;
+ static gboolean opt_primary = FALSE;
+ static gboolean opt_characteristics = FALSE;
+ static gboolean opt_char_read = FALSE;
+@@ -512,6 +512,8 @@ static GOptionEntry options[] = {
+ 		"Specify local adapter interface", "hciX" },
+ 	{ "device", 'b', 0, G_OPTION_ARG_STRING, &opt_dst,
+ 		"Specify remote Bluetooth address", "MAC" },
++	{ "local", 'L', 0, G_OPTION_ARG_NONE, &opt_local,
++		"Use unix socket transport (local communication)", NULL },
+ 	{ "addr-type", 't', 0, G_OPTION_ARG_STRING, &opt_dst_type,
+ 		"Set LE address type. Default: public", "[public | random]"},
+ 	{ "mtu", 'm', 0, G_OPTION_ARG_INT, &opt_mtu,
+@@ -564,6 +566,11 @@ int main(int argc, char *argv[])
+ 		g_clear_error(&gerr);
+ 	}
+ 
++	if (opt_local) {
++		opt_src = NULL;
++		opt_dst = NULL;
++	}
 +
-+noinst_PROGRAMS += test/gatt-service
+ 	if (opt_interactive) {
+ 		interactive(opt_src, opt_dst, opt_dst_type, opt_psm);
+ 		goto done;
+@@ -589,14 +596,20 @@ int main(int argc, char *argv[])
+ 		goto done;
+ 	}
+ 
+-	if (opt_dst == NULL) {
+-		g_print("Remote Bluetooth address required\n");
+-		got_error = TRUE;
+-		goto done;
++	if (opt_local)
++		chan = unix_connect(connect_cb, &gerr);
++	else {
++		if (opt_dst == NULL) {
++			g_print("Remote Bluetooth address required\n");
++			got_error = TRUE;
++			goto done;
++		}
 +
-+test_gatt_service_SOURCES = test/gatt-service.c
-+test_gatt_service_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ gdbus/libgdbus-internal.la
-diff --git a/test/gatt-service.c b/test/gatt-service.c
-new file mode 100644
-index 0000000..16e2cea
---- /dev/null
-+++ b/test/gatt-service.c
-@@ -0,0 +1,136 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Instituto Nokia de Tecnologia - INdT
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
++		chan = gatt_connect(opt_src, opt_dst, opt_dst_type,
++					opt_sec_level, opt_psm, opt_mtu,
++					connect_cb, &gerr);
+ 	}
+ 
+-	chan = gatt_connect(opt_src, opt_dst, opt_dst_type, opt_sec_level,
+-					opt_psm, opt_mtu, connect_cb, &gerr);
+ 	if (chan == NULL) {
+ 		g_printerr("%s\n", gerr->message);
+ 		g_clear_error(&gerr);
+diff --git a/attrib/gatttool.h b/attrib/gatttool.h
+index 8f0913c..be8e236 100644
+--- a/attrib/gatttool.h
++++ b/attrib/gatttool.h
+@@ -27,4 +27,5 @@ GIOChannel *gatt_connect(const char *src, const char *dst,
+ 			const char *dst_type, const char *sec_level,
+ 			int psm, int mtu, BtIOConnect connect_cb,
+ 			GError **gerr);
++GIOChannel *unix_connect(BtIOConnect connect_cb, GError **gerr);
+ size_t gatt_attr_data_from_string(const char *str, uint8_t **data);
+diff --git a/attrib/utils.c b/attrib/utils.c
+index 77bab27..de7b00a 100644
+--- a/attrib/utils.c
++++ b/attrib/utils.c
+@@ -25,7 +25,12 @@
+ #include "config.h"
+ #endif
+ 
 +#include <errno.h>
-+#include <stdio.h>
+ #include <stdlib.h>
++#include <unistd.h>
++#include <sys/socket.h>
++#include <sys/un.h>
 +
-+#include <glib.h>
-+#include <dbus/dbus.h>
-+#include <gdbus/gdbus.h>
-+
-+#define SERVICE_IFACE			"org.bluez.Service1"
-+
-+/* Immediate Alert Service UUID */
-+#define IAS_UUID			"00001802-0000-1000-8000-00805f9b34fb"
-+
-+static GMainLoop *main_loop;
-+static GSList *services;
-+
-+static gboolean service_get_uuid(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
+ #include <glib.h>
+ 
+ #include <bluetooth/bluetooth.h>
+@@ -101,6 +106,55 @@ GIOChannel *gatt_connect(const char *src, const char *dst,
+ 	return chan;
+ }
+ 
++static gboolean unix_connect_cb(GIOChannel *io, GIOCondition cond,
++							gpointer user_data)
 +{
-+	const char *uuid = user_data;
++	BtIOConnect connect_cb = user_data;
++	GError *gerr;
 +
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
++	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
++		gerr = g_error_new_literal(G_IO_CHANNEL_ERROR,
++						G_IO_CHANNEL_ERROR_FAILED,
++						"connection attempt failed");
++		connect_cb(io, gerr, user_data);
++		g_clear_error(&gerr);
++	} else {
++		connect_cb(io, NULL, user_data);
++	}
 +
-+	return TRUE;
-+}
-+
-+static gboolean service_get_includes(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
-+{
-+	return TRUE;
-+}
-+
-+static gboolean service_exist_includes(const GDBusPropertyTable *property,
-+							void *user_data)
-+{
 +	return FALSE;
 +}
 +
-+static DBusMessage *service_release(DBusConnection *conn,
-+				DBusMessage *msg, void *user_data)
++GIOChannel *unix_connect(BtIOConnect connect_cb, GError **gerr)
 +{
-+	fprintf(stderr, "Terminating...\n");
++	GIOChannel *io;
++	struct sockaddr_un uaddr  = {
++		.sun_family	= AF_UNIX,
++		.sun_path	= "\0/bluetooth/unix_att",
++	};
++	int sk;
 +
-+	g_main_loop_quit(main_loop);
-+
-+	return NULL;
-+}
-+
-+static const GDBusMethodTable service_methods[] = {
-+	{ GDBUS_NOREPLY_METHOD("Release", NULL, NULL, service_release) },
-+	{ }
-+};
-+
-+static const GDBusPropertyTable service_properties[] = {
-+	{ "UUID", "s", service_get_uuid },
-+	{ "Includes", "ao", service_get_includes, NULL,
-+					service_exist_includes },
-+	{ }
-+};
-+
-+static char *register_service(DBusConnection *conn, const char *uuid)
-+{
-+	static int id = 1;
-+	char *path;
-+
-+	path = g_strdup_printf("/service%d", id++);
-+	if (g_dbus_register_interface(conn, path, SERVICE_IFACE,
-+				service_methods, NULL, service_properties,
-+				g_strdup(uuid), g_free) == FALSE) {
-+		fprintf(stderr, "Couldn't register service interface\n");
-+		g_free(path);
++	sk = socket(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC , 0);
++	if (sk < 0) {
++		g_set_error_literal(gerr, G_IO_CHANNEL_ERROR,
++				G_IO_CHANNEL_ERROR_FAILED, strerror(errno));
 +		return NULL;
 +	}
 +
-+	return path;
++	if (connect(sk, (struct sockaddr *) &uaddr, sizeof(uaddr)) < 0) {
++		g_set_error_literal(gerr, G_IO_CHANNEL_ERROR,
++				G_IO_CHANNEL_ERROR_FAILED, strerror(errno));
++		close(sk);
++		return NULL;
++	}
++
++	io = g_io_channel_unix_new(sk);
++	g_io_add_watch(io, G_IO_OUT | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++						unix_connect_cb, connect_cb);
++
++	return io;
 +}
 +
-+static void create_services(DBusConnection *conn)
-+{
-+	char *service_path;
-+
-+	service_path = register_service(conn, IAS_UUID);
-+
-+	services = g_slist_prepend(services, service_path);
-+
-+	printf("Registered service: %s\n", service_path);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	DBusConnection *dbus_conn;
-+
-+	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
-+
-+	main_loop = g_main_loop_new(NULL, FALSE);
-+
-+	g_dbus_attach_object_manager(dbus_conn);
-+
-+	printf("gatt-service unique name: %s\n",
-+				dbus_bus_get_unique_name(dbus_conn));
-+
-+	create_services(dbus_conn);
-+
-+	g_main_loop_run(main_loop);
-+
-+	g_slist_free_full(services, g_free);
-+	dbus_connection_unref(dbus_conn);
-+
-+	return 0;
-+}
+ size_t gatt_attr_data_from_string(const char *str, uint8_t **data)
+ {
+ 	char tmp[3];
 -- 
 1.8.3.1
 
