@@ -1,28 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] android/tester: Remove redundant whitespace
-Date: Thu,  9 Jan 2014 12:01:32 +0100
-Message-Id: <1389265295-3344-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH] android/haltest: Silence static analyzers
+Date: Thu,  9 Jan 2014 12:45:20 +0200
+Message-Id: <1389264320-7778-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1389259565-995-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1389259565-995-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+
+This makes code more readable and silence static analyzers which think
+that pipe and fd are close two times.
 ---
- android/android-tester.c | 1 -
- 1 file changed, 1 deletion(-)
+ android/android-tester.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/android/android-tester.c b/android/android-tester.c
-index a448ab5..4f733e1 100644
+index a448ab5..c14cc19 100644
 --- a/android/android-tester.c
 +++ b/android/android-tester.c
-@@ -189,7 +189,6 @@ static void expected_cb_count_init(struct test_data *data)
- 	data->cb_count = test_data->expected_cb_count;
+@@ -445,7 +445,7 @@ static void emulator(int pipe, int hci_index)
  
- 	check_cb_count();
--
- }
+ 	close(pipe);
+ 	close(fd);
+-	bluetoothd_start(hci_index);
++	return bluetoothd_start(hci_index);
  
- static void mgmt_cb_init(struct test_data *data)
+ failed:
+ 	close(pipe);
 -- 
-1.8.5.2
+1.8.3.2
 
