@@ -2,141 +2,141 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@gmail.com,
-	Andre Guedes <andre.guedes@openbossa.org>
-Subject: [PATCH BlueZ v0 05/18] gatt: Add helper for creating GATT services
-Date: Thu,  9 Jan 2014 13:38:10 -0300
-Message-Id: <1389285503-19348-6-git-send-email-claudio.takahasi@openbossa.org>
+	Alvaro Silva <alvaro.silva@openbossa.org>
+Subject: [PATCH BlueZ v0 03/18] gatt: Add registering external service
+Date: Thu,  9 Jan 2014 13:38:08 -0300
+Message-Id: <1389285503-19348-4-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1389285503-19348-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1385585457-26951-1-git-send-email-claudio.takahasi@openbossa.org>
  <1389285503-19348-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andre Guedes <andre.guedes@openbossa.org>
+From: Alvaro Silva <alvaro.silva@openbossa.org>
 
-This patch adds the btd_gatt_add_service() helper which adds a
-GATT Service declaration to the local attribute database.
+This patch allows external applications register a given service on
+Bluez. Applications must provide an object path and a dictionary of
+options. Options dictionary will be used later to provide additional
+service information.
 ---
- lib/uuid.h |  5 +++++
- src/gatt.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/gatt.h | 10 ++++++++++
- 3 files changed, 77 insertions(+)
+ src/gatt-dbus.c | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 88 insertions(+), 1 deletion(-)
 
-diff --git a/lib/uuid.h b/lib/uuid.h
-index c24cee5..237145b 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -158,6 +158,11 @@ void bt_uuid_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst);
- int bt_uuid_to_string(const bt_uuid_t *uuid, char *str, size_t n);
- int bt_string_to_uuid(bt_uuid_t *uuid, const char *string);
- 
-+static inline int bt_uuid_len(const bt_uuid_t *uuid)
-+{
-+	return uuid->type / 8;
-+}
-+
- #ifdef __cplusplus
- }
+diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
+index 90a321b..fc41b78 100644
+--- a/src/gatt-dbus.c
++++ b/src/gatt-dbus.c
+@@ -26,22 +26,109 @@
  #endif
-diff --git a/src/gatt.c b/src/gatt.c
-index e8b691a..ee045b1 100644
---- a/src/gatt.c
-+++ b/src/gatt.c
-@@ -27,11 +27,73 @@
+ 
+ #include <stdint.h>
++#include <errno.h>
  
  #include <glib.h>
+ #include <dbus/dbus.h>
+ #include <gdbus/gdbus.h>
  
 +#include "adapter.h"
 +#include "device.h"
-+
- #include "log.h"
 +#include "lib/uuid.h"
-+#include "attrib/att.h"
+ #include "dbus-common.h"
+ #include "log.h"
  
++#include "error.h"
  #include "gatt-dbus.h"
- #include "gatt.h"
  
-+/* Common GATT UUIDs */
-+static const bt_uuid_t primary_uuid  = { .type = BT_UUID16,
-+					.value.u16 = GATT_PRIM_SVC_UUID };
-+
-+struct btd_attribute {
-+	uint16_t handle;
-+	bt_uuid_t type;
-+	uint16_t value_len;
-+	uint8_t value[0];
+ #define SERVICE_MGR_IFACE			"org.bluez.ServiceManager1"
+ 
++struct external_app {
++	char *owner;
++	char *path;
++	GDBusClient *client;
++	unsigned int watch;
 +};
 +
-+static GList *local_attribute_db;
-+static uint16_t next_handle = 0x0001;
++static GSList *external_apps;
 +
-+static int local_database_add(uint16_t handle, struct btd_attribute *attr)
++static int external_app_path_cmp(gconstpointer a, gconstpointer b)
 +{
-+	attr->handle = handle;
++	const struct external_app *eapp = a;
++	const char *path = b;
 +
-+	local_attribute_db = g_list_append(local_attribute_db, attr);
-+
-+	return 0;
++	return g_strcmp0(eapp->path, path);
 +}
 +
-+struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
++static void external_app_watch_destroy(gpointer user_data)
 +{
-+	uint16_t len = bt_uuid_len(uuid);
-+	struct btd_attribute *attr = g_malloc0(sizeof(struct btd_attribute) +
-+									len);
++	struct external_app *eapp = user_data;
 +
-+	/*
-+	 * Service DECLARATION
-+	 *
-+	 *   TYPE         ATTRIBUTE VALUE
-+	 * +-------+---------------------------------+
-+	 * |0x2800 | 0xYYYY...                       |
-+	 * | (1)   | (2)                             |
-+	 * +------+----------------------------------+
-+	 * (1) - 2 octets: Primary/Secondary Service UUID
-+	 * (2) - 2 or 16 octets: Service UUID
-+	 */
++	/* TODO: Remove from the database */
 +
-+	attr->type = primary_uuid;
++	external_apps = g_slist_remove(external_apps, eapp);
 +
-+	att_put_uuid(*uuid, attr->value);
-+	attr->value_len = len;
++	g_dbus_client_unref(eapp->client);
 +
-+	if (local_database_add(next_handle, attr) < 0) {
-+		g_free(attr);
++	g_free(eapp->owner);
++	g_free(eapp->path);
++	g_free(eapp);
++}
++
++static struct external_app *new_external_app(DBusConnection *conn,
++					const char *sender, const char *path)
++{
++	struct external_app *eapp;
++	GDBusClient *client;
++
++	client = g_dbus_client_new(conn, sender, "/");
++	if (client == NULL)
++		return NULL;
++
++	eapp = g_new0(struct external_app, 1);
++
++	eapp->watch = g_dbus_add_disconnect_watch(btd_get_dbus_connection(),
++			sender, NULL, eapp, external_app_watch_destroy);
++	if (eapp->watch == 0) {
++		g_dbus_client_unref(client);
++		g_free(eapp);
 +		return NULL;
 +	}
 +
-+	/* TODO: missing overflow checking */
-+	next_handle = next_handle + 1;
++	eapp->owner = g_strdup(sender);
++	eapp->client = client;
++	eapp->path = g_strdup(path);
 +
-+	return attr;
++	return eapp;
 +}
 +
- void gatt_init(void)
+ static DBusMessage *register_service(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
  {
- 	DBG("Starting GATT server");
-diff --git a/src/gatt.h b/src/gatt.h
-index 3a320b4..8dd1312 100644
---- a/src/gatt.h
-+++ b/src/gatt.h
-@@ -21,6 +21,16 @@
-  *
-  */
- 
-+struct btd_attribute;
+-	return dbus_message_new_method_return(msg);
++	struct external_app *eapp;
++	DBusMessageIter iter;
++	const char *path;
 +
- void gatt_init(void);
- 
- void gatt_cleanup(void);
++	if (!dbus_message_iter_init(msg, &iter))
++		return btd_error_invalid_args(msg);
 +
-+/* btd_gatt_add_service - Add a service declaration to local attribute database.
-+ * @uuid:	Service UUID.
-+ *
-+ * Returns a reference to service declaration attribute. In case of error,
-+ * NULL is returned.
-+ */
-+struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid);
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_OBJECT_PATH)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_get_basic(&iter, &path);
++
++	if (g_slist_find_custom(external_apps, path, external_app_path_cmp))
++		return btd_error_already_exists(msg);
++
++	eapp = new_external_app(conn, dbus_message_get_sender(msg), path);
++	if (eapp == NULL)
++		return btd_error_failed(msg, "Not enough resources");
++
++	external_apps = g_slist_prepend(external_apps, eapp);
++
++	DBG("New app %p: %s", eapp, path);
++
++	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ }
+ 
+ static DBusMessage *unregister_service(DBusConnection *conn,
 -- 
 1.8.3.1
 
