@@ -1,28 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 9 Jan 2014 14:15:32 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] shared: Fix clearing of IO handlers
-Message-ID: <20140109121532.GA9338@x220.p-661hnu-f1>
-References: <1389263508-7073-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1389263508-7073-1-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1389267956-2297-3-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1389267956-2297-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1389267956-2297-3-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Thu, 9 Jan 2014 14:14:13 +0200
+Message-ID: <CABBYNZ+cVbwPQO-RX6yosU4arkdonVjaB0sAgg0jJbpEbLO=Nw@mail.gmail.com>
+Subject: Re: [PATCH 2/4] android/audio: Change mainloop handle in ipc_handler
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Szymon Janc <szymon.janc@tieto.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Lukasz,
 
-On Thu, Jan 09, 2014, Szymon Janc wrote:
-> If NULL callback is passed to io_set_read/write_handler don't add watch
-> for it and just clear struct io memebers. This was resulting in
-> write/read_callback being call in loop due to fd being never written
-> or read.
+On Thu, Jan 9, 2014 at 1:45 PM, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> Make sure we wait 1 sec  after each loop iteration.
+> It is important in case of failure that we do not overload cpu.
+>
 > ---
->  src/shared/io-glib.c | 16 ++++++++++++++--
->  1 file changed, 14 insertions(+), 2 deletions(-)
+>  android/hal-audio.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+>
+> diff --git a/android/hal-audio.c b/android/hal-audio.c
+> index 7a7c111..4a12bcb 100644
+> --- a/android/hal-audio.c
+> +++ b/android/hal-audio.c
+> @@ -465,15 +465,14 @@ failed:
+>
+>  static void *ipc_handler(void *data)
+>  {
+> -       bool done = false;
+>         struct pollfd pfd;
+> +       bool done;
+>
+>         DBG("");
+>
+> -       while (!done) {
+> +       for (done = false; !done; sleep(1)) {
 
-Applied. Thanks.
+This is getting bad really quickly, I did not realize there was a
+sleep in it but usually the use of it means we are doing something
+wrong which I suspect it has to do with either bind or listen failing
+since you are executing them in a loop, in that case I would suggest
+to start the listen socket on audio_open and only do the accept in the
+thread.
 
-Johan
+
+
+-- 
+Luiz Augusto von Dentz
