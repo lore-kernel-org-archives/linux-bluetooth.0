@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1389267956-2297-3-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1389267956-2297-2-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1389267956-2297-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1389267956-2297-3-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Thu, 9 Jan 2014 14:14:13 +0200
-Message-ID: <CABBYNZ+cVbwPQO-RX6yosU4arkdonVjaB0sAgg0jJbpEbLO=Nw@mail.gmail.com>
-Subject: Re: [PATCH 2/4] android/audio: Change mainloop handle in ipc_handler
+	<1389267956-2297-2-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Thu, 9 Jan 2014 14:06:20 +0200
+Message-ID: <CABBYNZLae+a37AAN8DzT_VswmCaL4SdQJEtakHHon7+kvuj3Mg@mail.gmail.com>
+Subject: Re: [PATCH 1/4] android/audio: Prefix error log with "a2dp"
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
@@ -19,37 +19,82 @@ Hi Lukasz,
 
 On Thu, Jan 9, 2014 at 1:45 PM, Lukasz Rymanowski
 <lukasz.rymanowski@tieto.com> wrote:
-> Make sure we wait 1 sec  after each loop iteration.
-> It is important in case of failure that we do not overload cpu.
->
 > ---
->  android/hal-audio.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
+>  android/hal-audio.c | 16 +++++++++-------
+>  1 file changed, 9 insertions(+), 7 deletions(-)
 >
 > diff --git a/android/hal-audio.c b/android/hal-audio.c
-> index 7a7c111..4a12bcb 100644
+> index 59a8269..7a7c111 100644
 > --- a/android/hal-audio.c
 > +++ b/android/hal-audio.c
-> @@ -465,15 +465,14 @@ failed:
+> @@ -423,7 +423,8 @@ static bool create_audio_ipc(void)
+>         sk = socket(PF_LOCAL, SOCK_SEQPACKET, 0);
+>         if (sk < 0) {
+>                 err = errno;
+> -               error("Failed to create socket: %d (%s)", err, strerror(err));
+> +               error("a2dp: Failed to create socket: %d (%s)", err,
+> +                                                               strerror(err));
+>                 return false;
+>         }
 >
->  static void *ipc_handler(void *data)
->  {
-> -       bool done = false;
->         struct pollfd pfd;
-> +       bool done;
+> @@ -435,13 +436,14 @@ static bool create_audio_ipc(void)
 >
+>         if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+>                 err = errno;
+> -               error("Failed to bind socket: %d (%s)", err, strerror(err));
+> +               error("a2dp: Failed to bind socket: %d (%s)", err,
+> +                                                               strerror(err));
+>                 goto failed;
+>         }
+>
+>         if (listen(sk, 1) < 0) {
+>                 err = errno;
+> -               error("Failed to listen on the socket: %d (%s)", err,
+> +               error("a2dp: Failed to listen on the socket: %d (%s)", err,
+>                                                                 strerror(err));
+>                 goto failed;
+>         }
+> @@ -449,7 +451,7 @@ static bool create_audio_ipc(void)
+>         audio_sk = accept(sk, NULL, NULL);
+>         if (audio_sk < 0) {
+>                 err = errno;
+> -               error("Failed to accept socket: %d (%s)", err, strerror(err));
+> +               error("a2dp: Failed to accept socket: %d (%s)", err, strerror(err));
+>                 goto failed;
+>         }
+>
+> @@ -470,7 +472,7 @@ static void *ipc_handler(void *data)
+>
+>         while (!done) {
+>                 if(!create_audio_ipc()) {
+> -                       error("Failed to create listening socket");
+> +                       error("a2dp: Failed to create listening socket");
+>                         sleep(1);
+>                         continue;
+>                 }
+> @@ -511,7 +513,7 @@ static int audio_open(const hw_module_t *module, const char *name,
 >         DBG("");
 >
-> -       while (!done) {
-> +       for (done = false; !done; sleep(1)) {
+>         if (strcmp(name, AUDIO_HARDWARE_INTERFACE)) {
+> -               error("interface %s not matching [%s]", name,
+> +               error("ad2p: interface %s not matching [%s]", name,
+>                                                 AUDIO_HARDWARE_INTERFACE);
+>                 return -EINVAL;
+>         }
+> @@ -547,7 +549,7 @@ static int audio_open(const hw_module_t *module, const char *name,
+>         err = pthread_create(&ipc_th, NULL, ipc_handler, NULL);
+>         if (err < 0) {
+>                 ipc_th = 0;
+> -               error("Failed to start Audio IPC thread: %d (%s)",
+> +               error("a2dp: Failed to start Audio IPC thread: %d (%s)",
+>                                                         -err, strerror(-err));
+>                 return (-err);
+>         }
+> --
+> 1.8.4
 
-This is getting bad really quickly, I did not realize there was a
-sleep in it but usually the use of it means we are doing something
-wrong which I suspect it has to do with either bind or listen failing
-since you are executing them in a loop, in that case I would suggest
-to start the listen socket on audio_open and only do the accept in the
-thread.
-
+I prefer you use the term Audio as prefix e.g. Audo: Failed to start
+IPC thread as this may be used for more than just A2DP.
 
 
 -- 
