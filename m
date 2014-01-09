@@ -2,65 +2,68 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] shared: Fix memory leaks in mgmt_unref
-Date: Thu,  9 Jan 2014 15:17:10 +0100
-Message-Id: <1389277030-2131-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH] shared: Fix use after free in queue_foreach
+Date: Thu,  9 Jan 2014 14:32:37 +0100
+Message-Id: <1389274357-25902-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Destroy notify and pending lists on freeing mgmt. Those two lists
-cannot be destroyed in same place as reply and request queues due
-to being used in can_read_data().
+Function passed to queue_foreach may free queue entry. Make loop safe
+with that. Fix number of following valgrin reports.
 
-Fix following valgrind reports:
-
-24 bytes in 1 blocks are definitely lost in loss record 70 of 212
-   at 0x4C2C494: calloc (in /usr/lib/valgrind/
+Invalid read of size 8
+   at 0x408EEC: queue_foreach (queue.c:181)
+   by 0x409A0E: can_read_data (mgmt.c:286)
+   by 0x40896C: read_callback (io-glib.c:164)
+   by 0x4E7C3B5: g_main_context_dispatch (in
+       /lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
+   by 0x4E7C707: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
+   by 0x4E7CB09: g_main_loop_run (in /lib/x86_64-linux-gnu/
+       libglib-2.0.so.0.3800.1)
+   by 0x40B5FC: tester_run (tester.c:784)
+   by 0x4034F4: main (android-tester.c:2127)
+ Address 0x59603a8 is 8 bytes inside a block of size 16 free'd
+   at 0x4C2B60C: free (in /usr/lib/valgrind/
        vgpreload_memcheck-amd64-linux.so)
-   by 0x46B5E2: queue_new (queue.c:46)
-   by 0x46C3CA: mgmt_new (mgmt.c:407)
-   by 0x46C4B5: mgmt_new_default (mgmt.c:466)
-   by 0x45FB45: adapter_init (adapter.c:6237)
-   by 0x40A4F1: main (main.c:534)
-
-24 bytes in 1 blocks are definitely lost in loss record 71 of 212
-   at 0x4C2C494: calloc (in /usr/lib/
-       valgrind/vgpreload_memcheck-amd64-linux.so)
-   by 0x46B5E2: queue_new (queue.c:46)
-   by 0x46C3D8: mgmt_new (mgmt.c:417)
-   by 0x46C4B5: mgmt_new_default (mgmt.c:466)
-   by 0x45FB45: adapter_init (adapter.c:6237)
-   by 0x40A4F1: main (main.c:534)
+   by 0x40910D: queue_remove_all (queue.c:289)
+   by 0x40A0BD: mgmt_unregister_all (mgmt.c:792)
+   by 0x40A0F4: mgmt_unref (mgmt.c:499)
+   by 0x40D814: index_removed_callback (android-tester.c:329)
+   by 0x408EEB: queue_foreach (queue.c:184)
+   by 0x409A0E: can_read_data (mgmt.c:286)
+   by 0x40896C: read_callback (io-glib.c:164)
+   by 0x4E7C3B5: g_main_context_dispatch (in /lib/x86_64-linux-gnu/
+       libglib-2.0.so.0.3800.1)
+   by 0x4E7C707: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.3800.1)
+   by 0x4E7CB09: g_main_loop_run (in /lib/x86_64-linux-gnu/
+       libglib-2.0.so.0.3800.1)
+   by 0x40B5FC: tester_run (tester.c:784)
 ---
- src/shared/mgmt.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ src/shared/queue.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
-index 2a2c2a3..b663d3a 100644
---- a/src/shared/mgmt.c
-+++ b/src/shared/mgmt.c
-@@ -291,8 +291,11 @@ static void read_watch_destroy(void *user_data)
- {
- 	struct mgmt *mgmt = user_data;
+diff --git a/src/shared/queue.c b/src/shared/queue.c
+index 0019e53..a7cc8d5 100644
+--- a/src/shared/queue.c
++++ b/src/shared/queue.c
+@@ -176,8 +176,15 @@ void queue_foreach(struct queue *queue, queue_foreach_func_t function,
+ 	if (!queue || !function)
+ 		return;
  
--	if (mgmt->destroyed)
-+	if (mgmt->destroyed) {
-+		queue_destroy(mgmt->notify_list, NULL);
-+		queue_destroy(mgmt->pending_list, NULL);
- 		free(mgmt);
+-	for (entry = queue->head; entry; entry = entry->next)
+-		function(entry->data, user_data);
++	entry = queue->head;
++
++	while (entry) {
++		struct queue_entry *tmp = entry;
++
++		entry = tmp->next;
++
++		function(tmp->data, user_data);
 +	}
  }
  
- static bool can_read_data(struct io *io, void *user_data)
-@@ -514,6 +517,8 @@ void mgmt_unref(struct mgmt *mgmt)
- 	mgmt->buf = NULL;
- 
- 	if (!mgmt->in_notify) {
-+		queue_destroy(mgmt->notify_list, NULL);
-+		queue_destroy(mgmt->pending_list, NULL);
- 		free(mgmt);
- 		return;
- 	}
+ void *queue_find(struct queue *queue, queue_match_func_t function,
 -- 
 1.8.3.2
 
