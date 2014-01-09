@@ -1,53 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 9 Jan 2014 18:21:02 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] shared: Fix not calling destroy callback while clearing
- up handlers
-Message-ID: <20140109162102.GA23401@x220.p-661hnu-f1>
-References: <1389281160-17452-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1389281160-17452-1-git-send-email-szymon.janc@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/3] hcidump: Fix missing break
+Date: Thu,  9 Jan 2014 18:11:02 +0200
+Message-Id: <1389283864-15135-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Thu, Jan 09, 2014, Szymon Janc wrote:
-> @@ -191,8 +191,10 @@ bool io_set_read_handler(struct io *io, io_callback_func_t callback,
->  
->  done:
->  	io->read_callback = callback;
-> -	io->read_destroy = destroy;
-> -	io->read_data = user_data;
-> +	if (callback) {
-> +		io->read_destroy = destroy;
-> +		io->read_data = user_data;
-> +	}
->  
->  	return true;
->  }
+---
+ tools/parser/avrcp.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-You're already checking for the value of callback earlier in the
-function, so to avoid another check how about just move these
-assignments right before the done: label?
+diff --git a/tools/parser/avrcp.c b/tools/parser/avrcp.c
+index b523533..7c320ea 100644
+--- a/tools/parser/avrcp.c
++++ b/tools/parser/avrcp.c
+@@ -1180,12 +1180,16 @@ response:
+ 		switch (status) {
+ 		case 0x00:
+ 			printf("(POWER_ON)\n");
++			break;
+ 		case 0x01:
+ 			printf("(POWER_OFF)\n");
++			break;
+ 		case 0x02:
+ 			printf("(UNPLUGGED)\n");
++			break;
+ 		default:
+ 			printf("(UNKOWN)\n");
++			break;
+ 		}
+ 		break;
+ 	case AVRCP_EVENT_PLAYER_APPLICATION_SETTING_CHANGED:
+-- 
+1.8.3.2
 
-> @@ -252,8 +254,10 @@ bool io_set_write_handler(struct io *io, io_callback_func_t callback,
->  
->  done:
->  	io->write_callback = callback;
-> -	io->write_destroy = destroy;
-> -	io->write_data = user_data;
-> +	if (callback) {
-> +		io->write_destroy = destroy;
-> +		io->write_data = user_data;
-> +	}
->  
->  	return true;
->  }
-
-Same here.
-
-Johan
