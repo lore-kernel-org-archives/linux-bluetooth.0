@@ -4,9 +4,9 @@ To: <linux-bluetooth@vger.kernel.org>
 CC: <luiz.dentz@gmail.com>, <szymon.janc@tieto.com>,
 	<johan.hedberg@gmail.com>,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 3/4] android/audio: Add skeleton for open_endpoint_cmd function
-Date: Thu, 9 Jan 2014 12:45:55 +0100
-Message-ID: <1389267956-2297-4-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 2/4] android/audio: Change mainloop handle in ipc_handler
+Date: Thu, 9 Jan 2014 12:45:54 +0100
+Message-ID: <1389267956-2297-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1389267956-2297-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1389267956-2297-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
@@ -14,40 +14,35 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Make sure we wait 1 sec  after each loop iteration.
+It is important in case of failure that we do not overload cpu.
+
 ---
- android/hal-audio.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ android/hal-audio.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 4a12bcb..95efa89 100644
+index 7a7c111..4a12bcb 100644
 --- a/android/hal-audio.c
 +++ b/android/hal-audio.c
-@@ -412,6 +412,13 @@ static int audio_close(hw_device_t *device)
- 	return 0;
- }
+@@ -465,15 +465,14 @@ failed:
  
-+static int open_endpoint_cmd(void)
-+{
-+	DBG("Not Implemented");
-+
-+	return AUDIO_STATUS_FAILED;
-+}
-+
- static bool create_audio_ipc(void)
+ static void *ipc_handler(void *data)
  {
- 	struct sockaddr_un addr;
-@@ -478,7 +485,10 @@ static void *ipc_handler(void *data)
+-	bool done = false;
+ 	struct pollfd pfd;
++	bool done;
  
- 		DBG("Audio IPC: Connected");
+ 	DBG("");
  
--		/* TODO: Register ENDPOINT here */
-+		if (open_endpoint_cmd() == AUDIO_STATUS_FAILED) {
-+			error("a2dp: failed to open endpoint");
-+			continue;
-+		}
+-	while (!done) {
++	for (done = false; !done; sleep(1)) {
+ 		if(!create_audio_ipc()) {
+ 			error("a2dp: Failed to create listening socket");
+-			sleep(1);
+ 			continue;
+ 		}
  
- 		memset(&pfd, 0, sizeof(pfd));
- 		pfd.fd = audio_sk;
 -- 
 1.8.4
 
