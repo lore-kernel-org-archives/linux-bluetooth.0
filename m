@@ -1,58 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 05/13] Bluetooth: Add support for handling P-256 derived link keys
-Date: Thu,  9 Jan 2014 22:40:46 -0800
-Message-Id: <1389336054-54064-5-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2 03/13] Bluetooth: Add HCI command definition for extended OOB data
+Date: Thu,  9 Jan 2014 22:40:44 -0800
+Message-Id: <1389336054-54064-3-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Before being able to enable Secure Connections support, the core needs
-to know on how to handle P-256 derived link keys. The difference between
-authenticated and unauthenticated P-256 derived link keys is the same as
-its P-192 counter parts.
+The Secure Connections feature introduces the support for P-256 strength
+pairings (compared to P-192 with Secure Simple Pairing). This however
+means that for out-of-band pairing the hash and randomizer needs to be
+differentiated. Two new commands are introduced to handle the possible
+combinations of P-192 and P-256. This add the HCI command definition
+for both.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_conn.c  | 6 ++++--
- net/bluetooth/hci_event.c | 3 ++-
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ include/net/bluetooth/hci.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 251f22e32fbf..cf96b3438a91 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -802,12 +802,14 @@ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 2a35d273de2c..e4e94bfc5232 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -664,6 +664,15 @@ struct hci_rp_set_csb {
  
- 	/* An authenticated combination key has sufficient security for any
- 	   security level. */
--	if (conn->key_type == HCI_LK_AUTH_COMBINATION_P192)
-+	if (conn->key_type == HCI_LK_AUTH_COMBINATION_P192 ||
-+	    conn->key_type == HCI_LK_AUTH_COMBINATION_P256)
- 		goto encrypt;
+ #define HCI_OP_START_SYNC_TRAIN		0x0443
  
- 	/* An unauthenticated combination key has sufficient security for
- 	   security level 1 and 2. */
--	if (conn->key_type == HCI_LK_UNAUTH_COMBINATION_P192 &&
-+	if ((conn->key_type == HCI_LK_UNAUTH_COMBINATION_P192 ||
-+	     conn->key_type == HCI_LK_UNAUTH_COMBINATION_P256) &&
- 	    (sec_level == BT_SECURITY_MEDIUM || sec_level == BT_SECURITY_LOW))
- 		goto encrypt;
++#define HCI_OP_REMOTE_OOB_EXT_DATA_REPLY	0x0445
++struct hci_cp_remote_oob_ext_data_reply {
++	bdaddr_t bdaddr;
++	__u8     hash192[16];
++	__u8     randomizer192[16];
++	__u8     hash256[16];
++	__u8     randomizer256[16];
++} __packed;
++
+ #define HCI_OP_SNIFF_MODE		0x0803
+ struct hci_cp_sniff_mode {
+ 	__le16   handle;
+@@ -948,6 +957,15 @@ struct hci_cp_write_sc_support {
+ 	__u8	support;
+ } __packed;
  
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index defa1252b534..b3c5396e0c1b 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2633,7 +2633,8 @@ static void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
- 	if (conn) {
--		if (key->type == HCI_LK_UNAUTH_COMBINATION_P192 &&
-+		if ((key->type == HCI_LK_UNAUTH_COMBINATION_P192 ||
-+		     key->type == HCI_LK_UNAUTH_COMBINATION_P256) &&
- 		    conn->auth_type != 0xff && (conn->auth_type & 0x01)) {
- 			BT_DBG("%s ignoring unauthenticated key", hdev->name);
- 			goto not_found;
++#define HCI_OP_READ_LOCAL_OOB_EXT_DATA	0x0c7d
++struct hci_rp_read_local_oob_ext_data {
++	__u8     status;
++	__u8     hash192[16];
++	__u8     randomizer192[16];
++	__u8     hash256[16];
++	__u8     randomizer256[16];
++} __packed;
++
+ #define HCI_OP_READ_LOCAL_VERSION	0x1001
+ struct hci_rp_read_local_version {
+ 	__u8     status;
 -- 
 1.8.4.2
 
