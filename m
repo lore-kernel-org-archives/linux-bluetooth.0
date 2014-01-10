@@ -1,102 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 14/15] Bluetooth: Add internal function for storing P-192 and P-256 data
-Date: Fri, 10 Jan 2014 02:07:29 -0800
-Message-Id: <1389348450-23303-14-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v4 15/15] Bluetooth: Add support for remote OOB input of P-256 data
+Date: Fri, 10 Jan 2014 02:07:30 -0800
+Message-Id: <1389348450-23303-15-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add function to allow adding P-192 and P-256 data to the internal
-storage. This also fixes a few coding style issues from the previous
-helper functions for the out-of-band credentials storage.
+The current management interface only allows to provide the remote
+OOB input of P-192 data. This extends the command to also accept
+P-256 data as well. To make this backwards compatible, the userspace
+can decide to only provide P-192 data or the combined P-192 and P-256
+data. It is also allowed to leave the P-192 data empty if userspace
+only has the remote P-256 data.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h |  9 ++++++---
- net/bluetooth/hci_core.c         | 37 +++++++++++++++++++++++++++++++++----
- 2 files changed, 39 insertions(+), 7 deletions(-)
+ include/net/bluetooth/mgmt.h |  8 ++++++++
+ net/bluetooth/mgmt.c         | 45 +++++++++++++++++++++++++++++++++-----------
+ 2 files changed, 42 insertions(+), 11 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 5948930f92e6..66e96ebffe97 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -761,9 +761,12 @@ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 036ddc7dc7ed..e19049fb6c46 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -309,6 +309,14 @@ struct mgmt_cp_add_remote_oob_data {
+ 	__u8	randomizer[16];
+ } __packed;
+ #define MGMT_ADD_REMOTE_OOB_DATA_SIZE	(MGMT_ADDR_INFO_SIZE + 32)
++struct mgmt_cp_add_remote_oob_ext_data {
++	struct mgmt_addr_info addr;
++	__u8	hash192[16];
++	__u8	randomizer192[16];
++	__u8	hash256[16];
++	__u8	randomizer256[16];
++} __packed;
++#define MGMT_ADD_REMOTE_OOB_EXT_DATA_SIZE (MGMT_ADDR_INFO_SIZE + 64)
  
- int hci_remote_oob_data_clear(struct hci_dev *hdev);
- struct oob_data *hci_find_remote_oob_data(struct hci_dev *hdev,
--							bdaddr_t *bdaddr);
--int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
--								u8 *randomizer);
-+					  bdaddr_t *bdaddr);
-+int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
-+			    u8 *hash, u8 *randomizer);
-+int hci_add_remote_oob_ext_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
-+				u8 *hash192, u8 *randomizer192,
-+				u8 *hash256, u8 *randomizer256);
- int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr);
- 
- void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index f13c0550f368..499ec1b1095d 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2794,15 +2794,14 @@ int hci_remote_oob_data_clear(struct hci_dev *hdev)
- 	return 0;
- }
- 
--int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
--			    u8 *randomizer)
-+int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
-+			    u8 *hash, u8 *randomizer)
+ #define MGMT_OP_REMOVE_REMOTE_OOB_DATA	0x0022
+ struct mgmt_cp_remove_remote_oob_data {
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index bbe30c983492..4b6034fcc902 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3096,23 +3096,46 @@ unlock:
+ static int add_remote_oob_data(struct sock *sk, struct hci_dev *hdev,
+ 			       void *data, u16 len)
  {
- 	struct oob_data *data;
+-	struct mgmt_cp_add_remote_oob_data *cp = data;
+-	u8 status;
+ 	int err;
  
- 	data = hci_find_remote_oob_data(hdev, bdaddr);
--
- 	if (!data) {
--		data = kzalloc(sizeof(*data), GFP_ATOMIC);
-+		data = kmalloc(sizeof(*data), GFP_ATOMIC);
- 		if (!data)
- 			return -ENOMEM;
+ 	BT_DBG("%s ", hdev->name);
  
-@@ -2813,6 +2812,36 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
- 	memcpy(data->hash192, hash, sizeof(data->hash192));
- 	memcpy(data->randomizer192, randomizer, sizeof(data->randomizer192));
+ 	hci_dev_lock(hdev);
  
-+	memset(data->hash256, 0, sizeof(data->hash256));
-+	memset(data->randomizer256, 0, sizeof(data->randomizer256));
+-	err = hci_add_remote_oob_data(hdev, &cp->addr.bdaddr, cp->hash,
+-				      cp->randomizer);
+-	if (err < 0)
+-		status = MGMT_STATUS_FAILED;
+-	else
+-		status = MGMT_STATUS_SUCCESS;
++	if (len == MGMT_ADD_REMOTE_OOB_DATA_SIZE) {
++		struct mgmt_cp_add_remote_oob_data *cp = data;
++		u8 status;
+ 
+-	err = cmd_complete(sk, hdev->id, MGMT_OP_ADD_REMOTE_OOB_DATA, status,
+-			   &cp->addr, sizeof(cp->addr));
++		err = hci_add_remote_oob_data(hdev, &cp->addr.bdaddr,
++					      cp->hash, cp->randomizer);
++		if (err < 0)
++			status = MGMT_STATUS_FAILED;
++		else
++			status = MGMT_STATUS_SUCCESS;
 +
-+	BT_DBG("%s for %pMR", hdev->name, bdaddr);
++		err = cmd_complete(sk, hdev->id, MGMT_OP_ADD_REMOTE_OOB_DATA,
++				   status, &cp->addr, sizeof(cp->addr));
++	} else if (len == MGMT_ADD_REMOTE_OOB_EXT_DATA_SIZE) {
++		struct mgmt_cp_add_remote_oob_ext_data *cp = data;
++		u8 status;
 +
-+	return 0;
-+}
++		err = hci_add_remote_oob_ext_data(hdev, &cp->addr.bdaddr,
++						  cp->hash192,
++						  cp->randomizer192,
++						  cp->hash256,
++						  cp->randomizer256);
++		if (err < 0)
++			status = MGMT_STATUS_FAILED;
++		else
++			status = MGMT_STATUS_SUCCESS;
 +
-+int hci_add_remote_oob_ext_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
-+				u8 *hash192, u8 *randomizer192,
-+				u8 *hash256, u8 *randomizer256)
-+{
-+	struct oob_data *data;
-+
-+	data = hci_find_remote_oob_data(hdev, bdaddr);
-+	if (!data) {
-+		data = kmalloc(sizeof(*data), GFP_ATOMIC);
-+		if (!data)
-+			return -ENOMEM;
-+
-+		bacpy(&data->bdaddr, bdaddr);
-+		list_add(&data->list, &hdev->remote_oob_data);
++		err = cmd_complete(sk, hdev->id, MGMT_OP_ADD_REMOTE_OOB_DATA,
++				   status, &cp->addr, sizeof(cp->addr));
++	} else {
++		BT_ERR("add_remote_oob_data: invalid length of %u bytes", len);
++		err = cmd_status(sk, hdev->id, MGMT_OP_ADD_REMOTE_OOB_DATA,
++				 MGMT_STATUS_INVALID_PARAMS);
 +	}
-+
-+	memcpy(data->hash192, hash192, sizeof(data->hash192));
-+	memcpy(data->randomizer192, randomizer192, sizeof(data->randomizer192));
-+
-+	memcpy(data->hash256, hash256, sizeof(data->hash256));
-+	memcpy(data->randomizer256, randomizer256, sizeof(data->randomizer256));
-+
- 	BT_DBG("%s for %pMR", hdev->name, bdaddr);
  
- 	return 0;
+ 	hci_dev_unlock(hdev);
+ 	return err;
+@@ -4202,7 +4225,7 @@ static const struct mgmt_handler {
+ 	{ user_passkey_reply,     false, MGMT_USER_PASSKEY_REPLY_SIZE },
+ 	{ user_passkey_neg_reply, false, MGMT_USER_PASSKEY_NEG_REPLY_SIZE },
+ 	{ read_local_oob_data,    false, MGMT_READ_LOCAL_OOB_DATA_SIZE },
+-	{ add_remote_oob_data,    false, MGMT_ADD_REMOTE_OOB_DATA_SIZE },
++	{ add_remote_oob_data,    true,  MGMT_ADD_REMOTE_OOB_DATA_SIZE },
+ 	{ remove_remote_oob_data, false, MGMT_REMOVE_REMOTE_OOB_DATA_SIZE },
+ 	{ start_discovery,        false, MGMT_START_DISCOVERY_SIZE },
+ 	{ stop_discovery,         false, MGMT_STOP_DISCOVERY_SIZE },
 -- 
 1.8.4.2
 
