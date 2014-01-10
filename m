@@ -1,145 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 12/15] Bluetooth: Add debugfs quirk for forcing Secure Connections support
-Date: Fri, 10 Jan 2014 01:29:39 -0800
-Message-Id: <1389346182-12387-12-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v3 13/15] Bluetooth: Provide remote OOB data for Secure Connections
+Date: Fri, 10 Jan 2014 01:29:40 -0800
+Message-Id: <1389346182-12387-13-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Bluetooth 4.1 specification with Secure Connections support has
-just been released and controllers with this feature are still in
-an early stage.
+When Secure Connections has been enabled it is possible to provide P-192
+and/or P-256 data during the pairing process. The internal out-of-band
+credentials storage has been extended to also hold P-256 data.
 
-A handful of controllers have already support for it, but they do
-not always identify this feature correctly. This debugfs entry
-allows to tell the kernel that the controller can be treated as
-it would fully support Secure Connections.
-
-Using debugfs to force Secure Connections support of course does
-not make this feature magically appear in all controllers. This
-is a debug functionality for early adopters. Once the majority
-of controllers matures this quirk will be removed.
+Initially the P-256 data will be empty and with Secure Connections enabled
+no P-256 data will be provided. This is according to the specification
+since it might be possible that the remote side did not provide either
+of the out-of-band credentials.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h |  1 +
- net/bluetooth/hci_core.c    | 51 ++++++++++++++++++++++++++++++++++++++++++++-
- net/bluetooth/mgmt.c        |  6 ++++--
- 3 files changed, 55 insertions(+), 3 deletions(-)
+ include/net/bluetooth/hci_core.h |  6 ++++--
+ net/bluetooth/hci_core.c         |  6 +++---
+ net/bluetooth/hci_event.c        | 32 ++++++++++++++++++++++++--------
+ 3 files changed, 31 insertions(+), 13 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 0253276e88e4..2bc19881e250 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -117,6 +117,7 @@ enum {
- 	HCI_SERVICE_CACHE,
- 	HCI_DEBUG_KEYS,
- 	HCI_DUT_MODE,
-+	HCI_FORCE_SC,
- 	HCI_UNREGISTER,
- 	HCI_USER_CHANNEL,
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index bd15eaa4c06e..5948930f92e6 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -114,8 +114,10 @@ struct link_key {
+ struct oob_data {
+ 	struct list_head list;
+ 	bdaddr_t bdaddr;
+-	u8 hash[16];
+-	u8 randomizer[16];
++	u8 hash192[16];
++	u8 randomizer192[16];
++	u8 hash256[16];
++	u8 randomizer256[16];
+ };
  
+ #define HCI_MAX_SHORT_NAME_LENGTH	10
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index b3b619a448b5..946631ffe802 100644
+index 946631ffe802..f13c0550f368 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -415,6 +415,52 @@ static int ssp_debug_mode_get(void *data, u64 *val)
- DEFINE_SIMPLE_ATTRIBUTE(ssp_debug_mode_fops, ssp_debug_mode_get,
- 			ssp_debug_mode_set, "%llu\n");
+@@ -2802,7 +2802,7 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
+ 	data = hci_find_remote_oob_data(hdev, bdaddr);
  
-+static ssize_t force_sc_support_read(struct file *file, char __user *user_buf,
-+				     size_t count, loff_t *ppos)
-+{
-+	struct hci_dev *hdev = file->private_data;
-+	char buf[3];
-+
-+	buf[0] = test_bit(HCI_FORCE_SC, &hdev->dev_flags) ? 'Y': 'N';
-+	buf[1] = '\n';
-+	buf[2] = '\0';
-+	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
-+}
-+
-+static ssize_t force_sc_support_write(struct file *file,
-+				      const char __user *user_buf,
-+				      size_t count, loff_t *ppos)
-+{
-+	struct hci_dev *hdev = file->private_data;
-+	char buf[32];
-+	size_t buf_size = min(count, (sizeof(buf)-1));
-+	bool enable;
-+
-+	if (test_bit(HCI_UP, &hdev->flags))
-+		return -EBUSY;
-+
-+	if (copy_from_user(buf, user_buf, buf_size))
-+		return -EFAULT;
-+
-+	buf[buf_size] = '\0';
-+	if (strtobool(buf, &enable))
-+		return -EINVAL;
-+
-+	if (enable == test_bit(HCI_FORCE_SC, &hdev->dev_flags))
-+		return -EALREADY;
-+
-+	change_bit(HCI_FORCE_SC, &hdev->dev_flags);
-+
-+	return count;
-+}
-+
-+static const struct file_operations force_sc_support_fops = {
-+	.open		= simple_open,
-+	.read		= force_sc_support_read,
-+	.write		= force_sc_support_write,
-+	.llseek		= default_llseek,
-+};
-+
- static int idle_timeout_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-@@ -1365,7 +1411,8 @@ static void hci_init4_req(struct hci_request *req, unsigned long opt)
- 		hci_req_add(req, HCI_OP_READ_SYNC_TRAIN_PARAMS, 0, NULL);
+ 	if (!data) {
+-		data = kmalloc(sizeof(*data), GFP_ATOMIC);
++		data = kzalloc(sizeof(*data), GFP_ATOMIC);
+ 		if (!data)
+ 			return -ENOMEM;
  
- 	/* Enable Secure Connections if supported and configured */
--	if (lmp_sc_capable(hdev) &&
-+	if ((lmp_sc_capable(hdev) ||
-+	     test_bit(HCI_FORCE_SC, &hdev->dev_flags)) &&
- 	    test_bit(HCI_SC_ENABLED, &hdev->dev_flags)) {
- 		u8 support = 0x01;
- 		hci_req_add(req, HCI_OP_WRITE_SC_SUPPORT,
-@@ -1442,6 +1489,8 @@ static int __hci_init(struct hci_dev *hdev)
- 				    hdev, &auto_accept_delay_fops);
- 		debugfs_create_file("ssp_debug_mode", 0644, hdev->debugfs,
- 				    hdev, &ssp_debug_mode_fops);
-+		debugfs_create_file("force_sc_support", 0644, hdev->debugfs,
-+				    hdev, &force_sc_support_fops);
+@@ -2810,8 +2810,8 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
+ 		list_add(&data->list, &hdev->remote_oob_data);
  	}
  
- 	if (lmp_sniff_capable(hdev)) {
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a7d4ae679ab7..bbe30c983492 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -378,7 +378,8 @@ static u32 get_supported_settings(struct hci_dev *hdev)
- 			settings |= MGMT_SETTING_HS;
- 		}
+-	memcpy(data->hash, hash, sizeof(data->hash));
+-	memcpy(data->randomizer, randomizer, sizeof(data->randomizer));
++	memcpy(data->hash192, hash, sizeof(data->hash192));
++	memcpy(data->randomizer192, randomizer, sizeof(data->randomizer192));
  
--		if (lmp_sc_capable(hdev))
-+		if (lmp_sc_capable(hdev) ||
-+		    test_bit(HCI_FORCE_SC, &hdev->dev_flags))
- 			settings |= MGMT_SETTING_SECURE_CONN;
+ 	BT_DBG("%s for %pMR", hdev->name, bdaddr);
+ 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 6923241d2b3e..47b953e24864 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3391,20 +3391,36 @@ static void hci_remote_oob_data_request_evt(struct hci_dev *hdev,
+ 
+ 	data = hci_find_remote_oob_data(hdev, &ev->bdaddr);
+ 	if (data) {
+-		struct hci_cp_remote_oob_data_reply cp;
++		if (test_bit(HCI_SC_ENABLED, &hdev->dev_flags)) {
++			struct hci_cp_remote_oob_ext_data_reply cp;
+ 
+-		bacpy(&cp.bdaddr, &ev->bdaddr);
+-		memcpy(cp.hash, data->hash, sizeof(cp.hash));
+-		memcpy(cp.randomizer, data->randomizer, sizeof(cp.randomizer));
++			bacpy(&cp.bdaddr, &ev->bdaddr);
++			memcpy(cp.hash192, data->hash192, sizeof(cp.hash192));
++			memcpy(cp.randomizer192, data->randomizer192,
++			       sizeof(cp.randomizer192));
++			memcpy(cp.hash256, data->hash256, sizeof(cp.hash256));
++			memcpy(cp.randomizer256, data->randomizer256,
++			       sizeof(cp.randomizer256));
++
++			hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_EXT_DATA_REPLY,
++				     sizeof(cp), &cp);
++		} else {
++			struct hci_cp_remote_oob_data_reply cp;
+ 
+-		hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_DATA_REPLY, sizeof(cp),
+-			     &cp);
++			bacpy(&cp.bdaddr, &ev->bdaddr);
++			memcpy(cp.hash, data->hash192, sizeof(cp.hash));
++			memcpy(cp.randomizer, data->randomizer192,
++			       sizeof(cp.randomizer));
++
++			hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_DATA_REPLY,
++				     sizeof(cp), &cp);
++		}
+ 	} else {
+ 		struct hci_cp_remote_oob_data_neg_reply cp;
+ 
+ 		bacpy(&cp.bdaddr, &ev->bdaddr);
+-		hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_DATA_NEG_REPLY, sizeof(cp),
+-			     &cp);
++		hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_DATA_NEG_REPLY,
++			     sizeof(cp), &cp);
  	}
  
-@@ -4026,7 +4027,8 @@ static int set_secure_conn(struct sock *sk, struct hci_dev *hdev,
- 		return cmd_status(sk, hdev->id, MGMT_OP_SET_SECURE_CONN,
- 				  status);
- 
--	if (!lmp_sc_capable(hdev))
-+	if (!lmp_sc_capable(hdev) &&
-+	    !test_bit(HCI_FORCE_SC, &hdev->dev_flags))
- 		return cmd_status(sk, hdev->id, MGMT_OP_SET_SECURE_CONN,
- 				  MGMT_STATUS_NOT_SUPPORTED);
- 
+ unlock:
 -- 
 1.8.4.2
 
