@@ -1,57 +1,134 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 01/13] Bluetooth: Add LMP feature definitions for Secure Connections support
-Date: Thu,  9 Jan 2014 22:40:42 -0800
-Message-Id: <1389336054-54064-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Provide remote OOB data for Secure Connections
+Date: Thu,  9 Jan 2014 21:58:24 -0800
+Message-Id: <1389333504-47886-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The support for Secure Connections introduces two new controller
-features and one new host feature.
+When Secure Connections has been enabled it is possible to provide P-192
+and/or P-256 data during the pairing process. The internal out-of-band
+credentials storage has been extended to also hold P-256 data.
+
+Initially the P-256 data will be empty and with Secure Connections enabled
+no P-256 data will be provided. This is according to the specification
+since it might be possible that the remote side did not provide either
+of the out-of-band credentials.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h      | 4 ++++
- include/net/bluetooth/hci_core.h | 3 +++
- 2 files changed, 7 insertions(+)
+ include/net/bluetooth/hci.h      |  4 ++--
+ include/net/bluetooth/hci_core.h |  6 ++++--
+ net/bluetooth/hci_core.c         |  6 +++---
+ net/bluetooth/hci_event.c        | 32 ++++++++++++++++++++++++--------
+ 4 files changed, 33 insertions(+), 15 deletions(-)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 66c1cd87bfe7..cd40219d32aa 100644
+index 4850da41f788..2bc19881e250 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -282,10 +282,14 @@ enum {
- #define LMP_SYNC_TRAIN	0x04
- #define LMP_SYNC_SCAN	0x08
+@@ -668,8 +668,8 @@ struct hci_rp_set_csb {
  
-+#define LMP_SC		0x01
-+#define LMP_PING	0x02
-+
- /* Host features */
- #define LMP_HOST_SSP		0x01
- #define LMP_HOST_LE		0x02
- #define LMP_HOST_LE_BREDR	0x04
-+#define LMP_HOST_SC		0x08
+ #define HCI_OP_START_SYNC_TRAIN		0x0443
  
- /* Connection modes */
- #define HCI_CM_ACTIVE	0x0000
+-#define HCI_OP_REMOTE_OOB_DATA_EXT_REPLY	0x0445
+-struct hci_cp_remote_oob_data_ext_reply {
++#define HCI_OP_REMOTE_OOB_EXT_DATA_REPLY	0x0445
++struct hci_cp_remote_oob_ext_data_reply {
+ 	bdaddr_t bdaddr;
+ 	__u8     hash192[16];
+ 	__u8     randomizer192[16];
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index f2f0cf5865c4..bb984d0626b7 100644
+index bd15eaa4c06e..5948930f92e6 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -803,9 +803,12 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- #define lmp_csb_slave_capable(dev)  ((dev)->features[2][0] & LMP_CSB_SLAVE)
- #define lmp_sync_train_capable(dev) ((dev)->features[2][0] & LMP_SYNC_TRAIN)
- #define lmp_sync_scan_capable(dev)  ((dev)->features[2][0] & LMP_SYNC_SCAN)
-+#define lmp_sc_capable(dev)         ((dev)->features[2][1] & LMP_SC)
-+#define lmp_ping_capable(dev)       ((dev)->features[2][1] & LMP_PING)
+@@ -114,8 +114,10 @@ struct link_key {
+ struct oob_data {
+ 	struct list_head list;
+ 	bdaddr_t bdaddr;
+-	u8 hash[16];
+-	u8 randomizer[16];
++	u8 hash192[16];
++	u8 randomizer192[16];
++	u8 hash256[16];
++	u8 randomizer256[16];
+ };
  
- /* ----- Host capabilities ----- */
- #define lmp_host_ssp_capable(dev)  ((dev)->features[1][0] & LMP_HOST_SSP)
-+#define lmp_host_sc_capable(dev)   ((dev)->features[1][0] & LMP_HOST_SC)
- #define lmp_host_le_capable(dev)   (!!((dev)->features[1][0] & LMP_HOST_LE))
- #define lmp_host_le_br_capable(dev) (!!((dev)->features[1][0] & LMP_HOST_LE_BREDR))
+ #define HCI_MAX_SHORT_NAME_LENGTH	10
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 946631ffe802..f13c0550f368 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2802,7 +2802,7 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
+ 	data = hci_find_remote_oob_data(hdev, bdaddr);
  
+ 	if (!data) {
+-		data = kmalloc(sizeof(*data), GFP_ATOMIC);
++		data = kzalloc(sizeof(*data), GFP_ATOMIC);
+ 		if (!data)
+ 			return -ENOMEM;
+ 
+@@ -2810,8 +2810,8 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
+ 		list_add(&data->list, &hdev->remote_oob_data);
+ 	}
+ 
+-	memcpy(data->hash, hash, sizeof(data->hash));
+-	memcpy(data->randomizer, randomizer, sizeof(data->randomizer));
++	memcpy(data->hash192, hash, sizeof(data->hash192));
++	memcpy(data->randomizer192, randomizer, sizeof(data->randomizer192));
+ 
+ 	BT_DBG("%s for %pMR", hdev->name, bdaddr);
+ 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 6923241d2b3e..47b953e24864 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3391,20 +3391,36 @@ static void hci_remote_oob_data_request_evt(struct hci_dev *hdev,
+ 
+ 	data = hci_find_remote_oob_data(hdev, &ev->bdaddr);
+ 	if (data) {
+-		struct hci_cp_remote_oob_data_reply cp;
++		if (test_bit(HCI_SC_ENABLED, &hdev->dev_flags)) {
++			struct hci_cp_remote_oob_ext_data_reply cp;
+ 
+-		bacpy(&cp.bdaddr, &ev->bdaddr);
+-		memcpy(cp.hash, data->hash, sizeof(cp.hash));
+-		memcpy(cp.randomizer, data->randomizer, sizeof(cp.randomizer));
++			bacpy(&cp.bdaddr, &ev->bdaddr);
++			memcpy(cp.hash192, data->hash192, sizeof(cp.hash192));
++			memcpy(cp.randomizer192, data->randomizer192,
++			       sizeof(cp.randomizer192));
++			memcpy(cp.hash256, data->hash256, sizeof(cp.hash256));
++			memcpy(cp.randomizer256, data->randomizer256,
++			       sizeof(cp.randomizer256));
++
++			hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_EXT_DATA_REPLY,
++				     sizeof(cp), &cp);
++		} else {
++			struct hci_cp_remote_oob_data_reply cp;
+ 
+-		hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_DATA_REPLY, sizeof(cp),
+-			     &cp);
++			bacpy(&cp.bdaddr, &ev->bdaddr);
++			memcpy(cp.hash, data->hash192, sizeof(cp.hash));
++			memcpy(cp.randomizer, data->randomizer192,
++			       sizeof(cp.randomizer));
++
++			hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_DATA_REPLY,
++				     sizeof(cp), &cp);
++		}
+ 	} else {
+ 		struct hci_cp_remote_oob_data_neg_reply cp;
+ 
+ 		bacpy(&cp.bdaddr, &ev->bdaddr);
+-		hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_DATA_NEG_REPLY, sizeof(cp),
+-			     &cp);
++		hci_send_cmd(hdev, HCI_OP_REMOTE_OOB_DATA_NEG_REPLY,
++			     sizeof(cp), &cp);
+ 	}
+ 
+ unlock:
 -- 
 1.8.4.2
 
