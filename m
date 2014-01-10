@@ -1,77 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 07/15] Bluetooth: Add flags and setting for Secure Connections support
-Date: Fri, 10 Jan 2014 02:07:22 -0800
-Message-Id: <1389348450-23303-7-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v4 06/15] Bluetooth: Enable Authenticated Payload Timeout Expired event
+Date: Fri, 10 Jan 2014 02:07:21 -0800
+Message-Id: <1389348450-23303-6-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The MGMT_SETTING_SECURE_CONN setting is used to track the support and
-status for Secure Connections from the management interface. For HCI
-based tracking HCI_SC_ENABLED flag is used.
+With Secure Connections capable controllers, the authenticated payload
+timeout can trigger. Enable the event so the controller informs the
+host when this happens.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h  | 1 +
- include/net/bluetooth/mgmt.h | 1 +
- net/bluetooth/mgmt.c         | 7 +++++++
- 3 files changed, 9 insertions(+)
+ net/bluetooth/hci_core.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 8d888bc432c6..0253276e88e4 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -122,6 +122,7 @@ enum {
- 
- 	HCI_LE_SCAN,
- 	HCI_SSP_ENABLED,
-+	HCI_SC_ENABLED,
- 	HCI_HS_ENABLED,
- 	HCI_LE_ENABLED,
- 	HCI_ADVERTISING,
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 518c5c84e39a..4ec17dec62e0 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -94,6 +94,7 @@ struct mgmt_rp_read_index_list {
- #define MGMT_SETTING_HS			0x00000100
- #define MGMT_SETTING_LE			0x00000200
- #define MGMT_SETTING_ADVERTISING	0x00000400
-+#define MGMT_SETTING_SECURE_CONN	0x00000800
- 
- #define MGMT_OP_READ_INFO		0x0004
- #define MGMT_READ_INFO_SIZE		0
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a03ca3ca91bf..b00fa0253cba 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -79,6 +79,7 @@ static const u16 mgmt_commands[] = {
- 	MGMT_OP_SET_BREDR,
- 	MGMT_OP_SET_STATIC_ADDRESS,
- 	MGMT_OP_SET_SCAN_PARAMS,
-+	MGMT_OP_SET_SECURE_CONN,
- };
- 
- static const u16 mgmt_events[] = {
-@@ -376,6 +377,9 @@ static u32 get_supported_settings(struct hci_dev *hdev)
- 			settings |= MGMT_SETTING_SSP;
- 			settings |= MGMT_SETTING_HS;
- 		}
-+
-+		if (lmp_sc_capable(hdev))
-+			settings |= MGMT_SETTING_SECURE_CONN;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 5e8663c194c1..52e398f37129 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1288,6 +1288,10 @@ static void hci_set_event_mask_page_2(struct hci_request *req)
+ 		events[2] |= 0x08;	/* Truncated Page Complete */
  	}
  
- 	if (lmp_le_capable(hdev)) {
-@@ -423,6 +427,9 @@ static u32 get_current_settings(struct hci_dev *hdev)
- 	if (test_bit(HCI_ADVERTISING, &hdev->dev_flags))
- 		settings |= MGMT_SETTING_ADVERTISING;
- 
-+	if (test_bit(HCI_SC_ENABLED, &hdev->dev_flags))
-+		settings |= MGMT_SETTING_SECURE_CONN;
++	/* Enable Authenticated Payload Timeout Expired event if supported */
++	if (lmp_ping_capable(hdev))
++		events[2] |= 0x80;
 +
- 	return settings;
+ 	hci_req_add(req, HCI_OP_SET_EVENT_MASK_PAGE_2, sizeof(events), events);
  }
  
 -- 
