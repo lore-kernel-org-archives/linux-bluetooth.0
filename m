@@ -1,61 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1389356048-4333-1-git-send-email-luiz.dentz@gmail.com>
-References: <1389356048-4333-1-git-send-email-luiz.dentz@gmail.com>
-Date: Fri, 10 Jan 2014 15:39:33 +0200
-Message-ID: <CABBYNZLCj2T5=EjLYJKBuAvzHfGBmzydSUp9k0JNgF9yWFr8tw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] android: Convert libaudio-internal to a plugin
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android-tester: Add possibility to debug mgmt
+Date: Fri, 10 Jan 2014 14:23:34 +0100
+Message-Id: <1389360214-31932-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Print mgmt debug info if debug flag is set in android-tester.
+---
+ android/android-tester.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-On Fri, Jan 10, 2014 at 2:14 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This convert the static library libaudio-internal.la to
-> audio.a2dp.default.so when building with autotools.
-> ---
->  android/Makefile.am | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/android/Makefile.am b/android/Makefile.am
-> index 0a32a95..97173db 100644
-> --- a/android/Makefile.am
-> +++ b/android/Makefile.am
-> @@ -114,18 +114,19 @@ android_android_tester_LDADD = lib/libbluetooth-internal.la \
->
->  android_android_tester_LDFLAGS = -pthread
->
-> -noinst_LTLIBRARIES += android/libaudio-internal.la
-> +plugin_LTLIBRARIES += android/audio.a2dp.default.la
->
-> -android_libaudio_internal_la_SOURCES = android/audio-msg.h \
-> +android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
->                                         android/hal-audio.c \
->                                         android/hardware/audio.h \
->                                         android/hardware/audio_effect.h \
->                                         android/hardware/hardware.h \
->                                         android/system/audio.h
->
-> -android_libaudio_internal_la_CFLAGS = -I$(srcdir)/android
-> +android_audio_a2dp_default_la_CFLAGS = -I$(srcdir)/android
->
-> -android_libaudio_internal_la_LDFLAGS = -pthread
-> +android_audio_a2dp_default_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
-> +                                       -no-undefined -pthread
->
->  endif
->
-> --
-> 1.8.4.2
-
-This now pushed.
-
-
+diff --git a/android/android-tester.c b/android/android-tester.c
+index 0185f99..ce1cedf 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -95,6 +95,13 @@ struct test_data {
+ 
+ static char exec_dir[PATH_MAX + 1];
+ 
++static void mgmt_debug(const char *str, void *user_data)
++{
++	const char *prefix = user_data;
++
++	tester_print("%s%s", prefix, str);
++}
++
+ static void test_update_state(void)
+ {
+ 	struct test_data *data = tester_get_data();
+@@ -334,9 +341,6 @@ static void test_pre_setup(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+ 
+-	if (!tester_use_debug())
+-		fclose(stderr);
+-
+ 	data->mgmt = mgmt_new_default();
+ 	if (!data->mgmt) {
+ 		tester_warn("Failed to setup management interface");
+@@ -344,6 +348,11 @@ static void test_pre_setup(const void *test_data)
+ 		return;
+ 	}
+ 
++	if (!tester_use_debug())
++		fclose(stderr);
++	else
++		mgmt_set_debug(data->mgmt, mgmt_debug, "mgmt: ", NULL);
++
+ 	mgmt_send(data->mgmt, MGMT_OP_READ_INDEX_LIST, MGMT_INDEX_NONE, 0,
+ 				NULL, read_index_list_callback, NULL, NULL);
+ }
 -- 
-Luiz Augusto von Dentz
+1.8.3.1
+
