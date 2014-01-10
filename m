@@ -1,79 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 07/13] Bluetooth: Add flags and setting for Secure Connections support
-Date: Thu,  9 Jan 2014 22:40:48 -0800
-Message-Id: <1389336054-54064-7-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2 05/13] Bluetooth: Add support for handling P-256 derived link keys
+Date: Thu,  9 Jan 2014 22:40:46 -0800
+Message-Id: <1389336054-54064-5-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The MGMT_SETTING_SECURE_CONN setting is used to track the support and
-status for Secure Connections from the management interface. For HCI
-based tracking HCI_SC_ENABLED flag is used.
+Before being able to enable Secure Connections support, the core needs
+to know on how to handle P-256 derived link keys. The difference between
+authenticated and unauthenticated P-256 derived link keys is the same as
+its P-192 counter parts.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h  | 1 +
- include/net/bluetooth/mgmt.h | 1 +
- net/bluetooth/mgmt.c         | 7 +++++++
- 3 files changed, 9 insertions(+)
+ net/bluetooth/hci_conn.c  | 6 ++++--
+ net/bluetooth/hci_event.c | 3 ++-
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 8d888bc432c6..0253276e88e4 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -122,6 +122,7 @@ enum {
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 251f22e32fbf..cf96b3438a91 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -802,12 +802,14 @@ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
  
- 	HCI_LE_SCAN,
- 	HCI_SSP_ENABLED,
-+	HCI_SC_ENABLED,
- 	HCI_HS_ENABLED,
- 	HCI_LE_ENABLED,
- 	HCI_ADVERTISING,
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 518c5c84e39a..4ec17dec62e0 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -94,6 +94,7 @@ struct mgmt_rp_read_index_list {
- #define MGMT_SETTING_HS			0x00000100
- #define MGMT_SETTING_LE			0x00000200
- #define MGMT_SETTING_ADVERTISING	0x00000400
-+#define MGMT_SETTING_SECURE_CONN	0x00000800
+ 	/* An authenticated combination key has sufficient security for any
+ 	   security level. */
+-	if (conn->key_type == HCI_LK_AUTH_COMBINATION_P192)
++	if (conn->key_type == HCI_LK_AUTH_COMBINATION_P192 ||
++	    conn->key_type == HCI_LK_AUTH_COMBINATION_P256)
+ 		goto encrypt;
  
- #define MGMT_OP_READ_INFO		0x0004
- #define MGMT_READ_INFO_SIZE		0
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a03ca3ca91bf..b00fa0253cba 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -79,6 +79,7 @@ static const u16 mgmt_commands[] = {
- 	MGMT_OP_SET_BREDR,
- 	MGMT_OP_SET_STATIC_ADDRESS,
- 	MGMT_OP_SET_SCAN_PARAMS,
-+	MGMT_OP_SET_SECURE_CONN,
- };
+ 	/* An unauthenticated combination key has sufficient security for
+ 	   security level 1 and 2. */
+-	if (conn->key_type == HCI_LK_UNAUTH_COMBINATION_P192 &&
++	if ((conn->key_type == HCI_LK_UNAUTH_COMBINATION_P192 ||
++	     conn->key_type == HCI_LK_UNAUTH_COMBINATION_P256) &&
+ 	    (sec_level == BT_SECURITY_MEDIUM || sec_level == BT_SECURITY_LOW))
+ 		goto encrypt;
  
- static const u16 mgmt_events[] = {
-@@ -376,6 +377,9 @@ static u32 get_supported_settings(struct hci_dev *hdev)
- 			settings |= MGMT_SETTING_SSP;
- 			settings |= MGMT_SETTING_HS;
- 		}
-+
-+		if (lmp_sc_capable(hdev))
-+			settings |= MGMT_SETTING_SECURE_CONN;
- 	}
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index defa1252b534..b3c5396e0c1b 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2633,7 +2633,8 @@ static void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
  
- 	if (lmp_le_capable(hdev)) {
-@@ -423,6 +427,9 @@ static u32 get_current_settings(struct hci_dev *hdev)
- 	if (test_bit(HCI_ADVERTISING, &hdev->dev_flags))
- 		settings |= MGMT_SETTING_ADVERTISING;
- 
-+	if (test_bit(HCI_SC_ENABLED, &hdev->dev_flags))
-+		settings |= MGMT_SETTING_SECURE_CONN;
-+
- 	return settings;
- }
- 
+ 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
+ 	if (conn) {
+-		if (key->type == HCI_LK_UNAUTH_COMBINATION_P192 &&
++		if ((key->type == HCI_LK_UNAUTH_COMBINATION_P192 ||
++		     key->type == HCI_LK_UNAUTH_COMBINATION_P256) &&
+ 		    conn->auth_type != 0xff && (conn->auth_type & 0x01)) {
+ 			BT_DBG("%s ignoring unauthenticated key", hdev->name);
+ 			goto not_found;
 -- 
 1.8.4.2
 
