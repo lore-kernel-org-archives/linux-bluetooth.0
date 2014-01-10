@@ -1,57 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 01/15] Bluetooth: Add LMP feature definitions for Secure Connections support
-Date: Fri, 10 Jan 2014 01:29:28 -0800
-Message-Id: <1389346182-12387-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCHv3 13/19] tools/rfcomm-tester: Add Connection refused client test case
+Date: Fri, 10 Jan 2014 10:18:23 +0100
+Message-Id: <1389345509-27206-14-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1389345509-27206-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1389345509-27206-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The support for Secure Connections introduces two new controller
-features and one new host feature.
-
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+This will test RFCOMM client connection to wrong server channel.
 ---
- include/net/bluetooth/hci.h      | 4 ++++
- include/net/bluetooth/hci_core.h | 3 +++
- 2 files changed, 7 insertions(+)
+ tools/rfcomm-tester.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 66c1cd87bfe7..cd40219d32aa 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -282,10 +282,14 @@ enum {
- #define LMP_SYNC_TRAIN	0x04
- #define LMP_SYNC_SCAN	0x08
+diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
+index 271f554..f471c3b 100644
+--- a/tools/rfcomm-tester.c
++++ b/tools/rfcomm-tester.c
+@@ -262,6 +262,12 @@ const struct rfcomm_client_data connect_success = {
+ 	.client_channel = 0x0c
+ };
  
-+#define LMP_SC		0x01
-+#define LMP_PING	0x02
++const struct rfcomm_client_data connect_nval = {
++	.server_channel = 0x0c,
++	.client_channel = 0x0e,
++	.expected_connect_err = -ECONNREFUSED
++};
 +
- /* Host features */
- #define LMP_HOST_SSP		0x01
- #define LMP_HOST_LE		0x02
- #define LMP_HOST_LE_BREDR	0x04
-+#define LMP_HOST_SC		0x08
+ static void test_basic(const void *test_data)
+ {
+ 	int sk;
+@@ -399,6 +405,8 @@ int main(int argc, char *argv[])
+ 					setup_powered_client, test_basic);
+ 	test_rfcomm("Basic RFCOMM Socket Client - Success", &connect_success,
+ 					setup_powered_client, test_connect);
++	test_rfcomm("Basic RFCOMM Socket Client - Conn Refused",
++			&connect_nval, setup_powered_client, test_connect);
  
- /* Connection modes */
- #define HCI_CM_ACTIVE	0x0000
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index f2f0cf5865c4..bb984d0626b7 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -803,9 +803,12 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- #define lmp_csb_slave_capable(dev)  ((dev)->features[2][0] & LMP_CSB_SLAVE)
- #define lmp_sync_train_capable(dev) ((dev)->features[2][0] & LMP_SYNC_TRAIN)
- #define lmp_sync_scan_capable(dev)  ((dev)->features[2][0] & LMP_SYNC_SCAN)
-+#define lmp_sc_capable(dev)         ((dev)->features[2][1] & LMP_SC)
-+#define lmp_ping_capable(dev)       ((dev)->features[2][1] & LMP_PING)
- 
- /* ----- Host capabilities ----- */
- #define lmp_host_ssp_capable(dev)  ((dev)->features[1][0] & LMP_HOST_SSP)
-+#define lmp_host_sc_capable(dev)   ((dev)->features[1][0] & LMP_HOST_SC)
- #define lmp_host_le_capable(dev)   (!!((dev)->features[1][0] & LMP_HOST_LE))
- #define lmp_host_le_br_capable(dev) (!!((dev)->features[1][0] & LMP_HOST_LE_BREDR))
- 
+ 	return tester_run();
+ }
 -- 
-1.8.4.2
+1.8.3.1
 
