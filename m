@@ -1,48 +1,210 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] android: Convert libaudio-internal to a plugin
-Date: Fri, 10 Jan 2014 14:14:06 +0200
-Message-Id: <1389356048-4333-1-git-send-email-luiz.dentz@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Sebastian Chlad <sebastianx.chlad@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: Add PTS test results for L2CAP
+Date: Fri, 10 Jan 2014 13:02:52 +0100
+Message-ID: <2921803.FP4sJCsu3M@uw000953>
+In-Reply-To: <1389354460-7297-1-git-send-email-sebastianx.chlad@intel.com>
+References: <1389354460-7297-1-git-send-email-sebastianx.chlad@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Sebastian,
 
-This convert the static library libaudio-internal.la to
-audio.a2dp.default.so when building with autotools.
----
- android/Makefile.am | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+On Friday 10 of January 2014 13:47:40 Sebastian Chlad wrote:
+> ---
+>  android/pts-l2cap.txt | 128 +++++++++++++++++++++++++-------------------------
+>  1 file changed, 64 insertions(+), 64 deletions(-)
+> 
+> diff --git a/android/pts-l2cap.txt b/android/pts-l2cap.txt
+> index d293046..51eedf5 100644
+> --- a/android/pts-l2cap.txt
+> +++ b/android/pts-l2cap.txt
+> @@ -1,7 +1,7 @@
+>  PTS test results for L2CAP
+>  
+>  PTS version: 5.0
+> -Tested: 18.12.2013
+> +Tested: 10.01.2014
+>  
+>  Results:
+>  PASS   test passed
+> @@ -12,21 +12,21 @@ N/A    test is disabled due to PICS setup
+>  -------------------------------------------------------------------------------
+>  Test Name              Result  Notes
+>  -------------------------------------------------------------------------------
+> -TC_COS_CED_BV_01_C     PASS
+> +TC_COS_CED_BV_01_C     PASS    l2test -n -P 33 <bdaddr>
+>  TC_COS_CED_BV_03_C     PASS
+>  TC_COS_CED_BV_04_C     N/A
+>  TC_COS_CED_BV_05_C     PASS
+>  TC_COS_CED_BV_07_C     PASS
+>  TC_COS_CED_BV_08_C     PASS
+> -TC_COS_CED_BV_09_C     INC
+> +TC_COS_CED_BV_09_C     PASS
+>  TC_COS_CED_BV_10_C     N/A
+>  TC_COS_CED_BV_11_C     PASS
+>  TC_COS_CED_BI_01_C     PASS
+>  TC_COS_CFD_BV_01_C     PASS
+>  TC_COS_CFD_BV_02_C     PASS
+>  TC_COS_CFD_BV_03_C     PASS
+> -TC_COS_CFD_BV_08_C     INC
+> -TC_COS_CFD_BV_09_C     INC
+> +TC_COS_CFD_BV_08_C     PASS
+> +TC_COS_CFD_BV_09_C     PASS
+>  TC_COS_CFD_BV_10_C     N/A
+>  TC_COS_CFD_BI_11_C     PASS
+>  TC_COS_CFD_BV_12_C     PASS
+> @@ -34,7 +34,7 @@ TC_COS_CFD_BV_13_C     N/A
+>  TC_COS_IEX_BV_01_C     PASS
+>  TC_COS_IEX_BV_02_C     PASS
+>  TC_COS_ECH_BV_01_C     PASS
+> -TC_COS_ECH_BV_02_C     INC
+> +TC_COS_ECH_BV_02_C     PASS
+>  TC_CLS_CLR_BV_01_C     N/A
+>  TC_CLS_UCD_BV_01_C     N/A
+>  TC_CLS_UCD_BV_02_C     N/A
+> @@ -45,75 +45,75 @@ TC_EXF_BV_03_C         PASS
+>  TC_EXF_BV_04_C         N/A
+>  TC_EXF_BV_05_C         PASS
+>  TC_EXF_BV_06_C         N/A
+> -TC_CMC_BV_01_C         INC
+> -TC_CMC_BV_02_C         INC
+> -TC_CMC_BV_03_C         INC
+> -TC_CMC_BV_04_C         INC
+> -TC_CMC_BV_05_C         INC
+> -TC_CMC_BV_06_C         INC
+> -TC_CMC_BV_07_C         INC
+> -TC_CMC_BV_08_C         INC
+> -TC_CMC_BV_09_C         INC
+> -TC_CMC_BV_10_C         INC
+> -TC_CMC_BV_11_C         INC
+> -TC_CMC_BV_12_C         INC
+> -TC_CMC_BV_13_C         INC
+> -TC_CMC_BV_14_C         INC
+> -TC_CMC_BV_15_C         INC
+> -TC_CMC_BI_01_C         INC
+> -TC_CMC_BI_02_C         INC
+> -TC_CMC_BI_03_C         INC
+> -TC_CMC_BI_04_C         INC
+> -TC_CMC_BI_05_C         INC
+> -TC_CMC_BI_06_C         INC
+> -TC_FOC_BV_01_C         INC
+> -TC_FOC_BV_02_C         INC
+> -TC_FOC_BV_03_C         INC
+> -TC_FOC_BV_04_C         INC
+> -TC_OFS_BV_01_C         INC
+> -TC_OFS_BV_02_C         INC
+> -TC_OFS_BV_03_C         INC
+> -TC_OFS_BV_04_C         INC
+> -TC_OFS_BV_05_C         INC
+> -TC_OFS_BV_06_C         INC
+> -TC_OFS_BV_07_C         INC
+> -TC_OFS_BV_08_C         INC
+> -TC_ERM_BV_01_C         INC
+> -TC_ERM_BV_02_C         INC
+> -TC_ERM_BV_03_C         INC
+> -TC_ERM_BV_04_C         INC
+> -TC_ERM_BV_05_C         INC
+> -TC_ERM_BV_06_C         INC
+> -TC_ERM_BV_07_C         INC
+> -TC_ERM_BV_08_C         INC
+> -TC_ERM_BV_09_C         INC
+> +TC_CMC_BV_01_C         PASS    l2test -X ertm -P 33 <bdaddr>
+> +TC_CMC_BV_02_C         PASS    l2test -X ertm -P 33 <bdaddr>
+> +TC_CMC_BV_03_C         PASS    l2test -X ertm -P 33 <bdaddr>
+> +TC_CMC_BV_04_C         PASS    l2test -X streaming -P 33 <bdaddr>
+> +TC_CMC_BV_05_C         PASS    l2test -X streaming -P 33 <bdaddr>
+> +TC_CMC_BV_06_C         PASS    l2test -X streaming -P 33 <bdaddr>
+> +TC_CMC_BV_07_C         PASS    l2test -X basic -P 33 <bdaddr>
+> +TC_CMC_BV_08_C         PASS    l2test -X basic -P 33 <bdaddr>
+> +TC_CMC_BV_09_C         PASS    l2test -X streaming -P 33 <bdaddr>
+> +TC_CMC_BV_10_C         PASS    l2test -n <bdaddr>
+> +TC_CMC_BV_11_C         PASS    l2test -n <bdaddr>
+> +TC_CMC_BV_12_C         PASS    l2test -n -X ertm -P 33 <bdaddr>
+> +TC_CMC_BV_13_C         PASS    l2test -s -X streaming -P 33 <bdaddr>
+> +TC_CMC_BV_14_C         PASS    l2test -X streaming -P 33 <bdaddr>
+> +TC_CMC_BV_15_C         PASS    l2test -X streaming -P 33 <bdaddr>
+> +TC_CMC_BI_01_C         PASS
+> +TC_CMC_BI_02_C         PASS
+> +TC_CMC_BI_03_C         PASS
+> +TC_CMC_BI_04_C         PASS
+> +TC_CMC_BI_05_C         PASS
+> +TC_CMC_BI_06_C         PASS
+> +TC_FOC_BV_01_C         PASS    l2test -X ertm -P 33 -F 0 &
+> +TC_FOC_BV_02_C         PASS    l2test -X ertm -P 33 -F 0 &
+> +TC_FOC_BV_03_C         PASS    l2test -X ertm -P 33 -F 0 &
+> +TC_FOC_BV_04_C         PASS    l2test -n -X ertm -P <bdaddr> &
+> +TC_OFS_BV_01_C         PASS
+> +TC_OFS_BV_02_C         PASS    l2test -X ertm -P 33 -F 0 &
+> +TC_OFS_BV_03_C         PASS
+> +TC_OFS_BV_04_C         PASS
+> +TC_OFS_BV_05_C         PASS    l2test -X ertm -P 33 -F 0 &
+> +TC_OFS_BV_06_C         PASS    l2test -X ertm -P 33 -F 0 &
+> +TC_OFS_BV_07_C         PASS
+> +TC_OFS_BV_08_C         PASS
+> +TC_ERM_BV_01_C         PASS    l2test -X ertm -P 33 -B -Y 3 &
+> +TC_ERM_BV_02_C         PASS    l2test -X ertm -P 33 &
+> +TC_ERM_BV_03_C         PASS    l2test -X ertm -P 33 &
+> +TC_ERM_BV_04_C         PASS    l2test -X ertm -P 33 -B &
+> +TC_ERM_BV_05_C         PASS
+> +TC_ERM_BV_06_C         PASS
+> +TC_ERM_BV_07_C         PASS    l2test -X ertm -P 33 &
+> +TC_ERM_BV_08_C         PASS
+> +TC_ERM_BV_09_C         PASS    l2test -X ertm -P 33 &
+>  TC_ERM_BV_10_C         INC
+>  TC_ERM_BV_11_C         INC
+>  TC_ERM_BV_12_C         INC
+> -TC_ERM_BV_13_C         INC
+> -TC_ERM_BV_14_C         INC
+> -TC_ERM_BV_15_C         INC
+> -TC_ERM_BV_16_C         INC
+> -TC_ERM_BV_17_C         INC
+> +TC_ERM_BV_13_C         PASS
+> +TC_ERM_BV_14_C         PASS
+> +TC_ERM_BV_15_C         PASS
+> +TC_ERM_BV_16_C         PASS
+> +TC_ERM_BV_17_C         PASS
+>  TC_ERM_BV_18_C         INC
+>  TC_ERM_BV_19_C         INC
+> -TC_ERM_BV_20_C         INC
+> -TC_ERM_BV_21_C         INC
+> -TC_ERM_BV_22_C         INC
+> -TC_ERM_BV_23_C         INC
+> -TC_ERM_BI_01_C         INC
+> -TC_ERM_BI_02_C         INC
+> -TC_ERM_BI_03_C         INC
+> -TC_ERM_BI_04_C         INC
+> -TC_ERM_BI_05_C         INC
+> +TC_ERM_BV_20_C         PASS
+> +TC_ERM_BV_21_C         PASS
+> +TC_ERM_BV_22_C         PASS
+> +TC_ERM_BV_23_C         PASS
+> +TC_ERM_BI_01_C         PASS
+> +TC_ERM_BI_02_C         PASS
+> +TC_ERM_BI_03_C         PASS
+> +TC_ERM_BI_04_C         PASS
+> +TC_ERM_BI_05_C         PASS
+>  TC_STM_BV_01_C         INC
+>  TC_STM_BV_02_C         INC
+>  TC_STM_BV_03_C         INC
+>  TC_STM_BV_11_C         N/A
+>  TC_STM_BV_12_C         N/A
+>  TC_STM_BV_13_C         N/A
+> -TC_FIX_BV_01_C         PASS
+> -TC_FIX_BV_02_C         PASS
+> +TC_FIX_BV_01_C         PASS    l2test -n -P 33 <bdaddr>
+> +TC_FIX_BV_02_C         N/A
+>  TC_EWC_BV_01_C         N/A
+>  TC_EWC_BV_02_C         N/A
+>  TC_EWC_BV_03_C         N/A
+> 
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 0a32a95..97173db 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -114,18 +114,19 @@ android_android_tester_LDADD = lib/libbluetooth-internal.la \
- 
- android_android_tester_LDFLAGS = -pthread
- 
--noinst_LTLIBRARIES += android/libaudio-internal.la
-+plugin_LTLIBRARIES += android/audio.a2dp.default.la
- 
--android_libaudio_internal_la_SOURCES = android/audio-msg.h \
-+android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
- 					android/hal-audio.c \
- 					android/hardware/audio.h \
- 					android/hardware/audio_effect.h \
- 					android/hardware/hardware.h \
- 					android/system/audio.h
- 
--android_libaudio_internal_la_CFLAGS = -I$(srcdir)/android
-+android_audio_a2dp_default_la_CFLAGS = -I$(srcdir)/android
- 
--android_libaudio_internal_la_LDFLAGS = -pthread
-+android_audio_a2dp_default_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
-+					-no-undefined -pthread
- 
- endif
- 
+Applied, thanks.
+
 -- 
-1.8.4.2
-
+Best regards, 
+Szymon Janc
