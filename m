@@ -2,65 +2,267 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v7 3/4] android/pan: Implement PAN enable HAL api at daemon side
-Date: Fri, 10 Jan 2014 16:11:48 +0200
-Message-Id: <1389363109-6312-4-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v7 2/4] android/pan: Listen for incoming connections and accept in NAP role
+Date: Fri, 10 Jan 2014 16:11:47 +0200
+Message-Id: <1389363109-6312-3-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1389363109-6312-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1389363109-6312-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Listen for incoming connections and accept it. Create bnep interface
+add it to bridge and notify control and connection state information
+through HAL. Remove the device on disconnect request. If android
+settings UI does not have bluetooth tethering enabled it immediately
+sends disconnect signal.
 ---
- android/pan.c | 30 ++++++++++++++++++++++++++----
- 1 file changed, 26 insertions(+), 4 deletions(-)
+ android/pan.c | 185 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 182 insertions(+), 3 deletions(-)
 
 diff --git a/android/pan.c b/android/pan.c
-index 21a46b4..9f99ed9 100644
+index bb009f3..21a46b4 100644
 --- a/android/pan.c
 +++ b/android/pan.c
-@@ -576,18 +576,40 @@ static void bt_pan_enable(const void *buf, uint16_t len)
+@@ -65,12 +65,15 @@ struct pan_device {
+ 	uint8_t		role;
+ 	GIOChannel	*io;
+ 	struct bnep	*session;
++	guint		watch;
+ };
+ 
+ static struct {
+ 	uint32_t	record_id;
++	GIOChannel	*io;
+ } nap_dev = {
+ 	.record_id = 0,
++	.io = NULL,
+ };
+ 
+ static int device_cmp(gconstpointer s, gconstpointer user_data)
+@@ -83,13 +86,19 @@ static int device_cmp(gconstpointer s, gconstpointer user_data)
+ 
+ static void pan_device_free(struct pan_device *dev)
  {
- 	const struct hal_cmd_pan_enable *cmd = buf;
- 	uint8_t status;
-+	int err;
++	if (dev->watch > 0) {
++		bnep_server_delete(BNEP_BRIDGE, dev->iface, &dev->dst);
++		g_source_remove(dev->watch);
++	}
++
+ 	if (dev->io) {
+ 		g_io_channel_shutdown(dev->io, FALSE, NULL);
+ 		g_io_channel_unref(dev->io);
+-		dev->io = NULL;
+ 	}
+ 
+-	bnep_free(dev->session);
++	if (dev->session)
++		bnep_free(dev->session);
++
+ 	devices = g_slist_remove(devices, dev);
+ 	g_free(dev);
+ 
+@@ -300,7 +309,7 @@ static void bt_pan_disconnect(const void *buf, uint16_t len)
+ 
+ 	dev = l->data;
+ 
+-	if (dev->conn_state == HAL_PAN_STATE_CONNECTED)
++	if (dev->conn_state == HAL_PAN_STATE_CONNECTED && dev->session)
+ 		bnep_disconnect(dev->session);
+ 
+ 	bt_pan_notify_conn_state(dev, HAL_PAN_STATE_DISCONNECTED);
+@@ -310,6 +319,154 @@ failed:
+ 	ipc_send_rsp(HAL_SERVICE_ID_PAN, HAL_OP_PAN_DISCONNECT, status);
+ }
+ 
++static gboolean nap_watchdog_cb(GIOChannel *chan, GIOCondition cond,
++							gpointer user_data)
++{
++	struct pan_device *dev = user_data;
++
++	DBG("disconnected");
++
++	bt_pan_notify_conn_state(dev, HAL_PAN_STATE_DISCONNECTED);
++
++	return FALSE;
++}
++static gboolean nap_setup_cb(GIOChannel *chan, GIOCondition cond,
++							gpointer user_data)
++{
++	struct pan_device *dev = user_data;
++	uint8_t packet[BNEP_MTU];
++	struct bnep_setup_conn_req *req = (void *) packet;
++	uint16_t src_role, dst_role, rsp = BNEP_CONN_NOT_ALLOWED;
++	int sk, n;
++
++	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
++		error("Hangup or error or inval on BNEP socket");
++		return FALSE;
++	}
++
++	sk = g_io_channel_unix_get_fd(chan);
++
++	/* Reading BNEP_SETUP_CONNECTION_REQUEST_MSG */
++	n = read(sk, packet, sizeof(packet));
++	if (n  < 0) {
++		error("read(): %s(%d)", strerror(errno), errno);
++		goto failed;
++	}
++
++	/* Highest known control command id BNEP_FILTER_MULT_ADDR_RSP 0x06 */
++	if (req->type == BNEP_CONTROL &&
++			req->ctrl > BNEP_FILTER_MULT_ADDR_RSP) {
++		error("cmd not understood");
++		bnep_send_ctrl_rsp(sk, BNEP_CONTROL, BNEP_CMD_NOT_UNDERSTOOD,
++								req->ctrl);
++		goto failed;
++	}
++
++	if (req->type != BNEP_CONTROL || req->ctrl != BNEP_SETUP_CONN_REQ) {
++		error("cmd is not BNEP_SETUP_CONN_REQ %02X %02X", req->type,
++								req->ctrl);
++		goto failed;
++	}
++
++	rsp = bnep_setup_decode(req, &dst_role, &src_role);
++	if (rsp) {
++		error("bnep_setup_decode failed");
++		goto failed;
++	}
++
++	rsp = bnep_setup_chk(dst_role, src_role);
++	if (rsp) {
++		error("benp_setup_chk failed");
++		goto failed;
++	}
++
++	if (bnep_server_add(sk, dst_role, BNEP_BRIDGE, dev->iface,
++							&dev->dst) < 0) {
++		error("server_connadd failed");
++		rsp = BNEP_CONN_NOT_ALLOWED;
++		goto failed;
++	}
++
++	rsp = BNEP_SUCCESS;
++	bnep_send_ctrl_rsp(sk, BNEP_CONTROL, BNEP_SETUP_CONN_RSP, rsp);
++
++	dev->watch = g_io_add_watch(chan, G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++							nap_watchdog_cb, dev);
++	g_io_channel_unref(dev->io);
++	dev->io = NULL;
++
++	bt_pan_notify_ctrl_state(dev, HAL_PAN_CTRL_ENABLED);
++	bt_pan_notify_conn_state(dev, HAL_PAN_STATE_CONNECTED);
++
++	return FALSE;
++
++failed:
++	bnep_send_ctrl_rsp(sk, BNEP_CONTROL, BNEP_SETUP_CONN_RSP, rsp);
++	pan_device_free(dev);
++
++	return FALSE;
++}
++
++static void nap_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
++{
++	struct pan_device *dev = user_data;
 +
 +	DBG("");
 +
-+	if (local_role == cmd->local_role) {
-+		status = HAL_STATUS_SUCCESS;
-+		goto reply;
++	if (err) {
++		error("%s", err->message);
++		bt_pan_notify_conn_state(dev, HAL_PAN_STATE_DISCONNECTED);
++		return;
 +	}
 +
-+	/* destroy existing server */
-+	destroy_nap_device();
++	g_io_channel_set_close_on_unref(chan, TRUE);
++	dev->watch = g_io_add_watch(chan,
++				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++				nap_setup_cb, dev);
++}
++
++static void nap_confirm_cb(GIOChannel *chan, gpointer data)
++{
++	struct pan_device *dev = NULL;
++	bdaddr_t dst;
++	char address[18];
++	GError *err = NULL;
++
++	DBG("");
++
++	bt_io_get(chan, &err, BT_IO_OPT_DEST_BDADDR, &dst,
++			BT_IO_OPT_DEST, address, BT_IO_OPT_INVALID);
++	if (err) {
++		error("%s", err->message);
++		g_error_free(err);
++		goto failed;
++	}
++
++	DBG("incoming connect request from %s", address);
++	dev = g_new0(struct pan_device, 1);
++	bacpy(&dev->dst, &dst);
++	local_role = HAL_PAN_ROLE_NAP;
++	dev->role = HAL_PAN_ROLE_PANU;
++
++	dev->io = g_io_channel_ref(chan);
++	g_io_channel_set_close_on_unref(dev->io, TRUE);
++
++	if (!bt_io_accept(dev->io, nap_connect_cb, dev, NULL, &err)) {
++		error("bt_io_accept: %s", err->message);
++		g_error_free(err);
++		goto failed;
++	}
++
++	devices = g_slist_append(devices, dev);
++	bt_pan_notify_conn_state(dev, HAL_PAN_STATE_CONNECTING);
++
++	return;
++
++failed:
++	g_free(dev);
++	bt_pan_notify_conn_state(dev, HAL_PAN_STATE_DISCONNECTED);
++}
++
+ static int set_forward_delay(void)
+ {
+ 	int fd, ret;
+@@ -378,10 +535,17 @@ static void destroy_nap_device(void)
+ 	DBG("");
  
- 	switch (cmd->local_role) {
--	case HAL_PAN_ROLE_PANU:
- 	case HAL_PAN_ROLE_NAP:
--		DBG("Not Implemented");
--		status  = HAL_STATUS_FAILED;
- 		break;
-+	case HAL_PAN_ROLE_NONE:
-+		status = HAL_STATUS_SUCCESS;
-+		goto reply;
- 	default:
- 		status = HAL_STATUS_UNSUPPORTED;
--		break;
-+		goto reply;
- 	}
+ 	nap_remove_bridge();
++
++	if (nap_dev.io) {
++		g_io_channel_shutdown(nap_dev.io, FALSE, NULL);
++		g_io_channel_unref(nap_dev.io);
++		nap_dev.io = NULL;
++	}
+ }
  
-+	local_role = cmd->local_role;
-+	err = register_nap_server();
-+	if (err < 0) {
-+		status = HAL_STATUS_FAILED;
+ static int register_nap_server(void)
+ {
++	GError *gerr;
+ 	int err;
+ 
+ 	DBG("");
+@@ -390,6 +554,21 @@ static int register_nap_server(void)
+ 	if (err < 0)
+ 		return err;
+ 
++	nap_dev.io = bt_io_listen(NULL, nap_confirm_cb, NULL, NULL, &gerr,
++					BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
++					BT_IO_OPT_PSM, BNEP_PSM,
++					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
++					BT_IO_OPT_OMTU, BNEP_MTU,
++					BT_IO_OPT_IMTU, BNEP_MTU,
++					BT_IO_OPT_INVALID);
++
++	if (!nap_dev.io) {
 +		destroy_nap_device();
-+		goto reply;
++		error("%s", gerr->message);
++		g_error_free(gerr);
++		return -EINVAL;
 +	}
 +
-+	status = HAL_STATUS_SUCCESS;
-+
-+reply:
- 	ipc_send_rsp(HAL_SERVICE_ID_PAN, HAL_OP_PAN_ENABLE, status);
+ 	return 0;
  }
  
 -- 
