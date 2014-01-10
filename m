@@ -1,29 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 10 Jan 2014 21:50:24 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 01/15] Bluetooth: Add LMP feature definitions for
- Secure Connections support
-Message-ID: <20140110195024.GA5917@x220.p-661hnu-f1>
-References: <1389348450-23303-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1389348450-23303-1-git-send-email-marcel@holtmann.org>
+Date: Fri, 10 Jan 2014 09:57:25 -0800
+Message-ID: <CAOVeLGSGAf9LmsEcaAiECh+zL-7bg-gZJnue4TqzbBCNFfMj3w@mail.gmail.com>
+Subject: Compilation using clang
+From: Donald Carr <sirspudd@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Top of the morning,
 
-On Fri, Jan 10, 2014, Marcel Holtmann wrote:
-> The support for Secure Connections introduces two new controller
-> features and one new host feature.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/hci.h      | 4 ++++
->  include/net/bluetooth/hci_core.h | 3 +++
->  2 files changed, 7 insertions(+)
+qtconnectivity currently contains a kludge which is required due to
+the use of the GCC typeof extension in bluetooth.h which is breaking
+with Clang compilation against the cxx11 spec.
 
-All patches in this set have been applied to bluetooth-next. Thanks.
+The kludge in question involves molesting the standard (eg -std=cxx11)
+specified to the compiler (explicitly away from cxx11 toward g++0x)
+and hence I am hoping to be able to murder its intrusive self. I am
+not entirely clear on the nuances though:
 
-Johan
+This is the offending section:
+
+#define bt_get_unaligned(ptr)                   \
+({                                              \
+        struct __attribute__((packed)) {        \
+                typeof(*(ptr)) __v;         \
+        } *__p = (typeof(__p)) (ptr);               \
+        __p->__v;                               \
+})
+
+#define bt_put_unaligned(val, ptr)              \
+do {                                            \
+        struct __attribute__((packed)) {        \
+                typeof(*(ptr)) __v;         \
+        } *__p = (typeof(__p)) (ptr);               \
+        __p->__v = (val);                       \
+} while(0)
+
+and changing typeof to __typeof__ has been verified to succeed in the
+stated circumstance. I don't know whether this is the ideal solution,
+or whether decltype or so other designator would be a closer/better
+match.
+
+Any feedback would be greatly appreciated, I am using this change
+locally and I think it could be of broader use to people.
+
+Yours sincerely,
+Donald Carr
+
+
+-- 
+-------------------------------
+ °v°  Donald Carr
+/(_)\ Vaguely Professional Penguin lover
+ ^ ^
+
+Cave canem, te necet lingendo
