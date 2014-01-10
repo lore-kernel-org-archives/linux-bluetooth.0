@@ -1,114 +1,145 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 15/15] Bluetooth: Add support for remote OOB input of P-256 data
-Date: Fri, 10 Jan 2014 02:07:30 -0800
-Message-Id: <1389348450-23303-15-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v4 12/15] Bluetooth: Add debugfs quirk for forcing Secure Connections support
+Date: Fri, 10 Jan 2014 02:07:27 -0800
+Message-Id: <1389348450-23303-12-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The current management interface only allows to provide the remote
-OOB input of P-192 data. This extends the command to also accept
-P-256 data as well. To make this backwards compatible, the userspace
-can decide to only provide P-192 data or the combined P-192 and P-256
-data. It is also allowed to leave the P-192 data empty if userspace
-only has the remote P-256 data.
+The Bluetooth 4.1 specification with Secure Connections support has
+just been released and controllers with this feature are still in
+an early stage.
+
+A handful of controllers have already support for it, but they do
+not always identify this feature correctly. This debugfs entry
+allows to tell the kernel that the controller can be treated as
+it would fully support Secure Connections.
+
+Using debugfs to force Secure Connections support of course does
+not make this feature magically appear in all controllers. This
+is a debug functionality for early adopters. Once the majority
+of controllers matures this quirk will be removed.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/mgmt.h |  8 ++++++++
- net/bluetooth/mgmt.c         | 45 +++++++++++++++++++++++++++++++++-----------
- 2 files changed, 42 insertions(+), 11 deletions(-)
+ include/net/bluetooth/hci.h |  1 +
+ net/bluetooth/hci_core.c    | 51 ++++++++++++++++++++++++++++++++++++++++++++-
+ net/bluetooth/mgmt.c        |  6 ++++--
+ 3 files changed, 55 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 036ddc7dc7ed..e19049fb6c46 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -309,6 +309,14 @@ struct mgmt_cp_add_remote_oob_data {
- 	__u8	randomizer[16];
- } __packed;
- #define MGMT_ADD_REMOTE_OOB_DATA_SIZE	(MGMT_ADDR_INFO_SIZE + 32)
-+struct mgmt_cp_add_remote_oob_ext_data {
-+	struct mgmt_addr_info addr;
-+	__u8	hash192[16];
-+	__u8	randomizer192[16];
-+	__u8	hash256[16];
-+	__u8	randomizer256[16];
-+} __packed;
-+#define MGMT_ADD_REMOTE_OOB_EXT_DATA_SIZE (MGMT_ADDR_INFO_SIZE + 64)
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 0253276e88e4..2bc19881e250 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -117,6 +117,7 @@ enum {
+ 	HCI_SERVICE_CACHE,
+ 	HCI_DEBUG_KEYS,
+ 	HCI_DUT_MODE,
++	HCI_FORCE_SC,
+ 	HCI_UNREGISTER,
+ 	HCI_USER_CHANNEL,
  
- #define MGMT_OP_REMOVE_REMOTE_OOB_DATA	0x0022
- struct mgmt_cp_remove_remote_oob_data {
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index b3b619a448b5..946631ffe802 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -415,6 +415,52 @@ static int ssp_debug_mode_get(void *data, u64 *val)
+ DEFINE_SIMPLE_ATTRIBUTE(ssp_debug_mode_fops, ssp_debug_mode_get,
+ 			ssp_debug_mode_set, "%llu\n");
+ 
++static ssize_t force_sc_support_read(struct file *file, char __user *user_buf,
++				     size_t count, loff_t *ppos)
++{
++	struct hci_dev *hdev = file->private_data;
++	char buf[3];
++
++	buf[0] = test_bit(HCI_FORCE_SC, &hdev->dev_flags) ? 'Y': 'N';
++	buf[1] = '\n';
++	buf[2] = '\0';
++	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
++}
++
++static ssize_t force_sc_support_write(struct file *file,
++				      const char __user *user_buf,
++				      size_t count, loff_t *ppos)
++{
++	struct hci_dev *hdev = file->private_data;
++	char buf[32];
++	size_t buf_size = min(count, (sizeof(buf)-1));
++	bool enable;
++
++	if (test_bit(HCI_UP, &hdev->flags))
++		return -EBUSY;
++
++	if (copy_from_user(buf, user_buf, buf_size))
++		return -EFAULT;
++
++	buf[buf_size] = '\0';
++	if (strtobool(buf, &enable))
++		return -EINVAL;
++
++	if (enable == test_bit(HCI_FORCE_SC, &hdev->dev_flags))
++		return -EALREADY;
++
++	change_bit(HCI_FORCE_SC, &hdev->dev_flags);
++
++	return count;
++}
++
++static const struct file_operations force_sc_support_fops = {
++	.open		= simple_open,
++	.read		= force_sc_support_read,
++	.write		= force_sc_support_write,
++	.llseek		= default_llseek,
++};
++
+ static int idle_timeout_set(void *data, u64 val)
+ {
+ 	struct hci_dev *hdev = data;
+@@ -1365,7 +1411,8 @@ static void hci_init4_req(struct hci_request *req, unsigned long opt)
+ 		hci_req_add(req, HCI_OP_READ_SYNC_TRAIN_PARAMS, 0, NULL);
+ 
+ 	/* Enable Secure Connections if supported and configured */
+-	if (lmp_sc_capable(hdev) &&
++	if ((lmp_sc_capable(hdev) ||
++	     test_bit(HCI_FORCE_SC, &hdev->dev_flags)) &&
+ 	    test_bit(HCI_SC_ENABLED, &hdev->dev_flags)) {
+ 		u8 support = 0x01;
+ 		hci_req_add(req, HCI_OP_WRITE_SC_SUPPORT,
+@@ -1442,6 +1489,8 @@ static int __hci_init(struct hci_dev *hdev)
+ 				    hdev, &auto_accept_delay_fops);
+ 		debugfs_create_file("ssp_debug_mode", 0644, hdev->debugfs,
+ 				    hdev, &ssp_debug_mode_fops);
++		debugfs_create_file("force_sc_support", 0644, hdev->debugfs,
++				    hdev, &force_sc_support_fops);
+ 	}
+ 
+ 	if (lmp_sniff_capable(hdev)) {
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index bbe30c983492..4b6034fcc902 100644
+index a7d4ae679ab7..bbe30c983492 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -3096,23 +3096,46 @@ unlock:
- static int add_remote_oob_data(struct sock *sk, struct hci_dev *hdev,
- 			       void *data, u16 len)
- {
--	struct mgmt_cp_add_remote_oob_data *cp = data;
--	u8 status;
- 	int err;
+@@ -378,7 +378,8 @@ static u32 get_supported_settings(struct hci_dev *hdev)
+ 			settings |= MGMT_SETTING_HS;
+ 		}
  
- 	BT_DBG("%s ", hdev->name);
+-		if (lmp_sc_capable(hdev))
++		if (lmp_sc_capable(hdev) ||
++		    test_bit(HCI_FORCE_SC, &hdev->dev_flags))
+ 			settings |= MGMT_SETTING_SECURE_CONN;
+ 	}
  
- 	hci_dev_lock(hdev);
+@@ -4026,7 +4027,8 @@ static int set_secure_conn(struct sock *sk, struct hci_dev *hdev,
+ 		return cmd_status(sk, hdev->id, MGMT_OP_SET_SECURE_CONN,
+ 				  status);
  
--	err = hci_add_remote_oob_data(hdev, &cp->addr.bdaddr, cp->hash,
--				      cp->randomizer);
--	if (err < 0)
--		status = MGMT_STATUS_FAILED;
--	else
--		status = MGMT_STATUS_SUCCESS;
-+	if (len == MGMT_ADD_REMOTE_OOB_DATA_SIZE) {
-+		struct mgmt_cp_add_remote_oob_data *cp = data;
-+		u8 status;
+-	if (!lmp_sc_capable(hdev))
++	if (!lmp_sc_capable(hdev) &&
++	    !test_bit(HCI_FORCE_SC, &hdev->dev_flags))
+ 		return cmd_status(sk, hdev->id, MGMT_OP_SET_SECURE_CONN,
+ 				  MGMT_STATUS_NOT_SUPPORTED);
  
--	err = cmd_complete(sk, hdev->id, MGMT_OP_ADD_REMOTE_OOB_DATA, status,
--			   &cp->addr, sizeof(cp->addr));
-+		err = hci_add_remote_oob_data(hdev, &cp->addr.bdaddr,
-+					      cp->hash, cp->randomizer);
-+		if (err < 0)
-+			status = MGMT_STATUS_FAILED;
-+		else
-+			status = MGMT_STATUS_SUCCESS;
-+
-+		err = cmd_complete(sk, hdev->id, MGMT_OP_ADD_REMOTE_OOB_DATA,
-+				   status, &cp->addr, sizeof(cp->addr));
-+	} else if (len == MGMT_ADD_REMOTE_OOB_EXT_DATA_SIZE) {
-+		struct mgmt_cp_add_remote_oob_ext_data *cp = data;
-+		u8 status;
-+
-+		err = hci_add_remote_oob_ext_data(hdev, &cp->addr.bdaddr,
-+						  cp->hash192,
-+						  cp->randomizer192,
-+						  cp->hash256,
-+						  cp->randomizer256);
-+		if (err < 0)
-+			status = MGMT_STATUS_FAILED;
-+		else
-+			status = MGMT_STATUS_SUCCESS;
-+
-+		err = cmd_complete(sk, hdev->id, MGMT_OP_ADD_REMOTE_OOB_DATA,
-+				   status, &cp->addr, sizeof(cp->addr));
-+	} else {
-+		BT_ERR("add_remote_oob_data: invalid length of %u bytes", len);
-+		err = cmd_status(sk, hdev->id, MGMT_OP_ADD_REMOTE_OOB_DATA,
-+				 MGMT_STATUS_INVALID_PARAMS);
-+	}
- 
- 	hci_dev_unlock(hdev);
- 	return err;
-@@ -4202,7 +4225,7 @@ static const struct mgmt_handler {
- 	{ user_passkey_reply,     false, MGMT_USER_PASSKEY_REPLY_SIZE },
- 	{ user_passkey_neg_reply, false, MGMT_USER_PASSKEY_NEG_REPLY_SIZE },
- 	{ read_local_oob_data,    false, MGMT_READ_LOCAL_OOB_DATA_SIZE },
--	{ add_remote_oob_data,    false, MGMT_ADD_REMOTE_OOB_DATA_SIZE },
-+	{ add_remote_oob_data,    true,  MGMT_ADD_REMOTE_OOB_DATA_SIZE },
- 	{ remove_remote_oob_data, false, MGMT_REMOVE_REMOTE_OOB_DATA_SIZE },
- 	{ start_discovery,        false, MGMT_START_DISCOVERY_SIZE },
- 	{ stop_discovery,         false, MGMT_STOP_DISCOVERY_SIZE },
 -- 
 1.8.4.2
 
