@@ -1,70 +1,249 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bing Zhao <bzhao@marvell.com>
-To: Ben Hutchings <ben@decadent.org.uk>
-CC: <linux-wireless@vger.kernel.org>,
-	<linux-bluetooth@vger.kernel.org>,
-	Frank Huang <frankh@marvell.com>, Bing Zhao <bzhao@marvell.com>
-Subject: linux-firmware: pull-request Marvell mwifiex-firmware 2014-01-09
-Date: Thu, 9 Jan 2014 19:48:11 -0800
-Message-ID: <1389325691-21371-1-git-send-email-bzhao@marvell.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <luiz.dentz@gmail.com>, <johan.hedberg@gmail.com>,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 6/7] android/audio: Add audio_ipc_cmd
+Date: Fri, 10 Jan 2014 02:24:27 +0100
+Message-ID: <1389317068-12540-7-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1389317068-12540-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1389317068-12540-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The following changes since commit 52d77db9f133afe4d2b26aeccfd603745f45fda1:
+Adds function to handle send/receive on audio_sk
 
-  Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/egrumbach/linux-firmware (2013-12-30 15:22:40 +0100)
+Also moves ipc related functions on top of the file to avoid moving it
+later on when implementing AudioFlinger functions.
 
-are available in the git repository at:
+---
+ android/Makefile.am |   1 +
+ android/hal-audio.c | 178 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 172 insertions(+), 7 deletions(-)
 
-
-  git://git.marvell.com/mwifiex-firmware.git master
-
-for you to fetch changes up to 2d4aa2037a7015c4d78cde40006f80b8012537a6:
-
-  linux-firmware: add Marvell USB8897-B0 firmware combo image (2014-01-09 19:17:35 -0800)
-
-----------------------------------------------------------------
-Bing Zhao (3):
-      linux-firmware: update Marvell USB8797-B0 firmware image
-      linux-firmware: update Marvell SD8897-B0 firmware combo image
-      linux-firmware: add Marvell USB8897-B0 firmware combo image
-
- WHENCE                  |   7 +++++--
- mrvl/sd8897_uapsta.bin  | Bin 639012 -> 668028 bytes
- mrvl/usb8797_uapsta.bin | Bin 508372 -> 541048 bytes
- mrvl/usb8897_uapsta.bin | Bin 0 -> 705364 bytes
- 4 files changed, 5 insertions(+), 2 deletions(-)
- create mode 100644 mrvl/usb8897_uapsta.bin
-
-diff --git a/WHENCE b/WHENCE
-index 4f87d8a..23faafa 100644
---- a/WHENCE
-+++ b/WHENCE
-@@ -730,10 +730,13 @@ File: mrvl/sd8797_uapsta.bin
- Version: 14.66.11.p151
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 0a32a95..94e5329 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -117,6 +117,7 @@ android_android_tester_LDFLAGS = -pthread
+ noinst_LTLIBRARIES += android/libaudio-internal.la
  
- File: mrvl/sd8897_uapsta.bin
--Version: 15.69.2.p11
-+Version: 15.68.201.p113
+ android_libaudio_internal_la_SOURCES = android/audio-msg.h \
++					android/hal-msg.h \
+ 					android/hal-audio.c \
+ 					android/hardware/audio.h \
+ 					android/hardware/audio_effect.h \
+diff --git a/android/hal-audio.c b/android/hal-audio.c
+index 4c5a9d9..3b94e62 100644
+--- a/android/hal-audio.c
++++ b/android/hal-audio.c
+@@ -31,6 +31,7 @@
  
- File: mrvl/usb8797_uapsta.bin
--Version: 14.69.11.p179
-+Version: 14.68.29.p26
+ #include "audio-msg.h"
+ #include "hal-log.h"
++#include "hal-msg.h"
+ 
+ static int listen_sk = -1;
+ static int audio_sk = -1;
+@@ -38,12 +39,182 @@ static bool close_thread = false;
+ 
+ static pthread_t ipc_th = 0;
+ static pthread_mutex_t close_mutex = PTHREAD_MUTEX_INITIALIZER;
++static pthread_mutex_t sk_mutex = PTHREAD_MUTEX_INITIALIZER;
+ 
+ struct a2dp_audio_dev {
+ 	struct audio_hw_device dev;
+ 	struct audio_stream_out *out;
+ };
+ 
++static int audio_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len,
++			void *param, size_t *rsp_len, void *rsp, int *fd)
++{
++	ssize_t ret;
++	struct msghdr msg;
++	struct iovec iv[2];
++	struct hal_hdr cmd;
++	char cmsgbuf[CMSG_SPACE(sizeof(int))];
++	struct hal_status s;
++	size_t s_len = sizeof(s);
 +
-+File: mrvl/usb8897_uapsta.bin
-+Version: 15.68.201.p113
++	if (audio_sk < 0) {
++		error("audio: Invalid cmd socket passed to audio_ipc_cmd");
++		goto failed;
++	}
++
++	if (!rsp || !rsp_len) {
++		memset(&s, 0, s_len);
++		rsp_len = &s_len;
++		rsp = &s;
++	}
++
++	memset(&msg, 0, sizeof(msg));
++	memset(&cmd, 0, sizeof(cmd));
++
++	cmd.service_id = service_id;
++	cmd.opcode = opcode;
++	cmd.len = len;
++
++	iv[0].iov_base = &cmd;
++	iv[0].iov_len = sizeof(cmd);
++
++	iv[1].iov_base = param;
++	iv[1].iov_len = len;
++
++	msg.msg_iov = iv;
++	msg.msg_iovlen = 2;
++
++	pthread_mutex_lock(&sk_mutex);
++
++	ret = sendmsg(audio_sk, &msg, 0);
++	if (ret < 0) {
++		error("audio: Sending command failed:%s", strerror(errno));
++		pthread_mutex_unlock(&sk_mutex);
++		goto failed;
++	}
++
++	/* socket was shutdown */
++	if (ret == 0) {
++		error("audio: Command socket closed");
++		goto failed;
++	}
++
++	memset(&msg, 0, sizeof(msg));
++	memset(&cmd, 0, sizeof(cmd));
++
++	iv[0].iov_base = &cmd;
++	iv[0].iov_len = sizeof(cmd);
++
++	iv[1].iov_base = rsp;
++	iv[1].iov_len = *rsp_len;
++
++	msg.msg_iov = iv;
++	msg.msg_iovlen = 2;
++
++	if (fd) {
++		memset(cmsgbuf, 0, sizeof(cmsgbuf));
++		msg.msg_control = cmsgbuf;
++		msg.msg_controllen = sizeof(cmsgbuf);
++	}
++
++	ret = recvmsg(audio_sk, &msg, 0);
++	if (ret < 0) {
++		error("audio: Receiving command response failed:%s",
++							strerror(errno));
++		pthread_mutex_unlock(&sk_mutex);
++		goto failed;
++	}
++
++	pthread_mutex_unlock(&sk_mutex);
++
++	if (ret < (ssize_t) sizeof(cmd)) {
++		error("audio: Too small response received(%zd bytes)", ret);
++		goto failed;
++	}
++
++	if (cmd.service_id != service_id) {
++		error("audio: Invalid service id (%u vs %u)", cmd.service_id,
++								service_id);
++		goto failed;
++	}
++
++	if (ret != (ssize_t) (sizeof(cmd) + cmd.len)) {
++		error("audio: Malformed response received(%zd bytes)", ret);
++		goto failed;
++	}
++
++	if (cmd.opcode != opcode && cmd.opcode != AUDIO_OP_STATUS) {
++		error("audio: Invalid opcode received (%u vs %u)",
++						cmd.opcode, opcode);
++		goto failed;
++	}
++
++	if (cmd.opcode == AUDIO_OP_STATUS) {
++		struct hal_status *s = rsp;
++
++		if (sizeof(*s) != cmd.len) {
++			error("audio: Invalid status length");
++			goto failed;
++		}
++
++		if (s->code == AUDIO_STATUS_SUCCESS) {
++			error("audio: Invalid success status response");
++			goto failed;
++		}
++
++		return s->code;
++	}
++
++	/* Receive auxiliary data in msg */
++	if (fd) {
++		struct cmsghdr *cmsg;
++
++		*fd = -1;
++
++		for (cmsg = CMSG_FIRSTHDR(&msg); cmsg;
++					cmsg = CMSG_NXTHDR(&msg, cmsg)) {
++			if (cmsg->cmsg_level == SOL_SOCKET
++					&& cmsg->cmsg_type == SCM_RIGHTS) {
++				memcpy(fd, CMSG_DATA(cmsg), sizeof(int));
++				break;
++			}
++		}
++	}
++
++	if (rsp_len)
++		*rsp_len = cmd.len;
++
++	return AUDIO_STATUS_SUCCESS;
++
++failed:
++	/* Some serious issue happen on IPC - recover */
++	shutdown(audio_sk, SHUT_RDWR);
++	audio_sk = -1;
++	return AUDIO_STATUS_FAILED;
++}
++
++static int ipc_open_cmd(void)
++{
++	struct audio_rsp_open rsp;
++	uint8_t buf[sizeof(struct audio_cmd_open) +
++						sizeof(struct audio_preset)];
++	size_t rsp_len = sizeof(rsp);
++	int result;
++
++	DBG("");
++
++	memset(&buf, 0, sizeof(buf));
++
++	/* TODO: Fill in buf here with smth */
++
++	result = audio_ipc_cmd(AUDIO_SERVICE_ID, AUDIO_OP_OPEN, sizeof(buf), buf,
++							&rsp_len, &rsp, NULL);
++
++	/*TODO: Read response and store endoint id */
++
++	return result;
++}
++
+ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+ 								size_t bytes)
+ {
+@@ -417,13 +588,6 @@ static int audio_close(hw_device_t *device)
+ 	return 0;
+ }
  
- File: mrvl/pcie8897_uapsta.bin
- Version: 15.69.2.p11
-diff --git a/mrvl/sd8897_uapsta.bin b/mrvl/sd8897_uapsta.bin
-index 70732a6..e68a049 100644
-Binary files a/mrvl/sd8897_uapsta.bin and b/mrvl/sd8897_uapsta.bin differ
-diff --git a/mrvl/usb8797_uapsta.bin b/mrvl/usb8797_uapsta.bin
-index bd7c07c..1963798 100644
-Binary files a/mrvl/usb8797_uapsta.bin and b/mrvl/usb8797_uapsta.bin differ
-diff --git a/mrvl/usb8897_uapsta.bin b/mrvl/usb8897_uapsta.bin
-new file mode 100644
-index 0000000..59aef78
-Binary files /dev/null and b/mrvl/usb8897_uapsta.bin differ
+-static int ipc_open_cmd(void)
+-{
+-	DBG("Not Implemented");
+-
+-	return AUDIO_STATUS_FAILED;
+-}
+-
+ static void *ipc_handler(void *data)
+ {
+ 	bool done = false;
+-- 
+1.8.4
+
