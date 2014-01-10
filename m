@@ -1,43 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 02/15] Bluetooth: Add HCI command definition for Secure Connections enabling
-Date: Fri, 10 Jan 2014 01:29:29 -0800
-Message-Id: <1389346182-12387-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v3 06/15] Bluetooth: Enable Authenticated Payload Timeout Expired event
+Date: Fri, 10 Jan 2014 01:29:33 -0800
+Message-Id: <1389346182-12387-6-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Secure Connections feature is optional and host stacks have to
-manually enable it. This add the HCI command definiton for reading
-and writing this setting.
+With Secure Connections capable controllers, the authenticated payload
+timeout can trigger. Enable the event so the controller informs the
+host when this happens.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ net/bluetooth/hci_core.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index cd40219d32aa..2a35d273de2c 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -937,6 +937,17 @@ struct hci_rp_write_sync_train_params {
- 	__le16	sync_train_int;
- } __packed;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 5e8663c194c1..52e398f37129 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1288,6 +1288,10 @@ static void hci_set_event_mask_page_2(struct hci_request *req)
+ 		events[2] |= 0x08;	/* Truncated Page Complete */
+ 	}
  
-+#define HCI_OP_READ_SC_SUPPORT		0x0c79
-+struct hci_rp_read_sc_support {
-+	__u8	status;
-+	__u8	support;
-+} __packed;
++	/* Enable Authenticated Payload Timeout Expired event if supported */
++	if (lmp_ping_capable(hdev))
++		events[2] |= 0x80;
 +
-+#define HCI_OP_WRITE_SC_SUPPORT		0x0c7a
-+struct hci_cp_write_sc_support {
-+	__u8	support;
-+} __packed;
-+
- #define HCI_OP_READ_LOCAL_VERSION	0x1001
- struct hci_rp_read_local_version {
- 	__u8     status;
+ 	hci_req_add(req, HCI_OP_SET_EVENT_MASK_PAGE_2, sizeof(events), events);
+ }
+ 
 -- 
 1.8.4.2
 
