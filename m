@@ -1,55 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3] android/tester: Multi property check for test case
+Date: Fri, 10 Jan 2014 16:24:27 +0100
+Message-ID: <1389370457.yrK6roSgYp@uw000953>
+In-Reply-To: <1389363698-30492-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1389363698-30492-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1389317068-12540-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1389317068-12540-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Fri, 10 Jan 2014 17:49:18 +0200
-Message-ID: <CABBYNZJR9+mtp20dyZifcieRmPA8RiZVA7XBSZmbk2NO1APT8g@mail.gmail.com>
-Subject: Re: [PATCH v2 0/7] Next skeleton patches for audio plugin
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi Grzegorz,
 
-On Fri, Jan 10, 2014 at 3:24 AM, Lukasz Rymanowski
-<lukasz.rymanowski@tieto.com> wrote:
-> v1:
-> Those patches adds function to handle send/receive msg on audio IPC.
-> Also adds some small changes.
->
-> Not that since we do not yet support AUDIO_OP_OPEN, audio socket will be
-> reseted just after connect.
->
-> v2:
-> Fixes suggester by Luiz
-> Some additional fixes
->
-> Lukasz Rymanowski (7):
->   android/audio: Prefix error log with "audio"
->   android: Fix error check from pthread_create
->   android/audio: Refactor create_audio_ipc
->   android/audio: Trivial function move
->   android/audio: Add skeleton for ipc_open_cmd function
->   android/audio: Add audio_ipc_cmd
->   android/audio: Add audio_ipc_cleanup function
->
->  android/Makefile.am |   1 +
->  android/hal-audio.c | 304 ++++++++++++++++++++++++++++++++++++++++++----------
->  android/hal-ipc.c   |   6 +-
->  3 files changed, 250 insertions(+), 61 deletions(-)
->
-> --
-> 1.8.4
+On Friday 10 of January 2014 15:21:38 Grzegorz Kolodziejczyk wrote:
+> This patch allows to check multiple properties for test case. Properties
+> can be prioritized to allow check if they'll come in right order. Now
+> properties aren't treated as a "single" callback. In future in one
+> callback multiple properties can come.
+> ---
+>  android/android-tester.c | 536 ++++++++++++++++++++++++++++++++++-------------
+>  1 file changed, 392 insertions(+), 144 deletions(-)
 
-Ive applied some of these set, any of those that involved the command
-I left out for now since they are not complete and they would
-otherwise just cause failures now that haltest does load
-audio.a2dp.default.so.
-
+Applied, thanks.
 
 -- 
-Luiz Augusto von Dentz
+Best regards, 
+Szymon Janc
