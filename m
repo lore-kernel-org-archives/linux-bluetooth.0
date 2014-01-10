@@ -1,60 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 03/15] Bluetooth: Add HCI command definition for extended OOB data
-Date: Fri, 10 Jan 2014 01:29:30 -0800
-Message-Id: <1389346182-12387-3-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v3 14/15] Bluetooth: Add internal function for storing P-192 and P-256 data
+Date: Fri, 10 Jan 2014 01:29:41 -0800
+Message-Id: <1389346182-12387-14-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Secure Connections feature introduces the support for P-256 strength
-pairings (compared to P-192 with Secure Simple Pairing). This however
-means that for out-of-band pairing the hash and randomizer needs to be
-differentiated. Two new commands are introduced to handle the possible
-combinations of P-192 and P-256. This add the HCI command definition
-for both.
+Add function to allow adding P-192 and P-256 data to the internal
+storage. This also fixes a few coding style issues from the previous
+helper functions for the out-of-band credentials storage.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ include/net/bluetooth/hci_core.h |  9 ++++++---
+ net/bluetooth/hci_core.c         | 32 +++++++++++++++++++++++++++++---
+ 2 files changed, 35 insertions(+), 6 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 2a35d273de2c..e4e94bfc5232 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -664,6 +664,15 @@ struct hci_rp_set_csb {
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 5948930f92e6..66e96ebffe97 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -761,9 +761,12 @@ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
  
- #define HCI_OP_START_SYNC_TRAIN		0x0443
+ int hci_remote_oob_data_clear(struct hci_dev *hdev);
+ struct oob_data *hci_find_remote_oob_data(struct hci_dev *hdev,
+-							bdaddr_t *bdaddr);
+-int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
+-								u8 *randomizer);
++					  bdaddr_t *bdaddr);
++int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
++			    u8 *hash, u8 *randomizer);
++int hci_add_remote_oob_ext_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
++				u8 *hash192, u8 *randomizer192,
++				u8 *hash256, u8 *randomizer256);
+ int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr);
  
-+#define HCI_OP_REMOTE_OOB_EXT_DATA_REPLY	0x0445
-+struct hci_cp_remote_oob_ext_data_reply {
-+	bdaddr_t bdaddr;
-+	__u8     hash192[16];
-+	__u8     randomizer192[16];
-+	__u8     hash256[16];
-+	__u8     randomizer256[16];
-+} __packed;
+ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index f13c0550f368..9adcc5f9740d 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2794,13 +2794,12 @@ int hci_remote_oob_data_clear(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
+-int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
+-			    u8 *randomizer)
++int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
++			    u8 *hash, u8 *randomizer)
+ {
+ 	struct oob_data *data;
+ 
+ 	data = hci_find_remote_oob_data(hdev, bdaddr);
+-
+ 	if (!data) {
+ 		data = kzalloc(sizeof(*data), GFP_ATOMIC);
+ 		if (!data)
+@@ -2818,6 +2817,33 @@ int hci_add_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 *hash,
+ 	return 0;
+ }
+ 
++int hci_add_remote_oob_ext_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
++				u8 *hash192, u8 *randomizer192,
++				u8 *hash256, u8 *randomizer256)
++{
++	struct oob_data *data;
 +
- #define HCI_OP_SNIFF_MODE		0x0803
- struct hci_cp_sniff_mode {
- 	__le16   handle;
-@@ -948,6 +957,15 @@ struct hci_cp_write_sc_support {
- 	__u8	support;
- } __packed;
- 
-+#define HCI_OP_READ_LOCAL_OOB_EXT_DATA	0x0c7d
-+struct hci_rp_read_local_oob_ext_data {
-+	__u8     status;
-+	__u8     hash192[16];
-+	__u8     randomizer192[16];
-+	__u8     hash256[16];
-+	__u8     randomizer256[16];
-+} __packed;
++	data = hci_find_remote_oob_data(hdev, bdaddr);
++	if (!data) {
++		data = kzalloc(sizeof(*data), GFP_ATOMIC);
++		if (!data)
++			return -ENOMEM;
 +
- #define HCI_OP_READ_LOCAL_VERSION	0x1001
- struct hci_rp_read_local_version {
- 	__u8     status;
++		bacpy(&data->bdaddr, bdaddr);
++		list_add(&data->list, &hdev->remote_oob_data);
++	}
++
++	memcpy(data->hash192, hash192, sizeof(data->hash192));
++	memcpy(data->randomizer192, randomizer192, sizeof(data->randomizer192));
++
++	memcpy(data->hash256, hash256, sizeof(data->hash256));
++	memcpy(data->randomizer256, randomizer256, sizeof(data->randomizer256));
++
++	BT_DBG("%s for %pMR", hdev->name, bdaddr);
++
++	return 0;
++}
++
+ struct bdaddr_list *hci_blacklist_lookup(struct hci_dev *hdev,
+ 					 bdaddr_t *bdaddr, u8 type)
+ {
 -- 
 1.8.4.2
 
