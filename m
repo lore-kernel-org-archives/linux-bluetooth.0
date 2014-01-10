@@ -1,58 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 05/15] Bluetooth: Add support for handling P-256 derived link keys
-Date: Fri, 10 Jan 2014 01:29:32 -0800
-Message-Id: <1389346182-12387-5-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v3 01/15] Bluetooth: Add LMP feature definitions for Secure Connections support
+Date: Fri, 10 Jan 2014 01:29:28 -0800
+Message-Id: <1389346182-12387-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Before being able to enable Secure Connections support, the core needs
-to know on how to handle P-256 derived link keys. The difference between
-authenticated and unauthenticated P-256 derived link keys is the same as
-its P-192 counter parts.
+The support for Secure Connections introduces two new controller
+features and one new host feature.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_conn.c  | 6 ++++--
- net/bluetooth/hci_event.c | 3 ++-
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ include/net/bluetooth/hci.h      | 4 ++++
+ include/net/bluetooth/hci_core.h | 3 +++
+ 2 files changed, 7 insertions(+)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 251f22e32fbf..cf96b3438a91 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -802,12 +802,14 @@ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 66c1cd87bfe7..cd40219d32aa 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -282,10 +282,14 @@ enum {
+ #define LMP_SYNC_TRAIN	0x04
+ #define LMP_SYNC_SCAN	0x08
  
- 	/* An authenticated combination key has sufficient security for any
- 	   security level. */
--	if (conn->key_type == HCI_LK_AUTH_COMBINATION_P192)
-+	if (conn->key_type == HCI_LK_AUTH_COMBINATION_P192 ||
-+	    conn->key_type == HCI_LK_AUTH_COMBINATION_P256)
- 		goto encrypt;
++#define LMP_SC		0x01
++#define LMP_PING	0x02
++
+ /* Host features */
+ #define LMP_HOST_SSP		0x01
+ #define LMP_HOST_LE		0x02
+ #define LMP_HOST_LE_BREDR	0x04
++#define LMP_HOST_SC		0x08
  
- 	/* An unauthenticated combination key has sufficient security for
- 	   security level 1 and 2. */
--	if (conn->key_type == HCI_LK_UNAUTH_COMBINATION_P192 &&
-+	if ((conn->key_type == HCI_LK_UNAUTH_COMBINATION_P192 ||
-+	     conn->key_type == HCI_LK_UNAUTH_COMBINATION_P256) &&
- 	    (sec_level == BT_SECURITY_MEDIUM || sec_level == BT_SECURITY_LOW))
- 		goto encrypt;
+ /* Connection modes */
+ #define HCI_CM_ACTIVE	0x0000
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index f2f0cf5865c4..bb984d0626b7 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -803,9 +803,12 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ #define lmp_csb_slave_capable(dev)  ((dev)->features[2][0] & LMP_CSB_SLAVE)
+ #define lmp_sync_train_capable(dev) ((dev)->features[2][0] & LMP_SYNC_TRAIN)
+ #define lmp_sync_scan_capable(dev)  ((dev)->features[2][0] & LMP_SYNC_SCAN)
++#define lmp_sc_capable(dev)         ((dev)->features[2][1] & LMP_SC)
++#define lmp_ping_capable(dev)       ((dev)->features[2][1] & LMP_PING)
  
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index defa1252b534..b3c5396e0c1b 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2633,7 +2633,8 @@ static void hci_link_key_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ /* ----- Host capabilities ----- */
+ #define lmp_host_ssp_capable(dev)  ((dev)->features[1][0] & LMP_HOST_SSP)
++#define lmp_host_sc_capable(dev)   ((dev)->features[1][0] & LMP_HOST_SC)
+ #define lmp_host_le_capable(dev)   (!!((dev)->features[1][0] & LMP_HOST_LE))
+ #define lmp_host_le_br_capable(dev) (!!((dev)->features[1][0] & LMP_HOST_LE_BREDR))
  
- 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &ev->bdaddr);
- 	if (conn) {
--		if (key->type == HCI_LK_UNAUTH_COMBINATION_P192 &&
-+		if ((key->type == HCI_LK_UNAUTH_COMBINATION_P192 ||
-+		     key->type == HCI_LK_UNAUTH_COMBINATION_P256) &&
- 		    conn->auth_type != 0xff && (conn->auth_type & 0x01)) {
- 			BT_DBG("%s ignoring unauthenticated key", hdev->name);
- 			goto not_found;
 -- 
 1.8.4.2
 
