@@ -1,35 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 10/15] Bluetooth: Limit acceptable link key types to only supported ones
-Date: Fri, 10 Jan 2014 01:29:37 -0800
-Message-Id: <1389346182-12387-10-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v3 09/15] Bluetooth: Enable Secure Connection during power on if configured
+Date: Fri, 10 Jan 2014 01:29:36 -0800
+Message-Id: <1389346182-12387-9-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The link keys that are loaded by userspace during controller setup
-should be limited to actual valid and supported types. With the
-support for Secure Connections, it is limited to types 0x00 - 0x08
-at the moment. Reject any other link key types.
+If support for Secure Connection has been configured, then make sure
+to send the appropiate HCI command to enable it when powering on the
+controller.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/hci_core.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 68a3c998d19c..9b162038acb7 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2241,7 +2241,7 @@ static int load_link_keys(struct sock *sk, struct hci_dev *hdev, void *data,
- 	for (i = 0; i < key_count; i++) {
- 		struct mgmt_link_key_info *key = &cp->keys[i];
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 52e398f37129..b3b619a448b5 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1363,6 +1363,14 @@ static void hci_init4_req(struct hci_request *req, unsigned long opt)
+ 	/* Check for Synchronization Train support */
+ 	if (lmp_sync_train_capable(hdev))
+ 		hci_req_add(req, HCI_OP_READ_SYNC_TRAIN_PARAMS, 0, NULL);
++
++	/* Enable Secure Connections if supported and configured */
++	if (lmp_sc_capable(hdev) &&
++	    test_bit(HCI_SC_ENABLED, &hdev->dev_flags)) {
++		u8 support = 0x01;
++		hci_req_add(req, HCI_OP_WRITE_SC_SUPPORT,
++			    sizeof(support), &support);
++	}
+ }
  
--		if (key->addr.type != BDADDR_BREDR)
-+		if (key->addr.type != BDADDR_BREDR || key->type > 0x08)
- 			return cmd_status(sk, hdev->id, MGMT_OP_LOAD_LINK_KEYS,
- 					  MGMT_STATUS_INVALID_PARAMS);
- 	}
+ static int __hci_init(struct hci_dev *hdev)
 -- 
 1.8.4.2
 
