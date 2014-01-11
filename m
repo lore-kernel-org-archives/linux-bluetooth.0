@@ -2,46 +2,58 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 09/11] attrib: Reject incomplete PDU in dec_find_by_type_resp()
-Date: Sat, 11 Jan 2014 00:47:25 -0400
-Message-Id: <1389415647-25831-9-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 08/11] attrib: Remove unnecessary local variables from dec_find_by_type_req()
+Date: Sat, 11 Jan 2014 00:47:24 -0400
+Message-Id: <1389415647-25831-8-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1389415647-25831-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1389415647-25831-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Otherwise, an incomplete PDU may be silently accepted (with any
-remaining data discarded).
+Use number instead of "min_len", which is easier to review (with help of
+the documented parameter sizes).
+
+valuelen is redundant as *vlen can be used directly.
 ---
- attrib/att.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ attrib/att.c | 14 ++++----------
+ 1 file changed, 4 insertions(+), 10 deletions(-)
 
 diff --git a/attrib/att.c b/attrib/att.c
-index d367918..c279b2c 100644
+index 435a26d..d367918 100644
 --- a/attrib/att.c
 +++ b/attrib/att.c
-@@ -334,12 +334,21 @@ GSList *dec_find_by_type_resp(const uint8_t *pdu, size_t len)
- 	GSList *matches;
- 	off_t offset;
+@@ -281,14 +281,10 @@ uint16_t dec_find_by_type_req(const uint8_t *pdu, size_t len, uint16_t *start,
+ 						uint16_t *end, bt_uuid_t *uuid,
+ 						uint8_t *value, size_t *vlen)
+ {
+-	size_t valuelen;
+-	uint16_t min_len = sizeof(pdu[0]) + sizeof(*start) +
+-						sizeof(*end) + sizeof(uint16_t);
+-
+ 	if (pdu == NULL)
+ 		return 0;
  
-+	/* PDU should contain at least:
-+	 * - Attribute Opcode (1 octet)
-+	 * - Handles Information List (at least one entry):
-+	 *   - Found Attribute Handle (2 octets)
-+	 *   - Group End Handle (2 octets) */
- 	if (pdu == NULL || len < 5)
- 		return NULL;
+-	if (len < min_len)
++	if (len < 7)
+ 		return 0;
  
- 	if (pdu[0] != ATT_OP_FIND_BY_TYPE_RESP)
- 		return NULL;
+ 	/* Attribute Opcode (1 octet) */
+@@ -302,12 +298,10 @@ uint16_t dec_find_by_type_req(const uint8_t *pdu, size_t len, uint16_t *start,
+ 	/* 16-bit UUID to find (2 octets) */
+ 	*uuid = att_get_uuid16(&pdu[5]);
  
-+	/* Reject incomplete Handles Information List */
-+	if ((len - 1) % 4)
-+		return NULL;
-+
- 	for (offset = 1, matches = NULL;
- 				len >= (offset + sizeof(uint16_t) * 2);
- 				offset += sizeof(uint16_t) * 2) {
+-	valuelen = len - min_len;
+-	*vlen = valuelen;
+-
+ 	/* Attribute value to find */
+-	if (valuelen > 0)
+-		memcpy(value, pdu + min_len, valuelen);
++	*vlen = len - 7;
++	if (*vlen > 0)
++		memcpy(value, pdu + 7, *vlen);
+ 
+ 	return len;
+ }
 -- 
 1.8.3.2
 
