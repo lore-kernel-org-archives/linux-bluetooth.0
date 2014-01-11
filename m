@@ -1,120 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Handle security level 4 for L2CAP connections
-Date: Sat, 11 Jan 2014 13:44:00 -0800
-Message-Id: <1389476641-28084-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Introduce requirements for security level 4
+Date: Sat, 11 Jan 2014 13:03:01 -0800
+Message-Id: <1389474181-21219-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With the introduction of security level 4, the L2CAP sockets need to
-be made aware of this new level. This change ensures that the pairing
-requirements are set correctly for these connections.
+The security level 4 is a new strong security requirement that is based
+around 128-bit equivalent strength for link and encryption keys required
+using FIPS approved algorithms. Which means that E0, SAFER+ and P-192
+are not allowed. Only connections created with P-256 resulting from
+using Secure Connections support are allowed.
+
+This security level needs to be enforced when Secure Connection Only
+mode is enabled for a controller or a service requires FIPS compliant
+strong security. Currently it is not possible to enable either of
+these two cases. This patch just puts in the foundation for being
+able to handle security level 4 in the future.
+
+It should be noted that devices or services with security level 4
+requirement can only communicate using Bluetooth 4.1 controllers
+with support for Secure Connections. There is no backward compatibilty
+if used with older hardware.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/l2cap.h |  1 +
- net/bluetooth/l2cap_core.c    | 11 ++++++++---
- net/bluetooth/l2cap_sock.c    | 10 ++++++++++
- 3 files changed, 19 insertions(+), 3 deletions(-)
+ include/net/bluetooth/bluetooth.h |  1 +
+ net/bluetooth/hci_conn.c          | 18 +++++++++++++-----
+ 2 files changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index dbc4a89984ca..c695083eee2b 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -91,6 +91,7 @@ struct l2cap_conninfo {
- #define L2CAP_LM_TRUSTED	0x0008
- #define L2CAP_LM_RELIABLE	0x0010
- #define L2CAP_LM_SECURE		0x0020
-+#define L2CAP_LM_FIPS		0x0040
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index f4f9ee466791..904777c1cd24 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -65,6 +65,7 @@ struct bt_security {
+ #define BT_SECURITY_LOW		1
+ #define BT_SECURITY_MEDIUM	2
+ #define BT_SECURITY_HIGH	3
++#define BT_SECURITY_FIPS	4
  
- /* L2CAP command codes */
- #define L2CAP_COMMAND_REJ	0x01
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b0ad2c752d73..3f0dd552cb2b 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -737,6 +737,7 @@ static inline u8 l2cap_get_auth_type(struct l2cap_chan *chan)
- 	case L2CAP_CHAN_RAW:
- 		switch (chan->sec_level) {
- 		case BT_SECURITY_HIGH:
-+		case BT_SECURITY_FIPS:
- 			return HCI_AT_DEDICATED_BONDING_MITM;
- 		case BT_SECURITY_MEDIUM:
- 			return HCI_AT_DEDICATED_BONDING;
-@@ -749,7 +750,8 @@ static inline u8 l2cap_get_auth_type(struct l2cap_chan *chan)
- 			if (chan->sec_level == BT_SECURITY_LOW)
- 				chan->sec_level = BT_SECURITY_SDP;
- 		}
--		if (chan->sec_level == BT_SECURITY_HIGH)
-+		if (chan->sec_level == BT_SECURITY_HIGH ||
-+		    chan->sec_level == BT_SECURITY_FIPS)
- 			return HCI_AT_NO_BONDING_MITM;
- 		else
- 			return HCI_AT_NO_BONDING;
-@@ -759,7 +761,8 @@ static inline u8 l2cap_get_auth_type(struct l2cap_chan *chan)
- 			if (chan->sec_level == BT_SECURITY_LOW)
- 				chan->sec_level = BT_SECURITY_SDP;
+ #define BT_DEFER_SETUP	7
  
--			if (chan->sec_level == BT_SECURITY_HIGH)
-+			if (chan->sec_level == BT_SECURITY_HIGH ||
-+			    chan->sec_level == BT_SECURITY_FIPS)
- 				return HCI_AT_NO_BONDING_MITM;
- 			else
- 				return HCI_AT_NO_BONDING;
-@@ -768,6 +771,7 @@ static inline u8 l2cap_get_auth_type(struct l2cap_chan *chan)
- 	default:
- 		switch (chan->sec_level) {
- 		case BT_SECURITY_HIGH:
-+		case BT_SECURITY_FIPS:
- 			return HCI_AT_GENERAL_BONDING_MITM;
- 		case BT_SECURITY_MEDIUM:
- 			return HCI_AT_GENERAL_BONDING;
-@@ -7206,7 +7210,8 @@ static inline void l2cap_check_encryption(struct l2cap_chan *chan, u8 encrypt)
- 	if (encrypt == 0x00) {
- 		if (chan->sec_level == BT_SECURITY_MEDIUM) {
- 			__set_chan_timer(chan, L2CAP_ENC_TIMEOUT);
--		} else if (chan->sec_level == BT_SECURITY_HIGH)
-+		} else if (chan->sec_level == BT_SECURITY_HIGH ||
-+			   chan->sec_level == BT_SECURITY_FIPS)
- 			l2cap_chan_close(chan, ECONNREFUSED);
- 	} else {
- 		if (chan->sec_level == BT_SECURITY_MEDIUM)
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 20ef748b2906..4aa6704f0b33 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -432,6 +432,10 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname,
- 			opt = L2CAP_LM_AUTH | L2CAP_LM_ENCRYPT |
- 			      L2CAP_LM_SECURE;
- 			break;
-+		case BT_SECURITY_FIPS:
-+			opt = L2CAP_LM_AUTH | L2CAP_LM_ENCRYPT |
-+			      L2CAP_LM_SECURE | L2CAP_LM_FIPS;
-+			break;
- 		default:
- 			opt = 0;
- 			break;
-@@ -445,6 +449,7 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname,
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index cf96b3438a91..0266bd8e4913 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -800,10 +800,17 @@ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
+ 	if (!(conn->link_mode & HCI_LM_AUTH))
+ 		goto auth;
  
- 		if (put_user(opt, (u32 __user *) optval))
- 			err = -EFAULT;
+-	/* An authenticated combination key has sufficient security for any
+-	   security level. */
+-	if (conn->key_type == HCI_LK_AUTH_COMBINATION_P192 ||
+-	    conn->key_type == HCI_LK_AUTH_COMBINATION_P256)
++	/* An authenticated FIPS approved combination key has sufficient
++	 * security for security level 4. */
++	if (conn->key_type == HCI_LK_AUTH_COMBINATION_P256 &&
++	    sec_level == BT_SECURITY_FIPS)
++		goto encrypt;
 +
- 		break;
++	/* An authenticated combination key has sufficient security for
++	   security level 3. */
++	if ((conn->key_type == HCI_LK_AUTH_COMBINATION_P192 ||
++	     conn->key_type == HCI_LK_AUTH_COMBINATION_P256) &&
++	    sec_level == BT_SECURITY_HIGH)
+ 		goto encrypt;
  
- 	case L2CAP_CONNINFO:
-@@ -699,6 +704,11 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname,
- 			break;
- 		}
+ 	/* An unauthenticated combination key has sufficient security for
+@@ -818,7 +825,8 @@ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
+ 	   is generated using maximum PIN code length (16).
+ 	   For pre 2.1 units. */
+ 	if (conn->key_type == HCI_LK_COMBINATION &&
+-	    (sec_level != BT_SECURITY_HIGH || conn->pin_length == 16))
++	    (sec_level == BT_SECURITY_MEDIUM || sec_level == BT_SECURITY_LOW ||
++	     conn->pin_length == 16))
+ 		goto encrypt;
  
-+		if (opt & L2CAP_LM_FIPS) {
-+			err = -EINVAL;
-+			break;
-+		}
-+
- 		if (opt & L2CAP_LM_AUTH)
- 			chan->sec_level = BT_SECURITY_LOW;
- 		if (opt & L2CAP_LM_ENCRYPT)
+ auth:
 -- 
 1.8.4.2
 
