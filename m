@@ -1,39 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 11 Jan 2014 18:56:48 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 01/11] attrib: Modify gatt_cb_t signature
-Message-ID: <20140111165648.GA5063@x220.p-661hnu-f1>
-References: <1389415647-25831-1-git-send-email-anderson.lizardo@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1389415647-25831-1-git-send-email-anderson.lizardo@openbossa.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/6] audio/A2DP: Add implemention of audio Close command
+Date: Sat, 11 Jan 2014 12:13:32 +0200
+Message-Id: <1389435216-29040-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1389435216-29040-1-git-send-email-luiz.dentz@gmail.com>
+References: <1389435216-29040-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Sat, Jan 11, 2014, Anderson Lizardo wrote:
-> Use standard C types instead of GLib ones (which are unnecessary here)
-> and move the "status" parameter to the first position, so it is
-> consistent with other callbacks.
-> ---
->  attrib/gatt.c                        | 10 +++++-----
->  attrib/gatt.h                        |  2 +-
->  attrib/gatttool.c                    |  9 ++++-----
->  attrib/interactive.c                 |  9 ++++-----
->  profiles/cyclingspeed/cyclingspeed.c |  2 +-
->  profiles/deviceinfo/deviceinfo.c     |  4 ++--
->  profiles/gatt/gas.c                  |  4 ++--
->  profiles/heartrate/heartrate.c       |  2 +-
->  profiles/input/hog.c                 |  6 +++---
->  profiles/proximity/monitor.c         | 12 ++++++------
->  profiles/scanparam/scan.c            |  7 +++----
->  profiles/thermometer/thermometer.c   |  4 ++--
->  src/device.c                         |  5 ++---
->  13 files changed, 36 insertions(+), 40 deletions(-)
+---
+ android/a2dp.c | 30 ++++++++++++++++++++++++++++--
+ 1 file changed, 28 insertions(+), 2 deletions(-)
 
-All patches in this set have been applied. Thanks.
+diff --git a/android/a2dp.c b/android/a2dp.c
+index 28b7406..8649cf3 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -515,11 +515,37 @@ failed:
+ 	audio_ipc_send_rsp(AUDIO_OP_OPEN, AUDIO_STATUS_FAILED);
+ }
+ 
++static struct a2dp_endpoint *find_endpoint(uint8_t id)
++{
++	GSList *l;
++
++	for (l = endpoints; l; l = g_slist_next(l)) {
++		struct a2dp_endpoint *endpoint = l->data;
++
++		if (endpoint->id == id)
++			return endpoint;
++	}
++
++	return NULL;
++}
++
+ static void bt_audio_close(const void *buf, uint16_t len)
+ {
+-	DBG("Not Implemented");
++	const struct audio_cmd_close *cmd = buf;
++	struct a2dp_endpoint *endpoint;
++
++	DBG("");
++
++	endpoint = find_endpoint(cmd->id);
++	if (!endpoint) {
++		error("Unable to find endpoint %u", cmd->id);
++		audio_ipc_send_rsp(AUDIO_OP_CLOSE, HAL_STATUS_FAILED);
++		return;
++	}
++
++	unregister_endpoint(endpoint);
+ 
+-	audio_ipc_send_rsp(AUDIO_OP_CLOSE, HAL_STATUS_FAILED);
++	audio_ipc_send_rsp(AUDIO_OP_CLOSE, HAL_STATUS_SUCCESS);
+ }
+ 
+ static void bt_stream_open(const void *buf, uint16_t len)
+-- 
+1.8.4.2
 
-Johan
