@@ -2,48 +2,32 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 11/11] attrib: Add extra PDU checks when decoding Read by Type Response
-Date: Sat, 11 Jan 2014 00:47:27 -0400
-Message-Id: <1389415647-25831-11-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 10/11] attrib: Fix PDU length check for Read by Type Request
+Date: Sat, 11 Jan 2014 00:47:26 -0400
+Message-Id: <1389415647-25831-10-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1389415647-25831-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1389415647-25831-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These checks are needed to avoid invalid memory access on bogus PDUs.
+PDU length must be either 7 or 21 octets.
 ---
- attrib/att.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ attrib/att.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/attrib/att.c b/attrib/att.c
-index 183390b..e28be25 100644
+index c279b2c..183390b 100644
 --- a/attrib/att.c
 +++ b/attrib/att.c
-@@ -454,7 +454,24 @@ struct att_data_list *dec_read_by_type_resp(const uint8_t *pdu, size_t len)
- 	if (pdu[0] != ATT_OP_READ_BY_TYPE_RESP)
- 		return NULL;
+@@ -400,7 +400,7 @@ uint16_t dec_read_by_type_req(const uint8_t *pdu, size_t len, uint16_t *start,
+ 	if (start == NULL || end == NULL || uuid == NULL)
+ 		return 0;
  
-+	/* PDU must contain at least:
-+	 * - Attribute Opcode (1 octet)
-+	 * - Length (1 octet)
-+	 * - Attribute Data List (at least one entry):
-+	 *   - Attribute Handle (2 octets)
-+	 *   - Attribute Value (at least 1 octet) */
-+	if (len < 5)
-+		return NULL;
-+
- 	elen = pdu[1];
-+	/* Minimum Attribute Data List size */
-+	if (elen < 3)
-+		return NULL;
-+
-+	/* Reject incomplete Attribute Data List */
-+	if ((len - 2) % elen)
-+		return NULL;
-+
- 	num = (len - 2) / elen;
- 	list = att_data_list_alloc(num, elen);
- 	if (list == NULL)
+-	if (len < min_len + 2)
++	if (len != (min_len + 2) && len != (min_len + 16))
+ 		return 0;
+ 
+ 	if (pdu[0] != ATT_OP_READ_BY_TYPE_REQ)
 -- 
 1.8.3.2
 
