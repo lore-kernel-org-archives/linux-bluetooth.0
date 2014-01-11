@@ -1,63 +1,234 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Track Secure Connections support of remote devices
-Date: Sat, 11 Jan 2014 12:39:53 -0800
-Message-Id: <1389472793-18931-1-git-send-email-marcel@holtmann.org>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/6] audio/A2DP: Add implemention of audio Open command
+Date: Sat, 11 Jan 2014 20:14:32 +0100
+Message-ID: <2333195.LhkmxyANVN@athlon>
+In-Reply-To: <1389435216-29040-1-git-send-email-luiz.dentz@gmail.com>
+References: <1389435216-29040-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It is important to know if Secure Connections support has been enabled
-for a given remote device. The information is provided in the remote
-host features page. So track this information and provide a simple
-helper function to extract the status.
+Hi Luiz,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/hci_core.h | 8 ++++++++
- net/bluetooth/hci_event.c        | 3 +++
- 2 files changed, 11 insertions(+)
+On Saturday 11 January 2014 12:13:31 Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> ---
+>  android/a2dp.c | 159
+> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++- 1 file changed,
+> 158 insertions(+), 1 deletion(-)
+> 
+> diff --git a/android/a2dp.c b/android/a2dp.c
+> index b59c53d..28b7406 100644
+> --- a/android/a2dp.c
+> +++ b/android/a2dp.c
+> @@ -52,9 +52,23 @@
+> 
+>  static GIOChannel *server = NULL;
+>  static GSList *devices = NULL;
+> +static GSList *endpoints = NULL;
+>  static bdaddr_t adapter_addr;
+>  static uint32_t record_id = 0;
+> 
+> +struct a2dp_preset {
+> +	void *data;
+> +	int8_t len;
+> +};
+> +
+> +struct a2dp_endpoint {
+> +	uint8_t id;
+> +	uint8_t codec;
+> +	struct avdtp_local_sep *sep;
+> +	struct a2dp_preset *caps;
+> +	GSList *presets;
+> +};
+> +
+>  struct a2dp_device {
+>  	bdaddr_t	dst;
+>  	uint8_t		state;
+> @@ -70,6 +84,29 @@ static int device_cmp(gconstpointer s, gconstpointer
+> user_data) return bacmp(&dev->dst, dst);
+>  }
+> 
+> +static void preset_free(void *data)
+> +{
+> +	struct a2dp_preset *preset = data;
+> +
+> +	g_free(preset->data);
+> +	g_free(preset);
+> +}
+> +
+> +static void unregister_endpoint(void *data)
+> +{
+> +	struct a2dp_endpoint *endpoint = data;
+> +
+> +	if (endpoint->sep)
+> +		avdtp_unregister_sep(endpoint->sep);
+> +
+> +	if (endpoint->caps)
+> +		preset_free(endpoint->caps);
+> +
+> +	g_slist_free_full(endpoint->presets, preset_free);
+> +
+> +	g_free(endpoint);
+> +}
+> +
+>  static void a2dp_device_free(struct a2dp_device *dev)
+>  {
+>  	if (dev->session)
+> @@ -354,10 +391,127 @@ static sdp_record_t *a2dp_record(void)
+>  	return record;
+>  }
+> 
+> +static gboolean sep_getcap_ind(struct avdtp *session,
+> +					struct avdtp_local_sep *sep,
+> +					GSList **caps, uint8_t *err,
+> +					void *user_data)
+> +{
+> +	struct a2dp_endpoint *endpoint = user_data;
+> +	struct a2dp_preset *cap = endpoint->presets->data;
+> +	struct avdtp_service_capability *media_transport, *media_codec;
+> +	struct avdtp_media_codec_capability *codec_caps;
+> +
+> +	*caps = NULL;
+> +
+> +	media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
+> +								NULL, 0);
+> +
+> +	*caps = g_slist_append(*caps, media_transport);
+> +
+> +	codec_caps = g_malloc0(sizeof(*codec_caps) + sizeof(cap));
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 66e96ebffe97..8d225e4ea2ce 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -448,6 +448,7 @@ enum {
- 	HCI_CONN_LE_SMP_PEND,
- 	HCI_CONN_MGMT_CONNECTED,
- 	HCI_CONN_SSP_ENABLED,
-+	HCI_CONN_SC_ENABLED,
- 	HCI_CONN_POWER_SAVE,
- 	HCI_CONN_REMOTE_OOB,
- 	HCI_CONN_6LOWPAN,
-@@ -460,6 +461,13 @@ static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
- 	       test_bit(HCI_CONN_SSP_ENABLED, &conn->flags);
- }
- 
-+static inline bool hci_conn_sc_enabled(struct hci_conn *conn)
-+{
-+	struct hci_dev *hdev = conn->hdev;
-+	return test_bit(HCI_SC_ENABLED, &hdev->dev_flags) &&
-+	       test_bit(HCI_CONN_SC_ENABLED, &conn->flags);
-+}
-+
- static inline void hci_conn_hash_add(struct hci_dev *hdev, struct hci_conn *c)
- {
- 	struct hci_conn_hash *h = &hdev->conn_hash;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index da1eca1c43db..8c44bbe19add 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2898,6 +2898,9 @@ static void hci_remote_ext_features_evt(struct hci_dev *hdev,
- 			 * features do not indicate SSP support */
- 			clear_bit(HCI_CONN_SSP_ENABLED, &conn->flags);
- 		}
-+
-+		if (ev->features[0] & LMP_HOST_SC)
-+			set_bit(HCI_CONN_SC_ENABLED, &conn->flags);
- 	}
- 
- 	if (conn->state != BT_CONFIG)
+Shouldn't this be cap->len instead of sizeof(cap) ?
+
+> +	codec_caps->media_type = AVDTP_MEDIA_TYPE_AUDIO;
+> +	codec_caps->media_codec_type = endpoint->codec;
+> +	memcpy(codec_caps->data, cap->data, cap->len);
+> +
+> +	media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, codec_caps,
+> +					sizeof(*codec_caps) + sizeof(cap));
+> +
+> +	*caps = g_slist_append(*caps, media_codec);
+> +	g_free(codec_caps);
+> +
+> +	return TRUE;
+> +}
+> +
+> +static struct avdtp_sep_ind sep_ind = {
+> +	.get_capability		= sep_getcap_ind,
+> +};
+> +
+> +static uint8_t register_endpoint(const uint8_t *uuid, uint8_t codec,
+> +							GSList *presets)
+> +{
+> +	struct a2dp_endpoint *endpoint;
+> +
+> +	/* FIXME: Add proper check for uuid */
+> +
+> +	endpoint = g_new0(struct a2dp_endpoint, 1);
+> +	endpoint->id = g_slist_length(endpoints) + 1;
+> +	endpoint->codec = codec;
+> +	endpoint->sep = avdtp_register_sep(AVDTP_SEP_TYPE_SOURCE,
+> +						AVDTP_MEDIA_TYPE_AUDIO,
+> +						codec, FALSE, &sep_ind, NULL,
+> +						endpoint);
+> +	endpoint->caps = g_slist_nth_data(presets->data, 0);
+> +	endpoint->presets = g_slist_copy(g_slist_nth(presets, 1));
+> +
+> +	endpoints = g_slist_append(endpoints, endpoint);
+> +
+> +	return endpoint->id;
+> +}
+> +
+> +static GSList *parse_presets(const struct audio_preset *p, uint8_t count,
+> +								uint16_t len)
+> +{
+> +	GSList *l = NULL;
+> +	uint8_t i;
+> +
+> +	for (i = 0; count > i; i++) {
+> +		struct a2dp_preset *preset;
+> +
+> +		if (len < sizeof(struct audio_preset)) {
+
+If Audio IPC command is malformed we should discard it, free list and return 
+NULL.
+
+(I'm still not sure how daemon should behave if there is Audio IPC error, 
+possibly closing IPC socket and reset a2dp service state?)
+
+> +			DBG("Invalid preset index %u", i);
+> +			break;
+> +		}
+> +
+> +		len -= sizeof(struct audio_preset);
+> +		if (len == 0 || len < p->len) {
+> +			DBG("Invalid preset size of %u for index %u", len, i);
+> +			break;
+> +		}
+> +
+> +		preset = g_new0(struct a2dp_preset, 1);
+> +		preset->len = p->len;
+> +		preset->data = g_memdup(p->data, preset->len);
+> +		l = g_slist_append(l, preset);
+> +
+> +		len -= preset->len;
+> +		p += sizeof(struct audio_preset) + preset->len;
+> +	}
+> +
+> +	return l;
+> +}
+> +
+>  static void bt_audio_open(const void *buf, uint16_t len)
+>  {
+> -	DBG("Not Implemented");
+> +	const struct audio_cmd_open *cmd = buf;
+> +	struct audio_rsp_open rsp;
+> +	GSList *presets;
+> +
+> +	DBG("");
+> 
+> +	if (cmd->presets == 0) {
+> +		error("No audio presets found");
+> +		goto failed;
+> +	}
+> +
+> +	presets = parse_presets(cmd->preset, cmd->presets, len - sizeof(*cmd));
+> +	if (!presets) {
+> +		error("No audio presets found");
+> +		goto failed;
+> +	}
+> +
+> +	rsp.id = register_endpoint(cmd->uuid, cmd->codec, presets);
+> +	g_slist_free(presets);
+> +
+> +	if (rsp.id == 0) {
+> +		error("Unable to register endpoint");
+> +		goto failed;
+> +	}
+> +
+> +	audio_ipc_send_rsp_full(AUDIO_OP_OPEN, sizeof(rsp), &rsp, -1);
+> +
+> +	return;
+> +
+> +failed:
+>  	audio_ipc_send_rsp(AUDIO_OP_OPEN, AUDIO_STATUS_FAILED);
+>  }
+> 
+> @@ -471,6 +625,9 @@ void bt_a2dp_unregister(void)
+>  {
+>  	DBG("");
+> 
+> +	g_slist_free_full(endpoints, unregister_endpoint);
+> +	endpoints = NULL;
+> +
+>  	g_slist_foreach(devices, a2dp_device_disconnected, NULL);
+>  	devices = NULL;
+
 -- 
-1.8.4.2
-
+Szymon K. Janc
+szymon.janc@gmail.com
