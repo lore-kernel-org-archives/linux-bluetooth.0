@@ -1,176 +1,169 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1389435216-29040-1-git-send-email-luiz.dentz@gmail.com>
-References: <1389435216-29040-1-git-send-email-luiz.dentz@gmail.com>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Date: Sun, 12 Jan 2014 22:21:23 +0100
-Message-ID: <CAF3PWx2-pgeVQue3863WVbwOdKxiVzbM-W5Sn=eztiC6J-A0LQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/6] audio/A2DP: Add implemention of audio Open command
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Dean_Jenkins@mentor.com
+To: linux-bluetooth@vger.kernel.org,
+	marcel@holtmann.org,
+	gustavo@padovan.org
+Cc: Dean_Jenkins@mentor.com
+Subject: [PATCH] Bluetooth: BCSP fails to ACK re-transmitted frames from the peer
+Date: Sun, 12 Jan 2014 17:27:13 +0100
+Message-Id: <1389544033-16974-1-git-send-email-Dean_Jenkins@mentor.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Dean Jenkins <djenkins@mentor.com>
 
-On 11 January 2014 11:13, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> ---
->  android/a2dp.c | 159 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 158 insertions(+), 1 deletion(-)
->
-> diff --git a/android/a2dp.c b/android/a2dp.c
-> index b59c53d..28b7406 100644
-> --- a/android/a2dp.c
-> +++ b/android/a2dp.c
-> @@ -52,9 +52,23 @@
->
->  static GIOChannel *server = NULL;
->  static GSList *devices = NULL;
-> +static GSList *endpoints = NULL;
->  static bdaddr_t adapter_addr;
->  static uint32_t record_id = 0;
->
-> +struct a2dp_preset {
-> +       void *data;
-> +       int8_t len;
-> +};
-> +
-> +struct a2dp_endpoint {
-> +       uint8_t id;
-> +       uint8_t codec;
-> +       struct avdtp_local_sep *sep;
-> +       struct a2dp_preset *caps;
-> +       GSList *presets;
-> +};
-> +
->  struct a2dp_device {
->         bdaddr_t        dst;
->         uint8_t         state;
-> @@ -70,6 +84,29 @@ static int device_cmp(gconstpointer s, gconstpointer user_data)
->         return bacmp(&dev->dst, dst);
->  }
->
-> +static void preset_free(void *data)
-> +{
-> +       struct a2dp_preset *preset = data;
-> +
-> +       g_free(preset->data);
-> +       g_free(preset);
-> +}
-> +
-> +static void unregister_endpoint(void *data)
-> +{
-> +       struct a2dp_endpoint *endpoint = data;
-> +
-> +       if (endpoint->sep)
-> +               avdtp_unregister_sep(endpoint->sep);
-> +
-> +       if (endpoint->caps)
-> +               preset_free(endpoint->caps);
-> +
-> +       g_slist_free_full(endpoint->presets, preset_free);
-> +
-> +       g_free(endpoint);
-> +}
-> +
->  static void a2dp_device_free(struct a2dp_device *dev)
->  {
->         if (dev->session)
-> @@ -354,10 +391,127 @@ static sdp_record_t *a2dp_record(void)
->         return record;
->  }
->
-> +static gboolean sep_getcap_ind(struct avdtp *session,
-> +                                       struct avdtp_local_sep *sep,
-> +                                       GSList **caps, uint8_t *err,
-> +                                       void *user_data)
-> +{
-> +       struct a2dp_endpoint *endpoint = user_data;
-> +       struct a2dp_preset *cap = endpoint->presets->data;
-> +       struct avdtp_service_capability *media_transport, *media_codec;
-> +       struct avdtp_media_codec_capability *codec_caps;
-> +
-> +       *caps = NULL;
-> +
-> +       media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
-> +                                                               NULL, 0);
-> +
-> +       *caps = g_slist_append(*caps, media_transport);
-> +
-> +       codec_caps = g_malloc0(sizeof(*codec_caps) + sizeof(cap));
-> +       codec_caps->media_type = AVDTP_MEDIA_TYPE_AUDIO;
-> +       codec_caps->media_codec_type = endpoint->codec;
-> +       memcpy(codec_caps->data, cap->data, cap->len);
-> +
-> +       media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, codec_caps,
-> +                                       sizeof(*codec_caps) + sizeof(cap));
-> +
-> +       *caps = g_slist_append(*caps, media_codec);
-> +       g_free(codec_caps);
-> +
-> +       return TRUE;
-> +}
-> +
-> +static struct avdtp_sep_ind sep_ind = {
-> +       .get_capability         = sep_getcap_ind,
-> +};
-> +
-> +static uint8_t register_endpoint(const uint8_t *uuid, uint8_t codec,
-> +                                                       GSList *presets)
-> +{
-> +       struct a2dp_endpoint *endpoint;
-> +
-> +       /* FIXME: Add proper check for uuid */
-> +
-> +       endpoint = g_new0(struct a2dp_endpoint, 1);
-> +       endpoint->id = g_slist_length(endpoints) + 1;
-> +       endpoint->codec = codec;
-> +       endpoint->sep = avdtp_register_sep(AVDTP_SEP_TYPE_SOURCE,
-> +                                               AVDTP_MEDIA_TYPE_AUDIO,
-> +                                               codec, FALSE, &sep_ind, NULL,
-> +                                               endpoint);
-> +       endpoint->caps = g_slist_nth_data(presets->data, 0);
-> +       endpoint->presets = g_slist_copy(g_slist_nth(presets, 1));
-> +
-> +       endpoints = g_slist_append(endpoints, endpoint);
-> +
-> +       return endpoint->id;
-> +}
-> +
-> +static GSList *parse_presets(const struct audio_preset *p, uint8_t count,
-> +                                                               uint16_t len)
-> +{
-> +       GSList *l = NULL;
-> +       uint8_t i;
-> +
-> +       for (i = 0; count > i; i++) {
-> +               struct a2dp_preset *preset;
-> +
-> +               if (len < sizeof(struct audio_preset)) {
-> +                       DBG("Invalid preset index %u", i);
-> +                       break;
-> +               }
-> +
-> +               len -= sizeof(struct audio_preset);
-> +               if (len == 0 || len < p->len) {
-> +                       DBG("Invalid preset size of %u for index %u", len, i);
-> +                       break;
-> +               }
-> +
-> +               preset = g_new0(struct a2dp_preset, 1);
-> +               preset->len = p->len;
-> +               preset->data = g_memdup(p->data, preset->len);
-> +               l = g_slist_append(l, preset);
-> +
-> +               len -= preset->len;
-> +               p += sizeof(struct audio_preset) + preset->len;
+Send an ACK frame with the current txack value in response to
+every received reliable frame unless a TX reliable frame is being
+sent. This modification allows re-transmitted frames from the remote
+peer to be acknowledged rather than ignored. It means that the remote
+peer knows which frame number to start re-transmitting from.
 
-It would be better to explicitly use uint8_t pointer for presets
-buffer since this will work only as long as sizeof(struct
-audio_preset) is 1.
+Without this modification, the recovery time to a missing frame
+from the remote peer was unnecessarily being extended because the
+headers of the out of order reliable frames were being discarded rather
+than being processed. The frame headers of received frames will
+indicate whether the local peer's transmissions have been
+acknowledged by the remote peer. Therefore, the local peer may
+unnecessarily re-transmit despite the remote peer already indicating
+that the frame had been acknowledged in out of order reliable frame.
 
+Signed-off-by: Dean Jenkins <djenkins@mentor.com>
+---
+ drivers/bluetooth/hci_bcsp.c | 94 ++++++++++++++++++++++++++++----------------
+ 1 file changed, 60 insertions(+), 34 deletions(-)
 
-Andrzej
+diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
+index 0bc87f7..449de29 100644
+--- a/drivers/bluetooth/hci_bcsp.c
++++ b/drivers/bluetooth/hci_bcsp.c
+@@ -473,13 +473,30 @@ static inline void bcsp_unslip_one_byte(struct bcsp_struct *bcsp, unsigned char
+ static void bcsp_complete_rx_pkt(struct hci_uart *hu)
+ {
+ 	struct bcsp_struct *bcsp = hu->priv;
+-	int pass_up;
++	int pass_up = 0;
+ 
+ 	if (bcsp->rx_skb->data[0] & 0x80) {	/* reliable pkt */
+ 		BT_DBG("Received seqno %u from card", bcsp->rxseq_txack);
+-		bcsp->rxseq_txack++;
+-		bcsp->rxseq_txack %= 0x8;
+-		bcsp->txack_req    = 1;
++
++		/* check the rx sequence number is as expected */
++		if ((bcsp->rx_skb->data[0] & 0x07) == bcsp->rxseq_txack) {
++			bcsp->rxseq_txack++;
++			bcsp->rxseq_txack %= 0x8;
++		} else {
++			/*
++			 * handle re-transmitted packet or
++			 * when packet was missed
++			 */
++			BT_ERR("Out-of-order packet arrived, got %u expected %u",
++				bcsp->rx_skb->data[0] & 0x07,
++				bcsp->rxseq_txack);
++
++			/* do not process out-of-order packet payload */
++			pass_up = 2;
++		}
++
++		/* send current txack value to all recieved reliable packets */
++		bcsp->txack_req = 1;
+ 
+ 		/* If needed, transmit an ack pkt */
+ 		hci_uart_tx_wakeup(hu);
+@@ -488,26 +505,35 @@ static void bcsp_complete_rx_pkt(struct hci_uart *hu)
+ 	bcsp->rxack = (bcsp->rx_skb->data[0] >> 3) & 0x07;
+ 	BT_DBG("Request for pkt %u from card", bcsp->rxack);
+ 
++	/*
++	 * handle recieved ACK indications,
++	 * including those from out-of-order packets
++	 */
+ 	bcsp_pkt_cull(bcsp);
+-	if ((bcsp->rx_skb->data[1] & 0x0f) == 6 &&
+-			bcsp->rx_skb->data[0] & 0x80) {
+-		bt_cb(bcsp->rx_skb)->pkt_type = HCI_ACLDATA_PKT;
+-		pass_up = 1;
+-	} else if ((bcsp->rx_skb->data[1] & 0x0f) == 5 &&
+-			bcsp->rx_skb->data[0] & 0x80) {
+-		bt_cb(bcsp->rx_skb)->pkt_type = HCI_EVENT_PKT;
+-		pass_up = 1;
+-	} else if ((bcsp->rx_skb->data[1] & 0x0f) == 7) {
+-		bt_cb(bcsp->rx_skb)->pkt_type = HCI_SCODATA_PKT;
+-		pass_up = 1;
+-	} else if ((bcsp->rx_skb->data[1] & 0x0f) == 1 &&
+-			!(bcsp->rx_skb->data[0] & 0x80)) {
+-		bcsp_handle_le_pkt(hu);
+-		pass_up = 0;
+-	} else
+-		pass_up = 0;
+-
+-	if (!pass_up) {
++
++	if (pass_up != 2) {
++		if ((bcsp->rx_skb->data[1] & 0x0f) == 6 &&
++				bcsp->rx_skb->data[0] & 0x80) {
++			bt_cb(bcsp->rx_skb)->pkt_type = HCI_ACLDATA_PKT;
++			pass_up = 1;
++		} else if ((bcsp->rx_skb->data[1] & 0x0f) == 5 &&
++				bcsp->rx_skb->data[0] & 0x80) {
++			bt_cb(bcsp->rx_skb)->pkt_type = HCI_EVENT_PKT;
++			pass_up = 1;
++		} else if ((bcsp->rx_skb->data[1] & 0x0f) == 7) {
++			bt_cb(bcsp->rx_skb)->pkt_type = HCI_SCODATA_PKT;
++			pass_up = 1;
++		} else if ((bcsp->rx_skb->data[1] & 0x0f) == 1 &&
++				!(bcsp->rx_skb->data[0] & 0x80)) {
++			bcsp_handle_le_pkt(hu);
++			pass_up = 0;
++		} else
++			pass_up = 0;
++	}
++
++	switch (pass_up) {
++	case 0:
++	{
+ 		struct hci_event_hdr hdr;
+ 		u8 desc = (bcsp->rx_skb->data[1] & 0x0f);
+ 
+@@ -532,11 +558,21 @@ static void bcsp_complete_rx_pkt(struct hci_uart *hu)
+ 			}
+ 		} else
+ 			kfree_skb(bcsp->rx_skb);
+-	} else {
++		break;
++	}
++	case 1:
+ 		/* Pull out BCSP hdr */
+ 		skb_pull(bcsp->rx_skb, 4);
+ 
+ 		hci_recv_frame(hu->hdev, bcsp->rx_skb);
++		break;
++	default:
++		/*
++		 * ignore packet payload of already ACKed re-transmitted
++		 * packets or when a packet was missed in the BCSP window
++		 */
++		kfree_skb(bcsp->rx_skb);
++		break;
+ 	}
+ 
+ 	bcsp->rx_state = BCSP_W4_PKT_DELIMITER;
+@@ -582,16 +618,6 @@ static int bcsp_recv(struct hci_uart *hu, void *data, int count)
+ 				bcsp->rx_count = 0;
+ 				continue;
+ 			}
+-			if (bcsp->rx_skb->data[0] & 0x80	/* reliable pkt */
+-			    		&& (bcsp->rx_skb->data[0] & 0x07) != bcsp->rxseq_txack) {
+-				BT_ERR ("Out-of-order packet arrived, got %u expected %u",
+-					bcsp->rx_skb->data[0] & 0x07, bcsp->rxseq_txack);
+-
+-				kfree_skb(bcsp->rx_skb);
+-				bcsp->rx_state = BCSP_W4_PKT_DELIMITER;
+-				bcsp->rx_count = 0;
+-				continue;
+-			}
+ 			bcsp->rx_state = BCSP_W4_DATA;
+ 			bcsp->rx_count = (bcsp->rx_skb->data[1] >> 4) + 
+ 					(bcsp->rx_skb->data[2] << 4);	/* May be 0 */
+-- 
+1.8.1.5
