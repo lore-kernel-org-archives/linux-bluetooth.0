@@ -1,30 +1,176 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1389435216-29040-1-git-send-email-luiz.dentz@gmail.com>
+References: <1389435216-29040-1-git-send-email-luiz.dentz@gmail.com>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH] android/ipc: Fix arguments order in DBG
-Date: Sun, 12 Jan 2014 22:44:45 +0100
-Message-Id: <1389563085-9731-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Sun, 12 Jan 2014 22:21:23 +0100
+Message-ID: <CAF3PWx2-pgeVQue3863WVbwOdKxiVzbM-W5Sn=eztiC6J-A0LQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/6] audio/A2DP: Add implemention of audio Open command
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/ipc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Luiz,
 
-diff --git a/android/ipc.c b/android/ipc.c
-index 03bdc35..a31d315 100644
---- a/android/ipc.c
-+++ b/android/ipc.c
-@@ -88,7 +88,7 @@ int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
- 	if ((handler->var_len && handler->data_len > msg->len) ||
- 			(!handler->var_len && handler->data_len != msg->len)) {
- 		DBG("invalid size for opcode 0x%x service 0x%x",
--						msg->service_id, msg->opcode);
-+						msg->opcode, msg->service_id);
- 		return -EMSGSIZE;
- 	}
- 
--- 
-1.8.5.2
+On 11 January 2014 11:13, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> ---
+>  android/a2dp.c | 159 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 158 insertions(+), 1 deletion(-)
+>
+> diff --git a/android/a2dp.c b/android/a2dp.c
+> index b59c53d..28b7406 100644
+> --- a/android/a2dp.c
+> +++ b/android/a2dp.c
+> @@ -52,9 +52,23 @@
+>
+>  static GIOChannel *server = NULL;
+>  static GSList *devices = NULL;
+> +static GSList *endpoints = NULL;
+>  static bdaddr_t adapter_addr;
+>  static uint32_t record_id = 0;
+>
+> +struct a2dp_preset {
+> +       void *data;
+> +       int8_t len;
+> +};
+> +
+> +struct a2dp_endpoint {
+> +       uint8_t id;
+> +       uint8_t codec;
+> +       struct avdtp_local_sep *sep;
+> +       struct a2dp_preset *caps;
+> +       GSList *presets;
+> +};
+> +
+>  struct a2dp_device {
+>         bdaddr_t        dst;
+>         uint8_t         state;
+> @@ -70,6 +84,29 @@ static int device_cmp(gconstpointer s, gconstpointer user_data)
+>         return bacmp(&dev->dst, dst);
+>  }
+>
+> +static void preset_free(void *data)
+> +{
+> +       struct a2dp_preset *preset = data;
+> +
+> +       g_free(preset->data);
+> +       g_free(preset);
+> +}
+> +
+> +static void unregister_endpoint(void *data)
+> +{
+> +       struct a2dp_endpoint *endpoint = data;
+> +
+> +       if (endpoint->sep)
+> +               avdtp_unregister_sep(endpoint->sep);
+> +
+> +       if (endpoint->caps)
+> +               preset_free(endpoint->caps);
+> +
+> +       g_slist_free_full(endpoint->presets, preset_free);
+> +
+> +       g_free(endpoint);
+> +}
+> +
+>  static void a2dp_device_free(struct a2dp_device *dev)
+>  {
+>         if (dev->session)
+> @@ -354,10 +391,127 @@ static sdp_record_t *a2dp_record(void)
+>         return record;
+>  }
+>
+> +static gboolean sep_getcap_ind(struct avdtp *session,
+> +                                       struct avdtp_local_sep *sep,
+> +                                       GSList **caps, uint8_t *err,
+> +                                       void *user_data)
+> +{
+> +       struct a2dp_endpoint *endpoint = user_data;
+> +       struct a2dp_preset *cap = endpoint->presets->data;
+> +       struct avdtp_service_capability *media_transport, *media_codec;
+> +       struct avdtp_media_codec_capability *codec_caps;
+> +
+> +       *caps = NULL;
+> +
+> +       media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
+> +                                                               NULL, 0);
+> +
+> +       *caps = g_slist_append(*caps, media_transport);
+> +
+> +       codec_caps = g_malloc0(sizeof(*codec_caps) + sizeof(cap));
+> +       codec_caps->media_type = AVDTP_MEDIA_TYPE_AUDIO;
+> +       codec_caps->media_codec_type = endpoint->codec;
+> +       memcpy(codec_caps->data, cap->data, cap->len);
+> +
+> +       media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, codec_caps,
+> +                                       sizeof(*codec_caps) + sizeof(cap));
+> +
+> +       *caps = g_slist_append(*caps, media_codec);
+> +       g_free(codec_caps);
+> +
+> +       return TRUE;
+> +}
+> +
+> +static struct avdtp_sep_ind sep_ind = {
+> +       .get_capability         = sep_getcap_ind,
+> +};
+> +
+> +static uint8_t register_endpoint(const uint8_t *uuid, uint8_t codec,
+> +                                                       GSList *presets)
+> +{
+> +       struct a2dp_endpoint *endpoint;
+> +
+> +       /* FIXME: Add proper check for uuid */
+> +
+> +       endpoint = g_new0(struct a2dp_endpoint, 1);
+> +       endpoint->id = g_slist_length(endpoints) + 1;
+> +       endpoint->codec = codec;
+> +       endpoint->sep = avdtp_register_sep(AVDTP_SEP_TYPE_SOURCE,
+> +                                               AVDTP_MEDIA_TYPE_AUDIO,
+> +                                               codec, FALSE, &sep_ind, NULL,
+> +                                               endpoint);
+> +       endpoint->caps = g_slist_nth_data(presets->data, 0);
+> +       endpoint->presets = g_slist_copy(g_slist_nth(presets, 1));
+> +
+> +       endpoints = g_slist_append(endpoints, endpoint);
+> +
+> +       return endpoint->id;
+> +}
+> +
+> +static GSList *parse_presets(const struct audio_preset *p, uint8_t count,
+> +                                                               uint16_t len)
+> +{
+> +       GSList *l = NULL;
+> +       uint8_t i;
+> +
+> +       for (i = 0; count > i; i++) {
+> +               struct a2dp_preset *preset;
+> +
+> +               if (len < sizeof(struct audio_preset)) {
+> +                       DBG("Invalid preset index %u", i);
+> +                       break;
+> +               }
+> +
+> +               len -= sizeof(struct audio_preset);
+> +               if (len == 0 || len < p->len) {
+> +                       DBG("Invalid preset size of %u for index %u", len, i);
+> +                       break;
+> +               }
+> +
+> +               preset = g_new0(struct a2dp_preset, 1);
+> +               preset->len = p->len;
+> +               preset->data = g_memdup(p->data, preset->len);
+> +               l = g_slist_append(l, preset);
+> +
+> +               len -= preset->len;
+> +               p += sizeof(struct audio_preset) + preset->len;
 
+It would be better to explicitly use uint8_t pointer for presets
+buffer since this will work only as long as sizeof(struct
+audio_preset) is 1.
+
+
+Andrzej
