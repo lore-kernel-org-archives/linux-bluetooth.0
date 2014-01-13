@@ -1,58 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pan: Generate file path in compile time
-Date: Mon, 13 Jan 2014 11:00:18 +0100
-Message-ID: <1933000.xY1JAbUgSt@uw000953>
-In-Reply-To: <1389604100-26189-1-git-send-email-szymon.janc@tieto.com>
-References: <1389604100-26189-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CABBYNZ+pfaxs8=0eO6w7e3DRmCGyA2wLJpANscCMpLgXOAo_7A@mail.gmail.com>
+References: <1389435216-29040-1-git-send-email-luiz.dentz@gmail.com>
+	<1389435216-29040-3-git-send-email-luiz.dentz@gmail.com>
+	<CAN_7+YbqjZ7=hRjED10mDJuGnhy8pD45iuf9SWFqGM_3N=hVDg@mail.gmail.com>
+	<CABBYNZ+pfaxs8=0eO6w7e3DRmCGyA2wLJpANscCMpLgXOAo_7A@mail.gmail.com>
+Date: Mon, 13 Jan 2014 10:38:22 +0100
+Message-ID: <CAN_7+YahMeLPSME3kaA_nquB5N1B1WYGAuYY7ACaKQT1edUVyg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/6] audio/A2DP: Add implemention of audio Open
+ Stream command
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-On Monday 13 of January 2014 10:08:20 Szymon Janc wrote:
-> This reduce need of using snprintf function and removes need of manual
-> buffer size calculation.
-> ---
->  android/pan.c | 11 ++++-------
->  1 file changed, 4 insertions(+), 7 deletions(-)
-> 
-> diff --git a/android/pan.c b/android/pan.c
-> index 205da71..dfd7762 100644
-> --- a/android/pan.c
-> +++ b/android/pan.c
-> @@ -50,9 +50,9 @@
->  #include "bluetooth.h"
->  
->  #define SVC_HINT_NETWORKING 0x02
-> -#define BNEP_BRIDGE	"bnep"
-> -#define FORWARD_DELAY_PATH	"/sys/class/net/%s/bridge/forward_delay"
-> -#define DELAY_PATH_MAX	41
-> +
-> +#define BNEP_BRIDGE "bnep"
-> +#define FORWARD_DELAY_PATH "/sys/class/net/"BNEP_BRIDGE"/bridge/forward_delay"
->  
->  static bdaddr_t adapter_addr;
->  GSList *devices = NULL;
-> @@ -470,11 +470,8 @@ failed:
->  static int set_forward_delay(void)
->  {
->  	int fd, ret;
-> -	char path[DELAY_PATH_MAX];
-> -
-> -	snprintf(path, sizeof(path), FORWARD_DELAY_PATH, BNEP_BRIDGE);
->  
-> -	fd = open(path, O_RDWR);
-> +	fd = open(FORWARD_DELAY_PATH, O_RDWR);
->  	if (fd < 0)
->  		return -errno;
+On Mon, Jan 13, 2014 at 8:55 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Lukasz,
 >
+> On Mon, Jan 13, 2014 at 2:10 AM, Lukasz Rymanowski
+> <lukasz.rymanowski@gmail.com> wrote:
+>> Hi Luiz,
+>>
+>> On Sat, Jan 11, 2014 at 11:13 AM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>
+>>> ---
+>>>  android/a2dp.c | 199 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>>  1 file changed, 197 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/android/a2dp.c b/android/a2dp.c
+>>> index 8649cf3..479cb71 100644
+>>> --- a/android/a2dp.c
+>>> +++ b/android/a2dp.c
+>>> @@ -37,6 +37,7 @@
+>>>  #include "lib/bluetooth.h"
+>>>  #include "lib/sdp.h"
+>>>  #include "lib/sdp_lib.h"
+>>> +#include "profiles/audio/a2dp-codecs.h"
+>>
+>> We need to discuss how we gonna use structs from this file in
+>> hal-audio (eg. a2dp_sbc_t). Maybe we should have some special file
+>> with audio structs/defines for IPC only? Then you could copy data to
+>> structs you need.
+>
+> Not sure what you mean about this header, its LGPL already so I see no
+> problem of including it in hal-audio.
 
-This is now upstream.
+You are right, it is LGPL so no problem.
 
--- 
-Best regards, 
-Szymon Janc
+\Lukasz
