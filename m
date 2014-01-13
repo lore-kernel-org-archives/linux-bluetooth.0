@@ -1,57 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 13/15] android/tester: Add get remote DISCTIMEOUT property fail test case
-Date: Mon, 13 Jan 2014 18:12:39 +0100
-Message-Id: <1389633161-11357-13-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 05/15] android/tester: Add get remote COD property success test case
+Date: Mon, 13 Jan 2014 18:12:31 +0100
+Message-Id: <1389633161-11357-5-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1389633161-11357-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1389633161-11357-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds remote DISCOVERY TIMEOUT property fail test case.
+This adds remote COD property success test case.
 ---
- android/android-tester.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ android/android-tester.c | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
 diff --git a/android/android-tester.c b/android/android-tester.c
-index f4acbd1..04329c2 100644
+index a4dac42..13470bd 100644
 --- a/android/android-tester.c
 +++ b/android/android-tester.c
-@@ -1540,6 +1540,28 @@ static const struct generic_data
- 	.expected_adapter_status = BT_STATUS_FAIL,
+@@ -1358,6 +1358,29 @@ static const struct generic_data
+ 	.expected_adapter_status = BT_STATUS_SUCCESS,
  };
  
-+static uint32_t remote_getprop_disctimeout_val = 120;
++static uint32_t remote_getprop_cod_val = 0;
 +
-+static struct priority_property remote_getprop_disctimeout_props[] = {
++static struct priority_property remote_getprop_cod_props[] = {
 +	{
-+	.prop.type = BT_PROPERTY_ADAPTER_DISCOVERY_TIMEOUT,
-+	.prop.val = &remote_getprop_disctimeout_val,
-+	.prop.len = sizeof(remote_getprop_disctimeout_val),
++	.prop.type = BT_PROPERTY_CLASS_OF_DEVICE,
++	.prop.val = &remote_getprop_cod_val,
++	.prop.len = sizeof(remote_getprop_cod_val),
 +	},
 +};
 +
 +static const struct generic_data
-+			bluetooth_remote_getprop_disctimeout_fail_test = {
++				bluetooth_remote_getprop_cod_success_test = {
 +	.expected_hal_cb.discovery_state_changed_cb =
 +					remote_discovery_state_changed_cb,
 +	.expected_hal_cb.device_found_cb = remote_get_property_device_found_cb,
 +	.expected_hal_cb.remote_device_properties_cb =
 +					remote_test_device_properties_cb,
 +	.expected_cb_count = 3,
-+	.expected_properties = remote_getprop_disctimeout_props,
-+	.expected_adapter_status = BT_STATUS_FAIL,
++	.expected_properties_num = 1,
++	.expected_properties = remote_getprop_cod_props,
++	.expected_adapter_status = BT_STATUS_SUCCESS,
 +};
 +
  static bt_callbacks_t bt_callbacks = {
  	.size = sizeof(bt_callbacks),
  	.adapter_state_changed_cb = adapter_state_changed_cb,
-@@ -2152,6 +2174,15 @@ static void test_remote_getprop_bonded_devices_success(const void *test_data)
+@@ -1898,6 +1921,15 @@ static void test_remote_getprop_uuids_success(const void *test_data)
  	data->if_bluetooth->start_discovery();
  }
  
-+static void test_remote_getprop_disctimeout_fail(const void *test_data)
++static void test_remote_getprop_cod_success(const void *test_data)
 +{
 +	struct test_data *data = tester_get_data();
 +
@@ -63,14 +64,14 @@ index f4acbd1..04329c2 100644
  /* Test Socket HAL */
  
  static void adapter_socket_state_changed_cb(bt_state_t state)
-@@ -2808,6 +2839,11 @@ int main(int argc, char *argv[])
- 			setup_enabled_adapter,
- 			test_remote_getprop_bonded_devices_success, teardown);
+@@ -2514,6 +2546,11 @@ int main(int argc, char *argv[])
+ 				setup_enabled_adapter,
+ 				test_remote_getprop_uuids_success, teardown);
  
-+	test_bredrle("Bluetooth RemDev Get DISCOVERY_TIMEOUT - Fail",
-+				&bluetooth_remote_getprop_disctimeout_fail_test,
++	test_bredrle("Bluetooth RemDev Get CLASS_OF_DEVICE - Success",
++				&bluetooth_remote_getprop_cod_success_test,
 +				setup_enabled_adapter,
-+				test_remote_getprop_disctimeout_fail, teardown);
++				test_remote_getprop_cod_success, teardown);
 +
  	test_bredrle("Socket Init", NULL, setup_socket_interface,
  						test_dummy, teardown);
