@@ -1,165 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 7/7] android/ipc-tester: Add basic negative test cases for IPC's daemon site
-Date: Mon, 13 Jan 2014 11:37:02 +0100
-Message-Id: <1389609422-21200-8-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 6/7] android/ipc-tester: Register services
+Date: Mon, 13 Jan 2014 11:37:01 +0100
+Message-Id: <1389609422-21200-7-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1389609422-21200-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1389609422-21200-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch add first few test cases checking for proper daemon
-termination in case of receiving invalid IPC data.
+This patch adds basic bluetooth service registration during setup procedure.
+Without this daemon would reject commands for not registered services.
 
 ---
- android/ipc-negative-tester.c | 120 ++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 117 insertions(+), 3 deletions(-)
+ android/ipc-negative-tester.c | 48 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 47 insertions(+), 1 deletion(-)
 
 diff --git a/android/ipc-negative-tester.c b/android/ipc-negative-tester.c
-index 7b2bbf8..15701e8 100644
+index 46a8754..7b2bbf8 100644
 --- a/android/ipc-negative-tester.c
 +++ b/android/ipc-negative-tester.c
-@@ -540,22 +540,136 @@ static void ipc_send_tc(const void *data)
- 							3, user, g_free); \
- 	} while (0)
+@@ -404,13 +404,53 @@ failed:
+ 	return false;
+ }
  
--static const struct generic_data dummy_data = {
-+struct regmod_msg register_bt_msg = {
++struct regmod_msg {
++	struct hal_hdr header;
++	struct hal_cmd_register_module cmd;
++};
++
++static bool setup_module(int service_id)
++{
++	struct hal_hdr response;
++	struct hal_hdr expected_response;
++
++	struct regmod_msg btmodule_msg = {
 +		.header = {
 +			.service_id = HAL_SERVICE_ID_CORE,
 +			.opcode = HAL_OP_REGISTER_MODULE,
 +			.len = sizeof(struct hal_cmd_register_module),
 +			},
 +		.cmd = {
-+			.service_id = HAL_SERVICE_ID_CORE,
++			.service_id = service_id,
 +			},
 +	};
 +
-+static const struct generic_data to_small_data = {
- 	.ipc_data = {
--		.buffer = "",
-+		/* valid header and payload */
-+		.buffer = &register_bt_msg,
-+		/* but write only incomplete header */
- 		.len = 1,
- 	},
- 	.init_services = {HAL_SERVICE_ID_BLUETOOTH},
- 	.num_services = 1,
- };
- 
-+struct regmod_msg register_bt_malformed_size_msg = {
-+		.header = {
-+			.service_id = HAL_SERVICE_ID_CORE,
-+			.opcode = HAL_OP_REGISTER_MODULE,
-+			/* wrong payload size declared */
-+			.len = sizeof(struct hal_cmd_register_module) - 1,
-+			},
-+		.cmd = {
-+			.service_id = HAL_SERVICE_ID_CORE,
-+			},
-+	};
++	if (write(cmd_sk, &btmodule_msg, sizeof(btmodule_msg)) < 0)
++		goto fail;
 +
-+static const struct generic_data malformed_data = {
-+	.ipc_data = {
-+		/* use malformed msg - wrong size declared */
-+		.buffer = &register_bt_malformed_size_msg,
-+		/* but write proper size */
-+		.len = sizeof(struct hal_cmd_register_module),
-+	},
-+	.init_services = {HAL_SERVICE_ID_BLUETOOTH},
-+	.num_services = 1,
-+};
++	if (read(cmd_sk, &response, sizeof(response)) < 0)
++		goto fail;
 +
-+struct hal_hdr enable_unknown_service_hdr = {
-+	.service_id = HAL_SERVICE_ID_MAX + 1,
-+	.opcode = HAL_OP_ENABLE,
-+	.len = 0,
-+};
++	expected_response = btmodule_msg.header;
++	expected_response.len = 0;
 +
-+static const struct generic_data enable_unknown_service_data = {
-+	.ipc_data = {
-+		/* enable invalid service */
-+		.buffer = &enable_unknown_service_hdr,
-+		.len = sizeof(enable_unknown_service_hdr),
-+	},
-+	.init_services = {HAL_SERVICE_ID_BLUETOOTH},
-+	.num_services = 1,
-+};
++	if (memcmp(&response, &expected_response, sizeof(response)) == 0)
++		return true;
 +
-+struct hal_hdr enable_bt_service_hdr = {
-+	.service_id = HAL_SERVICE_ID_BLUETOOTH,
-+	.opcode = HAL_OP_ENABLE,
-+	.len = 0,
-+};
++fail:
++	tester_warn("Module registration failed.");
++	return false;
++}
 +
-+static const struct generic_data enable_unregistered_service_data = {
-+	.ipc_data = {
-+		/* valid msg */
-+		.buffer = &enable_bt_service_hdr,
-+		/* send the whole thing */
-+		.len = sizeof(enable_bt_service_hdr),
-+	},
-+	/* but don't register it before enabling */
-+	.init_services = {},
-+	.num_services = 0,
-+};
-+
-+struct hal_hdr invalid_opcode_hdr = {
-+	.service_id = HAL_SERVICE_ID_BLUETOOTH,
-+	.opcode = 0x16,
-+	.len = 0,
-+};
-+
-+static const struct generic_data invalid_opcode_data = {
-+	.ipc_data = {
-+		/* valid msg */
-+		.buffer = &invalid_opcode_hdr,
-+		/* send the whole thing */
-+		.len = sizeof(invalid_opcode_hdr),
-+	},
-+	.init_services = {HAL_SERVICE_ID_BLUETOOTH},
-+	.num_services = 1,
-+};
-+
-+struct hal_hdr invalid_msg_size_hdr = {
-+	.service_id = HAL_SERVICE_ID_BLUETOOTH,
-+	.opcode = HAL_OP_CREATE_BOND,
-+	.len = 0,
-+};
-+
-+static const struct generic_data invalid_msg_size_data = {
-+	.ipc_data = {
-+		.buffer = &invalid_msg_size_hdr,
-+		.len = sizeof(invalid_msg_size_hdr),
-+	},
-+	.init_services = {HAL_SERVICE_ID_BLUETOOTH},
-+	.num_services = 1,
-+};
-+
- int main(int argc, char *argv[])
+ static void setup(const void *data)
  {
- 	snprintf(exec_dir, sizeof(exec_dir), "%s", dirname(argv[0]));
++	const struct generic_data *generic_data = data;
+ 	struct test_data *test_data = tester_get_data();
+ 	int signal_fd[2];
+ 	char buf[1024];
+ 	pid_t pid;
+ 	int len;
++	unsigned int i;
  
- 	tester_init(&argc, &argv);
+ 	if (pipe(signal_fd)) {
+ 		tester_setup_failed();
+@@ -454,9 +494,15 @@ static void setup(const void *data)
+ 		return;
+ 	}
  
--	test_bredrle("Test Dummy", &dummy_data, setup, ipc_send_tc, teardown);
-+	test_bredrle("To small data", &to_small_data,
-+						setup, ipc_send_tc, teardown);
-+	test_bredrle("Malformed data", &malformed_data,
-+						setup, ipc_send_tc, teardown);
-+	test_bredrle("Invalid service", &enable_unknown_service_data,
-+						setup, ipc_send_tc, teardown);
-+	test_bredrle("Enable unregistered service",
-+					&enable_unregistered_service_data,
-+					setup, ipc_send_tc, teardown);
-+	test_bredrle("Invalid opcode", &invalid_opcode_data,
-+						setup, ipc_send_tc, teardown);
-+	test_bredrle("Invalid msg size for opcode", &invalid_msg_size_data,
-+						setup, ipc_send_tc, teardown);
+-	/* TODO: register modules */
++	tester_print("Will init %d services.", generic_data->num_services);
++
++	for (i = 0; i < generic_data->num_services; i++)
++		if (!setup_module(generic_data->init_services[i]))
++			tester_setup_failed();
  
- 	return tester_run();
+ 	test_data->setup_done = true;
++
++	tester_setup_complete();
  }
+ 
+ static void teardown(const void *data)
 -- 
 1.8.5
 
