@@ -1,217 +1,266 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <3017327.dufLGECPfA@uw000953>
+References: <CAA8=LDXCLCVytAMDNAX8Vafi827F5mMrEp7WELbseM_oZ5+S0w@mail.gmail.com>
+	<3017327.dufLGECPfA@uw000953>
+Date: Mon, 13 Jan 2014 13:19:52 +0200
+Message-ID: <CABBYNZJgbZt3MopBQRFMmH4LtmJZJ5c699yTex-y_Y=7R=2r-g@mail.gmail.com>
+Subject: Re: Problems with Logitech V270 mouse
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v4 1/6] audio/A2DP: Add implemention of audio Open command
-Date: Mon, 13 Jan 2014 14:09:59 +0200
-Message-Id: <1389615004-32612-1-git-send-email-luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: Jakub Jechanowski <j.jechanowski@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi,
 
----
- android/a2dp.c | 161 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 160 insertions(+), 1 deletion(-)
+On Mon, Jan 13, 2014 at 12:37 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> On Thursday 02 of January 2014 23:55:25 Jakub Jechanowski wrote:
+>> After pairing and connecting (bluetoothctl or bluetooth-wizard) mouse
+>> works ok. But when I restart bluetoothd (or whole OS) mouse no longer
+>> works. After touching the mouse, in bluetoothd log I get:
+>>
+>> bluetoothd[6418]: src/adapter.c:connected_callback() hci0 device
+>> 00:07:61:68:55:27 connected eir_len 5
+>> bluetoothd[6418]: src/device.c:device_create() dst 00:07:61:68:55:27
+>> bluetoothd[6418]: src/device.c:device_new() address 00:07:61:68:55:27
+>> bluetoothd[6418]: src/device.c:device_new() Creating device
+>> /org/bluez/hci0/dev_00_07_61_68_55_27
+>> bluetoothd[6418]: src/device.c:btd_device_set_temporary() temporary 1
+>> bluetoothd[6418]: src/adapter.c:adapter_connect_list_remove() device
+>> /org/bluez/hci0/dev_00_07_61_68_55_27 is not on the list, ignoring
+>> bluetoothd[6418]: src/device.c:device_set_class()
+>> /org/bluez/hci0/dev_00_07_61_68_55_27 0x002580
+>> bluetoothd[6418]: profiles/input/server.c:connect_event_cb() Incoming
+>> connection from 00:07:61:68:55:27 on PSM 17
+>> bluetoothd[6418]: profiles/input/device.c:input_device_set_channel()
+>> idev (nil) psm 17
+>> bluetoothd[6418]: Refusing input device connect: No such file or directory (2)
+>> bluetoothd[6418]: profiles/input/server.c:confirm_event_cb()
+>> bluetoothd[6418]: Refusing connection from 00:07:61:68:55:27: unknown device
+>>    <<<few seconds of pause>>>
+>> bluetoothd[6418]: src/adapter.c:dev_disconnected() Device
+>> 00:07:61:68:55:27 disconnected, reason 2
+>> bluetoothd[6418]: src/adapter.c:adapter_remove_connection()
+>> bluetoothd[6418]: src/adapter.c:adapter_remove_connection() Removing
+>> temporary device /org/bluez/hci0/dev_00_07_61_68_55_27
+>> bluetoothd[6418]: src/device.c:device_remove() Removing device
+>> /org/bluez/hci0/dev_00_07_61_68_55_27
+>> bluetoothd[6418]: src/device.c:btd_device_unref() Freeing device
+>> /org/bluez/hci0/dev_00_07_61_68_55_27
+>> bluetoothd[6418]: src/device.c:device_free() 0x24a65e0
+>> bluetoothd[6418]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr
+>> 00:07:61:68:55:27 type 0 status 0xe
+>> bluetoothd[6418]: src/adapter.c:resume_discovery()
+>>
+>> ------------------------------------
+>>
+>> Log from btmon after touching mouse:
+>>
+>> > HCI Event: Connect Request (0x04) plen 10                     [hci0] 9.133728
+>>         Address: 00:07:61:68:55:27 (Logitech Europe SA)
+>>         Class: 0x002580
+>>           Major class: Peripheral (mouse, joystick, keyboards)
+>>           Minor class: 0x20
+>>           Limited Discoverable Mode
+>>         Link type: ACL (0x01)
+>> < HCI Command: Accept Connection Request (0x01|0x0009) plen 7   [hci0] 9.133770
+>>         Address: 00:07:61:68:55:27 (Logitech Europe SA)
+>>         Role: Master (0x00)
+>> > HCI Event: Command Status (0x0f) plen 4                       [hci0] 9.136727
+>>       Accept Connection Request (0x01|0x0009) ncmd 1
+>>         Status: Success (0x00)
+>> > HCI Event: Role Change (0x12) plen 8                          [hci0] 9.294753
+>>         Status: Success (0x00)
+>>         Address: 00:07:61:68:55:27 (Logitech Europe SA)
+>>         Role: Master (0x00)
+>> > HCI Event: Connect Complete (0x03) plen 11                    [hci0] 9.444736
+>>         Status: Success (0x00)
+>>         Handle: 11
+>>         Address: 00:07:61:68:55:27 (Logitech Europe SA)
+>>         Link type: ACL (0x01)
+>>         Encryption: Disabled (0x00)
+>> < HCI Command: Read Remote Supported Fe.. (0x01|0x001b) plen 2  [hci0] 9.444839
+>>         Handle: 11
+>> > HCI Event: Command Status (0x0f) plen 4                       [hci0] 9.446731
+>>       Read Remote Supported Features (0x01|0x001b) ncmd 1
+>>         Status: Success (0x00)
+>> > HCI Event: Read Remote Supported Features (0x0b) plen 11      [hci0] 9.448739
+>>         Status: Success (0x00)
+>>         Handle: 11
+>>         Features: 0xfc 0xff 0x0f 0x00 0x08 0x08 0x00 0x00
+>>           Encryption
+>>           Slot offset
+>>           Timing accuracy
+>>           Role switch
+>>           Hold mode
+>>           Sniff mode
+>>           Park state
+>>           Power control requests
+>>           Channel quality driven data rate (CQDDR)
+>>           SCO link
+>>           HV2 packets
+>>           HV3 packets
+>>           u-law log synchronous data
+>>           A-law log synchronous data
+>>           CVSD synchronous data
+>>           Paging parameter negotiation
+>>           Power control
+>>           Transparent synchronous data
+>>           AFH capable slave
+>>           AFH capable master
+>> < HCI Command: Remote Name Request (0x01|0x0019) plen 10        [hci0] 9.448793
+>>         Address: 00:07:61:68:55:27 (Logitech Europe SA)
+>>         Page scan repetition mode: R2 (0x02)
+>>         Page scan mode: Mandatory (0x00)
+>>         Clock offset: 0x0000
+>> > HCI Event: Command Status (0x0f) plen 4                       [hci0] 9.449737
+>>       Remote Name Request (0x01|0x0019) ncmd 1
+>>         Status: Success (0x00)
+>> > ACL Data RX: Handle 11 flags 0x02 dlen 12                     [hci0] 9.477736
+>>       L2CAP: Connection Request (0x02) ident 1 len 4
+>>         PSM: 17 (0x0011)
+>>         Source CID: 64
+>> < ACL Data TX: Handle 11 flags 0x02 dlen 16                     [hci0] 9.477798
+>>       L2CAP: Connection Response (0x03) ident 1 len 8
+>>         Destination CID: 64
+>>         Source CID: 64
+>>         Result: Connection pending (0x0001)
+>>         Status: No further information available (0x0000)
+>> < ACL Data TX: Handle 11 flags 0x02 dlen 10                     [hci0] 9.477805
+>>       L2CAP: Information Request (0x0a) ident 1 len 2
+>>         Type: Extended features supported (0x0002)
+>> @ Device Connected: 00:07:61:68:55:27 (0) flags 0x0000
+>>         04 0d 80 25 00                                   ...%.
+>> > HCI Event: Number of Completed Packets (0x13) plen 5          [hci0] 9.485716
+>>         Num handles: 1
+>>         Handle: 11
+>>         Count: 2
+>> > ACL Data RX: Handle 11 flags 0x02 dlen 16                     [hci0] 9.501737
+>>       L2CAP: Information Response (0x0b) ident 1 len 8
+>>         Type: Extended features supported (0x0002)
+>>         Result: Success (0x0000)
+>>         Features: 0x00000000
+>> < ACL Data TX: Handle 11 flags 0x02 dlen 16                     [hci0] 9.502107
+>>       L2CAP: Connection Response (0x03) ident 1 len 8
+>>         Destination CID: 64
+>>         Source CID: 64
+>>         Result: Connection successful (0x0000)
+>>         Status: No further information available (0x0000)
+>> < ACL Data TX: Handle 11 flags 0x02 dlen 12                     [hci0] 9.502113
+>>       L2CAP: Configure Request (0x04) ident 2 len 4
+>>         Destination CID: 64
+>>         Flags: 0x0000
+>> > HCI Event: Number of Completed Packets (0x13) plen 5          [hci0] 9.507719
+>>         Num handles: 1
+>>         Handle: 11
+>>         Count: 2
+>> > HCI Event: Remote Name Req Complete (0x07) plen 255           [hci0] 9.548727
+>>         Status: Success (0x00)
+>>         Address: 00:07:61:68:55:27 (Logitech Europe SA)
+>>         Name: Bluetooth Travel Mouse
+>> > ACL Data RX: Handle 11 flags 0x02 dlen 17                     [hci0] 9.555740
+>> > ACL Data RX: Handle 11 flags 0x01 dlen 17                     [hci0] 9.556723
+>> > HCI Event: QoS Setup Complete (0x0d) plen 21                  [hci0] 9.557718
+>>         Status: Success (0x00)
+>>         Handle: 11
+>>         Flags: 0x00
+>>         Service type: Best Effort (0x01)
+>>         Token rate: 1511
+>>         Peak bandwidth: 0
+>>         Latency: 11250
+>>         Delay variation: -1
+>> > ACL Data RX: Handle 11 flags 0x01 dlen 6                      [hci0] 9.557726
+>>       L2CAP: Configure Request (0x04) ident 2 len 32
+>>         Destination CID: 64
+>>         Flags: 0x0000
+>>         Option: Maximum Transmission Unit (0x01)
+>>           MTU: 48
+>>         Option: Quality of Service (0x03)
+>>           Flags: 0x00
+>>           Service type: Best Effort (0x01)
+>>           Token rate: 0x00000000
+>>           Token bucket size: 0x00000000
+>>           Peak bandwidth: 0x00000000
+>>           Latency: 0x00002bf2
+>>           Delay variation: 0xffffffff
+>> < ACL Data TX: Handle 11 flags 0x02 dlen 18                     [hci0] 9.557754
+>>       L2CAP: Configure Response (0x05) ident 2 len 10
+>>         Source CID: 64
+>>         Flags: 0x0000
+>>         Result: Success (0x0000)
+>>         Option: Maximum Transmission Unit (0x01)
+>>           MTU: 48
+>> > ACL Data RX: Handle 11 flags 0x02 dlen 14                     [hci0] 9.570733
+>>       L2CAP: Configure Response (0x05) ident 2 len 6
+>>         Source CID: 64
+>>         Flags: 0x0000
+>>         Result: Success (0x0000)
+>> < ACL Data TX: Handle 11 flags 0x02 dlen 5                      [hci0] 9.571076
+>>       Channel: 64 len 1 [PSM 17 mode 0] {chan 0}
+>>         15                                               .
+>> < ACL Data TX: Handle 11 flags 0x02 dlen 12                     [hci0] 9.571284
+>>       L2CAP: Disconnection Request (0x06) ident 3 len 4
+>>         Destination CID: 64
+>>         Source CID: 64
+>> > HCI Event: Number of Completed Packets (0x13) plen 5          [hci0] 9.573737
+>>         Num handles: 1
+>>         Handle: 11
+>>         Count: 2
+>> > ACL Data RX: Handle 11 flags 0x02 dlen 12                     [hci0] 9.610754
+>>       L2CAP: Connection Request (0x02) ident 3 len 4
+>>         PSM: 19 (0x0013)
+>>         Source CID: 65
+>> < ACL Data TX: Handle 11 flags 0x02 dlen 16                     [hci0] 9.610846
+>>       L2CAP: Connection Response (0x03) ident 3 len 8
+>>         Destination CID: 65
+>>         Source CID: 65
+>>         Result: Connection pending (0x0001)
+>>         Status: Authorization pending (0x0002)
+>> < ACL Data TX: Handle 11 flags 0x02 dlen 16                     [hci0] 9.612931
+>>       L2CAP: Connection Response (0x03) ident 3 len 8
+>>         Destination CID: 65
+>>         Source CID: 65
+>>         Result: Connection refused - security block (0x0003)
+>>         Status: No further information available (0x0000)
+>> > HCI Event: Number of Completed Packets (0x13) plen 5          [hci0] 9.613738
+>>         Num handles: 1
+>>         Handle: 11
+>>         Count: 2
+>> > ACL Data RX: Handle 11 flags 0x02 dlen 12                     [hci0] 9.640735
+>>       L2CAP: Disconnection Response (0x07) ident 3 len 4
+>>         Destination CID: 64
+>>         Source CID: 64
+>> > HCI Event: Number of Completed Packets (0x13) plen 5          [hci0] 9.854750
+>>         Num handles: 1
+>>         Handle: 11
+>>         Count: 1
+>> < HCI Command: Disconnect (0x01|0x0006) plen 3                 [hci0] 13.650261
+>>         Handle: 11
+>>         Reason: Remote User Terminated Connection (0x13)
+>> > HCI Event: Command Status (0x0f) plen 4                      [hci0] 13.652743
+>>       Disconnect (0x01|0x0006) ncmd 1
+>>         Status: Success (0x00)
+>> > HCI Event: Disconnect Complete (0x05) plen 4                 [hci0] 13.705753
+>>         Status: Success (0x00)
+>>         Handle: 11
+>>         Reason: Connection Terminated By Local Host (0x16)
+>> @ Device Disconnected: 00:07:61:68:55:27 (0) reason 2
+>>
+>>
+>> ------------------------------------
+>>
+>> I also noticed, that after bluetoothd restart, lists of devices and
+>> paired-devices are empty:
+>
+> This looks like issues with storage. Could you check if bluetoothd is able to
+> access storage directory (/var/lib/bluetooth) ?
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index b59c53d..b6b46e4 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -52,9 +52,23 @@
- 
- static GIOChannel *server = NULL;
- static GSList *devices = NULL;
-+static GSList *endpoints = NULL;
- static bdaddr_t adapter_addr;
- static uint32_t record_id = 0;
- 
-+struct a2dp_preset {
-+	void *data;
-+	int8_t len;
-+};
-+
-+struct a2dp_endpoint {
-+	uint8_t id;
-+	uint8_t codec;
-+	struct avdtp_local_sep *sep;
-+	struct a2dp_preset *caps;
-+	GSList *presets;
-+};
-+
- struct a2dp_device {
- 	bdaddr_t	dst;
- 	uint8_t		state;
-@@ -70,6 +84,29 @@ static int device_cmp(gconstpointer s, gconstpointer user_data)
- 	return bacmp(&dev->dst, dst);
- }
- 
-+static void preset_free(void *data)
-+{
-+	struct a2dp_preset *preset = data;
-+
-+	g_free(preset->data);
-+	g_free(preset);
-+}
-+
-+static void unregister_endpoint(void *data)
-+{
-+	struct a2dp_endpoint *endpoint = data;
-+
-+	if (endpoint->sep)
-+		avdtp_unregister_sep(endpoint->sep);
-+
-+	if (endpoint->caps)
-+		preset_free(endpoint->caps);
-+
-+	g_slist_free_full(endpoint->presets, preset_free);
-+
-+	g_free(endpoint);
-+}
-+
- static void a2dp_device_free(struct a2dp_device *dev)
- {
- 	if (dev->session)
-@@ -354,10 +391,129 @@ static sdp_record_t *a2dp_record(void)
- 	return record;
- }
- 
-+static gboolean sep_getcap_ind(struct avdtp *session,
-+					struct avdtp_local_sep *sep,
-+					GSList **caps, uint8_t *err,
-+					void *user_data)
-+{
-+	struct a2dp_endpoint *endpoint = user_data;
-+	struct a2dp_preset *cap = endpoint->caps;
-+	struct avdtp_service_capability *service;
-+	struct avdtp_media_codec_capability *codec;
-+
-+	*caps = NULL;
-+
-+	service = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT, NULL, 0);
-+	*caps = g_slist_append(*caps, service);
-+
-+	codec = g_malloc0(sizeof(*codec) + sizeof(cap->len));
-+	codec->media_type = AVDTP_MEDIA_TYPE_AUDIO;
-+	codec->media_codec_type = endpoint->codec;
-+	memcpy(codec->data, cap->data, cap->len);
-+
-+	service = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, codec,
-+						sizeof(*codec) + cap->len);
-+	*caps = g_slist_append(*caps, service);
-+	g_free(codec);
-+
-+	return TRUE;
-+}
-+
-+static struct avdtp_sep_ind sep_ind = {
-+	.get_capability		= sep_getcap_ind,
-+};
-+
-+static uint8_t register_endpoint(const uint8_t *uuid, uint8_t codec,
-+							GSList *presets)
-+{
-+	struct a2dp_endpoint *endpoint;
-+
-+	/* FIXME: Add proper check for uuid */
-+
-+	endpoint = g_new0(struct a2dp_endpoint, 1);
-+	endpoint->id = g_slist_length(endpoints) + 1;
-+	endpoint->codec = codec;
-+	endpoint->sep = avdtp_register_sep(AVDTP_SEP_TYPE_SOURCE,
-+						AVDTP_MEDIA_TYPE_AUDIO,
-+						codec, FALSE, &sep_ind, NULL,
-+						endpoint);
-+	endpoint->caps = presets->data;
-+	endpoint->presets = g_slist_copy(g_slist_nth(presets, 1));
-+
-+	endpoints = g_slist_append(endpoints, endpoint);
-+
-+	return endpoint->id;
-+}
-+
-+static GSList *parse_presets(const struct audio_preset *p, uint8_t count,
-+								uint16_t len)
-+{
-+	GSList *l = NULL;
-+	uint8_t i;
-+
-+	for (i = 0; count > i; i++) {
-+		const uint8_t *ptr = (const uint8_t *) p;
-+		struct a2dp_preset *preset;
-+
-+		if (len < sizeof(struct audio_preset)) {
-+			DBG("Invalid preset index %u", i);
-+			g_slist_free_full(l, preset_free);
-+			return NULL;
-+		}
-+
-+		len -= sizeof(struct audio_preset);
-+		if (len == 0 || len < p->len) {
-+			DBG("Invalid preset size of %u for index %u", len, i);
-+			g_slist_free_full(l, preset_free);
-+			return NULL;
-+		}
-+
-+		preset = g_new0(struct a2dp_preset, 1);
-+		preset->len = p->len;
-+		preset->data = g_memdup(p->data, preset->len);
-+		l = g_slist_append(l, preset);
-+
-+		len -= preset->len;
-+		ptr += sizeof(*p) + preset->len;
-+		p = (const struct audio_preset *) ptr;
-+	}
-+
-+	return l;
-+}
-+
- static void bt_audio_open(const void *buf, uint16_t len)
- {
--	DBG("Not Implemented");
-+	const struct audio_cmd_open *cmd = buf;
-+	struct audio_rsp_open rsp;
-+	GSList *presets;
- 
-+	DBG("");
-+
-+	if (cmd->presets == 0) {
-+		error("No audio presets found");
-+		goto failed;
-+	}
-+
-+	presets = parse_presets(cmd->preset, cmd->presets, len - sizeof(*cmd));
-+	if (!presets) {
-+		error("No audio presets found");
-+		goto failed;
-+	}
-+
-+	rsp.id = register_endpoint(cmd->uuid, cmd->codec, presets);
-+	if (rsp.id == 0) {
-+		g_slist_free_full(presets, preset_free);
-+		error("Unable to register endpoint");
-+		goto failed;
-+	}
-+
-+	g_slist_free(presets);
-+
-+	audio_ipc_send_rsp_full(AUDIO_OP_OPEN, sizeof(rsp), &rsp, -1);
-+
-+	return;
-+
-+failed:
- 	audio_ipc_send_rsp(AUDIO_OP_OPEN, AUDIO_STATUS_FAILED);
- }
- 
-@@ -471,6 +627,9 @@ void bt_a2dp_unregister(void)
- {
- 	DBG("");
- 
-+	g_slist_free_full(endpoints, unregister_endpoint);
-+	endpoints = NULL;
-+
- 	g_slist_foreach(devices, a2dp_device_disconnected, NULL);
- 	devices = NULL;
- 
+Either this or the mount point gets overwritten/wiped on every boot...
+
+
+
 -- 
-1.8.4.2
-
+Luiz Augusto von Dentz
