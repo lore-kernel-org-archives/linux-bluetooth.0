@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v4 4/6] audio/A2DP: Add implemention of audio Close Stream command
-Date: Mon, 13 Jan 2014 14:10:02 +0200
-Message-Id: <1389615004-32612-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [BlueZ v4 5/6] audio/A2DP: Add implemention of audio Resume Stream command
+Date: Mon, 13 Jan 2014 14:10:03 +0200
+Message-Id: <1389615004-32612-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1389615004-32612-1-git-send-email-luiz.dentz@gmail.com>
 References: <1389615004-32612-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,38 +16,38 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
  1 file changed, 22 insertions(+), 1 deletion(-)
 
 diff --git a/android/a2dp.c b/android/a2dp.c
-index b26d727..ece5e47 100644
+index ece5e47..fee8b81 100644
 --- a/android/a2dp.c
 +++ b/android/a2dp.c
-@@ -752,8 +752,29 @@ static void bt_stream_open(const void *buf, uint16_t len)
+@@ -780,8 +780,29 @@ failed:
  
- static void bt_stream_close(const void *buf, uint16_t len)
+ static void bt_stream_resume(const void *buf, uint16_t len)
  {
 -	DBG("Not Implemented");
-+	const struct audio_cmd_close_stream *cmd = buf;
++	const struct audio_cmd_resume_stream *cmd = buf;
 +	struct a2dp_setup *setup;
 +	int err;
- 
-+	DBG("");
 +
++	DBG("");
+ 
 +	setup = find_setup(cmd->id);
 +	if (!setup) {
 +		error("Unable to find stream for endpoint %u", cmd->id);
 +		goto failed;
 +	}
 +
-+	err = avdtp_close(setup->dev->session, setup->stream, FALSE);
++	err = avdtp_start(setup->dev->session, setup->stream);
 +	if (err < 0) {
-+		error("avdtp_close: %s", strerror(-err));
++		error("avdtp_start: %s", strerror(-err));
 +		goto failed;
 +	}
 +
-+	audio_ipc_send_rsp(AUDIO_OP_CLOSE_STREAM, AUDIO_STATUS_SUCCESS);
++	audio_ipc_send_rsp(AUDIO_OP_RESUME_STREAM, AUDIO_STATUS_SUCCESS);
 +
 +	return;
 +
 +failed:
- 	audio_ipc_send_rsp(AUDIO_OP_CLOSE_STREAM, AUDIO_STATUS_FAILED);
+ 	audio_ipc_send_rsp(AUDIO_OP_RESUME_STREAM, AUDIO_STATUS_FAILED);
  }
  
 -- 
