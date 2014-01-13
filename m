@@ -1,287 +1,214 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v2 3/6] audio/A2DP: Add implemention of audio Open Stream command
-Date: Mon, 13 Jan 2014 09:52:02 +0200
-Message-Id: <1389599525-6353-3-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1389599525-6353-1-git-send-email-luiz.dentz@gmail.com>
-References: <1389599525-6353-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [BlueZ v2 1/6] audio/A2DP: Add implemention of audio Open command
+Date: Mon, 13 Jan 2014 09:52:00 +0200
+Message-Id: <1389599525-6353-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/a2dp.c | 203 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 200 insertions(+), 3 deletions(-)
+ android/a2dp.c | 159 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 158 insertions(+), 1 deletion(-)
 
 diff --git a/android/a2dp.c b/android/a2dp.c
-index 82f9b4f..af7a131 100644
+index b59c53d..970e2dc 100644
 --- a/android/a2dp.c
 +++ b/android/a2dp.c
-@@ -37,6 +37,7 @@
- #include "lib/bluetooth.h"
- #include "lib/sdp.h"
- #include "lib/sdp_lib.h"
-+#include "profiles/audio/a2dp-codecs.h"
- #include "log.h"
- #include "a2dp.h"
- #include "hal-msg.h"
-@@ -53,6 +54,7 @@
+@@ -52,9 +52,23 @@
+ 
  static GIOChannel *server = NULL;
  static GSList *devices = NULL;
- static GSList *endpoints = NULL;
-+static GSList *setups = NULL;
++static GSList *endpoints = NULL;
  static bdaddr_t adapter_addr;
  static uint32_t record_id = 0;
  
-@@ -67,6 +69,7 @@ struct a2dp_endpoint {
- 	struct avdtp_local_sep *sep;
- 	struct a2dp_preset *caps;
- 	GSList *presets;
-+	struct a2dp_config *config;
- };
- 
- struct a2dp_device {
-@@ -76,6 +79,13 @@ struct a2dp_device {
- 	struct avdtp	*session;
- };
- 
-+struct a2dp_setup {
-+	struct a2dp_device *dev;
-+	struct a2dp_endpoint *endpoint;
-+	struct a2dp_preset *preset;
-+	struct avdtp_stream *stream;
++struct a2dp_preset {
++	void *data;
++	int8_t len;
 +};
 +
- static int device_cmp(gconstpointer s, gconstpointer user_data)
- {
- 	const struct a2dp_device *dev = s;
-@@ -397,7 +407,7 @@ static gboolean sep_getcap_ind(struct avdtp *session,
- 					void *user_data)
- {
- 	struct a2dp_endpoint *endpoint = user_data;
--	struct a2dp_preset *cap = endpoint->presets->data;
-+	struct a2dp_preset *cap = endpoint->caps;
- 	struct avdtp_service_capability *service;
- 	struct avdtp_media_codec_capability *codec;
- 
-@@ -419,8 +429,162 @@ static gboolean sep_getcap_ind(struct avdtp *session,
- 	return TRUE;
++struct a2dp_endpoint {
++	uint8_t id;
++	uint8_t codec;
++	struct avdtp_local_sep *sep;
++	struct a2dp_preset *caps;
++	GSList *presets;
++};
++
+ struct a2dp_device {
+ 	bdaddr_t	dst;
+ 	uint8_t		state;
+@@ -70,6 +84,29 @@ static int device_cmp(gconstpointer s, gconstpointer user_data)
+ 	return bacmp(&dev->dst, dst);
  }
  
-+static int sbc_check_config(struct a2dp_endpoint *endpoint,
-+						struct a2dp_preset *conf)
++static void preset_free(void *data)
 +{
-+	a2dp_sbc_t *caps, *config;
++	struct a2dp_preset *preset = data;
 +
-+	if (conf->len != sizeof(a2dp_sbc_t)) {
-+		error("SBC: Invalid configuration size (%u)", conf->len);
-+		return -EINVAL;
-+	}
-+
-+	caps = endpoint->caps->data;
-+	config = conf->data;
-+
-+	if (!(caps->frequency & config->frequency)) {
-+		error("SBC: Unsupported frequency (%u) by endpoint",
-+							config->frequency);
-+		return -EINVAL;
-+	}
-+
-+	if (!(caps->channel_mode & config->channel_mode)) {
-+		error("SBC: Unsupported channel mode (%u) by endpoint",
-+							config->channel_mode);
-+		return -EINVAL;
-+	}
-+
-+	if (!(caps->block_length & config->block_length)) {
-+		error("SBC: Unsupported block length (%u) by endpoint",
-+							config->block_length);
-+		return -EINVAL;
-+	}
-+
-+	if (!(caps->allocation_method & config->allocation_method)) {
-+		error("SBC: Unsupported allocation method (%u) by endpoint",
-+							config->block_length);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
++	g_free(preset->data);
++	g_free(preset);
 +}
 +
-+static int check_config(struct a2dp_endpoint *endpoint,
-+						struct a2dp_preset *config)
++static void unregister_endpoint(void *data)
 +{
-+	GSList *l;
++	struct a2dp_endpoint *endpoint = data;
 +
-+	for (l = endpoint->presets; l; l = g_slist_next(l)) {
-+		struct a2dp_preset *preset = l->data;
++	if (endpoint->sep)
++		avdtp_unregister_sep(endpoint->sep);
 +
-+		if (preset->len != config->len)
-+			continue;
++	if (endpoint->caps)
++		preset_free(endpoint->caps);
 +
-+		if (memcmp(preset->data, config->data, preset->len) == 0)
-+			return 0;
-+	}
++	g_slist_free_full(endpoint->presets, preset_free);
 +
-+	/* Codec specific */
-+	switch (endpoint->codec) {
-+	case A2DP_CODEC_SBC:
-+		return sbc_check_config(endpoint, config);
-+	default:
-+		return -EINVAL;
-+	}
++	g_free(endpoint);
 +}
 +
-+static struct a2dp_device *find_device_by_session(struct avdtp *session)
-+{
-+	GSList *l;
-+
-+	for (l = devices; l; l = g_slist_next(l)) {
-+		struct a2dp_device *dev = l->data;
-+
-+		if (dev->session == session)
-+			return dev;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void setup_free(void *data)
-+{
-+	struct a2dp_setup *setup = data;
-+
-+	preset_free(setup->preset);
-+	g_free(setup);
-+}
-+
-+static void setup_add(struct a2dp_device *dev, struct a2dp_endpoint *endpoint,
-+			struct a2dp_preset *preset, struct avdtp_stream *stream)
-+{
-+	struct a2dp_setup *setup;
-+
-+	setup = g_new0(struct a2dp_setup, 1);
-+	setup->dev = dev;
-+	setup->endpoint = endpoint;
-+	setup->preset = preset;
-+	setup->stream = stream;
-+	setups = g_slist_append(setups, setup);
-+}
-+
-+static gboolean sep_setconf_ind(struct avdtp *session,
-+						struct avdtp_local_sep *sep,
-+						struct avdtp_stream *stream,
-+						GSList *caps,
-+						avdtp_set_configuration_cb cb,
-+						void *user_data)
+ static void a2dp_device_free(struct a2dp_device *dev)
+ {
+ 	if (dev->session)
+@@ -354,10 +391,127 @@ static sdp_record_t *a2dp_record(void)
+ 	return record;
+ }
+ 
++static gboolean sep_getcap_ind(struct avdtp *session,
++					struct avdtp_local_sep *sep,
++					GSList **caps, uint8_t *err,
++					void *user_data)
 +{
 +	struct a2dp_endpoint *endpoint = user_data;
-+	struct a2dp_device *dev;
-+	struct a2dp_preset *preset = NULL;
++	struct a2dp_preset *cap = endpoint->presets->data;
++	struct avdtp_service_capability *service;
++	struct avdtp_media_codec_capability *codec;
 +
-+	DBG("");
++	*caps = NULL;
 +
-+	dev = find_device_by_session(session);
-+	if (!dev) {
-+		error("Unable to find device for session %p", session);
-+		return FALSE;
-+	}
++	service = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT, NULL, 0);
++	*caps = g_slist_append(*caps, service);
 +
-+	for (; caps != NULL; caps = g_slist_next(caps)) {
-+		struct avdtp_service_capability *cap = caps->data;
-+		struct avdtp_media_codec_capability *codec;
++	codec = g_malloc0(sizeof(*codec) + sizeof(cap->len));
++	codec->media_type = AVDTP_MEDIA_TYPE_AUDIO;
++	codec->media_codec_type = endpoint->codec;
++	memcpy(codec->data, cap->data, cap->len);
 +
-+		if (cap->category == AVDTP_DELAY_REPORTING)
-+			return FALSE;
-+
-+		if (cap->category != AVDTP_MEDIA_CODEC)
-+			continue;
-+
-+		codec = (struct avdtp_media_codec_capability *) cap->data;
-+
-+		if (codec->media_codec_type != endpoint->codec)
-+			return FALSE;
-+
-+		preset = g_new0(struct a2dp_preset, 1);
-+		preset->len = cap->length - sizeof(*codec);
-+		preset->data = g_memdup(codec->data, preset->len);
-+
-+		if (check_config(endpoint, preset) < 0) {
-+			preset_free(preset);
-+			return FALSE;
-+		}
-+	}
-+
-+	if (!preset)
-+		return FALSE;
-+
-+	setup_add(dev, endpoint, preset, stream);
-+
-+	cb(session, stream, NULL);
++	service = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, codec,
++						sizeof(*codec) + cap->len);
++	*caps = g_slist_append(*caps, service);
++	g_free(codec);
 +
 +	return TRUE;
 +}
 +
- static struct avdtp_sep_ind sep_ind = {
- 	.get_capability		= sep_getcap_ind,
-+	.set_configuration	= sep_setconf_ind,
- };
- 
- static uint8_t register_endpoint(const uint8_t *uuid, uint8_t codec,
-@@ -548,11 +712,41 @@ static void bt_audio_close(const void *buf, uint16_t len)
- 	audio_ipc_send_rsp(AUDIO_OP_CLOSE, AUDIO_STATUS_SUCCESS);
- }
- 
-+static struct a2dp_setup *find_setup(uint8_t id)
++static struct avdtp_sep_ind sep_ind = {
++	.get_capability		= sep_getcap_ind,
++};
++
++static uint8_t register_endpoint(const uint8_t *uuid, uint8_t codec,
++							GSList *presets)
 +{
-+	GSList *l;
++	struct a2dp_endpoint *endpoint;
 +
-+	for (l = setups; l; l = g_slist_next(l)) {
-+		struct a2dp_setup *setup = l->data;
++	/* FIXME: Add proper check for uuid */
 +
-+		if (setup->endpoint->id == id)
-+			return setup;
-+	}
++	endpoint = g_new0(struct a2dp_endpoint, 1);
++	endpoint->id = g_slist_length(endpoints) + 1;
++	endpoint->codec = codec;
++	endpoint->sep = avdtp_register_sep(AVDTP_SEP_TYPE_SOURCE,
++						AVDTP_MEDIA_TYPE_AUDIO,
++						codec, FALSE, &sep_ind, NULL,
++						endpoint);
++	endpoint->caps = g_slist_nth_data(presets->data, 0);
++	endpoint->presets = g_slist_copy(g_slist_nth(presets, 1));
 +
-+	return NULL;
++	endpoints = g_slist_append(endpoints, endpoint);
++
++	return endpoint->id;
 +}
 +
- static void bt_stream_open(const void *buf, uint16_t len)
- {
--	DBG("Not Implemented");
-+	const struct audio_cmd_open_stream *cmd = buf;
-+	struct audio_rsp_open_stream *rsp;
-+	struct a2dp_setup *setup;
++static GSList *parse_presets(const struct audio_preset *p, uint8_t count,
++								uint16_t len)
++{
++	GSList *l = NULL;
++	uint8_t i;
 +
-+	DBG("");
- 
--	audio_ipc_send_rsp(AUDIO_OP_OPEN_STREAM, AUDIO_STATUS_FAILED);
-+	setup = find_setup(cmd->id);
-+	if (!setup) {
-+		error("Unable to find stream for endpoint %u", cmd->id);
-+		audio_ipc_send_rsp(AUDIO_OP_OPEN_STREAM, AUDIO_STATUS_FAILED);
-+		return;
++	for (i = 0; count > i; i++) {
++		struct a2dp_preset *preset;
++
++		if (len < sizeof(struct audio_preset)) {
++			DBG("Invalid preset index %u", i);
++			g_slist_free_full(l, preset_free);
++			return NULL;
++		}
++
++		len -= sizeof(struct audio_preset);
++		if (len == 0 || len < p->len) {
++			DBG("Invalid preset size of %u for index %u", len, i);
++			g_slist_free_full(l, preset_free);
++			return NULL;
++		}
++
++		preset = g_new0(struct a2dp_preset, 1);
++		preset->len = p->len;
++		preset->data = g_memdup(p->data, preset->len);
++		l = g_slist_append(l, preset);
++
++		len -= preset->len;
++		p += sizeof(struct audio_preset) + preset->len;
 +	}
 +
-+	len = sizeof(*rsp) + setup->preset->len;
-+	rsp = g_malloc0(sizeof(*rsp) + setup->preset->len);
-+	rsp->preset->len = setup->preset->len;
-+	memcpy(rsp->preset->data, setup->preset->data, setup->preset->len);
++	return l;
++}
 +
-+	audio_ipc_send_rsp_full(AUDIO_OP_OPEN_STREAM, len, rsp, -1);
+ static void bt_audio_open(const void *buf, uint16_t len)
+ {
+-	DBG("Not Implemented");
++	const struct audio_cmd_open *cmd = buf;
++	struct audio_rsp_open rsp;
++	GSList *presets;
+ 
++	DBG("");
++
++	if (cmd->presets == 0) {
++		error("No audio presets found");
++		goto failed;
++	}
++
++	presets = parse_presets(cmd->preset, cmd->presets, len - sizeof(*cmd));
++	if (!presets) {
++		error("No audio presets found");
++		goto failed;
++	}
++
++	rsp.id = register_endpoint(cmd->uuid, cmd->codec, presets);
++	if (rsp.id == 0) {
++		g_slist_free_full(presets, preset_free);
++		error("Unable to register endpoint");
++		goto failed;
++	}
++
++	g_slist_free(presets);
++
++	audio_ipc_send_rsp_full(AUDIO_OP_OPEN, sizeof(rsp), &rsp, -1);
++
++	return;
++
++failed:
+ 	audio_ipc_send_rsp(AUDIO_OP_OPEN, AUDIO_STATUS_FAILED);
  }
  
- static void bt_stream_close(const void *buf, uint16_t len)
-@@ -651,6 +845,9 @@ void bt_a2dp_unregister(void)
+@@ -471,6 +625,9 @@ void bt_a2dp_unregister(void)
  {
  	DBG("");
  
-+	g_slist_free_full(setups, setup_free);
-+	setups = NULL;
++	g_slist_free_full(endpoints, unregister_endpoint);
++	endpoints = NULL;
 +
- 	g_slist_free_full(endpoints, unregister_endpoint);
- 	endpoints = NULL;
+ 	g_slist_foreach(devices, a2dp_device_disconnected, NULL);
+ 	devices = NULL;
  
 -- 
 1.8.4.2
