@@ -1,23 +1,21 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
 In-Reply-To: <1389435216-29040-3-git-send-email-luiz.dentz@gmail.com>
-References: <1389435216-29040-1-git-send-email-luiz.dentz@gmail.com>
-	<1389435216-29040-3-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 13 Jan 2014 01:10:01 +0100
-Message-ID: <CAN_7+YbqjZ7=hRjED10mDJuGnhy8pD45iuf9SWFqGM_3N=hVDg@mail.gmail.com>
+References: <1389435216-29040-1-git-send-email-luiz.dentz@gmail.com> <1389435216-29040-3-git-send-email-luiz.dentz@gmail.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Date: Mon, 13 Jan 2014 01:02:28 +0100
+Message-ID: <CAF3PWx2CnwjPe3oS--7jg4bsoyYth_kHY2_1WFFSPMJ3b4rnnQ@mail.gmail.com>
 Subject: Re: [PATCH BlueZ 3/6] audio/A2DP: Add implemention of audio Open
  Stream command
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-On Sat, Jan 11, 2014 at 11:13 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On 11 January 2014 11:13, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
 > ---
@@ -33,12 +31,6 @@ On Sat, Jan 11, 2014 at 11:13 AM, Luiz Augusto von Dentz
 >  #include "lib/sdp.h"
 >  #include "lib/sdp_lib.h"
 > +#include "profiles/audio/a2dp-codecs.h"
-
-We need to discuss how we gonna use structs from this file in
-hal-audio (eg. a2dp_sbc_t). Maybe we should have some special file
-with audio structs/defines for IPC only? Then you could copy data to
-structs you need.
-
 >  #include "log.h"
 >  #include "a2dp.h"
 >  #include "hal-msg.h"
@@ -225,79 +217,10 @@ structs you need.
 > +       setup_add(dev, endpoint, preset, stream);
 > +
 > +       return TRUE;
-> +}
-> +
->  static struct avdtp_sep_ind sep_ind = {
->         .get_capability         = sep_getcap_ind,
-> +       .set_configuration      = sep_setconf_ind,
->  };
->
->  static uint8_t register_endpoint(const uint8_t *uuid, uint8_t codec,
-> @@ -548,11 +710,41 @@ static void bt_audio_close(const void *buf, uint16_t len)
->         audio_ipc_send_rsp(AUDIO_OP_CLOSE, HAL_STATUS_SUCCESS);
->  }
->
-> +static struct a2dp_setup *find_setup(uint8_t id)
-> +{
-> +       GSList *l;
-> +
-> +       for (l = setups; l; l = g_slist_next(l)) {
-> +               struct a2dp_setup *setup = l->data;
-> +
-> +               if (setup->endpoint->id == id)
-> +                       return setup;
-> +       }
-> +
-> +       return NULL;
-> +}
-> +
->  static void bt_stream_open(const void *buf, uint16_t len)
->  {
-> -       DBG("Not Implemented");
-> +       const struct audio_cmd_open_stream *cmd = buf;
-> +       struct audio_rsp_open_stream *rsp;
-> +       struct a2dp_setup *setup;
-> +
-> +       DBG("");
->
-> -       audio_ipc_send_rsp(AUDIO_OP_OPEN_STREAM, AUDIO_STATUS_FAILED);
-> +       setup = find_setup(cmd->id);
-> +       if (!setup) {
-> +               error("Unable to find stream for endpoint %u", cmd->id);
-> +               audio_ipc_send_rsp(AUDIO_OP_OPEN_STREAM, HAL_STATUS_FAILED);
 
-Use AUDIO_STATUS_FAILED
+I guess there should be call to avdtp_set_configuration_cb somewhere
+in this function?
 
-> +               return;
-> +       }
-> +
-> +       len = sizeof(*rsp) + setup->preset->len;
-> +       rsp = g_malloc0(sizeof(*rsp) + setup->preset->len);
-> +       rsp->preset->len = setup->preset->len;
-> +       memcpy(rsp->preset->data, setup->preset->data, setup->preset->len);
-> +
-> +       audio_ipc_send_rsp_full(AUDIO_OP_OPEN_STREAM, len, rsp, -1);
->  }
->
->  static void bt_stream_close(const void *buf, uint16_t len)
-> @@ -651,6 +843,9 @@ void bt_a2dp_unregister(void)
->  {
->         DBG("");
->
-> +       g_slist_free_full(setups, setup_free);
-> +       setups = NULL;
-> +
->         g_slist_free_full(endpoints, unregister_endpoint);
->         endpoints = NULL;
->
-> --
-> 1.8.4.2
->
 
-BR
-Lukasz
-
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+BR,
+Andrzej
