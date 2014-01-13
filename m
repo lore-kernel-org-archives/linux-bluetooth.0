@@ -1,48 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAN_7+YbqjZ7=hRjED10mDJuGnhy8pD45iuf9SWFqGM_3N=hVDg@mail.gmail.com>
-References: <1389435216-29040-1-git-send-email-luiz.dentz@gmail.com>
-	<1389435216-29040-3-git-send-email-luiz.dentz@gmail.com>
-	<CAN_7+YbqjZ7=hRjED10mDJuGnhy8pD45iuf9SWFqGM_3N=hVDg@mail.gmail.com>
-Date: Mon, 13 Jan 2014 09:55:11 +0200
-Message-ID: <CABBYNZ+pfaxs8=0eO6w7e3DRmCGyA2wLJpANscCMpLgXOAo_7A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 3/6] audio/A2DP: Add implemention of audio Open
- Stream command
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Subject: [BlueZ v2 6/6] audio/A2DP: Add implemention of audio Suspend Stream command
+Date: Mon, 13 Jan 2014 09:52:05 +0200
+Message-Id: <1389599525-6353-6-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1389599525-6353-1-git-send-email-luiz.dentz@gmail.com>
+References: <1389599525-6353-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Jan 13, 2014 at 2:10 AM, Lukasz Rymanowski
-<lukasz.rymanowski@gmail.com> wrote:
-> Hi Luiz,
->
-> On Sat, Jan 11, 2014 at 11:13 AM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> ---
->>  android/a2dp.c | 199 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->>  1 file changed, 197 insertions(+), 2 deletions(-)
->>
->> diff --git a/android/a2dp.c b/android/a2dp.c
->> index 8649cf3..479cb71 100644
->> --- a/android/a2dp.c
->> +++ b/android/a2dp.c
->> @@ -37,6 +37,7 @@
->>  #include "lib/bluetooth.h"
->>  #include "lib/sdp.h"
->>  #include "lib/sdp_lib.h"
->> +#include "profiles/audio/a2dp-codecs.h"
->
-> We need to discuss how we gonna use structs from this file in
-> hal-audio (eg. a2dp_sbc_t). Maybe we should have some special file
-> with audio structs/defines for IPC only? Then you could copy data to
-> structs you need.
+---
+ android/a2dp.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
-Not sure what you mean about this header, its LGPL already so I see no
-problem of including it in hal-audio.
+diff --git a/android/a2dp.c b/android/a2dp.c
+index 0598d4d..9061984 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -807,8 +807,29 @@ failed:
+ 
+ static void bt_stream_suspend(const void *buf, uint16_t len)
+ {
+-	DBG("Not Implemented");
++	const struct audio_cmd_suspend_stream *cmd = buf;
++	struct a2dp_setup *setup;
++	int err;
++
++	DBG("");
++
++	setup = find_setup(cmd->id);
++	if (!setup) {
++		error("Unable to find stream for endpoint %u", cmd->id);
++		goto failed;
++	}
++
++	err = avdtp_suspend(setup->dev->session, setup->stream);
++	if (err < 0) {
++		error("avdtp_suspend: %s", strerror(-err));
++		goto failed;
++	}
+ 
++	audio_ipc_send_rsp(AUDIO_OP_SUSPEND_STREAM, AUDIO_STATUS_SUCCESS);
++
++	return;
++
++failed:
+ 	audio_ipc_send_rsp(AUDIO_OP_SUSPEND_STREAM, AUDIO_STATUS_FAILED);
+ }
+ 
+-- 
+1.8.4.2
+
