@@ -1,69 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/2] tools: Fix build error in seq2bseq
-Date: Mon, 13 Jan 2014 09:09:13 +0100
-Message-Id: <1389600554-20669-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CAN_7+YbqjZ7=hRjED10mDJuGnhy8pD45iuf9SWFqGM_3N=hVDg@mail.gmail.com>
+References: <1389435216-29040-1-git-send-email-luiz.dentz@gmail.com>
+	<1389435216-29040-3-git-send-email-luiz.dentz@gmail.com>
+	<CAN_7+YbqjZ7=hRjED10mDJuGnhy8pD45iuf9SWFqGM_3N=hVDg@mail.gmail.com>
+Date: Mon, 13 Jan 2014 09:55:11 +0200
+Message-ID: <CABBYNZ+pfaxs8=0eO6w7e3DRmCGyA2wLJpANscCMpLgXOAo_7A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/6] audio/A2DP: Add implemention of audio Open
+ Stream command
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Don't ignore return value of write. This fix following build error on
-Ubuntu:
+Hi Lukasz,
 
-tools/seq2bseq.c: In function ‘convert_line’:
-tools/seq2bseq.c:52:8: error: ignoring return value of ‘write’,
-     declared with attribute warn_unused_result [-Werror=unused-result]
-   write(fd, &val, 1);
----
- tools/seq2bseq.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+On Mon, Jan 13, 2014 at 2:10 AM, Lukasz Rymanowski
+<lukasz.rymanowski@gmail.com> wrote:
+> Hi Luiz,
+>
+> On Sat, Jan 11, 2014 at 11:13 AM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> ---
+>>  android/a2dp.c | 199 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>  1 file changed, 197 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/android/a2dp.c b/android/a2dp.c
+>> index 8649cf3..479cb71 100644
+>> --- a/android/a2dp.c
+>> +++ b/android/a2dp.c
+>> @@ -37,6 +37,7 @@
+>>  #include "lib/bluetooth.h"
+>>  #include "lib/sdp.h"
+>>  #include "lib/sdp_lib.h"
+>> +#include "profiles/audio/a2dp-codecs.h"
+>
+> We need to discuss how we gonna use structs from this file in
+> hal-audio (eg. a2dp_sbc_t). Maybe we should have some special file
+> with audio structs/defines for IPC only? Then you could copy data to
+> structs you need.
 
-diff --git a/tools/seq2bseq.c b/tools/seq2bseq.c
-index 6d70777..9797f5f 100644
---- a/tools/seq2bseq.c
-+++ b/tools/seq2bseq.c
-@@ -31,16 +31,17 @@
- #include <string.h>
- #include <stdlib.h>
- #include <getopt.h>
-+#include <errno.h>
- #include <sys/stat.h>
- 
--static void convert_line(int fd, const char *line)
-+static int convert_line(int fd, const char *line)
- {
- 	const char *ptr = line;
- 	char str[3];
- 	unsigned char val;
- 
- 	if (line[0] == '*' || line[0] == '\r' || line[0] == '\r')
--		return;
-+		return 0;
- 
- 	while (1) {
- 		str[0] = *ptr++;
-@@ -49,7 +50,8 @@ static void convert_line(int fd, const char *line)
- 
- 		val = strtol(str, NULL, 16);
- 
--		write(fd, &val, 1);
-+		if (write(fd, &val, 1) < 0)
-+			return -errno;
- 
- 		if (*ptr == '\r' || *ptr == '\n')
- 			break;
-@@ -57,6 +59,8 @@ static void convert_line(int fd, const char *line)
- 		while (*ptr == ' ')
- 			ptr++;
- 	}
-+
-+	return 0;
- }
- 
- static void convert_file(const char *input_path, const char *output_path)
--- 
-1.8.3.2
-
+Not sure what you mean about this header, its LGPL already so I see no
+problem of including it in hal-audio.
