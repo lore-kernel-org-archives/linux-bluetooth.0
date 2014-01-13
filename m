@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v2 2/6] audio/A2DP: Add implemention of audio Close command
-Date: Mon, 13 Jan 2014 09:52:01 +0200
-Message-Id: <1389599525-6353-2-git-send-email-luiz.dentz@gmail.com>
+Subject: [BlueZ v2 4/6] audio/A2DP: Add implemention of audio Close Stream command
+Date: Mon, 13 Jan 2014 09:52:03 +0200
+Message-Id: <1389599525-6353-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1389599525-6353-1-git-send-email-luiz.dentz@gmail.com>
 References: <1389599525-6353-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,53 +12,44 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/a2dp.c | 30 ++++++++++++++++++++++++++++--
- 1 file changed, 28 insertions(+), 2 deletions(-)
+ android/a2dp.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
 diff --git a/android/a2dp.c b/android/a2dp.c
-index 970e2dc..82f9b4f 100644
+index af7a131..48ca00b 100644
 --- a/android/a2dp.c
 +++ b/android/a2dp.c
-@@ -515,11 +515,37 @@ failed:
- 	audio_ipc_send_rsp(AUDIO_OP_OPEN, AUDIO_STATUS_FAILED);
- }
+@@ -751,8 +751,29 @@ static void bt_stream_open(const void *buf, uint16_t len)
  
-+static struct a2dp_endpoint *find_endpoint(uint8_t id)
-+{
-+	GSList *l;
-+
-+	for (l = endpoints; l; l = g_slist_next(l)) {
-+		struct a2dp_endpoint *endpoint = l->data;
-+
-+		if (endpoint->id == id)
-+			return endpoint;
-+	}
-+
-+	return NULL;
-+}
-+
- static void bt_audio_close(const void *buf, uint16_t len)
+ static void bt_stream_close(const void *buf, uint16_t len)
  {
 -	DBG("Not Implemented");
-+	const struct audio_cmd_close *cmd = buf;
-+	struct a2dp_endpoint *endpoint;
-+
++	const struct audio_cmd_close_stream *cmd = buf;
++	struct a2dp_setup *setup;
++	int err;
+ 
 +	DBG("");
 +
-+	endpoint = find_endpoint(cmd->id);
-+	if (!endpoint) {
-+		error("Unable to find endpoint %u", cmd->id);
-+		audio_ipc_send_rsp(AUDIO_OP_CLOSE, AUDIO_STATUS_FAILED);
-+		return;
++	setup = find_setup(cmd->id);
++	if (!setup) {
++		error("Unable to find stream for endpoint %u", cmd->id);
++		goto failed;
 +	}
 +
-+	unregister_endpoint(endpoint);
- 
--	audio_ipc_send_rsp(AUDIO_OP_CLOSE, HAL_STATUS_FAILED);
-+	audio_ipc_send_rsp(AUDIO_OP_CLOSE, AUDIO_STATUS_SUCCESS);
++	err = avdtp_close(setup->dev->session, setup->stream, FALSE);
++	if (err < 0) {
++		error("avdtp_close: %s", strerror(-err));
++		goto failed;
++	}
++
++	audio_ipc_send_rsp(AUDIO_OP_CLOSE_STREAM, AUDIO_STATUS_SUCCESS);
++
++	return;
++
++failed:
+ 	audio_ipc_send_rsp(AUDIO_OP_CLOSE_STREAM, AUDIO_STATUS_FAILED);
  }
  
- static void bt_stream_open(const void *buf, uint16_t len)
 -- 
 1.8.4.2
 
