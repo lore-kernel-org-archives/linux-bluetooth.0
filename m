@@ -1,49 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android/pan: Generate file path in compile time
-Date: Mon, 13 Jan 2014 10:08:20 +0100
-Message-Id: <1389604100-26189-1-git-send-email-szymon.janc@tieto.com>
+Date: Mon, 13 Jan 2014 10:48:45 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] tools: Fix build error in seq2bseq
+Message-ID: <20140113084845.GE27885@x220.p-661hnu-f1>
+References: <1389600554-20669-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1389600554-20669-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This reduce need of using snprintf function and removes need of manual
-buffer size calculation.
----
- android/pan.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+Hi Szymon,
 
-diff --git a/android/pan.c b/android/pan.c
-index 205da71..dfd7762 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -50,9 +50,9 @@
- #include "bluetooth.h"
- 
- #define SVC_HINT_NETWORKING 0x02
--#define BNEP_BRIDGE	"bnep"
--#define FORWARD_DELAY_PATH	"/sys/class/net/%s/bridge/forward_delay"
--#define DELAY_PATH_MAX	41
-+
-+#define BNEP_BRIDGE "bnep"
-+#define FORWARD_DELAY_PATH "/sys/class/net/"BNEP_BRIDGE"/bridge/forward_delay"
- 
- static bdaddr_t adapter_addr;
- GSList *devices = NULL;
-@@ -470,11 +470,8 @@ failed:
- static int set_forward_delay(void)
- {
- 	int fd, ret;
--	char path[DELAY_PATH_MAX];
--
--	snprintf(path, sizeof(path), FORWARD_DELAY_PATH, BNEP_BRIDGE);
- 
--	fd = open(path, O_RDWR);
-+	fd = open(FORWARD_DELAY_PATH, O_RDWR);
- 	if (fd < 0)
- 		return -errno;
- 
--- 
-1.8.3.2
+On Mon, Jan 13, 2014, Szymon Janc wrote:
+> Don't ignore return value of write. This fix following build error on
+> Ubuntu:
+> 
+> tools/seq2bseq.c: In function ‘convert_line’:
+> tools/seq2bseq.c:52:8: error: ignoring return value of ‘write’,
+>      declared with attribute warn_unused_result [-Werror=unused-result]
+>    write(fd, &val, 1);
+> ---
+>  tools/seq2bseq.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
 
+Both patches have been applied. Thanks.
+
+Johan
